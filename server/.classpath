@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="**/.svn/**" kind="src" path="src"/>
-	<classpathentry excluding="**/.svn/**|com/wireless/protocol/ReqCancelOrder.java|com/wireless/protocol/ReqInsertOrder.java|com/wireless/protocol/ReqOTAUpdate.java|com/wireless/protocol/ReqOrderPackage.java|com/wireless/protocol/ReqPayOrder.java|com/wireless/protocol/ReqPing.java|com/wireless/protocol/ReqQueryMenu.java|com/wireless/protocol/ReqQueryOrder.java|com/wireless/protocol/ReqQueryOrder2.java|com/wireless/protocol/ReqQueryRestaurant.java" kind="src" path="protocol"/>
+	<classpathentry excluding="**/.svn/" kind="src" path="src"/>
+	<classpathentry excluding="**/.svn/|com/wireless/protocol/ReqCancelOrder.java|com/wireless/protocol/ReqInsertOrder.java|com/wireless/protocol/ReqOTAUpdate.java|com/wireless/protocol/ReqOrderPackage.java|com/wireless/protocol/ReqPayOrder.java|com/wireless/protocol/ReqPing.java|com/wireless/protocol/ReqQueryMenu.java|com/wireless/protocol/ReqQueryOrder.java|com/wireless/protocol/ReqQueryOrder2.java|com/wireless/protocol/ReqQueryRestaurant.java" kind="src" path="protocol"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="lib" path="mysql-connector-java-5.1.13/mysql-connector-java-5.1.13-bin.jar" sourcepath="mysql-connector-java-5.1.13/src"/>
 	<classpathentry kind="output" path="bin"/>
