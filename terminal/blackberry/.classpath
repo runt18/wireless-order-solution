@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry excluding="com/wireless/protocol/RespACK.java|com/wireless/protocol/RespNAK.java|com/wireless/protocol/RespPackage.java|com/wireless/protocol/RespQueryMenu.java|com/wireless/protocol/RespQueryOrder.java|com/wireless/protocol/RespQueryRestaurant.java|com/wireless/protocol/RespPrinterLogin.java|com/wireless/protocol/ReqPrintOrder.java|com/wireless/protocol/ReqPrintPackage.java|com/wireless/protocol/RespOTAUpdate.java" kind="src" path="protocol"/>
+	<classpathentry excluding=".svn/*" kind="src" path="src"/>
+	<classpathentry excluding=".svn/*|com/wireless/protocol/ReqPrintOrder.java|com/wireless/protocol/ReqPrintPackage.java|com/wireless/protocol/RespACK.java|com/wireless/protocol/RespNAK.java|com/wireless/protocol/RespOTAUpdate.java|com/wireless/protocol/RespPackage.java|com/wireless/protocol/RespPrinterLogin.java|com/wireless/protocol/RespQueryMenu.java|com/wireless/protocol/RespQueryOrder.java|com/wireless/protocol/RespQueryRestaurant.java" kind="src" path="protocol"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/net.rim.ejde.BlackBerryVMInstallType/BlackBerry JRE 5.0.0"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
