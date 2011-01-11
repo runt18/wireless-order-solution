@@ -1,0 +1,56 @@
+/******************** (C) COPYRIGHT SierraAtlantic*****************************
+* Author                : Ying.Zhang
+* Create Date        : 28/10/2010
+* Description         : The release note of db design and scripts for wireless order project
+*******************************************************************************/
+
+/******************************************************************************************************
+Release v1.0.2 <xx/xx/2010> 
+<General Info>
+1 - Release on xx/xx/2010
+2 - Source code is tagged as "Tag_1_0_2" in SA's CVS
+<Issues>
+1 - add "restaurant_info" field to "restaurant" table
+2 - make the restaurant id (1 ¡« 10) reserved
+3 - add 8 db fields
+     ¢Ùrestaurant.total_income
+     ¢Úfood.order_count
+     ¢Ûterminal.entry_date
+     ¢Üterminal.idle_date
+     ¢Ýterminal.discard_date
+     ¢Þterminal.work_date
+     ¢ßterminal.idle_duration
+     ¢àterminal..work_duration
+ 4 - add the field "owner_name" for table "terminal" in script "crearte_demo_restaurant.sql"
+ 5 - add the unique index restriction to "restaurant"."account"
+ 6 - add the field "kitchen" for table "food" in script "create_db.sql"
+ 7 - add the field "waiter" for table "order" in script "create_db.sql"
+******************************************************************************************************/
+
+/******************************************************************************************************
+Release v1.0.1 <30/11/2010> 
+<General Info>
+1 - Release on 30/11/2010
+2 - Source code is tagged as "Tag_1_0_1" in SA's CVS
+<Issues>
+1 - add four db fields.
+     ¢Ùfood.enabled
+     ¢Útable.enabled
+     ¢Ûorder_food.unit_price
+     ¢Üorder_food.name
+2 - change to use MD5 to encrypt the account's password
+******************************************************************************************************/
+
+/******************************************************************************************************
+Release v1.0.0 <28/10/2010> 
+<General Info>
+1 - Release on 28/10/2010
+2 - Source code is tagged as "Tag_1_0_0" in SA's CVS
+<Issues>
+1 - the first release of the db design and scripts, it contains stuff below.
+     ¢ÙWirelessOrderDB.mwb - the db design files of mysql work-bench
+     ¢Úscripts\create_account.sql - the sql script to create the db account
+     ¢Ûscripts\create_db.sql - the sql script to create the db
+     ¢Üscripts\create_demo_restaurant.sql - the db script to create the demo restaurant data
+     ¢Ýscripts\erase_demo_restaurant.sql - the db script to erase the demo restaurant data
+******************************************************************************************************/

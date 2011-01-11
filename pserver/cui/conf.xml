@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<conf>
+	<remote ip="127.0.0.1" port="44444" account="demo" pwd="demo@123"/>
+	<printer name="Zonerich AB-58MK USB"  func="1"  desc="中崎热敏打印机"/>
+    <printer name="Zonerich AB-58MK USB"  func="2"  desc="中崎热敏打印机"/>
+    <printer name="Zonerich AB-58MK USB"  func="3"  desc="中崎热敏打印机"/>
+</conf>

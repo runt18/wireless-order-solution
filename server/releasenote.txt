@@ -1,0 +1,49 @@
+/******************** (C) COPYRIGHT SierraAtlantic*****************************
+* Author                : Ying.Zhang
+* Create Date        : 28/10/2010
+* Description         : The release note of server socket for wireless order project
+*******************************************************************************/
+
+/******************************************************************************************************
+Release v0.9.2 <xx/xx/2010> 
+<General Info>
+1 - Release on xx/xx/2010
+2 - Source code of socket is tagged as "Tag_0_9_2" in SA's CVS
+3 - Source code of protocol is tagged as "STag_0_9_2" in SA' CVS
+4 - Build under Eclipse
+<Issues>
+1 - add to handle the request of retrieving restaurant info
+2 - add to accumulate the total income of the restaurant after paying order
+3 - add to accumulate each food's order count after paying order
+4 - add to support multi print template
+5 - add the owner name in response to query restaurant info
+6 - add to support the multi kitchen print for order detail
+******************************************************************************************************/
+
+/******************************************************************************************************
+Release v0.9.1 <30/11/2010> 
+<General Info>
+1 - Release on 30/11/2010
+2 - Source code of socket is tagged as "Tag_0_9_1" in SA's CVS
+3 - Source code of protocol is tagged as "STag_0_9_1" in SA' CVS
+4 - Build under Eclipse
+<Issues>
+1 - change to add other info (like name, unit price) while performing insert and update order
+2 - add to check if the food exist or not before inserting and updating order
+3 - add to check if the table exist or not before inserting and updating order
+4 - add an error code for "food menu expired"
+5 - fix the issue of encoding for print function under Unbuntu
+6 - add the amount of restaurant to the monitor report
+7 - add to handle the printer OTA reqeust
+******************************************************************************************************/
+
+/******************************************************************************************************
+Release v0.9.0 <28/10/2010> 
+<General Info>
+1 - Release on 28/10/2010
+2 - Source code of socket is tagged as "Tag_0_9_0" in SA's CVS
+3 - Source code of protocol is tagged as "STag_0_9_0" in SA' CVS
+4 - Build under Eclipse
+<Issues>
+1 - the first release of the wireless order server socket
+******************************************************************************************************/

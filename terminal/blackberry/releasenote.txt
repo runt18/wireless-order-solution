@@ -1,0 +1,44 @@
+/******************** (C) COPYRIGHT Digi-e Co.,Ltd*****************************
+* Author                : Ying.Zhang
+* Create Date        : 28/10/2010
+* Description         : The release note of terminal for wireless order project
+*******************************************************************************/
+
+/******************************************************************************************************
+Release v0.9.2 <xx/xx/2010> 
+<General Info>
+1 - Release on xx/xx/2010
+2 - Source code of socket is tagged as "Tag_0_9_2" in SA's CVS
+3 - Source code of protocol is tagged as "TTag_0_9_2" in SA' CVS
+4 - Build under Eclipse
+<Issues>
+1 - add to show the restaurant info in main screen
+2 - add the "About" screen
+3 - add the owner name in main screen
+******************************************************************************************************/
+
+/******************************************************************************************************
+Release v0.9.1 <30/11/2010> 
+<General Info>
+1 - Release on 30/11/2010
+2 - Source code of socket is tagged as "Tag_0_9_1" in SA's CVS
+3 - Source code of protocol is tagged as "TTag_0_9_1" in SA' CVS
+4 - Build under Eclipse
+<Issues>
+1 - add "¸üÐÂ²ËÆ×" in menu for main screen
+2 - add to prompt a msg to user when inserting or updating the order if the table doesn't exist 
+3 - add to prompt a msg to user when inserting or updating the order if the food doesn't exist
+4 - extend the width of price field to fit the dispiplay
+5 - add the desktop icon 
+******************************************************************************************************/
+
+/******************************************************************************************************
+Release v0.9.0 <28/10/2010> 
+<General Info>
+1 - Release on 28/10/2010
+2 - Source code of socket is tagged as "Tag_0_9_0" in SA's CVS
+3 - Source code of protocol is tagged as "TTag_0_9_0" in SA' CVS
+4 - Build under Eclipse
+<Issues>
+1 - the first release of the terminal cod for blackberry
+******************************************************************************************************/
