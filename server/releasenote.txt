@@ -5,11 +5,11 @@
 *******************************************************************************/
 
 /******************************************************************************************************
-Release v0.9.2 <xx/xx/2010> 
+Release v0.9.2 <12/01/2011> 
 <General Info>
-1 - Release on xx/xx/2010
-2 - Source code of socket is tagged as "Tag_0_9_2" in SA's CVS
-3 - Source code of protocol is tagged as "STag_0_9_2" in SA' CVS
+1 - Release on 12/01/2011
+2 - Source code of socket is tagged as 1.0.0" in Google Code's SVN
+3 - Source code of protocol is tagged as "1.0.0" in Google Code's SVN
 4 - Build under Eclipse
 <Issues>
 1 - add to handle the request of retrieving restaurant info
