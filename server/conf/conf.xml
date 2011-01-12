@@ -19,14 +19,17 @@
 	<!-- the template to print order -->
 	<print_template func="1">		
 		<file style="1" path="ptemp/order"/><!-- 58mm -->
+		<file style="2" path="ptemp/order"/><!-- 80mm -->
 	</print_template>
 	<!-- the template to print order detail -->
 	<print_template func="2">
 		<file style="1" path="ptemp/order_detail"/><!-- 58mm -->
+		<file style="2" path="ptemp/order_detail"/><!-- 80mm -->
 	</print_template>
 	<!-- the template to print receipt -->
 	<print_template func="3">
 		<file style="1" path="ptemp/receipt"/><!-- 58mm -->
+		<file style="2" path="ptemp/receipt"/><!-- 80mm -->
 	</print_template>
 	<!-- the parameter to thread pool -->
 	<cool_pool_size>100</cool_pool_size>
