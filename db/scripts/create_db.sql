@@ -68,7 +68,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`table` (
     REFERENCES `wireless_order_db`.`restaurant` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = InnoDB;
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
