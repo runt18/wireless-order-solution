@@ -7,6 +7,7 @@ IF EXIST dist rmdir /s/q dist > nul
 
 Rem copy the db files
 IF EXIST db\scripts GOTO db_exist
+IF NOT EXIST db goto db_file
 :db_exist
 	@echo copying the db script files...
 	@xcopy /s/y db\scripts dist\db\scripts\ > nul
@@ -15,7 +16,6 @@ IF EXIST db\scripts GOTO db_exist
 
 	GOTO www_files
 
-IF NOT EXIST db goto db_file
 db_not_exist:
 	@echo the db files missing
 	@pause
@@ -25,6 +25,7 @@ db_not_exist:
 Rem copy the www files
 :www_files
 IF EXIST www GOTO www_exist
+IF NOT EXIST www GOTO www_not_exist
 :www_exist
 	@echo copying the index.php...
 	@xcopy /s/y www\index.php dist\www\ > nul
@@ -36,7 +37,6 @@ IF EXIST www GOTO www_exist
 
 	GOTO cod_files
 
-IF NOT EXIST www GOTO www_not_exist
 www_not_exist:
 	@echo the www files missing
 	@pause
@@ -45,6 +45,7 @@ www_not_exist:
 Rem copy the terminal cod files
 :cod_files
 IF EXIST terminal\blackberry\deliverables\Web\5.0.0\WirelessOrderTerminal.cod GOTO cod_exist
+IF NOT EXIST terminal\blackberry\deliverables\Web\5.0.0\WirelessOrderTerminal.cod GOTO cod_not_exist
 :cod_exist
 	@echo copying the terminal cod files...
 	IF NOT EXIST dist\www\ota mkdir dist\www\ota
@@ -56,8 +57,7 @@ IF EXIST terminal\blackberry\deliverables\Web\5.0.0\WirelessOrderTerminal.cod GO
 	@copy terminal\blackberry\releasenote.txt dist\www\ota\ > nul
 	GOTO help_files
 
-IF NOT EXIST terminal\blackberry\deliverables\Web\5.0.0\WirelessOrderTerminal.cod GOTO cod_not_exist
-cod_not_exist:
+:cod_not_exist
 	@echo the terminal cod file missing
 	@pause
 	GOTO end
@@ -65,12 +65,12 @@ cod_not_exist:
 Rem copy the terminal help files
 :help_files
 IF EXIST terminal\blackberry\help GOTO help_exist
+IF NOT EXIST terminal\blackberry\help GOTO help_not_exist
 :help_exist
 	@echo copying the terminal help files...
 	@xcopy /s/y terminal\blackberry\help dist\www\help\ > nul
 	GOTO pserver_files
 
-IF NOT EXIST terminal\blackberry\help GOTO help_not_exist
 help_not_exist:
 	@echo the terminal help files missing
 	@pause
@@ -78,14 +78,15 @@ help_not_exist:
 
 :pserver_files
 IF EXIST pserver\setup_nsis\pserver.exe GOTO pserver_exist
+IF NOT EXIST pserver\setup_nsis\pserver.exe GOTO pserver_not_exist
 :pserver_exist
 	@echo copying the pserver setup program...
 	IF NOT EXIST dist\www\pserver mkdir dist\www\pserver
 	@copy pserver\setup_nsis\pserver.exe dist\www\pserver\ > nul
+	@copy pserver\setup_nsis\version.php dist\www\pserver\ > nul
 	@copy pserver\releasenote.txt dist\www\pserver\ > nul
 	GOTO socket_jar
 
-IF NOT EXIST pserver\setup_nsis\pserver.exe GOTO pserver_not_exist
 :pserver_not_exist
 	@echo the pserver setup program missing
 	@pause
@@ -93,6 +94,7 @@ IF NOT EXIST pserver\setup_nsis\pserver.exe GOTO pserver_not_exist
 
 :socket_jar
 IF EXIST server\deliverables\wireless_order_socket.jar GOTO socket_exist
+IF NOT EXIST server\deliverables\wireless_order_socket.jar GOTO socket_not_exist
 :socket_exist
 	@echo copying the wireless order socket jar file...
 	IF NOT EXIST dist\socket mkdir dist\socket
@@ -101,7 +103,6 @@ IF EXIST server\deliverables\wireless_order_socket.jar GOTO socket_exist
 	@copy server\releasenote.txt dist\socket > nul
 	GOTO socket_scripts
 
-IF NOT EXIST server\deliverables\wireless_order_socket.jar GOTO socket_not_exist
 :socket_not_exist
 	@echo the wireless order socket missing
 	@pause
@@ -109,13 +110,13 @@ IF NOT EXIST server\deliverables\wireless_order_socket.jar GOTO socket_not_exist
 
 :socket_scripts
 IF EXIST server\scripts GOTO sscripts_exist
+IF NOT EXIST server\scripts GOTO sscripts_not_exist
 :sscripts_exist
 	@echo copying the socket scripts...
 	IF NOT EXIST dist\socket\scripts mkdir dist\socket\scripts
 	@copy server\scripts\*.* dist\socket\scripts > nul
 	GOTO ptemp_files
 
-IF NOT EXIST server\scripts GOTO sscripts_not_exist
 :sscripts_not_exist
 	@echo the socket scripts missing
 	@pause
@@ -123,13 +124,13 @@ IF NOT EXIST server\scripts GOTO sscripts_not_exist
 
 :ptemp_files
 IF EXIST server\ptemp GOTO ptemp_exist
+IF NOT EXIST server\ptemp GOTO ptemp_not_exist
 :ptemp_exist
 	@echo copying the socket print templates...
 	IF NOT EXIST dist\socket\ptemp mkdir dist\socket\ptemp
 	@copy server\ptemp\*.* dist\socket\ptemp > nul
 	GOTO end
 
-IF NOT EXIST server\ptemp GOTO ptemp_not_exist
 :ptemp_not_exist
 	@echo the socket print templates missing
 	@pause
