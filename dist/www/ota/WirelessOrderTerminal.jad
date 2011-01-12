@@ -1,0 +1,20 @@
+Manifest-Version: 1.0
+MIDlet-Version: 0.9.2
+MIDlet-Jar-Size: 211980
+MicroEdition-Configuration: CLDC-1.1
+MIDlet-Jar-URL: WirelessOrderTerminal.jar
+RIM-COD-Module-Dependencies: net_rim_cldc,net_rim_bbapi_browser,net_rim_bb_browser_field_api,net_rim_os
+RIM-COD-URL-1: WirelessOrderTerminal-1.cod
+RIM-COD-SHA1-1: c3 d6 27 b6 5a f0 15 60 6c 37 d7 57 85 0d 5c c4 8e 0a 83 27
+RIM-MIDlet-Flags-1: 0
+RIM-COD-Size-1: 13856
+RIM-COD-Module-Name: WirelessOrderTerminal
+MIDlet-Name: WirelessOrderTerminal
+RIM-COD-Size: 57468
+RIM-COD-Creation-Time: 1294739120
+MIDlet-1: e??,res/Stardock_PocketBlinds_Rollover.png,
+RIM-COD-URL: WirelessOrderTerminal.cod
+MIDlet-Description: Smart & Easy Wireless Order System
+RIM-COD-SHA1: bb ab 76 d0 5a 97 5f 96 47 b4 ce 7d cb bb 30 dc c5 f2 1a fa
+MicroEdition-Profile: MIDP-2.0
+MIDlet-Vendor: Digi-e Co.,Ltd
