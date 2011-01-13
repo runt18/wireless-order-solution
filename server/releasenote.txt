@@ -1,8 +1,19 @@
-/******************** (C) COPYRIGHT SierraAtlantic*****************************
+/******************** (C) COPYRIGHT Digi-e Co.,Ltd*****************************
 * Author                : Ying.Zhang
 * Create Date        : 28/10/2010
 * Description         : The release note of server socket for wireless order project
 *******************************************************************************/
+
+/******************************************************************************************************
+Release v0.9.3 <xx/xx/2011> 
+<General Info>
+1 - Release on xx/xx/2011
+2 - Source code of socket is tagged as 1.0.1" in Google Code's SVN
+3 - Source code of protocol is tagged as "1.0.1" in Google Code's SVN
+4 - Build under Eclipse
+<Issues>
+1 - fix the issue that throw a null pointer exception if the terminal is expired
+******************************************************************************************************/
 
 /******************************************************************************************************
 Release v0.9.2 <12/01/2011> 
