@@ -82,7 +82,8 @@ class OrderHandler extends Handler implements Runnable{
 
 			while(_rs.next()){
 				_restaurantID = _rs.getInt("restaurant_id");
-				_expiredTimeMillis = _rs.getDate("expire_date").getTime();
+				Date expiredDate = _rs.getDate("expire_date");
+				_expiredTimeMillis = expiredDate != null ? expiredDate.getTime() : 0;
 				_owner = _rs.getString("owner_name");
 			}   
 			//in the case the terminal is not associated with any valid restaurant,
