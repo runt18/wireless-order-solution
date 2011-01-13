@@ -30,6 +30,9 @@ IF NOT EXIST www GOTO www_not_exist
 	@echo copying the index.php...
 	@xcopy /s/y www\index.php dist\www\ > nul
 	
+	@echo copying the favicon...
+	@xcopy /s/y www\images\favicon.ico dist\www\ > nul
+
 	@echo copying the www files...
 	@xcopy /s/y www dist\www\digi-e\ > nul
 	@copy www\releasenote.txt dist\www\digi-e\ > nul
