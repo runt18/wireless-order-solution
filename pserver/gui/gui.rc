@@ -86,6 +86,8 @@ BEGIN
     END
     POPUP "帮助(&H)"
     BEGIN
+        MENUITEM "在线帮助(&H)\tCtrl+H",            ID_ONLINE_HELP
+        MENUITEM SEPARATOR
         MENUITEM "检查更新(&C)\tCtrl+C",            ID_CHK_UPDATE
         MENUITEM SEPARATOR
         MENUITEM "关于Digi-e打印服务 (&A)\tCtrl+A",   ID_APP_ABOUT
@@ -207,7 +209,7 @@ BEGIN
     LTEXT           "描述",IDC_STATIC,29,102,17,8
     COMBOBOX        IDC_COMBO1,55,31,116,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO2,55,56,54,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "",IDC_RICHEDIT21,"RichEdit20W",ES_AUTOHSCROLL | WS_BORDER | WS_TABSTOP,54,102,118,36
+    CONTROL         "",IDC_RICHEDIT21,"RichEdit20W",WS_BORDER | WS_TABSTOP | 0x80,54,102,118,36
     LTEXT           "类型",IDC_STATIC,30,82,17,8
     COMBOBOX        IDC_COMBO3,54,80,56,14,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO4,120,56,51,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
@@ -537,9 +539,9 @@ BEGIN
     "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)\r\n"
     "LANGUAGE 4, 2\r\n"
     "#pragma code_page(936)\r\n"
-    "#include ""res\\gui.rc2""  // 非 Microsoft Visual C++ 编辑的资源\r\n"
-    "#include ""l.CHS\\afxres.rc""          // 标准组件\r\n"
-    "#include ""l.CHS\\afxprint.rc""        // 打印/打印预览资源\r\n"
+    "#include ""res\\gui.rc2""  // ? Microsoft Visual C++ ?????\r\n"
+    "#include ""l.CHS\\afxres.rc""          // ????\r\n"
+    "#include ""l.CHS\\afxprint.rc""        // ??/??????\r\n"
     "#endif\r\n"
     "\0"
 END

@@ -92,6 +92,7 @@ private:
 
 public:
 	afx_msg void OnChkUpdate();
+	afx_msg void OnHelpOnline();
 };
 
 

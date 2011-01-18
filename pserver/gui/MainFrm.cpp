@@ -56,6 +56,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(ID_AUTO_UPDATE, &CMainFrame::OnUpdateAutoChkUpdate)
 	ON_COMMAND(ID_AUTO_UPDATE, &CMainFrame::OnAutoUpdate)
 	ON_COMMAND(ID_CHK_UPDATE, &CMainFrame::OnChkUpdate)
+	ON_COMMAND(ID_ONLINE_HELP, &CMainFrame::OnHelpOnline)
+	
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -635,4 +637,58 @@ void CMainFrame::OnAutoUpdate(){
 void CMainFrame::OnChkUpdate(){
 	CChkUpdateDlg* pChkUpdateDlg = new CChkUpdateDlg(this, this);
 	pChkUpdateDlg->ShowWindow(SW_HIDE);
+}
+
+void CMainFrame::OnHelpOnline(){
+	CString str = _T("HTTP\\shell\\open\\command");//注册表路径，默认浏览器的保存位置  
+	//打开注册表
+	HKEY hRegKey;
+	if(RegOpenKeyEx(HKEY_CLASSES_ROOT, str, 0, KEY_ALL_ACCESS, &hRegKey) != ERROR_SUCCESS)    
+	{   
+		//打开不成功就返回
+		return;   
+	} 
+
+	DWORD m_dwCount = 0;
+	LONG iRet = RegQueryValueEx(hRegKey, NULL, 0, NULL, NULL, &m_dwCount);
+	if(SUCCEEDED(iRet)){
+		//allocate the memory to hold the default browser
+		boost::shared_ptr<BYTE> pBrowser(new BYTE[m_dwCount], boost::checked_array_deleter<BYTE>());
+		LONG iRet = RegQueryValueEx(hRegKey, NULL, 0, NULL, pBrowser.get(), &m_dwCount);
+		if(SUCCEEDED(iRet)){
+			CString cmdBrowser;
+			cmdBrowser.Format(_T("%s"), pBrowser.get());
+			cmdBrowser.Replace(_T("\""), _T(""));
+			cmdBrowser.Replace(_T("%1"), _T(""));
+
+			//get the path of the gui.exe
+			ifstream fin(_Conf_Path_);
+			if(fin.good()){
+				TiXmlDocument confDoc;
+				fin >> confDoc;
+				fin.close();
+				//get the remote IP address, 
+				TiXmlElement* pRemote = TiXmlHandle(&confDoc).FirstChildElement(ConfTags::CONF_ROOT).FirstChildElement(ConfTags::REMOTE).Element();
+				if(pRemote){
+					//get the IP address
+					string ip_addr = pRemote->Attribute(ConfTags::REMOTE_IP);
+					if(!ip_addr.empty()){
+						CString url;
+						url.Format(_T("http://%s:10080/pserver/help.html"), CString(ip_addr.c_str()));
+						ShellExecute(NULL, _T("open"), cmdBrowser, url, NULL, SW_MAX);
+					}else{
+						MessageBox(_T("无法打开在线帮助文档"));
+					}
+				}else{
+					MessageBox(_T("无法打开在线帮助文档"));
+				}
+			}else{
+				MessageBox(_T("无法打开在线帮助文档"));
+			}
+		}else{
+			MessageBox(_T("无法打开在线帮助文档"));
+		}
+	}else{
+		MessageBox(_T("无法打开在线帮助文档"));
+	}
 }
