@@ -84,7 +84,7 @@ if($editType == "setOwner")
            		if($diff <= 15)
            			{
            			$background = "style='background-color:yellow'";
-           			$toolTip=" title='距离有效期还有" .round($diff)."天'";
+           			$toolTip=" title='距离有效期还有" .ceil($diff)."天'";
 						}
            	}
            	$bh=$bh+1;

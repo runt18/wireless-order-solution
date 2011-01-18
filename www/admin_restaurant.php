@@ -151,12 +151,13 @@ else if($editType == "deleteRestaurant")
 				<th><h3>帐户名</h3></th>
 				<th><h3>餐厅名</h3></th>
 				<th><h3>帐单有效期</h3></th>
-				<th><h3>操作</h3></th>				
+				<th><h3>餐厅信息</h3></th>			
+				<th><h3>操作</h3></th>						
 			</tr>
 		</thead>
 		<tbody>
            <?php 
-           
+				
            include("conn.php"); 		 		
            $xm=$_REQUEST["keyword_type"];        
            $kw=$_REQUEST["keyword"]; 	
@@ -188,12 +189,16 @@ else if($editType == "deleteRestaurant")
            	if($row["record_alive"] !=0)
            	{
            		$record_alive = ($row["record_alive"]/24/3600)."天";
-           	}
+           	}			
+			$r_info = $row["restaurant_info"];
+			$r_info_subject = str_replace("\n","<br />",str_replace("\r\n","<br />",cut_str($row["restaurant_info"],12)));			
+			
            	echo "<tr>";
            	echo "<td>" .$row["id"] ."</td>";
            	echo "<td>" .$row["account"] ."</td>";
            	echo "<td>" .$row["restaurant_name"] ."</td>";
            	echo "<td>" .$record_alive ."</td>";
+			echo "<td title='".$r_info."'>" .$r_info_subject."</td>";
            	echo "<td>".
            		"<a href='#' onclick='viewRestaurant(&quot;".$row["id"]."&quot;,&quot;".$row["account"]."&quot;,&quot;".$row["restaurant_name"]."&quot;,&quot;".($row["record_alive"]/24/3600)."&quot;,&quot;".$row["order_num"]."&quot;,&quot;".$row["terminal_num"]."&quot;,&quot;".$row["food_num"]."&quot;,&quot;".$row["table_num"]."&quot;,&quot;".$row["order_paid"]."&quot;,&quot;".$row["table_using"]."&quot;)'><img src='images/View.png'  height='16' width='14' border='0'/>&nbsp;查看</a>".
 				"&nbsp;&nbsp;&nbsp;&nbsp;" .
@@ -204,6 +209,42 @@ else if($editType == "deleteRestaurant")
            }
            //mysql_query("SET NAMES utf8"); 
            mysql_close($con);
+function cut_str($string, $sublen, $start = 0, $code = 'UTF-8') 
+{ 
+if($code == 'UTF-8') 
+{ 
+$pa = "/[\x01-\x7f]|[\xc2-\xdf][\x80-\xbf]|\xe0[\xa0-\xbf][\x80-\xbf]|[\xe1-\xef][\x80-\xbf][\x80-\xbf]|\xf0[\x90-\xbf][\x80-\xbf][\x80-\xbf]|[\xf1-\xf7][\x80-\xbf][\x80-\xbf][\x80-\xbf]/"; 
+preg_match_all($pa, $string, $t_string); 
+
+if(count($t_string[0]) - $start > $sublen) return join('', array_slice($t_string[0], $start, $sublen))."..."; 
+return join('', array_slice($t_string[0], $start, $sublen)); 
+} 
+else 
+{ 
+$start = $start*2; 
+$sublen = $sublen*2; 
+$strlen = strlen($string); 
+$tmpstr = ''; 
+
+for($i=0; $i< $strlen; $i++) 
+{ 
+if($i>=$start && $i< ($start+$sublen)) 
+{ 
+if(ord(substr($string, $i, 1))>129) 
+{ 
+$tmpstr.= substr($string, $i, 2); 
+} 
+else 
+{ 
+$tmpstr.= substr($string, $i, 1); 
+} 
+} 
+if(ord(substr($string, $i, 1))>129) $i++; 
+} 
+if(strlen($tmpstr)< $strlen ) $tmpstr.= "..."; 
+return $tmpstr; 
+} 
+} 
            ?>
 			
 		</tbody>
