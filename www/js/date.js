@@ -1,10 +1,12 @@
 var months = new Array("一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"); 
 var daysInMonth = new Array(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31); 
 var days = new Array("日","一", "二", "三", "四", "五", "六"); 
-var today; 
+var today;
 
-document.writeln("<div id='Calendar' style='position:absolute; z-index:65536; visibility: hidden; filter:\"progid:DXImageTransform.Microsoft.Shadow(direction=135,color=#999999,strength=3)\"'></div>");
-
+document.writeln("<div id='Calendar' onblur='HidCalendar()' style='position:absolute; z-index:65536; visibility: hidden; filter:\"progid:DXImageTransform.Microsoft.Shadow(direction=135,color=#999999,strength=3)\"'></div>");
+function HidCalendar() {
+    setTimeout("HiddenCalendar()", 160);
+}
 function getDays(month, year)
 { 
 //下面的这段代码是判断当前是否是闰年的 
@@ -166,6 +168,7 @@ DivContent+="</table></td></tr></table>";
 
 document.all.Calendar.innerHTML=DivContent;
 newCalendar();
+document.all.Calendar.focus();
 }
 
 function isDate(dateStr)
