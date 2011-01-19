@@ -1,11 +1,22 @@
 var months = new Array("一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"); 
 var daysInMonth = new Array(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31); 
-var days = new Array("日","一", "二", "三", "四", "五", "六"); 
+var days = new Array("日","一", "二", "三", "四", "五", "六");
 var today;
+var needHid = true;
 
-document.writeln("<div id='Calendar' onblur='HidCalendar()' style='position:absolute; z-index:65536; visibility: hidden; filter:\"progid:DXImageTransform.Microsoft.Shadow(direction=135,color=#999999,strength=3)\"'></div>");
+document.writeln("<div id='Calendar' onblur='HidCalendar()' onclick='SetNotHid()' style='position:absolute; z-index:65536; visibility: hidden; filter:\"progid:DXImageTransform.Microsoft.Shadow(direction=135,color=#999999,strength=3)\"'></div>");
 function HidCalendar() {
-    setTimeout("HiddenCalendar()", 160);
+    needHid = true;
+    setTimeout("HidCalendarAction()", 160);
+}
+function HidCalendarAction() {
+    if (needHid) {
+        HiddenCalendar();
+    }
+}
+function SetNotHid()
+{
+    needHid = false;
 }
 function getDays(month, year)
 { 
@@ -131,13 +142,13 @@ DivContent+="<tr>";
 DivContent+="<td style='border-bottom:1px solid #0066FF; background-color:#C7D8FA'>";
 
 //年
-DivContent+="<select name='Year' id='Year' onChange='newCalendar()' style='font-family:Verdana; font-size:12px'>";
-for (intLoop = thisyear - 35; intLoop < (thisyear + 10); intLoop++) 
+DivContent += "<select name='Year' id='Year' onChange='newCalendar()' onblur='HidCalendar()' style='font-family:Verdana; font-size:12px'>";
+for (intLoop = 2000; intLoop < (thisyear + 10); intLoop++) 
 DivContent+="<option value= " + intLoop + " " + (today.year == intLoop ? "Selected" : "") + ">" + intLoop + "</option>"; 
 DivContent+="</select>";
 
 //月
-DivContent+="<select name='Month' id='Month' onChange='newCalendar()' style='font-family:Verdana; font-size:12px'>";
+DivContent += "<select name='Month' id='Month' onChange='newCalendar()' onblur='HidCalendar()' style='font-family:Verdana; font-size:12px'>";
 for (intLoop = 0; intLoop < months.length; intLoop++) 
 DivContent+="<option value= " + (intLoop + 1) + " " + (today.month == intLoop ? "Selected" : "") + ">" + months[intLoop] + "</option>"; 
 DivContent+="</select>";

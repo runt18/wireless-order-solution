@@ -61,7 +61,7 @@ include("changePassword.php");
 				<th><h3>编&nbsp;号</h3></th>
 				<th><h3>内部编号</h3></th>
 				<th><h3>名&nbsp;称</h3></th>
-				<th><h3>单&nbsp;价</h3></th>
+				<th><h3>单价（￥）</h3></th>
 				<th><h3>厨&nbsp;房</h3></th>
 				<th><h3>餐&nbsp;厅</h3></th>
 			</tr>
@@ -169,7 +169,7 @@ include("changePassword.php");
 			echo "<td>" .$row["no"]."</td>";
 			echo "<td>" .$row["alias_id"] ."</td>";
 			echo "<td>" .$row["name"] ."</td>";
-			echo "<td>￥" .$row["unit_price"] ."</td>";
+			echo "<td>" .$row["unit_price"] ."</td>";
 			echo "<td>" .$kitchen[$row["kitchen"]] ."</td>";
 			echo "<td>"."<a href='#' onclick='viewRestaurant(&quot;".$row["id"]."&quot;,&quot;".$row["account"]."&quot;,&quot;".$row["restaurant_name"]."&quot;,&quot;".($row["record_alive"]/24/3600)."&quot;,&quot;".$row["order_num"]."&quot;,&quot;".$row["terminal_num"]."&quot;,&quot;".$row["food_num"]."&quot;,&quot;".$row["table_num"]."&quot;,&quot;".$row["order_paid"]."&quot;,&quot;".$row["table_using"]."&quot;)'>".
 				$row["restaurant_name"]."（".$row["id"]."）</a></td>";			

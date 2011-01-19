@@ -84,7 +84,7 @@ include("changePassword.php");
 				<th><h3>帐单号</h3></th>
 				<th><h3>台&nbsp;号</h3></th>
                 <th><h3>日&nbsp;期</h3></th>
-				<th><h3>金&nbsp;额</h3></th>
+				<th><h3>金额（￥）</h3></th>
 				<th><h3>操&nbsp;作</h3></th>
 			</tr>
 		</thead>
@@ -193,7 +193,7 @@ include("changePassword.php");
          	echo "<td>" .$row["id"] ."</td>";
          	echo "<td>" .$row["alias_id"] ."</td>";
          	echo "<td>" .$row["order_date"]. "</td>";
-         	echo "<td>￥" .$row["total_price"]."</td>";
+         	echo "<td>" .$row["total_price"]."</td>";
          	echo "<td><a href='#' onclick='showOrderDetail(&quot;".$row["id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["order_date"]."&quot;,&quot;".$row["total_price"]."&quot;,&quot;".$row["num"]."&quot;,&quot;".$row["foods"]."&quot;,&quot;".$row["is_paid"]."&quot;,&quot;".$row["waiter"]."&quot;)'><img src='images/View.png'  height='16' width='14' border='0'/>&nbsp;查看</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href='#' onclick='deleteOrder(&quot;$row[0]&quot;)'><img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;删除</a></td>";
          	echo "</tr>";
          }

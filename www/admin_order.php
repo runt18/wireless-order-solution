@@ -85,7 +85,7 @@ include("changePassword.php");
 				<th><h3>帐单号</h3></th>
 				<th><h3>台&nbsp;号</h3></th>
 				<th><h3>餐&nbsp;厅</h3></th>
-				<th><h3>金&nbsp;额</h3></th>
+				<th><h3>金额（￥）</h3></th>
                 <th><h3>日&nbsp;期</h3></th>				
 				<th><h3>操&nbsp;作</h3></th>
 			</tr>
@@ -203,7 +203,7 @@ include("changePassword.php");
          	echo "<td>".$row["table_id"] ."（".$row["alias_id"]."）</td>";
          	echo "<td>"."<a href='#' onclick='viewRestaurant(&quot;".$row["id"]."&quot;,&quot;".$row["account"]."&quot;,&quot;".$row["restaurant_name"]."&quot;,&quot;".($row["record_alive"]/24/3600)."&quot;,&quot;".$row["order_num"]."&quot;,&quot;".$row["terminal_num"]."&quot;,&quot;".$row["food_num"]."&quot;,&quot;".$row["table_num"]."&quot;,&quot;".$row["order_paid"]."&quot;,&quot;".$row["table_using"]."&quot;)'>".
          		$row["restaurant_name"]."（".$row["id"]."）</a></td>";	
-         	echo "<td>￥" .$row["total_price"]."</td>";
+         	echo "<td>" .$row["total_price"]."</td>";
          	echo "<td>" .$row["order_date"]. "</td>";         	
          	echo "<td><a href='#' onclick='showOrderDetail(&quot;".$row["order_id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["order_date"]."&quot;,&quot;".$row["total_price"]."&quot;,&quot;".$row["num"]."&quot;,&quot;".$row["foods"]."&quot;,&quot;".$row["is_paid"]."&quot;,&quot;".$row["waiter"]."&quot;)'><img src='images/View.png'  height='16' width='14' border='0'/>&nbsp;查看</a></td>";
          	echo "</tr>";

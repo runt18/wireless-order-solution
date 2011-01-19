@@ -195,7 +195,7 @@ if($deleteId != null)
 			<tr>
 				<th><h3>编&nbsp;号</h3></th>
 				<th><h3>名&nbsp;称</h3></th>
-				<th><h3>价&nbsp;格</h3></th>
+				<th><h3>价格（￥）</h3></th>
 				<th><h3>厨房打印</h3></th>
 				<th><h3>操&nbsp;作</h3></th>
 			</tr>
@@ -250,7 +250,7 @@ if($deleteId != null)
 			echo "<tr>";
 			echo "<td>" .$row["alias_id"] ."</td>";
 			echo "<td>" .$row["name"] ."</td>";
-			echo "<td>￥" .$row["unit_price"] ."</td>";
+			echo "<td>" .$row["unit_price"] ."</td>";
 			echo "<td>" .$kitchen[$row["kitchen"]] ."</td>";
 			echo "<td><a href='#' onclick='editFood(&quot;".$row["id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["name"]."&quot;,&quot;".$row["unit_price"]."&quot;,&quot;".$row["kitchen"].
 				"&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
