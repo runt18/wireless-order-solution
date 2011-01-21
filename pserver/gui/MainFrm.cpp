@@ -20,7 +20,7 @@ using namespace std;
 #endif
 
 //the string indicating the version of the program
-const TCHAR* _PROG_VER_ = _T("0.9.2");
+const TCHAR* _PROG_VER_ = _T("0.9.3");
 //the path to the conf.xml
 CString _Conf_Path_;
 //the path to new setup program
