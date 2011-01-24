@@ -107,8 +107,8 @@ function HiddenCalendar()
 document.all.Calendar.style.visibility='hidden';
 }
 
-function ShowCalendar(InputBox)
-{
+function ShowCalendar(InputBox) {
+needHid = false;
 var x,y,intLoop,intWeeks,intDays;
 var DivContent;
 var year,month,day;
