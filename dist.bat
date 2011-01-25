@@ -58,7 +58,7 @@ IF NOT EXIST terminal\blackberry\deliverables\Web\5.0.0\WirelessOrderTerminal.co
 	@copy terminal\blackberry\deliverables\Web\5.0.0\WirelessOrderTerminal.jar dist\www\ota\ > nul
 	@copy terminal\blackberry\version.php dist\www\ota\ > nul
 	@copy terminal\blackberry\releasenote.txt dist\www\ota\ > nul
-	GOTO help_files
+	GOTO terminal_help
 
 :cod_not_exist
 	@echo the terminal cod file missing
@@ -66,15 +66,15 @@ IF NOT EXIST terminal\blackberry\deliverables\Web\5.0.0\WirelessOrderTerminal.co
 	GOTO end
 
 Rem copy the terminal help files
-:help_files
-IF EXIST terminal\blackberry\help GOTO help_exist
-IF NOT EXIST terminal\blackberry\help GOTO help_not_exist
-:help_exist
+:terminal_help
+IF EXIST terminal\blackberry\help GOTO terminal_help_exist
+IF NOT EXIST terminal\blackberry\help GOTO terminal_help_not_exist
+:terminal_help_exist
 	@echo copying the terminal help files...
 	@xcopy /s/y terminal\blackberry\help dist\www\help\ > nul
 	GOTO pserver_files
 
-help_not_exist:
+terminal_help_not_exist:
 	@echo the terminal help files missing
 	@pause
 	GOTO end
@@ -88,6 +88,10 @@ IF NOT EXIST pserver\setup_nsis\pserver.exe GOTO pserver_not_exist
 	@copy pserver\setup_nsis\pserver.exe dist\www\pserver\ > nul
 	@copy pserver\setup_nsis\version.php dist\www\pserver\ > nul
 	@copy pserver\releasenote.txt dist\www\pserver\ > nul
+	@echo copying the pserver help files...
+	@copy pserver\setup_nsis\help.html dist\www\pserver\ > nul
+	IF NOT EXIST dist\www\pserver\images mkdir dist\www\pserver\images
+	@copy pserver\setup_nsis\images\*.* dist\www\pserver\images\ > nul
 	GOTO socket_jar
 
 :pserver_not_exist
