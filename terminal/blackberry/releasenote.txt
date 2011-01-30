@@ -13,7 +13,7 @@ Release v0.9.3 <xx/xx/2011>
 4 - Build under Eclipse
 <Issues>
 1 - add the function setting in the main screen
-2 - change the layout to network setting screen.
+2 - change the layout to network setting screen
 ******************************************************************************************************/
 
 
