@@ -13,6 +13,7 @@ Release v0.9.3 <xx/xx/2011>
 4 - Build under Eclipse
 <Issues>
 1 - fix the issue that throw a null pointer exception if the terminal is expired
+2 - add to support perform synchronious print action 
 ******************************************************************************************************/
 
 /******************************************************************************************************
