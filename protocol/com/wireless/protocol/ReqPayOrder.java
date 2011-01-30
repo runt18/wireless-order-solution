@@ -8,20 +8,20 @@ public class ReqPayOrder extends ReqOrderPackage{
 	* mode - ORDER_BUSSINESS
 	* type - CANCEL_ORDER
 	* seq - auto calculated and filled in
-	* reserved - 0x00
+	* reserved - PRINT_SYNC or PRINT_ASYNC
 	* pin[6] - auto calculated and filled in
 	* len[2] - 0x06, 0x00
 	* <Table>
 	* table[2] : total_price[4]
 	* table[2] - 2-byte indicates the table id
-	* tatal_price[4] - 4-byte indicates the total price
+	* total_price[4] - 4-byte indicates the total price
 	* 				   total_price[0] indicates the float part
 	* 				   total_price[1..3] indicates the fixed part
 	*******************************************************/
-	public ReqPayOrder(short tableID, int totalPrice){
+	public ReqPayOrder(short tableID, int totalPrice, byte printType){
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.PAY_ORDER;
-		header.reserved = 0;
+		header.reserved = printType;
 		header.length[0] = 0x06;
 		header.length[1] = 0x00;
 		body = new byte[6];

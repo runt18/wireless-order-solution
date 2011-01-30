@@ -41,9 +41,9 @@ public class ReqInsertOrder extends ReqOrderPackage {
 	 * @param reqOrder the order detail information
 	 * @param type indicates insert or update request
 	 */
-	public ReqInsertOrder(Order reqOrder, byte type){
-		makePackage(reqOrder, type, Reserved.DEFAULT_CONF);
-	}  
+	//public ReqInsertOrder(Order reqOrder, byte type){
+	//	makePackage(reqOrder, type, Reserved.DEFAULT_CONF);
+	//}  
 	
 	/**
 	 * Make the insert order request package with default request configuration
