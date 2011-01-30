@@ -419,6 +419,10 @@ class OrderHandler extends Handler implements Runnable{
 
 		//find the printer connection socket to the restaurant for this terminal
 		ArrayList<Socket> printerConn = WirelessSocketServer.printerConnections.get(new Integer(_restaurantID));
+		Socket[] connections = null;
+		if(printerConn != null){
+			connections = printerConn.toArray(new Socket[printerConn.size()]);			
+		}
 		//check whether the print request is synchronized or asynchronous
 		if((req.header.reserved & Reserved.PRINT_SYNC) != 0){
 			/**
@@ -426,26 +430,25 @@ class OrderHandler extends Handler implements Runnable{
 			 * the print request is done, and send the ACK or NAK to let the terminal know whether 
 			 * the print actions is successfully or not
 			 */
-			if(printerConn != null){
-				Iterator<Socket> iter = printerConn.iterator();
-				while(iter.hasNext()){
-					byte[] printFuncs = {Reserved.PRINT_ORDER, Reserved.PRINT_ORDER_DETAIL};
-					new PrintHandler(orderToInsert, iter.next(), printFuncs, _restaurantID, _owner).run2();
+			if(connections != null){
+				for(int i = 0; i < connections.length; i++){
+					try{
+						byte[] printFuncs = {Reserved.PRINT_ORDER, Reserved.PRINT_ORDER_DETAIL};
+						new PrintHandler(orderToInsert, connections[i], printFuncs, _restaurantID, _owner).run2();						
+					}catch(PrintSocketException e){}
 				}
-			}else{
-				throw new PrintLogicException("The printer server hasn't been registered to wireless order server.");
 			}
+			
 		}else{
 			/**
 			 * if the print request is asynchronous, then the insert order request return an ACK immediately,
 			 * regardless of the print request. In the mean time, the print request would be put to a 
 			 * new thread to run.
 			 */
-			if(printerConn != null){
-				Iterator<Socket> iter = printerConn.iterator();
-				while(iter.hasNext()){
+			if(connections != null){
+				for(int i = 0; i < connections.length; i++){
 					byte[] printFuncs = {Reserved.PRINT_ORDER, Reserved.PRINT_ORDER_DETAIL};
-					WirelessSocketServer.threadPool.execute(new PrintHandler(orderToInsert, iter.next(), printFuncs, _restaurantID, _owner));
+					WirelessSocketServer.threadPool.execute(new PrintHandler(orderToInsert, connections[i], printFuncs, _restaurantID, _owner));
 				}
 			}
 		}
@@ -648,6 +651,10 @@ class OrderHandler extends Handler implements Runnable{
 		
 		//find the printer connection socket to the restaurant for this terminal
 		ArrayList<Socket> printerConn = WirelessSocketServer.printerConnections.get(new Integer(_restaurantID));
+		Socket[] connections = null;
+		if(printerConn != null){
+			connections = printerConn.toArray(new Socket[printerConn.size()]);
+		}
 		//check whether the print request is synchronized or asynchronous
 		if((req.header.reserved & Reserved.PRINT_SYNC) != 0){
 			/**
@@ -655,28 +662,27 @@ class OrderHandler extends Handler implements Runnable{
 			 * the print request is done, and send the ACK or NAK to let the terminal know whether 
 			 * the print actions is successfully or not
 			 */
-			if(printerConn != null){
-				Iterator<Socket> iter = printerConn.iterator();
-				while(iter.hasNext()){
-					Order orderToPay = getOrderByID(payOrderInfo.id, payOrderInfo.tableID);
-					orderToPay.setTotalPrice(payOrderInfo.getTotalPrice());
-					new PrintHandler(orderToPay, iter.next(), Reserved.PRINT_RECEIPT, _restaurantID, _owner).run2();
+			if(connections != null){
+				for(int i = 0; i < connections.length; i++){					
+					try{
+						Order orderToPay = getOrderByID(payOrderInfo.id, payOrderInfo.tableID);
+						orderToPay.setTotalPrice(payOrderInfo.getTotalPrice());
+						new PrintHandler(orderToPay, connections[i], Reserved.PRINT_RECEIPT, _restaurantID, _owner).run2();
+					}catch(PrintSocketException e){}
 				}
-			}else{
-				throw new PrintLogicException("The printer server hasn't been registered to wireless order server.");
 			}
+			
 		}else{
 			/**
 			 * if the print request is asynchronous, then the pay order request return an ACK immediately,
 			 * regardless of the print request. In the mean time, the print request would be put to the 
 			 * thread pool to run.
 			 */
-			if(printerConn != null){
-				Iterator<Socket> iter = printerConn.iterator();
-				while(iter.hasNext()){
+			if(connections != null){
+				for(int i = 0; i < connections.length; i++){
 					Order orderToPay = getOrderByID(payOrderInfo.id, payOrderInfo.tableID);
 					orderToPay.setTotalPrice(payOrderInfo.getTotalPrice());
-					WirelessSocketServer.threadPool.execute(new PrintHandler(orderToPay, iter.next(), Reserved.PRINT_RECEIPT, _restaurantID, _owner));
+					WirelessSocketServer.threadPool.execute(new PrintHandler(orderToPay, connections[i], Reserved.PRINT_RECEIPT, _restaurantID, _owner));					
 				}
 			}
 		}
