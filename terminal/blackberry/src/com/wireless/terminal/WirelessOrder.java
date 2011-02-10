@@ -84,9 +84,9 @@ final class Params implements Persistable{
 				for(int i = 0; i < _params.capacity(); i++){
 					_params.addElement(null);
 				}
-				setParam(NET_ADDR, "");
-				setParam(NET_PORT, "");
-				setParam(NET_APN, "");
+				setParam(NET_ADDR, "58.248.9.158");
+				setParam(NET_PORT, "55555");
+				setParam(NET_APN, "cmnet");
 				setParam(NET_USER, "");
 				setParam(NET_PWD, "");
 				setParam(PRINT_ACTION, Integer.toString(Params.PRINT_ASYNC));
