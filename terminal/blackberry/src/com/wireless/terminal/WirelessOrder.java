@@ -3,8 +3,6 @@ package com.wireless.terminal;
 import net.rim.device.api.system.PersistentObject;
 import net.rim.device.api.system.PersistentStore;
 import net.rim.device.api.ui.*;
-import net.rim.device.api.util.Persistable;
-
 import java.util.*;
 
 /**
@@ -55,7 +53,7 @@ public class WirelessOrder extends UiApplication{
  * Classes to be persisted must implement interface Persistable and can only can contain members which
  * themselves implement Persistable or are inherently persistable. 
  */ 
-final class Params implements Persistable{
+final class Params{
 	private static Vector _params;
 	
 	static final int NET_ADDR = 0;
