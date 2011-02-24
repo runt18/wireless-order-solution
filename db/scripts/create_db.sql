@@ -15,11 +15,16 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`restaurant` (
   `pwd` VARCHAR(45) NOT NULL COMMENT 'the password for the restaurant to log in' ,
   `account` VARCHAR(45) NOT NULL COMMENT 'the account for the restaurant to log in' ,
   `restaurant_name` VARCHAR(50) NULL COMMENT 'the restaurant name ' ,
-  `restaurant_info` VARCHAR(300) NULL DEFAULT '' COMMENT 'the restaurant info' ,
+  `restaurant_info` VARCHAR(300) NULL COMMENT 'the restaurant info' ,
+  `tele1` VARCHAR(45) NOT NULL COMMENT 'One of the telephones to this restaurant.' ,
+  `tele2` VARCHAR(45) NOT NULL COMMENT 'One of the telephones to this restaurant.' ,
+  `address` VARCHAR(70) NOT NULL COMMENT 'The address to this restaurant.' ,
   `total_income` DECIMAL(15,2) NOT NULL DEFAULT 0 COMMENT 'the total income of the restaurant' ,
   `record_alive` BIGINT NOT NULL DEFAULT 0 COMMENT 'Indicates how long the order record of this restaurant can be persisted. It\'s represented in second. Value 0 means the records never expire.' ,
+  `token` VARCHAR(45) NOT NULL DEFAULT 'b60061d439af3d4cb937a0a3ddd36b34' COMMENT 'The token used for login verification in web service.' ,
   PRIMARY KEY (`id`, `account`) ,
-  UNIQUE INDEX `account_UNIQUE` (`account` ASC) )
+  UNIQUE INDEX `account_UNIQUE` (`account` ASC) ,
+  INDEX `token_index` (`token` ASC) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'describe the restaurnat\'s information';
