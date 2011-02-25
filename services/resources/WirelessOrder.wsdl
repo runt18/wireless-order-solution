@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="WirelessOrder" targetNamespace="http://wireless.com/WirelessOrder/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://wireless.com/WirelessOrder/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://wireless.com/WirelessOrder/">
+      <xsd:element name="login">
+        <xsd:complexType>
+          <xsd:sequence>
+          	<xsd:element name="user" type="xsd:string"/>
+          	<xsd:element name="pwd" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="loginResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="token" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="loginFault">
+      	<xsd:complexType>
+      		<xsd:sequence>
+
+      			<xsd:element name="errorType" type="xsd:int"/>
+      		</xsd:sequence>
+      	</xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="loginFault">
+    <wsdl:part name="parameters" element="tns:loginFault">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="loginResponse">
+    <wsdl:part name="parameters" element="tns:loginResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="loginRequest">
+    <wsdl:part name="parameters" element="tns:login">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="WirelessOrder">
+    <wsdl:operation name="login">
+      <wsdl:input message="tns:loginRequest">
+    </wsdl:input>
+      <wsdl:output message="tns:loginResponse">
+    </wsdl:output>
+      <wsdl:fault name="fault" message="tns:loginFault">
+    </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="WirelessOrderSOAP" type="tns:WirelessOrder">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="login">
+      <soap:operation soapAction="http://wireless.com/WirelessOrder/login"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="WirelessOrder">
+    <wsdl:port name="WirelessOrderSOAP" binding="tns:WirelessOrderSOAP">
+      <soap:address location="http://www.example.org/"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

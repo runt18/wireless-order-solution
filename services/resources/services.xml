@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This file was auto-generated from WSDL -->
+<!-- by the Apache Axis2 version: 1.5.4  Built on : Dec 19, 2010 (08:18:42 CET) -->
+<serviceGroup>
+    <service name="WirelessOrder">
+        <messageReceivers>
+            <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out" class="com.wireless.wirelessorder.WirelessOrderMessageReceiverInOut"/>
+        </messageReceivers>
+        <parameter name="ServiceClass">com.wireless.wirelessorder.WirelessOrderSkeleton</parameter>
+        <parameter name="useOriginalwsdl">true</parameter>
+        <parameter name="modifyUserWSDLPortAddress">true</parameter>
+        <operation name="login" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://wireless.com/WirelessOrder/">
+            <actionMapping>http://wireless.com/WirelessOrder/login</actionMapping>
+            <outputActionMapping>http://wireless.com/WirelessOrder/WirelessOrder/loginResponse</outputActionMapping>
+            <faultActionMapping faultName="fault">http://wireless.com/WirelessOrder/WirelessOrder/login/Fault/fault</faultActionMapping>
+            <faultActionMapping faultName="loginFault">urn:loginloginFault</faultActionMapping>
+        </operation>
+    </service>
+</serviceGroup>
