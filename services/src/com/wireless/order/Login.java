@@ -12,11 +12,11 @@ public final class Login {
 	 * Perform the login service to verify the user account and password,
 	 * and return the token if passing the verification. 
 	 * @param user the user account
-	 * @param pwd the password to this user account
+	 * @param pwd the password encoded by md5 to this user account
 	 * @return a token string if passing the verification, otherwise an empty string
 	 * @throws LoginFault throws if any error occurred in login
 	 */
-	public static String perform(String user, String pwd) throws LoginFault{
+	public static String exec(String user, String pwd) throws LoginFault{
 		//open the database
 		Connection dbCon = null;
 		Statement stmt = null;
@@ -28,13 +28,9 @@ public final class Login {
 			stmt = dbCon.createStatement();   		
 			//set names to UTF-8
 			stmt.execute("SET NAMES utf8");
-			//encode the password using md5
-			MessageDigest algorithm = MessageDigest.getInstance("MD5");
-			algorithm.reset();
-			algorithm.update(pwd.getBytes());
 
 			String sql = "SELECT id FROM " + Params.dbName + ".restaurant WHERE account='" + user +
-						 "' AND pwd='" + toHexString(algorithm.digest()) + "'";
+						 "' AND pwd='" + pwd + "'";
 			rs = stmt.executeQuery(sql);
 			/**
 			 * Check to see if passing the user verification.
@@ -42,6 +38,8 @@ public final class Login {
 			 * Then update this token to restaurant record and sent the token as response.
 			 */
 			if(rs.next()){
+				//encode the password using md5
+				MessageDigest algorithm = MessageDigest.getInstance("MD5");
 				algorithm.reset();
 				algorithm.update(new Double(Math.random() * Math.random()).toString().getBytes());
 				String token = toHexString(algorithm.digest());
