@@ -1,6 +1,6 @@
 package com.wireless.protocol;
 
-public class Type{
+public final class Type{
 	/* common to protocol */
 	public final static byte ACK = -128;
 	public final static byte NAK = -127;
@@ -15,6 +15,7 @@ public class Type{
 	public final static byte UPDATE_ORDER = 7;
 	public final static byte PAY_ORDER = 8;
 	public final static byte QUERY_RESTAURANT = 9;
+	public final static byte PRINT_ORDER = 10;
 	
 	/* belong to OTA */
 	public final static byte CHECK_VER = 1;
