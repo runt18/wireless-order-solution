@@ -5,6 +5,8 @@ import net.rim.device.api.system.PersistentStore;
 import net.rim.device.api.ui.*;
 import java.util.*;
 
+import com.wireless.protocol.ReqOrderPackage;
+
 /**
  * This sample enables client/server communication using a simple implementation 
  * of TCP sockets. The client application allows the user to select direct TCP as
@@ -30,6 +32,12 @@ public class WirelessOrder extends UiApplication{
 		ServerConnector.instance().setNetPwd(Params.getParam(Params.NET_PWD));
 		ServerConnector.instance().setTimeout(Integer.parseInt(Params.getParam(Params.CONN_TIME_OUT)));
 		ServerConnector.instance().setConnType(Integer.parseInt(Params.getParam(Params.CONN_TYPE)));
+		//set device id generator
+		ReqOrderPackage.setGen(new com.wireless.protocol.PinGen(){
+			public int getDeviceId(){
+				return net.rim.device.api.system.DeviceInfo.getDeviceId();
+			}
+		});
 	}
 	
 	/**
