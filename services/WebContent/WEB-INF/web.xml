@@ -9,15 +9,23 @@
     <welcome-file>default.htm</welcome-file>
     <welcome-file>default.jsp</welcome-file>
   </welcome-file-list>
-  
   <!-- deploy the login servlet -->
   <servlet>
-       <servlet-name>Login</servlet-name>
-       <servlet-class>com.wireless.order.Login</servlet-class>
+    <servlet-name>Login</servlet-name>
+    <servlet-class>com.wireless.order.Login</servlet-class>
   </servlet>
-
-   <servlet-mapping>
-      <servlet-name>Login</servlet-name>
-      <url-pattern>/servlet/Login</url-pattern>
-   </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>Login</servlet-name>
+    <url-pattern>/servlet/Login</url-pattern>
+  </servlet-mapping>
+  
+  <!-- deploy the print servlet -->
+  <servlet>
+    <servlet-name>Print</servlet-name>
+    <servlet-class>com.wireless.order.Print</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Print</servlet-name>
+    <url-pattern>/servlet/Print</url-pattern>
+  </servlet-mapping>
 </web-app>
