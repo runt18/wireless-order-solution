@@ -75,6 +75,66 @@ class OrderReqParser {
 	}
 	
 	/******************************************************
+	 * Design the print order 2 request looks like below
+	 * <Header>
+	 * mode : type : seq : reserved : pin[6] : len[2]
+	 * mode - PRINT
+	 * type - PRINT_BILL_2
+	 * seq - auto calculated and filled in
+	 * reserved - 0x00
+	 * pin[6] - auto calculated and filled in
+	 * len[2] - length of the <Body>
+	 * <Body>
+	 * total_price[4] : table[2] : custom_num : food_num : <Food1> : <Food2>...
+	 * tatal_price[4] - 4-byte indicates the total price
+	 * 				   total_price[0] indicates the float part
+	 * 				   total_price[1..3] indicates the fixed part
+	 * table[2] - 2-byte indicates the table id  
+	 * custom_num - 1-byte indicating the custom number for this table
+	 * food_num - 1-byte indicating the number of foods
+	 * <Food>
+	 * food_id[2] : order_num[2]
+	 * food_id[2] - 2-byte indicating the food's id
+	 * order_num[2] - 2-byte indicating how many this foods are ordered
+	 * 			   order_num[0] - 1-byte indicates the float-point
+	 * 			   order_num[1] - 1-byte indicates the fixed-point
+	 *******************************************************/
+	static Order parsePrintReq(ProtocolPackage req){
+		Order order = new Order();
+		
+		//assign the total price
+		int totalPrice = (req.body[0] & 0x000000FF) | 
+		 				((req.body[1] & 0x000000FF) << 8) | 
+		 				((req.body[2] & 0x000000FF) << 16) |
+		 				((req.body[3] & 0x000000FF) << 24);
+		order.setTotalPrice(totalPrice);
+		
+		//assign the table id
+		order.tableID = (short)((req.body[4] & 0x00FF) | 
+							((req.body[5] & 0x00FF) << 8));
+		
+		//assign the number of customs
+		order.customNum = (byte)(req.body[6] & 0x000000FF);
+		
+		//assign the number of foods
+		int foodNum = (byte)(req.body[7] & 0x000000FF);
+		
+		Food[] orderFoods = new Food[foodNum];
+		//total_price(4-byte) + table id(2-byte) + custom_num(1-byte) + food_num(1-byte)
+		int index = 8;
+		//assign each order food's information, including the food's id and order number
+		for(int i = 0; i < orderFoods.length; i++){
+			int foodID = (req.body[index] & 0x000000FF) | ((req.body[index + 1] & 0x000000FF) << 8);
+			int orderNum = (req.body[index + 2] & 0x000000FF) | ((req.body[index + 3] & 0x000000FF) << 8);
+			orderFoods[i] = new Food();
+			orderFoods[i].alias_id = foodID;
+			orderFoods[i].setCount(orderNum);
+			index += 4;
+		}
+		return order;
+	}
+	
+	/******************************************************
 	* Design the cancel order request looks like below
 	* <Header>
 	* mode : type : seq : reserved : pin[6] : len[2]
