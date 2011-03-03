@@ -29,5 +29,6 @@ public final class Type{
 	public final static byte PRINTER_LOGIN = 1;
 	public final static byte PRINT_BILL = 2;
 	public final static byte PRINTER_OTA = 3;
+	public final static byte PRINT_BILL_2 = 4;
 }
  
