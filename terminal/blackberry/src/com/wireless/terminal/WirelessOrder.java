@@ -5,6 +5,7 @@ import net.rim.device.api.system.PersistentStore;
 import net.rim.device.api.ui.*;
 import java.util.*;
 
+import com.wireless.protocol.PinGen;
 import com.wireless.protocol.ReqOrderPackage;
 
 /**
@@ -36,6 +37,9 @@ public class WirelessOrder extends UiApplication{
 		ReqOrderPackage.setGen(new com.wireless.protocol.PinGen(){
 			public int getDeviceId(){
 				return net.rim.device.api.system.DeviceInfo.getDeviceId();
+			}
+			public short getDeviceType(){
+				return PinGen.BLACK_BERRY;
 			}
 		});
 	}
