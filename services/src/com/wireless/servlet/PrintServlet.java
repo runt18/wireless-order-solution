@@ -80,24 +80,23 @@ public class PrintServlet extends HttpServlet {
 		}
 		
 		response.setContentType("text/html;charset=GB2312");
-
+		
+		Gson gson = new Gson();
 		try{
 			com.wireless.order.Print.exec(token, orderID, conf);
-			Gson gson = new Gson();
-			response.getWriter().print(gson.toJson("打印成功"));
+			response.getWriter().print(gson.toJson("打印" + orderID + "号账单成功"));
+			
 		}catch(VerifyFault e){
-			Gson gson = new Gson();
-			response.getWriter().print(gson.toJson("帐号验证未通过"));
+			response.getWriter().print(gson.toJson("打印失败，帐号验证未通过"));
 			
 		}catch(PrintFault e){
-			Gson gson = new Gson();
 			if(e.errType == PrintFault.ORDER_NOT_EXIST){
-				response.getWriter().print(gson.toJson("你要打印的账单不存在"));
+				response.getWriter().print(gson.toJson("打印失败，" + orderID + "号账单不存在"));
 				
 			}else if(e.errType == PrintFault.DB_ERROR){
 				response.getWriter().print(gson.toJson("打印失败，与数据库通信未成功"));
 				
-			}if(e.errType == PrintFault.SOCKET_ERROR){
+			}else if(e.errType == PrintFault.SOCKET_ERROR){
 				response.getWriter().print(gson.toJson("打印失败，与服务器通信未成功"));
 				
 			}else{

@@ -47,7 +47,7 @@ public class LoginServlet extends HttpServlet {
 				t.msg = "验证失败，未能与数据库通信";
 				
 			}else{
-				t.msg = "登录失败，请确认帐号和密码是否准确";
+				t.msg = "验证失败，请确认帐号和密码是否准确";
 			}
 			response.getWriter().print(gson.toJson(t));
 		}
