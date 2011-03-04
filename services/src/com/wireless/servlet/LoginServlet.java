@@ -36,18 +36,18 @@ public class LoginServlet extends HttpServlet {
 		try{
 			String token = com.wireless.order.Login.exec(user, pwd);			
 			t.token = token;
-			t.errMsg = "";
+			t.msg = "验证成功";
 			response.getWriter().print(gson.toJson(t));
 		}catch(LoginFault e){
 			t.token = null;
 			if(e.errorType == LoginFault.USER_PWD_NOT_MATCHED){
-				t.errMsg = "验证失败，帐号和密码不匹配";
+				t.msg = "验证失败，帐号和密码不匹配";
 				
 			}else if(e.errorType == LoginFault.DB_ERROR){
-				t.errMsg = "验证失败，未能与数据库通信";
+				t.msg = "验证失败，未能与数据库通信";
 				
 			}else{
-				t.errMsg = "登录失败，请确认帐号和密码是否准确";
+				t.msg = "登录失败，请确认帐号和密码是否准确";
 			}
 			response.getWriter().print(gson.toJson(t));
 		}
@@ -63,7 +63,7 @@ public class LoginServlet extends HttpServlet {
 
 class Token{
 	String token;
-	String errMsg;
+	String msg;
 	Token(){}
 }
 
