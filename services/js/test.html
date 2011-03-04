@@ -16,18 +16,25 @@ $.getJSON(
 		user: "demo",
 	    pwd: MD5("demo@123")
 	  },
-	  function(token_id) {
-			$.getJSON(
-				"http://localhost:8080/WirelessOrderServlet/Print",
-				 {
-					token: token_id,
-					order_id: 67,
-					conf: 0
-				  },
-				  function(data) {
-						alert(data);
-				  }
-			);
+	  function(token) {
+			if(token.token != null){
+				$.getJSON(
+					"http://localhost:8080/WirelessOrderServlet/Print",
+					 {
+						token : token.token,	// the token retrieved from login function
+						order_id : 67,			// the id of the order to print
+						print_sync : 1,			// indicates whether the print is sync or async
+						print_order : 0,		// indicates whether to print the order
+						//print_detail : 0,		// indicates whether to print the order detail
+						print_receipt : 1		// indicates whether to print the receipt
+					  },
+					  function(data) {
+							alert(data);
+					  }
+				);
+			}else{
+				alert(token.errMsg);
+			}
 			//alert(token_id);
 	  }
 );
