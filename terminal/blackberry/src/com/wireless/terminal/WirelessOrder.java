@@ -53,7 +53,11 @@ public class WirelessOrder extends UiApplication{
 	}
 
 	public WirelessOrder(){
-		pushScreen(new OrderMainScreen());
+		invokeLater(new Runnable(){
+			public void run(){
+				pushGlobalScreen(new StartupScreen(), 1, UiEngine.GLOBAL_MODAL);				
+			}
+		});		
 	}
 	
 
