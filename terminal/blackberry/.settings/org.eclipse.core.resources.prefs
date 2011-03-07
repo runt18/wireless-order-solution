@@ -1,4 +1,4 @@
-#Mon Mar 07 00:06:51 CST 2011
+#Mon Mar 07 15:43:06 CST 2011
 eclipse.preferences.version=1
 encoding//src/com/wireless/terminal/ChangeOrderScreen.java=UTF-16
 encoding//src/com/wireless/terminal/FuncSettingScreen.java=UTF-16
@@ -6,7 +6,10 @@ encoding//src/com/wireless/terminal/NetworkSettingScreen.java=UTF-16
 encoding//src/com/wireless/terminal/NetworkTestPopup.java=UTF-16
 encoding//src/com/wireless/terminal/OTAUpdatePopup.java=UTF-16
 encoding//src/com/wireless/terminal/PayOrderScreen.java=UTF-16
+encoding//src/com/wireless/terminal/QueryMenuPopup.java=UTF-8
 encoding//src/com/wireless/terminal/QueryRestaurantPopup.java=UTF-16
 encoding//src/com/wireless/terminal/StartupScreen.java=UTF-16
+encoding//src/com/wireless/util/OTAUpdate.java=UTF-8
+encoding//src/com/wireless/util/QueryMenu.java=UTF-8
 encoding/<project>=Cp1252
 encoding/BlackBerry_App_Descriptor.xml=UTF-8
