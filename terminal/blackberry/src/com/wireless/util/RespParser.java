@@ -1,4 +1,4 @@
-package com.wireless.terminal;
+package com.wireless.util;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Enumeration;
@@ -9,8 +9,9 @@ import com.wireless.protocol.Order;
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.Restaurant;
 import com.wireless.protocol.Type;
+import com.wireless.terminal.WirelessOrder;
 
-class RespParser {
+public class RespParser {
 	
 	/**
 	 * Parse the response associated with query order request.
@@ -184,7 +185,7 @@ class RespParser {
 	 * @param response The response containing the restaurant info.
 	 * @return The restaurant info.
 	 */
-	static Restaurant parseQueryRestaurant(ProtocolPackage response){
+	public static Restaurant parseQueryRestaurant(ProtocolPackage response){
 		Restaurant restaurant = new Restaurant();;
 		/******************************************************
 		 * In the case query restaurant successfully, 
