@@ -22,6 +22,7 @@ public final class Params{
 	public static final int PRINT_ACTION = 5;
 	public static final int CONN_TIME_OUT = 6;
 	public static final int CONN_TYPE = 7;
+	public static final int AUTO_STARTUP = 8;
 	
     private static final long PERSISTENT_PARAM_ID = 0x230157d6843fDefEL;
     
@@ -36,7 +37,7 @@ public final class Params{
 			_params = (Vector)store.getContents();
 			//initialize the parameters if the storage not exist before
 			if(_params == null){
-				_params = new Vector(8);
+				_params = new Vector(9);
 				for(int i = 0; i < _params.capacity(); i++){
 					_params.addElement(null);
 				}
@@ -48,6 +49,7 @@ public final class Params{
 				setParam(PRINT_ACTION, Integer.toString(Params.PRINT_ASYNC));
 				setParam(CONN_TIME_OUT, Integer.toString(Params.CONN_TIMEOUT_10));
 				setParam(CONN_TYPE, Integer.toString(Params.CONN_MOBILE));	
+				setParam(AUTO_STARTUP, Integer.toString(Params.ON));
 	        	store.setContents(_params);
 	        	store.commit();
 			}
@@ -106,4 +108,10 @@ public final class Params{
 	 */
 	public static final int PRINT_ASYNC = 0;
 	public static final int PRINT_SYNC = 1;
+	
+	/**
+	 * The options for check box field
+	 */
+	public static final int OFF = 0;
+	public static final int ON = 1;
 }
