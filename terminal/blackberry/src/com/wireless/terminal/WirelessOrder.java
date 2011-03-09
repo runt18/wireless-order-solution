@@ -1,5 +1,10 @@
 package com.wireless.terminal;
 
+import net.rim.device.api.system.ApplicationDescriptor;
+import net.rim.device.api.system.ApplicationManager;
+import net.rim.device.api.system.ApplicationManagerException;
+import net.rim.device.api.system.CodeModuleManager;
+import net.rim.device.api.system.SystemListener;
 import net.rim.device.api.ui.*;
 import java.util.*;
 
@@ -14,7 +19,7 @@ import com.wireless.util.ServerConnector;
  * is opened using the BlackBerry MDS Connection Service. The server application 
  * can be found in com/rim/samples/server/socketdemo. 
  */
-public class WirelessOrder extends UiApplication{
+public class WirelessOrder extends UiApplication implements SystemListener{
 
 	public static Vector FoodMenu = new Vector();
 	
@@ -47,19 +52,62 @@ public class WirelessOrder extends UiApplication{
 	 * @param args
 	 */
 	public static void main(String[] args) {
-        WirelessOrder wireless_order = new WirelessOrder();
-        wireless_order.enterEventDispatcher();
+        WirelessOrder wireless_order = new WirelessOrder(args);
 	}
 
-	public WirelessOrder(){
-		invokeLater(new Runnable(){
-			public void run(){
-				pushGlobalScreen(new StartupScreen(), 1, UiEngine.GLOBAL_MODAL);				
-			}
-		});		
-	}
+	private boolean _powerOff = false;
 	
+	public WirelessOrder(String[] args){
 
+		if(args != null && args.length > 0 && args[0].equals("autostartup")){
+			addSystemListener(this);
+			enterEventDispatcher();
+			
+		}else{
+			invokeLater(new Runnable(){
+				public void run(){
+					pushGlobalScreen(new StartupScreen(), 1, UiEngine.GLOBAL_MODAL);				
+				}
+			});
+			enterEventDispatcher();
+		}
+	}
+
+	public void batteryGood() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void batteryLow() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void batteryStatusChange(int status) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void powerOff() {
+		_powerOff = true;
+		
+	}
+
+	public void powerUp() {
+		if(_powerOff){
+			int modHandle =  CodeModuleManager.getModuleHandle("WirelessOrderTerminal");
+			ApplicationDescriptor[] apDes = CodeModuleManager.getApplicationDescriptors(modHandle);
+			String[] args = {"run"};
+			ApplicationDescriptor apDes4Startup = new ApplicationDescriptor(apDes[0], args);
+			
+			try{
+				ApplicationManager.getApplicationManager().runApplication(apDes4Startup);
+				
+			}catch(ApplicationManagerException e){
+				
+			}			
+		}		
+	}
 } 
 
 
