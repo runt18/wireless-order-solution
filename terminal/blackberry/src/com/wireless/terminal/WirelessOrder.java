@@ -6,6 +6,8 @@ import net.rim.device.api.system.ApplicationManagerException;
 import net.rim.device.api.system.CodeModuleManager;
 import net.rim.device.api.system.SystemListener;
 import net.rim.device.api.ui.*;
+import net.rim.device.api.ui.container.FullScreen;
+
 import java.util.*;
 
 import com.wireless.protocol.PinGen;
@@ -19,7 +21,7 @@ import com.wireless.util.ServerConnector;
  * is opened using the BlackBerry MDS Connection Service. The server application 
  * can be found in com/rim/samples/server/socketdemo. 
  */
-public class WirelessOrder extends UiApplication implements SystemListener{
+public class WirelessOrder extends UiApplication{
 
 	public static Vector FoodMenu = new Vector();
 	
@@ -52,62 +54,84 @@ public class WirelessOrder extends UiApplication implements SystemListener{
 	 * @param args
 	 */
 	public static void main(String[] args) {
-        WirelessOrder wireless_order = new WirelessOrder(args);
+        new WirelessOrder(args);
 	}
 
-	private boolean _powerOff = false;
-	
 	public WirelessOrder(String[] args){
 
-		if(args != null && args.length > 0 && args[0].equals("autostartup")){
-			addSystemListener(this);
-			enterEventDispatcher();
-			
-		}else{
+		if(args != null && args.length > 0 && args[0].equals("run")){
 			invokeLater(new Runnable(){
 				public void run(){
 					pushGlobalScreen(new StartupScreen(), 1, UiEngine.GLOBAL_MODAL);				
 				}
 			});
+			
+			addSystemListener(new SystemListener(){
+				public void batteryGood() {	}
+
+				public void batteryLow() { }
+
+				public void batteryStatusChange(int status) {}
+
+				public void powerOff() {}
+
+				/**
+				 * In the case the wireless order application is alive before power off,
+				 * just have it restored if the auto startup option is set to on.
+				 */
+				public void powerUp() {
+					
+					Params.restore();
+					
+					if(isAlive() && !isForeground() && Integer.parseInt(Params.getParam(Params.AUTO_STARTUP)) == Params.ON){
+						requestForeground();
+					}
+				}	
+
+			});
+			enterEventDispatcher();
+			
+		}else{
+			
+			/**
+			 * This system listener is used to launch the wireless order terminal application after power up.
+			 * In the case of hard reset, the powerUp() would be invoked since the application descriptor has 
+			 * defined it as general entry point.<br>
+			 * In the case of soft reset, it would be launched as a system module after exit the order main screen
+			 * if the auto startup option is set to ON.
+			 */
+			addSystemListener(new SystemListener(){
+				public void batteryGood() {	}
+
+				public void batteryLow() { }
+
+				public void batteryStatusChange(int status) {}
+
+				public void powerOff() {}
+
+				public void powerUp() {
+
+					int modHandle = CodeModuleManager.getModuleHandle("WirelessOrderTerminal");
+					ApplicationDescriptor[] apDes = CodeModuleManager.getApplicationDescriptors(modHandle);
+					String[] args = { "run" };
+					ApplicationDescriptor apDes4Startup = new ApplicationDescriptor(apDes[0], args);
+					try {
+						ApplicationManager.getApplicationManager().runApplication(apDes4Startup);
+					} catch (ApplicationManagerException e) {
+
+					}
+					
+					System.exit(0);
+				}	
+
+			});
+			//make it run in background
+			requestBackground();
 			enterEventDispatcher();
 		}
 	}
 
-	public void batteryGood() {
-		// TODO Auto-generated method stub
-		
-	}
 
-	public void batteryLow() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void batteryStatusChange(int status) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void powerOff() {
-		_powerOff = true;
-		
-	}
-
-	public void powerUp() {
-		if(_powerOff){
-			int modHandle =  CodeModuleManager.getModuleHandle("WirelessOrderTerminal");
-			ApplicationDescriptor[] apDes = CodeModuleManager.getApplicationDescriptors(modHandle);
-			String[] args = {"run"};
-			ApplicationDescriptor apDes4Startup = new ApplicationDescriptor(apDes[0], args);
-			
-			try{
-				ApplicationManager.getApplicationManager().runApplication(apDes4Startup);
-				
-			}catch(ApplicationManagerException e){
-				
-			}			
-		}		
-	}
 } 
 
 
