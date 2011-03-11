@@ -4,9 +4,10 @@ import net.rim.device.api.system.ApplicationDescriptor;
 import net.rim.device.api.system.ApplicationManager;
 import net.rim.device.api.system.ApplicationManagerException;
 import net.rim.device.api.system.CodeModuleManager;
+import net.rim.device.api.system.GlobalEventListener;
 import net.rim.device.api.system.SystemListener;
 import net.rim.device.api.ui.*;
-import net.rim.device.api.ui.container.FullScreen;
+
 
 import java.util.*;
 
@@ -120,17 +121,32 @@ public class WirelessOrder extends UiApplication{
 					} catch (ApplicationManagerException e) {
 
 					}
-					
+
 					System.exit(0);
 				}	
 
+			});
+			
+			/**
+			 * This global event listener is used to listen to the event that exit the eBootup process
+			 */
+			this.addGlobalEventListener(new GlobalEventListener(){
+
+				public void eventOccurred(long guid, int data0, int data1, Object object0, Object object1){					
+					if(guid == GLOBAL_EVENT_EXIT){
+						System.exit(0);
+					}
+				}
+				
 			});
 			//make it run in background
 			requestBackground();
 			enterEventDispatcher();
 		}
 	}
-
+	
+	final static long GLOBAL_EVENT_EXIT = 1; 
+	final static long E_BOOTUP_PROC_ID = 0x66ae754bd0827258L;
 
 } 
 
