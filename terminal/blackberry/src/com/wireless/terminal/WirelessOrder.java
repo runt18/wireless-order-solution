@@ -58,39 +58,50 @@ public class WirelessOrder extends UiApplication{
         new WirelessOrder(args);
 	}
 
+	private boolean _isAutoStartup = false;
+	
+	private void startup(boolean autostartup){
+		_isAutoStartup = autostartup;
+		
+		invokeLater(new Runnable(){
+			public void run(){
+				pushGlobalScreen(new StartupScreen(_isAutoStartup), 1, UiEngine.GLOBAL_MODAL);				
+			}
+		});
+		
+		addSystemListener(new SystemListener(){
+			public void batteryGood() {	}
+
+			public void batteryLow() { }
+
+			public void batteryStatusChange(int status) {}
+
+			public void powerOff() {}
+
+			/**
+			 * In the case the wireless order application is alive before power off,
+			 * just have it restored if the auto startup option is set to on.
+			 */
+			public void powerUp() {
+				
+				Params.restore();
+				
+				if(isAlive() && !isForeground() && Integer.parseInt(Params.getParam(Params.AUTO_STARTUP)) == Params.ON){
+					requestForeground();
+				}
+			}	
+
+		});
+		enterEventDispatcher();
+	}
+	
 	public WirelessOrder(String[] args){
 
-		if(args != null && args.length > 0 && args[0].equals("run")){
-			invokeLater(new Runnable(){
-				public void run(){
-					pushGlobalScreen(new StartupScreen(), 1, UiEngine.GLOBAL_MODAL);				
-				}
-			});
+		if(args != null && args.length > 0 && args[0].equals("autostartup")){
+			startup(true);
 			
-			addSystemListener(new SystemListener(){
-				public void batteryGood() {	}
-
-				public void batteryLow() { }
-
-				public void batteryStatusChange(int status) {}
-
-				public void powerOff() {}
-
-				/**
-				 * In the case the wireless order application is alive before power off,
-				 * just have it restored if the auto startup option is set to on.
-				 */
-				public void powerUp() {
-					
-					Params.restore();
-					
-					if(isAlive() && !isForeground() && Integer.parseInt(Params.getParam(Params.AUTO_STARTUP)) == Params.ON){
-						requestForeground();
-					}
-				}	
-
-			});
-			enterEventDispatcher();
+		}else if(args != null && args.length > 0 && args[0].equals("run")){
+			startup(false);
 			
 		}else{
 			
@@ -114,7 +125,7 @@ public class WirelessOrder extends UiApplication{
 
 					int modHandle = CodeModuleManager.getModuleHandle("WirelessOrderTerminal");
 					ApplicationDescriptor[] apDes = CodeModuleManager.getApplicationDescriptors(modHandle);
-					String[] args = { "run" };
+					String[] args = { "autostartup" };
 					ApplicationDescriptor apDes4Startup = new ApplicationDescriptor(apDes[0], args);
 					try {
 						ApplicationManager.getApplicationManager().runApplication(apDes4Startup);
