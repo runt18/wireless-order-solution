@@ -13,6 +13,8 @@ Release v1.0.3 <xx/xx/2011>
 1 - add "tele1" and "tele2" field to "restaurant" table
 2 - add "token" field to "restaurant" table
 3 - add "address" field to "restaurant" table
+4 - add the "preference" field to "order_food" table
+5 - add the "taste" table
 ******************************************************************************************************/
 
 /******************************************************************************************************

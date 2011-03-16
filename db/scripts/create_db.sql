@@ -14,11 +14,11 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`restaurant` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'the id to this restaurant, id 1 indicates the root user, id 2 indicates idle-repository, id 3 indicates discarded-repository' ,
   `pwd` VARCHAR(45) NOT NULL COMMENT 'the password for the restaurant to log in' ,
   `account` VARCHAR(45) NOT NULL COMMENT 'the account for the restaurant to log in' ,
-  `restaurant_name` VARCHAR(50) NULL COMMENT 'the restaurant name ' ,
-  `restaurant_info` VARCHAR(300) NULL COMMENT 'the restaurant info' ,
-  `tele1` VARCHAR(45) NOT NULL COMMENT 'One of the telephones to this restaurant.' ,
-  `tele2` VARCHAR(45) NOT NULL COMMENT 'One of the telephones to this restaurant.' ,
-  `address` VARCHAR(70) NOT NULL COMMENT 'The address to this restaurant.' ,
+  `restaurant_name` VARCHAR(50) NOT NULL DEFAULT '' COMMENT 'the restaurant name ' ,
+  `restaurant_info` VARCHAR(300) NOT NULL DEFAULT '' COMMENT 'the restaurant info' ,
+  `tele1` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'One of the telephones to this restaurant.' ,
+  `tele2` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'One of the telephones to this restaurant.' ,
+  `address` VARCHAR(70) NOT NULL DEFAULT '' COMMENT 'The address to this restaurant.' ,
   `total_income` DECIMAL(15,2) NOT NULL DEFAULT 0 COMMENT 'the total income of the restaurant' ,
   `record_alive` BIGINT NOT NULL DEFAULT 0 COMMENT 'Indicates how long the order record of this restaurant can be persisted. It\'s represented in second. Value 0 means the records never expire.' ,
   `token` VARCHAR(45) NOT NULL DEFAULT 'b60061d439af3d4cb937a0a3ddd36b34' COMMENT 'The token used for login verification in web service.' ,
@@ -155,7 +155,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food` (
   `food_id` BIGINT UNSIGNED NOT NULL ,
   `order_count` DECIMAL(5,2) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the amount of this food is ordered' ,
   `unit_price` DECIMAL(7,2) UNSIGNED NOT NULL DEFAULT 0 ,
-  `name` VARCHAR(45) NOT NULL ,
+  `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to the ordered food' ,
+  `taste` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the taste preference to the ordered food' ,
   INDEX `fk_order_food_order` (`order_id` ASC) ,
   INDEX `fk_order_food_food` (`food_id` ASC) ,
   CONSTRAINT `fk_order_food_order`
@@ -172,7 +173,26 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'descirbe the relationship between the order and food';
 
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`taste`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`taste` ;
 
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`taste` (
+  `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to taste table' ,
+  `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'indicates the taste preference belong to which restaurant' ,
+  `alias_id` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the alias id to this taste preference, the lower the alias id , the more commonly this taste preference used' ,
+  `preference` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the description to this taste preference' ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_taste_restaurant_id` (`restaurant_id` ASC) ,
+  CONSTRAINT `fk_taste_restaurant_id`
+    FOREIGN KEY (`restaurant_id` )
+    REFERENCES `wireless_order_db`.`restaurant` (`id` )
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COMMENT = 'describe the taste info';
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
