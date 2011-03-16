@@ -26,8 +26,8 @@ import java.io.UnsupportedEncodingException;
  * pin[6] - same as request
  * len[2] -  length of the <Body>
  * <Body>
- * item_num[2] : <Item1> : <Item2>...
- * item_num[2] - 2-byte indicating the number of the foods listed in the menu
+ * item_amount[2] : <Item1> : <Item2>...
+ * item_amount[2] - 2-byte indicating the amount of the foods listed in the menu
  * <Item>
  * food_id[2] : price[2] : len : name[len]
  * food_id[2] - 2-byte indicating the food's id
