@@ -208,7 +208,7 @@
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="Left" type="integer">440</XPD:ATTR>
 <XPD:ATTR name="Top" type="integer">36</XPD:ATTR>
-<XPD:ATTR name="Width" type="integer">70</XPD:ATTR>
+<XPD:ATTR name="Width" type="integer">93</XPD:ATTR>
 <XPD:ATTR name="Height" type="integer">350</XPD:ATTR>
 <XPD:REF name="Model">PiiNYaM/5kO1OVYvS0JZ/wAA</XPD:REF>
 <XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="/+DgYZ/Bw0KlkkHCyEy3ZAAA">
@@ -231,7 +231,7 @@
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="LineStyle" type="LineStyleKind">lsRectilinear</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">199,125;475,125</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">199,125;486,125</XPD:ATTR>
 <XPD:REF name="Model">M5+xOn7d/kKSlyZVR+DJnwAA</XPD:REF>
 <XPD:REF name="Head">MnIhHqLC1UeFW9/69ykt1gAA</XPD:REF>
 <XPD:REF name="Tail">o6WKizSCa0uG78zA/MHp6gAA</XPD:REF>
@@ -258,7 +258,7 @@
 </XPD:OBJ>
 <XPD:OBJ name="Activation" type="UMLActivationView" guid="9fVG0VYsrEmdn+jUbvOQDwAA">
 <XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
-<XPD:ATTR name="Left" type="integer">475</XPD:ATTR>
+<XPD:ATTR name="Left" type="integer">486</XPD:ATTR>
 <XPD:ATTR name="Top" type="integer">125</XPD:ATTR>
 <XPD:ATTR name="Width" type="integer">14</XPD:ATTR>
 <XPD:ATTR name="Height" type="integer">29</XPD:ATTR>
@@ -284,7 +284,7 @@ len[2] : 0x00,0x00
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="LineStyle" type="LineStyleKind">lsRectilinear</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">475,220;199,220</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">486,220;199,220</XPD:ATTR>
 <XPD:REF name="Model">TT0i5McDeUWDlbRqEm0lvgAA</XPD:REF>
 <XPD:REF name="Head">o6WKizSCa0uG78zA/MHp6gAA</XPD:REF>
 <XPD:REF name="Tail">MnIhHqLC1UeFW9/69ykt1gAA</XPD:REF>
@@ -320,17 +320,17 @@ len[2] : 0x00,0x00
 <XPD:OBJ name="OwnedViews[5]" type="UMLNoteLinkView" guid="iwKpSX4MqkKlAABu+9PvDgAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">386,111;580,97</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">391,111;580,97</XPD:ATTR>
 <XPD:REF name="Head">/X2FDxl/oU6nqc9KdoB5kQAA</XPD:REF>
 <XPD:REF name="Tail">wN38Gl6Yx0GsHe4zDXEXhgAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedViews[6]" type="UMLNoteView" guid="90wcZ37oVU+FojPXDB7U7QAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Left" type="integer">560</XPD:ATTR>
+<XPD:ATTR name="Left" type="integer">556</XPD:ATTR>
 <XPD:ATTR name="Top" type="integer">176</XPD:ATTR>
-<XPD:ATTR name="Width" type="integer">200</XPD:ATTR>
-<XPD:ATTR name="Height" type="integer">248</XPD:ATTR>
+<XPD:ATTR name="Width" type="integer">225</XPD:ATTR>
+<XPD:ATTR name="Height" type="integer">329</XPD:ATTR>
 <XPD:ATTR name="Text" type="string">in the case request successfully, 
 assign ACK to the header.type field
 
@@ -343,16 +343,20 @@ pin[6] : same as request
 len[2] : length of the &lt;Body&gt;
 
 &lt;Body&gt;
-item_num[2] : &lt;Item1&gt; : &lt;Item2&gt;...
+food_num[2] : &lt;Food1&gt; : &lt;Food2&gt;...
+taste_num[1] : &lt;Taste1&gt; : &lt;Taste2&gt;...
 
-&lt;Item&gt;
+&lt;Food&gt;
 food_id[2] : price[3] : len : name[len]
+
+&lt;Taste&gt;
+taste_id : len : preference[len]
 </XPD:ATTR>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedViews[7]" type="UMLNoteLinkView" guid="cKYeO1rNWkmx9u9mO1bJvAAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">358,213;560,271</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">357,213;556,294</XPD:ATTR>
 <XPD:REF name="Head">90wcZ37oVU+FojPXDB7U7QAA</XPD:REF>
 <XPD:REF name="Tail">fDVepPZITU6Q7O8dcD1Q5wAA</XPD:REF>
 </XPD:OBJ>
@@ -360,7 +364,7 @@ food_id[2] : price[3] : len : name[len]
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="LineStyle" type="LineStyleKind">lsRectilinear</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">475,328;199,328</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">486,328;199,328</XPD:ATTR>
 <XPD:REF name="Model">3zgTls6mgEunuF42BQxqZwAA</XPD:REF>
 <XPD:REF name="Head">o6WKizSCa0uG78zA/MHp6gAA</XPD:REF>
 <XPD:REF name="Tail">MnIhHqLC1UeFW9/69ykt1gAA</XPD:REF>
@@ -415,7 +419,7 @@ len[2] : 0x00,0x00
 <XPD:OBJ name="OwnedViews[10]" type="UMLNoteLinkView" guid="aocfQaFnl0Od/LCD8qBXcwAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">331,324;265,404</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">336,324;268,404</XPD:ATTR>
 <XPD:REF name="Head">kJAuAF1dmEWBYvlEzsAgwQAA</XPD:REF>
 <XPD:REF name="Tail">/B3cnwV7g021+Z6w4hihHwAA</XPD:REF>
 </XPD:OBJ>
@@ -579,7 +583,7 @@ len[2] : length of the &lt;Body&gt;
 table[2] : custom_num : food_num : &lt;Food1&gt; : &lt;Food2&gt;...
 
 &lt;Food&gt;
-food_id[2] : order_num[2]
+food_id[2] : order_num[2] : taste_id
 </XPD:ATTR>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedViews[4]" type="UMLNoteLinkView" guid="QFjSW90l/ECdpofChL68vQAA">
@@ -1448,7 +1452,7 @@ len[2] : 0x00, 0x00
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="Left" type="integer">412</XPD:ATTR>
 <XPD:ATTR name="Top" type="integer">80</XPD:ATTR>
-<XPD:ATTR name="Width" type="integer">70</XPD:ATTR>
+<XPD:ATTR name="Width" type="integer">93</XPD:ATTR>
 <XPD:ATTR name="Height" type="integer">350</XPD:ATTR>
 <XPD:REF name="Model">PiiNYaM/5kO1OVYvS0JZ/wAA</XPD:REF>
 <XPD:OBJ name="NameCompartment" type="UMLNameCompartmentView" guid="bQDF8LWaX0iEteAFU7NUVQAA">
@@ -1471,7 +1475,7 @@ len[2] : 0x00, 0x00
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="LineStyle" type="LineStyleKind">lsRectilinear</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">199,180;447,180</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">199,180;458,180</XPD:ATTR>
 <XPD:REF name="Model">trhcpdRAhUCZPcMudS9pBQAA</XPD:REF>
 <XPD:REF name="Head">NQN/qsFHCkaqvJnbAyL0kAAA</XPD:REF>
 <XPD:REF name="Tail">A8MNGdmBekyoU7eqJ2z3ewAA</XPD:REF>
@@ -1498,7 +1502,7 @@ len[2] : 0x00, 0x00
 </XPD:OBJ>
 <XPD:OBJ name="Activation" type="UMLActivationView" guid="upXrM0fi3keEGCA2Fh41ewAA">
 <XPD:ATTR name="Visible" type="boolean">False</XPD:ATTR>
-<XPD:ATTR name="Left" type="integer">447</XPD:ATTR>
+<XPD:ATTR name="Left" type="integer">458</XPD:ATTR>
 <XPD:ATTR name="Top" type="integer">180</XPD:ATTR>
 <XPD:ATTR name="Width" type="integer">14</XPD:ATTR>
 <XPD:ATTR name="Height" type="integer">29</XPD:ATTR>
@@ -1523,13 +1527,13 @@ len[2] : length of the &lt;Body&gt;
 table[2] : custom_num : food_num: &lt;Food1&gt; : &lt;Food2&gt;...
 
 &lt;Food&gt;
-food_id[2] : order_num[2]
+food_id[2] : order_num[2] : taste_id
 </XPD:ATTR>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedViews[4]" type="UMLNoteLinkView" guid="53hS6azOQ0Wv3bD0/1lmuwAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">492,182;396,175</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">492,181;401,175</XPD:ATTR>
 <XPD:REF name="Head">l8cAKs9L9U6SgZuDlM+G0QAA</XPD:REF>
 <XPD:REF name="Tail">J4P0dGBtGkmrDEDRTNmD6QAA</XPD:REF>
 </XPD:OBJ>
@@ -1537,7 +1541,7 @@ food_id[2] : order_num[2]
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="LineStyle" type="LineStyleKind">lsRectilinear</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">447,280;199,280</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">458,280;199,280</XPD:ATTR>
 <XPD:REF name="Model">yZJDj51tlEa7NEFG0W7oWQAA</XPD:REF>
 <XPD:REF name="Head">A8MNGdmBekyoU7eqJ2z3ewAA</XPD:REF>
 <XPD:REF name="Tail">NQN/qsFHCkaqvJnbAyL0kAAA</XPD:REF>
@@ -1591,7 +1595,7 @@ len[2] : 0x00, 0x00
 <XPD:OBJ name="OwnedViews[7]" type="UMLNoteLinkView" guid="W2kuMAVteUirE+xcafPzTQAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">335,273;528,367</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">340,273;528,366</XPD:ATTR>
 <XPD:REF name="Head">LXf8P2vbtEqFkNpHZMHuigAA</XPD:REF>
 <XPD:REF name="Tail">QAWEfMT7GkmIGvvG279FzAAA</XPD:REF>
 </XPD:OBJ>
@@ -1599,7 +1603,7 @@ len[2] : 0x00, 0x00
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="LineStyle" type="LineStyleKind">lsRectilinear</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">447,376;199,376</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">458,376;199,376</XPD:ATTR>
 <XPD:REF name="Model">Hn65EOyla06+91qE3Q9sKwAA</XPD:REF>
 <XPD:REF name="Head">A8MNGdmBekyoU7eqJ2z3ewAA</XPD:REF>
 <XPD:REF name="Tail">NQN/qsFHCkaqvJnbAyL0kAAA</XPD:REF>
@@ -1653,7 +1657,7 @@ len[2] : 0x00, 0x00
 <XPD:OBJ name="OwnedViews[10]" type="UMLNoteLinkView" guid="CjxDndEWAkmKyG3QBU9zXAAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">320,373;271,476</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">325,373;273,476</XPD:ATTR>
 <XPD:REF name="Head">Fs/Ys2gkkE23zLIujcU2SgAA</XPD:REF>
 <XPD:REF name="Tail">zPZfdmlPj0ymM6Pl5Ijp1QAA</XPD:REF>
 </XPD:OBJ>
