@@ -17,6 +17,17 @@ SET AUTOCOMMIT=1;
 INSERT INTO `wireless_order_db`.`restaurant` (`id`, `pwd`, `account`, `restaurant_name`, `record_alive`) VALUES ('11', MD5('demo@123'), 'demo', '演示餐厅', '0');
 
 -- -----------------------------------------------------
+-- Insert test taste perference bound to the demo restaurant
+-- -----------------------------------------------------
+SET AUTOCOMMIT=0;
+-- DELETE FROM wireless_order_db.taste WHERE restaurant_id=11;
+INSERT INTO `wireless_order_db`.`taste` (`restaurant_id`, `alias_id`, `preference`) VALUES (11, 1, '加辣');
+INSERT INTO `wireless_order_db`.`taste` (`restaurant_id`, `alias_id`, `preference`) VALUES (11, 2, '少盐');
+INSERT INTO `wireless_order_db`.`taste` (`restaurant_id`, `alias_id`, `preference`) VALUES (11, 3, '少辣');
+COMMIT;
+-- SELECT * FROM terminal;
+
+-- -----------------------------------------------------
 -- Insert test terminals bound to the demo restaurant
 -- -----------------------------------------------------
 SET AUTOCOMMIT=0;

@@ -3,3 +3,4 @@ DELETE FROM wireless_order_db.order WHERE restaurant_id=11;
 DELETE FROM wireless_order_db.terminal WHERE restaurant_id=11;
 DELETE FROM wireless_order_db.table WHERE restaurant_id=11;
 DELETE FROM wireless_order_db.food WHERE restaurant_id=11;
+DELETE FROM wireless_order_db.taste WHERE restaurant_id=11;
