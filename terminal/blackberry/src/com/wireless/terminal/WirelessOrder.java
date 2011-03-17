@@ -7,10 +7,7 @@ import net.rim.device.api.system.CodeModuleManager;
 import net.rim.device.api.system.GlobalEventListener;
 import net.rim.device.api.system.SystemListener;
 import net.rim.device.api.ui.*;
-
-
-import java.util.*;
-
+import com.wireless.protocol.FoodMenu;
 import com.wireless.protocol.PinGen;
 import com.wireless.protocol.ReqOrderPackage;
 import com.wireless.util.ServerConnector;
@@ -24,7 +21,7 @@ import com.wireless.util.ServerConnector;
  */
 public class WirelessOrder extends UiApplication{
 
-	public static Vector FoodMenu = new Vector();
+	public static FoodMenu foodMenu = new FoodMenu(null, null);	
 	
 	/**
 	 * First of all, the program would restore the parameter from persist storage,

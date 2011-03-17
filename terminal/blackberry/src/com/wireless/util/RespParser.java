@@ -5,9 +5,11 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 import com.wireless.protocol.Food;
+import com.wireless.protocol.FoodMenu;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.Restaurant;
+import com.wireless.protocol.Taste;
 import com.wireless.protocol.Type;
 import com.wireless.terminal.WirelessOrder;
 
@@ -95,15 +97,14 @@ public class RespParser {
 	public static Order parseQueryOrderEx(ProtocolPackage response){
 		Order order = parseQueryOrder(response);
 		for(int i = 0; i < order.foods.length; i++){
-			Enumeration enumMenu = WirelessOrder.FoodMenu.elements();
-			while(enumMenu.hasMoreElements()){
-				Food menuFood = (Food)enumMenu.nextElement();
-				if(order.foods[i].alias_id == menuFood.alias_id){
-					order.foods[i].name = menuFood.name;
-					order.foods[i].setPrice(menuFood.getPrice());
-					break;
+			for(int j = 0; j < WirelessOrder.foodMenu.foods.length; j++){
+				if(order.foods[i].alias_id == WirelessOrder.foodMenu.foods[j].alias_id){
+					order.foods[i].name = WirelessOrder.foodMenu.foods[j].name;
+					order.foods[i].setPrice(WirelessOrder.foodMenu.foods[j].getPrice());
+					break;					
 				}
 			}
+			
 		}
 		return order;
 	}
@@ -113,8 +114,87 @@ public class RespParser {
 	 * @param response the protocol package return from ProtocolConnector's ask() function
 	 * @return the vector containing the food instance
 	 */
-	public static Vector parseQueryMenu(ProtocolPackage response){
-		Vector foodMenu = new Vector();
+//	public static Vector parseQueryMenu(ProtocolPackage response){
+//		Vector foodMenu = new Vector();
+//		/******************************************************
+//		 * In the case query menu successfully, 
+//		 * design the query menu response looks like below
+//		 * mode : type : seq : reserved : pin[6] : len[2] : item1 : item2...
+//		 * <Header>
+//		 * mode - ORDER_BUSSINESS
+//		 * type - ACK
+//		 * seq - same as request
+//		 * reserved - 0x00
+//		 * pin[6] - same as request
+//		 * len[2] -  length of the <Body>
+//		 * <Body>
+//		 * food_amount[2] : <Food1> : <Food2>... : taste_amount : <Taste1> : <Taste2> ...
+//		 * food_amount[2] - 2-byte indicating the amount of the foods listed in the menu
+//		 * <Food>
+//		 * food_id[2] : price[2] : len : name[len]
+//		 * food_id[2] - 2-byte indicating the food's id
+//		 * price[3] - 3-byte indicating the food's price
+//		 * 			  price[0] 1-byte indicating the float point
+//		 * 			  price[1..2] 2-byte indicating the fixed point
+//		 * len - 1-byte indicating the length of the food's name
+//		 * name[len] - the food's name whose length equals "len"
+//		 * 
+//		 * taste_amount - 1-byte indicates the amount of the taste preference
+//		 * <Taste>
+//		 * taste_id : len : preference[len]
+//		 * taste_id - 1-byte indicating the alias id to this taste preference
+//		 * len - 1-byte indicating the length of the preference
+//		 * preference[len] - the string to preference whose length is "len"
+//		 *******************************************************/
+//		//make sure the response is ACK
+//		if(response.header.type == Type.ACK){
+//			//get the food number
+//			int foodNum = (response.body[0] & 0x000000FF) | ((response.body[1] & 0x000000FF) << 8);
+//			
+//			int index = 2; /* the food number takes up 2-byte */
+//			
+//			//get each food's information 
+//			for(int i = 0; i < foodNum; i++){
+//				Food _food = new Food();
+//				//get the food's id
+//				_food.alias_id = (response.body[index] & 0x000000FF) |
+//							((response.body[index + 1] & 0x000000FF) << 8);
+//				
+//				//get the food's price
+//				_food.setPrice( ((response.body[index + 2] & 0x000000FF) |
+//								((response.body[index + 3] & 0x000000FF) << 8) |
+//								((response.body[index + 4] & 0x000000FF) << 16)) &
+//								0x00FFFFFF  
+//							   );
+//				
+//				index += 5;
+//
+//				//get the length of the food's name
+//				int length = response.body[index];
+//				
+//				//get the name value 
+//				try{
+//					_food.name = new String(response.body, index + 1, length, "UTF-16BE");
+//				}catch(UnsupportedEncodingException e){
+//
+//				}
+//				
+//				index += (length + 1);
+//				
+//				//add to food menu
+//				foodMenu.addElement(_food);
+//			}
+//		}
+//		return foodMenu;
+//	}
+	
+	/**
+	 * Parse the response associated with query menu request.
+	 * @param response the protocol package return from ProtocolConnector's ask() function
+	 * @return the vector containing the food instance
+	 */
+	public static FoodMenu parseQueryMenu(ProtocolPackage response){
+
 		/******************************************************
 		 * In the case query menu successfully, 
 		 * design the query menu response looks like below
@@ -127,57 +207,95 @@ public class RespParser {
 		 * pin[6] - same as request
 		 * len[2] -  length of the <Body>
 		 * <Body>
-		 * item_num[2] : <Item1> : <Item2>...
-		 * item_num[2] - 2-byte indicating the number of the foods listed in the menu
-		 * <Item>
-		 * food_id[2] : price[2] : len : name[len]
+		 * food_amount[2] : <Food1> : <Food2>... : taste_amount : <Taste1> : <Taste2> ...
+		 * food_amount[2] - 2-byte indicating the amount of the foods listed in the menu
+		 * <Food>
+		 * food_id[2] : price[3] : len : name[len]
 		 * food_id[2] - 2-byte indicating the food's id
 		 * price[3] - 3-byte indicating the food's price
 		 * 			  price[0] 1-byte indicating the float point
 		 * 			  price[1..2] 2-byte indicating the fixed point
 		 * len - 1-byte indicating the length of the food's name
 		 * name[len] - the food's name whose length equals "len"
+		 * 
+		 * taste_amount - 1-byte indicates the amount of the taste preference
+		 * <Taste>
+		 * taste_id : len : preference[len]
+		 * taste_id - 1-byte indicating the alias id to this taste preference
+		 * len - 1-byte indicating the length of the preference
+		 * preference[len] - the string to preference whose length is "len"
 		 *******************************************************/
 		//make sure the response is ACK
 		if(response.header.type == Type.ACK){
-			//get the food number
-			int foodNum = (response.body[0] & 0x000000FF) | ((response.body[1] & 0x000000FF) << 8);
+			//get the amount of foods
+			int nFoods = (response.body[0] & 0x000000FF) | ((response.body[1] & 0x000000FF) << 8);
+			
+			//allocate the memory for foods
+			Food[] foods = new Food[nFoods];
 			
 			int index = 2; /* the food number takes up 2-byte */
 			
 			//get each food's information 
-			for(int i = 0; i < foodNum; i++){
-				Food _food = new Food();
+			for(int i = 0; i < nFoods; i++){
+				Food food = new Food();
 				//get the food's id
-				_food.alias_id = (response.body[index] & 0x000000FF) |
+				food.alias_id = (response.body[index] & 0x000000FF) |
 							((response.body[index + 1] & 0x000000FF) << 8);
 				
 				//get the food's price
-				_food.setPrice( ((response.body[index + 2] & 0x000000FF) |
+				food.setPrice( ((response.body[index + 2] & 0x000000FF) |
 								((response.body[index + 3] & 0x000000FF) << 8) |
 								((response.body[index + 4] & 0x000000FF) << 16)) &
 								0x00FFFFFF  
 							   );
 				
-				index += 5;
-
 				//get the length of the food's name
-				int length = response.body[index];
+				int length = response.body[index + 5];
 				
 				//get the name value 
 				try{
-					_food.name = new String(response.body, index + 1, length, "UTF-16BE");
+					food.name = new String(response.body, index + 6, length, "UTF-16BE");
 				}catch(UnsupportedEncodingException e){
 
 				}
 				
-				index += (length + 1);
+				index += 6 + length;
 				
-				//add to food menu
-				foodMenu.addElement(_food);
+				//add to foods
+				foods[i] = food;
 			}
+			
+			//get the amount of taste preferences
+			int nTastes = response.body[index] & 0x000000FF;
+			index++;
+			//allocate the memory for taste preferences
+			Taste[] tastes = new Taste[nTastes];
+			//get each taste preference's information
+			for(int i = 0; i < nTastes; i++){
+				
+				//get the alias id to taste preference
+				short alias_id = response.body[index];
+				
+				//get the length to taste preference string
+				int length = response.body[index + 1];
+				
+				String preference = null;
+				//get the taste preference string
+				try{
+					preference = new String(response.body, index + 2, length, "UTF-16BE");
+				}catch(UnsupportedEncodingException e){}
+				
+				index += 2 + length;
+				
+				//add the taste
+				tastes[i] = new Taste(alias_id, preference);
+			}
+			
+			return new FoodMenu(foods, tastes);
+			
+		}else{
+			return new FoodMenu(new Food[0], new Taste[0]);
 		}
-		return foodMenu;
 	}
 	
 	/**

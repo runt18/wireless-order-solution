@@ -1,8 +1,6 @@
 package com.wireless.util;
 
 import java.io.IOException;
-import java.util.Enumeration;
-import java.util.Vector;
 import com.wireless.protocol.*;
 import com.wireless.terminal.WirelessOrder;
 
@@ -25,12 +23,8 @@ public class QueryMenu extends Thread{
 			_queryCallBack.preQueryMenu();
 			resp = ServerConnector.instance().ask(new ReqQueryMenu());	
 			if(resp.header.type == Type.ACK){
-				Vector menu = RespParser.parseQueryMenu(resp);
-				WirelessOrder.FoodMenu.removeAllElements();
-				Enumeration e = menu.elements();
-				while(e.hasMoreElements()){
-					WirelessOrder.FoodMenu.addElement(e.nextElement());
-				}
+				WirelessOrder.foodMenu = null;
+				WirelessOrder.foodMenu = RespParser.parseQueryMenu(resp);;
 				_queryCallBack.passMenu(resp);
 				
 			}else{
