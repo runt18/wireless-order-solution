@@ -2,8 +2,6 @@ package com.wireless.protocol;
 
 import java.io.UnsupportedEncodingException;
 
-import com.wireless.protocol.Taste;
-
 /******************************************************
  * In the case query menu not successfully
  * <Header>
