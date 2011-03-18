@@ -109,12 +109,8 @@ class OrderHandler extends Handler implements Runnable{
 			//check the header's mode and type to determine which action is performed
 			//handle query menu request
 			if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_MENU){
-				Food[] foodMenu = execQueryMenu(request);
-				if(foodMenu != null){
-					response = new RespQueryMenu(request.header, foodMenu);
-				}else{
-					response = new RespNAK(request.header);
-				}
+				FoodMenu foodMenu = execQueryMenu(request);
+				response = new RespQueryMenu(request.header, foodMenu);
 
 				//handle query restaurant request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_RESTAURANT){
@@ -255,14 +251,13 @@ class OrderHandler extends Handler implements Runnable{
 	 * Access the db to query the menu according to the table,
 	 * which contains in the query request.
 	 * @param req the query menu request
-	 * @return the array containing the food's information if query menu successfully
-	 * 		   the null array object if query menu not successfully
+	 * @return the food menu containing the foods and tastes information if succeed to request
 	 * @throws SQLException if execute the SQL statements fail		   
 	 */
-	private Food[] execQueryMenu(ProtocolPackage req) throws SQLException{
-		ArrayList<Food> foodMenu = new ArrayList<Food>();
+	private FoodMenu execQueryMenu(ProtocolPackage req) throws SQLException{
+		ArrayList<Food> foods = new ArrayList<Food>();
         //in the case the corresponding restaurant exist, and is not expired
-        //then get the food menu to this restaurant
+        //then get the foods to this restaurant
 		String sql = "SELECT alias_id, name, unit_price FROM " + WirelessSocketServer.database + ".food WHERE restaurant_id=" + _restaurantID +
 					 " AND enabled=1";
 		_rs = _stmt.executeQuery(sql);
@@ -270,10 +265,22 @@ class OrderHandler extends Handler implements Runnable{
 			Food food = new Food(_rs.getShort("alias_id"),
 					_rs.getString("name"),
 					new Float(_rs.getFloat("unit_price")));
-			foodMenu.add(food);
+			foods.add(food);
 		}
-		return foodMenu.toArray(new Food[0]);
 	
+		//Get the taste preferences to this restaurant sort by alias id in ascend order.
+		//The lower alias id, the more commonly this preference used.
+		//Put the most commonly used taste preference in first position 
+		sql = "SELECT alias_id, preference FROM " + WirelessSocketServer.database + ".taste WHERE restaurant_id=" + _restaurantID + 
+				" ORDER BY alias_id";
+		_rs = _stmt.executeQuery(sql);
+		ArrayList<Taste> tastes = new ArrayList<Taste>();
+		while(_rs.next()){
+			Taste taste = new Taste(_rs.getShort("alias_id"), _rs.getString("preference"));
+			tastes.add(taste);
+		}
+		
+		return new FoodMenu(foods.toArray(new Food[foods.size()]), tastes.toArray(new Taste[tastes.size()]));
 	}
 
 	/**
