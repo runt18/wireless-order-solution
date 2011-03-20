@@ -1,4 +1,4 @@
-#Mon Mar 07 15:43:06 CST 2011
+#Sun Mar 20 17:54:48 CST 2011
 eclipse.preferences.version=1
 encoding//src/com/wireless/terminal/ChangeOrderScreen.java=UTF-16
 encoding//src/com/wireless/terminal/FuncSettingScreen.java=UTF-16
@@ -8,6 +8,7 @@ encoding//src/com/wireless/terminal/OTAUpdatePopup.java=UTF-16
 encoding//src/com/wireless/terminal/PayOrderScreen.java=UTF-16
 encoding//src/com/wireless/terminal/QueryMenuPopup.java=UTF-8
 encoding//src/com/wireless/terminal/QueryRestaurantPopup.java=UTF-16
+encoding//src/com/wireless/terminal/SelectTastePopup.java=UTF-8
 encoding//src/com/wireless/terminal/StartupScreen.java=UTF-16
 encoding//src/com/wireless/util/OTAUpdate.java=UTF-8
 encoding//src/com/wireless/util/QueryMenu.java=UTF-8
