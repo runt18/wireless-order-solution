@@ -409,6 +409,15 @@ class OrderHandler extends Handler implements Runnable{
 			}else{
 				throw new OrderBusinessException("The food(id=" + realFoodID + ") to query doesn't exit.", ErrorCode.MENU_EXPIRED);
 			}
+			
+			//get the taste preference according to the taste id
+			sql = "SELECT preference FROM " + WirelessSocketServer.database + 
+					".taste WHERE restaurant_id=" + _restaurantID + 
+					" AND alias=" + orderToInsert.foods[i].alias_id;
+			_rs = _stmt.executeQuery(sql);
+			if(_rs.next()){
+				orderToInsert.foods[i].taste = _rs.getString("preference");
+			}
 		}
 
 		//insert to order table
@@ -429,9 +438,10 @@ class OrderHandler extends Handler implements Runnable{
 		//insert each ordered food
 		for(int i = 0; i < orderToInsert.foods.length; i++){
 			sql = "INSERT INTO `" + WirelessSocketServer.database +
-				"`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`) VALUES (" +	
+				"`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `taste`) VALUES (" +	
 				orderToInsert.id + ", " + orderToInsert.foods[i].real_id + ", " + orderToInsert.foods[i].count2Float().toString() + 
-				", " + orderToInsert.foods[i].price2Float().toString() + ", '" + orderToInsert.foods[i].name + "')";
+				", " + orderToInsert.foods[i].price2Float().toString() + ", '" + orderToInsert.foods[i].name + "', '" + 
+				orderToInsert.foods[i].taste + "')";
 			_stmt.addBatch(sql);
 		}		
 		_stmt.executeBatch();
@@ -495,45 +505,59 @@ class OrderHandler extends Handler implements Runnable{
 		//query all the food's id and order count of this order
 		long[] oldFoodIDs = new long[nFoods];
 		float[] oldOrderCounts = new float[nFoods];
-		sql = "SELECT food_id, order_count FROM `" + WirelessSocketServer.database + "`.`order_food` WHERE order_id=" + orderID;
+		short[] oldTastes = new short[nFoods];
+		sql = "SELECT food_id, order_count, taste_id FROM `" + WirelessSocketServer.database + "`.`order_food` WHERE order_id=" + orderID;
 		_rs = _stmt.executeQuery(sql);
 		int index = 0;
 		while(_rs.next()){
 			oldFoodIDs[index] = _rs.getLong("food_id");
 			oldOrderCounts[index] = _rs.getFloat("order_count");
+			oldTastes[index] = _rs.getShort("taste_id");
 			index++;
 		}
 		
 		ArrayList<Long> insertFoodIDs = new ArrayList<Long>();
 		ArrayList<String> insertFoodNames = new ArrayList<String>();
 		ArrayList<Float> insertFoodCounts = new ArrayList<Float>();
-		ArrayList<Float> insertFoodUnitPrices = new ArrayList<Float>();		
+		ArrayList<Float> insertFoodUnitPrices = new ArrayList<Float>();	
+		ArrayList<Short> insertFoodTastes = new ArrayList<Short>();
 		ArrayList<Long> updateFoodIDs = new ArrayList<Long>();
 		ArrayList<Float> updateFoodCounts = new ArrayList<Float>();
+		ArrayList<Short> updateFoodTastes = new ArrayList<Short>();
+		
+		ArrayList<Food> recordsToInsert = new ArrayList<Food>();
+		ArrayList<Food> recordsToUpdate = new ArrayList<Food>();
 		
 		for(int i = 0; i < orderToUpdate.foods.length; i++){
 			/**
-			 * Assume both food'id and order amount is not matched,
+			 * Assume it's the new record,
 			 * and need to perform the insert action.
 			 */
 			Action action = Action.Insert;
 			
 			for(int j = 0; j < nFoods; j++){
 				/**
-				 * in the case the both food alias id and order count is matched
-				 * means no change to this record
+				 * In the case below,
+				 * 1 - food alias id is matched
+				 * 2 - order count is matched
+				 * 3 - taste is matched
+				 * No need to update this record
 				 */
 				if(orderToUpdate.foods[i].alias_id == (int)(oldFoodIDs[j] & 0x00000000FFFFFFFF) &&
-					orderToUpdate.foods[i].count2Float().floatValue() == oldOrderCounts[j]){
+					orderToUpdate.foods[i].count2Float().floatValue() == oldOrderCounts[j] &&
+					orderToUpdate.foods[i].taste_id == oldTastes[j]){
 					action = Action.Skip;
 					break;
 					
 				/**
-				 * in the case the food alias id is matched, but the order count not,
-				 * means to update the order count to this record
+				 * In the case below,
+				 * 1 - food alias id is matched
+				 * 2 - order count isn't matched or taste preference isn't matched
+				 * Need to update the order count and taste preference to this record
 				 */
 				}else if(orderToUpdate.foods[i].alias_id == (int)(oldFoodIDs[j] & 0x00000000FFFFFFFF) &&
-						orderToUpdate.foods[i].count2Float().floatValue() != oldOrderCounts[j]){
+						(orderToUpdate.foods[i].count2Float().floatValue() != oldOrderCounts[j] || 
+						orderToUpdate.foods[i].taste_id != oldTastes[j])){
 					action = Action.Update;
 					break;					
 				}
@@ -541,23 +565,47 @@ class OrderHandler extends Handler implements Runnable{
 			long realFoodID = ((long)orderToUpdate.foods[i].alias_id & 0x00000000FFFFFFFFL) |
 								(((long)_restaurantID << 32) & 0xFFFFFFFF00000000L);
 			/**
-			 * If performing insert action, check to see whether the new food submitted by terminal exist in db or is 
-			 * disabled by user. 
+			 * In the case of inserting action,
+			 * firstly, check to see whether the new food submitted by terminal exist in db or is disabled by user.
 			 * If the food can't be found in db or has been disabled by user, means the menu in terminal has been expired,
+			 * and then sent back an error to tell the terminal to update the menu.
+			 * secondly, check to see whether the taste preference submitted by terminal exist in db or not.
+			 * If the taste preference can't be found in db, means the taste in terminal has been expired,
 			 * and then sent back an error to tell the terminal to update the menu.
 			 */
 			if(action == Action.Insert){
-				sql = "SELECT name, unit_price, enabled FROM " + WirelessSocketServer.database + ".food WHERE id=" + realFoodID + " AND enabled=1";
+				//get the food name and its unit price
+				sql = "SELECT name, unit_price FROM " + WirelessSocketServer.database + ".food WHERE id=" + realFoodID + " AND enabled=1";
 				_rs = _stmt.executeQuery(sql);
 				//check if the food to be inserted exist in db or not
+				Food food = new Food();
 				if(_rs.next()){
 					insertFoodIDs.add(new Long(realFoodID));
 					insertFoodNames.add(_rs.getString("name"));
 					insertFoodUnitPrices.add(new Float(_rs.getFloat("unit_price")));
 					insertFoodCounts.add(orderToUpdate.foods[i].count2Float());
+					insertFoodTastes.add(orderToUpdate.foods[i].taste_id);
+					//--------------------------------------------
+					food.real_id = realFoodID;
+					food.name = _rs.getString("name");
+					adfa food.setPrice((int)(_rs.getFloat("unit_price") * 100));
+					food.setCount(orderToUpdate.foods[i].count2Float());
 				}else{
 					throw new OrderBusinessException("The food(id=" + realFoodID + ") to query doesn't exist.", ErrorCode.MENU_EXPIRED);
 				}
+				
+				//get the taste preference
+				sql = "SELECT preference FROM " + WirelessSocketServer.database + ".taste WHERE restaurant_id=" + _restaurantID +
+						" AND alias_id=" + orderToUpdate.foods[i].taste_id;
+				_rs = _stmt.executeQuery(sql);
+				//check if the taste preference exist in db
+				if(_rs.next()){
+					food.taste_id = orderToUpdate.foods[i].taste_id;
+					food.taste = _rs.getString("preference");
+				}else{
+					throw new OrderBusinessException("The taste(alias_id=" + orderToUpdate.foods[i].taste_id + ") to query doesn't exist.", ErrorCode.MENU_EXPIRED);
+				}
+				recordsToInsert.add(food);
 
 			/**
 			 * If performing update action, we just update the order amount without checking its other info.
@@ -569,6 +617,23 @@ class OrderHandler extends Handler implements Runnable{
 			}else if(action == Action.Update){
 				updateFoodIDs.add(new Long(realFoodID));
 				updateFoodCounts.add(orderToUpdate.foods[i].count2Float());
+				updateFoodTastes.add(orderToUpdate.foods[i].taste_id);
+				//----------------------------
+				Food food = new Food();
+				food.real_id = realFoodID;
+				food.setCount(orderToUpdate.foods[i].count2Float());
+				//get the taste preference
+				sql = "SELECT preference FROM " + WirelessSocketServer.database + ".taste WHERE restaurant_id=" + _restaurantID +
+						" AND alias_id=" + orderToUpdate.foods[i].taste_id;
+				_rs = _stmt.executeQuery(sql);
+				//check if the taste preference exist in db
+				if(_rs.next()){
+					food.taste_id = orderToUpdate.foods[i].taste_id;
+					food.taste = _rs.getString("preference");
+				}else{
+					throw new OrderBusinessException("The taste(alias_id=" + orderToUpdate.foods[i].taste_id + ") to query doesn't exist.", ErrorCode.MENU_EXPIRED);
+				}
+				recordsToUpdate.add(food);
 			}
 		}
 		
@@ -829,7 +894,7 @@ class OrderHandler extends Handler implements Runnable{
 			nCustom = _rs.getByte(1);
 		}
 		//query the food's id and order count associate with the order id for "order_food" table
-		sql = "SELECT name, food_id, order_count, unit_price FROM `" + WirelessSocketServer.database + 
+		sql = "SELECT name, food_id, order_count, unit_price, taste, taste_id FROM `" + WirelessSocketServer.database + 
 		"`.`order_food` WHERE order_id=" + orderID;
 		_rs = _stmt.executeQuery(sql);
 		ArrayList<Food> foods = new ArrayList<Food>();
@@ -844,6 +909,8 @@ class OrderHandler extends Handler implements Runnable{
 			int val = (int)(_rs.getFloat("unit_price") * 100);
 			int unitPrice = ((val / 100) << 8) | (val % 100);
 			food.setPrice(unitPrice);
+			food.taste = _rs.getString("taste");
+			food.taste_id = _rs.getShort("taste_id");
 			foods.add(food);
 		}
 		

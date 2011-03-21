@@ -40,11 +40,12 @@ class OrderReqParser {
 	 * custom_num - 1-byte indicating the custom number for this table
 	 * food_num - 1-byte indicating the number of foods
 	 * <Food>
-	 * food_id[2] : order_num[2]
+	 * food_id[2] : order_num[2] : taste_id
 	 * food_id[2] - 2-byte indicating the food's id
 	 * order_num[2] - 2-byte indicating how many this foods are ordered
 	 * 			   order_num[0] - 1-byte indicates the float-point
 	 * 			   order_num[1] - 1-byte indicates the fixed-point
+	 * taste_id - 1-byte indicates the taste preference id
 	 *******************************************************/
 	static Order parseInsertOrder(ProtocolPackage req){
 		Order order = new Order();
@@ -65,10 +66,12 @@ class OrderReqParser {
 		for(int i = 0; i < orderFoods.length; i++){
 			int foodID = (req.body[index] & 0x000000FF) | ((req.body[index + 1] & 0x000000FF) << 8);
 			int orderNum = (req.body[index + 2] & 0x000000FF) | ((req.body[index + 3] & 0x000000FF) << 8);
+			short taste_id = req.body[index + 4];
 			orderFoods[i] = new Food();
 			orderFoods[i].alias_id = foodID;
 			orderFoods[i].setCount(orderNum);
-			index += 4;
+			orderFoods[i].taste_id = taste_id;
+			index += 5;
 		}
 		order.foods = orderFoods;
 		return order;
