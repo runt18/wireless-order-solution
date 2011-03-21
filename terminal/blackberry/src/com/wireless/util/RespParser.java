@@ -1,9 +1,6 @@
 package com.wireless.util;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Enumeration;
-import java.util.Vector;
-
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodMenu;
 import com.wireless.protocol.Order;
@@ -45,11 +42,12 @@ public class RespParser {
 		 * 			  price[1..3] - 3-byte indicating the fixed-point
 		 * food_num - 1-byte indicating the number of ordered food
 		 * <Food>
-		 * food_id[2] : order_num[2]
+		 * food_id[2] : order_num[2] : taste_id
 		 * food_id[2] - 2-byte indicating the food's id
 		 * order_num[2] - 2-byte indicating how many this foods are ordered
 		 * 			   order_num[0] - 1-byte indicates the float-point
 		 * 			   order_num[1] - 1-byte indicates the fixed-point
+		 * taste_id - 1-byte indicates the taste preference id
 		 *******************************************************/
 		if(response.header.type == Type.ACK){
 			//get the table id
@@ -75,11 +73,13 @@ public class RespParser {
 							((response.body[index + 1] & 0x000000FF) << 8);
 				int orderNum = (response.body[index + 2] & 0x000000FF) |
 								((response.body[index + 3] & 0x000000FF) << 8);
-				//each food information takes up 4-byte
-				index += 4;
+				short tasteID = response.body[index + 4];
+				//each food information takes up 5-byte
+				index += 5;
 				orderFoods[i] = new Food();
 				orderFoods[i].alias_id = foodID;
 				orderFoods[i].setCount(orderNum);
+				orderFoods[i].taste_id = tasteID;
 			}
 			order.foods = orderFoods;
 		}
