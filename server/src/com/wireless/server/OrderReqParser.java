@@ -70,7 +70,7 @@ class OrderReqParser {
 			orderFoods[i] = new Food();
 			orderFoods[i].alias_id = foodID;
 			orderFoods[i].setCount(orderNum);
-			orderFoods[i].taste_id = taste_id;
+			orderFoods[i].taste.alias_id = taste_id;
 			index += 5;
 		}
 		order.foods = orderFoods;
