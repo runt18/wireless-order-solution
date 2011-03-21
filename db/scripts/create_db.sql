@@ -157,6 +157,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food` (
   `unit_price` DECIMAL(7,2) UNSIGNED NOT NULL DEFAULT 0 ,
   `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to the ordered food' ,
   `taste` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the taste preference to the ordered food' ,
+  `taste_id` TINYINT NOT NULL DEFAULT 0 COMMENT 'the taste alias id' ,
   INDEX `fk_order_food_order` (`order_id` ASC) ,
   INDEX `fk_order_food_food` (`food_id` ASC) ,
   CONSTRAINT `fk_order_food_order`

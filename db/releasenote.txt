@@ -15,6 +15,7 @@ Release v1.0.3 <xx/xx/2011>
 3 - add "address" field to "restaurant" table
 4 - add the "preference" field to "order_food" table
 5 - add the "taste" table
+6 - add the "taste_id" field to "order_food" table
 ******************************************************************************************************/
 
 /******************************************************************************************************
