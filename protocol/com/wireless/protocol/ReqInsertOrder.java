@@ -94,7 +94,7 @@ public class ReqInsertOrder extends ReqOrderPackage {
 			body[foodIndex + 1] = (byte)((reqOrder.foods[i].alias_id & 0x0000FF00) >> 8);
 			body[foodIndex + 2] = (byte)(reqOrder.foods[i].getCount() & 0x000000FF);
 			body[foodIndex + 3] = (byte)((reqOrder.foods[i].getCount() & 0x0000FF00) >> 8);
-			body[foodIndex + 4] = (byte)(reqOrder.foods[i].taste_id & 0x00FF);
+			body[foodIndex + 4] = (byte)(reqOrder.foods[i].taste.alias_id & 0x00FF);
 			foodIndex += 5;
 		}		
 	}
