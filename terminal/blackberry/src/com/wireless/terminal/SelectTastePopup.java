@@ -33,7 +33,7 @@ public class SelectTastePopup extends PopupScreen{
 		}
 		
 		//the label to show the info about the food and taste preference
-		add(new LabelField(food.name + "-" + (food.taste_id == 0 ? "无口味" : WirelessOrder.foodMenu.tastes[food.taste_id - 1].preference)));
+		add(new LabelField(food.name + "-" + (food.taste.alias_id == Taste.NO_TASTE ? "无口味" : WirelessOrder.foodMenu.tastes[food.taste.alias_id - 1].preference)));
 		//the edit field to select the taste
 		_tasteID = new EditField("口味编号: ", "", 20, TextField.NO_NEWLINE | EditField.FILTER_NUMERIC);
 		
@@ -99,7 +99,7 @@ public class SelectTastePopup extends PopupScreen{
 				if(getSelectedIndex() != -1){
 					int resp = Dialog.ask(Dialog.D_YES_NO, "确认口味-" + WirelessOrder.foodMenu.tastes[getSelectedIndex()].preference + " ?", Dialog.YES);
 					if(resp == Dialog.YES){
-						_selectedFood.taste_id = (short)(getSelectedIndex() + 1);
+						_selectedFood.taste.alias_id = (short)(getSelectedIndex() + 1);
 						_orderListField.addFoodByTaste(_selectedFood);
 						close();
 						_parent.close();

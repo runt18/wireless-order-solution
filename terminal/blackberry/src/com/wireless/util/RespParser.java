@@ -79,7 +79,7 @@ public class RespParser {
 				orderFoods[i] = new Food();
 				orderFoods[i].alias_id = foodID;
 				orderFoods[i].setCount(orderNum);
-				orderFoods[i].taste_id = tasteID;
+				orderFoods[i].taste.alias_id = tasteID;
 			}
 			order.foods = orderFoods;
 		}
