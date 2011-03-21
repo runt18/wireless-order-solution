@@ -985,7 +985,7 @@ total_price[4] - 4-byte indicating the total price to this order, but right now 
 food_num - the number of the following food items
 
 &lt;Food&gt;
-food_id[2] : order_num[2]
+food_id[2] : order_num[2] : taste_id
 </XPD:ATTR>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedViews[7]" type="UMLNoteLinkView" guid="gGSnKYlsA0yt2tGNW9jR0QAA">
