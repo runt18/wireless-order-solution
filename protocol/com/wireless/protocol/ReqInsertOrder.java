@@ -70,7 +70,6 @@ public class ReqInsertOrder extends ReqOrderPackage {
 		//calculate the body's length
 		int bodyLen = 2 + /* table id takes up 2-byte */
 					1 + /* custom number takes up 1-byte */ 
-					4 + /* price takes up 4-byte */ 
 					1 + /* food number takes up 1-byte */
 					reqOrder.foods.length * 5; /* each food takes up 5-byte*/
 		header.length[0] = (byte)(bodyLen & 0x000000FF) ;
@@ -88,7 +87,7 @@ public class ReqInsertOrder extends ReqOrderPackage {
 		body[3] = (byte)(reqOrder.foods.length & 0x000000FF);
 		
 		//assign each order food's id and count
-		int foodIndex = 5;
+		int foodIndex = 4;
 		for(int i = 0; i < reqOrder.foods.length; i++){
 			body[foodIndex] = (byte)(reqOrder.foods[i].alias_id & 0x000000FF);
 			body[foodIndex + 1] = (byte)((reqOrder.foods[i].alias_id & 0x0000FF00) >> 8);
