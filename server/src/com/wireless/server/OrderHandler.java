@@ -415,7 +415,7 @@ class OrderHandler extends Handler implements Runnable{
 			if(orderToInsert.foods[i].taste.alias_id != Taste.NO_TASTE){
 				sql = "SELECT preference FROM " + WirelessSocketServer.database + 
 					".taste WHERE restaurant_id=" + _restaurantID + 
-					" AND alias_id=" + orderToInsert.foods[i].alias_id;
+					" AND alias_id=" + orderToInsert.foods[i].taste.alias_id;
 				_rs = _stmt.executeQuery(sql);
 				if(_rs.next()){
 					orderToInsert.foods[i].taste.preference = _rs.getString("preference");
@@ -441,10 +441,10 @@ class OrderHandler extends Handler implements Runnable{
 		//insert each ordered food
 		for(int i = 0; i < orderToInsert.foods.length; i++){
 			sql = "INSERT INTO `" + WirelessSocketServer.database +
-				"`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `taste`) VALUES (" +	
+				"`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `taste`, `taste_id`) VALUES (" +	
 				orderToInsert.id + ", " + orderToInsert.foods[i].real_id + ", " + orderToInsert.foods[i].count2Float().toString() + 
 				", " + orderToInsert.foods[i].price2Float().toString() + ", '" + orderToInsert.foods[i].name + "', '" + 
-				orderToInsert.foods[i].taste + "')";
+				orderToInsert.foods[i].taste.preference + "', " + orderToInsert.foods[i].taste.alias_id + ")";
 			_stmt.addBatch(sql);
 		}		
 		_stmt.executeBatch();
