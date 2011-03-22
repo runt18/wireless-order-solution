@@ -99,7 +99,12 @@ public class SelectTastePopup extends PopupScreen{
 				if(getSelectedIndex() != -1){
 					int resp = Dialog.ask(Dialog.D_YES_NO, "确认口味-" + WirelessOrder.foodMenu.tastes[getSelectedIndex()].preference + " ?", Dialog.YES);
 					if(resp == Dialog.YES){
+						//assign the taste id
 						_selectedFood.taste.alias_id = (short)(getSelectedIndex() + 1);
+						//assign the taste preference
+						try{
+							_selectedFood.taste.preference = WirelessOrder.foodMenu.tastes[getSelectedIndex()].preference;
+						}catch(ArrayIndexOutOfBoundsException e){}
 						_orderListField.addFoodByTaste(_selectedFood);
 						close();
 						_parent.close();
