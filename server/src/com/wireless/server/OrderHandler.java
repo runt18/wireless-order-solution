@@ -497,44 +497,17 @@ class OrderHandler extends Handler implements Runnable{
 		Order orderToUpdate = OrderReqParser.parseInsertOrder(req);
 		int orderID = getUnPaidOrderID(orderToUpdate.tableID);
 		
-		//calculate how many foods has been ordered 
-//		String sql = "SELECT COUNT(food_id) FROM `" + WirelessSocketServer.database + "`.`order_food` WHERE order_id=" + orderID;
-//		_rs = _stmt.executeQuery(sql);
-//		int nFoods = 0;
-//		if(_rs.next()){
-//			nFoods = _rs.getInt(1);
-//		}
-
-		
-//		long[] oldFoodIDs = new long[nFoods];
-//		float[] oldOrderCounts = new float[nFoods];
-//		short[] oldTastes = new short[nFoods];
-		
 		//query all the food's id ,order count and taste preference of this order
 		ArrayList<Food> originalRecords = new ArrayList<Food>();
 		String sql = "SELECT food_id, order_count, taste_id FROM `" + WirelessSocketServer.database + "`.`order_food` WHERE order_id=" + orderID;
 		_rs = _stmt.executeQuery(sql);
-		int index = 0;
 		while(_rs.next()){
-//			oldFoodIDs[index] = _rs.getLong("food_id");
-//			oldOrderCounts[index] = _rs.getFloat("order_count");
-//			oldTastes[index] = _rs.getShort("taste_id");
 			Food food = new Food();
 			food.real_id = _rs.getLong("food_id");
 			food.setCount(new Float(_rs.getFloat("order_count")));
 			food.taste.alias_id = _rs.getShort("taste_id");
 			originalRecords.add(food);
-			index++;
 		}
-		
-//		ArrayList<Long> insertFoodIDs = new ArrayList<Long>();
-//		ArrayList<String> insertFoodNames = new ArrayList<String>();
-//		ArrayList<Float> insertFoodCounts = new ArrayList<Float>();
-//		ArrayList<Float> insertFoodUnitPrices = new ArrayList<Float>();	
-//		ArrayList<Short> insertFoodTastes = new ArrayList<Short>();
-//		ArrayList<Long> updateFoodIDs = new ArrayList<Long>();
-//		ArrayList<Float> updateFoodCounts = new ArrayList<Float>();
-//		ArrayList<Short> updateFoodTastes = new ArrayList<Short>();
 		
 		ArrayList<Food> recordsToInsert = new ArrayList<Food>();
 		ArrayList<Food> recordsToUpdate = new ArrayList<Food>();
@@ -591,12 +564,6 @@ class OrderHandler extends Handler implements Runnable{
 				//check if the food to be inserted exist in db or not
 				Food food = new Food();
 				if(_rs.next()){
-//					insertFoodIDs.add(new Long(realFoodID));
-//					insertFoodNames.add(_rs.getString("name"));
-//					insertFoodUnitPrices.add(new Float(_rs.getFloat("unit_price")));
-//					insertFoodCounts.add(orderToUpdate.foods[i].count2Float());
-//					insertFoodTastes.add(orderToUpdate.foods[i].taste_id);
-					//--------------------------------------------
 					food.real_id = realFoodID;
 					food.name = _rs.getString("name");
 					food.setPrice(new Float(_rs.getFloat("unit_price")));
@@ -606,7 +573,7 @@ class OrderHandler extends Handler implements Runnable{
 				}
 				
 				//get the taste preference only if the food has taste preference
-				if(food.taste.alias_id != Taste.NO_TASTE){
+				if(orderToUpdate.foods[i].taste.alias_id != Taste.NO_TASTE){
 					sql = "SELECT preference FROM " + WirelessSocketServer.database + ".taste WHERE restaurant_id=" + _restaurantID +
 						" AND alias_id=" + orderToUpdate.foods[i].taste.alias_id;
 					_rs = _stmt.executeQuery(sql);
@@ -629,15 +596,11 @@ class OrderHandler extends Handler implements Runnable{
 			 * So we suggest the user had better update the menu in the case that no updated order exist.    
 			 */
 			}else if(action == Action.Update){
-//				updateFoodIDs.add(new Long(realFoodID));
-//				updateFoodCounts.add(orderToUpdate.foods[i].count2Float());
-//				updateFoodTastes.add(orderToUpdate.foods[i].taste_id);
-				//----------------------------
 				Food food = new Food();
 				food.real_id = realFoodID;
 				food.setCount(orderToUpdate.foods[i].count2Float());
 				//get the taste preference only if the food has taste preference
-				if(food.taste.alias_id != Taste.NO_TASTE){
+				if(orderToUpdate.foods[i].taste.alias_id != Taste.NO_TASTE){
 					sql = "SELECT preference FROM " + WirelessSocketServer.database + ".taste WHERE restaurant_id=" + _restaurantID +
 						" AND alias_id=" + orderToUpdate.foods[i].taste.alias_id;
 					_rs = _stmt.executeQuery(sql);
@@ -663,13 +626,16 @@ class OrderHandler extends Handler implements Runnable{
 			_stmt.addBatch(sql);
 		}
 		
-		//update the ordered food
+		//update the ordered food, including order count, taste id and preference
 		for(int i = 0; i < recordsToUpdate.size(); i++){
 			sql = "UPDATE `" + WirelessSocketServer.database + "`.`order_food` SET order_count=" + 
-			recordsToUpdate.get(i).count2String() + " WHERE order_id=" + orderID +
-			" AND food_id=" + recordsToUpdate.get(i).real_id;
+					recordsToUpdate.get(i).count2String() + 
+					", taste_id=" + recordsToUpdate.get(i).taste.alias_id +
+					", taste='" + recordsToUpdate.get(i).taste.preference + "'" + " WHERE order_id=" + orderID +
+					" AND food_id=" + recordsToUpdate.get(i).real_id;
 			_stmt.addBatch(sql);			
 		}
+		
 		//delete the original's food'id from "order_food" table if it's excluded in the updated's
 		for(int i = 0; i < originalRecords.size(); i++){
 			boolean isCancelledFood = true;
