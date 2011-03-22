@@ -414,8 +414,8 @@ class OrderHandler extends Handler implements Runnable{
 			//only if the food has the taste preference
 			if(orderToInsert.foods[i].taste.alias_id != Taste.NO_TASTE){
 				sql = "SELECT preference FROM " + WirelessSocketServer.database + 
-				".taste WHERE restaurant_id=" + _restaurantID + 
-				" AND alias=" + orderToInsert.foods[i].alias_id;
+					".taste WHERE restaurant_id=" + _restaurantID + 
+					" AND alias_id=" + orderToInsert.foods[i].alias_id;
 				_rs = _stmt.executeQuery(sql);
 				if(_rs.next()){
 					orderToInsert.foods[i].taste.preference = _rs.getString("preference");
