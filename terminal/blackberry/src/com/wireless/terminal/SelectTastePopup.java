@@ -20,6 +20,10 @@ public class SelectTastePopup extends PopupScreen{
 	private PopupScreen _parent = null;
 	int[] _tasteMatchedIdx = null;
 	
+	public SelectTastePopup(OrderListField orderField, Food food){
+		this(orderField, food, null);
+	}
+	
 	public SelectTastePopup(OrderListField orderField, Food food, PopupScreen parent){		
 		super(new VerticalFieldManager(VERTICAL_SCROLL | VERTICAL_SCROLLBAR), DEFAULT_CLOSE);
 		_orderListField = orderField;
@@ -112,7 +116,9 @@ public class SelectTastePopup extends PopupScreen{
 						}catch(ArrayIndexOutOfBoundsException e){}
 						_orderListField.addFood(_selectedFood);
 						close();
-						_parent.close();
+						if(_parent != null){
+							_parent.close();
+						}
 					}
 				}
 				
