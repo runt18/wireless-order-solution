@@ -504,6 +504,7 @@ class OrderHandler extends Handler implements Runnable{
 		while(_rs.next()){
 			Food food = new Food();
 			food.real_id = _rs.getLong("food_id");
+			food.alias_id = (int)(food.real_id & 0x00000000FFFFFFFF);
 			food.setCount(new Float(_rs.getFloat("order_count")));
 			food.taste.alias_id = _rs.getShort("taste_id");
 			originalRecords.add(food);
@@ -514,38 +515,37 @@ class OrderHandler extends Handler implements Runnable{
 		
 		for(int i = 0; i < orderToUpdate.foods.length; i++){
 			/**
-			 * Assume it's the new record,
-			 * and need to perform the insert action.
+			 * Assume it's a new record,
+			 * need to perform the insert action.
 			 */
 			Action action = Action.Insert;
 			
 			for(int j = 0; j < originalRecords.size(); j++){
 				/**
 				 * In the case below,
-				 * 1 - food alias id is matched
+				 * 1 - both food alias id and taste id is matched
 				 * 2 - order count is matched
-				 * 3 - taste is matched
 				 * No need to update this record
 				 */
-				if(orderToUpdate.foods[i].alias_id == (int)(originalRecords.get(j).real_id & 0x00000000FFFFFFFF) &&
-					orderToUpdate.foods[i].count2Float().equals(originalRecords.get(j).count2Float()) &&
-					orderToUpdate.foods[i].taste.alias_id == originalRecords.get(j).taste.alias_id){
+				if(orderToUpdate.foods[i].equals(originalRecords.get(j)) &&
+					orderToUpdate.foods[i].count2Float().equals(originalRecords.get(j).count2Float())){
 					action = Action.Skip;
 					break;
 					
 				/**
 				 * In the case below,
-				 * 1 - food alias id is matched
-				 * 2 - order count isn't matched or taste preference isn't matched
-				 * Need to update the order count and taste preference to this record
+				 * 1 - both food alias id and taste id is matched
+				 * 2 - order count isn't matched
+				 * Need to update the order count
 				 */
-				}else if(orderToUpdate.foods[i].alias_id == (int)(originalRecords.get(j).real_id & 0x00000000FFFFFFFF) &&
-						(!orderToUpdate.foods[i].count2Float().equals(originalRecords.get(j).count2Float()) || 
-						orderToUpdate.foods[i].taste.alias_id != originalRecords.get(j).taste.alias_id)){
+				}else if(orderToUpdate.foods[i].equals(originalRecords.get(j)) &&
+						  !orderToUpdate.foods[i].count2Float().equals(originalRecords.get(j).count2Float())){
 					action = Action.Update;
 					break;					
 				}
 			}
+			
+			//calculate the read food id
 			long realFoodID = ((long)orderToUpdate.foods[i].alias_id & 0x00000000FFFFFFFFL) |
 								(((long)_restaurantID << 32) & 0xFFFFFFFF00000000L);
 			/**
@@ -632,7 +632,7 @@ class OrderHandler extends Handler implements Runnable{
 					recordsToUpdate.get(i).count2String() + 
 					", taste_id=" + recordsToUpdate.get(i).taste.alias_id +
 					", taste='" + recordsToUpdate.get(i).taste.preference + "'" + " WHERE order_id=" + orderID +
-					" AND food_id=" + recordsToUpdate.get(i).real_id;
+					" AND food_id=" + recordsToUpdate.get(i).real_id + " AND taste_id=" + recordsToUpdate.get(i).taste.alias_id;
 			_stmt.addBatch(sql);			
 		}
 		
@@ -640,14 +640,14 @@ class OrderHandler extends Handler implements Runnable{
 		for(int i = 0; i < originalRecords.size(); i++){
 			boolean isCancelledFood = true;
 			for(int j = 0; j < orderToUpdate.foods.length; j++){
-				if(((int)originalRecords.get(i).real_id & 0x00000000FFFFFFFF) == orderToUpdate.foods[j].alias_id){
+				if(originalRecords.get(i).equals(orderToUpdate.foods[j])){
 					isCancelledFood = false;
 					break;
 				}
 			}
 			if(isCancelledFood){
 				sql = "DELETE FROM `" + WirelessSocketServer.database + "`.`order_food` WHERE order_id=" + orderID +
-						" AND food_id=" + originalRecords.get(i).real_id;
+						" AND food_id=" + originalRecords.get(i).real_id + " AND taste_id=" + originalRecords.get(i).taste.alias_id;
 				_stmt.addBatch(sql);
 			}
 		}
