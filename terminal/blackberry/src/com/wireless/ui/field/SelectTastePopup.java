@@ -1,7 +1,8 @@
-package com.wireless.terminal;
+package com.wireless.ui.field;
 
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Taste;
+import com.wireless.terminal.WirelessOrder;
 
 import net.rim.device.api.system.Characters;
 import net.rim.device.api.system.Display;

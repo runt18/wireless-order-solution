@@ -1,6 +1,8 @@
 package com.wireless.terminal;
 
 import com.wireless.protocol.Order;
+import com.wireless.ui.field.OrderListField;
+
 import net.rim.device.api.ui.*;
 import net.rim.device.api.ui.component.*;
 import net.rim.device.api.ui.container.*;

@@ -3,6 +3,9 @@ package com.wireless.terminal;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.Type;
+import com.wireless.ui.field.OrderListField;
+import com.wireless.ui.field.SelectFoodPopup;
+
 import net.rim.device.api.ui.*;
 import net.rim.device.api.ui.component.*;
 import net.rim.device.api.ui.container.*;
