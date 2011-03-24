@@ -82,7 +82,7 @@ public class RespParser {
 				orderFoods[i].taste.alias_id = tasteID;
 				if(tasteID != Taste.NO_TASTE){
 					try{
-						orderFoods[i].taste.preference = WirelessOrder.foodMenu.tastes[tasteID - 1].preference;
+						orderFoods[i].taste.preference = WirelessOrder.foodMenu.tastes[tasteID].preference;
 					}catch(ArrayIndexOutOfBoundsException e){}
 				}
 			}
@@ -195,9 +195,13 @@ public class RespParser {
 			int nTastes = response.body[index] & 0x000000FF;
 			index++;
 			//allocate the memory for taste preferences
-			Taste[] tastes = new Taste[nTastes];
+			Taste[] tastes = new Taste[nTastes + 1];
+			/**
+			 * We put the no taste preference to the first element
+			 */
+			tastes[0] = new Taste(Taste.NO_TASTE, Taste.NO_PREFERENCE);
 			//get each taste preference's information
-			for(int i = 0; i < nTastes; i++){
+			for(int i = 1; i < tastes.length; i++){
 				
 				//get the alias id to taste preference
 				short alias_id = response.body[index];
