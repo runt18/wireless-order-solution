@@ -761,7 +761,7 @@ class OrderHandler extends Handler implements Runnable{
 	 * @throws PrintLogicException throws if print fails
 	 */
 	private void execPrintReq(ProtocolPackage req) throws SQLException, PrintLogicException{
-		Order orderToPrint = OrderReqParser.parseInsertOrder(req);
+		Order orderToPrint = OrderReqParser.parsePrintReq(req);
 		/**
 		 * Get all the food's detail info submitted by terminal, 
 		 * and then check whether the food exist in db or is disabled by user.
