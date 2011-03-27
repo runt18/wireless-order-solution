@@ -31,7 +31,9 @@ class PayOrderPopup2 extends PopupScreen{
 				public void run(){
 					try{
 						int tmp = Integer.parseInt((String)Params.getParam(Params.PRINT_ACTION));
-						byte printType = Reserved.DEFAULT_CONF;
+						//print the receipt while paying order
+						byte printType = Reserved.DEFAULT_CONF | Reserved.PRINT_RECEIPT_2;
+						//check if the print sync or async
 						if(tmp == Params.PRINT_SYNC){
 							printType |= Reserved.PRINT_SYNC;
 						}
