@@ -6,6 +6,7 @@ import com.wireless.terminal.WirelessOrder;
 
 import net.rim.device.api.system.Characters;
 import net.rim.device.api.system.Display;
+import net.rim.device.api.ui.DrawStyle;
 import net.rim.device.api.ui.Field;
 import net.rim.device.api.ui.FieldChangeListener;
 import net.rim.device.api.ui.Graphics;
@@ -38,7 +39,7 @@ public class SelectTastePopup extends PopupScreen{
 		}
 		
 		//the label to show the info about the food and taste preference
-		add(new LabelField(food.name + "-" + (WirelessOrder.foodMenu.tastes[food.taste.alias_id].preference)));
+		add(new LabelField("请选择\"" + food.name + "\"的口味", DrawStyle.ELLIPSIS));
 		//the edit field to select the taste
 		_tasteID = new EditField("口味编号: ", "", 20, TextField.NO_NEWLINE | EditField.FILTER_NUMERIC);
 		
