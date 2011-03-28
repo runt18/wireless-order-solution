@@ -52,8 +52,7 @@ IF NOT EXIST terminal\blackberry\deliverables\Web\5.0.0\WirelessOrderTerminal.co
 :cod_exist
 	@echo copying the terminal cod files...
 	IF NOT EXIST dist\www\ota mkdir dist\www\ota
-	@copy terminal\blackberry\deliverables\Web\5.0.0\WirelessOrderTerminal.cod dist\www\ota\ > nul
-	@copy terminal\blackberry\deliverables\Web\5.0.0\WirelessOrderTerminal-1.cod dist\www\ota\ > nul
+	@copy terminal\blackberry\deliverables\Web\5.0.0\WirelessOrderTerminal*.cod dist\www\ota\ > nul
 	@copy terminal\blackberry\deliverables\Web\5.0.0\WirelessOrderTerminal.jad dist\www\ota\ > nul
 	@copy terminal\blackberry\deliverables\Web\5.0.0\WirelessOrderTerminal.jar dist\www\ota\ > nul
 	@copy terminal\blackberry\version.php dist\www\ota\ > nul
