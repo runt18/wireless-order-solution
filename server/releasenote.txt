@@ -5,6 +5,18 @@
 *******************************************************************************/
 
 /******************************************************************************************************
+Release v0.9.4 <28/03/2011> 
+<General Info>
+1 - Release on 28/03/2011
+2 - Source code of socket is tagged as 1.0.2" in Google Code's SVN
+3 - Source code of protocol is tagged as "1.0.2" in Google Code's SVN
+4 - Build under Eclipse
+<Issues>
+1 - add to support taste preference
+2 - add to support perform synchronious print action 
+******************************************************************************************************/
+
+/******************************************************************************************************
 Release v0.9.3 <09/02/2011> 
 <General Info>
 1 - Release on 09/02/2011
