@@ -37,12 +37,14 @@ public class Print {
 			stmt.execute("SET NAMES utf8");
 
 			//get the total price, table id and amount of customer
-			String sql = "SELECT total_price, table_id, custom_num FROM " + Params.dbName + ".order WHERE id=" + orderID;
+			String sql = "SELECT restaurant_id, total_price, table_id, custom_num FROM " + Params.dbName + ".order WHERE id=" + orderID;
 			rs = stmt.executeQuery(sql);
 			float totalPrice = 0;
 			short tableID = 0;
 			int customNum = 0;
+			int restaurantID = 0;
 			if(rs.next()){
+				restaurantID = rs.getInt("restaurant_id");
 				totalPrice = rs.getFloat("total_price");
 				tableID = (short)(rs.getLong("table_id") & 0x000000000000FFFF);
 				customNum = rs.getInt("custom_num");
@@ -51,12 +53,13 @@ public class Print {
 			}
 			
 			//get all the food's detail to this order
-			sql = "SELECT food_id, order_count FROM " + Params.dbName + ".order_food WHERE order_id=" + orderID;
+			sql = "SELECT name, taste, order_count FROM " + Params.dbName + ".order_food WHERE order_id=" + orderID;
 			rs = stmt.executeQuery(sql);
 			ArrayList<Food> foods = new ArrayList<Food>();
 			while(rs.next()){
 				Food food = new Food();
-				food.alias_id = (short)(rs.getLong("food_id") & 0x000000000000FFFF);
+				food.name = rs.getString("name");
+				food.taste.preference = rs.getString("taste");
 				food.setCount(new Float(rs.getFloat("order_count")));
 				foods.add(food);
 			}
@@ -69,7 +72,7 @@ public class Print {
 			reqOrder.foods = foods.toArray(new Food[foods.size()]);
 			
 			//generate the request for print order
-			ReqPrintOrder2 req = new ReqPrintOrder2(reqOrder, conf);
+			ReqPrintOrder2 req = new ReqPrintOrder2(restaurantID, reqOrder, conf);
 			
 			ProtocolPackage resp = ServerConnector.instance().ask(req);
 			if(resp.header.type != Type.ACK){
