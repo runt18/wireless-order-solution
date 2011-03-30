@@ -350,7 +350,7 @@ taste_num[1] : &lt;Taste1&gt; : &lt;Taste2&gt;...
 food_id[2] : price[3] : len : name[len]
 
 &lt;Taste&gt;
-taste_id : len : preference[len]
+taste_id : price[3] : len : preference[len]
 </XPD:ATTR>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedViews[7]" type="UMLNoteLinkView" guid="cKYeO1rNWkmx9u9mO1bJvAAA">
