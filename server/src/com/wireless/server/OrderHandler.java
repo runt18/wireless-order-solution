@@ -263,20 +263,22 @@ class OrderHandler extends Handler implements Runnable{
 		_rs = _stmt.executeQuery(sql);
 		while(_rs.next()){
 			Food food = new Food(_rs.getShort("alias_id"),
-					_rs.getString("name"),
-					new Float(_rs.getFloat("unit_price")));
+								 _rs.getString("name"),
+								 new Float(_rs.getFloat("unit_price")));
 			foods.add(food);
 		}
 	
 		//Get the taste preferences to this restaurant sort by alias id in ascend order.
 		//The lower alias id, the more commonly this preference used.
 		//Put the most commonly used taste preference in first position 
-		sql = "SELECT alias_id, preference FROM " + WirelessSocketServer.database + ".taste WHERE restaurant_id=" + _restaurantID + 
+		sql = "SELECT alias_id, preference, price FROM " + WirelessSocketServer.database + ".taste WHERE restaurant_id=" + _restaurantID + 
 				" ORDER BY alias_id";
 		_rs = _stmt.executeQuery(sql);
 		ArrayList<Taste> tastes = new ArrayList<Taste>();
 		while(_rs.next()){
-			Taste taste = new Taste(_rs.getShort("alias_id"), _rs.getString("preference"));
+			Taste taste = new Taste(_rs.getShort("alias_id"), 
+									_rs.getString("preference"),
+									new Float(_rs.getFloat("price")));
 			tastes.add(taste);
 		}
 		
@@ -404,7 +406,7 @@ class OrderHandler extends Handler implements Runnable{
 				orderToInsert.foods[i].name = _rs.getString("name");
 				int val = (int)(_rs.getFloat("unit_price") * 100);
 				int unitPrice = ((val / 100) << 8) | (val % 100);
-				orderToInsert.foods[i].setPrice(unitPrice);
+				orderToInsert.foods[i].price = unitPrice;
 				orderToInsert.foods[i].kitchen = _rs.getShort("kitchen");
 			}else{
 				throw new OrderBusinessException("The food(id=" + realFoodID + ") to query doesn't exit.", ErrorCode.MENU_EXPIRED);
@@ -782,7 +784,7 @@ class OrderHandler extends Handler implements Runnable{
 				orderToPrint.foods[i].name = _rs.getString("name");
 				int val = (int)(_rs.getFloat("unit_price") * 100);
 				int unitPrice = ((val / 100) << 8) | (val % 100);
-				orderToPrint.foods[i].setPrice(unitPrice);
+				orderToPrint.foods[i].price = unitPrice;
 				orderToPrint.foods[i].kitchen = _rs.getShort("kitchen");
 			}else{
 				throw new PrintLogicException("The food(id=" + realFoodID + ") to query doesn't exit.", ErrorCode.MENU_EXPIRED);
@@ -892,7 +894,7 @@ class OrderHandler extends Handler implements Runnable{
 			food.setCount(new Float(_rs.getFloat("order_count")));
 			int val = (int)(_rs.getFloat("unit_price") * 100);
 			int unitPrice = ((val / 100) << 8) | (val % 100);
-			food.setPrice(unitPrice);
+			food.price = unitPrice;
 			food.taste.preference = _rs.getString("taste");
 			food.taste.alias_id = _rs.getShort("taste_id");
 			foods.add(food);

@@ -69,7 +69,7 @@ class OrderReqParser {
 			short taste_id = req.body[index + 4];
 			orderFoods[i] = new Food();
 			orderFoods[i].alias_id = foodID;
-			orderFoods[i].setCount(orderNum);
+			orderFoods[i].count = orderNum;
 			orderFoods[i].taste.alias_id = taste_id;
 			index += 5;
 		}
@@ -163,7 +163,7 @@ class OrderReqParser {
 			System.arraycopy(req.body, index, foodTaste, 0, nTasteBytes);
 			index += nTasteBytes;
 			
-			orderFoods[i].setCount(orderNum);
+			orderFoods[i].count = orderNum;
 			orderFoods[i].name = new String(foodName);
 			orderFoods[i].taste.preference = new String(foodTaste);
 		}
