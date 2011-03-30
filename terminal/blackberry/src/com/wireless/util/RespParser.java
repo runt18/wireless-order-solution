@@ -78,7 +78,7 @@ public class RespParser {
 				index += 5;
 				orderFoods[i] = new Food();
 				orderFoods[i].alias_id = foodID;
-				orderFoods[i].setCount(orderNum);
+				orderFoods[i].count = orderNum;
 				orderFoods[i].taste.alias_id = tasteID;
 				if(tasteID != Taste.NO_TASTE){
 					try{
@@ -105,7 +105,7 @@ public class RespParser {
 			for(int j = 0; j < WirelessOrder.foodMenu.foods.length; j++){
 				if(order.foods[i].alias_id == WirelessOrder.foodMenu.foods[j].alias_id){
 					order.foods[i].name = WirelessOrder.foodMenu.foods[j].name;
-					order.foods[i].setPrice(WirelessOrder.foodMenu.foods[j].getPrice());
+					order.foods[i].price = WirelessOrder.foodMenu.foods[j].price;
 					break;					
 				}
 			}
@@ -146,8 +146,11 @@ public class RespParser {
 		 * 
 		 * taste_amount - 1-byte indicates the amount of the taste preference
 		 * <Taste>
-		 * taste_id : len : preference[len]
+		 * taste_id : price[3] : len : preference[len]
 		 * taste_id - 1-byte indicating the alias id to this taste preference
+		 * price[3] - 3-byte indicating the food's price
+		 * 			  price[0] 1-byte indicating the float point
+		 * 			  price[1..2] 2-byte indicating the fixed point
 		 * len - 1-byte indicating the length of the preference
 		 * preference[len] - the string to preference whose length is "len"
 		 *******************************************************/
@@ -169,11 +172,9 @@ public class RespParser {
 							((response.body[index + 1] & 0x000000FF) << 8);
 				
 				//get the food's price
-				food.setPrice( ((response.body[index + 2] & 0x000000FF) |
-								((response.body[index + 3] & 0x000000FF) << 8) |
-								((response.body[index + 4] & 0x000000FF) << 16)) &
-								0x00FFFFFF  
-							   );
+				food.price = ((response.body[index + 2] & 0x000000FF) |
+							 ((response.body[index + 3] & 0x000000FF) << 8) |
+							 ((response.body[index + 4] & 0x000000FF) << 16)) &	0x00FFFFFF;
 				
 				//get the length of the food's name
 				int length = response.body[index + 5];
@@ -206,19 +207,24 @@ public class RespParser {
 				//get the alias id to taste preference
 				short alias_id = response.body[index];
 				
+				//get the price to taste preference
+				int price = ((response.body[index + 2] & 0x000000FF) |
+							((response.body[index + 3] & 0x000000FF) << 8) |
+							((response.body[index + 4] & 0x000000FF) << 16)) & 0x00FFFFFF ;
+				
 				//get the length to taste preference string
-				int length = response.body[index + 1];
+				int length = response.body[index + 5];
 				
 				String preference = null;
 				//get the taste preference string
 				try{
-					preference = new String(response.body, index + 2, length, "UTF-16BE");
+					preference = new String(response.body, index + 6, length, "UTF-16BE");
 				}catch(UnsupportedEncodingException e){}
 				
-				index += 2 + length;
+				index += 6 + length;
 				
 				//add the taste
-				tastes[i] = new Taste(alias_id, preference);
+				tastes[i] = new Taste(alias_id, preference, price);
 			}
 			
 			return new FoodMenu(foods, tastes);

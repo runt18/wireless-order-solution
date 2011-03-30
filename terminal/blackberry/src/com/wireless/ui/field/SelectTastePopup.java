@@ -131,8 +131,10 @@ public class SelectTastePopup extends PopupScreen{
 		_tasteList.setCallback(new ListFieldCallback(){
 			// draw the current row
 		    public void drawListRow(ListField list, Graphics g, int index, int y, int w){
-	    		Taste taste = (Taste)WirelessOrder.foodMenu.tastes[_tasteMatchedIdx[index]];	
-		    	g.drawText(taste.preference, 0, y, 0, w);
+	    		Taste taste = (Taste)WirelessOrder.foodMenu.tastes[_tasteMatchedIdx[index]];
+	    		int priceWidth = 85;
+		    	g.drawText(taste.preference, 0, y, 0, w - priceWidth);
+				g.drawText(taste.price2String(), w - priceWidth, y, DrawStyle.RIGHT, priceWidth);		
 		    }
 		    
 		    // get the selected index from the correct Vector
