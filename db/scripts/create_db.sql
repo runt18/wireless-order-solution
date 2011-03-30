@@ -157,6 +157,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food` (
   `unit_price` DECIMAL(7,2) UNSIGNED NOT NULL DEFAULT 0 ,
   `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to the ordered food' ,
   `taste` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the taste preference to the ordered food' ,
+  `taste_price` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the price to taste preference' ,
   `taste_id` TINYINT NOT NULL DEFAULT 0 COMMENT 'the taste alias id' ,
   INDEX `fk_order_food_order` (`order_id` ASC) ,
   INDEX `fk_order_food_food` (`food_id` ASC) ,
@@ -184,6 +185,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`taste` (
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'indicates the taste preference belong to which restaurant' ,
   `alias_id` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the alias id to this taste preference, the lower the alias id , the more commonly this taste preference used' ,
   `preference` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the description to this taste preference' ,
+  `price` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the price to this taste preference' ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_taste_restaurant_id` (`restaurant_id` ASC) ,
   CONSTRAINT `fk_taste_restaurant_id`

@@ -8,6 +8,7 @@ DELETE FROM wireless_order_db.order WHERE restaurant_id=11;
 DELETE FROM wireless_order_db.terminal WHERE restaurant_id=11;
 DELETE FROM wireless_order_db.table WHERE restaurant_id=11;
 DELETE FROM wireless_order_db.food WHERE restaurant_id=11;
+DELETE FROM wireless_order_db.taste WHERE restaurant_id=11;
 DELETE FROM wireless_order_db.restaurant WHERE id=11;
 
 -- -----------------------------------------------------
@@ -21,9 +22,9 @@ INSERT INTO `wireless_order_db`.`restaurant` (`id`, `pwd`, `account`, `restauran
 -- -----------------------------------------------------
 SET AUTOCOMMIT=0;
 -- DELETE FROM wireless_order_db.taste WHERE restaurant_id=11;
-INSERT INTO `wireless_order_db`.`taste` (`restaurant_id`, `alias_id`, `preference`) VALUES (11, 1, '加辣');
-INSERT INTO `wireless_order_db`.`taste` (`restaurant_id`, `alias_id`, `preference`) VALUES (11, 2, '少盐');
-INSERT INTO `wireless_order_db`.`taste` (`restaurant_id`, `alias_id`, `preference`) VALUES (11, 3, '少辣');
+INSERT INTO `wireless_order_db`.`taste` (`restaurant_id`, `alias_id`, `preference`, `price`) VALUES (11, 1, '加辣', 2.5);
+INSERT INTO `wireless_order_db`.`taste` (`restaurant_id`, `alias_id`, `preference`, `price`) VALUES (11, 2, '少盐', 0);
+INSERT INTO `wireless_order_db`.`taste` (`restaurant_id`, `alias_id`, `preference`, `price`) VALUES (11, 3, '少辣', 5.0);
 COMMIT;
 -- SELECT * FROM terminal;
 
