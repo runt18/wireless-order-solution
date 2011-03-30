@@ -69,8 +69,8 @@ public class RespQueryOrder extends RespPackage{
 		for(int i = 0; i < order.foods.length; i++){
 			body[index] = (byte)(order.foods[i].alias_id & 0x000000FF);
 			body[index + 1] = (byte)((order.foods[i].alias_id & 0x0000FF00) >> 8);
-			body[index + 2] = (byte)(order.foods[i].getCount() & 0x000000FF);
-			body[index + 3] = (byte)((order.foods[i].getCount() & 0x0000FF00) >> 8);
+			body[index + 2] = (byte)(order.foods[i].count & 0x000000FF);
+			body[index + 3] = (byte)((order.foods[i].count & 0x0000FF00) >> 8);
 			body[index + 4] = (byte)(order.foods[i].taste.alias_id & 0x00FF);
 			index += 5;
 		}

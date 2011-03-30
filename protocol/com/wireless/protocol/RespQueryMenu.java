@@ -39,7 +39,7 @@ import java.io.UnsupportedEncodingException;
  * 
  * taste_amount - 1-byte indicates the amount of the taste preference
  * <Taste>
- * taste_id : len : preference[len]
+ * taste_id : price[3] : len : preference[len]
  * taste_id - 1-byte indicating the alias id to this taste preference
  * len - 1-byte indicating the length of the preference
  * preference[len] - the string to preference whose length is "len"
@@ -68,9 +68,9 @@ public class RespQueryMenu extends RespPackage{
 			byte[] preference = foodMenu.tastes[i].preference.getBytes("UTF-16BE");
 			/*
 			 * each taste preference consist of the stuff below.
-			 * toast_id(1-byte) + length of the preference(1-byte) + preference description(len-byte)
+			 * toast_id(1-byte) + price(3-byte) + length of the preference(1-byte) + preference description(len-byte)
 			 */
-			bodyLen += 1 + 1 + preference.length;
+			bodyLen += 1 + 3 + 1 + preference.length;
 		}
 		
 		//assign the body length to the corresponding header's field
@@ -92,10 +92,10 @@ public class RespQueryMenu extends RespPackage{
 			body[index + 1] = (byte)((foodMenu.foods[i].alias_id & 0x0000FF00) >> 8);
 			
 			//assign the float-point of the price
-			body[index + 2] = (byte)(foodMenu.foods[i].getPrice() & 0x000000FF);
+			body[index + 2] = (byte)(foodMenu.foods[i].price & 0x000000FF);
 			//assign the fixed-point of the price
-			body[index + 3] = (byte)((foodMenu.foods[i].getPrice() & 0x0000FF00) >> 8);
-			body[index + 4] = (byte)((foodMenu.foods[i].getPrice() & 0x00FF0000) >> 16);
+			body[index + 3] = (byte)((foodMenu.foods[i].price & 0x0000FF00) >> 8);
+			body[index + 4] = (byte)((foodMenu.foods[i].price & 0x00FF0000) >> 16);
 			//assign the length of food's name
 			byte[] name = foodMenu.foods[i].name.getBytes("UTF-16BE");
 			body[index + 5] = (byte)(name.length & 0x000000FF);
@@ -117,17 +117,24 @@ public class RespQueryMenu extends RespPackage{
 		for(int i = 0; i < foodMenu.tastes.length; i++){
 			//assign the taste preference alias id
 			body[index] = (byte)(foodMenu.tastes[i].alias_id & 0x00FF);
+			
+			//assign the float-point of taste preference price
+			body[index + 1] = (byte)(foodMenu.tastes[i].price & 0x000000FF);
+			//assign the fixed-point of the taste preference price
+			body[index + 2] = (byte)((foodMenu.tastes[i].price & 0x0000FF00) >> 8);
+			body[index + 3] = (byte)((foodMenu.tastes[i].price & 0x00FF0000) >> 16);
+			
 			//assign the length of the preference string
 			byte[] preference = foodMenu.tastes[i].preference.getBytes("UTF-16BE");
-			body[index + 1] = (byte)(preference.length & 0x000000FF);
+			body[index + 4] = (byte)(preference.length & 0x000000FF);
 			//assign the preference string
 			for(int cnt = 0; cnt < preference.length; cnt++){
-				body[index + 2 + cnt] = preference[cnt];
+				body[index + 5 + cnt] = preference[cnt];
 			}
 			/*
-			 * toast_id(1-byte) + length of the preference(1-byte) + preference description(len-byte) 
+			 * toast_id(1-byte) + price(3-byte) + length of the preference(1-byte) + preference description(len-byte) 
 			 */
-			index += 1 + 1 + preference.length;
+			index += 1 + 3 + 1 + preference.length;
 		}		
 	}
 }

@@ -100,8 +100,8 @@ public class ReqPrintOrder2 extends ReqOrderPackage{
 		int index = 12;
 		for(int i = 0; i < reqOrder.foods.length; i++){
 			//assign the order count
-			body[index] = (byte)(reqOrder.foods[i].getCount() & 0x000000FF);
-			body[index + 1] = (byte)((reqOrder.foods[i].getCount() & 0x0000FF00) >> 8);
+			body[index] = (byte)(reqOrder.foods[i].count & 0x000000FF);
+			body[index + 1] = (byte)((reqOrder.foods[i].count & 0x0000FF00) >> 8);
 			index += 2;
 			
 			byte[] foodName = reqOrder.foods[i].name.getBytes();
