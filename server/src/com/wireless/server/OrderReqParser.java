@@ -119,7 +119,7 @@ class OrderReqParser {
 		 				((req.body[1] & 0x000000FF) << 8) | 
 		 				((req.body[2] & 0x000000FF) << 16) |
 		 				((req.body[3] & 0x000000FF) << 24);
-		order.setTotalPrice(totalPrice);
+		order.totalPrice = totalPrice;
 		
 		int restaurantID = (req.body[4] & 0x000000FF) | 
 						((req.body[5] & 0x000000FF) << 8) | 
@@ -216,7 +216,7 @@ class OrderReqParser {
 		
 		Order orderToPay = new Order();
 		orderToPay.tableID = tableToPay;
-		orderToPay.setTotalPrice(totalPrice);
+		orderToPay.totalPrice = totalPrice;
 		return orderToPay;
 	}
 }

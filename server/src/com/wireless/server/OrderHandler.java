@@ -691,7 +691,7 @@ class OrderHandler extends Handler implements Runnable{
 		Order payOrderInfo = OrderReqParser.parsePayOrder(req);
 		payOrderInfo.id = getUnPaidOrderID(payOrderInfo.tableID);
 		
-		float totalPrice = payOrderInfo.price2Float().floatValue();
+		float totalPrice = Util.price2Float(payOrderInfo.totalPrice, Util.INT_MASK_3).floatValue();
 		_stmt.clearBatch();
 		//update the total price and terminal pin in "order" table
 		String sql = "UPDATE `" + WirelessSocketServer.database + "`.`order` SET terminal_pin=" + _pin +
@@ -734,7 +734,7 @@ class OrderHandler extends Handler implements Runnable{
 				for(int i = 0; i < connections.length; i++){					
 					try{
 						Order orderToPay = getOrderByID(payOrderInfo.id, payOrderInfo.tableID);
-						orderToPay.setTotalPrice(payOrderInfo.getTotalPrice());
+						orderToPay.totalPrice = payOrderInfo.totalPrice;
 						new PrintHandler(orderToPay, connections[i], req.header.reserved, _restaurantID, _owner).run2();
 					}catch(PrintSocketException e){}
 				}
@@ -749,7 +749,7 @@ class OrderHandler extends Handler implements Runnable{
 			if(connections != null){
 				for(int i = 0; i < connections.length; i++){
 					Order orderToPay = getOrderByID(payOrderInfo.id, payOrderInfo.tableID);
-					orderToPay.setTotalPrice(payOrderInfo.getTotalPrice());
+					orderToPay.totalPrice = payOrderInfo.totalPrice;
 					WirelessSocketServer.threadPool.execute(new PrintHandler(orderToPay, connections[i], req.header.reserved, _restaurantID, _owner));					
 				}
 			}
