@@ -3,7 +3,7 @@ package com.wireless.protocol;
 public class Taste {
 	
 	public final static short NO_TASTE = 0;
-	public final static String NO_PREFERENCE = "æ— å�£å‘³"; 
+	public final static String NO_PREFERENCE = "无口味"; 
 	
 	public short alias_id;
 	public String preference;
@@ -73,30 +73,32 @@ public class Taste {
 	}
 	
 	/**
-	 * Convert the unit price of ordered food to string.
+	 * Convert the price of taste to string.
 	 * Note that the value accurate to two decimal parts 
 	 * and add the "￥" character in front of the converted string.<br>
 	 * For example as below.<br>
 	 * "1" shown as "￥1".<br>
 	 * "1.1" shown as "￥1.10".<br>
 	 * "1.23" shown as "￥1.23".<br>
+	 * @param priceInt the price of taste represented as an integer
 	 * @return the converted string
 	 */
-	public String price2String(){
-		String integer = new Integer((price & 0x00FFFF00) >> 8).toString();
-		String decimal = new Byte((byte)(price & 0x000000FF)).toString();
-		if((price & 0x000000FF) < 10){
-			return "￥" + integer + ".0" + decimal;			
-		}else{
-			return "￥" + integer + "." + decimal;			
-		}
-	}
+//	public String price2String(int priceInt){
+//		String integer = new Integer((priceInt & 0x00FFFF00) >> 8).toString();
+//		String decimal = new Byte((byte)(priceInt & 0x000000FF)).toString();
+//		if((priceInt & 0x000000FF) < 10){
+//			return "￥" + integer + ".0" + decimal;			
+//		}else{
+//			return "￥" + integer + "." + decimal;			
+//		}
+//	}
 	
 	/**
-	 * Convert the unit price of the ordered food to Float object
+	 * Convert the price of taste to Float object
+	 * @param priceInt the price of taste represented as an integer
 	 * @return the Float object indicates the unit price of the ordered food
 	 */
-	public Float price2Float(){
-		return new Float(((price & 0x00FFFF00) >> 8) + ((price & 0x000000FF) * 0.01));
-	}
+//	public Float price2Float(int priceInt){
+//		return new Float(((priceInt & 0x00FFFF00) >> 8) + ((priceInt & 0x000000FF) * 0.01));
+//	}
 }

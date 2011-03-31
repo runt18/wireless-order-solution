@@ -56,10 +56,10 @@ public class RespQueryOrder extends RespPackage{
 		body[2] = (byte)(order.customNum & 0x000000FF);
 		
 		//assign the total price
-		body[3] = (byte)(order.getTotalPrice() & 0x000000FF);
-		body[4] = (byte)((order.getTotalPrice() & 0x0000FF00) >> 8);
-		body[5] = (byte)((order.getTotalPrice() & 0x00FF0000) >> 16);
-		body[6] = (byte)((order.getTotalPrice() & 0xFF000000) >> 24);
+		body[3] = (byte)(order.totalPrice & 0x000000FF);
+		body[4] = (byte)((order.totalPrice & 0x0000FF00) >> 8);
+		body[5] = (byte)((order.totalPrice & 0x00FF0000) >> 16);
+		body[6] = (byte)((order.totalPrice & 0xFF000000) >> 24);
 		
 		//assign the food number
 		body[7] = (byte)(order.foods.length & 0x000000FF);

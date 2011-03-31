@@ -74,7 +74,7 @@ public class ReqPrintOrder2 extends ReqOrderPackage{
 		body = new byte[bodyLen];
 		
 		//assign the total price
-		int totalPrice = reqOrder.getTotalPrice();
+		int totalPrice = reqOrder.totalPrice;
 		body[0] = (byte)(totalPrice & 0x000000FF);
 		body[1] = (byte)((totalPrice >> 8) & 0x000000FF);
 		body[2] = (byte)((totalPrice >> 16) & 0x000000FF);
