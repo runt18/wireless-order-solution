@@ -17,7 +17,7 @@ import javax.xml.parsers.*;
 public class WirelessSocketServer {
 
 	//the version of the wireless socket server
-	static final String VERSION = "0.9.3";
+	static final String VERSION = "0.9.5";
 	//the OTA server address
 	static String OTA_IP = ""; 
 	//the OTA server port
