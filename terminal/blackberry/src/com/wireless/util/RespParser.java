@@ -57,10 +57,10 @@ public class RespParser {
 			order.customNum = (int)response.body[2];
 
 			//get the total price
-			order.setTotalPrice( (response.body[3] & 0x000000FF) | 
+			order.totalPrice =  (response.body[3] & 0x000000FF) | 
 								((response.body[4] & 0x000000FF ) << 8) |
 								((response.body[5] & 0x000000FF ) << 16) |
-								((response.body[6] & 0x000000FF ) << 24));
+								((response.body[6] & 0x000000FF ) << 24);
 
 			//get order food's number
 			int foodNum = response.body[7];
@@ -82,6 +82,7 @@ public class RespParser {
 				orderFoods[i].taste.alias_id = tasteID;
 				if(tasteID != Taste.NO_TASTE){
 					try{
+						orderFoods[i].taste.price = WirelessOrder.foodMenu.tastes[tasteID].price;
 						orderFoods[i].taste.preference = WirelessOrder.foodMenu.tastes[tasteID].preference;
 					}catch(ArrayIndexOutOfBoundsException e){}
 				}
@@ -208,20 +209,20 @@ public class RespParser {
 				short alias_id = response.body[index];
 				
 				//get the price to taste preference
-				int price = ((response.body[index + 2] & 0x000000FF) |
-							((response.body[index + 3] & 0x000000FF) << 8) |
-							((response.body[index + 4] & 0x000000FF) << 16)) & 0x00FFFFFF ;
+				int price = ((response.body[index + 1] & 0x000000FF) |
+							((response.body[index + 2] & 0x000000FF) << 8) |
+							((response.body[index + 3] & 0x000000FF) << 16)) & 0x00FFFFFF ;
 				
 				//get the length to taste preference string
-				int length = response.body[index + 5];
+				int length = response.body[index + 4];
 				
 				String preference = null;
 				//get the taste preference string
 				try{
-					preference = new String(response.body, index + 6, length, "UTF-16BE");
+					preference = new String(response.body, index + 5, length, "UTF-16BE");
 				}catch(UnsupportedEncodingException e){}
 				
-				index += 6 + length;
+				index += 5 + length;
 				
 				//add the taste
 				tastes[i] = new Taste(alias_id, preference, price);

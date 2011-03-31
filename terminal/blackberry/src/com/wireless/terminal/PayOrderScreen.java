@@ -1,11 +1,24 @@
 package com.wireless.terminal;
 
-import com.wireless.protocol.Order;
-import com.wireless.ui.field.OrderListField;
+import net.rim.device.api.ui.Color;
+import net.rim.device.api.ui.DrawStyle;
+import net.rim.device.api.ui.Field;
+import net.rim.device.api.ui.FieldChangeListener;
+import net.rim.device.api.ui.Graphics;
+import net.rim.device.api.ui.Manager;
+import net.rim.device.api.ui.UiApplication;
+import net.rim.device.api.ui.component.ButtonField;
+import net.rim.device.api.ui.component.Dialog;
+import net.rim.device.api.ui.component.LabelField;
+import net.rim.device.api.ui.component.ListField;
+import net.rim.device.api.ui.component.SeparatorField;
+import net.rim.device.api.ui.container.HorizontalFieldManager;
+import net.rim.device.api.ui.container.MainScreen;
+import net.rim.device.api.ui.container.VerticalFieldManager;
 
-import net.rim.device.api.ui.*;
-import net.rim.device.api.ui.component.*;
-import net.rim.device.api.ui.container.*;
+import com.wireless.protocol.Order;
+import com.wireless.protocol.Util;
+import com.wireless.ui.field.OrderListField;
 
 public class PayOrderScreen extends MainScreen
 							implements PostPayOrder{
@@ -56,7 +69,7 @@ public class PayOrderScreen extends MainScreen
 		_vfm.add(new SeparatorField());
 		add(_vfm);
 		HorizontalFieldManager _hfm1 = new HorizontalFieldManager(Manager.FIELD_RIGHT);
-		_hfm1.add(new LabelField("合计：" + _bill.price2StringEx()));
+		_hfm1.add(new LabelField("合计：" + Util.price2String(_bill.totalPrice2(), Util.INT_MASK_3)));
 		add(_hfm1);
 		add(new SeparatorField());
 		
@@ -68,7 +81,7 @@ public class PayOrderScreen extends MainScreen
 		//Set the submit button's listener
 		_submit.setChangeListener(new FieldChangeListener(){
 			public void fieldChanged(Field field, int context) {
-				UiApplication.getUiApplication().pushScreen(new PayOrderPopup2(_bill.tableID, _bill.getTotalPrice(), _self));
+				UiApplication.getUiApplication().pushScreen(new PayOrderPopup2(_bill.tableID, _bill.totalPrice2(), _self));
 	         }
 		});
 		
