@@ -106,8 +106,9 @@ else if($editType == "deleteRestaurant")
 	$password = $_POST["password"];
 	if($password == $_SESSION["password"])
 	{
-		if($db->Execute("DELETE FROM order_food WHERE food_id IN (SELECT id from food WHERE restaurant_id=$id)") && $db->Execute("DELETE FROM food WHERE restaurant_id=$id") 
-			&& $db->Execute("DELETE FROM `order` WHERE restaurant_id=$id") && $db->Execute("DELETE FROM `table` WHERE restaurant_id=$id")  
+				if($db->Execute("DELETE FROM order_food WHERE food_id IN (SELECT id from food WHERE restaurant_id=$id)") && $db->Execute("DELETE FROM food WHERE restaurant_id=$id") 
+						&& $db->Execute("DELETE FROM `order` WHERE restaurant_id=$id") && $db->Execute("DELETE FROM `table` WHERE restaurant_id=$id")  
+						&& $db->Execute("DELETE FROM `taste` WHERE restaurant_id=$id")
 			&& $db->Execute("UPDATE `terminal` SET restaurant_id=2,idle_date=NOW(),expire_date=NULL WHERE restaurant_id=$id") && $db->Execute("DELETE FROM restaurant WHERE id=$id"))
 		{			
 			echo "<script>alert('删除成功！');</script>";
