@@ -19,6 +19,8 @@ public class Reserved {
 	public static final byte PRINT_ORDER_DETAIL_2 = 0x04;
 	//indicates to print receipt
 	public static final byte PRINT_RECEIPT_2 = 0x08;
+	//indicates to print extra food detail
+	public static final byte PRINT_EXTRA_FOOD_2 = 0x10;
 	/**
 	 * The values below are used for the print request
 	 * to indicate which function of the print is going to do. 
@@ -27,4 +29,5 @@ public class Reserved {
 	public static final byte PRINT_ORDER = 1;
 	public static final byte PRINT_ORDER_DETAIL = 2;
 	public static final byte PRINT_RECEIPT = 3;
+	public static final byte PRINT_EXTRA_FOOD = 4;
 }
