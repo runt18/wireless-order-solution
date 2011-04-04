@@ -493,9 +493,10 @@ class OrderHandler extends Handler implements Runnable{
 	 * Access the database to update the order specified in the request
 	 * @param req the update order request with all the order information
 	 * @throws SQLException if execute SQL statements fail
+	 * @throws PrintLogicExeption if fail to print extra food detail
 	 * @throws OrderBusinessException if the table or the order to be updated doesn't exist
 	 */
-	private void execUpdateOrder(ProtocolPackage req) throws SQLException, OrderBusinessException{
+	private void execUpdateOrder(ProtocolPackage req) throws SQLException, PrintLogicException, OrderBusinessException{
 		Order orderToUpdate = OrderReqParser.parseInsertOrder(req);
 		int orderID = getUnPaidOrderID(orderToUpdate.tableID);
 		
@@ -618,6 +619,52 @@ class OrderHandler extends Handler implements Runnable{
 			}
 		}
 		
+
+		/**
+		 * If any new foods to be ordered, print the new food detail to notify the kitchen
+		 */
+		if(recordsToInsert.size() != 0){
+			
+			Order extraOrder = new Order();
+			extraOrder.id = orderToUpdate.id;
+			extraOrder.tableID = orderToUpdate.tableID;
+			extraOrder.foods = recordsToInsert.toArray(new Food[recordsToInsert.size()]);
+			
+			//find the printer connection socket to the restaurant for this terminal
+			ArrayList<Socket> printerConn = WirelessSocketServer.printerConnections.get(new Integer(_restaurantID));
+			Socket[] connections = null;
+			if(printerConn != null){
+				connections = printerConn.toArray(new Socket[printerConn.size()]);			
+			}
+			//check whether the print request is synchronized or asynchronous
+			if((req.header.reserved & Reserved.PRINT_SYNC) != 0){
+				/**
+				 * if the print request is synchronized, then the insert order request must wait until
+				 * the print request is done, and send the ACK or NAK to let the terminal know whether 
+				 * the print actions is successfully or not
+				 */
+				if(connections != null){
+					for(int i = 0; i < connections.length; i++){
+						try{
+							new PrintHandler(extraOrder, connections[i], Reserved.PRINT_EXTRA_FOOD_2, _restaurantID, _owner).run2();						
+						}catch(PrintSocketException e){}
+					}
+				}
+				
+			}else{
+				/**
+				 * if the print request is asynchronous, then the insert order request return an ACK immediately,
+				 * regardless of the print request. In the mean time, the print request would be put to a 
+				 * new thread to run.
+				 */
+				if(connections != null){
+					for(int i = 0; i < connections.length; i++){
+						WirelessSocketServer.threadPool.execute(new PrintHandler(extraOrder, connections[i], Reserved.PRINT_EXTRA_FOOD_2, _restaurantID, _owner));
+					}
+				}
+			}
+		}
+		
 		_stmt.clearBatch();
 		//insert the new ordered food
 		for(int i = 0; i < recordsToInsert.size(); i++){
@@ -625,7 +672,7 @@ class OrderHandler extends Handler implements Runnable{
 			orderID + ", " + recordsToInsert.get(i).real_id + ", " + recordsToInsert.get(i).count2String() + 
 			", " + recordsToInsert.get(i).price2Float() + ", '" + recordsToInsert.get(i).name + 
 			"'," + recordsToInsert.get(i).taste.alias_id + ", '" + recordsToInsert.get(i).taste.preference + "')";
-			_stmt.addBatch(sql);
+			_stmt.addBatch(sql);			
 		}
 		
 		//update the ordered food, including order count, taste id and preference
