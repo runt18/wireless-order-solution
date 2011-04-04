@@ -100,7 +100,13 @@ var orderedForm = new Ext.form.FormPanel(
 						text : "提交",
 						handler : function() {
 							dishesOrderNorthPanel.findById("orderTime")
-									.setValue(new Date().toLocaleString());
+									.setValue(new Date().toLocaleString()); // according
+																			// to
+																			// the
+																			// operation
+																			// system
+																			// language
+																			// type!
 							// dishesOrderNorthPanel.findById("orderTime").setValue(
 							// DateTime.Now);
 							dishesOrderNorthPanel.findById("orderOperator")
@@ -204,38 +210,38 @@ var dishTasteWindow = new Ext.Window( {
 // --------------dishes order east panel-----------------
 // 1，数据
 var dishesDisplayData = [];
-dishesDisplayData.push( [ "酸菜鱼", 1, 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2, 50 ]);
-dishesDisplayData.push( [ "酸菜鱼", 1, 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2, 50 ]);
-dishesDisplayData.push( [ "酸菜鱼", 1, 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2, 50 ]);
-dishesDisplayData.push( [ "酸菜鱼", 1, 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2, 50 ]);
-dishesDisplayData.push( [ "酸菜鱼", 1, 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2, 50 ]);
-dishesDisplayData.push( [ "酸菜鱼", 1, 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2, 50 ]);
-dishesDisplayData.push( [ "酸菜鱼", 1, 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2, 50 ]);
-dishesDisplayData.push( [ "酸菜鱼", 1, 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2, 50 ]);
-dishesDisplayData.push( [ "酸菜鱼", 1, 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2, 50 ]);
-dishesDisplayData.push( [ "酸菜鱼", 1, 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2, 50 ]);
-dishesDisplayData.push( [ "酸菜鱼", 1, 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2, 50 ]);
-dishesDisplayData.push( [ "酸菜鱼", 1, 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2, 50 ]);
-dishesDisplayData.push( [ "酸菜鱼", 1, 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2, 50 ]);
-dishesDisplayData.push( [ "酸菜鱼", 1, 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2, 50 ]);
-dishesDisplayData.push( [ "酸菜鱼", 1, 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2, 50 ]);
-dishesDisplayData.push( [ "酸菜鱼", 1, 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2, 50 ]);
+dishesDisplayData.push( [ "酸菜鱼", 1101, 35.1 ]);
+dishesDisplayData.push( [ "京酱肉丝", 2201, 50 ]);
+dishesDisplayData.push( [ "酸菜鱼", 1112, 35.1 ]);
+dishesDisplayData.push( [ "京酱肉丝", 2212, 50 ]);
+dishesDisplayData.push( [ "酸菜鱼", 1114, 35.1 ]);
+dishesDisplayData.push( [ "京酱肉丝", 2312, 50 ]);
+dishesDisplayData.push( [ "酸菜鱼", 4234, 35.1 ]);
+dishesDisplayData.push( [ "京酱肉丝", 2456, 50 ]);
+dishesDisplayData.push( [ "酸菜鱼", 1234, 35.1 ]);
+dishesDisplayData.push( [ "京酱肉丝", 2765, 50 ]);
+dishesDisplayData.push( [ "酸菜鱼", 1678, 35.1 ]);
+dishesDisplayData.push( [ "京酱肉丝", 2123, 50 ]);
+dishesDisplayData.push( [ "酸菜鱼", 1567, 35.1 ]);
+dishesDisplayData.push( [ "京酱肉丝", 2567, 50 ]);
+dishesDisplayData.push( [ "酸菜鱼", 1355, 35.1 ]);
+dishesDisplayData.push( [ "京酱肉丝", 2536, 50 ]);
+dishesDisplayData.push( [ "酸菜鱼", 1534, 35.1 ]);
+dishesDisplayData.push( [ "京酱肉丝", 2345, 50 ]);
+dishesDisplayData.push( [ "酸菜鱼", 1456, 35.1 ]);
+dishesDisplayData.push( [ "京酱肉丝", 2235, 50 ]);
+dishesDisplayData.push( [ "酸菜鱼", 1345, 35.1 ]);
+dishesDisplayData.push( [ "京酱肉丝", 2756, 50 ]);
+dishesDisplayData.push( [ "酸菜鱼", 1345, 35.1 ]);
+dishesDisplayData.push( [ "京酱肉丝", 2543, 50 ]);
+dishesDisplayData.push( [ "酸菜鱼", 1756, 35.1 ]);
+dishesDisplayData.push( [ "京酱肉丝", 2786, 50 ]);
+dishesDisplayData.push( [ "酸菜鱼", 1456, 35.1 ]);
+dishesDisplayData.push( [ "京酱肉丝", 2547, 50 ]);
+dishesDisplayData.push( [ "酸菜鱼", 1245, 35.1 ]);
+dishesDisplayData.push( [ "京酱肉丝", 2765, 50 ]);
+dishesDisplayData.push( [ "酸菜鱼", 1768, 35.1 ]);
+dishesDisplayData.push( [ "京酱肉丝", 2688, 50 ]);
 
 // 2，表格的数据store
 var dishesDisplayStore = new Ext.data.Store( {
@@ -320,7 +326,13 @@ var dishesOrderEastPanel = new Ext.Panel( {
 			fieldLabel : "菜名编号",
 			name : "orderNbr",
 			id : "orderNbr",
-			anchor : "90%"
+			anchor : "90%",
+			listeners : {
+				change : function(thiz, newValue, oldValue) {
+					alert(newValue);
+					alert(oldValue);
+				}
+			}
 		}, dishesDisplayGrid ]
 	} ]
 });
@@ -341,7 +353,7 @@ var dishesOrderNorthPanel = new Ext.form.FormPanel( {
 		labelSeparator : '：',
 		items : [ {
 			layout : "form",
-			width : 220,
+			width : 230,
 			labelWidth : 60,
 			border : false,
 			items : [ {
@@ -371,7 +383,7 @@ var dishesOrderNorthPanel = new Ext.form.FormPanel( {
 		labelSeparator : '：',
 		items : [ {
 			layout : "form",
-			width : 220,
+			width : 230,
 			labelWidth : 60,
 			border : false,
 			items : [ {
@@ -400,6 +412,10 @@ var dishesOrderNorthPanel = new Ext.form.FormPanel( {
 	buttons : [ {
 		text : "提交"
 	}, {
-		text : "清空"
+		text : "清空",
+		handler : function() {
+			dishesOrderNorthPanel.findById("tableNumber").setValue("");
+			dishesOrderNorthPanel.findById("personCount").setValue("");
+		}
 	} ]
 });
