@@ -13,6 +13,7 @@ Release v0.9.5 <xx/xx/2011>
 <Issues>
 1 - add the price to taste preference
 2 - adjust the 80mm's print template
+3 - add to print extra food detail if any new food is added while updating order
 ******************************************************************************************************/
 
 /******************************************************************************************************
