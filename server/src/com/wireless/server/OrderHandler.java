@@ -562,7 +562,7 @@ class OrderHandler extends Handler implements Runnable{
 			 */
 			if(action == Action.Insert){
 				//get the food name and its unit price
-				sql = "SELECT name, unit_price FROM " + WirelessSocketServer.database + ".food WHERE id=" + realFoodID + " AND enabled=1";
+				sql = "SELECT name, unit_price, kitchen FROM " + WirelessSocketServer.database + ".food WHERE id=" + realFoodID + " AND enabled=1";
 				_rs = _stmt.executeQuery(sql);
 				//check if the food to be inserted exist in db or not
 				Food food = new Food();
@@ -571,6 +571,7 @@ class OrderHandler extends Handler implements Runnable{
 					food.name = _rs.getString("name");
 					food.setPrice(new Float(_rs.getFloat("unit_price")));
 					food.setCount(orderToUpdate.foods[i].count2Float());
+					food.kitchen = _rs.getShort("kitchen");
 				}else{
 					throw new OrderBusinessException("The food(id=" + realFoodID + ") to query doesn't exist.", ErrorCode.MENU_EXPIRED);
 				}
@@ -626,7 +627,7 @@ class OrderHandler extends Handler implements Runnable{
 		if(recordsToInsert.size() != 0){
 			
 			Order extraOrder = new Order();
-			extraOrder.id = orderToUpdate.id;
+			extraOrder.id = orderID;
 			extraOrder.tableID = orderToUpdate.tableID;
 			extraOrder.foods = recordsToInsert.toArray(new Food[recordsToInsert.size()]);
 			
