@@ -1,9 +1,19 @@
 function editTaste(id, alias_id, preference, price, old_alias_id) {
     var editType = "addTaste";
-    var title = "添加口味";   
+    var title = "添加口味";
     if (id != "") {
         editType = "editTaste";
-        title = "修改口味";
+        title = "修改口味";        
+    }
+    var aliasId = "";
+    if (id == "") {
+        aliasId = '<input type="text" id="alias_id" name="alias_id" value="' + alias_id + '" size="25" height="20" ' + 
+	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57"' +
+	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
+	                            ' style="ime-mode:Disabled" />'
+    }
+    else {
+        aliasId = '<input type="hidden" id="alias_id" name="alias_id" value="' + alias_id + '"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + alias_id + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
     }
     var content = ' <div class="add_foot">' +
                         '<div class="title">' +
@@ -16,7 +26,7 @@ function editTaste(id, alias_id, preference, price, old_alias_id) {
 	                      '<input type="hidden" name="old_alias_id" value="' + old_alias_id + '" />' +
 	                      '<div class="add_foot_Content" style="height:180px;text-align:center">' +
 	                        '<div class="pop_Content">' +
-	                            '<div class="pop_Content1">序&nbsp;号：<input type="text" id="alias_id" name="alias_id" value="' + alias_id + '" size="25" height="20" onfocus="this.select()" style="position: relative; right: -20px; width: 120px;"/></div>' +
+	                            '<div class="pop_Content1">编&nbsp;号：' + aliasId + '</div>' +	                          
 	                            '<div class="pop_Content1">口&nbsp;味：<input type="text" id="preference" name="preference" value="' + preference + '" onfocus="this.select()"  style="position: relative; right: -20px; width: 120px;"/></div>' +
 	                            '<div class="pop_Content1">价&nbsp;格：<input type="text" id="price" name="price" value="' + price + '" onfocus="this.select()"  style="position: relative; right: -20px; width: 120px;"' +
 	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57||event.keyCode==46"' +  
@@ -30,16 +40,21 @@ function editTaste(id, alias_id, preference, price, old_alias_id) {
 	                '</div>';
 
     showMessageBox(content, 342, 350);
-   
-    document.getElementById("alias_id").focus();
+    if (id == "") {
+        document.getElementById("alias_id").focus();
+    }
+    else {
+        document.getElementById("preference").focus();
+    }
+    
 }
 
-function submitTasteData() {
+function submitTasteData() {  
     var alias_id = document.getElementById("alias_id").value;
     var preference = document.getElementById("preference").value;
     var price = document.getElementById("price").value;
     if (alias_id == undefined || alias_id == null || alias_id == "") {
-        alert("序号不能为空！");
+        alert("编号不能为空！");
         return;
     }
     if (preference == undefined || preference == null || preference == "") {
@@ -48,6 +63,11 @@ function submitTasteData() {
     }
     if (price == undefined || price == null || price == "") {
         alert("价格不能为空！");
+        return;
+    }
+    var id = parseInt(alias_id);
+    if (id > 255) {
+        alert("编号只能输入0~255之间的数字！")
         return;
     }
     document.tasteForm.submit();
@@ -85,4 +105,39 @@ function deleteTaste(id) {
         formDelete.submit();
     }
 
+}
+
+function showHideCondition(select) {
+    //    alert(select);
+    var option = select.options[select.selectedIndex];
+    document.getElementById("condition_type").style.display = "none";
+    document.getElementById("keyword").style.display = "inline";
+    document.getElementById("keyword").value = "";
+    if (option.value == "price") {
+        document.getElementById("condition_type").style.display = "inline";
+    }
+}
+function initializeTaste() {
+    var keyword_type = document.getElementById("keyword_type");
+    var keyword_type_value = document.getElementById("keyword_type_value").value;
+    var condition_type = document.getElementById("condition_type");
+    var condition_type_value = document.getElementById("condition_type_value").value;  
+    var keyword = document.getElementById("keyword");
+    var keyword_value = document.getElementById("keyword_value").value;
+    for (var i = 0; i < keyword_type.options.length; i++) {
+        if (keyword_type.options[i].value == keyword_type_value) {
+            keyword_type.options[i].selected = true;
+            break;
+        }
+    }
+    for (var i = 0; i < condition_type.options.length; i++) {
+        if (condition_type.options[i].value == condition_type_value) {
+            condition_type.options[i].selected = true;
+            break;
+        }
+    }   
+    keyword.value = keyword_value;
+    if (keyword_type_value == "price") {
+        document.getElementById("condition_type").style.display = "inline";
+    }   
 }

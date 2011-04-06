@@ -31,11 +31,11 @@ if($editType == "addTaste" || $editType == "editTaste")
 	$validate = true;
 	if($editType == "addTaste")
 	{		
-		$sql = "SELECT * FROM taste WHERE alias_id=$alias_id";		
+		$sql = "SELECT * FROM taste WHERE alias_id=$alias_id AND restaurant_id=" . $_SESSION["restaurant_id"];				
 		$rs = $db ->GetOne($sql);		
 		if($rs)
 		{			
-			echo "<script>alert('已存在此序号的口味，请输入其它序号！');editTaste('','$alias_id','$preference','$price','');</script>";
+			echo "<script>alert('已存在此编号的口味，请输入其它编号！');editTaste('','$alias_id','$preference','$price','');</script>";
 			$validate = false;
 		}
 		else
@@ -45,15 +45,15 @@ if($editType == "addTaste" || $editType == "editTaste")
 	}
 	else
 	{
-		$id = $_POST["id"];
+		$id = $_POST["alias_id"];
 		$old_alias_id = $_POST["old_alias_id"];
 		if($old_alias_id != $alias_id)
 		{
-			$sql = "SELECT * FROM taste WHERE alias_id=$alias_id'";		
+			$sql = "SELECT * FROM taste WHERE alias_id=$alias_id AND restaurant_id=" . $_SESSION["restaurant_id"];		
 			$rs = $db ->GetOne($sql);		
 			if($rs)
 			{			
-				echo "<script>alert('已存在此序号的口味，请输入其它序号！');editTaste('$id','$alias_id','$preference','$price','$old_alias_id');</script>";
+				echo "<script>alert('已存在此编号的口味，请输入其它编号！');editTaste('$id','$alias_id','$preference','$price','$old_alias_id');</script>";
 				$validate = false;
 			}
 		}		
@@ -89,7 +89,21 @@ else if($editType == "deleteTaste")
 <span class="action-span1">e点通会员中心</span><span id="search_id" class="action-span2">&nbsp;- 口味管理 </span>
 <div style="clear:both"></div>
 </h1>
-
+<div class="form-div">
+  <form action="taste.php"  method="get">
+    <!-- 搜索条件 -->
+    <div class="font" style="color:#2a7d8d;font-size:15px;font-weight:bold;text-align:right;">过滤：</div>
+    <select id="keyword_type" name="keyword_type"  onchange="showHideCondition(this)">
+	<option value="0">全部</option>
+	<option value="alias_id">编号</option>
+	<option value="preference">口味</option>
+	<option value="price">价格</option></select>
+	<select id="condition_type" name="condition_type" style="display:none"><option value="Equal">等于</option><option value="EqualOrGrater" selected="selected">大于等于</option><option value="EqualOrLess">小于等于</option></select>
+	
+    <input type="text" id="keyword" name="keyword"   />
+    <input type="submit" value=" 搜索 " class="button" />
+  </form>
+</div>
 <div class="Content">
 
 
@@ -97,7 +111,7 @@ else if($editType == "deleteTaste")
 <table cellpModifying="0" cellspacing="0" border="0" id="table" class="sortable">
 		<thead>
 			<tr>
-				<th><h3>序&nbsp;号</h3></th>
+				<th><h3>编&nbsp;号</h3></th>
 				<th><h3>口&nbsp;味</h3></th>
 				<th><h3>价格（￥）</h3></th>				
 				<th><h3>操&nbsp;作</h3></th>
@@ -105,8 +119,39 @@ else if($editType == "deleteTaste")
 		</thead>
 		<tbody>
 <?php 	  		
-include("conn.php"); 		 			
-$sql = "SELECT id,alias_id,preference,price FROM taste WHERE restaurant_id=" . $_SESSION["restaurant_id"]." ORDER BY alias_id";				
+include("conn.php"); 		 				
+$xm=$_REQUEST["keyword_type"];
+$ct=$_REQUEST["condition_type"];
+$kw=$_REQUEST["keyword"]; 
+$sql = "SELECT id,alias_id,preference,price FROM taste WHERE restaurant_id=" . $_SESSION["restaurant_id"];			
+switch ($xm)
+{
+	case "alias_id":
+		if ($kw!="")
+			$sql .= " AND alias_id = $kw" ;  			
+		break;
+	case "preference":
+		if ($kw!="")
+			$sql .= " AND preference like '%$kw%'" ;  			
+		break;
+	case "price":
+		if ($kw!="")
+		{
+			if($ct == "Equal")
+			{
+				$sql .= " AND price = $kw" ;  
+			}
+			elseif($ct == "EqualOrGrater")
+			{
+				$sql .= " AND price >= $kw" ; 
+			}
+			elseif($ct == "EqualOrLess")
+			{
+				$sql = " AND price <= $k" ; 
+			}
+		}				
+		break;		
+}			
 $bh=0;
 mysql_query("SET NAMES utf8"); 
 // mysql_query("set names 'utf-8'") ;		
@@ -117,7 +162,7 @@ foreach ($rs as $row){
 	echo "<td>" .$row["alias_id"] ."</td>";
 	echo "<td>" .$row["preference"] ."</td>";
 	echo "<td>" .$row["price"] ."</td>";
-	echo "<td><a href='#' onclick='editTaste(&quot;".$row["id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["preference"]."&quot;,&quot;".$row["price"]."&quot;,&quot;".$row["old_alias_id"].
+	echo "<td><a href='#' onclick='editTaste(&quot;".$row["id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["preference"]."&quot;,&quot;".$row["price"]."&quot;,&quot;".$row["alias_id"].
 		"&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
 		"<a href='#' onclick='deleteTaste(".$row["id"].")'><img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;删除</a></td>";
 	echo "</tr>";
@@ -149,7 +194,11 @@ mysql_close($con);
           <a href="#" onclick="sorter.move(1,true)">最末页</a>
         </div>
        </div>
-
+<?php
+echo "<input type='hidden' id='keyword_type_value' value='$xm' />";
+echo "<input type='hidden' id='condition_type_value' value='$ct' />";
+echo "<input type='hidden' id='keyword_value' value='$kw' />";
+    ?>
 	<script type="text/javascript" src="js/script.js"></script>
 	<script type="text/javascript">
   var sorter = new TINY.table.sorter("sorter");
@@ -164,6 +213,7 @@ mysql_close($con);
 	sorter.currentid = "currentpage";
 	sorter.limitid = "pagelimit";
 	sorter.init("table",0);
+	initializeTaste();
   </script>
 </body>
 </html>
