@@ -937,7 +937,7 @@ class OrderHandler extends Handler implements Runnable{
 			nCustom = _rs.getByte(1);
 		}
 		//query the food's id and order count associate with the order id for "order_food" table
-		sql = "SELECT name, food_id, order_count, unit_price, taste, taste_id FROM `" + WirelessSocketServer.database + 
+		sql = "SELECT name, food_id, order_count, unit_price, taste, taste_price, taste_id FROM `" + WirelessSocketServer.database + 
 		"`.`order_food` WHERE order_id=" + orderID;
 		_rs = _stmt.executeQuery(sql);
 		ArrayList<Food> foods = new ArrayList<Food>();
@@ -953,6 +953,7 @@ class OrderHandler extends Handler implements Runnable{
 			int unitPrice = ((val / 100) << 8) | (val % 100);
 			food.price = unitPrice;
 			food.taste.preference = _rs.getString("taste");
+			food.taste.setPrice(_rs.getFloat("taste_price"));
 			food.taste.alias_id = _rs.getShort("taste_id");
 			foods.add(food);
 		}
