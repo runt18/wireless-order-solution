@@ -231,7 +231,7 @@ if($deleteId != null)
 					}
 					elseif($ct == "EqualOrLess")
 					{
-						$sql = " AND unit_price <= $k" ; 
+						$sql .= " AND unit_price <= $kw" ; 
 					}
 				}				
 				break;	

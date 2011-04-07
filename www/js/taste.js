@@ -7,13 +7,13 @@ function editTaste(id, alias_id, preference, price, old_alias_id) {
     }
     var aliasId = "";
     if (id == "") {
-        aliasId = '<input type="text" id="alias_id" name="alias_id" value="' + alias_id + '" size="25" height="20" ' + 
+        aliasId = '<input type="text" id="alias_id" name="alias_id" value="' + alias_id + '" size="25" height="20" onfocus="this.select()" ' + 
 	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57"' +
 	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
 	                            ' style="ime-mode:Disabled" />'
     }
     else {
-        aliasId = '<input type="hidden" id="alias_id" name="alias_id" value="' + alias_id + '"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + alias_id + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+        aliasId = '<input type="hidden" id="alias_id" name="alias_id" value="' + alias_id + '"/>' + alias_id + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
     }
     var content = ' <div class="add_foot">' +
                         '<div class="title">' +
@@ -26,9 +26,9 @@ function editTaste(id, alias_id, preference, price, old_alias_id) {
 	                      '<input type="hidden" name="old_alias_id" value="' + old_alias_id + '" />' +
 	                      '<div class="add_foot_Content" style="height:180px;text-align:center">' +
 	                        '<div class="pop_Content">' +
-	                            '<div class="pop_Content1">编&nbsp;号：' + aliasId + '</div>' +	                          
-	                            '<div class="pop_Content1">口&nbsp;味：<input type="text" id="preference" name="preference" value="' + preference + '" onfocus="this.select()"  style="position: relative; right: -20px; width: 120px;"/></div>' +
-	                            '<div class="pop_Content1">价&nbsp;格：<input type="text" id="price" name="price" value="' + price + '" onfocus="this.select()"  style="position: relative; right: -20px; width: 120px;"' +
+	                            '<div class="pop_Content1">编号：' + aliasId + '</div>' +
+	                            '<div class="pop_Content1">口味：<input type="text" id="preference" name="preference" value="' + preference + '" onfocus="this.select()" size="25" height="20" style="ime-mode:Disabled" /></div>' +
+	                            '<div class="pop_Content1">价格：<input type="text" id="price" name="price" value="' + price + '" onfocus="this.select()" size="25" height="20" style="ime-mode:Disabled"' +
 	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57||event.keyCode==46"' +  
 	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
 	                            ' style="ime-mode:Disabled" /></div>' +	                           
@@ -66,7 +66,7 @@ function submitTasteData() {
         return;
     }
     var id = parseInt(alias_id);
-    if (id > 255) {
+    if (id > 255 || id == 0) {
         alert("编号只能输入0~255之间的数字！")
         return;
     }

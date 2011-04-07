@@ -147,7 +147,7 @@ switch ($xm)
 			}
 			elseif($ct == "EqualOrLess")
 			{
-				$sql = " AND price <= $k" ; 
+				$sql .= " AND price <= $kw" ; 
 			}
 		}				
 		break;		
