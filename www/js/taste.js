@@ -27,8 +27,8 @@ function editTaste(id, alias_id, preference, price, old_alias_id) {
 	                      '<div class="add_foot_Content" style="height:180px;text-align:center">' +
 	                        '<div class="pop_Content">' +
 	                            '<div class="pop_Content1">编号：' + aliasId + '</div>' +
-	                            '<div class="pop_Content1">口味：<input type="text" id="preference" name="preference" value="' + preference + '" onfocus="this.select()" size="25" height="20" style="ime-mode:Disabled" /></div>' +
-	                            '<div class="pop_Content1">价格：<input type="text" id="price" name="price" value="' + price + '" onfocus="this.select()" size="25" height="20" style="ime-mode:Disabled"' +
+	                            '<div class="pop_Content1">口味：<input type="text" id="preference" name="preference" value="' + preference + '" onfocus="this.select()" size="25" height="20" /></div>' +
+	                            '<div class="pop_Content1">价格：<input type="text" id="price" name="price" value="' + price + '" onfocus="this.select()" size="25" height="20"' +
 	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57||event.keyCode==46"' +  
 	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
 	                            ' style="ime-mode:Disabled" /></div>' +	                           
@@ -67,7 +67,7 @@ function submitTasteData() {
     }
     var id = parseInt(alias_id);
     if (id > 255 || id == 0) {
-        alert("编号只能输入0~255之间的数字！")
+        alert("编号的输入范围是1~255")
         return;
     }
     document.tasteForm.submit();
