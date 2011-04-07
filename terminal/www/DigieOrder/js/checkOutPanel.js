@@ -22,6 +22,8 @@ checkOutData.push( [ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2" ]);
 checkOutData.push( [ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2" ]);
 checkOutData.push( [ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2" ]);
 
+checkOutData.push( [ "", "", "", "合计：￥100" ]);
+
 // 2，表格的数据store
 var checkOutStore = new Ext.data.Store( {
 	proxy : new Ext.data.MemoryProxy(checkOutData),
