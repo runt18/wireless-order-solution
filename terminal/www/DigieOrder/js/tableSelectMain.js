@@ -1,6 +1,6 @@
 ﻿var dishOrderCurrRowIndex_ = 0;
 
-Ext.onReady( function() {
+Ext.onReady(function() {
 	// 解决ext中文传入后台变问号问题
 		Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
 		Ext.QuickTips.init();
@@ -8,39 +8,79 @@ Ext.onReady( function() {
 		// ***************tableSelectNorthPanel******************
 		var tableSelectNorthPanel = new Ext.form.FormPanel( {
 			region : "north",
-			//frame : true,
-			//height : 35,
-			height : 60,
-			style:"padding-top:10px;padding-left:10px;",
+			frame : true,
+			height : 50,
 			labelSeparator : '：',
-			labelWidth : 60,
+			labelWidth : 30,
 			border : false,
 			items : [ {
-				xtype : "textfield",
 				border : false,
-				fieldLabel : "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;桌号"
+				layout : "form",
+				style : "padding-top:10px;padding-left:20px;",
+				items : [ {
+					xtype : "textfield",
+					border : false,
+					fieldLabel : "桌号"
+				} ]
 			} ]
 		});
 
+		// ***************tableSelectCenterPanel******************
 		var tableSelectCenterPanel = new Ext.Panel( {
-			region : "center"
+			region : "center",
+			contentEl : "tableDisplay"
 		});
 
 		// *************整体布局*************
-		var centerTabPanel = new Ext.Panel(
-				{
-					region : "center",
-					tbar : [
-							{
-								text : "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;点菜&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-							},
-							{
-								text : "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;结账&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-							} ],
-					layout : "border",
-					border : false,
-					items : [ tableSelectNorthPanel, tableSelectCenterPanel ]
-				});
+		var dishesOrderImgBut = new Ext.ux.ImageButton( {
+			imgPath : "../images/im48x48.png",
+			imgWidth : 50,
+			imgHeight : 50,
+			tooltip : "点菜",
+			handler : function(btn) {
+				Ext.MessageBox.alert("test", "点菜");
+			}
+		});
+
+		var checkOutImgBut = new Ext.ux.ImageButton( {
+			imgPath : "../images/extlogo48.png",
+			imgWidth : 50,
+			imgHeight : 50,
+			tooltip : "结账",
+			handler : function(btn) {
+				Ext.MessageBox.alert("test", "结账");
+			}
+		});
+
+		var orderDeleteImgBut = new Ext.ux.ImageButton( {
+			imgPath : "../images/im48x48.png",
+			imgWidth : 50,
+			imgHeight : 50,
+			tooltip : "删单",
+			handler : function(btn) {
+				Ext.MessageBox.alert("test", "删单");
+			}
+		});
+
+		var centerTabPanel = new Ext.Panel( {
+			region : "center",
+			tbar : new Ext.Toolbar( {
+				height : 55,
+				items : [ {
+					text : " ",
+					disabled : true
+				}, dishesOrderImgBut, {
+					text : "&nbsp;&nbsp;&nbsp;",
+					disabled : true
+				}, checkOutImgBut, dishesOrderImgBut, {
+					text : "&nbsp;&nbsp;&nbsp;",
+					disabled : true
+				}, orderDeleteImgBut ]
+			}),
+			layout : "border",
+			border : false,
+			items : [ tableSelectNorthPanel, tableSelectCenterPanel ]
+		});
 
 		var viewport = new Ext.Viewport(
 				{
