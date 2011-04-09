@@ -10,33 +10,39 @@ Ext.onReady( function() {
 				{
 					region : "north",
 					frame : true,
-					height : 130,
+					height : 45,
 					labelSeparator : '：',
 					labelWidth : 30,
 					border : false,
 					items : [ {
 						border : false,
 						layout : "form",
-						style : "padding-top:10px;padding-left:20px;",
-						items : [
-								{
-									xtype : "textfield",
-									border : false,
-									fieldLabel : "<b>桌号</b>"
-								},
-								{
-									xtype : "fieldset",
-									title : "餐桌信息",
-									autoHeight : true,
-									width : 220,
-									items : [
-											{
-												html : "<div style='font-size:11pt;'>&nbsp;&nbsp;桌号：100&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;人数：4</div>"
-											},
-											{
-												html : "<div style='font-size:11pt;'>&nbsp;&nbsp;状态：占用<div>"
-											} ]
-								} ]
+						//style : "padding-top:10px;padding-left:20px;",
+						items : [ {
+							layout : "column",
+							border : false,
+							anchor : '98%',
+							labelSeparator : '：',
+							items : [ 
+									{
+										layout : "form",
+										width : 230,
+										labelWidth : 30,
+										style : "padding-top:7px;",
+										border : false,
+										items : [ {
+											xtype : "textfield",
+											fieldLabel : "<b>桌号</b>",
+											name : "tableNumber",
+											id : "tableNumber",
+											anchor : "90%"
+										} ]
+									},
+									{
+										width : 800,
+										html : "<img src='../images/table-idle.png' style='float:left;'/><div style='float:left;padding-top:9px;'>100&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div><img src='../images/table-total.png' style='float:left;'/><div style='float:left;padding-top:9px;'>4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div><img src='../images/table-used.png' style='float:left;'/><div style='float:left;padding-top:9px;'>占用</div>"
+									} ] 
+						} ]
 					} ]
 				});
 
