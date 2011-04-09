@@ -1,29 +1,44 @@
 ﻿var dishOrderCurrRowIndex_ = 0;
 
-Ext.onReady(function() {
+Ext.onReady( function() {
 	// 解决ext中文传入后台变问号问题
 		Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
 		Ext.QuickTips.init();
 
 		// ***************tableSelectNorthPanel******************
-		var tableSelectNorthPanel = new Ext.form.FormPanel( {
-			region : "north",
-			frame : true,
-			height : 50,
-			labelSeparator : '：',
-			labelWidth : 30,
-			border : false,
-			items : [ {
-				border : false,
-				layout : "form",
-				style : "padding-top:10px;padding-left:20px;",
-				items : [ {
-					xtype : "textfield",
+		var tableSelectNorthPanel = new Ext.form.FormPanel(
+				{
+					region : "north",
+					frame : true,
+					height : 130,
+					labelSeparator : '：',
+					labelWidth : 30,
 					border : false,
-					fieldLabel : "桌号"
-				} ]
-			} ]
-		});
+					items : [ {
+						border : false,
+						layout : "form",
+						style : "padding-top:10px;padding-left:20px;",
+						items : [
+								{
+									xtype : "textfield",
+									border : false,
+									fieldLabel : "<b>桌号</b>"
+								},
+								{
+									xtype : "fieldset",
+									title : "餐桌信息",
+									autoHeight : true,
+									width : 220,
+									items : [
+											{
+												html : "<div style='font-size:11pt;'>&nbsp;&nbsp;桌号：100&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;人数：4</div>"
+											},
+											{
+												html : "<div style='font-size:11pt;'>&nbsp;&nbsp;状态：占用<div>"
+											} ]
+								} ]
+					} ]
+				});
 
 		// ***************tableSelectCenterPanel******************
 		var tableSelectCenterPanel = new Ext.Panel( {
@@ -91,7 +106,16 @@ Ext.onReady(function() {
 								html : "<div style='padding:40px; background-color:#A9D0F5'><h1 style='font-size:200%'>无线点餐网页终端<h1></div>",
 								height : 100,
 								margins : '0 0 5 0'
-							}, centerTabPanel ]
+							},
+							centerTabPanel,
+							{
+								region : "south",
+								height : 30,
+								layout : "form",
+								frame : true,
+								border : false,
+								html : "<div style='font-size:11pt; text-align:center;'><b>版权所有(c) 2011 智易科技</b></div>"
+							} ]
 				});
 
 		// -------------------- 浏览器大小改变 -------------------------------

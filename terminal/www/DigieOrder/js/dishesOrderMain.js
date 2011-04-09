@@ -60,15 +60,26 @@ Ext.onReady( function() {
 					}
 				});
 
-		var viewport = new Ext.Viewport( {
-			layout : "border",
-			items : [ {
-				region : "north",
-				html : "<div style='padding:40px; background-color:#A9D0F5'><h1 style='font-size:200%'>无线点餐网页终端<h1></div>",
-				height : 100,
-				margins : '0 0 5 0'
-			}, centerTabPanel ]
-		});
+		var viewport = new Ext.Viewport(
+				{
+					layout : "border",
+					items : [
+							{
+								region : "north",
+								html : "<div style='padding:40px; background-color:#A9D0F5'><h1 style='font-size:200%'>无线点餐网页终端<h1></div>",
+								height : 100,
+								margins : '0 0 5 0'
+							},
+							centerTabPanel,
+							{
+								region : "south",
+								height : 30,
+								layout : "form",
+								frame : true,
+								border : false,
+								html : "<div style='font-size:11pt; text-align:center;'><b>版权所有(c) 2011 智易科技</b></div>"
+							} ]
+				});
 
 		// -------------------- 浏览器大小改变 -------------------------------
 		// 1,调整colDisplayFormUQ中表格的高度
