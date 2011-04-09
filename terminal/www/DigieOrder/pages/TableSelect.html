@@ -34,10 +34,18 @@
 <script type="text/javascript" src="../js/animation/tableListMove.js"></script>
 <script type="text/javascript" src="../js/tableSelectMain.js"></script>
 
-
+<script type="text/javascript">
+function onLoad(){
+	$(".table_list li").each(function(){
+			$(this).bind("click",function(){
+				location.href = "OrderMain.html";
+				})
+		});
+};
+</script>
 
 </head>
-<body>
+<body onload="onLoad()">
 <script type="text/javascript" src="../extjs/examples.js"></script>
 
 <div id="west"></div>
@@ -57,7 +65,8 @@
 
 
 
-<div id="tableDisplay" style="padding:10px; margin: 0 auto; width: 1000px;">
+<div id="tableDisplay"
+	style="padding: 10px; margin: 0 auto; width: 1000px;">
 <div class="side_btn" id="left_btn"></div>
 <div id="wrap">
 <div id="list">
@@ -138,7 +147,7 @@
 	<li onclick="showMenu(&quot;204&quot;)">204</li>
 </ul>
 </div>
-<script>statTable(51,40)</script></div>
+</div>
 </div>
 <div class="side_btn" id="right_btn"></div>
 </div>
