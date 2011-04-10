@@ -40,7 +40,7 @@ Ext.onReady( function() {
 									},
 									{
 										width : 800,
-										html : "<img src='../images/table-idle.png' style='float:left;'/><div style='float:left;padding-top:9px;'>100&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div><img src='../images/table-total.png' style='float:left;'/><div style='float:left;padding-top:9px;'>4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div><img src='../images/table-used.png' style='float:left;'/><div style='float:left;padding-top:9px;'>占用</div>"
+										contentEl : "tableStatusTS"
 									} ] 
 						} ]
 					} ]
@@ -49,6 +49,7 @@ Ext.onReady( function() {
 		// ***************tableSelectCenterPanel******************
 		var tableSelectCenterPanel = new Ext.Panel( {
 			region : "center",
+			bodyStyle:"background-color:#d8ebef", 
 			contentEl : "tableDisplay"
 		});
 
@@ -109,8 +110,8 @@ Ext.onReady( function() {
 					items : [
 							{
 								region : "north",
-								html : "<div style='padding:40px; background-color:#A9D0F5'><h1 style='font-size:200%'>无线点餐网页终端<h1></div>",
-								height : 100,
+								html : "<div style='padding:10px; background-color:#A9D0F5'><h4 style='font-size:150%'>无线点餐网页终端<h4></div>",
+								height : 50,
 								margins : '0 0 5 0'
 							},
 							centerTabPanel,

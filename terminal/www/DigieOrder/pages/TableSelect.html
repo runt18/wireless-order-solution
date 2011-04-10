@@ -28,26 +28,18 @@
 	src="../js/components/Ext.ux.ImageButton.js"></script>
 
 <!-- css -->
-<link rel="stylesheet" type="text/css"
-	href="../css/tableSelectStyle.css" />
+<link rel="stylesheet" type="text/css" href="../css/tableList.css" />
+<link rel="stylesheet" type="text/css" href="../css/tableStatus.css" />
 
 <script type="text/javascript" src="../js/animation/tableListMove.js"></script>
+<script type="text/javascript" src="../js/animation/tableListLoad.js"></script>
 <script type="text/javascript" src="../js/tableSelectMain.js"></script>
 
-<script type="text/javascript">
-function onLoad(){
-	$(".table_list li").each(function(){
-			$(this).bind("dblclick",function(){
-				location.href = "OrderMain.html";
-				})
-		});
-};
-</script>
-
 </head>
-<body onload="onLoad()">
+<body onload="tableSelectOnLoad()">
 <script type="text/javascript" src="../extjs/examples.js"></script>
 
+<!------------------- layout ------------------------>
 <div id="west"></div>
 <div id="north">
 <p>icons here.</p>
@@ -59,12 +51,7 @@ function onLoad(){
 <p>建设中......</p>
 </div>
 
-
-
-
-
-
-
+<!------------------- table list ------------------------>
 <div id="tableDisplay"
 	style="padding: 10px; margin: 0 auto; width: 1000px;">
 <div class="side_btn" id="left_btn"></div>
@@ -73,67 +60,67 @@ function onLoad(){
 <div class="item">
 <h3>1号厅</h3>
 <ul class="table_list">
-	<li class='on'>100</li>
-	<li>101</li>
-	<li>102</li>
-	<li>103</li>
-	<li>104</li>
-	<li class='on'>105</li>
-	<li class='on'>106</li>
-	<li>107</li>
-	<li>108</li>
-	<li class='on'>109</li>
-	<li class='on'>110</li>
-	<li>111</li>
-	<li class='on'>112</li>
-	<li class='on'>113</li>
-	<li class='on'>114</li>
-	<li class='on'>115</li>
-	<li class='on'>116</li>
-	<li>117</li>
-	<li>118</li>
-	<li>119</li>
-	<li>120</li>
-	<li>121</li>
-	<li>122</li>
-	<li class='on'>123</li>
+	<li id="table100" class='on'>100</li>
+	<li id="table101" >101</li>
+	<li id="table102" >102</li>
+	<li id="table103" >103</li>
+	<li id="table104" >104</li>
+	<li  id="table105" class='on'>105</li>
+	<li  id="table106" class='on'>106</li>
+	<li id="table107" >107</li>
+	<li id="table108" >108</li>
+	<li  id="table109" class='on'>109</li>
+	<li  id="table110" class='on'>110</li>
+	<li id="table111" >111</li>
+	<li  id="table112" class='on'>112</li>
+	<li  id="table113" class='on'>113</li>
+	<li  id="table114" class='on'>114</li>
+	<li  id="table115" class='on'>115</li>
+	<li  id="table116" class='on'>116</li>
+	<li id="table117" >117</li>
+	<li id="table118" >118</li>
+	<li id="table119" >119</li>
+	<li id="table120" >120</li>
+	<li id="table121" >121</li>
+	<li id="table122" >122</li>
+	<li  id="table123" class='on'>123</li>
 </ul>
 </div>
 <div class="item">
 <h3>2号厅</h3>
 <ul class="table_list">
-	<li>124</li>
-	<li>125</li>
-	<li>126</li>
-	<li>127</li>
-	<li>128</li>
-	<li>129</li>
-	<li>130</li>
-	<li>131</li>
-	<li>132</li>
-	<li>133</li>
-	<li>134</li>
-	<li>135</li>
-	<li>136</li>
-	<li>137</li>
-	<li>138</li>
-	<li>139</li>
-	<li>140</li>
-	<li>141</li>
-	<li>142</li>
-	<li>143</li>
-	<li>144</li>
-	<li>145</li>
-	<li>200</li>
-	<li>201</li>
+	<li id="table124" >124</li>
+	<li id="table125" >125</li>
+	<li id="table126" >126</li>
+	<li id="table127" >127</li>
+	<li id="table128" >128</li>
+	<li id="table129" >129</li>
+	<li id="table130" >130</li>
+	<li id="table131" >131</li>
+	<li id="table132" >132</li>
+	<li id="table133" >133</li>
+	<li id="table134" >134</li>
+	<li id="table135" >135</li>
+	<li id="table136" >136</li>
+	<li id="table137" >137</li>
+	<li id="table138" >138</li>
+	<li id="table139" >139</li>
+	<li id="table140" >140</li>
+	<li id="table141" >141</li>
+	<li id="table142" >142</li>
+	<li id="table143" >143</li>
+	<li id="table144" >144</li>
+	<li id="table145" >145</li>
+	<li id="table200" >200</li>
+	<li id="table201" >201</li>
 </ul>
 </div>
 <div class="item">
 <h3>3号厅</h3>
 <ul class="table_list">
-	<li>202</li>
-	<li>203</li>
-	<li>204</li>
+	<li id="table202" >202</li>
+	<li id="table203" >203</li>
+	<li id="table204" >204</li>
 </ul>
 </div>
 </div>
@@ -141,8 +128,15 @@ function onLoad(){
 <div class="side_btn" id="right_btn"></div>
 </div>
 
-
-
+<!------------------- table status ------------------------>
+<div id="tableStatusTS"><img src='../images/table-idle.png'
+	style='float: left;' />
+<div class="tableStatusChar">100&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+<img src='../images/table-total.png' style='float: left;' />
+<div class="tableStatusChar">4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+<img src='../images/table-used.png' style='float: left;' />
+<div class="tableStatusChar">占用</div>
+</div>
 
 
 

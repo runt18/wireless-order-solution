@@ -1,0 +1,60 @@
+#wrap {
+	float: left;
+	width: 800px;
+	overflow: hidden;
+	height: 480px;
+	position: relative;
+}
+
+#list {
+	width: 1000%;
+	position: absolute;
+	left: 0px;
+	top: 0px;
+}
+
+#left_btn {
+	float: left;
+	width: 100px;
+	height: 180px;
+	background: url(../images/left_btn.gif) no-repeat 50%;
+	cursor: pointer;
+	margin: 150px 0;
+}
+
+#right_btn {
+	float: left;
+	width: 100px;
+	height: 180px;
+	background: url(../images/right_btn.gif) no-repeat 50%;
+	cursor: pointer;
+	margin: 150px 0;
+}
+
+.item {
+	float: left;
+	width: 800px;
+	height: 480px;
+	overflow: hidden;
+	background: #fff;
+	background-color:#d8ebef;
+}
+
+.table_list li {
+	float: left;
+	background: url(../images/table_null.gif) no-repeat 50%;
+	border: 1px solid #ccc;
+	width: 62px;
+	height: 32px;
+	display: block;
+	margin: 20px 27px;
+	padding: 40px 0 0 10px;
+	font-size: 18px;
+	font-weight: bold;
+	color: #fff;
+	cursor: pointer;
+}
+
+.table_list li.on {
+	background: url(../images/table_on.gif);
+}
