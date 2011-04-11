@@ -1,56 +1,55 @@
 ﻿var dishOrderCurrRowIndex_ = 0;
 
-Ext.onReady( function() {
+Ext.onReady(function() {
 	// 解决ext中文传入后台变问号问题
 		Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
 		Ext.QuickTips.init();
 
 		// ***************tableSelectNorthPanel******************
-		var tableSelectNorthPanel = new Ext.form.FormPanel(
-				{
-					region : "north",
-					frame : true,
-					height : 45,
-					labelSeparator : '：',
-					labelWidth : 30,
+		var tableSelectNorthPanel = new Ext.form.FormPanel( {
+			region : "north",
+			frame : true,
+			height : 45,
+			labelSeparator : '：',
+			labelWidth : 30,
+			border : false,
+			items : [ {
+				border : false,
+				layout : "form",
+				// style : "padding-top:10px;padding-left:20px;",
+				items : [ {
+					layout : "column",
 					border : false,
+					anchor : '98%',
+					labelSeparator : '：',
 					items : [ {
-						border : false,
 						layout : "form",
-						//style : "padding-top:10px;padding-left:20px;",
+						width : 230,
+						labelWidth : 30,
+						style : "padding-top:7px;",
+						border : false,
 						items : [ {
-							layout : "column",
-							border : false,
-							anchor : '98%',
-							labelSeparator : '：',
-							items : [ 
-									{
-										layout : "form",
-										width : 230,
-										labelWidth : 30,
-										style : "padding-top:7px;",
-										border : false,
-										items : [ {
-											xtype : "textfield",
-											fieldLabel : "<b>桌号</b>",
-											name : "tableNumber",
-											id : "tableNumber",
-											anchor : "90%"
-										} ]
-									},
-									{
-										width : 800,
-										contentEl : "tableStatusTS"
-									} ] 
+							xtype : "textfield",
+							fieldLabel : "<b>桌号</b>",
+							name : "tableNumber",
+							id : "tableNumber",
+							anchor : "90%"
 						} ]
+					}, {
+						width : 800,
+						contentEl : "tableStatusTS"
 					} ]
-				});
+				} ]
+			} ]
+		});
 
 		// ***************tableSelectCenterPanel******************
 		var tableSelectCenterPanel = new Ext.Panel( {
 			region : "center",
-			bodyStyle:"background-color:#d8ebef", 
-			contentEl : "tableDisplay"
+			layout : "fit",
+			bodyStyle : "background-color:#d8ebef;padding-top:4%",
+			contentEl : "tableDisplay",
+			autoScroll : true
 		});
 
 		// *************整体布局*************
