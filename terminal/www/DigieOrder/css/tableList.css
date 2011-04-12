@@ -37,13 +37,12 @@
 	height: 480px;
 	overflow: hidden;
 	background: #fff;
-	background-color:#d8ebef;
+	background-color: #d8ebef;
 }
 
 .table_list li {
 	float: left;
 	background: url(../images/table_null.gif) no-repeat 50%;
-	border: 1px solid #ccc;
 	width: 62px;
 	height: 32px;
 	display: block;
