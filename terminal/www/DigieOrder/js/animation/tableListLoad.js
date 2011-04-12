@@ -14,11 +14,13 @@ function tableSelectOnLoad() {
 	$(".table_list li").each(function() {
 		$(this).hover(function() {
 			$(this).stop().animate( {
-				marginTop : "10px"
+				marginTop : "10px",
+				paddingBottom : "10px"
 			},200);
 		}, function() {
 			$(this).stop().animate( {
-				marginTop : "20px"
+				marginTop : "20px",
+				paddingBottom : "0px"
 			},200);
 		});
 	});
