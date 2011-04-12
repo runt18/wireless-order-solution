@@ -22,6 +22,40 @@ function tableSelectOnLoad() {
 			},200);
 		});
 	});
+	
+//	$(".table_list li").each(function() {
+//		$(this).hover(function() {
+////			this.style["background"] = "url(../images/table_on_selected.png) no-repeat 50%";
+////			$(this).css("height","40px");
+////			$(this).css("width","70px");
+////			$(this).css("margin","12px 23px");
+//			
+////			$(this).stop().fadeTo(200,0.1,function(){
+////				//$(this).css("background","url(../images/table_on_selected.png) no-repeat 50%");
+////				this.style["background"] = "url(../images/table_on_selected.png) no-repeat 50%";
+////				$(this).css("height","40px");
+////				$(this).css("width","70px");
+////				//margin: 20px 27px; width: 62px; height: 32px;
+////				$(this).css("margin","12px 23px");
+////				$(this).fadeTo(200,1);
+////			});
+//			
+//		}, function() {
+////			$(this).css("background","url(../images/table_on.gif) no-repeat 50%");
+////			$(this).css("height","32px");
+////			$(this).css("width","62px");
+////			$(this).css("margin","20px 27px");
+//			
+////			$(this).stop().fadeTo(200,0.1,function(){
+////				$(this).css("background","url(../images/table_on.gif) no-repeat 50%");
+////				$(this).css("height","32px");
+////				$(this).css("width","62px");
+////				$(this).css("margin","20px 27px");
+////				$(this).fadeTo(200,1);
+////			});
+//			
+//		});
+//	});
 
 	// double click -- forward the page
 	$(".table_list li").each(function() {
@@ -47,6 +81,7 @@ function tableSelectOnLoad() {
 												}
 											}
 
+											// update status
 											document
 													.getElementById("tblNbrDivTS").innerHTML = tableStatusListTS[tableIndex][0]
 													+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
@@ -55,6 +90,12 @@ function tableSelectOnLoad() {
 													+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 											document
 													.getElementById("tblStatusDivTS").innerHTML = tableStatusListTS[tableIndex][2];
+											
+											// icon animation
+											this.style["background"] = "url(../images/table_on_selected.png) no-repeat 50%";
+											$(this).css("height","40px");
+											$(this).css("width","70px");
+											$(this).css("margin","12px 23px");
 										});
 					});
 };

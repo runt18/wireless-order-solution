@@ -6,6 +6,114 @@ Ext.onReady(function() {
 		Ext.QuickTips.init();
 
 		// ***************tableSelectNorthPanel******************
+		var softKeyBoard = new Ext.Window( {
+			layout : "fit",
+			width : 200,
+			height : 140,
+			closeAction : "hide",
+			items : [ {
+				layout : "form",
+				labelSeparator : '：',
+				labelWidth : 40,
+				frame : true,
+				buttonAlign : "left",
+				items : [ {
+					xtype : "numberfield",
+					fieldLabel : "桌号",
+					width : "100"
+				}, {
+					layout : "column",
+					border : false,
+					items : [ {
+						layout : "form",
+						width : 30,
+						border : false,
+						items : [ {
+							text : "1",
+							xtype : "button"
+						} ]
+					}, {
+						layout : "form",
+						width : 30,
+						border : false,
+						items : [ {
+							text : "2",
+							xtype : "button"
+						} ]
+					}, {
+						layout : "form",
+						width : 30,
+						border : false,
+						items : [ {
+							text : "3",
+							xtype : "button"
+						} ]
+					}, {
+						layout : "form",
+						width : 30,
+						border : false,
+						items : [ {
+							text : "4",
+							xtype : "button"
+						} ]
+					}, {
+						layout : "form",
+						width : 30,
+						border : false,
+						items : [ {
+							text : "5",
+							xtype : "button"
+						} ]
+					}, {
+						layout : "form",
+						width : 30,
+						border : false,
+						items : [ {
+							text : "6",
+							xtype : "button"
+						} ]
+					}, {
+						layout : "form",
+						width : 30,
+						border : false,
+						items : [ {
+							text : "7",
+							xtype : "button"
+						} ]
+					}, {
+						layout : "form",
+						width : 30,
+						border : false,
+						items : [ {
+							text : "8",
+							xtype : "button"
+						} ]
+					}, {
+						layout : "form",
+						width : 30,
+						border : false,
+						items : [ {
+							text : "9",
+							xtype : "button"
+						} ]
+					}, {
+						layout : "form",
+						width : 30,
+						border : false,
+						items : [ {
+							text : "0",
+							xtype : "button"
+						} ]
+					} ]
+				} ],
+				buttons : [ {
+					text : "确定"
+				}, {
+					text : "取消"
+				} ]
+			} ]
+		});
+
 		var tableSelectNorthPanel = new Ext.form.FormPanel( {
 			region : "north",
 			frame : true,
@@ -34,6 +142,23 @@ Ext.onReady(function() {
 							name : "tableNumber",
 							id : "tableNumber",
 							anchor : "90%"
+						} ]
+					}, {
+						width : 80,
+						border : false,
+						// layout : "fit",
+						style : "padding-top:7px;",
+						items : [ {
+							xtype : "button",
+							// style : "margin-left:7px;",
+							tooltip : "软键盘",
+							width : 30,
+							text : "K",
+							listeners : {
+								"click" : function() {
+									softKeyBoard.show();
+								}
+							}
 						} ]
 					}, {
 						width : 800,
