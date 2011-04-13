@@ -1,4 +1,5 @@
 ﻿var tableStatusListTS = [];
+var selectedTable = "";
 
 function tableSelectOnLoad() {
 
@@ -8,56 +9,46 @@ function tableSelectOnLoad() {
 	tableStatusListTS.push( [ "103", 2, "空桌" ]);
 	tableStatusListTS.push( [ "104", 5, "空桌" ]);
 	tableStatusListTS.push( [ "105", 2, "占用" ]);
+	tableStatusListTS.push( [ "106", 4, "占用" ]);
+	tableStatusListTS.push( [ "107", 1, "空桌" ]);
+	tableStatusListTS.push( [ "108", 6, "空桌" ]);
+	tableStatusListTS.push( [ "109", 2, "占用" ]);
+	tableStatusListTS.push( [ "110", 5, "占用" ]);
+	tableStatusListTS.push( [ "111", 2, "空桌" ]);
+	for ( var i = 112; i <= 145; i++) {
+		tableStatusListTS.push( [ i, 2, "空桌" ]);
+	}
+	for ( var i = 200; i <= 201; i++) {
+		tableStatusListTS.push( [ i, 2, "占用" ]);
+	}
+	tableStatusListTS.push( [ "1081", 2, "占用" ]);
+	tableStatusListTS.push( [ "1082", 5, "占用" ]);
+	tableStatusListTS.push( [ "1083", 2, "空桌" ]);
+
+	// ********** create table list **********
+	// n, create page count
+	var pageTotalCount = 3;
+	var pageIndex = 1;
+	var pageIndexSpan = document.getElementById("pageIndexTL");
+	pageIndexSpan.innerHTML = pageIndex + "";
+	var pageTotalCountSpan = document.getElementById("totalCountTL");
+	pageTotalCountSpan.innerHTML = "&nbsp;&nbsp;/&nbsp;&nbsp;" + pageTotalCount
+			+ "";
 
 	// ********** register the event handler for the table icon **********
 	// mouse over & mouse off -- heightlight the icon
 	$(".table_list li").each(function() {
 		$(this).hover(function() {
 			$(this).stop().animate( {
-				marginTop : "10px",
-				paddingBottom : "10px"
-			},200);
+				marginTop : "5px"
+			}, 200);
 		}, function() {
 			$(this).stop().animate( {
-				marginTop : "20px",
-				paddingBottom : "0px"
-			},200);
+				marginTop : "20px"
+
+			}, 200);
 		});
 	});
-	
-//	$(".table_list li").each(function() {
-//		$(this).hover(function() {
-////			this.style["background"] = "url(../images/table_on_selected.png) no-repeat 50%";
-////			$(this).css("height","40px");
-////			$(this).css("width","70px");
-////			$(this).css("margin","12px 23px");
-//			
-////			$(this).stop().fadeTo(200,0.1,function(){
-////				//$(this).css("background","url(../images/table_on_selected.png) no-repeat 50%");
-////				this.style["background"] = "url(../images/table_on_selected.png) no-repeat 50%";
-////				$(this).css("height","40px");
-////				$(this).css("width","70px");
-////				//margin: 20px 27px; width: 62px; height: 32px;
-////				$(this).css("margin","12px 23px");
-////				$(this).fadeTo(200,1);
-////			});
-//			
-//		}, function() {
-////			$(this).css("background","url(../images/table_on.gif) no-repeat 50%");
-////			$(this).css("height","32px");
-////			$(this).css("width","62px");
-////			$(this).css("margin","20px 27px");
-//			
-////			$(this).stop().fadeTo(200,0.1,function(){
-////				$(this).css("background","url(../images/table_on.gif) no-repeat 50%");
-////				$(this).css("height","32px");
-////				$(this).css("width","62px");
-////				$(this).css("margin","20px 27px");
-////				$(this).fadeTo(200,1);
-////			});
-//			
-//		});
-//	});
 
 	// double click -- forward the page
 	$(".table_list li").each(function() {
@@ -92,12 +83,88 @@ function tableSelectOnLoad() {
 													+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 											document
 													.getElementById("tblStatusDivTS").innerHTML = tableStatusListTS[tableIndex][2];
-											
+
 											// icon animation
 											this.style["background"] = "url(../images/table_on_selected.png) no-repeat 50%";
-											$(this).css("height","40px");
-											$(this).css("width","70px");
-											$(this).css("margin","12px 23px");
+											$(this).css("height", "40px");
+											$(this).css("width", "70px");
+											$(this).css("margin", "12px 23px");
+
+											// deselect the selected table
+											if (selectedTable != ""
+													&& selectedTable != $(this)
+															.attr("id")
+															.substring(5)) {
+												var selectedTableIndex = -1;
+												for ( var i = 0; i < tableStatusListTS.length; i++) {
+													if (tableStatusListTS[i][0] == selectedTable) {
+														selectedTableIndex = i;
+													}
+												}
+												if (tableStatusListTS[selectedTableIndex][2] == "占用") {
+													$("#table" + selectedTable)
+															.css("background",
+																	"url(../images/table_on.gif) no-repeat 50%");
+												} else {
+													$("#table" + selectedTable)
+															.css("background",
+																	"url(../images/table_null.gif) no-repeat 50%");
+												}
+
+												$("#table" + selectedTable)
+														.css("height", "32px");
+												$("#table" + selectedTable)
+														.css("width", "62px");
+												$("#table" + selectedTable)
+														.css("margin",
+																"20px 27px");
+
+											}
+
+											// mark the selected table
+											selectedTable = $(this).attr("id");
+											selectedTable = selectedTable
+													.substring(5);
+
 										});
 					});
+
+	// keyboard input table number
+	$("#tableNumber").bind(
+			"keyup",
+			function() {
+				var curTableNbr = Ext.getCmp("tableNumber").getValue() + "";
+				var hasTable = false;
+				var tableIndex = -1;
+				for ( var i = 0; i < tableStatusListTS.length; i++) {
+					if (tableStatusListTS[i][0] == curTableNbr) {
+						hasTable = true;
+						tableIndex = i;
+					}
+				}
+				if (hasTable) {
+					var tableId = "table" + curTableNbr;
+					// select the icon
+					$("#" + tableId).trigger("click");
+
+					var curItemIndex = parseInt(document
+							.getElementById("pageIndexTL").innerHTML);
+					var forwardIndex = parseInt(tableIndex / 24) + 1;
+					if (forwardIndex != curItemIndex) {
+						// move the list
+						$("#list").animate( {
+							left : -(forwardIndex - 1) * 800 + "px"
+						}, 500, function() {
+							left = -(forwardIndex - 1) * 800;
+						});
+
+						// change the page index
+						$("#pageIndexTL").fadeTo(250, 0.1, function() {
+							$(this).html(forwardIndex);
+							$(this).fadeTo(250, 1);
+						});
+					}
+
+				}
+			});
 };

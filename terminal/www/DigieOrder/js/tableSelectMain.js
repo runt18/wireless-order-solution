@@ -8,110 +8,237 @@ Ext.onReady(function() {
 		// ***************tableSelectNorthPanel******************
 		var softKeyBoard = new Ext.Window( {
 			layout : "fit",
-			width : 200,
-			height : 140,
+			width : 177,
+			height : 100,
 			closeAction : "hide",
+			resizable : false,
+			x : 41,
+			y : 146,
 			items : [ {
 				layout : "form",
 				labelSeparator : '：',
 				labelWidth : 40,
 				frame : true,
 				buttonAlign : "left",
-				items : [ {
-					xtype : "numberfield",
-					fieldLabel : "桌号",
-					width : "100"
-				}, {
+				items : [
+				// {
+				// xtype : "numberfield",
+				// fieldLabel : "桌号",
+				// width : 85
+				// },
+				{
 					layout : "column",
 					border : false,
-					items : [ {
-						layout : "form",
-						width : 30,
-						border : false,
-						items : [ {
-							text : "1",
-							xtype : "button"
-						} ]
-					}, {
-						layout : "form",
-						width : 30,
-						border : false,
-						items : [ {
-							text : "2",
-							xtype : "button"
-						} ]
-					}, {
-						layout : "form",
-						width : 30,
-						border : false,
-						items : [ {
-							text : "3",
-							xtype : "button"
-						} ]
-					}, {
-						layout : "form",
-						width : 30,
-						border : false,
-						items : [ {
-							text : "4",
-							xtype : "button"
-						} ]
-					}, {
-						layout : "form",
-						width : 30,
-						border : false,
-						items : [ {
-							text : "5",
-							xtype : "button"
-						} ]
-					}, {
-						layout : "form",
-						width : 30,
-						border : false,
-						items : [ {
-							text : "6",
-							xtype : "button"
-						} ]
-					}, {
-						layout : "form",
-						width : 30,
-						border : false,
-						items : [ {
-							text : "7",
-							xtype : "button"
-						} ]
-					}, {
-						layout : "form",
-						width : 30,
-						border : false,
-						items : [ {
-							text : "8",
-							xtype : "button"
-						} ]
-					}, {
-						layout : "form",
-						width : 30,
-						border : false,
-						items : [ {
-							text : "9",
-							xtype : "button"
-						} ]
-					}, {
-						layout : "form",
-						width : 30,
-						border : false,
-						items : [ {
-							text : "0",
-							xtype : "button"
-						} ]
-					} ]
-				} ],
-				buttons : [ {
-					text : "确定"
-				}, {
-					text : "取消"
+					items : [
+							{
+								layout : "form",
+								width : 30,
+								border : false,
+								items : [ {
+									text : "1",
+									xtype : "button",
+									handler : function() {
+										var currValue = tableSelectNorthPanel
+												.findById("tableNumber")
+												.getValue();
+										tableSelectNorthPanel.findById(
+												"tableNumber").setValue(
+												currValue + "1");
+									}
+								} ]
+							},
+							{
+								layout : "form",
+								width : 30,
+								border : false,
+								items : [ {
+									text : "2",
+									xtype : "button",
+									handler : function() {
+										var currValue = tableSelectNorthPanel
+												.findById("tableNumber")
+												.getValue();
+										tableSelectNorthPanel.findById(
+												"tableNumber").setValue(
+												currValue + "2");
+									}
+								} ]
+							},
+							{
+								layout : "form",
+								width : 30,
+								border : false,
+								items : [ {
+									text : "3",
+									xtype : "button",
+									handler : function() {
+										var currValue = tableSelectNorthPanel
+												.findById("tableNumber")
+												.getValue();
+										tableSelectNorthPanel.findById(
+												"tableNumber").setValue(
+												currValue + "3");
+									}
+								} ]
+							},
+							{
+								layout : "form",
+								width : 30,
+								border : false,
+								items : [ {
+									text : "4",
+									xtype : "button",
+									handler : function() {
+										var currValue = tableSelectNorthPanel
+												.findById("tableNumber")
+												.getValue();
+										tableSelectNorthPanel.findById(
+												"tableNumber").setValue(
+												currValue + "4");
+									}
+								} ]
+							},
+							{
+								layout : "form",
+								width : 30,
+								border : false,
+								items : [ {
+									text : "5",
+									xtype : "button",
+									handler : function() {
+										var currValue = tableSelectNorthPanel
+												.findById("tableNumber")
+												.getValue();
+										tableSelectNorthPanel.findById(
+												"tableNumber").setValue(
+												currValue + "5");
+									}
+								} ]
+							},
+							{
+								layout : "form",
+								width : 30,
+								border : false,
+								items : [ {
+									text : "6",
+									xtype : "button",
+									handler : function() {
+										var currValue = tableSelectNorthPanel
+												.findById("tableNumber")
+												.getValue();
+										tableSelectNorthPanel.findById(
+												"tableNumber").setValue(
+												currValue + "6");
+									}
+								} ]
+							},
+							{
+								layout : "form",
+								width : 30,
+								border : false,
+								items : [ {
+									text : "7",
+									xtype : "button",
+									handler : function() {
+										var currValue = tableSelectNorthPanel
+												.findById("tableNumber")
+												.getValue();
+										tableSelectNorthPanel.findById(
+												"tableNumber").setValue(
+												currValue + "7");
+									}
+								} ]
+							},
+							{
+								layout : "form",
+								width : 30,
+								border : false,
+								items : [ {
+									text : "8",
+									xtype : "button",
+									handler : function() {
+										var currValue = tableSelectNorthPanel
+												.findById("tableNumber")
+												.getValue();
+										tableSelectNorthPanel.findById(
+												"tableNumber").setValue(
+												currValue + "8");
+									}
+								} ]
+							},
+							{
+								layout : "form",
+								width : 30,
+								border : false,
+								items : [ {
+									text : "9",
+									xtype : "button",
+									handler : function() {
+										var currValue = tableSelectNorthPanel
+												.findById("tableNumber")
+												.getValue();
+										tableSelectNorthPanel.findById(
+												"tableNumber").setValue(
+												currValue + "9");
+									}
+								} ]
+							},
+							{
+								layout : "form",
+								width : 30,
+								border : false,
+								items : [ {
+									text : "0",
+									xtype : "button",
+									handler : function() {
+										var currValue = tableSelectNorthPanel
+												.findById("tableNumber")
+												.getValue();
+										tableSelectNorthPanel.findById(
+												"tableNumber").setValue(
+												currValue + "0");
+									}
+								} ]
+							},
+							{
+								layout : "form",
+								width : 60,
+								border : false,
+								items : [ {
+									text : "&nbsp;确 认&nbsp;",
+									xtype : "button",
+									handler : function() {
+										softKeyBoard.hide();
+									}
+								} ]
+							},
+							{
+								layout : "form",
+								width : 60,
+								border : false,
+								items : [ {
+									text : "&nbsp;清 空&nbsp;",
+									xtype : "button",
+									handler : function() {
+										tableSelectNorthPanel.findById(
+												"tableNumber").setValue("");
+									}
+								} ]
+							} ]
 				} ]
-			} ]
+			// ,
+			// buttons : [ {
+			// text : "确定"
+			// }, {
+			// text : "取消"
+			// } ]
+			} ],
+			listeners : {
+				show : function(thiz) {
+					// tableSelectNorthPanel.findById("tableNumber").focus(true);
+			// document.getElementById("tableNumber").focus();
+		}
+	}
 		});
 
 		var tableSelectNorthPanel = new Ext.form.FormPanel( {
@@ -132,38 +259,45 @@ Ext.onReady(function() {
 					labelSeparator : '：',
 					items : [ {
 						layout : "form",
-						width : 230,
+						width : 237,
 						labelWidth : 30,
 						style : "padding-top:7px;",
 						border : false,
 						items : [ {
-							xtype : "textfield",
+							xtype : "numberfield",
 							fieldLabel : "<b>桌号</b>",
 							name : "tableNumber",
 							id : "tableNumber",
-							anchor : "90%"
-						} ]
-					}, {
-						width : 80,
-						border : false,
-						// layout : "fit",
-						style : "padding-top:7px;",
-						items : [ {
-							xtype : "button",
-							// style : "margin-left:7px;",
-							tooltip : "软键盘",
-							width : 30,
-							text : "K",
+							anchor : "90%",
 							listeners : {
-								"click" : function() {
+								focus : function(thiz) {
 									softKeyBoard.show();
 								}
 							}
 						} ]
-					}, {
-						width : 800,
-						contentEl : "tableStatusTS"
-					} ]
+					},
+					// {
+							// width : 80,
+							// border : false,
+							// // layout : "fit",
+							// style : "padding-top:7px;",
+							// items : [ {
+							// xtype : "button",
+							// // style : "margin-left:7px;",
+							// tooltip : "软键盘",
+							// width : 30,
+							// text : "K",
+							// listeners : {
+							// "click" : function() {
+							// softKeyBoard.show();
+							// }
+							// }
+							// } ]
+							// },
+							{
+								width : 800,
+								contentEl : "tableStatusTS"
+							} ]
 				} ]
 			} ]
 		});
