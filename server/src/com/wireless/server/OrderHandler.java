@@ -642,28 +642,26 @@ class OrderHandler extends Handler implements Runnable{
 			if(printerConn != null){
 				connections = printerConn.toArray(new Socket[printerConn.size()]);			
 			}
-			//check whether the print request is synchronized or asynchronous
-			if((req.header.reserved & Reserved.PRINT_SYNC) != 0){
-				/**
-				 * if the print request is synchronized, then the insert order request must wait until
-				 * the print request is done, and send the ACK or NAK to let the terminal know whether 
-				 * the print actions is successfully or not
-				 */
-				if(connections != null){
-					for(int i = 0; i < connections.length; i++){
-						try{
-							new PrintHandler(extraOrder, connections[i], Reserved.PRINT_EXTRA_FOOD_2, _restaurantID, _owner).run2();						
-						}catch(PrintSocketException e){}
+			if(connections != null){
+				//check whether the print request is synchronized or asynchronous
+				if((req.header.reserved & Reserved.PRINT_SYNC) != 0){
+					/**
+					 * if the print request is synchronized, then the insert order request must wait until
+					 * the print request is done, and send the ACK or NAK to let the terminal know whether 
+					 * the print actions is successfully or not
+					 */
+					for (int i = 0; i < connections.length; i++) {
+						try {
+							new PrintHandler(extraOrder, connections[i], Reserved.PRINT_EXTRA_FOOD_2, _restaurantID, _owner).run2();
+						} catch (PrintSocketException e) {}
 					}
-				}
-				
-			}else{
-				/**
-				 * if the print request is asynchronous, then the insert order request return an ACK immediately,
-				 * regardless of the print request. In the mean time, the print request would be put to a 
-				 * new thread to run.
-				 */
-				if(connections != null){
+	
+				}else{
+					/**
+					 * if the print request is asynchronous, then the insert order request return an ACK immediately,
+					 * regardless of the print request. In the mean time, the print request would be put to a 
+					 * new thread to run.
+					 */
 					for(int i = 0; i < connections.length; i++){
 						WirelessSocketServer.threadPool.execute(new PrintHandler(extraOrder, connections[i], Reserved.PRINT_EXTRA_FOOD_2, _restaurantID, _owner));
 					}
