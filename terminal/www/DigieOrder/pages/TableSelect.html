@@ -32,8 +32,18 @@
 <link rel="stylesheet" type="text/css" href="../css/tableList.css" />
 <link rel="stylesheet" type="text/css" href="../css/tableStatus.css" />
 
+
+<script type="text/javascript">
+	// global variable
+	var tableStatusListTS = []; // tables' infomation
+	var selectedTable = ""; // the current selected table number("" if null)
+	var softKeyBoardTS = null; // table select soft key board
+	var personCountInputWin = null // person count input pop window
+</script>
+
 <script type="text/javascript" src="../js/animation/tableListMove.js"></script>
 <script type="text/javascript" src="../js/animation/tableListLoad.js"></script>
+<script type="text/javascript" src="../js/animation/tableItemSelect.js"></script>
 <script type="text/javascript" src="../js/tableSelectMain.js"></script>
 
 </head>
@@ -132,10 +142,8 @@
 </div>
 </div>
 <div class="side_btn" id="right_btn"></div>
-<div id="tableListPageCount" class="pageCount">
-	<span id="pageIndexTL"></span>
-	<span id="totalCountTL"></span>
-</div>
+<div id="tableListPageCount" class="pageCount"><span
+	id="pageIndexTL"></span> <span id="totalCountTL"></span></div>
 </div>
 
 
