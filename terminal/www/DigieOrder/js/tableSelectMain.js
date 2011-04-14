@@ -1,17 +1,78 @@
-﻿var dishOrderCurrRowIndex_ = 0;
-
-Ext.onReady(function() {
+﻿Ext.onReady(function() {
 	// 解决ext中文传入后台变问号问题
 		Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
 		Ext.QuickTips.init();
 
+		// person count input pop window
+		personCountInputWin = new Ext.Window(
+				{
+					layout : "fit",
+					width : 177,
+					height : 100,
+					closeAction : "hide",
+					resizable : false,
+					items : [ {
+						layout : "form",
+						labelWidth : 30,
+						border : false,
+						frame : true,
+						items : [ {
+							xtype : "numberfield",
+							fieldLabel : "人数",
+							id : "personCountInput",
+							width : 110
+						} ]
+					} ],
+					buttons : [
+							{
+								text : "确定",
+								handler : function() {
+									var inputCount = personCountInputWin
+											.findById("personCountInput")
+											.getValue();
+									if (inputCount != 0 && inputCount != "") {
+										personCountInputWin.hide();
+
+										// update data
+										var tableIndex = -1;
+										for ( var i = 0; i < tableStatusListTS.length; i++) {
+											if (tableStatusListTS[i][0] == selectedTable) {
+												tableIndex = i;
+											}
+										}
+										tableStatusListTS[tableIndex][1] = inputCount;
+										tableStatusListTS[tableIndex][2] = "占用";
+
+										// update status output
+										document
+												.getElementById("perCountDivTS").innerHTML = inputCount
+												+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+										document
+												.getElementById("tblStatusDivTS").innerHTML = "占用";
+
+										// for forward the page
+										location.href = "OrderMain.html?tableNbr="
+												+ selectedTable
+												+ "&personCount=" + inputCount;
+
+									}
+								}
+							}, {
+								text : "取消",
+								handler : function() {
+									personCountInputWin.hide();
+								}
+							} ]
+				});
+
 		// ***************tableSelectNorthPanel******************
-		var softKeyBoard = new Ext.Window( {
+		softKeyBoardTS = new Ext.Window( {
 			layout : "fit",
 			width : 177,
 			height : 100,
 			closeAction : "hide",
 			resizable : false,
+			closable : false,
 			x : 41,
 			y : 146,
 			items : [ {
@@ -208,7 +269,7 @@ Ext.onReady(function() {
 									text : "&nbsp;确 认&nbsp;",
 									xtype : "button",
 									handler : function() {
-										softKeyBoard.hide();
+										softKeyBoardTS.hide();
 									}
 								} ]
 							},
@@ -223,20 +284,15 @@ Ext.onReady(function() {
 										tableSelectNorthPanel.findById(
 												"tableNumber").setValue("");
 									}
+
 								} ]
 							} ]
 				} ]
-			// ,
-			// buttons : [ {
-			// text : "确定"
-			// }, {
-			// text : "取消"
-			// } ]
 			} ],
 			listeners : {
 				show : function(thiz) {
-					// tableSelectNorthPanel.findById("tableNumber").focus(true);
-			// document.getElementById("tableNumber").focus();
+					var f = Ext.get("tableNumber");
+					f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
 		}
 	}
 		});
@@ -271,7 +327,7 @@ Ext.onReady(function() {
 							anchor : "90%",
 							listeners : {
 								focus : function(thiz) {
-									softKeyBoard.show();
+									softKeyBoardTS.show();
 								}
 							}
 						} ]
@@ -289,7 +345,7 @@ Ext.onReady(function() {
 							// text : "K",
 							// listeners : {
 							// "click" : function() {
-							// softKeyBoard.show();
+							// softKeyBoardTS.show();
 							// }
 							// }
 							// } ]
@@ -318,7 +374,17 @@ Ext.onReady(function() {
 			imgHeight : 50,
 			tooltip : "点菜",
 			handler : function(btn) {
-				Ext.MessageBox.alert("test", "点菜");
+				if (selectedTable != "") {
+					var tableIndex = -1;
+					for ( var i = 0; i < tableStatusListTS.length; i++) {
+						if (tableStatusListTS[i][0] == selectedTable) {
+							tableIndex = i;
+						}
+					}
+					location.href = "OrderMain.html?tableNbr=" + selectedTable
+							+ "&personCount="
+							+ tableStatusListTS[tableIndex][1];
+				}
 			}
 		});
 
@@ -328,7 +394,18 @@ Ext.onReady(function() {
 			imgHeight : 50,
 			tooltip : "结账",
 			handler : function(btn) {
-				Ext.MessageBox.alert("test", "结账");
+				if (selectedTable != "") {
+					var tableIndex = -1;
+					for ( var i = 0; i < tableStatusListTS.length; i++) {
+						if (tableStatusListTS[i][0] == selectedTable) {
+							tableIndex = i;
+						}
+					}
+					location.href = "CheckOut.html?tableNbr=" + selectedTable
+							+ "&personCount="
+							+ tableStatusListTS[tableIndex][1];
+					;
+				}
 			}
 		});
 
@@ -365,6 +442,7 @@ Ext.onReady(function() {
 		var viewport = new Ext.Viewport(
 				{
 					layout : "border",
+					id : "viewport",
 					items : [
 							{
 								region : "north",

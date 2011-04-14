@@ -1,7 +1,4 @@
-﻿var tableStatusListTS = [];
-var selectedTable = "";
-
-function tableSelectOnLoad() {
+﻿function tableSelectOnLoad() {
 
 	tableStatusListTS.push( [ "100", 4, "占用" ]);
 	tableStatusListTS.push( [ "101", 1, "空桌" ]);
@@ -51,11 +48,31 @@ function tableSelectOnLoad() {
 	});
 
 	// double click -- forward the page
-	$(".table_list li").each(function() {
-		$(this).bind("dblclick", function() {
-			location.href = "OrderMain.html";
-		});
-	});
+	$(".table_list li")
+			.each(
+					function() {
+						$(this)
+								.bind(
+										"dblclick",
+										function() {
+											var tableIndex = -1;
+											for ( var i = 0; i < tableStatusListTS.length; i++) {
+												if (tableStatusListTS[i][0] == selectedTable) {
+													tableIndex = i;
+												}
+											}
+
+											if (tableStatusListTS[tableIndex][2] == "空桌") {
+												personCountInputWin.show();
+											} else {
+
+												location.href = "OrderMain.html?tableNbr="
+														+ selectedTable
+														+ "&personCount="
+														+ tableStatusListTS[tableIndex][1];
+											}
+										});
+					});
 
 	// click - 1,change the status info; 2,heightlight the icon
 	$(".table_list li")
@@ -84,48 +101,13 @@ function tableSelectOnLoad() {
 											document
 													.getElementById("tblStatusDivTS").innerHTML = tableStatusListTS[tableIndex][2];
 
-											// icon animation
-											this.style["background"] = "url(../images/table_on_selected.png) no-repeat 50%";
-											$(this).css("height", "40px");
-											$(this).css("width", "70px");
-											$(this).css("margin", "12px 23px");
-
-											// deselect the selected table
-											if (selectedTable != ""
-													&& selectedTable != $(this)
-															.attr("id")
-															.substring(5)) {
-												var selectedTableIndex = -1;
-												for ( var i = 0; i < tableStatusListTS.length; i++) {
-													if (tableStatusListTS[i][0] == selectedTable) {
-														selectedTableIndex = i;
-													}
-												}
-												if (tableStatusListTS[selectedTableIndex][2] == "占用") {
-													$("#table" + selectedTable)
-															.css("background",
-																	"url(../images/table_on.gif) no-repeat 50%");
-												} else {
-													$("#table" + selectedTable)
-															.css("background",
-																	"url(../images/table_null.gif) no-repeat 50%");
-												}
-
-												$("#table" + selectedTable)
-														.css("height", "32px");
-												$("#table" + selectedTable)
-														.css("width", "62px");
-												$("#table" + selectedTable)
-														.css("margin",
-																"20px 27px");
-
+											// table select
+											var currTableNbr = $(this).attr(
+													"id").substring(5);
+											if (currTableNbr != selectedTable) {
+												deselectTable();
+												selectTable(currTableNbr);
 											}
-
-											// mark the selected table
-											selectedTable = $(this).attr("id");
-											selectedTable = selectedTable
-													.substring(5);
-
 										});
 					});
 
@@ -165,6 +147,9 @@ function tableSelectOnLoad() {
 						});
 					}
 
+				} else {
+					deselectTable();
 				}
 			});
+
 };
