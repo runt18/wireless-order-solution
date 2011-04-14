@@ -1,6 +1,4 @@
-﻿var dishOrderCurrRowIndex_ = 0;
-
-// --------------dishes order center panel-----------------
+﻿// --------------dishes order center panel-----------------
 // 1，数据
 var orderedData = [];
 orderedData.push( [ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "" ]);
@@ -26,23 +24,22 @@ orderedStore.reload();
 
 // 3，栏位模型
 function dishOptTasteHandler(rowIndex) {
-	dishOrderCurrRowIndex_ = rowIndex;
-	dishTasteWindow.show();
-};
-function dishOptModifyHandler() {
-	alert("shit!shit!");
+	if (dishOrderCurrRowIndex_ != -1) {
+		dishOrderCurrRowIndex_ = rowIndex;
+		dishTasteWindow.show();
+	}
 };
 function dishOptDeleteHandler(rowIndex) {
-	orderedData.splice(rowIndex, 1);
-	orderedStore.reload();
+	if (dishOrderCurrRowIndex_ != -1) {
+		orderedData.splice(rowIndex, 1);
+		orderedStore.reload();
+		dishOrderCurrRowIndex_ = -1;
+	}
 };
 
 function dishOptDispley(value, cellmeta, record, rowIndex, columnIndex, store) {
 	return "<center><a href=\"javascript:dishOptTasteHandler(" + rowIndex
 			+ ")\">" + "<img src='../images/Modify.png'/>口味</a>"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-			+ "<a href=\"javascript:dishOptModifyHandler()\">"
-			+ "<img src='../images/Modify.png'/>修改</a>"
 			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
 			+ "<a href=\"javascript:dishOptDeleteHandler(" + rowIndex + ")\">"
 			+ "<img src='../images/del.png'/>删除</a></center>";
@@ -78,6 +75,26 @@ var orderedColumnModel = new Ext.grid.ColumnModel( [
 		} ]);
 
 // 4，表格
+var tasteChooseImgBut = new Ext.ux.ImageButton( {
+	imgPath : "../images/im48x48.png",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "口味",
+	handler : function(btn) {
+		dishOptTasteHandler(dishOrderCurrRowIndex_);
+	}
+});
+
+var dishDeleteImgBut = new Ext.ux.ImageButton( {
+	imgPath : "../images/extlogo48.png",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "删除",
+	handler : function(btn) {
+		dishOptDeleteHandler(dishOrderCurrRowIndex_);
+	}
+});
+
 var orderedGrid = new Ext.grid.GridPanel( {
 	title : "已点菜式",
 	// height : 400,
@@ -85,66 +102,82 @@ var orderedGrid = new Ext.grid.GridPanel( {
 	anchor : "99%",
 	// height : 500,
 	ds : orderedStore,
-	cm : orderedColumnModel
+	cm : orderedColumnModel,
+	sm : new Ext.grid.RowSelectionModel( {
+		singleSelect : true
+	}),
+	tbar : new Ext.Toolbar( {
+		height : 55,
+		items : [ {
+			text : " ",
+			disabled : true
+		}, tasteChooseImgBut, {
+			text : "&nbsp;&nbsp;&nbsp;",
+			disabled : true
+		}, dishDeleteImgBut ]
+	}),
+	listeners : {
+		rowclick : function(thiz, rowIndex, e) {
+			dishOrderCurrRowIndex_ = rowIndex;
+		}
+	}
 });
 
-var orderedForm = new Ext.form.FormPanel(
-		{
-			frame : true,
-			border : false,
-			items : [
-					{
-						id : "orderedInfoMsg",
-						html : "<br/><font size=3pt,style='padding-bottom:10pt;'>当前台号尚未下单。</font>"
-					}, orderedGrid ],
-			buttons : [
-					{
-						text : "提交",
-						handler : function() {
-							dishesOrderNorthPanel.findById("orderTime")
-									.setValue(new Date().toLocaleString()); // according
-							// to
-							// the
-							// operation
-							// system
-							// language
-							// type!
-							// dishesOrderNorthPanel.findById("orderTime").setValue(
-							// DateTime.Now);
-							dishesOrderNorthPanel.findById("orderOperator")
-									.setValue("ZhaoTongFei");
-						}
-					}, {
-						text : "清空",
-						handler : function() {
-							Ext.Msg.show( {
-								title : "提示",
-								msg : "确定要删除所有已点菜式？",
-								buttons : Ext.Msg.YESNO,
-								fn : function(btn) {
-									if (btn == "yes") {
-										orderedData.length = 0;
-										orderedStore.reload();
-									}
-									;
-								},
-								icon : Ext.MessageBox.QUESTION
-							});
-						}
-					}, {
-						text : "删单"
-					} ],
-			listeners : {
-				afterlayout : function(thiz) {
-					orderedGrid.setHeight(thiz.getInnerHeight() - 30);
+var orderedForm = new Ext.form.FormPanel( {
+	frame : true,
+	border : false,
+	items : [ orderedGrid ],
+	buttons : [
+			{
+				text : "提交",
+				handler : function() {
+					dishesOrderNorthPanel.findById("orderTime").setValue(
+							new Date().toLocaleString()); // according
+					// to
+					// the
+					// operation
+					// system
+					// language
+					// type!
+					// dishesOrderNorthPanel.findById("orderTime").setValue(
+					// DateTime.Now);
+					dishesOrderNorthPanel.findById("orderOperator").setValue(
+							"ZhaoTongFei");
 				}
-			}
-		});
+			}, {
+				text : "清空",
+				handler : function() {
+					Ext.Msg.show( {
+						title : "提示",
+						msg : "确定要删除所有已点菜式？",
+						buttons : Ext.Msg.YESNO,
+						fn : function(btn) {
+							if (btn == "yes") {
+								orderedData.length = 0;
+								orderedStore.reload();
+							}
+							;
+						},
+						icon : Ext.MessageBox.QUESTION
+					});
+				}
+			}, {
+				text : "返回",
+				handler : function() {
+					location.href = "TableSelect.html";
+				}
+			} ],
+	listeners : {
+		afterlayout : function(thiz) {
+			orderedGrid.setHeight(thiz.getInnerHeight() - 30);
+		}
+	}
+});
 
 var dishesOrderCenterPanel = new Ext.Panel( {
 	region : "center",
 	id : "dishesOrderCenterPanel",
-	title : "新下单",
+	title : "<div style='font-size:18px;padding-left:2px'>新下单<div>",
 	layout : "fit",
 	items : [ orderedForm ]
 });
@@ -210,6 +243,188 @@ var dishTasteWindow = new Ext.Window( {
 });
 
 // --------------dishes order east panel-----------------
+// soft key board
+var softKBKeyHandler = function(relateItemId, number) {
+	var currValue = dishesOrderEastPanel.findById(relateItemId).getValue();
+	dishesOrderEastPanel.findById(relateItemId).setValue(
+			currValue + "" + number);
+};
+
+softKeyBoardDO = new Ext.Window( {
+	layout : "fit",
+	width : 177,
+	height : 100,
+	closeAction : "hide",
+	resizable : false,
+	closable : false,
+	x : 41,
+	y : 146,
+	items : [ {
+		layout : "form",
+		labelSeparator : '：',
+		labelWidth : 40,
+		frame : true,
+		buttonAlign : "left",
+		items : [ {
+			layout : "column",
+			border : false,
+			items : [
+					{
+						layout : "form",
+						width : 30,
+						border : false,
+						items : [ {
+							text : "1",
+							xtype : "button",
+							handler : function() {
+								softKBKeyHandler(softKBRelateItemId, "1");
+							}
+						} ]
+					},
+					{
+						layout : "form",
+						width : 30,
+						border : false,
+						items : [ {
+							text : "2",
+							xtype : "button",
+							handler : function() {
+								softKBKeyHandler(softKBRelateItemId, "2");
+							}
+						} ]
+					},
+					{
+						layout : "form",
+						width : 30,
+						border : false,
+						items : [ {
+							text : "3",
+							xtype : "button",
+							handler : function() {
+								softKBKeyHandler(softKBRelateItemId, "3");
+							}
+						} ]
+					},
+					{
+						layout : "form",
+						width : 30,
+						border : false,
+						items : [ {
+							text : "4",
+							xtype : "button",
+							handler : function() {
+								softKBKeyHandler(softKBRelateItemId, "4");
+							}
+						} ]
+					},
+					{
+						layout : "form",
+						width : 30,
+						border : false,
+						items : [ {
+							text : "5",
+							xtype : "button",
+							handler : function() {
+								softKBKeyHandler(softKBRelateItemId, "5");
+							}
+						} ]
+					},
+					{
+						layout : "form",
+						width : 30,
+						border : false,
+						items : [ {
+							text : "6",
+							xtype : "button",
+							handler : function() {
+								softKBKeyHandler(softKBRelateItemId, "6");
+							}
+						} ]
+					},
+					{
+						layout : "form",
+						width : 30,
+						border : false,
+						items : [ {
+							text : "7",
+							xtype : "button",
+							handler : function() {
+								softKBKeyHandler(softKBRelateItemId, "7");
+							}
+						} ]
+					},
+					{
+						layout : "form",
+						width : 30,
+						border : false,
+						items : [ {
+							text : "8",
+							xtype : "button",
+							handler : function() {
+								softKBKeyHandler(softKBRelateItemId, "8");
+							}
+						} ]
+					},
+					{
+						layout : "form",
+						width : 30,
+						border : false,
+						items : [ {
+							text : "9",
+							xtype : "button",
+							handler : function() {
+								softKBKeyHandler(softKBRelateItemId, "9");
+							}
+						} ]
+					},
+					{
+						layout : "form",
+						width : 30,
+						border : false,
+						items : [ {
+							text : "0",
+							xtype : "button",
+							handler : function() {
+								softKBKeyHandler(softKBRelateItemId, "0");
+							}
+						} ]
+					},
+					{
+						layout : "form",
+						width : 60,
+						border : false,
+						items : [ {
+							text : "&nbsp;确 认&nbsp;",
+							xtype : "button",
+							handler : function() {
+								softKeyBoardDO.hide();
+							}
+						} ]
+					},
+					{
+						layout : "form",
+						width : 60,
+						border : false,
+						items : [ {
+							text : "&nbsp;清 空&nbsp;",
+							xtype : "button",
+							handler : function() {
+								dishesOrderEastPanel.findById(
+										softKBRelateItemId).setValue("");
+							}
+
+						} ]
+					} ]
+		} ]
+	} ],
+	listeners : {
+		show : function(thiz) {
+			var f = Ext.get(softKBRelateItemId);
+			f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
+}
+}
+});
+
 // 1，数据
 var dishesDisplayData = [];
 dishesDisplayData.push( [ "酸菜鱼", 1101, 35.1 ]);
@@ -233,6 +448,17 @@ dishesDisplayData.push( [ "京酱肉丝", 2345, 50 ]);
 dishesDisplayData.push( [ "酸菜鱼", 1456, 35.1 ]);
 dishesDisplayData.push( [ "京酱肉丝", 2235, 50 ]);
 dishesDisplayData.push( [ "酸菜鱼", 1345, 35.1 ]);
+dishesDisplayData.push( [ "京酱肉丝", 2756, 50 ]);
+dishesDisplayData.push( [ "酸菜鱼", 1345, 35.1 ]);
+dishesDisplayData.push( [ "京酱肉丝", 2543, 50 ]);
+dishesDisplayData.push( [ "酸菜鱼", 1756, 35.1 ]);
+dishesDisplayData.push( [ "京酱肉丝", 2786, 50 ]);
+dishesDisplayData.push( [ "酸菜鱼", 1456, 35.1 ]);
+dishesDisplayData.push( [ "京酱肉丝", 2547, 50 ]);
+dishesDisplayData.push( [ "酸菜鱼", 1245, 35.1 ]);
+dishesDisplayData.push( [ "京酱肉丝", 2765, 50 ]);
+dishesDisplayData.push( [ "酸菜鱼", 1768, 35.1 ]);
+dishesDisplayData.push( [ "京酱肉丝", 2688, 50 ]);
 dishesDisplayData.push( [ "京酱肉丝", 2756, 50 ]);
 dishesDisplayData.push( [ "酸菜鱼", 1345, 35.1 ]);
 dishesDisplayData.push( [ "京酱肉丝", 2543, 50 ]);
@@ -274,7 +500,6 @@ var dishesDisplayColumnModel = new Ext.grid.ColumnModel( [
 // 4，表格
 var dishesDisplayGrid = new Ext.grid.GridPanel( {
 	xtype : "grid",
-	// title : "菜单",
 	// height : 400,
 	anchor : "98%",
 	autoScroll : true,
@@ -299,125 +524,90 @@ var dishesDisplayGrid = new Ext.grid.GridPanel( {
 
 dishesDisplayStore.reload();
 
-var dishesOrderEastPanel = new Ext.Panel( {
+var dishesOrderEastPanel = new Ext.form.FormPanel( {
 	region : "east",
 	title : "菜谱",
 	collapsible : true,
-	width : 280,
-	minSize : 180,
-	maxSize : 380,
+	width : 400,
+	minSize : 300,
+	maxSize : 500,
 	margins : '0 5 0 5',
 	split : true,
 	id : "dishesOrderEastPanel",
-	layout : "fit",
-	items : [ {
-		id : "dishesOrderForm",
-		layout : "form",
-		labelWidth : 60,
-		frame : true,
-		border : false,
-		// height : 300,
-		items : [ {
-			xtype : "numberfield",
-			fieldLabel : "数量",
-			name : "orderCount",
-			id : "orderCount",
-			value : 1,
-			anchor : "90%"
-		}, {
-			xtype : "numberfield",
-			fieldLabel : "菜名编号",
-			name : "orderNbr",
-			id : "orderNbr",
-			anchor : "90%"
-		}, dishesDisplayGrid ]
-	} ]
+	border : false,
+	frame : true,
+	items : [
+			{
+				layout : "column",
+				border : false,
+				anchor : "98%",
+				items : [
+						{
+							layout : "form",
+							labelWidth : 60,
+							border : false,
+							labelSeparator : '：',
+							columnWidth : .50,
+							items : [ {
+								xtype : "numberfield",
+								fieldLabel : "数量",
+								name : "orderCount",
+								id : "orderCount",
+								value : 1,
+								anchor : "90%",
+								listeners : {
+									focus : function(thiz) {
+										softKeyBoardDO.setPosition(
+												dishesOrderCenterPanel
+														.getInnerWidth() + 45,
+												148);
+										softKBRelateItemId = "orderCount";
+										softKeyBoardDO.show();
+
+									}
+								}
+							} ]
+						},
+						{
+							layout : "form",
+							labelWidth : 60,
+							border : false,
+							labelSeparator : '：',
+							columnWidth : .50,
+							items : [ {
+								xtype : "numberfield",
+								fieldLabel : "菜名编号",
+								name : "orderNbr",
+								id : "orderNbr",
+								anchor : "90%",
+								listeners : {
+									focus : function(thiz) {
+										softKeyBoardDO.setPosition(
+												dishesOrderCenterPanel
+														.getInnerWidth() + 232,
+												148);
+										softKBRelateItemId = "orderNbr";
+										softKeyBoardDO.show();
+
+									}
+								}
+							} ]
+						} ]
+			}, dishesDisplayGrid ]
 });
 
 // --------------dishes order north panel-----------------
-var dishesOrderNorthPanel = new Ext.form.FormPanel( {
+var dishesOrderNorthPanel = new Ext.Panel( {
 	id : "dishesOrderNorthPanel",
 	region : "north",
-	height : 100,
+	height : 40,
 	border : false,
+	layout : "form",
 	frame : true,
-	// autoScroll : true,
-	buttonAlign : "left",
-	items : [ {
-		layout : "column",
-		border : false,
-		anchor : '98%',
-		labelSeparator : '：',
-		items : [ {
-			layout : "form",
-			width : 230,
-			labelWidth : 60,
-			border : false,
-			items : [ {
-				xtype : "textfield",
-				fieldLabel : "桌号",
-				name : "tableNumber",
-				id : "tableNumber",
-				anchor : "90%"
-			} ]
-		}, {
-			layout : "form",
-			width : 150,
-			labelWidth : 40,
-			border : false,
-			items : [ {
-				xtype : "numberfield",
-				fieldLabel : "人数",
-				name : "personCount",
-				id : "personCount",
-				anchor : "90%"
-			} ]
-		} ]
-	}, {
-		layout : "column",
-		border : false,
-		anchor : '98%',
-		labelSeparator : '：',
-		items : [ {
-			layout : "form",
-			width : 230,
-			labelWidth : 60,
-			border : false,
-			items : [ {
-				xtype : "textfield",
-				fieldLabel : "下单时间",
-				name : "orderTime",
-				id : "orderTime",
-				disabled : true,
-				anchor : "90%"
-			} ]
-		}, {
-			layout : "form",
-			width : 150,
-			labelWidth : 40,
-			border : false,
-			items : [ {
-				xtype : "textfield",
-				fieldLabel : "操作人",
-				name : "orderOperator",
-				id : "orderOperator",
-				disabled : true,
-				anchor : "90%"
-			} ]
-		} ]
-	} ],
-	buttons : [ {
-		text : "提交"
-	}, {
-		text : "清空",
-		handler : function() {
-			dishesOrderNorthPanel.findById("tableNumber").setValue("");
-			dishesOrderNorthPanel.findById("personCount").setValue("");
-		}
-	} ]
+	contentEl : "tableStatusDO"
 });
 
-Ext.onReady(function() {
+Ext.onReady( function() {
 	// 解决ext中文传入后台变问号问题
 		Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
 		Ext.QuickTips.init();
@@ -436,6 +626,7 @@ Ext.onReady(function() {
 		var viewport = new Ext.Viewport(
 				{
 					layout : "border",
+					id : "viewport",
 					items : [
 							{
 								region : "north",
@@ -456,9 +647,9 @@ Ext.onReady(function() {
 
 		// -------------------- 浏览器大小改变 -------------------------------
 		// 1,调整colDisplayFormUQ中表格的高度
-		Ext.EventManager.onWindowResize(function() {
-			dishesDisplayGrid.setHeight(dishesOrderEastPanel.findById(
-					"dishesOrderForm").getInnerHeight() - 50);
+		Ext.EventManager.onWindowResize( function() {
+			dishesDisplayGrid
+					.setHeight(dishesOrderEastPanel.getInnerHeight() - 50);
 			// dataSortGridUQ.setHeight(150);
 			});
 	});
