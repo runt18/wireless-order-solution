@@ -66,6 +66,14 @@
 				});
 
 		// ***************tableSelectNorthPanel******************
+		// soft key board
+		var softKBKeyHandlerTS = function(relateItemId, number) {
+			var currValue = tableSelectNorthPanel.findById(relateItemId)
+					.getValue();
+			tableSelectNorthPanel.findById(relateItemId).setValue(
+					currValue + "" + number);
+		};
+
 		softKeyBoardTS = new Ext.Window( {
 			layout : "fit",
 			width : 177,
@@ -99,12 +107,8 @@
 									text : "1",
 									xtype : "button",
 									handler : function() {
-										var currValue = tableSelectNorthPanel
-												.findById("tableNumber")
-												.getValue();
-										tableSelectNorthPanel.findById(
-												"tableNumber").setValue(
-												currValue + "1");
+										softKBKeyHandlerTS("tableNumber", "1");
+										tableKeyboardSelect();
 									}
 								} ]
 							},
@@ -116,12 +120,8 @@
 									text : "2",
 									xtype : "button",
 									handler : function() {
-										var currValue = tableSelectNorthPanel
-												.findById("tableNumber")
-												.getValue();
-										tableSelectNorthPanel.findById(
-												"tableNumber").setValue(
-												currValue + "2");
+										softKBKeyHandlerTS("tableNumber", "2");
+										tableKeyboardSelect();
 									}
 								} ]
 							},
@@ -133,12 +133,8 @@
 									text : "3",
 									xtype : "button",
 									handler : function() {
-										var currValue = tableSelectNorthPanel
-												.findById("tableNumber")
-												.getValue();
-										tableSelectNorthPanel.findById(
-												"tableNumber").setValue(
-												currValue + "3");
+										softKBKeyHandlerTS("tableNumber", "3");
+										tableKeyboardSelect();
 									}
 								} ]
 							},
@@ -150,12 +146,8 @@
 									text : "4",
 									xtype : "button",
 									handler : function() {
-										var currValue = tableSelectNorthPanel
-												.findById("tableNumber")
-												.getValue();
-										tableSelectNorthPanel.findById(
-												"tableNumber").setValue(
-												currValue + "4");
+										softKBKeyHandlerTS("tableNumber", "4");
+										tableKeyboardSelect();
 									}
 								} ]
 							},
@@ -167,12 +159,8 @@
 									text : "5",
 									xtype : "button",
 									handler : function() {
-										var currValue = tableSelectNorthPanel
-												.findById("tableNumber")
-												.getValue();
-										tableSelectNorthPanel.findById(
-												"tableNumber").setValue(
-												currValue + "5");
+										softKBKeyHandlerTS("tableNumber", "5");
+										tableKeyboardSelect();
 									}
 								} ]
 							},
@@ -184,12 +172,8 @@
 									text : "6",
 									xtype : "button",
 									handler : function() {
-										var currValue = tableSelectNorthPanel
-												.findById("tableNumber")
-												.getValue();
-										tableSelectNorthPanel.findById(
-												"tableNumber").setValue(
-												currValue + "6");
+										softKBKeyHandlerTS("tableNumber", "6");
+										tableKeyboardSelect();
 									}
 								} ]
 							},
@@ -201,12 +185,8 @@
 									text : "7",
 									xtype : "button",
 									handler : function() {
-										var currValue = tableSelectNorthPanel
-												.findById("tableNumber")
-												.getValue();
-										tableSelectNorthPanel.findById(
-												"tableNumber").setValue(
-												currValue + "7");
+										softKBKeyHandlerTS("tableNumber", "7");
+										tableKeyboardSelect();
 									}
 								} ]
 							},
@@ -218,12 +198,8 @@
 									text : "8",
 									xtype : "button",
 									handler : function() {
-										var currValue = tableSelectNorthPanel
-												.findById("tableNumber")
-												.getValue();
-										tableSelectNorthPanel.findById(
-												"tableNumber").setValue(
-												currValue + "8");
+										softKBKeyHandlerTS("tableNumber", "8");
+										tableKeyboardSelect();
 									}
 								} ]
 							},
@@ -235,12 +211,8 @@
 									text : "9",
 									xtype : "button",
 									handler : function() {
-										var currValue = tableSelectNorthPanel
-												.findById("tableNumber")
-												.getValue();
-										tableSelectNorthPanel.findById(
-												"tableNumber").setValue(
-												currValue + "9");
+										softKBKeyHandlerTS("tableNumber", "9");
+										tableKeyboardSelect();
 									}
 								} ]
 							},
@@ -252,12 +224,8 @@
 									text : "0",
 									xtype : "button",
 									handler : function() {
-										var currValue = tableSelectNorthPanel
-												.findById("tableNumber")
-												.getValue();
-										tableSelectNorthPanel.findById(
-												"tableNumber").setValue(
-												currValue + "0");
+										softKBKeyHandlerTS("tableNumber", "0");
+										tableKeyboardSelect();
 									}
 								} ]
 							},
@@ -283,6 +251,7 @@
 									handler : function() {
 										tableSelectNorthPanel.findById(
 												"tableNumber").setValue("");
+										tableKeyboardSelect();
 									}
 
 								} ]

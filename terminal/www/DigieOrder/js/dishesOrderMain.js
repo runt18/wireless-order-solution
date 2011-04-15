@@ -50,7 +50,7 @@ var orderedColumnModel = new Ext.grid.ColumnModel( [
 			header : "菜名",
 			sortable : true,
 			dataIndex : "dishName",
-			width : 230
+			width : 210
 		}, {
 			header : "口味",
 			sortable : true,
@@ -127,46 +127,33 @@ var orderedForm = new Ext.form.FormPanel( {
 	frame : true,
 	border : false,
 	items : [ orderedGrid ],
-	buttons : [
-			{
-				text : "提交",
-				handler : function() {
-					dishesOrderNorthPanel.findById("orderTime").setValue(
-							new Date().toLocaleString()); // according
-					// to
-					// the
-					// operation
-					// system
-					// language
-					// type!
-					// dishesOrderNorthPanel.findById("orderTime").setValue(
-					// DateTime.Now);
-					dishesOrderNorthPanel.findById("orderOperator").setValue(
-							"ZhaoTongFei");
-				}
-			}, {
-				text : "清空",
-				handler : function() {
-					Ext.Msg.show( {
-						title : "提示",
-						msg : "确定要删除所有已点菜式？",
-						buttons : Ext.Msg.YESNO,
-						fn : function(btn) {
-							if (btn == "yes") {
-								orderedData.length = 0;
-								orderedStore.reload();
-							}
-							;
-						},
-						icon : Ext.MessageBox.QUESTION
-					});
-				}
-			}, {
-				text : "返回",
-				handler : function() {
-					location.href = "TableSelect.html";
-				}
-			} ],
+	buttons : [ {
+		text : "提交",
+		handler : function() {
+		}
+	}, {
+		text : "清空",
+		handler : function() {
+			Ext.Msg.show( {
+				title : "提示",
+				msg : "确定要删除所有已点菜式？",
+				buttons : Ext.Msg.YESNO,
+				fn : function(btn) {
+					if (btn == "yes") {
+						orderedData.length = 0;
+						orderedStore.reload();
+					}
+					;
+				},
+				icon : Ext.MessageBox.QUESTION
+			});
+		}
+	}, {
+		text : "返回",
+		handler : function() {
+			location.href = "TableSelect.html";
+		}
+	} ],
 	listeners : {
 		afterlayout : function(thiz) {
 			orderedGrid.setHeight(thiz.getInnerHeight() - 30);
@@ -229,6 +216,7 @@ var dishTasteGrid = new Ext.grid.GridPanel( {
 			orderedData[dishIndex][1] = selectedTaste;
 			orderedStore.reload();
 			dishTasteWindow.hide();
+			dishOrderCurrRowIndex_ = -1;
 		}
 	}
 });
@@ -250,183 +238,213 @@ var softKBKeyHandler = function(relateItemId, number) {
 			currValue + "" + number);
 };
 
-softKeyBoardDO = new Ext.Window( {
-	layout : "fit",
-	width : 177,
-	height : 100,
-	closeAction : "hide",
-	resizable : false,
-	closable : false,
-	x : 41,
-	y : 146,
-	items : [ {
-		layout : "form",
-		labelSeparator : '：',
-		labelWidth : 40,
-		frame : true,
-		buttonAlign : "left",
-		items : [ {
-			layout : "column",
-			border : false,
-			items : [
-					{
-						layout : "form",
-						width : 30,
-						border : false,
-						items : [ {
-							text : "1",
-							xtype : "button",
-							handler : function() {
-								softKBKeyHandler(softKBRelateItemId, "1");
-							}
-						} ]
-					},
-					{
-						layout : "form",
-						width : 30,
-						border : false,
-						items : [ {
-							text : "2",
-							xtype : "button",
-							handler : function() {
-								softKBKeyHandler(softKBRelateItemId, "2");
-							}
-						} ]
-					},
-					{
-						layout : "form",
-						width : 30,
-						border : false,
-						items : [ {
-							text : "3",
-							xtype : "button",
-							handler : function() {
-								softKBKeyHandler(softKBRelateItemId, "3");
-							}
-						} ]
-					},
-					{
-						layout : "form",
-						width : 30,
-						border : false,
-						items : [ {
-							text : "4",
-							xtype : "button",
-							handler : function() {
-								softKBKeyHandler(softKBRelateItemId, "4");
-							}
-						} ]
-					},
-					{
-						layout : "form",
-						width : 30,
-						border : false,
-						items : [ {
-							text : "5",
-							xtype : "button",
-							handler : function() {
-								softKBKeyHandler(softKBRelateItemId, "5");
-							}
-						} ]
-					},
-					{
-						layout : "form",
-						width : 30,
-						border : false,
-						items : [ {
-							text : "6",
-							xtype : "button",
-							handler : function() {
-								softKBKeyHandler(softKBRelateItemId, "6");
-							}
-						} ]
-					},
-					{
-						layout : "form",
-						width : 30,
-						border : false,
-						items : [ {
-							text : "7",
-							xtype : "button",
-							handler : function() {
-								softKBKeyHandler(softKBRelateItemId, "7");
-							}
-						} ]
-					},
-					{
-						layout : "form",
-						width : 30,
-						border : false,
-						items : [ {
-							text : "8",
-							xtype : "button",
-							handler : function() {
-								softKBKeyHandler(softKBRelateItemId, "8");
-							}
-						} ]
-					},
-					{
-						layout : "form",
-						width : 30,
-						border : false,
-						items : [ {
-							text : "9",
-							xtype : "button",
-							handler : function() {
-								softKBKeyHandler(softKBRelateItemId, "9");
-							}
-						} ]
-					},
-					{
-						layout : "form",
-						width : 30,
-						border : false,
-						items : [ {
-							text : "0",
-							xtype : "button",
-							handler : function() {
-								softKBKeyHandler(softKBRelateItemId, "0");
-							}
-						} ]
-					},
-					{
-						layout : "form",
-						width : 60,
-						border : false,
-						items : [ {
-							text : "&nbsp;确 认&nbsp;",
-							xtype : "button",
-							handler : function() {
-								softKeyBoardDO.hide();
-							}
-						} ]
-					},
-					{
-						layout : "form",
-						width : 60,
-						border : false,
-						items : [ {
-							text : "&nbsp;清 空&nbsp;",
-							xtype : "button",
-							handler : function() {
-								dishesOrderEastPanel.findById(
-										softKBRelateItemId).setValue("");
-							}
+softKeyBoardDO = new Ext.Window(
+		{
+			layout : "fit",
+			width : 177,
+			height : 100,
+			closeAction : "hide",
+			resizable : false,
+			closable : false,
+			x : 41,
+			y : 146,
+			items : [ {
+				layout : "form",
+				labelSeparator : '：',
+				labelWidth : 40,
+				frame : true,
+				buttonAlign : "left",
+				items : [ {
+					layout : "column",
+					border : false,
+					items : [
+							{
+								layout : "form",
+								width : 30,
+								border : false,
+								items : [ {
+									text : "1",
+									xtype : "button",
+									handler : function() {
+										softKBKeyHandler(softKBRelateItemId,
+												"1");
+										dishKeyboardSelect();
+									}
+								} ]
+							},
+							{
+								layout : "form",
+								width : 30,
+								border : false,
+								items : [ {
+									text : "2",
+									xtype : "button",
+									handler : function() {
+										softKBKeyHandler(softKBRelateItemId,
+												"2");
+										dishKeyboardSelect();
+									}
+								} ]
+							},
+							{
+								layout : "form",
+								width : 30,
+								border : false,
+								items : [ {
+									text : "3",
+									xtype : "button",
+									handler : function() {
+										softKBKeyHandler(softKBRelateItemId,
+												"3");
+										dishKeyboardSelect();
+									}
+								} ]
+							},
+							{
+								layout : "form",
+								width : 30,
+								border : false,
+								items : [ {
+									text : "4",
+									xtype : "button",
+									handler : function() {
+										softKBKeyHandler(softKBRelateItemId,
+												"4");
+										dishKeyboardSelect();
+									}
+								} ]
+							},
+							{
+								layout : "form",
+								width : 30,
+								border : false,
+								items : [ {
+									text : "5",
+									xtype : "button",
+									handler : function() {
+										softKBKeyHandler(softKBRelateItemId,
+												"5");
+										dishKeyboardSelect();
+									}
+								} ]
+							},
+							{
+								layout : "form",
+								width : 30,
+								border : false,
+								items : [ {
+									text : "6",
+									xtype : "button",
+									handler : function() {
+										softKBKeyHandler(softKBRelateItemId,
+												"6");
+										dishKeyboardSelect();
+									}
+								} ]
+							},
+							{
+								layout : "form",
+								width : 30,
+								border : false,
+								items : [ {
+									text : "7",
+									xtype : "button",
+									handler : function() {
+										softKBKeyHandler(softKBRelateItemId,
+												"7");
+										dishKeyboardSelect();
+									}
+								} ]
+							},
+							{
+								layout : "form",
+								width : 30,
+								border : false,
+								items : [ {
+									text : "8",
+									xtype : "button",
+									handler : function() {
+										softKBKeyHandler(softKBRelateItemId,
+												"8");
+										dishKeyboardSelect();
+									}
+								} ]
+							},
+							{
+								layout : "form",
+								width : 30,
+								border : false,
+								items : [ {
+									text : "9",
+									xtype : "button",
+									handler : function() {
+										softKBKeyHandler(softKBRelateItemId,
+												"9");
+										dishKeyboardSelect();
+									}
+								} ]
+							},
+							{
+								layout : "form",
+								width : 30,
+								border : false,
+								items : [ {
+									text : "0",
+									xtype : "button",
+									handler : function() {
+										softKBKeyHandler(softKBRelateItemId,
+												"0");
+										dishKeyboardSelect();
+									}
+								} ]
+							},
+							{
+								layout : "form",
+								width : 60,
+								border : false,
+								items : [ {
+									text : "&nbsp;确 认&nbsp;",
+									xtype : "button",
+									handler : function() {
+										if (softKBRelateItemId == "orderCount"
+												&& (Ext.getCmp("orderCount")
+														.getValue() == 0 || Ext
+														.getCmp("orderCount")
+														.getValue() == "")) {
+										} else {
+											softKeyBoardDO.hide();
+										}
+									}
+								} ]
+							},
+							{
+								layout : "form",
+								width : 60,
+								border : false,
+								items : [ {
+									text : "&nbsp;清 空&nbsp;",
+									xtype : "button",
+									handler : function() {
+										dishesOrderEastPanel.findById(
+												softKBRelateItemId)
+												.setValue("");
+										dishKeyboardSelect();
+									}
 
-						} ]
-					} ]
-		} ]
-	} ],
-	listeners : {
-		show : function(thiz) {
-			var f = Ext.get(softKBRelateItemId);
-			f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
-}
-}
-});
+								} ]
+							} ]
+				} ]
+			} ],
+			listeners : {
+				show : function(thiz) {
+					var f = Ext.get(softKBRelateItemId);
+					f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
+		}
+	}
+		});
 
 // 1，数据
-var dishesDisplayData = [];
+dishesDisplayData = [];
 dishesDisplayData.push( [ "酸菜鱼", 1101, 35.1 ]);
 dishesDisplayData.push( [ "京酱肉丝", 2201, 50 ]);
 dishesDisplayData.push( [ "酸菜鱼", 1112, 35.1 ]);
@@ -471,9 +489,14 @@ dishesDisplayData.push( [ "京酱肉丝", 2765, 50 ]);
 dishesDisplayData.push( [ "酸菜鱼", 1768, 35.1 ]);
 dishesDisplayData.push( [ "京酱肉丝", 2688, 50 ]);
 
+for ( var i = 0; i < dishesDisplayData.length; i++) {
+	dishesDisplayDataShow.push( [ dishesDisplayData[i][0],
+			dishesDisplayData[i][1], dishesDisplayData[i][2] ]);
+}
+
 // 2，表格的数据store
 var dishesDisplayStore = new Ext.data.Store( {
-	proxy : new Ext.data.MemoryProxy(dishesDisplayData),
+	proxy : new Ext.data.MemoryProxy(dishesDisplayDataShow),
 	reader : new Ext.data.ArrayReader( {}, [ {
 		name : "dish"
 	}, {
@@ -494,6 +517,11 @@ var dishesDisplayColumnModel = new Ext.grid.ColumnModel( [
 			header : "菜名编号",
 			sortable : true,
 			dataIndex : "dishIndex",
+			width : 80
+		}, {
+			header : "单价（元）",
+			sortable : true,
+			dataIndex : "dishPrice",
 			width : 80
 		} ]);
 
@@ -589,6 +617,9 @@ var dishesOrderEastPanel = new Ext.form.FormPanel( {
 										softKBRelateItemId = "orderNbr";
 										softKeyBoardDO.show();
 
+									},
+									render : function(thiz) {
+										dishNbrOnLoad();
 									}
 								}
 							} ]
@@ -607,7 +638,7 @@ var dishesOrderNorthPanel = new Ext.Panel( {
 	contentEl : "tableStatusDO"
 });
 
-Ext.onReady( function() {
+Ext.onReady(function() {
 	// 解决ext中文传入后台变问号问题
 		Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
 		Ext.QuickTips.init();
@@ -647,7 +678,7 @@ Ext.onReady( function() {
 
 		// -------------------- 浏览器大小改变 -------------------------------
 		// 1,调整colDisplayFormUQ中表格的高度
-		Ext.EventManager.onWindowResize( function() {
+		Ext.EventManager.onWindowResize(function() {
 			dishesDisplayGrid
 					.setHeight(dishesOrderEastPanel.getInnerHeight() - 50);
 			// dataSortGridUQ.setHeight(150);
