@@ -460,31 +460,29 @@ class OrderHandler extends Handler implements Runnable{
 		if(printerConn != null){
 			connections = printerConn.toArray(new Socket[printerConn.size()]);			
 		}
-		//check whether the print request is synchronized or asynchronous
-		if((req.header.reserved & Reserved.PRINT_SYNC) != 0){
-			/**
-			 * if the print request is synchronized, then the insert order request must wait until
-			 * the print request is done, and send the ACK or NAK to let the terminal know whether 
-			 * the print actions is successfully or not
-			 */
-			if(connections != null){
+		if(connections != null){
+			//check whether the print request is synchronized or asynchronous
+			if((req.header.reserved & Reserved.PRINT_SYNC) != 0){
+				/**
+				 * if the print request is synchronized, then the insert order request must wait until
+				 * the print request is done, and send the ACK or NAK to let the terminal know whether 
+				 * the print actions is successfully or not
+				 */	
 				for(int i = 0; i < connections.length; i++){
 					try{
 						new PrintHandler(orderToInsert, connections[i], req.header.reserved, _restaurantID, _owner).run2();						
 					}catch(PrintSocketException e){}
-				}
-			}
-			
-		}else{
-			/**
-			 * if the print request is asynchronous, then the insert order request return an ACK immediately,
-			 * regardless of the print request. In the mean time, the print request would be put to a 
-			 * new thread to run.
-			 */
-			if(connections != null){
+				}	
+				
+			}else{
+				/**
+				 * if the print request is asynchronous, then the insert order request return an ACK immediately,
+				 * regardless of the print request. In the mean time, the print request would be put to a 
+				 * new thread to run.
+				 */	
 				for(int i = 0; i < connections.length; i++){
 					WirelessSocketServer.threadPool.execute(new PrintHandler(orderToInsert, connections[i], req.header.reserved, _restaurantID, _owner));
-				}
+				}	
 			}
 		}
 	}
@@ -634,7 +632,7 @@ class OrderHandler extends Handler implements Runnable{
 			Order extraOrder = new Order();
 			extraOrder.id = orderID;
 			extraOrder.tableID = orderToUpdate.tableID;
-			extraOrder.foods = recordsToInsert.toArray(new Food[recordsToInsert.size()]);
+			//extraOrder.foods = recordsToInsert.toArray(new Food[recordsToInsert.size()]);
 			
 			//find the printer connection socket to the restaurant for this terminal
 			ArrayList<Socket> printerConn = WirelessSocketServer.printerConnections.get(new Integer(_restaurantID));
@@ -643,13 +641,32 @@ class OrderHandler extends Handler implements Runnable{
 				connections = printerConn.toArray(new Socket[printerConn.size()]);			
 			}
 			if(connections != null){
+				/**
+				 * The reason to the code below is to deal with the case below.
+				 * In the case we just add taste to a food,
+				 * In system perspective, it's a new food because the taste is changed, so that need to print an extra order.
+				 * In user perspective,  it should NOT a new food since only the taste is changed, so that NOT need to print.
+				 * As a result, only the food meet the conditions below are regarded as the extra one to print.
+				 * - both name and taste is NOT matched against the original
+				 */
+				ArrayList<Food> extraFoods = new ArrayList<Food>(); 
+				for(int i = 0; i < recordsToInsert.size(); i++){
+					boolean isExtra = true;
+					for(int j = 0; j < originalRecords.size(); j++){
+						if(recordsToInsert.get(i).name.equals(originalRecords.get(j))){
+							isExtra = false;
+							break;
+						}
+					}
+					if(isExtra){
+						extraFoods.add(recordsToInsert.get(i));
+					}
+				}
+				extraOrder.foods = extraFoods.toArray(new Food[extraFoods.size()]);
+				
 				//check whether the print request is synchronized or asynchronous
-				if((req.header.reserved & Reserved.PRINT_SYNC) != 0){
-					/**
-					 * if the print request is synchronized, then the insert order request must wait until
-					 * the print request is done, and send the ACK or NAK to let the terminal know whether 
-					 * the print actions is successfully or not
-					 */
+				if((req.header.reserved & Reserved.PRINT_SYNC) != 0){					
+					//perform print in synchronized mode					
 					for (int i = 0; i < connections.length; i++) {
 						try {
 							new PrintHandler(extraOrder, connections[i], Reserved.PRINT_EXTRA_FOOD_2, _restaurantID, _owner).run2();
@@ -657,11 +674,7 @@ class OrderHandler extends Handler implements Runnable{
 					}
 	
 				}else{
-					/**
-					 * if the print request is asynchronous, then the insert order request return an ACK immediately,
-					 * regardless of the print request. In the mean time, the print request would be put to a 
-					 * new thread to run.
-					 */
+					//perform print in asynchronous mode					 
 					for(int i = 0; i < connections.length; i++){
 						WirelessSocketServer.threadPool.execute(new PrintHandler(extraOrder, connections[i], Reserved.PRINT_EXTRA_FOOD_2, _restaurantID, _owner));
 					}
@@ -778,35 +791,33 @@ class OrderHandler extends Handler implements Runnable{
 		if(printerConn != null){
 			connections = printerConn.toArray(new Socket[printerConn.size()]);
 		}
-		//check whether the print request is synchronized or asynchronous
-		if((req.header.reserved & Reserved.PRINT_SYNC) != 0){
-			/**
-			 * if the print request is synchronized, then the pay order request must wait until
-			 * the print request is done, and send the ACK or NAK to let the terminal know whether 
-			 * the print actions is successfully or not
-			 */
-			if(connections != null){
+		if(connections != null){
+			//check whether the print request is synchronized or asynchronous
+			if((req.header.reserved & Reserved.PRINT_SYNC) != 0){
+				/**
+				 * if the print request is synchronized, then the pay order request must wait until
+				 * the print request is done, and send the ACK or NAK to let the terminal know whether 
+				 * the print actions is successfully or not
+				 */	
 				for(int i = 0; i < connections.length; i++){					
 					try{
 						Order orderToPay = getOrderByID(payOrderInfo.id, payOrderInfo.tableID);
 						orderToPay.totalPrice = payOrderInfo.totalPrice;
 						new PrintHandler(orderToPay, connections[i], req.header.reserved, _restaurantID, _owner).run2();
 					}catch(PrintSocketException e){}
-				}
-			}
-			
-		}else{
-			/**
-			 * if the print request is asynchronous, then the pay order request return an ACK immediately,
-			 * regardless of the print request. In the mean time, the print request would be put to the 
-			 * thread pool to run.
-			 */
-			if(connections != null){
+				}	
+				
+			}else{
+				/**
+				 * if the print request is asynchronous, then the pay order request return an ACK immediately,
+				 * regardless of the print request. In the mean time, the print request would be put to the 
+				 * thread pool to run.
+				 */	
 				for(int i = 0; i < connections.length; i++){
 					Order orderToPay = getOrderByID(payOrderInfo.id, payOrderInfo.tableID);
 					orderToPay.totalPrice = payOrderInfo.totalPrice;
 					WirelessSocketServer.threadPool.execute(new PrintHandler(orderToPay, connections[i], req.header.reserved, _restaurantID, _owner));					
-				}
+				}	
 			}
 		}
 	}
