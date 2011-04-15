@@ -370,10 +370,13 @@
 							tableIndex = i;
 						}
 					}
-					location.href = "CheckOut.html?tableNbr=" + selectedTable
-							+ "&personCount="
-							+ tableStatusListTS[tableIndex][1];
-					;
+					if (tableStatusListTS[tableIndex][2] == "空桌") {
+						Ext.Msg.alert("", "<b>此桌没有下单，不能结账！</b>");
+					} else {
+						location.href = "CheckOut.html?tableNbr="
+								+ selectedTable + "&personCount="
+								+ tableStatusListTS[tableIndex][1];
+					}
 				}
 			}
 		});
@@ -384,8 +387,19 @@
 			imgHeight : 50,
 			tooltip : "删单",
 			handler : function(btn) {
-				Ext.MessageBox.alert("test", "删单");
-			}
+				var tableIndex = -1;
+				for ( var i = 0; i < tableStatusListTS.length; i++) {
+					if (tableStatusListTS[i][0] == selectedTable) {
+						tableIndex = i;
+					}
+				}
+				if (tableStatusListTS[tableIndex][2] == "空桌") {
+					Ext.Msg.alert("", "<b>此桌没有下单，不能删单！</b>");
+				} else {
+					// ...................;
+			Ext.Msg.alert("", "<b>删单成功！</b>");
+		}
+	}
 		});
 
 		var centerTabPanel = new Ext.Panel( {
