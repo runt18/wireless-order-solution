@@ -75,7 +75,7 @@ if (window.parent != window)
 </head>
 <body style="background: #278295">
 
-<div style="margin:0 auto; text-align:right; font-size: small;">e点通&reg;餐饮管理平台(v0.9.1)</div>
+<div style="margin:0 auto; text-align:right; font-size: small;">e点通&reg;餐饮管理平台(v0.9.2)</div>
 
 <form method="post" action="chk.php" name='theForm' onsubmit="return validate()">
   <table cellspacing="0" cellpadding="0" style="margin-top: 100px" align="center">
@@ -130,7 +130,7 @@ if (window.parent != window)
 </script>
 
 <div style="height:100%;"></div>
-<div id="postBar"><span style="color: #FFFFFF; font-size: small">版权所有(c) 2010 智易科技</span></div>
+<div id="postBar"><span style="color: #FFFFFF; font-size: small">版权所有(c) 2011 智易科技</span></div>
 
 
 
