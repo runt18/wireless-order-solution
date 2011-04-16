@@ -503,12 +503,13 @@ class OrderHandler extends Handler implements Runnable{
 		
 		//query all the food's id ,order count and taste preference of this order
 		ArrayList<Food> originalRecords = new ArrayList<Food>();
-		String sql = "SELECT food_id, order_count, taste_id FROM `" + WirelessSocketServer.database + "`.`order_food` WHERE order_id=" + orderID;
+		String sql = "SELECT food_id, name, order_count, taste_id FROM `" + WirelessSocketServer.database + "`.`order_food` WHERE order_id=" + orderID;
 		_rs = _stmt.executeQuery(sql);
 		while(_rs.next()){
 			Food food = new Food();
 			food.real_id = _rs.getLong("food_id");
 			food.alias_id = (int)(food.real_id & 0x00000000FFFFFFFF);
+			food.name = _rs.getString("name");
 			food.setCount(new Float(_rs.getFloat("order_count")));
 			food.taste.alias_id = _rs.getShort("taste_id");
 			originalRecords.add(food);
@@ -653,7 +654,7 @@ class OrderHandler extends Handler implements Runnable{
 				for(int i = 0; i < recordsToInsert.size(); i++){
 					boolean isExtra = true;
 					for(int j = 0; j < originalRecords.size(); j++){
-						if(recordsToInsert.get(i).name.equals(originalRecords.get(j))){
+						if(recordsToInsert.get(i).name.equals(originalRecords.get(j).name)){
 							isExtra = false;
 							break;
 						}
