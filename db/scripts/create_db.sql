@@ -278,7 +278,7 @@ COMMENT = 'This table preserves all the order records.';
 DROP TABLE IF EXISTS `wireless_order_db`.`order_food_history` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food_history` (
-  `order_id` INT UNSIGNED NOT NULL COMMENT 'external key associated with the order table' ,
+  `order_id` INT UNSIGNED NOT NULL ,
   `food_id` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the alias id to this food' ,
   `order_count` DECIMAL(5,2) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the amount of this food is ordered' ,
   `unit_price` DECIMAL(7,2) UNSIGNED NOT NULL DEFAULT 0 ,
@@ -287,10 +287,10 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food_history` (
   `taste_price` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the price to taste preference' ,
   `taste_id` TINYINT NOT NULL DEFAULT 0 COMMENT 'the taste alias id' ,
   `discount` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the discount to this food' ,
-  INDEX `fk_order_food_order` (`order_id` ASC) ,
-  CONSTRAINT `fk_order_food_order0`
+  INDEX `fk_order_food_history_order_history1` (`order_id` ASC) ,
+  CONSTRAINT `fk_order_food_history_order_history1`
     FOREIGN KEY (`order_id` )
-    REFERENCES `wireless_order_db`.`order` (`id` )
+    REFERENCES `wireless_order_db`.`order_history` (`id` )
     ON DELETE RESTRICT
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
@@ -306,6 +306,7 @@ DROP TABLE IF EXISTS `wireless_order_db`.`material` ;
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`material` (
   `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this material' ,
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'the id to related restaurant' ,
+  `alias_id` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the alias id to this material' ,
   `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to this material' ,
   `stock` FLOAT NOT NULL DEFAULT 0 COMMENT 'the remaining amount to this material' ,
   `price` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the unit price to this material' ,
@@ -349,10 +350,34 @@ DEFAULT CHARACTER SET = utf8
 COMMENT = 'describe the releation ship between food and material';
 
 
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`material_history`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`material_history` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`material_history` (
+  `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this material history record' ,
+  `material_id` INT NOT NULL ,
+  `date` DATE NOT NULL DEFAULT 19000101 ,
+  `price` DECIMAL(7,2) NOT NULL DEFAULT 0 ,
+  `amount` FLOAT NOT NULL DEFAULT 0 ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_material_history_material1` (`material_id` ASC) ,
+  CONSTRAINT `fk_material_history_material1`
+    FOREIGN KEY (`material_id` )
+    REFERENCES `wireless_order_db`.`material` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COMMENT = 'preserved the material  storage history records';
+
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
 
 
 -- -----------------------------------------------------
