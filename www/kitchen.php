@@ -11,7 +11,7 @@ include("hasLogin.php");
 <link rel="stylesheet" href="css/style.css" />
 <link rel="stylesheet" href="css/pop_up.css" />
 <script type="text/javascript" src="js/pop-up.js"></script>
-<script type="text/javascript" src="js/taste.js"></script>
+<script type="text/javascript" src="js/kitchen.js"></script>
 <script type="text/javascript" src="js/changePassword.js"></script>
 </head>
 <body>
@@ -22,44 +22,34 @@ include("changePassword.php");
 include("conn.php");
 mysql_query("SET NAMES utf8"); 
 $editType = $_POST["editType"];
-if($editType == "addTaste" || $editType == "editTaste")
+if($editType == "addKitchen" || $editType == "editKitchen")
 {
 	$alias_id = $_POST["alias_id"];
-	$preference = $_POST["preference"];
-	$price = $_POST["price"];
+	$name = $_POST["name"];
+	$discount = $_POST["discount"];
+	$member_discount_1 = $_POST["member_discount_1"];
+	$member_discount_2 = $_POST["member_discount_2"];
 	
 	$validate = true;
-	if($editType == "addTaste")
+	if($editType == "addKitchen")
 	{		
-		$sql = "SELECT * FROM taste WHERE alias_id=$alias_id AND restaurant_id=" . $_SESSION["restaurant_id"];				
+		$sql = "SELECT * FROM kitchen WHERE alias_id=$alias_id AND restaurant_id=" . $_SESSION["restaurant_id"];				
 		$rs = $db ->GetOne($sql);		
 		if($rs)
 		{			
-			echo "<script>alert('已存在此编号的口味，请输入其它编号！');editTaste('','$alias_id','$preference','$price','');</script>";
+			echo "<script>alert('已存在此编号的厨房，请输入其它编号！');editKitchen('','$alias_id','$name','$discount','$member_discount_1','$member_discount_2');</script>";
 			$validate = false;
 		}
 		else
 		{
-			$sql = "INSERT INTO taste(restaurant_id,alias_id,preference,price) VALUES(".$_SESSION["restaurant_id"].",$alias_id,'$preference',$price)";
+			$sql = "INSERT INTO kitchen(restaurant_id,alias_id,name,discount,member_discount_1,member_discount_2) VALUES(".$_SESSION["restaurant_id"].",$alias_id,'$name',$discount,$member_discount_1,$member_discount_2)";
 		}
 	}
 	else
 	{
-		$id = $_POST["id"];
-		$old_alias_id = $_POST["old_alias_id"];
-		if($old_alias_id != $alias_id)
-		{
-			$sql = "SELECT * FROM taste WHERE alias_id=$alias_id AND restaurant_id=" . $_SESSION["restaurant_id"];		
-			$rs = $db ->GetOne($sql);		
-			if($rs)
-			{			
-				echo "<script>alert('已存在此编号的口味，请输入其它编号！');editTaste('$id','$alias_id','$preference','$price','$old_alias_id');</script>";
-				$validate = false;
-			}
-		}		
-		$sql = "UPDATE taste SET alias_id=$alias_id, preference='$preference',price=$price WHERE id=$id";		
-	}
-	/*echo "<script>alert('$sql');</script>";*/
+		$id = $_POST["id"];				
+		$sql = "UPDATE kitchen SET alias_id=$alias_id, name='$name',discount=$discount,member_discount_1=$member_discount_1,member_discount_2=$member_discount_2 WHERE id=$id";		
+	}	
 	if($validate)
 	{
 		if($db->Execute($sql))
@@ -71,11 +61,11 @@ if($editType == "addTaste" || $editType == "editTaste")
 		}
 	}
 }
-else if($editType == "deleteTaste")
+else if($editType == "deleteKitchen")
 	{
 		$id = $_POST["id"];
 		
-		if($db->Execute("DELETE FROM taste WHERE id=$id"))
+		if($db->Execute("DELETE FROM kitchen WHERE id=$id"))
 		{			
 			echo "<script>alert('删除成功！');</script>";
 		}	
@@ -85,20 +75,27 @@ else if($editType == "deleteTaste")
 	}
 ?>
 <h1>
-<span class="action-span"><a href="#" onclick="editTaste('','','','','')">添加口味</a></span>
-<span class="action-span1">e点通会员中心</span><span id="search_id" class="action-span2">&nbsp;- 口味管理 </span>
+<span class="action-span" style="display:none"><a href="#" onclick="editKitchen('','','','','','')">添加厨房</a></span>
+<span class="action-span1">e点通会员中心</span><span id="search_id" class="action-span2">&nbsp;- 分厨管理 </span>
 <div style="clear:both"></div>
 </h1>
 <div class="form-div">
-  <form action="taste.php"  method="get">
+  <form action="kitchen.php"  method="get">
     <!-- 搜索条件 -->
     <div class="font" style="color:#2a7d8d;font-size:15px;font-weight:bold;text-align:right;">过滤：</div>
     <select id="keyword_type" name="keyword_type"  onchange="showHideCondition(this)">
-	<option value="0">全部</option>
-	<option value="alias_id">编号</option>
-	<option value="preference">口味</option>
-	<option value="price">价格</option></select>
-	<select id="condition_type" name="condition_type" style="display:none"><option value="Equal">等于</option><option value="EqualOrGrater" selected="selected">大于等于</option><option value="EqualOrLess">小于等于</option></select>
+		<option value="0">全部</option>
+		<option value="alias_id">编号</option>
+		<option value="name">名称</option>
+		<option value="discount">一般折扣</option>
+		<option value="member_discount_1">会员折扣1</option>
+		<option value="member_discount_2">会员折扣2</option>
+	</select>
+	<select id="condition_type" name="condition_type" style="display:none">
+	<option value="Equal">等于</option>
+	<option value="EqualOrGrater" selected="selected">大于等于</option>
+	<option value="EqualOrLess">小于等于</option>
+	</select>
 	
     <input type="text" id="keyword" name="keyword"   />
     <input type="submit" value=" 搜索 " class="button" />
@@ -112,8 +109,10 @@ else if($editType == "deleteTaste")
 		<thead>
 			<tr>
 				<th><h3>编&nbsp;号</h3></th>
-				<th><h3>口&nbsp;味</h3></th>
-				<th><h3>价格（￥）</h3></th>				
+				<th><h3>名&nbsp;称</h3></th>
+				<th><h3>一般折扣</h3></th>				
+				<th><h3>会员折扣1</h3></th>
+				<th><h3>会员折扣2</h3></th>
 				<th><h3>操&nbsp;作</h3></th>
 			</tr>
 		</thead>
@@ -123,31 +122,65 @@ include("conn.php");
 $xm=$_REQUEST["keyword_type"];
 $ct=$_REQUEST["condition_type"];
 $kw=$_REQUEST["keyword"]; 
-$sql = "SELECT id,alias_id,preference,price FROM taste WHERE restaurant_id=" . $_SESSION["restaurant_id"];			
+$sql = "SELECT id,alias_id,name,discount,member_discount_1,member_discount_2 FROM kitchen WHERE restaurant_id=" . $_SESSION["restaurant_id"];			
 switch ($xm)
 {
 	case "alias_id":
 		if ($kw!="")
 			$sql .= " AND alias_id = $kw" ;  			
 		break;
-	case "preference":
+	case "name":
 		if ($kw!="")
-			$sql .= " AND preference like '%$kw%'" ;  			
-		break;
-	case "price":
+			$sql .= " AND name like '%$kw%'" ;  			
+		break;	
+	case "discount":
 		if ($kw!="")
 		{
 			if($ct == "Equal")
 			{
-				$sql .= " AND price = $kw" ;  
+				$sql .= " AND discount = $kw" ;  
 			}
 			elseif($ct == "EqualOrGrater")
 			{
-				$sql .= " AND price >= $kw" ; 
+				$sql .= " AND discount >= $kw" ; 
 			}
 			elseif($ct == "EqualOrLess")
 			{
-				$sql .= " AND price <= $kw" ; 
+				$sql .= " AND discount <= $kw" ; 
+			}
+		}				
+		break;		
+	case "member_discount_1":
+		if ($kw!="")
+		{
+			if($ct == "Equal")
+			{
+				$sql .= " AND member_discount_1 = $kw" ;  
+			}
+			elseif($ct == "EqualOrGrater")
+			{
+				$sql .= " AND member_discount_1 >= $kw" ; 
+			}
+			elseif($ct == "EqualOrLess")
+			{
+				$sql .= " AND member_discount_1 <= $kw" ; 
+			}
+		}				
+		break;		
+	case "member_discount_2":
+		if ($kw!="")
+		{
+			if($ct == "Equal")
+			{
+				$sql .= " AND member_discount_2 = $kw" ;  
+			}
+			elseif($ct == "EqualOrGrater")
+			{
+				$sql .= " AND member_discount_2 >= $kw" ; 
+			}
+			elseif($ct == "EqualOrLess")
+			{
+				$sql .= " AND member_discount_2 <= $kw" ; 
 			}
 		}				
 		break;		
@@ -160,11 +193,13 @@ foreach ($rs as $row){
 	$bh=$bh+1;
 	echo "<tr>";
 	echo "<td>" .$row["alias_id"] ."</td>";
-	echo "<td>" .$row["preference"] ."</td>";
-	echo "<td>" .$row["price"] ."</td>";
-	echo "<td><a href='#' onclick='editTaste(&quot;".$row["id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["preference"]."&quot;,&quot;".$row["price"]."&quot;,&quot;".$row["alias_id"].
+	echo "<td>" .$row["name"] ."</td>";
+	echo "<td>" .$row["discount"] ."</td>";
+	echo "<td>" .$row["member_discount_1"] ."</td>";
+	echo "<td>" .$row["member_discount_2"] ."</td>";	
+	echo "<td><a href='#' onclick='editKitchen(&quot;".$row["id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["name"]."&quot;,&quot;".$row["discount"]."&quot;,&quot;".$row["member_discount_1"]."&quot;,&quot;".$row["member_discount_2"].
 		"&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
-		"<a href='#' onclick='deleteTaste(".$row["id"].")'><img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;删除</a></td>";
+		"<a href='#' style='display:none' onclick='deleteKitchen(".$row["id"].")'><img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;删除</a></td>";
 	echo "</tr>";
 }
 //mysql_query("SET NAMES utf8"); 
@@ -213,7 +248,7 @@ echo "<input type='hidden' id='keyword_value' value='$kw' />";
 	sorter.currentid = "currentpage";
 	sorter.limitid = "pagelimit";
 	sorter.init("table",0);
-	initializeTaste();
+	initializeKitchen();
   </script>
 </body>
 </html>

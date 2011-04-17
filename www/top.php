@@ -155,6 +155,7 @@
     <li class="fix-spacel">&nbsp;&nbsp;&nbsp;&nbsp;</li>
     <li><a href="food.php" target="main-frame">菜谱管理</a></li>
 	<li><a href="taste.php" target="main-frame">口味管理</a></li>
+	<li><a href="kitchen.php" target="main-frame">分厨管理</a></li>
     <li><a href="order.php" target="main-frame">帐单管理</a></li>
     <li><a href="terminal.php" target="main-frame">终端信息</a></li>
     <li><a href="table.php" target="main-frame">餐台信息</a></li>
