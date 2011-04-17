@@ -7,12 +7,15 @@ DELETE FROM wireless_order_db.order_food_history WHERE order_id IN (SELECT id FR
 DELETE FROM wireless_order_db.order_history WHERE restaurant_id=11;
 DELETE FROM wireless_order_db.order_food WHERE order_id IN (SELECT id FROM wireless_order_db.order WHERE restaurant_id=11);
 DELETE FROM wireless_order_db.order WHERE restaurant_id=11;
+DELETE FROM wireless_order_db.food_material WHERE food_id IN (SELECT id FROM wireless_order_db.food WHERE restaurant_id=11);
+DELETE FROM wireless_order_db.material WHERE id=11;
 DELETE FROM wireless_order_db.terminal WHERE restaurant_id=11;
 DELETE FROM wireless_order_db.table WHERE restaurant_id=11;
 DELETE FROM wireless_order_db.food WHERE restaurant_id=11;
 DELETE FROM wireless_order_db.taste WHERE restaurant_id=11;
 DELETE FROM wireless_order_db.kitchen WHERE restaurant_id=11;
 DELETE FROM wireless_order_db.member WHERE restaurant_id=11;
+
 DELETE FROM wireless_order_db.restaurant WHERE id=11;
 
 -- -----------------------------------------------------
@@ -103,61 +106,87 @@ COMMIT;
 -- SELECT * FROM wireless_order_db_demo.table;
 
 -- -----------------------------------------------------
+-- Insert kitchen records, note that each restaruant has ten kitchens
+-- -----------------------------------------------------
+SET AUTOCOMMIT=0;
+INSERT INTO `wireless_order_db`.`kitchen` (`restaurant_id`, `alias_id`, `name`, `discount`, `member_discount_1`, `member_discount_2`) VALUES (11, 0, '明档', 1.00, 1.00, 1.00);
+INSERT INTO `wireless_order_db`.`kitchen` (`restaurant_id`, `alias_id`, `name`, `discount`, `member_discount_1`, `member_discount_2`) VALUES (11, 1, '烧味', 0.95, 0.9, 0.9);
+INSERT INTO `wireless_order_db`.`kitchen` (`restaurant_id`, `alias_id`, `name`, `discount`, `member_discount_1`, `member_discount_2`) VALUES (11, 2, '海鲜', 1.00, 1.00, 1.00);
+INSERT INTO `wireless_order_db`.`kitchen` (`restaurant_id`, `alias_id`, `name`) VALUES (11, 3, '厨房4');
+INSERT INTO `wireless_order_db`.`kitchen` (`restaurant_id`, `alias_id`, `name`) VALUES (11, 4, '厨房5');
+INSERT INTO `wireless_order_db`.`kitchen` (`restaurant_id`, `alias_id`, `name`) VALUES (11, 5, '厨房6');
+INSERT INTO `wireless_order_db`.`kitchen` (`restaurant_id`, `alias_id`, `name`) VALUES (11, 6, '厨房7');
+INSERT INTO `wireless_order_db`.`kitchen` (`restaurant_id`, `alias_id`, `name`) VALUES (11, 7, '厨房8');
+INSERT INTO `wireless_order_db`.`kitchen` (`restaurant_id`, `alias_id`, `name`) VALUES (11, 8, '厨房9');
+INSERT INTO `wireless_order_db`.`kitchen` (`restaurant_id`, `alias_id`, `name`) VALUES (11, 9, '厨房10');
+COMMIT;
+SET AUTOCOMMIT=1;
+
+-- -----------------------------------------------------
+-- Insert member records
+-- -----------------------------------------------------
+SET AUTOCOMMIT=0;
+INSERT INTO `wireless_order_db`.`member` (`restaurant_id`, `alias_id`, `name`, `tele`, `birth`, `balance`, `discount_type`, `exchange_rate`) VALUES (11, '13694260535', '熊至明', '13694260535', 19810315, 250.00, 0, 0);
+INSERT INTO `wireless_order_db`.`member` (`restaurant_id`, `alias_id`, `name`, `tele`, `birth`, `balance`, `discount_type`, `exchange_rate`) VALUES (11, '13632654789', '刘天宁', '13632654789', 19720615, 145.00, 0, 0);
+INSERT INTO `wireless_order_db`.`member` (`restaurant_id`, `alias_id`, `name`, `tele`, `birth`, `balance`, `discount_type`, `exchange_rate`) VALUES (11, '18854236534', '李小明', '18854236534', 19781230, 300.00, 0, 0);
+COMMIT;
+SET AUTOCOMMIT=1;
+-- -----------------------------------------------------
 -- Insert test food menu(bound to demo restaurant, range from 1100 to 1150, 1200 to 1250)
 -- -----------------------------------------------------
 SET AUTOCOMMIT=0;
 -- DELETE FROM wireless_order_db.food WHERE restaurant_id=11;
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB0000044C, 0x44C, '京都骨', 23.53, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB0000044D, 0x44D, '京酱肉丝', 35.3, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB0000044E, 0x44E, '白切鸡', 21.00, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB0000044F, 0x44F, '盐水菜心', 10.67, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB00000450, 0x450, '湛江鸡', 26, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB00000451, 0x451, '东波肉', 16, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB00000452, 0x452, '红烧排骨', 32, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB00000453, 0x453, '清蒸桂花鱼', 29, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB00000454, 0x454, '鼓油王鹅肠', 24, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB00000455, 0x455, '白灼猪肚', 22.5, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB00000456, 0x456, '水煮鱼', 39, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB00000457, 0x457, '酸菜鱼', 34, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB00000458, 0x458, '鱼香肉丝', 16, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB00000459, 0x459, '白爆鱼丁', 18, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB0000045A, 0x45A, '白菜粉丝', 15, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB0000045B, 0x45B, '白饭', 1.5, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB0000045C, 0x45C, '鲍鱼龙须', 23.5, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB0000045D, 0x45D, '北菰炒面', 13, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB0000045E, 0x45E, '北菰烩鸭丝', 19, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB0000045F, 0x45F, '北京烤鸭', 41, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB00000460, 0x460, '北京泡菜', 6, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB00000461, 0x461, '比利时烩鸡', 69, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB00000462, 0x462, '碧绿生鱼球', 35, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB00000463, 0x463, '冰冻荔枝', 23, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB000004B0, 0x4B0, '冰淇淋', 8, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB000004B1, 0x4B1, '冰肉莲蓉粽', 6.5, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB000004B2, 0x4B2, '菠菜炒鸡蛋', 11, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB000004B3, 0x4B3, '腊肠', 8.5, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB000004B4, 0x4B4, '腊金银润', 10, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB000004B5, 0x4B5, '辣椒肉丝', 10.5, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB000004B6, 0x4B6, '辣蔬菜', 11.3, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB000004B7, 0x4B7, '辣汁鱼头', 22, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB000004B8, 0x4B8, '辣子炒鸡丁', 16.5, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB000004B9, 0x4B9, '辣子炒肉丁', 17, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB000004BA, 0x4BA, '辣子肉丁', 16, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB000004BB, 0x4BB, '粒驻鲍鱼', 79, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB000004BC, 0x4BC, '烂鸡鱼翅', 125, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB000004BD, 0x4BD, '醪糟百子果羹', 36, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB000004BE, 0x4BE, '老鸡蛋托黑鱼子', 35, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB000004BF, 0x4BF, '烙饼', 6, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB000004C0, 0x4C0, '冷茶肠', 11.5, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB000004C1, 0x4C1, '冷醋鱼', 13.5, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB000004C2, 0x4C2, '冷火腿蔬菜', 7, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB000004C3, 0x4C3, '冷鸡冻', 23, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB000004C4, 0x4C4, '冷烤鸭', 16, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB000004C5, 0x4C5, '冷辣白菜', 10, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB000004C6, 0x4C6, '冷牛舌', 14, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB000004C7, 0x4C7, '冷阉鸡', 16, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB000004C8, 0x4C8, '荔脯芋香角', 16.5, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB000004C9, 0x4C9, '栗子鸡', 21, 11);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`) VALUES (0xB000004CA, 0x4CA, '莲煎软饼', 3.5, 11);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB0000044C, 0x44C, '京都骨', 23.53, 11, 1);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB0000044D, 0x44D, '京酱肉丝', 35.3, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB0000044E, 0x44E, '白切鸡', 21.00, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB0000044F, 0x44F, '盐水菜心', 10.67, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB00000450, 0x450, '湛江鸡', 26, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB00000451, 0x451, '东波肉', 16, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB00000452, 0x452, '红烧排骨', 32, 11, 1);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB00000453, 0x453, '清蒸桂花鱼', 29, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB00000454, 0x454, '鼓油王鹅肠', 24, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB00000455, 0x455, '白灼猪肚', 22.5, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB00000456, 0x456, '水煮鱼', 39, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB00000457, 0x457, '酸菜鱼', 34, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB00000458, 0x458, '鱼香肉丝', 16, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB00000459, 0x459, '白爆鱼丁', 18, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB0000045A, 0x45A, '白菜粉丝', 15, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB0000045B, 0x45B, '白饭', 1.5, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB0000045C, 0x45C, '鲍鱼龙须', 23.5, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB0000045D, 0x45D, '北菰炒面', 13, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB0000045E, 0x45E, '北菰烩鸭丝', 19, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB0000045F, 0x45F, '北京烤鸭', 41, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB00000460, 0x460, '北京泡菜', 6, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB00000461, 0x461, '比利时烩鸡', 69, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB00000462, 0x462, '碧绿生鱼球', 35, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB00000463, 0x463, '冰冻荔枝', 23, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB000004B0, 0x4B0, '冰淇淋', 8, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB000004B1, 0x4B1, '冰肉莲蓉粽', 6.5, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB000004B2, 0x4B2, '菠菜炒鸡蛋', 11, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB000004B3, 0x4B3, '腊肠', 8.5, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB000004B4, 0x4B4, '腊金银润', 10, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB000004B5, 0x4B5, '辣椒肉丝', 10.5, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB000004B6, 0x4B6, '辣蔬菜', 11.3, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB000004B7, 0x4B7, '辣汁鱼头', 22, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB000004B8, 0x4B8, '辣子炒鸡丁', 16.5, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB000004B9, 0x4B9, '辣子炒肉丁', 17, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB000004BA, 0x4BA, '辣子肉丁', 16, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB000004BB, 0x4BB, '粒驻鲍鱼', 79, 11, 2);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB000004BC, 0x4BC, '烂鸡鱼翅', 125, 11, 2);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB000004BD, 0x4BD, '醪糟百子果羹', 36, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB000004BE, 0x4BE, '老鸡蛋托黑鱼子', 35, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB000004BF, 0x4BF, '烙饼', 6, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB000004C0, 0x4C0, '冷茶肠', 11.5, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB000004C1, 0x4C1, '冷醋鱼', 13.5, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB000004C2, 0x4C2, '冷火腿蔬菜', 7, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB000004C3, 0x4C3, '冷鸡冻', 23, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB000004C4, 0x4C4, '冷烤鸭', 16, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB000004C5, 0x4C5, '冷辣白菜', 10, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB000004C6, 0x4C6, '冷牛舌', 14, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB000004C7, 0x4C7, '冷阉鸡', 16, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB000004C8, 0x4C8, '荔脯芋香角', 16.5, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB000004C9, 0x4C9, '栗子鸡', 21, 11, 0);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`) VALUES (0xB000004CA, 0x4CA, '莲煎软饼', 3.5, 11, 0);
 COMMIT;
 SET AUTOCOMMIT=1;
 -- SELECT * FROM food;
@@ -295,3 +324,4 @@ INSERT INTO `wireless_order_db`.`order_food` (`order_id`, `food_id`, `order_coun
 UPDATE `wireless_order_db`.`restaurant` SET total_income=302.25+216 WHERE id=11;
 COMMIT;
 SET AUTOCOMMIT=1;
+

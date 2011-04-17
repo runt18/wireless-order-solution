@@ -61,23 +61,59 @@ COMMENT = 'This table contains the all restaurant\'s food information.';
 
 
 -- -----------------------------------------------------
--- Table `wireless_order_db`.`table`
+-- Table `wireless_order_db`.`order`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `wireless_order_db`.`table` ;
+DROP TABLE IF EXISTS `wireless_order_db`.`order` ;
 
-CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`table` (
-  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'in the form of \"restaurant.id << 32 | table.alias_id\"' ,
-  `alias_id` SMALLINT UNSIGNED NULL ,
-  `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'Indicates the table belongs to which restaurant.' ,
-  `enabled` TINYINT NOT NULL DEFAULT 1 COMMENT 'indicates whether the table information is enabled or not' ,
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'the id to order' ,
+  `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'external key associated with the  restaurant table' ,
+  `order_date` DATETIME NOT NULL COMMENT 'the order\'s date and time' ,
+  `total_price` DECIMAL(10,2) NOT NULL DEFAULT -1 COMMENT 'The total price to this order.\nIts default value is -1, means the order not be paid, in the case the total price is greater than 0, means the order has been paid.' ,
+  `custom_num` TINYINT UNSIGNED NOT NULL DEFAULT 0 ,
+  `waiter` VARCHAR(45) NOT NULL COMMENT 'the waiter who operates on this order' ,
+  `type` TINYINT NOT NULL DEFAULT 0 COMMENT 'the type to pay order, it would be one of the values below.\nCash : 1\nCredit Card : 2\nMember Card : 3' ,
+  `member_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the member\'s alias id' ,
+  `member` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the member name' ,
+  `terminal_model` TINYINT NOT NULL DEFAULT 0 COMMENT 'the terminal model to this order' ,
+  `terminal_pin` INT NOT NULL DEFAULT 0 COMMENT 'the terminal pin to this order' ,
+  `table_id` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the table alias id to this order' ,
   PRIMARY KEY (`id`) ,
-  INDEX `fk_table_restaurant1` (`restaurant_id` ASC) ,
-  CONSTRAINT `fk_table_restaurant1`
+  INDEX `fk_order_restaurant` (`restaurant_id` ASC) ,
+  CONSTRAINT `fk_order_restaurant`
     FOREIGN KEY (`restaurant_id` )
     REFERENCES `wireless_order_db`.`restaurant` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COMMENT = 'This table describe the all restaurant\'s order information.';
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`order_food`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`order_food` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food` (
+  `order_id` INT UNSIGNED NOT NULL COMMENT 'external key associated with the order table' ,
+  `food_id` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the alias id to this food' ,
+  `order_count` DECIMAL(5,2) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the amount of this food is ordered' ,
+  `unit_price` DECIMAL(7,2) UNSIGNED NOT NULL DEFAULT 0 ,
+  `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to the ordered food' ,
+  `taste` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the taste preference to the ordered food' ,
+  `taste_price` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the price to taste preference' ,
+  `taste_id` TINYINT NOT NULL DEFAULT 0 COMMENT 'the taste alias id' ,
+  `discount` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the discount to this food' ,
+  INDEX `fk_order_food_order` (`order_id` ASC) ,
+  CONSTRAINT `fk_order_food_order`
+    FOREIGN KEY (`order_id` )
+    REFERENCES `wireless_order_db`.`order` (`id` )
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COMMENT = 'descirbe the relationship between the order and food';
 
 
 -- -----------------------------------------------------
@@ -112,60 +148,24 @@ COMMENT = 'describe the terminal info';
 
 
 -- -----------------------------------------------------
--- Table `wireless_order_db`.`order`
+-- Table `wireless_order_db`.`table`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `wireless_order_db`.`order` ;
+DROP TABLE IF EXISTS `wireless_order_db`.`table` ;
 
-CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'the id to order' ,
-  `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'external key associated with the  restaurant table' ,
-  `order_date` DATETIME NOT NULL COMMENT 'the order\'s date and time' ,
-  `total_price` DECIMAL(10,2) NOT NULL DEFAULT -1 COMMENT 'The total price to this order.\nIts default value is -1, means the order not be paid, in the case the total price is greater than 0, means the order has been paid.' ,
-  `custom_num` TINYINT UNSIGNED NOT NULL DEFAULT 0 ,
-  `waiter` VARCHAR(45) NOT NULL COMMENT 'the waiter who operates on this order' ,
-  `type` TINYINT NOT NULL DEFAULT 0 COMMENT 'the type to pay order, it would be one of the values below.\nCash : 1\nCredit Card : 2\nMember Card : 3' ,
-  `member_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the member\'s alias id' ,
-  `member` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the member name' ,
-  `terminal_model` TINYINT NOT NULL DEFAULT 0 COMMENT 'the terminal model to this order' ,
-  `terminal_pin` INT NOT NULL DEFAULT 0 COMMENT 'the terminal pin to this order' ,
-  `table_id` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the table alias id to this order' ,
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`table` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'in the form of \"restaurant.id << 32 | table.alias_id\"' ,
+  `alias_id` SMALLINT UNSIGNED NULL ,
+  `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'Indicates the table belongs to which restaurant.' ,
+  `enabled` TINYINT NOT NULL DEFAULT 1 COMMENT 'indicates whether the table information is enabled or not' ,
   PRIMARY KEY (`id`) ,
-  INDEX `fk_order_restaurant` (`restaurant_id` ASC) ,
-  CONSTRAINT `fk_order_restaurant`
+  INDEX `fk_table_restaurant1` (`restaurant_id` ASC) ,
+  CONSTRAINT `fk_table_restaurant1`
     FOREIGN KEY (`restaurant_id` )
     REFERENCES `wireless_order_db`.`restaurant` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8
-COMMENT = 'This table describe the all restaurant\'s order information.';
-
-
-
--- -----------------------------------------------------
--- Table `wireless_order_db`.`order_food`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `wireless_order_db`.`order_food` ;
-
-CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food` (
-  `order_id` INT UNSIGNED NOT NULL COMMENT 'external key associated with the order table' ,
-  `food_id` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the alias id to this food' ,
-  `order_count` DECIMAL(5,2) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the amount of this food is ordered' ,
-  `unit_price` DECIMAL(7,2) UNSIGNED NOT NULL DEFAULT 0 ,
-  `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to the ordered food' ,
-  `taste` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the taste preference to the ordered food' ,
-  `taste_price` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the price to taste preference' ,
-  `taste_id` TINYINT NOT NULL DEFAULT 0 COMMENT 'the taste alias id' ,
-  `discount` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the discount to this food' ,
-  INDEX `fk_order_food_order` (`order_id` ASC) ,
-  CONSTRAINT `fk_order_food_order`
-    FOREIGN KEY (`order_id` )
-    REFERENCES `wireless_order_db`.`order` (`id` )
     ON DELETE RESTRICT
     ON UPDATE RESTRICT)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8
-COMMENT = 'descirbe the relationship between the order and food';
+ENGINE = InnoDB;
+
 
 -- -----------------------------------------------------
 -- Table `wireless_order_db`.`taste`
@@ -189,6 +189,7 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'describe the taste info';
 
+
 -- -----------------------------------------------------
 -- Table `wireless_order_db`.`kitchen`
 -- -----------------------------------------------------
@@ -207,15 +208,12 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`kitchen` (
   CONSTRAINT `fk_kitchen_restaurant1`
     FOREIGN KEY (`restaurant_id` )
     REFERENCES `wireless_order_db`.`restaurant` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'describe the kitchen information';
 
-SET SQL_MODE=@OLD_SQL_MODE;
-SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
-SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
 -- -----------------------------------------------------
 -- Table `wireless_order_db`.`member`
@@ -237,11 +235,12 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member` (
   CONSTRAINT `fk_member_restaurant1`
     FOREIGN KEY (`restaurant_id` )
     REFERENCES `wireless_order_db`.`restaurant` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'describe the member information';
+
 
 -- -----------------------------------------------------
 -- Table `wireless_order_db`.`order_history`
@@ -266,11 +265,12 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_history` (
   CONSTRAINT `fk_order_restaurant0`
     FOREIGN KEY (`restaurant_id` )
     REFERENCES `wireless_order_db`.`restaurant` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'This table preserves all the order records.';
+
 
 -- -----------------------------------------------------
 -- Table `wireless_order_db`.`order_food_history`
@@ -296,6 +296,64 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food_history` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'descirbe the relationship between the order and food';
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`material`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`material` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`material` (
+  `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this material' ,
+  `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'the id to related restaurant' ,
+  `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to this material' ,
+  `stock` FLOAT NOT NULL DEFAULT 0 COMMENT 'the remaining amount to this material' ,
+  `price` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the unit price to this material' ,
+  `warning_threshold` FLOAT NOT NULL DEFAULT 0 COMMENT 'the warning threshold to this material' ,
+  `danger_threshold` FLOAT NOT NULL DEFAULT 0 COMMENT 'the danger threshold to this material' ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_material_restaurant1` (`restaurant_id` ASC) ,
+  CONSTRAINT `fk_material_restaurant1`
+    FOREIGN KEY (`restaurant_id` )
+    REFERENCES `wireless_order_db`.`restaurant` (`id` )
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COMMENT = 'describe the material information.';
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`food_material`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`food_material` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food_material` (
+  `food_id` BIGINT UNSIGNED NOT NULL ,
+  `material_id` INT NOT NULL ,
+  `consumption` FLOAT NOT NULL DEFAULT 0 COMMENT 'the consumption between the food and the material' ,
+  INDEX `fk_food_material_food1` (`food_id` ASC) ,
+  INDEX `fk_food_material_material1` (`material_id` ASC) ,
+  CONSTRAINT `fk_food_material_food1`
+    FOREIGN KEY (`food_id` )
+    REFERENCES `wireless_order_db`.`food` (`id` )
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT,
+  CONSTRAINT `fk_food_material_material1`
+    FOREIGN KEY (`material_id` )
+    REFERENCES `wireless_order_db`.`material` (`id` )
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COMMENT = 'describe the releation ship between food and material';
+
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
 
 -- -----------------------------------------------------
 -- Data for table `wireless_order_db`.`restaurant`
