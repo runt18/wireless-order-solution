@@ -321,7 +321,7 @@
 							// },
 							{
 								width : 800,
-								contentEl : "tableStatusTS"
+								contentEl : "tableSumInfo"
 							} ]
 				} ]
 			} ]
@@ -335,6 +335,17 @@
 			contentEl : "tableDisplay",
 			autoScroll : true
 		});
+
+		// ***************tableSelectSouthPanel******************
+		var tableSelectSouthPanel = new Ext.Panel(
+				{
+					region : "south",
+					layout : "fit",
+					height : 35,
+					border : false,
+					bodyStyle : "background-color:#d8ebef;padding-left:20px;",
+					contentEl : "tableStatusTS"
+				});
 
 		// *************整体布局*************
 		var dishesOrderImgBut = new Ext.ux.ImageButton( {
@@ -419,7 +430,8 @@
 			}),
 			layout : "border",
 			border : false,
-			items : [ tableSelectNorthPanel, tableSelectCenterPanel ]
+			items : [ tableSelectNorthPanel, tableSelectCenterPanel,
+					tableSelectSouthPanel ]
 		});
 
 		var viewport = new Ext.Viewport(
