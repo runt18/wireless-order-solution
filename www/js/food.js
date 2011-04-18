@@ -180,15 +180,27 @@ function initializeFood() {
         document.getElementById("keyword").style.display = "none";
     }
 }
-
-function showFoodRanked()
-{
-     var content = ' <div class="add_foot" style="height:450px">' +
+function showFoodRankedSearch() {
+    var content = ' <div class="add_foot" style="height:450px">' +
                               '<div class="title">' +
 	                          '<div class="title_left"><font class="font">点菜排名</font></div>' +
 	                          '<div class="title_right"></div>' +
+	                          '</div>' +
+	                          '<div class="add_foot_Content" style="height:370px;text-align:center;">' +
+	                              '<iframe src="foodRanked.php" scrolling="no" style="width:100%;height:100%" />' +
+	                          '</div>' +
+						   '</div>';
+    showMessageBox(content, 350, 350);
+
+}
+function showFoodRanked()
+{
+     var content = ' <div class="add_foot" style="height:450px;width:450px">' +
+                              '<div class="title" style="width:100%">' +
+	                          '<div class="title_left" style="width:92%"><font class="font">点菜排名</font></div>' +
+	                          '<div class="title_right" style="width:8%;float:left" ></div>' +
 	                          '</div>' +	               
-	                          '<div class="add_foot_Content" style="height:370px;text-align:center;">' + 	                        
+	                          '<div class="add_foot_Content" style="height:370px;text-align:center;width:99%">' + 	                        
 	                              '<iframe src="foodRanked.php" scrolling="no" style="width:100%;height:100%" />' +	                           
 	                          '</div>' +	                      
 						   '</div>';
@@ -239,6 +251,8 @@ function foodSearchKeyDown() {
         closeWindow();
     }
 }
+
+
 
 //function showHideAdminCondition(select) {
 ////    alert(select);
