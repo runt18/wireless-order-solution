@@ -43,7 +43,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food` (
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'indicates the food belong to which restaurant' ,
   `order_count` INT NOT NULL DEFAULT 0 COMMENT 'the food\'s total order count' ,
   `kitchen` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the kitchen number which the food belong to. the maximum value (255) means the food does not belong to any kitchen.' ,
-  `status` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates the status to this food, the value is the combination of values below.\n特价菜 ：0x00\n推荐菜 ：0x02\n停售　 ：0x04' ,
+  `status` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates the status to this food, the value is the combination of values below.\n特价菜 ：0x01\n推荐菜 ：0x02\n停售　 ：0x04' ,
   `img1` BINARY NULL DEFAULT NULL ,
   `img2` BINARY NULL DEFAULT NULL ,
   `img3` BINARY NULL DEFAULT NULL ,
@@ -72,7 +72,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order` (
   `total_price` DECIMAL(10,2) NOT NULL DEFAULT -1 COMMENT 'The total price to this order.\nIts default value is -1, means the order not be paid, in the case the total price is greater than 0, means the order has been paid.' ,
   `custom_num` TINYINT UNSIGNED NOT NULL DEFAULT 0 ,
   `waiter` VARCHAR(45) NOT NULL COMMENT 'the waiter who operates on this order' ,
-  `type` TINYINT NOT NULL DEFAULT 0 COMMENT 'the type to pay order, it would be one of the values below.\nCash : 1\nCredit Card : 2\nMember Card : 3' ,
+  `type` TINYINT NOT NULL DEFAULT 0 COMMENT 'the type to pay order, it would be one of the values below.\n现金 : 1\n刷卡 : 2\n会员卡 : 3\n挂账 ：4\n签单：5' ,
   `member_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the member\'s alias id' ,
   `member` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the member name' ,
   `terminal_model` TINYINT NOT NULL DEFAULT 0 COMMENT 'the terminal model to this order' ,
@@ -105,6 +105,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food` (
   `taste_price` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the price to taste preference' ,
   `taste_id` TINYINT NOT NULL DEFAULT 0 COMMENT 'the taste alias id' ,
   `discount` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the discount to this food' ,
+  `kitchen` TINYINT NOT NULL DEFAULT 0 COMMENT 'the kitchen number which the order food of this record belong to. the maximum value (255) means the food does not belong to any kitchen.' ,
   INDEX `fk_order_food_order` (`order_id` ASC) ,
   CONSTRAINT `fk_order_food_order`
     FOREIGN KEY (`order_id` )
@@ -287,6 +288,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food_history` (
   `taste_price` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the price to taste preference' ,
   `taste_id` TINYINT NOT NULL DEFAULT 0 COMMENT 'the taste alias id' ,
   `discount` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the discount to this food' ,
+  `kitchen` TINYINT NOT NULL DEFAULT 0 COMMENT 'the kitchen number which the order food of this record belong to. the maximum value (255) means the food does not belong to any kitchen.' ,
   INDEX `fk_order_food_history_order_history1` (`order_id` ASC) ,
   CONSTRAINT `fk_order_food_history_order_history1`
     FOREIGN KEY (`order_id` )
@@ -377,8 +379,6 @@ COMMENT = 'preserved the material  storage history records';
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
-
 
 -- -----------------------------------------------------
 -- Data for table `wireless_order_db`.`restaurant`
