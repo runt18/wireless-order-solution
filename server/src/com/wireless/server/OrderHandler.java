@@ -21,7 +21,7 @@ class OrderHandler extends Handler implements Runnable{
     private int _restaurantID = -1;
     private long _expiredTimeMillis = 0;
     private String _owner = null;
-    private long _pin = 0;
+    private int _pin = 0;
 	private Socket _conn = null;
 	private int _timeout = 10000;	//default timeout is 10s
 	 
@@ -359,8 +359,8 @@ class OrderHandler extends Handler implements Runnable{
 		String sql = null;	
 		//calculate the real table id
 		//the real id is in the form as "restaurant.id << 32 | table.alias_id"
-		long realTableID = ((long)orderToInsert.tableID & 0x00000000FFFFFFFFL) | 
-							(((long)_restaurantID << 32) & 0xFFFFFFFF00000000L);
+//		long realTableID = ((long)orderToInsert.tableID & 0x00000000FFFFFFFFL) | 
+//							(((long)_restaurantID << 32) & 0xFFFFFFFF00000000L);
 		
 		/**
 		 * Here invoke "getUnPaidOrderID" is to check two status.
@@ -370,7 +370,7 @@ class OrderHandler extends Handler implements Runnable{
 		try{
 			getUnPaidOrderID(orderToInsert.tableID);
 			//throw the exception if the table is paid
-			throw new OrderBusinessException("The table(id=" + realTableID +") has been paid.", ErrorCode.TABLE_HAS_PAID);
+			throw new OrderBusinessException("The table(alias_id=" + orderToInsert.tableID +") has been paid.", ErrorCode.TABLE_HAS_PAID);
 			
 		}catch(OrderBusinessException e){ 			
 			if(e.errCode == ErrorCode.TABLE_NOT_EXIST){
@@ -394,22 +394,21 @@ class OrderHandler extends Handler implements Runnable{
 		 */
 		for(int i = 0; i < orderToInsert.foods.length; i++){
 			//the food's real id is in the form as "restaurant.id" << 32 | "food.alias_id"
-			long realFoodID = ((long)orderToInsert.foods[i].alias_id & 0x00000000FFFFFFFFL) |
-							(((long)_restaurantID << 32) & 0xFFFFFFFF00000000L);
+//			long realFoodID = ((long)orderToInsert.foods[i].alias_id & 0x00000000FFFFFFFFL) |
+//							(((long)_restaurantID << 32) & 0xFFFFFFFF00000000L);
 			//get the associated food's unit price and name
 			sql = "SELECT unit_price, name, kitchen FROM " +  WirelessSocketServer.database + 
-				".food WHERE id=" + realFoodID + " AND enabled=1";
+				".food WHERE alias_id=" + orderToInsert.foods[i].alias_id + " AND restaurant_id=" + _restaurantID + " AND enabled=1";
 			_rs = _stmt.executeQuery(sql);
 			//check if the food exist in db 
 			if(_rs.next()){
-				orderToInsert.foods[i].real_id = realFoodID;
 				orderToInsert.foods[i].name = _rs.getString("name");
 				int val = (int)(_rs.getFloat("unit_price") * 100);
 				int unitPrice = ((val / 100) << 8) | (val % 100);
 				orderToInsert.foods[i].price = unitPrice;
 				orderToInsert.foods[i].kitchen = _rs.getShort("kitchen");
 			}else{
-				throw new OrderBusinessException("The food(id=" + realFoodID + ") to query doesn't exit.", ErrorCode.MENU_EXPIRED);
+				throw new OrderBusinessException("The food(alias_id=" + orderToInsert.foods[i].alias_id + ") to query doesn't exit.", ErrorCode.MENU_EXPIRED);
 			}
 			
 			//get the taste preference according to the taste id,
@@ -429,7 +428,7 @@ class OrderHandler extends Handler implements Runnable{
 		//insert to order table
 		sql = "INSERT INTO `" + WirelessSocketServer.database + 
 				"`.`order` (`id`, `restaurant_id`, `table_id`, `terminal_pin`, `order_date`, `custom_num`, `waiter`) VALUES (NULL, " + 
-				_restaurantID + ", " + realTableID + ", " + _pin + ", NOW(), " + 
+				_restaurantID + ", " + orderToInsert.tableID + ", " + _pin + ", NOW(), " + 
 				orderToInsert.customNum + ", '" + _owner + "')";
 		_stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 		//get the generated id to order 
@@ -444,12 +443,13 @@ class OrderHandler extends Handler implements Runnable{
 		//insert each ordered food
 		for(int i = 0; i < orderToInsert.foods.length; i++){
 			sql = "INSERT INTO `" + WirelessSocketServer.database +
-				"`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `taste`, `taste_price`, `taste_id`) VALUES (" +	
-				orderToInsert.id + ", " + orderToInsert.foods[i].real_id + ", " + orderToInsert.foods[i].count2Float().toString() + 
+				"`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `taste`, `taste_price`, `taste_id`, `kitchen`) VALUES (" +	
+				orderToInsert.id + ", " + orderToInsert.foods[i].alias_id + ", " + orderToInsert.foods[i].count2Float().toString() + 
 				", " + Util.price2Float(orderToInsert.foods[i].price, Util.INT_MASK_2).toString() + ", '" + orderToInsert.foods[i].name + "', '" + 
 				orderToInsert.foods[i].taste.preference + "', " + 
 				Util.price2Float(orderToInsert.foods[i].taste.price, Util.INT_MASK_2).toString() + ", " +
-				orderToInsert.foods[i].taste.alias_id + ")";
+				orderToInsert.foods[i].taste.alias_id + ", " + 
+				orderToInsert.foods[i].kitchen + ")";
 			_stmt.addBatch(sql);
 		}		
 		_stmt.executeBatch();
@@ -507,8 +507,7 @@ class OrderHandler extends Handler implements Runnable{
 		_rs = _stmt.executeQuery(sql);
 		while(_rs.next()){
 			Food food = new Food();
-			food.real_id = _rs.getLong("food_id");
-			food.alias_id = (int)(food.real_id & 0x00000000FFFFFFFF);
+			food.alias_id = _rs.getShort("food_id");
 			food.name = _rs.getString("name");
 			food.setCount(new Float(_rs.getFloat("order_count")));
 			food.taste.alias_id = _rs.getShort("taste_id");
@@ -551,8 +550,8 @@ class OrderHandler extends Handler implements Runnable{
 			}
 			
 			//calculate the read food id
-			long realFoodID = ((long)orderToUpdate.foods[i].alias_id & 0x00000000FFFFFFFFL) |
-								(((long)_restaurantID << 32) & 0xFFFFFFFF00000000L);
+//			long realFoodID = ((long)orderToUpdate.foods[i].alias_id & 0x00000000FFFFFFFFL) |
+//								(((long)_restaurantID << 32) & 0xFFFFFFFF00000000L);
 			/**
 			 * In the case of inserting action,
 			 * firstly, check to see whether the new food submitted by terminal exist in db or is disabled by user.
@@ -564,18 +563,21 @@ class OrderHandler extends Handler implements Runnable{
 			 */
 			if(action == Action.Insert){
 				//get the food name and its unit price
-				sql = "SELECT name, unit_price, kitchen FROM " + WirelessSocketServer.database + ".food WHERE id=" + realFoodID + " AND enabled=1";
+				sql = "SELECT name, unit_price, kitchen FROM " + WirelessSocketServer.database + 
+						".food WHERE alias_id=" + orderToUpdate.foods[i].alias_id + 
+						" AND restaurant_id=" + _restaurantID +
+						" AND enabled=1";
 				_rs = _stmt.executeQuery(sql);
 				//check if the food to be inserted exist in db or not
 				Food food = new Food();
 				if(_rs.next()){
-					food.real_id = realFoodID;
+					food.alias_id = orderToUpdate.foods[i].alias_id;
 					food.name = _rs.getString("name");
 					food.setPrice(new Float(_rs.getFloat("unit_price")));
 					food.setCount(orderToUpdate.foods[i].count2Float());
 					food.kitchen = _rs.getShort("kitchen");
 				}else{
-					throw new OrderBusinessException("The food(id=" + realFoodID + ") to query doesn't exist.", ErrorCode.MENU_EXPIRED);
+					throw new OrderBusinessException("The food(alias_id=" + orderToUpdate.foods[i].alias_id + ") to query doesn't exist.", ErrorCode.MENU_EXPIRED);
 				}
 				
 				//get the taste preference only if the food has taste preference
@@ -604,7 +606,7 @@ class OrderHandler extends Handler implements Runnable{
 			 */
 			}else if(action == Action.Update){
 				Food food = new Food();
-				food.real_id = realFoodID;
+				food.alias_id = orderToUpdate.foods[i].alias_id;
 				food.setCount(orderToUpdate.foods[i].count2Float());
 				//get the taste preference only if the food has taste preference
 				if(orderToUpdate.foods[i].taste.alias_id != Taste.NO_TASTE){
@@ -686,12 +688,13 @@ class OrderHandler extends Handler implements Runnable{
 		_stmt.clearBatch();
 		//insert the new ordered food
 		for(int i = 0; i < recordsToInsert.size(); i++){
-			sql = "INSERT INTO `" + WirelessSocketServer.database + "`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `taste_id`, `taste_price`, `taste`) VALUES (" +
-			orderID + ", " + recordsToInsert.get(i).real_id + ", " + recordsToInsert.get(i).count2String() + 
+			sql = "INSERT INTO `" + WirelessSocketServer.database + "`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `taste_id`, `taste_price`, `taste`, `kitchen`) VALUES (" +
+			orderID + ", " + recordsToInsert.get(i).alias_id + ", " + recordsToInsert.get(i).count2String() + 
 			", " + Util.price2Float(recordsToInsert.get(i).price, Util.INT_MASK_2).toString() + ", '" + recordsToInsert.get(i).name + 
 			"'," + recordsToInsert.get(i).taste.alias_id + "," +
 			Util.price2Float(recordsToInsert.get(i).taste.price, Util.INT_MASK_2).toString() + ", '" +
-			recordsToInsert.get(i).taste.preference + "')";
+			recordsToInsert.get(i).taste.preference + "', " + 
+			recordsToInsert.get(i).kitchen + ")";
 			_stmt.addBatch(sql);			
 		}
 		
@@ -703,7 +706,7 @@ class OrderHandler extends Handler implements Runnable{
 					", taste='" + recordsToUpdate.get(i).taste.preference + "'" +
 					", taste_price=" + Util.price2Float(recordsToUpdate.get(i).taste.price, Util.INT_MASK_2).toString() +
 					" WHERE order_id=" + orderID +
-					" AND food_id=" + recordsToUpdate.get(i).real_id + " AND taste_id=" + recordsToUpdate.get(i).taste.alias_id;
+					" AND food_id=" + recordsToUpdate.get(i).alias_id + " AND taste_id=" + recordsToUpdate.get(i).taste.alias_id;
 			_stmt.addBatch(sql);			
 		}
 		
@@ -718,7 +721,7 @@ class OrderHandler extends Handler implements Runnable{
 			}
 			if(isCancelledFood){
 				sql = "DELETE FROM `" + WirelessSocketServer.database + "`.`order_food` WHERE order_id=" + orderID +
-						" AND food_id=" + originalRecords.get(i).real_id + " AND taste_id=" + originalRecords.get(i).taste.alias_id;
+						" AND food_id=" + originalRecords.get(i).alias_id + " AND taste_id=" + originalRecords.get(i).taste.alias_id;
 				_stmt.addBatch(sql);
 			}
 		}
@@ -838,23 +841,21 @@ class OrderHandler extends Handler implements Runnable{
 		 * then notify the terminal that the food menu is expired.
 		 */
 		for(int i = 0; i < orderToPrint.foods.length; i++){
-			//the food's real id is in the form as "restaurant.id" << 32 | "food.alias_id"
-			long realFoodID = ((long)orderToPrint.foods[i].alias_id & 0x00000000FFFFFFFFL) |
-							(((long)_restaurantID << 32) & 0xFFFFFFFF00000000L);
-			//get the associated food's unit price and name
+
 			String sql = "SELECT unit_price, name, kitchen FROM " +  WirelessSocketServer.database + 
-				".food WHERE id=" + realFoodID + " AND enabled=1";
+						".food WHERE alias_id=" + orderToPrint.foods[i].alias_id + 
+						" AND restaurant_id=" + _restaurantID + 
+						" AND enabled=1";
 			_rs = _stmt.executeQuery(sql);
 			//check if the food exist in db 
 			if(_rs.next()){
-				orderToPrint.foods[i].real_id = realFoodID;
 				orderToPrint.foods[i].name = _rs.getString("name");
 				int val = (int)(_rs.getFloat("unit_price") * 100);
 				int unitPrice = ((val / 100) << 8) | (val % 100);
 				orderToPrint.foods[i].price = unitPrice;
 				orderToPrint.foods[i].kitchen = _rs.getShort("kitchen");
 			}else{
-				throw new PrintLogicException("The food(id=" + realFoodID + ") to query doesn't exit.", ErrorCode.MENU_EXPIRED);
+				throw new PrintLogicException("The food(alias_id=" + orderToPrint.foods[i].alias_id + ") to query doesn't exit.", ErrorCode.MENU_EXPIRED);
 			}
 		}
 		
@@ -864,28 +865,18 @@ class OrderHandler extends Handler implements Runnable{
 		if(printerConn != null){
 			connections = printerConn.toArray(new Socket[printerConn.size()]);			
 		}
-		//check whether the print request is synchronized or asynchronous
-		if((req.header.reserved & Reserved.PRINT_SYNC) != 0){
-			/**
-			 * if the print request is synchronized, then the insert order request must wait until
-			 * the print request is done, and send the ACK or NAK to let the terminal know whether 
-			 * the print actions is successfully or not
-			 */
-			if(connections != null){
+		if(connections != null){
+			//check whether the print request is synchronized or asynchronous
+			if((req.header.reserved & Reserved.PRINT_SYNC) != 0){
+				//perform print in synchronized mode
 				for(int i = 0; i < connections.length; i++){
 					try{
 						new PrintHandler(orderToPrint, connections[i], req.header.reserved, _restaurantID, _owner).run2();						
 					}catch(PrintSocketException e){}
 				}
-			}
-			
-		}else{
-			/**
-			 * if the print request is asynchronous, then the insert order request return an ACK immediately,
-			 * regardless of the print request. In the mean time, the print request would be put to a 
-			 * new thread to run.
-			 */
-			if(connections != null){
+				
+			}else{	
+				//perform print in asynchronous mode 
 				for(int i = 0; i < connections.length; i++){
 					WirelessSocketServer.threadPool.execute(new PrintHandler(orderToPrint, connections[i], req.header.reserved, _restaurantID, _owner));
 				}
@@ -905,27 +896,27 @@ class OrderHandler extends Handler implements Runnable{
 		//and the restaurant id to get the real table id
 		String sql = "SELECT id, enabled FROM `" + WirelessSocketServer.database +
 					"`.`table` WHERE alias_id=" + tableToQuery + " AND restaurant_id=" + _restaurantID + " AND enabled=1";
-		long realTableID = -1;
 		_rs = _stmt.executeQuery(sql);
 		if(_rs.next()){
-			realTableID = _rs.getLong("id");
+			//query the order table to check if the order exist
+			//in the case the record whose total_price equals -1.00,
+			//means the order exist, then return the order id, 
+			//otherwise throw an OrderBusinessExcpetion.
+			 sql = "SELECT id FROM `" + WirelessSocketServer.database + 
+						"`.`order` WHERE table_id = " + tableToQuery +
+						" AND restaurant_id = " + _restaurantID +
+						" AND total_price = -1.00";
+			_rs = _stmt.executeQuery(sql);
+			if(_rs.next()){
+				return _rs.getInt(1);
+			}else{
+				throw new OrderBusinessException("The order to query doesn't exist.", ErrorCode.ORDER_NOT_EXIST);
+			}
+			
 		}else{
-			throw new OrderBusinessException("The table(id=" + realTableID + ") to query doesn't exist.", ErrorCode.TABLE_NOT_EXIST);
+			throw new OrderBusinessException("The table(alias_id=" + tableToQuery + ") to query doesn't exist.", ErrorCode.TABLE_NOT_EXIST);
 		}
-		//query the order table to check if the order exist
-		//in the case the record whose total_price equals -1.00,
-		//means the order exist, then return the order id, 
-		//otherwise throw an OrderBusinessExcpetion.
-		 sql = "SELECT id FROM `" + WirelessSocketServer.database + 
-					"`.`order` WHERE table_id = " + realTableID +
-					" AND restaurant_id = " + _restaurantID +
-					" AND total_price = -1.00";
-		_rs = _stmt.executeQuery(sql);
-		if(_rs.next()){
-			return _rs.getInt(1);
-		}else{
-			throw new OrderBusinessException("The order to query doesn't exist.", ErrorCode.ORDER_NOT_EXIST);
-		}
+
 	}
 	
 	/**
