@@ -76,12 +76,12 @@
 
 		softKeyBoardTS = new Ext.Window( {
 			layout : "fit",
-			width : 177,
-			height : 100,
+			width : 117,
+			height : 118,
 			closeAction : "hide",
 			resizable : false,
-			closable : false,
-			x : 41,
+			// closable : false,
+			x : 56,
 			y : 146,
 			items : [ {
 				layout : "form",
@@ -89,13 +89,7 @@
 				labelWidth : 40,
 				frame : true,
 				buttonAlign : "left",
-				items : [
-				// {
-				// xtype : "numberfield",
-				// fieldLabel : "桌号",
-				// width : 85
-				// },
-				{
+				items : [ {
 					layout : "column",
 					border : false,
 					items : [
@@ -234,18 +228,6 @@
 								width : 60,
 								border : false,
 								items : [ {
-									text : "&nbsp;确 认&nbsp;",
-									xtype : "button",
-									handler : function() {
-										softKeyBoardTS.hide();
-									}
-								} ]
-							},
-							{
-								layout : "form",
-								width : 60,
-								border : false,
-								items : [ {
 									text : "&nbsp;清 空&nbsp;",
 									xtype : "button",
 									handler : function() {
@@ -284,9 +266,9 @@
 					labelSeparator : '：',
 					items : [ {
 						layout : "form",
-						width : 237,
+						width : 185,
 						labelWidth : 30,
-						style : "padding-top:7px;",
+						style : "padding-top:7px;padding-left:15px;",
 						border : false,
 						items : [ {
 							xtype : "numberfield",
@@ -300,29 +282,10 @@
 								}
 							}
 						} ]
-					},
-					// {
-							// width : 80,
-							// border : false,
-							// // layout : "fit",
-							// style : "padding-top:7px;",
-							// items : [ {
-							// xtype : "button",
-							// // style : "margin-left:7px;",
-							// tooltip : "软键盘",
-							// width : 30,
-							// text : "K",
-							// listeners : {
-							// "click" : function() {
-							// softKeyBoardTS.show();
-							// }
-							// }
-							// } ]
-							// },
-							{
-								width : 800,
-								contentEl : "tableSumInfo"
-							} ]
+					}, {
+						width : 800,
+						contentEl : "tableSumInfo"
+					} ]
 				} ]
 			} ]
 		});
@@ -330,22 +293,35 @@
 		// ***************tableSelectCenterPanel******************
 		var tableSelectCenterPanel = new Ext.Panel( {
 			region : "center",
-			layout : "fit",
-			bodyStyle : "background-color:#d8ebef;padding-top:4%",
-			contentEl : "tableDisplay",
-			autoScroll : true
+			layout : "border",
+			border : false,
+			bodyStyle : "background-color:#d8ebef;",
+			items : [ {
+				region : "center",
+				border : false,
+				bodyStyle : "background-color:#d8ebef;padding-top:4%",
+				contentEl : "tableDisplay",
+				autoScroll : true
+			}, {
+				region : "south",
+				border : false,
+				bodyStyle : "background-color:#d8ebef;",
+				height : 60,
+				contentEl : "tableListPageCount"
+			} ]
+
 		});
 
 		// ***************tableSelectSouthPanel******************
-		var tableSelectSouthPanel = new Ext.Panel(
-				{
-					region : "south",
-					layout : "fit",
-					height : 35,
-					border : false,
-					bodyStyle : "background-color:#d8ebef;padding-left:20px;",
-					contentEl : "tableStatusTS"
-				});
+		var tableSelectSouthPanel = new Ext.Panel( {
+			region : "south",
+			height : 55,
+			// width : 800,
+			layout : "fit",
+			border : false,
+			bodyStyle : "background-color:#d8ebef;padding-left:20px;",
+			contentEl : "tableStatusTS"
+		});
 
 		// *************整体布局*************
 		var dishesOrderImgBut = new Ext.ux.ImageButton( {
@@ -457,12 +433,11 @@
 				});
 
 		// -------------------- 浏览器大小改变 -------------------------------
-		// 1,调整colDisplayFormUQ中表格的高度
-		// Ext.EventManager.onWindowResize( function() {
-		// if (centerTabPanel.getActiveTab().getId() == "dishesOrderTab") {
-		// dishesDisplayGrid.setHeight(dishesOrderEastPanel.findById(
-		// "dishesOrderForm").getInnerHeight() - 50);
-		// }
-		// // dataSortGridUQ.setHeight(150);
+		// Ext.EventManager.onWindowResize(function() {
+		// // obj.style[attr]
+		// document.getElementById("wrap").style["height"] =
+		// (tableSelectCenterPanel
+		// .getInnerHeight() - 100)
+		// + "px";
 		// });
 	});
