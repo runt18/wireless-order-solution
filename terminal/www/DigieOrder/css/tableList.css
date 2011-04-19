@@ -68,13 +68,13 @@
 	padding: 40px 0 0 1px;
 	cursor: auto;
 	overflow: hidden;
-	filter: alpha(opacity =     0);
+	filter: alpha(opacity =           0);
 	-moz-opacity: 0.0;
 	-khtml-opacity: 0.0;
 	opacity: 0.0;
 }
 
-#tableDisplay div.pageCount {
+#tableListPageCount.pageCount {
 	text-align: center;
 	padding-right: 40px;
 	font-size: 18px;
