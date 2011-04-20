@@ -96,6 +96,7 @@ COMMENT = 'This table describe the all restaurant\'s order information.';
 DROP TABLE IF EXISTS `wireless_order_db`.`order_food` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food` (
+  `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this order detail record' ,
   `order_id` INT UNSIGNED NOT NULL COMMENT 'external key associated with the order table' ,
   `food_id` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the alias id to this food' ,
   `order_count` DECIMAL(5,2) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the amount of this food is ordered' ,
@@ -107,6 +108,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food` (
   `discount` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the discount to this food' ,
   `kitchen` TINYINT NOT NULL DEFAULT 0 COMMENT 'the kitchen number which the order food of this record belong to. the maximum value (255) means the food does not belong to any kitchen.' ,
   INDEX `fk_order_food_order` (`order_id` ASC) ,
+  PRIMARY KEY (`id`) ,
   CONSTRAINT `fk_order_food_order`
     FOREIGN KEY (`order_id` )
     REFERENCES `wireless_order_db`.`order` (`id` )
@@ -279,6 +281,7 @@ COMMENT = 'This table preserves all the order records.';
 DROP TABLE IF EXISTS `wireless_order_db`.`order_food_history` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food_history` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
   `order_id` INT UNSIGNED NOT NULL ,
   `food_id` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the alias id to this food' ,
   `order_count` DECIMAL(5,2) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the amount of this food is ordered' ,
@@ -290,6 +293,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food_history` (
   `discount` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the discount to this food' ,
   `kitchen` TINYINT NOT NULL DEFAULT 0 COMMENT 'the kitchen number which the order food of this record belong to. the maximum value (255) means the food does not belong to any kitchen.' ,
   INDEX `fk_order_food_history_order_history1` (`order_id` ASC) ,
+  PRIMARY KEY (`id`) ,
   CONSTRAINT `fk_order_food_history_order_history1`
     FOREIGN KEY (`order_id` )
     REFERENCES `wireless_order_db`.`order_history` (`id` )
@@ -375,11 +379,80 @@ DEFAULT CHARACTER SET = utf8
 COMMENT = 'preserved the material  storage history records';
 
 
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`order_detail`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`order_detail` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_detail` (
+  `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this order detail record' ,
+  `order_food_id` INT NOT NULL ,
+  `waiter` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name of waiter ' ,
+  `order_count` DECIMAL(5,2) NOT NULL DEFAULT 0 COMMENT 'the count that the waiter ordered. the count can be positive or negative.' ,
+  `order_date` DATETIME NOT NULL DEFAULT 19000101 ,
+  `comment` VARCHAR(100) NULL DEFAULT NULL COMMENT 'the comment to this record, such as the reason to cancel food' ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_order_detail_order_food1` (`order_food_id` ASC) ,
+  CONSTRAINT `fk_order_detail_order_food1`
+    FOREIGN KEY (`order_food_id` )
+    REFERENCES `wireless_order_db`.`order_food` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COMMENT = 'describe the order detail';
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`order_detail_history`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`order_detail_history` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_detail_history` (
+  `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this order detail record' ,
+  `order_food_id` INT NOT NULL ,
+  `waiter` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name of waiter ' ,
+  `order_count` DECIMAL(5,2) NOT NULL DEFAULT 0 COMMENT 'the count that the waiter ordered. the count can be positive or negative.' ,
+  `order_date` DATETIME NOT NULL DEFAULT 19000101 ,
+  `comment` VARCHAR(100) NULL DEFAULT NULL COMMENT 'the comment to this record, such as the reason to cancel food' ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_order_detail_history_order_food_history1` (`order_food_id` ASC) ,
+  CONSTRAINT `fk_order_detail_history_order_food_history1`
+    FOREIGN KEY (`order_food_id` )
+    REFERENCES `wireless_order_db`.`order_food_history` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COMMENT = 'describe the order detail';
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`member_charge`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`member_charge` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_charge` (
+  `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this record' ,
+  `member_id` INT NOT NULL ,
+  `date` DATETIME NOT NULL DEFAULT 19000101 COMMENT 'the date to recharge' ,
+  `money` DECIMAL(10,2) NOT NULL DEFAULT 0 COMMENT 'the money to recharge' ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_member_charge_member1` (`member_id` ASC) ,
+  CONSTRAINT `fk_member_charge_member1`
+    FOREIGN KEY (`member_id` )
+    REFERENCES `wireless_order_db`.`member` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COMMENT = 'describe the member charge records ';
+
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
 
 -- -----------------------------------------------------
 -- Data for table `wireless_order_db`.`restaurant`
