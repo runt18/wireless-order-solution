@@ -14,114 +14,15 @@ include("hasLogin.php");
 <script type="text/javascript" src="js/food.js"></script>
 <script type="text/javascript" src="js/changePassword.js"></script>
 <script type="text/javascript" src="js/date.js"></script>
+<script type="text/javascript" src="js/common.js"></script>
 <script type="text/javascript">
-function addAll()
-{
-	var fl = document.getElementById("foodList");
-	var sl= document.getElementById("selectedList");
-	for(var i=0;i<fl.options.length;i++)
-	{
-		var op = document.createElement("option");
-		op.text = fl.options[i].text;
-		op.value = fl.options[i].value;
-		try
-		{
-			sl.add(op,null);
-		}
-		catch(ex)
-		{
-			sl.add(op);
-		}
-	}
-	for(var i= fl.options.length - 1; i >= 0; i--)
-	{
-		fl.remove(i);
-	}
-}
-function removeAll()
-{
-	var fl = document.getElementById("foodList");
-	var sl= document.getElementById("selectedList");
-	for(var i=0;i<sl.options.length;i++)
-	{
-		var op = document.createElement("option");
-		op.text = sl.options[i].text;
-		op.value = sl.options[i].value;
-		try
-		{
-			fl.add(op,null);
-		}
-		catch(ex)
-		{
-			fl.add(op);
-		}
-	}
-	for(var i= sl.options.length - 1; i >= 0; i--)
-	{
-		sl.remove(i);
-	}
-}
-function add()
-{
-	var fl = document.getElementById("foodList");
-	var sl= document.getElementById("selectedList");
-	var addList = new Array();
-	for(var i=0;i<fl.options.length;i++)
-	{
-		var option = fl.options[i];
-		if(option.selected)
-		{
-			var op = document.createElement("option");
-			op.text = option.text;
-			op.value = option.value;
-			addList.push(i);
-			try
-			{
-				sl.add(op,null);
-			}
-			catch(ex)
-			{
-				sl.add(op);
-			}
-		}
-	}
-	for(var i= addList.length - 1; i >= 0; i--)
-	{
-		fl.remove(addList[i]);
-	}
-}
-function remove()
-{
-	var fl = document.getElementById("foodList");
-	var sl= document.getElementById("selectedList");
-	var removeList= new Array();
-	for(var i=0;i<sl.options.length;i++)
-	{
-		var option = sl.options[i];
-		if(option.selected)
-		{
-			var op = document.createElement("option");
-			op.text = option.text;
-			op.value = option.value;
-			removeList.push(i);
-			try
-			{
-				fl.add(op,null);
-			}
-			catch(ex)
-			{
-				fl.add(op);
-			}
-		}
-	}
-	for(var i= removeList.length - 1; i >= 0; i--)
-	{
-		sl.remove(removeList[i]);
-	}
+function submitSearch() {
+	getSelectedItem("selectedList", "searchForm");
+	document.getElementById("searchForm").submit();
 }
 </script>
 </head>
-<body style="width:100%;height:100%" onkeydown="foodRankedKeyDown()" onload="this.focus()">
+<body style="width:98%;height:100%" onkeydown="foodRankedKeyDown()" onload="this.focus()">
 <?php
 include("changePassword.php"); 
 ?>
@@ -130,7 +31,7 @@ include("conn.php");
 mysql_query("SET NAMES utf8"); 
 ?>
 <div id="divSearch">
-	<form action="foodRanked.php" method="post">
+	<form id="searchForm" action="foodRanked.php" method="post">
 	 <div style="text-align:center">
 		日期：<input type="text" id="dateFrom" name="dateFrom" style="width:136px" onclick="javascript:ShowCalendar(this.id)" />
 		&nbsp;&nbsp;至&nbsp;&nbsp;<input type="text" id="dateTo" name="dateTo" style="width:136px" onclick="javascript:ShowCalendar(this.id)" />
@@ -139,19 +40,23 @@ mysql_query("SET NAMES utf8");
 		<div style="float:left;width:40%;text-align:right;height:100%">
 			<select id="foodList" multiple="multiple" style="width:80%;height:100%">
 <?PHP
-$sql = "SELECT id, name FROM food";					      
-$rs = $db->GetAll($sql);
-foreach ($rs as $row){
-	echo "<option value='".$row["id"]."'>".$row["name"]."</option>";
+$ids = $_POST["ids"];
+if($ids == null)
+{
+	$sql = "SELECT id, name FROM food";					      
+	$rs = $db->GetAll($sql);
+	foreach ($rs as $row){
+		echo "<option value='".$row["id"]."'>".$row["name"]."</option>";
+	}
 }
 				?>								
 			</select>
 		</div>
 		<div style="float:left;width:20%;text-align:center;height:100%;padding-top:100px">		
-			<div style="width:100%;text-align:center;margin-top:10px;font-size:14px"><a href="#" onclick="add()">&gt;</a></div>
-			<div style="width:100%;text-align:center;margin-top:10px;font-size:14px"><a href="#" onclick="addAll()">&gt;&gt;</a></div>
-			<div style="width:100%;text-align:center;margin-top:10px;font-size:14px"><a href="#" onclick="removeAll()">&lt;&lt;</a></div>
-			<div style="width:100%;text-align:center;margin-top:10px;font-size:14px"><a href="#" onclick="remove()">&lt;</a></div>		
+			<div style="width:100%;text-align:center;margin-top:10px;font-size:14px"><a href="#" onclick="moveSelectedItem('foodList','selectedList')">&gt;</a></div>
+			<div style="width:100%;text-align:center;margin-top:10px;font-size:14px"><a href="#" onclick="moveAllItem('foodList','selectedList')">&gt;&gt;</a></div>
+			<div style="width:100%;text-align:center;margin-top:10px;font-size:14px"><a href="#" onclick="moveAllItem('selectedList','foodList')">&lt;&lt;</a></div>
+			<div style="width:100%;text-align:center;margin-top:10px;font-size:14px"><a href="#" onclick="moveSelectedItem('selectedList','foodList')">&lt;</a></div>		
 		</div>
 		<div style="float:left;width:40%;text-align:left;height:100%">
 			<select id="selectedList" multiple="multiple" style="width:80%;height:100%">				
@@ -159,7 +64,7 @@ foreach ($rs as $row){
 		</div>
 	</div>
 	<div>
-		 <span class="pop_action-span" style="margin-left:70px;margin-top:10px"><a href="#" onclick="submitFoodData()">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>
+		 <span class="pop_action-span" style="margin-left:70px;margin-top:10px"><a href="#" onclick="submitSearch()">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>
 		 <span class="pop_action-span1" style="margin-right:70px;margin-top:10px"><a href="#" onclick="parent.closeWindow()">取&nbsp;&nbsp;&nbsp;&nbsp;消</a></span>
 	</div>
 	</form>
@@ -171,39 +76,67 @@ foreach ($rs as $row){
 			<tr style="height: 25px;">
 				<th>排&nbsp;名</th>
 				<th>菜&nbsp;名</th>
-				<th>次&nbsp;数</th>				
+				<th>单&nbsp;价（￥）</th>		
+				<th>数&nbsp;量</th>
+				<th>金&nbsp;额（￥）</th>			
 			</tr>
 		</thead>
 		<tbody>
 <?php 	  		
 include("conn.php"); 		 				
 
-$sql .= ("SELECT `name`,order_count FROM food WHERE enabled=1 AND restaurant_id=" . $_SESSION["restaurant_id"]) ;
-$sql .=" ORDER BY order_count DESC";
-/*echo "<script>alert('$sql');</script>";*/
-$bh=0;
-mysql_query("SET NAMES utf8"); 
-// mysql_query("set names 'utf-8'") ;		
-$rs = $db->GetAll($sql);
-foreach ($rs as $row){
-	$bh=$bh+1;
-	echo "<tr>";
-	echo "<td>" .$bh ."</td>";
-	echo "<td>" .$row[0] ."</td>";
-	echo "<td>" .$row[1] ."</td>";			
-	echo "</tr>";
-}	
+if($ids != null)
+{	
+	$dateFrom = $_POST["dateFrom"];
+	$dateTo = $_POST["dateTo"];
+	$sql = "SELECT f.id,d.order_count,f.name,f.unit_price,d.order_count,format(f.unit_price*d.order_count,2) as total_price FROM 
+			food f LEFT JOIN
+			(SELECT a.id,SUM(b.order_count) AS order_count FROM `food` a 
+			INNER JOIN order_food b ON a.alias_id = b.food_id
+			INNER JOIN `order` c ON b.order_id = c.id WHERE a.enabled=1 AND a.restaurant_id=" . $_SESSION["restaurant_id"];
+	if($dateFrom != "")
+	{
+		$sql .= (" AND c.order_date >='" . $dateFrom . " 0:0:0'");
+	}
+	if($dateTo != "")
+	{
+		$sql .= (" AND c.order_date <='" . $dateTo . " 23:59:59'");
+	}
+	
+	$sql .= (" GROUP BY a.id) AS d ON f.id = d.id");	
+	if($ids != "")
+	{
+		$sql.= " WHERE f.id IN ($ids)";
+	}	
+	$sql .=" ORDER BY d.order_count DESC";
+	//echo "<script>alert('$sql');</script>";
+	$bh=0;
+	mysql_query("SET NAMES utf8"); 
+	// mysql_query("set names 'utf-8'") ;		
+	$rs = $db->GetAll($sql);
+	foreach ($rs as $row){
+		$bh=$bh+1;
+		echo "<tr>";
+		echo "<td>" .$bh ."</td>";
+		echo "<td>" .$row["name"] ."</td>";
+		echo "<td>" .$row["unit_price"] ."</td>";	
+		echo "<td>" .$row["order_count"] ."</td>";	
+		echo "<td>" .$row["total_price"] ."</td>";			
+		echo "</tr>";
+	}	
+}
 mysql_close($con);
 		?>			
 	</tbody>
   </table>
   </div>
   
-	<div id="controls" style="width:420px;text-align:right;margin: 0px -50px;">      
+	<div id="controls" style="width:420px;text-align:right;margin: 0px -20px;">      
         <div id="text" style="font-size:12px;text-align:right"><?php echo "总计" .$bh ."&nbsp;条记录"; ?></div>
 
 		<div id="navigation" style="font-size:12px;text-align:right">
   		      <span id="page-link"> </span>
+			  <a href="#" onclick="preview(1)">打印</a>
 			  <a href="#" onclick="sorter.move(-1,true)">首页</a>
 			  <a href="#" onclick="sorter.move(-1)">上页</a>
 			  <a href="#" onclick="sorter.move(1)">下页</a>
@@ -230,6 +163,12 @@ mysql_close($con);
 	sorter.limitid = "pagelimit";
 	sorter.pagesize = 10;
 	sorter.init("table",0);
+<?php
+if($ids != null)
+{
+	echo "document.getElementById('divSearch').style.display='none';document.getElementById('divContent').style.display = 'block'";
+}
+	?>
   </script>
 	</div>
 </body>

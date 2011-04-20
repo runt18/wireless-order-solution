@@ -78,6 +78,7 @@ include("changePassword.php");
 </div>
 
 <div class="Content">
+	<!--startprint1-->
 	<table cellpModifying="0" cellspacing="0" border="0" id="table" class="sortable">
 		<thead>
 			<tr>
@@ -202,6 +203,7 @@ include("changePassword.php");
          ?>      
 		</tbody>
   </table>
+<!--endprint1-->
   </div>
 	<div id="controls">
        <div id="text"><?php echo "总计:" .$bh ."&nbsp;条记录"; ?>&nbsp;&nbsp;&nbsp;&nbsp;当前第 <span id="currentpage"></span> 页，每页 </div>
