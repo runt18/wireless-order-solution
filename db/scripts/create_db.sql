@@ -75,7 +75,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order` (
   `type` TINYINT NOT NULL DEFAULT 0 COMMENT 'the type to pay order, it would be one of the values below.\n现金 : 1\n刷卡 : 2\n会员卡 : 3\n挂账 ：4\n签单：5' ,
   `member_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the member\'s alias id' ,
   `member` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the member name' ,
-  `terminal_model` TINYINT NOT NULL DEFAULT 0 COMMENT 'the terminal model to this order' ,
+  `terminal_model` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the terminal model to this order' ,
   `terminal_pin` INT NOT NULL DEFAULT 0 COMMENT 'the terminal pin to this order' ,
   `table_id` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the table alias id to this order' ,
   PRIMARY KEY (`id`) ,
@@ -258,7 +258,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_history` (
   `type` TINYINT NOT NULL DEFAULT 0 COMMENT 'the type to pay order, it would be one of the values below.\nCash : 1\nCredit Card : 2\nMember Card : 3' ,
   `member_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the member\'s alias id' ,
   `member` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the member name' ,
-  `terminal_model` TINYINT NOT NULL DEFAULT 0 COMMENT 'the terminal model to this order' ,
+  `terminal_model` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the terminal model to this order' ,
   `terminal_pin` INT NOT NULL DEFAULT 0 COMMENT 'the terminal pin to this order' ,
   `table_id` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the table alias id to this order' ,
   PRIMARY KEY (`id`) ,
@@ -379,6 +379,7 @@ COMMENT = 'preserved the material  storage history records';
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
 
 -- -----------------------------------------------------
 -- Data for table `wireless_order_db`.`restaurant`
