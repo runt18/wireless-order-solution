@@ -1,8 +1,9 @@
 ﻿// --------------dishes order center panel-----------------
 // 1，数据
+// 格式：[菜名，口味，数量，单价，操作，实价]
 var orderedData = [];
-orderedData.push( [ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "" ]);
-orderedData.push( [ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "" ]);
+orderedData.push( [ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "", "￥56.2" ]);
+orderedData.push( [ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "", "￥56.2" ]);
 
 // 2，表格的数据store
 var orderedStore = new Ext.data.Store( {
@@ -17,6 +18,8 @@ var orderedStore = new Ext.data.Store( {
 		name : "dishPrice"
 	}, {
 		name : "dishOpt"
+	}, {
+		name : "dishTotalPrice"
 	} ])
 });
 
@@ -75,7 +78,7 @@ var orderedColumnModel = new Ext.grid.ColumnModel( [
 		}, {
 			header : "单价",
 			sortable : true,
-			dataIndex : "dishPrice",
+			dataIndex : "dishTotalPrice",
 			width : 120
 		}, {
 			header : "<center>操作</center>",
@@ -192,20 +195,22 @@ var dishesOrderCenterPanel = new Ext.Panel( {
 // --------------dishes taste pop window-----------------
 // 1，数据
 var dishTasteData = [];
-dishTasteData.push( [ "只要酸菜不要鱼" ]);
-dishTasteData.push( [ "不要盐" ]);
-dishTasteData.push( [ "少盐" ]);
-dishTasteData.push( [ "中盐" ]);
-dishTasteData.push( [ "多盐" ]);
-dishTasteData.push( [ "超多盐" ]);
-dishTasteData.push( [ "使劲放盐" ]);
-dishTasteData.push( [ "咸死你" ]);
+dishTasteData.push( [ "只要酸菜不要鱼", "￥0" ]);
+dishTasteData.push( [ "不要盐", "￥2" ]);
+dishTasteData.push( [ "少盐", "￥3" ]);
+dishTasteData.push( [ "中盐", "￥4" ]);
+dishTasteData.push( [ "多盐", "￥5" ]);
+dishTasteData.push( [ "超多盐", "￥6" ]);
+dishTasteData.push( [ "使劲放盐", "￥7" ]);
+dishTasteData.push( [ "咸死你", "￥8" ]);
 
 // 2，表格的数据store
 var dishTasteStore = new Ext.data.Store( {
 	proxy : new Ext.data.MemoryProxy(dishTasteData),
 	reader : new Ext.data.ArrayReader( {}, [ {
 		name : "dishTaste"
+	}, {
+		name : "tastePrice"
 	} ])
 });
 
@@ -217,29 +222,40 @@ var dishTasteColumnModel = new Ext.grid.ColumnModel( [
 			header : "口味",
 			sortable : true,
 			dataIndex : "dishTaste",
-			width : 200
+			width : 100
+		}, {
+			header : "价钱",
+			sortable : true,
+			dataIndex : "tastePrice",
+			width : 100
 		} ]);
 
 // 4，表格
-var dishTasteGrid = new Ext.grid.GridPanel( {
-	title : "可选口味",
-	anchor : "99%",
-	ds : dishTasteStore,
-	cm : dishTasteColumnModel,
-	sm : new Ext.grid.RowSelectionModel( {
-		singleSelect : true
-	}),
-	listeners : {
-		rowdblclick : function(thiz, rowIndex, e) {
-			var selectedTaste = dishTasteData[rowIndex][0];
-			var dishIndex = dishOrderCurrRowIndex_;
-			orderedData[dishIndex][1] = selectedTaste;
-			orderedStore.reload();
-			dishTasteWindow.hide();
-			dishOrderCurrRowIndex_ = -1;
-		}
-	}
-});
+var dishTasteGrid = new Ext.grid.GridPanel(
+		{
+			title : "可选口味",
+			anchor : "99%",
+			ds : dishTasteStore,
+			cm : dishTasteColumnModel,
+			sm : new Ext.grid.RowSelectionModel( {
+				singleSelect : true
+			}),
+			listeners : {
+				rowdblclick : function(thiz, rowIndex, e) {
+					var selectedTaste = dishTasteData[rowIndex][0];
+					var tastePrice = dishTasteData[rowIndex][1];
+					var dishIndex = dishOrderCurrRowIndex_;
+					orderedData[dishIndex][1] = selectedTaste;
+					orderedData[dishIndex][5] = "￥"
+							+ (parseFloat(orderedData[dishIndex][3]
+									.substring(1)) + parseFloat(tastePrice
+									.substring(1)));
+					orderedStore.reload();
+					dishTasteWindow.hide();
+					dishOrderCurrRowIndex_ = -1;
+				}
+			}
+		});
 
 var dishTasteWindow = new Ext.Window( {
 	layout : "fit",
@@ -453,49 +469,49 @@ softKeyBoardDO = new Ext.Window( {
 // 1，数据
 // 格式：[菜名，菜名编号，菜名拼音，单价]
 dishesDisplayData = [];
-dishesDisplayData.push( [ "酸菜鱼", 1101, "SCY", 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2201, "JJRS", 50 ]);
-dishesDisplayData.push( [ "酸菜鱼", 1112, "SCY", 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2212, "JJRS", 50 ]);
-dishesDisplayData.push( [ "酸菜鱼", 1114, "SCY", 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2312, "JJRS", 50 ]);
-dishesDisplayData.push( [ "酸菜鱼", 4234, "SCY", 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2456, "JJRS", 50 ]);
-dishesDisplayData.push( [ "酸菜鱼", 1234, "SCY", 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2765, "JJRS", 50 ]);
-dishesDisplayData.push( [ "酸菜鱼", 1678, "SCY", 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2123, "JJRS", 50 ]);
-dishesDisplayData.push( [ "酸菜鱼", 1567, "SCY", 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2567, "JJRS", 50 ]);
-dishesDisplayData.push( [ "酸菜鱼", 1355, "SCY", 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2536, "JJRS", 50 ]);
-dishesDisplayData.push( [ "酸菜鱼", 1534, "SCY", 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2345, "JJRS", 50 ]);
-dishesDisplayData.push( [ "酸菜鱼", 1456, "SCY", 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2235, "JJRS", 50 ]);
-dishesDisplayData.push( [ "酸菜鱼", 1345, "SCY", 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2756, "JJRS", 50 ]);
-dishesDisplayData.push( [ "酸菜鱼", 1345, "SCY", 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2543, "JJRS", 50 ]);
-dishesDisplayData.push( [ "酸菜鱼", 1756, "SCY", 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2786, "JJRS", 50 ]);
-dishesDisplayData.push( [ "酸菜鱼", 1456, "SCY", 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2547, "JJRS", 50 ]);
-dishesDisplayData.push( [ "酸菜鱼", 1245, "SCY", 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2765, "JJRS", 50 ]);
-dishesDisplayData.push( [ "酸菜鱼", 1768, "SCY", 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2688, "JJRS", 50 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2756, "JJRS", 50 ]);
-dishesDisplayData.push( [ "酸菜鱼", 1345, "SCY", 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2543, "JJRS", 50 ]);
-dishesDisplayData.push( [ "酸菜鱼", 1756, "SCY", 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2786, "JJRS", 50 ]);
-dishesDisplayData.push( [ "酸菜鱼", 1456, "SCY", 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2547, "JJRS", 50 ]);
-dishesDisplayData.push( [ "酸菜鱼", 1245, "SCY", 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2765, "JJRS", 50 ]);
-dishesDisplayData.push( [ "酸菜鱼", 1768, "SCY", 35.1 ]);
-dishesDisplayData.push( [ "京酱肉丝", 2688, "JJRS", 50 ]);
+dishesDisplayData.push( [ "酸菜鱼", 1101, "SCY", "￥35.1" ]);
+dishesDisplayData.push( [ "京酱肉丝", 2201, "JJRS", "￥50" ]);
+dishesDisplayData.push( [ "酸菜鱼", 1112, "SCY", "￥35.1" ]);
+dishesDisplayData.push( [ "京酱肉丝", 2212, "JJRS", "￥50" ]);
+dishesDisplayData.push( [ "酸菜鱼", 1114, "SCY", "￥35.1" ]);
+dishesDisplayData.push( [ "京酱肉丝", 2312, "JJRS", "￥50" ]);
+dishesDisplayData.push( [ "酸菜鱼", 4234, "SCY", "￥35.1" ]);
+dishesDisplayData.push( [ "京酱肉丝", 2456, "JJRS", "￥50" ]);
+dishesDisplayData.push( [ "酸菜鱼", 1234, "SCY", "￥35.1" ]);
+dishesDisplayData.push( [ "京酱肉丝", 2765, "JJRS", "￥50" ]);
+dishesDisplayData.push( [ "酸菜鱼", 1678, "SCY", "￥35.1" ]);
+dishesDisplayData.push( [ "京酱肉丝", 2123, "JJRS", "￥50" ]);
+dishesDisplayData.push( [ "酸菜鱼", 1567, "SCY", "￥35.1" ]);
+dishesDisplayData.push( [ "京酱肉丝", 2567, "JJRS", "￥50" ]);
+dishesDisplayData.push( [ "酸菜鱼", 1355, "SCY", "￥35.1" ]);
+dishesDisplayData.push( [ "京酱肉丝", 2536, "JJRS", "￥50" ]);
+dishesDisplayData.push( [ "酸菜鱼", 1534, "SCY", "￥35.1" ]);
+dishesDisplayData.push( [ "京酱肉丝", 2345, "JJRS", "￥50" ]);
+dishesDisplayData.push( [ "酸菜鱼", 1456, "SCY", "￥35.1" ]);
+dishesDisplayData.push( [ "京酱肉丝", 2235, "JJRS", "￥50" ]);
+dishesDisplayData.push( [ "酸菜鱼", 1345, "SCY", "￥35.1" ]);
+dishesDisplayData.push( [ "京酱肉丝", 2756, "JJRS", "￥50" ]);
+dishesDisplayData.push( [ "酸菜鱼", 1345, "SCY", "￥35.1" ]);
+dishesDisplayData.push( [ "京酱肉丝", 2543, "JJRS", "￥50" ]);
+dishesDisplayData.push( [ "酸菜鱼", 1756, "SCY", "￥35.1" ]);
+dishesDisplayData.push( [ "京酱肉丝", 2786, "JJRS", "￥50" ]);
+dishesDisplayData.push( [ "酸菜鱼", 1456, "SCY", "￥35.1" ]);
+dishesDisplayData.push( [ "京酱肉丝", 2547, "JJRS", "￥50" ]);
+dishesDisplayData.push( [ "酸菜鱼", 1245, "SCY", "￥35.1" ]);
+dishesDisplayData.push( [ "京酱肉丝", 2765, "JJRS", "￥50" ]);
+dishesDisplayData.push( [ "酸菜鱼", 1768, "SCY", "￥35.1" ]);
+dishesDisplayData.push( [ "京酱肉丝", 2688, "JJRS", "￥50" ]);
+dishesDisplayData.push( [ "京酱肉丝", 2756, "JJRS", "￥50" ]);
+dishesDisplayData.push( [ "酸菜鱼", 1345, "SCY", "￥35.1" ]);
+dishesDisplayData.push( [ "京酱肉丝", 2543, "JJRS", "￥50" ]);
+dishesDisplayData.push( [ "酸菜鱼", 1756, "SCY", "￥35.1" ]);
+dishesDisplayData.push( [ "京酱肉丝", 2786, "JJRS", "￥50" ]);
+dishesDisplayData.push( [ "酸菜鱼", 1456, "SCY", "￥35.1" ]);
+dishesDisplayData.push( [ "京酱肉丝", 2547, "JJRS", "￥50" ]);
+dishesDisplayData.push( [ "酸菜鱼", 1245, "SCY", "￥35.1" ]);
+dishesDisplayData.push( [ "京酱肉丝", 2765, "JJRS", "￥50" ]);
+dishesDisplayData.push( [ "酸菜鱼", 1768, "SCY", "￥35.1" ]);
+dishesDisplayData.push( [ "京酱肉丝", 2688, "JJRS", "￥50" ]);
 
 for ( var i = 0; i < dishesDisplayData.length; i++) {
 	dishesDisplayDataShow.push( [ dishesDisplayData[i][0],
@@ -535,7 +551,7 @@ var dishesDisplayColumnModel = new Ext.grid.ColumnModel( [
 			dataIndex : "dishSpell",
 			width : 80
 		}, {
-			header : "单价（元）",
+			header : "单价",
 			sortable : true,
 			dataIndex : "dishPrice",
 			width : 80
@@ -558,10 +574,10 @@ var dishesDisplayGrid = new Ext.grid.GridPanel( {
 			var dishCurrCount = dishesOrderEastPanel.findById("orderCountNum")
 					.getValue();
 			var dishCurrName = dishesDisplayDataShow[rowIndex][0];
-			var dishCurrPrice = "￥" + dishesDisplayDataShow[rowIndex][3];
+			var dishCurrPrice = dishesDisplayDataShow[rowIndex][3];
 
 			orderedData.push( [ dishCurrName, "无特别要求", dishCurrCount,
-					dishCurrPrice ]);
+					dishCurrPrice, "", dishCurrPrice ]);
 			orderedStore.reload();
 		}
 	}
@@ -719,6 +735,11 @@ var dishesDisplayTabPanel = new Ext.TabPanel( {
 				dishesOrderEastPanel.findById("orderCountNum"));
 		dishesOrderEastPanel.findById("orderCountSpell").fireEvent("blur",
 				dishesOrderEastPanel.findById("orderCountSpell"));
+
+		// hide the soft keyboard
+		if (softKeyBoardDO.isVisible()) {
+			softKeyBoardDO.hide();
+		}
 	}
 }
 });
