@@ -89,6 +89,20 @@ else if($editType == "deleteMember")
 				echo "<script>alert('冲值失败！');</script>";
 			}	
 		}
+		else if($editType == "viewDetail")
+			{
+				
+				$viewType = $_POST["viewType"];
+				$id = $_POST["id"];
+				$name = $_POST["name"];
+				$dateFrom = $_POST["dateFrom"];
+				$dateTo = $_POST["dateTo"];
+				if($viewType == "expenditure")		
+				{					
+					echo "<script>viewExpenditure('$id','$name','$dateFrom','$dateTo');</script>";
+					//echo "<script>viewExpenditure(&quot;".$id."&quot;,&quot;".$name."&quot;,&quot;".$dateFrom."&quot;,&quot;".$dateTo."&quot;);</script>";
+				}
+			}
 ?>
 <h1>
 <span class="action-span"><a href="#" onclick="editMember('','','','','','','')">添加会员</a></span>
@@ -212,9 +226,9 @@ foreach ($rs as $row){
 	echo "<td>" .$row["name"] ."</td>";
 	echo "<td>" .$row["birth"];
 	if($row["birth"] == date("Y-m-d"))
-		{
+	{
 		echo "&nbsp;<img src='images/birth.png'  height='16' width='16' border='0'/>";
-			}	
+	}	
 	echo"</td>";	
 	echo "<td>" .$row["tele"] ."</td>";	
 	echo "<td>" .GetDiscountTypeName($row["discount_type"]) ."</td>";	
@@ -225,7 +239,7 @@ foreach ($rs as $row){
 		"&quot;,&quot;".$row["balance"]."&quot;,&quot;".$row["exchange_rate"]."&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
 		"<a href='#' onclick='recharge(&quot;".$row["id"]."&quot;,&quot;".$row["name"]."&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;冲值</a>".
 		"<a href='#' onclick='deleteMember(".$row["id"].")'><img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;删除</a>".
-		"<a href='#' onclick='detail(&quot;".$row["id"]."&quot;,&quot;".$row["name"]."&quot;)'><img src='images/View.png'  height='16' width='14' border='0'/>&nbsp;明细</a></td>";
+		"<a href='#' onclick='viewDetail(&quot;".$row["alias_id"]."&quot;,&quot;".$row["name"]."&quot;)'><img src='images/View.png'  height='16' width='14' border='0'/>&nbsp;明细</a></td>";
 	echo "</tr>";
 }
 //mysql_query("SET NAMES utf8"); 

@@ -217,3 +217,73 @@ function submitRechargeData() {
     }
     document.memberForm.submit();
 }
+
+function viewDetail(id, name) {
+    var editType = "viewDetail";
+    var content = ' <div class="add_foot">' +
+                        '<div class="title">' +
+	                        '<div class="title_left"><font class="font" style="width:350px;">明细 - 请选择类型和区间</font></div>' +
+	                        '<div class="title_right"></div>' +
+	                    '</div>' +
+	                    '<form name="memberForm" action="member.php"  method="post" onkeydown="editMemberKeyDown()">' +
+	                      '<input type="hidden" name="editType" value="' + editType + '" />' +
+	                      '<input type="hidden" name="id" value="' + id + '" />' +
+	                      '<input type="hidden" name="name" value="' + name + '" />' +
+	                      '<div class="add_foot_Content" style="height:130px;text-align:center">' +
+	                        '<div class="pop_Content">' +
+	                          '<div class="pop_Content1" style="padding-left:0px;text-align:center"><input type="radio" checked="checked" name="viewType" value="recharge" />冲值&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" name="viewType" value="expenditure" />消费</div>' +
+	                           '<div class="pop_Content1" style="padding-left:0px;text-align:center">日期：<input type="text" id="dateFrom" name="dateFrom" style="width:100px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;&nbsp;至&nbsp;&nbsp;<input type="text" id="dateTo" name="dateTo" style="width:100px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;</div>' +
+	                        '</div>' +
+	                            '<span class="pop_action-span"><a href="#" onclick="submitViewDetail()">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>' +
+	                            '<span class="pop_action-span1"><a href="#" onclick="closeWindow()">取&nbsp;&nbsp;&nbsp;&nbsp;消</a></span>' +
+	                      '</div>' +
+	                      '</form>' +
+	                '</div>';
+
+    showMessageBox(content, 342, 350);
+}
+function submitViewDetail() {   
+    document.memberForm.submit();
+}
+
+function viewRecharge(id,name,dateFrom,dateTo) {
+    var content = ' <div class="add_foot" style="height:550px;width:100%">' +
+                              '<div class="title" style="width:100%">' +
+	                          '<div class="title_left" style="width:92%"><font class="font">充值明细 -</font></div>' +
+	                          '<div class="title_right" style="width:8%;float:left" ></div>' +
+	                          '</div>' +
+	                          '<div class="add_foot_Content" style="height:370px;text-align:center;width:99%">' +
+	                              '<iframe src="foodRanked.php" scrolling="no" style="width:100%;height:100%" />' +
+	                          '</div>' +
+						   '</div>';
+    showMessageBox(content, 600, 350);
+
+}
+function viewRechargeKeyDown() {
+    if (event.keyCode == 27) {
+        event.returnValue = false;
+        event.cancel = true;
+        parent.closeWindow();
+    }
+}
+
+function viewExpenditure(id, name, dateFrom, dateTo) {
+    var content = ' <div class="add_foot" style="height:550px;width:100%">' +
+                              '<div class="title" style="width:100%">' +
+	                          '<div class="title_left" style="width:92%"><font class="font" style="width:200px">消费明细 - ' + name + '</font></div>' +
+	                          '<div class="title_right" style="width:8%;float:left" ></div>' +
+	                          '</div>' +
+	                          '<div class="add_foot_Content" style="height:370px;text-align:center;width:99%">' +
+	                              '<iframe src="viewExpenditure.php?id=' + id + '&dateFrom=' + encodeURIComponent(dateFrom) + '&dateTo=' + encodeURIComponent(dateTo) + '" scrolling="no" style="width:100%;height:100%" />' +
+	                          '</div>' +
+						   '</div>';
+    showMessageBox(content, 450, 350);
+
+}
+function viewExpenditureKeyDown() {
+    if (event.keyCode == 27) {
+        event.returnValue = false;
+        event.cancel = true;
+        parent.closeWindow();
+    }
+}
