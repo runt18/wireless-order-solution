@@ -439,32 +439,23 @@ class OrderHandler extends Handler implements Runnable{
 			throw new SQLException("The id of order is not generated successfully.");
 		}
 		
+		_stmt.clearBatch();
 		//insert each ordered food
 		for(int i = 0; i < orderToInsert.foods.length; i++){
 			//insert the record to table "order_food"
 			sql = "INSERT INTO `" + WirelessSocketServer.database +
-				"`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `taste`, `taste_price`, `taste_id`, `kitchen`) VALUES (" +	
+				"`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `taste`, `taste_price`, `taste_id`, `kitchen`, `waiter`, `order_date`) VALUES (" +	
 				orderToInsert.id + ", " + orderToInsert.foods[i].alias_id + ", " + orderToInsert.foods[i].count2Float().toString() + 
 				", " + Util.price2Float(orderToInsert.foods[i].price, Util.INT_MASK_2).toString() + ", '" + orderToInsert.foods[i].name + "', '" + 
 				orderToInsert.foods[i].taste.preference + "', " + 
 				Util.price2Float(orderToInsert.foods[i].taste.price, Util.INT_MASK_2).toString() + ", " +
 				orderToInsert.foods[i].taste.alias_id + ", " + 
-				orderToInsert.foods[i].kitchen + ")";
+				orderToInsert.foods[i].kitchen + ", '" + 
+				_owner + "', NOW()" + ")";
 			
-			_stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
-			//get the generated id to order_food record
-			_rs = _stmt.getGeneratedKeys();
-			if(_rs.next()){
-				int id = _rs.getInt(1);
-				//insert the record to table "order_detail"
-				sql = "INSERT INTO `" + WirelessSocketServer.database +
-					"`.`order_detail` (`order_food_id`, `waiter`, `order_count`, `order_date`) VALUES (" +
-					id + ", '" + _owner + "', " + orderToInsert.foods[i].count2Float().toString() + ", NOW())";
-				_stmt.execute(sql);
-			}else{
-				throw new SQLException("The id of order_food is not generated successfully.");
-			}
+			_stmt.addBatch(sql);
 		}		
+		_stmt.executeBatch();
 
 
 		//find the printer connection socket to the restaurant for this terminal
@@ -754,12 +745,8 @@ class OrderHandler extends Handler implements Runnable{
 		short tableToCancel = OrderReqParser.parseCancelOrder(req);
 		int orderID = getUnPaidOrderID(tableToCancel);
 		_stmt.clearBatch();
-		//delete the related records in "order_detail"
-		String sql = "DELETE FROM `" + WirelessSocketServer.database + "`.`order_detail` WHERE order_food_id IN (SELECT id FROM `" +
-					WirelessSocketServer.database + "`.`order_food` WHERE order_id=" + orderID + ")";
-		_stmt.addBatch(sql);
 		//delete the records related to the order id and food id in "order_food" table
-		sql = "DELETE FROM `" + WirelessSocketServer.database + "`.`order_food` WHERE order_id=" + orderID;
+		String sql = "DELETE FROM `" + WirelessSocketServer.database + "`.`order_food` WHERE order_id=" + orderID;
 		_stmt.addBatch(sql);
 		//delete the corresponding order record in "order" table
 		sql = "DELETE FROM `" + WirelessSocketServer.database + "`.`order` WHERE id=" + orderID;
