@@ -491,9 +491,6 @@ class OrderHandler extends Handler implements Runnable{
 		}
 	}
 	
-	enum Action{
-		Skip, Insert, Update;
-	};
 	/**
 	 * Access the database to update the order specified in the request
 	 * @param req the update order request with all the order information
@@ -518,211 +515,127 @@ class OrderHandler extends Handler implements Runnable{
 			originalRecords.add(food);
 		}
 		
-		ArrayList<Food> recordsToInsert = new ArrayList<Food>();
-		ArrayList<Food> recordsToUpdate = new ArrayList<Food>();
+		ArrayList<Food> extraFoods = new ArrayList<Food>();
+		ArrayList<Food> cancelledFoods = new ArrayList<Food>();
+		
+		ArrayList<Food> newRecords = new ArrayList<Food>();
 		
 		for(int i = 0; i < orderToUpdate.foods.length; i++){
-			/**
-			 * Assume it's a new record,
-			 * need to perform the insert action.
-			 */
-			Action action = Action.Insert;
 			
 			for(int j = 0; j < originalRecords.size(); j++){
 				/**
 				 * In the case below,
 				 * 1 - both food alias id and taste id is matched
 				 * 2 - order count is matched
-				 * No need to update this record
+				 * Skip this record since it is NOT new
 				 */
 				if(orderToUpdate.foods[i].equals(originalRecords.get(j)) &&
-					orderToUpdate.foods[i].count2Float().equals(originalRecords.get(j).count2Float())){
-					action = Action.Skip;
+					orderToUpdate.foods[i].count == originalRecords.get(j).count){
 					break;
 					
 				/**
 				 * In the case below,
 				 * 1 - both food alias id and taste id is matched
 				 * 2 - order count isn't matched
-				 * Need to update the order count
+				 * Calculate the difference between these two records and insert a new record to keep track of this incremental
 				 */
 				}else if(orderToUpdate.foods[i].equals(originalRecords.get(j)) &&
-						  !orderToUpdate.foods[i].count2Float().equals(originalRecords.get(j).count2Float())){
-					action = Action.Update;
+						orderToUpdate.foods[i].count != originalRecords.get(j).count){
+
+					//calculate the difference between the submitted and original record
+					float diff = orderToUpdate.foods[i].count2Float().floatValue() - originalRecords.get(i).count2Float().floatValue();
+					
+					/**
+					 * firstly, check to see whether the new food submitted by terminal exist in db or is disabled by user.
+					 * If the food can't be found in db or has been disabled by user, means the menu in terminal has been expired,
+					 * and then sent back an error to tell the terminal to update the menu.
+					 * secondly, check to see whether the taste preference submitted by terminal exist in db or not.
+					 * If the taste preference can't be found in db, means the taste in terminal has been expired,
+					 * and then sent back an error to tell the terminal to update the menu.
+					 */
+					
+					//get the food name and its unit price
+					sql = "SELECT name, unit_price, kitchen FROM " + WirelessSocketServer.database + 
+							".food WHERE alias_id=" + orderToUpdate.foods[i].alias_id + 
+							" AND restaurant_id=" + _restaurantID +
+							" AND enabled=1";
+					_rs = _stmt.executeQuery(sql);
+					//check if the food to be inserted exist in db or not
+					Food food = new Food();
+					if(_rs.next()){
+						food.alias_id = orderToUpdate.foods[i].alias_id;
+						food.name = _rs.getString("name");
+						food.setPrice(new Float(_rs.getFloat("unit_price")));
+						food.setCount(new Float(Math.abs(diff)));
+						food.kitchen = _rs.getShort("kitchen");
+					}else{
+						throw new OrderBusinessException("The food(alias_id=" + orderToUpdate.foods[i].alias_id + ") to query doesn't exist.", ErrorCode.MENU_EXPIRED);
+					}
+					
+					//get the taste preference only if the food has taste preference
+					if(orderToUpdate.foods[i].taste.alias_id != Taste.NO_TASTE){
+						sql = "SELECT preference, price FROM " + WirelessSocketServer.database + ".taste WHERE restaurant_id=" + _restaurantID +
+							" AND alias_id=" + orderToUpdate.foods[i].taste.alias_id;
+						_rs = _stmt.executeQuery(sql);
+						//check if the taste preference exist in db
+						if(_rs.next()){
+							food.taste.alias_id = orderToUpdate.foods[i].taste.alias_id;
+							food.taste.preference = _rs.getString("preference");
+							food.taste.setPrice(_rs.getFloat("price"));
+						}else{
+							throw new OrderBusinessException("The taste(alias_id=" + orderToUpdate.foods[i].taste.alias_id + ") to query doesn't exist.", ErrorCode.MENU_EXPIRED);
+						}
+					}
+					
+					if(diff > 0){
+						extraFoods.add(food);
+					}else{
+						cancelledFoods.add(food);
+					}
+					
+					newRecords.add(food);
 					break;					
 				}
 			}
-			
-			/**
-			 * In the case of inserting action,
-			 * firstly, check to see whether the new food submitted by terminal exist in db or is disabled by user.
-			 * If the food can't be found in db or has been disabled by user, means the menu in terminal has been expired,
-			 * and then sent back an error to tell the terminal to update the menu.
-			 * secondly, check to see whether the taste preference submitted by terminal exist in db or not.
-			 * If the taste preference can't be found in db, means the taste in terminal has been expired,
-			 * and then sent back an error to tell the terminal to update the menu.
-			 */
-			if(action == Action.Insert){
-				//get the food name and its unit price
-				sql = "SELECT name, unit_price, kitchen FROM " + WirelessSocketServer.database + 
-						".food WHERE alias_id=" + orderToUpdate.foods[i].alias_id + 
-						" AND restaurant_id=" + _restaurantID +
-						" AND enabled=1";
-				_rs = _stmt.executeQuery(sql);
-				//check if the food to be inserted exist in db or not
-				Food food = new Food();
-				if(_rs.next()){
-					food.alias_id = orderToUpdate.foods[i].alias_id;
-					food.name = _rs.getString("name");
-					food.setPrice(new Float(_rs.getFloat("unit_price")));
-					food.setCount(orderToUpdate.foods[i].count2Float());
-					food.kitchen = _rs.getShort("kitchen");
-				}else{
-					throw new OrderBusinessException("The food(alias_id=" + orderToUpdate.foods[i].alias_id + ") to query doesn't exist.", ErrorCode.MENU_EXPIRED);
-				}
-				
-				//get the taste preference only if the food has taste preference
-				if(orderToUpdate.foods[i].taste.alias_id != Taste.NO_TASTE){
-					sql = "SELECT preference, price FROM " + WirelessSocketServer.database + ".taste WHERE restaurant_id=" + _restaurantID +
-						" AND alias_id=" + orderToUpdate.foods[i].taste.alias_id;
-					_rs = _stmt.executeQuery(sql);
-					//check if the taste preference exist in db
-					if(_rs.next()){
-						food.taste.alias_id = orderToUpdate.foods[i].taste.alias_id;
-						food.taste.preference = _rs.getString("preference");
-						food.taste.setPrice(_rs.getFloat("price"));
-					}else{
-						throw new OrderBusinessException("The taste(alias_id=" + orderToUpdate.foods[i].taste.alias_id + ") to query doesn't exist.", ErrorCode.MENU_EXPIRED);
-					}
-				}
-
-				recordsToInsert.add(food);
-
-			/**
-			 * If performing update action, we just update the order amount and taste preference without checking its other info.
-			 * So we might have a potential bug, 
-			 * if the user updates the food using original alias id (means only modify the name or unit price),
-			 * then the db's record would be different from the terminal.
-			 * So we suggest the user had better update the menu in the case that no updated order exist.    
-			 */
-			}else if(action == Action.Update){
-				Food food = new Food();
-				food.alias_id = orderToUpdate.foods[i].alias_id;
-				food.setCount(orderToUpdate.foods[i].count2Float());
-				//get the taste preference only if the food has taste preference
-				if(orderToUpdate.foods[i].taste.alias_id != Taste.NO_TASTE){
-					sql = "SELECT preference, price FROM " + WirelessSocketServer.database + ".taste WHERE restaurant_id=" + _restaurantID +
-						" AND alias_id=" + orderToUpdate.foods[i].taste.alias_id;
-					_rs = _stmt.executeQuery(sql);
-					//check if the taste preference exist in db
-					if(_rs.next()){
-						food.taste.alias_id = orderToUpdate.foods[i].taste.alias_id;
-						food.taste.preference = _rs.getString("preference");
-						food.taste.setPrice(_rs.getFloat("price"));
-					}else{
-						throw new OrderBusinessException("The taste(alias_id=" + orderToUpdate.foods[i].taste.alias_id + ") to query doesn't exist.", ErrorCode.MENU_EXPIRED);
-					}	
-				}
-				recordsToUpdate.add(food);
-			}
-		}
-		
-
-		/**
-		 * If any new foods to be ordered, print the new food detail to notify the kitchen
-		 */
-		if(recordsToInsert.size() != 0){
-			
-			Order extraOrder = new Order();
-			extraOrder.id = orderID;
-			extraOrder.tableID = orderToUpdate.tableID;
-			//extraOrder.foods = recordsToInsert.toArray(new Food[recordsToInsert.size()]);
-			
-			//find the printer connection socket to the restaurant for this terminal
-			ArrayList<Socket> printerConn = WirelessSocketServer.printerConnections.get(new Integer(_restaurantID));
-			Socket[] connections = null;
-			if(printerConn != null){
-				connections = printerConn.toArray(new Socket[printerConn.size()]);			
-			}
-			if(connections != null){
-				/**
-				 * The reason to the code below is to deal with the case below.
-				 * In the case we just add taste to a food,
-				 * In system perspective, it's a new food because the taste is changed, so that need to print an extra order.
-				 * In user perspective,  it should NOT a new food since only the taste is changed, so that NOT need to print.
-				 * As a result, only the food meet the conditions below are regarded as the extra one to print.
-				 * - both name and taste is NOT matched against the original
-				 */
-				ArrayList<Food> extraFoods = new ArrayList<Food>(); 
-				for(int i = 0; i < recordsToInsert.size(); i++){
-					boolean isExtra = true;
-					for(int j = 0; j < originalRecords.size(); j++){
-						if(recordsToInsert.get(i).name.equals(originalRecords.get(j).name)){
-							isExtra = false;
-							break;
-						}
-					}
-					if(isExtra){
-						extraFoods.add(recordsToInsert.get(i));
-					}
-				}
-				extraOrder.foods = extraFoods.toArray(new Food[extraFoods.size()]);
-				
-				//check whether the print request is synchronized or asynchronous
-				if((req.header.reserved & Reserved.PRINT_SYNC) != 0){					
-					//perform print in synchronized mode					
-					for (int i = 0; i < connections.length; i++) {
-						try {
-							new PrintHandler(extraOrder, connections[i], Reserved.PRINT_EXTRA_FOOD_2, _restaurantID, _owner).run2();
-						} catch (PrintSocketException e) {}
-					}
-	
-				}else{
-					//perform print in asynchronous mode					 
-					for(int i = 0; i < connections.length; i++){
-						WirelessSocketServer.threadPool.execute(new PrintHandler(extraOrder, connections[i], Reserved.PRINT_EXTRA_FOOD_2, _restaurantID, _owner));
-					}
-				}
-			}
-		}
+		}	
 		
 		_stmt.clearBatch();
-		//insert the new ordered food
-		for(int i = 0; i < recordsToInsert.size(); i++){
-			sql = "INSERT INTO `" + WirelessSocketServer.database + "`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `taste_id`, `taste_price`, `taste`, `kitchen`) VALUES (" +
-			orderID + ", " + recordsToInsert.get(i).alias_id + ", " + recordsToInsert.get(i).count2String() + 
-			", " + Util.price2Float(recordsToInsert.get(i).price, Util.INT_MASK_2).toString() + ", '" + recordsToInsert.get(i).name + 
-			"'," + recordsToInsert.get(i).taste.alias_id + "," +
-			Util.price2Float(recordsToInsert.get(i).taste.price, Util.INT_MASK_2).toString() + ", '" +
-			recordsToInsert.get(i).taste.preference + "', " + 
-			recordsToInsert.get(i).kitchen + ")";
+		//insert the new order records
+		for(int i = 0; i < newRecords.size(); i++){
+			sql = "INSERT INTO `" + WirelessSocketServer.database + "`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `taste_id`, `taste_price`, `taste`, `kitchen`, `waiter`, `order_date`) VALUES (" +
+					orderID + ", " + newRecords.get(i).alias_id + ", " + newRecords.get(i).count2String() + 
+					", " + Util.price2Float(newRecords.get(i).price, Util.INT_MASK_2).toString() + ", '" + newRecords.get(i).name + 
+					"'," + newRecords.get(i).taste.alias_id + "," +
+					Util.price2Float(newRecords.get(i).taste.price, Util.INT_MASK_2).toString() + ", '" +
+					newRecords.get(i).taste.preference + "', " + 
+					newRecords.get(i).kitchen + ", '" + 
+					_owner + "', NOW()" + ")";
 			_stmt.addBatch(sql);			
 		}
 		
-		//update the ordered food, including order count, taste id and preference
-		for(int i = 0; i < recordsToUpdate.size(); i++){
-			sql = "UPDATE `" + WirelessSocketServer.database + "`.`order_food` SET order_count=" + 
-					recordsToUpdate.get(i).count2String() + 
-					", taste_id=" + recordsToUpdate.get(i).taste.alias_id +
-					", taste='" + recordsToUpdate.get(i).taste.preference + "'" +
-					", taste_price=" + Util.price2Float(recordsToUpdate.get(i).taste.price, Util.INT_MASK_2).toString() +
-					" WHERE order_id=" + orderID +
-					" AND food_id=" + recordsToUpdate.get(i).alias_id + " AND taste_id=" + recordsToUpdate.get(i).taste.alias_id;
-			_stmt.addBatch(sql);			
-		}
-		
-		//delete the original's food'id from "order_food" table if it's excluded in the updated's
+		//insert the canceled order records
 		for(int i = 0; i < originalRecords.size(); i++){
-			boolean isCancelledFood = true;
+			boolean isCancelled = true;
 			for(int j = 0; j < orderToUpdate.foods.length; j++){
 				if(originalRecords.get(i).equals(orderToUpdate.foods[j])){
-					isCancelledFood = false;
+					isCancelled = false;
 					break;
 				}
 			}
-			if(isCancelledFood){
-				sql = "DELETE FROM `" + WirelessSocketServer.database + "`.`order_food` WHERE order_id=" + orderID +
-						" AND food_id=" + originalRecords.get(i).alias_id + " AND taste_id=" + originalRecords.get(i).taste.alias_id;
+			/**
+			 * If the original records are excluded from the submitted, means the food is to be cancel.
+			 * So we insert an record whose order count is negative to original record
+			 */
+			if(isCancelled){
+				sql = "INSERT INTO `" + WirelessSocketServer.database + "`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `taste_id`, `taste_price`, `taste`, `kitchen`, `waiter`, `order_date`, `comment`) VALUES (" +
+						orderID + ", " + originalRecords.get(i).alias_id + ", " + "-" + originalRecords.get(i).count2String() + 
+						", " + Util.price2Float(originalRecords.get(i).price, Util.INT_MASK_2).toString() + ", '" + originalRecords.get(i).name + 
+						"'," + originalRecords.get(i).taste.alias_id + "," +
+						Util.price2Float(originalRecords.get(i).taste.price, Util.INT_MASK_2).toString() + ", '" +
+						originalRecords.get(i).taste.preference + "', " + 
+						originalRecords.get(i).kitchen + ", '" + 
+						_owner + "', NOW(), " + 
+						"NULL" + ")";
 				_stmt.addBatch(sql);
 			}
 		}
@@ -733,6 +646,61 @@ class OrderHandler extends Handler implements Runnable{
 		_stmt.addBatch(sql);
 
 		_stmt.executeBatch();
+		
+		/**
+		 * Notify the print handler to print the extra and canceled foods
+		 */
+		if(!extraFoods.isEmpty() || !cancelledFoods.isEmpty()){
+			Order extraOrder = null;
+			if(!extraFoods.isEmpty()){
+				extraOrder = new Order();
+				extraOrder.id = orderID;
+				extraOrder.tableID = orderToUpdate.tableID;
+				extraOrder.foods = extraFoods.toArray(new Food[extraFoods.size()]);
+			}
+
+			Order cancelledOrder = null;
+			if(!cancelledFoods.isEmpty()){
+				cancelledOrder = new Order();
+				cancelledOrder.id = orderID;
+				cancelledOrder.tableID = orderToUpdate.tableID;
+				cancelledOrder.foods = cancelledFoods.toArray(new Food[cancelledFoods.size()]);
+			}
+			
+			//find the printer connection socket to the restaurant for this terminal
+			ArrayList<Socket> printerConn = WirelessSocketServer.printerConnections.get(new Integer(_restaurantID));
+			Socket[] connections = null;
+			if(printerConn != null){
+				connections = printerConn.toArray(new Socket[printerConn.size()]);			
+			}
+			if(connections != null){				
+				//check whether the print request is synchronized or asynchronous
+				if((req.header.reserved & Reserved.PRINT_SYNC) != 0){					
+					//perform print in synchronized mode					
+					for (int i = 0; i < connections.length; i++) {
+						try {
+							if(extraOrder != null){
+								new PrintHandler(extraOrder, connections[i], Reserved.PRINT_EXTRA_FOOD_2, _restaurantID, _owner).run2();								
+							}
+							if(cancelledOrder != null){
+								new PrintHandler(cancelledOrder, connections[i], Reserved.PRINT_EXTRA_FOOD_2, _restaurantID, _owner).run2();								
+							}
+						} catch (PrintSocketException e) {}
+					}
+	
+				}else{
+					//perform print in asynchronous mode					 
+					for(int i = 0; i < connections.length; i++){
+						if(extraOrder != null){
+							WirelessSocketServer.threadPool.execute(new PrintHandler(extraOrder, connections[i], Reserved.PRINT_EXTRA_FOOD_2, _restaurantID, _owner));							
+						}
+						if(cancelledOrder != null){
+							WirelessSocketServer.threadPool.execute(new PrintHandler(cancelledOrder, connections[i], Reserved.PRINT_EXTRA_FOOD_2, _restaurantID, _owner));							
+						}
+					}
+				}
+			}
+		}		
 	}
 	
 	/**
