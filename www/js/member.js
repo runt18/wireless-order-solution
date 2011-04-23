@@ -184,7 +184,7 @@ function recharge(id, name) {
 	                        '<div class="title_left"><font class="font" style="width:350px;">会员充值 - ' + name + '</font></div>' +
 	                        '<div class="title_right"></div>' +
 	                    '</div>' +
-	                    '<form name="memberForm" action="member.php"  method="post" onkeydown="editMemberKeyDown()">' +
+	                    '<form name="memberForm" action="member.php"  method="post" onkeydown="rechargeKeyDown()">' +
 	                      '<input type="hidden" name="editType" value="' + editType + '" />' +
 	                      '<input type="hidden" name="id" value="' + id + '" />' +
 	                      '<div class="add_foot_Content" style="height:130px;text-align:center">' +
@@ -202,6 +202,19 @@ function recharge(id, name) {
 
     showMessageBox(content, 342, 350);
     document.getElementById("money").focus();
+}
+
+function rechargeKeyDown() {
+    if (event.keyCode == 13) {
+        event.returnValue = false;
+        event.cancel = true;
+        submitRechargeData();
+    }
+    if (event.keyCode == 27) {
+        event.returnValue = false;
+        event.cancel = true;
+        closeWindow();
+    }
 }
 
 function submitRechargeData() {
@@ -249,23 +262,18 @@ function submitViewDetail() {
 function viewRecharge(id,name,dateFrom,dateTo) {
     var content = ' <div class="add_foot" style="height:550px;width:100%">' +
                               '<div class="title" style="width:100%">' +
-	                          '<div class="title_left" style="width:92%"><font class="font">充值明细 -</font></div>' +
+	                          '<div class="title_left" style="width:92%"><font class="font" style="width:200px">充值明细 - ' + name + '</font></div>' +
 	                          '<div class="title_right" style="width:8%;float:left" ></div>' +
 	                          '</div>' +
 	                          '<div class="add_foot_Content" style="height:370px;text-align:center;width:99%">' +
-	                              '<iframe src="foodRanked.php" scrolling="no" style="width:100%;height:100%" />' +
+	                              '<iframe src="viewRecharge.php?id=' + id + '&dateFrom=' + dateFrom + '&dateTo=' + dateTo + '" scrolling="no" style="width:100%;height:100%" />' +
 	                          '</div>' +
 						   '</div>';
-    showMessageBox(content, 600, 350);
+    showMessageBox(content, 450, 350);
+
 
 }
-function viewRechargeKeyDown() {
-    if (event.keyCode == 27) {
-        event.returnValue = false;
-        event.cancel = true;
-        parent.closeWindow();
-    }
-}
+
 
 function viewExpenditure(id, name, dateFrom, dateTo) {
     var content = ' <div class="add_foot" style="height:550px;width:100%">' +
@@ -274,11 +282,19 @@ function viewExpenditure(id, name, dateFrom, dateTo) {
 	                          '<div class="title_right" style="width:8%;float:left" ></div>' +
 	                          '</div>' +
 	                          '<div class="add_foot_Content" style="height:370px;text-align:center;width:99%">' +
-	                              '<iframe src="viewExpenditure.php?id=' + id + '&dateFrom=' + encodeURIComponent(dateFrom) + '&dateTo=' + encodeURIComponent(dateTo) + '" scrolling="no" style="width:100%;height:100%" />' +
+	                              '<iframe src="viewExpenditure.php?id=' + id + '&dateFrom=' + dateFrom + '&dateTo=' + dateTo + '" scrolling="no" style="width:100%;height:100%" />' +
 	                          '</div>' +
 						   '</div>';
     showMessageBox(content, 450, 350);
 
+}
+
+function viewRechargeKeyDown() {
+    if (event.keyCode == 27) {
+        event.returnValue = false;
+        event.cancel = true;
+        parent.closeWindow();
+    }
 }
 function viewExpenditureKeyDown() {
     if (event.keyCode == 27) {

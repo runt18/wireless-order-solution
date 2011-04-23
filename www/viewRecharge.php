@@ -17,22 +17,20 @@ include("hasLogin.php");
 <script type="text/javascript" src="js/common.js"></script>
 <script type="text/javascript" src="js/member.js"></script>
 </head>
-<body style="width:98%;height:100%" onkeydown="viewExpenditureKeyDown()" onload="this.focus()">
+<body style="width:98%;height:100%" onkeydown="viewRechargeKeyDown()" onload="this.focus()">
 <?php
 include("changePassword.php"); 
 ?>
 <?PHP
 include("conn.php");
 mysql_query("SET NAMES utf8"); 
-echo $_REQUEST["id"];
 ?>
 <div id="divContent">
 <div class="Content">        
 <table cellpModifying="0" cellspacing="0" border="0" id="table" class="sortable">
 		<thead>
 			<tr style="height: 25px;">
-				<th>编&nbsp;号</th>
-				<th>账单号</th>
+				<th>编&nbsp;号</th>				
 				<th>日期</th>						
 				<th>金&nbsp;额（￥）</th>			
 			</tr>
@@ -40,20 +38,19 @@ echo $_REQUEST["id"];
 		<tbody>
 <?php 	  		
 include("conn.php"); 		 				
-
 	$id = $_REQUEST["id"];
 	$dateFrom = $_REQUEST["dateFrom"];
 	$dateTo = $_REQUEST["dateTo"];
-	$sql = "SELECT id,order_date,total_price FROM `order` WHERE member_id = $id AND total_price > 0 AND restaurant_id=" . $_SESSION["restaurant_id"];
+	$sql = "SELECT `date`,money FROM `member_charge` WHERE member_id = (SELECT id FROM member WHERE alias_id = $id AND restaurant_id=" . $_SESSION["restaurant_id"].")";
 	if($dateFrom != "")
 	{
-		$sql .= (" AND order_date >='" . $dateFrom . " 0:0:0'");
+		$sql .= (" AND `date` >='" . $dateFrom . " 0:0:0'");
 	}
 	if($dateTo != "")
 	{
-		$sql .= (" AND order_date <='" . $dateTo . " 23:59:59'");
+		$sql .= (" AND `date` <='" . $dateTo . " 23:59:59'");
 	}	
-	//echo "<script>alert('$sql');</script>";
+	
 	$bh=0;
 	$total_price = 0;
 	mysql_query("SET NAMES utf8"); 
@@ -62,12 +59,11 @@ include("conn.php");
 	$rs = $db->GetAll($sql);
 	foreach ($rs as $row){
 		$bh=$bh+1;
-		$total_price += $row["total_price"];
+		$total_money += $row["money"];
 		echo "<tr>";
 		echo "<td>" .$bh ."</td>";
-		echo "<td>" .$row["id"] ."</td>";	
-		echo "<td>" .$row["order_date"] ."</td>";				
-		echo "<td>" .$row["total_price"] ."</td>";					
+		echo "<td>" .$row["date"] ."</td>";				
+		echo "<td>" .$row["money"] ."</td>";					
 		echo "</tr>";
 	}	
 mysql_close($con);
@@ -77,7 +73,7 @@ mysql_close($con);
   </div>
   
 	<div id="controls" style="width:420px;text-align:right;margin: 0px -50px;">      
-        <div id="text" style="font-size:12px;text-align:right"><?php echo "汇总（￥）：" .$total_price ."&nbsp;"; ?></div>
+        <div id="text" style="font-size:12px;text-align:right"><?php echo "汇总（￥）：" .$total_money ."&nbsp;"; ?></div>
 
 		<div id="navigation" style="font-size:12px;text-align:right">
   		      <span id="page-link"> </span>			  
@@ -108,7 +104,6 @@ mysql_close($con);
 	sorter.pagesize = 10;
 	sorter.init("table",0);
   </script>
-
 	</div>
 </body>
 </html>

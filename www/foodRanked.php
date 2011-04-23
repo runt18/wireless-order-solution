@@ -92,7 +92,7 @@ if($ids != null)
 	$sql = "SELECT f.id,d.order_count,f.name,f.unit_price,d.order_count,format(f.unit_price*d.order_count,2) as total_price FROM 
 			food f LEFT JOIN
 			(SELECT a.id,SUM(b.order_count) AS order_count FROM `food` a 
-			INNER JOIN order_food b ON a.alias_id = b.food_id
+			INNER JOIN order_food_history b ON a.alias_id = b.food_id
 			INNER JOIN `order` c ON b.order_id = c.id WHERE a.enabled=1 AND a.restaurant_id=" . $_SESSION["restaurant_id"];
 	if($dateFrom != "")
 	{

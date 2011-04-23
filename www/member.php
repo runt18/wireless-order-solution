@@ -78,10 +78,11 @@ else if($editType == "deleteMember")
 	else if($editType == "recharge")
 		{
 			$id = $_POST["id"];	
-			$money = $_POST["money"];				
-			$sql = "UPDATE member SET balance=balance+$money WHERE id=$id";
+			$money = $_POST["money"];		
+			$sql1 = "INSERT INTO member_charge(member_id,date,money) VALUES($id,NOW(),$money)";	
+			$sql2 = "UPDATE member SET balance=balance+$money WHERE id=$id";
 			
-			if($db->Execute($sql))
+			if($db->Execute($sql1) && $db->Execute($sql2))
 			{			
 				echo "<script>alert('冲值成功！');</script>";
 			}	
@@ -102,6 +103,10 @@ else if($editType == "deleteMember")
 					echo "<script>viewExpenditure('$id','$name','$dateFrom','$dateTo');</script>";
 					//echo "<script>viewExpenditure(&quot;".$id."&quot;,&quot;".$name."&quot;,&quot;".$dateFrom."&quot;,&quot;".$dateTo."&quot;);</script>";
 				}
+				else if($viewType == "recharge")		
+					{
+						echo "<script>viewRecharge('$id','$name','$dateFrom','$dateTo');</script>";
+					}
 			}
 ?>
 <h1>
