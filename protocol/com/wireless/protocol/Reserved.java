@@ -33,4 +33,5 @@ public class Reserved {
 	public static final byte PRINT_RECEIPT = 3;
 	public static final byte PRINT_EXTRA_FOOD = 4;
 	public static final byte PRINT_CANCELLED_FOOD = 5;
+	public static final byte PRINT_HURRY_FOOD = 6;
 }
