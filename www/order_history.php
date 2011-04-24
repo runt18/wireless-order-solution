@@ -21,11 +21,11 @@ include("conn.php");
 $deleteId = $_POST["deleteId"];
 if($deleteId != null)
 {
-	$sql2 = "DELETE FROM order_food WHERE order_id=$deleteId";
+	$sql2 = "DELETE FROM order_food_history WHERE order_id=$deleteId";
 	$db->Execute($sql2);
 	/*$sql3 = "DELETE FROM food WHERE id IN ($ids)";
 	$db->Execute($sql3);*/
-	$sql4 = "DELETE FROM `order` WHERE id=$deleteId";
+	$sql4 = "DELETE FROM `order_history` WHERE id=$deleteId";
 	if($db->Execute($sql4))
 	{
 		echo "<script>alert('删除成功！');</script>";
@@ -40,37 +40,23 @@ if($deleteId != null)
 <?php
 include("changePassword.php"); 
 $editType = $_POST["editType"];
-if($editType == "dailyCheckOut")
+if($editType == "viewStat")
 {	
-	$sql1 = "INSERT INTO `order_history`(`id`, `restaurant_id`,`order_date`, `total_price`, `custom_num`, 
-			`waiter`,`type`, `member_id`, `member`,`terminal_pin`, `terminal_model`, `table_id`)
-			SELECT `id`, `restaurant_id`,`order_date`, `total_price`, `custom_num`, 
-			`waiter`,`type`, `member_id`, `member`,`terminal_pin`, `terminal_model`, `table_id` FROM `order` WHERE total_price <> -1";
-	$sql2 = "INSERT INTO `order_food_history`(`id`,`order_id`, `food_id`, `order_date`, `order_count`, 
-			`unit_price`,`name`, `taste`,`taste_price`,`taste_id`,`discount`,`kitchen`,`comment`,`waiter`)
-			SELECT `id`,`order_id`, `food_id`, `order_date`, `order_count`, 
-			`unit_price`,`name`, `taste`,`taste_price`,`taste_id`,`discount`,`kitchen`,`comment`,`waiter`
-			FROM `order_food` WHERE `order_food`.`order_id` IN (SELECT id FROM `order` WHERE total_price <> -1)";
-	$sql3 = "DELETE FROM `order_food` WHERE `order_id` IN (SELECT id FROM `order` WHERE total_price <> -1)";
-	$sql4 = "DELETE FROM `order` WHERE total_price <> -1";
-	$db->Execute($sql2);	
-	if($db->Execute($sql1) && $db->Execute($sql2) && $db->Execute($sql3) && $db->Execute($sql4))
-	{
-		echo "<script>alert('日结成功！');</script>";
-	}	
-	else{
-		echo "<script>alert('日结失败！');</script>";
-	}
+	$statType = $_POST["statType"];	
+	$dateFrom = $_POST["dateFrom"];
+	$dateTo = $_POST["dateTo"];
+	echo "<script>showOrderStat('$statType','$dateFrom','$dateTo');</script>";				
 }    
 ?>
 <h1>
-<span class="action-span"><a href="#" onclick="showSearch('order.php');">高级搜索</a></span>
-<span class="action-span"><a href="#" onclick="dailyCheckOut();">营业日结</a></span>
-<span class="action-span1">e点通会员中心</span><span id="search_id" class="action-span2">&nbsp;- 当日帐单(<?php echo date("Y-m-d");?>)</span>
+<span class="action-span"><a href="#" onclick="showSearch('order_history.php');">高级搜索</a></span>
+<span class="action-span"><a href="#" onclick="viewOrderStat('daily');">日结汇总</a></span>
+<span class="action-span"><a href="#" onclick="viewOrderStat('monthly');">月结汇总</a></span>
+<span class="action-span1">e点通会员中心</span><span id="search_id" class="action-span2">&nbsp;- 帐单管理 </span>
 <div style="clear:both"></div>
 </h1>
 <div class="form-div">
-  <form name="form1" action="order.php" method="get">
+  <form name="form1" action="order_history.php" method="get">
     <!-- 搜索条件 -->
     <div class="font" style="color:#2a7d8d;font-size:15px;font-weight:bold;text-align:right;">过滤：</div>
     <select id="keyword_type" name="keyword_type" onchange="showHideCondition(this)">
@@ -126,7 +112,7 @@ $alias_id = $_POST["alias_id"];
 $type1 = $_POST["type"];  
 /*session_start(); */
 $where = "";
-$sql = "SELECT * FROM order_view WHERE is_paid <> 0 AND restaurant_id=" . $_SESSION["restaurant_id"];
+$sql = "SELECT * FROM order_history_view WHERE is_paid <> 0 AND restaurant_id=" . $_SESSION["restaurant_id"];
 if($dateFrom != null && $dateFrom !="")
 {
 	$sql .= " AND order_date >='" . $dateFrom . " 0:0:0'";
@@ -214,7 +200,7 @@ foreach ($rs as $row){
 	echo "<td>" .$row["total_price"]."</td>";
 	echo "<td><a href='#' onclick='showOrderDetail(&quot;".$row["id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["order_date"]."&quot;,&quot;".$row["total_price"].
 		"&quot;,&quot;".$row["num"]."&quot;,&quot;".$row["foods"]."&quot;,&quot;".$row["is_paid"]."&quot;,&quot;".$row["waiter"]."&quot;,&quot;".$row["type_name"]."&quot;)'>
-			<img src='images/View.png'  height='16' width='14' border='0'/>&nbsp;查看</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href='#' onclick='deleteOrder(&quot;".$row["id"]."&quot;,&quot;order.php&quot;)'>
+			<img src='images/View.png'  height='16' width='14' border='0'/>&nbsp;查看</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href='#' onclick='deleteOrderHistory(&quot;".$row["id"]."&quot;,&quot;order_history.php&quot;)'>
 			<img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;删除</a></td>";
 	echo "</tr>";
 }

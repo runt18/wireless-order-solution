@@ -47,7 +47,7 @@ else
 	} 
 	else
 	{
-		echo '账号或密码错误,';	
+		echo '帐号或密码错误,';	
 		echo '<a href="login.php">请重新登录!</a>';
 	}
 

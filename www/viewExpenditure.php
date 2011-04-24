@@ -31,7 +31,7 @@ mysql_query("SET NAMES utf8");
 		<thead>
 			<tr style="height: 25px;">
 				<th>编&nbsp;号</th>
-				<th>账单号</th>
+				<th>帐单号</th>
 				<th>日期</th>						
 				<th>金&nbsp;额（￥）</th>			
 			</tr>
@@ -42,7 +42,7 @@ include("conn.php");
 	$id = $_REQUEST["id"];
 	$dateFrom = $_REQUEST["dateFrom"];
 	$dateTo = $_REQUEST["dateTo"];
-	$sql = "SELECT id,order_date,total_price FROM `order` WHERE member_id = $id AND total_price > 0 AND restaurant_id=" . $_SESSION["restaurant_id"];
+	$sql = "SELECT id,order_date,total_price FROM `order_history` WHERE member_id = $id AND total_price > 0 AND restaurant_id=" . $_SESSION["restaurant_id"];
 	if($dateFrom != "")
 	{
 		$sql .= (" AND order_date >='" . $dateFrom . " 0:0:0'");

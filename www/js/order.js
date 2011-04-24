@@ -1,28 +1,15 @@
 
-function showSearch() {
-
-    //    var title = '<div class="title">' +
-    //                    '<div class="title_left"><font class="font">高级搜索</font></div>' +
-    //                    '<div class="title_right"></div>' +
-    //                '</div>';
-    //    var content = '<div class="Advanced_Search_Content">' +
-    //                    '<div class="Content">' +
-    //                        '<div class="Content1">日期：<input type="text" name="keyword" size="20" height="20"/>&nbsp;<img src="images/data.png" />&nbsp;&nbsp;至&nbsp;&nbsp;<input type="text" name="keyword" size="20" height="20"/>&nbsp;<img src="images/data.png" /></div>' +
-    //                        '<div class="Content1">价格：<input type="text" name="keyword" size="20" height="20"/>&nbsp;<img src="images/data.png" />&nbsp;&nbsp;至&nbsp;&nbsp;<input type="text" name="keyword" size="20" height="20"/>&nbsp;<img src="images/data.png" /></div>' +
-    //                        '<div class="Content2">台号：<input type="text" name="keyword" size="10" height="20"/></div>' +
-    //                    '</div>' +
-    //                    '<span class="action-span1"><a href="#">取&nbsp;&nbsp;&nbsp;&nbsp;消</a></span>' +
-    //                    '<span class="action-span"><a href="#">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>' +
-    //                '</div>';
+function showSearch(target) {
     var content = '<div id="Advanced_Search">' +
                     '<div class="title">' +
                         '<div class="title_left" style="width: 451px;"><font class="font">高级搜索</font></div>' +
                         '<div class="title_right" style="float:left"></div>' +
                     '</div>' +
-                     '<form id="searchForm" name="searchForm" action="order.php"  method="post" onkeydown="searchOrderKeyDown()">' +
-                    '<div class="Advanced_Search_Content" style="width:480px;">' +
+                     '<form id="searchForm" name="searchForm" action="' + target +'"  method="post" onkeydown="searchOrderKeyDown()">' +
+                    '<div class="Advanced_Search_Content" style="width:480px;height:180px">' +
                         '<div class="pop_Content">' +
                             '<div class="pop_Content1">日期：<input type="text" id="dateFrom" name="dateFrom" style="width:136px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;&nbsp;至&nbsp;&nbsp;<input type="text" id="dateTo" name="dateTo" style="width:136px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;</div>' +
+                            '<div class="pop_Content2">结帐方式：<select id="type" name="type"><option value="" selected="selected">全部</option><option value="1">现金</option><option value="2">刷卡</option>	<option value="3">会员卡</option><option value="4">挂账</option><option value="5">签单</option></select></div>' +
                             '<div class="pop_Content1">金额：<input type="text" name="priceFrom" style="width:136px" onkeypress="return event.keyCode>=48&&event.keyCode<=57" />&nbsp;&nbsp;至&nbsp;&nbsp;<input type="text" name="priceTo" style="width:136px" onkeypress="return event.keyCode>=48&&event.keyCode<=57" /></div>' +
                             '<div class="pop_Content2">台号：<input type="text" name="alias_id" size="10" height="20" onkeypress="return event.keyCode>=48&&event.keyCode<=57" /></div>' +
                         '</div>' +
@@ -33,9 +20,6 @@ function showSearch() {
                 '</div>';
     showMessageBox(content, 540, 188);
     document.getElementById("dateFrom").focus();
-    //    window.addEvent('domready', function() {
-    //        myCal1 = new Calendar({ dateFrom: 'd/m/Y' }, { direction: 1, tweak: { x: 6, y: 0} });
-    //    });
 }
 
 
@@ -51,7 +35,7 @@ function searchOrderKeyDown() {
         closeWindow();
     }
 }
-function showOrderDetail(id, alias, date, totalPrice, count, foods, isPaid,owner_name) {
+function showOrderDetail(id, alias, date, totalPrice, count, foods, isPaid,owner_name,type_name) {
     var f = "";
     var fs = foods.split(",");
     for (var i = 0; i < fs.length; i++) {
@@ -77,6 +61,7 @@ function showOrderDetail(id, alias, date, totalPrice, count, foods, isPaid,owner
 		                  '<div class="pop_Content3">帐单号：' + id + '</div>' +
 						  '<div class="pop_Content3">&nbsp;&nbsp;&nbsp;台号：' + alias + '</div>' +
 						  '<div class="pop_Content3">&nbsp;&nbsp;&nbsp;日期：' + date + '</div>' +
+						  '<div class="pop_Content3">&nbsp;&nbsp;&nbsp;结帐方式：' + type_name + '</div>' +
 						  '<div class="pop_Content3">&nbsp;&nbsp;&nbsp;人数：' + count + '</div>' +
 		                  '<div class="pop_Content3">服务员：' +  owner_name + '</div>' +
 		                  '<div class="pop_Content3">&nbsp;&nbsp;&nbsp;状态：' +  isPaidStr + '</div>' +
@@ -98,10 +83,10 @@ function showOrderDetail(id, alias, date, totalPrice, count, foods, isPaid,owner
     showMessageBox(content, 342, 350);
 }
 
-function deleteOrder(id) {
+function deleteOrder(id,target) {
     if (confirm("确认删除" + id + "号帐单的信息？")) {
         var formDelete = document.createElement("form");
-        formDelete.action = "order.php";
+        formDelete.action = target;
         formDelete.method = "post";
         var deleteId = document.createElement("input");
         deleteId.name = "deleteId";
@@ -111,44 +96,57 @@ function deleteOrder(id) {
         document.body.appendChild(formDelete);
         formDelete.submit();
     }
-
 }
 
+function dailyCheckOut(id) {
+    if (confirm("确认要进行日结操作？")) {
+        var formDelete = document.createElement("form");
+        formDelete.action = "order.php";
+        formDelete.method = "post";       
+        var editType = document.createElement("input");
+        editType.name = "editType";
+        editType.value = "dailyCheckOut";
+        editType.type = "hidden";
+        formDelete.appendChild(editType);
+        document.body.appendChild(formDelete);
+        formDelete.submit();
+    }
+}
+
+
 function showHideCondition(select) {
-    //    alert(select);
+    document.getElementById("condition_type").style.display = "none";
+    document.getElementById("type").style.display = "none";
+    document.getElementById("keyword").style.display = "inline";
+    var keyword = document.getElementById("keyword");
+    keyword.value = "";
+    keyword.onclick = null;
+    keyword.value = "";
     var option = select.options[select.selectedIndex];
     if (option.value == "is_Price" || option.value == "is_day") {
         document.getElementById("condition_type").style.display = "inline";
+    }           
+    if (option.value == "is_day") {
+        keyword.onclick = showCal;
     }
-    else {
-        document.getElementById("condition_type").style.display = "none";
-    }
-    var obj = document.getElementById("keyword");
-    obj.value = "";
-    obj.onclick = null;
-//    obj.onblur = null;
-    if (option.value == "is_day") {       
-        obj.onclick = showCal;
-//        obj.onblur = hidCal;
+    if (option.value == "is_type") {
+        document.getElementById("type").style.display = "inline";
+        document.getElementById("keyword").style.display = "none";
     }   
 }
 function showCal() {
     ShowCalendar('keyword');
 }
-//function hidCal() {
-//    if(document.all.Calendar)
-//    {
-//        document.all.Calendar.style.visibility='hidden';
-//    }
-//}
 
 function ininOriginal() {
     var keyword_type = document.getElementById("keyword_type");
-    var condition_type = document.getElementById("condition_type");
-    var keyword = document.getElementById("keyword");
     var keyword_type_value = document.getElementById("keyword_type_value").value;
-    var condition_type_value = document.getElementById("condition_type_value").value;
+    var keyword = document.getElementById("keyword");
     var keyword_value = document.getElementById("keyword_value").value;
+    var condition_type = document.getElementById("condition_type");
+    var condition_type_value = document.getElementById("condition_type_value").value;
+    var type = document.getElementById("type");
+    var type_value = document.getElementById("type_value");
     for (var i = 0; i < keyword_type.options.length; i++) {
         if (keyword_type.options[i].value == keyword_type_value) {
             keyword_type.options[i].selected = true;
@@ -161,13 +159,22 @@ function ininOriginal() {
             break;
         }
     }
+    for (var i = 0; i < type.options.length; i++) {
+        if (type.options[i].value == type_value) {
+            type.options[i].selected = true;
+            break;
+        }
+    }
     keyword.value = keyword_value;
     if (keyword_type_value == "is_Price" || keyword_type_value == "is_day") {
         document.getElementById("condition_type").style.display = "inline";
     }
-    if (keyword_type_value == "is_day") {
-        //        obj.setAttribute("onclick", "javascript:ShowCalendar('keyword')");
+    if (keyword_type_value == "is_day") {        
         keyword.onclick = showCal;
+    }
+    if (keyword_type_value == "is_type") {
+        document.getElementById("type").style.display = "inline";
+        document.getElementById("keyword").style.display = "none";
     }
 }
 
@@ -183,8 +190,31 @@ function formatNum(num) {
 
     return num;
 }
+function viewOrderStat(statType) {
+    var editType = "viewStat";
+    var content = ' <div class="add_foot">' +
+                        '<div class="title">' +
+	                        '<div class="title_left"><font class="font" style="width:350px;">日结/月结汇总 - 请选择日期区间</font></div>' +
+	                        '<div class="title_right"></div>' +
+	                    '</div>' +
+	                    '<form id="searchForm" name="searchForm" action="order_history.php"  method="post" onkeydown="searchOrderKeyDown()">' +
+	                      '<input type="hidden" name="editType" value="' + editType + '" />' +
+	                      '<input type="hidden" name="statType" value="' + statType + '" />' +
+	                      '<div class="add_foot_Content" style="height:130px;text-align:center">' +
+	                        '<div class="pop_Content">' +	                          
+	                           '<div class="pop_Content1" style="padding-left:0px;text-align:center">日期：<input type="text" id="dateFrom" name="dateFrom" style="width:100px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;&nbsp;至&nbsp;&nbsp;<input type="text" id="dateTo" name="dateTo" style="width:100px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;</div>' +
+	                        '</div>' +
+	                            '<span class="pop_action-span"><a href="#" onclick="document.searchForm.submit();">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>' +
+	                            '<span class="pop_action-span1"><a href="#" onclick="closeWindow()">取&nbsp;&nbsp;&nbsp;&nbsp;消</a></span>' +
+	                      '</div>' +
+	                      '</form>' +
+	                '</div>';
 
-function showOrderStat(statType)
+    showMessageBox(content, 342, 350);
+    document.getElementById("dateFrom").focus();
+}
+
+function showOrderStat(statType,dateFrom,dateTo)
 {
     var title = "";
     if(statType == "daily")
@@ -195,16 +225,17 @@ function showOrderStat(statType)
     {
         title = "月结汇总";
     }
-     var content = ' <div class="add_foot" style="height:450px">' +
-                        '<div class="title">' +
-	                        '<div class="title_left"><font id="dynamicTitle" style="font-size: 16px;font-weight: normal;color: #FFF;margin-left: 15px;line-height: 30px;text-align: left;" >' + title + '</font></div>' +	                       
-	                        '<div class="title_right"></div>' +
-	                    '</div>' +	               
-	                      '<div class="add_foot_Content" style="height:370px;text-align:center;">' + 	                        
-	                            '<iframe src="orderStat.php?StatType=' + statType +'" scrolling="no" style="width:100%;height:100%" />' +	                           
+    title += "（" + dateFrom + "～" + dateTo + "）";
+    var content = ' <div class="add_foot" style="height:550px;width:100%">' +
+                        '<div class="title" style="width:100%">' +
+	                        '<div class="title_left" style="width:95%"><font id="dynamicTitle" style="font-size: 16px;font-weight: normal;color: #FFF;margin-left: 15px;line-height: 30px;text-align: left;" >' + title + '</font></div>' +
+	                        '<div class="title_right"  style="width:4%;float:left"></div>' +
+	                    '</div>' +
+	                      '<div class="add_foot_Content" style="height:370px;text-align:center;width:99%">' + 	                        
+	                            '<iframe src="orderStat.php?StatType=' + statType + '&dateFrom=' + dateFrom + '&dateTo=' + dateTo + '" scrolling="no" style="width:100%;height:100%" />' +	                           
 	                        '</div>' +	                      
 	                '</div>';
-	showMessageBox(content, 350, 350);
+	showMessageBox(content, 850, 350);
 }
 
 function orderStatKeyDown() {   

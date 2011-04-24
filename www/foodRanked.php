@@ -70,7 +70,8 @@ if($ids == null)
 	</form>
 </div>
 <div id="divContent" style="display:none">
-<div class="Content">        
+<!--startprint1-->    
+<div class="Content">    
 <table cellpModifying="0" cellspacing="0" border="0" id="table" class="sortable">
 		<thead>
 			<tr style="height: 25px;">
@@ -93,7 +94,7 @@ if($ids != null)
 			food f LEFT JOIN
 			(SELECT a.id,SUM(b.order_count) AS order_count FROM `food` a 
 			INNER JOIN order_food_history b ON a.alias_id = b.food_id
-			INNER JOIN `order` c ON b.order_id = c.id WHERE a.enabled=1 AND a.restaurant_id=" . $_SESSION["restaurant_id"];
+			INNER JOIN `order_history` c ON b.order_id = c.id WHERE a.enabled=1 AND a.restaurant_id=" . $_SESSION["restaurant_id"];
 	if($dateFrom != "")
 	{
 		$sql .= (" AND c.order_date >='" . $dateFrom . " 0:0:0'");
@@ -130,7 +131,7 @@ mysql_close($con);
 	</tbody>
   </table>
   </div>
-  
+  <!--endprint1-->
 	<div id="controls" style="width:420px;text-align:right;margin: 0px -20px;">      
         <div id="text" style="font-size:12px;text-align:right"><?php echo "总计" .$bh ."&nbsp;条记录"; ?></div>
 

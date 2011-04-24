@@ -1160,6 +1160,10 @@
     {
     "ProjRelPath" = "T"
     }
+    "order_history.php"
+    {
+    "ProjRelPath" = "T"
+    }
 }
 "ProjStartupServices"
 {

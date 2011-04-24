@@ -123,7 +123,6 @@ function deleteMember(id) {
         document.body.appendChild(formDelete);
         formDelete.submit();
     }
-
 }
 
 function showHideCondition(select) {

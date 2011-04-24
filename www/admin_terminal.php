@@ -187,7 +187,7 @@ else if($editType == "deleteTerminal")
 		echo "<script>alert('删除成功！');</script>";
 	}	
 	else{
-		echo "<script>alert('还存在依赖的账单数据，暂时不能删除这台终端！');</script>";
+		echo "<script>alert('还存在依赖的帐单数据，暂时不能删除这台终端！');</script>";
 	}
 }
 $db->Execute("UPDATE terminal t SET idle_duration = idle_duration + datediff(date(now()),date(idle_date))*3600*24+time_to_sec(timediff(time(now()),time(idle_date))),
