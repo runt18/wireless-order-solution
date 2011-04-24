@@ -8,16 +8,15 @@
 #include <WinSpool.h>
 #include <boost/shared_ptr.hpp>
 
-PrinterInstance::PrinterInstance() : name(""), m_hPrintThread(NULL), pPrintReport(NULL), style(PRINT_STYLE_UNKNOWN), kitchen(Kitchen::KITCHEN_NULL){
+PrinterInstance::PrinterInstance() : name(""), m_hPrintThread(NULL), pPrintReport(NULL), style(PRINT_STYLE_UNKNOWN), kitchen4Detail(Kitchen::KITCHEN_NULL){
 	hPrintEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 	hEndPrintEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 	InitializeCriticalSection(&m_csJobQueue);
 }
 
-PrinterInstance::PrinterInstance(const char* pName, int iFunc, int iStyle, int iKitchen, IPReport* pReport){
+PrinterInstance::PrinterInstance(const char* pName, int iFunc, int iStyle, IPReport* pReport){
 	name = pName;
 	style = iStyle;
-	kitchen = iKitchen;
 	funcs.push_back(iFunc);
 	m_hPrintThread = NULL;
 	pPrintReport = pReport;
@@ -29,7 +28,10 @@ PrinterInstance::PrinterInstance(const char* pName, int iFunc, int iStyle, int i
 PrinterInstance::PrinterInstance(const PrinterInstance &right){
 	name = right.name;
 	style = right.style;
-	kitchen = right.kitchen;
+	kitchen4Detail = right.kitchen4Detail;
+	kitchen4Extra = right.kitchen4Extra;
+	kitchen4Cancelled = right.kitchen4Cancelled;
+	kitchen4Hurry = right.kitchen4Hurry;
 	funcs.clear();
 	vector<int>::const_iterator iter = right.funcs.begin();
 	for(iter; iter != right.funcs.end(); iter++){
@@ -44,7 +46,10 @@ PrinterInstance::PrinterInstance(const PrinterInstance &right){
 PrinterInstance& PrinterInstance::operator =(const PrinterInstance &right){
 	name = right.name;
 	style = right.style;
-	kitchen = right.kitchen;
+	kitchen4Detail = right.kitchen4Detail;
+	kitchen4Extra = right.kitchen4Extra;
+	kitchen4Cancelled = right.kitchen4Cancelled;
+	kitchen4Hurry = right.kitchen4Hurry;
 	funcs.clear();
 	vector<int>::const_iterator iter = right.funcs.begin();
 	for(iter; iter != right.funcs.end(); iter++){
@@ -232,54 +237,119 @@ void PrinterInstance::addJob(const char* buf, int len, int iFunc){
 		}else{
 			offset = offset + length + 3;
 		}
-	}	
+	}
 
+	vector<string> details; 
+	//in the case of printing order detail, need to filter the order details matched the printer instance's kitchen
+	//offset = 0;
+	//if(!print_content.empty() && iFunc == Reserved::PRINT_ORDER_DETAIL){
+	//	int size = print_content.size();
+	//	while(offset < (int)print_content.size()){
+	//		int length = (print_content[offset + 1] & 0x000000FF) | ((print_content[offset + 2] & 0x000000FF) << 8);
+	//		//check to see whether the kitchen between print request and printer instance is matched 
+	//		if(print_content[offset] == kitchen4Detail){
+	//			offset += 3;
+	//			details.push_back(string(print_content.begin() + offset, print_content.begin() + offset + length));
+	//			offset += length;
+	//		}else{
+	//			offset += 3 + length;
+	//		}
+	//	}
+	//}
+	
+	if(iFunc == Reserved::PRINT_ORDER_DETAIL){
+		split2Details(print_content, kitchen4Detail, details);
+
+	}else if(iFunc == Reserved::PRINT_EXTRA_FOOD){
+		split2Details(print_content, kitchen4Extra, details);
+
+	}else if(iFunc == Reserved::PRINT_CANCELLED_FOOD){
+		split2Details(print_content, kitchen4Cancelled, details);
+
+	}else if(iFunc == Reserved::PRINT_HURRY_FOOD){
+		split2Details(print_content, kitchen4Hurry, details);
+
+	}else{
+		if(!print_content.empty()){
+			details.push_back(print_content);
+		}
+	}
+
+
+	EnterCriticalSection(&m_csJobQueue);
+
+	if(!details.empty()){
+		//add all order detail jobs to the queue
+		vector<string>::iterator iter = details.begin();
+		for(iter; iter != details.end(); iter++){
+			jobQueue.push(PrintJob(iFunc, *iter));
+		}
+		//notify the print thread to run
+		SetEvent(hPrintEvent);
+	}
+
+	//if(iFunc == Reserved::PRINT_ORDER_DETAIL && !details.empty()){
+	//	//add all order detail jobs to the queue
+	//	vector<string>::iterator iter = details.begin();
+	//	for(iter; iter != details.end(); iter++){
+	//		jobQueue.push(PrintJob(iFunc, *iter));
+	//	}
+	//	//notify the print thread to run
+	//	SetEvent(hPrintEvent);
+
+	//}else if(iFunc != Reserved::PRINT_ORDER_DETAIL && !print_content.empty()){
+	//	//add the print job containing both function code and print content to the job queue
+	//	jobQueue.push(PrintJob(iFunc, print_content));
+	//	//notify the print thread to run
+	//	SetEvent(hPrintEvent);
+	//}
+
+	LeaveCriticalSection(&m_csJobQueue);
+}
+
+/*******************************************************************************
+* Function Name  : split2Details
+* Description    : Split the print content into several details.
+* Input          : print_content - the content to be split
+			       kitchen - the kitchen determining whether the detail to be print
+* Output         : details - the vector holding the results
+* Return         : None
+*******************************************************************************/
+void PrinterInstance::split2Details(const string& print_content, int kitchen, vector<string>& details){
 	/************************************************************************
-	* The print content looks like below in the case of printing order detail 
-	* <order_detail_1> : <order_detail_2> : ...
-	* Each order detail looks like below.
+	* The print content looks like below in the case the content to print is as below
+	* 1 - order detail
+	* 2 - extra order
+	* 3 - canceled order
+	* 4 - hurried order
+	* <detail_1> : <detail_2> : ... : <detail_x>
+	* Each detail looks like below.
 	* kitchen : len[2] : content
 	* kitchen - 1-byte indicating the kitchen no
 	* len[2] - 2-byte indicating the length of detail content
 	* content - the order detail content                                                          
 	************************************************************************/
-	offset = 0;
-	vector<string> order_details; 
-	//in the case of printing order detail, need to filter the order details matched the printer instance's kitchen
-	if(!print_content.empty() && iFunc == Reserved::PRINT_ORDER_DETAIL){
+	details.clear();
+	if(!print_content.empty()){
+		int offset = 0;
+		vector<string> details; 
 		int size = print_content.size();
 		while(offset < (int)print_content.size()){
 			int length = (print_content[offset + 1] & 0x000000FF) | ((print_content[offset + 2] & 0x000000FF) << 8);
-			//check to see whether the kitchen between print request and printer instance is matched 
-			if(print_content[offset] == kitchen){
+			/************************************************************************
+			* Either of two cases below means kitchen between print request and printer instance is matched     
+			* 1 - the kitchen equals to Kitchen.KITCHEN_FULL
+			* 2 - the kitchen equals to print request
+			************************************************************************/
+			if(kitchen == Kitchen::KITCHEN_FULL || print_content[offset] == kitchen){
 				offset += 3;
-				order_details.push_back(string(print_content.begin() + offset, print_content.begin() + offset + length));
+				details.push_back(string(print_content.begin() + offset, print_content.begin() + offset + length));
 				offset += length;
 			}else{
 				offset += 3 + length;
 			}
 		}
 	}
-
-	EnterCriticalSection(&m_csJobQueue);
-
-	if(iFunc == Reserved::PRINT_ORDER_DETAIL && !order_details.empty()){
-		//add all order detail jobs to the queue
-		vector<string>::iterator iter = order_details.begin();
-		for(iter; iter != order_details.end(); iter++){
-			jobQueue.push(PrintJob(iFunc, *iter));
-		}
-		//notify the print thread to run
-		SetEvent(hPrintEvent);
-
-	}else if(iFunc != Reserved::PRINT_ORDER_DETAIL && !print_content.empty()){
-		//add the print job containing both function code and print content to the job queue
-		jobQueue.push(PrintJob(iFunc, print_content));
-		//notify the print thread to run
-		SetEvent(hPrintEvent);
-	}
-
-	LeaveCriticalSection(&m_csJobQueue);
 }
 
 /*******************************************************************************

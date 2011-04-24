@@ -100,11 +100,6 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 		//get the printer style
 		int style = PRINT_STYLE_UNKNOWN;
 		pPrinter->QueryIntAttribute(ConfTags::PRINT_STYLE, &style);
-		//get the kitchen if the function is to print order detail
-		int kitchen = Kitchen::KITCHEN_NULL;
-		if(func == Reserved::PRINT_ORDER_DETAIL){
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN, &kitchen);
-		}
 
 		vector< boost::shared_ptr<PrinterInstance> >::iterator it = g_PrintInstances.begin();
 		for(it; it != g_PrintInstances.end(); it++){
@@ -113,9 +108,27 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 			}				
 		}
 
+		int kitchen = Kitchen::KITCHEN_NULL;
 		if(it == g_PrintInstances.end()){
 			//create the printer instance and put it to the vector if not be found in the exist printer instances
-			boost::shared_ptr<PrinterInstance> pPI(new PrinterInstance(name.c_str(), func, style, kitchen, pReport));
+			boost::shared_ptr<PrinterInstance> pPI(new PrinterInstance(name.c_str(), func, style, pReport));
+			//set the kitchen according to the function
+			if(func == Reserved::PRINT_ORDER_DETAIL){
+				pPrinter->QueryIntAttribute(ConfTags::KITCHEN, &kitchen);
+				pPI->kitchen4Detail = kitchen;
+
+			}else if(func == Reserved::PRINT_EXTRA_FOOD){
+				pPrinter->QueryIntAttribute(ConfTags::KITCHEN, &kitchen);
+				pPI->kitchen4Extra = kitchen;
+
+			}else if(func == Reserved::PRINT_CANCELLED_FOOD){
+				pPrinter->QueryIntAttribute(ConfTags::KITCHEN, &kitchen);
+				pPI->kitchen4Cancelled = kitchen;
+
+			}else if(func == Reserved::PRINT_HURRY_FOOD){
+				pPrinter->QueryIntAttribute(ConfTags::KITCHEN, &kitchen);
+				pPI->kitchen4Hurry = kitchen;
+			}
 			g_PrintInstances.push_back(pPI);
 
 		}else{
@@ -123,7 +136,20 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 			(*it)->addFunc(func);
 			//set the kitchen if the function is to print order detail
 			if(func == Reserved::PRINT_ORDER_DETAIL){
-				(*it)->kitchen = kitchen;
+				pPrinter->QueryIntAttribute(ConfTags::KITCHEN, &kitchen);
+				(*it)->kitchen4Detail = kitchen;
+
+			}else if(func == Reserved::PRINT_EXTRA_FOOD){
+				pPrinter->QueryIntAttribute(ConfTags::KITCHEN, &kitchen);
+				(*it)->kitchen4Extra = kitchen;
+
+			}else if(func == Reserved::PRINT_CANCELLED_FOOD){
+				pPrinter->QueryIntAttribute(ConfTags::KITCHEN, &kitchen);
+				(*it)->kitchen4Cancelled = kitchen;
+
+			}else if(func == Reserved::PRINT_HURRY_FOOD){
+				pPrinter->QueryIntAttribute(ConfTags::KITCHEN, &kitchen);
+				(*it)->kitchen4Hurry = kitchen;
 			}
 		}
 	}
@@ -174,6 +200,15 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 									(*iter)->addJob(printReq.body, len, *it);
 
 								}else if((*it) == Reserved::PRINT_RECEIPT && (printReq.header.reserved == Reserved::PRINT_RECEIPT)){
+									(*iter)->addJob(printReq.body, len, *it);
+
+								}else if((*it) == Reserved::PRINT_EXTRA_FOOD && (printReq.header.reserved == Reserved::PRINT_EXTRA_FOOD)){
+									(*iter)->addJob(printReq.body, len, *it);
+
+								}else if((*it) == Reserved::PRINT_CANCELLED_FOOD && (printReq.header.reserved == Reserved::PRINT_CANCELLED_FOOD)){
+									(*iter)->addJob(printReq.body, len, *it);
+
+								}else if((*it) == Reserved::PRINT_HURRY_FOOD && (printReq.header.reserved == Reserved::PRINT_HURRY_FOOD)){
 									(*iter)->addJob(printReq.body, len, *it);
 								}
 							}

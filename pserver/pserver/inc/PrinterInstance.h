@@ -31,7 +31,7 @@ class PrinterInstance
 {
 public:
 	PrinterInstance();
-	PrinterInstance(const char* pName, int iFunc, int iStyle, int iKitchen, IPReport* pReport);
+	PrinterInstance(const char* pName, int iFunc, int iStyle, IPReport* pReport);
 	PrinterInstance(const PrinterInstance& right);
 	PrinterInstance& operator=(const PrinterInstance& right);
 	~PrinterInstance(void);
@@ -45,8 +45,14 @@ public:
 	string name;
 	//the functions supported by the printer
 	vector<int> funcs;
-	//the kitchen that the printer belong to
-	int kitchen;
+	//the kitchen for the function to print order detail
+	int kitchen4Detail;
+	//the kitchen for the function to print extra order
+	int kitchen4Extra;
+	//the kitchen for the function to print canceled order
+	int kitchen4Cancelled;
+	//the kitchen for the function to print hurry order
+	int kitchen4Hurry;
 	//the print content are put to this queue,
 	//so as to be scheduled to print
 	queue<PrintJob> jobQueue;
@@ -63,6 +69,7 @@ public:
 
 private:
 	int style;
+	void split2Details(const string& printContent, int kitchen, vector<string>& details);
 
 };
 
