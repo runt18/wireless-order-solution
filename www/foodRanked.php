@@ -21,7 +21,7 @@ function submitSearch() {
 	document.getElementById("searchForm").submit();
 }
 </script>
-</head>
+</head> 
 <body style="width:98%;height:100%" onkeydown="foodRankedKeyDown()" onload="this.focus()">
 <?php
 include("changePassword.php"); 
@@ -167,7 +167,8 @@ mysql_close($con);
 <?php
 if($ids != null)
 {
-	echo "document.getElementById('divSearch').style.display='none';document.getElementById('divContent').style.display = 'block'";
+	echo "document.getElementById('divSearch').style.display='none';document.getElementById('divContent').style.display = 'block';";
+	echo "parent.document.getElementById('titleName').innerText = '点菜统计(".$dateFrom."~".$dateTo.")';";
 }
 	?>
   </script>

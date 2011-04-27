@@ -127,7 +127,7 @@ if($deleteId != null && $deleteId != "")
 	$sql = "SELECT od.id,t.alias_id,od.order_date,total_price,num,foods,is_paid,waiter FROM `table` t LEFT OUTER JOIN 
 
 (SELECT MAX(id) AS OrderId,table_id ".
-		" FROM `order` GROUP BY `order`.table_id) AS o ON t.id = o.table_id".
+		" FROM `order` GROUP BY `order`.table_id) AS o ON t.alias_id = o.table_id".
 		" LEFT OUTER JOIN `order_view` od ON o.OrderId = od.id WHERE t.enabled=1 AND t.restaurant_id=" . $_SESSION["restaurant_id"] ;
 	/*echo $sql;*/
 	$rs = $db->Execute($sql);
@@ -145,7 +145,7 @@ if($deleteId != null && $deleteId != "")
 		$is_paid = $row["is_paid"];
 		$on = "";
 		
-		if($is_paid == null || $is_paid != 0)	
+		if($is_paid == null || $is_paid == 1)	
 		{
 			$action = ' onclick="showMenu(&quot;' .$row["alias_id"].'&quot;)"';
 			$isPaidNum++;			

@@ -167,7 +167,7 @@ if($deleteId != null)
 }
 ?>
 <h1>
-<span class="action-span"><a href="#" onclick="editFood('','','','','0')">添加新菜</a></span><span class="action-span"><a href="#" onclick="showFoodRanked()">点菜排名</a></span>
+<span class="action-span"><a href="#" onclick="editFood('','','','','0')">添加新菜</a></span><span class="action-span"><a href="#" onclick="showFoodRanked()">点菜统计</a></span>
 <span class="action-span1">e点通会员中心</span><span id="search_id" class="action-span2">&nbsp;- 菜单管理 </span>
 <div style="clear:both"></div>
 </h1>
@@ -177,9 +177,17 @@ if($deleteId != null)
     <div class="font" style="color:#2a7d8d;font-size:15px;font-weight:bold;text-align:right;">过滤：</div>
     <select id="keyword_type" name="keyword_type"  onchange="showHideCondition(this)"><option value="0">全部</option><option value="is_no">编号</option><option value="is_name">名称</option><option value="is_Price">价格</option><option value="is_kitchen">厨房</option></select>
 	<select id="condition_type" name="condition_type" style="display:none"><option value="Equal">等于</option><option value="EqualOrGrater" selected="selected">大于等于</option><option value="EqualOrLess">小于等于</option></select>
-	<select id="kitchen" name="kitchen" style="display:none;width:150px;"><option value="0" selected="selected">厨房1</option><option value="1">厨房2</option>'+
-	                            ' <option value="2">厨房3</option><option value="3">厨房4</option><option value="4">厨房5</option><option value="5">厨房6</option><option value="6">厨房7</option>'+
-	                            ' <option value="7">厨房8</option><option value="8">厨房9</option><option value="9">厨房10</option><option value="255">空</option></select>
+	<select id="kitchen" name="kitchen" style="display:none;width:150px;">
+<?php
+include("conn.php"); 
+mysql_query("SET NAMES utf8"); 
+$sql = "SELECT alias_id, name FROM kitchen";
+$rs = $db->GetAll($sql);
+foreach ($rs as $row){
+	echo "<option value='".$row["alias_id"]."'>".$row["name"]."</option>";
+}
+	?>
+<option value="255">空</option></select>
     <!-- 关键字 -->
     <input type="text" id="keyword" name="keyword"   />
     <input type="submit" value=" 搜索 " class="button" />
@@ -201,64 +209,64 @@ if($deleteId != null)
 			</tr>
 		</thead>
 		<tbody>
-		<?php 	  		
-		include("conn.php"); 		 		
-		$xm=$_REQUEST["keyword_type"];
-		$ct=$_REQUEST["condition_type"];
-		$kw=$_REQUEST["keyword"]; 
-		$kitchen_value=$_REQUEST["kitchen"];
-		$sql = "SELECT * FROM food WHERE enabled=1 AND restaurant_id=" . $_SESSION["restaurant_id"];		
-		switch ($xm)
+<?php 	  		
+		 		
+$xm=$_REQUEST["keyword_type"];
+$ct=$_REQUEST["condition_type"];
+$kw=$_REQUEST["keyword"]; 
+$kitchen_value=$_REQUEST["kitchen"];
+$sql = "SELECT f.*,k.name AS kitchen FROM food f LEFT JOIN kitchen k ON f.kitchen = k.alias_id WHERE f.enabled=1 AND f.restaurant_id=" . $_SESSION["restaurant_id"];		
+switch ($xm)
+{
+	case "is_no":
+		if ($kw!="")
+			$sql .= " AND f.alias_id = $kw" ;  			
+		break;
+	case "is_name":
+		if ($kw!="")
+			$sql .= " AND f.name like '%$kw%'" ;  			
+		break;
+	case "is_Price":
+		if ($kw!="")
 		{
-			case "is_no":
-				if ($kw!="")
-					$sql .= " AND alias_id = $kw" ;  			
-				break;
-			case "is_name":
-				if ($kw!="")
-					$sql .= " AND name like '%$kw%'" ;  			
-				break;
-			case "is_Price":
-				if ($kw!="")
-				{
-					if($ct == "Equal")
-					{
-						$sql .= " AND unit_price = $kw" ;  
-					}
-					elseif($ct == "EqualOrGrater")
-					{
-						$sql .= " AND unit_price >= $kw" ; 
-					}
-					elseif($ct == "EqualOrLess")
-					{
-						$sql .= " AND unit_price <= $kw" ; 
-					}
-				}				
-				break;	
-			case "is_kitchen":
-				if ($kitchen_value!="")
-					$sql .= " AND kitchen=$kitchen_value" ;  			
-				break;		
-		}	
-		$bh=0;
-		mysql_query("SET NAMES utf8"); 
-		// mysql_query("set names 'utf-8'") ;
-		$kitchen = array('0'=>'厨房1', '1'=>'厨房2', '2'=>'厨房3', '3'=>'厨房4', '4'=>'厨房5', '5'=>'厨房6', '6'=>'厨房7', '7'=>'厨房8', '8'=>'厨房9', '9'=>'厨房10', '255'=>'空');
-		$rs = $db->GetAll($sql);
-		foreach ($rs as $row){
-			$bh=$bh+1;
-			echo "<tr>";
-			echo "<td>" .$row["alias_id"] ."</td>";
-			echo "<td>" .$row["name"] ."</td>";
-			echo "<td>" .$row["unit_price"] ."</td>";
-			echo "<td>" .$kitchen[$row["kitchen"]] ."</td>";
-			echo "<td><a href='#' onclick='editFood(&quot;".$row["id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["name"]."&quot;,&quot;".$row["unit_price"]."&quot;,&quot;".$row["kitchen"].
-				"&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
-				"<a href='#' onclick='deleteFood(".$row["id"].")'><img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;删除</a></td>";
-			echo "</tr>";
-		}
-		//mysql_query("SET NAMES utf8"); 
-		mysql_close($con);
+			if($ct == "Equal")
+			{
+				$sql .= " AND f.unit_price = $kw" ;  
+			}
+			elseif($ct == "EqualOrGrater")
+			{
+				$sql .= " AND f.unit_price >= $kw" ; 
+			}
+			elseif($ct == "EqualOrLess")
+			{
+				$sql .= " AND f.unit_price <= $kw" ; 
+			}
+		}				
+		break;	
+	case "is_kitchen":
+		if ($kitchen_value!="")
+			$sql .= " AND f.kitchen=$kitchen_value" ;  			
+		break;		
+}	
+$bh=0;
+mysql_query("SET NAMES utf8"); 
+// mysql_query("set names 'utf-8'") ;
+/*$kitchen = array('0'=>'厨房1', '1'=>'厨房2', '2'=>'厨房3', '3'=>'厨房4', '4'=>'厨房5', '5'=>'厨房6', '6'=>'厨房7', '7'=>'厨房8', '8'=>'厨房9', '9'=>'厨房10', '255'=>'空');*/
+$rs = $db->GetAll($sql);
+foreach ($rs as $row){
+	$bh=$bh+1;
+	echo "<tr>";
+	echo "<td>" .$row["alias_id"] ."</td>";
+	echo "<td>" .$row["name"] ."</td>";
+	echo "<td>" .$row["unit_price"] ."</td>";
+	echo "<td>" .$row["kitchen"] ."</td>";
+	echo "<td><a href='#' onclick='editFood(&quot;".$row["id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["name"]."&quot;,&quot;".$row["unit_price"]."&quot;,&quot;".$row["kitchen"].
+		"&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
+		"<a href='#' onclick='deleteFood(".$row["id"].")'><img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;删除</a></td>";
+	echo "</tr>";
+}
+//mysql_query("SET NAMES utf8"); 
+mysql_close($con);
 		?>			
 	</tbody>
   </table>
@@ -284,11 +292,11 @@ if($deleteId != null)
           <a href="#" onclick="sorter.move(1,true)">最末页</a>
         </div>
        </div>
-    <?php
-    echo "<input type='hidden' id='keyword_type_value' value='$xm' />";
-    echo "<input type='hidden' id='condition_type_value' value='$ct' />";
-    echo "<input type='hidden' id='keyword_value' value='$kw' />";
-    echo "<input type='hidden' id='kitchen_value' value='$kitchen_value' />";
+<?php
+echo "<input type='hidden' id='keyword_type_value' value='$xm' />";
+echo "<input type='hidden' id='condition_type_value' value='$ct' />";
+echo "<input type='hidden' id='keyword_value' value='$kw' />";
+echo "<input type='hidden' id='kitchen_value' value='$kitchen_value' />";
     ?>
 
 	<script type="text/javascript" src="js/script.js"></script>

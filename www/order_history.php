@@ -52,7 +52,7 @@ if($editType == "viewStat")
 <span class="action-span"><a href="#" onclick="showSearch('order_history.php');">高级搜索</a></span>
 <span class="action-span"><a href="#" onclick="viewOrderStat('daily');">日结汇总</a></span>
 <span class="action-span"><a href="#" onclick="viewOrderStat('monthly');">月结汇总</a></span>
-<span class="action-span1">e点通会员中心</span><span id="search_id" class="action-span2">&nbsp;- 帐单管理 </span>
+<span class="action-span1">e点通会员中心</span><span id="search_id" class="action-span2">&nbsp;- 历史帐单 </span>
 <div style="clear:both"></div>
 </h1>
 <div class="form-div">

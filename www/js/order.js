@@ -220,12 +220,39 @@ function showOrderStat(statType,dateFrom,dateTo)
     if(statType == "daily")
     {
         title = "日结汇总";
+        if (dateFrom != "") {
+            var t = dateFrom;
+            if (dateTo != "") {
+                t += "~" + dateTo;
+            }
+            title += "（" + t + "）";
+        }
+        else {
+            if (dateTo != "") {
+                title += "（" + dateTo + "）";
+
+            }
+        }
     }
     else
     {
         title = "月结汇总";
+        if (dateFrom != "") {
+            var t = dateFrom.substring(0, dateFrom.lastIndexOf("-"));
+            if (dateTo != "") {
+                t += "~" + dateTo.substring(0, dateTo.lastIndexOf("-"));
+            }
+            title += "（" + t + "）";
+        }
+        else {
+            if (dateTo != "") {
+                title += "（" + dateTo.substring(0, dateTo.lastIndexOf("-")) + "）";
+
+            }
+        }
     }
-    title += "（" + dateFrom + "～" + dateTo + "）";
+    
+    
     var content = ' <div class="add_foot" style="height:550px;width:100%">' +
                         '<div class="title" style="width:100%">' +
 	                        '<div class="title_left" style="width:95%"><font id="dynamicTitle" style="font-size: 16px;font-weight: normal;color: #FFF;margin-left: 15px;line-height: 30px;text-align: left;" >' + title + '</font></div>' +

@@ -24,7 +24,7 @@ mysql_query("SET NAMES utf8");
 $editType = $_POST["editType"];
 if($editType == "addKitchen" || $editType == "editKitchen")
 {
-	$alias_id = $_POST["alias_id"];
+	//$alias_id = $_POST["alias_id"];
 	$name = $_POST["name"];
 	$discount = $_POST["discount"];
 	$member_discount_1 = $_POST["member_discount_1"];
@@ -33,7 +33,7 @@ if($editType == "addKitchen" || $editType == "editKitchen")
 	$validate = true;
 	if($editType == "addKitchen")
 	{		
-		$sql = "SELECT * FROM kitchen WHERE alias_id=$alias_id AND restaurant_id=" . $_SESSION["restaurant_id"];				
+		/*$sql = "SELECT * FROM kitchen WHERE alias_id=$alias_id AND restaurant_id=" . $_SESSION["restaurant_id"];				
 		$rs = $db ->GetOne($sql);		
 		if($rs)
 		{			
@@ -43,12 +43,12 @@ if($editType == "addKitchen" || $editType == "editKitchen")
 		else
 		{
 			$sql = "INSERT INTO kitchen(restaurant_id,alias_id,name,discount,member_discount_1,member_discount_2) VALUES(".$_SESSION["restaurant_id"].",$alias_id,'$name',$discount,$member_discount_1,$member_discount_2)";
-		}
+		}*/
 	}
 	else
 	{
 		$id = $_POST["id"];				
-		$sql = "UPDATE kitchen SET alias_id=$alias_id, name='$name',discount=$discount,member_discount_1=$member_discount_1,member_discount_2=$member_discount_2 WHERE id=$id";		
+		$sql = "UPDATE kitchen SET name='$name',discount=$discount,member_discount_1=$member_discount_1,member_discount_2=$member_discount_2 WHERE id=$id";		
 	}	
 	if($validate)
 	{
@@ -192,12 +192,12 @@ $rs = $db->GetAll($sql);
 foreach ($rs as $row){
 	$bh=$bh+1;
 	echo "<tr>";
-	echo "<td>" .$row["alias_id"] ."</td>";
+	echo "<td>" .$bh ."</td>";
 	echo "<td>" .$row["name"] ."</td>";
 	echo "<td>" .$row["discount"] ."</td>";
 	echo "<td>" .$row["member_discount_1"] ."</td>";
 	echo "<td>" .$row["member_discount_2"] ."</td>";	
-	echo "<td><a href='#' onclick='editKitchen(&quot;".$row["id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["name"]."&quot;,&quot;".$row["discount"]."&quot;,&quot;".$row["member_discount_1"]."&quot;,&quot;".$row["member_discount_2"].
+	echo "<td><a href='#' onclick='editKitchen(&quot;".$row["id"]."&quot;,&quot;".$bh."&quot;,&quot;".$row["name"]."&quot;,&quot;".$row["discount"]."&quot;,&quot;".$row["member_discount_1"]."&quot;,&quot;".$row["member_discount_2"].
 		"&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
 		"<a href='#' style='display:none' onclick='deleteKitchen(".$row["id"].")'><img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;删除</a></td>";
 	echo "</tr>";

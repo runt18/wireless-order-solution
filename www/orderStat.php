@@ -56,7 +56,7 @@ if($statType == "daily")
 			FROM
 			(SELECT DATE(order_date) AS o_date, o.type_value,
 			COUNT(id) AS o_num, SUM(total_price) AS t_price 
-			FROM `order_view` as o WHERE is_paid <> 0 AND restaurant_id=" . $_SESSION["restaurant_id"];
+			FROM `order_history_view` as o WHERE is_paid <> 0 AND restaurant_id=" . $_SESSION["restaurant_id"];
 	
 }
 else
@@ -72,7 +72,7 @@ else
 			FROM
 			(SELECT DATE_FORMAT(order_date,'%Y-%m') AS o_date, o.type_value,
 			COUNT(id) AS o_num, SUM(total_price) AS t_price 
-			FROM `order_view` as o WHERE is_paid <> 0 AND restaurant_id=" . $_SESSION["restaurant_id"];
+			FROM `order_history_view` as o WHERE is_paid <> 0 AND restaurant_id=" . $_SESSION["restaurant_id"];
 }
 
 $dateFrom = $_REQUEST["dateFrom"];

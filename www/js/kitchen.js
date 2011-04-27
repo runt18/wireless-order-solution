@@ -87,17 +87,20 @@ function submitKitchenData() {
     }
     var dis = parseFloat(discount);
     if (dis > 1 || dis < 0) {
-        alert("一般折扣的输入范围是0~1")
+        alert("一般折扣的输入范围是0~1");
+        document.getElementById("discount").focus();
         return;
     }
     var dis1 = parseFloat(member_discount_1);
     if (dis1 > 1 || dis1 < 0) {
-        alert("会员折扣1的输入范围是0~1")
+        alert("会员折扣1的输入范围是0~1");
+        document.getElementById("member_discount_1").focus()
         return;
     }
     var dis2 = parseFloat(member_discount_2);
     if (dis2 > 1 || dis2 < 0) {
-        alert("会员折扣2的输入范围是0~1")
+        alert("会员折扣2的输入范围是0~1");
+        document.getElementById("member_discount_2").focus()
         return;
     }
     document.kitchenForm.submit();
