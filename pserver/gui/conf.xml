@@ -1,1 +1,1 @@
-<?xml version="1.0" ?><conf><remote ip="127.0.0.1" port="44444" account="demo" pwd="f702c1502be8e55f4208d69419f50d0a" /><auto_update on="1" /><printer name="Zonerich AB-T88" func="4" kitchen="254" style="2" desc="" /></conf>
+<?xml version="1.0" ?><conf><remote ip="127.0.0.1" port="44444" account="demo" pwd="f702c1502be8e55f4208d69419f50d0a" /><auto_update on="1" /><printer name="Microsoft XPS Document Writer" func="4" kitchen="254" style="2" desc="" /></conf>

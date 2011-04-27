@@ -66,13 +66,27 @@ void CPrinterSettingDlg::Update(){
 		pPrinter->QueryIntAttribute(ConfTags::PRINT_FUNC, &func);
 		//set the "功能"
 		if(func < _nFuncs){
-			//set the "厨房" if the function is to print order detail
-			if(func == Reserved::PRINT_ORDER_DETAIL){
+			//set the kitchen if the function is as below
+			//1 - print order detail
+			//2 - print extra food
+			//3 - print canceled food
+			//4 - print hurried food
+			if(func == Reserved::PRINT_ORDER_DETAIL ||
+				func == Reserved::PRINT_EXTRA_FOOD ||
+				func == Reserved::PRINT_CANCELLED_FOOD ||
+				func == Reserved::PRINT_HURRY_FOOD){
 				int kitchen = Kitchen::KITCHEN_NULL;
 				int ret = pPrinter->QueryIntAttribute(ConfTags::KITCHEN, &kitchen);
-				if(ret == TIXML_NO_ATTRIBUTE || kitchen > _nKitchen - 1){
+				if(ret == TIXML_NO_ATTRIBUTE){
 					m_PrinterListCtrl.SetItemText(row, COLUMN_FUNC_CODE, _FuncDesc[func]);
+
+				}else if(kitchen > _nKitchen - 1 && kitchen != Kitchen::KITCHEN_FULL && kitchen != Kitchen::KITCHEN_NULL){
+					m_PrinterListCtrl.SetItemText(row, COLUMN_FUNC_CODE, _FuncDesc[func]);
+
 				}else{
+					if(kitchen == Kitchen::KITCHEN_FULL){
+						kitchen = _nKitchen - 1;
+					}
 					CString tmp;
 					tmp.Format(_T("%s - %s"), _FuncDesc[func], _PrinterKitchen[kitchen]);
 					m_PrinterListCtrl.SetItemText(row, COLUMN_FUNC_CODE, tmp);
@@ -112,7 +126,7 @@ BOOL CPrinterSettingDlg::OnInitDialog(){
 	m_PrinterListCtrl.SetExtendedStyle(LVS_EX_LABELTIP | LVS_EX_SUBITEMIMAGES | LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
 	m_PrinterListCtrl.InsertColumn(COLUMN_ID, _T("编号"), LVCFMT_RIGHT, 40);
 	m_PrinterListCtrl.InsertColumn(COLUMN_PRINTER_NAME, _T("打印机"), LVCFMT_LEFT, 170);
-	m_PrinterListCtrl.InsertColumn(COLUMN_FUNC_CODE, _T("功能"), LVCFMT_LEFT, 115);
+	m_PrinterListCtrl.InsertColumn(COLUMN_FUNC_CODE, _T("功能"), LVCFMT_LEFT, 135);
 	m_PrinterListCtrl.InsertColumn(COLUMN_PRINTER_STYLE, _T("类型"), LVCFMT_LEFT, 55);
 	m_PrinterListCtrl.InsertColumn(COLUMN_PRINTER_DESC, _T("描述"), LVCFMT_LEFT, 250);
 

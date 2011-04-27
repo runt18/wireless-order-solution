@@ -68,6 +68,7 @@ public:
 	afx_msg void OnUpdateStartPrinter(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateStopPrinter(CCmdUI* pCmdUI);
 	afx_msg void OnTrayRestore();
+	afx_msg void OnTrayExit();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnAutoRun();
 	afx_msg void OnUpdateAutoRun(CCmdUI *pCmdUI);

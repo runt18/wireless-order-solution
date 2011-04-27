@@ -16,7 +16,7 @@ extern TCHAR* _PrinterKitchen[];
 extern int _nKitchen;
 
 TCHAR* _FuncDesc[] = {
-	_T("未知"), _T("下单"), _T("下单(详细)"), _T("结帐")
+	_T("未知"), _T("下单"), _T("下单(详细)"), _T("结帐"), _T("加菜(详细)"), _T("退菜(详细)"), _T("催菜(详细)")
 };
 
 int _nFuncs = sizeof(_FuncDesc) / sizeof(TCHAR*);
@@ -52,7 +52,7 @@ int CPrinterListCtrl::OnCreate(LPCREATESTRUCT lpCreateStruct){
 	SetExtendedStyle(LVS_EX_LABELTIP | LVS_EX_SUBITEMIMAGES | LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
 	InsertColumn(COLUMN_ID, _T("编号"), LVCFMT_RIGHT, 75);
 	InsertColumn(COLUMN_PRINTER_NAME, _T("打印机"), LVCFMT_LEFT, 200);
-	InsertColumn(COLUMN_FUNC_CODE, _T("功能"), LVCFMT_LEFT, 115);
+	InsertColumn(COLUMN_FUNC_CODE, _T("功能"), LVCFMT_LEFT, 150);
 	InsertColumn(COLUMN_PRINTER_STYLE, _T("类型"), LVCFMT_LEFT, 100);
 	InsertColumn(COLUMN_PRINTER_DESC, _T("描述"), LVCFMT_LEFT, 250);
 	Update();
@@ -94,13 +94,27 @@ void CPrinterListCtrl::Update(){
 			pPrinter->QueryIntAttribute(ConfTags::PRINT_FUNC, &func);
 			//set the "功能"
 			if(func < _nFuncs){
-				//set the "厨房" if the function is to print order detail
-				if(func == Reserved::PRINT_ORDER_DETAIL){
+				//set the kitchen if the function is as below
+				//1 - print order detail
+				//2 - print extra food
+				//3 - print canceled food
+				//4 - print hurried food
+				if(func == Reserved::PRINT_ORDER_DETAIL ||
+					func == Reserved::PRINT_EXTRA_FOOD ||
+					func == Reserved::PRINT_CANCELLED_FOOD ||
+					func == Reserved::PRINT_HURRY_FOOD){
 					int kitchen = Kitchen::KITCHEN_NULL;
 					int ret = pPrinter->QueryIntAttribute(ConfTags::KITCHEN, &kitchen);
-					if(ret == TIXML_NO_ATTRIBUTE || kitchen > _nKitchen - 1){
+					if(ret == TIXML_NO_ATTRIBUTE){
 						SetItemText(row, COLUMN_FUNC_CODE, _FuncDesc[func]);
+
+					}else if(kitchen > _nKitchen - 1 && kitchen != Kitchen::KITCHEN_FULL && kitchen != Kitchen::KITCHEN_NULL){
+						SetItemText(row, COLUMN_FUNC_CODE, _FuncDesc[func]);
+
 					}else{
+						if(kitchen == Kitchen::KITCHEN_FULL){
+							kitchen = _nKitchen - 1;
+						}
 						CString tmp;
 						tmp.Format(_T("%s - %s"), _FuncDesc[func], _PrinterKitchen[kitchen]);
 						SetItemText(row, COLUMN_FUNC_CODE, tmp);

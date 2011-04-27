@@ -20,7 +20,7 @@ using namespace std;
 #endif
 
 //the string indicating the version of the program
-const TCHAR* _PROG_VER_ = _T("0.9.3");
+const TCHAR* _PROG_VER_ = _T("0.9.4");
 //the path to the conf.xml
 CString _Conf_Path_;
 //the path to new setup program
@@ -49,6 +49,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_NETWORK, &CMainFrame::OnNetworkSetting)
 	ON_COMMAND(ID_SET_PRINTER, &CMainFrame::OnPrinterSetting)
 	ON_COMMAND(ID_TRAY_RESTORE, &CMainFrame::OnTrayRestore)
+	ON_COMMAND(ID_SYS_TRAY_EXIT,  &CMainFrame::OnTrayExit)
 	ON_UPDATE_COMMAND_UI(ID_START_PRINTER, OnUpdateStartPrinter)
 	ON_UPDATE_COMMAND_UI(ID_STOP_PRINTER, OnUpdateStopPrinter)
 	ON_COMMAND(ID_AUTO_RUN, &CMainFrame::OnAutoRun)
@@ -169,17 +170,29 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 
 
 void CMainFrame::OnClose(){
-	CFrameWnd::OnClose();
-	//run the new setup program normally
+
+	//exit the program before run the new setup program normally
 	if(g_DoQuitProg == 1){
+		CFrameWnd::OnClose();
 		Sleep(500);
 		ShellExecute(NULL, _T("open"), g_NewProgPath, NULL, NULL, SW_NORMAL);
+		
 
-	//run the new setup program silently
+	//exit the program run the new setup program silently
 	}else if(g_DoQuitProg == 2){
+		CFrameWnd::OnClose();
 		Sleep(500);
-		ShellExecute(NULL, _T("open"), g_NewProgPath, _T("/S"), NULL, SW_HIDE);
+		ShellExecute(NULL, _T("open"), g_NewProgPath, _T("/S"), NULL, SW_HIDE);		
+	
+	//in other cases, minimize the windows
+	}else{
+		PostMessage(WM_SYSCOMMAND, SC_MINIMIZE);
 	}
+}
+
+//Close the program when click the exit on system tray
+void CMainFrame::OnTrayExit(){
+	CMainFrame::DestroyWindow();
 }
 
 // CMainFrame diagnostics
@@ -472,7 +485,10 @@ void CMainFrame::OnAutoRun(){
 
 
 		//打开成功写信息到注册表
-		if(bResult=::RegSetValueEx(hRegKey, REG_VALUE, 0, REG_SZ, (const unsigned char*)CurrentPath, MAX_PATH) != ERROR_SUCCESS)  
+		CString progPath(CurrentPath);
+		//开机最小化运行
+		progPath.Append(_T(" -minimize"));
+		if(bResult=::RegSetValueEx(hRegKey, REG_VALUE, 0, REG_SZ, (const unsigned char*)progPath.GetBuffer(), MAX_PATH) != ERROR_SUCCESS)  
 		{   //写入失败, 关闭注册表key
 			RegCloseKey(hRegKey);   
 			//释放内存资源

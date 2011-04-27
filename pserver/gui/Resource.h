@@ -64,13 +64,15 @@
 #define ID_CHK_UPDATE                   32793
 #define ID_32794                        32794
 #define ID_ONLINE_HELP                  32795
+#define ID_SYS_TRAY_EXIT                32796
+#define ID_Menu32797                    32797
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        142
-#define _APS_NEXT_COMMAND_VALUE         32796
+#define _APS_NEXT_COMMAND_VALUE         32798
 #define _APS_NEXT_CONTROL_VALUE         1030
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

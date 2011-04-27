@@ -133,6 +133,12 @@ static unsigned __stdcall PrintProc(LPVOID pvParam){
 						stDocInfo.pDocName = L"ÏÂµ¥ÏêÏ¸";
 					}else if(job.func == Reserved::PRINT_RECEIPT){
 						stDocInfo.pDocName = L"½áÕÊ";
+					}else if(job.func == Reserved::PRINT_EXTRA_FOOD){
+						stDocInfo.pDocName = L"¼Ó²ËÏêÏ¸";
+					}else if(job.func == Reserved::PRINT_CANCELLED_FOOD){
+						stDocInfo.pDocName = L"ÍË²ËÏêÏ¸";
+					}else if(job.func == Reserved::PRINT_HURRY_FOOD){
+						stDocInfo.pDocName = L"´ß²ËÏêÏ¸";
 					}else{
 						stDocInfo.pDocName = L"Î´ÖªÐÅÏ¢";
 					}
@@ -278,7 +284,7 @@ void PrinterInstance::addJob(const char* buf, int len, int iFunc){
 
 	EnterCriticalSection(&m_csJobQueue);
 
-	if(!details.empty()){
+	if(details.size() != 0){
 		//add all order detail jobs to the queue
 		vector<string>::iterator iter = details.begin();
 		for(iter; iter != details.end(); iter++){
@@ -312,10 +318,10 @@ void PrinterInstance::addJob(const char* buf, int len, int iFunc){
 * Description    : Split the print content into several details.
 * Input          : print_content - the content to be split
 			       kitchen - the kitchen determining whether the detail to be print
-* Output         : details - the vector holding the results
+* Output         : detail_content - the vector holding the results
 * Return         : None
 *******************************************************************************/
-void PrinterInstance::split2Details(const string& print_content, int kitchen, vector<string>& details){
+void PrinterInstance::split2Details(const string& print_content, int kitchen, vector<string>& detail_content){
 	/************************************************************************
 	* The print content looks like below in the case the content to print is as below
 	* 1 - order detail
@@ -329,7 +335,7 @@ void PrinterInstance::split2Details(const string& print_content, int kitchen, ve
 	* len[2] - 2-byte indicating the length of detail content
 	* content - the order detail content                                                          
 	************************************************************************/
-	details.clear();
+	detail_content.clear();
 	if(!print_content.empty()){
 		int offset = 0;
 		vector<string> details; 
@@ -343,7 +349,7 @@ void PrinterInstance::split2Details(const string& print_content, int kitchen, ve
 			************************************************************************/
 			if(kitchen == Kitchen::KITCHEN_FULL || print_content[offset] == kitchen){
 				offset += 3;
-				details.push_back(string(print_content.begin() + offset, print_content.begin() + offset + length));
+				detail_content.push_back(string(print_content.begin() + offset, print_content.begin() + offset + length));
 				offset += length;
 			}else{
 				offset += 3 + length;

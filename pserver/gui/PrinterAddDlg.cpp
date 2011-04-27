@@ -12,7 +12,7 @@
 #include <boost/shared_ptr.hpp>
 
 TCHAR* _PrinterKitchen[] = {
-	_T("厨房1"), _T("厨房2"), _T("厨房3"), _T("厨房4"), _T("厨房5"), _T("厨房6"), _T("厨房7"), _T("厨房8"), _T("厨房9"), _T("厨房10")
+	_T("厨房1"), _T("厨房2"), _T("厨房3"), _T("厨房4"), _T("厨房5"), _T("厨房6"), _T("厨房7"), _T("厨房8"), _T("厨房9"), _T("厨房10"), _T("所有厨房")
 };
 
 int _nKitchen = sizeof(_PrinterKitchen) / sizeof(TCHAR*);
@@ -161,9 +161,19 @@ void CAddPrinterDlg::OnOK(){
 			//set the function code attribute
 			pPrinter->SetAttribute(ConfTags::PRINT_FUNC, tmp);
 
-			//set the kitchen only if the function is to print order detail
-			if((selected + 1) == Reserved::PRINT_ORDER_DETAIL){
+			//set the kitchen if the function is as below
+			//1 - print order detail
+			//2 - print extra food
+			//3 - print canceled food
+			//4 - print hurried food
+			if((selected + 1) == Reserved::PRINT_ORDER_DETAIL ||
+				(selected + 1) == Reserved::PRINT_EXTRA_FOOD ||
+				(selected + 1) == Reserved::PRINT_CANCELLED_FOOD ||
+				(selected + 1) == Reserved::PRINT_HURRY_FOOD){
 				int kitchen = m_PrintKitchen.GetCurSel();
+				if(kitchen == _nKitchen - 1){
+					kitchen = Kitchen::KITCHEN_FULL;
+				}
 				sprintf_s(tmp, sizeof(tmp), "%d", kitchen);
 				//set the kitchen for printing order detail
 				pPrinter->SetAttribute(ConfTags::KITCHEN, tmp);
@@ -213,8 +223,15 @@ void CAddPrinterDlg::OnCbnFuncChg()
 {
 	//assign the selected function code value
 	int selected = m_Funcs.GetCurSel();
-	//only show kitchen combobox if the function is to print order detail
-	if((selected + 1) == Reserved::PRINT_ORDER_DETAIL){
+	//show kitchen combobox if the function is as below.
+	//1 - print order detail
+	//2 - print extra food
+	//3 - print canceled food
+	//4 - print hurried food
+	if((selected + 1) == Reserved::PRINT_ORDER_DETAIL ||
+		(selected + 1) == Reserved::PRINT_EXTRA_FOOD ||
+		(selected + 1) == Reserved::PRINT_CANCELLED_FOOD ||
+		(selected + 1) == Reserved::PRINT_HURRY_FOOD){
 		m_PrintKitchen.EnableWindow(TRUE);
 	}else{
 		m_PrintKitchen.EnableWindow(FALSE);

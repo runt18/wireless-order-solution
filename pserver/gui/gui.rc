@@ -118,11 +118,12 @@ BEGIN
     BEGIN
         MENUITEM "显示",                          ID_TRAY_RESTORE
         MENUITEM "开机启动",                        ID_AUTO_RUN
+        MENUITEM "自动更新",                        ID_AUTO_UPDATE
         MENUITEM SEPARATOR
         MENUITEM "启动",                          ID_START_PRINTER
         MENUITEM "停止",                          ID_STOP_PRINTER
         MENUITEM SEPARATOR
-        MENUITEM "退出",                          ID_APP_EXIT
+        MENUITEM "退出",                          ID_SYS_TRAY_EXIT
     END
 END
 
@@ -539,9 +540,9 @@ BEGIN
     "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)\r\n"
     "LANGUAGE 4, 2\r\n"
     "#pragma code_page(936)\r\n"
-    "#include ""res\\gui.rc2""  // ? Microsoft Visual C++ ?????\r\n"
-    "#include ""l.CHS\\afxres.rc""          // ????\r\n"
-    "#include ""l.CHS\\afxprint.rc""        // ??/??????\r\n"
+    "#include ""res\\gui.rc2""  // 非 Microsoft Visual C++ 编辑的资源\r\n"
+    "#include ""l.CHS\\afxres.rc""          // 标准组件\r\n"
+    "#include ""l.CHS\\afxprint.rc""        // 打印/打印预览资源\r\n"
     "#endif\r\n"
     "\0"
 END
