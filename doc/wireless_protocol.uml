@@ -3090,8 +3090,8 @@ pwd - the password related to the user
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="Left" type="integer">464</XPD:ATTR>
 <XPD:ATTR name="Top" type="integer">264</XPD:ATTR>
-<XPD:ATTR name="Width" type="integer">211</XPD:ATTR>
-<XPD:ATTR name="Height" type="integer">143</XPD:ATTR>
+<XPD:ATTR name="Width" type="integer">227</XPD:ATTR>
+<XPD:ATTR name="Height" type="integer">188</XPD:ATTR>
 <XPD:ATTR name="Text" type="string">in the case the printer login successfully
 
 &lt;Header&gt;
@@ -3101,12 +3101,15 @@ seq : same as request
 reserved : 0x00
 pin[6] : same as request
 len[2] : 0x00, 0x00
+nKitchen : &lt;kitchen_1&gt; : ... : &lt;kitchen_n&gt;
+&lt;kitchen_x&gt;
+len_name : name
 </XPD:ATTR>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedViews[7]" type="UMLNoteLinkView" guid="1MbgRQBec0u4N4wx70P0NwAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">464,307;272,256</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">464,320;267,256</XPD:ATTR>
 <XPD:REF name="Head">axSndZDl5kajMOi65XYE1AAA</XPD:REF>
 <XPD:REF name="Tail">AiRwFyp64E+CeZUTLrUR5gAA</XPD:REF>
 </XPD:OBJ>
