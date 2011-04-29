@@ -198,6 +198,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\src\Kitchen.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\Protocol.cpp"
 				>
 			</File>
@@ -231,6 +235,10 @@
 			</File>
 			<File
 				RelativePath=".\src\RespPackage.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\RespParser.cpp"
 				>
 			</File>
 			<File
@@ -313,6 +321,10 @@
 			</File>
 			<File
 				RelativePath=".\inc\RespPackage.h"
+				>
+			</File>
+			<File
+				RelativePath=".\inc\RespParser.h"
 				>
 			</File>
 			<File

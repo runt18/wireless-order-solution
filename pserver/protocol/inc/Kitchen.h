@@ -1,5 +1,8 @@
 #pragma once
 
+#include <string>
+using namespace std;
+
 class Kitchen{
 public:
 	/**
@@ -18,4 +21,13 @@ public:
 	static const int KITCHEN_8 = 7;
 	static const int KITCHEN_9 = 8;
 	static const int KITCHEN_10 = 9;
+
+	Kitchen(const string& kName, int id);
+	Kitchen(const Kitchen& right);
+	Kitchen& operator=(const Kitchen& right);
+	//the name to this kitchen
+	string name;
+	//the alias id to this kitchen
+	int alias_id;
+	
 };
