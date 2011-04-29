@@ -17,8 +17,8 @@ package com.wireless.protocol;
  * len[2] - 2-byte indicates the length of the template content
  * template - the template content whose length equals to len[2]
  *******************************************************/
-public class RespPrinterLogin extends RespPackage{
-	public RespPrinterLogin(ProtocolHeader reqHeader, byte[] respBody){
+public class RespPrintLogin extends RespPackage{
+	public RespPrintLogin(ProtocolHeader reqHeader, byte[] respBody){
 		super(reqHeader);
 		header.mode = Mode.PRINT;
 		header.type = Type.ACK;
