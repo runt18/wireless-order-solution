@@ -4,7 +4,7 @@ import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.ProtocolPackage;
 
-class OrderReqParser {
+public class ReqParser {
 	/******************************************************
 	* Design the query order request looks like below
 	* <Header>
@@ -19,7 +19,7 @@ class OrderReqParser {
 	* table[2]
 	* table[2] - 2-byte indicates the table id
 	*******************************************************/
-	static short parseQueryOrder(ProtocolPackage req){
+	public static short parseQueryOrder(ProtocolPackage req){
 		//return the table to query
 		return (short)((req.body[0] & 0x00FF) | ((req.body[1] & 0x00FF) << 8));
 	}
@@ -47,7 +47,7 @@ class OrderReqParser {
 	 * 			   order_num[1] - 1-byte indicates the fixed-point
 	 * taste_id - 1-byte indicates the taste preference id
 	 *******************************************************/
-	static Order parseInsertOrder(ProtocolPackage req){
+	public static Order parseInsertOrder(ProtocolPackage req){
 		Order order = new Order();
 		//assign the table id
 		order.tableID = (short)((req.body[0] & 0x00FF) | 
@@ -111,7 +111,7 @@ class OrderReqParser {
 	 * taste_len : 1-byte indicates the length of taste preference
 	 * taste[len] : the taste preference   
 	 *******************************************************/
-	static Order parsePrintReq(ProtocolPackage req){
+	public static Order parsePrintReq(ProtocolPackage req){
 		Order order = new Order();
 		
 		//assign the total price
@@ -184,7 +184,7 @@ class OrderReqParser {
 	* table[2]
 	* table[2] - 2-byte indicates the table id
 	*******************************************************/
-	static short parseCancelOrder(ProtocolPackage req){
+	public static short parseCancelOrder(ProtocolPackage req){
 		//return the table to cancel
 		return (short)((req.body[0] & 0x00FF) | ((req.body[1] & 0x00FF) << 8));
 	}
@@ -206,7 +206,7 @@ class OrderReqParser {
 	* 				   total_price[0] indicates the float part
 	* 				   total_price[1..3] indicates the fixed part
 	*******************************************************/
-	static Order parsePayOrder(ProtocolPackage req){
+	public static Order parsePayOrder(ProtocolPackage req){
 		//return the table to pay
 		short tableToPay = (short)((req.body[0] & 0x00FF) | ((req.body[1] & 0x00FF) << 8));
 		int totalPrice = (req.body[2] & 0x000000FF) | 

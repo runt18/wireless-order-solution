@@ -333,7 +333,7 @@ class OrderHandler extends Handler implements Runnable{
 	 * @throws OrderBusinessException if the table to query or the order to query doesn't exist.
 	 */
 	private Order execQueryOrder(ProtocolPackage req) throws SQLException, OrderBusinessException{
-		short tableToQuery = OrderReqParser.parseQueryOrder(req);
+		short tableToQuery = ReqParser.parseQueryOrder(req);
 		
 		int orderID = getUnPaidOrderID(tableToQuery);
 
@@ -348,7 +348,7 @@ class OrderHandler extends Handler implements Runnable{
 	 * @throws OrderBusinessException if the table to query or the order to query doesn't exist.
 	 */
 	private void execQueryOrder2(ProtocolPackage req) throws SQLException, OrderBusinessException{
-		short tableToQuery = OrderReqParser.parseQueryOrder(req);
+		short tableToQuery = ReqParser.parseQueryOrder(req);
 		getUnPaidOrderID(tableToQuery);
 	}
 	
@@ -360,7 +360,7 @@ class OrderHandler extends Handler implements Runnable{
 	 * 		   OrderBusinessException if any ordered doesn't exist in db or disabled by user 
 	 */
 	private void execInsertOrder(ProtocolPackage req) throws SQLException, PrintLogicException, OrderBusinessException{
-		Order orderToInsert = OrderReqParser.parseInsertOrder(req);
+		Order orderToInsert = ReqParser.parseInsertOrder(req);
 		
 		String sql = null;	
 		
@@ -505,7 +505,7 @@ class OrderHandler extends Handler implements Runnable{
 	 * @throws OrderBusinessException if the table or the order to be updated doesn't exist
 	 */
 	private void execUpdateOrder(ProtocolPackage req) throws SQLException, PrintLogicException, OrderBusinessException{
-		Order orderToUpdate = OrderReqParser.parseInsertOrder(req);
+		Order orderToUpdate = ReqParser.parseInsertOrder(req);
 		int orderID = getUnPaidOrderID(orderToUpdate.tableID);
 		
 		//query all the food's id ,order count and taste preference of this order
@@ -802,7 +802,7 @@ class OrderHandler extends Handler implements Runnable{
 	 * @throws OrderBusinessException if the order or the table to be canceled doesn't exist
 	 */
 	private void execCancelOrder(ProtocolPackage req) throws SQLException, OrderBusinessException{
-		short tableToCancel = OrderReqParser.parseCancelOrder(req);
+		short tableToCancel = ReqParser.parseCancelOrder(req);
 		int orderID = getUnPaidOrderID(tableToCancel);
 		_stmt.clearBatch();
 		//delete the records related to the order id and food id in "order_food" table
@@ -821,7 +821,7 @@ class OrderHandler extends Handler implements Runnable{
 	 * @throws OrderBusinessException if the order or table to be paid doesn't exist
 	 */
 	private void execPayOrder(ProtocolPackage req) throws SQLException, OrderBusinessException, PrintLogicException{
-		Order payOrderInfo = OrderReqParser.parsePayOrder(req);
+		Order payOrderInfo = ReqParser.parsePayOrder(req);
 		payOrderInfo.id = getUnPaidOrderID(payOrderInfo.tableID);
 		
 		float totalPrice = Util.price2Float(payOrderInfo.totalPrice, Util.INT_MASK_3).floatValue();
@@ -894,7 +894,7 @@ class OrderHandler extends Handler implements Runnable{
 	 * @throws PrintLogicException throws if print fails
 	 */
 	private void execPrintReq(ProtocolPackage req) throws SQLException, PrintLogicException{
-		Order orderToPrint = OrderReqParser.parsePrintReq(req);
+		Order orderToPrint = ReqParser.parsePrintReq(req);
 		/**
 		 * Get all the food's detail info submitted by terminal, 
 		 * and then check whether the food exist in db or is disabled by user.
