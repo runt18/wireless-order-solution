@@ -8,6 +8,7 @@
 #include "../../protocol/inc/Kitchen.h"
 #include "../../protocol/inc/RespACK.h"
 #include "../../protocol/inc/RespNAK.h"
+#include "../../protocol/inc/RespParser.h"
 #include "../../tinyxml/tinyxml.h"
 #include "../inc/PrintServer.h"
 #include "../inc/ConfTags.h"
@@ -365,6 +366,8 @@ static unsigned __stdcall LoginProc(LPVOID pvParam){
 						if(loginResp.header.seq == reqLogin.header.seq){
 							//check the type to see it's an ACK or NAK
 							if(loginResp.header.type == Type::ACK){
+								vector<Kitchen> kits;
+								RespParse::parsePrintLogin(loginResp, kits);
 								if(pReport){
 									pReport->OnPrintReport(0, "µÇÂ¼³É¹¦");
 								}
