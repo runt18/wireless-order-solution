@@ -2,6 +2,7 @@ package com.wireless.util;
 
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqQueryRestaurant;
+import com.wireless.protocol.RespParser;
 import com.wireless.protocol.Type;
 
 public class QueryRestaurant extends Thread {
