@@ -12,4 +12,12 @@ public final class Kitchen {
 	public final static short KITCHEN_8 = 7;
 	public final static short KITCHEN_9 = 8;
 	public final static short KITCHEN_10 = 9;
+	
+	public String name;
+	public short alias_id = KITCHEN_NULL;
+	
+	public Kitchen(String kName, short id){
+		name = kName;
+		alias_id = id;
+	}
 }
