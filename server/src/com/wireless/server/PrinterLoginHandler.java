@@ -1,16 +1,28 @@
 package com.wireless.server;
 
-import java.io.*;
-import java.net.*;
-import java.sql.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Mode;
 import com.wireless.protocol.ProtocolPackage;
-import com.wireless.protocol.RespACK;
 import com.wireless.protocol.RespNAK;
 import com.wireless.protocol.RespOTAUpdate;
+import com.wireless.protocol.RespPrintLogin;
 import com.wireless.protocol.Type;
 
 /**
@@ -102,11 +114,23 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 						if(_rs.next()){	
 							//check to see whether the password is matched or not
 							if(pwd.equals(_rs.getString("pwd"))){
-								//respond with ACK
-								send(_out, new RespACK(loginReq.header));
+								
+								int restaurantID = _rs.getInt("id");
+								_rs.close();
+								//get the related kitchen information 
+								sql = "SELECT alias_id, name FROM " + WirelessSocketServer.database + ".kitchen WHERE restaurant_id=" + restaurantID;
+								_rs = _stmt.executeQuery(sql);
+								ArrayList<Kitchen> kitchens = new ArrayList<Kitchen>();
+								while(_rs.next()){
+									kitchens.add(new Kitchen(_rs.getString("name"),
+															 _rs.getShort("alias_id")));															
+								}
+								//respond with the related kitchen information
+								send(_out, new RespPrintLogin(loginReq.header, kitchens.toArray(new Kitchen[kitchens.size()])));
+								
 								//put the restaurant id and the associated socket to the tree map's socket list
 								synchronized(WirelessSocketServer.printerConnections){
-									ArrayList<Socket> printerSockets = WirelessSocketServer.printerConnections.get(new Integer(_rs.getInt("id")));
+									ArrayList<Socket> printerSockets = WirelessSocketServer.printerConnections.get(new Integer(restaurantID));
 									//just add the new connection if other connections have been exist before 
 									if(printerSockets != null){
 										printerSockets.add(connection);									
@@ -114,7 +138,7 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 									}else{
 										printerSockets = new ArrayList<Socket>();
 										printerSockets.add(connection);
-										WirelessSocketServer.printerConnections.put(new Integer(_rs.getInt("id")), printerSockets);									
+										WirelessSocketServer.printerConnections.put(new Integer(restaurantID), printerSockets);									
 									}
 								}
 							}else{
