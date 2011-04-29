@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="res"/>
-	<classpathentry excluding="**/.svn/**|com/wireless/protocol/GodGen.java|com/wireless/protocol/Print.java|com/wireless/protocol/ReqPrintOrder.java|com/wireless/protocol/ReqPrintPackage.java|com/wireless/protocol/RespACK.java|com/wireless/protocol/RespNAK.java|com/wireless/protocol/RespOTAUpdate.java|com/wireless/protocol/RespPackage.java|com/wireless/protocol/RespPrinterLogin.java|com/wireless/protocol/RespQueryMenu.java|com/wireless/protocol/RespQueryOrder.java|com/wireless/protocol/RespQueryRestaurant.java" kind="src" path="protocol"/>
+	<classpathentry excluding="**/.svn/**|com/wireless/protocol/GodGen.java|com/wireless/protocol/Print.java|com/wireless/protocol/ReqPrintOrder.java|com/wireless/protocol/ReqPrintPackage.java|com/wireless/protocol/RespACK.java|com/wireless/protocol/RespNAK.java|com/wireless/protocol/RespOTAUpdate.java|com/wireless/protocol/RespPackage.java|com/wireless/protocol/RespPrinterLogin.java|com/wireless/protocol/RespQueryMenu.java|com/wireless/protocol/RespQueryOrder.java|com/wireless/protocol/RespQueryRestaurant.java|com/wireless/protocol/RespPrintLogin.java" kind="src" path="protocol"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/net.rim.ejde.BlackBerryVMInstallType/BlackBerry JRE 5.0.0"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
