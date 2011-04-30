@@ -1,4 +1,4 @@
-function editMember(id, alias_id, name, birth, tele, exchange_rate, discount_type) {
+function editMember(id, alias_id, name, birth, tele, exchange_rate, discount_type_value) {
     var editType = "addMember";
     var title = "添加会员";
     if (id != "") {
@@ -12,7 +12,7 @@ function editMember(id, alias_id, name, birth, tele, exchange_rate, discount_typ
 	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
 	                            ' style="ime-mode:Disabled" />';
         exchange_rate = "0.00";
-        discount_type = "0";
+        discount_type_value = "0";
     }
     else {
         aliasId = '<input type="hidden" id="alias_id" name="alias_id" value="' + alias_id + '"/>' + alias_id + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
@@ -54,7 +54,7 @@ function editMember(id, alias_id, name, birth, tele, exchange_rate, discount_typ
     else {
         document.getElementById("name").focus();
     }
-    document.all.discount_type.value = discount_type;
+    document.all.discount_type.value = discount_type_value;
 }
 
 function submitMemberData() {
@@ -65,22 +65,27 @@ function submitMemberData() {
     var exchange_rate = document.getElementById("exchange_rate").value;
     if (alias_id == undefined || alias_id == null || alias_id == "") {
         alert("编号不能为空！");
+        document.getElementById("alias_id").focus();
         return;
     }
     if (name == undefined || name == null || name == "") {
         alert("姓名不能为空！");
+        document.getElementById("name").focus();
         return;
     }
     if (birth == undefined || birth == null || birth == "") {
         alert("出生日期不能为空！");
+        document.getElementById("birth").focus();
         return;
     }
     if (tele == undefined || tele == null || tele == "") {
         alert("电话不能为空！");
+        document.getElementById("tele").focus();
         return;
     }
     if (exchange_rate == undefined || exchange_rate == null || exchange_rate == "") {
-        alert("兑换折扣！");
+        alert("兑换折扣不能为空！");
+        document.getElementById("exchange_rate").focus();
         return;
     }
     //    var dis = parseFloat(discount);
@@ -128,14 +133,14 @@ function deleteMember(id) {
 function showHideCondition(select) {
     var option = select.options[select.selectedIndex];
     document.getElementById("condition_type").style.display = "none";
-    document.getElementById("discount_type").style.display = "none";
+    document.getElementById("discount_type_select").style.display = "none";
     document.getElementById("keyword").style.display = "inline";
     document.getElementById("keyword").value = "";
     if (option.value == "balance" || option.value == "expenditure") {
         document.getElementById("condition_type").style.display = "inline";
     }
     if (option.value == "discount_type") {
-        document.getElementById("discount_type").style.display = "inline";
+        document.getElementById("discount_type_select").style.display = "inline";
         document.getElementById("keyword").style.display = "none";
     }
 }
@@ -144,8 +149,8 @@ function initializeMember() {
     var keyword_type_value = document.getElementById("keyword_type_value").value;
     var condition_type = document.getElementById("condition_type");
     var condition_type_value = document.getElementById("condition_type_value").value;
-    var discount_type = document.getElementById("discount_type");
-    var discount_type_value = document.getElementById("discount_type_value").value;
+    var discount_type = document.getElementById("discount_type_select");
+    var discount_type_value = document.getElementById("discount_type_select_value").value;
     var keyword = document.getElementById("keyword");
     var keyword_value = document.getElementById("keyword_value").value;
     for (var i = 0; i < keyword_type.options.length; i++) {
@@ -171,7 +176,7 @@ function initializeMember() {
         document.getElementById("condition_type").style.display = "inline";
     }
     if (keyword_type_value == "discount_type") {
-        document.getElementById("discount_type").style.display = "inline";
+        document.getElementById("discount_type_select").style.display = "inline";
         document.getElementById("keyword").style.display = "none";
     }
 }

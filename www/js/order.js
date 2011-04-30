@@ -48,8 +48,8 @@ function showOrderDetail(id, alias, date, totalPrice, count, foods, isPaid,owner
 	var isPaidStr = "";
 	if(isPaid == "0"){
 		isPaidStr = "未结帐";
-	}else{
-		isPaidStr = "已结帐";
+} else {
+		isPaidStr = "已结帐(" + type_name + ")";
 	}
     var content = '<div id="Has_order">' +
 					  '<div class="title">' +
@@ -61,10 +61,10 @@ function showOrderDetail(id, alias, date, totalPrice, count, foods, isPaid,owner
 		                  '<div class="pop_Content3">帐单号：' + id + '</div>' +
 						  '<div class="pop_Content3">&nbsp;&nbsp;&nbsp;台号：' + alias + '</div>' +
 						  '<div class="pop_Content3">&nbsp;&nbsp;&nbsp;日期：' + date + '</div>' +
-						  '<div class="pop_Content3">&nbsp;&nbsp;&nbsp;结帐方式：' + type_name + '</div>' +
+						  //'<div class="pop_Content3">&nbsp;&nbsp;&nbsp;结帐方式：' + type_name + '</div>' +
 						  '<div class="pop_Content3">&nbsp;&nbsp;&nbsp;人数：' + count + '</div>' +
 		                  '<div class="pop_Content3">服务员：' +  owner_name + '</div>' +
-		                  '<div class="pop_Content3">&nbsp;&nbsp;&nbsp;状态：' +  isPaidStr + '</div>' +
+		                  '<div class="pop_Content3">&nbsp;&nbsp;&nbsp;状态：' + isPaidStr + '</div>' +
 						'</div>' +
 						'<div class="title1"><font class="font1">已点菜</font></div>' +
 						  '<div class="cls_container">' +
@@ -192,9 +192,16 @@ function formatNum(num) {
 }
 function viewOrderStat(statType) {
     var editType = "viewStat";
+    var title = "";
+    if (statType == "daily") {
+        title = "日结汇总 - 请选择日期区间";
+    }
+    else {
+        title = "月结汇总 - 请选择日期区间";
+    }
     var content = ' <div class="add_foot">' +
                         '<div class="title">' +
-	                        '<div class="title_left"><font class="font" style="width:350px;">日结/月结汇总 - 请选择日期区间</font></div>' +
+	                        '<div class="title_left"><font class="font" style="width:350px;">' + title + '</font></div>' +
 	                        '<div class="title_right"></div>' +
 	                    '</div>' +
 	                    '<form id="searchForm" name="searchForm" action="order_history.php"  method="post" onkeydown="searchOrderKeyDown()">' +
@@ -220,35 +227,31 @@ function showOrderStat(statType,dateFrom,dateTo)
     if(statType == "daily")
     {
         title = "日结汇总";
-        if (dateFrom != "") {
-            var t = dateFrom;
-            if (dateTo != "") {
-                t += "~" + dateTo;
-            }
-            title += "（" + t + "）";
+        if (dateFrom != "" && dateTo != "") {
+            title += "（" + dateFrom + "~" + dateTo + "）";
+        }
+        else if (dateFrom != "" && dateTo == "") {
+            title += "（" + dateFrom + "之后）";
         }
         else {
-            if (dateTo != "") {
-                title += "（" + dateTo + "）";
-
-            }
+            title += "（" + dateTo + "之前）";
         }
     }
     else
     {
         title = "月结汇总";
-        if (dateFrom != "") {
-            var t = dateFrom.substring(0, dateFrom.lastIndexOf("-"));
-            if (dateTo != "") {
-                t += "~" + dateTo.substring(0, dateTo.lastIndexOf("-"));
-            }
-            title += "（" + t + "）";
+        var df = dateFrom.substring(0, dateFrom.lastIndexOf("-"));
+        var dt = dateTo.substring(0, dateTo.lastIndexOf("-"));
+        if (dateFrom != "" && dateTo != "") {
+            title += "（" + df + "~" + dt + "）";
+            dateFrom = df + "-1";
+            dateTo = dt + "-31";
+        }
+        else if (dateFrom != "" && dateTo == "") {
+            title += "（" + df + "之后）";
         }
         else {
-            if (dateTo != "") {
-                title += "（" + dateTo.substring(0, dateTo.lastIndexOf("-")) + "）";
-
-            }
+            title += "（" + dt + "之前）";
         }
     }
     

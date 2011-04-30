@@ -15,9 +15,14 @@ function deleteFood(id)
     }
     
 }
-function editFood(fId,fCode,fName,fPrice,kitchen)
-{	
-    var titleName;
+function editFood(fId, fCode, fName, fPrice, kitchen, kitchens) {
+    var ks = "";
+    var arr1 = kitchens.split("@");
+    for (var i = 0; i < arr1.length; i++) {
+        var arr2 = arr1[i].split("|");
+        ks += (' <option value="' + arr2[0] + '">' + arr2[1] + '</option>');
+    }
+        var titleName;
     var isDisable = "";
 	if(fId == "")
 	{
@@ -54,9 +59,9 @@ function editFood(fId,fCode,fName,fPrice,kitchen)
 	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57||event.keyCode==46"' +  
 	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
 	                            ' style="ime-mode:Disabled" /></div>' + 
-								'<div class="pop_Content1">厨房：<select id="kitchenSelect" name="kitchenSelect" style="width:85px;"><option value="0">厨房1</option><option value="1">厨房2</option>' +
-	                            ' <option value="2">厨房3</option><option value="3">厨房4</option><option value="4">厨房5</option><option value="5">厨房6</option><option value="6">厨房7</option>'+
-	                            ' <option value="7">厨房8</option><option value="8">厨房9</option><option value="9">厨房10</option><option value="255">空</option></select></div>' +	                          
+								'<div class="pop_Content1">厨房：<select id="kitchenSelect" name="kitchenSelect" style="width:85px;">' +
+                                ks +								
+								'<option value="255">空</option></select></div>' +	                          
 	                        '</div>' +
 	                        '<span class="pop_action-span"><a href="#" onclick="submitFoodData()">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>' +
 	                        '<span class="pop_action-span1"><a href="#" onclick="closeWindow()">取&nbsp;&nbsp;&nbsp;&nbsp;消</a></span>' +

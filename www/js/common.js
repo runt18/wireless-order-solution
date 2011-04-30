@@ -56,6 +56,7 @@ function getSelectedItem(id, formId) {
     hidIds.value = ids;
     hidIds.type = "hidden";
     form.appendChild(hidIds);
+    return ids;
 }
 
 function preview(oper) {
