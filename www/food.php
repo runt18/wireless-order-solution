@@ -167,7 +167,21 @@ if($deleteId != null)
 }
 ?>
 <h1>
-<span class="action-span"><a href="#" onclick="editFood('','','','','0')">添加新菜</a></span><span class="action-span"><a href="#" onclick="showFoodRanked()">点菜统计</a></span>
+<?php
+include("conn.php"); 
+mysql_query("SET NAMES utf8"); 
+$kitchens = "";
+$sql = "SELECT alias_id, name FROM kitchen";
+$rs = $db->GetAll($sql);
+foreach ($rs as $row){	
+	if($kitchens  != "")
+	{
+		$kitchens .= "@";
+	}
+	$kitchens .= ($row["alias_id"] . "|" . $row["name"]);
+}
+	?>
+<span class="action-span"><a href="#" onclick="editFood('','','','','0','<?php echo $kitchens; ?>')">添加新菜</a></span><span class="action-span"><a href="#" onclick="showFoodRanked()">点菜统计</a></span>
 <span class="action-span1">e点通会员中心</span><span id="search_id" class="action-span2">&nbsp;- 菜单管理 </span>
 <div style="clear:both"></div>
 </h1>
@@ -184,7 +198,7 @@ mysql_query("SET NAMES utf8");
 $sql = "SELECT alias_id, name FROM kitchen";
 $rs = $db->GetAll($sql);
 foreach ($rs as $row){
-	echo "<option value='".$row["alias_id"]."'>".$row["name"]."</option>";
+	echo "<option value='".$row["alias_id"]."'>".$row["name"]."</option>";	
 }
 	?>
 <option value="255">空</option></select>
@@ -210,12 +224,12 @@ foreach ($rs as $row){
 		</thead>
 		<tbody>
 <?php 	  		
-		 		
+
 $xm=$_REQUEST["keyword_type"];
 $ct=$_REQUEST["condition_type"];
 $kw=$_REQUEST["keyword"]; 
 $kitchen_value=$_REQUEST["kitchen"];
-$sql = "SELECT f.*,k.name AS kitchen FROM food f LEFT JOIN kitchen k ON f.kitchen = k.alias_id WHERE f.enabled=1 AND f.restaurant_id=" . $_SESSION["restaurant_id"];		
+$sql = "SELECT f.*,CASE WHEN k.name IS NULL THEN '空' ELSE k.name END AS kitchen,k.alias_id AS kitchen_value FROM food f LEFT JOIN kitchen k ON f.kitchen = k.alias_id WHERE f.enabled=1 AND f.restaurant_id=" . $_SESSION["restaurant_id"];		
 switch ($xm)
 {
 	case "is_no":
@@ -260,7 +274,7 @@ foreach ($rs as $row){
 	echo "<td>" .$row["name"] ."</td>";
 	echo "<td>" .$row["unit_price"] ."</td>";
 	echo "<td>" .$row["kitchen"] ."</td>";
-	echo "<td><a href='#' onclick='editFood(&quot;".$row["id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["name"]."&quot;,&quot;".$row["unit_price"]."&quot;,&quot;".$row["kitchen"].
+	echo "<td><a href='#' onclick='editFood(&quot;".$row["id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["name"]."&quot;,&quot;".$row["unit_price"]."&quot;,&quot;".$row["kitchen_value"]."&quot;,&quot;".$kitchens.
 		"&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
 		"<a href='#' onclick='deleteFood(".$row["id"].")'><img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;删除</a></td>";
 	echo "</tr>";
