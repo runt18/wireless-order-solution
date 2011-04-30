@@ -71,12 +71,17 @@ include("conn.php");
 mysql_close($con);
 		?>			
 	</tbody>
+	<tfoot>
+		<tr>
+			<td colspan="3" style="text-align:right">汇总：</td>
+			<td><?php echo $total_price;?></td>
+		</tr>
+	</tfoot>
   </table>
   </div>
   
-	<div id="controls" style="width:420px;text-align:right;margin: 0px -50px;">      
-        <div id="text" style="font-size:12px;text-align:right"><?php echo "汇总（￥）：" .$total_price ."&nbsp;"; ?></div>
-
+	<div id="controls" style="width:420px;text-align:right;margin: 0px -50px;">  
+		<div id="text" style="font-size:12px;text-align:right"><?php echo "总计" .$bh ."&nbsp;条记录"; ?></div>           
 		<div id="navigation" style="font-size:12px;text-align:right">
   		      <span id="page-link"> </span>			  
 			  <a href="#" onclick="sorter.move(-1,true)">首页</a>

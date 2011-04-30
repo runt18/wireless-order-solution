@@ -132,7 +132,7 @@ else if($editType == "deleteMember")
 	<option value="EqualOrGrater" selected="selected">大于等于</option>
 	<option value="EqualOrLess">小于等于</option>
 	</select>
-	<select id="discount_type" name="discount_type" style="display:none">
+	<select id="discount_type_select" name="discount_type_select" style="display:none">
 	<option value="0" selected="selected">折扣方式1</option>
 	<option value="1">折扣方式2</option>	
 	</select>
@@ -164,9 +164,9 @@ include("conn.php");
 $xm=$_REQUEST["keyword_type"];
 $ct=$_REQUEST["condition_type"];
 $kw=$_REQUEST["keyword"]; 
-$discount_type = $_REQUEST["discount_type"];
+$discount_type_select = $_REQUEST["discount_type_select"];
 $sql = "SELECT id,alias_id,name,birth,tele,discount_type,balance,exchange_rate,expenditure FROM member a"
-	." LEFT JOIN (SELECT member_id,SUM(total_price) AS expenditure FROM `order` GROUP BY member_id) AS b ON a.alias_id = b.member_id WHERE restaurant_id=" . $_SESSION["restaurant_id"];			
+	." LEFT JOIN (SELECT member_id,SUM(total_price) AS expenditure FROM `order_history` GROUP BY member_id) AS b ON a.alias_id = b.member_id WHERE restaurant_id=" . $_SESSION["restaurant_id"];			
 switch ($xm)
 {
 	case "alias_id":
@@ -182,7 +182,7 @@ switch ($xm)
 			$sql .= " AND tele = $kw" ;  				
 		break;		
 	case "discount_type":
-		$sql .= " AND discount_type = $discount_type" ;  
+		$sql .= " AND discount_type = $discount_type_select" ;  
 		break;		
 	case "balance":
 		if ($kw!="")
@@ -240,8 +240,8 @@ foreach ($rs as $row){
 	echo "<td>" .$row["balance"] ."</td>";
 	echo "<td>" .$row["exchange_rate"] ."</td>";	
 	echo "<td>" .$row["expenditure"] ."</td>";		
-	echo "<td><a href='#' onclick='editMember(&quot;".$row["id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["name"]."&quot;,&quot;".$row["birth"]."&quot;,&quot;".$row["tele"]."&quot;,&quot;".$row["discount_type"].
-		"&quot;,&quot;".$row["balance"]."&quot;,&quot;".$row["exchange_rate"]."&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
+	echo "<td><a href='#' onclick='editMember(&quot;".$row["id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["name"]."&quot;,&quot;".$row["birth"]."&quot;,&quot;".$row["tele"]."&quot;,&quot;".$row["exchange_rate"].
+		"&quot;,&quot;".$row["discount_type"]."&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
 		"<a href='#' onclick='recharge(&quot;".$row["id"]."&quot;,&quot;".$row["name"]."&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;冲值</a>".
 		"<a href='#' onclick='deleteMember(".$row["id"].")'><img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;删除</a>".
 		"<a href='#' onclick='viewDetail(&quot;".$row["alias_id"]."&quot;,&quot;".$row["name"]."&quot;)'><img src='images/View.png'  height='16' width='14' border='0'/>&nbsp;明细</a></td>";
@@ -289,7 +289,7 @@ function GetDiscountTypeName($discount_type)
 <?php
 echo "<input type='hidden' id='keyword_type_value' value='$xm' />";
 echo "<input type='hidden' id='condition_type_value' value='$ct' />";
-echo "<input type='hidden' id='discount_type_value' value='$discount_type' />";
+echo "<input type='hidden' id='discount_type_select_value' value='$discount_type_select' />";
 echo "<input type='hidden' id='keyword_value' value='$kw' />";
     ?>
 	<script type="text/javascript" src="js/script.js"></script>
