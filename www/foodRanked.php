@@ -17,8 +17,12 @@ include("hasLogin.php");
 <script type="text/javascript" src="js/common.js"></script>
 <script type="text/javascript">
 function submitSearch() {
-	getSelectedItem("selectedList", "searchForm");
-	document.getElementById("searchForm").submit();
+if(getSelectedItem("selectedList", "searchForm") == "")
+{
+	alert("请至少选择一种菜品进行统计！");
+	return;
+}
+document.getElementById("searchForm").submit();
 }
 </script>
 </head> 
@@ -38,7 +42,7 @@ mysql_query("SET NAMES utf8");
 	</div>
 	<div style="width:100%;margin-top:10px;height:280px">
 		<div style="float:left;width:40%;text-align:right;height:100%">
-			<select id="foodList" multiple="multiple" style="width:80%;height:100%">
+			<select id="foodList" multiple="multiple" ondblclick="moveSelectedItem('foodList','selectedList')" style="width:80%;height:100%">
 <?PHP
 $ids = $_POST["ids"];
 if($ids == null)
@@ -59,7 +63,7 @@ if($ids == null)
 			<div style="width:100%;text-align:center;margin-top:10px;font-size:14px"><a href="#" onclick="moveSelectedItem('selectedList','foodList')">&lt;</a></div>		
 		</div>
 		<div style="float:left;width:40%;text-align:left;height:100%">
-			<select id="selectedList" multiple="multiple" style="width:80%;height:100%">				
+			<select id="selectedList" multiple="multiple" ondblclick="moveSelectedItem('selectedList','foodList')" style="width:80%;height:100%">				
 			</select>
 		</div>
 	</div>
@@ -90,7 +94,8 @@ if($ids != null)
 {	
 	$dateFrom = $_POST["dateFrom"];
 	$dateTo = $_POST["dateTo"];
-	$sql = "SELECT f.id,d.order_count,f.name,f.unit_price,d.order_count,format(f.unit_price*d.order_count,2) as total_price FROM 
+	$sql = "SELECT f.id,d.order_count,f.name,f.unit_price,CASE WHEN d.order_count IS NULL THEN 0 ELSE d.order_count END AS order_count,
+			CASE WHEN format(f.unit_price*d.order_count,2) IS NULL THEN 0 ELSE format(f.unit_price*d.order_count,2) END AS total_price FROM 
 			food f LEFT JOIN
 			(SELECT a.id,SUM(b.order_count) AS order_count FROM `food` a 
 			INNER JOIN order_food_history b ON a.alias_id = b.food_id
@@ -166,9 +171,20 @@ mysql_close($con);
 	sorter.init("table",0);
 <?php
 if($ids != null)
-{
+{	
 	echo "document.getElementById('divSearch').style.display='none';document.getElementById('divContent').style.display = 'block';";
-	echo "parent.document.getElementById('titleName').innerText = '点菜统计(".$dateFrom."~".$dateTo.")';";
+	if($dateFrom != "" & $dateTo != "")
+	{
+		echo "parent.document.getElementById('titleName').innerText = '点菜统计(".$dateFrom."~".$dateTo.")';";
+	}
+	else if($dateFrom != "" & $dateTo == "")
+		{
+			echo "parent.document.getElementById('titleName').innerText = '点菜统计(".$dateFrom."之后)';";
+		}
+		else if($dateFrom == "" & $dateTo != "")
+			{
+				echo "parent.document.getElementById('titleName').innerText = '点菜统计(".$dateTo."之前)';";
+			}
 }
 	?>
   </script>
