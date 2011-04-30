@@ -25,10 +25,28 @@ bool RespParse::parsePrintLogin(const ProtocolPackage& resp, vector<Kitchen>& ki
 	* nKitchen : <kitchen_1> : ... : <kitchen_n>
 	* nKitchen - the number of kitchens
 	* <kitchen_x>
-	* len_name : name
-	* len_name - the length of the kitchen name
+	* alias_id : len_name : name
+	* aliad_id - the alias id to this kitchen
+	* len_name - the length of kitchen name
 	* name - the name to kitchen
 	*******************************************************/
-	kitchens.push_back(Kitchen("aaa", 1));
+	//get the number of kitchens
+	int nKitchen = resp.body[0];
+	int offset = 1;
+	for(int i = 0; i < nKitchen; i++){
+		//get the alias id
+		short alias_id = resp.body[offset];
+		//get the length of kitchen name
+		int len = resp.body[offset + 1];
+		//get the name of kitchen
+		string name;
+		name.assign(resp.body + offset + 2, len);
+		offset += 1 + /* alias id takes up 1-byte */
+				  1 + /* length to kitchen name takes up 1-byte */
+				  len; /* the name takes up length bytes */
+		//add the kitchen to the result set
+		kitchens.push_back(Kitchen(name, alias_id));
+	}
+
 	return true;
 }

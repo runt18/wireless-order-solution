@@ -10,7 +10,7 @@
 #include <fstream>
 using namespace std;
 
-extern CString _Conf_Path_;
+extern CString g_ConfPath;
 
 // CNetSettingDlg dialog
 
@@ -48,7 +48,7 @@ BOOL CNetSettingDlg::OnInitDialog()
 		tabCtrl->InsertItem(0, _T("连接参数"));
 	}
 	//read and get the parameters from configuration file
-	ifstream fin(_Conf_Path_);
+	ifstream fin(g_ConfPath);
 	if(fin.good()){
 		fin >> m_Conf;
 		TiXmlElement* pRemote = TiXmlHandle(&m_Conf).FirstChildElement(ConfTags::CONF_ROOT).FirstChildElement(ConfTags::REMOTE).Element();
@@ -121,7 +121,7 @@ void CNetSettingDlg::OnOK(){
 			pRemote->SetAttribute(ConfTags::PWD, MD5(pwd).toString());
 		}
 
-		ofstream out(_Conf_Path_);
+		ofstream out(g_ConfPath);
 		out << m_Conf;
 		out.close();
 	}

@@ -22,6 +22,7 @@ public:
 	static const int KITCHEN_9 = 8;
 	static const int KITCHEN_10 = 9;
 
+	Kitchen();
 	Kitchen(const string& kName, int id);
 	Kitchen(const Kitchen& right);
 	Kitchen& operator=(const Kitchen& right);

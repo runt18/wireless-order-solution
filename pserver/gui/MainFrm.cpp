@@ -22,7 +22,7 @@ using namespace std;
 //the string indicating the version of the program
 const TCHAR* _PROG_VER_ = _T("0.9.4");
 //the path to the conf.xml
-CString _Conf_Path_;
+CString g_ConfPath;
 //the path to new setup program
 CString g_NewProgPath;
 //the flag indicating what action would be perform after quit the program
@@ -30,6 +30,9 @@ CString g_NewProgPath;
 //1 - Run new setup program normally
 //2 - Run new setup program silently 
 int g_DoQuitProg = 0;
+
+vector<CString> g_Kitchens;
+
 
 static bool g_isPrinterStarted = false;
 
@@ -75,6 +78,13 @@ static UINT indicators[] =
 CMainFrame::CMainFrame() : m_pStatusView(NULL), m_pPrinterView(NULL), m_UpdateWaitTime(10), m_TimerID(0)
 {
 	// TODO: add member initialization code here
+	//initialize the kitchens, "厨房1" to "厨房10" and "所有厨房"
+	for(int i = 0; i < 10; i++){
+		CString kit;
+		kit.Format(_T("厨房%d"), i + 1);
+		g_Kitchens.push_back(kit);
+	}
+	g_Kitchens.push_back(_T("所有厨房"));
 }
 
 CMainFrame::~CMainFrame()
@@ -143,13 +153,13 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext){
 	m_pPrinterView = (CPrinterView*)m_wndSplitter.GetPane(1, 0);
 
 	//get the path of the gui.exe
-	GetModuleFileName(NULL, _Conf_Path_.GetBufferSetLength(MAX_PATH + 1), MAX_PATH);
-	_Conf_Path_.ReleaseBuffer(); 
+	GetModuleFileName(NULL, g_ConfPath.GetBufferSetLength(MAX_PATH + 1), MAX_PATH);
+	g_ConfPath.ReleaseBuffer(); 
 	//get the directory of the gui.exe
-	int pos = _Conf_Path_.ReverseFind('\\'); 
-	_Conf_Path_ = _Conf_Path_.Left(pos); 
+	int pos = g_ConfPath.ReverseFind('\\'); 
+	g_ConfPath = g_ConfPath.Left(pos); 
 	//connect the conf.xml to the directory
-	_Conf_Path_.Append(_T("\\conf.xml"));
+	g_ConfPath.Append(_T("\\conf.xml"));
 
 	//read and get the parameters from configuration file
 	OnStartPrinter();
@@ -238,7 +248,7 @@ static unsigned _stdcall StartPrinterProc(LPVOID pvParam){
 	g_isPrinterStarted = true;
 
 	//get the path of the gui.exe
-	ifstream fin(_Conf_Path_);
+	ifstream fin(g_ConfPath);
 
 	bool isAutoUpdate = false;
 	//if the conf.xml exist, pass it to pserver and start to run,
@@ -268,7 +278,7 @@ static unsigned _stdcall StartPrinterProc(LPVOID pvParam){
 				pRoot->LinkEndChild(pAutoUpdate);
 				fin.close();
 				//save to the conf.xml
-				ofstream fout(_Conf_Path_);
+				ofstream fout(g_ConfPath);
 				fout << confDoc;
 				fout.close();
 			}
@@ -295,7 +305,7 @@ static unsigned _stdcall StartPrinterProc(LPVOID pvParam){
 		confDoc.LinkEndChild(pDecl);
 		confDoc.LinkEndChild(pRoot);
 
-		ofstream fout(_Conf_Path_);
+		ofstream fout(g_ConfPath);
 		fout << confDoc;
 		fout.close();
 		isAutoUpdate = true;
@@ -307,7 +317,7 @@ static unsigned _stdcall StartPrinterProc(LPVOID pvParam){
 
 	if(isAutoUpdate){
 		//check to see if new version exist
-		fin.open(_Conf_Path_);
+		fin.open(g_ConfPath);
 		CChkUpdate::instance().check(_PROG_VER_, pMainFrame, fin);
 		fin.close();
 	}
@@ -348,6 +358,18 @@ void CMainFrame::OnPrintReport(int type, const char* msg){
 		MultiByteToWideChar (CP_ACP, 0, msg, -1, pMsg.get(), dwNum);
 		m_pStatusView->ShowStatus(pMsg.get(), 0);
 	}
+}
+
+void CMainFrame::OnRetrieveKitchen(const std::vector<Kitchen>& kitchens){
+	g_Kitchens.clear();
+	for(unsigned int i = 0; i < kitchens.size(); i++){
+		//convert the msg from ANSI to UNICODE
+		DWORD dwNum = MultiByteToWideChar (CP_ACP, 0, kitchens[i].name.c_str(), -1, NULL, 0);
+		boost::shared_ptr<wchar_t> pMsg(new wchar_t[dwNum], boost::checked_array_deleter<wchar_t>());
+		MultiByteToWideChar (CP_ACP, 0, kitchens[i].name.c_str(), -1, pMsg.get(), dwNum);
+		g_Kitchens.push_back(pMsg.get());
+	}
+	g_Kitchens.push_back(_T("所有餐厅"));
 }
 
 void CMainFrame::OnSize(UINT nType, int cx, int cy) {
@@ -611,7 +633,7 @@ void CMainFrame::OnTimer(UINT nIDEvent){
 
 void CMainFrame::OnUpdateAutoChkUpdate(CCmdUI *pCmdUI){
 	TiXmlDocument doc;
-	ifstream fin(_Conf_Path_);
+	ifstream fin(g_ConfPath);
 	fin >> doc;
 	//check the auto update setting 
 	TiXmlElement* pAutoUpdate = TiXmlHandle(&doc).FirstChildElement(ConfTags::CONF_ROOT).FirstChildElement(ConfTags::AUTO_UPDATE).Element();
@@ -629,7 +651,7 @@ void CMainFrame::OnUpdateAutoChkUpdate(CCmdUI *pCmdUI){
 
 void CMainFrame::OnAutoUpdate(){
 	TiXmlDocument doc;
-	ifstream fin(_Conf_Path_);
+	ifstream fin(g_ConfPath);
 	fin >> doc;
 	//check the auto update setting 
 	TiXmlElement* pAutoUpdate = TiXmlHandle(&doc).FirstChildElement(ConfTags::CONF_ROOT).FirstChildElement(ConfTags::AUTO_UPDATE).Element();
@@ -645,7 +667,7 @@ void CMainFrame::OnAutoUpdate(){
 	}
 	fin.close();
 
-	ofstream fout(_Conf_Path_);
+	ofstream fout(g_ConfPath);
 	fout << doc;
 	fout.close();
 }
@@ -678,7 +700,7 @@ void CMainFrame::OnHelpOnline(){
 			cmdBrowser.Replace(_T("%1"), _T(""));
 
 			//get the path of the gui.exe
-			ifstream fin(_Conf_Path_);
+			ifstream fin(g_ConfPath);
 			if(fin.good()){
 				TiXmlDocument confDoc;
 				fin >> confDoc;

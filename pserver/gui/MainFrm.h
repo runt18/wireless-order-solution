@@ -63,6 +63,7 @@ public:
 	afx_msg void OnStartPrinter();
 	virtual void OnPrintReport(int type, const char* msg);
 	virtual void OnPrintExcep(int type, const char* msg);
+	virtual void OnRetrieveKitchen(const std::vector<Kitchen>& kitchens);
 	afx_msg void OnNetworkSetting();
 	afx_msg void OnPrinterSetting();
 	afx_msg void OnUpdateStartPrinter(CCmdUI* pCmdUI);

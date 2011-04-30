@@ -12,8 +12,7 @@
 #include <boost/shared_ptr.hpp>
 using namespace std;
 
-extern TCHAR* _PrinterKitchen[];
-extern int _nKitchen;
+extern vector<CString> g_Kitchens;
 
 TCHAR* _FuncDesc[] = {
 	_T("Î´Öª"), _T("ÏÂµ¥"), _T("ÏÂµ¥(ÏêÏ¸)"), _T("½áÕÊ"), _T("¼Ó²Ë(ÏêÏ¸)"), _T("ÍË²Ë(ÏêÏ¸)"), _T("´ß²Ë(ÏêÏ¸)")
@@ -108,15 +107,15 @@ void CPrinterListCtrl::Update(){
 					if(ret == TIXML_NO_ATTRIBUTE){
 						SetItemText(row, COLUMN_FUNC_CODE, _FuncDesc[func]);
 
-					}else if(kitchen > _nKitchen - 1 && kitchen != Kitchen::KITCHEN_FULL && kitchen != Kitchen::KITCHEN_NULL){
+					}else if(kitchen > (int)g_Kitchens.size() - 1 && kitchen != Kitchen::KITCHEN_FULL && kitchen != Kitchen::KITCHEN_NULL){
 						SetItemText(row, COLUMN_FUNC_CODE, _FuncDesc[func]);
 
 					}else{
 						if(kitchen == Kitchen::KITCHEN_FULL){
-							kitchen = _nKitchen - 1;
+							kitchen = g_Kitchens.size() - 1;
 						}
 						CString tmp;
-						tmp.Format(_T("%s - %s"), _FuncDesc[func], _PrinterKitchen[kitchen]);
+						tmp.Format(_T("%s - %s"), _FuncDesc[func], g_Kitchens[kitchen]);
 						SetItemText(row, COLUMN_FUNC_CODE, tmp);
 					}
 				}else{

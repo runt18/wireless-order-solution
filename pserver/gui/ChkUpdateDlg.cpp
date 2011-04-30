@@ -11,7 +11,7 @@ using namespace std;
 extern const TCHAR* _PROG_VER_;
 extern int g_DoQuitProg;
 extern CString g_NewProgPath;
-extern CString _Conf_Path_;
+extern CString g_ConfPath;
 
 // CChkUpdateDlg dialog
 
@@ -40,7 +40,7 @@ void CChkUpdateDlg::DoDataExchange(CDataExchange* pDX)
 
 BOOL CChkUpdateDlg::OnInitDialog(){
 	//CDialog::OnInitDialog();
-	ifstream fin(_Conf_Path_);
+	ifstream fin(g_ConfPath);
 	CChkUpdate::instance().check(_PROG_VER_, this, fin);
 	fin.close();
 	return TRUE;

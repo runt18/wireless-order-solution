@@ -13,9 +13,8 @@
 #include <boost/shared_ptr.hpp>
 using namespace std;
 
-extern CString _Conf_Path_;
-extern TCHAR* _PrinterKitchen[];
-extern int _nKitchen;
+extern CString g_ConfPath;
+extern vector<CString> g_Kitchens;
 
 // CPrinterSettingDlg dialog
 
@@ -80,15 +79,15 @@ void CPrinterSettingDlg::Update(){
 				if(ret == TIXML_NO_ATTRIBUTE){
 					m_PrinterListCtrl.SetItemText(row, COLUMN_FUNC_CODE, _FuncDesc[func]);
 
-				}else if(kitchen > _nKitchen - 1 && kitchen != Kitchen::KITCHEN_FULL && kitchen != Kitchen::KITCHEN_NULL){
+				}else if(kitchen > (int)g_Kitchens.size() - 1 && kitchen != Kitchen::KITCHEN_FULL && kitchen != Kitchen::KITCHEN_NULL){
 					m_PrinterListCtrl.SetItemText(row, COLUMN_FUNC_CODE, _FuncDesc[func]);
 
 				}else{
 					if(kitchen == Kitchen::KITCHEN_FULL){
-						kitchen = _nKitchen - 1;
+						kitchen = g_Kitchens.size() - 1;
 					}
 					CString tmp;
-					tmp.Format(_T("%s - %s"), _FuncDesc[func], _PrinterKitchen[kitchen]);
+					tmp.Format(_T("%s - %s"), _FuncDesc[func], g_Kitchens[kitchen]);
 					m_PrinterListCtrl.SetItemText(row, COLUMN_FUNC_CODE, tmp);
 				}
 			}else{
@@ -130,7 +129,7 @@ BOOL CPrinterSettingDlg::OnInitDialog(){
 	m_PrinterListCtrl.InsertColumn(COLUMN_PRINTER_STYLE, _T("ÀàÐÍ"), LVCFMT_LEFT, 55);
 	m_PrinterListCtrl.InsertColumn(COLUMN_PRINTER_DESC, _T("ÃèÊö"), LVCFMT_LEFT, 250);
 
-	ifstream fin(_Conf_Path_);
+	ifstream fin(g_ConfPath);
 	if(fin.good()){
 		fin >> m_Conf;
 	}
@@ -172,7 +171,7 @@ void CPrinterSettingDlg::OnNMRClickPrinterList(NMHDR *pNMHDR, LRESULT *pResult)
 }
 
 void CPrinterSettingDlg::OnOK(){
-	ofstream fout(_Conf_Path_);
+	ofstream fout(g_ConfPath);
 	if(fout.good()){
 		fout.seekp(ios::beg);
 		fout << m_Conf;

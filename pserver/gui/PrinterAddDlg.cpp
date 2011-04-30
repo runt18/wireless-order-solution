@@ -11,13 +11,9 @@
 #include <winspool.h>
 #include <boost/shared_ptr.hpp>
 
-TCHAR* _PrinterKitchen[] = {
-	_T("厨房1"), _T("厨房2"), _T("厨房3"), _T("厨房4"), _T("厨房5"), _T("厨房6"), _T("厨房7"), _T("厨房8"), _T("厨房9"), _T("厨房10"), _T("所有厨房")
-};
-
-int _nKitchen = sizeof(_PrinterKitchen) / sizeof(TCHAR*);
-
 // CAddPrinterDlg dialog
+
+extern vector<CString> g_Kitchens;
 
 IMPLEMENT_DYNAMIC(CAddPrinterDlg, CDialog)
 
@@ -79,9 +75,9 @@ BOOL CAddPrinterDlg::OnInitDialog(){
 	m_Funcs.GetLBText(0, m_Func);	
 
 	//set the printer kitchen 
-	for(int i = 0; i < _nKitchen; i++){
+	for(unsigned int i = 0; i < g_Kitchens.size(); i++){
 		//m_PrintKitchen.AddString(_PrinterKitchen[i]);
-		m_PrintKitchen.InsertString(i, _PrinterKitchen[i]);
+		m_PrintKitchen.InsertString(i, g_Kitchens[i]);
 	}
 	m_PrintKitchen.SetCurSel(0);
 	m_Kitchen = m_PrintKitchen.GetCurSel();
@@ -171,7 +167,7 @@ void CAddPrinterDlg::OnOK(){
 				(selected + 1) == Reserved::PRINT_CANCELLED_FOOD ||
 				(selected + 1) == Reserved::PRINT_HURRY_FOOD){
 				int kitchen = m_PrintKitchen.GetCurSel();
-				if(kitchen == _nKitchen - 1){
+				if(kitchen == g_Kitchens.size() - 1){
 					kitchen = Kitchen::KITCHEN_FULL;
 				}
 				sprintf_s(tmp, sizeof(tmp), "%d", kitchen);

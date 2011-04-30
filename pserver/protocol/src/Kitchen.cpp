@@ -1,6 +1,10 @@
 #include "stdafx.h"
 #include "../inc/Kitchen.h"
 
+Kitchen::Kitchen(){
+	alias_id = KITCHEN_NULL;
+}
+
 Kitchen::Kitchen(const string& kName, int id){
 	name = kName;
 	alias_id = id;

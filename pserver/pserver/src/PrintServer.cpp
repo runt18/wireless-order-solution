@@ -370,6 +370,7 @@ static unsigned __stdcall LoginProc(LPVOID pvParam){
 								RespParse::parsePrintLogin(loginResp, kits);
 								if(pReport){
 									pReport->OnPrintReport(0, "µÇÂ¼³É¹¦");
+									pReport->OnRetrieveKitchen(kits);
 								}
 								//notify the print manager thread to run
 								SetEvent(g_hPrintMgrEvent);
