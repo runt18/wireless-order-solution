@@ -20,11 +20,12 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	virtual BOOL OnInitDialog();
 	virtual void OnOK();
+	afx_msg void OnClose();
 	DECLARE_MESSAGE_MAP()
 
 private:
 	CTabCtrl m_TabCtrl;
-	CListCtrl m_PrinterListCtrl;
+	CPrinterListCtrl m_ListCtrl;
 	TiXmlDocument m_Conf;
 	void Update();
 	vector<TiXmlElement*> m_Printers;

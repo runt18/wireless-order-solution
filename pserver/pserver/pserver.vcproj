@@ -208,6 +208,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\PrintFunc.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\PrintServer.cpp"
 				>
 			</File>
@@ -251,6 +255,10 @@
 			</File>
 			<File
 				RelativePath=".\inc\PrinterInstance.h"
+				>
+			</File>
+			<File
+				RelativePath=".\inc\PrintFunc.h"
 				>
 			</File>
 			<File

@@ -271,6 +271,20 @@ static unsigned _stdcall StartPrinterProc(LPVOID pvParam){
 				}else{
 					isAutoUpdate = false;
 				}
+
+				/**
+				 * Since we add "repeat" attribute from 0.9.4,
+				 * we need to check to see whether each printer tag containing the "repeat" attribute.
+				 * If not containing "repeat" attribute, add one whose default value is 1.
+				 */
+				TiXmlElement* pPrinter = TiXmlHandle(&confDoc).FirstChildElement(ConfTags::CONF_ROOT).FirstChildElement(ConfTags::PRINTER).Element();
+				for(pPrinter; pPrinter != NULL; pPrinter = pPrinter->NextSiblingElement(ConfTags::PRINTER)){
+					int repeat = 0;
+					int ret = pPrinter->QueryIntAttribute(ConfTags::PRINT_STYLE, &repeat);
+					if(ret == TIXML_NO_ATTRIBUTE){
+						pPrinter->SetAttribute(ConfTags::PRINT_REPEAT, 1);
+					}
+				}
 			}else{
 				//create the <auto_update> tag and set it on
 				TiXmlElement * pAutoUpdate = new TiXmlElement(ConfTags::AUTO_UPDATE);
@@ -370,6 +384,7 @@ void CMainFrame::OnRetrieveKitchen(const std::vector<Kitchen>& kitchens){
 		g_Kitchens.push_back(pMsg.get());
 	}
 	g_Kitchens.push_back(_T("ËùÓÐ²ÍÌü"));
+	m_pPrinterView->Update();
 }
 
 void CMainFrame::OnSize(UINT nType, int cx, int cy) {

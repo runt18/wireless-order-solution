@@ -8,16 +8,15 @@
 #include <WinSpool.h>
 #include <boost/shared_ptr.hpp>
 
-PrinterInstance::PrinterInstance() : name(""), m_hPrintThread(NULL), pPrintReport(NULL), style(PRINT_STYLE_UNKNOWN), kitchen4Detail(Kitchen::KITCHEN_NULL){
+PrinterInstance::PrinterInstance() : name(""), m_hPrintThread(NULL), pPrintReport(NULL), style(PRINT_STYLE_UNKNOWN){
 	hPrintEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 	hEndPrintEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 	InitializeCriticalSection(&m_csJobQueue);
 }
 
-PrinterInstance::PrinterInstance(const char* pName, int iFunc, int iStyle, IPReport* pReport){
+PrinterInstance::PrinterInstance(const char* pName, int iStyle, IPReport* pReport){
 	name = pName;
 	style = iStyle;
-	funcs.push_back(iFunc);
 	m_hPrintThread = NULL;
 	pPrintReport = pReport;
 	hPrintEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
@@ -28,12 +27,12 @@ PrinterInstance::PrinterInstance(const char* pName, int iFunc, int iStyle, IPRep
 PrinterInstance::PrinterInstance(const PrinterInstance &right){
 	name = right.name;
 	style = right.style;
-	kitchen4Detail = right.kitchen4Detail;
-	kitchen4Extra = right.kitchen4Extra;
-	kitchen4Cancelled = right.kitchen4Cancelled;
-	kitchen4Hurry = right.kitchen4Hurry;
+	//kitchen4Detail = right.kitchen4Detail;
+	//kitchen4Extra = right.kitchen4Extra;
+	//kitchen4Cancelled = right.kitchen4Cancelled;
+	//kitchen4Hurry = right.kitchen4Hurry;
 	funcs.clear();
-	vector<int>::const_iterator iter = right.funcs.begin();
+	vector<PrintFunc>::const_iterator iter = right.funcs.begin();
 	for(iter; iter != right.funcs.end(); iter++){
 		funcs.push_back(*iter);
 	}
@@ -46,12 +45,12 @@ PrinterInstance::PrinterInstance(const PrinterInstance &right){
 PrinterInstance& PrinterInstance::operator =(const PrinterInstance &right){
 	name = right.name;
 	style = right.style;
-	kitchen4Detail = right.kitchen4Detail;
-	kitchen4Extra = right.kitchen4Extra;
-	kitchen4Cancelled = right.kitchen4Cancelled;
-	kitchen4Hurry = right.kitchen4Hurry;
+	//kitchen4Detail = right.kitchen4Detail;
+	//kitchen4Extra = right.kitchen4Extra;
+	//kitchen4Cancelled = right.kitchen4Cancelled;
+	//kitchen4Hurry = right.kitchen4Hurry;
 	funcs.clear();
-	vector<int>::const_iterator iter = right.funcs.begin();
+	vector<PrintFunc>::const_iterator iter = right.funcs.begin();
 	for(iter; iter != right.funcs.end(); iter++){
 		funcs.push_back(*iter);
 	}
@@ -127,17 +126,17 @@ static unsigned __stdcall PrintProc(LPVOID pvParam){
 
 					DOC_INFO_1 stDocInfo;
 					memset(&stDocInfo, 0, sizeof(DOC_INFO_1));
-					if(job.func == Reserved::PRINT_ORDER){
+					if(job.func.code == Reserved::PRINT_ORDER){
 						stDocInfo.pDocName = L"下单";
-					}else if(job.func == Reserved::PRINT_ORDER_DETAIL){
+					}else if(job.func.code == Reserved::PRINT_ORDER_DETAIL){
 						stDocInfo.pDocName = L"下单详细";
-					}else if(job.func == Reserved::PRINT_RECEIPT){
+					}else if(job.func.code == Reserved::PRINT_RECEIPT){
 						stDocInfo.pDocName = L"结帐";
-					}else if(job.func == Reserved::PRINT_EXTRA_FOOD){
+					}else if(job.func.code == Reserved::PRINT_EXTRA_FOOD){
 						stDocInfo.pDocName = L"加菜详细";
-					}else if(job.func == Reserved::PRINT_CANCELLED_FOOD){
+					}else if(job.func.code == Reserved::PRINT_CANCELLED_FOOD){
 						stDocInfo.pDocName = L"退菜详细";
-					}else if(job.func == Reserved::PRINT_HURRY_FOOD){
+					}else if(job.func.code == Reserved::PRINT_HURRY_FOOD){
 						stDocInfo.pDocName = L"催菜详细";
 					}else{
 						stDocInfo.pDocName = L"未知信息";
@@ -150,23 +149,26 @@ static unsigned __stdcall PrintProc(LPVOID pvParam){
 					result = StartPagePrinter(hPrinter);
 					_ASSERT(result == TRUE);
 
-					DWORD dwWritten = 0;
-					result = WritePrinter(hPrinter, (char*)job.content.c_str(), job.content.length(), &dwWritten);
-					_ASSERT(result == TRUE);
-					if(pPI->pPrintReport){
-						DWORD dwNum = WideCharToMultiByte(CP_OEMCP, NULL, stDocInfo.pDocName, -1, NULL, 0, NULL, FALSE);
-						boost::shared_ptr<char> doc_name(new char[dwNum], boost::checked_array_deleter<char>());
-						WideCharToMultiByte (CP_OEMCP, NULL, stDocInfo.pDocName, -1, doc_name.get(), dwNum, NULL, FALSE);
+					//print the receipt for repeat times
+					for(int i = 0; i < job.func.repeat; i++){
+						DWORD dwWritten = 0;
+						result = WritePrinter(hPrinter, (char*)job.content.c_str(), job.content.length(), &dwWritten);
+						_ASSERT(result == TRUE);
+						if(pPI->pPrintReport){
+							DWORD dwNum = WideCharToMultiByte(CP_OEMCP, NULL, stDocInfo.pDocName, -1, NULL, 0, NULL, FALSE);
+							boost::shared_ptr<char> doc_name(new char[dwNum], boost::checked_array_deleter<char>());
+							WideCharToMultiByte (CP_OEMCP, NULL, stDocInfo.pDocName, -1, doc_name.get(), dwNum, NULL, FALSE);
 
-						if(result == TRUE){
-							ostringstream os;
-							os << pPI->name << " 打印" << doc_name.get() << "信息成功";
-							pPI->pPrintReport->OnPrintReport(job.func, os.str().c_str());
-						}else{
-							ostringstream os;
-							os << pPI->name << " 打印" << doc_name.get() << "信息失败";
-							pPI->pPrintReport->OnPrintExcep(0, os.str().c_str());
-						}							
+							if(result == TRUE){
+								ostringstream os;
+								os << pPI->name << " 打印" << doc_name.get() << "信息成功";
+								pPI->pPrintReport->OnPrintReport(job.func.code, os.str().c_str());
+							}else{
+								ostringstream os;
+								os << pPI->name << " 打印" << doc_name.get() << "信息失败";
+								pPI->pPrintReport->OnPrintExcep(0, os.str().c_str());
+							}							
+						}
 					}
 
 					result = EndPagePrinter(hPrinter);
@@ -174,8 +176,6 @@ static unsigned __stdcall PrintProc(LPVOID pvParam){
 
 					result = EndDocPrinter(hPrinter);
 					_ASSERT(result == TRUE);
-
-
 				}
 			}
 
@@ -227,7 +227,7 @@ void PrinterInstance::addJob(const char* buf, int len, int iFunc){
 	* len[2] - length of the <Body>
 	* <Print_1..n>
 	* style[1] : len[2] : print_content[x]
-	* style[1] - 1-byte indicats the print style
+	* style[1] - 1-byte indicates the print style
 	* len[2] - 2-byte indicates the length of following print content
 	* print_content - the print content                                                                     
 	************************************************************************/
@@ -245,35 +245,17 @@ void PrinterInstance::addJob(const char* buf, int len, int iFunc){
 		}
 	}
 
-	vector<string> details; 
-	//in the case of printing order detail, need to filter the order details matched the printer instance's kitchen
-	//offset = 0;
-	//if(!print_content.empty() && iFunc == Reserved::PRINT_ORDER_DETAIL){
-	//	int size = print_content.size();
-	//	while(offset < (int)print_content.size()){
-	//		int length = (print_content[offset + 1] & 0x000000FF) | ((print_content[offset + 2] & 0x000000FF) << 8);
-	//		//check to see whether the kitchen between print request and printer instance is matched 
-	//		if(print_content[offset] == kitchen4Detail){
-	//			offset += 3;
-	//			details.push_back(string(print_content.begin() + offset, print_content.begin() + offset + length));
-	//			offset += length;
-	//		}else{
-	//			offset += 3 + length;
-	//		}
-	//	}
-	//}
-	
-	if(iFunc == Reserved::PRINT_ORDER_DETAIL){
-		split2Details(print_content, kitchen4Detail, details);
+	vector<string> details; 	
 
-	}else if(iFunc == Reserved::PRINT_EXTRA_FOOD){
-		split2Details(print_content, kitchen4Extra, details);
+	vector<PrintFunc>::iterator iter_func = find(funcs.begin(), funcs.end(), PrintFunc(iFunc));
 
-	}else if(iFunc == Reserved::PRINT_CANCELLED_FOOD){
-		split2Details(print_content, kitchen4Cancelled, details);
-
-	}else if(iFunc == Reserved::PRINT_HURRY_FOOD){
-		split2Details(print_content, kitchen4Hurry, details);
+	if(iFunc == Reserved::PRINT_ORDER_DETAIL ||
+		iFunc == Reserved::PRINT_EXTRA_FOOD ||
+		iFunc == Reserved::PRINT_CANCELLED_FOOD ||
+		iFunc == Reserved::PRINT_HURRY_FOOD){		
+		if(iter_func != funcs.end()){
+			split2Details(print_content, iter_func->kitchen, details);
+		}
 
 	}else{
 		if(!print_content.empty()){
@@ -281,34 +263,37 @@ void PrinterInstance::addJob(const char* buf, int len, int iFunc){
 		}
 	}
 
+	//if(iFunc == Reserved::PRINT_ORDER_DETAIL){
+	//	split2Details(print_content, kitchen4Detail, details);
+
+	//}else if(iFunc == Reserved::PRINT_EXTRA_FOOD){
+	//	split2Details(print_content, kitchen4Extra, details);
+
+	//}else if(iFunc == Reserved::PRINT_CANCELLED_FOOD){
+	//	split2Details(print_content, kitchen4Cancelled, details);
+
+	//}else if(iFunc == Reserved::PRINT_HURRY_FOOD){
+	//	split2Details(print_content, kitchen4Hurry, details);
+
+	//}else{
+	//	if(!print_content.empty()){
+	//		details.push_back(print_content);
+	//	}
+	//}
 
 	EnterCriticalSection(&m_csJobQueue);
 
 	if(details.size() != 0){
-		//add all order detail jobs to the queue
-		vector<string>::iterator iter = details.begin();
-		for(iter; iter != details.end(); iter++){
-			jobQueue.push(PrintJob(iFunc, *iter));
+		if(iter_func != funcs.end()){
+			//add all order detail jobs to the queue
+			vector<string>::iterator iter = details.begin();
+			for(iter; iter != details.end(); iter++){
+				jobQueue.push(PrintJob(*iter_func, *iter));
+			}
+			//notify the print thread to run
+			SetEvent(hPrintEvent);
 		}
-		//notify the print thread to run
-		SetEvent(hPrintEvent);
 	}
-
-	//if(iFunc == Reserved::PRINT_ORDER_DETAIL && !details.empty()){
-	//	//add all order detail jobs to the queue
-	//	vector<string>::iterator iter = details.begin();
-	//	for(iter; iter != details.end(); iter++){
-	//		jobQueue.push(PrintJob(iFunc, *iter));
-	//	}
-	//	//notify the print thread to run
-	//	SetEvent(hPrintEvent);
-
-	//}else if(iFunc != Reserved::PRINT_ORDER_DETAIL && !print_content.empty()){
-	//	//add the print job containing both function code and print content to the job queue
-	//	jobQueue.push(PrintJob(iFunc, print_content));
-	//	//notify the print thread to run
-	//	SetEvent(hPrintEvent);
-	//}
 
 	LeaveCriticalSection(&m_csJobQueue);
 }
@@ -361,13 +346,13 @@ void PrinterInstance::split2Details(const string& print_content, int kitchen, ve
 /*******************************************************************************
 * Function Name  : addFunc
 * Description    : Add the function code 
-* Input          : iFunc - the function code that the printer instance will support
+* Input          : func - the function that the printer instance will support
 * Output         : None
 * Return         : None
 *******************************************************************************/
-void PrinterInstance::addFunc(int iFunc){
-	vector<int>::iterator iter = find(funcs.begin(), funcs.end(), iFunc);
+void PrinterInstance::addFunc(const PrintFunc& func){
+	vector<PrintFunc>::iterator iter = find(funcs.begin(), funcs.end(), func);
 	if(iter == funcs.end()){
-		funcs.push_back(iFunc);
+		funcs.push_back(func);
 	}
 }

@@ -101,6 +101,22 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 		//get the printer style
 		int style = PRINT_STYLE_UNKNOWN;
 		pPrinter->QueryIntAttribute(ConfTags::PRINT_STYLE, &style);
+		//get the repeat number
+		int repeat = 1;
+		pPrinter->QueryIntAttribute(ConfTags::PRINT_REPEAT, &repeat);
+
+		//get the kitchen for functions below
+		//otherwise set the kitchen to full
+		int kitchen = Kitchen::KITCHEN_FULL;
+		if(func == Reserved::PRINT_ORDER_DETAIL ||
+			func == Reserved::PRINT_EXTRA_FOOD ||
+			func == Reserved::PRINT_CANCELLED_FOOD ||
+			func == Reserved::PRINT_HURRY_FOOD)
+		{	
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN, &kitchen);
+		}else{
+			kitchen = Kitchen::KITCHEN_FULL;
+		}
 
 		vector< boost::shared_ptr<PrinterInstance> >::iterator it = g_PrintInstances.begin();
 		for(it; it != g_PrintInstances.end(); it++){
@@ -109,49 +125,15 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 			}				
 		}
 
-		int kitchen = Kitchen::KITCHEN_NULL;
 		if(it == g_PrintInstances.end()){
 			//create the printer instance and put it to the vector if not be found in the exist printer instances
-			boost::shared_ptr<PrinterInstance> pPI(new PrinterInstance(name.c_str(), func, style, pReport));
-			//set the kitchen according to the function
-			if(func == Reserved::PRINT_ORDER_DETAIL){
-				pPrinter->QueryIntAttribute(ConfTags::KITCHEN, &kitchen);
-				pPI->kitchen4Detail = kitchen;
-
-			}else if(func == Reserved::PRINT_EXTRA_FOOD){
-				pPrinter->QueryIntAttribute(ConfTags::KITCHEN, &kitchen);
-				pPI->kitchen4Extra = kitchen;
-
-			}else if(func == Reserved::PRINT_CANCELLED_FOOD){
-				pPrinter->QueryIntAttribute(ConfTags::KITCHEN, &kitchen);
-				pPI->kitchen4Cancelled = kitchen;
-
-			}else if(func == Reserved::PRINT_HURRY_FOOD){
-				pPrinter->QueryIntAttribute(ConfTags::KITCHEN, &kitchen);
-				pPI->kitchen4Hurry = kitchen;
-			}
+			boost::shared_ptr<PrinterInstance> pPI(new PrinterInstance(name.c_str(), style, pReport));
+			pPI->addFunc(PrintFunc(func, kitchen, repeat));
 			g_PrintInstances.push_back(pPI);
 
 		}else{
-			//just add the function code to the exist printer instance
-			(*it)->addFunc(func);
-			//set the kitchen if the function is to print order detail
-			if(func == Reserved::PRINT_ORDER_DETAIL){
-				pPrinter->QueryIntAttribute(ConfTags::KITCHEN, &kitchen);
-				(*it)->kitchen4Detail = kitchen;
-
-			}else if(func == Reserved::PRINT_EXTRA_FOOD){
-				pPrinter->QueryIntAttribute(ConfTags::KITCHEN, &kitchen);
-				(*it)->kitchen4Extra = kitchen;
-
-			}else if(func == Reserved::PRINT_CANCELLED_FOOD){
-				pPrinter->QueryIntAttribute(ConfTags::KITCHEN, &kitchen);
-				(*it)->kitchen4Cancelled = kitchen;
-
-			}else if(func == Reserved::PRINT_HURRY_FOOD){
-				pPrinter->QueryIntAttribute(ConfTags::KITCHEN, &kitchen);
-				(*it)->kitchen4Hurry = kitchen;
-			}
+			//just add the function to the exist printer instance
+			(*it)->addFunc(PrintFunc(func, kitchen, repeat));
 		}
 	}
 
@@ -192,25 +174,25 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 						vector< boost::shared_ptr<PrinterInstance> >::iterator iter = g_PrintInstances.begin();
 						//enumerate each printer instances' supported function codes to check if the job is supported
 						for(iter; iter != g_PrintInstances.end(); iter++){
-							vector<int>::iterator it = (*iter)->funcs.begin();
+							vector<PrintFunc>::iterator it = (*iter)->funcs.begin();
 							for(it; it != (*iter)->funcs.end(); it++){
-								if((*it) == Reserved::PRINT_ORDER && (printReq.header.reserved == Reserved::PRINT_ORDER)){
-									(*iter)->addJob(printReq.body, len, *it);
+								if(it->code == Reserved::PRINT_ORDER && (printReq.header.reserved == Reserved::PRINT_ORDER)){
+									(*iter)->addJob(printReq.body, len, it->code);
 
-								}else if((*it) == Reserved::PRINT_ORDER_DETAIL && (printReq.header.reserved == Reserved::PRINT_ORDER_DETAIL)){
-									(*iter)->addJob(printReq.body, len, *it);
+								}else if(it->code == Reserved::PRINT_ORDER_DETAIL && (printReq.header.reserved == Reserved::PRINT_ORDER_DETAIL)){
+									(*iter)->addJob(printReq.body, len, it->code);
 
-								}else if((*it) == Reserved::PRINT_RECEIPT && (printReq.header.reserved == Reserved::PRINT_RECEIPT)){
-									(*iter)->addJob(printReq.body, len, *it);
+								}else if(it->code == Reserved::PRINT_RECEIPT && (printReq.header.reserved == Reserved::PRINT_RECEIPT)){
+									(*iter)->addJob(printReq.body, len, it->code);
 
-								}else if((*it) == Reserved::PRINT_EXTRA_FOOD && (printReq.header.reserved == Reserved::PRINT_EXTRA_FOOD)){
-									(*iter)->addJob(printReq.body, len, *it);
+								}else if(it->code == Reserved::PRINT_EXTRA_FOOD && (printReq.header.reserved == Reserved::PRINT_EXTRA_FOOD)){
+									(*iter)->addJob(printReq.body, len, it->code);
 
-								}else if((*it) == Reserved::PRINT_CANCELLED_FOOD && (printReq.header.reserved == Reserved::PRINT_CANCELLED_FOOD)){
-									(*iter)->addJob(printReq.body, len, *it);
+								}else if(it->code == Reserved::PRINT_CANCELLED_FOOD && (printReq.header.reserved == Reserved::PRINT_CANCELLED_FOOD)){
+									(*iter)->addJob(printReq.body, len, it->code);
 
-								}else if((*it) == Reserved::PRINT_HURRY_FOOD && (printReq.header.reserved == Reserved::PRINT_HURRY_FOOD)){
-									(*iter)->addJob(printReq.body, len, *it);
+								}else if(it->code == Reserved::PRINT_HURRY_FOOD && (printReq.header.reserved == Reserved::PRINT_HURRY_FOOD)){
+									(*iter)->addJob(printReq.body, len, it->code);
 								}
 							}
 						}

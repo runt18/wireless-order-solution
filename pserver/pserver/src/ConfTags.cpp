@@ -12,6 +12,7 @@ const char* ConfTags::PRINT_NAME = "name";
 const char* ConfTags::PRINT_FUNC = "func";
 const char* ConfTags::PRINT_STYLE = "style";
 const char* ConfTags::KITCHEN = "kitchen";
+const char* ConfTags::PRINT_REPEAT = "repeat";
 const char* ConfTags::PRINT_DESC = "desc";
 const char* ConfTags::AUTO_UPDATE = "auto_update";
 const char* ConfTags::ON = "on";
