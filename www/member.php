@@ -228,12 +228,14 @@ foreach ($rs as $row){
 	$bh=$bh+1;
 	echo "<tr>";
 	echo "<td>" .$row["alias_id"] ."</td>";
-	echo "<td>" .$row["name"] ."</td>";
-	echo "<td>" .$row["birth"];
+	echo "<td>" .$row["name"];
 	if($row["birth"] == date("Y-m-d"))
 	{
 		echo "&nbsp;<img src='images/birth.png'  height='16' width='16' border='0'/>";
 	}	
+	echo "</td>";
+	echo "<td>" .$row["birth"];
+	
 	echo"</td>";	
 	echo "<td>" .$row["tele"] ."</td>";	
 	echo "<td>" .GetDiscountTypeName($row["discount_type"]) ."</td>";	

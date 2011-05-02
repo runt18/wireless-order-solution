@@ -139,12 +139,12 @@ echo "<script>addTitle('$total_income');</script>";*/
 			<tr style="height: 25px;">							
 				<td colspan="3" style="text-align:right">汇总：</td>
 				<?PHP
-				echo "<td>$total_1</td>";
-				echo "<td>$total_2</td>";
-				echo "<td>$total_3</td>";
-				echo "<td>$total_4</td>";
-				echo "<td>$total_5</td>";
-				echo "<td>$total_all</td>";				
+				echo "<td>".number_format($total_1,2)."</td>";
+				echo "<td>".number_format($total_2,2)."</td>";
+				echo "<td>".number_format($total_3,2)."</td>";
+				echo "<td>".number_format($total_4,2)."</td>";
+				echo "<td>".number_format($total_5,2)."</td>";
+				echo "<td>".number_format($total_all,2)."</td>";				
 				?>	
 			</tr>
 		</tfood>

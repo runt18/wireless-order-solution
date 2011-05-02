@@ -95,7 +95,7 @@ if($ids != null)
 	$dateFrom = $_POST["dateFrom"];
 	$dateTo = $_POST["dateTo"];
 	$sql = "SELECT f.id,d.order_count,f.name,f.unit_price,CASE WHEN d.order_count IS NULL THEN 0 ELSE d.order_count END AS order_count,
-			CASE WHEN format(f.unit_price*d.order_count,2) IS NULL THEN 0 ELSE format(f.unit_price*d.order_count,2) END AS total_price FROM 
+			CASE WHEN format(f.unit_price*d.order_count,2) IS NULL THEN 0.00 ELSE format(f.unit_price*d.order_count,2) END AS total_price FROM 
 			food f LEFT JOIN
 			(SELECT a.id,SUM(b.order_count) AS order_count FROM `food` a 
 			INNER JOIN order_food_history b ON a.alias_id = b.food_id

@@ -229,7 +229,7 @@ $xm=$_REQUEST["keyword_type"];
 $ct=$_REQUEST["condition_type"];
 $kw=$_REQUEST["keyword"]; 
 $kitchen_value=$_REQUEST["kitchen"];
-$sql = "SELECT f.*,CASE WHEN k.name IS NULL THEN '空' ELSE k.name END AS kitchen,k.alias_id AS kitchen_value FROM food f LEFT JOIN kitchen k ON f.kitchen = k.alias_id WHERE f.enabled=1 AND f.restaurant_id=" . $_SESSION["restaurant_id"];		
+$sql = "SELECT f.*,CASE WHEN k.name IS NULL THEN '空' ELSE k.name END AS kitchen,f.kitchen AS kitchen_value FROM food f LEFT JOIN kitchen k ON f.kitchen = k.alias_id WHERE f.enabled=1 AND f.restaurant_id=" . $_SESSION["restaurant_id"];		
 switch ($xm)
 {
 	case "is_no":

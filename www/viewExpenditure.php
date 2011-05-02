@@ -74,7 +74,7 @@ mysql_close($con);
 	<tfoot>
 		<tr>
 			<td colspan="3" style="text-align:right">汇总：</td>
-			<td><?php echo $total_price;?></td>
+			<td><?php echo number_format($total_price,2);?></td>
 		</tr>
 	</tfoot>
   </table>

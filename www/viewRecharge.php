@@ -72,7 +72,7 @@ mysql_close($con);
 	<tfoot>
 		<tr>
 			<td colspan="2" style="text-align:right">汇总：</td>
-			<td><?php echo $total_money;?></td>
+			<td><?php echo number_format($total_money,2);?></td>
 		</tr>
 	</tfoot>
   </table>

@@ -29,7 +29,7 @@ function editMember(id, alias_id, name, birth, tele, exchange_rate, discount_typ
 	                        '<div class="pop_Content">' +
 	                            '<div class="pop_Content1">编号：' + aliasId + '</div>' +
 	                            '<div class="pop_Content1">姓名：<input type="text" id="name" name="name" value="' + name + '" onfocus="this.select()" size="25" height="20" /></div>' +
-	                            '<div class="pop_Content1">出生日期：<input type="text" id="birth" name="birth" value="' + birth + '" size="25" height="20" onclick="javascript:ShowCalendar(this.id)" onfocus="this.select()" style="position: relative; right: -14px; width: 150px;"/></div>' +
+	                            '<div class="pop_Content1">出生日期：<input type="text" id="birth" name="birth" value="' + birth + '" size="25" height="20" onfocus="this.select()" style="position: relative; right: -14px; width: 150px;"/></div>' +
 	                            '<div class="pop_Content1">电话：<input type="text" id="tele" name="tele" value="' + tele + '" onfocus="this.select()" size="25" height="20"' +
 	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57||event.keyCode==46"' +
 	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
@@ -93,7 +93,12 @@ function submitMemberData() {
     //        alert("一般折扣的输入范围是0~1")
     //        return;
     //    }
-
+    var re = /^((((((0[48])|([13579][26])|([2468][048]))00)|([0-9][0-9]((0[48])|([13579][26])|([2468][048]))))-02-29)|(((000[1-9])|(00[1-9][0-9])|(0[1-9][0-9][0-9])|([1-9][0-9][0-9][0-9]))-((((0[13578])|(1[02]))-31)|(((0[1,3-9])|(1[0-2]))-(29|30))|(((0[1-9])|(1[0-2]))-((0[1-9])|(1[0-9])|(2[0-8]))))))$/i;
+    if (!re.test(birth)) {
+        alert('出生日期应按如下格式填写\n yyyy-MM-DD 比如: 1985-01-08 ！');
+        document.getElementById("birth").focus();
+        return;
+    }
     document.memberForm.submit();
 }
 
@@ -194,7 +199,7 @@ function recharge(id, name) {
 	                      '<div class="add_foot_Content" style="height:130px;text-align:center">' +
 	                        '<div class="pop_Content">' +
 	                            '<div class="pop_Content1">金额：<input type="text" id="money" name="money" onfocus="this.select()" size="25" height="20"' +
-	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57||event.keyCode==46"' +
+	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57||event.keyCode==46||event.keyCode==45"' +
 	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
 	                            ' style="ime-mode:Disabled" /></div>' +
 	                        '</div>' +
@@ -228,10 +233,11 @@ function submitRechargeData() {
         return;
     }
     var m = parseFloat(money);
-    if (m <= 0) {
-        alert("冲值金额必须大于0！")
-        return;
-    }
+//    if (m <= 0) {
+//        alert("冲值金额必须大于0！")
+//        return;
+    //    }
+//    alert(m);
     document.memberForm.submit();
 }
 

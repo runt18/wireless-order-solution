@@ -55,19 +55,23 @@ function submitTasteData() {
     var price = document.getElementById("price").value;
     if (alias_id == undefined || alias_id == null || alias_id == "") {
         alert("编号不能为空！");
+        document.getElementById("alias_id").focus();
         return;
     }
     if (preference == undefined || preference == null || preference == "") {
         alert("口味不能为空！");
+        document.getElementById("preference").focus();
         return;
     }
     if (price == undefined || price == null || price == "") {
         alert("价格不能为空！");
+        document.getElementById("price").focus();
         return;
     }
     var id = parseInt(alias_id);
     if (id > 255 || id == 0) {
-        alert("编号的输入范围是1~255")
+        alert("编号的输入范围是1~255");
+        document.getElementById("price").focus();
         return;
     }
     document.tasteForm.submit();

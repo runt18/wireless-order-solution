@@ -115,14 +115,17 @@ function validateFoodData() {
     
     if (foodCode == undefined || foodCode == null || foodCode == "") {
         alert("编号不能为空！");
+        document.getElementById("foodCode").focus();
         return false;
     }
     if (foodName == undefined || foodName == null || foodName == "") {
         alert("菜名不能为空！");
+        document.getElementById("foodName").focus();
         return false;
     }
     if (foodPrice == undefined || foodPrice == null || foodPrice == "") {
         alert("价格不能为空！");
+        document.getElementById("foodPrice").focus();
         return false;
     }
     var fc = parseInt(foodCode);
