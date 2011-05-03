@@ -40,6 +40,9 @@
 #define IDC_VER_INFO                    1027
 #define IDC_COMBO3                      1028
 #define IDC_COMBO4                      1029
+#define IDC_EDIT1                       1030
+#define IDC_EDIT_REPEAT                 1030
+#define IDC_SPIN_REPEAT                 1031
 #define ID_START_PRINTER                32771
 #define ID_STOP_PRINTER                 32772
 #define ID_NET_SETTING                  32774
@@ -73,7 +76,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        142
 #define _APS_NEXT_COMMAND_VALUE         32798
-#define _APS_NEXT_CONTROL_VALUE         1030
+#define _APS_NEXT_CONTROL_VALUE         1032
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

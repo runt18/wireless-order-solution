@@ -349,9 +349,13 @@ static unsigned __stdcall LoginProc(LPVOID pvParam){
 							//check the type to see it's an ACK or NAK
 							if(loginResp.header.type == Type::ACK){
 								vector<Kitchen> kits;
-								RespParse::parsePrintLogin(loginResp, kits);
+								string rest;
+								RespParse::parsePrintLogin(loginResp, kits, rest);
 								if(pReport){
-									pReport->OnPrintReport(0, "登录成功");
+									ostringstream os;
+									os << "\"" << rest << "\"" << "登录成功";
+									pReport->OnPrintReport(0, os.str().c_str());
+									pReport->OnRetrieveRestaurant(rest);
 									pReport->OnRetrieveKitchen(kits);
 								}
 								//notify the print manager thread to run

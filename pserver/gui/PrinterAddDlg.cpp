@@ -38,6 +38,8 @@ void CAddPrinterDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO3, m_PrinterStyle);
 	DDX_Control(pDX, IDC_COMBO4, m_PrintKitchen);
 	DDX_Control(pDX, IDC_RICHEDIT21, m_DescCtrl);
+	DDX_Control(pDX, IDC_EDIT_REPEAT, m_PrintRepeat);
+	DDX_Control(pDX, IDC_SPIN_REPEAT, m_SpinRepeat);
 }
 
 
@@ -88,6 +90,11 @@ BOOL CAddPrinterDlg::OnInitDialog(){
 	for(int i = 1; i < _nStyle; i++){
 		m_PrinterStyle.InsertString(i - 1, _PrinterStyle[i]);
 	}
+
+	//set the repeat range from 1 to 10
+	m_SpinRepeat.SetRange(1, 10);
+	//set the default repeat to 1
+	m_PrintRepeat.SetWindowText(_T("1"));
 
 
 	m_PrinterStyle.SetCurSel(0);
@@ -188,6 +195,15 @@ void CAddPrinterDlg::OnOK(){
 			WideCharToMultiByte(CP_UTF8, NULL, desc.GetBuffer(), -1, pDesc.get(), dwNum, NULL, FALSE);
 			//set the printer description attribute
 			pPrinter->SetAttribute(ConfTags::PRINT_DESC, pDesc.get());
+
+			//get the print repeat and convert it to UTF-8
+			CString repeat;
+			m_PrintRepeat.GetWindowText(repeat);
+			dwNum = WideCharToMultiByte(CP_UTF8, NULL, repeat.GetBuffer(), -1, NULL, 0, NULL, FALSE);
+			boost::shared_ptr<char> pRepeat(new char[dwNum], boost::checked_array_deleter<char>());
+			WideCharToMultiByte(CP_UTF8, NULL, repeat.GetBuffer(), -1, pRepeat.get(), dwNum, NULL, FALSE);
+			//set the printer repeat attribute
+			pPrinter->SetAttribute(ConfTags::PRINT_REPEAT, pRepeat.get());
 
 			pRoot->LinkEndChild(pPrinter);
 		}

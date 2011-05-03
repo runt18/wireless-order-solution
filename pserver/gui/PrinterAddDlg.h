@@ -28,6 +28,8 @@ private:
 	CComboBox m_Funcs;
 	CComboBox m_PrinterStyle;
 	CComboBox m_PrintKitchen;
+	CSpinButtonCtrl m_SpinRepeat;
+	CEdit m_PrintRepeat;
 	CRichEditCtrl m_DescCtrl;
 	TiXmlDocument& m_Conf;
 	CString m_Printer;

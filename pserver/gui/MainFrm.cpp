@@ -33,6 +33,8 @@ int g_DoQuitProg = 0;
 
 vector<CString> g_Kitchens;
 
+//the name of the restaurant
+static CString g_Restaurant = _T("e点通");
 
 static bool g_isPrinterStarted = false;
 
@@ -125,6 +127,16 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_wndToolBar.EnableDocking(CBRS_ALIGN_ANY);
 	EnableDocking(CBRS_ALIGN_ANY);
 	DockControlBar(&m_wndToolBar);
+
+	//check to see if the startup parameter is "-minimize"
+	//if so, make the program run in minimize
+	CString sCmdLine = AfxGetApp()->m_lpCmdLine;
+	if(sCmdLine == _T("-minimize")){
+		//ShowWindow(SW_SHOW);
+		//ShowWindow(SW_SHOWMINIMIZED);
+		AfxGetApp()->m_nCmdShow = SW_HIDE;			
+		//PostMessage(WM_SYSCOMMAND, SC_MINIMIZE);
+	}
 
 	return 0;
 }
@@ -226,8 +238,10 @@ static unsigned __stdcall StopPrinterProc(LPVOID pvParam){
 	CMainFrame* pMainFrame = reinterpret_cast<CMainFrame*>(pvParam);
 	PServer::instance().terminate();
 	g_isPrinterStarted = false;
-	pMainFrame->SetWindowText(_T("e点通打印服务器 - 停止"));
-	pMainFrame->m_TrayIcon.SetTooltipText(_T("e点通打印服务器 - 停止"));
+	CString title;
+	title.Format(_T("%s打印服务 - 停止"), g_Restaurant);
+	pMainFrame->SetWindowText(title);
+	pMainFrame->m_TrayIcon.SetTooltipText(title);
 	pMainFrame->m_TrayIcon.SetIcon(IDI_SYS_TRAY);
 	return 0;
 }
@@ -243,8 +257,10 @@ static unsigned _stdcall StartPrinterProc(LPVOID pvParam){
 		g_hPrinterStop = NULL;
 	}
 
-	pMainFrame->SetWindowText(_T("e点通打印服务器 - 启动"));
-	pMainFrame->m_TrayIcon.SetTooltipText(_T("e点通打印服务器 - 启动"));
+	CString title;
+	title.Format(_T("%s打印服务 - 启动"), g_Restaurant);
+	pMainFrame->SetWindowText(title);
+	pMainFrame->m_TrayIcon.SetTooltipText(title);
 	g_isPrinterStarted = true;
 
 	//get the path of the gui.exe
@@ -387,6 +403,22 @@ void CMainFrame::OnRetrieveKitchen(const std::vector<Kitchen>& kitchens){
 	m_pPrinterView->Update();
 }
 
+void CMainFrame::OnRetrieveRestaurant(const std::string& restaurant){
+	//convert the restaurant name from ANSI to UNICODE
+	DWORD dwNum = MultiByteToWideChar (CP_ACP, 0, restaurant.c_str(), -1, NULL, 0);
+	boost::shared_ptr<wchar_t> pRestaurant(new wchar_t[dwNum], boost::checked_array_deleter<wchar_t>());
+	MultiByteToWideChar (CP_ACP, 0, restaurant.c_str(), -1, pRestaurant.get(), dwNum);
+	g_Restaurant = pRestaurant.get();
+	CString title;
+	if(g_isPrinterStarted){
+		title.Format(_T("%s打印服务 - 启动"), g_Restaurant);
+	}else{
+		title.Format(_T("%s打印服务 - 停止"), g_Restaurant);
+	}
+	SetWindowText(title);
+	m_TrayIcon.SetTooltipText(title);
+}
+
 void CMainFrame::OnSize(UINT nType, int cx, int cy) {
 	if (m_wndSplitter.GetSafeHwnd())
 	{
@@ -453,8 +485,8 @@ void CMainFrame::OnUpdateStopPrinter(CCmdUI* pCmdUI){
 
 void CMainFrame::OnTrayRestore() 
 {
-	ShowWindow(SW_RESTORE);
-	ShowWindow(SW_SHOW);
+	ShowWindow(SW_SHOWNORMAL);
+	PostMessage(WM_SYSCOMMAND, SC_RESTORE);
 }
 
 void CMainFrame::OnSysCommand(UINT nID, LPARAM lParam)
