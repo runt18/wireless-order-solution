@@ -6,11 +6,12 @@ public class RespParser {
 	
 	/**
 	 * Parse the response associated with query order request.
-	 * The order food doesn't have the name and price.
+	 * The result only doesn't contain the detail info like food's name 
+	 * , price and taste's name and price 
 	 * @param response 
 	 * the protocol package return from ProtocolConnector's ask() function
 	 * @return
-	 * the vector containing the food instance
+	 * the order result
 	 */
 	public static Order parseQueryOrder(ProtocolPackage response){
 		Order order = new Order();
