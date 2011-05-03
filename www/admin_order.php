@@ -253,7 +253,7 @@ include("changePassword.php");
 	sorter.currentid = "currentpage";
 	sorter.limitid = "pagelimit";
 	sorter.init("table",1);
-	ininOriginal();
+	adminIninOriginal();
   </script>
 
 </body>

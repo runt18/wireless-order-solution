@@ -178,6 +178,34 @@ function ininOriginal() {
     }
 }
 
+function adminIninOriginal() {
+    var keyword_type = document.getElementById("keyword_type");
+    var keyword_type_value = document.getElementById("keyword_type_value").value;
+    var keyword = document.getElementById("keyword");
+    var keyword_value = document.getElementById("keyword_value").value;
+    var condition_type = document.getElementById("condition_type");
+    var condition_type_value = document.getElementById("condition_type_value").value;
+    for (var i = 0; i < keyword_type.options.length; i++) {
+        if (keyword_type.options[i].value == keyword_type_value) {
+            keyword_type.options[i].selected = true;
+            break;
+        }
+    }
+    for (var i = 0; i < condition_type.options.length; i++) {
+        if (condition_type.options[i].value == condition_type_value) {
+            condition_type.options[i].selected = true;
+            break;
+        }
+    }   
+    keyword.value = keyword_value;
+    if (keyword_type_value == "is_Price" || keyword_type_value == "is_day") {
+        document.getElementById("condition_type").style.display = "inline";
+    }
+    if (keyword_type_value == "is_day") {
+        keyword.onclick = showCal;
+    }  
+}
+
 function formatNum(num) {
     var num1 = num.substr(num.length - 1, 1);
     if (num1 == "0") {
