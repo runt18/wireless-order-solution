@@ -14,6 +14,7 @@ import com.wireless.protocol.FoodMenu;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqCancelOrder;
+import com.wireless.protocol.ReqInsertOrder;
 import com.wireless.protocol.ReqQueryMenu;
 import com.wireless.protocol.ReqQueryOrder;
 import com.wireless.protocol.RespParser;
@@ -108,6 +109,10 @@ public class SampleServlet extends HttpServlet {
 				throw new Exception("菜谱下载失败，请检查网络信号或重新连接。");
 			}
 		}
+	}
+	
+	private void insertOrder(){
+		ProtocolPackage _resp = ServerConnector.instance().ask(new ReqInsertOrder(_reqOrder, _type, printType));
 	}
 	
 }
