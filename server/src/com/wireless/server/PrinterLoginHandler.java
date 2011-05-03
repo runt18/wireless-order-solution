@@ -107,7 +107,7 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 								 							 WirelessSocketServer.user, 
 								 							 WirelessSocketServer.password);   
 						_stmt = _dbCon.createStatement(); 
-						String sql = "SELECT id, pwd FROM " + WirelessSocketServer.database + ".restaurant WHERE account='" + user + "'";
+						String sql = "SELECT id, pwd, restaurant_name FROM " + WirelessSocketServer.database + ".restaurant WHERE account='" + user + "'";
 						_rs = _stmt.executeQuery(sql);
 						
 						//check to see whether the account exist or not
@@ -116,6 +116,7 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 							if(pwd.equals(_rs.getString("pwd"))){
 								
 								int restaurantID = _rs.getInt("id");
+								String restaurantName = _rs.getString("restaurant_name");
 								_rs.close();
 								//get the related kitchen information 
 								sql = "SELECT alias_id, name FROM " + WirelessSocketServer.database + ".kitchen WHERE restaurant_id=" + restaurantID;
@@ -126,7 +127,7 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 															 _rs.getShort("alias_id")));															
 								}
 								//respond with the related kitchen information
-								send(_out, new RespPrintLogin(loginReq.header, kitchens.toArray(new Kitchen[kitchens.size()])));
+								send(_out, new RespPrintLogin(loginReq.header, kitchens.toArray(new Kitchen[kitchens.size()]), restaurantName));
 								
 								//put the restaurant id and the associated socket to the tree map's socket list
 								synchronized(WirelessSocketServer.printerConnections){
