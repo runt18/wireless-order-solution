@@ -1,7 +1,6 @@
 package com.wireless.protocol;
 
 import java.io.UnsupportedEncodingException;
-import com.wireless.terminal.WirelessOrder;
 
 public class RespParser {
 	
@@ -73,41 +72,12 @@ public class RespParser {
 				orderFoods[i].alias_id = foodID;
 				orderFoods[i].count = orderNum;
 				orderFoods[i].taste.alias_id = tasteID;
-				if(tasteID != Taste.NO_TASTE){
-					try{
-						orderFoods[i].taste.price = WirelessOrder.foodMenu.tastes[tasteID].price;
-						orderFoods[i].taste.preference = WirelessOrder.foodMenu.tastes[tasteID].preference;
-					}catch(ArrayIndexOutOfBoundsException e){}
-				}
 			}
 			order.foods = orderFoods;
 		}
 		return order;
 	}
 
-	/**
-	 * Parse the response associated with query order request.
-	 * The order food has the name and price.
-	 * @param response 
-	 * the protocol package return from ProtocolConnector's ask() function
-	 * @return
-	 * the vector containing the food instance
-	 */
-	public static Order parseQueryOrderEx(ProtocolPackage response){
-		Order order = parseQueryOrder(response);
-		for(int i = 0; i < order.foods.length; i++){
-			for(int j = 0; j < WirelessOrder.foodMenu.foods.length; j++){
-				if(order.foods[i].alias_id == WirelessOrder.foodMenu.foods[j].alias_id){
-					order.foods[i].name = WirelessOrder.foodMenu.foods[j].name;
-					order.foods[i].price = WirelessOrder.foodMenu.foods[j].price;
-					break;					
-				}
-			}
-			
-		}
-		return order;
-	}
-	
 	/**
 	 * Parse the response associated with query menu request.
 	 * @param response the protocol package return from ProtocolConnector's ask() function

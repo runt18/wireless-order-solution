@@ -5,7 +5,8 @@ import java.io.UnsupportedEncodingException;
 /******************************************************
  * In the case printer login successfully, 
  * design the response looks like below
- * mode : type : seq : reserved : pin[6] : len[2] : nKitchen : <kitchen_1> : ... : <kitchen_n>
+ * mode : type : seq : reserved : pin[6] : len[2] : nKitchen : <kitchen_1> : ... : <kitchen_n> : 
+ * restaurant_len : restaurant_name
  * <Header>
  * mode - PRINT
  * type - ACK
@@ -14,15 +15,18 @@ import java.io.UnsupportedEncodingException;
  * pin[6] - same as request
  * len[2] -  length of the <Body>
  * <Body>
- * nKitchen : <kitchen_1> : ... : <kitchen_n>
+ * nKitchen : <kitchen_1> : ... : <kitchen_n> : restaurant_len : restaurant_name
  * nKitchen - the number of kitchens
  * <kitchen_x>
- * len_name : name
+ * alias_id : len_name : name
+ * alias_id - the alias id to this kitchen
  * len_name - the length of the kitchen name
  * name - the name to kitchen
+ * restaurant_len - the length of the user name
+ * restaurant_name - the name to user
  *******************************************************/
 public class RespPrintLogin extends RespPackage{
-	public RespPrintLogin(ProtocolHeader reqHeader, Kitchen[] kitchens){
+	public RespPrintLogin(ProtocolHeader reqHeader, Kitchen[] kitchens, String restaurant){
 		super(reqHeader);
 		header.mode = Mode.PRINT;
 		header.type = Type.ACK;
@@ -36,6 +40,8 @@ public class RespPrintLogin extends RespPackage{
 		byte[][] nameBytes = new byte[kitchens.length][];
 		
 		for(int i = 0; i < nameBytes.length; i++){
+			//the alias id takes up 1-byte
+			len += 1;
 			//the length of the name takes up 1-byte
 			len += 1;
 			try{
@@ -46,6 +52,17 @@ public class RespPrintLogin extends RespPackage{
 			//the name of kitchen takes up the byte arrays' length
 			len += nameBytes[i].length;
 		}
+		
+		byte[] restaurantBytes = new byte[0];
+		//the length of restaurant name
+		len += 1;
+		try{
+			restaurantBytes = restaurant.getBytes("GBK");
+			len += restaurantBytes.length;
+		}catch(UnsupportedEncodingException e){
+			
+		}
+		
 		//allocate the memory for the body
 		body = new byte[len];
 		
@@ -55,13 +72,21 @@ public class RespPrintLogin extends RespPackage{
 		offset++;
 		
 		for(int i = 0; i < nameBytes.length; i++){
+			//assign the alias id
+			body[offset] = (byte)kitchens[i].alias_id;
 			//assign the length to kitchen name
-			body[offset] = (byte)nameBytes[i].length;
+			body[offset + 1] = (byte)nameBytes[i].length;
 			//assign the name of kitchen
-			System.arraycopy(nameBytes[i], 0, body, offset + 1, nameBytes[i].length);
-			offset += 1 + /* the length of name takes up 1-byte */
+			System.arraycopy(nameBytes[i], 0, body, offset + 2, nameBytes[i].length);
+			offset += 1 + /* the alias id takes up 1-byte */ 
+					  1 + /* the length of name takes up 1-byte */
 					  nameBytes[i].length; /* the name of kitchen takes up the byte arrays' length */
 		}
+		
+		//assign the length of restaurant
+		body[offset] = (byte)restaurantBytes.length;
+		//assign the restaurant value
+		System.arraycopy(restaurantBytes, 0, body, offset + 1, restaurantBytes.length);
 		
 		header.length[0] = (byte)(body.length & 0x000000FF);
 		header.length[1] = (byte)((body.length & 0x0000FF00) >> 8);
