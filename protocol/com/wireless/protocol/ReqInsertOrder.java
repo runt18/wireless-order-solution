@@ -18,12 +18,13 @@ import com.wireless.protocol.Reserved;
  * custom_num - 1-byte indicating the custom number for this table
  * food_num - 1-byte indicating the number of foods
  * <Food>
- * food_id[2] : order_num[2] : taste_id
+ * food_id[2] : order_num[2] : taste_id : kitchen
  * food_id[2] - 2-byte indicating the food's id
  * order_num[2] - 2-byte indicating how many this foods are ordered
  * 			   order_num[0] - 1-byte indicates the float-point
  * 			   order_num[1] - 1-byte indicates the fixed-point
  * taste_id - 1-byte indicates the taste preference id
+ * kitchen - the kitchen to this food
  *******************************************************/
 public class ReqInsertOrder extends ReqOrderPackage {
 
@@ -71,7 +72,7 @@ public class ReqInsertOrder extends ReqOrderPackage {
 		int bodyLen = 2 + /* table id takes up 2-byte */
 					1 + /* custom number takes up 1-byte */ 
 					1 + /* food number takes up 1-byte */
-					reqOrder.foods.length * 5; /* each food takes up 5-byte*/
+					reqOrder.foods.length * 6; /* each food takes up 6-byte*/
 		header.length[0] = (byte)(bodyLen & 0x000000FF) ;
 		header.length[1] = (byte)((bodyLen & 0x0000FF00) >> 8);
 		
@@ -94,7 +95,8 @@ public class ReqInsertOrder extends ReqOrderPackage {
 			body[foodIndex + 2] = (byte)(reqOrder.foods[i].count & 0x000000FF);
 			body[foodIndex + 3] = (byte)((reqOrder.foods[i].count & 0x0000FF00) >> 8);
 			body[foodIndex + 4] = (byte)(reqOrder.foods[i].taste.alias_id & 0x00FF);
-			foodIndex += 5;
+			body[foodIndex + 5] = (byte)(reqOrder.foods[i].kitchen);
+			foodIndex += 6;
 		}		
 	}
 	

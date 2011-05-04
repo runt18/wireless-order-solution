@@ -98,14 +98,17 @@ public class RespParser {
 		 * pin[6] - same as request
 		 * len[2] -  length of the <Body>
 		 * <Body>
-		 * food_amount[2] : <Food1> : <Food2>... : taste_amount : <Taste1> : <Taste2> ...
+		 * food_amount[2] : <Food1> : <Food2>... : 
+		 * taste_amount : <Taste1> : <Taste2> ...
+		 * 
 		 * food_amount[2] - 2-byte indicating the amount of the foods listed in the menu
 		 * <Food>
-		 * food_id[2] : price[3] : len : name[len]
+		 * food_id[2] : price[3] : kitchen : len : name[len]
 		 * food_id[2] - 2-byte indicating the food's id
 		 * price[3] - 3-byte indicating the food's price
 		 * 			  price[0] 1-byte indicating the float point
 		 * 			  price[1..2] 2-byte indicating the fixed point
+		 * kitchen - the kitchen to this food
 		 * len - 1-byte indicating the length of the food's name
 		 * name[len] - the food's name whose length equals "len"
 		 * 
@@ -141,17 +144,20 @@ public class RespParser {
 							 ((response.body[index + 3] & 0x000000FF) << 8) |
 							 ((response.body[index + 4] & 0x000000FF) << 16)) &	0x00FFFFFF;
 				
+				//get the kitchen no to this food
+				food.kitchen = response.body[index + 5];
+				
 				//get the length of the food's name
-				int length = response.body[index + 5];
+				int length = response.body[index + 6];
 				
 				//get the name value 
 				try{
-					food.name = new String(response.body, index + 6, length, "UTF-16BE");
+					food.name = new String(response.body, index + 7, length, "UTF-16BE");
 				}catch(UnsupportedEncodingException e){
 
 				}
 				
-				index += 6 + length;
+				index += 7 + length;
 				
 				//add to foods
 				foods[i] = food;
@@ -192,10 +198,10 @@ public class RespParser {
 				tastes[i] = new Taste(alias_id, preference, price);
 			}
 			
-			return new FoodMenu(foods, tastes);
+			return new FoodMenu(foods, tastes, null);
 			
 		}else{
-			return new FoodMenu(new Food[0], new Taste[0]);
+			return new FoodMenu(new Food[0], new Taste[0], new Kitchen[0]);
 		}
 	}
 	

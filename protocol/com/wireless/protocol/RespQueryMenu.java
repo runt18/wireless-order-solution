@@ -29,11 +29,12 @@ import java.io.UnsupportedEncodingException;
  * food_amount[2] : <Food1> : <Food2>... : taste_amount : <Taste1> : <Taste2> ...
  * food_amount[2] - 2-byte indicating the amount of the foods listed in the menu
  * <Food>
- * food_id[2] : price[2] : len : name[len]
+ * food_id[2] : price[3] : kitchen : len : name[len]
  * food_id[2] - 2-byte indicating the food's id
  * price[3] - 3-byte indicating the food's price
  * 			  price[0] 1-byte indicating the float point
  * 			  price[1..2] 2-byte indicating the fixed point
+ * kitchen - the kitchen to this food
  * len - 1-byte indicating the length of the food's name
  * name[len] - the food's name whose length equals "len"
  * 
@@ -56,9 +57,9 @@ public class RespQueryMenu extends RespPackage{
 			byte[] name = foodMenu.foods[i].name.getBytes("UTF-16BE");
 			/*
 			 * each item of the food menu consist of the stuff below.
-			 * food_id(2-byte) + price(3-byte) + length of food name(1-byte) + food's name(len-byte)
+			 * food_id(2-byte) + price(3-byte) + + kitchen(1-byte) + length of food name(1-byte) + food's name(len-byte) 
 			 */
-			bodyLen += 2 + 3 + 1 + name.length; 
+			bodyLen += 2 + 3 + 1 + 1 + name.length; 
 		}
 		
 		/* the taste amount takes up 1-byte */
@@ -96,17 +97,20 @@ public class RespQueryMenu extends RespPackage{
 			//assign the fixed-point of the price
 			body[index + 3] = (byte)((foodMenu.foods[i].price & 0x0000FF00) >> 8);
 			body[index + 4] = (byte)((foodMenu.foods[i].price & 0x00FF0000) >> 16);
+			//assign the kitchen to this food
+			body[index + 5] = (byte)foodMenu.foods[i].kitchen;
 			//assign the length of food's name
 			byte[] name = foodMenu.foods[i].name.getBytes("UTF-16BE");
-			body[index + 5] = (byte)(name.length & 0x000000FF);
+			body[index + 6] = (byte)(name.length & 0x000000FF);
 			//assign the food name
 			for(int cnt = 0; cnt < name.length; cnt++){
-				body[index + 6 + cnt] = name[cnt];
+				body[index + 7 + cnt] = name[cnt];
 			}
+
 			/* 
-			 * food_id(2-byte) + price(3-byte) + length of food's name(1-byte) + food's name 
+			 * food_id(2-byte) + price(3-byte) + kitchen(1-byte) + length of food's name(1-byte) + food's name 
 			 */
-			index += 2 + 3 + 1 + name.length; 
+			index += 2 + 3 + 1 + 1 + name.length; 
 		}
 		
 		//assign the taste preference amount
