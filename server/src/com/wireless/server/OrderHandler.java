@@ -411,7 +411,7 @@ class OrderHandler extends Handler implements Runnable{
 		 */
 		for(int i = 0; i < orderToInsert.foods.length; i++){
 
-			//get the associated food's unit price and name
+			//get the associated foods' unit price and name
 			sql = "SELECT unit_price, name FROM " +  WirelessSocketServer.database + 
 				".food WHERE alias_id=" + orderToInsert.foods[i].alias_id + " AND restaurant_id=" + _restaurantID + " AND enabled=1";
 			_rs = _stmt.executeQuery(sql);
@@ -423,6 +423,15 @@ class OrderHandler extends Handler implements Runnable{
 				orderToInsert.foods[i].price = unitPrice;
 			}else{
 				throw new OrderBusinessException("The food(alias_id=" + orderToInsert.foods[i].alias_id + ") to query doesn't exit.", ErrorCode.MENU_EXPIRED);
+			}
+			_rs.close();
+			
+			//get the associated foods' discount
+			sql = "SELECT discount FROM " + WirelessSocketServer.database + ".kitchen WHERE restaurant_id=" + _restaurantID +
+				" AND alias_id=" + orderToInsert.foods[i].kitchen;		
+			_rs = _stmt.executeQuery(sql);
+			if(_rs.next()){
+				orderToInsert.foods[i].discount = (byte)(_rs.getFloat("discount") * 100);
 			}
 			
 			//get the taste preference according to the taste id,
@@ -456,13 +465,6 @@ class OrderHandler extends Handler implements Runnable{
 		_stmt.clearBatch();
 		//insert each ordered food
 		for(int i = 0; i < orderToInsert.foods.length; i++){
-			String discount;
-			if(orderToInsert.foods[i].kitchen == Kitchen.KITCHEN_NULL){
-				discount = "1";
-			}else{
-				discount = "SELECT discount FROM " + WirelessSocketServer.database + ".kitchen WHERE restaurant_id=" + _restaurantID +
-				 		" AND alias_id=" + orderToInsert.foods[i].kitchen;				
-			}
 			
 			//insert the record to table "order_food"
 			sql = "INSERT INTO `" + WirelessSocketServer.database +
@@ -471,8 +473,8 @@ class OrderHandler extends Handler implements Runnable{
 				orderToInsert.foods[i].alias_id + ", " + 
 				orderToInsert.foods[i].count2Float().toString() + ", " + 
 				Util.price2Float(orderToInsert.foods[i].price, Util.INT_MASK_2).toString() + ", '" + 
-				orderToInsert.foods[i].name + "', (" +
-				discount + "), '" +
+				orderToInsert.foods[i].name + "', " +
+				(float)orderToInsert.foods[i].discount / 100 + ", '" +
 				orderToInsert.foods[i].taste.preference + "', " + 
 				Util.price2Float(orderToInsert.foods[i].taste.price, Util.INT_MASK_2).toString() + ", " +
 				orderToInsert.foods[i].taste.alias_id + ", " + 
@@ -536,7 +538,7 @@ class OrderHandler extends Handler implements Runnable{
 		
 		//query all the food's id ,order count and taste preference of this order
 		ArrayList<Food> originalRecords = new ArrayList<Food>();
-		String sql = "SELECT food_id, unit_price, name, SUM(order_count) AS order_sum, taste, taste_price, taste_id, kitchen FROM `" + 
+		String sql = "SELECT food_id, unit_price, name, discount, SUM(order_count) AS order_sum, taste, taste_price, taste_id, kitchen FROM `" + 
 					WirelessSocketServer.database + "`.`order_food` WHERE order_id=" + orderID + 
 					" GROUP BY food_id, taste_id HAVING order_sum > 0";
 		_rs = _stmt.executeQuery(sql);
@@ -545,6 +547,7 @@ class OrderHandler extends Handler implements Runnable{
 			food.alias_id = _rs.getShort("food_id");
 			food.setPrice(new Float(_rs.getFloat("unit_price")));
 			food.name = _rs.getString("name");
+			food.discount = (byte)(_rs.getFloat("discount") * 100);
 			food.setCount(new Float(_rs.getFloat("order_sum")));
 			food.kitchen = _rs.getShort("kitchen");
 			food.taste.alias_id = _rs.getShort("taste_id");
@@ -623,6 +626,14 @@ class OrderHandler extends Handler implements Runnable{
 					throw new OrderBusinessException("The food(alias_id=" + orderToUpdate.foods[i].alias_id + ") to query doesn't exist.", ErrorCode.MENU_EXPIRED);
 				}
 				
+				//get the associated foods' discount
+				sql = "SELECT discount FROM " + WirelessSocketServer.database + ".kitchen WHERE restaurant_id=" + _restaurantID +
+					" AND alias_id=" + orderToUpdate.foods[i].kitchen;		
+				_rs = _stmt.executeQuery(sql);
+				if(_rs.next()){
+					food.discount = (byte)(_rs.getFloat("discount") * 100);
+				}
+				
 				//get the taste preference only if the food has taste preference
 				if(orderToUpdate.foods[i].taste.alias_id != Taste.NO_TASTE){
 					sql = "SELECT preference, price FROM " + WirelessSocketServer.database + ".taste WHERE restaurant_id=" + _restaurantID +
@@ -675,19 +686,13 @@ class OrderHandler extends Handler implements Runnable{
 		
 		//insert the extra order food records
 		for(int i = 0; i < extraFoods.size(); i++){
-			String discount;
-			if(extraFoods.get(i).kitchen == Kitchen.KITCHEN_NULL){
-				discount = "1";
-			}else{
-				discount = "SELECT discount FROM " + WirelessSocketServer.database + ".kitchen WHERE restaurant_id=" + _restaurantID +
-				 		" AND alias_id=" + extraFoods.get(i).kitchen;				
-			}
+
 			sql = "INSERT INTO `" + WirelessSocketServer.database + "`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `discount`, `taste_id`, `taste_price`, `taste`, `kitchen`, `waiter`, `order_date`) VALUES (" +
 					orderID + ", " + extraFoods.get(i).alias_id + ", " + 
 					extraFoods.get(i).count2String() + ", " + 
 					Util.price2Float(extraFoods.get(i).price, Util.INT_MASK_2).toString() + ", '" + 
-					extraFoods.get(i).name + "', (" + 
-					discount + "), " +
+					extraFoods.get(i).name + "', " + 
+					(float)extraFoods.get(i).discount / 100 + ", " +
 					extraFoods.get(i).taste.alias_id + "," +
 					Util.price2Float(extraFoods.get(i).taste.price, Util.INT_MASK_2).toString() + ", '" +
 					extraFoods.get(i).taste.preference + "', " + 
@@ -698,19 +703,13 @@ class OrderHandler extends Handler implements Runnable{
 		
 		//insert the canceled order food records 
 		for(int i = 0; i < cancelledFoods.size(); i++){
-			String discount;
-			if(cancelledFoods.get(i).kitchen == Kitchen.KITCHEN_NULL){
-				discount = "1";
-			}else{
-				discount = "SELECT discount FROM " + WirelessSocketServer.database + ".kitchen WHERE restaurant_id=" + _restaurantID +
-				 		" AND alias_id=" + cancelledFoods.get(i).kitchen;				
-			}
+
 			sql = "INSERT INTO `" + WirelessSocketServer.database + "`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `discount`, `taste_id`, `taste_price`, `taste`, `kitchen`, `waiter`, `order_date`) VALUES (" +
 					orderID + ", " + cancelledFoods.get(i).alias_id + ", " + 
 					"-" + cancelledFoods.get(i).count2String() + ", " + 
 					Util.price2Float(cancelledFoods.get(i).price, Util.INT_MASK_2).toString() + ", '" + 
-					cancelledFoods.get(i).name + "', (" + 
-					discount + "), " +
+					cancelledFoods.get(i).name + "', " + 
+					(float)cancelledFoods.get(i).discount / 100 + ", " +
 					cancelledFoods.get(i).taste.alias_id + "," +
 					Util.price2Float(cancelledFoods.get(i).taste.price, Util.INT_MASK_2).toString() + ", '" +
 					cancelledFoods.get(i).taste.preference + "', " + 
