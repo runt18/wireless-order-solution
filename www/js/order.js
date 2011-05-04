@@ -41,7 +41,7 @@ function showOrderDetail(id, alias, date, totalPrice, count, foods, isPaid, owne
     for (var i = 0; i < fs.length; i++) {
         var str = fs[i].split("|");
         //        f += "<li><table width='100%' align='left'><tr><td align='left' width='70%'>菜" + (i + 1) + "：" + str[0] + "</td><td align='right' width='30%'>￥" + str[1] + "</td></tr></table></li>"
-        f += "<li><table width='100%' align='left'><tr><td align='left' width='70%'>菜" + (i + 1) + "：" + str[0] + "(" + formatNum(str[1]) + ")</td><td align='right' width='30%'>￥" + str[2] + "</td></tr></table></li>";
+        f += "<li><table width='100%' align='left'><tr><td align='left' width='70%'>菜" + (i + 1) + "：" + str[0] + "(" + formatNum(str[1]) + ")" + str[2] + "</td><td align='right' width='30%'>￥" + str[3] + "</td></tr></table></li>";
         // f += "<li>菜" + (i + 1) + "：" + str[0] + "&nbsp;&nbsp;&nbsp;&nbsp;￥" + str[1] + "</td></tr></table></li>";
 
     }
