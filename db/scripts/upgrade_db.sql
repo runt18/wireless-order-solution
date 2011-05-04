@@ -1,4 +1,4 @@
-USE `wireless_order_db` ;
+﻿USE `wireless_order_db` ;
 
 
 -- -----------------------------------------------------
@@ -288,7 +288,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order` (
   `id` INT UNSIGNED NOT NULL COMMENT 'the id to order' ,
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'external key associated with the  restaurant table' ,
   `order_date` DATETIME NOT NULL COMMENT 'the order\'s date and time' ,
-  `total_price` DECIMAL(10,2) NOT NULL DEFAULT -1 COMMENT 'The total price to this order.\nIts default value is -1, means the order not be paid, in the case the total price is greater than 0, means the order has been paid.' ,
+ `total_price` DECIMAL(10,2) NULL DEFAULT NULL COMMENT 'The total price to this order.\nIts default value is NULL, means the order not be paid, otherwise means the order has been paid.' ,
   `custom_num` TINYINT UNSIGNED NOT NULL DEFAULT 0 ,
   `waiter` VARCHAR(45) NOT NULL COMMENT 'the waiter who operates on this order' ,
   `type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the type to pay order, it would be one of the values below.\n现金 : 1\n刷卡 : 2\n会员卡 : 3\n挂账 ：4\n签单：5' ,
@@ -336,7 +336,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food` (
   `taste_price` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the price to taste preference' ,
   `taste_id` TINYINT NOT NULL DEFAULT 0 COMMENT 'the taste alias id' ,
   `discount` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the discount to this food' ,
-  `kitchen` TINYINT NOT NULL DEFAULT 0 COMMENT 'the kitchen number which the order food of this record belong to. the maximum value (255) means the food does not belong to any kitchen.' ,
+  `kitchen` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the kitchen number which the order food of this record belong to. the maximum value (255) means the food does not belong to any kitchen.' ,
   `comment` VARCHAR(100) NULL DEFAULT NULL COMMENT 'the comment to this record, such as the reason to cancel food' ,
   `waiter` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name of waiter who deal with this record' ,
   INDEX `fk_order_food_order` (`order_id` ASC) ,
@@ -374,7 +374,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_history` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'the id to order' ,
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'external key associated with the  restaurant table' ,
   `order_date` DATETIME NOT NULL COMMENT 'the order\'s date and time' ,
-  `total_price` DECIMAL(10,2) NOT NULL DEFAULT -1 COMMENT 'The total price to this order.\nIts default value is -1, means the order not be paid, in the case the total price is greater than 0, means the order has been paid.' ,
+  `total_price` DECIMAL(10,2) NULL DEFAULT NULL COMMENT 'The total price to this order.\nIts default value is NULL, means the order not be paid, otherwise means the order has been paid.' ,
   `custom_num` TINYINT UNSIGNED NOT NULL DEFAULT 0 ,
   `waiter` VARCHAR(45) NOT NULL COMMENT 'the waiter who operates on this order' ,
   `type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the type to pay order, it would be one of the values below.\n现金 : 1\n刷卡 : 2\n会员卡 : 3\n挂账 ：4\n签单：5' ,
@@ -412,7 +412,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food_history` (
   `taste_price` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the price to taste preference' ,
   `taste_id` TINYINT NOT NULL DEFAULT 0 COMMENT 'the taste alias id' ,
   `discount` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the discount to this food' ,
-  `kitchen` TINYINT NOT NULL DEFAULT 0 COMMENT 'the kitchen number which the order food of this record belong to. the maximum value (255) means the food does not belong to any kitchen.' ,
+  `kitchen` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the kitchen number which the order food of this record belong to. the maximum value (255) means the food does not belong to any kitchen.' ,
   `comment` VARCHAR(100) NULL DEFAULT NULL COMMENT 'the comment to this record, such as the reason to cancel food' ,
   `waiter` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name of waiter who deal with this record' ,
   PRIMARY KEY (`id`) ,
