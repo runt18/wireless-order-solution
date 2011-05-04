@@ -329,7 +329,7 @@ len[2] : 0x00,0x00
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="Left" type="integer">556</XPD:ATTR>
 <XPD:ATTR name="Top" type="integer">176</XPD:ATTR>
-<XPD:ATTR name="Width" type="integer">225</XPD:ATTR>
+<XPD:ATTR name="Width" type="integer">243</XPD:ATTR>
 <XPD:ATTR name="Height" type="integer">329</XPD:ATTR>
 <XPD:ATTR name="Text" type="string">in the case request successfully, 
 assign ACK to the header.type field
@@ -347,7 +347,7 @@ food_num[2] : &lt;Food1&gt; : &lt;Food2&gt;...
 taste_num[1] : &lt;Taste1&gt; : &lt;Taste2&gt;...
 
 &lt;Food&gt;
-food_id[2] : price[3] : len : name[len]
+food_id[2] : price[3] : kitchen : len : name[len]
 
 &lt;Taste&gt;
 taste_id : price[3] : len : preference[len]
@@ -356,7 +356,7 @@ taste_id : price[3] : len : preference[len]
 <XPD:OBJ name="OwnedViews[7]" type="UMLNoteLinkView" guid="cKYeO1rNWkmx9u9mO1bJvAAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">357,213;556,294</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">357,213;556,292</XPD:ATTR>
 <XPD:REF name="Head">90wcZ37oVU+FojPXDB7U7QAA</XPD:REF>
 <XPD:REF name="Tail">fDVepPZITU6Q7O8dcD1Q5wAA</XPD:REF>
 </XPD:OBJ>
@@ -583,7 +583,7 @@ len[2] : length of the &lt;Body&gt;
 table[2] : custom_num : food_num : &lt;Food1&gt; : &lt;Food2&gt;...
 
 &lt;Food&gt;
-food_id[2] : order_num[2] : taste_id
+food_id[2] : order_num[2] : taste_id : kitchen
 </XPD:ATTR>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedViews[4]" type="UMLNoteLinkView" guid="QFjSW90l/ECdpofChL68vQAA">
@@ -1527,7 +1527,7 @@ len[2] : length of the &lt;Body&gt;
 table[2] : custom_num : food_num: &lt;Food1&gt; : &lt;Food2&gt;...
 
 &lt;Food&gt;
-food_id[2] : order_num[2] : taste_id
+food_id[2] : order_num[2] : taste_id : kitchen
 </XPD:ATTR>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedViews[4]" type="UMLNoteLinkView" guid="53hS6azOQ0Wv3bD0/1lmuwAA">
