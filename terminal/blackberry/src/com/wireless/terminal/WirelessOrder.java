@@ -21,7 +21,7 @@ import com.wireless.util.ServerConnector;
  */
 public class WirelessOrder extends UiApplication{
 
-	public static FoodMenu foodMenu = new FoodMenu(null, null);	
+	public static FoodMenu foodMenu = new FoodMenu();	
 	
 	/**
 	 * First of all, the program would restore the parameter from persist storage,
