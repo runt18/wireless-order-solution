@@ -22,6 +22,7 @@ public class RespParser2{
 				if(order.foods[i].alias_id == WirelessOrder.foodMenu.foods[j].alias_id){
 					order.foods[i].name = WirelessOrder.foodMenu.foods[j].name;
 					order.foods[i].price = WirelessOrder.foodMenu.foods[j].price;
+					order.foods[i].kitchen = WirelessOrder.foodMenu.foods[j].kitchen;
 					break;
 				}			
 			}	
