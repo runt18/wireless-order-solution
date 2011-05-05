@@ -145,7 +145,7 @@ if($deleteId != null && $deleteId != "")
 		$is_paid = $row["is_paid"];
 		$on = "";
 		
-		if($is_paid == 1)	
+		if($is_paid == NULL || $is_paid == 1)	
 		{
 			$action = ' onclick="showMenu(&quot;' .$row["alias_id"].'&quot;)"';
 			$isPaidNum++;			
