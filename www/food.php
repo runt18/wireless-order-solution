@@ -171,7 +171,7 @@ if($deleteId != null)
 include("conn.php"); 
 mysql_query("SET NAMES utf8"); 
 $kitchens = "";
-$sql = "SELECT alias_id, name FROM kitchen";
+$sql = "SELECT alias_id, name FROM kitchen WHERE restaurant_id=" . $_SESSION["restaurant_id"];
 $rs = $db->GetAll($sql);
 foreach ($rs as $row){	
 	if($kitchens  != "")
@@ -195,7 +195,7 @@ foreach ($rs as $row){
 <?php
 include("conn.php"); 
 mysql_query("SET NAMES utf8"); 
-$sql = "SELECT alias_id, name FROM kitchen";
+$sql = "SELECT alias_id, name FROM kitchen WHERE restaurant_id=" . $_SESSION["restaurant_id"];		
 $rs = $db->GetAll($sql);
 foreach ($rs as $row){
 	echo "<option value='".$row["alias_id"]."'>".$row["name"]."</option>";	
@@ -229,7 +229,7 @@ $xm=$_REQUEST["keyword_type"];
 $ct=$_REQUEST["condition_type"];
 $kw=$_REQUEST["keyword"]; 
 $kitchen_value=$_REQUEST["kitchen"];
-$sql = "SELECT f.*,CASE WHEN k.name IS NULL THEN '空' ELSE k.name END AS kitchen,f.kitchen AS kitchen_value FROM food f LEFT JOIN kitchen k ON f.kitchen = k.alias_id WHERE f.enabled=1 AND f.restaurant_id=" . $_SESSION["restaurant_id"];		
+$sql = "SELECT f.*,CASE WHEN k.name IS NULL THEN '空' ELSE k.name END AS kitchen,f.kitchen AS kitchen_value FROM food f LEFT JOIN kitchen k ON f.kitchen = k.alias_id AND f.restaurant_id = k.restaurant_id WHERE f.enabled=1 AND f.restaurant_id=" . $_SESSION["restaurant_id"];		
 switch ($xm)
 {
 	case "is_no":

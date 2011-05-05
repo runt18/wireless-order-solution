@@ -193,8 +193,8 @@ function showFoodRanked()
 {
      var content = ' <div class="add_foot" style="height:550px;width:100%">' +
                               '<div class="title" style="width:100%">' +
-	                          '<div class="title_left" style="width:92%"><font id="titleName" class="font" style="width:260px">点菜统计</font></div>' +
-	                          '<div class="title_right" style="width:8%;float:left" ></div>' +
+	                          '<div class="title_left" style="width:565px"><font id="titleName" class="font" style="width:260px">点菜统计</font></div>' +
+	                          '<div class="title_right" style="width:35px;float:left" ></div>' +
 	                          '</div>' +	               
 	                          '<div class="add_foot_Content" style="height:370px;text-align:center;width:99%">' + 	                        
 	                              '<iframe src="foodRanked.php" scrolling="no" style="width:100%;height:100%" />' +	                           

@@ -6,12 +6,11 @@ function showSearch(target) {
                         '<div class="title_right" style="float:left"></div>' +
                     '</div>' +
                      '<form id="searchForm" name="searchForm" action="' + target + '"  method="post" onkeydown="searchOrderKeyDown()">' +
-                    '<div class="Advanced_Search_Content" style="width:480px;height:180px">' +
+                    '<div class="Advanced_Search_Content" style="width:480px;height:160px">' +
                         '<div class="pop_Content">' +
-                            '<div class="pop_Content1">日期：<input type="text" id="dateFrom" name="dateFrom" style="width:136px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;&nbsp;至&nbsp;&nbsp;<input type="text" id="dateTo" name="dateTo" style="width:136px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;</div>' +
-                            '<div class="pop_Content2">结帐方式：<select id="type" name="type"><option value="" selected="selected">全部</option><option value="1">现金</option><option value="2">刷卡</option>	<option value="3">会员卡</option><option value="4">挂账</option><option value="5">签单</option></select></div>' +
+                            '<div class="pop_Content1">日期：<input type="text" id="dateFrom" name="dateFrom" style="width:136px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;&nbsp;至&nbsp;&nbsp;<input type="text" id="dateTo" name="dateTo" style="width:136px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;</div>' +                          
                             '<div class="pop_Content1">金额：<input type="text" name="priceFrom" style="width:136px" onkeypress="return event.keyCode>=48&&event.keyCode<=57" />&nbsp;&nbsp;至&nbsp;&nbsp;<input type="text" name="priceTo" style="width:136px" onkeypress="return event.keyCode>=48&&event.keyCode<=57" /></div>' +
-                            '<div class="pop_Content2">台号：<input type="text" name="alias_id" size="10" height="20" onkeypress="return event.keyCode>=48&&event.keyCode<=57" /></div>' +
+                            '<div class="pop_Content2">台号：<input type="text" name="alias_id" size="10" height="20" onkeypress="return event.keyCode>=48&&event.keyCode<=57" />&nbsp;&nbsp;&nbsp;&nbsp;结帐方式：<select id="type" name="type"><option value="" selected="selected">全部</option><option value="1">现金</option><option value="2">刷卡</option>	<option value="3">会员卡</option><option value="4">挂账</option><option value="5">签单</option></select></div>' +
                         '</div>' +
                         '<span class="action-span" style="margin-left:110px;"><a href="#"  onclick="document.searchForm.submit();">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>' +
                          '<span class="action-span1" style="margin-right:100px;"><a href="#" onclick="closeWindow()">取&nbsp;&nbsp;&nbsp;&nbsp;消</a></span>' +
@@ -283,8 +282,8 @@ function showOrderStat(statType, dateFrom, dateTo) {
 
     var content = ' <div class="add_foot" style="height:550px;width:100%">' +
                         '<div class="title" style="width:100%">' +
-	                        '<div class="title_left" style="width:95%"><font id="dynamicTitle" style="font-size: 16px;font-weight: normal;color: #FFF;margin-left: 15px;line-height: 30px;text-align: left;" >' + title + '</font></div>' +
-	                        '<div class="title_right"  style="width:4%;float:left"></div>' +
+	                        '<div class="title_left" style="width:814px"><font id="dynamicTitle" style="font-size: 16px;font-weight: normal;color: #FFF;margin-left: 15px;line-height: 30px;text-align: left;" >' + title + '</font></div>' +
+	                        '<div class="title_right"  style="width:35px;float:left"></div>' +
 	                    '</div>' +
 	                      '<div class="add_foot_Content" style="height:370px;text-align:center;width:99%">' +
 	                            '<iframe src="orderStat.php?StatType=' + statType + '&dateFrom=' + dateFrom + '&dateTo=' + dateTo + '" scrolling="no" style="width:100%;height:100%" />' +

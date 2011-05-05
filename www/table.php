@@ -124,10 +124,10 @@ if($deleteId != null && $deleteId != "")
 	<?php
 	/*include("conn.php"); */
 	mysql_query("SET NAMES utf8"); 
-	$sql = "SELECT od.id,t.alias_id,od.order_date,total_price,num,foods,is_paid,waiter FROM `table` t LEFT OUTER JOIN 
-
-(SELECT MAX(id) AS OrderId,table_id ".
-		" FROM `order` GROUP BY `order`.table_id) AS o ON t.alias_id = o.table_id".
+$sql = "SELECT od.id,t.alias_id,od.order_date,total_price,num,foods,is_paid,waiter FROM `table` t LEFT OUTER JOIN 
+		
+		(SELECT MAX(id) AS OrderId,table_id,MAX(restaurant_id) AS restaurant_id".
+	" FROM `order` GROUP BY `order`.table_id) AS o ON t.alias_id = o.table_id AND `t`.`restaurant_id` = `o`.`restaurant_id`".
 		" LEFT OUTER JOIN `order_view` od ON o.OrderId = od.id WHERE t.enabled=1 AND t.restaurant_id=" . $_SESSION["restaurant_id"] ;
 	/*echo $sql;*/
 	$rs = $db->Execute($sql);

@@ -47,7 +47,7 @@ mysql_query("SET NAMES utf8");
 $ids = $_POST["ids"];
 if($ids == null)
 {
-	$sql = "SELECT id, name FROM food";					      
+	$sql = "SELECT id, name FROM food WHERE restaurant_id=" . $_SESSION["restaurant_id"];			      
 	$rs = $db->GetAll($sql);
 	foreach ($rs as $row){
 		echo "<option value='".$row["id"]."'>".$row["name"]."</option>";
@@ -99,7 +99,7 @@ if($ids != null)
 			food f LEFT JOIN
 			(SELECT a.id,SUM(b.order_count) AS order_count FROM `food` a 
 			INNER JOIN order_food_history b ON a.alias_id = b.food_id
-			INNER JOIN `order_history` c ON b.order_id = c.id WHERE a.enabled=1 AND a.restaurant_id=" . $_SESSION["restaurant_id"];
+			INNER JOIN `order_history` c ON b.order_id = c.id AND c.restaurant_id=a.restaurant_id WHERE a.enabled=1 AND a.restaurant_id=" . $_SESSION["restaurant_id"];
 	if($dateFrom != "")
 	{
 		$sql .= (" AND c.order_date >='" . $dateFrom . " 0:0:0'");

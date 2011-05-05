@@ -26,11 +26,11 @@ function editKitchen(id, alias_id, name, discount, member_discount_1, member_dis
 	                    '<form name="kitchenForm" action="kitchen.php"  method="post" onkeydown="editKitchenKeyDown()">' +
 	                      '<input type="hidden" name="editType" value="' + editType + '" />' +
 	                      '<input type="hidden" name="id" value="' + id + '" />' +	                      
-	                      '<div class="add_foot_Content" style="height:180px;text-align:center">' +
+	                      '<div class="add_foot_Content" style="height:220px;text-align:center">' +
 	                        '<div class="pop_Content">' +
-	                            '<div class="pop_Content1">编号：' + aliasId + '</div>' +
-	                            '<div class="pop_Content1">名称：<input type="text" id="name" name="name" value="' + name + '" onfocus="this.select()" size="25" height="20" /></div>' +
-	                            '<div class="pop_Content1">一般折扣：<input type="text" id="discount" name="discount" value="' + discount + '" onfocus="this.select()" size="25" height="20"' +
+	                            '<div class="pop_Content1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;编号：' + aliasId + '</div>' +
+	                            '<div class="pop_Content1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名称：<input type="text" id="name" name="name" value="' + name + '" onfocus="this.select()" size="25" height="20" /></div>' +
+	                            '<div class="pop_Content1">&nbsp;&nbsp;一般折扣：<input type="text" id="discount" name="discount" value="' + discount + '" onfocus="this.select()" size="25" height="20"' +
 	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57||event.keyCode==46"' +
 	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
 	                            ' style="ime-mode:Disabled" /></div>' +
