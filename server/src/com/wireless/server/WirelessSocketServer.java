@@ -12,6 +12,10 @@ import org.tiling.scheduling.MonthlyIterator;
 import org.tiling.scheduling.Scheduler;
 import org.w3c.dom.*; 
 import org.xml.sax.SAXException;
+
+import com.wireless.task.SweepDBTask;
+import com.wireless.task.SweepPrtConTask;
+
 import javax.xml.parsers.*; 
 
 public class WirelessSocketServer {
@@ -201,10 +205,12 @@ public class WirelessSocketServer {
 					pos1 = pos2 + 1;
 					int second = Integer.parseInt(time.substring(pos1));
 					//schedule the sweep db task
-					scheDBTask.schedule(new SweepDBTask(), new MonthlyIterator(dayOfMonth, hourOfDay, minute, second));
+					scheDBTask.schedule(new SweepDBTask(url, database, user, password), 
+										new MonthlyIterator(dayOfMonth, hourOfDay, minute, second));
 				}else{
 					//schedule the sweeper task on 15th 2:00am every month if not specified in conf.xml 
-					scheDBTask.schedule(new SweepDBTask(), new MonthlyIterator(15, 2, 0, 0));
+					scheDBTask.schedule(new SweepDBTask(url, database, user, password), 
+										new MonthlyIterator(15, 2, 0, 0));
 				}
 				
 				//schedule to run the sweep print connection task on 0:15:30 every day
@@ -224,10 +230,12 @@ public class WirelessSocketServer {
 					pos1 = pos2 + 1;
 					int second = Integer.parseInt(time.substring(pos1));
 					//schedule the sweep print socket task
-					schePrtConTask.schedule(new SweepPrtConTask(), new DailyIterator(hourOfDay, minute, second));
+					schePrtConTask.schedule(new SweepPrtConTask(printerConnections), 
+											new DailyIterator(hourOfDay, minute, second));
 				}else{
 					//schedule the sweeper task on 0:15:00am every day if not specified in conf.xml 
-					schePrtConTask.schedule(new SweepPrtConTask(), new DailyIterator(00, 15, 00));
+					schePrtConTask.schedule(new SweepPrtConTask(printerConnections), 
+											new DailyIterator(00, 15, 00));
 				}
 				
 			}catch(ParserConfigurationException e){

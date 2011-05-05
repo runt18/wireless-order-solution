@@ -1,13 +1,20 @@
-package com.wireless.server;
+package com.wireless.task;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 import org.tiling.scheduling.SchedulerTask;
 
 import com.wireless.protocol.Restaurant;
 
-import java.sql.*;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.io.*;
 
 /**
  * This sweep db task is designed to accomplish three goals.
@@ -30,8 +37,13 @@ import java.io.*;
  * We would use this scheduled task to sweep the expired order record and
  * check to see which foods can be deleted every specific time (maybe 30 days)
  */
-class SweepDBTask extends SchedulerTask {
+public class SweepDBTask extends SchedulerTask {
 
+	private String _dbUrl = null;
+	private String _dbName = null;
+	private String _dbUser = null;
+	private String _dbPwd = null;
+	
 	class RecAlive{
 		int restaurantID = 0;
 		long recordAlive = 0;
@@ -39,6 +51,13 @@ class SweepDBTask extends SchedulerTask {
 			this.restaurantID = restaurantID;
 			this.recordAlive = recordAlive;
 		}
+	}
+	
+	public SweepDBTask(String url, String db, String user, String pwd){
+		_dbUrl = url;
+		_dbName = db;
+		_dbUser = user;
+		_dbPwd = pwd;
 	}
 	
 	/**
@@ -58,9 +77,9 @@ class SweepDBTask extends SchedulerTask {
 		try {   
 			
 			Class.forName("com.mysql.jdbc.Driver");   
-			dbCon = DriverManager.getConnection(WirelessSocketServer.url, 
-					WirelessSocketServer.user, 
-					WirelessSocketServer.password);
+			dbCon = DriverManager.getConnection(_dbUrl, 
+					_dbUser, 
+					_dbPwd);
 			
 			stmt = dbCon.createStatement();						
 			
@@ -69,7 +88,7 @@ class SweepDBTask extends SchedulerTask {
 			//get all the restaurant id and record alive 
 			//except three reserved restaurant(root, idle and discarded),
 			//and the record alive value equals 0
-			String sql = "SELECT id, record_alive FROM " + WirelessSocketServer.database + 
+			String sql = "SELECT id, record_alive FROM " + _dbName + 
 						".restaurant WHERE id NOT IN (" + Restaurant.ADMIN + "," +
 						Restaurant.IDLE + "," + Restaurant.DISCARD + ") AND record_alive <> 0";
 			rs = stmt.executeQuery(sql);
@@ -80,7 +99,7 @@ class SweepDBTask extends SchedulerTask {
 			//get the order id matches the restaurant id and its order record is expired from "order" table
 			ArrayList<Long> expiredOrders = new ArrayList<Long>();
 			for(int i = 0; i < recAlives.size(); i++){
-				sql = "SELECT id FROM " + WirelessSocketServer.database + 
+				sql = "SELECT id FROM " + _dbName + 
 						".order WHERE restaurant_id=" + recAlives.get(i).restaurantID + 
 						" AND (UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(order_date) > " + 
 						recAlives.get(i).recordAlive + " AND total_price <> -1)";
@@ -93,7 +112,7 @@ class SweepDBTask extends SchedulerTask {
 			//delete all the food records matches the order which has been expired from "order_food" table
 			stmt.clearBatch();
 			for(int i = 0; i < expiredOrders.size(); i++){
-				sql = "DELETE FROM " + WirelessSocketServer.database + 
+				sql = "DELETE FROM " + _dbName + 
 					  ".order_food WHERE order_id=" + expiredOrders.get(i).toString();
 				stmt.addBatch(sql);
 			}
@@ -108,7 +127,7 @@ class SweepDBTask extends SchedulerTask {
 			//delete all the expired order record from "order" table
 			stmt.clearBatch();
 			for(int i = 0; i < expiredOrders.size(); i++){
-				sql = "DELETE FROM " + WirelessSocketServer.database + 
+				sql = "DELETE FROM " + _dbName + 
 					  ".order WHERE id=" + expiredOrders.get(i).toString();
 				stmt.addBatch(sql);
 			}
@@ -123,8 +142,7 @@ class SweepDBTask extends SchedulerTask {
 			/* Task2 */
 			//get the canceled foods from "food" table, whose enabled attribute equals to zero
 			ArrayList<Long> cancelFoods = new ArrayList<Long>();
-			sql = "SELECT id FROM " + WirelessSocketServer.database + 
-				  ".food WHERE enabled=0";
+			sql = "SELECT id FROM " + _dbName + ".food WHERE enabled=0";
 			rs = stmt.executeQuery(sql);
 			while(rs.next()){
 				cancelFoods.add(new Long(rs.getLong("id")));
@@ -134,12 +152,11 @@ class SweepDBTask extends SchedulerTask {
 			//if no related record exist, then delete this canceled food from "food" table
 			count = 0;
 			for(int i = 0; i < cancelFoods.size(); i++){
-				sql = "SELECT COUNT(*) FROM " + WirelessSocketServer.database +
-				      ".order_food WHERE food_id=" + cancelFoods.get(i).toString();
+				sql = "SELECT COUNT(*) FROM " + _dbName + ".order_food WHERE food_id=" + cancelFoods.get(i).toString();
 				rs = stmt.executeQuery(sql);
 				if(rs.next()){
 					if(rs.getInt(1) == 0){
-						sql = "DELETE FROM " + WirelessSocketServer.database + 
+						sql = "DELETE FROM " + _dbName + 
 							  ".food WHERE id=" + cancelFoods.get(i).toString();
 						if(stmt.executeUpdate(sql) != 0){
 							count++;
@@ -152,7 +169,7 @@ class SweepDBTask extends SchedulerTask {
 			/* Task3 */
 			//get the canceled table from "table" table, whose enabled attribute equals to zero
 			ArrayList<Long> cancelTables = new ArrayList<Long>();
-			sql = "SELECT id FROM " + WirelessSocketServer.database + 
+			sql = "SELECT id FROM " + _dbName + 
 			  	".table WHERE enabled=0";
 			rs = stmt.executeQuery(sql);
 			while(rs.next()){
@@ -162,12 +179,12 @@ class SweepDBTask extends SchedulerTask {
 			//if no related record exist, then delete this table from "table" table
 			count = 0;
 			for(int i = 0; i < cancelTables.size(); i++){
-				sql = "SELECT COUNT(*) FROM " + WirelessSocketServer.database +
+				sql = "SELECT COUNT(*) FROM " + _dbName +
 					  ".order WHERE table_id=" + cancelTables.get(i).toString();
 				rs = stmt.executeQuery(sql);
 				if(rs.next()){
 					if(rs.getInt(1) == 0){
-						sql = "DELETE FROM " + WirelessSocketServer.database + 
+						sql = "DELETE FROM " + _dbName + 
 						      ".table WHERE id=" + cancelTables.get(i).toString();
 						if(stmt.executeUpdate(sql) != 0){
 							count++;

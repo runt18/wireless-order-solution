@@ -1,4 +1,4 @@
-package com.wireless.server;
+package com.wireless.task;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -7,8 +7,10 @@ import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
-
+import java.util.TreeMap;
 import org.tiling.scheduling.SchedulerTask;
+
+
 
 /**
  * The sweep printer connection task is designed to clean up the invalid socket 
@@ -18,8 +20,14 @@ import org.tiling.scheduling.SchedulerTask;
  * so here, we schedule a task to scan all the printer socket connection, and clean up
  * the invalid ones. The task would be scheduled every day.
  */
-class SweepPrtConTask extends SchedulerTask{
+public class SweepPrtConTask extends SchedulerTask{
 
+	private TreeMap<Integer, ArrayList<Socket>> _printerConnections = null;
+	
+	public SweepPrtConTask(TreeMap<Integer, ArrayList<Socket>> conn){
+		_printerConnections = conn;
+	}
+	
 	public void run(){
 		String sep = System.getProperty("line.separator");
 		String taskInfo = "Sweep print connection task starts on " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z").format(new java.util.Date()) + sep;
@@ -27,9 +35,9 @@ class SweepPrtConTask extends SchedulerTask{
 		try{			
 			int nConnection = 0;
 			int nRestaurant = 0;
-			synchronized(WirelessSocketServer.printerConnections){
+			synchronized(_printerConnections){
 				//enumerate the values of printer connection to remove the sockets not connected,
-				Iterator<ArrayList<Socket>> iter1 = WirelessSocketServer.printerConnections.values().iterator();
+				Iterator<ArrayList<Socket>> iter1 = _printerConnections.values().iterator();
 				while(iter1.hasNext()){
 					ArrayList<Socket> sockets = iter1.next();
 					Iterator<Socket> iter2 = sockets.iterator();
@@ -48,10 +56,10 @@ class SweepPrtConTask extends SchedulerTask{
 				}
 				//enumerate the keys of printer connection to remove the restaurant not containing any 
 				//printer socket connections
-				Iterator<Integer> iter3 = WirelessSocketServer.printerConnections.keySet().iterator();
+				Iterator<Integer> iter3 = _printerConnections.keySet().iterator();
 				while(iter3.hasNext()){
 					Integer restaurantID = iter3.next();
-					if(WirelessSocketServer.printerConnections.get(restaurantID).size() == 0){
+					if(_printerConnections.get(restaurantID).size() == 0){
 						nRestaurant++;
 						iter3.remove();
 					}
