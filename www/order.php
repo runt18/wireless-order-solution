@@ -45,14 +45,14 @@ if($editType == "dailyCheckOut")
 	$sql1 = "INSERT INTO `order_history`(`id`, `restaurant_id`,`order_date`, `total_price`, `custom_num`, 
 			`waiter`,`type`, `member_id`, `member`,`terminal_pin`, `terminal_model`, `table_id`)
 			SELECT `id`, `restaurant_id`,`order_date`, `total_price`, `custom_num`, 
-			`waiter`,`type`, `member_id`, `member`,`terminal_pin`, `terminal_model`, `table_id` FROM `order` WHERE total_price <> -1";
+			`waiter`,`type`, `member_id`, `member`,`terminal_pin`, `terminal_model`, `table_id` FROM `order` WHERE total_price IS NOT NULL";
 	$sql2 = "INSERT INTO `order_food_history`(`id`,`order_id`, `food_id`, `order_date`, `order_count`, 
 			`unit_price`,`name`, `taste`,`taste_price`,`taste_id`,`discount`,`kitchen`,`comment`,`waiter`)
 			SELECT `id`,`order_id`, `food_id`, `order_date`, `order_count`, 
 			`unit_price`,`name`, `taste`,`taste_price`,`taste_id`,`discount`,`kitchen`,`comment`,`waiter`
-			FROM `order_food` WHERE `order_food`.`order_id` IN (SELECT id FROM `order` WHERE total_price <> -1)";
-	$sql3 = "DELETE FROM `order_food` WHERE `order_id` IN (SELECT id FROM `order` WHERE total_price <> -1)";
-	$sql4 = "DELETE FROM `order` WHERE total_price <> -1";
+			FROM `order_food` WHERE `order_food`.`order_id` IN (SELECT id FROM `order` WHERE total_price  IS NOT NULL)";
+	$sql3 = "DELETE FROM `order_food` WHERE `order_id` IN (SELECT id FROM `order` WHERE total_price  IS NOT NULL)";
+	$sql4 = "DELETE FROM `order` WHERE total_price  IS NOT NULL";
 	$db->Execute($sql2);	
 	if($db->Execute($sql1) && $db->Execute($sql2) && $db->Execute($sql3) && $db->Execute($sql4))
 	{
