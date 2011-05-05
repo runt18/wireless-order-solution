@@ -4,6 +4,7 @@
 	<db>wireless_order_db</db>
 	<!-- the ip address of the db host -->
 	<host>192.168.190.200</host>
+    <!-- <host>127.0.0.1</host> -->
 	<!-- the port that the db is listened on -->
 	<port>3306</port>
 	<!-- the db account -->
@@ -50,6 +51,13 @@
 	e.g. "2, 0, 0" means the task would be executed on 2:00:00am every day 
 	-->
 	<sweep_prt_conn>0,15,30</sweep_prt_conn>
+    <!-- 
+	define the time to perform the daily settlement task.
+	the format is as below.
+	hourOfDay, minute, second
+	e.g. "2, 0, 0" means the task would be executed on 2:00:00am every day 
+	-->
+	<daily_settlement>1,23,37</daily_settlement>
 	<!-- the OTA server address and port -->
 	<OTA>
 		<host>58.248.9.158</host>

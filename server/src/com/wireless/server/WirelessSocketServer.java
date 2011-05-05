@@ -1,22 +1,30 @@
 package com.wireless.server;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.net.Socket;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import org.tiling.scheduling.DailyIterator;
 import org.tiling.scheduling.MonthlyIterator;
 import org.tiling.scheduling.Scheduler;
-import org.w3c.dom.*; 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.wireless.task.DailySettlementTask;
 import com.wireless.task.SweepDBTask;
 import com.wireless.task.SweepPrtConTask;
-
-import javax.xml.parsers.*; 
 
 public class WirelessSocketServer {
 
@@ -69,6 +77,8 @@ public class WirelessSocketServer {
     static Scheduler scheDBTask = null;
     //the sweep printer connections scheduler task;
     static Scheduler schePrtConTask = null;
+    //the daily settlement task
+    static Scheduler scheDailySettlement = null;
 	/**
 	 * @param args
 	 */
@@ -184,6 +194,9 @@ public class WirelessSocketServer {
 				printerLoginHandler = new PrinterLoginHandler();
 				new Thread(printerLoginHandler).start();
 				
+				//FIX ME!!!
+				//Just cancel the sweep db temporary
+				/*
 				//start to schedule the sweep db task
 				scheDBTask = new Scheduler();
 				//parse the time to run sweep db task from configuration file
@@ -212,6 +225,32 @@ public class WirelessSocketServer {
 					scheDBTask.schedule(new SweepDBTask(url, database, user, password), 
 										new MonthlyIterator(15, 2, 0, 0));
 				}
+				*/
+				
+				//start to schedule the daily settlement task
+				scheDailySettlement = new Scheduler();
+				//parse the time to run daily settlement task from configuration file
+				nl = doc.getElementsByTagName("daily_settlement");
+				if(nl.item(0) != null){
+					String time = nl.item(0).getFirstChild().getNodeValue();
+					int pos1 = 0;
+					int pos2 = time.indexOf(",", pos1);
+					int hourOfDay = Integer.parseInt(time.substring(pos1, pos2));
+					
+					pos1 = pos2 + 1;
+					pos2 = time.indexOf(",", pos1);
+					int minute = Integer.parseInt(time.substring(pos1, pos2));
+					
+					pos1 = pos2 + 1;
+					int second = Integer.parseInt(time.substring(pos1));
+					//schedule the daily settlement task
+					scheDailySettlement.schedule(new DailySettlementTask(url, database, user, password), 
+												 new DailyIterator(hourOfDay, minute, second));
+				}else{
+					//schedule the daily settlement task on 01:23:37 if not specified in conf.xml 
+					scheDBTask.schedule(new SweepDBTask(url, database, user, password), 
+										new DailyIterator(1, 23, 37));
+				}
 				
 				//schedule to run the sweep print connection task on 0:15:30 every day
 				schePrtConTask = new Scheduler();
@@ -235,7 +274,7 @@ public class WirelessSocketServer {
 				}else{
 					//schedule the sweeper task on 0:15:00am every day if not specified in conf.xml 
 					schePrtConTask.schedule(new SweepPrtConTask(printerConnections), 
-											new DailyIterator(00, 15, 00));
+											new DailyIterator(0, 15, 0));
 				}
 				
 			}catch(ParserConfigurationException e){

@@ -77,9 +77,7 @@ public class SweepDBTask extends SchedulerTask {
 		try {   
 			
 			Class.forName("com.mysql.jdbc.Driver");   
-			dbCon = DriverManager.getConnection(_dbUrl, 
-					_dbUser, 
-					_dbPwd);
+			dbCon = DriverManager.getConnection(_dbUrl, _dbUser, _dbPwd);
 			
 			stmt = dbCon.createStatement();						
 			
