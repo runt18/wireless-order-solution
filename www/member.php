@@ -244,8 +244,8 @@ foreach ($rs as $row){
 	echo "<td>" .$row["expenditure"] ."</td>";		
 	echo "<td><a href='#' onclick='editMember(&quot;".$row["id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["name"]."&quot;,&quot;".$row["birth"]."&quot;,&quot;".$row["tele"]."&quot;,&quot;".$row["exchange_rate"].
 		"&quot;,&quot;".$row["discount_type"]."&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
-		"<a href='#' onclick='recharge(&quot;".$row["id"]."&quot;,&quot;".$row["name"]."&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;冲值</a>".
-		"<a href='#' onclick='deleteMember(".$row["id"].")'><img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;删除</a>".
+		"<a href='#' onclick='recharge(&quot;".$row["id"]."&quot;,&quot;".$row["name"]."&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;冲值</a>&nbsp;&nbsp;&nbsp;&nbsp;".
+		"<a href='#' onclick='deleteMember(".$row["id"].")'><img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;删除</a>&nbsp;&nbsp;&nbsp;&nbsp;".
 		"<a href='#' onclick='viewDetail(&quot;".$row["alias_id"]."&quot;,&quot;".$row["name"]."&quot;)'><img src='images/View.png'  height='16' width='14' border='0'/>&nbsp;明细</a></td>";
 	echo "</tr>";
 }
