@@ -46,7 +46,6 @@ COMMIT;
 SET AUTOCOMMIT=0;
 -- DELETE FROM wireless_order_db.terminal WHERE restaurant_id=11;
 INSERT INTO `wireless_order_db`.`terminal` (`pin`, `restaurant_id`, `model_id`, `model_name`, `owner_name`, `entry_date`, `expire_date`, `work_date`) VALUES (0x2100000A, 11, 0x00, 'BlackBerry 8100', '温晓宁', 20101223, 20140717, NOW());
-INSERT INTO `wireless_order_db`.`terminal` (`pin`, `restaurant_id`, `model_id`, `model_name`, `owner_name`, `entry_date`, `expire_date`, `work_date`) VALUES (0x20237AB8, 11, 0x00, 'BlackBerry 8100', '张宁远', 20101223, 20140717, NOW());
 COMMIT;
 -- SELECT * FROM terminal;
 
