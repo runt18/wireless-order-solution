@@ -65,7 +65,7 @@ public class StartupScreen extends MainScreen implements IQueryMenu,
 			if(_isStartup){
 				new QueryPing(this, 15, 1000).start();
 			}else{
-				new QueryMenu(this).start();
+				new OTAUpdate(this).start();
 			}
 
 		}else{
@@ -108,11 +108,10 @@ public class StartupScreen extends MainScreen implements IQueryMenu,
 
 	/**
 	 * Assign the menu flag to OK and
-	 * perform to query restaurant info if passing the menu download 
+	 * jumb to the main screen  if passing the menu download 
 	 */
 	public void passMenu(ProtocolPackage resp) {
 		_isMenuOK = true;
-		new QueryRestaurant(this).start();
 	}
 
 	/**
@@ -122,16 +121,15 @@ public class StartupScreen extends MainScreen implements IQueryMenu,
 	 */
 	public void failMenu(ProtocolPackage resp, String errMsg) {
 		_errMsg = errMsg;
+	}
+
+	public void postQueryMenu() {
+		// TODO Auto-generated method stub
 		UiApplication.getUiApplication().invokeLater(new Runnable(){
 			public void run(){
 				close();
 			}
 		});
-	}
-
-	public void postQueryMenu() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	/**
@@ -160,10 +158,10 @@ public class StartupScreen extends MainScreen implements IQueryMenu,
 	}
 
 	/**
-	 * Perform to OTA update no matter succeed to query restaurant or not
+	 * Continue to perform menu query no matter succeed to query restaurant or not
 	 */
 	public void postQueryRestaurant() {
-		new OTAUpdate(this).start();		
+		new QueryMenu(this).start();		
 	}
 
 	/**
@@ -180,27 +178,28 @@ public class StartupScreen extends MainScreen implements IQueryMenu,
 	/**
 	 * In the case a newer version is available,
 	 * assign the latest version and the OTA url,
-	 * and then close the startup screen and jump to the OTA screen 
+	 * and then close the startup screen and jump to the OTA screen.
+	 * Otherwise perform to query the restaurant info.
 	 */
 	public void passOTAUpdate(String latestVer, String url4ota) {
-		_ver = latestVer;
-		_url = url4ota;
-		UiApplication.getUiApplication().invokeLater(new Runnable(){
-			public void run(){
-				close();
-			}
-		});
+		if(latestVer != null & url4ota != null){
+			_ver = latestVer;
+			_url = url4ota;
+			UiApplication.getUiApplication().invokeLater(new Runnable(){
+				public void run(){
+					close();
+				}
+			});			
+		}else{
+			new QueryRestaurant(this).start();
+		}
 	}
 
 	/**
-	 * Just close the startup screen even fail to perform OTA update.
+	 * Continue to perform to query the restaurant info even if fail to OTA update.
 	 */
 	public void failOTAUpdate(String errMsg){
-		UiApplication.getUiApplication().invokeLater(new Runnable(){
-			public void run(){
-				close();
-			}
-		});
+		new QueryRestaurant(this).start();
 	}
 
 	public void postOTAUpdate() {
@@ -220,10 +219,10 @@ public class StartupScreen extends MainScreen implements IQueryMenu,
 	}
 
 	/**
-	 * Start to query menu if Ping passes.
+	 * Perform OTA to check the new version if Ping passes.
 	 */
 	public void passPing(){
-		new QueryMenu(this).start();	
+		new OTAUpdate(this).start();	
 	}
 	
 	/**
