@@ -5,31 +5,37 @@
 
 PrintFunc::PrintFunc(){
 	code = Reserved::PRINT_UNKNOWN;
-	kitchen = Kitchen::KITCHEN_FULL;
 	repeat = 1;
 }
 
 PrintFunc::PrintFunc(int iFunc){
 	code = iFunc;
-	kitchen = Kitchen::KITCHEN_FULL;
 	repeat = 1;
 }
 
 PrintFunc::PrintFunc(int iFunc, int iKit, int iRepeat){
 	code = iFunc;
-	kitchen = iKit;
+	kitchens.push_back(iKit);
 	repeat = iRepeat;
 }
 
 PrintFunc::PrintFunc(const PrintFunc &right){
 	code = right.code;
-	kitchen = right.kitchen;
+	kitchens.clear();
+	vector<int>::const_iterator it = right.kitchens.begin();
+	for(it; it != right.kitchens.end(); it++){
+		kitchens.push_back(*it);
+	}
 	repeat = right.repeat;
 }
 
 PrintFunc& PrintFunc::operator=(const PrintFunc& right){
 	code = right.code;
-	kitchen = right.kitchen;
+	kitchens.clear();
+	vector<int>::const_iterator it = right.kitchens.begin();
+	for(it; it != right.kitchens.end(); it++){
+		kitchens.push_back(*it);
+	}
 	repeat = right.repeat;
 	return *this;
 }

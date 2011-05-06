@@ -1,5 +1,8 @@
 #pragma once
 
+#include <vector>
+using namespace std;
+
 class PrintFunc{
 public:
 	PrintFunc();
@@ -11,6 +14,6 @@ public:
 	~PrintFunc(){};
 
 	int code;		//the function code 
-	int kitchen;	//the kitchen to this function
+	vector<int> kitchens;	//the kitchen to this function
 	int repeat;		//the repeat number to this function
 };

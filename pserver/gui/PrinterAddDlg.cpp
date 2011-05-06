@@ -127,19 +127,54 @@ void CAddPrinterDlg::OnOK(){
 		//get the printer function code
 		int func = 0;
 		pPrinter->QueryIntAttribute(ConfTags::PRINT_FUNC, &func);
-		if(m_Printer == CString(name.c_str()) && m_Func.Compare(_FuncDesc[func]) == 0){
-			CString msg;
-			msg.Format(_T("已存在打印机%s执行打印%s操作，\n请不要重复添加打印功能。"), CString(name.c_str()), _FuncDesc[func]);
-			MessageBox(msg,  _T("信息"), MB_ICONINFORMATION);
-			isDuplicate = true;
-			break;
+		if(m_Printer == CString(name.c_str())){
+			//in the case the functions below
+			//1 - print order detail
+			//2 - print extra food
+			//3 - print canceled food
+			//4 - print hurried food
+			//Check to whether see both the function and kitchen is the same.
+			//Otherwise, just check to see whether the function is the same.
+			if(m_Func.Compare(_FuncDesc[func]) == 0){
+				if(func == Reserved::PRINT_ORDER_DETAIL ||
+					func == Reserved::PRINT_EXTRA_FOOD ||
+					func == Reserved::PRINT_CANCELLED_FOOD ||
+					func == Reserved::PRINT_HURRY_FOOD)
+				{
+					//get the kitchen to this printer instance
+					int kitchen = Kitchen::KITCHEN_FULL;;
+					pPrinter->QueryIntAttribute(ConfTags::KITCHEN, &kitchen);
+
+					//get the kitchen to add
+					int kitchen2Add = m_PrintKitchen.GetCurSel();
+					if(kitchen2Add == g_Kitchens.size() - 1){
+						kitchen2Add = Kitchen::KITCHEN_FULL;
+					}
+
+					//check to see whether the kitchen is the same
+					if(kitchen2Add == kitchen){
+						isDuplicate = true;
+						CString msg;
+						msg.Format(_T("已存在打印机\"%s\"执行打印\"%s-%s\"操作，\n请不要重复添加打印功能。"), CString(name.c_str()), _FuncDesc[func], g_Kitchens.at(m_PrintKitchen.GetCurSel()));
+						MessageBox(msg,  _T("信息"), MB_ICONINFORMATION);
+						break;
+					}
+
+				}else{
+					isDuplicate = true;
+					CString msg;
+					msg.Format(_T("已存在打印机\"%s\"执行打印\"%s\"操作，\n请不要重复添加打印功能。"), CString(name.c_str()), _FuncDesc[func]);
+					MessageBox(msg,  _T("信息"), MB_ICONINFORMATION);
+					break;
+				}
+			}
 		}
 		//get the printer style
 		int style = 0;
 		pPrinter->QueryIntAttribute(ConfTags::PRINT_STYLE, &style);
 		if(m_Printer == CString(name.c_str()) && m_Style.Compare(_PrinterStyle[style]) != 0){
 			CString msg;
-			msg.Format(_T("已存在打印机%s的%s打印类型，\n请确认相同型号的打印机要使用相同的打印类型。"), CString(name.c_str()), _PrinterStyle[style]);
+			msg.Format(_T("已存在打印机\"%s\"的\"%s\"打印类型，\n请确认相同型号的打印机要使用相同的打印类型。"), CString(name.c_str()), _PrinterStyle[style]);
 			MessageBox(msg,  _T("信息"), MB_ICONINFORMATION);
 			isDuplicate = true;
 			break;

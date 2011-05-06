@@ -128,12 +128,12 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 		if(it == g_PrintInstances.end()){
 			//create the printer instance and put it to the vector if not be found in the exist printer instances
 			boost::shared_ptr<PrinterInstance> pPI(new PrinterInstance(name.c_str(), style, pReport));
-			pPI->addFunc(PrintFunc(func, kitchen, repeat));
+			pPI->addFunc(func, kitchen, repeat);
 			g_PrintInstances.push_back(pPI);
 
 		}else{
 			//just add the function to the exist printer instance
-			(*it)->addFunc(PrintFunc(func, kitchen, repeat));
+			(*it)->addFunc(func, kitchen, repeat);
 		}
 	}
 

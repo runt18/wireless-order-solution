@@ -27,10 +27,7 @@ PrinterInstance::PrinterInstance(const char* pName, int iStyle, IPReport* pRepor
 PrinterInstance::PrinterInstance(const PrinterInstance &right){
 	name = right.name;
 	style = right.style;
-	//kitchen4Detail = right.kitchen4Detail;
-	//kitchen4Extra = right.kitchen4Extra;
-	//kitchen4Cancelled = right.kitchen4Cancelled;
-	//kitchen4Hurry = right.kitchen4Hurry;
+
 	funcs.clear();
 	vector<PrintFunc>::const_iterator iter = right.funcs.begin();
 	for(iter; iter != right.funcs.end(); iter++){
@@ -45,10 +42,7 @@ PrinterInstance::PrinterInstance(const PrinterInstance &right){
 PrinterInstance& PrinterInstance::operator =(const PrinterInstance &right){
 	name = right.name;
 	style = right.style;
-	//kitchen4Detail = right.kitchen4Detail;
-	//kitchen4Extra = right.kitchen4Extra;
-	//kitchen4Cancelled = right.kitchen4Cancelled;
-	//kitchen4Hurry = right.kitchen4Hurry;
+
 	funcs.clear();
 	vector<PrintFunc>::const_iterator iter = right.funcs.begin();
 	for(iter; iter != right.funcs.end(); iter++){
@@ -254,7 +248,7 @@ void PrinterInstance::addJob(const char* buf, int len, int iFunc){
 		iFunc == Reserved::PRINT_CANCELLED_FOOD ||
 		iFunc == Reserved::PRINT_HURRY_FOOD){		
 		if(iter_func != funcs.end()){
-			split2Details(print_content, iter_func->kitchen, details);
+			split2Details(print_content, iter_func->kitchens, details);
 		}
 
 	}else{
@@ -262,24 +256,6 @@ void PrinterInstance::addJob(const char* buf, int len, int iFunc){
 			details.push_back(print_content);
 		}
 	}
-
-	//if(iFunc == Reserved::PRINT_ORDER_DETAIL){
-	//	split2Details(print_content, kitchen4Detail, details);
-
-	//}else if(iFunc == Reserved::PRINT_EXTRA_FOOD){
-	//	split2Details(print_content, kitchen4Extra, details);
-
-	//}else if(iFunc == Reserved::PRINT_CANCELLED_FOOD){
-	//	split2Details(print_content, kitchen4Cancelled, details);
-
-	//}else if(iFunc == Reserved::PRINT_HURRY_FOOD){
-	//	split2Details(print_content, kitchen4Hurry, details);
-
-	//}else{
-	//	if(!print_content.empty()){
-	//		details.push_back(print_content);
-	//	}
-	//}
 
 	EnterCriticalSection(&m_csJobQueue);
 
@@ -302,11 +278,11 @@ void PrinterInstance::addJob(const char* buf, int len, int iFunc){
 * Function Name  : split2Details
 * Description    : Split the print content into several details.
 * Input          : print_content - the content to be split
-			       kitchen - the kitchen determining whether the detail to be print
+			       kitchens - the kitchens that this printer contains
 * Output         : detail_content - the vector holding the results
 * Return         : None
 *******************************************************************************/
-void PrinterInstance::split2Details(const string& print_content, int kitchen, vector<string>& detail_content){
+void PrinterInstance::split2Details(const string& print_content, const vector<int>& kitchens, vector<string>& detail_content){
 	/************************************************************************
 	* The print content looks like below in the case the content to print is as below
 	* 1 - order detail
@@ -326,19 +302,27 @@ void PrinterInstance::split2Details(const string& print_content, int kitchen, ve
 		vector<string> details; 
 		int size = print_content.size();
 		while(offset < (int)print_content.size()){
+
 			int length = (print_content[offset + 1] & 0x000000FF) | ((print_content[offset + 2] & 0x000000FF) << 8);
-			/************************************************************************
-			* Either of two cases below means kitchen between print request and printer instance is matched     
-			* 1 - the kitchen equals to Kitchen.KITCHEN_FULL
-			* 2 - the kitchen equals to print request
-			************************************************************************/
-			if(kitchen == Kitchen::KITCHEN_FULL || print_content[offset] == kitchen){
-				offset += 3;
-				detail_content.push_back(string(print_content.begin() + offset, print_content.begin() + offset + length));
-				offset += length;
-			}else{
-				offset += 3 + length;
-			}
+			int kit2Print = print_content[offset];
+
+			//enumerate to see which kitchens match the print content,
+			//and then print it
+			vector<int>::const_iterator it = kitchens.begin();
+			for(it; it != kitchens.end(); it++){		
+				/************************************************************************
+				* Either of two cases below means kitchen between print request and printer instance is matched     
+				* 1 - the kitchen equals to Kitchen.KITCHEN_FULL
+				* 2 - the kitchen equals to print request
+				************************************************************************/
+				if(*it == Kitchen::KITCHEN_FULL || *it == kit2Print){
+					detail_content.push_back(string(print_content.begin() + offset + 3, print_content.begin() + offset + 3 + length));
+					break;
+				}
+			}	
+
+			offset += 3 + length;
+
 		}
 	}
 }
@@ -346,13 +330,25 @@ void PrinterInstance::split2Details(const string& print_content, int kitchen, ve
 /*******************************************************************************
 * Function Name  : addFunc
 * Description    : Add the function code 
-* Input          : func - the function that the printer instance will support
+* Input          : iFunc - the code to this function
+				   iKitchen - the kitchen to this function
+				   iRepeat - the repeat times to this function
 * Output         : None
 * Return         : None
 *******************************************************************************/
-void PrinterInstance::addFunc(const PrintFunc& func){
-	vector<PrintFunc>::iterator iter = find(funcs.begin(), funcs.end(), func);
-	if(iter == funcs.end()){
-		funcs.push_back(func);
+void PrinterInstance::addFunc(int iFunc, int iKitchen, int iRepeat){
+	vector<PrintFunc>::iterator iter_func = find(funcs.begin(), funcs.end(), PrintFunc(iFunc));
+	if(iter_func == funcs.end()){
+		//if the function doesn't exist, means the new function
+		//put it to the function list 
+		funcs.push_back(PrintFunc(iFunc, iKitchen, iRepeat));
+
+	}else{
+		//if the function has been exist, check to see whether this function contains this kitchen or not.
+		//add the kitchen to this function if not exist
+		vector<int>::iterator it = find(iter_func->kitchens.begin(), iter_func->kitchens.end(), iKitchen);
+		if(it == iter_func->kitchens.end()){
+			iter_func->kitchens.push_back(iKitchen);
+		}
 	}
 }

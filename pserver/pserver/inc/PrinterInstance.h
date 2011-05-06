@@ -39,7 +39,7 @@ public:
 
 	void run();
 	void addJob(const char* buf, int len, int iFunc);
-	void addFunc(const PrintFunc& func);
+	void addFunc(int iFunc, int iKitchen, int iRepeat);
 
 public:
 	//the name of the printer
@@ -75,7 +75,7 @@ public:
 
 private:
 	int style;
-	void split2Details(const string& printContent, int kitchen, vector<string>& details);
+	void split2Details(const string& printContent, const vector<int>& kitchens, vector<string>& details);
 
 };
 
