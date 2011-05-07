@@ -111,10 +111,11 @@ public class SelectTastePopup extends PopupScreen{
 						 * we might remove the original food first
 						 */
 						_orderListField._orderFoods.removeElement(_selectedFood);
-						//assign the taste id
-						_selectedFood.taste.alias_id = (short)(getSelectedIndex());
-						//assign the taste preference
+
 						try{
+							//assign the taste id
+							_selectedFood.taste.alias_id = WirelessOrder.foodMenu.tastes[getSelectedIndex()].alias_id;
+							//assign the taste preference
 							_selectedFood.taste.preference = WirelessOrder.foodMenu.tastes[getSelectedIndex()].preference;
 							_selectedFood.taste.price = WirelessOrder.foodMenu.tastes[getSelectedIndex()].price;
 						}catch(ArrayIndexOutOfBoundsException e){}
