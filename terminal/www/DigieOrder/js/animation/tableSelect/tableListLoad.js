@@ -63,7 +63,7 @@ function tableSelectOnLoad() {
 
 	Ext.Ajax
 			.request( {
-				url : "../findMutilTableCol.do",
+				url : "QueryTable",
 				params : {
 					"pin" : pin
 				},
@@ -246,5 +246,5 @@ function tableSelectOnLoad() {
 		failure : function(response, options) {
 		}
 			});
-
+	
 };
