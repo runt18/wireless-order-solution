@@ -1,4 +1,4 @@
-﻿Ext.onReady(function() {
+﻿Ext.onReady( function() {
 	// 解决ext中文传入后台变问号问题
 		Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
 		Ext.QuickTips.init();
@@ -53,7 +53,9 @@
 										// for forward the page
 										location.href = "OrderMain.html?tableNbr="
 												+ selectedTable
-												+ "&personCount=" + inputCount;
+												+ "&personCount="
+												+ inputCount
+												+ "&pin=" + pin;
 
 									}
 								}
@@ -383,10 +385,19 @@
 				if (tableStatusListTS[tableIndex][2] == "空桌") {
 					Ext.Msg.alert("", "<b>此桌没有下单，不能删单！</b>");
 				} else {
-					// ...................;
-			Ext.Msg.alert("", "<b>删单成功！</b>");
-		}
-	}
+					Ext.Ajax.request( {
+						url : "../findMutilTableCol.do",
+						params : {
+							tableID : selectedTable
+						},
+						success : function(response, options) {
+							Ext.Msg.alert("", "<b>删单成功！</b>");
+						},
+						failure : function(response, options) {
+						}
+					});
+				}
+			}
 		});
 
 		var centerTabPanel = new Ext.Panel( {

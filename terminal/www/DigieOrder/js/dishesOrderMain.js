@@ -1,9 +1,8 @@
 ﻿// --------------dishes order center panel-----------------
 // 1，数据
 // 格式：[菜名，口味，数量，单价，操作，实价]
-var orderedData = [];
-orderedData.push( [ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "", "￥56.2" ]);
-orderedData.push( [ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "", "￥56.2" ]);
+//orderedData.push( [ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "", "￥56.2" ]);
+//orderedData.push( [ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "", "￥56.2" ]);
 
 // 2，表格的数据store
 var orderedStore = new Ext.data.Store( {
@@ -145,6 +144,9 @@ var orderedGrid = new Ext.grid.GridPanel( {
 	listeners : {
 		rowclick : function(thiz, rowIndex, e) {
 			dishOrderCurrRowIndex_ = rowIndex;
+		},
+		render : function(thiz) {
+			orderedDishesOnLoad();
 		}
 	}
 });
@@ -765,10 +767,15 @@ var dishesOrderNorthPanel = new Ext.Panel( {
 	border : false,
 	layout : "form",
 	frame : true,
-	contentEl : "tableStatusDO"
+	contentEl : "tableStatusDO",
+	listeners : {
+		render : function(thiz) {
+			tableStuLoad();
+		}
+	}
 });
 
-Ext.onReady(function() {
+Ext.onReady( function() {
 	// 解决ext中文传入后台变问号问题
 		Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
 		Ext.QuickTips.init();
