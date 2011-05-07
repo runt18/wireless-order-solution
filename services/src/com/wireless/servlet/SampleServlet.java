@@ -112,7 +112,7 @@ public class SampleServlet extends HttpServlet {
 	}
 	
 	private void insertOrder(){
-		ProtocolPackage _resp = ServerConnector.instance().ask(new ReqInsertOrder(_reqOrder, _type, printType));
+		//ProtocolPackage _resp = ServerConnector.instance().ask(new ReqInsertOrder(_reqOrder, _type, printType));
 	}
 	
 }

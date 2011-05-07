@@ -13,7 +13,7 @@ public class Verify {
 	 * @param token the token to be verified
 	 * @throws VerifyFault throws if fail to verify the token
 	 */
-	public static void exec(String token) throws VerifyFault{
+	public static int exec(String pin) throws VerifyFault{
 		//open the database
 		Connection dbCon = null;
 		Statement stmt = null;
@@ -26,15 +26,18 @@ public class Verify {
 			//set names to UTF-8
 			stmt.execute("SET NAMES utf8");
 			
-			String sql = "SELECT id FROM " + Params.dbName + ".restaurant WHERE token='" + token + "'";
+			String sql = "SELECT restaurant_id FROM " +  Params.dbName + ".terminal WHERE pin=" + pin;
 			rs = stmt.executeQuery(sql);
 			/**
 			 * pass to verify the token if existing in restaurant table,
 			 * otherwise fail to verify the token 
 			 */
-			if(!rs.next()){
+			if(rs.next()){
+				return rs.getInt("restaurant_id");
+			}else{
 				throw new VerifyFault();
 			}
+			
 		}catch(ClassNotFoundException e){
 			throw new VerifyFault();
 			
