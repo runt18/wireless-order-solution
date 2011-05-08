@@ -27,18 +27,18 @@ function editMember(id, alias_id, name, birth, tele, exchange_rate, discount_typ
 	                      '<input type="hidden" name="id" value="' + id + '" />' +
 	                      '<div class="add_foot_Content" style="height:230px;text-align:center">' +
 	                        '<div class="pop_Content">' +
-	                            '<div class="pop_Content1">编号：' + aliasId + '</div>' +
-	                            '<div class="pop_Content1">姓名：<input type="text" id="name" name="name" value="' + name + '" onfocus="this.select()" size="25" height="20" /></div>' +
-	                            '<div class="pop_Content1">出生日期：<input type="text" id="birth" name="birth" value="' + birth + '" size="25" height="20" onfocus="this.select()" style="position: relative; right: -14px; width: 150px;"/></div>' +
-	                            '<div class="pop_Content1">电话：<input type="text" id="tele" name="tele" value="' + tele + '" onfocus="this.select()" size="25" height="20"' +
+	                            '<div class="pop_Content1" style="padding-left:32px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;编号：' + aliasId + '</div>' +
+	                            '<div class="pop_Content1" style="padding-left:32px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;姓名：<input type="text" id="name" name="name" value="' + name + '" onfocus="this.select()" size="25" height="20" /></div>' +
+	                            '<div class="pop_Content1" style="padding-left:32px">出生日期：<input type="text" id="birth" name="birth" value="' + birth + '" size="25" height="20" onfocus="this.select()" /></div>' +
+	                            '<div class="pop_Content1" style="padding-left:32px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;电话：<input type="text" id="tele" name="tele" value="' + tele + '" onfocus="this.select()" size="25" height="20"' +
 	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57||event.keyCode==46"' +
 	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
 	                            ' style="ime-mode:Disabled" /></div>' +
-	                            '<div class="pop_Content1">兑换折扣：<input type="text" id="exchange_rate" name="exchange_rate" value="' + exchange_rate + '" onfocus="this.select()" size="25" height="20"' +
+	                            '<div class="pop_Content1" style="padding-left:32px">兑换折扣：<input type="text" id="exchange_rate" name="exchange_rate" value="' + exchange_rate + '" onfocus="this.select()" size="25" height="20"' +
 	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57||event.keyCode==46"' +
 	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
 	                            ' style="ime-mode:Disabled" /></div>' +
-	                            '<div class="pop_Content1">折扣方式：<select style="width: 90px;position: relative; right: -2px;" id="discount_type" name="discount_type" ' +
+	                            '<div class="pop_Content1" style="padding-left:32px">折扣方式：<select style="width: 90px;position: relative;" id="discount_type" name="discount_type" ' +
 	                            '><option value="0">会员折扣1</option><option value="1">会员折扣2</option></select></div>' +
 	                        '</div>' +
 	                            '<span class="pop_action-span"><a href="#" onclick="submitMemberData()">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>' +

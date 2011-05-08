@@ -10,7 +10,7 @@ function showSearch(target) {
                         '<div class="pop_Content">' +
                             '<div class="pop_Content1">日期：<input type="text" id="dateFrom" name="dateFrom" style="width:136px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;&nbsp;至&nbsp;&nbsp;<input type="text" id="dateTo" name="dateTo" style="width:136px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;</div>' +                          
                             '<div class="pop_Content1">金额：<input type="text" name="priceFrom" style="width:136px" onkeypress="return event.keyCode>=48&&event.keyCode<=57" />&nbsp;&nbsp;至&nbsp;&nbsp;<input type="text" name="priceTo" style="width:136px" onkeypress="return event.keyCode>=48&&event.keyCode<=57" /></div>' +
-                            '<div class="pop_Content2">台号：<input type="text" name="alias_id" size="10" height="20" onkeypress="return event.keyCode>=48&&event.keyCode<=57" />&nbsp;&nbsp;&nbsp;&nbsp;结帐方式：<select id="type" name="type"><option value="" selected="selected">全部</option><option value="1">现金</option><option value="2">刷卡</option>	<option value="3">会员卡</option><option value="4">挂账</option><option value="5">签单</option></select></div>' +
+                            '<div class="pop_Content2">台号：<input type="text" name="alias_id" size="10" height="20" onkeypress="return event.keyCode>=48&&event.keyCode<=57" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;结帐方式：<select id="type" name="type"><option value="" selected="selected">全部</option><option value="1">现金</option><option value="2">刷卡</option>	<option value="3">会员卡</option><option value="4">挂账</option><option value="5">签单</option></select></div>' +
                         '</div>' +
                         '<span class="action-span" style="margin-left:110px;"><a href="#"  onclick="document.searchForm.submit();">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>' +
                          '<span class="action-span1" style="margin-right:100px;"><a href="#" onclick="closeWindow()">取&nbsp;&nbsp;&nbsp;&nbsp;消</a></span>' +
@@ -227,16 +227,16 @@ function viewOrderStat(statType) {
         title = "月结汇总 - 请选择日期区间";
     }
     var content = ' <div class="add_foot">' +
-                        '<div class="title">' +
-	                        '<div class="title_left"><font class="font" style="width:350px;">' + title + '</font></div>' +
-	                        '<div class="title_right"></div>' +
+                        '<div class="title" style="width:430px">' +
+	                        '<div class="title_left" style="width:385px;"><font class="font" style="width:260px;">' + title + '</font></div>' +
+	                        '<div class="title_right" style="float:left;width:35px;"></div>' +
 	                    '</div>' +
 	                    '<form id="searchForm" name="searchForm" action="order_history.php"  method="post" onkeydown="searchOrderKeyDown()">' +
 	                      '<input type="hidden" name="editType" value="' + editType + '" />' +
 	                      '<input type="hidden" name="statType" value="' + statType + '" />' +
-	                      '<div class="add_foot_Content" style="height:130px;text-align:center">' +
+	                      '<div class="add_foot_Content" style="height:130px;text-align:center;width:413px">' +
 	                        '<div class="pop_Content">' +
-	                           '<div class="pop_Content1" style="padding-left:0px;text-align:center">日期：<input type="text" id="dateFrom" name="dateFrom" style="width:100px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;&nbsp;至&nbsp;&nbsp;<input type="text" id="dateTo" name="dateTo" style="width:100px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;</div>' +
+	                           '<div class="pop_Content1" style="padding-left:0px;text-align:center">日期：<input type="text" id="dateFrom" name="dateFrom" style="width:136px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;&nbsp;至&nbsp;&nbsp;<input type="text" id="dateTo" name="dateTo" style="width:width:136px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;</div>' +
 	                        '</div>' +
 	                            '<span class="pop_action-span"><a href="#" onclick="document.searchForm.submit();">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>' +
 	                            '<span class="pop_action-span1"><a href="#" onclick="closeWindow()">取&nbsp;&nbsp;&nbsp;&nbsp;消</a></span>' +
@@ -244,7 +244,7 @@ function viewOrderStat(statType) {
 	                      '</form>' +
 	                '</div>';
 
-    showMessageBox(content, 342, 350);
+    showMessageBox(content, 430, 350);
     document.getElementById("dateFrom").focus();
 }
 

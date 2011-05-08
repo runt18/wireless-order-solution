@@ -1,4 +1,4 @@
-function editKitchen(id, alias_id, name, discount, member_discount_1, member_discount_2) {
+function editKitchen(id, alias_id, name, discount1, discount2, member_discount_1, member_discount_2) {
     var editType = "addKitchen";
     var title = "添加厨房";
     if (id != "") {
@@ -26,19 +26,23 @@ function editKitchen(id, alias_id, name, discount, member_discount_1, member_dis
 	                    '<form name="kitchenForm" action="kitchen.php"  method="post" onkeydown="editKitchenKeyDown()">' +
 	                      '<input type="hidden" name="editType" value="' + editType + '" />' +
 	                      '<input type="hidden" name="id" value="' + id + '" />' +	                      
-	                      '<div class="add_foot_Content" style="height:220px;text-align:center">' +
+	                      '<div class="add_foot_Content" style="height:230px;text-align:center">' +
 	                        '<div class="pop_Content">' +
-	                            '<div class="pop_Content1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;编号：' + aliasId + '</div>' +
-	                            '<div class="pop_Content1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名称：<input type="text" id="name" name="name" value="' + name + '" onfocus="this.select()" size="25" height="20" /></div>' +
-	                            '<div class="pop_Content1">&nbsp;&nbsp;一般折扣：<input type="text" id="discount" name="discount" value="' + discount + '" onfocus="this.select()" size="25" height="20"' +
+	                            '<div class="pop_Content1" style="padding-left:32px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;编号：' + aliasId + '</div>' +
+	                            '<div class="pop_Content1" style="padding-left:32px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名称：<input type="text" id="name" name="name" value="' + name + '" onfocus="this.select()" size="25" height="20" /></div>' +
+	                            '<div class="pop_Content1" style="padding-left:32px">一般折扣1：<input type="text" id="discount_1" name="discount_1" value="' + discount1 + '" onfocus="this.select()" size="25" height="20"' +
 	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57||event.keyCode==46"' +
 	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
 	                            ' style="ime-mode:Disabled" /></div>' +
-	                            '<div class="pop_Content1">会员折扣1：<input type="text" id="member_discount_1" name="member_discount_1" value="' + member_discount_1 + '" onfocus="this.select()" size="25" height="20"' +
+	                             '<div class="pop_Content1" style="padding-left:32px">一般折扣2：<input type="text" id="discount_2" name="discount_2" value="' + discount2 + '" onfocus="this.select()" size="25" height="20"' +
 	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57||event.keyCode==46"' +
 	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
 	                            ' style="ime-mode:Disabled" /></div>' +
-	                            '<div class="pop_Content1">会员折扣2：<input type="text" id="member_discount_2" name="member_discount_2" value="' + member_discount_2 + '" onfocus="this.select()" size="25" height="20"' +
+	                            '<div class="pop_Content1" style="padding-left:32px">会员折扣1：<input type="text" id="member_discount_1" name="member_discount_1" value="' + member_discount_1 + '" onfocus="this.select()" size="25" height="20"' +
+	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57||event.keyCode==46"' +
+	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
+	                            ' style="ime-mode:Disabled" /></div>' +
+	                            '<div class="pop_Content1" style="padding-left:32px">会员折扣2：<input type="text" id="member_discount_2" name="member_discount_2" value="' + member_discount_2 + '" onfocus="this.select()" size="25" height="20"' +
 	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57||event.keyCode==46"' +
 	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
 	                            ' style="ime-mode:Disabled" /></div>' +
@@ -62,7 +66,8 @@ function editKitchen(id, alias_id, name, discount, member_discount_1, member_dis
 function submitKitchenData() {
     var alias_id = document.getElementById("alias_id").value;
     var name = document.getElementById("name").value;
-    var discount = document.getElementById("discount").value;
+    var discount_1 = document.getElementById("discount_1").value;
+    var discount_2 = document.getElementById("discount_2").value;
     var member_discount_1 = document.getElementById("member_discount_1").value;
     var member_discount_2 = document.getElementById("member_discount_2").value;
     if (alias_id == undefined || alias_id == null || alias_id == "") {
@@ -73,8 +78,12 @@ function submitKitchenData() {
         alert("名称不能为空！");
         return;
     }
-    if (discount == undefined || discount == null || discount == "") {
-        alert("一般折扣不能为空！");
+    if (discount_1 == undefined || discount_1 == null || discount_1 == "") {
+        alert("一般折扣1不能为空！");
+        return;
+    }
+    if (discount_2 == undefined || discount_2 == null || discount_2 == "") {
+        alert("一般折扣2不能为空！");
         return;
     }
     if (member_discount_1 == undefined || member_discount_1 == null || member_discount_1 == "") {
@@ -85,10 +94,16 @@ function submitKitchenData() {
         alert("会员折扣2不能为空！");
         return;
     }
-    var dis = parseFloat(discount);
+    var dis = parseFloat(discount_1);
     if (dis > 1 || dis < 0) {
-        alert("一般折扣的输入范围是0~1");
-        document.getElementById("discount").focus();
+        alert("一般折扣1的输入范围是0~1");
+        document.getElementById("discount_1").focus();
+        return;
+    }
+    dis = parseFloat(discount_2);
+    if (dis > 1 || dis < 0) {
+        alert("一般折扣2的输入范围是0~1");
+        document.getElementById("discount_2").focus();
         return;
     }
     var dis1 = parseFloat(member_discount_1);
@@ -145,7 +160,7 @@ function showHideCondition(select) {
     document.getElementById("condition_type").style.display = "none";
     document.getElementById("keyword").style.display = "inline";
     document.getElementById("keyword").value = "";
-    if (option.value == "discount" || option.value == "member_discount_1" || option.value == "member_discount_2") {
+    if (option.value == "discount1" || option.value == "discount2" || option.value == "member_discount1" || option.value == "member_discount2") {
         document.getElementById("condition_type").style.display = "inline";
     }
 }
@@ -169,7 +184,7 @@ function initializeKitchen() {
         }
     }
     keyword.value = keyword_value;
-    if (keyword_type_value == "discount" || keyword_type_value == "member_discount_1" || keyword_type_value == "member_discount_2") {
+    if (keyword_type_value == "discount1" || keyword_type_value == "discount2" || keyword_type_value == "member_discount1" || keyword_type_value == "member_discount2") {
         document.getElementById("condition_type").style.display = "inline";
     }
 }

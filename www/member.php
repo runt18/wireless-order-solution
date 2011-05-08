@@ -165,7 +165,7 @@ $xm=$_REQUEST["keyword_type"];
 $ct=$_REQUEST["condition_type"];
 $kw=$_REQUEST["keyword"]; 
 $discount_type_select = $_REQUEST["discount_type_select"];
-$sql = "SELECT id,alias_id,name,birth,tele,discount_type,balance,exchange_rate,expenditure FROM member a"
+$sql = "SELECT id,alias_id,name,birth,tele,discount_type,balance,exchange_rate,CASE WHEN expenditure IS NULL THEN 0.00 ELSE expenditure END as expenditure FROM member a"
 	." LEFT JOIN (SELECT member_id,SUM(total_price) AS expenditure FROM `order_history` GROUP BY member_id) AS b ON a.alias_id = b.member_id WHERE restaurant_id=" . $_SESSION["restaurant_id"];			
 switch ($xm)
 {

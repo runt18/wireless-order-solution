@@ -26,7 +26,8 @@ if($editType == "addKitchen" || $editType == "editKitchen")
 {
 	//$alias_id = $_POST["alias_id"];
 	$name = $_POST["name"];
-	$discount = $_POST["discount"];
+	$discount_1 = $_POST["discount_1"];
+	$discount_2 = $_POST["discount_2"];
 	$member_discount_1 = $_POST["member_discount_1"];
 	$member_discount_2 = $_POST["member_discount_2"];
 	
@@ -48,7 +49,7 @@ if($editType == "addKitchen" || $editType == "editKitchen")
 	else
 	{
 		$id = $_POST["id"];				
-		$sql = "UPDATE kitchen SET name='$name',discount=$discount,member_discount_1=$member_discount_1,member_discount_2=$member_discount_2 WHERE id=$id";		
+		$sql = "UPDATE kitchen SET name='$name',discount=$discount_1,discount_2 = $discount_2,member_discount_1=$member_discount_1,member_discount_2=$member_discount_2 WHERE id=$id";		
 	}	
 	if($validate)
 	{
@@ -87,9 +88,10 @@ else if($editType == "deleteKitchen")
 		<option value="0">全部</option>
 		<option value="alias_id">编号</option>
 		<option value="name">名称</option>
-		<option value="discount">一般折扣</option>
-		<option value="member_discount_1">会员折扣1</option>
-		<option value="member_discount_2">会员折扣2</option>
+		<option value="discount1">一般折扣1</option>
+		<option value="discount2">一般折扣2</option>
+		<option value="member_discount1">会员折扣1</option>
+		<option value="member_discount2">会员折扣2</option>
 	</select>
 	<select id="condition_type" name="condition_type" style="display:none">
 	<option value="Equal">等于</option>
@@ -110,7 +112,8 @@ else if($editType == "deleteKitchen")
 			<tr>
 				<th><h3>编&nbsp;号</h3></th>
 				<th><h3>名&nbsp;称</h3></th>
-				<th><h3>一般折扣</h3></th>				
+				<th><h3>一般折扣1</h3></th>	
+				<th><h3>一般折扣2</h3></th>				
 				<th><h3>会员折扣1</h3></th>
 				<th><h3>会员折扣2</h3></th>
 				<th><h3>操&nbsp;作</h3></th>
@@ -122,7 +125,7 @@ include("conn.php");
 $xm=$_REQUEST["keyword_type"];
 $ct=$_REQUEST["condition_type"];
 $kw=$_REQUEST["keyword"]; 
-$sql = "SELECT id,alias_id,name,discount,member_discount_1,member_discount_2 FROM kitchen WHERE restaurant_id=" . $_SESSION["restaurant_id"];			
+$sql = "SELECT id,alias_id,name,discount,discount_2,member_discount_1,member_discount_2 FROM kitchen WHERE restaurant_id=" . $_SESSION["restaurant_id"];			
 switch ($xm)
 {
 	case "alias_id":
@@ -133,7 +136,24 @@ switch ($xm)
 		if ($kw!="")
 			$sql .= " AND name like '%$kw%'" ;  			
 		break;	
-	case "discount":
+	case "discount1":
+		if ($kw!="")
+		{
+			if($ct == "Equal")
+			{
+				$sql .= " AND discount = $kw" ;  
+			}
+			elseif($ct == "EqualOrGrater")
+			{
+				$sql .= " AND discount >= $kw" ; 
+			}
+			elseif($ct == "EqualOrLess")
+			{
+				$sql .= " AND discount <= $kw" ; 
+			}
+		}				
+		break;	
+	case "discount2":
 		if ($kw!="")
 		{
 			if($ct == "Equal")
@@ -150,7 +170,7 @@ switch ($xm)
 			}
 		}				
 		break;		
-	case "member_discount_1":
+	case "member_discount1":
 		if ($kw!="")
 		{
 			if($ct == "Equal")
@@ -167,7 +187,7 @@ switch ($xm)
 			}
 		}				
 		break;		
-	case "member_discount_2":
+	case "member_discount2":
 		if ($kw!="")
 		{
 			if($ct == "Equal")
@@ -195,9 +215,10 @@ foreach ($rs as $row){
 	echo "<td>" .$bh ."</td>";
 	echo "<td>" .$row["name"] ."</td>";
 	echo "<td>" .$row["discount"] ."</td>";
+	echo "<td>" .$row["discount_2"] ."</td>";
 	echo "<td>" .$row["member_discount_1"] ."</td>";
 	echo "<td>" .$row["member_discount_2"] ."</td>";	
-	echo "<td><a href='#' onclick='editKitchen(&quot;".$row["id"]."&quot;,&quot;".$bh."&quot;,&quot;".$row["name"]."&quot;,&quot;".$row["discount"]."&quot;,&quot;".$row["member_discount_1"]."&quot;,&quot;".$row["member_discount_2"].
+	echo "<td><a href='#' onclick='editKitchen(&quot;".$row["id"]."&quot;,&quot;".$bh."&quot;,&quot;".$row["name"]."&quot;,&quot;".$row["discount"]."&quot;,&quot;".$row["discount_2"]."&quot;,&quot;".$row["member_discount_1"]."&quot;,&quot;".$row["member_discount_2"].
 		"&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
 		"<a href='#' style='display:none' onclick='deleteKitchen(".$row["id"].")'><img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;删除</a></td>";
 	echo "</tr>";

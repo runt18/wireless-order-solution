@@ -53,7 +53,6 @@ if($editType == "dailyCheckOut")
 			FROM `order_food` WHERE `order_food`.`order_id` IN (SELECT id FROM `order` WHERE total_price  IS NOT NULL AND restaurant_id=" . $_SESSION["restaurant_id"].")";
 	$sql3 = "DELETE FROM `order_food` WHERE `order_id` IN (SELECT id FROM `order` WHERE total_price  IS NOT NULL AND restaurant_id=" . $_SESSION["restaurant_id"].")";
 	$sql4 = "DELETE FROM `order` WHERE total_price  IS NOT NULL AND restaurant_id=" . $_SESSION["restaurant_id"];	
-	$db->Execute($sql2);	
 	if($db->Execute($sql1) && $db->Execute($sql2) && $db->Execute($sql3) && $db->Execute($sql4))
 	{
 		echo "<script>alert('日结成功！');</script>";
