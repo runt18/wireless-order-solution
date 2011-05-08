@@ -399,7 +399,7 @@ void CMainFrame::OnRetrieveKitchen(const std::vector<Kitchen>& kitchens){
 		MultiByteToWideChar (CP_ACP, 0, kitchens[i].name.c_str(), -1, pMsg.get(), dwNum);
 		g_Kitchens.push_back(pMsg.get());
 	}
-	g_Kitchens.push_back(_T("所有餐厅"));
+	g_Kitchens.push_back(_T("所有厨房"));
 	m_pPrinterView->Update();
 }
 
