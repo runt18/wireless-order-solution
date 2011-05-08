@@ -15,35 +15,47 @@ function deleteFood(id)
     }
     
 }
-function editFood(fId, fCode, fName, fPrice, kitchen, kitchens) {
+function editFood(fId, fCode, fName, fPrice, kitchen, kitchens, status) {
     var ks = "";
     var arr1 = kitchens.split("@");
     for (var i = 0; i < arr1.length; i++) {
         var arr2 = arr1[i].split("|");
         ks += (' <option value="' + arr2[0] + '">' + arr2[1] + '</option>');
     }
-        var titleName;
+    var titleName;
     var isDisable = "";
-	if(fId == "")
-	{
-	    titleName = "添加新菜";	    
-	}
-	else
-	{
-	    titleName = "修改菜谱";
-	    isDisable = 'readonly = "readonly"';
-	}
-	var foodCode = "";
-	if (fId == "") {
-	    foodCode = '<input type="text" id="foodCode" name="foodCode" value="' + fCode + '" size="25" height="20" ' + isDisable +
+    if (fId == "") {
+        titleName = "添加新菜";
+    }
+    else {
+        titleName = "修改菜谱";
+        isDisable = 'readonly = "readonly"';
+    }
+    var foodCode = "";
+    if (fId == "") {
+        foodCode = '<input type="text" id="foodCode" name="foodCode" value="' + fCode + '" size="25" height="20" ' + isDisable +
 	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57"' +
 	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
 	                            ' style="ime-mode:Disabled" />'
-	}
-	else {
-	    foodCode = '<input type="hidden" id="foodCode" name="foodCode" value="' + fCode + '"/>' + fCode + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-	}
-   
+    }
+    else {
+        foodCode = '<input type="hidden" id="foodCode" name="foodCode" value="' + fCode + '"/>' + fCode + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+    }
+
+    specialOfferStatus = "";
+    recommendStatus = "";
+    pausedStatus = "";
+
+    if ((status & 1) != 0) {
+        specialOfferStatus = 'checked = "checked"';
+    }
+    if ((status & 2) != 0) {
+        recommendStatus = 'checked = "checked"';
+    }
+    if ((status & 4) != 0) {
+        pausedStatus = 'checked = "checked"';
+    }
+
     var content = ' <div class="add_foot">' +
                     '<div class="title">' +
 	                    '<div class="title_left"><font class="font">' + titleName + '</font></div>' +
@@ -51,17 +63,23 @@ function editFood(fId, fCode, fName, fPrice, kitchen, kitchens) {
 	                '</div>' +
 	                '<form name="foodForm" action="food.php"  method="post" onkeydown="foodKeyDown()">' +
 	                      '<input type="hidden" name="foodId" value="' + fId + '" />' +
-	                      '<div class="add_foot_Content" style="height:185px;">' + 
+	                      '<input type="statusValue" name="statusValue" />' +
+	                      '<div class="add_foot_Content" style="height:185px;">' +
 	                        '<div class="pop_Content">' +
-	                            '<div class="pop_Content1">编号：'+ foodCode + '</div>' +
+	                            '<div class="pop_Content1">编号：' + foodCode + '</div>' +
 	                            '<div class="pop_Content1">菜名：<input type="text" id="foodName" name="foodName" value="' + fName + '" size="25" height="20"/></div>' +
 	                            '<div class="pop_Content1">价格：<input type="text" id="foodPrice" name="foodPrice" value="' + fPrice + '" size="25" height="20"' +
-	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57||event.keyCode==46"' +  
+	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57||event.keyCode==46"' +
 	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
-	                            ' style="ime-mode:Disabled" /></div>' + 
+	                            ' style="ime-mode:Disabled" /></div>' +
 								'<div class="pop_Content1">厨房：<select id="kitchenSelect" name="kitchenSelect" style="width:85px;">' +
-                                ks +								
-								'<option value="255">空</option></select></div>' +	                          
+                                ks +
+								'<option value="255">空</option></select></div>' +
+								'<div class="pop_Content1">' +
+								'<input id="specialOffer" name="specialOffer" type="checkbox" ' + specialOfferStatus + '>特价</input>' +
+								'<input id="recommend" name="recommend" type="checkbox" ' + recommendStatus + '>推荐</input>' +
+								'<input id="paused" name="paused" type="checkbox" ' + pausedStatus + '>停售</input>' +
+								'</div>' +
 	                        '</div>' +
 	                        '<span class="pop_action-span"><a href="#" onclick="submitFoodData()">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>' +
 	                        '<span class="pop_action-span1"><a href="#" onclick="closeWindow()">取&nbsp;&nbsp;&nbsp;&nbsp;消</a></span>' +
@@ -75,7 +93,7 @@ function editFood(fId, fCode, fName, fPrice, kitchen, kitchens) {
     else {
         document.getElementById("foodName").focus();
     }
-//    alert(kitchen);
+    //    alert(kitchen);
     document.all.kitchenSelect.value = kitchen;
 }
 
@@ -99,10 +117,20 @@ function clearNoNum(obj) {
     obj.value = obj.value.replace(".", "$#$").replace(/\./g, "").replace("$#$", ".");
 }
 
-function submitFoodData()
-{
-    if(validateFoodData())
-    {
+function submitFoodData() {
+    if (validateFoodData()) {
+        var statusValue = document.getElementById("statusValue");
+        var value = 0;
+        if (document.getElementById("specialOffer").checked) {
+            value += 1;
+        }
+        if (document.getElementById("recommend").checked) {
+            value += 2;
+        }
+        if (document.getElementById("paused").checked) {
+            value += 4;
+        }
+        statusValue.value = value;
         document.foodForm.submit();
     }
 }

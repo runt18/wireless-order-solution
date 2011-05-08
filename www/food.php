@@ -29,6 +29,7 @@ if($foodCode != null)
 	$foodName = $_POST["foodName"];
 	$foodPrice = $_POST["foodPrice"];
 	$kitchen = $_POST["kitchenSelect"];
+	$status = $_POST["statusValue"];
 	$restaurant_id = $_SESSION["restaurant_id"];
 	
 	if($foodId == "" || $foodId == null)//如果是新增
@@ -57,7 +58,7 @@ if($foodCode != null)
 			{
 				/*$c = $rs;
 				echo "<script>alert('$c');</script>";*/
-				$sql = "UPDATE food SET alias_id=$foodCode, name='$foodName', unit_price=$foodPrice,kitchen=$kitchen, enabled=1 WHERE id=" . $rs;					
+				$sql = "UPDATE food SET alias_id=$foodCode, name='$foodName', unit_price=$foodPrice,kitchen=$kitchen,status=$status, enabled=1 WHERE id=" . $rs;					
 				/*echo "<script>alert('$sql');</script>";*/
 				if($db->Execute($sql))
 				{
@@ -69,7 +70,7 @@ if($foodCode != null)
 			}
 			else
 			{
-				$sql = "INSERT INTO food(id,alias_id,`name`,unit_price,restaurant_id,kitchen,enabled) VALUES($foodId,$foodCode,'$foodName',$foodPrice,$restaurant_id,$kitchen,1)";
+				$sql = "INSERT INTO food(id,alias_id,`name`,unit_price,restaurant_id,kitchen,enabled) VALUES($foodId,$foodCode,'$foodName',$foodPrice,$restaurant_id,$kitchen,$status,1)";
 				/*echo "<script>alert('$sql');</script>";*/
 				if($db->Execute($sql))
 				{
@@ -83,73 +84,17 @@ if($foodCode != null)
 	}
 	else//如果是编辑
 	{
-		$sql = "SELECT alias_id FROM food WHERE id=$foodId AND enabled=1";
-		$rs = $db ->GetOne($sql);
-		if($rs == $foodCode)
+		
+		$sql = "UPDATE food SET name='$foodName', unit_price=$foodPrice,kitchen=$kitchen,status = $status WHERE id=$foodId";	
+		$db->Execute($sql);	
+		if($db->Execute($sql))
 		{
-			$sql = "UPDATE food SET name='$foodName', unit_price=$foodPrice,kitchen=$kitchen WHERE id=$foodId";	
-			$db->Execute($sql);	
-			if($db->Execute($sql))
-			{
-				echo "<script>alert('保存成功！');</script>";
-			}
-			else{
-				echo "<script>alert('保存失败！');</script>";
-			}
+			echo "<script>alert('保存成功！');</script>";
 		}
-		else
-		{
-			$oldFoodId = $foodId;			
-			$id = $restaurant_id;
-			for($i=0;$i < 32;$i++)
-			{
-				$id *= 2;
-			}
-			$foodId = $id + $foodCode;//4 << 32 | $foodCode;
-			$sql = "SELECT * FROM food WHERE id=$foodId AND enabled=1" ;
-			/*echo "<script>alert('$sql');</script>";*/
-			$rs = $db ->GetOne($sql);
-			if($rs)
-			{
-				echo "<script>alert('编号已存在！');editFood('','$foodCode','$foodName','$foodPrice','$kitchen');</script>";
-			}
-			else
-			{				
-				$sql = "UPDATE food SET enabled=0 WHERE id=$oldFoodId";	
-				/*echo "<script>alert('$sql');</script>";*/
-				$db->Execute($sql);	
-				$sql = "SELECT id FROM food WHERE id=$foodId AND enabled=0" ;//是否存在已逻辑删除的记录
-				/*echo "<script>alert('$sql');</script>";*/
-				$rs = $db ->GetOne($sql);
-				if($rs)
-				{
-					/*$c = $rs;
-					echo "<script>alert('$c');</script>";*/
-					$sql = "UPDATE food SET alias_id=$foodCode, name='$foodName', unit_price=$foodPrice,kitchen=$kitchen, enabled=1 WHERE id=" . $rs;					
-					/*echo "<script>alert('$sql');</script>";*/
-					if($db->Execute($sql))
-					{
-						echo "<script>alert('保存成功！');</script>";
-					}
-					else{
-						echo "<script>alert('保存失败！');</script>";
-					}
-				}
-				else
-				{
-					$sql = "INSERT INTO food(id,alias_id,`name`,unit_price,restaurant_id,kitchen,enabled) VALUES($foodId,$foodCode,'$foodName',$foodPrice,$restaurant_id,$kitchen,1)";
-					echo "<script>alert('$sql');</script>";
-					if($db->Execute($sql))
-					{
-						echo "<script>alert('保存成功！');</script>";
-					}
-					else{
-						echo "<script>alert('保存失败！');</script>";
-					}
-				}
-			}
-		}
-	}
+		else{
+			echo "<script>alert('保存失败！');</script>";
+		}	
+	}	
 }
 $deleteId = $_POST["deleteId"];
 if($deleteId != null)
@@ -269,13 +214,24 @@ mysql_query("SET NAMES utf8");
 $rs = $db->GetAll($sql);
 foreach ($rs as $row){
 	$bh=$bh+1;
+	$status = $row["status"];
 	echo "<tr>";
 	echo "<td>" .$row["alias_id"] ."</td>";
-	echo "<td>" .$row["name"] ."</td>";
+	echo "<td>" .$row["name"];
+	if (($status & 1) != 0) {
+        echo "  特" ;
+    }
+    if (($status & 2) != 0) {
+        echo "  荐" ;
+    }
+    if (($status & 4) != 0) {
+        echo "  停" ;
+    }
+	echo "</td>";
 	echo "<td>" .$row["unit_price"] ."</td>";
 	echo "<td>" .$row["kitchen"] ."</td>";
 	echo "<td><a href='#' onclick='editFood(&quot;".$row["id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["name"]."&quot;,&quot;".$row["unit_price"]."&quot;,&quot;".$row["kitchen_value"]."&quot;,&quot;".$kitchens.
-		"&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
+		"&quot;,".$row["status"].")'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
 		"<a href='#' onclick='deleteFood(".$row["id"].")'><img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;删除</a></td>";
 	echo "</tr>";
 }
