@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<conf>
+	<db>
+		<!-- the name of db -->
+		<name>wireless_order_db</name>
+		<!-- the ip address of the db host -->
+		<host>192.168.123.130</host>
+		<!-- the port that the db is listened on -->
+		<port>3306</port>
+		<!-- the db account -->
+		<user>yzhang</user>
+		<!-- password to the db account -->
+		<pwd>HelloZ315</pwd>
+	</db>
+	<socket>
+		<!-- the ip address of the socket server -->
+		<host>127.0.0.1</host>
+		<!-- the port listened by socket server -->
+		<port>55555</port>
+	</socket>
+</conf>

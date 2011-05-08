@@ -1,0 +1,13 @@
+#Sun May 08 18:35:13 CST 2011
+eclipse.preferences.version=1
+encoding//protocol/com/wireless/protocol/Util.java=UTF-8
+encoding//src/com/wireless/order/QueryMenu.java=UTF-8
+encoding//src/com/wireless/order/QueryOrder.java=UTF-8
+encoding//src/com/wireless/order/QueryTable.java=UTF-8
+encoding//src/com/wireless/order/Verify.java=UTF-8
+encoding//src/com/wireless/servlet/LoginServlet.java=UTF-8
+encoding//src/com/wireless/servlet/PrintServlet.java=UTF-8
+encoding//src/com/wireless/servlet/QueryMenuServlet.java=UTF-8
+encoding//src/com/wireless/servlet/QueryOrderServlet.java=UTF-8
+encoding//src/com/wireless/servlet/QueryTableServlet.java=UTF-8
+encoding//src/com/wireless/servlet/SampleServlet.java=UTF-8
