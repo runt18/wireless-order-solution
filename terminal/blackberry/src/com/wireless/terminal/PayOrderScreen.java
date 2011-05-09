@@ -1,5 +1,6 @@
 package com.wireless.terminal;
 
+import net.rim.device.api.system.Characters;
 import net.rim.device.api.ui.Color;
 import net.rim.device.api.ui.DrawStyle;
 import net.rim.device.api.ui.Field;
@@ -9,6 +10,7 @@ import net.rim.device.api.ui.Manager;
 import net.rim.device.api.ui.UiApplication;
 import net.rim.device.api.ui.component.ButtonField;
 import net.rim.device.api.ui.component.Dialog;
+import net.rim.device.api.ui.component.EditField;
 import net.rim.device.api.ui.component.LabelField;
 import net.rim.device.api.ui.component.ListField;
 import net.rim.device.api.ui.component.SeparatorField;
@@ -23,9 +25,10 @@ import com.wireless.ui.field.OrderListField;
 public class PayOrderScreen extends MainScreen
 							implements PostPayOrder{
 	
-	private ListField _orderListField;
-	private LabelField _customNum;
-	private Order _bill;
+	private ListField _orderListField = null;
+	private LabelField _customNum = null;
+	private EditField _actualIncome = null;
+	private Order _bill = null;
 	private PayOrderScreen _self = this;
 	
 	// Constructor
@@ -33,9 +36,9 @@ public class PayOrderScreen extends MainScreen
 		_bill = bill;
 		setTitle("结帐");
 		//The food has ordered would be listed in here.
-		VerticalFieldManager _vfm = new VerticalFieldManager();
-		_vfm.add(new SeparatorField());
-		_vfm.add(new LabelField(_bill.tableID + "号餐台信息", LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
+		VerticalFieldManager vfm = new VerticalFieldManager();
+		vfm.add(new SeparatorField());
+		vfm.add(new LabelField(_bill.tableID + "号餐台信息", LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
 			protected void paintBackground(Graphics g) {
 				g.clear();
 				g.setBackgroundColor(Color.GRAY);
@@ -48,9 +51,9 @@ public class PayOrderScreen extends MainScreen
 			}
 		});
 		_customNum = new LabelField("人数：" + new Integer(_bill.customNum).toString());
-		_vfm.add(_customNum);
-		_vfm.add(new SeparatorField());
-		_vfm.add(new LabelField("已点菜", LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
+		vfm.add(_customNum);
+		vfm.add(new SeparatorField());
+		vfm.add(new LabelField("已点菜", LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
 			protected void paintBackground(Graphics g) {
 				g.clear();
 				g.setBackgroundColor(Color.GRAY);
@@ -65,28 +68,68 @@ public class PayOrderScreen extends MainScreen
 		
 		_orderListField = new OrderListField(_bill.foods, Field.NON_FOCUSABLE);
 		
-		_vfm.add(_orderListField);
-		_vfm.add(new SeparatorField());
-		add(_vfm);
-		HorizontalFieldManager _hfm1 = new HorizontalFieldManager(Manager.FIELD_RIGHT);
-		_hfm1.add(new LabelField("合计：" + Util.price2String(_bill.totalPrice2(), Util.INT_MASK_3)));
-		add(_hfm1);
+		vfm.add(_orderListField);
+		vfm.add(new SeparatorField());
+		add(vfm);
+		HorizontalFieldManager hfm1 = new HorizontalFieldManager(Manager.FIELD_RIGHT);
+		hfm1.add(new LabelField("合计：" + Util.price2String(_bill.totalPrice2(), Util.INT_MASK_3)));
+		add(hfm1);
+		
+		HorizontalFieldManager hfm2 = new HorizontalFieldManager(Field.FIELD_RIGHT);
+		//hfm2.add(new LabelField("实收：￥"));
+		_actualIncome = new EditField("实收：￥", 
+									  Util.price2String(_bill.totalPrice2(), Util.INT_MASK_3).substring(1), 
+									  7, 
+									  Field.HIGHLIGHT_SELECT | Field.FIELD_RIGHT | EditField.NO_LEARNING | EditField.NO_NEWLINE | EditField.FILTER_REAL_NUMERIC){
+		    public void layout(int width, int height) {
+		        super.layout(getPreferredWidth(), height);
+		        setExtent(getPreferredWidth(), getHeight());
+		    }
+
+		    public int getPreferredWidth() {
+		        int maxChars = this.getTextLength(); // + 1 to allow some visible extra space
+		        int textSpace = this.getFont().getAdvance(Characters.DIGIT_ZERO) * maxChars +
+		                        this.getFont().getAdvance(this.getLabel()); 
+		        return textSpace;
+		    }	    
+		    
+			protected boolean keyChar(char key, int status, int time) {
+				boolean result = super.keyChar(key, status, time);
+				// changes in the field's text require a new layout (width change)
+				layout(getPreferredWidth(), getHeight());
+				return result;
+			}
+		};
+
+		hfm2.add(_actualIncome);
+		add(hfm2);
+		
 		add(new SeparatorField());
 		
-		ButtonField _submit = new ButtonField("提交", ButtonField.CONSUME_CLICK);
-		HorizontalFieldManager _hfm2 = new HorizontalFieldManager(Manager.FIELD_HCENTER);
-		_hfm2.add(_submit);
-		add(_hfm2);
+		ButtonField submitNormal = new ButtonField("一般", ButtonField.CONSUME_CLICK);
+		HorizontalFieldManager hfm3 = new HorizontalFieldManager(Manager.FIELD_HCENTER);
+		hfm3.add(submitNormal);
+		hfm3.add(new LabelField("    "));
+		ButtonField submitDiscount = new ButtonField("折扣", ButtonField.CONSUME_CLICK);
+		hfm3.add(submitDiscount);
+		add(hfm3);
 		
 		//Set the submit button's listener
-		_submit.setChangeListener(new FieldChangeListener(){
+		submitNormal.setChangeListener(new FieldChangeListener(){
 			public void fieldChanged(Field field, int context) {
 				UiApplication.getUiApplication().pushScreen(new PayOrderPopup2(_bill.tableID, _bill.totalPrice2(), _self));
 	         }
 		});
 		
+		//Set the submit discount's listener
+		submitDiscount.setChangeListener(new FieldChangeListener(){
+			public void fieldChanged(Field field, int context) {
+				
+			}			
+		});
+		
 		//Focus on order button
-		_submit.setFocus();
+		submitNormal.setFocus();
 	}  
 	
 	protected boolean onSavePrompt(){

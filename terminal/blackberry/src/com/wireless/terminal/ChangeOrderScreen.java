@@ -73,8 +73,8 @@ public class ChangeOrderScreen extends MainScreen
 		_hfm.add(_addOrder);
 		_hfm.add(new LabelField("    "));
 		_hfm.add(_submit);
-		_hfm.add(new LabelField("    "));
-		_hfm.add(_reset);
+		//_hfm.add(new LabelField("    "));
+		//_hfm.add(_reset);
 		add(_hfm);
 		
 		//Set the listener to order button
