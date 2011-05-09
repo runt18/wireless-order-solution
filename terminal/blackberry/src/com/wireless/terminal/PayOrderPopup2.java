@@ -11,16 +11,16 @@ class PayOrderPopup2 extends PopupScreen{
 	
 	private PayOrderPopup2 _self = this;
 	private short _table = 0;
-	private int _totalPrice = 0;
+	private Order _orderToPay = null;
 	private Exception _excep = null;
 	private ProtocolPackage _resp = null;
 	private PostPayOrder _postPayOrder = null;
 	private byte _errCode = ErrorCode.UNKNOWN;
 	
-	PayOrderPopup2(short table, int totalPrice, PostPayOrder postPayOrder){
+	PayOrderPopup2(short table, Order order, PostPayOrder postPayOrder){
 		super(new VerticalFieldManager());
 		_table = table;
-		_totalPrice = totalPrice;
+		_orderToPay = order;
 		_postPayOrder = postPayOrder;
 		add(new LabelField("提交" + _table + "号台结帐信息...请稍候"));
 	}
@@ -37,7 +37,7 @@ class PayOrderPopup2 extends PopupScreen{
 						if(tmp == Params.PRINT_SYNC){
 							printType |= Reserved.PRINT_SYNC;
 						}
-						_resp = ServerConnector.instance().ask(new ReqPayOrder(_table, _totalPrice, printType));
+						_resp = ServerConnector.instance().ask(new ReqPayOrder(_table, _orderToPay, printType));
 						if(_resp.header.type == Type.ACK){
 							UiApplication.getUiApplication().invokeLater(new Runnable(){
 								public void run(){
