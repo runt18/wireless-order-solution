@@ -1807,7 +1807,7 @@ len[2] : 0x00, 0x00
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="Left" type="integer">540</XPD:ATTR>
 <XPD:ATTR name="Top" type="integer">16</XPD:ATTR>
-<XPD:ATTR name="Width" type="integer">304</XPD:ATTR>
+<XPD:ATTR name="Width" type="integer">336</XPD:ATTR>
 <XPD:ATTR name="Height" type="integer">203</XPD:ATTR>
 <XPD:ATTR name="Text" type="string">&lt;Header&gt;
 mode : ORDER_BUSSINESS
@@ -1818,10 +1818,10 @@ pin[6] : Auto
 len[2] : 0x06, 0x00
 
 &lt;Body&gt;
-table[2] : total_price[4]
+table[2] : total_price[4] 
 table[2] - 2-byte indicating the table alias id
-total_price[4] 4-byte indicating the total price to this order,
-                       this value is calculated by terminal right now.
+total_price[4] 4-byte indicating the actual total price to this order,
+                       this value is input by the user
 </XPD:ATTR>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedViews[4]" type="UMLNoteLinkView" guid="+BALDObc2k2MtUcZDALptwAA">
@@ -1989,7 +1989,7 @@ len[2] : 0x00, 0x00
 <XPD:OBJ name="OwnedViews[14]" type="UMLNoteLinkView" guid="zluUFJud30WVXaVYFmCjyQAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">540,139;393,161</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">540,141;393,162</XPD:ATTR>
 <XPD:REF name="Head">48aSALtAiEuTvTC+NY36jQAA</XPD:REF>
 <XPD:REF name="Tail">iCzid+Cnk0euP00xTp/4PAAA</XPD:REF>
 </XPD:OBJ>
