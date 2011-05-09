@@ -1716,7 +1716,7 @@ len[2] : 0x00, 0x00
 <XPD:REF name="DiagramOwner">YRvZWXE5l0mj6VgpZ6XoEQAA</XPD:REF>
 <XPD:OBJ name="DiagramView" type="UMLSequenceRoleDiagramView" guid="Jjn7OhkwXUS9avOKDpzLtQAA">
 <XPD:REF name="Diagram">bVk/Je/zz0ePLH9CeeDkTAAA</XPD:REF>
-<XPD:ATTR name="#OwnedViews" type="integer">15</XPD:ATTR>
+<XPD:ATTR name="#OwnedViews" type="integer">21</XPD:ATTR>
 <XPD:OBJ name="OwnedViews[0]" type="UMLSeqClassifierRoleView" guid="NJeJ+NtIwk6tHjVJN6ZPEwAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
@@ -1805,10 +1805,9 @@ len[2] : 0x00, 0x00
 <XPD:OBJ name="OwnedViews[3]" type="UMLNoteView" guid="iCzid+Cnk0euP00xTp/4PAAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Left" type="integer">540</XPD:ATTR>
-<XPD:ATTR name="Top" type="integer">16</XPD:ATTR>
-<XPD:ATTR name="Width" type="integer">336</XPD:ATTR>
-<XPD:ATTR name="Height" type="integer">203</XPD:ATTR>
+<XPD:ATTR name="Left" type="integer">696</XPD:ATTR>
+<XPD:ATTR name="Width" type="integer">397</XPD:ATTR>
+<XPD:ATTR name="Height" type="integer">278</XPD:ATTR>
 <XPD:ATTR name="Text" type="string">&lt;Header&gt;
 mode : ORDER_BUSSINESS
 type : PAY_ORDER
@@ -1818,16 +1817,21 @@ pin[6] : Auto
 len[2] : 0x06, 0x00
 
 &lt;Body&gt;
-table[2] : total_price[4] 
+table[2] : total_price[4] : pay_type : discount_type : len_member : member_id
 table[2] - 2-byte indicating the table alias id
-total_price[4] 4-byte indicating the actual total price to this order,
+total_price[4] - 4-byte indicating the actual total price to this order,
                        this value is input by the user
+pay_type - one of the values of pay type
+discount_type - one of the values of discount type
+pay_manner - one of the values of pay manner
+len_member - length of the id to member
+member_id - the id to member
 </XPD:ATTR>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedViews[4]" type="UMLNoteLinkView" guid="+BALDObc2k2MtUcZDALptwAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">540,122;345,128</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">696,135;345,131</XPD:ATTR>
 <XPD:REF name="Head">818PRFoIvU65cFVCQMj7TgAA</XPD:REF>
 <XPD:REF name="Tail">iCzid+Cnk0euP00xTp/4PAAA</XPD:REF>
 </XPD:OBJ>
@@ -1989,9 +1993,68 @@ len[2] : 0x00, 0x00
 <XPD:OBJ name="OwnedViews[14]" type="UMLNoteLinkView" guid="zluUFJud30WVXaVYFmCjyQAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">540,141;393,162</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">696,150;393,169</XPD:ATTR>
 <XPD:REF name="Head">48aSALtAiEuTvTC+NY36jQAA</XPD:REF>
 <XPD:REF name="Tail">iCzid+Cnk0euP00xTp/4PAAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedViews[15]" type="UMLNoteView" guid="ZuRtcLYh2USPjSDPwLSKSQAA">
+<XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
+<XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
+<XPD:ATTR name="Left" type="integer">756</XPD:ATTR>
+<XPD:ATTR name="Top" type="integer">320</XPD:ATTR>
+<XPD:ATTR name="Width" type="integer">212</XPD:ATTR>
+<XPD:ATTR name="Height" type="integer">65</XPD:ATTR>
+<XPD:ATTR name="Text" type="string">The pay type is one of the values below
+- PAY_NORMAL
+- PAY_MEMBER
+</XPD:ATTR>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedViews[16]" type="UMLNoteView" guid="bWtE25wV6kyCOjY/3AhU6gAA">
+<XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
+<XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
+<XPD:ATTR name="Left" type="integer">1060</XPD:ATTR>
+<XPD:ATTR name="Top" type="integer">328</XPD:ATTR>
+<XPD:ATTR name="Width" type="integer">234</XPD:ATTR>
+<XPD:ATTR name="Height" type="integer">53</XPD:ATTR>
+<XPD:ATTR name="Text" type="string">The discount type is one of the values below
+- DISCOUNT_1
+- DISCOUNT_2
+</XPD:ATTR>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedViews[17]" type="UMLNoteView" guid="czg5LM+yyEK6FZmu8raC0wAA">
+<XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
+<XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
+<XPD:ATTR name="Left" type="integer">936</XPD:ATTR>
+<XPD:ATTR name="Top" type="integer">420</XPD:ATTR>
+<XPD:ATTR name="Width" type="integer">226</XPD:ATTR>
+<XPD:ATTR name="Height" type="integer">83</XPD:ATTR>
+<XPD:ATTR name="Text" type="string">The pay manner is one of the values below
+- CASH
+- CREDIT_CARD
+- SIGN
+- HANG
+</XPD:ATTR>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedViews[18]" type="UMLNoteLinkView" guid="jaU8tphz8Eq0cX62sZtUtwAA">
+<XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
+<XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">866,320;873,277</XPD:ATTR>
+<XPD:REF name="Head">iCzid+Cnk0euP00xTp/4PAAA</XPD:REF>
+<XPD:REF name="Tail">ZuRtcLYh2USPjSDPwLSKSQAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedViews[19]" type="UMLNoteLinkView" guid="YgORJeUHfE61dpCCOhd7ywAA">
+<XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
+<XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">1142,328;1075,277</XPD:ATTR>
+<XPD:REF name="Head">iCzid+Cnk0euP00xTp/4PAAA</XPD:REF>
+<XPD:REF name="Tail">bWtE25wV6kyCOjY/3AhU6gAA</XPD:REF>
+</XPD:OBJ>
+<XPD:OBJ name="OwnedViews[20]" type="UMLNoteLinkView" guid="gqpJnCAuJk2SjcNL9YNXowAA">
+<XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
+<XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">1028,420;960,277</XPD:ATTR>
+<XPD:REF name="Head">iCzid+Cnk0euP00xTp/4PAAA</XPD:REF>
+<XPD:REF name="Tail">czg5LM+yyEK6FZmu8raC0wAA</XPD:REF>
 </XPD:OBJ>
 </XPD:OBJ>
 </XPD:OBJ>
