@@ -248,7 +248,7 @@ public class WirelessSocketServer {
 												 new DailyIterator(hourOfDay, minute, second));
 				}else{
 					//schedule the daily settlement task on 01:23:37 if not specified in conf.xml 
-					scheDBTask.schedule(new SweepDBTask(url, database, user, password), 
+					scheDailySettlement.schedule(new DailySettlementTask(url, database, user, password), 
 										new DailyIterator(1, 23, 37));
 				}
 				
