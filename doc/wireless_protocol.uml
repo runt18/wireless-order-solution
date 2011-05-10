@@ -2027,10 +2027,11 @@ len[2] : 0x00, 0x00
 <XPD:ATTR name="Left" type="integer">936</XPD:ATTR>
 <XPD:ATTR name="Top" type="integer">420</XPD:ATTR>
 <XPD:ATTR name="Width" type="integer">226</XPD:ATTR>
-<XPD:ATTR name="Height" type="integer">83</XPD:ATTR>
+<XPD:ATTR name="Height" type="integer">98</XPD:ATTR>
 <XPD:ATTR name="Text" type="string">The pay manner is one of the values below
 - CASH
 - CREDIT_CARD
+- MEMBER
 - SIGN
 - HANG
 </XPD:ATTR>
@@ -2052,7 +2053,7 @@ len[2] : 0x00, 0x00
 <XPD:OBJ name="OwnedViews[20]" type="UMLNoteLinkView" guid="gqpJnCAuJk2SjcNL9YNXowAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">1028,420;960,277</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">1026,420;959,277</XPD:ATTR>
 <XPD:REF name="Head">iCzid+Cnk0euP00xTp/4PAAA</XPD:REF>
 <XPD:REF name="Tail">czg5LM+yyEK6FZmu8raC0wAA</XPD:REF>
 </XPD:OBJ>
