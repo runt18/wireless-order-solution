@@ -1,4 +1,4 @@
-package com.wireless.terminal;
+package com.wireless.ui.neworder;
 
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
