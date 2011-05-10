@@ -1,4 +1,4 @@
-package com.wireless.terminal;
+package com.wireless.ui.payoder;
 
 import net.rim.device.api.system.Characters;
 import net.rim.device.api.ui.Color;
@@ -85,7 +85,7 @@ public class PayOrderScreen extends MainScreen
 		        super.layout(getPreferredWidth(), height);
 		        setExtent(getPreferredWidth(), getHeight());
 		    }
-
+		    
 		    public int getPreferredWidth() {
 		        int maxChars = this.getTextLength(); // + 1 to allow some visible extra space
 		        int textSpace = this.getFont().getAdvance(Characters.DIGIT_ZERO) * maxChars +
@@ -100,7 +100,7 @@ public class PayOrderScreen extends MainScreen
 				return result;
 			}
 		};
-
+		
 		hfm2.add(_actualIncome);
 		add(hfm2);
 		
@@ -117,14 +117,25 @@ public class PayOrderScreen extends MainScreen
 		//Set the submit button's listener
 		submitNormal.setChangeListener(new FieldChangeListener(){
 			public void fieldChanged(Field field, int context) {
-				UiApplication.getUiApplication().pushScreen(new PayOrderPopup2(_bill.tableID, _bill.totalPrice2(), _self));
+				try{
+					_bill.setActualPrice(new Float(Float.parseFloat(_actualIncome.getText())));
+					_bill.payType = Order.PAY_NORMAL;
+					_bill.discountType = Order.DISCOUNT_1;
+					UiApplication.getUiApplication().pushScreen(new SelectMannerPopup(_bill, _self));					
+				}catch(NumberFormatException e){
+					Dialog.alert("实收数字不正确，请重新输入");
+					_actualIncome.setFocus();
+				}
 	         }
 		});
 		
 		//Set the submit discount's listener
 		submitDiscount.setChangeListener(new FieldChangeListener(){
 			public void fieldChanged(Field field, int context) {
-				
+				_bill.setActualPrice(new Float(Float.parseFloat(_actualIncome.getText())));
+				_bill.payType = Order.PAY_NORMAL;
+				_bill.discountType = Order.DISCOUNT_2;
+				UiApplication.getUiApplication().pushScreen(new SelectMannerPopup(_bill, _self));
 			}			
 		});
 		

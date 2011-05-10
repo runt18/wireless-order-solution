@@ -1,28 +1,27 @@
-package com.wireless.terminal;
+package com.wireless.ui.payoder;
 
 import java.io.IOException;
 import net.rim.device.api.ui.*;
 import net.rim.device.api.ui.component.*;
 import net.rim.device.api.ui.container.*;
 import com.wireless.protocol.*;
+import com.wireless.terminal.Params;
 import com.wireless.util.ServerConnector;
 
 class PayOrderPopup2 extends PopupScreen{
 	
 	private PayOrderPopup2 _self = this;
-	private short _table = 0;
 	private Order _orderToPay = null;
 	private Exception _excep = null;
 	private ProtocolPackage _resp = null;
 	private PostPayOrder _postPayOrder = null;
 	private byte _errCode = ErrorCode.UNKNOWN;
 	
-	PayOrderPopup2(short table, Order order, PostPayOrder postPayOrder){
+	PayOrderPopup2(Order order, PostPayOrder postPayOrder){
 		super(new VerticalFieldManager());
-		_table = table;
 		_orderToPay = order;
 		_postPayOrder = postPayOrder;
-		add(new LabelField("提交" + _table + "号台结帐信息...请稍候"));
+		add(new LabelField("提交" + _orderToPay.tableID + "号台结帐信息...请稍候"));
 	}
 	
 	protected void onUiEngineAttached(boolean attached){
@@ -37,11 +36,11 @@ class PayOrderPopup2 extends PopupScreen{
 						if(tmp == Params.PRINT_SYNC){
 							printType |= Reserved.PRINT_SYNC;
 						}
-						_resp = ServerConnector.instance().ask(new ReqPayOrder(_table, _orderToPay, printType));
+						_resp = ServerConnector.instance().ask(new ReqPayOrder(_orderToPay, printType));
 						if(_resp.header.type == Type.ACK){
 							UiApplication.getUiApplication().invokeLater(new Runnable(){
 								public void run(){
-									Dialog.alert(_table + "号台结帐成功");
+									Dialog.alert(_orderToPay.tableID + "号台结帐成功");
 									if(_postPayOrder != null){								
 										_postPayOrder.payOrderPass();
 									}
@@ -52,13 +51,13 @@ class PayOrderPopup2 extends PopupScreen{
 							UiApplication.getUiApplication().invokeLater(new Runnable(){
 								public void run(){
 									if(_errCode == ErrorCode.TABLE_NOT_EXIST){
-										Dialog.alert(_table + "号台已被删除，请与餐厅负责人确认。");
+										Dialog.alert(_orderToPay.tableID + "号台已被删除，请与餐厅负责人确认。");
 									}else if(_errCode == ErrorCode.ORDER_NOT_EXIST){
-										Dialog.alert(_table + "号台的账单已结帐或删除，请与餐厅负责人确认。");
+										Dialog.alert(_orderToPay.tableID + "号台的账单已结帐或删除，请与餐厅负责人确认。");
 									}else if(_errCode == ErrorCode.PRINT_FAIL){
-										Dialog.alert(_table + "号结帐打印未成功，请与餐厅负责人确认。");
+										Dialog.alert(_orderToPay.tableID + "号结帐打印未成功，请与餐厅负责人确认。");
 									}else{
-										Dialog.alert(_table + "号台结帐未成功，请重新结帐");
+										Dialog.alert(_orderToPay.tableID + "号台结帐未成功，请重新结帐");
 									}
 									if(_postPayOrder != null){
 										_postPayOrder.payOrderFail();
