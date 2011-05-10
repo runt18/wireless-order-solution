@@ -25,7 +25,7 @@ public class ReqPayOrder extends ReqOrderPackage{
 	* len_member - length of the id to member
 	* member_id[len] - the id to member
 	*******************************************************/
-	public ReqPayOrder(short tableID, Order order, byte printType){
+	public ReqPayOrder(Order order, byte printType){
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.PAY_ORDER;
 		header.reserved = printType;
@@ -51,13 +51,13 @@ public class ReqPayOrder extends ReqOrderPackage{
 		
 		body = new byte[bodyLen];
 		//assign the table id
-		body[0] = (byte)(tableID & 0x00FF);
-		body[1] = (byte)((tableID >> 8) & 0x00FF);
+		body[0] = (byte)(order.tableID & 0x00FF);
+		body[1] = (byte)((order.tableID >> 8) & 0x00FF);
 		//assign the total price
-		body[2] = (byte)(order.totalPrice & 0x000000FF);
-		body[3] = (byte)((order.totalPrice >> 8) & 0x000000FF);
-		body[4] = (byte)((order.totalPrice >> 16) & 0x000000FF);
-		body[5] = (byte)((order.totalPrice >> 24) & 0x000000FF);
+		body[2] = (byte)(order.actualPrice & 0x000000FF);
+		body[3] = (byte)((order.actualPrice >> 8) & 0x000000FF);
+		body[4] = (byte)((order.actualPrice >> 16) & 0x000000FF);
+		body[5] = (byte)((order.actualPrice >> 24) & 0x000000FF);
 		//assign the payment type
 		body[6] = (byte)(order.payType & 0x000000FF);
 		//assign the discount type

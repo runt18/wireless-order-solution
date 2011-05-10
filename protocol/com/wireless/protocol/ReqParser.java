@@ -119,7 +119,7 @@ public class ReqParser {
 		 				((req.body[1] & 0x000000FF) << 8) | 
 		 				((req.body[2] & 0x000000FF) << 16) |
 		 				((req.body[3] & 0x000000FF) << 24);
-		order.totalPrice = totalPrice;
+		order.actualPrice = totalPrice;
 		
 		int restaurantID = (req.body[4] & 0x000000FF) | 
 						((req.body[5] & 0x000000FF) << 8) | 
@@ -196,27 +196,51 @@ public class ReqParser {
 	* mode - ORDER_BUSSINESS
 	* type - CANCEL_ORDER
 	* seq - auto calculated and filled in
-	* reserved - 0x00
+	* reserved - PRINT_SYNC or PRINT_ASYNC
 	* pin[6] - auto calculated and filled in
 	* len[2] - 0x06, 0x00
-	* <Table>
-	* table[2] : total_price[4]
+	* <Body>
+	* table[2] : total_price[4] : pay_type : discount_type : len_member : member_id[len]
 	* table[2] - 2-byte indicates the table id
-	* tatal_price[4] - 4-byte indicates the total price
+	* total_price[4] - 4-byte indicates the total price
 	* 				   total_price[0] indicates the float part
 	* 				   total_price[1..3] indicates the fixed part
+	* pay_type - one of the values of pay type
+	* discount_type - one of the values of discount type
+	* pay_manner - one of the values of pay manner
+	* len_member - length of the id to member
+	* member_id[len] - the id to member
 	*******************************************************/
 	public static Order parsePayOrder(ProtocolPackage req){
-		//return the table to pay
+		//get the table id
 		short tableToPay = (short)((req.body[0] & 0x00FF) | ((req.body[1] & 0x00FF) << 8));
+		//get the actual total price
 		int totalPrice = (req.body[2] & 0x000000FF) | 
 						 ((req.body[3] & 0x000000FF) << 8) | 
 						 ((req.body[4] & 0x000000FF) << 16) |
 						 ((req.body[5] & 0x000000FF) << 24);
 		
+		//get the payment type
+		int payType = req.body[6];
+		//get the discount type
+		int discountType = req.body[7];
+		//get the payment manner
+		int payManner = req.body[8];
+		//get the the length to member id
+		int len = req.body[9];
+		//get the value to member id
+		String memberID = null;
+		if(len > 0){
+			byte[] memberIDBytes = new byte[len];
+			System.arraycopy(req.body, 10, memberIDBytes, 0, len);
+		}
 		Order orderToPay = new Order();
 		orderToPay.tableID = tableToPay;
-		orderToPay.totalPrice = totalPrice;
+		orderToPay.actualPrice = totalPrice;
+		orderToPay.payType = payType;
+		orderToPay.discountType = discountType;
+		orderToPay.payManner = payManner;
+		orderToPay.memberID = memberID;
 		return orderToPay;
 	}
 }
