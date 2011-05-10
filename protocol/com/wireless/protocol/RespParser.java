@@ -176,7 +176,7 @@ public class RespParser {
 			for(int i = 1; i < tastes.length; i++){
 				
 				//get the alias id to taste preference
-				short alias_id = response.body[index];
+				short alias_id = (short)(response.body[index] & 0x00FF);
 				
 				//get the price to taste preference
 				int price = ((response.body[index + 1] & 0x000000FF) |
