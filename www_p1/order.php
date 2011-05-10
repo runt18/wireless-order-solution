@@ -34,6 +34,21 @@ if($deleteId != null)
 		echo "<script>alert('删除失败！');</script>";
 	}
 }  
+$editType = $_POST["editType"];
+if($editType == "editOrder")
+{
+	$id = $_POST["id"];	
+	$total_price_2 = $_POST["total_price_2"];			
+	$sql = "UPDATE `order` SET total_price_2 = $total_price_2 WHERE id=$id";
+	
+	if($db->Execute($sql))
+	{			
+		echo "<script>alert('修改成功！');</script>";
+	}	
+	else{
+		echo "<script>alert('修改失败！');</script>";
+	}	
+}
 ?>
 </head>
 <body>
@@ -42,9 +57,9 @@ include("changePassword.php");
 $editType = $_POST["editType"];
 if($editType == "dailyCheckOut")
 {	
-	$sql1 = "INSERT INTO `order_history`(`id`, `restaurant_id`,`order_date`, `total_price`, `custom_num`, 
+	$sql1 = "INSERT INTO `order_history`(`id`, `restaurant_id`,`order_date`, `total_price`,`total_price_2`, `custom_num`, 
 			`waiter`,`type`, `member_id`, `member`,`terminal_pin`, `terminal_model`, `table_id`)
-			SELECT `id`, `restaurant_id`,`order_date`, `total_price`, `custom_num`, 
+			SELECT `id`, `restaurant_id`,`order_date`, `total_price`,`total_price_2`, `custom_num`, 
 			`waiter`,`type`, `member_id`, `member`,`terminal_pin`, `terminal_model`, `table_id` FROM `order` WHERE total_price IS NOT NULL AND restaurant_id=" . $_SESSION["restaurant_id"];		
 	$sql2 = "INSERT INTO `order_food_history`(`id`,`order_id`, `food_id`, `order_date`, `order_count`, 
 			`unit_price`,`name`, `taste`,`taste_price`,`taste_id`,`discount`,`kitchen`,`comment`,`waiter`)
@@ -106,6 +121,7 @@ if($editType == "dailyCheckOut")
                 <th><h3>日&nbsp;期</h3></th>
 				<th><h3>结帐方式</h3></th>
 				<th><h3>金额（￥）</h3></th>
+				<th><h3>实收（￥）</h3></th>
 				<th><h3>操&nbsp;作</h3></th>
 			</tr>
 		</thead>
@@ -211,8 +227,10 @@ foreach ($rs as $row){
 	echo "<td>" .$row["order_date"]. "</td>";
 	echo "<td>" .$row["type_name"]."</td>";
 	echo "<td>" .$row["total_price"]."</td>";
-	echo "<td><a href='#' onclick='showOrderDetail(&quot;".$row["id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["order_date"]."&quot;,&quot;".$row["total_price"].
-		"&quot;,&quot;".$row["num"]."&quot;,&quot;".$row["foods"]."&quot;,&quot;".$row["is_paid"]."&quot;,&quot;".$row["waiter"]."&quot;,&quot;".$row["type_name"]."&quot;)'>
+	echo "<td>" .$row["total_price_2"]."</td>";
+	echo "<td><a href='#' onclick='editOrder(&quot;".$row["id"]."&quot;,&quot;".$row["total_price_2"]."&quot;,&quot;order.php&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
+		"<a href='#' onclick='showOrderDetail(&quot;".$row["id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["order_date"]."&quot;,&quot;".$row["total_price"].
+		"&quot;,&quot;".$row["num"]."&quot;,&quot;".$row["foods"]."&quot;,&quot;".$row["is_paid"]."&quot;,&quot;".$row["waiter"]."&quot;,&quot;".$row["type_name"]."&quot;,&quot;".$row["total_price_2"]."&quot;)'>
 			<img src='images/View.png'  height='16' width='14' border='0'/>&nbsp;查看</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href='#' onclick='deleteOrder(&quot;".$row["id"]."&quot;,&quot;order.php&quot;)'>
 			<img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;删除</a></td>";
 	echo "</tr>";
