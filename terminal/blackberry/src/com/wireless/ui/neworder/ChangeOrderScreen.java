@@ -15,6 +15,8 @@ import net.rim.device.api.ui.container.*;
 public class ChangeOrderScreen extends MainScreen
 								implements PostSubmitOrder{
 	private OrderListField _orderListField;
+	private LabelField _tableTitle = null;
+	private EditField _table = null;
 	private EditField _customNum;
 	private Order _bill;
 	private ChangeOrderScreen _self = this;
@@ -26,7 +28,8 @@ public class ChangeOrderScreen extends MainScreen
 		//The food has ordered would be listed in here.
 		VerticalFieldManager _vfm = new VerticalFieldManager();
 		_vfm.add(new SeparatorField());
-		_vfm.add(new LabelField(_bill.tableID + "号餐台信息", LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
+		
+		_tableTitle = new LabelField(_bill.tableID + "号餐台信息", LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
 			protected void paintBackground(Graphics g) {
 				g.clear();
 				g.setBackgroundColor(Color.GRAY);
@@ -37,7 +40,24 @@ public class ChangeOrderScreen extends MainScreen
 				g.setColor(Color.WHITE);		
 				super.paint(g);  
 			}
+		};
+
+		_vfm.add(_tableTitle);
+		
+		_table = new EditField("台号：", new Short(_bill.tableID).toString(),
+							   4, TextField.NO_NEWLINE | EditField.FILTER_NUMERIC);
+		
+		/**
+		 * The id on table title would be changed with the input
+		 */
+		_table.setChangeListener(new FieldChangeListener(){
+
+			public void fieldChanged(Field field, int context) {
+				_tableTitle.setText(_table.getText() + "号餐台信息");
+			}
+			
 		});
+		_vfm.add(_table);
 		_customNum = new EditField("人数：", new Integer(_bill.customNum).toString(), 
 									2, TextField.NO_NEWLINE | EditField.FILTER_NUMERIC){
 			protected boolean navigationClick(int status, int time){
@@ -93,7 +113,9 @@ public class ChangeOrderScreen extends MainScreen
 					for(int i = 0; i < _orderListField.getSize(); i++){
 						foods[i] = (Food)_orderListField.getCallback().get(null, i);
 					}
-					Order reqOrder = new Order(foods, _bill.tableID, Integer.parseInt(_customNum.getText()));
+					Order reqOrder = new Order(foods, 
+											   Short.parseShort(_table.getText()), 
+											   Integer.parseInt(_customNum.getText()));
 					UiApplication.getUiApplication().pushScreen(new SubmitOrderPopup(reqOrder, 
 																Type.UPDATE_ORDER,
 																_self));
