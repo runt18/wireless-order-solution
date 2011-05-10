@@ -352,7 +352,7 @@ class OrderHandler extends Handler implements Runnable{
 		
 		int orderID = getUnPaidOrderID(tableToQuery);
 
-		return getOrderByID(orderID, tableToQuery);
+		return getOrderByID(orderID);
 	}
 	
 	/**
@@ -866,11 +866,19 @@ class OrderHandler extends Handler implements Runnable{
 	 * @throws OrderBusinessException if the order or table to be paid doesn't exist
 	 */
 	private void execPayOrder(ProtocolPackage req) throws SQLException, OrderBusinessException, PrintLogicException{
-		Order payOrderInfo = ReqParser.parsePayOrder(req);
+		Order reqOrderInfo = ReqParser.parsePayOrder(req);
 		
-		payOrderInfo.id = getUnPaidOrderID(payOrderInfo.tableID);
+		reqOrderInfo.id = getUnPaidOrderID(reqOrderInfo.tableID);
 		
-		Order orderToPay = getOrderByID(payOrderInfo.id, payOrderInfo.tableID);
+		//get the order along with discount to each food according to the payment and discount type
+		Order orderToPay = getOrderByID(reqOrderInfo.id, 
+									    reqOrderInfo.tableID,
+									    reqOrderInfo.payType,
+									    reqOrderInfo.discountType,
+									    reqOrderInfo.memberID);
+		
+		orderToPay.actualPrice = reqOrderInfo.actualPrice;
+		orderToPay.payManner = reqOrderInfo.payManner;
 		
 		/**
 		 * Calculate the total price of this order as below.
@@ -887,30 +895,40 @@ class OrderHandler extends Handler implements Runnable{
 		totalPrice = (float)Math.round(totalPrice * 100) / 100;
 		orderToPay.setTotalPrice(totalPrice);
 		
-		//totalPrice = Util.price2Float(payOrderInfo.totalPrice, Util.INT_MASK_3).floatValue();
-		
-		//FIX!!!
-		//the total price should be calculated according to the order type,
-		//here we just implement the normal discount
+		_stmt.clearBatch();
 		/**
-		 * update the total price, terminal pin and order date in "order" table
+		 * Update the values below to "order" table
+		 * - total price
+		 * - actual price
+		 * - payment manner
+		 * - terminal pin
+		 * - pay order date
 		 */
 		String sql = "UPDATE `" + WirelessSocketServer.database + "`.`order` SET terminal_pin=" + _pin +
-					", total_price=" + totalPrice + ", order_date=NOW()" + 
-					" WHERE id=" + payOrderInfo.id;
-		_stmt.execute(sql);
+					", total_price=" + totalPrice + 
+					", total_price_2=" + Util.price2Float(orderToPay.actualPrice, Util.INT_MASK_3) +
+					", type=" + orderToPay.payManner + 
+					", order_date=NOW()" + 
+					" WHERE id=" + orderToPay.id;
+		_stmt.addBatch(sql);
 		
-		//get all the food's id of this order
-		sql = "SELECT food_id FROM `" + WirelessSocketServer.database + "`.`order_food` WHERE order_id=" + payOrderInfo.id;
-		_rs = _stmt.executeQuery(sql);
-		ArrayList<String> execSql = new ArrayList<String>();
-		//accumulate the order count to this food
-		while(_rs.next()){
-			execSql.add("UPDATE `" + WirelessSocketServer.database + "`.`food` SET order_count=order_count+1 WHERE id=" + _rs.getLong(1));
-		}
-		_stmt.clearBatch();
-		for(int i = 0; i < execSql.size(); i++){
-			_stmt.addBatch(execSql.get(i));
+
+		/**
+		 * Two tasks below.
+		 * 1 - update each food's discount to "order_food" table
+		 * 2 - update the order count to "food" table
+		 */
+
+		for(int i = 0; i < orderToPay.foods.length; i++){
+			float discount = (float)orderToPay.foods[i].discount / 100;
+			sql = "UPDATE " + WirelessSocketServer.database + ".order_food SET discount=" + discount +
+				  " WHERE order_id=" + orderToPay.id + 
+				  " AND food_id=" + orderToPay.foods[i].alias_id;
+			_stmt.addBatch(sql);
+			
+			sql = "UPDATE " + WirelessSocketServer.database + 
+				  ".food SET order_count=order_count+1 WHERE alias_id=" + orderToPay.foods[i].alias_id +
+				  " AND restaurant_id=" + _restaurantID;
 		}
 		_stmt.executeBatch();
 		
@@ -1040,18 +1058,20 @@ class OrderHandler extends Handler implements Runnable{
 	 * @throws SQLException if execute the SQL statement fail
 	 * @throws OrderBusinessException if the table to query or the order to query doesn't exist.
 	 */
-	private Order getOrderByID(int orderID, short tableID) throws SQLException, OrderBusinessException{
+	private Order getOrderByID(int orderID) throws SQLException, OrderBusinessException{
 		
 		int nCustom = 0;
+		short tableID = 0;
 		//query the custom number from "order" table according to the order id
-		String sql = "SELECT custom_num FROM `" + WirelessSocketServer.database + 
-		"`.`order` WHERE id=" + orderID;
+		String sql = "SELECT custom_num, table_id FROM `" + WirelessSocketServer.database + 
+					"`.`order` WHERE id=" + orderID;
 		_rs = _stmt.executeQuery(sql);
 		if(_rs.next()){
-			nCustom = _rs.getByte(1);
+			nCustom = _rs.getByte("custom_num");
+			tableID = _rs.getShort("table_id");
 		}
 		//query the food's id and order count associate with the order id for "order_food" table
-		sql = "SELECT name, food_id, SUM(order_count) AS order_sum, unit_price, discount, taste, taste_price, taste_id FROM `" + 
+		sql = "SELECT name, food_id, SUM(order_count) AS order_sum, unit_price, discount, kitchen, taste, taste_price, taste_id FROM `" + 
 				WirelessSocketServer.database + 
 				"`.`order_food` WHERE order_id=" + orderID +
 				" GROUP BY food_id, taste_id HAVING order_sum > 0";
@@ -1064,6 +1084,7 @@ class OrderHandler extends Handler implements Runnable{
 			food.setCount(new Float(_rs.getFloat("order_sum")));
 			food.setPrice(new Float(_rs.getFloat("unit_price")));
 			food.discount = (byte)(_rs.getFloat("discount") * 100);
+			food.kitchen = _rs.getByte("kitchen");
 			food.taste.preference = _rs.getString("taste");
 			food.taste.setPrice(_rs.getFloat("taste_price"));
 			food.taste.alias_id = _rs.getShort("taste_id");
@@ -1078,6 +1099,69 @@ class OrderHandler extends Handler implements Runnable{
 		return orderInfo;		
 
 	}
-
+	
+	/**
+	 * Get the order detail information for a specific order id,
+	 * and get the discount to each food according the payment and discount type 
+	 * @param orderID the id to this order
+	 * @param tableID the table id to this order
+	 * @param payType the payment type to this order, it is one of the values below.<br>
+	 * 		  - PAY_NORMAL<br>
+	 * 		  - PAY_MEMBER
+	 * @param discountType the discount type to this order, it is one of the values below.<br>
+	 * 		  - DISCOUNT_1<br>
+	 * 		  - DISCOUNT_2
+	 * @param memberID the member id to this order if the payment type is PAY_MEMBER, otherwise is null
+	 * @return the order containing all of the information
+	 * @throws SQLException if fail to execute any SQL statement 
+	 * @throws OrderBusinessException
+	 */
+	private Order getOrderByID(int orderID, short tableID, int payType, 
+								int discountType, String memberID) throws SQLException, OrderBusinessException{
+		
+		Order orderInfo = getOrderByID(orderID);
+		String discount = "discount";
+		if(payType == Order.PAY_NORMAL && discountType == Order.DISCOUNT_1){
+			discount = "discount";
+			
+		}else if(payType == Order.PAY_NORMAL && discountType == Order.DISCOUNT_2){
+			discount = "discount_2";
+			
+		}else if(payType == Order.PAY_MEMBER){
+			//validate the member id
+			String sql = "SELECT id FROM " + WirelessSocketServer.database + 
+						 ".member WHERE restaurant_id=" + _restaurantID + 
+						 " AND alias_id='" + memberID + "'";
+			_rs = _stmt.executeQuery(sql);
+			if(_rs.next()){
+				if(discountType == Order.DISCOUNT_1){
+					discount = "member_discount_1";
+				}else if(discountType == Order.DISCOUNT_2){
+					discount = "member_discount_2";
+				}
+			}else{
+				throw new OrderBusinessException("The member id(" + memberID + ") is invalid.", ErrorCode.MEMBER_INVALID);
+			}
+		}
+		
+		for(int i = 0; i < orderInfo.foods.length; i++){
+			//get the discount to each food according to the payment and discount type
+			String sql = "SELECT " + discount + " FROM " + WirelessSocketServer.database + 
+			".kitchen WHERE restaurant_id=" + _restaurantID + 
+			" AND alias_id=" + orderInfo.foods[i].kitchen;
+			
+			_rs = _stmt.executeQuery(sql);
+			if(_rs.next()){
+				orderInfo.foods[i].discount = (byte)(_rs.getFloat(discount) * 100);
+			}
+			_rs.close();
+		}
+		orderInfo.payType = payType;
+		orderInfo.discountType = discountType;
+		orderInfo.memberID = memberID; 
+		return orderInfo;
+	}
 }
+
+
 
