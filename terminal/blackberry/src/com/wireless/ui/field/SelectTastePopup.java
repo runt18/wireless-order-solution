@@ -51,7 +51,7 @@ public class SelectTastePopup extends PopupScreen{
 				int matchNum = 0;
 				for(int i = 0; i < WirelessOrder.foodMenu.tastes.length; i++){
 					Taste taste = (Taste)WirelessOrder.foodMenu.tastes[i];
-					if(new Integer(taste.alias_id).toString().indexOf(_tasteID.getText()) == 0){
+					if(new Integer(taste.alias_id).toString().startsWith(_tasteID.getText())){
 						_tasteMatchedIdx[matchNum] = i;
 						matchNum++;
 					}
