@@ -32,7 +32,7 @@ public class ReqParser {
 	 * pin[6] - auto calculated and filled in
 	 * len[2] - length of the <Body>
 	 * <Body>
-	 * table[2] : custom_num : food_num : <Food1> : <Food2>...
+	 * table[2] : custom_num : food_num : <Food1> : <Food2>... : original_table[2]
 	 * table[2] - 2-byte indicates the table id  
 	 * custom_num - 1-byte indicating the custom number for this table
 	 * food_num - 1-byte indicating the number of foods
@@ -44,6 +44,9 @@ public class ReqParser {
 	 * 			   order_num[1] - 1-byte indicates the fixed-point
 	 * taste_id - 1-byte indicates the taste preference id
 	 * kitchen - the kitchen to this food
+	 *
+	 * origianal_table[2] - 2-bytes indicates the original table id,
+	 *                      These two bytes are used for table transferred
 	 *******************************************************/
 	public static Order parseInsertOrder(ProtocolPackage req){
 		Order order = new Order();
@@ -59,21 +62,25 @@ public class ReqParser {
 		
 		Food[] orderFoods = new Food[foodNum];
 		//table id(2-byte) + custom_num(1-byte) + food_num(1-byte)
-		int index = 4;
+		int offset = 4;
 		//assign each order food's information, including the food's id and order number
 		for(int i = 0; i < orderFoods.length; i++){
-			int foodID = (req.body[index] & 0x000000FF) | ((req.body[index + 1] & 0x000000FF) << 8);
-			int orderNum = (req.body[index + 2] & 0x000000FF) | ((req.body[index + 3] & 0x000000FF) << 8);
-			short taste_id = req.body[index + 4];
-			short kitchen = req.body[index + 5];
+			int foodID = (req.body[offset] & 0x000000FF) | ((req.body[offset + 1] & 0x000000FF) << 8);
+			int orderNum = (req.body[offset + 2] & 0x000000FF) | ((req.body[offset + 3] & 0x000000FF) << 8);
+			short taste_id = req.body[offset + 4];
+			short kitchen = req.body[offset + 5];
 			orderFoods[i] = new Food();
 			orderFoods[i].alias_id = foodID;
 			orderFoods[i].count = orderNum;
 			orderFoods[i].taste.alias_id = taste_id;
 			orderFoods[i].kitchen = (short)(kitchen & 0xFF);
-			index += 6;
+			offset += 6;
 		}
 		order.foods = orderFoods;
+		
+		//assign the original table id
+		order.originalTableID = (short)((req.body[offset] & 0x00FF) | 
+									((req.body[offset + 1] & 0x00FF) << 8));
 		return order;
 	}
 	

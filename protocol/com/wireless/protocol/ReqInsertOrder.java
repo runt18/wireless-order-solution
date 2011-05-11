@@ -13,7 +13,7 @@ import com.wireless.protocol.Reserved;
  * pin[6] - auto calculated and filled in
  * len[2] - length of the <Order>
  * <Order>
- * table[2] : custom_num : food_num : <Food1> : <Food2>...
+ * table[2] : custom_num : food_num : <Food1> : <Food2>... : original_table[2] 
  * table[2] - 2-byte indicates the table id 
  * custom_num - 1-byte indicating the custom number for this table
  * food_num - 1-byte indicating the number of foods
@@ -25,6 +25,10 @@ import com.wireless.protocol.Reserved;
  * 			   order_num[1] - 1-byte indicates the fixed-point
  * taste_id - 1-byte indicates the taste preference id
  * kitchen - the kitchen to this food
+ * 
+ * origianal_table[2] - 2-bytes indicates the original table id,
+ *                      These two bytes are used for table transferred
+ *  
  *******************************************************/
 public class ReqInsertOrder extends ReqOrderPackage {
 
@@ -69,10 +73,11 @@ public class ReqInsertOrder extends ReqOrderPackage {
 		header.type = type;
 		header.reserved = reqConf;
 		//calculate the body's length
-		int bodyLen = 2 + /* table id takes up 2-byte */
-					1 + /* custom number takes up 1-byte */ 
-					1 + /* food number takes up 1-byte */
-					reqOrder.foods.length * 6; /* each food takes up 6-byte*/
+		int bodyLen = 2 + /* table id takes up 2 bytes */
+					1 + /* custom number takes up 1 byte */ 
+					1 + /* food number takes up 1 byte */
+					reqOrder.foods.length * 6 + /* each food takes up 6 bytes*/
+					2; /* original table id takes up 2 bytes */
 		header.length[0] = (byte)(bodyLen & 0x000000FF) ;
 		header.length[1] = (byte)((bodyLen & 0x0000FF00) >> 8);
 		
@@ -88,16 +93,20 @@ public class ReqInsertOrder extends ReqOrderPackage {
 		body[3] = (byte)(reqOrder.foods.length & 0x000000FF);
 		
 		//assign each order food's id and count
-		int foodIndex = 4;
+		int offset = 4;
 		for(int i = 0; i < reqOrder.foods.length; i++){
-			body[foodIndex] = (byte)(reqOrder.foods[i].alias_id & 0x000000FF);
-			body[foodIndex + 1] = (byte)((reqOrder.foods[i].alias_id & 0x0000FF00) >> 8);
-			body[foodIndex + 2] = (byte)(reqOrder.foods[i].count & 0x000000FF);
-			body[foodIndex + 3] = (byte)((reqOrder.foods[i].count & 0x0000FF00) >> 8);
-			body[foodIndex + 4] = (byte)(reqOrder.foods[i].taste.alias_id & 0x00FF);
-			body[foodIndex + 5] = (byte)(reqOrder.foods[i].kitchen);
-			foodIndex += 6;
+			body[offset] = (byte)(reqOrder.foods[i].alias_id & 0x000000FF);
+			body[offset + 1] = (byte)((reqOrder.foods[i].alias_id & 0x0000FF00) >> 8);
+			body[offset + 2] = (byte)(reqOrder.foods[i].count & 0x000000FF);
+			body[offset + 3] = (byte)((reqOrder.foods[i].count & 0x0000FF00) >> 8);
+			body[offset + 4] = (byte)(reqOrder.foods[i].taste.alias_id & 0x00FF);
+			body[offset + 5] = (byte)(reqOrder.foods[i].kitchen);
+			offset += 6;
 		}		
+		
+		//assign the original table id
+		body[offset] = (byte)(reqOrder.originalTableID & 0x000000FF);
+		body[offset + 1] = (byte)((reqOrder.originalTableID & 0x0000FF00) >> 8);
 	}
 	
 	/******************************************************
