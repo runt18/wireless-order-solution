@@ -1,3 +1,5 @@
+USE wireless_order_db;
+
 ALTER TABLE `order`
 ADD `total_price_2` DECIMAL(10,2) NULL DEFAULT NULL COMMENT 'the actual total price to this order';
 ALTER TABLE `order_history`
