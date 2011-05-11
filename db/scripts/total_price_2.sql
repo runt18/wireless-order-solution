@@ -1,3 +1,5 @@
+SET NAMES utf8;
+
 USE wireless_order_db;
 
 ALTER TABLE `order`
