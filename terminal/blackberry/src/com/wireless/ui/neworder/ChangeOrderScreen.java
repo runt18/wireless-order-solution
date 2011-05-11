@@ -2,10 +2,8 @@ package com.wireless.ui.neworder;
 
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
-import com.wireless.protocol.Type;
 import com.wireless.ui.field.OrderListField;
 import com.wireless.ui.field.SelectFoodPopup;
-
 import net.rim.device.api.ui.*;
 import net.rim.device.api.ui.component.*;
 import net.rim.device.api.ui.container.*;
@@ -18,18 +16,18 @@ public class ChangeOrderScreen extends MainScreen
 	private LabelField _tableTitle = null;
 	private EditField _table = null;
 	private EditField _customNum;
-	private Order _bill;
+	private final Order _originalOrder;
 	private ChangeOrderScreen _self = this;
 	
 	// Constructor
 	public ChangeOrderScreen(Order bill){
-		_bill = bill;
+		_originalOrder = bill;
 		setTitle("改单");
 		//The food has ordered would be listed in here.
 		VerticalFieldManager _vfm = new VerticalFieldManager();
 		_vfm.add(new SeparatorField());
 		
-		_tableTitle = new LabelField(_bill.tableID + "号餐台信息", LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
+		_tableTitle = new LabelField(_originalOrder.tableID + "号餐台信息", LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
 			protected void paintBackground(Graphics g) {
 				g.clear();
 				g.setBackgroundColor(Color.GRAY);
@@ -44,21 +42,22 @@ public class ChangeOrderScreen extends MainScreen
 
 		_vfm.add(_tableTitle);
 		
-		_table = new EditField("台号：", new Short(_bill.tableID).toString(),
+		_table = new EditField("台号：", new Short(_originalOrder.tableID).toString(),
 							   4, TextField.NO_NEWLINE | EditField.FILTER_NUMERIC);
 		
 		/**
 		 * The id on table title would be changed with the input
 		 */
-		_table.setChangeListener(new FieldChangeListener(){
-
-			public void fieldChanged(Field field, int context) {
-				_tableTitle.setText(_table.getText() + "号餐台信息");
-			}
-			
-		});
+//		_table.setChangeListener(new FieldChangeListener(){
+//
+//			public void fieldChanged(Field field, int context) {
+//				_tableTitle.setText(_table.getText() + "号餐台信息");
+//			}
+//			
+//		});
 		_vfm.add(_table);
-		_customNum = new EditField("人数：", new Integer(_bill.customNum).toString(), 
+		
+		_customNum = new EditField("人数：", new Integer(_originalOrder.customNum).toString(), 
 									2, TextField.NO_NEWLINE | EditField.FILTER_NUMERIC){
 			protected boolean navigationClick(int status, int time){
 				return true;
@@ -79,7 +78,7 @@ public class ChangeOrderScreen extends MainScreen
 			}
 		});
 		
-		_orderListField = new OrderListField(_bill.foods);
+		_orderListField = new OrderListField(_originalOrder.foods);
 		
 		_vfm.add(_orderListField);
 		_vfm.add(new SeparatorField());
@@ -116,9 +115,9 @@ public class ChangeOrderScreen extends MainScreen
 					Order reqOrder = new Order(foods, 
 											   Short.parseShort(_table.getText()), 
 											   Integer.parseInt(_customNum.getText()));
-					UiApplication.getUiApplication().pushScreen(new SubmitOrderPopup(reqOrder, 
-																Type.UPDATE_ORDER,
-																_self));
+					reqOrder.originalTableID = _originalOrder.tableID;
+					
+					UiApplication.getUiApplication().pushScreen(new SubmitChangePopup(reqOrder, _self));
 				}
 	         }
 		});

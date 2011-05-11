@@ -52,7 +52,7 @@ class PayOrderPopup2 extends PopupScreen{
 								public void run(){
 									if(_errCode == ErrorCode.TABLE_NOT_EXIST){
 										Dialog.alert(_orderToPay.tableID + "号台已被删除，请与餐厅负责人确认。");
-									}else if(_errCode == ErrorCode.ORDER_NOT_EXIST){
+									}else if(_errCode == ErrorCode.TABLE_IDLE){
 										Dialog.alert(_orderToPay.tableID + "号台的账单已结帐或删除，请与餐厅负责人确认。");
 									}else if(_errCode == ErrorCode.PRINT_FAIL){
 										Dialog.alert(_orderToPay.tableID + "号结帐打印未成功，请与餐厅负责人确认。");
