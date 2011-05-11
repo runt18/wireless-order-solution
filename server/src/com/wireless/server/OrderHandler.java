@@ -1082,7 +1082,7 @@ class OrderHandler extends Handler implements Runnable{
 			if(_rs.next()){
 				return _rs.getInt(1);
 			}else{
-				throw new OrderBusinessException("The table(alias_id=" + tableToQuery + ")to query is busy.", ErrorCode.TABLE_IDLE);
+				throw new OrderBusinessException("The table(alias_id=" + tableToQuery + ")to query is idle.", ErrorCode.TABLE_IDLE);
 			}
 			
 		}else{
