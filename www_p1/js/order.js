@@ -1,8 +1,8 @@
-function editOrder(id, total_price_2,target) {
+function editOrder(id, total_price_2,target,type_value) {
     var editType = "editOrder";
     var content = ' <div class="add_foot">' +
                         '<div class="title">' +
-	                        '<div class="title_left"><font class="font" style="width:350px;">修改实收金额</font></div>' +
+	                        '<div class="title_left"><font class="font" style="width:350px;">修改</font></div>' +
 	                        '<div class="title_right"></div>' +
 	                    '</div>' +
 	                    '<form name="orderForm" action="' + target + '"  method="post" onkeydown="editOrderKeyDown()">' +
@@ -14,6 +14,13 @@ function editOrder(id, total_price_2,target) {
 	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57||event.keyCode==46||event.keyCode==45"' +
 	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
 	                            ' style="ime-mode:Disabled" /></div>' +
+	                            '<div class="pop_Content1">结帐方式：<select id="sel_type" name="sel_type">' +
+	                                    '<option value="1" selected="selected">现金</option>' +
+	                                    '<option value="2">刷卡</option>' +	
+	                                    '<option value="3">会员卡</option>' +
+	                                    '<option value="4">挂账</option>' +
+	                                    '<option value="5">签单</option>' +
+	                                    '</select>' +	                            	                            
 	                        '</div>' +
 	                            '<span class="pop_action-span"><a href="#" onclick="submitOrderData()">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>' +
 	                            '<span class="pop_action-span1"><a href="#" onclick="closeWindow()">取&nbsp;&nbsp;&nbsp;&nbsp;消</a></span>' +
@@ -23,6 +30,7 @@ function editOrder(id, total_price_2,target) {
 
     showMessageBox(content, 342, 350);
     document.getElementById("total_price_2").focus();
+    document.all.sel_type.value = type_value;
 }
 
 function editOrderKeyDown() {
@@ -98,6 +106,14 @@ function showOrderDetail(id, alias, date, totalPrice, count, foods, isPaid, owne
     } else {
         isPaidStr = "已结帐(" + type_name + ")";
     }
+    var showTotalPrice_2 = "";
+    if (totalPrice_2 == undefined || totalPrice_2 == null || totalPrice_2 == "") {
+    }
+    else {
+        showTotalPrice_2 = '<li>' +
+								'<div align="right" style="font-size:15px"><strong>实收：￥' + totalPrice_2 + '</strong></div>' +
+							  '</li>';
+    }
     var content = '<div id="Has_order">' +
 					  '<div class="title">' +
 						'<div class="title_left"><font class="font" style="width:160px">查看 （' + id + '号帐单）</font></div>' +
@@ -122,9 +138,7 @@ function showOrderDetail(id, alias, date, totalPrice, count, foods, isPaid, owne
 							  '<li>' +
 								'<div align="right" style="font-size:15px"><strong>合计：￥' + totalPrice + '</strong></div>' +
 							  '</li>' +
-							   '<li>' +
-								'<div align="right" style="font-size:15px"><strong>实收：￥' + totalPrice_2 + '</strong></div>' +
-							  '</li>' +
+							        showTotalPrice_2 +
 							'</ul>' +
 						  '</div>' +
 						'<span class="action-span" style="height:40px;margin-left:60px;"><a href="#" onclick="closeWindow()">确&nbsp;&nbsp;&nbsp;&nbsp;定</a></span><span class="action-span"><a href="#" onclick="printreport()">打&nbsp;&nbsp;&nbsp;&nbsp;印</a></span>' +
