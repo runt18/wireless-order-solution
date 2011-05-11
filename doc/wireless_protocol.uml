@@ -569,7 +569,7 @@ len[2] : 0x00,0x00
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="Left" type="integer">464</XPD:ATTR>
 <XPD:ATTR name="Top" type="integer">44</XPD:ATTR>
-<XPD:ATTR name="Width" type="integer">342</XPD:ATTR>
+<XPD:ATTR name="Width" type="integer">396</XPD:ATTR>
 <XPD:ATTR name="Height" type="integer">203</XPD:ATTR>
 <XPD:ATTR name="Text" type="string">&lt;Header&gt;
 mode : ORDER_BUSSINESS
@@ -580,7 +580,7 @@ pin[6] : auto
 len[2] : length of the &lt;Body&gt;
 
 &lt;Body&gt;
-table[2] : custom_num : food_num : &lt;Food1&gt; : &lt;Food2&gt;...
+table[2] : custom_num : food_num : &lt;Food1&gt; : &lt;Food2&gt;... : origian_table[2]
 
 &lt;Food&gt;
 food_id[2] : order_num[2] : taste_id : kitchen
@@ -751,7 +751,7 @@ len[2] : 0x00, 0x00
 <XPD:OBJ name="OwnedViews[14]" type="UMLNoteLinkView" guid="hJs7yKUMl0SGqBgb7eYXDwAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">349,170;464,160</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">349,171;464,161</XPD:ATTR>
 <XPD:REF name="Head">p+0MN6Dz/kaTPZFkTgFoAAAA</XPD:REF>
 <XPD:REF name="Tail">YVwwD+L110+LlBUG0q0/FwAA</XPD:REF>
 </XPD:OBJ>
@@ -1513,7 +1513,7 @@ len[2] : 0x00, 0x00
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="Left" type="integer">492</XPD:ATTR>
 <XPD:ATTR name="Top" type="integer">92</XPD:ATTR>
-<XPD:ATTR name="Width" type="integer">339</XPD:ATTR>
+<XPD:ATTR name="Width" type="integer">395</XPD:ATTR>
 <XPD:ATTR name="Height" type="integer">203</XPD:ATTR>
 <XPD:ATTR name="Text" type="string">&lt;Header&gt;
 mode : ORDER_BUSSINESS
@@ -1524,7 +1524,7 @@ pin[6] : auto
 len[2] : length of the &lt;Body&gt;
 
 &lt;Body&gt;
-table[2] : custom_num : food_num: &lt;Food1&gt; : &lt;Food2&gt;...
+table[2] : custom_num : food_num: &lt;Food1&gt; : &lt;Food2&gt;... : original_table[2]
 
 &lt;Food&gt;
 food_id[2] : order_num[2] : taste_id : kitchen
@@ -1533,7 +1533,7 @@ food_id[2] : order_num[2] : taste_id : kitchen
 <XPD:OBJ name="OwnedViews[4]" type="UMLNoteLinkView" guid="53hS6azOQ0Wv3bD0/1lmuwAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">492,181;401,175</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">492,180;401,174</XPD:ATTR>
 <XPD:REF name="Head">l8cAKs9L9U6SgZuDlM+G0QAA</XPD:REF>
 <XPD:REF name="Tail">J4P0dGBtGkmrDEDRTNmD6QAA</XPD:REF>
 </XPD:OBJ>
