@@ -3,8 +3,8 @@
 	<!-- the name of db -->
 	<db>wireless_order_db</db>
 	<!-- the ip address of the db host -->
-	<host>192.168.190.200</host>
-    <!-- <host>127.0.0.1</host> -->
+	<!-- <host>192.168.190.200</host> -->
+    <host>127.0.0.1</host>
 	<!-- the port that the db is listened on -->
 	<port>3306</port>
 	<!-- the db account -->
@@ -57,7 +57,7 @@
 	hourOfDay, minute, second
 	e.g. "2, 0, 0" means the task would be executed on 2:00:00am every day 
 	-->
-	<daily_settlement>1,23,37</daily_settlement>
+	<daily_settlement>18,32,0</daily_settlement>
 	<!-- the OTA server address and port -->
 	<OTA>
 		<host>58.248.9.158</host>
