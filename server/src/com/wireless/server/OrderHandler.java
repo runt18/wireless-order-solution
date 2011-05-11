@@ -387,17 +387,17 @@ class OrderHandler extends Handler implements Runnable{
 		try{
 			getUnPaidOrderID(orderToInsert.tableID);
 			//throw the exception if the table is paid
-			throw new OrderBusinessException("The table(alias_id=" + orderToInsert.tableID +") has been paid.", ErrorCode.TABLE_HAS_PAID);
+			throw new OrderBusinessException("The table(alias_id=" + orderToInsert.tableID +") has been paid.", ErrorCode.TABLE_BUSY);
 			
 		}catch(OrderBusinessException e){ 			
 			if(e.errCode == ErrorCode.TABLE_NOT_EXIST){
 				//re-throw the exception if table doesn't exist
 				throw e;			
-			}else if(e.errCode == ErrorCode.TABLE_HAS_PAID){
-				//re-throw the exception if the table is paid
+			}else if(e.errCode == ErrorCode.TABLE_BUSY){
+				//re-throw the exception if the table is busy
 				throw e;
-			}else if(e.errCode == ErrorCode.ORDER_NOT_EXIST){
-				//proceed to insert the new order if the table isn't paid 
+			}else if(e.errCode == ErrorCode.TABLE_IDLE){
+				//proceed to insert the new order if the table is idle
 			}else{
 				throw e;
 			}
@@ -534,7 +534,48 @@ class OrderHandler extends Handler implements Runnable{
 	 */
 	private void execUpdateOrder(ProtocolPackage req) throws SQLException, PrintLogicException, OrderBusinessException{
 		Order orderToUpdate = ReqParser.parseInsertOrder(req);
-		int orderID = getUnPaidOrderID(orderToUpdate.tableID);
+		
+		/**
+		 * There are two update order condition to deal with.
+		 * 1 - The table is the same
+		 * 2 - The table is different
+		 * 
+		 * In the 1st case, need to assure the table to update remains in busy.
+		 * 
+		 * In the 2nd case, need to assure two conditions
+		 * 1 - original table remains in busy
+		 * 2 - the table to be transferred is idle now
+		 */
+		
+		int orderID = 0;
+		
+		/**
+		 * In the case the table is the same as before,
+		 * need to assure the table to update remains in busy.
+		 */
+		if(orderToUpdate.tableID == orderToUpdate.originalTableID){
+			orderID = getUnPaidOrderID(orderToUpdate.tableID);
+			
+		/**
+		 * In the case that the table is different from before,
+		 * need to assure two conditions
+		 * 1 - original table remains in busy
+		 * 2 - the table to be transferred is idle now
+		 */
+		}else{			
+			orderID = getUnPaidOrderID(orderToUpdate.originalTableID);
+			try{
+				getUnPaidOrderID(orderToUpdate.tableID);
+				throw new OrderBusinessException("The table(alias_id=" + orderToUpdate.tableID + ")to be transferred is busy", ErrorCode.TABLE_BUSY);
+			}catch(OrderBusinessException e){
+				if(e.errCode == ErrorCode.TABLE_IDLE){
+					//proceed to update the new order if the table to be transferred is idle
+				}else{
+					//otherwise re-throw the order business exception
+					throw e;
+				}
+			}
+		}
 		
 		//query all the food's id ,order count and taste preference of this order
 		ArrayList<Food> originalRecords = new ArrayList<Food>();
@@ -721,7 +762,7 @@ class OrderHandler extends Handler implements Runnable{
 
 		//update the custom number depending on the order id to "order" table
 		 sql = "UPDATE `" + WirelessSocketServer.database + "`.`order` SET custom_num=" + orderToUpdate.customNum +
-				", terminal_pin=" + _pin + ", waiter='" + _owner + "' WHERE id=" + orderID;
+				", terminal_pin=" + _pin + ", waiter='" + _owner + "', table_id=" + orderToUpdate.tableID + " WHERE id=" + orderID;
 		_stmt.addBatch(sql);
 
 		_stmt.executeBatch();
@@ -1041,7 +1082,7 @@ class OrderHandler extends Handler implements Runnable{
 			if(_rs.next()){
 				return _rs.getInt(1);
 			}else{
-				throw new OrderBusinessException("The order to query doesn't exist.", ErrorCode.ORDER_NOT_EXIST);
+				throw new OrderBusinessException("The table(alias_id=" + tableToQuery + ")to query is busy.", ErrorCode.TABLE_IDLE);
 			}
 			
 		}else{
