@@ -138,6 +138,11 @@ public class MonitorHandler implements Runnable{
 							WirelessSocketServer.schePrtConTask.cancel();
 							response += "stop the sweeping print connection task" + sep;
 						}
+						//terminate the daily settlement task
+						if(WirelessSocketServer.scheDailySettlement != null){
+							WirelessSocketServer.scheDailySettlement.cancel();
+							response += "stop the daily settlement task" + sep;
+						}
 						
 					//check if the command is "check_version"
 					}else if(cmd.equals(Cmd.CVersion)){
