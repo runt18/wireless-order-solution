@@ -59,12 +59,12 @@ public class WirelessOrder extends UiApplication{
 	
 	private void startup(boolean autostartup){
 		_isAutoStartup = autostartup;
-		
-		invokeLater(new Runnable(){
-			public void run(){
-				pushGlobalScreen(new StartupScreen(_isAutoStartup), 1, UiEngine.GLOBAL_MODAL);				
-			}
-		});
+		pushScreen(new StartupScreen(_isAutoStartup));
+//		invokeLater(new Runnable(){
+//			public void run(){
+//				pushGlobalScreen(new StartupScreen(_isAutoStartup), 1, UiEngine.GLOBAL_MODAL);				
+//			}
+//		});
 		
 		addSystemListener(new SystemListener(){
 			public void batteryGood() {	}

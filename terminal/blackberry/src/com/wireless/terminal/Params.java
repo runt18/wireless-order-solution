@@ -24,7 +24,7 @@ public final class Params{
 	public static final int CONN_TYPE = 7;
 	public static final int AUTO_STARTUP = 8;
 	
-    private static final long PERSISTENT_PARAM_ID = 0x230157d6843fDefEL;
+    private static final long PERSISTENT_PARAM_ID = 0x330157d6843fDefEL;
     
     /**
      * Restore the parameters stored in persist storage if it has exist,
@@ -49,7 +49,7 @@ public final class Params{
 				setParam(PRINT_ACTION, Integer.toString(Params.PRINT_ASYNC));
 				setParam(CONN_TIME_OUT, Integer.toString(Params.CONN_TIMEOUT_10));
 				setParam(CONN_TYPE, Integer.toString(Params.CONN_MOBILE));	
-				setParam(AUTO_STARTUP, Integer.toString(Params.ON));
+				setParam(AUTO_STARTUP, Integer.toString(Params.OFF));
 	        	store.setContents(_params);
 	        	store.commit();
 			}

@@ -69,9 +69,9 @@ public class StartupScreen extends MainScreen implements IQueryMenu,
 			}
 
 		}else{
-			UiApplication.getApplication().invokeLater(new Runnable(){
-				public void run(){
-					UiApplication.getApplication().requestForeground();
+//			UiApplication.getApplication().invokeLater(new Runnable(){
+//				public void run(){
+					//UiApplication.getApplication().requestForeground();
 					UiApplication.getUiApplication().pushScreen(new OrderMainScreen(_isMenuOK, _info));
 					if(_errMsg != null){
 						Dialog.alert(_errMsg);
@@ -83,8 +83,8 @@ public class StartupScreen extends MainScreen implements IQueryMenu,
 						browserSession.displayPage(_url);
 						browserSession.showBrowser();						
 					}
-				}
-			});
+//				}
+//			});
 		}
 	}
 
