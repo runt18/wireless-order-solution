@@ -27,6 +27,7 @@ $target = $_REQUEST["target"];
 ?>
 <div id="divSearch">
 	<form id="searchForm" action="<?PHP echo $target; ?>" method="post">
+	<input id="editType" type="hidden" name="editType" value="viewStat"></input>
 	 <div style="text-align:center">
 		日期：<input type="text" id="dateFrom" name="dateFrom" style="width:136px" onclick="javascript:ShowCalendar(this.id)" />
 		&nbsp;&nbsp;至&nbsp;&nbsp;<input type="text" id="dateTo" name="dateTo" style="width:136px" onclick="javascript:ShowCalendar(this.id)" />

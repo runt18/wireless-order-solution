@@ -59,14 +59,31 @@ function getSelectedItem(id, formId) {
     return ids;
 }
 
+function submitSearch(msg) {
+    if (getSelectedItem("selectedList", "searchForm") == "") {
+        alert("è¯·è‡³å°‘é€‰æ‹©ä¸€ç§" + msg + "è¿›è¡Œç»Ÿè®¡ï¼");
+        event.returnValue = false;
+        event.cancel = true;
+        return;
+    }
+    document.getElementById("searchForm").submit();
+}
+function iframeKeyDown() {
+    if (event.keyCode == 27) {
+        event.returnValue = false;
+        event.cancel = true;
+        parent.closeWindow();
+    }
+}
+
 function preview(oper) {
     if (oper < 10) {
-        bdhtml = window.document.body.innerHTML; //»ñÈ¡µ±Ç°Ò³µÄhtml´úÂë
-        sprnstr = "<!--startprint" + oper + "-->"; //ÉèÖÃ´òÓ¡¿ªÊ¼ÇøÓò
-        eprnstr = "<!--endprint" + oper + "-->"; //ÉèÖÃ´òÓ¡½áÊøÇøÓò
-        prnhtml = bdhtml.substring(bdhtml.indexOf(sprnstr) + 18); //´Ó¿ªÊ¼´úÂëÏòºóÈ¡html
+        bdhtml = window.document.body.innerHTML; //è·å–å½“å‰é¡µçš„htmlä»£ç 
+        sprnstr = "<!--startprint" + oper + "-->"; //è®¾ç½®æ‰“å°å¼€å§‹åŒºåŸŸ
+        eprnstr = "<!--endprint" + oper + "-->"; //è®¾ç½®æ‰“å°ç»“æŸåŒºåŸŸ
+        prnhtml = bdhtml.substring(bdhtml.indexOf(sprnstr) + 18); //ä»å¼€å§‹ä»£ç å‘åå–html
 
-        prnhtml = prnhtml.substring(0, prnhtml.indexOf(eprnstr)); //´Ó½áÊø´úÂëÏòÇ°È¡html
+        prnhtml = prnhtml.substring(0, prnhtml.indexOf(eprnstr)); //ä»ç»“æŸä»£ç å‘å‰å–html
         window.document.body.innerHTML = prnhtml;
         window.print();
         window.document.body.innerHTML = bdhtml;
@@ -79,11 +96,11 @@ function preview(oper) {
 }
 
 function printsetup() {
-    // ´òÓ¡Ò³ÃæÉèÖÃ 
+    // æ‰“å°é¡µé¢è®¾ç½® 
     wb.execwb(8, 1);
 }
 function printpreview() {
-    // ´òÓ¡Ò³ÃæÔ¤ÀÀ 
+    // æ‰“å°é¡µé¢é¢„è§ˆ 
 
     wb.execwb(7, 1);
 

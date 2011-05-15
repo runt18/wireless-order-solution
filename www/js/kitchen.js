@@ -25,7 +25,7 @@ function editKitchen(id, alias_id, name, discount1, discount2, member_discount_1
 	                    '</div>' +
 	                    '<form name="kitchenForm" action="kitchen.php"  method="post" onkeydown="editKitchenKeyDown()">' +
 	                      '<input type="hidden" name="editType" value="' + editType + '" />' +
-	                      '<input type="hidden" name="id" value="' + id + '" />' +	                      
+	                      '<input type="hidden" name="id" value="' + id + '" />' +
 	                      '<div class="add_foot_Content" style="height:230px;text-align:center">' +
 	                        '<div class="pop_Content">' +
 	                            '<div class="pop_Content1" style="padding-left:32px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;编号：' + aliasId + '</div>' +
@@ -155,7 +155,7 @@ function deleteKitchen(id) {
 
 }
 
-function showHideCondition(select) {    
+function showHideCondition(select) {
     var option = select.options[select.selectedIndex];
     document.getElementById("condition_type").style.display = "none";
     document.getElementById("keyword").style.display = "inline";
@@ -187,4 +187,19 @@ function initializeKitchen() {
     if (keyword_type_value == "discount1" || keyword_type_value == "discount2" || keyword_type_value == "member_discount1" || keyword_type_value == "member_discount2") {
         document.getElementById("condition_type").style.display = "inline";
     }
+}
+
+function viewKitchenStat() {
+    title = "分厨汇总";
+    var content = ' <div id="div_add_foot" class="add_foot" style="height:550px;width:100%">' +
+                              '<div class="title" style="width:100%">' +
+	                          '<div id="div_title_left" class="title_left" style="width:565px"><font id="titleName" class="font" style="width:260px">' + title + '</font></div>' +
+	                          '<div class="title_right" style="width:35px;float:left" ></div>' +
+	                          '</div>' +
+	                          '<div class="add_foot_Content" style="height:370px;text-align:center;width:99%">' +
+	                              '<iframe src="searchCondition.php?table=kitchen&value=id&name=name&target=viewKitchenStat.php&msg=厨房" scrolling="no" style="width:100%;height:100%" />' +
+	                          '</div>' +
+						   '</div>';
+    showMessageBox(content, 600, 535);
+
 }

@@ -74,8 +74,16 @@ else if($editType == "deleteKitchen")
 			echo "<script>alert('删除失败！');</script>";
 		}	
 	}
+	else if($editType == "viewStat")
+		{
+			$ids = $_POST["ids"];	
+			$dateFrom = $_POST["dateFrom"];
+			$dateTo = $_POST["dateTo"];
+			echo "<script>showKitchenStat('$ids','$dateFrom','$dateTo');</script>";		
+		}
 ?>
 <h1>
+<span class="action-span"><a href="#" onclick="viewKitchenStat();">分厨汇总</a></span>
 <span class="action-span" style="display:none"><a href="#" onclick="editKitchen('','','','','','')">添加厨房</a></span>
 <span class="action-span1">e点通会员中心</span><span id="search_id" class="action-span2">&nbsp;- 分厨管理 </span>
 <div style="clear:both"></div>
