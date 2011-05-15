@@ -78,3 +78,14 @@ function preview(oper) {
 
 }
 
+function printsetup() {
+    // 打印页面设置 
+    wb.execwb(8, 1);
+}
+function printpreview() {
+    // 打印页面预览 
+
+    wb.execwb(7, 1);
+
+} 
+

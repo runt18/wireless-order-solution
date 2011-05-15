@@ -75,7 +75,7 @@ if($ids == null)
 </div>
 <div id="divContent" style="display:none">
 <!--startprint1-->    
-<div class="Content">    
+<div  id="printContent" class="Content">    
 <table cellpModifying="0" cellspacing="0" border="0" id="table" class="sortable">
 		<thead>
 			<tr style="height: 25px;">
@@ -142,7 +142,7 @@ mysql_close($con);
 
 		<div id="navigation" style="font-size:12px;text-align:right">
   		      <span id="page-link"> </span>
-			  <a href="#" onclick="preview(1)">打印</a>
+			  <a href="#" onclick="javascript:sorter.pagesize = 10000;sorter.init('table',0);window.open('PrintPage.html');">打印</a>
 			  <a href="#" onclick="sorter.move(-1,true)">首页</a>
 			  <a href="#" onclick="sorter.move(-1)">上页</a>
 			  <a href="#" onclick="sorter.move(1)">下页</a>

@@ -47,6 +47,22 @@ if($editType == "viewStat")
 	$dateTo = $_POST["dateTo"];
 	echo "<script>showOrderStat('$statType','$dateFrom','$dateTo');</script>";				
 }    
+$editType = $_POST["editType"];
+if($editType == "editOrder")
+{
+	$id = $_POST["id"];	
+	$total_price_2 = $_POST["total_price_2"];	
+	$type_value = $_POST["sel_type"];		
+	$sql = "UPDATE `order_history` SET total_price_2 = $total_price_2,type=$type_value WHERE id=$id";
+	
+	if($db->Execute($sql))
+	{			
+		echo "<script>alert('修改成功！');</script>";
+	}	
+	else{
+		echo "<script>alert('修改失败！');</script>";
+	}	
+}
 ?>
 <h1>
 <span class="action-span"><a href="#" onclick="showSearch('order_history.php');">高级搜索</a></span>
@@ -93,6 +109,7 @@ if($editType == "viewStat")
                 <th><h3>日&nbsp;期</h3></th>
 				<th><h3>结帐方式</h3></th>
 				<th><h3>金额（￥）</h3></th>
+				<th><h3>实收（￥）</h3></th>
 				<th><h3>操&nbsp;作</h3></th>
 			</tr>
 		</thead>
@@ -198,8 +215,10 @@ foreach ($rs as $row){
 	echo "<td>" .$row["order_date"]. "</td>";
 	echo "<td>" .$row["type_name"]."</td>";
 	echo "<td>" .$row["total_price"]."</td>";
-	echo "<td><a href='#' onclick='showOrderDetail(&quot;".$row["id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["order_date"]."&quot;,&quot;".$row["total_price"].
-		"&quot;,&quot;".$row["num"]."&quot;,&quot;".$row["foods"]."&quot;,&quot;".$row["is_paid"]."&quot;,&quot;".$row["waiter"]."&quot;,&quot;".$row["type_name"]."&quot;)'>
+	echo "<td>" .$row["total_price_2"]."</td>";
+	echo "<td><a href='#' onclick='editOrder(&quot;".$row["id"]."&quot;,&quot;".$row["total_price_2"]."&quot;,&quot;order_history.php&quot;,&quot;".$row["type_value"]."&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
+		"<a href='#' onclick='showOrderDetail(&quot;".$row["id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["order_date"]."&quot;,&quot;".$row["total_price"].
+		"&quot;,&quot;".$row["num"]."&quot;,&quot;".$row["foods"]."&quot;,&quot;".$row["is_paid"]."&quot;,&quot;".$row["waiter"]."&quot;,&quot;".$row["type_name"]."&quot;,&quot;".$row["total_price_2"]."&quot;)'>
 			<img src='images/View.png'  height='16' width='14' border='0'/>&nbsp;查看</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href='#' onclick='deleteOrder(&quot;".$row["id"]."&quot;,&quot;order_history.php&quot;)'>
 			<img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;删除</a></td>";
 	echo "</tr>";
