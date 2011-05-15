@@ -1,8 +1,8 @@
 <?php
 
 $database="wireless_order_db";
-$sa="root";
-$pwd="li";
+$sa="custom_user";
+$pwd="custom_user@digi-e";
 $ip="127.0.0.1";
 $con = mysql_connect($ip,$sa,$pwd);
 
