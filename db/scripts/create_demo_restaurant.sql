@@ -156,8 +156,8 @@ SET AUTOCOMMIT=0;
 INSERT INTO `wireless_order_db`.`material` (`id`, `restaurant_id`, `alias_id`, `name`, `stock`, `price`, `warning_threshold`, `danger_threshold`) VALUES (1, 11, '100', '排骨', 35.00, 18.5, 10.5, 5.5);
 INSERT INTO `wireless_order_db`.`material` (`id`, `restaurant_id`, `alias_id`, `name`, `stock`, `price`, `warning_threshold`, `danger_threshold`) VALUES (2, 11, '101', '鸡肉', 57.50, 13, 22, 14);
 INSERT INTO `wireless_order_db`.`material` (`id`, `restaurant_id`, `alias_id`, `name`, `stock`, `price`, `warning_threshold`, `danger_threshold`) VALUES (3, 11, '102', '牛肉', 43.00, 16, 27, 13);
-INSERT INTO `wireless_order_db`.`material` (`id`, `restaurant_id`, `alias_id`, `name`, `stock`, `price`, `warning_threshold`, `danger_threshold`) VALUES (4, 11, '102', '猪肉', 54.00, 13.5, 27, 13);
-INSERT INTO `wireless_order_db`.`material` (`id`, `restaurant_id`, `alias_id`, `name`, `stock`, `price`, `warning_threshold`, `danger_threshold`) VALUES (5, 11, '103', '酱汁', 100.00, 1, 30, 20);
+INSERT INTO `wireless_order_db`.`material` (`id`, `restaurant_id`, `alias_id`, `name`, `stock`, `price`, `warning_threshold`, `danger_threshold`) VALUES (4, 11, '103', '猪肉', 54.00, 13.5, 27, 13);
+INSERT INTO `wireless_order_db`.`material` (`id`, `restaurant_id`, `alias_id`, `name`, `stock`, `price`, `warning_threshold`, `danger_threshold`) VALUES (5, 11, '104', '酱汁', 100.00, 1, 30, 20);
 COMMIT;
 SET AUTOCOMMIT=1;
 
@@ -261,24 +261,32 @@ SET AUTOCOMMIT=1;
 -- -----------------------------------------------------
 SET AUTOCOMMIT=0;
 INSERT INTO `wireless_order_db`.`order_history` (`id`, `restaurant_id`, `table_id`, `terminal_pin`, `order_date`, `total_price`, `total_price_2`, `custom_num`, `waiter`, `member_id`, `member`) VALUES (1, 11, 0x64, 0x20237AB8, 20110102, 214, 214, 5, (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), '13694260535', '熊至明');
-INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (1, 0x44C, 1.2, '京都骨', 23.53, NOW(), '张宁远', NULL);
+INSERT INTO `wireless_order_db`.`order_food_history` (`id`, `order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (1, 1, 0x44C, 1.2, '京都骨', 23.53, NOW(), '张宁远', NULL);
+INSERT INTO `wireless_order_db`.`order_food_material_history`(`order_food_id`, `material_id`, `name`, `price`, `consumption`) VALUES (1, 100, '排骨', 18.5, 1);
 
 -- the order detail to 京酱肉丝
-INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (1, 0x44D, 2, '京酱肉丝', 35.3, 20110411180911, '张宁远', NULL);
-INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (1, 0x44D, 2, '京酱肉丝', 35.3, 20110411191523, '张宁远', NULL);
+INSERT INTO `wireless_order_db`.`order_food_history` (`id`, `order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (2, 1, 0x44D, 2, '京酱肉丝', 35.3, 20110411180911, '张宁远', NULL);
+INSERT INTO `wireless_order_db`.`order_food_material_history`(`order_food_id`, `material_id`, `name`, `price`, `consumption`) VALUES (2, 103, '猪肉', 13.5, 1);
+INSERT INTO `wireless_order_db`.`order_food_history` (`id`, `order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (3, 1, 0x44D, 2, '京酱肉丝', 35.3, 20110411191523, '张宁远', NULL);
+INSERT INTO `wireless_order_db`.`order_food_material_history`(`order_food_id`, `material_id`, `name`, `price`, `consumption`) VALUES (3, 103, '猪肉', 13.5, 1);
 
 -- the order detail to 白切鸡
-INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (1, 0x44E, 1, '白切鸡', 21.00, 20110411171200, '张宁远', NULL);
-INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (1, 0x44E, -1, '白切鸡', 21.00, 20110411174521, '黄家声', '客人退菜');
+INSERT INTO `wireless_order_db`.`order_food_history` (`id`, `order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (4, 1, 0x44E, 1, '白切鸡', 21.00, 20110411171200, '张宁远', NULL);
+INSERT INTO `wireless_order_db`.`order_food_material_history`(`order_food_id`, `material_id`, `name`, `price`, `consumption`) VALUES (4, 101, '鸡肉', 13, 1);
+INSERT INTO `wireless_order_db`.`order_food_history` (`id`, `order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (5, 1, 0x44E, -1, '白切鸡', 21.00, 20110411174521, '黄家声', '客人退菜');
+INSERT INTO `wireless_order_db`.`order_food_material_history`(`order_food_id`, `material_id`, `name`, `price`, `consumption`) VALUES (5, 101, '鸡肉', 13, 1);
+
+-- the order detail to 湛江鸡
+INSERT INTO `wireless_order_db`.`order_food_history` (`id`, `order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`, `discount`) VALUES (6, 1, 0x450, 6, '湛江鸡', 26, 20110412170931, '黄家声', NULL, 0.98);
+INSERT INTO `wireless_order_db`.`order_food_material_history`(`order_food_id`, `material_id`, `name`, `price`, `consumption`) VALUES (6, 101, '鸡肉', 13, 1);
+INSERT INTO `wireless_order_db`.`order_food_history` (`id`, `order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`, `discount`) VALUES (7, 1, 0x450, -1, '湛江鸡', 26, 20110412170931, '黄家声', '客人退菜', 0.98);
+INSERT INTO `wireless_order_db`.`order_food_material_history`(`order_food_id`, `material_id`, `name`, `price`, `consumption`) VALUES (7, 101, '鸡肉', 13, 1);
 
 -- the order detail to 盐水菜心
 INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`, `discount`) VALUES (1, 0x44F, 2, '盐水菜心', 10.67, 20110412181511, '黄家声', NULL, 0.75);
 
--- the order detail to 湛江鸡
-INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`, `discount`) VALUES (1, 0x450, 6, '湛江鸡', 26, 20110412170931, '黄家声', NULL, 0.98);
-INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`, `discount`) VALUES (1, 0x450, -1, '湛江鸡', 26, 20110412170931, '黄家声', '客人退菜', 0.98);
 
-INSERT INTO `wireless_order_db`.`order_history` (`id`, `restaurant_id`, `table_id`, `terminal_pin`, `order_date`, `total_price`, `total_price_2`, `custom_num`, `waiter`, `member_id`, `member`, `type`) VALUES (2, 11, 0x65, 0x20237AB8, 20110203, 543, 540, 6, (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), '13632654789', '刘天宁', 3);
+INSERT INTO `wireless_order_db`.`order_history` (`id`, `restaurant_id`, `table_id`, `terminal_pin`, `order_date`, `total_price`, `total_price_2`, `custom_num`, `waiter`, `member_id`, `member`, `type`, `comment`) VALUES (2, 11, 0x65, 0x20237AB8, 20110203, 543, 540, 6, (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), '13632654789', '刘天宁', 3, '会员卡结帐');
 INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (2, 0x451, 2.5, '东波肉', 16, NOW(), (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), NULL);
 INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (2, 0x452, 2.2, '红烧排骨', 32, NOW(), (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), NULL);
 INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (2, 0x453, 3.0, '清蒸桂花鱼', 29, NOW(), (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), NULL);
@@ -302,13 +310,13 @@ INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `or
 INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (5, 0x462, 1, '碧绿生鱼球', 35, NOW(), (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), NULL);
 INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (5, 0x463, 1, '冰冻荔枝', 23, NOW(), (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), NULL);
 INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (5, 0x4B0, 1, '冰淇淋', 8, NOW(), (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), NULL);
-INSERT INTO `wireless_order_db`.`order_history` (`id`, `restaurant_id`, `table_id`, `terminal_pin`, `order_date`, `total_price`, `total_price_2`, `custom_num`, `waiter`, `type`) VALUES (6, 11, 0x69, 0x20237AB8, 20110509, 213, 210, 8, (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), 4);
+INSERT INTO `wireless_order_db`.`order_history` (`id`, `restaurant_id`, `table_id`, `terminal_pin`, `order_date`, `total_price`, `total_price_2`, `custom_num`, `waiter`, `type`, `comment`) VALUES (6, 11, 0x69, 0x20237AB8, 20110509, 213, 210, 8, (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), 4, '挂账埋单');
 INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (6, 0x4B0, 1, '冰淇淋', 8, NOW(), (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), NULL);
 INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (6, 0x4B1, 1, '冰肉莲蓉粽', 6.5, NOW(), (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), NULL);
 INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (6, 0x4B2, 1, '菠菜炒鸡蛋', 11, NOW(), (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), NULL);
 INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (6, 0x4B3, 1, '腊肠', 8.5, NOW(), (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), NULL);
 INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (6, 0x4B4, 1, '腊金银润', 10, NOW(), (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), NULL);
-INSERT INTO `wireless_order_db`.`order_history` (`id`, `restaurant_id`, `table_id`, `terminal_pin`, `order_date`, `total_price`, `total_price_2`, `custom_num`, `waiter`, `type`) VALUES (7, 11, 0x70, 0x20237AB8, 20110421, 121, 120, 8, (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), 4);
+INSERT INTO `wireless_order_db`.`order_history` (`id`, `restaurant_id`, `table_id`, `terminal_pin`, `order_date`, `total_price`, `total_price_2`, `custom_num`, `waiter`, `type`, `comment`) VALUES (7, 11, 0x70, 0x20237AB8, 20110421, 121, 120, 8, (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), 4, '挂账埋单');
 INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (7, 0x4B5, 1, '辣椒肉丝', 10.5, NOW(), (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), NULL);
 INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (7, 0x4B6, 1, '辣蔬菜', 11.3, NOW(), (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), NULL);
 INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (7, 0x4B7, 1, '辣汁鱼头', 22, NOW(), (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), NULL);
@@ -326,13 +334,13 @@ INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `or
 INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (9, 0x4B7, 1, '辣汁鱼头', 22, NOW(), (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), NULL);
 INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (9, 0x4B8, 1, '辣子炒鸡丁', 16.5, NOW(), (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), NULL);
 INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (9, 0x4B9, 1, '辣子炒肉丁', 17, NOW(), (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), NULL);
-INSERT INTO `wireless_order_db`.`order_history` (`id`, `restaurant_id`, `table_id`, `terminal_pin`, `order_date`, `total_price`, `total_price_2`, `custom_num`, `waiter`, `type`) VALUES (10, 11, 0x6B, 0x20237AB8, 20110223, 432, 430, 3, (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), 2);
+INSERT INTO `wireless_order_db`.`order_history` (`id`, `restaurant_id`, `table_id`, `terminal_pin`, `order_date`, `total_price`, `total_price_2`, `custom_num`, `waiter`, `type`,  `category`, `comment`) VALUES (10, 11, 0x6B, 0x20237AB8, 20110223, 432, 430, 3, (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), 1, 2, '中大外卖');
 INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (10, 0x4BA, 1, '辣子肉丁', 16, NOW(), (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), NULL);
 INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (10, 0x4BB, 1, '粒驻鲍鱼', 79, NOW(), (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), NULL);
 INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (10, 0x4BC, 1, '烂鸡鱼翅', 125, NOW(), (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), NULL);
 INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (10, 0x4BD, 1, '醪糟百子果羹', 36, NOW(), (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), NULL);
 INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (10, 0x4BE, 1, '老鸡蛋托黑鱼子', 35, NOW(), (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), NULL);
-INSERT INTO `wireless_order_db`.`order_history` (`id`, `restaurant_id`, `table_id`, `terminal_pin`, `order_date`, `total_price`, `total_price_2`, `custom_num`, `waiter`, `type`) VALUES (11, 11, 0x6C, 0x20237AB8, NOW(), 221, 220, 3, (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), 2);
+INSERT INTO `wireless_order_db`.`order_history` (`id`, `restaurant_id`, `table_id`, `terminal_pin`, `order_date`, `total_price`, `total_price_2`, `custom_num`, `waiter`, `type`, `category`, `comment`) VALUES (11, 11, 0x6C, 0x20237AB8, NOW(), 221, 220, 3, (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), 1, 2, '车陂外卖');
 INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (11, 0x4BF, 1.3, '烙饼', 6, NOW(), (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), NULL);
 INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (11, 0x4C0, 1, '冷茶肠', 4.5, NOW(), (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), NULL);
 INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (11, 0x4C1, 1, '冷醋鱼', 13.5, NOW(), (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), NULL);
@@ -424,7 +432,7 @@ INSERT INTO `wireless_order_db`.`order_food` (`order_id`, `food_id`, `order_coun
 INSERT INTO `wireless_order_db`.`order_food` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (40, 0x450, 5, '湛江鸡', 26, 20110412170931, '黄家声', NULL);
 INSERT INTO `wireless_order_db`.`order_food` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (40, 0x450, -5, '湛江鸡', 26, 20110412170931, '黄家声', '客人退菜');
 
-INSERT INTO `wireless_order_db`.`order` (`id`, `restaurant_id`, `table_id`, `terminal_pin`, `order_date`, `total_price`, `total_price_2`, `custom_num`, `waiter`, `type`) VALUES (41, 11, 0x65, 0x20237AB8, NOW(), 325.3, 320, 6, (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), 2);
+INSERT INTO `wireless_order_db`.`order` (`id`, `restaurant_id`, `table_id`, `terminal_pin`, `order_date`, `total_price`, `total_price_2`, `custom_num`, `waiter`, `type`, `comment`) VALUES (41, 11, 0x65, 0x20237AB8, NOW(), 325.3, 320, 6, (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), 2, '刷卡结帐');
 INSERT INTO `wireless_order_db`.`order_food` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (41, 0x451, 2.5, '东波肉', 16, NOW(), (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), NULL);
 INSERT INTO `wireless_order_db`.`order_food` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (41, 0x452, 2.2, '红烧排骨', 32, NOW(), (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), NULL);
 INSERT INTO `wireless_order_db`.`order_food` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (41, 0x453, 3.0, '清蒸桂花鱼', 29, NOW(), (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), NULL);

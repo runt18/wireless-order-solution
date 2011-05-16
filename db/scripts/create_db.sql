@@ -16,6 +16,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`restaurant` (
   `account` VARCHAR(45) NOT NULL COMMENT 'the account for the restaurant to log in' ,
   `restaurant_name` VARCHAR(50) NOT NULL DEFAULT '' COMMENT 'the restaurant name ' ,
   `restaurant_info` VARCHAR(300) NOT NULL DEFAULT '' COMMENT 'the restaurant info' ,
+  `pwd2` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the 2nd password to this restaurant, used to grant permission to change the order' ,
   `tele1` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'One of the telephones to this restaurant.' ,
   `tele2` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'One of the telephones to this restaurant.' ,
   `address` VARCHAR(70) NOT NULL DEFAULT '' COMMENT 'The address to this restaurant.' ,
@@ -66,7 +67,7 @@ COMMENT = 'This table contains the all restaurant\'s food information.';
 DROP TABLE IF EXISTS `wireless_order_db`.`order` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'the id to order' ,
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'external key associated with the  restaurant table' ,
   `order_date` DATETIME NOT NULL COMMENT 'the order\'s date and time' ,
   `total_price` DECIMAL(10,2) NULL DEFAULT NULL COMMENT 'The total price to this order.\nIts default value is NULL, means the order not be paid, otherwise means the order has been paid.' ,
@@ -74,11 +75,13 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order` (
   `custom_num` TINYINT UNSIGNED NOT NULL DEFAULT 0 ,
   `waiter` VARCHAR(45) NOT NULL COMMENT 'the waiter who operates on this order' ,
   `type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the type to pay order, it would be one of the values below.\n现金 : 1\n刷卡 : 2\n会员卡 : 3\n挂账 ：4\n签单：5' ,
+  `category` TINYINT NOT NULL DEFAULT 1 COMMENT 'the category to this order, it should be one the values below.\n一般 : 1\n外卖 : 2' ,
   `member_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the member\'s alias id' ,
   `member` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the member name' ,
   `terminal_model` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the terminal model to this order' ,
   `terminal_pin` INT NOT NULL DEFAULT 0 COMMENT 'the terminal pin to this order' ,
   `table_id` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the table alias id to this order' ,
+  `comment` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the comment to this order' ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_order_restaurant` (`restaurant_id` ASC) ,
   CONSTRAINT `fk_order_restaurant`
@@ -209,8 +212,10 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`kitchen` (
   `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name of this kitchen' ,
   `discount` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the discount to the food belong to this kitchen, range from 0.00 to 1.00' ,
   `discount_2` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the 2nd discount to the food belong to this kitchen, range from 0.00 to 1.00' ,
+  `discount_3` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the 3rd discount to the food belong to this kitchen, range from 0.00 to 1.00' ,
   `member_discount_1` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the 1st member discount to the food belong to this kitchen, range from 0.00 to 1.00' ,
   `member_discount_2` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the 2nd member discount to the food belong to this kitchen, range from 0.00 to 1.00' ,
+  `member_discount_3` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the 3rd member discount to the food belong to this kitchen, range from 0.00 to 1.00' ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_kitchen_restaurant1` (`restaurant_id` ASC) ,
   CONSTRAINT `fk_kitchen_restaurant1`
@@ -264,11 +269,13 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_history` (
   `custom_num` TINYINT UNSIGNED NOT NULL DEFAULT 0 ,
   `waiter` VARCHAR(45) NOT NULL COMMENT 'the waiter who operates on this order' ,
   `type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the type to pay order, it would be one of the values below.\n现金 : 1\n刷卡 : 2\n会员卡 : 3\n挂账 ：4\n签单：5' ,
+  `category` TINYINT NOT NULL DEFAULT 1 COMMENT 'the category to this order, it should be one the values below.\n一般 : 1\n外卖 : 2' ,
   `member_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the member\'s alias id' ,
   `member` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the member name' ,
   `terminal_model` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the terminal model to this order' ,
   `terminal_pin` INT NOT NULL DEFAULT 0 COMMENT 'the terminal pin to this order' ,
   `table_id` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the table alias id to this order' ,
+  `comment` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the comment to this order' ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_order_restaurant` (`restaurant_id` ASC) ,
   CONSTRAINT `fk_order_restaurant0`
@@ -408,6 +415,53 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food_history` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'descirbe the relationship between the order and food';
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`order_food_material`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`order_food_material` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food_material` (
+  `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this record' ,
+  `order_food_id` INT NOT NULL ,
+  `material_id` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the alias id to the material' ,
+  `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to the material' ,
+  `price` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the price to this material' ,
+  `consumption` FLOAT NOT NULL DEFAULT 0 COMMENT 'the consumption to this material' ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_order_food_material_order_food1` (`order_food_id` ASC) ,
+  CONSTRAINT `fk_order_food_material_order_food1`
+    FOREIGN KEY (`order_food_id` )
+    REFERENCES `wireless_order_db`.`order_food` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`order_food_material_history`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`order_food_material_history` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food_material_history` (
+  `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this record' ,
+  `order_food_id` INT NOT NULL ,
+  `material_id` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the alias id to the material' ,
+  `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to the material' ,
+  `price` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the price to this material' ,
+  `consumption` FLOAT NOT NULL DEFAULT 0 COMMENT 'the consumption to this material' ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_order_food_material_history_order_food_history1` (`order_food_id` ASC) ,
+  CONSTRAINT `fk_order_food_material_history_order_food_history1`
+    FOREIGN KEY (`order_food_id` )
+    REFERENCES `wireless_order_db`.`order_food_history` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
 
 
 SET SQL_MODE=@OLD_SQL_MODE;
