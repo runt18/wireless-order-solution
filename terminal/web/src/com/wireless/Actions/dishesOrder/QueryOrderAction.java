@@ -1,5 +1,9 @@
 package com.wireless.Actions.dishesOrder;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.SQLException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -8,13 +12,12 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.order.QueryOrder;
+import com.wireless.db.QueryOrder;
+import com.wireless.exception.BusinessException;
 import com.wireless.protocol.Order;
+import com.wireless.protocol.Terminal;
 import com.wireless.protocol.Util;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.List;
 
 public class QueryOrderAction extends Action {
 
@@ -41,7 +44,7 @@ public class QueryOrderAction extends Action {
 		
 		try {
 
-			Order order = QueryOrder.exec(pin, tableID);
+			Order order = QueryOrder.exec(Integer.parseInt(pin, 16), Terminal.MODEL_STAFF, tableID);
 			jsonResp = jsonResp.replace("$(result)", "true");
 
 			if (order.foods.length == 0) {
@@ -70,10 +73,16 @@ public class QueryOrderAction extends Action {
 				jsonResp = jsonResp.replace("$(value)", value);
 			}
 
-		} catch (Exception e) {
-			jsonResp = jsonResp.replace("$(result)", "false");
+		} catch (BusinessException e) {
+			jsonResp = jsonResp.replace("$(result)", "false");			
 			jsonResp = jsonResp.replace("$(value)", e.getMessage());
+			
+		}catch(SQLException e){
+			e.printStackTrace();
+			jsonResp = jsonResp.replace("$(result)", "false");
+			jsonResp = jsonResp.replace("$(value)", "数据库请求发生错误，请确认网络是否连接正常");
 		}
+
 
 		System.out.println(jsonResp);
 
