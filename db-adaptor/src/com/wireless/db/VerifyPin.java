@@ -1,71 +1,62 @@
 package com.wireless.db;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+import com.wireless.exception.BusinessException;
+import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.Terminal;
+
 
 public class VerifyPin {
 	/**
 	 * Check the terminal along with pin and model is exist or not.
-	 * Return the associated restaurant id if exist,
+	 * Return the associated terminal info if exist,
 	 * otherwise throw the exception to tell the caller. 
 	 * @param model the model id 
-	 * @pin the pin value
-	 * @throws Exception throws if the terminal with pin and model is NOT attached with any restaurant
+	 * @param pin the pin value
+	 * @return the terminal info if exist
+	 * @throws BusinessException throws if the terminal is NOT attached with any restaurant
+	 * @throws SQLException throws if fail to execute the SQL statement
 	 */
-	public static int exec(String model, String pin) throws Exception{
-		//open the database
-		Connection dbCon = null;
-		Statement stmt = null;
-		ResultSet rs = null;
-		try {   
-			Class.forName("com.mysql.jdbc.Driver");   
+	public static Terminal exec(int pin, short model) throws BusinessException, SQLException{
 		
-			dbCon = DriverManager.getConnection(Params.dbUrl, Params.dbUser, Params.dbPwd);   
-			stmt = dbCon.createStatement();   		
-			//set names to UTF-8
-			stmt.execute("SET NAMES utf8");
+
+		
+		//open the database
+		DBCon dbCon = new DBCon();;
+		try {   
 			
-			String sql = "SELECT restaurant_id FROM " +  Params.dbName + ".terminal WHERE pin=" + pin +
+			dbCon.connect();
+			
+			String sql = "SELECT restaurant_id, expire_date, owner_name, model_name FROM " +  
+					     Params.dbName + ".terminal WHERE pin=" + pin +
 						 "AND model_id=" + model;
-			rs = stmt.executeQuery(sql);
-			/**
-			 * pass to verify the token if existing in restaurant table,
-			 * otherwise fail to verify the token 
-			 */
-			if(rs.next()){
-				return rs.getInt("restaurant_id");
-			}else{
-				throw new Exception("请求的PIN(" + pin + ")无对应的餐厅");
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			Terminal terminal = new Terminal();
+			if(dbCon.rs.next()){
+				terminal.restaurant_id = dbCon.rs.getInt("restaurant_id");
+				terminal.expireDate = dbCon.rs.getDate("expire_date");
+				terminal.owner = dbCon.rs.getString("owner_name");
+				terminal.modelName = dbCon.rs.getString("model_name");
+				terminal.modelID = model;
+				terminal.pin = pin;
+				return terminal;
 			}
 			
-		}catch(ClassNotFoundException e){
-			e.printStackTrace();
-			throw new Exception("请求的PIN(" + pin + ")不成功");
-			
-		}catch(SQLException e){
-			e.printStackTrace();
-			throw new Exception("请求的PIN(" + pin + ")不成功");
+			/**
+			 * Since the restaurant id 1 through 10 is reserved for system,
+			 * throw a BusinessException with "TERMINAL_NOT_ATTACHED" 
+			 * if the restaurant id is less than 10
+			 */
+			if(terminal.restaurant_id > 10){
+				return terminal;
+			}else{
+				throw new BusinessException("The terminal is NOT attached with any restaurant.",
+										    ErrorCode.TERMINAL_NOT_ATTACHED);
+				
+			}
 			
 		}finally{
-			try{
-				if(rs != null){
-					rs.close();
-					rs = null;
-				}
-				if(stmt != null){
-					stmt.close();
-					stmt = null;
-				}
-				if(dbCon != null){
-					dbCon.close();
-					dbCon = null;
-				}
-			}catch(SQLException e){
-				System.err.println(e.toString());
-			}
+			dbCon.disconnect();
 		}
 	}
 }
