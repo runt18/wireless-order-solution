@@ -3,11 +3,15 @@ SET NAMES utf8;
 -- -----------------------------------------------------
 -- Delete all the info before creating the demo	
 -- -----------------------------------------------------
+DELETE FROM wireless_order_db.order_food_material_history WHERE order_food_id IN (SELECT id FROM wireless_order_db.order_food_history WHERE order_id IN (SELECT id FROM wireless_order_db.order_history WHERE restaurant_id=11) );
 DELETE FROM wireless_order_db.order_food_history WHERE order_id IN (SELECT id FROM wireless_order_db.order_history WHERE restaurant_id=11);
 DELETE FROM wireless_order_db.order_history WHERE restaurant_id=11;
 
+DELETE FROM wireless_order_db.order_food_material WHERE order_food_id IN (SELECT id FROM wireless_order_db.order_food WHERE order_id IN (SELECT id FROM wireless_order_db.order WHERE restaurant_id=11) );
 DELETE FROM wireless_order_db.order_food WHERE order_id IN (SELECT id FROM wireless_order_db.order WHERE restaurant_id=11);
 DELETE FROM wireless_order_db.order WHERE restaurant_id=11;
+
+DELETE FROM wireless_order_db.staff WHERE restaurant_id=11;
 
 DELETE FROM wireless_order_db.food_material WHERE food_id IN (SELECT id FROM wireless_order_db.food WHERE restaurant_id=11);
 DELETE FROM wireless_order_db.material_history WHERE material_id IN (SELECT id FROM wireless_order_db.material WHERE restaurant_id=11);
@@ -406,7 +410,6 @@ INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `or
 INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (21, 0x4C5, 1, '冷辣白菜', 10, NOW(), (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), NULL);
 INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (21, 0x452, 2, '红烧排骨', 32, NOW(), (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), NULL);
 INSERT INTO `wireless_order_db`.`order_food_history` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (21, 0x4C3, 1, '冷鸡冻', 23, NOW(), (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), NULL);
-UPDATE `wireless_order_db`.`restaurant` SET total_income=302.25+216 WHERE id=11;
 COMMIT;
 SET AUTOCOMMIT=1;
 
@@ -474,6 +477,20 @@ INSERT INTO `wireless_order_db`.`order_food` (`order_id`, `food_id`, `order_coun
 INSERT INTO `wireless_order_db`.`order_food` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (47, 0x45C, 0.5, '鲍鱼龙须', 23.5, NOW(), (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), NULL);
 INSERT INTO `wireless_order_db`.`order_food` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (47, 0x4BD, 2, '醪糟百子果羹', 36, NOW(), (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), NULL);
 INSERT INTO `wireless_order_db`.`order_food` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (47, 0x4BE, 1, '老鸡蛋托黑鱼子', 35, NOW(), (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), NULL);
+
+COMMIT;
+SET AUTOCOMMIT=1;
+
+-- -----------------------------------------------------
+-- Insert staff and associated terminal info
+-- -----------------------------------------------------
+SET AUTOCOMMIT=0;
+
+INSERT INTO `wireless_order_db`.`terminal` (`pin`, `restaurant_id`, `model_id`, `model_name`, `owner_name`) VALUES (1, 11, 0xFF, 'Staff', '张宁远');
+INSERT INTO `wireless_order_db`.`staff` (`restaurant_id`, `terminal_id`, `alias_id`, `name`, `pwd`) VALUES (11, LAST_INSERT_ID(), 1000, '张宁远', md5('staff1@123'));
+
+INSERT INTO `wireless_order_db`.`terminal` (`pin`, `restaurant_id`, `model_id`, `model_name`, `owner_name`) VALUES (2, 11, 0xFF, 'Staff', '李颖宜');
+INSERT INTO `wireless_order_db`.`staff` (`restaurant_id`, `terminal_id`, `alias_id`, `name`, `pwd`) VALUES (11, LAST_INSERT_ID(), 1000, '李颖宜', md5('staff2@123'));
 
 COMMIT;
 SET AUTOCOMMIT=1;

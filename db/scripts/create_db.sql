@@ -20,12 +20,9 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`restaurant` (
   `tele1` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'One of the telephones to this restaurant.' ,
   `tele2` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'One of the telephones to this restaurant.' ,
   `address` VARCHAR(70) NOT NULL DEFAULT '' COMMENT 'The address to this restaurant.' ,
-  `total_income` DECIMAL(15,2) NOT NULL DEFAULT 0 COMMENT 'the total income of the restaurant' ,
   `record_alive` BIGINT NOT NULL DEFAULT 0 COMMENT 'Indicates how long the order record of this restaurant can be persisted. It\'s represented in second. Value 0 means the records never expire.' ,
-  `token` VARCHAR(45) NOT NULL DEFAULT 'b60061d439af3d4cb937a0a3ddd36b34' COMMENT 'The token used for login verification in web service.' ,
   PRIMARY KEY (`id`, `account`) ,
-  UNIQUE INDEX `account_UNIQUE` (`account` ASC) ,
-  INDEX `token_index` (`token` ASC) )
+  UNIQUE INDEX `account_UNIQUE` (`account` ASC) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'describe the restaurnat\'s information';
@@ -42,7 +39,6 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food` (
   `name` VARCHAR(45) NOT NULL COMMENT 'the name of the food' ,
   `unit_price` DECIMAL(7,2) UNSIGNED NOT NULL DEFAULT 0.0 COMMENT 'the unit price of the food' ,
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'indicates the food belong to which restaurant' ,
-  `order_count` INT NOT NULL DEFAULT 0 COMMENT 'the food\'s total order count' ,
   `kitchen` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the kitchen number which the food belong to. the maximum value (255) means the food does not belong to any kitchen.' ,
   `status` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates the status to this food, the value is the combination of values below.\n特价菜 ：0x01\n推荐菜 ：0x02\n停售　 ：0x04' ,
   `img1` BINARY NULL DEFAULT NULL ,
@@ -135,10 +131,10 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`terminal` (
   `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this terminal' ,
   `pin` INT UNSIGNED NOT NULL COMMENT 'the pin to identify the phone' ,
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'indicates the terminal belong to which restaurant' ,
-  `model_id` TINYINT NOT NULL DEFAULT 0 COMMENT 'the model to this terminal.\nBlackBerry : 0x00\nAndroid : 0x01\nBrowser : 0xFF' ,
+  `model_id` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the model to this terminal.\nBlackBerry : 0x00\nAndroid : 0x01\nStaff : 0xFF' ,
   `model_name` VARCHAR(45) NULL COMMENT 'the model name to the phone' ,
   `owner_name` VARCHAR(45) NOT NULL COMMENT 'the owner name of this terminal' ,
-  `expire_date` DATE NULL DEFAULT 10000101 COMMENT 'the expired date to the phone' ,
+  `expire_date` DATE NULL DEFAULT NULL COMMENT 'the expired date to the terminal,\nNULL means never expired,' ,
   `entry_date` DATETIME NULL COMMENT 'the date to add the terminal' ,
   `idle_date` DATETIME NULL COMMENT 'the date to make the phone idle' ,
   `work_date` DATETIME NULL COMMENT 'the date to make the phone in use' ,
@@ -463,10 +459,41 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
 
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`staff`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`staff` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`staff` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `restaurant_id` INT UNSIGNED NOT NULL ,
+  `terminal_id` INT NOT NULL ,
+  `alias_id` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the alias id to this stuff' ,
+  `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to this stuff' ,
+  `pwd` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the password to this staff whose format is MD5' ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_staff_restaurant1` (`restaurant_id` ASC) ,
+  INDEX `fk_staff_terminal1` (`terminal_id` ASC) ,
+  CONSTRAINT `fk_staff_restaurant1`
+    FOREIGN KEY (`restaurant_id` )
+    REFERENCES `wireless_order_db`.`restaurant` (`id` )
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT,
+  CONSTRAINT `fk_staff_terminal1`
+    FOREIGN KEY (`terminal_id` )
+    REFERENCES `wireless_order_db`.`terminal` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COMMENT = 'the staff information ';
+
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
 
 -- -----------------------------------------------------
 -- Data for table `wireless_order_db`.`restaurant`
