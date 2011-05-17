@@ -6,10 +6,11 @@ import net.rim.device.api.system.ApplicationManagerException;
 import net.rim.device.api.system.CodeModuleManager;
 import net.rim.device.api.system.GlobalEventListener;
 import net.rim.device.api.system.SystemListener;
-import net.rim.device.api.ui.*;
+import net.rim.device.api.ui.UiApplication;
+
 import com.wireless.protocol.FoodMenu;
-import com.wireless.protocol.PinGen;
 import com.wireless.protocol.ReqOrderPackage;
+import com.wireless.protocol.Terminal;
 import com.wireless.util.ServerConnector;
 
 /**
@@ -43,7 +44,7 @@ public class WirelessOrder extends UiApplication{
 				return net.rim.device.api.system.DeviceInfo.getDeviceId();
 			}
 			public short getDeviceType(){
-				return PinGen.BLACK_BERRY;
+				return Terminal.MODEL_BB;
 			}
 		});
 	}
