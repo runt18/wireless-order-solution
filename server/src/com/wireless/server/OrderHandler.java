@@ -967,9 +967,9 @@ class OrderHandler extends Handler implements Runnable{
 				  " AND food_id=" + orderToPay.foods[i].alias_id;
 			_stmt.addBatch(sql);
 			
-			sql = "UPDATE " + WirelessSocketServer.database + 
-				  ".food SET order_count=order_count+1 WHERE alias_id=" + orderToPay.foods[i].alias_id +
-				  " AND restaurant_id=" + _restaurantID;
+//			sql = "UPDATE " + WirelessSocketServer.database + 
+//				  ".food SET order_count=order_count+1 WHERE alias_id=" + orderToPay.foods[i].alias_id +
+//				  " AND restaurant_id=" + _restaurantID;
 		}
 		_stmt.executeBatch();
 		
