@@ -1,5 +1,9 @@
 package com.wireless.Actions.tableSelect;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.SQLException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -8,12 +12,11 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.order.QueryTable;
+import com.wireless.db.QueryTable;
+import com.wireless.exception.BusinessException;
+import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Table;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.List;
+import com.wireless.protocol.Terminal;
 
 public class QueryTableAction extends Action {
 
@@ -38,7 +41,7 @@ public class QueryTableAction extends Action {
 		String jsonResp = "{success:$(result), data:'$(value)'}";
 		try {
 
-			Table[] tables = QueryTable.exec(pin);
+			Table[] tables = QueryTable.exec(Integer.parseInt(pin, 16), Terminal.MODEL_STAFF);
 			jsonResp = jsonResp.replace("$(result)", "true");
 			// format the table results into response string in the form of JSON
 			if (tables.length == 0) {
@@ -68,9 +71,18 @@ public class QueryTableAction extends Action {
 				jsonResp = jsonResp.replace("$(value)", value);
 			}
 
-		} catch (Exception e) {
+		} catch(BusinessException e){
+			e.printStackTrace();
 			jsonResp = jsonResp.replace("$(result)", "false");
-			jsonResp = jsonResp.replace("$(value)", e.getMessage());
+			if(e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED){
+				jsonResp = jsonResp.replace("$(value)", "请求获取到餐厅信息，请重新确认");				
+			}else{
+				jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅的餐台信息，请重新确认");
+			}
+		}catch(SQLException e){
+			e.printStackTrace();
+			jsonResp = jsonResp.replace("$(result)", "false");
+			jsonResp = jsonResp.replace("$(value)", "数据库请求发生错误，请确认网络是否连接正常");
 		}
 
 		out.write(jsonResp);
