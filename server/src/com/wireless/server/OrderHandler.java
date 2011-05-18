@@ -16,6 +16,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 
+import com.wireless.db.VerifyPin;
+import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodMenu;
@@ -110,36 +112,39 @@ class OrderHandler extends Handler implements Runnable{
 
 
 			
-			String sql = "SELECT restaurant_id, expire_date, owner_name FROM "
-					+ WirelessSocketServer.database + ".terminal WHERE pin="
-					+ _pin;
-			_rs = _stmt.executeQuery(sql);
+//			String sql = "SELECT restaurant_id, expire_date, owner_name FROM "
+//					+ WirelessSocketServer.database + ".terminal WHERE pin="
+//					+ _pin;
+//			_rs = _stmt.executeQuery(sql);
+//
+//			while (_rs.next()) {
+//				_restaurantID = _rs.getInt("restaurant_id");
+//				Date expiredDate = _rs.getDate("expire_date");
+//				_expiredTimeMillis = expiredDate != null ? expiredDate.getTime() : 0;
+//				_owner = _rs.getString("owner_name");
+//			}
+//			// in the case the terminal is not associated with any valid
+//			// restaurant,
+//			// the valid restaurant id is more than 10, id ranges from 1 through
+//			// 10 is reserved for system,
+//			// then throw an OrderBusinessException with "TERMINAL_NOT_ATTACHED"
+//			// error code
+//			if (_restaurantID <= 10) {
+//				throw new OrderBusinessException(
+//						"The terminal hasn't been associated with a restaurant.",
+//						ErrorCode.TERMINAL_NOT_ATTACHED);
+//			}
+//			// in the case the terminal is expired
+//			// throw an OrderBusinessException with "TERMINAL_EXPIRED" error
+//			// code
+//			if (System.currentTimeMillis() > _expiredTimeMillis) {
+//				throw new OrderBusinessException("The terminal is expired.",
+//						ErrorCode.TERMINAL_EXPIRED);
+//			}
 
-			while (_rs.next()) {
-				_restaurantID = _rs.getInt("restaurant_id");
-				Date expiredDate = _rs.getDate("expire_date");
-				_expiredTimeMillis = expiredDate != null ? expiredDate.getTime() : 0;
-				_owner = _rs.getString("owner_name");
-			}
-			// in the case the terminal is not associated with any valid
-			// restaurant,
-			// the valid restaurant id is more than 10, id ranges from 1 through
-			// 10 is reserved for system,
-			// then throw an OrderBusinessException with "TERMINAL_NOT_ATTACHED"
-			// error code
-			if (_restaurantID <= 10) {
-				throw new OrderBusinessException(
-						"The terminal hasn't been associated with a restaurant.",
-						ErrorCode.TERMINAL_NOT_ATTACHED);
-			}
-			// in the case the terminal is expired
-			// throw an OrderBusinessException with "TERMINAL_EXPIRED" error
-			// code
-			if (System.currentTimeMillis() > _expiredTimeMillis) {
-				throw new OrderBusinessException("The terminal is expired.",
-						ErrorCode.TERMINAL_EXPIRED);
-			}
-
+			Terminal term = VerifyPin.exec(_pin, _model);
+			_owner = term.owner;
+			
 			//check the header's mode and type to determine which action is performed
 			//handle query menu request
 			if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_MENU){
@@ -201,6 +206,14 @@ class OrderHandler extends Handler implements Runnable{
 			//send the response to terminal
 			send(out, response);
 			
+			
+		}catch(BusinessException e){
+			if(request != null){
+				try{
+					send(out, new RespNAK(request.header, e.errCode));
+				}catch(IOException ex){}
+			}
+			e.printStackTrace();
 			
 		}catch(OrderBusinessException e){
 			if(request != null){
