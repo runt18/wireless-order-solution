@@ -20,8 +20,11 @@ public final class Kitchen {
 	 * So the real price should be divided 100 at last. 
 	 */
 	public byte discount = 100;	
+	public byte discount_2 = 100;
+	public byte discount_3 = 100;
 	public byte member_discount_1 = 100;
 	public byte member_discount_2 = 100;
+	public byte member_discount_3 = 100;
 	
 	public String name;
 	public short alias_id = KITCHEN_NULL;
@@ -32,10 +35,13 @@ public final class Kitchen {
 		alias_id = id;
 	}
 	
-	public Kitchen(String kName, short id, byte dist, byte memDist1, byte memDist2){
+	public Kitchen(String kName, short id, byte dist1, byte dist2, byte dist3, byte memDist1, byte memDist2, byte memDist3){
 		this(kName, id);
-		discount = dist;
+		discount = dist1;
+		discount_2 = dist2;
+		discount_3 = dist3;
 		member_discount_1 = memDist1;
 		member_discount_2 = memDist2;
+		member_discount_3 = memDist3;
 	}
 }
