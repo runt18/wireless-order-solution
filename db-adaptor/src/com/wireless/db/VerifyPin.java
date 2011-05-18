@@ -14,7 +14,9 @@ public class VerifyPin {
 	 * @param model the model id 
 	 * @param pin the pin value
 	 * @return the terminal info if exist
-	 * @throws BusinessException throws if the terminal is NOT attached with any restaurant
+	 * @throws BusinessException throws if either of cases below.<br>
+	 * 							 - The terminal is NOT attached with any restaurant.<br>
+	 * 							 - The terminal is expired.
 	 * @throws SQLException throws if fail to execute the SQL statement
 	 */
 	public static Terminal exec(int pin, short model) throws BusinessException, SQLException{
@@ -48,7 +50,19 @@ public class VerifyPin {
 			 * if the restaurant id is less than 10
 			 */
 			if(terminal.restaurant_id > 10){
-				return terminal;
+				/**
+				 * Check if the terminal is expired or not.
+				 * Note that NULL means the terminal never expire
+				 */
+				if(terminal.expireDate != null){
+					if(System.currentTimeMillis() > terminal.expireDate.getTime()) {
+						throw new BusinessException("The terminal is expired.",	ErrorCode.TERMINAL_EXPIRED);
+					}else{
+						return terminal;
+					}
+				}else{
+					return terminal;
+				}
 			}else{
 				throw new BusinessException("The terminal is NOT attached with any restaurant.",
 										    ErrorCode.TERMINAL_NOT_ATTACHED);
