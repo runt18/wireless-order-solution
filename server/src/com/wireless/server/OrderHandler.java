@@ -1,15 +1,42 @@
 package com.wireless.server;
 
-import java.net.*;
-import java.io.*;
-import java.util.*;
-import com.wireless.protocol.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Date;
 
-import java.sql.Connection;   
-import java.sql.DriverManager;   
-import java.sql.ResultSet;   
-import java.sql.SQLException;   
-import java.sql.Statement;  
+import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.Food;
+import com.wireless.protocol.FoodMenu;
+import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.Mode;
+import com.wireless.protocol.Order;
+import com.wireless.protocol.ProtocolPackage;
+import com.wireless.protocol.ReqParser;
+import com.wireless.protocol.Reserved;
+import com.wireless.protocol.RespACK;
+import com.wireless.protocol.RespNAK;
+import com.wireless.protocol.RespOTAUpdate;
+import com.wireless.protocol.RespPackage;
+import com.wireless.protocol.RespQueryMenu;
+import com.wireless.protocol.RespQueryOrder;
+import com.wireless.protocol.RespQueryRestaurant;
+import com.wireless.protocol.Restaurant;
+import com.wireless.protocol.Taste;
+import com.wireless.protocol.Terminal;
+import com.wireless.protocol.Type;
+import com.wireless.protocol.Util;
 /**
  * @author yzhang
  *
@@ -22,7 +49,7 @@ class OrderHandler extends Handler implements Runnable{
     private int _restaurantID = -1;
     private long _expiredTimeMillis = 0;
     private String _owner = null;
-    private short _model = PinGen.BLACK_BERRY;
+    private short _model = Terminal.MODEL_BB;
     private int _pin = 0;
 	private Socket _conn = null;
 	private int _timeout = 10000;	//default timeout is 10s
@@ -277,14 +304,18 @@ class OrderHandler extends Handler implements Runnable{
 		_rs.close();
 		//get all the kitchen information to this restaurant,
 		ArrayList<Kitchen> kitchens = new ArrayList<Kitchen>();
-		sql = "SELECT alias_id, name, discount, member_discount_1, member_discount_2 FROM " + WirelessSocketServer.database + ".kitchen WHERE restaurant_id=" + _restaurantID;
+		sql = "SELECT alias_id, name, discount, discount_2, discount_3, member_discount_1, member_discount_2, member_discount_3 FROM " + 
+			  WirelessSocketServer.database + ".kitchen WHERE restaurant_id=" + _restaurantID;
 		_rs = _stmt.executeQuery(sql);
 		while(_rs.next()){
 			kitchens.add(new Kitchen(_rs.getString("name"),
 									  _rs.getShort("alias_id"),
 									  (byte)(_rs.getFloat("discount") * 100),
+									  (byte)(_rs.getFloat("discount_2") * 100),
+									  (byte)(_rs.getFloat("discount_3") * 100),
 									  (byte)(_rs.getFloat("member_discount_1") * 100),
-									  (byte)(_rs.getFloat("member_discount_2") * 100)));
+									  (byte)(_rs.getFloat("member_discount_2") * 100),
+									  (byte)(_rs.getFloat("member_discount_3") * 100)));
 		}
 		
 		//Get the taste preferences to this restaurant sort by alias id in ascend order.
