@@ -20,7 +20,7 @@ public class QueryTable {
 	 */
 	public static Table[] exec(int pin, short model) throws BusinessException, SQLException{
 		
-		Terminal terminal = VerifyPin.exec(pin, model);
+		Terminal term = VerifyPin.exec(pin, model);
 
 		DBCon dbCon = new DBCon();
 
@@ -33,10 +33,11 @@ public class QueryTable {
 			//get the idle tables
 			String sql = "SELECT table_id FROM " + Params.dbName + ".order a WHERE id = (SELECT max(id) FROM " + 
 						Params.dbName + ".order b WHERE a.table_id = b.table_id AND a.restaurant_id=b.restaurant_id) " +
-						"AND total_price IS NOT NULL AND restaurant_id=" + terminal.restaurant_id;
+						"AND total_price IS NOT NULL AND restaurant_id=" + term.restaurant_id;
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while(dbCon.rs.next()){
 				Table idleTable = new Table();
+				idleTable.restaurant_id = term.restaurant_id;
 				idleTable.alias_id = dbCon.rs.getShort(1);
 				idleTable.status = Table.TABLE_IDLE;
 				tables.add(idleTable);
@@ -44,10 +45,11 @@ public class QueryTable {
 			dbCon.rs.close();
 			
 			sql = "SELECT alias_id FROM " + Params.dbName + ".table WHERE alias_id NOT IN (SELECT distinct table_id FROM " +
-					Params.dbName + ".order WHERE restaurant_id=" + terminal.restaurant_id + ")" + " AND restaurant_id=" + terminal.restaurant_id;
+					Params.dbName + ".order WHERE restaurant_id=" + term.restaurant_id + ")" + " AND restaurant_id=" + term.restaurant_id;
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while(dbCon.rs.next()){
 				Table idleTable = new Table();
+				idleTable.restaurant_id = term.restaurant_id;
 				idleTable.alias_id = dbCon.rs.getShort(1);
 				tables.add(idleTable);
 			}
@@ -56,11 +58,12 @@ public class QueryTable {
 			//get the busy tables
 			sql = "SELECT table_id, custom_num FROM " + Params.dbName + ".order a WHERE id=(SELECT max(id) FROM " + Params.dbName + 
 				".order b WHERE a.table_id = b.table_id and a.restaurant_id=b.restaurant_id) and total_price IS NULL AND restaurant_id="+
-				terminal.restaurant_id;
+				term.restaurant_id;
 			
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while(dbCon.rs.next()){
 				Table busyTable = new Table();
+				busyTable.restaurant_id = term.restaurant_id;
 				busyTable.alias_id = dbCon.rs.getShort("table_id");
 				busyTable.custom_num = dbCon.rs.getShort("custom_num");
 				busyTable.status = Table.TABLE_BUSY;
@@ -110,6 +113,7 @@ public class QueryTable {
 					   " AND total_price IS NULL";
 				 dbCon.rs = dbCon.stmt.executeQuery(sql);
 				 Table table = new Table();
+				 table.restaurant_id = term.restaurant_id;
 				 table.alias_id = tableID;
 				 
 				 if(dbCon.rs.next()){

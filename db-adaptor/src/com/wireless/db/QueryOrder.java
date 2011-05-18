@@ -7,20 +7,32 @@ import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
-import com.wireless.protocol.Terminal;
+import com.wireless.protocol.Table;
 
 public class QueryOrder {
 	
+	/**
+	 * Get the order detail information to the specific table alias id.
+	 * @param pin the pin to the terminal
+	 * @param model the model id to the terminal
+	 * @param tableID the table alias id to query
+	 * @return Order the order detail information
+	 * @throws BusinessException throws if one of cases below.<br>
+	 * 							 - The terminal is NOT attached to any restaurant.<br>
+	 * 							 - The table to query does NOT exist.<br>
+	 * 							 - The table to query is idle.
+	 * @throws SQLException throws if fail to execute any SQL statement.
+	 */
 	public static Order exec(int pin, short model, short tableID) throws BusinessException, SQLException{
 		
-		Terminal term = VerifyPin.exec(pin, model);
+		Table table = QueryTable.exec(pin, model, tableID);
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			//query the order id associated with the this table
 			String sql = "SELECT id FROM `" + Params.dbName + 
 						"`.`order` WHERE table_id = " + tableID +
-						" AND restaurant_id = " + term.restaurant_id +
+						" AND restaurant_id = " + table.restaurant_id +
 						" AND total_price IS NULL";
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			if(dbCon.rs.next()){

@@ -29,7 +29,7 @@ public class VerifyPin {
 			
 			String sql = "SELECT restaurant_id, expire_date, owner_name, model_name FROM " +  
 					     Params.dbName + ".terminal WHERE pin=" + pin +
-						 "AND model_id=" + model;
+						 " AND model_id=" + model;
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			Terminal terminal = new Terminal();
 			if(dbCon.rs.next()){
