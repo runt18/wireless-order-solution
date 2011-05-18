@@ -24,9 +24,10 @@ include("changePassword.php");
 include("conn.php");
 mysql_query("SET NAMES utf8"); 
 $target = $_REQUEST["target"];
+$statType = $_REQUEST["statType"];
 ?>
 <div id="divSearch">
-	<form id="searchForm" action="<?PHP echo $target; ?>" method="post">
+	<form id="searchForm" action="<?PHP echo $target."?statType=".$statType; ?>" method="post">
 	<input id="editType" type="hidden" name="editType" value="viewStat"></input>
 	 <div style="text-align:center">
 		日期：<input type="text" id="dateFrom" name="dateFrom" style="width:136px" onclick="javascript:ShowCalendar(this.id)" />
