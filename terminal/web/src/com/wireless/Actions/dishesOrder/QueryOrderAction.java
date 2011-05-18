@@ -14,6 +14,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.QueryOrder;
 import com.wireless.exception.BusinessException;
+import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.Terminal;
 import com.wireless.protocol.Util;
@@ -38,6 +39,9 @@ public class QueryOrderAction extends Action {
 		}
 
 		String pin = request.getParameter("pin");
+		if(pin.startsWith("0x") || pin.startsWith("0X")){
+			pin = pin.substring(2);
+		}
 		short tableID = Short.parseShort(request.getParameter("tableID"));
 
 		String jsonResp = "{success:$(result), data:'$(value)'}";
@@ -73,9 +77,20 @@ public class QueryOrderAction extends Action {
 				jsonResp = jsonResp.replace("$(value)", value);
 			}
 
-		} catch (BusinessException e) {
-			jsonResp = jsonResp.replace("$(result)", "false");			
-			jsonResp = jsonResp.replace("$(value)", e.getMessage());
+		}catch(BusinessException e) {
+			jsonResp = jsonResp.replace("$(result)", "false");		
+			if(e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED){
+				jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");	
+				
+			}else if(e.errCode == ErrorCode.TABLE_NOT_EXIST){
+				jsonResp = jsonResp.replace("$(value)", tableID + "号台餐台信息不存在，请重新确认");	
+				
+			}else if(e.errCode == ErrorCode.TABLE_IDLE){
+				jsonResp = jsonResp.replace("$(value)", tableID + "号台餐台信息还未下单，请重新确认");	
+				
+			}else{
+				jsonResp = jsonResp.replace("$(value)", "没有获取到" + tableID + "号台的账单信息，请重新确认");	
+			}
 			
 		}catch(SQLException e){
 			e.printStackTrace();

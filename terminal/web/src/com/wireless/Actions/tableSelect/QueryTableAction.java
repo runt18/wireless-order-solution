@@ -37,6 +37,9 @@ public class QueryTableAction extends Action {
 		}
 
 		String pin = request.getParameter("pin");
+		if(pin.startsWith("0x") || pin.startsWith("0X")){
+			pin = pin.substring(2);
+		}
 
 		String jsonResp = "{success:$(result), data:'$(value)'}";
 		try {
@@ -75,7 +78,7 @@ public class QueryTableAction extends Action {
 			e.printStackTrace();
 			jsonResp = jsonResp.replace("$(result)", "false");
 			if(e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED){
-				jsonResp = jsonResp.replace("$(value)", "请求获取到餐厅信息，请重新确认");				
+				jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");				
 			}else{
 				jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅的餐台信息，请重新确认");
 			}
