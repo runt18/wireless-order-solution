@@ -3,5 +3,6 @@
 	<classpathentry excluding="**/.svn/**" kind="src" path="src"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="protocol"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
