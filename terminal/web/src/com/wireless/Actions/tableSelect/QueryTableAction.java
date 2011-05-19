@@ -26,24 +26,19 @@ public class QueryTableAction extends Action {
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 
-		// 解决后台中文传到前台乱码
-		response.setContentType("text/json; charset=utf-8");
-
 		PrintWriter out = null;
-		try {
-			out = response.getWriter();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		String pin = request.getParameter("pin");
-		if(pin.startsWith("0x") || pin.startsWith("0X")){
-			pin = pin.substring(2);
-		}
 
 		String jsonResp = "{success:$(result), data:'$(value)'}";
 		try {
-
+			// 解决后台中文传到前台乱码
+			response.setContentType("text/json; charset=utf-8");
+			out = response.getWriter();
+			
+			String pin = request.getParameter("pin");
+			if(pin.startsWith("0x") || pin.startsWith("0X")){
+				pin = pin.substring(2);
+			}
+			
 			Table[] tables = QueryTable.exec(Integer.parseInt(pin, 16), Terminal.MODEL_STAFF);
 			jsonResp = jsonResp.replace("$(result)", "true");
 			// format the table results into response string in the form of JSON
@@ -86,9 +81,15 @@ public class QueryTableAction extends Action {
 			e.printStackTrace();
 			jsonResp = jsonResp.replace("$(result)", "false");
 			jsonResp = jsonResp.replace("$(value)", "数据库请求发生错误，请确认网络是否连接正常");
+			
+		}catch(IOException e){
+			e.printStackTrace();
+			
+		}finally{
+			//Just for debug
+			System.out.println(jsonResp);
+			out.write(jsonResp);
 		}
-
-		out.write(jsonResp);
 		return null;
 	}
 

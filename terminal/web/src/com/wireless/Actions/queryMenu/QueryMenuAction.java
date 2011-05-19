@@ -1,0 +1,194 @@
+package com.wireless.Actions.queryMenu;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.SQLException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.struts.action.Action;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+
+import com.wireless.db.QueryMenu;
+import com.wireless.exception.BusinessException;
+import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.Food;
+import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.Taste;
+import com.wireless.protocol.Terminal;
+import com.wireless.protocol.Util;
+
+public class QueryMenuAction extends Action {
+	public ActionForward execute(ActionMapping mapping, ActionForm form,
+								 HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+		String jsonResp = "{success:$(result), data:'$(value)'}";
+		
+		PrintWriter out = null;
+		try {
+			// 解决后台中文传到前台乱码
+			response.setContentType("text/json; charset=utf-8");
+			out = response.getWriter();
+			
+			String pin = request.getParameter("pin");
+			if(pin.startsWith("0x") || pin.startsWith("0X")){
+				pin = pin.substring(2);
+			}
+			/**
+			 * The value to type means which item to query.
+			 * 1 - Food
+			 * 2 - Taste
+			 * 3 - Kitchen
+			 */
+			short type = Short.parseShort(request.getParameter("type"));
+			
+			if(type == 1){
+				Food[] foods = QueryMenu.execFoods(Integer.parseInt(pin, 16), Terminal.MODEL_STAFF);
+				jsonResp = jsonResp.replace("$(value)", toJson(foods));
+				
+			}else if(type == 2){
+				Taste[] tastes = QueryMenu.execTastes(Integer.parseInt(pin, 16), Terminal.MODEL_STAFF);
+				jsonResp = jsonResp.replace("$(value)", toJson(tastes));
+				
+			}else if(type == 3){
+				Kitchen[] kitchens = QueryMenu.execKitchens(Integer.parseInt(pin, 16), Terminal.MODEL_STAFF);
+				jsonResp = jsonResp.replace("$(value)", toJson(kitchens));
+				
+			}else{
+				throw new BusinessException(ErrorCode.UNKNOWN);
+			}
+			
+			jsonResp = jsonResp.replace("$(result)", "true");
+
+
+		}catch(BusinessException e) {
+			e.printStackTrace();
+			jsonResp = jsonResp.replace("$(result)", "false");		
+			if(e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED){
+				jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");	
+				
+			}else if(e.errCode == ErrorCode.TERMINAL_EXPIRED){
+				jsonResp = jsonResp.replace("$(value)", "终端已过期，请重新确认");	
+				
+			}else{
+				jsonResp = jsonResp.replace("$(value)", "没有获取到菜谱信息，请重新确认");	
+			}
+			
+		}catch(SQLException e){
+			e.printStackTrace();
+			jsonResp = jsonResp.replace("$(result)", "false");
+			jsonResp = jsonResp.replace("$(value)", "数据库请求发生错误，请确认网络是否连接正常");
+			
+		}catch(IOException e){
+			e.printStackTrace();
+			
+		}finally{
+			//just for debug
+			System.out.println(jsonResp);
+			out.write(jsonResp);			
+		}
+		return null;
+	}
+	
+	/**
+	 * Convert the foods to jasn format
+	 * @param foods
+	 * @return
+	 */
+	private String toJson(Food[] foods){
+		if(foods.length == 0){
+			return "";
+		}else{
+			StringBuffer value = new StringBuffer();
+			for (int i = 0; i < foods.length; i++) {
+				/**
+				 * The json format to each food item looks like below.
+				 * [厨房编号,"菜品名称",菜品编号,"￥菜品单价"]
+				 */
+				String jsonFood = "[$(kitchen_id),\"$(name)\",$(alias_id),\"$(unit)\"]";
+				jsonFood = jsonFood.replace("$(kitchen_id)", new Short(foods[i].kitchen).toString());
+				jsonFood = jsonFood.replace("$(name)", foods[i].name);
+				jsonFood = jsonFood.replace("$(alias_id)", new Integer(foods[i].alias_id).toString());
+				jsonFood = jsonFood.replace("$(unit)", Util.price2String(foods[i].price, Util.INT_MASK_2));
+
+				// put each json food info to the value
+				value.append(jsonFood);
+				// the string is separated by comma
+				if (i != foods.length - 1) {
+					value.append("，");
+				}
+			}
+			return value.toString();
+		}
+	}
+	
+	/**
+	 * Convert the taste to json format
+	 * @param tastes
+	 * @return
+	 */
+	private String toJson(Taste[] tastes){
+		if(tastes.length == 0){
+			return "";
+		}else{
+			StringBuffer value = new StringBuffer();
+			for(int i = 0; i < tastes.length; i++){				
+				/**
+				 * The json format to each taste item looks like below.
+				 * [口味编号,"口味名称","￥口味单价"]
+				 */
+				String jsonTaste = "[$(taste_id),\"$(preference)\",\"$(unit)\"]";
+				jsonTaste.replace("$(taste_id)", new Short(tastes[i].alias_id).toString());
+				jsonTaste.replace("$(preference)", tastes[i].preference);
+				jsonTaste.replace("$(unit)", Util.price2String(tastes[i].price, Util.INT_MASK_2));
+				
+				// put each json taste info to the value
+				value.append(jsonTaste);
+				// the string is separated by comma
+				if (i != tastes.length - 1) {
+					value.append("，");
+				}
+			}
+			return value.toString();
+		}
+	}
+	
+	/**
+	 * Convert the kitchen to json format
+	 * @param kitchens
+	 * @return
+	 */
+	private String toJson(Kitchen[] kitchens){
+		if(kitchens.length == 0){
+			return "";			
+		}else{
+			StringBuffer value = new StringBuffer();
+			for(int i = 0; i < kitchens.length; i++){
+				/**
+				 * The json format to each kitchen looks like below.
+				 * [厨房编号,"厨房名称",一般折扣1,一般折扣2,一般折扣3,会员折扣1,会员折扣2,会员折扣3]
+				 */
+				String jsonKitchen = "[$(kitchen_id),\"$(name)\",$(dist1),$(dist2),$(dist3),$(memDist1),$(memDist2),$(memDist3)]";
+				jsonKitchen.replace("$(kitchen_id)", new Short(kitchens[i].alias_id).toString());
+				jsonKitchen.replace("$(name)", kitchens[i].name);
+				jsonKitchen.replace("$(dist1)", new Float((float)kitchens[i].discount / 100).toString());
+				jsonKitchen.replace("$(dist2)", new Float((float)kitchens[i].discount_2 / 100).toString());
+				jsonKitchen.replace("$(dist3)", new Float((float)kitchens[i].discount_3 / 100).toString());
+				jsonKitchen.replace("$(memDist1)", new Float((float)kitchens[i].member_discount_1 / 100).toString());
+				jsonKitchen.replace("$(memDist2)", new Float((float)kitchens[i].member_discount_2 / 100).toString());
+				jsonKitchen.replace("$(memDist3)", new Float((float)kitchens[i].member_discount_3 / 100).toString());
+				
+				// put each json kitchen info to the value
+				value.append(jsonKitchen);
+				// the string is separated by comma
+				if (i != kitchens.length - 1) {
+					value.append("，");
+				}
+			}
+			return value.toString();
+		}
+	}
+}

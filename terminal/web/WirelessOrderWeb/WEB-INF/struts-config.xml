@@ -10,6 +10,9 @@
 		<action path="/QueryOrder" type="com.wireless.Actions.dishesOrder.QueryOrderAction"
 			scope="request">
 		</action>
+		<action path="/QueryMenu" type="com.wireless.Actions.queryMenu.QueryMenuAction"
+			scope="request">
+		</action>
 	</action-mappings>
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
 </struts-config>

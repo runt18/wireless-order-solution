@@ -28,27 +28,21 @@ public class QueryOrderAction extends Action {
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 
-		// 解决后台中文传到前台乱码
-		response.setContentType("text/json; charset=utf-8");
-
+		short tableID = 0;
+		String jsonResp = "{success:$(result), data:'$(value)'}";
 		PrintWriter out = null;
 		try {
+			// 解决后台中文传到前台乱码
+			response.setContentType("text/json; charset=utf-8");
 			out = response.getWriter();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		String pin = request.getParameter("pin");
-		if(pin.startsWith("0x") || pin.startsWith("0X")){
-			pin = pin.substring(2);
-		}
-		short tableID = Short.parseShort(request.getParameter("tableID"));
-
-		String jsonResp = "{success:$(result), data:'$(value)'}";
-		
-		try {
-
+			
+			String pin = request.getParameter("pin");
+			if(pin.startsWith("0x") || pin.startsWith("0X")){
+				pin = pin.substring(2);
+			}
+			tableID = Short.parseShort(request.getParameter("tableID"));
 			Order order = QueryOrder.exec(Integer.parseInt(pin, 16), Terminal.MODEL_STAFF, tableID);
+			
 			jsonResp = jsonResp.replace("$(result)", "true");
 
 			if (order.foods.length == 0) {
@@ -78,6 +72,7 @@ public class QueryOrderAction extends Action {
 			}
 
 		}catch(BusinessException e) {
+			e.printStackTrace();
 			jsonResp = jsonResp.replace("$(result)", "false");		
 			if(e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED){
 				jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");	
@@ -96,12 +91,16 @@ public class QueryOrderAction extends Action {
 			e.printStackTrace();
 			jsonResp = jsonResp.replace("$(result)", "false");
 			jsonResp = jsonResp.replace("$(value)", "数据库请求发生错误，请确认网络是否连接正常");
+			
+		}catch(IOException e){
+			e.printStackTrace();
+			
+		}finally{
+			//just for debug
+			System.out.println(jsonResp);
+			out.write(jsonResp);
 		}
 
-
-		System.out.println(jsonResp);
-
-		out.write(jsonResp);
 		return null;
 	}
 
