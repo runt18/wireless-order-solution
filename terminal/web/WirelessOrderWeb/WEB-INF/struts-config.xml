@@ -10,7 +10,7 @@
 		<action path="/QueryOrder" type="com.wireless.Actions.dishesOrder.QueryOrderAction"
 			scope="request">
 		</action>
-		<action path="/QueryMenu" type="com.wireless.Actions.queryMenu.QueryMenuAction"
+		<action path="/QueryMenu" type="com.wireless.Actions.dishesOrder.QueryMenuAction"
 			scope="request">
 		</action>
 	</action-mappings>
