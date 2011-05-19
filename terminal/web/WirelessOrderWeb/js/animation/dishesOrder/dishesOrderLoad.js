@@ -109,6 +109,7 @@ function orderedDishesOnLoad() {
 		success : function(response, options) {
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
 			if (resultJSON.success == true) {
+				if(resultJSON.data != "NULL"){
 				var josnData = resultJSON.data;
 				var orderList = josnData.split("，");
 				for ( var i = 0; i < orderList.length; i++) {
@@ -128,6 +129,7 @@ function orderedDishesOnLoad() {
 											orderInfo[3].length - 2) ]);
 				}
 				orderedStore.reload();
+				}
 			} else {
 				var dataInfo = resultJSON.data;
 				// Ext.Msg.alert(tableData);
@@ -157,13 +159,12 @@ function orderedMenuOnLoad() {
 			if (resultJSON.success == true) {
 				var josnData = resultJSON.data;
 				 var menuList = josnData.split("，");
-				 for ( var i = 0; i < orderList.length; i++) {
+				 for ( var i = 0; i < menuList.length; i++) {
 				 var menuInfo = menuList[i].substr(1,
 						 menuList[i].length - 2).split(",");
 				 //格式：[菜名，菜名编号，菜名拼音，单价]
 				 //后台格式：[厨房编号,"菜品名称",菜品编号,"菜品拼音","￥菜品单价"]
-				 dishesDisplayData.push
-				 .push([
+				 dishesDisplayData.push([
 				 menuInfo[1].substr(1,
 						 menuInfo[1].length - 2),
 						 menuInfo[2],
@@ -172,7 +173,12 @@ function orderedMenuOnLoad() {
 								 menuInfo[4].substr(1,
 										 menuInfo[4].length - 2) ]);
 				 }
-				 dishesDisplayData.reload();
+				 for ( var i = 0; i < dishesDisplayData.length; i++) {
+						dishesDisplayDataShow.push( [ dishesDisplayData[i][0],
+								dishesDisplayData[i][1], dishesDisplayData[i][2],
+								dishesDisplayData[i][3] ]);
+					}
+				 dishesDisplayStore.reload();
 			}
 		},
 		failure : function(response, options) {

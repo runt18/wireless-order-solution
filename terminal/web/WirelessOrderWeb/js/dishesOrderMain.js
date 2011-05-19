@@ -515,12 +515,6 @@ softKeyBoardDO = new Ext.Window( {
 //dishesDisplayData.push( [ "酸菜鱼", 1768, "SCY", "￥35.1" ]);
 //dishesDisplayData.push( [ "京酱肉丝", 2688, "JJRS", "￥50" ]);
 
-for ( var i = 0; i < dishesDisplayData.length; i++) {
-	dishesDisplayDataShow.push( [ dishesDisplayData[i][0],
-			dishesDisplayData[i][1], dishesDisplayData[i][2],
-			dishesDisplayData[i][3] ]);
-}
-
 // 2，表格的数据store
 var dishesDisplayStore = new Ext.data.Store( {
 	proxy : new Ext.data.MemoryProxy(dishesDisplayDataShow),
