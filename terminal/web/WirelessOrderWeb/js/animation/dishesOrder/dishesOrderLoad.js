@@ -150,7 +150,8 @@ function orderedMenuOnLoad() {
 	Ext.Ajax.request({
 		url : "../QueryMenu.do",
 		params : {
-			"pin" : Request["pin"]
+			"pin" : Request["pin"],
+			"type" : "1"
 		},
 		success : function(response, options) {
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
