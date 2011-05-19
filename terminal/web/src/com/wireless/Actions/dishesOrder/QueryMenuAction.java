@@ -106,12 +106,13 @@ public class QueryMenuAction extends Action {
 			for (int i = 0; i < foods.length; i++) {
 				/**
 				 * The json format to each food item looks like below.
-				 * [厨房编号,"菜品名称",菜品编号,"￥菜品单价"]
+				 * [厨房编号,"菜品名称",菜品编号,"菜品拼音","￥菜品单价"]
 				 */
-				String jsonFood = "[$(kitchen_id),\"$(name)\",$(alias_id),\"$(unit)\"]";
+				String jsonFood = "[$(kitchen_id),\"$(name)\",$(alias_id),\"$(pinyin)\"\"$(unit)\"]";
 				jsonFood = jsonFood.replace("$(kitchen_id)", new Short(foods[i].kitchen).toString());
 				jsonFood = jsonFood.replace("$(name)", foods[i].name);
 				jsonFood = jsonFood.replace("$(alias_id)", new Integer(foods[i].alias_id).toString());
+				jsonFood = jsonFood.replace("$(pinyin)", "");
 				jsonFood = jsonFood.replace("$(unit)", Util.price2String(foods[i].price, Util.INT_MASK_2));
 
 				// put each json food info to the value

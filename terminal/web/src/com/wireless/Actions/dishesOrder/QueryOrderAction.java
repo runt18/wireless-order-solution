@@ -73,17 +73,21 @@ public class QueryOrderAction extends Action {
 
 		}catch(BusinessException e) {
 			e.printStackTrace();
-			jsonResp = jsonResp.replace("$(result)", "false");		
+					
 			if(e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED){
+				jsonResp = jsonResp.replace("$(result)", "false");
 				jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");	
 				
 			}else if(e.errCode == ErrorCode.TABLE_NOT_EXIST){
+				jsonResp = jsonResp.replace("$(result)", "false");
 				jsonResp = jsonResp.replace("$(value)", tableID + "号台餐台信息不存在，请重新确认");	
 				
 			}else if(e.errCode == ErrorCode.TABLE_IDLE){
-				jsonResp = jsonResp.replace("$(value)", tableID + "号台餐台信息还未下单，请重新确认");	
+				jsonResp = jsonResp.replace("$(result)", "true");
+				jsonResp = jsonResp.replace("$(value)", "NULL");	
 				
 			}else{
+				jsonResp = jsonResp.replace("$(result)", "false");
 				jsonResp = jsonResp.replace("$(value)", "没有获取到" + tableID + "号台的账单信息，请重新确认");	
 			}
 			
