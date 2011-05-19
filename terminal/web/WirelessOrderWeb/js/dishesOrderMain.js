@@ -581,6 +581,9 @@ var dishesDisplayGrid = new Ext.grid.GridPanel( {
 			orderedData.push( [ dishCurrName, "无口味", dishCurrCount,
 					dishCurrPrice, "", dishCurrPrice ]);
 			orderedStore.reload();
+		},
+		render : function(thiz) {
+			orderedMenuOnLoad();
 		}
 	}
 });

@@ -134,3 +134,40 @@ function orderedDishesOnLoad() {
 		}
 	});
 };
+
+// 菜谱
+function orderedMenuOnLoad(){
+	var Request = new URLParaQuery();
+	Ext.Ajax.request({
+		url : "../QueryMenu.do",
+		params : {
+			"pin" : Request["pin"]
+		},
+		success : function(response, options) {
+			var resultJSON = Ext.util.JSON.decode(response.responseText);
+			if (resultJSON.success == true) {
+				var josnData = resultJSON.data;
+//				var orderList = josnData.split("，");
+//				for ( var i = 0; i < orderList.length; i++) {
+//					var orderInfo = orderList[i].substr(1,
+//							orderList[i].length - 2).split(",");
+//					orderedData
+//							.push([
+//									orderInfo[0].substr(1,
+//											orderInfo[0].length - 2),
+//									orderInfo[1].substr(1,
+//											orderInfo[1].length - 2),
+//									orderInfo[2],
+//									orderInfo[3].substr(1,
+//											orderInfo[3].length - 2),
+//									"",
+//									orderInfo[3].substr(1,
+//											orderInfo[3].length - 2) ]);
+//				}
+//				orderedStore.reload();
+			}
+		},
+		failure : function(response, options) {
+		}
+	});
+};
