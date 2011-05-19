@@ -14,14 +14,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Date;
 
+import com.wireless.db.QueryMenu;
+import com.wireless.db.QueryOrder;
+import com.wireless.db.QueryRestaurant;
+import com.wireless.db.QueryTable;
 import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.FoodMenu;
-import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Mode;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.ProtocolPackage;
@@ -34,7 +35,7 @@ import com.wireless.protocol.RespPackage;
 import com.wireless.protocol.RespQueryMenu;
 import com.wireless.protocol.RespQueryOrder;
 import com.wireless.protocol.RespQueryRestaurant;
-import com.wireless.protocol.Restaurant;
+import com.wireless.protocol.Table;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Terminal;
 import com.wireless.protocol.Type;
@@ -49,7 +50,6 @@ class OrderHandler extends Handler implements Runnable{
     private Statement _stmt = null;
     private ResultSet _rs = null;
     private int _restaurantID = -1;
-    private long _expiredTimeMillis = 0;
     private String _owner = null;
     private short _model = Terminal.MODEL_BB;
     private int _pin = 0;
@@ -143,27 +143,43 @@ class OrderHandler extends Handler implements Runnable{
 //			}
 
 			Terminal term = VerifyPin.exec(_pin, _model);
+			_restaurantID = term.restaurant_id;
 			_owner = term.owner;
 			
 			//check the header's mode and type to determine which action is performed
 			//handle query menu request
 			if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_MENU){
-				FoodMenu foodMenu = execQueryMenu(request);
-				response = new RespQueryMenu(request.header, foodMenu);
+				//FoodMenu foodMenu = execQueryMenu(request);
+				//response = new RespQueryMenu(request.header, foodMenu);
+				response = new RespQueryMenu(request.header, QueryMenu.exec(term.pin, term.modelID));
 
 				//handle query restaurant request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_RESTAURANT){
-				response = new RespQueryRestaurant(request.header, execQueryRestaurant(request));
+				//response = new RespQueryRestaurant(request.header, execQueryRestaurant(request));
+				response = new RespQueryRestaurant(request.header, QueryRestaurant.exec(term.pin, term.modelID));
 
 				//handle query order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_ORDER){
-				response = new RespQueryOrder(request.header, execQueryOrder(request));
+				//response = new RespQueryOrder(request.header, execQueryOrder(request));
+				short tableToQuery = ReqParser.parseQueryOrder(request);
+				response = new RespQueryOrder(request.header, QueryOrder.exec(term.pin, term.modelID, tableToQuery));
 
 				//handle query order 2 request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_ORDER_2){
-				execQueryOrder2(request);
-				response = new RespACK(request.header);
-
+				//execQueryOrder2(request);
+				//response = new RespACK(request.header);
+				short tableToQuery = ReqParser.parseQueryOrder(request);
+				Table table = QueryTable.exec(term.pin, term.modelID, tableToQuery);
+				if(table.status == Table.TABLE_BUSY){
+					response = new RespACK(request.header);
+					
+				}else if(table.status == Table.TABLE_IDLE){
+					response = new RespNAK(request.header, ErrorCode.TABLE_IDLE);
+					
+				}else{
+					response = new RespNAK(request.header, ErrorCode.UNKNOWN);
+				}
+				
 				//handle insert order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.INSERT_ORDER){
 
@@ -300,7 +316,7 @@ class OrderHandler extends Handler implements Runnable{
 	 * @return the food menu containing the foods and tastes information if succeed to request
 	 * @throws SQLException if execute the SQL statements fail		   
 	 */
-	private FoodMenu execQueryMenu(ProtocolPackage req) throws SQLException{
+/*	private FoodMenu execQueryMenu(ProtocolPackage req) throws SQLException{
 		ArrayList<Food> foods = new ArrayList<Food>();
         //get all the food information to this restaurant
 		String sql = "SELECT alias_id, name, unit_price, kitchen FROM " + WirelessSocketServer.database + ".food WHERE restaurant_id=" + _restaurantID +
@@ -348,7 +364,7 @@ class OrderHandler extends Handler implements Runnable{
 		return new FoodMenu(foods.toArray(new Food[foods.size()]), 
 						    tastes.toArray(new Taste[tastes.size()]),
 						    kitchens.toArray(new Kitchen[kitchens.size()]));
-	}
+	}*/
 
 	/**
 	 * Access the db to get the restaurant information
@@ -356,7 +372,7 @@ class OrderHandler extends Handler implements Runnable{
 	 * @return the restaurant information
 	 * @throws SQLException if execute the SQL statements fail
 	 */
-	private Restaurant execQueryRestaurant(ProtocolPackage req) throws SQLException{
+/*	private Restaurant execQueryRestaurant(ProtocolPackage req) throws SQLException{
 		Restaurant restaurant = new Restaurant();
 		restaurant.owner = _owner;
 		
@@ -369,9 +385,9 @@ class OrderHandler extends Handler implements Runnable{
 			restaurant.name = _rs.getString("restaurant_name");
 			restaurant.info = _rs.getString("restaurant_info");
 		}
-		/**
+		*//**
 		 * if the corresponding info not be found, then get the root's info as common
-		 */
+		 *//*
 		if(restaurant.info.isEmpty()){
 			sql = "SELECT restaurant_info FROM " + WirelessSocketServer.database + "." +
 						"restaurant WHERE id=" + Restaurant.ADMIN;
@@ -381,7 +397,7 @@ class OrderHandler extends Handler implements Runnable{
 			}
 		}			
 		return restaurant;
-	}
+	}*/
 	
 	/**
 	 * Access the db to query order according the table, 
@@ -391,13 +407,13 @@ class OrderHandler extends Handler implements Runnable{
 	 * @throws SQLException if execute the SQL statements fail
 	 * @throws OrderBusinessException if the table to query or the order to query doesn't exist.
 	 */
-	private Order execQueryOrder(ProtocolPackage req) throws SQLException, OrderBusinessException{
+/*	private Order execQueryOrder(ProtocolPackage req) throws SQLException, OrderBusinessException{
 		short tableToQuery = ReqParser.parseQueryOrder(req);
 		
 		int orderID = getUnPaidOrderID(tableToQuery);
 
 		return getOrderByID(orderID);
-	}
+	}*/
 	
 	/**
 	 * Access the db to check if the table has been order or not, 
@@ -406,10 +422,10 @@ class OrderHandler extends Handler implements Runnable{
 	 * @throws SQLException if execute the SQL statements fail
 	 * @throws OrderBusinessException if the table to query or the order to query doesn't exist.
 	 */
-	private void execQueryOrder2(ProtocolPackage req) throws SQLException, OrderBusinessException{
+/*	private void execQueryOrder2(ProtocolPackage req) throws SQLException, OrderBusinessException{
 		short tableToQuery = ReqParser.parseQueryOrder(req);
 		getUnPaidOrderID(tableToQuery);
-	}
+	}*/
 	
 	/**
 	 * Access the db to insert the order, and then connect the print server to print the order.
