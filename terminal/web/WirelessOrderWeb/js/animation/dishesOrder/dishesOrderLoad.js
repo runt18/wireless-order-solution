@@ -100,7 +100,6 @@ function tableStuLoad() {
 // orderedData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "", "￥56.2" ]);
 function orderedDishesOnLoad() {
 	var Request = new URLParaQuery();
-	alert(Request["pin"]);
 	Ext.Ajax.request({
 		url : "../QueryOrder.do",
 		params : {
@@ -157,24 +156,23 @@ function orderedMenuOnLoad() {
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
 			if (resultJSON.success == true) {
 				var josnData = resultJSON.data;
-				// var orderList = josnData.split("，");
-				// for ( var i = 0; i < orderList.length; i++) {
-				// var orderInfo = orderList[i].substr(1,
-				// orderList[i].length - 2).split(",");
-				// orderedData
-				// .push([
-				// orderInfo[0].substr(1,
-				// orderInfo[0].length - 2),
-				// orderInfo[1].substr(1,
-				// orderInfo[1].length - 2),
-				// orderInfo[2],
-				// orderInfo[3].substr(1,
-				// orderInfo[3].length - 2),
-				// "",
-				// orderInfo[3].substr(1,
-				// orderInfo[3].length - 2) ]);
-				// }
-				// orderedStore.reload();
+				 var menuList = josnData.split("，");
+				 for ( var i = 0; i < orderList.length; i++) {
+				 var menuInfo = menuList[i].substr(1,
+						 menuList[i].length - 2).split(",");
+				 //格式：[菜名，菜名编号，菜名拼音，单价]
+				 //后台格式：[厨房编号,"菜品名称",菜品编号,"菜品拼音","￥菜品单价"]
+				 dishesDisplayData.push
+				 .push([
+				 menuInfo[1].substr(1,
+						 menuInfo[1].length - 2),
+						 menuInfo[2],
+								 menuInfo[3].substr(1,
+										 menuInfo[3].length - 2),		 
+								 menuInfo[4].substr(1,
+										 menuInfo[4].length - 2) ]);
+				 }
+				 dishesDisplayData.reload();
 			}
 		},
 		failure : function(response, options) {
