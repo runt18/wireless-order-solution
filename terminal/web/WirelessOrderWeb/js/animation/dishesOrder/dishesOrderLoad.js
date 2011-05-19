@@ -96,10 +96,11 @@ function tableStuLoad() {
 
 // 以点菜式数据
 // 格式：[菜名，口味，数量，单价，操作，实价]
-//orderedData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "", "￥56.2" ]);
-//orderedData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "", "￥56.2" ]);
+// orderedData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "", "￥56.2" ]);
+// orderedData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "", "￥56.2" ]);
 function orderedDishesOnLoad() {
 	var Request = new URLParaQuery();
+	alert(Request["pin"]);
 	Ext.Ajax.request({
 		url : "../QueryOrder.do",
 		params : {
@@ -128,6 +129,14 @@ function orderedDishesOnLoad() {
 											orderInfo[3].length - 2) ]);
 				}
 				orderedStore.reload();
+			} else {
+				var dataInfo = resultJSON.data;
+				// Ext.Msg.alert(tableData);
+				Ext.MessageBox.show({
+					msg : dataInfo,
+					width : 300,
+					buttons : Ext.MessageBox.OK
+				});
 			}
 		},
 		failure : function(response, options) {
@@ -136,7 +145,7 @@ function orderedDishesOnLoad() {
 };
 
 // 菜谱
-function orderedMenuOnLoad(){
+function orderedMenuOnLoad() {
 	var Request = new URLParaQuery();
 	Ext.Ajax.request({
 		url : "../QueryMenu.do",
@@ -147,24 +156,24 @@ function orderedMenuOnLoad(){
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
 			if (resultJSON.success == true) {
 				var josnData = resultJSON.data;
-//				var orderList = josnData.split("，");
-//				for ( var i = 0; i < orderList.length; i++) {
-//					var orderInfo = orderList[i].substr(1,
-//							orderList[i].length - 2).split(",");
-//					orderedData
-//							.push([
-//									orderInfo[0].substr(1,
-//											orderInfo[0].length - 2),
-//									orderInfo[1].substr(1,
-//											orderInfo[1].length - 2),
-//									orderInfo[2],
-//									orderInfo[3].substr(1,
-//											orderInfo[3].length - 2),
-//									"",
-//									orderInfo[3].substr(1,
-//											orderInfo[3].length - 2) ]);
-//				}
-//				orderedStore.reload();
+				// var orderList = josnData.split("，");
+				// for ( var i = 0; i < orderList.length; i++) {
+				// var orderInfo = orderList[i].substr(1,
+				// orderList[i].length - 2).split(",");
+				// orderedData
+				// .push([
+				// orderInfo[0].substr(1,
+				// orderInfo[0].length - 2),
+				// orderInfo[1].substr(1,
+				// orderInfo[1].length - 2),
+				// orderInfo[2],
+				// orderInfo[3].substr(1,
+				// orderInfo[3].length - 2),
+				// "",
+				// orderInfo[3].substr(1,
+				// orderInfo[3].length - 2) ]);
+				// }
+				// orderedStore.reload();
 			}
 		},
 		failure : function(response, options) {
