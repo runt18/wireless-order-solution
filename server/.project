@@ -14,13 +14,6 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>protocol</name>
-			<type>2</type>
-			<location>F:/wireless-order-solution/trunk/protocol</location>
-		</link>
-	</linkedResources>
 	<filteredResources>
 		<filter>
 			<id>1305779230337</id>
