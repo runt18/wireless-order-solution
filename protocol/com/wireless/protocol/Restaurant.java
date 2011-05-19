@@ -28,4 +28,11 @@ public class Restaurant {
 	public static final int ADMIN = 1;
 	public static final int IDLE = 2;
 	public static final int DISCARD = 3;
+	public static final int RESERVED_1 = 4;
+	public static final int RESERVED_2 = 5;
+	public static final int RESERVED_3 = 6;
+	public static final int RESERVED_4 = 7;
+	public static final int RESERVED_5 = 8;
+	public static final int RESERVED_6 = 9;
+	public static final int RESERVED_7 = 10;
 }
