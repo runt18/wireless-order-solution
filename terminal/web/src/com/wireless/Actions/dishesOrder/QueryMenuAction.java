@@ -1,4 +1,4 @@
-package com.wireless.Actions.queryMenu;
+package com.wireless.Actions.dishesOrder;
 
 import java.io.IOException;
 import java.io.PrintWriter;

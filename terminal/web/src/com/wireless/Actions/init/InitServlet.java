@@ -17,9 +17,9 @@ public class InitServlet extends ActionServlet {
 		//FIX ME!!!
 		//The parameters should be read from the configuration file
 		Params.setDatabase("wireless_order_db");
-		Params.setDbHost("192.168.123.130");
+		Params.setDbHost("127.0.0.1");
 		Params.setDbPort(3306);
-		Params.setDbUser("yzhang");
+		Params.setDbUser("root");
 		Params.setDbPwd("HelloZ315");
 		Params.setSocketHost("127.0.0.1");
 		Params.setSocketPort(55555);
