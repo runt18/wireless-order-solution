@@ -20,6 +20,7 @@
 #include <vector>
 #include <algorithm>
 #include <process.h>
+#include <Mstcpip.h>
 
 //the vector holding print instances
 static vector< boost::shared_ptr<PrinterInstance> > g_PrintInstances;
@@ -319,6 +320,40 @@ static unsigned __stdcall LoginProc(LPVOID pvParam){
 				os << "创建连接失败: " << WSAGetLastError();
 				return 1;
 			}
+
+			//---------------------------------------
+			// Set the socket connection keep alive on.
+			// The SO_KEEPALIVE parameter is a socket option 
+			// that makes the socket send keep alive messages
+			// on the session. The SO_KEEPALIVE socket option
+			// requires a boolean value to be passed to the
+			// setsockopt function. If TRUE, the socket is
+			// configured to send keep alive messages, if FALSE
+			// the socket configured to NOT send keep alive messages.
+			BOOL bOptVal = TRUE;
+			int bOptLen = sizeof(BOOL);
+			if(setsockopt(g_ConnectSocket, SOL_SOCKET, SO_KEEPALIVE, (char*)&bOptVal, bOptLen) == SOCKET_ERROR){
+				ostringstream os;
+				os << "设置连接KeepAlive失败: " << WSAGetLastError();
+				pReport->OnPrintExcep(0, os.str().c_str());
+			}
+
+			//Set the alive time to 60s,
+			//and the interval time to 5s
+			tcp_keepalive alive_in;
+			alive_in.onoff = TRUE;
+			alive_in.keepalivetime = 60000;	
+			alive_in.keepaliveinterval = 5000;
+
+			tcp_keepalive alive_out;
+			unsigned long ulBytesReturn = 0;
+			//Set keep alive parameters
+			if(WSAIoctl(g_ConnectSocket, SIO_KEEPALIVE_VALS, &alive_in, sizeof(alive_in), &alive_out, sizeof(alive_out), &ulBytesReturn, NULL, NULL) == SOCKET_ERROR){
+				ostringstream os;
+				os << "设置连接KeepAlive间隔失败: " << WSAGetLastError();
+				pReport->OnPrintExcep(0, os.str().c_str());
+			}
+
 			// Connect to server.
 			int iResult = connect(g_ConnectSocket, (SOCKADDR*) &clientService, sizeof(clientService));
 
