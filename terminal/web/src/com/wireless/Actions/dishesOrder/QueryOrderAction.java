@@ -13,9 +13,11 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.QueryOrder;
+import com.wireless.db.QueryTable;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
+import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 import com.wireless.protocol.Util;
 
@@ -41,34 +43,46 @@ public class QueryOrderAction extends Action {
 				pin = pin.substring(2);
 			}
 			tableID = Short.parseShort(request.getParameter("tableID"));
-			Order order = QueryOrder.exec(Integer.parseInt(pin, 16), Terminal.MODEL_STAFF, tableID);
 			
-			jsonResp = jsonResp.replace("$(result)", "true");
+			Table table = QueryTable.exec(Integer.parseInt(pin, 16), Terminal.MODEL_STAFF, tableID);
+			
+			if(table.status == Table.TABLE_BUSY){
+				Order order = QueryOrder.exec(Integer.parseInt(pin, 16), Terminal.MODEL_STAFF, tableID);
+				
+				jsonResp = jsonResp.replace("$(result)", "true");
 
-			if (order.foods.length == 0) {
-				jsonResp = jsonResp.replace("$(value)", "");
-			} else {
-				StringBuffer value = new StringBuffer();
-				for (int i = 0; i < order.foods.length; i++) {
-					String jsonOrderFood = "[\"$(name)\",\"$(taste)\",$(count),\"$(unit)\"]";
-					jsonOrderFood = jsonOrderFood.replace("$(name)",
-							order.foods[i].name);
-					jsonOrderFood = jsonOrderFood.replace("$(taste)",
-							order.foods[i].taste.preference);
-					jsonOrderFood = jsonOrderFood.replace("$(count)",
-							order.foods[i].count2String());
-					jsonOrderFood = jsonOrderFood.replace("$(unit)", Util
-							.price2String(order.foods[i].price2(),
-									Util.INT_MASK_2));
+				if (order.foods.length == 0) {
+					jsonResp = jsonResp.replace("$(value)", "");
+				} else {
+					StringBuffer value = new StringBuffer();
+					for (int i = 0; i < order.foods.length; i++) {
+						String jsonOrderFood = "[\"$(name)\",\"$(taste)\",$(count),\"$(unit)\"]";
+						jsonOrderFood = jsonOrderFood.replace("$(name)",
+								order.foods[i].name);
+						jsonOrderFood = jsonOrderFood.replace("$(taste)",
+								order.foods[i].taste.preference);
+						jsonOrderFood = jsonOrderFood.replace("$(count)",
+								order.foods[i].count2String());
+						jsonOrderFood = jsonOrderFood.replace("$(unit)", Util
+								.price2String(order.foods[i].price2(),
+										Util.INT_MASK_2));
 
-					// pub each json order food info to the value
-					value.append(jsonOrderFood);
-					// the string is separated by comma
-					if (i != order.foods.length - 1) {
-						value.append("，");
+						// pub each json order food info to the value
+						value.append(jsonOrderFood);
+						// the string is separated by comma
+						if (i != order.foods.length - 1) {
+							value.append("，");
+						}
 					}
+					jsonResp = jsonResp.replace("$(value)", value);
 				}
-				jsonResp = jsonResp.replace("$(value)", value);
+				
+			}else if(table.status == Table.TABLE_IDLE){
+				jsonResp = jsonResp.replace("$(result)", "true");
+				jsonResp = jsonResp.replace("$(value)", "NULL");
+				
+			}else{
+				throw new BusinessException(ErrorCode.UNKNOWN);
 			}
 
 		}catch(BusinessException e) {
@@ -81,10 +95,6 @@ public class QueryOrderAction extends Action {
 			}else if(e.errCode == ErrorCode.TABLE_NOT_EXIST){
 				jsonResp = jsonResp.replace("$(result)", "false");
 				jsonResp = jsonResp.replace("$(value)", tableID + "号台餐台信息不存在，请重新确认");	
-				
-			}else if(e.errCode == ErrorCode.TABLE_IDLE){
-				jsonResp = jsonResp.replace("$(result)", "true");
-				jsonResp = jsonResp.replace("$(value)", "NULL");	
 				
 			}else{
 				jsonResp = jsonResp.replace("$(result)", "false");
