@@ -18,6 +18,36 @@
 			<param-name>detail</param-name>
 			<param-value>3</param-value>
 		</init-param>
+		<!-- Below is the configuration parameters to database adaptor -->
+		<init-param>
+			<param-name>db_name</param-name>
+			<param-value>wireless_order_db</param-value>
+		</init-param>
+		<init-param>
+			<param-name>db_host</param-name>
+			<param-value>192.168.123.130</param-value>
+		</init-param>
+		<init-param>
+			<param-name>db_port</param-name>
+			<param-value>3306</param-value>
+		</init-param>
+		<init-param>
+			<param-name>db_user</param-name>
+			<param-value>root</param-value>
+		</init-param>
+		<init-param>
+			<param-name>db_pwd</param-name>
+			<param-value>HelloZ315</param-value>
+		</init-param>
+		<!-- Below is the configuration parameters to socket -->
+		<init-param>
+			<param-name>socket_host</param-name>
+			<param-value>127.0.0.1</param-value>
+		</init-param>
+		<init-param>
+			<param-name>socket_port</param-name>
+			<param-value>55555</param-value>
+		</init-param>
 		<load-on-startup>0</load-on-startup>
 	</servlet>
 	<servlet-mapping>

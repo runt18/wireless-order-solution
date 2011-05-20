@@ -14,15 +14,12 @@ public class InitServlet extends ActionServlet {
 	private static final long serialVersionUID = 7899564175504837996L;
 
 	public void init() throws ServletException{
-		//FIX ME!!!
-		//The parameters should be read from the configuration file
-		Params.setDatabase("wireless_order_db");
-		Params.setDbHost("127.0.0.1");
-		Params.setDbPort(3306);
-		Params.setDbUser("root");
-		Params.setDbPwd("HelloZ315");
-		Params.setSocketHost("127.0.0.1");
-		Params.setSocketPort(55555);
+
+		Params.setDatabase(getServletConfig().getInitParameter("db_name"));
+		Params.setDbHost(getServletConfig().getInitParameter("db_host"));
+		Params.setDbPort(Integer.parseInt(getServletConfig().getInitParameter("db_port")));
+		Params.setDbUser(getServletConfig().getInitParameter("db_user"));
+		Params.setDbPwd(getServletConfig().getInitParameter("db_pwd"));
 		super.init();
 	}
 }
