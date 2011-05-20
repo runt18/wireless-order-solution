@@ -142,9 +142,9 @@ public class QueryMenuAction extends Action {
 				 * [口味编号,"口味名称","￥口味单价"]
 				 */
 				String jsonTaste = "[$(taste_id),\"$(preference)\",\"$(unit)\"]";
-				jsonTaste.replace("$(taste_id)", new Short(tastes[i].alias_id).toString());
-				jsonTaste.replace("$(preference)", tastes[i].preference);
-				jsonTaste.replace("$(unit)", Util.price2String(tastes[i].price, Util.INT_MASK_2));
+				jsonTaste = jsonTaste.replace("$(taste_id)", new Short(tastes[i].alias_id).toString());
+				jsonTaste = jsonTaste.replace("$(preference)", tastes[i].preference);
+				jsonTaste = jsonTaste.replace("$(unit)", Util.price2String(tastes[i].price, Util.INT_MASK_2));
 				
 				// put each json taste info to the value
 				value.append(jsonTaste);
@@ -173,14 +173,14 @@ public class QueryMenuAction extends Action {
 				 * [厨房编号,"厨房名称",一般折扣1,一般折扣2,一般折扣3,会员折扣1,会员折扣2,会员折扣3]
 				 */
 				String jsonKitchen = "[$(kitchen_id),\"$(name)\",$(dist1),$(dist2),$(dist3),$(memDist1),$(memDist2),$(memDist3)]";
-				jsonKitchen.replace("$(kitchen_id)", new Short(kitchens[i].alias_id).toString());
-				jsonKitchen.replace("$(name)", kitchens[i].name);
-				jsonKitchen.replace("$(dist1)", new Float((float)kitchens[i].discount / 100).toString());
-				jsonKitchen.replace("$(dist2)", new Float((float)kitchens[i].discount_2 / 100).toString());
-				jsonKitchen.replace("$(dist3)", new Float((float)kitchens[i].discount_3 / 100).toString());
-				jsonKitchen.replace("$(memDist1)", new Float((float)kitchens[i].member_discount_1 / 100).toString());
-				jsonKitchen.replace("$(memDist2)", new Float((float)kitchens[i].member_discount_2 / 100).toString());
-				jsonKitchen.replace("$(memDist3)", new Float((float)kitchens[i].member_discount_3 / 100).toString());
+				jsonKitchen = jsonKitchen.replace("$(kitchen_id)", new Short(kitchens[i].alias_id).toString());
+				jsonKitchen = jsonKitchen.replace("$(name)", kitchens[i].name);
+				jsonKitchen = jsonKitchen.replace("$(dist1)", new Float((float)kitchens[i].discount / 100).toString());
+				jsonKitchen = jsonKitchen.replace("$(dist2)", new Float((float)kitchens[i].discount_2 / 100).toString());
+				jsonKitchen = jsonKitchen.replace("$(dist3)", new Float((float)kitchens[i].discount_3 / 100).toString());
+				jsonKitchen = jsonKitchen.replace("$(memDist1)", new Float((float)kitchens[i].member_discount_1 / 100).toString());
+				jsonKitchen = jsonKitchen.replace("$(memDist2)", new Float((float)kitchens[i].member_discount_2 / 100).toString());
+				jsonKitchen = jsonKitchen.replace("$(memDist3)", new Float((float)kitchens[i].member_discount_3 / 100).toString());
 				
 				// put each json kitchen info to the value
 				value.append(jsonKitchen);
