@@ -342,8 +342,8 @@ static unsigned __stdcall LoginProc(LPVOID pvParam){
 			//and the interval time to 5s
 			tcp_keepalive alive_in;
 			alive_in.onoff = TRUE;
-			alive_in.keepalivetime = 60000;	
-			alive_in.keepaliveinterval = 5000;
+			alive_in.keepalivetime = 30000;	
+			alive_in.keepaliveinterval = 1000;
 
 			tcp_keepalive alive_out;
 			unsigned long ulBytesReturn = 0;
