@@ -15,6 +15,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import com.wireless.db.CancelOrder;
+import com.wireless.db.InsertOrder;
+import com.wireless.db.PayOrder;
 import com.wireless.db.QueryMenu;
 import com.wireless.db.QueryOrder;
 import com.wireless.db.QueryRestaurant;
@@ -183,7 +186,8 @@ class OrderHandler extends Handler implements Runnable{
 				//handle insert order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.INSERT_ORDER){
 
-				execInsertOrder(request);
+				Order orderToInsert = ReqParser.parseInsertOrder(request);				
+				printNewOrder(request, InsertOrder.exec(term.pin, term.modelID, orderToInsert));
 				response = new RespACK(request.header);
 
 				//handle update order request
@@ -193,12 +197,15 @@ class OrderHandler extends Handler implements Runnable{
 
 				//handle the cancel order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.CANCEL_ORDER){
-				execCancelOrder(request);
+				//execCancelOrder(request);
+				short tableToCancel = ReqParser.parseCancelOrder(request);
+				CancelOrder.exec(term.pin, term.modelID, tableToCancel);
 				response = new RespACK(request.header);
 
 				//handle the pay order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.PAY_ORDER){
-				execPayOrder(request);
+				Order orderToPay = ReqParser.parsePayOrder(request);
+				printPaidOrder(request, PayOrder.exec(term.pin, term.modelID, orderToPay));
 				response = new RespACK(request.header);
 
 				//handle the print request
@@ -434,16 +441,15 @@ class OrderHandler extends Handler implements Runnable{
 	 * 		   PrintException if fail to send print request 
 	 * 		   OrderBusinessException if any ordered doesn't exist in db or disabled by user 
 	 */
-	private void execInsertOrder(ProtocolPackage req) throws SQLException, PrintLogicException, OrderBusinessException{
-		Order orderToInsert = ReqParser.parseInsertOrder(req);
+	private void printNewOrder(ProtocolPackage req, Order orderToInsert) throws SQLException, PrintLogicException, OrderBusinessException{
 		
-		String sql = null;	
+		/*String sql = null;	
 		
-		/**
+		*//**
 		 * Here invoke "getUnPaidOrderID" is to check two status.
 		 * One is check to see the table is exist or not.
 		 * The other is check to see the table has been paid or not. 
-		 */
+		 *//*
 		try{
 			getUnPaidOrderID(orderToInsert.tableID);
 			//throw the exception if the table is paid
@@ -463,12 +469,12 @@ class OrderHandler extends Handler implements Runnable{
 			}
 		}
 		
-		/**
+		*//**
 		 * Get all the food's detail info submitted by terminal, 
 		 * and then check whether the food exist in db or is disabled by user.
 		 * If the food doesn't exist in db or is disabled by user,
 		 * then notify the terminal that the food menu is expired.
-		 */
+		 *//*
 		for(int i = 0; i < orderToInsert.foods.length; i++){
 
 			//get the associated foods' unit price and name
@@ -543,9 +549,9 @@ class OrderHandler extends Handler implements Runnable{
 			
 			_stmt.addBatch(sql);
 		}		
-		_stmt.executeBatch();
+		_stmt.executeBatch();*/
 
-
+		
 		//find the printer connection socket to the restaurant for this terminal
 		ArrayList<Socket> printerConn = WirelessSocketServer.printerConnections.get(new Integer(_restaurantID));
 		Socket[] connections = null;
@@ -947,7 +953,7 @@ class OrderHandler extends Handler implements Runnable{
 	 * @throws SQLException if execute SQL statements fail
 	 * @throws OrderBusinessException if the order or the table to be canceled doesn't exist
 	 */
-	private void execCancelOrder(ProtocolPackage req) throws SQLException, OrderBusinessException{
+/*	private void execCancelOrder(ProtocolPackage req) throws SQLException, OrderBusinessException{
 		short tableToCancel = ReqParser.parseCancelOrder(req);
 		int orderID = getUnPaidOrderID(tableToCancel);
 		_stmt.clearBatch();
@@ -958,7 +964,7 @@ class OrderHandler extends Handler implements Runnable{
 		sql = "DELETE FROM `" + WirelessSocketServer.database + "`.`order` WHERE id=" + orderID;
 		_stmt.addBatch(sql);
 		_stmt.executeBatch();
-	}
+	}*/
 	
 	/**
 	 * Access the db to pay the order according to the table containing in the request
@@ -966,10 +972,10 @@ class OrderHandler extends Handler implements Runnable{
 	 * @throws SQLException if execute SQL statements fails
 	 * @throws OrderBusinessException if the order or table to be paid doesn't exist
 	 */
-	private void execPayOrder(ProtocolPackage req) throws SQLException, OrderBusinessException, PrintLogicException{
-		Order reqOrderInfo = ReqParser.parsePayOrder(req);
+	private void printPaidOrder(ProtocolPackage req, Order orderToPay) throws SQLException, OrderBusinessException, PrintLogicException{
+
 		
-		reqOrderInfo.id = getUnPaidOrderID(reqOrderInfo.tableID);
+/*		reqOrderInfo.id = getUnPaidOrderID(reqOrderInfo.tableID);
 		
 		//get the order along with discount to each food according to the payment and discount type
 		Order orderToPay = getOrderByID(reqOrderInfo.id, 
@@ -981,11 +987,11 @@ class OrderHandler extends Handler implements Runnable{
 		orderToPay.actualPrice = reqOrderInfo.actualPrice;
 		orderToPay.payManner = reqOrderInfo.payManner;
 		
-		/**
+		*//**
 		 * Calculate the total price of this order as below.
 		 * total = food_price_1 + food_price_2 + ...
 		 * food_price_n = (unit * discount + taste) * count
-		 */
+		 *//*
 		float totalPrice = 0;
 		for(int i = 0; i < orderToPay.foods.length; i++){
 			float discount = (float)Math.round(orderToPay.foods[i].discount) / 100;
@@ -997,14 +1003,14 @@ class OrderHandler extends Handler implements Runnable{
 		orderToPay.setTotalPrice(totalPrice);
 		
 		_stmt.clearBatch();
-		/**
+		*//**
 		 * Update the values below to "order" table
 		 * - total price
 		 * - actual price
 		 * - payment manner
 		 * - terminal pin
 		 * - pay order date
-		 */
+		 *//*
 		String sql = "UPDATE `" + WirelessSocketServer.database + "`.`order` SET terminal_pin=" + _pin +
 					", total_price=" + totalPrice + 
 					", total_price_2=" + Util.price2Float(orderToPay.actualPrice, Util.INT_MASK_3) +
@@ -1014,11 +1020,11 @@ class OrderHandler extends Handler implements Runnable{
 		_stmt.addBatch(sql);
 		
 
-		/**
+		*//**
 		 * Two tasks below.
 		 * 1 - update each food's discount to "order_food" table
 		 * 2 - update the order count to "food" table
-		 */
+		 *//*
 
 		for(int i = 0; i < orderToPay.foods.length; i++){
 			float discount = (float)orderToPay.foods[i].discount / 100;
@@ -1031,7 +1037,7 @@ class OrderHandler extends Handler implements Runnable{
 //				  ".food SET order_count=order_count+1 WHERE alias_id=" + orderToPay.foods[i].alias_id +
 //				  " AND restaurant_id=" + _restaurantID;
 		}
-		_stmt.executeBatch();
+		_stmt.executeBatch();*/
 		
 		//find the printer connection socket to the restaurant for this terminal
 		ArrayList<Socket> printerConn = WirelessSocketServer.printerConnections.get(new Integer(_restaurantID));
@@ -1159,7 +1165,7 @@ class OrderHandler extends Handler implements Runnable{
 	 * @throws SQLException if execute the SQL statement fail
 	 * @throws OrderBusinessException if the table to query or the order to query doesn't exist.
 	 */
-	private Order getOrderByID(int orderID) throws SQLException, OrderBusinessException{
+/*	private Order getOrderByID(int orderID) throws SQLException, OrderBusinessException{
 		
 		int nCustom = 0;
 		short tableID = 0;
@@ -1199,7 +1205,7 @@ class OrderHandler extends Handler implements Runnable{
 		orderInfo.foods = foods.toArray(new Food[foods.size()]);
 		return orderInfo;		
 
-	}
+	}*/
 	
 	/**
 	 * Get the order detail information for a specific order id,
@@ -1217,7 +1223,7 @@ class OrderHandler extends Handler implements Runnable{
 	 * @throws SQLException if fail to execute any SQL statement 
 	 * @throws OrderBusinessException
 	 */
-	private Order getOrderByID(int orderID, short tableID, int payType, 
+/*	private Order getOrderByID(int orderID, short tableID, int payType, 
 								int discountType, String memberID) throws SQLException, OrderBusinessException{
 		
 		Order orderInfo = getOrderByID(orderID);
@@ -1261,7 +1267,7 @@ class OrderHandler extends Handler implements Runnable{
 		orderInfo.discountType = discountType;
 		orderInfo.memberID = memberID; 
 		return orderInfo;
-	}
+	}*/
 }
 
 
