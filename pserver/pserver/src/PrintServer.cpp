@@ -338,8 +338,8 @@ static unsigned __stdcall LoginProc(LPVOID pvParam){
 				pReport->OnPrintExcep(0, os.str().c_str());
 			}
 
-			//Set the alive time to 60s,
-			//and the interval time to 5s
+			//Set the alive time to 30s,
+			//and the interval time to 1s
 			tcp_keepalive alive_in;
 			alive_in.onoff = TRUE;
 			alive_in.keepalivetime = 30000;	
