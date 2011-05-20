@@ -197,17 +197,16 @@ function tasteOnLoad() {
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
 			if (resultJSON.success == true) {
 				var josnData = resultJSON.data;
-				alert(josnData);
 				var tasteList = josnData.split("，");
 				for ( var i = 0; i < tasteList.length; i++) {
 					var tasteInfo = tasteList[i].substr(1,
 							tasteList[i].length - 2).split(",");
-					// 后台格式：[厨房编号,"菜品名称",菜品编号,"菜品拼音","￥菜品单价"]
-					dishTasteData.push.push([
+					// 后台格式：[1,"加辣","￥2.50"]，[2,"少盐","￥0.00"]，[3,"少辣","￥5.00"]
+					// 前后台格式有差异，口味编号前台存储放在最后一位
+					dishTasteData.push([
 							tasteInfo[1].substr(1, tasteInfo[1].length - 2),
-							tasteInfo[2],
-							tasteInfo[3].substr(1, tasteInfo[3].length - 2),
-							tasteInfo[4].substr(1, tasteInfo[4].length - 2) ]);
+							tasteInfo[2].substr(1, tasteInfo[2].length - 2),
+							tasteInfo[0] ]);
 				}
 				dishTasteStore.reload();
 			}

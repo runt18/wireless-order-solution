@@ -160,6 +160,20 @@ var orderedForm = new Ext.form.FormPanel({
 	buttons : [ {
 		text : "提交",
 		handler : function() {
+			// Ext.Ajax.request({
+			// url : "../XXXXX.do",
+			// params : {
+			// "pin" : Request["pin"],
+			// "type" : "2"
+			// },
+			// success : function(response, options) {
+			// var resultJSON = Ext.util.JSON.decode(response.responseText);
+			// if (resultJSON.success == true) {
+			// }
+			// },
+			// failure : function(response, options) {
+			// }
+			// });
 		}
 	}, {
 		text : "清空",
@@ -196,15 +210,15 @@ var dishesOrderCenterPanel = new Ext.Panel({
 
 // --------------dishes taste pop window-----------------
 // 1，数据
-//dishTasteData = [];
-//dishTasteData.push([ "只要酸菜不要鱼", "￥0" ]);
-//dishTasteData.push([ "不要盐", "￥2" ]);
-//dishTasteData.push([ "少盐", "￥3" ]);
-//dishTasteData.push([ "中盐", "￥4" ]);
-//dishTasteData.push([ "多盐", "￥5" ]);
-//dishTasteData.push([ "超多盐", "￥6" ]);
-//dishTasteData.push([ "使劲放盐", "￥7" ]);
-//dishTasteData.push([ "咸死你", "￥8" ]);
+// dishTasteData = [];
+// dishTasteData.push([ "只要酸菜不要鱼", "￥0" ]);
+// dishTasteData.push([ "不要盐", "￥2" ]);
+// dishTasteData.push([ "少盐", "￥3" ]);
+// dishTasteData.push([ "中盐", "￥4" ]);
+// dishTasteData.push([ "多盐", "￥5" ]);
+// dishTasteData.push([ "超多盐", "￥6" ]);
+// dishTasteData.push([ "使劲放盐", "￥7" ]);
+// dishTasteData.push([ "咸死你", "￥8" ]);
 
 // 2，表格的数据store
 var dishTasteStore = new Ext.data.Store({
@@ -233,31 +247,38 @@ var dishTasteColumnModel = new Ext.grid.ColumnModel([
 		} ]);
 
 // 4，表格
-var dishTasteGrid = new Ext.grid.GridPanel(
-		{
-			title : "可选口味",
-			anchor : "99%",
-			ds : dishTasteStore,
-			cm : dishTasteColumnModel,
-			sm : new Ext.grid.RowSelectionModel({
-				singleSelect : true
-			}),
-			listeners : {
-				rowdblclick : function(thiz, rowIndex, e) {
-					var selectedTaste = dishTasteData[rowIndex][0];
-					var tastePrice = dishTasteData[rowIndex][1];
-					var dishIndex = dishOrderCurrRowIndex_;
-					orderedData[dishIndex][1] = selectedTaste;
-					orderedData[dishIndex][5] = "￥"
-							+ (parseFloat(orderedData[dishIndex][3]
-									.substring(1)) + parseFloat(tastePrice
-									.substring(1)));
-					orderedStore.reload();
-					dishTasteWindow.hide();
-					dishOrderCurrRowIndex_ = -1;
-				}
+var dishTasteGrid = new Ext.grid.GridPanel({
+	title : "可选口味",
+	anchor : "99%",
+	ds : dishTasteStore,
+	cm : dishTasteColumnModel,
+	sm : new Ext.grid.RowSelectionModel({
+		singleSelect : true
+	}),
+	listeners : {
+		rowdblclick : function(thiz, rowIndex, e) {
+			var selectedTaste = dishTasteData[rowIndex][0];
+			var tastePrice = dishTasteData[rowIndex][1];
+			var dishIndex = dishOrderCurrRowIndex_;
+			// update taste
+			orderedData[dishIndex][1] = selectedTaste;
+			// update price
+			var currPrice = parseFloat(orderedData[dishIndex][3].substring(1))
+					+ parseFloat(tastePrice.substring(1)) + "";
+			if (currPrice.indexOf(".") < 0) {
+				currPrice = currPrice + ".00";
+			} else if (currPrice.length - currPrice.indexOf(".") == 3) {
+				currPrice = currPrice;
+			} else if (currPrice.length - currPrice.indexOf(".") == 2) {
+				currPrice = currPrice + "0";
 			}
-		});
+			orderedData[dishIndex][5] = "￥" + currPrice;
+			orderedStore.reload();
+			dishTasteWindow.hide();
+			dishOrderCurrRowIndex_ = -1;
+		}
+	}
+});
 
 var dishTasteWindow = new Ext.Window({
 	layout : "fit",
@@ -473,47 +494,6 @@ softKeyBoardDO = new Ext.Window({
 // dishesDisplayData = [];
 // dishesDisplayData.push( [ "酸菜鱼", 1101, "SCY", "￥35.1" ]);
 // dishesDisplayData.push( [ "京酱肉丝", 2201, "JJRS", "￥50" ]);
-// dishesDisplayData.push( [ "酸菜鱼", 1112, "SCY", "￥35.1" ]);
-// dishesDisplayData.push( [ "京酱肉丝", 2212, "JJRS", "￥50" ]);
-// dishesDisplayData.push( [ "酸菜鱼", 1114, "SCY", "￥35.1" ]);
-// dishesDisplayData.push( [ "京酱肉丝", 2312, "JJRS", "￥50" ]);
-// dishesDisplayData.push( [ "酸菜鱼", 4234, "SCY", "￥35.1" ]);
-// dishesDisplayData.push( [ "京酱肉丝", 2456, "JJRS", "￥50" ]);
-// dishesDisplayData.push( [ "酸菜鱼", 1234, "SCY", "￥35.1" ]);
-// dishesDisplayData.push( [ "京酱肉丝", 2765, "JJRS", "￥50" ]);
-// dishesDisplayData.push( [ "酸菜鱼", 1678, "SCY", "￥35.1" ]);
-// dishesDisplayData.push( [ "京酱肉丝", 2123, "JJRS", "￥50" ]);
-// dishesDisplayData.push( [ "酸菜鱼", 1567, "SCY", "￥35.1" ]);
-// dishesDisplayData.push( [ "京酱肉丝", 2567, "JJRS", "￥50" ]);
-// dishesDisplayData.push( [ "酸菜鱼", 1355, "SCY", "￥35.1" ]);
-// dishesDisplayData.push( [ "京酱肉丝", 2536, "JJRS", "￥50" ]);
-// dishesDisplayData.push( [ "酸菜鱼", 1534, "SCY", "￥35.1" ]);
-// dishesDisplayData.push( [ "京酱肉丝", 2345, "JJRS", "￥50" ]);
-// dishesDisplayData.push( [ "酸菜鱼", 1456, "SCY", "￥35.1" ]);
-// dishesDisplayData.push( [ "京酱肉丝", 2235, "JJRS", "￥50" ]);
-// dishesDisplayData.push( [ "酸菜鱼", 1345, "SCY", "￥35.1" ]);
-// dishesDisplayData.push( [ "京酱肉丝", 2756, "JJRS", "￥50" ]);
-// dishesDisplayData.push( [ "酸菜鱼", 1345, "SCY", "￥35.1" ]);
-// dishesDisplayData.push( [ "京酱肉丝", 2543, "JJRS", "￥50" ]);
-// dishesDisplayData.push( [ "酸菜鱼", 1756, "SCY", "￥35.1" ]);
-// dishesDisplayData.push( [ "京酱肉丝", 2786, "JJRS", "￥50" ]);
-// dishesDisplayData.push( [ "酸菜鱼", 1456, "SCY", "￥35.1" ]);
-// dishesDisplayData.push( [ "京酱肉丝", 2547, "JJRS", "￥50" ]);
-// dishesDisplayData.push( [ "酸菜鱼", 1245, "SCY", "￥35.1" ]);
-// dishesDisplayData.push( [ "京酱肉丝", 2765, "JJRS", "￥50" ]);
-// dishesDisplayData.push( [ "酸菜鱼", 1768, "SCY", "￥35.1" ]);
-// dishesDisplayData.push( [ "京酱肉丝", 2688, "JJRS", "￥50" ]);
-// dishesDisplayData.push( [ "京酱肉丝", 2756, "JJRS", "￥50" ]);
-// dishesDisplayData.push( [ "酸菜鱼", 1345, "SCY", "￥35.1" ]);
-// dishesDisplayData.push( [ "京酱肉丝", 2543, "JJRS", "￥50" ]);
-// dishesDisplayData.push( [ "酸菜鱼", 1756, "SCY", "￥35.1" ]);
-// dishesDisplayData.push( [ "京酱肉丝", 2786, "JJRS", "￥50" ]);
-// dishesDisplayData.push( [ "酸菜鱼", 1456, "SCY", "￥35.1" ]);
-// dishesDisplayData.push( [ "京酱肉丝", 2547, "JJRS", "￥50" ]);
-// dishesDisplayData.push( [ "酸菜鱼", 1245, "SCY", "￥35.1" ]);
-// dishesDisplayData.push( [ "京酱肉丝", 2765, "JJRS", "￥50" ]);
-// dishesDisplayData.push( [ "酸菜鱼", 1768, "SCY", "￥35.1" ]);
-// dishesDisplayData.push( [ "京酱肉丝", 2688, "JJRS", "￥50" ]);
 
 // 2，表格的数据store
 var dishesDisplayStore = new Ext.data.Store({
