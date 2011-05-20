@@ -92,7 +92,24 @@ public class QueryTable {
 		
 		Terminal term = VerifyPin.exec(pin, model);
 		
+		return exec(pin, model, term.restaurant_id, tableID);
+	}
+	
+	/**
+	 * Get the table information according the specific table alias id and restaurant id.
+	 * Assure the terminal with this pin is NOT expired before invoking this method.
+	 * @param pin the pin to this terminal
+	 * @param model the model to this terminal
+	 * @param restaurantID the restaurant id the table belong to
+	 * @param tableID the table alias id to query
+	 * @return the table information
+	 * @throws BusinessException throws if the table to query does NOT exist
+	 * @throws SQLException throws if fail to execute any SQL statement
+	 */
+	static Table exec(int pin, short model, int restaurantID, short tableID) throws BusinessException, SQLException{
+		
 		DBCon dbCon = new DBCon();
+		
 		try{
 			dbCon.connect();
 			
@@ -101,7 +118,7 @@ public class QueryTable {
 			 */
 			String sql = "SELECT id, enabled FROM `" + Params.dbName +
 						"`.`table` WHERE alias_id=" + tableID + 
-						" AND restaurant_id=" + term.restaurant_id + " AND enabled=1";
+						" AND restaurant_id=" + restaurantID + " AND enabled=1";
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			if(dbCon.rs.next()){
 				/**
@@ -109,11 +126,11 @@ public class QueryTable {
 				 */
 				 sql = "SELECT custom_num FROM `" + Params.dbName + 
 					   "`.`order` WHERE table_id = " + tableID +
-					   " AND restaurant_id = " + term.restaurant_id +
+					   " AND restaurant_id = " + restaurantID +
 					   " AND total_price IS NULL";
 				 dbCon.rs = dbCon.stmt.executeQuery(sql);
 				 Table table = new Table();
-				 table.restaurant_id = term.restaurant_id;
+				 table.restaurant_id = restaurantID;
 				 table.alias_id = tableID;
 				 
 				 if(dbCon.rs.next()){
