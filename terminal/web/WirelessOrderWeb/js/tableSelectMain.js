@@ -354,10 +354,14 @@
 								tableIndex = i;
 							}
 						}
-						location.href = "OrderMain.html?tableNbr="
-								+ selectedTable + "&personCount="
-								+ tableStatusListTS[tableIndex][1] + "&pin="
-								+ pin;
+						if (tableStatusListTS[tableIndex][2] == "占用") {
+							location.href = "OrderMain.html?tableNbr="
+									+ selectedTable + "&personCount="
+									+ tableStatusListTS[tableIndex][1]
+									+ "&pin=" + pin;
+						} else {
+							personCountInputWin.show();
+						}
 					}
 				}
 			});

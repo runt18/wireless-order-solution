@@ -109,26 +109,26 @@ function orderedDishesOnLoad() {
 		success : function(response, options) {
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
 			if (resultJSON.success == true) {
-				if(resultJSON.data != "NULL"){
-				var josnData = resultJSON.data;
-				var orderList = josnData.split("，");
-				for ( var i = 0; i < orderList.length; i++) {
-					var orderInfo = orderList[i].substr(1,
-							orderList[i].length - 2).split(",");
-					orderedData
-							.push([
-									orderInfo[0].substr(1,
-											orderInfo[0].length - 2),
-									orderInfo[1].substr(1,
-											orderInfo[1].length - 2),
-									orderInfo[2],
-									orderInfo[3].substr(1,
-											orderInfo[3].length - 2),
-									"",
-									orderInfo[3].substr(1,
-											orderInfo[3].length - 2) ]);
-				}
-				orderedStore.reload();
+				if (resultJSON.data != "NULL") {
+					var josnData = resultJSON.data;
+					var orderList = josnData.split("，");
+					for ( var i = 0; i < orderList.length; i++) {
+						var orderInfo = orderList[i].substr(1,
+								orderList[i].length - 2).split(",");
+						orderedData
+								.push([
+										orderInfo[0].substr(1,
+												orderInfo[0].length - 2),
+										orderInfo[1].substr(1,
+												orderInfo[1].length - 2),
+										orderInfo[2],
+										orderInfo[3].substr(1,
+												orderInfo[3].length - 2),
+										"",
+										orderInfo[3].substr(1,
+												orderInfo[3].length - 2) ]);
+					}
+					orderedStore.reload();
 				}
 			} else {
 				var dataInfo = resultJSON.data;
@@ -158,27 +158,58 @@ function orderedMenuOnLoad() {
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
 			if (resultJSON.success == true) {
 				var josnData = resultJSON.data;
-				 var menuList = josnData.split("，");
-				 for ( var i = 0; i < menuList.length; i++) {
-				 var menuInfo = menuList[i].substr(1,
-						 menuList[i].length - 2).split(",");
-				 //格式：[菜名，菜名编号，菜名拼音，单价]
-				 //后台格式：[厨房编号,"菜品名称",菜品编号,"菜品拼音","￥菜品单价"]
-				 dishesDisplayData.push([
-				 menuInfo[1].substr(1,
-						 menuInfo[1].length - 2),
-						 menuInfo[2],
-								 menuInfo[3].substr(1,
-										 menuInfo[3].length - 2),		 
-								 menuInfo[4].substr(1,
-										 menuInfo[4].length - 2) ]);
-				 }
-				 for ( var i = 0; i < dishesDisplayData.length; i++) {
-						dishesDisplayDataShow.push( [ dishesDisplayData[i][0],
-								dishesDisplayData[i][1], dishesDisplayData[i][2],
-								dishesDisplayData[i][3] ]);
-					}
-				 dishesDisplayStore.reload();
+				var menuList = josnData.split("，");
+				for ( var i = 0; i < menuList.length; i++) {
+					var menuInfo = menuList[i]
+							.substr(1, menuList[i].length - 2).split(",");
+					// 格式：[菜名，菜名编号，菜名拼音，单价]
+					// 后台格式：[厨房编号,"菜品名称",菜品编号,"菜品拼音","￥菜品单价"]
+					dishesDisplayData.push([
+							menuInfo[1].substr(1, menuInfo[1].length - 2),
+							menuInfo[2],
+							menuInfo[3].substr(1, menuInfo[3].length - 2),
+							menuInfo[4].substr(1, menuInfo[4].length - 2) ]);
+				}
+				for ( var i = 0; i < dishesDisplayData.length; i++) {
+					dishesDisplayDataShow.push([ dishesDisplayData[i][0],
+							dishesDisplayData[i][1], dishesDisplayData[i][2],
+							dishesDisplayData[i][3] ]);
+				}
+				dishesDisplayStore.reload();
+			}
+		},
+		failure : function(response, options) {
+		}
+	});
+};
+
+// 口味
+// dishTasteData.push([ "咸死你", "￥8" ]);
+function tasteOnLoad() {
+	var Request = new URLParaQuery();
+	Ext.Ajax.request({
+		url : "../QueryMenu.do",
+		params : {
+			"pin" : Request["pin"],
+			"type" : "2"
+		},
+		success : function(response, options) {
+			var resultJSON = Ext.util.JSON.decode(response.responseText);
+			if (resultJSON.success == true) {
+				var josnData = resultJSON.data;
+				alert(josnData);
+				var tasteList = josnData.split("，");
+				for ( var i = 0; i < tasteList.length; i++) {
+					var tasteInfo = tasteList[i].substr(1,
+							tasteList[i].length - 2).split(",");
+					// 后台格式：[厨房编号,"菜品名称",菜品编号,"菜品拼音","￥菜品单价"]
+					dishTasteData.push.push([
+							tasteInfo[1].substr(1, tasteInfo[1].length - 2),
+							tasteInfo[2],
+							tasteInfo[3].substr(1, tasteInfo[3].length - 2),
+							tasteInfo[4].substr(1, tasteInfo[4].length - 2) ]);
+				}
+				dishTasteStore.reload();
 			}
 		},
 		failure : function(response, options) {
