@@ -13,11 +13,11 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.QueryOrder;
-import com.wireless.db.QueryTable;
+
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
-import com.wireless.protocol.Table;
+
 import com.wireless.protocol.Terminal;
 import com.wireless.protocol.Util;
 
@@ -44,61 +44,62 @@ public class QueryOrderAction extends Action {
 			}
 			tableID = Short.parseShort(request.getParameter("tableID"));
 			
-			Table table = QueryTable.exec(Integer.parseInt(pin, 16), Terminal.MODEL_STAFF, tableID);
-			
-			if(table.status == Table.TABLE_BUSY){
-				Order order = QueryOrder.exec(Integer.parseInt(pin, 16), Terminal.MODEL_STAFF, tableID);
-				
-				jsonResp = jsonResp.replace("$(result)", "true");
+			Order order = QueryOrder.exec(Integer.parseInt(pin, 16), Terminal.MODEL_STAFF, tableID);
 
-				if (order.foods.length == 0) {
-					jsonResp = jsonResp.replace("$(value)", "");
-				} else {
-					StringBuffer value = new StringBuffer();
-					for (int i = 0; i < order.foods.length; i++) {
-						String jsonOrderFood = "[\"$(name)\",\"$(taste)\",$(count),\"$(unit)\"]";
-						jsonOrderFood = jsonOrderFood.replace("$(name)",
-								order.foods[i].name);
-						jsonOrderFood = jsonOrderFood.replace("$(taste)",
-								order.foods[i].taste.preference);
-						jsonOrderFood = jsonOrderFood.replace("$(count)",
-								order.foods[i].count2String());
-						jsonOrderFood = jsonOrderFood.replace("$(unit)", Util
-								.price2String(order.foods[i].price2(),
-										Util.INT_MASK_2));
+			jsonResp = jsonResp.replace("$(result)", "true");
 
-						// pub each json order food info to the value
-						value.append(jsonOrderFood);
-						// the string is separated by comma
-						if (i != order.foods.length - 1) {
-							value.append("，");
-						}
+			if (order.foods.length == 0) {
+				jsonResp = jsonResp.replace("$(value)", "");
+			} else {
+				StringBuffer value = new StringBuffer();
+				for (int i = 0; i < order.foods.length; i++) {
+					/**
+					 * The json to order food looks like below.
+					 * ["菜名",菜名编号,厨房编号,"口味",口味编号,数量,单价]
+					 */
+					String jsonOrderFood = "[\"$(food)\",$(food_id),$(kitchen)\"$(taste)\",$(taste_id),$(count),\"$(unit)\"]";
+					jsonOrderFood = jsonOrderFood.replace("$(food)", order.foods[i].name);
+					jsonOrderFood = jsonOrderFood.replace("$(food_id)", new Integer(order.foods[i].alias_id).toString());
+					jsonOrderFood = jsonOrderFood.replace("$(kitchen)", new Short(order.foods[i].kitchen).toString());
+					jsonOrderFood = jsonOrderFood.replace("$(taste)", order.foods[i].taste.preference);
+					jsonOrderFood = jsonOrderFood.replace("$(taste_id)", new Short(order.foods[i].taste.alias_id).toString());
+					jsonOrderFood = jsonOrderFood.replace("$(count)", order.foods[i].count2String());
+					jsonOrderFood = jsonOrderFood.replace("$(unit)", Util.price2String(order.foods[i].price2(),	Util.INT_MASK_2));
+
+					// pub each json order food info to the value
+					value.append(jsonOrderFood);
+					// the string is separated by comma
+					if (i != order.foods.length - 1) {
+						value.append("，");
 					}
-					jsonResp = jsonResp.replace("$(value)", value);
 				}
-				
-			}else if(table.status == Table.TABLE_IDLE){
-				jsonResp = jsonResp.replace("$(result)", "true");
-				jsonResp = jsonResp.replace("$(value)", "NULL");
-				
-			}else{
-				throw new BusinessException(ErrorCode.UNKNOWN);
-			}
+				jsonResp = jsonResp.replace("$(value)", value);
+			}				
 
 		}catch(BusinessException e) {
-			e.printStackTrace();
 					
 			if(e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED){
+				e.printStackTrace();
 				jsonResp = jsonResp.replace("$(result)", "false");
 				jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");	
 				
 			}else if(e.errCode == ErrorCode.TABLE_NOT_EXIST){
+				e.printStackTrace();
 				jsonResp = jsonResp.replace("$(result)", "false");
-				jsonResp = jsonResp.replace("$(value)", tableID + "号台餐台信息不存在，请重新确认");	
+				jsonResp = jsonResp.replace("$(value)", tableID + "号餐台信息不存在，请重新确认");	
+				
+			}else if(e.errCode == ErrorCode.TABLE_IDLE){
+				jsonResp = jsonResp.replace("$(result)", "true");
+				jsonResp = jsonResp.replace("$(value)", "NULL");
+				
+			}else if(e.errCode == ErrorCode.MENU_EXPIRED){
+				jsonResp = jsonResp.replace("$(result)", "false");
+				jsonResp = jsonResp.replace("$(value)", "菜谱信息与服务器不匹配，请与餐厅负责人确认或重新更新菜谱");	
 				
 			}else{
+				e.printStackTrace();
 				jsonResp = jsonResp.replace("$(result)", "false");
-				jsonResp = jsonResp.replace("$(value)", "没有获取到" + tableID + "号台的账单信息，请重新确认");	
+				jsonResp = jsonResp.replace("$(value)", "没有获取到" + tableID + "号餐台的账单信息，请重新确认");	
 			}
 			
 		}catch(SQLException e){
