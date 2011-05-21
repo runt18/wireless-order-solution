@@ -95,9 +95,10 @@ function tableStuLoad() {
 };
 
 // 以点菜式数据
-// 格式：[菜名，口味，数量，单价，操作，实价]
+// 格式：[菜名，口味，数量，单价，操作，实价，菜名编号，厨房编号，口味编号]
 // orderedData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "", "￥56.2" ]);
 // orderedData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "", "￥56.2" ]);
+// 后台：[菜名,菜名编号,厨房编号,口味,口味编号,数量,单价]
 function orderedDishesOnLoad() {
 	var Request = new URLParaQuery();
 	Ext.Ajax.request({
@@ -118,15 +119,19 @@ function orderedDishesOnLoad() {
 						orderedData
 								.push([
 										orderInfo[0].substr(1,
-												orderInfo[0].length - 2),
-										orderInfo[1].substr(1,
-												orderInfo[1].length - 2),
-										orderInfo[2],
+												orderInfo[0].length - 2), // 菜名
 										orderInfo[3].substr(1,
-												orderInfo[3].length - 2),
-										"",
-										orderInfo[3].substr(1,
-												orderInfo[3].length - 2) ]);
+												orderInfo[3].length - 2),// 口味
+										orderInfo[5],// 数量
+										orderInfo[6].substr(1,
+												orderInfo[6].length - 2),// 单价
+										"",// 操作
+										orderInfo[6].substr(1,
+												orderInfo[6].length - 2),// 实价
+										orderInfo[1],// 菜名编号
+										orderInfo[2],// 厨房编号
+										orderInfo[4] // 口味编号
+								]);
 					}
 					orderedStore.reload();
 				}
@@ -148,39 +153,50 @@ function orderedDishesOnLoad() {
 // 菜谱
 function orderedMenuOnLoad() {
 	var Request = new URLParaQuery();
-	Ext.Ajax.request({
-		url : "../QueryMenu.do",
-		params : {
-			"pin" : Request["pin"],
-			"type" : "1"
-		},
-		success : function(response, options) {
-			var resultJSON = Ext.util.JSON.decode(response.responseText);
-			if (resultJSON.success == true) {
-				var josnData = resultJSON.data;
-				var menuList = josnData.split("，");
-				for ( var i = 0; i < menuList.length; i++) {
-					var menuInfo = menuList[i]
-							.substr(1, menuList[i].length - 2).split(",");
-					// 格式：[菜名，菜名编号，菜名拼音，单价]
-					// 后台格式：[厨房编号,"菜品名称",菜品编号,"菜品拼音","￥菜品单价"]
-					dishesDisplayData.push([
-							menuInfo[1].substr(1, menuInfo[1].length - 2),
-							menuInfo[2],
-							menuInfo[3].substr(1, menuInfo[3].length - 2),
-							menuInfo[4].substr(1, menuInfo[4].length - 2) ]);
+	Ext.Ajax
+			.request({
+				url : "../QueryMenu.do",
+				params : {
+					"pin" : Request["pin"],
+					"type" : "1"
+				},
+				success : function(response, options) {
+					var resultJSON = Ext.util.JSON
+							.decode(response.responseText);
+					if (resultJSON.success == true) {
+						var josnData = resultJSON.data;
+						var menuList = josnData.split("，");
+						for ( var i = 0; i < menuList.length; i++) {
+							var menuInfo = menuList[i].substr(1,
+									menuList[i].length - 2).split(",");
+							// 格式：[菜名，菜名编号，菜名拼音，单价，厨房编号]
+							// 后台格式：[厨房编号,"菜品名称",菜品编号,"菜品拼音","￥菜品单价"]
+							// 前后台格式有差异，厨房编号前台存储放在最后一位
+							dishesDisplayData.push([
+									menuInfo[1].substr(1,
+											menuInfo[1].length - 2),// 菜名
+									menuInfo[2],// 菜名编号
+									menuInfo[3].substr(1,
+											menuInfo[3].length - 2),// 菜名拼音
+									menuInfo[4].substr(1,
+											menuInfo[4].length - 2),// 单价
+									menuInfo[0] // 厨房编号
+							]);
+						}
+						for ( var i = 0; i < dishesDisplayData.length; i++) {
+							dishesDisplayDataShow.push([
+									dishesDisplayData[i][0],
+									dishesDisplayData[i][1],
+									dishesDisplayData[i][2],
+									dishesDisplayData[i][3],
+									dishesDisplayData[i][4] ]);
+						}
+						dishesDisplayStore.reload();
+					}
+				},
+				failure : function(response, options) {
 				}
-				for ( var i = 0; i < dishesDisplayData.length; i++) {
-					dishesDisplayDataShow.push([ dishesDisplayData[i][0],
-							dishesDisplayData[i][1], dishesDisplayData[i][2],
-							dishesDisplayData[i][3] ]);
-				}
-				dishesDisplayStore.reload();
-			}
-		},
-		failure : function(response, options) {
-		}
-	});
+			});
 };
 
 // 口味
@@ -204,9 +220,10 @@ function tasteOnLoad() {
 					// 后台格式：[1,"加辣","￥2.50"]，[2,"少盐","￥0.00"]，[3,"少辣","￥5.00"]
 					// 前后台格式有差异，口味编号前台存储放在最后一位
 					dishTasteData.push([
-							tasteInfo[1].substr(1, tasteInfo[1].length - 2),
-							tasteInfo[2].substr(1, tasteInfo[2].length - 2),
-							tasteInfo[0] ]);
+							tasteInfo[1].substr(1, tasteInfo[1].length - 2), // 口味
+							tasteInfo[2].substr(1, tasteInfo[2].length - 2), // 价钱
+							tasteInfo[0] // 口味编号
+					]);
 				}
 				dishTasteStore.reload();
 			}

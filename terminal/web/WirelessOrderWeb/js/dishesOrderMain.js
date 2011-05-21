@@ -1,6 +1,5 @@
 ﻿// --------------dishes order center panel-----------------
 // 1，数据
-// 格式：[菜名，口味，数量，单价，操作，实价]
 //orderedData.push( [ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "", "￥56.2" ]);
 //orderedData.push( [ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "", "￥56.2" ]);
 
@@ -157,47 +156,69 @@ var orderedForm = new Ext.form.FormPanel({
 	region : "south",
 	height : 60,
 	items : [ {} ],
-	buttons : [ {
-		text : "提交",
-		handler : function() {
-			// Ext.Ajax.request({
-			// url : "../XXXXX.do",
-			// params : {
-			// "pin" : Request["pin"],
-			// "type" : "2"
-			// },
-			// success : function(response, options) {
-			// var resultJSON = Ext.util.JSON.decode(response.responseText);
-			// if (resultJSON.success == true) {
-			// }
-			// },
-			// failure : function(response, options) {
-			// }
-			// });
-		}
-	}, {
-		text : "清空",
-		handler : function() {
-			Ext.Msg.show({
-				title : "提示",
-				msg : "确定要删除所有已点菜式？",
-				buttons : Ext.Msg.YESNO,
-				fn : function(btn) {
-					if (btn == "yes") {
-						orderedData.length = 0;
-						orderedStore.reload();
+	buttons : [
+			{
+				// tableID="100"&customNum="3"&foods="{[1100,2,1,0]}"
+				// 各字段表示的意义：
+				// tableID：餐台号
+				// customNum：就餐人数
+				// foods：菜品列表，格式为{[菜品1编号,菜品1数量,口味1编号,厨房1编号]，[菜品2编号,菜品2数量,口味2编号,厨房2编号]}
+				// 以点菜式格式：[菜名，口味，数量，单价，操作，实价，菜名编号，厨房编号，口味编号]
+				text : "提交",
+				handler : function() {
+					var Request = new URLParaQuery();
+
+					var foodPara = "";
+					for ( var i = 0; i < orderedData.length; i++) {
+						foodPara = foodPara + "[" + orderedData[i][6] + "," // 菜品1编号
+								+ orderedData[i][2] + "," // 菜品1数量
+								+ orderedData[i][8] + "," // 口味1编号
+								+ orderedData[i][7] // 厨房1编号
+								+ "]，";
 					}
-					;
-				},
-				icon : Ext.MessageBox.QUESTION
-			});
-		}
-	}, {
-		text : "返回",
-		handler : function() {
-			location.href = "TableSelect.html";
-		}
-	} ]
+					foodPara = foodPara.substr(0, foodPara.length - 1);
+
+					Ext.Ajax.request({
+						url : "../InsertOrder.do",
+						params : {
+							"pin" : Request["pin"],
+							"tableID" : Request["tableNbr"],
+							"customNum" : Request["personCount"],
+							"foods" : foodPara
+						},
+						success : function(response, options) {
+							var resultJSON = Ext.util.JSON
+									.decode(response.responseText);
+							if (resultJSON.success == true) {
+							}
+						},
+						failure : function(response, options) {
+						}
+					});
+				}
+			}, {
+				text : "清空",
+				handler : function() {
+					Ext.Msg.show({
+						title : "提示",
+						msg : "确定要删除所有已点菜式？",
+						buttons : Ext.Msg.YESNO,
+						fn : function(btn) {
+							if (btn == "yes") {
+								orderedData.length = 0;
+								orderedStore.reload();
+							}
+							;
+						},
+						icon : Ext.MessageBox.QUESTION
+					});
+				}
+			}, {
+				text : "返回",
+				handler : function() {
+					location.href = "TableSelect.html";
+				}
+			} ]
 });
 
 var dishesOrderCenterPanel = new Ext.Panel({
@@ -257,8 +278,11 @@ var dishTasteGrid = new Ext.grid.GridPanel({
 	}),
 	listeners : {
 		rowdblclick : function(thiz, rowIndex, e) {
+			// 口味格式：[口味，价钱，口味编号]
+			// 以点菜式格式：[菜名，口味，数量，单价，操作，实价，菜名编号，厨房编号，口味编号]
 			var selectedTaste = dishTasteData[rowIndex][0];
 			var tastePrice = dishTasteData[rowIndex][1];
+			var tasteNbr = dishTasteData[rowIndex][2];
 			var dishIndex = dishOrderCurrRowIndex_;
 			// update taste
 			orderedData[dishIndex][1] = selectedTaste;
@@ -273,6 +297,9 @@ var dishTasteGrid = new Ext.grid.GridPanel({
 				currPrice = currPrice + "0";
 			}
 			orderedData[dishIndex][5] = "￥" + currPrice;
+			// update taste num
+			orderedData[dishIndex][8] = tasteNbr;
+
 			orderedStore.reload();
 			dishTasteWindow.hide();
 			dishOrderCurrRowIndex_ = -1;
@@ -490,10 +517,8 @@ softKeyBoardDO = new Ext.Window({
 });
 
 // 1，数据
-// 格式：[菜名，菜名编号，菜名拼音，单价]
+// 格式：[菜名，菜名编号，菜名拼音，单价，厨房编号]
 // dishesDisplayData = [];
-// dishesDisplayData.push( [ "酸菜鱼", 1101, "SCY", "￥35.1" ]);
-// dishesDisplayData.push( [ "京酱肉丝", 2201, "JJRS", "￥50" ]);
 
 // 2，表格的数据store
 var dishesDisplayStore = new Ext.data.Store({
@@ -534,34 +559,39 @@ var dishesDisplayColumnModel = new Ext.grid.ColumnModel([
 		} ]);
 
 // 4，表格
-var dishesDisplayGrid = new Ext.grid.GridPanel({
-	xtype : "grid",
-	// height : 400,
-	anchor : "98%",
-	autoScroll : true,
-	region : "center",
-	ds : dishesDisplayStore,
-	cm : dishesDisplayColumnModel,
-	sm : new Ext.grid.RowSelectionModel({
-		singleSelect : true
-	}),
-	listeners : {
-		rowdblclick : function(thiz, rowIndex, e) {
-			var dishCurrCount = dishesOrderEastPanel.findById("orderCountNum")
-					.getValue();
-			var dishCurrName = dishesDisplayDataShow[rowIndex][0];
-			var dishCurrPrice = dishesDisplayDataShow[rowIndex][3];
-
-			orderedData.push([ dishCurrName, "无口味", dishCurrCount,
-					dishCurrPrice, "", dishCurrPrice ]);
-			orderedStore.reload();
-		},
-		render : function(thiz) {
-			orderedMenuOnLoad();
-			tasteOnLoad();
-		}
-	}
-});
+var dishesDisplayGrid = new Ext.grid.GridPanel(
+		{
+			xtype : "grid",
+			// height : 400,
+			anchor : "98%",
+			autoScroll : true,
+			region : "center",
+			ds : dishesDisplayStore,
+			cm : dishesDisplayColumnModel,
+			sm : new Ext.grid.RowSelectionModel({
+				singleSelect : true
+			}),
+			listeners : {
+				rowdblclick : function(thiz, rowIndex, e) {
+					// mune格式：[菜名，菜名编号，菜名拼音，单价，厨房编号]
+					// ordered格式：[菜名，口味，数量，单价，操作，实价，菜名编号，厨房编号，口味编号]
+					var dishCurrCount = dishesOrderEastPanel.findById(
+							"orderCountNum").getValue();
+					var dishCurrName = dishesDisplayDataShow[rowIndex][0];
+					var dishCurrPrice = dishesDisplayDataShow[rowIndex][3];
+					var dishNbr = dishesDisplayDataShow[rowIndex][1];
+					var kitchenNbr = dishesDisplayDataShow[rowIndex][4];
+					orderedData.push([ dishCurrName, "无口味", dishCurrCount,
+							dishCurrPrice, "", dishCurrPrice, dishNbr,
+							kitchenNbr, 0 ]);
+					orderedStore.reload();
+				},
+				render : function(thiz) {
+					orderedMenuOnLoad();
+					tasteOnLoad();
+				}
+			}
+		});
 
 dishesDisplayStore.reload();
 
