@@ -31,7 +31,7 @@ public class InsertOrder {
 		
 		Terminal term = VerifyPin.exec(pin, model);
 		
-		Table table = QueryTable.exec(pin, model, term.restaurant_id, orderToInsert.tableID);
+		Table table = QueryTable.exec(pin, model, term.restaurant_id, orderToInsert.table_id);
 		
 		if(table.status == Table.TABLE_IDLE){
 		
@@ -91,8 +91,8 @@ public class InsertOrder {
 				//insert to order table
 				sql = "INSERT INTO `" + Params.dbName + 
 						"`.`order` (`id`, `restaurant_id`, `table_id`, `terminal_model`, `terminal_pin`, `order_date`, `custom_num`, `waiter`) VALUES (NULL, " + 
-						table.restaurant_id + ", " + orderToInsert.tableID + ", " + term.modelID + ", "+ term.pin + ", NOW(), " + 
-						orderToInsert.customNum + ", '" + term.owner + "')";
+						table.restaurant_id + ", " + orderToInsert.table_id + ", " + term.modelID + ", "+ term.pin + ", NOW(), " + 
+						orderToInsert.custom_num + ", '" + term.owner + "')";
 				dbCon.stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
 				//get the generated id to order 
 				dbCon.rs = dbCon.stmt.getGeneratedKeys();
@@ -132,7 +132,7 @@ public class InsertOrder {
 			}
 			
 		}else if(table.status == Table.TABLE_BUSY){
-			throw new BusinessException("The tabe(alias_id=" + orderToInsert.tableID + ") to be inserted order is BUSY.", ErrorCode.TABLE_BUSY);
+			throw new BusinessException("The tabe(alias_id=" + orderToInsert.table_id + ") to be inserted order is BUSY.", ErrorCode.TABLE_BUSY);
 			
 		}else{
 			throw new BusinessException("Unknown error occourred while inserting order.", ErrorCode.UNKNOWN);

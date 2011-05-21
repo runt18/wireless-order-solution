@@ -59,7 +59,7 @@ public class PayOrder {
 			String sql = "UPDATE `" + Params.dbName + "`.`order` SET terminal_pin=" + pin +
 						", total_price=" + totalPrice + 
 						", total_price_2=" + Util.price2Float(orderInfo.actualPrice, Util.INT_MASK_3) +
-						", type=" + orderInfo.payManner + 
+						", type=" + orderInfo.pay_manner + 
 						", order_date=NOW()" + 
 						" WHERE id=" + orderInfo.id;
 			dbCon.stmt.addBatch(sql);
@@ -103,33 +103,33 @@ public class PayOrder {
 	 */
 	private static Order execQueryOrder(int pin, short model, Order orderToPay) throws BusinessException, SQLException{
 		
-		Order orderInfo = QueryOrder.exec(pin, model, orderToPay.tableID);
+		Order orderInfo = QueryOrder.exec(pin, model, orderToPay.table_id);
 		
 		DBCon dbCon = new DBCon();
 		
 		try{
 			dbCon.connect();
 			String discount = "discount";
-			if(orderToPay.payType == Order.PAY_NORMAL && orderToPay.discountType == Order.DISCOUNT_1){
+			if(orderToPay.pay_type == Order.PAY_NORMAL && orderToPay.discount_type == Order.DISCOUNT_1){
 				discount = "discount";
 				
-			}else if(orderToPay.payType == Order.PAY_NORMAL && orderToPay.discountType == Order.DISCOUNT_2){
+			}else if(orderToPay.pay_type == Order.PAY_NORMAL && orderToPay.discount_type == Order.DISCOUNT_2){
 				discount = "discount_2";
 				
-			}else if(orderToPay.payType == Order.PAY_MEMBER){
+			}else if(orderToPay.pay_type == Order.PAY_MEMBER){
 				//validate the member id
 				String sql = "SELECT id FROM " + Params.dbName + 
 							 ".member WHERE restaurant_id=" + orderToPay.restaurant_id + 
-							 " AND alias_id='" + orderToPay.memberID + "'";
+							 " AND alias_id='" + orderToPay.member_id + "'";
 				dbCon.rs = dbCon.stmt.executeQuery(sql);
 				if(dbCon.rs.next()){
-					if(orderToPay.discountType == Order.DISCOUNT_1){
+					if(orderToPay.discount_type == Order.DISCOUNT_1){
 						discount = "member_discount_1";
-					}else if(orderToPay.discountType == Order.DISCOUNT_2){
+					}else if(orderToPay.discount_type == Order.DISCOUNT_2){
 						discount = "member_discount_2";
 					}
 				}else{
-					throw new BusinessException("The member id(" + orderToPay.memberID + ") is invalid.", ErrorCode.MEMBER_INVALID);
+					throw new BusinessException("The member id(" + orderToPay.member_id + ") is invalid.", ErrorCode.MEMBER_INVALID);
 				}
 			}
 			
@@ -147,11 +147,11 @@ public class PayOrder {
 			}
 			
 			orderInfo.restaurant_id = orderToPay.restaurant_id;
-			orderInfo.payType = orderToPay.payType;
-			orderInfo.discountType = orderToPay.discountType;
-			orderInfo.memberID = orderToPay.memberID; 
+			orderInfo.pay_type = orderToPay.pay_type;
+			orderInfo.discount_type = orderToPay.discount_type;
+			orderInfo.member_id = orderToPay.member_id; 
 			orderInfo.actualPrice = orderToPay.actualPrice;
-			orderInfo.payManner = orderToPay.payManner;
+			orderInfo.pay_manner = orderToPay.pay_manner;
 			
 			return orderInfo;
 			

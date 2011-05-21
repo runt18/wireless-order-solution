@@ -72,8 +72,8 @@ public class QueryOrder {
 			Order orderInfo = new Order();
 			orderInfo.id = orderID;
 			orderInfo.restaurant_id = table.restaurant_id;
-			orderInfo.tableID = tableID;
-			orderInfo.customNum = nCustom;
+			orderInfo.table_id = tableID;
+			orderInfo.custom_num = nCustom;
 			orderInfo.foods = foods.toArray(new Food[foods.size()]);
 
 			return orderInfo;
