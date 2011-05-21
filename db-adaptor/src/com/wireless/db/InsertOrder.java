@@ -21,8 +21,9 @@ public class InsertOrder {
 	 * @throws BusinessException throws if one of cases below.<br>
 	 * 							 - The terminal is NOT attached to any restaurant.<br>
 	 * 							 - The terminal is expired.<br>
-	 * 							 - The table associated with this order does NOT exist
-	 * 							 - The table associated with this order is BUSY.
+	 * 							 - The table associated with this order does NOT exist.<br>
+	 * 							 - The table associated with this order is BUSY.<br>
+	 * 							 - Any food query to insert does NOT exist.
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 * @return Order completed information to inserted order
 	 */
