@@ -51,11 +51,11 @@ public class ReqParser {
 	public static Order parseInsertOrder(ProtocolPackage req){
 		Order order = new Order();
 		//assign the table id
-		order.tableID = (short)((req.body[0] & 0x00FF) | 
+		order.table_id = (short)((req.body[0] & 0x00FF) | 
 							((req.body[1] & 0x00FF) << 8));
 		
 		//assign the number of customs
-		order.customNum = (byte)(req.body[2] & 0x000000FF);
+		order.custom_num = (byte)(req.body[2] & 0x000000FF);
 		
 		//assign the number of foods
 		int foodNum = (byte)(req.body[3] & 0x000000FF);
@@ -134,11 +134,11 @@ public class ReqParser {
 						((req.body[7] & 0x000000FF) << 24);
 		
 		//assign the table id
-		order.tableID = (short)((req.body[8] & 0x00FF) | 
+		order.table_id = (short)((req.body[8] & 0x00FF) | 
 							((req.body[9] & 0x00FF) << 8));
 		
 		//assign the number of customs
-		order.customNum = (byte)(req.body[10] & 0x000000FF);
+		order.custom_num = (byte)(req.body[10] & 0x000000FF);
 		
 		//assign the number of foods
 		int foodNum = (byte)(req.body[11] & 0x000000FF);
@@ -242,12 +242,12 @@ public class ReqParser {
 			System.arraycopy(req.body, 10, memberIDBytes, 0, len);
 		}
 		Order orderToPay = new Order();
-		orderToPay.tableID = tableToPay;
+		orderToPay.table_id = tableToPay;
 		orderToPay.actualPrice = totalPrice;
-		orderToPay.payType = payType;
-		orderToPay.discountType = discountType;
-		orderToPay.payManner = payManner;
-		orderToPay.memberID = memberID;
+		orderToPay.pay_type = payType;
+		orderToPay.discount_type = discountType;
+		orderToPay.pay_manner = payManner;
+		orderToPay.member_id = memberID;
 		return orderToPay;
 	}
 }

@@ -87,11 +87,11 @@ public class ReqPrintOrder2 extends ReqOrderPackage{
 		body[7] = (byte)((restaurantID >> 24) & 0x000000FF);
 		
 		//assign the table id
-		body[8] = (byte)(reqOrder.tableID & 0x00FF);
-		body[9] = (byte)((reqOrder.tableID & 0xFF00) >> 8);
+		body[8] = (byte)(reqOrder.table_id & 0x00FF);
+		body[9] = (byte)((reqOrder.table_id & 0xFF00) >> 8);
 		
 		//assign the custom number
-		body[10] = (byte)(reqOrder.customNum & 0x000000FF);
+		body[10] = (byte)(reqOrder.custom_num & 0x000000FF);
 		
 		//assign the number of foods
 		body[11] = (byte)(reqOrder.foods.length & 0x000000FF);

@@ -49,11 +49,11 @@ public class RespQueryOrder extends RespPackage{
 		body = new byte[bodyLen];
 		
 		//assign the table id
-		body[0] = (byte)(order.tableID & 0x00FF);
-		body[1] = (byte)((order.tableID & 0xFF00) >> 8);
+		body[0] = (byte)(order.table_id & 0x00FF);
+		body[1] = (byte)((order.table_id & 0xFF00) >> 8);
 		
 		//assign the custom number
-		body[2] = (byte)(order.customNum & 0x000000FF);
+		body[2] = (byte)(order.custom_num & 0x000000FF);
 		
 		//assign the total price
 		body[3] = (byte)(order.actualPrice & 0x000000FF);

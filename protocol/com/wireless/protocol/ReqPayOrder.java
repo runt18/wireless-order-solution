@@ -31,9 +31,9 @@ public class ReqPayOrder extends ReqOrderPackage{
 		header.reserved = printType;
 		
 		byte[] memberIDBytes = new byte[0];
-		if(order.memberID != null){
+		if(order.member_id != null){
 			try{
-				memberIDBytes = order.memberID.getBytes("UTF-8");
+				memberIDBytes = order.member_id.getBytes("UTF-8");
 			}catch(UnsupportedEncodingException e){}
 		}
 		
@@ -51,19 +51,19 @@ public class ReqPayOrder extends ReqOrderPackage{
 		
 		body = new byte[bodyLen];
 		//assign the table id
-		body[0] = (byte)(order.tableID & 0x00FF);
-		body[1] = (byte)((order.tableID >> 8) & 0x00FF);
+		body[0] = (byte)(order.table_id & 0x00FF);
+		body[1] = (byte)((order.table_id >> 8) & 0x00FF);
 		//assign the total price
 		body[2] = (byte)(order.actualPrice & 0x000000FF);
 		body[3] = (byte)((order.actualPrice >> 8) & 0x000000FF);
 		body[4] = (byte)((order.actualPrice >> 16) & 0x000000FF);
 		body[5] = (byte)((order.actualPrice >> 24) & 0x000000FF);
 		//assign the payment type
-		body[6] = (byte)(order.payType & 0x000000FF);
+		body[6] = (byte)(order.pay_type & 0x000000FF);
 		//assign the discount type
-		body[7] = (byte)(order.discountType & 0x000000FF);
+		body[7] = (byte)(order.discount_type & 0x000000FF);
 		//assign the payment manner
-		body[8] = (byte)(order.payManner & 0x000000FF);
+		body[8] = (byte)(order.pay_manner & 0x000000FF);
 		//assign the length of the member id
 		body[9] = (byte)(memberIDBytes.length & 0x000000FF);
 		//assign the value of the member id

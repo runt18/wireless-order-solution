@@ -83,11 +83,11 @@ public class ReqInsertOrder extends ReqOrderPackage {
 		
 		body = new byte[bodyLen];
 		//assign the table id
-		body[0] = (byte)(reqOrder.tableID & 0x00FF);
-		body[1] = (byte)((reqOrder.tableID & 0xFF00) >> 8);
+		body[0] = (byte)(reqOrder.table_id & 0x00FF);
+		body[1] = (byte)((reqOrder.table_id & 0xFF00) >> 8);
 
 		//assign the custom number
-		body[2] = (byte)(reqOrder.customNum & 0x000000FF);
+		body[2] = (byte)(reqOrder.custom_num & 0x000000FF);
 		
 		//assign the number of foods
 		body[3] = (byte)(reqOrder.foods.length & 0x000000FF);

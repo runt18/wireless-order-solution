@@ -44,10 +44,10 @@ public class RespParser {
 		 *******************************************************/
 		if(response.header.type == Type.ACK){
 			//get the table id
-			order.tableID = (short)((response.body[0] & 0x00FF) | ((response.body[1] & 0x00FF) << 8));
+			order.table_id = (short)((response.body[0] & 0x00FF) | ((response.body[1] & 0x00FF) << 8));
 
 			//get the custom number
-			order.customNum = (int)response.body[2];
+			order.custom_num = (int)response.body[2];
 
 			//get the total price
 			order.totalPrice =  (response.body[3] & 0x000000FF) | 
