@@ -13,6 +13,9 @@
 		<action path="/QueryMenu" type="com.wireless.Actions.dishesOrder.QueryMenuAction"
 			scope="request">
 		</action>
+		<action path="/CancelOrder" type="com.wireless.Actions.tableSelect.CancelOrderAction"
+			scope="request">
+		</action>
 	</action-mappings>
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
 </struts-config>

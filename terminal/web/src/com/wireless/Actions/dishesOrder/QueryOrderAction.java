@@ -17,6 +17,7 @@ import com.wireless.db.QueryOrder;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
+import com.wireless.protocol.Taste;
 
 import com.wireless.protocol.Terminal;
 import com.wireless.protocol.Util;
@@ -61,7 +62,11 @@ public class QueryOrderAction extends Action {
 					jsonOrderFood = jsonOrderFood.replace("$(food)", order.foods[i].name);
 					jsonOrderFood = jsonOrderFood.replace("$(food_id)", new Integer(order.foods[i].alias_id).toString());
 					jsonOrderFood = jsonOrderFood.replace("$(kitchen)", new Short(order.foods[i].kitchen).toString());
-					jsonOrderFood = jsonOrderFood.replace("$(taste)", order.foods[i].taste.preference);
+					if(order.foods[i].taste.alias_id == Taste.NO_TASTE){
+						jsonOrderFood = jsonOrderFood.replace("$(taste)", "无口味");
+					}else{
+						jsonOrderFood = jsonOrderFood.replace("$(taste)", order.foods[i].taste.preference);
+					}
 					jsonOrderFood = jsonOrderFood.replace("$(taste_id)", new Short(order.foods[i].taste.alias_id).toString());
 					jsonOrderFood = jsonOrderFood.replace("$(count)", order.foods[i].count2String());
 					jsonOrderFood = jsonOrderFood.replace("$(unit)", Util.price2String(order.foods[i].price2(),	Util.INT_MASK_2));

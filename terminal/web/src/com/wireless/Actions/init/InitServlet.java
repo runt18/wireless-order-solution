@@ -5,6 +5,7 @@ import javax.servlet.ServletException;
 import org.apache.struts.action.ActionServlet;
 
 import com.wireless.db.Params;
+import com.wireless.sccon.ServerConnector;
 
 public class InitServlet extends ActionServlet {
 
@@ -20,6 +21,8 @@ public class InitServlet extends ActionServlet {
 		Params.setDbPort(Integer.parseInt(getServletConfig().getInitParameter("db_port")));
 		Params.setDbUser(getServletConfig().getInitParameter("db_user"));
 		Params.setDbPwd(getServletConfig().getInitParameter("db_pwd"));
+		ServerConnector.instance().setNetAddr(getServletConfig().getInitParameter("socket_host"));
+		ServerConnector.instance().setNetPort(Integer.parseInt(getServletConfig().getInitParameter("socket_port")));
 		super.init();
 	}
 }
