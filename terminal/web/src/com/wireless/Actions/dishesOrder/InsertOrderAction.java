@@ -18,6 +18,7 @@ import com.wireless.protocol.PinGen;
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqInsertOrder;
 import com.wireless.protocol.ReqOrderPackage;
+import com.wireless.protocol.Reserved;
 import com.wireless.protocol.Terminal;
 import com.wireless.protocol.Type;
 import com.wireless.sccon.ServerConnector;
@@ -53,7 +54,10 @@ public class InsertOrderAction extends Action implements PinGen {
 			orderToInsert.foods = toFoodArray(request.getParameter("foods"));
 			
 			ReqOrderPackage.setGen(this);
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(orderToInsert));
+			byte printType = Reserved.PRINT_ORDER_2 | Reserved.PRINT_ORDER_DETAIL_2;
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(orderToInsert, 
+																					 Type.INSERT_ORDER,
+																					 printType));
 			if(resp.header.type == Type.ACK){
 				jsonResp = jsonResp.replace("$(result)", "true");
 				jsonResp = jsonResp.replace("$(value)", orderToInsert.tableID + "号餐台下单成功");
@@ -82,6 +86,10 @@ public class InsertOrderAction extends Action implements PinGen {
 			jsonResp = jsonResp.replace("$(result)", "false");
 			jsonResp = jsonResp.replace("$(value)", "服务器请求不成功，请重新检查网络是否连通");
 			
+		}catch(NumberFormatException e){
+			jsonResp = jsonResp.replace("$(result)", "false");
+			jsonResp = jsonResp.replace("$(value)", "菜品提交的数量不正确，请检查后重新提交");
+			
 		}finally{
 			//just for debug
 			System.out.println(jsonResp);
@@ -97,7 +105,7 @@ public class InsertOrderAction extends Action implements PinGen {
 	 * 			{[菜品1编号,菜品1数量,口味1编号,厨房1编号]，[菜品2编号,菜品2数量,口味2编号,厨房2编号]，...}
 	 * @return the class food array
 	 */
-	private Food[] toFoodArray(String submitFoods){
+	private Food[] toFoodArray(String submitFoods) throws NumberFormatException{
 		//remove the "{}"
 		submitFoods = submitFoods.substring(1, submitFoods.length() - 1);
 		//extract each food item string
@@ -106,8 +114,9 @@ public class InsertOrderAction extends Action implements PinGen {
 		for(int i = 0; i < foodItems.length; i++){
 			//remove the "[]"
 			String foodItem = foodItems[i].substring(1, foodItems[i].length() - 1);
-			//extract each food detail information string
-			String[] values = foodItem.split(",");			
+			foods[i] = new Food();
+			//extract each food detail information string			
+			String[] values = foodItem.split(",");		
 			//extract the food alias id
 			foods[i].alias_id = Integer.parseInt(values[0]);
 			//extract the amount to order food
