@@ -38,7 +38,7 @@ public class PayOrderScreen extends MainScreen
 		//The food has ordered would be listed in here.
 		VerticalFieldManager vfm = new VerticalFieldManager();
 		vfm.add(new SeparatorField());
-		vfm.add(new LabelField(_bill.tableID + "号餐台信息", LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
+		vfm.add(new LabelField(_bill.table_id + "号餐台信息", LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
 			protected void paintBackground(Graphics g) {
 				g.clear();
 				g.setBackgroundColor(Color.GRAY);
@@ -50,7 +50,7 @@ public class PayOrderScreen extends MainScreen
 				super.paint(g);  
 			}
 		});
-		_customNum = new LabelField("人数：" + new Integer(_bill.customNum).toString());
+		_customNum = new LabelField("人数：" + new Integer(_bill.custom_num).toString());
 		vfm.add(_customNum);
 		vfm.add(new SeparatorField());
 		vfm.add(new LabelField("已点菜", LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
@@ -119,8 +119,8 @@ public class PayOrderScreen extends MainScreen
 			public void fieldChanged(Field field, int context) {
 				try{
 					_bill.setActualPrice(new Float(Float.parseFloat(_actualIncome.getText())));
-					_bill.payType = Order.PAY_NORMAL;
-					_bill.discountType = Order.DISCOUNT_1;
+					_bill.pay_type = Order.PAY_NORMAL;
+					_bill.discount_type = Order.DISCOUNT_1;
 					UiApplication.getUiApplication().pushScreen(new SelectMannerPopup(_bill, _self));					
 				}catch(NumberFormatException e){
 					Dialog.alert("实收数字不正确，请重新输入");
@@ -133,8 +133,8 @@ public class PayOrderScreen extends MainScreen
 		submitDiscount.setChangeListener(new FieldChangeListener(){
 			public void fieldChanged(Field field, int context) {
 				_bill.setActualPrice(new Float(Float.parseFloat(_actualIncome.getText())));
-				_bill.payType = Order.PAY_NORMAL;
-				_bill.discountType = Order.DISCOUNT_2;
+				_bill.pay_type = Order.PAY_NORMAL;
+				_bill.discount_type = Order.DISCOUNT_2;
 				UiApplication.getUiApplication().pushScreen(new SelectMannerPopup(_bill, _self));
 			}			
 		});

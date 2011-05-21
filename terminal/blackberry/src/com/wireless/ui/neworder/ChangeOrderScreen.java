@@ -27,7 +27,7 @@ public class ChangeOrderScreen extends MainScreen
 		VerticalFieldManager _vfm = new VerticalFieldManager();
 		_vfm.add(new SeparatorField());
 		
-		_tableTitle = new LabelField(_originalOrder.tableID + "号餐台信息", LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
+		_tableTitle = new LabelField(_originalOrder.table_id + "号餐台信息", LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
 			protected void paintBackground(Graphics g) {
 				g.clear();
 				g.setBackgroundColor(Color.GRAY);
@@ -42,7 +42,7 @@ public class ChangeOrderScreen extends MainScreen
 
 		_vfm.add(_tableTitle);
 		
-		_table = new EditField("台号：", new Short(_originalOrder.tableID).toString(),
+		_table = new EditField("台号：", new Short(_originalOrder.table_id).toString(),
 							   4, TextField.NO_NEWLINE | EditField.FILTER_NUMERIC);
 		
 		/**
@@ -57,7 +57,7 @@ public class ChangeOrderScreen extends MainScreen
 //		});
 		_vfm.add(_table);
 		
-		_customNum = new EditField("人数：", new Integer(_originalOrder.customNum).toString(), 
+		_customNum = new EditField("人数：", new Integer(_originalOrder.custom_num).toString(), 
 									2, TextField.NO_NEWLINE | EditField.FILTER_NUMERIC){
 			protected boolean navigationClick(int status, int time){
 				return true;
@@ -115,7 +115,7 @@ public class ChangeOrderScreen extends MainScreen
 					Order reqOrder = new Order(foods, 
 											   Short.parseShort(_table.getText()), 
 											   Integer.parseInt(_customNum.getText()));
-					reqOrder.originalTableID = _originalOrder.tableID;
+					reqOrder.originalTableID = _originalOrder.table_id;
 					
 					UiApplication.getUiApplication().pushScreen(new SubmitChangePopup(reqOrder, _self));
 				}
