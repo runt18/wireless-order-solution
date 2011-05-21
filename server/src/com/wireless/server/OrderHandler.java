@@ -619,8 +619,8 @@ class OrderHandler extends Handler implements Runnable{
 		 * In the case the table is the same as before,
 		 * need to assure the table to update remains in busy.
 		 */
-		if(orderToUpdate.tableID == orderToUpdate.originalTableID){
-			orderID = getUnPaidOrderID(orderToUpdate.tableID);
+		if(orderToUpdate.table_id == orderToUpdate.originalTableID){
+			orderID = getUnPaidOrderID(orderToUpdate.table_id);
 			
 		/**
 		 * In the case that the table is different from before,
@@ -631,8 +631,8 @@ class OrderHandler extends Handler implements Runnable{
 		}else{			
 			orderID = getUnPaidOrderID(orderToUpdate.originalTableID);
 			try{
-				getUnPaidOrderID(orderToUpdate.tableID);
-				throw new OrderBusinessException("The table(alias_id=" + orderToUpdate.tableID + ")to be transferred is busy", ErrorCode.TABLE_BUSY);
+				getUnPaidOrderID(orderToUpdate.table_id);
+				throw new OrderBusinessException("The table(alias_id=" + orderToUpdate.table_id + ")to be transferred is busy", ErrorCode.TABLE_BUSY);
 			}catch(OrderBusinessException e){
 				if(e.errCode == ErrorCode.TABLE_IDLE){
 					//proceed to update the new order if the table to be transferred is idle
@@ -827,8 +827,8 @@ class OrderHandler extends Handler implements Runnable{
 
 
 		//update the custom number depending on the order id to "order" table
-		 sql = "UPDATE `" + WirelessSocketServer.database + "`.`order` SET custom_num=" + orderToUpdate.customNum +
-				", terminal_pin=" + _pin + ", waiter='" + _owner + "', table_id=" + orderToUpdate.tableID + " WHERE id=" + orderID;
+		 sql = "UPDATE `" + WirelessSocketServer.database + "`.`order` SET custom_num=" + orderToUpdate.custom_num +
+				", terminal_pin=" + _pin + ", waiter='" + _owner + "', table_id=" + orderToUpdate.table_id + " WHERE id=" + orderID;
 		_stmt.addBatch(sql);
 
 		_stmt.executeBatch();
@@ -871,7 +871,7 @@ class OrderHandler extends Handler implements Runnable{
 			if(!tmpFoods.isEmpty()){
 				extraOrder = new Order();
 				extraOrder.id = orderID;
-				extraOrder.tableID = orderToUpdate.tableID;
+				extraOrder.table_id = orderToUpdate.table_id;
 				extraOrder.foods = tmpFoods.toArray(new Food[tmpFoods.size()]);
 			}
 			
@@ -907,7 +907,7 @@ class OrderHandler extends Handler implements Runnable{
 			if(!tmpFoods.isEmpty()){
 				cancelledOrder = new Order();
 				cancelledOrder.id = orderID;
-				cancelledOrder.tableID = orderToUpdate.tableID;
+				cancelledOrder.table_id = orderToUpdate.table_id;
 				cancelledOrder.foods = tmpFoods.toArray(new Food[tmpFoods.size()]);
 			}
 			
