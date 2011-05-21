@@ -176,7 +176,8 @@ var orderedForm = new Ext.form.FormPanel({
 								+ orderedData[i][7] // 厨房1编号
 								+ "]，";
 					}
-					foodPara = foodPara.substr(0, foodPara.length - 1);
+					foodPara = "{" + foodPara.substr(0, foodPara.length - 1)
+							+ "}";
 
 					Ext.Ajax.request({
 						url : "../InsertOrder.do",
