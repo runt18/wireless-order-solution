@@ -57,7 +57,7 @@ public class QueryOrderAction extends Action {
 					 * The json to order food looks like below.
 					 * ["菜名",菜名编号,厨房编号,"口味",口味编号,数量,单价]
 					 */
-					String jsonOrderFood = "[\"$(food)\",$(food_id),$(kitchen)\"$(taste)\",$(taste_id),$(count),\"$(unit)\"]";
+					String jsonOrderFood = "[\"$(food)\",$(food_id),$(kitchen),\"$(taste)\",$(taste_id),$(count),\"$(unit)\"]";
 					jsonOrderFood = jsonOrderFood.replace("$(food)", order.foods[i].name);
 					jsonOrderFood = jsonOrderFood.replace("$(food_id)", new Integer(order.foods[i].alias_id).toString());
 					jsonOrderFood = jsonOrderFood.replace("$(kitchen)", new Short(order.foods[i].kitchen).toString());
