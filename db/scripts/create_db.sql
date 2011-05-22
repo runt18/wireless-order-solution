@@ -37,6 +37,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food` (
   `id` BIGINT UNSIGNED NOT NULL COMMENT 'in the form of \"restaurant.id << 32 | food.alias_id\"' ,
   `alias_id` SMALLINT UNSIGNED NOT NULL COMMENT 'the waiter use this alias id to select food in terminal' ,
   `name` VARCHAR(45) NOT NULL COMMENT 'the name of the food' ,
+  `pinyin` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the pinyin to this food' ,
   `unit_price` DECIMAL(7,2) UNSIGNED NOT NULL DEFAULT 0.0 COMMENT 'the unit price of the food' ,
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'indicates the food belong to which restaurant' ,
   `kitchen` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the kitchen number which the food belong to. the maximum value (255) means the food does not belong to any kitchen.' ,
@@ -163,6 +164,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`table` (
   `alias_id` SMALLINT UNSIGNED NULL ,
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'Indicates the table belongs to which restaurant.' ,
   `enabled` TINYINT NOT NULL DEFAULT 1 COMMENT 'indicates whether the table information is enabled or not' ,
+  `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to this table' ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_table_restaurant1` (`restaurant_id` ASC) ,
   CONSTRAINT `fk_table_restaurant1`
