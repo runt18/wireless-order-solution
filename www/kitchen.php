@@ -28,8 +28,10 @@ if($editType == "addKitchen" || $editType == "editKitchen")
 	$name = $_POST["name"];
 	$discount_1 = $_POST["discount_1"];
 	$discount_2 = $_POST["discount_2"];
+	$discount_3 = $_POST["discount_3"];
 	$member_discount_1 = $_POST["member_discount_1"];
 	$member_discount_2 = $_POST["member_discount_2"];
+	$member_discount_3 = $_POST["member_discount_3"];
 	
 	$validate = true;
 	if($editType == "addKitchen")
@@ -49,7 +51,7 @@ if($editType == "addKitchen" || $editType == "editKitchen")
 	else
 	{
 		$id = $_POST["id"];				
-		$sql = "UPDATE kitchen SET name='$name',discount=$discount_1,discount_2 = $discount_2,member_discount_1=$member_discount_1,member_discount_2=$member_discount_2 WHERE id=$id";		
+		$sql = "UPDATE kitchen SET name='$name',discount=$discount_1,discount_2 = $discount_2,discount_3 = $discount_3,member_discount_1=$member_discount_1,member_discount_2=$member_discount_2,member_discount_3=$member_discount_3 WHERE id=$id";		
 	}	
 	if($validate)
 	{
@@ -92,8 +94,10 @@ else if($editType == "deleteKitchen")
 		<option value="name">名称</option>
 		<option value="discount1">一般折扣1</option>
 		<option value="discount2">一般折扣2</option>
+		<option value="discount3">一般折扣3</option>
 		<option value="member_discount1">会员折扣1</option>
 		<option value="member_discount2">会员折扣2</option>
+		<option value="member_discount3">会员折扣3</option>
 	</select>
 	<select id="condition_type" name="condition_type" style="display:none">
 	<option value="Equal">等于</option>
@@ -115,9 +119,11 @@ else if($editType == "deleteKitchen")
 				<th><h3>编&nbsp;号</h3></th>
 				<th><h3>名&nbsp;称</h3></th>
 				<th><h3>一般折扣1</h3></th>	
-				<th><h3>一般折扣2</h3></th>				
+				<th><h3>一般折扣2</h3></th>	
+				<th><h3>一般折扣3</h3></th>			
 				<th><h3>会员折扣1</h3></th>
 				<th><h3>会员折扣2</h3></th>
+				<th><h3>会员折扣3</h3></th>
 				<th><h3>操&nbsp;作</h3></th>
 			</tr>
 		</thead>
@@ -127,7 +133,7 @@ include("conn.php");
 $xm=$_REQUEST["keyword_type"];
 $ct=$_REQUEST["condition_type"];
 $kw=$_REQUEST["keyword"]; 
-$sql = "SELECT id,alias_id,name,discount,discount_2,member_discount_1,member_discount_2 FROM kitchen WHERE restaurant_id=" . $_SESSION["restaurant_id"];			
+$sql = "SELECT id,alias_id,name,discount,discount_2,discount_3,member_discount_1,member_discount_2,member_discount_3 FROM kitchen WHERE restaurant_id=" . $_SESSION["restaurant_id"];			
 switch ($xm)
 {
 	case "alias_id":
@@ -160,15 +166,32 @@ switch ($xm)
 		{
 			if($ct == "Equal")
 			{
-				$sql .= " AND discount = $kw" ;  
+				$sql .= " AND discount_2 = $kw" ;  
 			}
 			elseif($ct == "EqualOrGrater")
 			{
-				$sql .= " AND discount >= $kw" ; 
+				$sql .= " AND discount_2 >= $kw" ; 
 			}
 			elseif($ct == "EqualOrLess")
 			{
-				$sql .= " AND discount <= $kw" ; 
+				$sql .= " AND discount_2 <= $kw" ; 
+			}
+		}				
+		break;		
+	case "discount3":
+		if ($kw!="")
+		{
+			if($ct == "Equal")
+			{
+				$sql .= " AND discount_3 = $kw" ;  
+			}
+			elseif($ct == "EqualOrGrater")
+			{
+				$sql .= " AND discount_3 >= $kw" ; 
+			}
+			elseif($ct == "EqualOrLess")
+			{
+				$sql .= " AND discount_3 <= $kw" ; 
 			}
 		}				
 		break;		
@@ -206,6 +229,23 @@ switch ($xm)
 			}
 		}				
 		break;		
+	case "member_discount3":
+		if ($kw!="")
+		{
+			if($ct == "Equal")
+			{
+				$sql .= " AND member_discount_3 = $kw" ;  
+			}
+			elseif($ct == "EqualOrGrater")
+			{
+				$sql .= " AND member_discount_3 >= $kw" ; 
+			}
+			elseif($ct == "EqualOrLess")
+			{
+				$sql .= " AND member_discount_3 <= $kw" ; 
+			}
+		}				
+		break;		
 }			
 $bh=0;
 mysql_query("SET NAMES utf8"); 
@@ -218,9 +258,11 @@ foreach ($rs as $row){
 	echo "<td>" .$row["name"] ."</td>";
 	echo "<td>" .$row["discount"] ."</td>";
 	echo "<td>" .$row["discount_2"] ."</td>";
+	echo "<td>" .$row["discount_3"] ."</td>";
 	echo "<td>" .$row["member_discount_1"] ."</td>";
 	echo "<td>" .$row["member_discount_2"] ."</td>";	
-	echo "<td><a href='#' onclick='editKitchen(&quot;".$row["id"]."&quot;,&quot;".$bh."&quot;,&quot;".$row["name"]."&quot;,&quot;".$row["discount"]."&quot;,&quot;".$row["discount_2"]."&quot;,&quot;".$row["member_discount_1"]."&quot;,&quot;".$row["member_discount_2"].
+	echo "<td>" .$row["member_discount_3"] ."</td>";	
+	echo "<td><a href='#' onclick='editKitchen(&quot;".$row["id"]."&quot;,&quot;".$bh."&quot;,&quot;".$row["name"]."&quot;,&quot;".$row["discount"]."&quot;,&quot;".$row["discount_2"]."&quot;,&quot;".$row["discount_3"]."&quot;,&quot;".$row["member_discount_1"]."&quot;,&quot;".$row["member_discount_2"]."&quot;,&quot;".$row["member_discount_3"].
 		"&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
 		"<a href='#' style='display:none' onclick='deleteKitchen(".$row["id"].")'><img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;删除</a></td>";
 	echo "</tr>";

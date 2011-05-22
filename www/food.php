@@ -232,7 +232,8 @@ foreach ($rs as $row){
 	echo "<td>" .$row["kitchen"] ."</td>";
 	echo "<td><a href='#' onclick='editFood(&quot;".$row["id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["name"]."&quot;,&quot;".$row["unit_price"]."&quot;,&quot;".$row["kitchen_value"]."&quot;,&quot;".$kitchens.
 		"&quot;,".$row["status"].")'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
-		"<a href='#' onclick='deleteFood(".$row["id"].")'><img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;删除</a></td>";
+		"<a href='#' onclick='deleteFood(".$row["id"].")'><img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;删除</a>&nbsp;&nbsp;&nbsp;&nbsp;".
+		"<a href='food_material.php?id=".$row["id"]."'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;关联</a></td>";
 	echo "</tr>";
 }
 //mysql_query("SET NAMES utf8"); 
