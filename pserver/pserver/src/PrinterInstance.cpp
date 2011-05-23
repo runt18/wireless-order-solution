@@ -306,21 +306,22 @@ void PrinterInstance::split2Details(const string& print_content, const vector<in
 			int length = (print_content[offset + 1] & 0x000000FF) | ((print_content[offset + 2] & 0x000000FF) << 8);
 			int kit2Print = print_content[offset];
 
-			//enumerate to see which kitchens match the print content,
-			//and then print it
-			vector<int>::const_iterator it = kitchens.begin();
-			for(it; it != kitchens.end(); it++){		
-				/************************************************************************
-				* Either of two cases below means kitchen between print request and printer instance is matched     
-				* 1 - the kitchen equals to Kitchen.KITCHEN_FULL
-				* 2 - the kitchen equals to print request
-				************************************************************************/
-				if(*it == Kitchen::KITCHEN_FULL || *it == kit2Print){
-					detail_content.push_back(string(print_content.begin() + offset + 3, print_content.begin() + offset + 3 + length));
-					break;
+			if(kit2Print != Kitchen::KITCHEN_NULL){
+				//enumerate to see which kitchens match the print content,
+				//and then print it
+				vector<int>::const_iterator it = kitchens.begin();
+				for(it; it != kitchens.end(); it++){		
+					/************************************************************************
+					* Either of two cases below means kitchen between print request and printer instance is matched     
+					* 1 - the kitchen equals to Kitchen.KITCHEN_FULL
+					* 2 - the kitchen equals to print request
+					************************************************************************/
+					if(*it == Kitchen::KITCHEN_FULL || *it == kit2Print){
+						detail_content.push_back(string(print_content.begin() + offset + 3, print_content.begin() + offset + 3 + length));
+						break;
+					}
 				}
-			}	
-
+			}
 			offset += 3 + length;
 
 		}
