@@ -28,14 +28,15 @@ public class QueryOrder {
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement.
 	 */
-	public static Order exec(int pin, short model, short tableID)
-			throws BusinessException, SQLException {
-
-		Table table = QueryTable.exec(pin, model, tableID);
+	public static Order exec(int pin, short model, short tableID) throws BusinessException, SQLException {
+		
 		DBCon dbCon = new DBCon();
+		
 		try {
 			dbCon.connect();
 
+			Table table = QueryTable.exec(dbCon, pin, model, tableID);
+			
 			int orderID = Util.getUnPaidOrderID(dbCon, table);
 			int nCustom = 0;
 			// query the custom number from "order" table according to the order id
@@ -61,7 +62,7 @@ public class QueryOrder {
 				food.alias_id = dbCon.rs.getInt("food_id");
 				food.setCount(new Float(dbCon.rs.getFloat("order_sum")));
 				food.setPrice(new Float(dbCon.rs.getFloat("unit_price")));
-				food.kitchen = dbCon.rs.getByte("kitchen");
+				food.kitchen = dbCon.rs.getShort("kitchen");
 				food.discount = (byte) (dbCon.rs.getFloat("discount") * 100);
 				food.taste.preference = dbCon.rs.getString("taste");
 				food.taste.setPrice(dbCon.rs.getFloat("taste_price"));

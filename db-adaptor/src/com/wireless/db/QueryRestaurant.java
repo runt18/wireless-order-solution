@@ -22,11 +22,13 @@ public class QueryRestaurant {
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
 	public static Restaurant exec(int pin, short model) throws BusinessException, SQLException{ 
-		Terminal term = VerifyPin.exec(pin, model);
+
 		DBCon dbCon = new DBCon();
 		
 		try{
 			dbCon.connect();
+			
+			Terminal term = VerifyPin.exec(dbCon, pin, model);
 			
 			Restaurant restaurant = new Restaurant();
 			restaurant.owner = term.owner;

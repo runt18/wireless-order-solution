@@ -20,14 +20,16 @@ public class QueryTable {
 	 */
 	public static Table[] exec(int pin, short model) throws BusinessException, SQLException{
 		
-		Terminal term = VerifyPin.exec(pin, model);
+		
 
 		DBCon dbCon = new DBCon();
 
 		try {   
 			
 			dbCon.connect();			
-	
+			
+			Terminal term = VerifyPin.exec(dbCon, pin, model);
+			
 			ArrayList<Table> tables = new ArrayList<Table>();
 			
 			//get the idle tables
@@ -90,65 +92,69 @@ public class QueryTable {
 	 */
 	public static Table exec(int pin, short model, short tableID) throws BusinessException, SQLException{
 		
-		Terminal term = VerifyPin.exec(pin, model);
+		DBCon dbCon = new DBCon();		
 		
-		return exec(pin, model, term.restaurant_id, tableID);
+		try{
+			dbCon.connect();
+
+			return exec(dbCon, pin, model, tableID);
+			
+		}finally{
+			dbCon.disconnect();
+		}
+		
 	}
 	
 	/**
 	 * Get the table information according the specific table alias id and restaurant id.
 	 * Assure the terminal with this pin is NOT expired before invoking this method.
+	 * Note that the database should be connected before invoking this method
+	 * @param dbCon the database connection
 	 * @param pin the pin to this terminal
 	 * @param model the model to this terminal
-	 * @param restaurantID the restaurant id the table belong to
 	 * @param tableID the table alias id to query
 	 * @return the table information
 	 * @throws BusinessException throws if the table to query does NOT exist
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	static Table exec(int pin, short model, int restaurantID, short tableID) throws BusinessException, SQLException{
+	static Table exec(DBCon dbCon, int pin, short model, short tableID) throws BusinessException, SQLException{
 		
-		DBCon dbCon = new DBCon();
+		Terminal term = VerifyPin.exec(dbCon, pin, model);
 		
-		try{
-			dbCon.connect();
-			
+		/**
+		 * Check to see if the table with this alias id is exist or not.
+		 */
+		String sql = "SELECT id, enabled FROM `" + Params.dbName +
+					"`.`table` WHERE alias_id=" + tableID + 
+					" AND restaurant_id=" + term.restaurant_id + " AND enabled=1";
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
 			/**
-			 * Check to see if the table with this alias id is exist or not.
+			 * Check to see if the table with this alias id is idle or busy
 			 */
-			String sql = "SELECT id, enabled FROM `" + Params.dbName +
-						"`.`table` WHERE alias_id=" + tableID + 
-						" AND restaurant_id=" + restaurantID + " AND enabled=1";
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			if(dbCon.rs.next()){
-				/**
-				 * Check to see if the table with this alias id is idle or busy
-				 */
-				 sql = "SELECT custom_num FROM `" + Params.dbName + 
-					   "`.`order` WHERE table_id = " + tableID +
-					   " AND restaurant_id = " + restaurantID +
-					   " AND total_price IS NULL";
-				 dbCon.rs = dbCon.stmt.executeQuery(sql);
-				 Table table = new Table();
-				 table.restaurant_id = restaurantID;
-				 table.alias_id = tableID;
+			 sql = "SELECT custom_num FROM `" + Params.dbName + 
+				   "`.`order` WHERE table_id = " + tableID +
+				   " AND restaurant_id = " + term.restaurant_id +
+				   " AND total_price IS NULL";
+			 dbCon.rs = dbCon.stmt.executeQuery(sql);
+			 Table table = new Table();
+			 table.restaurant_id = term.restaurant_id;
+			 table.alias_id = tableID;
+			 
+			 if(dbCon.rs.next()){
+				 table.custom_num = dbCon.rs.getByte("custom_num");
+				 table.status = Table.TABLE_BUSY;
+			 }else{
+				 table.status = Table.TABLE_IDLE;
+			 }
+			 
+			 dbCon.rs.close();
+			 return table;
 				 
-				 if(dbCon.rs.next()){
-					 table.custom_num = dbCon.rs.getByte("custom_num");
-					 table.status = Table.TABLE_BUSY;
-				 }else{
-					 table.status = Table.TABLE_IDLE;
-				 }
-				 
-				 return table;
-				 
-			}else{
-				throw new BusinessException("The table(alias_id=" + tableID + ") to query does NOT exist.", ErrorCode.TABLE_NOT_EXIST);
-			}
-			
-		}finally{
-			dbCon.disconnect();
-		}
+		}else{
+			throw new BusinessException("The table(alias_id=" + tableID + ") to query does NOT exist.", ErrorCode.TABLE_NOT_EXIST);
+		}		
+
 	}
 	
 }

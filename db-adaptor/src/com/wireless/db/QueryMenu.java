@@ -29,10 +29,11 @@ public class QueryMenu {
 	 */
 	public static FoodMenu exec(int pin, short model) throws BusinessException, SQLException{
 		
-		Terminal term = VerifyPin.exec(pin, model);
 		
 		try{
 			_dbCon.connect();
+			
+			Terminal term = VerifyPin.exec(_dbCon, pin, model);
 			
 			return new FoodMenu(queryFoods(term.restaurant_id), 
 							    queryTastes(term.restaurant_id),
@@ -55,10 +56,11 @@ public class QueryMenu {
 	 */
 	public static Food[] execFoods(int pin, short model) throws BusinessException, SQLException{
 		
-		Terminal term = VerifyPin.exec(pin, model);
 		
 		try{
 			_dbCon.connect();
+			
+			Terminal term = VerifyPin.exec(_dbCon, pin, model);		
 			
 			return queryFoods(term.restaurant_id);
 			
@@ -78,10 +80,10 @@ public class QueryMenu {
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
 	public static Taste[] execTastes(int pin, short model) throws BusinessException, SQLException {
-		Terminal term = VerifyPin.exec(pin, model);
+
 		try {
 			_dbCon.connect();
-
+			Terminal term = VerifyPin.exec(_dbCon, pin, model);
 			return queryTastes(term.restaurant_id);
 
 		} finally {
@@ -100,10 +102,10 @@ public class QueryMenu {
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
 	public static Kitchen[] execKitchens(int pin, short model) throws BusinessException, SQLException{
-		Terminal term = VerifyPin.exec(pin, model);
+
 		try {
 			_dbCon.connect();
-
+			Terminal term = VerifyPin.exec(_dbCon, pin, model);
 			return queryKitchens(term.restaurant_id);
 
 		} finally {
