@@ -23,15 +23,17 @@ public class PayOrder {
 	 */
 	public static Order exec(int pin, short model, Order orderToPay) throws BusinessException, SQLException{
 		
-		/**
-		 * Get the completed order information.
-		 */
-		Order orderInfo = execQueryOrder(pin, model, orderToPay); 
 		
 		DBCon dbCon = new DBCon();
 		
 		try{
 			dbCon.connect();
+			
+			/**
+			 * Get the completed order information.
+			 */
+			
+			Order orderInfo = execQueryOrder(dbCon, pin, model, orderToPay); 
 			/**
 			 * Calculate the total price of this order as below.
 			 * total = food_price_1 + food_price_2 + ...
@@ -90,6 +92,8 @@ public class PayOrder {
 	
 	/**
 	 * Get the order detail information and get the discount to each food according the payment and discount type.
+	 * Note that the database should be connected before invoking this method.
+	 * @param dbCon the database connection
 	 * @param pin the pin to this terminal
 	 * @param model the model to this terminal
 	 * @param orderToPay the pay order information submitted by terminal,
@@ -101,62 +105,54 @@ public class PayOrder {
 	 * 							 - The table associated with this order is idle.
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	private static Order execQueryOrder(int pin, short model, Order orderToPay) throws BusinessException, SQLException{
+	private static Order execQueryOrder(DBCon dbCon, int pin, short model, Order orderToPay) throws BusinessException, SQLException{
 		
-		Order orderInfo = QueryOrder.exec(pin, model, orderToPay.table_id);
+		Order orderInfo = QueryOrder.exec(dbCon, pin, model, orderToPay.table_id);
 		
-		DBCon dbCon = new DBCon();
-		
-		try{
-			dbCon.connect();
-			String discount = "discount";
-			if(orderToPay.pay_type == Order.PAY_NORMAL && orderToPay.discount_type == Order.DISCOUNT_1){
-				discount = "discount";
-				
-			}else if(orderToPay.pay_type == Order.PAY_NORMAL && orderToPay.discount_type == Order.DISCOUNT_2){
-				discount = "discount_2";
-				
-			}else if(orderToPay.pay_type == Order.PAY_MEMBER){
-				//validate the member id
-				String sql = "SELECT id FROM " + Params.dbName + 
-							 ".member WHERE restaurant_id=" + orderToPay.restaurant_id + 
-							 " AND alias_id='" + orderToPay.member_id + "'";
-				dbCon.rs = dbCon.stmt.executeQuery(sql);
-				if(dbCon.rs.next()){
-					if(orderToPay.discount_type == Order.DISCOUNT_1){
-						discount = "member_discount_1";
-					}else if(orderToPay.discount_type == Order.DISCOUNT_2){
-						discount = "member_discount_2";
-					}
-				}else{
-					throw new BusinessException("The member id(" + orderToPay.member_id + ") is invalid.", ErrorCode.MEMBER_INVALID);
+		String discount = "discount";
+		if(orderToPay.pay_type == Order.PAY_NORMAL && orderToPay.discount_type == Order.DISCOUNT_1){
+			discount = "discount";
+			
+		}else if(orderToPay.pay_type == Order.PAY_NORMAL && orderToPay.discount_type == Order.DISCOUNT_2){
+			discount = "discount_2";
+			
+		}else if(orderToPay.pay_type == Order.PAY_MEMBER){
+			//validate the member id
+			String sql = "SELECT id FROM " + Params.dbName + 
+						 ".member WHERE restaurant_id=" + orderToPay.restaurant_id + 
+						 " AND alias_id='" + orderToPay.member_id + "'";
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
+				if(orderToPay.discount_type == Order.DISCOUNT_1){
+					discount = "member_discount_1";
+				}else if(orderToPay.discount_type == Order.DISCOUNT_2){
+					discount = "member_discount_2";
 				}
+			}else{
+				throw new BusinessException("The member id(" + orderToPay.member_id + ") is invalid.", ErrorCode.MEMBER_INVALID);
 			}
-			
-			for(int i = 0; i < orderInfo.foods.length; i++){
-				//get the discount to each food according to the payment and discount type
-				String sql = "SELECT " + discount + " FROM " + Params.dbName + 
-				".kitchen WHERE restaurant_id=" + orderInfo.restaurant_id + 
-				" AND alias_id=" + orderInfo.foods[i].kitchen;
-				
-				dbCon.rs = dbCon.stmt.executeQuery(sql);
-				if(dbCon.rs.next()){
-					orderInfo.foods[i].discount = (byte)(dbCon.rs.getFloat(discount) * 100);
-				}
-				dbCon.rs.close();
-			}
-			
-			orderInfo.restaurant_id = orderToPay.restaurant_id;
-			orderInfo.pay_type = orderToPay.pay_type;
-			orderInfo.discount_type = orderToPay.discount_type;
-			orderInfo.member_id = orderToPay.member_id; 
-			orderInfo.actualPrice = orderToPay.actualPrice;
-			orderInfo.pay_manner = orderToPay.pay_manner;
-			
-			return orderInfo;
-			
-		}finally{
-			dbCon.disconnect();
 		}
+			
+		for(int i = 0; i < orderInfo.foods.length; i++){
+			//get the discount to each food according to the payment and discount type
+			String sql = "SELECT " + discount + " FROM " + Params.dbName + 
+			".kitchen WHERE restaurant_id=" + orderInfo.restaurant_id + 
+			" AND alias_id=" + orderInfo.foods[i].kitchen;
+			
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
+				orderInfo.foods[i].discount = (byte)(dbCon.rs.getFloat(discount) * 100);
+			}
+			dbCon.rs.close();
+		}
+		
+		orderInfo.restaurant_id = orderToPay.restaurant_id;
+		orderInfo.pay_type = orderToPay.pay_type;
+		orderInfo.discount_type = orderToPay.discount_type;
+		orderInfo.member_id = orderToPay.member_id; 
+		orderInfo.actualPrice = orderToPay.actualPrice;
+		orderInfo.pay_manner = orderToPay.pay_manner;
+			
+		return orderInfo;
 	}
 }
