@@ -43,6 +43,32 @@ public class QueryOrder {
 	}
 	
 	/**
+	 * Get the order detail information according to the specific order id. Note
+	 *
+	 * @param pin
+	 *            the pin to terminal
+	 * @param model
+	 *            the model to terminal
+	 * @param orderID
+	 *            the order id to query
+	 * @return the order detail information
+	 * @throws SQLException
+	 *             throws if fail to execute any SQL statement
+	 */
+	public static Order execByID(int pin, short model, int orderID) throws BusinessException, SQLException {
+		DBCon dbCon = new DBCon();
+		
+		try {
+			dbCon.connect();
+
+			return execByID(dbCon, pin, model, orderID);
+
+		} finally {
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
 	 * Get the order detail information to the specific table alias id.
 	 * Note that the database should be connected before invoking this method.
 	 * @param dbCon
@@ -66,17 +92,43 @@ public class QueryOrder {
 
 		Table table = QueryTable.exec(dbCon, pin, model, tableID);
 			
-		int orderID = Util.getUnPaidOrderID(dbCon, table);
-		int nCustom = 0;
+		return execByID(dbCon, pin, model, Util.getUnPaidOrderID(dbCon, table));
+
+	}
+
+	/**
+	 * Get the order detail information according to the specific order id. Note
+	 * that the database should be connected before invoking this method.
+	 * 
+	 * @param dbCon
+	 *            the database connection
+	 * @param pin
+	 *            the pin to terminal
+	 * @param model
+	 *            the model to terminal
+	 * @param orderID
+	 *            the order id to query
+	 * @return the order detail information
+	 * @throws SQLException
+	 *             throws if fail to execute any SQL statement
+	 */
+	static Order execByID(DBCon dbCon, int pin, short model, int orderID) throws SQLException{
+
 		// query the custom number from "order" table according to the order id
-		String sql = "SELECT custom_num FROM `" + Params.dbName
+		String sql = "SELECT custom_num, table_id, restaurant_id FROM `" + Params.dbName
 				+ "`.`order` WHERE id=" + orderID;
 
-		dbCon.rs.close();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		
+		Order orderInfo = new Order();
+
 		if (dbCon.rs.next()) {
-			nCustom = dbCon.rs.getByte(1);
+			orderInfo.restaurant_id = dbCon.rs.getInt("restaurant_id");
+			orderInfo.table_id = dbCon.rs.getShort("table_id");
+			orderInfo.custom_num = dbCon.rs.getShort("custom_num");
 		}
+		dbCon.rs.close();
+		
 		// query the food's id and order count associate with the order id for "order_food" table
 		sql = "SELECT name, food_id, SUM(order_count) AS order_sum, unit_price, discount, taste, taste_price, taste_id, kitchen FROM `"
 				+ Params.dbName
@@ -98,15 +150,10 @@ public class QueryOrder {
 			food.taste.alias_id = dbCon.rs.getShort("taste_id");
 			foods.add(food);
 		}
-		Order orderInfo = new Order();
 		orderInfo.id = orderID;
-		orderInfo.restaurant_id = table.restaurant_id;
-		orderInfo.table_id = tableID;
-		orderInfo.custom_num = nCustom;
 		orderInfo.foods = foods.toArray(new Food[foods.size()]);
 
 		return orderInfo;
-
 	}
-
+	
 }
