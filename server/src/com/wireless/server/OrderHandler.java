@@ -163,7 +163,15 @@ class OrderHandler extends Handler implements Runnable{
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_ORDER){
 				//response = new RespQueryOrder(request.header, execQueryOrder(request));
 				short tableToQuery = ReqParser.parseQueryOrder(request);
-				response = new RespQueryOrder(request.header, QueryOrder.exec(term.pin, term.modelID, tableToQuery));
+				try{
+					response = new RespQueryOrder(request.header, QueryOrder.exec(term.pin, term.modelID, tableToQuery));
+				}catch(BusinessException e){
+					if(e.errCode == ErrorCode.TABLE_IDLE){
+						response = new RespNAK(request.header, ErrorCode.TABLE_IDLE);
+					}else{
+						throw e;
+					}
+				}
 
 				//handle query order 2 request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_ORDER_2){
