@@ -1,4 +1,4 @@
-function editOrder(id, total_price_2,target,type_value) {
+function editOrder(id, total_price_2, target, type_value) {
     var editType = "editOrder";
     var content = ' <div class="add_foot">' +
                         '<div class="title">' +
@@ -16,11 +16,11 @@ function editOrder(id, total_price_2,target,type_value) {
 	                            ' style="ime-mode:Disabled" /></div>' +
 	                            '<div class="pop_Content1">结帐方式：<select id="sel_type" name="sel_type">' +
 	                                    '<option value="1" selected="selected">现金</option>' +
-	                                    '<option value="2">刷卡</option>' +	
+	                                    '<option value="2">刷卡</option>' +
 	                                    '<option value="3">会员卡</option>' +
 	                                    '<option value="4">挂账</option>' +
 	                                    '<option value="5">签单</option>' +
-	                                    '</select>' +	                            	                            
+	                                    '</select>' +
 	                        '</div>' +
 	                            '<span class="pop_action-span"><a href="#" onclick="submitOrderData()">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>' +
 	                            '<span class="pop_action-span1"><a href="#" onclick="closeWindow()">取&nbsp;&nbsp;&nbsp;&nbsp;消</a></span>' +
@@ -51,7 +51,7 @@ function submitOrderData() {
     if (total_price_2 == undefined || total_price_2 == null || total_price_2 == "") {
         alert("实收金额不能为空！");
         return;
-    }    
+    }
     document.orderForm.submit();
 }
 
@@ -64,7 +64,7 @@ function showSearch(target) {
                      '<form id="searchForm" name="searchForm" action="' + target + '"  method="post" onkeydown="searchOrderKeyDown()">' +
                     '<div class="Advanced_Search_Content" style="width:480px;height:160px">' +
                         '<div class="pop_Content">' +
-                            '<div class="pop_Content1">日期：<input type="text" id="dateFrom" name="dateFrom" style="width:136px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;&nbsp;至&nbsp;&nbsp;<input type="text" id="dateTo" name="dateTo" style="width:136px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;</div>' +                          
+                            '<div class="pop_Content1">日期：<input type="text" id="dateFrom" name="dateFrom" style="width:136px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;&nbsp;至&nbsp;&nbsp;<input type="text" id="dateTo" name="dateTo" style="width:136px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;</div>' +
                             '<div class="pop_Content1">金额：<input type="text" name="priceFrom" style="width:136px" onkeypress="return event.keyCode>=48&&event.keyCode<=57" />&nbsp;&nbsp;至&nbsp;&nbsp;<input type="text" name="priceTo" style="width:136px" onkeypress="return event.keyCode>=48&&event.keyCode<=57" /></div>' +
                             '<div class="pop_Content2">台号：<input type="text" name="alias_id" size="10" height="20" onkeypress="return event.keyCode>=48&&event.keyCode<=57" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;结帐方式：<select id="type" name="type"><option value="" selected="selected">全部</option><option value="1">现金</option><option value="2">刷卡</option>	<option value="3">会员卡</option><option value="4">挂账</option><option value="5">签单</option></select></div>' +
                         '</div>' +
@@ -90,7 +90,7 @@ function searchOrderKeyDown() {
         closeWindow();
     }
 }
-function showOrderDetail(id, alias, date, totalPrice, count, foods, isPaid, owner_name, type_name, totalPrice_2) {
+function showOrderDetail(id, alias, date, totalPrice, count, foods, isPaid, owner_name, type_name, totalPrice_2, category_name, comment) {
     var f = "";
     var fs = foods.split(",");
     for (var i = 0; i < fs.length; i++) {
@@ -107,13 +107,19 @@ function showOrderDetail(id, alias, date, totalPrice, count, foods, isPaid, owne
         isPaidStr = "已结帐(" + type_name + ")";
     }
     var showTotalPrice_2 = "";
-    if (totalPrice_2 == undefined || totalPrice_2 == null || totalPrice_2 == "") {
-    }
-    else {
-        showTotalPrice_2 = '<li>' +
+    var showCategoryName = "";
+    var showComment = "";
+    if (!(totalPrice_2 == undefined || totalPrice_2 == null || totalPrice_2 == "")) {
+      showTotalPrice_2 = '<li>' +
 								'<div align="right" style="font-size:15px"><strong>实收：￥' + totalPrice_2 + '</strong></div>' +
 							  '</li>';
-    }
+  }
+  if (!(category_name == undefined || category_name == null || category_name == "")) {
+      showCategoryName = '(' + category_name + ')';
+  }
+  if (!(comment == undefined || comment == null || comment == "")) {
+      showComment = '<div class="pop_Content3">&nbsp;&nbsp;&nbsp;备注：' + comment + '</div>';
+  }
     var content = '<div id="Has_order">' +
 					  '<div class="title">' +
 						'<div class="title_left"><font class="font" style="width:160px">查看 （' + id + '号帐单）</font></div>' +
@@ -121,13 +127,14 @@ function showOrderDetail(id, alias, date, totalPrice, count, foods, isPaid, owne
 					  '</div>' +
 					  '<div class="Has_order_Content">' +
 						'<div class="pop_Content">' +
-		                  '<div class="pop_Content3">帐单号：' + id + '</div>' +
+		                  '<div class="pop_Content3">帐单号：' + id + showCategoryName + '</div>' +
 						  '<div class="pop_Content3">&nbsp;&nbsp;&nbsp;台号：' + alias + '</div>' +
 						  '<div class="pop_Content3">&nbsp;&nbsp;&nbsp;日期：' + date + '</div>' +
     //'<div class="pop_Content3">&nbsp;&nbsp;&nbsp;结帐方式：' + type_name + '</div>' +
 						  '<div class="pop_Content3">&nbsp;&nbsp;&nbsp;人数：' + count + '</div>' +
 		                  '<div class="pop_Content3">服务员：' + owner_name + '</div>' +
 		                  '<div class="pop_Content3">&nbsp;&nbsp;&nbsp;状态：' + isPaidStr + '</div>' +
+		                  showComment +
 						'</div>' +
 						'<div class="title1"><font class="font1">已点菜</font></div>' +
 						  '<div class="cls_container">' +
@@ -260,14 +267,14 @@ function adminIninOriginal() {
             condition_type.options[i].selected = true;
             break;
         }
-    }   
+    }
     keyword.value = keyword_value;
     if (keyword_type_value == "is_Price" || keyword_type_value == "is_day") {
         document.getElementById("condition_type").style.display = "inline";
     }
     if (keyword_type_value == "is_day") {
         keyword.onclick = showCal;
-    }  
+    }
 }
 
 function formatNum(num) {
@@ -301,6 +308,7 @@ function viewOrderStat(statType) {
 	                      '<input type="hidden" name="statType" value="' + statType + '" />' +
 	                      '<div class="add_foot_Content" style="height:130px;text-align:center;width:413px">' +
 	                        '<div class="pop_Content">' +
+	                         '<div class="pop_Content1" style="padding-left:0px;text-align:center"><input type="radio" checked="checked" name="viewType" value="total_price" />按实收&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" name="viewType" value="total_price_2" />按金额</div>' +
 	                           '<div class="pop_Content1" style="padding-left:0px;text-align:center">日期：<input type="text" id="dateFrom" name="dateFrom" style="width:136px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;&nbsp;至&nbsp;&nbsp;<input type="text" id="dateTo" name="dateTo" style="width:width:136px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;</div>' +
 	                        '</div>' +
 	                            '<span class="pop_action-span"><a href="#" onclick="document.searchForm.submit();">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>' +
@@ -313,7 +321,7 @@ function viewOrderStat(statType) {
     document.getElementById("dateFrom").focus();
 }
 
-function showOrderStat(statType, dateFrom, dateTo) {
+function showOrderStat(statType, dateFrom, dateTo,viewType) {
     var title = "";
     if (statType == "daily") {
         title = "日结汇总";
@@ -351,7 +359,7 @@ function showOrderStat(statType, dateFrom, dateTo) {
 	                        '<div class="title_right"  style="width:35px;float:left"></div>' +
 	                    '</div>' +
 	                      '<div class="add_foot_Content" style="height:370px;text-align:center;width:99%">' +
-	                            '<iframe src="orderStat.php?StatType=' + statType + '&dateFrom=' + dateFrom + '&dateTo=' + dateTo + '" scrolling="no" style="width:100%;height:100%;" />' +
+	                            '<iframe src="orderStat.php?statType=' + statType + '&dateFrom=' + dateFrom + '&dateTo=' + dateTo + '&viewType=' + viewType + '" scrolling="no" style="width:100%;height:100%;" />' +
 	                        '</div>' +
 	                '</div>';
     showMessageBox(content, 950, 350);

@@ -42,37 +42,74 @@ mysql_query("SET NAMES utf8");
 		<tbody>
 <?php 	  		
 include("conn.php"); 		 		
-$statType = $_REQUEST["StatType"];
+$statType = $_REQUEST["statType"];
+$viewType = $_REQUEST["viewType"];
 if($statType == "daily")
-{			
-	$sql = "SELECT o_date,
-			SUM(o_num) AS o_num,
-			Sum(CASE type_value WHEN 1 THEN t_price_2 ELSE 0.00 END) AS '现金',
-			Sum(CASE type_value WHEN 2 THEN t_price_2 ELSE 0.00 END) AS '刷卡',
-			Sum(CASE type_value WHEN 3 THEN t_price_2 ELSE 0.00 END) AS '会员卡',
-			Sum(CASE type_value WHEN 4 THEN t_price_2 ELSE 0.00 END) AS '挂账',
-			Sum(CASE type_value WHEN 5 THEN t_price_2 ELSE 0.00 END) AS '签单',
-			SUM(t_price_2) AS '合计'			
-			FROM
-			(SELECT DATE(order_date) AS o_date, o.type_value,
-			COUNT(id) AS o_num, SUM(total_price) AS t_price, SUM(total_price_2) AS t_price_2 
-			FROM `order_history_view` as o WHERE is_paid <> 0 AND restaurant_id=" . $_SESSION["restaurant_id"];
+{		
+	if($viewType == "total_price_2")	
+	{
+		$sql = "SELECT o_date,
+				SUM(o_num) AS o_num,
+				Sum(CASE type_value WHEN 1 THEN t_price_2 ELSE 0.00 END) AS '现金',
+				Sum(CASE type_value WHEN 2 THEN t_price_2 ELSE 0.00 END) AS '刷卡',
+				Sum(CASE type_value WHEN 3 THEN t_price_2 ELSE 0.00 END) AS '会员卡',
+				Sum(CASE type_value WHEN 4 THEN t_price_2 ELSE 0.00 END) AS '挂账',
+				Sum(CASE type_value WHEN 5 THEN t_price_2 ELSE 0.00 END) AS '签单',
+				SUM(t_price_2) AS '合计'			
+				FROM
+				(SELECT DATE(order_date) AS o_date, o.type_value,
+				COUNT(id) AS o_num, SUM(total_price) AS t_price, SUM(total_price_2) AS t_price_2 
+				FROM `order_history_view` as o WHERE is_paid <> 0 AND restaurant_id=" . $_SESSION["restaurant_id"];
+	}
+	else
+		{
+		$sql = "SELECT o_date,
+				SUM(o_num) AS o_num,
+				Sum(CASE type_value WHEN 1 THEN t_price ELSE 0.00 END) AS '现金',
+				Sum(CASE type_value WHEN 2 THEN t_price ELSE 0.00 END) AS '刷卡',
+				Sum(CASE type_value WHEN 3 THEN t_price ELSE 0.00 END) AS '会员卡',
+				Sum(CASE type_value WHEN 4 THEN t_price ELSE 0.00 END) AS '挂账',
+				Sum(CASE type_value WHEN 5 THEN t_price ELSE 0.00 END) AS '签单',
+				SUM(t_price) AS '合计'			
+				FROM
+				(SELECT DATE(order_date) AS o_date, o.type_value,
+				COUNT(id) AS o_num, SUM(total_price) AS t_price, SUM(total_price_2) AS t_price_2 
+				FROM `order_history_view` as o WHERE is_paid <> 0 AND restaurant_id=" . $_SESSION["restaurant_id"];
+			}
 	
 }
 else
 {
-	$sql = "SELECT o_date,
-			SUM(o_num) AS o_num,
-			Sum(CASE type_value WHEN 1 THEN t_price_2 ELSE 0.00 END) AS '现金',
-			Sum(CASE type_value WHEN 2 THEN t_price_2 ELSE 0.00 END) AS '刷卡',
-			Sum(CASE type_value WHEN 3 THEN t_price_2 ELSE 0.00 END) AS '会员卡',
-			Sum(CASE type_value WHEN 4 THEN t_price_2 ELSE 0.00 END) AS '挂账',
-			Sum(CASE type_value WHEN 5 THEN t_price_2 ELSE 0.00 END) AS '签单',
-			SUM(t_price_2) AS '合计'			
-			FROM
-			(SELECT DATE_FORMAT(order_date,'%Y-%m') AS o_date, o.type_value,
-			COUNT(id) AS o_num, SUM(total_price) AS t_price, SUM(total_price_2) AS t_price_2
-			FROM `order_history_view` as o WHERE is_paid <> 0 AND restaurant_id=" . $_SESSION["restaurant_id"];
+	if($viewType == "total_price_2")	
+	{
+		$sql = "SELECT o_date,
+				SUM(o_num) AS o_num,
+				Sum(CASE type_value WHEN 1 THEN t_price_2 ELSE 0.00 END) AS '现金',
+				Sum(CASE type_value WHEN 2 THEN t_price_2 ELSE 0.00 END) AS '刷卡',
+				Sum(CASE type_value WHEN 3 THEN t_price_2 ELSE 0.00 END) AS '会员卡',
+				Sum(CASE type_value WHEN 4 THEN t_price_2 ELSE 0.00 END) AS '挂账',
+				Sum(CASE type_value WHEN 5 THEN t_price_2 ELSE 0.00 END) AS '签单',
+				SUM(t_price_2) AS '合计'			
+				FROM
+				(SELECT DATE_FORMAT(order_date,'%Y-%m') AS o_date, o.type_value,
+				COUNT(id) AS o_num, SUM(total_price) AS t_price, SUM(total_price_2) AS t_price_2
+				FROM `order_history_view` as o WHERE is_paid <> 0 AND restaurant_id=" . $_SESSION["restaurant_id"];
+	}
+	else
+		{
+		$sql = "SELECT o_date,
+				SUM(o_num) AS o_num,
+				Sum(CASE type_value WHEN 1 THEN t_price ELSE 0.00 END) AS '现金',
+				Sum(CASE type_value WHEN 2 THEN t_price ELSE 0.00 END) AS '刷卡',
+				Sum(CASE type_value WHEN 3 THEN t_price ELSE 0.00 END) AS '会员卡',
+				Sum(CASE type_value WHEN 4 THEN t_price ELSE 0.00 END) AS '挂账',
+				Sum(CASE type_value WHEN 5 THEN t_price ELSE 0.00 END) AS '签单',
+				SUM(t_price) AS '合计'			
+				FROM
+				(SELECT DATE_FORMAT(order_date,'%Y-%m') AS o_date, o.type_value,
+				COUNT(id) AS o_num, SUM(total_price) AS t_price, SUM(total_price_2) AS t_price_2
+				FROM `order_history_view` as o WHERE is_paid <> 0 AND restaurant_id=" . $_SESSION["restaurant_id"];
+			}
 }
 
 $dateFrom = $_REQUEST["dateFrom"];

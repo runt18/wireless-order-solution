@@ -79,9 +79,9 @@ if($ids == null)
 <table cellpModifying="0" cellspacing="0" border="0" id="table" class="sortable">
 		<thead>
 			<tr style="height: 25px;">
-				<th>排&nbsp;名</th>
+				<th>编&nbsp;号</th>
 				<th>菜&nbsp;名</th>
-				<th>单&nbsp;价（￥）</th>		
+				<th>厨&nbsp;房（￥）</th>		
 				<th>数&nbsp;量</th>
 				<th>金&nbsp;额（￥）</th>			
 			</tr>
@@ -94,9 +94,9 @@ if($ids != null)
 {	
 	$dateFrom = $_POST["dateFrom"];
 	$dateTo = $_POST["dateTo"];
-	$sql = "SELECT f.id,d.order_count,f.name,f.unit_price,CASE WHEN d.order_count IS NULL THEN 0 ELSE d.order_count END AS order_count,
-			CASE WHEN format(f.unit_price*d.order_count,2) IS NULL THEN 0.00 ELSE format(f.unit_price*d.order_count,2) END AS total_price FROM 
-			food f LEFT JOIN
+	$sql = "SELECT f.id,f.alias_id,d.order_count,f.name,f.unit_price,CASE WHEN d.order_count IS NULL THEN 0 ELSE d.order_count END AS order_count,
+			CASE WHEN format(f.unit_price*d.order_count,2) IS NULL THEN 0.00 ELSE format(f.unit_price*d.order_count,2) END AS total_price,CASE WHEN k.name IS NULL THEN '空' ELSE k.name END AS kitchen_name FROM 
+			food f LEFT JOIN kitchen k ON f.kitchen = k.alias_id LEFT JOIN 
 			(SELECT a.id,SUM(b.order_count) AS order_count FROM `food` a 
 			INNER JOIN order_food_history b ON a.alias_id = b.food_id
 			INNER JOIN `order_history` c ON b.order_id = c.id AND c.restaurant_id=a.restaurant_id WHERE a.enabled=1 AND a.restaurant_id=" . $_SESSION["restaurant_id"];
@@ -114,18 +114,19 @@ if($ids != null)
 	{
 		$sql.= " WHERE f.id IN ($ids)";
 	}	
-	$sql .=" ORDER BY d.order_count DESC";
+	$sql .=" ORDER BY f.alias_id ASC";
 	//echo "<script>alert('$sql');</script>";
 	$bh=0;
 	mysql_query("SET NAMES utf8"); 
 	// mysql_query("set names 'utf-8'") ;		
 	$rs = $db->GetAll($sql);
+	$total_price = 0;
 	foreach ($rs as $row){
-		$bh=$bh+1;
+		$total_price  += $row["total_price"];
 		echo "<tr>";
-		echo "<td>" .$bh ."</td>";
+		echo "<td>" .$row["alias_id"] ."</td>";
 		echo "<td>" .$row["name"] ."</td>";
-		echo "<td>" .$row["unit_price"] ."</td>";	
+		echo "<td>" .$row["kitchen_name"] ."</td>";	
 		echo "<td>" .$row["order_count"] ."</td>";	
 		echo "<td>" .$row["total_price"] ."</td>";			
 		echo "</tr>";
@@ -134,8 +135,15 @@ if($ids != null)
 mysql_close($con);
 		?>			
 	</tbody>
+	<tfoot>
+		<tr>
+			<td colspan="4" style="text-align:right">汇总：</td>			
+			<td><?php echo number_format($total_price,2); ?></td>
+		</tr>
+	</tfoot>
   </table>
   </div>
+<?PHP //echo $sql; ?>
   <!--endprint1-->
 	<div id="controls" style="width:420px;text-align:right;margin: 0px -20px;">      
         <div id="text" style="font-size:12px;text-align:right"><?php echo "总计" .$bh ."&nbsp;条记录"; ?></div>

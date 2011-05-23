@@ -154,7 +154,7 @@ $sql = "SELECT od.id,t.alias_id,od.order_date,total_price,num,foods,is_paid,wait
 		else
 		{			
 			$on = "class='on'";
-			$action = ' onclick="showOrderDetail(&quot;'.$row["id"].'&quot;,&quot;'.$row["alias_id"].'&quot;,&quot;'.$row["order_date"].'&quot;,&quot;'.$row["total_price"].'&quot;,&quot;'.$row["num"].'&quot;,&quot;'.$row["foods"].'&quot;,&quot;'.$row["is_paid"].'&quot;,&quot;'.$row["waiter"].'&quot;)"';
+		$action = ' onclick="showOrderDetail(&quot;'.$row["id"].'&quot;,&quot;'.$row["alias_id"].'&quot;,&quot;'.$row["order_date"].'&quot;,&quot;'.$row["total_price"].'&quot;,&quot;'.$row["num"].'&quot;,&quot;'.$row["foods"].'&quot;,&quot;'.$row["is_paid"].'&quot;,&quot;'.$row["waiter"].'&quot;,&quot;'.$row["totalPrice_2"].'&quot;,&quot;'.$row["category_name"].'&quot;,&quot;'.$row["comment"].'&quot;)"';
 		}
 		$content .= ('<li  '.$on. $action . '>' . $row["alias_id"] . '</li>');					
 		if($ts % 24 == 23)

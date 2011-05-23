@@ -1,16 +1,17 @@
-function changePassword(newPwd) {       
+function changePassword(newPwd,pwd2) {       
     var content = ' <div class="add_foot">' +
                     '<div class="title">' +
 	                    '<div class="title_left"><font class="font">修改密码</font></div>' +
 	                    '<div class="title_right"></div>' +
 	                '</div>' +
 	                '<form name="changePasswordForm" action=""  method="post" onkeydown="KeyDown()">' +	   
-	                      '<input type="hidden" id="isChangePassword" name="isChangePassword" value="true" />' +                   
-	                      '<div class="add_foot_Content">' +
+	                      '<input type="hidden" id="isChangePassword" name="isChangePassword" value="true" />' +
+	                      '<div class="add_foot_Content" style="height:200px;">' +
 	                        '<div class="pop_Content">' +
 	                            '<div class="pop_Content1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;旧密码：<input type="password" id="oldPassword" name="oldPassword" size="25" height="20" style="width:140px" onfocus="this.select()" /></div>' +
 	                            '<div class="pop_Content1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;新密码：<input type="password" id="newPassword" name="newPassword" size="25" height="20" style="width:140px" onfocus="this.select()" value="' + newPwd + '" /></div>' +
 	                            '<div class="pop_Content1">确认新密码：<input type="password" id="confirmPassword" name="confirmPassword" size="25" height="20" style="width:140px" onfocus="this.select()" value="' + newPwd + '" /></div>' +
+	                            '<div class="pop_Content1" style="padding-left:51px">&nbsp;&nbsp;&nbsp;&nbsp;权限密码：<input type="password" id="pwd2" name="pwd2" size="25" height="20" style="width:140px;" onfocus="this.select()" value="' + pwd2 + '" /></div>' +
 	                        '</div>' +
 	                        '<span class="pop_action-span"><a href="#" onclick="pSubmitData()">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>' +
 	                        '<span class="pop_action-span1"><a href="#" onclick="closeWindow()">取&nbsp;&nbsp;&nbsp;&nbsp;消</a></span>' +
