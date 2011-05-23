@@ -1,6 +1,6 @@
 package com.wireless.protocol;
 
-public class ReqQueryRestaurant extends ReqOrderPackage{
+public class ReqQueryRestaurant extends ReqPackage{
 	/******************************************************
 	* Design the query restaurant request looks like below
 	* <Header>

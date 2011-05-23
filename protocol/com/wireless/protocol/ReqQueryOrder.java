@@ -1,6 +1,6 @@
 package com.wireless.protocol;
 
-public class ReqQueryOrder extends ReqOrderPackage {
+public class ReqQueryOrder extends ReqPackage {
 	/******************************************************
 	* Design the query order request looks like below
 	* <Header>

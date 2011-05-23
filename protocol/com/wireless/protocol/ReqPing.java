@@ -11,7 +11,7 @@ package com.wireless.protocol;
 * pin[6] - auto calculated and filled in
 * len[2] - 0x00, 0x00
 ******************************************************/
-public class ReqPing extends ReqOrderPackage{
+public class ReqPing extends ReqPackage{
 	public ReqPing(){
 		header.mode = Mode.TEST;
 		header.type = Type.PING;

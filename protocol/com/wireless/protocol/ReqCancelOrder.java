@@ -1,6 +1,6 @@
 package com.wireless.protocol;
 
-public class ReqCancelOrder extends ReqOrderPackage{
+public class ReqCancelOrder extends ReqPackage{
 	/******************************************************
 	* Design the cancel order request looks like below
 	* <Header>

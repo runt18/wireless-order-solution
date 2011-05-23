@@ -2,7 +2,7 @@ package com.wireless.protocol;
 
 import java.io.UnsupportedEncodingException;
 
-public class ReqPayOrder extends ReqOrderPackage{
+public class ReqPayOrder extends ReqPackage{
 	/******************************************************
 	* Design the pay order request looks like below
 	* <Header>

@@ -30,7 +30,7 @@ import com.wireless.protocol.Reserved;
  *                      These two bytes are used for table transferred
  *  
  *******************************************************/
-public class ReqInsertOrder extends ReqOrderPackage {
+public class ReqInsertOrder extends ReqPackage {
 
 	/**
 	 * Make the insert or update order request package

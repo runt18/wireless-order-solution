@@ -1,6 +1,6 @@
 package com.wireless.protocol;
 
-public class ReqOTAUpdate extends ReqOrderPackage{
+public class ReqOTAUpdate extends ReqPackage{
 
 	/******************************************************
 	* Design the OTA update request looks like below

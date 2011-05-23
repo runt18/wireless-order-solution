@@ -1,6 +1,6 @@
 package com.wireless.protocol;
 
-public class ReqQueryMenu extends ReqOrderPackage{
+public class ReqQueryMenu extends ReqPackage{
 	/******************************************************
 	* Design the query menu request looks like below
 	* <Header>

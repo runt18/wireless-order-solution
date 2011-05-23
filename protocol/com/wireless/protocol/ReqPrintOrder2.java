@@ -34,7 +34,7 @@ package com.wireless.protocol;
  * taste_len : 1-byte indicates the length of taste preference
  * taste[len] : the taste preference   
  *******************************************************/
-public class ReqPrintOrder2 extends ReqOrderPackage{
+public class ReqPrintOrder2 extends ReqPackage{
 	
 	/**
 	 * The print order 2 request 
