@@ -1125,7 +1125,7 @@ class OrderHandler extends Handler implements Runnable{
 			food.setCount(new Float(_rs.getFloat("order_sum")));
 			food.setPrice(new Float(_rs.getFloat("unit_price")));
 			food.discount = (byte)(_rs.getFloat("discount") * 100);
-			food.kitchen = _rs.getByte("kitchen");
+			food.kitchen = _rs.getShort("kitchen");
 			food.taste.preference = _rs.getString("taste");
 			food.taste.setPrice(_rs.getFloat("taste_price"));
 			food.taste.alias_id = _rs.getShort("taste_id");
