@@ -15,7 +15,7 @@ import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.PinGen;
 import com.wireless.protocol.ProtocolPackage;
-import com.wireless.protocol.ReqOrderPackage;
+import com.wireless.protocol.ReqPackage;
 import com.wireless.protocol.ReqPayOrder;
 import com.wireless.protocol.Reserved;
 import com.wireless.protocol.Terminal;
@@ -50,7 +50,7 @@ public class PayOrderAction extends Action implements PinGen{
 			orderToPay.discount_type = Integer.parseInt(request.getParameter("discountType"));
 			orderToPay.member_id = request.getParameter("memberID");
 			
-			ReqOrderPackage.setGen(this);
+			ReqPackage.setGen(this);
 			byte printType = Reserved.PRINT_RECEIPT_2;
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqPayOrder(orderToPay, printType));
 			

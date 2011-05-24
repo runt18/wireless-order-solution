@@ -17,7 +17,7 @@ import com.wireless.protocol.Order;
 import com.wireless.protocol.PinGen;
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqInsertOrder;
-import com.wireless.protocol.ReqOrderPackage;
+import com.wireless.protocol.ReqPackage;
 import com.wireless.protocol.Reserved;
 import com.wireless.protocol.Terminal;
 import com.wireless.protocol.Type;
@@ -52,7 +52,7 @@ public class InsertOrderAction extends Action implements PinGen {
 			orderToInsert.originalTableID = Short.parseShort(request.getParameter("tableID"));
 			orderToInsert.foods = toFoodArray(request.getParameter("foods"));
 			
-			ReqOrderPackage.setGen(this);
+			ReqPackage.setGen(this);
 			byte printType = Reserved.PRINT_ORDER_2 | Reserved.PRINT_ORDER_DETAIL_2;
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(orderToInsert, 
 																					 Type.INSERT_ORDER,

@@ -19,6 +19,9 @@
 		<action path="/InsertOrder" type="com.wireless.Actions.dishesOrder.InsertOrderAction"
 			scope="request">
 		</action>
+		<action path="/PrintOrder" type="com.wireless.Actions.dishesOrder.PrintOrderAction"
+			scope="request">
+		</action>
 	</action-mappings>
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
 </struts-config>
