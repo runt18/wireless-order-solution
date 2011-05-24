@@ -7,42 +7,26 @@ package com.wireless.protocol;
  * mode - PRINT
  * type - PRINT_BILL
  * seq - auto calculated and filled in
- * reserved - the meaning to each bit is as below
- * 			  [0] - PRINT_SYNC
- * 		      [1] - PRINT_ORDER_2
- * 			  [2] - PRINT_ORDER_DETAIL_2
- * 			  [3] - PRINT_RECEIPT_2
- * 			  [4..7] - Not Used
+ * reserved - PRINT_ORDER
  * pin[6] - auto calculated and filled in
  * len[2] - length of the <Body>
  * <Body>
- * order_id[4] - 4-byte indicating the order id to print
+ * print_content - the print content
  *******************************************************/
 public class ReqPrintOrder extends ReqPackage{
-
 	/**
-	 * Construct the print protocol.
-	 * @param printConf
-	 * 				the configuration parameter to the print, the meaning to each bit is as below.<br>
-	 *              [0] - PRINT_SYNC<br>
-	 *              [1] - PRINT_ORDER_2<br>
-	 *              [2] - PRINT_ORDER_DETAIL_2<br>
-	 *              [3] - PRINT_RECEIPT_2<br>
-	 *              [4..7] - Not Used			
-	 * @param orderID
-	 * 			    the order id to print
+	 * In the constructor, use order information to replace the template's variables. 
+	 * @param printContent the print content 
+	 * @param orderInfo the order information used to replace the template's variable
+	 * @param printFunc one of the print function values
 	 */
-	public ReqPrintOrder(byte printConf, int orderID){
+	public ReqPrintOrder(byte[] printContent, Order orderInfo, byte printFunc){
 		header.mode = Mode.PRINT;
 		header.type = Type.PRINT_BILL;
-		header.reserved = printConf;
-		header.length[0] = 4;
-		header.length[1] = 0;
-		body = new byte[4];
-		
-		body[0] = (byte)(printConf & 0x000000FF);
-		body[1] = (byte)((printConf & 0x0000FF00) >> 8);
-		body[2] = (byte)((printConf & 0x00FF0000) >> 16);
-		body[3] = (byte)((printConf & 0xFF000000) >> 24);
+		header.reserved = printFunc;
+		header.length[0] = (byte)(printContent.length & 0x000000FF);
+		header.length[1] = (byte)((printContent.length & 0x0000FF00) >> 8);
+		this.body = printContent;
+
 	}
 }
