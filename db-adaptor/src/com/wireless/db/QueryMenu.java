@@ -116,14 +116,17 @@ public class QueryMenu {
 	private static Food[] queryFoods(int restaurantID) throws SQLException{
 		ArrayList<Food> foods = new ArrayList<Food>();
         //get all the food information to this restaurant
-		String sql = "SELECT alias_id, name, unit_price, kitchen FROM " + Params.dbName + ".food WHERE restaurant_id=" + restaurantID +
+		String sql = "SELECT alias_id, name, unit_price, kitchen, status, pinyin FROM " + 
+					 Params.dbName + ".food WHERE restaurant_id=" + restaurantID +
 					 " AND enabled=1";
 		_dbCon.rs = _dbCon.stmt.executeQuery(sql);
 		while(_dbCon.rs.next()){
 			Food food = new Food(_dbCon.rs.getShort("alias_id"),
 								 _dbCon.rs.getString("name"),
 								 new Float(_dbCon.rs.getFloat("unit_price")),
-								 _dbCon.rs.getShort("kitchen"));
+								 _dbCon.rs.getShort("kitchen"),
+								 _dbCon.rs.getShort("status"),
+								 _dbCon.rs.getString("pinyin"));
 			foods.add(food);
 		}
 	
