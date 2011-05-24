@@ -99,28 +99,35 @@ public class RespParser {
 		 * len[2] -  length of the <Body>
 		 * <Body>
 		 * food_amount[2] : <Food1> : <Food2>... : 
-		 * taste_amount : <Taste1> : <Taste2> ...
-		 * 
+		 * taste_amount : <Taste1> : <Taste2> ... :
+		 * kitchen_amount : <Kitchen1> : <Kitchen2>...
 		 * food_amount[2] - 2-byte indicating the amount of the foods listed in the menu
 		 * <Food>
-		 * food_id[2] : price[3] : kitchen : len : name[len]
+		 * food_id[2] : price[3] : status : kitchen : len : name[len] : len2 : pinyin[len2]
 		 * food_id[2] - 2-byte indicating the food's id
 		 * price[3] - 3-byte indicating the food's price
 		 * 			  price[0] 1-byte indicating the float point
 		 * 			  price[1..2] 2-byte indicating the fixed point
-		 * kitchen - the kitchen to this food
-		 * len - 1-byte indicating the length of the food's name
-		 * name[len] - the food's name whose length equals "len"
+		 * kitchen - the kitchen id to this food
+		 * len1 - the length of the food's name
+		 * name[len1] - the food's name whose length equals "len1"
+		 * len2 - the length of the pinyin
+		 * pinyin[len2] - the pinyin whose length equals "len2"
 		 * 
 		 * taste_amount - 1-byte indicates the amount of the taste preference
 		 * <Taste>
 		 * taste_id : price[3] : len : preference[len]
 		 * taste_id - 1-byte indicating the alias id to this taste preference
-		 * price[3] - 3-byte indicating the food's price
-		 * 			  price[0] 1-byte indicating the float point
-		 * 			  price[1..2] 2-byte indicating the fixed point
 		 * len - 1-byte indicating the length of the preference
 		 * preference[len] - the string to preference whose length is "len"
+		 * 
+		 * <Kitchen>
+		 * kitchen_id : dist_1 : dist_2 : dist_3 : mdist_1 : mdist_2 : mdist_3 : len : kname[len]
+		 * kitchen_id : the id to this kitchen
+		 * dist_1..3 : 3 normal discounts to this kitchen
+		 * mdist_1..3 : 3 member discounts to this kitchen
+		 * len : the length of the kitchen name
+		 * kname[len] : the name to this kitchen
 		 *******************************************************/
 		//make sure the response is ACK
 		if(response.header.type == Type.ACK){
@@ -147,17 +154,28 @@ public class RespParser {
 				//get the kitchen no to this food
 				food.kitchen = response.body[index + 5];
 				
+				//get the status to this food
+				food.status = response.body[index + 6];
+				
 				//get the length of the food's name
-				int length = response.body[index + 6];
+				int len1 = response.body[index + 7];
 				
 				//get the name value 
 				try{
-					food.name = new String(response.body, index + 7, length, "UTF-16BE");
+					food.name = new String(response.body, index + 8, len1, "UTF-16BE");
 				}catch(UnsupportedEncodingException e){
 
 				}
 				
-				index += 7 + length;
+				//get the length of the food's pinyin
+				int len2 = response.body[index + 8 + len1];
+				
+				//get the food's pinyin
+				if(len2 != 0){
+					food.pinyin = new String(response.body, index + 8 + len1 + 1, len2);
+				}
+				
+				index += 8 + len1 + 1 + len2;
 				
 				//add to foods
 				foods[i] = food;
@@ -198,7 +216,43 @@ public class RespParser {
 				tastes[i] = new Taste(alias_id, preference, price);
 			}
 			
-			return new FoodMenu(foods, tastes, null);
+			//get the amount of kitchens
+			int nKitchens = response.body[index] & 0x000000FF;
+			index++;
+			//allocate the memory for kitchens
+			Kitchen[] kitchens = new Kitchen[nKitchens];
+			//get each kitchen's information
+			for(int i = 0; i < kitchens.length; i++){
+				
+				//get the kitchen alias id
+				short kitchen_id = (short)(response.body[index] & 0x00FF);
+				
+				//get 3 normal discounts
+				byte dist_1 = response.body[index + 1];
+				byte dist_2 = response.body[index + 2];
+				byte dist_3 = response.body[index + 3];
+				
+				//get 3 member discounts
+				byte mdist_1 = response.body[index + 4];
+				byte mdist_2 = response.body[index + 5];
+				byte mdist_3 = response.body[index + 6];
+				
+				//get the length of the kitchen name
+				int length = response.body[index + 7];
+				String kname = null;
+				try{
+					kname = new String(response.body, index + 8, length, "UTF-16BE");
+				}catch(UnsupportedEncodingException e){}
+				
+				index += 8 + length;
+				
+				//add the kitchen
+				kitchens[i] = new Kitchen(kname, kitchen_id,
+										  dist_1, dist_2, dist_3,
+										  mdist_1, mdist_2, mdist_3);
+			}
+			
+			return new FoodMenu(foods, tastes, kitchens);
 			
 		}else{
 			return new FoodMenu(new Food[0], new Taste[0], new Kitchen[0]);
