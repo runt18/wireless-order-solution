@@ -62,11 +62,12 @@ function showSearch(target) {
                         '<div class="title_right" style="float:left"></div>' +
                     '</div>' +
                      '<form id="searchForm" name="searchForm" action="' + target + '"  method="post" onkeydown="searchOrderKeyDown()">' +
-                    '<div class="Advanced_Search_Content" style="width:480px;height:160px">' +
+                    '<div class="Advanced_Search_Content" style="width:480px;height:180px">' +
                         '<div class="pop_Content">' +
                             '<div class="pop_Content1">日期：<input type="text" id="dateFrom" name="dateFrom" style="width:136px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;&nbsp;至&nbsp;&nbsp;<input type="text" id="dateTo" name="dateTo" style="width:136px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;</div>' +
                             '<div class="pop_Content1">金额：<input type="text" name="priceFrom" style="width:136px" onkeypress="return event.keyCode>=48&&event.keyCode<=57" />&nbsp;&nbsp;至&nbsp;&nbsp;<input type="text" name="priceTo" style="width:136px" onkeypress="return event.keyCode>=48&&event.keyCode<=57" /></div>' +
                             '<div class="pop_Content2">台号：<input type="text" name="alias_id" size="10" height="20" onkeypress="return event.keyCode>=48&&event.keyCode<=57" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;结帐方式：<select id="type" name="type"><option value="" selected="selected">全部</option><option value="1">现金</option><option value="2">刷卡</option>	<option value="3">会员卡</option><option value="4">挂账</option><option value="5">签单</option></select></div>' +
+                            '<div class="pop_Content2">类型：<select id="category" name="category"><option value="" selected="selected">全部</option><option value="1">一般</option><option value="2">外卖</option>	<option value="3">拼台</option></select></div>' +
                         '</div>' +
                         '<span class="action-span" style="margin-left:110px;"><a href="#"  onclick="document.searchForm.submit();">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>' +
                          '<span class="action-span1" style="margin-right:100px;"><a href="#" onclick="closeWindow()">取&nbsp;&nbsp;&nbsp;&nbsp;消</a></span>' +
@@ -188,6 +189,7 @@ function dailyCheckOut(id) {
 function showHideCondition(select) {
     document.getElementById("condition_type").style.display = "none";
     document.getElementById("type").style.display = "none";
+    document.getElementById("category").style.display = "none";
     document.getElementById("keyword").style.display = "inline";
     var keyword = document.getElementById("keyword");
     keyword.value = "";
@@ -204,6 +206,10 @@ function showHideCondition(select) {
         document.getElementById("type").style.display = "inline";
         document.getElementById("keyword").style.display = "none";
     }
+    if (option.value == "is_category") {
+        document.getElementById("category").style.display = "inline";
+        document.getElementById("keyword").style.display = "none";
+    }
 }
 function showCal() {
     ShowCalendar('keyword');
@@ -217,7 +223,9 @@ function ininOriginal() {
     var condition_type = document.getElementById("condition_type");
     var condition_type_value = document.getElementById("condition_type_value").value;
     var type = document.getElementById("type");
-    var type_value = document.getElementById("type_value");
+    var type_value = document.getElementById("type_value").value;
+    var category = document.getElementById("category");
+    var category_value = document.getElementById("category_value").value;
     for (var i = 0; i < keyword_type.options.length; i++) {
         if (keyword_type.options[i].value == keyword_type_value) {
             keyword_type.options[i].selected = true;
@@ -236,6 +244,12 @@ function ininOriginal() {
             break;
         }
     }
+    for (var i = 0; i < category.options.length; i++) {
+        if (category.options[i].value == category_value) {
+            category.options[i].selected = true;
+            break;
+        }
+    }
     keyword.value = keyword_value;
     if (keyword_type_value == "is_Price" || keyword_type_value == "is_day") {
         document.getElementById("condition_type").style.display = "inline";
@@ -245,6 +259,10 @@ function ininOriginal() {
     }
     if (keyword_type_value == "is_type") {
         document.getElementById("type").style.display = "inline";
+        document.getElementById("keyword").style.display = "none";
+    }
+    if (keyword_type_value == "is_category") {
+        document.getElementById("category").style.display = "inline";
         document.getElementById("keyword").style.display = "none";
     }
 }

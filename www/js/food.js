@@ -63,7 +63,7 @@ function editFood(fId, fCode, fName, fPrice, kitchen, kitchens, status) {
 	                '</div>' +
 	                '<form name="foodForm" action="food.php"  method="post" onkeydown="foodKeyDown()">' +
 	                      '<input type="hidden" name="foodId" value="' + fId + '" />' +
-	                      '<input type="statusValue" name="statusValue" />' +
+	                      '<input type="hidden" name="statusValue" />' +
 	                      '<div class="add_foot_Content" style="height:185px;">' +
 	                        '<div class="pop_Content">' +
 	                            '<div class="pop_Content1">编号：' + foodCode + '</div>' +

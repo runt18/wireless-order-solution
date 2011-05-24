@@ -81,6 +81,7 @@ if($editType == "editOrder")
 	<option value="is_no">帐单号</option>
 	<option value="is_name">台号</option>
 	<option value="is_day">日期</option>
+	<option value="is_category">类型</option>
 	<option value="is_type">结帐方式</option>
 	<option value="is_Price">金额</option>
 	</select>
@@ -90,6 +91,11 @@ if($editType == "editOrder")
 	<option value="3">会员卡</option>
 	<option value="4">挂账</option>	
 	<option value="5">签单</option>
+	</select>
+	<select id="category" name="category" style="display:none">
+	<option value="1" selected="selected">一般</option>
+	<option value="2">外卖</option>	
+	<option value="3">拼台</option>	
 	</select>
 	<select id="condition_type" name="condition_type" style="display:none"><option value="Equal">等于</option><option value="EqualOrGrater" selected="selected">大于等于</option><option value="EqualOrLess">小于等于</option></select>
     <!-- 关键字 -->
@@ -108,6 +114,7 @@ if($editType == "editOrder")
 				<th><h3>帐单号</h3></th>
 				<th><h3>台&nbsp;号</h3></th>
                 <th><h3>日&nbsp;期</h3></th>
+				<th><h3>类&nbsp;型</h3></th>
 				<th><h3>结帐方式</h3></th>
 				<th><h3>金额（￥）</h3></th>
 				<th><h3>实收（￥）</h3></th>
@@ -122,12 +129,15 @@ $xm=$_REQUEST["keyword_type"];
 $ct=$_REQUEST["condition_type"];
 $kw=$_REQUEST["keyword"]; 
 $type = $_REQUEST["type"];
+$category = $_REQUEST["category"];
+
 $dateFrom=$_POST["dateFrom"];
 $dateTo = $_POST["dateTo"];
 $priceFrom = $_POST["priceFrom"];
 $priceTo = $_POST["priceTo"];
 $alias_id = $_POST["alias_id"];      
 $type1 = $_POST["type"];  
+$category1 = $_POST["category"]; 
 /*session_start(); */
 $where = "";
 $sql = "SELECT * FROM order_history_view WHERE is_paid <> 0 AND restaurant_id=" . $_SESSION["restaurant_id"];
@@ -154,6 +164,10 @@ if($alias_id != null && $alias_id !="")
 if($type1 != null && $type1 !="")
 {
 	$sql .= (" AND type_value = $type1");
+}
+if($category1 != null && $category1 !="")
+{
+	$sql .= (" AND category = $category1");
 }
 switch ($xm)
 {
@@ -203,6 +217,10 @@ switch ($xm)
 		if ($type!="")
 			$sql .= " AND type_value = $type" ;  		
 		break;
+	case "is_category":
+		if ($category!="")
+			$sql .= " AND category = $category" ;  		
+		break;
 }
 $bh=0;
 mysql_query("SET NAMES utf8"); 
@@ -214,6 +232,7 @@ foreach ($rs as $row){
 	echo "<td>" .$row["id"] ."</td>";
 	echo "<td>" .$row["alias_id"] ."</td>";
 	echo "<td>" .$row["order_date"]. "</td>";
+	echo "<td>" .$row["category_name"]."</td>";
 	echo "<td>" .$row["type_name"]."</td>";
 	echo "<td>" .$row["total_price"]."</td>";
 	echo "<td>" .$row["total_price_2"]."</td>";
@@ -256,6 +275,7 @@ echo "<input type='hidden' id='keyword_type_value' value='$xm' />";
 echo "<input type='hidden' id='condition_type_value' value='$ct' />";
 echo "<input type='hidden' id='keyword_value' value='$kw' />";
 echo "<input type='hidden' id='type_value' value='$type' />";
+echo "<input type='hidden' id='category_value' value='$category' />";
 	    ?>
 	<script type="text/javascript" src="js/script.js"></script>
 	<script type="text/javascript">
