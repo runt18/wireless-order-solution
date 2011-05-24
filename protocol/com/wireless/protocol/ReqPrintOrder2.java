@@ -40,9 +40,9 @@ public class ReqPrintOrder2 extends ReqPackage{
 		header.length[1] = 0;
 		body = new byte[4];
 		
-		body[0] = (byte)(printConf & 0x000000FF);
-		body[1] = (byte)((printConf & 0x0000FF00) >> 8);
-		body[2] = (byte)((printConf & 0x00FF0000) >> 16);
-		body[3] = (byte)((printConf & 0xFF000000) >> 24);
+		body[0] = (byte)(orderID & 0x000000FF);
+		body[1] = (byte)((orderID & 0x0000FF00) >> 8);
+		body[2] = (byte)((orderID & 0x00FF0000) >> 16);
+		body[3] = (byte)((orderID & 0xFF000000) >> 24);
 	}
 }
