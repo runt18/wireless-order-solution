@@ -265,7 +265,7 @@ SET AUTOCOMMIT=1;
 -- -----------------------------------------------------
 SET AUTOCOMMIT=0;
 INSERT INTO `wireless_order_db`.`order_history` (`id`, `restaurant_id`, `table_id`, `terminal_pin`, `order_date`, `total_price`, `total_price_2`, `custom_num`, `waiter`, `member_id`, `member`) VALUES (1, 11, 0x64, 0x20237AB8, 20110102, 214, 214, 5, (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), '13694260535', '熊至明');
-INSERT INTO `wireless_order_db`.`order_food_history` (`id`, `order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (1, 1, 0x44C, 1.2, '京都骨', 23.53, NOW(), '张宁远', NULL);
+INSERT INTO `wireless_order_db`.`order_food_history` (`id`, `order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`, `kitchen`) VALUES (1, 1, 0x44C, 1.2, '京都骨', 23.53, NOW(), '张宁远', NULL, 1);
 INSERT INTO `wireless_order_db`.`order_food_material_history`(`order_food_id`, `material_id`, `name`, `price`, `consumption`) VALUES (1, 100, '排骨', 18.5, 1);
 
 -- the order detail to 京酱肉丝
