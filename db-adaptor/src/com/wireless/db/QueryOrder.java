@@ -115,7 +115,7 @@ public class QueryOrder {
 	static Order execByID(DBCon dbCon, int pin, short model, int orderID) throws SQLException{
 
 		// query the custom number from "order" table according to the order id
-		String sql = "SELECT custom_num, table_id, restaurant_id FROM `" + Params.dbName
+		String sql = "SELECT custom_num, table_id, restaurant_id, total_price, total_price_2 FROM `" + Params.dbName
 				+ "`.`order` WHERE id=" + orderID;
 
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -126,6 +126,8 @@ public class QueryOrder {
 			orderInfo.restaurant_id = dbCon.rs.getInt("restaurant_id");
 			orderInfo.table_id = dbCon.rs.getShort("table_id");
 			orderInfo.custom_num = dbCon.rs.getShort("custom_num");
+			orderInfo.setTotalPrice(dbCon.rs.getFloat("total_price"));
+			orderInfo.setActualPrice(dbCon.rs.getFloat("total_price_2"));
 		}
 		dbCon.rs.close();
 		
