@@ -348,7 +348,7 @@ taste_num[1] : &lt;Taste1&gt; : &lt;Taste2&gt;...
 kitchen_num[1] : &lt;Kitchen1&gt; : &lt;Kitchen2&gt;...
 
 &lt;Food&gt;
-food_id[2] : price[3] : kitchen : status : len_name : name[len] : len_pinyin : pinyin[len] 
+food_id[2] : price[3] : kitchen : status : len1 : name[len1] : len2 : pinyin[len2] 
 
 &lt;Taste&gt;
 taste_id : price[3] : len : preference[len]
