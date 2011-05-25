@@ -126,6 +126,7 @@ public class InsertOrder {
 				dbCon.stmt.executeBatch();
 				
 				return orderToInsert;
+				
 			}else if(table.status == Table.TABLE_BUSY){
 				throw new BusinessException("The tabe(alias_id=" + orderToInsert.table_id + ") to be inserted order is BUSY.", ErrorCode.TABLE_BUSY);
 				
