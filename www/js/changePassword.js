@@ -1,17 +1,19 @@
-function changePassword(newPwd,pwd2) {       
+function changePassword(newPwd,pwd2,random) {       
     var content = ' <div class="add_foot">' +
                     '<div class="title">' +
 	                    '<div class="title_left"><font class="font">修改密码</font></div>' +
 	                    '<div class="title_right"></div>' +
 	                '</div>' +
-	                '<form name="changePasswordForm" action=""  method="post" onkeydown="KeyDown()">' +	   
+	                '<form name="changePasswordForm" action=""  method="post" onkeydown="KeyDown()">' +
 	                      '<input type="hidden" id="isChangePassword" name="isChangePassword" value="true" />' +
+	                      '<input type="hidden" id="random" name="random" value="' + random + '" />' +
 	                      '<div class="add_foot_Content" style="height:200px;">' +
 	                        '<div class="pop_Content">' +
-	                            '<div class="pop_Content1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;旧密码：<input type="password" id="oldPassword" name="oldPassword" size="25" height="20" style="width:140px" onfocus="this.select()" /></div>' +
-	                            '<div class="pop_Content1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;新密码：<input type="password" id="newPassword" name="newPassword" size="25" height="20" style="width:140px" onfocus="this.select()" value="' + newPwd + '" /></div>' +
-	                            '<div class="pop_Content1">确认新密码：<input type="password" id="confirmPassword" name="confirmPassword" size="25" height="20" style="width:140px" onfocus="this.select()" value="' + newPwd + '" /></div>' +
-	                            '<div class="pop_Content1" style="padding-left:51px">&nbsp;&nbsp;&nbsp;&nbsp;权限密码：<input type="password" id="pwd2" name="pwd2" size="25" height="20" style="width:140px;" onfocus="this.select()" value="' + pwd2 + '" /></div>' +
+	                            '<div class="pop_Content1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;旧密码：<input type="password" id="oldPassword" name="oldPassword" size="25" height="20" style="width:140px" onfocus="this.select()" /></div>' +
+	                            '<div class="pop_Content1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;新密码：<input type="password" id="newPassword" name="newPassword" size="25" height="20" style="width:140px" onfocus="this.select()" value="' + newPwd + '" /></div>' +
+	                            '<div class="pop_Content1">&nbsp;&nbsp;&nbsp;&nbsp;确认新密码：<input type="password" id="confirmPassword" name="confirmPassword" size="25" height="20" style="width:140px" onfocus="this.select()" value="' + newPwd + '" /></div>' +
+	                            '<div class="pop_Content1" style="padding-left:51px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;权限密码：<input type="password" id="pwd2" name="pwd2" size="25" height="20" style="width:140px;" onfocus="this.select()" value="' + pwd2 + '" /></div>' +
+	                            '<div class="pop_Content1" style="padding-left:51px">&nbsp;确认权限密码：<input type="password" id="confirm_pwd2" name="confirm_pwd2" size="25" height="20" style="width:140px;" onfocus="this.select()" value="' + pwd2 + '" /></div>' +
 	                        '</div>' +
 	                        '<span class="pop_action-span"><a href="#" onclick="pSubmitData()">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>' +
 	                        '<span class="pop_action-span1"><a href="#" onclick="closeWindow()">取&nbsp;&nbsp;&nbsp;&nbsp;消</a></span>' +
@@ -33,6 +35,8 @@ function pValidateData() {
     var oldPassword = document.getElementById("oldPassword").value;
     var newPassword = document.getElementById("newPassword").value;
     var confirmPassword = document.getElementById("confirmPassword").value;
+    var pwd2 = document.getElementById("pwd2").value;
+    var confirm_pwd2 = document.getElementById("confirm_pwd2").value;
     //    alert(foodCode);
 
     if (oldPassword == undefined || oldPassword == null || oldPassword == "") {
@@ -47,8 +51,16 @@ function pValidateData() {
         alert("新密码的最大长度不能超过30个英文字符！");
         return false;
     }
+    if (pwd2 == undefined || pwd2 == null || pwd2 == "") {
+        alert("权限密码不能为空！");
+        return false;
+    }
     if (confirmPassword != newPassword) {
         alert("两次输入的新密码不一致！");
+        return false;
+    }
+    if (pwd2 != confirm_pwd2) {
+        alert("两次输入的权限密码不一致！");
         return false;
     }  
     return true;

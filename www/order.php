@@ -239,17 +239,22 @@ mysql_query("SET NAMES utf8");
 
 $rs = $db->GetAll($sql);
 foreach ($rs as $row){
+	$alias_id = $row["alias_id"];
+	if($row["category"] != 1)
+		{
+		$alias_id = "-";
+			}
 	$bh=$bh+1;
 	echo "<tr>";
 	echo "<td>" .$row["id"] ."</td>";
-	echo "<td>" .$row["alias_id"] ."</td>";
+	echo "<td>" .$alias_id ."</td>";
 	echo "<td>" .$row["order_date"]. "</td>";
 	echo "<td>" .$row["category_name"]."</td>";
 	echo "<td>" .$row["type_name"]."</td>";
 	echo "<td>" .$row["total_price"]."</td>";
 	echo "<td>" .$row["total_price_2"]."</td>";
 	echo "<td><a href='#' onclick='editOrder(&quot;".$row["id"]."&quot;,&quot;".$row["total_price_2"]."&quot;,&quot;order.php&quot;,&quot;".$row["type_value"]."&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
-		"<a href='#' onclick='showOrderDetail(&quot;".$row["id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["order_date"]."&quot;,&quot;".$row["total_price"].
+		"<a href='#' onclick='showOrderDetail(&quot;".$row["id"]."&quot;,&quot;".$alias_id."&quot;,&quot;".$row["order_date"]."&quot;,&quot;".$row["total_price"].
 		"&quot;,&quot;".$row["num"]."&quot;,&quot;".$row["foods"]."&quot;,&quot;".$row["is_paid"]."&quot;,&quot;".$row["waiter"]."&quot;,&quot;".$row["type_name"]."&quot;,&quot;".$row["total_price_2"]."&quot;,&quot;".$row["category_name"]."&quot;,&quot;".$row["comment"]."&quot;)'>
 			<img src='images/View.png'  height='16' width='14' border='0'/>&nbsp;查看</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href='#' onclick='deleteOrder(&quot;".$row["id"]."&quot;,&quot;order.php&quot;)'>
 			<img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;删除</a></td>";

@@ -326,7 +326,7 @@ function viewOrderStat(statType) {
 	                      '<input type="hidden" name="statType" value="' + statType + '" />' +
 	                      '<div class="add_foot_Content" style="height:130px;text-align:center;width:413px">' +
 	                        '<div class="pop_Content">' +
-	                         '<div class="pop_Content1" style="padding-left:0px;text-align:center"><input type="radio" checked="checked" name="viewType" value="total_price" />按实收&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" name="viewType" value="total_price_2" />按金额</div>' +
+	                         '<div class="pop_Content1" style="padding-left:0px;text-align:center"><input type="radio" checked="checked" name="viewType" value="total_price_2" />按实收&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" name="viewType" value="total_price" />按金额</div>' +
 	                           '<div class="pop_Content1" style="padding-left:0px;text-align:center">日期：<input type="text" id="dateFrom" name="dateFrom" style="width:136px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;&nbsp;至&nbsp;&nbsp;<input type="text" id="dateTo" name="dateTo" style="width:width:136px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;</div>' +
 	                        '</div>' +
 	                            '<span class="pop_action-span"><a href="#" onclick="document.searchForm.submit();">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>' +

@@ -122,6 +122,7 @@ if($ids != null)
 	$rs = $db->GetAll($sql);
 	$total_price = 0;
 	foreach ($rs as $row){
+		$bh=$bh+1;
 		$total_price  += $row["total_price"];
 		echo "<tr>";
 		echo "<td>" .$row["alias_id"] ."</td>";

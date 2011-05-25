@@ -134,7 +134,23 @@
 #menu-div li.fix-spacel{width:30px; border-left:none;}
 #menu-div li.fix-spacer{border-right:none;}
 </style>
-
+<?PHP 
+//产生随机数函数 
+function random($length) { 
+	$hash = array();
+	$number = "";
+	$chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz'; 
+	$max = strlen($chars) - 1; 
+	while(count($hash)<=$length){
+		$hash[] = mt_rand(0,$max);
+		$hash = array_unique($hash);
+	}
+	for ($j=0;$j<6;$j++){
+		$number.=substr($chars,$hash[$j],1);
+	}
+	return $number;
+} 
+?>
 </head>
 <body>
 <div id="header-div">
@@ -144,7 +160,7 @@
  
     <div id="send_info" style="padding: 20px 50px 0 0; clear:right; text-align: right; color: #FF9900; width:40%; float: right;">
 	  <a href="../pserver/pserver.exe" target="_top" class="fix-submenu">下载e点通打印程序</a>    
-	  <a href="#" onclick="javascript:window.parent.frames(1).changePassword('','')" class="fix-submenu">修改密码</a>    
+	  <a href="#" onclick="javascript:window.parent.frames(1).changePassword('<?PHP $random = random(6); echo $random; ?>','<?PHP echo $random; ?>','<?PHP echo $random; ?>')" class="fix-submenu">修改密码</a>    
       <a href="help.html" target="_blank" class="fix-submenu">帮助</a>    
       <a href="login.php" target="_top" class="fix-submenu">退出</a>    
     </div>
