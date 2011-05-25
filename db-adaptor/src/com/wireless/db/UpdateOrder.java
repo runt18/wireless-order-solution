@@ -105,7 +105,7 @@ public class UpdateOrder {
 			
 			//query all the food's id ,order count and taste preference of this order
 			ArrayList<Food> originalRecords = new ArrayList<Food>();
-			String sql = "SELECT food_id, unit_price, name, discount, SUM(order_count) AS order_sum, taste, taste_price, taste_id, kitchen FROM `" + 
+			String sql = "SELECT food_id, unit_price, name, food_status, discount, SUM(order_count) AS order_sum, taste, taste_price, taste_id, kitchen FROM `" + 
 						Params.dbName + "`.`order_food` WHERE order_id=" + orderID + 
 						" GROUP BY food_id, taste_id HAVING order_sum > 0";
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -114,6 +114,7 @@ public class UpdateOrder {
 				food.alias_id = dbCon.rs.getShort("food_id");
 				food.setPrice(new Float(dbCon.rs.getFloat("unit_price")));
 				food.name = dbCon.rs.getString("name");
+				food.status = dbCon.rs.getShort("food_status");
 				food.discount = (byte)(dbCon.rs.getFloat("discount") * 100);
 				food.setCount(new Float(dbCon.rs.getFloat("order_sum")));
 				food.kitchen = dbCon.rs.getShort("kitchen");
@@ -177,7 +178,7 @@ public class UpdateOrder {
 					 */
 					
 					//get the food name and its unit price
-					sql = "SELECT name, unit_price, kitchen FROM " + Params.dbName + 
+					sql = "SELECT name, status, unit_price, kitchen FROM " + Params.dbName + 
 							".food WHERE alias_id=" + orderToUpdate.foods[i].alias_id + 
 							" AND restaurant_id=" + term.restaurant_id +
 							" AND enabled=1";
@@ -186,6 +187,7 @@ public class UpdateOrder {
 					Food food = new Food();
 					if(dbCon.rs.next()){
 						food.alias_id = orderToUpdate.foods[i].alias_id;
+						food.status = dbCon.rs.getShort("status");
 						food.name = dbCon.rs.getString("name");
 						food.setPrice(new Float(dbCon.rs.getFloat("unit_price")));
 						food.setCount(new Float((float)Math.round(Math.abs(diff) * 100) / 100));
@@ -259,11 +261,12 @@ public class UpdateOrder {
 			//insert the extra order food records
 			for(int i = 0; i < extraFoods.size(); i++){
 
-				sql = "INSERT INTO `" + Params.dbName + "`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `discount`, `taste_id`, `taste_price`, `taste`, `kitchen`, `waiter`, `order_date`) VALUES (" +
+				sql = "INSERT INTO `" + Params.dbName + "`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, `discount`, `taste_id`, `taste_price`, `taste`, `kitchen`, `waiter`, `order_date`) VALUES (" +
 						orderID + ", " + extraFoods.get(i).alias_id + ", " + 
 						extraFoods.get(i).count2String() + ", " + 
 						com.wireless.protocol.Util.price2Float(extraFoods.get(i).price, com.wireless.protocol.Util.INT_MASK_2).toString() + ", '" + 
 						extraFoods.get(i).name + "', " + 
+						extraFoods.get(i).status + ", " +
 						(float)extraFoods.get(i).discount / 100 + ", " +
 						extraFoods.get(i).taste.alias_id + "," +
 						com.wireless.protocol.Util.price2Float(extraFoods.get(i).taste.price, com.wireless.protocol.Util.INT_MASK_2).toString() + ", '" +
@@ -276,11 +279,12 @@ public class UpdateOrder {
 			//insert the canceled order food records 
 			for(int i = 0; i < cancelledFoods.size(); i++){
 
-				sql = "INSERT INTO `" + Params.dbName + "`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `discount`, `taste_id`, `taste_price`, `taste`, `kitchen`, `waiter`, `order_date`) VALUES (" +
+				sql = "INSERT INTO `" + Params.dbName + "`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, `discount`, `taste_id`, `taste_price`, `taste`, `kitchen`, `waiter`, `order_date`) VALUES (" +
 						orderID + ", " + cancelledFoods.get(i).alias_id + ", " + 
 						"-" + cancelledFoods.get(i).count2String() + ", " + 
 						com.wireless.protocol.Util.price2Float(cancelledFoods.get(i).price, com.wireless.protocol.Util.INT_MASK_2).toString() + ", '" + 
 						cancelledFoods.get(i).name + "', " + 
+						cancelledFoods.get(i).status + ", " +
 						(float)cancelledFoods.get(i).discount / 100 + ", " +
 						cancelledFoods.get(i).taste.alias_id + "," +
 						com.wireless.protocol.Util.price2Float(cancelledFoods.get(i).taste.price, com.wireless.protocol.Util.INT_MASK_2).toString() + ", '" +

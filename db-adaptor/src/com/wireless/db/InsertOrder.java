@@ -50,13 +50,14 @@ public class InsertOrder {
 				for(int i = 0; i < orderToInsert.foods.length; i++){
 	
 					//get the associated foods' unit price and name
-					sql = "SELECT unit_price, name FROM " +  Params.dbName + 
+					sql = "SELECT unit_price, name, status FROM " +  Params.dbName + 
 					 	  ".food WHERE alias_id=" + orderToInsert.foods[i].alias_id + 
 					 	  " AND restaurant_id=" + table.restaurant_id + " AND enabled=1";
 					dbCon.rs = dbCon.stmt.executeQuery(sql);
 					//check if the food exist in db 
 					if(dbCon.rs.next()){
 						orderToInsert.foods[i].name = dbCon.rs.getString("name");
+						orderToInsert.foods[i].status = dbCon.rs.getShort("status");
 						int val = (int)(dbCon.rs.getFloat("unit_price") * 100);
 						int unitPrice = ((val / 100) << 8) | (val % 100);
 						orderToInsert.foods[i].price = unitPrice;
@@ -108,12 +109,13 @@ public class InsertOrder {
 						
 					//insert the record to table "order_food"
 					sql = "INSERT INTO `" + Params.dbName +
-						"`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `discount`, `taste`, `taste_price`, `taste_id`, `kitchen`, `waiter`, `order_date`) VALUES (" +	
+						"`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, `discount`, `taste`, `taste_price`, `taste_id`, `kitchen`, `waiter`, `order_date`) VALUES (" +	
 						orderToInsert.id + ", " + 
 						orderToInsert.foods[i].alias_id + ", " + 
 						orderToInsert.foods[i].count2Float().toString() + ", " + 
 						Util.price2Float(orderToInsert.foods[i].price, Util.INT_MASK_2).toString() + ", '" + 
 						orderToInsert.foods[i].name + "', " +
+						orderToInsert.foods[i].status + ", " +
 						(float)orderToInsert.foods[i].discount / 100 + ", '" +
 						orderToInsert.foods[i].taste.preference + "', " + 
 						Util.price2Float(orderToInsert.foods[i].taste.price, Util.INT_MASK_2).toString() + ", " +
