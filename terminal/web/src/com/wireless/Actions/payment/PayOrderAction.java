@@ -1,4 +1,4 @@
-package com.wireless.Actions.dishesOrder;
+package com.wireless.Actions.payment;
 
 import java.io.IOException;
 import java.io.PrintWriter;
