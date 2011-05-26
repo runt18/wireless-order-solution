@@ -41,7 +41,13 @@ public class PayOrder {
 			 */
 			float totalPrice = 0;
 			for(int i = 0; i < orderInfo.foods.length; i++){
-				float discount = (float)Math.round(orderInfo.foods[i].discount) / 100;
+				float discount = 100;
+				/**
+				 * The special food does NOT discount
+				 */
+				if(!orderInfo.foods[i].isSpecial()){
+					discount = (float)Math.round(orderInfo.foods[i].discount) / 100;					
+				}
 				float foodPrice = Util.price2Float(orderInfo.foods[i].price, Util.INT_MASK_2).floatValue();
 				float tastePrice = Util.price2Float(orderInfo.foods[i].taste.price, Util.INT_MASK_2).floatValue();
 				totalPrice += (foodPrice * discount + tastePrice) * orderInfo.foods[i].count2Float().floatValue();

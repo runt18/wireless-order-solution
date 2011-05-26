@@ -132,7 +132,7 @@ public class QueryOrder {
 		dbCon.rs.close();
 		
 		// query the food's id and order count associate with the order id for "order_food" table
-		sql = "SELECT name, food_id, SUM(order_count) AS order_sum, unit_price, discount, taste, taste_price, taste_id, kitchen FROM `"
+		sql = "SELECT name, food_id, food_status, SUM(order_count) AS order_sum, unit_price, discount, taste, taste_price, taste_id, kitchen FROM `"
 				+ Params.dbName
 				+ "`.`order_food` WHERE order_id="
 				+ orderID
@@ -143,6 +143,7 @@ public class QueryOrder {
 			Food food = new Food();
 			food.name = dbCon.rs.getString("name");
 			food.alias_id = dbCon.rs.getInt("food_id");
+			food.status = dbCon.rs.getShort("food_status");
 			food.setCount(new Float(dbCon.rs.getFloat("order_sum")));
 			food.setPrice(new Float(dbCon.rs.getFloat("unit_price")));
 			food.kitchen = dbCon.rs.getShort("kitchen");
