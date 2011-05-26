@@ -70,7 +70,7 @@ public class DailySettlementTask extends SchedulerTask{
 									"`waiter`,`type`, `member_id`, `member`,`terminal_pin`, `terminal_model`, `table_id`";
 			
 			final String orderFoodItem = "`id`,`order_id`, `food_id`, `order_date`, `order_count`," + 
-										"`unit_price`,`name`, `taste`,`taste_price`,`taste_id`,`discount`,`kitchen`,`comment`,`waiter`";
+										"`unit_price`,`name`, `food_status`, `taste`,`taste_price`,`taste_id`,`discount`,`kitchen`,`comment`,`waiter`";
 			
 			stmt.clearBatch();
 			//move the order have been paid from "order" to "order_history"
