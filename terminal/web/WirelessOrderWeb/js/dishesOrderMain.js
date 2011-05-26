@@ -179,42 +179,64 @@ var orderedForm = new Ext.form.FormPanel({
 					foodPara = "{" + foodPara.substr(0, foodPara.length - 1)
 							+ "}";
 
+					var type = 9;
+					if (Request["tableStat"] == "free") {
+						type = 1;
+					} else {
+						type = 2;
+					}
+
 					Ext.Ajax.request({
 						url : "../InsertOrder.do",
 						params : {
 							"pin" : Request["pin"],
 							"tableID" : Request["tableNbr"],
 							"customNum" : Request["personCount"],
+							"type" : type,
+							"originalTableID" : Request["tableNbr"],
 							"foods" : foodPara
 						},
 						success : function(response, options) {
 							var resultJSON = Ext.util.JSON
 									.decode(response.responseText);
 							if (resultJSON.success == true) {
+								Ext.MessageBox.show({
+									msg : resultJSON.data,
+									width : 300,
+									buttons : Ext.MessageBox.OK
+								});
+							} else {
+								Ext.MessageBox.show({
+									msg : resultJSON.data,
+									width : 300,
+									buttons : Ext.MessageBox.OK
+								});
 							}
 						},
 						failure : function(response, options) {
 						}
 					});
 				}
-			}, {
-				text : "清空",
-				handler : function() {
-					Ext.Msg.show({
-						title : "提示",
-						msg : "确定要删除所有已点菜式？",
-						buttons : Ext.Msg.YESNO,
-						fn : function(btn) {
-							if (btn == "yes") {
-								orderedData.length = 0;
-								orderedStore.reload();
-							}
-							;
-						},
-						icon : Ext.MessageBox.QUESTION
-					});
-				}
-			}, {
+			}
+			// , {
+			// text : "清空",
+			// handler : function() {
+			// Ext.Msg.show({
+			// title : "提示",
+			// msg : "确定要删除所有已点菜式？",
+			// buttons : Ext.Msg.YESNO,
+			// fn : function(btn) {
+			// if (btn == "yes") {
+			// orderedData.length = 0;
+			// orderedStore.reload();
+			// }
+			// ;
+			// },
+			// icon : Ext.MessageBox.QUESTION
+			// });
+			// }
+			// }
+			, {
 				text : "返回",
 				handler : function() {
 					location.href = "TableSelect.html";

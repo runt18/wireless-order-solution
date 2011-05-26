@@ -85,7 +85,8 @@ function tableSelectOnLoad() {
 									tableStatusList[2].length - 2);
 							tableStatusListTS.push([ thisTblNbr, thisPerNbr,
 									thisStatus ]);
-						};
+						}
+						;
 
 						// 2 ********** create table list **********
 						// 2.1,get the page total count
@@ -254,7 +255,7 @@ function tableSelectOnLoad() {
 						$("#tableNumber").bind("keyup", tableKeyboardSelect);
 					} else {
 						var tableData = resultJSON.data;
-						//Ext.Msg.alert(tableData);
+						// Ext.Msg.alert(tableData);
 						Ext.MessageBox.show({
 							msg : tableData,
 							width : 300,

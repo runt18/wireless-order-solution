@@ -34,6 +34,7 @@
 										if (inputCount != 0 && inputCount != "") {
 											personCountInputWin.hide();
 
+											/*
 											// update data
 											var tableIndex = -1;
 											for ( var i = 0; i < tableStatusListTS.length; i++) {
@@ -50,14 +51,14 @@
 													+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 											document
 													.getElementById("tblStatusDivTS").innerHTML = "占用";
-
+											 */
+											
 											// for forward the page
 											location.href = "OrderMain.html?tableNbr="
 													+ selectedTable
 													+ "&personCount="
 													+ inputCount
-													+ "&pin="
-													+ pin;
+													+ "&tableStat=free&pin=" + pin;
 
 										}
 									}
@@ -358,7 +359,7 @@
 							location.href = "OrderMain.html?tableNbr="
 									+ selectedTable + "&personCount="
 									+ tableStatusListTS[tableIndex][1]
-									+ "&pin=" + pin;
+									+ "&tableStat=used&pin=" + pin;
 						} else {
 							personCountInputWin.show();
 						}

@@ -85,6 +85,7 @@ function URLParaQuery() {
 }
 
 function tableStuLoad() {
+	// update table status
 	var Request = new URLParaQuery();
 	var tableNbr = Request["tableNbr"];
 	var personCount = Request["personCount"];
@@ -92,6 +93,15 @@ function tableStuLoad() {
 			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 	document.getElementById("perCountDivTS").innerHTML = personCount
 			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+
+	// update label new or mod
+	var Request = new URLParaQuery();
+	var status = Request["tableStat"];
+	if (status == "free") {
+		dishesOrderNorthPanel.setTitle("<div style='font-size:18px;padding-left:2px'>新下单<div>");
+	} else {
+		dishesOrderNorthPanel.setTitle("<div style='font-size:18px;padding-left:2px'>改单<div>");
+	}
 };
 
 // 以点菜式数据
