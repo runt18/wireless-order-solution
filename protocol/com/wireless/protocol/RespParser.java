@@ -35,11 +35,12 @@ public class RespParser {
 		 * 			  price[1..3] - 3-byte indicating the fixed-point
 		 * food_num - 1-byte indicating the number of ordered food
 		 * <Food>
-		 * food_id[2] : order_num[2] : taste_id
+		 * food_id[2] : order_num[2] : status : taste_id
 		 * food_id[2] - 2-byte indicating the food's id
 		 * order_num[2] - 2-byte indicating how many this foods are ordered
 		 * 			   order_num[0] - 1-byte indicates the float-point
 		 * 			   order_num[1] - 1-byte indicates the fixed-point
+		 * status - the status to this food
 		 * taste_id - 1-byte indicates the taste preference id
 		 *******************************************************/
 		if(response.header.type == Type.ACK){
@@ -65,13 +66,15 @@ public class RespParser {
 				int foodID = (response.body[index] & 0x000000FF) |
 							((response.body[index + 1] & 0x000000FF) << 8);
 				int orderNum = (response.body[index + 2] & 0x000000FF) |
-								((response.body[index + 3] & 0x000000FF) << 8);
-				short tasteID = response.body[index + 4];
+								((response.body[index + 3] & 0x000000FF) << 8);				
+				short status = response.body[index + 4];				
+				short tasteID = response.body[index + 5];
 				//each food information takes up 5-byte
-				index += 5;
+				index += 6;
 				orderFoods[i] = new Food();
 				orderFoods[i].alias_id = foodID;
 				orderFoods[i].count = orderNum;
+				orderFoods[i].status = status;
 				orderFoods[i].taste.alias_id = tasteID;
 			}
 			order.foods = orderFoods;
