@@ -132,15 +132,31 @@ class OrderHandler extends Handler implements Runnable{
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.INSERT_ORDER){
 
 				Order orderToInsert = ReqParser.parseInsertOrder(request);				
-				printOrder(request, InsertOrder.exec(_term.pin, _term.modelID, orderToInsert));
+				printOrder(request.header.reserved, InsertOrder.exec(_term.pin, _term.modelID, orderToInsert));
 				response = new RespACK(request.header);
 
 				//handle update order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.UPDATE_ORDER){
 				Order orderToUpdate = ReqParser.parseInsertOrder(request);
 				UpdateOrder.Result result = UpdateOrder.exec(_term.pin, _term.modelID, orderToUpdate);
-				printOrder(request, result.extraOrder);
-				printOrder(request, result.canceledOrder);
+				
+				byte printConf = Reserved.DEFAULT_CONF;				
+				if((request.header.reserved & Reserved.PRINT_SYNC) != 0){
+					printConf |= Reserved.PRINT_SYNC;
+				}
+				if((request.header.reserved & Reserved.PRINT_EXTRA_FOOD_2) != 0){
+					printConf |= Reserved.PRINT_EXTRA_FOOD_2;
+				}
+				printOrder(printConf, result.extraOrder);
+				
+				printConf = Reserved.DEFAULT_CONF;
+				if((request.header.reserved & Reserved.PRINT_SYNC) != 0){
+					printConf |= Reserved.PRINT_SYNC;
+				}
+				if((request.header.reserved & Reserved.PRINT_CANCELLED_FOOD_2) != 0){
+					printConf |= Reserved.PRINT_CANCELLED_FOOD_2;
+				}
+				printOrder(printConf, result.canceledOrder);
 				response = new RespACK(request.header);
 
 				//handle the cancel order request
@@ -152,13 +168,13 @@ class OrderHandler extends Handler implements Runnable{
 				//handle the pay order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.PAY_ORDER){
 				Order orderToPay = ReqParser.parsePayOrder(request);
-				printOrder(request, PayOrder.exec(_term.pin, _term.modelID, orderToPay));
+				printOrder(request.header.reserved, PayOrder.exec(_term.pin, _term.modelID, orderToPay));
 				response = new RespACK(request.header);
 
 				//handle the print request
 			}else if(request.header.mode == Mode.PRINT && request.header.type == Type.PRINT_BILL_2){
 				int orderID = ReqParser.parsePrintReq(request);				
-				printOrder(request, QueryOrder.execByID(_term.pin, _term.modelID, orderID));
+				printOrder(request.header.reserved, QueryOrder.execByID(_term.pin, _term.modelID, orderID));
 				response = new RespACK(request.header);
 				
 				//handle the ping test request
@@ -251,7 +267,7 @@ class OrderHandler extends Handler implements Runnable{
 	 *             throws if any logic exception occurred while performing print
 	 *             action
 	 */
-	private void printOrder(ProtocolPackage req, Order orderToPrint) throws PrintLogicException{
+	private void printOrder(byte printConf, Order orderToPrint) throws PrintLogicException{
 		//find the printer connection socket to the restaurant for this terminal
 		ArrayList<Socket> printerConn = WirelessSocketServer.printerConnections.get(new Integer(_term.restaurant_id));
 		Socket[] connections = null;
@@ -261,14 +277,14 @@ class OrderHandler extends Handler implements Runnable{
 		if(connections != null && orderToPrint != null){
 			for(int i = 0; i < connections.length; i++){
 				//check whether the print request is synchronized or asynchronous
-				if((req.header.reserved & Reserved.PRINT_SYNC) != 0){
+				if((printConf & Reserved.PRINT_SYNC) != 0){
 					/**
 					 * if the print request is synchronized, then the insert order request must wait until
 					 * the print request is done, and send the ACK or NAK to let the terminal know whether 
 					 * the print actions is successfully or not
 					 */	
 					try{
-						new PrintHandler(orderToPrint, connections[i], req.header.reserved, _term.restaurant_id, _term.owner).run2();						
+						new PrintHandler(orderToPrint, connections[i], printConf, _term.restaurant_id, _term.owner).run2();						
 					}catch(PrintSocketException e){}
 				
 				}else{
@@ -277,7 +293,7 @@ class OrderHandler extends Handler implements Runnable{
 					 * regardless of the print request. In the mean time, the print request would be put to a 
 					 * new thread to run.
 					 */	
-					WirelessSocketServer.threadPool.execute(new PrintHandler(orderToPrint, connections[i], req.header.reserved, _term.restaurant_id, _term.owner));
+					WirelessSocketServer.threadPool.execute(new PrintHandler(orderToPrint, connections[i], printConf, _term.restaurant_id, _term.owner));
 				}
 			}
 		}
