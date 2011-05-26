@@ -14,7 +14,7 @@ public class ReqPayOrder extends ReqPackage{
 	* pin[6] - auto calculated and filled in
 	* len[2] - 0x06, 0x00
 	* <Body>
-	* table[2] : total_price[4] : pay_type : discount_type : len_member : member_id[len]
+	* table[2] : total_price[4] : pay_type : discount_type : pay_manner : len_member : member_id[len]
 	* table[2] - 2-byte indicates the table id
 	* total_price[4] - 4-byte indicates the total price
 	* 				   total_price[0] indicates the float part
