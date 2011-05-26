@@ -37,6 +37,26 @@ public class PayOrderAction extends Action implements PinGen{
 			response.setContentType("text/json; charset=utf-8");
 			out = response.getWriter();			
 
+			/**
+			 * The parameters looks like below.
+			 * e.g. pin=0x1 & tableID=201 & actualPrice=120 & payType=1 & discountType=1 & payManner=1 & memberID=13693834750
+			 * pin : the pin the this terminal
+			 * tableID : the table id to be paid order
+			 * actualPrice : the actual amount of the money to be paid
+			 * payType : "1" means pay in normal, "2" means pay in member 
+			 * discountType : "1" means to pay using discount 1
+			 * 				  "2" means to pay using discount 2
+			 * 				  "3" means to pay using discount 3
+			 * payManner : "1" means "现金"
+			 * 			   "2" means "刷卡"
+			 * 			   "3" means "会员卡"
+			 * 			   "4" means "签单"
+			 * 			   "5" means "挂账"
+			 * memberID : the id to member, 
+			 * 			  this parameter is optional, 
+			 * 			  NOT need to pass this parameter if pay in normal 
+			 */
+			
 			String pin = request.getParameter("pin");
 			if(pin.startsWith("0x") || pin.startsWith("0X")){
 				pin = pin.substring(2);
@@ -48,6 +68,7 @@ public class PayOrderAction extends Action implements PinGen{
 			orderToPay.setActualPrice(Float.parseFloat(request.getParameter("actualPrice")));
 			orderToPay.pay_type = Integer.parseInt(request.getParameter("payType"));
 			orderToPay.discount_type = Integer.parseInt(request.getParameter("discountType"));
+			orderToPay.pay_manner = Integer.parseInt(request.getParameter("payManner"));
 			orderToPay.member_id = request.getParameter("memberID");
 			
 			ReqPackage.setGen(this);
