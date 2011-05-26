@@ -40,6 +40,20 @@ public class InsertOrderAction extends Action implements PinGen {
 			out = response.getWriter();
 			
 
+			/**
+			 * The parameters looks like below.
+			 * e.g. pin=0x1 & tableID=201 & customNum=2 & type=1 & foods="{[1102,2,2,4]}"
+			 * pin : the pin the this terminal
+			 * tableID : the table id to insert order
+			 * actualPrice : the actual amount of the money to be paid
+			 * customNum : the custom number to this order, ranges from 1 through 255
+			 * type : "1" means insert order
+			 * 		  "2" means update order
+			 * originalTableID : the original table id, this parameter is optional.
+			 * 					 if the type is insert order, NOT need this parameter.
+			 * 			     	 if the type is update order, need this parameter to indicate the original table
+			 * foods : the food string
+			 */
 			String pin = request.getParameter("pin");
 			if(pin.startsWith("0x") || pin.startsWith("0X")){
 				pin = pin.substring(2);
@@ -49,13 +63,18 @@ public class InsertOrderAction extends Action implements PinGen {
 			Order orderToInsert = new Order();
 			orderToInsert.table_id = Short.parseShort(request.getParameter("tableID"));
 			orderToInsert.custom_num = Integer.parseInt(request.getParameter("customNum"));
-			orderToInsert.originalTableID = Short.parseShort(request.getParameter("tableID"));
+			int type = Integer.parseInt(request.getParameter("type"));
+			if(type == 1){
+				orderToInsert.originalTableID = Short.parseShort(request.getParameter("tableID"));				
+			}else{
+				orderToInsert.originalTableID = Short.parseShort(request.getParameter("originalTableID"));
+			}
 			orderToInsert.foods = toFoodArray(request.getParameter("foods"));
 			
 			ReqPackage.setGen(this);
 			byte printType = Reserved.PRINT_ORDER_2 | Reserved.PRINT_ORDER_DETAIL_2;
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(orderToInsert, 
-																					 Type.INSERT_ORDER,
+																					 (type == 1) ? Type.INSERT_ORDER : Type.UPDATE_ORDER, 
 																					 printType));
 			if(resp.header.type == Type.ACK){
 				jsonResp = jsonResp.replace("$(result)", "true");
