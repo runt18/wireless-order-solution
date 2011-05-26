@@ -197,14 +197,21 @@ public class UpdateOrder {
 					}
 					dbCon.rs.close();
 					
-					//get the associated foods' discount
-					sql = "SELECT discount FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id +
-						" AND alias_id=" + orderToUpdate.foods[i].kitchen;		
-					dbCon.rs = dbCon.stmt.executeQuery(sql);
-					if(dbCon.rs.next()){
-						food.discount = (byte)(dbCon.rs.getFloat("discount") * 100);
+					/**
+					 * The special food does NOT discount.
+					 */
+					if(food.isSpecial()){
+						food.discount = 100;
+					}else{
+						//get the associated foods' discount
+						sql = "SELECT discount FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id +
+							" AND alias_id=" + orderToUpdate.foods[i].kitchen;		
+						dbCon.rs = dbCon.stmt.executeQuery(sql);
+						if(dbCon.rs.next()){
+							food.discount = (byte)(dbCon.rs.getFloat("discount") * 100);
+						}
+						dbCon.rs.close();						
 					}
-					dbCon.rs.close();
 					
 					//get the taste preference only if the food has taste preference
 					if(orderToUpdate.foods[i].taste.alias_id != Taste.NO_TASTE){

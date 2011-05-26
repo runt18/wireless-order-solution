@@ -41,13 +41,7 @@ public class PayOrder {
 			 */
 			float totalPrice = 0;
 			for(int i = 0; i < orderInfo.foods.length; i++){
-				float discount = 100;
-				/**
-				 * The special food does NOT discount
-				 */
-				if(!orderInfo.foods[i].isSpecial()){
-					discount = (float)Math.round(orderInfo.foods[i].discount) / 100;					
-				}
+				float discount = (float)Math.round(orderInfo.foods[i].discount) / 100;					
 				float foodPrice = Util.price2Float(orderInfo.foods[i].price, Util.INT_MASK_2).floatValue();
 				float tastePrice = Util.price2Float(orderInfo.foods[i].taste.price, Util.INT_MASK_2).floatValue();
 				totalPrice += (foodPrice * discount + tastePrice) * orderInfo.foods[i].count2Float().floatValue();
@@ -122,6 +116,9 @@ public class PayOrder {
 		}else if(orderToPay.pay_type == Order.PAY_NORMAL && orderToPay.discount_type == Order.DISCOUNT_2){
 			discount = "discount_2";
 			
+		}else if(orderToPay.pay_type == Order.PAY_NORMAL && orderToPay.discount_type == Order.DISCOUNT_3){
+			discount = "discount_3";
+			
 		}else if(orderToPay.pay_type == Order.PAY_MEMBER){
 			//validate the member id
 			String sql = "SELECT id FROM " + Params.dbName + 
@@ -133,6 +130,8 @@ public class PayOrder {
 					discount = "member_discount_1";
 				}else if(orderToPay.discount_type == Order.DISCOUNT_2){
 					discount = "member_discount_2";
+				}else if(orderToPay.discount_type == Order.DISCOUNT_3){
+					discount = "member_discount_3";
 				}
 			}else{
 				throw new BusinessException("The member id(" + orderToPay.member_id + ") is invalid.", ErrorCode.MEMBER_INVALID);
@@ -140,16 +139,23 @@ public class PayOrder {
 		}
 			
 		for(int i = 0; i < orderInfo.foods.length; i++){
-			//get the discount to each food according to the payment and discount type
-			String sql = "SELECT " + discount + " FROM " + Params.dbName + 
-			".kitchen WHERE restaurant_id=" + orderInfo.restaurant_id + 
-			" AND alias_id=" + orderInfo.foods[i].kitchen;
-			
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			if(dbCon.rs.next()){
-				orderInfo.foods[i].discount = (byte)(dbCon.rs.getFloat(discount) * 100);
+			/**
+			 * The special food does NOT discount
+			 */
+			if(orderInfo.foods[i].isSpecial()){
+				orderInfo.foods[i].discount = 100;
+			}else{
+				//get the discount to each food according to the payment and discount type
+				String sql = "SELECT " + discount + " FROM " + Params.dbName + 
+							 ".kitchen WHERE restaurant_id=" + orderInfo.restaurant_id + 
+							 " AND alias_id=" + orderInfo.foods[i].kitchen;
+				
+				dbCon.rs = dbCon.stmt.executeQuery(sql);
+				if(dbCon.rs.next()){
+					orderInfo.foods[i].discount = (byte)(dbCon.rs.getFloat(discount) * 100);
+				}
+				dbCon.rs.close();				
 			}
-			dbCon.rs.close();
 		}
 		
 		orderInfo.restaurant_id = orderToPay.restaurant_id;

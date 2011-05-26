@@ -66,13 +66,20 @@ public class InsertOrder {
 					}
 					dbCon.rs.close();
 						
-					//get the associated foods' discount
-					sql = "SELECT discount FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + 
-						  table.restaurant_id +
-						  " AND alias_id=" + orderToInsert.foods[i].kitchen;		
-					dbCon.rs = dbCon.stmt.executeQuery(sql);
-					if(dbCon.rs.next()){
-						orderToInsert.foods[i].discount = (byte)(dbCon.rs.getFloat("discount") * 100);
+					/**
+					 * The special food does NOT discount
+					 */
+					if(orderToInsert.foods[i].isSpecial()){
+						orderToInsert.foods[i].discount = 100;
+					}else{
+						//get the associated foods' discount
+						sql = "SELECT discount FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + 
+							  table.restaurant_id +
+							  " AND alias_id=" + orderToInsert.foods[i].kitchen;		
+						dbCon.rs = dbCon.stmt.executeQuery(sql);
+						if(dbCon.rs.next()){
+							orderToInsert.foods[i].discount = (byte)(dbCon.rs.getFloat("discount") * 100);
+						}						
 					}
 						
 					//get the taste preference according to the taste id,
