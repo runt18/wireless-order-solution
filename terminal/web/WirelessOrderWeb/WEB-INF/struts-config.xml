@@ -19,7 +19,10 @@
 		<action path="/InsertOrder" type="com.wireless.Actions.dishesOrder.InsertOrderAction"
 			scope="request">
 		</action>
-		<action path="/PrintOrder" type="com.wireless.Actions.dishesOrder.PrintOrderAction"
+		<action path="/PrintOrder" type="com.wireless.Actions.payment.PrintOrderAction"
+			scope="request">
+		</action>
+		<action path="/PayOrder" type="com.wireless.Actions.payment.PrintOrderAction"
 			scope="request">
 		</action>
 	</action-mappings>
