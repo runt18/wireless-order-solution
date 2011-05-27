@@ -112,7 +112,7 @@ public class QueryMenuAction extends Action {
 				jsonFood = jsonFood.replace("$(kitchen_id)", new Short(foods[i].kitchen).toString());
 				jsonFood = jsonFood.replace("$(name)", foods[i].name);
 				jsonFood = jsonFood.replace("$(alias_id)", new Integer(foods[i].alias_id).toString());
-				jsonFood = jsonFood.replace("$(pinyin)", "");
+				jsonFood = jsonFood.replace("$(pinyin)", foods[i].pinyin);
 				jsonFood = jsonFood.replace("$(unit)", Util.price2String(foods[i].price, Util.INT_MASK_2));
 
 				// put each json food info to the value
