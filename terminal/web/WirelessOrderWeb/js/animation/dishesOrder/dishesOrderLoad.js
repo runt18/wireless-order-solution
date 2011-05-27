@@ -54,7 +54,7 @@ function dishSpellOnLoad() {
 					dishesDisplayDataShow.length = 0;
 					for ( var i = 0; i < dishesDisplayData.length; i++) {
 						if ((dishesDisplayData[i][2] + "").substring(0,
-								curDishSpell.length) == curDishSpell) {
+								curDishSpell.length).toUpperCase() == curDishSpell) {
 							dishesDisplayDataShow.push([
 									dishesDisplayData[i][0],
 									dishesDisplayData[i][1],
