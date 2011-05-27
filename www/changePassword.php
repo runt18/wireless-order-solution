@@ -17,6 +17,7 @@ if($isChangePassword == "true")
 		if($newPassword != $random && $pwd2 != $random)
 		{
 			$sql = "Update restaurant SET pwd='" .md5($newPassword). "', pwd2='" .md5($pwd2). "' WHERE id=$restaurant_id";	
+			$_SESSION["pwd2"] = md5($pwd2);	
 		}
 		else if($newPassword != $random && $pwd2 == $random)
 			{
@@ -25,6 +26,7 @@ if($isChangePassword == "true")
 			else if($newPassword == $random && $pwd2 != $random)
 				{
 					$sql = "Update restaurant SET pwd2='" .md5($pwd2). "' WHERE id=$restaurant_id";	
+					$_SESSION["pwd2"] = md5($pwd2);	
 				}
 				else
 				{
@@ -35,6 +37,7 @@ if($isChangePassword == "true")
 		if($db->Execute($sql))
 		{
 			echo "<script>alert('修改成功！');</script>";
+			
 		}
 		else{
 			echo "<script>alert('修改失败！');</script>";

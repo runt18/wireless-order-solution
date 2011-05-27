@@ -1,4 +1,40 @@
-function editOrder(id, total_price_2, target, type_value) {
+function canEditOrder(id, total_price_2, target, type_value, table_id, category_value) {
+    var editType = "canEditOrder";
+    var content = ' <div class="add_foot">' +
+                        '<div class="title">' +
+	                        '<div class="title_left"><font class="font" style="width:350px;">修改帐单</font></div>' +
+	                        '<div class="title_right"></div>' +
+	                    '</div>' +
+	                    '<form name="orderForm" action="' + target + '"  method="post" onkeydown="editOrderKeyDown()">' +
+	                      '<input type="hidden" name="editType" value="' + editType + '" />' +
+	                      '<input type="hidden" name="id" value="' + id + '" />' +
+	                      '<input type="hidden" name="total_price_2" value="' + total_price_2 + '" />' +
+	                      '<input type="hidden" name="target" value="' + target + '" />' +
+	                      '<input type="hidden" name="type_value" value="' + type_value + '" />' +
+	                      '<input type="hidden" name="table_id" value="' + table_id + '" />' +
+	                      '<input type="hidden" name="category_value" value="' + category_value + '" />' +
+	                      '<div class="add_foot_Content" style="height:130px;text-align:center">' +
+	                        '<div class="pop_Content">' +
+	                           '<div class="pop_Content1">请输入权限密码：<input type="text" id="pwd2" name="pwd2" size="25" height="20"/></div>' +
+	                        '</div>' +
+	                            '<span class="pop_action-span"><a href="#" onclick="submitCanEdit()">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>' +
+	                            '<span class="pop_action-span1"><a href="#" onclick="closeWindow()">取&nbsp;&nbsp;&nbsp;&nbsp;消</a></span>' +
+	                      '</div>' +
+	                      '</form>' +
+	                '</div>';
+
+    showMessageBox(content, 342, 350);
+    document.getElementById("pwd2").focus();
+}
+function submitCanEdit() {
+    var pwd2 = document.getElementById("pwd2").value;
+    if (pwd2 == undefined || pwd2 == null || pwd2 == "") {
+        alert("权限密码不能为空！");
+        return;
+    }
+    document.orderForm.submit();
+}
+function editOrder(id, total_price_2, target, type_value, table_id, category_value) {    
     var editType = "editOrder";
     var content = ' <div class="add_foot">' +
                         '<div class="title">' +
@@ -8,19 +44,28 @@ function editOrder(id, total_price_2, target, type_value) {
 	                    '<form name="orderForm" action="' + target + '"  method="post" onkeydown="editOrderKeyDown()">' +
 	                      '<input type="hidden" name="editType" value="' + editType + '" />' +
 	                      '<input type="hidden" name="id" value="' + id + '" />' +
-	                      '<div class="add_foot_Content" style="height:130px;text-align:center">' +
+	                      '<div class="add_foot_Content" style="height:200px;text-align:center">' +
 	                        '<div class="pop_Content">' +
-	                            '<div class="pop_Content1">实收金额：<input type="text" id="total_price_2" name="total_price_2" onfocus="this.select()" size="25" height="20" value="' + total_price_2 + '" ' +
-	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57||event.keyCode==46||event.keyCode==45"' +
+	                           '<div class="pop_Content1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;台号：<input type="text" id="table_id" name="table_id" value="' + table_id + '" size="25" height="20" onfocus="this.select()" ' +
+	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57"' +
 	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
 	                            ' style="ime-mode:Disabled" /></div>' +
+	                             '<div class="pop_Content1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;类型：<select id="sel_category" name="sel_category">' +
+	                                    '<option value="1" selected="selected">一般</option>' +
+	                                    '<option value="2">外卖</option>' +
+	                                    '<option value="3">拼台</option>' +
+	                                    '</select></div>' +	                                    
 	                            '<div class="pop_Content1">结帐方式：<select id="sel_type" name="sel_type">' +
 	                                    '<option value="1" selected="selected">现金</option>' +
 	                                    '<option value="2">刷卡</option>' +
 	                                    '<option value="3">会员卡</option>' +
 	                                    '<option value="4">挂账</option>' +
 	                                    '<option value="5">签单</option>' +
-	                                    '</select>' +
+	                                    '</select></div>' +
+	                            '<div class="pop_Content1">实收金额：<input type="text" id="total_price_2" name="total_price_2" onfocus="this.select()" size="25" height="20" value="' + total_price_2 + '" ' +
+	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57||event.keyCode==46||event.keyCode==45"' +
+	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
+	                            ' style="ime-mode:Disabled" /></div>' +
 	                        '</div>' +
 	                            '<span class="pop_action-span"><a href="#" onclick="submitOrderData()">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>' +
 	                            '<span class="pop_action-span1"><a href="#" onclick="closeWindow()">取&nbsp;&nbsp;&nbsp;&nbsp;消</a></span>' +
@@ -29,8 +74,9 @@ function editOrder(id, total_price_2, target, type_value) {
 	                '</div>';
 
     showMessageBox(content, 342, 350);
-    document.getElementById("total_price_2").focus();
+    document.getElementById("table_id").focus();
     document.all.sel_type.value = type_value;
+    document.all.sel_category.value = category_value;
 }
 
 function editOrderKeyDown() {

@@ -956,11 +956,11 @@
     {
     "ProjRelPath" = "T"
     }
-    "js\\staff.js"
+    "libs\\adodb\\tests\\testmssql.php"
     {
     "ProjRelPath" = "T"
     }
-    "libs\\adodb\\tests\\testmssql.php"
+    "js\\staff.js"
     {
     "ProjRelPath" = "T"
     }
@@ -1349,6 +1349,10 @@
     "ProjRelPath" = "T"
     }
     "libs\\adodb\\datadict\\datadict-mysql.inc.php"
+    {
+    "ProjRelPath" = "T"
+    }
+    "common.php"
     {
     "ProjRelPath" = "T"
     }

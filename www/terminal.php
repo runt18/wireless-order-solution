@@ -60,7 +60,7 @@ if($editType == "setOwner")
            include("conn.php"); 
            $restaurant_id = $_SESSION["restaurant_id"];
            $bh=0;
-           $sql = "SELECT model_name,owner_name,pin,expire_date FROM `terminal` WHERE restaurant_id=$restaurant_id ORDER BY restaurant_id" ;  
+           $sql = "SELECT model_id,model_name,owner_name,pin,expire_date FROM `terminal` WHERE restaurant_id=$restaurant_id ORDER BY restaurant_id" ;  
            
            $rs = $db->GetAll($sql);
            foreach ($rs as $row){
@@ -72,6 +72,11 @@ if($editType == "setOwner")
            	$diff = ($time1 - $time2)/(3600*24);
            	/*$currentDate = getdate(*/
 			//$diff= abs(($time2 – $time1)/(3600*24));
+	$disable = "";
+	if($row["model_id"] == 255)
+		{
+		$disable = "disabled='disabled'";
+			}
 
            	if($diff<0)
            	{
@@ -94,7 +99,7 @@ if($editType == "setOwner")
            	echo "<td ".$background.$toolTip.">" .$row["owner_name"] ."</td>";
            	echo "<td ".$background.$toolTip.">" .strtoupper(base_convert($row["pin"],10,16)) ."</td>";
            	echo "<td ".$background.$toolTip.">" .$row["expire_date"] ."</td>";
-           	echo "<td ".$background.$toolTip."><a href='#' onclick='setOwner(&quot;".$row["pin"]."&quot;,&quot;".$row["owner_name"]."&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;设定持有人</a>";
+	echo "<td $disable ".$background.$toolTip."><a href='#' onclick='setOwner(&quot;".$row["pin"]."&quot;,&quot;".$row["owner_name"]."&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;设定持有人</a>";
            	echo "</tr>";
            }
            mysql_close($con);

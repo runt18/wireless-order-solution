@@ -31,7 +31,8 @@ else
 	{
 		$_SESSION["restaurant_id"] = $rs["id"];
 		$_SESSION["restaurant_name"] = $rs["restaurant_name"];
-		$_SESSION["total_income"] = $rs["total_income"];				
+		$_SESSION["total_income"] = $rs["total_income"];		
+		$_SESSION["pwd2"] = $rs["pwd2"];				
 		if($rs["id"] > 10)
 		{
 			header('Location: main.php');

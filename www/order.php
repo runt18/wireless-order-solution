@@ -19,6 +19,7 @@ include("hasLogin.php");
 <?php
 include("conn.php");
 $deleteId = $_POST["deleteId"];
+$editType = $_POST["editType"];
 if($deleteId != null)
 {
 	$sql2 = "DELETE FROM order_food WHERE order_id=$deleteId";
@@ -34,13 +35,22 @@ if($deleteId != null)
 		echo "<script>alert('删除失败！');</script>";
 	}
 }  
-$editType = $_POST["editType"];
+
 if($editType == "editOrder")
 {
 	$id = $_POST["id"];	
 	$total_price_2 = $_POST["total_price_2"];			
 	$type_value = $_POST["sel_type"];
-	$sql = "UPDATE `order` SET total_price_2 = $total_price_2,type=$type_value WHERE id=$id";
+	$table_id = $_POST["table_id"];
+	$sel_category = $_POST["sel_category"];
+	if($table_id != "-")
+	{
+		$sql = "UPDATE `order` SET total_price_2 = $total_price_2,type=$type_value,table_id=$table_id,category=$sel_category WHERE id=$id";
+	}
+	else
+	{
+		$sql = "UPDATE `order` SET total_price_2 = $total_price_2,type=$type_value,category=$sel_category WHERE id=$id";	
+	}
 	
 	if($db->Execute($sql))
 	{			
@@ -54,6 +64,7 @@ if($editType == "editOrder")
 </head>
 <body>
 <?php
+//echo $sql;
 include("changePassword.php"); 
 $editType = $_POST["editType"];
 if($editType == "dailyCheckOut")
@@ -77,6 +88,24 @@ if($editType == "dailyCheckOut")
 		echo "<script>alert('日结失败！');</script>";
 	}
 }    
+if($editType == "canEditOrder")
+{
+	$_id = $_POST["id"];	
+	$_total_price_2 = $_POST["total_price_2"];	
+	$_target = $_POST["target"];	
+	$_type_value = $_POST["type_value"];	
+	$_table_id = $_POST["table_id"];
+	$_category = $_POST["category_value"];
+	$_pwd2 = $_POST["pwd2"];		
+	if(md5($_pwd2) == $_SESSION["pwd2"])	
+	{
+		echo "<script>editOrder('$_id','$_total_price_2','$_target','$_type_value','$_table_id','$_category')</script>";
+	}
+	else
+	{
+		echo "<script>alert('权限密码错误！');canEditOrder('$_id','$_total_price_2','$_target','$_type_value','$_table_id','$_category')</script>";
+	}
+}
 ?>
 <h1>
 <span class="action-span"><a href="#" onclick="showSearch('order.php');">高级搜索</a></span>
@@ -241,9 +270,9 @@ $rs = $db->GetAll($sql);
 foreach ($rs as $row){
 	$alias_id = $row["alias_id"];
 	if($row["category"] != 1)
-		{
+	{
 		$alias_id = "-";
-			}
+	}
 	$bh=$bh+1;
 	echo "<tr>";
 	echo "<td>" .$row["id"] ."</td>";
@@ -253,7 +282,7 @@ foreach ($rs as $row){
 	echo "<td>" .$row["type_name"]."</td>";
 	echo "<td>" .$row["total_price"]."</td>";
 	echo "<td>" .$row["total_price_2"]."</td>";
-	echo "<td><a href='#' onclick='editOrder(&quot;".$row["id"]."&quot;,&quot;".$row["total_price_2"]."&quot;,&quot;order.php&quot;,&quot;".$row["type_value"]."&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
+	echo "<td><a href='#' onclick='canEditOrder(&quot;".$row["id"]."&quot;,&quot;".$row["total_price_2"]."&quot;,&quot;order.php&quot;,&quot;".$row["type_value"]."&quot;,&quot;".$alias_id."&quot;,&quot;".$row["category"]."&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
 		"<a href='#' onclick='showOrderDetail(&quot;".$row["id"]."&quot;,&quot;".$alias_id."&quot;,&quot;".$row["order_date"]."&quot;,&quot;".$row["total_price"].
 		"&quot;,&quot;".$row["num"]."&quot;,&quot;".$row["foods"]."&quot;,&quot;".$row["is_paid"]."&quot;,&quot;".$row["waiter"]."&quot;,&quot;".$row["type_name"]."&quot;,&quot;".$row["total_price_2"]."&quot;,&quot;".$row["category_name"]."&quot;,&quot;".$row["comment"]."&quot;)'>
 			<img src='images/View.png'  height='16' width='14' border='0'/>&nbsp;查看</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href='#' onclick='deleteOrder(&quot;".$row["id"]."&quot;,&quot;order.php&quot;)'>
