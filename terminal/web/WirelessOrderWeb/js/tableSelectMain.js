@@ -1,4 +1,21 @@
-﻿Ext
+﻿// 从url获取当前桌信息
+function URLParaQuery() {
+	var name, value, i;
+	var str = location.href;
+	var num = str.indexOf("?")
+	str = str.substr(num + 1);
+	var arrtmp = str.split("&");
+	for (i = 0; i < arrtmp.length; i++) {
+		num = arrtmp[i].indexOf("=");
+		if (num > 0) {
+			name = arrtmp[i].substring(0, num);
+			value = arrtmp[i].substr(num + 1);
+			this[name] = value;
+		}
+	}
+}
+
+Ext
 		.onReady(function() {
 			// 解决ext中文传入后台变问号问题
 			Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
