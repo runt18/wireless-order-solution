@@ -38,6 +38,8 @@ public class CancelOrderAction extends Action {
 			tableID = Short.parseShort(request.getParameter("tableID"));
 			
 			CancelOrder.exec(Integer.parseInt(pin, 16), Terminal.MODEL_STAFF, tableID);
+			jsonResp = jsonResp.replace("$(result)", "true");
+			jsonResp = jsonResp.replace("$(value)", tableID + "号餐台删单成功");
 			
 		}catch(BusinessException e){
 			e.printStackTrace();
