@@ -1,86 +1,73 @@
-﻿// 从url获取当前桌信息
-function URLParaQuery() {
-	var name, value, i;
-	var str = location.href;
-	var num = str.indexOf("?")
-	str = str.substr(num + 1);
-	var arrtmp = str.split("&");
-	for (i = 0; i < arrtmp.length; i++) {
-		num = arrtmp[i].indexOf("=");
-		if (num > 0) {
-			name = arrtmp[i].substring(0, num);
-			value = arrtmp[i].substr(num + 1);
-			this[name] = value;
-		}
-	}
-}
-
-Ext
+﻿Ext
 		.onReady(function() {
 			// 解决ext中文传入后台变问号问题
 			Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
 			Ext.QuickTips.init();
 
 			// person count input pop window
-			personCountInputWin = new Ext.Window({
-				layout : "fit",
-				width : 177,
-				height : 100,
-				closeAction : "hide",
-				resizable : false,
-				items : [ {
-					layout : "form",
-					labelWidth : 30,
-					border : false,
-					frame : true,
-					items : [ {
-						xtype : "numberfield",
-						fieldLabel : "人数",
-						id : "personCountInput",
-						width : 110
-					} ]
-				} ],
-				buttons : [
-						{
-							text : "确定",
-							handler : function() {
-								var inputCount = personCountInputWin.findById(
-										"personCountInput").getValue();
-								if (inputCount != 0 && inputCount != "") {
-									personCountInputWin.hide();
+			personCountInputWin = new Ext.Window(
+					{
+						layout : "fit",
+						width : 177,
+						height : 100,
+						closeAction : "hide",
+						resizable : false,
+						items : [ {
+							layout : "form",
+							labelWidth : 30,
+							border : false,
+							frame : true,
+							items : [ {
+								xtype : "numberfield",
+								fieldLabel : "人数",
+								id : "personCountInput",
+								width : 110
+							} ]
+						} ],
+						buttons : [
+								{
+									text : "确定",
+									handler : function() {
+										var inputCount = personCountInputWin
+												.findById("personCountInput")
+												.getValue();
+										if (inputCount != 0 && inputCount != "") {
+											personCountInputWin.hide();
 
-									/*
-									 * // update data var tableIndex = -1; for (
-									 * var i = 0; i < tableStatusListTS.length;
-									 * i++) { if (tableStatusListTS[i][0] ==
-									 * selectedTable) { tableIndex = i; } }
-									 * tableStatusListTS[tableIndex][1] =
-									 * inputCount;
-									 * tableStatusListTS[tableIndex][2] = "占用";
-									 *  // update status output document
-									 * .getElementById("perCountDivTS").innerHTML =
-									 * inputCount +
-									 * "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-									 * document
-									 * .getElementById("tblStatusDivTS").innerHTML =
-									 * "占用";
-									 */
+											// update data
+											var tableIndex = -1;
+											for ( var i = 0; i < tableStatusListTS.length; i++) {
+												if (tableStatusListTS[i][0] == selectedTable) {
+													tableIndex = i;
+												}
+											}
+											tableStatusListTS[tableIndex][1] = inputCount;
+											tableStatusListTS[tableIndex][2] = "占用";
 
-									// for forward the page
-									location.href = "OrderMain.html?tableNbr="
-											+ selectedTable + "&personCount="
-											+ inputCount
-											+ "&tableStat=free&pin=" + pin;
+											// update status output
+											document
+													.getElementById("perCountDivTS").innerHTML = inputCount
+													+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+											document
+													.getElementById("tblStatusDivTS").innerHTML = "占用";
 
-								}
-							}
-						}, {
-							text : "取消",
-							handler : function() {
-								personCountInputWin.hide();
-							}
-						} ]
-			});
+											// for forward the page
+											location.href = "OrderMain.html?tableNbr="
+													+ selectedTable
+													+ "&personCount="
+													+ inputCount
+													+ "&pin="
+													+ pin;
+
+										}
+									}
+								}, {
+									text : "取消",
+									handler : function() {
+										personCountInputWin.hide();
+									}
+								} ]
+					});
 
 			// ***************tableSelectNorthPanel******************
 			// soft key board
@@ -367,14 +354,10 @@ Ext
 								tableIndex = i;
 							}
 						}
-						if (tableStatusListTS[tableIndex][2] == "占用") {
-							location.href = "OrderMain.html?tableNbr="
-									+ selectedTable + "&personCount="
-									+ tableStatusListTS[tableIndex][1]
-									+ "&tableStat=used&pin=" + pin;
-						} else {
-							personCountInputWin.show();
-						}
+						location.href = "OrderMain.html?tableNbr="
+								+ selectedTable + "&personCount="
+								+ tableStatusListTS[tableIndex][1] + "&pin="
+								+ pin;
 					}
 				}
 			});
@@ -418,30 +401,13 @@ Ext
 					if (tableStatusListTS[tableIndex][2] == "空桌") {
 						Ext.Msg.alert("", "<b>此桌没有下单，不能删单！</b>");
 					} else {
-						var Request = new URLParaQuery();
 						Ext.Ajax.request({
-							url : "../CancelOrder.do",
+							url : "../findMutilTableCol.do",
 							params : {
-								"pin" : Request["pin"],
-								"tableID" : selectedTable
+								tableID : selectedTable
 							},
 							success : function(response, options) {
-								var resultJSON = Ext.util.JSON
-										.decode(response.responseText);
-								if (resultJSON.success == true) {
-									Ext.MessageBox.show({
-										msg : resultJSON.data,
-										width : 300,
-										buttons : Ext.MessageBox.OK
-									});
-								} else {
-									Ext.MessageBox.show({
-										msg : resultJSON.data,
-										width : 300,
-										buttons : Ext.MessageBox.OK
-									});
-								}
-
+								Ext.Msg.alert("", "<b>删单成功！</b>");
 							},
 							failure : function(response, options) {
 							}
