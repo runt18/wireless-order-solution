@@ -165,7 +165,7 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 				 * print_content - the print content
 				 *******************************************************************************/
 				ProtocolPackage printReq;
-				iResult = Protocol::recv(g_ConnectSocket, 4096, printReq);			
+				iResult = Protocol::recv(g_ConnectSocket, 128, printReq);			
 				if(iResult > 0){
 					if(printReq.header.mode == Mode::PRINT && printReq.header.type == Type::PRINT_BILL){
 						//extract the 2-byte length of the print content

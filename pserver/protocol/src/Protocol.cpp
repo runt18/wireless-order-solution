@@ -61,34 +61,58 @@ int Protocol::send(SOCKET socket, const ProtocolPackage& pack){
 *                  If the connection has been gracefully closed, the return value is zero
 *******************************************************************************/
 int Protocol::recv(SOCKET socket, int rec_size, ProtocolPackage& pack){
-	boost::shared_ptr<char> rec_buf(new char[rec_size], boost::checked_array_deleter<char>());
-	int iResult = ::recv(socket, rec_buf.get(), rec_size, 0);
-	if(iResult >= 12){
+	//receive the header to package
+	boost::shared_ptr<char> header_buf(new char[ProtocolHeader::SIZE], boost::checked_array_deleter<char>());
+	int iResult = ::recv(socket, header_buf.get(), ProtocolHeader::SIZE, 0);
+	if(iResult >= ProtocolHeader::SIZE){
 		//assign the header
-		pack.header.mode = rec_buf.get()[0];
-		pack.header.type = rec_buf.get()[1];
-		pack.header.seq = rec_buf.get()[2];
-		pack.header.reserved = rec_buf.get()[3];
-		pack.header.pin[0] = rec_buf.get()[4];
-		pack.header.pin[1] = rec_buf.get()[5];
-		pack.header.pin[2] = rec_buf.get()[6];
-		pack.header.pin[3] = rec_buf.get()[7];
-		pack.header.pin[4] = rec_buf.get()[8];
-		pack.header.pin[5] = rec_buf.get()[9];
-		pack.header.length[0] = rec_buf.get()[10];
-		pack.header.length[1] = rec_buf.get()[11];
+		pack.header.mode = header_buf.get()[0];
+		pack.header.type = header_buf.get()[1];
+		pack.header.seq = header_buf.get()[2];
+		pack.header.reserved = header_buf.get()[3];
+		pack.header.pin[0] = header_buf.get()[4];
+		pack.header.pin[1] = header_buf.get()[5];
+		pack.header.pin[2] = header_buf.get()[6];
+		pack.header.pin[3] = header_buf.get()[7];
+		pack.header.pin[4] = header_buf.get()[8];
+		pack.header.pin[5] = header_buf.get()[9];
+		pack.header.length[0] = header_buf.get()[10];
+		pack.header.length[1] = header_buf.get()[11];
+
 		//calculate the length of the body
-		unsigned int len = (unsigned char)pack.header.length[0] | 
-			(unsigned char)pack.header.length[1] << 8;
-		if(len > 0){
+		unsigned int body_len = (unsigned char)pack.header.length[0] | 
+							   (unsigned char)pack.header.length[1] << 8;
+
+		body_len += strlen(ProtocolPackage::EOP);
+
+		//allocate the memory for receiving body
+		boost::shared_ptr<char> body_buf(new char[body_len], boost::checked_array_deleter<char>());
+		unsigned int offset = 0;
+		do{
+			//receive the body to package
+			iResult = ::recv(socket, body_buf.get() + offset, body_len - offset, 0);
+			//In order to receive all the data blocks, 
+			//the function "recv" might be invoked for some times if the data is huge.
+			//So here loop to receive the data until the length of received data is equal to the header,
+			//and sleep a short time before the data available.
+			if(iResult > 0){
+				offset += iResult;
+				if(offset < body_len){
+					//Sleep(200);
+				}
+			}else{
+				break;
+			}
+		}while(offset < body_len);
+
+		if(offset >= body_len){
 			//allocate the memory for the body
-			pack.body = new char[len];
+			pack.body = new char[body_len];
 			//assign the body
-			for(unsigned int i = 0; i < len; i++){
-				pack.body[i] = rec_buf.get()[ProtocolHeader::SIZE + i];
+			for(unsigned int i = 0; i < body_len; i++){
+				pack.body[i] = body_buf.get()[i];
 			}
 		}
-
 	}
 	return iResult;
 }
