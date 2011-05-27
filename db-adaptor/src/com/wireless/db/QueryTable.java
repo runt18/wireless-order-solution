@@ -3,6 +3,9 @@ package com.wireless.db;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Table;
@@ -72,6 +75,21 @@ public class QueryTable {
 				tables.add(busyTable);
 			}			
 
+			Collections.sort(tables, new Comparator<Table>(){
+
+				@Override
+				public int compare(Table table1, Table table2) {
+					// TODO Auto-generated method stub
+					if(table1.alias_id > table2.alias_id){
+						return 1;
+					}else if(table1.alias_id < table2.alias_id){
+						return -1;
+					}else{
+						return 0;
+					}
+				}
+				
+			});
 			return tables.toArray(new Table[tables.size()]);
 			
 		}finally{
@@ -158,3 +176,4 @@ public class QueryTable {
 	}
 	
 }
+
