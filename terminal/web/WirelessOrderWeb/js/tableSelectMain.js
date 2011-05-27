@@ -5,70 +5,65 @@
 			Ext.QuickTips.init();
 
 			// person count input pop window
-			personCountInputWin = new Ext.Window(
-					{
-						layout : "fit",
-						width : 177,
-						height : 100,
-						closeAction : "hide",
-						resizable : false,
-						items : [ {
-							layout : "form",
-							labelWidth : 30,
-							border : false,
-							frame : true,
-							items : [ {
-								xtype : "numberfield",
-								fieldLabel : "人数",
-								id : "personCountInput",
-								width : 110
-							} ]
-						} ],
-						buttons : [
-								{
-									text : "确定",
-									handler : function() {
-										var inputCount = personCountInputWin
-												.findById("personCountInput")
-												.getValue();
-										if (inputCount != 0 && inputCount != "") {
-											personCountInputWin.hide();
+			personCountInputWin = new Ext.Window({
+				layout : "fit",
+				width : 177,
+				height : 100,
+				closeAction : "hide",
+				resizable : false,
+				items : [ {
+					layout : "form",
+					labelWidth : 30,
+					border : false,
+					frame : true,
+					items : [ {
+						xtype : "numberfield",
+						fieldLabel : "人数",
+						id : "personCountInput",
+						width : 110
+					} ]
+				} ],
+				buttons : [
+						{
+							text : "确定",
+							handler : function() {
+								var inputCount = personCountInputWin.findById(
+										"personCountInput").getValue();
+								if (inputCount != 0 && inputCount != "") {
+									personCountInputWin.hide();
 
-											/*
-											// update data
-											var tableIndex = -1;
-											for ( var i = 0; i < tableStatusListTS.length; i++) {
-												if (tableStatusListTS[i][0] == selectedTable) {
-													tableIndex = i;
-												}
-											}
-											tableStatusListTS[tableIndex][1] = inputCount;
-											tableStatusListTS[tableIndex][2] = "占用";
+									/*
+									 * // update data var tableIndex = -1; for (
+									 * var i = 0; i < tableStatusListTS.length;
+									 * i++) { if (tableStatusListTS[i][0] ==
+									 * selectedTable) { tableIndex = i; } }
+									 * tableStatusListTS[tableIndex][1] =
+									 * inputCount;
+									 * tableStatusListTS[tableIndex][2] = "占用";
+									 *  // update status output document
+									 * .getElementById("perCountDivTS").innerHTML =
+									 * inputCount +
+									 * "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+									 * document
+									 * .getElementById("tblStatusDivTS").innerHTML =
+									 * "占用";
+									 */
 
-											// update status output
-											document
-													.getElementById("perCountDivTS").innerHTML = inputCount
-													+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-											document
-													.getElementById("tblStatusDivTS").innerHTML = "占用";
-											 */
-											
-											// for forward the page
-											location.href = "OrderMain.html?tableNbr="
-													+ selectedTable
-													+ "&personCount="
-													+ inputCount
-													+ "&tableStat=free&pin=" + pin;
+									// for forward the page
+									location.href = "OrderMain.html?tableNbr="
+											+ selectedTable + "&personCount="
+											+ inputCount
+											+ "&tableStat=free&pin=" + pin;
 
-										}
-									}
-								}, {
-									text : "取消",
-									handler : function() {
-										personCountInputWin.hide();
-									}
-								} ]
-					});
+								}
+							}
+						}, {
+							text : "取消",
+							handler : function() {
+								personCountInputWin.hide();
+							}
+						} ]
+			});
 
 			// ***************tableSelectNorthPanel******************
 			// soft key board
@@ -406,13 +401,30 @@
 					if (tableStatusListTS[tableIndex][2] == "空桌") {
 						Ext.Msg.alert("", "<b>此桌没有下单，不能删单！</b>");
 					} else {
+						var Request = new URLParaQuery();
 						Ext.Ajax.request({
-							url : "../findMutilTableCol.do",
+							url : "../CancelOrder.do",
 							params : {
-								tableID : selectedTable
+								"pin" : Request["pin"],
+								"tableID" : selectedTable
 							},
 							success : function(response, options) {
-								Ext.Msg.alert("", "<b>删单成功！</b>");
+								var resultJSON = Ext.util.JSON
+										.decode(response.responseText);
+								if (resultJSON.success == true) {
+									Ext.MessageBox.show({
+										msg : resultJSON.data,
+										width : 300,
+										buttons : Ext.MessageBox.OK
+									});
+								} else {
+									Ext.MessageBox.show({
+										msg : resultJSON.data,
+										width : 300,
+										buttons : Ext.MessageBox.OK
+									});
+								}
+
 							},
 							failure : function(response, options) {
 							}
