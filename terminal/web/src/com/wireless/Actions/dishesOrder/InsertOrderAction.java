@@ -64,9 +64,12 @@ public class InsertOrderAction extends Action implements PinGen {
 			orderToInsert.table_id = Short.parseShort(request.getParameter("tableID"));
 			orderToInsert.custom_num = Integer.parseInt(request.getParameter("customNum"));
 			int type = Integer.parseInt(request.getParameter("type"));
+			String orderType = null;
 			if(type == 1){
+				orderType = "下单";
 				orderToInsert.originalTableID = Short.parseShort(request.getParameter("tableID"));				
 			}else{
+				orderType = "改单";
 				orderToInsert.originalTableID = Short.parseShort(request.getParameter("originalTableID"));
 			}
 			orderToInsert.foods = toFoodArray(request.getParameter("foods"));
@@ -76,9 +79,15 @@ public class InsertOrderAction extends Action implements PinGen {
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(orderToInsert, 
 																					 (type == 1) ? Type.INSERT_ORDER : Type.UPDATE_ORDER, 
 																					 printType));
+			
+		
 			if(resp.header.type == Type.ACK){
 				jsonResp = jsonResp.replace("$(result)", "true");
-				jsonResp = jsonResp.replace("$(value)", orderToInsert.table_id + "号餐台下单成功");
+				if(orderToInsert.table_id == orderToInsert.originalTableID){
+					jsonResp = jsonResp.replace("$(value)", orderToInsert.table_id + "号餐台" + orderType + "成功");
+				}else{
+					jsonResp = jsonResp.replace("$(value)", orderToInsert.originalTableID + "号台转至" + orderToInsert.table_id + "号台，改单成功。");
+				}
 				
 			}else if(resp.header.type == Type.NAK){
 				jsonResp = jsonResp.replace("$(result)", "false");
@@ -92,15 +101,15 @@ public class InsertOrderAction extends Action implements PinGen {
 					jsonResp = jsonResp.replace("$(value)", orderToInsert.table_id + "号餐台正在就餐，可能已下单，请重新确认");
 					
 				}else if(resp.header.reserved == ErrorCode.PRINT_FAIL){
-					jsonResp = jsonResp.replace("$(value)", orderToInsert.table_id + "号餐台下单成功，但未能成功打印，请立刻补打下单并与相关人员确认");
+					jsonResp = jsonResp.replace("$(value)", orderToInsert.table_id + "号餐台" + orderType + "成功，但未能成功打印，请立刻补打下单并与相关人员确认");
 					
 				}else{
-					jsonResp = jsonResp.replace("$(value)", orderToInsert.table_id + "号餐台下单失败，请重新确认");
+					jsonResp = jsonResp.replace("$(value)", orderToInsert.table_id + "号餐台" + orderType + "失败，请重新确认");
 				}
 				
 			}else{
 				jsonResp = jsonResp.replace("$(result)", "false");
-				jsonResp = jsonResp.replace("$(value)", orderToInsert.table_id + "餐台下单不成功，请重新确认");
+				jsonResp = jsonResp.replace("$(value)", orderToInsert.table_id + "号餐台" + orderType + "不成功，请重新确认");
 			}
 			
 		}catch(IOException e){
