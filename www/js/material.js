@@ -8,15 +8,26 @@ function editMaterial(id, alias_id, name, stock, price, warning_threshold, dange
         stockTitle = "库存";
     }
     var aliasId = "";
+    var showStock = "";
+    var showPrice = "";
     if (id == "") {
         aliasId = '<input type="text" id="alias_id" name="alias_id" value="' + alias_id + '" size="25" height="20" onfocus="this.select()" ' +
 	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57"' +
 	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
 	                            ' style="ime-mode:Disabled" />';
-        	                            
+        showStock = '<input type="text" id="stock" name="stock" value="' + stock + '" size="25" height="20" onfocus="this.select()"' +
+	                             ' onkeypress="return event.keyCode>=48&&event.keyCode<=57||event.keyCode==46"' +
+	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
+	                            ' style="ime-mode:Disabled" />';
+        showPrice = '<input type="text" id="price" name="price" value="' + price + '" onfocus="this.select()" size="25" height="20"' +
+	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57||event.keyCode==46"' +
+	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
+	                            ' style="ime-mode:Disabled" />';
     }
     else {
         aliasId = '<input type="hidden" id="alias_id" name="alias_id" value="' + alias_id + '"/>' + alias_id + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+        showStock = '<input type="hidden" id="stock" name="stock" value="' + stock + '"/>' + stock;
+        showPrice = '<input type="hidden" id="price" name="price" value="' + price + '"/>' + price;
     }
     var content = ' <div class="add_foot">' +
                         '<div class="title">' +
@@ -30,14 +41,8 @@ function editMaterial(id, alias_id, name, stock, price, warning_threshold, dange
 	                        '<div class="pop_Content">' +
 	                            '<div class="pop_Content1" style="padding-left:32px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;编号：' + aliasId + '</div>' +
 	                            '<div class="pop_Content1" style="padding-left:32px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名称：<input type="text" id="name" name="name" value="' + name + '" onfocus="this.select()" size="25" height="20" /></div>' +
-	                            '<div class="pop_Content1" style="padding-left:32px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + stockTitle + '：<input type="text" id="stock" name="stock" value="' + stock + '" size="25" height="20" onfocus="this.select()"' +
-	                             ' onkeypress="return event.keyCode>=48&&event.keyCode<=57||event.keyCode==46"' +
-	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
-	                            ' style="ime-mode:Disabled" /></div>' +
-	                            '<div class="pop_Content1" style="padding-left:32px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;价格：<input type="text" id="price" name="price" value="' + price + '" onfocus="this.select()" size="25" height="20"' +
-	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57||event.keyCode==46"' +
-	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
-	                            ' style="ime-mode:Disabled" /></div>' +
+	                            '<div class="pop_Content1" style="padding-left:32px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + stockTitle + '：' + showStock + '</div>' +
+	                            '<div class="pop_Content1" style="padding-left:32px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;价格：' + showPrice + '</div>' +
 	                            '<div class="pop_Content1" style="padding-left:32px">预警阀值：<input type="text" id="warning_threshold" name="warning_threshold" value="' + warning_threshold + '" onfocus="this.select()" size="25" height="20"' +
 	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57||event.keyCode==46"' +
 	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +

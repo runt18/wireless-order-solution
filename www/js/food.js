@@ -15,7 +15,7 @@ function deleteFood(id)
     }
     
 }
-function editFood(fId, fCode, fName, fPrice, kitchen, kitchens, status) {
+function editFood(fId, fCode, fName, fPrice, kitchen, kitchens, status,pinyin) {
     var ks = "";
     var arr1 = kitchens.split("@");
     for (var i = 0; i < arr1.length; i++) {
@@ -64,10 +64,11 @@ function editFood(fId, fCode, fName, fPrice, kitchen, kitchens, status) {
 	                '<form name="foodForm" action="food.php"  method="post" onkeydown="foodKeyDown()">' +
 	                      '<input type="hidden" name="foodId" value="' + fId + '" />' +
 	                      '<input type="hidden" name="statusValue" />' +
-	                      '<div class="add_foot_Content" style="height:185px;">' +
+	                      '<div class="add_foot_Content" style="height:220px;">' +
 	                        '<div class="pop_Content">' +
 	                            '<div class="pop_Content1">编号：' + foodCode + '</div>' +
 	                            '<div class="pop_Content1">菜名：<input type="text" id="foodName" name="foodName" value="' + fName + '" size="25" height="20"/></div>' +
+	                            '<div class="pop_Content1">拼音：<input type="text" id="pinyin" name="pinyin" value="' + pinyin + '" size="25" height="20"/></div>' +
 	                            '<div class="pop_Content1">价格：<input type="text" id="foodPrice" name="foodPrice" value="' + fPrice + '" size="25" height="20"' +
 	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57||event.keyCode==46"' +
 	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
@@ -138,6 +139,7 @@ function submitFoodData() {
 function validateFoodData() {
     var foodCode = document.getElementById("foodCode").value;
     var foodName = document.getElementById("foodName").value;
+    var pinyin = document.getElementById("pinyin").value;
     var foodPrice = document.getElementById("foodPrice").value;
     //    alert(foodCode);
     
@@ -149,6 +151,11 @@ function validateFoodData() {
     if (foodName == undefined || foodName == null || foodName == "") {
         alert("菜名不能为空！");
         document.getElementById("foodName").focus();
+        return false;
+    }
+    if (pinyin == undefined || pinyin == null || pinyin == "") {
+        alert("拼音不能为空！");
+        document.getElementById("pinyin").focus();
         return false;
     }
     if (foodPrice == undefined || foodPrice == null || foodPrice == "") {

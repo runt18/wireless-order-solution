@@ -78,3 +78,79 @@ function KeyDown() {
         closeWindow();
     }
 }
+
+function editRestaurant(id, restaurant_name, address, tele1, tele2) {
+    var editType = "editRestaurant";
+    var title = "修改餐厅信息";
+
+    var content = ' <div class="add_foot">' +
+                        '<div class="title">' +
+	                        '<div class="title_left"><font class="font" style="width:350px;">' + title + '</font></div>' +
+	                        '<div class="title_right"></div>' +
+	                    '</div>' +
+	                    '<form name="restaurantForm" action=""  method="post" onkeydown="editRestaurantKeyDown()">' +
+	                      '<input type="hidden" name="editType" value="' + editType + '" />' +
+	                      '<input type="hidden" name="id" value="' + id + '" />' +
+	                      '<div class="add_foot_Content" style="height:180px;text-align:center">' +
+	                        '<div class="pop_Content">' +
+	                            '<div class="pop_Content1">名称：<input type="text" id="restaurant_name" name="restaurant_name" value="' + restaurant_name + '" onfocus="this.select()" size="25" height="20" /></div>' +
+	                             '<div class="pop_Content1">地址：<input type="text" id="address" name="address" value="' + address + '" onfocus="this.select()" size="25" height="20" /></div>' +
+	                              '<div class="pop_Content1">电话1：<input type="text" id="tele1" name="tele1" value="' + tele1 + '" onfocus="this.select()" size="25" height="20"' +
+	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57||event.keyCode==46"' +
+	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
+	                            ' style="ime-mode:Disabled" /></div>' +
+	                             '<div class="pop_Content1">电话2：<input type="text" id="tele2" name="tele2" value="' + tele2 + '" onfocus="this.select()" size="25" height="20"' +
+	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57||event.keyCode==46"' +
+	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
+	                            ' style="ime-mode:Disabled" /></div>' +
+	                        '</div>' +
+	                            '<span class="pop_action-span"><a href="#" onclick="submitRestaurantData()">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>' +
+	                            '<span class="pop_action-span1"><a href="#" onclick="closeWindow()">取&nbsp;&nbsp;&nbsp;&nbsp;消</a></span>' +
+	                      '</div>' +
+	                      '</form>' +
+	                '</div>';
+
+    showMessageBox(content, 342, 350);
+    document.getElementById("restaurant_name").focus();
+}
+
+function submitRestaurantData() {
+    var restaurant_name = document.getElementById("restaurant_name").value;
+    var address = document.getElementById("address").value;
+    var tele1 = document.getElementById("tele1").value;
+    var tele2 = document.getElementById("tele2").value;
+    if (restaurant_name == undefined || restaurant_name == null || restaurant_name == "") {
+        alert("名称不能为空！");
+        document.getElementById("restaurant_name").focus();
+        return;
+    }
+    if (address == undefined || address == null || address == "") {
+        alert("地址不能为空！");
+        document.getElementById("address").focus();
+        return;
+    }
+    if (tele1 == undefined || tele1 == null || tele1 == "") {
+        alert("电话1不能为空！");
+        document.getElementById("tele1").focus();
+        return;
+    }
+    if (tele2 == undefined || tele2 == null || tele2 == "") {
+        alert("电话2不能为空！");
+        document.getElementById("tele2").focus();
+        return;
+    }
+    document.restaurantForm.submit();
+}
+
+function editRestaurantKeyDown() {
+    if (event.keyCode == 13) {
+        event.returnValue = false;
+        event.cancel = true;
+        submitRestaurantData();
+    }
+    if (event.keyCode == 27) {
+        event.returnValue = false;
+        event.cancel = true;
+        closeWindow();
+    }
+}

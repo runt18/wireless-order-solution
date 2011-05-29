@@ -49,5 +49,29 @@ if($isChangePassword == "true")
 		echo "<script>alert('旧密码错误！');changePassword('$newPassword','$pwd2','$random')</script>";	
 	}		
 }	
+$editType = $_POST["editType"];
+if($editType == "editRestaurant")
+{
+	//$alias_id = $_POST["alias_id"];
+	$id = $_POST["id"];
+	$restaurant_name = $_POST["restaurant_name"];
+	$address = $_POST["address"];
+	$tele1 = $_POST["tele1"];
+	$tele2 = $_POST["tele2"];
+	
+	$sql = "UPDATE restaurant SET restaurant_name='$restaurant_name',address='$address',tele1 = '$tele1',tele2 = '$tele2' WHERE id=$id";		
+	
+	if($db->Execute($sql))
+	{
+		echo "<script>alert('保存成功！');window.parent.frames(0).location.reload();;</script>";
+		$_SESSION["restaurant_name"] = $restaurant_name;
+		$_SESSION["address"] = $address;
+		$_SESSION["tele1"] = $tele1;
+		$_SESSION["tele2"] = $tele2;			
+	}
+	else{
+		echo "<script>alert('保存失败！');</script>";
+	}
+}
 ?>
 

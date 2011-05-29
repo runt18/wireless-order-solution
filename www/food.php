@@ -27,6 +27,7 @@ if($foodCode != null)
 	$foodId = $_POST["foodId"];
 	
 	$foodName = $_POST["foodName"];
+	$pinyin = $_POST["pinyin"];
 	$foodPrice = $_POST["foodPrice"];
 	$kitchen = $_POST["kitchenSelect"];
 	$status = $_POST["statusValue"];
@@ -47,7 +48,7 @@ if($foodCode != null)
 		$rs = $db ->GetOne($sql);
 		if($rs)
 		{
-			echo "<script>alert('编号已存在！');editFood('','$foodCode','$foodName','$foodPrice','$kitchen');</script>";
+			echo "<script>alert('编号已存在！');editFood('','$foodCode','$foodName','$foodPrice','$kitchen',$status,'$pinyin');</script>";
 		}
 		else
 		{
@@ -58,7 +59,7 @@ if($foodCode != null)
 			{
 				/*$c = $rs;
 				echo "<script>alert('$c');</script>";*/
-				$sql = "UPDATE food SET alias_id=$foodCode, name='$foodName', unit_price=$foodPrice,kitchen=$kitchen,status=$status, enabled=1 WHERE id=" . $rs;					
+				$sql = "UPDATE food SET alias_id=$foodCode, name='$foodName', unit_price=$foodPrice,kitchen=$kitchen,status=$status,pinyin='$pinyin' enabled=1 WHERE id=" . $rs;					
 				/*echo "<script>alert('$sql');</script>";*/
 				if($db->Execute($sql))
 				{
@@ -70,7 +71,7 @@ if($foodCode != null)
 			}
 			else
 			{
-				$sql = "INSERT INTO food(id,alias_id,`name`,unit_price,restaurant_id,kitchen,enabled) VALUES($foodId,$foodCode,'$foodName',$foodPrice,$restaurant_id,$kitchen,$status,1)";
+				$sql = "INSERT INTO food(id,alias_id,`name`,unit_price,restaurant_id,kitchen,enabled,pinyin) VALUES($foodId,$foodCode,'$foodName',$foodPrice,$restaurant_id,$kitchen,$status,1,'$pinyin')";
 				/*echo "<script>alert('$sql');</script>";*/
 				if($db->Execute($sql))
 				{
@@ -85,7 +86,7 @@ if($foodCode != null)
 	else//如果是编辑
 	{
 		
-		$sql = "UPDATE food SET name='$foodName', unit_price=$foodPrice,kitchen=$kitchen,status = $status WHERE id=$foodId";	
+		$sql = "UPDATE food SET name='$foodName', unit_price=$foodPrice,kitchen=$kitchen,status = $status,pinyin='$pinyin' WHERE id=$foodId";	
 		$db->Execute($sql);	
 		if($db->Execute($sql))
 		{
@@ -134,8 +135,20 @@ foreach ($rs as $row){
   <form action="food.php"  method="get">
     <!-- 搜索条件 -->
     <div class="font" style="color:#2a7d8d;font-size:15px;font-weight:bold;text-align:right;">过滤：</div>
-    <select id="keyword_type" name="keyword_type"  onchange="showHideCondition(this)"><option value="0">全部</option><option value="is_no">编号</option><option value="is_name">名称</option><option value="is_Price">价格</option><option value="is_kitchen">厨房</option></select>
-	<select id="condition_type" name="condition_type" style="display:none"><option value="Equal">等于</option><option value="EqualOrGrater" selected="selected">大于等于</option><option value="EqualOrLess">小于等于</option></select>
+    <select id="keyword_type" name="keyword_type"  onchange="showHideCondition(this)">
+	<option value="0">全部</option>
+	<option value="is_no">
+	编号</option>
+	<option value="is_name">名称</option>
+	<option value="is_pinyin">拼音</option>
+	<option value="is_Price">价格</option>
+	<option value="is_kitchen">厨房</option>
+	</select>
+	<select id="condition_type" name="condition_type" style="display:none">
+	<option value="Equal">等于</option>
+	<option value="EqualOrGrater" selected="selected">大于等于</option>
+	<option value="EqualOrLess">小于等于</option>
+	</select>
 	<select id="kitchen" name="kitchen" style="display:none;width:150px;">
 <?php
 include("conn.php"); 
@@ -162,6 +175,7 @@ foreach ($rs as $row){
 			<tr>
 				<th><h3>编&nbsp;号</h3></th>
 				<th><h3>名&nbsp;称</h3></th>
+				<th><h3>拼&nbsp;音</h3></th>
 				<th><h3>价格（￥）</h3></th>
 				<th><h3>厨房打印</h3></th>
 				<th><h3>操&nbsp;作</h3></th>
@@ -184,6 +198,10 @@ switch ($xm)
 	case "is_name":
 		if ($kw!="")
 			$sql .= " AND f.name like '%$kw%'" ;  			
+		break;
+	case "is_pinyin":
+		if ($kw!="")
+			$sql .= " AND f.pinyin like '%$kw%'" ;  			
 		break;
 	case "is_Price":
 		if ($kw!="")
@@ -228,10 +246,11 @@ foreach ($rs as $row){
         echo "  停" ;
     }
 	echo "</td>";
+	echo "<td>" .$row["pinyin"] ."</td>";
 	echo "<td>" .$row["unit_price"] ."</td>";
 	echo "<td>" .$row["kitchen"] ."</td>";
 	echo "<td><a href='#' onclick='editFood(&quot;".$row["id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["name"]."&quot;,&quot;".$row["unit_price"]."&quot;,&quot;".$row["kitchen_value"]."&quot;,&quot;".$kitchens.
-		"&quot;,".$row["status"].")'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
+		"&quot;,".$row["status"].",&quot;".$row["pinyin"]."&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
 		"<a href='#' onclick='deleteFood(".$row["id"].")'><img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;删除</a>&nbsp;&nbsp;&nbsp;&nbsp;".
 		"<a href='food_material.php?id=".$row["id"]."'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;关联</a></td>";
 	echo "</tr>";

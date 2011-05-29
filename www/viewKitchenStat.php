@@ -54,8 +54,8 @@ $sql = "SELECT o_date,
 		(SELECT DATE(c.order_date) AS o_date, a.name AS kitchen, c.type AS type_value,
 		FORMAT(SUM((`b`.`unit_price` * `b`.`discount`) + `b`.`taste_price`) * `b`.`order_count`,2) AS t_price
 		FROM kitchen a
-		INNER JOIN order_food_history b ON  a.alias_id = b.kitchen 
-		INNER JOIN order_history c ON b.order_id = c.id WHERE c.restaurant_id=" . $_SESSION["restaurant_id"];	
+		LEFT JOIN order_food_history b ON  a.alias_id = b.kitchen 
+		LEFT JOIN order_history c ON b.order_id = c.id AND a.restaurant_id = c.restaurant_id WHERE a.restaurant_id=" . $_SESSION["restaurant_id"];	
 
 $dateFrom = $_REQUEST["dateFrom"];
 $dateTo = $_REQUEST["dateTo"];

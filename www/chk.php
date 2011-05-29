@@ -31,6 +31,9 @@ else
 	{
 		$_SESSION["restaurant_id"] = $rs["id"];
 		$_SESSION["restaurant_name"] = $rs["restaurant_name"];
+		$_SESSION["address"] = $rs["address"];
+		$_SESSION["tele1"] = $rs["tele1"];
+		$_SESSION["tele2"] = $rs["tele2"];
 		$_SESSION["total_income"] = $rs["total_income"];		
 		$_SESSION["pwd2"] = $rs["pwd2"];				
 		if($rs["id"] > 10)

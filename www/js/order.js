@@ -471,4 +471,17 @@ function showAdminSearch() {
     document.getElementById("alias_id").focus();
 }
 
+function viewOrderDetail(id,table_name) {
+    var content = ' <div class="add_foot" style="height:550px;width:100%">' +
+                              '<div class="title" style="width:100%">' +
+	                          '<div class="title_left" style="width:813px"><font class="font" style="width:200px">帐单明细(' + id + '号帐单)</font></div>' +
+	                          '<div class="title_right" style="width:35px;float:left" ></div>' +
+	                          '</div>' +
+	                          '<div class="add_foot_Content" style="height:370px;text-align:center;width:99%">' +
+	                              '<iframe src="viewOrderDetail.php?id=' + id + '&table_name=' + table_name + '" scrolling="no" style="width:100%;height:100%" />' +
+	                          '</div>' +
+						   '</div>';
+    showMessageBox(content, 850, 350);
+}
+
 

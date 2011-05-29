@@ -476,6 +476,10 @@
     {
     "ProjRelPath" = "T"
     }
+    "table_list.php"
+    {
+    "ProjRelPath" = "T"
+    }
     "images\\help\\chg_pwd.png"
     {
     "ProjRelPath" = "T"
@@ -1169,6 +1173,10 @@
     "ProjRelPath" = "T"
     }
     "libs\\adodb\\session"
+    {
+    "ProjRelPath" = "T"
+    }
+    "ViewOrderDetail.php"
     {
     "ProjRelPath" = "T"
     }

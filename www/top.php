@@ -4,7 +4,7 @@
 <title>e点通－会员中心</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <link href="css/general.css" rel="stylesheet" type="text/css" />
- 
+ <link rel="stylesheet" href="css/pop_up.css" />
  
 <style type="text/css"> 
 #header-div {
@@ -134,13 +134,19 @@
 #menu-div li.fix-spacel{width:30px; border-left:none;}
 #menu-div li.fix-spacer{border-right:none;}
 </style>
+<script language="javascript" type="text/javascript" src="js/top.js"></script>
+<script type="text/javascript" src="js/pop-up.js"></script>
 <?PHP 
 include("common.php");
+session_start();
 ?>
 </head>
 <body>
 <div id="header-div">
-  <div id="logo-div" style="bgcolor:#000000;"><a href="#"><?php session_start(); echo $_SESSION["restaurant_name"] ?></a></div>
+<div id="logo-div" style="bgcolor:#000000;"><a href="#" onclick="javascript:window.parent.frames(1).editRestaurant(<?php echo "&quot;". $_SESSION["restaurant_id"]."&quot;,&quot;".$_SESSION["restaurant_name"]
+	."&quot;,&quot;".$_SESSION["address"]."&quot;,&quot;".$_SESSION["tele1"]."&quot;,&quot;".$_SESSION["tele2"]."&quot;"
+
+?>)"><?php  echo $_SESSION["restaurant_name"] ?></a></div>
   <div id="license-div" style="bgcolor:#000000;"></div>
   <div id="submenu-div">
  
