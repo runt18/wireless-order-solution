@@ -168,6 +168,7 @@ class OrderHandler extends Handler implements Runnable{
 				//handle the pay order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.PAY_ORDER){
 				Order orderToPay = ReqParser.parsePayOrder(request);
+				orderToPay.restaurant_id = _term.restaurant_id;
 				printOrder(request.header.reserved, PayOrder.exec(_term.pin, _term.modelID, orderToPay));
 				response = new RespACK(request.header);
 
