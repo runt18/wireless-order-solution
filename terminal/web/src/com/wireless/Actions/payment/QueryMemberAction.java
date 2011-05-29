@@ -52,7 +52,7 @@ public class QueryMemberAction extends Action {
 			 * The format to member looks like below.
 			 * 会员姓名,会员电话
 			 */
-			String jsonMember = "name:\"$(name)\",phone:\"$(phone)\"";
+			String jsonMember = "\"$(name)\",\"$(phone)\"";
 			jsonMember = jsonMember.replace("$(name)", member.name);
 			jsonMember = jsonMember.replace("$(phone)", member.tele);
 			jsonResp = jsonResp.replace("$(value)", jsonMember);
