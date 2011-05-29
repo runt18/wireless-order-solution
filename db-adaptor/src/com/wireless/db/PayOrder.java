@@ -135,7 +135,7 @@ public class PayOrder {
 					discount = "member_discount_3";
 				}
 			}else{
-				throw new BusinessException("The member id(" + orderToPay.member_id + ") is invalid.", ErrorCode.MEMBER_INVALID);
+				throw new BusinessException("The member id(" + orderToPay.member_id + ") is invalid.", ErrorCode.MEMBER_NOT_EXIST);
 			}
 		}
 			
