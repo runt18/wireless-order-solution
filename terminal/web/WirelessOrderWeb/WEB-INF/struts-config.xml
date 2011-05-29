@@ -22,7 +22,7 @@
 		<action path="/PrintOrder" type="com.wireless.Actions.payment.PrintOrderAction"
 			scope="request">
 		</action>
-		<action path="/PayOrder" type="com.wireless.Actions.payment.PrintOrderAction"
+		<action path="/PayOrder" type="com.wireless.Actions.payment.PayOrderAction"
 			scope="request">
 		</action>
 	</action-mappings>

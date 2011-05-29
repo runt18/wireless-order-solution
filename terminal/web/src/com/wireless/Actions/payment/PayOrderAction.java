@@ -54,7 +54,10 @@ public class PayOrderAction extends Action implements PinGen{
 			 * 			   "5" means "挂账"
 			 * memberID : the id to member, 
 			 * 			  this parameter is optional, 
-			 * 			  NOT need to pass this parameter if pay in normal 
+			 * 			  NO need to pass this parameter if pay in normal 
+			 * comment : the comment to this order
+			 *           this parameter is optional,
+			 *           No need to pass this parameter if no comment input. 
 			 */
 			
 			String pin = request.getParameter("pin");
@@ -70,6 +73,7 @@ public class PayOrderAction extends Action implements PinGen{
 			orderToPay.discount_type = Integer.parseInt(request.getParameter("discountType"));
 			orderToPay.pay_manner = Integer.parseInt(request.getParameter("payManner"));
 			orderToPay.member_id = request.getParameter("memberID");
+			orderToPay.comment = request.getParameter("comment");
 			
 			ReqPackage.setGen(this);
 			byte printType = Reserved.PRINT_RECEIPT_2;
