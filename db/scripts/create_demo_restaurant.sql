@@ -490,7 +490,7 @@ INSERT INTO `wireless_order_db`.`terminal` (`pin`, `restaurant_id`, `model_id`, 
 INSERT INTO `wireless_order_db`.`staff` (`restaurant_id`, `terminal_id`, `alias_id`, `name`, `pwd`) VALUES (11, LAST_INSERT_ID(), 1000, '张宁远', md5('staff1@123'));
 
 INSERT INTO `wireless_order_db`.`terminal` (`pin`, `restaurant_id`, `model_id`, `model_name`, `owner_name`) VALUES (2, 11, 0xFF, 'Staff', '李颖宜');
-INSERT INTO `wireless_order_db`.`staff` (`restaurant_id`, `terminal_id`, `alias_id`, `name`, `pwd`) VALUES (11, LAST_INSERT_ID(), 1000, '李颖宜', md5('staff2@123'));
+INSERT INTO `wireless_order_db`.`staff` (`restaurant_id`, `terminal_id`, `alias_id`, `name`, `pwd`) VALUES (11, LAST_INSERT_ID(), 1001, '李颖宜', md5('staff2@123'));
 
 COMMIT;
 SET AUTOCOMMIT=1;
