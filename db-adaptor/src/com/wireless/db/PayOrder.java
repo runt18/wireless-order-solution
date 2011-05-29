@@ -63,6 +63,7 @@ public class PayOrder {
 						", total_price_2=" + Util.price2Float(orderInfo.actualPrice, Util.INT_MASK_3) +
 						", type=" + orderInfo.pay_manner + 
 						", order_date=NOW()" + 
+						(orderInfo.comment != null ? ", comment='" + orderInfo.comment + "'" : "") +
 						" WHERE id=" + orderInfo.id;
 			dbCon.stmt.addBatch(sql);
 			
@@ -164,6 +165,7 @@ public class PayOrder {
 		orderInfo.member_id = orderToPay.member_id; 
 		orderInfo.actualPrice = orderToPay.actualPrice;
 		orderInfo.pay_manner = orderToPay.pay_manner;
+		orderInfo.comment = orderToPay.comment;
 			
 		return orderInfo;
 	}
