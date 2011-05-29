@@ -39,8 +39,8 @@
 									 * selectedTable) { tableIndex = i; } }
 									 * tableStatusListTS[tableIndex][1] =
 									 * inputCount;
-									 * tableStatusListTS[tableIndex][2] = "占用";
-									 *  // update status output document
+									 * tableStatusListTS[tableIndex][2] = "占用"; //
+									 * update status output document
 									 * .getElementById("perCountDivTS").innerHTML =
 									 * inputCount +
 									 * "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
@@ -414,9 +414,11 @@
 									Ext.MessageBox.show({
 										msg : resultJSON.data,
 										width : 300,
-										buttons : Ext.MessageBox.OK
+										buttons : Ext.MessageBox.OK,
+										fn : function() {
+											location.reload();
+										}
 									});
-									location.reload();
 								} else {
 									Ext.MessageBox.show({
 										msg : resultJSON.data,

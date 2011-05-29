@@ -150,99 +150,110 @@ var orderedGrid = new Ext.grid.GridPanel({
 	}
 });
 
-var orderedForm = new Ext.form.FormPanel({
-	frame : true,
-	border : false,
-	region : "south",
-	height : 60,
-	items : [ {} ],
-	buttons : [
-			{
-				// tableID="100"&customNum="3"&foods="{[1100,2,1,0]}"
-				// 各字段表示的意义：
-				// tableID：餐台号
-				// customNum：就餐人数
-				// foods：菜品列表，格式为{[菜品1编号,菜品1数量,口味1编号,厨房1编号]，[菜品2编号,菜品2数量,口味2编号,厨房2编号]}
-				// 以点菜式格式：[菜名，口味，数量，单价，操作，实价，菜名编号，厨房编号，口味编号]
-				text : "提交",
-				handler : function() {
-					var Request = new URLParaQuery();
+var orderedForm = new Ext.form.FormPanel(
+		{
+			frame : true,
+			border : false,
+			region : "south",
+			height : 60,
+			items : [ {} ],
+			buttons : [
+					{
+						// tableID="100"&customNum="3"&foods="{[1100,2,1,0]}"
+						// 各字段表示的意义：
+						// tableID：餐台号
+						// customNum：就餐人数
+						// foods：菜品列表，格式为{[菜品1编号,菜品1数量,口味1编号,厨房1编号]，[菜品2编号,菜品2数量,口味2编号,厨房2编号]}
+						// 以点菜式格式：[菜名，口味，数量，单价，操作，实价，菜名编号，厨房编号，口味编号]
+						text : "提交",
+						handler : function() {
+							if (orderedData.length > 0) {
 
-					var foodPara = "";
-					for ( var i = 0; i < orderedData.length; i++) {
-						foodPara = foodPara + "[" + orderedData[i][6] + "," // 菜品1编号
-								+ orderedData[i][2] + "," // 菜品1数量
-								+ orderedData[i][8] + "," // 口味1编号
-								+ orderedData[i][7] // 厨房1编号
-								+ "]，";
-					}
-					foodPara = "{" + foodPara.substr(0, foodPara.length - 1)
-							+ "}";
+								var Request = new URLParaQuery();
 
-					var type = 9;
-					if (Request["tableStat"] == "free") {
-						type = 1;
-					} else {
-						type = 2;
-					}
+								var foodPara = "";
+								for ( var i = 0; i < orderedData.length; i++) {
+									foodPara = foodPara + "["
+											+ orderedData[i][6] + "," // 菜品1编号
+											+ orderedData[i][2] + "," // 菜品1数量
+											+ orderedData[i][8] + "," // 口味1编号
+											+ orderedData[i][7] // 厨房1编号
+											+ "]，";
+								}
+								foodPara = "{"
+										+ foodPara.substr(0,
+												foodPara.length - 1) + "}";
 
-					Ext.Ajax.request({
-						url : "../InsertOrder.do",
-						params : {
-							"pin" : Request["pin"],
-							"tableID" : Request["tableNbr"],
-							"customNum" : Request["personCount"],
-							"type" : type,
-							"originalTableID" : Request["tableNbr"],
-							"foods" : foodPara
-						},
-						success : function(response, options) {
-							var resultJSON = Ext.util.JSON
-									.decode(response.responseText);
-							if (resultJSON.success == true) {
-								Ext.MessageBox.show({
-									msg : resultJSON.data,
-									width : 300,
-									buttons : Ext.MessageBox.OK
-								});
-							} else {
-								Ext.MessageBox.show({
-									msg : resultJSON.data,
-									width : 300,
-									buttons : Ext.MessageBox.OK
-								});
+								var type = 9;
+								if (Request["tableStat"] == "free") {
+									type = 1;
+								} else {
+									type = 2;
+								}
+
+								Ext.Ajax
+										.request({
+											url : "../InsertOrder.do",
+											params : {
+												"pin" : Request["pin"],
+												"tableID" : Request["tableNbr"],
+												"customNum" : Request["personCount"],
+												"type" : type,
+												"originalTableID" : Request["tableNbr"],
+												"foods" : foodPara
+											},
+											success : function(response,
+													options) {
+												var resultJSON = Ext.util.JSON
+														.decode(response.responseText);
+												if (resultJSON.success == true) {
+													Ext.MessageBox
+															.show({
+																msg : resultJSON.data,
+																width : 300,
+																buttons : Ext.MessageBox.OK
+															});
+												} else {
+													Ext.MessageBox
+															.show({
+																msg : resultJSON.data,
+																width : 300,
+																buttons : Ext.MessageBox.OK
+															});
+												}
+											},
+											failure : function(response,
+													options) {
+											}
+										});
 							}
-						},
-						failure : function(response, options) {
 						}
-					});
-				}
-			}
-			// , {
-			// text : "清空",
-			// handler : function() {
-			// Ext.Msg.show({
-			// title : "提示",
-			// msg : "确定要删除所有已点菜式？",
-			// buttons : Ext.Msg.YESNO,
-			// fn : function(btn) {
-			// if (btn == "yes") {
-			// orderedData.length = 0;
-			// orderedStore.reload();
-			// }
-			// ;
-			// },
-			// icon : Ext.MessageBox.QUESTION
-			// });
-			// }
-			// }
-			, {
-				text : "返回",
-				handler : function() {
-					location.href = "TableSelect.html";
-				}
-			} ]
-});
+					}
+					// , {
+					// text : "清空",
+					// handler : function() {
+					// Ext.Msg.show({
+					// title : "提示",
+					// msg : "确定要删除所有已点菜式？",
+					// buttons : Ext.Msg.YESNO,
+					// fn : function(btn) {
+					// if (btn == "yes") {
+					// orderedData.length = 0;
+					// orderedStore.reload();
+					// }
+					// ;
+					// },
+					// icon : Ext.MessageBox.QUESTION
+					// });
+					// }
+					// }
+					, {
+						text : "返回",
+						handler : function() {
+							location.href = "TableSelect.html";
+						}
+					} ]
+		});
 
 var dishesOrderCenterPanel = new Ext.Panel({
 	region : "center",

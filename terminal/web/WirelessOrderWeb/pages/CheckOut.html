@@ -32,15 +32,28 @@
 
 <script type="text/javascript">
 	// global variable
-	var gridHeightOffset = 120; // bill grid heigth offset
+	var gridHeightOffset = 180; // bill grid heigth offset
+	var checkOutData = [] // the ordered dished display list
+	var discountData = [] // discount rate list
+	var checkOutDataDisplay = [] // check out dishes display
+	
+	var discountType = 1; // discount type, default normal
+	var payType = 1;  // pay type, default type 1
+	var actualMemberID = -1 //menber id
 </script>
 
+<script type="text/javascript"
+	src="../js/animation/checkOut/checkOutLoad.js"></script>
+<script type="text/javascript"
+	src="../js/animation/checkOut/checkOutTypeChoose.js"></script>
+<script type="text/javascript"
+	src="../js/animation/checkOut/checkOutPay.js"></script>
 <script type="text/javascript" src="../js/checkOutMain.js"></script>
 
 
 
 </head>
-<body>
+<body onload="checkOutOnLoad()">
 <script type="text/javascript" src="../extjs/examples.js"></script>
 
 <div id="west"></div>
