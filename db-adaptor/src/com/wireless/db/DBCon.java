@@ -6,13 +6,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-class DBCon {
+public class DBCon {
 	//open the database
 	Connection dbCon = null;
 	Statement stmt = null;
 	ResultSet rs = null;
 	
-	void connect() throws SQLException{
+	public void connect() throws SQLException{
 		try{
 			Class.forName("com.mysql.jdbc.Driver");
 		}catch(ClassNotFoundException e){
@@ -25,7 +25,7 @@ class DBCon {
 		stmt.execute("SET NAMES utf8");
 	}
 	
-	void disconnect(){
+	public void disconnect(){
 		try{
 			if(rs != null){
 				rs.close();
