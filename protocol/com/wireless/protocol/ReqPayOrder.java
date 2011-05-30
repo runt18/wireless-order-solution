@@ -14,7 +14,7 @@ public class ReqPayOrder extends ReqPackage{
 	* pin[6] - auto calculated and filled in
 	* len[2] - 0x06, 0x00
 	* <Body>
-	* table[2] : total_price[4] : pay_type : discount_type : pay_manner : len_member : member_id[len]
+	* table[2] : total_price[4] : pay_type : discount_type : pay_manner : len_member : member_id[len] : len_comment : comment[len]
 	* table[2] - 2-byte indicates the table id
 	* total_price[4] - 4-byte indicates the total price
 	* 				   total_price[0] indicates the float part
@@ -24,6 +24,8 @@ public class ReqPayOrder extends ReqPackage{
 	* pay_manner - one of the values of pay manner
 	* len_member - length of the id to member
 	* member_id[len] - the id to member
+	* len_comment - length of the comment 
+	* comment[len] - the comment this order
 	*******************************************************/
 	public ReqPayOrder(Order order, byte printType){
 		header.mode = Mode.ORDER_BUSSINESS;
@@ -37,13 +39,22 @@ public class ReqPayOrder extends ReqPackage{
 			}catch(UnsupportedEncodingException e){}
 		}
 		
+		byte[] commentBytes = new byte[0];
+		if(order.comment != null){
+			try{
+				commentBytes = order.comment.getBytes("UTF-8");
+			}catch(UnsupportedEncodingException e){}
+		}
+		
 		int bodyLen = 2 + /* table id takes up 2 bytes */
 					  4 + /* actual total price takes up 4 bytes */
 					  1 + /* pay type takes up 1 byte */
 					  1 + /* discount type takes up 1 byte */
 					  1 + /* the pay manner takes up 1 byte */
 					  1 + /* the length of member id takes up 1 byte */
-					  memberIDBytes.length; /* the member id takes up length bytes */
+					  memberIDBytes.length + /* the member id takes up length bytes */
+					  1 + /* the length of comment takes up 1 byte */
+					  commentBytes.length;	 /* the comment takes up length bytes */
 		
 		//assign the length of the body
 		header.length[0] = (byte)(bodyLen & 0x000000FF);
@@ -68,6 +79,10 @@ public class ReqPayOrder extends ReqPackage{
 		body[9] = (byte)(memberIDBytes.length & 0x000000FF);
 		//assign the value of the member id
 		System.arraycopy(memberIDBytes, 0, body, 10, memberIDBytes.length);
+		//assign the length of comment
+		body[10 + memberIDBytes.length] = (byte)(commentBytes.length & 0x000000FF);
+		//assign the value of comment
+		System.arraycopy(commentBytes, 0, body, 11 + memberIDBytes.length, commentBytes.length);
 	} 
 
 	/******************************************************

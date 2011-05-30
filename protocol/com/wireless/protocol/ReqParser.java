@@ -1,5 +1,7 @@
 package com.wireless.protocol;
 
+import java.io.UnsupportedEncodingException;
+
 
 public class ReqParser {
 	/******************************************************
@@ -140,7 +142,7 @@ public class ReqParser {
 	* pin[6] - auto calculated and filled in
 	* len[2] - 0x06, 0x00
 	* <Body>
-	* table[2] : total_price[4] : pay_type : discount_type : len_member : member_id[len]
+	* table[2] : total_price[4] : pay_type : discount_type : len_member : member_id[len] : len_comment : comment[len]
 	* table[2] - 2-byte indicates the table id
 	* total_price[4] - 4-byte indicates the total price
 	* 				   total_price[0] indicates the float part
@@ -150,6 +152,8 @@ public class ReqParser {
 	* pay_manner - one of the values of pay manner
 	* len_member - length of the id to member
 	* member_id[len] - the id to member
+	* len_comment - length of the comment 
+	* comment[len] - the comment this order
 	*******************************************************/
 	public static Order parsePayOrder(ProtocolPackage req){
 		//get the table id
@@ -167,12 +171,27 @@ public class ReqParser {
 		//get the payment manner
 		int payManner = req.body[8];
 		//get the the length to member id
-		int len = req.body[9];
+		int lenMember = req.body[9];
 		//get the value to member id
 		String memberID = null;
-		if(len > 0){
-			byte[] memberIDBytes = new byte[len];
-			System.arraycopy(req.body, 10, memberIDBytes, 0, len);
+		//get the member id if exist
+		if(lenMember > 0){
+			byte[] memberIDBytes = new byte[lenMember];
+			System.arraycopy(req.body, 10, memberIDBytes, 0, lenMember);
+			try{
+				memberID = new String(memberIDBytes, "UTF-8");
+			}catch(UnsupportedEncodingException e){}
+		}
+		//get the length of comment
+		int lenComment = req.body[10 + lenMember];
+		String comment = null;
+		//get the comment if exist
+		if(lenComment > 0){
+			byte[] commentBytes = new byte[lenComment];
+			System.arraycopy(req.body, 11 + lenMember, commentBytes, 0, lenComment);
+			try{
+				comment = new String(commentBytes, "UTF-8");
+			}catch(UnsupportedEncodingException e){}
 		}
 		Order orderToPay = new Order();
 		orderToPay.table_id = tableToPay;
@@ -181,6 +200,7 @@ public class ReqParser {
 		orderToPay.discount_type = discountType;
 		orderToPay.pay_manner = payManner;
 		orderToPay.member_id = memberID;
+		orderToPay.comment = comment;
 		return orderToPay;
 	}
 }

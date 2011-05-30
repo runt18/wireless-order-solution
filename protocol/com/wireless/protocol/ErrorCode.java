@@ -11,5 +11,5 @@ public final class ErrorCode {
 	public final static byte PRINT_FAIL = 7;
 	public final static byte MENU_EXPIRED = 8;
 	public final static byte TABLE_BUSY = 9;
-	public final static byte MEMBER_INVALID = 10;
+	public final static byte MEMBER_NOT_EXIST = 10;
 }
