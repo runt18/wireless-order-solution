@@ -20,6 +20,7 @@ include("changePassword.php");
 ?>
 <?PHP
 $id = $_REQUEST["id"];
+$name = $_REQUEST["name"];
 include("conn.php"); 
 mysql_query("SET NAMES utf8"); 
 $materials = "";
@@ -88,8 +89,9 @@ else if($editType == "deleteFoodMaterial")
 //echo $sql;
 ?>
 <h1>
+<span class="action-span"><a href="food.php">返回</a></span>
 <span class="action-span"><a href="#" onclick="editFoodMaterial('<?PHP echo $id; ?>','','','','<?PHP echo $materials; ?>')">添加食材</a></span>
-<span class="action-span1">关联食材</span><span id="search_id" class="action-span2">&nbsp;- 京都骨 </span>
+<span class="action-span1">关联食材</span><span id="search_id" class="action-span2">&nbsp;- <?PHP echo $name; ?> </span>
 <div style="clear:both"></div>
 </h1>
 

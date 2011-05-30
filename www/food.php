@@ -71,7 +71,7 @@ if($foodCode != null)
 			}
 			else
 			{
-				$sql = "INSERT INTO food(id,alias_id,`name`,unit_price,restaurant_id,kitchen,enabled,pinyin) VALUES($foodId,$foodCode,'$foodName',$foodPrice,$restaurant_id,$kitchen,$status,1,'$pinyin')";
+				$sql = "INSERT INTO food(id,alias_id,`name`,unit_price,restaurant_id,kitchen,status,enabled,pinyin) VALUES($foodId,$foodCode,'$foodName',$foodPrice,$restaurant_id,$kitchen,$status,1,'$pinyin')";
 				/*echo "<script>alert('$sql');</script>";*/
 				if($db->Execute($sql))
 				{
@@ -127,7 +127,7 @@ foreach ($rs as $row){
 	$kitchens .= ($row["alias_id"] . "|" . $row["name"]);
 }
 	?>
-<span class="action-span"><a href="#" onclick="editFood('','','','','0','<?php echo $kitchens; ?>')">添加新菜</a></span><span class="action-span"><a href="#" onclick="showFoodRanked()">点菜统计</a></span>
+<span class="action-span"><a href="#" onclick="editFood('','','','','0','<?php echo $kitchens; ?>','','')">添加新菜</a></span><span class="action-span"><a href="#" onclick="showFoodRanked()">点菜统计</a></span>
 <span class="action-span1">e点通会员中心</span><span id="search_id" class="action-span2">&nbsp;- 菜单管理 </span>
 <div style="clear:both"></div>
 </h1>
@@ -252,7 +252,7 @@ foreach ($rs as $row){
 	echo "<td><a href='#' onclick='editFood(&quot;".$row["id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["name"]."&quot;,&quot;".$row["unit_price"]."&quot;,&quot;".$row["kitchen_value"]."&quot;,&quot;".$kitchens.
 		"&quot;,".$row["status"].",&quot;".$row["pinyin"]."&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
 		"<a href='#' onclick='deleteFood(".$row["id"].")'><img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;删除</a>&nbsp;&nbsp;&nbsp;&nbsp;".
-		"<a href='food_material.php?id=".$row["id"]."'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;关联</a></td>";
+		"<a href='food_material.php?id=".$row["id"]."&name=".$row["name"]."'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;关联</a></td>";
 	echo "</tr>";
 }
 //mysql_query("SET NAMES utf8"); 

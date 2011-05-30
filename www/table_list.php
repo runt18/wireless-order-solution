@@ -21,6 +21,7 @@ include("changePassword.php");
 ?>
 <?PHP
 include("conn.php"); 
+mysql_query("SET NAMES utf8"); 
 $name = $_POST["name"];
 $editType = $_POST["editType"];
 $restaurant_id = $_SESSION["restaurant_id"];
@@ -100,6 +101,7 @@ if($editType == "deleteTable")
 		echo "<script>alert('没有对应的餐桌信息！');</script>";
 	}
 }
+//echo $sql;
 ?>
 <h1>
 <span class="action-span"><a href="#" onclick="editTable('','','','table_list.php');">添加餐桌</a></span>  <span class="action-span1">e点通会员中心</span>
@@ -111,7 +113,7 @@ if($editType == "deleteTable")
   <form action="table_list.php"  method="get">
     <!-- 搜索条件 -->
     <div class="font" style="color:#2a7d8d;font-size:15px;font-weight:bold;text-align:right;">过滤：</div>
-    <select id="keyword_type" name="keyword_type"  onchange="showHideCondition(this)">
+    <select id="keyword_type" name="keyword_type"  onchange="showHideTableCondition(this)">
 	<option value="0">全部</option>
 	<option value="alias_id">编号</option>
 	<option value="name">名称</option>
@@ -205,7 +207,7 @@ mysql_close($con);
 		?>			
 	</tbody>
   </table>
-  <?PHP echo $sql; ?>
+  <?PHP //echo $sql; ?>
   </div>
 	<div id="controls">
        <div id="text"><?php echo "总计:" .$bh ."&nbsp;条记录"; ?>&nbsp;&nbsp;&nbsp;&nbsp;当前第 <span id="currentpage"></span> 页，每页 </div>

@@ -46,6 +46,10 @@ if($editType == "addMaterial" || $editType == "editMaterial")
 		else
 		{
 			$sql = "INSERT INTO material(restaurant_id,alias_id,name,stock,price,warning_threshold,danger_threshold) VALUES(".$_SESSION["restaurant_id"].",$alias_id,'$name',$stock,$price,$warning_threshold,$danger_threshold)";
+			$db->Execute($sql);			
+			$sql = "SELECT id FROM material WHERE alias_id = $alias_id AND restaurant_id = ".$_SESSION["restaurant_id"];		
+			$rs = $db ->GetOne($sql);	
+			$sql = "INSERT INTO material_history(material_id,date,price,amount) VALUES($rs,NOW(),$price,$stock)";		
 		}
 	}
 	else
@@ -68,7 +72,7 @@ else if($editType == "deleteMaterial")
 	{
 		$id = $_POST["id"];
 		
-		if($db->Execute("DELETE FROM material WHERE id=$id"))
+		if($db->Execute("DELETE FROM material_history WHERE material_id=$id") && $db->Execute("DELETE FROM material WHERE id=$id"))
 		{			
 			echo "<script>alert('删除成功！');</script>";
 		}	

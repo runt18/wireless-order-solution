@@ -253,6 +253,11 @@ $bh=0;
 mysql_query("SET NAMES utf8"); 
 
 $rs = $db->GetAll($sql);
+$Operation = "editOrder";
+if($_SESSION["pwd2"] != "")
+	{
+	$Operation = "canEditOrder";
+		}
 foreach ($rs as $row){
 	$alias_id = $row["alias_id"];
 	if($row["category"] != 1)
@@ -268,7 +273,7 @@ foreach ($rs as $row){
 	echo "<td>" .$row["type_name"]."</td>";
 	echo "<td>" .$row["total_price"]."</td>";
 	echo "<td>" .$row["total_price_2"]."</td>";
-	echo "<td><a href='#' onclick='canEditOrder(&quot;".$row["id"]."&quot;,&quot;".$row["total_price_2"]."&quot;,&quot;order_history.php&quot;,&quot;".$row["type_value"]."&quot;,&quot;".$alias_id."&quot;,&quot;".$row["category"]."&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
+	echo "<td><a href='#' onclick='".$Operation."(&quot;".$row["id"]."&quot;,&quot;".$row["total_price_2"]."&quot;,&quot;order_history.php&quot;,&quot;".$row["type_value"]."&quot;,&quot;".$alias_id."&quot;,&quot;".$row["category"]."&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
 		"<a href='#' onclick='showOrderDetail(&quot;".$row["id"]."&quot;,&quot;".$alias_id."&quot;,&quot;".$row["order_date"]."&quot;,&quot;".$row["total_price"].
 		"&quot;,&quot;".$row["num"]."&quot;,&quot;".$row["foods"]."&quot;,&quot;".$row["is_paid"]."&quot;,&quot;".$row["waiter"]."&quot;,&quot;".$row["type_name"]."&quot;,&quot;".$row["total_price_2"]."&quot;,&quot;".$row["category_name"]."&quot;,&quot;".$row["comment"]."&quot;)'>
 			<img src='images/View.png'  height='16' width='14' border='0'/>&nbsp;查看</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href='#' onclick='deleteOrder(&quot;".$row["id"]."&quot;,&quot;order_history.php&quot;)'>

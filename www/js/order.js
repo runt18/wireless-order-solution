@@ -15,7 +15,7 @@ function canEditOrder(id, total_price_2, target, type_value, table_id, category_
 	                      '<input type="hidden" name="category_value" value="' + category_value + '" />' +
 	                      '<div class="add_foot_Content" style="height:130px;text-align:center">' +
 	                        '<div class="pop_Content">' +
-	                           '<div class="pop_Content1">请输入权限密码：<input type="text" id="pwd2" name="pwd2" size="25" height="20"/></div>' +
+	                           '<div class="pop_Content1">请输入权限密码：<input type="password" id="pwd2" name="pwd2" size="25" height="20"/></div>' +
 	                        '</div>' +
 	                            '<span class="pop_action-span"><a href="#" onclick="submitCanEdit()">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>' +
 	                            '<span class="pop_action-span1"><a href="#" onclick="closeWindow()">取&nbsp;&nbsp;&nbsp;&nbsp;消</a></span>' +
@@ -139,11 +139,11 @@ function searchOrderKeyDown() {
 }
 function showOrderDetail(id, alias, date, totalPrice, count, foods, isPaid, owner_name, type_name, totalPrice_2, category_name, comment) {
     var f = "";
-    var fs = foods.split(",");
+    var fs = foods.split(";");
     for (var i = 0; i < fs.length; i++) {
         var str = fs[i].split("|");
         //        f += "<li><table width='100%' align='left'><tr><td align='left' width='70%'>菜" + (i + 1) + "：" + str[0] + "</td><td align='right' width='30%'>￥" + str[1] + "</td></tr></table></li>"
-        f += "<li><table width='100%' align='left'><tr><td align='left' width='70%'>菜" + (i + 1) + "：" + str[0] + "(" + formatNum(str[1]) + ")" + str[2] + "</td><td align='right' width='30%'>￥" + str[3] + "</td></tr></table></li>";
+        f += "<li><table width='100%' align='left'><tr><td align='left' width='70%'>菜" + (i + 1) + "：" + str[0] + "(" + formatNum(str[1]) + ")" + str[2] + str[3] + "</td><td align='right' width='30%'>￥" + str[4] + "</td></tr></table></li>";
         // f += "<li>菜" + (i + 1) + "：" + str[0] + "&nbsp;&nbsp;&nbsp;&nbsp;￥" + str[1] + "</td></tr></table></li>";
 
     }

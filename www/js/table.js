@@ -210,7 +210,7 @@ function addTableKeyDown() {
         closeWindow();
     }
 }
-function showHideCondition(select) {
+function showHideTableCondition(select) {
     //    alert(select);
     var option = select.options[select.selectedIndex];
     document.getElementById("condition_type").style.display = "none";

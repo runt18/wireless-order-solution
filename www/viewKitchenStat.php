@@ -42,14 +42,14 @@ mysql_query("SET NAMES utf8");
 		<tbody>
 <?php 	  		
 include("conn.php"); 		 		
-$sql = "SELECT o_date,
+$sql = "SELECT CASE WHEN o_date IS NULL THEN '-' ELSE o_date END AS o_date,
 		kitchen,
 		Sum(CASE type_value WHEN 1 THEN t_price ELSE 0.00 END) AS '现金',
 		Sum(CASE type_value WHEN 2 THEN t_price ELSE 0.00 END) AS '刷卡',
 		Sum(CASE type_value WHEN 3 THEN t_price ELSE 0.00 END) AS '会员卡',
 		Sum(CASE type_value WHEN 4 THEN t_price ELSE 0.00 END) AS '挂账',
 		Sum(CASE type_value WHEN 5 THEN t_price ELSE 0.00 END) AS '签单',
-		SUM(t_price) AS '合计'
+		CASE WHEN SUM(t_price) IS NULL THEN 0.00 ELSE SUM(t_price) END AS '合计'
 		FROM
 		(SELECT DATE(c.order_date) AS o_date, a.name AS kitchen, c.type AS type_value,
 		FORMAT(SUM((`b`.`unit_price` * `b`.`discount`) + `b`.`taste_price`) * `b`.`order_count`,2) AS t_price

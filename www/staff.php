@@ -46,7 +46,7 @@ if($editType == "addStaff" || $editType == "editStaff")
 			$sql = "INSERT INTO `terminal` (`pin`, `restaurant_id`, `model_id`, `model_name`, `owner_name`
 					) VALUES ($pin, ".$_SESSION["restaurant_id"].", 255, 'Staff', '$name')";
 			$db->Execute($sql);
-			$sql = "SELECT id FROM terminal WHERE pin = $pin";
+			$sql = "SELECT id FROM terminal WHERE pin = $pin AND restaurant_id = ".$_SESSION["restaurant_id"];
 			$rs = $db ->GetOne($sql);	
 			$sql = "INSERT INTO staff(restaurant_id,terminal_id,alias_id,name,pwd) VALUES(".$_SESSION["restaurant_id"].",$rs,$alias_id,'$name','".md5($pwd)."')";
 		}

@@ -93,8 +93,8 @@ function editRestaurant(id, restaurant_name, address, tele1, tele2) {
 	                      '<input type="hidden" name="id" value="' + id + '" />' +
 	                      '<div class="add_foot_Content" style="height:180px;text-align:center">' +
 	                        '<div class="pop_Content">' +
-	                            '<div class="pop_Content1">名称：<input type="text" id="restaurant_name" name="restaurant_name" value="' + restaurant_name + '" onfocus="this.select()" size="25" height="20" /></div>' +
-	                             '<div class="pop_Content1">地址：<input type="text" id="address" name="address" value="' + address + '" onfocus="this.select()" size="25" height="20" /></div>' +
+	                            '<div class="pop_Content1">&nbsp;&nbsp;名称：<input type="text" id="restaurant_name" name="restaurant_name" value="' + restaurant_name + '" onfocus="this.select()" size="25" height="20" /></div>' +
+	                             '<div class="pop_Content1">&nbsp;&nbsp;地址：<input type="text" id="address" name="address" value="' + address + '" onfocus="this.select()" size="25" height="20" /></div>' +
 	                              '<div class="pop_Content1">电话1：<input type="text" id="tele1" name="tele1" value="' + tele1 + '" onfocus="this.select()" size="25" height="20"' +
 	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57||event.keyCode==46"' +
 	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
@@ -116,29 +116,29 @@ function editRestaurant(id, restaurant_name, address, tele1, tele2) {
 
 function submitRestaurantData() {
     var restaurant_name = document.getElementById("restaurant_name").value;
-    var address = document.getElementById("address").value;
-    var tele1 = document.getElementById("tele1").value;
-    var tele2 = document.getElementById("tele2").value;
+//    var address = document.getElementById("address").value;
+//    var tele1 = document.getElementById("tele1").value;
+//    var tele2 = document.getElementById("tele2").value;
     if (restaurant_name == undefined || restaurant_name == null || restaurant_name == "") {
         alert("名称不能为空！");
         document.getElementById("restaurant_name").focus();
         return;
     }
-    if (address == undefined || address == null || address == "") {
-        alert("地址不能为空！");
-        document.getElementById("address").focus();
-        return;
-    }
-    if (tele1 == undefined || tele1 == null || tele1 == "") {
-        alert("电话1不能为空！");
-        document.getElementById("tele1").focus();
-        return;
-    }
-    if (tele2 == undefined || tele2 == null || tele2 == "") {
-        alert("电话2不能为空！");
-        document.getElementById("tele2").focus();
-        return;
-    }
+//    if (address == undefined || address == null || address == "") {
+//        alert("地址不能为空！");
+//        document.getElementById("address").focus();
+//        return;
+//    }
+//    if (tele1 == undefined || tele1 == null || tele1 == "") {
+//        alert("电话1不能为空！");
+//        document.getElementById("tele1").focus();
+//        return;
+//    }
+//    if (tele2 == undefined || tele2 == null || tele2 == "") {
+//        alert("电话2不能为空！");
+//        document.getElementById("tele2").focus();
+//        return;
+//    }
     document.restaurantForm.submit();
 }
 
