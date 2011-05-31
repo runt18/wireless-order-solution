@@ -193,7 +193,7 @@ SET AUTOCOMMIT=1;
 -- -----------------------------------------------------
 SET AUTOCOMMIT=0;
 -- DELETE FROM wireless_order_db.food WHERE restaurant_id=11;
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`, `pinyin`) VALUES (0xB0000044C, 0x44C, '京都骨', 23.53, 11, 1, 'jdg');
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`, `pinyin`, `status`) VALUES (0xB0000044C, 0x44C, '京都骨', 23.53, 11, 1, 'jdg', 4);
 INSERT INTO `wireless_order_db`.`food_material` (`food_id`, `material_id`, `consumption`) VALUES (0xB0000044C, 1, 1);
 INSERT INTO `wireless_order_db`.`food_material` (`food_id`, `material_id`, `consumption`) VALUES (0xB0000044C, 5, 1);
 INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`, `pinyin`) VALUES (0xB0000044D, 0x44D, '京酱肉丝', 35.3, 11, 0, 'jjrs');
