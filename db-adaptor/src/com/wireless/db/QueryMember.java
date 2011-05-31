@@ -47,7 +47,7 @@ public class QueryMember {
 	 */
 	static Member exec(DBCon dbCon, int restaurantID, String memberID) throws BusinessException, SQLException{
 		try{
-			String sql = "SELECT name, tele FROM " + Params.dbName + ".member WHERE restaurant_id=" +
+			String sql = "SELECT name, tele, balance FROM " + Params.dbName + ".member WHERE restaurant_id=" +
 			 			 restaurantID + " AND alias_id=" +
 			 			 memberID;
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -55,7 +55,8 @@ public class QueryMember {
 			if(dbCon.rs.next()){
 				return new Member(memberID,
 								  dbCon.rs.getString("name"),
-								  dbCon.rs.getString("tele"));
+								  dbCon.rs.getString("tele"),
+								  dbCon.rs.getFloat("balance"));
 			}else{
 				throw new BusinessException("The member(id=" + memberID + ") does NOT exist.", ErrorCode.MEMBER_NOT_EXIST);
 			}

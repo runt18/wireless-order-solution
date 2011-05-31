@@ -4,6 +4,7 @@ import java.sql.SQLException;
 
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.Member;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.Util;
 
@@ -49,7 +50,31 @@ public class PayOrder {
 			totalPrice = (float)Math.round(totalPrice * 100) / 100;
 			orderInfo.setTotalPrice(totalPrice);
 			
+			/**
+			 * Get the member info if the pay type for member
+			 */
+			Member member = null;
+			if(orderInfo.pay_type == Order.PAY_MEMBER && orderInfo.member_id != null){
+				member = QueryMember.exec(dbCon, orderInfo.restaurant_id, orderInfo.member_id);
+			}
+			
 			dbCon.stmt.clearBatch();
+			String sql = null;
+			/**
+			 * Calculate the member balance if the pay type is for member.
+			 * The formula is as below.
+			 * balance = balance - actualPrice + actualPrice * exchange_rate
+			 */
+			if(orderInfo.pay_type == Order.PAY_MEMBER){
+				String actualMoney = Util.price2Float(orderInfo.actualPrice, Util.INT_MASK_3).toString();
+				sql = "UPDATE " + Params.dbName + ".member SET balance=balance - " + actualMoney +
+					  " + " + actualMoney + " * exchange_rate" + 
+					  " WHERE restaurant_id=" + orderInfo.restaurant_id +
+					  " AND alias_id=" + member.alias_id;
+				
+				dbCon.stmt.addBatch(sql);
+			}
+					 
 			/**
 			 * Update the values below to "order" table
 			 * - total price
@@ -57,14 +82,19 @@ public class PayOrder {
 			 * - payment manner
 			 * - terminal pin
 			 * - pay order date
+			 * - comment if exist
+			 * - member id if pay type is for member
+			 * - member name if pay type is for member
 			 */
-			String sql = "UPDATE `" + Params.dbName + "`.`order` SET terminal_pin=" + pin +
-						", total_price=" + totalPrice + 
-						", total_price_2=" + Util.price2Float(orderInfo.actualPrice, Util.INT_MASK_3) +
-						", type=" + orderInfo.pay_manner + 
-						", order_date=NOW()" + 
-						(orderInfo.comment != null ? ", comment='" + orderInfo.comment + "'" : "") +
-						" WHERE id=" + orderInfo.id;
+			sql = "UPDATE `" + Params.dbName + "`.`order` SET terminal_pin=" + pin +
+				  ", total_price=" + totalPrice + 
+				  ", total_price_2=" + Util.price2Float(orderInfo.actualPrice, Util.INT_MASK_3) +
+				  ", type=" + orderInfo.pay_manner + 
+			   	  ", order_date=NOW()" + 
+				  (orderInfo.comment != null ? ", comment='" + orderInfo.comment + "'" : "") +
+				  (member != null ? ", member_id=" + member.alias_id + ", member='" + member.name + "'" : "") + 
+				  " WHERE id=" + orderInfo.id;
+			
 			dbCon.stmt.addBatch(sql);
 			
 
