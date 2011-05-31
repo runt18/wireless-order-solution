@@ -77,7 +77,6 @@ public class QueryTable {
 
 			Collections.sort(tables, new Comparator<Table>(){
 
-				@Override
 				public int compare(Table table1, Table table2) {
 					// TODO Auto-generated method stub
 					if(table1.alias_id > table2.alias_id){
