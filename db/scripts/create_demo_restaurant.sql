@@ -212,9 +212,9 @@ INSERT INTO `wireless_order_db`.`food_material` (`food_id`, `material_id`, `cons
 INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`, `pinyin`) VALUES (0xB00000452, 0x452, '红烧排骨', 32, 11, 1, 'hspg');
 INSERT INTO `wireless_order_db`.`food_material` (`food_id`, `material_id`, `consumption`) VALUES (0xB00000452, 1, 1);
 INSERT INTO `wireless_order_db`.`food_material` (`food_id`, `material_id`, `consumption`) VALUES (0xB00000452, 5, 1.5);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`, `pinyin`) VALUES (0xB00000453, 0x453, '清蒸桂花鱼', 29, 11, 0, 'qzghy');
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`, `pinyin`) VALUES (0xB00000454, 0x454, '鼓油王鹅肠', 24, 11, 0, 'jywec');
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`, `pinyin`) VALUES (0xB00000455, 0x455, '白灼猪肚', 22.5, 11, 0, 'bzzd');
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`, `pinyin`, `status`) VALUES (0xB00000453, 0x453, '清蒸桂花鱼', 29, 11, 0, 'qzghy', 1);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`, `pinyin`, `status`) VALUES (0xB00000454, 0x454, '鼓油王鹅肠', 24, 11, 0, 'jywec', 3);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`, `pinyin`, `status`) VALUES (0xB00000455, 0x455, '白灼猪肚', 22.5, 11, 0, 'bzzd', 7);
 INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`, `pinyin`) VALUES (0xB00000456, 0x456, '水煮鱼', 39, 11, 0, 'szy');
 INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`, `pinyin`) VALUES (0xB00000457, 0x457, '酸菜鱼', 34, 11, 0, 'scy');
 INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`, `pinyin`) VALUES (0xB00000458, 0x458, '鱼香肉丝', 16, 11, 0, 'yxrs');
