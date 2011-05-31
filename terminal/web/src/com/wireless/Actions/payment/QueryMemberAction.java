@@ -50,11 +50,12 @@ public class QueryMemberAction extends Action {
 			jsonResp = jsonResp.replace("$(result)", "true");
 			/**
 			 * The format to member looks like below.
-			 * 会员姓名,会员电话
+			 * "会员姓名","会员电话",会员余额
 			 */
-			String jsonMember = "\"$(name)\",\"$(phone)\"";
+			String jsonMember = "\"$(name)\",\"$(phone)\",$(balance)";
 			jsonMember = jsonMember.replace("$(name)", member.name);
 			jsonMember = jsonMember.replace("$(phone)", member.tele);
+			jsonMember = jsonMember.replace("$(balance)", member.balance.toString());
 			jsonResp = jsonResp.replace("$(value)", jsonMember);
 			
 		}catch(BusinessException e){

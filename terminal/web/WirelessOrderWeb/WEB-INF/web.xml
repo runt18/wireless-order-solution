@@ -25,7 +25,7 @@
 		</init-param>
 		<init-param>
 			<param-name>db_host</param-name>
-			<param-value>127.0.0.1</param-value>
+			<param-value>192.168.123.130</param-value>
 		</init-param>
 		<init-param>
 			<param-name>db_port</param-name>
@@ -33,7 +33,7 @@
 		</init-param>
 		<init-param>
 			<param-name>db_user</param-name>
-			<param-value>root</param-value>
+			<param-value>yzhang</param-value>
 		</init-param>
 		<init-param>
 			<param-name>db_pwd</param-name>
