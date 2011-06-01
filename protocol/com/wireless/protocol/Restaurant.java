@@ -1,7 +1,11 @@
 package com.wireless.protocol;
 
 public class Restaurant {
+	public int id;
 	public String name;
+	public String tele_1;
+	public String tele_2;
+	public String addr;
 	public String info;
 	public String owner;
 	
