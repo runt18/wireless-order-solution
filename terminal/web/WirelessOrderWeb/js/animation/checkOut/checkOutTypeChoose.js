@@ -93,14 +93,54 @@ var checkOurListRefresh = function() {
 			}
 		}
 
-		var price = parseFloat(checkOutData[i][4].substring(1)) * discountRate
-				* checkOutData[i][3];
+		var tastePrice = 0;
+		for ( var j = 0; j < dishTasteData.length; j++) {
+			if (dishTasteData[j][0] == checkOutData[i][2]) {
+				tastePrice = parseFloat(dishTasteData[j][1].substr(1,
+						dishTasteData[j][1].length - 1));
+			}
+		}
+		// 总价 = （原料价 * 折扣率 + 口味价）* 数量
+		if (checkOutData[i][5] == "false") {
+			// 非特价
+			var price = ((parseFloat(checkOutData[i][4].substring(1)) - tastePrice)
+					* discountRate + tastePrice)
+					* checkOutData[i][3];
+		} else {
+			// 特价，不打折
+			var price = parseFloat(checkOutData[i][4].substring(1))
+					* checkOutData[i][3];
+		}
+
 		var priceDisplay = checkOutData[i][4].substring(0, 1)
 				+ price.toFixed(2);
 
 		checkOutDataDisplay.push([ checkOutData[i][1], checkOutData[i][2],
 				checkOutData[i][3], checkOutData[i][4], discountRate,
-				priceDisplay ]);
+				priceDisplay, // 实价
+				checkOutData[i][5],// 特
+				checkOutData[i][6],// 荐
+				checkOutData[i][7] // 停
+		]);
+	}
+
+	// 根据“特荐停”重新写菜名
+	for ( var i = 0; i < checkOutDataDisplay.length; i++) {
+		if (checkOutDataDisplay[i][6] == "true") {
+			// 特
+			checkOutDataDisplay[i][0] = checkOutDataDisplay[i][0]
+					+ "<img src='../images/icon_tip_te.gif'></img>";
+		}
+		if (checkOutDataDisplay[i][7] == "true") {
+			// 荐
+			checkOutDataDisplay[i][0] = checkOutDataDisplay[i][0]
+					+ "<img src='../images/icon_tip_jian.gif'></img>";
+		}
+		if (checkOutDataDisplay[i][8] == "true") {
+			// 停
+			checkOutDataDisplay[i][0] = checkOutDataDisplay[i][0]
+					+ "<img src='../images/icon_tip_ting.gif'></img>";
+		}
 	}
 
 	checkOutStore.reload();

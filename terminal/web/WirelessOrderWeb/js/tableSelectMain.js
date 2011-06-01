@@ -380,7 +380,8 @@
 						} else {
 							location.href = "CheckOut.html?tableNbr="
 									+ selectedTable + "&personCount="
-									+ tableStatusListTS[tableIndex][1];
+									+ tableStatusListTS[tableIndex][1]
+									+ "&pin=" + pin;
 						}
 					}
 				}

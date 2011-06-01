@@ -20,7 +20,11 @@
 				Ext.MessageBox.show({
 					msg : dataInfo,
 					width : 300,
-					buttons : Ext.MessageBox.OK
+					buttons : Ext.MessageBox.OK,
+					fn : function() {
+						var Request = new URLParaQuery();
+						location.href = "TableSelect.html?pin=" + Request["pin"];
+					}
 				});
 			} else {
 				var dataInfo = resultJSON.data;

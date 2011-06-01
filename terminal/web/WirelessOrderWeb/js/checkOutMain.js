@@ -111,7 +111,7 @@ var checkOutColumnModel = new Ext.grid.ColumnModel([
 			sortable : true,
 			dataIndex : "dishName",
 			id : "dishNameCOCM",
-			width : 230
+			width : 290
 		}, {
 			header : "口味",
 			sortable : true,
@@ -136,7 +136,7 @@ var checkOutColumnModel = new Ext.grid.ColumnModel([
 			header : "总价",
 			sortable : true,
 			dataIndex : "dishTotalPrice",
-			width : 220
+			width : 160
 		} ]);
 
 // 4，表格

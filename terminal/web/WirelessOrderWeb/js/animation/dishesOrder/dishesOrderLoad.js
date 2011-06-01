@@ -8,7 +8,9 @@ var dishKeyboardSelect = function(relateItemId) {
 			for ( var i = 0; i < dishesDisplayData.length; i++) {
 				dishesDisplayDataShow.push([ dishesDisplayData[i][0],
 						dishesDisplayData[i][1], dishesDisplayData[i][2],
-						dishesDisplayData[i][3] ]);
+						dishesDisplayData[i][3], dishesDisplayData[i][4],
+						dishesDisplayData[i][5], dishesDisplayData[i][6],
+						dishesDisplayData[i][7] ]);
 			}
 		} else {
 			dishesDisplayDataShow.length = 0;
@@ -17,7 +19,9 @@ var dishKeyboardSelect = function(relateItemId) {
 						curDishNbr.length) == curDishNbr) {
 					dishesDisplayDataShow.push([ dishesDisplayData[i][0],
 							dishesDisplayData[i][1], dishesDisplayData[i][2],
-							dishesDisplayData[i][3] ]);
+							dishesDisplayData[i][3], dishesDisplayData[i][4],
+							dishesDisplayData[i][5], dishesDisplayData[i][6],
+							dishesDisplayData[i][7] ]);
 				}
 			}
 		}
@@ -36,35 +40,45 @@ function dishNbrOnLoad() {
 
 function dishSpellOnLoad() {
 	// keyboard input dish spell
-	$("#orderSpell").bind(
-			"keyup",
-			function() {
-				var curDishSpell = Ext.getCmp("orderSpell").getValue()
-						.toUpperCase()
-						+ "";
-				if (curDishSpell == "") {
-					dishesDisplayDataShow.length = 0;
-					for ( var i = 0; i < dishesDisplayData.length; i++) {
-						dishesDisplayDataShow.push([ dishesDisplayData[i][0],
-								dishesDisplayData[i][1],
-								dishesDisplayData[i][2],
-								dishesDisplayData[i][3] ]);
-					}
-				} else {
-					dishesDisplayDataShow.length = 0;
-					for ( var i = 0; i < dishesDisplayData.length; i++) {
-						if ((dishesDisplayData[i][2] + "").substring(0,
-								curDishSpell.length).toUpperCase() == curDishSpell) {
-							dishesDisplayDataShow.push([
-									dishesDisplayData[i][0],
-									dishesDisplayData[i][1],
-									dishesDisplayData[i][2],
-									dishesDisplayData[i][3] ]);
+	$("#orderSpell")
+			.bind(
+					"keyup",
+					function() {
+						var curDishSpell = Ext.getCmp("orderSpell").getValue()
+								.toUpperCase()
+								+ "";
+						if (curDishSpell == "") {
+							dishesDisplayDataShow.length = 0;
+							for ( var i = 0; i < dishesDisplayData.length; i++) {
+								dishesDisplayDataShow.push([
+										dishesDisplayData[i][0],
+										dishesDisplayData[i][1],
+										dishesDisplayData[i][2],
+										dishesDisplayData[i][3],
+										dishesDisplayData[i][4],
+										dishesDisplayData[i][5],
+										dishesDisplayData[i][6],
+										dishesDisplayData[i][7] ]);
+							}
+						} else {
+							dishesDisplayDataShow.length = 0;
+							for ( var i = 0; i < dishesDisplayData.length; i++) {
+								if ((dishesDisplayData[i][2] + "").substring(0,
+										curDishSpell.length).toUpperCase() == curDishSpell) {
+									dishesDisplayDataShow.push([
+											dishesDisplayData[i][0],
+											dishesDisplayData[i][1],
+											dishesDisplayData[i][2],
+											dishesDisplayData[i][3],
+											dishesDisplayData[i][4],
+											dishesDisplayData[i][5],
+											dishesDisplayData[i][6],
+											dishesDisplayData[i][7] ]);
+								}
+							}
 						}
-					}
-				}
-				dishesDisplayStore.reload();
-			});
+						dishesDisplayStore.reload();
+					});
 }
 
 // 从url获取当前桌信息
@@ -98,36 +112,39 @@ function tableStuLoad() {
 	var Request = new URLParaQuery();
 	var status = Request["tableStat"];
 	if (status == "free") {
-		dishesOrderNorthPanel.setTitle("<div style='font-size:18px;padding-left:2px'>新下单<div>");
+		dishesOrderNorthPanel
+				.setTitle("<div style='font-size:18px;padding-left:2px'>新下单<div>");
 	} else {
-		dishesOrderNorthPanel.setTitle("<div style='font-size:18px;padding-left:2px'>改单<div>");
+		dishesOrderNorthPanel
+				.setTitle("<div style='font-size:18px;padding-left:2px'>改单<div>");
 	}
 };
 
 // 以点菜式数据
-// 格式：[菜名，口味，数量，单价，操作，实价，菜名编号，厨房编号，口味编号]
+// 格式：[菜名，口味，数量，单价，操作，实价，菜名编号，厨房编号，口味编号,特,荐,停]
 // orderedData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "", "￥56.2" ]);
 // orderedData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "", "￥56.2" ]);
-// 后台：[菜名,菜名编号,厨房编号,口味,口味编号,数量,单价]
+// 后台：[菜名,菜名编号,厨房编号,口味,口味编号,数量,单价,特,荐,停]
 function orderedDishesOnLoad() {
 	var Request = new URLParaQuery();
-	Ext.Ajax.request({
-		url : "../QueryOrder.do",
-		params : {
-			"pin" : Request["pin"],
-			"tableID" : Request["tableNbr"]
-		},
-		success : function(response, options) {
-			var resultJSON = Ext.util.JSON.decode(response.responseText);
-			if (resultJSON.success == true) {
-				if (resultJSON.data != "NULL") {
-					var josnData = resultJSON.data;
-					var orderList = josnData.split("，");
-					for ( var i = 0; i < orderList.length; i++) {
-						var orderInfo = orderList[i].substr(1,
-								orderList[i].length - 2).split(",");
-						orderedData
-								.push([
+	Ext.Ajax
+			.request({
+				url : "../QueryOrder.do",
+				params : {
+					"pin" : Request["pin"],
+					"tableID" : Request["tableNbr"]
+				},
+				success : function(response, options) {
+					var resultJSON = Ext.util.JSON
+							.decode(response.responseText);
+					if (resultJSON.success == true) {
+						if (resultJSON.data != "NULL") {
+							var josnData = resultJSON.data;
+							var orderList = josnData.split("，");
+							for ( var i = 0; i < orderList.length; i++) {
+								var orderInfo = orderList[i].substr(1,
+										orderList[i].length - 2).split(",");
+								orderedData.push([
 										orderInfo[0].substr(1,
 												orderInfo[0].length - 2), // 菜名
 										orderInfo[3].substr(1,
@@ -140,24 +157,47 @@ function orderedDishesOnLoad() {
 												orderInfo[6].length - 2),// 实价
 										orderInfo[1],// 菜名编号
 										orderInfo[2],// 厨房编号
-										orderInfo[4] // 口味编号
+										orderInfo[4], // 口味编号
+										orderInfo[7],// 特
+										orderInfo[8],// 荐
+										orderInfo[9] // 停
 								]);
+							}
+
+							// 根据“特荐停”重新写菜名
+							for ( var i = 0; i < orderedData.length; i++) {
+								if (orderedData[i][9] == "true") {
+									// 特
+									orderedData[i][0] = orderedData[i][0]
+											+ "<img src='../images/icon_tip_te.gif'></img>";
+								}
+								if (orderedData[i][10] == "true") {
+									// 荐
+									orderedData[i][0] = orderedData[i][0]
+											+ "<img src='../images/icon_tip_jian.gif'></img>";
+								}
+								if (orderedData[i][11] == "true") {
+									// 停
+									orderedData[i][0] = orderedData[i][0]
+											+ "<img src='../images/icon_tip_ting.gif'></img>";
+								}
+							}
+
+							orderedStore.reload();
+						}
+					} else {
+						var dataInfo = resultJSON.data;
+						// Ext.Msg.alert(tableData);
+						Ext.MessageBox.show({
+							msg : dataInfo,
+							width : 300,
+							buttons : Ext.MessageBox.OK
+						});
 					}
-					orderedStore.reload();
+				},
+				failure : function(response, options) {
 				}
-			} else {
-				var dataInfo = resultJSON.data;
-				// Ext.Msg.alert(tableData);
-				Ext.MessageBox.show({
-					msg : dataInfo,
-					width : 300,
-					buttons : Ext.MessageBox.OK
-				});
-			}
-		},
-		failure : function(response, options) {
-		}
-	});
+			});
 };
 
 // 菜谱
@@ -179,8 +219,8 @@ function orderedMenuOnLoad() {
 						for ( var i = 0; i < menuList.length; i++) {
 							var menuInfo = menuList[i].substr(1,
 									menuList[i].length - 2).split(",");
-							// 格式：[菜名，菜名编号，菜名拼音，单价，厨房编号]
-							// 后台格式：[厨房编号,"菜品名称",菜品编号,"菜品拼音","￥菜品单价"]
+							// 格式：[菜名，菜名编号，菜名拼音，单价，厨房编号,特,荐,停]
+							// 后台格式：[厨房编号,"菜品名称",菜品编号,"菜品拼音","￥菜品单价",特,荐,停]
 							// 前后台格式有差异，厨房编号前台存储放在最后一位
 							dishesDisplayData.push([
 									menuInfo[1].substr(1,
@@ -190,8 +230,29 @@ function orderedMenuOnLoad() {
 											menuInfo[3].length - 2),// 菜名拼音
 									menuInfo[4].substr(1,
 											menuInfo[4].length - 2),// 单价
-									menuInfo[0] // 厨房编号
+									menuInfo[0], // 厨房编号
+									menuInfo[5], // 特
+									menuInfo[6], // 荐
+									menuInfo[7] // 停
 							]);
+						}
+						// 根据“特荐停”重新写菜名
+						for ( var i = 0; i < dishesDisplayData.length; i++) {
+							if (dishesDisplayData[i][5] == "true") {
+								// 特
+								dishesDisplayData[i][0] = dishesDisplayData[i][0]
+										+ "<img src='../images/icon_tip_te.gif'></img>";
+							}
+							if (dishesDisplayData[i][6] == "true") {
+								// 荐
+								dishesDisplayData[i][0] = dishesDisplayData[i][0]
+										+ "<img src='../images/icon_tip_jian.gif'></img>";
+							}
+							if (dishesDisplayData[i][7] == "true") {
+								// 停
+								dishesDisplayData[i][0] = dishesDisplayData[i][0]
+										+ "<img src='../images/icon_tip_ting.gif'></img>";
+							}
 						}
 						for ( var i = 0; i < dishesDisplayData.length; i++) {
 							dishesDisplayDataShow.push([
@@ -199,7 +260,10 @@ function orderedMenuOnLoad() {
 									dishesDisplayData[i][1],
 									dishesDisplayData[i][2],
 									dishesDisplayData[i][3],
-									dishesDisplayData[i][4] ]);
+									dishesDisplayData[i][4],
+									dishesDisplayData[i][5],
+									dishesDisplayData[i][6],
+									dishesDisplayData[i][7] ]);
 						}
 						dishesDisplayStore.reload();
 					}
