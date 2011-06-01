@@ -8,9 +8,9 @@ import java.sql.Statement;
 
 public class DBCon {
 	//open the database
-	Connection dbCon = null;
-	Statement stmt = null;
-	ResultSet rs = null;
+	public Connection dbCon = null;
+	public Statement stmt = null;
+	public ResultSet rs = null;
 	
 	public void connect() throws SQLException{
 		try{
