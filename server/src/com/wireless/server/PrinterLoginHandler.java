@@ -16,6 +16,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Mode;
@@ -143,10 +144,10 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 									}
 								}
 							}else{
-								throw new PrintLogicException("The password is not correct.", ErrorCode.PWD_NOT_MATCH);
+								throw new BusinessException("The password is not correct.", ErrorCode.PWD_NOT_MATCH);
 							}						
 						}else{
-							throw new PrintLogicException("The user \"" + user + "\" doesn't exist.", ErrorCode.ACCOUNT_NOT_EXIST);						
+							throw new BusinessException("The user \"" + user + "\" doesn't exist.", ErrorCode.ACCOUNT_NOT_EXIST);						
 						}
 						
 					//handle the printer OTA request to get the OTA host address and port
@@ -158,10 +159,10 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 						}
 						
 					}else{
-						throw new PrintLogicException("The mode or type doesn't belong to print service");
+						throw new BusinessException("The mode or type doesn't belong to print service");
 					}					
 					
-				}catch(PrintLogicException e){
+				}catch(BusinessException e){
 					if(loginReq != null){
 						try{
 							send(_out, new RespNAK(loginReq.header, e.errCode));

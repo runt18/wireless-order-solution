@@ -34,6 +34,7 @@ import com.wireless.protocol.RespPackage;
 import com.wireless.protocol.RespQueryMenu;
 import com.wireless.protocol.RespQueryOrder;
 import com.wireless.protocol.RespQueryRestaurant;
+import com.wireless.protocol.Restaurant;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 import com.wireless.protocol.Type;
@@ -277,6 +278,16 @@ class OrderHandler extends Handler implements Runnable{
 		}
 		if(connections != null && orderToPrint != null){
 			for(int i = 0; i < connections.length; i++){
+				/**
+				 * Get the corresponding restaurant information
+				 */
+				Restaurant restaurant = null;
+				try{
+					restaurant = QueryRestaurant.exec(_term.restaurant_id);
+				}catch(SQLException e){
+					restaurant = new Restaurant();
+				}
+				
 				//check whether the print request is synchronized or asynchronous
 				if((printConf & Reserved.PRINT_SYNC) != 0){
 					/**
@@ -285,7 +296,7 @@ class OrderHandler extends Handler implements Runnable{
 					 * the print actions is successfully or not
 					 */	
 					try{
-						new PrintHandler(orderToPrint, connections[i], printConf, _term.restaurant_id, _term.owner).run2();						
+						new PrintHandler(orderToPrint, connections[i], printConf, restaurant, _term.owner).run2();						
 					}catch(PrintSocketException e){}
 				
 				}else{
@@ -294,7 +305,7 @@ class OrderHandler extends Handler implements Runnable{
 					 * regardless of the print request. In the mean time, the print request would be put to a 
 					 * new thread to run.
 					 */	
-					WirelessSocketServer.threadPool.execute(new PrintHandler(orderToPrint, connections[i], printConf, _term.restaurant_id, _term.owner));
+					WirelessSocketServer.threadPool.execute(new PrintHandler(orderToPrint, connections[i], printConf, restaurant, _term.owner));
 				}
 			}
 		}
