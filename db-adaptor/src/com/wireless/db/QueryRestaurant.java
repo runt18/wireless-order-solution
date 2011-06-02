@@ -73,6 +73,7 @@ public class QueryRestaurant {
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
+			restaurant.id = restaurantID;
 			restaurant.name = dbCon.rs.getString("restaurant_name");
 			restaurant.info = dbCon.rs.getString("restaurant_info");
 			restaurant.tele_1 = dbCon.rs.getString("tele1");
