@@ -9,13 +9,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Iterator;
 
+import com.wireless.db.DBCon;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Kitchen;
@@ -42,9 +40,6 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 	private boolean _isRunning = false;
 	private InputStream _in = null;
 	private OutputStream _out = null;
-    private Connection _dbCon = null;
-    private Statement _stmt = null;
-    private ResultSet _rs = null;
     private ServerSocket _server = null;
     
     void kill(){
@@ -65,6 +60,7 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 			_isRunning = true;
 			while(_isRunning){
 				ProtocolPackage loginReq = null;
+				DBCon dbCon = new DBCon();
 				try{
 					connection = _server.accept();
 					_in = new BufferedInputStream(new DataInputStream(connection.getInputStream()));
@@ -99,34 +95,27 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 						String pwd = new String(loginReq.body, loginReq.body[0] + 2, len);
 						
 						//access the database to get the password and restaurant id according to the user
-				        try {   
-				        	Class.forName("com.mysql.jdbc.Driver");   
-				        } catch (ClassNotFoundException e) { 
-				        	e.printStackTrace();   
-				        }   
-						_dbCon = DriverManager.getConnection(WirelessSocketServer.url, 
-								 							 WirelessSocketServer.user, 
-								 							 WirelessSocketServer.password);   
-						_stmt = _dbCon.createStatement(); 
+						dbCon.connect();
 						String sql = "SELECT id, pwd, restaurant_name FROM " + WirelessSocketServer.database + ".restaurant WHERE account='" + user + "'";
-						_rs = _stmt.executeQuery(sql);
+						dbCon.rs = dbCon.stmt.executeQuery(sql);
 						
 						//check to see whether the account exist or not
-						if(_rs.next()){	
+						if(dbCon.rs.next()){	
 							//check to see whether the password is matched or not
-							if(pwd.equals(_rs.getString("pwd"))){
+							if(pwd.equals(dbCon.rs.getString("pwd"))){
 								
-								int restaurantID = _rs.getInt("id");
-								String restaurantName = _rs.getString("restaurant_name");
-								_rs.close();
+								int restaurantID = dbCon.rs.getInt("id");
+								String restaurantName = dbCon.rs.getString("restaurant_name");
+								dbCon.rs.close();
 								//get the related kitchen information 
 								sql = "SELECT alias_id, name FROM " + WirelessSocketServer.database + ".kitchen WHERE restaurant_id=" + restaurantID;
-								_rs = _stmt.executeQuery(sql);
+								dbCon.rs = dbCon.stmt.executeQuery(sql);
 								ArrayList<Kitchen> kitchens = new ArrayList<Kitchen>();
-								while(_rs.next()){
-									kitchens.add(new Kitchen(_rs.getString("name"),
-															 _rs.getShort("alias_id")));															
+								while(dbCon.rs.next()){
+									kitchens.add(new Kitchen(dbCon.rs.getString("name"),
+															 dbCon.rs.getShort("alias_id")));															
 								}
+								dbCon.rs.close();
 								//respond with the related kitchen information
 								send(_out, new RespPrintLogin(loginReq.header, kitchens.toArray(new Kitchen[kitchens.size()]), restaurantName));
 								
@@ -135,9 +124,34 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 									ArrayList<Socket> printerSockets = WirelessSocketServer.printerConnections.get(new Integer(restaurantID));
 									//just add the new connection if other connections have been exist before 
 									if(printerSockets != null){
-										printerSockets.add(connection);									
-									//create a new connection list if no connections exist before
+										/**
+										 * Before adding the new socket connection,
+										 * check other sockets to see if connected or NOT.
+										 * Remove the sockets to this restaurant if NOT valid any more.
+										 */
+										Iterator<Socket> iter = printerSockets.iterator();
+										while(iter.hasNext()){
+											Socket conn = iter.next();
+											try{
+												conn.sendUrgentData(0);
+											}catch(IOException e){
+												try{
+													conn.close();
+												}finally{
+													iter.remove();
+												}
+											}
+										}
+										/**
+										 * Add the new socket connection
+										 */
+										printerSockets.add(connection);		
+										
+									
 									}else{
+										/**
+										 * Create a new connection list if no connections exist before.
+										 */
 										printerSockets = new ArrayList<Socket>();
 										printerSockets.add(connection);
 										WirelessSocketServer.printerConnections.put(new Integer(restaurantID), printerSockets);									
@@ -196,22 +210,7 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 					closeSocket(connection);
 					
 				}finally{	
-					try{
-						if(_rs != null){
-							_rs.close();
-							_rs = null;
-						}
-						if(_stmt != null){
-							_stmt.close();
-							_stmt = null;
-						}
-						if(_dbCon != null){
-							_dbCon.close();
-							_dbCon = null;
-						}
-					}catch(SQLException e){
-						e.printStackTrace();
-					}					
+					dbCon.disconnect();
 				}
 			}
 		}catch(IOException e){
