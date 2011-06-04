@@ -38,10 +38,25 @@ IF NOT EXIST www GOTO www_not_exist
 	@copy www\releasenote.txt dist\www\digi-e\ > nul
 	@del dist\www\digi-e\index.php > nul
 
+	GOTO web_term_files
+
+:www_not_exist
+	@echo the www files missing
+	@pause
+	GOTO end
+
+Rem copy the web-term files
+:web_term_files
+IF EXIST terminal\web\WirelessOrderWeb GOTO web_term_exist
+IF NOT EXIST terminal\web\WirelessOrderWeb GOTO web_term_not_exist
+:web_term_exist
+	@echo copying the web-term files...
+	@xcopy /s/y terminal\web\WirelessOrderWeb dist\www\web-term\ > nul
+
 	GOTO cod_files
 
-www_not_exist:
-	@echo the www files missing
+:web_term_not_exist
+	@echo the web term files missing
 	@pause
 	GOTO end
 
