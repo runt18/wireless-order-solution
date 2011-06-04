@@ -41,7 +41,7 @@ public class QueryStaffAction extends Action {
 				StringBuffer value = new StringBuffer();
 				for (int i = 0; i < staffs.length; i++) {
 					String jsonStaff = "[$(pin),\"$(name)\",\"$(pwd)\"]";
-					jsonStaff = jsonStaff.replace("$(pin)", Integer.toString(staffs[i].pin));
+					jsonStaff = jsonStaff.replace("$(pin)", "0x" + Integer.toHexString(staffs[i].pin));
 					jsonStaff = jsonStaff.replace("$(name)", staffs[i].name);
 					jsonStaff = jsonStaff.replace("$(pwd)", staffs[i].pwd);
 					// pub each json staff info to the value
