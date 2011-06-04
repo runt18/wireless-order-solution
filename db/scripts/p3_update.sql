@@ -118,11 +118,6 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'the staff information ';
 
-SET SQL_MODE=@OLD_SQL_MODE;
-SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
-SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
-
 -- -----------------------------------------------------
 -- View`order_food_history_view`
 -- -----------------------------------------------------
