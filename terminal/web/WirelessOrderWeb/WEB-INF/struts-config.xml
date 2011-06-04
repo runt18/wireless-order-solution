@@ -28,6 +28,9 @@
 		<action path="/QueryMember" type="com.wireless.Actions.payment.QueryMemberAction"
 			scope="request">
 		</action>
+		<action path="/QueryStaff" type="com.wireless.Actions.login.QueryStaffAction"
+			scope="request">
+		</action>
 	</action-mappings>
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
 </struts-config>
