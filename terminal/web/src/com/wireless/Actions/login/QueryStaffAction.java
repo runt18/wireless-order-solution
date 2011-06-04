@@ -32,7 +32,7 @@ public class QueryStaffAction extends Action {
 			Staff[] staffs = QueryStaff.exec(restaurantID);
 			
 			if(staffs.length != 0){
-				jsonResp = jsonResp.replace("$(result)", "false");
+				jsonResp = jsonResp.replace("$(result)", "true");
 				/**
 				 * The json staff format looks like below
 				 * {[1,"李颖宜","d7a7b87838c6e3853f3f6d3bdc836a7c"]，[2,"张宁远","fe01ce2a7fbac8fafaed7c982a04e229"]}
@@ -44,6 +44,12 @@ public class QueryStaffAction extends Action {
 					jsonStaff = jsonStaff.replace("$(pin)", Integer.toString(staffs[i].pin));
 					jsonStaff = jsonStaff.replace("$(name)", staffs[i].name);
 					jsonStaff = jsonStaff.replace("$(pwd)", staffs[i].pwd);
+					// pub each json staff info to the value
+					value.append(jsonStaff);
+					// the string is separated by comma
+					if (i != staffs.length - 1) {
+						value.append("，");
+					}
 				}
 				jsonResp = jsonResp.replace("$(value)", value.toString());
 			}else{
