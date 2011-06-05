@@ -51,10 +51,10 @@ function pValidateData() {
         alert("新密码的最大长度不能超过30个英文字符！");
         return false;
     }
-    if (pwd2 == undefined || pwd2 == null || pwd2 == "") {
-        alert("权限密码不能为空！");
-        return false;
-    }
+//    if (pwd2 == undefined || pwd2 == null || pwd2 == "") {
+//        alert("权限密码不能为空！");
+//        return false;
+//    }
     if (confirmPassword != newPassword) {
         alert("两次输入的新密码不一致！");
         return false;

@@ -79,7 +79,7 @@ else if($editType == "editTable")
 		else{
 			echo "<script>alert('保存失败！');</script>";
 		}
-		}
+	}
 if($editType == "deleteTable")
 {		
 	$deleteId = $_POST["deleteId"];
@@ -179,14 +179,19 @@ mysql_query("SET NAMES utf8");
 $rs = $db->GetAll($sql);
 foreach ($rs as $row){	
 	$bh=$bh+1;
+	$table_name = "-";
+	if($row["name"] != null)
+	{
+		$table_name = $row["name"];
+	}
 	echo "<tr>";
 	echo "<td>" .$row["alias_id"] ."</td>";
-	echo "<td>" .$row["name"] ."</td>";
+	echo "<td>" .$table_name ."</td>";
 	echo "<td>" .$row["status"] ."</td>";
 	$is_paid = $row["is_paid"];
 	if($is_paid == NULL || $is_paid == 1)	
 	{
-		echo "<td><a href='#' onclick='editTable(&quot;".$row["table_id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["name"].
+		echo "<td><a href='#' onclick='editTable(&quot;".$row["table_id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$table_name.
 			"&quot;,&quot;table_list.php&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
 			"<a href='#' onclick='confirmDelete(".$row["alias_id"].",&quot;table_list.php&quot;)'><img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;删除</a></td>";
 	}
@@ -196,7 +201,7 @@ foreach ($rs as $row){
 				<a href='#' onclick='showOrderDetail(&quot;".$row["table_id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["order_date"]."&quot;,&quot;".$row["total_price"].
 			"&quot;,&quot;".$row["num"]."&quot;,&quot;".$row["foods"]."&quot;,&quot;".$row["is_paid"]."&quot;,&quot;".$row["waiter"]."&quot;,&quot;".$row["type_name"]."&quot;,&quot;".$row["total_price_2"]."&quot;,&quot;".$row["category_name"]."&quot;,&quot;".$row["comment"]."&quot;)'>
 				<img src='images/View.png'  height='16' width='14' border='0'/>&nbsp;查看</a>&nbsp;&nbsp;&nbsp;&nbsp;
-				<a href='#' onclick='editTable(&quot;".$row["id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["name"].
+				<a href='#' onclick='editTable(&quot;".$row["id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$table_name.
 			"&quot;,&quot;table_list.php&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
 			"<a href='#' onclick='confirmDelete(".$row["alias_id"].",&quot;table_list.php&quot;)'><img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;删除</a></td>";
 	}

@@ -24,7 +24,21 @@ include("conn.php");
 mysql_query("SET NAMES utf8"); 
 ?>
 <!--startprint1-->  
-<div class="Content">        
+<div id="printTitle" style="display:none">
+<?PHP
+$statType = $_REQUEST["statType"];
+
+
+if($statType == "daily")
+{
+	echo "日结汇总";
+}
+else{
+	echo "月结汇总";
+}
+?>
+</div>
+<div id="printContent" class="Content">        
 <table cellpModifying="0" cellspacing="0" border="0" id="table" class="sortable">
 		<thead>
 			<tr style="height: 25px;">
@@ -50,7 +64,6 @@ foreach ($rs_material as $row){
 		<tbody>
 <?php 	  		
 include("conn.php"); 		 		
-$statType = $_REQUEST["statType"];
 $dateType = "";
 if($statType == "daily")
 {		

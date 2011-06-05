@@ -24,6 +24,25 @@ include("conn.php");
 mysql_query("SET NAMES utf8"); 
 ?>
 <!--startprint1-->  
+<div id="printTitle" style="display:none">
+<?PHP
+$statType = $_REQUEST["statType"];
+$viewType = $_REQUEST["viewType"];
+$viewTypeName = "按实收";
+if($viewType == "total_price")
+{
+	$viewTypeName = "按金额";
+}
+
+if($statType == "daily")
+{
+	echo $viewTypeName . "日结汇总";
+}
+else{
+	echo $viewTypeName . "月结汇总";
+}
+?>
+</div>
 <div id="printContent" class="Content">        
 <table cellpModifying="0" cellspacing="0" border="0" id="table" class="sortable">
 		<thead>
@@ -42,8 +61,7 @@ mysql_query("SET NAMES utf8");
 		<tbody>
 <?php 	  		
 include("conn.php"); 		 		
-$statType = $_REQUEST["statType"];
-$viewType = $_REQUEST["viewType"];
+
 if($statType == "daily")
 {		
 	if($viewType == "total_price_2")	
@@ -62,7 +80,7 @@ if($statType == "daily")
 				FROM `order_history_view` as o WHERE is_paid <> 0 AND restaurant_id=" . $_SESSION["restaurant_id"];
 	}
 	else
-		{
+	{
 		$sql = "SELECT o_date,
 				SUM(o_num) AS o_num,
 				Sum(CASE type_value WHEN 1 THEN t_price ELSE 0.00 END) AS '现金',
@@ -75,7 +93,7 @@ if($statType == "daily")
 				(SELECT DATE(order_date) AS o_date, o.type_value,
 				COUNT(id) AS o_num, SUM(total_price) AS t_price, SUM(total_price_2) AS t_price_2 
 				FROM `order_history_view` as o WHERE is_paid <> 0 AND restaurant_id=" . $_SESSION["restaurant_id"];
-			}
+	}
 	
 }
 else
@@ -96,7 +114,7 @@ else
 				FROM `order_history_view` as o WHERE is_paid <> 0 AND restaurant_id=" . $_SESSION["restaurant_id"];
 	}
 	else
-		{
+	{
 		$sql = "SELECT o_date,
 				SUM(o_num) AS o_num,
 				Sum(CASE type_value WHEN 1 THEN t_price ELSE 0.00 END) AS '现金',
@@ -109,7 +127,7 @@ else
 				(SELECT DATE_FORMAT(order_date,'%Y-%m') AS o_date, o.type_value,
 				COUNT(id) AS o_num, SUM(total_price) AS t_price, SUM(total_price_2) AS t_price_2
 				FROM `order_history_view` as o WHERE is_paid <> 0 AND restaurant_id=" . $_SESSION["restaurant_id"];
-			}
+	}
 }
 
 $dateFrom = $_REQUEST["dateFrom"];
@@ -130,8 +148,8 @@ if($statType == "daily")
 else
 {
 	$sql .= (" GROUP BY DATE_FORMAT(order_date,'%Y-%m'),o.type_value) AS b
-			GROUP BY o_date ORDER BY o_date DESC");
-	}		
+				GROUP BY o_date ORDER BY o_date DESC");
+}		
 
 /*echo "<script>alert('" . $_SESSION["total_income"] . "');</script>";*/
 $bh=0;
@@ -176,13 +194,13 @@ echo "<script>addTitle('$total_income');</script>";*/
 	<tfood>
 			<tr style="height: 25px;">							
 				<td colspan="3" style="text-align:right">汇总：</td>
-				<?PHP
-				echo "<td>".number_format($total_1,2)."</td>";
-				echo "<td>".number_format($total_2,2)."</td>";
-				echo "<td>".number_format($total_3,2)."</td>";
-				echo "<td>".number_format($total_4,2)."</td>";
-				echo "<td>".number_format($total_5,2)."</td>";
-				echo "<td>".number_format($total_all,2)."</td>";								
+<?PHP
+echo "<td>".number_format($total_1,2)."</td>";
+echo "<td>".number_format($total_2,2)."</td>";
+echo "<td>".number_format($total_3,2)."</td>";
+echo "<td>".number_format($total_4,2)."</td>";
+echo "<td>".number_format($total_5,2)."</td>";
+echo "<td>".number_format($total_all,2)."</td>";								
 				?>	
 			</tr>
 		</tfood>

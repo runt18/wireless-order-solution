@@ -387,8 +387,12 @@ function viewOrderStat(statType) {
 
 function showOrderStat(statType, dateFrom, dateTo,viewType) {
     var title = "";
+    var viewTypeName = "按实收";
+    if (viewType == "total_price") {
+        viewTypeName = "按金额";
+    }
     if (statType == "daily") {
-        title = "日结汇总";
+        title = viewTypeName + "日结汇总";
         if (dateFrom != "" && dateTo != "") {
             title += "（" + dateFrom + "~" + dateTo + "）";
         }
@@ -400,7 +404,7 @@ function showOrderStat(statType, dateFrom, dateTo,viewType) {
         }
     }
     else {
-        title = "月结汇总";
+        title = viewTypeName + "月结汇总";
         var df = dateFrom.substring(0, dateFrom.lastIndexOf("-"));
         var dt = dateTo.substring(0, dateTo.lastIndexOf("-"));
         if (dateFrom != "" && dateTo != "") {

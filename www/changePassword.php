@@ -25,8 +25,13 @@ if($isChangePassword == "true")
 			}
 			else if($newPassword == $random && $pwd2 != $random)
 				{
-					$sql = "Update restaurant SET pwd2='" .md5($pwd2). "' WHERE id=$restaurant_id";	
-					$_SESSION["pwd2"] = md5($pwd2);	
+					$password2 = md5($pwd2);
+					if($pwd2 == "")
+						{
+						$password2 = "";
+							}
+					$sql = "Update restaurant SET pwd2='" .$password2. "' WHERE id=$restaurant_id";	
+					$_SESSION["pwd2"] = $password2;	
 				}
 				else
 				{

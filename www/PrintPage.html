@@ -10,12 +10,16 @@
 	</head>
 	<body>
 	<object classid="CLSID:8856F961-340A-11D0-A96B-00C04FD705A2" height="0" id="wb" name="wb" width="0"></object> 
+	<div id="divTitle" style="font-family: '微软雅黑';font-size: 24px;text-align: center;padding-bottom:5px">
+	    
+	</div>
 	<div id="divContent">
 	
 	</div>
 	</body>
 	<script type="text/jscript">
 	    document.getElementById("divContent").innerHTML = window.parent.opener.document.getElementById("printContent").innerHTML;
+	    document.getElementById("divTitle").innerText = window.parent.opener.document.getElementById("printTitle").innerHTML;
 	    printpreview();
 	    window.parent.opener.sorter.pagesize = 10; window.parent.opener.sorter.init('table', 0);
 	    window.close();

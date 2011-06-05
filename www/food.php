@@ -59,7 +59,7 @@ if($foodCode != null)
 			{
 				/*$c = $rs;
 				echo "<script>alert('$c');</script>";*/
-				$sql = "UPDATE food SET alias_id=$foodCode, name='$foodName', unit_price=$foodPrice,kitchen=$kitchen,status=$status,pinyin='$pinyin' enabled=1 WHERE id=" . $rs;					
+				$sql = "UPDATE food SET alias_id=$foodCode, name='$foodName', unit_price=$foodPrice,kitchen=$kitchen,status=$status,pinyin='$pinyin', enabled=1 WHERE id=" . $rs;					
 				/*echo "<script>alert('$sql');</script>";*/
 				if($db->Execute($sql))
 				{
@@ -111,6 +111,7 @@ if($deleteId != null)
 		echo "<script>alert('删除失败！');</script>";
 	}
 }
+//echo $sql;
 ?>
 <h1>
 <?php

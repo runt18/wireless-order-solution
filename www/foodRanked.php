@@ -74,6 +74,11 @@ if($ids == null)
 	</form>
 </div>
 <div id="divContent" style="display:none">
+<div id="printTitle" style="display:none">
+<?PHP
+echo "点菜统计";
+?>
+</div>
 <!--startprint1-->    
 <div  id="printContent" class="Content">    
 <table cellpModifying="0" cellspacing="0" border="0" id="table" class="sortable">

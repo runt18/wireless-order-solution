@@ -24,6 +24,11 @@ include("conn.php");
 mysql_query("SET NAMES utf8"); 
 ?>
 <!--startprint1-->  
+<div id="printTitle" style="display:none">
+<?PHP
+echo "分厨汇总";
+?>
+</div>
 <div id="printContent" class="Content">        
 <table cellpModifying="0" cellspacing="0" border="0" id="table" class="sortable">
 		<thead>

@@ -85,31 +85,36 @@ if (window.parent != window)
       <table>
       <tr>
         <td>会员帐号：</td>
-        <td><input type="text" name="username" /></td>
+        <td><input type="text" name="username" style="width:188px" /></td>
+		
       </tr>
       <tr>
         <td>会员密码：</td>
-        <td><input type="password" name="password" /></td>
+        <td><input type="password" name="password" style="width:188px" /></td>
+		
       </tr>
             <tr>
         <td>验证码：</td>
-        <td><input type="text" name="code" class="code" /></td>
+        <td><input type="text" name="code" class="code" style="width:188px" /></td>
+		
       </tr>
       <tr>
-      <td colspan="2" align="right"><img src="button.php" onclick=this.src='button.php?act='+Math.random() style="cursor: pointer;"  title="看不清？点击更换另一个验证码。"/>
+      <td colspan="2" align="right" style="padding-right:5px"><img src="button.php" onclick="this.src='button.php?act='+Math.random()" style="cursor: pointer;"  title="看不清？点击更换另一个验证码。"/>
       </td>
       </tr>
             <tr><td colspan="2" id="save">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" value="1" name="remember" id="remember" /><label 
                     for="remember">&nbsp;&nbsp;请保存我这次的登录信息</label></td></tr>
       <tr>
         <td>&nbsp;</td><td>
-                          <input  id="button" type="submit" value="进入会员中心" class="button"  style="width:143px;" /></td></tr>
+                          <input  id="button" type="submit" onclick="javascript:document.getElementById('loginType').value = 'Web';" value="进入会员中心" class="button"  style="width:85px;" />
+						<input  id="button" type="submit" onclick="javascript:document.getElementById('loginType').value = 'WebTerminal';" value="进入web点菜系统" class="button"  style="width:105px;" /></td></tr>
       
       </table>
     </td>
   </tr>
   </table>
   <input type="hidden" name="act" value="signin" />
+  <input type="hidden" id="loginType" name="loginType" value="Web" />
 </form>
 <script language="JavaScript"> 
   document.forms['theForm'].elements['username'].focus();

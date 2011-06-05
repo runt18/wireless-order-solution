@@ -5,6 +5,8 @@ $password = $_REQUEST['password'];
 $code = strtolower($_REQUEST['code']);
 session_start();
 $code1=strtolower($_SESSION['code']);
+$loginType = $_REQUEST["loginType"];
+
 if ($code != $code1)
 {
 	echo '输入的验证码不符,';	
@@ -14,12 +16,12 @@ if ($code != $code1)
 else
 {
 	include("conn.php"); 
-
+	
 	//	if (!$con)
 	//  	{
 	// 		die('Could not connect: ' . mysql_error());
 	//	  }
-
+	
 	//	mysql_select_db($database, $con);
 	mysql_query("SET NAMES utf8"); //解决MSQL乱码
 	// mysql_close($con);
@@ -38,10 +40,18 @@ else
 		$_SESSION["pwd2"] = $rs["pwd2"];				
 		if($rs["id"] > 10)
 		{
-			header('Location: main.php');
+			$loginType = $_REQUEST["loginType"];
+			if($loginType == "Web")
+			{
+				header('Location: main.php');
+			}
+			else
+			{
+				header('Location: ../web-term/pages/PersonLogin.html?restaurantID='.$_SESSION["restaurant_id"]);
+			}
 		}
 		else
-		{
+		{			
 			$sql = "SELECT restaurant_info FROM restaurant where id = 1";  
 			$rs = $db ->GetOne($sql);
 			$_SESSION["root_restaurant_info"] = $rs;
@@ -54,8 +64,8 @@ else
 		echo '帐号或密码错误,';	
 		echo '<a href="login.php">请重新登录!</a>';
 	}
-
-
+	
+	
 	
 }
 ?>
