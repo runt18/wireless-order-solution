@@ -440,7 +440,8 @@ var checkOutForm = new Ext.form.FormPanel(
 			}, {
 				text : "返回",
 				handler : function() {
-					location.href = "TableSelect.html";
+					var Request = new URLParaQuery();
+					location.href = "TableSelect.html?pin=" + Request["pin"];
 				}
 			} ],
 			listeners : {

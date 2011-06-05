@@ -62,7 +62,14 @@
 							handler : function() {
 								personCountInputWin.hide();
 							}
-						} ]
+						} ],
+				listeners : {
+					show : function(thiz) {
+						//thiz.findById("personCountInput").focus();
+						var f = Ext.get("personCountInput");
+						f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
+					}
+				}
 			});
 
 			// ***************tableSelectNorthPanel******************
@@ -338,7 +345,7 @@
 
 			// *************整体布局*************
 			var dishesOrderImgBut = new Ext.ux.ImageButton({
-				imgPath : "../images/im48x48.png",
+				imgPath : "../images/InsertOrder.png",
 				imgWidth : 50,
 				imgHeight : 50,
 				tooltip : "点菜",
@@ -363,7 +370,7 @@
 			});
 
 			var checkOutImgBut = new Ext.ux.ImageButton({
-				imgPath : "../images/extlogo48.png",
+				imgPath : "../images/PayOrder.png",
 				imgWidth : 50,
 				imgHeight : 50,
 				tooltip : "结账",
@@ -388,7 +395,7 @@
 			});
 
 			var orderDeleteImgBut = new Ext.ux.ImageButton({
-				imgPath : "../images/im48x48.png",
+				imgPath : "../images/DeleteOrder.png",
 				imgWidth : 50,
 				imgHeight : 50,
 				tooltip : "删单",

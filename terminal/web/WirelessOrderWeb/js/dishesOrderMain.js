@@ -50,10 +50,11 @@ function dishOptDeleteHandler(rowIndex) {
 	}
 };
 function dishOptPressHandler(rowIndex) {
+
 	if (dishOrderCurrRowIndex_ != -1) {
-		Ext.Msg.alert("", "已催菜！");
-		orderedStore.reload();
-		dishOrderCurrRowIndex_ = -1;
+		// Ext.Msg.alert("", "已催菜！");
+		// orderedStore.reload();
+		// dishOrderCurrRowIndex_ = -1;
 	}
 
 };
@@ -119,7 +120,7 @@ var dishDeleteImgBut = new Ext.ux.ImageButton({
 	}
 });
 var dishPressImgBut = new Ext.ux.ImageButton({
-	imgPath : "../images/im48x48.png",
+	imgPath : "../images/HurryFood.png",
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : "催菜",
@@ -264,22 +265,27 @@ var orderedForm = new Ext.form.FormPanel(
 					// });
 					// }
 					// }
-					, {
+					,
+					{
 						text : "返回",
 						handler : function() {
+							var Request = new URLParaQuery();
 							if (orderIsChanged == false) {
-								location.href = "TableSelect.html";
+								location.href = "TableSelect.html?pin="
+										+ Request["pin"];
 							} else {
-								Ext.MessageBox.show({
-									msg : "下/改单还未提交，是否确认退出？",
-									width : 300,
-									buttons : Ext.MessageBox.YESNO,
-									fn : function(btn) {
-										if (btn == "yes") {
-											location.href = "TableSelect.html";
-										}
-									}
-								});
+								Ext.MessageBox
+										.show({
+											msg : "下/改单还未提交，是否确认退出？",
+											width : 300,
+											buttons : Ext.MessageBox.YESNO,
+											fn : function(btn) {
+												if (btn == "yes") {
+													location.href = "TableSelect.html?pin="
+															+ Request["pin"];
+												}
+											}
+										});
 							}
 						}
 					} ]
@@ -384,9 +390,11 @@ var dishTasteWindow = new Ext.Window({
 // --------------dishes order east panel-----------------
 // soft key board
 var softKBKeyHandler = function(relateItemId, number) {
+
 	var currValue = dishesOrderEastPanel.findById(relateItemId).getValue();
 	dishesOrderEastPanel.findById(relateItemId).setValue(
-			currValue + "" + number);
+			currValue + ("" + number));
+
 	dishesOrderEastPanel.findById(relateItemId).fireEvent("blur",
 			dishesOrderEastPanel.findById(relateItemId));
 };
@@ -394,7 +402,7 @@ var softKBKeyHandler = function(relateItemId, number) {
 softKeyBoardDO = new Ext.Window({
 	layout : "fit",
 	width : 117,
-	height : 118,
+	height : 142,
 	resizable : false,
 	closeAction : "hide",
 	// x : 41,
@@ -524,6 +532,39 @@ softKeyBoardDO = new Ext.Window({
 								softKBKeyHandler(softKBRelateItemId, "9");
 								dishKeyboardSelect(softKBRelateItemId);
 							}
+						} ]
+					},
+					{
+						layout : "form",
+						width : 30,
+						border : false,
+						items : [ {
+							text : "&nbsp;.",
+							xtype : "button",
+							handler : function() {
+								softKBKeyHandler(softKBRelateItemId, ".");
+								dishKeyboardSelect(softKBRelateItemId);
+							}
+						} ]
+					},
+					{
+						layout : "form",
+						width : 60,
+						border : false,
+						items : [ {
+							text : "&nbsp;删 除&nbsp;",
+							xtype : "button",
+							handler : function() {
+								dishesOrderEastPanel.findById(
+										softKBRelateItemId).setValue("");
+								dishKeyboardSelect(softKBRelateItemId);
+								dishesOrderEastPanel.findById(
+										softKBRelateItemId).fireEvent(
+										"blur",
+										dishesOrderEastPanel
+												.findById(softKBRelateItemId));
+							}
+
 						} ]
 					},
 					{
@@ -700,7 +741,7 @@ var dishesChooseBySpellForm = new Ext.form.FormPanel({
 					labelSeparator : '：',
 					columnWidth : .50,
 					items : [ {
-						xtype : "numberfield",
+						xtype : "textfield",
 						fieldLabel : "数量",
 						name : "orderCountSpell",
 						id : "orderCountSpell",
@@ -764,7 +805,7 @@ var dishesChooseByNumForm = new Ext.form.FormPanel({
 					labelSeparator : '：',
 					columnWidth : .50,
 					items : [ {
-						xtype : "numberfield",
+						xtype : "textfield",
 						fieldLabel : "数量",
 						name : "orderCountNum",
 						id : "orderCountNum",
