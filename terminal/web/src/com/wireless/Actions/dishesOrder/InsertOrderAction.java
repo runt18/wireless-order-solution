@@ -65,17 +65,19 @@ public class InsertOrderAction extends Action implements PinGen {
 			orderToInsert.custom_num = Integer.parseInt(request.getParameter("customNum"));
 			int type = Integer.parseInt(request.getParameter("type"));
 			String orderType = null;
+			byte printType = Reserved.DEFAULT_CONF;
 			if(type == 1){
 				orderType = "下单";
 				orderToInsert.originalTableID = Short.parseShort(request.getParameter("tableID"));				
+				printType = Reserved.PRINT_ORDER_2 | Reserved.PRINT_ORDER_DETAIL_2;
 			}else{
 				orderType = "改单";
 				orderToInsert.originalTableID = Short.parseShort(request.getParameter("originalTableID"));
+				printType |= Reserved.PRINT_EXTRA_FOOD_2 | Reserved.PRINT_CANCELLED_FOOD_2;
 			}
 			orderToInsert.foods = toFoodArray(request.getParameter("foods"));
 			
 			ReqPackage.setGen(this);
-			byte printType = Reserved.PRINT_ORDER_2 | Reserved.PRINT_ORDER_DETAIL_2;
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(orderToInsert, 
 																					 (type == 1) ? Type.INSERT_ORDER : Type.UPDATE_ORDER, 
 																					 printType));
