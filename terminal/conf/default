@@ -1,0 +1,64 @@
+# Below is to configure the AJP parameters
+# Where to find workers.properties	
+JkWorkersFile /etc/libapache2-mod-jk/workers.properties
+# Where to put jk logs
+JkLogFile /var/log/apache2/mod_jk.log
+# Set the jk log level [debug/error/info]
+JkLogLevel error	
+
+<VirtualHost *:80>
+	ServerAdmin webmaster@localhost
+
+	DocumentRoot /home/yzhang/www 
+
+	Alias www_base "/home/yzhang/www"
+
+	<Directory />
+		Options FollowSymLinks
+		AllowOverride None
+	</Directory>
+	<Directory www_base/>
+		Options -Indexes FollowSymLinks MultiViews
+		AllowOverride None
+		Order allow,deny
+		allow from all
+	</Directory>
+
+	# Deny access to the WEB-INF of web-term
+	<Directory /www_base/web-term/WEB-INF/>
+		Options -Indexes FollowSymLinks MultiViews
+		AllowOverride None
+		Order allow,deny
+		deny from all
+	</Directory>
+	
+	# Mount all the servlet request of web-term to tomcat worker
+	JkMount /web-term/*.do ajp13_worker
+
+	ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
+	<Directory "/usr/lib/cgi-bin">
+		AllowOverride None
+		Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
+		Order allow,deny
+		Allow from all
+	</Directory>
+
+	ErrorLog /var/log/apache2/error.log
+
+	# Possible values include: debug, info, notice, warn, error, crit,
+	# alert, emerg.
+	LogLevel warn
+
+	CustomLog /var/log/apache2/access.log combined
+
+    Alias /doc/ "/usr/share/doc/"
+    <Directory "/usr/share/doc/">
+        Options Indexes MultiViews FollowSymLinks
+        AllowOverride None
+        Order deny,allow
+        Deny from all
+        Allow from 127.0.0.0/255.0.0.0 ::1/128
+    </Directory>
+
+</VirtualHost>
+
