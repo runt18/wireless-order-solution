@@ -38,7 +38,7 @@ function editOrder(id, total_price_2, target, type_value, table_id, category_val
     var editType = "editOrder";
     var content = ' <div class="add_foot">' +
                         '<div class="title">' +
-	                        '<div class="title_left"><font class="font" style="width:350px;">修改</font></div>' +
+	                        '<div class="title_left"><font class="font" style="width:350px;">修改(' + id + '号帐单)</font></div>' +
 	                        '<div class="title_right"></div>' +
 	                    '</div>' +
 	                    '<form name="orderForm" action="' + target + '"  method="post" onkeydown="editOrderKeyDown()">' +

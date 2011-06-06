@@ -16,6 +16,8 @@ include("hasLogin.php");
 <script type="text/javascript" src="js/changePassword.js"></script>
 <script type="text/javascript" src="js/mootools.js"></script>
 <script type="text/javascript" src="js/date.js"></script>
+</head>
+<body>
 <?php
 include("conn.php");
 $deleteId = $_POST["deleteId"];
@@ -43,28 +45,42 @@ if($editType == "editOrder")
 	$type_value = $_POST["sel_type"];
 	$table_id = $_POST["table_id"];
 	$sel_category = $_POST["sel_category"];
+	$validate = true;	
 	if($table_id != "-")
 	{
-		$sql = "UPDATE `order` SET total_price_2 = $total_price_2,type=$type_value,table_id=$table_id,category=$sel_category WHERE id=$id";
+		$sql1 = "SELECT * FROM `table` WHERE alias_id=$table_id AND restaurant_id=".$_SESSION["restaurant_id"];	
+		
+		$rs = $db ->GetOne($sql1);
+		if($rs)
+		{
+			$sql = "UPDATE `order` SET total_price_2 = $total_price_2,type=$type_value,table_id=$table_id,category=$sel_category WHERE id=$id";
+			
+		}
+		else
+		{
+			echo "<script>alert('台号不存在，请输入其它台号！');editOrder('$id','$total_price_2','order.php','$type_value','$table_id','$sel_category');</script>";
+			$validate = false;	
+		}		
 	}
 	else
 	{
 		$sql = "UPDATE `order` SET total_price_2 = $total_price_2,type=$type_value,category=$sel_category WHERE id=$id";	
 	}
-	
-	if($db->Execute($sql))
-	{			
-		echo "<script>alert('修改成功！');</script>";
-	}	
-	else{
-		echo "<script>alert('修改失败！');</script>";
-	}	
+	if($validate)
+	{
+		if($db->Execute($sql))
+		{			
+			echo "<script>alert('修改成功！');</script>";
+		}	
+		else{
+			echo "<script>alert('修改失败！');</script>";
+		}	
+	}
 }
 ?>
-</head>
-<body>
+
 <?php
-//echo $sql;
+//echo $sql1;
 include("changePassword.php"); 
 $editType = $_POST["editType"];
 if($editType == "dailyCheckOut")
