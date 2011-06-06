@@ -4,14 +4,8 @@
 			Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
 			Ext.QuickTips.init();
 
-			// emplComboData = [ [ "0x1", "一般" ], [ "0x2", "会员" ] ];
-			// alert(emplComboData);
-			// var emplStore = new Ext.data.SimpleStore({
-			// fields : [ "value", "text" ],
-			// data : emplComboData
-			// });
-
-			var emplStore = new Ext.data.Store({
+			emplComboData = [ [ "XXX", "XXX" ] ];
+			emplStore = new Ext.data.Store({
 				proxy : new Ext.data.MemoryProxy(emplComboData),
 				reader : new Ext.data.ArrayReader({}, [ {
 					name : "value"
@@ -20,65 +14,94 @@
 				} ])
 			});
 
-			var centerPanel = new Ext.Panel(
+			emplStore.load();
+
+			var staffForm = new Ext.form.FormPanel(
 					{
-						region : "center",
+						layout : "form",
+						id : "staffFrom",
 						frame : true,
+						labelSeparator : "：",
+						style : "margin:0 auto",
+						title : "<div style='font-size:18px;padding-left:2px'>员工登陆<div>",
+						collapsible : false,
+						buttonAlign : "center",
+						labelWidth : 60,
+						width : 280,
+						height : 140,
+						defaults : {
+							width : 200
+						},
 						items : [
 								{
-									html : "<div>&nbsp;&nbsp;</div>",
-									id : "placeHolderCOF1",
-									height : 200
+									xtype : "combo",
+									fieldLabel : "<img src='../images/user.png'/ style='float:left'>&nbsp;姓名",
+									id : "empName",
+									forceSelection : true,
+									store : emplStore,
+									valueField : "value",
+									displayField : "text",
+									typeAhead : true,
+									mode : "local",
+									triggerAction : "all",
+									selectOnFocus : true,
+									blankText : '请选择一位员工',
+									emptyText : '请选择',
+									allowBlank : false
 								},
 								{
-									layout : "form",
-									frame : true,
-									labelSeparator : "：",
-									style : "margin:0 auto",
-									title : "<div style='font-size:18px;padding-left:2px'>员工登陆<div>",
-									collapsible : false,
-									buttonAlign : "center",
-									labelWidth : 60,
-									width : 280,
-									height : 140,
-									defaults : {
-										width : 200
-									},
-									items : [
-											{
-												xtype : "combo",
-												fieldLabel : "<img src='../images/user.png'/ style='float:left'>&nbsp;姓名",
-												id : "empName",
-												forceSelection : true,
-												// value : "一般",
-												store : emplStore,
-												valueField : "value",
-												displayField : "text",
-												typeAhead : true,
-												mode : "local",
-												triggerAction : "all",
-												selectOnFocus : true,
-												allowBlank : false
-											},
-											{
-												xtype : "textfield",
-												inputType : "password",
-												fieldLabel : "<img src='../images/password.png' style='float:left'/>&nbsp;密码",
-												id : "empPassword"
-											} ],
-									buttons : [ {
-										text : '提交'
-
-									}, {
-										text : '重置'
-									} ]
+									xtype : "textfield",
+									inputType : "password",
+									fieldLabel : "<img src='../images/password.png' style='float:left'/>&nbsp;密码",
+									id : "empPassword"
 								} ],
-						listeners : {
-							render : function(thiz) {
-								emplStore.reload();
-							}
-						}
+						buttons : [
+								{
+									text : '提交',
+									handler : function() {
+										if (staffForm.getForm().isValid()) {
+											// check the password
+											var pin = staffForm.findById(
+													"empName").getValue();
+											var password = "";
+											for ( var i = 0; i < emplData.length; i++) {
+												if (emplData[i][0] == pin) {
+													password = emplData[i][2];
+												}
+											}
+											var passwordInput = staffForm
+													.findById("empPassword")
+													.getValue();
+											var pwdTrans = MD5(passwordInput);
+											if (password == pwdTrans) {
+												location.href = "TableSelect.html?pin="
+														+ pin;
+											} else {
+												Ext.MessageBox.show({
+													msg : "姓名或密码错误！",
+													width : 300,
+													buttons : Ext.MessageBox.OK
+												});
+											}
+										}
+									}
+								}, {
+									text : '重置',
+									handler : function() {
+										staffForm.getForm().reset();
+									}
+								} ]
 					});
+
+			var centerPanel = new Ext.Panel({
+				region : "center",
+				frame : true,
+				items : [ {
+					html : "<div>&nbsp;&nbsp;</div>",
+					id : "placeHolderCOF1",
+					height : 200
+				}, staffForm ]
+			});
 
 			var viewport = new Ext.Viewport(
 					{

@@ -65,7 +65,7 @@
 						} ],
 				listeners : {
 					show : function(thiz) {
-						//thiz.findById("personCountInput").focus();
+						// thiz.findById("personCountInput").focus();
 						var f = Ext.get("personCountInput");
 						f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
 					}
@@ -471,7 +471,8 @@
 						items : [
 								{
 									region : "north",
-									html : "<div style='padding:10px; background-color:#A9D0F5'><h4 style='font-size:150%'>无线点餐网页终端<h4></div>",
+									bodyStyle : "background-color:#A9D0F5",
+									html : "<h4 style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4><a href='PersonLogin.html' style='float:right;font-size:12px;padding:30px;'>返回员工登陆</a>",
 									height : 50,
 									margins : '0 0 5 0'
 								},

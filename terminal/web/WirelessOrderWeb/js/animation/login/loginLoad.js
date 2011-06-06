@@ -34,6 +34,7 @@ function loginOnLoad() {
 			if (resultJSON.success == true) {
 				var dataInfo = resultJSON.data;
 				var staffList = dataInfo.split("，");
+				emplData = [];
 				for ( var i = 0; i < staffList.length; i++) {
 					var staffInfo = staffList[i].substr(1,
 							staffList[i].length - 2).split(',');
@@ -43,14 +44,14 @@ function loginOnLoad() {
 					]);
 				}
 
+				emplComboData.length = 0;
 				for ( var i = 0; i < emplData.length; i++) {
 					emplComboData.push([ emplData[i][0],// pin
 					emplData[i][1] // 姓名
 					]);
 				}
 
-				// alert(emplComboData);
-				// emplStore.reload();
+				emplStore.reload();
 			} else {
 				var dataInfo = resultJSON.data;
 				Ext.MessageBox.show({
