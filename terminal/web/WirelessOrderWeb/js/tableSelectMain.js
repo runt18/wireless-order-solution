@@ -53,7 +53,8 @@
 									location.href = "OrderMain.html?tableNbr="
 											+ selectedTable + "&personCount="
 											+ inputCount
-											+ "&tableStat=free&pin=" + pin;
+											+ "&tableStat=free&pin=" + pin
+											+ "&restaurantID=" + restaurantID;
 
 								}
 							}
@@ -361,7 +362,8 @@
 							location.href = "OrderMain.html?tableNbr="
 									+ selectedTable + "&personCount="
 									+ tableStatusListTS[tableIndex][1]
-									+ "&tableStat=used&pin=" + pin;
+									+ "&tableStat=used&pin=" + pin
+									+ "&restaurantID=" + restaurantID;
 						} else {
 							personCountInputWin.show();
 						}
@@ -388,7 +390,8 @@
 							location.href = "CheckOut.html?tableNbr="
 									+ selectedTable + "&personCount="
 									+ tableStatusListTS[tableIndex][1]
-									+ "&pin=" + pin;
+									+ "&pin=" + pin + "&restaurantID="
+									+ restaurantID;
 						}
 					}
 				}
@@ -472,7 +475,9 @@
 								{
 									region : "north",
 									bodyStyle : "background-color:#A9D0F5",
-									html : "<h4 style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4><a href='PersonLogin.html' style='float:right;font-size:12px;padding:30px;'>返回员工登陆</a>",
+									html : "<h4 style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4><a href='PersonLogin.html?restaurantID="
+											+ restaurantID
+											+ "' style='float:right;font-size:12px;padding:30px;'>返回员工登陆</a>",
 									height : 50,
 									margins : '0 0 5 0'
 								},

@@ -20,6 +20,9 @@ function checkOutOnLoad() {
 
 	// 1,update table status
 	var Request = new URLParaQuery();
+	
+	restaurantID = Request["restaurantID"];
+	
 	var tableNum = Request["tableNbr"];
 	var persCount = Request["personCount"];
 	document.getElementById("tblNbrDivTS").innerHTML = tableNum

@@ -75,7 +75,9 @@
 											var pwdTrans = MD5(passwordInput);
 											if (password == pwdTrans) {
 												location.href = "TableSelect.html?pin="
-														+ pin;
+														+ pin
+														+ "&restaurantID="
+														+ restaurantID;
 											} else {
 												Ext.MessageBox.show({
 													msg : "姓名或密码错误！",

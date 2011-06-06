@@ -228,7 +228,9 @@ var orderedForm = new Ext.form.FormPanel(
 																fn : function() {
 																	var Request = new URLParaQuery();
 																	location.href = "TableSelect.html?pin="
-																			+ Request["pin"];
+																			+ Request["pin"]
+																			+ "&restaurantID="
+																			+ restaurantID;
 																}
 															});
 												} else {
@@ -272,7 +274,8 @@ var orderedForm = new Ext.form.FormPanel(
 							var Request = new URLParaQuery();
 							if (orderIsChanged == false) {
 								location.href = "TableSelect.html?pin="
-										+ Request["pin"];
+										+ Request["pin"] + "&restaurantID="
+										+ restaurantID;
 							} else {
 								Ext.MessageBox
 										.show({
@@ -282,7 +285,9 @@ var orderedForm = new Ext.form.FormPanel(
 											fn : function(btn) {
 												if (btn == "yes") {
 													location.href = "TableSelect.html?pin="
-															+ Request["pin"];
+															+ Request["pin"]
+															+ "&restaurantID="
+															+ restaurantID;
 												}
 											}
 										});

@@ -98,9 +98,14 @@ function URLParaQuery() {
 	}
 }
 
+
+
 function tableStuLoad() {
 	// update table status
 	var Request = new URLParaQuery();
+	
+	restaurantID = Request["restaurantID"];
+	
 	var tableNbr = Request["tableNbr"];
 	var personCount = Request["personCount"];
 	document.getElementById("tblNbrDivTS").innerHTML = tableNbr

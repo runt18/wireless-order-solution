@@ -19,7 +19,12 @@ function URLParaQuery() {
 function loginOnLoad() {
 
 	var Request = new URLParaQuery();
-	// var restaurantID = Request["restaurantID"];
+	restaurantID = Request["restaurantID"];
+
+//	// for local test
+//	if (restaurantID == undefined) {
+//		restaurantID = "11";
+//	}
 
 	// emplData: [pin，姓名，密码]
 	// 后台格式：{success:true,

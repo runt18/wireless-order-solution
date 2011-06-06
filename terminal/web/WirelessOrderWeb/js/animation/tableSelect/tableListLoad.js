@@ -1,24 +1,4 @@
-﻿// 从url获取当前桌信息
-function URLParaQuery() {
-	var name, value, i;
-	var str = location.href;
-	var num = str.indexOf("?")
-	str = str.substr(num + 1);
-	var arrtmp = str.split("&");
-	for (i = 0; i < arrtmp.length; i++) {
-		num = arrtmp[i].indexOf("=");
-		if (num > 0) {
-			name = arrtmp[i].substring(0, num);
-			value = arrtmp[i].substr(num + 1);
-			this[name] = value;
-		}
-	}
-}
-
-var Request = new URLParaQuery();
-pin = Request["pin"];
-
-// keyboard select handler
+﻿// keyboard select handler
 var tableKeyboardSelect = function() {
 	var curTableNbr = Ext.getCmp("tableNumber").getValue() + "";
 	var hasTable = false;
@@ -80,6 +60,9 @@ function tableSelectOnLoad() {
 	// tableStatusListTS.push( [ "1081", 2, "占用" ]);
 	// tableStatusListTS.push( [ "1082", 5, "占用" ]);
 	// tableStatusListTS.push( [ "1083", 2, "空桌" ]);
+
+	var Request = new URLParaQuery();
+	pin = Request["pin"];
 
 	Ext.Ajax
 			.request({
@@ -222,7 +205,9 @@ function tableSelectOnLoad() {
 																			+ "&personCount="
 																			+ tableStatusListTS[tableIndex][1]
 																			+ "&pin="
-																			+ pin;
+																			+ pin
+																			+ "&restaurantID="
+																			+ restaurantID;
 																}
 															});
 										});

@@ -409,41 +409,49 @@ var checkOutForm = new Ext.form.FormPanel(
 							} ]
 						} ]
 					} ],
-			buttons : [ {
-				text : "现金结账",
-				handler : function() {
-					paySubmit(1);
-				}
-			}, {
-				text : "刷卡结账",
-				handler : function() {
-					paySubmit(2);
-				}
-			}, {
-				text : "会员卡结账",
-				// hidden : true,
-				handler : function() {
-					paySubmit(3);
-				}
-			}, {
-				text : "签单",
-				// hidden : true,
-				handler : function() {
-					paySubmit(4);
-				}
-			}, {
-				text : "挂账",
-				// hidden : true,
-				handler : function() {
-					paySubmit(5);
-				}
-			}, {
-				text : "返回",
-				handler : function() {
-					var Request = new URLParaQuery();
-					location.href = "TableSelect.html?pin=" + Request["pin"];
-				}
-			} ],
+			buttons : [
+					{
+						text : "现金结账",
+						handler : function() {
+							paySubmit(1);
+						}
+					},
+					{
+						text : "刷卡结账",
+						handler : function() {
+							paySubmit(2);
+						}
+					},
+					{
+						text : "会员卡结账",
+						// hidden : true,
+						handler : function() {
+							paySubmit(3);
+						}
+					},
+					{
+						text : "签单",
+						// hidden : true,
+						handler : function() {
+							paySubmit(4);
+						}
+					},
+					{
+						text : "挂账",
+						// hidden : true,
+						handler : function() {
+							paySubmit(5);
+						}
+					},
+					{
+						text : "返回",
+						handler : function() {
+							var Request = new URLParaQuery();
+							location.href = "TableSelect.html?pin="
+									+ Request["pin"] + "&restaurantID="
+									+ restaurantID;
+						}
+					} ],
 			listeners : {
 				afterlayout : function(thiz) {
 					checkOutGrid.setHeight(thiz.getInnerHeight() - 30);

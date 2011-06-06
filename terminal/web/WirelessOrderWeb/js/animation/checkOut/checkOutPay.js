@@ -23,7 +23,9 @@
 					buttons : Ext.MessageBox.OK,
 					fn : function() {
 						var Request = new URLParaQuery();
-						location.href = "TableSelect.html?pin=" + Request["pin"];
+						location.href = "TableSelect.html?pin="
+								+ Request["pin"] + "&restaurantID="
+								+ restaurantID;
 					}
 				});
 			} else {
