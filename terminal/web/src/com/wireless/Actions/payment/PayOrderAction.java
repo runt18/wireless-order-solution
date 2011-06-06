@@ -50,8 +50,8 @@ public class PayOrderAction extends Action implements PinGen{
 			 * payManner : "1" means "现金"
 			 * 			   "2" means "刷卡"
 			 * 			   "3" means "会员卡"
-			 * 			   "4" means "签单"
-			 * 			   "5" means "挂账"
+			 * 			   "4" means "挂账"
+			 * 			   "5" means "签单"
 			 * memberID : the id to member, 
 			 * 			  this parameter is optional, 
 			 * 			  NO need to pass this parameter if pay in normal 
