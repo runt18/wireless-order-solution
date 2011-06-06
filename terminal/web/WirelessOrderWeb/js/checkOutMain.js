@@ -433,14 +433,14 @@ var checkOutForm = new Ext.form.FormPanel(
 						text : "签单",
 						// hidden : true,
 						handler : function() {
-							paySubmit(4);
+							paySubmit(5);
 						}
 					},
 					{
 						text : "挂账",
 						// hidden : true,
 						handler : function() {
-							paySubmit(5);
+							paySubmit(4);
 						}
 					},
 					{
