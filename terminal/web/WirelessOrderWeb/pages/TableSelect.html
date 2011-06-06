@@ -34,13 +34,35 @@
 
 
 <script type="text/javascript">
+	//从url获取当前桌信息
+	function URLParaQuery() {
+		var name, value, i;
+		var str = location.href;
+		var num = str.indexOf("?")
+		str = str.substr(num + 1);
+		var arrtmp = str.split("&");
+		for (i = 0; i < arrtmp.length; i++) {
+			num = arrtmp[i].indexOf("=");
+			if (num > 0) {
+				name = arrtmp[i].substring(0, num);
+				value = arrtmp[i].substr(num + 1);
+				this[name] = value;
+			}
+		}
+	}
+
 	// global variable
 	var tableStatusListTS = []; // tables' infomation
 	var selectedTable = ""; // the current selected table number("" if null)
 	var softKeyBoardTS = null; // table select soft key board
-	var personCountInputWin = null // person count input pop window
+	var personCountInputWin = null
+	// person count input pop window
 
 	var pin = ""; // the restaurant pin 
+
+	var Request = new URLParaQuery();
+	var restaurantID = "";
+	restaurantID = Request["restaurantID"];
 </script>
 
 <script type="text/javascript"
@@ -53,52 +75,53 @@
 
 </head>
 <body onload="tableSelectOnLoad()">
-<script type="text/javascript" src="../extjs/examples.js"></script>
+	<script type="text/javascript" src="../extjs/examples.js"></script>
 
-<!------------------- layout ------------------------>
-<div id="west"></div>
-<div id="north">
-<p>icons here.</p>
-</div>
-<div id="south"></div>
-<div id="west"></div>
-<div id="center"></div>
-<div id="temp">
-<p>建设中......</p>
-</div>
+	<!------------------- layout ------------------------>
+	<div id="west"></div>
+	<div id="north">
+		<p>icons here.</p>
+	</div>
+	<div id="south"></div>
+	<div id="west"></div>
+	<div id="center"></div>
+	<div id="temp">
+		<p>建设中......</p>
+	</div>
 
-<!------------------- table list ------------------------>
-<div id="tableDisplay"
-	style="padding: 10px; margin: 0 auto; width: 1000px;">
-<div class="side_btn" id="left_btn"></div>
-<div id="wrap">
-<div id="list"></div>
-</div>
-<div class="side_btn" id="right_btn"></div>
-</div>
-<div id="tableListPageCount" class="pageCount"><span
-	id="pageIndexTL"></span> <span id="totalCountTL"></span></div>
+	<!------------------- table list ------------------------>
+	<div id="tableDisplay"
+		style="padding: 10px; margin: 0 auto; width: 1000px;">
+		<div class="side_btn" id="left_btn"></div>
+		<div id="wrap">
+			<div id="list"></div>
+		</div>
+		<div class="side_btn" id="right_btn"></div>
+	</div>
+	<div id="tableListPageCount" class="pageCount">
+		<span id="pageIndexTL"></span> <span id="totalCountTL"></span>
+	</div>
 
 
-<!--   table status    -->
-<div id="tableStatusTS"><img title="桌号"
-	src="../images/TableID.png" style="float: left;" />
-<div id="tblNbrDivTS" class="tableStatusChar">000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-<img title="人数" src="../images/DinnerAmount.png" style="float: left;" />
-<div id="perCountDivTS" class="tableStatusChar">0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-<img title="状态" src="../images/TableStatus.png" style="float: left;" />
-<div id="tblStatusDivTS" class="tableStatusChar">空桌</div>
-</div>
+	<!--   table status    -->
+	<div id="tableStatusTS">
+		<img title="桌号" src="../images/TableID.png" style="float: left;" />
+		<div id="tblNbrDivTS" class="tableStatusChar">000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+		<img title="人数" src="../images/DinnerAmount.png" style="float: left;" />
+		<div id="perCountDivTS" class="tableStatusChar">0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+		<img title="状态" src="../images/TableStatus.png" style="float: left;" />
+		<div id="tblStatusDivTS" class="tableStatusChar">空桌</div>
+	</div>
 
-<!--    table summary infomation   -->
-<div id="tableSumInfo"><img title="总台数"
-	src='../images/table-idle.png' style='float: left;' />
-<div id="allTblDivTS" class="tableStatusChar">000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-<img title="就餐台数" src='../images/table-total.png' style='float: left;' />
-<div id="usedTbltDivTS" class="tableStatusChar">000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-<img title="空闲台数" src='../images/table-used.png' style='float: left;' />
-<div id="freeTblDivTS" class="tableStatusChar">000</div>
-</div>
+	<!--    table summary infomation   -->
+	<div id="tableSumInfo">
+		<img title="总台数" src='../images/table-idle.png' style='float: left;' />
+		<div id="allTblDivTS" class="tableStatusChar">000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+		<img title="就餐台数" src='../images/table-total.png' style='float: left;' />
+		<div id="usedTbltDivTS" class="tableStatusChar">000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+		<img title="空闲台数" src='../images/table-used.png' style='float: left;' />
+		<div id="freeTblDivTS" class="tableStatusChar">000</div>
+	</div>
 
 
 
