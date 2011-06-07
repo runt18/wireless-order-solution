@@ -2,6 +2,12 @@ SET NAMES utf8;
 USE `wireless_order_db` ;
 
 ALTER TABLE `restaurant`
+ADD `tele1` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'One of the telephones to this restaurant.'; 
+ALTER TABLE `restaurant`
+ADD `tele2` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'One of the telephones to this restaurant.';
+ALTER TABLE `restaurant`
+ADD `address` VARCHAR(70) NOT NULL DEFAULT '' COMMENT 'The address to this restaurant.';
+ALTER TABLE `restaurant`
 ADD `pwd2` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the 2nd password to this restaurant, used to grant permission to change the order';
 
 ALTER TABLE `order`
