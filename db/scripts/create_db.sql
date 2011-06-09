@@ -133,7 +133,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`terminal` (
   `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this terminal' ,
   `pin` INT UNSIGNED NOT NULL COMMENT 'the pin to identify the phone' ,
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'indicates the terminal belong to which restaurant' ,
-  `model_id` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the model to this terminal.\nBlackBerry : 0x00\nAndroid : 0x01\nStaff : 0xFF' ,
+  `model_id` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the model to this terminal.\nBlackBerry : 0x00\nAndroid : 0x01\nAdmin : 0xFE\nStaff : 0xFF' ,
   `model_name` VARCHAR(45) NULL COMMENT 'the model name to the phone' ,
   `owner_name` VARCHAR(45) NOT NULL COMMENT 'the owner name of this terminal' ,
   `expire_date` DATE NULL DEFAULT NULL COMMENT 'the expired date to the terminal,\nNULL means never expired,' ,
