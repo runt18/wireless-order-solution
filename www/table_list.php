@@ -34,38 +34,22 @@ if($editType == "addTable")
 		$id *= 2;
 	}
 	$tableId = $id + $alias_id;
-	$sql = "SELECT * FROM `table` WHERE enabled =1 AND id = $tableId";
+	$sql = "SELECT * FROM `table` WHERE id = $tableId";
 	$rs = $db ->GetOne($sql);
 	if($rs)
 	{
 		echo "<script>alert('餐桌已存在！');editTable('','$alias_id','$name','table_list.php')</script>";
 	}
 	else
-	{
-		$sql = "SELECT id FROM `table` WHERE enabled =0 AND id = $tableId";
-		$rs = $db ->GetOne($sql);
-		if($rs)
+	{		
+		$sql = "INSERT INTO `table`(id,alias_id,restaurant_id,enabled,name) VALUES($tableId,$alias_id,$restaurant_id,'$name')";	
+		if($db->Execute($sql))
 		{
-			$sql = "UPDATE `table` SET enabled=1,name='$name' WHERE id=$rs";
-			if($db->Execute($sql))
-			{
-				echo "<script>alert('保存成功！');</script>";
-			}	
-			else{
-				echo "<script>alert('保存失败！');</script>";
-			}
-		}		
-		else
-		{
-			$sql = "INSERT INTO `table`(id,alias_id,restaurant_id,enabled,name) VALUES($tableId,$alias_id,$restaurant_id,1,'$name')";	
-			if($db->Execute($sql))
-			{
-				echo "<script>alert('保存成功！');</script>";
-			}
-			else{
-				echo "<script>alert('保存失败！');</script>";
-			}
+			echo "<script>alert('保存成功！');</script>";
 		}
+		else{
+			echo "<script>alert('保存失败！');</script>";
+		}		
 	}
 }
 else if($editType == "editTable")
@@ -83,11 +67,11 @@ else if($editType == "editTable")
 if($editType == "deleteTable")
 {		
 	$deleteId = $_POST["deleteId"];
-	$sql = "SELECT id FROM `table` WHERE enabled=1 AND alias_id=$deleteId AND restaurant_id=$restaurant_id";	
+	$sql = "SELECT id FROM `table` WHERE alias_id=$deleteId AND restaurant_id=$restaurant_id";	
 	$rs = $db ->GetOne($sql);
 	if($rs)
 	{
-		$sql = "UPDATE `table` SET enabled=0 WHERE id=$rs";	
+		$sql = "DELETE FROM `table` WHERE id=$rs";	
 		if($db->Execute($sql))
 		{
 			echo "<script>alert('删除成功！');</script>";
@@ -104,7 +88,7 @@ if($editType == "deleteTable")
 //echo $sql;
 ?>
 <h1>
-<span class="action-span"><a href="#" onclick="editTable('','','','table_list.php');">添加餐桌</a></span>  <span class="action-span1">e点通会员中心</span>
+<span class="action-span"><a href="#" onclick="editTable('','','','table_list.php');">添加餐桌</a></span>
 <span class="action-span"><a href="#" onclick="javascript:window.location.href = 'table.php'">图标显示</a></span>  
 <span class="action-span1">e点通会员中心</span>
 <span id="search_id" class="action-span2">&nbsp;- 餐台信息 </span>
@@ -151,7 +135,7 @@ $sql = "SELECT od.id,t.id AS table_id,t.alias_id,t.name,CASE is_paid WHEN 0 THEN
 		
 		(SELECT MAX(id) AS OrderId,table_id,MAX(restaurant_id) AS restaurant_id".
 	" FROM `order` WHERE `order`.`restaurant_id`=".$_SESSION["restaurant_id"]." GROUP BY `order`.table_id) AS o ON t.alias_id = o.table_id ".
-	" LEFT OUTER JOIN `order_view` od ON o.OrderId = od.id WHERE t.enabled=1 AND t.restaurant_id=" . $_SESSION["restaurant_id"] ;			
+	" LEFT OUTER JOIN `order_view` od ON o.OrderId = od.id WHERE t.restaurant_id=" . $_SESSION["restaurant_id"] ;			
 switch ($xm)
 {
 	case "alias_id":
@@ -201,7 +185,7 @@ foreach ($rs as $row){
 				<a href='#' onclick='showOrderDetail(&quot;".$row["table_id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["order_date"]."&quot;,&quot;".$row["total_price"].
 			"&quot;,&quot;".$row["num"]."&quot;,&quot;".$row["foods"]."&quot;,&quot;".$row["is_paid"]."&quot;,&quot;".$row["waiter"]."&quot;,&quot;".$row["type_name"]."&quot;,&quot;".$row["total_price_2"]."&quot;,&quot;".$row["category_name"]."&quot;,&quot;".$row["comment"]."&quot;)'>
 				<img src='images/View.png'  height='16' width='14' border='0'/>&nbsp;查看</a>&nbsp;&nbsp;&nbsp;&nbsp;
-				<a href='#' onclick='editTable(&quot;".$row["id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$table_name.
+				<a href='#' onclick='editTable(&quot;".$row["table_id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$table_name.
 			"&quot;,&quot;table_list.php&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
 			"<a href='#' onclick='confirmDelete(".$row["alias_id"].",&quot;table_list.php&quot;)'><img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;删除</a></td>";
 	}

@@ -43,7 +43,7 @@ if($foodCode != null)
 		}
 		$foodId = $id + $foodCode;//4 << 32 | $foodCode;
 		
-		$sql = "SELECT * FROM food WHERE id=$foodId AND enabled=1";
+		$sql = "SELECT * FROM food WHERE id=$foodId";
 		/*echo "<script>alert('$sql');</script>";*/
 		$rs = $db ->GetOne($sql);
 		if($rs)
@@ -51,36 +51,16 @@ if($foodCode != null)
 			echo "<script>alert('编号已存在！');editFood('','$foodCode','$foodName','$foodPrice','$kitchen',$status,'$pinyin');</script>";
 		}
 		else
-		{
-			$sql = "SELECT id FROM food WHERE id=$foodId AND enabled=0" ;
+		{			
+			$sql = "INSERT INTO food(id,alias_id,`name`,unit_price,restaurant_id,kitchen,status,pinyin) VALUES($foodId,$foodCode,'$foodName',$foodPrice,$restaurant_id,$kitchen,$status,'$pinyin')";
 			/*echo "<script>alert('$sql');</script>";*/
-			$rs = $db ->GetOne($sql);
-			if($rs)
+			if($db->Execute($sql))
 			{
-				/*$c = $rs;
-				echo "<script>alert('$c');</script>";*/
-				$sql = "UPDATE food SET alias_id=$foodCode, name='$foodName', unit_price=$foodPrice,kitchen=$kitchen,status=$status,pinyin='$pinyin', enabled=1 WHERE id=" . $rs;					
-				/*echo "<script>alert('$sql');</script>";*/
-				if($db->Execute($sql))
-				{
-					echo "<script>alert('保存成功！');</script>";
-				}
-				else{
-					echo "<script>alert('保存失败！');</script>";
-				}
+				echo "<script>alert('保存成功！');</script>";
 			}
-			else
-			{
-				$sql = "INSERT INTO food(id,alias_id,`name`,unit_price,restaurant_id,kitchen,status,enabled,pinyin) VALUES($foodId,$foodCode,'$foodName',$foodPrice,$restaurant_id,$kitchen,$status,1,'$pinyin')";
-				/*echo "<script>alert('$sql');</script>";*/
-				if($db->Execute($sql))
-				{
-					echo "<script>alert('保存成功！');</script>";
-				}
-				else{
-					echo "<script>alert('保存失败！');</script>";
-				}
-			}
+			else{
+				echo "<script>alert('保存失败！');</script>";
+			}			
 		}
 	}
 	else//如果是编辑
@@ -102,7 +82,7 @@ if($deleteId != null)
 {
 	/*$sql = "DELETE FROM order_food WHERE food_id=$deleteId";*/
 	/*$db->Execute($sql);*/
-	$sql = "UPDATE food SET enabled=0 WHERE id=$deleteId";	
+	$sql = "DELETE FROM food WHERE id=$deleteId";	
 	if($db->Execute($sql))
 	{
 		echo "<script>alert('删除成功！');</script>";
@@ -189,7 +169,7 @@ $xm=$_REQUEST["keyword_type"];
 $ct=$_REQUEST["condition_type"];
 $kw=$_REQUEST["keyword"]; 
 $kitchen_value=$_REQUEST["kitchen"];
-$sql = "SELECT f.*,CASE WHEN k.name IS NULL THEN '空' ELSE k.name END AS kitchen,f.kitchen AS kitchen_value FROM food f LEFT JOIN kitchen k ON f.kitchen = k.alias_id AND f.restaurant_id = k.restaurant_id WHERE f.enabled=1 AND f.restaurant_id=" . $_SESSION["restaurant_id"];		
+$sql = "SELECT f.*,CASE WHEN k.name IS NULL THEN '空' ELSE k.name END AS kitchen,f.kitchen AS kitchen_value FROM food f LEFT JOIN kitchen k ON f.kitchen = k.alias_id AND f.restaurant_id = k.restaurant_id WHERE f.restaurant_id=" . $_SESSION["restaurant_id"];		
 switch ($xm)
 {
 	case "is_no":
@@ -233,21 +213,26 @@ mysql_query("SET NAMES utf8");
 $rs = $db->GetAll($sql);
 foreach ($rs as $row){
 	$bh=$bh+1;
+	$py = "-";
+	if($row["pinyin"] != null)
+	{
+		$py = $row["pinyin"];
+	}
 	$status = $row["status"];
 	echo "<tr>";
 	echo "<td>" .$row["alias_id"] ."</td>";
 	echo "<td>" .$row["name"];
 	if (($status & 1) != 0) {
-        echo "  特" ;
-    }
-    if (($status & 2) != 0) {
-        echo "  荐" ;
-    }
-    if (($status & 4) != 0) {
-        echo "  停" ;
-    }
+		echo "  特" ;
+	}
+	if (($status & 2) != 0) {
+		echo "  荐" ;
+	}
+	if (($status & 4) != 0) {
+		echo "  停" ;
+	}
 	echo "</td>";
-	echo "<td>" .$row["pinyin"] ."</td>";
+	echo "<td>" .$py ."</td>";
 	echo "<td>" .$row["unit_price"] ."</td>";
 	echo "<td>" .$row["kitchen"] ."</td>";
 	echo "<td><a href='#' onclick='editFood(&quot;".$row["id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["name"]."&quot;,&quot;".$row["unit_price"]."&quot;,&quot;".$row["kitchen_value"]."&quot;,&quot;".$kitchens.

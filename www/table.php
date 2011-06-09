@@ -5,7 +5,7 @@
 include("hasLogin.php"); 
 ?>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta http-equiv="refresh"content="30;url=table.php">
+<meta http-equiv="refresh" content="30">
 <title>e点通－会员中心</title>
 <link rel="stylesheet" type="text/css" href="css/jquery-ui-1.8.5.custom.css"/>
 <link rel="stylesheet" href="css/main.css" />
@@ -33,6 +33,7 @@ $(function(){
     });
     
 });
+
 </script>
 
 
@@ -55,38 +56,22 @@ if($editType == "addTable")
 		$id *= 2;
 	}
 	$tableId = $id + $alias_id;
-	$sql = "SELECT * FROM `table` WHERE enabled =1 AND id = $tableId";
+	$sql = "SELECT * FROM `table` WHERE id = $tableId";
 	$rs = $db ->GetOne($sql);
 	if($rs)
 	{
 		echo "<script>alert('餐桌已存在！');editTable('','$alias_id','$name','table.php')</script>";
 	}
 	else
-	{
-		$sql = "SELECT id FROM `table` WHERE enabled =0 AND id = $tableId";
-		$rs = $db ->GetOne($sql);
-		if($rs)
+	{		
+		$sql = "INSERT INTO `table`(id,alias_id,restaurant_id,name) VALUES($tableId,$alias_id,$restaurant_id,'$name')";	
+		if($db->Execute($sql))
 		{
-			$sql = "UPDATE `table` SET enabled=1,name='$name' WHERE id=$rs";
-			if($db->Execute($sql))
-			{
-				echo "<script>alert('保存成功！');</script>";
-			}	
-			else{
-				echo "<script>alert('保存失败！');</script>";
-			}
-		}		
-		else
-		{
-			$sql = "INSERT INTO `table`(id,alias_id,restaurant_id,enabled,name) VALUES($tableId,$alias_id,$restaurant_id,1,'$name')";	
-			if($db->Execute($sql))
-			{
-				echo "<script>alert('保存成功！');</script>";
-			}
-			else{
-				echo "<script>alert('保存失败！');</script>";
-			}
+			echo "<script>alert('保存成功！');</script>";
 		}
+		else{
+			echo "<script>alert('保存失败！');</script>";
+		}		
 	}
 }
 else if($editType == "editTable")
@@ -104,11 +89,11 @@ else if($editType == "editTable")
 if($editType == "deleteTable")
 {		
 	$deleteId = $_POST["deleteId"];
-	$sql = "SELECT id FROM `table` WHERE enabled=1 AND alias_id=$deleteId AND restaurant_id=$restaurant_id";	
+	$sql = "SELECT id FROM `table` WHERE alias_id=$deleteId AND restaurant_id=$restaurant_id";	
 	$rs = $db ->GetOne($sql);
 	if($rs)
 	{
-		$sql = "UPDATE `table` SET enabled=0 WHERE id=$rs";	
+		$sql = "DELETE FROM `table` WHERE id=$rs";	
 		if($db->Execute($sql))
 		{
 			echo "<script>alert('删除成功！');</script>";
@@ -124,7 +109,7 @@ if($editType == "deleteTable")
 }
 ?>
 <h1>
-<span class="action-span"><a href="#" onclick="editTable('','','','table.php')">添加餐桌</a></span>  <span class="action-span1">e点通会员中心</span>
+<span class="action-span"><a href="#" onclick="editTable('','','','table.php')">添加餐桌</a></span> 
 <span class="action-span"><a href="#" onclick="javascript:window.location.href = 'table_list.php'">列表显示</a></span>  
 <span class="action-span1">e点通会员中心</span>
 <span id="search_id" class="action-span2">&nbsp;- 餐台信息</span>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -138,54 +123,54 @@ if($editType == "deleteTable")
   <div class="side_btn" id="left_btn"></div>
   <div id="wrap">
     <div id="list">
-	<?php
-	/*include("conn.php"); */
-	mysql_query("SET NAMES utf8"); 
+<?php
+/*include("conn.php"); */
+mysql_query("SET NAMES utf8"); 
 $sql = "SELECT od.id,t.alias_id,od.order_date,total_price,num,foods,is_paid,waiter FROM `table` t LEFT OUTER JOIN 
 		
 		(SELECT MAX(id) AS OrderId,table_id,MAX(restaurant_id) AS restaurant_id".
 	" FROM `order` WHERE `order`.`restaurant_id`=".$_SESSION["restaurant_id"]." GROUP BY `order`.table_id) AS o ON t.alias_id = o.table_id ".
-		" LEFT OUTER JOIN `order_view` od ON o.OrderId = od.id WHERE t.enabled=1 AND t.restaurant_id=" . $_SESSION["restaurant_id"] ;
-	/*echo $sql;*/
-	$rs = $db->Execute($sql);
-	$ts = 0;
-	$content = '';
-	$roomNo = 1;	
-	$isPaidNum = 0;
-	foreach ($rs as $row){	
-		
-		if($ts % 24 == 0)
-		{
-			$content.='<div class="item"><h3>'.$roomNo.'号厅</h3><ul class="table_list">';
-			$roomNo++;
-		}
-		$is_paid = $row["is_paid"];
-		$on = "";
-		
-		if($is_paid == NULL || $is_paid == 1)	
-		{
-			$action = ' onclick="showMenu(&quot;' .$row["alias_id"].'&quot;)"';
-			$isPaidNum++;			
-		}
-		else
-		{			
-			$on = "class='on'";
+	" LEFT OUTER JOIN `order_view` od ON o.OrderId = od.id WHERE t.restaurant_id=" . $_SESSION["restaurant_id"] ;
+/*echo $sql;*/
+$rs = $db->Execute($sql);
+$ts = 0;
+$content = '';
+$roomNo = 1;	
+$isPaidNum = 0;
+foreach ($rs as $row){	
+	
+	if($ts % 24 == 0)
+	{
+		$content.='<div class="item"><h3>'.$roomNo.'号厅</h3><ul class="table_list">';
+		$roomNo++;
+	}
+	$is_paid = $row["is_paid"];
+	$on = "";
+	
+	if($is_paid == NULL || $is_paid == 1)	
+	{
+		$action = ' onclick="showMenu(&quot;' .$row["alias_id"].'&quot;)"';
+		$isPaidNum++;			
+	}
+	else
+	{			
+		$on = "class='on'";
 		$action = ' onclick="showOrderDetail(&quot;'.$row["id"].'&quot;,&quot;'.$row["alias_id"].'&quot;,&quot;'.$row["order_date"].'&quot;,&quot;'.$row["total_price"].'&quot;,&quot;'.$row["num"].'&quot;,&quot;'.$row["foods"].'&quot;,&quot;'.$row["is_paid"].'&quot;,&quot;'.$row["waiter"].'&quot;,&quot;'.$row["type_name"]."&quot;,&quot;".$row["totalPrice_2"].'&quot;,&quot;'.$row["category_name"].'&quot;,&quot;'.$row["comment"].'&quot;)"';
-		}
-		$content .= ('<li  '.$on. $action . '>' . $row["alias_id"] . '</li>');					
-		if($ts % 24 == 23)
-		{
-			$content .= '</ul></div>';
-		}
-		$ts++;
-	} 	
-	if(!($ts % 24 == 0))
+	}
+	$content .= ('<li  '.$on. $action . '>' . $row["alias_id"] . '</li>');					
+	if($ts % 24 == 23)
 	{
 		$content .= '</ul></div>';
 	}
-	echo $content;
-	mysql_close($con);
-	echo "<script>statTable($ts,$isPaidNum)</script>";
+	$ts++;
+} 	
+if(!($ts % 24 == 0))
+{
+	$content .= '</ul></div>';
+}
+echo $content;
+mysql_close($con);
+echo "<script>statTable($ts,$isPaidNum)</script>";
 	?>
     </div>
   </div>

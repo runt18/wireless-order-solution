@@ -48,10 +48,10 @@ include("conn.php");
 $id = $_REQUEST["id"];
 $table_name = $_REQUEST["table_name"];
 $sql = "SELECT of.id,of.order_date,of.name AS food_name,of.unit_price,of.order_count,of.discount,
-CASE of.taste WHEN '' THEN '无口味' ELSE of.taste END AS taste,of.taste_price,
-CASE WHEN k.name IS NULL THEN '空' ELSE k.name END AS kitchen_name,of.waiter,CASE WHEN comment IS NULL THEN '-' ELSE comment END AS comment
+		CASE of.taste WHEN '' THEN '无口味' ELSE of.taste END AS taste,of.taste_price,
+		CASE WHEN k.name IS NULL THEN '空' ELSE k.name END AS kitchen_name,of.waiter,CASE WHEN comment IS NULL THEN '-' ELSE comment END AS comment
 		from $table_name of
-		LEFT JOIN kitchen k ON of.kitchen = k.alias_id 
+		LEFT JOIN kitchen k ON of.kitchen = k.alias_id AND k.restaurant_id = " . $_SESSION["restaurant_id"]."  
 		WHERE order_id = $id
 		ORDER BY of.order_date DESC";
 
