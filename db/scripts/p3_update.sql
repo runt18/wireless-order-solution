@@ -1,6 +1,9 @@
 SET NAMES utf8;
 USE `wireless_order_db` ;
 
+DELETE FROM `food` WHERE enabled=0;
+DELETE FROM `table` WHERE enabled=0;
+
 ALTER TABLE `restaurant`
 ADD `tele1` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'One of the telephones to this restaurant.'; 
 ALTER TABLE `restaurant`
@@ -14,11 +17,15 @@ ALTER TABLE `order`
 ADD `category` TINYINT NOT NULL DEFAULT 1 COMMENT 'the category to this order, it should be one the values below.\n一般 : 1\n外卖 : 2';
 ALTER TABLE `order`
 ADD `comment` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the comment to this order';
+ALTER TABLE `order`
+ADD `table_name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the table name to this order';
 
 ALTER TABLE `order_history`
 ADD `category` TINYINT NOT NULL DEFAULT 1 COMMENT 'the category to this order, it should be one the values below.\n一般 : 1\n外卖 : 2';
 ALTER TABLE `order_history`
 ADD `comment` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the comment to this order';
+ALTER TABLE `order_history`
+ADD `table_name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the table name to this order';
 
 ALTER TABLE `kitchen`
 ADD `discount_3` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the 3rd discount to the food belong to this kitchen, range from 0.00 to 1.00';
