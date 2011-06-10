@@ -354,6 +354,7 @@ public class UpdateOrder {
 					result.extraOrder = new Order();
 					result.extraOrder.id = orderID;
 					result.extraOrder.table_id = orderToUpdate.table_id;
+					result.extraOrder.table_name = orderToUpdate.table_name;
 					result.extraOrder.foods = tmpFoods.toArray(new Food[tmpFoods.size()]);
 				}
 				
@@ -389,6 +390,7 @@ public class UpdateOrder {
 					result.canceledOrder = new Order();
 					result.canceledOrder.id = orderID;
 					result.canceledOrder.table_id = orderToUpdate.table_id;
+					result.canceledOrder.table_name = orderToUpdate.table_name;
 					result.canceledOrder.foods = tmpFoods.toArray(new Food[tmpFoods.size()]);
 				}
 			}
