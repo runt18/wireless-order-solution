@@ -40,6 +40,9 @@ public class InsertOrder {
 			Table table = QueryTable.exec(dbCon, pin, model, orderToInsert.table_id);
 				
 			if(table.status == Table.TABLE_IDLE){
+				
+				orderToInsert.table_name = table.name;
+				
 				String sql = null;
 				/**
 				 * Get all the food's detail info submitted by terminal, 
@@ -98,9 +101,15 @@ public class InsertOrder {
 	
 				//insert to order table
 				sql = "INSERT INTO `" + Params.dbName + 
-						"`.`order` (`id`, `restaurant_id`, `table_id`, `terminal_model`, `terminal_pin`, `order_date`, `custom_num`, `waiter`) VALUES (NULL, " + 
-						table.restaurant_id + ", " + orderToInsert.table_id + ", " + term.modelID + ", "+ term.pin + ", NOW(), " + 
-						orderToInsert.custom_num + ", '" + term.owner + "')";
+						"`.`order` (`id`, `restaurant_id`, `table_id`, `table_name`, `terminal_model`, `terminal_pin`, `order_date`, `custom_num`, `waiter`) VALUES (NULL, " + 
+						table.restaurant_id + ", " + 
+						orderToInsert.table_id + ", '" + 
+						orderToInsert.table_name + "', " +
+						term.modelID + ", "+ 
+						term.pin + 
+						", NOW(), " + 
+						orderToInsert.custom_num + ", '" + 
+						term.owner + "')";
 				dbCon.stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
 				//get the generated id to order 
 				dbCon.rs = dbCon.stmt.getGeneratedKeys();

@@ -76,7 +76,7 @@ public class UpdateOrder {
 					throw new BusinessException("The table(alias_id=" + orderToUpdate.table_id + ") to change order is IDLE."
 												,ErrorCode.TABLE_IDLE);
 				}
-				
+				orderToUpdate.table_name = table.name;
 				orderID = Util.getUnPaidOrderID(dbCon, table);
 				
 			/**
@@ -98,7 +98,7 @@ public class UpdateOrder {
 					throw new BusinessException("The original table(alias_id=" + orderToUpdate.originalTableID + ") to be transferred is IDLE.",
 												ErrorCode.TABLE_IDLE);
 				}
-
+				orderToUpdate.table_name = transferredTable.name;
 				orderID = Util.getUnPaidOrderID(dbCon, originalTable);
 
 			}
@@ -302,9 +302,15 @@ public class UpdateOrder {
 			}
 
 
-			//update the custom number depending on the order id to "order" table
-			 sql = "UPDATE `" + Params.dbName + "`.`order` SET custom_num=" + orderToUpdate.custom_num +
-					", terminal_pin=" + term.pin + ", waiter='" + term.owner + "', table_id=" + orderToUpdate.table_id + " WHERE id=" + orderID;
+			/**
+			 * Update the related info to this order
+			 */
+			sql = "UPDATE `" + Params.dbName + "`.`order` SET custom_num=" + orderToUpdate.custom_num +
+					", terminal_pin=" + term.pin + 
+					", waiter='" + term.owner + 
+					"', table_id=" + orderToUpdate.table_id + 
+					", table_name='" + orderToUpdate.table_name + "'" +
+					" WHERE id=" + orderID;
 			dbCon.stmt.addBatch(sql);
 
 			dbCon.stmt.executeBatch();
