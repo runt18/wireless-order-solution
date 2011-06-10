@@ -78,6 +78,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order` (
   `terminal_model` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the terminal model to this order' ,
   `terminal_pin` INT NOT NULL DEFAULT 0 COMMENT 'the terminal pin to this order' ,
   `table_id` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the table alias id to this order' ,
+  `table_name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the table to this order' ,
   `comment` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the comment to this order' ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_order_restaurant` (`restaurant_id` ASC) ,
@@ -173,8 +174,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`table` (
     REFERENCES `wireless_order_db`.`restaurant` (`id` )
     ON DELETE RESTRICT
     ON UPDATE RESTRICT)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8;
+ENGINE = InnoDB;
+
 
 -- -----------------------------------------------------
 -- Table `wireless_order_db`.`taste`
@@ -274,6 +275,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_history` (
   `terminal_model` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the terminal model to this order' ,
   `terminal_pin` INT NOT NULL DEFAULT 0 COMMENT 'the terminal pin to this order' ,
   `table_id` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the table alias id to this order' ,
+  `table_name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the table name to this order' ,
   `comment` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the comment to this order' ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_order_restaurant` (`restaurant_id` ASC) ,
@@ -491,7 +493,6 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`staff` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'the staff information ';
-
 
 
 SET SQL_MODE=@OLD_SQL_MODE;
