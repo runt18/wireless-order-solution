@@ -19,7 +19,9 @@ include("hasLogin.php");
 <body>
 <?php
 include("changePassword.php"); 
+include("common.php"); 
 include("conn.php"); 
+
 mysql_query("SET NAMES utf8"); 
 $editType = $_POST["editType"];
 //echo "<script>alert('$editType');</script>";
@@ -35,11 +37,14 @@ if($editType == "editInfo")
 		echo "<script>alert('保存失败！');</script>";
 	}
 }
-else if($editType == "addRestaurant" || $editType == "editRestaurant")
+else if($editType == "addRestaurant" || $editType == "editAdminRestaurant")
 	{
 		$account = $_POST["account"];
 		$pwd = $_POST["newPassword"];
 		$restaurant_name = $_POST["restaurant_name"];
+		$tele1 = $_POST["tele1"];
+		$tele2 = $_POST["tele2"];
+		$address = $_POST["address"];
 		$record_alive = $_POST["record_alive"];
 		$restaurant_info = $_POST["restaurant_info"];
 		$random_num = $_POST["random_num"];
@@ -53,12 +58,12 @@ else if($editType == "addRestaurant" || $editType == "editRestaurant")
 			$rs = $db ->GetOne($sql);		
 			if($rs)
 			{			
-				echo "<script>alert('已存在此帐户名，请选用另外一个帐户名！');editRestaurant('','$account','$restaurant_name','$restaurant_info','$record_alive','');</script>";
+				echo "<script>alert('已存在此帐户名，请选用另外一个帐户名！');editRestaurant('','$account','$restaurant_name','$tele1','$tele2','$address','$restaurant_info','$record_alive','','');</script>";
 				$validate = false;
 			}
 			else
 			{
-				$sql = "INSERT INTO restaurant(pwd,account,restaurant_name,restaurant_info,total_income,record_alive) VALUES('".md5($pwd)."','$account','$restaurant_name','$restaurant_info',0,$record_alive)";
+				$sql = "INSERT INTO restaurant(pwd,account,restaurant_name,tele1,tele2,address,restaurant_info,record_alive) VALUES('".md5($pwd)."','$account','$restaurant_name','$tele1','$tele2','$address','$restaurant_info',$record_alive)";
 			}
 		}
 		else
@@ -71,20 +76,20 @@ else if($editType == "addRestaurant" || $editType == "editRestaurant")
 				$rs = $db ->GetOne($sql);		
 				if($rs)
 				{			
-					echo "<script>alert('已存在此帐户名，请选用另外一个帐户名！');editRestaurant('$id','$account','$restaurant_name','$restaurant_info','$record_alive','$random_num','$old_account');</script>";
+					echo "<script>alert('已存在此帐户名，请选用另外一个帐户名！');editRestaurant('$id','$account','$restaurant_name','$tele1','$tele2','$address','$restaurant_info','$record_alive','$random_num','$old_account');</script>";
 					$validate = false;
 				}
 			}
 			if($pwd != $random_num)
 			{
-				$sql = "UPDATE restaurant SET account='$account', pwd='".md5($pwd)."',restaurant_name='$restaurant_name',restaurant_info='$restaurant_info',record_alive=$record_alive WHERE id=$id";
+				$sql = "UPDATE restaurant SET account='$account', pwd='".md5($pwd)."',restaurant_name='$restaurant_name',tele1='$tele1',tele2='$tele2',address='$address',restaurant_info='$restaurant_info',record_alive=$record_alive WHERE id=$id";
 			}
 			else
 			{
-				$sql = "UPDATE restaurant SET account='$account', restaurant_name='$restaurant_name',restaurant_info='$restaurant_info',record_alive=$record_alive WHERE id=$id";
+				$sql = "UPDATE restaurant SET account='$account', restaurant_name='$restaurant_name',tele1='$tele1',tele2='$tele2',address='$address',restaurant_info='$restaurant_info',record_alive=$record_alive WHERE id=$id";
 			}
 		}
-		/*echo "<script>alert('$sql');</script>";*/
+		/*echo $sql;*/
 		if($validate)
 		{
 			if($db->Execute($sql))
@@ -119,6 +124,17 @@ else if($editType == "addRestaurant" || $editType == "editRestaurant")
 					$db->Execute($sql);
 					$sql = "INSERT INTO kitchen(restaurant_id,alias_id,name) VALUES($id,9,'厨房10')";
 					$db->Execute($sql);
+					$admin_pin = "9". randomNumber(6);
+					$sql = "SELECT id FROM terminal WHERE pin='$admin_pin'";
+					$rs = $db ->GetOne($sql);		
+					while($rs)
+					{
+						$admin_pin = "9". randomNumber(6);
+						$sql = "SELECT id FROM terminal WHERE pin='$admin_pin'";
+						$rs = $db ->GetOne($sql);		
+					}
+					$sql = "INSERT INTO terminal(pin,restaurant_id,model_id,owner_name) VALUES($admin_pin,$id,0xFE,'管理员')";
+					$db->Execute($sql);
 				}
 			}
 			else{
@@ -132,11 +148,25 @@ else if($editType == "addRestaurant" || $editType == "editRestaurant")
 			$password = $_POST["password"];
 			if($password == $_SESSION["password"])
 			{
-				if($db->Execute("DELETE FROM order_food WHERE food_id IN (SELECT id from food WHERE restaurant_id=$id)") && $db->Execute("DELETE FROM food WHERE restaurant_id=$id") 
-						&& $db->Execute("DELETE FROM `order` WHERE restaurant_id=$id") && $db->Execute("DELETE FROM `table` WHERE restaurant_id=$id")  
-						&& $db->Execute("DELETE FROM `taste` WHERE restaurant_id=$id")
-						&& $db->Execute("UPDATE `terminal` SET restaurant_id=2,idle_date=NOW(),expire_date=NULL WHERE restaurant_id=$id") && $db->Execute("DELETE FROM restaurant WHERE id=$id"))
-				{			
+				if($db->Execute("DELETE FROM wireless_order_db.order_food_material_history WHERE order_food_id IN (SELECT id FROM wireless_order_db.order_food_history WHERE order_id IN (SELECT id FROM wireless_order_db.order_history WHERE restaurant_id=$id) )")
+						&& $db->Execute("DELETE FROM wireless_order_db.order_food_history WHERE order_id IN (SELECT id FROM wireless_order_db.order_history WHERE restaurant_id=$id)")
+						&& $db->Execute("DELETE FROM wireless_order_db.order_history WHERE restaurant_id=$id")
+						&& $db->Execute("DELETE FROM wireless_order_db.order_food_material WHERE order_food_id IN (SELECT id FROM wireless_order_db.order_food WHERE order_id IN (SELECT id FROM wireless_order_db.order WHERE restaurant_id=$id) )")
+						&& $db->Execute("DELETE FROM wireless_order_db.order_food WHERE order_id IN (SELECT id FROM wireless_order_db.order WHERE restaurant_id=$id)")
+						&& $db->Execute("DELETE FROM wireless_order_db.order WHERE restaurant_id=$id")
+						&& $db->Execute("DELETE FROM wireless_order_db.staff WHERE restaurant_id=$id")
+						&& $db->Execute("DELETE FROM wireless_order_db.food_material WHERE food_id IN (SELECT id FROM wireless_order_db.food WHERE restaurant_id=$id)")
+						&& $db->Execute("DELETE FROM wireless_order_db.material_history WHERE material_id IN (SELECT id FROM wireless_order_db.material WHERE restaurant_id=$id)")
+						&& $db->Execute("DELETE FROM wireless_order_db.material WHERE restaurant_id=$id")
+						&& $db->Execute("DELETE FROM wireless_order_db.terminal WHERE restaurant_id=$id AND model_id > 0x7F")
+						&& $db->Execute("UPDATE wireless_order_db.terminal SET restaurant_id=2,idle_date=NOW(),discard_date=NULL WHERE restaurant_id=$id AND model_id <= 0x7F")
+				&& $db->Execute("DELETE FROM wireless_order_db.table WHERE restaurant_id=$id")
+				&& $db->Execute("DELETE FROM wireless_order_db.food WHERE restaurant_id=$id")
+				&& $db->Execute("DELETE FROM wireless_order_db.taste WHERE restaurant_id=$id")
+				&& $db->Execute("DELETE FROM wireless_order_db.kitchen WHERE restaurant_id=$id")
+				&& $db->Execute("DELETE FROM wireless_order_db.member_charge WHERE member_id IN (SELECT id FROM wireless_order_db.member WHERE restaurant_id=$id)")
+				&& $db->Execute("DELETE FROM wireless_order_db.member WHERE restaurant_id=$id")
+				&& $db->Execute("DELETE FROM wireless_order_db.restaurant WHERE id=$id")){			
 					echo "<script>alert('删除成功！');</script>";
 				}	
 				else{
@@ -150,7 +180,7 @@ else if($editType == "addRestaurant" || $editType == "editRestaurant")
 		}
 ?>
 <h1>
-<span class="action-span"><a href="#" onclick="editRestaurant('','','','','','')">添加餐厅</a></span><span class="action-span"><a href="#" onclick="editInfo('<?php echo str_replace("\n","<br />",str_replace("\r\n","<br />",$_SESSION["root_restaurant_info"])) ?>')">编辑信息</a></span>
+<span class="action-span"><a href="#" onclick="editRestaurant('','','','','','','','','')">添加餐厅</a></span><span class="action-span"><a href="#" onclick="editInfo('<?php echo str_replace("\n","<br />",str_replace("\r\n","<br />",$_SESSION["root_restaurant_info"])) ?>')">编辑信息</a></span>
 <span class="action-span1">Digi-e 管理中心</span><span id="search_id" class="action-span2"> - 餐厅信息 </span>
 <div style="clear:both"></div>
 </h1>
@@ -177,8 +207,11 @@ else if($editType == "addRestaurant" || $editType == "editRestaurant")
 				<th><h3>编&nbsp;号</h3></th>
 				<th><h3>帐户名</h3></th>
 				<th><h3>餐厅名</h3></th>
-				<th><h3>帐单有效期</h3></th>
-				<th><h3>餐厅信息</h3></th>			
+				<th><h3>电话1</h3></th>
+				<th><h3>电话2</h3></th>
+				<th><h3>地址</h3></th>				
+				<th><h3>餐厅信息</h3></th>	
+				<th><h3>帐单有效期</h3></th>		
 				<th><h3>操作</h3></th>						
 			</tr>
 		</thead>
@@ -224,12 +257,17 @@ foreach ($rs as $row){
 	echo "<td>" .$row["id"] ."</td>";
 	echo "<td>" .$row["account"] ."</td>";
 	echo "<td>" .$row["restaurant_name"] ."</td>";
-	echo "<td>" .$record_alive ."</td>";
+	echo "<td>" .$row["tele1"] ."</td>";
+	echo "<td>" .$row["tele2"] ."</td>";
+	echo "<td>" .$row["address"] ."</td>";
 	echo "<td title='".$r_info."'>" .$r_info_subject."</td>";
+	echo "<td>" .$record_alive ."</td>";
 	echo "<td>".
 		"<a href='#' onclick='viewRestaurant(&quot;".$row["id"]."&quot;,&quot;".$row["account"]."&quot;,&quot;".$row["restaurant_name"]."&quot;,&quot;".($row["record_alive"]/24/3600)."&quot;,&quot;".$row["order_num"]."&quot;,&quot;".$row["terminal_num"]."&quot;,&quot;".$row["food_num"]."&quot;,&quot;".$row["table_num"]."&quot;,&quot;".$row["order_paid"]."&quot;,&quot;".$row["table_using"]."&quot;)'><img src='images/View.png'  height='16' width='14' border='0'/>&nbsp;查看</a>".
 		"&nbsp;&nbsp;&nbsp;&nbsp;" .
-		"<a href='#' onclick='editRestaurant(&quot;".$row["id"]."&quot;,&quot;".$row["account"]."&quot;,&quot;".$row["restaurant_name"]."&quot;,&quot;". str_replace("\n","<br />",str_replace("\r\n","<br />",$row["restaurant_info"])) ."&quot;,&quot;".($row["record_alive"]/24/3600)."&quot;,&quot;".random(6)."&quot;,&quot;".$row["account"]."&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>".
+		"<a href='#' onclick='editRestaurant(&quot;".$row["id"]."&quot;,&quot;".$row["account"]."&quot;,&quot;".$row["restaurant_name"].
+		"&quot;,&quot;".$row["tele1"]."&quot;,&quot;".$row["tele2"]."&quot;,&quot;".$row["address"].
+		"&quot;,&quot;". str_replace("\n","<br />",str_replace("\r\n","<br />",$row["restaurant_info"])) ."&quot;,&quot;".($row["record_alive"]/24/3600)."&quot;,&quot;".random(6)."&quot;,&quot;".$row["account"]."&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>".
 		"&nbsp;&nbsp;&nbsp;&nbsp;" .
 		"<a href='#' onclick='deleteRestaurant(&quot;".$row["id"]."&quot;)'><img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;删除</a></td>";
 	echo "</tr>";
@@ -276,6 +314,7 @@ function cut_str($string, $sublen, $start = 0, $code = 'UTF-8')
 			
 		</tbody>
   </table>
+
   </div>
 	<div id="controls">
        <div id="text"><?php echo "总计:" .$bh ."&nbsp;条记录"; ?>&nbsp;&nbsp;&nbsp;&nbsp;当前第 <span id="currentpage"></span> 页，每页 </div>
@@ -317,21 +356,5 @@ echo "<input type='hidden' id='keyword_value' value='$kw' />";
 	sorter.init("table",0);
 	ininRestaurantOriginal();
   </script>
-<?php
-function random($length) { 
-	$hash = array();
-	$number = "";
-	$chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz'; 
-	$max = strlen($chars) - 1; 
-	while(count($hash)<=$length){
-		$hash[] = mt_rand(0,$max);
-		$hash = array_unique($hash);
-	}
-	for ($j=0;$j<$length;$j++){
-		$number.=substr($chars,$hash[$j],1);
-	}
-	return $number;
-} 
-?>
 </body>
 </html>

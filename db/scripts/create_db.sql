@@ -548,18 +548,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 -- -----------------------------------------------------
 DROP VIEW IF EXISTS restaurant_view;
 
-CREATE VIEW `restaurant_view` AS select 
-`r`.`id` AS `id`,`r`.`account` AS `account`,
-`r`.`restaurant_name` AS `restaurant_name`,
-`r`.`restaurant_info` AS `restaurant_info`,
-`r`.`record_alive` AS `record_alive`,
-(select count(`order`.`id`) from `order` where (`order`.`restaurant_id` = `r`.`id`)) AS `order_num`,
-(select count(`terminal`.`pin`) from `terminal` where (`terminal`.`restaurant_id` = `r`.`id`)) AS `terminal_num`,
-(select count(`food`.`id`) from `food` where (`food`.`restaurant_id` = `r`.`id`)) AS `food_num`,
-(select count(`table`.`id`) from `table` where (`table`.`restaurant_id` = `r`.`id`)) AS `table_num`,
-(select count(`order`.`id`) from `order` where (`order`.`restaurant_id` = `r`.`id` AND `order`.total_price>0)) AS `order_paid`,
-(select count(`table`.`id`) from `table` where (`table`.`restaurant_id` = `r`.`id` AND EXISTS (SELECT * FROM `order` WHERE `order`.table_id = `table`.id AND NOT `order`.total_price>0))) AS `table_using`
-from `restaurant` `r`;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `wireless_order_db`.`restaurant_view` AS select `r`.`id` AS `id`,`r`.`account` AS `account`,`r`.`restaurant_name` AS `restaurant_name`,`r`.`tele1` AS `tele1`,`r`.`tele2` AS `tele2`,`r`.`address` AS `address`,`r`.`restaurant_info` AS `restaurant_info`,`r`.`record_alive` AS `record_alive`,(select count(`wireless_order_db`.`order`.`id`) from `wireless_order_db`.`order` where (`wireless_order_db`.`order`.`restaurant_id` = `r`.`id`)) AS `order_num`,(select count(`wireless_order_db`.`terminal`.`pin`) from `wireless_order_db`.`terminal` where (`wireless_order_db`.`terminal`.`restaurant_id` = `r`.`id`)) AS `terminal_num`,(select count(`wireless_order_db`.`food`.`id`) from `wireless_order_db`.`food` where (`wireless_order_db`.`food`.`restaurant_id` = `r`.`id`)) AS `food_num`,(select count(`wireless_order_db`.`table`.`id`) from `wireless_order_db`.`table` where (`wireless_order_db`.`table`.`restaurant_id` = `r`.`id`)) AS `table_num`,(select count(`wireless_order_db`.`order`.`id`) from `wireless_order_db`.`order` where ((`wireless_order_db`.`order`.`restaurant_id` = `r`.`id`) and (`wireless_order_db`.`order`.`total_price` > 0))) AS `order_paid`,(select count(`wireless_order_db`.`table`.`id`) from `wireless_order_db`.`table` where ((`wireless_order_db`.`table`.`restaurant_id` = `r`.`id`) and exists(select 1 from `wireless_order_db`.`order` where ((`wireless_order_db`.`order`.`table_id` = `wireless_order_db`.`table`.`id`) and (`wireless_order_db`.`order`.`total_price` <= 0))))) AS `table_using` from `wireless_order_db`.`restaurant` `r`;
 
 -- -----------------------------------------------------
 -- View`terminal_view`

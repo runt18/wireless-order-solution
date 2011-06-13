@@ -29,13 +29,13 @@ function viewRestaurant(id,account,restaurant_name,record_alive,order_num,termin
     showMessageBox(content, 400, 400);
 }
 
-function editRestaurant(id, account, restaurant_name, restaurant_info, record_alive,random_num,old_account) {
+function editRestaurant(id, account, restaurant_name,tele1,tele2,address, restaurant_info, record_alive,random_num,old_account) {
     var editType = "addRestaurant";
     var title = "添加餐厅";   
 //    var isDisable = "";    
     if(id != "")
     {
-        editType = "editRestaurant";
+        editType = "editAdminRestaurant";
         title = "修改（" + restaurant_name + "）";
 //        isDisable = 'disabled = "true"';
     }    
@@ -54,12 +54,21 @@ function editRestaurant(id, account, restaurant_name, restaurant_info, record_al
 	                      '<input type="hidden" name="id" value="' + id + '" />' +
 	                      '<input type="hidden" name="random_num" value="' + random_num + '" />' +
 	                      '<input type="hidden" name="old_account" value="' + old_account + '" />' +
-	                      '<div class="add_foot_Content" style="height:320px;text-align:center">' +
+	                      '<div class="add_foot_Content" style="height:400px;text-align:center">' +
 	                        '<div class="pop_Content">' +
 	                            '<div class="pop_Content1">帐户名：<input type="text" id="account" name="account" value="' + account + '" size="25" height="20" onfocus="this.select()" style="position: relative; right: -30px; width: 120px;"/></div>' +
 	                            '<div class="pop_Content1">新密码：<input type="password" id="newPassword" name="newPassword" value="' + random_num +'" onfocus="this.select()"  style="position: relative; right: -30px; width: 120px;"/></div>' +
 	                            '<div class="pop_Content1">确认新密码：<input type="password" id="confirmPassword" name="confirmPassword" value="' + random_num +'" onfocus="this.select()"  style="position: relative; right: -2px; width: 120px;"/></div>' +
 	                            '<div class="pop_Content1">餐厅名：<input type="text" id="restaurant_name" name="restaurant_name" value="' + restaurant_name + '" onfocus="this.select()" style="position: relative; right: -30px; width: 120px;"/></div>' +
+	                            '<div class="pop_Content1">电话1：<input type="text" id="tele1" name="tele1" value="' + tele1 + '" onfocus="this.select()" size="25" height="20" style="position: relative; right: -35px; width: 120px;"' +
+	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57||event.keyCode==46"' +
+	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
+	                            ' style="ime-mode:Disabled" /></div>' +
+	                            '<div class="pop_Content1">电话2：<input type="text" id="tele2" name="tele2" value="' + tele2 + '" onfocus="this.select()" size="25" height="20" style="position: relative; right: -35px; width: 120px;"' +
+	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57||event.keyCode==46"' +
+	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
+	                            ' style="ime-mode:Disabled" /></div>' +
+	                            '<div class="pop_Content1">地址：<input type="text" id="address" name="address" value="' + address + '" onfocus="this.select()" style="position: relative; right: -43px; width: 120px;"/></div>' +
 	                            '<div class="pop_Content1">帐单有效期：<select style="width: 70px;position: relative; right: -2px;" id="record_alive" name="record_alive" value="' + record_alive + 
 	                            '"><option value="90">90天</option><option value="180">180天</option><option value="360">360天</option><option value="0">永久</option></select></div>' +
 	                            '<div class="pop_Content1">餐厅信息：</div>' +
