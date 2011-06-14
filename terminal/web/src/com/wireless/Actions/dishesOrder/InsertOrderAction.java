@@ -45,13 +45,14 @@ public class InsertOrderAction extends Action implements PinGen {
 			 * e.g. pin=0x1 & tableID=201 & customNum=2 & type=1 & foods="{[1102,2,2,4]}"
 			 * pin : the pin the this terminal
 			 * tableID : the table id to insert order
-			 * actualPrice : the actual amount of the money to be paid
 			 * customNum : the custom number to this order, ranges from 1 through 255
 			 * type : "1" means insert order
 			 * 		  "2" means update order
 			 * originalTableID : the original table id, this parameter is optional.
 			 * 					 if the type is insert order, NOT need this parameter.
-			 * 			     	 if the type is update order, need this parameter to indicate the original table
+			 * 			     	 if the type is update order, need this parameter to indicate the original table.
+			 * 			  		 if you want to transfer to another table, using this parameter like below.
+			 * 					 e.g. transfer table from 100 to 101, "table=101 & originalTableID=100"
 			 * foods : the food string
 			 */
 			String pin = request.getParameter("pin");
@@ -72,7 +73,12 @@ public class InsertOrderAction extends Action implements PinGen {
 				printType = Reserved.PRINT_ORDER_2 | Reserved.PRINT_ORDER_DETAIL_2;
 			}else{
 				orderType = "改单";
-				orderToInsert.originalTableID = Short.parseShort(request.getParameter("originalTableID"));
+				String oriTableID = request.getParameter("originalTableID");
+				if(oriTableID == null){
+					orderToInsert.originalTableID = orderToInsert.table_id;
+				}else{
+					orderToInsert.originalTableID = Short.parseShort(oriTableID);
+				}
 				printType |= Reserved.PRINT_EXTRA_FOOD_2 | Reserved.PRINT_CANCELLED_FOOD_2;
 			}
 			orderToInsert.foods = toFoodArray(request.getParameter("foods"));
