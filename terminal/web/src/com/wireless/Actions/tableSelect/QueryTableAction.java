@@ -15,6 +15,7 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.QueryTable;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.Order;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 
@@ -48,17 +49,43 @@ public class QueryTableAction extends Action {
 
 				StringBuffer value = new StringBuffer();
 				for (int i = 0; i < tables.length; i++) {
-					String jsonTable = "[\"$(alias_id)\",\"$(custom_num)\",\"$(status)\"]";
-					jsonTable = jsonTable.replace("$(alias_id)", new Short(
-							tables[i].alias_id).toString());
-					jsonTable = jsonTable.replace("$(custom_num)", new Short(
-							tables[i].custom_num).toString());
-					if (tables[i].status == Table.TABLE_BUSY) {
+					/**
+					 * The json format of table query looks like below.
+					 * ["餐台1编号"，"餐台1名称"，"餐台1人数"，"占用"，"一般"]，["餐台2编号"，"餐台2名称"，"餐台2人数"，"空桌"，"外卖"]
+					 */
+					String jsonTable = "[\"$(alias_id)\",\"$(alias_name)\",\"$(custom_num)\",\"$(status)\",\"$(category)\"]";
+					jsonTable = jsonTable.replace("$(alias_id)", new Short(tables[i].alias_id).toString());
+					jsonTable = jsonTable.replace("$(custom_num)", new Short(tables[i].custom_num).toString());
+					
+					if(tables[i].name != null){
+						jsonTable = jsonTable.replace("$(alias_name)", tables[i].name);						
+					}else{
+						jsonTable = jsonTable.replace("$(alias_name)", "");		
+					}
+					
+					if(tables[i].status == Table.TABLE_BUSY) {
 						jsonTable = jsonTable.replace("$(status)", "占用");
-					} else {
+					}else{
 						jsonTable = jsonTable.replace("$(status)", "空桌");
 					}
-					// pub each json table info to the value
+					
+					if(tables[i].category == Order.CATE_NORMAL){
+						jsonTable = jsonTable.replace("$(category)", "一般");
+						
+					}else if(tables[i].category == Order.CATE_TAKE_OUT){
+						jsonTable = jsonTable.replace("$(category)", "外卖");
+						
+					}else if(tables[i].category == Order.CATE_JOIN_TABLE){
+						jsonTable = jsonTable.replace("$(category)", "并台");
+						
+					}else if(tables[i].category == Order.CATE_MERGER_TABLE){
+						jsonTable = jsonTable.replace("$(category)", "拼台");
+						
+					}else{
+						jsonTable = jsonTable.replace("$(category)", "一般");
+					}
+					
+					// put each json table info to the value
 					value.append(jsonTable);
 					// the string is separated by comma
 					if (i != tables.length - 1) {

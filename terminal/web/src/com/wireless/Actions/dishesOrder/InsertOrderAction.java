@@ -42,9 +42,15 @@ public class InsertOrderAction extends Action implements PinGen {
 
 			/**
 			 * The parameters looks like below.
-			 * e.g. pin=0x1 & tableID=201 & customNum=2 & type=1 & foods="{[1102,2,2,4]}"
+			 * e.g. pin=0x1 & tableID=201 & tableID_2=0 & category=1 & customNum=2 & type=1 & foods="{[1102,2,2,4]}"
 			 * pin : the pin the this terminal
 			 * tableID : the table id to insert order
+			 * tableID_2 : the 2nd table id, this parameter only takes effect
+			 * 			   in the case of "拼台"
+			 * category : "1" means "一般"
+			 * 			  "2" means "外卖"
+			 * 			  "3" means "并台"
+			 * 			  "4" means "拼台"
 			 * customNum : the custom number to this order, ranges from 1 through 255
 			 * type : "1" means insert order
 			 * 		  "2" means update order
@@ -63,6 +69,8 @@ public class InsertOrderAction extends Action implements PinGen {
 			
 			Order orderToInsert = new Order();
 			orderToInsert.table_id = Short.parseShort(request.getParameter("tableID"));
+			orderToInsert.table2_id = Short.parseShort(request.getParameter("tableID_2"));
+			orderToInsert.category = Short.parseShort(request.getParameter("category"));
 			orderToInsert.custom_num = Integer.parseInt(request.getParameter("customNum"));
 			int type = Integer.parseInt(request.getParameter("type"));
 			String orderType = null;
