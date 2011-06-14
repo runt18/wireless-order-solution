@@ -13,8 +13,10 @@ import com.wireless.protocol.Reserved;
  * pin[6] - auto calculated and filled in
  * len[2] - length of the <Order>
  * <Order>
- * table[2] : custom_num : food_num : <Food1> : <Food2>... : original_table[2] 
- * table[2] - 2-byte indicates the table id 
+ * table[2] : table2[2] : category : custom_num : food_num : <Food1> : <Food2>... : original_table[2] 
+ * table[2] - 2-byte indicates the table id
+ * table_2[2] - 2-byte indicates the 2nd table id  
+ * category - 1-byte indicating the category to this order
  * custom_num - 1-byte indicating the custom number for this table
  * food_num - 1-byte indicating the number of foods
  * <Food>
@@ -74,6 +76,8 @@ public class ReqInsertOrder extends ReqPackage {
 		header.reserved = reqConf;
 		//calculate the body's length
 		int bodyLen = 2 + /* table id takes up 2 bytes */
+					2 + /* 2nd table id takes up 2 bytes */
+					1 + /* category takes up 1 byte */
 					1 + /* custom number takes up 1 byte */ 
 					1 + /* food number takes up 1 byte */
 					reqOrder.foods.length * 6 + /* each food takes up 6 bytes*/
@@ -86,14 +90,21 @@ public class ReqInsertOrder extends ReqPackage {
 		body[0] = (byte)(reqOrder.table_id & 0x00FF);
 		body[1] = (byte)((reqOrder.table_id & 0xFF00) >> 8);
 
+		//assign the 2nd table id
+		body[2] = (byte)(reqOrder.table2_id & 0x00FF);
+		body[3] = (byte)((reqOrder.table2_id & 0xFF00) >> 8);
+		
+		//assign the category
+		body[4] = (byte)(reqOrder.category & 0x00FF); 
+		
 		//assign the custom number
-		body[2] = (byte)(reqOrder.custom_num & 0x000000FF);
+		body[5] = (byte)(reqOrder.custom_num & 0x000000FF);
 		
 		//assign the number of foods
-		body[3] = (byte)(reqOrder.foods.length & 0x000000FF);
+		body[6] = (byte)(reqOrder.foods.length & 0x000000FF);
 		
 		//assign each order food's id and count
-		int offset = 4;
+		int offset = 7;
 		for(int i = 0; i < reqOrder.foods.length; i++){
 			body[offset] = (byte)(reqOrder.foods[i].alias_id & 0x000000FF);
 			body[offset + 1] = (byte)((reqOrder.foods[i].alias_id & 0x0000FF00) >> 8);

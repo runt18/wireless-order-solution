@@ -15,4 +15,6 @@ public class Table {
 	public short custom_num = 0;
 	//the status to this table
 	public short status = TABLE_IDLE;
+	//the category to this table
+	public short category = Order.CATE_NORMAL;
 }

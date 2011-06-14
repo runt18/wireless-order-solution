@@ -34,8 +34,10 @@ public class ReqParser {
 	 * pin[6] - auto calculated and filled in
 	 * len[2] - length of the <Body>
 	 * <Body>
-	 * table[2] : custom_num : food_num : <Food1> : <Food2>... : original_table[2]
-	 * table[2] - 2-byte indicates the table id  
+	 * table[2] : table_2[2] : category : custom_num : food_num : <Food1> : <Food2>... : original_table[2]
+	 * table[2] - 2-byte indicates the table id
+	 * table_2[2] - 2-byte indicates the 2nd table id  
+	 * categroy - 1-byte indicates the category to this order  
 	 * custom_num - 1-byte indicating the custom number for this table
 	 * food_num - 1-byte indicating the number of foods
 	 * <Food>
@@ -52,19 +54,26 @@ public class ReqParser {
 	 *******************************************************/
 	public static Order parseInsertOrder(ProtocolPackage req){
 		Order order = new Order();
-		//assign the table id
+		//get the table id
 		order.table_id = (short)((req.body[0] & 0x00FF) | 
 							((req.body[1] & 0x00FF) << 8));
 		
-		//assign the number of customs
-		order.custom_num = (byte)(req.body[2] & 0x000000FF);
+		//get the 2nd table id
+		order.table2_id = (short)((req.body[2] & 0x00FF) | 
+							((req.body[3] & 0x00FF) << 8));
 		
-		//assign the number of foods
-		int foodNum = (byte)(req.body[3] & 0x000000FF);
+		//get the category
+		order.category = (short)(req.body[4] & 0x000000FF);
+		
+		//get the number of customs
+		order.custom_num = (byte)(req.body[5] & 0x000000FF);
+		
+		//get the number of foods
+		int foodNum = (byte)(req.body[6] & 0x000000FF);
 		
 		Food[] orderFoods = new Food[foodNum];
-		//table id(2-byte) + custom_num(1-byte) + food_num(1-byte)
-		int offset = 4;
+		//table id(2-byte) + 2nd table id(2-byte) + category(1-byte) + custom_num(1-byte) + food_num(1-byte)
+		int offset = 7;
 		//assign each order food's information, including the food's id and order number
 		for(int i = 0; i < orderFoods.length; i++){
 			int foodID = (req.body[offset] & 0x000000FF) | ((req.body[offset + 1] & 0x000000FF) << 8);
