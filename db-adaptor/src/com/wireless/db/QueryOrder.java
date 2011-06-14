@@ -117,7 +117,7 @@ public class QueryOrder {
 		/**
 		 * Get the related info to this order.
 		 */
-		String sql = "SELECT custom_num, table_id, table_name, restaurant_id, total_price, total_price_2 FROM `" + Params.dbName
+		String sql = "SELECT custom_num, table_id, table_name, table2_id, table2_name, restaurant_id, category, total_price, total_price_2 FROM `" + Params.dbName
 				+ "`.`order` WHERE id=" + orderID;
 
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -128,7 +128,10 @@ public class QueryOrder {
 			orderInfo.restaurant_id = dbCon.rs.getInt("restaurant_id");
 			orderInfo.table_id = dbCon.rs.getShort("table_id");
 			orderInfo.table_name = dbCon.rs.getString("table_name");
+			orderInfo.table2_id = dbCon.rs.getShort("table2_id");
+			orderInfo.table2_name = dbCon.rs.getString("table2_name");
 			orderInfo.custom_num = dbCon.rs.getShort("custom_num");
+			orderInfo.category = dbCon.rs.getShort("category");
 			orderInfo.setTotalPrice(dbCon.rs.getFloat("total_price"));
 			orderInfo.setActualPrice(dbCon.rs.getFloat("total_price_2"));
 		}

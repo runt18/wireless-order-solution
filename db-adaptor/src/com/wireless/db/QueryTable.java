@@ -8,6 +8,7 @@ import java.util.Comparator;
 
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.Order;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 
@@ -36,33 +37,35 @@ public class QueryTable {
 			ArrayList<Table> tables = new ArrayList<Table>();
 			
 			//get the idle tables
-			String sql = "SELECT table_id FROM " + Params.dbName + ".order a WHERE id = (SELECT max(id) FROM " + 
+			String sql = "SELECT table_id, table_name FROM " + Params.dbName + ".order a WHERE id = (SELECT max(id) FROM " + 
 						Params.dbName + ".order b WHERE a.table_id = b.table_id AND a.restaurant_id=b.restaurant_id) " +
 						"AND total_price IS NOT NULL AND restaurant_id=" + term.restaurant_id;
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while(dbCon.rs.next()){
 				Table idleTable = new Table();
 				idleTable.restaurant_id = term.restaurant_id;
-				idleTable.alias_id = dbCon.rs.getShort(1);
+				idleTable.alias_id = dbCon.rs.getShort("table_id");
+				idleTable.name = dbCon.rs.getString("table_name");
 				idleTable.status = Table.TABLE_IDLE;
 				tables.add(idleTable);
 			}
 			dbCon.rs.close();
 			
-			sql = "SELECT alias_id FROM " + Params.dbName + ".table WHERE alias_id NOT IN (SELECT distinct table_id FROM " +
+			sql = "SELECT alias_id, name FROM " + Params.dbName + ".table WHERE alias_id NOT IN (SELECT distinct table_id FROM " +
 					Params.dbName + ".order WHERE restaurant_id=" + term.restaurant_id + ")" + " AND restaurant_id=" + term.restaurant_id;
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while(dbCon.rs.next()){
 				Table idleTable = new Table();
 				idleTable.restaurant_id = term.restaurant_id;
-				idleTable.alias_id = dbCon.rs.getShort(1);
+				idleTable.alias_id = dbCon.rs.getShort("alias_id");
+				idleTable.name = dbCon.rs.getString("name");
 				tables.add(idleTable);
 			}
 			dbCon.rs.close();
 			
 			//get the busy tables
-			sql = "SELECT table_id, custom_num FROM " + Params.dbName + ".order a WHERE id=(SELECT max(id) FROM " + Params.dbName + 
-				".order b WHERE a.table_id = b.table_id and a.restaurant_id=b.restaurant_id) and total_price IS NULL AND restaurant_id="+
+			sql = "SELECT table_id, table_name, table2_id, table2_name, custom_num, category FROM " + Params.dbName + ".order a WHERE id=(SELECT max(id) FROM " + Params.dbName + 
+				".order b WHERE a.table_id = b.table_id AND a.restaurant_id=b.restaurant_id) AND total_price IS NULL AND restaurant_id="+
 				term.restaurant_id;
 			
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -70,9 +73,25 @@ public class QueryTable {
 				Table busyTable = new Table();
 				busyTable.restaurant_id = term.restaurant_id;
 				busyTable.alias_id = dbCon.rs.getShort("table_id");
+				busyTable.name = dbCon.rs.getString("table_name");
 				busyTable.custom_num = dbCon.rs.getShort("custom_num");
+				busyTable.category = dbCon.rs.getShort("category");
 				busyTable.status = Table.TABLE_BUSY;
 				tables.add(busyTable);
+				/**
+				 * If the category is table merger, 
+				 * means another table is busy.
+				 */
+				if(busyTable.category == Order.CATE_MERGER_TABLE){
+					Table mergerTable = new Table();
+					mergerTable.restaurant_id = term.restaurant_id;
+					mergerTable.alias_id = dbCon.rs.getShort("table2_id");
+					mergerTable.name = dbCon.rs.getString("table2_name");
+					mergerTable.custom_num = dbCon.rs.getShort("custom_num");
+					mergerTable.category = dbCon.rs.getShort("category");
+					mergerTable.status = Table.TABLE_BUSY;
+					tables.add(mergerTable);
+				}
 			}			
 
 			Collections.sort(tables, new Comparator<Table>(){
@@ -150,8 +169,9 @@ public class QueryTable {
 			/**
 			 * Check to see if the table with this alias id is idle or busy
 			 */
-			 sql = "SELECT custom_num FROM `" + Params.dbName + 
+			 sql = "SELECT custom_num, category FROM `" + Params.dbName + 
 				   "`.`order` WHERE table_id = " + tableID +
+				   " OR table2_id = " + tableID + 
 				   " AND restaurant_id = " + term.restaurant_id +
 				   " AND total_price IS NULL";
 			 dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -162,6 +182,7 @@ public class QueryTable {
 			 
 			 if(dbCon.rs.next()){
 				 table.custom_num = dbCon.rs.getByte("custom_num");
+				 table.category = dbCon.rs.getShort("category");
 				 table.status = Table.TABLE_BUSY;
 			 }else{
 				 table.status = Table.TABLE_IDLE;

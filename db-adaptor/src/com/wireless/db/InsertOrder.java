@@ -41,6 +41,20 @@ public class InsertOrder {
 				
 			if(table.status == Table.TABLE_IDLE){
 				
+				/**
+				 * In the case of table merger,
+				 * check to see if the table to be merger is idle or busy.
+				 * Assure both tables to be merger remains in idle. 
+				 */
+				if(orderToInsert.category == Order.CATE_MERGER_TABLE){
+					Table mergerTable = QueryTable.exec(dbCon, pin, model, orderToInsert.table2_id);
+					if(mergerTable.status == Table.TABLE_BUSY){
+						throw new BusinessException("The tabe(alias_id=" + orderToInsert.table2_id + ") to be mergerd is BUSY.", ErrorCode.TABLE_BUSY);
+					}else{
+						orderToInsert.table2_name = mergerTable.name;
+					}
+				}
+				
 				orderToInsert.table_name = table.name;
 				
 				String sql = null;
@@ -98,7 +112,7 @@ public class InsertOrder {
 						}				
 					}
 				}
-	
+				afafd
 				//insert to order table
 				sql = "INSERT INTO `" + Params.dbName + 
 						"`.`order` (`id`, `restaurant_id`, `table_id`, `table_name`, `terminal_model`, `terminal_pin`, `order_date`, `custom_num`, `waiter`) VALUES (NULL, " + 
