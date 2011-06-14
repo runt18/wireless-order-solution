@@ -112,13 +112,14 @@ public class InsertOrder {
 						}				
 					}
 				}
-				afafd
 				//insert to order table
 				sql = "INSERT INTO `" + Params.dbName + 
-						"`.`order` (`id`, `restaurant_id`, `table_id`, `table_name`, `terminal_model`, `terminal_pin`, `order_date`, `custom_num`, `waiter`) VALUES (NULL, " + 
+						"`.`order` (`id`, `restaurant_id`, `table_id`, `table_name`, `table2_id`, `table2_name`, `terminal_model`, `terminal_pin`, `order_date`, `custom_num`, `waiter`) VALUES (NULL, " + 
 						table.restaurant_id + ", " + 
 						orderToInsert.table_id + ", '" + 
 						orderToInsert.table_name + "', " +
+						(orderToInsert.category == Order.CATE_MERGER_TABLE ? orderToInsert.table2_id : "NULL") + ", " +
+						(orderToInsert.category == Order.CATE_MERGER_TABLE ? "'" + orderToInsert.table2_name + "'" : "NULL") + ", " +
 						term.modelID + ", "+ 
 						term.pin + 
 						", NOW(), " + 
