@@ -51,9 +51,9 @@ public class QueryTableAction extends Action {
 				for (int i = 0; i < tables.length; i++) {
 					/**
 					 * The json format of table query looks like below.
-					 * ["餐台1编号"，"餐台1名称"，"餐台1人数"，"占用"，"一般"]，["餐台2编号"，"餐台2名称"，"餐台2人数"，"空桌"，"外卖"]
+					 * ["餐台1编号","餐台1人数","占用","餐台1名称","一般"]，["餐台2编号","餐台2人数","空桌","餐台2名称","外卖"]
 					 */
-					String jsonTable = "[\"$(alias_id)\",\"$(alias_name)\",\"$(custom_num)\",\"$(status)\",\"$(category)\"]";
+					String jsonTable = "[\"$(alias_id)\",\"$(custom_num)\",\"$(status)\",\"$(alias_name)\",\"$(category)\"]";
 					jsonTable = jsonTable.replace("$(alias_id)", new Short(tables[i].alias_id).toString());
 					jsonTable = jsonTable.replace("$(custom_num)", new Short(tables[i].custom_num).toString());
 					

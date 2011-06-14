@@ -58,7 +58,7 @@ public class InsertOrderAction extends Action implements PinGen {
 			 * 					 if the type is insert order, NOT need this parameter.
 			 * 			     	 if the type is update order, need this parameter to indicate the original table.
 			 * 			  		 if you want to transfer to another table, using this parameter like below.
-			 * 					 e.g. transfer table from 100 to 101, "table=101 & originalTableID=100"
+			 * 					 e.g. transfer table from 100 to 101, "tableID=101 & originalTableID=100"
 			 * foods : the food string
 			 */
 			String pin = request.getParameter("pin");
