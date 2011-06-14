@@ -72,13 +72,15 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order` (
   `custom_num` TINYINT UNSIGNED NOT NULL DEFAULT 0 ,
   `waiter` VARCHAR(45) NOT NULL COMMENT 'the waiter who operates on this order' ,
   `type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the type to pay order, it would be one of the values below.\n现金 : 1\n刷卡 : 2\n会员卡 : 3\n挂账 ：4\n签单：5' ,
-  `category` TINYINT NOT NULL DEFAULT 1 COMMENT 'the category to this order, it should be one the values below.\n一般 : 1\n外卖 : 2' ,
+  `category` TINYINT NOT NULL DEFAULT 1 COMMENT 'the category to this order, it should be one the values below.\n一般 : 1\n外卖 : 2\n并台 : 3\n拼台 : 4' ,
   `member_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the member\'s alias id' ,
   `member` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the member name' ,
   `terminal_model` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the terminal model to this order' ,
   `terminal_pin` INT NOT NULL DEFAULT 0 COMMENT 'the terminal pin to this order' ,
   `table_id` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the table alias id to this order' ,
   `table_name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the table to this order' ,
+  `table2_id` SMALLINT NULL DEFAULT NULL COMMENT 'the 2nd table alias id to this order(used for table merger)' ,
+  `table2_name` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the 2nd table name to this order(used for table merger)' ,
   `comment` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the comment to this order' ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_order_restaurant` (`restaurant_id` ASC) ,
@@ -165,8 +167,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`table` (
   `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'in the form of \"restaurant.id << 32 | table.alias_id\"' ,
   `alias_id` SMALLINT UNSIGNED NULL ,
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'Indicates the table belongs to which restaurant.' ,
-  `enabled` TINYINT NOT NULL DEFAULT 1 COMMENT 'indicates whether the table information is enabled or not' ,
   `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to this table' ,
+  `enabled` TINYINT NOT NULL DEFAULT 1 COMMENT 'indicates whether the table information is enabled or not' ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_table_restaurant1` (`restaurant_id` ASC) ,
   CONSTRAINT `fk_table_restaurant1`
@@ -261,7 +263,7 @@ COMMENT = 'describe the member information';
 DROP TABLE IF EXISTS `wireless_order_db`.`order_history` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_history` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'the id to order' ,
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'external key associated with the  restaurant table' ,
   `order_date` DATETIME NOT NULL COMMENT 'the order\'s date and time' ,
   `total_price` DECIMAL(10,2) NULL DEFAULT NULL COMMENT 'The total price to this order.\nIts default value is NULL, means the order not be paid, otherwise means the order has been paid.' ,
@@ -269,13 +271,15 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_history` (
   `custom_num` TINYINT UNSIGNED NOT NULL DEFAULT 0 ,
   `waiter` VARCHAR(45) NOT NULL COMMENT 'the waiter who operates on this order' ,
   `type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the type to pay order, it would be one of the values below.\n现金 : 1\n刷卡 : 2\n会员卡 : 3\n挂账 ：4\n签单：5' ,
-  `category` TINYINT NOT NULL DEFAULT 1 COMMENT 'the category to this order, it should be one the values below.\n一般 : 1\n外卖 : 2' ,
+  `category` TINYINT NOT NULL DEFAULT 1 COMMENT 'the category to this order, it should be one the values below.\n一般 : 1\n外卖 : 2\n并台 : 3\n拼台 : 4' ,
   `member_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the member\'s alias id' ,
   `member` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the member name' ,
   `terminal_model` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the terminal model to this order' ,
   `terminal_pin` INT NOT NULL DEFAULT 0 COMMENT 'the terminal pin to this order' ,
   `table_id` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the table alias id to this order' ,
   `table_name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the table name to this order' ,
+  `table2_id` SMALLINT NULL DEFAULT NULL COMMENT 'the 2nd table alias id to this order(used for table merger)' ,
+  `table2_name` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the 2nd table name to this order(used for table merger)' ,
   `comment` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the comment to this order' ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_order_restaurant` (`restaurant_id` ASC) ,
@@ -495,10 +499,10 @@ DEFAULT CHARACTER SET = utf8
 COMMENT = 'the staff information ';
 
 
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
 
 -- -----------------------------------------------------
 -- Data for table `wireless_order_db`.`restaurant`

@@ -14,18 +14,26 @@ ALTER TABLE `restaurant`
 ADD `pwd2` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the 2nd password to this restaurant, used to grant permission to change the order';
 
 ALTER TABLE `order`
-ADD `category` TINYINT NOT NULL DEFAULT 1 COMMENT 'the category to this order, it should be one the values below.\n一般 : 1\n外卖 : 2';
+ADD `category` TINYINT NOT NULL DEFAULT 1 COMMENT 'the category to this order, it should be one the values below.\n一般 : 1\n外卖 : 2\n并台 : 3\n拼台 : 4' ;
 ALTER TABLE `order`
 ADD `comment` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the comment to this order';
 ALTER TABLE `order`
 ADD `table_name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the table name to this order';
+ALTER TABLE `order`
+ADD `table2_id` SMALLINT NULL DEFAULT NULL COMMENT 'the 2nd table alias id to this order(used for table merger)' ;
+ALTER TABLE `order`
+ADD `table2_name` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the 2nd table name to this order(used for table merger)' ;
 
 ALTER TABLE `order_history`
-ADD `category` TINYINT NOT NULL DEFAULT 1 COMMENT 'the category to this order, it should be one the values below.\n一般 : 1\n外卖 : 2';
+ADD `category` TINYINT NOT NULL DEFAULT 1 COMMENT 'the category to this order, it should be one the values below.\n一般 : 1\n外卖 : 2\n并台 : 3\n拼台 : 4' ;
 ALTER TABLE `order_history`
 ADD `comment` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the comment to this order';
 ALTER TABLE `order_history`
 ADD `table_name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the table name to this order';
+ALTER TABLE `order_history`
+ADD `table2_id` SMALLINT NULL DEFAULT NULL COMMENT 'the 2nd table alias id to this order(used for table merger)' ;
+ALTER TABLE `order_history`
+ADD `table2_name` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the 2nd table name to this order(used for table merger)' ;
 
 ALTER TABLE `kitchen`
 ADD `discount_3` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the 3rd discount to the food belong to this kitchen, range from 0.00 to 1.00';
