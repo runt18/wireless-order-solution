@@ -263,7 +263,7 @@ foreach ($rs as $row){
 	echo "<td title='".$r_info."'>" .$r_info_subject."</td>";
 	echo "<td>" .$record_alive ."</td>";
 	echo "<td>".
-		"<a href='#' onclick='viewRestaurant(&quot;".$row["id"]."&quot;,&quot;".$row["account"]."&quot;,&quot;".$row["restaurant_name"]."&quot;,&quot;".($row["record_alive"]/24/3600)."&quot;,&quot;".$row["order_num"]."&quot;,&quot;".$row["terminal_num"]."&quot;,&quot;".$row["food_num"]."&quot;,&quot;".$row["table_num"]."&quot;,&quot;".$row["order_paid"]."&quot;,&quot;".$row["table_using"]."&quot;)'><img src='images/View.png'  height='16' width='14' border='0'/>&nbsp;查看</a>".
+		"<a href='#' onclick='viewRestaurant(&quot;".$row["id"]."&quot;,&quot;".$row["account"]."&quot;,&quot;".$row["restaurant_name"]."&quot;,&quot;".($row["record_alive"]/24/3600)."&quot;,&quot;".$row["order_num"]."&quot;,&quot;".$row["order_history_num"]."&quot;,&quot;".$row["terminal_num"]."&quot;,&quot;".$row["terminal_virtual_num"]."&quot;,&quot;".$row["food_num"]."&quot;,&quot;".$row["table_num"]."&quot;,&quot;".$row["order_paid"]."&quot;,&quot;".$row["order_history_paid"]."&quot;,&quot;".$row["table_using"]."&quot;)'><img src='images/View.png'  height='16' width='14' border='0'/>&nbsp;查看</a>".
 		"&nbsp;&nbsp;&nbsp;&nbsp;" .
 		"<a href='#' onclick='editRestaurant(&quot;".$row["id"]."&quot;,&quot;".$row["account"]."&quot;,&quot;".$row["restaurant_name"].
 		"&quot;,&quot;".$row["tele1"]."&quot;,&quot;".$row["tele2"]."&quot;,&quot;".$row["address"].

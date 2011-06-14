@@ -28,18 +28,19 @@ $editType = $_POST["editType"];
 if($editType == "addTerminal")
 {
 	$new_pin = $_POST["new_pin"];
+	$model_id = $_POST["sel_model"];	
 	$model_name = $_POST["model_name"];	
 	$validate = true;	
 	$sql = "SELECT * FROM terminal WHERE pin=".base_convert($new_pin,16,10);		
 	$rs = $db ->GetOne($sql);
 	if($rs)
 	{
-		echo "<script>alert('已存在此PIN的终端，请重新输入新终端的PIN码！');addTerminal('$pin','$new_pin','$model_name')</script>";
+		echo "<script>alert('已存在此PIN的终端，请重新输入新终端的PIN码！');addTerminal('$pin','$new_pin','$model_id','$model_name')</script>";
 		$validate = false;
 	}
 	if($validate)
 	{
-		$sql = "INSERT INTO terminal(pin,restaurant_id,model_name,entry_date,idle_date) VALUES(".strtoupper(base_convert($new_pin,16,10)).",2,'$model_name',NOW(),NOW())";
+		$sql = "INSERT INTO terminal(pin,restaurant_id,model_id,model_name,entry_date,idle_date,owner_name) VALUES(".strtoupper(base_convert($new_pin,16,10)).",2,$model_id,'$model_name',NOW(),NOW(),'')";
 		if($db->Execute($sql))
 		{
 			echo "<script>alert('保存成功！');</script>";		
@@ -53,6 +54,7 @@ else if($editType == "editTerminal")
 {
 	$pin = $_POST["pin"];
 	$new_pin = $_POST["new_pin"];
+	$model_id = $_POST["sel_model"];	
 	$model_name = $_POST["model_name"];	
 	$owner_name = $_POST["owner_name"];	
 	$validate = true;
@@ -62,13 +64,13 @@ else if($editType == "editTerminal")
 		$rs = $db ->GetOne($sql);
 		if($rs)
 		{
-			echo "<script>alert('已存在此PIN的终端，请重新输入新终端的PIN码！');editTerminal('$pin','$new_pin','$model_name','$owner_name')</script>";
+				echo "<script>alert('已存在此PIN的终端，请重新输入新终端的PIN码！');editTerminal('$pin','$new_pin','$model_id','$model_name','$owner_name')</script>";
 			$validate = false;
 		}
 	}	
 	if($validate)
 	{
-		$sql = "UPDATE terminal SET pin=".base_convert($new_pin,16,10). ",model_name='$model_name',owner_name='$owner_name' WHERE pin=".base_convert($pin,16,10);		
+			$sql = "UPDATE terminal SET pin=".base_convert($new_pin,16,10). ",model_id=$model_id,model_name='$model_name',owner_name='$owner_name' WHERE pin=".base_convert($pin,16,10);		
 		/*echo $sql;*/	
 		if($db->Execute($sql))
 		{
@@ -206,9 +208,10 @@ work_date = NOW() WHERE (((`t`.`restaurant_id` > 10) and (date(now()) <= `t`.`ex
 
 	//mysqli_query($con1,"call update_duration()");
 	//mysql_close($con1);
+//echo $sql;	
 ?>
 <h1>
-<span class="action-span"><a href="#" onclick="addTerminal('','','')">添加终端</a></span>
+<span class="action-span"><a href="#" onclick="addTerminal('','','','','')">添加终端</a></span>
 <span class="action-span1">e点通管理中心</span><span id="search_id" class="action-span2">  - 终端信息 </span>
 <span id="terminalStat" class="action-span1" style="color:brown;margin-left:20px">空闲:23.5   使用:136.2  使用率:78.3%</span>
 <div style="clear:both"></div>
@@ -352,17 +355,17 @@ work_date = NOW() WHERE (((`t`.`restaurant_id` > 10) and (date(now()) <= `t`.`ex
 			}
 			if($row["status"] == "空闲")
 			{
-				$operation = "<a href='#' onclick='viewTerminal(&quot;".strtoupper(base_convert($row["pin"],10,16))."&quot;,&quot;".$row["restaurant_id"]."&quot;,&quot;".$row["model_name"]."&quot;,&quot;".$Ex_date.
-					"&quot;,&quot;".$row["status"]."&quot;,&quot;".$row["entry_date"]."&quot;,&quot;".$row["work_month"]."&quot;,&quot;".$row["idle_month"]."&quot;,&quot;".$Dis_date.
-					"&quot;,&quot;".$row["use_rate"]."&quot;,&quot;".$owner_name.
-					"&quot;)'><img src='images/View.png'  height='16' width='14' border='0'/>&nbsp;查看</a>"."&nbsp;".
-					"<a href='#' onclick='editTerminal(&quot;".strtoupper(base_convert($row["pin"],10,16))."&quot;,&quot;".strtoupper(base_convert($row["pin"],10,16))."&quot;,&quot;".$row["model_name"]."&quot;,&quot;".$owner_name."&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>"."&nbsp;".				
+		$operation = "<a href='#' onclick='viewTerminal(&quot;".strtoupper(base_convert($row["pin"],10,16))."&quot;,&quot;".$row["restaurant_id"]."&quot;,&quot;".$row["model_name"]."&quot;,&quot;".$Ex_date.
+			"&quot;,&quot;".$row["status"]."&quot;,&quot;".$row["entry_date"]."&quot;,&quot;".$row["work_month"]."&quot;,&quot;".$row["idle_month"]."&quot;,&quot;".$Dis_date.
+			"&quot;,&quot;".$row["use_rate"]."&quot;,&quot;".$owner_name.
+			"&quot;)'><img src='images/View.png'  height='16' width='14' border='0'/>&nbsp;查看</a>"."&nbsp;".
+			"<a href='#' onclick='editTerminal(&quot;".strtoupper(base_convert($row["pin"],10,16))."&quot;,&quot;".strtoupper(base_convert($row["pin"],10,16))."&quot;,&quot;".$row["model_id"]."&quot;,&quot;".$row["model_name"]."&quot;,&quot;".$owner_name."&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>"."&nbsp;".				
 					"<a href='#' onclick='installTerminal(&quot;".strtoupper(base_convert($row["pin"],10,16))."&quot;,&quot;".$row["restaurant_id"]."&quot;,&quot;".date("Y-m-d")."&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;挂载</a>"."&nbsp;".
 					"<a href='#' onclick='changeTerminalStatus(&quot;".strtoupper(base_convert($row["pin"],10,16))."&quot;,&quot;discardTerminal&quot;,&quot;废弃&quot;)'><img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;废弃</a>";
 			}
 			if($row["status"] == "废弃")
 			{
-				$operation = "<a href='#' onclick='viewTerminal(&quot;".strtoupper(base_convert($row["pin"],10,16))."&quot;,&quot;".$row["restaurant_id"]."&quot;,&quot;".$row["model_name"]."&quot;,&quot;".$Ex_date.
+		$operation = "<a href='#' onclick='viewTerminal(&quot;".strtoupper(base_convert($row["pin"],10,16))."&quot;,&quot;".$row["restaurant_id"]."&quot;,&quot;".$row["model_id"]."&quot;,&quot;".$row["model_name"]."&quot;,&quot;".$Ex_date.
 					"&quot;,&quot;".$row["status"]."&quot;,&quot;".$row["entry_date"]."&quot;,&quot;".$row["work_month"]."&quot;,&quot;".$row["idle_month"]."&quot;,&quot;".$Dis_date.
 					"&quot;,&quot;".$row["use_rate"]."&quot;,&quot;".$owner_name.
 					"&quot;)'><img src='images/View.png'  height='16' width='14' border='0'/>&nbsp;查看</a>"."&nbsp;".

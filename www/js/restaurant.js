@@ -1,11 +1,12 @@
-function viewRestaurant(id,account,restaurant_name,record_alive,order_num,terminal_num,food_num,table_num,order_paid,table_using) {
+function viewRestaurant(id,account,restaurant_name,record_alive,order_num,order_history_num,terminal_num,terminal_virtual_num,food_num,table_num,order_paid,order_history_paid,table_using) {
 //    alert(order_num);
     var ra = "永久";
     if(record_alive != "0")
     {
         ra = record_alive + "天";
     }
-    var order_notPaid = parseInt(order_num)-parseInt(order_paid);
+    var order_notPaid = parseInt(order_num) - parseInt(order_paid);
+    var order_history_notPaid = parseInt(order_history_num) - parseInt(order_history_paid);
     var table_notUsing = parseInt(table_num)-parseInt(table_using);
     var content = ' <div class="add_foot" style="width:400px">' +
                         '<div class="title" style="width:400px">' +
@@ -18,8 +19,9 @@ function viewRestaurant(id,account,restaurant_name,record_alive,order_num,termin
 	                            '<div class="pop_Content1">餐厅名：' + restaurant_name + '</div>' +
 	                            '<div class="pop_Content1">帐户名：' + account + '</div>' +
 	                            '<div class="pop_Content1">帐单有效期：' + ra + '</div>' +
-	                            '<div class="pop_Content1">帐单数量：' + order_num + '（总数），' + order_paid + '（已结帐），' + order_notPaid + '（未结帐）</div>' +
-	                            '<div class="pop_Content1">终端数量：' + terminal_num + '</div>' +
+	                            '<div class="pop_Content1">当日帐单：' + order_num + '（总数），' + order_paid + '（已结帐），' + order_notPaid + '（未结帐）</div>' +
+	                            '<div class="pop_Content1">历史帐单：' + order_history_num + '（总数），' + order_history_paid + '（已结帐），' + order_history_notPaid + '（未结帐）</div>' +
+	                            '<div class="pop_Content1">终端数量：' + terminal_num + '(实机)，' + terminal_virtual_num + '(虚拟)' + '</div>' +
 	                            '<div class="pop_Content1">菜谱数量：' + food_num + '</div>' +
 	                            '<div class="pop_Content1">餐台数：' + table_num + '（总数），' + table_using + '（就餐），' + table_notUsing + '（空闲）</div>' +
 	                        '</div>' +	                        

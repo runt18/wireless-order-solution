@@ -75,7 +75,7 @@ function statTerminal(totalWork, totalIdle) {
     document.getElementById("terminalStat").innerText = "空闲(月)：" + totalIdleMonth.toFixed(1) + "   使用(月)：" + totalWorkMonth.toFixed(1) + "  使用率：" + useRate.toFixed(1) + "%";
 }
 
-function addTerminal(pin, new_pin, model_name,owner_name) {
+function addTerminal(pin, new_pin, model_id, model_name) {
     var editType = "addTerminal";
     var title = "添加终端";    
     var content = ' <div class="add_foot">' +
@@ -87,8 +87,12 @@ function addTerminal(pin, new_pin, model_name,owner_name) {
 	                        '<input type="hidden" name="editType" value="' + editType + '" />' +	                      	     	                	                          
 	                      '<div class="add_foot_Content" >' +
 	                        '<div class="pop_Content">' +
-	                            '<div class="pop_Content1">PIN：&nbsp;&nbsp;<input type="text" id="new_pin" name="new_pin" value="' + new_pin + '" size="25" height="20" onfocus="this.select()" /></div>' +
-	                            '<div class="pop_Content1">型号：<input type="text" id="model_name" name="model_name" value="' + model_name + '" size="25" height="20" onfocus="this.select()" /></div>' +                           
+	                            '<div class="pop_Content1">PIN：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="new_pin" name="new_pin" value="' + new_pin + '" size="25" height="20" onfocus="this.select()" /></div>' +
+	                              '<div class="pop_Content1">型号ID：<select id="sel_model" name="sel_model">' +
+	                                    '<option value="0" selected="selected">BlackBerry</option>' +
+	                                    '<option value="1">Android</option>' +
+	                                    '</select></div>' +
+	                            '<div class="pop_Content1">型号：&nbsp;&nbsp;&nbsp;<input type="text" id="model_name" name="model_name" value="' + model_name + '" size="25" height="20" onfocus="this.select()" /></div>' +                           
 	                        '</div>' +
 	                            '<span class="pop_action-span"><a href="#" onclick="submitTerminalData()">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>' +
 	                            '<span class="pop_action-span1"><a href="#" onclick="closeWindow()">取&nbsp;&nbsp;&nbsp;&nbsp;消</a></span>' +
@@ -97,22 +101,15 @@ function addTerminal(pin, new_pin, model_name,owner_name) {
 	                '</div>';
 
     showMessageBox(content, 342, 350);
-    document.getElementById("new_pin").focus();     
+    document.getElementById("new_pin").focus();
+    if (model_id != "") {
+        document.all.sel_model.value = model_id;
+    }
 }
 
-function editTerminal(pin, new_pin, model_name,owner_name) {
+function editTerminal(pin, new_pin, model_id,model_name,owner_name) {
     var editType = "editTerminal";
     var title = '修改（' + pin + '）';
-//    var pinedit = "";       
-//    if (pin != "") {
-//        editType = "editTerminal";
-//        title = '修改（' + pin + '）';
-//        pinedit = '<input type="hidden" name="pin" value="' + new_pin + '" /> <div class="pop_Content1">PIN：' + new_pin + '</div>';       
-//    }
-//    else
-//    {
-//        pinedit = '<div class="pop_Content1">PIN：&nbsp;&nbsp;<input type="text" id="new_pin" name="new_pin" value="' + new_pin + '" size="25" height="20" onfocus="this.select()" /></div>';  
-//    }
     var content = ' <div class="add_foot">' +
                         '<div class="title">' +
 	                        '<div class="title_left"><font class="font" style="width:160px">' + title + '</font></div>' +
@@ -122,11 +119,15 @@ function editTerminal(pin, new_pin, model_name,owner_name) {
 	                        '<input type="hidden" name="editType" value="' + editType + '" />' +	     	                
 	                         '<input type="hidden" name="pin" value="' + pin + '" />' +	  
 	                         '<input type="hidden" name="new_pin" value="' + new_pin + '" />'  +            
-	                      '<div class="add_foot_Content" >' +
+	                      '<div class="add_foot_Content" style="height:180px" >' +
 	                        '<div class="pop_Content">' +
 	                            '<div class="pop_Content1">PIN：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + new_pin + '</div>' +
 //	                            '<div class="pop_Content1">PIN：&nbsp;&nbsp;<input type="text" id="new_pin" name="new_pin" value="' + new_pin + '" size="25" height="20" onfocus="this.select()" /></div>' +
-                                '<div class="pop_Content1">持有人：<input type="text" id="owner_name" name="owner_name" value="' + owner_name + '" size="25" height="20" onfocus="this.select()" style="width: 150px;"/></div>' +                           
+                                '<div class="pop_Content1">持有人：<input type="text" id="owner_name" name="owner_name" value="' + owner_name + '" size="25" height="20" onfocus="this.select()" style="width: 150px;"/></div>' +
+                                  '<div class="pop_Content1">型号ID：<select id="sel_model" name="sel_model">' +
+	                                    '<option value="0" selected="selected">BlackBerry</option>' +
+	                                    '<option value="1">Android</option>' +	                                                       
+	                                    '</select></div>' +
 	                            '<div class="pop_Content1">型号：<input type="text" id="model_name" name="model_name" value="' + model_name + '" size="25" height="20" onfocus="this.select()" style="position: relative; right: -14px; width: 150px;"/></div>' +                           	                            
 	                        '</div>' +
 	                            '<span class="pop_action-span"><a href="#" onclick="submitTerminalData()">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>' +
@@ -136,14 +137,8 @@ function editTerminal(pin, new_pin, model_name,owner_name) {
 	                '</div>';
 
     showMessageBox(content, 342, 350);
-//    if(pin != "")
-//    {
-         document.getElementById("owner_name").focus();
-//    }
-//    else
-//    {
-//        document.getElementById("new_pin").focus();    
-//    }   
+    document.getElementById("owner_name").focus();
+    document.all.sel_model.value = model_id;
 }
 
 function submitTerminalData() {
