@@ -100,11 +100,10 @@ if($ids != null)
 	$dateFrom = $_POST["dateFrom"];
 	$dateTo = $_POST["dateTo"];
 	$sql = "SELECT f.id,f.alias_id,d.order_count,f.name,f.unit_price,CASE WHEN d.order_count IS NULL THEN 0 ELSE d.order_count END AS order_count,
-			CASE WHEN format(f.unit_price*d.order_count,2) IS NULL THEN 0.00 ELSE format(f.unit_price*d.order_count,2) END AS total_price,CASE WHEN k.name IS NULL THEN '空' ELSE k.name END AS kitchen_name FROM 
+			CASE WHEN format(d.total_price,2) IS NULL THEN 0.00 ELSE format(d.total_price,2) END AS total_price,CASE WHEN k.name IS NULL THEN '空' ELSE k.name END AS kitchen_name FROM 
 			food f LEFT JOIN kitchen k ON f.kitchen = k.alias_id AND k.restaurant_id = " . $_SESSION["restaurant_id"]." LEFT JOIN 
-			(SELECT a.id,SUM(b.order_count) AS order_count FROM `food` a 
-			INNER JOIN order_food_history b ON a.alias_id = b.food_id
-			INNER JOIN `order_history` c ON b.order_id = c.id AND c.restaurant_id=a.restaurant_id WHERE a.restaurant_id=" . $_SESSION["restaurant_id"];
+			(SELECT a.food_id,SUM(a.order_count) AS order_count,SUM((a.unit_price*a.discount+a.taste_price)*a.order_count) AS total_price FROM order_food_history_view a 
+			INNER JOIN `order_history` b ON a.order_id = b.id WHERE b.restaurant_id=" . $_SESSION["restaurant_id"];
 	if($dateFrom != "")
 	{
 		$sql .= (" AND c.order_date >='" . $dateFrom . " 0:0:0'");
@@ -114,7 +113,7 @@ if($ids != null)
 		$sql .= (" AND c.order_date <='" . $dateTo . " 23:59:59'");
 	}
 	
-	$sql .= (" GROUP BY a.id) AS d ON f.id = d.id");	
+	$sql .= (" GROUP BY a.food_id) AS d ON f.alias_id = d.food_id AND f.restaurant_id =" . $_SESSION["restaurant_id"]);	
 	if($ids != "")
 	{
 		$sql.= " WHERE f.id IN ($ids)";

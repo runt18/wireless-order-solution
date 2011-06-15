@@ -129,17 +129,17 @@ function editTable(id, alias_id, name, target) {
 
 function submitTableData() {
     var alias_id = document.getElementById("alias_id").value;
-    var name = document.getElementById("name").value;
+//    var name = document.getElementById("name").value;
     if (alias_id == undefined || alias_id == null || alias_id == "") {
         alert("编号不能为空！");
         document.getElementById("alias_id").focus();
         return;
     }
-    if (name == undefined || name == null || name == "") {
-        alert("名称不能为空！");
-        document.getElementById("name").focus();
-        return;
-    }
+//    if (name == undefined || name == null || name == "") {
+//        alert("名称不能为空！");
+//        document.getElementById("name").focus();
+//        return;
+//    }
     document.tableForm.submit();
 }
 

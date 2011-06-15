@@ -56,29 +56,31 @@ $sql = "SELECT CASE WHEN o_date IS NULL THEN '-' ELSE o_date END AS o_date,
 		Sum(CASE type_value WHEN 5 THEN t_price ELSE 0.00 END) AS '签单',
 		CASE WHEN SUM(t_price) IS NULL THEN 0.00 ELSE SUM(t_price) END AS '合计'
 		FROM
-		(SELECT DATE(c.order_date) AS o_date, a.name AS kitchen, c.type AS type_value,
-		FORMAT(SUM((`b`.`unit_price` * `b`.`discount`) + `b`.`taste_price`) * `b`.`order_count`,2) AS t_price
-		FROM kitchen a
-		LEFT JOIN order_food_history b ON  a.alias_id = b.kitchen 
-		LEFT JOIN order_history c ON b.order_id = c.id AND a.restaurant_id = c.restaurant_id WHERE a.restaurant_id=" . $_SESSION["restaurant_id"];	
+		(SELECT DATE(b.order_date) AS o_date,a.name AS kitchen, b.type AS type_value,
+		SUM(((`b`.`unit_price` * `b`.`discount`) + `b`.`taste_price`) * `b`.`order_count`) AS t_price,b.type
+		FROM kitchen a 
+		LEFT JOIN 
+		(SELECT o.type,o.order_date,of.* FROM order_history o 
+		INNER JOIN order_food_history_view of ON of.order_id = o.id) AS b ON b.kitchen=a.alias_id
+		WHERE a.restaurant_id=" . $_SESSION["restaurant_id"];	
 
 $dateFrom = $_REQUEST["dateFrom"];
 $dateTo = $_REQUEST["dateTo"];
 $ids = $_REQUEST["ids"];
 if($dateFrom != "")
 {
-	$sql .= (" AND c.order_date >='" . $dateFrom . " 0:0:0'");
+	$sql .= (" AND b.order_date >='" . $dateFrom . " 0:0:0'");
 }
 if($dateTo != "")
 {
-	$sql .= (" AND c.order_date <='" . $dateTo . " 23:59:59'");
+	$sql .= (" AND b.order_date <='" . $dateTo . " 23:59:59'");
 }	
 if($ids != "")
 {
 	$sql .= (" AND a.id IN ($ids)");
 }	
 
-$sql .= (" GROUP BY DATE(c.order_date), a.name,c.type) AS b
+$sql .= (" GROUP BY DATE(b.order_date), a.name,b.type) AS b
 			GROUP BY o_date,kitchen ORDER BY o_date DESC,kitchen DESC");
 
 
@@ -104,12 +106,12 @@ foreach ($rs as $row){
 	echo "<td>" .$bh ."</td>";
 	echo "<td>" .$row["o_date"] ."</td>";
 	echo "<td>" .$row["kitchen"] ."</td>";		
-	echo "<td>" .$row["现金"] ."</td>";
-	echo "<td>" .$row["刷卡"] ."</td>";
-	echo "<td>" .$row["会员卡"] ."</td>";
-	echo "<td>" .$row["挂账"] ."</td>";
-	echo "<td>" .$row["签单"] ."</td>";
-	echo "<td>" .$row["合计"] ."</td>";
+	echo "<td>" .number_format($row["现金"],2) ."</td>";
+	echo "<td>" .number_format($row["刷卡"],2) ."</td>";
+	echo "<td>" .number_format($row["会员卡"],2) ."</td>";
+	echo "<td>" .number_format($row["挂账"],2) ."</td>";
+	echo "<td>" .number_format($row["签单"],2) ."</td>";
+	echo "<td>" .number_format($row["合计"],2) ."</td>";
 	echo "</tr>";
 }	
 /*$sql = "SELECT * FROM restaurant where id=".$_SESSION["restaurant_id"]; 
@@ -135,6 +137,7 @@ echo "<td>".number_format($total_all,2)."</td>";
 		</tfood>
   </table>
   </div>
+<?PHP //echo $sql; ?>
     <!--endprint1-->	
 	<div id="controls" style="width:420px;text-align:right;margin: 0px -20px;">      
         <div id="text" style="font-size:12px;text-align:right"><?php echo "总计" .$bh ."&nbsp;条记录"; ?></div>
