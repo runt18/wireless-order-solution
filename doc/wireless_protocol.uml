@@ -573,7 +573,7 @@ len[2] : 0x00,0x00
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="Left" type="integer">464</XPD:ATTR>
 <XPD:ATTR name="Top" type="integer">44</XPD:ATTR>
-<XPD:ATTR name="Width" type="integer">449</XPD:ATTR>
+<XPD:ATTR name="Width" type="integer">509</XPD:ATTR>
 <XPD:ATTR name="Height" type="integer">203</XPD:ATTR>
 <XPD:ATTR name="Text" type="string">&lt;Header&gt;
 mode : ORDER_BUSSINESS
@@ -584,7 +584,7 @@ pin[6] : auto
 len[2] : length of the &lt;Body&gt;
 
 &lt;Body&gt;
-table[2] : category : custom_num : food_num : &lt;Food1&gt; : &lt;Food2&gt;... : origian_table[2]
+table[2] : table_2[2] : category : custom_num : food_num : &lt;Food1&gt; : &lt;Food2&gt;... : origian_table[2]
 
 &lt;Food&gt;
 food_id[2] : order_num[2] : taste_id : kitchen
@@ -593,7 +593,7 @@ food_id[2] : order_num[2] : taste_id : kitchen
 <XPD:OBJ name="OwnedViews[4]" type="UMLNoteLinkView" guid="QFjSW90l/ECdpofChL68vQAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">464,135;339,129</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">464,134;339,129</XPD:ATTR>
 <XPD:REF name="Head">mMJhXgcrmES0x3D5nCtc/QAA</XPD:REF>
 <XPD:REF name="Tail">p+0MN6Dz/kaTPZFkTgFoAAAA</XPD:REF>
 </XPD:OBJ>
@@ -755,7 +755,7 @@ len[2] : 0x00, 0x00
 <XPD:OBJ name="OwnedViews[14]" type="UMLNoteLinkView" guid="hJs7yKUMl0SGqBgb7eYXDwAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">349,171;464,162</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">349,172;464,164</XPD:ATTR>
 <XPD:REF name="Head">p+0MN6Dz/kaTPZFkTgFoAAAA</XPD:REF>
 <XPD:REF name="Tail">YVwwD+L110+LlBUG0q0/FwAA</XPD:REF>
 </XPD:OBJ>
@@ -776,7 +776,7 @@ len[2] : 0x00, 0x00
 <XPD:OBJ name="OwnedViews[16]" type="UMLNoteLinkView" guid="orUZEThBWUqfNrwrxUOkgQAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">636,300;654,246</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">642,300;668,246</XPD:ATTR>
 <XPD:REF name="Head">p+0MN6Dz/kaTPZFkTgFoAAAA</XPD:REF>
 <XPD:REF name="Tail">PtDk4CyduEKRFiDheu2B9AAA</XPD:REF>
 </XPD:OBJ>
@@ -989,8 +989,8 @@ table[2]
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="Left" type="integer">444</XPD:ATTR>
 <XPD:ATTR name="Top" type="integer">276</XPD:ATTR>
-<XPD:ATTR name="Width" type="integer">447</XPD:ATTR>
-<XPD:ATTR name="Height" type="integer">338</XPD:ATTR>
+<XPD:ATTR name="Width" type="integer">505</XPD:ATTR>
+<XPD:ATTR name="Height" type="integer">353</XPD:ATTR>
 <XPD:ATTR name="Text" type="string">in the case query order successfully
 
 &lt;Header&gt;
@@ -1002,9 +1002,10 @@ pin[6] : same as request
 len[2] : length of the &lt;Body&gt;
 
 &lt;Body&gt;
-table[2] : category : customer_num : total_price[4] : food_num: &lt;Food1&gt; : &lt;Food2&gt;...
+table[2] : table_2[2] : category : customer_num : total_price[4] : food_num: &lt;Food1&gt; : &lt;Food2&gt;...
 
 table[2] - 2-byte indicating the table alias id
+table_2[2] - 2-byte indicating the 2nd table alias id, only used for table merger
 category - 1-byte indicating the category to this order
 customer_num - the number of customer
 total_price[4] - 4-byte indicating the total price to this order, but right now the 
@@ -1018,7 +1019,7 @@ food_id[2] : order_num[2] : food_status : taste_id
 <XPD:OBJ name="OwnedViews[7]" type="UMLNoteLinkView" guid="gGSnKYlsA0yt2tGNW9jR0QAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">444,309;326,237</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">444,305;326,237</XPD:ATTR>
 <XPD:REF name="Head">WlikubFmzkSa+EXEfDJgzQAA</XPD:REF>
 <XPD:REF name="Tail">0s2zH7OdtE+C4QgjH+cyDQAA</XPD:REF>
 </XPD:OBJ>
@@ -1087,8 +1088,8 @@ len[2] : 0x00, 0x00
 <XPD:OBJ name="OwnedViews[11]" type="UMLNoteView" guid="5ybrXjoA1kS7aY2Gz1X4cwAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Left" type="integer">328</XPD:ATTR>
-<XPD:ATTR name="Top" type="integer">620</XPD:ATTR>
+<XPD:ATTR name="Left" type="integer">264</XPD:ATTR>
+<XPD:ATTR name="Top" type="integer">652</XPD:ATTR>
 <XPD:ATTR name="Width" type="integer">208</XPD:ATTR>
 <XPD:ATTR name="Height" type="integer">57</XPD:ATTR>
 <XPD:ATTR name="Text" type="string">the error code is one the values below.
@@ -1099,15 +1100,15 @@ len[2] : 0x00, 0x00
 <XPD:OBJ name="OwnedViews[12]" type="UMLNoteLinkView" guid="Wk7QhQasTUSjkeQDy9DIGQAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">388,620;312,571</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">342,652;282,584</XPD:ATTR>
 <XPD:REF name="Head">5+RP0wX/OUWQpj7olBZ/SwAA</XPD:REF>
 <XPD:REF name="Tail">5ybrXjoA1kS7aY2Gz1X4cwAA</XPD:REF>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedViews[13]" type="UMLNoteView" guid="q4lJlyidOkytpp/utS7FqAAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Left" type="integer">596</XPD:ATTR>
-<XPD:ATTR name="Top" type="integer">624</XPD:ATTR>
+<XPD:ATTR name="Left" type="integer">588</XPD:ATTR>
+<XPD:ATTR name="Top" type="integer">652</XPD:ATTR>
 <XPD:ATTR name="Width" type="integer">214</XPD:ATTR>
 <XPD:ATTR name="Height" type="integer">83</XPD:ATTR>
 <XPD:ATTR name="Text" type="string">the category is one of the values below.
@@ -1120,7 +1121,7 @@ len[2] : 0x00, 0x00
 <XPD:OBJ name="OwnedViews[14]" type="UMLNoteLinkView" guid="JA15B0WNBk+kVuQPpH1gYAAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">696,624;694,613</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">694,652;694,628</XPD:ATTR>
 <XPD:REF name="Head">0s2zH7OdtE+C4QgjH+cyDQAA</XPD:REF>
 <XPD:REF name="Tail">q4lJlyidOkytpp/utS7FqAAA</XPD:REF>
 </XPD:OBJ>
@@ -1561,7 +1562,7 @@ len[2] : 0x00, 0x00
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="Left" type="integer">492</XPD:ATTR>
 <XPD:ATTR name="Top" type="integer">92</XPD:ATTR>
-<XPD:ATTR name="Width" type="integer">395</XPD:ATTR>
+<XPD:ATTR name="Width" type="integer">508</XPD:ATTR>
 <XPD:ATTR name="Height" type="integer">203</XPD:ATTR>
 <XPD:ATTR name="Text" type="string">&lt;Header&gt;
 mode : ORDER_BUSSINESS
@@ -1572,7 +1573,7 @@ pin[6] : auto
 len[2] : length of the &lt;Body&gt;
 
 &lt;Body&gt;
-table[2] : custom_num : food_num: &lt;Food1&gt; : &lt;Food2&gt;... : original_table[2]
+table[2] : table_2[2] : category : custom_num : food_num: &lt;Food1&gt; : &lt;Food2&gt;... : original_table[2]
 
 &lt;Food&gt;
 food_id[2] : order_num[2] : taste_id : kitchen
@@ -1581,7 +1582,7 @@ food_id[2] : order_num[2] : taste_id : kitchen
 <XPD:OBJ name="OwnedViews[4]" type="UMLNoteLinkView" guid="53hS6azOQ0Wv3bD0/1lmuwAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">492,180;401,174</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">492,179;401,174</XPD:ATTR>
 <XPD:REF name="Head">l8cAKs9L9U6SgZuDlM+G0QAA</XPD:REF>
 <XPD:REF name="Tail">J4P0dGBtGkmrDEDRTNmD6QAA</XPD:REF>
 </XPD:OBJ>
