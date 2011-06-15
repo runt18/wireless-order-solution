@@ -67,7 +67,7 @@ public class DailySettlementTask extends SchedulerTask{
 			rs.close();
 			
 			final String orderItem = "`id`, `restaurant_id`,`order_date`, `total_price`, `total_price_2`, `custom_num`," + 
-									"`waiter`,`type`, `member_id`, `member`,`terminal_pin`, `terminal_model`, `table_id`, `table_name`";
+									"`waiter`,`type`, `member_id`, `member`,`terminal_pin`, `terminal_model`, `table_id`, `table_name`, `table2_id`, `table2_name`";
 			
 			final String orderFoodItem = "`id`,`order_id`, `food_id`, `order_date`, `order_count`," + 
 										"`unit_price`,`name`, `food_status`, `taste`,`taste_price`,`taste_id`,`discount`,`kitchen`,`comment`,`waiter`";
