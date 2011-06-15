@@ -48,7 +48,8 @@ public class InsertTable {
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static int exec(DBCon dbCon, Table table) throws BusinessException, SQLException{
+	public static int exec(DBCon dbCon, Table table, boolean autoGenID) throws BusinessException, SQLException{
+
 		String sql = "SELECT id FROM " + Params.dbName + 
 					 ".table WHERE alias_id=" + table.alias_id +
 					 " AND restaurant_id=" + table.restaurant_id;
