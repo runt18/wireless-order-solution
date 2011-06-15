@@ -2,7 +2,7 @@ package com.wireless.db;
 
 public class Params {
 	
-	static String dbName = null;
+	public static String dbName = null;
 	static String dbHost = null;
 	static int dbPort = 0;
 	static String dbUrl = null;

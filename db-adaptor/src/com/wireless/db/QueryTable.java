@@ -153,7 +153,7 @@ public class QueryTable {
 	 * @throws BusinessException throws if the table to query does NOT exist
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	static Table exec(DBCon dbCon, int pin, short model, short tableID) throws BusinessException, SQLException{
+	public static Table exec(DBCon dbCon, int pin, short model, short tableID) throws BusinessException, SQLException{
 		
 		Terminal term = VerifyPin.exec(dbCon, pin, model);
 		
@@ -170,8 +170,8 @@ public class QueryTable {
 			 * Check to see if the table with this alias id is idle or busy
 			 */
 			 sql = "SELECT custom_num, category FROM `" + Params.dbName + 
-				   "`.`order` WHERE table_id = " + tableID +
-				   " OR table2_id = " + tableID + 
+				   "`.`order` WHERE (table_id = " + tableID +
+				   " OR table2_id = " + tableID + ")" + 
 				   " AND restaurant_id = " + term.restaurant_id +
 				   " AND total_price IS NULL";
 			 dbCon.rs = dbCon.stmt.executeQuery(sql);

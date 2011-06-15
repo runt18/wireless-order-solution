@@ -48,7 +48,7 @@ public class VerifyPin {
 	 * 							 - The terminal is expired.
 	 * @throws SQLException throws if fail to execute the SQL statement
 	 */
-	static Terminal exec(DBCon dbCon, int pin, short model) throws BusinessException, SQLException{
+	public static Terminal exec(DBCon dbCon, int pin, short model) throws BusinessException, SQLException{
 		String sql = "SELECT restaurant_id, expire_date, owner_name, model_name FROM " +  
 	     			Params.dbName + ".terminal WHERE pin=" + pin +
 	     			" AND model_id=" + model;

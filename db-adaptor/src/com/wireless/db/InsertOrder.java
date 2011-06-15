@@ -120,7 +120,7 @@ public class InsertOrder {
 						orderToInsert.table_name + "', " +
 						(orderToInsert.category == Order.CATE_MERGER_TABLE ? orderToInsert.table2_id : "NULL") + ", " +
 						(orderToInsert.category == Order.CATE_MERGER_TABLE ? "'" + orderToInsert.table2_name + "'" : "NULL") + ", " +
-						term.modelID + ", "+ 
+						term.modelID + ", " + 
 						term.pin + 
 						", NOW(), " + 
 						orderToInsert.custom_num + ", '" + 
