@@ -27,8 +27,9 @@ public class RespParser {
 		 * pin[6] : same as request
 		 * len[2] -  length of the <Body>
 		 * <Body>
-		 * table[2] : category : custom_num : price[2] : food_num : <Food1> : <Food2>...
+		 * table[2] : table_2[2] : category : custom_num : price[2] : food_num : <Food1> : <Food2>...
 		 * table[2] - 2-byte indicates the table id
+		 * table_2[2] - 2-byte indicates the 2nd table id, only used table merger
 		 * category - 1-byte indicates the category to this order 
 		 * custom_num - 1-byte indicating the number of the custom for this order
 		 * price[4] - 4-byte indicating the total price to this order
@@ -48,24 +49,27 @@ public class RespParser {
 			//get the table id
 			order.table_id = (short)((response.body[0] & 0x00FF) | ((response.body[1] & 0x00FF) << 8));
 
+			//get the 2nd table id
+			order.table2_id = (short)((response.body[2] & 0x00FF) | ((response.body[3] & 0x00FF) << 8));
+			
 			//get the category
-			order.category = (short)(response.body[2] & 0x00FF);
+			order.category = (short)(response.body[4] & 0x00FF);
 			
 			//get the custom number
-			order.custom_num = (int)response.body[3];
+			order.custom_num = (int)response.body[5];
 
 			//get the total price
-			order.totalPrice =  (response.body[4] & 0x000000FF) | 
-								((response.body[5] & 0x000000FF ) << 8) |
-								((response.body[6] & 0x000000FF ) << 16) |
-								((response.body[7] & 0x000000FF ) << 24);
+			order.totalPrice =  (response.body[6] & 0x000000FF) | 
+								((response.body[7] & 0x000000FF ) << 8) |
+								((response.body[8] & 0x000000FF ) << 16) |
+								((response.body[9] & 0x000000FF ) << 24);
 
 			//get order food's number
-			int foodNum = response.body[8];
+			int foodNum = response.body[10];
 			Food[] orderFoods = new Food[foodNum]; 
 			
 			//get every order food's id and number
-			int index = 9;
+			int index = 11;
 			for(int i = 0; i < orderFoods.length; i++){
 				int foodID = (response.body[index] & 0x000000FF) |
 							((response.body[index + 1] & 0x000000FF) << 8);

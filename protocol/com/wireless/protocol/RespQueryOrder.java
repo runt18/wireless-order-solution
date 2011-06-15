@@ -14,8 +14,9 @@ import java.io.UnsupportedEncodingException;
  * pin[6] : same as request
  * len[2] -  length of the <Body>
  * <Body>
- * table[2] : category : custom_num : price[4] : food_num : <Food1> : <Food2>...
+ * table[2] : table_2[2] : category : custom_num : price[4] : food_num : <Food1> : <Food2>...
  * table[2] - 2-byte indicates the table id 
+ * table_2[2] - 2-byte indicates the 2nd table id, only used table merger
  * category - 1-byte indicates the category to this order
  * custom_num - 1-byte indicating the number of the custom for this order
  * price[4] - 4-byte indicating the total price to this order
@@ -38,6 +39,7 @@ public class RespQueryOrder extends RespPackage{
 		header.type = Type.ACK;
 		//calculate the body's length
 		int bodyLen = 2 + /* table id takes up 2-byte */
+					2 + /* 2nd table id takes up 2-byte */
 					1 + /* category takes up 1-byte */
 					1 + /* custom number takes up 1-byte */ 
 					4 + /* price takes up 4-byte */ 
@@ -55,23 +57,27 @@ public class RespQueryOrder extends RespPackage{
 		body[0] = (byte)(order.table_id & 0x00FF);
 		body[1] = (byte)((order.table_id & 0xFF00) >> 8);
 		
+		//assign the 2nd table id
+		body[2] = (byte)(order.table2_id & 0x00FF);
+		body[3] = (byte)((order.table2_id & 0xFF00) >> 8);
+		
 		//assign the category
-		body[2] = (byte)(order.category & 0x00FF);
+		body[4] = (byte)(order.category & 0x00FF);
 		
 		//assign the custom number
-		body[3] = (byte)(order.custom_num & 0x000000FF);
+		body[5] = (byte)(order.custom_num & 0x000000FF);
 		
 		//assign the total price
-		body[4] = (byte)(order.actualPrice & 0x000000FF);
-		body[5] = (byte)((order.actualPrice & 0x0000FF00) >> 8);
-		body[6] = (byte)((order.actualPrice & 0x00FF0000) >> 16);
-		body[7] = (byte)((order.actualPrice & 0xFF000000) >> 24);
+		body[6] = (byte)(order.actualPrice & 0x000000FF);
+		body[7] = (byte)((order.actualPrice & 0x0000FF00) >> 8);
+		body[8] = (byte)((order.actualPrice & 0x00FF0000) >> 16);
+		body[9] = (byte)((order.actualPrice & 0xFF000000) >> 24);
 		
 		//assign the food number
-		body[8] = (byte)(order.foods.length & 0x000000FF);
+		body[10] = (byte)(order.foods.length & 0x000000FF);
 		
 		//assign each food information, including food'id and order number
-		int index = 9;
+		int index = 11;
 		for(int i = 0; i < order.foods.length; i++){
 			body[index] = (byte)(order.foods[i].alias_id & 0x000000FF);
 			body[index + 1] = (byte)((order.foods[i].alias_id & 0x0000FF00) >> 8);
