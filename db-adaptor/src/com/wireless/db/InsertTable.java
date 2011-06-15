@@ -58,6 +58,9 @@ public class InsertTable {
 			throw new BusinessException("Table(alias_id=" + table.alias_id + ") has exist.", ErrorCode.TABLE_EXIST);
 			
 		}else{
+			if(autoGenID){
+				sql = "SELECT MAX(alias_id) FROM " + Params.dbName + "WHERE restaurant_id=" + table.restaurant_id;
+			}
 			sql = "INSERT INTO " + Params.dbName + 
 				  ".table (`id`, `alias_id`, `restaurant_id`, `name`) VALUES (" +
 				  "NULL, " +
