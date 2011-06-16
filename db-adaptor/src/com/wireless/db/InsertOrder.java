@@ -36,7 +36,13 @@ public class InsertOrder {
 			dbCon.connect();
 			
 			Terminal term = VerifyPin.exec(dbCon, pin, model);
-				
+			
+//			if(orderToInsert.category == Order.CATE_JOIN_TABLE || orderToInsert.category == Order.CATE_TAKE_OUT){
+//				Table tmpTable = new Table();
+//				tmpTable.name = orderToInsert.table_name;
+//				orderToInsert.table_id = InsertTable.exec(dbCon, pin, model, tmpTable, true);
+//			}
+			
 			Table table = QueryTable.exec(dbCon, pin, model, orderToInsert.table_id);
 				
 			if(table.status == Table.TABLE_IDLE){
@@ -114,8 +120,9 @@ public class InsertOrder {
 				}
 				//insert to order table
 				sql = "INSERT INTO `" + Params.dbName + 
-						"`.`order` (`id`, `restaurant_id`, `table_id`, `table_name`, `table2_id`, `table2_name`, `terminal_model`, `terminal_pin`, `order_date`, `custom_num`, `waiter`) VALUES (NULL, " + 
+						"`.`order` (`id`, `restaurant_id`, `category`, `table_id`, `table_name`, `table2_id`, `table2_name`, `terminal_model`, `terminal_pin`, `order_date`, `custom_num`, `waiter`) VALUES (NULL, " + 
 						table.restaurant_id + ", " + 
+						orderToInsert.category + ", " +
 						orderToInsert.table_id + ", '" + 
 						orderToInsert.table_name + "', " +
 						(orderToInsert.category == Order.CATE_MERGER_TABLE ? orderToInsert.table2_id : "NULL") + ", " +
