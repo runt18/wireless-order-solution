@@ -1,4 +1,4 @@
-package com.wireless.Actions.dishesOrder;
+package com.wireless.Actions.tableSelect;
 
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -87,6 +87,8 @@ public class TransTableAction extends Action {
 				jsonResp = jsonResp.replace("$(value)", oldTableID + "号台信息不存在");
 			}else if(newTable == null){
 				jsonResp = jsonResp.replace("$(value)", newTableID + "号台信息不存在");
+			}else{
+				jsonResp = jsonResp.replace("$(value)", oldTable.alias_id + "号台转至" + newTable.alias_id + "号台不成功");				
 			}
 			
 		}catch(SQLException e){
