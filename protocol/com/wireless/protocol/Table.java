@@ -8,7 +8,7 @@ public class Table {
 	//the restaurant id that this table is attached to
 	public int restaurant_id = 0;
 	//the alias id to this table
-	public short alias_id = 0;
+	public int alias_id = 0;
 	//the alias name to this table
 	public String name;
 	//the number of the custom to this table
