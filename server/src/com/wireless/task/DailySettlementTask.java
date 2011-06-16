@@ -3,14 +3,14 @@ package com.wireless.task;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.SimpleDateFormat;
 
 import org.tiling.scheduling.SchedulerTask;
+
+import com.wireless.db.DBCon;
+import com.wireless.db.Params;
+import com.wireless.protocol.Restaurant;
 
 /**
  * 
@@ -19,52 +19,40 @@ import org.tiling.scheduling.SchedulerTask;
  */
 public class DailySettlementTask extends SchedulerTask{
 
-	private String _dbUrl = null;
-	private String _dbName = null;
-	private String _dbUser = null;
-	private String _dbPwd = null;
+
 	
-	public DailySettlementTask(String url, String db, String user, String pwd){
-		_dbUrl = url;
-		_dbName = db;
-		_dbUser = user;
-		_dbPwd = pwd;
+	public DailySettlementTask(){
+
 	}
 	
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-		Connection dbCon = null;
-		Statement stmt = null;
-		ResultSet rs = null;
+		DBCon dbCon = new DBCon();
 		String sep = System.getProperty("line.separator");
 		String taskInfo = "Daily settlement task starts on " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z").format(new java.util.Date()) + sep;
 		
 		try {   
-			
-			Class.forName("com.mysql.jdbc.Driver");   
-			dbCon = DriverManager.getConnection(_dbUrl, _dbUser, _dbPwd);
-			
-			stmt = dbCon.createStatement();		
+			dbCon.connect();
 			
 			//get the count to orders which have been paid
 			int nOrders = 0;
-			String sql = "SELECT count(*) FROM " + _dbName + ".order WHERE total_price IS NOT NULL";
-			rs = stmt.executeQuery(sql);
-			if(rs.next()){
-				nOrders = rs.getInt(1);
+			String sql = "SELECT count(*) FROM " + Params.dbName + ".order WHERE total_price IS NOT NULL";
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
+				nOrders = dbCon.rs.getInt(1);
 			}
-			rs.close();
+			dbCon.rs.close();
 			
 			//get the count to order details which have been paid 
 			int nOrderDetails = 0;
-			sql = "SELECT count(*) FROM " + _dbName + ".order_food WHERE order_id IN (" +
-			  	  "SELECT id FROM " + _dbName + ".order WHERE total_price IS NOT NULL)";
-			rs = stmt.executeQuery(sql);
-			if(rs.next()){
-				nOrderDetails = rs.getInt(1);				
+			sql = "SELECT count(*) FROM " + Params.dbName + ".order_food WHERE order_id IN (" +
+			  	  "SELECT id FROM " + Params.dbName + ".order WHERE total_price IS NOT NULL)";
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
+				nOrderDetails = dbCon.rs.getInt(1);				
 			}
-			rs.close();
+			dbCon.rs.close();
 			
 			final String orderItem = "`id`, `restaurant_id`,`order_date`, `total_price`, `total_price_2`, `custom_num`," + 
 									"`waiter`,`type`, `member_id`, `member`,`terminal_pin`, `terminal_model`, `table_id`, `table_name`, `table2_id`, `table2_name`";
@@ -72,34 +60,79 @@ public class DailySettlementTask extends SchedulerTask{
 			final String orderFoodItem = "`id`,`order_id`, `food_id`, `order_date`, `order_count`," + 
 										"`unit_price`,`name`, `food_status`, `taste`,`taste_price`,`taste_id`,`discount`,`kitchen`,`comment`,`waiter`";
 			
-			stmt.clearBatch();
+			dbCon.stmt.clearBatch();
 			//move the order have been paid from "order" to "order_history"
-			sql = "INSERT INTO " + _dbName + ".order_history (" + orderItem + ") " + 
-				  "SELECT " + orderItem + " FROM " + _dbName + ".order WHERE total_price IS NOT NULL";
-			stmt.addBatch(sql);
+			sql = "INSERT INTO " + Params.dbName + ".order_history (" + orderItem + ") " + 
+				  "SELECT " + orderItem + " FROM " + Params.dbName + ".order WHERE total_price IS NOT NULL";
+			dbCon.stmt.addBatch(sql);
 			
 			//move the paid order details from "order_food" to "order_food_history" 
-			sql = "INSERT INTO " + _dbName + ".order_food_history (" + orderFoodItem + ") " +
-				  "SELECT " + orderFoodItem + " FROM " + _dbName + ".order_food WHERE order_id IN (" +
-				  "SELECT id FROM " + _dbName + ".order WHERE total_price IS NOT NULL)";
-			stmt.addBatch(sql);
+			sql = "INSERT INTO " + Params.dbName + ".order_food_history (" + orderFoodItem + ") " +
+				  "SELECT " + orderFoodItem + " FROM " + Params.dbName + ".order_food WHERE order_id IN (" +
+				  "SELECT id FROM " + Params.dbName + ".order WHERE total_price IS NOT NULL)";
+			dbCon.stmt.addBatch(sql);
 			
 			//delete the order details which have been paid from "order_food"
-			sql = "DELETE FROM " + _dbName + ".order_food WHERE order_id IN (" +
-				  "SELECT id FROM " + _dbName + ".order WHERE total_price IS NOT NULL)";
-			stmt.addBatch(sql);
+			sql = "DELETE FROM " + Params.dbName + ".order_food WHERE order_id IN (" +
+				  "SELECT id FROM " + Params.dbName + ".order WHERE total_price IS NOT NULL)";
+			dbCon.stmt.addBatch(sql);
 			
 			//delete the order which have been paid from "order"
-			sql = "DELETE FROM " + _dbName + ".order WHERE total_price IS NOT NULL";
-			stmt.addBatch(sql);
-			stmt.executeBatch();
+			sql = "DELETE FROM " + Params.dbName + ".order WHERE total_price IS NOT NULL";
+			dbCon.stmt.addBatch(sql);
+			
+			//delete the order_food record to root
+			sql = "DELETE FROM " + Params.dbName + ".order_food WHERE order_id IN (SELECT id FROM " + 
+				  Params.dbName + ".order WHERE restaurant_id=" + Restaurant.ADMIN + ")";
+			dbCon.stmt.addBatch(sql);
+			
+			//delete the order record to root
+			sql = "DELETE FROM " + Params.dbName + ".order WHERE restaurant_id=" + Restaurant.ADMIN;
+			dbCon.stmt.addBatch(sql);			
+			
+			dbCon.stmt.executeBatch();
+			
+			//get the max order id from both order and order_history
+			int maxOrderID = 0;
+			sql = "SELECT MAX(`id`) + 1 FROM (" + "SELECT id FROM " + Params.dbName + 
+				  ".order UNION SELECT id FROM " + Params.dbName + 
+				  ".order_history) AS all_order";
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
+				maxOrderID = dbCon.rs.getInt(1);
+				//insert a order record with the max order id to root
+				sql = "INSERT INTO " + Params.dbName + ".order (`id`, `restaurant_id`, `order_date`) VALUES (" + 
+					  maxOrderID + ", " +
+					  Restaurant.ADMIN + ", " +
+					  0 +
+					  ")";
+				dbCon.stmt.execute(sql);
+			}
+			dbCon.rs.close();
+			
+			
+			//get the max order_food id from both order_food and order_food_history
+			int maxOrderFoodID = 0;
+			sql = "SELECT MAX(`id`) + 1 FROM (SELECT id FROM " + Params.dbName +
+				  ".order_food UNION SELECT id FROM " + Params.dbName +
+				  ".order_food_history) AS all_order";
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
+				maxOrderFoodID = dbCon.rs.getInt(1);
+				//insert a order_food record with the max order_food id to root
+				sql = "INSERT INTO " + Params.dbName + ".order_food (`id`, `order_id`, `order_date`) VALUES (" +
+					  maxOrderFoodID + ", " +
+					  maxOrderID + ", " +
+					  0 +
+					  ")";
+				dbCon.stmt.execute(sql);
+			}
+			dbCon.rs.close();
 			
 			taskInfo += "info : " + nOrders + " record(s) are moved from \"order\" to \"order_history\"" + sep;
 			taskInfo += "info : " + nOrderDetails + " record(s) are moved from \"order_food\" to \"order_food_history\"" + sep;
+			taskInfo += "info : " + "maxium order id : " + maxOrderID + ", maxium order food id : " + maxOrderFoodID + sep;
 			
-		}catch(ClassNotFoundException e) { 
-			taskInfo += "error : " + e.getMessage() + sep;
-			e.printStackTrace();   
 			
 		}catch(SQLException e){
 			taskInfo += "error : " + e.getMessage() + sep;
@@ -123,14 +156,7 @@ public class DailySettlementTask extends SchedulerTask{
 				logWriter.close();
 			}catch(IOException e){}
 			
-			try{
-				if(rs != null)
-					rs.close();
-				if(stmt != null)
-					stmt.close();
-				if(dbCon != null)
-					dbCon.close();
-			}catch(SQLException e){}
+			dbCon.disconnect();
 		}
 	}
 
