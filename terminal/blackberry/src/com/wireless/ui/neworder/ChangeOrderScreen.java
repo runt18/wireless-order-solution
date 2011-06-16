@@ -42,7 +42,7 @@ public class ChangeOrderScreen extends MainScreen
 
 		_vfm.add(_tableTitle);
 		
-		_table = new EditField("台号：", new Short(_originalOrder.table_id).toString(),
+		_table = new EditField("台号：", Integer.toString(_originalOrder.table_id),
 							   4, TextField.NO_NEWLINE | EditField.FILTER_NUMERIC);
 		
 		/**

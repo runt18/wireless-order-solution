@@ -103,7 +103,7 @@ class SubmitChangePopup extends PopupScreen{
 		}
 	}
 	
-	private String getErrMsg(short tableID, byte errCode){
+	private String getErrMsg(int tableID, byte errCode){
 		if(errCode == ErrorCode.MENU_EXPIRED){
 			return "菜谱有更新，请更新菜谱后再重新改单。"; 
 			
