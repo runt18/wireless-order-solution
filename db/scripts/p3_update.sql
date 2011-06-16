@@ -1,6 +1,15 @@
 ﻿SET NAMES utf8;
 USE `wireless_order_db` ;
 
+-- Delete all the order record of root
+DELETE FROM `order_food` WHERE order_id IN (SELECT id FROM `order` WHERE restaurant_id=1);
+DELETE FROM `order` WHERE restaurant_id=1;
+-- Insert a maxium order and order_food id record
+SELECT @max_order_id:=(MAX(`id`) + 1) FROM (SELECT id FROM `order` UNION SELECT id FROM `order_history`) AS all_order;
+INSERT INTO `order` (`id`, `restaurant_id`) VALUES(@max_order_id, 1);
+SELECT @max_order_food_id:=(MAX(`id`) + 1) FROM (SELECT id FROM `order_food` UNION SELECT id FROM `order_food_history`) AS all_order;
+INSERT INTO `order_food` (`id`, `order_id`) VALUES(@max_order_food_id, @max_order_id);
+
 DELETE FROM `food` WHERE enabled=0;
 DELETE FROM `table` WHERE enabled=0;
 
@@ -23,6 +32,10 @@ ALTER TABLE `order`
 ADD `table2_id` SMALLINT NULL DEFAULT NULL COMMENT 'the 2nd table alias id to this order(used for table merger)' ;
 ALTER TABLE `order`
 ADD `table2_name` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the 2nd table name to this order(used for table merger)' ;
+ALTER TABLE `order`
+MODIFY `waiter` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the waiter who operates on this order';
+ALTER TABLE `order`
+MODIFY `custom_num` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the amount of custom to this order';
 
 ALTER TABLE `order_history`
 ADD `category` TINYINT NOT NULL DEFAULT 1 COMMENT 'the category to this order, it should be one the values below.\n一般 : 1\n外卖 : 2\n并台 : 3\n拼台 : 4' ;
@@ -34,6 +47,10 @@ ALTER TABLE `order_history`
 ADD `table2_id` SMALLINT NULL DEFAULT NULL COMMENT 'the 2nd table alias id to this order(used for table merger)' ;
 ALTER TABLE `order_history`
 ADD `table2_name` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the 2nd table name to this order(used for table merger)' ;
+ALTER TABLE `order`
+MODIFY `waiter` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the waiter who operates on this order';
+ALTER TABLE `order`
+MODIFY `custom_num` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the amount of custom to this order';
 
 ALTER TABLE `kitchen`
 ADD `discount_3` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the 3rd discount to the food belong to this kitchen, range from 0.00 to 1.00';
