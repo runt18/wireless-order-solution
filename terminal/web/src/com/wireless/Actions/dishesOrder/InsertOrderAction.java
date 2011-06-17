@@ -45,7 +45,8 @@ public class InsertOrderAction extends Action implements PinGen {
 			 * e.g. pin=0x1 & tableID=201 & tableID_2=0 & category=1 & customNum=2 & type=1 & foods="{[1102,2,2,4]}"
 			 * pin : the pin the this terminal
 			 * tableID : the table id to insert order
-			 * tableID_2 : the 2nd table id, this parameter only takes effect in the case of "拼台"
+			 * tableID_2 : the 2nd table id, 
+			 * 			   this parameter is optional and only takes effect in the case of "拼台"
 			 * category : "1" means "一般"
 			 * 			  "2" means "外卖"
 			 * 			  "3" means "并台"
@@ -67,7 +68,8 @@ public class InsertOrderAction extends Action implements PinGen {
 			_pin = Integer.parseInt(pin, 16);
 			
 			Order orderToInsert = new Order();
-			orderToInsert.table_id = Short.parseShort(request.getParameter("tableID"));
+			int tableID = request.getParameter("tableID") != null ? Short.parseShort(request.getParameter("tableID")) : 0;
+			orderToInsert.table_id = tableID;
 			String table2ID = request.getParameter("tableID_2");
 			if(table2ID != null){
 				orderToInsert.table2_id = Short.parseShort(table2ID);
@@ -79,7 +81,7 @@ public class InsertOrderAction extends Action implements PinGen {
 			byte printType = Reserved.DEFAULT_CONF;
 			if(type == 1){
 				orderType = "下单";
-				orderToInsert.originalTableID = Short.parseShort(request.getParameter("tableID"));				
+				orderToInsert.originalTableID = tableID;				
 				printType = Reserved.PRINT_ORDER_2 | Reserved.PRINT_ORDER_DETAIL_2;
 			}else{
 				orderType = "改单";
@@ -101,10 +103,21 @@ public class InsertOrderAction extends Action implements PinGen {
 		
 			if(resp.header.type == Type.ACK){
 				jsonResp = jsonResp.replace("$(result)", "true");
-				if(orderToInsert.table_id == orderToInsert.originalTableID){
-					jsonResp = jsonResp.replace("$(value)", orderToInsert.table_id + "号餐台" + orderType + "成功");
-				}else{
-					jsonResp = jsonResp.replace("$(value)", orderToInsert.originalTableID + "号台转至" + orderToInsert.table_id + "号台，改单成功。");
+				if(orderToInsert.category == Order.CATE_NORMAL){
+					if(orderToInsert.table_id == orderToInsert.originalTableID){
+						jsonResp = jsonResp.replace("$(value)", orderToInsert.table_id + "号餐台" + orderType + "成功");
+					}else{
+						jsonResp = jsonResp.replace("$(value)", orderToInsert.originalTableID + "号台转至" + orderToInsert.table_id + "号台，改单成功。");
+					}					
+					
+				}else if(orderToInsert.category == Order.CATE_TAKE_OUT){
+					jsonResp = jsonResp.replace("$(value)", "外卖" + orderType + "成功");
+					
+				}else if(orderToInsert.category == Order.CATE_MERGER_TABLE){
+					jsonResp = jsonResp.replace("$(value)", orderToInsert.table_id + "号台拼" + orderToInsert.table2_id + "号台" + orderType + "成功");
+					
+				}else if(orderToInsert.category == Order.CATE_JOIN_TABLE){
+					jsonResp = jsonResp.replace("$(value)", "并" + orderToInsert.table_id + "号" + orderType + "成功");
 				}
 				
 			}else if(resp.header.type == Type.NAK){

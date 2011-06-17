@@ -54,7 +54,7 @@ public class QueryTableAction extends Action {
 					 * ["餐台1编号","餐台1人数","占用","餐台1名称","一般"]，["餐台2编号","餐台2人数","空桌","餐台2名称","外卖"]
 					 */
 					String jsonTable = "[\"$(alias_id)\",\"$(custom_num)\",\"$(status)\",\"$(alias_name)\",\"$(category)\"]";
-					jsonTable = jsonTable.replace("$(alias_id)", new Short(tables[i].alias_id).toString());
+					jsonTable = jsonTable.replace("$(alias_id)", Integer.toString(tables[i].alias_id));
 					jsonTable = jsonTable.replace("$(custom_num)", new Short(tables[i].custom_num).toString());
 					
 					if(tables[i].name != null){
