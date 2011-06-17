@@ -49,14 +49,8 @@ $editType = $_POST["editType"];
 $restaurant_id = $_SESSION["restaurant_id"];
 if($editType == "addTable")
 {
-	$alias_id = $_POST["alias_id"];
-	$id = $restaurant_id;
-	for($i=0;$i < 32;$i++)
-	{
-		$id *= 2;
-	}
-	$tableId = $id + $alias_id;
-	$sql = "SELECT * FROM `table` WHERE id = $tableId";
+	$alias_id = $_POST["alias_id"];	
+	$sql = "SELECT * FROM `table` WHERE alias_id = $alias_id AND restaurant_id=$restaurant_id";
 	$rs = $db ->GetOne($sql);
 	if($rs)
 	{
@@ -64,7 +58,7 @@ if($editType == "addTable")
 	}
 	else
 	{		
-		$sql = "INSERT INTO `table`(id,alias_id,restaurant_id,name) VALUES($tableId,$alias_id,$restaurant_id,'$name')";	
+		$sql = "INSERT INTO `table`(alias_id,restaurant_id,name) VALUES($alias_id,$restaurant_id,'$name')";	
 		if($db->Execute($sql))
 		{
 			echo "<script>alert('保存成功！');</script>";
