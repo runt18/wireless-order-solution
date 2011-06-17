@@ -37,28 +37,18 @@ public class QueryTable {
 			ArrayList<Table> tables = new ArrayList<Table>();
 			
 			//get the idle tables
-			String sql = "SELECT table_id, table_name FROM " + Params.dbName + ".order a WHERE id = (SELECT max(id) FROM " + 
-						Params.dbName + ".order b WHERE a.table_id = b.table_id AND a.restaurant_id=b.restaurant_id) " +
-						"AND total_price IS NOT NULL AND restaurant_id=" + term.restaurant_id;
+			String sql = "SELECT alias_id AS table_id, name AS table_name FROM " + Params.dbName + 
+						 ".table a WHERE NOT EXISTS (SELECT id FROM " + Params.dbName + 
+						 ".order b WHERE (a.alias_id = b.table_id OR a.alias_id=b.table2_id) AND b.restaurant_id=a.restaurant_id AND total_price IS NULL)" +
+						 " AND restaurant_id=" + term.restaurant_id;
+			
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while(dbCon.rs.next()){
 				Table idleTable = new Table();
 				idleTable.restaurant_id = term.restaurant_id;
-				idleTable.alias_id = dbCon.rs.getShort("table_id");
+				idleTable.alias_id = dbCon.rs.getInt("table_id");
 				idleTable.name = dbCon.rs.getString("table_name");
 				idleTable.status = Table.TABLE_IDLE;
-				tables.add(idleTable);
-			}
-			dbCon.rs.close();
-			
-			sql = "SELECT alias_id, name FROM " + Params.dbName + ".table WHERE alias_id NOT IN (SELECT distinct table_id FROM " +
-					Params.dbName + ".order WHERE restaurant_id=" + term.restaurant_id + ")" + " AND restaurant_id=" + term.restaurant_id;
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			while(dbCon.rs.next()){
-				Table idleTable = new Table();
-				idleTable.restaurant_id = term.restaurant_id;
-				idleTable.alias_id = dbCon.rs.getShort("alias_id");
-				idleTable.name = dbCon.rs.getString("name");
 				tables.add(idleTable);
 			}
 			dbCon.rs.close();
@@ -72,7 +62,7 @@ public class QueryTable {
 			while(dbCon.rs.next()){
 				Table busyTable = new Table();
 				busyTable.restaurant_id = term.restaurant_id;
-				busyTable.alias_id = dbCon.rs.getShort("table_id");
+				busyTable.alias_id = dbCon.rs.getInt("table_id");
 				busyTable.name = dbCon.rs.getString("table_name");
 				busyTable.custom_num = dbCon.rs.getShort("custom_num");
 				busyTable.category = dbCon.rs.getShort("category");
@@ -85,7 +75,7 @@ public class QueryTable {
 				if(busyTable.category == Order.CATE_MERGER_TABLE){
 					Table mergerTable = new Table();
 					mergerTable.restaurant_id = term.restaurant_id;
-					mergerTable.alias_id = dbCon.rs.getShort("table2_id");
+					mergerTable.alias_id = dbCon.rs.getInt("table2_id");
 					mergerTable.name = dbCon.rs.getString("table2_name");
 					mergerTable.custom_num = dbCon.rs.getShort("custom_num");
 					mergerTable.category = dbCon.rs.getShort("category");
