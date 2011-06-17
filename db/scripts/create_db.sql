@@ -176,7 +176,9 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`table` (
     REFERENCES `wireless_order_db`.`restaurant` (`id` )
     ON DELETE RESTRICT
     ON UPDATE RESTRICT)
-ENGINE = InnoDB;
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COMMENT = 'describe the restaurant\'s table info';
 
 
 -- -----------------------------------------------------
@@ -503,6 +505,7 @@ COMMENT = 'the staff information ';
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
 
 
 -- -----------------------------------------------------
