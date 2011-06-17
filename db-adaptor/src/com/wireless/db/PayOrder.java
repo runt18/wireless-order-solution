@@ -32,9 +32,9 @@ public class PayOrder {
 			
 			/**
 			 * Get the completed order information.
-			 */
-			
+			 */			
 			Order orderInfo = execQueryOrder(dbCon, pin, model, orderToPay); 
+			
 			/**
 			 * Calculate the total price of this order as below.
 			 * total = food_price_1 + food_price_2 + ...
@@ -106,11 +106,17 @@ public class PayOrder {
 				sql = "UPDATE " + Params.dbName + ".order_food SET discount=" + discount +
 					  " WHERE order_id=" + orderInfo.id + 
 					  " AND food_id=" + orderInfo.foods[i].alias_id;
+				dbCon.stmt.addBatch(sql);				
+			}
+			
+			/**
+			 * Delete the table in the case of "并台" and "外卖",
+			 * since the table to these order is temporary. 
+			 */
+			if(orderInfo.category == Order.CATE_JOIN_TABLE || orderInfo.category == Order.CATE_TAKE_OUT){
+				sql = "DELETE FROM " + Params.dbName + ".table WHERE alias_id=" +
+					  orderInfo.table_id + " AND restaurant_id=" + orderInfo.restaurant_id;
 				dbCon.stmt.addBatch(sql);
-				
-//				sql = "UPDATE " + WirelessSocketServer.database + 
-//					  ".food SET order_count=order_count+1 WHERE alias_id=" + orderToPay.foods[i].alias_id +
-//					  " AND restaurant_id=" + _restaurantID;
 			}
 			dbCon.stmt.executeBatch();
 			

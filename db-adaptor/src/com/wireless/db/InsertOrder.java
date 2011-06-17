@@ -37,11 +37,19 @@ public class InsertOrder {
 			
 			Terminal term = VerifyPin.exec(dbCon, pin, model);
 			
-//			if(orderToInsert.category == Order.CATE_JOIN_TABLE || orderToInsert.category == Order.CATE_TAKE_OUT){
-//				Table tmpTable = new Table();
-//				tmpTable.name = orderToInsert.table_name;
-//				orderToInsert.table_id = InsertTable.exec(dbCon, pin, model, tmpTable, true);
-//			}
+			/**
+			 * Create a temporary table in the case of "并台" and "外卖". 
+			 * The order would be attached with this new table.
+			 */
+			if(orderToInsert.category == Order.CATE_JOIN_TABLE){
+				Table tmpTable = new Table();
+				tmpTable.name = Integer.toString(orderToInsert.table_id);
+				orderToInsert.table_id = InsertTable.exec(dbCon, pin, model, tmpTable, true);
+				
+			}else if(orderToInsert.category == Order.CATE_TAKE_OUT){
+				Table tmpTable = new Table();
+				orderToInsert.table_id = InsertTable.exec(dbCon, pin, model, tmpTable, true);				
+			}
 			
 			Table table = QueryTable.exec(dbCon, pin, model, orderToInsert.table_id);
 				
