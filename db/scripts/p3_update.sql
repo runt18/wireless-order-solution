@@ -1,6 +1,75 @@
 ﻿SET NAMES utf8;
 USE `wireless_order_db` ;
 
+-- -----------------------------------------------------
+-- change the id of food
+-- -----------------------------------------------------
+ALTER   TABLE   `food`   RENAME   TO   `old_food`;
+ALTER TABLE `old_food` DROP FOREIGN KEY `fk_food_restaurant`;
+
+DROP TABLE IF EXISTS `wireless_order_db`.`food` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'the id to this food' ,
+  `alias_id` SMALLINT UNSIGNED NOT NULL COMMENT 'the waiter use this alias id to select food in terminal' ,
+  `name` VARCHAR(45) NOT NULL COMMENT 'the name of the food' ,
+  `pinyin` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the pinyin to this food' ,
+  `unit_price` DECIMAL(7,2) UNSIGNED NOT NULL DEFAULT 0.0 COMMENT 'the unit price of the food' ,
+  `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'indicates the food belong to which restaurant' ,
+  `kitchen` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the kitchen number which the food belong to. the maximum value (255) means the food does not belong to any kitchen.' ,
+  `status` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates the status to this food, the value is the combination of values below.\n特价菜 ：0x01\n推荐菜 ：0x02\n停售　 ：0x04' ,
+  `img1` BINARY NULL DEFAULT NULL ,
+  `img2` BINARY NULL DEFAULT NULL ,
+  `img3` BINARY NULL DEFAULT NULL ,
+  `enabled` TINYINT NOT NULL DEFAULT 1 COMMENT 'indicates whether the food information is enabled or not' ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_food_restaurant` (`restaurant_id` ASC) ,
+  CONSTRAINT `fk_food_restaurant`
+    FOREIGN KEY (`restaurant_id` )
+    REFERENCES `wireless_order_db`.`restaurant` (`id` )
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COMMENT = 'This table contains the all restaurant\'s food information.';
+
+INSERT INTO `food`(`alias_id`,`restaurant_id`, `name`, `unit_price`, `kitchen`, `status`, `img1`, `img2`, `img3`, `enabled`) 
+SELECT `alias_id`,`restaurant_id`, `name`, `unit_price`, `kitchen`, `status`, `img1`, `img2`, `img3`, `enabled` FROM `old_food`;
+
+DROP TABLE `old_food`;
+-- ----------------------------------------------------------------------------------------------
+
+-- -----------------------------------------------------
+-- change the id of table
+-- -----------------------------------------------------
+ALTER   TABLE   `table`   RENAME   TO   `old_table`;
+ALTER TABLE `old_table` DROP FOREIGN KEY `fk_table_restaurant1`;
+
+DROP TABLE IF EXISTS `wireless_order_db`.`table` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`table` (
+  `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this table' ,
+  `alias_id` SMALLINT UNSIGNED NULL ,
+  `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'Indicates the table belongs to which restaurant.' ,
+  `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to this table' ,
+  `enabled` TINYINT NOT NULL DEFAULT 1 COMMENT 'indicates whether the table information is enabled or not' ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_table_restaurant1` (`restaurant_id` ASC) ,
+  CONSTRAINT `fk_table_restaurant1`
+    FOREIGN KEY (`restaurant_id` )
+    REFERENCES `wireless_order_db`.`restaurant` (`id` )
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COMMENT = 'describe the restaurant\'s table info';
+
+INSERT INTO `table`(`alias_id`,`restaurant_id`, `enabled`) 
+SELECT `alias_id`,`restaurant_id`, `enabled` FROM `old_table`;
+
+DROP TABLE `old_table`;
+-- ----------------------------------------------------------------------------------------------
+
 -- Delete all the order record of root
 DELETE FROM `order_food` WHERE order_id IN (SELECT id FROM `order` WHERE restaurant_id=1);
 DELETE FROM `order` WHERE restaurant_id=1;
@@ -65,15 +134,6 @@ MODIFY COLUMN `expire_date` DATE NULL DEFAULT NULL COMMENT 'the expired date to 
 
 ALTER TABLE `restaurant`
 DROP COLUMN `total_income`;
-
-ALTER TABLE `food`
-DROP COLUMN `order_count`;
-
-ALTER TABLE `food`
-ADD `pinyin` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the pinyin to this food';
-
-ALTER TABLE `table`
-ADD `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to this table';
 
 ALTER TABLE `order_food`
 ADD `food_status` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates the status to this food, the value is the combination of values below.\n特价菜 ：0x01\n推荐菜 ：0x02\n停售　 ：0x04';

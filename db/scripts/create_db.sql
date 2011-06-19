@@ -34,7 +34,7 @@ COMMENT = 'describe the restaurnat\'s information';
 DROP TABLE IF EXISTS `wireless_order_db`.`food` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food` (
-  `id` BIGINT UNSIGNED NOT NULL COMMENT 'in the form of \"restaurant.id << 32 | food.alias_id\"' ,
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'the id to this food' ,
   `alias_id` SMALLINT UNSIGNED NOT NULL COMMENT 'the waiter use this alias id to select food in terminal' ,
   `name` VARCHAR(45) NOT NULL COMMENT 'the name of the food' ,
   `pinyin` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the pinyin to this food' ,
@@ -164,7 +164,7 @@ COMMENT = 'describe the terminal info';
 DROP TABLE IF EXISTS `wireless_order_db`.`table` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`table` (
-  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'in the form of \"restaurant.id << 32 | table.alias_id\"' ,
+  `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this table' ,
   `alias_id` SMALLINT UNSIGNED NULL ,
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'Indicates the table belongs to which restaurant.' ,
   `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to this table' ,
@@ -327,7 +327,7 @@ COMMENT = 'describe the material information.';
 DROP TABLE IF EXISTS `wireless_order_db`.`food_material` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food_material` (
-  `food_id` BIGINT UNSIGNED NOT NULL ,
+  `food_id` INT UNSIGNED NOT NULL ,
   `material_id` INT NOT NULL ,
   `consumption` FLOAT NOT NULL DEFAULT 0 COMMENT 'the consumption between the food and the material' ,
   INDEX `fk_food_material_food1` (`food_id` ASC) ,
@@ -505,6 +505,7 @@ COMMENT = 'the staff information ';
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
 
 
 
