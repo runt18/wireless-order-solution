@@ -151,9 +151,9 @@ public class ReqParser {
 	* pin[6] - auto calculated and filled in
 	* len[2] - 0x06, 0x00
 	* <Body>
-	* table[2] : total_price[4] : pay_type : discount_type : len_member : member_id[len] : len_comment : comment[len]
+	* table[2] : cash_income[4] : pay_type : discount_type : len_member : member_id[len] : len_comment : comment[len]
 	* table[2] - 2-byte indicates the table id
-	* total_price[4] - 4-byte indicates the total price
+	* cash_income[4] - 4-byte indicates the cash income to this order
 	* 				   total_price[0] indicates the float part
 	* 				   total_price[1..3] indicates the fixed part
 	* pay_type - one of the values of pay type
@@ -168,7 +168,7 @@ public class ReqParser {
 		//get the table id
 		short tableToPay = (short)((req.body[0] & 0x00FF) | ((req.body[1] & 0x00FF) << 8));
 		//get the actual total price
-		int totalPrice = (req.body[2] & 0x000000FF) | 
+		int cashIncome = (req.body[2] & 0x000000FF) | 
 						 ((req.body[3] & 0x000000FF) << 8) | 
 						 ((req.body[4] & 0x000000FF) << 16) |
 						 ((req.body[5] & 0x000000FF) << 24);
@@ -204,7 +204,7 @@ public class ReqParser {
 		}
 		Order orderToPay = new Order();
 		orderToPay.table_id = tableToPay;
-		orderToPay.actualPrice = totalPrice;
+		orderToPay.cashIncome = cashIncome;
 		orderToPay.pay_type = payType;
 		orderToPay.discount_type = discountType;
 		orderToPay.pay_manner = payManner;

@@ -14,9 +14,9 @@ public class ReqPayOrder extends ReqPackage{
 	* pin[6] - auto calculated and filled in
 	* len[2] - 0x06, 0x00
 	* <Body>
-	* table[2] : total_price[4] : pay_type : discount_type : pay_manner : len_member : member_id[len] : len_comment : comment[len]
+	* table[2] : cash_income[4] : pay_type : discount_type : pay_manner : len_member : member_id[len] : len_comment : comment[len]
 	* table[2] - 2-byte indicates the table id
-	* total_price[4] - 4-byte indicates the total price
+	* cash_income[4] - 4-byte indicates the total price
 	* 				   total_price[0] indicates the float part
 	* 				   total_price[1..3] indicates the fixed part
 	* pay_type - one of the values of pay type
@@ -65,10 +65,10 @@ public class ReqPayOrder extends ReqPackage{
 		body[0] = (byte)(order.table_id & 0x00FF);
 		body[1] = (byte)((order.table_id >> 8) & 0x00FF);
 		//assign the total price
-		body[2] = (byte)(order.actualPrice & 0x000000FF);
-		body[3] = (byte)((order.actualPrice >> 8) & 0x000000FF);
-		body[4] = (byte)((order.actualPrice >> 16) & 0x000000FF);
-		body[5] = (byte)((order.actualPrice >> 24) & 0x000000FF);
+		body[2] = (byte)(order.cashIncome & 0x000000FF);
+		body[3] = (byte)((order.cashIncome >> 8) & 0x000000FF);
+		body[4] = (byte)((order.cashIncome >> 16) & 0x000000FF);
+		body[5] = (byte)((order.cashIncome >> 24) & 0x000000FF);
 		//assign the payment type
 		body[6] = (byte)(order.pay_type & 0x000000FF);
 		//assign the discount type
