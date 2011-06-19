@@ -133,7 +133,7 @@ public class QueryOrder {
 			orderInfo.custom_num = dbCon.rs.getShort("custom_num");
 			orderInfo.category = dbCon.rs.getShort("category");
 			orderInfo.setTotalPrice(dbCon.rs.getFloat("total_price"));
-			orderInfo.setActualPrice(dbCon.rs.getFloat("total_price_2"));
+			orderInfo.setCashIncome(dbCon.rs.getFloat("total_price_2"));
 		}
 		dbCon.rs.close();
 		

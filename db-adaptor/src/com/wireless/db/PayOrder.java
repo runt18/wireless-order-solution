@@ -51,6 +51,14 @@ public class PayOrder {
 			orderInfo.setTotalPrice(totalPrice);
 			
 			/**
+			 * Calculate the total price 2 as below.
+			 * total_2 = total * 尾数处理方式
+			 * FIX ME !!! the amount to tail does NOT handle right now.
+			 */
+			float totalPrice2 = totalPrice;
+			orderInfo.setActualPrice(totalPrice2);
+			
+			/**
 			 * Get the member info if the pay type for member
 			 */
 			Member member = null;
@@ -66,9 +74,8 @@ public class PayOrder {
 			 * balance = balance - actualPrice + actualPrice * exchange_rate
 			 */
 			if(orderInfo.pay_type == Order.PAY_MEMBER){
-				String actualMoney = Util.price2Float(orderInfo.actualPrice, Util.INT_MASK_3).toString();
-				sql = "UPDATE " + Params.dbName + ".member SET balance=balance - " + actualMoney +
-					  " + " + actualMoney + " * exchange_rate" + 
+				sql = "UPDATE " + Params.dbName + ".member SET balance=balance - " + totalPrice2 +
+					  " + " + totalPrice2 + " * exchange_rate" + 
 					  " WHERE restaurant_id=" + orderInfo.restaurant_id +
 					  " AND alias_id=" + member.alias_id;
 				
@@ -88,7 +95,7 @@ public class PayOrder {
 			 */
 			sql = "UPDATE `" + Params.dbName + "`.`order` SET terminal_pin=" + pin +
 				  ", total_price=" + totalPrice + 
-				  ", total_price_2=" + Util.price2Float(orderInfo.actualPrice, Util.INT_MASK_3) +
+				  ", total_price_2=" + totalPrice2 +
 				  ", type=" + orderInfo.pay_manner + 
 			   	  ", order_date=NOW()" + 
 				  (orderInfo.comment != null ? ", comment='" + orderInfo.comment + "'" : "") +
@@ -110,7 +117,7 @@ public class PayOrder {
 			}
 			
 			/**
-			 * Delete the table in the case of "并台" and "外卖",
+			 * Delete the table in the case of "å¹¶å�°" and "å¤–å�–",
 			 * since the table to these order is temporary. 
 			 */
 			if(orderInfo.category == Order.CATE_JOIN_TABLE || orderInfo.category == Order.CATE_TAKE_OUT){
@@ -199,7 +206,7 @@ public class PayOrder {
 		orderInfo.pay_type = orderToPay.pay_type;
 		orderInfo.discount_type = orderToPay.discount_type;
 		orderInfo.member_id = orderToPay.member_id; 
-		orderInfo.actualPrice = orderToPay.actualPrice;
+		orderInfo.cashIncome = orderToPay.cashIncome;
 		orderInfo.pay_manner = orderToPay.pay_manner;
 		orderInfo.comment = orderToPay.comment;
 			
