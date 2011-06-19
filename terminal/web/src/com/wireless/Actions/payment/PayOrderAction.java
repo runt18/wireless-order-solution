@@ -68,7 +68,7 @@ public class PayOrderAction extends Action implements PinGen{
 			
 			Order orderToPay = new Order();
 			orderToPay.table_id = Short.parseShort(request.getParameter("tableID"));
-			orderToPay.setActualPrice(Float.parseFloat(request.getParameter("actualPrice")));
+			orderToPay.setCashIncome(Float.parseFloat(request.getParameter("actualPrice")));
 			orderToPay.pay_type = Integer.parseInt(request.getParameter("payType"));
 			if(orderToPay.pay_type == Order.PAY_MEMBER){
 				orderToPay.member_id = request.getParameter("memberID");
