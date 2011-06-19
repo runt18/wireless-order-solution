@@ -158,8 +158,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food_material` (
   CONSTRAINT `fk_order_food_material_order_food1`
     FOREIGN KEY (`order_food_id` )
     REFERENCES `wireless_order_db`.`order_food` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
@@ -181,8 +181,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food_material_history` (
   CONSTRAINT `fk_order_food_material_history_order_food_history1`
     FOREIGN KEY (`order_food_id` )
     REFERENCES `wireless_order_db`.`order_food_history` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
