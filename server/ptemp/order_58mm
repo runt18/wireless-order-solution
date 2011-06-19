@@ -3,8 +3,7 @@
 餐厅：$(restaurant)
 账单：$(order_id)
 服务员：$(waiter)
-日期：$(print_date)
-时间：$(print_time)
+时间：$(print_date) $(print_time)
 --------------------------------
 餐台：$(table)
 人数：$(custom_num)
