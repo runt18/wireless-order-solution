@@ -27,7 +27,7 @@ public class PayOrderScreen extends MainScreen
 	
 	private ListField _orderListField = null;
 	private LabelField _customNum = null;
-	private EditField _actualIncome = null;
+	private EditField _cashIncome = null;
 	private Order _bill = null;
 	private PayOrderScreen _self = this;
 	
@@ -77,7 +77,7 @@ public class PayOrderScreen extends MainScreen
 		
 		HorizontalFieldManager hfm2 = new HorizontalFieldManager(Field.FIELD_RIGHT);
 		//hfm2.add(new LabelField("实收：￥"));
-		_actualIncome = new EditField("实收：￥", 
+		_cashIncome = new EditField("实收：￥", 
 									  Util.price2String(_bill.totalPrice2(), Util.INT_MASK_3).substring(1), 
 									  7, 
 									  Field.HIGHLIGHT_SELECT | Field.FIELD_RIGHT | EditField.NO_LEARNING | EditField.NO_NEWLINE | EditField.FILTER_REAL_NUMERIC){
@@ -101,7 +101,7 @@ public class PayOrderScreen extends MainScreen
 			}
 		};
 		
-		hfm2.add(_actualIncome);
+		hfm2.add(_cashIncome);
 		add(hfm2);
 		
 		add(new SeparatorField());
@@ -118,13 +118,13 @@ public class PayOrderScreen extends MainScreen
 		submitNormal.setChangeListener(new FieldChangeListener(){
 			public void fieldChanged(Field field, int context) {
 				try{
-					_bill.setActualPrice(new Float(Float.parseFloat(_actualIncome.getText())));
+					_bill.setCashIncome(new Float(Float.parseFloat(_cashIncome.getText())));
 					_bill.pay_type = Order.PAY_NORMAL;
 					_bill.discount_type = Order.DISCOUNT_1;
 					UiApplication.getUiApplication().pushScreen(new SelectMannerPopup(_bill, _self));					
 				}catch(NumberFormatException e){
 					Dialog.alert("实收数字不正确，请重新输入");
-					_actualIncome.setFocus();
+					_cashIncome.setFocus();
 				}
 	         }
 		});
@@ -132,7 +132,7 @@ public class PayOrderScreen extends MainScreen
 		//Set the submit discount's listener
 		submitDiscount.setChangeListener(new FieldChangeListener(){
 			public void fieldChanged(Field field, int context) {
-				_bill.setActualPrice(new Float(Float.parseFloat(_actualIncome.getText())));
+				_bill.setCashIncome(new Float(Float.parseFloat(_cashIncome.getText())));
 				_bill.pay_type = Order.PAY_NORMAL;
 				_bill.discount_type = Order.DISCOUNT_2;
 				UiApplication.getUiApplication().pushScreen(new SelectMannerPopup(_bill, _self));
