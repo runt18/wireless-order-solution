@@ -6,7 +6,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Table;
 
-class Util {
+public class Util {
 	/**
 	 * Get the unpaid order id according to the specific table if the table is busy,
 	 * otherwise throw a business exception with the TABLE_IDLE error code.
@@ -16,7 +16,7 @@ class Util {
 	 * @throws BusinessException throws if the table to query is idle
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	static int getUnPaidOrderID(DBCon dbCon, Table table) throws BusinessException, SQLException{
+	public static int getUnPaidOrderID(DBCon dbCon, Table table) throws BusinessException, SQLException{
 		//query the order id associated with the this table
 		String sql = "SELECT id FROM `" + Params.dbName + 
 					"`.`order` WHERE (table_id = " + table.alias_id +
