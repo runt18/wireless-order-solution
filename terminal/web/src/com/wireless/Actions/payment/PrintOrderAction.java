@@ -11,11 +11,15 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import com.wireless.db.DBCon;
+import com.wireless.exception.BusinessException;
+import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.PinGen;
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqPackage;
 import com.wireless.protocol.ReqPrintOrder2;
 import com.wireless.protocol.Reserved;
+import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 import com.wireless.protocol.Type;
 import com.wireless.sccon.ServerConnector;
@@ -30,6 +34,8 @@ public class PrintOrderAction extends Action implements PinGen{
 		
 		String jsonResp = "{success:$(result), data:'$(value)'}";
 		PrintWriter out = null;
+		int tableID = 0;
+		DBCon dbCon = new DBCon();
 		try {
 			// 解决后台中文传到前台乱码
 			response.setContentType("text/json; charset=utf-8");
@@ -38,9 +44,11 @@ public class PrintOrderAction extends Action implements PinGen{
 			
 			/**
 			 * The parameters looks like below.
-			 * e.g. pin=0x1 & orderID=654 & printSync=1 & printOrder=1 & printDetail=0 & printReceipt=0
+			 * 1st example: pin=0x1 & orderID=654 & printSync=1 & printOrder=1 & printDetail=0 & printReceipt=0
+			 * 2nd example: pin=0x1 & tableID=101 & printSync=1 & printOrder=1 & printDetail=0 & printReceipt=0
 			 * pin : the pin the this terminal
 			 * orderID : the order id to print
+			 * tableID : the order associated with this table to print
 			 * printSync : 1 means print in sync, 0 means print in async
 			 * printOrder : 1 means to print the order, 0 or null means NOT
 			 * printDetail : 1 means to print the order detail, 0 or null means NOT
@@ -52,11 +60,24 @@ public class PrintOrderAction extends Action implements PinGen{
 			}
 			_pin = Integer.parseInt(pin, 16);
 			
-			int orderID = Integer.parseInt(request.getParameter("orderID"));
+			int orderID = 0;
+			if(request.getParameter("orderID") != null){
+				orderID = Integer.parseInt(request.getParameter("orderID"));
+			}else{
+				
+				if(request.getParameter("tableID") != null){
+					Table table = new Table();
+					tableID = Integer.parseInt(request.getParameter("tableID"));
+					table.alias_id = tableID;
+					dbCon.connect();
+					orderID = com.wireless.db.Util.getUnPaidOrderID(dbCon, table);
+				}
+			}
+			
 			
 			byte conf = 0;
 			
-			String param = request.getParameter("prinSync");
+			String param = request.getParameter("printSync");
 			if(param != null){
 				if(Byte.parseByte(param) == 0){
 					conf &= ~Reserved.PRINT_SYNC;
@@ -115,12 +136,22 @@ public class PrintOrderAction extends Action implements PinGen{
 				jsonResp = jsonResp.replace("$(value)", orderID + "号账单打印不成功，请重新检查网络是否连通");
 			}
 			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jsonResp = jsonResp.replace("$(result)", "false");
+			if(e.errCode == ErrorCode.TABLE_IDLE){				
+				jsonResp = jsonResp.replace("$(value)", tableID + "号餐台是空闲状态，不存在此张餐台的账单信息，请重新确认");
+			}else{
+				jsonResp = jsonResp.replace("$(value)", "打印" + tableID + "号餐台的账单不成功");
+			}
+			
 		}catch(IOException e){
 			e.printStackTrace();
 			jsonResp = jsonResp.replace("$(result)", "false");
 			jsonResp = jsonResp.replace("$(value)", "服务器请求不成功，请重新检查网络是否连通");
 			
 		}finally{
+			dbCon.disconnect();
 			//just for debug
 			System.out.println(jsonResp);
 			out.write(jsonResp);
