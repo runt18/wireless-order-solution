@@ -223,13 +223,13 @@ foreach ($rs as $row){
 	echo "<td>" .$row["alias_id"] ."</td>";
 	echo "<td>" .$row["name"];
 	if (($status & 1) != 0) {
-		echo "  特" ;
+		echo "  <img src='images/icon_tip_te.gif'  height='19' width='19' border='0'/>" ;
 	}
 	if (($status & 2) != 0) {
-		echo "  荐" ;
+		echo "  <img src='images/icon_tip_jian.gif'  height='19' width='19' border='0'/>" ;
 	}
 	if (($status & 4) != 0) {
-		echo "  停" ;
+		echo "  <img src='images/icon_tip_ting.gif'  height='19' width='19' border='0'/>" ;
 	}
 	echo "</td>";
 	echo "<td>" .$py ."</td>";
