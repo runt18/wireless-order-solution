@@ -13,4 +13,5 @@ public final class ErrorCode {
 	public final static byte MENU_EXPIRED = 9;
 	public final static byte TABLE_BUSY = 10;
 	public final static byte MEMBER_NOT_EXIST = 11;
+	public final static byte ORDER_NOT_EXIST = 12;
 }
