@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import com.wireless.exception.BusinessException;
+import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.Table;
@@ -112,19 +113,19 @@ public class QueryOrder {
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
-	public static Order execByID(DBCon dbCon, int pin, short model, int orderID) throws SQLException{
+	public static Order execByID(DBCon dbCon, int pin, short model, int orderID) throws BusinessException, SQLException{
 
 		/**
 		 * Get the related info to this order.
 		 */
-		String sql = "SELECT custom_num, table_id, table_name, table2_id, table2_name, restaurant_id, category, total_price, total_price_2 FROM `" + Params.dbName
+		String sql = "SELECT custom_num, table_id, table_name, table2_id, table2_name, restaurant_id, category FROM `" + Params.dbName
 				+ "`.`order` WHERE id=" + orderID;
 
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
 		Order orderInfo = new Order();
 
-		if (dbCon.rs.next()) {
+		if(dbCon.rs.next()) {
 			orderInfo.restaurant_id = dbCon.rs.getInt("restaurant_id");
 			orderInfo.table_id = dbCon.rs.getShort("table_id");
 			orderInfo.table_name = dbCon.rs.getString("table_name");
@@ -132,8 +133,20 @@ public class QueryOrder {
 			orderInfo.table2_name = dbCon.rs.getString("table2_name");
 			orderInfo.custom_num = dbCon.rs.getShort("custom_num");
 			orderInfo.category = dbCon.rs.getShort("category");
+		}else{
+			throw new BusinessException("The order(id=" + orderID + ") does NOT exist.", ErrorCode.ORDER_NOT_EXIST);
+		}
+		dbCon.rs.close();
+		
+		/**
+		 * Get the total price if the order has been paid
+		 */
+		sql = "SELECT total_price FROM `" + Params.dbName +
+			   "`.`order` WHERE id=" + orderID +
+			   " AND total_price IS NOT NULL";
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
 			orderInfo.setTotalPrice(dbCon.rs.getFloat("total_price"));
-			orderInfo.setCashIncome(dbCon.rs.getFloat("total_price_2"));
 		}
 		dbCon.rs.close();
 		

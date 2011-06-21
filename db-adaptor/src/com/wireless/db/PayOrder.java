@@ -35,28 +35,8 @@ public class PayOrder {
 			 */			
 			Order orderInfo = execQueryOrder(dbCon, pin, model, orderToPay); 
 			
-			/**
-			 * Calculate the total price of this order as below.
-			 * total = food_price_1 + food_price_2 + ...
-			 * food_price_n = (unit * discount + taste) * count
-			 */
-			float totalPrice = 0;
-			for(int i = 0; i < orderInfo.foods.length; i++){
-				float discount = (float)Math.round(orderInfo.foods[i].discount) / 100;					
-				float foodPrice = Util.price2Float(orderInfo.foods[i].price, Util.INT_MASK_2).floatValue();
-				float tastePrice = Util.price2Float(orderInfo.foods[i].taste.price, Util.INT_MASK_2).floatValue();
-				totalPrice += (foodPrice * discount + tastePrice) * orderInfo.foods[i].count2Float().floatValue();
-			}
-			totalPrice = (float)Math.round(totalPrice * 100) / 100;
-			orderInfo.setTotalPrice(totalPrice);
-			
-			/**
-			 * Calculate the total price 2 as below.
-			 * total_2 = total * 尾数处理方式
-			 * FIX ME !!! the amount to tail does NOT handle right now.
-			 */
-			float totalPrice2 = totalPrice;
-			orderInfo.setActualPrice(totalPrice2);
+			float totalPrice = Util.price2Float(orderInfo.totalPrice, Util.INT_MASK_3).floatValue();
+			float totalPrice2 = Util.price2Float(orderInfo.actualPrice, Util.INT_MASK_3).floatValue();
 			
 			/**
 			 * Get the member info if the pay type for member
@@ -136,6 +116,31 @@ public class PayOrder {
 	
 	/**
 	 * Get the order detail information and get the discount to each food according the payment and discount type.
+	 * @param pin the pin to this terminal
+	 * @param model the model to this terminal
+	 * @param orderToPay the pay order information submitted by terminal,
+	 * 					 refer to the class "ReqPayOrder" for more details on what information it contains.
+	 * @return Order completed pay order information to paid order
+	 * @throws BusinessException throws if one of the cases below.<br>
+	 * 							 - The terminal is NOT attached to any restaurant.<br>
+	 * 							 - The terminal is expired.<br>
+	 * 							 - The table associated with this order is idle.
+	 * @throws SQLException throws if fail to execute any SQL statement
+	 */
+	public static Order queryOrder(int pin, short model, Order orderToPay) throws BusinessException, SQLException{
+		
+		DBCon dbCon = new DBCon();
+		
+		try{
+			dbCon.connect();
+			return execQueryOrder(dbCon, pin, model, orderToPay);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the order detail information and get the discount to each food according the payment and discount type.
 	 * Note that the database should be connected before invoking this method.
 	 * @param dbCon the database connection
 	 * @param pin the pin to this terminal
@@ -201,6 +206,29 @@ public class PayOrder {
 				dbCon.rs.close();				
 			}
 		}
+		
+		/**
+		 * Calculate the total price of this order as below.
+		 * total = food_price_1 + food_price_2 + ...
+		 * food_price_n = (unit * discount + taste) * count
+		 */
+		float totalPrice = 0;
+		for(int i = 0; i < orderInfo.foods.length; i++){
+			float dist = (float)Math.round(orderInfo.foods[i].discount) / 100;					
+			float foodPrice = Util.price2Float(orderInfo.foods[i].price, Util.INT_MASK_2).floatValue();
+			float tastePrice = Util.price2Float(orderInfo.foods[i].taste.price, Util.INT_MASK_2).floatValue();
+			totalPrice += (foodPrice * dist + tastePrice) * orderInfo.foods[i].count2Float().floatValue();
+		}
+		totalPrice = (float)Math.round(totalPrice * 100) / 100;
+		orderInfo.setTotalPrice(totalPrice);
+		
+		/**
+		 * Calculate the total price 2 as below.
+		 * total_2 = total * 尾数处理方式
+		 * FIX ME !!! the amount to tail does NOT handle right now.
+		 */
+		float totalPrice2 = totalPrice;
+		orderInfo.setActualPrice(totalPrice2);
 		
 		orderInfo.restaurant_id = orderToPay.restaurant_id;
 		orderInfo.pay_type = orderToPay.pay_type;
