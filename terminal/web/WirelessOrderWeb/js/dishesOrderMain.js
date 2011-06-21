@@ -225,7 +225,24 @@ var printTotalImgBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "补打总单",
 	handler : function(btn) {
-
+		Ext.Ajax.request({
+			url : "../PrintOrder.do",
+			params : {
+				"pin" : Request["pin"],
+				"tableID" : Request["tableNbr"],
+				"printOrder" : 1
+			},
+			success : function(response, options) {
+				var resultJSON = Ext.util.JSON.decode(response.responseText);
+				Ext.MessageBox.show({
+					msg : resultJSON.data,
+					width : 300,
+					buttons : Ext.MessageBox.OK
+				});
+			},
+			failure : function(response, options) {
+			}
+		});
 	}
 });
 var printDetailImgBut = new Ext.ux.ImageButton({
@@ -234,7 +251,24 @@ var printDetailImgBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "补打明细",
 	handler : function(btn) {
-
+		Ext.Ajax.request({
+			url : "../PrintOrder.do",
+			params : {
+				"pin" : Request["pin"],
+				"tableID" : Request["tableNbr"],
+				"printDetail" : 1
+			},
+			success : function(response, options) {
+				var resultJSON = Ext.util.JSON.decode(response.responseText);
+				Ext.MessageBox.show({
+					msg : resultJSON.data,
+					width : 300,
+					buttons : Ext.MessageBox.OK
+				});
+			},
+			failure : function(response, options) {
+			}
+		});
 	}
 });
 
@@ -276,13 +310,13 @@ var orderedGrid = new Ext.grid.GridPanel({
 			text : "&nbsp;&nbsp;&nbsp;",
 			disabled : true
 		}
-//		, '-', {
-//			text : "&nbsp;&nbsp;&nbsp;",
-//			disabled : true
-//		}, printTotalImgBut, {
-//			text : "&nbsp;&nbsp;&nbsp;",
-//			disabled : true
-//		}, printDetailImgBut 
+		// , '-', {
+		// text : "&nbsp;&nbsp;&nbsp;",
+		// disabled : true
+		// }, printTotalImgBut, {
+		// text : "&nbsp;&nbsp;&nbsp;",
+		// disabled : true
+		// }, printDetailImgBut
 		]
 	}),
 	listeners : {
