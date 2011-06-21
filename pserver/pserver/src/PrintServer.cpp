@@ -183,7 +183,7 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 								}else if(it->code == Reserved::PRINT_ORDER_DETAIL && (printReq.header.reserved == Reserved::PRINT_ORDER_DETAIL)){
 									(*iter)->addJob(printReq.body, len, it->code);
 
-								}else if(it->code == Reserved::PRINT_RECEIPT && (printReq.header.reserved == Reserved::PRINT_RECEIPT)){
+								}else if(it->code == Reserved::PRINT_RECEIPT && (printReq.header.reserved == Reserved::PRINT_RECEIPT || printReq.header.reserved == Reserved::PRINT_TEMP_RECEIPT)){
 									(*iter)->addJob(printReq.body, len, it->code);
 
 								}else if(it->code == Reserved::PRINT_EXTRA_FOOD && (printReq.header.reserved == Reserved::PRINT_EXTRA_FOOD)){

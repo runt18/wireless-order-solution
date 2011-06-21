@@ -13,4 +13,5 @@ public:
 	static const int PRINT_EXTRA_FOOD = 4;
 	static const int PRINT_CANCELLED_FOOD = 5;
 	static const int PRINT_HURRY_FOOD = 6;
+	static const int PRINT_TEMP_RECEIPT = 7;
 };
