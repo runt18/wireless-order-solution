@@ -12,6 +12,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.PinGen;
@@ -63,13 +64,15 @@ public class PrintOrderAction extends Action implements PinGen{
 			int orderID = 0;
 			if(request.getParameter("orderID") != null){
 				orderID = Integer.parseInt(request.getParameter("orderID"));
-			}else{
 				
+			}else{				
 				if(request.getParameter("tableID") != null){
 					Table table = new Table();
 					tableID = Integer.parseInt(request.getParameter("tableID"));
 					table.alias_id = tableID;
 					dbCon.connect();
+					Terminal term = VerifyPin.exec(dbCon, _pin, Terminal.MODEL_STAFF);
+					table.restaurant_id = term.restaurant_id;
 					orderID = com.wireless.db.Util.getUnPaidOrderID(dbCon, table);
 				}
 			}
@@ -85,7 +88,7 @@ public class PrintOrderAction extends Action implements PinGen{
 					conf |= Reserved.PRINT_SYNC;
 				}
 			}else{
-				conf |= Reserved.PRINT_SYNC;
+				conf &= ~Reserved.PRINT_SYNC;
 			}
 			
 			param = request.getParameter("printOrder");
@@ -125,11 +128,23 @@ public class PrintOrderAction extends Action implements PinGen{
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqPrintOrder2(conf, orderID));
 			if(resp.header.type == Type.ACK){
 				jsonResp = jsonResp.replace("$(result)", "true");
-				jsonResp = jsonResp.replace("$(value)", orderID + "号账单打印成功");
+				if(request.getParameter("orderID") != null){
+					jsonResp = jsonResp.replace("$(value)", orderID + "号账单打印成功");
+					
+				}else if(request.getParameter("tableID") != null){
+					jsonResp = jsonResp.replace("$(value)", tableID + "号餐台的账单打印成功");
+					
+				}else{
+					jsonResp = jsonResp.replace("$(value)", orderID + "号账单打印成功");					
+				}
 				
 			}else if(resp.header.type == Type.NAK){
 				jsonResp = jsonResp.replace("$(result)", "false");
-				jsonResp = jsonResp.replace("$(value)", orderID + "号账单打印不成功，请重新检查网络是否连通");
+				if(resp.header.reserved == ErrorCode.ORDER_NOT_EXIST){
+					jsonResp = jsonResp.replace("$(value)", orderID + "号账单不存在，请重新确认");					
+				}else{
+					jsonResp = jsonResp.replace("$(value)", orderID + "号账单打印不成功，请重新检查网络是否连通");
+				}
 				
 			}else{
 				jsonResp = jsonResp.replace("$(result)", "false");

@@ -32,6 +32,7 @@ public class PayOrderAction extends Action implements PinGen{
 		
 		String jsonResp = "{success:$(result), data:'$(value)'}";
 		PrintWriter out = null;
+		String tempPay;
 		try {
 			// 解决后台中文传到前台乱码
 			response.setContentType("text/json; charset=utf-8");
@@ -39,11 +40,12 @@ public class PayOrderAction extends Action implements PinGen{
 
 			/**
 			 * The parameters looks like below.
-			 * e.g. pin=0x1 & tableID=201 & actualPrice=120 & payType=1 & discountType=1 & payManner=1 & memberID=13693834750
+			 * e.g. pin=0x1 & tempPay=false & tableID=201 & payType=1 & discountType=1 & payManner=1 & cashIncome=120 & memberID=13693834750
 			 * pin : the pin the this terminal
+			 * tempPay : indicates whether to pay order temporary
 			 * tableID : the table id to be paid order
-			 * actualPrice : the actual amount of the money to be paid
-			 * payType : "1" means pay in normal, "2" means pay in member 
+			 * payType : "1" means pay in "一般", 
+			 * 			 "2" means pay in "会员" 
 			 * discountType : "1" means to pay using discount 1
 			 * 				  "2" means to pay using discount 2
 			 * 				  "3" means to pay using discount 3
@@ -52,9 +54,10 @@ public class PayOrderAction extends Action implements PinGen{
 			 * 			   "3" means "会员卡"
 			 * 			   "4" means "挂账"
 			 * 			   "5" means "签单"
+			 * cashIncome : the cash that client pay for this order,
+			 * 				this parameter is optional, only takes effect while the pay manner is "现金"
 			 * memberID : the id to member, 
-			 * 			  this parameter is optional, 
-			 * 			  NO need to pass this parameter if pay in normal 
+			 * 			  this parameter is optional, only takes effect while the pay type is "会员" 
 			 * comment : the comment to this order
 			 *           this parameter is optional,
 			 *           No need to pass this parameter if no comment input. 
@@ -67,23 +70,63 @@ public class PayOrderAction extends Action implements PinGen{
 			_pin = Integer.parseInt(pin, 16);
 			
 			Order orderToPay = new Order();
+			
 			orderToPay.table_id = Short.parseShort(request.getParameter("tableID"));
-			orderToPay.setCashIncome(Float.parseFloat(request.getParameter("actualPrice")));
+			
 			orderToPay.pay_type = Integer.parseInt(request.getParameter("payType"));
+			
+			/**
+			 * Get the member id if the pay type is "会员"
+			 */
 			if(orderToPay.pay_type == Order.PAY_MEMBER){
 				orderToPay.member_id = request.getParameter("memberID");
 			}
+			
 			orderToPay.discount_type = Integer.parseInt(request.getParameter("discountType"));
+			
 			orderToPay.pay_manner = Integer.parseInt(request.getParameter("payManner"));
+			/**
+			 * Get the cash income if the pay manner is "现金"
+			 */
+			if(orderToPay.pay_manner == Order.MANNER_CASH){
+				orderToPay.setCashIncome(Float.parseFloat(request.getParameter("cashIncome")));
+			}
+			
+			/**
+			 * Get the temporary pay flag.
+			 * If pay order temporary, just print the receipt.
+			 * Otherwise perform to pay order and print the receipt.
+			 */
+			byte printType;
+			tempPay = request.getParameter("tempPay");
+			if(tempPay != null){
+				if(Boolean.parseBoolean(tempPay)){
+					printType = Reserved.PRINT_TEMP_RECEIPT_2;
+				}else{
+					printType = Reserved.PRINT_RECEIPT_2;
+				}				
+			}else{
+				printType = Reserved.PRINT_RECEIPT_2;				
+			}
+			
 			orderToPay.comment = request.getParameter("comment");
 			
 			ReqPackage.setGen(this);
-			byte printType = Reserved.PRINT_RECEIPT_2;
+			
+
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqPayOrder(orderToPay, printType));
 			
 			if(resp.header.type == Type.ACK){
 				jsonResp = jsonResp.replace("$(result)", "true");
-				jsonResp = jsonResp.replace("$(value)", orderToPay.table_id + "号餐台结帐成功");
+				if(tempPay != null){
+					if(Boolean.parseBoolean(tempPay)){
+						jsonResp = jsonResp.replace("$(value)", orderToPay.table_id + "号餐台暂结成功");
+					}else{
+						jsonResp = jsonResp.replace("$(value)", orderToPay.table_id + "号餐台结帐成功");
+					}
+				}else{
+					jsonResp = jsonResp.replace("$(value)", orderToPay.table_id + "号餐台结帐成功");
+				}
 				
 			}else if(resp.header.type == Type.NAK){
 				jsonResp = jsonResp.replace("$(result)", "false");
