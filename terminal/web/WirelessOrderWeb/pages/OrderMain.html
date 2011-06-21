@@ -26,9 +26,12 @@
 <!-- components -->
 <script type="text/javascript"
 	src="../js/components/Ext.ux.ImageButton.js"></script>
+<script type="text/javascript" src="../js/components/functionLib.js"></script>
 
 <!-- css -->
+<link rel="stylesheet" type="text/css" href="../css/header.css" />
 <link rel="stylesheet" type="text/css" href="../css/tableStatus.css" />
+<link rel="stylesheet" type="text/css" href="../css/dishOrder.css" />
 
 <script type="text/javascript">
 	// global variable
@@ -36,45 +39,92 @@
 	var softKBRelateItemId = ""; // soft keyboard relate item id
 	var dishesDisplayData = []; // all dishes display data 
 	var dishesDisplayDataShow = []; // all dishes display data for show in page
-	var dishTasteData = [] // taste
+	var dishTasteData = []
+	// taste
 	var dishesCount = -1; // the dish count user input, in order to keep the same between tabs
 	var orderedData = []; // the dishes have been ordered
 	var orderIsChanged = false; // if the order is changed
 	
+	var kitchenData = [];
+
+	var operatorName = "XXX";
+
 	var restaurantID = "";
+	var category = "X"
+
+	var Request = new URLParaQuery();
+	restaurantID = Request["restaurantID"];
+	category = Request["category"];
 </script>
 
 <script type="text/javascript"
 	src="../js/animation/dishesOrder/dishesOrderLoad.js"></script>
+<script type="text/javascript"
+	src="../js/animation/dishesOrder/kitchenSelect.js"></script>
 <script type="text/javascript" src="../js/dishesOrderMain.js"></script>
 
 
 
 </head>
 <body>
-<script type="text/javascript" src="../extjs/examples.js"></script>
+	<script type="text/javascript" src="../extjs/examples.js"></script>
 
-<div id="west"></div>
-<div id="north">
-<p>icons here.</p>
-</div>
-<div id="south"></div>
-<div id="west"></div>
-<div id="center"></div>
-<div id="temp">
-<p>建设中......</p>
-</div>
+	<div id="west"></div>
+	<div id="north">
+		<p>icons here.</p>
+	</div>
+	<div id="south"></div>
+	<div id="west"></div>
+	<div id="center"></div>
+	<div id="temp">
+		<p>建设中......</p>
+	</div>
 
 
 
-<!-- table status -->
-<div id="tableStatusDO" style="padding-left: 5px"><img title="桌号"
-	src='../images/TableID.png' style='float: left;' />
-<div id="tblNbrDivTS" class="tableStatusChar">100&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-<img title="人数" src='../images/DinnerAmount.png' style='float: left;' />
-<div id="perCountDivTS" class="tableStatusChar">4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-</div>
+	<!-- table status -->
+	<div id="tableStatusDO" style="padding-left: 5px">
+		<img title="桌号" src='../images/TableID.png' style='float: left;' />
+		<div id="tblNbrDivTS" class="tableStatusChar">100&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+		<img title="人数" src='../images/DinnerAmount.png' style='float: left;' />
+		<div id="perCountDivTS" class="tableStatusChar">4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+	</div>
 
+
+	<!-- kitchen select -->
+	<div id="kitchenSelectDO"
+		style="padding-left: 10px; visibility: hidden;">
+		<div>
+			<div id = "kitchen0" style='background: url(../images/extlogo48.png) no-repeat 50%;' class="ketchenSelect"></div>
+			<span style="width: 10px; float: left;"> </span> 
+			<div id = "kitchen1" style='background: url(../images/extlogo48.png) no-repeat 50%;' class="ketchenSelect"></div> 
+			<span style="width: 10px; float: left;"> </span> 
+			<div id = "kitchen2" style='background: url(../images/extlogo48.png) no-repeat 50%;' class="ketchenSelect"></div>
+			<span style="width: 10px; float: left;"> </span> 
+			<div id = "kitchen3" style='background: url(../images/extlogo48.png) no-repeat 50%;' class="ketchenSelect"></div>
+			<span style="width: 10px; float: left;"> </span> 
+			<div id = "kitchen4" style='background: url(../images/extlogo48.png) no-repeat 50%;' class="ketchenSelect"></div>
+			<span style="width: 10px; float: left;"> </span> 
+			<div id = "kitchen5" style='background: url(../images/extlogo48.png) no-repeat 50%;' class="ketchenSelect"></div>
+			<span style="width: 10px; float: left;"> </span> 
+			<div id = "kitchen6" style='background: url(../images/extlogo48.png) no-repeat 50%;' class="ketchenSelect"></div>
+		</div>
+		<div>
+			<div id = "kitchen7" style='background: url(../images/extlogo48.png) no-repeat 50%;' class="ketchenSelect"></div>
+			<span style="width: 10px; float: left;"> </span> 
+			<div id = "kitchen8" style='background: url(../images/extlogo48.png) no-repeat 50%;' class="ketchenSelect"></div>
+			<span style="width: 10px; float: left;"> </span> 
+			<div id = "kitchen9" style='background: url(../images/extlogo48.png) no-repeat 50%;' class="ketchenSelect"></div>
+			<span style="width: 10px; float: left;"> </span> 
+			<div id = "kitchen10" style='background: url(../images/extlogo48.png) no-repeat 50%;' class="ketchenSelect"></div>
+			<span style="width: 10px; float: left;"> </span> 
+			<div id = "kitchen11" style='background: url(../images/extlogo48.png) no-repeat 50%;' class="ketchenSelect"></div>
+			<span style="width: 10px; float: left;"> </span> 
+			<div id = "kitchen12" style='background: url(../images/extlogo48.png) no-repeat 50%;' class="ketchenSelect"></div>
+			<span style="width: 10px; float: left;"> </span> 
+			<div id = "kitchen13" style='background: url(../images/extlogo48.png) no-repeat 50%;' class="ketchenSelect"></div>
+		</div>
+	</div>
 
 </body>
 </html>

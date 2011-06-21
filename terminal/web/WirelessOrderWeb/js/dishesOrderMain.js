@@ -1,8 +1,55 @@
-﻿// --------------dishes order center panel-----------------
-// 1，数据
-//orderedData.push( [ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "", "￥56.2" ]);
-//orderedData.push( [ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "", "￥56.2" ]);
+﻿// dish count input pop window
+dishCountInputWin = new Ext.Window({
+	layout : "fit",
+	width : 200,
+	height : 100,
+	closeAction : "hide",
+	resizable : false,
+	items : [ {
+		layout : "form",
+		labelWidth : 30,
+		border : false,
+		frame : true,
+		items : [ {
+			xtype : "numberfield",
+			fieldLabel : "数量",
+			id : "dishCountInput",
+			width : 110
+		} ]
+	} ],
+	buttons : [
+			{
+				text : "确定",
+				handler : function() {
+					var inputCount = dishCountInputWin.findById(
+							"dishCountInput").getValue();
+					if (inputCount != 0 && inputCount != "") {
+						dishCountInputWin.hide();
+						orderedData[dishOrderCurrRowIndex_][2] = inputCount;
+						orderedStore.reload();
+						orderedGrid.getSelectionModel().selectRow(
+								dishOrderCurrRowIndex_);
+					}
 
+				}
+			}, {
+				text : "取消",
+				handler : function() {
+					dishCountInputWin.hide();
+				}
+			} ],
+	listeners : {
+		show : function(thiz) {
+			// thiz.findById("personCountInput").focus();
+			var f = Ext.get("dishCountInput");
+			f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
+		}
+	}
+});
+
+// --------------dishes order center panel-----------------
+
+// 已点菜式
 // 2，表格的数据store
 var orderedStore = new Ext.data.Store({
 	proxy : new Ext.data.MemoryProxy(orderedData),
@@ -128,6 +175,68 @@ var dishPressImgBut = new Ext.ux.ImageButton({
 		dishOptPressHandler(dishOrderCurrRowIndex_);
 	}
 });
+var countAddImgBut = new Ext.ux.ImageButton(
+		{
+			imgPath : "../images/extlogo48.png",
+			imgWidth : 50,
+			imgHeight : 50,
+			tooltip : "数量加1",
+			handler : function(btn) {
+				if (dishOrderCurrRowIndex_ != -1) {
+					orderedData[dishOrderCurrRowIndex_][2] = parseFloat(orderedData[dishOrderCurrRowIndex_][2]) + 1;
+					orderedStore.reload();
+					orderedGrid.getSelectionModel().selectRow(
+							dishOrderCurrRowIndex_);
+				}
+			}
+		});
+var countMinusImgBut = new Ext.ux.ImageButton(
+		{
+			imgPath : "../images/extlogo48.png",
+			imgWidth : 50,
+			imgHeight : 50,
+			tooltip : "数量减1",
+			handler : function(btn) {
+				if (dishOrderCurrRowIndex_ != -1) {
+					if (orderedData[dishOrderCurrRowIndex_][2] != "1") {
+						orderedData[dishOrderCurrRowIndex_][2] = parseFloat(orderedData[dishOrderCurrRowIndex_][2]) - 1;
+						orderedStore.reload();
+						orderedGrid.getSelectionModel().selectRow(
+								dishOrderCurrRowIndex_);
+					}
+				}
+
+			}
+		});
+var countEqualImgBut = new Ext.ux.ImageButton({
+	imgPath : "../images/extlogo48.png",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "数量等于",
+	handler : function(btn) {
+		if (dishOrderCurrRowIndex_ != -1) {
+			dishCountInputWin.show();
+		}
+	}
+});
+var printTotalImgBut = new Ext.ux.ImageButton({
+	imgPath : "../images/extlogo48.png",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "补打总单",
+	handler : function(btn) {
+
+	}
+});
+var printDetailImgBut = new Ext.ux.ImageButton({
+	imgPath : "../images/extlogo48.png",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "补打明细",
+	handler : function(btn) {
+
+	}
+});
 
 var orderedGrid = new Ext.grid.GridPanel({
 	title : "已点菜式",
@@ -151,7 +260,30 @@ var orderedGrid = new Ext.grid.GridPanel({
 		}, dishDeleteImgBut, {
 			text : "&nbsp;&nbsp;&nbsp;",
 			disabled : true
-		}, dishPressImgBut ]
+		}, dishPressImgBut, dishDeleteImgBut, {
+			text : "&nbsp;&nbsp;&nbsp;",
+			disabled : true
+		}, '-', dishDeleteImgBut, {
+			text : "&nbsp;&nbsp;&nbsp;",
+			disabled : true
+		}, countAddImgBut, {
+			text : "&nbsp;&nbsp;&nbsp;",
+			disabled : true
+		}, countMinusImgBut, {
+			text : "&nbsp;&nbsp;&nbsp;",
+			disabled : true
+		}, countEqualImgBut, {
+			text : "&nbsp;&nbsp;&nbsp;",
+			disabled : true
+		}
+//		, '-', {
+//			text : "&nbsp;&nbsp;&nbsp;",
+//			disabled : true
+//		}, printTotalImgBut, {
+//			text : "&nbsp;&nbsp;&nbsp;",
+//			disabled : true
+//		}, printDetailImgBut 
+		]
 	}),
 	listeners : {
 		rowclick : function(thiz, rowIndex, e) {
@@ -204,16 +336,29 @@ var orderedForm = new Ext.form.FormPanel(
 									type = 2;
 								}
 
+								alert("pin:" + Request["pin"] + "     tableID:"
+										+ Request["tableNbr"]
+										+ "      tableID_2:"
+										+ Request["tableNbr2"]
+										+ "      customNum:"
+										+ Request["personCount"] + "     type:"
+										+ type + "     originalTableID:"
+										+ Request["tableNbr"]
+										+ "     category:" + category
+										+ "     foods" + foodPara);
 								Ext.Ajax
 										.request({
 											url : "../InsertOrder.do",
 											params : {
 												"pin" : Request["pin"],
 												"tableID" : Request["tableNbr"],
+												"tableID_2" : Request["tableNbr2"],
 												"customNum" : Request["personCount"],
 												"type" : type,
-												"originalTableID" : Request["tableNbr"],
-												"foods" : foodPara
+												"originalTableID" : Request["tableNbr"],// no
+												// use
+												"foods" : foodPara,
+												"category" : category
 											},
 											success : function(response,
 													options) {
@@ -305,17 +450,7 @@ var dishesOrderCenterPanel = new Ext.Panel({
 });
 
 // --------------dishes taste pop window-----------------
-// 1，数据
-// dishTasteData = [];
-// dishTasteData.push([ "只要酸菜不要鱼", "￥0" ]);
-// dishTasteData.push([ "不要盐", "￥2" ]);
-// dishTasteData.push([ "少盐", "￥3" ]);
-// dishTasteData.push([ "中盐", "￥4" ]);
-// dishTasteData.push([ "多盐", "￥5" ]);
-// dishTasteData.push([ "超多盐", "￥6" ]);
-// dishTasteData.push([ "使劲放盐", "￥7" ]);
-// dishTasteData.push([ "咸死你", "￥8" ]);
-
+// 口味
 // 2，表格的数据store
 var dishTasteStore = new Ext.data.Store({
 	proxy : new Ext.data.MemoryProxy(dishTasteData),
@@ -627,10 +762,7 @@ softKeyBoardDO = new Ext.Window({
 	}
 });
 
-// 1，数据
-// 格式：[菜名，菜名编号，菜名拼音，单价，厨房编号]
-// dishesDisplayData = [];
-
+// ------------------------------------- 菜谱 -----------------------------------
 // 2，表格的数据store
 var dishesDisplayStore = new Ext.data.Store({
 	proxy : new Ext.data.MemoryProxy(dishesDisplayDataShow),
@@ -711,6 +843,7 @@ var dishesDisplayGrid = new Ext.grid.GridPanel({
 							dishesDisplayDataShow[rowIndex][7] ]);
 				}
 				orderedStore.reload();
+				dishOrderCurrRowIndex_ = -1;
 				orderIsChanged = true;
 			} else {
 				Ext.MessageBox.show({
@@ -767,7 +900,12 @@ var dishesChooseBySpellForm = new Ext.form.FormPanel({
 										.setValue(thisValue);
 							}
 						}
-					} ]
+					} ],
+					listeners : {
+						render : function(thiz) {
+							thiz.hide();
+						}
+					}
 				}, {
 					layout : "form",
 					labelWidth : 60,
@@ -832,7 +970,12 @@ var dishesChooseByNumForm = new Ext.form.FormPanel({
 												thisValue);
 							}
 						}
-					} ]
+					} ],
+					listeners : {
+						render : function(thiz) {
+							thiz.hide();
+						}
+					}
 				},
 				{
 					layout : "form",
@@ -864,12 +1007,32 @@ var dishesChooseByNumForm = new Ext.form.FormPanel({
 	} ]
 });
 
+var dishesChooseByKitchenForm = new Ext.form.FormPanel(
+		{
+			title : "分厨选菜",
+			id : "dishesChooseByKitchenForm",
+			border : false,
+			frame : true,
+			items : [ {
+				contentEl : "kitchenSelectDO"
+			} ],
+			listeners : {
+				render : function(thiz) {
+					document.getElementById("kitchenSelectDO").style["visibility"] = "visible";
+					// bind the kitchen select image click function
+					kitchenSelectLoad();
+				}
+			}
+		});
+
 var dishesDisplayTabPanel = new Ext.TabPanel({
 	activeTab : 0,
-	height : 65,
+	// height : 65,
+	height : 135,
 	region : "north",
 	border : false,
-	items : [ dishesChooseByNumForm, dishesChooseBySpellForm ],
+	items : [ dishesChooseByNumForm, dishesChooseBySpellForm,
+			dishesChooseByKitchenForm ],
 	listeners : {
 		// for FF only!!! FF when clicking the tab, the focus of the number
 		// field
@@ -883,6 +1046,15 @@ var dishesDisplayTabPanel = new Ext.TabPanel({
 			// hide the soft keyboard
 			if (softKeyBoardDO.isVisible()) {
 				softKeyBoardDO.hide();
+			}
+
+			// change the height of the form panel
+			if (panel.getId() == "dishesChooseByKitchenForm") {
+				dishesDisplayTabPanel.setHeight(135);
+				dishesOrderEastPanel.doLayout();
+			} else {
+				dishesDisplayTabPanel.setHeight(65);
+				dishesOrderEastPanel.doLayout();
 			}
 		}
 	}
@@ -941,7 +1113,8 @@ Ext
 						items : [
 								{
 									region : "north",
-									html : "<div style='padding:10px; background-color:#A9D0F5'><h4 style='font-size:150%'>无线点餐网页终端<h4></div>",
+									bodyStyle : "background-color:#A9D0F5",
+									html : "<h4 style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4><div id='optName' class='optName'></div>",
 									height : 50,
 									margins : "0 0 5 0"
 								},

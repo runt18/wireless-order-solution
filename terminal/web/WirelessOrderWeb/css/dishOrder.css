@@ -1,0 +1,10 @@
+﻿.ketchenSelect {
+	width: 48px;
+	height: 48px;
+	font-family: 楷体, 楷体_GB2312;
+	font-weight: bold;
+	font-size: 21px;
+	color: blue;
+	float: left;
+	background: url(../images/extlogo48.png) no-repeat 50%;
+}

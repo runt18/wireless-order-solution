@@ -64,6 +64,8 @@ function tableSelectOnLoad() {
 	var Request = new URLParaQuery();
 	pin = Request["pin"];
 
+	// 后台：["餐台1编号","餐台1人数","占用","餐台1名称","一般"]，["餐台2编号","餐台2人数","空桌","餐台2名称","外卖"]
+	// 页面：tableStatusListTS和后台一致
 	Ext.Ajax
 			.request({
 				url : "../QueryTable.do",
@@ -86,8 +88,15 @@ function tableSelectOnLoad() {
 									tableStatusList[1].length - 2);
 							var thisStatus = tableStatusList[2].substr(1,
 									tableStatusList[2].length - 2);
-							tableStatusListTS.push([ thisTblNbr, thisPerNbr,
-									thisStatus ]);
+							tableStatusListTS.push([
+									thisTblNbr,// 餐台编号
+									thisPerNbr,// 餐台人数
+									thisStatus, // 状态
+									tableStatusList[3].substr(1,
+											tableStatusList[3].length - 2),// 餐台名称
+									tableStatusList[4].substr(1,
+											tableStatusList[4].length - 2) // 餐台类型
+							]);
 						}
 						;
 
@@ -119,9 +128,33 @@ function tableSelectOnLoad() {
 							for ( var j = i * 24; j < i * 24 + currListCount; j++) {
 								var liNode = document.createElement("li");
 								liNode.id = "table" + tableStatusListTS[j][0];
-								if (tableStatusListTS[j][2] == "占用") {
-									liNode.className = "on";
+								
+								if (tableStatusListTS[j][4] == "一般"
+										&& tableStatusListTS[j][2] == "空桌") {
+									liNode.className = "normal_null";
+								} else if (tableStatusListTS[j][4] == "一般"
+										&& tableStatusListTS[j][2] == "占用") {
+									liNode.className = "normal_on";
+								} else if (tableStatusListTS[j][4] == "拼台"
+										&& tableStatusListTS[j][2] == "空桌") {
+									liNode.className = "merge_null";
+								} else if (tableStatusListTS[j][4] == "拼台"
+										&& tableStatusListTS[j][2] == "占用") {
+									liNode.className = "merge_on";
+								} else if (tableStatusListTS[j][4] == "外卖"
+										&& tableStatusListTS[j][2] == "空桌") {
+									liNode.className = "package_null";
+								} else if (tableStatusListTS[j][4] == "外卖"
+										&& tableStatusListTS[j][2] == "占用") {
+									liNode.className = "package_on";
+								}else if (tableStatusListTS[j][4] == "并台"
+										&& tableStatusListTS[j][2] == "空桌") {
+									liNode.className = "separate_null";
+								} else if (tableStatusListTS[j][4] == "并台"
+										&& tableStatusListTS[j][2] == "占用") {
+									liNode.className = "separate_on";
 								}
+
 								liNode.innerHTML = tableStatusListTS[j][0];
 								ulNode.appendChild(liNode);
 								indexInRow = indexInRow + 1;
@@ -271,5 +304,38 @@ function tableSelectOnLoad() {
 				failure : function(response, options) {
 				}
 			});
+
+	// get the table merge info
+	// 后台：["主餐台号1","副餐台号1"]，["主餐台号2","副餐台号2"]
+	// 前台: tableMergeList 与后台一致
+	Ext.Ajax.request({
+		url : "../QueryMerger.do",
+		params : {
+			"pin" : pin
+		},
+		success : function(response, options) {
+			var resultJSON = Ext.util.JSON.decode(response.responseText);
+			if (resultJSON.success == true) {
+				var data = resultJSON.data;
+				var mergeInfoList = data.split("，");
+				for ( var i = 0; i < mergeInfoList.length; i++) {
+					var tableInfo = mergeInfoList[i].substr(1,
+							mergeInfoList[i].length - 2).split(",");
+					tableMergeList.push([ tableInfo[0], tableInfo[1] ]);
+				}
+			} else {
+				Ext.MessageBox.show({
+					msg : resultJSON.data,
+					width : 300,
+					buttons : Ext.MessageBox.OK
+				});
+			}
+		},
+		failure : function(response, options) {
+		}
+	});
+
+	// update the operator name
+	getOperatorName(pin);
 
 };

@@ -7,7 +7,7 @@
 			// person count input pop window
 			personCountInputWin = new Ext.Window({
 				layout : "fit",
-				width : 177,
+				width : 200,
 				height : 100,
 				closeAction : "hide",
 				resizable : false,
@@ -50,11 +50,13 @@
 									 */
 
 									// for forward the page
+									// 只有空台才要输入人数，只有“一般”类型才有空台，固定category为1
 									location.href = "OrderMain.html?tableNbr="
 											+ selectedTable + "&personCount="
-											+ inputCount
-											+ "&tableStat=free&pin=" + pin
-											+ "&restaurantID=" + restaurantID;
+											+ inputCount + "&tableStat=free"
+											+ "&category=1" + "&tableNbr2=0"
+											+ "&pin=" + pin + "&restaurantID="
+											+ restaurantID;
 
 								}
 							}
@@ -68,6 +70,245 @@
 					show : function(thiz) {
 						// thiz.findById("personCountInput").focus();
 						var f = Ext.get("personCountInput");
+						f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
+					}
+				}
+			});
+
+			// table change pop window
+			tableChangeWin = new Ext.Window(
+					{
+						layout : "fit",
+						width : 200,
+						height : 100,
+						closeAction : "hide",
+						resizable : false,
+						items : [ {
+							layout : "form",
+							labelWidth : 30,
+							border : false,
+							frame : true,
+							items : [ {
+								xtype : "textfield",
+								fieldLabel : "转至",
+								id : "tableChangeInput",
+								width : 110
+							} ]
+						} ],
+						buttons : [
+								{
+									text : "确定",
+									handler : function() {
+										var inputTableNbr = tableChangeWin
+												.findById("tableChangeInput")
+												.getValue();
+										if (inputTableNbr != "") {
+											var tableIndex = -1;
+											for ( var i = 0; i < tableStatusListTS.length; i++) {
+												if (tableStatusListTS[i][0] == inputTableNbr) {
+													tableIndex = i;
+												}
+											}
+
+											if (tableIndex == -1) {
+												Ext.Msg.alert("",
+														"<b>您输入的台号不存在！</b>");
+											} else if (tableStatusListTS[tableIndex][2] == "占用") {
+												Ext.Msg
+														.alert("",
+																"<b>您输入的台号为就餐状态，不能转台！</b>");
+											} else {
+												tableChangeWin.hide();
+												Ext.Ajax
+														.request({
+															url : "../TransTable.do",
+															params : {
+																"pin" : pin,
+																"oldTableID" : selectedTable,
+																"newTableID" : inputTableNbr
+															},
+															success : function(
+																	response,
+																	options) {
+																var resultJSON = Ext.util.JSON
+																		.decode(response.responseText);
+																if (resultJSON.success == true) {
+																	Ext.MessageBox
+																			.show({
+																				msg : resultJSON.data,
+																				width : 300,
+																				buttons : Ext.MessageBox.OK,
+																				fn : function() {
+																					location
+																							.reload();
+																				}
+																			});
+																} else {
+																	Ext.MessageBox
+																			.show({
+																				msg : resultJSON.data,
+																				width : 300,
+																				buttons : Ext.MessageBox.OK,
+																				fn : function() {
+																					location
+																							.reload();
+																				}
+																			});
+																}
+
+															},
+															failure : function(
+																	response,
+																	options) {
+															}
+														});
+											}
+										}
+									}
+								}, {
+									text : "取消",
+									handler : function() {
+										tableChangeWin.hide();
+									}
+								} ],
+						listeners : {
+							show : function(thiz) {
+								// thiz.findById("personCountInput").focus();
+								var f = Ext.get("tableChangeInput");
+								f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
+							}
+						}
+					});
+
+			// table merge pop window
+			tableMergeWin = new Ext.Window(
+					{
+						layout : "fit",
+						width : 200,
+						height : 115,
+						closeAction : "hide",
+						resizable : false,
+						items : [ {
+							layout : "form",
+							labelWidth : 60,
+							border : false,
+							frame : true,
+							items : [ {
+								xtype : "textfield",
+								fieldLabel : "拼台台号",
+								id : "tableMergeInput",
+								width : 110
+							}, {
+								xtype : "numberfield",
+								fieldLabel : "人数",
+								id : "tableMergeCount",
+								width : 110
+							} ]
+						} ],
+						buttons : [
+								{
+									text : "确定",
+									handler : function() {
+										var inputTableNbr = tableMergeWin
+												.findById("tableMergeInput")
+												.getValue();
+										var tableMergeCount = tableMergeWin
+												.findById("tableMergeCount")
+												.getValue();
+										if (inputTableNbr != "") {
+											var tableIndex = -1;
+											for ( var i = 0; i < tableStatusListTS.length; i++) {
+												if (tableStatusListTS[i][0] == inputTableNbr) {
+													tableIndex = i;
+												}
+											}
+
+											if (tableIndex == -1) {
+												Ext.Msg.alert("",
+														"<b>您输入的台号不存在！</b>");
+											} else if (tableStatusListTS[tableIndex][2] == "占用") {
+												Ext.Msg
+														.alert("",
+																"<b>您输入的台号为就餐状态，不能拼台！</b>");
+											} else {
+												tableMergeWin.hide();
+												location.href = "OrderMain.html?tableNbr="
+														+ selectedTable
+														+ "&personCount="
+														+ tableMergeCount
+														+ "&tableStat=free"
+														+ "&category=4"
+														+ "&tableNbr2="
+														+ inputTableNbr
+														+ "&pin="
+														+ pin
+														+ "&restaurantID="
+														+ restaurantID;
+											}
+										}
+									}
+								}, {
+									text : "取消",
+									handler : function() {
+										tableMergeWin.hide();
+									}
+								} ],
+						listeners : {
+							show : function(thiz) {
+								// thiz.findById("personCountInput").focus();
+								var f = Ext.get("tableMergeInput");
+								f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
+							}
+						}
+					});
+
+			// table separate pop window
+			tableSeparateWin = new Ext.Window({
+				layout : "fit",
+				width : 200,
+				height : 100,
+				closeAction : "hide",
+				resizable : false,
+				items : [ {
+					layout : "form",
+					labelWidth : 30,
+					border : false,
+					frame : true,
+					items : [ {
+						xtype : "numberfield",
+						fieldLabel : "人数",
+						id : "personCountInputSep",
+						width : 110
+					} ]
+				} ],
+				buttons : [
+						{
+							text : "确定",
+							handler : function() {
+								var inputCount = tableSeparateWin.findById(
+										"personCountInputSep").getValue();
+								if (inputCount != 0 && inputCount != "") {
+									tableSeparateWin.hide();
+									// for forward the page
+									location.href = "OrderMain.html?tableNbr="
+											+ selectedTable + "&personCount="
+											+ inputCount + "&tableStat=free"
+											+ "&category=3" + "&tableNbr2=0"
+											+ "&pin=" + pin + "&restaurantID="
+											+ restaurantID;
+
+								}
+							}
+						}, {
+							text : "取消",
+							handler : function() {
+								tableSeparateWin.hide();
+							}
+						} ],
+				listeners : {
+					show : function(thiz) {
+						// thiz.findById("personCountInput").focus();
+						var f = Ext.get("personCountInputSep");
 						f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
 					}
 				}
@@ -334,42 +575,66 @@
 			});
 
 			// ***************tableSelectSouthPanel******************
-			var tableSelectSouthPanel = new Ext.Panel({
-				region : "south",
-				height : 55,
-				// width : 800,
-				layout : "fit",
-				border : false,
-				bodyStyle : "background-color:#d8ebef;padding-left:20px;",
-				contentEl : "tableStatusTS"
-			});
+			// var tableSelectSouthPanel = new Ext.Panel({
+			// region : "south",
+			// height : 55,
+			// // width : 800,
+			// layout : "fit",
+			// border : false,
+			// bodyStyle : "background-color:#d8ebef;padding-left:20px;",
+			// contentEl : "tableStatusTS"
+			// });
 
 			// *************整体布局*************
-			var dishesOrderImgBut = new Ext.ux.ImageButton({
-				imgPath : "../images/InsertOrder.png",
-				imgWidth : 50,
-				imgHeight : 50,
-				tooltip : "点菜",
-				handler : function(btn) {
-					if (selectedTable != "") {
-						var tableIndex = -1;
-						for ( var i = 0; i < tableStatusListTS.length; i++) {
-							if (tableStatusListTS[i][0] == selectedTable) {
-								tableIndex = i;
+			var dishesOrderImgBut = new Ext.ux.ImageButton(
+					{
+						imgPath : "../images/InsertOrder.png",
+						imgWidth : 50,
+						imgHeight : 50,
+						tooltip : "点菜",
+						handler : function(btn) {
+							if (selectedTable != "") {
+								var tableIndex = -1;
+								for ( var i = 0; i < tableStatusListTS.length; i++) {
+									if (tableStatusListTS[i][0] == selectedTable) {
+										tableIndex = i;
+									}
+								}
+								if (tableStatusListTS[tableIndex][2] == "占用") {
+									var category = "X";
+									var tableNbr = "XXX";
+									var tableNbr2 = "XXX";
+									if (tableStatusListTS[tableIndex][4] == "一般") {
+										category = "1";
+										tableNbr = selectedTable;
+										tableNbr2 = "0";
+									} else if (tableStatusListTS[tableIndex][4] == "外卖") {
+										category = "2";
+										tableNbr = selectedTable;
+										tableNbr2 = "0";
+									} else if (tableStatusListTS[tableIndex][4] == "并台") {
+										category = "3";
+										tableNbr = selectedTable;
+										tableNbr2 = "0";
+									} else if (tableStatusListTS[tableIndex][4] == "拼台") {
+										category = "4";
+										var tblArray = getMergeTable(selectedTable);
+										tableNbr = tblArray[0];
+										tableNbr2 = tblArray[1];
+									}
+									location.href = "OrderMain.html?tableNbr="
+											+ tableNbr + "&personCount="
+											+ tableStatusListTS[tableIndex][1]
+											+ "&tableStat=used" + "&category="
+											+ category + "&tableNbr2="
+											+ tableNbr2 + "&pin=" + pin
+											+ "&restaurantID=" + restaurantID;
+								} else {
+									personCountInputWin.show();
+								}
 							}
 						}
-						if (tableStatusListTS[tableIndex][2] == "占用") {
-							location.href = "OrderMain.html?tableNbr="
-									+ selectedTable + "&personCount="
-									+ tableStatusListTS[tableIndex][1]
-									+ "&tableStat=used&pin=" + pin
-									+ "&restaurantID=" + restaurantID;
-						} else {
-							personCountInputWin.show();
-						}
-					}
-				}
-			});
+					});
 
 			var checkOutImgBut = new Ext.ux.ImageButton({
 				imgPath : "../images/PayOrder.png",
@@ -446,6 +711,127 @@
 				}
 			});
 
+			var tableChangeImgBut = new Ext.ux.ImageButton({
+				imgPath : "../images/extlogo48.png",
+				imgWidth : 50,
+				imgHeight : 50,
+				tooltip : "转台",
+				handler : function(btn) {
+					if (selectedTable != "") {
+						var tableIndex = -1;
+						for ( var i = 0; i < tableStatusListTS.length; i++) {
+							if (tableStatusListTS[i][0] == selectedTable) {
+								tableIndex = i;
+							}
+						}
+						if (tableStatusListTS[tableIndex][2] == "占用"
+								&& tableStatusListTS[tableIndex][4] == "一般") {
+							tableChangeWin.show();
+						} else {
+							if (tableStatusListTS[tableIndex][2] != "占用") {
+								Ext.Msg.alert("", "<b>空台不能转台！</b>");
+							} else {
+								Ext.Msg.alert("", "<b>该台不允许转台！</b>");
+							}
+						}
+					}
+				}
+			});
+
+			var tableMergeImgBut = new Ext.ux.ImageButton({
+				imgPath : "../images/extlogo48.png",
+				imgWidth : 50,
+				imgHeight : 50,
+				tooltip : "拼台",
+				handler : function(btn) {
+					if (selectedTable != "") {
+						var tableIndex = -1;
+						for ( var i = 0; i < tableStatusListTS.length; i++) {
+							if (tableStatusListTS[i][0] == selectedTable) {
+								tableIndex = i;
+							}
+						}
+						if (tableStatusListTS[tableIndex][2] == "占用") {
+							Ext.Msg.alert("", "<b>已就餐台不能拼台！</b>");
+						} else {
+							tableMergeWin.show();
+						}
+					}
+				}
+			});
+
+			var tableSepImgBut = new Ext.ux.ImageButton({
+				imgPath : "../images/extlogo48.png",
+				imgWidth : 50,
+				imgHeight : 50,
+				tooltip : "并台",
+				handler : function(btn) {
+					if (selectedTable != "") {
+						var tableIndex = -1;
+						for ( var i = 0; i < tableStatusListTS.length; i++) {
+							if (tableStatusListTS[i][0] == selectedTable) {
+								tableIndex = i;
+							}
+						}
+
+						if (tableStatusListTS[tableIndex][2] == "占用"
+								&& tableStatusListTS[tableIndex][4] == "一般") {
+
+							Ext.MessageBox.show({
+								msg : "并到" + selectedTable
+										+ "号台后，将新增加一张临时餐台，是否确定？",
+								width : 300,
+								buttons : Ext.MessageBox.YESNO,
+								fn : function(btn) {
+									if (btn == "yes") {
+										tableSeparateWin.show();
+									}
+								}
+							});
+						} else {
+							if (tableStatusListTS[tableIndex][2] != "占用") {
+								Ext.Msg.alert("", "<b>空台不能并台！</b>");
+							} else {
+								Ext.Msg.alert("", "<b>该台不允许并台！</b>");
+							}
+						}
+					}
+				}
+			});
+
+			var packageImgBut = new Ext.ux.ImageButton({
+				imgPath : "../images/extlogo48.png",
+				imgWidth : 50,
+				imgHeight : 50,
+				tooltip : "外卖",
+				handler : function(btn) {
+					location.href = "OrderMain.html?tableNbr=0"
+							+ "&personCount=0" + "&tableStat=free"
+							+ "&category=2" + "&tableNbr2=0" + "&pin=" + pin
+							+ "&restaurantID=" + restaurantID;
+				}
+			});
+
+			var pushBackBut = new Ext.ux.ImageButton({
+				imgPath : "../images/extlogo48.png",
+				imgWidth : 50,
+				imgHeight : 50,
+				tooltip : "返回",
+				handler : function(btn) {
+					location.href = "PersonLogin.html?restaurantID="
+							+ restaurantID;
+				}
+			});
+
+			var logOutBut = new Ext.ux.ImageButton({
+				imgPath : "../images/extlogo48.png",
+				imgWidth : 50,
+				imgHeight : 50,
+				tooltip : "登出",
+				handler : function(btn) {
+				}
+			});
+
 			var centerTabPanel = new Ext.Panel({
 				region : "center",
 				tbar : new Ext.Toolbar({
@@ -456,15 +842,32 @@
 					}, dishesOrderImgBut, {
 						text : "&nbsp;&nbsp;&nbsp;",
 						disabled : true
-					}, checkOutImgBut, dishesOrderImgBut, {
+					}, checkOutImgBut, {
 						text : "&nbsp;&nbsp;&nbsp;",
 						disabled : true
-					}, orderDeleteImgBut ]
+					}, orderDeleteImgBut, {
+						text : "&nbsp;&nbsp;&nbsp;",
+						disabled : true
+					}, tableChangeImgBut, {
+						text : "&nbsp;&nbsp;&nbsp;",
+						disabled : true
+					}, tableMergeImgBut, {
+						text : "&nbsp;&nbsp;&nbsp;",
+						disabled : true
+					}, tableSepImgBut, {
+						text : "&nbsp;&nbsp;&nbsp;",
+						disabled : true
+					}, packageImgBut, "->", pushBackBut, {
+						text : "&nbsp;&nbsp;&nbsp;",
+						disabled : true
+					}, logOutBut ]
 				}),
 				layout : "border",
 				border : false,
-				items : [ tableSelectNorthPanel, tableSelectCenterPanel,
-						tableSelectSouthPanel ]
+				items : [ tableSelectNorthPanel, tableSelectCenterPanel
+				// ,
+				// tableSelectSouthPanel
+				]
 			});
 
 			var viewport = new Ext.Viewport(
@@ -475,9 +878,7 @@
 								{
 									region : "north",
 									bodyStyle : "background-color:#A9D0F5",
-									html : "<h4 style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4><a href='PersonLogin.html?restaurantID="
-											+ restaurantID
-											+ "' style='float:right;font-size:12px;padding:30px;'>返回员工登陆</a>",
+									html : "<h4 style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4><div id='optName' class='optName'></div>",
 									height : 50,
 									margins : '0 0 5 0'
 								},

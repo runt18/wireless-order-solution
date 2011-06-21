@@ -1,30 +1,13 @@
-﻿// 从url获取当前桌信息
-function URLParaQuery() {
-	var name, value, i;
-	var str = location.href;
-	var num = str.indexOf("?")
-	str = str.substr(num + 1);
-	var arrtmp = str.split("&");
-	for (i = 0; i < arrtmp.length; i++) {
-		num = arrtmp[i].indexOf("=");
-		if (num > 0) {
-			name = arrtmp[i].substring(0, num);
-			value = arrtmp[i].substr(num + 1);
-			this[name] = value;
-		}
-	}
-}
-
-// on page load function
+﻿// on page load function
 function loginOnLoad() {
 
 	var Request = new URLParaQuery();
 	restaurantID = Request["restaurantID"];
 
-//	// for local test
-//	if (restaurantID == undefined) {
-//		restaurantID = "11";
-//	}
+	// for local test
+	if (restaurantID == undefined) {
+		restaurantID = "11";
+	}
 
 	// emplData: [pin，姓名，密码]
 	// 后台格式：{success:true,

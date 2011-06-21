@@ -27,38 +27,26 @@
 <!-- components -->
 <script type="text/javascript"
 	src="../js/components/Ext.ux.ImageButton.js"></script>
+<script type="text/javascript" src="../js/components/functionLib.js"></script>
 
 <!-- css -->
+<link rel="stylesheet" type="text/css" href="../css/header.css" />
 <link rel="stylesheet" type="text/css" href="../css/tableList.css" />
 <link rel="stylesheet" type="text/css" href="../css/tableStatus.css" />
 
 
 <script type="text/javascript">
-	//从url获取当前桌信息
-	function URLParaQuery() {
-		var name, value, i;
-		var str = location.href;
-		var num = str.indexOf("?")
-		str = str.substr(num + 1);
-		var arrtmp = str.split("&");
-		for (i = 0; i < arrtmp.length; i++) {
-			num = arrtmp[i].indexOf("=");
-			if (num > 0) {
-				name = arrtmp[i].substring(0, num);
-				value = arrtmp[i].substr(num + 1);
-				this[name] = value;
-			}
-		}
-	}
-
 	// global variable
 	var tableStatusListTS = []; // tables' infomation
+	var tableMergeList = [];
+	
 	var selectedTable = ""; // the current selected table number("" if null)
 	var softKeyBoardTS = null; // table select soft key board
 	var personCountInputWin = null
 	// person count input pop window
 
 	var pin = ""; // the restaurant pin 
+	var operatorName = "XXX";
 
 	var Request = new URLParaQuery();
 	var restaurantID = "";
@@ -104,7 +92,7 @@
 
 
 	<!--   table status    -->
-	<div id="tableStatusTS">
+	<div id="tableStatusTS" style="visibility: hidden;">
 		<img title="桌号" src="../images/TableID.png" style="float: left;" />
 		<div id="tblNbrDivTS" class="tableStatusChar">000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
 		<img title="人数" src="../images/DinnerAmount.png" style="float: left;" />
@@ -112,6 +100,7 @@
 		<img title="状态" src="../images/TableStatus.png" style="float: left;" />
 		<div id="tblStatusDivTS" class="tableStatusChar">空桌</div>
 	</div>
+
 
 	<!--    table summary infomation   -->
 	<div id="tableSumInfo">
@@ -122,9 +111,6 @@
 		<img title="空闲台数" src='../images/table-used.png' style='float: left;' />
 		<div id="freeTblDivTS" class="tableStatusChar">000</div>
 	</div>
-
-
-
 
 </body>
 </html>
