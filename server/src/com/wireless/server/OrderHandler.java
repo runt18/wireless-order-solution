@@ -170,7 +170,15 @@ class OrderHandler extends Handler implements Runnable{
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.PAY_ORDER){
 				Order orderToPay = ReqParser.parsePayOrder(request);
 				orderToPay.restaurant_id = _term.restaurant_id;
-				printOrder(request.header.reserved, PayOrder.exec(_term.pin, _term.modelID, orderToPay));
+				/**
+				 * If pay order temporary, just only print the temporary receipt.
+				 * Otherwise perform the pay action and print receipt 
+				 */
+				if((request.header.reserved & Reserved.PRINT_TEMP_RECEIPT_2) != 0){
+					printOrder(request.header.reserved, PayOrder.queryOrder(_term.pin, _term.modelID, orderToPay));
+				}else{
+					printOrder(request.header.reserved, PayOrder.exec(_term.pin, _term.modelID, orderToPay));
+				}
 				response = new RespACK(request.header);
 
 				//handle the print request
