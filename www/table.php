@@ -124,7 +124,7 @@ $sql = "SELECT od.id,t.alias_id,od.order_date,total_price,num,foods,is_paid,wait
 		
 		(SELECT MAX(id) AS OrderId,table_id,MAX(restaurant_id) AS restaurant_id".
 	" FROM `order` WHERE `order`.`restaurant_id`=".$_SESSION["restaurant_id"]." GROUP BY `order`.table_id) AS o ON t.alias_id = o.table_id ".
-	" LEFT OUTER JOIN `order_view` od ON o.OrderId = od.id WHERE t.restaurant_id=" . $_SESSION["restaurant_id"] ;
+	" LEFT OUTER JOIN `order_view` od ON o.OrderId = od.id WHERE t.restaurant_id=" . $_SESSION["restaurant_id"]. " ORDER BY t.alias_id" ;
 /*echo $sql;*/
 $rs = $db->Execute($sql);
 $ts = 0;

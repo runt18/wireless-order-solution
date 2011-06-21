@@ -139,7 +139,7 @@ function submitFoodData() {
 function validateFoodData() {
     var foodCode = document.getElementById("foodCode").value;
     var foodName = document.getElementById("foodName").value;
-    var pinyin = document.getElementById("pinyin").value;
+//    var pinyin = document.getElementById("pinyin").value;
     var foodPrice = document.getElementById("foodPrice").value;
     //    alert(foodCode);
     
@@ -153,11 +153,11 @@ function validateFoodData() {
         document.getElementById("foodName").focus();
         return false;
     }
-    if (pinyin == undefined || pinyin == null || pinyin == "") {
-        alert("拼音不能为空！");
-        document.getElementById("pinyin").focus();
-        return false;
-    }
+//    if (pinyin == undefined || pinyin == null || pinyin == "") {
+//        alert("拼音不能为空！");
+//        document.getElementById("pinyin").focus();
+//        return false;
+//    }
     if (foodPrice == undefined || foodPrice == null || foodPrice == "") {
         alert("价格不能为空！");
         document.getElementById("foodPrice").focus();

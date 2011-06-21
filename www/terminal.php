@@ -60,7 +60,7 @@ if($editType == "setOwner")
 include("conn.php"); 
 $restaurant_id = $_SESSION["restaurant_id"];
 $bh=0;
-$sql = "SELECT model_id,model_name,owner_name,pin,expire_date FROM `terminal` WHERE restaurant_id=$restaurant_id ORDER BY restaurant_id" ;  
+$sql = "SELECT model_id,model_name,owner_name,pin,expire_date FROM `terminal` WHERE restaurant_id=$restaurant_id and model_id<=0x7F ORDER BY restaurant_id" ;  
 
 $rs = $db->GetAll($sql);
 foreach ($rs as $row){

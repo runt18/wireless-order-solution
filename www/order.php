@@ -152,7 +152,8 @@ if($editType == "canEditOrder")
 	<select id="category" name="category" style="display:none">
 	<option value="1" selected="selected">一般</option>
 	<option value="2">外卖</option>	
-	<option value="3">拼台</option>	
+	<option value="3">并台</option>	
+	<option value="4">拼台</option>	
 	</select>
 	<select id="condition_type" name="condition_type" style="display:none"><option value="Equal">等于</option><option value="EqualOrGrater" selected="selected">大于等于</option><option value="EqualOrLess">小于等于</option></select>
     <!-- 关键字 -->

@@ -53,7 +53,8 @@ function editOrder(id, total_price_2, target, type_value, table_id, category_val
 	                             '<div class="pop_Content1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;类型：<select id="sel_category" name="sel_category">' +
 	                                    '<option value="1" selected="selected">一般</option>' +
 	                                    '<option value="2">外卖</option>' +
-	                                    '<option value="3">拼台</option>' +
+	                                    '<option value="3">并台</option>' +
+	                                    '<option value="4">拼台</option>' +
 	                                    '</select></div>' +	                                    
 	                            '<div class="pop_Content1">结帐方式：<select id="sel_type" name="sel_type">' +
 	                                    '<option value="1" selected="selected">现金</option>' +
@@ -113,7 +114,7 @@ function showSearch(target) {
                             '<div class="pop_Content1">日期：<input type="text" id="dateFrom" name="dateFrom" style="width:136px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;&nbsp;至&nbsp;&nbsp;<input type="text" id="dateTo" name="dateTo" style="width:136px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;</div>' +
                             '<div class="pop_Content1">金额：<input type="text" name="priceFrom" style="width:136px" onkeypress="return event.keyCode>=48&&event.keyCode<=57" />&nbsp;&nbsp;至&nbsp;&nbsp;<input type="text" name="priceTo" style="width:136px" onkeypress="return event.keyCode>=48&&event.keyCode<=57" /></div>' +
                             '<div class="pop_Content2">台号：<input type="text" name="alias_id" size="10" height="20" onkeypress="return event.keyCode>=48&&event.keyCode<=57" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;结帐方式：<select id="type" name="type"><option value="" selected="selected">全部</option><option value="1">现金</option><option value="2">刷卡</option>	<option value="3">会员卡</option><option value="4">挂账</option><option value="5">签单</option></select></div>' +
-                            '<div class="pop_Content2">类型：<select id="category" name="category"><option value="" selected="selected">全部</option><option value="1">一般</option><option value="2">外卖</option>	<option value="3">拼台</option></select></div>' +
+                            '<div class="pop_Content2">类型：<select id="category" name="category"><option value="" selected="selected">全部</option><option value="1">一般</option><option value="2">外卖</option>	<option value="3">并台</option><option value="4">拼台</option></select></div>' +
                         '</div>' +
                         '<span class="action-span" style="margin-left:110px;"><a href="#"  onclick="document.searchForm.submit();">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>' +
                          '<span class="action-span1" style="margin-right:100px;"><a href="#" onclick="closeWindow()">取&nbsp;&nbsp;&nbsp;&nbsp;消</a></span>' +

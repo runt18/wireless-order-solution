@@ -180,8 +180,7 @@ foreach ($rs as $row){
 			"&quot;,&quot;".$row["num"]."&quot;,&quot;".$row["foods"]."&quot;,&quot;".$row["is_paid"]."&quot;,&quot;".$row["waiter"]."&quot;,&quot;".$row["type_name"]."&quot;,&quot;".$row["total_price_2"]."&quot;,&quot;".$row["category_name"]."&quot;,&quot;".$row["comment"]."&quot;)'>
 				<img src='images/View.png'  height='16' width='14' border='0'/>&nbsp;查看</a>&nbsp;&nbsp;&nbsp;&nbsp;
 				<a href='#' onclick='editTable(&quot;".$row["table_id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["name"].
-			"&quot;,&quot;table_list.php&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
-			"<a href='#' onclick='confirmDelete(".$row["alias_id"].",&quot;table_list.php&quot;)'><img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;删除</a></td>";
+			"&quot;,&quot;table_list.php&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a></td>";
 	}
 	echo "</tr>";
 }
