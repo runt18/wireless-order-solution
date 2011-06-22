@@ -370,16 +370,16 @@ var orderedForm = new Ext.form.FormPanel(
 									type = 2;
 								}
 
-								alert("pin:" + Request["pin"] + "     tableID:"
-										+ Request["tableNbr"]
-										+ "      tableID_2:"
-										+ Request["tableNbr2"]
-										+ "      customNum:"
-										+ Request["personCount"] + "     type:"
-										+ type + "     originalTableID:"
-										+ Request["tableNbr"]
-										+ "     category:" + category
-										+ "     foods" + foodPara);
+								// alert("pin:" + Request["pin"] + " tableID:"
+								// + Request["tableNbr"]
+								// + " tableID_2:"
+								// + Request["tableNbr2"]
+								// + " customNum:"
+								// + Request["personCount"] + " type:"
+								// + type + " originalTableID:"
+								// + Request["tableNbr"]
+								// + " category:" + category
+								//										+ "     foods" + foodPara);
 								Ext.Ajax
 										.request({
 											url : "../InsertOrder.do",

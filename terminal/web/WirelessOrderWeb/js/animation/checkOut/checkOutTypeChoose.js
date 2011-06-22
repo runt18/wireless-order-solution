@@ -1,49 +1,55 @@
 ﻿var getMemberInfo = function(memberNbr) {
 
 	var Request = new URLParaQuery();
-	Ext.Ajax.request({
-		url : "../QueryMember.do",
-		params : {
-			"pin" : Request["pin"],
-			"memberID" : memberNbr
-		},
-		success : function(response, options) {
-			var resultJSON = Ext.util.JSON.decode(response.responseText);
-			if (resultJSON.success == true) {
-				// 1,update the menber info
-				var josnData = resultJSON.data;
-				var memberList = josnData.split(",");
-				var menberName = memberList[0].substr(1,
-						memberList[0].length - 2);
-				var menberPhone = memberList[1].substr(1,
-						memberList[1].length - 2);
-				document.getElementById("memberNbr").innerHTML = memberNbr
-						+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-				document.getElementById("memberName").innerHTML = menberName
-						+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-				document.getElementById("memberPhone").innerHTML = menberPhone
-						+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+	Ext.Ajax
+			.request({
+				url : "../QueryMember.do",
+				params : {
+					"pin" : Request["pin"],
+					"memberID" : memberNbr
+				},
+				success : function(response, options) {
+					var resultJSON = Ext.util.JSON
+							.decode(response.responseText);
+					if (resultJSON.success == true) {
+						// 1,update the menber info
+						var josnData = resultJSON.data;
+						var memberList = josnData.split(",");
+						var menberName = memberList[0].substr(1,
+								memberList[0].length - 2);
+						var menberPhone = memberList[1].substr(1,
+								memberList[1].length - 2);
+						var menberBalance = memberList[2];
+						mBalance = menberBalance;
+						document.getElementById("memberNbr").innerHTML = memberNbr
+								+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+						document.getElementById("memberName").innerHTML = menberName
+								+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+						document.getElementById("memberPhone").innerHTML = menberPhone
+								+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+						document.getElementById("memberBalance").innerHTML = menberBalance
+								+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 
-				// 2,display the menber info panel
-				checkOutForm.findById("memberInfoPanel").show();
+						// 2,display the menber info panel
+						checkOutForm.findById("memberInfoPanel").show();
 
-				// 3,hide the menber number input window
-				memberNbrInputWin.hide();
+						// 3,hide the menber number input window
+						memberNbrInputWin.hide();
 
-				// 4,mark the menber id
-				actualMemberID = memberNbr;
-			} else {
-				var dataInfo = resultJSON.data;
-				Ext.MessageBox.show({
-					msg : dataInfo,
-					width : 300,
-					buttons : Ext.MessageBox.OK
-				});
-			}
-		},
-		failure : function(response, options) {
-		}
-	});
+						// 4,mark the menber id
+						actualMemberID = memberNbr;
+					} else {
+						var dataInfo = resultJSON.data;
+						Ext.MessageBox.show({
+							msg : dataInfo,
+							width : 300,
+							buttons : Ext.MessageBox.OK
+						});
+					}
+				},
+				failure : function(response, options) {
+				}
+			});
 
 };
 

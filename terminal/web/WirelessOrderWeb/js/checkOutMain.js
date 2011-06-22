@@ -223,6 +223,8 @@ var discountKindComb = new Ext.form.ComboBox({
 	listeners : {
 		select : function(combo, record, index) {
 			if (record.get("text") == "一般") {
+				// set the memeber card balance to -1;
+				mBalance = -1;
 				checkOurListRefresh();
 				// hide the member info
 				checkOutForm.findById("memberInfoPanel").hide();
@@ -441,6 +443,13 @@ var checkOutForm = new Ext.form.FormPanel(
 						// hidden : true,
 						handler : function() {
 							paySubmit(4);
+						}
+					},
+					{
+						text : "暂结",
+						// hidden : true,
+						handler : function() {
+							paySubmit(6);
 						}
 					},
 					{
