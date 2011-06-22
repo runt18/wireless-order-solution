@@ -33,7 +33,7 @@ DELETE FROM wireless_order_db.restaurant WHERE id=11;
 SET AUTOCOMMIT=1;
 INSERT INTO `wireless_order_db`.`restaurant` (`id`, `pwd`, `account`, `restaurant_name`, `record_alive`) VALUES ('11', MD5('demo@123'), 'demo', '演示餐厅', '0');
 INSERT INTO `wireless_order_db`.`terminal` (`pin`, `restaurant_id`, `model_id`, `model_name`, `owner_name`) VALUES (1, 11, 0xFE, 'Admin', '管理员');
-
+INSERT INTO `wireless_order_db`.`setting` (`restaurant_id`) VALUES (11);
 -- -----------------------------------------------------
 -- Insert test taste perference bound to the demo restaurant
 -- -----------------------------------------------------

@@ -172,6 +172,32 @@ ALTER TABLE `order_food_history`
 ADD `food_status` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates the status to this food, the value is the combination of values below.\n特价菜 ：0x01\n推荐菜 ：0x02\n停售　 ：0x04';
 
 -- -----------------------------------------------------
+-- Table `wireless_order_db`.`setting`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`setting` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`setting` (
+  `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to setting' ,
+  `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'the restaurant id to this setting' ,
+  `price_tail` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'indicates how to deal with the tail of price:\n不处理 : 0\n小数抹零 : 1\n小数四舍五入 : 2' ,
+  `auto_reprint` TINYINT NOT NULL DEFAULT 1 COMMENT 'indicates whether to auto re-print' ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_setting_restaurant` (`restaurant_id` ASC) ,
+  CONSTRAINT `fk_setting_restaurant`
+    FOREIGN KEY (`restaurant_id` )
+    REFERENCES `wireless_order_db`.`restaurant` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COMMENT = 'the setting to restaurant';
+
+-- -----------------------------------------------------
+-- Insert the setting info for every restraurant
+-- -----------------------------------------------------
+INSERT INTO `wireless_order_db`.`setting` (`restaurant_id`) SELECT id FROM `wireless_order_db`.`restaurant` WHERE id > 10;
+
+-- -----------------------------------------------------
 -- Table `wireless_order_db`.`order_food_material`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `wireless_order_db`.`order_food_material` ;
