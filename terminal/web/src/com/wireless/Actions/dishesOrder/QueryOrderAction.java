@@ -39,6 +39,12 @@ public class QueryOrderAction extends Action {
 			response.setContentType("text/json; charset=utf-8");
 			out = response.getWriter();
 			
+			/**
+			 * The parameters looks like below.
+			 * e.g. pin=0x1 & tableID=201
+			 * pin : the pin the this terminal
+			 * tableID : the order with this table ID to query
+			 */
 			String pin = request.getParameter("pin");
 			if(pin.startsWith("0x") || pin.startsWith("0X")){
 				pin = pin.substring(2);

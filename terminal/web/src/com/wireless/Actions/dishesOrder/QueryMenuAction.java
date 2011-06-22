@@ -33,6 +33,15 @@ public class QueryMenuAction extends Action {
 			response.setContentType("text/json; charset=utf-8");
 			out = response.getWriter();
 			
+			/**
+			 * The parameters looks like below.
+			 * e.g. pin=0x1 & type=1 
+			 * pin : the pin the this terminal
+			 * type : "1" means to query foods 
+			 * 		  "2" means to query tastes
+			 * 		  "3" means to query kitchens
+			 */
+			
 			String pin = request.getParameter("pin");
 			if(pin.startsWith("0x") || pin.startsWith("0X")){
 				pin = pin.substring(2);

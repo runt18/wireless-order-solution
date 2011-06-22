@@ -43,6 +43,9 @@
 		<action path="/CancelTable" type="com.wireless.Actions.dishesOrder.CancelTableAction"
 			scope="request">
 		</action>
+		<action path="/VerifyPwd" type="com.wireless.Actions.dishesOrder.VerifyPwdAction"
+			scope="request">
+		</action>
 	</action-mappings>
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
 </struts-config>
