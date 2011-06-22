@@ -225,9 +225,18 @@ public class PayOrder {
 		/**
 		 * Calculate the total price 2 as below.
 		 * total_2 = total * 尾数处理方式
-		 * FIX ME !!! the amount to tail does NOT handle right now.
 		 */
-		float totalPrice2 = totalPrice;
+		float totalPrice2;
+		if(orderInfo.price_tail == Order.TAIL_DECIMAL_CUT){
+			//小数抹零
+			totalPrice2 = new Float(totalPrice).intValue();
+		}else if(orderInfo.price_tail == Order.TAIL_DECIMAL_ROUND){
+			//小数四舍五入
+			totalPrice2 = Math.round(totalPrice);
+		}else{
+			totalPrice2 = totalPrice;
+		}
+		
 		orderInfo.setActualPrice(totalPrice2);
 		
 		orderInfo.restaurant_id = orderToPay.restaurant_id;

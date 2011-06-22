@@ -150,6 +150,15 @@ public class QueryOrder {
 		}
 		dbCon.rs.close();
 		
+		/**
+		 * Get the type to handle the tail of price
+		 */
+		sql = "SELECT price_tail FROM " + Params.dbName +
+			  ".setting WHERE restaurant_id=" + orderInfo.restaurant_id;
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			orderInfo.price_tail = dbCon.rs.getShort("price_tail");
+		}
 		// query the food's id and order count associate with the order id for "order_food" table
 		sql = "SELECT name, food_id, food_status, SUM(order_count) AS order_sum, unit_price, discount, taste, taste_price, taste_id, kitchen FROM `"
 				+ Params.dbName
