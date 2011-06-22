@@ -9,7 +9,7 @@
 	var payManner = -1;
 	var tempPay;
 
-	// 现金，检查实际金额
+	// 现金
 	if (submitType == 1) {
 		submitPrice = actualPrice;
 	} else {
@@ -25,8 +25,9 @@
 		payManner = submitType;
 	}
 
-	// 会员卡结帐，检查余额
-	if (submitType == 3 && parseFloat(countPrice) > parseFloat(mBalance)) {
+	// 会员卡结帐，检查余额；现金校验
+	if (submitType == 3 && parseFloat(countPrice) > parseFloat(mBalance)
+			&& payType == 2) {
 		Ext.Msg.alert("", "<b>会员卡余额小于合计金额，不能结帐！</b>");
 		canSubmit = false;
 	} else if (submitType == 1
