@@ -17,4 +17,10 @@ public class Table {
 	public short status = TABLE_IDLE;
 	//the category to this table
 	public short category = Order.CATE_NORMAL;
+	/**
+	 * The value of minimum cost to this order, ranges from 99999.99 through 0.00
+	 * Since the 8100 doesn't support float, we instead to use 0 through 9999999.
+	 * So the real price should be divided 100 at last. 
+	 */
+	public int minimum_cost = 0;
 }

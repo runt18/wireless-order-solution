@@ -151,14 +151,15 @@ public class ReqParser {
 	* pin[6] - auto calculated and filled in
 	* len[2] - 0x06, 0x00
 	* <Body>
-	* table[2] : cash_income[4] : pay_type : discount_type : len_member : member_id[len] : len_comment : comment[len]
+	* table[2] : cash_income[4] : pay_type : discount_type : pay_manner : service_rate : len_member : member_id[len] : len_comment : comment[len]
 	* table[2] - 2-byte indicates the table id
-	* cash_income[4] - 4-byte indicates the cash income to this order
+	* cash_income[4] - 4-byte indicates the total price
 	* 				   total_price[0] indicates the float part
 	* 				   total_price[1..3] indicates the fixed part
 	* pay_type - one of the values of pay type
 	* discount_type - one of the values of discount type
 	* pay_manner - one of the values of pay manner
+	* service_rate - the service rate to this order
 	* len_member - length of the id to member
 	* member_id[len] - the id to member
 	* len_comment - length of the comment 
@@ -179,25 +180,27 @@ public class ReqParser {
 		int discountType = req.body[7];
 		//get the payment manner
 		int payManner = req.body[8];
+		//get the service rate
+		byte serviceRate = req.body[9];
 		//get the the length to member id
-		int lenMember = req.body[9];
+		int lenMember = req.body[10];
 		//get the value to member id
 		String memberID = null;
 		//get the member id if exist
 		if(lenMember > 0){
 			byte[] memberIDBytes = new byte[lenMember];
-			System.arraycopy(req.body, 10, memberIDBytes, 0, lenMember);
+			System.arraycopy(req.body, 11, memberIDBytes, 0, lenMember);
 			try{
 				memberID = new String(memberIDBytes, "UTF-8");
 			}catch(UnsupportedEncodingException e){}
 		}
 		//get the length of comment
-		int lenComment = req.body[10 + lenMember];
+		int lenComment = req.body[11 + lenMember];
 		String comment = null;
 		//get the comment if exist
 		if(lenComment > 0){
 			byte[] commentBytes = new byte[lenComment];
-			System.arraycopy(req.body, 11 + lenMember, commentBytes, 0, lenComment);
+			System.arraycopy(req.body, 12 + lenMember, commentBytes, 0, lenComment);
 			try{
 				comment = new String(commentBytes, "UTF-8");
 			}catch(UnsupportedEncodingException e){}
@@ -208,6 +211,7 @@ public class ReqParser {
 		orderToPay.pay_type = payType;
 		orderToPay.discount_type = discountType;
 		orderToPay.pay_manner = payManner;
+		orderToPay.service_rate = serviceRate;
 		orderToPay.member_id = memberID;
 		orderToPay.comment = comment;
 		return orderToPay;
