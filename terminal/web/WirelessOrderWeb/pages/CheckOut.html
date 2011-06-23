@@ -36,17 +36,23 @@
 <script type="text/javascript">
 	// global variable
 	var gridHeightOffset = 180; // bill grid heigth offset
-	var checkOutData = [] // the ordered dished display list
-	var discountData = [] // discount rate list
+	var checkOutData = []
+	// the ordered dished display list
+	var discountData = []
+	// discount rate list
 	var dishTasteData = []; // taste date
-	var checkOutDataDisplay = [] // check out dishes display
-	
+	var checkOutDataDisplay = []
+	// check out dishes display
+
 	var discountType = 1; // discount type, default normal
-	var payType = 1;  // pay type, default type 1
-	var actualMemberID = -1 //menber id
-	
+	var payType = 1; // pay type, default type 1
+	var actualMemberID = -1
+	//menber id
+
 	var restaurantID = "";
 	var operatorName = "XXX";
+	
+	var mBalance = -1;
 </script>
 
 <script type="text/javascript"
@@ -61,38 +67,42 @@
 
 </head>
 <body onload="checkOutOnLoad()">
-<script type="text/javascript" src="../extjs/examples.js"></script>
+	<script type="text/javascript" src="../extjs/examples.js"></script>
 
-<div id="west"></div>
-<div id="north">
-<p>icons here.</p>
-</div>
-<div id="south"></div>
-<div id="west"></div>
-<div id="center"></div>
-<div id="temp">
-<p>建设中......</p>
-</div>
-
-
-<!-- table status -->
-<div id="tableStatusCO" style="padding-left: 5px"><img title="桌号"
-	src='../images/TableID.png' style='float: left;' />
-<div id="tblNbrDivTS" class="tableStatusChar">100&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-<img title="人数" src='../images/DinnerAmount.png' style='float: left;' />
-<div id="perCountDivTS" class="tableStatusChar">4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-</div>
+	<div id="west"></div>
+	<div id="north">
+		<p>icons here.</p>
+	</div>
+	<div id="south"></div>
+	<div id="west"></div>
+	<div id="center"></div>
+	<div id="temp">
+		<p>建设中......</p>
+	</div>
 
 
-<!-- member infomation -->
-<div id="memberInfo" style="padding-left: 5px"><img title="会员号"
-	src='../images/MemberID.png' style='float: left;' />
-<div id="memberNbr" class="tableStatusChar">000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-<img title="姓名" src='../images/MemberName.png' style='float: left;' />
-<div id="memberName" class="tableStatusChar">XXX&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-<img title="电话" src='../images/MemberTele.png.png' style='float: left;' />
-<div id="memberPhone" class="tableStatusChar">1234567890</div>
-</div>
+	<!-- table status -->
+	<div id="tableStatusCO" style="padding-left: 5px">
+		<img title="桌号" src='../images/TableID.png' style='float: left;' />
+		<div id="tblNbrDivTS" class="tableStatusChar">100&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+		<img title="人数" src='../images/DinnerAmount.png' style='float: left;' />
+		<div id="perCountDivTS" class="tableStatusChar">4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+	</div>
+
+
+	<!-- member infomation -->
+	<div id="memberInfo" style="padding-left: 5px">
+		<img title="会员号" src='../images/MemberID.png' style='float: left;' />
+		<div id="memberNbr" class="tableStatusChar">000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+		<img title="姓名" src='../images/MemberName.png' style='float: left;' />
+		<div id="memberName" class="tableStatusChar">XXX&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+		<img title="电话" src='../images/MemberTele.png.png'
+			style='float: left;' />
+		<div id="memberPhone" class="tableStatusChar">1234567890&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+		<img title="会员卡余额" src='../images/MemberTele.png.png'
+			style='float: left;' />
+		<div id="memberBalance" class="tableStatusChar">10.0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+	</div>
 
 </body>
 </html>
