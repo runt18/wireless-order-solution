@@ -59,9 +59,9 @@ COMMIT;
 -- -----------------------------------------------------
 SET AUTOCOMMIT=0;
 -- DELETE FROM wireless_order_db.table WHERE restaurant_id=11;
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`, `name`) VALUES (NULL, 0x64, 11, '菊花厅');
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`, `name`) VALUES (NULL, 0x65, 11, '水仙厅');
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`, `name`) VALUES (NULL, 0x66, 11, '兰花厅');
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`, `name`, `minimum_cost`) VALUES (NULL, 0x64, 11, '菊花厅', 150);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`, `name`, `minimum_cost`) VALUES (NULL, 0x65, 11, '水仙厅', 300.50);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`, `name`, `minimum_cost`) VALUES (NULL, 0x66, 11, '兰花厅', 500);
 INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x67, 11);
 INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x68, 11);
 INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x69, 11);

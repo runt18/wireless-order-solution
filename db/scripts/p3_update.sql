@@ -112,6 +112,9 @@ INSERT INTO `order_food` (`id`, `order_id`) VALUES(@max_order_food_id, @max_orde
 DELETE FROM `food` WHERE enabled=0;
 DELETE FROM `table` WHERE enabled=0;
 
+ALTER TABLE `table`
+ADD `minimum_cost` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the minimum cost to this table';
+
 ALTER TABLE `restaurant`
 ADD `tele1` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'One of the telephones to this restaurant.'; 
 ALTER TABLE `restaurant`
@@ -132,6 +135,8 @@ ADD `table2_id` SMALLINT NULL DEFAULT NULL COMMENT 'the 2nd table alias id to th
 ALTER TABLE `order`
 ADD `table2_name` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the 2nd table name to this order(used for table merger)' ;
 ALTER TABLE `order`
+ADD `service_rate` DECIMAL(3,2) NOT NULL DEFAULT 0 COMMENT 'the service rate to this order' ;
+ALTER TABLE `order`
 MODIFY `waiter` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the waiter who operates on this order';
 ALTER TABLE `order`
 MODIFY `custom_num` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the amount of custom to this order';
@@ -146,6 +151,8 @@ ALTER TABLE `order_history`
 ADD `table2_id` SMALLINT NULL DEFAULT NULL COMMENT 'the 2nd table alias id to this order(used for table merger)' ;
 ALTER TABLE `order_history`
 ADD `table2_name` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the 2nd table name to this order(used for table merger)' ;
+ALTER TABLE `order_history`
+ADD `service_rate` DECIMAL(3,2) NOT NULL DEFAULT 0 COMMENT 'the service rate to this order' ;
 ALTER TABLE `order`
 MODIFY `waiter` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the waiter who operates on this order';
 ALTER TABLE `order`

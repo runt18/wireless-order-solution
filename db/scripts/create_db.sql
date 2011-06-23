@@ -81,6 +81,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order` (
   `table_name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the table to this order' ,
   `table2_id` SMALLINT NULL DEFAULT NULL COMMENT 'the 2nd table alias id to this order(used for table merger)' ,
   `table2_name` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the 2nd table name to this order(used for table merger)' ,
+  `service_rate` DECIMAL(3,2) NOT NULL DEFAULT 0 COMMENT 'the service rate to this order' ,
   `comment` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the comment to this order' ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_order_restaurant` (`restaurant_id` ASC) ,
@@ -169,6 +170,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`table` (
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'Indicates the table belongs to which restaurant.' ,
   `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to this table' ,
   `enabled` TINYINT NOT NULL DEFAULT 1 COMMENT 'indicates whether the table information is enabled or not' ,
+  `minimum_cost` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the minimum cost to this table' ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_table_restaurant1` (`restaurant_id` ASC) ,
   CONSTRAINT `fk_table_restaurant1`
@@ -282,6 +284,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_history` (
   `table_name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the table name to this order' ,
   `table2_id` SMALLINT NULL DEFAULT NULL COMMENT 'the 2nd table alias id to this order(used for table merger)' ,
   `table2_name` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the 2nd table name to this order(used for table merger)' ,
+  `service_rate` DECIMAL(3,2) NOT NULL DEFAULT 0 COMMENT 'the service rate to this order' ,
   `comment` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the comment to this order' ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_order_restaurant` (`restaurant_id` ASC) ,
