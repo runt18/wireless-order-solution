@@ -20,6 +20,8 @@ DELETE FROM wireless_order_db.kitchen WHERE restaurant_id=11;
 DELETE FROM wireless_order_db.member_charge WHERE member_id IN (SELECT id FROM wireless_order_db.member WHERE restaurant_id=11);
 DELETE FROM wireless_order_db.member WHERE restaurant_id=11;
 
+DELETE FROM wireless_order_db.setting WHERE restaurant_id=11;
+
 DELETE FROM wireless_order_db.restaurant WHERE id=11;
 
 
