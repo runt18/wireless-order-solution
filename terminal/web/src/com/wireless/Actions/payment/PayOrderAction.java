@@ -40,7 +40,7 @@ public class PayOrderAction extends Action implements PinGen{
 
 			/**
 			 * The parameters looks like below.
-			 * e.g. pin=0x1 & tempPay=false & tableID=201 & payType=1 & discountType=1 & payManner=1 & cashIncome=120 & memberID=13693834750
+			 * e.g. pin=0x1 & tempPay=false & tableID=201 & payType=1 & discountType=1 & payManner=1 & cashIncome=120 & serviceRate=5 & memberID=13693834750
 			 * pin : the pin the this terminal
 			 * tempPay : indicates whether to pay order temporary
 			 * tableID : the table id to be paid order
@@ -56,6 +56,8 @@ public class PayOrderAction extends Action implements PinGen{
 			 * 			   "5" means "签单"
 			 * cashIncome : the cash that client pay for this order,
 			 * 				this parameter is optional, only takes effect while the pay manner is "现金"
+			 * serviceRate : the service percent rate to this order,
+			 * 				 this parameter is optional.
 			 * memberID : the id to member, 
 			 * 			  this parameter is optional, only takes effect while the pay type is "会员" 
 			 * comment : the comment to this order
@@ -73,7 +75,11 @@ public class PayOrderAction extends Action implements PinGen{
 			
 			orderToPay.table_id = Short.parseShort(request.getParameter("tableID"));
 			
-			orderToPay.pay_type = Integer.parseInt(request.getParameter("payType"));
+			if(request.getParameter("payType") != null){
+				orderToPay.pay_type = Integer.parseInt(request.getParameter("payType"));				
+			}else{
+				orderToPay.pay_type = Order.PAY_NORMAL;
+			}
 			
 			/**
 			 * Get the member id if the pay type is "会员"
@@ -82,9 +88,24 @@ public class PayOrderAction extends Action implements PinGen{
 				orderToPay.member_id = request.getParameter("memberID");
 			}
 			
-			orderToPay.discount_type = Integer.parseInt(request.getParameter("discountType"));
+			if(request.getParameter("discountType") != null){
+				orderToPay.discount_type = Integer.parseInt(request.getParameter("discountType"));				
+			}else{
+				orderToPay.discount_type = Order.DISCOUNT_1;
+			}
 			
-			orderToPay.pay_manner = Integer.parseInt(request.getParameter("payManner"));
+			if(request.getParameter("payManner") != null){
+				orderToPay.pay_manner = Integer.parseInt(request.getParameter("payManner"));
+			}else{
+				orderToPay.pay_manner = Order.MANNER_CASH;
+			}
+			
+			if(request.getParameter("serviceRate") != null){
+				orderToPay.service_rate = Byte.parseByte(request.getParameter("serviceRate"));
+			}else{
+				orderToPay.service_rate = 0;
+			}
+			
 			/**
 			 * Get the cash income if the pay manner is "现金"
 			 */
