@@ -54,8 +54,8 @@ public class VerifyPwdAction extends Action {
 			}
 			
 			boolean isMatch = VerifyPwd.exec(Integer.parseInt(pin, 16), Terminal.MODEL_STAFF, type, pwd);
-			jsonResp = jsonResp.replace("$(result)", "true");
-			jsonResp = jsonResp.replace("$(value)", isMatch ? "true" : "false");	
+			jsonResp = jsonResp.replace("$(result)", isMatch ? "true" : "false");
+			jsonResp = jsonResp.replace("$(value)", isMatch ? "密码验证通过" : "密码验证失败");	
 			
 		}catch(BusinessException e){
 			e.printStackTrace();
