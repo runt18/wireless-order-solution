@@ -150,12 +150,13 @@ public class QueryTable {
 		/**
 		 * Check to see if the table with this alias id is exist or not.
 		 */
-		String sql = "SELECT name FROM `" + Params.dbName +
+		String sql = "SELECT name, minimum_cost FROM `" + Params.dbName +
 					"`.`table` WHERE alias_id=" + tableID + 
 					" AND restaurant_id=" + term.restaurant_id + " AND enabled=1";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			String tableName = dbCon.rs.getString("name");
+			float minimumCost = dbCon.rs.getFloat("minimum_cost");
 			/**
 			 * Check to see if the table with this alias id is idle or busy
 			 */
@@ -169,6 +170,7 @@ public class QueryTable {
 			 table.restaurant_id = term.restaurant_id;
 			 table.alias_id = tableID;
 			 table.name = tableName;
+			 table.minimum_cost = new Float(minimumCost).intValue();
 			 
 			 if(dbCon.rs.next()){
 				 table.custom_num = dbCon.rs.getByte("custom_num");

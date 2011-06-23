@@ -68,6 +68,7 @@ public class PayOrder {
 			 * - actual price
 			 * - payment manner
 			 * - terminal pin
+			 * - service rate
 			 * - pay order date
 			 * - comment if exist
 			 * - member id if pay type is for member
@@ -77,6 +78,7 @@ public class PayOrder {
 				  ", total_price=" + totalPrice + 
 				  ", total_price_2=" + totalPrice2 +
 				  ", type=" + orderInfo.pay_manner + 
+				  ", service_rate=" + ((float)orderInfo.service_rate / 100) +
 			   	  ", order_date=NOW()" + 
 				  (orderInfo.comment != null ? ", comment='" + orderInfo.comment + "'" : "") +
 				  (member != null ? ", member_id=" + member.alias_id + ", member='" + member.name + "'" : "") + 
@@ -221,6 +223,13 @@ public class PayOrder {
 		}
 		totalPrice = (float)Math.round(totalPrice * 100) / 100;
 		orderInfo.setTotalPrice(totalPrice);
+
+		/**
+		 * Multiplied by the service rate.
+		 * total = total * (1 + service_rate)
+		 */
+		totalPrice = totalPrice * (1 + ((float)orderToPay.service_rate / 100));
+
 		
 		/**
 		 * Calculate the total price 2 as below.
@@ -246,6 +255,7 @@ public class PayOrder {
 		orderInfo.cashIncome = orderToPay.cashIncome;
 		orderInfo.pay_manner = orderToPay.pay_manner;
 		orderInfo.comment = orderToPay.comment;
+		orderInfo.service_rate = orderToPay.service_rate;
 			
 		return orderInfo;
 	}
