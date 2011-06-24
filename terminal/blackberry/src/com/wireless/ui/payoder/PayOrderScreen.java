@@ -50,8 +50,26 @@ public class PayOrderScreen extends MainScreen
 				super.paint(g);  
 			}
 		});
+		
 		_customNum = new LabelField("人数：" + new Integer(_bill.custom_num).toString());
 		vfm.add(_customNum);
+		
+		if(bill.minimum_cost != 0){
+			int decimal = bill.minimum_cost % 100;
+			String strDecimal = null;
+			if(decimal != 0){
+				if(decimal < 10){
+					strDecimal = "." + "0" + decimal;
+				}else{
+					strDecimal = "." + Integer.toString(decimal);
+				}
+			}else{
+				strDecimal = "";
+			}
+			LabelField minimumCost = new LabelField("最低消：￥" + (bill.minimum_cost / 100) + strDecimal);
+			vfm.add(minimumCost);
+		}
+		
 		vfm.add(new SeparatorField());
 		vfm.add(new LabelField("已点菜", LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
 			protected void paintBackground(Graphics g) {

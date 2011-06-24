@@ -13,7 +13,6 @@ class QueryRestaurantPopup extends PopupScreen implements IQueryRestaurant{
 	private QueryRestaurantPopup _self = this;
 	private ProtocolPackage _resp = null;
 	private IQueryRestaurant _queryCallBack = null;
-	private Restaurant _restaurantInfo = null;
 	
 	QueryRestaurantPopup(IQueryRestaurant queryCallBack){
 		super(new VerticalFieldManager());
@@ -38,12 +37,11 @@ class QueryRestaurantPopup extends PopupScreen implements IQueryRestaurant{
 		});		
 	}
 
-	public void passQueryRestaurant(ProtocolPackage resp, Restaurant info) {
+	public void passQueryRestaurant(ProtocolPackage resp) {
 		_resp = resp;
-		_restaurantInfo = info;
 		UiApplication.getUiApplication().invokeLater(new Runnable(){
 			public void run(){
-				_queryCallBack.passQueryRestaurant(_resp, _restaurantInfo);
+				_queryCallBack.passQueryRestaurant(_resp);
 			}
 		});		
 	}
@@ -52,7 +50,7 @@ class QueryRestaurantPopup extends PopupScreen implements IQueryRestaurant{
 		_resp = resp;
 		UiApplication.getUiApplication().invokeLater(new Runnable(){
 			public void run(){
-				_queryCallBack.passQueryRestaurant(_resp, new Restaurant("餐厅名称"));
+				_queryCallBack.passQueryRestaurant(_resp);
 			}
 		});
 	}

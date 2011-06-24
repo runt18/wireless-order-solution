@@ -23,7 +23,6 @@ public class StartupScreen extends MainScreen implements IQueryMenu,
 														 IQueryPing
 {
 	private boolean _isMenuOK = false;
-	private Restaurant _info = new Restaurant("");
 	private String _errMsg = null;
 	private String _ver = null;
 	private String _url = null;
@@ -72,7 +71,7 @@ public class StartupScreen extends MainScreen implements IQueryMenu,
 //			UiApplication.getApplication().invokeLater(new Runnable(){
 //				public void run(){
 					//UiApplication.getApplication().requestForeground();
-					UiApplication.getUiApplication().pushScreen(new OrderMainScreen(_isMenuOK, _info));
+					UiApplication.getUiApplication().pushScreen(new OrderMainScreen(_isMenuOK));
 					if(_errMsg != null){
 						Dialog.alert(_errMsg);
 						
@@ -146,8 +145,8 @@ public class StartupScreen extends MainScreen implements IQueryMenu,
 	/**
 	 * Log the restaurant info and perform to OTA update if passing the restaurant query.
 	 */
-	public void passQueryRestaurant(ProtocolPackage resp, Restaurant info) {
-		_info = info;		
+	public void passQueryRestaurant(ProtocolPackage resp) {
+	
 	}
 
 	/**
