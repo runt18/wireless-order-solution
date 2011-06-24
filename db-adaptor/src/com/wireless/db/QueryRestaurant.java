@@ -18,7 +18,8 @@ public class QueryRestaurant {
 	 * 		   - The owner name to this terminal
 	 * @throws BusinessException throws if either of cases below.<br>
 	 * 							 - The terminal is NOT attached to any restaurant.<br>
-	 * 							 - The terminal is expired.
+	 * 							 - The terminal is expired.<br>
+	 * 							 - The restaurant this terminal attached to does NOT exist.
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
 	public static Restaurant exec(int pin, short model) throws BusinessException, SQLException{ 
@@ -42,11 +43,15 @@ public class QueryRestaurant {
 	
 	/**
 	 * Get the restaurant information according to specific restaurant id.
-	 * @param restaurantID the restaurant id to query
+	 * @param restaurantID 
+	 * 			the restaurant id to query
 	 * @return the restaurant information
-	 * @throws SQLException throws if fail to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if the restaurant does NOT exist
+	 * @throws SQLException 
+	 * 			throws if fail to execute any SQL statement
 	 */
-	public static Restaurant exec(int restaurantID) throws SQLException{
+	public static Restaurant exec(int restaurantID) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		
 		try{
@@ -61,12 +66,17 @@ public class QueryRestaurant {
 	/**
 	 * Get the restaurant information according to specific restaurant id.
 	 * Note that this method should be invoked before connecting the database 
-	 * @param dbCon the database connection 
-	 * @param restaurantID the restaurant id to query
+	 * @param dbCon 
+	 * 			the database connection 
+	 * @param restaurantID 
+	 * 			the restaurant id to query
 	 * @return the restaurant information
-	 * @throws SQLException throws if fail to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if the restaurant does NOT exist
+	 * @throws SQLException 
+	 * 			throws if fail to execute any SQL statement
 	 */
-	static Restaurant exec(DBCon dbCon, int restaurantID) throws SQLException{
+	static Restaurant exec(DBCon dbCon, int restaurantID) throws BusinessException, SQLException{
 		Restaurant restaurant = new Restaurant();
 		String sql = "SELECT restaurant_name, restaurant_info, tele1, tele2, address FROM " + Params.dbName + "." +
 					 "restaurant WHERE id=" + restaurantID; 
@@ -79,7 +89,10 @@ public class QueryRestaurant {
 			restaurant.tele_1 = dbCon.rs.getString("tele1");
 			restaurant.tele_2 = dbCon.rs.getString("tele2");
 			restaurant.addr = dbCon.rs.getString("address");
+		}else{
+			throw new BusinessException("The restaurant(id=" + restaurantID + ") does NOT exist.");
 		}
+		dbCon.rs.close();
 		/**
 		* if the corresponding info not be found, then get the root's info as common
 		*/
@@ -90,7 +103,19 @@ public class QueryRestaurant {
 			if(dbCon.rs.next()){
 				restaurant.info = dbCon.rs.getString(1);
 			}
-		}			
+			dbCon.rs.close();
+		}		
+		/**
+		 * Get the corresponding restaurant setting
+		 */
+		sql = "SELECT price_tail, auto_reprint FROM " + Params.dbName +
+			  ".setting WHERE restaurant_id=" + restaurantID;
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			restaurant.setting.price_tail = dbCon.rs.getInt("price_tail");
+			restaurant.setting.auto_reprint = dbCon.rs.getBoolean("auto_reprint");
+		}
+		dbCon.rs.close();
 		return restaurant;
 	}
 	

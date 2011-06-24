@@ -37,7 +37,7 @@ public class QueryTable {
 			ArrayList<Table> tables = new ArrayList<Table>();
 			
 			//get the idle tables
-			String sql = "SELECT alias_id AS table_id, name AS table_name FROM " + Params.dbName + 
+			String sql = "SELECT alias_id AS table_id, name AS table_name, minimum_cost FROM " + Params.dbName + 
 						 ".table a WHERE NOT EXISTS (SELECT id FROM " + Params.dbName + 
 						 ".order b WHERE (a.alias_id = b.table_id OR a.alias_id=b.table2_id) AND b.restaurant_id=a.restaurant_id AND total_price IS NULL)" +
 						 " AND restaurant_id=" + term.restaurant_id;
@@ -48,6 +48,7 @@ public class QueryTable {
 				idleTable.restaurant_id = term.restaurant_id;
 				idleTable.alias_id = dbCon.rs.getInt("table_id");
 				idleTable.name = dbCon.rs.getString("table_name");
+				idleTable.minimum_cost = new Float((dbCon.rs.getFloat("minimum_cost") * 100)).intValue();
 				idleTable.status = Table.TABLE_IDLE;
 				tables.add(idleTable);
 			}
@@ -170,7 +171,7 @@ public class QueryTable {
 			 table.restaurant_id = term.restaurant_id;
 			 table.alias_id = tableID;
 			 table.name = tableName;
-			 table.minimum_cost = new Float(minimumCost).intValue();
+			 table.minimum_cost = new Float(minimumCost * 100).intValue();
 			 
 			 if(dbCon.rs.next()){
 				 table.custom_num = dbCon.rs.getByte("custom_num");
