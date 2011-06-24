@@ -51,9 +51,9 @@ public class QueryTableAction extends Action {
 				for (int i = 0; i < tables.length; i++) {
 					/**
 					 * The json format of table query looks like below.
-					 * ["餐台1编号","餐台1人数","占用","餐台1名称","一般"]，["餐台2编号","餐台2人数","空桌","餐台2名称","外卖"]
+					 * ["餐台1编号","餐台1人数","占用","餐台1名称","一般",0]，["餐台2编号","餐台2人数","空桌","餐台2名称","外卖",300.50]
 					 */
-					String jsonTable = "[\"$(alias_id)\",\"$(custom_num)\",\"$(status)\",\"$(alias_name)\",\"$(category)\"]";
+					String jsonTable = "[\"$(alias_id)\",\"$(custom_num)\",\"$(status)\",\"$(alias_name)\",\"$(category)\",$(minimum_cost)]";
 					jsonTable = jsonTable.replace("$(alias_id)", Integer.toString(tables[i].alias_id));
 					jsonTable = jsonTable.replace("$(custom_num)", new Short(tables[i].custom_num).toString());
 					
@@ -84,6 +84,8 @@ public class QueryTableAction extends Action {
 					}else{
 						jsonTable = jsonTable.replace("$(category)", "一般");
 					}
+					
+					jsonTable = jsonTable.replace("$(minimum_cost)", Float.toString((float)tables[i].minimum_cost / 100));
 					
 					// put each json table info to the value
 					value.append(jsonTable);
