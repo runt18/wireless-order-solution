@@ -8,6 +8,7 @@ public class Restaurant {
 	public String addr;
 	public String info;
 	public String owner;
+	public Setting setting = new Setting();
 	
 	public Restaurant(){
 		this.name = "";
@@ -40,3 +41,5 @@ public class Restaurant {
 	public static final int RESERVED_6 = 9;
 	public static final int RESERVED_7 = 10;
 }
+
+
