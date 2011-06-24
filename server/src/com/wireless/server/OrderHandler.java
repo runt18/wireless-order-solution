@@ -292,7 +292,7 @@ class OrderHandler extends Handler implements Runnable{
 				Restaurant restaurant = null;
 				try{
 					restaurant = QueryRestaurant.exec(_term.restaurant_id);
-				}catch(SQLException e){
+				}catch(Exception e){
 					restaurant = new Restaurant();
 				}
 				
