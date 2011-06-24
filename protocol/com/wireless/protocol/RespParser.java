@@ -27,9 +27,10 @@ public class RespParser {
 		 * pin[6] : same as request
 		 * len[2] -  length of the <Body>
 		 * <Body>
-		 * table[2] : table_2[2] : category : custom_num : price[2] : food_num : <Food1> : <Food2>...
+		 * table[2] : table_2[2] : minimum_cost[4] : category : custom_num : price[2] : food_num : <Food1> : <Food2>...
 		 * table[2] - 2-byte indicates the table id
 		 * table_2[2] - 2-byte indicates the 2nd table id, only used table merger
+		 * minimum_cost[4] - 4-byte indicates the minimum cost to this order
 		 * category - 1-byte indicates the category to this order 
 		 * custom_num - 1-byte indicating the number of the custom for this order
 		 * price[4] - 4-byte indicating the total price to this order
@@ -52,24 +53,30 @@ public class RespParser {
 			//get the 2nd table id
 			order.table2_id = (short)((response.body[2] & 0x00FF) | ((response.body[3] & 0x00FF) << 8));
 			
+			//get the minimum cost
+			order.minimum_cost = (response.body[4] & 0x000000FF) | 
+								 ((response.body[5] & 0x000000FF ) << 8) |
+								 ((response.body[6] & 0x000000FF ) << 16) |
+								 ((response.body[7] & 0x000000FF ) << 24);
+			
 			//get the category
-			order.category = (short)(response.body[4] & 0x00FF);
+			order.category = (short)(response.body[8] & 0x00FF);
 			
 			//get the custom number
-			order.custom_num = (int)response.body[5];
+			order.custom_num = (int)response.body[9];
 
 			//get the total price
-			order.totalPrice =  (response.body[6] & 0x000000FF) | 
-								((response.body[7] & 0x000000FF ) << 8) |
-								((response.body[8] & 0x000000FF ) << 16) |
-								((response.body[9] & 0x000000FF ) << 24);
+			order.totalPrice =  (response.body[10] & 0x000000FF) | 
+								((response.body[11] & 0x000000FF ) << 8) |
+								((response.body[12] & 0x000000FF ) << 16) |
+								((response.body[13] & 0x000000FF ) << 24);
 
 			//get order food's number
-			int foodNum = response.body[10];
+			int foodNum = response.body[14];
 			Food[] orderFoods = new Food[foodNum]; 
 			
 			//get every order food's id and number
-			int index = 11;
+			int index = 15;
 			for(int i = 0; i < orderFoods.length; i++){
 				int foodID = (response.body[index] & 0x000000FF) |
 							((response.body[index + 1] & 0x000000FF) << 8);
@@ -289,13 +296,15 @@ public class RespParser {
 		 * pin[6] : same as request
 		 * len[2] -  length of the <Body>
 		 * <Body>
-		 * len_1 : restaurant_name : len_2 : restaurant_info 
+		 * len_1 : restaurant_name : len_2 : restaurant_info : len_3 : owner : len_4 : pwd2
 		 * len_1 - 1-byte indicates the length of the restaurant name
 		 * restaurant_name - restaurant name whose length equals "len_1"
-		 * len_2 - 1-byte indicating the length of the restaurant info
+		 * len_2 - 1-byte indicates the length of the restaurant info
 		 * restaurant_info - restaurant info whose length equals "len_2"
 		 * len_3 - 1-byte indicates the length of the terminal's owner name
 		 * owner - the owner name of terminal
+		 * len_4 : 1-byte indicates the length of the password2
+		 * pwd2 : the 2nd password to this restaurant
 		 *******************************************************/
 
 		int offset = 0;
@@ -307,6 +316,7 @@ public class RespParser {
 			if(length != 0){
 				restaurant.name = new String(response.body, offset, length, "UTF-16BE");
 			}
+			
 			//calculate the position of the length to restaurant info
 			offset = offset + length;
 			length = response.body[offset];
@@ -315,6 +325,7 @@ public class RespParser {
 			if(length != 0){
 				restaurant.info = new String(response.body, offset, length, "UTF-16BE");
 			}
+			
 			//calculate the position of the length to owner
 			offset = offset + length;
 			length = response.body[offset];
@@ -323,6 +334,16 @@ public class RespParser {
 			if(length != 0){
 				restaurant.owner = new String(response.body, offset, length, "UTF-16BE");
 			}
+			
+			//calculate the position of the length to 2nd password
+			offset = offset + length;
+			length = response.body[offset];
+			offset++;
+			//get the 2nd password
+			if(length != 0){
+				restaurant.pwd2 = new String(response.body, offset, length);
+			}
+			
 		}catch(UnsupportedEncodingException e){
 
 		}

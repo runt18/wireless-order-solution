@@ -8,6 +8,7 @@ public class Restaurant {
 	public String addr;
 	public String info;
 	public String owner;
+	public String pwd2;
 	public Setting setting = new Setting();
 	
 	public Restaurant(){
