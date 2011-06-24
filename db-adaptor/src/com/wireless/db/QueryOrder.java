@@ -159,6 +159,20 @@ public class QueryOrder {
 		if(dbCon.rs.next()){
 			orderInfo.price_tail = dbCon.rs.getShort("price_tail");
 		}
+		dbCon.rs.close();
+		
+		/**
+		 * Get the minimum cost
+		 */
+		sql = "SELECT minimum_cost FROM " + Params.dbName +	
+			  ".table WHERE restaurant_id=" + orderInfo.restaurant_id +
+			  " AND alias_id=" + orderInfo.table_id;
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			orderInfo.minimum_cost = new Float(dbCon.rs.getFloat("minimum_cost") * 100).intValue();
+		}
+		dbCon.rs.close();
+		
 		// query the food's id and order count associate with the order id for "order_food" table
 		sql = "SELECT name, food_id, food_status, SUM(order_count) AS order_sum, unit_price, discount, taste, taste_price, taste_id, kitchen FROM `"
 				+ Params.dbName
