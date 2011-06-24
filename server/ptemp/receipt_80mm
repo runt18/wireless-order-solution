@@ -5,6 +5,7 @@
 服务员：$(waiter)
 时间：$(print_date) $(print_time)
 付款方式：$(pay_manner)
+服务费：$(service_rate)
 -----------------------------------------------
 餐台：$(table)
 人数：$(custom_num)
