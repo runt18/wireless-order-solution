@@ -27,7 +27,7 @@ public class RespParser {
 		 * pin[6] : same as request
 		 * len[2] -  length of the <Body>
 		 * <Body>
-		 * table[2] : table_2[2] : minimum_cost[4] : category : custom_num : price[2] : food_num : <Food1> : <Food2>...
+		 * table[2] : table_2[2] : minimum_cost[4] : category : custom_num : price[4] : food_num : <Food1> : <Food2>...
 		 * table[2] - 2-byte indicates the table id
 		 * table_2[2] - 2-byte indicates the 2nd table id, only used table merger
 		 * minimum_cost[4] - 4-byte indicates the minimum cost to this order
