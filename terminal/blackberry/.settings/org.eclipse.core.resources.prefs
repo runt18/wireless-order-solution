@@ -1,15 +1,20 @@
-#Wed May 11 11:12:09 CST 2011
+#Sat Jun 25 13:38:49 CST 2011
 eclipse.preferences.version=1
 encoding//protocol/com/wireless/protocol/Taste.java=UTF-8
 encoding//protocol/com/wireless/protocol/Util.java=UTF-8
-encoding//src/com/wireless/terminal/FuncSettingScreen.java=UTF-8
-encoding//src/com/wireless/terminal/NetworkSettingScreen.java=UTF-8
-encoding//src/com/wireless/terminal/NetworkTestPopup.java=UTF-8
-encoding//src/com/wireless/terminal/OTAUpdatePopup.java=UTF-8
-encoding//src/com/wireless/terminal/QueryMenuPopup.java=UTF-8
-encoding//src/com/wireless/terminal/QueryRestaurantPopup.java=UTF-8
 encoding//src/com/wireless/terminal/StartupScreen.java=UTF-8
+encoding//src/com/wireless/terminal/VerifyPwd.java=UTF-8
 encoding//src/com/wireless/ui/field/SelectTastePopup.java=UTF-8
+encoding//src/com/wireless/ui/funcset/FuncSettingScreen.java=UTF-8
+encoding//src/com/wireless/ui/main/CancelOrderPopup.java=UTF-8
+encoding//src/com/wireless/ui/main/NewOrderPop.java=UTF-8
+encoding//src/com/wireless/ui/main/OTAUpdatePopup.java=UTF-8
+encoding//src/com/wireless/ui/main/PayOrderPopup.java=UTF-8
+encoding//src/com/wireless/ui/main/QueryMenuPopup.java=UTF-8
+encoding//src/com/wireless/ui/main/QueryRestaurantPopup.java=UTF-8
+encoding//src/com/wireless/ui/main/UpdateOrderPopup.java=UTF-8
+encoding//src/com/wireless/ui/networkset/NetworkSettingScreen.java=UTF-8
+encoding//src/com/wireless/ui/networkset/NetworkTestPopup.java=UTF-8
 encoding//src/com/wireless/ui/neworder/ChangeOrderScreen.java=UTF-8
 encoding//src/com/wireless/ui/neworder/SubmitChangePopup.java=UTF-8
 encoding//src/com/wireless/ui/payoder/PayOrderPopup2.java=UTF-8
