@@ -1,4 +1,4 @@
-package com.wireless.terminal;
+package com.wireless.ui.main;
 
 import com.wireless.util.IOTAUpdate;
 import com.wireless.util.OTAUpdate;

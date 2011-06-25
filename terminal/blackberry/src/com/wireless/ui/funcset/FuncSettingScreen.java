@@ -1,6 +1,7 @@
-package com.wireless.terminal;
+package com.wireless.ui.funcset;
 
 
+import com.wireless.terminal.Params;
 import com.wireless.ui.field.BlankSeparatorField;
 import com.wireless.util.ServerConnector;
 
@@ -19,10 +20,10 @@ public class FuncSettingScreen extends MainScreen{
 	private ButtonField _ok = null;
 	private ButtonField _cancel = null;
 	private ButtonField _restore = null;
-	private PostFuncSet _postFuncSet = null; 
+	private IPostFuncSet _postFuncSet = null; 
 	private boolean _isDirty = false;
 	
-	public FuncSettingScreen(PostFuncSet postFuncSet){
+	public FuncSettingScreen(IPostFuncSet postFuncSet){
 		_postFuncSet = postFuncSet;
 		setTitle("功能设置");
 
@@ -166,6 +167,4 @@ public class FuncSettingScreen extends MainScreen{
 	}
 }
 
-interface PostFuncSet{
-	public void postFuncSet(boolean isDirty);
-}
+

@@ -1,6 +1,7 @@
-package com.wireless.terminal;
+package com.wireless.ui.networkset;
 
 
+import com.wireless.terminal.Params;
 import com.wireless.util.ServerConnector;
 
 import net.rim.device.api.ui.*;
@@ -35,10 +36,10 @@ public class NetworkSettingScreen extends MainScreen{
 		}
 	};
 	
-	private PostNetworkSet _postNetworkSet = null;
+	private IPostNetworkSet _postNetworkSet = null;
 	private boolean _isParamDirty = false;
 
-	public NetworkSettingScreen(PostNetworkSet postNetworkSet){
+	public NetworkSettingScreen(IPostNetworkSet postNetworkSet){
 		super(Screen.DEFAULT_CLOSE);
 		_postNetworkSet = postNetworkSet;
 		setTitle("网络设置");
@@ -174,10 +175,4 @@ public class NetworkSettingScreen extends MainScreen{
 	}
 }
 
-interface PostNetworkSet{
-	/**
-	 * Perform the action after network setting. 
-	 * @param isDirty indicates whether the network parameters is modified
-	 */
-	public void postNetworkSet(boolean isDirty);
-}
+

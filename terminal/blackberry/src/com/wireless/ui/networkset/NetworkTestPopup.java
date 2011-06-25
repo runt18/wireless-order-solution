@@ -1,6 +1,7 @@
-package com.wireless.terminal;
+package com.wireless.ui.networkset;
 
 import com.wireless.protocol.*;
+import com.wireless.terminal.Params;
 import com.wireless.util.ServerConnector;
 
 import net.rim.device.api.ui.UiApplication;

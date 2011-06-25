@@ -1,4 +1,4 @@
-package com.wireless.terminal;
+package com.wireless.ui.main;
 
 import net.rim.device.api.ui.UiApplication;
 import net.rim.device.api.ui.component.LabelField;

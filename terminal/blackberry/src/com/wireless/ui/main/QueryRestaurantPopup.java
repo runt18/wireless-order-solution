@@ -1,4 +1,4 @@
-package com.wireless.terminal;
+package com.wireless.ui.main;
 
 import com.wireless.protocol.*;
 import com.wireless.util.IQueryRestaurant;
@@ -8,7 +8,7 @@ import net.rim.device.api.ui.component.LabelField;
 import net.rim.device.api.ui.container.PopupScreen;
 import net.rim.device.api.ui.container.VerticalFieldManager;
 
-class QueryRestaurantPopup extends PopupScreen implements IQueryRestaurant{
+public class QueryRestaurantPopup extends PopupScreen implements IQueryRestaurant{
 	
 	private QueryRestaurantPopup _self = this;
 	private ProtocolPackage _resp = null;
