@@ -156,8 +156,8 @@ public class WirelessOrder extends UiApplication{
 		}
 	}
 	
-	final static long GLOBAL_EVENT_EXIT = 1; 
-	final static long E_BOOTUP_PROC_ID = 0x66ae754bd0827258L;
+	public final static long GLOBAL_EVENT_EXIT = 1; 
+	public final static long E_BOOTUP_PROC_ID = 0x66ae754bd0827258L;
 
 } 
 

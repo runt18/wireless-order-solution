@@ -3,6 +3,7 @@ package com.wireless.terminal;
 
 import com.wireless.protocol.*;
 import com.wireless.ui.field.*;
+import com.wireless.ui.main.OrderMainScreen;
 import com.wireless.util.*;
 import net.rim.blackberry.api.browser.Browser;
 import net.rim.blackberry.api.browser.BrowserSession;
