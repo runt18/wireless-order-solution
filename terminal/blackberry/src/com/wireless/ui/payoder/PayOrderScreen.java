@@ -91,13 +91,13 @@ public class PayOrderScreen extends MainScreen
 		vfm.add(new SeparatorField());
 		add(vfm);
 		HorizontalFieldManager hfm1 = new HorizontalFieldManager(Manager.FIELD_RIGHT);
-		hfm1.add(new LabelField("合计：" + Util.price2String(_bill.totalPrice2(), Util.INT_MASK_3)));
+		hfm1.add(new LabelField("合计：" + Util.price2String(_bill.totalPrice2())));
 		add(hfm1);
 		
 		HorizontalFieldManager hfm2 = new HorizontalFieldManager(Field.FIELD_RIGHT);
 		//hfm2.add(new LabelField("实收：￥"));
 		_cashIncome = new EditField("实收：￥", 
-									  Util.price2String(_bill.totalPrice2(), Util.INT_MASK_3).substring(1), 
+									  Util.price2String(_bill.totalPrice2()).substring(1), 
 									  7, 
 									  Field.HIGHLIGHT_SELECT | Field.FIELD_RIGHT | EditField.NO_LEARNING | EditField.NO_NEWLINE | EditField.FILTER_REAL_NUMERIC){
 		    public void layout(int width, int height) {

@@ -21,7 +21,8 @@ public class RespParser2{
 			for(int j = 0; j < WirelessOrder.foodMenu.foods.length; j++){
 				if(order.foods[i].alias_id == WirelessOrder.foodMenu.foods[j].alias_id){
 					order.foods[i].name = WirelessOrder.foodMenu.foods[j].name;
-					order.foods[i].price = WirelessOrder.foodMenu.foods[j].price;
+					//order.foods[i].price = WirelessOrder.foodMenu.foods[j].price;
+					order.foods[i].setPrice(WirelessOrder.foodMenu.foods[j].getPrice());
 					order.foods[i].kitchen = WirelessOrder.foodMenu.foods[j].kitchen;
 					break;
 				}			
@@ -31,7 +32,8 @@ public class RespParser2{
 			for(int j = 0; j < WirelessOrder.foodMenu.tastes.length; j++){
 				if(order.foods[i].taste.alias_id == WirelessOrder.foodMenu.tastes[j].alias_id){
 					order.foods[i].taste.preference = WirelessOrder.foodMenu.tastes[j].preference;
-					order.foods[i].taste.price = WirelessOrder.foodMenu.tastes[j].price;
+					//order.foods[i].taste.price = WirelessOrder.foodMenu.tastes[j].price;
+					order.foods[i].taste.setPrice(WirelessOrder.foodMenu.tastes[j].getPrice());
 					break;
 				}
 			}

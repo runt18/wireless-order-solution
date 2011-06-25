@@ -117,7 +117,8 @@ public class SelectTastePopup extends PopupScreen{
 							_selectedFood.taste.alias_id = WirelessOrder.foodMenu.tastes[getSelectedIndex()].alias_id;
 							//assign the taste preference
 							_selectedFood.taste.preference = WirelessOrder.foodMenu.tastes[getSelectedIndex()].preference;
-							_selectedFood.taste.price = WirelessOrder.foodMenu.tastes[getSelectedIndex()].price;
+							//_selectedFood.taste.price = WirelessOrder.foodMenu.tastes[getSelectedIndex()].price;
+							_selectedFood.taste.setPrice(WirelessOrder.foodMenu.tastes[getSelectedIndex()].getPrice());
 						}catch(ArrayIndexOutOfBoundsException e){}
 						_orderListField.addFood(_selectedFood);
 						close();
@@ -137,7 +138,7 @@ public class SelectTastePopup extends PopupScreen{
 	    		Taste taste = (Taste)WirelessOrder.foodMenu.tastes[_tasteMatchedIdx[index]];
 	    		int priceWidth = 85;
 		    	g.drawText(taste.preference, 0, y, 0, w - priceWidth);
-				g.drawText(Util.price2String(taste.price, Util.INT_MASK_2), w - priceWidth, y, DrawStyle.RIGHT, priceWidth);		
+				g.drawText(Util.price2String(Util.float2Int(taste.getPrice())), w - priceWidth, y, DrawStyle.RIGHT, priceWidth);		
 		    }
 		    
 		    // get the selected index from the correct Vector
