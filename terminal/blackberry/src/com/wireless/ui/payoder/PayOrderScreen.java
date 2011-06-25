@@ -19,6 +19,7 @@ import net.rim.device.api.ui.container.MainScreen;
 import net.rim.device.api.ui.container.VerticalFieldManager;
 
 import com.wireless.protocol.Order;
+import com.wireless.protocol.Type;
 import com.wireless.protocol.Util;
 import com.wireless.ui.field.OrderListField;
 
@@ -84,7 +85,7 @@ public class PayOrderScreen extends MainScreen
 			}
 		});
 		
-		_orderListField = new OrderListField(_bill.foods, Field.NON_FOCUSABLE);
+		_orderListField = new OrderListField(_bill.foods, Field.NON_FOCUSABLE, Type.PAY_ORDER);
 		
 		vfm.add(_orderListField);
 		vfm.add(new SeparatorField());

@@ -1,12 +1,27 @@
 package com.wireless.ui.neworder;
 
+import net.rim.device.api.ui.Color;
+import net.rim.device.api.ui.DrawStyle;
+import net.rim.device.api.ui.Field;
+import net.rim.device.api.ui.FieldChangeListener;
+import net.rim.device.api.ui.Graphics;
+import net.rim.device.api.ui.Manager;
+import net.rim.device.api.ui.UiApplication;
+import net.rim.device.api.ui.component.ButtonField;
+import net.rim.device.api.ui.component.Dialog;
+import net.rim.device.api.ui.component.EditField;
+import net.rim.device.api.ui.component.LabelField;
+import net.rim.device.api.ui.component.SeparatorField;
+import net.rim.device.api.ui.component.TextField;
+import net.rim.device.api.ui.container.HorizontalFieldManager;
+import net.rim.device.api.ui.container.MainScreen;
+import net.rim.device.api.ui.container.VerticalFieldManager;
+
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
+import com.wireless.protocol.Type;
 import com.wireless.ui.field.OrderListField;
 import com.wireless.ui.field.SelectFoodPopup;
-import net.rim.device.api.ui.*;
-import net.rim.device.api.ui.component.*;
-import net.rim.device.api.ui.container.*;
 
 
 
@@ -78,7 +93,7 @@ public class ChangeOrderScreen extends MainScreen
 			}
 		});
 		
-		_orderListField = new OrderListField(_originalOrder.foods);
+		_orderListField = new OrderListField(_originalOrder.foods, Type.UPDATE_ORDER);
 		
 		_vfm.add(_orderListField);
 		_vfm.add(new SeparatorField());
