@@ -9,7 +9,6 @@ import com.wireless.protocol.Order;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Terminal;
-import com.wireless.protocol.Util;
 
 public class InsertOrder {
 	/**
@@ -38,7 +37,7 @@ public class InsertOrder {
 			Terminal term = VerifyPin.exec(dbCon, pin, model);
 			
 			/**
-			 * Create a temporary table in the case of "并台" and "外卖". 
+			 * Create a temporary table in the case of "å¹¶å�°" and "å¤–å�–". 
 			 * The order would be attached with this new table.
 			 */
 			if(orderToInsert.category == Order.CATE_JOIN_TABLE){
@@ -89,9 +88,7 @@ public class InsertOrder {
 					if(dbCon.rs.next()){
 						orderToInsert.foods[i].name = dbCon.rs.getString("name");
 						orderToInsert.foods[i].status = dbCon.rs.getShort("status");
-						int val = (int)(dbCon.rs.getFloat("unit_price") * 100);
-						int unitPrice = ((val / 100) << 8) | (val % 100);
-						orderToInsert.foods[i].price = unitPrice;
+						orderToInsert.foods[i].setPrice(dbCon.rs.getFloat("unit_price"));
 					}else{
 						throw new BusinessException("The food(alias_id=" + orderToInsert.foods[i].alias_id + ") to query doesn't exit.", ErrorCode.MENU_EXPIRED);
 					}
@@ -159,12 +156,12 @@ public class InsertOrder {
 						orderToInsert.id + ", " + 
 						orderToInsert.foods[i].alias_id + ", " + 
 						orderToInsert.foods[i].count2Float().toString() + ", " + 
-						Util.price2Float(orderToInsert.foods[i].price, Util.INT_MASK_2).toString() + ", '" + 
+						orderToInsert.foods[i].getPrice() + ", '" + 
 						orderToInsert.foods[i].name + "', " +
 						orderToInsert.foods[i].status + ", " +
 						(float)orderToInsert.foods[i].discount / 100 + ", '" +
 						orderToInsert.foods[i].taste.preference + "', " + 
-						Util.price2Float(orderToInsert.foods[i].taste.price, Util.INT_MASK_2).toString() + ", " +
+						orderToInsert.foods[i].taste.getPrice() + ", " +
 						orderToInsert.foods[i].taste.alias_id + ", " + 
 						orderToInsert.foods[i].kitchen + ", '" + 
 						term.owner + "', NOW()" + ")";

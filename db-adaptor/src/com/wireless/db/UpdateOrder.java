@@ -270,13 +270,13 @@ public class UpdateOrder {
 
 				sql = "INSERT INTO `" + Params.dbName + "`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, `discount`, `taste_id`, `taste_price`, `taste`, `kitchen`, `waiter`, `order_date`) VALUES (" +
 						orderID + ", " + extraFoods.get(i).alias_id + ", " + 
-						extraFoods.get(i).count2String() + ", " + 
-						com.wireless.protocol.Util.price2Float(extraFoods.get(i).price, com.wireless.protocol.Util.INT_MASK_2).toString() + ", '" + 
+						extraFoods.get(i).getCount() + ", " + 
+						extraFoods.get(i).getPrice() + ", '" + 
 						extraFoods.get(i).name + "', " + 
 						extraFoods.get(i).status + ", " +
 						(float)extraFoods.get(i).discount / 100 + ", " +
 						extraFoods.get(i).taste.alias_id + "," +
-						com.wireless.protocol.Util.price2Float(extraFoods.get(i).taste.price, com.wireless.protocol.Util.INT_MASK_2).toString() + ", '" +
+						extraFoods.get(i).taste.getPrice() + ", '" +
 						extraFoods.get(i).taste.preference + "', " + 
 						extraFoods.get(i).kitchen + ", '" + 
 						term.owner + "', NOW()" + ")";
@@ -288,13 +288,13 @@ public class UpdateOrder {
 
 				sql = "INSERT INTO `" + Params.dbName + "`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, `discount`, `taste_id`, `taste_price`, `taste`, `kitchen`, `waiter`, `order_date`) VALUES (" +
 						orderID + ", " + cancelledFoods.get(i).alias_id + ", " + 
-						"-" + cancelledFoods.get(i).count2String() + ", " + 
-						com.wireless.protocol.Util.price2Float(cancelledFoods.get(i).price, com.wireless.protocol.Util.INT_MASK_2).toString() + ", '" + 
+						"-" + cancelledFoods.get(i).getCount() + ", " + 
+						cancelledFoods.get(i).getPrice() + ", '" + 
 						cancelledFoods.get(i).name + "', " + 
 						cancelledFoods.get(i).status + ", " +
 						(float)cancelledFoods.get(i).discount / 100 + ", " +
 						cancelledFoods.get(i).taste.alias_id + "," +
-						com.wireless.protocol.Util.price2Float(cancelledFoods.get(i).taste.price, com.wireless.protocol.Util.INT_MASK_2).toString() + ", '" +
+						cancelledFoods.get(i).taste.getPrice() + ", '" +
 						cancelledFoods.get(i).taste.preference + "', " + 
 						cancelledFoods.get(i).kitchen + ", '" + 
 						term.owner + "', NOW()" + ")";

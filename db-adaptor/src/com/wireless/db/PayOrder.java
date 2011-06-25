@@ -6,7 +6,6 @@ import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Member;
 import com.wireless.protocol.Order;
-import com.wireless.protocol.Util;
 
 public class PayOrder {
 	/**
@@ -35,8 +34,8 @@ public class PayOrder {
 			 */			
 			Order orderInfo = execQueryOrder(dbCon, pin, model, orderToPay); 
 			
-			float totalPrice = Util.price2Float(orderInfo.totalPrice, Util.INT_MASK_3).floatValue();
-			float totalPrice2 = Util.price2Float(orderInfo.actualPrice, Util.INT_MASK_3).floatValue();
+			float totalPrice = orderInfo.getTotalPrice().floatValue();
+			float totalPrice2 = orderInfo.getActualPrice().floatValue();
 			
 			/**
 			 * Get the member info if the pay type for member
@@ -217,8 +216,8 @@ public class PayOrder {
 		float totalPrice = 0;
 		for(int i = 0; i < orderInfo.foods.length; i++){
 			float dist = (float)Math.round(orderInfo.foods[i].discount) / 100;					
-			float foodPrice = Util.price2Float(orderInfo.foods[i].price, Util.INT_MASK_2).floatValue();
-			float tastePrice = Util.price2Float(orderInfo.foods[i].taste.price, Util.INT_MASK_2).floatValue();
+			float foodPrice = orderInfo.foods[i].getPrice().floatValue();
+			float tastePrice = orderInfo.foods[i].taste.getPrice().floatValue();
 			totalPrice += (foodPrice * dist + tastePrice) * orderInfo.foods[i].count2Float().floatValue();
 		}
 		totalPrice = (float)Math.round(totalPrice * 100) / 100;
@@ -252,7 +251,7 @@ public class PayOrder {
 		orderInfo.pay_type = orderToPay.pay_type;
 		orderInfo.discount_type = orderToPay.discount_type;
 		orderInfo.member_id = orderToPay.member_id; 
-		orderInfo.cashIncome = orderToPay.cashIncome;
+		orderInfo.setCashIncome(orderToPay.getCashIncome());
 		orderInfo.pay_manner = orderToPay.pay_manner;
 		orderInfo.comment = orderToPay.comment;
 		orderInfo.service_rate = orderToPay.service_rate;
