@@ -2,6 +2,8 @@ package com.wireless.protocol;
 
 public class Util {
 	
+	public final static String CURRENCY_SIGN = "￥";
+	
 	/**
 	 * Convert the price to string.
 	 * Note that the value accurate to two decimal parts 
@@ -14,8 +16,36 @@ public class Util {
 	 * @param intMask indicates how many bytes are used to represent the integer part
 	 * @return the converted string
 	 */
-	public static String price2String(int priceInt){		
+	static String price2String(int priceInt){		
 		return "￥" + int2String(priceInt);
+	}
+	
+	/**
+	 * Convert the float to string.
+	 * Note that the value accurate to two decimal parts.<br>
+	 * For example as below.<br>
+	 * "1" shown as "1.00".<br>
+	 * "1.1" shown as "1.10".<br>
+	 * "1.23" shown as "1.23".<br>
+	 * @param floatValue the float value
+	 * @return the result string
+	 */
+	public static String float2String(Float floatValue){
+		return int2String(float2Int(floatValue));
+	}
+	
+	/**
+	 * Convert the float to string.
+	 * Note that the value accurate to two decimal parts.<br>
+	 * For example as below.<br>
+	 * "1" shown as "1".<br>
+	 * "1.1" shown as "1.1".<br>
+	 * "1.23" shown as "1.23".<br>
+	 * @param floatValue the float value
+	 * @return the result string
+	 */
+	public static String float2String2(Float floatValue){
+		return int2String2(float2Int(floatValue));
 	}
 	
 	/**
@@ -26,9 +56,9 @@ public class Util {
 	 * "1.1" shown as "1.10".<br>
 	 * "1.23" shown as "1.23".<br>
 	 * @param intValue the int value
-	 * @return the string
+	 * @return the result string
 	 */
-	public static String int2String(int intValue){
+	static String int2String(int intValue){
 		int integer = intValue / 100;
 		int decimal = intValue % 100;
 		if(decimal < 10){
@@ -46,9 +76,9 @@ public class Util {
 	 * "1.1" shown as "1.1".<br>
 	 * "1.23" shown as "1.23".<br>
 	 * @param intValue the int value
-	 * @return the string
+	 * @return the result string
 	 */
-	public static String int2String2(int intValue){
+	static String int2String2(int intValue){
 		int integer = intValue / 100;
 		int decimal = intValue % 100;
 		if(decimal == 0){
