@@ -169,7 +169,8 @@ public class QueryOrder {
 			  " AND alias_id=" + orderInfo.table_id;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
-			orderInfo.minimum_cost = new Float(dbCon.rs.getFloat("minimum_cost") * 100).intValue();
+			//orderInfo.minimum_cost = new Float(dbCon.rs.getFloat("minimum_cost") * 100).intValue();
+			orderInfo.setMinimumCost(dbCon.rs.getFloat("minimum_cost"));
 		}
 		dbCon.rs.close();
 		
