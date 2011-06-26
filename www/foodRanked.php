@@ -102,7 +102,7 @@ if($ids != null)
 	$sql = "SELECT f.id,f.alias_id,d.order_count,f.name,f.unit_price,CASE WHEN d.order_count IS NULL THEN 0 ELSE d.order_count END AS order_count,
 			CASE WHEN format(d.total_price,2) IS NULL THEN 0.00 ELSE format(d.total_price,2) END AS total_price,CASE WHEN k.name IS NULL THEN '空' ELSE k.name END AS kitchen_name FROM 
 			food f LEFT JOIN kitchen k ON f.kitchen = k.alias_id AND k.restaurant_id = " . $_SESSION["restaurant_id"]." LEFT JOIN 
-			(SELECT a.food_id,SUM(a.order_count) AS order_count,SUM((a.unit_price*a.discount+a.taste_price)*a.order_count) AS total_price FROM order_food_history_view a 
+			(SELECT a.food_id,SUM(a.order_count) AS order_count,SUM((a.unit_price*a.discount+a.taste_price)*a.order_count*(1+service_rate)) AS total_price FROM order_food_history_view a 
 			INNER JOIN `order_history` b ON a.order_id = b.id WHERE b.restaurant_id=" . $_SESSION["restaurant_id"];
 	if($dateFrom != "")
 	{

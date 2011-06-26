@@ -135,6 +135,8 @@ else if($editType == "addRestaurant" || $editType == "editAdminRestaurant")
 					}
 					$sql = "INSERT INTO terminal(pin,restaurant_id,model_id,owner_name) VALUES($admin_pin,$id,0xFE,'管理员')";
 					$db->Execute($sql);
+					$sql = "INSERT INTO setting(restaurant_id) VALUES($id)";
+					$db->Execute($sql);
 				}
 			}
 			else{
@@ -160,12 +162,13 @@ else if($editType == "addRestaurant" || $editType == "editAdminRestaurant")
 						&& $db->Execute("DELETE FROM wireless_order_db.material WHERE restaurant_id=$id")
 						&& $db->Execute("DELETE FROM wireless_order_db.terminal WHERE restaurant_id=$id AND model_id > 0x7F")
 						&& $db->Execute("UPDATE wireless_order_db.terminal SET restaurant_id=2,idle_date=NOW(),discard_date=NULL WHERE restaurant_id=$id AND model_id <= 0x7F")
-				&& $db->Execute("DELETE FROM wireless_order_db.table WHERE restaurant_id=$id")
-				&& $db->Execute("DELETE FROM wireless_order_db.food WHERE restaurant_id=$id")
-				&& $db->Execute("DELETE FROM wireless_order_db.taste WHERE restaurant_id=$id")
-				&& $db->Execute("DELETE FROM wireless_order_db.kitchen WHERE restaurant_id=$id")
-				&& $db->Execute("DELETE FROM wireless_order_db.member_charge WHERE member_id IN (SELECT id FROM wireless_order_db.member WHERE restaurant_id=$id)")
-				&& $db->Execute("DELETE FROM wireless_order_db.member WHERE restaurant_id=$id")
+						&& $db->Execute("DELETE FROM wireless_order_db.table WHERE restaurant_id=$id")
+						&& $db->Execute("DELETE FROM wireless_order_db.food WHERE restaurant_id=$id")
+						&& $db->Execute("DELETE FROM wireless_order_db.taste WHERE restaurant_id=$id")
+						&& $db->Execute("DELETE FROM wireless_order_db.kitchen WHERE restaurant_id=$id")
+						&& $db->Execute("DELETE FROM wireless_order_db.member_charge WHERE member_id IN (SELECT id FROM wireless_order_db.member WHERE restaurant_id=$id)")
+						&& $db->Execute("DELETE FROM wireless_order_db.setting WHERE restaurant_id=$id")
+						&& $db->Execute("DELETE FROM wireless_order_db.member WHERE restaurant_id=$id")
 				&& $db->Execute("DELETE FROM wireless_order_db.restaurant WHERE id=$id")){			
 					echo "<script>alert('删除成功！');</script>";
 				}	

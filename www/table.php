@@ -5,7 +5,7 @@
 include("hasLogin.php"); 
 ?>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta http-equiv="refresh" content="30">
+<meta http-equiv="refresh" content="60">
 <title>e点通－会员中心</title>
 <link rel="stylesheet" type="text/css" href="css/jquery-ui-1.8.5.custom.css"/>
 <link rel="stylesheet" href="css/main.css" />

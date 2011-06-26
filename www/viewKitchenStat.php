@@ -57,10 +57,10 @@ $sql = "SELECT CASE WHEN o_date IS NULL THEN '-' ELSE o_date END AS o_date,
 		CASE WHEN SUM(t_price) IS NULL THEN 0.00 ELSE SUM(t_price) END AS '合计'
 		FROM
 		(SELECT DATE(b.order_date) AS o_date,a.name AS kitchen, b.type AS type_value,
-		SUM(((`b`.`unit_price` * `b`.`discount`) + `b`.`taste_price`) * `b`.`order_count`) AS t_price,b.type
+		SUM(((`b`.`unit_price` * `b`.`discount`) + `b`.`taste_price`) * `b`.`order_count`*(1+service_rate)) AS t_price,b.type
 		FROM kitchen a 
 		LEFT JOIN 
-		(SELECT o.type,o.order_date,of.* FROM order_history o 
+		(SELECT o.type,o.order_date,of.*,o.service_rate FROM order_history o 
 		INNER JOIN order_food_history_view of ON of.order_id = o.id) AS b ON b.kitchen=a.alias_id
 		WHERE a.restaurant_id=" . $_SESSION["restaurant_id"];	
 
