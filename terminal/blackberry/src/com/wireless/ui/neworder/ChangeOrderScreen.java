@@ -42,7 +42,18 @@ public class ChangeOrderScreen extends MainScreen
 		VerticalFieldManager _vfm = new VerticalFieldManager();
 		_vfm.add(new SeparatorField());
 		
-		_tableTitle = new LabelField(_originalOrder.table_id + "号餐台信息", LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
+		String category;
+		if(bill.category == Order.CATE_JOIN_TABLE){
+			category = "(并台)";
+		}else if(bill.category == Order.CATE_MERGER_TABLE){
+			category = "(拼台)";
+		}else if(bill.category == Order.CATE_TAKE_OUT){
+			category = "(外卖)";
+		}else{
+			category = "";
+		}
+		
+		_tableTitle = new LabelField(_originalOrder.table_id + "号餐台信息" + category, LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
 			protected void paintBackground(Graphics g) {
 				g.clear();
 				g.setBackgroundColor(Color.GRAY);
@@ -58,26 +69,18 @@ public class ChangeOrderScreen extends MainScreen
 		_vfm.add(_tableTitle);
 		
 		_table = new EditField("台号：", Integer.toString(_originalOrder.table_id),
-							   4, TextField.NO_NEWLINE | EditField.FILTER_NUMERIC);
-		
-		/**
-		 * The id on table title would be changed with the input
-		 */
-//		_table.setChangeListener(new FieldChangeListener(){
-//
-//			public void fieldChanged(Field field, int context) {
-//				_tableTitle.setText(_table.getText() + "号餐台信息");
-//			}
-//			
-//		});
-		_vfm.add(_table);
-		
-		_customNum = new EditField("人数：", new Integer(_originalOrder.custom_num).toString(), 
-									2, TextField.NO_NEWLINE | EditField.FILTER_NUMERIC){
-			protected boolean navigationClick(int status, int time){
+			   	   			   4, TextField.NO_NEWLINE | EditField.FILTER_NUMERIC);
+		if(bill.category == Order.CATE_NORMAL){
+			_vfm.add(_table);			
+		}
+
+		_customNum = new EditField("人数：", Integer.toString(_originalOrder.custom_num), 2,
+								   TextField.NO_NEWLINE | EditField.FILTER_NUMERIC) {
+			protected boolean navigationClick(int status, int time) {
 				return true;
 			}
-		};
+		};		
+
 		_vfm.add(_customNum);
 		_vfm.add(new SeparatorField());
 		_vfm.add(new LabelField("已点菜", LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
@@ -102,13 +105,10 @@ public class ChangeOrderScreen extends MainScreen
 		//Three buttons would be shown in the bottom of the screen
 		ButtonField _addOrder = new ButtonField("加菜", ButtonField.CONSUME_CLICK);
 		ButtonField _submit = new ButtonField("提交", ButtonField.CONSUME_CLICK);
-		ButtonField _reset = new ButtonField("清空", ButtonField.CONSUME_CLICK);
 		HorizontalFieldManager _hfm = new HorizontalFieldManager(Manager.FIELD_HCENTER);
 		_hfm.add(_addOrder);
 		_hfm.add(new LabelField("    "));
 		_hfm.add(_submit);
-		//_hfm.add(new LabelField("    "));
-		//_hfm.add(_reset);
 		add(_hfm);
 		
 		//Set the listener to order button
@@ -136,17 +136,6 @@ public class ChangeOrderScreen extends MainScreen
 				}
 	         }
 		});
-		//Set the reset button's listener
-		_reset.setChangeListener(new FieldChangeListener(){
-			public void fieldChanged(Field field, int context){
-				if(!_orderListField.isEmpty()){
-					int response = Dialog.ask(Dialog.D_YES_NO, "确认清空?");
-					if(response == Dialog.YES){
-						 _orderListField.removeAll();
-					}
-				}
-	         }
-		});		
 		
 		//Focus on order button
 		_addOrder.setFocus();

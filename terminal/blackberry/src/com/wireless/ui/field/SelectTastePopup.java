@@ -138,7 +138,7 @@ public class SelectTastePopup extends PopupScreen{
 	    		Taste taste = (Taste)WirelessOrder.foodMenu.tastes[_tasteMatchedIdx[index]];
 	    		int priceWidth = 85;
 		    	g.drawText(taste.preference, 0, y, 0, w - priceWidth);
-				g.drawText(Util.price2String(Util.float2Int(taste.getPrice())), w - priceWidth, y, DrawStyle.RIGHT, priceWidth);		
+				g.drawText(Util.CURRENCY_SIGN + Util.float2String(taste.getPrice()), w - priceWidth, y, DrawStyle.RIGHT, priceWidth);		
 		    }
 		    
 		    // get the selected index from the correct Vector
