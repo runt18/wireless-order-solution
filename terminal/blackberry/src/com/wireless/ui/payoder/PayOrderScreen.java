@@ -1,6 +1,5 @@
 package com.wireless.ui.payoder;
 
-import net.rim.device.api.system.Characters;
 import net.rim.device.api.ui.Color;
 import net.rim.device.api.ui.DrawStyle;
 import net.rim.device.api.ui.Field;
@@ -86,32 +85,32 @@ public class PayOrderScreen extends MainScreen
 		hfm1.add(new LabelField("合计：" + Util.CURRENCY_SIGN + Util.float2String(_bill.totalPrice2())));
 		add(hfm1);
 		
-		HorizontalFieldManager hfm2 = new HorizontalFieldManager(Field.FIELD_RIGHT);
-		_cashIncome = new EditField("实收：￥", 
-									  Util.float2String(_bill.totalPrice2()), 
-									  7, 
-									  Field.HIGHLIGHT_SELECT | Field.FIELD_RIGHT | EditField.NO_LEARNING | EditField.NO_NEWLINE | EditField.FILTER_REAL_NUMERIC){
-		    public void layout(int width, int height) {
-		        super.layout(getPreferredWidth(), height);
-		        setExtent(getPreferredWidth(), getHeight());
-		    }
-		    
-		    public int getPreferredWidth() {
-		        int maxChars = this.getTextLength(); // + 1 to allow some visible extra space
-		        int textSpace = this.getFont().getAdvance(Characters.DIGIT_ZERO) * maxChars +
-		                        this.getFont().getAdvance(this.getLabel()); 
-		        return textSpace;
-		    }	    
-		    
-			protected boolean keyChar(char key, int status, int time) {
-				boolean result = super.keyChar(key, status, time);
-				// changes in the field's text require a new layout (width change)
-				layout(getPreferredWidth(), getHeight());
-				return result;
-			}
-		};
-		
-		hfm2.add(_cashIncome);
+//		HorizontalFieldManager hfm2 = new HorizontalFieldManager(Field.FIELD_RIGHT);
+//		_cashIncome = new EditField("实收：￥", 
+//									  Util.float2String(_bill.totalPrice2()), 
+//									  7, 
+//									  Field.HIGHLIGHT_SELECT | Field.FIELD_RIGHT | EditField.NO_LEARNING | EditField.NO_NEWLINE | EditField.FILTER_REAL_NUMERIC){
+//		    public void layout(int width, int height) {
+//		        super.layout(getPreferredWidth(), height);
+//		        setExtent(getPreferredWidth(), getHeight());
+//		    }
+//		    
+//		    public int getPreferredWidth() {
+//		        int maxChars = this.getTextLength(); // + 1 to allow some visible extra space
+//		        int textSpace = this.getFont().getAdvance(Characters.DIGIT_ZERO) * maxChars +
+//		                        this.getFont().getAdvance(this.getLabel()); 
+//		        return textSpace;
+//		    }	    
+//		    
+//			protected boolean keyChar(char key, int status, int time) {
+//				boolean result = super.keyChar(key, status, time);
+//				// changes in the field's text require a new layout (width change)
+//				layout(getPreferredWidth(), getHeight());
+//				return result;
+//			}
+//		};
+//		
+//		hfm2.add(_cashIncome);
 		//add(hfm2);
 		
 		add(new SeparatorField());
