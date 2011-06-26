@@ -201,7 +201,7 @@ include("changePassword.php");
          	echo "<tr>";
          	echo "<td>" .$row["order_id"] ."</td>";
          	echo "<td>".$row["table_id"] ."（".$row["alias_id"]."）</td>";
-         	echo "<td>"."<a href='#' onclick='viewRestaurant(&quot;".$row["id"]."&quot;,&quot;".$row["account"]."&quot;,&quot;".$row["restaurant_name"]."&quot;,&quot;".($row["record_alive"]/24/3600)."&quot;,&quot;".$row["order_num"]."&quot;,&quot;".$row["terminal_num"]."&quot;,&quot;".$row["food_num"]."&quot;,&quot;".$row["table_num"]."&quot;,&quot;".$row["order_paid"]."&quot;,&quot;".$row["table_using"]."&quot;)'>".
+	echo "<td>"."<a href='#' onclick='viewRestaurant(&quot;".$row["id"]."&quot;,&quot;".$row["account"]."&quot;,&quot;".$row["restaurant_name"]."&quot;,&quot;".($row["record_alive"]/24/3600)."&quot;,&quot;".$row["order_num"]."&quot;,&quot;".$row["order_history_num"]."&quot;,&quot;".$row["terminal_num"]."&quot;,&quot;".$row["terminal_virtual_num"]."&quot;,&quot;".$row["food_num"]."&quot;,&quot;".$row["table_num"]."&quot;,&quot;".$row["order_paid"]."&quot;,&quot;".$row["order_history_paid"]."&quot;,&quot;".$row["table_using"]."&quot;)'>".
          		$row["restaurant_name"]."（".$row["id"]."）</a></td>";	
          	echo "<td>" .$row["total_price"]."</td>";
          	echo "<td>" .$row["order_date"]. "</td>";         	

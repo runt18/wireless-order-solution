@@ -3,6 +3,8 @@ function showHideCondition(select,withClear) {
     condition_type.style.display = "none";
     var status_type = document.getElementById("status_type");
     status_type.style.display = "none";
+    var model_id = document.getElementById("model_id");
+    model_id.style.display = "none";
     var keyword = document.getElementById("keyword");    
     keyword.style.display = "none";
     keyword.onclick = null;
@@ -16,6 +18,9 @@ function showHideCondition(select,withClear) {
         keyword.style.display = "inline";
         keyword.onclick = showCal;
 //        keyword.onblur = hidCal;
+    }
+    else if (option.value == "is_model_id") {
+        model_id.style.display = "inline";
     }
     else {
         keyword.style.display = "inline";
@@ -38,10 +43,12 @@ function ininTerminalOriginal() {
     var keyword_type = document.getElementById("keyword_type");
     var condition_type = document.getElementById("condition_type");
     var status_type = document.getElementById("status_type");
+    var model_id = document.getElementById("model_id");
     var keyword = document.getElementById("keyword");
     var keyword_type_value = document.getElementById("keyword_type_value").value;
     var condition_type_value = document.getElementById("condition_type_value").value;
     var status_type_value = document.getElementById("status_type_value");
+    var model_id_value = document.getElementById("model_id_value");
     var keyword_value = document.getElementById("keyword_value").value;
     for (var i = 0; i < keyword_type.options.length; i++) {
         if (keyword_type.options[i].value == keyword_type_value) {
@@ -61,18 +68,24 @@ function ininTerminalOriginal() {
             break;
         }
     }
+       for (var i = 0; i < model_id.options.length; i++) {
+        if (model_id.options[i].value == model_id_value) {
+            model_id.options[i].selected = true;
+            break;
+        }
+    }
     keyword.value = keyword_value;
     showHideCondition(keyword_type, false);
 }
 
-function statTerminal(totalWork, totalIdle) {
+function statTerminal(totalWork, totalIdle,terminal_num,terminal_virtual_num) {
     var useRate = 0;
     if ((totalWork + totalIdle) != 0) {
         useRate = totalWork / (totalWork + totalIdle)*100;
     }
     var totalIdleMonth = totalIdle/3600/24/30;
     var totalWorkMonth = totalWork/3600/24/30;
-    document.getElementById("terminalStat").innerText = "空闲(月)：" + totalIdleMonth.toFixed(1) + "   使用(月)：" + totalWorkMonth.toFixed(1) + "  使用率：" + useRate.toFixed(1) + "%";
+    document.getElementById("terminalStat").innerText = "实机：" + terminal_num + "   虚拟：" + terminal_virtual_num + "      空闲(月)：" + totalIdleMonth.toFixed(1) + "   使用(月)：" + totalWorkMonth.toFixed(1) + "  使用率：" + useRate.toFixed(1) + "%";
 }
 
 function addTerminal(pin, new_pin, model_id, model_name) {
@@ -91,6 +104,8 @@ function addTerminal(pin, new_pin, model_id, model_name) {
 	                              '<div class="pop_Content1">型号ID：<select id="sel_model" name="sel_model">' +
 	                                    '<option value="0" selected="selected">BlackBerry</option>' +
 	                                    '<option value="1">Android</option>' +
+	                                    '<option value="2">iPhone</option>' +
+	                                    '<option value="3">WindowsMobile</option>' +
 	                                    '</select></div>' +
 	                            '<div class="pop_Content1">型号：&nbsp;&nbsp;&nbsp;<input type="text" id="model_name" name="model_name" value="' + model_name + '" size="25" height="20" onfocus="this.select()" /></div>' +                           
 	                        '</div>' +
@@ -126,7 +141,9 @@ function editTerminal(pin, new_pin, model_id,model_name,owner_name) {
                                 '<div class="pop_Content1">持有人：<input type="text" id="owner_name" name="owner_name" value="' + owner_name + '" size="25" height="20" onfocus="this.select()" style="width: 150px;"/></div>' +
                                   '<div class="pop_Content1">型号ID：<select id="sel_model" name="sel_model">' +
 	                                    '<option value="0" selected="selected">BlackBerry</option>' +
-	                                    '<option value="1">Android</option>' +	                                                       
+	                                    '<option value="1">Android</option>' +
+	                                    '<option value="2">iPhone</option>' +
+	                                    '<option value="3">WindowsMobile</option>' +
 	                                    '</select></div>' +
 	                            '<div class="pop_Content1">型号：<input type="text" id="model_name" name="model_name" value="' + model_name + '" size="25" height="20" onfocus="this.select()" style="position: relative; right: -14px; width: 150px;"/></div>' +                           	                            
 	                        '</div>' +
@@ -169,7 +186,7 @@ function addTerminalKeyDown() {
 }
 
 
-function editUsingTerminal(pin,new_pin, restaurant_id, model_name,expire_date,owner_name) {       
+function editUsingTerminal(pin,new_pin, restaurant_id, model_id,model_name,expire_date,owner_name) {       
     var content = ' <div class="add_foot">' +
                         '<div class="title">' +
 	                        '<div class="title_left"><font class="font" style="width:160px">修改（' + pin + '）</font></div>' +
@@ -179,12 +196,18 @@ function editUsingTerminal(pin,new_pin, restaurant_id, model_name,expire_date,ow
 	                        '<input type="hidden" name="editType" value="editUsingTerminal" />' +	
 	                        '<input type="hidden" name="pin" value="' + pin + '" />' +	 
 	                         '<input type="hidden" name="new_pin" value="' + new_pin + '" />' +	                      
-	                      '<div class="add_foot_Content" style="height:200px;" >' +
+	                      '<div class="add_foot_Content" style="height:240px;" >' +
 	                        '<div class="pop_Content">' +
 	                            '<div class="pop_Content1">PIN：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + new_pin + '</div>' +
 	                           '<input type="text" id="new_pin" name="new_pin" value="' + new_pin + '" size="25" height="20" style="display:none;" />' +
 	                            '<div class="pop_Content1">餐厅编号：<input type="text" id="restaurant_id" name="restaurant_id" value="' + restaurant_id + '" size="25" height="20" onfocus="this.select()" style="width:150px;"onkeypress="return event.keyCode>=48&&event.keyCode<=57" style="ime-mode:Disabled" /></div>' + 
 	                            '<div class="pop_Content1">持有人：<input type="text" id="owner_name" name="owner_name" value="' + owner_name + '" size="25" height="20" onfocus="this.select()" style="position: relative; right: -14px; width: 150px;"/></div>' +                           
+	                              '<div class="pop_Content1">型号ID：&nbsp;&nbsp;&nbsp;&nbsp;<select id="sel_model" name="sel_model" style="position: relative; left: -1px;">' +
+	                                    '<option value="0" selected="selected">BlackBerry</option>' +
+	                                    '<option value="1">Android</option>' +
+	                                    '<option value="2">iPhone</option>' +
+	                                    '<option value="3">WindowsMobile</option>' +
+	                                    '</select></div>' +
 	                            '<div class="pop_Content1">型号：<input type="text" id="model_name" name="model_name" value="' + model_name + '" size="25" height="20" onfocus="this.select()" style="position: relative; right: -28px; width: 150px;"/></div>' + 
 	                            '<div class="pop_Content1">有效期：<input type="text" id="expire_date" name="expire_date" value="' + expire_date + '" size="25" height="20" onclick="javascript:ShowCalendar(this.id)" onfocus="this.select()" style="position: relative; right: -14px; width: 150px;"/></div>' +                           
 	                        '</div>' +
@@ -197,6 +220,7 @@ function editUsingTerminal(pin,new_pin, restaurant_id, model_name,expire_date,ow
     showMessageBox(content, 342, 350);
 //    document.getElementById("new_pin").focus();
     document.getElementById("restaurant_id").focus();
+    document.all.sel_model.value = model_id;
 }
 function submitUsingTerminalData() {
     var new_pin = document.getElementById("new_pin").value;

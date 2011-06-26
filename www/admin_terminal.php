@@ -85,7 +85,8 @@ else if($editType == "editUsingTerminal")
 {
 	$pin = $_POST["pin"];
 	$new_pin = $_POST["new_pin"];
-	$restaurant_id = $_POST["restaurant_id"];	
+	$restaurant_id = $_POST["restaurant_id"];
+	$model_id = $_POST["sel_model"];	
 	$model_name = $_POST["model_name"];
 	$expire_date = $_POST["expire_date"];
 	$owner_name = $_POST["owner_name"];	
@@ -104,12 +105,12 @@ else if($editType == "editUsingTerminal")
 	$rs = $db ->GetOne($sql);
 	if($rs == null)
 	{
-		echo "<script>alert('餐厅编号不存在！');editUsingTerminal('$pin','$new_pin','$restaurant_id','$model_name','$expire_date','$owner_name');</script>";
+				echo "<script>alert('餐厅编号不存在！');editUsingTerminal('$pin','$new_pin','$restaurant_id','$model_id','$model_name','$expire_date','$owner_name');</script>";
 		$validate = false;
 	}
 	if($validate)
 	{		
-		$sql = "UPDATE terminal SET pin=".strtoupper(base_convert($new_pin,16,10)). ",restaurant_id=$restaurant_id,model_name='$model_name',expire_date='$expire_date',owner_name='$owner_name' WHERE pin=".strtoupper(base_convert($pin,16,10));
+				$sql = "UPDATE terminal SET pin=".strtoupper(base_convert($new_pin,16,10)). ",restaurant_id=$restaurant_id,model_id=$model_id,model_name='$model_name',expire_date='$expire_date',owner_name='$owner_name' WHERE pin=".strtoupper(base_convert($pin,16,10));
 		/*echo $sql;*/
 		if($db->Execute($sql))
 		{
@@ -227,6 +228,7 @@ work_date = NOW() WHERE (((`t`.`restaurant_id` > 10) and (date(now()) <= `t`.`ex
 	<option value="is_restaurant_name">餐厅名称</option>
 	<option value="is_owner_name">持有人</option>
 	<option value="is_model_name">型号</option>
+	<option value="is_model_id">型号ID</option>
 	<option value="is_expire_date">有效期</option>
 	<option value="is_status">状态</option>
 	</select>
@@ -241,6 +243,12 @@ work_date = NOW() WHERE (((`t`.`restaurant_id` > 10) and (date(now()) <= `t`.`ex
 	<option value="空闲">空闲</option>
 	<option value="废弃">废弃</option>
 	<option value="过期">过期</option>
+	</select>
+	<select id="model_id" name="model_id" style="display:none;">
+	<option value="0" selected="selected">BlackBerry</option>
+	<option value="1">Android</option>
+	<option value="2">iPhone</option>
+	<option value="3">WindowsMobile</option>
 	</select>
     <!-- 关键字 -->
     <input type="text" id="keyword" name="keyword" style=" width: 137px;"/>
@@ -257,6 +265,7 @@ work_date = NOW() WHERE (((`t`.`restaurant_id` > 10) and (date(now()) <= `t`.`ex
 			<tr>
 				<th><h3>PIN</h3></th>
 				<th><h3>餐厅名称</h3></th>
+				<th><h3>型号ID</h3></th>
 				<th><h3>型号</h3></th>
 				<th><h3>添加日期</h3></th>
 				<th><h3>废弃日期</h3></th>
@@ -275,6 +284,7 @@ work_date = NOW() WHERE (((`t`.`restaurant_id` > 10) and (date(now()) <= `t`.`ex
 		$xm=$_REQUEST["keyword_type"];
 		$ct=$_REQUEST["condition_type"];
 		$st=$_REQUEST["status_type"];
+		$mi=$_REQUEST["model_id"];
 		$kw=$_REQUEST["keyword"]; 	
 		
 		$sql = "SELECT * FROM terminal_view t INNER JOIN restaurant_view r ON t.restaurant_id=r.id WHERE 1=1";
@@ -322,7 +332,11 @@ work_date = NOW() WHERE (((`t`.`restaurant_id` > 10) and (date(now()) <= `t`.`ex
 			case "is_status":
 				if ($st!="")
 					$sql .= " AND `status` = '$st'" ;  			
-				break;						
+				break;			
+			case "is_model_id":
+				if ($mi!="")
+					$sql .= " AND `model_id` = '$mi'" ;  			
+				break;					
 		}			
 		$bh=0;
 		mysql_query("SET NAMES utf8"); 
@@ -350,7 +364,7 @@ work_date = NOW() WHERE (((`t`.`restaurant_id` > 10) and (date(now()) <= `t`.`ex
 					"&quot;,&quot;".$row["status"]."&quot;,&quot;".$row["entry_date"]."&quot;,&quot;".$row["work_month"]."&quot;,&quot;".$row["idle_month"]."&quot;,&quot;".$Dis_date.
 					"&quot;,&quot;".$row["use_rate"]."&quot;,&quot;".$owner_name.
 					"&quot;)'><img src='images/View.png'  height='16' width='14' border='0'/>&nbsp;查看</a>"."&nbsp;".
-					"<a href='#' onclick='editUsingTerminal(&quot;".strtoupper(base_convert($row["pin"],10,16))."&quot;,&quot;".strtoupper(base_convert($row["pin"],10,16))."&quot;,&quot;".$row["restaurant_id"]."&quot;,&quot;".$row["model_name"]."&quot;,&quot;".$Ex_date."&quot;,&quot;".$owner_name."&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>"."&nbsp;".					
+					"<a href='#' onclick='editUsingTerminal(&quot;".strtoupper(base_convert($row["pin"],10,16))."&quot;,&quot;".strtoupper(base_convert($row["pin"],10,16))."&quot;,&quot;".$row["restaurant_id"]."&quot;,&quot;".$row["model_id"]."&quot;,&quot;".$row["model_name"]."&quot;,&quot;".$Ex_date."&quot;,&quot;".$owner_name."&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>"."&nbsp;".					
 					"<a href='#' onclick='changeTerminalStatus(&quot;".strtoupper(base_convert($row["pin"],10,16))."&quot;,&quot;uninstallTerminal&quot;,&quot;卸载&quot;)'><img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;卸载</a>";
 			}
 			if($row["status"] == "空闲")
@@ -387,8 +401,9 @@ work_date = NOW() WHERE (((`t`.`restaurant_id` > 10) and (date(now()) <= `t`.`ex
 			
 			echo "<tr>";
 			echo "<td>" .strtoupper(base_convert($row["pin"],10,16)) ."</td>";
-			echo "<td>"."<a href='#' onclick='viewRestaurant(&quot;".$row["id"]."&quot;,&quot;".$row["account"]."&quot;,&quot;".$row["restaurant_name"]."&quot;,&quot;".($row["record_alive"]/24/3600)."&quot;,&quot;".$row["order_num"]."&quot;,&quot;".$row["terminal_num"]."&quot;,&quot;".$row["food_num"]."&quot;,&quot;".$row["table_num"]."&quot;,&quot;".$row["order_paid"]."&quot;,&quot;".$row["table_using"]."&quot;)'>".
+	echo "<td>"."<a href='#' onclick='viewRestaurant(&quot;".$row["id"]."&quot;,&quot;".$row["account"]."&quot;,&quot;".$row["restaurant_name"]."&quot;,&quot;".($row["record_alive"]/24/3600)."&quot;,&quot;".$row["order_num"]."&quot;,&quot;".$row["order_history_num"]."&quot;,&quot;".$row["terminal_num"]."&quot;,&quot;".$row["terminal_virtual_num"]."&quot;,&quot;".$row["food_num"]."&quot;,&quot;".$row["table_num"]."&quot;,&quot;".$row["order_paid"]."&quot;,&quot;".$row["order_history_paid"]."&quot;,&quot;".$row["table_using"]."&quot;)'>".
 				$row["restaurant_name"]."（".$row["id"]."）</a></td>";	
+			echo "<td>" .$row["model_id_name"] ."</td>";
 			echo "<td>" .$row["model_name"] ."</td>";
 			echo "<td>" .$row["entry_date"] ."</td>";
 			echo "<td>" .$Dis_date ."</td>";
@@ -401,6 +416,10 @@ work_date = NOW() WHERE (((`t`.`restaurant_id` > 10) and (date(now()) <= `t`.`ex
 			echo "<td>$operation</td>";			
 			echo "</tr>";
 		}	
+		$sql = "SELECT COUNT(id) FROM terminal WHERE model_id <= 0x7F";		
+		$terminal_num = $db ->GetOne($sql);
+		$sql = "SELECT COUNT(id) FROM terminal WHERE model_id > 0x7F";		
+		$terminal_virtual_num = $db ->GetOne($sql);
 		mysql_close($con);
 		?>			
 	</tbody>
@@ -431,8 +450,9 @@ work_date = NOW() WHERE (((`t`.`restaurant_id` > 10) and (date(now()) <= `t`.`ex
     echo "<input type='hidden' id='keyword_type_value' value='$xm' />";
     echo "<input type='hidden' id='condition_type_value' value='$ct' />";
     echo "<input type='hidden' id='status_type_value' value='$st' />";
+	echo "<input type='hidden' id='model_id_value' value='$mi' />";
     echo "<input type='hidden' id='keyword_value' value='$kw' />";
-    echo "<script>statTerminal($total_work,$total_idle)</script>";
+echo "<script>statTerminal($total_work,$total_idle,$terminal_num,$terminal_virtual_num)</script>";
     ?>
 
 	<script type="text/javascript" src="js/script.js"></script>
