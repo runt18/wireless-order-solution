@@ -87,7 +87,6 @@ public class PayOrderScreen extends MainScreen
 		add(hfm1);
 		
 		HorizontalFieldManager hfm2 = new HorizontalFieldManager(Field.FIELD_RIGHT);
-		//hfm2.add(new LabelField("实收：￥"));
 		_cashIncome = new EditField("实收：￥", 
 									  Util.float2String(_bill.totalPrice2()), 
 									  7, 
@@ -113,7 +112,7 @@ public class PayOrderScreen extends MainScreen
 		};
 		
 		hfm2.add(_cashIncome);
-		add(hfm2);
+		//add(hfm2);
 		
 		add(new SeparatorField());
 		
@@ -151,7 +150,8 @@ public class PayOrderScreen extends MainScreen
 			if(totalPrice < minimumCost){
 				Dialog.alert("消费额还没到最低消费,暂不能结帐");
 			}else{
-				_bill.setCashIncome(new Float(Float.parseFloat(_cashIncome.getText())));
+				//_bill.setCashIncome(new Float(Float.parseFloat(_cashIncome.getText())));
+				
 				_bill.pay_type = payType;
 				_bill.discount_type = distType;
 				UiApplication.getUiApplication().pushScreen(new SelectMannerPopup(_bill, _self));
