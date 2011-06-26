@@ -122,7 +122,7 @@ public class QueryMenuAction extends Action {
 				jsonFood = jsonFood.replace("$(name)", foods[i].name);
 				jsonFood = jsonFood.replace("$(alias_id)", new Integer(foods[i].alias_id).toString());
 				jsonFood = jsonFood.replace("$(pinyin)", foods[i].pinyin);
-				jsonFood = jsonFood.replace("$(unit)", Util.price2String(foods[i].price, Util.INT_MASK_2));
+				jsonFood = jsonFood.replace("$(unit)", Util.CURRENCY_SIGN + Util.float2String(foods[i].getPrice()));
 				jsonFood = jsonFood.replace("$(special)", foods[i].isSpecial() ? "true" : "false");
 				jsonFood = jsonFood.replace("$(recommend)", foods[i].isRecommend() ? "true" : "false");
 				jsonFood = jsonFood.replace("$(soldout)", foods[i].isSellOut() ? "true" : "false");
@@ -155,7 +155,7 @@ public class QueryMenuAction extends Action {
 				String jsonTaste = "[$(taste_id),\"$(preference)\",\"$(unit)\"]";
 				jsonTaste = jsonTaste.replace("$(taste_id)", new Short(tastes[i].alias_id).toString());
 				jsonTaste = jsonTaste.replace("$(preference)", tastes[i].preference);
-				jsonTaste = jsonTaste.replace("$(unit)", Util.price2String(tastes[i].price, Util.INT_MASK_2));
+				jsonTaste = jsonTaste.replace("$(unit)", Util.CURRENCY_SIGN + Util.float2String(tastes[i].getPrice()));
 				
 				// put each json taste info to the value
 				value.append(jsonTaste);
