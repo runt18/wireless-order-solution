@@ -5,22 +5,6 @@ public class Util {
 	public final static String CURRENCY_SIGN = "￥";
 	
 	/**
-	 * Convert the price to string.
-	 * Note that the value accurate to two decimal parts 
-	 * and add the "￥" character in front of the converted string.<br>
-	 * For example as below.<br>
-	 * "1" shown as "￥1.00".<br>
-	 * "1.1" shown as "￥1.10".<br>
-	 * "1.23" shown as "￥1.23".<br>	 
-	 * @param priceInt the price represented as an integer
-	 * @param intMask indicates how many bytes are used to represent the integer part
-	 * @return the converted string
-	 */
-	static String price2String(int priceInt){		
-		return "￥" + int2String(priceInt);
-	}
-	
-	/**
 	 * Convert the float to string.
 	 * Note that the value accurate to two decimal parts.<br>
 	 * For example as below.<br>
