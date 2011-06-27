@@ -22,5 +22,14 @@ public class Table {
 	 * Since the 8100 doesn't support float, we instead to use 0 through 9999999.
 	 * So the real price should be divided 100 at last. 
 	 */
-	public int minimum_cost = 0;
+	int minimum_cost = 0;
+	
+	public void setMinimumCost(Float cost){
+		minimum_cost = Util.float2Int(cost);
+	}
+	
+	public Float getMinimumCost(){
+		return Util.int2Float(minimum_cost);
+	}
+	
 }
