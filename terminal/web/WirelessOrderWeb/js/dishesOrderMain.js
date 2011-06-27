@@ -77,23 +77,103 @@ function dishOptTasteHandler(rowIndex) {
 		dishTasteWindow.show();
 	}
 };
+
+var dishPushBackWin = new Ext.Window({
+	layout : "fit",
+	width : 200,
+	height : 100,
+	closeAction : "hide",
+	resizable : false,
+	items : [ {
+		layout : "form",
+		labelWidth : 30,
+		border : false,
+		frame : true,
+		items : [ {
+			xtype : "textfield",
+			inputType : "password",
+			fieldLabel : "密码",
+			id : "dishPushBackPwd",
+			width : 110
+		} ]
+	} ],
+	buttons : [
+			{
+				text : "确定",
+				handler : function() {
+					var dishPushBackPwd = dishPushBackWin.findById(
+							"dishPushBackPwd").getValue();
+					var pwdTrans = MD5(dishPushBackPwd);
+					
+					dishPushBackWin.hide();
+
+					Ext.Ajax.request({
+						url : "../VerifyPwd.do",
+						params : {
+							"pin" : Request["pin"],
+							"type" : "2",
+							"pwd" : pwdTrans
+						},
+						success : function(response, options) {
+							var resultJSON = Ext.util.JSON
+									.decode(response.responseText);
+							if (resultJSON.success == true) {
+								orderedData.splice(dishOrderCurrRowIndex_, 1);
+								orderedStore.reload();
+								orderIsChanged = true;
+								dishOrderCurrRowIndex_ = -1;
+
+								Ext.MessageBox.show({
+									msg : resultJSON.data,
+									width : 300,
+									buttons : Ext.MessageBox.OK
+								});
+							} else {
+								Ext.MessageBox.show({
+									msg : resultJSON.data,
+									width : 300,
+									buttons : Ext.MessageBox.OK
+								});
+							}
+						},
+						failure : function(response, options) {
+						}
+					});
+				}
+			}, {
+				text : "取消",
+				handler : function() {
+					dishPushBackWin.hide();
+				}
+			} ],
+	listeners : {
+		show : function(thiz) {
+			// thiz.findById("personCountInput").focus();
+			var f = Ext.get("dishPushBackPwd");
+			f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
+		}
+	}
+});
 function dishOptDeleteHandler(rowIndex) {
 
 	if (dishOrderCurrRowIndex_ != -1) {
-		Ext.MessageBox.show({
-			msg : "您确定要删除此菜品？",
-			width : 300,
-			buttons : Ext.MessageBox.YESNO,
-			fn : function(btn) {
-				if (btn == "yes") {
-					orderedData.splice(rowIndex, 1);
-					orderedStore.reload();
-					orderIsChanged = true;
-					dishOrderCurrRowIndex_ = -1;
+		if (Request["tableStat"] == "used") {
+			dishPushBackWin.show();
+		} else {
+			Ext.MessageBox.show({
+				msg : "您确定要删除此菜品？",
+				width : 300,
+				buttons : Ext.MessageBox.YESNO,
+				fn : function(btn) {
+					if (btn == "yes") {
+						orderedData.splice(rowIndex, 1);
+						orderedStore.reload();
+						orderIsChanged = true;
+						dishOrderCurrRowIndex_ = -1;
+					}
 				}
-			}
-		});
-
+			});
+		}
 	}
 };
 function dishOptPressHandler(rowIndex) {
@@ -379,7 +459,7 @@ var orderedForm = new Ext.form.FormPanel(
 								// + type + " originalTableID:"
 								// + Request["tableNbr"]
 								// + " category:" + category
-								//										+ "     foods" + foodPara);
+								// + " foods" + foodPara);
 								Ext.Ajax
 										.request({
 											url : "../InsertOrder.do",

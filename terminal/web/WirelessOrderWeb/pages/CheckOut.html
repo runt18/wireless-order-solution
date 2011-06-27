@@ -50,8 +50,10 @@
 	//menber id
 
 	var restaurantID = "";
-	var operatorName = "XXX";
+	var restaurantData = [];
 	
+	var operatorName = "XXX";
+
 	var mBalance = -1;
 </script>
 
@@ -102,6 +104,35 @@
 		<img title="会员卡余额" src='../images/MemberTele.png.png'
 			style='float: left;' />
 		<div id="memberBalance" class="tableStatusChar">10.0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+	</div>
+
+	<!-- pay infomation -->
+	<div id="payInfo">
+		<table>
+			<tr>
+				<td>&nbsp;&nbsp;&nbsp;</td>
+				<td>服务费：</td>
+				<td><input id="serviceCharge" type="text" value="0" style="width:50px;"></input></td>
+				<td>%</td>
+				<td style="width:60px;">&nbsp;</td>
+				<td>合计：￥</td>
+				<td><div id="totalCount"></div>
+				</td>
+			</tr>
+			<tr>
+				<td>&nbsp;&nbsp;&nbsp;</td>
+				<td>现金实收：￥</td>
+				<td><input id="actualCount" type="text" style="width:50px;"></input>
+				</td>
+				<td>&nbsp;&nbsp;&nbsp;</td>
+				<td style="width:60px;">&nbsp;</td>
+				<td>应收：￥</td>
+				<td><div id="shouldPay"></div></td>
+				<td style="width:60px;">&nbsp;</td>
+				<td>找零：￥</td>
+				<td><div id="change"></div></td>
+			</tr>
+		</table>
 	</div>
 
 </body>

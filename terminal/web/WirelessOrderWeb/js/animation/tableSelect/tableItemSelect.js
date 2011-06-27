@@ -30,7 +30,7 @@ var deselectTable = function() {
 		} else if (tableStatusListTS[selectedTableIndex][4] == "拼台"
 				&& tableStatusListTS[selectedTableIndex][2] == "占用") {
 			$("#table" + selectedTable).css("background",
-					"url(../images/table_on_merge.png) no-repeat 50%");
+					"url(../images/table_on_merge.gif) no-repeat 50%");
 		} else if (tableStatusListTS[selectedTableIndex][4] == "外卖"
 				&& tableStatusListTS[selectedTableIndex][2] == "空桌") {
 			$("#table" + selectedTable).css("background",
@@ -38,7 +38,7 @@ var deselectTable = function() {
 		} else if (tableStatusListTS[selectedTableIndex][4] == "外卖"
 				&& tableStatusListTS[selectedTableIndex][2] == "占用") {
 			$("#table" + selectedTable).css("background",
-					"url(../images/table_on_package.png) no-repeat 50%");
+					"url(../images/table_on_package.gif) no-repeat 50%");
 		} else if (tableStatusListTS[selectedTableIndex][4] == "并台"
 				&& tableStatusListTS[selectedTableIndex][2] == "空桌") {
 			$("#table" + selectedTable).css("background",
@@ -46,7 +46,7 @@ var deselectTable = function() {
 		} else if (tableStatusListTS[selectedTableIndex][4] == "并台"
 				&& tableStatusListTS[selectedTableIndex][2] == "占用") {
 			$("#table" + selectedTable).css("background",
-					"url(../images/table_on_separate.png) no-repeat 50%");
+					"url(../images/table_on_separate.gif) no-repeat 50%");
 		}
 
 		$("#table" + selectedTable).css("height", "32px");

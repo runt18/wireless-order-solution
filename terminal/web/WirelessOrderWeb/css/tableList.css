@@ -66,7 +66,7 @@
 }
 
 .table_list li.merge_on {
-	background: url(../images/table_on_merge.png) no-repeat 50%;
+	background: url(../images/table_on_merge.gif) no-repeat 50%;
 }
 
 .table_list li.package_null {
@@ -74,7 +74,7 @@
 }
 
 .table_list li.package_on {
-	background: url(../images/table_on_package.png) no-repeat;
+	background: url(../images/table_on_package.gif) no-repeat;
 }
 
 .table_list li.separate_null {
@@ -82,7 +82,7 @@
 }
 
 .table_list li.separate_on {
-	background: url(../images/table_on_separate.png) no-repeat;
+	background: url(../images/table_on_separate.gif) no-repeat;
 }
 
 .table_list li.placeHolder {

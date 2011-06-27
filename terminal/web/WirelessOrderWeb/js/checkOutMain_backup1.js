@@ -241,119 +241,119 @@ var checkOutForm = new Ext.form.FormPanel(
 			frame : true,
 			border : false,
 			items : [
-					{
-						layout : "column",
-						border : false,
-						items : [ {
-							html : "<div>&nbsp;&nbsp;</div>",
-							id : "placeHolderCOF1",
-							width : 150
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '：',
-							labelWidth : 30,
-							width : 300,
-							items : [ discountKindComb ]
-						}, {
-							// columnWidth : .25,
-							width : 80,
-							layout : 'form',
-							labelWidth : 0,
-							labelSeparator : '',
-							hideLabels : true,
-							border : false,
-							items : [ {
-								xtype : 'radio',
-								// fieldLabel : '是否连带2A',
-								boxLabel : '折扣1',
-								checked : true,
-								name : 'discountRadio',
-								inputValue : 'discount1',
-								anchor : '95%',
-								listeners : {
-									check : function(thiz, newValue, oldValue) {
-										// alert("1");
-										checkOurListRefresh();
-									}
-								}
-							} ]
-						}, {
-							// columnWidth : .25,
-							width : 80,
-							layout : 'form',
-							labelWidth : 0,
-							labelSeparator : '',
-							hideLabels : true,
-							border : false,
-							items : [ {
-								xtype : 'radio',
-								// fieldLabel : '',
-								boxLabel : '折扣2',
-								name : 'discountRadio',
-								inputValue : 'discount2',
-								anchor : '95%',
-								listeners : {
-									check : function(thiz, newValue, oldValue) {
-										// alert("2");
-										checkOurListRefresh();
-									}
-								}
-							} ]
-						}, {
-							// columnWidth : .25,
-							width : 80,
-							layout : 'form',
-							labelWidth : 0,
-							labelSeparator : '',
-							hideLabels : true,
-							border : false,
-							items : [ {
-								xtype : 'radio',
-								// fieldLabel : '',
-								boxLabel : '折扣3',
-								name : 'discountRadio',
-								inputValue : 'discount3',
-								anchor : '95%',
-								listeners : {
-									check : function(thiz, newValue, oldValue) {
-										// alert("3");
-										checkOurListRefresh();
-									}
-								}
-							} ]
-						} ]
-					},
-					{
-						layout : "column",
-						border : false,
-						items : [
-								{
-									html : "<div>&nbsp;&nbsp;</div>",
-									id : "placeHolderCOF2",
-									hidden : true,
-									width : 150
-								},
-								{
-									layout : "fit",
-									id : "memberInfoPanel",
-									width : 1000,
-									contentEl : "memberInfo",
-									hidden : true,
-									listeners : {
-										hide : function(thiz) {
-											checkOutForm.findById(
-													"placeHolderCOF2").hide();
-											// gridHeightOffset = 80;
-										},
-										show : function(thiz) {
-											checkOutForm.findById(
-													"placeHolderCOF2").show();
-											// gridHeightOffset = 120;
-										}
-									}
-								} ]
-					},
+//					{
+//						layout : "column",
+//						border : false,
+//						items : [ {
+//							html : "<div>&nbsp;&nbsp;</div>",
+//							id : "placeHolderCOF1",
+//							width : 150
+//						}, {
+//							layout : "form",
+//							border : false,
+//							labelSeparator : '：',
+//							labelWidth : 30,
+//							width : 300,
+//							items : [ discountKindComb ]
+//						}, {
+//							// columnWidth : .25,
+//							width : 80,
+//							layout : 'form',
+//							labelWidth : 0,
+//							labelSeparator : '',
+//							hideLabels : true,
+//							border : false,
+//							items : [ {
+//								xtype : 'radio',
+//								// fieldLabel : '是否连带2A',
+//								boxLabel : '折扣1',
+//								checked : true,
+//								name : 'discountRadio',
+//								inputValue : 'discount1',
+//								anchor : '95%',
+//								listeners : {
+//									check : function(thiz, newValue, oldValue) {
+//										// alert("1");
+//										checkOurListRefresh();
+//									}
+//								}
+//							} ]
+//						}, {
+//							// columnWidth : .25,
+//							width : 80,
+//							layout : 'form',
+//							labelWidth : 0,
+//							labelSeparator : '',
+//							hideLabels : true,
+//							border : false,
+//							items : [ {
+//								xtype : 'radio',
+//								// fieldLabel : '',
+//								boxLabel : '折扣2',
+//								name : 'discountRadio',
+//								inputValue : 'discount2',
+//								anchor : '95%',
+//								listeners : {
+//									check : function(thiz, newValue, oldValue) {
+//										// alert("2");
+//										checkOurListRefresh();
+//									}
+//								}
+//							} ]
+//						}, {
+//							// columnWidth : .25,
+//							width : 80,
+//							layout : 'form',
+//							labelWidth : 0,
+//							labelSeparator : '',
+//							hideLabels : true,
+//							border : false,
+//							items : [ {
+//								xtype : 'radio',
+//								// fieldLabel : '',
+//								boxLabel : '折扣3',
+//								name : 'discountRadio',
+//								inputValue : 'discount3',
+//								anchor : '95%',
+//								listeners : {
+//									check : function(thiz, newValue, oldValue) {
+//										// alert("3");
+//										checkOurListRefresh();
+//									}
+//								}
+//							} ]
+//						} ]
+//					},
+//					{
+//						layout : "column",
+//						border : false,
+//						items : [
+//								{
+//									html : "<div>&nbsp;&nbsp;</div>",
+//									id : "placeHolderCOF2",
+//									hidden : true,
+//									width : 150
+//								},
+//								{
+//									layout : "fit",
+//									id : "memberInfoPanel",
+//									width : 1000,
+//									contentEl : "memberInfo",
+//									hidden : true,
+//									listeners : {
+//										hide : function(thiz) {
+//											checkOutForm.findById(
+//													"placeHolderCOF2").hide();
+//											// gridHeightOffset = 80;
+//										},
+//										show : function(thiz) {
+//											checkOutForm.findById(
+//													"placeHolderCOF2").show();
+//											// gridHeightOffset = 120;
+//										}
+//									}
+//								} ]
+//					},
 					checkOutGrid,
 					{
 						layout : "column",
@@ -364,39 +364,31 @@ var checkOutForm = new Ext.form.FormPanel(
 									id : "placeHolderCOF3",
 									// hidden : true,
 									width : 150
-								}
-								,
+								},
 								{
+									layout : "form",
 									border : false,
-									contentEl:"payInfo"
-								}
-//								,
-//								{
-//									layout : "form",
-//									border : false,
-//									labelSeparator : '：',
-//									labelWidth : 40,
-//									width : 250,
-//									items : [ {
-//										html : "<div style='font-size:18px;font-weight:bold;'>合计：       ￥100</div>",
-//										// fieldLabel : "合计",
-//										id : "totalCount"
-//									} ]
-//								}
-//								,
-//								{
-//									layout : "form",
-//									border : false,
-//									labelSeparator : '：',
-//									labelWidth : 80,
-//									width : 300,
-//									items : [ {
-//										xtype : "textfield",
-//										fieldLabel : "<span style='font-size:18px;font-weight:bold;'>实收</span>",
-//										id : "actualCount"
-//									} ]
-//								}
-								]
+									labelSeparator : '：',
+									labelWidth : 40,
+									width : 250,
+									items : [ {
+										html : "<div style='font-size:18px;font-weight:bold;'>合计：       ￥100</div>",
+										// fieldLabel : "合计",
+										id : "totalCount"
+									} ]
+								},
+								{
+									layout : "form",
+									border : false,
+									labelSeparator : '：',
+									labelWidth : 80,
+									width : 300,
+									items : [ {
+										xtype : "textfield",
+										fieldLabel : "<span style='font-size:18px;font-weight:bold;'>实收</span>",
+										id : "actualCount"
+									} ]
+								} ]
 					}, {
 						layout : "column",
 						border : false,
@@ -484,11 +476,150 @@ var checkOutForm = new Ext.form.FormPanel(
 			}
 		});
 
+// var checkOutCenterPanel = new Ext.Panel({
+// region : "center",
+// id : "checkOutCenterPanel",
+// layout : "fit",
+// items : [ checkOutForm ]
+// });
+// -----------------------------------------------------------------------------------------------------------
+var payTypeForm = new Ext.form.FormPanel({
+	frame : true,
+	border : false,
+	items : [ {
+		layout : "column",
+		border : false,
+		items : [ {
+			html : "<div>&nbsp;&nbsp;</div>",
+			id : "placeHolderCOF1",
+			width : 150
+		}, {
+			layout : "form",
+			border : false,
+			labelSeparator : '：',
+			labelWidth : 30,
+			width : 300,
+			items : [ discountKindComb ]
+		}, {
+			// columnWidth : .25,
+			width : 80,
+			layout : 'form',
+			labelWidth : 0,
+			labelSeparator : '',
+			hideLabels : true,
+			border : false,
+			items : [ {
+				xtype : 'radio',
+				// fieldLabel : '是否连带2A',
+				boxLabel : '折扣1',
+				checked : true,
+				name : 'discountRadio',
+				inputValue : 'discount1',
+				anchor : '95%',
+				listeners : {
+					check : function(thiz, newValue, oldValue) {
+						// alert("1");
+						// checkOurListRefresh();
+					}
+				}
+			} ]
+		}, {
+			// columnWidth : .25,
+			width : 80,
+			layout : 'form',
+			labelWidth : 0,
+			labelSeparator : '',
+			hideLabels : true,
+			border : false,
+			items : [ {
+				xtype : 'radio',
+				// fieldLabel : '',
+				boxLabel : '折扣2',
+				name : 'discountRadio',
+				inputValue : 'discount2',
+				anchor : '95%',
+				listeners : {
+					check : function(thiz, newValue, oldValue) {
+						// alert("2");
+						checkOurListRefresh();
+					}
+				}
+			} ]
+		}, {
+			// columnWidth : .25,
+			width : 80,
+			layout : 'form',
+			labelWidth : 0,
+			labelSeparator : '',
+			hideLabels : true,
+			border : false,
+			items : [ {
+				xtype : 'radio',
+				// fieldLabel : '',
+				boxLabel : '折扣3',
+				name : 'discountRadio',
+				inputValue : 'discount3',
+				anchor : '95%',
+				listeners : {
+					check : function(thiz, newValue, oldValue) {
+						// alert("3");
+						checkOurListRefresh();
+					}
+				}
+			} ]
+		} ]
+	} ]
+});
+
 var checkOutCenterPanel = new Ext.Panel({
 	region : "center",
 	id : "checkOutCenterPanel",
-	layout : "fit",
-	items : [ checkOutForm ]
+	layout : "anchor",
+	items : [ {
+		anchor : 'right 100%',
+		border : false,
+		items : payTypeForm
+	}, {
+		anchor : 'right 20',
+		border : false,
+		itmes : [ {
+			layout : "column",
+			border : false,
+			items : [
+					{
+						html : "<div>&nbsp;&nbsp;</div>",
+						id : "placeHolderCOF2",
+						hidden : true,
+						width : 150
+					},
+					{
+						layout : "fit",
+						id : "memberInfoPanel",
+						width : 1000,
+						contentEl : "memberInfo",
+						hidden : true,
+						listeners : {
+							hide : function(thiz) {
+								checkOutForm.findById(
+										"placeHolderCOF2").hide();
+								// gridHeightOffset = 80;
+							},
+							show : function(thiz) {
+								checkOutForm.findById(
+										"placeHolderCOF2").show();
+								// gridHeightOffset = 120;
+							}
+						}
+					} ]
+		} ]
+	}, {
+		title : 'Item 3',
+		// html : 'wtf',
+		anchor : 'right bottom',
+		itmes : [ {
+			html : "<div>shit</div>"
+		} ]
+	} ]
 });
 
 // --------------check-out north panel-----------------

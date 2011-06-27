@@ -3,9 +3,9 @@ function checkOutOnLoad() {
 
 	// 1,update table status
 	var Request = new URLParaQuery();
-	
+
 	restaurantID = Request["restaurantID"];
-	
+
 	var tableNum = Request["tableNbr"];
 	var persCount = Request["personCount"];
 	document.getElementById("tblNbrDivTS").innerHTML = tableNum
@@ -210,14 +210,99 @@ function checkOutOnLoad() {
 																totalCount = totalCount
 																		.toFixed(2);
 																document
-																		.getElementById("totalCount").innerHTML = "<div style='font-size:18px;font-weight:bold;'>合计：       ￥"
-																		+ totalCount
-																		+ "</div>";
-																checkOutForm
-																		.findById(
-																				"actualCount")
-																		.setValue(
-																				totalCount);
+																		.getElementById("totalCount").innerHTML = totalCount;
+																document
+																		.getElementById("actualCount").value = totalCount;
+																document
+																		.getElementById("shouldPay").innerHTML = totalCount;
+																// checkOutForm
+																// .findById(
+																// "actualCount")
+																// .setValue(
+																// totalCount);
+
+																// 4,尾数处理
+																// 后台：["餐厅名称","餐厅信息","电话1","电话2","地址",$(尾数处理),$(自动补打)]
+																// 前台：restaurantData
+																// ，格式一样
+																Ext.Ajax
+																		.request({
+																			url : "../QueryRestaurant.do",
+																			params : {
+																				"restaurantID" : restaurantID
+																			},
+																			success : function(
+																					response,
+																					options) {
+																				var resultJSON = Ext.util.JSON
+																						.decode(response.responseText);
+																				if (resultJSON.success == true) {
+																					var dataInfo = resultJSON.data;
+																					var restaurantInfo = dataInfo
+																							.split(",");
+																					restaurantData
+																							.push([
+																									restaurantInfo[0]
+																											.substr(
+																													1,
+																													restaurantInfo[0].length - 2),// 餐厅名称
+																									restaurantInfo[1]
+																											.substr(
+																													1,
+																													restaurantInfo[1].length - 2),// 餐厅信息
+																									restaurantInfo[2]
+																											.substr(
+																													1,
+																													restaurantInfo[2].length - 2),// 电话1
+																									restaurantInfo[3]
+																											.substr(
+																													1,
+																													restaurantInfo[3].length - 2),// 电话2
+																									restaurantInfo[4]
+																											.substr(
+																													1,
+																													restaurantInfo[4].length - 2),// 地址
+																									restaurantInfo[5],// 尾数处理
+																									restaurantInfo[6] // 自动补打
+																							]);
+
+																					var sPay = document
+																							.getElementById("shouldPay").innerHTML;
+																					if (restaurantData[0][5] == 2) {
+																						sPay = sPay
+																								.substr(
+																										0,
+																										sPay
+																												.indexOf("."))
+																								+ ".00";
+																					} else if (restaurantData[0][5] == 3) {
+																						sPay = parseFloat(
+																								sPay)
+																								.toFixed(
+																										0)
+																								+ ".00";
+																					}
+																					document
+																							.getElementById("shouldPay").innerHTML = sPay;
+																					document
+																							.getElementById("change").innerHTML = (parseFloat(totalCount) - parseFloat(sPay))
+																							.toFixed(2);
+																				} else {
+																					var dataInfo = resultJSON.data;
+																					Ext.MessageBox
+																							.show({
+																								msg : dataInfo,
+																								width : 300,
+																								buttons : Ext.MessageBox.OK
+																							});
+																				}
+																			},
+																			failure : function(
+																					response,
+																					options) {
+																			}
+																		});
+
 															} else {
 																var dataTasteInfo = resultTasteJSON.data;
 																Ext.MessageBox

@@ -1,7 +1,9 @@
 ﻿var paySubmit = function(submitType) {
 	var canSubmit = true;
-	var actualPrice = checkOutForm.findById("actualCount").getValue();
+	// var actualPrice = checkOutForm.findById("actualCount").getValue();
+	var actualPrice = document.getElementById("actualCount").value;
 	var countPriceString = document.getElementById("totalCount").innerHTML;
+	var shouldPay = document.getElementById("shouldPay").innerHTML;
 	var countPrice = countPriceString.substr(countPriceString.indexOf("￥") + 1,
 			countPriceString.length - countPriceString.indexOf("￥") - 7);
 	var submitPrice = -1;
@@ -11,7 +13,7 @@
 
 	// 现金
 	if (submitType == 1) {
-		submitPrice = actualPrice;
+		submitPrice = shouldPay;
 	} else {
 		submitPrice = countPrice;
 	}
@@ -43,7 +45,7 @@
 			params : {
 				"pin" : Request["pin"],
 				"tableID" : Request["tableNbr"],
-				"cashIncome" : actualPrice,
+				"cashIncome" : submitPrice,
 				"payType" : payType,
 				"discountType" : discountType,
 				"payManner" : payManner,
