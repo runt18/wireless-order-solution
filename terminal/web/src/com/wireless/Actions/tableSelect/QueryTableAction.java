@@ -85,7 +85,7 @@ public class QueryTableAction extends Action {
 						jsonTable = jsonTable.replace("$(category)", "一般");
 					}
 					
-					jsonTable = jsonTable.replace("$(minimum_cost)", Float.toString((float)tables[i].minimum_cost / 100));
+					jsonTable = jsonTable.replace("$(minimum_cost)", tables[i].getMinimumCost().toString());
 					
 					// put each json table info to the value
 					value.append(jsonTable);
