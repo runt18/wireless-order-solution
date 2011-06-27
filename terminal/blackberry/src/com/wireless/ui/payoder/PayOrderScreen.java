@@ -38,7 +38,17 @@ public class PayOrderScreen extends MainScreen
 		//The food has ordered would be listed in here.
 		VerticalFieldManager vfm = new VerticalFieldManager();
 		vfm.add(new SeparatorField());
-		vfm.add(new LabelField(_bill.table_id + "号餐台信息", LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
+		String category;
+		if(bill.category == Order.CATE_JOIN_TABLE){
+			category = "(并台)";
+		}else if(bill.category == Order.CATE_MERGER_TABLE){
+			category = "(拼台)";
+		}else if(bill.category == Order.CATE_TAKE_OUT){
+			category = "(外卖)";
+		}else{
+			category = "";
+		}
+		vfm.add(new LabelField(_bill.table_id + "号餐台信息" + category, LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
 			protected void paintBackground(Graphics g) {
 				g.clear();
 				g.setBackgroundColor(Color.GRAY);
