@@ -61,7 +61,7 @@ $sql = "SELECT CASE WHEN o_date IS NULL THEN '-' ELSE o_date END AS o_date,
 		FROM kitchen a 
 		LEFT JOIN 
 		(SELECT o.type,o.order_date,of.*,o.service_rate FROM order_history o 
-		INNER JOIN order_food_history_view of ON of.order_id = o.id) AS b ON b.kitchen=a.alias_id
+		INNER JOIN order_food_history_view of ON of.order_id = o.id AND o.restaurant_id=".$_SESSION["restaurant_id"].") AS b ON b.kitchen=a.alias_id
 		WHERE a.restaurant_id=" . $_SESSION["restaurant_id"];	
 
 $dateFrom = $_REQUEST["dateFrom"];

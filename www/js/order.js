@@ -138,7 +138,7 @@ function searchOrderKeyDown() {
         closeWindow();
     }
 }
-function showOrderDetail(id, alias, date, totalPrice, count, foods, isPaid, owner_name, type_name, totalPrice_2, category_name, comment) {
+function showOrderDetail(id, alias, date, totalPrice, count, foods, isPaid, owner_name, type_name, totalPrice_2, category_name, comment,service_rate,table_name) {
     var f = "";
     var fs = foods.split(";");
     for (var i = 0; i < fs.length; i++) {
@@ -153,6 +153,14 @@ function showOrderDetail(id, alias, date, totalPrice, count, foods, isPaid, owne
         isPaidStr = "未结帐";
     } else {
         isPaidStr = "已结帐(" + type_name + ")";
+    }
+    if(service_rate != 0)
+    {
+        isPaidStr += "(" + (service_rate*100) + "%服务费)";
+    }
+    if(table_name != "")
+    {
+        alias += ("(" + table_name + ")");
     }
     var showTotalPrice_2 = "";
     var showCategoryName = "";
@@ -372,8 +380,7 @@ function viewOrderStat(statType) {
 	                      '<input type="hidden" name="editType" value="' + editType + '" />' +
 	                      '<input type="hidden" name="statType" value="' + statType + '" />' +
 	                      '<div class="add_foot_Content" style="height:130px;text-align:center;width:413px">' +
-	                        '<div class="pop_Content">' +
-	                         '<div class="pop_Content1" style="padding-left:0px;text-align:center"><input type="radio" checked="checked" name="viewType" value="total_price_2" />按实收&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" name="viewType" value="total_price" />按金额</div>' +
+	                        '<div class="pop_Content">' +	                         
 	                           '<div class="pop_Content1" style="padding-left:0px;text-align:center">日期：<input type="text" id="dateFrom" name="dateFrom" style="width:136px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;&nbsp;至&nbsp;&nbsp;<input type="text" id="dateTo" name="dateTo" style="width:width:136px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;</div>' +
 	                        '</div>' +
 	                            '<span class="pop_action-span"><a href="#" onclick="document.searchForm.submit();">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>' +

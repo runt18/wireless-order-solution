@@ -287,7 +287,7 @@ work_date = NOW() WHERE (((`t`.`restaurant_id` > 10) and (date(now()) <= `t`.`ex
 		$mi=$_REQUEST["model_id"];
 		$kw=$_REQUEST["keyword"]; 	
 		
-		$sql = "SELECT * FROM terminal_view t INNER JOIN restaurant_view r ON t.restaurant_id=r.id WHERE 1=1";
+		$sql = "SELECT * FROM terminal_view t INNER JOIN restaurant_view r ON t.restaurant_id=r.id WHERE t.model_id <= 0x7F";
 		$total_work = 0;
 		$total_idle = 0;
 		switch ($xm)

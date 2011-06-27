@@ -86,9 +86,9 @@ $editType = $_POST["editType"];
 if($editType == "dailyCheckOut")
 {	
 	$sql1 = "INSERT INTO `order_history`(`id`, `restaurant_id`,`order_date`, `total_price`,`total_price_2`, `custom_num`, 
-			`waiter`,`type`, `member_id`, `member`,`terminal_pin`, `terminal_model`, `table_id`, `table_name`)
+			`waiter`,`type`, `member_id`, `member`,`terminal_pin`, `terminal_model`, `table_id`, `table_name`,service_rate,comment)
 			SELECT `id`, `restaurant_id`,`order_date`, `total_price`,`total_price_2`, `custom_num`, 
-			`waiter`,`type`, `member_id`, `member`,`terminal_pin`, `terminal_model`, `table_id`, `table_name` FROM `order` WHERE total_price IS NOT NULL AND restaurant_id=" . $_SESSION["restaurant_id"];		
+			`waiter`,`type`, `member_id`, `member`,`terminal_pin`, `terminal_model`, `table_id`, `table_name`,service_rate,comment FROM `order` WHERE total_price IS NOT NULL AND restaurant_id=" . $_SESSION["restaurant_id"];		
 	$sql2 = "INSERT INTO `order_food_history`(`id`,`order_id`, `food_id`, `order_date`, `order_count`, 
 			`unit_price`,`name`, `taste`,`taste_price`,`taste_id`,`discount`,`kitchen`,`comment`,`waiter`,`food_status`)
 			SELECT `id`,`order_id`, `food_id`, `order_date`, `order_count`, 
@@ -306,7 +306,7 @@ foreach ($rs as $row){
 	echo "<td>" .$row["total_price_2"]."</td>";
 	echo "<td><a href='#' onclick='".$Operation."(&quot;".$row["id"]."&quot;,&quot;".$row["total_price_2"]."&quot;,&quot;order.php&quot;,&quot;".$row["type_value"]."&quot;,&quot;".$alias_id."&quot;,&quot;".$row["category"]."&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
 		"<a href='#' onclick='showOrderDetail(&quot;".$row["id"]."&quot;,&quot;".$alias_id."&quot;,&quot;".$row["order_date"]."&quot;,&quot;".$row["total_price"].
-		"&quot;,&quot;".$row["num"]."&quot;,&quot;".$row["foods"]."&quot;,&quot;".$row["is_paid"]."&quot;,&quot;".$row["waiter"]."&quot;,&quot;".$row["type_name"]."&quot;,&quot;".$row["total_price_2"]."&quot;,&quot;".$row["category_name"]."&quot;,&quot;".$row["comment"]."&quot;)'>
+		"&quot;,&quot;".$row["num"]."&quot;,&quot;".$row["foods"]."&quot;,&quot;".$row["is_paid"]."&quot;,&quot;".$row["waiter"]."&quot;,&quot;".$row["type_name"]."&quot;,&quot;".$row["total_price_2"]."&quot;,&quot;".$row["category_name"]."&quot;,&quot;".$row["comment"]."&quot;,".$row["service_rate"].",&quot;".$row["table_name"]."&quot;)'>
 			<img src='images/View.png'  height='16' width='14' border='0'/>&nbsp;查看</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href='#' onclick='deleteOrder(&quot;".$row["id"]."&quot;,&quot;order.php&quot;)'>
 			<img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;删除</a>&nbsp;&nbsp;&nbsp;&nbsp;
 			<a href='#' onclick='viewOrderDetail(&quot;".$row["id"]."&quot;,&quot;order_food&quot;)'>
