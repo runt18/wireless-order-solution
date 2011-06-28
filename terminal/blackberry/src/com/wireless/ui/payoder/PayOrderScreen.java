@@ -157,10 +157,15 @@ public class PayOrderScreen extends MainScreen
 			int minimumCost = Util.float2Int(_bill.getMinimumCost());
 			//check to see whether the total price reach the minimum cost
 			if(totalPrice < minimumCost){
-				Dialog.alert("消费额还没到最低消费,暂不能结帐");
-			}else{
-				//_bill.setCashIncome(new Float(Float.parseFloat(_cashIncome.getText())));
+				int resp = Dialog.ask(Dialog.D_YES_NO, "消费额还没到最低消费，是否结帐?", Dialog.NO);
+				if(resp == Dialog.YES){
+					_bill.pay_type = payType;
+					_bill.discount_type = distType;
+					UiApplication.getUiApplication().pushScreen(new SelectMannerPopup(_bill, _self));
+				}
 				
+			}else{
+				//_bill.setCashIncome(new Float(Float.parseFloat(_cashIncome.getText())));				
 				_bill.pay_type = payType;
 				_bill.discount_type = distType;
 				UiApplication.getUiApplication().pushScreen(new SelectMannerPopup(_bill, _self));
