@@ -6,6 +6,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Member;
 import com.wireless.protocol.Order;
+import com.wireless.protocol.Table;
 
 public class PayOrder {
 	/**
@@ -157,7 +158,9 @@ public class PayOrder {
 	 */
 	private static Order execQueryOrder(DBCon dbCon, int pin, short model, Order orderToPay) throws BusinessException, SQLException{
 		
-		Order orderInfo = QueryOrder.exec(dbCon, pin, model, orderToPay.table_id);
+		Table table = QueryTable.exec(dbCon, pin, model, orderToPay.table_id);
+		
+		Order orderInfo = QueryOrder.execByID(dbCon, pin, model, Util.getUnPaidOrderID(dbCon, table));
 		
 		String discount = "discount";
 		if(orderToPay.pay_type == Order.PAY_NORMAL && orderToPay.discount_type == Order.DISCOUNT_1){
@@ -227,15 +230,22 @@ public class PayOrder {
 		 * Multiplied by the service rate.
 		 * total = total * (1 + service_rate)
 		 */
-		totalPrice = totalPrice * (1 + ((float)orderToPay.service_rate / 100));
-
+		totalPrice = totalPrice * (1 + ((float)orderToPay.service_rate / 100));		
 		
 		/**
 		 * Calculate the total price 2 as below.
 		 * total_2 = total * 尾数处理方式
 		 */
 		float totalPrice2;
-		if(orderInfo.price_tail == Order.TAIL_DECIMAL_CUT){
+		/**
+		 * Comparing the minimum cost against total price.
+		 * Set the actual price to minimum cost if total price is less than minimum cost.
+		 */
+		if(totalPrice < table.getMinimumCost().floatValue()){
+			//直接使用最低消费
+			totalPrice2 = table.getMinimumCost().floatValue();
+			
+		}else if(orderInfo.price_tail == Order.TAIL_DECIMAL_CUT){
 			//小数抹零
 			totalPrice2 = new Float(totalPrice).intValue();
 		}else if(orderInfo.price_tail == Order.TAIL_DECIMAL_ROUND){
