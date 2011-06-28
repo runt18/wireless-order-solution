@@ -395,10 +395,10 @@ function viewOrderStat(statType) {
 
 function showOrderStat(statType, dateFrom, dateTo,viewType) {
     var title = "";
-    var viewTypeName = "按实收";
-    if (viewType == "total_price") {
+    var viewTypeName = "";
+    /*if (viewType == "total_price") {
         viewTypeName = "按金额";
-    }
+    }*/
     if (statType == "daily") {
         title = viewTypeName + "日结汇总";
         if (dateFrom != "" && dateTo != "") {
