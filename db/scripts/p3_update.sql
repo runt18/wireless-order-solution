@@ -174,9 +174,13 @@ DROP COLUMN `total_income`;
 
 ALTER TABLE `order_food`
 ADD `food_status` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates the status to this food, the value is the combination of values below.\n特价菜 ：0x01\n推荐菜 ：0x02\n停售　 ：0x04';
+ALTER TABLE `order_food`
+MODIFY COLUMN `taste_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the taste alias id';
 
 ALTER TABLE `order_food_history`
 ADD `food_status` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates the status to this food, the value is the combination of values below.\n特价菜 ：0x01\n推荐菜 ：0x02\n停售　 ：0x04';
+ALTER TABLE `order_food_history`
+MODIFY COLUMN `taste_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the taste alias id';
 
 -- -----------------------------------------------------
 -- Table `wireless_order_db`.`setting`
