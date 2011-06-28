@@ -8,7 +8,6 @@ import java.util.Comparator;
 
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.Order;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 
@@ -48,41 +47,28 @@ public class QueryTable {
 				idleTable.restaurant_id = term.restaurant_id;
 				idleTable.alias_id = dbCon.rs.getInt("table_id");
 				idleTable.name = dbCon.rs.getString("table_name");
-				idleTable.minimum_cost = new Float((dbCon.rs.getFloat("minimum_cost") * 100)).intValue();
+				idleTable.setMinimumCost(dbCon.rs.getFloat("minimum_cost"));
 				idleTable.status = Table.TABLE_IDLE;
 				tables.add(idleTable);
 			}
 			dbCon.rs.close();
 			
 			//get the busy tables
-			sql = "SELECT table_id, table_name, table2_id, table2_name, custom_num, category FROM " + Params.dbName + ".order a WHERE id=(SELECT max(id) FROM " + Params.dbName + 
-				".order b WHERE a.table_id = b.table_id AND a.restaurant_id=b.restaurant_id) AND total_price IS NULL AND restaurant_id="+
-				term.restaurant_id;
-			
+			sql = "SELECT a.*, o.custom_num, o.category FROM " + Params.dbName +
+				  ".`table` a  INNER JOIN " + Params.dbName +
+				  ".`order` o ON o.restaurant_id = a.restaurant_id AND o.total_price IS NULL AND (a.alias_id=o.table_id OR a.alias_id=table2_id)" +
+				  " WHERE a.restaurant_id=" + term.restaurant_id;
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while(dbCon.rs.next()){
 				Table busyTable = new Table();
 				busyTable.restaurant_id = term.restaurant_id;
-				busyTable.alias_id = dbCon.rs.getInt("table_id");
-				busyTable.name = dbCon.rs.getString("table_name");
+				busyTable.alias_id = dbCon.rs.getInt("alias_id");
+				busyTable.name = dbCon.rs.getString("name");
+				busyTable.setMinimumCost(dbCon.rs.getFloat("minimum_cost"));
 				busyTable.custom_num = dbCon.rs.getShort("custom_num");
 				busyTable.category = dbCon.rs.getShort("category");
 				busyTable.status = Table.TABLE_BUSY;
 				tables.add(busyTable);
-				/**
-				 * If the category is table merger, 
-				 * means another table is busy.
-				 */
-				if(busyTable.category == Order.CATE_MERGER_TABLE){
-					Table mergerTable = new Table();
-					mergerTable.restaurant_id = term.restaurant_id;
-					mergerTable.alias_id = dbCon.rs.getInt("table2_id");
-					mergerTable.name = dbCon.rs.getString("table2_name");
-					mergerTable.custom_num = dbCon.rs.getShort("custom_num");
-					mergerTable.category = dbCon.rs.getShort("category");
-					mergerTable.status = Table.TABLE_BUSY;
-					tables.add(mergerTable);
-				}
 			}			
 
 			Collections.sort(tables, new Comparator<Table>(){
@@ -171,7 +157,7 @@ public class QueryTable {
 			 table.restaurant_id = term.restaurant_id;
 			 table.alias_id = tableID;
 			 table.name = tableName;
-			 table.minimum_cost = new Float(minimumCost * 100).intValue();
+			 table.setMinimumCost(minimumCost);
 			 
 			 if(dbCon.rs.next()){
 				 table.custom_num = dbCon.rs.getByte("custom_num");
