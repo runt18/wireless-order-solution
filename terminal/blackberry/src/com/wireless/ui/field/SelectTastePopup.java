@@ -51,7 +51,7 @@ public class SelectTastePopup extends PopupScreen{
 				int matchNum = 0;
 				for(int i = 0; i < WirelessOrder.foodMenu.tastes.length; i++){
 					Taste taste = (Taste)WirelessOrder.foodMenu.tastes[i];
-					if(new Integer(taste.alias_id).toString().startsWith(_tasteID.getText())){
+					if(Integer.toString(taste.alias_id).startsWith(_tasteID.getText())){
 						_tasteMatchedIdx[matchNum] = i;
 						matchNum++;
 					}
@@ -113,12 +113,13 @@ public class SelectTastePopup extends PopupScreen{
 						_orderListField._orderFoods.removeElement(_selectedFood);
 
 						try{
+							Taste selectedTaste = WirelessOrder.foodMenu.tastes[_tasteMatchedIdx[getSelectedIndex()]];
 							//assign the taste id
-							_selectedFood.taste.alias_id = WirelessOrder.foodMenu.tastes[getSelectedIndex()].alias_id;
+							_selectedFood.taste.alias_id = selectedTaste.alias_id;
 							//assign the taste preference
-							_selectedFood.taste.preference = WirelessOrder.foodMenu.tastes[getSelectedIndex()].preference;
+							_selectedFood.taste.preference = selectedTaste.preference;
 							//_selectedFood.taste.price = WirelessOrder.foodMenu.tastes[getSelectedIndex()].price;
-							_selectedFood.taste.setPrice(WirelessOrder.foodMenu.tastes[getSelectedIndex()].getPrice());
+							_selectedFood.taste.setPrice(selectedTaste.getPrice());
 						}catch(ArrayIndexOutOfBoundsException e){}
 						_orderListField.addFood(_selectedFood);
 						close();
