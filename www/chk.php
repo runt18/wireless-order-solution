@@ -25,8 +25,14 @@ else
 	//	mysql_select_db($database, $con);
 	mysql_query("SET NAMES utf8"); //解决MSQL乱码
 	// mysql_close($con);
-	
-	$sql = "SELECT * FROM restaurant where account='" .$name . "' and pwd='" .md5($password) ."'" ; 
+	if($loginType == "Web")
+	{
+		$sql = "SELECT * FROM restaurant where account='" .$name . "' and pwd='" .md5($password) ."'" ; 
+	}
+	else
+	{
+		$sql = "SELECT * FROM restaurant where account='" .$name . "'";
+	}
 	$rs = $db->GetRow($sql);
 	/* 检查密码是否正确 */
 	if ($rs)
@@ -61,7 +67,14 @@ else
 	} 
 	else
 	{
-		echo '帐号或密码错误,';	
+		if($loginType == "Web")
+		{
+			echo '帐号或密码错误,';
+		}
+		else
+		{
+			echo '帐号错误,';	
+		}	
 		echo '<a href="login.php">请重新登录!</a>';
 	}
 	

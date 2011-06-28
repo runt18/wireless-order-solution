@@ -441,6 +441,58 @@ function showOrderStat(statType, dateFrom, dateTo,viewType) {
     showMessageBox(content, 950, 350);
 }
 
+function viewCancelStat() {
+    var editType = "viewCancel";
+    var title = "退菜汇总 - 请选择日期区间";
+  
+    var content = ' <div class="add_foot">' +
+                        '<div class="title" style="width:430px">' +
+	                        '<div class="title_left" style="width:385px;"><font class="font" style="width:260px;">' + title + '</font></div>' +
+	                        '<div class="title_right" style="float:left;width:35px;"></div>' +
+	                    '</div>' +
+	                    '<form id="searchForm" name="searchForm" action="order_history.php"  method="post" onkeydown="searchOrderKeyDown()">' +
+	                      '<input type="hidden" name="editType" value="' + editType + '" />' +	                     
+	                      '<div class="add_foot_Content" style="height:130px;text-align:center;width:413px">' +
+	                        '<div class="pop_Content">' +	                         
+	                           '<div class="pop_Content1" style="padding-left:0px;text-align:center">日期：<input type="text" id="dateFrom" name="dateFrom" style="width:136px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;&nbsp;至&nbsp;&nbsp;<input type="text" id="dateTo" name="dateTo" style="width:width:136px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;</div>' +
+	                        '</div>' +
+	                            '<span class="pop_action-span"><a href="#" onclick="document.searchForm.submit();">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>' +
+	                            '<span class="pop_action-span1"><a href="#" onclick="closeWindow()">取&nbsp;&nbsp;&nbsp;&nbsp;消</a></span>' +
+	                      '</div>' +
+	                      '</form>' +
+	                '</div>';
+
+    showMessageBox(content, 430, 350);
+    document.getElementById("dateFrom").focus();
+}
+
+function showCancelStat(dateFrom, dateTo) {
+    var title = "";
+    var viewTypeName = "";      
+    title = viewTypeName + "退菜汇总";
+    if (dateFrom != "" && dateTo != "") {
+        title += "（" + dateFrom + "~" + dateTo + "）";
+    }
+    else if (dateFrom != "" && dateTo == "") {
+        title += "（" + dateFrom + "之后）";
+    }
+    else if (dateFrom == "" && dateTo != "") {
+        title += "（" + dateTo + "之前）";
+    }  
+
+
+    var content = ' <div class="add_foot" style="height:550px;width:100%">' +
+                        '<div class="title" style="width:100%">' +
+	                        '<div class="title_left" style="width:914px"><font id="dynamicTitle" style="font-size: 16px;font-weight: normal;color: #FFF;margin-left: 15px;line-height: 30px;text-align: left;" >' + title + '</font></div>' +
+	                        '<div class="title_right"  style="width:35px;float:left"></div>' +
+	                    '</div>' +
+	                      '<div class="add_foot_Content" style="height:370px;text-align:center;width:99%">' +
+	                            '<iframe src="viewCancelStat.php?dateFrom=' + dateFrom + '&dateTo=' + dateTo + '" scrolling="no" style="width:100%;height:100%;" />' +
+	                        '</div>' +
+	                '</div>';
+    showMessageBox(content, 950, 350);
+}
+
 function orderStatKeyDown() {
     if (event.keyCode == 27) {
         event.returnValue = false;

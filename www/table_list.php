@@ -28,6 +28,11 @@ $restaurant_id = $_SESSION["restaurant_id"];
 if($editType == "addTable")
 {
 	$alias_id = $_POST["alias_id"];	
+	$minimum_cost = $_POST["minimum_cost"];
+	if($minimum_cost == "")
+	{
+		$minimum_cost = 0;
+	}
 	$sql = "SELECT * FROM `table` WHERE alias_id = $alias_id AND restaurant_id=$restaurant_id";
 	$rs = $db ->GetOne($sql);
 	if($rs)
@@ -36,7 +41,7 @@ if($editType == "addTable")
 	}
 	else
 	{		
-		$sql = "INSERT INTO `table`(alias_id,restaurant_id,name) VALUES($alias_id,$restaurant_id,'$name')";	
+		$sql = "INSERT INTO `table`(alias_id,restaurant_id,name,minimum_cost) VALUES($alias_id,$restaurant_id,'$name',$minimum_cost)";	
 		if($db->Execute($sql))
 		{
 			echo "<script>alert('保存成功！');</script>";
@@ -49,7 +54,12 @@ if($editType == "addTable")
 else if($editType == "editTable")
 	{
 		$id = $_POST["id"];
-		$sql = "UPDATE `table` SET name='$name' WHERE id=$id";
+		$minimum_cost = $_POST["minimum_cost"];
+		if($minimum_cost == "")
+		{
+			$minimum_cost = 0;
+		}
+		$sql = "UPDATE `table` SET name='$name',minimum_cost=$minimum_cost WHERE id=$id";
 		if($db->Execute($sql))
 		{
 			echo "<script>alert('保存成功！');</script>";
@@ -82,7 +92,7 @@ if($editType == "deleteTable")
 //echo $sql;
 ?>
 <h1>
-<span class="action-span"><a href="#" onclick="editTable('','','','table_list.php');">添加餐桌</a></span>
+<span class="action-span"><a href="#" onclick="editTable('','','','table_list.php','');">添加餐桌</a></span>
 <span class="action-span"><a href="#" onclick="javascript:window.location.href = 'table.php'">图标显示</a></span>  
 <span class="action-span1">e点通会员中心</span>
 <span id="search_id" class="action-span2">&nbsp;- 餐台信息 </span>
@@ -172,7 +182,7 @@ foreach ($rs as $row){
 	if($is_paid == NULL || $is_paid == 1)	
 	{
 		echo "<td><a href='#' onclick='editTable(&quot;".$row["table_id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["name"].
-			"&quot;,&quot;table_list.php&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
+			"&quot;,&quot;table_list.php&quot;,".$row["minimum_cost"].")'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
 			"<a href='#' onclick='confirmDelete(".$row["alias_id"].",&quot;table_list.php&quot;)'><img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;删除</a></td>";
 	}
 	else
@@ -182,7 +192,7 @@ foreach ($rs as $row){
 			"&quot;,&quot;".$row["num"]."&quot;,&quot;".$row["foods"]."&quot;,&quot;".$row["is_paid"]."&quot;,&quot;".$row["waiter"]."&quot;,&quot;".$row["type_name"]."&quot;,&quot;".$row["total_price_2"]."&quot;,&quot;".$row["category_name"]."&quot;,&quot;".$row["comment"]."&quot;,".$row["service_rate"].",&quot;".$row["table_name"]."&quot;)'>
 				<img src='images/View.png'  height='16' width='14' border='0'/>&nbsp;查看</a>&nbsp;&nbsp;&nbsp;&nbsp;
 				<a href='#' onclick='editTable(&quot;".$row["table_id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["name"].
-			"&quot;,&quot;table_list.php&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a></td>";
+			"&quot;,&quot;table_list.php&quot;,".$row["minimum_cost"].")'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a></td>";
 	}
 	echo "</tr>";
 }

@@ -81,7 +81,7 @@ function confirmDelete(id, target) {
 
 }
 
-function editTable(id, alias_id, name, target) {
+function editTable(id, alias_id, name, target, minimum_cost) {
     var editType = "addTable";
     var title = "添加餐桌";    
     if (id != "") {
@@ -108,8 +108,12 @@ function editTable(id, alias_id, name, target) {
 	                      '<input type="hidden" name="id" value="' + id + '" />' +
 	                      '<div class="add_foot_Content" style="height:180px;text-align:center">' +
 	                        '<div class="pop_Content">' +
-	                            '<div class="pop_Content1">编号：' + aliasId + '</div>' +
-	                            '<div class="pop_Content1">名称：<input type="text" id="name" name="name" value="' + name + '" onfocus="this.select()" size="25" height="20" /></div>' +
+	                            '<div class="pop_Content1">&nbsp;&nbsp;&nbsp;编号：' + aliasId + '</div>' +
+	                            '<div class="pop_Content1">&nbsp;&nbsp;&nbsp;名称：<input type="text" id="name" name="name" value="' + name + '" onfocus="this.select()" size="25" height="20" /></div>' +
+	                            '<div class="pop_Content1">最低消：<input type="text" id="minimum_cost" name="minimum_cost" onfocus="this.select()" style="position:relative;left:-2px" size="25" height="20" value="' + minimum_cost + '" ' +
+	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57||event.keyCode==46||event.keyCode==45"' +
+	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
+	                            ' style="ime-mode:Disabled" /></div>' +
 	                        '</div>' +
 	                            '<span class="pop_action-span"><a href="#" onclick="submitTableData()">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>' +
 	                            '<span class="pop_action-span1"><a href="#" onclick="closeWindow()">取&nbsp;&nbsp;&nbsp;&nbsp;消</a></span>' +

@@ -47,7 +47,14 @@ if($editType == "viewStat")
 	$dateFrom = $_POST["dateFrom"];
 	$dateTo = $_POST["dateTo"];
 	echo "<script>showOrderStat('$statType','$dateFrom','$dateTo','$viewType');</script>";				
-}    
+}  
+if($editType == "viewCancel")
+{		
+	$viewType = $_POST["viewType"];
+	$dateFrom = $_POST["dateFrom"];
+	$dateTo = $_POST["dateTo"];
+	echo "<script>showCancelStat('$dateFrom','$dateTo');</script>";				
+}      
 $editType = $_POST["editType"];
 if($editType == "editOrder")
 {
@@ -110,6 +117,7 @@ if($editType == "canEditOrder")
 <span class="action-span"><a href="#" onclick="showSearch('order_history.php');">高级搜索</a></span>
 <span class="action-span"><a href="#" onclick="viewOrderStat('daily');">日结汇总</a></span>
 <span class="action-span"><a href="#" onclick="viewOrderStat('monthly');">月结汇总</a></span>
+<span class="action-span"><a href="#" onclick="viewCancelStat();">退菜汇总</a></span>
 <span class="action-span1">e点通会员中心</span><span id="search_id" class="action-span2">&nbsp;- 历史帐单 </span>
 <div style="clear:both"></div>
 </h1>
