@@ -78,7 +78,7 @@ public class ReqParser {
 		for(int i = 0; i < orderFoods.length; i++){
 			int foodID = (req.body[offset] & 0x000000FF) | ((req.body[offset + 1] & 0x000000FF) << 8);
 			int orderNum = (req.body[offset + 2] & 0x000000FF) | ((req.body[offset + 3] & 0x000000FF) << 8);
-			short taste_id = req.body[offset + 4];
+			short taste_id = (short)(req.body[offset + 4] & 0x00FF);
 			short kitchen = req.body[offset + 5];
 			orderFoods[i] = new Food();
 			orderFoods[i].alias_id = foodID;

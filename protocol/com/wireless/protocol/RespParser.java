@@ -83,7 +83,7 @@ public class RespParser {
 				int orderNum = (response.body[index + 2] & 0x000000FF) |
 								((response.body[index + 3] & 0x000000FF) << 8);				
 				short status = response.body[index + 4];				
-				short tasteID = response.body[index + 5];
+				short tasteID = (short)(response.body[index + 5] & 0x00FF);
 				//each food information takes up 5-byte
 				index += 6;
 				orderFoods[i] = new Food();
