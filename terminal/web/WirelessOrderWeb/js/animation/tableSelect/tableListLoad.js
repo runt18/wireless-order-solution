@@ -64,7 +64,7 @@ function tableSelectOnLoad() {
 	var Request = new URLParaQuery();
 	pin = Request["pin"];
 
-	// 后台：["餐台1编号","餐台1人数","占用","餐台1名称","一般"]，["餐台2编号","餐台2人数","空桌","餐台2名称","外卖"]
+	// 后台：["餐台1编号","餐台1人数","占用","餐台1名称","一般",0]，["餐台2编号","餐台2人数","空桌","餐台2名称","外卖",300.50]
 	// 页面：tableStatusListTS和后台一致
 	Ext.Ajax
 			.request({
@@ -95,7 +95,8 @@ function tableSelectOnLoad() {
 									tableStatusList[3].substr(1,
 											tableStatusList[3].length - 2),// 餐台名称
 									tableStatusList[4].substr(1,
-											tableStatusList[4].length - 2) // 餐台类型
+											tableStatusList[4].length - 2), // 餐台类型
+									tableStatusList[5] // 最低消费
 							]);
 						}
 						;
@@ -128,7 +129,7 @@ function tableSelectOnLoad() {
 							for ( var j = i * 24; j < i * 24 + currListCount; j++) {
 								var liNode = document.createElement("li");
 								liNode.id = "table" + tableStatusListTS[j][0];
-								
+
 								if (tableStatusListTS[j][4] == "一般"
 										&& tableStatusListTS[j][2] == "空桌") {
 									liNode.className = "normal_null";
@@ -147,7 +148,7 @@ function tableSelectOnLoad() {
 								} else if (tableStatusListTS[j][4] == "外卖"
 										&& tableStatusListTS[j][2] == "占用") {
 									liNode.className = "package_on";
-								}else if (tableStatusListTS[j][4] == "并台"
+								} else if (tableStatusListTS[j][4] == "并台"
 										&& tableStatusListTS[j][2] == "空桌") {
 									liNode.className = "separate_null";
 								} else if (tableStatusListTS[j][4] == "并台"
@@ -240,7 +241,9 @@ function tableSelectOnLoad() {
 																			+ "&pin="
 																			+ pin
 																			+ "&restaurantID="
-																			+ restaurantID;
+																			+ restaurantID
+																			+ "&minCost="
+																			+ tableStatusListTS[tableIndex][5];
 																}
 															});
 										});

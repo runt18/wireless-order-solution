@@ -51,10 +51,12 @@
 
 	var restaurantID = "";
 	var restaurantData = [];
-	
+
 	var operatorName = "XXX";
 
 	var mBalance = -1;
+	
+	var originalTotalCount = -1 // important!!!
 </script>
 
 <script type="text/javascript"
@@ -89,6 +91,9 @@
 		<div id="tblNbrDivTS" class="tableStatusChar">100&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
 		<img title="人数" src='../images/DinnerAmount.png' style='float: left;' />
 		<div id="perCountDivTS" class="tableStatusChar">4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+		<img title="最低消费" id="minCostImgTS" src='../images/DinnerAmount.png'
+			style='float: left;' />
+		<div id="minCostDivTS" class="tableStatusChar">4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
 	</div>
 
 
@@ -112,9 +117,10 @@
 			<tr>
 				<td>&nbsp;&nbsp;&nbsp;</td>
 				<td>服务费：</td>
-				<td><input id="serviceCharge" type="text" value="0" style="width:50px;"></input></td>
+				<td><input id="serviceCharge" type="text" value="0"
+					style="width: 50px;"></input></td>
 				<td>%</td>
-				<td style="width:60px;">&nbsp;</td>
+				<td style="width: 60px;">&nbsp;</td>
 				<td>合计：￥</td>
 				<td><div id="totalCount"></div>
 				</td>
@@ -122,15 +128,17 @@
 			<tr>
 				<td>&nbsp;&nbsp;&nbsp;</td>
 				<td>现金实收：￥</td>
-				<td><input id="actualCount" type="text" style="width:50px;"></input>
+				<td><input id="actualCount" type="text" style="width: 50px;"></input>
 				</td>
 				<td>&nbsp;&nbsp;&nbsp;</td>
-				<td style="width:60px;">&nbsp;</td>
+				<td style="width: 60px;">&nbsp;</td>
 				<td>应收：￥</td>
 				<td><div id="shouldPay"></div></td>
-				<td style="width:60px;">&nbsp;</td>
+				<td style="width: 60px;">&nbsp;</td>
 				<td>找零：￥</td>
 				<td><div id="change"></div></td>
+				<td style="width: 40px;">&nbsp;</td>
+				<td><input type="button" value="计算" style="width: 80px;" onclick="moneyCount()"></input></td>
 			</tr>
 		</table>
 	</div>

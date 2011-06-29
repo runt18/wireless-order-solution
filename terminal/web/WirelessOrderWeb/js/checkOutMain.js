@@ -236,253 +236,242 @@ var discountKindComb = new Ext.form.ComboBox({
 	}
 });
 
-var checkOutForm = new Ext.form.FormPanel(
-		{
-			frame : true,
+var checkOutForm = new Ext.form.FormPanel({
+	frame : true,
+	border : false,
+	items : [ {
+		layout : "column",
+		border : false,
+		items : [ {
+			html : "<div>&nbsp;&nbsp;</div>",
+			id : "placeHolderCOF1",
+			width : 150
+		}, {
+			layout : "form",
 			border : false,
-			items : [
-					{
-						layout : "column",
-						border : false,
-						items : [ {
-							html : "<div>&nbsp;&nbsp;</div>",
-							id : "placeHolderCOF1",
-							width : 150
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '：',
-							labelWidth : 30,
-							width : 300,
-							items : [ discountKindComb ]
-						}, {
-							// columnWidth : .25,
-							width : 80,
-							layout : 'form',
-							labelWidth : 0,
-							labelSeparator : '',
-							hideLabels : true,
-							border : false,
-							items : [ {
-								xtype : 'radio',
-								// fieldLabel : '是否连带2A',
-								boxLabel : '折扣1',
-								checked : true,
-								name : 'discountRadio',
-								inputValue : 'discount1',
-								anchor : '95%',
-								listeners : {
-									check : function(thiz, newValue, oldValue) {
-										// alert("1");
-										checkOurListRefresh();
-									}
-								}
-							} ]
-						}, {
-							// columnWidth : .25,
-							width : 80,
-							layout : 'form',
-							labelWidth : 0,
-							labelSeparator : '',
-							hideLabels : true,
-							border : false,
-							items : [ {
-								xtype : 'radio',
-								// fieldLabel : '',
-								boxLabel : '折扣2',
-								name : 'discountRadio',
-								inputValue : 'discount2',
-								anchor : '95%',
-								listeners : {
-									check : function(thiz, newValue, oldValue) {
-										// alert("2");
-										checkOurListRefresh();
-									}
-								}
-							} ]
-						}, {
-							// columnWidth : .25,
-							width : 80,
-							layout : 'form',
-							labelWidth : 0,
-							labelSeparator : '',
-							hideLabels : true,
-							border : false,
-							items : [ {
-								xtype : 'radio',
-								// fieldLabel : '',
-								boxLabel : '折扣3',
-								name : 'discountRadio',
-								inputValue : 'discount3',
-								anchor : '95%',
-								listeners : {
-									check : function(thiz, newValue, oldValue) {
-										// alert("3");
-										checkOurListRefresh();
-									}
-								}
-							} ]
-						} ]
-					},
-					{
-						layout : "column",
-						border : false,
-						items : [
-								{
-									html : "<div>&nbsp;&nbsp;</div>",
-									id : "placeHolderCOF2",
-									hidden : true,
-									width : 150
-								},
-								{
-									layout : "fit",
-									id : "memberInfoPanel",
-									width : 1000,
-									contentEl : "memberInfo",
-									hidden : true,
-									listeners : {
-										hide : function(thiz) {
-											checkOutForm.findById(
-													"placeHolderCOF2").hide();
-											// gridHeightOffset = 80;
-										},
-										show : function(thiz) {
-											checkOutForm.findById(
-													"placeHolderCOF2").show();
-											// gridHeightOffset = 120;
-										}
-									}
-								} ]
-					},
-					checkOutGrid,
-					{
-						layout : "column",
-						border : false,
-						items : [
-								{
-									html : "<div>&nbsp;&nbsp;</div>",
-									id : "placeHolderCOF3",
-									// hidden : true,
-									width : 150
-								}
-								,
-								{
-									border : false,
-									contentEl:"payInfo"
-								}
-//								,
-//								{
-//									layout : "form",
-//									border : false,
-//									labelSeparator : '：',
-//									labelWidth : 40,
-//									width : 250,
-//									items : [ {
-//										html : "<div style='font-size:18px;font-weight:bold;'>合计：       ￥100</div>",
-//										// fieldLabel : "合计",
-//										id : "totalCount"
-//									} ]
-//								}
-//								,
-//								{
-//									layout : "form",
-//									border : false,
-//									labelSeparator : '：',
-//									labelWidth : 80,
-//									width : 300,
-//									items : [ {
-//										xtype : "textfield",
-//										fieldLabel : "<span style='font-size:18px;font-weight:bold;'>实收</span>",
-//										id : "actualCount"
-//									} ]
-//								}
-								]
-					}, {
-						layout : "column",
-						border : false,
-						items : [ {
-							html : "<div>&nbsp;&nbsp;</div>",
-							id : "placeHolderCOF4",
-							// hidden : true,
-							width : 150
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '：',
-							labelWidth : 40,
-							width : 1000,
-							items : [ {
-								xtype : "textfield",
-								fieldLabel : "备注",
-								id : "remark",
-								anchor : "%99"
-							} ]
-						} ]
-					} ],
-			buttons : [
-					{
-						text : "现金结账",
-						handler : function() {
-							paySubmit(1);
-						}
-					},
-					{
-						text : "刷卡结账",
-						handler : function() {
-							paySubmit(2);
-						}
-					},
-					{
-						text : "会员卡结账",
-						// hidden : true,
-						handler : function() {
-							paySubmit(3);
-						}
-					},
-					{
-						text : "签单",
-						// hidden : true,
-						handler : function() {
-							paySubmit(5);
-						}
-					},
-					{
-						text : "挂账",
-						// hidden : true,
-						handler : function() {
-							paySubmit(4);
-						}
-					},
-					{
-						text : "暂结",
-						// hidden : true,
-						handler : function() {
-							paySubmit(6);
-						}
-					},
-					{
-						text : "返回",
-						handler : function() {
-							var Request = new URLParaQuery();
-							location.href = "TableSelect.html?pin="
-									+ Request["pin"] + "&restaurantID="
-									+ restaurantID;
-						}
-					} ],
+			labelSeparator : '：',
+			labelWidth : 30,
+			width : 300,
+			items : [ discountKindComb ]
+		}, {
+			// columnWidth : .25,
+			width : 80,
+			layout : 'form',
+			labelWidth : 0,
+			labelSeparator : '',
+			hideLabels : true,
+			border : false,
+			items : [ {
+				xtype : 'radio',
+				// fieldLabel : '是否连带2A',
+				boxLabel : '折扣1',
+				checked : true,
+				name : 'discountRadio',
+				inputValue : 'discount1',
+				anchor : '95%',
+				listeners : {
+					check : function(thiz, newValue, oldValue) {
+						// alert("1");
+						checkOurListRefresh();
+					}
+				}
+			} ]
+		}, {
+			// columnWidth : .25,
+			width : 80,
+			layout : 'form',
+			labelWidth : 0,
+			labelSeparator : '',
+			hideLabels : true,
+			border : false,
+			items : [ {
+				xtype : 'radio',
+				// fieldLabel : '',
+				boxLabel : '折扣2',
+				name : 'discountRadio',
+				inputValue : 'discount2',
+				anchor : '95%',
+				listeners : {
+					check : function(thiz, newValue, oldValue) {
+						// alert("2");
+						checkOurListRefresh();
+					}
+				}
+			} ]
+		}, {
+			// columnWidth : .25,
+			width : 80,
+			layout : 'form',
+			labelWidth : 0,
+			labelSeparator : '',
+			hideLabels : true,
+			border : false,
+			items : [ {
+				xtype : 'radio',
+				// fieldLabel : '',
+				boxLabel : '折扣3',
+				name : 'discountRadio',
+				inputValue : 'discount3',
+				anchor : '95%',
+				listeners : {
+					check : function(thiz, newValue, oldValue) {
+						// alert("3");
+						checkOurListRefresh();
+					}
+				}
+			} ]
+		} ]
+	}, {
+		layout : "column",
+		border : false,
+		items : [ {
+			html : "<div>&nbsp;&nbsp;</div>",
+			id : "placeHolderCOF2",
+			hidden : true,
+			width : 150
+		}, {
+			layout : "fit",
+			id : "memberInfoPanel",
+			width : 1000,
+			contentEl : "memberInfo",
+			hidden : true,
 			listeners : {
-				afterlayout : function(thiz) {
-					checkOutGrid.setHeight(thiz.getInnerHeight() - 30);
-					thiz.findById("placeHolderCOF1").setWidth(
-							(thiz.getInnerWidth() - 1000) / 2);
-					thiz.findById("placeHolderCOF2").setWidth(
-							(thiz.getInnerWidth() - 1000) / 2);
-					thiz.findById("placeHolderCOF3").setWidth(
-							(thiz.getInnerWidth() - 1000) / 2);
-					thiz.findById("placeHolderCOF4").setWidth(
-							(thiz.getInnerWidth() - 1000) / 2);
+				hide : function(thiz) {
+					checkOutForm.findById("placeHolderCOF2").hide();
+					// gridHeightOffset = 80;
+				},
+				show : function(thiz) {
+					checkOutForm.findById("placeHolderCOF2").show();
+					// gridHeightOffset = 120;
 				}
 			}
-		});
+		} ]
+	}, checkOutGrid, {
+		layout : "column",
+		border : false,
+		items : [ {
+			html : "<div>&nbsp;&nbsp;</div>",
+			id : "placeHolderCOF3",
+			// hidden : true,
+			width : 150
+		}, {
+			border : false,
+			contentEl : "payInfo"
+		}
+		// ,
+		// {
+		// layout : "form",
+		// border : false,
+		// labelSeparator : '：',
+		// labelWidth : 40,
+		// width : 250,
+		// items : [ {
+		// html : "<div style='font-size:18px;font-weight:bold;'>合计：
+		// ￥100</div>",
+		// // fieldLabel : "合计",
+		// id : "totalCount"
+		// } ]
+		// }
+		// ,
+		// {
+		// layout : "form",
+		// border : false,
+		// labelSeparator : '：',
+		// labelWidth : 80,
+		// width : 300,
+		// items : [ {
+		// xtype : "textfield",
+		// fieldLabel : "<span
+		// style='font-size:18px;font-weight:bold;'>实收</span>",
+		// id : "actualCount"
+		// } ]
+		// }
+		]
+	}, {
+		layout : "column",
+		border : false,
+		items : [ {
+			html : "<div>&nbsp;&nbsp;</div>",
+			id : "placeHolderCOF4",
+			// hidden : true,
+			width : 150
+		}, {
+			layout : "form",
+			border : false,
+			labelSeparator : '：',
+			labelWidth : 40,
+			width : 1000,
+			items : [ {
+				xtype : "textfield",
+				fieldLabel : "备注",
+				id : "remark",
+				anchor : "%99"
+			} ]
+		} ]
+	} ],
+	buttons : [
+			{
+				text : "现金结账",
+				handler : function() {
+					paySubmit(1);
+				}
+			},
+			{
+				text : "刷卡结账",
+				handler : function() {
+					paySubmit(2);
+				}
+			},
+			{
+				text : "会员卡结账",
+				// hidden : true,
+				handler : function() {
+					paySubmit(3);
+				}
+			},
+			{
+				text : "签单",
+				// hidden : true,
+				handler : function() {
+					paySubmit(5);
+				}
+			},
+			{
+				text : "挂账",
+				// hidden : true,
+				handler : function() {
+					paySubmit(4);
+				}
+			},
+			{
+				text : "暂结",
+				// hidden : true,
+				handler : function() {
+					paySubmit(6);
+				}
+			},
+			{
+				text : "返回",
+				handler : function() {
+					var Request = new URLParaQuery();
+					location.href = "TableSelect.html?pin=" + Request["pin"]
+							+ "&restaurantID=" + restaurantID;
+				}
+			} ],
+	listeners : {
+		afterlayout : function(thiz) {
+			checkOutGrid.setHeight(thiz.getInnerHeight() - 30);
+			thiz.findById("placeHolderCOF1").setWidth(
+					(thiz.getInnerWidth() - 1000) / 2);
+			thiz.findById("placeHolderCOF2").setWidth(
+					(thiz.getInnerWidth() - 1000) / 2);
+			thiz.findById("placeHolderCOF3").setWidth(
+					(thiz.getInnerWidth() - 1000) / 2);
+			thiz.findById("placeHolderCOF4").setWidth(
+					(thiz.getInnerWidth() - 1000) / 2);
+		}
+	}
+});
 
 var checkOutCenterPanel = new Ext.Panel({
 	region : "center",

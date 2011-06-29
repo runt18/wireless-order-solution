@@ -2,10 +2,9 @@
 	var canSubmit = true;
 	// var actualPrice = checkOutForm.findById("actualCount").getValue();
 	var actualPrice = document.getElementById("actualCount").value;
-	var countPriceString = document.getElementById("totalCount").innerHTML;
+	var countPrice = document.getElementById("totalCount").innerHTML;
 	var shouldPay = document.getElementById("shouldPay").innerHTML;
-	var countPrice = countPriceString.substr(countPriceString.indexOf("￥") + 1,
-			countPriceString.length - countPriceString.indexOf("￥") - 7);
+	var serviceRate = document.getElementById("serviceCharge").value;
 	var submitPrice = -1;
 
 	var payManner = -1;
@@ -13,9 +12,9 @@
 
 	// 现金
 	if (submitType == 1) {
-		submitPrice = shouldPay;
+		submitPrice = actualPrice;
 	} else {
-		submitPrice = countPrice;
+		submitPrice = originalTotalCount;
 	}
 
 	// 暂结，调整参数
@@ -33,8 +32,8 @@
 		Ext.Msg.alert("", "<b>会员卡余额小于合计金额，不能结帐！</b>");
 		canSubmit = false;
 	} else if (submitType == 1
-			&& parseFloat(actualPrice) < parseFloat(countPrice)) {
-		Ext.Msg.alert("", "<b>现金实收金额小于合计金额，不能结帐！</b>");
+			&& parseFloat(actualPrice) < parseFloat(shouldPay)) {
+		Ext.Msg.alert("", "<b>实缴金额小于应收金额，不能结帐！</b>");
 		canSubmit = false;
 	}
 
@@ -51,7 +50,8 @@
 				"payManner" : payManner,
 				"tempPay" : tempPay,
 				"memberID" : actualMemberID,
-				"comment" : checkOutForm.findById("remark").getValue()
+				"comment" : checkOutForm.findById("remark").getValue(),
+				"serviceRate" : serviceRate
 			},
 			success : function(response, options) {
 				var resultJSON = Ext.util.JSON.decode(response.responseText);

@@ -1,9 +1,9 @@
-﻿// on page load function
+﻿var Request = new URLParaQuery();
+
+// on page load function
 function checkOutOnLoad() {
 
 	// 1,update table status
-	var Request = new URLParaQuery();
-
 	restaurantID = Request["restaurantID"];
 
 	var tableNum = Request["tableNbr"];
@@ -12,6 +12,12 @@ function checkOutOnLoad() {
 			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 	document.getElementById("perCountDivTS").innerHTML = persCount
 			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+	document.getElementById("minCostDivTS").innerHTML = Request["minCost"]
+			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+	if (Request["minCost"] == "0.0") {
+		document.getElementById("minCostDivTS").style["visibility"] = "hidden";
+		document.getElementById("minCostImgTS").style["visibility"] = "hidden";
+	}
 
 	// 2,get the ordered dishes and discount
 	// checkOutData [ 厨房编号,"菜名", "口味", 数量, "单价",特,荐,停 ]
@@ -209,6 +215,7 @@ function checkOutOnLoad() {
 																}
 																totalCount = totalCount
 																		.toFixed(2);
+																originalTotalCount = totalCount;
 																document
 																		.getElementById("totalCount").innerHTML = totalCount;
 																document
@@ -221,7 +228,7 @@ function checkOutOnLoad() {
 																// .setValue(
 																// totalCount);
 
-																// 4,尾数处理
+																// 4,（尾数处理）
 																// 后台：["餐厅名称","餐厅信息","电话1","电话2","地址",$(尾数处理),$(自动补打)]
 																// 前台：restaurantData
 																// ，格式一样
@@ -268,6 +275,29 @@ function checkOutOnLoad() {
 
 																					var sPay = document
 																							.getElementById("shouldPay").innerHTML;
+
+																					// 5,最低消费处理
+																					var minCost = Request["minCost"];
+																					if (minCost > sPay) {
+																						sPay = minCost;
+																						Ext.MessageBox
+																								.show({
+																									msg : "消费额小于最低消费额，是否继续结帐？",
+																									width : 300,
+																									buttons : Ext.MessageBox.YESNO,
+																									fn : function(
+																											btn) {
+																										if (btn == "no") {
+																											location.href = "TableSelect.html?pin="
+																													+ Request["pin"]
+																													+ "&restaurantID="
+																													+ restaurantID;
+																										}
+																									}
+																								});
+																					}
+
+																					// 6,尾数处理
 																					if (restaurantData[0][5] == 2) {
 																						sPay = sPay
 																								.substr(
@@ -346,4 +376,36 @@ function checkOutOnLoad() {
 				}
 			});
 
+};
+
+function moneyCount() {
+	var shouldPay = document.getElementById("shouldPay").innerHTML;
+	var actualPay = document.getElementById("actualCount").value;
+	var minCost = Request["minCost"];
+	var serviceRate = document.getElementById("serviceCharge").value;
+	var totalCount = document.getElementById("totalCount").innerHTML;
+
+	var totalCount_out;
+	var shouldPay_out;
+	var change_out;
+
+	if (parseFloat(totalCount) < parseFloat(minCost)) {
+		shouldPay_out = parseFloat(minCost) * (1 + parseFloat(serviceRate)/100);
+	} else {
+		shouldPay_out = parseFloat(totalCount) * (1 + parseFloat(serviceRate)/100);
+	}
+	if (restaurantData[0][5] == 2) {
+		shouldPay_out = shouldPay_out.substr(0, shouldPay_out.indexOf(".")) + ".00";
+	} else if (restaurantData[0][5] == 3) {
+		shouldPay_out = parseFloat(shouldPay_out).toFixed(0) + ".00";
+	}
+	
+	totalCount_out = (parseFloat(totalCount) * (1 + parseFloat(serviceRate)/100)).toFixed(2);
+	
+	change_out = (parseFloat(actualPay) - shouldPay_out).toFixed(2);
+	
+	document.getElementById("totalCount").innerHTML = totalCount_out;
+	document.getElementById("shouldPay").innerHTML = shouldPay_out;
+	document.getElementById("change").innerHTML = change_out;
+	
 };

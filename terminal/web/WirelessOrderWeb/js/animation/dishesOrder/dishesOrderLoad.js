@@ -100,7 +100,13 @@ function tableStuLoad() {
 			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 	document.getElementById("perCountDivTS").innerHTML = personCount
 			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-
+	document.getElementById("minCostDivTS").innerHTML = Request["minCost"]
+			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+	if (Request["minCost"] == "0.0") {
+		document.getElementById("minCostDivTS").style["visibility"] = "hidden";
+		document.getElementById("minCostImgTS").style["visibility"] = "hidden";
+	}
+	
 	// update label new or mod
 	var Request = new URLParaQuery();
 	var status = Request["tableStat"];
