@@ -49,11 +49,11 @@ public class PayOrder {
 			dbCon.stmt.clearBatch();
 			String sql = null;
 			/**
-			 * Calculate the member balance if the pay type is for member.
+			 * Calculate the member balance if both pay type and manner is for member .
 			 * The formula is as below.
 			 * balance = balance - actualPrice + actualPrice * exchange_rate
 			 */
-			if(orderInfo.pay_type == Order.PAY_MEMBER){
+			if(orderInfo.pay_type == Order.PAY_MEMBER && orderInfo.pay_manner == Order.MANNER_MEMBER){
 				sql = "UPDATE " + Params.dbName + ".member SET balance=balance - " + totalPrice2 +
 					  " + " + totalPrice2 + " * exchange_rate" + 
 					  " WHERE restaurant_id=" + orderInfo.restaurant_id +
