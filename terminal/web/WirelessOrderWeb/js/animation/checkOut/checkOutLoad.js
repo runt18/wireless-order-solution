@@ -277,8 +277,8 @@ function checkOutOnLoad() {
 																							.getElementById("shouldPay").innerHTML;
 
 																					// 5,最低消费处理
-																					var minCost = Request["minCost"];
-																					if (minCost > sPay) {
+																					var minCost = Request["minCost"];															
+																					if (parseFloat(minCost) > parseFloat(sPay)) {
 																						sPay = minCost;
 																						Ext.MessageBox
 																								.show({
@@ -392,15 +392,15 @@ function moneyCount() {
 	if (parseFloat(totalCount) < parseFloat(minCost)) {
 		shouldPay_out = parseFloat(minCost) * (1 + parseFloat(serviceRate)/100);
 	} else {
-		shouldPay_out = parseFloat(totalCount) * (1 + parseFloat(serviceRate)/100);
+		shouldPay_out = parseFloat(originalTotalCount) * (1 + parseFloat(serviceRate)/100);
 	}
 	if (restaurantData[0][5] == 2) {
-		shouldPay_out = shouldPay_out.substr(0, shouldPay_out.indexOf(".")) + ".00";
+		shouldPay_out = (shouldPay_out+"").substr(0, (shouldPay_out+"").indexOf(".")) + ".00";
 	} else if (restaurantData[0][5] == 3) {
 		shouldPay_out = parseFloat(shouldPay_out).toFixed(0) + ".00";
 	}
 	
-	totalCount_out = (parseFloat(totalCount) * (1 + parseFloat(serviceRate)/100)).toFixed(2);
+	totalCount_out = (parseFloat(originalTotalCount) * (1 + parseFloat(serviceRate)/100)).toFixed(2);
 	
 	change_out = (parseFloat(actualPay) - shouldPay_out).toFixed(2);
 	
