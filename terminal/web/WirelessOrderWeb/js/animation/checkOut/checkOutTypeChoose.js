@@ -158,19 +158,22 @@ var checkOurListRefresh = function() {
 		totalCount = totalCount + singleCount;
 	}
 	totalCount = totalCount.toFixed(2);
-	if (document.getElementById("totalCount") != undefined
-			&& checkOutForm.findById("actualCount") != undefined) {
-		document.getElementById("totalCount").innerHTML = totalCount;
-		document.getElementById("actualCount").value = totalCount;
-		document.getElementById("shouldPay").innerHTML = totalCount;
-		var sPay = document.getElementById("shouldPay").innerHTML;
-		if (restaurantData[0][5] == 2) {
-			sPay = sPay.substr(0, sPay.indexOf(".")) + ".00";
-		} else if (restaurantData[0][5] == 3) {
-			sPay = parseFloat(sPay).toFixed(0) + ".00";
-		}
-		document.getElementById("shouldPay").innerHTML = sPay;
-		document.getElementById("change").innerHTML = (parseFloat(totalCount)-parseFloat(sPay)).toFixed(2);
-		// checkOutForm.findById("actualCount").setValue(totalCount);
-	}
+	originalTotalCount = totalCount;
+
+	document.getElementById("totalCount").innerHTML = totalCount;
+	// //document.getElementById("actualCount").value = totalCount;
+	// document.getElementById("shouldPay").innerHTML = totalCount;
+	// var sPay = document.getElementById("shouldPay").innerHTML;
+	// if (restaurantData[0][5] == 2) {
+	// sPay = sPay.substr(0, sPay.indexOf(".")) + ".00";
+	// } else if (restaurantData[0][5] == 3) {
+	// sPay = parseFloat(sPay).toFixed(0) + ".00";
+	// }
+	// document.getElementById("shouldPay").innerHTML = sPay;
+	// document.getElementById("change").innerHTML =
+	// (parseFloat(totalCount)-parseFloat(sPay)).toFixed(2);
+	// // checkOutForm.findById("actualCount").setValue(totalCount);
+
+	moneyCount();
+
 };

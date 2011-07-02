@@ -180,6 +180,7 @@ var memberNbrInputWin = new Ext.Window({
 
 						getMemberInfo(memberNbr);
 						checkOurListRefresh();
+						checkOutForm.buttons[2].show();
 
 					}
 				}
@@ -187,6 +188,7 @@ var memberNbrInputWin = new Ext.Window({
 				text : "取消",
 				handler : function() {
 					memberNbrInputWin.hide();
+					checkOutForm.buttons[2].hide();
 				}
 			} ],
 	listeners : {
@@ -226,6 +228,7 @@ var discountKindComb = new Ext.form.ComboBox({
 				// set the memeber card balance to -1;
 				mBalance = -1;
 				checkOurListRefresh();
+				checkOutForm.buttons[2].hide();
 				// hide the member info
 				checkOutForm.findById("memberInfoPanel").hide();
 			} else {
@@ -357,36 +360,7 @@ var checkOutForm = new Ext.form.FormPanel({
 		}, {
 			border : false,
 			contentEl : "payInfo"
-		}
-		// ,
-		// {
-		// layout : "form",
-		// border : false,
-		// labelSeparator : '：',
-		// labelWidth : 40,
-		// width : 250,
-		// items : [ {
-		// html : "<div style='font-size:18px;font-weight:bold;'>合计：
-		// ￥100</div>",
-		// // fieldLabel : "合计",
-		// id : "totalCount"
-		// } ]
-		// }
-		// ,
-		// {
-		// layout : "form",
-		// border : false,
-		// labelSeparator : '：',
-		// labelWidth : 80,
-		// width : 300,
-		// items : [ {
-		// xtype : "textfield",
-		// fieldLabel : "<span
-		// style='font-size:18px;font-weight:bold;'>实收</span>",
-		// id : "actualCount"
-		// } ]
-		// }
-		]
+		} ]
 	}, {
 		layout : "column",
 		border : false,
@@ -424,7 +398,7 @@ var checkOutForm = new Ext.form.FormPanel({
 			},
 			{
 				text : "会员卡结账",
-				// hidden : true,
+				hidden : true,
 				handler : function() {
 					paySubmit(3);
 				}

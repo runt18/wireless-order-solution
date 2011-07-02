@@ -219,7 +219,7 @@ function checkOutOnLoad() {
 																document
 																		.getElementById("totalCount").innerHTML = totalCount;
 																document
-																		.getElementById("actualCount").value = totalCount;
+																		.getElementById("actualCount").value = "0.00";
 																document
 																		.getElementById("shouldPay").innerHTML = totalCount;
 																// checkOutForm
@@ -277,7 +277,7 @@ function checkOutOnLoad() {
 																							.getElementById("shouldPay").innerHTML;
 
 																					// 5,最低消费处理
-																					var minCost = Request["minCost"];															
+																					var minCost = Request["minCost"];
 																					if (parseFloat(minCost) > parseFloat(sPay)) {
 																						sPay = minCost;
 																						Ext.MessageBox
@@ -314,9 +314,15 @@ function checkOutOnLoad() {
 																					}
 																					document
 																							.getElementById("shouldPay").innerHTML = sPay;
+																					// document
+																					// .getElementById("change").innerHTML
+																					// =
+																					// (parseFloat(totalCount)
+																					// -
+																					// parseFloat(sPay))
+																					// .toFixed(2);
 																					document
-																							.getElementById("change").innerHTML = (parseFloat(totalCount) - parseFloat(sPay))
-																							.toFixed(2);
+																							.getElementById("change").innerHTML = "0.00";
 																				} else {
 																					var dataInfo = resultJSON.data;
 																					Ext.MessageBox
@@ -385,27 +391,42 @@ function moneyCount() {
 	var serviceRate = document.getElementById("serviceCharge").value;
 	var totalCount = document.getElementById("totalCount").innerHTML;
 
-	var totalCount_out;
-	var shouldPay_out;
-	var change_out;
+	var totalCount_out = "0.00";
+	var shouldPay_out = "0.00";
+	var change_out = "0.00";
 
-	if (parseFloat(totalCount) < parseFloat(minCost)) {
-		shouldPay_out = parseFloat(minCost) * (1 + parseFloat(serviceRate)/100);
-	} else {
-		shouldPay_out = parseFloat(originalTotalCount) * (1 + parseFloat(serviceRate)/100);
+	if (restaurantData[0] != undefined) {
+
+		if (parseFloat(totalCount) < parseFloat(minCost)) {
+			shouldPay_out = parseFloat(minCost)
+					* (1 + parseFloat(serviceRate) / 100);
+		} else {
+			shouldPay_out = parseFloat(originalTotalCount)
+					* (1 + parseFloat(serviceRate) / 100);
+		}
+
+		if (restaurantData[0][5] == 2) {
+			if ((shouldPay_out + "").indexOf(".") != -1) {
+				shouldPay_out = (shouldPay_out + "").substr(0,
+						(shouldPay_out + "").indexOf("."))
+						+ ".00";
+			} else {
+				shouldPay_out = shouldPay_out + ".00";
+			}
+		} else if (restaurantData[0][5] == 3) {
+			shouldPay_out = parseFloat(shouldPay_out).toFixed(0) + ".00";
+		}
+
+		totalCount_out = (parseFloat(originalTotalCount) * (1 + parseFloat(serviceRate) / 100))
+				.toFixed(2);
+
+		if (actualPay != "" && actualPay != "0.00") {
+			change_out = (parseFloat(actualPay) - parseFloat(shouldPay_out))
+					.toFixed(2);
+		}
+
+		document.getElementById("totalCount").innerHTML = totalCount_out;
+		document.getElementById("shouldPay").innerHTML = shouldPay_out;
+		document.getElementById("change").innerHTML = change_out;
 	}
-	if (restaurantData[0][5] == 2) {
-		shouldPay_out = (shouldPay_out+"").substr(0, (shouldPay_out+"").indexOf(".")) + ".00";
-	} else if (restaurantData[0][5] == 3) {
-		shouldPay_out = parseFloat(shouldPay_out).toFixed(0) + ".00";
-	}
-	
-	totalCount_out = (parseFloat(originalTotalCount) * (1 + parseFloat(serviceRate)/100)).toFixed(2);
-	
-	change_out = (parseFloat(actualPay) - shouldPay_out).toFixed(2);
-	
-	document.getElementById("totalCount").innerHTML = totalCount_out;
-	document.getElementById("shouldPay").innerHTML = shouldPay_out;
-	document.getElementById("change").innerHTML = change_out;
-	
 };

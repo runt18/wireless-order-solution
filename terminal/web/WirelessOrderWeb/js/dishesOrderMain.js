@@ -228,7 +228,7 @@ var orderedColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(),
 
 // 4，表格
 var tasteChooseImgBut = new Ext.ux.ImageButton({
-	imgPath : "../images/im48x48.png",
+	imgPath : "../images/Taste.png",
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : "口味",
@@ -238,7 +238,7 @@ var tasteChooseImgBut = new Ext.ux.ImageButton({
 });
 
 var dishDeleteImgBut = new Ext.ux.ImageButton({
-	imgPath : "../images/extlogo48.png",
+	imgPath : "../images/DeleteDish.png",
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : "删除",
@@ -257,7 +257,7 @@ var dishPressImgBut = new Ext.ux.ImageButton({
 });
 var countAddImgBut = new Ext.ux.ImageButton(
 		{
-			imgPath : "../images/extlogo48.png",
+			imgPath : "../images/AddCount.png",
 			imgWidth : 50,
 			imgHeight : 50,
 			tooltip : "数量加1",
@@ -272,7 +272,7 @@ var countAddImgBut = new Ext.ux.ImageButton(
 		});
 var countMinusImgBut = new Ext.ux.ImageButton(
 		{
-			imgPath : "../images/extlogo48.png",
+			imgPath : "../images/MinusCount.png",
 			imgWidth : 50,
 			imgHeight : 50,
 			tooltip : "数量减1",
@@ -289,7 +289,7 @@ var countMinusImgBut = new Ext.ux.ImageButton(
 			}
 		});
 var countEqualImgBut = new Ext.ux.ImageButton({
-	imgPath : "../images/extlogo48.png",
+	imgPath : "../images/EqualCount.png",
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : "数量等于",
@@ -1107,7 +1107,7 @@ var dishesChooseByNumForm = new Ext.form.FormPanel({
 							focus : function(thiz) {
 								softKeyBoardDO
 										.setPosition(dishesOrderCenterPanel
-												.getInnerWidth() + 281, 187);
+												.getInnerWidth() + 77, 187);
 								softKBRelateItemId = "orderNbr";
 								softKeyBoardDO.show();
 
@@ -1170,6 +1170,17 @@ var dishesDisplayTabPanel = new Ext.TabPanel({
 				dishesDisplayTabPanel.setHeight(65);
 				dishesOrderEastPanel.doLayout();
 			}
+			
+			// show all the dishes
+			dishesDisplayDataShow.length = 0;
+			for ( var i = 0; i < dishesDisplayData.length; i++) {
+				dishesDisplayDataShow.push([ dishesDisplayData[i][0],
+						dishesDisplayData[i][1], dishesDisplayData[i][2],
+						dishesDisplayData[i][3], dishesDisplayData[i][4],
+						dishesDisplayData[i][5], dishesDisplayData[i][6],
+						dishesDisplayData[i][7] ]);
+			}
+			dishesDisplayStore.reload();
 		}
 	}
 });

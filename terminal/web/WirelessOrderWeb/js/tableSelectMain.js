@@ -293,7 +293,7 @@
 											// for forward the page
 											var tableIndex = -1;
 											for ( var i = 0; i < tableStatusListTS.length; i++) {
-												if (tableStatusListTS[i][0] == inputTableNbr) {
+												if (tableStatusListTS[i][0] == selectedTable) {
 													tableIndex = i;
 												}
 											}
@@ -524,6 +524,125 @@
 						}
 					});
 
+			var dishPushBackWin = new Ext.Window(
+					{
+						layout : "fit",
+						width : 200,
+						height : 100,
+						closeAction : "hide",
+						resizable : false,
+						items : [ {
+							layout : "form",
+							labelWidth : 30,
+							border : false,
+							frame : true,
+							items : [ {
+								xtype : "textfield",
+								inputType : "password",
+								fieldLabel : "密码",
+								id : "dishPushBackPwd",
+								width : 110
+							} ]
+						} ],
+						buttons : [
+								{
+									text : "确定",
+									handler : function() {
+										var dishPushBackPwd = dishPushBackWin
+												.findById("dishPushBackPwd")
+												.getValue();
+										var pwdTrans = MD5(dishPushBackPwd);
+
+										dishPushBackWin.hide();
+
+										Ext.Ajax
+												.request({
+													url : "../VerifyPwd.do",
+													params : {
+														"pin" : Request["pin"],
+														"type" : "2",
+														"pwd" : pwdTrans
+													},
+													success : function(
+															response, options) {
+														var resultJSON = Ext.util.JSON
+																.decode(response.responseText);
+														if (resultJSON.success == true) {
+
+															Ext.Ajax
+																	.request({
+																		url : "../CancelOrder.do",
+																		params : {
+																			"pin" : pin,
+																			"tableID" : selectedTable
+																		},
+																		success : function(
+																				response,
+																				options) {
+																			var resultJSON1 = Ext.util.JSON
+																					.decode(response.responseText);
+																			if (resultJSON1.success == true) {
+																				Ext.MessageBox
+																						.show({
+																							msg : resultJSON1.data,
+																							width : 300,
+																							buttons : Ext.MessageBox.OK,
+																							fn : function() {
+																								location
+																										.reload();
+																							}
+																						});
+																			} else {
+																				Ext.MessageBox
+																						.show({
+																							msg : resultJSON.data,
+																							width : 300,
+																							buttons : Ext.MessageBox.OK
+																						});
+																			}
+
+																		},
+																		failure : function(
+																				response,
+																				options) {
+																		}
+																	});
+
+															Ext.MessageBox
+																	.show({
+																		msg : resultJSON.data,
+																		width : 300,
+																		buttons : Ext.MessageBox.OK
+																	});
+														} else {
+															Ext.MessageBox
+																	.show({
+																		msg : resultJSON.data,
+																		width : 300,
+																		buttons : Ext.MessageBox.OK
+																	});
+														}
+													},
+													failure : function(
+															response, options) {
+													}
+												});
+									}
+								}, {
+									text : "取消",
+									handler : function() {
+										dishPushBackWin.hide();
+									}
+								} ],
+						listeners : {
+							show : function(thiz) {
+								// thiz.findById("personCountInput").focus();
+								var f = Ext.get("dishPushBackPwd");
+								f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
+							}
+						}
+					});
+
 			var tableSelectNorthPanel = new Ext.form.FormPanel({
 				region : "north",
 				frame : true,
@@ -694,42 +813,13 @@
 					if (tableStatusListTS[tableIndex][2] == "空桌") {
 						Ext.Msg.alert("", "<b>此桌没有下单，不能删单！</b>");
 					} else {
-						Ext.Ajax.request({
-							url : "../CancelOrder.do",
-							params : {
-								"pin" : pin,
-								"tableID" : selectedTable
-							},
-							success : function(response, options) {
-								var resultJSON = Ext.util.JSON
-										.decode(response.responseText);
-								if (resultJSON.success == true) {
-									Ext.MessageBox.show({
-										msg : resultJSON.data,
-										width : 300,
-										buttons : Ext.MessageBox.OK,
-										fn : function() {
-											location.reload();
-										}
-									});
-								} else {
-									Ext.MessageBox.show({
-										msg : resultJSON.data,
-										width : 300,
-										buttons : Ext.MessageBox.OK
-									});
-								}
-
-							},
-							failure : function(response, options) {
-							}
-						});
+						dishPushBackWin.show();
 					}
 				}
 			});
 
 			var tableChangeImgBut = new Ext.ux.ImageButton({
-				imgPath : "../images/extlogo48.png",
+				imgPath : "../images/TableChange.png",
 				imgWidth : 50,
 				imgHeight : 50,
 				tooltip : "转台",
@@ -756,7 +846,7 @@
 			});
 
 			var tableMergeImgBut = new Ext.ux.ImageButton({
-				imgPath : "../images/extlogo48.png",
+				imgPath : "../images/TableMerage.png",
 				imgWidth : 50,
 				imgHeight : 50,
 				tooltip : "拼台",
@@ -778,7 +868,7 @@
 			});
 
 			var tableSepImgBut = new Ext.ux.ImageButton({
-				imgPath : "../images/extlogo48.png",
+				imgPath : "../images/TableSeparate.png",
 				imgWidth : 50,
 				imgHeight : 50,
 				tooltip : "并台",
@@ -817,7 +907,7 @@
 			});
 
 			var packageImgBut = new Ext.ux.ImageButton({
-				imgPath : "../images/extlogo48.png",
+				imgPath : "../images/Package.png",
 				imgWidth : 50,
 				imgHeight : 50,
 				tooltip : "外卖",
@@ -837,7 +927,7 @@
 			});
 
 			var pushBackBut = new Ext.ux.ImageButton({
-				imgPath : "../images/extlogo48.png",
+				imgPath : "../images/UserLogout.png",
 				imgWidth : 50,
 				imgHeight : 50,
 				tooltip : "返回",
@@ -848,7 +938,7 @@
 			});
 
 			var logOutBut = new Ext.ux.ImageButton({
-				imgPath : "../images/extlogo48.png",
+				imgPath : "../images/ResLogout.png",
 				imgWidth : 50,
 				imgHeight : 50,
 				tooltip : "登出",
