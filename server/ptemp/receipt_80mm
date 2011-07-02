@@ -1,10 +1,9 @@
 @$(title)
 -----------------------------------------------
 ²ÍÌü£º$(restaurant)
-ÕËµ¥£º$(order_id)($(pay_manner))
+ÕËµ¥£º$(order_id)($(pay_manner))$(service_rate)
 ·şÎñÔ±£º$(waiter)
 Ê±¼ä£º$(print_date) $(print_time)
-·şÎñ·Ñ£º$(service_rate)
 -----------------------------------------------
 ²ÍÌ¨£º$(table)
 ÈËÊı£º$(custom_num)
