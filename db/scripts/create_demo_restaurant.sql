@@ -120,7 +120,7 @@ COMMIT;
 -- Insert kitchen records, note that each restaruant has ten kitchens
 -- -----------------------------------------------------
 SET AUTOCOMMIT=0;
-INSERT INTO `wireless_order_db`.`kitchen` (`restaurant_id`, `alias_id`, `name`, `discount`, `member_discount_1`, `member_discount_2`) VALUES (11, 0, '明档', 1.00, 1.00, 1.00);
+INSERT INTO `wireless_order_db`.`kitchen` (`restaurant_id`, `alias_id`, `name`, `discount`, `member_discount_1`, `member_discount_2`) VALUES (11, 0, '明档', 0.9, 1.00, 1.00);
 INSERT INTO `wireless_order_db`.`kitchen` (`restaurant_id`, `alias_id`, `name`, `discount`, `member_discount_1`, `member_discount_2`) VALUES (11, 1, '烧味', 0.95, 0.9, 0.9);
 INSERT INTO `wireless_order_db`.`kitchen` (`restaurant_id`, `alias_id`, `name`, `discount`, `member_discount_1`, `member_discount_2`) VALUES (11, 2, '海鲜', 1.00, 1.00, 1.00);
 INSERT INTO `wireless_order_db`.`kitchen` (`restaurant_id`, `alias_id`, `name`) VALUES (11, 3, '厨房4');
