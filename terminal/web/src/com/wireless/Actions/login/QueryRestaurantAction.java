@@ -36,9 +36,9 @@ public class QueryRestaurantAction extends Action {
 			/**
 			 * The json restaurant format looks like below
 			 * ["餐厅名称","餐厅信息","电话1","电话2","地址",$(尾数处理),$(自动补打)]
-			 * $(尾数处理) - "1" means "不处理"
-			 * 				 "2" means "小数抹零"
-			 * 				 "3" means "小数四舍五入"
+			 * $(尾数处理) - "0" means "不处理"
+			 * 				 "1" means "小数抹零"
+			 * 				 "2" means "小数四舍五入"
 			 * $(自动补打) - "0" means "关闭自动补打"
 			 * 				 "1" means "开启自动补打"
 			 */
