@@ -52,8 +52,8 @@ public class PayOrderAction extends Action implements PinGen{
 			 * payManner : "1" means "现金"
 			 * 			   "2" means "刷卡"
 			 * 			   "3" means "会员卡"
-			 * 			   "4" means "挂账"
-			 * 			   "5" means "签单"
+			 * 			   "4" means "签单"
+			 * 			   "5" means "挂账"
 			 * cashIncome : the cash that client pay for this order,
 			 * 				this parameter is optional, only takes effect while the pay manner is "现金"
 			 * serviceRate : the service percent rate to this order,
