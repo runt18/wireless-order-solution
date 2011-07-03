@@ -174,6 +174,6 @@ var checkOurListRefresh = function() {
 	// (parseFloat(totalCount)-parseFloat(sPay)).toFixed(2);
 	// // checkOutForm.findById("actualCount").setValue(totalCount);
 
-	moneyCount();
+	moneyCount("radio");
 
 };

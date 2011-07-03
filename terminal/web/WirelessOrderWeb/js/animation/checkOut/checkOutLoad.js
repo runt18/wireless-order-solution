@@ -218,15 +218,11 @@ function checkOutOnLoad() {
 																originalTotalCount = totalCount;
 																document
 																		.getElementById("totalCount").innerHTML = totalCount;
-																document
-																		.getElementById("actualCount").value = "0.00";
+																// document
+																// .getElementById("actualCount").value
+																// = "0.00";
 																document
 																		.getElementById("shouldPay").innerHTML = totalCount;
-																// checkOutForm
-																// .findById(
-																// "actualCount")
-																// .setValue(
-																// totalCount);
 
 																// 4,（尾数处理）
 																// 后台：["餐厅名称","餐厅信息","电话1","电话2","地址",$(尾数处理),$(自动补打)]
@@ -298,14 +294,14 @@ function checkOutOnLoad() {
 																					}
 
 																					// 6,尾数处理
-																					if (restaurantData[0][5] == 2) {
+																					if (restaurantData[0][5] == 1) {
 																						sPay = sPay
 																								.substr(
 																										0,
 																										sPay
 																												.indexOf("."))
 																								+ ".00";
-																					} else if (restaurantData[0][5] == 3) {
+																					} else if (restaurantData[0][5] == 2) {
 																						sPay = parseFloat(
 																								sPay)
 																								.toFixed(
@@ -314,13 +310,8 @@ function checkOutOnLoad() {
 																					}
 																					document
 																							.getElementById("shouldPay").innerHTML = sPay;
-																					// document
-																					// .getElementById("change").innerHTML
-																					// =
-																					// (parseFloat(totalCount)
-																					// -
-																					// parseFloat(sPay))
-																					// .toFixed(2);
+																					document
+																							.getElementById("actualCount").value = sPay;
 																					document
 																							.getElementById("change").innerHTML = "0.00";
 																				} else {
@@ -384,7 +375,7 @@ function checkOutOnLoad() {
 
 };
 
-function moneyCount() {
+function moneyCount(opt) {
 	var shouldPay = document.getElementById("shouldPay").innerHTML;
 	var actualPay = document.getElementById("actualCount").value;
 	var minCost = Request["minCost"];
@@ -405,7 +396,7 @@ function moneyCount() {
 					* (1 + parseFloat(serviceRate) / 100);
 		}
 
-		if (restaurantData[0][5] == 2) {
+		if (restaurantData[0][5] == 1) {
 			if ((shouldPay_out + "").indexOf(".") != -1) {
 				shouldPay_out = (shouldPay_out + "").substr(0,
 						(shouldPay_out + "").indexOf("."))
@@ -413,7 +404,7 @@ function moneyCount() {
 			} else {
 				shouldPay_out = shouldPay_out + ".00";
 			}
-		} else if (restaurantData[0][5] == 3) {
+		} else if (restaurantData[0][5] == 2) {
 			shouldPay_out = parseFloat(shouldPay_out).toFixed(0) + ".00";
 		}
 
@@ -428,5 +419,9 @@ function moneyCount() {
 		document.getElementById("totalCount").innerHTML = totalCount_out;
 		document.getElementById("shouldPay").innerHTML = shouldPay_out;
 		document.getElementById("change").innerHTML = change_out;
+		if (opt == "button") {
+		} else {
+			document.getElementById("actualCount").value = shouldPay_out;
+		}
 	}
 };

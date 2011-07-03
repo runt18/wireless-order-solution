@@ -912,17 +912,10 @@
 				imgHeight : 50,
 				tooltip : "外卖",
 				handler : function(btn) {
-					var tableIndex = -1;
-					for ( var i = 0; i < tableStatusListTS.length; i++) {
-						if (tableStatusListTS[i][0] == selectedTable) {
-							tableIndex = i;
-						}
-					}
 					location.href = "OrderMain.html?tableNbr=0"
 							+ "&personCount=0" + "&tableStat=free"
 							+ "&category=2" + "&tableNbr2=0" + "&pin=" + pin
-							+ "&restaurantID=" + restaurantID + "&minCost="
-							+ tableStatusListTS[tableIndex][5];
+							+ "&restaurantID=" + restaurantID + "&minCost=0.0";
 				}
 			});
 

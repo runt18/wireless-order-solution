@@ -407,14 +407,14 @@ var checkOutForm = new Ext.form.FormPanel({
 				text : "签单",
 				// hidden : true,
 				handler : function() {
-					paySubmit(5);
+					paySubmit(4);
 				}
 			},
 			{
 				text : "挂账",
 				// hidden : true,
 				handler : function() {
-					paySubmit(4);
+					paySubmit(5);
 				}
 			},
 			{
@@ -434,7 +434,7 @@ var checkOutForm = new Ext.form.FormPanel({
 			} ],
 	listeners : {
 		afterlayout : function(thiz) {
-			checkOutGrid.setHeight(thiz.getInnerHeight() - 30);
+			checkOutGrid.setHeight(thiz.getInnerHeight() - gridHeightOffset);
 			thiz.findById("placeHolderCOF1").setWidth(
 					(thiz.getInnerWidth() - 1000) / 2);
 			thiz.findById("placeHolderCOF2").setWidth(
