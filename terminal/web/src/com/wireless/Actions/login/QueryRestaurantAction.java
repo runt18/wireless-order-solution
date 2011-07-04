@@ -44,7 +44,7 @@ public class QueryRestaurantAction extends Action {
 			 */
 			String value = "\"$(name)\",\"$(info)\",\"$(tele_1)\",\"$(tele_2)\",\"$(addr)\",$(price_tail),$(auto_reprint)";
 			value = value.replace("$(name)", restaurant.name);	
-			value = value.replace("$(info)", restaurant.info);	
+			value = value.replace("$(info)", restaurant.info.replace("\n", "<br>"));	
 			value = value.replace("$(tele_1)", restaurant.tele_1);	
 			value = value.replace("$(tele_2)", restaurant.tele_2);	
 			value = value.replace("$(addr)", restaurant.addr);	
