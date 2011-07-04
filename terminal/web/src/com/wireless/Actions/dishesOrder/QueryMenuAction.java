@@ -147,22 +147,26 @@ public class QueryMenuAction extends Action {
 			return "";
 		}else{
 			StringBuffer value = new StringBuffer();
+			String jsonTaste = "[$(taste_id),\"$(preference)\",\"$(unit)\"]";
+			jsonTaste = jsonTaste.replace("$(taste_id)", "0");
+			jsonTaste = jsonTaste.replace("$(preference)", "无口味");
+			jsonTaste = jsonTaste.replace("$(unit)", Util.CURRENCY_SIGN + "0.0");
+			value.append(jsonTaste);
+			
 			for(int i = 0; i < tastes.length; i++){				
 				/**
 				 * The json format to each taste item looks like below.
 				 * [口味编号,"口味名称","￥口味单价"]
 				 */
-				String jsonTaste = "[$(taste_id),\"$(preference)\",\"$(unit)\"]";
-				jsonTaste = jsonTaste.replace("$(taste_id)", new Short(tastes[i].alias_id).toString());
+				// the string is separated by comma
+				value.append("，");
+				jsonTaste = "[$(taste_id),\"$(preference)\",\"$(unit)\"]";
+				jsonTaste = jsonTaste.replace("$(taste_id)", Short.toString((tastes[i].alias_id)));
 				jsonTaste = jsonTaste.replace("$(preference)", tastes[i].preference);
 				jsonTaste = jsonTaste.replace("$(unit)", Util.CURRENCY_SIGN + Util.float2String(tastes[i].getPrice()));
 				
 				// put each json taste info to the value
 				value.append(jsonTaste);
-				// the string is separated by comma
-				if (i != tastes.length - 1) {
-					value.append("，");
-				}
 			}
 			return value.toString();
 		}
