@@ -150,7 +150,7 @@ public class QueryMenuAction extends Action {
 			String jsonTaste = "[$(taste_id),\"$(preference)\",\"$(unit)\"]";
 			jsonTaste = jsonTaste.replace("$(taste_id)", "0");
 			jsonTaste = jsonTaste.replace("$(preference)", "无口味");
-			jsonTaste = jsonTaste.replace("$(unit)", Util.CURRENCY_SIGN + "0.0");
+			jsonTaste = jsonTaste.replace("$(unit)", Util.CURRENCY_SIGN + "0.00");
 			value.append(jsonTaste);
 			
 			for(int i = 0; i < tastes.length; i++){				
