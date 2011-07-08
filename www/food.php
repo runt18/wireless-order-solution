@@ -34,16 +34,8 @@ if($foodCode != null)
 	$restaurant_id = $_SESSION["restaurant_id"];
 	
 	if($foodId == "" || $foodId == null)//如果是新增
-	{
-		
-		$id = $restaurant_id;
-		for($i=0;$i < 32;$i++)
-		{
-			$id *= 2;
-		}
-		$foodId = $id + $foodCode;//4 << 32 | $foodCode;
-		
-		$sql = "SELECT * FROM food WHERE id=$foodId";
+	{						
+		$sql = "SELECT * FROM food WHERE alias_id=$foodCode AND restaurant_id=$restaurant_id";
 		/*echo "<script>alert('$sql');</script>";*/
 		$rs = $db ->GetOne($sql);
 		if($rs)
@@ -52,7 +44,7 @@ if($foodCode != null)
 		}
 		else
 		{			
-			$sql = "INSERT INTO food(id,alias_id,`name`,unit_price,restaurant_id,kitchen,status,pinyin) VALUES($foodId,$foodCode,'$foodName',$foodPrice,$restaurant_id,$kitchen,$status,'$pinyin')";
+			$sql = "INSERT INTO food(alias_id,`name`,unit_price,restaurant_id,kitchen,status,pinyin) VALUES($foodCode,'$foodName',$foodPrice,$restaurant_id,$kitchen,$status,'$pinyin')";
 			/*echo "<script>alert('$sql');</script>";*/
 			if($db->Execute($sql))
 			{
