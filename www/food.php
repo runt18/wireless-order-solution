@@ -16,6 +16,20 @@ include("hasLogin.php");
 </head>
 <body>
 <?php
+include("conn.php"); 
+mysql_query("SET NAMES utf8"); 
+$kitchens = "";
+$sql = "SELECT alias_id, name FROM kitchen WHERE restaurant_id=" . $_SESSION["restaurant_id"];
+$rs = $db->GetAll($sql);
+foreach ($rs as $row){	
+	if($kitchens  != "")
+	{
+		$kitchens .= "@";
+	}
+	$kitchens .= ($row["alias_id"] . "|" . $row["name"]);
+}
+	?>
+<?php
 include("changePassword.php"); 
 ?>
 <?PHP
@@ -34,25 +48,17 @@ if($foodCode != null)
 	$restaurant_id = $_SESSION["restaurant_id"];
 	
 	if($foodId == "" || $foodId == null)//如果是新增
-	{
-		
-		$id = $restaurant_id;
-		for($i=0;$i < 32;$i++)
-		{
-			$id *= 2;
-		}
-		$foodId = $id + $foodCode;//4 << 32 | $foodCode;
-		
-		$sql = "SELECT * FROM food WHERE id=$foodId";
+	{						
+		$sql = "SELECT * FROM food WHERE alias_id=$foodCode AND restaurant_id=$restaurant_id";
 		/*echo "<script>alert('$sql');</script>";*/
 		$rs = $db ->GetOne($sql);
 		if($rs)
 		{
-			echo "<script>alert('编号已存在！');editFood('','$foodCode','$foodName','$foodPrice','$kitchen',$status,'$pinyin');</script>";
+			echo "<script>alert('编号已存在！');editFood('','$foodCode','$foodName','$foodPrice','$kitchen','$kitchens',$status,'$pinyin');</script>";
 		}
 		else
 		{			
-			$sql = "INSERT INTO food(id,alias_id,`name`,unit_price,restaurant_id,kitchen,status,pinyin) VALUES($foodId,$foodCode,'$foodName',$foodPrice,$restaurant_id,$kitchen,$status,'$pinyin')";
+			$sql = "INSERT INTO food(alias_id,`name`,unit_price,restaurant_id,kitchen,status,pinyin) VALUES($foodCode,'$foodName',$foodPrice,$restaurant_id,$kitchen,$status,'$pinyin')";
 			/*echo "<script>alert('$sql');</script>";*/
 			if($db->Execute($sql))
 			{
@@ -94,20 +100,7 @@ if($deleteId != null)
 //echo $sql;
 ?>
 <h1>
-<?php
-include("conn.php"); 
-mysql_query("SET NAMES utf8"); 
-$kitchens = "";
-$sql = "SELECT alias_id, name FROM kitchen WHERE restaurant_id=" . $_SESSION["restaurant_id"];
-$rs = $db->GetAll($sql);
-foreach ($rs as $row){	
-	if($kitchens  != "")
-	{
-		$kitchens .= "@";
-	}
-	$kitchens .= ($row["alias_id"] . "|" . $row["name"]);
-}
-	?>
+
 <span class="action-span"><a href="#" onclick="editFood('','','','','0','<?php echo $kitchens; ?>','','')">添加新菜</a></span><span class="action-span"><a href="#" onclick="showFoodRanked()">点菜统计</a></span>
 <span class="action-span1">e点通会员中心</span><span id="search_id" class="action-span2">&nbsp;- 菜单管理 </span>
 <div style="clear:both"></div>

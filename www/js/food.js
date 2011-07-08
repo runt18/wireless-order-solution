@@ -63,7 +63,7 @@ function editFood(fId, fCode, fName, fPrice, kitchen, kitchens, status,pinyin) {
 	                '</div>' +
 	                '<form name="foodForm" action="food.php"  method="post" onkeydown="foodKeyDown()">' +
 	                      '<input type="hidden" name="foodId" value="' + fId + '" />' +
-	                      '<input type="hidden" name="statusValue" />' +
+	                      '<input type="hidden" id="statusValue" name="statusValue" />' +
 	                      '<div class="add_foot_Content" style="height:220px;">' +
 	                        '<div class="pop_Content">' +
 	                            '<div class="pop_Content1">编号：' + foodCode + '</div>' +
@@ -120,7 +120,7 @@ function clearNoNum(obj) {
 
 function submitFoodData() {
     if (validateFoodData()) {
-        var statusValue = document.getElementById("statusValue");
+        var statusValue = document.getElementById("statusValue");       
         var value = 0;
         if (document.getElementById("specialOffer").checked) {
             value += 1;

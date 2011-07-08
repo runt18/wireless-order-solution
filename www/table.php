@@ -103,7 +103,7 @@ if($editType == "deleteTable")
 }
 ?>
 <h1>
-<span class="action-span"><a href="#" onclick="editTable('','','','table.php')">添加餐桌</a></span> 
+<span class="action-span"><a href="#" onclick="editTable('','','','table.php','')">添加餐桌</a></span> 
 <span class="action-span"><a href="#" onclick="javascript:window.location.href = 'table_list.php'">列表显示</a></span>  
 <span class="action-span1">e点通会员中心</span>
 <span id="search_id" class="action-span2">&nbsp;- 餐台信息</span>&nbsp;&nbsp;&nbsp;&nbsp;
