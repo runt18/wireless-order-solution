@@ -143,33 +143,30 @@ public class QueryMenuAction extends Action {
 	 * @return
 	 */
 	private String toJson(Taste[] tastes){
-		if(tastes.length == 0){
-			return "";
-		}else{
-			StringBuffer value = new StringBuffer();
-			String jsonTaste = "[$(taste_id),\"$(preference)\",\"$(unit)\"]";
-			jsonTaste = jsonTaste.replace("$(taste_id)", "0");
-			jsonTaste = jsonTaste.replace("$(preference)", "无口味");
-			jsonTaste = jsonTaste.replace("$(unit)", Util.CURRENCY_SIGN + "0.00");
-			value.append(jsonTaste);
+		StringBuffer value = new StringBuffer();
+		String jsonTaste = "[$(taste_id),\"$(preference)\",\"$(unit)\"]";
+		jsonTaste = jsonTaste.replace("$(taste_id)", "0");
+		jsonTaste = jsonTaste.replace("$(preference)", "无口味");
+		jsonTaste = jsonTaste.replace("$(unit)", Util.CURRENCY_SIGN + "0.00");
+		value.append(jsonTaste);	
 			
-			for(int i = 0; i < tastes.length; i++){				
-				/**
-				 * The json format to each taste item looks like below.
-				 * [口味编号,"口味名称","￥口味单价"]
-				 */
-				// the string is separated by comma
-				value.append("，");
-				jsonTaste = "[$(taste_id),\"$(preference)\",\"$(unit)\"]";
-				jsonTaste = jsonTaste.replace("$(taste_id)", Short.toString((tastes[i].alias_id)));
-				jsonTaste = jsonTaste.replace("$(preference)", tastes[i].preference);
-				jsonTaste = jsonTaste.replace("$(unit)", Util.CURRENCY_SIGN + Util.float2String(tastes[i].getPrice()));
-				
-				// put each json taste info to the value
-				value.append(jsonTaste);
-			}
-			return value.toString();
-		}
+		for (int i = 0; i < tastes.length; i++) {
+			/**
+			 * The json format to each taste item looks like below.
+			 * [口味编号,"口味名称","￥口味单价"]
+			 */
+			// the string is separated by comma
+			value.append("，");
+			jsonTaste = "[$(taste_id),\"$(preference)\",\"$(unit)\"]";
+			jsonTaste = jsonTaste.replace("$(taste_id)", Short.toString((tastes[i].alias_id)));
+			jsonTaste = jsonTaste.replace("$(preference)", tastes[i].preference);
+			jsonTaste = jsonTaste.replace("$(unit)", Util.CURRENCY_SIGN	+ Util.float2String(tastes[i].getPrice()));
+
+			// put each json taste info to the value
+			value.append(jsonTaste);
+		}			
+
+		return value.toString();
 	}
 	
 	/**
