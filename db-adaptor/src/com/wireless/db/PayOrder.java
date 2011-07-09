@@ -193,9 +193,9 @@ public class PayOrder {
 			
 		for(int i = 0; i < orderInfo.foods.length; i++){
 			/**
-			 * The special food does NOT discount
+			 * Both the special food and gifted food does NOT discount
 			 */
-			if(orderInfo.foods[i].isSpecial()){
+			if(orderInfo.foods[i].isSpecial() || orderInfo.foods[i].isGift()){
 				orderInfo.foods[i].discount = 100;
 			}else{
 				//get the discount to each food according to the payment and discount type
