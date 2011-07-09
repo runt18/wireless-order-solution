@@ -41,7 +41,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food` (
   `unit_price` DECIMAL(7,2) UNSIGNED NOT NULL DEFAULT 0.0 COMMENT 'the unit price of the food' ,
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'indicates the food belong to which restaurant' ,
   `kitchen` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the kitchen number which the food belong to. the maximum value (255) means the food does not belong to any kitchen.' ,
-  `status` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates the status to this food, the value is the combination of values below.\n特价菜 ：0x01\n推荐菜 ：0x02\n停售　 ：0x04' ,
+  `status` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates the status to this food, the value is the combination of values below.\n特价菜 ：0x01\n推荐菜 ：0x02\n停售　 ：0x04\n赠送     ：0x08' ,
   `img1` BINARY NULL DEFAULT NULL ,
   `img2` BINARY NULL DEFAULT NULL ,
   `img3` BINARY NULL DEFAULT NULL ,
@@ -108,7 +108,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food` (
   `order_count` DECIMAL(5,2) NOT NULL DEFAULT 0 COMMENT 'the count that the waiter ordered. the count can be positive or negative.' ,
   `unit_price` DECIMAL(7,2) UNSIGNED NOT NULL DEFAULT 0 ,
   `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to the ordered food' ,
-  `food_status` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates the status to this food, the value is the combination of values below.\n特价菜 ：0x01\n推荐菜 ：0x02\n停售　 ：0x04' ,
+  `food_status` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates the status to this food, the value is the combination of values below.\n特价菜 ：0x01\n推荐菜 ：0x02\n停售　 ：0x04\n赠送     ：0x08' ,
   `taste` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the taste preference to the ordered food' ,
   `taste_price` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the price to taste preference' ,
   `taste_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the taste alias id' ,
@@ -141,6 +141,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`terminal` (
   `model_name` VARCHAR(45) NULL COMMENT 'the model name to the phone' ,
   `owner_name` VARCHAR(45) NOT NULL COMMENT 'the owner name of this terminal' ,
   `expire_date` DATE NULL DEFAULT NULL COMMENT 'the expired date to the terminal,\nNULL means never expired,' ,
+  `gift_quota` DECIMAL(7,2) NULL DEFAULT NULL COMMENT 'the gift quota to this terminal, \"NULL\" means no limit' ,
   `entry_date` DATETIME NULL COMMENT 'the date to add the terminal' ,
   `idle_date` DATETIME NULL COMMENT 'the date to make the phone idle' ,
   `work_date` DATETIME NULL COMMENT 'the date to make the phone in use' ,
@@ -408,7 +409,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food_history` (
   `order_date` DATETIME NOT NULL DEFAULT 19000101 ,
   `unit_price` DECIMAL(7,2) UNSIGNED NOT NULL DEFAULT 0 ,
   `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to the ordered food' ,
-  `food_status` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates the status to this food, the value is the combination of values below.\n特价菜 ：0x01\n推荐菜 ：0x02\n停售　 ：0x04' ,
+  `food_status` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates the status to this food, the value is the combination of values below.\n特价菜 ：0x01\n推荐菜 ：0x02\n停售　 ：0x04\n赠送     ：0x08' ,
   `taste` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the taste preference to the ordered food' ,
   `taste_price` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the price to taste preference' ,
   `taste_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the taste alias id' ,
@@ -526,10 +527,35 @@ DEFAULT CHARACTER SET = utf8
 COMMENT = 'the setting to restaurant';
 
 
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`shift`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`shift` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`shift` (
+  `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to each shift record' ,
+  `restaurant_id` INT UNSIGNED NOT NULL ,
+  `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name of the operator to shift' ,
+  `on_duty` DATETIME NULL DEFAULT NULL COMMENT 'the datetime to be on duty' ,
+  `off_duty` DATETIME NULL DEFAULT NULL COMMENT 'the datetime to be off duty' ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_shift_restaurant1` (`restaurant_id` ASC) ,
+  CONSTRAINT `fk_shift_restaurant1`
+    FOREIGN KEY (`restaurant_id` )
+    REFERENCES `wireless_order_db`.`restaurant` (`id` )
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COMMENT = 'the shift history to each restaurant';
+
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+
 
 
 

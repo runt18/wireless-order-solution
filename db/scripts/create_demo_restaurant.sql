@@ -25,6 +25,10 @@ DELETE FROM wireless_order_db.kitchen WHERE restaurant_id=11;
 DELETE FROM wireless_order_db.member_charge WHERE member_id IN (SELECT id FROM wireless_order_db.member WHERE restaurant_id=11);
 DELETE FROM wireless_order_db.member WHERE restaurant_id=11;
 
+DELETE FROM wireless_order_db.setting WHERE restaurant_id=11;
+
+DELETE FROM wireless_order_db.shift WHERE restaurant_id=11;
+
 DELETE FROM wireless_order_db.restaurant WHERE id=11;
 
 -- -----------------------------------------------------
@@ -32,7 +36,7 @@ DELETE FROM wireless_order_db.restaurant WHERE id=11;
 -- -----------------------------------------------------
 SET AUTOCOMMIT=1;
 INSERT INTO `wireless_order_db`.`restaurant` (`id`, `pwd`, `account`, `restaurant_name`, `record_alive`) VALUES ('11', MD5('demo@123'), 'demo', '演示餐厅', '0');
-INSERT INTO `wireless_order_db`.`terminal` (`pin`, `restaurant_id`, `model_id`, `model_name`, `owner_name`) VALUES (1, 11, 0xFE, 'Admin', '管理员');
+INSERT INTO `wireless_order_db`.`terminal` (`pin`, `restaurant_id`, `model_id`, `model_name`, `owner_name`, `gift_quota`) VALUES (1, 11, 0xFE, 'Admin', '管理员', 300);
 INSERT INTO `wireless_order_db`.`setting` (`restaurant_id`) VALUES (11);
 -- -----------------------------------------------------
 -- Insert test taste perference bound to the demo restaurant
@@ -205,8 +209,8 @@ INSERT INTO `wireless_order_db`.`food_material` (`food_id`, `material_id`, `cons
 INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`, `pinyin`,`status`) VALUES (3, 0x44E, '白切鸡', 21.00, 11, 0, 'bqj', 4);
 INSERT INTO `wireless_order_db`.`food_material` (`food_id`, `material_id`, `consumption`) VALUES (3, 2, 1);
 INSERT INTO `wireless_order_db`.`food_material` (`food_id`, `material_id`, `consumption`) VALUES (3, 5, 0.5);
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`, `pinyin`) VALUES (4, 0x44F, '盐水菜心', 10.67, 11, 0, 'yscx');
-INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`, `pinyin`) VALUES (5, 0x450, '湛江鸡', 26, 11, 0, 'zjj');
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`, `pinyin`, `status`) VALUES (4, 0x44F, '盐水菜心', 10.67, 11, 0, 'yscx', 8);
+INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`, `pinyin`, `status`) VALUES (5, 0x450, '湛江鸡', 26, 11, 0, 'zjj', 8);
 INSERT INTO `wireless_order_db`.`food_material` (`food_id`, `material_id`, `consumption`) VALUES (5, 2, 1);
 INSERT INTO `wireless_order_db`.`food_material` (`food_id`, `material_id`, `consumption`) VALUES (5, 5, 0.5);
 INSERT INTO `wireless_order_db`.`food` (`id`, `alias_id`, `name`, `unit_price`, `restaurant_id`, `kitchen`, `pinyin`) VALUES (6, 0x451, '东波肉', 16, 11, 0, 'dpr');
@@ -503,8 +507,18 @@ SET AUTOCOMMIT=0;
 INSERT INTO `wireless_order_db`.`terminal` (`pin`, `restaurant_id`, `model_id`, `model_name`, `owner_name`) VALUES (1, 11, 0xFF, 'Staff', '张宁远');
 INSERT INTO `wireless_order_db`.`staff` (`restaurant_id`, `terminal_id`, `alias_id`, `name`, `pwd`) VALUES (11, LAST_INSERT_ID(), 1000, '张宁远', md5('1'));
 
-INSERT INTO `wireless_order_db`.`terminal` (`pin`, `restaurant_id`, `model_id`, `model_name`, `owner_name`) VALUES (2, 11, 0xFF, 'Staff', '李颖宜');
+INSERT INTO `wireless_order_db`.`terminal` (`pin`, `restaurant_id`, `model_id`, `model_name`, `owner_name`, `gift_quota`) VALUES (2, 11, 0xFF, 'Staff', '李颖宜', 100);
 INSERT INTO `wireless_order_db`.`staff` (`restaurant_id`, `terminal_id`, `alias_id`, `name`, `pwd`) VALUES (11, LAST_INSERT_ID(), 1001, '李颖宜', md5('2'));
+
+COMMIT;
+SET AUTOCOMMIT=1;
+
+-- -----------------------------------------------------
+-- Insert shift record
+-- -----------------------------------------------------
+SET AUTOCOMMIT=0;
+
+INSERT INTO `wireless_order_db`.`shift` (`restaurant_id`, `name`, `on_duty`, `off_duty`) VALUES (11, '李颖宜', 20110501000000, NOW());
 
 COMMIT;
 SET AUTOCOMMIT=1;
