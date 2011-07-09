@@ -62,11 +62,11 @@ public class PayOrderScreen extends MainScreen
 		});
 		
 		HorizontalFieldManager hfm = new HorizontalFieldManager(Field.USE_ALL_WIDTH);
-		_customNum = new LabelField("人数：" + new Integer(_bill.custom_num).toString());
+		_customNum = new LabelField("人数：" + Integer.toString(_bill.custom_num));
 		hfm.add(_customNum);
 		
 		if(Util.float2Int(bill.getMinimumCost()) != 0){
-			LabelField minimumCost = new LabelField("最低消:￥" + Util.float2String2(bill.getMinimumCost()), LabelField.USE_ALL_WIDTH | DrawStyle.RIGHT);
+			LabelField minimumCost = new LabelField("最低消：￥" + Util.float2String2(bill.getMinimumCost()), LabelField.USE_ALL_WIDTH | DrawStyle.RIGHT);
 			hfm.add(minimumCost);
 		}
 		
@@ -91,9 +91,12 @@ public class PayOrderScreen extends MainScreen
 		vfm.add(_orderListField);
 		vfm.add(new SeparatorField());
 		add(vfm);
-		HorizontalFieldManager hfm1 = new HorizontalFieldManager(Manager.FIELD_RIGHT);
-		hfm1.add(new LabelField("合计：" + Util.CURRENCY_SIGN + Util.float2String(_bill.totalPrice2())));
-		add(hfm1);
+
+		Float giftMoney = _bill.totalPrice3();
+		if(Util.float2Int(giftMoney) != 0){
+			add(new LabelField("赠送：" + Util.CURRENCY_SIGN + Util.float2String(giftMoney), LabelField.USE_ALL_WIDTH | DrawStyle.RIGHT));
+		}		
+		add(new LabelField("应收：" + Util.CURRENCY_SIGN + Util.float2String(_bill.totalPrice2()), LabelField.USE_ALL_WIDTH | DrawStyle.RIGHT));
 		
 //		HorizontalFieldManager hfm2 = new HorizontalFieldManager(Field.FIELD_RIGHT);
 //		_cashIncome = new EditField("实收：￥", 
