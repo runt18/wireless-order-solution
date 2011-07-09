@@ -62,9 +62,9 @@ public class QueryOrderAction extends Action {
 				for (int i = 0; i < order.foods.length; i++) {
 					/**
 					 * The json to order food looks like below.
-					 * ["菜名",菜名编号,厨房编号,"口味",口味编号,数量,单价,是否特价,是否推荐,是否停售]
+					 * ["菜名",菜名编号,厨房编号,"口味",口味编号,数量,单价,是否特价,是否推荐,是否停售,是否赠送]
 					 */
-					String jsonOrderFood = "[\"$(food)\",$(food_id),$(kitchen),\"$(taste)\",$(taste_id),$(count),\"$(unit)\",$(special),$(recommend),$(soldout)]";
+					String jsonOrderFood = "[\"$(food)\",$(food_id),$(kitchen),\"$(taste)\",$(taste_id),$(count),\"$(unit)\",$(special),$(recommend),$(soldout),$(gift)]";
 					jsonOrderFood = jsonOrderFood.replace("$(food)", order.foods[i].name);
 					jsonOrderFood = jsonOrderFood.replace("$(food_id)", new Integer(order.foods[i].alias_id).toString());
 					jsonOrderFood = jsonOrderFood.replace("$(kitchen)", new Short(order.foods[i].kitchen).toString());
@@ -79,6 +79,7 @@ public class QueryOrderAction extends Action {
 					jsonOrderFood = jsonOrderFood.replace("$(special)", order.foods[i].isSpecial() ? "true" : "false");
 					jsonOrderFood = jsonOrderFood.replace("$(recommend)", order.foods[i].isRecommend() ? "true" : "false");
 					jsonOrderFood = jsonOrderFood.replace("$(soldout)", order.foods[i].isSellOut() ? "true" : "false");
+					jsonOrderFood = jsonOrderFood.replace("$(gift)", order.foods[i].isGift() ? "true" : "false");
 
 					// pub each json order food info to the value
 					value.append(jsonOrderFood);
