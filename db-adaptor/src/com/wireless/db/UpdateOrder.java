@@ -265,9 +265,16 @@ public class UpdateOrder {
 			
 			dbCon.stmt.clearBatch();
 			
+			float giftAmount = 0;
+			
 			//insert the extra order food records
 			for(int i = 0; i < extraFoods.size(); i++){
 
+				//add the gift amount if extra foods
+				if(extraFoods.get(i).isGift()){
+					giftAmount += extraFoods.get(i).getPrice2().floatValue();
+				}
+				
 				sql = "INSERT INTO `" + Params.dbName + "`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, `discount`, `taste_id`, `taste_price`, `taste`, `kitchen`, `waiter`, `order_date`) VALUES (" +
 						orderID + ", " + extraFoods.get(i).alias_id + ", " + 
 						extraFoods.get(i).getCount() + ", " + 
@@ -286,6 +293,11 @@ public class UpdateOrder {
 			//insert the canceled order food records 
 			for(int i = 0; i < cancelledFoods.size(); i++){
 
+				//minus the gift amount if canceled foods
+				if(cancelledFoods.get(i).isGift()){
+					giftAmount -= cancelledFoods.get(i).getPrice2().floatValue();
+				}
+				
 				sql = "INSERT INTO `" + Params.dbName + "`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, `discount`, `taste_id`, `taste_price`, `taste`, `kitchen`, `waiter`, `order_date`) VALUES (" +
 						orderID + ", " + cancelledFoods.get(i).alias_id + ", " + 
 						"-" + cancelledFoods.get(i).getCount() + ", " + 
@@ -300,7 +312,23 @@ public class UpdateOrder {
 						term.owner + "', NOW()" + ")";
 				dbCon.stmt.addBatch(sql);			
 			}
-
+			
+			/**
+			 * Update the gift amount if not reach the quota.
+			 * Otherwise throw a business exception.
+			 */
+			if(term.getGiftQuota() > 0){
+				if((giftAmount + term.getGiftAmount()) > term.getGiftQuota()){
+					throw new BusinessException("The gift amount exceeds the quota.", ErrorCode.EXCEED_GIFT_QUOTA);
+					
+				}else{
+					sql = "UPDATE " + Params.dbName + ".terminal SET" +
+					  " gift_amount = gift_amount + " + giftAmount +
+					  " WHERE pin=" + "0x" + Integer.toHexString(term.pin) +
+					  " AND restaurant_id=" + term.restaurant_id;
+					dbCon.stmt.executeUpdate(sql);
+				}
+			}
 
 			/**
 			 * Update the related info to this order

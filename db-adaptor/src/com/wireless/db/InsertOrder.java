@@ -37,7 +37,7 @@ public class InsertOrder {
 			Terminal term = VerifyPin.exec(dbCon, pin, model);
 			
 			/**
-			 * Create a temporary table in the case of "å¹¶å�°" and "å¤–å�–". 
+			 * Create a temporary table in the case of "并台" and "外卖". 
 			 * The order would be attached with this new table.
 			 */
 			if(orderToInsert.category == Order.CATE_JOIN_TABLE){
@@ -94,22 +94,7 @@ public class InsertOrder {
 					}
 					dbCon.rs.close();
 						
-					/**
-					 * The special food does NOT discount
-					 */
-//					if(orderToInsert.foods[i].isSpecial()){
-//						orderToInsert.foods[i].discount = 100;
-//					}else{
-//						//get the associated foods' discount
-//						sql = "SELECT discount FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + 
-//							  table.restaurant_id +
-//							  " AND alias_id=" + orderToInsert.foods[i].kitchen;		
-//						dbCon.rs = dbCon.stmt.executeQuery(sql);
-//						if(dbCon.rs.next()){
-//							orderToInsert.foods[i].discount = (byte)(dbCon.rs.getFloat("discount") * 100);
-//						}						
-//					}
-						
+		
 					//get the taste preference according to the taste id,
 					//only if the food has the taste preference
 					if(orderToInsert.foods[i].taste.alias_id != Taste.NO_TASTE){
@@ -123,6 +108,27 @@ public class InsertOrder {
 						}				
 					}
 				}
+				
+				/**
+				 * Update the gift amount if not reach the quota.
+				 * Otherwise throw a business exception.
+				 */
+				float giftAmount = orderToInsert.totalPrice3().floatValue();
+				if(term.getGiftQuota() > 0){
+					if((giftAmount + term.getGiftAmount()) > term.getGiftQuota()){
+						throw new BusinessException("The gift amount exceeds the quota.", ErrorCode.EXCEED_GIFT_QUOTA);
+						
+					}else{
+						sql = "UPDATE " + Params.dbName + ".terminal SET" +
+							  " gift_amount = gift_amount + " + giftAmount +
+							  " WHERE pin=" + "0x" + Integer.toHexString(term.pin) +
+							  " AND restaurant_id=" + term.restaurant_id;
+						dbCon.stmt.executeUpdate(sql);
+					}
+				}
+				
+
+				
 				//insert to order table
 				sql = "INSERT INTO `" + Params.dbName + 
 						"`.`order` (`id`, `restaurant_id`, `category`, `table_id`, `table_name`, `table2_id`, `table2_name`, `terminal_model`, `terminal_pin`, `order_date`, `custom_num`, `waiter`) VALUES (NULL, " + 

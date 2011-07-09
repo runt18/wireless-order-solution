@@ -49,7 +49,7 @@ public class VerifyPin {
 	 * @throws SQLException throws if fail to execute the SQL statement
 	 */
 	public static Terminal exec(DBCon dbCon, int pin, short model) throws BusinessException, SQLException{
-		String sql = "SELECT restaurant_id, expire_date, owner_name, model_name FROM " +  
+		String sql = "SELECT restaurant_id, expire_date, owner_name, model_name, gift_quota, gift_amount FROM " +  
 	     			Params.dbName + ".terminal WHERE pin=" + "0x" + Integer.toHexString(pin) +
 	     			" AND model_id=" + model;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -59,6 +59,11 @@ public class VerifyPin {
 			terminal.expireDate = dbCon.rs.getDate("expire_date");
 			terminal.owner = dbCon.rs.getString("owner_name");
 			terminal.modelName = dbCon.rs.getString("model_name");
+			float quota = dbCon.rs.getFloat("gift_quota");
+			if(quota > 0){
+				terminal.setGiftQuota(quota);
+			}
+			terminal.setGiftAmount(dbCon.rs.getFloat("gift_amount"));
 			terminal.modelID = model;
 			terminal.pin = pin;
 			return terminal;
