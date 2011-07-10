@@ -126,7 +126,8 @@ var checkOurListRefresh = function() {
 				priceDisplay, // 实价
 				checkOutData[i][5],// 特
 				checkOutData[i][6],// 荐
-				checkOutData[i][7] // 停
+				checkOutData[i][7], // 停
+				checkOutData[i][8] // 送
 		]);
 	}
 
@@ -147,20 +148,32 @@ var checkOurListRefresh = function() {
 			checkOutDataDisplay[i][0] = checkOutDataDisplay[i][0]
 					+ "<img src='../images/icon_tip_ting.gif'></img>";
 		}
+		if (checkOutDataDisplay[i][9] == "true") {
+			// 送
+			checkOutDataDisplay[i][0] = checkOutDataDisplay[i][0]
+					+ "<img src='../images/icon_tip_ting.gif'></img>";
+		}
 	}
 
 	checkOutStore.reload();
 
 	// 算总价
 	var totalCount = 0;
+	var forFreeCount = 0;
 	for ( var i = 0; i < checkOutDataDisplay.length; i++) {
 		var singleCount = parseFloat(checkOutDataDisplay[i][5].substr(1));
-		totalCount = totalCount + singleCount;
+		if (checkOutDataDisplay[i][9] == "true") {
+			forFreeCount = forFreeCount + singleCount;
+		} else {
+			totalCount = totalCount + singleCount;
+		}
 	}
 	totalCount = totalCount.toFixed(2);
+	forFreeCount = forFreeCount.toFixed(2);
 	originalTotalCount = totalCount;
 
 	document.getElementById("totalCount").innerHTML = totalCount;
+	document.getElementById("forFree").innerHTML = forFreeCount;
 	// //document.getElementById("actualCount").value = totalCount;
 	// document.getElementById("shouldPay").innerHTML = totalCount;
 	// var sPay = document.getElementById("shouldPay").innerHTML;

@@ -20,11 +20,11 @@ function checkOutOnLoad() {
 	}
 
 	// 2,get the ordered dishes and discount
-	// checkOutData [ 厨房编号,"菜名", "口味", 数量, "单价",特,荐,停 ]
-	// 后台已点菜式 ["菜名",菜名编号,厨房编号,"口味",口味编号,数量,单价,特,荐,停]
+	// checkOutData [ 厨房编号,"菜名", "口味", 数量, "单价",特,荐,停,送 ]
+	// 后台已点菜式 ["菜名",菜名编号,厨房编号,"口味",口味编号,数量,单价,特,荐,停,送]
 	// discountData [厨房编号,一般折扣1,一般折扣2,一般折扣3,会员折扣1,会员折扣2,会员折扣3]
 	// 后台折扣率 [厨房编号,"厨房名称",一般折扣1,一般折扣2,一般折扣3,会员折扣1,会员折扣2,会员折扣3]
-	// checkOutDataDisplay ["菜名", "口味", 数量, "单价" ,"折扣率","实价",特,荐,停]
+	// checkOutDataDisplay ["菜名", "口味", 数量, "单价" ,"折扣率","实价",特,荐,停,送]
 	Ext.Ajax
 			.request({
 				url : "../QueryOrder.do",
@@ -50,7 +50,8 @@ function checkOutOnLoad() {
 							orderInfo[6].substr(1, orderInfo[6].length - 2), // 单价
 							orderInfo[7],// 特
 							orderInfo[8],// 荐
-							orderInfo[9] // 停
+							orderInfo[9], // 停
+							orderInfo[10] // 送
 							]);
 						}
 
@@ -180,7 +181,8 @@ function checkOutOnLoad() {
 																					priceDisplay, // 实价
 																					checkOutData[i][5],// 特
 																					checkOutData[i][6],// 荐
-																					checkOutData[i][7] // 停
+																					checkOutData[i][7], // 停
+																					checkOutData[i][8] // 送
 																			]);
 																}
 																// 根据“特荐停”重新写菜名
@@ -200,6 +202,11 @@ function checkOutOnLoad() {
 																		checkOutDataDisplay[i][0] = checkOutDataDisplay[i][0]
 																				+ "<img src='../images/icon_tip_ting.gif'></img>";
 																	}
+																	if (checkOutDataDisplay[i][9] == "true") {
+																		// 送
+																		checkOutDataDisplay[i][0] = checkOutDataDisplay[i][0]
+																				+ "<img src='../images/icon_tip_ting.gif'></img>";
+																	}
 																}
 
 																checkOutStore
@@ -207,17 +214,27 @@ function checkOutOnLoad() {
 
 																// 4,算总价
 																var totalCount = 0;
+																var forFreeCount = 0;
 																for ( var i = 0; i < checkOutDataDisplay.length; i++) {
 																	var singleCount = parseFloat(checkOutDataDisplay[i][5]
 																			.substr(1));
-																	totalCount = totalCount
-																			+ singleCount;
+																	if (checkOutDataDisplay[i][9] == "true") {
+																		forFreeCount = forFreeCount
+																				+ singleCount;
+																	} else {
+																		totalCount = totalCount
+																				+ singleCount;
+																	}
 																}
 																totalCount = totalCount
+																		.toFixed(2);
+																forFreeCount = forFreeCount
 																		.toFixed(2);
 																originalTotalCount = totalCount;
 																document
 																		.getElementById("totalCount").innerHTML = totalCount;
+																document
+																		.getElementById("forFree").innerHTML = forFreeCount;
 																// document
 																// .getElementById("actualCount").value
 																// = "0.00";
@@ -387,7 +404,7 @@ function moneyCount(opt) {
 	var change_out = "0.00";
 
 	if (restaurantData[0] != undefined) {
-
+		// “应收”加上服务费
 		if (parseFloat(totalCount) < parseFloat(minCost)) {
 			shouldPay_out = parseFloat(minCost)
 					* (1 + parseFloat(serviceRate) / 100);
@@ -396,6 +413,7 @@ function moneyCount(opt) {
 					* (1 + parseFloat(serviceRate) / 100);
 		}
 
+		// “应收”尾数处理
 		if (restaurantData[0][5] == 1) {
 			if ((shouldPay_out + "").indexOf(".") != -1) {
 				shouldPay_out = (shouldPay_out + "").substr(0,
@@ -406,11 +424,15 @@ function moneyCount(opt) {
 			}
 		} else if (restaurantData[0][5] == 2) {
 			shouldPay_out = parseFloat(shouldPay_out).toFixed(0) + ".00";
+		}else{
+			shouldPay_out = parseFloat(shouldPay_out).toFixed(2);
 		}
-
+		
+		// “合计”加上服务费
 		totalCount_out = (parseFloat(originalTotalCount) * (1 + parseFloat(serviceRate) / 100))
 				.toFixed(2);
 
+		// “找零”计算
 		if (actualPay != "" && actualPay != "0.00") {
 			change_out = (parseFloat(actualPay) - parseFloat(shouldPay_out))
 					.toFixed(2);

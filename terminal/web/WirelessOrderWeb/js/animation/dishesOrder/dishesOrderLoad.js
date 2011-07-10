@@ -123,10 +123,10 @@ function tableStuLoad() {
 };
 
 // 以点菜式数据
-// 格式：[菜名，口味，数量，单价，操作，实价，菜名编号，厨房编号，口味编号,特,荐,停]
+// 格式：[菜名，口味，数量，单价，操作，实价，菜名编号，厨房编号，口味编号,特,荐,停,送]
 // orderedData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "", "￥56.2" ]);
 // orderedData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "", "￥56.2" ]);
-// 后台：[菜名,菜名编号,厨房编号,口味,口味编号,数量,单价,特,荐,停]
+// 后台：[菜名,菜名编号,厨房编号,口味,口味编号,数量,单价,特,荐,停,送]
 function orderedDishesOnLoad() {
 	var Request = new URLParaQuery();
 	// 外卖不查询已点菜式
@@ -165,7 +165,8 @@ function orderedDishesOnLoad() {
 											orderInfo[4], // 口味编号
 											orderInfo[7],// 特
 											orderInfo[8],// 荐
-											orderInfo[9] // 停
+											orderInfo[9], // 停
+											orderInfo[10] // 送
 									]);
 								}
 
@@ -183,6 +184,11 @@ function orderedDishesOnLoad() {
 									}
 									if (orderedData[i][11] == "true") {
 										// 停
+										orderedData[i][0] = orderedData[i][0]
+												+ "<img src='../images/icon_tip_ting.gif'></img>";
+									}
+									if (orderedData[i][12] == "true") {
+										// 送
 										orderedData[i][0] = orderedData[i][0]
 												+ "<img src='../images/icon_tip_ting.gif'></img>";
 									}
@@ -259,8 +265,8 @@ function orderedMenuOnLoad() {
 						for ( var i = 0; i < menuList.length; i++) {
 							var menuInfo = menuList[i].substr(1,
 									menuList[i].length - 2).split(",");
-							// 格式：[菜名，菜名编号，菜名拼音，单价，厨房编号,特,荐,停]
-							// 后台格式：[厨房编号,"菜品名称",菜品编号,"菜品拼音","￥菜品单价",特,荐,停]
+							// 格式：[菜名，菜名编号，菜名拼音，单价，厨房编号,特,荐,停,送]
+							// 后台格式：[厨房编号,"菜品名称",菜品编号,"菜品拼音","￥菜品单价",特,荐,停,送]
 							// 前后台格式有差异，厨房编号前台存储放在最后一位
 							dishesDisplayData.push([
 									menuInfo[1].substr(1,
@@ -273,7 +279,8 @@ function orderedMenuOnLoad() {
 									menuInfo[0], // 厨房编号
 									menuInfo[5], // 特
 									menuInfo[6], // 荐
-									menuInfo[7] // 停
+									menuInfo[7], // 停
+									menuInfo[8] // 送
 							]);
 						}
 						// 根据“特荐停”重新写菜名
@@ -290,6 +297,11 @@ function orderedMenuOnLoad() {
 							}
 							if (dishesDisplayData[i][7] == "true") {
 								// 停
+								dishesDisplayData[i][0] = dishesDisplayData[i][0]
+										+ "<img src='../images/icon_tip_ting.gif'></img>";
+							}
+							if (dishesDisplayData[i][8] == "true") {
+								// 送
 								dishesDisplayData[i][0] = dishesDisplayData[i][0]
 										+ "<img src='../images/icon_tip_ting.gif'></img>";
 							}
