@@ -141,7 +141,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`terminal` (
   `model_name` VARCHAR(45) NULL COMMENT 'the model name to the phone' ,
   `owner_name` VARCHAR(45) NOT NULL COMMENT 'the owner name of this terminal' ,
   `expire_date` DATE NULL DEFAULT NULL COMMENT 'the expired date to the terminal,\nNULL means never expired,' ,
-  `gift_quota` DECIMAL(7,2) NULL DEFAULT NULL COMMENT 'the gift quota to this terminal, \"NULL\" means no limit' ,
+  `gift_amount` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the gift amount to this terminal' ,
+  `gift_quota` DECIMAL(7,2) NULL DEFAULT -1 COMMENT 'the gift quota to this terminal, \"NULL\" means no limit' ,
   `entry_date` DATETIME NULL COMMENT 'the date to add the terminal' ,
   `idle_date` DATETIME NULL COMMENT 'the date to make the phone idle' ,
   `work_date` DATETIME NULL COMMENT 'the date to make the phone in use' ,
@@ -554,7 +555,6 @@ COMMENT = 'the shift history to each restaurant';
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
 
 
 
