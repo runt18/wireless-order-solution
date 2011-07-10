@@ -116,6 +116,9 @@ class SubmitChangePopup extends PopupScreen{
 		}else if(errCode == ErrorCode.TABLE_BUSY){
 			return tableID + "号台已经下单。";
 			
+		}else if(errCode == ErrorCode.EXCEED_GIFT_QUOTA){
+			return "赠送的菜品已超出赠送额度，请与餐厅负责人确认。";
+			
 		}else{
 			return (tableID + "号台改单失败，请重新提交改单。");
 		}
