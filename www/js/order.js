@@ -441,9 +441,9 @@ function showOrderStat(statType, dateFrom, dateTo,viewType) {
     showMessageBox(content, 950, 350);
 }
 
-function viewCancelStat() {
-    var editType = "viewCancel";
-    var title = "退菜汇总 - 请选择日期区间";
+function viewSpecialStat(targetTitle,target) {
+    var editType = "viewSpecialStat";
+    var title = targetTitle + " - 请选择日期区间";
   
     var content = ' <div class="add_foot">' +
                         '<div class="title" style="width:430px">' +
@@ -451,7 +451,9 @@ function viewCancelStat() {
 	                        '<div class="title_right" style="float:left;width:35px;"></div>' +
 	                    '</div>' +
 	                    '<form id="searchForm" name="searchForm" action="order_history.php"  method="post" onkeydown="searchOrderKeyDown()">' +
-	                      '<input type="hidden" name="editType" value="' + editType + '" />' +	                     
+	                      '<input type="hidden" name="editType" value="' + editType + '" />' +	         
+	                      '<input type="hidden" name="targetTitle" value="' + targetTitle + '" />' +	       
+	                      '<input type="hidden" name="target" value="' + target + '" />' +	                   
 	                      '<div class="add_foot_Content" style="height:130px;text-align:center;width:413px">' +
 	                        '<div class="pop_Content">' +	                         
 	                           '<div class="pop_Content1" style="padding-left:0px;text-align:center">日期：<input type="text" id="dateFrom" name="dateFrom" style="width:136px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;&nbsp;至&nbsp;&nbsp;<input type="text" id="dateTo" name="dateTo" style="width:width:136px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;</div>' +
@@ -466,10 +468,8 @@ function viewCancelStat() {
     document.getElementById("dateFrom").focus();
 }
 
-function showCancelStat(dateFrom, dateTo) {
-    var title = "";
-    var viewTypeName = "";      
-    title = viewTypeName + "退菜汇总";
+function showSpecialStat(dateFrom, dateTo, targetTitle,target) {    
+    var title = targetTitle;
     if (dateFrom != "" && dateTo != "") {
         title += "（" + dateFrom + "~" + dateTo + "）";
     }
@@ -487,7 +487,7 @@ function showCancelStat(dateFrom, dateTo) {
 	                        '<div class="title_right"  style="width:35px;float:left"></div>' +
 	                    '</div>' +
 	                      '<div class="add_foot_Content" style="height:370px;text-align:center;width:99%">' +
-	                            '<iframe src="viewCancelStat.php?dateFrom=' + dateFrom + '&dateTo=' + dateTo + '" scrolling="no" style="width:100%;height:100%;" />' +
+	                            '<iframe src="' + target + '?dateFrom=' + dateFrom + '&dateTo=' + dateTo + '" scrolling="no" style="width:100%;height:100%;" />' +
 	                        '</div>' +
 	                '</div>';
     showMessageBox(content, 950, 350);
