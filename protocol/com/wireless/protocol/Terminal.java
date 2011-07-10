@@ -22,4 +22,30 @@ public class Terminal {
 	//the expired date to this terminal
 	//this value can be null, means never expire
 	public java.util.Date expireDate = null;
+	//the gift quota represented as an integer
+	int giftQuota = -1;
+	
+	public void setGiftQuota(Float quota){
+		giftQuota = Util.float2Int(quota);
+	}
+	
+	/**
+	 * Get the gift quota.
+	 * @return null if no quota limit, otherwise an Float object
+	 */
+	public Float getGiftQuota(){
+		return giftQuota < 0 ? new Float(giftQuota) : Util.int2Float(giftQuota);
+	}
+	
+	//the gift amount represented as an integer
+	int giftAmount = 0;
+	
+	public void setGiftAmount(Float amount){
+		giftAmount = Util.float2Int(amount);
+	}
+	
+	public Float getGiftAmount(){
+		return Util.int2Float(giftAmount);
+	}
+	
 }

@@ -14,4 +14,5 @@ public final class ErrorCode {
 	public final static byte TABLE_BUSY = 10;
 	public final static byte MEMBER_NOT_EXIST = 11;
 	public final static byte ORDER_NOT_EXIST = 12;
+	public final static byte EXCEED_GIFT_QUOTA = 13;
 }
