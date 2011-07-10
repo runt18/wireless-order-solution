@@ -3,8 +3,10 @@ package com.wireless.db;
 import java.sql.SQLException;
 
 import com.wireless.exception.BusinessException;
+import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.Table;
+import com.wireless.protocol.Terminal;
 
 public class CancelOrder {
 	/**
@@ -25,12 +27,38 @@ public class CancelOrder {
 		try{
 			dbCon.connect();
 			
+			Terminal term = VerifyPin.exec(dbCon, pin, model);
+			
 			Table table = QueryTable.exec(dbCon, pin, model, tableID);
 			
 			int orderID = Util.getUnPaidOrderID(dbCon, table);
 			
+			String sql;
+			
+			/**
+			 * Calculate the gift amount and remove it from the total gift amount if the gift quota exist.
+			 */
+			if(term.getGiftQuota() > 0){
+				float giftAmount = 0;
+				sql = "SELECT unit_price, order_count, food_status FROM " + Params.dbName +
+					  ".order_food WHERE order_id=" + orderID;
+				dbCon.rs = dbCon.stmt.executeQuery(sql);
+				while(dbCon.rs.next()){
+					if((dbCon.rs.getShort("food_status") & Food.GIFT) != 0){
+						giftAmount += dbCon.rs.getFloat("unit_price") * dbCon.rs.getFloat("order_count");
+					}
+				}
+				dbCon.rs.close();
+				
+				sql = "UPDATE " + Params.dbName + ".terminal SET" +
+				  	  " gift_amount = gift_amount - " + giftAmount +
+				  	  " WHERE pin=" + "0x" + Integer.toHexString(term.pin) +
+				  	  " AND restaurant_id=" + term.restaurant_id;
+				dbCon.stmt.executeUpdate(sql);
+			}
+			
 			boolean isDelTable = false;
-			String sql = "SELECT category FROM " + Params.dbName + ".order WHERE id=" + orderID;
+			sql = "SELECT category FROM " + Params.dbName + ".order WHERE id=" + orderID;
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			if(dbCon.rs.next()){
 				short category = dbCon.rs.getShort("category");

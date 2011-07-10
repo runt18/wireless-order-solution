@@ -272,7 +272,7 @@ public class UpdateOrder {
 
 				//add the gift amount if extra foods
 				if(extraFoods.get(i).isGift()){
-					giftAmount += extraFoods.get(i).getPrice2().floatValue();
+					giftAmount += extraFoods.get(i).getPrice2() * extraFoods.get(i).getCount();
 				}
 				
 				sql = "INSERT INTO `" + Params.dbName + "`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, `discount`, `taste_id`, `taste_price`, `taste`, `kitchen`, `waiter`, `order_date`) VALUES (" +
@@ -295,7 +295,7 @@ public class UpdateOrder {
 
 				//minus the gift amount if canceled foods
 				if(cancelledFoods.get(i).isGift()){
-					giftAmount -= cancelledFoods.get(i).getPrice2().floatValue();
+					giftAmount -= cancelledFoods.get(i).getPrice2() * cancelledFoods.get(i).getCount();
 				}
 				
 				sql = "INSERT INTO `" + Params.dbName + "`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, `discount`, `taste_id`, `taste_price`, `taste`, `kitchen`, `waiter`, `order_date`) VALUES (" +
