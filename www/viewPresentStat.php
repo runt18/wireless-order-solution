@@ -52,8 +52,8 @@ echo "退菜汇总";
 include("conn.php"); 		 		
 
 
-$sql = "SELECT a.*,b.order_date,k.name AS kitchen_name,format((((`a`.`unit_price` * `a`.`discount`) + `a`.`taste_price`) * `a`.`order_count`),2) AS total_price FROM order_food_history a INNER JOIN order_history b ON a.order_id = b.id LEFT JOIN kitchen k ON a.kitchen=k.alias_id AND k.restaurant_id =".
-	$_SESSION["restaurant_id"] . " WHERE a.food_status = 8 AND b.restaurant_id=" . $_SESSION["restaurant_id"];
+$sql = "SELECT a.*,b.order_date,k.name AS kitchen_name,format((((`a`.`unit_price` * `a`.`discount`) + `a`.`taste_price`) * `a`.`order_count` * (1+b.service_rate)),2) AS total_price FROM order_food_history a INNER JOIN order_history b ON a.order_id = b.id LEFT JOIN kitchen k ON a.kitchen=k.alias_id AND k.restaurant_id =".
+	$_SESSION["restaurant_id"] . " WHERE a.food_status & 8 <> 0 AND b.restaurant_id=" . $_SESSION["restaurant_id"];
 
 
 $dateFrom = $_REQUEST["dateFrom"];

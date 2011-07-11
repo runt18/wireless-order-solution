@@ -434,7 +434,7 @@ function showOrderStat(statType, dateFrom, dateTo,viewType) {
 	                        '<div class="title_left" style="width:914px"><font id="dynamicTitle" style="font-size: 16px;font-weight: normal;color: #FFF;margin-left: 15px;line-height: 30px;text-align: left;" >' + title + '</font></div>' +
 	                        '<div class="title_right"  style="width:35px;float:left"></div>' +
 	                    '</div>' +
-	                      '<div class="add_foot_Content" style="height:370px;text-align:center;width:99%">' +
+	                      '<div class="add_foot_Content" style="height:400px;text-align:center;width:99%">' +
 	                            '<iframe src="orderStat.php?statType=' + statType + '&dateFrom=' + dateFrom + '&dateTo=' + dateTo + '&viewType=' + viewType + '" scrolling="no" style="width:100%;height:100%;" />' +
 	                        '</div>' +
 	                '</div>';

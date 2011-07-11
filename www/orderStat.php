@@ -49,15 +49,17 @@ else{
 <table cellpModifying="0" cellspacing="0" border="0" id="table" class="sortable">
 		<thead>
 			<tr style="height: 25px;">
-				<th><h3>编&nbsp;号</h3></th>
-				<th><h3>日&nbsp;期</h3></th>
+				<th><h3>编号</h3></th>
+				<th><h3>&nbsp;日&nbsp;期&nbsp;&nbsp;</h3></th>
 				<th><h3>帐单数</h3></th>
 				<th><h3>现金（￥）</h3></th>
 				<th><h3>刷卡（￥）</h3></th>
 				<th><h3>会员卡（￥）</h3></th>
 				<th><h3>挂账（￥）</h3></th>
 				<th><h3>签单（￥）</h3></th>
-				<th><h3>合计（￥）</h3></th>	
+				<th><h3>折扣额（￥）</h3></th>	
+				<th><h3>赠送额（￥）</h3></th>	
+				<th><h3>金额（￥）</h3></th>	
 				<th><h3>实收（￥）</h3></th>				
 			</tr>
 		</thead>
@@ -91,11 +93,13 @@ if($statType == "daily")
 				Sum(CASE type_value WHEN 3 THEN t_price ELSE 0.00 END) AS '会员卡',
 				Sum(CASE type_value WHEN 4 THEN t_price ELSE 0.00 END) AS '挂账',
 				Sum(CASE type_value WHEN 5 THEN t_price ELSE 0.00 END) AS '签单',
-				SUM(t_price) AS '合计',		
+				SUM(t_price_discount) AS '折扣额',	
+				SUM(t_price_present) AS '赠送额',	
+				SUM(t_price) AS '金额',		
 				SUM(t_price_2) AS '实收'	
 				FROM
 				(SELECT DATE(order_date) AS o_date, o.type_value,
-				COUNT(id) AS o_num, SUM(total_price) AS t_price, SUM(total_price_2) AS t_price_2 
+				COUNT(id) AS o_num, SUM(total_price) AS t_price, SUM(total_price_2) AS t_price_2, SUM(total_price_discount) AS t_price_discount,SUM(total_price_present) AS t_price_present  
 				FROM `order_history_view` as o WHERE is_paid <> 0 AND restaurant_id=" . $_SESSION["restaurant_id"];
 	//}
 	
@@ -111,7 +115,7 @@ else
 				Sum(CASE type_value WHEN 3 THEN t_price_2 ELSE 0.00 END) AS '会员卡',
 				Sum(CASE type_value WHEN 4 THEN t_price_2 ELSE 0.00 END) AS '挂账',
 				Sum(CASE type_value WHEN 5 THEN t_price_2 ELSE 0.00 END) AS '签单',
-				SUM(t_price_2) AS '合计'			
+				SUM(t_price_2) AS '金额'			
 				FROM
 				(SELECT DATE_FORMAT(order_date,'%Y-%m') AS o_date, o.type_value,
 				COUNT(id) AS o_num, SUM(total_price) AS t_price, SUM(total_price_2) AS t_price_2
@@ -126,11 +130,13 @@ else
 				Sum(CASE type_value WHEN 3 THEN t_price ELSE 0.00 END) AS '会员卡',
 				Sum(CASE type_value WHEN 4 THEN t_price ELSE 0.00 END) AS '挂账',
 				Sum(CASE type_value WHEN 5 THEN t_price ELSE 0.00 END) AS '签单',
-				SUM(t_price) AS '合计',
+				SUM(t_price_discount) AS '折扣额',	
+				SUM(t_price_present) AS '赠送额',	
+				SUM(t_price) AS '金额',
 				SUM(t_price_2) AS '实收'
 				FROM
 				(SELECT DATE_FORMAT(order_date,'%Y-%m') AS o_date, o.type_value,
-				COUNT(id) AS o_num, SUM(total_price) AS t_price, SUM(total_price_2) AS t_price_2
+				COUNT(id) AS o_num, SUM(total_price) AS t_price, SUM(total_price_2) AS t_price_2, SUM(total_price_discount) AS t_price_discount,SUM(total_price_present) AS t_price_present  
 				FROM `order_history_view` as o WHERE is_paid <> 0 AND restaurant_id=" . $_SESSION["restaurant_id"];
 	//}
 }
@@ -165,6 +171,8 @@ $total_4=0;
 $total_5=0;
 $total_all=0;
 $total_2_all=0;
+$total_discount_all=0;
+$total_present_all=0;
 mysql_query("SET NAMES utf8"); 
 // mysql_query("set names 'utf-8'") ;		
 $rs = $db->GetAll($sql);
@@ -175,8 +183,10 @@ foreach ($rs as $row){
 	$total_3+=$row["会员卡"];
 	$total_4+=$row["挂账"];
 	$total_5+=$row["签单"];
-	$total_all+=$row["合计"];	
+	$total_all+=$row["金额"];	
 	$total_2_all+=$row["实收"];
+	$total_discount_all+=$row["折扣额"];
+	$total_present_all+=$row["赠送额"];
 	echo "<tr>";
 	echo "<td>" .$bh ."</td>";
 	echo "<td>" .$row["o_date"] ."</td>";
@@ -186,7 +196,9 @@ foreach ($rs as $row){
 	echo "<td>" .$row["会员卡"] ."</td>";
 	echo "<td>" .$row["挂账"] ."</td>";
 	echo "<td>" .$row["签单"] ."</td>";
-	echo "<td>" .$row["合计"] ."</td>";	
+	echo "<td>" .$row["折扣额"] ."</td>";	
+	echo "<td>" .$row["赠送额"] ."</td>";	
+	echo "<td>" .$row["金额"] ."</td>";	
 	echo "<td>" .$row["实收"] ."</td>";
 	echo "</tr>";
 }	
@@ -207,6 +219,8 @@ echo "<td>".number_format($total_2,2)."</td>";
 echo "<td>".number_format($total_3,2)."</td>";
 echo "<td>".number_format($total_4,2)."</td>";
 echo "<td>".number_format($total_5,2)."</td>";
+echo "<td>".number_format($total_discount_all,2)."</td>";	
+echo "<td>".number_format($total_present_all,2)."</td>";	
 echo "<td>".number_format($total_all,2)."</td>";	
 echo "<td>".number_format($total_2_all,2)."</td>";								
 				?>	
