@@ -42,9 +42,10 @@ function editFood(fId, fCode, fName, fPrice, kitchen, kitchens, status,pinyin) {
         foodCode = '<input type="hidden" id="foodCode" name="foodCode" value="' + fCode + '"/>' + fCode + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
     }
 
-    specialOfferStatus = "";
-    recommendStatus = "";
-    pausedStatus = "";
+    var specialOfferStatus = "";
+    var recommendStatus = "";
+    var pausedStatus = "";
+    var presentStatus = "";
 
     if ((status & 1) != 0) {
         specialOfferStatus = 'checked = "checked"';
@@ -54,6 +55,9 @@ function editFood(fId, fCode, fName, fPrice, kitchen, kitchens, status,pinyin) {
     }
     if ((status & 4) != 0) {
         pausedStatus = 'checked = "checked"';
+    }
+    if ((status & 8) != 0) {
+        presentStatus = 'checked = "checked"';
     }
 
     var content = ' <div class="add_foot">' +
@@ -79,6 +83,7 @@ function editFood(fId, fCode, fName, fPrice, kitchen, kitchens, status,pinyin) {
 								'<div class="pop_Content1">' +
 								'<input id="specialOffer" name="specialOffer" type="checkbox" ' + specialOfferStatus + '>特价</input>' +
 								'<input id="recommend" name="recommend" type="checkbox" ' + recommendStatus + '>推荐</input>' +
+								'<input id="present" name="present" type="checkbox" ' + presentStatus + '>赠送</input>' +
 								'<input id="paused" name="paused" type="checkbox" ' + pausedStatus + '>停售</input>' +
 								'</div>' +
 	                        '</div>' +
@@ -130,6 +135,9 @@ function submitFoodData() {
         }
         if (document.getElementById("paused").checked) {
             value += 4;
+        }
+        if (document.getElementById("present").checked) {
+            value += 8;
         }
         statusValue.value = value;
         document.foodForm.submit();
