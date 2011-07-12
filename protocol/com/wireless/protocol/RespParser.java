@@ -116,8 +116,10 @@ public class RespParser {
 		 * pin[6] - same as request
 		 * len[2] -  length of the <Body>
 		 * <Body>
-		 * food_amount[2] : <Food1> : <Food2>... : 
-		 * taste_amount : <Taste1> : <Taste2> ... :
+		 * food_amount[2] : <Food1> : <Food2>... 
+		 * taste_amount[2] : <Taste1> : <Taste2> ... 
+		 * style_amount[2] : <Style1> : <Style2>... 
+		 * spec_amount[2] : <Spec1> : <Spec2>... 
 		 * kitchen_amount : <Kitchen1> : <Kitchen2>...
 		 * food_amount[2] - 2-byte indicating the amount of the foods listed in the menu
 		 * <Food>
@@ -132,13 +134,25 @@ public class RespParser {
 		 * len2 - the length of the pinyin
 		 * pinyin[len2] - the pinyin whose length equals "len2"
 		 * 
-		 * taste_amount - 1-byte indicates the amount of the taste preference
+		 * taste_amount[2] - 2-byte indicates the amount of the taste preference
 		 * <Taste>
-		 * taste_id : price[3] : len : preference[len]
-		 * taste_id - 1-byte indicating the alias id to this taste preference
+		 * taste_id[2] : category : calc : price[3] : rate[2] : len : preference[len]
+		 * taste_id[2] - 2-byte indicating the alias id to this taste preference
+		 * category - the category to this taste
+		 * calc - the calculate type to this taste
+		 * price[3] - 3-byte indicating the price to this taste
+		 * rate[2] - 2-byte indicating the rate to this taste
 		 * len - 1-byte indicating the length of the preference
 		 * preference[len] - the string to preference whose length is "len"
+		 *
+		 * style_amount[2] - 2-byte indicates the amount of the taste style
+		 * <Style>
+		 * The same as <Taste>
 		 * 
+		 * spec_amount[2] - 2-byte indicates the specifications of the taste style
+		 * <Spec>
+		 * The same as <Taste>
+		 
 		 * <Kitchen>
 		 * kitchen_id : dist_1 : dist_2 : dist_3 : mdist_1 : mdist_2 : mdist_3 : len : kname[len]
 		 * kitchen_id : the id to this kitchen
@@ -199,41 +213,33 @@ public class RespParser {
 				foods[i] = food;
 			}
 			
+
 			//get the amount of taste preferences
-			int nTastes = response.body[index] & 0x000000FF;
-			index++;
+			int nCount = (response.body[index] & 0x000000FF) | ((response.body[index + 1] & 0x000000FF) << 8);
+			index += 2;
 			//allocate the memory for taste preferences
-			Taste[] tastes = new Taste[nTastes + 1];
-			/**
-			 * We put the no taste preference to the first element
-			 */
-			tastes[0] = new Taste(Taste.NO_TASTE, Taste.NO_PREFERENCE);
-			//get each taste preference's information
-			for(int i = 1; i < tastes.length; i++){
-				
-				//get the alias id to taste preference
-				short alias_id = (short)(response.body[index] & 0x00FF);
-				
-				//get the price to taste preference
-				int price = ((response.body[index + 1] & 0x000000FF) |
-							((response.body[index + 2] & 0x000000FF) << 8) |
-							((response.body[index + 3] & 0x000000FF) << 16)) & 0x00FFFFFF ;
-				
-				//get the length to taste preference string
-				int length = response.body[index + 4];
-				
-				String preference = null;
-				//get the taste preference string
-				try{
-					preference = new String(response.body, index + 5, length, "UTF-16BE");
-				}catch(UnsupportedEncodingException e){}
-				
-				index += 5 + length;
-				
-				//add the taste
-				tastes[i] = new Taste(alias_id, preference, price);
-			}
-			
+			Taste[] tastes = new Taste[nCount + 1];
+			//put the no taste preference to the first element
+			tastes[0] = new Taste();
+			//get the taste preferences
+			index = genTaste(response, index, tastes, 1, tastes.length);			
+
+			//get the amount of taste styles
+			nCount = (response.body[index] & 0x000000FF) | ((response.body[index + 1] & 0x000000FF) << 8);
+			index += 2;
+			//allocate the memory for taste preferences
+			Taste[] styles = new Taste[nCount];
+			//get the taste styles
+			index = genTaste(response, index, styles, 0, styles.length);
+
+			//get the amount of taste specifications
+			nCount = (response.body[index] & 0x000000FF) | ((response.body[index + 1] & 0x000000FF) << 8);
+			index += 2;
+			//allocate the memory for taste preferences
+			Taste[] specs = new Taste[nCount];
+			//get the taste specifications
+			index = genTaste(response, index, specs, 0, specs.length);
+					
 			//get the amount of kitchens
 			int nKitchens = response.body[index] & 0x000000FF;
 			index++;
@@ -270,11 +276,59 @@ public class RespParser {
 										  mdist_1, mdist_2, mdist_3);
 			}
 			
-			return new FoodMenu(foods, tastes, kitchens);
+			return new FoodMenu(foods, tastes, styles, specs, kitchens);
 			
 		}else{
-			return new FoodMenu(new Food[0], new Taste[0], new Kitchen[0]);
+			return new FoodMenu(new Food[0], new Taste[0], new Taste[0], new Taste[0], new Kitchen[0]);
 		}
+	}
+	
+	private static int genTaste(ProtocolPackage response, int offset, Taste[] tastes, int begPos, int endPos){
+		//get each taste preference's information
+		for(int i = begPos; i < endPos; i++){
+			
+			//get the alias id to taste preference
+			int alias_id = response.body[offset] & 0x000000FF |
+						   ((response.body[offset + 1] & 0x000000FF) << 8);
+			
+			//get the category to taste preference
+			short category = response.body[offset + 2];
+			
+			//get the calculate type to taste preference
+			short calcType = response.body[offset + 3];
+			
+			//get the price to taste preference
+			int price = ((response.body[offset + 4] & 0x000000FF) |
+						((response.body[offset + 5] & 0x000000FF) << 8) |
+						((response.body[offset + 6] & 0x000000FF) << 16)) & 0x00FFFFFF ;
+			
+			//get the rate to taste preference
+			int rate = response.body[offset + 7] & 0x000000FF | 
+					   ((response.body[offset + 8] & 0x000000FF) << 8);
+			
+			//get the length to taste preference string
+			int length = response.body[offset + 9];
+			
+			String preference = null;
+			//get the taste preference string
+			try{
+				preference = new String(response.body, offset + 10, length, "UTF-16BE");
+			}catch(UnsupportedEncodingException e){}
+			
+			/**
+			 * each taste preference consist of the stuff below.
+			 * toast_id(2-byte) + category(1-byte) + calc(1-byte) + 
+			 * price(3-byte) + rate(2-byte) + length of the preference(1-byte) + preference description(len-byte)
+			 */
+			offset += 2 + 1 + 1 + 3 + 2 + 1 + length;
+			
+			//add the taste
+			tastes[i] = new Taste(alias_id, preference, category, calcType, 
+							      Util.int2Float(rate),
+							      Util.int2Float(price));
+		}
+		
+		return offset;
 	}
 	
 	/**
@@ -349,4 +403,6 @@ public class RespParser {
 		}
 		return restaurant;
 	}
+	
+
 }
