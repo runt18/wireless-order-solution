@@ -151,7 +151,7 @@ var checkOurListRefresh = function() {
 		if (checkOutDataDisplay[i][9] == "true") {
 			// 送
 			checkOutDataDisplay[i][0] = checkOutDataDisplay[i][0]
-					+ "<img src='../images/icon_tip_ting.gif'></img>";
+					+ "<img src='../images/forFree.png'></img>";
 		}
 	}
 

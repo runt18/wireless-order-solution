@@ -190,7 +190,7 @@ function orderedDishesOnLoad() {
 									if (orderedData[i][12] == "true") {
 										// 送
 										orderedData[i][0] = orderedData[i][0]
-												+ "<img src='../images/icon_tip_ting.gif'></img>";
+												+ "<img src='../images/forFree.png'></img>";
 									}
 								}
 
@@ -303,7 +303,7 @@ function orderedMenuOnLoad() {
 							if (dishesDisplayData[i][8] == "true") {
 								// 送
 								dishesDisplayData[i][0] = dishesDisplayData[i][0]
-										+ "<img src='../images/icon_tip_ting.gif'></img>";
+										+ "<img src='../images/forFree.png'></img>";
 							}
 						}
 						for ( var i = 0; i < dishesDisplayData.length; i++) {
