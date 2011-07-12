@@ -35,7 +35,9 @@ public class QueryMenu {
 			Terminal term = VerifyPin.exec(dbCon, pin, model);
 			
 			return new FoodMenu(queryFoods(dbCon, term.restaurant_id), 
-							    queryTastes(dbCon, term.restaurant_id),
+							    queryTastes(dbCon, term.restaurant_id, Taste.CATE_TASTE),
+							    queryTastes(dbCon, term.restaurant_id, Taste.CATE_STYLE),
+							    queryTastes(dbCon, term.restaurant_id, Taste.CATE_SPEC),
 							    queryKitchens(dbCon, term.restaurant_id));
 			
 		}finally{
@@ -86,7 +88,7 @@ public class QueryMenu {
 		try {
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, pin, model);
-			return queryTastes(dbCon, term.restaurant_id);
+			return queryTastes(dbCon, term.restaurant_id, Taste.CATE_TASTE);
 
 		} finally {
 			dbCon.disconnect();
@@ -161,18 +163,38 @@ public class QueryMenu {
 		return kitchens.toArray(new Kitchen[kitchens.size()]);
 	}
 	
-	private static Taste[] queryTastes(DBCon dbCon, int restaurantID) throws SQLException{
+	/**
+	 * Query the specific taste information.
+	 * Note that the database should be connected before invoking this method.
+	 * @param dbCon 
+	 * 			the database connection
+	 * @param restaurantID 
+	 * 			the restaurant id
+	 * @param category 
+	 * 			the category of taste to query, one the values below.<br>
+	 * 	 	    - Taste.CATE_TASTE
+	 *          - Taste.CATE_STYLE
+	 *          - Taste.CATE_SPEC
+	 * @return the taste information
+	 * @throws SQLException 
+	 * 			throws if fail to execute any SQL statement
+	 */
+	private static Taste[] queryTastes(DBCon dbCon, int restaurantID, short category) throws SQLException{
 		//Get the taste preferences to this restaurant sort by alias id in ascend order.
 		//The lower alias id, the more commonly this preference used.
 		//Put the most commonly used taste preference in first position 
-		String sql = "SELECT alias_id, preference, price FROM " + Params.dbName + ".taste WHERE restaurant_id=" + 
+		String sql = "SELECT alias_id, preference, price, category, rate, calc FROM " + Params.dbName + ".taste WHERE restaurant_id=" + 
 					 restaurantID + 
+					 " AND category=" + category +
 					 " ORDER BY alias_id";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		ArrayList<Taste> tastes = new ArrayList<Taste>();
 		while(dbCon.rs.next()){
 			Taste taste = new Taste(dbCon.rs.getShort("alias_id"), 
 									dbCon.rs.getString("preference"),
+									dbCon.rs.getShort("category"),
+									dbCon.rs.getShort("calc"),
+									new Float(dbCon.rs.getFloat("rate")),
 									new Float(dbCon.rs.getFloat("price")));
 			tastes.add(taste);
 		}
