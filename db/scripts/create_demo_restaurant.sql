@@ -46,6 +46,11 @@ SET AUTOCOMMIT=0;
 INSERT INTO `wireless_order_db`.`taste` (`restaurant_id`, `alias_id`, `preference`, `price`) VALUES (11, 1, '加辣', 2.5);
 INSERT INTO `wireless_order_db`.`taste` (`restaurant_id`, `alias_id`, `preference`, `price`) VALUES (11, 2, '少盐', 0);
 INSERT INTO `wireless_order_db`.`taste` (`restaurant_id`, `alias_id`, `preference`, `price`) VALUES (11, 3, '少辣', 5.0);
+INSERT INTO `wireless_order_db`.`taste` (`restaurant_id`, `alias_id`, `preference`, `price`, `category`, `calc`) VALUES (11, 4, '打包', 5.0, 1, 0);
+INSERT INTO `wireless_order_db`.`taste` (`restaurant_id`, `alias_id`, `preference`, `price`, `category`, `calc`) VALUES (11, 5, '免葱', 5.0, 1, 0);
+INSERT INTO `wireless_order_db`.`taste` (`restaurant_id`, `alias_id`, `preference`, `rate`, `category`, `calc`) VALUES (11, 6, '例牌', 0, 2, 1); 
+INSERT INTO `wireless_order_db`.`taste` (`restaurant_id`, `alias_id`, `preference`, `rate`, `category`, `calc`) VALUES (11, 7, '中牌', 0.2, 2, 1);
+INSERT INTO `wireless_order_db`.`taste` (`restaurant_id`, `alias_id`, `preference`, `rate`, `category`, `calc`) VALUES (11, 8, '大牌', 0.5, 2, 1);
 COMMIT;
 -- SELECT * FROM terminal;
 
