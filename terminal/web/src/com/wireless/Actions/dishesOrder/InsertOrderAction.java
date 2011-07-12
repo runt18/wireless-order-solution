@@ -134,6 +134,9 @@ public class InsertOrderAction extends Action implements PinGen {
 				}else if(resp.header.reserved == ErrorCode.PRINT_FAIL){
 					jsonResp = jsonResp.replace("$(value)", orderToInsert.table_id + "号餐台" + orderType + "成功，但未能成功打印，请立刻补打下单并与相关人员确认");
 					
+				}else if(resp.header.reserved == ErrorCode.EXCEED_GIFT_QUOTA){
+					jsonResp = jsonResp.replace("$(value)", "赠送菜品金额已超过赠送额度，请与餐厅负责人确认");
+					
 				}else{
 					jsonResp = jsonResp.replace("$(value)", orderToInsert.table_id + "号餐台" + orderType + "失败，请重新确认");
 				}
