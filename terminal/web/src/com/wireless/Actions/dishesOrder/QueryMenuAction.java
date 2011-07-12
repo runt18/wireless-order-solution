@@ -159,7 +159,7 @@ public class QueryMenuAction extends Action {
 			// the string is separated by comma
 			value.append("，");
 			jsonTaste = "[$(taste_id),\"$(preference)\",\"$(unit)\"]";
-			jsonTaste = jsonTaste.replace("$(taste_id)", Short.toString((tastes[i].alias_id)));
+			jsonTaste = jsonTaste.replace("$(taste_id)", Integer.toString((tastes[i].alias_id)));
 			jsonTaste = jsonTaste.replace("$(preference)", tastes[i].preference);
 			jsonTaste = jsonTaste.replace("$(unit)", Util.CURRENCY_SIGN	+ Util.float2String(tastes[i].getPrice()));
 

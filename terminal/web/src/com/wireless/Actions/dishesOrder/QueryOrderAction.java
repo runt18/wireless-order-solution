@@ -73,7 +73,7 @@ public class QueryOrderAction extends Action {
 					}else{
 						jsonOrderFood = jsonOrderFood.replace("$(taste)", order.foods[i].taste.preference);
 					}
-					jsonOrderFood = jsonOrderFood.replace("$(taste_id)", new Short(order.foods[i].taste.alias_id).toString());
+					jsonOrderFood = jsonOrderFood.replace("$(taste_id)", Integer.toString(order.foods[i].taste.alias_id));
 					jsonOrderFood = jsonOrderFood.replace("$(count)", Util.float2String2(order.foods[i].getCount()));
 					jsonOrderFood = jsonOrderFood.replace("$(unit)", Util.CURRENCY_SIGN + Util.float2String(order.foods[i].getPrice2()));
 					jsonOrderFood = jsonOrderFood.replace("$(special)", order.foods[i].isSpecial() ? "true" : "false");
