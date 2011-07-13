@@ -595,7 +595,7 @@ len[2] : length of the &lt;Body&gt;
 table[2] : table_2[2] : category : custom_num : food_num : &lt;Food1&gt; : &lt;Food2&gt;... : origian_table[2]
 
 &lt;Food&gt;
-food_id[2] : order_num[2] : taste_id : kitchen
+food_id[2] : order_num[2] : taste_id[2] : taste_id2[2] : taste_id3[2] : kitchen
 </XPD:ATTR>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedViews[4]" type="UMLNoteLinkView" guid="QFjSW90l/ECdpofChL68vQAA">
