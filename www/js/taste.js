@@ -1,4 +1,4 @@
-function editTaste(id, alias_id, preference, price, old_alias_id) {
+function editTaste(id, alias_id, preference, price, rate,calc,category) {
     var editType = "addTaste";
     var title = "添加口味";
     if (id != "") {
@@ -11,6 +11,8 @@ function editTaste(id, alias_id, preference, price, old_alias_id) {
 	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57"' +
 	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
 	                            ' style="ime-mode:Disabled" />'
+	    calc = "0";
+	    category = "0";
     }
     else {
         aliasId = '<input type="hidden" id="alias_id" name="alias_id" value="' + alias_id + '"/>' + alias_id + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
@@ -22,16 +24,23 @@ function editTaste(id, alias_id, preference, price, old_alias_id) {
 	                    '</div>' +
 	                    '<form name="tasteForm" action="taste.php"  method="post" onkeydown="editTasteKeyDown()">' +
 	                      '<input type="hidden" name="editType" value="' + editType + '" />' +
-	                      '<input type="hidden" name="id" value="' + id + '" />' +
-	                      '<input type="hidden" name="old_alias_id" value="' + old_alias_id + '" />' +
-	                      '<div class="add_foot_Content" style="height:180px;text-align:center">' +
+	                      '<input type="hidden" name="id" value="' + id + '" />' +	                     
+	                      '<div class="add_foot_Content" style="height:230px;text-align:center">' +
 	                        '<div class="pop_Content">' +
-	                            '<div class="pop_Content1">编号：' + aliasId + '</div>' +
-	                            '<div class="pop_Content1">口味：<input type="text" id="preference" name="preference" value="' + preference + '" onfocus="this.select()" size="25" height="20" /></div>' +
-	                            '<div class="pop_Content1">价格：<input type="text" id="price" name="price" value="' + price + '" onfocus="this.select()" size="25" height="20"' +
+	                            '<div class="pop_Content1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;编号：' + aliasId + '</div>' +
+	                            '<div class="pop_Content1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;口味：<input type="text" id="preference" name="preference" value="' + preference + '" onfocus="this.select()" size="25" height="20" /></div>' +
+	                            '<div class="pop_Content1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;价格：<input type="text" id="price" name="price" value="' + price + '" onfocus="this.select()" size="25" height="20"' +
 	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57||event.keyCode==46"' +  
 	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
-	                            ' style="ime-mode:Disabled" /></div>' +	                           
+	                            ' style="ime-mode:Disabled" /></div>' +	         
+	                                       '<div class="pop_Content1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;比例：<input type="text" id="rate" name="rate" value="' + rate + '" onfocus="this.select()" size="25" height="20"' +
+	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57||event.keyCode==46"' +  
+	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
+	                            ' style="ime-mode:Disabled" /></div>' +	        
+	                               '<div class="pop_Content1">计算方式：<select style="width: 90px;position: relative;" id="calc" name="calc" ' +
+	                            '><option value="0">按价格</option><option value="1">按比例</option></select></div>' +
+	                               '<div class="pop_Content1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;类别：<select style="width: 90px;position: relative;" id="category" name="category" ' +
+	                            '><option value="0">口味</option><option value="1">做法</option><option value="2">规格</option></select></div>' +                     
 	                        '</div>' +
 	                            '<span class="pop_action-span"><a href="#" onclick="submitTasteData()">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>' +
 	                            '<span class="pop_action-span1"><a href="#" onclick="closeWindow()">取&nbsp;&nbsp;&nbsp;&nbsp;消</a></span>' +
@@ -46,6 +55,8 @@ function editTaste(id, alias_id, preference, price, old_alias_id) {
     else {
         document.getElementById("preference").focus();
     }
+    document.all.calc.value = calc;
+    document.all.category.value = category;
     
 }
 

@@ -27,6 +27,9 @@ if($editType == "addTaste" || $editType == "editTaste")
 	$alias_id = $_POST["alias_id"];
 	$preference = $_POST["preference"];
 	$price = $_POST["price"];
+	$rate = $_POST["rate"];
+	$calc = $_POST["calc"];
+	$category = $_POST["category"];
 	
 	$validate = true;
 	if($editType == "addTaste")
@@ -35,29 +38,18 @@ if($editType == "addTaste" || $editType == "editTaste")
 		$rs = $db ->GetOne($sql);		
 		if($rs)
 		{			
-			echo "<script>alert('已存在此编号的口味，请输入其它编号！');editTaste('','$alias_id','$preference','$price','');</script>";
+			echo "<script>alert('已存在此编号的口味，请输入其它编号！');editTaste('','$alias_id','$preference','$price','$rate','$calc','$category');</script>";
 			$validate = false;
 		}
 		else
 		{
-			$sql = "INSERT INTO taste(restaurant_id,alias_id,preference,price) VALUES(".$_SESSION["restaurant_id"].",$alias_id,'$preference',$price)";
+			$sql = "INSERT INTO taste(restaurant_id,alias_id,preference,price,rate,calc,category) VALUES(".$_SESSION["restaurant_id"].",$alias_id,'$preference',$price,rate,$calc,$category)";
 		}
 	}
 	else
 	{
-		$id = $_POST["id"];
-		$old_alias_id = $_POST["old_alias_id"];
-		if($old_alias_id != $alias_id)
-		{
-			$sql = "SELECT * FROM taste WHERE alias_id=$alias_id AND restaurant_id=" . $_SESSION["restaurant_id"];		
-			$rs = $db ->GetOne($sql);		
-			if($rs)
-			{			
-				echo "<script>alert('已存在此编号的口味，请输入其它编号！');editTaste('$id','$alias_id','$preference','$price','$old_alias_id');</script>";
-				$validate = false;
-			}
-		}		
-		$sql = "UPDATE taste SET alias_id=$alias_id, preference='$preference',price=$price WHERE id=$id";		
+		$id = $_POST["id"];			
+		$sql = "UPDATE taste SET alias_id=$alias_id, preference='$preference',price=$price,rate=$rate,calc=$calc,category=$category WHERE id=$id";		
 	}
 	/*echo "<script>alert('$sql');</script>";*/
 	if($validate)
@@ -113,8 +105,11 @@ else if($editType == "deleteTaste")
 			<tr>
 				<th><h3>编&nbsp;号</h3></th>
 				<th><h3>口&nbsp;味</h3></th>
-				<th><h3>价格（￥）</h3></th>				
-				<th><h3>操&nbsp;作</h3></th>
+				<th><h3>价格（￥）</h3></th>								
+				<th><h3>比&nbsp;例</h3></th>
+				<th><h3>计算方式</h3></th>
+				<th><h3>类&nbsp;型</h3></th>
+				<th><h3>操&nbsp;作</h3></th>				
 			</tr>
 		</thead>
 		<tbody>
@@ -123,7 +118,8 @@ include("conn.php");
 $xm=$_REQUEST["keyword_type"];
 $ct=$_REQUEST["condition_type"];
 $kw=$_REQUEST["keyword"]; 
-$sql = "SELECT id,alias_id,preference,price FROM taste WHERE restaurant_id=" . $_SESSION["restaurant_id"];			
+$sql = "SELECT id,alias_id,preference,price,rate,calc,category,CASE calc WHEN 0 THEN '按价格' WHEN 1 THEN '按比例' END AS calc_name,
+CASE category WHEN 0 THEN '口味' WHEN 1 THEN '做法' WHEN 2 THEN '规格' END AS category_name FROM taste WHERE restaurant_id=" . $_SESSION["restaurant_id"];			
 switch ($xm)
 {
 	case "alias_id":
@@ -162,7 +158,11 @@ foreach ($rs as $row){
 	echo "<td>" .$row["alias_id"] ."</td>";
 	echo "<td>" .$row["preference"] ."</td>";
 	echo "<td>" .$row["price"] ."</td>";
-	echo "<td><a href='#' onclick='editTaste(&quot;".$row["id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["preference"]."&quot;,&quot;".$row["price"]."&quot;,&quot;".$row["alias_id"].
+	echo "<td>" .($row["rate"]*100) ."%</td>";
+	echo "<td>" .$row["calc_name"] ."</td>";
+	echo "<td>" .$row["category_name"] ."</td>";
+	echo "<td><a href='#' onclick='editTaste(&quot;".$row["id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["preference"]."&quot;,&quot;".$row["price"].
+		"&quot;,&quot;".$row["rate"]."&quot;,&quot;".$row["calc"]."&quot;,&quot;".$row["category"].
 		"&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
 		"<a href='#' onclick='deleteTaste(".$row["id"].")'><img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;删除</a></td>";
 	echo "</tr>";
