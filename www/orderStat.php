@@ -95,7 +95,7 @@ if($statType == "daily")
 				SUM(t_price_2) AS '实收'	
 				FROM
 				(SELECT DATE(order_date) AS o_date, o.type_value,
-				COUNT(id) AS o_num, SUM(total_price) AS t_price, SUM(total_price_2) AS t_price_2 
+				COUNT(id) AS o_num, SUM(Replace(total_price,',','')) AS t_price, SUM(total_price_2) AS t_price_2 
 				FROM `order_history_view` as o WHERE is_paid <> 0 AND restaurant_id=" . $_SESSION["restaurant_id"];
 	//}
 	
@@ -130,7 +130,7 @@ else
 				SUM(t_price_2) AS '实收'
 				FROM
 				(SELECT DATE_FORMAT(order_date,'%Y-%m') AS o_date, o.type_value,
-				COUNT(id) AS o_num, SUM(total_price) AS t_price, SUM(total_price_2) AS t_price_2
+			COUNT(id) AS o_num, SUM(Replace(total_price,',','')) AS t_price, SUM(total_price_2) AS t_price_2
 				FROM `order_history_view` as o WHERE is_paid <> 0 AND restaurant_id=" . $_SESSION["restaurant_id"];
 	//}
 }
@@ -181,13 +181,13 @@ foreach ($rs as $row){
 	echo "<td>" .$bh ."</td>";
 	echo "<td>" .$row["o_date"] ."</td>";
 	echo "<td>" .$row["o_num"] ."</td>";		
-	echo "<td>" .$row["现金"] ."</td>";
-	echo "<td>" .$row["刷卡"] ."</td>";
-	echo "<td>" .$row["会员卡"] ."</td>";
-	echo "<td>" .$row["挂账"] ."</td>";
-	echo "<td>" .$row["签单"] ."</td>";
-	echo "<td>" .$row["合计"] ."</td>";	
-	echo "<td>" .$row["实收"] ."</td>";
+	echo "<td>" .number_format($row["现金"],2) ."</td>";
+	echo "<td>" .number_format($row["刷卡"],2) ."</td>";
+	echo "<td>" .number_format($row["会员卡"],2) ."</td>";
+	echo "<td>" .number_format($row["挂账"],2) ."</td>";
+	echo "<td>" .number_format($row["签单"],2) ."</td>";
+	echo "<td>" .number_format($row["合计"],2) ."</td>";	
+	echo "<td>" .number_format($row["实收"],2) ."</td>";
 	echo "</tr>";
 }	
 /*$sql = "SELECT * FROM restaurant where id=".$_SESSION["restaurant_id"]; 
