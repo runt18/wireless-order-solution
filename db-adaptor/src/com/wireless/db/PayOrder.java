@@ -220,7 +220,7 @@ public class PayOrder {
 		for(int i = 0; i < orderInfo.foods.length; i++){
 			float dist = (float)Math.round(orderInfo.foods[i].discount) / 100;					
 			float foodPrice = orderInfo.foods[i].getPrice().floatValue();
-			float tastePrice = orderInfo.foods[i].taste.getPrice().floatValue();
+			float tastePrice = orderInfo.foods[i].getTastePrice();
 			totalPrice += (foodPrice * dist + tastePrice) * orderInfo.foods[i].count2Float().floatValue();
 		}
 		totalPrice = (float)Math.round(totalPrice * 100) / 100;

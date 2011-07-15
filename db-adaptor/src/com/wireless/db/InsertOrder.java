@@ -95,18 +95,29 @@ public class InsertOrder {
 					dbCon.rs.close();
 						
 		
-					//get the taste preference according to the taste id,
-					//only if the food has the taste preference
-					if(orderToInsert.foods[i].taste.alias_id != Taste.NO_TASTE){
-						sql = "SELECT preference, price FROM " + Params.dbName + 
-							".taste WHERE restaurant_id=" + table.restaurant_id + 
-							" AND alias_id=" + orderToInsert.foods[i].taste.alias_id;
-						dbCon.rs = dbCon.stmt.executeQuery(sql);
-						if(dbCon.rs.next()){
-							orderToInsert.foods[i].taste.preference = dbCon.rs.getString("preference");
-							orderToInsert.foods[i].taste.setPrice(dbCon.rs.getFloat("price"));
-						}				
+					//get three taste information for each food
+					for(int j = 0; j < orderToInsert.foods[i].tastes.length; j++){
+						if(orderToInsert.foods[i].tastes[j].alias_id != Taste.NO_TASTE){
+							sql = "SELECT preference, price, category, rate, calc FROM " + Params.dbName + 
+								  ".taste WHERE restaurant_id=" + table.restaurant_id + 
+								  " AND alias_id=" + orderToInsert.foods[i].tastes[j].alias_id;
+							dbCon.rs = dbCon.stmt.executeQuery(sql);
+							if(dbCon.rs.next()){
+								orderToInsert.foods[i].tastes[j].preference = dbCon.rs.getString("preference");
+								orderToInsert.foods[i].tastes[j].setPrice(dbCon.rs.getFloat("price"));
+								orderToInsert.foods[i].tastes[j].category = dbCon.rs.getShort("category");
+								orderToInsert.foods[i].tastes[j].setRate(dbCon.rs.getFloat("rate"));
+								orderToInsert.foods[i].tastes[j].calc = dbCon.rs.getShort("calc");
+							}				
+						}
 					}
+					
+					//set the taste preference
+					orderToInsert.foods[i].tastePref = com.wireless.protocol.Util.genTastePref(orderToInsert.foods[i].tastes);
+					//set the total taste price
+					orderToInsert.foods[i].setTastePrice(com.wireless.protocol.Util.genTastePrice(orderToInsert.foods[i].tastes, 
+																							 orderToInsert.foods[i].getPrice()));
+
 				}
 				
 				/**
@@ -158,7 +169,7 @@ public class InsertOrder {
 						
 					//insert the record to table "order_food"
 					sql = "INSERT INTO `" + Params.dbName +
-						"`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, `discount`, `taste`, `taste_price`, `taste_id`, `kitchen`, `waiter`, `order_date`) VALUES (" +	
+						"`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, `discount`, `taste`, `taste_price`, `taste_id`, `taste_id2`, `taste_id3`, `kitchen`, `waiter`, `order_date`) VALUES (" +	
 						orderToInsert.id + ", " + 
 						orderToInsert.foods[i].alias_id + ", " + 
 						orderToInsert.foods[i].count2Float().toString() + ", " + 
@@ -166,9 +177,11 @@ public class InsertOrder {
 						orderToInsert.foods[i].name + "', " +
 						orderToInsert.foods[i].status + ", " +
 						(float)orderToInsert.foods[i].discount / 100 + ", '" +
-						orderToInsert.foods[i].taste.preference + "', " + 
-						orderToInsert.foods[i].taste.getPrice() + ", " +
-						orderToInsert.foods[i].taste.alias_id + ", " + 
+						orderToInsert.foods[i].tastePref + "', " + 
+						orderToInsert.foods[i].getTastePrice() + ", " +
+						orderToInsert.foods[i].tastes[0].alias_id + ", " + 
+						orderToInsert.foods[i].tastes[1].alias_id + ", " + 
+						orderToInsert.foods[i].tastes[2].alias_id + ", " + 
 						orderToInsert.foods[i].kitchen + ", '" + 
 						term.owner + "', NOW()" + ")";
 						

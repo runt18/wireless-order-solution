@@ -175,11 +175,11 @@ public class QueryOrder {
 		dbCon.rs.close();
 		
 		// query the food's id and order count associate with the order id for "order_food" table
-		sql = "SELECT name, food_id, food_status, SUM(order_count) AS order_sum, unit_price, discount, taste, taste_price, taste_id, kitchen FROM `"
+		sql = "SELECT name, food_id, food_status, SUM(order_count) AS order_sum, unit_price, discount, taste, taste_price, taste_id, taste_id2, taste_id3, kitchen FROM `"
 				+ Params.dbName
 				+ "`.`order_food` WHERE order_id="
 				+ orderID
-				+ " GROUP BY food_id, taste_id HAVING order_sum > 0";
+				+ " GROUP BY food_id, taste_id, taste_id2, taste_id3 HAVING order_sum > 0";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		ArrayList<Food> foods = new ArrayList<Food>();
 		while (dbCon.rs.next()) {
@@ -187,13 +187,15 @@ public class QueryOrder {
 			food.name = dbCon.rs.getString("name");
 			food.alias_id = dbCon.rs.getInt("food_id");
 			food.status = dbCon.rs.getShort("food_status");
-			food.setCount(new Float(dbCon.rs.getFloat("order_sum")));
-			food.setPrice(new Float(dbCon.rs.getFloat("unit_price")));
+			food.setCount(dbCon.rs.getFloat("order_sum"));
+			food.setPrice(dbCon.rs.getFloat("unit_price"));
 			food.kitchen = dbCon.rs.getShort("kitchen");
 			food.discount = (byte) (dbCon.rs.getFloat("discount") * 100);
-			food.taste.preference = dbCon.rs.getString("taste");
-			food.taste.setPrice(dbCon.rs.getFloat("taste_price"));
-			food.taste.alias_id = dbCon.rs.getShort("taste_id");
+			food.tastePref = dbCon.rs.getString("taste");
+			food.setTastePrice(dbCon.rs.getFloat("taste_price"));
+			food.tastes[0].alias_id = dbCon.rs.getInt("taste_id");
+			food.tastes[1].alias_id = dbCon.rs.getInt("taste_id2");
+			food.tastes[2].alias_id = dbCon.rs.getInt("taste_id3");
 			foods.add(food);
 		}
 		orderInfo.id = orderID;

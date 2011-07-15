@@ -105,9 +105,9 @@ public class UpdateOrder {
 			
 			//query all the food's id ,order count and taste preference of this order
 			ArrayList<Food> originalRecords = new ArrayList<Food>();
-			String sql = "SELECT food_id, unit_price, name, food_status, discount, SUM(order_count) AS order_sum, taste, taste_price, taste_id, kitchen FROM `" + 
+			String sql = "SELECT food_id, unit_price, name, food_status, discount, SUM(order_count) AS order_sum, taste, taste_price, taste_id, taste_id2, taste_id3, kitchen FROM `" + 
 						Params.dbName + "`.`order_food` WHERE order_id=" + orderID + 
-						" GROUP BY food_id, taste_id HAVING order_sum > 0";
+						" GROUP BY food_id, taste_id, taste_id2, taste_id3 HAVING order_sum > 0";
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while(dbCon.rs.next()){
 				Food food = new Food();
@@ -118,9 +118,11 @@ public class UpdateOrder {
 				food.discount = (byte)(dbCon.rs.getFloat("discount") * 100);
 				food.setCount(new Float(dbCon.rs.getFloat("order_sum")));
 				food.kitchen = dbCon.rs.getShort("kitchen");
-				food.taste.alias_id = dbCon.rs.getShort("taste_id");
-				food.taste.preference = dbCon.rs.getString("taste");
-				food.taste.setPrice(new Float(dbCon.rs.getFloat("taste_price")));
+				food.tastes[0].alias_id = dbCon.rs.getShort("taste_id");
+				food.tastes[1].alias_id = dbCon.rs.getShort("taste_id2");
+				food.tastes[2].alias_id = dbCon.rs.getShort("taste_id3");
+				food.tastePref = dbCon.rs.getString("taste");
+				food.setTastePrice(dbCon.rs.getFloat("taste_price"));
 				originalRecords.add(food);
 			}
 			dbCon.rs.close();
@@ -197,22 +199,32 @@ public class UpdateOrder {
 					}
 					dbCon.rs.close();
 					
-					//get the taste preference only if the food has taste preference
-					if(orderToUpdate.foods[i].taste.alias_id != Taste.NO_TASTE){
-						sql = "SELECT preference, price FROM " + Params.dbName + ".taste WHERE restaurant_id=" + term.restaurant_id +
-							" AND alias_id=" + orderToUpdate.foods[i].taste.alias_id;
-						dbCon.rs = dbCon.stmt.executeQuery(sql);
-						//check if the taste preference exist in db
-						if(dbCon.rs.next()){
-							food.taste.alias_id = orderToUpdate.foods[i].taste.alias_id;
-							food.taste.preference = dbCon.rs.getString("preference");
-							food.taste.setPrice(dbCon.rs.getFloat("price"));
-						}else{
-							throw new BusinessException("The taste(alias_id=" + orderToUpdate.foods[i].taste.alias_id + ") to query does NOT exist.", ErrorCode.MENU_EXPIRED);
+					//get the each taste information to this food only if the food has taste preference
+					for(int j = 0; j < orderToUpdate.foods[i].tastes.length; j++){
+						if(orderToUpdate.foods[i].tastes[j].alias_id != Taste.NO_TASTE){
+							sql = "SELECT preference, price, category, rate, calc FROM " + Params.dbName + ".taste WHERE restaurant_id=" + term.restaurant_id +
+								" AND alias_id=" + orderToUpdate.foods[i].tastes[j].alias_id;
+							dbCon.rs = dbCon.stmt.executeQuery(sql);
+							//check if the taste preference exist in db
+							if(dbCon.rs.next()){
+								food.tastes[j].alias_id = orderToUpdate.foods[i].tastes[j].alias_id;
+								food.tastes[j].preference = dbCon.rs.getString("preference");
+								food.tastes[j].category = dbCon.rs.getShort("category");
+								food.tastes[j].calc = dbCon.rs.getShort("calc");
+								food.tastes[j].setRate(dbCon.rs.getFloat("rate"));
+								food.tastes[j].setPrice(dbCon.rs.getFloat("price"));
+							}else{
+								throw new BusinessException("The taste(alias_id=" + orderToUpdate.foods[i].tastes[j].alias_id + ") to query does NOT exist.", ErrorCode.MENU_EXPIRED);
+							}
+							dbCon.rs.close();
+							
 						}
-						dbCon.rs.close();
-						
 					}
+					
+					//set the taste preference to this food
+					food.tastePref = com.wireless.protocol.Util.genTastePref(food.tastes);
+					//set the total taste price to this food
+					food.setTastePrice(com.wireless.protocol.Util.genTastePrice(food.tastes, food.getPrice()));
 					
 					if(diff > 0){
 						extraFoods.add(food);
@@ -259,16 +271,19 @@ public class UpdateOrder {
 					giftAmount += extraFoods.get(i).getPrice2() * extraFoods.get(i).getCount();
 				}
 				
-				sql = "INSERT INTO `" + Params.dbName + "`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, `discount`, `taste_id`, `taste_price`, `taste`, `kitchen`, `waiter`, `order_date`) VALUES (" +
+				sql = "INSERT INTO `" + Params.dbName + "`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, " +
+						"`discount`, `taste_id`, `taste_id2`, `taste_id3`, `taste_price`, `taste`, `kitchen`, `waiter`, `order_date`) VALUES (" +
 						orderID + ", " + extraFoods.get(i).alias_id + ", " + 
 						extraFoods.get(i).getCount() + ", " + 
 						extraFoods.get(i).getPrice() + ", '" + 
 						extraFoods.get(i).name + "', " + 
 						extraFoods.get(i).status + ", " +
 						(float)extraFoods.get(i).discount / 100 + ", " +
-						extraFoods.get(i).taste.alias_id + "," +
-						extraFoods.get(i).taste.getPrice() + ", '" +
-						extraFoods.get(i).taste.preference + "', " + 
+						extraFoods.get(i).tastes[0].alias_id + "," +
+						extraFoods.get(i).tastes[1].alias_id + "," +
+						extraFoods.get(i).tastes[2].alias_id + "," +
+						extraFoods.get(i).getTastePrice() + ", '" +
+						extraFoods.get(i).tastePref + "', " + 
 						extraFoods.get(i).kitchen + ", '" + 
 						term.owner + "', NOW()" + ")";
 				dbCon.stmt.addBatch(sql);			
@@ -282,16 +297,19 @@ public class UpdateOrder {
 					giftAmount -= cancelledFoods.get(i).getPrice2() * cancelledFoods.get(i).getCount();
 				}
 				
-				sql = "INSERT INTO `" + Params.dbName + "`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, `discount`, `taste_id`, `taste_price`, `taste`, `kitchen`, `waiter`, `order_date`) VALUES (" +
+				sql = "INSERT INTO `" + Params.dbName + "`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, " +
+						"`discount`, `taste_id`, `taste_id2`, `taste_id3`, `taste_price`, `taste`, `kitchen`, `waiter`, `order_date`) VALUES (" +
 						orderID + ", " + cancelledFoods.get(i).alias_id + ", " + 
 						"-" + cancelledFoods.get(i).getCount() + ", " + 
 						cancelledFoods.get(i).getPrice() + ", '" + 
 						cancelledFoods.get(i).name + "', " + 
 						cancelledFoods.get(i).status + ", " +
 						(float)cancelledFoods.get(i).discount / 100 + ", " +
-						cancelledFoods.get(i).taste.alias_id + "," +
-						cancelledFoods.get(i).taste.getPrice() + ", '" +
-						cancelledFoods.get(i).taste.preference + "', " + 
+						cancelledFoods.get(i).tastes[0].alias_id + "," +
+						cancelledFoods.get(i).tastes[1].alias_id + "," +
+						cancelledFoods.get(i).tastes[2].alias_id + "," +
+						cancelledFoods.get(i).getTastePrice() + ", '" +
+						cancelledFoods.get(i).tastePref + "', " + 
 						cancelledFoods.get(i).kitchen + ", '" + 
 						term.owner + "', NOW()" + ")";
 				dbCon.stmt.addBatch(sql);			
@@ -344,15 +362,13 @@ public class UpdateOrder {
 					/**
 					 * In the case below, 
 					 * 1 - food alias id is matched 
-					 * 2 - taste alias id is NOT matched 
-					 * 3 - order count is matched 
+					 * 2 - order count is matched 
 					 * Means just change the taste preference to this food. 
 					 * We don't print this record.
 					 */
 					for(int j = 0; j < cancelledFoods.size(); j++){
 						if(extraFoods.get(i).alias_id == cancelledFoods.get(j).alias_id &&
-						   extraFoods.get(i).count == cancelledFoods.get(j).count &&
-						   extraFoods.get(i).taste.alias_id != cancelledFoods.get(j).taste.alias_id){
+						   extraFoods.get(i).count == cancelledFoods.get(j).count){
 								isExtra = false;
 								break;
 						}
@@ -379,15 +395,13 @@ public class UpdateOrder {
 					/**
 					 * In the case below, 
 					 * 1 - food alias id is matched 
-					 * 2 - taste alias id is NOT matched 
-					 * 3 - order count is matched 
+					 * 2 - order count is matched 
 					 * Means just change the taste preference to this food. 
 					 * We don't print this record.
 					 */
 					for(int j = 0; j < extraFoods.size(); j++){
 						if(cancelledFoods.get(i).alias_id == extraFoods.get(j).alias_id &&
-							cancelledFoods.get(i).count == extraFoods.get(j).count &&
-							cancelledFoods.get(i).taste.alias_id != extraFoods.get(j).taste.alias_id){
+							cancelledFoods.get(i).count == extraFoods.get(j).count){
 							
 							isCancelled = false;
 							break;
