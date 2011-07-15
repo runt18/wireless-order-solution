@@ -163,7 +163,11 @@ var checkOurListRefresh = function() {
 	for ( var i = 0; i < checkOutDataDisplay.length; i++) {
 		var singleCount = parseFloat(checkOutDataDisplay[i][5].substr(1));
 		if (checkOutDataDisplay[i][9] == "true") {
-			forFreeCount = forFreeCount + singleCount;
+			// forFreeCount = forFreeCount + singleCount;
+			// for free count dont need discount
+			forFreeCount = forFreeCount
+					+ parseFloat(checkOutData[i][4].substring(1))
+					* checkOutData[i][3];
 		} else {
 			totalCount = totalCount + singleCount;
 		}

@@ -219,8 +219,22 @@ function checkOutOnLoad() {
 																	var singleCount = parseFloat(checkOutDataDisplay[i][5]
 																			.substr(1));
 																	if (checkOutDataDisplay[i][9] == "true") {
+																		// forFreeCount
+																		// =
+																		// forFreeCount
+																		// +
+																		// singleCount;
+
+																		// for
+																		// free
+																		// count
+																		// dont
+																		// need
+																		// discount
 																		forFreeCount = forFreeCount
-																				+ singleCount;
+																				+ parseFloat(checkOutData[i][4]
+																						.substring(1))
+																				* checkOutData[i][3];
 																	} else {
 																		totalCount = totalCount
 																				+ singleCount;
@@ -424,10 +438,10 @@ function moneyCount(opt) {
 			}
 		} else if (restaurantData[0][5] == 2) {
 			shouldPay_out = parseFloat(shouldPay_out).toFixed(0) + ".00";
-		}else{
+		} else {
 			shouldPay_out = parseFloat(shouldPay_out).toFixed(2);
 		}
-		
+
 		// “合计”加上服务费
 		totalCount_out = (parseFloat(originalTotalCount) * (1 + parseFloat(serviceRate) / 100))
 				.toFixed(2);
