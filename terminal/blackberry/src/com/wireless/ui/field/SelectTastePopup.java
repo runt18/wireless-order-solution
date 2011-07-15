@@ -115,14 +115,20 @@ public class SelectTastePopup extends PopupScreen{
 						try{
 							Taste selectedTaste = WirelessOrder.foodMenu.tastes[_tasteMatchedIdx[getSelectedIndex()]];
 							//assign the taste id
-							_selectedFood.taste.alias_id = selectedTaste.alias_id;
+							_selectedFood.tastes[0].alias_id = selectedTaste.alias_id;
 							//assign the taste preference
-							_selectedFood.taste.preference = selectedTaste.preference;
+							_selectedFood.tastes[0].preference = selectedTaste.preference;
 							//_selectedFood.taste.price = WirelessOrder.foodMenu.tastes[getSelectedIndex()].price;
-							_selectedFood.taste.setPrice(selectedTaste.getPrice());
+							_selectedFood.tastes[0].setPrice(selectedTaste.getPrice());
 						}catch(ArrayIndexOutOfBoundsException e){}
+						
+						_selectedFood.tastePref = Util.genTastePref(_selectedFood.tastes);
+						_selectedFood.setTastePrice(Util.genTastePrice(_selectedFood.tastes, _selectedFood.getPrice()));
+						
 						_orderListField.addFood(_selectedFood);
+						
 						close();
+						
 						if(_parent != null){
 							_parent.close();
 						}
