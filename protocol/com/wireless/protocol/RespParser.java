@@ -38,13 +38,15 @@ public class RespParser {
 		 * 			  price[1..3] - 3-byte indicating the fixed-point
 		 * food_num - 1-byte indicating the number of ordered food
 		 * <Food>
-		 * food_id[2] : order_num[2] : status : taste_id
+		 * food_id[2] : order_num[2] : status : taste_id[2] : taste_id2[2] : taste_id3[2]
 		 * food_id[2] - 2-byte indicating the food's id
 		 * order_num[2] - 2-byte indicating how many this foods are ordered
 		 * 			   order_num[0] - 1-byte indicates the float-point
 		 * 			   order_num[1] - 1-byte indicates the fixed-point
-		 * status - the status to this food
-		 * taste_id - 1-byte indicates the taste preference id
+		 * status - the status to this food 
+		 * taste_id[2] - 2-byte indicates the 1st taste preference id
+		 * taste_id2[2] - 2-byte indicates the 2nd taste preference id
+		 * taste_id3[3] - 2-byte indicates the 3rd taste preference id
 		 *******************************************************/
 		if(response.header.type == Type.ACK){
 			//get the table id
@@ -78,19 +80,34 @@ public class RespParser {
 			//get every order food's id and number
 			int index = 15;
 			for(int i = 0; i < orderFoods.length; i++){
+				//get the food alias id
 				int foodID = (response.body[index] & 0x000000FF) |
 							((response.body[index + 1] & 0x000000FF) << 8);
+				//get the order amount
 				int orderNum = (response.body[index + 2] & 0x000000FF) |
-								((response.body[index + 3] & 0x000000FF) << 8);				
-				short status = response.body[index + 4];				
-				short tasteID = (short)(response.body[index + 5] & 0x00FF);
-				//each food information takes up 5-byte
-				index += 6;
+								((response.body[index + 3] & 0x000000FF) << 8);
+				//get the food status
+				short status = response.body[index + 4];	
+				
+				//get each taste id
+				int[] tasteID = new int[3];
+				tasteID[0] = (response.body[index + 5] & 0x000000FF) | 
+								((response.body[index + 6] & 0x0000FF00) >> 8);
+				tasteID[1] = (response.body[index + 7] & 0x000000FF) | 
+								((response.body[index + 8] & 0x0000FF00) >> 8);
+				tasteID[2] = (response.body[index + 9] & 0x000000FF) | 
+								((response.body[index + 10] & 0x0000FF00) >> 8);
+				//each food information takes up 11-byte
+				index += 11;
 				orderFoods[i] = new Food();
 				orderFoods[i].alias_id = foodID;
 				orderFoods[i].count = orderNum;
 				orderFoods[i].status = status;
-				orderFoods[i].taste.alias_id = tasteID;
+				
+				//Arrays.sort(tasteID, 0, tasteID.length);
+				orderFoods[i].tastes[0].alias_id = tasteID[0];
+				orderFoods[i].tastes[1].alias_id = tasteID[1];
+				orderFoods[i].tastes[2].alias_id = tasteID[2];
 			}
 			order.foods = orderFoods;
 		}
@@ -288,7 +305,7 @@ public class RespParser {
 		for(int i = begPos; i < endPos; i++){
 			
 			//get the alias id to taste preference
-			int alias_id = response.body[offset] & 0x000000FF |
+			int alias_id = (response.body[offset] & 0x000000FF) |
 						   ((response.body[offset + 1] & 0x000000FF) << 8);
 			
 			//get the category to taste preference

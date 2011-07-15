@@ -1,7 +1,7 @@
 package com.wireless.protocol;
 
 import java.io.UnsupportedEncodingException;
-
+import java.util.Arrays;
 
 public class ReqParser {
 	/******************************************************
@@ -37,18 +37,20 @@ public class ReqParser {
 	 * table[2] : table_2[2] : category : custom_num : food_num : <Food1> : <Food2>... : original_table[2]
 	 * table[2] - 2-byte indicates the table id
 	 * table_2[2] - 2-byte indicates the 2nd table id  
-	 * categroy - 1-byte indicates the category to this order  
+	 * category - 1-byte indicates the category to this order  
 	 * custom_num - 1-byte indicating the custom number for this table
 	 * food_num - 1-byte indicating the number of foods
 	 * <Food>
-	 * food_id[2] : order_num[2] : taste_id : kitchen
+	 * food_id[2] : order_num[2] : taste_id[2] : taste_id2[2] : taste_id3[2] : kitchen
 	 * food_id[2] - 2-byte indicating the food's id
 	 * order_num[2] - 2-byte indicating how many this foods are ordered
 	 * 			   order_num[0] - 1-byte indicates the float-point
 	 * 			   order_num[1] - 1-byte indicates the fixed-point
-	 * taste_id - 1-byte indicates the taste preference id
+	 * taste_id[2] - 2-byte indicates the 1st taste preference id
+	 * taste_id2[2] - 2-byte indicates the 2nd taste preference id
+	 * taste_id3[2] - 2-byte indicates the 3rd taste preference id
 	 * kitchen - the kitchen to this food
-	 *
+	 * 
 	 * origianal_table[2] - 2-bytes indicates the original table id,
 	 *                      These two bytes are used for table transferred
 	 *******************************************************/
@@ -78,14 +80,43 @@ public class ReqParser {
 		for(int i = 0; i < orderFoods.length; i++){
 			int foodID = (req.body[offset] & 0x000000FF) | ((req.body[offset + 1] & 0x000000FF) << 8);
 			int orderNum = (req.body[offset + 2] & 0x000000FF) | ((req.body[offset + 3] & 0x000000FF) << 8);
-			short taste_id = (short)(req.body[offset + 4] & 0x00FF);
-			short kitchen = req.body[offset + 5];
+			
+			//get each taste id
+			int[] tasteID = new int[3];
+			tasteID[0] = (req.body[offset + 4] & 0x000000FF) | 
+							((req.body[offset + 5] & 0x0000FF00) >> 8);
+			tasteID[1] = (req.body[offset + 6] & 0x000000FF) | 
+							((req.body[offset + 7] & 0x0000FF00) >> 8);
+			tasteID[2] = (req.body[offset + 8] & 0x000000FF) | 
+							((req.body[offset + 9] & 0x0000FF00) >> 8);
+			
+			//get the kitchen 
+			short kitchen = req.body[offset + 10];
+			
 			orderFoods[i] = new Food();
 			orderFoods[i].alias_id = foodID;
 			orderFoods[i].count = orderNum;
-			orderFoods[i].taste.alias_id = taste_id;
+			
+			for(int cnt = 0; cnt < tasteID.length; cnt++){
+				if(tasteID[cnt] == Taste.NO_TASTE){
+					tasteID[cnt] = Integer.MAX_VALUE;
+				}
+			}
+			
+			Arrays.sort(tasteID);
+			
+			for(int cnt = 0; cnt < tasteID.length; cnt++){
+				if(tasteID[cnt] == Integer.MAX_VALUE){
+					tasteID[cnt] = Taste.NO_TASTE;
+				}
+			}
+			
+			orderFoods[i].tastes[0].alias_id = tasteID[0];
+			orderFoods[i].tastes[1].alias_id = tasteID[1];
+			orderFoods[i].tastes[2].alias_id = tasteID[2];
+			
 			orderFoods[i].kitchen = (short)(kitchen & 0xFF);
-			offset += 6;
+			offset += 11;
 		}
 		order.foods = orderFoods;
 		

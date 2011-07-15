@@ -20,12 +20,14 @@ import com.wireless.protocol.Reserved;
  * custom_num - 1-byte indicating the custom number for this table
  * food_num - 1-byte indicating the number of foods
  * <Food>
- * food_id[2] : order_num[2] : taste_id : kitchen
+ * food_id[2] : order_num[2] : taste_id[2] : taste_id2[2] : taste_id3[2] : kitchen
  * food_id[2] - 2-byte indicating the food's id
  * order_num[2] - 2-byte indicating how many this foods are ordered
  * 			   order_num[0] - 1-byte indicates the float-point
  * 			   order_num[1] - 1-byte indicates the fixed-point
- * taste_id - 1-byte indicates the taste preference id
+ * taste_id[2] - 2-byte indicates the 1st taste preference id
+ * taste_id2[2] - 2-byte indicates the 2nd taste preference id
+ * taste_id3[2] - 2-byte indicates the 3rd taste preference id
  * kitchen - the kitchen to this food
  * 
  * origianal_table[2] - 2-bytes indicates the original table id,
@@ -80,7 +82,7 @@ public class ReqInsertOrder extends ReqPackage {
 					1 + /* category takes up 1 byte */
 					1 + /* custom number takes up 1 byte */ 
 					1 + /* food number takes up 1 byte */
-					reqOrder.foods.length * 6 + /* each food takes up 6 bytes*/
+					reqOrder.foods.length * 11 + /* each food takes up 6 bytes*/
 					2; /* original table id takes up 2 bytes */
 		header.length[0] = (byte)(bodyLen & 0x000000FF) ;
 		header.length[1] = (byte)((bodyLen & 0x0000FF00) >> 8);
@@ -110,9 +112,14 @@ public class ReqInsertOrder extends ReqPackage {
 			body[offset + 1] = (byte)((reqOrder.foods[i].alias_id & 0x0000FF00) >> 8);
 			body[offset + 2] = (byte)(reqOrder.foods[i].count & 0x000000FF);
 			body[offset + 3] = (byte)((reqOrder.foods[i].count & 0x0000FF00) >> 8);
-			body[offset + 4] = (byte)(reqOrder.foods[i].taste.alias_id & 0x00FF);
-			body[offset + 5] = (byte)(reqOrder.foods[i].kitchen);
-			offset += 6;
+			body[offset + 4] = (byte)(reqOrder.foods[i].tastes[0].alias_id & 0x00FF);
+			body[offset + 5] = (byte)((reqOrder.foods[i].tastes[0].alias_id & 0xFF00) >> 8);
+			body[offset + 6] = (byte)(reqOrder.foods[i].tastes[1].alias_id & 0x00FF);
+			body[offset + 7] = (byte)((reqOrder.foods[i].tastes[1].alias_id & 0xFF00) >> 8);
+			body[offset + 8] = (byte)(reqOrder.foods[i].tastes[2].alias_id & 0x00FF);
+			body[offset + 9] = (byte)((reqOrder.foods[i].tastes[2].alias_id & 0xFF00) >> 8);
+			body[offset + 10] = (byte)(reqOrder.foods[i].kitchen);
+			offset += 11;
 		}		
 		
 		//assign the original table id

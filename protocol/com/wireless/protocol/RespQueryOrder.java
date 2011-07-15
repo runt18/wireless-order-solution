@@ -25,13 +25,15 @@ import java.io.UnsupportedEncodingException;
  * 			  price[1..3] - 3-byte indicating the fixed-point
  * food_num - 1-byte indicating the number of ordered food
  * <Food>
- * food_id[2] : order_num[2] : status : taste_id
+ * food_id[2] : order_num[2] : status : taste_id : taste_id[2] : taste_id2[2] : taste_id3[2]
  * food_id[2] - 2-byte indicating the food's id
  * order_num[2] - 2-byte indicating how many this foods are ordered
  * 			   order_num[0] - 1-byte indicates the float-point
  * 			   order_num[1] - 1-byte indicates the fixed-point
  * status - the status to this food
- * taste_id - 1-byte indicates the taste preference id
+ * taste_id[2] - 2-byte indicates the 1st taste preference id
+ * taste_id2[2] - 2-byte indicates the 2nd taste preference id
+ * taste_id3[3] - 2-byte indicates the 3rd taste preference id
  *******************************************************/
 public class RespQueryOrder extends RespPackage{
 
@@ -46,7 +48,7 @@ public class RespQueryOrder extends RespPackage{
 					1 + /* custom number takes up 1-byte */ 
 					4 + /* price takes up 4-byte */ 
 					1 + /* food number takes up 1-byte */
-					order.foods.length * 6; /* each food takes up 5-byte*/
+					order.foods.length * 11; /* each food takes up 11-byte*/
 		
 		//assign the body length to header's length field
 		header.length[0] = (byte)(bodyLen & 0x000000FF);
@@ -92,8 +94,13 @@ public class RespQueryOrder extends RespPackage{
 			body[index + 2] = (byte)(order.foods[i].count & 0x000000FF);
 			body[index + 3] = (byte)((order.foods[i].count & 0x0000FF00) >> 8);
 			body[index + 4] = (byte)(order.foods[i].status);
-			body[index + 5] = (byte)(order.foods[i].taste.alias_id & 0x00FF);
-			index += 6;
+			body[index + 5] = (byte)(order.foods[i].tastes[0].alias_id & 0x00FF);
+			body[index + 6] = (byte)(order.foods[i].tastes[0].alias_id & 0x00FF);
+			body[index + 7] = (byte)(order.foods[i].tastes[1].alias_id & 0x00FF);
+			body[index + 8] = (byte)(order.foods[i].tastes[1].alias_id & 0x00FF);
+			body[index + 9] = (byte)(order.foods[i].tastes[2].alias_id & 0x00FF);
+			body[index + 10] = (byte)(order.foods[i].tastes[2].alias_id & 0x00FF);
+			index += 11;
 		}
 	}
 

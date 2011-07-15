@@ -128,4 +128,54 @@ public class Util {
 		int integer = floatValue.intValue();
 		return integer * 100 + decimal;
 	}
+	
+	/**
+	 * Combine the tastes into a signal string,
+	 * each of which is separated by "," .
+	 * @param tastes the tastes to this food
+	 * @return the combined taste string
+	 */
+	public static String genTastePref(Taste[] tastes){
+		String tastePref = "";
+		boolean isTasted = false;
+		for(int i = 0; i < tastes.length; i++){
+			if(tastes[i].alias_id != Taste.NO_TASTE){
+				isTasted = true;
+				if(tastePref.length() != 0){
+					tastePref += ",";
+				}
+				tastePref += tastes[i].preference;
+			}
+		}
+		if(isTasted){
+			return tastePref;
+		}else{
+			return Taste.NO_PREFERENCE;
+		}
+	}
+	
+	/**
+	 * Calculate the total taste price.
+	 * @param tastes the tastes to this food
+	 * @param foodPrice the price to the food this taste attached to
+	 * @return the total taste price represented Float
+	 */
+	public static Float genTastePrice(Taste[] tastes, Float foodPrice){
+		return Util.int2Float(genTastePrice(tastes, Util.float2Int(foodPrice)));
+	}
+	
+	/**
+	 * Calculate the total taste price.
+	 * Note that this method only used for internal.
+	 * @param tastes the tastes to this food
+	 * @param foodPrice the price to the food this taste attached to
+	 * @return the total taste price represented as integer
+	 */
+	static int genTastePrice(Taste[] tastes, int foodPrice){
+		int tastePrice = 0;
+		for(int i = 0; i < tastes.length; i++){
+			tastePrice += (tastes[i].calc == Taste.CALC_PRICE ? tastes[i].price : foodPrice * tastes[i].rate / 100);
+		}
+		return tastePrice;
+	}
 }
