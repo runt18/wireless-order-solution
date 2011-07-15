@@ -172,7 +172,7 @@ public class InsertOrder {
 						"`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, `discount`, `taste`, `taste_price`, `taste_id`, `taste_id2`, `taste_id3`, `kitchen`, `waiter`, `order_date`) VALUES (" +	
 						orderToInsert.id + ", " + 
 						orderToInsert.foods[i].alias_id + ", " + 
-						orderToInsert.foods[i].count2Float().toString() + ", " + 
+						orderToInsert.foods[i].getCount() + ", " + 
 						orderToInsert.foods[i].getPrice() + ", '" + 
 						orderToInsert.foods[i].name + "', " +
 						orderToInsert.foods[i].status + ", " +

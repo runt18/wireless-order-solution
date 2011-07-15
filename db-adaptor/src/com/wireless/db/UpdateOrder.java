@@ -137,7 +137,7 @@ public class UpdateOrder {
 				 * So the difference is equal to the amount of new order food
 				 */
 				STATUS status = STATUS.NOT_MATCHED;
-				float diff = orderToUpdate.foods[i].count2Float().floatValue();
+				float diff = orderToUpdate.foods[i].getCount().floatValue();
 				
 				for(int j = 0; j < originalRecords.size(); j++){
 					/**
@@ -162,7 +162,7 @@ public class UpdateOrder {
 							orderToUpdate.foods[i].count != originalRecords.get(j).count){
 
 						//calculate the difference between the submitted and original record
-						diff = orderToUpdate.foods[i].count2Float().floatValue() - originalRecords.get(j).count2Float().floatValue();					
+						diff = orderToUpdate.foods[i].getCount().floatValue() - originalRecords.get(j).getCount().floatValue();					
 						status = STATUS.FULL_MATCHED_BUT_COUNT;
 						break;					
 					}
