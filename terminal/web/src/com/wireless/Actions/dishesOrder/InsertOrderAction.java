@@ -188,7 +188,7 @@ public class InsertOrderAction extends Action implements PinGen {
 			//extract the amount to order food
 			foods[i].setCount(Float.parseFloat(values[1]));
 			//extract the taste alias id
-			foods[i].taste.alias_id = Short.parseShort(values[2]);
+			foods[i].tastes[0].alias_id = Short.parseShort(values[2]);
 			//extract the kitchen number
 			foods[i].kitchen = Short.parseShort(values[3]);
 		}
