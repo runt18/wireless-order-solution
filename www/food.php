@@ -222,7 +222,7 @@ foreach ($rs as $row){
 		echo "  <img src='images/icon_tip_jian.gif'  height='19' width='19' border='0'/>" ;
 	}
 	if (($status & 8) != 0) {
-		echo " 赠" ;
+		echo " <img src='images/icon_tip_zeng.gif'  height='19' width='19' border='0'/>" ;
 	}
 	if (($status & 4) != 0) {
 		echo "  <img src='images/icon_tip_ting.gif'  height='19' width='19' border='0'/>" ;
