@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.TreeMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -14,8 +15,8 @@ import java.util.concurrent.TimeUnit;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
 import org.tiling.scheduling.DailyIterator;
-import org.tiling.scheduling.MonthlyIterator;
 import org.tiling.scheduling.Scheduler;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -23,8 +24,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.wireless.db.Params;
+import com.wireless.protocol.ProtocolPackage;
 import com.wireless.task.DailySettlementTask;
-import com.wireless.task.SweepDBTask;
 import com.wireless.task.SweepPrtConTask;
 
 public class WirelessSocketServer {
@@ -62,8 +63,10 @@ public class WirelessSocketServer {
     //the tree map holding the restaurant id and the corresponding printer socket
     static TreeMap<Integer, ArrayList<Socket>> printerConnections = new TreeMap<Integer, ArrayList<Socket>>();
     //the hash map holding the information is as below
-    //HashMap<func, HashMap<style, print_template>>
     static HashMap<Integer, HashMap<Integer, String>> printTemplates = new HashMap<Integer, HashMap<Integer, String>>();    
+    
+    //the hash map holding the unprinted request
+    static HashMap<Integer, LinkedList<ProtocolPackage>> printLosses = new HashMap<Integer, LinkedList<ProtocolPackage>>();
     
     //the thread pool
     static ThreadPoolExecutor threadPool = null;

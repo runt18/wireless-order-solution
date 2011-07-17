@@ -283,38 +283,38 @@ class OrderHandler extends Handler implements Runnable{
 		Socket[] connections = null;
 		if(printerConn != null){
 			connections = printerConn.toArray(new Socket[printerConn.size()]);			
+		}else{
+			connections = new Socket[0];
 		}
-		if(connections != null && orderToPrint != null){
-			for(int i = 0; i < connections.length; i++){
+		if(orderToPrint != null){
+			/**
+			 * Get the corresponding restaurant information
+			 */
+			Restaurant restaurant = null;
+			try{
+				restaurant = QueryRestaurant.exec(_term.restaurant_id);
+			}catch(Exception e){
+				restaurant = new Restaurant();
+			}
+			
+			//check whether the print request is synchronized or asynchronous
+			if((printConf & Reserved.PRINT_SYNC) != 0){
 				/**
-				 * Get the corresponding restaurant information
-				 */
-				Restaurant restaurant = null;
+				 * if the print request is synchronized, then the insert order request must wait until
+				 * the print request is done, and send the ACK or NAK to let the terminal know whether 
+				 * the print actions is successfully or not
+				 */	
 				try{
-					restaurant = QueryRestaurant.exec(_term.restaurant_id);
-				}catch(Exception e){
-					restaurant = new Restaurant();
-				}
+					new PrintHandler(orderToPrint, connections, printConf, restaurant, _term.owner).run2();						
+				}catch(PrintSocketException e){}
 				
-				//check whether the print request is synchronized or asynchronous
-				if((printConf & Reserved.PRINT_SYNC) != 0){
-					/**
-					 * if the print request is synchronized, then the insert order request must wait until
-					 * the print request is done, and send the ACK or NAK to let the terminal know whether 
-					 * the print actions is successfully or not
-					 */	
-					try{
-						new PrintHandler(orderToPrint, connections[i], printConf, restaurant, _term.owner).run2();						
-					}catch(PrintSocketException e){}
-				
-				}else{
-					/**
-					 * if the print request is asynchronous, then the insert order request return an ACK immediately,
-					 * regardless of the print request. In the mean time, the print request would be put to a 
-					 * new thread to run.
-					 */	
-					WirelessSocketServer.threadPool.execute(new PrintHandler(orderToPrint, connections[i], printConf, restaurant, _term.owner));
-				}
+			}else{
+				/**
+				 * if the print request is asynchronous, then the insert order request return an ACK immediately,
+				 * regardless of the print request. In the mean time, the print request would be put to a 
+				 * new thread to run.
+				 */	
+				WirelessSocketServer.threadPool.execute(new PrintHandler(orderToPrint, connections, printConf, restaurant, _term.owner));
 			}
 		}
 	}
