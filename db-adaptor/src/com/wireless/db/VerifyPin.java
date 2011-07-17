@@ -50,7 +50,7 @@ public class VerifyPin {
 	 */
 	public static Terminal exec(DBCon dbCon, int pin, short model) throws BusinessException, SQLException{
 		String sql = "SELECT restaurant_id, expire_date, owner_name, model_name FROM " +  
-	     			Params.dbName + ".terminal WHERE pin=" + pin +
+	     			Params.dbName + ".terminal WHERE pin=" + "0x" + Integer.toHexString(pin) +
 	     			" AND model_id=" + model;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		Terminal terminal = new Terminal();
