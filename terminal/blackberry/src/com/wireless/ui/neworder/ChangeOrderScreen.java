@@ -20,8 +20,10 @@ import net.rim.device.api.ui.container.VerticalFieldManager;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.Type;
+import com.wireless.terminal.WirelessOrder;
 import com.wireless.ui.field.OrderListField;
 import com.wireless.ui.field.SelectFoodPopup;
+import com.wireless.ui.field.SelectKitchenPopup;
 
 
 
@@ -39,8 +41,8 @@ public class ChangeOrderScreen extends MainScreen
 		_originalOrder = bill;
 		setTitle("改单");
 		//The food has ordered would be listed in here.
-		VerticalFieldManager _vfm = new VerticalFieldManager();
-		_vfm.add(new SeparatorField());
+		VerticalFieldManager vfm = new VerticalFieldManager();
+		vfm.add(new SeparatorField());
 		
 		String category;
 		if(bill.category == Order.CATE_JOIN_TABLE){
@@ -66,12 +68,12 @@ public class ChangeOrderScreen extends MainScreen
 			}
 		};
 
-		_vfm.add(_tableTitle);
+		vfm.add(_tableTitle);
 		
 		_table = new EditField("台号：", Integer.toString(_originalOrder.table_id),
 			   	   			   4, TextField.NO_NEWLINE | EditField.FILTER_NUMERIC);
 		if(bill.category == Order.CATE_NORMAL){
-			_vfm.add(_table);			
+			vfm.add(_table);			
 		}
 
 		_customNum = new EditField("人数：", Integer.toString(_originalOrder.custom_num), 2,
@@ -81,9 +83,9 @@ public class ChangeOrderScreen extends MainScreen
 			}
 		};		
 
-		_vfm.add(_customNum);
-		_vfm.add(new SeparatorField());
-		_vfm.add(new LabelField("已点菜", LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
+		vfm.add(_customNum);
+		vfm.add(new SeparatorField());
+		vfm.add(new LabelField("已点菜", LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
 			protected void paintBackground(Graphics g) {
 				g.clear();
 				g.setBackgroundColor(Color.GRAY);
@@ -98,27 +100,38 @@ public class ChangeOrderScreen extends MainScreen
 		
 		_orderListField = new OrderListField(_originalOrder.foods, Type.UPDATE_ORDER);
 		
-		_vfm.add(_orderListField);
-		_vfm.add(new SeparatorField());
-		add(_vfm);
+		vfm.add(_orderListField);
+		vfm.add(new SeparatorField());
+		add(vfm);
 		
 		//Three buttons would be shown in the bottom of the screen
-		ButtonField _addOrder = new ButtonField("加菜", ButtonField.CONSUME_CLICK);
-		ButtonField _submit = new ButtonField("提交", ButtonField.CONSUME_CLICK);
-		HorizontalFieldManager _hfm = new HorizontalFieldManager(Manager.FIELD_HCENTER);
-		_hfm.add(_addOrder);
-		_hfm.add(new LabelField("    "));
-		_hfm.add(_submit);
-		add(_hfm);
+		ButtonField byNoBtn = new ButtonField("编号", ButtonField.CONSUME_CLICK);
+		ButtonField byKitchenBtn = new ButtonField("分厨", ButtonField.CONSUME_CLICK);
+		ButtonField submit = new ButtonField("提交", ButtonField.CONSUME_CLICK);
+		HorizontalFieldManager hfm = new HorizontalFieldManager(Manager.FIELD_HCENTER);
+		hfm.add(byNoBtn);
+		hfm.add(new LabelField("    "));
+		hfm.add(byKitchenBtn);
+		hfm.add(new LabelField("    "));
+		hfm.add(submit);
+		add(hfm);
 		
 		//Set the listener to order button
-		_addOrder.setChangeListener(new FieldChangeListener(){
+		byNoBtn.setChangeListener(new FieldChangeListener(){
 			public void fieldChanged(Field field, int context) {
-	             UiApplication.getUiApplication().pushScreen(new SelectFoodPopup(_orderListField));
+	             UiApplication.getUiApplication().pushScreen(new SelectFoodPopup(_orderListField, WirelessOrder.foodMenu.foods));
 	         }
 		});
+		
+		//Set the listener to order by kitchen button
+		byKitchenBtn.setChangeListener(new FieldChangeListener(){
+			public void fieldChanged(Field field, int context) {
+				UiApplication.getUiApplication().pushScreen(new SelectKitchenPopup(_orderListField));
+			}
+		});
+		
 		//Set the submit button's listener
-		_submit.setChangeListener(new FieldChangeListener(){
+		submit.setChangeListener(new FieldChangeListener(){
 			public void fieldChanged(Field field, int context) {
 				if(_orderListField.getSize() == 0){
 					Dialog.alert("点菜单为空，暂时不能改单。");
@@ -138,7 +151,7 @@ public class ChangeOrderScreen extends MainScreen
 		});
 		
 		//Focus on order button
-		_addOrder.setFocus();
+		byNoBtn.setFocus();
 	}  
 	
 	protected boolean onSavePrompt(){
