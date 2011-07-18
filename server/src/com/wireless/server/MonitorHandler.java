@@ -5,6 +5,8 @@ import java.net.*;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import com.wireless.protocol.ProtocolPackage;
+
 /**
  * The monitor is designed to wait for the control command to the wireless order socket.<br>
  * It'll listen on a specific port (set from the outside conf.xml), and only accept the command
@@ -37,9 +39,9 @@ public class MonitorHandler implements Runnable{
 	public void run(){
 		try{
 			MonitorStatus ms = null;
-			InetAddress localHost = InetAddress.getByName("localhost");
-			//listened on port for the print login service
-			_server = new ServerSocket(WirelessSocketServer.monitor_listen);
+			//InetAddress localHost = InetAddress.getByName("localhost");
+			//listened on port of local host for the print login service
+			_server = new ServerSocket(WirelessSocketServer.monitor_listen, 0, InetAddress.getByName("localhost"));
 			InputStream in = null;
 			OutputStream out = null;
 			Socket connection = null;
@@ -50,9 +52,9 @@ public class MonitorHandler implements Runnable{
 				try{
 					connection = _server.accept();
 					//only accept the connection from local host
-					if(!connection.getInetAddress().equals(localHost)){
-						continue;
-					}					
+//					if(!connection.getInetAddress().equals(localHost)){
+//						continue;
+//					}					
 					in = new BufferedInputStream(new DataInputStream(connection.getInputStream()));
 					out = new BufferedOutputStream(new DataOutputStream(connection.getOutputStream()));
 					byte[] rec_buf = new byte[256];
@@ -233,27 +235,44 @@ class MonitorStatus extends Thread{
 				FileWriter statusWriter = new FileWriter(statusFile);
 				String status = "Thread pool status: $(core) core,  $(max) max,  $(alive)s alive,  $(queue_size) queues" + sep;
 				status += "Thread pool statistics: $(working) working,  $(queued) queued,  $(largest) largest,  $(completed) completed" + sep;
-				status += "Printer status: $(restaurant_printer) restaurant(s),  $(printer_socket) socket(s)";
+				status += "Printer status: $(restaurant_printer) restaurant(s),  $(printer_socket) socket(s)" + sep;
+				status += "Print loss status: $(restaurant_loss) restaurant(s),  $(printer_loss) receipt(s)";
 				//replace the thread pool status
-				status = status.replace("$(core)", new Integer(WirelessSocketServer.threadPool.getCorePoolSize()).toString());
-				status = status.replace("$(max)", new Integer(WirelessSocketServer.threadPool.getMaximumPoolSize()).toString());
-				status = status.replace("$(alive)", new Long(WirelessSocketServer.threadPool.getKeepAliveTime(TimeUnit.SECONDS)).toString());
-				status = status.replace("$(queue_size)", new Integer(WirelessSocketServer.threadPool.getQueue().size() + WirelessSocketServer.threadPool.getQueue().remainingCapacity()).toString());
-				status = status.replace("$(working)", new Integer(WirelessSocketServer.threadPool.getActiveCount()).toString());
-				status = status.replace("$(queued)", new Integer(WirelessSocketServer.threadPool.getQueue().size()).toString());
-				status = status.replace("$(largest)", new Integer(WirelessSocketServer.threadPool.getLargestPoolSize()).toString());
-				status = status.replace("$(completed)", new Long(WirelessSocketServer.threadPool.getCompletedTaskCount()).toString());
+				status = status.replace("$(core)", Integer.toString(WirelessSocketServer.threadPool.getCorePoolSize()));
+				status = status.replace("$(max)", Integer.toString(WirelessSocketServer.threadPool.getMaximumPoolSize()));
+				status = status.replace("$(alive)", Long.toString(WirelessSocketServer.threadPool.getKeepAliveTime(TimeUnit.SECONDS)));
+				status = status.replace("$(queue_size)", Integer.toString(WirelessSocketServer.threadPool.getQueue().size() + WirelessSocketServer.threadPool.getQueue().remainingCapacity()));
+				status = status.replace("$(working)", Integer.toString(WirelessSocketServer.threadPool.getActiveCount()));
+				status = status.replace("$(queued)", Integer.toString(WirelessSocketServer.threadPool.getQueue().size()));
+				status = status.replace("$(largest)", Integer.toString(WirelessSocketServer.threadPool.getLargestPoolSize()));
+				status = status.replace("$(completed)", Long.toString(WirelessSocketServer.threadPool.getCompletedTaskCount()));
+				
 				//get the amount of the restaurant logging in in the printer server
 				int nRestaurant = WirelessSocketServer.printerConnections.keySet().size();
-				status = status.replace("$(restaurant_printer)", new Integer(nRestaurant).toString());
+				status = status.replace("$(restaurant_printer)", Integer.toString(nRestaurant));
+				
 				//calculate the number of the printer sockets
 				Iterator<ArrayList<Socket>> iter = WirelessSocketServer.printerConnections.values().iterator();
 				int nPrtSocket = 0;
 				while(iter.hasNext()){
 					nPrtSocket += iter.next().size();
-				}
+				}				
 				//replace the printer sockets status
-				status = status.replace("$(printer_socket)", new Integer(nPrtSocket).toString());
+				status = status.replace("$(printer_socket)", Integer.toString(nPrtSocket));
+				
+				//get the amount of restaurant to print loss
+				nRestaurant = WirelessSocketServer.printLosses.keySet().size();
+				status = status.replace("$(restaurant_loss)", Integer.toString(nRestaurant));
+				
+				//calculate the number of the receipt loss
+				Iterator<LinkedList<ProtocolPackage>> iterLoss = WirelessSocketServer.printLosses.values().iterator();
+				int nPrintLoss = 0;
+				while(iterLoss.hasNext()){
+					nPrintLoss += iterLoss.next().size();
+				}
+				//replace the number of receipt to print loss
+				status = status.replace("$(printer_loss)", Integer.toString(nPrintLoss));
+				
 				//write to the log file
 				statusWriter.write(status);
 				statusWriter.close();

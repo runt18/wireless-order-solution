@@ -12,6 +12,7 @@ import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 import com.wireless.db.DBCon;
 import com.wireless.exception.BusinessException;
@@ -157,6 +158,12 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 										WirelessSocketServer.printerConnections.put(new Integer(restaurantID), printerSockets);									
 									}
 								}
+								
+								/**
+								 * Perform to print the loss receipt
+								 */
+								WirelessSocketServer.threadPool.execute(new PrintLossHandler(connection, restaurantID));
+								
 							}else{
 								throw new BusinessException("The password is not correct.", ErrorCode.PWD_NOT_MATCH);
 							}						
@@ -177,45 +184,50 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 					}					
 					
 				}catch(BusinessException e){
-					if(loginReq != null){
-						try{
-							send(_out, new RespNAK(loginReq.header, e.errCode));
-						}catch(IOException ex){
-							ex.printStackTrace();
-						}
-					}
+					respNAK(loginReq, e.errCode);
 					e.printStackTrace();
 					closeSocket(connection);
 					
 				}catch(IOException e){
-					if(loginReq != null){
-						try{
-							send(_out, new RespNAK(loginReq.header));
-						}catch(IOException ex){
-							ex.printStackTrace();
-						}
-					}
+					respNAK(loginReq, ErrorCode.UNKNOWN);
 					e.printStackTrace();
 					closeSocket(connection);
 					
 				}catch(SQLException e){
-					if(loginReq != null){
-						try{
-							send(_out, new RespNAK(loginReq.header));
-						}catch(IOException ex){
-							ex.printStackTrace();
-						}
-					}
+					respNAK(loginReq, ErrorCode.UNKNOWN);
+					e.printStackTrace();
+					closeSocket(connection);
+					
+				}catch(Exception e){
+					respNAK(loginReq, ErrorCode.UNKNOWN);
 					e.printStackTrace();
 					closeSocket(connection);
 					
 				}finally{	
+					
 					dbCon.disconnect();
 				}
 			}
 		}catch(IOException e){
 			e.printStackTrace();
 		}		
+	}
+	
+	/**
+	 * Response with NAK to client.
+	 * @param loginReq
+	 * 			the login request
+	 * @param errCode
+	 * 			the error code
+	 */
+	private void respNAK(ProtocolPackage loginReq, byte errCode){
+		if(loginReq != null){
+			try{
+				send(_out, new RespNAK(loginReq.header));
+			}catch(IOException e){
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	/**
@@ -238,4 +250,81 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 		}
 
 	}
+}
+
+class PrintLossHandler extends Handler implements Runnable{
+
+	private Socket _sock;
+	private int _restaurantID;
+	
+	PrintLossHandler(Socket sock, int restaurantID){
+		_sock = sock;
+		_restaurantID = restaurantID;
+	}
+	
+	public void run(){
+		/**
+		 * Copy the unprinted request to a temporary list
+		 */
+		LinkedList<ProtocolPackage> printReqs = new LinkedList<ProtocolPackage>();
+		synchronized(WirelessSocketServer.printLosses){
+			LinkedList<ProtocolPackage> printLosses = WirelessSocketServer.printLosses.get(_restaurantID);
+			if(printLosses != null){
+				printReqs.addAll(printLosses);
+			}			
+		}
+		
+		/**
+		 * Just return if no unprinted request exist
+		 */
+		if(printReqs.isEmpty()){
+			return;
+		}
+		
+		/**
+		 * Enumerate the list queue to send all the unprinted requests to client again.
+		 */
+		synchronized(_sock){
+			
+			try{
+				_sock.sendUrgentData(0);
+				
+				InputStream in = new BufferedInputStream(_sock.getInputStream());
+				OutputStream out = new BufferedOutputStream(_sock.getOutputStream());
+				
+				while(printReqs.size() != 0){
+					ProtocolPackage reqPrint = printReqs.peek();
+						
+					send(out, reqPrint);	
+					/**
+					 * Receive the response within 10s timeout
+					 */
+					ProtocolPackage respPrint = recv(in, 10 * 1000);
+					/**
+					 * Remove the unprinted request from the queue if receiving ACK
+					 */
+					if(respPrint.header.seq == reqPrint.header.seq){
+						if(respPrint.header.mode == Mode.PRINT && respPrint.header.type == Type.ACK){
+							printReqs.remove();
+						}							
+					}
+				}
+				
+			}catch(IOException e){
+				e.printStackTrace();
+			}
+		}
+		
+		/**
+		 * If succeed to send all the unprinted requests, then remove the corresponding restaurant.
+		 * Otherwise append the remaining unprinted request to the print loss queue. 
+		 */
+		synchronized(WirelessSocketServer.printLosses){		
+			WirelessSocketServer.printLosses.remove(_restaurantID);
+			if(!printReqs.isEmpty()){
+				WirelessSocketServer.printLosses.put(_restaurantID, printReqs);
+			}
+		}
+
+	}	
 }
