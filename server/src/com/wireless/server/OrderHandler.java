@@ -304,9 +304,7 @@ class OrderHandler extends Handler implements Runnable{
 				 * the print request is done, and send the ACK or NAK to let the terminal know whether 
 				 * the print actions is successfully or not
 				 */	
-				try{
-					new PrintHandler(orderToPrint, connections, printConf, restaurant, _term.owner).run2();						
-				}catch(PrintSocketException e){}
+				new PrintHandler(orderToPrint, connections, printConf, restaurant, _term.owner).run();						
 				
 			}else{
 				/**
