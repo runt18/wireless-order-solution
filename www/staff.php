@@ -13,6 +13,7 @@ include("hasLogin.php");
 <script type="text/javascript" src="js/pop-up.js"></script>
 <script type="text/javascript" src="js/staff.js"></script>
 <script type="text/javascript" src="js/changePassword.js"></script>
+<script type="text/javascript" src="js/date.js"></script>
 </head>
 <body>
 <?php
@@ -27,7 +28,7 @@ if($editType == "addStaff" || $editType == "editStaff")
 	$alias_id = $_POST["alias_id"];
 	$name = $_POST["name"];
 	$pwd = $_POST["pwd"];
-	
+	$quota = $_POST["quota"];
 	$validate = true;
 	if($editType == "addStaff")
 	{		
@@ -35,7 +36,7 @@ if($editType == "addStaff" || $editType == "editStaff")
 		$rs = $db ->GetOne($sql);		
 		if($rs)
 		{			
-			echo "<script>alert('已存在此编号的员工，请输入其它编号！');editStaff('','$alias_id','$name','$pwd');</script>";
+			echo "<script>alert('已存在此编号的员工，请输入其它编号！');editStaff('','$alias_id','$name','$pwd','','$quota');</script>";
 			$validate = false;
 		}
 		else
@@ -43,8 +44,16 @@ if($editType == "addStaff" || $editType == "editStaff")
 			$sql = "SELECT CASE MAX(pin) WHEN NULL THEN 0 ELSE MAX(pin) END FROM terminal WHERE model_name = 'Staff' AND pin < 1000000000";
 			$rs = $db ->GetOne($sql);	
 			$pin = $rs + 1;
-			$sql = "INSERT INTO `terminal` (`pin`, `restaurant_id`, `model_id`, `model_name`, `owner_name`
-					) VALUES ($pin, ".$_SESSION["restaurant_id"].", 255, 'Staff', '$name')";
+			if($quota == "")
+			{
+				$sql = "INSERT INTO `terminal` (`pin`, `restaurant_id`, `model_id`, `model_name`, `owner_name`
+						) VALUES ($pin, ".$_SESSION["restaurant_id"].", 255, 'Staff', '$name')";
+			}
+			else
+			{
+				$sql = "INSERT INTO `terminal` (`pin`, `restaurant_id`, `model_id`, `model_name`, `owner_name`,`gift_quota`
+						) VALUES ($pin, ".$_SESSION["restaurant_id"].", 255, 'Staff', '$name',$quota)";
+			}
 			$db->Execute($sql);
 			$sql = "SELECT id FROM terminal WHERE pin = $pin AND restaurant_id = ".$_SESSION["restaurant_id"];
 			$rs = $db ->GetOne($sql);	
@@ -57,7 +66,15 @@ if($editType == "addStaff" || $editType == "editStaff")
 		$random = $_POST["random"];
 		$sql = "SELECT terminal_id FROM staff WHERE id=$id";
 		$terminal_id = $db ->GetOne($sql);	
-		$db->Execute("UPDATE terminal SET `owner_name`='$name' WHERE id=$terminal_id");
+		if($quota == "")
+		{
+			$db->Execute("UPDATE terminal SET `owner_name`='$name' WHERE id=$terminal_id");
+		}
+		else
+		{
+			$db->Execute("UPDATE terminal SET `owner_name`='$name',gift_quota=$quota WHERE id=$terminal_id");
+		}
+		
 		if($pwd != $random)
 		{		
 			$sql = "UPDATE staff SET name='$name',pwd='".md5($pwd)."' WHERE id=$id";		
@@ -92,10 +109,18 @@ else if($editType == "deleteStaff")
 			echo "<script>alert('删除失败！');</script>";
 		}	
 	}
+$editType = $_POST["editType"];
+if($editType == "viewShiftRecord")
+{	
+	$dateFrom = $_POST["dateFrom"];
+	$dateTo = $_POST["dateTo"];
+	echo "<script>showShiftRecord('$dateFrom','$dateTo');</script>";				
+}  
 //echo $sql;
 ?>
 <h1>
-<span class="action-span"><a href="#" onclick="editStaff('','','','')">添加员工</a></span>
+<span class="action-span"><a href="#" onclick="editStaff('','','','','','')">添加员工</a></span>
+<span class="action-span"><a href="#" onclick="viewShiftRecord();">交班记录</a></span>
 <span class="action-span1">e点通会员中心</span><span id="search_id" class="action-span2">&nbsp;- 员工管理 </span>
 <div style="clear:both"></div>
 </h1>
@@ -121,6 +146,7 @@ else if($editType == "deleteStaff")
 			<tr>
 				<th><h3>编&nbsp;号</h3></th>
 				<th><h3>姓&nbsp;名</h3></th>							
+				<th><h3>赠送额度（￥）</h3></th>		
 				<th><h3>操&nbsp;作</h3></th>
 			</tr>
 		</thead>
@@ -130,16 +156,16 @@ include("conn.php");
 include("common.php"); 				
 $xm=$_REQUEST["keyword_type"];
 $kw=$_REQUEST["keyword"]; 
-$sql = "SELECT id,alias_id,name FROM staff WHERE restaurant_id=" . $_SESSION["restaurant_id"];			
+$sql = "SELECT a.id,a.alias_id,a.name,b.gift_quota FROM staff a INNER JOIN terminal b ON a.terminal_id = b.id WHERE a.restaurant_id=" . $_SESSION["restaurant_id"];			
 switch ($xm)
 {
 	case "alias_id":
 		if ($kw!="")
-			$sql .= " AND alias_id = $kw" ;  			
+			$sql .= " AND a.alias_id = $kw" ;  			
 		break;
 	case "name":
 		if ($kw!="")
-			$sql .= " AND name like '%$kw%'" ;  			
+			$sql .= " AND a.name like '%$kw%'" ;  			
 		break;	
 }			
 $bh=0;
@@ -152,7 +178,8 @@ foreach ($rs as $row){
 	echo "<tr>";
 	echo "<td>" .$row["alias_id"] ."</td>";
 	echo "<td>" .$row["name"] ."</td>";	
-	echo "<td><a href='#' onclick='editStaff(&quot;".$row["id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["name"]."&quot;,&quot;".$pwd."&quot;,&quot;".$pwd.
+	echo "<td>" .$row["gift_quota"] ."</td>";		
+	echo "<td><a href='#' onclick='editStaff(&quot;".$row["id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["name"]."&quot;,&quot;".$pwd."&quot;,&quot;".$pwd."&quot;,&quot;".$row["gift_quota"].
 		"&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
 		"<a href='#' onclick='deleteStaff(".$row["id"].")'><img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;删除</a></td>";
 	echo "</tr>";
@@ -163,7 +190,7 @@ mysql_close($con);
 	</tbody>
   </table>
   </div>
-  
+  <?PHP //echo $sql ?>
 	<div id="controls">
        <div id="text"><?php echo "总计:" .$bh ."&nbsp;条记录"; ?>&nbsp;&nbsp;&nbsp;&nbsp;当前第 <span id="currentpage"></span> 页，每页 </div>
         <div id="perpage">

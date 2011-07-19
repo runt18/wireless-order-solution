@@ -32,11 +32,11 @@
     {
     "ProjRelPath" = "T"
     }
-    "libs\\adodb\\lang\\adodb-pt-br.inc.php"
+    "libs\\adodb\\adodb.inc.php"
     {
     "ProjRelPath" = "T"
     }
-    "libs\\adodb\\adodb.inc.php"
+    "libs\\adodb\\lang\\adodb-pt-br.inc.php"
     {
     "ProjRelPath" = "T"
     }
@@ -192,19 +192,19 @@
     {
     "ProjRelPath" = "T"
     }
-    "js\\food.js"
-    {
-    "ProjRelPath" = "T"
-    }
     "js\\table.js"
     {
     "ProjRelPath" = "T"
     }
-    "libs\\adodb\\drivers\\adodb-odbtp_unicode.inc.php"
+    "js\\food.js"
     {
     "ProjRelPath" = "T"
     }
     "libs\\adodb\\drivers\\adodb-odbc_db2.inc.php"
+    {
+    "ProjRelPath" = "T"
+    }
+    "libs\\adodb\\drivers\\adodb-odbtp_unicode.inc.php"
     {
     "ProjRelPath" = "T"
     }
@@ -256,11 +256,11 @@
     {
     "ProjRelPath" = "T"
     }
-    "admin_main.php"
+    "libs\\adodb\\docs\\docs-perf.htm"
     {
     "ProjRelPath" = "T"
     }
-    "libs\\adodb\\docs\\docs-perf.htm"
+    "admin_main.php"
     {
     "ProjRelPath" = "T"
     }
@@ -504,19 +504,19 @@
     {
     "ProjRelPath" = "T"
     }
-    "libs\\adodb\\tests\\testoci8.php"
-    {
-    "ProjRelPath" = "T"
-    }
     "libs\\adodb\\tests\\test-pgblob.php"
     {
     "ProjRelPath" = "T"
     }
-    "libs\\adodb\\pivottable.inc.php"
+    "libs\\adodb\\tests\\testoci8.php"
     {
     "ProjRelPath" = "T"
     }
     "food_material.php"
+    {
+    "ProjRelPath" = "T"
+    }
+    "libs\\adodb\\pivottable.inc.php"
     {
     "ProjRelPath" = "T"
     }
@@ -600,11 +600,11 @@
     {
     "ProjRelPath" = "T"
     }
-    "order_history.php"
+    "libs\\adodb\\adodb-error.inc.php"
     {
     "ProjRelPath" = "T"
     }
-    "libs\\adodb\\adodb-error.inc.php"
+    "order_history.php"
     {
     "ProjRelPath" = "T"
     }
@@ -640,11 +640,11 @@
     {
     "ProjRelPath" = "T"
     }
-    "libs\\adodb\\datadict\\datadict-postgres.inc.php"
+    "libs\\adodb\\xsl\\convert-0.1-0.2.xsl"
     {
     "ProjRelPath" = "T"
     }
-    "libs\\adodb\\xsl\\convert-0.1-0.2.xsl"
+    "libs\\adodb\\datadict\\datadict-postgres.inc.php"
     {
     "ProjRelPath" = "T"
     }
@@ -700,11 +700,11 @@
     {
     "ProjRelPath" = "T"
     }
-    "libs\\adodb\\xmlschema.dtd"
+    "images\\help\\layout.png"
     {
     "ProjRelPath" = "T"
     }
-    "images\\help\\layout.png"
+    "libs\\adodb\\xmlschema.dtd"
     {
     "ProjRelPath" = "T"
     }
@@ -924,11 +924,11 @@
     {
     "ProjRelPath" = "T"
     }
-    "js\\validator.js"
+    "libs\\adodb\\session\\adodb-sessions.oracle.clob.sql"
     {
     "ProjRelPath" = "T"
     }
-    "libs\\adodb\\session\\adodb-sessions.oracle.clob.sql"
+    "js\\validator.js"
     {
     "ProjRelPath" = "T"
     }
@@ -988,11 +988,11 @@
     {
     "ProjRelPath" = "T"
     }
-    "libs\\adodb\\adodb-lib.inc.php"
+    "images\\View.png"
     {
     "ProjRelPath" = "T"
     }
-    "images\\View.png"
+    "libs\\adodb\\adodb-lib.inc.php"
     {
     "ProjRelPath" = "T"
     }
@@ -1044,11 +1044,11 @@
     {
     "ProjRelPath" = "T"
     }
-    "libs\\adodb\\adodb-active-record.inc.php"
+    "libs\\adodb\\tests\\testpear.php"
     {
     "ProjRelPath" = "T"
     }
-    "libs\\adodb\\tests\\testpear.php"
+    "libs\\adodb\\adodb-active-record.inc.php"
     {
     "ProjRelPath" = "T"
     }
@@ -1117,6 +1117,10 @@
     "ProjRelPath" = "T"
     }
     "admin_order.php"
+    {
+    "ProjRelPath" = "T"
+    }
+    "viewShiftRecord.php"
     {
     "ProjRelPath" = "T"
     }
@@ -1436,11 +1440,11 @@
     {
     "ProjRelPath" = "T"
     }
-    "common.php"
+    "images\\data.png"
     {
     "ProjRelPath" = "T"
     }
-    "images\\data.png"
+    "common.php"
     {
     "ProjRelPath" = "T"
     }

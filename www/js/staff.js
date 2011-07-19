@@ -1,4 +1,4 @@
-function editStaff(id, alias_id, name, pwd,random) {
+function editStaff(id, alias_id, name, pwd,random,quota) {
     var editType = "addStaff";
     var title = "添加员工";
     if (id != "") {
@@ -24,12 +24,16 @@ function editStaff(id, alias_id, name, pwd,random) {
 	                      '<input type="hidden" name="editType" value="' + editType + '" />' +
 	                      '<input type="hidden" name="id" value="' + id + '" />' +
 	                      '<input type="hidden" id="random" name="random" value="' + random + '" />' +                
-	                      '<div class="add_foot_Content" style="height:180px;text-align:center">' +
+	                      '<div class="add_foot_Content" style="height:200px;">' +
 	                        '<div class="pop_Content">' +
-	                            '<div class="pop_Content1">编号：' + aliasId + '</div>' +
-	                            '<div class="pop_Content1">姓名：<input type="text" id="name" name="name" value="' + name + '" onfocus="this.select()" size="25" height="20" /></div>' +
-	                            '<div class="pop_Content1">&nbsp;&nbsp;&nbsp;&nbsp;密码：<input type="password" id="pwd" name="pwd" value="' + pwd + '" onfocus="this.select()" size="25" height="20" /></div>' +
+	                            '<div class="pop_Content1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;编号：' + aliasId + '</div>' +
+	                            '<div class="pop_Content1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;姓名：<input type="text" id="name" name="name" value="' + name + '" onfocus="this.select()" size="25" height="20" /></div>' +
+	                            '<div class="pop_Content1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;密码：<input type="password" id="pwd" name="pwd" value="' + pwd + '" onfocus="this.select()" size="25" height="20" /></div>' +
 	                            '<div class="pop_Content1">确认密码：<input type="password" id="confirm_pwd" name="confirm_pwd" value="' + pwd + '" onfocus="this.select()" size="25" height="20" /></div>' +
+	                            '<div class="pop_Content1">赠送额度：<input type="text" id="quota" name="quota" value="' + quota + '" onfocus="this.select()" size="25" height="20"' +
+	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57||event.keyCode==46||event.keyCode==45"' +  
+	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
+	                            ' style="ime-mode:Disabled" /></div>' +	     
 	                        '</div>' +
 	                            '<span class="pop_action-span"><a href="#" onclick="submitStaffData()">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>' +
 	                            '<span class="pop_action-span1"><a href="#" onclick="closeWindow()">取&nbsp;&nbsp;&nbsp;&nbsp;消</a></span>' +
@@ -133,4 +137,54 @@ function initializeStaff() {
         }
     }  
     keyword.value = keyword_value; 
+}
+
+function viewShiftRecord() {
+    var editType = "viewShiftRecord";   
+    var title = "交班记录 - 请选择日期区间";
+  
+    var content = ' <div class="add_foot">' +
+                        '<div class="title" style="width:430px">' +
+	                        '<div class="title_left" style="width:385px;"><font class="font" style="width:260px;">' + title + '</font></div>' +
+	                        '<div class="title_right" style="float:left;width:35px;"></div>' +
+	                    '</div>' +
+	                    '<form id="searchForm" name="searchForm" action="staff.php"  method="post" onkeydown="searchOrderKeyDown()">' +
+	                      '<input type="hidden" name="editType" value="' + editType + '" />' +	                    
+	                      '<div class="add_foot_Content" style="height:130px;text-align:center;width:413px">' +
+	                        '<div class="pop_Content">' +	                         
+	                           '<div class="pop_Content1" style="padding-left:0px;text-align:center">日期：<input type="text" id="dateFrom" name="dateFrom" style="width:136px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;&nbsp;至&nbsp;&nbsp;<input type="text" id="dateTo" name="dateTo" style="width:width:136px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;</div>' +
+	                        '</div>' +
+	                            '<span class="pop_action-span"><a href="#" onclick="document.searchForm.submit();">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>' +
+	                            '<span class="pop_action-span1"><a href="#" onclick="closeWindow()">取&nbsp;&nbsp;&nbsp;&nbsp;消</a></span>' +
+	                      '</div>' +
+	                      '</form>' +
+	                '</div>';
+
+    showMessageBox(content, 430, 350);
+    document.getElementById("dateFrom").focus();
+}
+
+function showShiftRecord(dateFrom, dateTo) {
+    var title = "交班记录";
+    if (dateFrom != "" && dateTo != "") {
+        title += "（" + dateFrom + "~" + dateTo + "）";
+    }
+    else if (dateFrom != "" && dateTo == "") {
+        title += "（" + dateFrom + "之后）";
+    }
+    else if (dateFrom == "" && dateTo != "") {
+        title += "（" + dateTo + "之前）";
+    }  
+
+
+    var content = ' <div class="add_foot" style="height:550px;width:100%">' +
+                        '<div class="title" style="width:100%">' +
+	                        '<div class="title_left" style="width:914px"><font id="dynamicTitle" style="font-size: 16px;font-weight: normal;color: #FFF;margin-left: 15px;line-height: 30px;text-align: left;" >' + title + '</font></div>' +
+	                        '<div class="title_right"  style="width:35px;float:left"></div>' +
+	                    '</div>' +
+	                      '<div class="add_foot_Content" style="height:370px;text-align:center;width:99%">' +
+	                            '<iframe src="viewShiftRecord.php?dateFrom=' + dateFrom + '&dateTo=' + dateTo + '" scrolling="no" style="width:100%;height:100%;" />' +
+	                        '</div>' +
+	                '</div>';
+    showMessageBox(content, 950, 350);
 }
