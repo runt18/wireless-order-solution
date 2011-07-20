@@ -381,7 +381,10 @@ function viewOrderStat(statType) {
 	                      '<input type="hidden" name="statType" value="' + statType + '" />' +
 	                      '<div class="add_foot_Content" style="height:130px;text-align:center;width:413px">' +
 	                        '<div class="pop_Content">' +	                         
-	                           '<div class="pop_Content1" style="padding-left:0px;text-align:center">日期：<input type="text" id="dateFrom" name="dateFrom" style="width:136px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;&nbsp;至&nbsp;&nbsp;<input type="text" id="dateTo" name="dateTo" style="width:width:136px" onclick="javascript:ShowCalendar(this.id)" />&nbsp;</div>' +
+	                           '<div class="pop_Content1" style="padding-left:0px;text-align:center">日期：<input type="text" id="dateFrom" name="dateFrom" style="width:80px" onclick="javascript:ShowCalendar(this.id)" />' +
+	                           '<input name="timeFrom" id="timeFrom" type="text" readonly  onclick="_SetTime(this)" style="width:60px;"/> &nbsp;&nbsp;至&nbsp;&nbsp;' +
+	                           '<input type="text" id="dateTo" name="dateTo" style="width:80px" onclick="javascript:ShowCalendar(this.id)" />' +
+	                           '<input name="timeTo" id="timeTo" type="text" readonly  onclick="_SetTime(this)" style="width:60px;" />&nbsp;</div>' +
 	                        '</div>' +
 	                            '<span class="pop_action-span"><a href="#" onclick="document.searchForm.submit();">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>' +
 	                            '<span class="pop_action-span1"><a href="#" onclick="closeWindow()">取&nbsp;&nbsp;&nbsp;&nbsp;消</a></span>' +

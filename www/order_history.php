@@ -16,6 +16,7 @@ include("hasLogin.php");
 <script type="text/javascript" src="js/changePassword.js"></script>
 <script type="text/javascript" src="js/mootools.js"></script>
 <script type="text/javascript" src="js/date.js"></script>
+<script type="text/javascript" src="js/setTime.js"></script>
 <?php
 include("conn.php");
 $deleteId = $_POST["deleteId"];
@@ -46,6 +47,24 @@ if($editType == "viewStat")
 	$viewType = $_POST["viewType"];
 	$dateFrom = $_POST["dateFrom"];
 	$dateTo = $_POST["dateTo"];
+	$timeFrom = $_POST["timeFrom"];
+	$timeTo = $_POST["timeTo"];
+	if($dateFrom != "")
+	{
+		if($timeFrom == "")
+			{
+			$timeFrom = "0:0:0";
+				}
+		$dateFrom .= (" ".$timeFrom);
+	}
+	if($dateTo != "")
+	{
+		if($timeTo == "")
+		{
+			$timeTo = "23:59:59";	
+		}
+		$dateTo .= (" ".$timeTo);
+	}
 	echo "<script>showOrderStat('$statType','$dateFrom','$dateTo','$viewType');</script>";				
 }  
 if($editType == "viewSpecialStat")
@@ -284,9 +303,9 @@ mysql_query("SET NAMES utf8");
 $rs = $db->GetAll($sql);
 $Operation = "editOrder";
 if($_SESSION["pwd2"] != "")
-	{
+{
 	$Operation = "canEditOrder";
-		}
+}
 foreach ($rs as $row){
 	$alias_id = $row["alias_id"];
 	if($row["category"] != 1)

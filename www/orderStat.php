@@ -145,11 +145,11 @@ $dateFrom = $_REQUEST["dateFrom"];
 $dateTo = $_REQUEST["dateTo"];
 if($dateFrom != "")
 {
-	$sql .= (" AND order_date >='" . $dateFrom . " 0:0:0'");
+	$sql .= (" AND order_date >='" . $dateFrom . "'");
 }
 if($dateTo != "")
 {
-	$sql .= (" AND order_date <='" . $dateTo . " 23:59:59'");
+	$sql .= (" AND order_date <='" . $dateTo . "'");
 }	
 if($statType == "daily")
 {
