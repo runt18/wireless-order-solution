@@ -103,8 +103,15 @@ var dishPushBackWin = new Ext.Window({
 				handler : function() {
 					var dishPushBackPwd = dishPushBackWin.findById(
 							"dishPushBackPwd").getValue();
-					var pwdTrans = MD5(dishPushBackPwd);
-					
+					dishPushBackWin.findById("dishPushBackPwd").setValue("");
+
+					var pwdTrans;
+					if (dishPushBackPwd != "") {
+						pwdTrans = MD5(dishPushBackPwd);
+					} else {
+						pwdTrans = dishPushBackPwd;
+					}
+
 					dishPushBackWin.hide();
 
 					Ext.Ajax.request({
@@ -144,6 +151,7 @@ var dishPushBackWin = new Ext.Window({
 				text : "取消",
 				handler : function() {
 					dishPushBackWin.hide();
+					dishPushBackWin.findById("dishPushBackPwd").setValue("");
 				}
 			} ],
 	listeners : {
@@ -1170,7 +1178,7 @@ var dishesDisplayTabPanel = new Ext.TabPanel({
 				dishesDisplayTabPanel.setHeight(65);
 				dishesOrderEastPanel.doLayout();
 			}
-			
+
 			// show all the dishes
 			dishesDisplayDataShow.length = 0;
 			for ( var i = 0; i < dishesDisplayData.length; i++) {
