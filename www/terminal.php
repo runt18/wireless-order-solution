@@ -26,7 +26,12 @@ $editType = $_POST["editType"];
 if($editType == "setOwner")
 {
 	$pin=$_POST["pin"];
-	$sql = "UPDATE terminal SET owner_name ='" . $_POST["owner_name"] . "' WHERE pin = $pin";
+	$quota=$_POST["gift_quota"];
+	if($quota < 0)
+	{
+		$quota = -1;
+	}
+	$sql = "UPDATE terminal SET owner_name ='" . $_POST["owner_name"] . "' , gift_quota = $quota WHERE pin = $pin";
 	if($db->Execute($sql))
 	{
 		echo "<script>alert('保存成功！');</script>";		
@@ -52,6 +57,8 @@ if($editType == "setOwner")
 				<th><h3>持有人</h3></th>
 				<th><h3>PIN</h3></th>
 				<th><h3>有效期</h3></th>
+				<th><h3>已赠送（￥）</h3></th>
+				<th><h3>赠送额度（￥）</h3></th>
 				<th><h3>操&nbsp;作</h3></th>
 			</tr>
 		</thead>
@@ -60,7 +67,7 @@ if($editType == "setOwner")
 include("conn.php"); 
 $restaurant_id = $_SESSION["restaurant_id"];
 $bh=0;
-$sql = "SELECT model_id,model_name,owner_name,pin,expire_date FROM `terminal` WHERE restaurant_id=$restaurant_id and model_id<=0x7F ORDER BY restaurant_id" ;  
+$sql = "SELECT model_id,model_name,owner_name,pin,expire_date,gift_amount,gift_quota FROM `terminal` WHERE restaurant_id=$restaurant_id and model_id<=0x7F ORDER BY restaurant_id" ;  
 
 $rs = $db->GetAll($sql);
 foreach ($rs as $row){
@@ -100,14 +107,20 @@ foreach ($rs as $row){
 	{
 		$expire_date = "-";
 	}
-	
+	$gift_quota = $row["gift_quota"];
+	if($gift_quota < 0)
+	{
+		$gift_quota = "-";
+	}
 	echo "<tr>";
 	echo "<td ".$background.$toolTip.">" .$bh ."</td>";
 	echo "<td ".$background.$toolTip.">" .$row["model_name"] ."</td>";
 	echo "<td ".$background.$toolTip.">" .$row["owner_name"] ."</td>";
 	echo "<td ".$background.$toolTip.">" .strtoupper(base_convert($row["pin"],10,16)) ."</td>";
 	echo "<td ".$background.$toolTip.">" .$expire_date ."</td>";
-	echo "<td $disable ".$background.$toolTip."><a href='#' onclick='setOwner(&quot;".$row["pin"]."&quot;,&quot;".$row["owner_name"]."&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;设定持有人</a>";
+	echo "<td ".$background.$toolTip.">" .$row["gift_amount"] ."</td>";
+	echo "<td ".$background.$toolTip.">" .$gift_quota ."</td>";
+	echo "<td $disable ".$background.$toolTip."><a href='#' onclick='setOwner(&quot;".$row["pin"]."&quot;,&quot;".$row["owner_name"]."&quot;,&quot;".$gift_quota."&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;设定</a>";
 	echo "</tr>";
 }
 mysql_close($con);

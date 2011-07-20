@@ -310,11 +310,11 @@ function installTerminalKeyDown() {
 }
 
 
-function setOwner(pin,owner_name)
+function setOwner(pin,owner_name,gift_quota)
 {
       var content = ' <div class="add_foot">' +
             '<div class="title">' +
-                 '<div class="title_left"><font class="font" style="width:160px">设定持有人（' + pin + '）</font></div>' +                
+                 '<div class="title_left"><font class="font" style="width:160px">设定</font></div>' +                
                 '<div class="title_right"></div>' +
             '</div>' +
             '<form name="ownerForm" action="terminal.php"  method="post" onkeydown="setOwnerKeyDown()">' +	 
@@ -322,7 +322,11 @@ function setOwner(pin,owner_name)
                   '<input type="hidden" name="pin" value="' + pin + '" />' +          
                   '<div class="add_foot_Content">' + 
                     '<div class="pop_Content">' +                        
-                        '<div class="pop_Content1">持有人：<input type="text" id="owner_name" name="owner_name" size="25" value="' + owner_name + '"height="20" onfocus="this.select()" /></div>' +	                           
+                        '<div class="pop_Content1">&nbsp;&nbsp;&nbsp;持有人：<input type="text" id="owner_name" name="owner_name" size="25" value="' + owner_name + '"height="20" onfocus="this.select()" /></div>' +	  
+                         '<div class="pop_Content1">赠送额度：<input type="text" id="gift_quota" name="gift_quota" value="' + gift_quota + '" onfocus="this.select()" size="25" height="20"' +
+	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57||event.keyCode==46||event.keyCode==45"' +  
+	                            ' onpaste="return !clipboardData.getData(&quot;text&quot;).match(/\D/)" ondragenter="return false" ' +
+	                            ' style="ime-mode:Disabled" /></div>' +	                             
                     '</div>' +
                     '<span class="pop_action-span"><a href="#" onclick="ownerForm.submit();">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>' +
                     '<span class="pop_action-span1"><a href="#" onclick="closeWindow()">取&nbsp;&nbsp;&nbsp;&nbsp;消</a></span>' +
