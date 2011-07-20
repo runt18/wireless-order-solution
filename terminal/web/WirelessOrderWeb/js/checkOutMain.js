@@ -176,6 +176,7 @@ var memberNbrInputWin = new Ext.Window({
 				handler : function() {
 					var memberNbr = memberNbrInputWin
 							.findById("memberNbrInput").getValue();
+					memberNbrInputWin.findById("memberNbrInput").setValue("");
 					if (memberNbr != "") {
 
 						getMemberInfo(memberNbr);
@@ -189,6 +190,7 @@ var memberNbrInputWin = new Ext.Window({
 				handler : function() {
 					memberNbrInputWin.hide();
 					checkOutForm.buttons[2].hide();
+					memberNbrInputWin.findById("memberNbrInput").setValue("");
 				}
 			} ],
 	listeners : {

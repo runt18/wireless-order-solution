@@ -551,7 +551,14 @@
 										var dishPushBackPwd = dishPushBackWin
 												.findById("dishPushBackPwd")
 												.getValue();
-										var pwdTrans = MD5(dishPushBackPwd);
+										dishPushBackWin.findById(
+												"dishPushBackPwd").setValue("");
+										var pwdTrans;
+										if (dishPushBackPwd != "") {
+											pwdTrans = MD5(dishPushBackPwd);
+										} else {
+											pwdTrans = dishPushBackPwd;
+										}
 
 										dishPushBackWin.hide();
 
@@ -628,10 +635,13 @@
 													}
 												});
 									}
-								}, {
+								},
+								{
 									text : "取消",
 									handler : function() {
 										dishPushBackWin.hide();
+										dishPushBackWin.findById(
+												"dishPushBackPwd").setValue("");
 									}
 								} ],
 						listeners : {
@@ -804,16 +814,18 @@
 				imgHeight : 50,
 				tooltip : "删单",
 				handler : function(btn) {
-					var tableIndex = -1;
-					for ( var i = 0; i < tableStatusListTS.length; i++) {
-						if (tableStatusListTS[i][0] == selectedTable) {
-							tableIndex = i;
+					if (selectedTable != "") {
+						var tableIndex = -1;
+						for ( var i = 0; i < tableStatusListTS.length; i++) {
+							if (tableStatusListTS[i][0] == selectedTable) {
+								tableIndex = i;
+							}
 						}
-					}
-					if (tableStatusListTS[tableIndex][2] == "空桌") {
-						Ext.Msg.alert("", "<b>此桌没有下单，不能删单！</b>");
-					} else {
-						dishPushBackWin.show();
+						if (tableStatusListTS[tableIndex][2] == "空桌") {
+							Ext.Msg.alert("", "<b>此桌没有下单，不能删单！</b>");
+						} else {
+							dishPushBackWin.show();
+						}
 					}
 				}
 			});
