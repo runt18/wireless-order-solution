@@ -107,28 +107,40 @@ var checkOurListRefresh = function() {
 			}
 		}
 		// 总价 = （原料价 * 折扣率 + 口味价）* 数量
-		if (checkOutData[i][5] == "false") {
+		if (checkOutData[i][5] == "true" || checkOutData[i][8] == "true") {
+			// 特价，送, 不打折
+			var price = parseFloat(checkOutData[i][4].substring(1))
+					* checkOutData[i][3];
+		} else {
 			// 非特价
 			var price = ((parseFloat(checkOutData[i][4].substring(1)) - tastePrice)
 					* discountRate + tastePrice)
-					* checkOutData[i][3];
-		} else {
-			// 特价，不打折
-			var price = parseFloat(checkOutData[i][4].substring(1))
 					* checkOutData[i][3];
 		}
 
 		var priceDisplay = checkOutData[i][4].substring(0, 1)
 				+ price.toFixed(2);
 
-		checkOutDataDisplay.push([ checkOutData[i][1], checkOutData[i][2],
-				checkOutData[i][3], checkOutData[i][4], discountRate,
-				priceDisplay, // 实价
-				checkOutData[i][5],// 特
-				checkOutData[i][6],// 荐
-				checkOutData[i][7], // 停
-				checkOutData[i][8] // 送
-		]);
+		// 送 -- 折扣率 --1
+		if (checkOutData[i][8] == "true") {
+			checkOutDataDisplay.push([ checkOutData[i][1], checkOutData[i][2],
+					checkOutData[i][3], checkOutData[i][4],
+					parseFloat("1").toFixed(2), priceDisplay, // 实价
+					checkOutData[i][5],// 特
+					checkOutData[i][6],// 荐
+					checkOutData[i][7], // 停
+					checkOutData[i][8] // 送
+			]);
+		} else {
+			checkOutDataDisplay.push([ checkOutData[i][1], checkOutData[i][2],
+					checkOutData[i][3], checkOutData[i][4],
+					parseFloat(discountRate).toFixed(2), priceDisplay, // 实价
+					checkOutData[i][5],// 特
+					checkOutData[i][6],// 荐
+					checkOutData[i][7], // 停
+					checkOutData[i][8] // 送
+			]);
+		}
 	}
 
 	// 根据“特荐停”重新写菜名
