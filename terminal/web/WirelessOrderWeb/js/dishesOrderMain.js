@@ -300,7 +300,7 @@ var countEqualImgBut = new Ext.ux.ImageButton({
 	}
 });
 var printTotalImgBut = new Ext.ux.ImageButton({
-	imgPath : "../images/extlogo48.png",
+	imgPath : "../images/PrintTotal.png",
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : "补打总单",
@@ -326,7 +326,7 @@ var printTotalImgBut = new Ext.ux.ImageButton({
 	}
 });
 var printDetailImgBut = new Ext.ux.ImageButton({
-	imgPath : "../images/extlogo48.png",
+	imgPath : "../images/PrintDetail.png",
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : "补打明细",
