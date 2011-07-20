@@ -131,6 +131,10 @@ public class DailySettlementTask extends SchedulerTask{
 			}
 			dbCon.rs.close();
 			
+			//update all terminal gift amount to zero
+			sql = "UPDATE " + Params.dbName + ".terminal SET gift_amount=0";
+			dbCon.stmt.executeUpdate(sql);
+			
 			taskInfo += "info : " + nOrders + " record(s) are moved from \"order\" to \"order_history\"" + sep;
 			taskInfo += "info : " + nOrderDetails + " record(s) are moved from \"order_food\" to \"order_food_history\"" + sep;
 			taskInfo += "info : " + "maxium order id : " + maxOrderID + ", maxium order food id : " + maxOrderFoodID + sep;
