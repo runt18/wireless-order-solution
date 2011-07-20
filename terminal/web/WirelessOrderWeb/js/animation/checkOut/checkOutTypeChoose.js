@@ -122,7 +122,7 @@ var checkOurListRefresh = function() {
 				+ price.toFixed(2);
 
 		// 送 -- 折扣率 --1
-		if (checkOutData[i][8] == "true") {
+		if (checkOutData[i][8] == "true" || checkOutData[i][5] == "true") {
 			checkOutDataDisplay.push([ checkOutData[i][1], checkOutData[i][2],
 					checkOutData[i][3], checkOutData[i][4],
 					parseFloat("1").toFixed(2), priceDisplay, // 实价

@@ -174,7 +174,8 @@ function checkOutOnLoad() {
 
 																	// 送 -- 折扣率
 																	// --1
-																	if (checkOutData[i][8] == true) {
+																	if (checkOutData[i][8] == "true"
+																			|| checkOutData[i][5] == "true") {
 																		checkOutDataDisplay
 																				.push([
 																						checkOutData[i][1],// 菜名
