@@ -138,7 +138,7 @@ function searchOrderKeyDown() {
         closeWindow();
     }
 }
-function showOrderDetail(id, alias, date, totalPrice, count, foods, isPaid, owner_name, type_name, totalPrice_2, category_name, comment,service_rate,table_name) {
+function showOrderDetail(id, alias, date, totalPrice, count, foods, isPaid, owner_name, type_name, totalPrice_2, category_name, comment,service_rate,table_name,total_present) {
     var f = "";
     var fs = foods.split(";");
     for (var i = 0; i < fs.length; i++) {
@@ -199,7 +199,7 @@ function showOrderDetail(id, alias, date, totalPrice, count, foods, isPaid, owne
 							'</ul>' +
 							'<ul>' +
 							  '<li>' +
-								'<div align="right" style="font-size:15px"><strong>合计：￥' + totalPrice + '</strong></div>' +
+								'<div align="right" style="font-size:15px"><strong>赠送：￥' + total_present + '&nbsp;&nbsp;&nbsp;&nbsp;应收：￥' + totalPrice + '</strong></div>' +
 							  '</li>' +
 							        showTotalPrice_2 +
 							'</ul>' +

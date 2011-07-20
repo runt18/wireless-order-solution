@@ -66,9 +66,9 @@ if($editType == "addStaff" || $editType == "editStaff")
 		$random = $_POST["random"];
 		$sql = "SELECT terminal_id FROM staff WHERE id=$id";
 		$terminal_id = $db ->GetOne($sql);	
-		if($quota == "")
+		if($quota < 0)
 		{
-			$db->Execute("UPDATE terminal SET `owner_name`='$name' WHERE id=$terminal_id");
+			$db->Execute("UPDATE terminal SET `owner_name`='$name',gift_quota=-1 WHERE id=$terminal_id");
 		}
 		else
 		{
@@ -145,7 +145,8 @@ if($editType == "viewShiftRecord")
 		<thead>
 			<tr>
 				<th><h3>编&nbsp;号</h3></th>
-				<th><h3>姓&nbsp;名</h3></th>							
+				<th><h3>姓&nbsp;名</h3></th>	
+				<th><h3>已赠送（￥）</h3></th>						
 				<th><h3>赠送额度（￥）</h3></th>		
 				<th><h3>操&nbsp;作</h3></th>
 			</tr>
@@ -156,7 +157,7 @@ include("conn.php");
 include("common.php"); 				
 $xm=$_REQUEST["keyword_type"];
 $kw=$_REQUEST["keyword"]; 
-$sql = "SELECT a.id,a.alias_id,a.name,b.gift_quota FROM staff a INNER JOIN terminal b ON a.terminal_id = b.id WHERE a.restaurant_id=" . $_SESSION["restaurant_id"];			
+$sql = "SELECT a.id,a.alias_id,a.name,b.gift_quota,b.gift_amount FROM staff a INNER JOIN terminal b ON a.terminal_id = b.id WHERE a.restaurant_id=" . $_SESSION["restaurant_id"];			
 switch ($xm)
 {
 	case "alias_id":
@@ -175,11 +176,17 @@ $rs = $db->GetAll($sql);
 $pwd = random(6);
 foreach ($rs as $row){
 	$bh=$bh+1;	
+	$quota = $row["gift_quota"];
+	if($quota < 0)
+	{
+		$quota = "-";
+	}
 	echo "<tr>";
 	echo "<td>" .$row["alias_id"] ."</td>";
 	echo "<td>" .$row["name"] ."</td>";	
-	echo "<td>" .$row["gift_quota"] ."</td>";		
-	echo "<td><a href='#' onclick='editStaff(&quot;".$row["id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["name"]."&quot;,&quot;".$pwd."&quot;,&quot;".$pwd."&quot;,&quot;".$row["gift_quota"].
+	echo "<td>" .$row["gift_amount"] ."</td>";	
+	echo "<td>" .$quota ."</td>";		
+	echo "<td><a href='#' onclick='editStaff(&quot;".$row["id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["name"]."&quot;,&quot;".$pwd."&quot;,&quot;".$pwd."&quot;,&quot;".$quota.
 		"&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
 		"<a href='#' onclick='deleteStaff(".$row["id"].")'><img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;删除</a></td>";
 	echo "</tr>";

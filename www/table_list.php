@@ -136,7 +136,7 @@ include("conn.php");
 $xm=$_REQUEST["keyword_type"];
 $ct=$_REQUEST["condition_type"];
 $kw=$_REQUEST["keyword"]; 
-$sql = "SELECT od.id,t.id AS table_id,t.alias_id,t.name,t.minimum_cost,CASE is_paid WHEN 0 THEN '就餐' ELSE '空闲' END AS status,od.order_date,total_price,num,foods,is_paid,waiter,od.category,od.comment,od.service_rate FROM `table` t LEFT OUTER JOIN 
+$sql = "SELECT od.id,t.id AS table_id,t.alias_id,t.name,t.minimum_cost,CASE is_paid WHEN 0 THEN '就餐' ELSE '空闲' END AS status,od.order_date,total_price,num,foods,is_paid,waiter,od.category,od.comment,od.service_rate,od.total_price_present FROM `table` t LEFT OUTER JOIN 
 		
 		(SELECT MAX(id) AS OrderId,table_id,MAX(restaurant_id) AS restaurant_id".
 	" FROM `order` WHERE `order`.`restaurant_id`=".$_SESSION["restaurant_id"]." GROUP BY `order`.table_id) AS o ON t.alias_id = o.table_id ".
@@ -189,7 +189,7 @@ foreach ($rs as $row){
 	{
 		echo "<td>
 				<a href='#' onclick='showOrderDetail(&quot;".$row["table_id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["order_date"]."&quot;,&quot;".$row["total_price"].
-			"&quot;,&quot;".$row["num"]."&quot;,&quot;".$row["foods"]."&quot;,&quot;".$row["is_paid"]."&quot;,&quot;".$row["waiter"]."&quot;,&quot;".$row["type_name"]."&quot;,&quot;".$row["total_price_2"]."&quot;,&quot;".$row["category_name"]."&quot;,&quot;".$row["comment"]."&quot;,".$row["service_rate"].",&quot;".$row["table_name"]."&quot;)'>
+			"&quot;,&quot;".$row["num"]."&quot;,&quot;".$row["foods"]."&quot;,&quot;".$row["is_paid"]."&quot;,&quot;".$row["waiter"]."&quot;,&quot;".$row["type_name"]."&quot;,&quot;".$row["total_price_2"]."&quot;,&quot;".$row["category_name"]."&quot;,&quot;".$row["comment"]."&quot;,".$row["service_rate"].",&quot;".$row["table_name"]."&quot;,".$row["total_price_present"].")'>
 				<img src='images/View.png'  height='16' width='14' border='0'/>&nbsp;查看</a>&nbsp;&nbsp;&nbsp;&nbsp;
 				<a href='#' onclick='editTable(&quot;".$row["table_id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["name"].
 			"&quot;,&quot;table_list.php&quot;,".$row["minimum_cost"].")'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a></td>";

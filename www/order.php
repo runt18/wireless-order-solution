@@ -95,12 +95,15 @@ if($editType == "dailyCheckOut")
 			`unit_price`,`name`, `taste`,`taste_price`,`taste_id`,`discount`,`kitchen`,`comment`,`waiter`,`food_status` 
 			FROM `order_food` WHERE `order_food`.`order_id` IN (SELECT id FROM `order` WHERE total_price  IS NOT NULL AND restaurant_id=" . $_SESSION["restaurant_id"].")";
 	$sql3 = "DELETE FROM `order_food` WHERE `order_id` IN (SELECT id FROM `order` WHERE total_price  IS NOT NULL AND restaurant_id=" . $_SESSION["restaurant_id"].")";
-	$sql4 = "DELETE FROM `order` WHERE total_price  IS NOT NULL AND restaurant_id=" . $_SESSION["restaurant_id"];	
-	if($db->Execute($sql1) && $db->Execute($sql2) && $db->Execute($sql3) && $db->Execute($sql4))
+	$sql4 = "DELETE FROM `order` WHERE total_price  IS NOT NULL AND restaurant_id=" . $_SESSION["restaurant_id"];
+	$sql5 = "UPDATE `terminal` SET gift_amount=0 WHERE restaurant_id=" . $_SESSION["restaurant_id"];
+	/*echo ($sql1.";".$sql2.";".$sql3.";".$sql4.";".$sql5);*/
+	if($db->Execute($sql1) && $db->Execute($sql2) && $db->Execute($sql3) && $db->Execute($sql4) && $db->Execute($sql5))
 	{
 		echo "<script>alert('日结成功！');</script>";
 	}	
-	else{
+	else
+	{
 		echo "<script>alert('日结失败！');</script>";
 	}
 }    
@@ -306,7 +309,7 @@ foreach ($rs as $row){
 	echo "<td>" .$row["total_price_2"]."</td>";
 	echo "<td><a href='#' onclick='".$Operation."(&quot;".$row["id"]."&quot;,&quot;".$row["total_price_2"]."&quot;,&quot;order.php&quot;,&quot;".$row["type_value"]."&quot;,&quot;".$alias_id."&quot;,&quot;".$row["category"]."&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
 		"<a href='#' onclick='showOrderDetail(&quot;".$row["id"]."&quot;,&quot;".$alias_id."&quot;,&quot;".$row["order_date"]."&quot;,&quot;".$row["total_price"].
-		"&quot;,&quot;".$row["num"]."&quot;,&quot;".$row["foods"]."&quot;,&quot;".$row["is_paid"]."&quot;,&quot;".$row["waiter"]."&quot;,&quot;".$row["type_name"]."&quot;,&quot;".$row["total_price_2"]."&quot;,&quot;".$row["category_name"]."&quot;,&quot;".$row["comment"]."&quot;,".$row["service_rate"].",&quot;".$row["table_name"]."&quot;)'>
+		"&quot;,&quot;".$row["num"]."&quot;,&quot;".$row["foods"]."&quot;,&quot;".$row["is_paid"]."&quot;,&quot;".$row["waiter"]."&quot;,&quot;".$row["type_name"]."&quot;,&quot;".$row["total_price_2"]."&quot;,&quot;".$row["category_name"]."&quot;,&quot;".$row["comment"]."&quot;,".$row["service_rate"].",&quot;".$row["table_name"]."&quot;,".$row["total_price_present"].")'>
 			<img src='images/View.png'  height='16' width='14' border='0'/>&nbsp;查看</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href='#' onclick='deleteOrder(&quot;".$row["id"]."&quot;,&quot;order.php&quot;)'>
 			<img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;删除</a>&nbsp;&nbsp;&nbsp;&nbsp;
 			<a href='#' onclick='viewOrderDetail(&quot;".$row["id"]."&quot;,&quot;order_food&quot;)'>
