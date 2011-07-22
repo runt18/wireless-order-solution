@@ -36,7 +36,9 @@ public class DailySettlementTask extends SchedulerTask{
 		try {   
 			
 			//clean up the unprinted records
-			WirelessSocketServer.printLosses.clear();
+			synchronized(WirelessSocketServer.printLosses){
+				WirelessSocketServer.printLosses.clear();
+			}
 			
 			dbCon.connect();
 			
