@@ -11,6 +11,7 @@ import org.tiling.scheduling.SchedulerTask;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.protocol.Restaurant;
+import com.wireless.server.WirelessSocketServer;
 
 /**
  * 
@@ -33,6 +34,10 @@ public class DailySettlementTask extends SchedulerTask{
 		String taskInfo = "Daily settlement task starts on " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z").format(new java.util.Date()) + sep;
 		
 		try {   
+			
+			//clean up the unprinted records
+			WirelessSocketServer.printLosses.clear();
+			
 			dbCon.connect();
 			
 			//get the count to orders which have been paid
@@ -133,8 +138,8 @@ public class DailySettlementTask extends SchedulerTask{
 			
 			//update all terminal gift amount to zero
 			sql = "UPDATE " + Params.dbName + ".terminal SET gift_amount=0";
-			dbCon.stmt.executeUpdate(sql);
-			
+			dbCon.stmt.executeUpdate(sql);			
+						
 			taskInfo += "info : " + nOrders + " record(s) are moved from \"order\" to \"order_history\"" + sep;
 			taskInfo += "info : " + nOrderDetails + " record(s) are moved from \"order_food\" to \"order_food_history\"" + sep;
 			taskInfo += "info : " + "maxium order id : " + maxOrderID + ", maxium order food id : " + maxOrderFoodID + sep;

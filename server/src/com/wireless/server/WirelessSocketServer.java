@@ -31,7 +31,7 @@ import com.wireless.task.SweepPrtConTask;
 public class WirelessSocketServer {
 
 	//the version of the wireless socket server
-	static final String VERSION = "0.9.8";
+	static final String VERSION = "0.9.9";
 	//the OTA server address
 	static String OTA_IP = ""; 
 	//the OTA server port
@@ -66,7 +66,7 @@ public class WirelessSocketServer {
     static HashMap<Integer, HashMap<Integer, String>> printTemplates = new HashMap<Integer, HashMap<Integer, String>>();    
     
     //the hash map holding the unprinted request
-    static HashMap<Integer, LinkedList<ProtocolPackage>> printLosses = new HashMap<Integer, LinkedList<ProtocolPackage>>();
+    public static HashMap<Integer, LinkedList<ProtocolPackage>> printLosses = new HashMap<Integer, LinkedList<ProtocolPackage>>();
     
     //the thread pool
     static ThreadPoolExecutor threadPool = null;
