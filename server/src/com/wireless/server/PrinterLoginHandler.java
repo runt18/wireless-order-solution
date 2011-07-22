@@ -295,7 +295,10 @@ class PrintLossHandler extends Handler implements Runnable{
 				while(printReqs.size() != 0){
 					ProtocolPackage reqPrint = printReqs.peek();
 						
-					send(out, reqPrint);	
+					send(out, reqPrint);
+					
+					printReqs.remove();
+					
 					/**
 					 * Receive the response within 10s timeout
 					 */
@@ -305,7 +308,7 @@ class PrintLossHandler extends Handler implements Runnable{
 					 */
 					if(respPrint.header.seq == reqPrint.header.seq){
 						if(respPrint.header.mode == Mode.PRINT && respPrint.header.type == Type.ACK){
-							printReqs.remove();
+							
 						}							
 					}
 				}
