@@ -38,7 +38,7 @@ public class CancelOrder {
 			/**
 			 * Calculate the gift amount and remove it from the total gift amount if the gift quota exist.
 			 */
-			if(term.getGiftQuota() > 0){
+			if(term.getGiftQuota() >= 0){
 				float giftAmount = 0;
 				sql = "SELECT unit_price, order_count, food_status FROM " + Params.dbName +
 					  ".order_food WHERE order_id=" + orderID;

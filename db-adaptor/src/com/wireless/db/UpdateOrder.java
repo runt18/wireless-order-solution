@@ -319,7 +319,7 @@ public class UpdateOrder {
 			 * Update the gift amount if not reach the quota.
 			 * Otherwise throw a business exception.
 			 */
-			if(term.getGiftQuota() > 0){
+			if(term.getGiftQuota() >= 0){
 				if((giftAmount + term.getGiftAmount()) > term.getGiftQuota()){
 					throw new BusinessException("The gift amount exceeds the quota.", ErrorCode.EXCEED_GIFT_QUOTA);
 					

@@ -212,16 +212,18 @@ public class PayOrder {
 		}
 		
 		/**
-		 * Calculate the total price of this order as below.
+		 * Calculate the total price of this order(exclude the gifted foods) as below.
 		 * total = food_price_1 + food_price_2 + ...
 		 * food_price_n = (unit * discount + taste) * count
 		 */
 		float totalPrice = 0;
 		for(int i = 0; i < orderInfo.foods.length; i++){
-			float dist = (float)Math.round(orderInfo.foods[i].discount) / 100;					
-			float foodPrice = orderInfo.foods[i].getPrice().floatValue();
-			float tastePrice = orderInfo.foods[i].getTastePrice();
-			totalPrice += (foodPrice * dist + tastePrice) * orderInfo.foods[i].getCount().floatValue();
+			if(!orderInfo.foods[i].isGift()){
+				float dist = (float)Math.round(orderInfo.foods[i].discount) / 100;					
+				float foodPrice = orderInfo.foods[i].getPrice().floatValue();
+				float tastePrice = orderInfo.foods[i].getTastePrice();
+				totalPrice += (foodPrice * dist + tastePrice) * orderInfo.foods[i].getCount().floatValue();
+			}
 		}
 		totalPrice = (float)Math.round(totalPrice * 100) / 100;
 		orderInfo.setTotalPrice(totalPrice);
@@ -231,6 +233,7 @@ public class PayOrder {
 		 * total = total * (1 + service_rate)
 		 */
 		totalPrice = totalPrice * (1 + ((float)orderToPay.service_rate / 100));		
+		totalPrice = (float)Math.round(totalPrice * 100) / 100;
 		
 		/**
 		 * Calculate the total price 2 as below.
@@ -243,8 +246,7 @@ public class PayOrder {
 		 */
 		if(totalPrice < table.getMinimumCost().floatValue()){
 			//直接使用最低消费
-			totalPrice2 = table.getMinimumCost().floatValue();
-			
+			totalPrice2 = table.getMinimumCost().floatValue();			
 		}else if(orderInfo.price_tail == Order.TAIL_DECIMAL_CUT){
 			//小数抹零
 			totalPrice2 = new Float(totalPrice).intValue();

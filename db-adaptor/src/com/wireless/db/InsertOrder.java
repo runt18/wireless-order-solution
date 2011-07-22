@@ -125,7 +125,7 @@ public class InsertOrder {
 				 * Otherwise throw a business exception.
 				 */
 				float giftAmount = orderToInsert.totalPrice3().floatValue();
-				if(term.getGiftQuota() > 0){
+				if(term.getGiftQuota() >= 0){
 					if((giftAmount + term.getGiftAmount()) > term.getGiftQuota()){
 						throw new BusinessException("The gift amount exceeds the quota.", ErrorCode.EXCEED_GIFT_QUOTA);
 						

@@ -60,7 +60,7 @@ public class VerifyPin {
 			terminal.owner = dbCon.rs.getString("owner_name");
 			terminal.modelName = dbCon.rs.getString("model_name");
 			float quota = dbCon.rs.getFloat("gift_quota");
-			if(quota > 0){
+			if(quota >= 0){
 				terminal.setGiftQuota(quota);
 			}
 			terminal.setGiftAmount(dbCon.rs.getFloat("gift_amount"));
