@@ -49,6 +49,9 @@
 		<action path="/QueryRestaurant" type="com.wireless.Actions.login.QueryRestaurantAction"
 			scope="request">
 		</action>
+		<action path="/QueryToday" type="com.wireless.Actions.orderMgr.QueryTodayAction"
+			scope="request">
+		</action>
 	</action-mappings>
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
 </struts-config>

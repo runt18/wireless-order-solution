@@ -28,7 +28,7 @@ public class QueryOrderAction extends Action {
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 
-		short tableID = 0;
+		int tableID = 0;
 		String jsonResp = "{success:$(result), data:'$(value)'}";
 		PrintWriter out = null;
 		try {
@@ -46,7 +46,7 @@ public class QueryOrderAction extends Action {
 			if(pin.startsWith("0x") || pin.startsWith("0X")){
 				pin = pin.substring(2);
 			}
-			tableID = Short.parseShort(request.getParameter("tableID"));
+			tableID = Integer.parseInt(request.getParameter("tableID"));
 			
 			Order order = QueryOrder.exec(Integer.parseInt(pin, 16), Terminal.MODEL_STAFF, tableID);
 
@@ -75,7 +75,7 @@ public class QueryOrderAction extends Action {
 					jsonOrderFood = jsonOrderFood.replace("$(soldout)", order.foods[i].isSellOut() ? "true" : "false");
 					jsonOrderFood = jsonOrderFood.replace("$(gift)", order.foods[i].isGift() ? "true" : "false");
 
-					// pub each json order food info to the value
+					// put each json order food info to the value
 					value.append(jsonOrderFood);
 					// the string is separated by comma
 					if (i != order.foods.length - 1) {
