@@ -108,6 +108,9 @@ public class QueryTodayAction extends Action {
 			jsonResp = jsonResp.replace("$(value)", "数据库请求发生错误，请确认网络是否连接正常");
 			
 		}catch(IOException e){
+			e.printStackTrace();
+			jsonResp = jsonResp.replace("$(result)", "false");
+			jsonResp = jsonResp.replace("$(value)", "数据库请求发生错误，请确认网络是否连接正常");
 			
 		}finally{
 			dbCon.disconnect();
