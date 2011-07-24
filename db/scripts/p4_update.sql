@@ -42,6 +42,14 @@ ADD `taste_id2` SMALLINT UNSIGNED NOT NULL DEFAULT 0;
 ALTER TABLE `order_food`
 ADD `taste_id3` SMALLINT UNSIGNED NOT NULL DEFAULT 0;
 
+ALTER TABLE `wireless_order_db`.`order_food` 
+CHANGE COLUMN `food_id` 
+`food_id` SMALLINT(6) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'the alias id to this food';
+
+ALTER TABLE `wireless_order_db`.`order_food_history` 
+CHANGE COLUMN `food_id` 
+`food_id` SMALLINT(6) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'the alias id to this food';
+
 -- -----------------------------------------------------
 -- View`order_food_history_view`
 -- -----------------------------------------------------
