@@ -365,8 +365,12 @@ function formatNum(num) {
 function viewOrderStat(statType) {
     var editType = "viewStat";
     var title = "";
+    var tFrom = '';
+    var tTo = '';
     if (statType == "daily") {
         title = "日结汇总 - 请选择日期区间";
+        tFrom = '<input name="timeFrom" id="timeFrom" type="text" readonly  onclick="_SetTime(this)" style="width:60px;"/>';
+        tTo = '<input name="timeTo" id="timeTo" type="text" readonly  onclick="_SetTime(this)" style="width:60px;" />';
     }
     else {
         title = "月结汇总 - 请选择日期区间";
@@ -382,9 +386,9 @@ function viewOrderStat(statType) {
 	                      '<div class="add_foot_Content" style="height:130px;text-align:center;width:413px">' +
 	                        '<div class="pop_Content">' +	                         
 	                           '<div class="pop_Content1" style="padding-left:0px;text-align:center">日期：<input type="text" id="dateFrom" name="dateFrom" style="width:80px" onclick="javascript:ShowCalendar(this.id)" />' +
-	                           '<input name="timeFrom" id="timeFrom" type="text" readonly  onclick="_SetTime(this)" style="width:60px;"/> &nbsp;&nbsp;至&nbsp;&nbsp;' +
+	                           tFrom+'&nbsp;&nbsp;至&nbsp;&nbsp;' +
 	                           '<input type="text" id="dateTo" name="dateTo" style="width:80px" onclick="javascript:ShowCalendar(this.id)" />' +
-	                           '<input name="timeTo" id="timeTo" type="text" readonly  onclick="_SetTime(this)" style="width:60px;" />&nbsp;</div>' +
+	                           tTo + '&nbsp;</div>' +
 	                        '</div>' +
 	                            '<span class="pop_action-span"><a href="#" onclick="document.searchForm.submit();">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>' +
 	                            '<span class="pop_action-span1"><a href="#" onclick="closeWindow()">取&nbsp;&nbsp;&nbsp;&nbsp;消</a></span>' +
@@ -394,6 +398,11 @@ function viewOrderStat(statType) {
 
     showMessageBox(content, 430, 350);
     document.getElementById("dateFrom").focus();
+    if (statType != "daily")
+    {
+        document.getElementById("dateFrom").style.width = "136px"
+        document.getElementById("dateTo").style.width = "136px"
+    }
 }
 
 function showOrderStat(statType, dateFrom, dateTo,viewType) {
