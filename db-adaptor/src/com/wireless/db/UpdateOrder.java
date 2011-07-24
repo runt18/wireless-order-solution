@@ -111,7 +111,7 @@ public class UpdateOrder {
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while(dbCon.rs.next()){
 				Food food = new Food();
-				food.alias_id = dbCon.rs.getShort("food_id");
+				food.alias_id = dbCon.rs.getInt("food_id");
 				food.setPrice(new Float(dbCon.rs.getFloat("unit_price")));
 				food.name = dbCon.rs.getString("name");
 				food.status = dbCon.rs.getShort("food_status");

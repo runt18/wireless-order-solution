@@ -127,7 +127,7 @@ public class QueryMenu {
 					 " AND enabled=1";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
-			Food food = new Food(dbCon.rs.getShort("alias_id"),
+			Food food = new Food(dbCon.rs.getInt("alias_id"),
 								 dbCon.rs.getString("name"),
 								 new Float(dbCon.rs.getFloat("unit_price")),
 								 dbCon.rs.getShort("kitchen"),

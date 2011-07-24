@@ -27,7 +27,7 @@ if($editType == "setOwner")
 {
 	$pin=$_POST["pin"];
 	$quota=$_POST["gift_quota"];
-	if($quota < 0)
+	if($quota == "" || $quota == "-" || $quota < 0)
 	{
 		$quota = -1;
 	}
