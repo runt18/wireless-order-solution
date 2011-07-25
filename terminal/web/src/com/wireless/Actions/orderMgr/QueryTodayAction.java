@@ -136,9 +136,12 @@ public class QueryTodayAction extends Action {
 				}
 				/**
 				 * The json to each order looks like below
-				 * ["账单号","台号","日期","类型","结帐方式","金额","实收"]
+				 * ["账单号","台号","日期","类型","结帐方式","金额","实收","台号2"]
 				 */
-				String jsonOrder = "[\"$(order_id)\",\"$(table_id)\",\"$(order_date)\",\"$(order_cate)\",\"$(pay_manner)\",\"$(total_price)\",\"$(actual_income)\"]";
+				String jsonOrder = "[\"$(order_id)\",\"$(table_id)\",\"$(order_date)\",\"$(order_cate)\"," +
+								   "\"$(pay_manner)\",\"$(total_price)\",\"$(actual_income)\"," +
+								   "\"$(table2_id)\",\"$(custom_num)\",\"$(min_cost)\"" +
+								   "]";
 				jsonOrder = jsonOrder.replace("$(order_id)", Long.toString(dbCon.rs.getLong("id")));
 				jsonOrder = jsonOrder.replace("$(table_id)", Integer.toString(dbCon.rs.getInt("table_id")));
 				jsonOrder = jsonOrder.replace("$(order_date)", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(dbCon.rs.getTimestamp("order_date")));
@@ -146,6 +149,9 @@ public class QueryTodayAction extends Action {
 				jsonOrder = jsonOrder.replace("$(pay_manner)", Util.toPayManner(dbCon.rs.getShort("type")));
 				jsonOrder = jsonOrder.replace("$(total_price)", Float.toString(dbCon.rs.getFloat("total_price")));
 				jsonOrder = jsonOrder.replace("$(actual_income)", Float.toString(dbCon.rs.getFloat("total_price_2")));
+				jsonOrder = jsonOrder.replace("$(table2_id)", Integer.toString(dbCon.rs.getInt("table2_id")));
+				jsonOrder = jsonOrder.replace("$(custom_num)", Integer.toString(dbCon.rs.getInt("custom_num")));
+				jsonOrder = jsonOrder.replace("$(min_cost)", "0");
 				// put each json order info to the value
 				value.append(jsonOrder);
 				nCount++;
