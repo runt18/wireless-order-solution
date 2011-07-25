@@ -110,9 +110,9 @@ public class ChangeOrderScreen extends MainScreen
 		ButtonField submit = new ButtonField("提交", ButtonField.CONSUME_CLICK);
 		HorizontalFieldManager hfm = new HorizontalFieldManager(Manager.FIELD_HCENTER);
 		hfm.add(byNoBtn);
-		hfm.add(new LabelField("    "));
+		hfm.add(new LabelField("  "));
 		hfm.add(byKitchenBtn);
-		hfm.add(new LabelField("    "));
+		hfm.add(new LabelField("  "));
 		hfm.add(submit);
 		add(hfm);
 		
