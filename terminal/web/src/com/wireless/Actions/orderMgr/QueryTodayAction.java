@@ -46,7 +46,7 @@ public class QueryTodayAction extends Action {
 			 * 		  0 - 全部显示
 			 *  	  1 - 按账单号
 			 *  	  2 - 按台号
-			 *  	  3 - 按日期
+			 *  	  3 - 按日期时间
 			 *  	  4 - 按类型
 			 *  	  5 - 按结帐方式
 			 *  	  6 - 按金额
@@ -95,7 +95,7 @@ public class QueryTodayAction extends Action {
 				//按台号
 				filterCondition = " AND table_id" + ope + filterVal;
 			}else if(type == 3){
-				//按日期
+				//按日期时间
 				filterCondition = " AND order_date" + ope + "'" + filterVal + "'"; 
 			}else if(type == 4){
 				//按类型
