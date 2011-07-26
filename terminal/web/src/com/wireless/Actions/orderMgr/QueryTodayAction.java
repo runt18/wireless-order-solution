@@ -136,7 +136,7 @@ public class QueryTodayAction extends Action {
 				}
 				/**
 				 * The json to each order looks like below
-				 * ["账单号","台号","日期","类型","结帐方式","金额","实收","台号2"]
+				 * ["账单号","台号","日期","类型","结帐方式","金额","实收","台号2","就餐人数","最低消"]
 				 */
 				String jsonOrder = "[\"$(order_id)\",\"$(table_id)\",\"$(order_date)\",\"$(order_cate)\"," +
 								   "\"$(pay_manner)\",\"$(total_price)\",\"$(actual_income)\"," +
