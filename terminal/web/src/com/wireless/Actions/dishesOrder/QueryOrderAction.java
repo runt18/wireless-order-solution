@@ -29,6 +29,7 @@ public class QueryOrderAction extends Action {
 			throws Exception {
 
 		int tableID = 0;
+		int orderID = 0;
 		String jsonResp = "{success:$(result), data:'$(value)'}";
 		PrintWriter out = null;
 		try {
@@ -38,7 +39,10 @@ public class QueryOrderAction extends Action {
 			
 			/**
 			 * The parameters looks like below.
-			 * e.g. pin=0x1 & tableID=201
+			 * 1st example, query order by table id
+			 * pin=0x1 & tableID=201
+			 * 2nd example, query order by order id
+			 * pin=0x01 & orderID=40
 			 * pin : the pin the this terminal
 			 * tableID : the order with this table ID to query
 			 */
@@ -46,9 +50,16 @@ public class QueryOrderAction extends Action {
 			if(pin.startsWith("0x") || pin.startsWith("0X")){
 				pin = pin.substring(2);
 			}
-			tableID = Integer.parseInt(request.getParameter("tableID"));
 			
-			Order order = QueryOrder.exec(Integer.parseInt(pin, 16), Terminal.MODEL_STAFF, tableID);
+			Order order = null;
+			if(request.getParameter("tableID") != null){
+				tableID = Integer.parseInt(request.getParameter("tableID"));
+				order = QueryOrder.exec(Integer.parseInt(pin, 16), Terminal.MODEL_STAFF, tableID);
+				
+			}else if(request.getParameter("orderID") != null){
+				orderID = Integer.parseInt(request.getParameter("orderID"));
+				order = QueryOrder.execByID(Integer.parseInt(pin, 16), Terminal.MODEL_STAFF, orderID);
+			}			
 
 			jsonResp = jsonResp.replace("$(result)", "true");
 
@@ -104,6 +115,10 @@ public class QueryOrderAction extends Action {
 			}else if(e.errCode == ErrorCode.MENU_EXPIRED){
 				jsonResp = jsonResp.replace("$(result)", "false");
 				jsonResp = jsonResp.replace("$(value)", "菜谱信息与服务器不匹配，请与餐厅负责人确认或重新更新菜谱");	
+				
+			}else if(e.errCode == ErrorCode.ORDER_NOT_EXIST){
+				jsonResp = jsonResp.replace("$(result)", "false");
+				jsonResp = jsonResp.replace("$(value)", orderID + "号账单信息不存在，请重新确认");	
 				
 			}else{
 				e.printStackTrace();
