@@ -129,6 +129,7 @@ public class PayOrder {
 		 * - member name if pay type is for member
 		 */
 		sql = "UPDATE `" + Params.dbName + "`.`order` SET terminal_pin=" + pin +
+			  ", gift_price=" + orderInfo.getGiftPrice() +
 			  ", total_price=" + totalPrice + 
 			  ", total_price_2=" + totalPrice2 +
 			  ", type=" + orderInfo.pay_manner + 
@@ -308,11 +309,16 @@ public class PayOrder {
 				totalPrice += (foodPrice * dist + tastePrice) * orderInfo.foods[i].getCount().floatValue();
 			}
 		}
-		totalPrice = (float)Math.round(totalPrice * 100) / 100;
+		
+		/**
+		 * Minus the gift price as 
+		 * total = total - gift
+		 */
+		totalPrice = (float)Math.round((totalPrice - orderToPay.getGiftPrice()) * 100) / 100;
 		orderInfo.setTotalPrice(totalPrice);
 
 		/**
-		 * Multiplied by the service rate.
+		 * Multiplied by service rate
 		 * total = total * (1 + service_rate)
 		 */
 		totalPrice = totalPrice * (1 + ((float)orderToPay.service_rate / 100));		
@@ -347,6 +353,7 @@ public class PayOrder {
 		orderInfo.discount_type = orderToPay.discount_type;
 		orderInfo.member_id = orderToPay.member_id; 
 		orderInfo.setCashIncome(orderToPay.getCashIncome());
+		orderInfo.setGiftPrice(orderToPay.getGiftPrice());
 		orderInfo.pay_manner = orderToPay.pay_manner;
 		orderInfo.comment = orderToPay.comment;
 		orderInfo.service_rate = orderToPay.service_rate;
