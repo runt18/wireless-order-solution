@@ -182,11 +182,10 @@ public class ReqParser {
 	* pin[6] - auto calculated and filled in
 	* len[2] - 0x06, 0x00
 	* <Body>
-	* table[2] : cash_income[4] : pay_type : discount_type : pay_manner : service_rate : len_member : member_id[len] : len_comment : comment[len]
+	* table[2] : cash_income[4] : gift_price[4] : pay_type : discount_type : pay_manner : service_rate : len_member : member_id[len] : len_comment : comment[len]
 	* table[2] - 2-byte indicates the table id
 	* cash_income[4] - 4-byte indicates the total price
-	* 				   total_price[0] indicates the float part
-	* 				   total_price[1..3] indicates the fixed part
+	* gift_price[4] - 4-byte indicates the gift price
 	* pay_type - one of the values of pay type
 	* discount_type - one of the values of discount type
 	* pay_manner - one of the values of pay manner
@@ -204,34 +203,38 @@ public class ReqParser {
 						 ((req.body[3] & 0x000000FF) << 8) | 
 						 ((req.body[4] & 0x000000FF) << 16) |
 						 ((req.body[5] & 0x000000FF) << 24);
-		
+		//get the gift price
+		int giftPrice = (req.body[6] & 0x000000FF) | 
+		 				((req.body[7] & 0x000000FF) << 8) | 
+		 				((req.body[8] & 0x000000FF) << 16) |
+		 				((req.body[9] & 0x000000FF) << 24);
 		//get the payment type
-		int payType = req.body[6];
+		int payType = req.body[10];
 		//get the discount type
-		int discountType = req.body[7];
+		int discountType = req.body[11];
 		//get the payment manner
-		int payManner = req.body[8];
+		int payManner = req.body[12];
 		//get the service rate
-		byte serviceRate = req.body[9];
+		byte serviceRate = req.body[13];
 		//get the the length to member id
-		int lenMember = req.body[10];
+		int lenMember = req.body[14];
 		//get the value to member id
 		String memberID = null;
 		//get the member id if exist
 		if(lenMember > 0){
 			byte[] memberIDBytes = new byte[lenMember];
-			System.arraycopy(req.body, 11, memberIDBytes, 0, lenMember);
+			System.arraycopy(req.body, 15, memberIDBytes, 0, lenMember);
 			try{
 				memberID = new String(memberIDBytes, "UTF-8");
 			}catch(UnsupportedEncodingException e){}
 		}
 		//get the length of comment
-		int lenComment = req.body[11 + lenMember];
+		int lenComment = req.body[15 + lenMember];
 		String comment = null;
 		//get the comment if exist
 		if(lenComment > 0){
 			byte[] commentBytes = new byte[lenComment];
-			System.arraycopy(req.body, 12 + lenMember, commentBytes, 0, lenComment);
+			System.arraycopy(req.body, 16 + lenMember, commentBytes, 0, lenComment);
 			try{
 				comment = new String(commentBytes, "UTF-8");
 			}catch(UnsupportedEncodingException e){}
@@ -239,6 +242,7 @@ public class ReqParser {
 		Order orderToPay = new Order();
 		orderToPay.table_id = tableToPay;
 		orderToPay.cashIncome = cashIncome;
+		orderToPay.giftPrice = giftPrice;
 		orderToPay.pay_type = payType;
 		orderToPay.discount_type = discountType;
 		orderToPay.pay_manner = payManner;

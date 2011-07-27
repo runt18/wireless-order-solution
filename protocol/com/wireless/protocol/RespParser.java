@@ -56,7 +56,7 @@ public class RespParser {
 			order.table2_id = (short)((response.body[2] & 0x00FF) | ((response.body[3] & 0x00FF) << 8));
 			
 			//get the minimum cost
-			order.minimum_cost = (response.body[4] & 0x000000FF) | 
+			order.minCost = (response.body[4] & 0x000000FF) | 
 								 ((response.body[5] & 0x000000FF ) << 8) |
 								 ((response.body[6] & 0x000000FF ) << 16) |
 								 ((response.body[7] & 0x000000FF ) << 24);

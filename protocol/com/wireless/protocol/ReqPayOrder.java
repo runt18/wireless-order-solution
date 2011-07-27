@@ -14,11 +14,10 @@ public class ReqPayOrder extends ReqPackage{
 	* pin[6] - auto calculated and filled in
 	* len[2] - 0x06, 0x00
 	* <Body>
-	* table[2] : cash_income[4] : pay_type : discount_type : pay_manner : service_rate : len_member : member_id[len] : len_comment : comment[len]
+	* table[2] : cash_income[4] : gift_price[4] : pay_type : discount_type : pay_manner : service_rate : len_member : member_id[len] : len_comment : comment[len]
 	* table[2] - 2-byte indicates the table id
 	* cash_income[4] - 4-byte indicates the total price
-	* 				   total_price[0] indicates the float part
-	* 				   total_price[1..3] indicates the fixed part
+	* gift_price[4] - 4-byte indicates the gift price
 	* pay_type - one of the values of pay type
 	* discount_type - one of the values of discount type
 	* pay_manner - one of the values of pay manner
@@ -49,6 +48,7 @@ public class ReqPayOrder extends ReqPackage{
 		
 		int bodyLen = 2 + /* table id takes up 2 bytes */
 					  4 + /* actual total price takes up 4 bytes */
+					  4 + /* gift price takes up 4 bytes */
 					  1 + /* pay type takes up 1 byte */
 					  1 + /* discount type takes up 1 byte */
 					  1 + /* the pay manner takes up 1 byte */
@@ -71,22 +71,27 @@ public class ReqPayOrder extends ReqPackage{
 		body[3] = (byte)((order.cashIncome >> 8) & 0x000000FF);
 		body[4] = (byte)((order.cashIncome >> 16) & 0x000000FF);
 		body[5] = (byte)((order.cashIncome >> 24) & 0x000000FF);
+		//assign the gift price
+		body[6] = (byte)(order.giftPrice & 0x000000FF);
+		body[7] = (byte)((order.giftPrice >> 8) & 0x000000FF);
+		body[8] = (byte)((order.giftPrice >> 16) & 0x000000FF);
+		body[9] = (byte)((order.giftPrice >> 24) & 0x000000FF);
 		//assign the payment type
-		body[6] = (byte)(order.pay_type & 0x000000FF);
+		body[10] = (byte)(order.pay_type & 0x000000FF);
 		//assign the discount type
-		body[7] = (byte)(order.discount_type & 0x000000FF);
+		body[11] = (byte)(order.discount_type & 0x000000FF);
 		//assign the payment manner
-		body[8] = (byte)(order.pay_manner & 0x000000FF);
+		body[12] = (byte)(order.pay_manner & 0x000000FF);
 		//assign the service rate
-		body[9] = order.service_rate;
+		body[13] = order.service_rate;
 		//assign the length of the member id
-		body[10] = (byte)(memberIDBytes.length & 0x000000FF);
+		body[14] = (byte)(memberIDBytes.length & 0x000000FF);
 		//assign the value of the member id
-		System.arraycopy(memberIDBytes, 0, body, 11, memberIDBytes.length);
+		System.arraycopy(memberIDBytes, 0, body, 15, memberIDBytes.length);
 		//assign the length of comment
-		body[11 + memberIDBytes.length] = (byte)(commentBytes.length & 0x000000FF);
+		body[15 + memberIDBytes.length] = (byte)(commentBytes.length & 0x000000FF);
 		//assign the value of comment
-		System.arraycopy(commentBytes, 0, body, 12 + memberIDBytes.length, commentBytes.length);
+		System.arraycopy(commentBytes, 0, body, 16 + memberIDBytes.length, commentBytes.length);
 	} 
 
 	/******************************************************

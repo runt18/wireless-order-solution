@@ -66,10 +66,10 @@ public class RespQueryOrder extends RespPackage{
 		body[3] = (byte)((order.table2_id & 0xFF00) >> 8);
 		
 		//assign the minimum cost
-		body[4] = (byte)(order.minimum_cost & 0x000000FF);
-		body[5] = (byte)((order.minimum_cost & 0x0000FF00) >> 8);
-		body[6] = (byte)((order.minimum_cost & 0x00FF0000) >> 16);
-		body[7] = (byte)((order.minimum_cost & 0xFF000000) >> 24);
+		body[4] = (byte)(order.minCost & 0x000000FF);
+		body[5] = (byte)((order.minCost & 0x0000FF00) >> 8);
+		body[6] = (byte)((order.minCost & 0x00FF0000) >> 16);
+		body[7] = (byte)((order.minCost & 0xFF000000) >> 24);
 		
 		//assign the category
 		body[8] = (byte)(order.category & 0x00FF);
