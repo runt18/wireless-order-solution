@@ -67,6 +67,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'external key associated with the  restaurant table' ,
   `order_date` DATETIME NOT NULL COMMENT 'the order\'s date and time' ,
+  `gift_price` DECIMAL(10,2) NOT NULL DEFAULT 0 COMMENT 'the gift price to this order' ,
   `total_price` DECIMAL(10,2) NULL DEFAULT NULL COMMENT 'The total price to this order.\nIts default value is NULL, means the order not be paid, otherwise means the order has been paid.' ,
   `total_price_2` DECIMAL(10,2) NULL DEFAULT NULL COMMENT 'the actual total price to this order' ,
   `custom_num` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the amount of custom to this order' ,
@@ -277,6 +278,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_history` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'external key associated with the  restaurant table' ,
   `order_date` DATETIME NOT NULL COMMENT 'the order\'s date and time' ,
+  `gift_price` DECIMAL(10,2) NOT NULL DEFAULT 0 COMMENT 'the gift price to this order' ,
   `total_price` DECIMAL(10,2) NULL DEFAULT NULL COMMENT 'The total price to this order.\nIts default value is NULL, means the order not be paid, otherwise means the order has been paid.' ,
   `total_price_2` DECIMAL(10,2) NULL DEFAULT NULL COMMENT 'the actual total price to this order' ,
   `custom_num` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the amount of custom to this order' ,
@@ -560,9 +562,6 @@ COMMENT = 'the shift history to each restaurant';
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
-
-
 
 -- -----------------------------------------------------
 -- Data for table `wireless_order_db`.`restaurant`
