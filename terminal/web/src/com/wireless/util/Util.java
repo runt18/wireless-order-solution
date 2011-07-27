@@ -37,7 +37,7 @@ public class Util {
 	/**
 	 * Convert the foods string submitted by terminal into the array of class food.
 	 * @param submitFoods the submitted string looks like below.<br>
-	 * 			{[菜品1编号,菜品1数量,口味1编号,厨房1编号]，[菜品2编号,菜品2数量,口味2编号,厨房2编号]，...}
+	 * 			{[菜品1编号,菜品1数量,口味1编号,厨房1编号,菜品1折扣]，[菜品2编号,菜品2数量,口味2编号,厨房2编号,菜品2折扣]，...}
 	 * @return the class food array
 	 */
 	public static Food[] toFoodArray(String submitFoods) throws NumberFormatException{
@@ -60,6 +60,8 @@ public class Util {
 			foods[i].tastes[0].alias_id = Short.parseShort(values[2]);
 			//extract the kitchen number
 			foods[i].kitchen = Short.parseShort(values[3]);
+			//extract the discount
+			foods[i].discount = (byte)(Float.parseFloat(values[4]) * 100);
 		}
 		return foods;
 	}
