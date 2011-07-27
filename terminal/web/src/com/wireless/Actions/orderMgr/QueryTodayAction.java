@@ -19,6 +19,7 @@ import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Terminal;
+import com.wireless.util.Util;
 
 public class QueryTodayAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -70,16 +71,21 @@ public class QueryTodayAction extends Action {
 			int type = Integer.parseInt(request.getParameter("type"));
 			
 			//get the operator to filter
-			int opeType = Integer.parseInt(request.getParameter("ope"));
-			String ope = null;
-			if(opeType == 1){
-				ope = "=";
-			}else if(opeType == 2){
-				ope = ">=";
-			}else if(opeType == 3){
-				ope = "<=";
+			String ope = request.getParameter("ope");
+			if(ope != null){
+				int opeType = Integer.parseInt(ope);
+				
+				if(opeType == 1){
+					ope = "=";
+				}else if(opeType == 2){
+					ope = ">=";
+				}else if(opeType == 3){
+					ope = "<=";
+				}else{
+					ope = "=";
+				}
 			}else{
-				ope = "=";
+				ope = "";
 			}
 			
 			//get the value to filter
@@ -136,12 +142,12 @@ public class QueryTodayAction extends Action {
 				}
 				/**
 				 * The json to each order looks like below
-				 * ["账单号","台号","日期","类型","结帐方式","金额","实收","台号2","就餐人数","最低消"]
+				 * ["账单号","台号","日期","类型","结帐方式","金额","实收","台号2","就餐人数","最低消","服务费率","会员编号","会员姓名","账单备注"]
 				 */
 				String jsonOrder = "[\"$(order_id)\",\"$(table_id)\",\"$(order_date)\",\"$(order_cate)\"," +
 								   "\"$(pay_manner)\",\"$(total_price)\",\"$(actual_income)\"," +
-								   "\"$(table2_id)\",\"$(custom_num)\",\"$(min_cost)\"" +
-								   "]";
+								   "\"$(table2_id)\",\"$(custom_num)\",\"$(min_cost)\"," +
+								   "\"$(service_rate)\",\"$(member_id)\",\"$(member)\",\"$(comment)\"]";
 				jsonOrder = jsonOrder.replace("$(order_id)", Long.toString(dbCon.rs.getLong("id")));
 				jsonOrder = jsonOrder.replace("$(table_id)", Integer.toString(dbCon.rs.getInt("table_id")));
 				jsonOrder = jsonOrder.replace("$(order_date)", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(dbCon.rs.getTimestamp("order_date")));
@@ -152,6 +158,14 @@ public class QueryTodayAction extends Action {
 				jsonOrder = jsonOrder.replace("$(table2_id)", Integer.toString(dbCon.rs.getInt("table2_id")));
 				jsonOrder = jsonOrder.replace("$(custom_num)", Integer.toString(dbCon.rs.getInt("custom_num")));
 				jsonOrder = jsonOrder.replace("$(min_cost)", "0");
+				jsonOrder = jsonOrder.replace("$(service_rate)", Float.toString(dbCon.rs.getFloat("service_rate")));
+				String memberID = dbCon.rs.getString("member_id");
+				jsonOrder = jsonOrder.replace("$(member_id)", memberID != null ? memberID : "");
+				String member = dbCon.rs.getString("member");
+				jsonOrder = jsonOrder.replace("$(member)", member != null ? member : "");
+				String comment = dbCon.rs.getString("comment");
+				jsonOrder = jsonOrder.replace("$(comment)", comment != null ? comment : "");
+				
 				// put each json order info to the value
 				value.append(jsonOrder);
 				nCount++;

@@ -12,7 +12,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.PinGen;
 import com.wireless.protocol.ProtocolPackage;
@@ -22,6 +21,7 @@ import com.wireless.protocol.Reserved;
 import com.wireless.protocol.Terminal;
 import com.wireless.protocol.Type;
 import com.wireless.sccon.ServerConnector;
+import com.wireless.util.Util;
 
 
 public class InsertOrderAction extends Action implements PinGen {
@@ -93,7 +93,7 @@ public class InsertOrderAction extends Action implements PinGen {
 				}
 				printType |= Reserved.PRINT_EXTRA_FOOD_2 | Reserved.PRINT_CANCELLED_FOOD_2;
 			}
-			orderToInsert.foods = toFoodArray(request.getParameter("foods"));
+			orderToInsert.foods = Util.toFoodArray(request.getParameter("foods"));
 			
 			ReqPackage.setGen(this);
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(orderToInsert, 
@@ -163,36 +163,6 @@ public class InsertOrderAction extends Action implements PinGen {
 		}
 
 		return null;
-	}
-
-	/**
-	 * Convert the foods string submitted by terminal into the array of class food.
-	 * @param submitFoods the submitted string looks like below.<br>
-	 * 			{[菜品1编号,菜品1数量,口味1编号,厨房1编号]，[菜品2编号,菜品2数量,口味2编号,厨房2编号]，...}
-	 * @return the class food array
-	 */
-	private Food[] toFoodArray(String submitFoods) throws NumberFormatException{
-		//remove the "{}"
-		submitFoods = submitFoods.substring(1, submitFoods.length() - 1);
-		//extract each food item string
-		String[] foodItems = submitFoods.split("，");
-		Food[] foods = new Food[foodItems.length];
-		for(int i = 0; i < foodItems.length; i++){
-			//remove the "[]"
-			String foodItem = foodItems[i].substring(1, foodItems[i].length() - 1);
-			foods[i] = new Food();
-			//extract each food detail information string			
-			String[] values = foodItem.split(",");		
-			//extract the food alias id
-			foods[i].alias_id = Integer.parseInt(values[0]);
-			//extract the amount to order food
-			foods[i].setCount(Float.parseFloat(values[1]));
-			//extract the taste alias id
-			foods[i].tastes[0].alias_id = Short.parseShort(values[2]);
-			//extract the kitchen number
-			foods[i].kitchen = Short.parseShort(values[3]);
-		}
-		return foods;
 	}
 	
 	@Override

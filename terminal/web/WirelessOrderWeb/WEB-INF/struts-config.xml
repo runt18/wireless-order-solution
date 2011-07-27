@@ -52,6 +52,9 @@
 		<action path="/QueryToday" type="com.wireless.Actions.orderMgr.QueryTodayAction"
 			scope="request">
 		</action>
+		<action path="/UpdateOrder2" type="com.wireless.Actions.orderMgr.UpdateOrderAction2"
+			scope="request">
+		</action>
 	</action-mappings>
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
 </struts-config>

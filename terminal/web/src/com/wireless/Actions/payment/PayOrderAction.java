@@ -132,7 +132,7 @@ public class PayOrderAction extends Action implements PinGen{
 			
 			String comment = request.getParameter("comment");
 			/**
-			 * Get the first 12 characters of the comment
+			 * Get the first 20 characters of the comment
 			 */
 			if(comment != null){
 				orderToPay.comment = comment.substring(0, comment.length() < 20 ? comment.length() : 20);
