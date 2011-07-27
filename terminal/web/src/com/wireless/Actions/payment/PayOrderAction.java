@@ -40,26 +40,39 @@ public class PayOrderAction extends Action implements PinGen{
 
 			/**
 			 * The parameters looks like below.
-			 * e.g. pin=0x1 & tempPay=false & tableID=201 & payType=1 & discountType=1 & payManner=1 & cashIncome=120 & serviceRate=5 & memberID=13693834750
+			 * e.g. pin=0x1 & tempPay=false & tableID=201 & payType=1 & discountType=1 & 
+			 * 		payManner=1 & cashIncome=120 giftPrice=0 & serviceRate=5 & memberID=13693834750
+			 * 
 			 * pin : the pin the this terminal
+			 * 
 			 * tempPay : indicates whether to pay order temporary
+			 * 
 			 * tableID : the table id to be paid order
+			 * 
 			 * payType : "1" means pay in "一般", 
 			 * 			 "2" means pay in "会员" 
+			 * 
 			 * discountType : "1" means to pay using discount 1
 			 * 				  "2" means to pay using discount 2
 			 * 				  "3" means to pay using discount 3
+			 * 
 			 * payManner : "1" means "现金"
 			 * 			   "2" means "刷卡"
 			 * 			   "3" means "会员卡"
 			 * 			   "4" means "挂账"
 			 * 			   "5" means "签单"
+			 * 
 			 * cashIncome : the cash that client pay for this order,
 			 * 				this parameter is optional, only takes effect while the pay manner is "现金"
+			 * 
+			 * giftPrice : the gift price to this order
+			 * 
 			 * serviceRate : the service percent rate to this order,
 			 * 				 this parameter is optional.
+			 * 
 			 * memberID : the id to member, 
 			 * 			  this parameter is optional, only takes effect while the pay type is "会员" 
+			 * 
 			 * comment : the comment to this order
 			 *           this parameter is optional,
 			 *           No need to pass this parameter if no comment input. 
@@ -104,6 +117,10 @@ public class PayOrderAction extends Action implements PinGen{
 				orderToPay.service_rate = Byte.parseByte(request.getParameter("serviceRate"));
 			}else{
 				orderToPay.service_rate = 0;
+			}
+			
+			if(request.getParameter("giftPrice") != null){
+				orderToPay.setGiftPrice(Float.parseFloat(request.getParameter("giftPrice")));
 			}
 			
 			/**
