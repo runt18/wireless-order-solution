@@ -10,16 +10,17 @@ import com.wireless.protocol.Table;
 
 public class PayOrder {
 	/**
-	 * Perform to pay an order submitted by terminal.
+	 * Perform to pay an order along with the table id, payment and discount type.
 	 * @param pin the pin to this terminal
 	 * @param model the model to this terminal
-	 * @param orderToPay the pay order information submitted by terminal,
+	 * @param orderToPay the pay order information along with the table id, payment and discount type, 				     
 	 * 					 refer to the class "ReqPayOrder" for more details on what information it contains.
 	 * @return Order completed pay order information to paid order
 	 * @throws BusinessException throws if one of the cases below.<br>
 	 * 							 - The terminal is NOT attached to any restaurant.<br>
 	 * 							 - The terminal is expired.<br>
-	 * 							 - The table associated with this order is idle.
+	 * 							 - The table associated with this order is idle.<br>
+	 * 							 - The order to query does NOT exist.
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
 	public static Order exec(int pin, short model, Order orderToPay) throws BusinessException, SQLException{
@@ -31,85 +32,12 @@ public class PayOrder {
 			dbCon.connect();
 			
 			/**
-			 * Get the completed order information.
-			 */			
-			Order orderInfo = execQueryOrder(dbCon, pin, model, orderToPay); 
+			 * Get the unpaid order id associated with this table
+			 */		
+			Table table = QueryTable.exec(dbCon, pin, model, orderToPay.table_id);
+			orderToPay.id = Util.getUnPaidOrderID(dbCon, table);
 			
-			float totalPrice = orderInfo.getTotalPrice().floatValue();
-			float totalPrice2 = orderInfo.getActualPrice().floatValue();
-			
-			/**
-			 * Get the member info if the pay type for member
-			 */
-			Member member = null;
-			if(orderInfo.pay_type == Order.PAY_MEMBER && orderInfo.member_id != null){
-				member = QueryMember.exec(dbCon, orderInfo.restaurant_id, orderInfo.member_id);
-			}
-			
-			dbCon.stmt.clearBatch();
-			String sql = null;
-			/**
-			 * Calculate the member balance if both pay type and manner is for member .
-			 * The formula is as below.
-			 * balance = balance - actualPrice + actualPrice * exchange_rate
-			 */
-			if(orderInfo.pay_type == Order.PAY_MEMBER && orderInfo.pay_manner == Order.MANNER_MEMBER){
-				sql = "UPDATE " + Params.dbName + ".member SET balance=balance - " + totalPrice2 +
-					  " + " + totalPrice2 + " * exchange_rate" + 
-					  " WHERE restaurant_id=" + orderInfo.restaurant_id +
-					  " AND alias_id=" + member.alias_id;
-				
-				dbCon.stmt.addBatch(sql);
-			}
-					 
-			/**
-			 * Update the values below to "order" table
-			 * - total price
-			 * - actual price
-			 * - payment manner
-			 * - terminal pin
-			 * - service rate
-			 * - pay order date
-			 * - comment if exist
-			 * - member id if pay type is for member
-			 * - member name if pay type is for member
-			 */
-			sql = "UPDATE `" + Params.dbName + "`.`order` SET terminal_pin=" + pin +
-				  ", total_price=" + totalPrice + 
-				  ", total_price_2=" + totalPrice2 +
-				  ", type=" + orderInfo.pay_manner + 
-				  ", service_rate=" + ((float)orderInfo.service_rate / 100) +
-			   	  ", order_date=NOW()" + 
-				  (orderInfo.comment != null ? ", comment='" + orderInfo.comment + "'" : "") +
-				  (member != null ? ", member_id=" + member.alias_id + ", member='" + member.name + "'" : "") + 
-				  " WHERE id=" + orderInfo.id;
-			
-			dbCon.stmt.addBatch(sql);
-			
-
-			/**
-			 * Update each food's discount to "order_food" table
-			 */
-			for(int i = 0; i < orderInfo.foods.length; i++){
-				float discount = (float)orderInfo.foods[i].discount / 100;
-				sql = "UPDATE " + Params.dbName + ".order_food SET discount=" + discount +
-					  " WHERE order_id=" + orderInfo.id + 
-					  " AND food_id=" + orderInfo.foods[i].alias_id;
-				dbCon.stmt.addBatch(sql);				
-			}
-			
-			/**
-			 * Delete the table in the case of "å¹¶å�°" and "å¤–å�–",
-			 * since the table to these order is temporary. 
-			 */
-			if(orderInfo.category == Order.CATE_JOIN_TABLE || orderInfo.category == Order.CATE_TAKE_OUT){
-				sql = "DELETE FROM " + Params.dbName + ".table WHERE alias_id=" +
-					  orderInfo.table_id + " AND restaurant_id=" + orderInfo.restaurant_id;
-				dbCon.stmt.addBatch(sql);
-			}
-			dbCon.stmt.executeBatch();
-			
-			return orderInfo;
+			return execByID(dbCon, pin, model, orderToPay);			
 			
 		}finally{
 			dbCon.disconnect();
@@ -117,50 +45,205 @@ public class PayOrder {
 	}
 	
 	/**
-	 * Get the order detail information and get the discount to each food according the payment and discount type.
+	 * Perform to pay an order along with the order id, payment and discount type.
 	 * @param pin the pin to this terminal
 	 * @param model the model to this terminal
-	 * @param orderToPay the pay order information submitted by terminal,
+	 * @param orderToPay the pay order information along with the order ID, payment and discount type 				     
 	 * 					 refer to the class "ReqPayOrder" for more details on what information it contains.
 	 * @return Order completed pay order information to paid order
 	 * @throws BusinessException throws if one of the cases below.<br>
 	 * 							 - The terminal is NOT attached to any restaurant.<br>
 	 * 							 - The terminal is expired.<br>
-	 * 							 - The table associated with this order is idle.
+	 * 							 - The order to query does NOT exist.
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Order queryOrder(int pin, short model, Order orderToPay) throws BusinessException, SQLException{
-		
+	public static Order execByID(int pin, short model, Order orderToPay) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
-		
 		try{
 			dbCon.connect();
-			return execQueryOrder(dbCon, pin, model, orderToPay);
+			return execByID(dbCon, pin, model, orderToPay);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
+	
 	/**
-	 * Get the order detail information and get the discount to each food according the payment and discount type.
+	 * Perform to pay an order along with the order id.
+	 * Note that the database should be connected before invoking this method.
+	 * @param pin the pin to this terminal
+	 * @param model the model to this terminal
+	 * @param orderToPay the pay order information along with the order ID, payment and discount, 				     
+	 * 					 refer to the class "ReqPayOrder" for more details on what information it contains.
+	 * @return Order completed pay order information to paid order
+	 * @throws BusinessException throws if one of the cases below.<br>
+	 * 							 - The terminal is NOT attached to any restaurant.<br>
+	 * 							 - The terminal is expired.<br>
+	 * 							 - The order to query does NOT exist.
+	 * @throws SQLException throws if fail to execute any SQL statement
+	 */
+	public static Order execByID(DBCon dbCon, int pin, short model, Order orderToPay) throws BusinessException, SQLException{
+		
+		/**
+		 * Get the completed order information.
+		 */			
+		Order orderInfo = queryOrderByID(dbCon, pin, model, orderToPay); 
+			
+		float totalPrice = orderInfo.getTotalPrice().floatValue();
+		float totalPrice2 = orderInfo.getActualPrice().floatValue();
+			
+		/**
+		 * Get the member info if the pay type for member
+		 */
+		Member member = null;
+		if(orderInfo.pay_type == Order.PAY_MEMBER && orderInfo.member_id != null){
+			member = QueryMember.exec(dbCon, orderInfo.restaurant_id, orderInfo.member_id);
+		}
+			
+		dbCon.stmt.clearBatch();
+		String sql = null;
+		/**
+		 * Calculate the member balance if both pay type and manner is for member .
+		 * The formula is as below.
+		 * balance = balance - actualPrice + actualPrice * exchange_rate
+		 */
+		if(orderInfo.pay_type == Order.PAY_MEMBER && orderInfo.pay_manner == Order.MANNER_MEMBER){
+			sql = "UPDATE " + Params.dbName + ".member SET balance=balance - " + totalPrice2 +
+				  " + " + totalPrice2 + " * exchange_rate" + 
+				  " WHERE restaurant_id=" + orderInfo.restaurant_id +
+				  " AND alias_id=" + member.alias_id;
+			
+			dbCon.stmt.addBatch(sql);
+		}
+					 
+		/**
+		 * Update the values below to "order" table
+		 * - total price
+		 * - actual price
+		 * - payment manner
+		 * - terminal pin
+		 * - service rate
+		 * - pay order date
+		 * - comment if exist
+		 * - member id if pay type is for member
+		 * - member name if pay type is for member
+		 */
+		sql = "UPDATE `" + Params.dbName + "`.`order` SET terminal_pin=" + pin +
+			  ", total_price=" + totalPrice + 
+			  ", total_price_2=" + totalPrice2 +
+			  ", type=" + orderInfo.pay_manner + 
+			  ", service_rate=" + ((float)orderInfo.service_rate / 100) +
+		   	  ", order_date=NOW()" + 
+			  (orderInfo.comment != null ? ", comment='" + orderInfo.comment + "'" : "") +
+			  (member != null ? ", member_id=" + member.alias_id + ", member='" + member.name + "'" : "") + 
+			  " WHERE id=" + orderInfo.id;
+			
+		dbCon.stmt.addBatch(sql);
+			
+
+		/**
+		 * Update each food's discount to "order_food" table
+		 */
+		for(int i = 0; i < orderInfo.foods.length; i++){
+			float discount = (float)orderInfo.foods[i].discount / 100;
+			sql = "UPDATE " + Params.dbName + ".order_food SET discount=" + discount +
+				  " WHERE order_id=" + orderInfo.id + 
+				  " AND food_id=" + orderInfo.foods[i].alias_id;
+			dbCon.stmt.addBatch(sql);				
+		}
+			
+		/**
+		 * Delete the table in the case of "å¹¶å�°" and "å¤–å�–",
+		 * since the table to these order is temporary. 
+		 */
+		if(orderInfo.category == Order.CATE_JOIN_TABLE || orderInfo.category == Order.CATE_TAKE_OUT){
+			sql = "DELETE FROM " + Params.dbName + ".table WHERE alias_id=" +
+				  orderInfo.table_id + " AND restaurant_id=" + orderInfo.restaurant_id;
+			dbCon.stmt.addBatch(sql);
+		}
+		dbCon.stmt.executeBatch();
+			
+		return orderInfo;
+
+	}
+	
+	/**
+	 * Get the order detail information and get the discount to each food 
+	 * according to the table id, payment and discount type.
 	 * Note that the database should be connected before invoking this method.
 	 * @param dbCon the database connection
 	 * @param pin the pin to this terminal
 	 * @param model the model to this terminal
-	 * @param orderToPay the pay order information submitted by terminal,
+	 * @param orderToPay the pay order information along with table ID, payment and discount type,
 	 * 					 refer to the class "ReqPayOrder" for more details on what information it contains.
 	 * @return Order completed pay order information to paid order
 	 * @throws BusinessException throws if one of the cases below.<br>
 	 * 							 - The terminal is NOT attached to any restaurant.<br>
 	 * 							 - The terminal is expired.<br>
-	 * 							 - The table associated with this order is idle.
+	 *  						 - The table associated with this order is idle.<br>
+	 * 							 - The order to query does NOT exist.
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	private static Order execQueryOrder(DBCon dbCon, int pin, short model, Order orderToPay) throws BusinessException, SQLException{
+	public static Order queryOrder(int pin, short model, Order orderToPay) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			/**
+			 * Get the unpaid order id associated with this table
+			 */
+			Table table = QueryTable.exec(dbCon, pin, model, orderToPay.table_id);
+			orderToPay.id = Util.getUnPaidOrderID(dbCon, table);
+			
+			return queryOrderByID(dbCon, pin, model, orderToPay);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the order detail information and get the discount to each food 
+	 * according to the order id, payment and discount type.
+	 * @param dbCon the database connection
+	 * @param pin the pin to this terminal
+	 * @param model the model to this terminal
+	 * @param orderToPay the pay order information along with order ID, payment and discount type,
+	 * 					 refer to the class "ReqPayOrder" for more details on what information it contains.
+	 * @return Order completed pay order information to paid order
+	 * @throws BusinessException throws if one of the cases below.<br>
+	 * 							 - The terminal is NOT attached to any restaurant.<br>
+	 * 							 - The terminal is expired.<br>
+	 * 							 - The order to query does NOT exist.
+	 * @throws SQLException throws if fail to execute any SQL statement
+	 */
+	public static Order queryOrderByID(int pin, short model, Order orderToPay) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return queryOrderByID(dbCon, pin, model, orderToPay);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the order detail information and get the discount to each food 
+	 * according to the order id, payment and discount type.
+	 * Note that the database should be connected before invoking this method.
+	 * @param dbCon the database connection
+	 * @param pin the pin to this terminal
+	 * @param model the model to this terminal
+	 * @param orderToPay the pay order information along with order ID, payment and discount type,
+	 * 					 refer to the class "ReqPayOrder" for more details on what information it contains.
+	 * @return Order completed pay order information to paid order
+	 * @throws BusinessException throws if one of the cases below.<br>
+	 * 							 - The terminal is NOT attached to any restaurant.<br>
+	 * 							 - The terminal is expired.<br>
+	 * 							 - The order to query does NOT exist.
+	 * @throws SQLException throws if fail to execute any SQL statement
+	 */
+	public static Order queryOrderByID(DBCon dbCon, int pin, short model, Order orderToPay) throws BusinessException, SQLException{
 		
-		Table table = QueryTable.exec(dbCon, pin, model, orderToPay.table_id);
-		
-		Order orderInfo = QueryOrder.execByID(dbCon, pin, model, Util.getUnPaidOrderID(dbCon, table));
+		Order orderInfo = QueryOrder.execByID(dbCon, pin, model, orderToPay.id);
 		
 		String discount = "discount";
 		if(orderToPay.pay_type == Order.PAY_NORMAL && orderToPay.discount_type == Order.DISCOUNT_1){
@@ -244,9 +327,9 @@ public class PayOrder {
 		 * Comparing the minimum cost against total price.
 		 * Set the actual price to minimum cost if total price is less than minimum cost.
 		 */
-		if(totalPrice < table.getMinimumCost().floatValue()){
+		if(totalPrice < orderInfo.getMinimumCost()){
 			//直接使用最低消费
-			totalPrice2 = table.getMinimumCost().floatValue();			
+			totalPrice2 = orderInfo.getMinimumCost();			
 		}else if(orderInfo.price_tail == Order.TAIL_DECIMAL_CUT){
 			//小数抹零
 			totalPrice2 = new Float(totalPrice).intValue();
