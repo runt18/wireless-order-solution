@@ -42,24 +42,35 @@ public class InsertOrderAction extends Action implements PinGen {
 
 			/**
 			 * The parameters looks like below.
-			 * e.g. pin=0x1 & tableID=201 & tableID_2=0 & category=1 & customNum=2 & type=1 & foods="{[1102,2,2,4]}"
+			 * e.g. pin=0x1 & tableID=201 & tableID_2=0 & 
+			 * 		category=1 & customNum=2 & type=1 & 
+			 * 		foods={[1102,2,2,4,1]，[1103,2,2,4,0.9]，...}
+			 * 
 			 * pin : the pin the this terminal
+			 * 
 			 * tableID : the table id to insert order
+			 * 
 			 * tableID_2 : the 2nd table id, 
 			 * 			   this parameter is optional and only takes effect in the case of "拼台"
+			 * 
 			 * category : "1" means "一般"
 			 * 			  "2" means "外卖"
 			 * 			  "3" means "并台"
 			 * 			  "4" means "拼台"
+			 * 
 			 * customNum : the custom number to this order, ranges from 1 through 255
+			 * 
 			 * type : "1" means insert order
 			 * 		  "2" means update order
+			 * 
 			 * originalTableID : the original table id, this parameter is optional.
 			 * 					 if the type is insert order, NOT need this parameter.
 			 * 			     	 if the type is update order, need this parameter to indicate the original table.
 			 * 			  		 if you want to transfer to another table, using this parameter like below.
 			 * 					 e.g. transfer table from 100 to 101, "tableID=101 & originalTableID=100"
-			 * foods : the food string
+			 * 
+			 * foods : the food string whose format looks like below.
+			 *         {[菜品1编号,菜品1数量,口味1编号,厨房1编号,菜品1折扣]，[菜品2编号,菜品2数量,口味2编号,厨房2编号,菜品2折扣]，...}
 			 */
 			String pin = request.getParameter("pin");
 			if(pin.startsWith("0x") || pin.startsWith("0X")){

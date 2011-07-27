@@ -61,7 +61,9 @@ public class Util {
 			//extract the kitchen number
 			foods[i].kitchen = Short.parseShort(values[3]);
 			//extract the discount
-			foods[i].discount = (byte)(Float.parseFloat(values[4]) * 100);
+			if(values.length >= 4){
+				foods[i].discount = (byte)(Float.parseFloat(values[4]) * 100);
+			}
 		}
 		return foods;
 	}

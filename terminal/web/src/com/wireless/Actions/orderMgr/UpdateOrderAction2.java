@@ -38,7 +38,7 @@ public class UpdateOrderAction2 extends Action{
 			 * The parameters looks like below.
 			 * e.g. pin=0x1 & orderID=40 & category=1 & customNum=2 & payType=1 & 
 			 * 		discountType=1 & payManner=1 & serviceRate=0 & 
-			 * 		foods="{[1102,2,2,4]}"
+			 * 		foods={[1102,2,2,4,1]，[1103,2,2,4,0.9]，...}
 			 * 
 			 * pin : the pin the this terminal
 			 * 
@@ -74,7 +74,8 @@ public class UpdateOrderAction2 extends Action{
 			 *           this parameter is optional,
 			 *           No need to pass this parameter if no comment input. 
 			 *           
-			 * foods : the food string
+			 * foods : the food string whose format looks like below.
+			 *         {[菜品1编号,菜品1数量,口味1编号,厨房1编号,菜品1折扣]，[菜品2编号,菜品2数量,口味2编号,厨房2编号,菜品2折扣]，...}
 			 */
 			String pin = request.getParameter("pin");
 			if(pin.startsWith("0x") || pin.startsWith("0X")){

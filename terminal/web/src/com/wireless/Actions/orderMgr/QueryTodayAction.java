@@ -144,12 +144,13 @@ public class QueryTodayAction extends Action {
 				}
 				/**
 				 * The json to each order looks like below
-				 * ["账单号","台号","日期","类型","结帐方式","金额","实收","台号2","就餐人数","最低消","服务费率","会员编号","会员姓名","账单备注"]
+				 * ["账单号","台号","日期","类型","结帐方式","金额","实收","台号2",
+				 * "就餐人数","最低消","服务费率","赠券金额","会员编号","会员姓名","账单备注"]
 				 */
 				String jsonOrder = "[\"$(order_id)\",\"$(table_id)\",\"$(order_date)\",\"$(order_cate)\"," +
 								   "\"$(pay_manner)\",\"$(total_price)\",\"$(actual_income)\"," +
 								   "\"$(table2_id)\",\"$(custom_num)\",\"$(min_cost)\"," +
-								   "\"$(service_rate)\",\"$(member_id)\",\"$(member)\",\"$(comment)\"]";
+								   "\"$(service_rate)\",\"$(gift_price)\",\"$(member_id)\",\"$(member)\",\"$(comment)\"]";
 				jsonOrder = jsonOrder.replace("$(order_id)", Long.toString(dbCon.rs.getLong("id")));
 				jsonOrder = jsonOrder.replace("$(table_id)", Integer.toString(dbCon.rs.getInt("table_id")));
 				jsonOrder = jsonOrder.replace("$(order_date)", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(dbCon.rs.getTimestamp("order_date")));
@@ -161,6 +162,7 @@ public class QueryTodayAction extends Action {
 				jsonOrder = jsonOrder.replace("$(custom_num)", Integer.toString(dbCon.rs.getInt("custom_num")));
 				jsonOrder = jsonOrder.replace("$(min_cost)", "0");
 				jsonOrder = jsonOrder.replace("$(service_rate)", Float.toString(dbCon.rs.getFloat("service_rate")));
+				jsonOrder = jsonOrder.replace("$(gift_price)", Float.toString(dbCon.rs.getFloat("gift_price")));
 				String memberID = dbCon.rs.getString("member_id");
 				jsonOrder = jsonOrder.replace("$(member_id)", memberID != null ? memberID : "");
 				String member = dbCon.rs.getString("member");
