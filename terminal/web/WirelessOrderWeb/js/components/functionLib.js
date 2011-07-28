@@ -16,7 +16,7 @@ function URLParaQuery() {
 }
 
 // 获取操作人姓名
-// 此函数要求页面上有operatorName全局变量；有id为optName的div
+// 此函数要求页面上有operatorName,restaurantID全局变量；有id为optName的div
 function getOperatorName(pin) {
 	Ext.Ajax.request({
 		url : "../QueryStaff.do",

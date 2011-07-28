@@ -66,6 +66,22 @@ var orderedStore = new Ext.data.Store({
 		name : "dishOpt"
 	}, {
 		name : "dishTotalPrice"
+	}, {
+		name : "dishNbr"
+	}, {
+		name : "kitchNbr"
+	}, {
+		name : "tasteNbr"
+	}, {
+		name : "special"
+	}, {
+		name : "jian"
+	}, {
+		name : "soldOut"
+	}, {
+		name : "forFree"
+	}, {
+		name : "discountRate"
 	} ])
 });
 
@@ -79,121 +95,123 @@ function dishOptTasteHandler(rowIndex) {
 	}
 };
 
-var dishPushBackWin = new Ext.Window({
-	layout : "fit",
-	width : 200,
-	height : 100,
-	closeAction : "hide",
-	resizable : false,
-	items : [ {
-		layout : "form",
-		labelWidth : 30,
-		border : false,
-		frame : true,
-		items : [ {
-			xtype : "textfield",
-			inputType : "password",
-			fieldLabel : "密码",
-			id : "dishPushBackPwd",
-			width : 110
-		} ]
-	} ],
-	buttons : [
-			{
-				text : "确定",
-				handler : function() {
-					var dishPushBackPwd = dishPushBackWin.findById(
-							"dishPushBackPwd").getValue();
-					dishPushBackWin.findById("dishPushBackPwd").setValue("");
+// var dishPushBackWin = new Ext.Window({
+// layout : "fit",
+// width : 200,
+// height : 100,
+// closeAction : "hide",
+// resizable : false,
+// items : [ {
+// layout : "form",
+// labelWidth : 30,
+// border : false,
+// frame : true,
+// items : [ {
+// xtype : "textfield",
+// inputType : "password",
+// fieldLabel : "密码",
+// id : "dishPushBackPwd",
+// width : 110
+// } ]
+// } ],
+// buttons : [
+// {
+// text : "确定",
+// handler : function() {
+// var dishPushBackPwd = dishPushBackWin.findById(
+// "dishPushBackPwd").getValue();
+// dishPushBackWin.findById("dishPushBackPwd").setValue("");
+//
+// var pwdTrans;
+// if (dishPushBackPwd != "") {
+// pwdTrans = MD5(dishPushBackPwd);
+// } else {
+// pwdTrans = dishPushBackPwd;
+// }
+//
+// dishPushBackWin.hide();
+//
+// Ext.Ajax.request({
+// url : "../VerifyPwd.do",
+// params : {
+// "pin" : Request["pin"],
+// "type" : "2",
+// "pwd" : pwdTrans
+// },
+// success : function(response, options) {
+// var resultJSON = Ext.util.JSON
+// .decode(response.responseText);
+// if (resultJSON.success == true) {
+// orderedData.splice(dishOrderCurrRowIndex_, 1);
+// orderedStore.reload();
+// orderIsChanged = true;
+// dishOrderCurrRowIndex_ = -1;
+//
+// Ext.MessageBox.show({
+// msg : resultJSON.data,
+// width : 300,
+// buttons : Ext.MessageBox.OK
+// });
+// } else {
+// Ext.MessageBox.show({
+// msg : resultJSON.data,
+// width : 300,
+// buttons : Ext.MessageBox.OK
+// });
+// }
+// },
+// failure : function(response, options) {
+// }
+// });
+// }
+// }, {
+// text : "取消",
+// handler : function() {
+// dishPushBackWin.hide();
+// dishPushBackWin.findById("dishPushBackPwd").setValue("");
+// }
+// } ],
+// listeners : {
+// show : function(thiz) {
+// // thiz.findById("personCountInput").focus();
+// var f = Ext.get("dishPushBackPwd");
+// f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
+// }
+// }
+// });
 
-					var pwdTrans;
-					if (dishPushBackPwd != "") {
-						pwdTrans = MD5(dishPushBackPwd);
-					} else {
-						pwdTrans = dishPushBackPwd;
-					}
-
-					dishPushBackWin.hide();
-
-					Ext.Ajax.request({
-						url : "../VerifyPwd.do",
-						params : {
-							"pin" : Request["pin"],
-							"type" : "2",
-							"pwd" : pwdTrans
-						},
-						success : function(response, options) {
-							var resultJSON = Ext.util.JSON
-									.decode(response.responseText);
-							if (resultJSON.success == true) {
-								orderedData.splice(dishOrderCurrRowIndex_, 1);
-								orderedStore.reload();
-								orderIsChanged = true;
-								dishOrderCurrRowIndex_ = -1;
-
-								Ext.MessageBox.show({
-									msg : resultJSON.data,
-									width : 300,
-									buttons : Ext.MessageBox.OK
-								});
-							} else {
-								Ext.MessageBox.show({
-									msg : resultJSON.data,
-									width : 300,
-									buttons : Ext.MessageBox.OK
-								});
-							}
-						},
-						failure : function(response, options) {
-						}
-					});
-				}
-			}, {
-				text : "取消",
-				handler : function() {
-					dishPushBackWin.hide();
-					dishPushBackWin.findById("dishPushBackPwd").setValue("");
-				}
-			} ],
-	listeners : {
-		show : function(thiz) {
-			// thiz.findById("personCountInput").focus();
-			var f = Ext.get("dishPushBackPwd");
-			f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
-		}
-	}
-});
 function dishOptDeleteHandler(rowIndex) {
 
 	if (dishOrderCurrRowIndex_ != -1) {
-		if (Request["tableStat"] == "used") {
-			dishPushBackWin.show();
-		} else {
-			Ext.MessageBox.show({
-				msg : "您确定要删除此菜品？",
-				width : 300,
-				buttons : Ext.MessageBox.YESNO,
-				fn : function(btn) {
-					if (btn == "yes") {
-						orderedData.splice(rowIndex, 1);
-						orderedStore.reload();
-						orderIsChanged = true;
-						dishOrderCurrRowIndex_ = -1;
-					}
+		// if (Request["tableStat"] == "used") {
+		// dishPushBackWin.show();
+		// } else {
+		Ext.MessageBox.show({
+			msg : "您确定要删除此菜品？",
+			width : 300,
+			buttons : Ext.MessageBox.YESNO,
+			fn : function(btn) {
+				if (btn == "yes") {
+					orderedData.splice(rowIndex, 1);
+					orderedStore.reload();
+					orderIsChanged = true;
+					dishOrderCurrRowIndex_ = -1;
 				}
-			});
-		}
+			}
+		});
+		// }
 	}
 };
-function dishOptPressHandler(rowIndex) {
 
-	if (dishOrderCurrRowIndex_ != -1) {
-		// Ext.Msg.alert("", "已催菜！");
-		// orderedStore.reload();
-		// dishOrderCurrRowIndex_ = -1;
-	}
-
-};
+// function dishOptPressHandler(rowIndex) {
+//
+// if (dishOrderCurrRowIndex_ != -1) {
+// // Ext.Msg.alert("", "已催菜！");
+// // orderedStore.reload();
+// // dishOrderCurrRowIndex_ = -1;
+// }
+//
+// };
 
 function dishOptDispley(value, cellmeta, record, rowIndex, columnIndex, store) {
 	return "<center><a href=\"javascript:dishOptTasteHandler(" + rowIndex
@@ -201,9 +219,10 @@ function dishOptDispley(value, cellmeta, record, rowIndex, columnIndex, store) {
 			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
 			+ "<a href=\"javascript:dishOptDeleteHandler(" + rowIndex + ")\">"
 			+ "<img src='../images/del.png'/>删除</a>"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-			+ "<a href=\"javascript:dishOptPressHandler(" + rowIndex + ")\">"
-			+ "<img src='../images/Modify.png'/>催菜</a>" + "</center>";
+			// + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+			// + "<a href=\"javascript:dishOptPressHandler(" + rowIndex + ")\">"
+			// + "<img src='../images/Modify.png'/>催菜</a>"
+			+ "</center>";
 };
 
 var orderedColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(),
@@ -255,15 +274,15 @@ var dishDeleteImgBut = new Ext.ux.ImageButton({
 		dishOptDeleteHandler(dishOrderCurrRowIndex_);
 	}
 });
-var dishPressImgBut = new Ext.ux.ImageButton({
-	imgPath : "../images/HurryFood.png",
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : "催菜",
-	handler : function(btn) {
-		dishOptPressHandler(dishOrderCurrRowIndex_);
-	}
-});
+// var dishPressImgBut = new Ext.ux.ImageButton({
+// imgPath : "../images/HurryFood.png",
+// imgWidth : 50,
+// imgHeight : 50,
+// tooltip : "催菜",
+// handler : function(btn) {
+// dishOptPressHandler(dishOrderCurrRowIndex_);
+// }
+// });
 var countAddImgBut = new Ext.ux.ImageButton(
 		{
 			imgPath : "../images/AddCount.png",
@@ -310,58 +329,58 @@ var countEqualImgBut = new Ext.ux.ImageButton({
 		}
 	}
 });
-var printTotalImgBut = new Ext.ux.ImageButton({
-	imgPath : "../images/PrintTotal.png",
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : "补打总单",
-	handler : function(btn) {
-		Ext.Ajax.request({
-			url : "../PrintOrder.do",
-			params : {
-				"pin" : Request["pin"],
-				"tableID" : Request["tableNbr"],
-				"printOrder" : 1
-			},
-			success : function(response, options) {
-				var resultJSON = Ext.util.JSON.decode(response.responseText);
-				Ext.MessageBox.show({
-					msg : resultJSON.data,
-					width : 300,
-					buttons : Ext.MessageBox.OK
-				});
-			},
-			failure : function(response, options) {
-			}
-		});
-	}
-});
-var printDetailImgBut = new Ext.ux.ImageButton({
-	imgPath : "../images/PrintDetail.png",
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : "补打明细",
-	handler : function(btn) {
-		Ext.Ajax.request({
-			url : "../PrintOrder.do",
-			params : {
-				"pin" : Request["pin"],
-				"tableID" : Request["tableNbr"],
-				"printDetail" : 1
-			},
-			success : function(response, options) {
-				var resultJSON = Ext.util.JSON.decode(response.responseText);
-				Ext.MessageBox.show({
-					msg : resultJSON.data,
-					width : 300,
-					buttons : Ext.MessageBox.OK
-				});
-			},
-			failure : function(response, options) {
-			}
-		});
-	}
-});
+// var printTotalImgBut = new Ext.ux.ImageButton({
+// imgPath : "../images/PrintTotal.png",
+// imgWidth : 50,
+// imgHeight : 50,
+// tooltip : "补打总单",
+// handler : function(btn) {
+// Ext.Ajax.request({
+// url : "../PrintOrder.do",
+// params : {
+// "pin" : Request["pin"],
+// "tableID" : Request["tableNbr"],
+// "printOrder" : 1
+// },
+// success : function(response, options) {
+// var resultJSON = Ext.util.JSON.decode(response.responseText);
+// Ext.MessageBox.show({
+// msg : resultJSON.data,
+// width : 300,
+// buttons : Ext.MessageBox.OK
+// });
+// },
+// failure : function(response, options) {
+// }
+// });
+// }
+// });
+// var printDetailImgBut = new Ext.ux.ImageButton({
+// imgPath : "../images/PrintDetail.png",
+// imgWidth : 50,
+// imgHeight : 50,
+// tooltip : "补打明细",
+// handler : function(btn) {
+// Ext.Ajax.request({
+// url : "../PrintOrder.do",
+// params : {
+// "pin" : Request["pin"],
+// "tableID" : Request["tableNbr"],
+// "printDetail" : 1
+// },
+// success : function(response, options) {
+// var resultJSON = Ext.util.JSON.decode(response.responseText);
+// Ext.MessageBox.show({
+// msg : resultJSON.data,
+// width : 300,
+// buttons : Ext.MessageBox.OK
+// });
+// },
+// failure : function(response, options) {
+// }
+// });
+// }
+// });
 
 var orderedGrid = new Ext.grid.GridPanel({
 	title : "已点菜式",
@@ -385,7 +404,9 @@ var orderedGrid = new Ext.grid.GridPanel({
 		}, dishDeleteImgBut, {
 			text : "&nbsp;&nbsp;&nbsp;",
 			disabled : true
-		}, dishPressImgBut, dishDeleteImgBut, {
+		},
+		// dishPressImgBut,
+		dishDeleteImgBut, {
 			text : "&nbsp;&nbsp;&nbsp;",
 			disabled : true
 		}, '-', dishDeleteImgBut, {
@@ -413,10 +434,11 @@ var orderedGrid = new Ext.grid.GridPanel({
 	listeners : {
 		rowclick : function(thiz, rowIndex, e) {
 			dishOrderCurrRowIndex_ = rowIndex;
-		},
-		render : function(thiz) {
-			orderedDishesOnLoad();
 		}
+	// ,
+	// render : function(thiz) {
+	// orderedDishesOnLoad();
+	// }
 	}
 });
 
@@ -439,51 +461,62 @@ var orderedForm = new Ext.form.FormPanel(
 						handler : function() {
 							if (orderedData.length > 0) {
 
-								var Request = new URLParaQuery();
-
 								var foodPara = "";
 								for ( var i = 0; i < orderedData.length; i++) {
 									foodPara = foodPara + "["
 											+ orderedData[i][6] + "," // 菜品1编号
 											+ orderedData[i][2] + "," // 菜品1数量
 											+ orderedData[i][8] + "," // 口味1编号
-											+ orderedData[i][7] // 厨房1编号
+											+ orderedData[i][7] + ","// 厨房1编号
+											+ orderedData[i][13] // 折扣率
 											+ "]，";
 								}
 								foodPara = "{"
 										+ foodPara.substr(0,
 												foodPara.length - 1) + "}";
 
-								var type = 9;
-								if (Request["tableStat"] == "free") {
-									type = 1;
-								} else {
-									type = 2;
+								//alert(foodPara);
+
+								var categoryOut;
+								if (Request["category"] == "一般") {
+									categoryOut = 1;
+								} else if (Request["category"] == "外卖") {
+									categoryOut = 2;
+								} else if (Request["category"] == "并台") {
+									categoryOut = 3;
+								} else if (Request["category"] == "拼台") {
+									categoryOut = 4;
 								}
 
-								// alert("pin:" + Request["pin"] + " tableID:"
-								// + Request["tableNbr"]
-								// + " tableID_2:"
-								// + Request["tableNbr2"]
-								// + " customNum:"
-								// + Request["personCount"] + " type:"
-								// + type + " originalTableID:"
-								// + Request["tableNbr"]
-								// + " category:" + category
-								// + " foods" + foodPara);
+								var payMannerOut;
+								if (Request["payManner"] == "现金") {
+									payMannerOut = 1;
+								} else if (Request["payManner"] == "刷卡") {
+									payMannerOut = 2;
+								} else if (Request["payManner"] == "会员卡") {
+									payMannerOut = 3;
+								} else if (Request["payManner"] == "挂账") {
+									payMannerOut = 4;
+								} else if (Request["payManner"] == "签单") {
+									payMannerOut = 5;
+								}
+
 								Ext.Ajax
 										.request({
-											url : "../InsertOrder.do",
+											url : "../UpdateOrder2.do",
 											params : {
-												"pin" : Request["pin"],
-												"tableID" : Request["tableNbr"],
-												"tableID_2" : Request["tableNbr2"],
+												"pin" : pin,
+												"orderID" : Request["orderID"],
+												"category" : categoryOut,
 												"customNum" : Request["personCount"],
-												"type" : type,
-												"originalTableID" : Request["tableNbr"],// no
+												"payType" : payType,
+												"discountType" : discountType,
+												"payManner" : payMannerOut,
+												"serviceRate" : Request["serviceRate"],
+												"memberID" : Request["memberID"],
+												"comment" : Request["comment"],
 												// use
-												"foods" : foodPara,
-												"category" : category
+												"foods" : foodPara
 											},
 											success : function(response,
 													options) {
@@ -497,8 +530,8 @@ var orderedForm = new Ext.form.FormPanel(
 																buttons : Ext.MessageBox.OK,
 																fn : function() {
 																	var Request = new URLParaQuery();
-																	location.href = "TableSelect.html?pin="
-																			+ Request["pin"]
+																	location.href = "Bills.html?pin="
+																			+ pin
 																			+ "&restaurantID="
 																			+ restaurantID;
 																}
@@ -518,49 +551,26 @@ var orderedForm = new Ext.form.FormPanel(
 										});
 							}
 						}
-					}
-					// , {
-					// text : "清空",
-					// handler : function() {
-					// Ext.Msg.show({
-					// title : "提示",
-					// msg : "确定要删除所有已点菜式？",
-					// buttons : Ext.Msg.YESNO,
-					// fn : function(btn) {
-					// if (btn == "yes") {
-					// orderedData.length = 0;
-					// orderedStore.reload();
-					// }
-					// ;
-					// },
-					// icon : Ext.MessageBox.QUESTION
-					// });
-					// }
-					// }
-					,
+					},
 					{
 						text : "返回",
 						handler : function() {
-							var Request = new URLParaQuery();
 							if (orderIsChanged == false) {
-								location.href = "TableSelect.html?pin="
-										+ Request["pin"] + "&restaurantID="
-										+ restaurantID;
+								location.href = "Bills.html?pin=" + pin
+										+ "&restaurantID=" + restaurantID;
 							} else {
-								Ext.MessageBox
-										.show({
-											msg : "下/改单还未提交，是否确认退出？",
-											width : 300,
-											buttons : Ext.MessageBox.YESNO,
-											fn : function(btn) {
-												if (btn == "yes") {
-													location.href = "TableSelect.html?pin="
-															+ Request["pin"]
-															+ "&restaurantID="
-															+ restaurantID;
-												}
-											}
-										});
+								Ext.MessageBox.show({
+									msg : "账单修改还未提交，是否确认返回？",
+									width : 300,
+									buttons : Ext.MessageBox.YESNO,
+									fn : function(btn) {
+										if (btn == "yes") {
+											location.href = "Bills.html?pin="
+													+ pin + "&restaurantID="
+													+ restaurantID;
+										}
+									}
+								});
 							}
 						}
 					} ]
@@ -943,7 +953,7 @@ var dishesDisplayGrid = new Ext.grid.GridPanel({
 
 			if (dishesDisplayDataShow[rowIndex][7] == "false") {
 				// mune格式：[菜名，菜名编号，菜名拼音，单价，厨房编号]
-				// ordered格式：[菜名，口味，数量，单价，操作，实价，菜名编号，厨房编号，口味编号,特,荐,停]
+				// ordered格式：[菜名，口味，数量，单价，操作，实价，菜名编号，厨房编号，口味编号,特,荐,停,折扣率]
 				var dishCurrCount = dishesOrderEastPanel.findById(
 						"orderCountNum").getValue();
 				var dishCurrName = dishesDisplayDataShow[rowIndex][0];
@@ -961,11 +971,21 @@ var dishesDisplayGrid = new Ext.grid.GridPanel({
 				}
 
 				if (isAlreadyOrderd == false) {
-					orderedData.push([ dishCurrName, "无口味", dishCurrCount,
-							dishCurrPrice, "", dishCurrPrice, dishNbr,
-							kitchenNbr, 0, dishesDisplayDataShow[rowIndex][5],
-							dishesDisplayDataShow[rowIndex][6],
-							dishesDisplayDataShow[rowIndex][7] ]);
+					orderedData.push([ dishCurrName,// 菜名
+					"无口味",// 口味
+					dishCurrCount,// 数量
+					dishCurrPrice, // 单价
+					"",// 操作
+					dishCurrPrice,// 实价
+					dishNbr,// 菜名编号
+					kitchenNbr,// 厨房编号
+					0, // 口味编号
+					dishesDisplayDataShow[rowIndex][5],// 特
+					dishesDisplayDataShow[rowIndex][6],// 荐
+					dishesDisplayDataShow[rowIndex][7],// 停
+					dishesDisplayDataShow[rowIndex][8],// 送
+					"100"// 折扣率
+					]);
 				}
 				orderedStore.reload();
 				dishOrderCurrRowIndex_ = -1;
@@ -1124,7 +1144,7 @@ var dishesChooseByNumForm = new Ext.form.FormPanel({
 
 							},
 							render : function(thiz) {
-								dishNbrOnLoad();
+								// dishNbrOnLoad();
 							}
 						}
 					} ]
@@ -1220,7 +1240,7 @@ var dishesOrderNorthPanel = new Ext.Panel({
 	contentEl : "tableStatusDO",
 	listeners : {
 		render : function(thiz) {
-			tableStuLoad();
+			// tableStuLoad();
 		}
 	}
 });

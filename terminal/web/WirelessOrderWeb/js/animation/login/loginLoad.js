@@ -8,6 +8,9 @@ function loginOnLoad() {
 	if (restaurantID == undefined) {
 		restaurantID = "11";
 	}
+	
+	// protal function register
+	protalFuncReg();
 
 	// emplData: [pin，姓名，密码]
 	// 后台格式：{success:true,
@@ -40,6 +43,7 @@ function loginOnLoad() {
 				}
 
 				emplStore.reload();
+				personLoginWin.show();
 			} else {
 				var dataInfo = resultJSON.data;
 				Ext.MessageBox.show({
@@ -51,6 +55,56 @@ function loginOnLoad() {
 		},
 		failure : function(response, options) {
 		}
+	});
+	
+	
+	// mouse over & mouse off -- heightlight the icon
+	$("#order").each(function() {
+		$(this).hover(function() {
+			$(this).stop().css("background","url(../images/order_select.png) no-repeat 50%");
+		}, function() {
+			$(this).stop().css("background","url(../images/order.png) no-repeat 50%");
+		});
+	});
+	
+	$("#bill").each(function() {
+		$(this).hover(function() {
+			$(this).stop().css("background","url(../images/bill_select.png) no-repeat 50%");
+		}, function() {
+			$(this).stop().css("background","url(../images/bill.png) no-repeat 50%");
+		});
+	});
+	
+	$("#member").each(function() {
+		$(this).hover(function() {
+			$(this).stop().css("background","url(../images/member_select.png) no-repeat 50%");
+		}, function() {
+			$(this).stop().css("background","url(../images/member.png) no-repeat 50%");
+		});
+	});
+	
+	$("#book").each(function() {
+		$(this).hover(function() {
+			$(this).stop().css("background","url(../images/book_select.png) no-repeat 50%");
+		}, function() {
+			$(this).stop().css("background","url(../images/book.png) no-repeat 50%");
+		});
+	});
+	
+	$("#system").each(function() {
+		$(this).hover(function() {
+			$(this).stop().css("background","url(../images/system_select.png) no-repeat 50%");
+		}, function() {
+			$(this).stop().css("background","url(../images/system.png) no-repeat 50%");
+		});
+	});
+	
+	$("#logout").each(function() {
+		$(this).hover(function() {
+			$(this).stop().css("background","url(../images/logout_select.png) no-repeat 50%");
+		}, function() {
+			$(this).stop().css("background","url(../images/logout.png) no-repeat 50%");
+		});
 	});
 
 };

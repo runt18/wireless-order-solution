@@ -72,13 +72,25 @@
 											var passwordInput = staffForm
 													.findById("empPassword")
 													.getValue();
-											var pwdTrans = MD5(passwordInput);
-											if (password == pwdTrans) {
-												location.href = "TableSelect.html?pin="
-														+ pin
-														+ "&restaurantID="
-														+ restaurantID;
+											
+											var pwdTrans;
+											if (passwordInput != "") {
+												pwdTrans = MD5(passwordInput);
 											} else {
+												pwdTrans = passwordInput;
+											}
+											if (password == pwdTrans) {
+
+												// location.href =
+												// "TableSelect.html?pin="
+												// + pin
+												// + "&restaurantID="
+												// + restaurantID;
+												currPin = pin;
+												isVerified = true;
+												personLoginWin.hide();
+											} else {
+												isVerified = false;
 												Ext.MessageBox.show({
 													msg : "姓名或密码错误！",
 													width : 300,
@@ -95,14 +107,24 @@
 								} ]
 					});
 
+			// person login pop window
+			personLoginWin = new Ext.Window({
+				layout : "fit",
+				width : 300,
+				height : 160,
+				closeAction : "hide",
+				resizable : false,
+				closable : false,
+				items : staffForm
+			});
+
 			var centerPanel = new Ext.Panel({
 				region : "center",
 				frame : true,
 				items : [ {
-					html : "<div>&nbsp;&nbsp;</div>",
-					id : "placeHolderCOF1",
-					height : 200
-				}, staffForm ]
+					border : false,
+					contentEl : "protal"
+				} ]
 			});
 
 			var viewport = new Ext.Viewport(
