@@ -259,6 +259,7 @@ public class UpdateOrder {
 					food.alias_id = orderToUpdate.foods[i].alias_id;
 					food.status = dbCon.rs.getShort("status");
 					food.name = dbCon.rs.getString("name");
+					food.discount = orderToUpdate.foods[i].discount;
 					food.setPrice(new Float(dbCon.rs.getFloat("unit_price")));
 					food.setCount(new Float((float)Math.round(Math.abs(diff) * 100) / 100));
 					food.kitchen = dbCon.rs.getShort("kitchen");

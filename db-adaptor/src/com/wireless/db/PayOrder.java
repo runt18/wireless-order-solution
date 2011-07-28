@@ -37,7 +37,7 @@ public class PayOrder {
 			Table table = QueryTable.exec(dbCon, pin, model, orderToPay.table_id);
 			orderToPay.id = Util.getUnPaidOrderID(dbCon, table);
 			
-			return execByID(dbCon, pin, model, orderToPay);			
+			return execByID(dbCon, pin, model, orderToPay, false);			
 			
 		}finally{
 			dbCon.disconnect();
@@ -50,6 +50,7 @@ public class PayOrder {
 	 * @param model the model to this terminal
 	 * @param orderToPay the pay order information along with the order ID, payment and discount type 				     
 	 * 					 refer to the class "ReqPayOrder" for more details on what information it contains.
+	 * @param incDiscount indicate whether the pay order information comprises the discount
 	 * @return Order completed pay order information to paid order
 	 * @throws BusinessException throws if one of the cases below.<br>
 	 * 							 - The terminal is NOT attached to any restaurant.<br>
@@ -57,11 +58,11 @@ public class PayOrder {
 	 * 							 - The order to query does NOT exist.
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Order execByID(int pin, short model, Order orderToPay) throws BusinessException, SQLException{
+	public static Order execByID(int pin, short model, Order orderToPay, boolean incDiscount) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return execByID(dbCon, pin, model, orderToPay);
+			return execByID(dbCon, pin, model, orderToPay, incDiscount);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -75,6 +76,7 @@ public class PayOrder {
 	 * @param model the model to this terminal
 	 * @param orderToPay the pay order information along with the order ID, payment and discount, 				     
 	 * 					 refer to the class "ReqPayOrder" for more details on what information it contains.
+	 * @param incDiscount indicate whether the pay order information comprises the discount
 	 * @return Order completed pay order information to paid order
 	 * @throws BusinessException throws if one of the cases below.<br>
 	 * 							 - The terminal is NOT attached to any restaurant.<br>
@@ -82,12 +84,12 @@ public class PayOrder {
 	 * 							 - The order to query does NOT exist.
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Order execByID(DBCon dbCon, int pin, short model, Order orderToPay) throws BusinessException, SQLException{
+	public static Order execByID(DBCon dbCon, int pin, short model, Order orderToPay, boolean incDiscount) throws BusinessException, SQLException{
 		
 		/**
 		 * Get the completed order information.
 		 */			
-		Order orderInfo = queryOrderByID(dbCon, pin, model, orderToPay); 
+		Order orderInfo = queryOrderByID(dbCon, pin, model, orderToPay, incDiscount); 
 			
 		float totalPrice = orderInfo.getTotalPrice().floatValue();
 		float totalPrice2 = orderInfo.getActualPrice().floatValue();
@@ -195,7 +197,7 @@ public class PayOrder {
 			Table table = QueryTable.exec(dbCon, pin, model, orderToPay.table_id);
 			orderToPay.id = Util.getUnPaidOrderID(dbCon, table);
 			
-			return queryOrderByID(dbCon, pin, model, orderToPay);
+			return queryOrderByID(dbCon, pin, model, orderToPay, false);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -209,6 +211,7 @@ public class PayOrder {
 	 * @param model the model to this terminal
 	 * @param orderToPay the pay order information along with order ID, payment and discount type,
 	 * 					 refer to the class "ReqPayOrder" for more details on what information it contains.
+	 * @param incDiscount indicate whether the pay order information comprises the discount
 	 * @return Order completed pay order information to paid order
 	 * @throws BusinessException throws if one of the cases below.<br>
 	 * 							 - The terminal is NOT attached to any restaurant.<br>
@@ -216,11 +219,11 @@ public class PayOrder {
 	 * 							 - The order to query does NOT exist.
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Order queryOrderByID(int pin, short model, Order orderToPay) throws BusinessException, SQLException{
+	public static Order queryOrderByID(int pin, short model, Order orderToPay, boolean incDiscount) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return queryOrderByID(dbCon, pin, model, orderToPay);
+			return queryOrderByID(dbCon, pin, model, orderToPay, incDiscount);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -235,6 +238,7 @@ public class PayOrder {
 	 * @param model the model to this terminal
 	 * @param orderToPay the pay order information along with order ID, payment and discount type,
 	 * 					 refer to the class "ReqPayOrder" for more details on what information it contains.
+	 * @param incDiscount indicate whether the pay order information comprises the discount
 	 * @return Order completed pay order information to paid order
 	 * @throws BusinessException throws if one of the cases below.<br>
 	 * 							 - The terminal is NOT attached to any restaurant.<br>
@@ -242,56 +246,64 @@ public class PayOrder {
 	 * 							 - The order to query does NOT exist.
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Order queryOrderByID(DBCon dbCon, int pin, short model, Order orderToPay) throws BusinessException, SQLException{
+	public static Order queryOrderByID(DBCon dbCon, int pin, short model, Order orderToPay, boolean incDiscount) throws BusinessException, SQLException{
 		
 		Order orderInfo = QueryOrder.execByID(dbCon, pin, model, orderToPay.id);
 		
-		String discount = "discount";
-		if(orderToPay.pay_type == Order.PAY_NORMAL && orderToPay.discount_type == Order.DISCOUNT_1){
-			discount = "discount";
-			
-		}else if(orderToPay.pay_type == Order.PAY_NORMAL && orderToPay.discount_type == Order.DISCOUNT_2){
-			discount = "discount_2";
-			
-		}else if(orderToPay.pay_type == Order.PAY_NORMAL && orderToPay.discount_type == Order.DISCOUNT_3){
-			discount = "discount_3";
-			
-		}else if(orderToPay.pay_type == Order.PAY_MEMBER){
-			//validate the member id
-			String sql = "SELECT id FROM " + Params.dbName + 
-						 ".member WHERE restaurant_id=" + orderToPay.restaurant_id + 
-						 " AND alias_id='" + orderToPay.member_id + "'";
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			if(dbCon.rs.next()){
-				if(orderToPay.discount_type == Order.DISCOUNT_1){
-					discount = "member_discount_1";
-				}else if(orderToPay.discount_type == Order.DISCOUNT_2){
-					discount = "member_discount_2";
-				}else if(orderToPay.discount_type == Order.DISCOUNT_3){
-					discount = "member_discount_3";
-				}
-			}else{
-				throw new BusinessException("The member id(" + orderToPay.member_id + ") is invalid.", ErrorCode.MEMBER_NOT_EXIST);
-			}
-		}
-			
-		for(int i = 0; i < orderInfo.foods.length; i++){
-			/**
-			 * Both the special food and gifted food does NOT discount
-			 */
-			if(orderInfo.foods[i].isSpecial() || orderInfo.foods[i].isGift()){
-				orderInfo.foods[i].discount = 100;
-			}else{
-				//get the discount to each food according to the payment and discount type
-				String sql = "SELECT " + discount + " FROM " + Params.dbName + 
-							 ".kitchen WHERE restaurant_id=" + orderInfo.restaurant_id + 
-							 " AND alias_id=" + orderInfo.foods[i].kitchen;
+		/**
+		 * If the pay order formation does NOT comprise the discount,
+		 * get the discount according the pay type and manner.
+		 */
+		if(!incDiscount){
+			String discount = "discount";
+			if(orderToPay.pay_type == Order.PAY_NORMAL && orderToPay.discount_type == Order.DISCOUNT_1){
+				discount = "discount";
 				
+			}else if(orderToPay.pay_type == Order.PAY_NORMAL && orderToPay.discount_type == Order.DISCOUNT_2){
+				discount = "discount_2";
+				
+			}else if(orderToPay.pay_type == Order.PAY_NORMAL && orderToPay.discount_type == Order.DISCOUNT_3){
+				discount = "discount_3";
+				
+			}else if(orderToPay.pay_type == Order.PAY_MEMBER){
+				//validate the member id
+				String sql = "SELECT id FROM " + Params.dbName + 
+							 ".member WHERE restaurant_id=" + orderToPay.restaurant_id + 
+							 " AND alias_id='" + orderToPay.member_id + "'";
 				dbCon.rs = dbCon.stmt.executeQuery(sql);
 				if(dbCon.rs.next()){
-					orderInfo.foods[i].discount = (byte)(dbCon.rs.getFloat(discount) * 100);
+					if(orderToPay.discount_type == Order.DISCOUNT_1){
+						discount = "member_discount_1";
+					}else if(orderToPay.discount_type == Order.DISCOUNT_2){
+						discount = "member_discount_2";
+					}else if(orderToPay.discount_type == Order.DISCOUNT_3){
+						discount = "member_discount_3";
+					}
+				}else{
+					throw new BusinessException("The member id(" + orderToPay.member_id + ") is invalid.", ErrorCode.MEMBER_NOT_EXIST);
 				}
-				dbCon.rs.close();				
+			}
+				
+			for(int i = 0; i < orderInfo.foods.length; i++){
+				/**
+				 * Both the special food and gifted food does NOT discount
+				 */
+				if(orderInfo.foods[i].isSpecial() || orderInfo.foods[i].isGift()){
+					orderInfo.foods[i].discount = 100;
+				}else{
+					/**
+					 * Get the discount to each food according to the kitchen of this restaurant.
+					 */
+					String sql = "SELECT " + discount + " FROM " + Params.dbName + 
+								 ".kitchen WHERE restaurant_id=" + orderInfo.restaurant_id + 
+								 " AND alias_id=" + orderInfo.foods[i].kitchen;
+					
+					dbCon.rs = dbCon.stmt.executeQuery(sql);
+					if(dbCon.rs.next()){
+						orderInfo.foods[i].discount = (byte)(dbCon.rs.getFloat(discount) * 100);
+					}
+					dbCon.rs.close();				
+				}
 			}
 		}
 		
