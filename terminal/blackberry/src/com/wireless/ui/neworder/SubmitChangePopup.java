@@ -45,6 +45,7 @@ class SubmitChangePopup extends PopupScreen{
 						}
 						printType |= Reserved.PRINT_EXTRA_FOOD_2;
 						printType |= Reserved.PRINT_CANCELLED_FOOD_2;
+						printType |= Reserved.PRINT_TRANSFER_TABLE_2;
 						//Update the current order normally
 						ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(_reqOrder, Type.UPDATE_ORDER, printType));
 						if(resp.header.type == Type.ACK){
