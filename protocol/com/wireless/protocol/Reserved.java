@@ -24,7 +24,7 @@ public class Reserved {
 	//indicates to print canceled food detail
 	public static final byte PRINT_CANCELLED_FOOD_2 = 0x20;
 	//indicates to print hurry food
-	public static final byte PRINT_HURRY_FOOD_2 = 0x40;
+	public static final byte PRINT_TRANSFER_TABLE_2 = 0x40;
 	//indicates to print temporary receipt
 	public static final byte PRINT_TEMP_RECEIPT_2 = (byte)0x80;
 	/**
@@ -37,6 +37,6 @@ public class Reserved {
 	public static final byte PRINT_RECEIPT = 3;
 	public static final byte PRINT_EXTRA_FOOD = 4;
 	public static final byte PRINT_CANCELLED_FOOD = 5;
-	public static final byte PRINT_HURRY_FOOD = 6;
+	public static final byte PRINT_TRANSFER_TABLE = 6;
 	public static final byte PRINT_TEMP_RECEIPT = 7;
 }
