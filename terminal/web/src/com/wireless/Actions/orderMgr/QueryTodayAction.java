@@ -163,8 +163,8 @@ public class QueryTodayAction extends Action {
 				jsonOrder = jsonOrder.replace("$(table2_id)", Integer.toString(dbCon.rs.getInt("table2_id")));
 				jsonOrder = jsonOrder.replace("$(custom_num)", Integer.toString(dbCon.rs.getInt("custom_num")));
 				jsonOrder = jsonOrder.replace("$(min_cost)", "0");
-				jsonOrder = jsonOrder.replace("$(service_rate)", Float.toString(dbCon.rs.getFloat("service_rate")));
-				jsonOrder = jsonOrder.replace("$(gift_price)", Byte.toString((byte)(dbCon.rs.getFloat("gift_price") * 100)));
+				jsonOrder = jsonOrder.replace("$(service_rate)", Byte.toString((byte)(dbCon.rs.getFloat("service_rate") * 100)));
+				jsonOrder = jsonOrder.replace("$(gift_price)", Float.toString(dbCon.rs.getFloat("gift_price")));
 				String memberID = dbCon.rs.getString("member_id");
 				jsonOrder = jsonOrder.replace("$(member_id)", memberID != null ? memberID : "");
 				String member = dbCon.rs.getString("member");
