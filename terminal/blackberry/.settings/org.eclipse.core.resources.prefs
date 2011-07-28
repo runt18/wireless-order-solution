@@ -1,11 +1,13 @@
-#Tue Jul 19 00:02:31 CST 2011
+#Thu Jul 28 13:45:11 CST 2011
 eclipse.preferences.version=1
 encoding//protocol/com/wireless/protocol/Taste.java=UTF-8
 encoding//protocol/com/wireless/protocol/Util.java=UTF-8
 encoding//src/com/wireless/terminal/StartupScreen.java=UTF-8
-encoding//src/com/wireless/terminal/VerifyPwd.java=UTF-8
+encoding//src/com/wireless/ui/field/OpeFoodPopup.java=UTF-8
+encoding//src/com/wireless/ui/field/RemoveFoodPopup.java=UTF-8
 encoding//src/com/wireless/ui/field/SelectKitchenPopup.java=UTF-8
 encoding//src/com/wireless/ui/field/SelectTastePopup.java=UTF-8
+encoding//src/com/wireless/ui/field/VerifyPwd.java=UTF-8
 encoding//src/com/wireless/ui/funcset/FuncSettingScreen.java=UTF-8
 encoding//src/com/wireless/ui/main/CancelOrderPopup.java=UTF-8
 encoding//src/com/wireless/ui/main/NewOrderPop.java=UTF-8

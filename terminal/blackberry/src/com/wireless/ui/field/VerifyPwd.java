@@ -1,4 +1,6 @@
-package com.wireless.terminal;
+package com.wireless.ui.field;
+
+import com.wireless.terminal.WirelessOrder;
 
 import net.rim.device.api.crypto.MD5Digest;
 import net.rim.device.api.system.Characters;

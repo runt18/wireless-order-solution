@@ -15,24 +15,70 @@ import net.rim.device.api.ui.component.ListFieldCallback;
 import net.rim.device.api.ui.component.SeparatorField;
 import net.rim.device.api.ui.container.PopupScreen;
 import net.rim.device.api.ui.container.VerticalFieldManager;
+import net.rim.device.api.util.Arrays;
+import net.rim.device.api.util.Comparator;
 
 import com.wireless.protocol.Food;
+import com.wireless.protocol.Kitchen;
 import com.wireless.terminal.WirelessOrder;
 
 public class SelectKitchenPopup extends PopupScreen{
 	
 	private OrderListField _orderField;
+	private Vector _kitchens;
 	
 	public SelectKitchenPopup(OrderListField orderField){
 		super(new VerticalFieldManager(VERTICAL_SCROLL | VERTICAL_SCROLLBAR), DEFAULT_CLOSE);
 		
-		_orderField = orderField;
-		
+		_orderField = orderField;		
 
 		add(new LabelField("选择菜品的厨房"));
 		add(new SeparatorField());
 		
-		ListField kitchenLF = new ListField(WirelessOrder.foodMenu.kitchens.length){
+		Food[] tmpFoods = new Food[WirelessOrder.foodMenu.foods.length];
+		System.arraycopy(WirelessOrder.foodMenu.foods, 0, tmpFoods, 0, WirelessOrder.foodMenu.foods.length);
+		Arrays.sort(tmpFoods, new Comparator(){
+
+			public int compare(Object o1, Object o2) {
+				Food food1 = (Food)o1;
+				Food food2 = (Food)o2;
+				if(food1.kitchen > food2.kitchen){
+					return 1;
+				}else if(food1.kitchen < food2.kitchen){
+					return -1;
+				}else{
+					return 0;
+				}
+			}
+			
+		});
+		
+		_kitchens = new Vector();
+		for(int i = 0; i < WirelessOrder.foodMenu.kitchens.length; i++){
+			Food food = new Food();
+			food.kitchen = WirelessOrder.foodMenu.kitchens[i].alias_id;
+			int index = Arrays.binarySearch(tmpFoods, food, new Comparator(){
+
+				public int compare(Object o1, Object o2) {
+					Food food1 = (Food)o1;
+					Food food2 = (Food)o2;
+					if(food1.kitchen > food2.kitchen){
+						return 1;
+					}else if(food1.kitchen < food2.kitchen){
+						return -1;
+					}else{
+						return 0;
+					}
+				}
+			}, 0, tmpFoods.length);
+			
+			if(index >= 0){
+				_kitchens.addElement(WirelessOrder.foodMenu.kitchens[i]);
+			}
+		}
+		
+		
+		ListField kitchenLF = new ListField(_kitchens.size()){
 			private boolean _isFocused = false;
 		    //Invoked when this field receives the focus.
 		    public void onFocus(int direction){
@@ -74,7 +120,7 @@ public class SelectKitchenPopup extends PopupScreen{
 				int nCount = 0;
 				Vector vectFoods = new Vector();
 				for(int i = 0; i < WirelessOrder.foodMenu.foods.length; i++){
-					if(WirelessOrder.foodMenu.foods[i].kitchen == WirelessOrder.foodMenu.kitchens[getSelectedIndex()].alias_id){
+					if(WirelessOrder.foodMenu.foods[i].kitchen == ((Kitchen)_kitchens.elementAt(getSelectedIndex())).alias_id){
 						nCount++;
 						vectFoods.addElement(WirelessOrder.foodMenu.foods[i]);
 					}
@@ -84,14 +130,15 @@ public class SelectKitchenPopup extends PopupScreen{
 				UiApplication.getUiApplication().pushScreen(new SelectFoodPopup(_orderField, foods));
 			}
 		};
+		
 		kitchenLF.setCallback(new ListFieldCallback(){
 
 			public void drawListRow(ListField listField, Graphics graphics,	int index, int y, int width) {
-				graphics.drawText(WirelessOrder.foodMenu.kitchens[index].name, 0, y, 0, width);			
+				graphics.drawText(((Kitchen)_kitchens.elementAt(index)).name, 0, y, 0, width);			
 			}
 
 			public Object get(ListField listField, int index) {
-				return WirelessOrder.foodMenu.kitchens[index];
+				return _kitchens.elementAt(index);
 			}
 
 			public int getPreferredWidth(ListField listField) {
