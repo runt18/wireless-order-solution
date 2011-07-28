@@ -102,7 +102,7 @@ public class InsertOrderAction extends Action implements PinGen {
 				}else{
 					orderToInsert.originalTableID = Short.parseShort(oriTableID);
 				}
-				printType |= Reserved.PRINT_EXTRA_FOOD_2 | Reserved.PRINT_CANCELLED_FOOD_2;
+				printType |= Reserved.PRINT_EXTRA_FOOD_2 | Reserved.PRINT_CANCELLED_FOOD_2 | Reserved.PRINT_TRANSFER_TABLE;
 			}
 			orderToInsert.foods = Util.toFoodArray(request.getParameter("foods"));
 			
