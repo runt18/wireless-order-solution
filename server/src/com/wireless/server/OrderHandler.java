@@ -141,6 +141,7 @@ class OrderHandler extends Handler implements Runnable{
 				Order orderToUpdate = ReqParser.parseInsertOrder(request);
 				UpdateOrder.Result result = UpdateOrder.exec(_term.pin, _term.modelID, orderToUpdate);
 				
+				//print the extra food 
 				byte printConf = Reserved.DEFAULT_CONF;				
 				if((request.header.reserved & Reserved.PRINT_SYNC) != 0){
 					printConf |= Reserved.PRINT_SYNC;
@@ -150,6 +151,7 @@ class OrderHandler extends Handler implements Runnable{
 				}
 				printOrder(printConf, result.extraOrder);
 				
+				//print canceled food
 				printConf = Reserved.DEFAULT_CONF;
 				if((request.header.reserved & Reserved.PRINT_SYNC) != 0){
 					printConf |= Reserved.PRINT_SYNC;
@@ -158,6 +160,19 @@ class OrderHandler extends Handler implements Runnable{
 					printConf |= Reserved.PRINT_CANCELLED_FOOD_2;
 				}
 				printOrder(printConf, result.canceledOrder);
+				
+				//print the table transfer
+				printConf = Reserved.DEFAULT_CONF;
+				if((request.header.reserved & Reserved.PRINT_SYNC) != 0){
+					printConf |= Reserved.PRINT_SYNC;
+				}
+				if((request.header.reserved & Reserved.PRINT_TRANSFER_TABLE_2) != 0){
+					if(orderToUpdate.originalTableID != orderToUpdate.table_id){
+						printConf |= Reserved.PRINT_TRANSFER_TABLE_2;
+					}
+				}
+				printOrder(printConf, orderToUpdate);
+				
 				response = new RespACK(request.header);
 
 				//handle the cancel order request
