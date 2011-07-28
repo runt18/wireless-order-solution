@@ -132,14 +132,12 @@ void CAddPrinterDlg::OnOK(){
 			//1 - print order detail
 			//2 - print extra food
 			//3 - print canceled food
-			//4 - print hurried food
 			//Check to whether see both the function and kitchen is the same.
 			//Otherwise, just check to see whether the function is the same.
 			if(m_Func.Compare(_FuncDesc[func]) == 0){
 				if(func == Reserved::PRINT_ORDER_DETAIL ||
 					func == Reserved::PRINT_EXTRA_FOOD ||
-					func == Reserved::PRINT_CANCELLED_FOOD ||
-					func == Reserved::PRINT_HURRY_FOOD)
+					func == Reserved::PRINT_CANCELLED_FOOD)
 				{
 					//get the kitchen to this printer instance
 					int kitchen = Kitchen::KITCHEN_FULL;;
@@ -203,11 +201,9 @@ void CAddPrinterDlg::OnOK(){
 			//1 - print order detail
 			//2 - print extra food
 			//3 - print canceled food
-			//4 - print hurried food
 			if((selected + 1) == Reserved::PRINT_ORDER_DETAIL ||
 				(selected + 1) == Reserved::PRINT_EXTRA_FOOD ||
-				(selected + 1) == Reserved::PRINT_CANCELLED_FOOD ||
-				(selected + 1) == Reserved::PRINT_HURRY_FOOD){
+				(selected + 1) == Reserved::PRINT_CANCELLED_FOOD){
 				int kitchen = m_PrintKitchen.GetCurSel();
 				if(kitchen == g_Kitchens.size() - 1){
 					kitchen = Kitchen::KITCHEN_FULL;
@@ -274,11 +270,9 @@ void CAddPrinterDlg::OnCbnFuncChg()
 	//1 - print order detail
 	//2 - print extra food
 	//3 - print canceled food
-	//4 - print hurried food
 	if((selected + 1) == Reserved::PRINT_ORDER_DETAIL ||
 		(selected + 1) == Reserved::PRINT_EXTRA_FOOD ||
-		(selected + 1) == Reserved::PRINT_CANCELLED_FOOD ||
-		(selected + 1) == Reserved::PRINT_HURRY_FOOD){
+		(selected + 1) == Reserved::PRINT_CANCELLED_FOOD){
 		m_PrintKitchen.EnableWindow(TRUE);
 	}else{
 		m_PrintKitchen.EnableWindow(FALSE);

@@ -130,8 +130,8 @@ static unsigned __stdcall PrintProc(LPVOID pvParam){
 						stDocInfo.pDocName = L"¼Ó²ËÏêÏ¸";
 					}else if(job.func.code == Reserved::PRINT_CANCELLED_FOOD){
 						stDocInfo.pDocName = L"ÍË²ËÏêÏ¸";
-					}else if(job.func.code == Reserved::PRINT_HURRY_FOOD){
-						stDocInfo.pDocName = L"´ß²ËÏêÏ¸";
+					}else if(job.func.code == Reserved::PRINT_TRANSFER_TABLE){
+						stDocInfo.pDocName = L"×ªÌ¨";
 					}else{
 						stDocInfo.pDocName = L"Î´ÖªĞÅÏ¢";
 					}
@@ -245,8 +245,7 @@ void PrinterInstance::addJob(const char* buf, int len, int iFunc){
 
 	if(iFunc == Reserved::PRINT_ORDER_DETAIL ||
 		iFunc == Reserved::PRINT_EXTRA_FOOD ||
-		iFunc == Reserved::PRINT_CANCELLED_FOOD ||
-		iFunc == Reserved::PRINT_HURRY_FOOD){		
+		iFunc == Reserved::PRINT_CANCELLED_FOOD){		
 		if(iter_func != funcs.end()){
 			split2Details(print_content, iter_func->kitchens, details);
 		}

@@ -15,7 +15,7 @@ extern vector<CString> g_Kitchens;
 extern CString g_ConfPath;
 
 TCHAR* _FuncDesc[] = {
-	_T("Î´Öª"), _T("ÏÂµ¥"), _T("ÏÂµ¥(ÏêÏ¸)"), _T("½áÕÊ"), _T("¼Ó²Ë(ÏêÏ¸)"), _T("ÍË²Ë(ÏêÏ¸)")/*, _T("´ß²Ë(ÏêÏ¸)")*/
+	_T("Î´Öª"), _T("ÏÂµ¥"), _T("ÏÂµ¥(ÏêÏ¸)"), _T("½áÕÊ"), _T("¼Ó²Ë(ÏêÏ¸)"), _T("ÍË²Ë(ÏêÏ¸)"), _T("×ªÌ¨")
 };
 
 int _nFuncs = sizeof(_FuncDesc) / sizeof(TCHAR*);
@@ -102,7 +102,7 @@ void CPrinterListCtrl::Update(TiXmlDocument& conf){
 			if(func == Reserved::PRINT_ORDER_DETAIL ||
 				func == Reserved::PRINT_EXTRA_FOOD ||
 				func == Reserved::PRINT_CANCELLED_FOOD ||
-				func == Reserved::PRINT_HURRY_FOOD){
+				func == Reserved::PRINT_TRANSFER_TABLE){
 					int kitchen = Kitchen::KITCHEN_NULL;
 					int ret = pPrinter->QueryIntAttribute(ConfTags::KITCHEN, &kitchen);
 					if(ret == TIXML_NO_ATTRIBUTE){

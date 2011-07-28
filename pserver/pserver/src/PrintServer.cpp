@@ -112,7 +112,7 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 		if(func == Reserved::PRINT_ORDER_DETAIL ||
 			func == Reserved::PRINT_EXTRA_FOOD ||
 			func == Reserved::PRINT_CANCELLED_FOOD ||
-			func == Reserved::PRINT_HURRY_FOOD)
+			func == Reserved::PRINT_TRANSFER_TABLE)
 		{	
 			pPrinter->QueryIntAttribute(ConfTags::KITCHEN, &kitchen);
 		}else{
@@ -192,7 +192,7 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 								}else if(it->code == Reserved::PRINT_CANCELLED_FOOD && (printReq.header.reserved == Reserved::PRINT_CANCELLED_FOOD)){
 									(*iter)->addJob(printReq.body, len, it->code);
 
-								}else if(it->code == Reserved::PRINT_HURRY_FOOD && (printReq.header.reserved == Reserved::PRINT_HURRY_FOOD)){
+								}else if(it->code == Reserved::PRINT_TRANSFER_TABLE && (printReq.header.reserved == Reserved::PRINT_TRANSFER_TABLE)){
 									(*iter)->addJob(printReq.body, len, it->code);
 								}
 							}
