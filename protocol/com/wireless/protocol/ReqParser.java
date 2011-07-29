@@ -125,31 +125,51 @@ public class ReqParser {
 									((req.body[offset + 1] & 0x00FF) << 8));
 		return order;
 	}
-	
 	/******************************************************
-	 * Design the print order request looks like below
+	 * Design the print order 2 request looks like below
 	 * <Header>
 	 * mode : type : seq : reserved : pin[6] : len[2] : print_content
 	 * mode - PRINT
-	 * type - PRINT_BILL
+	 * type - PRINT_BILL_2
 	 * seq - auto calculated and filled in
 	 * reserved - the meaning to each bit is as below
 	 * 			  [0] - PRINT_SYNC
 	 * 		      [1] - PRINT_ORDER_2
 	 * 			  [2] - PRINT_ORDER_DETAIL_2
 	 * 			  [3] - PRINT_RECEIPT_2
-	 * 			  [4..7] - Not Used
+	 *            [4] - PRINT_EXTRA_FOOD_2<br>
+	 *            [5] - PRINT_CANCELLED_FOOD_2<br>
+	 *            [6] - PRINT_TRANSFER_TABLE_2<br>
+	 *            [7] - PRINT_TEMP_RECEIPT_2<br>	
 	 * pin[6] - auto calculated and filled in
 	 * len[2] - length of the <Body>
 	 * <Body>
+	 * order_id[4] : ori_tbl[2] : new_tbl[2] 
 	 * order_id[4] - 4-byte indicating the order id to print
+	 * ori_tbl[2] - 2-byte indicating the original table id
+	 * new_tbl[2] - 2-byte indicating the new table id
 	 *******************************************************/
-	public static int parsePrintReq(ProtocolPackage req){
+	public static Order parsePrintReq(ProtocolPackage req){
+		//get the order id
 		int orderID = (req.body[0] & 0x000000FF) |
 	   	   			  ((req.body[1] & 0x000000FF) << 8) |
 	   	   			  ((req.body[2] & 0x000000FF) << 16) |
 	   	   			  ((req.body[3] & 0x000000FF) << 24); 
-		return orderID;
+		
+		//get the original table id
+		int oriTblID = (req.body[4] & 0x000000FF) |
+					   ((req.body[5] & 0x000000FF) << 8);
+		
+		//get the new table id
+		int newTblID = (req.body[6] & 0x000000FF) |
+		   			   ((req.body[7] & 0x000000FF) << 8);
+		
+		Order orderToPrint = new Order();
+		orderToPrint.id = orderID;
+		orderToPrint.originalTableID = oriTblID;
+		orderToPrint.table_id = newTblID;
+		
+		return orderToPrint;
 	}
 	
 	/******************************************************
