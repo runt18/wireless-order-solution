@@ -50,6 +50,8 @@ public class UpdateOrder {
 		try{
 			dbCon.connect();
 			
+			Terminal term = VerifyPin.exec(dbCon, pin, model);
+			
 			/**
 			 * There are two update order condition to deal with.
 			 * 1 - The table is the same
@@ -100,7 +102,8 @@ public class UpdateOrder {
 				orderToUpdate.id = Util.getUnPaidOrderID(dbCon, originalTable);
 			}
 			
-			return execByID(dbCon, pin, model, orderToUpdate, false);
+			
+			return updateOrder(dbCon, term, orderToUpdate, false);
 			
 		}finally{
 			dbCon.disconnect();
@@ -157,11 +160,16 @@ public class UpdateOrder {
 	public static Result execByID(DBCon dbCon, int pin, short model, Order orderToUpdate, boolean isGiftSkip) throws BusinessException, SQLException{
 		
 		Terminal term = VerifyPin.exec(dbCon, pin, model);
-		String sql = "SELECT id FROM " + Params.dbName + ".order WHERE id=" + orderToUpdate.id;
+		String sql = "SELECT table_id, table_name FROM " + Params.dbName + ".order WHERE id=" + orderToUpdate.id;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
+			orderToUpdate.table_id = dbCon.rs.getInt("table_id");
+			String tblName = dbCon.rs.getString("table_name");
+			orderToUpdate.table_name = tblName != null ? tblName : "";
 			dbCon.rs.close();
+			
 			return updateOrder(dbCon, term, orderToUpdate, isGiftSkip);
+			
 		}else{
 			throw new BusinessException("Order(id=" + orderToUpdate.id + ") to query does NOT exist.", ErrorCode.ORDER_NOT_EXIST);
 		}
