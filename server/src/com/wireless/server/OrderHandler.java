@@ -167,9 +167,7 @@ class OrderHandler extends Handler implements Runnable{
 					printConf |= Reserved.PRINT_SYNC;
 				}
 				if((request.header.reserved & Reserved.PRINT_TRANSFER_TABLE_2) != 0){
-					if(orderToUpdate.originalTableID != orderToUpdate.table_id){
-						printConf |= Reserved.PRINT_TRANSFER_TABLE_2;
-					}
+					printConf |= Reserved.PRINT_TRANSFER_TABLE_2;
 				}
 				printOrder(printConf, orderToUpdate);
 				
@@ -198,8 +196,17 @@ class OrderHandler extends Handler implements Runnable{
 
 				//handle the print request
 			}else if(request.header.mode == Mode.PRINT && request.header.type == Type.PRINT_BILL_2){
-				int orderID = ReqParser.parsePrintReq(request);				
-				printOrder(request.header.reserved, QueryOrder.execByID(_term.pin, _term.modelID, orderID));
+				
+				Order reqToPrint = ReqParser.parsePrintReq(request);	
+				
+				Order orderToPrint = QueryOrder.execByID(_term.pin, _term.modelID, reqToPrint.id);
+				
+				if((request.header.reserved & Reserved.PRINT_TRANSFER_TABLE_2) != 0){
+					orderToPrint.table_id = reqToPrint.table_id;
+					orderToPrint.originalTableID = reqToPrint.originalTableID;
+				}
+				
+				printOrder(request.header.reserved, orderToPrint);
 				response = new RespACK(request.header);
 				
 				//handle the ping test request
