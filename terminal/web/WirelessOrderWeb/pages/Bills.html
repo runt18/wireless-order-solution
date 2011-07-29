@@ -49,6 +49,8 @@
 	var restaurantID = Request["restaurantID"];
 	var operatorName = "";
 	var pin = Request["pin"];
+	
+	var currRowIndex = -1;
 
 	var billsData = [];
 </script>
@@ -85,9 +87,9 @@
 						<option value=0>全部</option>
 						<option value=1>帐单号</option>
 						<option value=2>台号</option>
-						<option value=3>日期</option>
-						<option value=4>类型</option>
-						<option value=5>结帐方式</option>
+						<!-- <option value=3>日期</option>  -->
+						<!-- <option value=4>类型</option>  -->
+						<!-- <option value=5>结帐方式</option>  -->
 						<option value=6>金额</option>
 				</select></td>
 				<td style="width: 10px">&nbsp;</td>

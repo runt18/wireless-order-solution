@@ -329,32 +329,9 @@ var countEqualImgBut = new Ext.ux.ImageButton({
 		}
 	}
 });
-// var printTotalImgBut = new Ext.ux.ImageButton({
-// imgPath : "../images/PrintTotal.png",
-// imgWidth : 50,
-// imgHeight : 50,
-// tooltip : "补打总单",
-// handler : function(btn) {
-// Ext.Ajax.request({
-// url : "../PrintOrder.do",
-// params : {
-// "pin" : Request["pin"],
-// "tableID" : Request["tableNbr"],
-// "printOrder" : 1
-// },
-// success : function(response, options) {
-// var resultJSON = Ext.util.JSON.decode(response.responseText);
-// Ext.MessageBox.show({
-// msg : resultJSON.data,
-// width : 300,
-// buttons : Ext.MessageBox.OK
-// });
-// },
-// failure : function(response, options) {
-// }
-// });
-// }
-// });
+
+
+
 // var printDetailImgBut = new Ext.ux.ImageButton({
 // imgPath : "../images/PrintDetail.png",
 // imgWidth : 50,
@@ -425,7 +402,8 @@ var orderedGrid = new Ext.grid.GridPanel({
 		// , '-', {
 		// text : "&nbsp;&nbsp;&nbsp;",
 		// disabled : true
-		// }, printTotalImgBut, {
+		// }, printBillImgBut
+		// , {
 		// text : "&nbsp;&nbsp;&nbsp;",
 		// disabled : true
 		// }, printDetailImgBut
@@ -475,7 +453,7 @@ var orderedForm = new Ext.form.FormPanel(
 										+ foodPara.substr(0,
 												foodPara.length - 1) + "}";
 
-								//alert(foodPara);
+								alert(foodPara);
 
 								var categoryOut;
 								if (Request["category"] == "一般") {
@@ -984,7 +962,7 @@ var dishesDisplayGrid = new Ext.grid.GridPanel({
 					dishesDisplayDataShow[rowIndex][6],// 荐
 					dishesDisplayDataShow[rowIndex][7],// 停
 					dishesDisplayDataShow[rowIndex][8],// 送
-					"100"// 折扣率
+					"1"// 折扣率
 					]);
 				}
 				orderedStore.reload();

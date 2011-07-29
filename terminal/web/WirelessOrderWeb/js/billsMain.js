@@ -23,6 +23,72 @@
 			+ "&memberID=" + memberID + "&comment=" + comment;
 };
 
+var modifyBillBut = new Ext.ux.ImageButton({
+	imgPath : "../images/modifyBill.png",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "修改",
+	handler : function(btn) {
+		if (currRowIndex != -1) {
+			billOptModifyHandler(currRowIndex);
+		}
+	}
+});
+
+var viewBillBut = new Ext.ux.ImageButton({
+	imgPath : "../images/viewBill.png",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "查看",
+	handler : function(btn) {
+	}
+});
+
+var detailBillBut = new Ext.ux.ImageButton({
+	imgPath : "../images/detailBill.png",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "明细",
+	handler : function(btn) {
+
+	}
+});
+
+function printBillFunc(rowInd) {
+	Ext.Ajax.request({
+		url : "../PrintOrder.do",
+		params : {
+			"pin" : pin,
+			"orderID" : billsData[rowInd][0],
+			"printReceipt" : 1
+		},
+		success : function(response, options) {
+			var resultJSON = Ext.util.JSON.decode(response.responseText);
+			// currRowIndex = -1;
+			Ext.MessageBox.show({
+				msg : resultJSON.data,
+				width : 300,
+				buttons : Ext.MessageBox.OK
+			});
+		},
+		failure : function(response, options) {
+		}
+	});
+};
+
+var printBillImgBut = new Ext.ux.ImageButton({
+	imgPath : "../images/printBill.png",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "补打结账",
+	handler : function(btn) {
+		if (currRowIndex != -1) {
+			printBillFunc(currRowIndex);
+		}
+	}
+});
+
+// --
 var pushBackBut = new Ext.ux.ImageButton({
 	imgPath : "../images/UserLogout.png",
 	imgWidth : 50,
@@ -53,7 +119,14 @@ var billsQueryCondPanel = new Ext.Panel({
 // center
 function billOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
 	return "<center><a href=\"javascript:billOptModifyHandler(" + rowIndex
-			+ ")\">" + "<img src='../images/Modify.png'/>修改</a></center>";
+			+ ")\">" + "<img src='../images/Modify.png'/>修改</a>"
+			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+			+ "<a>" + "<img src='../images/del.png'/>查看</a>"
+			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+			+ "<a>" + "<img src='../images/Modify.png'/>明细</a>"
+			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+			+ "<a href=\"javascript:printBillFunc(" + rowIndex + ")\">"
+			+ "<img src='../images/Modify.png'/>补打</a>" + "</center>";
 };
 
 // 1，表格的数据store
@@ -136,7 +209,7 @@ var billsColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(), {
 	header : "<center>操作</center>",
 	sortable : true,
 	dataIndex : "billOpt",
-	width : 220,
+	width : 270,
 	renderer : billOpt
 } ]);
 
@@ -157,7 +230,12 @@ Ext
 				cm : billsColumnModel,
 				sm : new Ext.grid.RowSelectionModel({
 					singleSelect : true
-				})
+				}),
+				listeners : {
+					rowclick : function(thiz, rowIndex, e) {
+						currRowIndex = rowIndex;
+					}
+				}
 			});
 
 			var centerPanel = new Ext.Panel({
@@ -171,7 +249,16 @@ Ext
 				} ],
 				tbar : new Ext.Toolbar({
 					height : 55,
-					items : [ "->", pushBackBut, {
+					items : [ modifyBillBut, {
+						text : "&nbsp;&nbsp;&nbsp;",
+						disabled : true
+					}, viewBillBut, {
+						text : "&nbsp;&nbsp;&nbsp;",
+						disabled : true
+					}, detailBillBut, {
+						text : "&nbsp;&nbsp;&nbsp;",
+						disabled : true
+					}, printBillImgBut, "->", pushBackBut, {
 						text : "&nbsp;&nbsp;&nbsp;",
 						disabled : true
 					}, logOutBut ]
