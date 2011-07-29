@@ -129,6 +129,7 @@ public class QueryTodayAction extends Action {
 						 " WHERE b.restaurant_id=" + term.restaurant_id + 
 						 " AND b.total_price IS NOT NULL" +
 						 " AND a.alias_id=b.table_id" +
+						 " AND a.restaurant_id=" + term.restaurant_id +
 						 filterCondition;
 			
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
