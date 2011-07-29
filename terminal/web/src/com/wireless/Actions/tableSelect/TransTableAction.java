@@ -15,10 +15,18 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.QueryTable;
 import com.wireless.exception.BusinessException;
+import com.wireless.protocol.PinGen;
+import com.wireless.protocol.ReqPackage;
+import com.wireless.protocol.ReqPrintOrder2;
+import com.wireless.protocol.Reserved;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
+import com.wireless.sccon.ServerConnector;
 
-public class TransTableAction extends Action {
+public class TransTableAction extends Action implements PinGen{
+	
+	private int _pin = 0;
+	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 								HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
@@ -45,15 +53,16 @@ public class TransTableAction extends Action {
 			if(pin.startsWith("0x") || pin.startsWith("0X")){
 				pin = pin.substring(2);
 			}
+			_pin = Integer.parseInt(pin, 16);
 			
 			oldTableID = request.getParameter("oldTableID");
 			newTableID = request.getParameter("newTableID");
 			
 			dbCon.connect();
-			oldTable = QueryTable.exec(dbCon, Integer.parseInt(pin, 16), 
+			oldTable = QueryTable.exec(dbCon, _pin, 
 						 			   Terminal.MODEL_STAFF, Short.parseShort(oldTableID));
 			
-			newTable = QueryTable.exec(dbCon, Integer.parseInt(pin, 16), 
+			newTable = QueryTable.exec(dbCon, _pin, 
 						  			   Terminal.MODEL_STAFF, Short.parseShort(newTableID));
 			
 			/**
@@ -70,15 +79,22 @@ public class TransTableAction extends Action {
 				jsonResp = jsonResp.replace("$(value)", newTable.alias_id + "号台是就餐状态，请跟餐厅经理确认");
 				
 			}else{
+				
+				int orderID = com.wireless.db.Util.getUnPaidOrderID(dbCon, oldTable);
+				
 				String sql = "UPDATE " + Params.dbName + ".order SET table_id=" +
 							 newTable.alias_id +
-							 " WHERE restaurant_id=" + newTable.restaurant_id +
-							 " AND table_id=" + oldTable.alias_id +
-							 " AND total_price IS NULL";
+							 " WHERE id=" + orderID;
+				
 				dbCon.stmt.execute(sql);
 				
 				jsonResp = jsonResp.replace("$(result)", "true");
 				jsonResp = jsonResp.replace("$(value)", oldTable.alias_id + "号台转至" + newTable.alias_id + "号台成功");
+				
+				//print the transfer table receipt
+				ReqPackage.setGen(this);				
+				ServerConnector.instance().ask(new ReqPrintOrder2(Reserved.PRINT_TRANSFER_TABLE_2, orderID, oldTable.alias_id, newTable.alias_id));
+
 			}
 			
 		}catch(BusinessException e){
@@ -104,5 +120,17 @@ public class TransTableAction extends Action {
 			out.write(jsonResp);
 		}
 		return null;
+	}
+
+	@Override
+	public int getDeviceId() {
+		// TODO Auto-generated method stub
+		return _pin;
+	}
+
+	@Override
+	public short getDeviceType() {
+		// TODO Auto-generated method stub
+		return Terminal.MODEL_STAFF;
 	}
 }

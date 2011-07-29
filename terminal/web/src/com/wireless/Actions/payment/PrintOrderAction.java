@@ -45,15 +45,27 @@ public class PrintOrderAction extends Action implements PinGen{
 			
 			/**
 			 * The parameters looks like below.
-			 * 1st example: pin=0x1 & orderID=654 & printSync=1 & printOrder=1 & printDetail=0 & printReceipt=0
-			 * 2nd example: pin=0x1 & tableID=101 & printSync=1 & printOrder=1 & printDetail=0 & printReceipt=0
+			 * 
+			 * 1st example, print an order according to order id
+			 * pin=0x1 & orderID=654 & printSync=1 & printOrder=1 & printDetail=0 & printReceipt=0
+			 * 
+			 * 2nd example, print an order according to table id
+			 * pin=0x1 & tableID=101 & printSync=1 & printOrder=1 & printDetail=0 & printReceipt=0
+			 * 
 			 * pin : the pin the this terminal
+			 * 
 			 * orderID : the order id to print
+			 * 
 			 * tableID : the order associated with this table to print
+			 * 
 			 * printSync : 1 means print in sync, 0 means print in async
+			 * 
 			 * printOrder : 1 means to print the order, 0 or null means NOT
+			 * 
 			 * printDetail : 1 means to print the order detail, 0 or null means NOT
+			 * 
 			 * printReceipt : 1 means to print the receipt, 0 or null means NOT
+			 * 
 			 */
 			String pin = request.getParameter("pin");
 			if(pin.startsWith("0x") || pin.startsWith("0X")){
@@ -125,7 +137,7 @@ public class PrintOrderAction extends Action implements PinGen{
 			}
 			
 			ReqPackage.setGen(this);
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqPrintOrder2(conf, orderID));
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqPrintOrder2(conf, orderID, 0, 0));
 			if(resp.header.type == Type.ACK){
 				jsonResp = jsonResp.replace("$(result)", "true");
 				if(request.getParameter("orderID") != null){
