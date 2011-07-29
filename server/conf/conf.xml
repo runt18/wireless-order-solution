@@ -32,6 +32,11 @@
         <file style="2" path="ptemp/receipt_80mm"/><!-- 80mm -->
 		<file style="1" path="ptemp/receipt_58mm"/><!-- 58mm -->
 	</print_template>
+    <!-- the template to print table transfer -->
+	<print_template func="6">
+        <file style="2" path="ptemp/transfer_80mm"/><!-- 80mm -->
+		<file style="1" path="ptemp/transfer_58mm"/><!-- 58mm -->
+	</print_template>
 	<!-- the parameter to thread pool -->
 	<cool_pool_size>100</cool_pool_size>
 	<max_pool_size>200</max_pool_size>
