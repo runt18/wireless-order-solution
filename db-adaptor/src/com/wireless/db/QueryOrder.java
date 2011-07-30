@@ -139,14 +139,15 @@ public class QueryOrder {
 		dbCon.rs.close();
 		
 		/**
-		 * Get the total price if the order has been paid
+		 * Get the total and actual price if the order has been paid
 		 */
-		sql = "SELECT total_price FROM `" + Params.dbName +
+		sql = "SELECT total_price, total_price_2 FROM `" + Params.dbName +
 			   "`.`order` WHERE id=" + orderID +
 			   " AND total_price IS NOT NULL";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			orderInfo.setTotalPrice(dbCon.rs.getFloat("total_price"));
+			orderInfo.setActualPrice(dbCon.rs.getFloat("total_price_2"));
 		}
 		dbCon.rs.close();
 		
