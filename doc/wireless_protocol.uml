@@ -2915,7 +2915,7 @@ len[2] :0x00, 0x00
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
 <XPD:ATTR name="Left" type="integer">488</XPD:ATTR>
 <XPD:ATTR name="Top" type="integer">248</XPD:ATTR>
-<XPD:ATTR name="Width" type="integer">457</XPD:ATTR>
+<XPD:ATTR name="Width" type="integer">357</XPD:ATTR>
 <XPD:ATTR name="Height" type="integer">203</XPD:ATTR>
 <XPD:ATTR name="Text" type="string">in the case query restaurant info successfully
 
@@ -2928,7 +2928,8 @@ pin[6] : same as request
 len[2] : length of the &lt;Body&gt;
 
 &lt;Body&gt;
-len_1 : restaurant_name : len_2 : restaurant_info : len_3 : waiter_name : len_4 : pwd2
+len_1 : restaurant_name : len_2 : restaurant_info : 
+len_3 : waiter_name : len_4 : pwd : len_5 : pwd2 : len_6 : pwd3
 </XPD:ATTR>
 </XPD:OBJ>
 <XPD:OBJ name="OwnedViews[7]" type="UMLSeqMessageView" guid="aPR/oNLdqk6Bx2zqfiBGFgAA">
@@ -2971,7 +2972,7 @@ len_1 : restaurant_name : len_2 : restaurant_info : len_3 : waiter_name : len_4 
 <XPD:OBJ name="OwnedViews[8]" type="UMLNoteLinkView" guid="iX2AjW00QESs5cVTtCAh6wAA">
 <XPD:ATTR name="LineColor" type="string">clMaroon</XPD:ATTR>
 <XPD:ATTR name="FillColor" type="string">$00B9FFFF</XPD:ATTR>
-<XPD:ATTR name="Points" type="Points">488,281;338,237</XPD:ATTR>
+<XPD:ATTR name="Points" type="Points">488,289;336,237</XPD:ATTR>
 <XPD:REF name="Head">sojNlEnoX0KAXn4uTIhaZwAA</XPD:REF>
 <XPD:REF name="Tail">TbS8ETMnx0OT53z3m8m0HAAA</XPD:REF>
 </XPD:OBJ>
