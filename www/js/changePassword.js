@@ -7,7 +7,7 @@ function changePassword(newPwd,pwd2,pwd3,random) {
 	                '<form name="changePasswordForm" action=""  method="post" onkeydown="KeyDown()">' +
 	                      '<input type="hidden" id="isChangePassword" name="isChangePassword" value="true" />' +
 	                      '<input type="hidden" id="random" name="random" value="' + random + '" />' +
-	                      '<div class="add_foot_Content" style="height:240px;">' +
+	                      '<div class="add_foot_Content" style="height:260px;">' +
 	                        '<div class="pop_Content">' +
 	                            '<div class="pop_Content1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;旧密码：<input type="password" id="oldPassword" name="oldPassword" size="25" height="20" style="width:140px" onfocus="this.select()" /></div>' +
 	                            '<div class="pop_Content1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;新密码：<input type="password" id="newPassword" name="newPassword" size="25" height="20" style="width:140px" onfocus="this.select()" value="' + newPwd + '" /></div>' +
