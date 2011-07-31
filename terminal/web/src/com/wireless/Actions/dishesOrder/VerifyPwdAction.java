@@ -31,9 +31,13 @@ public class VerifyPwdAction extends Action {
 			/**
 			 * The parameters looks like below.
 			 * e.g. pin=0x1 & type=1 & pwd = fc875df90919bb4a8ac1b0795df4025c"
+			 * 
 			 * pin : the pin the this terminal
+			 * 
 			 * type : "1" means password_1
 			 * 		  "2" means password_2
+			 * 		  "3" means password_3
+			 * 
 			 * pwd : the password to verify, which is in the form of MD5
 			 */
 			String pin = request.getParameter("pin");
