@@ -42,7 +42,7 @@ class OpeFoodPopup extends PopupScreen{
 	    		if(_type == Type.UPDATE_ORDER){
 	    			if(WirelessOrder.restaurant.pwd2 != null){
 	    				if(WirelessOrder.restaurant.pwd2.length() != 0){
-	    					resp = VerifyPwd.ask();
+	    					resp = VerifyPwd.ask(VerifyPwd.PWD_3);
 	    				}else{
 	    					resp = VerifyPwd.VERIFY_PASS;
 	    				}

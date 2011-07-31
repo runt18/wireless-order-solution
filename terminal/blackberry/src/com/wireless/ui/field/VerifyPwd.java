@@ -23,14 +23,33 @@ public class VerifyPwd extends PopupScreen implements FieldChangeListener{
 	public final static int VERIFY_PASS = 1;
 	public final static int VERIFY_FAIL = 2;
 	
+	/**
+	 * The type to password
+	 */
+	public static final int PWD_1 = 1;
+	public static final int PWD_2 = 2;
+	public static final int PWD_3 = 3;
+	
 	private static int _resp = VERIFY_CANCEL;
 	private PasswordEditField _pwd;
 	private ButtonField _ok;
 	private ButtonField _cancel;
+	private int _pwdType = PWD_1;
 	
-	private VerifyPwd(){
+	private VerifyPwd(int pwdType){
 		super(new VerticalFieldManager());
-		add(new LabelField("请输入权限密码", LabelField.USE_ALL_WIDTH | DrawStyle.LEFT));
+		_pwdType = pwdType;
+		String msg;
+		if(_pwdType == PWD_1){
+			msg = "请输入密码";
+		}else if(_pwdType == PWD_2){
+			msg = "请输入权限密码1";
+		}else if(_pwdType == PWD_3){
+			msg = "请输入权限密码2";
+		}else{
+			msg = "请输入权限密码";
+		}
+		add(new LabelField(msg, LabelField.USE_ALL_WIDTH | DrawStyle.LEFT));
 		add(new SeparatorField());
 		_pwd = new PasswordEditField();
 		add(_pwd);
@@ -45,17 +64,47 @@ public class VerifyPwd extends PopupScreen implements FieldChangeListener{
 		add(_hfm);
 	}
 
-	public static int ask(){
-		if(WirelessOrder.restaurant.pwd2 != null){
-			if(WirelessOrder.restaurant.pwd2.length() != 0){
-				UiApplication.getUiApplication().pushModalScreen(new VerifyPwd());
-				return _resp;
+	public static int ask(int pwdType){
+		if(pwdType == PWD_1){
+			if(WirelessOrder.restaurant.pwd != null){
+				if(WirelessOrder.restaurant.pwd.length() != 0){
+					UiApplication.getUiApplication().pushModalScreen(new VerifyPwd(pwdType));
+					return _resp;
+				}else{
+					return VERIFY_PASS;
+				}
 			}else{
 				return VERIFY_PASS;
 			}
+			
+		}else if(pwdType == PWD_2){
+			if(WirelessOrder.restaurant.pwd2 != null){
+				if(WirelessOrder.restaurant.pwd2.length() != 0){
+					UiApplication.getUiApplication().pushModalScreen(new VerifyPwd(pwdType));
+					return _resp;
+				}else{
+					return VERIFY_PASS;
+				}
+			}else{
+				return VERIFY_PASS;
+			}	
+			
+		}else if(pwdType == PWD_3){
+			if(WirelessOrder.restaurant.pwd3 != null){
+				if(WirelessOrder.restaurant.pwd3.length() != 0){
+					UiApplication.getUiApplication().pushModalScreen(new VerifyPwd(pwdType));
+					return _resp;
+				}else{
+					return VERIFY_PASS;
+				}
+			}else{
+				return VERIFY_PASS;
+			}	
+			
 		}else{
 			return VERIFY_PASS;
-		}		
+		}
+	
 	}
 
 	public void fieldChanged(Field field, int context) {
@@ -81,15 +130,61 @@ public class VerifyPwd extends PopupScreen implements FieldChangeListener{
 		}
 	}
 	
+	/**
+	 * Verify the password to check whether permit to do this action.
+	 * The priority to password is below.
+	 * pwd1 > pwd2 > pwd3
+	 * e.g. While asking to verify 3rd password, then would pass if type 1st or 2nd password correctly. 
+	 * @param pwdType one of the password type
+	 * @return VERIFY_PASS if pass verification, VERIFY_FAIL if fail to verify.
+	 */
 	private int verify(){
 		MD5Digest digest = new MD5Digest();
 		digest.reset();
 		digest.update(_pwd.getText().getBytes());
-		if(WirelessOrder.restaurant.pwd2.equals(toHexString(digest.getDigest()))){
+		
+		if(_pwdType == PWD_1){
+			if(WirelessOrder.restaurant.pwd.equals(toHexString(digest.getDigest()))){
+				return VERIFY_PASS;
+			}else{
+				return VERIFY_FAIL;
+			}		
+			
+		}else if(_pwdType == PWD_2){
+			if(WirelessOrder.restaurant.pwd.equals(toHexString(digest.getDigest()))){
+				return VERIFY_PASS;
+			}else{
+				digest.reset();
+				digest.update(_pwd.getText().getBytes());
+				if(WirelessOrder.restaurant.pwd2.equals(toHexString(digest.getDigest()))){
+					return VERIFY_PASS;
+				}else{
+					return VERIFY_FAIL;
+				}
+			}
+			
+		}else if(_pwdType == PWD_3){
+			if(WirelessOrder.restaurant.pwd.equals(toHexString(digest.getDigest()))){
+				return VERIFY_PASS;
+			}else{
+				digest.reset();
+				digest.update(_pwd.getText().getBytes());
+				if(WirelessOrder.restaurant.pwd2.equals(toHexString(digest.getDigest()))){
+					return VERIFY_PASS;
+				}else{
+					digest.reset();
+					digest.update(_pwd.getText().getBytes());
+					if(WirelessOrder.restaurant.pwd3.equals(toHexString(digest.getDigest()))){
+						return VERIFY_PASS;
+					}else{
+						return VERIFY_FAIL;
+					}
+				}
+			}
+			
+		}else{			
 			return VERIFY_PASS;
-		}else{
-			return VERIFY_FAIL;
-		}			
+		}		
 	}
 	
 	/**

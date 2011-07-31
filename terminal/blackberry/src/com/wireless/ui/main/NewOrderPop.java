@@ -26,7 +26,7 @@ class NewOrderPopup extends PopupScreen implements FieldChangeListener,	IPostQue
 	private ButtonField _ok;
 	private ButtonField _cancel;
 	private EditField _tableID;
-	private EditField _customNum;
+	//private EditField _customNum;
 	private NewOrderPopup _self = this;
 
 	NewOrderPopup() {
@@ -36,10 +36,10 @@ class NewOrderPopup extends PopupScreen implements FieldChangeListener,	IPostQue
 		add(new SeparatorField());
 		_tableID = new EditField("台号：", "", 4, TextField.NO_NEWLINE
 				| TextField.NO_LEARNING | EditField.FILTER_NUMERIC);
-		_customNum = new EditField("人数：", "", 2, TextField.NO_NEWLINE
-				| EditField.FILTER_NUMERIC);
+//		_customNum = new EditField("人数：", "", 2, TextField.NO_NEWLINE
+//				| EditField.FILTER_NUMERIC);
 		add(_tableID);
-		add(_customNum);
+		//add(_customNum);
 		add(new SeparatorField());
 
 		HorizontalFieldManager _hfm = new HorizontalFieldManager(
@@ -80,11 +80,11 @@ class NewOrderPopup extends PopupScreen implements FieldChangeListener,	IPostQue
 			_tableID.setFocus();
 			return;
 		}
-		if (_customNum.getText().equals("")) {
-			Dialog.alert("请输入就餐的客人数量");
-			_customNum.setFocus();
-			return;
-		}
+//		if (_customNum.getText().equals("")) {
+//			Dialog.alert("请输入就餐的客人数量");
+//			_customNum.setFocus();
+//			return;
+//		}
 		close();
 		UiApplication.getUiApplication().pushScreen(
 				new QueryOrderPopup(Short.parseShort(_tableID.getText()),
@@ -95,7 +95,8 @@ class NewOrderPopup extends PopupScreen implements FieldChangeListener,	IPostQue
 		if (response.header.type == Type.NAK) {
 			if (response.header.reserved == ErrorCode.TABLE_IDLE) {
 				UiApplication.getUiApplication().pushScreen(new NewOrderScreen(Short.parseShort(_tableID.getText()), 
-															 			  	   Integer.parseInt(_customNum.getText())));
+															 			  	   /*Integer.parseInt(_customNum.getText())*/
+																			   1));
 			} else if (response.header.reserved == ErrorCode.TABLE_NOT_EXIST) {
 				Dialog.alert(_tableID + "号台信息不存在");
 
