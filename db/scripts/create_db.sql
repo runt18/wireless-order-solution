@@ -16,7 +16,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`restaurant` (
   `account` VARCHAR(45) NOT NULL COMMENT 'the account for the restaurant to log in' ,
   `restaurant_name` VARCHAR(50) NOT NULL DEFAULT '' COMMENT 'the restaurant name ' ,
   `restaurant_info` VARCHAR(300) NOT NULL DEFAULT '' COMMENT 'the restaurant info' ,
-  `pwd2` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the 2nd password to this restaurant, used to grant permission to change the order' ,
+  `pwd2` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the 2nd password to this restaurant, whose permission priority is lower than pwd' ,
+  `pwd3` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the 3rd password to this restaurant, whose permission priority is lower than pwd2' ,
   `tele1` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'One of the telephones to this restaurant.' ,
   `tele2` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'One of the telephones to this restaurant.' ,
   `address` VARCHAR(70) NOT NULL DEFAULT '' COMMENT 'The address to this restaurant.' ,
@@ -24,8 +25,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`restaurant` (
   PRIMARY KEY (`id`, `account`) ,
   UNIQUE INDEX `account_UNIQUE` (`account` ASC) )
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8
-COMMENT = 'describe the restaurnat\'s information';
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the restaurnat\'s information' ;
 
 
 -- -----------------------------------------------------
@@ -55,7 +56,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food` (
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
-COMMENT = 'This table contains the all restaurant\'s food information.';
+COMMENT = 'This table contains the all restaurant\'s food information.' ;
 
 
 -- -----------------------------------------------------
@@ -92,8 +93,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order` (
     ON DELETE RESTRICT
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8
-COMMENT = 'This table describe the all restaurant\'s order information.';
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'This table describe the all restaurant\'s order information.' ;
 
 
 -- -----------------------------------------------------
@@ -127,8 +128,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food` (
     ON DELETE RESTRICT
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8
-COMMENT = 'descirbe the relationship between the order and food';
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'descirbe the relationship between the order and food' ;
 
 
 -- -----------------------------------------------------
@@ -160,8 +161,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`terminal` (
     ON DELETE RESTRICT
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8
-COMMENT = 'describe the terminal info';
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the terminal info' ;
 
 
 -- -----------------------------------------------------
@@ -184,8 +185,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`table` (
     ON DELETE RESTRICT
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8
-COMMENT = 'describe the restaurant\'s table info';
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the restaurant\'s table info' ;
 
 
 -- -----------------------------------------------------
@@ -210,8 +211,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`taste` (
     ON DELETE RESTRICT
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8
-COMMENT = 'describe the taste info';
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the taste info' ;
 
 
 -- -----------------------------------------------------
@@ -238,8 +239,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`kitchen` (
     ON DELETE RESTRICT
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8
-COMMENT = 'describe the kitchen information';
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the kitchen information' ;
 
 
 -- -----------------------------------------------------
@@ -265,8 +266,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member` (
     ON DELETE RESTRICT
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8
-COMMENT = 'describe the member information';
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the member information' ;
 
 
 -- -----------------------------------------------------
@@ -303,8 +304,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_history` (
     ON DELETE RESTRICT
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8
-COMMENT = 'This table preserves all the order records.';
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'This table preserves all the order records.' ;
 
 
 -- -----------------------------------------------------
@@ -329,8 +330,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`material` (
     ON DELETE RESTRICT
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8
-COMMENT = 'describe the material information.';
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the material information.' ;
 
 
 -- -----------------------------------------------------
@@ -355,8 +356,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food_material` (
     ON DELETE RESTRICT
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8
-COMMENT = 'describe the releation ship between food and material';
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the releation ship between food and material' ;
 
 
 -- -----------------------------------------------------
@@ -378,8 +379,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`material_history` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8
-COMMENT = 'preserved the material  storage history records';
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'preserved the material  storage history records' ;
 
 
 -- -----------------------------------------------------
@@ -400,8 +401,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_charge` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8
-COMMENT = 'describe the member charge records ';
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the member charge records ' ;
 
 
 -- -----------------------------------------------------
@@ -433,8 +434,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food_history` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8
-COMMENT = 'descirbe the relationship between the order and food';
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'descirbe the relationship between the order and food' ;
 
 
 -- -----------------------------------------------------
@@ -509,8 +510,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`staff` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8
-COMMENT = 'the staff information ';
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'the staff information ' ;
 
 
 -- -----------------------------------------------------
@@ -531,8 +532,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`setting` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8
-COMMENT = 'the setting to restaurant';
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'the setting to restaurant' ;
 
 
 -- -----------------------------------------------------
@@ -554,14 +555,15 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`shift` (
     ON DELETE RESTRICT
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8
-COMMENT = 'the shift history to each restaurant';
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'the shift history to each restaurant' ;
 
 
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
 
 -- -----------------------------------------------------
 -- Data for table `wireless_order_db`.`restaurant`
