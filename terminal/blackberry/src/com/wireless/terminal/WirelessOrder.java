@@ -24,6 +24,7 @@ import com.wireless.util.ServerConnector;
 public class WirelessOrder extends UiApplication{
 
 	public static FoodMenu foodMenu = new FoodMenu();	
+	
 	public static Restaurant restaurant = new Restaurant();
 	
 	/**

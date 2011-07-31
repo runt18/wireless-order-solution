@@ -28,7 +28,6 @@ public class QueryMenu extends Thread{
 			_queryCallBack.preQueryMenu();
 			resp = ServerConnector.instance().ask(new ReqQueryMenu());	
 			if(resp.header.type == Type.ACK){
-				WirelessOrder.foodMenu = null;
 				WirelessOrder.foodMenu = RespParser.parseQueryMenu(resp);
 				_queryCallBack.passMenu(resp);
 				

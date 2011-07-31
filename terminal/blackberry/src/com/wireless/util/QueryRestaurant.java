@@ -25,7 +25,6 @@ public class QueryRestaurant extends Thread {
 			_queryCallBack.preQueryRestaurant();
 			resp = ServerConnector.instance().ask(new ReqQueryRestaurant());	
 			if(resp.header.type == Type.ACK){
-				WirelessOrder.restaurant = null;
 				WirelessOrder.restaurant = RespParser.parseQueryRestaurant(resp);
 				_queryCallBack.passQueryRestaurant(resp);		
 				
