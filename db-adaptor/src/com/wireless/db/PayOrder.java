@@ -122,6 +122,8 @@ public class PayOrder {
 		 * Update the values below to "order" table
 		 * - total price
 		 * - actual price
+		 * - gift price
+		 * - waiter
 		 * - payment manner
 		 * - terminal pin
 		 * - service rate
@@ -130,7 +132,9 @@ public class PayOrder {
 		 * - member id if pay type is for member
 		 * - member name if pay type is for member
 		 */
-		sql = "UPDATE `" + Params.dbName + "`.`order` SET terminal_pin=" + pin +
+		sql = "UPDATE `" + Params.dbName + "`.`order` SET " +
+			  "waiter=(SELECT owner_name FROM " + Params.dbName + ".terminal WHERE pin=" + "0x" + Integer.toHexString(pin) + " AND model_id=" + model + ")" +
+			  ", terminal_pin=" + pin +
 			  ", gift_price=" + orderInfo.getGiftPrice() +
 			  ", total_price=" + totalPrice + 
 			  ", total_price_2=" + totalPrice2 +
