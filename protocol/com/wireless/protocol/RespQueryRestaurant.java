@@ -15,15 +15,19 @@ public class RespQueryRestaurant extends RespPackage{
 	 * pin[6] : same as request
 	 * len[2] -  length of the <Body>
 	 * <Body>
-	 * len_1 : restaurant_name : len_2 : restaurant_info : len_3 : owner : len_4 : pwd2
+	 * len_1 : restaurant_name : len_2 : restaurant_info : len_3 : owner : len_4 : pwd : len_5 : pwd2 : len_6 : pwd3
 	 * len_1 - 1-byte indicates the length of the restaurant name
 	 * restaurant_name - restaurant name whose length equals "len_1"
 	 * len_2 - 1-byte indicates the length of the restaurant info
 	 * restaurant_info - restaurant info whose length equals "len_2"
 	 * len_3 - 1-byte indicates the length of the terminal's owner name
 	 * owner - the owner name of terminal
-	 * len_4 : 1-byte indicates the length of the password2
+	 * len_4 : 1-byte indicates the length of the password
+	 * pwd : the 1st password to this restaurant
+	 * len_5 : 1-byte indicates the length of the password2
 	 * pwd2 : the 2nd password to this restaurant
+	 * len_6 : 1-byte indicates the length of the password3
+	 * pwd3 : the 3rd password to this restaurant
 	 *******************************************************/
 	public RespQueryRestaurant(ProtocolHeader reqHeader, Restaurant restaurant) throws UnsupportedEncodingException{
 		super(reqHeader);
@@ -31,7 +35,9 @@ public class RespQueryRestaurant extends RespPackage{
 		byte[] name = restaurant.name.getBytes("UTF-16BE");	
 		byte[] info = restaurant.info.getBytes("UTF-16BE");
 		byte[] owner = restaurant.owner.getBytes("UTF-16BE");
+		byte[] pwd = restaurant.pwd != null ? restaurant.pwd.getBytes() : new byte[0];
 		byte[] pwd2 = restaurant.pwd2 != null ? restaurant.pwd2.getBytes() : new byte[0];
+		byte[] pwd3 = restaurant.pwd3 != null ? restaurant.pwd3.getBytes() : new byte[0];
 		//calculate the length of the body
 		int bodyLen = 1 +	/* length of the name takes up 1 byte */
 				      name.length + /* the name's length */
@@ -39,8 +45,12 @@ public class RespQueryRestaurant extends RespPackage{
 				      info.length + /* the info length */
 					  1 + /* length of the owner takes up 1 byte */
 					  owner.length + /* the owner name length */
+					  1 + /* length of the 1st password */
+					  pwd.length + /* the 1st password */
 					  1 + /* length of the 2nd password */
-					  pwd2.length; /* the 2nd password */
+					  pwd2.length + /* the 2nd password */
+					  1 + /* length of the 3rd password */
+					  pwd3.length; /* the 3rd password */
 					  
 		
 		//assign the body length to header's length field
@@ -71,11 +81,25 @@ public class RespQueryRestaurant extends RespPackage{
 			body[++offset] = owner[i];
 		}
 		
+		//assign the length of the 1st password
+		body[++offset] = (byte)(pwd.length & 0x000000FF);
+		//assign the 1st password
+		for(int i = 0; i < pwd.length; i++){
+			body[++offset] = pwd[i];
+		}
+		
 		//assign the length of the 2nd password
 		body[++offset] = (byte)(pwd2.length & 0x000000FF);
 		//assign the 2nd password
 		for(int i = 0; i < pwd2.length; i++){
 			body[++offset] = pwd2[i];
+		}
+		
+		//assign the length of the 3rd password
+		body[++offset] = (byte)(pwd3.length & 0x000000FF);
+		//assign the 2nd password
+		for(int i = 0; i < pwd3.length; i++){
+			body[++offset] = pwd3[i];
 		}
 	}
 }

@@ -367,15 +367,19 @@ public class RespParser {
 		 * pin[6] : same as request
 		 * len[2] -  length of the <Body>
 		 * <Body>
-		 * len_1 : restaurant_name : len_2 : restaurant_info : len_3 : owner : len_4 : pwd2
+		 * len_1 : restaurant_name : len_2 : restaurant_info : len_3 : owner : len_4 : pwd : len_5 : pwd2 : len_6 : pwd3
 		 * len_1 - 1-byte indicates the length of the restaurant name
 		 * restaurant_name - restaurant name whose length equals "len_1"
 		 * len_2 - 1-byte indicates the length of the restaurant info
 		 * restaurant_info - restaurant info whose length equals "len_2"
 		 * len_3 - 1-byte indicates the length of the terminal's owner name
 		 * owner - the owner name of terminal
-		 * len_4 : 1-byte indicates the length of the password2
+		 * len_4 : 1-byte indicates the length of the password
+		 * pwd : the 1st password to this restaurant
+		 * len_5 : 1-byte indicates the length of the password2
 		 * pwd2 : the 2nd password to this restaurant
+		 * len_6 : 1-byte indicates the length of the password3
+		 * pwd3 : the 3rd password to this restaurant
 		 *******************************************************/
 
 		int offset = 0;
@@ -406,6 +410,15 @@ public class RespParser {
 				restaurant.owner = new String(response.body, offset, length, "UTF-16BE");
 			}
 			
+			//calculate the position of the length to 1st password
+			offset = offset + length;
+			length = response.body[offset];
+			offset++;
+			//get the 1st password
+			if(length != 0){
+				restaurant.pwd = new String(response.body, offset, length);
+			}
+			
 			//calculate the position of the length to 2nd password
 			offset = offset + length;
 			length = response.body[offset];
@@ -413,6 +426,15 @@ public class RespParser {
 			//get the 2nd password
 			if(length != 0){
 				restaurant.pwd2 = new String(response.body, offset, length);
+			}
+			
+			//calculate the position of the length to 3rd password
+			offset = offset + length;
+			length = response.body[offset];
+			offset++;
+			//get the 3rd password
+			if(length != 0){
+				restaurant.pwd3 = new String(response.body, offset, length);
 			}
 			
 		}catch(UnsupportedEncodingException e){

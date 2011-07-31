@@ -8,7 +8,9 @@ public class Restaurant {
 	public String addr;
 	public String info;
 	public String owner;
+	public String pwd;
 	public String pwd2;
+	public String pwd3;
 	public Setting setting = new Setting();
 	
 	public Restaurant(){
@@ -41,6 +43,7 @@ public class Restaurant {
 	public static final int RESERVED_5 = 8;
 	public static final int RESERVED_6 = 9;
 	public static final int RESERVED_7 = 10;
+	
 }
 
 
