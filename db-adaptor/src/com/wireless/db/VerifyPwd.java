@@ -9,6 +9,7 @@ public class VerifyPwd {
 	
 	public static int PASSWORD_1 = 1;
 	public static int PASSWORD_2 = 2;
+	public static int PASSWORD_3 = 3;
 	
 	/**
 	 * Verify the password according to specific type.
@@ -41,7 +42,10 @@ public class VerifyPwd {
 	}
 	
 	/**
-	 * Verify the password according to specific type.
+	 * Verify the password to check whether permit to do this action.
+	 * The priority to password is below.
+	 * pwd1 > pwd2 > pwd3
+	 * e.g. While asking to verify 3rd password, then would pass if type 1st or 2nd password correctly. 
 	 * Note that this method should be invoked before database connected.
 	 * @param dbCon
 	 * 		The database connection.
@@ -51,7 +55,7 @@ public class VerifyPwd {
 	 * 		The model to terminal.
 	 * @param type
 	 * 		The type of password
-	 * @param pwd
+	 * @param pwd2Verify
 	 * 		The password to verify which is in the form of MD5
 	 * @return 
 	 * 		True if match the password.
@@ -63,20 +67,51 @@ public class VerifyPwd {
 	 * @throws SQLException
 	 * 		Throws if fail to execute any SQL statement.
 	 */
-	public static boolean exec(DBCon dbCon, int pin, short model, int type, String pwd) throws BusinessException, SQLException{
+	public static boolean exec(DBCon dbCon, int pin, short model, int type, String pwd2Verify) throws BusinessException, SQLException{
 		Terminal term = VerifyPin.exec(dbCon, pin, model);
-		String pwdType;
-		if(type == PASSWORD_1){
-			pwdType = "pwd";
-		}else if(type == PASSWORD_2){
-			pwdType = "pwd2";
-		}else{
-			pwdType = "pwd2";
-		}
-		String sql = "SELECT id FROM " + Params.dbName + ".restaurant WHERE " +
-					 pwdType + "='" + pwd + "'" + 
-					 " AND id=" + term.restaurant_id;
+		
+		String pwd = "", pwd2 = "", pwd3 = "";
+		
+		String sql = "SELECT pwd, pwd2, pwd3 FROM " + Params.dbName + ".restaurant WHERE id=" + term.restaurant_id;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		return dbCon.rs.next();
+		if(dbCon.rs.next()){
+			pwd = dbCon.rs.getString("pwd");
+			pwd2 = dbCon.rs.getString("pwd2");
+			pwd3 = dbCon.rs.getString("pwd3");
+		}
+		
+		if(type == PASSWORD_1){
+			return pwd2Verify.equals(pwd);
+			
+		}else if(type == PASSWORD_2){
+			if(pwd2Verify.equals(pwd)){
+				return true;
+			}else{
+				if(pwd2Verify.equals(pwd2)){
+					return true;
+				}else{
+					return false;
+				}
+			}
+
+		}else if(type == PASSWORD_3){
+			if(pwd2Verify.equals(pwd)){
+				return true;
+			}else{
+				if(pwd2Verify.equals(pwd2)){
+					return true;
+				}else{
+					if(pwd2Verify.equals(pwd3)){
+						return true;
+					}else{
+						return false;
+					}
+				}
+			}
+			
+		}else{
+			return false;
+		}
+
 	}
 }

@@ -78,7 +78,7 @@ public class QueryRestaurant {
 	 */
 	static Restaurant exec(DBCon dbCon, int restaurantID) throws BusinessException, SQLException{
 		Restaurant restaurant = new Restaurant();
-		String sql = "SELECT restaurant_name, restaurant_info, tele1, tele2, address, pwd2 FROM " + Params.dbName + "." +
+		String sql = "SELECT restaurant_name, restaurant_info, tele1, tele2, address, pwd, pwd2, pwd3 FROM " + Params.dbName + "." +
 					 "restaurant WHERE id=" + restaurantID; 
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -89,7 +89,9 @@ public class QueryRestaurant {
 			restaurant.tele_1 = dbCon.rs.getString("tele1");
 			restaurant.tele_2 = dbCon.rs.getString("tele2");
 			restaurant.addr = dbCon.rs.getString("address");
+			restaurant.pwd = dbCon.rs.getString("pwd");
 			restaurant.pwd2 = dbCon.rs.getString("pwd2");
+			restaurant.pwd3 = dbCon.rs.getString("pwd3");
 		}else{
 			throw new BusinessException("The restaurant(id=" + restaurantID + ") does NOT exist.");
 		}
