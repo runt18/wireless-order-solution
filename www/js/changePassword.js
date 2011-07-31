@@ -1,4 +1,4 @@
-function changePassword(newPwd,pwd2,random) {       
+function changePassword(newPwd,pwd2,pwd3,random) {       
     var content = ' <div class="add_foot">' +
                     '<div class="title">' +
 	                    '<div class="title_left"><font class="font">修改密码</font></div>' +
@@ -7,13 +7,15 @@ function changePassword(newPwd,pwd2,random) {
 	                '<form name="changePasswordForm" action=""  method="post" onkeydown="KeyDown()">' +
 	                      '<input type="hidden" id="isChangePassword" name="isChangePassword" value="true" />' +
 	                      '<input type="hidden" id="random" name="random" value="' + random + '" />' +
-	                      '<div class="add_foot_Content" style="height:200px;">' +
+	                      '<div class="add_foot_Content" style="height:240px;">' +
 	                        '<div class="pop_Content">' +
-	                            '<div class="pop_Content1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;旧密码：<input type="password" id="oldPassword" name="oldPassword" size="25" height="20" style="width:140px" onfocus="this.select()" /></div>' +
-	                            '<div class="pop_Content1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;新密码：<input type="password" id="newPassword" name="newPassword" size="25" height="20" style="width:140px" onfocus="this.select()" value="' + newPwd + '" /></div>' +
-	                            '<div class="pop_Content1">&nbsp;&nbsp;&nbsp;&nbsp;确认新密码：<input type="password" id="confirmPassword" name="confirmPassword" size="25" height="20" style="width:140px" onfocus="this.select()" value="' + newPwd + '" /></div>' +
-	                            '<div class="pop_Content1" style="padding-left:51px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;权限密码：<input type="password" id="pwd2" name="pwd2" size="25" height="20" style="width:140px;" onfocus="this.select()" value="' + pwd2 + '" /></div>' +
-	                            '<div class="pop_Content1" style="padding-left:51px">&nbsp;确认权限密码：<input type="password" id="confirm_pwd2" name="confirm_pwd2" size="25" height="20" style="width:140px;" onfocus="this.select()" value="' + pwd2 + '" /></div>' +
+	                            '<div class="pop_Content1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;旧密码：<input type="password" id="oldPassword" name="oldPassword" size="25" height="20" style="width:140px" onfocus="this.select()" /></div>' +
+	                            '<div class="pop_Content1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;新密码：<input type="password" id="newPassword" name="newPassword" size="25" height="20" style="width:140px" onfocus="this.select()" value="' + newPwd + '" /></div>' +
+	                            '<div class="pop_Content1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;确认新密码：<input type="password" id="confirmPassword" name="confirmPassword" size="25" height="20" style="width:140px" onfocus="this.select()" value="' + newPwd + '" /></div>' +
+	                            '<div class="pop_Content1" style="padding-left:51px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;权限密码1：<input type="password" id="pwd2" name="pwd2" size="25" height="20" style="width:140px;" onfocus="this.select()" value="' + pwd2 + '" /></div>' +
+	                            '<div class="pop_Content1" style="padding-left:51px">确认权限密码1：<input type="password" id="confirm_pwd2" name="confirm_pwd2" size="25" height="20" style="width:140px;" onfocus="this.select()" value="' + pwd2 + '" /></div>' +
+	                            '<div class="pop_Content1" style="padding-left:51px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;权限密码2：<input type="password" id="pwd3" name="pwd3" size="25" height="20" style="width:140px;" onfocus="this.select()" value="' + pwd3 + '" /></div>' +
+	                            '<div class="pop_Content1" style="padding-left:51px">确认权限密码2：<input type="password" id="confirm_pwd3" name="confirm_pwd3" size="25" height="20" style="width:140px;" onfocus="this.select()" value="' + pwd3 + '" /></div>' +
 	                        '</div>' +
 	                        '<span class="pop_action-span"><a href="#" onclick="pSubmitData()">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>' +
 	                        '<span class="pop_action-span1"><a href="#" onclick="closeWindow()">取&nbsp;&nbsp;&nbsp;&nbsp;消</a></span>' +
@@ -37,6 +39,8 @@ function pValidateData() {
     var confirmPassword = document.getElementById("confirmPassword").value;
     var pwd2 = document.getElementById("pwd2").value;
     var confirm_pwd2 = document.getElementById("confirm_pwd2").value;
+    var pwd3 = document.getElementById("pwd3").value;
+    var confirm_pwd3 = document.getElementById("confirm_pwd3").value;
     //    alert(foodCode);
 
     if (oldPassword == undefined || oldPassword == null || oldPassword == "") {
@@ -60,7 +64,11 @@ function pValidateData() {
         return false;
     }
     if (pwd2 != confirm_pwd2) {
-        alert("两次输入的权限密码不一致！");
+        alert("两次输入的权限密码1不一致！");
+        return false;
+    }  
+     if (pwd3 != confirm_pwd3) {
+        alert("两次输入的权限密码2不一致！");
         return false;
     }  
     return true;

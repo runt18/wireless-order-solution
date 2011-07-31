@@ -152,7 +152,7 @@ session_start();
  
     <div id="send_info" style="padding: 20px 50px 0 0; clear:right; text-align: right; color: #FF9900; width:40%; float: right;">
 	  <a href="../pserver/pserver.exe" target="_top" class="fix-submenu">下载e点通打印程序</a>    
-	  <a href="#" onclick="javascript:window.parent.frames(1).changePassword('<?PHP $random = random(6); echo $random; ?>','<?PHP echo $random; ?>','<?PHP echo $random; ?>')" class="fix-submenu">修改密码</a>    
+	  <a href="#" onclick="javascript:window.parent.frames(1).changePassword('<?PHP $random = random(6); echo $random; ?>','<?PHP echo $random; ?>','<?PHP echo $random; ?>','<?PHP echo $random; ?>')" class="fix-submenu">修改密码</a>    
       <a href="help.html" target="_blank" class="fix-submenu">帮助</a>    
       <a href="login.php" target="_top" class="fix-submenu">退出</a>    
     </div>

@@ -7,6 +7,7 @@ if($isChangePassword == "true")
 	$oldPassword = $_POST["oldPassword"];
 	$newPassword = $_POST["newPassword"];
 	$pwd2 = $_POST["pwd2"];
+	$pwd3 = $_POST["pwd3"];
 	$random = $_POST["random"];
 	$restaurant_id = $_SESSION["restaurant_id"];
 	$sql = "SELECT * FROM restaurant WHERE id=$restaurant_id AND pwd='" .md5($oldPassword) ."'";
@@ -14,7 +15,52 @@ if($isChangePassword == "true")
 	$rs = $db ->GetOne($sql);
 	if($rs)
 	{
-		if($newPassword != $random && $pwd2 != $random)
+		if($newPassword == $random && $pwd2 == $random && $pwd3 == $random)
+		{
+			echo "<script>alert('未做任何更改！');changePassword('$newPassword','$pwd2','$pwd3','$random')</script>";
+			return;
+		}
+		else
+		{
+			$sql = "Update restaurant SET";
+			$hasPwd = 0;
+			if($newPassword != $random)
+			{
+				$sql.= (" pwd='".md5($newPassword). "'");
+				$hasPwd = 1;
+			}
+			if($pwd2 != $random)
+			{
+				$password2 = md5($pwd2);
+				if($pwd2 == "")
+				{
+					$password2 = "";
+				}
+				if($hasPwd == 1)
+				{
+					$sql .= ",";
+				}
+				$sql.= (" pwd2='".$password2. "'");
+				$hasPwd = 1;
+				$_SESSION["pwd2"] = $password2;
+			}
+			if($pwd3 != $random)
+			{
+				$password3 = md5($pwd3);
+				if($pwd3 == "")
+				{
+					$password3 = "";
+				}
+				if($hasPwd == 1)
+				{
+					$sql .= ",";
+				}
+				$sql.= (" pwd3='".$password3. "'");
+				$hasPwd = 1;
+			}
+			$sql.= " WHERE id=$restaurant_id";	
+		}
+		/*if($newPassword != $random && $pwd2 != $random)
 		{
 			$sql = "Update restaurant SET pwd='" .md5($newPassword). "', pwd2='" .md5($pwd2). "' WHERE id=$restaurant_id";	
 			$_SESSION["pwd2"] = md5($pwd2);	
@@ -27,9 +73,9 @@ if($isChangePassword == "true")
 				{
 					$password2 = md5($pwd2);
 					if($pwd2 == "")
-						{
+					{
 						$password2 = "";
-							}
+					}
 					$sql = "Update restaurant SET pwd2='" .$password2. "' WHERE id=$restaurant_id";	
 					$_SESSION["pwd2"] = $password2;	
 				}
@@ -37,7 +83,7 @@ if($isChangePassword == "true")
 				{
 					echo "<script>alert('未做任何更改！');changePassword('$newPassword','$pwd2','$random')</script>";
 					return;
-				}
+				}*/
 		
 		if($db->Execute($sql))
 		{
@@ -51,7 +97,7 @@ if($isChangePassword == "true")
 	}
 	else
 	{		
-		echo "<script>alert('旧密码错误！');changePassword('$newPassword','$pwd2','$random')</script>";	
+		echo "<script>alert('旧密码错误！');changePassword('$newPassword','$pwd2','$pwd3','$random')</script>";	
 	}		
 }	
 $editType = $_POST["editType"];
