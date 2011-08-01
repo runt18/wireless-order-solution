@@ -31,7 +31,7 @@ class NewOrderPopup extends PopupScreen implements FieldChangeListener,	IPostQue
 
 	NewOrderPopup() {
 		super(new VerticalFieldManager());
-		add(new LabelField("输入下单的台号和人数", LabelField.USE_ALL_WIDTH
+		add(new LabelField("输入需要下单的台号", LabelField.USE_ALL_WIDTH
 				| DrawStyle.LEFT));
 		add(new SeparatorField());
 		_tableID = new EditField("台号：", "", 4, TextField.NO_NEWLINE
