@@ -27,7 +27,7 @@ mysql_query("SET NAMES utf8");
 <div id="printTitle" style="display:none">
 <?PHP
 
-echo "退菜汇总";
+echo "折扣汇总";
 ?>
 </div>
 <div id="printContent" class="Content">        
@@ -44,7 +44,7 @@ echo "退菜汇总";
 				<th><h3>口味价钱（￥）</h3></th>
 				<th><h3>厨房</h3></th>	
 				<th><h3>服务员</h3></th>	
-				<th><h3>金额（￥）</h3></th>				
+				<th><h3>折扣额（￥）</h3></th>				
 			</tr>
 		</thead>
 		<tbody>

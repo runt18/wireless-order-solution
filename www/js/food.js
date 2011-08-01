@@ -68,7 +68,7 @@ function editFood(fId, fCode, fName, fPrice, kitchen, kitchens, status,pinyin) {
 	                '<form name="foodForm" action="food.php"  method="post" onkeydown="foodKeyDown()">' +
 	                      '<input type="hidden" name="foodId" value="' + fId + '" />' +
 	                      '<input type="hidden" id="statusValue" name="statusValue" />' +
-	                      '<div class="add_foot_Content" style="height:220px;">' +
+	                      '<div class="add_foot_Content" style="height:240px;">' +
 	                        '<div class="pop_Content">' +
 	                            '<div class="pop_Content1">编号：' + foodCode + '</div>' +
 	                            '<div class="pop_Content1">菜名：<input type="text" id="foodName" name="foodName" value="' + fName + '" size="25" height="20"/></div>' +
@@ -80,11 +80,11 @@ function editFood(fId, fCode, fName, fPrice, kitchen, kitchens, status,pinyin) {
 								'<div class="pop_Content1">厨房：<select id="kitchenSelect" name="kitchenSelect" style="width:85px;">' +
                                 ks +
 								'<option value="255">空</option></select></div>' +
-								'<div class="pop_Content1">' +
-								'<input id="specialOffer" name="specialOffer" type="checkbox" ' + specialOfferStatus + '>特价</input>' +
-								'<input id="recommend" name="recommend" type="checkbox" ' + recommendStatus + '>推荐</input>' +
-								'<input id="present" name="present" type="checkbox" ' + presentStatus + '>赠送</input>' +
-								'<input id="paused" name="paused" type="checkbox" ' + pausedStatus + '>停售</input>' +
+								'<br/><div class="pop_Content1">' +
+								'<input id="specialOffer" name="specialOffer" type="checkbox" ' + specialOfferStatus + '>&nbsp;特价</input>&nbsp;&nbsp;' +
+								'<input id="recommend" name="recommend" type="checkbox" ' + recommendStatus + '>&nbsp;推荐</input>&nbsp;&nbsp;' +
+								'<input id="present" name="present" type="checkbox" ' + presentStatus + '>&nbsp;赠送</input>&nbsp;&nbsp;' +
+								'<input id="paused" name="paused" type="checkbox" ' + pausedStatus + '>&nbsp;停售</input>&nbsp;&nbsp;' +
 								'</div>' +
 	                        '</div>' +
 	                        '<span class="pop_action-span"><a href="#" onclick="submitFoodData()">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>' +
