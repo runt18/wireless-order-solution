@@ -67,7 +67,7 @@ if($dateTo != "")
 	$sql .= (" AND b.order_date <='" . $dateTo . " 23:59:59'");
 }	
 
-$sql .= " ORDER BY b.order_date DESC";
+$sql .= " ORDER BY b.order_date";
 
 mysql_query("SET NAMES utf8"); 
 // mysql_query("set names 'utf-8'") ;	
@@ -116,7 +116,7 @@ foreach ($rs as $row){
 
 		<div id="navigation" style="font-size:12px;text-align:right">
   		      <span id="page-link"> </span>
-				<a href="#" onclick="javascript:sorter.pagesize = 10000;sorter.init('table',0);window.open('PrintPage.html');">打印</a>
+				<a href="#" onclick="javascript:sorter.pagesize = 10000;sorter.init('table',1);window.open('PrintPage.html');">打印</a>
 			  <a href="#" onclick="sorter.move(-1,true)">首页</a>
 			  <a href="#" onclick="sorter.move(-1)">上页</a>
 			  <a href="#" onclick="sorter.move(1)">下页</a>
@@ -131,8 +131,8 @@ foreach ($rs as $row){
 	<script type="text/javascript">
   var sorter = new TINY.table.sorter("sorter");
 	sorter.head = "head";
+	//sorter.desc = "desc";
 	sorter.asc = "asc";
-	sorter.desc = "desc";
 	sorter.even = "evenrow";
 	sorter.odd = "oddrow";
 	sorter.evensel = "evenselected";

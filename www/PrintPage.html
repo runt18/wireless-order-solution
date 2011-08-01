@@ -21,7 +21,8 @@
 	    document.getElementById("divContent").innerHTML = window.parent.opener.document.getElementById("printContent").innerHTML;
 	    document.getElementById("divTitle").innerText = window.parent.opener.document.getElementById("printTitle").innerHTML;
 	    printpreview();
-	    window.parent.opener.sorter.pagesize = 10; window.parent.opener.sorter.init('table', 0);
+	    window.parent.opener.sorter.pagesize = 10; 
+		window.parent.opener.sorter.init('table', 0);
 	    window.close();
 	</script>
 </html>

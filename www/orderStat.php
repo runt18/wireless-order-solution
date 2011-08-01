@@ -154,12 +154,12 @@ if($dateTo != "")
 if($statType == "daily")
 {
 	$sql .= (" GROUP BY DATE(order_date),o.type_value) AS b
-				GROUP BY o_date ORDER BY o_date DESC");
+				GROUP BY o_date ORDER BY o_date");
 }
 else
 {
 	$sql .= (" GROUP BY DATE_FORMAT(order_date,'%Y-%m'),o.type_value) AS b
-				GROUP BY o_date ORDER BY o_date DESC");
+				GROUP BY o_date ORDER BY o_date");
 }		
 
 /*echo "<script>alert('" . $_SESSION["total_income"] . "');</script>";*/
@@ -234,7 +234,7 @@ echo "<td>".number_format($total_2_all,2)."</td>";
 
 		<div id="navigation" style="font-size:12px;text-align:right">
   		      <span id="page-link"> </span>
-				<a href="#" onclick="javascript:sorter.pagesize = 10000;sorter.init('table',0);window.open('PrintPage.html');">打印</a>
+				<a href="#" onclick="javascript:sorter.pagesize = 10000;sorter.init('table',1);window.open('PrintPage.html');">打印</a>
 			  <a href="#" onclick="sorter.move(-1,true)">首页</a>
 			  <a href="#" onclick="sorter.move(-1)">上页</a>
 			  <a href="#" onclick="sorter.move(1)">下页</a>
