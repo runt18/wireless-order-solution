@@ -149,8 +149,8 @@ if($editType == "canEditOrder")
 	<option value="1" selected="selected">现金</option>
 	<option value="2">刷卡</option>	
 	<option value="3">会员卡</option>
-	<option value="4">挂账</option>	
-	<option value="5">签单</option>
+	<option value="4">签单</option>	
+	<option value="5">挂账</option>
 	</select>
 	<select id="category" name="category" style="display:none">
 	<option value="1" selected="selected">一般</option>

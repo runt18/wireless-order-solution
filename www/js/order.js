@@ -60,8 +60,8 @@ function editOrder(id, total_price_2, target, type_value, table_id, category_val
 	                                    '<option value="1" selected="selected">现金</option>' +
 	                                    '<option value="2">刷卡</option>' +
 	                                    '<option value="3">会员卡</option>' +
-	                                    '<option value="4">挂账</option>' +
-	                                    '<option value="5">签单</option>' +
+	                                    '<option value="4">签单</option>' +
+	                                    '<option value="5">挂账</option>' +
 	                                    '</select></div>' +
 	                            '<div class="pop_Content1">实收金额：<input type="text" id="total_price_2" name="total_price_2" onfocus="this.select()" size="25" height="20" value="' + total_price_2 + '" ' +
 	                            ' onkeypress="return event.keyCode>=48&&event.keyCode<=57||event.keyCode==46||event.keyCode==45"' +
