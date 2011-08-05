@@ -69,7 +69,7 @@ class OrderHandler extends Handler implements Runnable{
 			request = recv(in, _timeout);				
 
 			RespPackage response = null;
-			int bodyLen = (request.header.length[0] & 0x000000FF) + ((request.header.length[1] & 0x0000FF00) << 8);
+			int bodyLen = (request.header.length[0] & 0x000000FF) | ((request.header.length[1] & 0x000000FF) << 8);
 
 			//check if request header's 2-byte length field equals the body's length				
 			if(bodyLen != request.body.length){

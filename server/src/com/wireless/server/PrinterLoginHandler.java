@@ -64,6 +64,8 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 				DBCon dbCon = new DBCon();
 				try{
 					connection = _server.accept();
+					connection.setTcpNoDelay(true);
+					connection.setSendBufferSize(10);
 					_in = new BufferedInputStream(new DataInputStream(connection.getInputStream()));
 					_out = new BufferedOutputStream(new DataOutputStream(connection.getOutputStream()));
 
@@ -287,28 +289,28 @@ class PrintLossHandler extends Handler implements Runnable{
 		synchronized(_sock){
 			
 			try{
-				_sock.sendUrgentData(0);
-				
-				InputStream in = new BufferedInputStream(_sock.getInputStream());
-				OutputStream out = new BufferedOutputStream(_sock.getOutputStream());
 				
 				while(printReqs.size() != 0){
+					
+					_sock.sendUrgentData(0);
+					
 					ProtocolPackage reqPrint = printReqs.peek();
 						
-					send(out, reqPrint);
+					send(_sock.getOutputStream(), reqPrint);					
 					
-					printReqs.remove();
+					//_sock.sendUrgentData(0);
 					
+					printReqs.remove();	
 					/**
 					 * Receive the response within 10s timeout
 					 */
-					ProtocolPackage respPrint = recv(in, 10 * 1000);
+					ProtocolPackage respPrint = recv(_sock.getInputStream(), 10 * 1000);
 					/**
 					 * Remove the unprinted request from the queue if receiving ACK
 					 */
 					if(respPrint.header.seq == reqPrint.header.seq){
 						if(respPrint.header.mode == Mode.PRINT && respPrint.header.type == Type.ACK){
-							
+													
 						}							
 					}
 				}
