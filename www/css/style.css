@@ -25,8 +25,8 @@ body {
 .sortable th {
 	text-align:center;
 	color:#2a7d8d;
-	border:1px solid #fff;
-	border-right:none;
+	border:1px solid #c6d5e1;
+	border-left:none;
 	background-color: #92cfd6;
 }
 .sortable th h3 {
