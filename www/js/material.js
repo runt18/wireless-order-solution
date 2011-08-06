@@ -298,12 +298,12 @@ function viewMaterialStat(statType) {
     else {
         title = "月结汇总";
     }
-    var content = ' <div id="div_add_foot" class="add_foot" style="height:400px;width:100%">' +
+    var content = ' <div id="div_add_foot" class="add_foot" style="height:420px;width:100%">' +
                               '<div class="title" style="width:100%">' +
 	                          '<div id="div_title_left" class="title_left" style="width:565px"><font id="titleName" class="font" style="width:260px">' + title + '</font></div>' +
 	                          '<div class="title_right" style="width:35px;float:left" ></div>' +
 	                          '</div>' +
-	                          '<div class="add_foot_Content" style="height:370px;text-align:center;width:99%">' +
+	                          '<div class="add_foot_Content" style="height:390px;text-align:center;width:99%">' +
 	                              '<iframe src="searchCondition.php?table=material&value=id&name=name&target=materialStat.php&statType=' + statType + '&msg=食材" scrolling="no" style="width:100%;height:100%" />' +
 	                          '</div>' +
 						   '</div>';

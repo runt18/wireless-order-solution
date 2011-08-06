@@ -38,7 +38,7 @@ mysql_query("SET NAMES utf8");
 	<form id="searchForm" action="foodRanked.php" method="post">
 	 <div style="text-align:center">
 		日期：<input type="text" id="dateFrom" name="dateFrom" style="width:136px" onclick="javascript:ShowCalendar(this.id)" />
-		&nbsp;&nbsp;至&nbsp;&nbsp;<input type="text" id="dateTo" name="dateTo" style="width:136px" onclick="javascript:ShowCalendar(this.id)" />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;至&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="dateTo" name="dateTo" style="width:136px" onclick="javascript:ShowCalendar(this.id)" />
 	</div>
 	<div style="width:100%;margin-top:10px;height:280px">
 		<div style="float:left;width:45%;text-align:right;height:100%">
@@ -56,8 +56,8 @@ if($ids == null)
 				?>								
 			</select>
 		</div>
-		<div style="float:left;width:10%;text-align:center;height:100%;padding-top:100px">		
-			<div style="width:100%;text-align:center;margin-top:10px;font-size:14px"><a href="#" onclick="moveSelectedItem('foodList','selectedList')">&gt;</a></div>
+		<div style="float:left;width:10%;text-align:center;height:100%;">		
+			<div style="width:100%;text-align:center;margin-top:100px;font-size:14px"><a href="#" onclick="moveSelectedItem('foodList','selectedList')">&gt;</a></div>
 			<div style="width:100%;text-align:center;margin-top:10px;font-size:14px"><a href="#" onclick="moveAllItem('foodList','selectedList')">&gt;&gt;</a></div>
 			<div style="width:100%;text-align:center;margin-top:10px;font-size:14px"><a href="#" onclick="moveAllItem('selectedList','foodList')">&lt;&lt;</a></div>
 			<div style="width:100%;text-align:center;margin-top:10px;font-size:14px"><a href="#" onclick="moveSelectedItem('selectedList','foodList')">&lt;</a></div>		
@@ -68,7 +68,7 @@ if($ids == null)
 		</div>
 	</div>
 	<div>
-		 <span class="pop_action-span" style="margin-left: -190px;"><a href="#" onclick="submitSearch()">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>
+		 <span class="pop_action-span" style="margin-left: 130px;"><a href="#" onclick="submitSearch()">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>
 		 <span class="pop_action-span1" style="margin-right: 130px;"><a href="#" onclick="parent.closeWindow()">取&nbsp;&nbsp;&nbsp;&nbsp;消</a></span>
 	</div>
 	</form>

@@ -31,10 +31,10 @@ $statType = $_REQUEST["statType"];
 	<input id="editType" type="hidden" name="editType" value="viewStat"></input>
 	 <div style="text-align:center">
 		日期：<input type="text" id="dateFrom" name="dateFrom" style="width:136px" onclick="javascript:ShowCalendar(this.id)" />
-		&nbsp;&nbsp;至&nbsp;&nbsp;<input type="text" id="dateTo" name="dateTo" style="width:136px" onclick="javascript:ShowCalendar(this.id)" />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;至&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="dateTo" name="dateTo" style="width:136px" onclick="javascript:ShowCalendar(this.id)" />
 	</div>
 	<div style="width:100%;margin-top:10px;height:280px">
-		<div style="float:left;width:40%;text-align:right;height:100%">
+		<div style="float:left;width:45%;text-align:right;height:100%">
 			<select id="itemList" multiple="multiple" ondblclick="moveSelectedItem('itemList','selectedList')" style="width:80%;height:100%">
 <?PHP
 $table = $_REQUEST["table"];
@@ -49,20 +49,20 @@ foreach ($rs as $row){
 				?>								
 			</select>
 		</div>
-		<div style="float:left;width:20%;text-align:center;height:100%;padding-top:100px">		
-			<div style="width:100%;text-align:center;margin-top:10px;font-size:14px"><a href="#" onclick="moveSelectedItem('itemList','selectedList')">&gt;</a></div>
+		<div style="float:left;width:10%;text-align:center;height:100%;">		
+			<div style="width:100%;text-align:center;margin-top:100px;font-size:14px"><a href="#" onclick="moveSelectedItem('itemList','selectedList')">&gt;</a></div>
 			<div style="width:100%;text-align:center;margin-top:10px;font-size:14px"><a href="#" onclick="moveAllItem('itemList','selectedList')">&gt;&gt;</a></div>
 			<div style="width:100%;text-align:center;margin-top:10px;font-size:14px"><a href="#" onclick="moveAllItem('selectedList','itemList')">&lt;&lt;</a></div>
 			<div style="width:100%;text-align:center;margin-top:10px;font-size:14px"><a href="#" onclick="moveSelectedItem('selectedList','itemList')">&lt;</a></div>		
 		</div>
-		<div style="float:left;width:40%;text-align:left;height:100%">
+		<div style="float:left;width:45%;text-align:left;height:100%">
 			<select id="selectedList" multiple="multiple" ondblclick="moveSelectedItem('selectedList','itemList')" style="width:80%;height:100%">				
 			</select>
 		</div>
 	</div>
 	<div>
-		 <span class="pop_action-span" style="margin-left:70px;margin-top:10px"><a href="#" onclick="submitSearch('<?PHP echo $msg; ?>')">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>
-		 <span class="pop_action-span1" style="margin-right:70px;margin-top:10px"><a href="#" onclick="parent.closeWindow()">取&nbsp;&nbsp;&nbsp;&nbsp;消</a></span>
+		 <span class="pop_action-span" style="margin-left:130px;"><a href="#" onclick="submitSearch('<?PHP echo $msg; ?>')">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>
+		 <span class="pop_action-span1" style="margin-right:130px;"><a href="#" onclick="parent.closeWindow()">取&nbsp;&nbsp;&nbsp;&nbsp;消</a></span>
 	</div>
 	</form>
 </div>
