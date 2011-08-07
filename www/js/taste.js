@@ -80,8 +80,8 @@ function submitTasteData() {
         return;
     }
     var id = parseInt(alias_id);
-    if (id > 255 || id == 0) {
-        alert("编号的输入范围是1~255");
+    if (id > 65535 || id == 0) {
+        alert("编号的输入范围是1~65535");
         document.getElementById("price").focus();
         return;
     }

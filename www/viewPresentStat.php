@@ -73,7 +73,9 @@ mysql_query("SET NAMES utf8");
 // mysql_query("set names 'utf-8'") ;	
 $total_price = 0;	
 $rs = $db->GetAll($sql);
+$bh = 0;
 foreach ($rs as $row){	
+	$bh += 1;
 	$taste = $row["taste"];
 	if($taste == "")
 	{

@@ -106,11 +106,11 @@ if($ids != null)
 			INNER JOIN `order_history` b ON a.order_id = b.id WHERE b.restaurant_id=" . $_SESSION["restaurant_id"];
 	if($dateFrom != "")
 	{
-		$sql .= (" AND c.order_date >='" . $dateFrom . " 0:0:0'");
+		$sql .= (" AND b.order_date >='" . $dateFrom . " 0:0:0'");
 	}
 	if($dateTo != "")
 	{
-		$sql .= (" AND c.order_date <='" . $dateTo . " 23:59:59'");
+		$sql .= (" AND b.order_date <='" . $dateTo . " 23:59:59'");
 	}
 	
 	$sql .= (" GROUP BY a.food_id) AS d ON f.alias_id = d.food_id AND f.restaurant_id =" . $_SESSION["restaurant_id"]);	

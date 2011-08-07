@@ -42,7 +42,7 @@ include("conn.php");
 	$id = $_REQUEST["id"];
 	$dateFrom = $_REQUEST["dateFrom"];
 	$dateTo = $_REQUEST["dateTo"];
-	$sql = "SELECT id,order_date,total_price FROM `order_history` WHERE member_id = $id AND total_price IS NOT NULL AND restaurant_id=" . $_SESSION["restaurant_id"];
+	$sql = "SELECT id,order_date,total_price_2 AS total_price FROM `order_history` WHERE member_id = $id AND total_price IS NOT NULL AND restaurant_id=" . $_SESSION["restaurant_id"];
 	if($dateFrom != "")
 	{
 		$sql .= (" AND order_date >='" . $dateFrom . " 0:0:0'");

@@ -52,7 +52,7 @@ echo "折扣汇总";
 include("conn.php"); 		 		
 
 
-$sql = "SELECT a.*,b.order_date,k.name AS kitchen_name,format((((`a`.`unit_price` * (1-`a`.`discount`)) + `a`.`taste_price`) * `a`.`order_count`),2) AS total_price FROM order_food_history a INNER JOIN order_history b ON a.order_id = b.id LEFT JOIN kitchen k ON a.kitchen=k.alias_id AND k.restaurant_id =".
+$sql = "SELECT a.*,b.order_date,k.name AS kitchen_name,format((((`a`.`unit_price` * (1-`a`.`discount`)) + `a`.`taste_price`) * `a`.`order_count`),2) AS total_price FROM order_food_history_view a INNER JOIN order_history b ON a.order_id = b.id LEFT JOIN kitchen k ON a.kitchen=k.alias_id AND k.restaurant_id =".
 	$_SESSION["restaurant_id"] . " WHERE a.food_status & 8 = 0 AND a.discount < 1 AND b.restaurant_id=" . $_SESSION["restaurant_id"];
 
 
@@ -73,7 +73,9 @@ mysql_query("SET NAMES utf8");
 // mysql_query("set names 'utf-8'") ;	
 $total_price = 0;	
 $rs = $db->GetAll($sql);
+$bh = 0;
 foreach ($rs as $row){	
+	$bh += 1;
 	$taste = $row["taste"];
 	if($taste == "")
 	{

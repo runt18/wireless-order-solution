@@ -10,8 +10,9 @@
 * 例如 <input name="time" type="text"   onclick="_SetTime(this)"/> 
 * 
 ************************************/ 
+var needTime = true;
 var str = ""; 
-document.writeln("<div id=\"_contents\" style=\"padding:6px; background-color:#E3E3E3; font-size: 12px; border: 1px solid #777777;  position:absolute; left:?px; top:?px; width:?px; height:?px; z-index:1000000000; visibility:hidden\">"); 
+document.writeln("<div id=\"_contents\" onblur=\"HidTime()\" onclick='SetNotHidTime()' style=\"padding:6px; background-color:#E3E3E3; font-size: 12px; border: 1px solid #777777;  position:absolute; left:?px; top:?px; width:?px; height:?px; z-index:1000000000; visibility:hidden\">"); 
 str += "\u65f6<select name=\"_hour\">"; 
 for (h = 0; h <= 9; h++) { 
     str += "<option value=\"0" + h + "\">0" + h + "</option>"; 
@@ -65,7 +66,7 @@ function _SetTime(tt) {
     document.all._hour.style.visibility = "visible";
     document.all._minute.style.visibility = "visible";
     document.all._second.style.visibility = "visible";
-
+    document.all._contents.focus();
 //    var timeValue = tt.value;
 //    if(timeValue != "")
 //    {
@@ -80,3 +81,20 @@ function _select() {
     document.all._minute.style.visibility = "hidden";
     document.all._second.style.visibility = "hidden";
 } 
+
+function HidTime() {
+    needHidTime = true;
+    setTimeout("HidTimeAction()", 160);
+}
+function HidTimeAction() {
+    if (needHidTime) {
+        document.all._contents.style.visibility = "hidden"; 
+        document.all._hour.style.visibility = "hidden";
+        document.all._minute.style.visibility = "hidden";
+        document.all._second.style.visibility = "hidden";
+    }
+}
+function SetNotHidTime()
+{
+    needHidTime = false;
+}
