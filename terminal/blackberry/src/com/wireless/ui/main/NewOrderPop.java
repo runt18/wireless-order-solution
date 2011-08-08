@@ -93,17 +93,17 @@ class NewOrderPopup extends PopupScreen implements FieldChangeListener,	IPostQue
 
 	public void postQueryOrder(ProtocolPackage response) {
 		if (response.header.type == Type.NAK) {
-			if (response.header.reserved == ErrorCode.TABLE_IDLE) {
+			if (response.header.reserved[0] == ErrorCode.TABLE_IDLE) {
 				UiApplication.getUiApplication().pushScreen(new NewOrderScreen(Short.parseShort(_tableID.getText()), 
 															 			  	   /*Integer.parseInt(_customNum.getText())*/
 																			   1));
-			} else if (response.header.reserved == ErrorCode.TABLE_NOT_EXIST) {
+			} else if (response.header.reserved[0] == ErrorCode.TABLE_NOT_EXIST) {
 				Dialog.alert(_tableID + "号台信息不存在");
 
-			} else if (response.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
+			} else if (response.header.reserved[0] == ErrorCode.TERMINAL_NOT_ATTACHED) {
 				Dialog.alert("终端没有登记到餐厅，请联系管理人员。");
 
-			} else if (response.header.reserved == ErrorCode.TERMINAL_EXPIRED) {
+			} else if (response.header.reserved[0] == ErrorCode.TERMINAL_EXPIRED) {
 				Dialog.alert("终端已过期，请联系管理人员。");
 
 			} else {

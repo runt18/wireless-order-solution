@@ -37,7 +37,7 @@ class SubmitChangePopup extends PopupScreen{
 			new Thread(){
 				public void run(){
 					try{
-						byte printType = Reserved.DEFAULT_CONF;
+						short printType = Reserved.DEFAULT_CONF;
 						//check if the print sync or async
 						int tmp = Integer.parseInt((String)Params.getParam(Params.PRINT_ACTION));
 						if(tmp == Params.PRINT_SYNC){
@@ -46,6 +46,8 @@ class SubmitChangePopup extends PopupScreen{
 						printType |= Reserved.PRINT_EXTRA_FOOD_2;
 						printType |= Reserved.PRINT_CANCELLED_FOOD_2;
 						printType |= Reserved.PRINT_TRANSFER_TABLE_2;
+						printType |= Reserved.PRINT_ALL_EXTRA_FOOD_2;
+						printType |= Reserved.PRINT_ALL_CANCELLED_FOOD_2;
 						//Update the current order normally
 						ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(_reqOrder, Type.UPDATE_ORDER, printType));
 						if(resp.header.type == Type.ACK){
@@ -65,7 +67,7 @@ class SubmitChangePopup extends PopupScreen{
 							});
 
 						}else{
-							throw new Exception(getErrMsg(_reqOrder.table_id, resp.header.reserved));									
+							throw new Exception(getErrMsg(_reqOrder.table_id, resp.header.reserved[0]));									
 						}
 						
 					}catch(IOException e){

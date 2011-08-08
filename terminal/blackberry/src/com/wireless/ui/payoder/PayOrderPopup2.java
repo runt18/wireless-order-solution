@@ -47,7 +47,7 @@ class PayOrderPopup2 extends PopupScreen{
 								}
 							});
 						}else{
-							_errCode = _resp.header.reserved;
+							_errCode = _resp.header.reserved[0];
 							UiApplication.getUiApplication().invokeLater(new Runnable(){
 								public void run(){
 									if(_errCode == ErrorCode.TABLE_NOT_EXIST){

@@ -33,9 +33,9 @@ public class QueryMenu extends Thread{
 				
 			}else{
 				String errMsg = null;
-				if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
+				if(resp.header.reserved[0] == ErrorCode.TERMINAL_NOT_ATTACHED) {
 					errMsg = "终端没有登记到餐厅，请联系管理人员。";
-				}else if(resp.header.reserved == ErrorCode.TERMINAL_EXPIRED) {
+				}else if(resp.header.reserved[0] == ErrorCode.TERMINAL_EXPIRED) {
 					errMsg = "终端已过期，请联系管理人员。";
 				} else {
 					errMsg = "菜谱下载失败，请检查网络信号或重新连接。";
