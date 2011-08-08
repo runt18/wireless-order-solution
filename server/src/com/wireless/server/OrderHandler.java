@@ -133,7 +133,7 @@ class OrderHandler extends Handler implements Runnable{
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.INSERT_ORDER){
 
 				Order orderToInsert = ReqParser.parseInsertOrder(request);				
-				printOrder(request.header.reserved, InsertOrder.exec(_term.pin, _term.modelID, orderToInsert));
+				printOrder(Reserved.toPrintConf(request.header.reserved), InsertOrder.exec(_term.pin, _term.modelID, orderToInsert));
 				response = new RespACK(request.header);
 
 				//handle update order request
@@ -142,31 +142,40 @@ class OrderHandler extends Handler implements Runnable{
 				UpdateOrder.Result result = UpdateOrder.exec(_term.pin, _term.modelID, orderToUpdate);
 				
 				//print the extra food 
-				byte printConf = Reserved.DEFAULT_CONF;				
-				if((request.header.reserved & Reserved.PRINT_SYNC) != 0){
+				short printConf = Reserved.DEFAULT_CONF;			
+				
+				short conf = Reserved.toPrintConf(request.header.reserved);
+				
+				if((conf & Reserved.PRINT_SYNC) != 0){
 					printConf |= Reserved.PRINT_SYNC;
 				}
-				if((request.header.reserved & Reserved.PRINT_EXTRA_FOOD_2) != 0){
+				if((conf & Reserved.PRINT_EXTRA_FOOD_2) != 0){
 					printConf |= Reserved.PRINT_EXTRA_FOOD_2;
+				}
+				if((conf & Reserved.PRINT_ALL_EXTRA_FOOD_2) != 0){
+					printConf |= Reserved.PRINT_ALL_EXTRA_FOOD_2;
 				}
 				printOrder(printConf, result.extraOrder);
 				
 				//print canceled food
 				printConf = Reserved.DEFAULT_CONF;
-				if((request.header.reserved & Reserved.PRINT_SYNC) != 0){
+				if((conf & Reserved.PRINT_SYNC) != 0){
 					printConf |= Reserved.PRINT_SYNC;
 				}
-				if((request.header.reserved & Reserved.PRINT_CANCELLED_FOOD_2) != 0){
+				if((conf & Reserved.PRINT_CANCELLED_FOOD_2) != 0){
 					printConf |= Reserved.PRINT_CANCELLED_FOOD_2;
+				}
+				if((conf & Reserved.PRINT_ALL_CANCELLED_FOOD_2) != 0){
+					printConf |= Reserved.PRINT_ALL_CANCELLED_FOOD_2;
 				}
 				printOrder(printConf, result.canceledOrder);
 				
 				//print the table transfer
 				printConf = Reserved.DEFAULT_CONF;
-				if((request.header.reserved & Reserved.PRINT_SYNC) != 0){
+				if((conf & Reserved.PRINT_SYNC) != 0){
 					printConf |= Reserved.PRINT_SYNC;
 				}
-				if((request.header.reserved & Reserved.PRINT_TRANSFER_TABLE_2) != 0){
+				if((conf & Reserved.PRINT_TRANSFER_TABLE_2) != 0){
 					printConf |= Reserved.PRINT_TRANSFER_TABLE_2;
 				}
 				printOrder(printConf, orderToUpdate);
@@ -187,10 +196,11 @@ class OrderHandler extends Handler implements Runnable{
 				 * If pay order temporary, just only print the temporary receipt.
 				 * Otherwise perform the pay action and print receipt 
 				 */
-				if((request.header.reserved & Reserved.PRINT_TEMP_RECEIPT_2) != 0){
-					printOrder(request.header.reserved, PayOrder.queryOrder(_term.pin, _term.modelID, orderToPay));
+				short printConf = Reserved.toPrintConf(request.header.reserved);
+				if((printConf & Reserved.PRINT_TEMP_RECEIPT_2) != 0){
+					printOrder(printConf, PayOrder.queryOrder(_term.pin, _term.modelID, orderToPay));
 				}else{
-					printOrder(request.header.reserved, PayOrder.exec(_term.pin, _term.modelID, orderToPay));
+					printOrder(printConf, PayOrder.exec(_term.pin, _term.modelID, orderToPay));
 				}
 				response = new RespACK(request.header);
 
@@ -201,12 +211,13 @@ class OrderHandler extends Handler implements Runnable{
 				
 				Order orderToPrint = QueryOrder.execByID(_term.pin, _term.modelID, reqToPrint.id);
 				
-				if((request.header.reserved & Reserved.PRINT_TRANSFER_TABLE_2) != 0){
+				short printConf = Reserved.toPrintConf(request.header.reserved);
+				if((printConf & Reserved.PRINT_TRANSFER_TABLE_2) != 0){
 					orderToPrint.table_id = reqToPrint.table_id;
 					orderToPrint.originalTableID = reqToPrint.originalTableID;
 				}
 				
-				printOrder(request.header.reserved, orderToPrint);
+				printOrder(printConf, orderToPrint);
 				response = new RespACK(request.header);
 				
 				//handle the ping test request
@@ -299,7 +310,7 @@ class OrderHandler extends Handler implements Runnable{
 	 *             throws if any logic exception occurred while performing print
 	 *             action
 	 */
-	private void printOrder(byte printConf, Order orderToPrint) throws PrintLogicException{
+	private void printOrder(short printConf, Order orderToPrint) throws PrintLogicException{
 		//find the printer connection socket to the restaurant for this terminal
 		ArrayList<Socket> printerConn = WirelessSocketServer.printerConnections.get(new Integer(_term.restaurant_id));
 		Socket[] connections = null;

@@ -83,15 +83,18 @@ public abstract class Handler {
 			recPack.header.mode = req[0];
 			recPack.header.type = req[1];
 			recPack.header.seq = req[2];
-			recPack.header.reserved = req[3];
-			recPack.header.pin[0] = req[4];
-			recPack.header.pin[1] = req[5];
-			recPack.header.pin[2] = req[6];
-			recPack.header.pin[3] = req[7];
-			recPack.header.pin[4] = req[8];
-			recPack.header.pin[5] = req[9];
-			recPack.header.length[0] = req[10];
-			recPack.header.length[1] = req[11];					
+			recPack.header.reserved[0] = req[3];
+			recPack.header.reserved[1] = req[4];
+			recPack.header.reserved[2] = req[5];
+			recPack.header.reserved[3] = req[6];
+			recPack.header.pin[0] = req[7];
+			recPack.header.pin[1] = req[8];
+			recPack.header.pin[2] = req[9];
+			recPack.header.pin[3] = req[10];
+			recPack.header.pin[4] = req[11];
+			recPack.header.pin[5] = req[12];
+			recPack.header.length[0] = req[13];
+			recPack.header.length[1] = req[14];					
 			//parse the request buffer into protocol body
 			//note that the body's length exclude the EOP
 			recPack.body = new byte[req.length - ProtocolHeader.SIZE - ProtocolPackage.EOP.length];
@@ -122,15 +125,18 @@ public abstract class Handler {
 			send_buf[0] = sendPack.header.mode;
 			send_buf[1] = sendPack.header.type;
 			send_buf[2] = sendPack.header.seq;
-			send_buf[3] = sendPack.header.reserved;
-			send_buf[4] = sendPack.header.pin[0];
-			send_buf[5] = sendPack.header.pin[1];
-			send_buf[6] = sendPack.header.pin[2];
-			send_buf[7] = sendPack.header.pin[3];
-			send_buf[8] = sendPack.header.pin[4];
-			send_buf[9] = sendPack.header.pin[5];
-			send_buf[10] = (byte)(sendPack.body.length & 0x000000FF);
-			send_buf[11] = (byte)((sendPack.body.length & 0x0000FF00) >> 8);
+			send_buf[3] = sendPack.header.reserved[0];
+			send_buf[4] = sendPack.header.reserved[1];
+			send_buf[5] = sendPack.header.reserved[2];
+			send_buf[6] = sendPack.header.reserved[3];
+			send_buf[7] = sendPack.header.pin[0];
+			send_buf[8] = sendPack.header.pin[1];
+			send_buf[9] = sendPack.header.pin[2];
+			send_buf[10] = sendPack.header.pin[3];
+			send_buf[11] = sendPack.header.pin[4];
+			send_buf[12] = sendPack.header.pin[5];
+			send_buf[13] = (byte)(sendPack.body.length & 0x000000FF);
+			send_buf[14] = (byte)((sendPack.body.length & 0x0000FF00) >> 8);
 			//assign the body to send buffer
 			for(int i = 0; i < sendPack.body.length; i++){
 				send_buf[ProtocolHeader.SIZE + i] = sendPack.body[i];
