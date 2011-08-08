@@ -135,7 +135,7 @@ public class PayOrderAction extends Action implements PinGen{
 			 * If pay order temporary, just print the receipt.
 			 * Otherwise perform to pay order and print the receipt.
 			 */
-			byte printType;
+			short printType;
 			tempPay = request.getParameter("tempPay");
 			if(tempPay != null){
 				if(Boolean.parseBoolean(tempPay)){
@@ -174,16 +174,16 @@ public class PayOrderAction extends Action implements PinGen{
 				
 			}else if(resp.header.type == Type.NAK){
 				jsonResp = jsonResp.replace("$(result)", "false");
-				if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED){
+				if(resp.header.reserved[0] == ErrorCode.TERMINAL_NOT_ATTACHED){
 					jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");
 					
-				}else if(resp.header.reserved == ErrorCode.TABLE_NOT_EXIST){					
+				}else if(resp.header.reserved[0] == ErrorCode.TABLE_NOT_EXIST){					
 					jsonResp = jsonResp.replace("$(value)", orderToPay.table_id + "号餐台信息不存在，请重新确认");
 					
-				}else if(resp.header.reserved == ErrorCode.TABLE_IDLE){
+				}else if(resp.header.reserved[0] == ErrorCode.TABLE_IDLE){
 					jsonResp = jsonResp.replace("$(value)", orderToPay.table_id + "号餐台是空闲状态，可能已结帐，请重新确认");
 					
-				}else if(resp.header.reserved == ErrorCode.PRINT_FAIL){
+				}else if(resp.header.reserved[0] == ErrorCode.PRINT_FAIL){
 					jsonResp = jsonResp.replace("$(value)", orderToPay.table_id + "号餐台结帐成功，但未能成功打印，请立刻补打结帐单并与相关人员确认");
 					
 				}else{

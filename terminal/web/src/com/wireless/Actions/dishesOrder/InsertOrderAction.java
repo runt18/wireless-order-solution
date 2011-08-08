@@ -89,7 +89,7 @@ public class InsertOrderAction extends Action implements PinGen {
 			orderToInsert.custom_num = Integer.parseInt(request.getParameter("customNum"));
 			int type = Integer.parseInt(request.getParameter("type"));
 			String orderType = null;
-			byte printType = Reserved.DEFAULT_CONF;
+			short printType = Reserved.DEFAULT_CONF;
 			if(type == 1){
 				orderType = "下单";
 				orderToInsert.originalTableID = tableID;				
@@ -102,7 +102,8 @@ public class InsertOrderAction extends Action implements PinGen {
 				}else{
 					orderToInsert.originalTableID = Short.parseShort(oriTableID);
 				}
-				printType |= Reserved.PRINT_EXTRA_FOOD_2 | Reserved.PRINT_CANCELLED_FOOD_2 | Reserved.PRINT_TRANSFER_TABLE_2;
+				printType |= Reserved.PRINT_EXTRA_FOOD_2 | Reserved.PRINT_CANCELLED_FOOD_2 | Reserved.PRINT_TRANSFER_TABLE_2 |
+						     Reserved.PRINT_ALL_CANCELLED_FOOD_2 | Reserved.PRINT_ALL_EXTRA_FOOD_2;
 			}
 			orderToInsert.foods = Util.toFoodArray(request.getParameter("foods"));
 			
@@ -133,19 +134,19 @@ public class InsertOrderAction extends Action implements PinGen {
 				
 			}else if(resp.header.type == Type.NAK){
 				jsonResp = jsonResp.replace("$(result)", "false");
-				if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED){
+				if(resp.header.reserved[0] == ErrorCode.TERMINAL_NOT_ATTACHED){
 					jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");
 					
-				}else if(resp.header.reserved == ErrorCode.TABLE_NOT_EXIST){					
+				}else if(resp.header.reserved[0] == ErrorCode.TABLE_NOT_EXIST){					
 					jsonResp = jsonResp.replace("$(value)", orderToInsert.table_id + "号餐台信息不存在，请重新确认");
 					
-				}else if(resp.header.reserved == ErrorCode.TABLE_BUSY){
+				}else if(resp.header.reserved[0] == ErrorCode.TABLE_BUSY){
 					jsonResp = jsonResp.replace("$(value)", orderToInsert.table_id + "号餐台正在就餐，可能已下单，请重新确认");
 					
-				}else if(resp.header.reserved == ErrorCode.PRINT_FAIL){
+				}else if(resp.header.reserved[0] == ErrorCode.PRINT_FAIL){
 					jsonResp = jsonResp.replace("$(value)", orderToInsert.table_id + "号餐台" + orderType + "成功，但未能成功打印，请立刻补打下单并与相关人员确认");
 					
-				}else if(resp.header.reserved == ErrorCode.EXCEED_GIFT_QUOTA){
+				}else if(resp.header.reserved[0] == ErrorCode.EXCEED_GIFT_QUOTA){
 					jsonResp = jsonResp.replace("$(value)", "赠送菜品金额已超过赠送额度，请与餐厅负责人确认");
 					
 				}else{
