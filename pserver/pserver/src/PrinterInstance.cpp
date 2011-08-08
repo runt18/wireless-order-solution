@@ -132,6 +132,10 @@ static unsigned __stdcall PrintProc(LPVOID pvParam){
 						stDocInfo.pDocName = L"退菜详细";
 					}else if(job.func.code == Reserved::PRINT_TRANSFER_TABLE){
 						stDocInfo.pDocName = L"转台";
+					}else if(job.func.code == Reserved::PRINT_ALL_EXTRA_FOOD){
+						stDocInfo.pDocName = L"加菜";
+					}else if(job.func.code == Reserved::PRINT_ALL_CANCELLED_FOOD){
+						stDocInfo.pDocName = L"退菜";
 					}else{
 						stDocInfo.pDocName = L"未知信息";
 					}
@@ -155,11 +159,12 @@ static unsigned __stdcall PrintProc(LPVOID pvParam){
 
 							if(result == TRUE){
 								ostringstream os;
-								os << pPI->name << " 打印" << doc_name.get() << "信息成功";
+								//os << pPI->name << " 打印" << job.order_id << "号账单" << doc_name.get() << "信息成功";
+								os << pPI->name << " 打印" << doc_name.get() << "信息成功 (" << job.order_id << "@" << job.order_date << ")";
 								pPI->pPrintReport->OnPrintReport(job.func.code, os.str().c_str());
 							}else{
 								ostringstream os;
-								os << pPI->name << " 打印" << doc_name.get() << "信息失败";
+								os << pPI->name << " 打印" << job.order_id << "号账单" << doc_name.get() << "信息失败";
 								pPI->pPrintReport->OnPrintExcep(0, os.str().c_str());
 							}							
 						}
@@ -212,30 +217,59 @@ void PrinterInstance::addJob(const char* buf, int len, int iFunc){
 
 	/************************************************************************
 	* <Header>
-	* mode : type : seq : reserved : pin[6] : len[2] : <Print_1> : <Print_2> : <Print_3> : ...
+	* mode : type : seq : reserved[4] : pin[6] : len[2] : <Print_1> : <Print_2> : <Print_3> : ...
 	* mode - PRINT
 	* type - PRINT_BILL
 	* seq - auto calculated and filled in
-	* reserved - one of the print functions
+	* reserved[1..3] - 0x00
+	* reserved[0] - one of the print functions
 	* pin[6] - auto calculated and filled in
 	* len[2] - length of the <Body>
 	* <Print_1..n>
-	* style[1] : len[2] : print_content[x]
-	* style[1] - 1-byte indicates the print style
-	* len[2] - 2-byte indicates the length of following print content
-	* print_content - the print content                                                                     
+	* style : order_id[4] : len : order_date : len[2] : print_content
+	* style - 1-byte indicating one of the printer style
+	* order_id[4] - 4-byte indicating the order id
+	* len - the length to order_date 
+	* order_date - the order date represented as string
+	* len[2] - 2-byte indicating the length of following print content
+	* print_content - the print content
 	************************************************************************/
 
 	//enumerate each print content to find the one matched the style
+	int order_id = 0;
 	string print_content;
+	string order_date;
 	int offset = 0;
 	while(offset < len){
-		int length = (buf[offset + 1] & 0x000000FF) | ((buf[offset + 2] & 0x000000FF) << 8);
-		if(buf[offset] == style){			
-			print_content.assign(buf + offset + 3, length);
+		//get the style to this order 
+		int printStyle = buf[offset];
+
+		//get the id to this order
+		offset++;
+		order_id = (buf[offset] & 0x000000FF) |
+				   ((buf[offset + 1] & 0x000000FF) << 8) |
+				   ((buf[offset + 2] & 0x000000FF) << 16) |
+				   ((buf[offset + 3] & 0x000000FF) << 24);
+
+		//get the length of order date
+		offset += 4;
+		int lenOrderDate = buf[offset];
+
+		//get the value of order date
+		offset++;
+		order_date.assign(buf + offset, lenOrderDate);
+
+		//get the length of print content
+		offset += lenOrderDate;
+		int length = (buf[offset] & 0x000000FF) | ((buf[offset + 1] & 0x000000FF) << 8);		
+
+		//get the value of print content if style matched
+		offset += 2;
+		if(printStyle == style){			
+			print_content.assign(buf + offset, length);
 			break;
 		}else{
-			offset = offset + length + 3;
+			offset += length;
 		}
 	}
 
@@ -263,7 +297,7 @@ void PrinterInstance::addJob(const char* buf, int len, int iFunc){
 			//add all order detail jobs to the queue
 			vector<string>::iterator iter = details.begin();
 			for(iter; iter != details.end(); iter++){
-				jobQueue.push(PrintJob(*iter_func, *iter));
+				jobQueue.push(PrintJob(*iter_func, *iter, order_id, order_date));
 			}
 			//notify the print thread to run
 			SetEvent(hPrintEvent);
@@ -300,7 +334,7 @@ void PrinterInstance::split2Details(const string& print_content, const vector<in
 		int offset = 0;
 		vector<string> details; 
 		int size = print_content.size();
-		while(offset < (int)print_content.size()){
+		while(offset < size){
 
 			int length = (print_content[offset + 1] & 0x000000FF) | ((print_content[offset + 2] & 0x000000FF) << 8);
 			int kit2Print = print_content[offset];

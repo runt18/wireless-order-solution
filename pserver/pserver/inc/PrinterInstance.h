@@ -17,13 +17,18 @@ typedef enum{
 class PrintJob{
 public:
 	PrintJob() : content(""){};
-	PrintJob(const PrintFunc& printFunc, const string& cont) : func(printFunc), content(cont){};
+	PrintJob(const PrintFunc& printFunc, const string& cont, int id, string date) : func(printFunc), 
+								content(cont), order_id(id), order_date(date){};
 	~PrintJob(){};
-	PrintJob(const PrintJob& right){ func = right.func; content = right.content; };
-	PrintJob& operator=(const PrintJob& right){ func = right.func; content = right.content; return *this; }
+	PrintJob(const PrintJob& right){ func = right.func; content = right.content; order_id = right.order_id; order_date = right.order_date; };
+	PrintJob& operator=(const PrintJob& right){ func = right.func; content = right.content; order_id = right.order_id; order_date = right.order_date; return *this; }
 
 	//the function that the printer instance is going to do
 	PrintFunc func;
+	//the order id 
+	int order_id;
+	//the order date
+	string order_date;
 	//the print content
 	string content;
 };

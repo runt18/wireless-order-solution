@@ -15,13 +15,23 @@ extern vector<CString> g_Kitchens;
 extern CString g_ConfPath;
 
 TCHAR* _FuncDesc[] = {
-	_T("未知"), _T("下单"), _T("下单(详细)"), _T("结帐"), _T("加菜(详细)"), _T("退菜(详细)"), _T("转台")
+	/* 0 */ _T("未知"), 
+	/* 1 */ _T("下单"), 
+	/* 2 */ _T("下单(详细)"), 
+	/* 3 */ _T("结帐"), 
+	/* 4 */ _T("加菜(详细)"), 
+	/* 5 */ _T("退菜(详细)"), 
+	/* 6 */ _T("转台"),
+	/* 7 */ _T("加菜"),
+	/* 8 */ _T("退菜")
 };
 
 int _nFuncs = sizeof(_FuncDesc) / sizeof(TCHAR*);
 
 TCHAR* _PrinterStyle[] = {
-	_T("未知"), _T("58 毫米"), _T("80 毫米")
+	/* 0 */ _T("未知"), 
+	/* 1 */ _T("58 毫米"), 
+	/* 2 */ _T("80 毫米")
 };
 
 int _nStyle = sizeof(_PrinterStyle) / sizeof(TCHAR*);
