@@ -15,7 +15,6 @@ public class ReqQueryMenu extends ReqPackage{
 	public ReqQueryMenu(){
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.QUERY_MENU;
-		header.reserved = 0;
 		header.length[0] = 0;
 		header.length[1] = 0;
 	} 

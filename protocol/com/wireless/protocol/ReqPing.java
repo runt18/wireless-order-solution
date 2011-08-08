@@ -15,7 +15,6 @@ public class ReqPing extends ReqPackage{
 	public ReqPing(){
 		header.mode = Mode.TEST;
 		header.type = Type.PING;
-		header.reserved = 0;
 		header.length[0] = 0x00;
 		header.length[1] = 0x00;
 	}

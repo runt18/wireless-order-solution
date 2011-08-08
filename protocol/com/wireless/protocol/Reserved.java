@@ -6,27 +6,34 @@ public class Reserved {
 	 * or pay order request, to indicates the request configuration 
 	 */
 	//the default request configuration
-	public static final byte DEFAULT_CONF = 0x00;
+	public static final short DEFAULT_CONF = 0x00;
 	/**
 	 * The values below are used for the print request,
 	 * to indicate which print actions would be performed
 	 */
 	//whether the insert or pay order would wait until print action is done.	
-	public static final byte PRINT_SYNC = 0x01;
+	public static final short PRINT_SYNC = 0x01;
 	//indicates to print order
-	public static final byte PRINT_ORDER_2 = 0x02;
+	public static final short PRINT_ORDER_2 = 0x02;
 	//indicates to print order detail
-	public static final byte PRINT_ORDER_DETAIL_2 = 0x04;
+	public static final short PRINT_ORDER_DETAIL_2 = 0x04;
 	//indicates to print receipt
-	public static final byte PRINT_RECEIPT_2 = 0x08;
+	public static final short PRINT_RECEIPT_2 = 0x08;
 	//indicates to print extra food detail
-	public static final byte PRINT_EXTRA_FOOD_2 = 0x10;
+	public static final short PRINT_EXTRA_FOOD_2 = 0x10;
 	//indicates to print canceled food detail
-	public static final byte PRINT_CANCELLED_FOOD_2 = 0x20;
+	public static final short PRINT_CANCELLED_FOOD_2 = 0x20;
 	//indicates to print hurry food
-	public static final byte PRINT_TRANSFER_TABLE_2 = 0x40;
+	public static final short PRINT_TRANSFER_TABLE_2 = 0x40;
+	//indicates to print all all extra foods
+	public static final short PRINT_ALL_EXTRA_FOOD_2 = 0x80;
+	//indicates to print all canceled foods
+	public static final short PRINT_ALL_CANCELLED_FOOD_2 = 0x100;
+	//indicates to print shift receipt
+	public static final short PRINT_SHIFT_RECEIPT_2 = 0x4000;
 	//indicates to print temporary receipt
-	public static final byte PRINT_TEMP_RECEIPT_2 = (byte)0x80;
+	public static final short PRINT_TEMP_RECEIPT_2 = (short)0x8000;
+
 	/**
 	 * The values below are used for the print request
 	 * to indicate which function of the print is going to do. 
@@ -38,5 +45,18 @@ public class Reserved {
 	public static final byte PRINT_EXTRA_FOOD = 4;
 	public static final byte PRINT_CANCELLED_FOOD = 5;
 	public static final byte PRINT_TRANSFER_TABLE = 6;
-	public static final byte PRINT_TEMP_RECEIPT = 7;
+	public static final byte PRINT_ALL_EXTRA_FOOD = 7;
+	public static final byte PRINT_ALL_CANCELLED_FOOD = 8;
+	public static final byte PRINT_SHIFT_RECEIPT = 126;
+	public static final byte PRINT_TEMP_RECEIPT = 127;
+	
+	/**
+	 * Make the print configuration since using reserved[0] and 
+	 * reserved[1] to represent it.
+	 * @param reserved the 4-byte char array for the reserved
+	 * @return The print configuration value combined with reserved[0] and reserved[1]
+	 */
+	public static short toPrintConf(byte[] reserved){
+		return (short)((reserved[0] &0x00FF) | ((reserved[1] & 0x00FF) << 8)); 
+	}
 }

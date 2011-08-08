@@ -27,10 +27,11 @@ public class ReqPayOrder extends ReqPackage{
 	* len_comment - length of the comment 
 	* comment[len] - the comment this order
 	*******************************************************/
-	public ReqPayOrder(Order order, byte printType){
+	public ReqPayOrder(Order order, short printType){
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.PAY_ORDER;
-		header.reserved = printType;
+		header.reserved[0] = (byte)(printType & 0x00FF);
+		header.reserved[1] = (byte)((printType & 0xFF00) >> 8);
 		
 		byte[] memberIDBytes = new byte[0];
 		if(order.member_id != null){

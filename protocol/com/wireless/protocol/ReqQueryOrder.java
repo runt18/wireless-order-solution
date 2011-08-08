@@ -18,7 +18,6 @@ public class ReqQueryOrder extends ReqPackage {
 	public ReqQueryOrder(short tableID){
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.QUERY_ORDER;
-		header.reserved = 0;
 		header.length[0] = 0x02;
 		header.length[1] = 0x00;
 		body = new byte[2];

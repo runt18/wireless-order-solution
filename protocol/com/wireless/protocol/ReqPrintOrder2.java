@@ -45,10 +45,11 @@ public class ReqPrintOrder2 extends ReqPackage{
 	 * @param newTbl
 	 * 				the id to new table 
 	 */
-	public ReqPrintOrder2(byte printConf, int orderID, int oriTbl, int newTbl){
+	public ReqPrintOrder2(short printConf, int orderID, int oriTbl, int newTbl){
 		header.mode = Mode.PRINT;
 		header.type = Type.PRINT_BILL_2;
-		header.reserved = printConf;
+		header.reserved[0] = (byte)(printConf & 0x00FF);
+		header.reserved[1] = (byte)((printConf & 0xFF00) >> 8);
 		header.length[0] = 8;
 		header.length[1] = 0;
 		

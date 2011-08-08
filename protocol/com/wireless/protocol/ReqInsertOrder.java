@@ -42,7 +42,7 @@ public class ReqInsertOrder extends ReqPackage {
 	 * @param type indicates insert or update request
 	 * @param reqConf indicates the request configuration, like sync or asyn print 
 	 */
-	public ReqInsertOrder(Order reqOrder, byte type, byte reqConf){
+	public ReqInsertOrder(Order reqOrder, byte type, short reqConf){
 		makePackage(reqOrder, type, reqConf);
 	}
 	
@@ -69,13 +69,14 @@ public class ReqInsertOrder extends ReqPackage {
 	 * @param type indicates insert or update request
 	 * @param reqConf indicates the request configuration, like sync or asyn print 
 	 */
-	private void makePackage(Order reqOrder, byte type, byte reqConf){
+	private void makePackage(Order reqOrder, byte type, short reqConf){
 		if(type != Type.INSERT_ORDER && type != Type.UPDATE_ORDER)
 			throw new IllegalArgumentException();
 		
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = type;
-		header.reserved = reqConf;
+		header.reserved[0] = (byte)(reqConf & 0x00FF);
+		header.reserved[1] = (byte)((reqConf & 0xFF00) >> 8);
 		//calculate the body's length
 		int bodyLen = 2 + /* table id takes up 2 bytes */
 					2 + /* 2nd table id takes up 2 bytes */

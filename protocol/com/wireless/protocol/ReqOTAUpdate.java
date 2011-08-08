@@ -16,7 +16,6 @@ public class ReqOTAUpdate extends ReqPackage{
 	public ReqOTAUpdate(){
 		header.mode = Mode.OTA;
 		header.type = Type.GET_HOST;
-		header.reserved = 0;
 		header.length[0] = 0x00;
 		header.length[1] = 0x00;
 	}
