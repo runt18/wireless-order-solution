@@ -460,6 +460,7 @@ public class UpdateOrder {
 				result.extraOrder.id = orderToUpdate.id;
 				result.extraOrder.table_id = orderToUpdate.table_id;
 				result.extraOrder.table_name = orderToUpdate.table_name;
+				result.extraOrder.custom_num = orderToUpdate.custom_num;
 				result.extraOrder.foods = tmpFoods.toArray(new Food[tmpFoods.size()]);
 			}
 			
@@ -494,6 +495,7 @@ public class UpdateOrder {
 				result.canceledOrder.id = orderToUpdate.id;
 				result.canceledOrder.table_id = orderToUpdate.table_id;
 				result.canceledOrder.table_name = orderToUpdate.table_name;
+				result.canceledOrder.custom_num = orderToUpdate.custom_num;
 				result.canceledOrder.foods = tmpFoods.toArray(new Food[tmpFoods.size()]);
 			}
 		}
