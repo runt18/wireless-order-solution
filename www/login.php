@@ -75,7 +75,7 @@ if (window.parent != window)
 </head>
 <body style="background: #278295">
 
-<div style="margin:0 auto; text-align:right; font-size: small;">e点通&reg;餐饮管理平台(v0.9.7)</div>
+<div style="margin:0 auto; text-align:right; font-size: small;">e点通&reg;餐饮管理平台(v0.9.8)</div>
 
 <form method="post" action="chk.php" name='theForm' onsubmit="return validate()">
   <table cellspacing="0" cellpadding="0" style="margin-top: 100px" align="center">
