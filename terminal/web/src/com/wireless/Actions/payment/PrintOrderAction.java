@@ -152,7 +152,7 @@ public class PrintOrderAction extends Action implements PinGen{
 				
 			}else if(resp.header.type == Type.NAK){
 				jsonResp = jsonResp.replace("$(result)", "false");
-				if(resp.header.reserved[0] == ErrorCode.ORDER_NOT_EXIST){
+				if(resp.header.reserved == ErrorCode.ORDER_NOT_EXIST){
 					jsonResp = jsonResp.replace("$(value)", orderID + "号账单不存在，请重新确认");					
 				}else{
 					jsonResp = jsonResp.replace("$(value)", orderID + "号账单打印不成功，请重新检查网络是否连通");
