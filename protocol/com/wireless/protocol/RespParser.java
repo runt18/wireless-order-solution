@@ -92,11 +92,11 @@ public class RespParser {
 				//get each taste id
 				int[] tasteID = new int[3];
 				tasteID[0] = (response.body[index + 5] & 0x000000FF) | 
-								((response.body[index + 6] & 0x0000FF00) >> 8);
+								((response.body[index + 6] & 0x000000FF) << 8);
 				tasteID[1] = (response.body[index + 7] & 0x000000FF) | 
-								((response.body[index + 8] & 0x0000FF00) >> 8);
+								((response.body[index + 8] & 0x000000FF) << 8);
 				tasteID[2] = (response.body[index + 9] & 0x000000FF) | 
-								((response.body[index + 10] & 0x0000FF00) >> 8);
+								((response.body[index + 10] & 0x000000FF) << 8);
 				//each food information takes up 11-byte
 				index += 11;
 				orderFoods[i] = new Food();

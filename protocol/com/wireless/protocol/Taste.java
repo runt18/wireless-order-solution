@@ -34,7 +34,7 @@ public class Taste {
 
 	}
 	
-	public Taste(short id, String pref){
+	public Taste(int id, String pref){
 		alias_id = id;
 		preference = pref;
 	}

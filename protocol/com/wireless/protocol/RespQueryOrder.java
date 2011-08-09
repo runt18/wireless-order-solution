@@ -95,11 +95,11 @@ public class RespQueryOrder extends RespPackage{
 			body[index + 3] = (byte)((order.foods[i].count & 0x0000FF00) >> 8);
 			body[index + 4] = (byte)(order.foods[i].status);
 			body[index + 5] = (byte)(order.foods[i].tastes[0].alias_id & 0x00FF);
-			body[index + 6] = (byte)(order.foods[i].tastes[0].alias_id & 0x00FF);
+			body[index + 6] = (byte)((order.foods[i].tastes[0].alias_id & 0xFF00) >> 8);
 			body[index + 7] = (byte)(order.foods[i].tastes[1].alias_id & 0x00FF);
-			body[index + 8] = (byte)(order.foods[i].tastes[1].alias_id & 0x00FF);
+			body[index + 8] = (byte)((order.foods[i].tastes[1].alias_id & 0xFF00) >> 8);
 			body[index + 9] = (byte)(order.foods[i].tastes[2].alias_id & 0x00FF);
-			body[index + 10] = (byte)(order.foods[i].tastes[2].alias_id & 0x00FF);
+			body[index + 10] = (byte)((order.foods[i].tastes[2].alias_id & 0xFF00) >> 8);
 			index += 11;
 		}
 	}

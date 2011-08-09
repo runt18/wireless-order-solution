@@ -84,11 +84,11 @@ public class ReqParser {
 			//get each taste id
 			int[] tasteID = new int[3];
 			tasteID[0] = (req.body[offset + 4] & 0x000000FF) | 
-							((req.body[offset + 5] & 0x0000FF00) >> 8);
+							((req.body[offset + 5] & 0x000000FF) << 8);
 			tasteID[1] = (req.body[offset + 6] & 0x000000FF) | 
-							((req.body[offset + 7] & 0x0000FF00) >> 8);
+							((req.body[offset + 7] & 0x000000FF) << 8);
 			tasteID[2] = (req.body[offset + 8] & 0x000000FF) | 
-							((req.body[offset + 9] & 0x0000FF00) >> 8);
+							((req.body[offset + 9] & 0x000000FF) << 8);
 			
 			//get the kitchen 
 			short kitchen = req.body[offset + 10];
