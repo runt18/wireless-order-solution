@@ -275,7 +275,7 @@
 mode : ORDER_BUSSINESS
 type : QUERY_MENU
 seq : Auto
-reserved : 0x00
+reserved[4] : 0x00
 pin[6] : Auto
 len[2] : 0x00,0x00
 </XPD:ATTR>
@@ -338,7 +338,7 @@ assign ACK to the header.type field
 mode : ORDER_BUSSINESS
 type : ACK
 seq : same as reqeust
-reserved : 0x00
+reserved[4] : 0x00
 pin[6] : same as request
 len[2] : length of the &lt;Body&gt;
 
@@ -423,7 +423,7 @@ assign NAK to the header.type
 mode : ORDER_BUSSINESS
 type : NAK
 seq : same as request
-reserved : 0x00
+reserved[4] : 0x00
 pin[6] : same as request
 len[2] : 0x00,0x00
 </XPD:ATTR>
