@@ -67,7 +67,7 @@ class SubmitChangePopup extends PopupScreen{
 							});
 
 						}else{
-							throw new Exception(getErrMsg(_reqOrder.table_id, resp.header.reserved[0]));									
+							throw new Exception(getErrMsg(_reqOrder.table_id, resp.header.reserved));									
 						}
 						
 					}catch(IOException e){

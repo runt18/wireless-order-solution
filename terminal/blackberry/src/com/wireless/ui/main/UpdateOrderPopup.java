@@ -89,13 +89,13 @@ class UpdateOrderPopup extends PopupScreen implements FieldChangeListener, IPost
 			Order _order = RespParser2.parseQueryOrder2(response);
 			UiApplication.getUiApplication().pushScreen(new ChangeOrderScreen(_order));
 		} else {
-			if (response.header.reserved[0] == ErrorCode.TABLE_IDLE) {
+			if (response.header.reserved == ErrorCode.TABLE_IDLE) {
 				Dialog.alert(_tableID + "号台还未下单");
-			} else if (response.header.reserved[0] == ErrorCode.TABLE_NOT_EXIST) {
+			} else if (response.header.reserved == ErrorCode.TABLE_NOT_EXIST) {
 				Dialog.alert(_tableID + "号台信息不存在");
-			} else if (response.header.reserved[0] == ErrorCode.TERMINAL_NOT_ATTACHED) {
+			} else if (response.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
 				Dialog.alert("终端没有登记到餐厅，请联系管理人员。");
-			} else if (response.header.reserved[0] == ErrorCode.TERMINAL_EXPIRED) {
+			} else if (response.header.reserved == ErrorCode.TERMINAL_EXPIRED) {
 				Dialog.alert("终端已过期，请联系管理人员。");
 			} else {
 				Dialog.alert("未确定的异常错误(" + response.header.reserved + ")");
