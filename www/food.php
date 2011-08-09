@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <?php
-include("hasLogin.php"); 
+include("hasLogin.php");
 ?>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>tbt</title>
@@ -16,12 +16,12 @@ include("hasLogin.php");
 </head>
 <body>
 <?php
-include("conn.php"); 
-mysql_query("SET NAMES utf8"); 
+include("conn.php");
+mysql_query("SET NAMES utf8");
 $kitchens = "";
 $sql = "SELECT alias_id, name FROM kitchen WHERE restaurant_id=" . $_SESSION["restaurant_id"];
 $rs = $db->GetAll($sql);
-foreach ($rs as $row){	
+foreach ($rs as $row){
 	if($kitchens  != "")
 	{
 		$kitchens .= "@";
@@ -30,25 +30,25 @@ foreach ($rs as $row){
 }
 	?>
 <?php
-include("changePassword.php"); 
+include("changePassword.php");
 ?>
 <?PHP
 include("conn.php");
-mysql_query("SET NAMES utf8"); 
+mysql_query("SET NAMES utf8");
 $foodCode = $_POST["foodCode"];
 if($foodCode != null)
 {
 	$foodId = $_POST["foodId"];
-	
+
 	$foodName = $_POST["foodName"];
 	$pinyin = $_POST["pinyin"];
 	$foodPrice = $_POST["foodPrice"];
 	$kitchen = $_POST["kitchenSelect"];
 	$status = $_POST["statusValue"];
 	$restaurant_id = $_SESSION["restaurant_id"];
-	
+
 	if($foodId == "" || $foodId == null)//如果是新增
-	{						
+	{
 		$sql = "SELECT * FROM food WHERE alias_id=$foodCode AND restaurant_id=$restaurant_id";
 		/*echo "<script>alert('$sql');</script>";*/
 		$rs = $db ->GetOne($sql);
@@ -57,7 +57,7 @@ if($foodCode != null)
 			echo "<script>alert('编号已存在！');editFood('','$foodCode','$foodName','$foodPrice','$kitchen','$kitchens',$status,'$pinyin');</script>";
 		}
 		else
-		{			
+		{
 			$sql = "INSERT INTO food(alias_id,`name`,unit_price,restaurant_id,kitchen,status,pinyin) VALUES($foodCode,'$foodName',$foodPrice,$restaurant_id,$kitchen,$status,'$pinyin')";
 			/*echo "<script>alert('$sql');</script>";*/
 			if($db->Execute($sql))
@@ -66,33 +66,33 @@ if($foodCode != null)
 			}
 			else{
 				echo "<script>alert('保存失败！');</script>";
-			}			
+			}
 		}
 	}
 	else//如果是编辑
 	{
-		
-		$sql = "UPDATE food SET name='$foodName', unit_price=$foodPrice,kitchen=$kitchen,status = $status,pinyin='$pinyin' WHERE id=$foodId";	
-		$db->Execute($sql);	
+
+		$sql = "UPDATE food SET name='$foodName', unit_price=$foodPrice,kitchen=$kitchen,status = $status,pinyin='$pinyin' WHERE id=$foodId";
+		$db->Execute($sql);
 		if($db->Execute($sql))
 		{
 			echo "<script>alert('保存成功！');</script>";
 		}
 		else{
 			echo "<script>alert('保存失败！');</script>";
-		}	
-	}	
+		}
+	}
 }
 $deleteId = $_POST["deleteId"];
 if($deleteId != null)
 {
 	/*$sql = "DELETE FROM order_food WHERE food_id=$deleteId";*/
 	/*$db->Execute($sql);*/
-	$sql = "DELETE FROM food WHERE id=$deleteId";	
+	$sql = "DELETE FROM food WHERE id=$deleteId";
 	if($db->Execute($sql))
 	{
 		echo "<script>alert('删除成功！');</script>";
-	}	
+	}
 	else{
 		echo "<script>alert('删除失败！');</script>";
 	}
@@ -125,12 +125,12 @@ if($deleteId != null)
 	</select>
 	<select id="kitchen" name="kitchen" style="display:none;width:150px;">
 <?php
-include("conn.php"); 
-mysql_query("SET NAMES utf8"); 
-$sql = "SELECT alias_id, name FROM kitchen WHERE restaurant_id=" . $_SESSION["restaurant_id"];		
+include("conn.php");
+mysql_query("SET NAMES utf8");
+$sql = "SELECT alias_id, name FROM kitchen WHERE restaurant_id=" . $_SESSION["restaurant_id"];
 $rs = $db->GetAll($sql);
 foreach ($rs as $row){
-	echo "<option value='".$row["alias_id"]."'>".$row["name"]."</option>";	
+	echo "<option value='".$row["alias_id"]."'>".$row["name"]."</option>";
 }
 	?>
 <option value="255">空</option></select>
@@ -143,7 +143,7 @@ foreach ($rs as $row){
 <div class="Content">
 
 
-        
+
 <table cellpModifying="0" cellspacing="0" border="0" id="table" class="sortable">
 		<thead>
 			<tr>
@@ -156,51 +156,51 @@ foreach ($rs as $row){
 			</tr>
 		</thead>
 		<tbody>
-<?php 	  		
+<?php
 
 $xm=$_REQUEST["keyword_type"];
 $ct=$_REQUEST["condition_type"];
-$kw=$_REQUEST["keyword"]; 
+$kw=$_REQUEST["keyword"];
 $kitchen_value=$_REQUEST["kitchen"];
-$sql = "SELECT f.*,CASE WHEN k.name IS NULL THEN '空' ELSE k.name END AS kitchen,f.kitchen AS kitchen_value FROM food f LEFT JOIN kitchen k ON f.kitchen = k.alias_id AND f.restaurant_id = k.restaurant_id WHERE f.restaurant_id=" . $_SESSION["restaurant_id"];		
+$sql = "SELECT f.*,CASE WHEN k.name IS NULL THEN '空' ELSE k.name END AS kitchen,f.kitchen AS kitchen_value FROM food f LEFT JOIN kitchen k ON f.kitchen = k.alias_id AND f.restaurant_id = k.restaurant_id WHERE f.restaurant_id=" . $_SESSION["restaurant_id"];
 switch ($xm)
 {
 	case "is_no":
 		if ($kw!="")
-			$sql .= " AND f.alias_id = $kw" ;  			
+			$sql .= " AND f.alias_id = $kw" ;
 		break;
 	case "is_name":
 		if ($kw!="")
-			$sql .= " AND f.name like '%$kw%'" ;  			
+			$sql .= " AND f.name like '%$kw%'" ;
 		break;
 	case "is_pinyin":
 		if ($kw!="")
-			$sql .= " AND f.pinyin like '%$kw%'" ;  			
+			$sql .= " AND f.pinyin like '%$kw%'" ;
 		break;
 	case "is_Price":
 		if ($kw!="")
 		{
 			if($ct == "Equal")
 			{
-				$sql .= " AND f.unit_price = $kw" ;  
+				$sql .= " AND f.unit_price = $kw" ;
 			}
 			elseif($ct == "EqualOrGrater")
 			{
-				$sql .= " AND f.unit_price >= $kw" ; 
+				$sql .= " AND f.unit_price >= $kw" ;
 			}
 			elseif($ct == "EqualOrLess")
 			{
-				$sql .= " AND f.unit_price <= $kw" ; 
+				$sql .= " AND f.unit_price <= $kw" ;
 			}
-		}				
-		break;	
+		}
+		break;
 	case "is_kitchen":
 		if ($kitchen_value!="")
-			$sql .= " AND f.kitchen=$kitchen_value" ;  			
-		break;		
-}	
+			$sql .= " AND f.kitchen=$kitchen_value" ;
+		break;
+}
 $bh=0;
-mysql_query("SET NAMES utf8"); 
+mysql_query("SET NAMES utf8");
 // mysql_query("set names 'utf-8'") ;
 /*$kitchen = array('0'=>'厨房1', '1'=>'厨房2', '2'=>'厨房3', '3'=>'厨房4', '4'=>'厨房5', '5'=>'厨房6', '6'=>'厨房7', '7'=>'厨房8', '8'=>'厨房9', '9'=>'厨房10', '255'=>'空');*/
 $rs = $db->GetAll($sql);
@@ -227,7 +227,7 @@ foreach ($rs as $row){
 	if (($status & 4) != 0) {
 		echo "  <img src='images/icon_tip_ting.gif'  height='19' width='19' border='0'/>" ;
 	}
-	
+
 	echo "</td>";
 	echo "<td>" .$py ."</td>";
 	echo "<td>" .$row["unit_price"] ."</td>";
@@ -238,13 +238,13 @@ foreach ($rs as $row){
 		"<a href='food_material.php?id=".$row["id"]."&name=".$row["name"]."'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;关联</a></td>";
 	echo "</tr>";
 }
-//mysql_query("SET NAMES utf8"); 
+//mysql_query("SET NAMES utf8");
 mysql_close($con);
-		?>			
+		?>
 	</tbody>
   </table>
   </div>
-  
+
 	<div id="controls">
        <div id="text"><?php echo "总计:" .$bh ."&nbsp;条记录"; ?>&nbsp;&nbsp;&nbsp;&nbsp;当前第 <span id="currentpage"></span> 页，每页 </div>
         <div id="perpage">
@@ -256,7 +256,7 @@ mysql_close($con);
 				<option value="100">100</option>
 			</select>
 		</div>
-        
+
         <div id="navigation">
         <span id="page-link"> </span>
           <a href="#" onclick="sorter.move(-1,true)">第一页</a>

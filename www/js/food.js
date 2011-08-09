@@ -13,7 +13,7 @@ function deleteFood(id)
         document.body.appendChild(formDelete);
         formDelete.submit();
     }
-    
+
 }
 function editFood(fId, fCode, fName, fPrice, kitchen, kitchens, status,pinyin) {
     var ks = "";
@@ -90,7 +90,11 @@ function editFood(fId, fCode, fName, fPrice, kitchen, kitchens, status,pinyin) {
 	                        '<span class="pop_action-span"><a href="#" onclick="submitFoodData()">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>' +
 	                        '<span class="pop_action-span1"><a href="#" onclick="closeWindow()">取&nbsp;&nbsp;&nbsp;&nbsp;消</a></span>' +
 	                      '</div>' +
-	                '</form>' +
+	                '<input type="hidden" name="keyword" value="' + document.getElementById("keyword_value").value + '"/>' +
+	                '<input type="hidden" name="condition_type" value="' + document.getElementById("condition_type_value").value + '"/>' +
+	                '<input type="hidden" name="keyword_type" value="' + document.getElementById("keyword_type_value").value + '"/>' +
+	                '<input type="hidden" name="kitchen" value="' + document.getElementById("kitchen_value").value + '"/>' +
+	                      '</form>' +
 	                '</div>';
     showMessageBox(content, 342, 350);
     if (fId == "") {
@@ -99,8 +103,13 @@ function editFood(fId, fCode, fName, fPrice, kitchen, kitchens, status,pinyin) {
     else {
         document.getElementById("foodName").focus();
     }
-    //    alert(kitchen);
-    document.all.kitchenSelect.value = kitchen;
+    //alert(kitchen);
+    var len = document.getElementById('kitchenSelect').options.length;
+    //alert(len);
+	if(kitchen > len) {
+		kitchen = len - 1;
+	}
+    document.getElementById("kitchenSelect").selectedIndex = kitchen;
 }
 
 function foodKeyDown() {
@@ -117,15 +126,15 @@ function foodKeyDown() {
 }
 
 function clearNoNum(obj) {
-    obj.value = obj.value.replace(/[^\d.]/g, "");  //清除“数字”和“.”以外的字符 
-    obj.value = obj.value.replace(/^\./g, "");  //验证第一个字符是数字而不是. 
-    obj.value = obj.value.replace(/\.{2,}/g, "."); //只保留第一个. 清除多余的. 
+    obj.value = obj.value.replace(/[^\d.]/g, "");  //清除“数字”和“.”以外的字符
+    obj.value = obj.value.replace(/^\./g, "");  //验证第一个字符是数字而不是.
+    obj.value = obj.value.replace(/\.{2,}/g, "."); //只保留第一个. 清除多余的.
     obj.value = obj.value.replace(".", "$#$").replace(/\./g, "").replace("$#$", ".");
 }
 
 function submitFoodData() {
     if (validateFoodData()) {
-        var statusValue = document.getElementById("statusValue");       
+        var statusValue = document.getElementById("statusValue");
         var value = 0;
         if (document.getElementById("specialOffer").checked) {
             value += 1;
@@ -150,7 +159,7 @@ function validateFoodData() {
 //    var pinyin = document.getElementById("pinyin").value;
     var foodPrice = document.getElementById("foodPrice").value;
     //    alert(foodCode);
-    
+
     if (foodCode == undefined || foodCode == null || foodCode == "") {
         alert("编号不能为空！");
         document.getElementById("foodCode").focus();
@@ -193,7 +202,7 @@ function showHideCondition(select) {
         document.getElementById("kitchen").style.display = "inline";
          document.getElementById("keyword").style.display = "none";
     }
-    
+
 }
 function initializeFood() {
     var keyword_type = document.getElementById("keyword_type");
@@ -238,15 +247,15 @@ function showFoodRanked()
                               '<div class="title" style="width:100%">' +
 	                          '<div class="title_left" style="width:565px"><font id="titleName" class="font" style="width:260px">点菜统计</font></div>' +
 	                          '<div class="title_right" style="width:35px;float:left" ></div>' +
-	                          '</div>' +	               
-	                          '<div class="add_foot_Content" style="height:410px;text-align:center;width:99%">' + 	                        
-	                              '<iframe src="foodRanked.php" scrolling="no" style="width:100%;height:100%" />' +	                           
-	                          '</div>' +	                      
+	                          '</div>' +
+	                          '<div class="add_foot_Content" style="height:410px;text-align:center;width:99%">' +
+	                              '<iframe src="foodRanked.php" scrolling="no" style="width:100%;height:100%" />' +
+	                          '</div>' +
 						   '</div>';
 	showMessageBox(content, 600, 350);
-	
+
 }
-function foodRankedKeyDown() {   
+function foodRankedKeyDown() {
     if (event.keyCode == 27) {
         event.returnValue = false;
         event.cancel = true;
@@ -254,7 +263,7 @@ function foodRankedKeyDown() {
     }
 }
 
-function showFoodSearch() {    
+function showFoodSearch() {
     var content = '<div id="Advanced_Search">' +
                     '<div class="title">' +
                         '<div class="title_left"><font class="font" style="width:200px;">高级搜索（菜谱）</font></div>' +
@@ -265,15 +274,15 @@ function showFoodSearch() {
                         '<div class="pop_Content" >' +
                             '<div class="pop_Content2">菜名：<input type="text" id="food_name" name="food_name" size="12" height="20" style="width:120px;"/></div>' +
                             '<div class="pop_Content2">餐厅：<select id="search_restaurant_type" name="search_restaurant_type" ><option value="Code" selected="selected">编号</option><option value="Name">名称</option></select>&nbsp;'+
-                            '<input type="text" name="restaurant" size="20" height="20" style="width:120px;"/></div>' +                                                  
+                            '<input type="text" name="restaurant" size="20" height="20" style="width:120px;"/></div>' +
                             '<div class="pop_Content2">单价：<select id="search_condition_type" name="search_condition_type" ><option value="Equal">等于</option><option value="EqualOrGrater" selected="selected">大于等于</option><option value="EqualOrLess">小于等于</option></select>&nbsp;'+
-                                '<input type="text" id="unit_price" name="unit_price" style="width:120px" onkeypress="return event.keyCode>=48&&event.keyCode<=57" /></div>' +                           
+                                '<input type="text" id="unit_price" name="unit_price" style="width:120px" onkeypress="return event.keyCode>=48&&event.keyCode<=57" /></div>' +
                         '</div>' +
                         '<span class="action-span"><a href="#"  onclick="document.searchForm.submit();">确&nbsp;&nbsp;&nbsp;&nbsp;认</a></span>' +
                          '<span class="action-span1"><a href="#" onclick="closeWindow()">取&nbsp;&nbsp;&nbsp;&nbsp;消</a></span>' +
                     '</div>' +
                     '</form>' +
-                '</div>';  
+                '</div>';
     showMessageBox(content, 540, 188);
     document.getElementById("food_name").focus();
 }
@@ -307,7 +316,7 @@ function foodSearchKeyDown() {
 //        document.getElementById("kitchen").style.display = "inline";
 //         document.getElementById("keyword").style.display = "none";
 //    }
-//    
+//
 //}
 
 //function iniAdminFood() {
@@ -328,11 +337,11 @@ function foodSearchKeyDown() {
 //            condition_type.options[i].selected = true;
 //            break;
 //        }
-//    }   
+//    }
 //    keyword.value = keyword_value;
 //    if (keyword_type_value == "is_Price") {
 //        document.getElementById("condition_type").style.display = "inline";
-//    }   
+//    }
 //}
 
 
