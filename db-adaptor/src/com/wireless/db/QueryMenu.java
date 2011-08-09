@@ -190,7 +190,7 @@ public class QueryMenu {
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		ArrayList<Taste> tastes = new ArrayList<Taste>();
 		while(dbCon.rs.next()){
-			Taste taste = new Taste(dbCon.rs.getShort("alias_id"), 
+			Taste taste = new Taste(dbCon.rs.getInt("alias_id"), 
 									dbCon.rs.getString("preference"),
 									dbCon.rs.getShort("category"),
 									dbCon.rs.getShort("calc"),

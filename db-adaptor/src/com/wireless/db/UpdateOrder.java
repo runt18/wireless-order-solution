@@ -193,9 +193,9 @@ public class UpdateOrder {
 			food.discount = (byte)(dbCon.rs.getFloat("discount") * 100);
 			food.setCount(new Float(dbCon.rs.getFloat("order_sum")));
 			food.kitchen = dbCon.rs.getShort("kitchen");
-			food.tastes[0].alias_id = dbCon.rs.getShort("taste_id");
-			food.tastes[1].alias_id = dbCon.rs.getShort("taste_id2");
-			food.tastes[2].alias_id = dbCon.rs.getShort("taste_id3");
+			food.tastes[0].alias_id = dbCon.rs.getInt("taste_id");
+			food.tastes[1].alias_id = dbCon.rs.getInt("taste_id2");
+			food.tastes[2].alias_id = dbCon.rs.getInt("taste_id3");
 			food.tastePref = dbCon.rs.getString("taste");
 			food.setTastePrice(dbCon.rs.getFloat("taste_price"));
 			originalRecords.add(food);
