@@ -50,13 +50,4 @@ public class Reserved {
 	public static final byte PRINT_SHIFT_RECEIPT = 126;
 	public static final byte PRINT_TEMP_RECEIPT = 127;
 	
-	/**
-	 * Make the print configuration since using reserved[0] and 
-	 * reserved[1] to represent it.
-	 * @param reserved the 4-byte char array for the reserved
-	 * @return The print configuration value combined with reserved[0] and reserved[1]
-	 */
-	public static short toPrintConf(byte[] reserved){
-		return (short)((reserved[0] &0x00FF) | ((reserved[1] & 0x00FF) << 8)); 
-	}
 }

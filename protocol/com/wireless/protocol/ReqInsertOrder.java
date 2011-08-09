@@ -13,7 +13,8 @@ import com.wireless.protocol.Reserved;
  * pin[6] - auto calculated and filled in
  * len[2] - length of the <Order>
  * <Order>
- * table[2] : table2[2] : category : custom_num : food_num : <Food1> : <Food2>... : original_table[2] 
+ * print_type[2] : table[2] : table2[2] : category : custom_num : food_num : <Food1> : <Food2>... : original_table[2] 
+ * print_type[2] - 2-byte indicates the print type
  * table[2] - 2-byte indicates the table id
  * table_2[2] - 2-byte indicates the 2nd table id  
  * category - 1-byte indicating the category to this order
@@ -75,10 +76,10 @@ public class ReqInsertOrder extends ReqPackage {
 		
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = type;
-		header.reserved[0] = (byte)(reqConf & 0x00FF);
-		header.reserved[1] = (byte)((reqConf & 0xFF00) >> 8);
+
 		//calculate the body's length
-		int bodyLen = 2 + /* table id takes up 2 bytes */
+		int bodyLen = 2 + /* print type takes up 2 bytes */
+					2 + /* table id takes up 2 bytes */
 					2 + /* 2nd table id takes up 2 bytes */
 					1 + /* category takes up 1 byte */
 					1 + /* custom number takes up 1 byte */ 
@@ -89,25 +90,30 @@ public class ReqInsertOrder extends ReqPackage {
 		header.length[1] = (byte)((bodyLen & 0x0000FF00) >> 8);
 		
 		body = new byte[bodyLen];
+		
+		//assign the print type
+		body[0] = (byte)(reqConf & 0x00FF);
+		body[1] = (byte)((reqConf & 0xFF00) >> 8);
+		
 		//assign the table id
-		body[0] = (byte)(reqOrder.table_id & 0x00FF);
-		body[1] = (byte)((reqOrder.table_id & 0xFF00) >> 8);
+		body[2] = (byte)(reqOrder.table_id & 0x00FF);
+		body[3] = (byte)((reqOrder.table_id & 0xFF00) >> 8);
 
 		//assign the 2nd table id
-		body[2] = (byte)(reqOrder.table2_id & 0x00FF);
-		body[3] = (byte)((reqOrder.table2_id & 0xFF00) >> 8);
+		body[4] = (byte)(reqOrder.table2_id & 0x00FF);
+		body[5] = (byte)((reqOrder.table2_id & 0xFF00) >> 8);
 		
 		//assign the category
-		body[4] = (byte)(reqOrder.category & 0x00FF); 
+		body[6] = (byte)(reqOrder.category & 0x00FF); 
 		
 		//assign the custom number
-		body[5] = (byte)(reqOrder.custom_num & 0x000000FF);
+		body[7] = (byte)(reqOrder.custom_num & 0x000000FF);
 		
 		//assign the number of foods
-		body[6] = (byte)(reqOrder.foods.length & 0x000000FF);
+		body[8] = (byte)(reqOrder.foods.length & 0x000000FF);
 		
 		//assign each order food's id and count
-		int offset = 7;
+		int offset = 9;
 		for(int i = 0; i < reqOrder.foods.length; i++){
 			body[offset] = (byte)(reqOrder.foods[i].alias_id & 0x000000FF);
 			body[offset + 1] = (byte)((reqOrder.foods[i].alias_id & 0x0000FF00) >> 8);

@@ -8,7 +8,7 @@ public class RespNAK extends RespPackage{
 	public RespNAK(ProtocolHeader reqHeader){
 		super(reqHeader);
 		header.type = Type.NAK;
-		header.reserved[0] = ErrorCode.UNKNOWN;
+		header.reserved = ErrorCode.UNKNOWN;
 	}
 	
 	/**
@@ -19,6 +19,6 @@ public class RespNAK extends RespPackage{
 	public RespNAK(ProtocolHeader reqHeader, byte errCode){
 		super(reqHeader);
 		header.type = Type.NAK;
-		header.reserved[0] = errCode;
+		header.reserved = errCode;
 	}
 }

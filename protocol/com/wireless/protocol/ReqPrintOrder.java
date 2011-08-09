@@ -24,7 +24,7 @@ public class ReqPrintOrder extends ReqPackage{
 	public ReqPrintOrder(byte[] printContent, Order orderInfo, byte printFunc){
 		header.mode = Mode.PRINT;
 		header.type = Type.PRINT_BILL;
-		header.reserved[0] = printFunc;
+		header.reserved = printFunc;
 		header.length[0] = (byte)(printContent.length & 0x000000FF);
 		header.length[1] = (byte)((printContent.length & 0x0000FF00) >> 8);
 		this.body = printContent;
