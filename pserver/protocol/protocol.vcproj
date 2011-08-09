@@ -226,10 +226,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\Reserved.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\src\RespACK.cpp"
 				>
 			</File>

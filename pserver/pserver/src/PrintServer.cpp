@@ -177,28 +177,28 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 						for(iter; iter != g_PrintInstances.end(); iter++){
 							vector<PrintFunc>::iterator it = (*iter)->funcs.begin();
 							for(it; it != (*iter)->funcs.end(); it++){
-								if(it->code == Reserved::PRINT_ORDER && (printReq.header.reserved[0] == Reserved::PRINT_ORDER)){
+								if(it->code == Reserved::PRINT_ORDER && (printReq.header.reserved == Reserved::PRINT_ORDER)){
 									(*iter)->addJob(printReq.body, len, it->code);
 
-								}else if(it->code == Reserved::PRINT_ORDER_DETAIL && (printReq.header.reserved[0] == Reserved::PRINT_ORDER_DETAIL)){
+								}else if(it->code == Reserved::PRINT_ORDER_DETAIL && (printReq.header.reserved == Reserved::PRINT_ORDER_DETAIL)){
 									(*iter)->addJob(printReq.body, len, it->code);
 
-								}else if(it->code == Reserved::PRINT_RECEIPT && (printReq.header.reserved[0] == Reserved::PRINT_RECEIPT || printReq.header.reserved[0] == Reserved::PRINT_TEMP_RECEIPT)){
+								}else if(it->code == Reserved::PRINT_RECEIPT && (printReq.header.reserved == Reserved::PRINT_RECEIPT || printReq.header.reserved == Reserved::PRINT_TEMP_RECEIPT)){
 									(*iter)->addJob(printReq.body, len, it->code);
 
-								}else if(it->code == Reserved::PRINT_EXTRA_FOOD && (printReq.header.reserved[0] == Reserved::PRINT_EXTRA_FOOD)){
+								}else if(it->code == Reserved::PRINT_EXTRA_FOOD && (printReq.header.reserved == Reserved::PRINT_EXTRA_FOOD)){
 									(*iter)->addJob(printReq.body, len, it->code);
 
-								}else if(it->code == Reserved::PRINT_CANCELLED_FOOD && (printReq.header.reserved[0] == Reserved::PRINT_CANCELLED_FOOD)){
+								}else if(it->code == Reserved::PRINT_CANCELLED_FOOD && (printReq.header.reserved == Reserved::PRINT_CANCELLED_FOOD)){
 									(*iter)->addJob(printReq.body, len, it->code);
 
-								}else if(it->code == Reserved::PRINT_TRANSFER_TABLE && (printReq.header.reserved[0] == Reserved::PRINT_TRANSFER_TABLE)){
+								}else if(it->code == Reserved::PRINT_TRANSFER_TABLE && (printReq.header.reserved == Reserved::PRINT_TRANSFER_TABLE)){
 									(*iter)->addJob(printReq.body, len, it->code);
 
-								}else if(it->code == Reserved::PRINT_ALL_EXTRA_FOOD && (printReq.header.reserved[0] == Reserved::PRINT_ALL_EXTRA_FOOD)){
+								}else if(it->code == Reserved::PRINT_ALL_EXTRA_FOOD && (printReq.header.reserved == Reserved::PRINT_ALL_EXTRA_FOOD)){
 									(*iter)->addJob(printReq.body, len, it->code);
 
-								}else if(it->code == Reserved::PRINT_ALL_CANCELLED_FOOD && (printReq.header.reserved[0] == Reserved::PRINT_ALL_CANCELLED_FOOD)){
+								}else if(it->code == Reserved::PRINT_ALL_CANCELLED_FOOD && (printReq.header.reserved == Reserved::PRINT_ALL_CANCELLED_FOOD)){
 									(*iter)->addJob(printReq.body, len, it->code);
 								}
 							}
@@ -404,9 +404,9 @@ static unsigned __stdcall LoginProc(LPVOID pvParam){
 							}else{
 								//show user the message according to the error code
 								if(pReport){
-									if(loginResp.header.reserved[0] == ErrorCode::ACCOUNT_NOT_EXIST){
+									if(loginResp.header.reserved == ErrorCode::ACCOUNT_NOT_EXIST){
 										pReport->OnPrintExcep(0, "µÇÂ¼Ê§°Ü£¬ÓÃ»§Ãû²»´æÔÚ");
-									}else if(loginResp.header.reserved[0] == ErrorCode::PWD_NOT_MATCH){
+									}else if(loginResp.header.reserved == ErrorCode::PWD_NOT_MATCH){
 										pReport->OnPrintExcep(0, "µÇÂ¼Ê§°Ü£¬ÃÜÂë²»ÕýÈ·");
 									}else{
 										pReport->OnPrintExcep(0, "µÇÂ¼Ê§°Ü");

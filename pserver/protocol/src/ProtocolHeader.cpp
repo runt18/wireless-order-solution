@@ -6,9 +6,7 @@ ProtocolHeader::ProtocolHeader(){
 	mode = 0;
 	type = 0;
 	seq	= 0;
-	for(int i = 0; i < RESERVE_LEN; i++){
-		reserved[i] = 0;
-	}
+	reserved = 0;
 	for(int i = 0; i < PIN_CNT; i++){
 		pin[i] = 0;
 	}

@@ -18,5 +18,4 @@ public:
 	static const int PRINT_SHIFT_RECEIPT = 126;
 	static const int PRINT_TEMP_RECEIPT = 127;
 
-	int toPrintConf(char reserved[]);
 };
