@@ -21,6 +21,7 @@ import com.wireless.protocol.Order;
 import com.wireless.protocol.Type;
 import com.wireless.protocol.Util;
 import com.wireless.ui.field.OrderListField;
+import com.wireless.ui.field.TopBannerField;
 
 public class PayOrderScreen extends MainScreen
 							implements PostPayOrder{
@@ -34,7 +35,8 @@ public class PayOrderScreen extends MainScreen
 	// Constructor
 	public PayOrderScreen(Order bill){
 		_bill = bill;
-		setTitle("结帐");
+		setBanner(new TopBannerField("结帐"));
+		//setTitle("结帐");
 		//The food has ordered would be listed in here.
 		VerticalFieldManager vfm = new VerticalFieldManager();
 		vfm.add(new SeparatorField());

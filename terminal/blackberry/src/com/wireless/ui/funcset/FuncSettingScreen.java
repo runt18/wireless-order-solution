@@ -3,6 +3,7 @@ package com.wireless.ui.funcset;
 
 import com.wireless.terminal.Params;
 import com.wireless.ui.field.BlankSeparatorField;
+import com.wireless.ui.field.TopBannerField;
 import com.wireless.util.ServerConnector;
 
 import net.rim.device.api.system.DeviceInfo;
@@ -25,7 +26,9 @@ public class FuncSettingScreen extends MainScreen{
 	
 	public FuncSettingScreen(IPostFuncSet postFuncSet){
 		_postFuncSet = postFuncSet;
-		setTitle("功能设置");
+		
+		setBanner(new TopBannerField("功能设置"));
+		//setTitle("功能设置");
 
 		//restore the parameters from the persist storage
 		Params.restore();

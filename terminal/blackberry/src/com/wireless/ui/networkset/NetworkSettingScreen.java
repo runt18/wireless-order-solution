@@ -2,6 +2,7 @@ package com.wireless.ui.networkset;
 
 
 import com.wireless.terminal.Params;
+import com.wireless.ui.field.TopBannerField;
 import com.wireless.util.ServerConnector;
 
 import net.rim.device.api.ui.*;
@@ -42,7 +43,8 @@ public class NetworkSettingScreen extends MainScreen{
 	public NetworkSettingScreen(IPostNetworkSet postNetworkSet){
 		super(Screen.DEFAULT_CLOSE);
 		_postNetworkSet = postNetworkSet;
-		setTitle("网络设置");
+		setBanner(new TopBannerField("网络设置"));
+		//setTitle("网络设置");
 		setDirty(true);
 		
 		//restore the net parameters from the persist storage

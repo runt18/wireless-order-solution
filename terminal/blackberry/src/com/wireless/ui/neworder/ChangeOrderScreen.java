@@ -24,6 +24,7 @@ import com.wireless.terminal.WirelessOrder;
 import com.wireless.ui.field.OrderListField;
 import com.wireless.ui.field.SelectFoodPopup;
 import com.wireless.ui.field.SelectKitchenPopup;
+import com.wireless.ui.field.TopBannerField;
 
 
 
@@ -39,7 +40,9 @@ public class ChangeOrderScreen extends MainScreen
 	// Constructor
 	public ChangeOrderScreen(Order bill){
 		_originalOrder = bill;
-		setTitle("改单");
+		
+		setBanner(new TopBannerField("改单"));
+		//setTitle("改单");
 		//The food has ordered would be listed in here.
 		VerticalFieldManager vfm = new VerticalFieldManager();
 		vfm.add(new SeparatorField());
