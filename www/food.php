@@ -11,6 +11,7 @@ include("hasLogin.php");
 <link rel="stylesheet" href="css/style.css" />
 <link rel="stylesheet" href="css/pop_up.css" />
 <script type="text/javascript" src="js/pop-up.js"></script>
+<script type="text/javascript" src="js/jquery-1.4.2.min.js"></script>
 <script type="text/javascript" src="js/food.js"></script>
 <script type="text/javascript" src="js/changePassword.js"></script>
 </head>
@@ -136,6 +137,14 @@ foreach ($rs as $row){
 <option value="255">空</option></select>
     <!-- 关键字 -->
     <input type="text" id="keyword" name="keyword"   />
+
+<span >
+	<input id="specialOffer_q" name="specialOffer_q" type="checkbox" >&nbsp;特价</input>&nbsp;&nbsp;
+	<input id="recommend_q" name="recommend_q" type="checkbox" >&nbsp;推荐</input>&nbsp;&nbsp;
+	<input id="present_q" name="present_q" type="checkbox"  >&nbsp;赠送</input>&nbsp;&nbsp;
+	<input id="paused_q" name="paused_q" type="checkbox"  >&nbsp;停售</input>&nbsp;&nbsp;
+</span>
+
     <input type="submit" value=" 搜索 " class="button" />
   </form>
 </div>
@@ -158,10 +167,9 @@ foreach ($rs as $row){
 		<tbody>
 <?php
 
-$xm=$_REQUEST["keyword_type"];
-$ct=$_REQUEST["condition_type"];
-$kw=$_REQUEST["keyword"];
-$kitchen_value=$_REQUEST["kitchen"];
+
+
+
 $sql = "SELECT f.*,CASE WHEN k.name IS NULL THEN '空' ELSE k.name END AS kitchen,f.kitchen AS kitchen_value FROM food f LEFT JOIN kitchen k ON f.kitchen = k.alias_id AND f.restaurant_id = k.restaurant_id WHERE f.restaurant_id=" . $_SESSION["restaurant_id"];
 switch ($xm)
 {
@@ -199,6 +207,37 @@ switch ($xm)
 			$sql .= " AND f.kitchen=$kitchen_value" ;
 		break;
 }
+
+$specialOffer_q=$_REQUEST["specialOffer_q"];
+$recommend_q=$_REQUEST["recommend_q"];
+$present_q=$_REQUEST["present_q"];
+$paused_q=$_REQUEST["paused_q"];
+
+
+$sta_value = 0;
+
+if ($specialOffer_q == 'on') {
+	$sta_value += 1;
+}
+
+if ($recommend_q == 'on') {
+	$sta_value += 2;
+}
+
+if ($paused_q == 'on') {
+	$sta_value += 4;
+}
+
+if ($present_q == 'on') {
+	$sta_value += 8;
+}
+
+if($sta_value != 0) {
+	$sql .= " AND f.status & $sta_value != 0" ;
+}
+
+//echo $sql;
+
 $bh=0;
 mysql_query("SET NAMES utf8");
 // mysql_query("set names 'utf-8'") ;
@@ -286,7 +325,7 @@ echo "<input type='hidden' id='kitchen_value' value='$kitchen_value' />";
 	sorter.currentid = "currentpage";
 	sorter.limitid = "pagelimit";
 	sorter.init("table",0);
-	initializeFood();
+	initializeFood(<?php echo $sta_value; ?>);
   </script>
 </body>
 </html>

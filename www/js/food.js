@@ -60,6 +60,11 @@ function editFood(fId, fCode, fName, fPrice, kitchen, kitchens, status,pinyin) {
         presentStatus = 'checked = "checked"';
     }
 
+    var specialOffer_q = $("#specialOffer_q").attr("checked") ? 'on' : '';
+    var recommend_q = $("#recommend_q").attr("checked") ? 'on' : '';
+    var present_q = $("#present_q").attr("checked") ? 'on' : '';
+    var paused_q = $("#paused_q").attr("checked") ? 'on' : '';
+
     var content = ' <div class="add_foot">' +
                     '<div class="title">' +
 	                    '<div class="title_left"><font class="font">' + titleName + '</font></div>' +
@@ -94,6 +99,10 @@ function editFood(fId, fCode, fName, fPrice, kitchen, kitchens, status,pinyin) {
 	                '<input type="hidden" name="condition_type" value="' + document.getElementById("condition_type_value").value + '"/>' +
 	                '<input type="hidden" name="keyword_type" value="' + document.getElementById("keyword_type_value").value + '"/>' +
 	                '<input type="hidden" name="kitchen" value="' + document.getElementById("kitchen_value").value + '"/>' +
+	                '<input type="hidden" name="specialOffer_q" value="' + specialOffer_q + '"/>' +
+	                '<input type="hidden" name="recommend_q" value="' + recommend_q + '"/>' +
+	                '<input type="hidden" name="present_q" value="' + present_q + '"/>' +
+	                '<input type="hidden" name="paused_q" value="' + paused_q + '"/>' +
 	                      '</form>' +
 	                '</div>';
     showMessageBox(content, 342, 350);
@@ -204,7 +213,7 @@ function showHideCondition(select) {
     }
 
 }
-function initializeFood() {
+function initializeFood(status_value) {
     var keyword_type = document.getElementById("keyword_type");
     var keyword_type_value = document.getElementById("keyword_type_value").value;
     var condition_type = document.getElementById("condition_type");
@@ -238,6 +247,19 @@ function initializeFood() {
     if (keyword_type_value == "is_kitchen") {
         document.getElementById("kitchen").style.display = "inline";
         document.getElementById("keyword").style.display = "none";
+    }
+
+    if ((status_value & 1) != 0) {
+       $("#specialOffer_q").attr("checked",true);
+    }
+    if ((status_value & 2) != 0) {
+    	$("#recommend_q").attr("checked",true);
+    }
+    if ((status_value & 4) != 0) {
+    	$("#paused_q").attr("checked",true);
+    }
+    if ((status_value & 8) != 0) {
+    	$("#present_q").attr("checked",true);
     }
 }
 
