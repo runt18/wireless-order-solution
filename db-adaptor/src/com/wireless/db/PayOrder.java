@@ -124,6 +124,7 @@ public class PayOrder {
 		 * - actual price
 		 * - gift price
 		 * - waiter
+		 * - discount_type
 		 * - payment manner
 		 * - terminal pin
 		 * - service rate
@@ -139,6 +140,7 @@ public class PayOrder {
 			  ", total_price=" + totalPrice + 
 			  ", total_price_2=" + totalPrice2 +
 			  ", type=" + orderInfo.pay_manner + 
+			  ", discount_type=" + orderInfo.discount_type +
 			  ", service_rate=" + ((float)orderInfo.service_rate / 100) +
 		   	  ", order_date=NOW()" + 
 			  (orderInfo.comment != null ? ", comment='" + orderInfo.comment + "'" : "") +
