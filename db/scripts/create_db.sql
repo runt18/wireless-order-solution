@@ -75,6 +75,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order` (
   `waiter` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the waiter who operates on this order' ,
   `type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the type to pay order, it would be one of the values below.\n现金 : 1\n刷卡 : 2\n会员卡 : 3\n签单：4\n挂账 ：5\n' ,
   `category` TINYINT NOT NULL DEFAULT 1 COMMENT 'the category to this order, it should be one the values below.\n一般 : 1\n外卖 : 2\n并台 : 3\n拼台 : 4' ,
+  `discount_type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the discount type to this order' ,
   `member_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the member\'s alias id' ,
   `member` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the member name' ,
   `terminal_model` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the terminal model to this order' ,
@@ -286,6 +287,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_history` (
   `waiter` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the waiter who operates on this order' ,
   `type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the type to pay order, it would be one of the values below.\n现金 : 1\n刷卡 : 2\n会员卡 : 3\n签单：4\n挂账 ：5\n' ,
   `category` TINYINT NOT NULL DEFAULT 1 COMMENT 'the category to this order, it should be one the values below.\n一般 : 1\n外卖 : 2\n并台 : 3\n拼台 : 4' ,
+  `discount_type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the discount type to this order' ,
   `member_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the member\'s alias id' ,
   `member` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the member name' ,
   `terminal_model` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the terminal model to this order' ,
@@ -563,7 +565,6 @@ COMMENT = 'the shift history to each restaurant' ;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
 
 -- -----------------------------------------------------
 -- Data for table `wireless_order_db`.`restaurant`

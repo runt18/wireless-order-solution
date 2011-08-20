@@ -2,6 +2,16 @@ SET NAMES utf8;
 use `wireless_order_db`;
 
 -- -----------------------------------------------------
+-- Add the `discount_type` to `order`
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order` ADD COLUMN `discount_type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the discount type to this order'  AFTER `type` ;
+
+-- -----------------------------------------------------
+-- Add the `discount_type` to `order_history`
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_history` ADD COLUMN `discount_type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the discount type to this order'  AFTER `type` ;
+
+-- -----------------------------------------------------
 -- View`order_food_history_view`
 -- -----------------------------------------------------
 DROP VIEW IF EXISTS order_food_history_view;
