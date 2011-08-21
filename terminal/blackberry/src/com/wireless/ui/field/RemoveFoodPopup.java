@@ -47,7 +47,15 @@ class RemoveFoodPopup extends PopupScreen implements FieldChangeListener{
 		}
 		add(new LabelField("请输入\"" + _food2Del.name + "\"" + ope + "数量", LabelField.USE_ALL_WIDTH | DrawStyle.LEFT));
 		add(new SeparatorField());
-		_amount = new EditField("", Util.float2String2(_food2Del.getCount()), 6, EditField.FILTER_REAL_NUMERIC);
+		String remaingAmount;
+		if(_type == Type.INSERT_ORDER){
+			remaingAmount = Util.float2String2(_food2Del.getCount());
+		}else if(_type == Type.UPDATE_ORDER){
+			remaingAmount = Util.float2String2(_food2Del.getCount2());
+		}else{
+			remaingAmount = Util.float2String2(_food2Del.getCount());
+		}
+		_amount = new EditField("", remaingAmount, 6, EditField.FILTER_REAL_NUMERIC);
 		add(_amount);
 		add(new SeparatorField());
 		_ok = new ButtonField("确定", ButtonField.CONSUME_CLICK);
@@ -63,12 +71,18 @@ class RemoveFoodPopup extends PopupScreen implements FieldChangeListener{
 	private void remove(){
 		try{
 			int removeAmount = Util.float2Int(Float.valueOf(_amount.getText()));
-			int foodAmount = Util.float2Int(_food2Del.getCount());			
+			int foodAmount;
+			if(_type == Type.INSERT_ORDER){
+				foodAmount = Util.float2Int(_food2Del.getCount());
+			}else if(_type == Type.UPDATE_ORDER){
+				foodAmount = Util.float2Int(_food2Del.getCount2());
+			}else{
+				foodAmount = Util.float2Int(_food2Del.getCount());
+			}
 			
 			if(foodAmount == removeAmount){
 				//remove the food if the food amount equals to remove amount
-				_orderList._orderFoods.removeElementAt(_orderList.getSelectedIndex());
-				_orderList.delete(_orderList.getSelectedIndex());
+				_orderList.delFood(_orderList.getSelectedIndex());
 				close();
 				if(_parent != null){
 					_parent.close();
@@ -85,7 +99,26 @@ class RemoveFoodPopup extends PopupScreen implements FieldChangeListener{
 			
 			}else{
 				//update the remaining amount to the food
-				_food2Del.setCount(Util.int2Float(foodAmount - removeAmount));
+				if(_type == Type.INSERT_ORDER){
+					/**
+					 * In the case of inserting order, 
+					 * just update the count. 
+					 */
+					_food2Del.setCount(Util.int2Float(foodAmount - removeAmount));					
+				}else if(_type == Type.UPDATE_ORDER){
+					/**
+					 * In the case of updating order,
+					 * Need to calculate the difference amount and update the difference count
+					 */
+					int diffCount;
+					if(_food2Del.diffPositive){
+						diffCount = Util.float2Int(_food2Del.getDiffCount()) - removeAmount;
+						_food2Del.diffPositive = diffCount >= 0 ? true : false;
+					}else{
+						diffCount = Util.float2Int(_food2Del.getDiffCount()) + removeAmount;
+					}					
+					_food2Del.setDiffCount(Util.int2Float(Math.abs(diffCount)));
+				}
 				close();
 				if(_parent != null){
 					_parent.close();

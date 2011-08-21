@@ -20,6 +20,7 @@ import net.rim.device.api.ui.container.VerticalFieldManager;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.Type;
+import com.wireless.protocol.Util;
 import com.wireless.terminal.WirelessOrder;
 import com.wireless.ui.field.OrderListField;
 import com.wireless.ui.field.SelectFoodPopup;
@@ -140,8 +141,21 @@ public class ChangeOrderScreen extends MainScreen
 					Dialog.alert("点菜单为空，暂时不能改单。");
 				}else{
 					Food[] foods = new Food[_orderListField.getSize()];
+					/**
+					 * Since in the change order screen, the count to food is divided in two parts.
+					 * - original count
+					 * - difference count
+					 * Plus both of them to make the order count finally.
+					 */
 					for(int i = 0; i < _orderListField.getSize(); i++){
 						foods[i] = (Food)_orderListField.getCallback().get(null, i);
+						//Get the difference count
+						int diffCount = Util.float2Int(foods[i].getDiffCount());
+						diffCount = foods[i].diffPositive ? diffCount : -diffCount;
+						//Plus the original and difference count
+						int count = Util.float2Int(foods[i].getCount()) + diffCount;
+						//Set the order count to this food
+						foods[i].setCount(Util.int2Float(count));
 					}
 					Order reqOrder = new Order(foods, 
 											   Short.parseShort(_table.getText()), 

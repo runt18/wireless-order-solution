@@ -1,56 +1,73 @@
 package com.wireless.ui.field;
 
-import com.wireless.protocol.Food;
-import com.wireless.protocol.Taste;
-import com.wireless.protocol.Util;
-import com.wireless.terminal.WirelessOrder;
-
 import net.rim.device.api.system.Characters;
 import net.rim.device.api.system.Display;
 import net.rim.device.api.ui.DrawStyle;
 import net.rim.device.api.ui.Field;
 import net.rim.device.api.ui.FieldChangeListener;
 import net.rim.device.api.ui.Graphics;
-import net.rim.device.api.ui.component.*;
-import net.rim.device.api.ui.container.*;
+import net.rim.device.api.ui.component.ButtonField;
+import net.rim.device.api.ui.component.Dialog;
+import net.rim.device.api.ui.component.EditField;
+import net.rim.device.api.ui.component.LabelField;
+import net.rim.device.api.ui.component.ListField;
+import net.rim.device.api.ui.component.ListFieldCallback;
+import net.rim.device.api.ui.component.SeparatorField;
+import net.rim.device.api.ui.component.TextField;
+import net.rim.device.api.ui.container.PopupScreen;
+import net.rim.device.api.ui.container.VerticalFieldManager;
+import net.rim.device.api.util.Arrays;
+import net.rim.device.api.util.Comparator;
+
+import com.wireless.protocol.Food;
+import com.wireless.protocol.Taste;
+import com.wireless.protocol.Util;
 
 public class SelectTastePopup extends PopupScreen{
 	
 	private OrderListField _orderListField = null;
 	private EditField _tasteID = null;
+	private Taste[] _tastes = null;
 	private Food _selectedFood = null;
 	private ListField _tasteList = null;
-	private PopupScreen _parent = null;
 	int[] _tasteMatchedIdx = null;
+	String _cate = null;
 	
-	public SelectTastePopup(OrderListField orderField, Food food){
-		this(orderField, food, null);
-	}
-	
-	public SelectTastePopup(OrderListField orderField, Food food, PopupScreen parent){		
+	public SelectTastePopup(OrderListField orderField, Taste[] tastes, Food food){		
 		super(new VerticalFieldManager(VERTICAL_SCROLL | VERTICAL_SCROLLBAR), DEFAULT_CLOSE);
 		_orderListField = orderField;
+		_tastes = tastes;
 		_selectedFood = food;
-		_parent = parent;
+
 		
 		//initialize the taste matched index
-		_tasteMatchedIdx = new int[WirelessOrder.foodMenu.tastes.length];
-		for(int i = 0; i < WirelessOrder.foodMenu.tastes.length; i++){
+		_tasteMatchedIdx = new int[_tastes.length];
+		for(int i = 0; i < _tastes.length; i++){
 			_tasteMatchedIdx[i] = i;
+		}
+	
+		if(tastes[0].category == Taste.CATE_TASTE){
+			_cate = "口味";
+		}else if(tastes[0].category == Taste.CATE_STYLE){
+			_cate = "做法";
+		}else if(tastes[0].category == Taste.CATE_SPEC){
+			_cate = "规格";
+		}else{
+			_cate = "口味";
 		}
 		
 		//the label to show the info about the food and taste preference
-		add(new LabelField("请选择\"" + food.name + "\"的口味", DrawStyle.ELLIPSIS));
+		add(new LabelField("请选择\"" + food.name + "\"的" + _cate, DrawStyle.ELLIPSIS));
 		//the edit field to select the taste
-		_tasteID = new EditField("口味编号: ", "", 20, TextField.NO_NEWLINE | EditField.FILTER_NUMERIC);
+		_tasteID = new EditField(_cate + "编号: ", "", 20, TextField.NO_NEWLINE | EditField.FILTER_NUMERIC);
 		
 		//Set the taste ID call back listener
 		//the available taste field would filter the taste matching the id
 		_tasteID.setChangeListener(new FieldChangeListener(){
 			public void fieldChanged(Field field, int context){
 				int matchNum = 0;
-				for(int i = 0; i < WirelessOrder.foodMenu.tastes.length; i++){
-					Taste taste = (Taste)WirelessOrder.foodMenu.tastes[i];
+				for(int i = 0; i < _tastes.length; i++){
+					Taste taste = (Taste)_tastes[i];
 					if(Integer.toString(taste.alias_id).startsWith(_tasteID.getText())){
 						_tasteMatchedIdx[matchNum] = i;
 						matchNum++;
@@ -64,7 +81,7 @@ public class SelectTastePopup extends PopupScreen{
 		});
 		
 		//the list field to display all the taste preference
-		_tasteList = new ListField(WirelessOrder.foodMenu.tastes.length){
+		_tasteList = new ListField(_tastes.length){
 			private boolean _isFocused = false;
 		    //Invoked when this field receives the focus.
 		    public void onFocus(int direction){
@@ -104,34 +121,83 @@ public class SelectTastePopup extends PopupScreen{
 			
 			private void addTaste(){
 				if(getSelectedIndex() != -1){
-					int resp = Dialog.ask(Dialog.D_YES_NO, "确认口味-" + WirelessOrder.foodMenu.tastes[getSelectedIndex()].preference + " ?", Dialog.YES);
+					int resp = Dialog.ask(Dialog.D_YES_NO, "确认" + _cate + "-" + _tastes[getSelectedIndex()].preference + " ?", Dialog.YES);
 					if(resp == Dialog.YES){
-						/**
-						 * Since add a taste to the food means another one different the previous,
-						 * we might remove the original food first
-						 */
-						_orderListField._orderFoods.removeElement(_selectedFood);
 
-						try{
-							Taste selectedTaste = WirelessOrder.foodMenu.tastes[_tasteMatchedIdx[getSelectedIndex()]];
-							//assign the taste id
-							_selectedFood.tastes[0].alias_id = selectedTaste.alias_id;
-							//assign the taste preference
-							_selectedFood.tastes[0].preference = selectedTaste.preference;
-							//_selectedFood.taste.price = WirelessOrder.foodMenu.tastes[getSelectedIndex()].price;
-							_selectedFood.tastes[0].setPrice(selectedTaste.getPrice());
-						}catch(ArrayIndexOutOfBoundsException e){}
-						
-						_selectedFood.tastePref = Util.genTastePref(_selectedFood.tastes);
-						_selectedFood.setTastePrice(Util.genTastePrice(_selectedFood.tastes, _selectedFood.getPrice()));
-						
-						_orderListField.addFood(_selectedFood);
-						
-						close();
-						
-						if(_parent != null){
-							_parent.close();
+
+						/**
+						 * Enumerate to check whether an available taste can be added
+						 */
+						int tastePos = 0;
+						for(; tastePos < _selectedFood.tastes.length; tastePos++){
+							if(_selectedFood.tastes[tastePos].alias_id == Taste.NO_TASTE){
+								break;
+							}
 						}
+						
+						if(tastePos < _selectedFood.tastes.length){
+							
+							/**
+							 * Since add a taste to the food means another one different the previous,
+							 * we might remove the original food first
+							 */
+							//_orderListField._orderFoods.removeElement(_selectedFood);
+							_orderListField.delFood(_selectedFood);
+							
+							/**
+							 * Add the taste to one of the three available tastes 
+							 */
+							try{
+								Taste selectedTaste = _tastes[_tasteMatchedIdx[getSelectedIndex()]];
+								//assign the taste id 
+								_selectedFood.tastes[tastePos].alias_id = selectedTaste.alias_id;
+								//assign the taste preference 
+								_selectedFood.tastes[tastePos].preference = selectedTaste.preference;
+								//assign the taste category
+								_selectedFood.tastes[tastePos].category = selectedTaste.category;
+								//assign the calculate type
+								_selectedFood.tastes[tastePos].calc = selectedTaste.calc;
+								//assign the taste price rate
+								_selectedFood.tastes[tastePos].setRate(selectedTaste.getRate());
+								//assign the taste price
+								_selectedFood.tastes[tastePos].setPrice(selectedTaste.getPrice());
+							}catch(ArrayIndexOutOfBoundsException e){}							
+						
+	
+							Arrays.sort(_selectedFood.tastes, new Comparator(){
+
+								public int compare(Object o1, Object o2) {
+									Taste taste1 = (Taste)o1;
+									Taste taste2 = (Taste)o2;
+									if(taste1.alias_id == taste2.alias_id){
+										return 0;
+									}else if(taste1.alias_id == Taste.NO_TASTE){
+										return 1;
+									}else if(taste2.alias_id == Taste.NO_TASTE){
+										return -1;
+									}else if(taste1.alias_id > taste2.alias_id){
+										return 1;
+									}else if(taste1.alias_id < taste2.alias_id){
+										return -1;
+									}else{
+										return 0;
+									}
+								}
+								
+							});
+							
+							/**
+							 * Calculate the taste price and preference
+							 */
+							_selectedFood.tastePref = Util.genTastePref(_selectedFood.tastes);
+							_selectedFood.setTastePrice(Util.genTastePrice(_selectedFood.tastes, _selectedFood.getPrice()));	
+							
+							_orderListField.addFood(_selectedFood);
+							
+						}else{
+							Dialog.alert("最多只能添加" + _selectedFood.tastes.length + "个口味");
+						}
+						
 					}
 				}
 				
@@ -142,15 +208,23 @@ public class SelectTastePopup extends PopupScreen{
 		_tasteList.setCallback(new ListFieldCallback(){
 			// draw the current row
 		    public void drawListRow(ListField list, Graphics g, int index, int y, int w){
-	    		Taste taste = (Taste)WirelessOrder.foodMenu.tastes[_tasteMatchedIdx[index]];
+	    		Taste taste = (Taste)_tastes[_tasteMatchedIdx[index]];
 	    		int priceWidth = 85;
 		    	g.drawText(taste.preference, 0, y, 0, w - priceWidth);
-				g.drawText(Util.CURRENCY_SIGN + Util.float2String(taste.getPrice()), w - priceWidth, y, DrawStyle.RIGHT, priceWidth);		
+		    	if(taste.calc == Taste.CALC_PRICE){
+		    		g.drawText(Util.CURRENCY_SIGN + Util.float2String(taste.getPrice()), w - priceWidth, y, DrawStyle.RIGHT, priceWidth);
+		    		
+		    	}else if(taste.calc == Taste.CALC_RATE){
+		    		g.drawText(Util.float2Int(taste.getRate()) + "%", w - priceWidth, y, DrawStyle.RIGHT, priceWidth);
+		    		
+		    	}else{
+		    		g.drawText(Util.CURRENCY_SIGN + Util.float2String(taste.getPrice()), w - priceWidth, y, DrawStyle.RIGHT, priceWidth);
+		    	}
 		    }
 		    
 		    // get the selected index from the correct Vector
 		    public Object get(ListField list, int index) {
-	    		return WirelessOrder.foodMenu.tastes[_tasteMatchedIdx[index]];
+	    		return _tastes[_tasteMatchedIdx[index]];
 		    }
 		    
 		    // get the screen width as the preferred width
