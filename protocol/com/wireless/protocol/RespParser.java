@@ -235,11 +235,9 @@ public class RespParser {
 			int nCount = (response.body[index] & 0x000000FF) | ((response.body[index + 1] & 0x000000FF) << 8);
 			index += 2;
 			//allocate the memory for taste preferences
-			Taste[] tastes = new Taste[nCount + 1];
-			//put the no taste preference to the first element
-			tastes[0] = new Taste();
+			Taste[] tastes = new Taste[nCount];
 			//get the taste preferences
-			index = genTaste(response, index, tastes, 1, tastes.length);			
+			index = genTaste(response, index, tastes, 0, tastes.length);			
 
 			//get the amount of taste styles
 			nCount = (response.body[index] & 0x000000FF) | ((response.body[index + 1] & 0x000000FF) << 8);

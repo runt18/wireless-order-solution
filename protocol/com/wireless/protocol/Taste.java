@@ -9,8 +9,8 @@ public class Taste {
 	public final static short CATE_STYLE = 1;
 	public final static short CATE_SPEC = 2;
 	
-	public final static short CALC_PRICE = 0;
-	public final static short CALC_RATE = 1;
+	public final static short CALC_PRICE = 0;	/* 按价格计算  */
+	public final static short CALC_RATE = 1;	/* 按比例计算  */
 	
 	public int alias_id = Taste.NO_TASTE;
 	public String preference = Taste.NO_PREFERENCE;
