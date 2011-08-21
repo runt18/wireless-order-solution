@@ -67,7 +67,7 @@ public class DailySettlementTask extends SchedulerTask{
 			
 			final String orderFoodItem = "`id`,`order_id`, `food_id`, `order_date`, `order_count`," + 
 										"`unit_price`,`name`, `food_status`, `taste`,`taste_price`," +
-										"`taste_id`,`discount`,`kitchen`,`comment`,`waiter`";
+										"`taste_id`,`taste_id2`,`taste_id3`,`discount`,`kitchen`,`comment`,`waiter`";
 			
 			dbCon.stmt.clearBatch();
 			//move the order have been paid from "order" to "order_history"
