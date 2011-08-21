@@ -938,7 +938,7 @@
 				tooltip : "返回",
 				handler : function(btn) {
 					location.href = "PersonLogin.html?restaurantID="
-							+ restaurantID;
+							+ restaurantID + "&isNewAccess=false&pin=" + pin;
 				}
 			});
 

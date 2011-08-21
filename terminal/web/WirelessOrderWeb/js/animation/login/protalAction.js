@@ -20,21 +20,28 @@
 										"click",
 										function() {
 											if (currPin != "") {
-												location.href = "SystemConfig.html?restaurantID="
-														+ restaurantID;
+												// can not go back
+//												location.href = "SystemConfig.html?restaurantID="
+//														+ restaurantID;
 											}
 										});
 					});
 
-	$("#bill").each(
-			function() {
-				$(this).bind(
-						"click",
-						function() {
-							if (currPin != "") {
-								location.href = "Bills.html?restaurantID="
-										+ restaurantID + "&pin=" + currPin;
-							}
-						});
-			});
+	$("#bill").each(function() {
+		$(this).bind("click", function() {
+			if (currPin != "") {
+
+				// 密码校验
+				billVerifyWin.show();
+			}
+		});
+	});
+
+	$("#logout").each(function() {
+		$(this).bind("click", function() {
+			currPin = "";
+			isVerified = false;
+			personLoginWin.show();
+		});
+	});
 };

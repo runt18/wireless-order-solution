@@ -106,8 +106,8 @@ function billModifyOnLoad() {
 	}
 
 	// update label new or mod
-	dishesOrderNorthPanel
-			.setTitle("<div style='font-size:18px;padding-left:2px'>帐单修改<div>");
+	// dishesOrderNorthPanel
+	// .setTitle("<div style='font-size:18px;padding-left:2px'>帐单修改<div>");
 
 	// 已点菜式查询
 	Ext.Ajax
@@ -194,6 +194,128 @@ function billModifyOnLoad() {
 				failure : function(response, options) {
 				}
 			});
+
+	// 当前帐单信息查询
+	Ext.Ajax
+			.request({
+				url : "../QueryToday.do",
+				params : {
+					"pin" : pin,
+					"type" : 0,
+					"ope" : 1,
+					"value" : ""
+				},
+				success : function(response, options) {
+					var resultJSON = Ext.util.JSON
+							.decode(response.responseText);
+					if (resultJSON.success == true) {
+						var josnData = resultJSON.data;
+						var billList = josnData.split("，");
+						for ( var i = 0; i < billList.length; i++) {
+							var billInfo = billList[i].substr(1,
+									billList[i].length - 2).split(",");
+							// 格式：["账单号","台号","日期","类型","结帐方式","金额","实收","台号2","就餐人数","最低消","服务费率","会员编号","会员姓名","账单备注","赠券金额","结帐类型","折扣类型"]
+							// 后台格式：["账单号","台号","日期","类型","结帐方式","金额","实收","台号2","就餐人数","最低消","服务费率","会员编号","会员姓名","账单备注","赠券金额","结帐类型","折扣类型"]
+							if (billInfo[0].substr(1, billInfo[0].length - 2) == Request["orderID"]) {
+								// 备注
+								billComment = billInfo[13].substr(1,
+										billInfo[13].length - 2);
+								billGenModForm.findById("remark").setValue(
+										billComment);
+								// 结帐类型
+								var payTpyeField = billGenModForm
+										.findById("payTpye");
+								var payTpyeValue = billInfo[15].substr(1,
+										billInfo[15].length - 2);
+								if (payTpyeValue == "1") {
+									payTpyeField.setValue("一般");
+								} else if (payTpyeValue == "2") {
+									payTpyeField.setValue("会员");
+								}
+								// 折扣类型
+								var discountTypeField = billGenModForm
+										.getForm().findField("discountRadio");
+								var discountTypeValue = billInfo[16].substr(1,
+										billInfo[16].length - 2);
+								if (discountTypeValue == "1") {
+									discountTypeField.setValue("discount1");
+								} else if (discountTypeValue == "2") {
+									discountTypeField.setValue("discount2");
+								} else if (discountTypeValue == "3") {
+									discountTypeField.setValue("discount3");
+								}
+								// 服务费率
+								billGenModForm
+										.findById("serviceRate")
+										.setValue(
+												billInfo[10]
+														.substr(
+																1,
+																billInfo[10].length - 2));
+								// 结帐方式
+								var payTypeField = billGenModForm.getForm()
+										.findField("payManner");
+								var payTypeValue = billInfo[4].substr(1,
+										billInfo[4].length - 2);
+								// var discountValue = billGenModForm.getForm()
+								// .findField("payType").getGroupValue();
+								if (payTypeValue == "现金") {
+									payTypeField.setValue("cashPay");
+								} else if (payTypeValue == "刷卡") {
+									payTypeField.setValue("cardPay");
+								} else if (payTypeValue == "挂账") {
+									payTypeField.setValue("handPay");
+								} else if (payTypeValue == "会员卡") {
+									payTypeField.setValue("memberPay");
+								} else if (payTypeValue == "签单") {
+									payTypeField.setValue("signPay");
+								}
+
+							}
+						}
+					}
+				},
+				failure : function(response, options) {
+				}
+			});
+
+	// 2,折扣率查询
+	Ext.Ajax.request({
+		url : "../QueryMenu.do",
+		params : {
+			"pin" : pin,
+			"type" : "3"
+		},
+		success : function(response, options) {
+			var resultJSON = Ext.util.JSON.decode(response.responseText);
+			if (resultJSON.success == true) {
+				var discountJSONData = resultJSON.data;
+				var discountList = discountJSONData.split("，");
+				for ( var i = 0; i < discountList.length; i++) {
+					var discountInfo = discountList[i].substr(1,
+							discountList[i].length - 2).split(",");
+					discountData.push([ discountInfo[0], // 厨房编号
+					discountInfo[2],// 一般折扣1
+					discountInfo[3],// 一般折扣2
+					discountInfo[4],// 一般折扣3
+					discountInfo[5],// 会员折扣1
+					discountInfo[6],// 会员折扣2
+					discountInfo[7] // 会员折扣3
+					]);
+				}
+			} else {
+				var dataInfo = resultJSON.data;
+				// Ext.Msg.alert(tableData);
+				Ext.MessageBox.show({
+					msg : dataInfo,
+					width : 300,
+					buttons : Ext.MessageBox.OK
+				});
+			}
+		},
+		failure : function(response, options) {
+		}
+	});
 
 };
 

@@ -247,6 +247,16 @@ var orderedColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(),
 			dataIndex : "dishTotalPrice",
 			width : 120
 		}, {
+			header : "折扣率",
+			sortable : true,
+			dataIndex : "discountRate",
+			width : 120,
+			editor : new Ext.form.NumberField({
+				allowBlank : false,
+				allowNegative : false,
+				maxValue : 100000
+			})
+		}, {
 			header : "<center>操作</center>",
 			sortable : true,
 			dataIndex : "dishOpt",
@@ -330,8 +340,6 @@ var countEqualImgBut = new Ext.ux.ImageButton({
 	}
 });
 
-
-
 // var printDetailImgBut = new Ext.ux.ImageButton({
 // imgPath : "../images/PrintDetail.png",
 // imgWidth : 50,
@@ -359,12 +367,13 @@ var countEqualImgBut = new Ext.ux.ImageButton({
 // }
 // });
 
-var orderedGrid = new Ext.grid.GridPanel({
+var orderedGrid = new Ext.grid.EditorGridPanel({
 	title : "已点菜式",
 	xtype : "grid",
 	anchor : "99%",
 	region : "center",
 	border : false,
+	clicksToEdit : 1,
 	ds : orderedStore,
 	cm : orderedColumnModel,
 	sm : new Ext.grid.RowSelectionModel({
@@ -412,6 +421,11 @@ var orderedGrid = new Ext.grid.GridPanel({
 	listeners : {
 		rowclick : function(thiz, rowIndex, e) {
 			dishOrderCurrRowIndex_ = rowIndex;
+		},
+		afteredit : function(Obj) {
+			var row = Obj.row;
+			var editValue = Obj.value;
+			orderedData[row][13] = editValue;
 		}
 	// ,
 	// render : function(thiz) {
@@ -425,7 +439,7 @@ var orderedForm = new Ext.form.FormPanel(
 			frame : true,
 			border : false,
 			region : "south",
-			height : 60,
+			height : 30,
 			items : [ {} ],
 			buttons : [
 					{
@@ -453,7 +467,7 @@ var orderedForm = new Ext.form.FormPanel(
 										+ foodPara.substr(0,
 												foodPara.length - 1) + "}";
 
-								//alert(foodPara);
+								// alert(foodPara);
 
 								var categoryOut;
 								if (Request["category"] == "一般") {
@@ -467,17 +481,27 @@ var orderedForm = new Ext.form.FormPanel(
 								}
 
 								var payMannerOut;
-								if (Request["payManner"] == "现金") {
+								var payMannerIn = billGenModForm.getForm()
+										.findField("payManner").getGroupValue();
+								if (payMannerIn == "cashPay") {
 									payMannerOut = 1;
-								} else if (Request["payManner"] == "刷卡") {
+								} else if (payMannerIn == "cardPay") {
 									payMannerOut = 2;
-								} else if (Request["payManner"] == "会员卡") {
+								} else if (payMannerIn == "memberPay") {
 									payMannerOut = 3;
-								} else if (Request["payManner"] == "挂账") {
-									payMannerOut = 4;
-								} else if (Request["payManner"] == "签单") {
+								} else if (payMannerIn == "handPay") {
 									payMannerOut = 5;
+								} else if (payMannerIn == "signPay") {
+									payMannerOut = 4;
 								}
+
+								var serviceRateIn = billGenModForm.findById(
+										"serviceRate").getValue();
+
+								var commentOut = billGenModForm.findById(
+										"remark").getValue();
+								
+								var memberIDOut = Request["memberID"] + "";
 
 								Ext.Ajax
 										.request({
@@ -490,9 +514,9 @@ var orderedForm = new Ext.form.FormPanel(
 												"payType" : payType,
 												"discountType" : discountType,
 												"payManner" : payMannerOut,
-												"serviceRate" : Request["serviceRate"],
-												"memberID" : Request["memberID"],
-												"comment" : Request["comment"],
+												"serviceRate" : serviceRateIn,
+												"memberID" : memberIDOut,
+												"comment" : commentOut,
 												// use
 												"foods" : foodPara
 											},
@@ -1116,7 +1140,7 @@ var dishesChooseByNumForm = new Ext.form.FormPanel({
 							focus : function(thiz) {
 								softKeyBoardDO
 										.setPosition(dishesOrderCenterPanel
-												.getInnerWidth() + 77, 187);
+												.getInnerWidth() + 77, 302);
 								softKBRelateItemId = "orderNbr";
 								softKeyBoardDO.show();
 
@@ -1210,7 +1234,7 @@ var dishesOrderEastPanel = new Ext.Panel({
 var dishesOrderNorthPanel = new Ext.Panel({
 	id : "dishesOrderNorthPanel",
 	region : "north",
-	title : "<div style='font-size:18px;padding-left:2px'>新下单<div>",
+	title : "<div style='font-size:18px;padding-left:2px'>帐单修改<div>",
 	height : 75,
 	border : false,
 	layout : "form",
@@ -1223,21 +1247,317 @@ var dishesOrderNorthPanel = new Ext.Panel({
 	}
 });
 
+/*---------------- bill general modification ---------------- */
+var discountKindData = [ [ "0", "一般" ], [ "1", "会员" ] ];
+
+var discountKindComb = new Ext.form.ComboBox({
+	fieldLabel : "结账方式",
+	// labelStyle : "font-size:14px;font-weight:bold;",
+	forceSelection : true,
+	value : "一般",
+	id : "payTpye",
+	store : new Ext.data.SimpleStore({
+		fields : [ "value", "text" ],
+		data : discountKindData
+	}),
+	valueField : "value",
+	displayField : "text",
+	typeAhead : true,
+	mode : "local",
+	triggerAction : "all",
+	selectOnFocus : true,
+	allowBlank : false,
+	listeners : {
+		select : function(combo, record, index) {
+			// if (record.get("text") == "一般") {
+			// // set the memeber card balance to -1;
+			// mBalance = -1;
+			// checkOurListRefresh();
+			// checkOutForm.buttons[2].hide();
+			// // hide the member info
+			// checkOutForm.findById("memberInfoPanel").hide();
+			// } else {
+			// memberNbrInputWin.show();
+			// }
+
+		}
+	}
+});
+
+var billGenModForm = new Ext.form.FormPanel({
+	frame : true,
+	border : false,
+	title : "总体信息",
+	layout : "fit",
+	items : [ {
+		layout : "column",
+		// height : 1,
+		border : false,
+		items : [ {
+			layout : "form",
+			border : false,
+			labelSeparator : '：',
+			labelWidth : 80,
+			width : 300,
+			// columnWidth : .30,
+			items : [ discountKindComb ]
+		}, {
+			// columnWidth : .10,
+			width : 170,
+			layout : 'form',
+			labelWidth : 80,
+			labelSeparator : '',
+			// hideLabels : true,
+			border : false,
+			items : [ {
+				xtype : 'radio',
+				fieldLabel : '折扣方式',
+				boxLabel : '折扣1',
+				checked : true,
+				name : 'discountRadio',
+				inputValue : 'discount1',
+				anchor : '95%',
+				listeners : {
+					check : function(thiz, newValue, oldValue) {
+						billListRefresh();
+					}
+				}
+			} ]
+		}, {
+			// columnWidth : .10,
+			width : 90,
+			layout : 'form',
+			labelWidth : 0,
+			labelSeparator : '',
+			hideLabels : true,
+			border : false,
+			items : [ {
+				xtype : 'radio',
+				// fieldLabel : '',
+				boxLabel : '折扣2',
+				name : 'discountRadio',
+				inputValue : 'discount2',
+				anchor : '95%',
+				listeners : {
+					check : function(thiz, newValue, oldValue) {
+						billListRefresh();
+					}
+				}
+			} ]
+		}, {
+			// columnWidth : .10,
+			width : 90,
+			layout : 'form',
+			labelWidth : 0,
+			labelSeparator : '',
+			hideLabels : true,
+			border : false,
+			items : [ {
+				xtype : 'radio',
+				// fieldLabel : '',
+				boxLabel : '折扣3',
+				name : 'discountRadio',
+				inputValue : 'discount3',
+				anchor : '95%',
+				listeners : {
+					check : function(thiz, newValue, oldValue) {
+						billListRefresh();
+					}
+				}
+			} ]
+		} ]
+	}, {
+		layout : "column",
+		// height : 10,
+		border : false,
+		items : [ {
+			layout : "form",
+			border : false,
+			labelSeparator : '：',
+			labelWidth : 80,
+			width : 253,
+			items : [ {
+				xtype : "numberfield",
+				fieldLabel : "服务费",
+				id : "serviceRate",
+				allowBlank : false,
+				anchor : "%99"
+			} ]
+		}, {
+			// layout : "form",
+			// border : false,
+			// labelSeparator : '：',
+			// labelWidth : 80,
+			width : 47,
+			html : "%"
+		}, {
+			// columnWidth : .10,
+			width : 170,
+			layout : 'form',
+			labelWidth : 80,
+			labelSeparator : '',
+			// hideLabels : true,
+			border : false,
+			items : [ {
+				xtype : 'radio',
+				fieldLabel : '付款方式',
+				boxLabel : '现金结帐',
+				checked : true,
+				name : 'payManner',
+				inputValue : 'cashPay',
+				anchor : '95%',
+				listeners : {
+					check : function(thiz, newValue, oldValue) {
+						// alert("1");
+						// checkOurListRefresh();
+					}
+				}
+			} ]
+		}, {
+			// columnWidth : .10,
+			width : 90,
+			layout : 'form',
+			labelWidth : 0,
+			labelSeparator : '',
+			hideLabels : true,
+			border : false,
+			items : [ {
+				xtype : 'radio',
+				// fieldLabel : '',
+				boxLabel : '刷卡结帐',
+				name : 'payManner',
+				inputValue : 'cardPay',
+				anchor : '95%',
+				listeners : {
+					check : function(thiz, newValue, oldValue) {
+						// alert("2");
+						// checkOurListRefresh();
+					}
+				}
+			} ]
+		}, {
+			// columnWidth : .10,
+			width : 90,
+			layout : 'form',
+			labelWidth : 0,
+			labelSeparator : '',
+			hideLabels : true,
+			border : false,
+			items : [ {
+				xtype : 'radio',
+				// fieldLabel : '',
+				boxLabel : '挂帐',
+				name : 'payManner',
+				inputValue : 'handPay',
+				anchor : '95%',
+				listeners : {
+					check : function(thiz, newValue, oldValue) {
+						// alert("3");
+						// checkOurListRefresh();
+					}
+				}
+			} ]
+		}, {
+			// columnWidth : .10,
+			width : 90,
+			layout : 'form',
+			labelWidth : 0,
+			labelSeparator : '',
+			hideLabels : true,
+			border : false,
+			items : [ {
+				xtype : 'radio',
+				// fieldLabel : '',
+				boxLabel : '会员卡',
+				name : 'payManner',
+				inputValue : 'memberPay',
+				anchor : '95%',
+				listeners : {
+					check : function(thiz, newValue, oldValue) {
+						// alert("3");
+						// checkOurListRefresh();
+					}
+				}
+			} ]
+		}, {
+			// columnWidth : .10,
+			width : 90,
+			layout : 'form',
+			labelWidth : 0,
+			labelSeparator : '',
+			hideLabels : true,
+			border : false,
+			items : [ {
+				xtype : 'radio',
+				// fieldLabel : '',
+				boxLabel : '签单',
+				name : 'payManner',
+				inputValue : 'signPay',
+				anchor : '95%',
+				listeners : {
+					check : function(thiz, newValue, oldValue) {
+						// alert("3");
+						// checkOurListRefresh();
+					}
+				}
+			} ]
+		} ]
+	}, {
+		layout : "column",
+		// height:1,
+		border : false,
+		items : [ {
+			layout : "form",
+			border : false,
+			labelSeparator : '：',
+			labelWidth : 80,
+			width : 1000,
+			items : [ {
+				xtype : "textfield",
+				fieldLabel : "备注",
+				id : "remark",
+				anchor : "%99"
+			} ]
+		} ]
+	} ]
+});
+
 Ext
 		.onReady(function() {
 			// 解决ext中文传入后台变问号问题
 			Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
 			Ext.QuickTips.init();
 
-			// *************整体布局*************
+			// *************整体布局************
+
+			var northPanelDO = new Ext.Panel({
+				id : "northPanelDO",
+				region : "north",
+				border : false,
+				// margins : "0 5 0 0",
+				// height : 115,
+				height : 215,
+				layout : "fit",
+				items : billGenModForm
+			});
+
 			var centerPanelDO = new Ext.Panel({
 				id : "centerPanelDO",
 				region : "center",
 				border : false,
-				margins : "0 5 0 0",
+				// margins : "0 5 0 0",
 				layout : "border",
 				items : [ dishesOrderCenterPanel, dishesOrderEastPanel,
-						dishesOrderNorthPanel ]
+						northPanelDO ]
+			});
+
+			var billModCenterPanel = new Ext.Panel({
+				id : "billModCenterPanel",
+				region : "center",
+				border : false,
+				margins : "0 5 0 0",
+				layout : "border",
+				items : [ centerPanelDO, dishesOrderNorthPanel ]
 			});
 
 			var viewport = new Ext.Viewport(
@@ -1252,7 +1572,7 @@ Ext
 									height : 50,
 									margins : "0 0 5 0"
 								},
-								centerPanelDO,
+								billModCenterPanel,
 								{
 									region : "south",
 									height : 30,

@@ -20,7 +20,7 @@
 			+ "&minCost=" + minCost + "&orderID=" + orderID + "&give=" + give
 			+ "&payType=" + payType + "&discountType=" + discountType
 			+ "&payManner=" + payManner + "&serviceRate=" + serviceRate
-			+ "&memberID=" + memberID + "&comment=" + comment;
+			+ "&memberID=" + memberID ;
 };
 
 var modifyBillBut = new Ext.ux.ImageButton({
@@ -95,7 +95,8 @@ var pushBackBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "返回",
 	handler : function(btn) {
-		location.href = "PersonLogin.html?restaurantID=" + restaurantID;
+		location.href = "PersonLogin.html?restaurantID=" + restaurantID
+				+ "&isNewAccess=false&pin=" + pin;
 	}
 });
 
@@ -238,6 +239,14 @@ Ext
 				}
 			});
 
+			var billSum = new Ext.Panel({
+				region : "south",
+				frame : true,
+				border : false,
+				height : 40,
+				contentEl : "billSum"
+			});
+
 			var centerPanel = new Ext.Panel({
 				region : "center",
 				layout : "fit",
@@ -245,7 +254,7 @@ Ext
 				items : [ {
 					layout : "border",
 					title : "<div style='font-size:20px;'>帐单信息<div>",
-					items : [ billsQueryCondPanel, billsGrid ]
+					items : [ billsQueryCondPanel, billsGrid, billSum ]
 				} ],
 				tbar : new Ext.Toolbar({
 					height : 55,

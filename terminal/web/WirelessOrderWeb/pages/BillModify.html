@@ -29,6 +29,13 @@
 <script type="text/javascript" src="../js/components/md5.js"></script>
 <script type="text/javascript" src="../js/components/functionLib.js"></script>
 
+<script type="text/javascript">
+	// 解决combobox图标异常问题
+	Ext.onReady(function() {
+		Ext.BLANK_IMAGE_URL = "../extjs/resources/images/default/s.gif";
+	});
+</script>
+
 <!-- css -->
 <link rel="stylesheet" type="text/css" href="../css/header.css" />
 <link rel="stylesheet" type="text/css" href="../css/tableStatus.css" />
@@ -51,16 +58,19 @@
 	var dishesDisplayDataShow = []; // all dishes display data for show in page
 	var dishTasteData = [];
 	var kitchenData = [];
-	
+	var discountData = [];
+
 	var softKBRelateItemId = ""; // soft keyboard relate item id
 	var dishesCount = -1; // the dish count user input, in order to keep the same between tabs
 	var category = Request["category"];
 
 	var orderIsChanged = false; // if the order is changed
 
-
+	var billComment = "";
 </script>
 
+<script type="text/javascript"
+	src="../js/animation/bills/billsFuncLib.js"></script>
 <script type="text/javascript"
 	src="../js/animation/bills/billModifyLoad.js"></script>
 <script type="text/javascript"

@@ -1,4 +1,84 @@
-﻿Ext
+﻿// ******************************************************************************************************
+
+var billVerifyWin = new Ext.Window({
+	layout : "fit",
+	width : 200,
+	height : 100,
+	closeAction : "hide",
+	resizable : false,
+	items : [ {
+		layout : "form",
+		labelWidth : 30,
+		border : false,
+		frame : true,
+		items : [ {
+			xtype : "textfield",
+			inputType : "password",
+			fieldLabel : "密码",
+			id : "billVerifyPwd",
+			width : 110
+		} ]
+	} ],
+	buttons : [
+			{
+				text : "确定",
+				handler : function() {
+					var billVerifyPwd = billVerifyWin.findById("billVerifyPwd")
+							.getValue();
+					billVerifyWin.findById("billVerifyPwd").setValue("");
+
+					var pwdTrans;
+					if (billVerifyPwd != "") {
+						pwdTrans = MD5(billVerifyPwd);
+					} else {
+						pwdTrans = billVerifyPwd;
+					}
+
+					billVerifyWin.hide();
+					billVerifyWin.findById("billVerifyPwd").setValue("");
+
+					Ext.Ajax.request({
+						url : "../VerifyPwd.do",
+						params : {
+							"pin" : currPin,
+							"type" : "2",
+							"pwd" : pwdTrans
+						},
+						success : function(response, options) {
+							var resultJSON = Ext.util.JSON
+									.decode(response.responseText);
+							if (resultJSON.success == true) {
+								location.href = "Bills.html?restaurantID="
+										+ restaurantID + "&pin=" + currPin;
+							} else {
+								Ext.MessageBox.show({
+									msg : resultJSON.data,
+									width : 300,
+									buttons : Ext.MessageBox.OK
+								});
+							}
+						},
+						failure : function(response, options) {
+						}
+					});
+				}
+			}, {
+				text : "取消",
+				handler : function() {
+					billVerifyWin.hide();
+					billVerifyWin.findById("billVerifyPwd").setValue("");
+				}
+			} ],
+	listeners : {
+		show : function(thiz) {
+			// thiz.findById("personCountInput").focus();
+			var f = Ext.get("billVerifyPwd");
+			f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
+		}
+	}
+});
+
+Ext
 		.onReady(function() {
 			// 解决ext中文传入后台变问号问题
 			Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
@@ -72,7 +152,7 @@
 											var passwordInput = staffForm
 													.findById("empPassword")
 													.getValue();
-											
+
 											var pwdTrans;
 											if (passwordInput != "") {
 												pwdTrans = MD5(passwordInput);
@@ -89,6 +169,9 @@
 												currPin = pin;
 												isVerified = true;
 												personLoginWin.hide();
+												personLoginWin.findById(
+														"empPassword")
+														.setValue("");
 											} else {
 												isVerified = false;
 												Ext.MessageBox.show({
@@ -118,6 +201,8 @@
 				items : staffForm
 			});
 
+			// ******************************************************************************************************
+
 			var centerPanel = new Ext.Panel({
 				region : "center",
 				frame : true,
@@ -134,7 +219,14 @@
 						items : [
 								{
 									region : "north",
-									html : "<div style='padding:10px; background-color:#A9D0F5'><h4 style='font-size:150%'>无线点餐网页终端<h4></div>",
+									// html : "<div style='padding:10px;
+									// background-color:#A9D0F5'><h4
+									// style='font-size:150%'>无线点餐网页终端<h4><div
+									// style='float:right;background:
+									// url(../images/UserLogout.png) no-repeat
+									// 50%;'></div></div>",
+									bodyStyle : "background-color:#A9D0F5",
+									html : "<h4 style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4><div style='float:right;width:50px;height:50px;background:url(../images/UserLogout.png) no-repeat 50%;'></div>",
 									height : 50,
 									margins : '0 0 5 0'
 								},
