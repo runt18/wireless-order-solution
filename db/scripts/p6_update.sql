@@ -14,7 +14,7 @@ ALTER TABLE `wireless_order_db`.`order_history` ADD COLUMN `discount_type` TINYI
 -- -----------------------------------------------------
 -- Add the `taste_id2` and `taste_id3` to `order_food_history`
 -- -----------------------------------------------------
-ALTER TABLE `wireless_order_db`.`order_food_history` ADD COLUMN `taste_id2` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the 2nd taste id to this order food record'  AFTER `taste` , ADD COLUMN `taste_id3` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the 3rd taste id to this order food record'  AFTER `taste_id2` ;
+ALTER TABLE `wireless_order_db`.`order_food_history` ADD COLUMN `taste_id2` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the 2nd taste id to this order food record'  AFTER `taste_id` , ADD COLUMN `taste_id3` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the 3rd taste id to this order food record'  AFTER `taste_id2` ;
 
 -- -----------------------------------------------------
 -- View`order_food_history_view`
