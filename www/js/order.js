@@ -429,8 +429,8 @@ function showOrderStat(statType, dateFrom, dateTo,viewType) {
         var dt = dateTo.substring(0, dateTo.lastIndexOf("-"));
         if (dateFrom != "" && dateTo != "") {
             title += "（" + df + "~" + dt + "）";
-            dateFrom = df + "-1";
-            dateTo = dt + "-31";
+            dateFrom = df + "-1 0:0:0";
+            dateTo = dt + "-31 23:59:59";
         }
         else if (dateFrom != "" && dateTo == "") {
             title += "（" + df + "之后）";
