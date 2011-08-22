@@ -239,7 +239,7 @@ if($sta_value != 0) {
 	$sql .= " AND f.status & $sta_value != 0" ;
 }
 
-echo $sql;
+//echo $sql;
 
 $bh=0;
 mysql_query("SET NAMES utf8");
