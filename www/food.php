@@ -236,7 +236,7 @@ if ($present_q == 'on') {
 }
 
 if($sta_value != 0) {
-	$sql .= " AND f.status & $sta_value != 0" ;
+	$sql .= " AND f.status & $sta_value = $sta_value" ;
 }
 
 //echo $sql;
