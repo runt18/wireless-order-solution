@@ -115,7 +115,7 @@ public class PayOrder {
 		 * The formula is as below.
 		 * balance = balance - actualPrice + actualPrice * exchange_rate
 		 */
-		if(orderInfo.pay_type == Order.PAY_MEMBER && orderInfo.pay_manner == Order.MANNER_MEMBER){
+		if(orderInfo.pay_type == Order.PAY_MEMBER && orderInfo.pay_manner == Order.MANNER_MEMBER && orderInfo.member_id != null){
 			sql = "UPDATE " + Params.dbName + ".member SET balance=balance - " + totalPrice2 +
 				  " + " + totalPrice2 + " * exchange_rate" + 
 				  " WHERE restaurant_id=" + orderInfo.restaurant_id +
@@ -168,7 +168,7 @@ public class PayOrder {
 		}
 			
 		/**
-		 * Delete the table in the case of "å¹¶å�°" and "å¤–å�–",
+		 * Delete the table in the case of "并台" or "外卖",
 		 * since the table to these order is temporary. 
 		 */
 		if(orderInfo.category == Order.CATE_JOIN_TABLE || orderInfo.category == Order.CATE_TAKE_OUT){
