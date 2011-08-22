@@ -37,7 +37,7 @@ public class PayOrder {
 			Table table = QueryTable.exec(dbCon, pin, model, orderToPay.table_id);
 			orderToPay.id = Util.getUnPaidOrderID(dbCon, table);
 			
-			return execByID(dbCon, pin, model, orderToPay, false);			
+			return execByID(dbCon, pin, model, orderToPay);			
 			
 		}finally{
 			dbCon.disconnect();
@@ -50,7 +50,6 @@ public class PayOrder {
 	 * @param model the model to this terminal
 	 * @param orderToPay the pay order information along with the order ID, payment and discount type 				     
 	 * 					 refer to the class "ReqPayOrder" for more details on what information it contains.
-	 * @param incDiscount indicate whether the pay order information comprises the discount
 	 * @return Order completed pay order information to paid order
 	 * @throws BusinessException throws if one of the cases below.<br>
 	 * 							 - The terminal is NOT attached to any restaurant.<br>
@@ -58,11 +57,11 @@ public class PayOrder {
 	 * 							 - The order to query does NOT exist.
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Order execByID(int pin, short model, Order orderToPay, boolean incDiscount) throws BusinessException, SQLException{
+	public static Order execByID(int pin, short model, Order orderToPay) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return execByID(dbCon, pin, model, orderToPay, incDiscount);
+			return execByID(dbCon, pin, model, orderToPay);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -76,7 +75,6 @@ public class PayOrder {
 	 * @param model the model to this terminal
 	 * @param orderToPay the pay order information along with the order ID, payment and discount, 				     
 	 * 					 refer to the class "ReqPayOrder" for more details on what information it contains.
-	 * @param incDiscount indicate whether the pay order information comprises the discount
 	 * @return Order completed pay order information to paid order
 	 * @throws BusinessException throws if one of the cases below.<br>
 	 * 							 - The terminal is NOT attached to any restaurant.<br>
@@ -84,12 +82,12 @@ public class PayOrder {
 	 * 							 - The order to query does NOT exist.
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Order execByID(DBCon dbCon, int pin, short model, Order orderToPay, boolean incDiscount) throws BusinessException, SQLException{
+	public static Order execByID(DBCon dbCon, int pin, short model, Order orderToPay) throws BusinessException, SQLException{
 		
 		/**
 		 * Get the completed order information.
 		 */			
-		Order orderInfo = queryOrderByID(dbCon, pin, model, orderToPay, incDiscount); 
+		Order orderInfo = queryOrderByID(dbCon, pin, model, orderToPay); 
 			
 		float totalPrice = orderInfo.getTotalPrice().floatValue();
 		float totalPrice2 = orderInfo.getActualPrice().floatValue();
@@ -203,7 +201,7 @@ public class PayOrder {
 			Table table = QueryTable.exec(dbCon, pin, model, orderToPay.table_id);
 			orderToPay.id = Util.getUnPaidOrderID(dbCon, table);
 			
-			return queryOrderByID(dbCon, pin, model, orderToPay, false);
+			return queryOrderByID(dbCon, pin, model, orderToPay);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -217,7 +215,6 @@ public class PayOrder {
 	 * @param model the model to this terminal
 	 * @param orderToPay the pay order information along with order ID, payment and discount type,
 	 * 					 refer to the class "ReqPayOrder" for more details on what information it contains.
-	 * @param incDiscount indicate whether the pay order information comprises the discount
 	 * @return Order completed pay order information to paid order
 	 * @throws BusinessException throws if one of the cases below.<br>
 	 * 							 - The terminal is NOT attached to any restaurant.<br>
@@ -225,11 +222,11 @@ public class PayOrder {
 	 * 							 - The order to query does NOT exist.
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Order queryOrderByID(int pin, short model, Order orderToPay, boolean incDiscount) throws BusinessException, SQLException{
+	public static Order queryOrderByID(int pin, short model, Order orderToPay) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return queryOrderByID(dbCon, pin, model, orderToPay, incDiscount);
+			return queryOrderByID(dbCon, pin, model, orderToPay);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -244,7 +241,6 @@ public class PayOrder {
 	 * @param model the model to this terminal
 	 * @param orderToPay the pay order information along with order ID, payment and discount type,
 	 * 					 refer to the class "ReqPayOrder" for more details on what information it contains.
-	 * @param incDiscount indicate whether the pay order information comprises the discount
 	 * @return Order completed pay order information to paid order
 	 * @throws BusinessException throws if one of the cases below.<br>
 	 * 							 - The terminal is NOT attached to any restaurant.<br>
@@ -252,7 +248,7 @@ public class PayOrder {
 	 * 							 - The order to query does NOT exist.
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Order queryOrderByID(DBCon dbCon, int pin, short model, Order orderToPay, boolean incDiscount) throws BusinessException, SQLException{
+	public static Order queryOrderByID(DBCon dbCon, int pin, short model, Order orderToPay) throws BusinessException, SQLException{
 		
 		Order orderInfo = QueryOrder.execByID(dbCon, pin, model, orderToPay.id);
 		
@@ -260,7 +256,7 @@ public class PayOrder {
 		 * If the pay order formation does NOT comprise the discount,
 		 * get the discount according the pay type and manner.
 		 */
-		if(!incDiscount){
+		//if(!incDiscount){
 			String discount = "discount";
 			if(orderToPay.pay_type == Order.PAY_NORMAL && orderToPay.discount_type == Order.DISCOUNT_1){
 				discount = "discount";
@@ -311,7 +307,7 @@ public class PayOrder {
 					dbCon.rs.close();				
 				}
 			}
-		}
+		//}
 		
 		/**
 		 * Calculate the total price of this order(exclude the gifted foods) as below.
