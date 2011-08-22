@@ -7,6 +7,7 @@ import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Member;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.Table;
+import com.wireless.protocol.Terminal;
 
 public class PayOrder {
 	/**
@@ -36,6 +37,7 @@ public class PayOrder {
 			 */		
 			Table table = QueryTable.exec(dbCon, pin, model, orderToPay.table_id);
 			orderToPay.id = Util.getUnPaidOrderID(dbCon, table);
+			orderToPay.restaurant_id = table.restaurant_id;
 			
 			return execByID(dbCon, pin, model, orderToPay);			
 			
@@ -61,6 +63,8 @@ public class PayOrder {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
+			Terminal term = VerifyPin.exec(dbCon, pin, model);
+			orderToPay.restaurant_id = term.restaurant_id;
 			return execByID(dbCon, pin, model, orderToPay);
 		}finally{
 			dbCon.disconnect();
@@ -96,8 +100,12 @@ public class PayOrder {
 		 * Get the member info if the pay type for member
 		 */
 		Member member = null;
-		if(orderInfo.pay_type == Order.PAY_MEMBER && orderInfo.member_id != null){
-			member = QueryMember.exec(dbCon, orderInfo.restaurant_id, orderInfo.member_id);
+		if(orderInfo.pay_type == Order.PAY_MEMBER){
+			if(orderInfo.member_id != null){
+				member = QueryMember.exec(dbCon, orderInfo.restaurant_id, orderInfo.member_id);
+			}else{
+				member = new Member("", "", "", new Float(0));
+			}
 		}
 			
 		dbCon.stmt.clearBatch();
@@ -142,7 +150,7 @@ public class PayOrder {
 			  ", service_rate=" + ((float)orderInfo.service_rate / 100) +
 		   	  ", order_date=NOW()" + 
 			  (orderInfo.comment != null ? ", comment='" + orderInfo.comment + "'" : "") +
-			  (member != null ? ", member_id=" + member.alias_id + ", member='" + member.name + "'" : "") + 
+			  (member != null ? ", member_id='" + member.alias_id + "', member='" + member.name + "'" : ", member_id=NULL, member=NULL") + 
 			  " WHERE id=" + orderInfo.id;
 			
 		dbCon.stmt.addBatch(sql);
@@ -200,6 +208,7 @@ public class PayOrder {
 			 */
 			Table table = QueryTable.exec(dbCon, pin, model, orderToPay.table_id);
 			orderToPay.id = Util.getUnPaidOrderID(dbCon, table);
+			orderToPay.restaurant_id = table.restaurant_id;
 			
 			return queryOrderByID(dbCon, pin, model, orderToPay);
 		}finally{
@@ -267,7 +276,7 @@ public class PayOrder {
 			}else if(orderToPay.pay_type == Order.PAY_NORMAL && orderToPay.discount_type == Order.DISCOUNT_3){
 				discount = "discount_3";
 				
-			}else if(orderToPay.pay_type == Order.PAY_MEMBER){
+			}else if(orderToPay.pay_type == Order.PAY_MEMBER && orderToPay.member_id != null){
 				//validate the member id
 				String sql = "SELECT id FROM " + Params.dbName + 
 							 ".member WHERE restaurant_id=" + orderToPay.restaurant_id + 
@@ -283,6 +292,15 @@ public class PayOrder {
 					}
 				}else{
 					throw new BusinessException("The member id(" + orderToPay.member_id + ") is invalid.", ErrorCode.MEMBER_NOT_EXIST);
+				}
+				
+			}else if(orderToPay.pay_type == Order.PAY_MEMBER && orderToPay.member_id == null){
+				if(orderToPay.discount_type == Order.DISCOUNT_1){
+					discount = "member_discount_1";
+				}else if(orderToPay.discount_type == Order.DISCOUNT_2){
+					discount = "member_discount_2";
+				}else if(orderToPay.discount_type == Order.DISCOUNT_3){
+					discount = "member_discount_3";
 				}
 			}
 				
