@@ -101,9 +101,9 @@ public class UpdateOrderAction2 extends Action{
 			/**
 			 * Get the member id if the pay type is "会员"
 			 */
-			if(orderToUpdate.pay_type == Order.PAY_MEMBER){
-				orderToUpdate.member_id = request.getParameter("memberID");
-			}
+			//if(orderToUpdate.pay_type == Order.PAY_MEMBER){
+			//	orderToUpdate.member_id = request.getParameter("memberID");
+			//}
 			/**
 			 * Get the first 20 characters of the comment
 			 */
