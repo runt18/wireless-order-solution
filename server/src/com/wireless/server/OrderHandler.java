@@ -191,7 +191,7 @@ class OrderHandler extends Handler implements Runnable{
 				//handle the pay order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.PAY_ORDER){
 				Order orderToPay = ReqParser.parsePayOrder(request);
-				orderToPay.restaurant_id = _term.restaurant_id;
+				//orderToPay.restaurant_id = _term.restaurant_id;
 				/**
 				 * If pay order temporary, just only print the temporary receipt.
 				 * Otherwise perform the pay action and print receipt 
