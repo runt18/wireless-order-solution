@@ -324,7 +324,7 @@ static unsigned _stdcall StartPrinterProc(LPVOID pvParam){
 		TiXmlDeclaration* pDecl = new TiXmlDeclaration( "1.0", "", "" );
 		TiXmlElement* pRoot = new TiXmlElement(ConfTags::CONF_ROOT);
 		TiXmlElement* pRemote = new TiXmlElement(ConfTags::REMOTE);
-		pRemote->SetAttribute(ConfTags::REMOTE_IP, "58.248.9.158");
+		pRemote->SetAttribute(ConfTags::REMOTE_IP, "122.115.57.66");
 		pRemote->SetAttribute(ConfTags::REMOTE_PORT, "44444");
 		pRemote->SetAttribute(ConfTags::ACCOUNT, "");
 		pRemote->SetAttribute(ConfTags::PWD, "");
