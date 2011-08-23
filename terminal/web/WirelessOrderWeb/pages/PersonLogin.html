@@ -30,6 +30,9 @@
 <script type="text/javascript" src="../js/components/md5.js"></script>
 <script type="text/javascript" src="../js/components/functionLib.js"></script>
 
+<!-- css -->
+<link rel="stylesheet" type="text/css" href="../css/header.css" />
+
 <script type="text/javascript">
 	// 解决combobox图标异常问题
 	Ext.onReady(function() {
@@ -46,7 +49,6 @@
 	var emplStore = null;
 
 	var isVerified = false;
-	var currPin = "";
 
 	var Request = new URLParaQuery();
 	var isNewAccess;
@@ -54,6 +56,13 @@
 		isNewAccess = true;
 	} else {
 		isNewAccess = false;
+	}
+
+	var currPin;
+	if (Request["pin"] == undefined) {
+		currPin = "";
+	} else {
+		currPin = Request["pin"];
 	}
 </script>
 

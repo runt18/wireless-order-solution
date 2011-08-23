@@ -38,6 +38,9 @@
 
 						// 4,mark the menber id
 						actualMemberID = memberNbr;
+						
+						// 5,refresh the general bill info
+						checkOurListRefresh();
 					} else {
 						var dataInfo = resultJSON.data;
 						Ext.MessageBox.show({

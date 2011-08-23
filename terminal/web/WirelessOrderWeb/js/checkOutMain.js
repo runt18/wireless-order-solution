@@ -180,7 +180,7 @@ var memberNbrInputWin = new Ext.Window({
 					if (memberNbr != "") {
 
 						getMemberInfo(memberNbr);
-						checkOurListRefresh();
+						//checkOurListRefresh();
 						checkOutForm.buttons[2].show();
 
 					}

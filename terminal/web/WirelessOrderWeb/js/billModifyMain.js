@@ -95,91 +95,6 @@ function dishOptTasteHandler(rowIndex) {
 	}
 };
 
-// var dishPushBackWin = new Ext.Window({
-// layout : "fit",
-// width : 200,
-// height : 100,
-// closeAction : "hide",
-// resizable : false,
-// items : [ {
-// layout : "form",
-// labelWidth : 30,
-// border : false,
-// frame : true,
-// items : [ {
-// xtype : "textfield",
-// inputType : "password",
-// fieldLabel : "密码",
-// id : "dishPushBackPwd",
-// width : 110
-// } ]
-// } ],
-// buttons : [
-// {
-// text : "确定",
-// handler : function() {
-// var dishPushBackPwd = dishPushBackWin.findById(
-// "dishPushBackPwd").getValue();
-// dishPushBackWin.findById("dishPushBackPwd").setValue("");
-//
-// var pwdTrans;
-// if (dishPushBackPwd != "") {
-// pwdTrans = MD5(dishPushBackPwd);
-// } else {
-// pwdTrans = dishPushBackPwd;
-// }
-//
-// dishPushBackWin.hide();
-//
-// Ext.Ajax.request({
-// url : "../VerifyPwd.do",
-// params : {
-// "pin" : Request["pin"],
-// "type" : "2",
-// "pwd" : pwdTrans
-// },
-// success : function(response, options) {
-// var resultJSON = Ext.util.JSON
-// .decode(response.responseText);
-// if (resultJSON.success == true) {
-// orderedData.splice(dishOrderCurrRowIndex_, 1);
-// orderedStore.reload();
-// orderIsChanged = true;
-// dishOrderCurrRowIndex_ = -1;
-//
-// Ext.MessageBox.show({
-// msg : resultJSON.data,
-// width : 300,
-// buttons : Ext.MessageBox.OK
-// });
-// } else {
-// Ext.MessageBox.show({
-// msg : resultJSON.data,
-// width : 300,
-// buttons : Ext.MessageBox.OK
-// });
-// }
-// },
-// failure : function(response, options) {
-// }
-// });
-// }
-// }, {
-// text : "取消",
-// handler : function() {
-// dishPushBackWin.hide();
-// dishPushBackWin.findById("dishPushBackPwd").setValue("");
-// }
-// } ],
-// listeners : {
-// show : function(thiz) {
-// // thiz.findById("personCountInput").focus();
-// var f = Ext.get("dishPushBackPwd");
-// f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
-// }
-// }
-// });
-
 function dishOptDeleteHandler(rowIndex) {
 
 	if (dishOrderCurrRowIndex_ != -1) {
@@ -340,33 +255,6 @@ var countEqualImgBut = new Ext.ux.ImageButton({
 	}
 });
 
-// var printDetailImgBut = new Ext.ux.ImageButton({
-// imgPath : "../images/PrintDetail.png",
-// imgWidth : 50,
-// imgHeight : 50,
-// tooltip : "补打明细",
-// handler : function(btn) {
-// Ext.Ajax.request({
-// url : "../PrintOrder.do",
-// params : {
-// "pin" : Request["pin"],
-// "tableID" : Request["tableNbr"],
-// "printDetail" : 1
-// },
-// success : function(response, options) {
-// var resultJSON = Ext.util.JSON.decode(response.responseText);
-// Ext.MessageBox.show({
-// msg : resultJSON.data,
-// width : 300,
-// buttons : Ext.MessageBox.OK
-// });
-// },
-// failure : function(response, options) {
-// }
-// });
-// }
-// });
-
 var orderedGrid = new Ext.grid.EditorGridPanel({
 	title : "已点菜式",
 	xtype : "grid",
@@ -500,7 +388,7 @@ var orderedForm = new Ext.form.FormPanel(
 
 								var commentOut = billGenModForm.findById(
 										"remark").getValue();
-								
+
 								var memberIDOut = Request["memberID"] + "";
 
 								Ext.Ajax
@@ -992,6 +880,9 @@ var dishesDisplayGrid = new Ext.grid.GridPanel({
 				orderedStore.reload();
 				dishOrderCurrRowIndex_ = -1;
 				orderIsChanged = true;
+
+				// refresh the discount rate
+				billListRefresh();
 			} else {
 				Ext.MessageBox.show({
 					msg : "该菜品已售完！",
@@ -1211,7 +1102,7 @@ var dishesDisplayTabPanel = new Ext.TabPanel({
 						dishesDisplayData[i][1], dishesDisplayData[i][2],
 						dishesDisplayData[i][3], dishesDisplayData[i][4],
 						dishesDisplayData[i][5], dishesDisplayData[i][6],
-						dishesDisplayData[i][7] ]);
+						dishesDisplayData[i][7], dishesDisplayData[i][8] ]);
 			}
 			dishesDisplayStore.reload();
 		}
@@ -1269,17 +1160,7 @@ var discountKindComb = new Ext.form.ComboBox({
 	allowBlank : false,
 	listeners : {
 		select : function(combo, record, index) {
-			// if (record.get("text") == "一般") {
-			// // set the memeber card balance to -1;
-			// mBalance = -1;
-			// checkOurListRefresh();
-			// checkOutForm.buttons[2].hide();
-			// // hide the member info
-			// checkOutForm.findById("memberInfoPanel").hide();
-			// } else {
-			// memberNbrInputWin.show();
-			// }
-
+			billListRefresh();
 		}
 	}
 });
@@ -1535,8 +1416,8 @@ Ext
 				region : "north",
 				border : false,
 				// margins : "0 5 0 0",
-				 height : 115,
-				//height : 215,
+				// height : 115,
+				height : 215,
 				layout : "fit",
 				items : billGenModForm
 			});

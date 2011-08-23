@@ -167,6 +167,7 @@ Ext
 												// + "&restaurantID="
 												// + restaurantID;
 												currPin = pin;
+												getOperatorName(currPin);
 												isVerified = true;
 												personLoginWin.hide();
 												personLoginWin.findById(
@@ -226,7 +227,11 @@ Ext
 									// url(../images/UserLogout.png) no-repeat
 									// 50%;'></div></div>",
 									bodyStyle : "background-color:#A9D0F5",
-									html : "<h4 style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4><div style='float:right;width:50px;height:50px;background:url(../images/UserLogout.png) no-repeat 50%;'></div>",
+									// html : "<h4
+									// style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4><div
+									// style='float:right;width:50px;height:50px;background:url(../images/UserLogout.png)
+									// no-repeat 50%;'></div>",
+									html : "<h4 style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4><div id='optName' class='optName'></div>",
 									height : 50,
 									margins : '0 0 5 0'
 								},

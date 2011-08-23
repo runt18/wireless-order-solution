@@ -474,8 +474,12 @@ function moneyCount(opt) {
 
 		// “找零”计算
 		if (actualPay != "" && actualPay != "0.00") {
-			change_out = (parseFloat(actualPay) - parseFloat(shouldPay_out))
-					.toFixed(2);
+			if (opt == "button") {
+				change_out = (parseFloat(actualPay) - parseFloat(shouldPay_out))
+						.toFixed(2);
+			} else {
+				change_out = "0.00";
+			}
 		}
 
 		document.getElementById("totalCount").innerHTML = totalCount_out;

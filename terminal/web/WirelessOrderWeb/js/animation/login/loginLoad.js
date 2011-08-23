@@ -62,6 +62,11 @@ function loginOnLoad() {
 		}
 	});
 
+	// update the operator name
+	if (currPin != "") {
+		getOperatorName(currPin);
+	}
+
 	// mouse over & mouse off -- heightlight the icon
 	$("#order")
 			.each(

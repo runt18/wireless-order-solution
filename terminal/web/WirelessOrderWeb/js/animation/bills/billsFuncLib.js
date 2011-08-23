@@ -141,7 +141,12 @@ var billListRefresh = function() {
 				discountRate = discountData[j][discountIndex];
 			}
 		}
-		orderedData[i][13] = discountRate;
+		//alert(orderedData[i][12]);
+		if (orderedData[i][9] == "true" || orderedData[i][12] == "true") {
+			orderedData[i][13] = "1.0";
+		} else {
+			orderedData[i][13] = discountRate;
+		}
 	}
 	orderedStore.reload();
 };

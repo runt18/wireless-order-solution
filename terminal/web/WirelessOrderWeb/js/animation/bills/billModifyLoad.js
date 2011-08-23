@@ -10,7 +10,7 @@ var dishKeyboardSelect = function(relateItemId) {
 						dishesDisplayData[i][1], dishesDisplayData[i][2],
 						dishesDisplayData[i][3], dishesDisplayData[i][4],
 						dishesDisplayData[i][5], dishesDisplayData[i][6],
-						dishesDisplayData[i][7] ]);
+						dishesDisplayData[i][7], dishesDisplayData[i][8] ]);
 			}
 		} else {
 			dishesDisplayDataShow.length = 0;
@@ -21,7 +21,7 @@ var dishKeyboardSelect = function(relateItemId) {
 							dishesDisplayData[i][1], dishesDisplayData[i][2],
 							dishesDisplayData[i][3], dishesDisplayData[i][4],
 							dishesDisplayData[i][5], dishesDisplayData[i][6],
-							dishesDisplayData[i][7] ]);
+							dishesDisplayData[i][7], dishesDisplayData[i][8] ]);
 				}
 			}
 		}
@@ -60,7 +60,8 @@ function billModifyOnLoad() {
 										dishesDisplayData[i][4],
 										dishesDisplayData[i][5],
 										dishesDisplayData[i][6],
-										dishesDisplayData[i][7] ]);
+										dishesDisplayData[i][7],
+										dishesDisplayData[i][8] ]);
 							}
 						} else {
 							dishesDisplayDataShow.length = 0;
@@ -75,7 +76,8 @@ function billModifyOnLoad() {
 											dishesDisplayData[i][4],
 											dishesDisplayData[i][5],
 											dishesDisplayData[i][6],
-											dishesDisplayData[i][7] ]);
+											dishesDisplayData[i][7],
+											dishesDisplayData[i][8] ]);
 								}
 							}
 						}
@@ -388,7 +390,8 @@ function orderedMenuOnLoad() {
 									dishesDisplayData[i][4],
 									dishesDisplayData[i][5],
 									dishesDisplayData[i][6],
-									dishesDisplayData[i][7] ]);
+									dishesDisplayData[i][7],
+									dishesDisplayData[i][8] ]);
 						}
 						dishesDisplayStore.reload();
 					}

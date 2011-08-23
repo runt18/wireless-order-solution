@@ -12,20 +12,15 @@
 						});
 			});
 
-	$("#system")
-			.each(
-					function() {
-						$(this)
-								.bind(
-										"click",
-										function() {
-											if (currPin != "") {
-												// can not go back
-//												location.href = "SystemConfig.html?restaurantID="
-//														+ restaurantID;
-											}
-										});
-					});
+	$("#system").each(function() {
+		$(this).bind("click", function() {
+			if (currPin != "") {
+				// can not go back
+				// location.href = "SystemConfig.html?restaurantID="
+				// + restaurantID;
+			}
+		});
+	});
 
 	$("#bill").each(function() {
 		$(this).bind("click", function() {
@@ -40,6 +35,7 @@
 	$("#logout").each(function() {
 		$(this).bind("click", function() {
 			currPin = "";
+			document.getElementById("optName").innerHTML = "";
 			isVerified = false;
 			personLoginWin.show();
 		});
