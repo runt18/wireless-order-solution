@@ -17,6 +17,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.tiling.scheduling.DailyIterator;
+import org.tiling.scheduling.MonthlyIterator;
 import org.tiling.scheduling.Scheduler;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -26,6 +27,7 @@ import org.xml.sax.SAXException;
 import com.wireless.db.Params;
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.task.DailySettlementTask;
+import com.wireless.task.SweepDBTask;
 import com.wireless.task.SweepPrtConTask;
 
 public class WirelessSocketServer {
@@ -203,9 +205,6 @@ public class WirelessSocketServer {
 				printerLoginHandler = new PrinterLoginHandler();
 				new Thread(printerLoginHandler).start();
 				
-				//FIX ME!!!
-				//Just cancel the sweep db temporary
-				/*
 				//start to schedule the sweep db task
 				scheDBTask = new Scheduler();
 				//parse the time to run sweep db task from configuration file
@@ -227,14 +226,14 @@ public class WirelessSocketServer {
 					pos1 = pos2 + 1;
 					int second = Integer.parseInt(time.substring(pos1));
 					//schedule the sweep db task
-					scheDBTask.schedule(new SweepDBTask(url, database, user, password), 
+					scheDBTask.schedule(new SweepDBTask(), 
 										new MonthlyIterator(dayOfMonth, hourOfDay, minute, second));
 				}else{
 					//schedule the sweeper task on 15th 2:00am every month if not specified in conf.xml 
-					scheDBTask.schedule(new SweepDBTask(url, database, user, password), 
+					scheDBTask.schedule(new SweepDBTask(), 
 										new MonthlyIterator(15, 2, 0, 0));
 				}
-				*/
+				
 				
 				//start to schedule the daily settlement task
 				scheDailySettlement = new Scheduler();
