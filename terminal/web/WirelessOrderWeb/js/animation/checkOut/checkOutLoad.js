@@ -20,8 +20,9 @@ function checkOutOnLoad() {
 	}
 
 	// 2,get the ordered dishes and discount
-	// checkOutData [ 厨房编号,"菜名", "口味", 数量, "单价",特,荐,停,送 ]
-	// 后台已点菜式 ["菜名",菜名编号,厨房编号,"口味",口味编号,数量,单价,特,荐,停,送]
+	// checkOutData [ 厨房编号,"菜名", "口味", 数量, "实价",特,荐,停,送 ,口味价钱,单价]
+	// 后台已点菜式
+	// ["菜名",菜名编号,厨房编号,"口味",口味编号,数量,单价,是否特价,是否推荐,是否停售,是否赠送,折扣率,口味编号2,口味编号3,口味价钱]
 	// discountData [厨房编号,一般折扣1,一般折扣2,一般折扣3,会员折扣1,会员折扣2,会员折扣3]
 	// 后台折扣率 [厨房编号,"厨房名称",一般折扣1,一般折扣2,一般折扣3,会员折扣1,会员折扣2,会员折扣3]
 	// checkOutDataDisplay ["菜名", "口味", 数量, "单价" ,"折扣率","实价",特,荐,停,送]
@@ -43,15 +44,25 @@ function checkOutOnLoad() {
 
 							var orderInfo = orderList[i].substr(1,
 									orderList[i].length - 2).split(",");
+							// 实价 = 单价 + 口味价钱
+							var singlePrice = parseFloat(orderInfo[6].substr(2,
+									orderInfo[6].length - 3));
+							var tastePrice = parseFloat(orderInfo[14].substr(2,
+									orderInfo[14].length - 3));
+							var acturalPrice = 0.0;
+							acturalPrice = singlePrice + tastePrice;
+							acturalPrice = "￥" + acturalPrice.toFixed(2);
 							checkOutData.push([ orderInfo[2],// 厨房编号
 							orderInfo[0].substr(1, orderInfo[0].length - 2), // 菜名
 							orderInfo[3].substr(1, orderInfo[3].length - 2),// 口味
 							orderInfo[5],// 数量
-							orderInfo[6].substr(1, orderInfo[6].length - 2), // 单价
+							acturalPrice, // 实价
 							orderInfo[7],// 特
 							orderInfo[8],// 荐
 							orderInfo[9], // 停
-							orderInfo[10] // 送
+							orderInfo[10], // 送
+							orderInfo[14].substr(2, orderInfo[14].length - 3),// 口味价钱
+							orderInfo[6].substr(2, orderInfo[6].length - 3) // 单价
 							]);
 						}
 
@@ -139,40 +150,69 @@ function checkOutOnLoad() {
 																		}
 																	}
 
-																	var tastePrice = 0;
-																	for ( var j = 0; j < dishTasteData.length; j++) {
-																		if (dishTasteData[j][0] == checkOutData[i][2]) {
-																			tastePrice = parseFloat(dishTasteData[j][1]
-																					.substr(
-																							1,
-																							dishTasteData[j][1].length - 1));
-																		}
-																	}
+																	var tastePrice = checkOutData[i][9];
+																	// var
+																	// tastePrice
+																	// = 0;
+																	// for ( var
+																	// j = 0; j
+																	// <
+																	// dishTasteData.length;
+																	// j++) {
+																	// if
+																	// (dishTasteData[j][0]
+																	// ==
+																	// checkOutData[i][2])
+																	// {
+																	// tastePrice
+																	// =
+																	// parseFloat(dishTasteData[j][1]
+																	// .substr(
+																	// 1,
+																	// dishTasteData[j][1].length
+																	// - 1));
+																	// }
+																	// }
 
 																	// 总价 = （原料价
 																	// * 折扣率 +
 																	// 口味价）* 数量
+																	var price;
 																	if (checkOutData[i][5] == "true"
 																			|| checkOutData[i][8] == "true") {
-																		// 特价，不打折
-																		var price = parseFloat(checkOutData[i][4]
+																		// 特价，送
+																		// 不打折
+																		price = parseFloat(checkOutData[i][4]
 																				.substring(1))
 																				* checkOutData[i][3];
+
 																	} else {
 																		// 非特价
-																		var price = ((parseFloat(checkOutData[i][4]
-																				.substring(1)) - tastePrice)
-																				* discountRate + tastePrice)
+																		// var
+																		// price
+																		// =
+																		// ((parseFloat(checkOutData[i][4]
+																		// .substring(1))
+																		// -
+																		// tastePrice)
+																		// *
+																		// discountRate
+																		// +
+																		// tastePrice)
+																		// *
+																		// checkOutData[i][3];
+
+																		price = (parseFloat(checkOutData[i][10])
+																				* discountRate + parseFloat(tastePrice))
 																				* checkOutData[i][3];
+																		
 																	}
-																	var priceDisplay = checkOutData[i][4]
-																			.substring(
-																					0,
-																					1)
+																	var priceDisplay = "￥"
 																			+ price
 																					.toFixed(2);
 
-																	// 送 -- 折扣率
+																	// 特价，送 --
+																	// 折扣率
 																	// --1
 																	if (checkOutData[i][8] == "true"
 																			|| checkOutData[i][5] == "true") {

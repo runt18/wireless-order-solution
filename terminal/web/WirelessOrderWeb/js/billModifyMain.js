@@ -1416,8 +1416,8 @@ Ext
 				region : "north",
 				border : false,
 				// margins : "0 5 0 0",
-				// height : 115,
-				height : 215,
+				 height : 115,
+				//height : 215,
 				layout : "fit",
 				items : billGenModForm
 			});

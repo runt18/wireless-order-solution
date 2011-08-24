@@ -129,6 +129,14 @@ function billModifyOnLoad() {
 							for ( var i = 0; i < orderList.length; i++) {
 								var orderInfo = orderList[i].substr(1,
 										orderList[i].length - 2).split(",");
+								// 实价 = 单价 + 口味价钱
+								var singlePrice = parseFloat(orderInfo[6]
+										.substr(2, orderInfo[6].length - 3));
+								var tastePrice = parseFloat(orderInfo[14]
+										.substr(2, orderInfo[14].length - 3));
+								var acturalPrice = 0.0;
+								acturalPrice = singlePrice + tastePrice;
+								acturalPrice = "￥" + acturalPrice.toFixed(1);
 								orderedData.push([
 										orderInfo[0].substr(1,
 												orderInfo[0].length - 2), // 菜名
@@ -138,8 +146,7 @@ function billModifyOnLoad() {
 										orderInfo[6].substr(1,
 												orderInfo[6].length - 2),// 单价
 										"",// 操作
-										orderInfo[6].substr(1,
-												orderInfo[6].length - 2),// 实价
+										acturalPrice,// 实价
 										orderInfo[1],// 菜名编号
 										orderInfo[2],// 厨房编号
 										orderInfo[4], // 口味编号

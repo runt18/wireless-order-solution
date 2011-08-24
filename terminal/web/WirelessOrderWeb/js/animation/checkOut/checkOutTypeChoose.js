@@ -38,7 +38,7 @@
 
 						// 4,mark the menber id
 						actualMemberID = memberNbr;
-						
+
 						// 5,refresh the general bill info
 						checkOurListRefresh();
 					} else {
@@ -102,27 +102,28 @@ var checkOurListRefresh = function() {
 			}
 		}
 
-		var tastePrice = 0;
-		for ( var j = 0; j < dishTasteData.length; j++) {
-			if (dishTasteData[j][0] == checkOutData[i][2]) {
-				tastePrice = parseFloat(dishTasteData[j][1].substr(1,
-						dishTasteData[j][1].length - 1));
-			}
-		}
+		var tastePrice = checkOutData[i][9];
+		// var tastePrice = 0;
+		// for ( var j = 0; j < dishTasteData.length; j++) {
+		// if (dishTasteData[j][0] == checkOutData[i][2]) {
+		// tastePrice = parseFloat(dishTasteData[j][1].substr(1,
+		// dishTasteData[j][1].length - 1));
+		// }
+		// }
+
 		// 总价 = （原料价 * 折扣率 + 口味价）* 数量
+		var price;
 		if (checkOutData[i][5] == "true" || checkOutData[i][8] == "true") {
-			// 特价，送, 不打折
-			var price = parseFloat(checkOutData[i][4].substring(1))
+			// 特价，送 不打折
+			price = parseFloat(checkOutData[i][4].substring(1))
 					* checkOutData[i][3];
 		} else {
 			// 非特价
-			var price = ((parseFloat(checkOutData[i][4].substring(1)) - tastePrice)
-					* discountRate + tastePrice)
+
+			price = (parseFloat(checkOutData[i][10]) * discountRate + parseFloat(tastePrice))
 					* checkOutData[i][3];
 		}
-
-		var priceDisplay = checkOutData[i][4].substring(0, 1)
-				+ price.toFixed(2);
+		var priceDisplay = "￥" + price.toFixed(2);
 
 		// 送 -- 折扣率 --1
 		if (checkOutData[i][8] == "true" || checkOutData[i][5] == "true") {

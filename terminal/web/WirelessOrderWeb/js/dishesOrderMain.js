@@ -624,6 +624,7 @@ var dishTasteGrid = new Ext.grid.GridPanel({
 			// update price
 			var currPrice = parseFloat(orderedData[dishIndex][3].substring(1))
 					+ parseFloat(tastePrice.substring(1)) + "";
+
 			if (currPrice.indexOf(".") < 0) {
 				currPrice = currPrice + ".00";
 			} else if (currPrice.length - currPrice.indexOf(".") == 3) {
