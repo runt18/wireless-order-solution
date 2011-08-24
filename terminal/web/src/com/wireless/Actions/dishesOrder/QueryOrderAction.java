@@ -70,11 +70,11 @@ public class QueryOrderAction extends Action {
 				for (int i = 0; i < order.foods.length; i++) {
 					/**
 					 * The json to order food looks like below.
-					 * ["菜名",菜名编号,厨房编号,"口味",口味编号,数量,单价,是否特价,是否推荐,是否停售,是否赠送,折扣率,口味编号2,口味编号3]
+					 * ["菜名",菜名编号,厨房编号,"口味",口味编号,数量,单价,是否特价,是否推荐,是否停售,是否赠送,折扣率,口味编号2,口味编号3,口味价钱]
 					 */
 					String jsonOrderFood = "[\"$(food)\",$(food_id),$(kitchen),\"$(taste)\",$(taste_id)," +
-										   "$(count),\"$(unit)\",$(special),$(recommend),$(soldout)," +
-										   "$(gift),$(discount),$(taste_id2),$(taste_id3)]";
+										   "$(count),\"$(unit_price)\",$(special),$(recommend),$(soldout)," +
+										   "$(gift),$(discount),$(taste_id2),$(taste_id3)],$(taste_price)";
 					jsonOrderFood = jsonOrderFood.replace("$(food)", order.foods[i].name);
 					jsonOrderFood = jsonOrderFood.replace("$(food_id)", new Integer(order.foods[i].alias_id).toString());
 					jsonOrderFood = jsonOrderFood.replace("$(kitchen)", new Short(order.foods[i].kitchen).toString());
@@ -82,8 +82,9 @@ public class QueryOrderAction extends Action {
 					//FIX ME!!!
 					jsonOrderFood = jsonOrderFood.replace("$(taste_id)", Integer.toString(order.foods[i].tastes[0].alias_id));
 					jsonOrderFood = jsonOrderFood.replace("$(count)", Util.float2String2(order.foods[i].getCount()));
-					float unitPrice = order.foods[i].getPrice() + order.foods[i].getTastePrice();
-					jsonOrderFood = jsonOrderFood.replace("$(unit)", Util.CURRENCY_SIGN + unitPrice);
+					//float unitPrice = order.foods[i].getPrice() + order.foods[i].getTastePrice();
+					jsonOrderFood = jsonOrderFood.replace("$(unit_price)", Util.CURRENCY_SIGN + order.foods[i].getPrice());
+					jsonOrderFood = jsonOrderFood.replace("$(taste_price)", Util.CURRENCY_SIGN + order.foods[i].getTastePrice());
 					jsonOrderFood = jsonOrderFood.replace("$(special)", order.foods[i].isSpecial() ? "true" : "false");
 					jsonOrderFood = jsonOrderFood.replace("$(recommend)", order.foods[i].isRecommend() ? "true" : "false");
 					jsonOrderFood = jsonOrderFood.replace("$(soldout)", order.foods[i].isSellOut() ? "true" : "false");
