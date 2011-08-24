@@ -70,7 +70,8 @@ public class InsertOrderAction extends Action implements PinGen {
 			 * 					 e.g. transfer table from 100 to 101, "tableID=101 & originalTableID=100"
 			 * 
 			 * foods : the food string whose format looks like below.
-			 *         {[菜品1编号,菜品1数量,口味1编号,厨房1编号,菜品1折扣]，[菜品2编号,菜品2数量,口味2编号,厨房2编号,菜品2折扣]，...}
+			 *         {[菜品1编号,菜品1数量,口味1编号,厨房1编号,菜品1折扣,2nd口味1编号,3rd口味1编号]，
+			 *          [菜品2编号,菜品2数量,口味2编号,厨房2编号,菜品2折扣,2nd口味2编号,3rd口味2编号]，...}
 			 */
 			String pin = request.getParameter("pin");
 			if(pin.startsWith("0x") || pin.startsWith("0X")){
