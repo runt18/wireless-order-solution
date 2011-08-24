@@ -74,7 +74,7 @@ public class QueryOrderAction extends Action {
 					 */
 					String jsonOrderFood = "[\"$(food)\",$(food_id),$(kitchen),\"$(taste)\",$(taste_id)," +
 										   "$(count),\"$(unit_price)\",$(special),$(recommend),$(soldout)," +
-										   "$(gift),$(discount),$(taste_id2),$(taste_id3)],$(taste_price)";
+										   "$(gift),$(discount),$(taste_id2),$(taste_id3),$(taste_price)]";
 					jsonOrderFood = jsonOrderFood.replace("$(food)", order.foods[i].name);
 					jsonOrderFood = jsonOrderFood.replace("$(food_id)", new Integer(order.foods[i].alias_id).toString());
 					jsonOrderFood = jsonOrderFood.replace("$(kitchen)", new Short(order.foods[i].kitchen).toString());
