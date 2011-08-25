@@ -21,7 +21,7 @@ public class ShowFoodPopup extends PopupScreen {
 		add(new LabelField(selectedFood.name));
 		add(new SeparatorField());
 		
-		add(new LabelField("数量：" + Util.float2String2(selectedFood.getCount2())));
+		add(new LabelField("数量：" + Util.float2String2(selectedFood.getCount())));
 		add(new LabelField("价钱：" + Util.CURRENCY_SIGN + Util.float2String(selectedFood.totalPrice2())));
 		if(!selectedFood.tastePref.equals(Taste.NO_PREFERENCE)){
 			add(new LabelField("口味：" + selectedFood.tastePref));			

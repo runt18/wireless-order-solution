@@ -83,6 +83,12 @@ public class RemoveTastePopup extends PopupScreen {
 				int resp = Dialog.ask(Dialog.D_YES_NO, "确认删除-" + _tastes[getSelectedIndex()].preference, Dialog.NO);
 				if(resp == Dialog.YES){
 					
+					/**
+					 * Since add a taste to the food means another one different the previous,
+					 * we might remove the original food first
+					 */
+					_orderField.delFood(_selectedFood);
+					
 					_tastes[getSelectedIndex()] = new Taste();
 					
 					/**
@@ -126,12 +132,6 @@ public class RemoveTastePopup extends PopupScreen {
 					 */
 					_tastes = getTastes();
 					setSize(_tastes.length, _tastes.length);
-					
-					/**
-					 * Since add a taste to the food means another one different the previous,
-					 * we might remove the original food first
-					 */
-					_orderField.delFood(_selectedFood);
 					
 					/**
 					 * Calculate the taste price and preference

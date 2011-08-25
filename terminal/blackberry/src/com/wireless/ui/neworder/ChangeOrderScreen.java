@@ -1,5 +1,7 @@
 package com.wireless.ui.neworder;
 
+import java.util.Vector;
+
 import net.rim.device.api.ui.Color;
 import net.rim.device.api.ui.DrawStyle;
 import net.rim.device.api.ui.Field;
@@ -29,9 +31,10 @@ import com.wireless.ui.field.TopBannerField;
 
 
 
-public class ChangeOrderScreen extends MainScreen
-								implements PostSubmitOrder{
-	private OrderListField _orderListField;
+public class ChangeOrderScreen extends MainScreen implements PostSubmitOrder{
+	
+	private OrderListField _originalListField;
+	private OrderListField _newListField;
 	private LabelField _tableTitle = null;
 	private EditField _table = null;
 	private EditField _customNum;
@@ -92,7 +95,7 @@ public class ChangeOrderScreen extends MainScreen
 		vfm.add(new LabelField("已点菜", LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
 			protected void paintBackground(Graphics g) {
 				g.clear();
-				g.setBackgroundColor(Color.GRAY);
+				g.setBackgroundColor(Color.RED);
 				super.paintBackground(g);
 			} 
 			protected void paint(Graphics g){
@@ -102,10 +105,28 @@ public class ChangeOrderScreen extends MainScreen
 			}
 		});
 		
-		_orderListField = new OrderListField(_originalOrder.foods, Type.UPDATE_ORDER);
+		_originalListField = new OrderListField(_originalOrder.foods, Type.UPDATE_ORDER);		
+		vfm.add(_originalListField);
 		
-		vfm.add(_orderListField);
 		vfm.add(new SeparatorField());
+		vfm.add(new LabelField("新点菜", LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
+			protected void paintBackground(Graphics g) {
+				g.clear();
+				g.setBackgroundColor(Color.GREEN);
+				super.paintBackground(g);
+			} 
+			protected void paint(Graphics g){
+				g.clear();
+				g.setColor(Color.WHITE);		
+				super.paint(g);  
+			}
+		});
+		
+		_newListField = new OrderListField();
+		vfm.add(_newListField);
+		
+		vfm.add(new SeparatorField());
+		
 		add(vfm);
 		
 		//Three buttons would be shown in the bottom of the screen
@@ -123,40 +144,52 @@ public class ChangeOrderScreen extends MainScreen
 		//Set the listener to order button
 		byNoBtn.setChangeListener(new FieldChangeListener(){
 			public void fieldChanged(Field field, int context) {
-	             UiApplication.getUiApplication().pushScreen(new SelectFoodPopup(_orderListField, WirelessOrder.foodMenu.foods));
+	             UiApplication.getUiApplication().pushScreen(new SelectFoodPopup(_newListField, WirelessOrder.foodMenu.foods));
 	         }
 		});
 		
 		//Set the listener to order by kitchen button
 		byKitchenBtn.setChangeListener(new FieldChangeListener(){
 			public void fieldChanged(Field field, int context) {
-				UiApplication.getUiApplication().pushScreen(new SelectKitchenPopup(_orderListField));
+				UiApplication.getUiApplication().pushScreen(new SelectKitchenPopup(_newListField));
 			}
 		});
 		
 		//Set the submit button's listener
 		submit.setChangeListener(new FieldChangeListener(){
 			public void fieldChanged(Field field, int context) {
-				if(_orderListField.getSize() == 0){
+				if(_originalListField.getSize() == 0 && _newListField.getSize() == 0){
 					Dialog.alert("点菜单为空，暂时不能改单。");
 				}else{
-					Food[] foods = new Food[_orderListField.getSize()];
+					
+					Vector vectFoods = new Vector();					
+					
 					/**
-					 * Since in the change order screen, the count to food is divided in two parts.
-					 * - original count
-					 * - difference count
-					 * Plus both of them to make the order count finally.
+					 * Combine the foods of original and new list fields. 
 					 */
-					for(int i = 0; i < _orderListField.getSize(); i++){
-						foods[i] = (Food)_orderListField.getCallback().get(null, i);
-						//Get the difference count
-						int diffCount = Util.float2Int(foods[i].getDiffCount());
-						diffCount = foods[i].diffPositive ? diffCount : -diffCount;
-						//Plus the original and difference count
-						int count = Util.float2Int(foods[i].getCount()) + diffCount;
-						//Set the order count to this food
-						foods[i].setCount(Util.int2Float(count));
+					for(int i = 0; i < _originalListField.getSize(); i++){
+						Food originalFood = (Food)_originalListField.getCallback().get(null, i);
+						for(int j = 0; j < _newListField.getSize(); j++){
+							Food newFood = (Food)_newListField.getCallback().get(null, j);
+							if(originalFood.equals(newFood)){
+								int count = Util.float2Int(originalFood.getCount()) + Util.float2Int(newFood.getCount());
+								originalFood.setCount(Util.int2Float(count));
+								break;
+							}
+						}
+						vectFoods.addElement(originalFood);
 					}
+					
+					for(int i = 0; i < _newListField.getSize(); i++){
+						Food newFood = (Food)_newListField.getCallback().get(null, i);
+						if(!vectFoods.contains(newFood)){
+							vectFoods.addElement(newFood);
+						}
+					}
+					
+					Food[] foods = new Food[vectFoods.size()];
+					vectFoods.copyInto(foods);
+					
 					Order reqOrder = new Order(foods, 
 											   Short.parseShort(_table.getText()), 
 											   Integer.parseInt(_customNum.getText()));
