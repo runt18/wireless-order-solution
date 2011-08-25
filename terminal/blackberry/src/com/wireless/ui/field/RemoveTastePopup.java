@@ -71,7 +71,7 @@ public class RemoveTastePopup extends PopupScreen {
 		    
 		    //Click ENTER to show all the taste to the type selected 
 			protected boolean keyChar(char c, int status, int time){
-				if(c == Characters.ENTER){
+				if(c == Characters.ENTER || c == Characters.BACKSPACE){
 					delTaste();			
 					return true;
 				}else{
