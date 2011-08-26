@@ -108,8 +108,14 @@ function billQueryHandler() {
 		queryValue = queryValue.format('Y-m-d');
 	} else if (conditionType == "tableTypeComb") {
 		queryValue = searchForm.findById("tableTypeComb").getValue();
+		if (queryValue == "一般") {
+			queryValue = 1;
+		}
 	} else if (conditionType == "payTypeComb") {
 		queryValue = searchForm.findById("payTypeComb").getValue();
+		if (queryValue == "现金") {
+			queryValue = 1;
+		}
 	}
 	// alert(queryTpye + " , " + queryOperator + " , " + queryValue);
 

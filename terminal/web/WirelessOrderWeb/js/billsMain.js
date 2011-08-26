@@ -216,6 +216,8 @@ var filterTypeComb = new Ext.form.ComboBox({
 			if (index == 0) {
 				// 全部
 				// searchForm.add(conditionText);
+				operatorComb.setValue("等于");
+				operatorComb.setDisabled(true);
 				conditionType = "text";
 			} else if (index == 1) {
 				// 帐单号
@@ -235,12 +237,14 @@ var filterTypeComb = new Ext.form.ComboBox({
 				searchForm.add(tableTypeComb);
 				operatorComb.setValue("等于");
 				operatorComb.setDisabled(true);
+				tableTypeComb.setValue("一般");
 				conditionType = "tableTypeComb";
 			} else if (index == 5) {
 				// 结帐方式
 				searchForm.add(payTypeComb);
 				operatorComb.setValue("等于");
 				operatorComb.setDisabled(true);
+				payTypeComb.setValue("现金");
 				conditionType = "payTypeComb";
 			} else if (index == 6) {
 				// 金额

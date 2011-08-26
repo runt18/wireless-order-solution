@@ -11,4 +11,5 @@ function billsOnLoad() {
 	billQuery(0, 1, "");
 	
 	searchForm.remove("conditionText");
+	operatorComb.setDisabled(true);
 };
