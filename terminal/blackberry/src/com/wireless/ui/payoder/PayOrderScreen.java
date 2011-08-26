@@ -53,7 +53,7 @@ public class PayOrderScreen extends MainScreen
 		vfm.add(new LabelField(_bill.table_id + "号餐台信息" + category, LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
 			protected void paintBackground(Graphics g) {
 				g.clear();
-				g.setBackgroundColor(Color.GRAY);
+				g.setBackgroundColor(Color.BLUE);
 				super.paintBackground(g);
 			} 
 			protected void paint(Graphics g){
@@ -78,7 +78,7 @@ public class PayOrderScreen extends MainScreen
 		vfm.add(new LabelField("已点菜", LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
 			protected void paintBackground(Graphics g) {
 				g.clear();
-				g.setBackgroundColor(Color.GRAY);
+				g.setBackgroundColor(Color.PURPLE);
 				super.paintBackground(g);
 			} 
 			protected void paint(Graphics g){
@@ -88,7 +88,7 @@ public class PayOrderScreen extends MainScreen
 			}
 		});
 		
-		_orderListField = new OrderListField(_bill.foods, Field.NON_FOCUSABLE, Type.PAY_ORDER);
+		_orderListField = new OrderListField(_bill.foods, Field.READONLY, Type.PAY_ORDER);
 		
 		vfm.add(_orderListField);
 		vfm.add(new SeparatorField());

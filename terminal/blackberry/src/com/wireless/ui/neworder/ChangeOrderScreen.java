@@ -65,7 +65,7 @@ public class ChangeOrderScreen extends MainScreen implements PostSubmitOrder{
 		_tableTitle = new LabelField(_originalOrder.table_id + "号餐台信息" + category, LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
 			protected void paintBackground(Graphics g) {
 				g.clear();
-				g.setBackgroundColor(Color.GRAY);
+				g.setBackgroundColor(Color.BLUE);
 				super.paintBackground(g);
 			} 
 			protected void paint(Graphics g){

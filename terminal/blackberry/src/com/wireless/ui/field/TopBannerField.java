@@ -13,90 +13,110 @@ import net.rim.device.api.ui.FontFamily;
 import net.rim.device.api.ui.Graphics;  
   
 public class TopBannerField extends Field implements DrawStyle {  
-    private Font headerFont = SmallFont();  
-    private SimpleDateFormat timeFormat = new SimpleDateFormat("h:mma");  
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");  
-    private String timeString;  
-    private String dateString;  
-    private String title;  
-    private boolean showSignal;  
-    private boolean showBattery;  
-    private boolean showDate;  
-    private boolean showTime;  
-    private boolean showTitle;  
-    private int fieldWidth;  
-    private int fieldHeight;  
-    private int fontColour;  
-    private int backgroundColour;  
-    private int batteryBackground;  
-    private Timer headerTimer = new Timer();  
-    private TimerTask headerTask;  
-  
-    public TopBannerField(String _title) {  
+    private Font _headerFont = SmallFont();  
+    private SimpleDateFormat _timeFormat = new SimpleDateFormat("h:mma");  
+    private SimpleDateFormat _dateFormat = new SimpleDateFormat("yyyy-MM-dd");  
+    private String _timeString;  
+    private String _dateString;  
+    private String _title;  
+    private boolean _showSignal;  
+    private boolean _showBattery;  
+    private boolean _showDate;  
+    private boolean _showTime;  
+    private boolean _showTitle;  
+    private int _fieldWidth;  
+    private int _fieldHeight;  
+    private int _fontColour;  
+    private int _backgroundColour;  
+    private int _batteryBackground;  
+    private Timer _headerTimer;  
+    private TimerTask _headerTask;  
+    
+    public TopBannerField(String title) {  
         super(Field.NON_FOCUSABLE);  
-        title = _title;  
-        showSignal = true;  
-        showBattery = true;  
-        showDate = false;  
-        showTime = true;  
-        showTitle = true;  
-        fieldHeight = 20;  
-        fieldWidth = Display.getWidth();  
-        fontColour = 0xFFFFFF;  
-        backgroundColour = 0x00000;  
-        batteryBackground = 0x999999;  
-  
-        headerTask = new TimerTask() {  
-            public void run() {  
-                invalidate();  
-            }  
-        };  
-  
-        headerTimer.scheduleAtFixedRate(headerTask, 500, 30000);  
+        _title = title;  
+        _showSignal = true;  
+        _showBattery = true;  
+        _showDate = false;  
+        _showTime = true;  
+        _showTitle = true;  
+        _fieldHeight = 20;  
+        _fieldWidth = Display.getWidth();  
+        _fontColour = 0xFFFFFF;  
+        _backgroundColour = 0x00000;  
+        _batteryBackground = 0x999999;   
+
     }  
   
-    public void setTitle(String _title) {  
-        title = _title;  
+    /**
+     * Start the timer task while the field is pushed into the display stack
+     */
+    protected void onDisplay(){
+    	if(_headerTimer == null && _headerTask == null){
+            _headerTask = new TimerTask() {  
+                public void run() {  
+                    invalidate();  
+                }  
+            };  
+            _headerTimer = new Timer();
+            _headerTimer.scheduleAtFixedRate(_headerTask, 500, 30000); 
+    	}
+    }
+    
+    /**
+     * Turn off the timer task while the field pop off.
+     */
+    protected void onUndisplay(){
+    	if(_headerTimer != null){
+    		_headerTimer.cancel();
+    		_headerTask.cancel();
+    		_headerTimer = null;
+    		_headerTask = null;
+    	}
+    }
+    
+    public void setTitle(String title) {  
+        _title = title;  
         invalidate();  
     }  
   
-    public void setFontColour(int _fontColour) {  
-        fontColour = _fontColour;  
+    public void setFontColour(int fontColour) {  
+        _fontColour = fontColour;  
         invalidate();  
     }  
   
-    public void setBatteryBackground(int _batteryBackground) {  
-        batteryBackground = _batteryBackground;  
+    public void setBatteryBackground(int batteryBackground) {  
+        _batteryBackground = batteryBackground;  
         invalidate();  
     }  
   
-    public void setBackgroundColour(int _backgroundColour) {  
-        backgroundColour = _backgroundColour;  
+    public void setBackgroundColour(int backgroundColour) {  
+        _backgroundColour = backgroundColour;  
         invalidate();  
     }  
   
     public void showSignal(boolean bool) {  
-        showSignal = bool;  
+        _showSignal = bool;  
         invalidate();  
     }  
   
     public void showBattery(boolean bool) {  
-        showBattery = bool;  
+        _showBattery = bool;  
         invalidate();  
     }  
   
     public void showDate(boolean bool) {  
-        showDate = bool;  
+        _showDate = bool;  
         invalidate();  
     }  
   
     public void showTime(boolean bool) {  
-        showTime = bool;  
+        _showTime = bool;  
         invalidate();  
     }  
   
     public void showTitle(boolean bool) {  
-        showTitle = bool;  
+        _showTitle = bool;  
         invalidate();  
     }  
   
@@ -105,21 +125,21 @@ public class TopBannerField extends Field implements DrawStyle {
     }  
   
     public int getPreferredWidth() {  
-        return fieldWidth;  
+        return _fieldWidth;  
     }  
   
     public int getPreferredHeight() {  
-        return fieldHeight;  
+        return _fieldHeight;  
     }  
   
     protected void paint(Graphics graphics) {  
-        graphics.setFont(headerFont);  
+        graphics.setFont(_headerFont);  
         int graphicsDiff = 0;  
   
-        graphics.setColor(backgroundColour);  
+        graphics.setColor(_backgroundColour);  
         graphics.fillRect(0, 0, this.getPreferredWidth(), this.getPreferredHeight());  
   
-        if (showSignal) {  
+        if (_showSignal) {  
             graphicsDiff = graphicsDiff + 28;  
             graphics.setColor(0x999999);  
             // draw blank background  
@@ -161,10 +181,10 @@ public class TopBannerField extends Field implements DrawStyle {
                 graphics.fillRect(this.getPreferredWidth() - 25, 9, 4, 2);  
             }  
         }  
-        if (showBattery) {  
+        if (_showBattery) {  
   
             int batteryLevel = DeviceInfo.getBatteryLevel();  
-            graphics.setColor(batteryBackground);  
+            graphics.setColor(_batteryBackground);  
             graphics.fillRect(this.getPreferredWidth() - 23 - graphicsDiff, 2,  
                     20, 8);  
             graphics.fillRect(this.getPreferredWidth() - 3 - graphicsDiff, 4,  
@@ -185,51 +205,51 @@ public class TopBannerField extends Field implements DrawStyle {
             graphicsDiff = graphicsDiff + 24;  
         }  
   
-        graphics.setColor(fontColour);  
+        graphics.setColor(_fontColour);  
   
-        if (showTime) {  
-            timeString = " "  
-                    + timeFormat.formatLocal(System.currentTimeMillis()) + " ";  
+        if (_showTime) {  
+            _timeString = " "  
+                    + _timeFormat.formatLocal(System.currentTimeMillis()) + " ";  
         } else {  
-            timeString = "";  
+            _timeString = "";  
         }  
   
-        if (showDate) {  
-            dateString = " "  
-                    + dateFormat.formatLocal(System.currentTimeMillis()) + " ";  
+        if (_showDate) {  
+            _dateString = " "  
+                    + _dateFormat.formatLocal(System.currentTimeMillis()) + " ";  
         } else {  
-            dateString = "";  
+            _dateString = "";  
         }  
   
-        graphics.drawText(dateString + timeString, 
+        graphics.drawText(_dateString + _timeString, 
         				 this.getPreferredWidth() - 
-        				 headerFont.getAdvance(dateString + timeString) - 
+        				 _headerFont.getAdvance(_dateString + _timeString) - 
         				 graphicsDiff, 1);  
   
-        if (showTitle) {  
+        if (_showTitle) {  
             int limit = 0;  
-            if (showSignal)  
+            if (_showSignal)  
                 limit = limit + 28;  
-            if (showBattery)  
+            if (_showBattery)  
                 limit = limit + 25;  
-            if (showTime)  
-                limit = limit + headerFont.getAdvance(timeString);  
-            if (showDate)  
-                limit = limit + headerFont.getAdvance(dateString);  
-            if (headerFont.getAdvance(title) > this.getPreferredWidth() - limit) {  
-                int elippsy = headerFont.getAdvance("...");  
+            if (_showTime)  
+                limit = limit + _headerFont.getAdvance(_timeString);  
+            if (_showDate)  
+                limit = limit + _headerFont.getAdvance(_dateString);  
+            if (_headerFont.getAdvance(_title) > this.getPreferredWidth() - limit) {  
+                int elippsy = _headerFont.getAdvance("...");  
                 int availableWidth = this.getPreferredWidth() - limit - elippsy;  
                 String _txt = "";  
                 String shorterTitle = "";  
-                for (int i = 1; i < title.length(); i++) {  
-                    _txt = title.substring(0, i);  
-                    if (headerFont.getAdvance(_txt) < availableWidth) {  
+                for (int i = 1; i < _title.length(); i++) {  
+                    _txt = _title.substring(0, i);  
+                    if (_headerFont.getAdvance(_txt) < availableWidth) {  
                         shorterTitle = _txt;  
                     }  
                 }  
-                title = shorterTitle + "...";  
+                _title = shorterTitle + "...";  
             }  
-            graphics.drawText(title, 1, 0);  
+            graphics.drawText(_title, 1, 0);  
         }  
     }  
   
