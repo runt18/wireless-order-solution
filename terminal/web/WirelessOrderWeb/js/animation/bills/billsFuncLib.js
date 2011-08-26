@@ -87,11 +87,48 @@
 };
 
 function billQueryHandler() {
-	var queryTpye = document.getElementById("type").value;
-	var queryOperator = document.getElementById("operator").value;
-	var queryValue = document.getElementById("condition").value;
+	var queryTpye = filterTypeComb.getValue();
+	if (queryTpye == "全部") {
+		queryTpye = 0;
+	}
 
-	billQuery(queryTpye, queryOperator, queryValue);
+	var queryOperator = operatorComb.getValue();
+	if (queryOperator == "等于") {
+		queryOperator = 1;
+	}
+
+	var queryValue = "";
+	if (conditionType == "text" && queryTpye != 0) {
+		queryValue = searchForm.findById("conditionText").getValue();
+	} else if (conditionType == "number") {
+		queryValue = searchForm.findById("conditionNumber").getValue();
+	} else if (conditionType == "date") {
+		queryValue = new Date();
+		queryValue = searchForm.findById("conditionDate").getValue();
+		queryValue = queryValue.format('Y-m-d');
+	} else if (conditionType == "tableTypeComb") {
+		queryValue = searchForm.findById("tableTypeComb").getValue();
+	} else if (conditionType == "payTypeComb") {
+		queryValue = searchForm.findById("payTypeComb").getValue();
+	}
+	// alert(queryTpye + " , " + queryOperator + " , " + queryValue);
+
+	var isInputValid = true;
+	if (conditionType == "text" && queryTpye != 0) {
+		isInputValid = searchForm.findById("conditionText").isValid();
+	} else if (conditionType == "number") {
+		isInputValid = searchForm.findById("conditionNumber").isValid();
+	} else if (conditionType == "date") {
+		isInputValid = searchForm.findById("conditionDate").isValid();
+	} else if (conditionType == "tableTypeComb") {
+		isInputValid = searchForm.findById("tableTypeComb").isValid();
+	} else if (conditionType == "payTypeComb") {
+		isInputValid = searchForm.findById("payTypeComb").isValid();
+	}
+
+	if (isInputValid) {
+		billQuery(queryTpye, queryOperator, queryValue);
+	}
 
 };
 
@@ -141,7 +178,7 @@ var billListRefresh = function() {
 				discountRate = discountData[j][discountIndex];
 			}
 		}
-		//alert(orderedData[i][12]);
+		// alert(orderedData[i][12]);
 		if (orderedData[i][9] == "true" || orderedData[i][12] == "true") {
 			orderedData[i][13] = "1.0";
 		} else {

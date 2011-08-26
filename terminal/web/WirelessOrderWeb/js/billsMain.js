@@ -20,7 +20,7 @@
 			+ "&minCost=" + minCost + "&orderID=" + orderID + "&give=" + give
 			+ "&payType=" + payType + "&discountType=" + discountType
 			+ "&payManner=" + payManner + "&serviceRate=" + serviceRate
-			+ "&memberID=" + memberID ;
+			+ "&memberID=" + memberID;
 };
 
 var modifyBillBut = new Ext.ux.ImageButton({
@@ -109,12 +109,227 @@ var logOutBut = new Ext.ux.ImageButton({
 	}
 });
 
-// north
-var billsQueryCondPanel = new Ext.Panel({
+// ------------------ north ------------------------
+// combom
+var filterTypeData = [ [ "0", "全部" ], [ "1", "帐单号" ], [ "2", "台号" ],
+		[ "3", "日期时间" ], [ "4", "类型" ], [ "5", "结帐方式" ], [ "6", "金额" ],
+		[ "7", "实收" ] ];
+var filterTypeComb = new Ext.form.ComboBox({
+	fieldLabel : "过滤",
+	forceSelection : true,
+	width : 100,
+	value : "全部",
+	id : "filter",
+	store : new Ext.data.SimpleStore({
+		fields : [ "value", "text" ],
+		data : filterTypeData
+	}),
+	valueField : "value",
+	displayField : "text",
+	typeAhead : true,
+	mode : "local",
+	triggerAction : "all",
+	selectOnFocus : true,
+	allowBlank : false,
+	listeners : {
+		select : function(combo, record, index) {
+
+			// ------------------dymatic field-------------------
+			var conditionText = new Ext.form.TextField({
+				hideLabel : true,
+				id : "conditionText",
+				allowBlank : false,
+				width : 120
+			});
+
+			var conditionNumber = new Ext.form.NumberField({
+				hideLabel : true,
+				id : "conditionNumber",
+				allowBlank : false,
+				width : 120
+			});
+
+			var conditionDate = new Ext.form.DateField({
+				hideLabel : true,
+				id : "conditionDate",
+				allowBlank : false,
+				width : 120
+			});
+
+			var tableTypeData = [ [ "1", "一般" ], [ "2", "外卖" ], [ "3", "并台" ],
+					[ "4", "拼台" ] ];
+			var tableTypeComb = new Ext.form.ComboBox({
+				hideLabel : true,
+				forceSelection : true,
+				width : 120,
+				// value : "等于",
+				id : "tableTypeComb",
+				store : new Ext.data.SimpleStore({
+					fields : [ "value", "text" ],
+					data : tableTypeData
+				}),
+				valueField : "value",
+				displayField : "text",
+				typeAhead : true,
+				mode : "local",
+				triggerAction : "all",
+				selectOnFocus : true,
+				allowBlank : false
+			});
+
+			var payTypeData = [ [ "1", "现金" ], [ "2", "刷卡" ], [ "3", "会员卡" ],
+					[ "4", "签单" ], [ "5", "挂账" ] ];
+			var payTypeComb = new Ext.form.ComboBox({
+				hideLabel : true,
+				forceSelection : true,
+				width : 120,
+				// value : "等于",
+				id : "payTypeComb",
+				store : new Ext.data.SimpleStore({
+					fields : [ "value", "text" ],
+					data : payTypeData
+				}),
+				valueField : "value",
+				displayField : "text",
+				typeAhead : true,
+				mode : "local",
+				triggerAction : "all",
+				selectOnFocus : true,
+				allowBlank : false
+			});
+
+			// ------------------remove field-------------------
+			if (conditionType == "text") {
+				searchForm.remove("conditionText");
+			} else if (conditionType == "number") {
+				searchForm.remove("conditionNumber");
+			} else if (conditionType == "date") {
+				searchForm.remove("conditionDate");
+			} else if (conditionType == "tableTypeComb") {
+				searchForm.remove("tableTypeComb");
+			} else if (conditionType == "payTypeComb") {
+				searchForm.remove("payTypeComb");
+			}
+
+			// ------------------ add field -------------------
+			operatorComb.setDisabled(false);
+			if (index == 0) {
+				// 全部
+				// searchForm.add(conditionText);
+				// conditionType = "text";
+			} else if (index == 1) {
+				// 帐单号
+				searchForm.add(conditionNumber);
+				// searchForm.items.add(conditionNumber);
+				conditionType = "number";
+			} else if (index == 2) {
+				// 台号
+				searchForm.add(conditionNumber);
+				conditionType = "number";
+			} else if (index == 3) {
+				// 日期时间
+				searchForm.add(conditionDate);
+				conditionType = "date";
+			} else if (index == 4) {
+				// 类型
+				searchForm.add(tableTypeComb);
+				operatorComb.setValue("等于");
+				operatorComb.setDisabled(true);
+				conditionType = "tableTypeComb";
+			} else if (index == 5) {
+				// 结帐方式
+				searchForm.add(payTypeComb);
+				operatorComb.setValue("等于");
+				operatorComb.setDisabled(true);
+				conditionType = "payTypeComb";
+			} else if (index == 6) {
+				// 金额
+				searchForm.add(conditionNumber);
+				conditionType = "number";
+			} else if (index == 7) {
+				// 实收
+				searchForm.add(conditionNumber);
+				conditionType = "number";
+			}
+
+			billsQueryCondPanel.doLayout();
+		}
+	}
+});
+
+var operatorData = [ [ "1", "等于" ], [ "2", "大于等于" ], [ "3", "小于等于" ] ];
+var operatorComb = new Ext.form.ComboBox({
+	hideLabel : true,
+	forceSelection : true,
+	width : 100,
+	value : "等于",
+	id : "operator",
+	store : new Ext.data.SimpleStore({
+		fields : [ "value", "text" ],
+		data : operatorData
+	}),
+	valueField : "value",
+	displayField : "text",
+	typeAhead : true,
+	mode : "local",
+	triggerAction : "all",
+	selectOnFocus : true,
+	allowBlank : false
+});
+
+// dymatic form
+var searchForm = new Ext.Panel({
+	border : false,
+	width : 130,
+	id : "searchForm",
+	items : [ {
+		xtype : "textfield",
+		hideLabel : true,
+		id : "conditionText",
+		allowBlank : false,
+		width : 120
+	} ]
+});
+
+// panel
+var billsQueryCondPanel = new Ext.form.FormPanel({
 	region : "north",
 	border : false,
-	height : 37,
-	contentEl : "queryCondition"
+	height : 23,
+	// contentEl : "queryCondition"
+	bodyStyle : "margin-top:5px;",
+	items : [ {
+		layout : "column",
+		border : false,
+		anchor : "98%",
+		items : [ {
+			layout : "form",
+			labelWidth : 40,
+			border : false,
+			labelSeparator : '：',
+			width : 150,
+			items : filterTypeComb
+		}, {
+			layout : "form",
+			border : false,
+			width : 110,
+			items : operatorComb
+		}, searchForm, {
+			layout : 'form',
+			border : false,
+			width : 110,
+			items : [ {
+				xtype : "button",
+				hideLabel : true,
+				id : "srchBtn",
+				text : "搜索",
+				width : 100,
+				listeners : {
+					"click" : billQueryHandler
+				}
+			} ]
+		} ]
+	} ]
 });
 
 // center

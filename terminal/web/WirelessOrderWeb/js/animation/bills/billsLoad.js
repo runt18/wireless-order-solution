@@ -9,4 +9,6 @@ function billsOnLoad() {
 
 	// get the bills
 	billQuery(0, 1, "");
+	
+	searchForm.remove("conditionText");
 };
