@@ -433,8 +433,8 @@ var orderedForm = new Ext.form.FormPanel(
 						// 各字段表示的意义：
 						// tableID：餐台号
 						// customNum：就餐人数
-						// foods：菜品列表，格式为{[菜品1编号,菜品1数量,口味1编号,厨房1编号]，[菜品2编号,菜品2数量,口味2编号,厨房2编号]}
-						// 以点菜式格式：[菜名，口味，数量，单价，操作，实价，菜名编号，厨房编号，口味编号]
+						// foods：菜品列表，格式为{[菜品1编号,菜品1数量,口味1编号,厨房1编号,菜品1折扣,2nd口味1编号,3rd口味1编号]}
+						// 以点菜式格式：[菜名，口味，数量，￥单价，操作，￥实价，菜名编号，厨房编号，口味编号1,特,荐,停,送,￥口味价钱,口味编号2,口味编号3]
 						text : "提交",
 						handler : function() {
 							if (orderedData.length > 0) {
@@ -443,13 +443,16 @@ var orderedForm = new Ext.form.FormPanel(
 
 								var foodPara = "";
 								for ( var i = 0; i < orderedData.length; i++) {
-									//菜品1编号,菜品1数量,口味1编号,厨房1编号,菜品1折扣,2nd口味1编号,3rd口味1编号
+									// 菜品1编号,菜品1数量,口味1编号,厨房1编号,菜品1折扣,2nd口味1编号,3rd口味1编号
 									foodPara = foodPara + "["
 											+ orderedData[i][6] + "," // 菜品1编号
 											+ orderedData[i][2] + "," // 菜品1数量
 											+ orderedData[i][8] + "," // 口味1编号
-											+ orderedData[i][7] // 厨房1编号
-											+ ",0,0,0" + "]，";
+											+ orderedData[i][7] + ","// 厨房1编号
+											+ "0,"// 菜品1折扣
+											+ orderedData[i][14] + ","// 2nd口味1编号
+											+ orderedData[i][15] // 3rd口味1编号
+											+ "]，";
 								}
 								foodPara = "{"
 										+ foodPara.substr(0,
@@ -614,26 +617,22 @@ var dishTasteGrid = new Ext.grid.GridPanel({
 	}),
 	listeners : {
 		rowdblclick : function(thiz, rowIndex, e) {
-			// 口味格式：[口味，价钱，口味编号]
-			// 以点菜式格式：[菜名，口味，数量，单价，操作，实价，菜名编号，厨房编号，口味编号,特,荐,停]
+			// 口味格式：[口味，￥价钱，口味编号]
+			// 以点菜式格式：[菜名，口味，数量，￥单价，操作，￥实价，菜名编号，厨房编号，口味编号1,特,荐,停,送,￥口味价钱,口味编号2,口味编号3]
 			var selectedTaste = dishTasteData[rowIndex][0];
 			var tastePrice = dishTasteData[rowIndex][1];
 			var tasteNbr = dishTasteData[rowIndex][2];
 			var dishIndex = dishOrderCurrRowIndex_;
+
 			// update taste
 			orderedData[dishIndex][1] = selectedTaste;
+
 			// update price
 			var currPrice = parseFloat(orderedData[dishIndex][3].substring(1))
-					+ parseFloat(tastePrice.substring(1)) + "";
-
-			if (currPrice.indexOf(".") < 0) {
-				currPrice = currPrice + ".00";
-			} else if (currPrice.length - currPrice.indexOf(".") == 3) {
-				currPrice = currPrice;
-			} else if (currPrice.length - currPrice.indexOf(".") == 2) {
-				currPrice = currPrice + "0";
-			}
+					+ parseFloat(tastePrice.substring(1));
+			currPrice = currPrice.toFixed(2);
 			orderedData[dishIndex][5] = "￥" + currPrice;
+
 			// update taste num
 			orderedData[dishIndex][8] = tasteNbr;
 
@@ -944,8 +943,8 @@ var dishesDisplayGrid = new Ext.grid.GridPanel({
 		rowdblclick : function(thiz, rowIndex, e) {
 
 			if (dishesDisplayDataShow[rowIndex][7] == "false") {
-				// mune格式：[菜名，菜名编号，菜名拼音，单价，厨房编号]
-				// ordered格式：[菜名，口味，数量，单价，操作，实价，菜名编号，厨房编号，口味编号,特,荐,停]
+				// mune格式：[菜名，菜名编号，菜名拼音，单价，厨房编号,特,荐,停,送]
+				// ordered格式：[菜名，口味，数量，￥单价，操作，￥实价，菜名编号，厨房编号，口味编号1,特,荐,停,送,￥口味价钱,口味编号2,口味编号3]
 				var dishCurrCount = dishesOrderEastPanel.findById(
 						"orderCountNum").getValue();
 				var dishCurrName = dishesDisplayDataShow[rowIndex][0];
@@ -967,7 +966,8 @@ var dishesDisplayGrid = new Ext.grid.GridPanel({
 							dishCurrPrice, "", dishCurrPrice, dishNbr,
 							kitchenNbr, 0, dishesDisplayDataShow[rowIndex][5],
 							dishesDisplayDataShow[rowIndex][6],
-							dishesDisplayDataShow[rowIndex][7] ]);
+							dishesDisplayDataShow[rowIndex][7],
+							dishesDisplayDataShow[rowIndex][8], "￥0", 0, 0 ]);
 				}
 				orderedStore.reload();
 				dishOrderCurrRowIndex_ = -1;
