@@ -216,7 +216,7 @@ var filterTypeComb = new Ext.form.ComboBox({
 			if (index == 0) {
 				// 全部
 				// searchForm.add(conditionText);
-				// conditionType = "text";
+				conditionType = "text";
 			} else if (index == 1) {
 				// 帐单号
 				searchForm.add(conditionNumber);
