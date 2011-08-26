@@ -443,12 +443,13 @@ var orderedForm = new Ext.form.FormPanel(
 
 								var foodPara = "";
 								for ( var i = 0; i < orderedData.length; i++) {
+									//菜品1编号,菜品1数量,口味1编号,厨房1编号,菜品1折扣,2nd口味1编号,3rd口味1编号
 									foodPara = foodPara + "["
 											+ orderedData[i][6] + "," // 菜品1编号
 											+ orderedData[i][2] + "," // 菜品1数量
 											+ orderedData[i][8] + "," // 口味1编号
 											+ orderedData[i][7] // 厨房1编号
-											+ "]，";
+											+ ",0,0,0" + "]，";
 								}
 								foodPara = "{"
 										+ foodPara.substr(0,
