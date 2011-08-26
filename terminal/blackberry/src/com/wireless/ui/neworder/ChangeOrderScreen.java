@@ -95,7 +95,7 @@ public class ChangeOrderScreen extends MainScreen implements PostSubmitOrder{
 		vfm.add(new LabelField("已点菜", LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
 			protected void paintBackground(Graphics g) {
 				g.clear();
-				g.setBackgroundColor(Color.RED);
+				g.setBackgroundColor(Color.PURPLE);
 				super.paintBackground(g);
 			} 
 			protected void paint(Graphics g){
