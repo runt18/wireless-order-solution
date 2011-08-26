@@ -112,6 +112,8 @@ function billModifyOnLoad() {
 	// .setTitle("<div style='font-size:18px;padding-left:2px'>帐单修改<div>");
 
 	// 已点菜式查询
+	// 格式：[菜名，口味，数量，￥单价，操作，￥实价，菜名编号，厨房编号，口味编号1,特,荐,停,送,折扣率,￥口味价钱,口味编号2,口味编号3]
+	// 后台：["菜名",菜名编号,厨房编号,"口味",口味编号,数量,￥单价,是否特价,是否推荐,是否停售,是否赠送,折扣率,口味编号2,口味编号3,￥口味价钱]
 	Ext.Ajax
 			.request({
 				url : "../QueryOrder.do",
@@ -154,7 +156,10 @@ function billModifyOnLoad() {
 										orderInfo[8],// 荐
 										orderInfo[9], // 停
 										orderInfo[10], // 送
-										orderInfo[11] // 折扣率
+										orderInfo[11], // 折扣率
+										tastePrice,// 口味价钱
+										orderInfo[12],// 口味编号2
+										orderInfo[13] // 口味编号3
 								]);
 							}
 
