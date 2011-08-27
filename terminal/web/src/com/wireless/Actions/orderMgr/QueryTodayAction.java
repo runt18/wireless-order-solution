@@ -96,25 +96,25 @@ public class QueryTodayAction extends Action {
 			
 			if(type == 1){
 				//按账单号
-				filterCondition = " AND b.id" + ope + filterVal;
+				filterCondition = " AND id" + ope + filterVal;
 			}else if(type == 2){
 				//按台号
-				filterCondition = " AND b.table_id" + ope + filterVal;
+				filterCondition = " AND table_id" + ope + filterVal;
 			}else if(type == 3){
 				//按日期时间
-				filterCondition = " AND b.order_date" + ope + "'" + filterVal + "'"; 
+				filterCondition = " AND order_date" + ope + "'" + filterVal + "'"; 
 			}else if(type == 4){
 				//按类型
-				filterCondition = " AND b.category" + ope + filterVal;
+				filterCondition = " AND category" + ope + filterVal;
 			}else if(type == 5){
 				//按结帐方式
-				filterCondition = " AND b.type" + ope + filterVal;
+				filterCondition = " AND type" + ope + filterVal;
 			}else if(type == 6){
 				//按金额
-				filterCondition = " AND b.total_price" + ope + filterVal;
+				filterCondition = " AND total_price" + ope + filterVal;
 			}else if(type == 7){
 				//按实收
-				filterCondition = " AND b.total_price_2" + ope + filterVal;
+				filterCondition = " AND total_price_2" + ope + filterVal;
 			}else{
 				filterCondition = "";
 			}
@@ -125,12 +125,17 @@ public class QueryTodayAction extends Action {
 			 * 2 - has been paid
 			 * 3 - match extra filter condition
 			 */
-			String sql = "SELECT a.minimum_cost, b.* FROM " + Params.dbName + ".table a, " + Params.dbName + ".order b" +
-						 " WHERE b.restaurant_id=" + term.restaurant_id + 
-						 " AND b.total_price IS NOT NULL" +
-						 " AND a.alias_id=b.table_id" +
-						 " AND a.restaurant_id=" + term.restaurant_id +
+			String sql = "SELECT * FROM " + Params.dbName + ".order WHERE" +
+						 " restaurant_id=" + term.restaurant_id + 
+						 " AND total_price IS NOT NULL" +
 						 filterCondition;
+			
+//			String sql = "SELECT a.minimum_cost, b.* FROM " + Params.dbName + ".table a, " + Params.dbName + ".order b" +
+//			 " WHERE b.restaurant_id=" + term.restaurant_id + 
+//			 " AND b.total_price IS NOT NULL" +
+//			 " AND a.alias_id=b.table_id" +
+//			 " AND a.restaurant_id=" + term.restaurant_id +
+//			 filterCondition;
 			
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			
