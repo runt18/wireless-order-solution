@@ -8,9 +8,9 @@ public class Util {
 		if(type == Order.CATE_NORMAL){
 			return "一般";
 		}else if(type == Order.CATE_JOIN_TABLE){
-			return "拼台";
-		}else if(type == Order.CATE_MERGER_TABLE){
 			return "并台";
+		}else if(type == Order.CATE_MERGER_TABLE){
+			return "拼台";
 		}else if(type == Order.CATE_TAKE_OUT){
 			return "外卖";
 		}else{
