@@ -113,8 +113,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food` (
   `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to the ordered food' ,
   `food_status` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates the status to this food, the value is the combination of values below.\n特价菜 ：0x01\n推荐菜 ：0x02\n停售　 ：0x04\n赠送     ：0x08' ,
   `taste_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the taste alias id' ,
-  `taste_id2` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the 2nd taste id to this order food record' ,
-  `taste_id3` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the 3rd taste id to this order food record' ,
+  `taste_id2` SMALLINT UNSIGNED NOT NULL DEFAULT 0 ,
+  `taste_id3` SMALLINT UNSIGNED NOT NULL DEFAULT 0 ,
   `taste` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the taste preference to the ordered food' ,
   `taste_price` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the price to taste preference' ,
   `discount` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the discount to this food' ,
@@ -175,6 +175,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`table` (
   `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this table' ,
   `alias_id` SMALLINT UNSIGNED NULL ,
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'Indicates the table belongs to which restaurant.' ,
+  `region` TINYINT UNSIGNED NOT NULL DEFAULT 255 COMMENT 'the region alias id to this table. 255 means the table does NOT belong to any region.' ,
   `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to this table' ,
   `enabled` TINYINT NOT NULL DEFAULT 1 COMMENT 'indicates whether the table information is enabled or not' ,
   `minimum_cost` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the minimum cost to this table' ,
@@ -225,6 +226,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`kitchen` (
   `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this kitchen' ,
   `restaurant_id` INT UNSIGNED NOT NULL ,
   `alias_id` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the alias id to this kitchen' ,
+  `super_kitchen` TINYINT UNSIGNED NOT NULL DEFAULT 255 COMMENT 'the super to this kitchen. 255 means NOT belong to any super kitchen.' ,
   `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name of this kitchen' ,
   `discount` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the discount to the food belong to this kitchen, range from 0.00 to 1.00' ,
   `discount_2` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the 2nd discount to the food belong to this kitchen, range from 0.00 to 1.00' ,
@@ -424,8 +426,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food_history` (
   `taste` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the taste preference to the ordered food' ,
   `taste_price` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the price to taste preference' ,
   `taste_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the taste alias id' ,
-  `taste_id2` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the 2nd taste id to this order food record' ,
-  `taste_id3` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the 3rd taste id to this order food record' ,
+  `taste_id2` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the 2nd taste to this record' ,
+  `taste_id3` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the 3rd taste to this record' ,
   `discount` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the discount to this food' ,
   `kitchen` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the kitchen number which the order food of this record belong to. the maximum value (255) means the food does not belong to any kitchen.' ,
   `comment` VARCHAR(100) NULL DEFAULT NULL COMMENT 'the comment to this record, such as the reason to cancel food' ,
@@ -563,10 +565,55 @@ DEFAULT CHARACTER SET = utf8,
 COMMENT = 'the shift history to each restaurant' ;
 
 
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`region`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`region` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`region` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'the id to this record' ,
+  `restaurant_id` INT UNSIGNED NOT NULL ,
+  `alias_id` TINYINT UNSIGNED NULL COMMENT 'the alias id to this table region' ,
+  `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to this table region' ,
+  PRIMARY KEY (`id`, `restaurant_id`) ,
+  INDEX `fk_region_restaurant1` (`restaurant_id` ASC) ,
+  CONSTRAINT `fk_region_restaurant1`
+    FOREIGN KEY (`restaurant_id` )
+    REFERENCES `wireless_order_db`.`restaurant` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the region information to the tables' ;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`super_kitchen`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`super_kitchen` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`super_kitchen` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `restaurant_id` INT UNSIGNED NOT NULL ,
+  `alias_id` TINYINT UNSIGNED NULL ,
+  `name` VARCHAR(45) NOT NULL DEFAULT '' ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_super_kitchen_restaurant1` (`restaurant_id` ASC) ,
+  CONSTRAINT `fk_super_kitchen_restaurant1`
+    FOREIGN KEY (`restaurant_id` )
+    REFERENCES `wireless_order_db`.`restaurant` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the super kitchen information' ;
+
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
 
 
 -- -----------------------------------------------------

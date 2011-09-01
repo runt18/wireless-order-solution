@@ -18,9 +18,11 @@ DELETE FROM wireless_order_db.material_history WHERE material_id IN (SELECT id F
 DELETE FROM wireless_order_db.material WHERE restaurant_id=11;
 DELETE FROM wireless_order_db.terminal WHERE restaurant_id=11;
 DELETE FROM wireless_order_db.table WHERE restaurant_id=11;
+DELETE FROM wireless_order_db.region WHERE restaurant_id=11;
 DELETE FROM wireless_order_db.food WHERE restaurant_id=11;
 DELETE FROM wireless_order_db.taste WHERE restaurant_id=11;
 DELETE FROM wireless_order_db.kitchen WHERE restaurant_id=11;
+DELETE FROM wireless_order_db.super_kitchen WHERE restaurant_id=11;
 
 DELETE FROM wireless_order_db.member_charge WHERE member_id IN (SELECT id FROM wireless_order_db.member WHERE restaurant_id=11);
 DELETE FROM wireless_order_db.member WHERE restaurant_id=11;
@@ -64,74 +66,109 @@ COMMIT;
 -- SELECT * FROM terminal;
 
 -- -----------------------------------------------------
+-- Insert test table regions(bound to demo restaurant)
+-- -----------------------------------------------------
+SET AUTOCOMMIT=0;
+INSERT INTO `wireless_order_db`.`region` (`id`, `restaurant_id`, `alias_id`, `name`) VALUES (NULL, 11, 0, '大厅1楼');
+INSERT INTO `wireless_order_db`.`region` (`id`, `restaurant_id`, `alias_id`, `name`) VALUES (NULL, 11, 1, '大厅2楼');
+INSERT INTO `wireless_order_db`.`region` (`id`, `restaurant_id`, `alias_id`, `name`) VALUES (NULL, 11, 2, '包房');
+INSERT INTO `wireless_order_db`.`region` (`id`, `restaurant_id`, `alias_id`, `name`) VALUES (NULL, 11, 3, 'VIP');
+INSERT INTO `wireless_order_db`.`region` (`id`, `restaurant_id`, `alias_id`, `name`) VALUES (NULL, 11, 4, '区域5');
+INSERT INTO `wireless_order_db`.`region` (`id`, `restaurant_id`, `alias_id`, `name`) VALUES (NULL, 11, 5, '区域6');
+INSERT INTO `wireless_order_db`.`region` (`id`, `restaurant_id`, `alias_id`, `name`) VALUES (NULL, 11, 6, '区域7');
+INSERT INTO `wireless_order_db`.`region` (`id`, `restaurant_id`, `alias_id`, `name`) VALUES (NULL, 11, 7, '区域8');
+INSERT INTO `wireless_order_db`.`region` (`id`, `restaurant_id`, `alias_id`, `name`) VALUES (NULL, 11, 8, '区域9');
+INSERT INTO `wireless_order_db`.`region` (`id`, `restaurant_id`, `alias_id`, `name`) VALUES (NULL, 11, 9, '区域10');
+COMMIT;
+
+-- -----------------------------------------------------
 -- Insert test tables(bound to demo restaurant, range from 100 to 145, 200 to 205)
 -- -----------------------------------------------------
 SET AUTOCOMMIT=0;
--- DELETE FROM wireless_order_db.table WHERE restaurant_id=11;
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`, `name`, `minimum_cost`) VALUES (NULL, 0x64, 11, '菊花厅', 150);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`, `name`, `minimum_cost`) VALUES (NULL, 0x65, 11, '水仙厅', 300.50);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`, `name`, `minimum_cost`) VALUES (NULL, 0x66, 11, '兰花厅', 500);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x67, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x68, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x69, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x6A, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x6B, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x6C, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x6D, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x6E, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x6F, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x70, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x71, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x72, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x73, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x74, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x75, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x76, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x77, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x78, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x79, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x7A, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x7B, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x7C, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x7D, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x7E, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x7F, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x80, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x81, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x82, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x83, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x84, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x85, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x86, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x87, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x88, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x89, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x8A, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x8B, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x8C, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x8D, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x8E, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x8F, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x90, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0x91, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0xC8, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0xC9, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0xCA, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0xCB, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 0xCC, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 205, 11);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `restaurant_id`) VALUES (NULL, 206, 11);
+-- belong to VIP
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`, `name`, `minimum_cost`) VALUES (NULL, 100, 3, 11, '菊花厅', 150);
+-- belong to 包房
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`, `name`, `minimum_cost`) VALUES (NULL, 101, 2, 11, '水仙厅', 300.50);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`, `name`, `minimum_cost`) VALUES (NULL, 102, 2, 11, '兰花厅', 500);
+-- belong to 大厅1楼
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 103, 0, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 104, 0, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 105, 0, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 106, 0, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 107, 0, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 108, 0, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 109, 0, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 110, 0, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 111, 0, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 112, 0, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 113, 0, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 114, 0, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 115, 0, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 116, 0, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 117, 0, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 118, 0, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 119, 0, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 120, 0, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 121, 0, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 122, 0, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 123, 0, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 124, 0, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 125, 0, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 126, 0, 11);
+-- belong to 大厅2楼
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 200, 1, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 201, 1, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 202, 1, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 203, 1, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 204, 1, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 205, 1, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 206, 1, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 207, 1, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 208, 1, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 209, 1, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 210, 1, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 211, 1, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 212, 1, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 213, 1, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 214, 1, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 215, 1, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 216, 1, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 217, 1, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 218, 1, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 219, 1, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 220, 1, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 221, 1, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 222, 1, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 223, 1, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 224, 1, 11);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant_id`) VALUES (NULL, 225, 1, 11);
 
 COMMIT;
--- SELECT * FROM wireless_order_db_demo.table;
+
+-- -----------------------------------------------------
+-- Insert super kitchen records, note that each restaruant has ten super kitchens
+-- -----------------------------------------------------
+SET AUTOCOMMIT=0;
+INSERT INTO `wireless_order_db`.`super_kitchen` (`id`, `restaurant_id`, `alias_id`, `name`) VALUES (NULL, 11, 0, '中厨');
+INSERT INTO `wireless_order_db`.`super_kitchen` (`id`, `restaurant_id`, `alias_id`, `name`) VALUES (NULL, 11, 1, '点心');
+INSERT INTO `wireless_order_db`.`super_kitchen` (`id`, `restaurant_id`, `alias_id`, `name`) VALUES (NULL, 11, 2, '大厨3');
+INSERT INTO `wireless_order_db`.`super_kitchen` (`id`, `restaurant_id`, `alias_id`, `name`) VALUES (NULL, 11, 3, '大厨4');
+INSERT INTO `wireless_order_db`.`super_kitchen` (`id`, `restaurant_id`, `alias_id`, `name`) VALUES (NULL, 11, 4, '大厨5');
+INSERT INTO `wireless_order_db`.`super_kitchen` (`id`, `restaurant_id`, `alias_id`, `name`) VALUES (NULL, 11, 5, '大厨6');
+INSERT INTO `wireless_order_db`.`super_kitchen` (`id`, `restaurant_id`, `alias_id`, `name`) VALUES (NULL, 11, 6, '大厨7');
+INSERT INTO `wireless_order_db`.`super_kitchen` (`id`, `restaurant_id`, `alias_id`, `name`) VALUES (NULL, 11, 7, '大厨8');
+INSERT INTO `wireless_order_db`.`super_kitchen` (`id`, `restaurant_id`, `alias_id`, `name`) VALUES (NULL, 11, 8, '大厨9');
+INSERT INTO `wireless_order_db`.`super_kitchen` (`id`, `restaurant_id`, `alias_id`, `name`) VALUES (NULL, 11, 9, '大厨10');
+
+COMMIT;
 
 -- -----------------------------------------------------
 -- Insert kitchen records, note that each restaruant has ten kitchens
 -- -----------------------------------------------------
 SET AUTOCOMMIT=0;
-INSERT INTO `wireless_order_db`.`kitchen` (`restaurant_id`, `alias_id`, `name`, `discount`, `member_discount_1`, `member_discount_2`) VALUES (11, 0, '明档', 0.9, 1.00, 1.00);
-INSERT INTO `wireless_order_db`.`kitchen` (`restaurant_id`, `alias_id`, `name`, `discount`, `member_discount_1`, `member_discount_2`) VALUES (11, 1, '烧味', 0.95, 0.9, 0.9);
-INSERT INTO `wireless_order_db`.`kitchen` (`restaurant_id`, `alias_id`, `name`, `discount`, `member_discount_1`, `member_discount_2`) VALUES (11, 2, '海鲜', 1.00, 1.00, 1.00);
+INSERT INTO `wireless_order_db`.`kitchen` (`restaurant_id`, `super_kitchen`, `alias_id`, `name`, `discount`, `member_discount_1`, `member_discount_2`) VALUES (11, 0, 0, '明档', 0.9, 1.00, 1.00);
+INSERT INTO `wireless_order_db`.`kitchen` (`restaurant_id`, `super_kitchen`, `alias_id`, `name`, `discount`, `member_discount_1`, `member_discount_2`) VALUES (11, 0, 1, '烧味', 0.95, 0.9, 0.9);
+INSERT INTO `wireless_order_db`.`kitchen` (`restaurant_id`, `super_kitchen`, `alias_id`, `name`, `discount`, `member_discount_1`, `member_discount_2`) VALUES (11, 1, 2, '海鲜', 1.00, 1.00, 1.00);
 INSERT INTO `wireless_order_db`.`kitchen` (`restaurant_id`, `alias_id`, `name`) VALUES (11, 3, '厨房4');
 INSERT INTO `wireless_order_db`.`kitchen` (`restaurant_id`, `alias_id`, `name`) VALUES (11, 4, '厨房5');
 INSERT INTO `wireless_order_db`.`kitchen` (`restaurant_id`, `alias_id`, `name`) VALUES (11, 5, '厨房6');
