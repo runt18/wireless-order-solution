@@ -1,5 +1,64 @@
 ﻿// ******************************************************************************************************
+// shiftWin
+var shiftPanel = new Ext.Panel({
+	frame : true,
+	items : [ {
+		border : false,
+		contentEl : "shiftDiv"
+	} ]
+});
 
+var shiftWin = new Ext.Window({
+	layout : "fit",
+	width : 450,
+	height : 450,
+	closeAction : "hide",
+	resizable : false,
+	items : shiftPanel,
+	buttons : [
+			{
+				text : "确定",
+				handler : function() {
+					// show the window
+					shiftWin.hide();
+
+					// do shift
+					// alert(shiftStartTiem + " , " + shiftEndTiem);
+					Ext.Ajax.request({
+						url : "../DoShift.do",
+						params : {
+							"pin" : currPin,
+							"onDuty" : shiftStartTiem,
+							"offDuty" : shiftEndTiem
+						},
+						success : function(response, options) {
+							var resultJSON = Ext.util.JSON
+									.decode(response.responseText);
+							Ext.MessageBox.show({
+								msg : resultJSON.data,
+								width : 300,
+								buttons : Ext.MessageBox.OK
+							});
+
+						},
+						failure : function(response, options) {
+						}
+					});
+				}
+			}, {
+				text : "打印",
+				disabled : true,
+				handler : function() {
+				}
+			}, {
+				text : "取消",
+				handler : function() {
+					shiftWin.hide();
+				}
+			} ]
+});
+
+// billVerifyWin
 var billVerifyWin = new Ext.Window({
 	layout : "fit",
 	width : 200,

@@ -32,6 +32,7 @@
 
 <!-- css -->
 <link rel="stylesheet" type="text/css" href="../css/header.css" />
+<link rel="stylesheet" type="text/css" href="../css/systemSetting.css" />
 
 <script type="text/javascript">
 	// 解决combobox图标异常问题
@@ -64,6 +65,9 @@
 	} else {
 		currPin = Request["pin"];
 	}
+	
+	var shiftStartTiem = "";
+	var shiftEndTiem = "";
 </script>
 
 <script type="text/javascript"
@@ -113,8 +117,107 @@
 				<td style="width: 100px;">&nbsp;</td>
 				<td id="logout"
 					style="width: 160px; height: 250px; background: url(../images/logout.png) no-repeat 50%;"></td>
+				<td style="width: 100px;">&nbsp;</td>
+				<td id="shift"
+					style="width: 160px; height: 250px; background: url(../images/shift.png) no-repeat 50%;"></td>
 
 			</tr>
+		</table>
+	</div>
+
+	<!------------------- shift ------------------------>
+	<div id="shiftDiv">
+		<table border="1" id="shiftContent">
+			<tr>
+				<td id="shiftTitle">交班对帐单</td>
+			</tr>
+			<tr>
+				<td>
+					<table>
+						<tr>
+							<td><table>
+									<tr>
+										<td style="width: 23px" />
+										<td>交班人：</td>
+										<td id="shiftOperator">fuck</td>
+										<td style="width: 120px" />
+										<td>帐单数：</td>
+										<td id="shiftBillCount">45</td>
+									</tr>
+								</table>
+							</td>
+
+						</tr>
+						<tr>
+							<td><table>
+									<tr>
+										<td style="width: 23px; height: 30px" />
+										<td>开始时间：</td>
+										<td id="shiftStartTime">2011-07-11 8:04:04</td>
+									</tr>
+									<tr>
+										<td style="width: 23px; height: 30px" />
+										<td>结束时间：</td>
+										<td id="shiftEndTime">2011-07-11 12:14:33</td>
+									</tr>
+								</table></td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+			 <tr>
+				<td><table>
+						<tr>
+							<td style="width: 27px; height: 30px" />
+							<td style="width: 140px">收款方式</td>
+							<td style="width: 140px">金额</td>
+							<td style="width: 140px">实收</td>
+						</tr>
+						<tr>
+							<td style="width: 27px; height: 30px" />
+							<td>现金</td>
+							<td id="amount1">1243.43</td>
+							<td id="actual1">1243</td>
+						</tr>
+						<tr>
+							<td style="width: 27px; height: 30px" />
+							<td>刷卡</td>
+							<td id="amount2">1243.43</td>
+							<td id="actual2">1243</td>
+						</tr>
+						<tr>
+							<td style="width: 27px; height: 30px" />
+							<td>会员卡</td>
+							<td id="amount3">1243.43</td>
+							<td id="actual3">1243</td>
+						</tr>
+						<tr>
+							<td style="width: 27px; height: 30px" />
+							<td>签单</td>
+							<td id="amount4">1243.43</td>
+							<td id="actual4">1243</td>
+						</tr>
+						<tr>
+							<td style="width: 27px; height: 30px" />
+							<td>挂账</td>
+							<td id="amount5">1243.43</td>
+							<td id="actual5">1243</td>
+						</tr>
+					</table></td>
+			</tr>
+			<tr>
+				<td><table>
+						<tr>
+							<td style="width: 27px; height: 30px" />
+							<td style="width: 60px">折扣：</td>
+							<td style="width: 70px" id="discountAmt">210</td>
+							<td style="width: 60px">赠送：</td>
+							<td style="width: 70px" id="freeAmt">210</td>
+							<td style="width: 60px">实收：</td>
+							<td style="width: 70px" id="payAmt">210</td>
+						</tr>
+					</table></td>
+			</tr> 
 		</table>
 	</div>
 
