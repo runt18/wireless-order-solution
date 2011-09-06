@@ -62,20 +62,24 @@ IF NOT EXIST terminal\web\WirelessOrderWeb GOTO web_term_not_exist
 
 Rem copy the terminal cod files
 :cod_files
-IF EXIST terminal\blackberry\deliverables\Web\5.0.0\WirelessOrderTerminal.cod GOTO cod_exist
-IF NOT EXIST terminal\blackberry\deliverables\Web\5.0.0\WirelessOrderTerminal.cod GOTO cod_not_exist
-:cod_exist
-	@echo copying the terminal cod files...
-	IF NOT EXIST dist\www\ota mkdir dist\www\ota
-	@copy terminal\blackberry\deliverables\Web\5.0.0\WirelessOrderTerminal*.cod dist\www\ota\ > nul
-	@copy terminal\blackberry\deliverables\Web\5.0.0\WirelessOrderTerminal.jad dist\www\ota\ > nul
-	@copy terminal\blackberry\deliverables\Web\5.0.0\WirelessOrderTerminal.jar dist\www\ota\ > nul
-	@copy terminal\blackberry\version.php dist\www\ota\ > nul
-	@copy terminal\blackberry\releasenote.txt dist\www\ota\ > nul
+IF EXIST terminal\blackberry\bb45\deliverables\Web\4.5.0\WirelessOrderTerminal.cod GOTO cod_45_exist
+IF NOT EXIST terminal\blackberry\deliverables\Web\4.5.0\WirelessOrderTerminal.cod GOTO cod_45_not_exist
+:cod_45_exist
+	@echo copying the terminal cod for blackberry 4.5 files...
+	IF NOT EXIST dist\www\ota\bb45 mkdir dist\www\ota\bb45
+	@copy terminal\blackberry\bb45\deliverables\Web\4.5.0\WirelessOrderTerminal*.cod dist\www\ota\bb45 > nul
+	@copy terminal\blackberry\bb45\deliverables\Web\4.5.0\WirelessOrderTerminal.jad dist\www\ota\bb45 > nul
+	@copy terminal\blackberry\bb45\deliverables\Web\4.5.0\WirelessOrderTerminal_BB45.jad dist\www\ota\bb45 > nul
+	@copy terminal\blackberry\bb45\deliverables\Web\4.5.0\WirelessOrderTerminal.jar dist\www\ota\bb45 > nul
+	@copy terminal\blackberry\bb45\deliverables\Web\4.5.0\WirelessOrderTerminal_BB45.jar dist\www\ota\bb45 > nul
+	@copy terminal\blackberry\version.php dist\www\ota\bb45 > nul
+	@copy terminal\blackberry\releasenote.txt dist\www\ota\bb45 > nul
+	terminal\blackberry\UpdateJad -n dist\www\ota\bb45\WirelessOrderTerminal_BB45.jad dist\www\ota\bb45\WirelessOrderTerminal.jad 
+	del dist\www\ota\bb45\WirelessOrderTerminal.jad
 	GOTO terminal_help
 
-:cod_not_exist
-	@echo the terminal cod file missing
+:cod_45_not_exist
+	@echo the terminal cod for blackberry 4.5 file missing
 	@pause
 	GOTO end
 
