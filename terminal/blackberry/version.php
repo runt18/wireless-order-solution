@@ -1,10 +1,10 @@
 <?php
-$file_content = file_get_contents("WirelessOrderTerminal.jad");
+$file_content = file("WirelessOrderTerminal.jad");
 
-$file_array = split("\r\n", $file_content);
+$no = count($file_content);
 
-foreach ($file_array as $value1){
-	$item = split(":", $value1);
+for($index = 0; $index < $no; $index++){
+	$item = split(":", $file_content[$index]);
 	if($item[0] == "MIDlet-Version"){
 		echo trim($item[1]);
 	}
