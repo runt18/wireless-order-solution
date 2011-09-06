@@ -57,8 +57,8 @@ public class DoShiftAction extends Action {
 			String sql = "INSERT INTO " + Params.dbName + ".shift (restaurant_id, name, on_duty, off_duty) VALUES(" +
 						 term.restaurant_id + "," +
 						 "'" + term.owner + "'," +
-						 onDuty + "," +
-						 offDuty +
+						 "DATE_FORMAT('" + onDuty + "', '%Y%m%d%H%i%s')" + "," +
+						 "DATE_FORMAT('" + offDuty + "', '%Y%m%d%H%i%s')" + 
 						 ")";
 			
 			dbCon.stmt.execute(sql);
