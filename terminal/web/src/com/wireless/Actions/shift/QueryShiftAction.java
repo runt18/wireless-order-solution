@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -65,13 +66,16 @@ public class QueryShiftAction extends Action {
 			/**
 			 * Make the current date as the off duty date
 			 */
-			String offDuty = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis());
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			sdf.setTimeZone(TimeZone.getTimeZone("GMT+8"));
+			String offDuty = sdf.format(System.currentTimeMillis());
 			
 			/**
 			 * Get the amount the order within this shift
 			 */
 			int orderAmount = 0;
 			sql = "SELECT COUNT(*) FROM " + Params.dbName + ".order WHERE restaurant_id=" + term.restaurant_id +
+				  " AND total_price IS NOT NULL" +
 				  " AND order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "'";
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			if(dbCon.rs.next()){
@@ -97,7 +101,7 @@ public class QueryShiftAction extends Action {
 			dbCon.rs.close();
 			
 			/**
-			 * Get the total credit card income within this shirt
+			 * Get the total credit card income within this shift
 			 */
 			float totalCreditCard = 0;
 			float totalCreditCard_2 = 0;
@@ -110,7 +114,7 @@ public class QueryShiftAction extends Action {
 			dbCon.rs.close();
 			
 			/**
-			 * Get the total member card income within this shirt
+			 * Get the total member card income within this shift
 			 */
 			float totalMemberCard = 0;
 			float totalMemberCard_2 = 0;
@@ -123,7 +127,7 @@ public class QueryShiftAction extends Action {
 			dbCon.rs.close();
 			
 			/**
-			 * Get the total sign income within this shirt
+			 * Get the total sign income within this shift
 			 */
 			float totalSign = 0;
 			float totalSign_2 = 0;
@@ -136,7 +140,7 @@ public class QueryShiftAction extends Action {
 			dbCon.rs.close();
 			
 			/**
-			 * Get the total hang income within this shirt
+			 * Get the total hang income within this shift
 			 */
 			float totalHang = 0;
 			float totalHang_2 = 0;
@@ -156,8 +160,8 @@ public class QueryShiftAction extends Action {
 			float totalGift = 0;
 			sql = "SELECT SUM(unit_price * order_count * discount + taste_price) FROM " + Params.dbName + ".order_food WHERE order_id IN(" +
 				  "SELECT id FROM " +Params.dbName + ".order WHERE restaurant_id=" + term.restaurant_id + 
-				  " AND total_price IS NOT NULL)" +
-				  " AND order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "'" +
+				  " AND total_price IS NOT NULL" +
+				  " AND order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "')" +
 				  " AND (food_status & " + Food.GIFT + ") <> 0"; 
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			if(dbCon.rs.next()){
@@ -171,8 +175,8 @@ public class QueryShiftAction extends Action {
 			float totalDiscount = 0;
 			sql = "SELECT SUM(unit_price * order_count * (1-discount) + taste_price) FROM " + Params.dbName + ".order_food WHERE order_id iN(" +
 				  "SELECT id FROM " +Params.dbName + ".order WHERE restaurant_id=" + term.restaurant_id + 
-				  " AND total_price IS NOT NULL)" +
-				  " AND order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "'" +
+				  " AND total_price IS NOT NULL" +
+				  " AND order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "')" +
 				  " AND discount < 1.00";
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			if(dbCon.rs.next()){
