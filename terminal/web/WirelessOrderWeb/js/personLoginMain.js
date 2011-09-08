@@ -21,6 +21,8 @@ var shiftWin = new Ext.Window({
 				handler : function() {
 					// show the window
 					shiftWin.hide();
+				
+					isPrompt = false;
 
 					// do shift
 					// alert(shiftStartTiem + " , " + shiftEndTiem);
@@ -54,6 +56,7 @@ var shiftWin = new Ext.Window({
 				text : "取消",
 				handler : function() {
 					shiftWin.hide();
+					isPrompt = false;
 				}
 			} ]
 });
@@ -94,6 +97,7 @@ var billVerifyWin = new Ext.Window({
 					}
 
 					billVerifyWin.hide();
+					isPrompt = false;
 					billVerifyWin.findById("billVerifyPwd").setValue("");
 
 					Ext.Ajax.request({
@@ -125,6 +129,7 @@ var billVerifyWin = new Ext.Window({
 				text : "取消",
 				handler : function() {
 					billVerifyWin.hide();
+					isPrompt = false;
 					billVerifyWin.findById("billVerifyPwd").setValue("");
 				}
 			} ],
