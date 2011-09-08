@@ -83,7 +83,7 @@ var billVerifyWin = new Ext.Window({
 	} ],
 	buttons : [
 			{
-				text : "确定",
+				text : "交班",
 				handler : function() {
 					var billVerifyPwd = billVerifyWin.findById("billVerifyPwd")
 							.getValue();

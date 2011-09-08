@@ -1,4 +1,19 @@
 #tail,#print {
-	font-weight:bold;
-	font-size:18px;
+	font-weight: bold;
+	font-size: 18px;
+}
+
+#shiftTitle {
+	height: 40px;
+	width: 450px;
+	text-align: center;
+	align: center;
+	font-size: 15pt;
+	font-family: Ώ¬Με, Ώ¬Με_GB2312;
+	font-weight: bold;
+}
+
+#shiftContent {
+	height: 30px;
+	font-size: 12pt;
 }
