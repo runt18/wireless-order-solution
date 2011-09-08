@@ -88,9 +88,9 @@
 							document.getElementById("amount5").innerHTML = shiftList[11].substr(1,shiftList[11].length-2);
 							document.getElementById("actual5").innerHTML = shiftList[12].substr(1,shiftList[12].length-2);
 							
-							document.getElementById("discountAmt").innerHTML = shiftList[13].substr(1,shiftList[14].length-2);
-							document.getElementById("freeAmt").innerHTML = shiftList[14].substr(1,shiftList[15].length-2);
-							document.getElementById("payAmt").innerHTML = shiftList[15].substr(1,shiftList[13].length-2);
+							document.getElementById("discountAmt").innerHTML = shiftList[14].substr(1,shiftList[14].length-2);
+							document.getElementById("freeAmt").innerHTML = shiftList[15].substr(1,shiftList[15].length-2);
+							document.getElementById("payAmt").innerHTML = shiftList[13].substr(1,shiftList[13].length-2);
 							
 							shiftStartTiem = shiftList[0].substr(1,shiftList[0].length-2);
 							shiftEndTiem = shiftList[1].substr(1,shiftList[1].length-2);
