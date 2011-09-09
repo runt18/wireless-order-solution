@@ -5,6 +5,7 @@ dishCountInputWin = new Ext.Window({
 	height : 100,
 	closeAction : "hide",
 	resizable : false,
+	closable : false,
 	items : [ {
 		layout : "form",
 		labelWidth : 30,
@@ -546,6 +547,8 @@ var dishTasteWindow = new Ext.Window({
 	layout : "fit",
 	width : 250,
 	height : 300,
+	resizable : false,
+	closable : false,
 	closeAction : "hide",
 	// plain: true,
 	items : dishTasteGrid
