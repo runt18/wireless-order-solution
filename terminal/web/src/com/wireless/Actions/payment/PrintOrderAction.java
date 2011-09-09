@@ -47,10 +47,10 @@ public class PrintOrderAction extends Action implements PinGen{
 			 * The parameters looks like below.
 			 * 
 			 * 1st example, print an order according to order id
-			 * pin=0x1 & orderID=654 & printSync=1 & printOrder=1 & printDetail=0 & printReceipt=0
+			 * pin=0x1 & orderID=654 & printSync=1 & printOrder=1 & printDetail=0 & printReceipt=0 & printShift=0
 			 * 
 			 * 2nd example, print an order according to table id
-			 * pin=0x1 & tableID=101 & printSync=1 & printOrder=1 & printDetail=0 & printReceipt=0
+			 * pin=0x1 & tableID=101 & printSync=1 & printOrder=1 & printDetail=0 & printReceipt=0 & printShift=0
 			 * 
 			 * pin : the pin the this terminal
 			 * 
@@ -65,6 +65,8 @@ public class PrintOrderAction extends Action implements PinGen{
 			 * printDetail : 1 means to print the order detail, 0 or null means NOT
 			 * 
 			 * printReceipt : 1 means to print the receipt, 0 or null means NOT
+			 * 
+			 * printShift : 1 means to print the shift, 0 or null means NOT
 			 * 
 			 */
 			String pin = request.getParameter("pin");
@@ -90,7 +92,7 @@ public class PrintOrderAction extends Action implements PinGen{
 			}
 			
 			
-			byte conf = 0;
+			short conf = 0;
 			
 			String param = request.getParameter("printSync");
 			if(param != null){
@@ -134,6 +136,17 @@ public class PrintOrderAction extends Action implements PinGen{
 				}
 			}else{
 				conf &= ~Reserved.PRINT_RECEIPT_2;
+			}
+			
+			param = request.getParameter("printShift");
+			if(param != null){
+				if(Byte.parseByte(param) == 0){
+					conf &= ~Reserved.PRINT_SHIFT_RECEIPT_2;
+				}else{
+					conf |= Reserved.PRINT_SHIFT_RECEIPT_2;
+				}
+			}else{
+				conf &= ~Reserved.PRINT_SHIFT_RECEIPT_2;
 			}
 			
 			ReqPackage.setGen(this);
