@@ -37,6 +37,11 @@
         <file style="2" path="ptemp/transfer_80mm"/><!-- 80mm -->
 		<file style="1" path="ptemp/transfer_58mm"/><!-- 58mm -->
 	</print_template>
+	<!-- the template to print shift receipt -->
+	<print_template func="126">
+        <file style="2" path="ptemp/shift_80mm"/><!-- 80mm -->
+		<file style="1" path="ptemp/shift_58mm"/><!-- 58mm -->
+	</print_template>
 	<!-- the parameter to thread pool -->
 	<cool_pool_size>100</cool_pool_size>
 	<max_pool_size>200</max_pool_size>
