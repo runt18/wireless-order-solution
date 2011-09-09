@@ -11,15 +11,21 @@ public class QueryMember {
 	
 	/**
 	 * Query the member information according to the specific restaurant and member id.
-	 * @param pin the pin to this terminal
-	 * @param model the model to this terminal
-	 * @param memberID the member id to query
+	 * 
+	 * @param pin
+	 *            the pin to this terminal
+	 * @param model
+	 *            the model to this terminal
+	 * @param memberID
+	 *            the member id to query
 	 * @return the member detail information
-	 * @throws BusinessException throws if one the cases below.<br>
-	 * 							 - The terminal is NOT attached to any restaurant.<br>
-	 * 							 - The terminal is expired.<br>
-	 * 							 - The member to query does NOT exist.
+	 * @throws BusinessException
+	 *             throws if one the cases below.<br>
+	 *             - The terminal is NOT attached to any restaurant.<br>
+	 *             - The terminal is expired.<br>
+	 *             - The member to query does NOT exist.
 	 * @throws SQLException
+	 *             throws if fail to execute any SQL statement
 	 */
 	public static Member exec(int pin, short model, String memberID) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
