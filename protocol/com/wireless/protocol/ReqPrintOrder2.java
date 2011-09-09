@@ -23,14 +23,18 @@ public class ReqPrintOrder2 extends ReqPackage{
 	 * Construct the print protocol.
 	 * @param printConf
 	 * 				the configuration parameter to the print, the meaning to each bit is as below.<br>
-	 *              [0] - PRINT_SYNC<br>
-	 *              [1] - PRINT_ORDER_2<br>
-	 *              [2] - PRINT_ORDER_DETAIL_2<br>
-	 *              [3] - PRINT_RECEIPT_2<br>
-	 *              [4] - PRINT_EXTRA_FOOD_2<br>
-	 *              [5] - PRINT_CANCELLED_FOOD_2<br>
-	 *              [6] - PRINT_TRANSFER_TABLE_2<br>
-	 *              [7] - PRINT_TEMP_RECEIPT_2<br>	
+	 * 				[0] - Not Used<br>
+	 *              [1] - PRINT_SYNC<br>
+	 *              [2] - PRINT_ORDER_2<br>
+	 *              [3] - PRINT_ORDER_DETAIL_2<br>
+	 *              [4] - PRINT_RECEIPT_2<br>
+	 *              [5] - PRINT_EXTRA_FOOD_2<br>
+	 *              [6] - PRINT_CANCELLED_FOOD_2<br>
+	 *              [7] - PRINT_TRANSFER_TABLE_2<br>
+	 *              [8] - PRINT_ALL_EXTRA_FOOD_2<br>
+	 *              [9] - PRINT_ALL_CANCELLED_FOOD_2<br>
+	 *              [10] - PRINT_SHIFT_RECEIPT_2<br>
+	 *              [11] - PRINT_TEMP_RECEIPT_2<br>	
 	 * @param printConf
 	 * 				the print configuration parameter             		
 	 * @param orderID
