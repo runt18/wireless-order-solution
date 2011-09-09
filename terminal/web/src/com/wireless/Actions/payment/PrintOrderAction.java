@@ -159,6 +159,9 @@ public class PrintOrderAction extends Action implements PinGen{
 				}else if(request.getParameter("tableID") != null){
 					jsonResp = jsonResp.replace("$(value)", tableID + "号餐台的账单打印成功");
 					
+				}else if(request.getParameter("printShift") != null){
+					jsonResp = jsonResp.replace("$(value)", "交班对账单打印成功");
+					
 				}else{
 					jsonResp = jsonResp.replace("$(value)", orderID + "号账单打印成功");					
 				}
