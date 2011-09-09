@@ -207,11 +207,17 @@ class OrderHandler extends Handler implements Runnable{
 				//handle the print request
 			}else if(request.header.mode == Mode.PRINT && request.header.type == Type.PRINT_BILL_2){
 				
-				Order reqToPrint = ReqParser.parsePrintReq(request);	
-				
-				Order orderToPrint = QueryOrder.execByID(_term.pin, _term.modelID, reqToPrint.id);
+				Order reqToPrint = ReqParser.parsePrintReq(request);
 				
 				int printConf = reqToPrint.print_type;
+
+				Order orderToPrint;
+				if((printConf & Reserved.PRINT_SHIFT_RECEIPT_2) == 0){
+					orderToPrint = QueryOrder.execByID(_term.pin, _term.modelID, reqToPrint.id);
+				}else{				
+					orderToPrint = new Order();
+				}
+				
 				if((printConf & Reserved.PRINT_TRANSFER_TABLE_2) != 0){
 					orderToPrint.table_id = reqToPrint.table_id;
 					orderToPrint.originalTableID = reqToPrint.originalTableID;
@@ -337,7 +343,7 @@ class OrderHandler extends Handler implements Runnable{
 				 * the print request is done, and send the ACK or NAK to let the terminal know whether 
 				 * the print actions is successfully or not
 				 */	
-				new PrintHandler(orderToPrint, connections, printConf, restaurant, _term.owner).run();						
+				new PrintHandler(orderToPrint, connections, printConf, restaurant, _term).run();						
 				
 			}else{
 				/**
@@ -345,7 +351,7 @@ class OrderHandler extends Handler implements Runnable{
 				 * regardless of the print request. In the mean time, the print request would be put to a 
 				 * new thread to run.
 				 */	
-				WirelessSocketServer.threadPool.execute(new PrintHandler(orderToPrint, connections, printConf, restaurant, _term.owner));
+				WirelessSocketServer.threadPool.execute(new PrintHandler(orderToPrint, connections, printConf, restaurant, _term));
 			}
 		}
 	}
