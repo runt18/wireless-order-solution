@@ -202,19 +202,19 @@ public class QueryShift {
 		shift.onDuty = onDuty;
 		shift.offDuty = offDuty;
 		shift.orderAmount = orderAmount;
-		shift.totalActual = totalActual;
-		shift.totalCash = totalCash;
-		shift.totalCash2 = totalCash_2;
-		shift.totalCreditCard = totalCreditCard;
-		shift.totalCreditCard2 = totalCreditCard_2;
-		shift.totalDiscount = totalDiscount;
-		shift.totalGift = totalGift;
-		shift.totalHang = totalHang;
-		shift.totalHang2 = totalHang_2;
-		shift.totalMemberCard = totalMemberCard;
-		shift.totalMemberCard2 = totalMemberCard_2;
-		shift.totalSign = totalSign;
-		shift.totalSign2 = totalSign_2;
+		shift.totalActual = (float)Math.round(totalActual * 100) / 100;
+		shift.totalCash = (float)Math.round(totalCash * 100) / 100;
+		shift.totalCash2 = (float)Math.round(totalCash_2 * 100) / 100;
+		shift.totalCreditCard = (float)Math.round(totalCreditCard * 100) / 100;
+		shift.totalCreditCard2 = (float)Math.round(totalCreditCard_2 * 100) / 100;
+		shift.totalDiscount = (float)Math.round(totalDiscount * 100) / 100;
+		shift.totalGift = (float)Math.round(totalGift * 100) / 100;
+		shift.totalHang = (float)Math.round(totalHang * 100) / 100;
+		shift.totalHang2 = (float)Math.round(totalHang_2 * 100) / 100;
+		shift.totalMemberCard = (float)Math.round(totalMemberCard * 100) / 100;
+		shift.totalMemberCard2 = (float)Math.round(totalMemberCard_2 * 100) / 100;
+		shift.totalSign = (float)Math.round(totalSign * 100) / 100;
+		shift.totalSign2 = (float)Math.round(totalSign_2 * 100) / 100;
 		return shift;
 	}
 }
