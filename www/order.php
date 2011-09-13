@@ -89,16 +89,50 @@ if($editType == "dailyCheckOut")
 			`waiter`,`type`, `discount_type`, `member_id`, `member`,`terminal_pin`, `terminal_model`, `table_id`, `table_name`,service_rate,comment)
 			SELECT `id`, `restaurant_id`,`order_date`, `total_price`,`total_price_2`, `custom_num`, 
 			`waiter`,`type`, `discount_type`, `member_id`, `member`,`terminal_pin`, `terminal_model`, `table_id`, `table_name`,service_rate,comment FROM `order` WHERE total_price IS NOT NULL AND restaurant_id=" . $_SESSION["restaurant_id"];		
+
 	$sql2 = "INSERT INTO `order_food_history`(`id`,`order_id`, `food_id`, `order_date`, `order_count`, 
 			`unit_price`,`name`, `taste`,`taste_price`,`taste_id`,`taste_id2`,`taste_id3`,`discount`,`kitchen`,`comment`,`waiter`,`food_status`)
 			SELECT `id`,`order_id`, `food_id`, `order_date`, `order_count`, 
 			`unit_price`,`name`, `taste`,`taste_price`,`taste_id`,`taste_id2`,`taste_id3`,`discount`,`kitchen`,`comment`,`waiter`,`food_status` 
 			FROM `order_food` WHERE `order_food`.`order_id` IN (SELECT id FROM `order` WHERE total_price  IS NOT NULL AND restaurant_id=" . $_SESSION["restaurant_id"].")";
-	$sql3 = "DELETE FROM `order_food` WHERE `order_id` IN (SELECT id FROM `order` WHERE total_price  IS NOT NULL AND restaurant_id=" . $_SESSION["restaurant_id"].")";
-	$sql4 = "DELETE FROM `order` WHERE total_price  IS NOT NULL AND restaurant_id=" . $_SESSION["restaurant_id"];
-	$sql5 = "UPDATE `terminal` SET gift_amount=0 WHERE restaurant_id=" . $_SESSION["restaurant_id"];
+
+	$sql3 = "INSERT INTO 
+			temp_order_food_history(order_id,food_id,taste_id,taste_id2,taste_id3,
+			`name`,taste,order_count,unit_price,taste_price,discount,food_status,kitchen,waiter) 
+			SELECT 
+			`wireless_order_db`.`order_food`.`order_id` AS `order_id`,
+			`wireless_order_db`.`order_food`.`food_id` AS `food_id`,
+			`wireless_order_db`.`order_food`.`taste_id` AS `taste_id`,
+			`wireless_order_db`.`order_food`.`taste_id` AS `taste_id2`,
+			`wireless_order_db`.`order_food`.`taste_id` AS `taste_id3`,
+			`wireless_order_db`.`order_food`.`name` AS `name`,
+			`wireless_order_db`.`order_food`.`taste` AS `taste`,
+			SUM(`wireless_order_db`.`order_food`.`order_count`) AS `order_count`,
+			MAX(`wireless_order_db`.`order_food`.`unit_price`) AS `unit_price`,
+			MAX(`wireless_order_db`.`order_food`.`taste_price`) AS `taste_price`,
+			MAX(`wireless_order_db`.`order_food`.`discount`) AS `discount`,
+			MAX(`wireless_order_db`.`order_food`.`food_status`) AS `food_status`,
+			MAX(`wireless_order_db`.`order_food`.`kitchen`) AS `kitchen`,
+			MAX(`wireless_order_db`.`order_food`.`waiter`) AS `waiter`
+			FROM `wireless_order_db`.`order_food` WHERE order_id IN(
+			SELECT id FROM `wireless_order_db`.`order` WHERE total_price IS NOT NULL AND restaurant_id=" . $_SESSION["restaurant_id"] .
+			")
+			GROUP BY 
+			`wireless_order_db`.`order_food`.`order_id`,
+			`wireless_order_db`.`order_food`.`food_id`,
+			`wireless_order_db`.`order_food`.`taste_id`,
+			`wireless_order_db`.`order_food`.`taste_id2`,
+			`wireless_order_db`.`order_food`.`taste_id3` 
+			HAVING (SUM(`wireless_order_db`.`order_food`.`order_count`) > 0);";
+
+	$sql4 = "DELETE FROM `order_food` WHERE `order_id` IN (SELECT id FROM `order` WHERE total_price  IS NOT NULL AND restaurant_id=" .							$_SESSION["restaurant_id"].")";
+
+	$sql5 = "DELETE FROM `order` WHERE total_price  IS NOT NULL AND restaurant_id=" . $_SESSION["restaurant_id"];
+
+	$sql6 = "UPDATE `terminal` SET gift_amount=0 WHERE restaurant_id=" . $_SESSION["restaurant_id"];
+
 	/*echo ($sql1.";".$sql2.";".$sql3.";".$sql4.";".$sql5);*/
-	if($db->Execute($sql1) && $db->Execute($sql2) && $db->Execute($sql3) && $db->Execute($sql4) && $db->Execute($sql5))
+	if($db->Execute($sql1) && $db->Execute($sql2) && $db->Execute($sql3) && $db->Execute($sql4) && $db->Execute($sql5) && $db->Execute($sql6))
 	{
 		echo "<script>alert('日结成功！');</script>";
 	}	
