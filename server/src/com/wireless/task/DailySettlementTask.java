@@ -61,6 +61,24 @@ public class DailySettlementTask extends SchedulerTask{
 			}
 			dbCon.rs.close();
 			
+			//get the amount of orders to move to "temp_order_food_history"
+			final String tempOrder = "FROM " + Params.dbName + ".`order_food` WHERE order_id IN ( " +
+			  					"SELECT id FROM " + Params.dbName + ".order WHERE total_price IS NOT NULL)" +
+			  					"GROUP BY " + 
+			  					Params.dbName + ".order_food.order_id," +
+			  					Params.dbName + ".order_food.food_id," + 
+			  					Params.dbName + ".order_food.taste_id," +
+			  					Params.dbName + ".order_food.taste_id2," + 
+			  					Params.dbName + ".order_food.taste_id3 " +
+			  					"HAVING (SUM(" + Params.dbName + ".`order_food`.`order_count`) > 0)";
+			int nTempOrders = 0;
+			sql = "SELECT COUNT(*) FROM(SELECT id " + tempOrder + ") aa";
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
+				nTempOrders = dbCon.rs.getInt(1);
+			}
+			dbCon.rs.close();
+			
 			final String orderItem = "`id`, `restaurant_id`,`order_date`, `total_price`, `total_price_2`, `custom_num`," + 
 									"`waiter`, `type`, `discount_type`,`category`, `member_id`, `member`,`terminal_pin`, `terminal_model`, `table_id`, " +
 									"`table_name`, `table2_id`, `table2_name`, `service_rate`, `comment`";
@@ -79,6 +97,27 @@ public class DailySettlementTask extends SchedulerTask{
 			sql = "INSERT INTO " + Params.dbName + ".order_food_history (" + orderFoodItem + ") " +
 				  "SELECT " + orderFoodItem + " FROM " + Params.dbName + ".order_food WHERE order_id IN (" +
 				  "SELECT id FROM " + Params.dbName + ".order WHERE total_price IS NOT NULL)";
+			dbCon.stmt.addBatch(sql);
+			
+			//move the details from "order_food" to "temp_order_food_history"
+			sql = "INSERT INTO " + Params.dbName + ".temp_order_food_history(order_id, food_id, taste_id, taste_id2, taste_id3, " +
+				  "`name`, taste, order_count, unit_price, taste_price, discount, food_status, kitchen, waiter) " + 
+				  "SELECT " +
+				  Params.dbName + ".`order_food`.`order_id` AS `order_id`," +
+				  Params.dbName + ".`order_food`.`food_id` AS `food_id`," +
+				  Params.dbName + ".`order_food`.`taste_id2` AS `taste_id`," +
+				  Params.dbName + ".`order_food`.`taste_id3` AS `taste_id2`," +
+				  Params.dbName + ".`order_food`.`taste_id` AS `taste_id3`," +
+				  Params.dbName + ".`order_food`.`name` AS `name`," +
+				  Params.dbName + ".`order_food`.`taste` AS `taste`," + 
+				  "sum(`wireless_order_db`.`order_food`.`order_count`) AS `order_count`," +
+				  "max(`wireless_order_db`.`order_food`.`unit_price`) AS `unit_price`," +
+				  "max(`wireless_order_db`.`order_food`.`taste_price`) AS `taste_price`," +
+				  "max(`wireless_order_db`.`order_food`.`discount`) AS `discount`," +
+				  "max(`wireless_order_db`.`order_food`.`food_status`) AS `food_status`," +
+				  "max(`wireless_order_db`.`order_food`.`kitchen`) AS `kitchen`," +
+				  "max(`wireless_order_db`.`order_food`.`waiter`) AS `waiter` " +
+				  tempOrder;
 			dbCon.stmt.addBatch(sql);
 			
 			//delete the order details which have been paid from "order_food"
@@ -141,8 +180,9 @@ public class DailySettlementTask extends SchedulerTask{
 			//update all terminal gift amount to zero
 			sql = "UPDATE " + Params.dbName + ".terminal SET gift_amount=0";
 			dbCon.stmt.executeUpdate(sql);			
-						
+					
 			taskInfo += "info : " + nOrders + " record(s) are moved from \"order\" to \"order_history\"" + sep;
+			taskInfo += "info : " + nTempOrders + " record(s) are moved from \"order_food\" to \"temp_order_food_history\"" + sep;
 			taskInfo += "info : " + nOrderDetails + " record(s) are moved from \"order_food\" to \"order_food_history\"" + sep;
 			taskInfo += "info : " + "maxium order id : " + maxOrderID + ", maxium order food id : " + maxOrderFoodID + sep;
 			

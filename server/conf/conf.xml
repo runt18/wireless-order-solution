@@ -53,24 +53,24 @@
 	dayOfMonth, hourOfDay, minute, second
 	e.g. "15, 2, 0, 0" means the task would be executed on 15th 2:00:00am every month 
 	-->
-	<sweep_db>4,18,21,0</sweep_db>
+	<sweep_db>13,14,22,0</sweep_db>
 	<!-- 
 	define the time to perform the sweep printer socket task.
 	the format is as below.
 	hourOfDay, minute, second
 	e.g. "2, 0, 0" means the task would be executed on 2:00:00am every day 
 	-->
-	<sweep_prt_conn>0,15,30</sweep_prt_conn>
+	<sweep_prt_conn>0,50,30</sweep_prt_conn>
     <!-- 
 	define the time to perform the daily settlement task.
 	the format is as below.
 	hourOfDay, minute, second
 	e.g. "2, 0, 0" means the task would be executed on 2:00:00am every day 
 	-->
-	<daily_settlement>18,32,0</daily_settlement>
+	<daily_settlement>14,21,0</daily_settlement>
 	<!-- the OTA server address and port -->
 	<OTA>
-		<host>58.248.9.158</host>
+		<host>125.88.20.194</host>
 		<port>10080</port>
 	</OTA>
 </conf>

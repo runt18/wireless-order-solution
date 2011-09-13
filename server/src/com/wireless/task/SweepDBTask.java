@@ -82,16 +82,52 @@ public class SweepDBTask extends SchedulerTask {
 			}
 			
 			/**
+			 * Delete all the records matches the order which has been expired from "temp_order_food_history" table.
+			 */
+			dbCon.stmt.clearBatch();
+			for(int i = 0; i < expiredOrders.size(); i++){
+				sql = "DELETE FROM " + Params.dbName + 
+				  ".temp_order_food_history WHERE order_id=" + expiredOrders.get(i).toString();
+				dbCon.stmt.addBatch(sql);				
+			}
+			int count = 0;
+			int[] rowsAffected = dbCon.stmt.executeBatch();
+			for(int i = 0; i < rowsAffected.length; i++){
+				if(rowsAffected[i] >= 0)
+					count += rowsAffected[i];
+			}
+			taskInfo += "info : " + count + " record(s) are deleted from \"temp_order_food_history\" table" + sep;
+			
+			/**
+			 * Delete all the records matches the order which has been expired from "order_food_material_hisotry" table.
+			 */
+			dbCon.stmt.clearBatch();
+			for(int i = 0; i < expiredOrders.size(); i++){
+				sql = "DELETE FROM " + Params.dbName + 
+					  ".order_food_material_history WHERE order_food_id IN(" + 
+					  "SELECT id FROM " + Params.dbName + ".order_food_history WHERE order_id IN(" + 
+					  "SELECT id FROM " + Params.dbName + ".order_history WHERE id=" + expiredOrders.get(i).toString() + "))";
+				dbCon.stmt.addBatch(sql);			
+			}
+			count = 0;
+			rowsAffected = dbCon.stmt.executeBatch();
+			for(int i = 0; i < rowsAffected.length; i++){
+				if(rowsAffected[i] >= 0)
+					count += rowsAffected[i];
+			}
+			taskInfo += "info : " + count + " record(s) are deleted from \"order_food_material_history\" table" + sep;
+			
+			/**
 			 * Delete all the food records matches the order which has been expired from "order_food_hisotry" table.
 			 */
 			dbCon.stmt.clearBatch();
 			for(int i = 0; i < expiredOrders.size(); i++){
 				sql = "DELETE FROM " + Params.dbName + 
 					  ".order_food_history WHERE order_id=" + expiredOrders.get(i).toString();
-				dbCon.stmt.addBatch(sql);
+				dbCon.stmt.addBatch(sql);			
 			}
-			int count = 0;
-			int[] rowsAffected = dbCon.stmt.executeBatch();
+			count = 0;
+			rowsAffected = dbCon.stmt.executeBatch();
 			for(int i = 0; i < rowsAffected.length; i++){
 				if(rowsAffected[i] >= 0)
 					count += rowsAffected[i];
