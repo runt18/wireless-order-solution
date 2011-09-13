@@ -2,7 +2,8 @@
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 
-CREATE SCHEMA IF NOT EXISTS `wireless_order_db` ;
+DROP SCHEMA IF EXISTS `wireless_order_db` ;
+CREATE SCHEMA IF NOT EXISTS `wireless_order_db` DEFAULT CHARACTER SET utf8 ;
 USE `wireless_order_db` ;
 
 -- -----------------------------------------------------
@@ -49,6 +50,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food` (
   `enabled` TINYINT NOT NULL DEFAULT 1 COMMENT 'indicates whether the food information is enabled or not' ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_food_restaurant` (`restaurant_id` ASC) ,
+  INDEX `ix_food_alias_id` (`alias_id` ASC) ,
   CONSTRAINT `fk_food_restaurant`
     FOREIGN KEY (`restaurant_id` )
     REFERENCES `wireless_order_db`.`restaurant` (`id` )
@@ -156,6 +158,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`terminal` (
   `work_duration` BIGINT NOT NULL DEFAULT 0 COMMENT 'the phone\'s work duration(expressed by second)' ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_terminal_restaurant1` (`restaurant_id` ASC) ,
+  INDEX `ix_terminal_pm` (`pin` ASC, `model_id` ASC) ,
   CONSTRAINT `fk_terminal_restaurant1`
     FOREIGN KEY (`restaurant_id` )
     REFERENCES `wireless_order_db`.`restaurant` (`id` )
@@ -180,7 +183,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`table` (
   `enabled` TINYINT NOT NULL DEFAULT 1 COMMENT 'indicates whether the table information is enabled or not' ,
   `minimum_cost` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the minimum cost to this table' ,
   PRIMARY KEY (`id`) ,
-  INDEX `fk_table_restaurant1` (`restaurant_id` ASC) ,
+  INDEX `fk_table_restaurant` (`restaurant_id` ASC) ,
+  INDEX `ix_table_alias_id` (`alias_id` ASC) ,
   CONSTRAINT `fk_table_restaurant1`
     FOREIGN KEY (`restaurant_id` )
     REFERENCES `wireless_order_db`.`restaurant` (`id` )
@@ -608,52 +612,39 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the super kitchen information' ;
 
+
 -- -----------------------------------------------------
--- Create table `wireless_order_db`.`temp_order_food_history`
+-- Table `wireless_order_db`.`temp_order_food_history`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `wireless_order_db`.`temp_order_food_history` ;
 
-CREATE TABLE `wireless_order_db`.`temp_order_food_history` (
-  `order_id` INT unsigned NOT NULL COMMENT 'the order id to this order detail record',
-  `food_id` SMALLINT unsigned NOT NULL COMMENT 'the food id to this order detail record',
-  `taste_id` SMALLINT unsigned NOT NULL COMMENT 'the taste id to this order detail record',
-  `taste_id2` SMALLINT unsigned NOT NULL COMMENT 'the 2nd taste id to this order detail record',
-  `taste_id3` SMALLINT unsigned NOT NULL COMMENT 'the 3rd taste id to this order detail record',
-  `name` VARCHAR(45) NOT NULL COMMENT 'the food name to this order detail record',
-  `taste` VARCHAR(45) NOT NULL COMMENT 'the taste preference to this order detail record',
-  `order_count` DECIMAL(5,2) NOT NULL COMMENT 'the sum of order count to this order detail record',
-  `unit_price` DECIMAL(7,2) unsigned NOT NULL COMMENT 'the unit price to this order detail record',
-  `taste_price` DECIMAL(7,2) unsigned NOT NULL COMMENT 'the taste price to this order detail record',
-  `discount` DECIMAL(5,2) NOT NULL COMMENT 'the discount to this order detail record',
-  `food_status` TINYINT NOT NULL COMMENT 'the food status to this order detail record',
-  `kitchen` TINYINT unsigned NOT NULL COMMENT 'the kitchen to this order detail record',
-  `waiter` VARCHAR(45) NOT NULL COMMENT 'the waiter name to this order detail record',
-  PRIMARY KEY (`order_id`,`food_id`,`taste_id`,`taste_id2`,`taste_id3`)) 
-  ENGINE = InnoDB
-  DEFAULT CHARSET=utf8, 
-  COMMENT = 'temporary order food history table for performance problem'  ;
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`temp_order_food_history` (
+  `order_id` INT UNSIGNED NOT NULL COMMENT 'the order id to this order detail record' ,
+  `food_id` SMALLINT UNSIGNED NOT NULL COMMENT 'the food id to this order detail record' ,
+  `taste_id` SMALLINT UNSIGNED NOT NULL COMMENT 'the taste id to this order detail record' ,
+  `taste_id2` SMALLINT UNSIGNED NOT NULL COMMENT 'the 2nd taste id to this order detail record' ,
+  `taste_id3` SMALLINT UNSIGNED NOT NULL COMMENT 'the 3rd taste id to this order detail record' ,
+  `name` VARCHAR(45) NOT NULL COMMENT 'the food name to this order detail record' ,
+  `taste` VARCHAR(45) NOT NULL COMMENT 'the taste preference to this order detail record' ,
+  `order_count` DECIMAL(5,2) NOT NULL COMMENT 'the sum of order count to this order detail record' ,
+  `unit_price` DECIMAL(7,2) UNSIGNED NOT NULL COMMENT 'the unit price to this order detail record' ,
+  `taste_price` DECIMAL(7,2) UNSIGNED NOT NULL COMMENT 'the taste price to this order detail record' ,
+  `discount` DECIMAL(3,2) NOT NULL COMMENT 'the discount to this order detail record' ,
+  `food_status` TINYINT NOT NULL COMMENT 'the food status to this order detail record' ,
+  `kitchen` TINYINT UNSIGNED NOT NULL COMMENT 'the kitchen to this order detail record' ,
+  `waiter` VARCHAR(45) NOT NULL COMMENT 'the waiter name to this order detail record' ,
+  PRIMARY KEY (`order_id`, `food_id`, `taste_id`, `taste_id2`, `taste_id3`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'temporary order food history table for performance problem' ;
+
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
--- -----------------------------------------------------
--- Add the index `ix_table_alias_id`
--- -----------------------------------------------------
-ALTER TABLE `wireless_order_db`.`table` 
-ADD INDEX `ix_table_alias_id` (`alias_id` ASC) ;
 
--- -----------------------------------------------------
--- Add the index `ix_food_alias_id`
--- -----------------------------------------------------
-ALTER TABLE `wireless_order_db`.`food` 
-ADD INDEX `ix_food_alias_id` (`alias_id` ASC) ;
-
--- -----------------------------------------------------
--- Add the index `ix_terminal_pm`
--- -----------------------------------------------------
-ALTER TABLE `wireless_order_db`.`terminal` 
-ADD INDEX `ix_terminal_pm` (`pin` ASC, `model_id` ASC) ;
 
 -- -----------------------------------------------------
 -- Data for table `wireless_order_db`.`restaurant`
@@ -672,6 +663,7 @@ INSERT INTO `wireless_order_db`.`restaurant` (`id`, `pwd`, `account`, `restauran
 INSERT INTO `wireless_order_db`.`restaurant` (`id`, `pwd`, `account`, `restaurant_name`, `record_alive`) VALUES ('9', MD5('reserved@123'), 'reserved6', 'reserved6', '0');
 INSERT INTO `wireless_order_db`.`restaurant` (`id`, `pwd`, `account`, `restaurant_name`, `record_alive`) VALUES ('10', MD5('reserved@123'), 'reserved7', 'reserved7', '0');
 COMMIT;
+SET AUTOCOMMIT=1;
 
 -- -----------------------------------------------------
 -- View`order_food_history_view`
