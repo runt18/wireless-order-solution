@@ -1,4 +1,4 @@
-package com.wireless.ui.main;
+package com.wireless.ui;
 
 import java.io.IOException;
 
@@ -13,6 +13,7 @@ import com.wireless.protocol.ReqQueryMenu;
 import com.wireless.protocol.RespParser;
 import com.wireless.protocol.Terminal;
 import com.wireless.sccon.ServerConnector;
+import com.wireless.ui.main.R;
 
 public class MainActivity extends Activity {
     /** Called when the activity is first created. */
