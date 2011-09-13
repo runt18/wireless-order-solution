@@ -1,13 +1,17 @@
 SET NAMES utf8;
 
+-- -----------------------------------------------------
 -- Add the field "super_kitchen" to table "kitchen"
+-- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`kitchen` ADD COLUMN `super_kitchen` TINYINT UNSIGNED NOT NULL DEFAULT 255 COMMENT 'the super to this kitchen. 255 means NOT belong to any super kitchen.'  AFTER `alias_id` ;
 
+-- -----------------------------------------------------
 -- Add the field "region" to table "table"
+-- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`table` ADD COLUMN `region` TINYINT UNSIGNED NOT NULL DEFAULT 255 COMMENT 'the region alias id to this table. 255 means the table does NOT belong to any region.'  AFTER `restaurant_id` ;
 
 -- -----------------------------------------------------
--- Table `wireless_order_db`.`super_kitchen`
+-- Create table `wireless_order_db`.`super_kitchen`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `wireless_order_db`.`super_kitchen` ;
 
@@ -28,7 +32,7 @@ DEFAULT CHARACTER SET = utf8,
 COMMENT = 'describe the super kitchen information' ;
 
 -- -----------------------------------------------------
--- Table `wireless_order_db`.`region`
+-- Create table `wireless_order_db`.`region`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `wireless_order_db`.`region` ;
 
@@ -47,3 +51,4 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`region` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the region information to the tables' ;
+

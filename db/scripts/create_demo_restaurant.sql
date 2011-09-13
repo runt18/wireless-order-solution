@@ -5,6 +5,7 @@ SET NAMES utf8;
 -- -----------------------------------------------------
 DELETE FROM wireless_order_db.order_food_material_history WHERE order_food_id IN (SELECT id FROM wireless_order_db.order_food_history WHERE order_id IN (SELECT id FROM wireless_order_db.order_history WHERE restaurant_id=11) );
 DELETE FROM wireless_order_db.order_food_history WHERE order_id IN (SELECT id FROM wireless_order_db.order_history WHERE restaurant_id=11);
+DELETE FROM wireless_order_db.temp_order_food_history WHERE order_id IN (SELECT id FROM wireless_order_db.order_history WHERE restaurant_id=11);
 DELETE FROM wireless_order_db.order_history WHERE restaurant_id=11;
 
 DELETE FROM wireless_order_db.order_food_material WHERE order_food_id IN (SELECT id FROM wireless_order_db.order_food WHERE order_id IN (SELECT id FROM wireless_order_db.order WHERE restaurant_id=11) );
@@ -463,11 +464,40 @@ COMMIT;
 SET AUTOCOMMIT=1;
 
 -- -----------------------------------------------------
+-- Insert the info from order_food_history to temp_order_food_history
+-- -----------------------------------------------------
+INSERT INTO `wireless_order_db`.temp_order_food_history(order_id,food_id,taste_id,taste_id2,taste_id3,`name`,taste,order_count,unit_price,taste_price,discount,food_status,kitchen,waiter) 
+SELECT 
+`wireless_order_db`.`order_food_history`.`order_id` AS `order_id`,
+`wireless_order_db`.`order_food_history`.`food_id` AS `food_id`,
+`wireless_order_db`.`order_food_history`.`taste_id` AS `taste_id`,
+`wireless_order_db`.`order_food_history`.`taste_id2` AS `taste_id2`,
+`wireless_order_db`.`order_food_history`.`taste_id3` AS `taste_id3`,
+`wireless_order_db`.`order_food_history`.`name` AS `name`,
+`wireless_order_db`.`order_food_history`.`taste` AS `taste`,
+sum(`wireless_order_db`.`order_food_history`.`order_count`) AS `order_count`,
+max(`wireless_order_db`.`order_food_history`.`unit_price`) AS `unit_price`,
+max(`wireless_order_db`.`order_food_history`.`taste_price`) AS `taste_price`,
+max(`wireless_order_db`.`order_food_history`.`discount`) AS `discount`,
+max(`wireless_order_db`.`order_food_history`.`food_status`) AS `food_status`,
+max(`wireless_order_db`.`order_food_history`.`kitchen`) AS `kitchen`,
+max(`wireless_order_db`.`order_food_history`.`waiter`) AS `waiter`
+FROM `wireless_order_db`.`order_food_history` 
+GROUP BY 
+`wireless_order_db`.`order_food_history`.`order_id`,
+`wireless_order_db`.`order_food_history`.`food_id`,
+`wireless_order_db`.`order_food_history`.`taste_id`,
+`wireless_order_db`.`order_food_history`.`taste_id2`,
+`wireless_order_db`.`order_food_history`.`taste_id3` 
+HAVING (SUM(`wireless_order_db`.`order_food_history`.`order_count`) > 0);
+
+-- -----------------------------------------------------
 -- Insert order and the associated order_food records
 -- -----------------------------------------------------
 SET AUTOCOMMIT=0;
+
 INSERT INTO `wireless_order_db`.`order` (`id`, `restaurant_id`, `table_id`, `terminal_pin`, `order_date`, `total_price`, `total_price_2`, `custom_num`, `waiter`, `member_id`, `member`) VALUES (40, 11, 0x64, 0x20237AB8, NOW(), 214, 210, 5, (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), '13694260535', '熊至明');
-INSERT INTO `wireless_order_db`.`order_food` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (40, 0x44C, 1.2, '京都骨', 23.53, NOW(), '张宁远', NULL);
+INSERT INTO `wireless_order_db`.`order_food` (`id`, `order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (400, 40, 0x44C, 1.2, '京都骨', 23.53, NOW(), '张宁远', NULL);
 
 -- the order detail to 京酱肉丝
 INSERT INTO `wireless_order_db`.`order_food` (`order_id`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`) VALUES (40, 0x44D, 2, '京酱肉丝', 35.3, 20110411180911, '张宁远', NULL);
