@@ -23,6 +23,8 @@ import com.wireless.util.ServerConnector;
  */
 public class WirelessOrder extends UiApplication{
 
+	public static PlatformInfo pfInfo;
+	
 	public static FoodMenu foodMenu = new FoodMenu();	
 	
 	public static Restaurant restaurant = new Restaurant();
@@ -52,13 +54,6 @@ public class WirelessOrder extends UiApplication{
 		});
 	}
 	
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-        new WirelessOrder(args);
-	}
-
 	private boolean _isAutoStartup = false;
 	
 	private void startup(boolean autostartup){
@@ -96,8 +91,10 @@ public class WirelessOrder extends UiApplication{
 		enterEventDispatcher();
 	}
 	
-	public WirelessOrder(String[] args){
+	public WirelessOrder(String[] args, PlatformInfo platformInfo){
 
+		pfInfo = platformInfo;
+		
 		if(args != null && args.length > 0 && args[0].equals("autostartup")){
 			startup(true);
 			
@@ -124,7 +121,7 @@ public class WirelessOrder extends UiApplication{
 
 				public void powerUp() {
 
-					int modHandle = CodeModuleManager.getModuleHandle("WirelessOrderTerminal");
+					int modHandle = CodeModuleManager.getModuleHandle(WirelessOrder.pfInfo.getModuleName());
 					ApplicationDescriptor[] apDes = CodeModuleManager.getApplicationDescriptors(modHandle);
 					String[] args = { "autostartup" };
 					ApplicationDescriptor apDes4Startup = new ApplicationDescriptor(apDes[0], args);

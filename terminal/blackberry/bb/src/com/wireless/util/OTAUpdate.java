@@ -50,7 +50,7 @@ public class OTAUpdate extends Thread{
 						new Short((short)(resp.body[2] & 0xFF)) + "." + 
 						new Short((short)(resp.body[3] & 0xFF));
 			otaPort = (resp.body[4] & 0x000000FF) | ((resp.body[5] & 0x000000FF ) << 8);
-			String url = "http://" + otaIP + ":" + otaPort + "/ota/version.php";
+			String url = "http://" + otaIP + ":" + otaPort + WirelessOrder.pfInfo.getVersionUrl();
 			int connType = Integer.parseInt(Params.getParam(Params.CONN_TYPE));
 			if(connType == Params.CONN_MOBILE){
 				url += ";deviceside=true";
@@ -122,10 +122,13 @@ public class OTAUpdate extends Thread{
 				}
 				
 				if(isUpdate){
-					_callBack.passOTAUpdate(ver, "http://" + otaIP + ":" + otaPort + "/ota/WirelessOrderTerminal.jad");
+					_callBack.passOTAUpdate(ver, "http://" + otaIP + ":" + otaPort + WirelessOrder.pfInfo.getOTAUrl());
 				}else{
 					_callBack.passOTAUpdate(null, null);
 				}
+				
+			}else{
+				_callBack.passOTAUpdate(null, null);
 			}
 				
 		}catch(IOException e){

@@ -6,6 +6,7 @@ import net.rim.device.api.ui.DrawStyle;
 import net.rim.device.api.ui.Field;
 import net.rim.device.api.ui.FieldChangeListener;
 import net.rim.device.api.ui.Graphics;
+import net.rim.device.api.ui.Screen;
 import net.rim.device.api.ui.component.ButtonField;
 import net.rim.device.api.ui.component.Dialog;
 import net.rim.device.api.ui.component.EditField;
@@ -22,9 +23,12 @@ import net.rim.device.api.util.Comparator;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Util;
+import com.wireless.terminal.PlatformInfo;
+import com.wireless.terminal.WirelessOrder;
 
 public class SelectTastePopup extends PopupScreen{
 	
+	private Screen _self = this;
 	private OrderListField _orderListField = null;
 	private EditField _tasteID = null;
 	private Taste[] _tastes = null;
@@ -85,12 +89,14 @@ public class SelectTastePopup extends PopupScreen{
 			private boolean _isFocused = false;
 		    //Invoked when this field receives the focus.
 		    public void onFocus(int direction){
+		    	WirelessOrder.pfInfo.setVKeyBoard(_self, PlatformInfo.HIDE);
 		        _isFocused = true;
 		        super.onFocus(direction);
 		    }
 
 		    //Invoked when a field loses the focus.
 		    public void onUnfocus(){
+		    	WirelessOrder.pfInfo.setVKeyBoard(_self, PlatformInfo.SHOW);
 		        _isFocused = false;
 		        super.onUnfocus();
 		    }
