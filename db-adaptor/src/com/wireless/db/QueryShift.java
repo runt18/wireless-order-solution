@@ -184,7 +184,7 @@ public class QueryShift {
 		 * Calculate the price to all discount food within this shift
 		 */
 		float totalDiscount = 0;
-		sql = "SELECT SUM(unit_price * order_count * (1-discount) + taste_price) FROM " + Params.dbName + ".order_food WHERE order_id iN(" +
+		sql = "SELECT SUM(unit_price * order_count * (1-discount)) FROM " + Params.dbName + ".order_food WHERE order_id iN(" +
 			  "SELECT id FROM " +Params.dbName + ".order WHERE restaurant_id=" + term.restaurant_id + 
 			  " AND total_price IS NOT NULL" +
 			  " AND order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "')" +
