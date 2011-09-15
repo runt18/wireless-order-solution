@@ -53,15 +53,43 @@ IF NOT EXIST terminal\web\WirelessOrderWeb GOTO web_term_not_exist
 	@echo copying the web-term files...
 	@xcopy /s/y terminal\web\WirelessOrderWeb dist\www\web-term\ > nul
 
-	GOTO cod_files
+	GOTO cod_45_files
 
 :web_term_not_exist
 	@echo the web term files missing
 	@pause
 	GOTO end
 
-Rem copy the terminal cod files
-:cod_files
+Rem ------------------------- FIX ME !!! ---------------------------------
+:cod_45_files
+IF EXIST terminal\blackberry\bb45\deliverables\Web\4.5.0\WirelessOrderTerminal.cod GOTO cod_exist
+IF NOT EXIST terminal\blackberry\deliverables\Web\4.5.0\WirelessOrderTerminal.cod GOTO cod_not_exist
+:cod_exist
+	@echo copying the terminal cod for blackberry 4.5 files...
+	IF NOT EXIST dist\www\ota\bb45 mkdir dist\www\ota
+	@copy terminal\blackberry\bb45\deliverables\Web\4.5.0\WirelessOrderTerminal*.cod dist\www\ota > nul
+	@copy terminal\blackberry\bb45\deliverables\Web\4.5.0\WirelessOrderTerminal.jad dist\www\ota > nul
+	@copy terminal\blackberry\bb45\deliverables\Web\4.5.0\WirelessOrderTerminal_BB45.jad dist\www\ota > nul
+	@copy terminal\blackberry\bb45\deliverables\Web\4.5.0\WirelessOrderTerminal.jar dist\www\ota > nul
+	@copy terminal\blackberry\bb45\deliverables\Web\4.5.0\WirelessOrderTerminal_BB45.jar dist\www\ota > nul
+	@copy terminal\blackberry\version.php dist\www\ota > nul
+	set pwd=%CD%
+	cd %CD%\dist\www\ota
+	%pwd%\terminal\blackberry\UpdateJad -n WirelessOrderTerminal_BB45.jad WirelessOrderTerminal.jad 
+	cd %pwd%
+	@copy dist\www\ota\WirelessOrderTerminal_BB45.jad dist\www\ota\WirelessOrderTerminal.jad
+	del dist\www\ota\WirelessOrderTerminal_BB45.jad > nul
+	GOTO cod_45_files
+
+:cod_not_exist
+	@echo the terminal cod for blackberry 4.5 file missing
+	@pause
+	GOTO end
+Rem --------------------- FIX ME !!! -------------------------------------
+
+
+Rem copy the bb45 terminal cod files
+:cod_45_files
 IF EXIST terminal\blackberry\bb45\deliverables\Web\4.5.0\WirelessOrderTerminal.cod GOTO cod_45_exist
 IF NOT EXIST terminal\blackberry\deliverables\Web\4.5.0\WirelessOrderTerminal.cod GOTO cod_45_not_exist
 :cod_45_exist
@@ -73,10 +101,14 @@ IF NOT EXIST terminal\blackberry\deliverables\Web\4.5.0\WirelessOrderTerminal.co
 	@copy terminal\blackberry\bb45\deliverables\Web\4.5.0\WirelessOrderTerminal.jar dist\www\ota\bb45 > nul
 	@copy terminal\blackberry\bb45\deliverables\Web\4.5.0\WirelessOrderTerminal_BB45.jar dist\www\ota\bb45 > nul
 	@copy terminal\blackberry\version.php dist\www\ota\bb45 > nul
+	call terminal\blackberry\replace.bat .\dist\www\ota\bb45\version.php ("WirelessOrderTerminal.jad") ("WirelessOrderTerminal_BB45.jad")
 	@copy terminal\blackberry\releasenote.txt dist\www\ota\bb45 > nul
-	terminal\blackberry\UpdateJad -n dist\www\ota\bb45\WirelessOrderTerminal_BB45.jad dist\www\ota\bb45\WirelessOrderTerminal.jad 
-	del dist\www\ota\bb45\WirelessOrderTerminal.jad
-	GOTO terminal_help
+	set pwd=%CD%
+	cd %CD%\dist\www\ota\bb45
+	%pwd%\terminal\blackberry\UpdateJad -n WirelessOrderTerminal_BB45.jad WirelessOrderTerminal.jad 
+	cd %pwd%
+	del dist\www\ota\bb45\WirelessOrderTerminal.jad > nul
+	GOTO bb45_help
 
 :cod_45_not_exist
 	@echo the terminal cod for blackberry 4.5 file missing
@@ -84,16 +116,44 @@ IF NOT EXIST terminal\blackberry\deliverables\Web\4.5.0\WirelessOrderTerminal.co
 	GOTO end
 
 Rem copy the terminal help files
-:terminal_help
-IF EXIST terminal\blackberry\help GOTO terminal_help_exist
-IF NOT EXIST terminal\blackberry\help GOTO terminal_help_not_exist
-:terminal_help_exist
-	@echo copying the terminal help files...
-	@xcopy /s/y terminal\blackberry\help dist\www\help\ > nul
+:bb45_help
+IF EXIST terminal\blackberry\bb45\help GOTO bb45_help_exist
+IF NOT EXIST terminal\blackberry\bb45\help GOTO bb45_help_not_exist
+:bb45_help_exist
+	@echo copying the bb45 help files...
+	@xcopy /s/y terminal\blackberry\bb45\help dist\www\help\bb45\ > nul
+	GOTO cod_50_files
+
+bb45_help_not_exist:
+	@echo the terminal help files missing
+	@pause
+	GOTO end
+
+Rem copy the bb50 terminal cod files
+:cod_50_files
+IF EXIST terminal\blackberry\bb45\deliverables\Web\4.5.0\WirelessOrderTerminal.cod GOTO cod_50_exist
+IF NOT EXIST terminal\blackberry\deliverables\Web\4.5.0\WirelessOrderTerminal.cod GOTO cod_50_not_exist
+:cod_50_exist
+	@echo copying the terminal cod for blackberry 5.0 files...
+	IF NOT EXIST dist\www\ota\bb50 mkdir dist\www\ota\bb50
+	@copy terminal\blackberry\bb50\deliverables\Web\4.5.0\WirelessOrderTerminal*.cod dist\www\ota\bb50 > nul
+	@copy terminal\blackberry\bb50\deliverables\Web\4.5.0\WirelessOrderTerminal.jar dist\www\ota\bb50 > nul
+	@copy terminal\blackberry\bb50\deliverables\Web\4.5.0\WirelessOrderTerminal.jad dist\www\ota\bb50 > nul
+	@copy terminal\blackberry\bb50\deliverables\Web\5.0.0\WirelessOrderTerminal*.cod dist\www\ota\bb50 > nul
+	@copy terminal\blackberry\bb50\deliverables\Web\5.0.0\WirelessOrderTerminal_BB50.jad dist\www\ota\bb50 > nul
+	@copy terminal\blackberry\bb50\deliverables\Web\5.0.0\WirelessOrderTerminal_BB50.jar dist\www\ota\bb50 > nul
+	@copy terminal\blackberry\version.php dist\www\ota\bb50 > nul
+	call terminal\blackberry\replace.bat .\dist\www\ota\bb50\version.php ("WirelessOrderTerminal.jad") ("WirelessOrderTerminal_BB50.jad")
+	@copy terminal\blackberry\releasenote.txt dist\www\ota\bb50 > nul
+	set pwd=%CD%
+	cd %CD%\dist\www\ota\bb50
+	%pwd%\terminal\blackberry\UpdateJad -n WirelessOrderTerminal_BB50.jad WirelessOrderTerminal.jad 
+	cd %pwd%
+	del dist\www\ota\bb50\WirelessOrderTerminal.jad > nul
 	GOTO pserver_files
 
-terminal_help_not_exist:
-	@echo the terminal help files missing
+:cod_50_not_exist
+	@echo the terminal cod for blackberry 5.0 file missing
 	@pause
 	GOTO end
 
