@@ -18,7 +18,7 @@ public class Startup {
 			}
 
 			public String getOTAUrl() {
-				return "/ota/bb45/ota/WirelessOrderTerminal_BB45.jad";
+				return "/ota/bb45/WirelessOrderTerminal_BB45.jad";
 			}
 
 			public String getHelpUrl() {

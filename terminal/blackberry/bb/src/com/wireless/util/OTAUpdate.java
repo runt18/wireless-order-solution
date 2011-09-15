@@ -95,6 +95,7 @@ public class OTAUpdate extends Thread{
 					ver = ver.substring(0, ver.indexOf('\n'));
 				}
 
+				ver = ver.trim();
 				beg = 0;
 				end = 0;
 				//extract the major, minor, revision value respectively

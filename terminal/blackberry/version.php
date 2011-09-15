@@ -1,5 +1,5 @@
 <?php
-$file_content = file("WirelessOrderTerminal.jad");
+$file_content = file("WirelessOrderTerminal.jad") ;
 
 $no = count($file_content);
 
