@@ -176,7 +176,7 @@ public class InsertOrder {
 						orderToInsert.foods[i].getPrice() + ", '" + 
 						orderToInsert.foods[i].name + "', " +
 						orderToInsert.foods[i].status + ", " +
-						(float)orderToInsert.foods[i].discount / 100 + ", '" +
+						orderToInsert.foods[i].getDiscount() + ", '" +
 						orderToInsert.foods[i].tastePref + "', " + 
 						orderToInsert.foods[i].getTastePrice() + ", " +
 						orderToInsert.foods[i].tastes[0].alias_id + ", " + 

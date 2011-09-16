@@ -190,7 +190,7 @@ public class UpdateOrder {
 			food.setPrice(new Float(dbCon.rs.getFloat("unit_price")));
 			food.name = dbCon.rs.getString("name");
 			food.status = dbCon.rs.getShort("food_status");
-			food.discount = (byte)(dbCon.rs.getFloat("discount") * 100);
+			food.setDiscount(dbCon.rs.getFloat("discount"));
 			food.setCount(new Float(dbCon.rs.getFloat("order_sum")));
 			food.kitchen = dbCon.rs.getShort("kitchen");
 			food.tastes[0].alias_id = dbCon.rs.getInt("taste_id");
@@ -223,7 +223,7 @@ public class UpdateOrder {
 				 * Skip this record since it is totally the same as original.
 				 */
 				if(orderToUpdate.foods[i].equals(originalRecords.get(j)) &&
-					orderToUpdate.foods[i].count == originalRecords.get(j).count){
+					orderToUpdate.foods[i].getCount().equals(originalRecords.get(j).getCount())){
 					diff = 0;
 					status = STATUS.FULL_MATCHED;
 					break;
@@ -235,7 +235,7 @@ public class UpdateOrder {
 				 * Calculate the difference between these two records and insert a new record to keep track of this incremental
 				 */
 				}else if(orderToUpdate.foods[i].equals(originalRecords.get(j)) &&
-						orderToUpdate.foods[i].count != originalRecords.get(j).count){
+						!orderToUpdate.foods[i].getCount().equals(originalRecords.get(j).getCount())){
 
 					//calculate the difference between the submitted and original record
 					diff = orderToUpdate.foods[i].getCount().floatValue() - originalRecords.get(j).getCount().floatValue();					
@@ -267,7 +267,7 @@ public class UpdateOrder {
 					food.alias_id = orderToUpdate.foods[i].alias_id;
 					food.status = dbCon.rs.getShort("status");
 					food.name = dbCon.rs.getString("name");
-					food.discount = orderToUpdate.foods[i].discount;
+					food.setDiscount(orderToUpdate.foods[i].getDiscount());
 					food.setPrice(new Float(dbCon.rs.getFloat("unit_price")));
 					food.setCount(new Float((float)Math.round(Math.abs(diff) * 100) / 100));
 					food.kitchen = dbCon.rs.getShort("kitchen");
@@ -318,7 +318,7 @@ public class UpdateOrder {
 			 * means the record to this food has been canceled before.
 			 * So we should skip to check this record.
 			 */
-			if(originalRecords.get(i).count > 0){
+			if(originalRecords.get(i).getCount() > 0){
 				boolean isCancelled = true;
 				for(int j = 0; j < orderToUpdate.foods.length; j++){
 					if(originalRecords.get(i).equals(orderToUpdate.foods[j])){
@@ -355,7 +355,7 @@ public class UpdateOrder {
 					extraFoods.get(i).getPrice() + ", '" + 
 					extraFoods.get(i).name + "', " + 
 					extraFoods.get(i).status + ", " +
-					(float)extraFoods.get(i).discount / 100 + ", " +
+					extraFoods.get(i).getDiscount() + ", " +
 					extraFoods.get(i).tastes[0].alias_id + "," +
 					extraFoods.get(i).tastes[1].alias_id + "," +
 					extraFoods.get(i).tastes[2].alias_id + "," +
@@ -381,7 +381,7 @@ public class UpdateOrder {
 					canceledFoods.get(i).getPrice() + ", '" + 
 					canceledFoods.get(i).name + "', " + 
 					canceledFoods.get(i).status + ", " +
-					(float)canceledFoods.get(i).discount / 100 + ", " +
+					canceledFoods.get(i).getDiscount() + ", " +
 					canceledFoods.get(i).tastes[0].alias_id + "," +
 					canceledFoods.get(i).tastes[1].alias_id + "," +
 					canceledFoods.get(i).tastes[2].alias_id + "," +
@@ -445,7 +445,7 @@ public class UpdateOrder {
 				 */
 				for(int j = 0; j < canceledFoods.size(); j++){
 					if(extraFoods.get(i).alias_id == canceledFoods.get(j).alias_id &&
-					   extraFoods.get(i).count == canceledFoods.get(j).count){
+					   extraFoods.get(i).getClass().equals(canceledFoods.get(j).getCount())){
 							isExtra = false;
 							break;
 					}
@@ -479,7 +479,7 @@ public class UpdateOrder {
 				 */
 				for(int j = 0; j < extraFoods.size(); j++){
 					if(canceledFoods.get(i).alias_id == extraFoods.get(j).alias_id &&
-							canceledFoods.get(i).count == extraFoods.get(j).count){
+							canceledFoods.get(i).getCount().equals(extraFoods.get(j).getCount())){
 						
 						isCancelled = false;
 						break;

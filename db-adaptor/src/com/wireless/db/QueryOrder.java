@@ -193,7 +193,7 @@ public class QueryOrder {
 			food.setCount(dbCon.rs.getFloat("order_sum"));
 			food.setPrice(dbCon.rs.getFloat("unit_price"));
 			food.kitchen = dbCon.rs.getShort("kitchen");
-			food.discount = (byte) (dbCon.rs.getFloat("discount") * 100);
+			food.setDiscount(dbCon.rs.getFloat("discount"));
 			food.tastePref = dbCon.rs.getString("taste");
 			food.setTastePrice(dbCon.rs.getFloat("taste_price"));
 			food.tastes[0].alias_id = dbCon.rs.getInt("taste_id");

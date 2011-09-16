@@ -160,8 +160,7 @@ public class PayOrder {
 		 * Update each food's discount to "order_food" table
 		 */
 		for(int i = 0; i < orderInfo.foods.length; i++){
-			float discount = (float)orderInfo.foods[i].discount / 100;
-			sql = "UPDATE " + Params.dbName + ".order_food SET discount=" + discount +
+			sql = "UPDATE " + Params.dbName + ".order_food SET discount=" + orderInfo.foods[i].getDiscount() +
 				  " WHERE order_id=" + orderInfo.id + 
 				  " AND food_id=" + orderInfo.foods[i].alias_id;
 			dbCon.stmt.addBatch(sql);				
@@ -309,7 +308,7 @@ public class PayOrder {
 				 * Both the special food and gifted food does NOT discount
 				 */
 				if(orderInfo.foods[i].isSpecial() || orderInfo.foods[i].isGift()){
-					orderInfo.foods[i].discount = 100;
+					orderInfo.foods[i].setDiscount(new Float(1.0));
 				}else{
 					/**
 					 * Get the discount to each food according to the kitchen of this restaurant.
@@ -320,7 +319,7 @@ public class PayOrder {
 					
 					dbCon.rs = dbCon.stmt.executeQuery(sql);
 					if(dbCon.rs.next()){
-						orderInfo.foods[i].discount = (byte)(dbCon.rs.getFloat(discount) * 100);
+						orderInfo.foods[i].setDiscount(dbCon.rs.getFloat(discount));
 					}
 					dbCon.rs.close();				
 				}
@@ -335,7 +334,7 @@ public class PayOrder {
 		float totalPrice = 0;
 		for(int i = 0; i < orderInfo.foods.length; i++){
 			if(!orderInfo.foods[i].isGift()){
-				float dist = (float)Math.round(orderInfo.foods[i].discount) / 100;					
+				float dist = orderInfo.foods[i].getDiscount();					
 				float foodPrice = orderInfo.foods[i].getPrice().floatValue();
 				float tastePrice = orderInfo.foods[i].getTastePrice();
 				totalPrice += (foodPrice * dist + tastePrice) * orderInfo.foods[i].getCount().floatValue();
