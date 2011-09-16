@@ -89,7 +89,7 @@ public class QueryOrderAction extends Action {
 					jsonOrderFood = jsonOrderFood.replace("$(recommend)", order.foods[i].isRecommend() ? "true" : "false");
 					jsonOrderFood = jsonOrderFood.replace("$(soldout)", order.foods[i].isSellOut() ? "true" : "false");
 					jsonOrderFood = jsonOrderFood.replace("$(gift)", order.foods[i].isGift() ? "true" : "false");
-					jsonOrderFood = jsonOrderFood.replace("$(discount)", Float.toString((float)order.foods[i].discount / 100));
+					jsonOrderFood = jsonOrderFood.replace("$(discount)", order.foods[i].getDiscount().toString());
 					jsonOrderFood = jsonOrderFood.replace("$(taste_id2)", Integer.toString(order.foods[i].tastes[1].alias_id));
 					jsonOrderFood = jsonOrderFood.replace("$(taste_id3)", Integer.toString(order.foods[i].tastes[2].alias_id));
 

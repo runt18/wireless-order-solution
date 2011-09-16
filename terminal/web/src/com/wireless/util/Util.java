@@ -63,7 +63,8 @@ public class Util {
 			foods[i].kitchen = Short.parseShort(values[3]);
 			//extract the discount
 			if(values.length > 4){
-				foods[i].discount = (byte)(Float.parseFloat(values[4]) * 100);
+				//foods[i].discount = (byte)(Float.parseFloat(values[4]) * 100);
+				foods[i].setDiscount(Float.parseFloat(values[4]));
 			}
 			if(values.length > 5){
 				//extract the 2nd taste alias id
