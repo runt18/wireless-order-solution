@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:orientation="vertical"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent">
+ <RelativeLayout 
+android:id="@+id/top_ket"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:background="@drawable/top_bg"
+android:layout_alignParentTop="true"
+>
+<ImageView
+android:id="@+id/ketback"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:src="@drawable/back_high"
+android:layout_marginLeft="20dip"
+android:layout_centerVertical="true"
+ >
+
+</ImageView>
+<TextView 
+android:id="@+id/kettitle"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:textColor="#FFFFFF"
+android:textSize="22sp"
+android:textStyle="bold"
+android:typeface="monospace"
+android:shadowDx="1"
+android:shadowDy="1"
+android:shadowRadius="3.0"
+android:text="下单-分厨"
+android:layout_centerVertical="true"
+android:layout_centerHorizontal="true"
+>
+</TextView>
+
+
+</RelativeLayout>
+</LinearLayout>

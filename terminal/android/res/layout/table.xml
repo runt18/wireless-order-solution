@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:background="#FFFFFF"
+	>
+
+	<TabHost xmlns:android="http://schemas.android.com/apk/res/android"
+		android:id="@android:id/tabhost" android:layout_width="fill_parent"
+		android:layout_height="fill_parent">
+		<LinearLayout android:orientation="vertical"
+			android:layout_width="fill_parent" android:layout_height="fill_parent">
+			<!--TabWidget在下面-布局tabbar在底部，TabWidget在上面-布局tabbar在顶部  -->
+			<FrameLayout android:id="@android:id/tabcontent" android:layout_weight="1"
+				android:layout_width="fill_parent" android:layout_height="fill_parent" />
+			<TabWidget android:id="@android:id/tabs"
+			    android:background="@drawable/foot_bg"
+				android:layout_width="fill_parent" android:layout_height="wrap_content"
+				android:layout_marginLeft="0dip" android:layout_marginRight="0dip" />
+		</LinearLayout>
+	</TabHost>
+
+</LinearLayout>
