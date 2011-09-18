@@ -1,11 +1,16 @@
 package com.wireless.ui;
 
+import com.wireless.protocol.FoodMenu;
+
 import android.app.Application;
 
 public class AppContext extends Application {
   private String notice;
   private String username;
   private String restaurant;
+  private  FoodMenu foodMenu;
+  
+  
 	public String getNotice() {
 		return notice;
 	}
@@ -23,6 +28,12 @@ public class AppContext extends Application {
 	}
 	public void setRestaurant(String restaurant) {
 		this.restaurant = restaurant;
+	}
+	public FoodMenu getFoodMenu() {
+		return foodMenu;
+	}
+	public void setFoodMenu(FoodMenu foodMenu) {
+		this.foodMenu = foodMenu;
 	}
     
   

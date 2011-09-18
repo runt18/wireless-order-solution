@@ -49,6 +49,7 @@ private float appVersion;
 Restaurant restaurant;
 ProtocolPackage resp;
 AlertDialog.Builder builder;
+private AppContext appcontext;
 boolean tag=false;
 private String [] str={"下单","改单","删单","结账","功能设置","网络设置","菜谱更新","软件更新","更多"};
 private int [] images={R.drawable.icon03,R.drawable.icon08,R.drawable.icon11,R.drawable.icon04,R.drawable.icon05
@@ -59,6 +60,7 @@ private int [] images={R.drawable.icon03,R.drawable.icon08,R.drawable.icon11,R.d
         
         ServerConnector.instance().setNetAddr("125.88.20.194");
         ServerConnector.instance().setNetPort(55555);
+    	appcontext=(AppContext)getApplication();
         ReqPackage.setGen(new PinGen(){
 			@Override
 			public int getDeviceId() {
@@ -110,6 +112,7 @@ private int [] images={R.drawable.icon03,R.drawable.icon08,R.drawable.icon11,R.d
 		if(Common.isNetworkAvailable(MainActivity.this)){
         	 askRestaurant();
         	 assign();
+        	 askMenu();
          }else{
         	 tag=true;
         	 AlertDialog();
@@ -129,6 +132,7 @@ private int [] images={R.drawable.icon03,R.drawable.icon08,R.drawable.icon11,R.d
         try{
         	resp = ServerConnector.instance().ask(new ReqQueryMenu());
             foodMenu = RespParser.parseQueryMenu(resp);
+            appcontext.setFoodMenu(foodMenu);
         }catch(IOException e){
         	
         }  

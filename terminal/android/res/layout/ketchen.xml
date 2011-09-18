@@ -2,8 +2,8 @@
 <LinearLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
   android:orientation="vertical"
-  android:layout_width="match_parent"
-  android:layout_height="match_parent">
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent">
  <RelativeLayout 
 android:id="@+id/top_ket"
 android:layout_width="wrap_content"
@@ -37,7 +37,49 @@ android:layout_centerVertical="true"
 android:layout_centerHorizontal="true"
 >
 </TextView>
-
-
 </RelativeLayout>
+
+<RelativeLayout 
+android:id="@+id/second"
+android:layout_width="fill_parent"
+android:layout_height="40dip"
+android:layout_below="@id/top_ket"
+android:background="@drawable/titlebg"
+>
+<TextView 
+android:id="@+id/ordernum"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:textColor="#FFFFFF"
+android:layout_centerVertical="true"
+android:textSize="20sp"
+android:text="编号:"
+android:layout_marginLeft="5dip"
+/>
+<EditText 
+android:id="@+id/searchpin"
+android:layout_width="250dip"
+android:layout_height="wrap_content"
+android:layout_centerVertical="true"
+android:layout_toRightOf="@id/ordernum"
+android:layout_marginLeft="10dip"
+/>
+</RelativeLayout>
+<ImageView 
+android:id="@+id/line"
+android:layout_width="fill_parent"
+android:layout_height="wrap_content"
+android:src="@drawable/table_line"
+android:layout_below="@id/second"
+/>
+
+<ListView 
+android:id="@+id/myListView"
+android:layout_width="fill_parent"
+android:layout_height="wrap_content"
+android:layout_below="@id/line"
+android:divider="@drawable/table_line"
+ android:cacheColorHint="#00000000"
+></ListView>
+
 </LinearLayout>

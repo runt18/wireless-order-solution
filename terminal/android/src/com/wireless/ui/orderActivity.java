@@ -10,6 +10,7 @@ import android.widget.ImageView;
 
 public class orderActivity extends Activity {
 private ImageView orderbutton;
+private ImageView orderback;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -17,6 +18,17 @@ private ImageView orderbutton;
 		setContentView(R.layout.order);
 		orderbutton=(ImageView)findViewById(R.id.orderbutton);
 		orderbutton.setOnClickListener(new orderbutton());
+		orderback=(ImageView)findViewById(R.id.orderback);
+		
+		orderback.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				finish();
+			}
+		});
+		
 		
 	}
      public class  orderbutton implements OnClickListener{
