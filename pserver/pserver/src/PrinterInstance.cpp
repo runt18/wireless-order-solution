@@ -175,6 +175,9 @@ static unsigned __stdcall PrintProc(LPVOID pvParam){
 
 					result = EndDocPrinter(hPrinter);
 					_ASSERT(result == TRUE);
+
+					result =  ClosePrinter(hPrinter);
+					_ASSERT(result == TRUE);
 				}
 			}
 
