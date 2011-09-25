@@ -34,6 +34,68 @@ class OpeFoodPopup extends PopupScreen{
 		add(new LabelField("请选择\"" + _selectedFood.name + "\"的操作", DrawStyle.ELLIPSIS));
 		add(new SeparatorField());
 
+		HorizontalFieldManager hfm = new HorizontalFieldManager(Manager.FIELD_HCENTER | Manager.HORIZONTAL_SCROLL);
+
+		ButtonField hangBtn = null;
+		if(_type == Type.INSERT_ORDER){
+			if(_orderList.getSelectedFood().hangStatus == Food.FOOD_NORMAL){
+				hangBtn = new ButtonField("叫起");
+				hangBtn.setChangeListener(new FieldChangeListener() {					
+					public void fieldChanged(Field field, int context) {
+						int resp = Dialog.ask(Dialog.D_YES_NO, "确认叫起" + _orderList.getSelectedFood().name + "?");
+						if(resp == Dialog.YES){
+							_orderList.getSelectedFood().hangStatus = Food.FOOD_HANG_UP;	
+							_orderList.invalidate(_orderList.getSelectedIndex());
+							close();
+						}
+					}
+				});
+				
+			}else if(_orderList.getSelectedFood().hangStatus == Food.FOOD_HANG_UP){
+				hangBtn = new ButtonField("即起");
+				hangBtn.setChangeListener(new FieldChangeListener() {					
+					public void fieldChanged(Field field, int context) {
+						int resp = Dialog.ask(Dialog.D_YES_NO, "确认取消叫起" + _orderList.getSelectedFood().name + "?");
+						if(resp == Dialog.YES){
+							_orderList.getSelectedFood().hangStatus = Food.FOOD_NORMAL;	
+							_orderList.invalidate(_orderList.getSelectedIndex());
+							close();
+						}
+					}
+				});				
+			}
+			
+
+		}else if(_type == Type.UPDATE_ORDER){
+			if(_orderList.getSelectedFood().hangStatus == Food.FOOD_HANG_UP){
+				hangBtn = new ButtonField("即起");
+				hangBtn.setChangeListener(new FieldChangeListener() {					
+					public void fieldChanged(Field field, int context) {
+						int resp = Dialog.ask(Dialog.D_YES_NO, "确认即起" + _orderList.getSelectedFood().name + "?");
+						if(resp == Dialog.YES){
+							_orderList.getSelectedFood().hangStatus = Food.FOOD_IMMEDIATE;			
+							_orderList.invalidate(_orderList.getSelectedIndex());
+							close();
+						}
+					}
+				});
+				
+			}else if(_orderList.getSelectedFood().hangStatus == Food.FOOD_IMMEDIATE){
+				hangBtn = new ButtonField("叫起");
+				hangBtn.setChangeListener(new FieldChangeListener() {					
+					public void fieldChanged(Field field, int context) {
+						int resp = Dialog.ask(Dialog.D_YES_NO, "确认重新叫起" + _orderList.getSelectedFood().name + "?");
+						if(resp == Dialog.YES){
+							_orderList.getSelectedFood().hangStatus = Food.FOOD_HANG_UP;	
+							_orderList.invalidate(_orderList.getSelectedIndex());
+							close();
+						}
+					}
+				});				
+			}
+		}
+
+		
 		//the button to remove the food from the order list
 		ButtonField delBtn = new ButtonField(type == Type.INSERT_ORDER ? "删除" : "退菜", Field.FIELD_HCENTER | ButtonField.CONSUME_CLICK);
 		delBtn.setChangeListener(new FieldChangeListener(){
@@ -71,16 +133,13 @@ class OpeFoodPopup extends PopupScreen{
 
 			}
 			
-		});
-		
-		HorizontalFieldManager hfm = new HorizontalFieldManager(Manager.FIELD_HCENTER | Manager.HORIZONTAL_SCROLL);
+		});		
 
-		
 		//the button to show selected food detail
 		ButtonField showDetailBtn = new ButtonField("查看", Field.FIELD_HCENTER | ButtonField.CONSUME_CLICK);
 		showDetailBtn.setChangeListener(new FieldChangeListener(){
 			public void fieldChanged(Field field, int context) {
-				UiApplication.getUiApplication().pushScreen(new ShowFoodPopup(_selectedFood));	
+				UiApplication.getUiApplication().pushScreen(new FoodDetailPopup(_selectedFood));	
 			}			
 		});
 		
@@ -92,33 +151,55 @@ class OpeFoodPopup extends PopupScreen{
 			}
 		});
 		
-		hfm.add(delBtn);
 		
-		//the button to add a taste, show up only if taste preferences exist
-		if(WirelessOrder.foodMenu.tastes.length != 0 || WirelessOrder.foodMenu.styles.length != 0 || WirelessOrder.foodMenu.specs.length != 0){
-			ButtonField addTasteBtn = new ButtonField("口味+", Field.FIELD_HCENTER | ButtonField.CONSUME_CLICK);
-			addTasteBtn.setChangeListener(new FieldChangeListener(){
-				public void fieldChanged(Field field, int context) {
-					UiApplication.getUiApplication().pushScreen(new SelectTTypePopup(_orderList, _selectedFood));		
-				} 
-			});
-			hfm.add(addTasteBtn);
-		}	
 		
-		//the button to remove taste, show up only if the food along with the taste
-		for(int i = 0; i < _selectedFood.tastes.length; i++){
-			if(_selectedFood.tastes[i].alias_id != Taste.NO_TASTE){
-				ButtonField delTasteBtn = new ButtonField("口味-", Field.FIELD_HCENTER | ButtonField.CONSUME_CLICK);
-				delTasteBtn.setChangeListener(new FieldChangeListener(){
+		//the button to add a taste, show up only if taste preferences exist and insert order
+		ButtonField addTasteBtn = null;
+		ButtonField delTasteBtn = null;
+		if(type == Type.INSERT_ORDER){
+			if(WirelessOrder.foodMenu.tastes.length != 0 || WirelessOrder.foodMenu.styles.length != 0 || WirelessOrder.foodMenu.specs.length != 0){
+				addTasteBtn = new ButtonField("口味+", Field.FIELD_HCENTER | ButtonField.CONSUME_CLICK);
+				addTasteBtn.setChangeListener(new FieldChangeListener(){
 					public void fieldChanged(Field field, int context) {
-						UiApplication.getUiApplication().pushScreen(new RemoveTastePopup(_orderList, _selectedFood));		
+						UiApplication.getUiApplication().pushScreen(new SelectTTypePopup(_orderList, _selectedFood));		
 					} 
 				});
-				hfm.add(delTasteBtn);
-				break;
-			}
-		}	
+				
+			}	
+			
+			//the button to remove taste, show up only if the food along with the taste
+			for(int i = 0; i < _selectedFood.tastes.length; i++){
+				if(_selectedFood.tastes[i].alias_id != Taste.NO_TASTE){
+					delTasteBtn = new ButtonField("口味-", Field.FIELD_HCENTER | ButtonField.CONSUME_CLICK);
+					delTasteBtn.setChangeListener(new FieldChangeListener(){
+						public void fieldChanged(Field field, int context) {
+							UiApplication.getUiApplication().pushScreen(new RemoveTastePopup(_orderList, _selectedFood));		
+						} 
+					});
+					hfm.add(delTasteBtn);
+					break;
+				}
+			}	
+		}
 
+		hfm.add(delBtn);
+		
+		if(addTasteBtn != null){
+			hfm.add(addTasteBtn);
+		}
+		
+		if(delTasteBtn != null){
+			hfm.add(delTasteBtn);
+		}
+		
+		if(hangBtn != null){
+			if(_type == Type.UPDATE_ORDER && _orderList.getSelectedFood().hangStatus == Food.FOOD_HANG_UP){
+				hfm.insert(hangBtn, 0);
+			}else{
+				hfm.add(hangBtn);
+			}
+		}
+		
 		hfm.add(showDetailBtn);
 		
 		add(hfm);
