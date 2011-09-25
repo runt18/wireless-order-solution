@@ -1,6 +1,11 @@
 SET NAMES utf8;
 
 -- -----------------------------------------------------
+-- Add the field "hang_status" to table "order_food"
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_food` ADD COLUMN `hang_status` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates hang up status.\n0 - normal\n1 - hang_up\n2 - immediate'  AFTER `food_status` ;
+
+-- -----------------------------------------------------
 -- Add the field "super_kitchen" to table "kitchen"
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`kitchen` ADD COLUMN `super_kitchen` TINYINT UNSIGNED NOT NULL DEFAULT 255 COMMENT 'the super to this kitchen. 255 means NOT belong to any super kitchen.'  AFTER `alias_id` ;
