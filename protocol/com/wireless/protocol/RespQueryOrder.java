@@ -25,7 +25,7 @@ import java.io.UnsupportedEncodingException;
  * 			  price[1..3] - 3-byte indicating the fixed-point
  * food_num - 1-byte indicating the number of ordered food
  * <Food>
- * food_id[2] : order_num[2] : status : taste_id : taste_id[2] : taste_id2[2] : taste_id3[2]
+ * food_id[2] : order_num[2] : status : taste_id : taste_id[2] : taste_id2[2] : taste_id3[2] : hang_status
  * food_id[2] - 2-byte indicating the food's id
  * order_num[2] - 2-byte indicating how many this foods are ordered
  * 			   order_num[0] - 1-byte indicates the float-point
@@ -34,6 +34,7 @@ import java.io.UnsupportedEncodingException;
  * taste_id[2] - 2-byte indicates the 1st taste preference id
  * taste_id2[2] - 2-byte indicates the 2nd taste preference id
  * taste_id3[3] - 2-byte indicates the 3rd taste preference id
+ * hang_status - indicates the hang status to the food
  *******************************************************/
 public class RespQueryOrder extends RespPackage{
 
@@ -48,7 +49,7 @@ public class RespQueryOrder extends RespPackage{
 					1 + /* custom number takes up 1-byte */ 
 					4 + /* price takes up 4-byte */ 
 					1 + /* food number takes up 1-byte */
-					order.foods.length * 11; /* each food takes up 11-byte*/
+					order.foods.length * 12; /* each food takes up 11-byte*/
 		
 		//assign the body length to header's length field
 		header.length[0] = (byte)(bodyLen & 0x000000FF);
@@ -100,7 +101,8 @@ public class RespQueryOrder extends RespPackage{
 			body[index + 8] = (byte)((order.foods[i].tastes[1].alias_id & 0xFF00) >> 8);
 			body[index + 9] = (byte)(order.foods[i].tastes[2].alias_id & 0x00FF);
 			body[index + 10] = (byte)((order.foods[i].tastes[2].alias_id & 0xFF00) >> 8);
-			index += 11;
+			body[index + 11] = (byte)(order.foods[i].hangStatus);
+			index += 12;
 		}
 	}
 

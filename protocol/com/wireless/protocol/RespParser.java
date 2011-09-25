@@ -38,7 +38,7 @@ public class RespParser {
 		 * 			  price[1..3] - 3-byte indicating the fixed-point
 		 * food_num - 1-byte indicating the number of ordered food
 		 * <Food>
-		 * food_id[2] : order_num[2] : status : taste_id[2] : taste_id2[2] : taste_id3[2]
+		 * food_id[2] : order_num[2] : status : taste_id[2] : taste_id2[2] : taste_id3[2] : hang_status
 		 * food_id[2] - 2-byte indicating the food's id
 		 * order_num[2] - 2-byte indicating how many this foods are ordered
 		 * 			   order_num[0] - 1-byte indicates the float-point
@@ -47,6 +47,7 @@ public class RespParser {
 		 * taste_id[2] - 2-byte indicates the 1st taste preference id
 		 * taste_id2[2] - 2-byte indicates the 2nd taste preference id
 		 * taste_id3[3] - 2-byte indicates the 3rd taste preference id
+		 * hang_status - indicates the hang status to the food
 		 *******************************************************/
 		if(response.header.type == Type.ACK){
 			//get the table id
@@ -97,8 +98,10 @@ public class RespParser {
 								((response.body[index + 8] & 0x000000FF) << 8);
 				tasteID[2] = (response.body[index + 9] & 0x000000FF) | 
 								((response.body[index + 10] & 0x000000FF) << 8);
-				//each food information takes up 11-byte
-				index += 11;
+				
+				short hangStatus = response.body[index + 11];
+				//each food information takes up 12-byte
+				index += 12;
 				orderFoods[i] = new Food();
 				orderFoods[i].alias_id = foodID;
 				orderFoods[i].count = orderNum;
@@ -108,6 +111,8 @@ public class RespParser {
 				orderFoods[i].tastes[0].alias_id = tasteID[0];
 				orderFoods[i].tastes[1].alias_id = tasteID[1];
 				orderFoods[i].tastes[2].alias_id = tasteID[2];
+				
+				orderFoods[i].hangStatus = hangStatus;
 			}
 			order.foods = orderFoods;
 		}
