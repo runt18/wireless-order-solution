@@ -5,6 +5,7 @@ import java.sql.Statement;
 
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Taste;
@@ -169,13 +170,15 @@ public class InsertOrder {
 						
 					//insert the record to table "order_food"
 					sql = "INSERT INTO `" + Params.dbName +
-						"`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, `discount`, `taste`, `taste_price`, `taste_id`, `taste_id2`, `taste_id3`, `kitchen`, `waiter`, `order_date`) VALUES (" +	
+						"`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, `hang_status`, " +
+						"`discount`, `taste`, `taste_price`, `taste_id`, `taste_id2`, `taste_id3`, `kitchen`, `waiter`, `order_date`) VALUES (" +	
 						orderToInsert.id + ", " + 
 						orderToInsert.foods[i].alias_id + ", " + 
 						orderToInsert.foods[i].getCount() + ", " + 
 						orderToInsert.foods[i].getPrice() + ", '" + 
 						orderToInsert.foods[i].name + "', " +
 						orderToInsert.foods[i].status + ", " +
+						(orderToInsert.foods[i].hangStatus == Food.FOOD_HANG_UP ? Food.FOOD_HANG_UP : Food.FOOD_NORMAL) + ", " +
 						orderToInsert.foods[i].getDiscount() + ", '" +
 						orderToInsert.foods[i].tastePref + "', " + 
 						orderToInsert.foods[i].getTastePrice() + ", " +

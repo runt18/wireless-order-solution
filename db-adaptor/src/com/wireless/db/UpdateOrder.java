@@ -2,6 +2,7 @@ package com.wireless.db;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
@@ -180,9 +181,10 @@ public class UpdateOrder {
 		
 		//query all the food's id ,order count and taste preference of this order
 		ArrayList<Food> originalRecords = new ArrayList<Food>();
-		String sql = "SELECT food_id, unit_price, name, food_status, discount, SUM(order_count) AS order_sum, taste, taste_price, taste_id, taste_id2, taste_id3, kitchen FROM `" + 
+		String sql = "SELECT food_id, unit_price, name, food_status, discount, SUM(order_count) AS order_sum, " +
+					"taste, taste_price, taste_id, taste_id2, taste_id3, hang_status, kitchen FROM `" + 
 					Params.dbName + "`.`order_food` WHERE order_id=" + orderToUpdate.id + 
-					" GROUP BY food_id, taste_id, taste_id2, taste_id3 HAVING order_sum > 0";
+					" GROUP BY food_id, taste_id, taste_id2, taste_id3, hang_status HAVING order_sum > 0";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
 			Food food = new Food();
@@ -198,6 +200,7 @@ public class UpdateOrder {
 			food.tastes[2].alias_id = dbCon.rs.getInt("taste_id3");
 			food.tastePref = dbCon.rs.getString("taste");
 			food.setTastePrice(dbCon.rs.getFloat("taste_price"));
+			food.hangStatus = dbCon.rs.getShort("hang_status");
 			originalRecords.add(food);
 		}
 		dbCon.rs.close();
@@ -264,10 +267,8 @@ public class UpdateOrder {
 				//check if the food to be inserted exist in db or not
 				Food food = new Food();
 				if(dbCon.rs.next()){
-					food.alias_id = orderToUpdate.foods[i].alias_id;
 					food.status = dbCon.rs.getShort("status");
 					food.name = dbCon.rs.getString("name");
-					food.setDiscount(orderToUpdate.foods[i].getDiscount());
 					food.setPrice(new Float(dbCon.rs.getFloat("unit_price")));
 					food.setCount(new Float((float)Math.round(Math.abs(diff) * 100) / 100));
 					food.kitchen = dbCon.rs.getShort("kitchen");
@@ -297,6 +298,10 @@ public class UpdateOrder {
 						
 					}
 				}
+				
+				food.alias_id = orderToUpdate.foods[i].alias_id;
+				food.setDiscount(orderToUpdate.foods[i].getDiscount());
+				food.hangStatus = orderToUpdate.foods[i].hangStatus;
 				
 				//set the taste preference to this food
 				food.tastePref = com.wireless.protocol.Util.genTastePref(food.tastes);
@@ -348,13 +353,15 @@ public class UpdateOrder {
 				giftAmount += extraFoods.get(i).getPrice2() * extraFoods.get(i).getCount();
 			}
 			
-			sql = "INSERT INTO `" + Params.dbName + "`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, " +
+			sql = "INSERT INTO `" + Params.dbName + 
+					"`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, `hang_status`, " +
 					"`discount`, `taste_id`, `taste_id2`, `taste_id3`, `taste_price`, `taste`, `kitchen`, `waiter`, `order_date`) VALUES (" +
 					orderToUpdate.id + ", " + extraFoods.get(i).alias_id + ", " + 
 					extraFoods.get(i).getCount() + ", " + 
 					extraFoods.get(i).getPrice() + ", '" + 
 					extraFoods.get(i).name + "', " + 
 					extraFoods.get(i).status + ", " +
+					(extraFoods.get(i).hangStatus == Food.FOOD_HANG_UP ? Food.FOOD_HANG_UP : Food.FOOD_NORMAL) + ", " +
 					extraFoods.get(i).getDiscount() + ", " +
 					extraFoods.get(i).tastes[0].alias_id + "," +
 					extraFoods.get(i).tastes[1].alias_id + "," +
@@ -374,13 +381,15 @@ public class UpdateOrder {
 				giftAmount -= canceledFoods.get(i).getPrice2() * canceledFoods.get(i).getCount();
 			}
 			
-			sql = "INSERT INTO `" + Params.dbName + "`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, " +
+			sql = "INSERT INTO `" + Params.dbName + 
+					"`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, `hang_status`, " +
 					"`discount`, `taste_id`, `taste_id2`, `taste_id3`, `taste_price`, `taste`, `kitchen`, `waiter`, `order_date`) VALUES (" +
 					orderToUpdate.id + ", " + canceledFoods.get(i).alias_id + ", " + 
 					"-" + canceledFoods.get(i).getCount() + ", " + 
 					canceledFoods.get(i).getPrice() + ", '" + 
 					canceledFoods.get(i).name + "', " + 
 					canceledFoods.get(i).status + ", " +
+					(canceledFoods.get(i).hangStatus == Food.FOOD_HANG_UP ? Food.FOOD_HANG_UP : Food.FOOD_NORMAL) + ", " +
 					canceledFoods.get(i).getDiscount() + ", " +
 					canceledFoods.get(i).tastes[0].alias_id + "," +
 					canceledFoods.get(i).tastes[1].alias_id + "," +
@@ -430,28 +439,99 @@ public class UpdateOrder {
 			
 			ArrayList<Food> tmpFoods = new ArrayList<Food>();
 			
+			Iterator<Food> iterExtra;
+			Iterator<Food> iterCancel;
+			
+			/**
+			 * Find the canceled foods to print
+			 */
+			tmpFoods.clear();
+			iterCancel = canceledFoods.iterator();
+			while(iterCancel.hasNext()){
+				Food canceledFood = iterCancel.next();
+				
+				boolean isCancelled = true;	
+				iterExtra = extraFoods.iterator();
+				while(iterExtra.hasNext()){
+					Food extraFood = iterExtra.next();
+					/**
+					 * If the food to cancel is hang up before.
+					 * Check to see whether the same extra food is exist
+					 * and the amount is equal or greater than the canceled.
+					 * If so, means the extra food is immediate
+					 * and NOT need to print this canceled food.
+					 */
+					if(canceledFood.hangStatus == Food.FOOD_HANG_UP){
+						if(extraFood.equals2(canceledFood) && 
+						   extraFood.getCount().floatValue() >= canceledFood.getCount().floatValue()){
+							
+							isCancelled = false;
+							extraFood.hangStatus = Food.FOOD_IMMEDIATE;
+							break;
+						}
+						
+					/**
+					 * In the case below, 
+					 * 1 - food alias id is matched 
+					 * 2 - order count is matched 
+					 * 3 - the hang status is the same
+					 * Means just change the taste preference to this food. 
+					 * We don't print this record.
+					 */
+					}else if(canceledFood.alias_id == extraFood.alias_id &&
+							 canceledFood.getCount().equals(extraFood.getCount()) &&
+							 canceledFood.hangStatus == extraFood.hangStatus) {
+
+						isCancelled = false;
+						break;
+					}
+				}
+				
+				if(isCancelled){
+					tmpFoods.add(canceledFood);
+				}				
+			}
+			
+			if(!tmpFoods.isEmpty()){
+				result.canceledOrder = new Order();
+				result.canceledOrder.id = orderToUpdate.id;
+				result.canceledOrder.table_id = orderToUpdate.table_id;
+				result.canceledOrder.table_name = orderToUpdate.table_name;
+				result.canceledOrder.custom_num = orderToUpdate.custom_num;
+				result.canceledOrder.foods = tmpFoods.toArray(new Food[tmpFoods.size()]);
+			}
+			
 			/**
 			 * Find the extra foods to print
 			 */
 			tmpFoods.clear();
-			for(int i = 0; i < extraFoods.size(); i++){				
+			iterExtra = extraFoods.listIterator();
+			while(iterExtra.hasNext()){
+				
+				Food extraFood = iterExtra.next();
+				
 				boolean isExtra = true;	
 				/**
 				 * In the case below, 
 				 * 1 - food alias id is matched 
 				 * 2 - order count is matched 
+				 * 3 - the hang status is the same
 				 * Means just change the taste preference to this food. 
 				 * We don't print this record.
 				 */
-				for(int j = 0; j < canceledFoods.size(); j++){
-					if(extraFoods.get(i).alias_id == canceledFoods.get(j).alias_id &&
-					   extraFoods.get(i).getClass().equals(canceledFoods.get(j).getCount())){
+				iterCancel = canceledFoods.iterator();
+				while(iterCancel.hasNext()){
+					Food canceledFood = iterCancel.next();
+					if(extraFood.alias_id == canceledFood.alias_id &&
+					   extraFood.getCount().equals(canceledFood.getCount()) &&
+					   extraFood.hangStatus == canceledFood.hangStatus){
 							isExtra = false;
 							break;
 					}
-				}				
+				}
+				
 				if(isExtra){
-					tmpFoods.add(extraFoods.get(i));
+					tmpFoods.add(extraFood);
 				}
 			}
 			
@@ -462,41 +542,6 @@ public class UpdateOrder {
 				result.extraOrder.table_name = orderToUpdate.table_name;
 				result.extraOrder.custom_num = orderToUpdate.custom_num;
 				result.extraOrder.foods = tmpFoods.toArray(new Food[tmpFoods.size()]);
-			}
-			
-			/**
-			 * Find the canceled foods to print
-			 */
-			tmpFoods.clear();
-			for(int i = 0; i < canceledFoods.size(); i++){				
-				boolean isCancelled = true;	
-				/**
-				 * In the case below, 
-				 * 1 - food alias id is matched 
-				 * 2 - order count is matched 
-				 * Means just change the taste preference to this food. 
-				 * We don't print this record.
-				 */
-				for(int j = 0; j < extraFoods.size(); j++){
-					if(canceledFoods.get(i).alias_id == extraFoods.get(j).alias_id &&
-							canceledFoods.get(i).getCount().equals(extraFoods.get(j).getCount())){
-						
-						isCancelled = false;
-						break;
-					}
-				}				
-				if(isCancelled){
-					tmpFoods.add(canceledFoods.get(i));
-				}
-			}
-			
-			if(!tmpFoods.isEmpty()){
-				result.canceledOrder = new Order();
-				result.canceledOrder.id = orderToUpdate.id;
-				result.canceledOrder.table_id = orderToUpdate.table_id;
-				result.canceledOrder.table_name = orderToUpdate.table_name;
-				result.canceledOrder.custom_num = orderToUpdate.custom_num;
-				result.canceledOrder.foods = tmpFoods.toArray(new Food[tmpFoods.size()]);
 			}
 		}
 		
