@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -40,7 +41,7 @@ public class QueryTodayAction extends Action {
 			 * 1st example, filter the order whose id equals 321 
 			 * pin=0x1 & type=1 & ope=1 & value=321
 			 * 2nd example, filter the order date greater than or equal 2011-7-14 14:30:00
-			 * pin=0x1 & type=1 & ope=2 & value=2011-7-14 14:30:00
+			 * pin=0x1 & type=3 & ope=2 & value=2011-7-14 14:30:00
 			 * 
 			 * pin : the pin the this terminal
 			 * type : the type is one of the values below.
@@ -52,6 +53,7 @@ public class QueryTodayAction extends Action {
 			 *  	  5 - 按结帐方式
 			 *  	  6 - 按金额
 			 *   	  7 - 按实收
+			 *   	  8 - 按时间
 			 * ope : the operator is one of the values below.
 			 * 		  1 - 等于
 			 * 		  2 - 大于等于
@@ -115,6 +117,9 @@ public class QueryTodayAction extends Action {
 			}else if(type == 7){
 				//按实收
 				filterCondition = " AND total_price_2" + ope + filterVal;
+			}else if(type == 8){
+				//按时间
+				filterCondition = " AND order_date" + ope + "'" + new SimpleDateFormat("yyyy-MM-dd").format(new Date()) + " " + filterVal + "'"; 
 			}else{
 				filterCondition = "";
 			}
