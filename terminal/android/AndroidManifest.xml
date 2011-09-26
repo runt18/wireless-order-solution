@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="com.wireless.ui"
       android:versionCode="1"
-      android:versionName="1.0">
+      android:versionName="1.0.0">
     <uses-sdk android:minSdkVersion="8" />
 
     <application android:icon="@drawable/main" android:label="@string/app_name"  android:debuggable="true"  android:theme="@android:style/Theme.NoTitleBar" android:name=".AppContext">
@@ -22,7 +22,6 @@
          
         
     </application>
-    <uses-permission android:name="android.permission.INTERNET" />
        <!-- 连接网络权限  --> 
 	  <uses-permission android:name="android.permission.INTERNET" /> 
 	  <uses-permission android:name="android.permission.SEND_SMS"/>
