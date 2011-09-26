@@ -90,18 +90,18 @@ public class MainActivity extends Activity {
 						   };
 		
 		// 生成动态数组，并且转入数据
-		ArrayList<HashMap<String, Object>> lstImageItem = new ArrayList<HashMap<String, Object>>();
+		ArrayList<HashMap<String, Object>> imgItems = new ArrayList<HashMap<String, Object>>();
 		for (int i = 0; i < imageIcons.length; i++) {
 			HashMap<String, Object> map = new HashMap<String, Object>();
 			map.put("ItemImage", imageIcons[i]);// 添加图像资源的ID
 			map.put("ItemText", iconDes[i]);// 按序号做ItemText
-			lstImageItem.add(map);
+			imgItems.add(map);
 		}
 		
 		// 生成适配器的ImageItem <====> 动态数组的元素，两者一一对应
 		// 添加并且显示九宫格
 		_funGridView.setAdapter(new SimpleAdapter(MainActivity.this, 							// 没什么解释
-				   								  lstImageItem,									// 数据来源
+				   								  imgItems,									// 数据来源
 				   								  R.layout.grewview_item,						// night_item的XML实现				
 				   								  new String[] { "ItemImage", "ItemText" }, 	// 动态数组与ImageItem对应的子项
 				   								  new int[] { R.id.ItemImage, R.id.ItemText }));// ImageItem的XML文件里面的一个ImageView,一个TextView ID
