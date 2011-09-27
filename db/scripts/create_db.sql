@@ -532,7 +532,7 @@ DROP TABLE IF EXISTS `wireless_order_db`.`setting` ;
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`setting` (
   `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to setting' ,
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'the restaurant id to this setting' ,
-  `price_tail` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'indicates how to deal with the tail of price:\n不处理 : 0\n小数抹零 : 1\n小数四舍五入 : 2' ,
+  `price_tail` TINYINT UNSIGNED NOT NULL DEFAULT 2 COMMENT 'indicates how to deal with the tail of price:\n不处理 : 0\n小数抹零 : 1\n小数四舍五入 : 2' ,
   `auto_reprint` TINYINT NOT NULL DEFAULT 1 COMMENT 'indicates whether to auto re-print' ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_setting_restaurant` (`restaurant_id` ASC) ,
