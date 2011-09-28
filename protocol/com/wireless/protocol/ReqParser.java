@@ -42,7 +42,7 @@ public class ReqParser {
 	 * custom_num - 1-byte indicating the custom number for this table
 	 * food_num - 1-byte indicating the number of foods
 	 * <Food>
-	 * food_id[2] : order_num[2] : taste_id[2] : taste_id2[2] : taste_id3[2] : kitchen : hang_status
+	 * food_id[2] : order_num[2] : taste_id[2] : taste_id2[2] : taste_id3[2] : kitchen : hang_status : is_hurried
 	 * food_id[2] - 2-byte indicating the food's id
 	 * order_num[2] - 2-byte indicating how many this foods are ordered
 	 * 			   order_num[0] - 1-byte indicates the float-point
@@ -52,6 +52,8 @@ public class ReqParser {
 	 * taste_id3[2] - 2-byte indicates the 3rd taste preference id
 	 * kitchen - the kitchen to this food
 	 * hang_status - the hang status to the food
+	 * is_hurried - indicates whether the food is hurried
+	 * 
 	 * origianal_table[2] - 2-bytes indicates the original table id,
 	 *                      These two bytes are used for table transferred
 	 *******************************************************/
@@ -96,8 +98,13 @@ public class ReqParser {
 			//get the kitchen 
 			short kitchen = req.body[offset + 10];
 			
-			//get the hang up flag
+			//get the hang up status
 			short hangStatus = req.body[offset + 11];
+			
+			//get the hurried flag
+			boolean isHurried = req.body[offset + 12] == 1 ? true : false;
+			
+			offset += 13;
 			
 			orderFoods[i] = new Food();
 			orderFoods[i].alias_id = foodID;
@@ -125,7 +132,8 @@ public class ReqParser {
 			
 			orderFoods[i].hangStatus = hangStatus;
 			
-			offset += 12;
+			orderFoods[i].isHurried = isHurried;			
+
 		}
 		order.foods = orderFoods;
 		

@@ -21,7 +21,7 @@ import com.wireless.protocol.Reserved;
  * custom_num - 1-byte indicating the custom number for this table
  * food_num - 1-byte indicating the number of foods
  * <Food>
- * food_id[2] : order_num[2] : taste_id[2] : taste_id2[2] : taste_id3[2] : kitchen : hang_status
+ * food_id[2] : order_num[2] : taste_id[2] : taste_id2[2] : taste_id3[2] : kitchen : hang_status : is_hurried
  * food_id[2] - 2-byte indicating the food's id
  * order_num[2] - 2-byte indicating how many this foods are ordered
  * 			   order_num[0] - 1-byte indicates the float-point
@@ -31,6 +31,7 @@ import com.wireless.protocol.Reserved;
  * taste_id3[2] - 2-byte indicates the 3rd taste preference id
  * kitchen - the kitchen to this food
  * hang_status - the hang status to the food
+ * is_hurried - indicates whether the food is hurried
  * 
  * origianal_table[2] - 2-bytes indicates the original table id,
  *                      These two bytes are used for table transferred
@@ -85,7 +86,7 @@ public class ReqInsertOrder extends ReqPackage {
 					1 + /* category takes up 1 byte */
 					1 + /* custom number takes up 1 byte */ 
 					1 + /* food number takes up 1 byte */
-					reqOrder.foods.length * 12 + /* each food takes up 12 bytes*/
+					reqOrder.foods.length * 13 + /* each food takes up 13 bytes*/
 					2; /* original table id takes up 2 bytes */
 		header.length[0] = (byte)(bodyLen & 0x000000FF) ;
 		header.length[1] = (byte)((bodyLen & 0x0000FF00) >> 8);
@@ -128,7 +129,8 @@ public class ReqInsertOrder extends ReqPackage {
 			body[offset + 9] = (byte)((reqOrder.foods[i].tastes[2].alias_id & 0xFF00) >> 8);
 			body[offset + 10] = (byte)(reqOrder.foods[i].kitchen);
 			body[offset + 11] = (byte)reqOrder.foods[i].hangStatus;
-			offset += 12;
+			body[offset + 12] = (byte)(reqOrder.foods[i].isHurried ? 1 : 0);
+			offset += 13;
 		}		
 		
 		//assign the original table id

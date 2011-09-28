@@ -5,9 +5,9 @@ public class Taste {
 	public final static short NO_TASTE = 0;
 	public final static String NO_PREFERENCE = "无口味"; 
 	
-	public final static short CATE_TASTE = 0;
-	public final static short CATE_STYLE = 1;
-	public final static short CATE_SPEC = 2;
+	public final static short CATE_TASTE = 0;	/* 口味 */
+	public final static short CATE_STYLE = 1;	/* 做法 */
+	public final static short CATE_SPEC = 2;	/* 规格 */
 	
 	public final static short CALC_PRICE = 0;	/* 按价格计算  */
 	public final static short CALC_RATE = 1;	/* 按比例计算  */
