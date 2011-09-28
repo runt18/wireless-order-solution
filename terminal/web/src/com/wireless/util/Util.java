@@ -1,5 +1,7 @@
 package com.wireless.util;
 
+import java.util.ArrayList;
+
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 
@@ -73,6 +75,24 @@ public class Util {
 				foods[i].tastes[2].alias_id = Short.parseShort(values[6]);
 			}
 		}
-		return foods;
+		
+		/**
+		 * Combine the amount of the same food.
+		 */
+		ArrayList<Food> tmpFoods = new ArrayList<Food>();
+		for(int i = 0; i < foods.length; i++){
+			
+			int index = tmpFoods.indexOf(foods[i]);
+			if(index != -1){
+				Food food = tmpFoods.get(index);
+				float count = food.getCount().floatValue() + foods[i].getCount().floatValue();
+				food.setCount(count);
+			}else{
+				tmpFoods.add(foods[i]);
+			}
+			
+		}
+		
+		return tmpFoods.toArray(new Food[tmpFoods.size()]);
 	}
 }

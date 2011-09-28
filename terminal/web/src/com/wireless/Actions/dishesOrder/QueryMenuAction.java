@@ -144,24 +144,36 @@ public class QueryMenuAction extends Action {
 	 * @return
 	 */
 	private String toJson(Taste[] tastes){
+		
+		final String tasteTemplate = "[$(taste_id),$(taste_cate),$(taste_pref),$(taste_price),$(taste_rate),$(calc_type)]";
+		
 		StringBuffer value = new StringBuffer();
-		String jsonTaste = "[$(taste_id),\"$(preference)\",\"$(unit)\"]";
+		String jsonTaste = tasteTemplate;
 		jsonTaste = jsonTaste.replace("$(taste_id)", "0");
-		jsonTaste = jsonTaste.replace("$(preference)", "无口味");
-		jsonTaste = jsonTaste.replace("$(unit)", Util.CURRENCY_SIGN + "0.00");
+		jsonTaste = jsonTaste.replace("$(taste_cate)", "0");
+		jsonTaste = jsonTaste.replace("$(taste_pref)", "无口味");
+		jsonTaste = jsonTaste.replace("$(taste_price)", Util.CURRENCY_SIGN	+ "0");
+		jsonTaste = jsonTaste.replace("$(taste_rate)", "0");
+		jsonTaste = jsonTaste.replace("$(calc_type)", "0");
+
 		value.append(jsonTaste);	
 			
 		for (int i = 0; i < tastes.length; i++) {
 			/**
 			 * The json format to each taste item looks like below.
-			 * [口味编号,"口味名称","￥口味单价"]
+			 * [口味编号,口味分类,口味名称,价钱,比例,计算方式]
+			 * “口味分类”的值如下： 0 - 口味 ， 1 - 做法，  2 - 规格
+			 * “计算方式”的值如下：0 - 按价格，1 - 按比例 
 			 */
 			// the string is separated by comma
 			value.append("，");
-			jsonTaste = "[$(taste_id),\"$(preference)\",\"$(unit)\"]";
+			jsonTaste = tasteTemplate;
 			jsonTaste = jsonTaste.replace("$(taste_id)", Integer.toString((tastes[i].alias_id)));
-			jsonTaste = jsonTaste.replace("$(preference)", tastes[i].preference);
-			jsonTaste = jsonTaste.replace("$(unit)", Util.CURRENCY_SIGN	+ Util.float2String(tastes[i].getPrice()));
+			jsonTaste = jsonTaste.replace("$(taste_cate)", Integer.toString((tastes[i].category)));
+			jsonTaste = jsonTaste.replace("$(taste_pref)", tastes[i].preference);
+			jsonTaste = jsonTaste.replace("$(taste_price)", Util.CURRENCY_SIGN	+ Util.float2String(tastes[i].getPrice()));
+			jsonTaste = jsonTaste.replace("$(taste_rate)", tastes[i].getRate().toString());
+			jsonTaste = jsonTaste.replace("$(calc_type)", Integer.toString(tastes[i].calc));
 
 			// put each json taste info to the value
 			value.append(jsonTaste);
