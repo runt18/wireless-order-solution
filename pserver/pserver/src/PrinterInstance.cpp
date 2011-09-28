@@ -120,22 +120,30 @@ static unsigned __stdcall PrintProc(LPVOID pvParam){
 
 					DOC_INFO_1 stDocInfo;
 					memset(&stDocInfo, 0, sizeof(DOC_INFO_1));
-					if(job.func.code == Reserved::PRINT_ORDER){
+					if(job.req_code == Reserved::PRINT_ORDER){
 						stDocInfo.pDocName = L"下单";
-					}else if(job.func.code == Reserved::PRINT_ORDER_DETAIL){
+					}else if(job.req_code == Reserved::PRINT_ORDER_DETAIL){
 						stDocInfo.pDocName = L"下单详细";
-					}else if(job.func.code == Reserved::PRINT_RECEIPT){
+					}else if(job.req_code == Reserved::PRINT_RECEIPT){
 						stDocInfo.pDocName = L"结帐";
-					}else if(job.func.code == Reserved::PRINT_EXTRA_FOOD){
+					}else if(job.req_code == Reserved::PRINT_TEMP_RECEIPT){
+						stDocInfo.pDocName = L"暂结";
+					}else if(job.req_code == Reserved::PRINT_EXTRA_FOOD){
 						stDocInfo.pDocName = L"加菜详细";
-					}else if(job.func.code == Reserved::PRINT_CANCELLED_FOOD){
+					}else if(job.req_code == Reserved::PRINT_CANCELLED_FOOD){
 						stDocInfo.pDocName = L"退菜详细";
-					}else if(job.func.code == Reserved::PRINT_TRANSFER_TABLE){
+					}else if(job.req_code == Reserved::PRINT_TRANSFER_TABLE){
 						stDocInfo.pDocName = L"转台";
-					}else if(job.func.code == Reserved::PRINT_ALL_EXTRA_FOOD){
+					}else if(job.req_code == Reserved::PRINT_ALL_EXTRA_FOOD){
 						stDocInfo.pDocName = L"加菜";
-					}else if(job.func.code == Reserved::PRINT_ALL_CANCELLED_FOOD){
+					}else if(job.req_code == Reserved::PRINT_ALL_CANCELLED_FOOD){
 						stDocInfo.pDocName = L"退菜";
+					}else if(job.req_code == Reserved::PRINT_ALL_HURRIED_FOOD){
+						stDocInfo.pDocName = L"催菜";
+					}else if(job.req_code == Reserved::PRINT_TRANSFER_TABLE){
+						stDocInfo.pDocName = L"转台";
+					}else if(job.req_code == Reserved::PRINT_SHIFT_RECEIPT){
+						stDocInfo.pDocName = L"交班对账";
 					}else{
 						stDocInfo.pDocName = L"未知信息";
 					}
@@ -212,10 +220,12 @@ void PrinterInstance::run(){
 * Description    : Add the print job to queue and notify the print thread to run
 * Input          : buf - the pointer to the print content
 				   len - the length of the buffer
+				   iFunc - the function code that the printer instance is going to do
+				   reqFuncCode - the function code sent by request
 * Output         : None
 * Return         : None
 *******************************************************************************/
-void PrinterInstance::addJob(const char* buf, int len, int iFunc){
+void PrinterInstance::addJob(const char* buf, int len, int iFunc, int iReqFuncCode){
 
 
 	/************************************************************************
@@ -300,7 +310,7 @@ void PrinterInstance::addJob(const char* buf, int len, int iFunc){
 			//add all order detail jobs to the queue
 			vector<string>::iterator iter = details.begin();
 			for(iter; iter != details.end(); iter++){
-				jobQueue.push(PrintJob(*iter_func, *iter, order_id, order_date));
+				jobQueue.push(PrintJob(*iter_func, iReqFuncCode, *iter, order_id, order_date));
 			}
 			//notify the print thread to run
 			SetEvent(hPrintEvent);

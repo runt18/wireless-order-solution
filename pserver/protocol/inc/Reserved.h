@@ -15,6 +15,8 @@ public:
 	static const int PRINT_TRANSFER_TABLE = 6;
 	static const int PRINT_ALL_EXTRA_FOOD = 7;
 	static const int PRINT_ALL_CANCELLED_FOOD = 8;
+	static const int PRINT_ALL_HURRIED_FOOD = 9;
+	static const int PRINT_HURRIED_FOOD = 10;
 	static const int PRINT_SHIFT_RECEIPT = 126;
 	static const int PRINT_TEMP_RECEIPT = 127;
 

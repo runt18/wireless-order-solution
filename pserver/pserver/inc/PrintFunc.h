@@ -13,7 +13,7 @@ public:
 	bool operator==(const PrintFunc&) const;
 	~PrintFunc(){};
 
-	int code;		//the function code 
+	int code;				//the function code 
 	vector<int> kitchens;	//the kitchen to this function
-	int repeat;		//the repeat number to this function
+	int repeat;				//the repeat number to this function
 };

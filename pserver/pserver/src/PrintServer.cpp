@@ -178,29 +178,32 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 							vector<PrintFunc>::iterator it = (*iter)->funcs.begin();
 							for(it; it != (*iter)->funcs.end(); it++){
 								if(it->code == Reserved::PRINT_ORDER && (printReq.header.reserved == Reserved::PRINT_ORDER)){
-									(*iter)->addJob(printReq.body, len, it->code);
+									(*iter)->addJob(printReq.body, len, it->code, printReq.header.reserved);
 
 								}else if(it->code == Reserved::PRINT_ORDER_DETAIL && (printReq.header.reserved == Reserved::PRINT_ORDER_DETAIL)){
-									(*iter)->addJob(printReq.body, len, it->code);
+									(*iter)->addJob(printReq.body, len, it->code, printReq.header.reserved);
 
 								}else if(it->code == Reserved::PRINT_RECEIPT && (printReq.header.reserved == Reserved::PRINT_RECEIPT 
 										|| printReq.header.reserved == Reserved::PRINT_TEMP_RECEIPT || printReq.header.reserved == Reserved::PRINT_SHIFT_RECEIPT)){
-									(*iter)->addJob(printReq.body, len, it->code);
+									(*iter)->addJob(printReq.body, len, it->code, printReq.header.reserved);
 
 								}else if(it->code == Reserved::PRINT_EXTRA_FOOD && (printReq.header.reserved == Reserved::PRINT_EXTRA_FOOD)){
-									(*iter)->addJob(printReq.body, len, it->code);
+									(*iter)->addJob(printReq.body, len, it->code, printReq.header.reserved);
 
 								}else if(it->code == Reserved::PRINT_CANCELLED_FOOD && (printReq.header.reserved == Reserved::PRINT_CANCELLED_FOOD)){
-									(*iter)->addJob(printReq.body, len, it->code);
+									(*iter)->addJob(printReq.body, len, it->code, printReq.header.reserved);
 
 								}else if(it->code == Reserved::PRINT_TRANSFER_TABLE && (printReq.header.reserved == Reserved::PRINT_TRANSFER_TABLE)){
-									(*iter)->addJob(printReq.body, len, it->code);
+									(*iter)->addJob(printReq.body, len, it->code, printReq.header.reserved);
 
 								}else if(it->code == Reserved::PRINT_ALL_EXTRA_FOOD && (printReq.header.reserved == Reserved::PRINT_ALL_EXTRA_FOOD)){
-									(*iter)->addJob(printReq.body, len, it->code);
+									(*iter)->addJob(printReq.body, len, it->code, printReq.header.reserved);
 
 								}else if(it->code == Reserved::PRINT_ALL_CANCELLED_FOOD && (printReq.header.reserved == Reserved::PRINT_ALL_CANCELLED_FOOD)){
-									(*iter)->addJob(printReq.body, len, it->code);
+									(*iter)->addJob(printReq.body, len, it->code, printReq.header.reserved);
+
+								}else if(it->code == Reserved::PRINT_ALL_HURRIED_FOOD && (printReq.header.reserved == Reserved::PRINT_ALL_HURRIED_FOOD)){
+									(*iter)->addJob(printReq.body, len, it->code, printReq.header.reserved);
 								}
 							}
 						}
