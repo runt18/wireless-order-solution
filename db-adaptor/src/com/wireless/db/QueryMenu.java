@@ -88,7 +88,7 @@ public class QueryMenu {
 		try {
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, pin, model);
-			return queryTastes(dbCon, term.restaurant_id, Taste.CATE_TASTE);
+			return queryTastes(dbCon, term.restaurant_id, Short.MIN_VALUE);
 
 		} finally {
 			dbCon.disconnect();
@@ -185,7 +185,7 @@ public class QueryMenu {
 		//Put the most commonly used taste preference in first position 
 		String sql = "SELECT alias_id, preference, price, category, rate, calc FROM " + Params.dbName + ".taste WHERE restaurant_id=" + 
 					 restaurantID + 
-					 " AND category=" + category +
+					 (category < 0 ? "" : " AND category=" + category) +
 					 " ORDER BY alias_id";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		ArrayList<Taste> tastes = new ArrayList<Taste>();

@@ -23,6 +23,7 @@ public class UpdateOrder {
 	public static class Result{
 		public Order canceledOrder = null;
 		public Order extraOrder = null;
+		public Order hurriedOrder = null;
 	}
 	
 	/**
@@ -208,9 +209,19 @@ public class UpdateOrder {
 
 		ArrayList<Food> extraFoods = new ArrayList<Food>();
 		ArrayList<Food> canceledFoods = new ArrayList<Food>();
+		ArrayList<Food> hurriedFoods = new ArrayList<Food>();
 		
 		for(int i = 0; i < orderToUpdate.foods.length; i++){
 					
+			/**
+			 * Check to see whether the food to update is hurried.
+			 */
+			if(orderToUpdate.foods[i].isHurried){
+				Food food = genFoodDetail(dbCon, term, orderToUpdate.foods[i]);
+				food.setCount(orderToUpdate.foods[i].getCount());
+				hurriedFoods.add(food);
+			}
+			
 			/**
 			 * Assume the order record is new, means not matched any original record.
 			 * So the difference is equal to the amount of new order food
@@ -249,64 +260,9 @@ public class UpdateOrder {
 			
 			if(status == STATUS.NOT_MATCHED || status == STATUS.FULL_MATCHED_BUT_COUNT){
 				
-				/**
-				 * firstly, check to see whether the new food submitted by terminal exist in db or is disabled by user.
-				 * If the food can't be found in db or has been disabled by user, means the menu in terminal has been expired,
-				 * and then sent back an error to tell the terminal to update the menu.
-				 * secondly, check to see whether the taste preference submitted by terminal exist in db or not.
-				 * If the taste preference can't be found in db, means the taste in terminal has been expired,
-				 * and then sent back an error to tell the terminal to update the menu.
-				 */
+				Food food = genFoodDetail(dbCon, term, orderToUpdate.foods[i]);
 				
-				//get the food name and its unit price
-				sql = "SELECT name, status, unit_price, kitchen FROM " + Params.dbName + 
-						".food WHERE alias_id=" + orderToUpdate.foods[i].alias_id + 
-						" AND restaurant_id=" + term.restaurant_id +
-						" AND enabled=1";
-				dbCon.rs = dbCon.stmt.executeQuery(sql);
-				//check if the food to be inserted exist in db or not
-				Food food = new Food();
-				if(dbCon.rs.next()){
-					food.status = dbCon.rs.getShort("status");
-					food.name = dbCon.rs.getString("name");
-					food.setPrice(new Float(dbCon.rs.getFloat("unit_price")));
-					food.setCount(new Float((float)Math.round(Math.abs(diff) * 100) / 100));
-					food.kitchen = dbCon.rs.getShort("kitchen");
-				}else{
-					throw new BusinessException("The food(alias_id=" + orderToUpdate.foods[i].alias_id + ") to query does NOT exist.", ErrorCode.MENU_EXPIRED);
-				}
-				dbCon.rs.close();
-				
-				//get the each taste information to this food only if the food has taste preference
-				for(int j = 0; j < orderToUpdate.foods[i].tastes.length; j++){
-					if(orderToUpdate.foods[i].tastes[j].alias_id != Taste.NO_TASTE){
-						sql = "SELECT preference, price, category, rate, calc FROM " + Params.dbName + ".taste WHERE restaurant_id=" + term.restaurant_id +
-							" AND alias_id=" + orderToUpdate.foods[i].tastes[j].alias_id;
-						dbCon.rs = dbCon.stmt.executeQuery(sql);
-						//check if the taste preference exist in db
-						if(dbCon.rs.next()){
-							food.tastes[j].alias_id = orderToUpdate.foods[i].tastes[j].alias_id;
-							food.tastes[j].preference = dbCon.rs.getString("preference");
-							food.tastes[j].category = dbCon.rs.getShort("category");
-							food.tastes[j].calc = dbCon.rs.getShort("calc");
-							food.tastes[j].setRate(dbCon.rs.getFloat("rate"));
-							food.tastes[j].setPrice(dbCon.rs.getFloat("price"));
-						}else{
-							throw new BusinessException("The taste(alias_id=" + orderToUpdate.foods[i].tastes[j].alias_id + ") to query does NOT exist.", ErrorCode.MENU_EXPIRED);
-						}
-						dbCon.rs.close();
-						
-					}
-				}
-				
-				food.alias_id = orderToUpdate.foods[i].alias_id;
-				food.setDiscount(orderToUpdate.foods[i].getDiscount());
-				food.hangStatus = orderToUpdate.foods[i].hangStatus;
-				
-				//set the taste preference to this food
-				food.tastePref = com.wireless.protocol.Util.genTastePref(food.tastes);
-				//set the total taste price to this food
-				food.setTastePrice(com.wireless.protocol.Util.genTastePrice(food.tastes, food.getPrice()));
+				food.setCount(new Float((float)Math.round(Math.abs(diff) * 100) / 100));
 				
 				if(diff > 0){
 					extraFoods.add(food);
@@ -433,7 +389,7 @@ public class UpdateOrder {
 		
 		Result result = new Result();			
 		/**
-		 * Notify the print handler to print the extra and canceled foods
+		 * Find the extra and canceled foods and put them to result.
 		 */
 		if(!extraFoods.isEmpty() || !canceledFoods.isEmpty()){			
 			
@@ -545,8 +501,102 @@ public class UpdateOrder {
 			}
 		}
 		
+		/**
+		 * Find the hurried foods and put them to result.
+		 */
+		if(!hurriedFoods.isEmpty()){
+			result.hurriedOrder = new Order();
+			result.hurriedOrder.id = orderToUpdate.id;
+			result.hurriedOrder.table_id = orderToUpdate.table_id;
+			result.hurriedOrder.table_name = orderToUpdate.table_name;
+			result.hurriedOrder.custom_num = orderToUpdate.custom_num;
+			result.hurriedOrder.foods = hurriedFoods.toArray(new Food[hurriedFoods.size()]);
+		}
+		
 		return result;
 	}	
+	
+	/**
+	 * Generate the food detail from the basic information defined in protocol.
+	 * The basic information consists of alias id, discount, taste id, hang status and so on.
+	 * @param dbCon
+	 * 			The db connection
+	 * @param term
+	 * 			The terminal associated with this request
+	 * @param foodBasic
+	 * 			The food instance with the basic information
+	 * @return 
+	 * 			The food instance with the detail information
+	 * @throws BusinessException
+	 * 			Throws with "MENU_EXPIRED" if the food can NOT be found in db
+	 * @throws SQLException
+	 * 			Throws if fail to execute any SQL statement
+	 */
+	private static Food genFoodDetail(DBCon dbCon, Terminal term, Food foodBasic) throws BusinessException, SQLException{
+		/**
+		 * firstly, check to see whether the new food submitted by terminal exist in db or is disabled by user.
+		 * If the food can NOT be found in db, means the menu in terminal has been expired,
+		 * and then sent back an error to tell the terminal to update the menu.
+		 * secondly, check to see whether the taste preference submitted by terminal exist in db or not.
+		 * If the taste preference can't be found in db, means the taste in terminal has been expired,
+		 * and then sent back an error to tell the terminal to update the menu.
+		 */
+		
+		//get the food name and its unit price
+		String sql = "SELECT name, status, unit_price, kitchen FROM " + Params.dbName + 
+				".food WHERE alias_id=" + foodBasic.alias_id + 
+				" AND restaurant_id=" + term.restaurant_id;
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		//check if the food to be inserted exist in db or not
+		Food food = new Food();
+		if(dbCon.rs.next()){
+			food.status = dbCon.rs.getShort("status");
+			food.name = dbCon.rs.getString("name");
+			food.setPrice(new Float(dbCon.rs.getFloat("unit_price")));
+
+			food.kitchen = dbCon.rs.getShort("kitchen");
+		}else{
+			throw new BusinessException("The food(alias_id=" + foodBasic.alias_id + ") to query does NOT exist.", ErrorCode.MENU_EXPIRED);
+		}
+		dbCon.rs.close();
+		
+		//get the each taste information to this food only if the food has taste preference
+		for(int j = 0; j < foodBasic.tastes.length; j++){
+			if(foodBasic.tastes[j].alias_id != Taste.NO_TASTE){
+				sql = "SELECT preference, price, category, rate, calc FROM " + Params.dbName + ".taste WHERE restaurant_id=" + term.restaurant_id +
+					" AND alias_id=" + foodBasic.tastes[j].alias_id;
+				dbCon.rs = dbCon.stmt.executeQuery(sql);
+				//check if the taste preference exist in db
+				if(dbCon.rs.next()){
+					food.tastes[j].alias_id = foodBasic.tastes[j].alias_id;
+					food.tastes[j].preference = dbCon.rs.getString("preference");
+					food.tastes[j].category = dbCon.rs.getShort("category");
+					food.tastes[j].calc = dbCon.rs.getShort("calc");
+					food.tastes[j].setRate(dbCon.rs.getFloat("rate"));
+					food.tastes[j].setPrice(dbCon.rs.getFloat("price"));
+				}else{
+					throw new BusinessException("The taste(alias_id=" + foodBasic.tastes[j].alias_id + ") to query does NOT exist.", ErrorCode.MENU_EXPIRED);
+				}
+				dbCon.rs.close();
+				
+			}
+		}
+		
+		//set the alias id
+		food.alias_id = foodBasic.alias_id;
+		//set the discount
+		food.setDiscount(foodBasic.getDiscount());
+		//set the hang status
+		food.hangStatus = foodBasic.hangStatus;
+		
+		//set the taste preference to this food
+		food.tastePref = com.wireless.protocol.Util.genTastePref(food.tastes);
+		//set the total taste price to this food
+		food.setTastePrice(com.wireless.protocol.Util.genTastePrice(food.tastes, food.getPrice()));
+		
+		return food;
+	}
+	
 }
 
 
