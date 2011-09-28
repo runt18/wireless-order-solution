@@ -145,7 +145,17 @@ class OrderHandler extends Handler implements Runnable{
 				
 				int conf = orderToUpdate.print_type;
 				
+				//print the hurried food 
+				if((conf & Reserved.PRINT_SYNC) != 0){
+					printConf |= Reserved.PRINT_SYNC;
+				}
+				if((conf & Reserved.PRINT_ALL_HURRIED_FOOD_2) != 0){
+					printConf |= Reserved.PRINT_ALL_HURRIED_FOOD_2;
+				}
+				printOrder(printConf, result.hurriedOrder);
+				
 				//print the extra food 
+				printConf = Reserved.DEFAULT_CONF;
 				if((conf & Reserved.PRINT_SYNC) != 0){
 					printConf |= Reserved.PRINT_SYNC;
 				}
@@ -308,7 +318,7 @@ class OrderHandler extends Handler implements Runnable{
 	 * Print the order according the parameters
 	 * 
 	 * @param req
-	 *            the raw data to the request package, We use the "Resvered"
+	 *            the raw data to the request package, We use the "Reserved"
 	 *            field since the print parameters stored in this field
 	 * @param orderToPrint
 	 *            the order to print
@@ -317,15 +327,16 @@ class OrderHandler extends Handler implements Runnable{
 	 *             action
 	 */
 	private void printOrder(int printConf, Order orderToPrint) throws PrintLogicException{
-		//find the printer connection socket to the restaurant for this terminal
-		ArrayList<Socket> printerConn = WirelessSocketServer.printerConnections.get(new Integer(_term.restaurant_id));
-		Socket[] connections = null;
-		if(printerConn != null){
-			connections = printerConn.toArray(new Socket[printerConn.size()]);			
-		}else{
-			connections = new Socket[0];
-		}
 		if(orderToPrint != null){
+			//find the printer connection socket to the restaurant for this terminal
+			ArrayList<Socket> printerConn = WirelessSocketServer.printerConnections.get(new Integer(_term.restaurant_id));
+			Socket[] connections = null;
+			if(printerConn != null){
+				connections = printerConn.toArray(new Socket[printerConn.size()]);			
+			}else{
+				//connections = new Socket[0];
+				return;
+			}
 			/**
 			 * Get the corresponding restaurant information
 			 */
@@ -355,52 +366,6 @@ class OrderHandler extends Handler implements Runnable{
 			}
 		}
 	}
-	
-	/**
-	 * Print the update order
-	 * @param req the raw data to request
-	 * @param result the update result containing two orders below.<br>
-	 * 				 - The extra order.<br>
-	 * 				 - The canceled order.
-	 * @throws PrintLogicException 
-	 */
-/*	private void printUpdateOrder(ProtocolPackage req, UpdateOrder.Result result) throws PrintLogicException{
-			
-		//find the printer connection socket to the restaurant for this terminal
-		ArrayList<Socket> printerConn = WirelessSocketServer.printerConnections.get(new Integer(_term.restaurant_id));
-		Socket[] connections = null;
-		if(printerConn != null){
-			connections = printerConn.toArray(new Socket[printerConn.size()]);			
-		}
-		if(connections != null){		
-			for(int i = 0; i < connections.length; i++){
-				//check whether the print request is synchronized or asynchronous
-				if((req.header.reserved & Reserved.PRINT_SYNC) != 0){					
-					//perform print in synchronized mode					
-					try {
-						if(result.extraOrder != null){
-							new PrintHandler(result.extraOrder, connections[i], Reserved.PRINT_EXTRA_FOOD_2, _term.restaurant_id, _term.owner).run2();								
-						}
-						if(result.canceledOrder != null){
-							new PrintHandler(result.canceledOrder, connections[i], Reserved.PRINT_CANCELLED_FOOD_2, _term.restaurant_id, _term.owner).run2();								
-						}
-					} catch (PrintSocketException e) {}
-
-				}else{
-					//perform print in asynchronous mode					 
-					if(result.extraOrder != null){
-						WirelessSocketServer.threadPool.execute(new PrintHandler(result.extraOrder, connections[i], Reserved.PRINT_EXTRA_FOOD_2, _term.restaurant_id, _term.owner));							
-					}
-					if(result.canceledOrder != null){
-						WirelessSocketServer.threadPool.execute(new PrintHandler(result.canceledOrder, connections[i], Reserved.PRINT_CANCELLED_FOOD_2, _term.restaurant_id, _term.owner));							
-					}
-				}				
-			}
-		}				
-	}*/
-
-	
-
 }
 
 
