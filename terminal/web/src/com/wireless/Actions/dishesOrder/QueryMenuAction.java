@@ -152,7 +152,7 @@ public class QueryMenuAction extends Action {
 		jsonTaste = jsonTaste.replace("$(taste_id)", "0");
 		jsonTaste = jsonTaste.replace("$(taste_cate)", "0");
 		jsonTaste = jsonTaste.replace("$(taste_pref)", "无口味");
-		jsonTaste = jsonTaste.replace("$(taste_price)", Util.CURRENCY_SIGN	+ "0");
+		jsonTaste = jsonTaste.replace("$(taste_price)", "0");
 		jsonTaste = jsonTaste.replace("$(taste_rate)", "0");
 		jsonTaste = jsonTaste.replace("$(calc_type)", "0");
 
