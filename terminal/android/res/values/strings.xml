@@ -2,4 +2,5 @@
 <resources>
     <string name="hello">Hello World, MainActivity!</string>
     <string name="app_name">WirelessOrderTerminal_Android</string>
+    <string name="ketchen">请选择厨房</string>
 </resources>

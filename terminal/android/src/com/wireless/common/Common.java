@@ -1,5 +1,11 @@
 package com.wireless.common;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.wireless.protocol.Food;
+import com.wireless.ui.AppContext;
+
 import android.app.Activity;
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -8,6 +14,8 @@ import android.net.NetworkInfo;
 public class Common {
 	//µ¥ÀýÄ£Ê½
      private static Common common;
+
+
      private Common(){}
 	 public static Common getCommon() {
 		if(common==null){
@@ -35,4 +43,7 @@ public class Common {
 		}
 		return false;
 	}
+	
+
+	
 }

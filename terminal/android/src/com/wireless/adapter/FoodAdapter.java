@@ -1,5 +1,7 @@
 package com.wireless.adapter;
 
+import java.util.List;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,8 +15,8 @@ import com.wireless.ui.R;
 
 public class FoodAdapter extends BaseAdapter {
 	private LayoutInflater minflater;
-	private Food[] foods;
-	public FoodAdapter(Context context,Food[] foods){
+	private List<Food> foods;
+	public FoodAdapter(Context context,List<Food> foods){
 		minflater=LayoutInflater.from(context);
 		this.foods=foods;
 	}
@@ -22,7 +24,7 @@ public class FoodAdapter extends BaseAdapter {
 	@Override
 	public int getCount() {
 		
-		return foods.length;
+		return foods.size();
 	}
 
 	@Override
@@ -51,17 +53,17 @@ public class FoodAdapter extends BaseAdapter {
 		}
 		
 		String status = "";
-		if(foods[position].isSpecial()){
+		if(foods.get(position).isSpecial()){
 			status = "ÌØ";
 		}
-		if(foods[position].isRecommend()){
+		if(foods.get(position).isRecommend()){
 			if(status.length() == 0){
 				status = "¼ö";
 			}else{
 				status = status + ",¼ö";
 			}
 		}
-		if(foods[position].isGift()){
+		if(foods.get(position).isGift()){
 			if(status.length() == 0){
 				status = "Ôù";
 			}else{
@@ -71,8 +73,8 @@ public class FoodAdapter extends BaseAdapter {
 		if(status.length() != 0){
 			status = "(" + status + ")";
 		}
-		holder.foodname.setText(foods[position].name+status);
-		holder.foodprice.setText(Util.CURRENCY_SIGN +Float.toString(foods[position].getPrice()));
+		holder.foodname.setText(foods.get(position).name+status);
+		holder.foodprice.setText(Util.CURRENCY_SIGN +Float.toString(foods.get(position).getPrice()));
 		return convertView;
 	}
 	

@@ -1,5 +1,9 @@
 package com.wireless.ui;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodMenu;
 
 import android.app.Application;
@@ -9,7 +13,7 @@ public class AppContext extends Application {
   private String username;
   private String restaurant;
   private  FoodMenu foodMenu;
-  
+	private List<Food> foods;
   
 	public String getNotice() {
 		return notice;
@@ -36,6 +40,13 @@ public class AppContext extends Application {
 		this.foodMenu = foodMenu;
 	}
     
+	public List<Food> getFoods(){
+		foods=new ArrayList<Food>();
+		for(int i=0;i<getFoodMenu().foods.length;i++){
+			foods.add(getFoodMenu().foods[i]);
+		}
+		return foods;
+	}
   
    
 }

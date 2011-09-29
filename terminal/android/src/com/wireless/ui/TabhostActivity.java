@@ -20,6 +20,7 @@ public class TabhostActivity extends TabActivity {
 	 */
 	private void setupTabHost() {
 		mTabHost = (TabHost) findViewById(android.R.id.tabhost);
+		
 		mTabHost.setup();
 	}
 

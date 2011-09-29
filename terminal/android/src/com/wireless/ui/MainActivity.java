@@ -70,12 +70,57 @@ public class MainActivity extends Activity {
 			}
 
 		});
+		if (Common.getCommon().isNetworkAvailable(MainActivity.this)) {
+			askRestaurant();
+			assign();
+			askMenu1();
+		} else {
+			_tag = true;
+			AlertDialog();
 
-		setContentView(R.layout.main);
+
+	    }
+         
+         
+    }
+    
+    
+    
+    //请求菜谱信息
+    public void askMenu1(){
+        FoodMenu foodMenu;
+        try{
+        	_resp = ServerConnector.instance().ask(new ReqQueryMenu());
+            foodMenu = RespParser.parseQueryMenu(_resp);
+            _appContext.setFoodMenu(foodMenu);
+        }catch(IOException e){
+        	
+        }  
+        
+    }
+    
+    //请求公告餐厅信息以及用户名     
+    public void askRestaurant(){
+    	setContentView(R.layout.main);
 		_topTitle = (TextView) findViewById(R.id.toptitle);
 		_userName = (TextView) findViewById(R.id.username);
 		_funGridView = (GridView) findViewById(R.id.gridview);
 		_billBoard = (TextView) findViewById(R.id.notice);
+   
+
+        	try {
+				_resp= ServerConnector.instance().ask(new ReqQueryRestaurant());
+				if(_resp.header.type == Type.ACK){
+					_restaurant = RespParser.parseQueryRestaurant(_resp);
+				}else{				
+					System.out.println("获取餐厅信息失败");										
+				}
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}	
+			
 
 		int[] imageIcons = { 
 							 R.drawable.icon03, R.drawable.icon08, R.drawable.icon11, 
@@ -105,6 +150,7 @@ public class MainActivity extends Activity {
 				   								  R.layout.grewview_item,						// night_item的XML实现				
 				   								  new String[] { "ItemImage", "ItemText" }, 	// 动态数组与ImageItem对应的子项
 				   								  new int[] { R.id.ItemImage, R.id.ItemText }));// ImageItem的XML文件里面的一个ImageView,一个TextView ID
+		
 		
 		_funGridView.setOnItemClickListener(new OnItemClickListener(){
 			public void onItemClick(AdapterView<?> arg0,// The AdapterView where the click happened
@@ -150,52 +196,18 @@ public class MainActivity extends Activity {
 
 					break;
 				}
-
 			}
+			
+											
+			});
+  }
+     
 
-		});
-		
-		Common.getCommon();
-		if (Common.isNetworkAvailable(MainActivity.this)) {
-			askRestaurant();
-			assign();
-			askMenu();
-		} else {
-			_tag = true;
-			AlertDialog();
 
-		}
+	
 
-	}
 
-	// 请求菜谱信息
-	public void askMenu() {
-		FoodMenu foodMenu;
-		try {
-			_resp = ServerConnector.instance().ask(new ReqQueryMenu());
-			foodMenu = RespParser.parseQueryMenu(_resp);
-			_appContext.setFoodMenu(foodMenu);
-		} catch (IOException e) {
-
-		}
-
-	}
-
-	// 请求公告餐厅信息以及用户名
-	public void askRestaurant() {
-		try {
-			_resp = ServerConnector.instance().ask(new ReqQueryRestaurant());
-			if (_resp.header.type == Type.ACK) {
-				_restaurant = RespParser.parseQueryRestaurant(_resp);
-			} else {
-				System.out.println("获取餐厅信息失败");
-			}
-
-		} catch (IOException e) {
-			System.out.println(e.getMessage());
-
-		}
-	}
+	
 
 	// 主界面元素赋值
 	public void assign() {
@@ -214,7 +226,7 @@ public class MainActivity extends Activity {
 		_userName.setText(_restaurant.name + "(" + _restaurant.owner + ")");
 	}
 
-	@Override
+
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
@@ -258,8 +270,6 @@ public class MainActivity extends Activity {
 				}).show();
 
 		_builder.setOnKeyListener(new OnKeyListener() {
-
-			@Override
 			public boolean onKey(DialogInterface dialog, int keyCode,
 					KeyEvent event) {
 				// TODO Auto-generated method stub
