@@ -55,6 +55,9 @@
 		<action path="/UpdateOrder2" type="com.wireless.Actions.orderMgr.UpdateOrderAction2"
 			scope="request">
 		</action>
+		<action path="/QueryDetail" type="com.wireless.Actions.orderMgr.QueryDetailAction"
+			scope="request">
+		</action>
 		<action path="/QueryShift" type="com.wireless.Actions.shift.QueryShiftAction"
 			scope="request">
 		</action>

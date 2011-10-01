@@ -145,19 +145,8 @@ public class QueryMenuAction extends Action {
 	 */
 	private String toJson(Taste[] tastes){
 		
-		final String tasteTemplate = "[$(taste_id),$(taste_cate),$(taste_pref),$(taste_price),$(taste_rate),$(calc_type)]";
-		
 		StringBuffer value = new StringBuffer();
-		String jsonTaste = tasteTemplate;
-		jsonTaste = jsonTaste.replace("$(taste_id)", "0");
-		jsonTaste = jsonTaste.replace("$(taste_cate)", "0");
-		jsonTaste = jsonTaste.replace("$(taste_pref)", "无口味");
-		jsonTaste = jsonTaste.replace("$(taste_price)", "0");
-		jsonTaste = jsonTaste.replace("$(taste_rate)", "0");
-		jsonTaste = jsonTaste.replace("$(calc_type)", "0");
 
-		value.append(jsonTaste);	
-			
 		for (int i = 0; i < tastes.length; i++) {
 			/**
 			 * The json format to each taste item looks like below.
@@ -165,9 +154,7 @@ public class QueryMenuAction extends Action {
 			 * “口味分类”的值如下： 0 - 口味 ， 1 - 做法，  2 - 规格
 			 * “计算方式”的值如下：0 - 按价格，1 - 按比例 
 			 */
-			// the string is separated by comma
-			value.append("，");
-			jsonTaste = tasteTemplate;
+			String jsonTaste = "[$(taste_id),$(taste_cate),$(taste_pref),$(taste_price),$(taste_rate),$(calc_type)]";
 			jsonTaste = jsonTaste.replace("$(taste_id)", Integer.toString((tastes[i].alias_id)));
 			jsonTaste = jsonTaste.replace("$(taste_cate)", Integer.toString((tastes[i].category)));
 			jsonTaste = jsonTaste.replace("$(taste_pref)", tastes[i].preference);
@@ -177,6 +164,10 @@ public class QueryMenuAction extends Action {
 
 			// put each json taste info to the value
 			value.append(jsonTaste);
+			if(i + 1 != tastes.length){
+				// the string is separated by comma
+				value.append("，");
+			}
 		}			
 
 		return value.toString();
