@@ -68,8 +68,8 @@ public class QueryDetailAction extends Action {
 				 * The json to each order detail looks like below
 				 * [日期,名称,单价,数量,折扣,口味,口味价钱,厨房,服务员,备注]
 				 */
-				String jsonOrderDetail = "[$(order_date),$(food_name),$(unit_price),$(amount),$(discount)" +
-										 "$(taste_pref),$(taste_price),$(kitchen),$(waiter),\"$(comment)\"]";
+				String jsonOrderDetail = "[$(order_date),$(food_name),$(unit_price),$(amount),$(discount)," +
+										 "$(taste_pref),$(taste_price),$(kitchen),$(waiter),$(comment)]";
 				jsonOrderDetail = jsonOrderDetail.replace("$(order_date)", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(dbCon.rs.getTimestamp("order_date")));
 				jsonOrderDetail = jsonOrderDetail.replace("$(food_name)", dbCon.rs.getString("name"));
 				jsonOrderDetail = jsonOrderDetail.replace("$(unit_price)", Float.toString(dbCon.rs.getFloat("unit_price")));
