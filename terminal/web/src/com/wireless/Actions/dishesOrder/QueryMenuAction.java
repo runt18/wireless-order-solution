@@ -166,7 +166,7 @@ public class QueryMenuAction extends Action {
 			value.append(jsonTaste);
 			if(i + 1 != tastes.length){
 				// the string is separated by comma
-				value.append("；");
+				value.append("，");
 			}
 		}			
 
