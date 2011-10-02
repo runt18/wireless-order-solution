@@ -75,7 +75,7 @@ public class QueryDetailAction extends Action {
 				jsonOrderDetail = jsonOrderDetail.replace("$(unit_price)", Float.toString(dbCon.rs.getFloat("unit_price")));
 				jsonOrderDetail = jsonOrderDetail.replace("$(amount)", Float.toString(dbCon.rs.getFloat("order_count")));
 				jsonOrderDetail = jsonOrderDetail.replace("$(discount)", Float.toString(dbCon.rs.getFloat("discount")));
-				jsonOrderDetail = jsonOrderDetail.replace("$(taste_pref)", dbCon.rs.getString("taste"));
+				jsonOrderDetail = jsonOrderDetail.replace("$(taste_pref)", dbCon.rs.getString("taste").replaceAll(",", "；"));
 				jsonOrderDetail = jsonOrderDetail.replace("$(taste_price)", Float.toString(dbCon.rs.getFloat("taste_price")));
 				jsonOrderDetail = jsonOrderDetail.replace("$(kitchen)", dbCon.rs.getString("kitchen_name"));
 				jsonOrderDetail = jsonOrderDetail.replace("$(waiter)", dbCon.rs.getString("waiter"));
