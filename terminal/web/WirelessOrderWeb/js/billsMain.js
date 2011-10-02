@@ -151,27 +151,28 @@ var viewBillWin = new Ext.Window(
 					},
 					{
 						text : "打印",
-						// disabled : true,
+						disabled : true,
 						handler : function() {
-							Ext.Ajax.request({
-								url : "../PrintOrder.do",
-								params : {
-									"pin" : currPin,
-									"printShift" : 1
-								},
-								success : function(response, options) {
-									var resultJSON = Ext.util.JSON
-											.decode(response.responseText);
-									Ext.MessageBox.show({
-										msg : resultJSON.data,
-										width : 300,
-										buttons : Ext.MessageBox.OK
-									});
-
-								},
-								failure : function(response, options) {
-								}
-							});
+							
+//							Ext.Ajax.request({
+//								url : "../PrintOrder.do",
+//								params : {
+//									"pin" : currPin,
+//									"printShift" : 1
+//								},
+//								success : function(response, options) {
+//									var resultJSON = Ext.util.JSON
+//											.decode(response.responseText);
+//									Ext.MessageBox.show({
+//										msg : resultJSON.data,
+//										width : 300,
+//										buttons : Ext.MessageBox.OK
+//									});
+//
+//								},
+//								failure : function(response, options) {
+//								}
+//							});
 						}
 					} ],
 			listeners : {
