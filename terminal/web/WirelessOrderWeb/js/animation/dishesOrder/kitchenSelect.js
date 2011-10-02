@@ -1,4 +1,18 @@
-﻿function kitchenSelectLoad() {
+﻿function ketchenDeselect() {
+	if (ketchenSelectIndex != -1) {
+		$("#kitchen" + ketchenSelectIndex).css("background",
+				"url(../images/KitchenNormal.png) no-repeat 50%");
+		ketchenSelectIndex = -1;
+	}
+};
+
+function ketchenSelect(ketchenNbr) {
+	$("#kitchen" + ketchenNbr).css("background",
+			"url(../images/KitchenHightLight.png) no-repeat 50%");
+	ketchenSelectIndex = ketchenNbr;
+};
+
+function kitchenSelectLoad() {
 	var Request = new URLParaQuery();
 	// 后台：[厨房编号,"厨房名称",一般折扣1,一般折扣2,一般折扣3,会员折扣1,会员折扣2,会员折扣3]
 	// 前台：kitchenData：[厨房编号,厨房名称]
@@ -81,5 +95,44 @@
 				failure : function(response, options) {
 				}
 			});
+
+	// 动作注册
+	$(".ketchenSelect")
+			.each(
+					function() {
+						$(this)
+								.hover(
+										function() {
+											var ketchenSelectId = this.id;
+											var SelectIndex = ketchenSelectId
+													.substr(7);
+											if (SelectIndex != ketchenSelectIndex) {
+												$(this)
+														.stop()
+														.css("background",
+																"url(../images/KitchenSelect.png) no-repeat 50%");
+											}
+										},
+										function() {
+											var ketchenSelectId = this.id;
+											var SelectIndex = ketchenSelectId
+													.substr(7);
+											if (SelectIndex != ketchenSelectIndex) {
+												$(this)
+														.stop()
+														.css("background",
+																"url(../images/KitchenNormal.png) no-repeat 50%");
+											}
+										});
+					});
+
+	$(".ketchenSelect").each(function() {
+		$(this).bind("click", function() {
+			var ketchenSelectId = this.id;
+			var SelectIndex = ketchenSelectId.substr(7);
+			ketchenDeselect();
+			ketchenSelect(SelectIndex);
+		});
+	});
 
 }

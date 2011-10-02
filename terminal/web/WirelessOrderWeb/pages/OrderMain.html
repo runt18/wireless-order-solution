@@ -40,18 +40,26 @@
 	var softKBRelateItemId = ""; // soft keyboard relate item id
 	var dishesDisplayData = []; // all dishes display data 
 	var dishesDisplayDataShow = []; // all dishes display data for show in page
-	var dishTasteData = []
+	
+	var dishTasteDataTas = [];
+	var dishTasteDataPar = [];
+	var dishTasteDataSiz = [];
+	
+	// 格式：[{編號,描述,價錢或比例,計算方式}]
+	var choosenTaset = [];
+	
 	// taste
 	var dishesCount = -1; // the dish count user input, in order to keep the same between tabs
 	var orderedData = []; // the dishes have been ordered
 	var orderIsChanged = false; // if the order is changed
-	
+
 	var kitchenData = [];
 
 	var operatorName = "XXX";
 
 	var restaurantID = "";
 	var category = "X"
+	var ketchenSelectIndex = -1;
 
 	var Request = new URLParaQuery();
 	restaurantID = Request["restaurantID"];
@@ -83,49 +91,100 @@
 
 
 
-	<!-- table status -->
+	<!-- table status 
 	<div id="tableStatusDO" style="padding-left: 5px">
 		<img title="桌号" src='../images/TableID.png' style='float: left;' />
 		<div id="tblNbrDivTS" class="tableStatusChar">100&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
 		<img title="人数" src='../images/DinnerAmount.png' style='float: left;' />
-		<div id="perCountDivTS" class="tableStatusChar">4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-		<img title="最低消费" id="minCostImgTS" src='../images/DinnerAmount.png' style='float: left;' />
+		<div id="perCountDivTS" class="tableStatusChar">
+			<input id="perCountInput" type="text" value="1" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		</div>
+		<img title="最低消费" id="minCostImgTS" src='../images/DinnerAmount.png'
+			style='float: left;' />
 		<div id="minCostDivTS" class="tableStatusChar">0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
 	</div>
+-->
+	<div id="tableStatusTableNbr" style="padding-left: 5px">
+		<img title="桌号" src='../images/TableID.png' style='float: left;' />
+		<div id="tblNbrDivTS" class="tableStatusChar">100&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+	</div>
 
+	<div id="tableStatusPerCount" style="padding-left: 5px">
+		<img title="人数" src='../images/DinnerAmount.png' style='float: left;' />
+	</div>
+
+	<!--
+	<div id="perCountDivTS" class="tableStatusChar">
+		<input id="perCountInput" type="text" value="1" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</div>
+ -->
+
+	<div id="tableStatusMinCost" style="padding-left: 5px">
+		<img title="最低消费" id="minCostImgTS" src='../images/minCost.png'
+			style='float: left;' />
+		<div id="minCostDivTS" class="tableStatusChar">0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+	</div>
 
 	<!-- kitchen select -->
 	<div id="kitchenSelectDO"
 		style="padding-left: 10px; visibility: hidden;">
 		<div>
-			<div id = "kitchen0" style='background: url(../images/KitchenNormal.png) no-repeat 50%;' class="ketchenSelect"></div>
-			<span style="width: 10px; float: left;"> </span> 
-			<div id = "kitchen1" style='background: url(../images/KitchenNormal.png) no-repeat 50%;' class="ketchenSelect"></div> 
-			<span style="width: 10px; float: left;"> </span> 
-			<div id = "kitchen2" style='background: url(../images/KitchenNormal.png) no-repeat 50%;' class="ketchenSelect"></div>
-			<span style="width: 10px; float: left;"> </span> 
-			<div id = "kitchen3" style='background: url(../images/KitchenNormal.png) no-repeat 50%;' class="ketchenSelect"></div>
-			<span style="width: 10px; float: left;"> </span> 
-			<div id = "kitchen4" style='background: url(../images/KitchenNormal.png) no-repeat 50%;' class="ketchenSelect"></div>
-			<span style="width: 10px; float: left;"> </span> 
-			<div id = "kitchen5" style='background: url(../images/KitchenNormal.png) no-repeat 50%;' class="ketchenSelect"></div>
-			<span style="width: 10px; float: left;"> </span> 
-			<div id = "kitchen6" style='background: url(../images/KitchenNormal.png) no-repeat 50%;' class="ketchenSelect"></div>
+			<div id="kitchen0"
+				style='background: url(../images/KitchenNormal.png) no-repeat 50%;'
+				class="ketchenSelect"></div>
+			<span style="width: 10px; float: left;"> </span>
+			<div id="kitchen1"
+				style='background: url(../images/KitchenNormal.png) no-repeat 50%;'
+				class="ketchenSelect"></div>
+			<span style="width: 10px; float: left;"> </span>
+			<div id="kitchen2"
+				style='background: url(../images/KitchenNormal.png) no-repeat 50%;'
+				class="ketchenSelect"></div>
+			<span style="width: 10px; float: left;"> </span>
+			<div id="kitchen3"
+				style='background: url(../images/KitchenNormal.png) no-repeat 50%;'
+				class="ketchenSelect"></div>
+			<span style="width: 10px; float: left;"> </span>
+			<div id="kitchen4"
+				style='background: url(../images/KitchenNormal.png) no-repeat 50%;'
+				class="ketchenSelect"></div>
+			<span style="width: 10px; float: left;"> </span>
+			<div id="kitchen5"
+				style='background: url(../images/KitchenNormal.png) no-repeat 50%;'
+				class="ketchenSelect"></div>
+			<span style="width: 10px; float: left;"> </span>
+			<div id="kitchen6"
+				style='background: url(../images/KitchenNormal.png) no-repeat 50%;'
+				class="ketchenSelect"></div>
 		</div>
 		<div>
-			<div id = "kitchen7" style='background: url(../images/KitchenNormal.png) no-repeat 50%;' class="ketchenSelect"></div>
-			<span style="width: 10px; float: left;"> </span> 
-			<div id = "kitchen8" style='background: url(../images/KitchenNormal.png) no-repeat 50%;' class="ketchenSelect"></div>
-			<span style="width: 10px; float: left;"> </span> 
-			<div id = "kitchen9" style='background: url(../images/KitchenNormal.png) no-repeat 50%;' class="ketchenSelect"></div>
-			<span style="width: 10px; float: left;"> </span> 
-			<div id = "kitchen10" style='background: url(../images/KitchenNormal.png) no-repeat 50%;' class="ketchenSelect"></div>
-			<span style="width: 10px; float: left;"> </span> 
-			<div id = "kitchen11" style='background: url(../images/KitchenNormal.png) no-repeat 50%;' class="ketchenSelect"></div>
-			<span style="width: 10px; float: left;"> </span> 
-			<div id = "kitchen12" style='background: url(../images/KitchenNormal.png) no-repeat 50%;' class="ketchenSelect"></div>
-			<span style="width: 10px; float: left;"> </span> 
-			<div id = "kitchen13" style='background: url(../images/KitchenNormal.png) no-repeat 50%;' class="ketchenSelect"></div>
+			<div id="kitchen7"
+				style='background: url(../images/KitchenNormal.png) no-repeat 50%;'
+				class="ketchenSelect"></div>
+			<span style="width: 10px; float: left;"> </span>
+			<div id="kitchen8"
+				style='background: url(../images/KitchenNormal.png) no-repeat 50%;'
+				class="ketchenSelect"></div>
+			<span style="width: 10px; float: left;"> </span>
+			<div id="kitchen9"
+				style='background: url(../images/KitchenNormal.png) no-repeat 50%;'
+				class="ketchenSelect"></div>
+			<span style="width: 10px; float: left;"> </span>
+			<div id="kitchen10"
+				style='background: url(../images/KitchenNormal.png) no-repeat 50%;'
+				class="ketchenSelect"></div>
+			<span style="width: 10px; float: left;"> </span>
+			<div id="kitchen11"
+				style='background: url(../images/KitchenNormal.png) no-repeat 50%;'
+				class="ketchenSelect"></div>
+			<span style="width: 10px; float: left;"> </span>
+			<div id="kitchen12"
+				style='background: url(../images/KitchenNormal.png) no-repeat 50%;'
+				class="ketchenSelect"></div>
+			<span style="width: 10px; float: left;"> </span>
+			<div id="kitchen13"
+				style='background: url(../images/KitchenNormal.png) no-repeat 50%;'
+				class="ketchenSelect"></div>
 		</div>
 	</div>
 

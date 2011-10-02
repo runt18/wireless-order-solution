@@ -230,8 +230,27 @@ function tableSelectOnLoad() {
 																}
 
 																if (tableStatusListTS[tableIndex][2] == "空桌") {
-																	personCountInputWin
-																			.show();
+																	// personCountInputWin
+																	// .show();
+																	// for
+																	// forward
+																	// the page
+																	// 只有空台才要输入人数，只有“一般”类型才有空台，固定category为1
+																	// default
+																	// person
+																	// count 1
+																	location.href = "OrderMain.html?tableNbr="
+																			+ selectedTable
+																			+ "&personCount=1"
+																			+ "&tableStat=free"
+																			+ "&category=1"
+																			+ "&tableNbr2=0"
+																			+ "&pin="
+																			+ pin
+																			+ "&restaurantID="
+																			+ restaurantID
+																			+ "&minCost="
+																			+ tableStatusListTS[tableIndex][5];
 																} else {
 
 																	location.href = "CheckOut.html?tableNbr="

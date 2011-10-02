@@ -129,6 +129,7 @@ function billModifyOnLoad() {
 							var josnData = resultJSON.data;
 							var orderList = josnData.split("，");
 							for ( var i = 0; i < orderList.length; i++) {
+								
 								var orderInfo = orderList[i].substr(1,
 										orderList[i].length - 2).split(",");
 								// 实价 = 单价 + 口味价钱
@@ -413,14 +414,18 @@ function orderedMenuOnLoad() {
 			});
 };
 
-// 口味
-// dishTasteData.push([ "咸死你", "￥8" ]);
+//口味
+//dishTasteData.push([ "咸死你", "￥8" ]);
+//后台：[口味编号,口味分类,口味名称,价钱,比例,计算方式]
+//“口味分类”的值如下： 0 - 口味 ， 1 - 做法， 2 - 规格
+//“计算方式”的值如下：0 - 按价格，1 - 按比例
+//前台：[口味编号,口味分类,口味名称,价钱,比例,计算方式，计算方式显示，选择]
 function tasteOnLoad() {
 	var Request = new URLParaQuery();
 	Ext.Ajax.request({
 		url : "../QueryMenu.do",
 		params : {
-			"pin" : pin,
+			"pin" : Request["pin"],
 			"type" : "2"
 		},
 		success : function(response, options) {
@@ -431,15 +436,49 @@ function tasteOnLoad() {
 				for ( var i = 0; i < tasteList.length; i++) {
 					var tasteInfo = tasteList[i].substr(1,
 							tasteList[i].length - 2).split(",");
-					// 后台格式：[1,"加辣","￥2.50"]，[2,"少盐","￥0.00"]，[3,"少辣","￥5.00"]
-					// 前后台格式有差异，口味编号前台存储放在最后一位
-					dishTasteData.push([
-							tasteInfo[1].substr(1, tasteInfo[1].length - 2), // 口味
-							tasteInfo[2].substr(1, tasteInfo[2].length - 2), // 价钱
-							tasteInfo[0] // 口味编号
-					]);
+					var countTypeDescr;
+					if (tasteInfo[5] == "0") {
+						countTypeDescr = "按价格";
+					} else {
+						countTypeDescr = "按比例";
+					}
+
+					if (tasteInfo[1] == "0") {
+						dishTasteDataTas.push([ tasteInfo[0], // 口味编号
+						tasteInfo[1], // 口味分类
+						tasteInfo[2], // 口味名称
+						tasteInfo[3], // 价钱
+						tasteInfo[4], // 比例
+						tasteInfo[5], // 计算方式
+						countTypeDescr, // 计算方式显示
+						false// 选择
+						]);
+					} else if (tasteInfo[1] == "1") {
+						dishTasteDataPar.push([ tasteInfo[0], // 口味编号
+						tasteInfo[1], // 口味分类
+						tasteInfo[2], // 口味名称
+						tasteInfo[3], // 价钱
+						tasteInfo[4], // 比例
+						tasteInfo[5], // 计算方式
+						countTypeDescr, // 计算方式显示
+						false// 选择
+						]);
+					} else {
+						dishTasteDataSiz.push([ tasteInfo[0], // 口味编号
+						tasteInfo[1], // 口味分类
+						tasteInfo[2], // 口味名称
+						tasteInfo[3], // 价钱
+						tasteInfo[4], // 比例
+						tasteInfo[5], // 计算方式
+						countTypeDescr, // 计算方式显示
+						false// 选择
+						]);
+					}
+
 				}
-				dishTasteStore.reload();
+				dishTasteStoreTas.reload();
+				dishTasteStorePar.reload();
+				dishTasteStoreSiz.reload();
 			}
 		},
 		failure : function(response, options) {

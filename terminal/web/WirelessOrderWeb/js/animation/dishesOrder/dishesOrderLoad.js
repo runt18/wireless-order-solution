@@ -1,4 +1,42 @@
-﻿// keyboard select handler
+﻿//刪退菜處理函數
+function dishOptTasteHandler(rowIndex) {
+	if (dishOrderCurrRowIndex_ != -1) {
+		dishOrderCurrRowIndex_ = rowIndex;
+		dishTasteWindow.show();
+	}
+};
+
+function dishGridRefresh() {
+
+	if (orderedData.length != 0) {
+		// 底色处理，已点菜式原色底色
+		for ( var i = 0; i < orderedData.length; i++) {
+			if (orderedData[i][16] == "1") {
+				orderedGrid.getView().getRow(i).style.backgroundColor = "#FFFF93";
+			} else if (orderedData[i][16] == "2") {
+				orderedGrid.getView().getRow(i).style.backgroundColor = "#FFE4CA";
+			} else {
+
+			}
+		}
+
+		// 底色处理，已点菜式原色底色
+		for ( var i = 0; i < orderedData.length; i++) {
+			if (orderedData[i][16] == "1") {
+				document.getElementById("tasteLink" + i).onclick = function() {
+					return false;
+				};
+			} else if (orderedData[i][16] == "2") {
+				// document.getElementById("tasteLink" + i).onclick =
+				// dishOptTasteHandler(dishOrderCurrRowIndex_);
+			} else {
+
+			}
+		}
+	}
+};
+
+// keyboard select handler
 var dishKeyboardSelect = function(relateItemId) {
 	if (relateItemId == "orderNbr") {
 		var curDishNbr = Ext.getCmp("orderNbr").getValue() + "";
@@ -90,6 +128,7 @@ function tableStuLoad() {
 	// 对"拼台""外卖"，台号特殊处理
 	var tableNbr = "000";
 	if (category == "4") {
+		dishesOrderNorthPanel.findById("tableNbrFrom").setWidth(140);
 		tableNbr = Request["tableNbr"] + "，" + Request["tableNbr2"];
 	} else if (category == "2" && Request["tableStat"] == "free") {
 		tableNbr = "外卖";
@@ -98,12 +137,12 @@ function tableStuLoad() {
 	}
 
 	var personCount = Request["personCount"];
-	document.getElementById("tblNbrDivTS").innerHTML = tableNbr
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-	document.getElementById("perCountDivTS").innerHTML = personCount
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-	document.getElementById("minCostDivTS").innerHTML = Request["minCost"]
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+
+	document.getElementById("tblNbrDivTS").innerHTML = tableNbr;
+	// + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+	dishesOrderNorthPanel.findById("tablePersonCount").setValue(personCount);
+	document.getElementById("minCostDivTS").innerHTML = Request["minCost"];
+	// + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 	if (Request["minCost"] == "0.0") {
 		document.getElementById("minCostDivTS").style["visibility"] = "hidden";
 		document.getElementById("minCostImgTS").style["visibility"] = "hidden";
@@ -118,6 +157,9 @@ function tableStuLoad() {
 	} else {
 		dishesOrderNorthPanel
 				.setTitle("<div style='font-size:18px;padding-left:2px'>改单<div>");
+		// ext-gen338
+		// document.getElementById("ext-gen338").alt = "退菜";
+
 	}
 
 	// update the operator name
@@ -125,7 +167,8 @@ function tableStuLoad() {
 };
 
 // 以点菜式数据
-// 格式：[菜名，口味，数量，￥单价，操作，￥实价，菜名编号，厨房编号，口味编号1,特,荐,停,送,￥口味价钱,口味编号2,口味编号3]
+// 菜品状态: 1：已点，2：新点，3：修改
+// 格式：[菜名，口味，数量，￥单价，操作，￥实价，菜名编号，厨房编号，口味编号1,特,荐,停,送,￥口味价钱,口味编号2,口味编号3,菜品状态]
 // orderedData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "", "￥56.2" ]);
 // orderedData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "", "￥56.2" ]);
 // 后台：["菜名",菜名编号,厨房编号,"口味",口味编号,数量,￥单价,是否特价,是否推荐,是否停售,是否赠送,折扣率,口味编号2,口味编号3,￥口味价钱]
@@ -179,7 +222,8 @@ function orderedDishesOnLoad() {
 											orderInfo[10], // 送
 											tastePrice,// 口味价钱
 											orderInfo[12],// 口味编号2
-											orderInfo[13] // 口味编号3
+											orderInfo[13], // 口味编号3
+											"1"// 菜品状态
 									]);
 								}
 
@@ -214,6 +258,8 @@ function orderedDishesOnLoad() {
 								}
 
 								orderedStore.reload();
+								// 底色处理，已点菜式原色底色
+								dishGridRefresh();
 							}
 						} else {
 							var dataInfo = resultJSON.data;
@@ -232,6 +278,41 @@ function orderedDishesOnLoad() {
 
 	// upate the tool bar
 	if (Request["tableStat"] == "free") {
+		orderedGrid.getTopToolbar().addSeparator();
+		orderedGrid.getTopToolbar().addSpacer();
+		orderedGrid.getTopToolbar().addSpacer();
+		orderedGrid.getTopToolbar().addSpacer();
+		orderedGrid.getTopToolbar().addSpacer();
+		orderedGrid.getTopToolbar().addSpacer();
+		orderedGrid.getTopToolbar().addSpacer();
+		orderedGrid.getTopToolbar().addSpacer();
+		orderedGrid.getTopToolbar().addSpacer();
+		orderedGrid.getTopToolbar().addSpacer();
+		orderedGrid.getTopToolbar().addSpacer();
+		orderedGrid.getTopToolbar().addItem(countAddImgBut);
+		orderedGrid.getTopToolbar().addSpacer();
+		orderedGrid.getTopToolbar().addSpacer();
+		orderedGrid.getTopToolbar().addSpacer();
+		orderedGrid.getTopToolbar().addSpacer();
+		orderedGrid.getTopToolbar().addSpacer();
+		orderedGrid.getTopToolbar().addSpacer();
+		orderedGrid.getTopToolbar().addSpacer();
+		orderedGrid.getTopToolbar().addSpacer();
+		orderedGrid.getTopToolbar().addSpacer();
+		orderedGrid.getTopToolbar().addSpacer();
+		orderedGrid.getTopToolbar().addItem(countMinusImgBut);
+		orderedGrid.getTopToolbar().addSpacer();
+		orderedGrid.getTopToolbar().addSpacer();
+		orderedGrid.getTopToolbar().addSpacer();
+		orderedGrid.getTopToolbar().addSpacer();
+		orderedGrid.getTopToolbar().addSpacer();
+		orderedGrid.getTopToolbar().addSpacer();
+		orderedGrid.getTopToolbar().addSpacer();
+		orderedGrid.getTopToolbar().addSpacer();
+		orderedGrid.getTopToolbar().addSpacer();
+		orderedGrid.getTopToolbar().addSpacer();
+		orderedGrid.getTopToolbar().addItem(countEqualImgBut);
+
 	} else {
 		orderedGrid.getTopToolbar().addSeparator();
 		orderedGrid.getTopToolbar().addSpacer();
@@ -341,6 +422,10 @@ function orderedMenuOnLoad() {
 
 // 口味
 // dishTasteData.push([ "咸死你", "￥8" ]);
+// 后台：[口味编号,口味分类,口味名称,价钱,比例,计算方式]
+// “口味分类”的值如下： 0 - 口味 ， 1 - 做法， 2 - 规格
+// “计算方式”的值如下：0 - 按价格，1 - 按比例
+// 前台：[口味编号,口味分类,口味名称,价钱,比例,计算方式，计算方式显示，选择]
 function tasteOnLoad() {
 	var Request = new URLParaQuery();
 	Ext.Ajax.request({
@@ -357,15 +442,49 @@ function tasteOnLoad() {
 				for ( var i = 0; i < tasteList.length; i++) {
 					var tasteInfo = tasteList[i].substr(1,
 							tasteList[i].length - 2).split(",");
-					// 后台格式：[1,"加辣","￥2.50"]，[2,"少盐","￥0.00"]，[3,"少辣","￥5.00"]
-					// 前后台格式有差异，口味编号前台存储放在最后一位
-					dishTasteData.push([
-							tasteInfo[1].substr(1, tasteInfo[1].length - 2), // 口味
-							tasteInfo[2].substr(1, tasteInfo[2].length - 2), // 价钱
-							tasteInfo[0] // 口味编号
-					]);
+					var countTypeDescr;
+					if (tasteInfo[5] == "0") {
+						countTypeDescr = "按价格";
+					} else {
+						countTypeDescr = "按比例";
+					}
+
+					if (tasteInfo[1] == "0") {
+						dishTasteDataTas.push([ tasteInfo[0], // 口味编号
+						tasteInfo[1], // 口味分类
+						tasteInfo[2], // 口味名称
+						tasteInfo[3], // 价钱
+						tasteInfo[4], // 比例
+						tasteInfo[5], // 计算方式
+						countTypeDescr, // 计算方式显示
+						false// 选择
+						]);
+					} else if (tasteInfo[1] == "1") {
+						dishTasteDataPar.push([ tasteInfo[0], // 口味编号
+						tasteInfo[1], // 口味分类
+						tasteInfo[2], // 口味名称
+						tasteInfo[3], // 价钱
+						tasteInfo[4], // 比例
+						tasteInfo[5], // 计算方式
+						countTypeDescr, // 计算方式显示
+						false// 选择
+						]);
+					} else {
+						dishTasteDataSiz.push([ tasteInfo[0], // 口味编号
+						tasteInfo[1], // 口味分类
+						tasteInfo[2], // 口味名称
+						tasteInfo[3], // 价钱
+						tasteInfo[4], // 比例
+						tasteInfo[5], // 计算方式
+						countTypeDescr, // 计算方式显示
+						false// 选择
+						]);
+					}
+
 				}
-				dishTasteStore.reload();
+				dishTasteStoreTas.reload();
+				dishTasteStorePar.reload();
+				dishTasteStoreSiz.reload();
 			}
 		},
 		failure : function(response, options) {

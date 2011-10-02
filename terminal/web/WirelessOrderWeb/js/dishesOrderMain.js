@@ -27,6 +27,8 @@ dishCountInputWin = new Ext.Window({
 						dishCountInputWin.hide();
 						orderedData[dishOrderCurrRowIndex_][2] = inputCount;
 						orderedStore.reload();
+						// 底色处理，已点菜式原色底色
+						dishGridRefresh();
 						orderedGrid.getSelectionModel().selectRow(
 								dishOrderCurrRowIndex_);
 						orderIsChanged = true;
@@ -70,103 +72,152 @@ var orderedStore = new Ext.data.Store({
 });
 
 orderedStore.reload();
+// 底色处理，已点菜式原色底色
+dishGridRefresh();
 
 // 3，栏位模型
-function dishOptTasteHandler(rowIndex) {
-	if (dishOrderCurrRowIndex_ != -1) {
-		dishOrderCurrRowIndex_ = rowIndex;
-		dishTasteWindow.show();
-	}
-};
+// 移去dishesOrderLaod.js
+// function dishOptTasteHandler(rowIndex) {
+// if (dishOrderCurrRowIndex_ != -1) {
+// dishOrderCurrRowIndex_ = rowIndex;
+// dishTasteWindow.show();
+// }
+// };
 
-var dishPushBackWin = new Ext.Window({
-	layout : "fit",
-	width : 200,
-	height : 100,
-	closeAction : "hide",
-	resizable : false,
-	items : [ {
-		layout : "form",
-		labelWidth : 30,
-		border : false,
-		frame : true,
-		items : [ {
-			xtype : "textfield",
-			inputType : "password",
-			fieldLabel : "密码",
-			id : "dishPushBackPwd",
-			width : 110
-		} ]
-	} ],
-	buttons : [
-			{
-				text : "确定",
-				handler : function() {
-					var dishPushBackPwd = dishPushBackWin.findById(
-							"dishPushBackPwd").getValue();
-					dishPushBackWin.findById("dishPushBackPwd").setValue("");
-
-					var pwdTrans;
-					if (dishPushBackPwd != "") {
-						pwdTrans = MD5(dishPushBackPwd);
-					} else {
-						pwdTrans = dishPushBackPwd;
-					}
-
-					dishPushBackWin.hide();
-
-					Ext.Ajax.request({
-						url : "../VerifyPwd.do",
-						params : {
-							"pin" : Request["pin"],
-							"type" : "3",
-							"pwd" : pwdTrans
-						},
-						success : function(response, options) {
-							var resultJSON = Ext.util.JSON
-									.decode(response.responseText);
-							if (resultJSON.success == true) {
-								orderedData.splice(dishOrderCurrRowIndex_, 1);
-								orderedStore.reload();
-								orderIsChanged = true;
-								dishOrderCurrRowIndex_ = -1;
-
-								Ext.MessageBox.show({
-									msg : resultJSON.data,
-									width : 300,
-									buttons : Ext.MessageBox.OK
-								});
-							} else {
-								Ext.MessageBox.show({
-									msg : resultJSON.data,
-									width : 300,
-									buttons : Ext.MessageBox.OK
-								});
-							}
-						},
-						failure : function(response, options) {
-						}
-					});
-				}
-			}, {
-				text : "取消",
-				handler : function() {
-					dishPushBackWin.hide();
-					dishPushBackWin.findById("dishPushBackPwd").setValue("");
-				}
+var dishPushBackWin = new Ext.Window(
+		{
+			layout : "fit",
+			width : 220,
+			height : 120,
+			closeAction : "hide",
+			resizable : false,
+			items : [ {
+				layout : "form",
+				labelWidth : 60,
+				border : false,
+				frame : true,
+				items : [ {
+					xtype : "numberfield",
+					fieldLabel : "退菜数量",
+					id : "dishPushBackCount",
+					allowBlank : false,
+					width : 110
+				}, {
+					xtype : "textfield",
+					inputType : "password",
+					fieldLabel : "密码",
+					id : "dishPushBackPwd",
+					width : 110
+				} ]
 			} ],
-	listeners : {
-		show : function(thiz) {
-			// thiz.findById("personCountInput").focus();
-			var f = Ext.get("dishPushBackPwd");
-			f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
-		}
-	}
-});
+			buttons : [
+					{
+						text : "确定",
+						handler : function() {
+							if (dishPushBackWin.findById("dishPushBackCount")
+									.isValid()) {
+								var dishPushBackPwd = dishPushBackWin.findById(
+										"dishPushBackPwd").getValue();
+								dishPushBackWin.findById("dishPushBackPwd")
+										.setValue("");
+
+								var pwdTrans;
+								if (dishPushBackPwd != "") {
+									pwdTrans = MD5(dishPushBackPwd);
+								} else {
+									pwdTrans = dishPushBackPwd;
+								}
+
+								dishPushBackWin.hide();
+
+								Ext.Ajax
+										.request({
+											url : "../VerifyPwd.do",
+											params : {
+												"pin" : Request["pin"],
+												"type" : "3",
+												"pwd" : pwdTrans
+											},
+											success : function(response,
+													options) {
+												var resultJSON = Ext.util.JSON
+														.decode(response.responseText);
+												if (resultJSON.success == true) {
+													var pushCount = dishPushBackWin
+															.findById(
+																	"dishPushBackCount")
+															.getValue();
+													dishPushBackWin
+															.findById(
+																	"dishPushBackCount")
+															.setValue("");
+													if (parseFloat(orderedData[dishOrderCurrRowIndex_][2])
+															- parseFloat(pushCount) <= 0) {
+														// 退光了
+														orderedData
+																.splice(
+																		dishOrderCurrRowIndex_,
+																		1);
+													} else if (parseFloat(orderedData[dishOrderCurrRowIndex_][2])
+															- parseFloat(pushCount) > 0) {
+														// 退部份
+														orderedData[dishOrderCurrRowIndex_][2] = parseFloat(orderedData[dishOrderCurrRowIndex_][2])
+																- parseFloat(pushCount);
+													}
+
+													orderedStore.reload();
+													// 底色处理，已点菜式原色底色
+													dishGridRefresh();
+													orderIsChanged = true;
+													dishOrderCurrRowIndex_ = -1;
+
+													Ext.MessageBox
+															.show({
+																msg : resultJSON.data,
+																width : 300,
+																buttons : Ext.MessageBox.OK
+															});
+												} else {
+													Ext.MessageBox
+															.show({
+																msg : resultJSON.data,
+																width : 300,
+																buttons : Ext.MessageBox.OK
+															});
+												}
+											},
+											failure : function(response,
+													options) {
+											}
+										});
+							}
+						}
+					},
+					{
+						text : "取消",
+						handler : function() {
+							dishPushBackWin.hide();
+							dishPushBackWin.findById("dishPushBackPwd")
+									.setValue("");
+						}
+					} ],
+			listeners : {
+				show : function(thiz) {
+					// thiz.findById("personCountInput").focus();
+					var f = Ext.get("dishPushBackPwd");
+					f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
+
+					thiz.findById("dishPushBackCount").setValue(
+							orderedData[dishOrderCurrRowIndex_][2]);
+				}
+			}
+		});
+
 function dishOptDeleteHandler(rowIndex) {
 
 	if (dishOrderCurrRowIndex_ != -1) {
-		if (Request["tableStat"] == "used") {
+		// if (Request["tableStat"] == "used")
+		if (orderedData[dishOrderCurrRowIndex_][16] == "1") {
 			dishPushBackWin.show();
 		} else {
 			Ext.MessageBox.show({
@@ -177,6 +228,8 @@ function dishOptDeleteHandler(rowIndex) {
 					if (btn == "yes") {
 						orderedData.splice(rowIndex, 1);
 						orderedStore.reload();
+						// 底色处理，已点菜式原色底色
+						dishGridRefresh();
 						orderIsChanged = true;
 						dishOrderCurrRowIndex_ = -1;
 					}
@@ -196,8 +249,9 @@ function dishOptPressHandler(rowIndex) {
 };
 
 function dishOptDispley(value, cellmeta, record, rowIndex, columnIndex, store) {
-	return "<center><a href=\"javascript:dishOptTasteHandler(" + rowIndex
-			+ ")\">" + "<img src='../images/Modify.png'/>口味</a>"
+	return "<center><a id='tasteLink" + rowIndex
+			+ "' href=\"javascript:dishOptTasteHandler(" + rowIndex + ")\">"
+			+ "<img src='../images/Modify.png'/>口味</a>"
 			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
 			+ "<a href=\"javascript:dishOptDeleteHandler(" + rowIndex + ")\">"
 			+ "<img src='../images/del.png'/>删除</a>"
@@ -274,6 +328,8 @@ var countAddImgBut = new Ext.ux.ImageButton(
 				if (dishOrderCurrRowIndex_ != -1) {
 					orderedData[dishOrderCurrRowIndex_][2] = parseFloat(orderedData[dishOrderCurrRowIndex_][2]) + 1;
 					orderedStore.reload();
+					// 底色处理，已点菜式原色底色
+					dishGridRefresh();
 					orderedGrid.getSelectionModel().selectRow(
 							dishOrderCurrRowIndex_);
 					orderIsChanged = true;
@@ -291,6 +347,8 @@ var countMinusImgBut = new Ext.ux.ImageButton(
 					if (orderedData[dishOrderCurrRowIndex_][2] != "1") {
 						orderedData[dishOrderCurrRowIndex_][2] = parseFloat(orderedData[dishOrderCurrRowIndex_][2]) - 1;
 						orderedStore.reload();
+						// 底色处理，已点菜式原色底色
+						dishGridRefresh();
 						orderedGrid.getSelectionModel().selectRow(
 								dishOrderCurrRowIndex_);
 						orderIsChanged = true;
@@ -388,19 +446,20 @@ var orderedGrid = new Ext.grid.GridPanel({
 		}, dishPressImgBut, dishDeleteImgBut, {
 			text : "&nbsp;&nbsp;&nbsp;",
 			disabled : true
-		}, '-', dishDeleteImgBut, {
-			text : "&nbsp;&nbsp;&nbsp;",
-			disabled : true
-		}, countAddImgBut, {
-			text : "&nbsp;&nbsp;&nbsp;",
-			disabled : true
-		}, countMinusImgBut, {
-			text : "&nbsp;&nbsp;&nbsp;",
-			disabled : true
-		}, countEqualImgBut, {
-			text : "&nbsp;&nbsp;&nbsp;",
-			disabled : true
 		}
+		// , '-', {
+		// text : "&nbsp;&nbsp;&nbsp;",
+		// disabled : true
+		// }, countAddImgBut, {
+		// text : "&nbsp;&nbsp;&nbsp;",
+		// disabled : true
+		// }, countMinusImgBut, {
+		// text : "&nbsp;&nbsp;&nbsp;",
+		// disabled : true
+		// }, countEqualImgBut, {
+		// text : "&nbsp;&nbsp;&nbsp;",
+		// disabled : true
+		// }
 		// , '-', {
 		// text : "&nbsp;&nbsp;&nbsp;",
 		// disabled : true
@@ -416,6 +475,7 @@ var orderedGrid = new Ext.grid.GridPanel({
 		},
 		render : function(thiz) {
 			orderedDishesOnLoad();
+			tableStuLoad();
 		}
 	}
 });
@@ -437,7 +497,9 @@ var orderedForm = new Ext.form.FormPanel(
 						// 以点菜式格式：[菜名，口味，数量，￥单价，操作，￥实价，菜名编号，厨房编号，口味编号1,特,荐,停,送,￥口味价钱,口味编号2,口味编号3]
 						text : "提交",
 						handler : function() {
-							if (orderedData.length > 0) {
+							if (orderedData.length > 0
+									&& dishesOrderNorthPanel.findById(
+											"tablePersonCount").isValid()) {
 
 								var Request = new URLParaQuery();
 
@@ -465,6 +527,10 @@ var orderedForm = new Ext.form.FormPanel(
 									type = 2;
 								}
 
+								var inputPersCount = dishesOrderNorthPanel
+										.findById("tablePersonCount")
+										.getValue();
+
 								// alert("pin:" + Request["pin"] + " tableID:"
 								// + Request["tableNbr"]
 								// + " tableID_2:"
@@ -482,7 +548,9 @@ var orderedForm = new Ext.form.FormPanel(
 												"pin" : Request["pin"],
 												"tableID" : Request["tableNbr"],
 												"tableID_2" : Request["tableNbr2"],
-												"customNum" : Request["personCount"],
+												"customNum" : inputPersCount,// get
+												// input
+												// count
 												"type" : type,
 												"originalTableID" : Request["tableNbr"],// no
 												// use
@@ -580,20 +648,40 @@ var dishesOrderCenterPanel = new Ext.Panel({
 
 // --------------dishes taste pop window-----------------
 // 口味
+
 // 2，表格的数据store
-var dishTasteStore = new Ext.data.Store({
-	proxy : new Ext.data.MemoryProxy(dishTasteData),
+// 前台：[口味编号,口味分类,口味名称,价钱,比例,计算方式]
+var dishTasteStoreTas = new Ext.data.Store({
+	proxy : new Ext.data.MemoryProxy(dishTasteDataTas),
 	reader : new Ext.data.ArrayReader({}, [ {
+		name : "tasteNumber"
+	}, {
+		name : "tasteType"
+	}, {
 		name : "dishTaste"
 	}, {
 		name : "tastePrice"
+	}, {
+		name : "tasteRate"
+	}, {
+		name : "tasteCountType"
+	}, {
+		name : "CountTypeDescr"
+	}, {
+		name : "tasteChoose"
 	} ])
 });
 
-dishTasteStore.reload();
+dishTasteStoreTas.reload();
 
 // 3，栏位模型
-var dishTasteColumnModel = new Ext.grid.ColumnModel([
+var checkColumnTas = new Ext.grid.CheckColumn({
+	header : " ",
+	dataIndex : "tasteChoose",
+	width : 100
+});
+
+var dishTasteColumnModelTas = new Ext.grid.ColumnModel([
 		new Ext.grid.RowNumberer(), {
 			header : "口味",
 			sortable : true,
@@ -604,54 +692,509 @@ var dishTasteColumnModel = new Ext.grid.ColumnModel([
 			sortable : true,
 			dataIndex : "tastePrice",
 			width : 100
-		} ]);
+		}, {
+			header : "比例",
+			sortable : true,
+			dataIndex : "tasteRate",
+			width : 100
+		}, {
+			header : "计算方式",
+			sortable : true,
+			dataIndex : "CountTypeDescr",
+			width : 100
+		}, checkColumnTas ]);
 
 // 4，表格
-var dishTasteGrid = new Ext.grid.GridPanel({
-	title : "可选口味",
+var dishTasteGridTas = new Ext.grid.EditorGridPanel({
+	title : '口味',
 	anchor : "99%",
-	ds : dishTasteStore,
-	cm : dishTasteColumnModel,
+	ds : dishTasteStoreTas,
+	cm : dishTasteColumnModelTas,
+	plugins : checkColumnTas,
+	clicksToEdit : 1,
 	sm : new Ext.grid.RowSelectionModel({
 		singleSelect : true
 	}),
 	listeners : {
-		rowdblclick : function(thiz, rowIndex, e) {
-			// 口味格式：[口味，￥价钱，口味编号]
-			// 以点菜式格式：[菜名，口味，数量，￥单价，操作，￥实价，菜名编号，厨房编号，口味编号1,特,荐,停,送,￥口味价钱,口味编号2,口味编号3]
-			var selectedTaste = dishTasteData[rowIndex][0];
-			var tastePrice = dishTasteData[rowIndex][1];
-			var tasteNbr = dishTasteData[rowIndex][2];
-			var dishIndex = dishOrderCurrRowIndex_;
 
-			// update taste
-			orderedData[dishIndex][1] = selectedTaste;
+	// rowdblclick : function(thiz, rowIndex, e) {
+	// // 口味格式：[口味，￥价钱，口味编号]
+	// // 以点菜式格式：[菜名，口味，数量，￥单价，操作，￥实价，菜名编号，厨房编号，口味编号1,特,荐,停,送,￥口味价钱,口味编号2,口味编号3]
+	// var selectedTaste = dishTasteData[rowIndex][0];
+	// var tastePrice = dishTasteData[rowIndex][1];
+	// var tasteNbr = dishTasteData[rowIndex][2];
+	// var dishIndex = dishOrderCurrRowIndex_;
+	//
+	// // update taste
+	// orderedData[dishIndex][1] = selectedTaste;
+	//
+	// // update price
+	// var currPrice = parseFloat(orderedData[dishIndex][3].substring(1))
+	// + parseFloat(tastePrice.substring(1));
+	// currPrice = currPrice.toFixed(2);
+	// orderedData[dishIndex][5] = "￥" + currPrice;
+	//
+	// // update taste num
+	// orderedData[dishIndex][8] = tasteNbr;
+	//
+	// orderedStore.reload();
+	// // 底色处理，已点菜式原色底色
+	// dishGridRefresh();
+	// orderIsChanged = true;
+	// dishTasteWindow.hide();
+	// dishOrderCurrRowIndex_ = -1;
+	// }
 
-			// update price
-			var currPrice = parseFloat(orderedData[dishIndex][3].substring(1))
-					+ parseFloat(tastePrice.substring(1));
-			currPrice = currPrice.toFixed(2);
-			orderedData[dishIndex][5] = "￥" + currPrice;
-
-			// update taste num
-			orderedData[dishIndex][8] = tasteNbr;
-
-			orderedStore.reload();
-			orderIsChanged = true;
-			dishTasteWindow.hide();
-			dishOrderCurrRowIndex_ = -1;
-		}
 	}
 });
 
-var dishTasteWindow = new Ext.Window({
-	layout : "fit",
-	width : 250,
-	height : 300,
-	closeAction : "hide",
-	// plain: true,
-	items : dishTasteGrid
+// /////////////////////////////////
+
+// 2，表格的数据store
+// 前台：[口味编号,口味分类,口味名称,价钱,比例,计算方式]
+var dishTasteStorePar = new Ext.data.Store({
+	proxy : new Ext.data.MemoryProxy(dishTasteDataPar),
+	reader : new Ext.data.ArrayReader({}, [ {
+		name : "tasteNumber"
+	}, {
+		name : "tasteType"
+	}, {
+		name : "dishTaste"
+	}, {
+		name : "tastePrice"
+	}, {
+		name : "tasteRate"
+	}, {
+		name : "tasteCountType"
+	}, {
+		name : "CountTypeDescr"
+	}, {
+		name : "tasteChoose"
+	} ])
 });
+
+dishTasteStorePar.reload();
+
+// 3，栏位模型
+var checkColumnPar = new Ext.grid.CheckColumn({
+	header : " ",
+	dataIndex : "tasteChoose",
+	width : 100
+});
+
+var dishTasteColumnModelPar = new Ext.grid.ColumnModel([
+		new Ext.grid.RowNumberer(), {
+			header : "口味",
+			sortable : true,
+			dataIndex : "dishTaste",
+			width : 100
+		}, {
+			header : "价钱",
+			sortable : true,
+			dataIndex : "tastePrice",
+			width : 100
+		}, {
+			header : "比例",
+			sortable : true,
+			dataIndex : "tasteRate",
+			width : 100
+		}, {
+			header : "计算方式",
+			sortable : true,
+			dataIndex : "CountTypeDescr",
+			width : 100
+		}, checkColumnPar ]);
+
+// 4，表格
+var dishTasteGridPar = new Ext.grid.EditorGridPanel({
+	title : '做法',
+	anchor : "99%",
+	ds : dishTasteStorePar,
+	cm : dishTasteColumnModelPar,
+	plugins : checkColumnPar,
+	clicksToEdit : 1,
+	sm : new Ext.grid.RowSelectionModel({
+		singleSelect : true
+	}),
+	listeners : {
+
+	}
+});
+
+// /////////////////////////////////
+
+// 2，表格的数据store
+// 前台：[口味编号,口味分类,口味名称,价钱,比例,计算方式]
+var dishTasteStoreSiz = new Ext.data.Store({
+	proxy : new Ext.data.MemoryProxy(dishTasteDataSiz),
+	reader : new Ext.data.ArrayReader({}, [ {
+		name : "tasteNumber"
+	}, {
+		name : "tasteType"
+	}, {
+		name : "dishTaste"
+	}, {
+		name : "tastePrice"
+	}, {
+		name : "tasteRate"
+	}, {
+		name : "tasteCountType"
+	}, {
+		name : "CountTypeDescr"
+	}, {
+		name : "tasteChoose"
+	} ])
+});
+
+dishTasteStoreSiz.reload();
+
+// 3，栏位模型
+var checkColumnSiz = new Ext.grid.CheckColumn({
+	header : " ",
+	dataIndex : "tasteChoose",
+	width : 100
+});
+
+var dishTasteColumnModelSiz = new Ext.grid.ColumnModel([
+		new Ext.grid.RowNumberer(), {
+			header : "口味",
+			sortable : true,
+			dataIndex : "dishTaste",
+			width : 100
+		}, {
+			header : "价钱",
+			sortable : true,
+			dataIndex : "tastePrice",
+			width : 100
+		}, {
+			header : "比例",
+			sortable : true,
+			dataIndex : "tasteRate",
+			width : 100
+		}, {
+			header : "计算方式",
+			sortable : true,
+			dataIndex : "CountTypeDescr",
+			width : 100
+		}, checkColumnSiz ]);
+
+// 4，表格
+var dishTasteGridSiz = new Ext.grid.EditorGridPanel({
+	title : '规格',
+	anchor : "99%",
+	ds : dishTasteStoreSiz,
+	cm : dishTasteColumnModelSiz,
+	plugins : checkColumnSiz,
+	clicksToEdit : 1,
+	sm : new Ext.grid.RowSelectionModel({
+		singleSelect : true
+	}),
+	listeners : {
+
+	}
+});
+
+// tab面版
+var dishTasteTabPanel = new Ext.TabPanel({
+	// layout : "fit",
+	tabPosition : "top",
+	width : 300,
+	height : 300,
+	activeTab : 0,
+	items : [ dishTasteGridTas, dishTasteGridPar, dishTasteGridSiz ]
+});
+
+var dishTasteWindow = new Ext.Window(
+		{
+			layout : "fit",
+			width : 550,
+			height : 300,
+			closeAction : "hide",
+			// plain: true,
+			items : dishTasteTabPanel,
+			buttons : [
+					{
+						text : "清空",
+						handler : function() {
+							dishTasteGridTas.getStore().each(function(record) {
+								record.set("tasteChoose", false);
+							});
+							dishTasteGridPar.getStore().each(function(record) {
+								record.set("tasteChoose", false);
+							});
+							dishTasteGridSiz.getStore().each(function(record) {
+								record.set("tasteChoose", false);
+							});
+						}
+					},
+					{
+						text : "确定",
+						handler : function() {
+							// dishTasteWindow.hide();
+							var choosenCount = 0;
+							// 格式：[{編號,描述,價錢或比例,計算方式}]
+							choosenTaset = [];
+							dishTasteGridTas
+									.getStore()
+									.each(
+											function(record) {
+												if (record.get("tasteChoose")) {
+													// 累計選擇數目，準備校驗超數
+													choosenCount = choosenCount + 1;
+
+													if (record
+															.get("tasteCountType") == "0") {
+														choosenTaset
+																.push([
+																		record
+																				.get("tasteNumber"),// 編號
+																		record
+																				.get("dishTaste"),// 描述
+																		record
+																				.get("tastePrice"),// 價錢或比例
+																		record
+																				.get("tasteCountType") // 計算方式
+																]);
+													} else {
+														choosenTaset
+																.push([
+																		record
+																				.get("tasteNumber"),// 編號
+																		record
+																				.get("dishTaste"),// 描述
+																		record
+																				.get("tasteRate"),// 價錢或比例
+																		record
+																				.get("tasteCountType") // 計算方式
+																]);
+													}
+												}
+											});
+							dishTasteGridPar
+									.getStore()
+									.each(
+											function(record) {
+												if (record.get("tasteChoose")) {
+													// 累計選擇數目，準備校驗超數
+													choosenCount = choosenCount + 1;
+
+													if (record
+															.get("tasteCountType") == "0") {
+														choosenTaset
+																.push([
+																		record
+																				.get("tasteNumber"),// 編號
+																		record
+																				.get("dishTaste"),// 描述
+																		record
+																				.get("tastePrice"),// 價錢或比例
+																		record
+																				.get("tasteCountType") // 計算方式
+																]);
+													} else {
+														choosenTaset
+																.push([
+																		record
+																				.get("tasteNumber"),// 編號
+																		record
+																				.get("dishTaste"),// 描述
+																		record
+																				.get("tasteRate"),// 價錢或比例
+																		record
+																				.get("tasteCountType") // 計算方式
+																]);
+													}
+												}
+											});
+							dishTasteGridSiz
+									.getStore()
+									.each(
+											function(record) {
+												if (record.get("tasteChoose")) {
+													// 累計選擇數目，準備校驗超數
+													choosenCount = choosenCount + 1;
+
+													if (record
+															.get("tasteCountType") == "0") {
+														choosenTaset
+																.push([
+																		record
+																				.get("tasteNumber"),// 編號
+																		record
+																				.get("dishTaste"),// 描述
+																		record
+																				.get("tastePrice"),// 價錢或比例
+																		record
+																				.get("tasteCountType") // 計算方式
+																]);
+													} else {
+														choosenTaset
+																.push([
+																		record
+																				.get("tasteNumber"),// 編號
+																		record
+																				.get("dishTaste"),// 描述
+																		record
+																				.get("tasteRate"),// 價錢或比例
+																		record
+																				.get("tasteCountType") // 計算方式
+																]);
+													}
+												}
+											});
+
+							if (choosenCount > 3) {
+								// 超過３個口味
+								Ext.MessageBox.show({
+									msg : "暂不允许选择超过３种口味",
+									width : 300,
+									buttons : Ext.MessageBox.OK
+								});
+
+							} else if (choosenCount == 0) {
+								// 未有選擇口味
+								orderedData[dishOrderCurrRowIndex_][8] = "0";
+								orderedData[dishOrderCurrRowIndex_][14] = "0";
+								orderedData[dishOrderCurrRowIndex_][15] = "0";
+								orderedData[dishOrderCurrRowIndex_][1] = "无口味";
+
+								orderedData[dishOrderCurrRowIndex_][5] = orderedData[dishOrderCurrRowIndex_][3];
+
+								// refresh
+								orderedStore.reload();
+								// 底色处理，已点菜式原色底色
+								dishGridRefresh();
+								orderIsChanged = true;
+
+								// hide the window
+								dishTasteWindow.hide();
+							} else {
+								// 校驗通過
+
+								// 更新單價,// 格式：[{編號,描述,價錢或比例,計算方式}]
+								var origPrice = orderedData[dishOrderCurrRowIndex_][3]
+										.substring(1);
+								var currPrice = parseFloat(origPrice);
+								for ( var i = 0; i < choosenTaset.length; i++) {
+									if (choosenTaset[i][3] == 1)
+										currPrice = currPrice
+												* (1 + parseFloat(choosenTaset[i][2]));
+								}
+								for ( var i = 0; i < choosenTaset.length; i++) {
+									if (choosenTaset[i][3] == 0)
+										currPrice = currPrice
+												+ parseFloat(choosenTaset[i][2]);
+								}
+								// update the single price
+								orderedData[dishOrderCurrRowIndex_][5] = "￥"
+										+ currPrice;
+
+								// mark the choosen taset
+								// 第一口味
+								if (choosenTaset[0] != undefined) {
+									orderedData[dishOrderCurrRowIndex_][8] = choosenTaset[0][0];
+									orderedData[dishOrderCurrRowIndex_][1] = choosenTaset[0][1];
+									orderedData[dishOrderCurrRowIndex_][1] = orderedData[dishOrderCurrRowIndex_][1]
+											+ "；";
+								}
+								// 第二口味
+								if (choosenTaset[1] != undefined) {
+									orderedData[dishOrderCurrRowIndex_][14] = choosenTaset[1][0];
+									orderedData[dishOrderCurrRowIndex_][1] = orderedData[dishOrderCurrRowIndex_][1]
+											+ choosenTaset[1][1];
+									orderedData[dishOrderCurrRowIndex_][1] = orderedData[dishOrderCurrRowIndex_][1]
+											+ "；";
+								}
+								// 第三口味
+								if (choosenTaset[2] != undefined) {
+									orderedData[dishOrderCurrRowIndex_][15] = choosenTaset[2][0];
+									orderedData[dishOrderCurrRowIndex_][1] = orderedData[dishOrderCurrRowIndex_][1]
+											+ choosenTaset[2][1];
+									orderedData[dishOrderCurrRowIndex_][1] = orderedData[dishOrderCurrRowIndex_][1]
+											+ "；";
+								}
+								orderedData[dishOrderCurrRowIndex_][1] = orderedData[dishOrderCurrRowIndex_][1]
+										.substring(
+												0,
+												orderedData[dishOrderCurrRowIndex_][1].length - 1);
+
+								// refresh
+								orderedStore.reload();
+								// 底色处理，已点菜式原色底色
+								dishGridRefresh();
+								orderIsChanged = true;
+
+								// hide the window
+								dishTasteWindow.hide();
+							}
+						}
+					}, {
+						text : "取消",
+						handler : function() {
+							dishTasteWindow.hide();
+						}
+					} ],
+			listeners : {
+				"show" : function(thiz) {
+
+					// show的時候從一點菜式數組中取出當前菜品的口味情況
+					var tasteNbr1 = orderedData[dishOrderCurrRowIndex_][8];
+					var tasteNbr2 = orderedData[dishOrderCurrRowIndex_][14];
+					var tasteNbr3 = orderedData[dishOrderCurrRowIndex_][15];
+
+					// 清空选择
+					dishTasteGridTas.getStore().each(function(record) {
+						record.set("tasteChoose", false);
+					});
+					dishTasteGridPar.getStore().each(function(record) {
+						record.set("tasteChoose", false);
+					});
+					dishTasteGridSiz.getStore().each(function(record) {
+						record.set("tasteChoose", false);
+					});
+					if (tasteNbr1 == 0 && tasteNbr2 == 0 && tasteNbr3 == 0) {
+
+					} else {
+						dishTasteGridTas
+								.getStore()
+								.each(
+										function(record) {
+											if (record.get("tasteNumber") == tasteNbr1
+													|| record
+															.get("tasteNumber") == tasteNbr2
+													|| record
+															.get("tasteNumber") == tasteNbr3) {
+												record.set("tasteChoose", true);
+											}
+										});
+						dishTasteGridPar
+								.getStore()
+								.each(
+										function(record) {
+											if (record.get("tasteNumber") == tasteNbr1
+													|| record
+															.get("tasteNumber") == tasteNbr2
+													|| record
+															.get("tasteNumber") == tasteNbr3) {
+												record.set("tasteChoose", true);
+											}
+										});
+						dishTasteGridSiz
+								.getStore()
+								.each(
+										function(record) {
+											if (record.get("tasteNumber") == tasteNbr1
+													|| record
+															.get("tasteNumber") == tasteNbr2
+													|| record
+															.get("tasteNumber") == tasteNbr3) {
+												record.set("tasteChoose", true);
+											}
+										});
+					}
+				}
+			}
+		});
 
 // --------------dishes order east panel-----------------
 // soft key board
@@ -821,8 +1364,13 @@ softKeyBoardDO = new Ext.Window({
 							text : "&nbsp;删 除&nbsp;",
 							xtype : "button",
 							handler : function() {
+								var origValue = dishesOrderEastPanel.findById(
+										softKBRelateItemId).getValue()
+										+ "";
+								var newValue = origValue.substring(0,
+										origValue.length - 1);
 								dishesOrderEastPanel.findById(
-										softKBRelateItemId).setValue("");
+										softKBRelateItemId).setValue(newValue);
 								dishKeyboardSelect(softKBRelateItemId);
 								dishesOrderEastPanel.findById(
 										softKBRelateItemId).fireEvent(
@@ -872,19 +1420,17 @@ softKeyBoardDO = new Ext.Window({
 		show : function(thiz) {
 			var f = Ext.get(softKBRelateItemId);
 			f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
-		},
-		beforehide : function(thiz) {
-			if ((softKBRelateItemId == "orderCountNum" && (Ext.getCmp(
-					"orderCountNum").getValue() == 0 || Ext.getCmp(
-					"orderCountNum").getValue() == ""))
-					|| (softKBRelateItemId == "orderCountSpell" && (Ext.getCmp(
-							"orderCountSpell").getValue() == 0 || Ext.getCmp(
-							"orderCountSpell").getValue() == ""))) {
-				return false;
-			} else {
-				return true;
-			}
 		}
+	// ,
+	// beforehide : function(thiz) {
+	// if ((softKBRelateItemId == "orderCountSpell" && (Ext.getCmp(
+	// "orderCountSpell").getValue() == 0 || Ext.getCmp(
+	// "orderCountSpell").getValue() == ""))) {
+	// return false;
+	// } else {
+	// return true;
+	// }
+	// }
 	}
 });
 
@@ -943,10 +1489,10 @@ var dishesDisplayGrid = new Ext.grid.GridPanel({
 		rowdblclick : function(thiz, rowIndex, e) {
 
 			if (dishesDisplayDataShow[rowIndex][7] == "false") {
-				// mune格式：[菜名，菜名编号，菜名拼音，单价，厨房编号,特,荐,停,送]
+				// mune格式：[菜名，菜名编号，菜名拼音，单价，厨房编号,特,荐,停,送,菜品状态]
 				// ordered格式：[菜名，口味，数量，￥单价，操作，￥实价，菜名编号，厨房编号，口味编号1,特,荐,停,送,￥口味价钱,口味编号2,口味编号3]
-				var dishCurrCount = dishesOrderEastPanel.findById(
-						"orderCountNum").getValue();
+				// var dishCurrCount = dishesOrderEastPanel.findById(
+				// "orderCountNum").getValue();
 				var dishCurrName = dishesDisplayDataShow[rowIndex][0];
 				var dishCurrPrice = dishesDisplayDataShow[rowIndex][3];
 				var dishNbr = dishesDisplayDataShow[rowIndex][1];
@@ -955,23 +1501,28 @@ var dishesDisplayGrid = new Ext.grid.GridPanel({
 				var isAlreadyOrderd = false;
 
 				for ( var i = 0; i < orderedData.length; i++) {
-					if (orderedData[i][6] == dishNbr) {
+					if (orderedData[i][6] == dishNbr
+							&& orderedData[i][16] == "2") {
 						orderedData[i][2] = parseFloat(orderedData[i][2]) + 1;
 						isAlreadyOrderd = true;
 					}
 				}
 
 				if (isAlreadyOrderd == false) {
-					orderedData.push([ dishCurrName, "无口味", dishCurrCount,
-							dishCurrPrice, "", dishCurrPrice, dishNbr,
-							kitchenNbr, 0, dishesDisplayDataShow[rowIndex][5],
-							dishesDisplayDataShow[rowIndex][6],
-							dishesDisplayDataShow[rowIndex][7],
-							dishesDisplayDataShow[rowIndex][8], "￥0", 0, 0 ]);
+					orderedData
+							.push([ dishCurrName, "无口味", 1, dishCurrPrice, "",
+									dishCurrPrice, dishNbr, kitchenNbr, 0,
+									dishesDisplayDataShow[rowIndex][5],
+									dishesDisplayDataShow[rowIndex][6],
+									dishesDisplayDataShow[rowIndex][7],
+									dishesDisplayDataShow[rowIndex][8], "￥0",
+									0, 0, "2" ]);
 				}
 				orderedStore.reload();
-				dishOrderCurrRowIndex_ = -1;
+				// 底色处理，已点菜式原色底色
+				dishGridRefresh();
 				orderIsChanged = true;
+				dishOrderCurrRowIndex_ = -1;
 			} else {
 				Ext.MessageBox.show({
 					msg : "该菜品已售完！",
@@ -998,63 +1549,28 @@ var dishesChooseBySpellForm = new Ext.form.FormPanel({
 		layout : "column",
 		border : false,
 		anchor : "98%",
-		items : [
-				{
-					layout : "form",
-					labelWidth : 60,
-					border : false,
-					labelSeparator : '：',
-					columnWidth : .50,
-					items : [ {
-						xtype : "textfield",
-						fieldLabel : "数量",
-						name : "orderCountSpell",
-						id : "orderCountSpell",
-						value : 1,
-						anchor : "90%",
-						listeners : {
-							focus : function(thiz) {
-								softKeyBoardDO
-										.setPosition(dishesOrderCenterPanel
-												.getInnerWidth() + 77, 187);
-								softKBRelateItemId = "orderCountSpell";
-								softKeyBoardDO.show();
-
-							},
-							blur : function(thiz) {
-								var thisValue = thiz.getValue();
-								dishesOrderEastPanel.findById("orderCountNum")
-										.setValue(thisValue);
-							}
-						}
-					} ],
-					listeners : {
-						render : function(thiz) {
-							thiz.hide();
-						}
+		items : [ {
+			layout : "form",
+			labelWidth : 60,
+			border : false,
+			labelSeparator : '：',
+			columnWidth : .50,
+			items : [ {
+				xtype : "textfield",
+				fieldLabel : "菜名拼音",
+				name : "orderSpell",
+				id : "orderSpell",
+				anchor : "90%",
+				listeners : {
+					focus : function(thiz) {
+						softKeyBoardDO.hide();
+					},
+					render : function(thiz) {
+						dishSpellOnLoad();
 					}
-				}, {
-					layout : "form",
-					labelWidth : 60,
-					border : false,
-					labelSeparator : '：',
-					columnWidth : .50,
-					items : [ {
-						xtype : "textfield",
-						fieldLabel : "菜名拼音",
-						name : "orderSpell",
-						id : "orderSpell",
-						anchor : "90%",
-						listeners : {
-							focus : function(thiz) {
-								softKeyBoardDO.hide();
-							},
-							render : function(thiz) {
-								dishSpellOnLoad();
-							}
-						}
-					} ]
-				} ]
+				}
+			} ]
+		} ]
 	} ]
 });
 
@@ -1068,42 +1584,7 @@ var dishesChooseByNumForm = new Ext.form.FormPanel({
 		border : false,
 		anchor : "98%",
 		items : [
-				{
-					layout : "form",
-					labelWidth : 60,
-					border : false,
-					labelSeparator : '：',
-					columnWidth : .50,
-					items : [ {
-						xtype : "textfield",
-						fieldLabel : "数量",
-						name : "orderCountNum",
-						id : "orderCountNum",
-						value : 1,
-						anchor : "90%",
-						listeners : {
-							focus : function(thiz) {
-								softKeyBoardDO
-										.setPosition(dishesOrderCenterPanel
-												.getInnerWidth() + 77, 187);
-								softKBRelateItemId = "orderCountNum";
-								softKeyBoardDO.show();
 
-							},
-							blur : function(thiz) {
-								var thisValue = thiz.getValue();
-								dishesOrderEastPanel
-										.findById("orderCountSpell").setValue(
-												thisValue);
-							}
-						}
-					} ],
-					listeners : {
-						render : function(thiz) {
-							thiz.hide();
-						}
-					}
-				},
 				{
 					layout : "form",
 					labelWidth : 60,
@@ -1118,15 +1599,35 @@ var dishesChooseByNumForm = new Ext.form.FormPanel({
 						anchor : "90%",
 						listeners : {
 							focus : function(thiz) {
+								// softKeyBoardDO
+								// .setPosition(dishesOrderCenterPanel
+								// .getInnerWidth() + 77, 187);
+								// softKBRelateItemId = "orderNbr";
+								// softKeyBoardDO.show();
+
+							},
+							render : function(thiz) {
+								dishNbrOnLoad();
+							}
+						}
+					} ]
+				},
+				{
+					layout : "form",
+					border : false,
+					columnWidth : .50,
+					items : [ {
+						xtype : "button",
+						text : "小键盘",
+						name : "softKeyBoardNbrBtn",
+						id : "softKeyBoardNbrBtn",
+						listeners : {
+							"click" : function(thiz, e) {
 								softKeyBoardDO
 										.setPosition(dishesOrderCenterPanel
 												.getInnerWidth() + 77, 187);
 								softKBRelateItemId = "orderNbr";
 								softKeyBoardDO.show();
-
-							},
-							render : function(thiz) {
-								dishNbrOnLoad();
 							}
 						}
 					} ]
@@ -1165,10 +1666,10 @@ var dishesDisplayTabPanel = new Ext.TabPanel({
 		// field
 		// does not lost!!!
 		tabchange : function(thiz, panel) {
-			dishesOrderEastPanel.findById("orderCountNum").fireEvent("blur",
-					dishesOrderEastPanel.findById("orderCountNum"));
-			dishesOrderEastPanel.findById("orderCountSpell").fireEvent("blur",
-					dishesOrderEastPanel.findById("orderCountSpell"));
+			// dishesOrderEastPanel.findById("orderCountNum").fireEvent("blur",
+			// dishesOrderEastPanel.findById("orderCountNum"));
+			// dishesOrderEastPanel.findById("orderCountSpell").fireEvent("blur",
+			// dishesOrderEastPanel.findById("orderCountSpell"));
 
 			// hide the soft keyboard
 			if (softKeyBoardDO.isVisible()) {
@@ -1194,6 +1695,10 @@ var dishesDisplayTabPanel = new Ext.TabPanel({
 						dishesDisplayData[i][7] ]);
 			}
 			dishesDisplayStore.reload();
+
+			// clear the number or spell input
+			dishesOrderEastPanel.findById("orderSpell").setValue("");
+			dishesOrderEastPanel.findById("orderNbr").setValue("");
 		}
 	}
 });
@@ -1219,10 +1724,51 @@ var dishesOrderNorthPanel = new Ext.Panel({
 	border : false,
 	layout : "form",
 	frame : true,
-	contentEl : "tableStatusDO",
+	// contentEl : "tableStatusDO",
+	items : [ {
+		layout : "column",
+		border : false,
+		anchor : "98%",
+		items : [ {
+			layout : "form",
+			border : false,
+			id : "tableNbrFrom",
+			width : 80,
+			contentEl : "tableStatusTableNbr"
+		}, {
+			layout : "form",
+			border : false,
+			width : 50,
+			contentEl : "tableStatusPerCount"
+		}, {
+			layout : "form",
+			border : false,
+			width : 50,
+			items : [ {
+				xtype : "numberfield",
+				id : "tablePersonCount",
+				width : 45,
+				hideLabel : true,
+				value : 1,
+				validator : function(v) {
+					if (v >= 0 && v <= 99) {
+						return true;
+					} else {
+						return "人数输入范围是０～９９";
+					}
+				}
+
+			} ]
+		}, {
+			layout : "form",
+			border : false,
+			width : 100,
+			contentEl : "tableStatusMinCost"
+		} ]
+	} ],
 	listeners : {
 		render : function(thiz) {
-			tableStuLoad();
+			// tableStuLoad();
 		}
 	}
 });

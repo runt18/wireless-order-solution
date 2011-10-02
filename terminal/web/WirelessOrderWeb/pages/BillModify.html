@@ -51,6 +51,7 @@
 	var give = Request["give"];
 	var payType = Request["payType"];
 	var discountType = Request["discountType"];
+	var orderID = Request["orderID"];
 
 	var orderedData = []; // the dishes have been ordered
 	var dishOrderCurrRowIndex_ = -1; // the selected row index in the chosen dishes display grid
@@ -67,6 +68,14 @@
 	var orderIsChanged = false; // if the order is changed
 
 	var billComment = "";
+	var ketchenSelectIndex = -1;
+	
+	var dishTasteDataTas = [];
+	var dishTasteDataPar = [];
+	var dishTasteDataSiz = [];
+	
+	// 格式：[{編號,描述,價錢或比例,計算方式}]
+	var choosenTaset = [];
 </script>
 
 <script type="text/javascript"
@@ -102,7 +111,7 @@
 		<div id="tblNbrDivTS" class="tableStatusChar">100&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
 		<img title="人数" src='../images/DinnerAmount.png' style='float: left;' />
 		<div id="perCountDivTS" class="tableStatusChar">4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-		<img title="最低消费" id="minCostImgTS" src='../images/DinnerAmount.png'
+		<img title="最低消费" id="minCostImgTS" src='../images/minCost.png'
 			style='float: left;' />
 		<div id="minCostDivTS" class="tableStatusChar">0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
 	</div>
