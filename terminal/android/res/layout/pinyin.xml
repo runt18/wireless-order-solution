@@ -75,14 +75,14 @@ android:src="@drawable/table_line"
 android:layout_below="@id/second"
 />
 
-<ListView 
+<com.wireless.util.DragListView 
 android:id="@+id/myListView"
 android:layout_width="fill_parent"
 android:layout_height="wrap_content"
 android:layout_below="@id/line"
 android:divider="@drawable/table_line"
 android:cacheColorHint="#00000000"
-></ListView>
+></com.wireless.util.DragListView >
 
 
 </LinearLayout>
