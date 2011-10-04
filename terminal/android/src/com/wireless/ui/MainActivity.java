@@ -44,9 +44,9 @@ public class MainActivity extends Activity {
 	private float _appVer;
 	Restaurant _restaurant;
 	ProtocolPackage _resp;
+	AlertDialog.Builder _builder;
 	private AppContext _appContext;
 	boolean _tag = false;
-
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -72,56 +72,35 @@ public class MainActivity extends Activity {
 		if (Common.getCommon().isNetworkAvailable(MainActivity.this)) {
 			askRestaurant();
 			assign();
-			askMenu();
-			
+			askMenu1();
 		} else {
 			_tag = true;
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setTitle("提示!")
-				   .setMessage("当前没有网络,请设置你的网络状态")
-				   .setPositiveButton("返回", new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {
-							// android.os.Process.killProcess(android.os.Process.myPid());
-							finish();
-						}
-					})
-					.setOnKeyListener(new OnKeyListener() {
-						public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-							// TODO Auto-generated method stub
-							return false;
-						}
-					})
-					.show();
+			AlertDialog();
 
-	    }         
-         
-    }    
+		}
 
-	/**
-	 * 请求菜谱信息
-	 */
-	public void askMenu(){
-        FoodMenu foodMenu;
-        try{
-        	_resp = ServerConnector.instance().ask(new ReqQueryMenu());
-            foodMenu = RespParser.parseQueryMenu(_resp);
-            _appContext.setFoodMenu(foodMenu);
-        }catch(IOException e){
-        	
-        }  
-        
-    }
+	}
 
-	/**
-	 * 请求公告餐厅信息以及用户名     
-	 */
-    public void askRestaurant(){
-    	setContentView(R.layout.main);
+	// 请求菜谱信息
+	public void askMenu1() {
+		FoodMenu foodMenu;
+		try {
+			_resp = ServerConnector.instance().ask(new ReqQueryMenu());
+			foodMenu = RespParser.parseQueryMenu(_resp);
+			_appContext.setFoodMenu(foodMenu);
+		} catch (IOException e) {
+
+		}
+
+	}
+
+	// 请求公告餐厅信息以及用户名
+	public void askRestaurant() {
+		setContentView(R.layout.main);
 		_topTitle = (TextView) findViewById(R.id.toptitle);
 		_userName = (TextView) findViewById(R.id.username);
 		_funGridView = (GridView) findViewById(R.id.gridview);
 		_billBoard = (TextView) findViewById(R.id.notice);
-   
 
 		try {
 			_resp = ServerConnector.instance().ask(new ReqQueryRestaurant());
@@ -136,43 +115,40 @@ public class MainActivity extends Activity {
 			e.printStackTrace();
 		}
 
-		int[] imageIcons = { 
-							 R.drawable.icon03, R.drawable.icon08, R.drawable.icon11, 
-							 R.drawable.icon04, R.drawable.icon05, R.drawable.icon06, 
-							 R.drawable.icon07, R.drawable.icon01, R.drawable.icon09 
-						   };
-		
-		String[] iconDes = { 
-				 			 "下单", "改单", "删单", 
-							 "结账", "功能设置", "网络设置",
-							 "菜谱更新", "软件更新", "更多" 
-						   };
-		
+		int[] imageIcons = { R.drawable.icon03, R.drawable.icon08,
+				R.drawable.icon11, R.drawable.icon04, R.drawable.icon05,
+				R.drawable.icon06, R.drawable.icon07, R.drawable.icon01,
+				R.drawable.icon09 };
+
+		String[] iconDes = { "下单", "改单", "删单", "结账", "功能设置", "网络设置", "菜谱更新",
+				"软件更新", "更多" };
+
 		// 生成动态数组，并且转入数据
 		ArrayList<HashMap<String, Object>> imgItems = new ArrayList<HashMap<String, Object>>();
 		for (int i = 0; i < imageIcons.length; i++) {
 			HashMap<String, Object> map = new HashMap<String, Object>();
 			map.put("ItemImage", imageIcons[i]);// 添加图像资源的ID
-			map.put("ItemText", iconDes[i]);	// 按序号做ItemText
+			map.put("ItemText", iconDes[i]);// 按序号做ItemText
 			imgItems.add(map);
 		}
-		
+
 		// 生成适配器的ImageItem <====> 动态数组的元素，两者一一对应
 		// 添加并且显示九宫格
-		_funGridView.setAdapter(new SimpleAdapter(MainActivity.this, 							// 没什么解释
-				   								  imgItems,										// 数据来源
-				   								  R.layout.grewview_item,						// night_item的XML实现				
-				   								  new String[] { "ItemImage", "ItemText" }, 	// 动态数组与ImageItem对应的子项
-				   								  new int[] { R.id.ItemImage, R.id.ItemText }));// ImageItem的XML文件里面的一个ImageView,一个TextView ID
-		
-		
-		_funGridView.setOnItemClickListener(new OnItemClickListener(){
-			public void onItemClick(AdapterView<?> arg0,// The AdapterView where the click happened
-									View arg1,			// The view within the AdapterView that was clicked
-									int position,		// The position of the view in the adapter
-									long arg3			// The row id of the item that was clicked
-									) 
-			{
+		_funGridView.setAdapter(new SimpleAdapter(MainActivity.this, // 没什么解释
+				imgItems, // 数据来源
+				R.layout.grewview_item, // night_item的XML实现
+				new String[] { "ItemImage", "ItemText" }, // 动态数组与ImageItem对应的子项
+				new int[] { R.id.ItemImage, R.id.ItemText }));// ImageItem的XML文件里面的一个ImageView,一个TextView
+																// ID
+
+		_funGridView.setOnItemClickListener(new OnItemClickListener() {
+			public void onItemClick(AdapterView<?> arg0,// The AdapterView where
+														// the click happened
+					View arg1, // The view within the AdapterView that was
+								// clicked
+					int position, // The position of the view in the adapter
+					long arg3 // The row id of the item that was clicked
+			) {
 				switch (position) {
 				case 0:
 					Intent intent = new Intent(MainActivity.this,
@@ -210,28 +186,27 @@ public class MainActivity extends Activity {
 
 					break;
 				}
-			}											
+			}
+
 		});
-    }
-     
-    /**
-     * 主界面元素赋值
-     */
+	}
+
+	// 主界面元素赋值
 	public void assign() {
 		// 通过系统去拿版本号
 		PackageManager manager = MainActivity.this.getPackageManager();
 		PackageInfo info = null;
 		try {
-			info = manager.getPackageInfo(MainActivity.this.getPackageName(), 0);
-			_appVer = new Float(info.versionName); // 版本名1.0
+			info = manager
+					.getPackageInfo(MainActivity.this.getPackageName(), 0);
 		} catch (NameNotFoundException e) {
 			e.printStackTrace();
 		}
+		_appVer = new Float(info.versionName); // 版本名1.0
 		_topTitle.setText("e点通(V" + _appVer + ")");
 		_billBoard.setText(_restaurant.info);
 		_userName.setText(_restaurant.name + "(" + _restaurant.owner + ")");
 	}
-
 
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 
@@ -241,22 +216,48 @@ public class MainActivity extends Activity {
 					.setMessage("您确定退出e点通?")
 					.setNeutralButton("确定",
 							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int which) {
-									// android.os.Process.killProcess(android.os.Process.myPid());
-									finish();
+
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									android.os.Process.killProcess(android.os.Process.myPid());
+									//finish();
 								}
-							})
-					.setNegativeButton("取消", null)
+							}).setNegativeButton("取消", null)
 					.setOnKeyListener(new OnKeyListener() {
-						public boolean onKey(DialogInterface arg0, int arg1, KeyEvent arg2) {
+
+						@Override
+						public boolean onKey(DialogInterface arg0, int arg1,
+								KeyEvent arg2) {
 							// TODO Auto-generated method stub
 							return true;
 						}
-					})
-					.show();
+					}).show();
+
 		}
-		
 		return super.onKeyDown(keyCode, event);
+	}
+
+	// 提示框，是否退出程序
+	public void AlertDialog() {
+		_builder = new AlertDialog.Builder(this);
+		_builder.setTitle("提示!").setMessage("当前没有网络,请设置你的网络状态")
+				.setPositiveButton("返回", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						// android.os.Process.killProcess(android.os.Process.myPid());
+						finish();
+
+					}
+				}).show();
+
+		_builder.setOnKeyListener(new OnKeyListener() {
+			public boolean onKey(DialogInterface dialog, int keyCode,
+					KeyEvent event) {
+				// TODO Auto-generated method stub
+				return false;
+			}
+
+		});
 	}
 
 }
