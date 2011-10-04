@@ -79,7 +79,7 @@ public class orderActivity extends Activity {
 		@Override
 		public void onClick(View v) {
 			Log.e("", Common.getCommon().getFoodlist().size()+"");
-			commit(Common.getCommon().getFoodlist().toArray(new Food[Common.getCommon().getFoodlist().size()]),Short.valueOf("117"),Integer.parseInt("2"));
+			commit(Common.getCommon().getFoodlist().toArray(new Food[Common.getCommon().getFoodlist().size()]),Short.valueOf("109"),Integer.parseInt("2"));
 		}
 
 	}
