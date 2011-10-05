@@ -7,6 +7,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodMenu;
 import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.SKitchen;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Terminal;
 
@@ -38,7 +39,8 @@ public class QueryMenu {
 							    queryTastes(dbCon, term.restaurant_id, Taste.CATE_TASTE),
 							    queryTastes(dbCon, term.restaurant_id, Taste.CATE_STYLE),
 							    queryTastes(dbCon, term.restaurant_id, Taste.CATE_SPEC),
-							    queryKitchens(dbCon, term.restaurant_id));
+							    queryKitchens(dbCon, term.restaurant_id),
+							    querySKitchens(dbCon, term.restaurant_id));
 			
 		}finally{
 			dbCon.disconnect();
@@ -97,13 +99,18 @@ public class QueryMenu {
 	
 	/**
 	 * Get the kitchen information.
-	 * @param pin the pin to this terminal
-	 * @param model the model to this terminal
-	 * @return the food menu holding all the information
-	 * @throws BusinessException throws if either of cases below.<br>
-	 * 							 - The terminal is NOT attache to any restaurant.<br>
-	 * 							 - The terminal is expired.
-	 * @throws SQLException throws if fail to execute any SQL statement
+	 * @param pin 
+	 * 			the pin to this terminal
+	 * @param model 
+	 * 			the model to this terminal
+	 * @return 
+	 * 			the food menu holding all the information
+	 * @throws BusinessException 
+	 * 			throws if either of cases below.<br>
+	 * 			- The terminal is NOT attache to any restaurant.<br>
+	 * 			- The terminal is expired.
+	 * @throws SQLException 
+	 * 			throws if fail to execute any SQL statement
 	 */
 	public static Kitchen[] execKitchens(int pin, short model) throws BusinessException, SQLException{
 
@@ -113,6 +120,34 @@ public class QueryMenu {
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, pin, model);
 			return queryKitchens(dbCon, term.restaurant_id);
+
+		} finally {
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the super kitchen information.
+	 * @param pin 
+	 * 			the pin to this terminal
+	 * @param model 
+	 * 			the model to this terminal
+	 * @return 
+	 * 			the food menu holding all the information
+	 * @throws BusinessException 
+	 * 			throws if either of cases below.<br>
+	 * 			- The terminal is NOT attache to any restaurant.<br>
+	 * 			- The terminal is expired.
+	 * @throws SQLException 
+	 * 			throws if fail to execute any SQL statement
+	 */
+	public static SKitchen[] execSKitchens(int pin, short model) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		
+		try {
+			dbCon.connect();
+			Terminal term = VerifyPin.exec(dbCon, pin, model);
+			return querySKitchens(dbCon, term.restaurant_id);
 
 		} finally {
 			dbCon.disconnect();
@@ -144,13 +179,16 @@ public class QueryMenu {
 	private static Kitchen[] queryKitchens(DBCon dbCon, int restaurantID) throws SQLException{
 		//get all the kitchen information to this restaurant,
 		ArrayList<Kitchen> kitchens = new ArrayList<Kitchen>();
-		String sql = "SELECT alias_id, name, discount, discount_2, discount_3, member_discount_1, member_discount_2, member_discount_3 FROM " + 
+		String sql = "SELECT alias_id, name, discount, discount_2, discount_3, " +
+					 "member_discount_1, member_discount_2, member_discount_3, " +
+					 "super_kitchen FROM " + 
 			  		 Params.dbName + ".kitchen WHERE restaurant_id=" + 
 			  		 restaurantID;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
 			kitchens.add(new Kitchen(dbCon.rs.getString("name"),
 									 dbCon.rs.getShort("alias_id"),
+									 dbCon.rs.getShort("super_kitchen"),
 									 (byte)(dbCon.rs.getFloat("discount") * 100),
 									 (byte)(dbCon.rs.getFloat("discount_2") * 100),
 									 (byte)(dbCon.rs.getFloat("discount_3") * 100),
@@ -161,6 +199,21 @@ public class QueryMenu {
 		dbCon.rs.close();
 		
 		return kitchens.toArray(new Kitchen[kitchens.size()]);
+	}
+	
+	private static SKitchen[] querySKitchens(DBCon dbCon, int restaurantID) throws SQLException{
+		//get tall the super kitchen information to this restaurant
+		ArrayList<SKitchen> sKitchens = new ArrayList<SKitchen>();
+		String sql = "SELECT alias_id, name FROM " + Params.dbName + ".super_kitchen WHERE " +
+					 " restaurant_id=" + restaurantID;
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		while(dbCon.rs.next()){
+			sKitchens.add(new SKitchen(dbCon.rs.getString("name"),
+									   dbCon.rs.getShort("alias_id")));
+		}
+		dbCon.rs.close();
+		
+		return sKitchens.toArray(new SKitchen[sKitchens.size()]);
 	}
 	
 	/**

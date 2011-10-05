@@ -12,7 +12,7 @@ import com.wireless.protocol.Terminal;
 
 public class QueryShift {
 	/**
-	 * Perform to query the shift information.
+	 * Perform to query the shift information through now to last shift.
 	 * 
 	 * @param pin
 	 *            the pin to this terminal
@@ -38,7 +38,7 @@ public class QueryShift {
 	}
 	
 	/**
-	 * Perform the query the shift detail information.
+	 * Perform to query the shift information through now to last shift.
 	 * Note that the database should be connected before invoking this method.
 	 * 
 	 * @param dbCon
@@ -81,11 +81,103 @@ public class QueryShift {
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT+8"));
 		String offDuty = sdf.format(System.currentTimeMillis());
 		
+		return genShiftDetail(dbCon, term, onDuty, offDuty);
+
+	}
+	
+	/**
+	 * Perform to get the latest shift information. 
+	 * @param dbCon
+	 *            the database connection
+	 * @param pin
+	 *            the pin to this terminal
+	 * @param model
+	 *            the model to this terminal
+	 * @return the shift detail information
+	 * @return the shift detail information
+	 * @throws BusinessException
+	 * 			  throws if one the cases below.<br>
+	 *             - The terminal is NOT attached to any restaurant.<br>
+	 *             - The terminal is expired.<br>
+	 *             - The member to query does NOT exist.
+	 *             - No shift record exist.
+	 * @throws SQLException
+	 * 				throws if fail to execute any SQL statement
+	 */
+	public static Shift exec2(int pin, short model) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return exec2(dbCon, pin, model);
+		}finally{
+			dbCon.disconnect();
+		}
+		
+	}
+	
+	/**
+	 * Perform to get the latest shift information. 
+	 * @param dbCon
+	 *            the database connection
+	 * @param pin
+	 *            the pin to this terminal
+	 * @param model
+	 *            the model to this terminal
+	 * @return the shift detail information
+	 * @return the shift detail information
+	 * @throws BusinessException
+	 * 			  throws if one the cases below.<br>
+	 *             - The terminal is NOT attached to any restaurant.<br>
+	 *             - The terminal is expired.<br>
+	 *             - The member to query does NOT exist.
+	 *             - No shift record exist.
+	 * @throws SQLException
+	 * 				throws if fail to execute any SQL statement
+	 */
+	public static Shift exec2(DBCon dbCon, int pin, short model) throws BusinessException, SQLException{
+		
+		Terminal term = VerifyPin.exec(dbCon, pin, model);
+		
+		/**
+		 * Get the latest on & off duty date
+		 */
+		String onDuty;
+		String offDuty;
+		String sql = "SELECT on_duty, off_duty FROM " + Params.dbName + ".shift WHERE restaurant_id=" + term.restaurant_id +
+					 " ORDER BY off_duty desc LIMIT 1";
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			onDuty = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(dbCon.rs.getTimestamp("on_duty"));
+			offDuty = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(dbCon.rs.getTimestamp("off_duty"));
+		}else{
+			throw new BusinessException("No shift record to restaurant(id=" + term.restaurant_id + ") exist.");
+		}
+		dbCon.rs.close();
+		
+		return genShiftDetail(dbCon, term, onDuty, offDuty);
+		
+	}
+	
+	/**
+	 * Generate the details to shift within the on & off duty date.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param term
+	 * 			the terminal to request
+	 * @param onDuty
+	 * 			the date to be on duty
+	 * @param offDuty
+	 * 			the date to be off duty
+	 * @return the shift detail information
+	 * @throws SQLException
+	 * 			throws if fail to execute any SQL statement
+	 */
+	private static Shift genShiftDetail(DBCon dbCon, Terminal term, String onDuty, String offDuty) throws SQLException{
 		/**
 		 * Get the amount the order within this shift
 		 */
 		int orderAmount = 0;
-		sql = "SELECT COUNT(*) FROM " + Params.dbName + ".order WHERE restaurant_id=" + term.restaurant_id +
+		String sql = "SELECT COUNT(*) FROM " + Params.dbName + ".order WHERE restaurant_id=" + term.restaurant_id +
 			  " AND total_price IS NOT NULL" +
 			  " AND order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "'";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -217,4 +309,5 @@ public class QueryShift {
 		shift.totalSign2 = (float)Math.round(totalSign_2 * 100) / 100;
 		return shift;
 	}
+	
 }
