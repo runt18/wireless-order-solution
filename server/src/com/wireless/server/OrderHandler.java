@@ -222,12 +222,17 @@ class OrderHandler extends Handler implements Runnable{
 				int printConf = reqToPrint.print_type;
 
 				Order orderToPrint;
+				/**
+				 * If print shift receipt, NOT need to query the order.
+				 */
 				if((printConf & (Reserved.PRINT_SHIFT_RECEIPT_2 | Reserved.PRINT_TEMP_SHIFT_RECEIPT_2)) == 0){
 					orderToPrint = QueryOrder.execByID(_term.pin, _term.modelID, reqToPrint.id);
 				}else{				
 					orderToPrint = new Order();
 				}
-				
+				/**
+				 * If print table transfer, need to assign the original and new table id to order.
+				 */
 				if((printConf & Reserved.PRINT_TRANSFER_TABLE_2) != 0){
 					orderToPrint.table_id = reqToPrint.table_id;
 					orderToPrint.originalTableID = reqToPrint.originalTableID;
@@ -334,8 +339,7 @@ class OrderHandler extends Handler implements Runnable{
 			if(printerConn != null){
 				connections = printerConn.toArray(new Socket[printerConn.size()]);			
 			}else{
-				//connections = new Socket[0];
-				return;
+				connections = new Socket[0];
 			}
 			/**
 			 * Get the corresponding restaurant information
