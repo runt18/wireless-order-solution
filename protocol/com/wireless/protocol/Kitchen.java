@@ -1,6 +1,7 @@
 package com.wireless.protocol;
 
 public final class Kitchen {
+	
 	public final static short KITCHEN_NULL = 255;
 	public final static short KITCHEN_1 = 0;
 	public final static short KITCHEN_2 = 1;
@@ -12,8 +13,7 @@ public final class Kitchen {
 	public final static short KITCHEN_8 = 7;
 	public final static short KITCHEN_9 = 8;
 	public final static short KITCHEN_10 = 9;
-	
-	
+		
 	/**
 	 * The discount to this kitchen ranges from 0.00 through 1.00
 	 * Since the 8100 doesn't support float, we instead to use 0 through 100.
@@ -28,15 +28,17 @@ public final class Kitchen {
 	
 	public String name;
 	public short alias_id = KITCHEN_NULL;
+	public short skitchen_id = SKitchen.S_KITCHEN_1;
 	
 	
-	public Kitchen(String kName, short id){
+	public Kitchen(String kName, short id, short sKitchenID){
 		name = kName;
 		alias_id = id;
+		skitchen_id = sKitchenID;
 	}
 	
-	public Kitchen(String kName, short id, byte dist1, byte dist2, byte dist3, byte memDist1, byte memDist2, byte memDist3){
-		this(kName, id);
+	public Kitchen(String kName, short id, short sKitchenID, byte dist1, byte dist2, byte dist3, byte memDist1, byte memDist2, byte memDist3){
+		this(kName, id, sKitchenID);
 		discount = dist1;
 		discount_2 = dist2;
 		discount_3 = dist3;

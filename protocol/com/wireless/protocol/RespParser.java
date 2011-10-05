@@ -143,6 +143,7 @@ public class RespParser {
 		 * style_amount[2] : <Style1> : <Style2>... 
 		 * spec_amount[2] : <Spec1> : <Spec2>... 
 		 * kitchen_amount : <Kitchen1> : <Kitchen2>...
+		 * s_kitchen_amount : <SKitchen1> : <SKitchen2>...
 		 * food_amount[2] - 2-byte indicating the amount of the foods listed in the menu
 		 * <Food>
 		 * food_id[2] : price[3] : status : kitchen : len : name[len] : len2 : pinyin[len2]
@@ -176,12 +177,19 @@ public class RespParser {
 		 * The same as <Taste>
 		 
 		 * <Kitchen>
-		 * kitchen_id : dist_1 : dist_2 : dist_3 : mdist_1 : mdist_2 : mdist_3 : len : kname[len]
+		 * kitchen_id : s_kitchen_id : dist_1 : dist_2 : dist_3 : mdist_1 : mdist_2 : mdist_3 : len : kname[len]
 		 * kitchen_id : the id to this kitchen
+		 * s_kitchen_id : the id to super kitchen which this kitchen belong to
 		 * dist_1..3 : 3 normal discounts to this kitchen
 		 * mdist_1..3 : 3 member discounts to this kitchen
 		 * len : the length of the kitchen name
 		 * kname[len] : the name to this kitchen
+		 * 
+		 * <SKitchen>
+		 * s_kitchen_id : len : s_kname[len]
+		 * s_kitchen_id : the id to this super kitchen
+		 * len : the length of the super kitchen name
+		 * s_kname[len] : the name to this super kitchen
 		 *******************************************************/
 		//make sure the response is ACK
 		if(response.header.type == Type.ACK){
@@ -271,35 +279,63 @@ public class RespParser {
 				//get the kitchen alias id
 				short kitchen_id = (short)(response.body[index] & 0x00FF);
 				
+				//get the super kitchen alias id that the kitchen belong to
+				short sKitchen_id = (short)(response.body[index + 1] & 0x00FF);
+				
 				//get 3 normal discounts
-				byte dist_1 = response.body[index + 1];
-				byte dist_2 = response.body[index + 2];
-				byte dist_3 = response.body[index + 3];
+				byte dist_1 = response.body[index + 2];
+				byte dist_2 = response.body[index + 3];
+				byte dist_3 = response.body[index + 4];
 				
 				//get 3 member discounts
-				byte mdist_1 = response.body[index + 4];
-				byte mdist_2 = response.body[index + 5];
-				byte mdist_3 = response.body[index + 6];
+				byte mdist_1 = response.body[index + 5];
+				byte mdist_2 = response.body[index + 6];
+				byte mdist_3 = response.body[index + 7];
 				
 				//get the length of the kitchen name
-				int length = response.body[index + 7];
+				int length = response.body[index + 8];
+				//get the value of super kitchen name
 				String kname = null;
 				try{
-					kname = new String(response.body, index + 8, length, "UTF-16BE");
+					kname = new String(response.body, index + 9, length, "UTF-16BE");
 				}catch(UnsupportedEncodingException e){}
 				
-				index += 8 + length;
+				index += 9 + length;
 				
 				//add the kitchen
-				kitchens[i] = new Kitchen(kname, kitchen_id,
+				kitchens[i] = new Kitchen(kname, kitchen_id, sKitchen_id,
 										  dist_1, dist_2, dist_3,
 										  mdist_1, mdist_2, mdist_3);
 			}
 			
-			return new FoodMenu(foods, tastes, styles, specs, kitchens);
+			//get the amount of super kitchens
+			int nSKitchen = response.body[index] & 0x000000FF;
+			index++;
+			//allocate the memory for super kitchens
+			SKitchen[] sKitchens = new SKitchen[nSKitchen];
+			//get each super kitchen's information
+			for(int i = 0; i < sKitchens.length; i++){
+				//get the alias id to super kitchen
+				short sKitchenID = (short)(response.body[index] & 0x00FF);
+				
+				//get the length of the super kitchen name
+				int length = response.body[index + 1];
+				
+				//get the value of super kitchen name
+				String sKname = null;
+				try{
+					sKname = new String(response.body, index + 2, length, "UTF-16BE");
+				}catch(UnsupportedEncodingException e){}
+				
+				index += 2 + length;
+				
+				sKitchens[i] = new SKitchen(sKname, sKitchenID);
+			}
+			
+			return new FoodMenu(foods, tastes, styles, specs, kitchens, sKitchens);
 			
 		}else{
-			return new FoodMenu(new Food[0], new Taste[0], new Taste[0], new Taste[0], new Kitchen[0]);
+			return new FoodMenu(new Food[0], new Taste[0], new Taste[0], new Taste[0], new Kitchen[0], new SKitchen[0]);
 		}
 	}
 	

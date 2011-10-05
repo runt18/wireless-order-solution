@@ -33,6 +33,8 @@ public class Reserved {
 	public static final short PRINT_HURRIED_FOOD_2 = 0x200;
 	//indicates to print all hurried food
 	public static final short PRINT_ALL_HURRIED_FOOD_2 = 0x400;
+	//indicates to print temporary shift receipt
+	public static final short PRINT_TEMP_SHIFT_RECEIPT_2 = 0x2000;
 	//indicates to print shift receipt
 	public static final short PRINT_SHIFT_RECEIPT_2 = 0x4000;
 	//indicates to print temporary receipt
@@ -53,6 +55,7 @@ public class Reserved {
 	public static final byte PRINT_ALL_CANCELLED_FOOD = 8;
 	public static final byte PRINT_ALL_HURRIED_FOOD = 9;
 	public static final byte PRINT_HURRIED_FOOD = 10;
+	public static final byte PRINT_TEMP_SHIFT_RECEIPT = 125;
 	public static final byte PRINT_SHIFT_RECEIPT = 126;
 	public static final byte PRINT_TEMP_RECEIPT = 127;
 	

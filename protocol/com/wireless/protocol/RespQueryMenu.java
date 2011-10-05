@@ -31,6 +31,7 @@ import java.io.UnsupportedEncodingException;
  * style_amount[2] : <Style1> : <Style2>... 
  * spec_amount[2] : <Spec1> : <Spec2>... 
  * kitchen_amount : <Kitchen1> : <Kitchen2>...
+ * s_kitchen_amount : <SKitchen1> : <SKitchen2>...
  * food_amount[2] - 2-byte indicating the amount of the foods listed in the menu
  * <Food>
  * food_id[2] : price[3] : status : kitchen : len : name[len] : len2 : pinyin[len2]
@@ -64,12 +65,19 @@ import java.io.UnsupportedEncodingException;
  * The same as <Taste>
  *  
  * <Kitchen>
- * kitchen_id : dist_1 : dist_2 : dist_3 : mdist_1 : mdist_2 : mdist_3 : len : kname[len]
+ * kitchen_id : s_kitchen_id : dist_1 : dist_2 : dist_3 : mdist_1 : mdist_2 : mdist_3 : len : kname[len]
  * kitchen_id : the id to this kitchen
+ * s_kitchen_id : the id to super kitchen which this kitchen belong to
  * dist_1..3 : 3 normal discounts to this kitchen
  * mdist_1..3 : 3 member discounts to this kitchen
  * len : the length of the kitchen name
  * kname[len] : the name to this kitchen
+ * 
+ * <SKitchen>
+ * s_kitchen_id : len : s_kname[len]
+ * s_kitchen_id : the id to this super kitchen
+ * len : the length of the super kitchen name
+ * s_kname[len] : the name to this super kitchen
  *******************************************************/
 public class RespQueryMenu extends RespPackage{
 	
@@ -105,16 +113,29 @@ public class RespQueryMenu extends RespPackage{
 		//add the length to taste specifications
 		bodyLen += tasteLen(foodMenu.specs);
 		
-		/* the kitchen amount takes up 1-byte */
+		/* the amount of kitchen takes up 1-byte */
 		bodyLen += 1;
 		
 		for(int i = 0; i < foodMenu.kitchens.length; i++){
 			byte[] kname = foodMenu.kitchens[i].name.getBytes("UTF-16BE");
 			/**
 			 * each kitchen consist of the stuff below.
-			 * kitchen_id(1-byte) + dist1..3(3-byte) + mdist1..3(3-byte) + length of the kitchen name(1-byte) + kitchen name(len-byte)
+			 * kitchen_id(1-byte) + sKitchen_id(1-byte) + dist1..3(3-byte) + mdist1..3(3-byte) + length of the kitchen name(1-byte) + kitchen name(len-byte)
 			 */
-			bodyLen += 1 + 3 + 3 + 1 + kname.length;
+			bodyLen += 1 + 1 + 3 + 3 + 1 + kname.length;
+		}
+		
+		
+		/* the amount of super kitchen takes up 1-byte */
+		bodyLen += 1;
+		
+		for(int i = 0; i < foodMenu.sKitchens.length; i++){
+			byte[] sKname = foodMenu.sKitchens[i].name.getBytes("UTF-16BE");
+			/**
+			 * each super kitchen consist of the stuff below.
+			 * skitchen_id(1-byte) + length of the super kitchen name(1-byte) + super kitchen name(len-byte)
+			 */
+			bodyLen += 1 + 1 + sKname.length;
 		}
 		
 		//assign the body length to the corresponding header's field
@@ -189,29 +210,57 @@ public class RespQueryMenu extends RespPackage{
 			//assign the kitchen id
 			body[index] = (byte)(foodMenu.kitchens[i].alias_id & 0x00FF);
 			
+			//assign the super kitchen id that this kitchen belong to 
+			body[index + 1] = (byte)(foodMenu.kitchens[i].skitchen_id & 0x00FF);
+			
 			//assign 3 normal discounts
-			body[index + 1] = foodMenu.kitchens[i].discount;
-			body[index + 2] = foodMenu.kitchens[i].discount_2;
-			body[index + 3] = foodMenu.kitchens[i].discount_3;
+			body[index + 2] = foodMenu.kitchens[i].discount;
+			body[index + 3] = foodMenu.kitchens[i].discount_2;
+			body[index + 4] = foodMenu.kitchens[i].discount_3;
 			
 			//assign 3 member discounts
-			body[index + 4] = foodMenu.kitchens[i].member_discount_1;
-			body[index + 5] = foodMenu.kitchens[i].member_discount_2;
-			body[index + 6] = foodMenu.kitchens[i].member_discount_3;
+			body[index + 5] = foodMenu.kitchens[i].member_discount_1;
+			body[index + 6] = foodMenu.kitchens[i].member_discount_2;
+			body[index + 7] = foodMenu.kitchens[i].member_discount_3;
 			
 			byte[] kname = foodMenu.kitchens[i].name.getBytes("UTF-16BE");
 			//assign the length of the kitchen name
-			body[index + 7] = (byte)(kname.length & 0x000000FF);
+			body[index + 8] = (byte)(kname.length & 0x000000FF);
 			
 			//assign the kitchen name
 			for(int cnt = 0; cnt < kname.length; cnt++){
-				body[index + 8 + cnt] = kname[cnt];
+				body[index + 9 + cnt] = kname[cnt];
 			}
 			
 			/**
-			 * kitchen_id(1-byte) + dist1..3(3-byte) + mdist1..3(3-byte) + length of the kitchen name(1-byte) + kitchen name(len-byte)
+			 * kitchen_id(1-byte) + sKitchen_ID(1-byte) + dist1..3(3-byte) + mdist1..3(3-byte) + length of the kitchen name(1-byte) + kitchen name(len-byte)
 			 */
-			index += 1 + 3 + 3 + 1 + kname.length;
+			index += 1 + 1 + 3 + 3 + 1 + kname.length;
+		}
+		
+		//assign the amount of super kitchen
+		body[index] = (byte)(foodMenu.sKitchens.length);
+		index++;
+		
+		//assign each super kitchen to the body
+		for(int i = 0; i < foodMenu.sKitchens.length; i++){
+			//assign the super kitchen id
+			body[index] = (byte)(foodMenu.sKitchens[i].alias_id & 0x00FF);
+			
+			//assign the length of the super kitchen name
+			byte[] sKname = foodMenu.sKitchens[i].name.getBytes("UTF-16BE");
+			body[index + 1] = (byte)(sKname.length & 0x000000FF);
+			
+			//assign the super kitchen name
+			for(int cnt = 0; cnt < sKname.length; cnt++){
+				body[index + 2 + cnt] = sKname[cnt];
+			}
+			
+			/**
+			 * each super kitchen consist of the stuff below.
+			 * skitchen_id(1-byte) + length of the super kitchen name(1-byte) + super kitchen name(len-byte)
+			 */
+			index += 1 + 1 + sKname.length;
 		}
 	}
 	
