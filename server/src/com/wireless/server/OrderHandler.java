@@ -222,7 +222,7 @@ class OrderHandler extends Handler implements Runnable{
 				int printConf = reqToPrint.print_type;
 
 				Order orderToPrint;
-				if((printConf & Reserved.PRINT_SHIFT_RECEIPT_2) == 0){
+				if((printConf & (Reserved.PRINT_SHIFT_RECEIPT_2 | Reserved.PRINT_TEMP_SHIFT_RECEIPT_2)) == 0){
 					orderToPrint = QueryOrder.execByID(_term.pin, _term.modelID, reqToPrint.id);
 				}else{				
 					orderToPrint = new Order();
