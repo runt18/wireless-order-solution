@@ -130,80 +130,11 @@ public class SelectTastePopup extends PopupScreen{
 					int resp = Dialog.ask(Dialog.D_YES_NO, "确认" + _cate + "-" + _tastes[getSelectedIndex()].preference + " ?", Dialog.YES);
 					if(resp == Dialog.YES){
 
-
-						/**
-						 * Enumerate to check whether an available taste can be added
-						 */
-						int tastePos = 0;
-						for(; tastePos < _selectedFood.tastes.length; tastePos++){
-							if(_selectedFood.tastes[tastePos].alias_id == Taste.NO_TASTE){
-								break;
-							}
-						}
-						
-						if(tastePos < _selectedFood.tastes.length){
-							
-							/**
-							 * Since add a taste to the food means another one different the previous,
-							 * we might remove the original food first
-							 */
-							//_orderListField._orderFoods.removeElement(_selectedFood);
-							_orderListField.delFood(_selectedFood);
-							
-							/**
-							 * Add the taste to one of the three available tastes 
-							 */
-							try{
-								Taste selectedTaste = _tastes[_tasteMatchedIdx[getSelectedIndex()]];
-								//assign the taste id 
-								_selectedFood.tastes[tastePos].alias_id = selectedTaste.alias_id;
-								//assign the taste preference 
-								_selectedFood.tastes[tastePos].preference = selectedTaste.preference;
-								//assign the taste category
-								_selectedFood.tastes[tastePos].category = selectedTaste.category;
-								//assign the calculate type
-								_selectedFood.tastes[tastePos].calc = selectedTaste.calc;
-								//assign the taste price rate
-								_selectedFood.tastes[tastePos].setRate(selectedTaste.getRate());
-								//assign the taste price
-								_selectedFood.tastes[tastePos].setPrice(selectedTaste.getPrice());
-							}catch(ArrayIndexOutOfBoundsException e){}							
-						
-	
-							Arrays.sort(_selectedFood.tastes, new Comparator(){
-
-								public int compare(Object o1, Object o2) {
-									Taste taste1 = (Taste)o1;
-									Taste taste2 = (Taste)o2;
-									if(taste1.alias_id == taste2.alias_id){
-										return 0;
-									}else if(taste1.alias_id == Taste.NO_TASTE){
-										return 1;
-									}else if(taste2.alias_id == Taste.NO_TASTE){
-										return -1;
-									}else if(taste1.alias_id > taste2.alias_id){
-										return 1;
-									}else if(taste1.alias_id < taste2.alias_id){
-										return -1;
-									}else{
-										return 0;
-									}
-								}
-								
-							});
-							
-							/**
-							 * Calculate the taste price and preference
-							 */
-							_selectedFood.tastePref = Util.genTastePref(_selectedFood.tastes);
-							_selectedFood.setTastePrice(Util.genTastePrice(_selectedFood.tastes, _selectedFood.getPrice()));	
-							
-							_orderListField.addFood(_selectedFood);
-							
-						}else{
+						int tastePos = _selectedFood.addTaste(_tastes[_tasteMatchedIdx[getSelectedIndex()]]);
+						if(tastePos < 0){
 							Dialog.alert("最多只能添加" + _selectedFood.tastes.length + "个口味");
 						}
-						
+						_orderListField.invalidate(_orderListField.getSelectedIndex());						
 					}
 				}
 				

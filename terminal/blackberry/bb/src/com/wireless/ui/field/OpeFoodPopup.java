@@ -198,7 +198,6 @@ class OpeFoodPopup extends PopupScreen{
 							UiApplication.getUiApplication().pushScreen(new RemoveTastePopup(_orderList, _selectedFood));		
 						} 
 					});
-					hfm.add(delTasteBtn);
 					break;
 				}
 			}	

@@ -16,8 +16,6 @@ import net.rim.device.api.ui.component.ListFieldCallback;
 import net.rim.device.api.ui.component.SeparatorField;
 import net.rim.device.api.ui.container.PopupScreen;
 import net.rim.device.api.ui.container.VerticalFieldManager;
-import net.rim.device.api.util.Arrays;
-import net.rim.device.api.util.Comparator;
 
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Taste;
@@ -83,63 +81,16 @@ public class RemoveTastePopup extends PopupScreen {
 				int resp = Dialog.ask(Dialog.D_YES_NO, "确认删除-" + _tastes[getSelectedIndex()].preference, Dialog.NO);
 				if(resp == Dialog.YES){
 					
-					/**
-					 * Since add a taste to the food means another one different the previous,
-					 * we might remove the original food first
-					 */
-					_orderField.delFood(_selectedFood);
-					
-					_tastes[getSelectedIndex()] = new Taste();
+					_selectedFood.removeTaste(_tastes[getSelectedIndex()]);
+					_orderField.invalidate(_orderField.getSelectedIndex());
 					
 					/**
-					 * Reassign the tastes to selected food
-					 */
-					for(int i = 0; i < _selectedFood.tastes.length; i++){
-						if(i < _tastes.length){
-							_selectedFood.tastes[i] = _tastes[i];
-						}else{
-							_selectedFood.tastes[i] = new Taste();
-						}
-					}
-					
-					/**
-					 * Sort the tastes to selected food
-					 */
-					Arrays.sort(_tastes, new Comparator(){
-
-						public int compare(Object o1, Object o2) {
-							Taste taste1 = (Taste)o1;
-							Taste taste2 = (Taste)o2;
-							if(taste1.alias_id == taste2.alias_id){
-								return 0;
-							}else if(taste1.alias_id == Taste.NO_TASTE){
-								return 1;
-							}else if(taste2.alias_id == Taste.NO_TASTE){
-								return -1;
-							}else if(taste1.alias_id > taste2.alias_id){
-								return 1;
-							}else if(taste1.alias_id < taste2.alias_id){
-								return -1;
-							}else{
-								return 0;
-							}
-						}
-						
-					});
-					
-					/**
-					 * Redraw the screen after remove the taste
+					 * Redraw the remove taste pop up screen after removing the taste
 					 */
 					_tastes = getTastes();
 					setSize(_tastes.length, _tastes.length);
 					
-					/**
-					 * Calculate the taste price and preference
-					 */
-					_selectedFood.tastePref = Util.genTastePref(_selectedFood.tastes);
-					_selectedFood.setTastePrice(Util.genTastePrice(_selectedFood.tastes, _selectedFood.getPrice()));	
-					
-					_orderField.addFood(_selectedFood);
+
 				}
 			}
 		};
