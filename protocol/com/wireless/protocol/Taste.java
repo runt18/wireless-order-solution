@@ -49,6 +49,29 @@ public class Taste {
 	}
 
 	/**
+	 * The rule to comparison is below.
+	 * 1 - Put the value of no taste to the end.
+	 * 2 - The smaller the taste alias id, the more the position in front.
+	 * @param taste2
+	 * @return
+	 */
+	public int compare(Taste taste2){
+		if(this.alias_id == taste2.alias_id){
+			return 0;
+		}else if(this.alias_id == Taste.NO_TASTE){
+			return 1;
+		}else if(taste2.alias_id == Taste.NO_TASTE){
+			return -1;
+		}else if(this.alias_id > taste2.alias_id){
+			return 1;
+		}else if(this.alias_id < taste2.alias_id){
+			return -1;
+		}else{
+			return 0;
+		}
+	}
+	
+	/**
 	 * The price to this taste preference.
 	 * Here we use an integer to represent the unit price of the food.
 	 */

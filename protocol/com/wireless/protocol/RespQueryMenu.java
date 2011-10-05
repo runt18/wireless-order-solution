@@ -156,9 +156,8 @@ public class RespQueryMenu extends RespPackage{
 			body[index] = (byte)(foodMenu.foods[i].alias_id & 0x000000FF);
 			body[index + 1] = (byte)((foodMenu.foods[i].alias_id & 0x0000FF00) >> 8);
 			
-			//assign the float-point of the price
+			//assign the unit price to this food
 			body[index + 2] = (byte)(foodMenu.foods[i].price & 0x000000FF);
-			//assign the fixed-point of the price
 			body[index + 3] = (byte)((foodMenu.foods[i].price & 0x0000FF00) >> 8);
 			body[index + 4] = (byte)((foodMenu.foods[i].price & 0x00FF0000) >> 16);
 			//assign the kitchen to this food
