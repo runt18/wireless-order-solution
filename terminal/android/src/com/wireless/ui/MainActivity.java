@@ -121,7 +121,7 @@ public class MainActivity extends Activity {
 				R.drawable.icon09 };
 
 		String[] iconDes = { "下单", "改单", "删单", "结账", "功能设置", "网络设置", "菜谱更新",
-				"软件更新", "更多" };
+				"软件更新", "关于" };
 
 		// 生成动态数组，并且转入数据
 		ArrayList<HashMap<String, Object>> imgItems = new ArrayList<HashMap<String, Object>>();

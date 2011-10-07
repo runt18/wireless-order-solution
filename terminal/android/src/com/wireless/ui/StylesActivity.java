@@ -4,15 +4,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.AdapterView.OnItemClickListener;
 
 import com.wireless.adapter.StylesAdapter;
+import com.wireless.common.Common;
+import com.wireless.protocol.Food;
 import com.wireless.protocol.Taste;
 
 public class StylesActivity extends Activity {
@@ -22,6 +28,7 @@ public class StylesActivity extends Activity {
 	private ImageView numback;
 	List<Taste> styles;
 	private EditText search;
+	private TextView foodtaste;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -29,12 +36,15 @@ public class StylesActivity extends Activity {
 		setContentView(R.layout.stytle);
 		appcontext = (AppContext) getApplication();
 		myListview=(ListView)findViewById(R.id.myListView);
-		adapter=new StylesAdapter(StylesActivity.this,appcontext.getStyles());
+		foodtaste=(TextView)findViewById(R.id.foodtaste);
+	    Common.getCommon().init(Common.getCommon().getFoodlist().get(Common.getCommon().getPosition()), foodtaste);
+		adapter=new StylesAdapter(StylesActivity.this,appcontext.getStyles(),foodtaste);
 		myListview.setAdapter(adapter);
 		
 		numback=(ImageView)findViewById(R.id.numback);
 		
 		styles=new ArrayList<Taste>();
+		
 		
 		search=(EditText)findViewById(R.id.search);
 		search.addTextChangedListener(watcher);
@@ -43,12 +53,45 @@ public class StylesActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				finish();
+				Intent intent=new Intent(StylesActivity.this,orderActivity.class);
+				startActivity(intent);
 			}
 		});
+		
 	}
+	
+
      
 	
+	protected void onRestart() {
+		// TODO Auto-generated method stub
+	 Common.getCommon().init(Common.getCommon().getFoodlist().get(Common.getCommon().getPosition()), foodtaste);
+		 super.onRestart();
+	}
+
+	
+	
+	
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		 Common.getCommon().init(Common.getCommon().getFoodlist().get(Common.getCommon().getPosition()), foodtaste);
+		super.onResume();
+	}
+
+
+
+
+	@Override
+	protected void onStop() {
+		// TODO Auto-generated method stub
+		 Common.getCommon().init(Common.getCommon().getFoodlist().get(Common.getCommon().getPosition()), foodtaste);
+		super.onStop();
+	}
+
+
+
+
 	//  ‰»ÎøÚ µ ±º‡Ã˝
 	private TextWatcher watcher = new TextWatcher() {
 
@@ -70,7 +113,7 @@ public class StylesActivity extends Activity {
 				int count) {
 
 			if (s.toString() == null || s.toString().equals("")) {
-				adapter = new StylesAdapter(StylesActivity.this,appcontext.getStyles());
+				adapter = new StylesAdapter(StylesActivity.this,appcontext.getStyles(),foodtaste);
 				myListview.setAdapter(adapter);
 			} else {
 				styles.clear();
@@ -79,8 +122,7 @@ public class StylesActivity extends Activity {
 						styles.add(appcontext.getStyles().get(i));
 					}
 				}
-				
-				adapter = new StylesAdapter(StylesActivity.this, styles);
+				adapter = new StylesAdapter(StylesActivity.this, styles,foodtaste);
 				myListview.setAdapter(adapter);
 
 			}

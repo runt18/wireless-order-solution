@@ -43,7 +43,7 @@ public class FoodAdapter extends BaseAdapter {
 	public View getView(int position, View convertView, ViewGroup parent) {
 		Holder holder;
 		if(convertView==null){
-			 convertView=minflater.inflate(R.layout.food_item, null);
+			 convertView=minflater.inflate(R.layout.fooditem, null);
 			 holder=new Holder();
 			 holder.foodname=(TextView)convertView.findViewById(R.id.foodname);
 			 holder.foodprice=(TextView)convertView.findViewById(R.id.foodprice);

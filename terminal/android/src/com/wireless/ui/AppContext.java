@@ -28,7 +28,8 @@ public class AppContext extends Application {
 	private List<Taste> stytles;
 	private List<Taste> speces;
  
-
+    
+    
 
 	public String getNotice() {
 		return notice;

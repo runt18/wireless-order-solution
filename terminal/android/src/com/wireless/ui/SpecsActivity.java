@@ -4,15 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.wireless.adapter.SpecAdapter;
+import com.wireless.common.Common;
+import com.wireless.protocol.Food;
 import com.wireless.protocol.Taste;
 
 public class SpecsActivity extends Activity {
@@ -22,15 +27,22 @@ public class SpecsActivity extends Activity {
 	private ImageView numback;
 	List<Taste> speces;
 	private EditText search;
+	private TextView foodtaste;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.specs);
+		Log.e("", "oncreate");
 		appcontext = (AppContext) getApplication();
 		myListview=(ListView)findViewById(R.id.myListView);
-		adapter=new SpecAdapter(SpecsActivity.this,appcontext.getSpecs());
+		foodtaste=(TextView)findViewById(R.id.foodtaste);
+	    Common.getCommon().init(Common.getCommon().getFoodlist().get(Common.getCommon().getPosition()), foodtaste);
+		adapter=new SpecAdapter(SpecsActivity.this,appcontext.getSpecs(),foodtaste);
 		myListview.setAdapter(adapter);
+		
+		
+		
 		
 		speces=new ArrayList<Taste>();
 		search=(EditText)findViewById(R.id.search);
@@ -42,12 +54,48 @@ public class SpecsActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				finish();
+				Intent intent=new Intent(SpecsActivity.this,orderActivity.class);
+				startActivity(intent);
 			}
 		});
+		
+		
 	}
-     
 	
+	
+	
+	
+	@Override
+	protected void onResume() {
+		Log.e("", "onResume");
+		Common.getCommon().init(Common.getCommon().getFoodlist().get(Common.getCommon().getPosition()), foodtaste);
+		super.onResume();
+	}
+
+
+
+
+	@Override
+	protected void onStop() {
+		// TODO Auto-generated method stub
+		Log.e("", "onStop");
+		Common.getCommon().init(Common.getCommon().getFoodlist().get(Common.getCommon().getPosition()), foodtaste);
+		super.onStop();
+	}
+
+
+
+
+	@Override
+	public  void onRestart() {
+		// TODO Auto-generated method stub
+		Log.e("", "restart");
+	    Common.getCommon().init(Common.getCommon().getFoodlist().get(Common.getCommon().getPosition()), foodtaste);
+		super.onStart();
+	}
+	
+	
+   
 	//  ‰»ÎøÚ µ ±º‡Ã˝
 	private TextWatcher watcher = new TextWatcher() {
 
@@ -64,12 +112,14 @@ public class SpecsActivity extends Activity {
 
 		}
 
+	
+		
 		@Override
 		public void onTextChanged(CharSequence s, int start, int before,
 				int count) {
 
 			if (s.toString() == null || s.toString().equals("")) {
-				adapter = new SpecAdapter(SpecsActivity.this,appcontext.getSpecs());
+				adapter = new SpecAdapter(SpecsActivity.this,appcontext.getSpecs(),foodtaste);
 				myListview.setAdapter(adapter);
 			} else {
 				speces.clear();
@@ -79,7 +129,7 @@ public class SpecsActivity extends Activity {
 					}
 				}
 				
-				adapter = new SpecAdapter(SpecsActivity.this, speces);
+				adapter = new SpecAdapter(SpecsActivity.this, speces,foodtaste);
 				myListview.setAdapter(adapter);
 
 			}

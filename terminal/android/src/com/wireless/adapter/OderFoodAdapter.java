@@ -3,6 +3,7 @@ package com.wireless.adapter;
 import java.util.List;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,15 +12,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.wireless.protocol.Food;
-import com.wireless.protocol.Util;
 import com.wireless.ui.R;
+import com.wireless.ui.orderActivity;
 
 public class OderFoodAdapter extends BaseAdapter {
 	private LayoutInflater minflater;
 	private List<Food> foods;
+	private orderActivity orer;
+
 	public OderFoodAdapter(Context context,List<Food> foods){
 		minflater=LayoutInflater.from(context);
 		this.foods=foods;
+		orer=(orderActivity)context;
 	}
 	
 	@Override
@@ -41,7 +45,7 @@ public class OderFoodAdapter extends BaseAdapter {
 	}
 
 	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
+	public View getView(final int position, View convertView, ViewGroup parent) {
 		Holder holder;
 		if(convertView==null){
 			 convertView=minflater.inflate(R.layout.oderfooditem, null);
@@ -59,13 +63,36 @@ public class OderFoodAdapter extends BaseAdapter {
 		}
 		
 		String taste="";
-		holder.foodname.setText(foods.get(position).name);
+	    if(foods.get(position).hangStatus==Food.FOOD_HANG_UP){
+	    	holder.foodname.setText("(╫п)"+foods.get(position).name);
+	    }else if(foods.get(position).hangStatus==Food.FOOD_NORMAL){
+	    	holder.foodname.setText(foods.get(position).name);
+	    }
+		
 		holder.count.setText(Float.toString(foods.get(position).getCount()));
-		holder.price.setText(Float.toString(foods.get(position).getPrice()*foods.get(position).getCount()));
-//		for(int i=0;i<foods.get(position).tastes.length;i++){
-//			taste+=foods.get(position).tastes[i];
-//		}
-//		holder.taste.setText(taste);
+		holder.price.setText(Float.toString(foods.get(position).totalPrice2()));
+        if(foods.get(position).tastePref.equals("нч©зн╤")){
+        	holder.taste.setText("");
+        }else{
+		holder.taste.setText(foods.get(position).tastePref);
+        }   
+		
+		 holder.deletefood.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				orer.Foodfunction(0,position);
+			}
+		});
+		 holder.addtaste.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					orer.Foodfunction(1,position);
+					
+				}
+			});
 		return convertView;
 	}
 	
