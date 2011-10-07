@@ -11,7 +11,6 @@
     android:layout_height="wrap_content"
     android:textColor="#000000"
     android:textSize="20sp"
-    android:layout_centerVertical="true"
     android:layout_marginLeft="5dip"
     />
     
@@ -20,9 +19,17 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:textColor="#000000"
-    android:textSize="20sp"
+    android:textSize="15sp"
+    android:layout_below="@id/foodname"
+    android:layout_marginLeft="5dip"
+    />
+    
+    <CheckBox 
+    android:id="@+id/chioce"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:layout_centerVertical="true"
     android:layout_alignParentRight="true"
-    android:layout_marginRight="5dip"
+    android:layout_marginRight="3dip"
     />
 </RelativeLayout>
