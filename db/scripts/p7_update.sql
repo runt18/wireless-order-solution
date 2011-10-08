@@ -8,7 +8,7 @@ ALTER TABLE `wireless_order_db`.`order_food` ADD COLUMN `hang_status` TINYINT NO
 -- -----------------------------------------------------
 -- Add the field "super_kitchen" to table "kitchen"
 -- -----------------------------------------------------
-ALTER TABLE `wireless_order_db`.`kitchen` ADD COLUMN `super_kitchen` TINYINT UNSIGNED NOT NULL DEFAULT 255 COMMENT 'the super to this kitchen. 255 means NOT belong to any super kitchen.'  AFTER `alias_id` ;
+ALTER TABLE `wireless_order_db`.`kitchen` ADD COLUMN `super_kitchen` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the super kitchen that this kitchen belong to.'  AFTER `alias_id` ;
 
 -- -----------------------------------------------------
 -- Add the field "region" to table "table"

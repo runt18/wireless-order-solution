@@ -231,7 +231,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`kitchen` (
   `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this kitchen' ,
   `restaurant_id` INT UNSIGNED NOT NULL ,
   `alias_id` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the alias id to this kitchen' ,
-  `super_kitchen` TINYINT UNSIGNED NOT NULL DEFAULT 255 COMMENT 'the super to this kitchen. 255 means NOT belong to any super kitchen.' ,
+  `super_kitchen` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the super kitchen that this kitchen belong to. ' ,
   `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name of this kitchen' ,
   `discount` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the discount to the food belong to this kitchen, range from 0.00 to 1.00' ,
   `discount_2` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the 2nd discount to the food belong to this kitchen, range from 0.00 to 1.00' ,
@@ -735,6 +735,7 @@ CREATE  OR REPLACE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY D
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
 
 
 
