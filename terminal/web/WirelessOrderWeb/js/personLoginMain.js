@@ -101,7 +101,7 @@ var shiftWin = new Ext.Window(
 								url : "../PrintOrder.do",
 								params : {
 									"pin" : currPin,
-									"printTmpReceipt" : 1
+									"printTmpShift" : 1
 								},
 								success : function(response, options) {
 									var resultJSON = Ext.util.JSON
