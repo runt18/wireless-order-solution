@@ -80,12 +80,13 @@ static UINT indicators[] =
 CMainFrame::CMainFrame() : m_pStatusView(NULL), m_pPrinterView(NULL), m_UpdateWaitTime(10), m_TimerID(0)
 {
 	// TODO: add member initialization code here
-	//initialize the kitchens, "厨房1" to "厨房10" and "所有厨房"
+	//initialize the kitchens, "厨房1" to "厨房10", "临时菜" and "所有厨房"
 	for(int i = 0; i < 10; i++){
 		CString kit;
 		kit.Format(_T("厨房%d"), i + 1);
 		g_Kitchens.push_back(kit);
 	}
+	g_Kitchens.push_back(_T("临时"));
 	g_Kitchens.push_back(_T("所有厨房"));
 }
 
@@ -399,6 +400,7 @@ void CMainFrame::OnRetrieveKitchen(const std::vector<Kitchen>& kitchens){
 		MultiByteToWideChar (CP_ACP, 0, kitchens[i].name.c_str(), -1, pMsg.get(), dwNum);
 		g_Kitchens.push_back(pMsg.get());
 	}
+	g_Kitchens.push_back(_T("临时菜"));
 	g_Kitchens.push_back(_T("所有厨房"));
 	m_pPrinterView->Update();
 }

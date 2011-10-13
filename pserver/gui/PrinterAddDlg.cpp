@@ -147,6 +147,8 @@ void CAddPrinterDlg::OnOK(){
 					int kitchen2Add = m_PrintKitchen.GetCurSel();
 					if(kitchen2Add == g_Kitchens.size() - 1){
 						kitchen2Add = Kitchen::KITCHEN_FULL;
+					}else if(kitchen2Add == g_Kitchens.size() - 2){
+						kitchen2Add = Kitchen::KITCHEN_TEMP;
 					}
 
 					//check to see whether the kitchen is the same
@@ -207,6 +209,8 @@ void CAddPrinterDlg::OnOK(){
 				int kitchen = m_PrintKitchen.GetCurSel();
 				if(kitchen == g_Kitchens.size() - 1){
 					kitchen = Kitchen::KITCHEN_FULL;
+				}else if(kitchen == g_Kitchens.size() - 2){
+					kitchen = Kitchen::KITCHEN_TEMP;
 				}
 				sprintf_s(tmp, sizeof(tmp), "%d", kitchen);
 				//set the kitchen for printing order detail

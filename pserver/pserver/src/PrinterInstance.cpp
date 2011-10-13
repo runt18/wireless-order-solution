@@ -350,7 +350,7 @@ void PrinterInstance::split2Details(const string& print_content, const vector<in
 		while(offset < size){
 
 			int length = (print_content[offset + 1] & 0x000000FF) | ((print_content[offset + 2] & 0x000000FF) << 8);
-			int kit2Print = print_content[offset];
+			int kit2Print = (unsigned char)print_content[offset];
 
 			if(kit2Print != Kitchen::KITCHEN_NULL){
 				//enumerate to see which kitchens match the print content,

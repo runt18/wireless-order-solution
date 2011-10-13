@@ -119,12 +119,16 @@ void CPrinterListCtrl::Update(TiXmlDocument& conf){
 					if(ret == TIXML_NO_ATTRIBUTE){
 						SetItemText(row, COLUMN_FUNC_CODE, _FuncDesc[func]);
 
-					}else if(kitchen > (int)g_Kitchens.size() - 1 && kitchen != Kitchen::KITCHEN_FULL && kitchen != Kitchen::KITCHEN_NULL){
+					}else if(kitchen > (int)g_Kitchens.size() - 1 && 
+						kitchen != Kitchen::KITCHEN_FULL && kitchen != Kitchen::KITCHEN_NULL && kitchen != Kitchen::KITCHEN_TEMP){
+
 						SetItemText(row, COLUMN_FUNC_CODE, _FuncDesc[func]);
 
 					}else{
 						if(kitchen == Kitchen::KITCHEN_FULL){
 							kitchen = g_Kitchens.size() - 1;
+						}else if(kitchen == Kitchen::KITCHEN_TEMP){
+							kitchen = g_Kitchens.size() - 2;
 						}
 						CString tmp;
 						tmp.Format(_T("%s - %s"), _FuncDesc[func], g_Kitchens[kitchen]);
