@@ -33,20 +33,47 @@ import com.wireless.ui.field.TopBannerField;
 
 public class ChangeOrderScreen extends MainScreen implements PostSubmitOrder{
 	
-	private OrderListField _originalListField;
+	private OrderListField _oriListField;
 	private OrderListField _newListField;
 	private LabelField _tableTitle = null;
 	private EditField _table = null;
-	private EditField _customNum;
+	private EditField _customNum = null;
+	private LabelField _totalPrice = null;
 	private final Order _originalOrder;
 	private ChangeOrderScreen _self = this;
+	
+	private LabelField _oriListTitle = new LabelField("已点菜", LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
+		protected void paintBackground(Graphics g) {
+			g.clear();
+			g.setBackgroundColor(Color.PURPLE);
+			super.paintBackground(g);
+		} 
+		protected void paint(Graphics g){
+			g.clear();
+			g.setColor(Color.WHITE);		
+			super.paint(g);  
+		}
+	};
+	
+	private LabelField _newListTitle = new LabelField("新点菜", LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
+		protected void paintBackground(Graphics g) {
+			g.clear();
+			g.setBackgroundColor(Color.GREEN);
+			super.paintBackground(g);
+		} 
+		protected void paint(Graphics g){
+			g.clear();
+			g.setColor(Color.WHITE);		
+			super.paint(g);  
+		}
+	};
 	
 	// Constructor
 	public ChangeOrderScreen(Order bill){
 		_originalOrder = bill;
 		
 		setBanner(new TopBannerField("改单"));
-		//setTitle("改单");
+
 		//The food has ordered would be listed in here.
 		VerticalFieldManager vfm = new VerticalFieldManager();
 		vfm.add(new SeparatorField());
@@ -92,42 +119,57 @@ public class ChangeOrderScreen extends MainScreen implements PostSubmitOrder{
 
 		vfm.add(_customNum);
 		vfm.add(new SeparatorField());
-		vfm.add(new LabelField("已点菜", LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
-			protected void paintBackground(Graphics g) {
-				g.clear();
-				g.setBackgroundColor(Color.PURPLE);
-				super.paintBackground(g);
-			} 
-			protected void paint(Graphics g){
-				g.clear();
-				g.setColor(Color.WHITE);		
-				super.paint(g);  
-			}
-		});
+		if(_originalOrder.foods.length != 0){
+			_oriListTitle.setText("已点菜" + "(" + _originalOrder.foods.length + ")");
+		}
+		vfm.add(_oriListTitle);
 		
-		_originalListField = new OrderListField(_originalOrder.foods, Type.UPDATE_ORDER);		
-		vfm.add(_originalListField);
+		_oriListField = new OrderListField(_originalOrder.foods, Type.UPDATE_ORDER);	
+		_oriListField.setChangeListener(new FieldChangeListener() {
+			
+			public void fieldChanged(Field field, int context) {
+				/**
+				 * Change the amount of ordered food and the total price as any changes to the food
+				 */
+				if(_oriListField.getSize() != 0){
+					_oriListTitle.setText("已点菜" + "(" + _oriListField.getSize() + ")");
+				}else{				
+					_oriListTitle.setText("已点菜");
+				}
+				int total = Util.float2Int(_oriListField.calcPrice()) + Util.float2Int(_newListField.calcPrice());
+				_totalPrice.setText("小计：" + Util.CURRENCY_SIGN + Util.float2String(Util.int2Float(total)));
+			}
+		});	
+		vfm.add(_oriListField);
 		
 		vfm.add(new SeparatorField());
-		vfm.add(new LabelField("新点菜", LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
-			protected void paintBackground(Graphics g) {
-				g.clear();
-				g.setBackgroundColor(Color.GREEN);
-				super.paintBackground(g);
-			} 
-			protected void paint(Graphics g){
-				g.clear();
-				g.setColor(Color.WHITE);		
-				super.paint(g);  
-			}
-		});
+		vfm.add(_newListTitle);
 		
 		_newListField = new OrderListField();
+		_newListField.setChangeListener(new FieldChangeListener() {
+			
+			public void fieldChanged(Field field, int context) {
+				/**
+				 * Change amount of new ordered food and the total price as any changes to the food
+				 */
+				if(_newListField.getSize() != 0){
+					_newListTitle.setText("新点菜" + "(" + _newListField.getSize() + ")");
+				}else{				
+					_newListTitle.setText("新点菜");
+				}
+				int total = Util.float2Int(_oriListField.calcPrice()) + Util.float2Int(_newListField.calcPrice());
+				_totalPrice.setText("小计：" + Util.CURRENCY_SIGN + Util.float2String(Util.int2Float(total)));
+			}
+		});
 		vfm.add(_newListField);
 		
 		vfm.add(new SeparatorField());
-		
 		add(vfm);
+		
+		_totalPrice = new LabelField("小计：" + Util.CURRENCY_SIGN + Util.float2String(_oriListField.calcPrice()), 
+									LabelField.USE_ALL_WIDTH | DrawStyle.RIGHT);
+		add(_totalPrice);
+		add(new SeparatorField());		
 		
 		//Three buttons would be shown in the bottom of the screen
 		ButtonField byNoBtn = new ButtonField("编号", ButtonField.CONSUME_CLICK);
@@ -158,7 +200,7 @@ public class ChangeOrderScreen extends MainScreen implements PostSubmitOrder{
 		//Set the submit button's listener
 		submit.setChangeListener(new FieldChangeListener(){
 			public void fieldChanged(Field field, int context) {
-				if(_originalListField.getSize() == 0 && _newListField.getSize() == 0){
+				if(_oriListField.getSize() == 0 && _newListField.getSize() == 0){
 					Dialog.alert("点菜单为空，暂时不能改单。");
 				}else{
 					
@@ -167,8 +209,8 @@ public class ChangeOrderScreen extends MainScreen implements PostSubmitOrder{
 					/**
 					 * Combine the foods of original and new list fields. 
 					 */
-					for(int i = 0; i < _originalListField.getSize(); i++){
-						Food originalFood = (Food)_originalListField.getCallback().get(null, i);
+					for(int i = 0; i < _oriListField.getSize(); i++){
+						Food originalFood = (Food)_oriListField.getCallback().get(null, i);
 						for(int j = 0; j < _newListField.getSize(); j++){
 							Food newFood = (Food)_newListField.getCallback().get(null, j);
 							if(originalFood.equals(newFood)){

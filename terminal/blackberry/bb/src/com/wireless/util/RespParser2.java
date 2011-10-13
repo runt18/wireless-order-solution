@@ -19,45 +19,46 @@ public class RespParser2{
 		Order order = RespParser.parseQueryOrder(response);		
 
 		for(int i = 0; i < order.foods.length; i++){
-			//get the food name and price
-			for(int j = 0; j < WirelessOrder.foodMenu.foods.length; j++){
-				if(order.foods[i].alias_id == WirelessOrder.foodMenu.foods[j].alias_id){
-					order.foods[i].name = WirelessOrder.foodMenu.foods[j].name;
-					order.foods[i].setPrice(WirelessOrder.foodMenu.foods[j].getPrice());
-					order.foods[i].kitchen = WirelessOrder.foodMenu.foods[j].kitchen;
-					break;
-				}			
-			}	
-			
-			for(int j = 0; j < order.foods[i].tastes.length; j++){
+			if(!order.foods[i].isTemporary){
+				//get the food name, unit price and attached kitchen
+				for(int j = 0; j < WirelessOrder.foodMenu.foods.length; j++){
+					if(order.foods[i].alias_id == WirelessOrder.foodMenu.foods[j].alias_id){
+						order.foods[i].name = WirelessOrder.foodMenu.foods[j].name;
+						order.foods[i].setPrice(WirelessOrder.foodMenu.foods[j].getPrice());
+						order.foods[i].kitchen = WirelessOrder.foodMenu.foods[j].kitchen;
+						break;
+					}			
+				}	
+				
+				for(int j = 0; j < order.foods[i].tastes.length; j++){
 
-				//search and get the taste match the alias id
-				Taste taste = srchTaste(order.foods[i].tastes[j].alias_id, WirelessOrder.foodMenu.tastes);
-				if(taste != null){
-					order.foods[i].tastes[j] = taste;
-					continue;
+					//search and get the taste match the alias id
+					Taste taste = srchTaste(order.foods[i].tastes[j].alias_id, WirelessOrder.foodMenu.tastes);
+					if(taste != null){
+						order.foods[i].tastes[j] = taste;
+						continue;
+					}
+					
+					//search and get the style match the alias id
+					Taste style = srchTaste(order.foods[i].tastes[j].alias_id, WirelessOrder.foodMenu.styles);
+					if(style != null){
+						order.foods[i].tastes[j] = style;
+						continue;
+					}
+					
+					//search and get the specification match the alias id
+					Taste spec = srchTaste(order.foods[i].tastes[j].alias_id, WirelessOrder.foodMenu.specs);
+					if(spec != null){
+						order.foods[i].tastes[j] = spec;
+						continue;
+					}
 				}
 				
-				//search and get the style match the alias id
-				Taste style = srchTaste(order.foods[i].tastes[j].alias_id, WirelessOrder.foodMenu.styles);
-				if(style != null){
-					order.foods[i].tastes[j] = style;
-					continue;
-				}
-				
-				//search and get the specification match the alias id
-				Taste spec = srchTaste(order.foods[i].tastes[j].alias_id, WirelessOrder.foodMenu.specs);
-				if(spec != null){
-					order.foods[i].tastes[j] = spec;
-					continue;
-				}
-			}
-			
-			//set the taste preference to this food
-			order.foods[i].tastePref = Util.genTastePref(order.foods[i].tastes);
-			//set the taste total price to this food
-			order.foods[i].setTastePrice(Util.genTastePrice(order.foods[i].tastes, order.foods[i].getPrice()));
-			
+				//set the taste preference to this food
+				order.foods[i].tastePref = Util.genTastePref(order.foods[i].tastes);
+				//set the taste total price to this food
+				order.foods[i].setTastePrice(Util.genTastePrice(order.foods[i].tastes, order.foods[i].getPrice()));
+			}			
 		}		
 
 		return order;

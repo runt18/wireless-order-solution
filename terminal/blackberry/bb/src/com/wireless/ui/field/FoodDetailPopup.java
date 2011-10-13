@@ -36,6 +36,9 @@ public class FoodDetailPopup extends PopupScreen {
 		if(selectedFood.isHurried){
 			status = (status == null ? "催" : (status + "," + "催"));
 		}
+		if(selectedFood.isTemporary){
+			status = (status == null ? "临" : ("临" + "," + status));
+		}
 		if(status != null){
 			add(new LabelField("状态：" + status));
 		}

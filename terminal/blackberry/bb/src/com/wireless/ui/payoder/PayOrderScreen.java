@@ -32,6 +32,19 @@ public class PayOrderScreen extends MainScreen
 	private Order _bill = null;
 	private PayOrderScreen _self = this;
 	
+	private LabelField _listTitle = new LabelField("已点菜", LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
+		protected void paintBackground(Graphics g) {
+			g.clear();
+			g.setBackgroundColor(Color.PURPLE);
+			super.paintBackground(g);
+		} 
+		protected void paint(Graphics g){
+			g.clear();
+			g.setColor(Color.WHITE);		
+			super.paint(g);  
+		}
+	}; 
+	
 	// Constructor
 	public PayOrderScreen(Order bill){
 		_bill = bill;
@@ -75,18 +88,10 @@ public class PayOrderScreen extends MainScreen
 		vfm.add(hfm);
 		
 		vfm.add(new SeparatorField());
-		vfm.add(new LabelField("已点菜", LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
-			protected void paintBackground(Graphics g) {
-				g.clear();
-				g.setBackgroundColor(Color.PURPLE);
-				super.paintBackground(g);
-			} 
-			protected void paint(Graphics g){
-				g.clear();
-				g.setColor(Color.WHITE);		
-				super.paint(g);  
-			}
-		});
+		if(bill.foods.length != 0){
+			_listTitle.setText("已点菜" + "(" + bill.foods.length + ")");
+		}
+		vfm.add(_listTitle);
 		
 		_orderListField = new OrderListField(_bill.foods, Field.READONLY, Type.PAY_ORDER);
 		
@@ -94,11 +99,11 @@ public class PayOrderScreen extends MainScreen
 		vfm.add(new SeparatorField());
 		add(vfm);
 
-		Float giftMoney = _bill.totalPrice3();
+		Float giftMoney = _bill.calcGiftPrice();
 		if(Util.float2Int(giftMoney) != 0){
 			add(new LabelField("赠送：" + Util.CURRENCY_SIGN + Util.float2String(giftMoney), LabelField.USE_ALL_WIDTH | DrawStyle.RIGHT));
 		}		
-		add(new LabelField("应收：" + Util.CURRENCY_SIGN + Util.float2String(_bill.totalPrice2()), LabelField.USE_ALL_WIDTH | DrawStyle.RIGHT));
+		add(new LabelField("应收：" + Util.CURRENCY_SIGN + Util.float2String(_bill.calcPrice2()), LabelField.USE_ALL_WIDTH | DrawStyle.RIGHT));
 		
 //		HorizontalFieldManager hfm2 = new HorizontalFieldManager(Field.FIELD_RIGHT);
 //		_cashIncome = new EditField("实收：￥", 
@@ -158,7 +163,7 @@ public class PayOrderScreen extends MainScreen
 	
 	private void payOrder(int payType, int distType){
 		try{
-			int totalPrice = Util.float2Int(_bill.totalPrice2());
+			int totalPrice = Util.float2Int(_bill.calcPrice2());
 			int minimumCost = Util.float2Int(_bill.getMinimumCost());
 			//check to see whether the total price reach the minimum cost
 			if(totalPrice < minimumCost){
