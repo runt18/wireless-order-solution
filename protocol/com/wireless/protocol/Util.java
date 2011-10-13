@@ -178,4 +178,12 @@ public class Util {
 		}
 		return tastePrice;
 	}
+	
+	/**
+	 * Generate the alias id to temporary food.
+	 * @return the alias id to temporary food
+	 */
+	public static int genTempFoodID(){
+		return (int)(System.currentTimeMillis() % 65535);
+	}
 }

@@ -62,11 +62,13 @@ public class ReqParser {
 	 * is_hurried - indicates whether the food is hurried
 	 *
 	 * <TmpFood>
-	 * is_temp(1) : food_id[2] : order_amount[2] : unit_price[3] : len : food_name[len] 
+	 * is_temp(1) : food_id[2] : order_amount[2] : unit_price[3] : hang_status : is_hurried : len : food_name[len] 
 	 * is_temp(1) - "1" means this food is temporary
 	 * food_id[2] - 2-byte indicating the food's id
 	 * order_amount[2] - 2-byte indicating how many this foods are ordered
 	 * unit_price[3] - 3-byte indicating the unit price to this food
+	 * hang_status - the hang status to the food
+	 * is_hurried - indicates whether the food is hurried
 	 * len - the length of food's name
 	 * food_name[len] - the value of the food name
 	 * 
@@ -103,7 +105,7 @@ public class ReqParser {
 			
 			if(isTemporary){
 				/**
-				 * is_temp(1) : food_id[2] : order_amount[2] : unit_price[3] : len : food_name[len] 
+				 * is_temp(1) : food_id[2] : order_amount[2] : unit_price[3] : hang_status : is_hurried : len : food_name[len] 
 				 */
 				//get the food id
 				int foodID = (req.body[offset + 1] & 0x000000FF) | 
@@ -118,23 +120,32 @@ public class ReqParser {
 								((req.body[offset + 6] & 0x000000FF) << 8) |
 								((req.body[offset + 7] & 0x000000FF) << 16);
 				
+				//get the hang status
+				short hangStatus = req.body[offset + 8];
+				
+				//get the hurried flag
+				boolean isHurried = req.body[offset + 9] == 1 ? true : false;
+				
 				//get the amount of food name bytes
-				int len = req.body[offset + 8];
+				int len = req.body[offset + 10];
 				
 				//get the food name
 				String name = null;
 				try{
-					name = new String(req.body, offset + 9, len, "UTF-8");
+					name = new String(req.body, offset + 11, len, "UTF-8");
 				}catch(UnsupportedEncodingException e){}
 				
 				orderFoods[i] = new Food();
-				orderFoods[i].isTemp = true;
+				orderFoods[i].isTemporary = true;
+				orderFoods[i].kitchen = Kitchen.KITCHEN_TEMP;
 				orderFoods[i].alias_id = foodID;
+				orderFoods[i].hangStatus = hangStatus;
+				orderFoods[i].isHurried = isHurried;
 				orderFoods[i].count = orderNum;
 				orderFoods[i].setPrice(Util.int2Float(unitPrice));
 				orderFoods[i].name = name != null ? name : "";
 				
-				offset = 1 + 2 + 2 + 3 + 1 + len;
+				offset += 1 + 2 + 2 + 3 + 1 + 1 + 1 + len;
 				
 			}else{
 				/**
@@ -171,21 +182,7 @@ public class ReqParser {
 				orderFoods[i].alias_id = foodID;
 				orderFoods[i].count = orderNum;
 				
-//				for(int cnt = 0; cnt < tasteID.length; cnt++){
-//					if(tasteID[cnt] == Taste.NO_TASTE){
-//						tasteID[cnt] = Integer.MAX_VALUE;
-//					}
-//				}
-//				
-//				Arrays.sort(tasteID);
-//				
-//				for(int cnt = 0; cnt < tasteID.length; cnt++){
-//					if(tasteID[cnt] == Integer.MAX_VALUE){
-//						tasteID[cnt] = Taste.NO_TASTE;
-//					}
-//				}
-				
-				orderFoods[i].isTemp = false;
+				orderFoods[i].isTemporary = false;
 				
 				orderFoods[i].tastes[0].alias_id = tasteID[0];
 				orderFoods[i].tastes[1].alias_id = tasteID[1];
@@ -209,8 +206,8 @@ public class ReqParser {
 		order.foods = orderFoods;
 		
 		//assign the original table id
-		order.originalTableID = (short)((req.body[offset] & 0x00FF) | 
-									((req.body[offset + 1] & 0x00FF) << 8));
+		order.originalTableID = ((req.body[offset] & 0x000000FF) | 
+									((req.body[offset + 1] & 0x000000FF) << 8));
 		return order;
 	}
 	/******************************************************

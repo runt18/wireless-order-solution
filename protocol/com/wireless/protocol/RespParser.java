@@ -27,27 +27,49 @@ public class RespParser {
 		 * pin[6] : same as request
 		 * len[2] -  length of the <Body>
 		 * <Body>
-		 * table[2] : table_2[2] : minimum_cost[4] : category : custom_num : price[4] : food_num : <Food1> : <Food2>...
-		 * table[2] - 2-byte indicates the table id
+		 * table[2] : table_2[2] : minimum_cost[4] : category : 
+		 * custom_num : price[4] : food_num : 
+		 * <Food1> : <Food2>...
+		 * <TmpFood1> : <TmpFood2>...
+		 * 
+		 * table[2] - 2-byte indicates the table id 
+		 * 
 		 * table_2[2] - 2-byte indicates the 2nd table id, only used table merger
+		 * 
 		 * minimum_cost[4] - 4-byte indicates the minimum cost to this order
-		 * category - 1-byte indicates the category to this order 
+		 * 
+		 * category - 1-byte indicates the category to this order
+		 * 
 		 * custom_num - 1-byte indicating the number of the custom for this order
+		 * 
 		 * price[4] - 4-byte indicating the total price to this order
 		 * 			  price[0] - 1-byte indicating the float-point
 		 * 			  price[1..3] - 3-byte indicating the fixed-point
+		 * 
 		 * food_num - 1-byte indicating the number of ordered food
+		 * 
 		 * <Food>
-		 * food_id[2] : order_num[2] : status : taste_id[2] : taste_id2[2] : taste_id3[2] : hang_status
+		 * is_temp(0) : food_id[2] : order_amount[2] : status : taste_id[2] : taste_id2[2] : taste_id3[2] : hang_status
+		 * is_temp : "0" means this food is NOT temporary
 		 * food_id[2] - 2-byte indicating the food's id
-		 * order_num[2] - 2-byte indicating how many this foods are ordered
+		 * order_amount[2] - 2-byte indicating how many this foods are ordered
 		 * 			   order_num[0] - 1-byte indicates the float-point
 		 * 			   order_num[1] - 1-byte indicates the fixed-point
-		 * status - the status to this food 
+		 * status - the status to this food
 		 * taste_id[2] - 2-byte indicates the 1st taste preference id
 		 * taste_id2[2] - 2-byte indicates the 2nd taste preference id
-		 * taste_id3[3] - 2-byte indicates the 3rd taste preference id
+		 * taste_id3[2] - 2-byte indicates the 3rd taste preference id
 		 * hang_status - indicates the hang status to the food
+		 * 
+		 * <TmpFood>
+		 * is_temp(1) : food_id[2] : order_amount[2] : unit_price[3] : hang_status : len : food_name[len] 
+		 * is_temp(1) - "1" means this food is temporary
+		 * food_id[2] - 2-byte indicating the food's id
+		 * order_amount[2] - 2-byte indicating how many this foods are ordered
+		 * unit_price[3] - 3-byte indicating the unit price to this food
+		 * hang_status - indicates the hang status to the food
+		 * len - the length of food's name
+		 * food_name[len] - the value of the food name
 		 *******************************************************/
 		if(response.header.type == Type.ACK){
 			//get the table id
@@ -79,40 +101,86 @@ public class RespParser {
 			Food[] orderFoods = new Food[foodNum]; 
 			
 			//get every order food's id and number
-			int index = 15;
+			int offset = 15;
 			for(int i = 0; i < orderFoods.length; i++){
-				//get the food alias id
-				int foodID = (response.body[index] & 0x000000FF) |
-							((response.body[index + 1] & 0x000000FF) << 8);
-				//get the order amount
-				int orderNum = (response.body[index + 2] & 0x000000FF) |
-								((response.body[index + 3] & 0x000000FF) << 8);
-				//get the food status
-				short status = response.body[index + 4];	
+				//get the temporary flag
+				boolean isTemporary = response.body[offset] == 1 ? true : false;
 				
-				//get each taste id
-				int[] tasteID = new int[3];
-				tasteID[0] = (response.body[index + 5] & 0x000000FF) | 
-								((response.body[index + 6] & 0x000000FF) << 8);
-				tasteID[1] = (response.body[index + 7] & 0x000000FF) | 
-								((response.body[index + 8] & 0x000000FF) << 8);
-				tasteID[2] = (response.body[index + 9] & 0x000000FF) | 
-								((response.body[index + 10] & 0x000000FF) << 8);
-				
-				short hangStatus = response.body[index + 11];
-				//each food information takes up 12-byte
-				index += 12;
-				orderFoods[i] = new Food();
-				orderFoods[i].alias_id = foodID;
-				orderFoods[i].count = orderNum;
-				orderFoods[i].status = status;
-				
-				//Arrays.sort(tasteID, 0, tasteID.length);
-				orderFoods[i].tastes[0].alias_id = tasteID[0];
-				orderFoods[i].tastes[1].alias_id = tasteID[1];
-				orderFoods[i].tastes[2].alias_id = tasteID[2];
-				
-				orderFoods[i].hangStatus = hangStatus;
+				if(isTemporary){
+					/**
+					 * is_temp(1) : food_id[2] : order_amount[2] : unit_price[3] : hang_status : len : food_name[len]
+					 */
+					//get the food alias id
+					int foodID = (response.body[offset + 1] & 0x000000FF) |
+								((response.body[offset + 2] & 0x000000FF) << 8);
+					//get the order amount
+					int orderAmount = (response.body[offset + 3] & 0x000000FF) |
+									((response.body[offset + 4] & 0x000000FF) << 8);
+					//get the unit price
+					int unitPrice = (response.body[offset + 5] & 0x000000FF) |
+									((response.body[offset + 6] & 0x000000FF) << 8) |
+									((response.body[offset + 7] & 0x000000FF) << 16);
+					//get the hang status
+					short hangStatus = response.body[offset + 8];
+					//get the amount of food name bytes
+					int len = response.body[offset + 9];
+					//get the food name
+					String name = null;
+					try{
+						name = new String(response.body, offset + 10, len, "UTF-8");
+					}catch(UnsupportedEncodingException e){}
+					
+					orderFoods[i] = new Food();
+					orderFoods[i].isTemporary = true;
+					orderFoods[i].alias_id = foodID;
+					orderFoods[i].hangStatus = hangStatus;
+					orderFoods[i].count = orderAmount;
+					orderFoods[i].setPrice(Util.int2Float(unitPrice));
+					orderFoods[i].name = (name != null ? name : "");
+					
+					offset += 1 + 2 + 2 + 3 + 1 + 1 + len;
+					
+				}else{
+					/**
+					 * is_temp(0) : food_id[2] : order_amount[2] : status : taste_id[2] : taste_id2[2] : taste_id3[2] : hang_status
+					 */
+					//get the food alias id
+					int foodID = (response.body[offset + 1] & 0x000000FF) |
+								((response.body[offset + 2] & 0x000000FF) << 8);
+					//get the order amount
+					int orderAmount = (response.body[offset + 3] & 0x000000FF) |
+									((response.body[offset + 4] & 0x000000FF) << 8);
+					//get the food status
+					short status = response.body[offset + 5];
+					
+					int[] tasteID = new int[3];
+					//get the 1st taste id
+					tasteID[0] = (response.body[offset + 6] & 0x000000FF) | 
+									((response.body[offset + 7] & 0x000000FF) << 8);
+					//get the 2nd taste id
+					tasteID[1] = (response.body[offset + 8] & 0x000000FF) | 
+									((response.body[offset + 9] & 0x000000FF) << 8);
+					//get the 3rd taste id
+					tasteID[2] = (response.body[offset + 10] & 0x000000FF) | 
+									((response.body[offset + 11] & 0x000000FF) << 8);
+					//get the hang status
+					short hangStatus = response.body[offset + 12];
+					
+					offset += 13;
+					
+					orderFoods[i] = new Food();
+					orderFoods[i].isTemporary = false;
+					orderFoods[i].alias_id = foodID;
+					orderFoods[i].count = orderAmount;
+					orderFoods[i].status = status;
+					
+					//Arrays.sort(tasteID, 0, tasteID.length);
+					orderFoods[i].tastes[0].alias_id = tasteID[0];
+					orderFoods[i].tastes[1].alias_id = tasteID[1];
+					orderFoods[i].tastes[2].alias_id = tasteID[2];
+					
+					orderFoods[i].hangStatus = hangStatus;
+				}
 			}
 			order.foods = orderFoods;
 		}

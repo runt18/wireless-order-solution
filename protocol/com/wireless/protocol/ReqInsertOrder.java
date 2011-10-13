@@ -14,7 +14,7 @@ import com.wireless.protocol.Reserved;
  * reserved - 0x00
  * pin[6] - auto calculated and filled in
  * len[2] - length of the <Order>
- * <Order>
+ * <Body>
  * print_type[2] : table[2] : table2[2] : category : custom_num : food_num : 
  * <Food1> : <Food2>... :
  * <TmpFood1> : <TmpFood2>... : 
@@ -40,11 +40,13 @@ import com.wireless.protocol.Reserved;
  * is_hurried - indicates whether the food is hurried
  * 
  * <TmpFood>
- * is_temp(1) : food_id[2] : order_amount[2] : unit_price[3] : len : food_name[len] 
+ * is_temp(1) : food_id[2] : order_amount[2] : unit_price[3] : hang_status : is_hurried : len : food_name[len] 
  * is_temp(1) - "1" means this food is temporary
  * food_id[2] - 2-byte indicating the food's id
  * order_amount[2] - 2-byte indicating how many this foods are ordered
  * unit_price[3] - 3-byte indicating the unit price to this food
+ * hang_status - the hang status to the food
+ * is_hurried - indicates whether the food is hurried
  * len - the length of food's name
  * food_name[len] - the value of the food name
  * 
@@ -97,9 +99,9 @@ public class ReqInsertOrder extends ReqPackage {
 		//calculate the amount of bytes that the food list needs
 		int foodLen = 0;
 		for(int i = 0; i < reqOrder.foods.length; i++){
-			if(reqOrder.foods[i].isTemp){
-				/* is_temp(1) : food_id[2] : order_amount[2] : unit_price[3] : len : food_name[len] */
-				foodLen += 1 + 2 + 2 + 3 + 1 + reqOrder.foods[i].name.getBytes("UTF-8").length;
+			if(reqOrder.foods[i].isTemporary){
+				/* is_temp(1) : food_id[2] : order_amount[2] : unit_price[3] : hang_status : is_hurried : len : food_name[len] */
+				foodLen += 1 + 2 + 2 + 3 + 1 + 1 + 1 + reqOrder.foods[i].name.getBytes("UTF-8").length;
 			}else{
 				/* is_temp(0) : food_id[2] : order_amount[2] : taste_id[2] : taste_id2[2] : taste_id3[2] : kitchen : hang_status : is_hurried */
 				foodLen += 14; 
@@ -144,12 +146,12 @@ public class ReqInsertOrder extends ReqPackage {
 		//assign each order food's id and count
 		int offset = 9;
 		for(int i = 0; i < reqOrder.foods.length; i++){
-			if(reqOrder.foods[i].isTemp){
+			if(reqOrder.foods[i].isTemporary){
 				byte[] nameBytes = reqOrder.foods[i].name.getBytes("UTF-8");
 				/**
-				 * is_temp(1) : food_id[2] : order_amount[2] : unit_price[3] : len : food_name[len]
+				 * is_temp(1) : food_id[2] : order_amount[2] : unit_price[3] : hang_status : is_hurried : len : food_name[len]
 				 */
-				//assign the temporary flat
+				//assign the temporary flag
 				body[offset] = 1;
 				//assign the food id
 				body[offset + 1] = (byte)(reqOrder.foods[i].alias_id & 0x000000FF);
@@ -161,14 +163,18 @@ public class ReqInsertOrder extends ReqPackage {
 				body[offset + 5] = (byte)(reqOrder.foods[i].price & 0x000000FF);
 				body[offset + 6] = (byte)((reqOrder.foods[i].price & 0x0000FF00) >> 8);
 				body[offset + 7] = (byte)((reqOrder.foods[i].price & 0x00FF0000) >> 16);
+				//assign the hang status
+				body[offset + 8] = (byte)reqOrder.foods[i].hangStatus;
+				//assign the hurried flag
+				body[offset + 9] = (byte)(reqOrder.foods[i].isHurried ? 1 : 0);
 				//assign the amount of food name's byte
-				body[offset + 8] = (byte)(nameBytes.length);
+				body[offset + 10] = (byte)(nameBytes.length);
 				//assign the value of food name
 				for(int cnt = 0; cnt < nameBytes.length; cnt++){
-					body[offset + 9 + cnt] = nameBytes[cnt];
+					body[offset + 11 + cnt] = nameBytes[cnt];
 				}
 				
-				offset += 1 + 2 + 2 + 3 + 1 + nameBytes.length;
+				offset += 1 + 2 + 2 + 3 + 1 + 1 + 1 + nameBytes.length;
 				
 			}else{
 				/**

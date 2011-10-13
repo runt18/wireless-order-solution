@@ -3,6 +3,8 @@ package com.wireless.protocol;
 public final class Kitchen {
 	
 	public final static short KITCHEN_NULL = 255;
+	public final static short KITCHEN_FULL = 254;
+	public final static short KITCHEN_TEMP = 253;
 	public final static short KITCHEN_1 = 0;
 	public final static short KITCHEN_2 = 1;
 	public final static short KITCHEN_3 = 2;
