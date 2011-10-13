@@ -183,9 +183,9 @@ public class UpdateOrder {
 		//query all the food's id ,order count and taste preference of this order
 		ArrayList<Food> originalRecords = new ArrayList<Food>();
 		String sql = "SELECT food_id, unit_price, name, food_status, discount, SUM(order_count) AS order_sum, " +
-					"taste, taste_price, taste_id, taste_id2, taste_id3, hang_status, kitchen FROM `" + 
+					"taste, taste_price, taste_id, taste_id2, taste_id3, hang_status, kitchen, is_temporary FROM `" + 
 					Params.dbName + "`.`order_food` WHERE order_id=" + orderToUpdate.id + 
-					" GROUP BY food_id, taste_id, taste_id2, taste_id3, hang_status HAVING order_sum > 0";
+					" GROUP BY food_id, taste_id, taste_id2, taste_id3, hang_status, is_temporary HAVING order_sum > 0";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
 			Food food = new Food();
@@ -202,6 +202,7 @@ public class UpdateOrder {
 			food.tastePref = dbCon.rs.getString("taste");
 			food.setTastePrice(dbCon.rs.getFloat("taste_price"));
 			food.hangStatus = dbCon.rs.getShort("hang_status");
+			food.isTemporary = dbCon.rs.getBoolean("is_temporary");
 			originalRecords.add(food);
 		}
 		dbCon.rs.close();
@@ -309,9 +310,10 @@ public class UpdateOrder {
 				giftAmount += extraFoods.get(i).getPrice2() * extraFoods.get(i).getCount();
 			}
 			
-			sql = "INSERT INTO `" + Params.dbName + 
-					"`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, `hang_status`, " +
-					"`discount`, `taste_id`, `taste_id2`, `taste_id3`, `taste_price`, `taste`, `kitchen`, `waiter`, `order_date`) VALUES (" +
+			sql = "INSERT INTO `" + Params.dbName + "`.`order_food` " +
+					"(`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, `hang_status`, " +
+					"`discount`, `taste_id`, `taste_id2`, `taste_id3`, `taste_price`, " +
+					"`taste`, `kitchen`, `waiter`, `order_date`, `is_temporary`) VALUES (" +
 					orderToUpdate.id + ", " + extraFoods.get(i).alias_id + ", " + 
 					extraFoods.get(i).getCount() + ", " + 
 					extraFoods.get(i).getPrice() + ", '" + 
@@ -325,7 +327,10 @@ public class UpdateOrder {
 					extraFoods.get(i).getTastePrice() + ", '" +
 					extraFoods.get(i).tastePref + "', " + 
 					extraFoods.get(i).kitchen + ", '" + 
-					term.owner + "', NOW()" + ")";
+					term.owner + "', " +
+					"NOW(), " + 
+					(extraFoods.get(i).isTemporary ? 1 : 0) + 
+					")";
 			dbCon.stmt.addBatch(sql);			
 		}
 		
@@ -337,9 +342,10 @@ public class UpdateOrder {
 				giftAmount -= canceledFoods.get(i).getPrice2() * canceledFoods.get(i).getCount();
 			}
 			
-			sql = "INSERT INTO `" + Params.dbName + 
-					"`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, `hang_status`, " +
-					"`discount`, `taste_id`, `taste_id2`, `taste_id3`, `taste_price`, `taste`, `kitchen`, `waiter`, `order_date`) VALUES (" +
+			sql = "INSERT INTO `" + Params.dbName + "`.`order_food` " +
+					"(`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, `hang_status`, " +
+					"`discount`, `taste_id`, `taste_id2`, `taste_id3`, `taste_price`, `taste`, `kitchen`, " +
+					"`waiter`, `order_date`, `is_temporary`) VALUES (" +
 					orderToUpdate.id + ", " + canceledFoods.get(i).alias_id + ", " + 
 					"-" + canceledFoods.get(i).getCount() + ", " + 
 					canceledFoods.get(i).getPrice() + ", '" + 
@@ -353,7 +359,10 @@ public class UpdateOrder {
 					canceledFoods.get(i).getTastePrice() + ", '" +
 					canceledFoods.get(i).tastePref + "', " + 
 					canceledFoods.get(i).kitchen + ", '" + 
-					term.owner + "', NOW()" + ")";
+					term.owner + "', " +
+					"NOW(), " + 
+					(canceledFoods.get(i).isTemporary ? 1 : 0) + 
+					")";
 			dbCon.stmt.addBatch(sql);			
 		}
 		
@@ -534,7 +543,9 @@ public class UpdateOrder {
 	 */
 	private static Food genFoodDetail(DBCon dbCon, Terminal term, Food foodBasic) throws BusinessException, SQLException{
 		/**
-		 * firstly, check to see whether the new food submitted by terminal exist in db or is disabled by user.
+		 * Firstly, check to see whether the submitted food is temporary.
+		 * If temporary, assign food basic's the name and price directly.
+		 * If not, check to see whether the submitted food sent by terminal exist in db.
 		 * If the food can NOT be found in db, means the menu in terminal has been expired,
 		 * and then sent back an error to tell the terminal to update the menu.
 		 * secondly, check to see whether the taste preference submitted by terminal exist in db or not.
@@ -542,43 +553,53 @@ public class UpdateOrder {
 		 * and then sent back an error to tell the terminal to update the menu.
 		 */
 		
-		//get the food name and its unit price
-		String sql = "SELECT name, status, unit_price, kitchen FROM " + Params.dbName + 
-				".food WHERE alias_id=" + foodBasic.alias_id + 
-				" AND restaurant_id=" + term.restaurant_id;
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		//check if the food to be inserted exist in db or not
 		Food food = new Food();
-		if(dbCon.rs.next()){
-			food.status = dbCon.rs.getShort("status");
-			food.name = dbCon.rs.getString("name");
-			food.setPrice(new Float(dbCon.rs.getFloat("unit_price")));
-
-			food.kitchen = dbCon.rs.getShort("kitchen");
-		}else{
-			throw new BusinessException("The food(alias_id=" + foodBasic.alias_id + ") to query does NOT exist.", ErrorCode.MENU_EXPIRED);
-		}
-		dbCon.rs.close();
 		
-		//get the each taste information to this food only if the food has taste preference
-		for(int j = 0; j < foodBasic.tastes.length; j++){
-			if(foodBasic.tastes[j].alias_id != Taste.NO_TASTE){
-				sql = "SELECT preference, price, category, rate, calc FROM " + Params.dbName + ".taste WHERE restaurant_id=" + term.restaurant_id +
-					" AND alias_id=" + foodBasic.tastes[j].alias_id;
-				dbCon.rs = dbCon.stmt.executeQuery(sql);
-				//check if the taste preference exist in db
-				if(dbCon.rs.next()){
-					food.tastes[j].alias_id = foodBasic.tastes[j].alias_id;
-					food.tastes[j].preference = dbCon.rs.getString("preference");
-					food.tastes[j].category = dbCon.rs.getShort("category");
-					food.tastes[j].calc = dbCon.rs.getShort("calc");
-					food.tastes[j].setRate(dbCon.rs.getFloat("rate"));
-					food.tastes[j].setPrice(dbCon.rs.getFloat("price"));
-				}else{
-					throw new BusinessException("The taste(alias_id=" + foodBasic.tastes[j].alias_id + ") to query does NOT exist.", ErrorCode.MENU_EXPIRED);
+		if(foodBasic.isTemporary){
+			food.name = foodBasic.name;
+			food.setPrice(foodBasic.getPrice());
+			food.kitchen = foodBasic.kitchen;
+			//food.setCount(foodBasic.getCount());
+			
+		}else{
+			//get the food name and its unit price
+			String sql = "SELECT name, status, unit_price, kitchen FROM " + Params.dbName + 
+					".food WHERE alias_id=" + foodBasic.alias_id + 
+					" AND restaurant_id=" + term.restaurant_id;
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			//check if the food to be inserted exist in db or not
+
+			if(dbCon.rs.next()){
+				food.status = dbCon.rs.getShort("status");
+				food.name = dbCon.rs.getString("name");
+				food.setPrice(new Float(dbCon.rs.getFloat("unit_price")));
+
+				food.kitchen = dbCon.rs.getShort("kitchen");
+			}else{
+				throw new BusinessException("The food(alias_id=" + foodBasic.alias_id + ") to query does NOT exist.", ErrorCode.MENU_EXPIRED);
+			}
+			dbCon.rs.close();
+			
+			//get the each taste information to this food only if the food has taste preference
+			for(int j = 0; j < foodBasic.tastes.length; j++){
+				if(foodBasic.tastes[j].alias_id != Taste.NO_TASTE){
+					sql = "SELECT preference, price, category, rate, calc FROM " + Params.dbName + ".taste WHERE restaurant_id=" + term.restaurant_id +
+						" AND alias_id=" + foodBasic.tastes[j].alias_id;
+					dbCon.rs = dbCon.stmt.executeQuery(sql);
+					//check if the taste preference exist in db
+					if(dbCon.rs.next()){
+						food.tastes[j].alias_id = foodBasic.tastes[j].alias_id;
+						food.tastes[j].preference = dbCon.rs.getString("preference");
+						food.tastes[j].category = dbCon.rs.getShort("category");
+						food.tastes[j].calc = dbCon.rs.getShort("calc");
+						food.tastes[j].setRate(dbCon.rs.getFloat("rate"));
+						food.tastes[j].setPrice(dbCon.rs.getFloat("price"));
+					}else{
+						throw new BusinessException("The taste(alias_id=" + foodBasic.tastes[j].alias_id + ") to query does NOT exist.", ErrorCode.MENU_EXPIRED);
+					}
+					dbCon.rs.close();
+					
 				}
-				dbCon.rs.close();
-				
 			}
 		}
 		
@@ -588,6 +609,8 @@ public class UpdateOrder {
 		food.setDiscount(foodBasic.getDiscount());
 		//set the hang status
 		food.hangStatus = foodBasic.hangStatus;
+		//set the temporary flag
+		food.isTemporary = foodBasic.isTemporary;
 		
 		//set the taste preference to this food
 		food.tastePref = com.wireless.protocol.Util.genTastePref(food.tastes);

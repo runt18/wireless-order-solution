@@ -74,58 +74,62 @@ public class InsertOrder {
 				String sql = null;
 				/**
 				 * Get all the food's detail info submitted by terminal, 
-				 * and then check whether the food exist in db or is disabled by user.
+				 * and then check whether the food exist in db.
 				 * If the food doesn't exist in db or is disabled by user,
 				 * then notify the terminal that the food menu is expired.
 				 */
 				for(int i = 0; i < orderToInsert.foods.length; i++){
-	
-					//get the associated foods' unit price and name
-					sql = "SELECT unit_price, name, status FROM " +  Params.dbName + 
-					 	  ".food WHERE alias_id=" + orderToInsert.foods[i].alias_id + 
-					 	  " AND restaurant_id=" + table.restaurant_id + " AND enabled=1";
-					dbCon.rs = dbCon.stmt.executeQuery(sql);
-					//check if the food exist in db 
-					if(dbCon.rs.next()){
-						orderToInsert.foods[i].name = dbCon.rs.getString("name");
-						orderToInsert.foods[i].status = dbCon.rs.getShort("status");
-						orderToInsert.foods[i].setPrice(dbCon.rs.getFloat("unit_price"));
-					}else{
-						throw new BusinessException("The food(alias_id=" + orderToInsert.foods[i].alias_id + ") to query doesn't exit.", ErrorCode.MENU_EXPIRED);
-					}
-					dbCon.rs.close();
-						
-		
-					//get three taste information for each food
-					for(int j = 0; j < orderToInsert.foods[i].tastes.length; j++){
-						if(orderToInsert.foods[i].tastes[j].alias_id != Taste.NO_TASTE){
-							sql = "SELECT preference, price, category, rate, calc FROM " + Params.dbName + 
-								  ".taste WHERE restaurant_id=" + table.restaurant_id + 
-								  " AND alias_id=" + orderToInsert.foods[i].tastes[j].alias_id;
-							dbCon.rs = dbCon.stmt.executeQuery(sql);
-							if(dbCon.rs.next()){
-								orderToInsert.foods[i].tastes[j].preference = dbCon.rs.getString("preference");
-								orderToInsert.foods[i].tastes[j].setPrice(dbCon.rs.getFloat("price"));
-								orderToInsert.foods[i].tastes[j].category = dbCon.rs.getShort("category");
-								orderToInsert.foods[i].tastes[j].setRate(dbCon.rs.getFloat("rate"));
-								orderToInsert.foods[i].tastes[j].calc = dbCon.rs.getShort("calc");
-							}				
-						}
-					}
 					
-					//set the taste preference
-					orderToInsert.foods[i].tastePref = com.wireless.protocol.Util.genTastePref(orderToInsert.foods[i].tastes);
-					//set the total taste price
-					orderToInsert.foods[i].setTastePrice(com.wireless.protocol.Util.genTastePrice(orderToInsert.foods[i].tastes, 
-																							 orderToInsert.foods[i].getPrice()));
-
+					/**
+					 * Not to get the detail if the submitted food is temporary,
+					 * since the submitted string has contained the details, like name, price and amount. 
+					 */
+					if(!orderToInsert.foods[i].isTemporary){
+						//get the associated foods' unit price and name
+						sql = "SELECT unit_price, name, status FROM " +  Params.dbName + 
+						 	  ".food WHERE alias_id=" + orderToInsert.foods[i].alias_id + 
+						 	  " AND restaurant_id=" + table.restaurant_id;
+						dbCon.rs = dbCon.stmt.executeQuery(sql);
+						//check if the food exist in db 
+						if(dbCon.rs.next()){
+							orderToInsert.foods[i].name = dbCon.rs.getString("name");
+							orderToInsert.foods[i].status = dbCon.rs.getShort("status");
+							orderToInsert.foods[i].setPrice(dbCon.rs.getFloat("unit_price"));
+						}else{
+							throw new BusinessException("The food(alias_id=" + orderToInsert.foods[i].alias_id + ") to query doesn't exit.", ErrorCode.MENU_EXPIRED);
+						}
+						dbCon.rs.close();
+						
+						//get three taste information for each food
+						for(int j = 0; j < orderToInsert.foods[i].tastes.length; j++){
+							if(orderToInsert.foods[i].tastes[j].alias_id != Taste.NO_TASTE){
+								sql = "SELECT preference, price, category, rate, calc FROM " + Params.dbName + 
+									  ".taste WHERE restaurant_id=" + table.restaurant_id + 
+									  " AND alias_id=" + orderToInsert.foods[i].tastes[j].alias_id;
+								dbCon.rs = dbCon.stmt.executeQuery(sql);
+								if(dbCon.rs.next()){
+									orderToInsert.foods[i].tastes[j].preference = dbCon.rs.getString("preference");
+									orderToInsert.foods[i].tastes[j].setPrice(dbCon.rs.getFloat("price"));
+									orderToInsert.foods[i].tastes[j].category = dbCon.rs.getShort("category");
+									orderToInsert.foods[i].tastes[j].setRate(dbCon.rs.getFloat("rate"));
+									orderToInsert.foods[i].tastes[j].calc = dbCon.rs.getShort("calc");
+								}				
+							}
+						}
+						
+						//set the taste preference
+						orderToInsert.foods[i].tastePref = com.wireless.protocol.Util.genTastePref(orderToInsert.foods[i].tastes);
+						//set the total taste price
+						orderToInsert.foods[i].setTastePrice(com.wireless.protocol.Util.genTastePrice(orderToInsert.foods[i].tastes, 
+																								 orderToInsert.foods[i].getPrice()));
+					}					
 				}
 				
 				/**
 				 * Update the gift amount if not reach the quota.
 				 * Otherwise throw a business exception.
 				 */
-				float giftAmount = orderToInsert.totalPrice3().floatValue();
+				float giftAmount = orderToInsert.calcGiftPrice().floatValue();
 				if(term.getGiftQuota() >= 0){
 					if((giftAmount + term.getGiftAmount()) > term.getGiftQuota()){
 						throw new BusinessException("The gift amount exceeds the quota.", ErrorCode.EXCEED_GIFT_QUOTA);
@@ -142,8 +146,11 @@ public class InsertOrder {
 
 				
 				//insert to order table
-				sql = "INSERT INTO `" + Params.dbName + 
-						"`.`order` (`id`, `restaurant_id`, `category`, `table_id`, `table_name`, `table2_id`, `table2_name`, `terminal_model`, `terminal_pin`, `order_date`, `custom_num`, `waiter`) VALUES (NULL, " + 
+				sql = "INSERT INTO `" + Params.dbName + "`.`order` (" +
+						"`id`, `restaurant_id`, `category`, `table_id`, " +
+						"`table_name`, `table2_id`, `table2_name`, `terminal_model`, " +
+						"`terminal_pin`, `order_date`, `custom_num`, `waiter`) VALUES (" +
+						"NULL, " + 
 						table.restaurant_id + ", " + 
 						orderToInsert.category + ", " +
 						orderToInsert.table_id + ", '" + 
@@ -169,24 +176,26 @@ public class InsertOrder {
 				for(int i = 0; i < orderToInsert.foods.length; i++){
 						
 					//insert the record to table "order_food"
-					sql = "INSERT INTO `" + Params.dbName +
-						"`.`order_food` (`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, `hang_status`, " +
-						"`discount`, `taste`, `taste_price`, `taste_id`, `taste_id2`, `taste_id3`, `kitchen`, `waiter`, `order_date`) VALUES (" +	
-						orderToInsert.id + ", " + 
-						orderToInsert.foods[i].alias_id + ", " + 
-						orderToInsert.foods[i].getCount() + ", " + 
-						orderToInsert.foods[i].getPrice() + ", '" + 
-						orderToInsert.foods[i].name + "', " +
-						orderToInsert.foods[i].status + ", " +
-						(orderToInsert.foods[i].hangStatus == Food.FOOD_HANG_UP ? Food.FOOD_HANG_UP : Food.FOOD_NORMAL) + ", " +
-						orderToInsert.foods[i].getDiscount() + ", '" +
-						orderToInsert.foods[i].tastePref + "', " + 
-						orderToInsert.foods[i].getTastePrice() + ", " +
-						orderToInsert.foods[i].tastes[0].alias_id + ", " + 
-						orderToInsert.foods[i].tastes[1].alias_id + ", " + 
-						orderToInsert.foods[i].tastes[2].alias_id + ", " + 
-						orderToInsert.foods[i].kitchen + ", '" + 
-						term.owner + "', NOW()" + ")";
+					sql = "INSERT INTO `" + Params.dbName + "`.`order_food` (" +
+							"`order_id`, `food_id`, `order_count`, `unit_price`, `name`, " +
+							"`food_status`, `hang_status`, `discount`, `taste`, `taste_price`, " +
+							"`taste_id`, `taste_id2`, `taste_id3`, `kitchen`, `waiter`, `order_date`, `is_temporary`) VALUES (" +	
+							orderToInsert.id + ", " + 
+							orderToInsert.foods[i].alias_id + ", " + 
+							orderToInsert.foods[i].getCount() + ", " + 
+							orderToInsert.foods[i].getPrice() + ", '" + 
+							orderToInsert.foods[i].name + "', " +
+							orderToInsert.foods[i].status + ", " +
+							(orderToInsert.foods[i].hangStatus == Food.FOOD_HANG_UP ? Food.FOOD_HANG_UP : Food.FOOD_NORMAL) + ", " +
+							orderToInsert.foods[i].getDiscount() + ", '" +
+							orderToInsert.foods[i].tastePref + "', " + 
+							orderToInsert.foods[i].getTastePrice() + ", " +
+							orderToInsert.foods[i].tastes[0].alias_id + ", " + 
+							orderToInsert.foods[i].tastes[1].alias_id + ", " + 
+							orderToInsert.foods[i].tastes[2].alias_id + ", " + 
+							orderToInsert.foods[i].kitchen + ", '" + 
+							term.owner + "', NOW(), " + 
+							(orderToInsert.foods[i].isTemporary ? "1" : "0") + ")";
 						
 					dbCon.stmt.addBatch(sql);
 				}		

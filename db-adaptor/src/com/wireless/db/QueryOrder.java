@@ -179,11 +179,11 @@ public class QueryOrder {
 		
 		// query the food's id and order count associate with the order id for "order_food" table
 		sql = "SELECT name, food_id, food_status, SUM(order_count) AS order_sum, unit_price, " +
-				"discount, taste, taste_price, taste_id, taste_id2, taste_id3, hang_status, kitchen FROM `"
+				"discount, taste, taste_price, taste_id, taste_id2, taste_id3, hang_status, kitchen, is_temporary FROM `"
 				+ Params.dbName
 				+ "`.`order_food` WHERE order_id="
 				+ orderID
-				+ " GROUP BY food_id, taste_id, taste_id2, taste_id3, hang_status HAVING order_sum > 0";
+				+ " GROUP BY food_id, taste_id, taste_id2, taste_id3, hang_status, is_temporary HAVING order_sum > 0";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		ArrayList<Food> foods = new ArrayList<Food>();
 		while (dbCon.rs.next()) {
@@ -201,6 +201,7 @@ public class QueryOrder {
 			food.tastes[1].alias_id = dbCon.rs.getInt("taste_id2");
 			food.tastes[2].alias_id = dbCon.rs.getInt("taste_id3");
 			food.hangStatus = dbCon.rs.getShort("hang_status");
+			food.isTemporary = dbCon.rs.getBoolean("is_temporary");
 			foods.add(food);
 		}
 		orderInfo.id = orderID;
