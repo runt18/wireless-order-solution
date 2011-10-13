@@ -69,7 +69,8 @@ public class DailySettlementTask extends SchedulerTask{
 			  					Params.dbName + ".order_food.food_id," + 
 			  					Params.dbName + ".order_food.taste_id," +
 			  					Params.dbName + ".order_food.taste_id2," + 
-			  					Params.dbName + ".order_food.taste_id3 " +
+			  					Params.dbName + ".order_food.taste_id3, " +
+			  					Params.dbName + ".order_food.is_temporary " +
 			  					"HAVING (SUM(" + Params.dbName + ".`order_food`.`order_count`) > 0)";
 			int nTempOrders = 0;
 			sql = "SELECT COUNT(*) FROM(SELECT id " + tempOrder + ") aa";
@@ -85,7 +86,8 @@ public class DailySettlementTask extends SchedulerTask{
 			
 			final String orderFoodItem = "`id`,`order_id`, `food_id`, `order_date`, `order_count`," + 
 										"`unit_price`,`name`, `food_status`, `taste`,`taste_price`," +
-										"`taste_id`,`taste_id2`,`taste_id3`,`discount`,`kitchen`,`comment`,`waiter`";
+										"`taste_id`,`taste_id2`,`taste_id3`,`discount`,`kitchen`," +
+										"`comment`,`waiter`,`is_temporary`";
 			
 			dbCon.stmt.clearBatch();
 			//move the order have been paid from "order" to "order_history"
@@ -100,7 +102,8 @@ public class DailySettlementTask extends SchedulerTask{
 			dbCon.stmt.addBatch(sql);
 			
 			//move the details from "order_food" to "temp_order_food_history"
-			sql = "INSERT INTO " + Params.dbName + ".temp_order_food_history(order_id, food_id, taste_id, taste_id2, taste_id3, " +
+			sql = "INSERT INTO " + Params.dbName + 
+				  ".temp_order_food_history(order_id, food_id, taste_id, taste_id2, taste_id3, is_temporary, " +
 				  "`name`, taste, order_count, unit_price, taste_price, discount, food_status, kitchen, waiter) " + 
 				  "SELECT " +
 				  Params.dbName + ".`order_food`.`order_id` AS `order_id`," +
@@ -108,8 +111,9 @@ public class DailySettlementTask extends SchedulerTask{
 				  Params.dbName + ".`order_food`.`taste_id2` AS `taste_id`," +
 				  Params.dbName + ".`order_food`.`taste_id3` AS `taste_id2`," +
 				  Params.dbName + ".`order_food`.`taste_id` AS `taste_id3`," +
+				  Params.dbName + ".`order_food`.`is_temporary` AS `is_temporary`," +
 				  Params.dbName + ".`order_food`.`name` AS `name`," +
-				  Params.dbName + ".`order_food`.`taste` AS `taste`," + 
+				  Params.dbName + ".`order_food`.`taste` AS `taste`," + 				   
 				  "sum(`wireless_order_db`.`order_food`.`order_count`) AS `order_count`," +
 				  "max(`wireless_order_db`.`order_food`.`unit_price`) AS `unit_price`," +
 				  "max(`wireless_order_db`.`order_food`.`taste_price`) AS `taste_price`," +
