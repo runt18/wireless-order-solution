@@ -39,8 +39,10 @@ public class Util {
 	/**
 	 * Convert the foods string submitted by terminal into the array of class food.
 	 * @param submitFoods the submitted string looks like below.<br>
-	 * 			{[菜品1编号,菜品1数量,口味1编号,厨房1编号,菜品1折扣,2nd口味1编号,3rd口味1编号]，
-	 * 			 [菜品2编号,菜品2数量,口味2编号,厨房2编号,菜品2折扣,2nd口味1编号,3rd口味1编号]，...}
+	 * 			{[是否临时菜(false),菜品1编号,菜品1数量,口味1编号,厨房1编号,菜品1折扣,2nd口味1编号,3rd口味1编号]，
+	 * 			 [是否临时菜(false),菜品2编号,菜品2数量,口味2编号,厨房2编号,菜品2折扣,2nd口味1编号,3rd口味1编号]，...
+	 * 			 [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价]，
+	 * 			 [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价]...}
 	 * @return the class food array
 	 */
 	public static Food[] toFoodArray(String submitFoods) throws NumberFormatException{

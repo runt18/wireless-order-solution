@@ -70,7 +70,7 @@ public class QueryOrderAction extends Action {
 				for (int i = 0; i < order.foods.length; i++) {
 					/**
 					 * The json to order food looks like below.
-					 * ["菜名",菜名编号,厨房编号,"口味",口味编号,数量,单价,是否特价,是否推荐,是否停售,是否赠送,折扣率,口味编号2,口味编号3,口味价钱]
+					 * ["菜名",菜名编号,厨房编号,"口味",口味编号,数量,单价,是否特价,是否推荐,是否停售,是否赠送,折扣率,口味编号2,口味编号3,口味价钱,是否临时菜]
 					 */
 					String jsonOrderFood = "[\"$(food)\",$(food_id),$(kitchen),\"$(taste)\",$(taste_id)," +
 										   "$(count),\"$(unit_price)\",$(special),$(recommend),$(soldout)," +
