@@ -174,19 +174,22 @@ public class ChangeOrderScreen extends MainScreen implements PostSubmitOrder{
 		//Three buttons would be shown in the bottom of the screen
 		ButtonField byNoBtn = new ButtonField("编号", ButtonField.CONSUME_CLICK);
 		ButtonField byKitchenBtn = new ButtonField("分厨", ButtonField.CONSUME_CLICK);
+		ButtonField byPinyin = new ButtonField("拼音", ButtonField.CONSUME_CLICK);
 		ButtonField submit = new ButtonField("提交", ButtonField.CONSUME_CLICK);
-		HorizontalFieldManager hfm = new HorizontalFieldManager(Manager.FIELD_HCENTER);
+		HorizontalFieldManager hfm = new HorizontalFieldManager(Manager.HORIZONTAL_SCROLL | Manager.FIELD_HCENTER);
 		hfm.add(byNoBtn);
-		hfm.add(new LabelField("  "));
+		hfm.add(new LabelField(""));
 		hfm.add(byKitchenBtn);
-		hfm.add(new LabelField("  "));
+		hfm.add(new LabelField(""));
+		hfm.add(byPinyin);
+		hfm.add(new LabelField(""));
 		hfm.add(submit);
 		add(hfm);
 		
 		//Set the listener to order button
 		byNoBtn.setChangeListener(new FieldChangeListener(){
 			public void fieldChanged(Field field, int context) {
-	             UiApplication.getUiApplication().pushScreen(new SelectFoodPopup(_newListField, WirelessOrder.foodMenu.foods));
+	             UiApplication.getUiApplication().pushScreen(new SelectFoodPopup(_newListField, WirelessOrder.foodMenu.foods, SelectFoodPopup.BY_FOOD_ID));
 	         }
 		});
 		
@@ -195,6 +198,13 @@ public class ChangeOrderScreen extends MainScreen implements PostSubmitOrder{
 			public void fieldChanged(Field field, int context) {
 				UiApplication.getUiApplication().pushScreen(new SelectKitchenPopup(_newListField));
 			}
+		});
+		
+		//Set the listener to order by pinyin
+		byPinyin.setChangeListener(new FieldChangeListener(){
+			public void fieldChanged(Field field, int context) {
+	            UiApplication.getUiApplication().pushScreen(new SelectFoodPopup(_newListField, WirelessOrder.foodMenu.foods, SelectFoodPopup.BY_PINYIN));
+	         }
 		});
 		
 		//Set the submit button's listener

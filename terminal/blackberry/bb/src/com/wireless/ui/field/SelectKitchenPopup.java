@@ -127,7 +127,7 @@ public class SelectKitchenPopup extends PopupScreen{
 				}
 				Food[] foods = new Food[nCount];
 				vectFoods.copyInto(foods);
-				UiApplication.getUiApplication().pushScreen(new SelectFoodPopup(_orderField, foods));
+				UiApplication.getUiApplication().pushScreen(new SelectFoodPopup(_orderField, foods, SelectFoodPopup.BY_FOOD_ID));
 			}
 		};
 		
