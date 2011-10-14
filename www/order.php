@@ -91,13 +91,15 @@ if($editType == "dailyCheckOut")
 			`waiter`,`type`, `discount_type`, `member_id`, `member`,`terminal_pin`, `terminal_model`, `table_id`, `table_name`,service_rate,comment FROM `order` WHERE total_price IS NOT NULL AND restaurant_id=" . $_SESSION["restaurant_id"];		
 
 	$sql2 = "INSERT INTO `order_food_history`(`id`,`order_id`, `food_id`, `order_date`, `order_count`, 
-			`unit_price`,`name`, `taste`,`taste_price`,`taste_id`,`taste_id2`,`taste_id3`,`discount`,`kitchen`,`comment`,`waiter`,`food_status`)
+			`unit_price`,`name`, `taste`,`taste_price`,`taste_id`,`taste_id2`,`taste_id3`,`discount`,
+			`kitchen`,`comment`,`waiter`,`food_status`, `is_temporary`)
 			SELECT `id`,`order_id`, `food_id`, `order_date`, `order_count`, 
-			`unit_price`,`name`, `taste`,`taste_price`,`taste_id`,`taste_id2`,`taste_id3`,`discount`,`kitchen`,`comment`,`waiter`,`food_status` 
+			`unit_price`,`name`, `taste`,`taste_price`,`taste_id`,`taste_id2`,`taste_id3`,`discount`,
+			`kitchen`,`comment`,`waiter`,`food_status`, `is_temporary`
 			FROM `order_food` WHERE `order_food`.`order_id` IN (SELECT id FROM `order` WHERE total_price  IS NOT NULL AND restaurant_id=" . $_SESSION["restaurant_id"].")";
 
 	$sql3 = "INSERT INTO 
-			temp_order_food_history(order_id,food_id,taste_id,taste_id2,taste_id3,
+			temp_order_food_history(order_id,food_id,taste_id,taste_id2,taste_id3, is_temporary,
 			`name`,taste,order_count,unit_price,taste_price,discount,food_status,kitchen,waiter) 
 			SELECT 
 			`wireless_order_db`.`order_food`.`order_id` AS `order_id`,
@@ -105,6 +107,7 @@ if($editType == "dailyCheckOut")
 			`wireless_order_db`.`order_food`.`taste_id` AS `taste_id`,
 			`wireless_order_db`.`order_food`.`taste_id` AS `taste_id2`,
 			`wireless_order_db`.`order_food`.`taste_id` AS `taste_id3`,
+			`wireless_order_db`.`order_food`.`taste_id` AS `is_temporary`,
 			`wireless_order_db`.`order_food`.`name` AS `name`,
 			`wireless_order_db`.`order_food`.`taste` AS `taste`,
 			SUM(`wireless_order_db`.`order_food`.`order_count`) AS `order_count`,
@@ -122,7 +125,8 @@ if($editType == "dailyCheckOut")
 			`wireless_order_db`.`order_food`.`food_id`,
 			`wireless_order_db`.`order_food`.`taste_id`,
 			`wireless_order_db`.`order_food`.`taste_id2`,
-			`wireless_order_db`.`order_food`.`taste_id3` 
+			`wireless_order_db`.`order_food`.`taste_id3`,
+			`wireless_order_db`.`order_food`.`is_temporary`
 			HAVING (SUM(`wireless_order_db`.`order_food`.`order_count`) > 0);";
 
 	$sql4 = "DELETE FROM `order_food` WHERE `order_id` IN (SELECT id FROM `order` WHERE total_price  IS NOT NULL AND restaurant_id=" .							$_SESSION["restaurant_id"].")";
