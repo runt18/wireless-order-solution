@@ -466,13 +466,14 @@ SET AUTOCOMMIT=1;
 -- -----------------------------------------------------
 -- Insert the info from order_food_history to temp_order_food_history
 -- -----------------------------------------------------
-INSERT INTO `wireless_order_db`.temp_order_food_history(order_id,food_id,taste_id,taste_id2,taste_id3,`name`,taste,order_count,unit_price,taste_price,discount,food_status,kitchen,waiter) 
+INSERT INTO `wireless_order_db`.temp_order_food_history(order_id,food_id,taste_id,taste_id2,taste_id3,is_temporary,`name`,taste,order_count,unit_price,taste_price,discount,food_status,kitchen,waiter) 
 SELECT 
 `wireless_order_db`.`order_food_history`.`order_id` AS `order_id`,
 `wireless_order_db`.`order_food_history`.`food_id` AS `food_id`,
 `wireless_order_db`.`order_food_history`.`taste_id` AS `taste_id`,
 `wireless_order_db`.`order_food_history`.`taste_id2` AS `taste_id2`,
 `wireless_order_db`.`order_food_history`.`taste_id3` AS `taste_id3`,
+`wireless_order_db`.`order_food_history`.`is_temporary` AS `is_temporary`,
 `wireless_order_db`.`order_food_history`.`name` AS `name`,
 `wireless_order_db`.`order_food_history`.`taste` AS `taste`,
 sum(`wireless_order_db`.`order_food_history`.`order_count`) AS `order_count`,
@@ -488,7 +489,8 @@ GROUP BY
 `wireless_order_db`.`order_food_history`.`food_id`,
 `wireless_order_db`.`order_food_history`.`taste_id`,
 `wireless_order_db`.`order_food_history`.`taste_id2`,
-`wireless_order_db`.`order_food_history`.`taste_id3` 
+`wireless_order_db`.`order_food_history`.`taste_id3`,
+`wireless_order_db`.`order_food_history`.`is_temporary`
 HAVING (SUM(`wireless_order_db`.`order_food_history`.`order_count`) > 0);
 
 -- -----------------------------------------------------

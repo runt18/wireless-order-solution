@@ -14,8 +14,13 @@ Release v1.1.0 <xx/xx/2011>
 2 - 增加字段“region”到表"table"
 3 - 增加表“super_kitchen”
 4 - 增加表“region”
-5 - 增加字段“is_hangup”到表"order_food"
+5 - 增加字段“hang_status”到表"order_food"
 6 - 修改“setting”的"price_tail"默认值为2（尾数四舍五入处理）
+7 - 增加字段“is_temporary”到表"temp_order_food_history"
+8 - 增加字段"is_temporary"到表"order_food"
+9 - 增加字段"is_temporary"到表"order_food_history"
+10 - 修改"order_food_history_view", 增加GROUP BY is_temporary
+11 - 修改"order_food_view", 增加GROUP BY is_temporary
 ******************************************************************************************************/
 
 /******************************************************************************************************

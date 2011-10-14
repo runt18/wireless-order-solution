@@ -124,6 +124,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food` (
   `kitchen` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the kitchen number which the order food of this record belong to. the maximum value (255) means the food does not belong to any kitchen.' ,
   `comment` VARCHAR(100) NULL DEFAULT NULL COMMENT 'the comment to this record, such as the reason to cancel food' ,
   `waiter` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name of waiter who deal with this record' ,
+  `is_temporary` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates whether the food to this record is temporary' ,
   INDEX `fk_order_food_order` (`order_id` ASC) ,
   PRIMARY KEY (`id`) ,
   CONSTRAINT `fk_order_food_order`
@@ -437,6 +438,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food_history` (
   `kitchen` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the kitchen number which the order food of this record belong to. the maximum value (255) means the food does not belong to any kitchen.' ,
   `comment` VARCHAR(100) NULL DEFAULT NULL COMMENT 'the comment to this record, such as the reason to cancel food' ,
   `waiter` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name of waiter who deal with this record' ,
+  `is_temporary` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates whether the food to this record is temporary' ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_order_food_history_order_history1` (`order_id` ASC) ,
   CONSTRAINT `fk_order_food_history_order_history1`
@@ -613,7 +615,6 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the super kitchen information' ;
 
-
 -- -----------------------------------------------------
 -- Table `wireless_order_db`.`temp_order_food_history`
 -- -----------------------------------------------------
@@ -625,32 +626,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`temp_order_food_history` (
   `taste_id` SMALLINT UNSIGNED NOT NULL COMMENT 'the taste id to this order detail record' ,
   `taste_id2` SMALLINT UNSIGNED NOT NULL COMMENT 'the 2nd taste id to this order detail record' ,
   `taste_id3` SMALLINT UNSIGNED NOT NULL COMMENT 'the 3rd taste id to this order detail record' ,
-  `name` VARCHAR(45) NOT NULL COMMENT 'the food name to this order detail record' ,
-  `taste` VARCHAR(45) NOT NULL COMMENT 'the taste preference to this order detail record' ,
-  `order_count` DECIMAL(5,2) NOT NULL COMMENT 'the sum of order count to this order detail record' ,
-  `unit_price` DECIMAL(7,2) UNSIGNED NOT NULL COMMENT 'the unit price to this order detail record' ,
-  `taste_price` DECIMAL(7,2) UNSIGNED NOT NULL COMMENT 'the taste price to this order detail record' ,
-  `discount` DECIMAL(3,2) NOT NULL COMMENT 'the discount to this order detail record' ,
-  `food_status` TINYINT NOT NULL COMMENT 'the food status to this order detail record' ,
-  `kitchen` TINYINT UNSIGNED NOT NULL COMMENT 'the kitchen to this order detail record' ,
-  `waiter` VARCHAR(45) NOT NULL COMMENT 'the waiter name to this order detail record' ,
-  PRIMARY KEY (`order_id`, `food_id`, `taste_id`, `taste_id2`, `taste_id3`) )
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8, 
-COMMENT = 'temporary order food history table for performance problem' ;
-
-
--- -----------------------------------------------------
--- Table `wireless_order_db`.`temp_order_food_history`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `wireless_order_db`.`temp_order_food_history` ;
-
-CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`temp_order_food_history` (
-  `order_id` INT UNSIGNED NOT NULL COMMENT 'the order id to this order detail record' ,
-  `food_id` SMALLINT UNSIGNED NOT NULL COMMENT 'the food id to this order detail record' ,
-  `taste_id` SMALLINT UNSIGNED NOT NULL COMMENT 'the taste id to this order detail record' ,
-  `taste_id2` SMALLINT UNSIGNED NOT NULL COMMENT 'the 2nd taste id to this order detail record' ,
-  `taste_id3` SMALLINT UNSIGNED NOT NULL COMMENT 'the 3rd taste id to this order detail record' ,
+  `is_temporary` TINYINT NOT NULL DEFAULT 0 COMMENT 'the flag indicates whether the food to this record is temporary' ,
   `name` VARCHAR(45) NOT NULL COMMENT 'the food name to this order detail record' ,
   `taste` VARCHAR(45) NOT NULL COMMENT 'the taste preference to this order detail record' ,
   `order_count` DECIMAL(5,2) NOT NULL COMMENT 'the sum of order count to this order detail record' ,
@@ -738,7 +714,6 @@ SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
 
 
-
 -- -----------------------------------------------------
 -- Data for table `wireless_order_db`.`restaurant`
 -- -----------------------------------------------------
@@ -762,13 +737,13 @@ SET AUTOCOMMIT=1;
 -- View`order_food_history_view`
 -- -----------------------------------------------------
 DROP VIEW IF EXISTS order_food_history_view;
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `order_food_history_view` AS select sum(`order_food_history`.`order_count`) AS `order_count`,max(`order_food_history`.`unit_price`) AS `unit_price`,max(`order_food_history`.`taste_price`) AS `taste_price`,max(`order_food_history`.`name`) AS `name`,max(`order_food_history`.`taste`) AS `taste`,max(`order_food_history`.`taste_id`) AS `taste_id`,max(`order_food_history`.`discount`) AS `discount`,max(`order_food_history`.`food_status`) AS `food_status`,max(`order_food_history`.`kitchen`) AS `kitchen`,max(`order_food_history`.`waiter`) AS `waiter`,`order_food_history`.`order_id` AS `order_id`,`order_food_history`.`food_id` AS `food_id` from `order_food_history` group by `order_food_history`.`order_id`,`order_food_history`.`food_id`,`order_food_history`.`taste_id`,`order_food_history`.`taste_id2`,`order_food_history`.`taste_id3` having (sum(`order_food_history`.`order_count`) > 0);
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `order_food_history_view` AS select sum(`order_food_history`.`order_count`) AS `order_count`,max(`order_food_history`.`unit_price`) AS `unit_price`,max(`order_food_history`.`taste_price`) AS `taste_price`,max(`order_food_history`.`name`) AS `name`,max(`order_food_history`.`taste`) AS `taste`,max(`order_food_history`.`taste_id`) AS `taste_id`,max(`order_food_history`.`discount`) AS `discount`,max(`order_food_history`.`food_status`) AS `food_status`,max(`order_food_history`.`kitchen`) AS `kitchen`,max(`order_food_history`.`waiter`) AS `waiter`,`order_food_history`.`order_id` AS `order_id`,`order_food_history`.`food_id` AS `food_id` from `order_food_history` group by `order_food_history`.`order_id`,`order_food_history`.`food_id`,`order_food_history`.`taste_id`,`order_food_history`.`taste_id2`,`order_food_history`.`taste_id3`,`order_food_history`.`is_temporary` having (sum(`order_food_history`.`order_count`) > 0);
 
 -- -----------------------------------------------------
 -- View`order_food_view`
 -- -----------------------------------------------------
 DROP VIEW IF EXISTS order_food_view;
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `order_food_view` AS select sum(`order_food`.`order_count`) AS `order_count`,max(`order_food`.`unit_price`) AS `unit_price`,max(`order_food`.`taste_price`) AS `taste_price`,max(`order_food`.`name`) AS `name`,max(`order_food`.`taste`) AS `taste`,max(`order_food`.`taste_id`) AS `taste_id`,max(`order_food`.`discount`) AS `discount`,max(`order_food`.`food_status`) AS `food_status`,`order_food`.`order_id` AS `order_id`,`order_food`.`food_id` AS `food_id` from `order_food` group by `order_food`.`order_id`,`order_food`.`food_id`,`order_food`.`taste_id`,`order_food`.`taste_id2`,`order_food`.`taste_id3` having (sum(`order_food`.`order_count`) > 0);
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `order_food_view` AS select sum(`order_food`.`order_count`) AS `order_count`,max(`order_food`.`unit_price`) AS `unit_price`,max(`order_food`.`taste_price`) AS `taste_price`,max(`order_food`.`name`) AS `name`,max(`order_food`.`taste`) AS `taste`,max(`order_food`.`taste_id`) AS `taste_id`,max(`order_food`.`discount`) AS `discount`,max(`order_food`.`food_status`) AS `food_status`,`order_food`.`order_id` AS `order_id`,`order_food`.`food_id` AS `food_id` from `order_food` group by `order_food`.`order_id`,`order_food`.`food_id`,`order_food`.`taste_id`,`order_food`.`taste_id2`,`order_food`.`taste_id3`,`order_food`.`is_temporary` having (sum(`order_food`.`order_count`) > 0);
 
 -- -----------------------------------------------------
 -- View`order_view`
@@ -781,7 +756,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 -- -----------------------------------------------------
 DROP VIEW IF EXISTS order_history_view;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `order_history_view` AS select `a`.`id` AS `id`,`a`.`table_id` AS `alias_id`,`a`.`table_name` AS `table_name`,`a`.`order_date` AS `order_date`,`a`.`category` AS `category`,(case `a`.`category` when 1 then '一般' when 2 then '外卖' when 3 then '并台' when 4 then '拼台' end) AS `category_name`,`a`.`comment` AS `comment`,`a`.`service_rate` AS `service_rate`,format((sum((((`b`.`unit_price` * `b`.`discount`) + `b`.`taste_price`) * (case when ((`b`.`food_status` & 8) <> 0) then 0 else `b`.`order_count` end))) * (1 + `a`.`service_rate`)),2) AS `total_price`,format((sum(((`b`.`unit_price` * (1 - `b`.`discount`)) * (case when ((`b`.`food_status` & 8) <> 0) then 0 else `b`.`order_count` end))) * (1 + `a`.`service_rate`)),2) AS `total_price_discount`,format((sum(((`b`.`unit_price` * `b`.`discount`) * (case when ((`b`.`food_status` & 8) = 0) then 0 else `b`.`order_count` end))) * (1 + `a`.`service_rate`)),2) AS `total_price_present`,`a`.`custom_num` AS `num`,group_concat(concat((case `b`.`taste_id` when 0 then `b`.`name` else concat(`b`.`name`,'-',`b`.`taste`) end),'|',format(`b`.`order_count`,2),'|',(case `b`.`food_status` when 1 then '(特)' when 2 then '(荐)' when 3 then '(特,荐)' when 8 then '(赠)' when 9 then '(特,赠)' when 10 then '(荐,赠)' when 11 then '(特,荐,赠)' else '' end),'|',(case when (`b`.`discount` < 1) then concat('(',format((`b`.`discount` * 10),1),'折',')') else '' end),'|',format((((`b`.`unit_price` * `b`.`discount`) + `b`.`taste_price`) * `b`.`order_count`),2)) separator ';') AS `foods`,(`a`.`total_price` is not null) AS `is_paid`,`a`.`total_price_2` AS `total_price_2`,`a`.`restaurant_id` AS `restaurant_id`,`r`.`restaurant_name` AS `restaurant_name`,`d`.`id` AS `table_id`,`a`.`waiter` AS `waiter`,`a`.`type` AS `type_value`,(case `a`.`type` when 1 then '现金' when 2 then '刷卡' when 3 then '会员卡' when 4 then '签单' when 5 then '挂账' end) AS `type_name` from (((((`order_history` `a` left join `order_food_history_view` `b` on((`a`.`id` = `b`.`order_id`))) left join `food` `c` on(((`b`.`food_id` = `c`.`alias_id`) and (`c`.`restaurant_id` = `a`.`restaurant_id`)))) left join `table` `d` on(((`a`.`table_id` = `d`.`alias_id`) and (`d`.`restaurant_id` = `a`.`restaurant_id`)))) left join `restaurant` `r` on((`a`.`restaurant_id` = `r`.`id`))) left join `terminal` `t` on((`a`.`terminal_pin` = `t`.`pin`) and (`t`.model_id = `a`.terminal_model))) group by `a`.`id`;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `order_history_view` AS select `a`.`id` AS `id`,`a`.`table_id` AS `alias_id`,`a`.`table_name` AS `table_name`,`a`.`order_date` AS `order_date`,`a`.`category` AS `category`,(case `a`.`category` when 1 then '一般' when 2 then '外卖' when 3 then '并台' when 4 then '拼台' end) AS `category_name`,`a`.`comment` AS `comment`,`a`.`service_rate` AS `service_rate`,format((sum((((`b`.`unit_price` * `b`.`discount`) + `b`.`taste_price`) * (case when ((`b`.`food_status` & 8) <> 0) then 0 else `b`.`order_count` end))) * (1 + `a`.`service_rate`)),2) AS `total_price`,format((sum(((`b`.`unit_price` * (1 - `b`.`discount`)) * (case when ((`b`.`food_status` & 8) <> 0) then 0 else `b`.`order_count` end))) * (1 + `a`.`service_rate`)),2) AS `total_price_discount`,format((sum(((`b`.`unit_price` * `b`.`discount`) * (case when ((`b`.`food_status` & 8) = 0) then 0 else `b`.`order_count` end))) * (1 + `a`.`service_rate`)),2) AS `total_price_present`,`a`.`custom_num` AS `num`,group_concat(concat((case `b`.`taste_id` when 0 then `b`.`name` else concat(`b`.`name`,'-',`b`.`taste`) end),'|',format(`b`.`order_count`,2),'|',(case `b`.`food_status` when 1 then '(特)' when 2 then '(荐)' when 3 then '(特,荐)' when 8 then '(赠)' when 9 then '(特,赠)' when 10 then '(荐,赠)' when 11 then '(特,荐,赠)' else '' end),'|',(case when (`b`.`discount` < 1) then concat('(',format((`b`.`discount` * 10),1),'折',')') else '' end),'|',format((((`b`.`unit_price` * `b`.`discount`) + `b`.`taste_price`) * `b`.`order_count`),2)) separator ';') AS `foods`,(`a`.`total_price` is not null) AS `is_paid`,`a`.`total_price_2` AS `total_price_2`,`a`.`restaurant_id` AS `restaurant_id`,`r`.`restaurant_name` AS `restaurant_name`,`d`.`id` AS `table_id`,`a`.`waiter` AS `waiter`,`a`.`type` AS `type_value`,(case `a`.`type` when 1 then '现金' when 2 then '刷卡' when 3 then '会员卡' when 4 then '签单' when 5 then '挂账' end) AS `type_name` from (((((`order_history` `a` left join `temp_order_food_history` `b` on((`a`.`id` = `b`.`order_id`))) left join `food` `c` on(((`b`.`food_id` = `c`.`alias_id`) and (`c`.`restaurant_id` = `a`.`restaurant_id`)))) left join `table` `d` on(((`a`.`table_id` = `d`.`alias_id`) and (`d`.`restaurant_id` = `a`.`restaurant_id`)))) left join `restaurant` `r` on((`a`.`restaurant_id` = `r`.`id`))) left join `terminal` `t` on((`a`.`terminal_pin` = `t`.`pin`) and (`t`.model_id = `a`.terminal_model))) group by `a`.`id`;
 
 -- -----------------------------------------------------
 -- View`restaurant_view`
