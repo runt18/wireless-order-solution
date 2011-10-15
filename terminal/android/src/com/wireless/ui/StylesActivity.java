@@ -34,7 +34,9 @@ public class StylesActivity extends Activity {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.stytle);
+		
 		appcontext = (AppContext) getApplication();
+		appcontext.activityList.add(StylesActivity.this);
 		myListview=(ListView)findViewById(R.id.myListView);
 		foodtaste=(TextView)findViewById(R.id.foodtaste);
 	    Common.getCommon().init(Common.getCommon().getFoodlist().get(Common.getCommon().getPosition()), foodtaste);

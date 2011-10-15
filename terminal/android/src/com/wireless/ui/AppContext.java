@@ -3,6 +3,8 @@ package com.wireless.ui;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.Application;
 import android.app.Dialog;
 import android.content.Context;
@@ -27,7 +29,7 @@ public class AppContext extends Application {
 	private List<Taste> tastes;
 	private List<Taste> stytles;
 	private List<Taste> speces;
- 
+	public static List<Activity> activityList=new ArrayList<Activity>();;
     
     
 
@@ -95,6 +97,21 @@ public class AppContext extends Application {
 		return speces;
 	}
 	
+	  /*
+	    * ÍË³ö¿Í»§¶Ë
+	    * 
+	    * */
+		public static void exitClient(Context context){
+			for(int i=0;i<activityList.size();i++){
+				if(null!=activityList.get(i)){
+					activityList.get(i).finish();
+				}
+				
+			}
+			ActivityManager activityManager =(ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
+			activityManager.restartPackage("com.wireless.ui");
+			        System.exit(0);
+		}
 	
 	
 }

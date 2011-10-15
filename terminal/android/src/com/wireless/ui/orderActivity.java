@@ -1,12 +1,18 @@
 package com.wireless.ui;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.DialogInterface.OnKeyListener;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -14,6 +20,8 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.adapter.OderFoodAdapter;
@@ -29,59 +37,78 @@ import com.wireless.sccon.ServerConnector;
 
 public class orderActivity extends Activity {
 	private ImageView orderbutton;
-	private ImageView orderback;
+	private ImageView back;
 	private ListView myListView;
 	private ImageView ordercommit;
 	OderFoodAdapter adapter;
 	private AppContext appcontext;
 	private EditText tableNum;
 	private EditText customNum;
+	private ImageView up;
     Message msg;
+    RelativeLayout  buttomrelativelayout;
+   private TextView amountvalue; 
+	 String plate;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.order);
 		
+		
+		plate = getIntent().getExtras().getString("plate");
 		Log.e("", "error");
 		orderbutton = (ImageView) findViewById(R.id.orderbutton);
 		
 		
 		tableNum=(EditText)findViewById(R.id.valueplatform);
-		
+		amountvalue=(TextView)findViewById(R.id.amountvalue);
 		customNum=(EditText)findViewById(R.id.valuepeople);
+		buttomrelativelayout=(RelativeLayout)findViewById(R.id.bottom);
 	
 
-
+		tableNum.setText(plate);
 		appcontext = (AppContext) getApplication();
+		appcontext.activityList.add(orderActivity.this);
 		orderbutton.setOnClickListener(new orderbutton());
 		myListView=(ListView)findViewById(R.id.myListView);
 
-		orderback = (ImageView) findViewById(R.id.orderback);
+		back = (ImageView) findViewById(R.id.orderback);
 		ordercommit = (ImageView) findViewById(R.id.ordercommit);
 		ordercommit.setOnClickListener(new ordercommit());
+		up=(ImageView)findViewById(R.id.up);
+		if(Common.getCommon().getFoodlist().size()==0){
+			up.setBackgroundResource(R.drawable.normal);
+		}else{
+			up.setBackgroundResource(R.drawable.expand);
+		}
 		if(Common.getCommon().getFoodlist()==null){
 			adapter=new OderFoodAdapter(orderActivity.this,null);
 		}else{
 			adapter=new OderFoodAdapter(orderActivity.this,Common.getCommon().getFoodlist());
 		}
 		
+		
 		myListView.setAdapter(adapter);
 		myListView.setOnItemClickListener(new item());
-		orderback.setOnClickListener(new View.OnClickListener() {
+		back.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
+			   // finish();
+				Common.getCommon().getFoodlist().clear();;
+				Common.getCommon().setPosition(0);
 				Intent intent=new Intent(orderActivity.this,MainActivity.class);
 				startActivity(intent);
 			}
 		});
-		
+		account();
 	}
 
+
 	
-	 /*
+	  /*
 	    * 点解list的item的事件
 	    * 
 	    * */
@@ -94,6 +121,25 @@ public class orderActivity extends Activity {
 		  }
 			
 		}
+		
+	/*计算总额
+	 * 
+	 * */
+		
+	public void account(){
+		if(Common.getCommon().getFoodlist().size()>0){
+			buttomrelativelayout.setVisibility(View.VISIBLE);
+			float account=0;
+			for(int i=0;i<Common.getCommon().getFoodlist().size();i++){
+				account+=Common.getCommon().getFoodlist().get(i).totalPrice2();
+			}
+			amountvalue.setText(Float.toString(account));
+			}else{
+				buttomrelativelayout.setVisibility(View.GONE);
+			}
+		
+	}	
+	
 	public class orderbutton implements OnClickListener {
 
 		@Override
@@ -134,6 +180,12 @@ public class orderActivity extends Activity {
 		Log.e("", "DDDDD");
 		adapter=new OderFoodAdapter(orderActivity.this,Common.getCommon().getFoodlist());
 		myListView.setAdapter(adapter);
+		account();
+		if(Common.getCommon().getFoodlist().size()==0){
+			up.setBackgroundResource(R.drawable.normal);
+		}else{
+			up.setBackgroundResource(R.drawable.expand);
+		}
 		super.onResume();
 	}
 
@@ -147,6 +199,12 @@ public class orderActivity extends Activity {
 		}
 		
 		myListView.setAdapter(adapter);
+		account();
+		if(Common.getCommon().getFoodlist().size()==0){
+			up.setBackgroundResource(R.drawable.normal);
+		}else{
+			up.setBackgroundResource(R.drawable.expand);
+		}
 		super.onRestart();
 	}
 	
@@ -224,6 +282,7 @@ public class orderActivity extends Activity {
 	public void Foodfunction(int num,int position){
 		if(num==0){
 			Common.getCommon();
+			Common.getCommon().setPosition(position);
 			Common.getCommon().getdeleteFoods(orderActivity.this, Common.getFoodlist(), position);
 		
 		}else{
@@ -233,6 +292,22 @@ public class orderActivity extends Activity {
 		}
 	}
 	
+	/*
+	 * 监听返回键
+	 * */
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			
+			Common.getCommon().getFoodlist().clear();;
+			Common.getCommon().setPosition(0);
+		
+			
+		}
+		return super.onKeyDown(keyCode, event);
+	}
+	
+	
 	private Handler handler=new Handler(){
 		public void handleMessage(Message msg){
 			if(!Thread.currentThread().interrupted()){
@@ -241,12 +316,20 @@ public class orderActivity extends Activity {
 				
 				case 0:
 					Common.getCommon().dialog.dismiss();
-					Common.getCommon().getFoodlist().clear();
-					adapter=new OderFoodAdapter(orderActivity.this,Common.getCommon().getFoodlist());
+					Common.getCommon().getFoodlist().clear();;
+					Common.getCommon().setPosition(0);
 					myListView.setAdapter(adapter);
-					new AlertDialog.Builder(orderActivity.this).setTitle("提示").setMessage("下单成功").setNeutralButton("确定", null).show();
+					account();
+					new AlertDialog.Builder(orderActivity.this).setTitle("提示").setMessage("下单成功").setPositiveButton("确定", new DialogInterface.OnClickListener() {
+				           public void onClick(DialogInterface dialog, int id) {
+				        		Intent intent=new Intent(orderActivity.this,MainActivity.class);
+								startActivity(intent);
+				        	 
+				           }
+				       })
+
+					.show();
 					
-					//adapter.notify();
 				break;
 				
 				case 1:

@@ -33,7 +33,9 @@ public class NumberActivity extends Activity {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.number);
+		
 		appcontext = (AppContext) getApplication();
+		appcontext.activityList.add(NumberActivity.this);
 		foodes = new ArrayList<Food>();
 		myListView = (DragListView) findViewById(R.id.myListView);
 		search = (EditText) findViewById(R.id.search);

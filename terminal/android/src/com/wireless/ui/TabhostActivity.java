@@ -13,7 +13,7 @@ import android.widget.TextView;
 
 public class TabhostActivity extends TabActivity {
 	private TabHost mTabHost;
-
+	private AppContext appcontext;
 	/**
 	 * Ê×¼ÓÔØ
 	 */
@@ -29,7 +29,8 @@ public class TabhostActivity extends TabActivity {
 		super.onCreate(savedInstanceState);
 		// construct the tabhost
 		setContentView(R.layout.table);
-
+		appcontext = (AppContext) getApplication();
+		appcontext.activityList.add(TabhostActivity.this);
 		setupTabHost();
 		// mTabHost.getTabWidget().setDividerDrawable(R.drawable.minitab_default);
 		/**

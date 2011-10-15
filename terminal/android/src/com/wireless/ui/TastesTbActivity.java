@@ -13,7 +13,7 @@ import android.widget.TabHost.TabSpec;
 
 public class TastesTbActivity extends TabActivity {
 	private TabHost mTabHost;
-
+	private AppContext appcontext;
 	/**
 	 * Ê×¼ÓÔØ
 	 */
@@ -29,7 +29,8 @@ public class TastesTbActivity extends TabActivity {
 		super.onCreate(savedInstanceState);
 		// construct the tabhost
 		setContentView(R.layout.tastetable);
-
+		appcontext = (AppContext) getApplication();
+		appcontext.activityList.add(TastesTbActivity.this);
 		setupTabHost();
 		// mTabHost.getTabWidget().setDividerDrawable(R.drawable.minitab_default);
 		/**

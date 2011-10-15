@@ -9,10 +9,10 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.DialogInterface.OnKeyListener;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,14 +20,20 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.wireless.adapter.ExpandlistAdapter;
 import com.wireless.protocol.Food;
+import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.SKitchen;
 import com.wireless.protocol.Taste;
+import com.wireless.ui.KitchenActivity;
+import com.wireless.ui.MainActivity;
 import com.wireless.ui.R;
 import com.wireless.ui.TasteActivity;
-import com.wireless.ui.TastesTbActivity;
 import com.wireless.ui.orderActivity;
 
 public class Common {
@@ -38,7 +44,17 @@ public class Common {
    orderActivity order;
    private int position;
    TasteActivity taste;
+   KitchenActivity kient;
+   MainActivity main;
+   
 
+	public KitchenActivity getKient() {
+	return kient;
+}
+
+public void setKient(KitchenActivity kient) {
+	this.kient = kient;
+}
 
 	public int getPosition() {
 		return position;
@@ -113,12 +129,14 @@ public class Common {
 	public void onitem(Context context,final List<Food> list, final int position){
 		order=(orderActivity)context;
 		View mView =LayoutInflater.from(context).inflate(R.layout.itemalert, null);
-		final Dialog mDialog = new Dialog(context);
+		final Dialog mDialog = new Dialog(context,R.style.FullHeightDialog);
 		mDialog.setContentView(mView);
-		mDialog.getWindow().setTitle("请选择"+list.get(position).name+"的操作");
-		mDialog.getWindow().setTitleColor(R.color.grey);
+//		mDialog.getWindow().setTitle("请选择"+list.get(position).name+"的操作");
+//		mDialog.getWindow().setTitleColor(R.color.grey);
 		mDialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
 		mDialog.show();
+		TextView ordername=(TextView)mView.findViewById(R.id.ordername);
+		ordername.setText("请选择"+list.get(position).name+"的操作");
 		TextView delete=(TextView)mView.findViewById(R.id.deletefood);
 		RelativeLayout r1=(RelativeLayout)mView.findViewById(R.id.r1);
 		r1.setOnClickListener(new View.OnClickListener() {
@@ -188,12 +206,14 @@ public class Common {
 		final EditText mycount;
 		
 		View mView =LayoutInflater.from(context).inflate(R.layout.alert, null);
-		final Dialog mDialog = new Dialog(context);
+		final Dialog mDialog = new Dialog(context,R.style.FullHeightDialog);
 		mDialog.setContentView(mView);
-		mDialog.getWindow().setTitle("请输入"+list.get(position).name+"的数量");
-		mDialog.getWindow().setTitleColor(R.color.grey);
+//		mDialog.getWindow().setTitle("请输入"+list.get(position).name+"的数量");
+//		mDialog.getWindow().setTitleColor(R.color.grey);
 		mDialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
 		mDialog.show();
+		TextView ordername=(TextView)mView.findViewById(R.id.ordername);
+		ordername.setText("请输入"+list.get(position).name+"的数量");
 	    mycount = (EditText)mView.findViewById(R.id.mycount);
 		//mycount.setGravity(Gravity.LEFT);
 		mycount.setText("1");
@@ -254,12 +274,12 @@ public class Common {
 		final EditText mycount;
 		order=(orderActivity)context;
 		View mView =LayoutInflater.from(context).inflate(R.layout.alert, null);
-		final Dialog mDialog = new Dialog(context);
+		final Dialog mDialog = new Dialog(context,R.style.FullHeightDialog);
 		mDialog.setContentView(mView);
-		mDialog.getWindow().setTitle("请输入"+list.get(position).name+"的删除数量");
-		mDialog.getWindow().setTitleColor(R.color.grey);
 		mDialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
 		mDialog.show();
+		TextView ordername=(TextView)mView.findViewById(R.id.ordername);
+		ordername.setText("请输入"+list.get(position).name+"的删除数量");
 	    mycount = (EditText)mView.findViewById(R.id.mycount);
 		//mycount.setGravity(Gravity.LEFT);
 		mycount.setText("1");
@@ -299,6 +319,92 @@ public class Common {
 
 		
 	}
+	
+	/*
+	 * 点解下单的时候的弹出框
+	 * 
+	 * */
+	public void order(final Context context){
+		final EditText mycount;
+		main=(MainActivity)context;
+		View mView =LayoutInflater.from(context).inflate(R.layout.alert, null);
+		final Dialog mDialog = new Dialog(context,R.style.FullHeightDialog);
+		mDialog.setContentView(mView);
+		mDialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
+		mDialog.show();
+		TextView ordername=(TextView)mView.findViewById(R.id.ordername);
+		ordername.setText("请输入台号:");
+	    mycount = (EditText)mView.findViewById(R.id.mycount);
+		Button mButtonOK = (Button) mView.findViewById(R.id.confirm);
+		mButtonOK.setText("确定");
+		mButtonOK.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				main.order(mycount.getText().toString());
+				 mDialog.cancel();
+			}
+		});
+		
+		Button cancle = (Button) mView.findViewById(R.id.cancle);
+		cancle.setText("取消");
+		cancle.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				mDialog.cancel();
+			}
+		});
+
+		
+	}
+	
+	/*
+	 * 点解分厨出现的二级菜单
+	 * 
+	 * */
+	AlertDialog aler;
+	public void showkichent(Context context,final List<SKitchen> perant,final List<List<Kitchen>> child){
+		
+	final AlertDialog.Builder mydialog=new  AlertDialog.Builder(context);
+		View view=LayoutInflater.from(context).inflate(R.layout.expandablelistview, null);
+		mydialog.setTitle("请选择厨房");
+		mydialog.setView(view);
+//		mydialog.show();
+		ExpandableListView mylistview=(ExpandableListView)view.findViewById(R.id.myExpandableListView);
+		
+		ExpandlistAdapter adapter=new ExpandlistAdapter(context,perant,child);
+		mylistview.setAdapter(adapter);
+		mylistview.setGroupIndicator(context.getResources().getDrawable( R.layout.expander_ic_folder));
+		
+		mylistview.setOnChildClickListener(new OnChildClickListener() {
+			
+			public boolean onChildClick(ExpandableListView parent, View v,
+					int groupPosition, int childPosition, long id) {
+		       Kitchen kitchen =child.get(groupPosition).get(childPosition);;
+		        if(kient!=null){
+		        	kient.getslect(kitchen);
+		        	aler.dismiss();
+		        }
+               Log.e("", "llllllll"+kitchen.name);
+                
+				return true;
+				
+			}
+		});
+		mydialog.setNegativeButton("返回", null).setOnKeyListener(new OnKeyListener() {
+
+			@Override
+			public boolean onKey(DialogInterface arg0, int arg1,
+					KeyEvent arg2) {
+				// TODO Auto-generated method stub
+				return true;
+			}
+		});
+		
+		 aler=mydialog.create();
+		aler.show();
+		
+	}
+	
 	
 	 /*
 	   * 点菜弹出的添加口味dialog
@@ -341,7 +447,7 @@ public class Common {
 		if(food.tastePref.equals("无口味")){
   			test.setText(food.name+":");
   		}else{
-  			test.setText(food.name+":"+food.tastePref);
+  			test.setText(food.name+":"+food.tastePref); 
   		}
 	}
 }

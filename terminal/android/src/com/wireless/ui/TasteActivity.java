@@ -38,8 +38,9 @@ String taste="";
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.taste);
-		appcontext = (AppContext) getApplication();
 		
+		appcontext = (AppContext) getApplication();
+		appcontext.activityList.add(TasteActivity.this);
 		foodtaste=(TextView)findViewById(R.id.foodtaste);
 	    Common.getCommon().init(Common.getCommon().getFoodlist().get(Common.getCommon().getPosition()), foodtaste);
 			

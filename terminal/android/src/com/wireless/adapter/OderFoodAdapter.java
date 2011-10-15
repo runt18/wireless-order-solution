@@ -65,6 +65,7 @@ public class OderFoodAdapter extends BaseAdapter {
 		String taste="";
 	    if(foods.get(position).hangStatus==Food.FOOD_HANG_UP){
 	    	holder.foodname.setText("(На)"+foods.get(position).name);
+	    	Log.e("", "(На)"+foods.get(position).name);
 	    }else if(foods.get(position).hangStatus==Food.FOOD_NORMAL){
 	    	holder.foodname.setText(foods.get(position).name);
 	    }

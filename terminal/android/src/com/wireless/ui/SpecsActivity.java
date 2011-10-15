@@ -33,8 +33,10 @@ public class SpecsActivity extends Activity {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.specs);
+		
 		Log.e("", "oncreate");
 		appcontext = (AppContext) getApplication();
+		appcontext.activityList.add(SpecsActivity.this);
 		myListview=(ListView)findViewById(R.id.myListView);
 		foodtaste=(TextView)findViewById(R.id.foodtaste);
 	    Common.getCommon().init(Common.getCommon().getFoodlist().get(Common.getCommon().getPosition()), foodtaste);

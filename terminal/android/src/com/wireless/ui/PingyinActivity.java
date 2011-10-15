@@ -34,7 +34,9 @@ public class PingyinActivity extends Activity {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.pinyin);
+		
 		appcontext = (AppContext) getApplication();
+		appcontext.activityList.add(PingyinActivity.this);
 		myListView = (DragListView) findViewById(R.id.myListView);
 		searchpin = (EditText) findViewById(R.id.searchpin);
 		
