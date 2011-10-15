@@ -33,4 +33,5 @@
 	  <uses-permission android:name="android.permission.CALL_PRIVILEGED"/> 
 	  <uses-permission android:name="android.permission.SEND_SMS"/> 
 	  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+	  <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES"/>
 </manifest>
