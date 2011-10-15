@@ -4,18 +4,36 @@
   android:layout_width="wrap_content"
   android:layout_height="wrap_content"
   >
+    <RelativeLayout 
+    android:id="@+id/l1"
+  android:layout_width="fill_parent"
+  android:layout_height="50dip"
 
+  >
+  <TextView 
+  android:id="@+id/ordername"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+  android:textColor="#000000"
+  android:textSize="20sp"
+  android:typeface="serif"
+  android:textStyle="bold"
+  android:layout_centerVertical="true"
+  />
   
+  
+</RelativeLayout>
   <ImageView 
   android:id="@+id/line1"
   android:layout_width="fill_parent"
   android:layout_height="wrap_content"
   android:src="@drawable/table_line"
+  android:layout_below="@id/l1"
   />
   
   <EditText 
   android:id="@+id/mycount"
-  android:layout_width="wrap_content"
+  android:layout_width="350dip"
   android:layout_height="50dip"
   android:textColor="#000000"
   android:textSize="18sp"
@@ -24,6 +42,8 @@
   android:background="@null"
   android:layout_below="@id/line1"
   android:layout_marginLeft="10dip"
+  android:inputType="numberSigned|text"     
+
   />  
   
     <ImageView 
