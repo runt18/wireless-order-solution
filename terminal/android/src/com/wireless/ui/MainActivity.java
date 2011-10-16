@@ -171,12 +171,11 @@ public class MainActivity extends Activity {
 			) {
 				switch (position) {
 				case 0:
-					Common.getCommon().order(MainActivity.this);
-					
+					Common.getCommon().order(MainActivity.this,0);
 					break;
 
 				case 1:
-
+					Common.getCommon().order(MainActivity.this,1);
 					break;
 				case 2:
 
@@ -316,9 +315,17 @@ public class MainActivity extends Activity {
 	public void order(String plate){
 		Intent intent = new Intent(MainActivity.this,
 				orderActivity.class);
-		intent.putExtra("plate", plate);
 		startActivity(intent);
 	}
+	
+	//跳转到下单界面
+	public void drop(String plate){
+		Intent intent = new Intent(MainActivity.this,
+				DropActivity.class);
+		intent.putExtra("platform", plate);
+		startActivity(intent);
+	}
+	
 	private Handler handler=new Handler(){
 		public void handleMessage(Message msg){
 			if(!Thread.currentThread().interrupted()){

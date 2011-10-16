@@ -1,13 +1,10 @@
 package com.wireless.ui;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.DialogInterface.OnKeyListener;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -49,25 +46,21 @@ public class orderActivity extends Activity {
     RelativeLayout  buttomrelativelayout;
    private TextView amountvalue; 
 	 String plate;
+	 private ProgressDialog mydialog;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.order);
-		
-		
-		plate = getIntent().getExtras().getString("plate");
-		Log.e("", "error");
+        
 		orderbutton = (ImageView) findViewById(R.id.orderbutton);
-		
-		
 		tableNum=(EditText)findViewById(R.id.valueplatform);
 		amountvalue=(TextView)findViewById(R.id.amountvalue);
 		customNum=(EditText)findViewById(R.id.valuepeople);
 		buttomrelativelayout=(RelativeLayout)findViewById(R.id.bottom);
 	
 
-		tableNum.setText(plate);
+		tableNum.setText(Common.getCommon().getOrderplatenum());
 		appcontext = (AppContext) getApplication();
 		appcontext.activityList.add(orderActivity.this);
 		orderbutton.setOnClickListener(new orderbutton());
@@ -99,6 +92,7 @@ public class orderActivity extends Activity {
 			   // finish();
 				Common.getCommon().getFoodlist().clear();;
 				Common.getCommon().setPosition(0);
+				Common.getCommon().setOrderplatenum("");
 				Intent intent=new Intent(orderActivity.this,MainActivity.class);
 				startActivity(intent);
 			}
@@ -154,15 +148,21 @@ public class orderActivity extends Activity {
 
 		@Override
 		public void onClick(View v) {
-			String tables=tableNum.getText().toString().trim();
-			String peoples=customNum.getText().toString().trim();
+			final String tables=tableNum.getText().toString().trim();
+			final String peoples=customNum.getText().toString().trim();
 			if(tables.trim().equals("")){
 				Toast.makeText(orderActivity.this, "台号不能为空", 1).show();
 			}else if(peoples.trim().equals("")){
 				Toast.makeText(orderActivity.this, "人数不能为空", 1).show();
 			}else if(Common.getCommon().isNetworkAvailable(orderActivity.this)){
-				Common.getCommon().showDialog(orderActivity.this, "正在下单，请稍候....");
-				commit(Common.getCommon().getFoodlist().toArray(new Food[Common.getCommon().getFoodlist().size()]),Short.valueOf(tables),Short.valueOf(peoples));
+				mydialog=ProgressDialog.show(orderActivity.this, "", "正在下单，请稍候....");				
+				new Thread(){
+					public void run(){
+						commit(Common.getCommon().getFoodlist().toArray(new Food[Common.getCommon().getFoodlist().size()]),Short.valueOf(tables),Short.valueOf(peoples));
+					}
+					
+				}.start();
+				
 			}else{
 				Toast.makeText(orderActivity.this, "当前没有网络", 1).show();
 			}
@@ -299,9 +299,12 @@ public class orderActivity extends Activity {
 
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
 			
+			Intent intent=new Intent(orderActivity.this,MainActivity.class);
+			startActivity(intent);
 			Common.getCommon().getFoodlist().clear();;
 			Common.getCommon().setPosition(0);
-		
+			Common.getCommon().setOrderplatenum("");
+			
 			
 		}
 		return super.onKeyDown(keyCode, event);
@@ -315,9 +318,10 @@ public class orderActivity extends Activity {
 				
 				
 				case 0:
-					Common.getCommon().dialog.dismiss();
+					mydialog.dismiss();
 					Common.getCommon().getFoodlist().clear();;
 					Common.getCommon().setPosition(0);
+					Common.getCommon().setOrderplatenum("");
 					myListView.setAdapter(adapter);
 					account();
 					new AlertDialog.Builder(orderActivity.this).setTitle("提示").setMessage("下单成功").setPositiveButton("确定", new DialogInterface.OnClickListener() {
@@ -333,35 +337,35 @@ public class orderActivity extends Activity {
 				break;
 				
 				case 1:
-					Common.getCommon().dialog.dismiss();
+					mydialog.dismiss();
 					new AlertDialog.Builder(orderActivity.this).setTitle("提示").setMessage("菜谱有更新，请更新菜谱后再重新下单。").setNeutralButton("确定", null).show();
 				break;
 				case 2:
-					Common.getCommon().dialog.dismiss();
+					mydialog.dismiss();
 					new AlertDialog.Builder(orderActivity.this).setTitle("提示").setMessage("号台已被删除，请与餐厅负责人确认。").setNeutralButton("确定", null).show();
 				break;
 					
 				case 3:
-					Common.getCommon().dialog.dismiss();
+					mydialog.dismiss();
 					new AlertDialog.Builder(orderActivity.this).setTitle("提示").setMessage("号台已经下单，请与餐厅负责人确认。").setNeutralButton("确定", null).show();
 					
 				break;
 						
                 case 4:
-                	Common.getCommon().dialog.dismiss();
+                	mydialog.dismiss();
 					new AlertDialog.Builder(orderActivity.this).setTitle("提示").setMessage("号台下单打印未成功，请与餐厅负责人确认。").setNeutralButton("确定", null).show();
 				break;
                 case 5:
-                	Common.getCommon().dialog.dismiss();
+                	mydialog.dismiss();
 					new AlertDialog.Builder(orderActivity.this).setTitle("提示").setMessage("赠送的菜品已超出赠送额度，请与餐厅负责人确认。").setNeutralButton("确定", null).show();
 				break;
 				
                 case 6:
-                	Common.getCommon().dialog.dismiss();
+                	mydialog.dismiss();
 					new AlertDialog.Builder(orderActivity.this).setTitle("提示").setMessage("号台下单失败，请重新提交下单。").setNeutralButton("确定", null).show();
                 	break;
                 case 7:
-                	Common.getCommon().dialog.dismiss();
+                	mydialog.dismiss();
 					new AlertDialog.Builder(orderActivity.this).setTitle("提示").setMessage("连接服务器超时，请重新请求").setNeutralButton("确定", null).show();
                 	break;
                 case 8:

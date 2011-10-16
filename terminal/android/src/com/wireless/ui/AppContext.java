@@ -24,7 +24,7 @@ public class AppContext extends Application {
 	private String notice;
 	private String username;
 	private String restaurant;
-	private FoodMenu foodMenu;
+	private static FoodMenu foodMenu;
 	private List<Food> foods;
 	private List<Taste> tastes;
 	private List<Taste> stytles;
@@ -57,12 +57,13 @@ public class AppContext extends Application {
 		this.restaurant = restaurant;
 	}
 
-	public FoodMenu getFoodMenu() {
+     
+	public static FoodMenu getFoodMenu() {
 		return foodMenu;
 	}
 
-	public void setFoodMenu(FoodMenu foodMenu) {
-		this.foodMenu = foodMenu;
+	public static void setFoodMenu(FoodMenu foodMenu) {
+		AppContext.foodMenu = foodMenu;
 	}
 
 	public List<Food> getFoods() {

@@ -30,6 +30,7 @@ import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.SKitchen;
 import com.wireless.protocol.Taste;
+import com.wireless.ui.DropActivity;
 import com.wireless.ui.KitchenActivity;
 import com.wireless.ui.MainActivity;
 import com.wireless.ui.R;
@@ -46,7 +47,39 @@ public class Common {
    TasteActivity taste;
    KitchenActivity kient;
    MainActivity main;
+   DropActivity drop;
+   public static List<Food> dropfoods;
+   //下单台号
+   private String orderplatenum;
+   //改单台号
+   private String dropplatenum;
    
+   
+   
+
+	public String getDropplatenum() {
+	return dropplatenum;
+}
+
+public void setDropplatenum(String dropplatenum) {
+	this.dropplatenum = dropplatenum;
+}
+
+	public String getOrderplatenum() {
+	return orderplatenum;
+}
+
+public void setOrderplatenum(String orderplatenum) {
+	this.orderplatenum = orderplatenum;
+}
+
+	public static List<Food> getDropfoods() {
+	return dropfoods;
+   }
+
+   public static void setDropfoods(List<Food> dropfoods) {
+	Common.dropfoods = dropfoods;
+   }
 
 	public KitchenActivity getKient() {
 	return kient;
@@ -324,9 +357,8 @@ public void setKient(KitchenActivity kient) {
 	 * 点解下单的时候的弹出框
 	 * 
 	 * */
-	public void order(final Context context){
+	public void order(final Context context,final int num){
 		final EditText mycount;
-		main=(MainActivity)context;
 		View mView =LayoutInflater.from(context).inflate(R.layout.alert, null);
 		final Dialog mDialog = new Dialog(context,R.style.FullHeightDialog);
 		mDialog.setContentView(mView);
@@ -340,8 +372,18 @@ public void setKient(KitchenActivity kient) {
 		mButtonOK.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				main.order(mycount.getText().toString());
-				 mDialog.cancel();
+				if(num==0){
+					main=(MainActivity)context;
+					main.order(mycount.getText().toString());
+					setOrderplatenum(mycount.getText().toString());
+					 mDialog.cancel();
+				}else{
+					main=(MainActivity)context;
+					main.drop(mycount.getText().toString());
+					setDropplatenum(mycount.getText().toString());
+					 mDialog.cancel();
+				}
+				
 			}
 		});
 		
