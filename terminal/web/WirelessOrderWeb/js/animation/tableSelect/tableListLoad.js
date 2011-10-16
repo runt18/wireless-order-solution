@@ -363,7 +363,7 @@ function tableSelectOnLoad() {
 	// 随机刷新
 	var x = 180000;  
 	var y = 1000;  
-	var rand = parseInt(Math.random() * (x - y + 1) + y);
+	var rand = parseInt(Math.random() * (x - y + 1000) + y);
 	setInterval(function() {
 		location.reload();
 	}, rand);
