@@ -24,6 +24,11 @@ function dishGridRefresh() {
 		for ( var i = 0; i < orderedData.length; i++) {
 			if (orderedData[i][16] == "1") {
 				document.getElementById("tasteLink" + i).onclick = function() {
+					Ext.MessageBox.show({
+						msg : "已点菜品不能修改口味",
+						width : 300,
+						buttons : Ext.MessageBox.OK
+					});
 					return false;
 				};
 			} else if (orderedData[i][16] == "2") {
@@ -278,40 +283,40 @@ function orderedDishesOnLoad() {
 
 	// upate the tool bar
 	if (Request["tableStat"] == "free") {
-		orderedGrid.getTopToolbar().addSeparator();
-		orderedGrid.getTopToolbar().addSpacer();
-		orderedGrid.getTopToolbar().addSpacer();
-		orderedGrid.getTopToolbar().addSpacer();
-		orderedGrid.getTopToolbar().addSpacer();
-		orderedGrid.getTopToolbar().addSpacer();
-		orderedGrid.getTopToolbar().addSpacer();
-		orderedGrid.getTopToolbar().addSpacer();
-		orderedGrid.getTopToolbar().addSpacer();
-		orderedGrid.getTopToolbar().addSpacer();
-		orderedGrid.getTopToolbar().addSpacer();
-		orderedGrid.getTopToolbar().addItem(countAddImgBut);
-		orderedGrid.getTopToolbar().addSpacer();
-		orderedGrid.getTopToolbar().addSpacer();
-		orderedGrid.getTopToolbar().addSpacer();
-		orderedGrid.getTopToolbar().addSpacer();
-		orderedGrid.getTopToolbar().addSpacer();
-		orderedGrid.getTopToolbar().addSpacer();
-		orderedGrid.getTopToolbar().addSpacer();
-		orderedGrid.getTopToolbar().addSpacer();
-		orderedGrid.getTopToolbar().addSpacer();
-		orderedGrid.getTopToolbar().addSpacer();
-		orderedGrid.getTopToolbar().addItem(countMinusImgBut);
-		orderedGrid.getTopToolbar().addSpacer();
-		orderedGrid.getTopToolbar().addSpacer();
-		orderedGrid.getTopToolbar().addSpacer();
-		orderedGrid.getTopToolbar().addSpacer();
-		orderedGrid.getTopToolbar().addSpacer();
-		orderedGrid.getTopToolbar().addSpacer();
-		orderedGrid.getTopToolbar().addSpacer();
-		orderedGrid.getTopToolbar().addSpacer();
-		orderedGrid.getTopToolbar().addSpacer();
-		orderedGrid.getTopToolbar().addSpacer();
-		orderedGrid.getTopToolbar().addItem(countEqualImgBut);
+		// orderedGrid.getTopToolbar().addSeparator();
+		// orderedGrid.getTopToolbar().addSpacer();
+		// orderedGrid.getTopToolbar().addSpacer();
+		// orderedGrid.getTopToolbar().addSpacer();
+		// orderedGrid.getTopToolbar().addSpacer();
+		// orderedGrid.getTopToolbar().addSpacer();
+		// orderedGrid.getTopToolbar().addSpacer();
+		// orderedGrid.getTopToolbar().addSpacer();
+		// orderedGrid.getTopToolbar().addSpacer();
+		// orderedGrid.getTopToolbar().addSpacer();
+		// orderedGrid.getTopToolbar().addSpacer();
+		// orderedGrid.getTopToolbar().addItem(countAddImgBut);
+		// orderedGrid.getTopToolbar().addSpacer();
+		// orderedGrid.getTopToolbar().addSpacer();
+		// orderedGrid.getTopToolbar().addSpacer();
+		// orderedGrid.getTopToolbar().addSpacer();
+		// orderedGrid.getTopToolbar().addSpacer();
+		// orderedGrid.getTopToolbar().addSpacer();
+		// orderedGrid.getTopToolbar().addSpacer();
+		// orderedGrid.getTopToolbar().addSpacer();
+		// orderedGrid.getTopToolbar().addSpacer();
+		// orderedGrid.getTopToolbar().addSpacer();
+		// orderedGrid.getTopToolbar().addItem(countMinusImgBut);
+		// orderedGrid.getTopToolbar().addSpacer();
+		// orderedGrid.getTopToolbar().addSpacer();
+		// orderedGrid.getTopToolbar().addSpacer();
+		// orderedGrid.getTopToolbar().addSpacer();
+		// orderedGrid.getTopToolbar().addSpacer();
+		// orderedGrid.getTopToolbar().addSpacer();
+		// orderedGrid.getTopToolbar().addSpacer();
+		// orderedGrid.getTopToolbar().addSpacer();
+		// orderedGrid.getTopToolbar().addSpacer();
+		// orderedGrid.getTopToolbar().addSpacer();
+		// orderedGrid.getTopToolbar().addItem(countEqualImgBut);
 
 	} else {
 		orderedGrid.getTopToolbar().addSeparator();
@@ -457,7 +462,7 @@ function tasteOnLoad() {
 						tasteInfo[4], // 比例
 						tasteInfo[5], // 计算方式
 						countTypeDescr, // 计算方式显示
-						false// 选择
+						false // 选择
 						]);
 					} else if (tasteInfo[1] == "1") {
 						dishTasteDataPar.push([ tasteInfo[0], // 口味编号
@@ -467,7 +472,7 @@ function tasteOnLoad() {
 						tasteInfo[4], // 比例
 						tasteInfo[5], // 计算方式
 						countTypeDescr, // 计算方式显示
-						false// 选择
+						false // 选择
 						]);
 					} else {
 						dishTasteDataSiz.push([ tasteInfo[0], // 口味编号
@@ -477,7 +482,7 @@ function tasteOnLoad() {
 						tasteInfo[4], // 比例
 						tasteInfo[5], // 计算方式
 						countTypeDescr, // 计算方式显示
-						false// 选择
+						false // 选择
 						]);
 					}
 

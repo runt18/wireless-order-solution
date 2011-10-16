@@ -1727,7 +1727,7 @@ var billGenModForm = new Ext.form.FormPanel({
 			} ]
 		}, {
 			// columnWidth : .10,
-			width : 90,
+			width : 60,
 			layout : 'form',
 			labelWidth : 0,
 			labelSeparator : '',
@@ -1749,7 +1749,7 @@ var billGenModForm = new Ext.form.FormPanel({
 			} ]
 		}, {
 			// columnWidth : .10,
-			width : 90,
+			width : 70,
 			layout : 'form',
 			labelWidth : 0,
 			labelSeparator : '',

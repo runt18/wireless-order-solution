@@ -39,7 +39,7 @@ var modifyBillBut = new Ext.ux.ImageButton({
 // 查看link
 var viewBillGenPanel = new Ext.Panel({
 	region : "north",
-	height : 160,
+	height : 140,
 	frame : true,
 	items : [ {
 		border : false,
@@ -142,39 +142,37 @@ var viewBillWin = new Ext.Window(
 				border : false,
 				items : [ viewBillGenPanel, viewBillDtlPanel, viewBillAddPanel ]
 			} ],
-			buttons : [
-					{
-						text : "确定",
-						handler : function() {
-							viewBillWin.hide();
-						}
-					},
-					{
-						text : "打印",
-						disabled : true,
-						handler : function() {
-							
-//							Ext.Ajax.request({
-//								url : "../PrintOrder.do",
-//								params : {
-//									"pin" : currPin,
-//									"printShift" : 1
-//								},
-//								success : function(response, options) {
-//									var resultJSON = Ext.util.JSON
-//											.decode(response.responseText);
-//									Ext.MessageBox.show({
-//										msg : resultJSON.data,
-//										width : 300,
-//										buttons : Ext.MessageBox.OK
-//									});
-//
-//								},
-//								failure : function(response, options) {
-//								}
-//							});
-						}
-					} ],
+			buttons : [ {
+				text : "确定",
+				handler : function() {
+					viewBillWin.hide();
+				}
+			}, {
+				text : "打印",
+				disabled : true,
+				handler : function() {
+
+					// Ext.Ajax.request({
+					// url : "../PrintOrder.do",
+					// params : {
+					// "pin" : currPin,
+					// "printShift" : 1
+					// },
+					// success : function(response, options) {
+					// var resultJSON = Ext.util.JSON
+					// .decode(response.responseText);
+					// Ext.MessageBox.show({
+					// msg : resultJSON.data,
+					// width : 300,
+					// buttons : Ext.MessageBox.OK
+					// });
+					//
+					// },
+					// failure : function(response, options) {
+					// }
+					// });
+				}
+			} ],
 			listeners : {
 				"show" : function(thiz) {
 					var billID = billsData[currRowIndex][0];
@@ -208,8 +206,8 @@ var viewBillWin = new Ext.Window(
 					document.getElementById("waiterBV").innerHTML = billWaiter;
 					document.getElementById("forFreeBV").innerHTML = "￥"
 							+ billForFree;
-					 document.getElementById("shouldPayBV").innerHTML = "￥"
-					 + billShouldPay;
+					document.getElementById("shouldPayBV").innerHTML = "￥"
+							+ billShouldPay;
 					document.getElementById("actrualPayBV").innerHTML = "￥"
 							+ billAvtrualPay;
 
@@ -268,16 +266,18 @@ var viewBillWin = new Ext.Window(
 														]);
 											}
 
-//											// 算應收
-//											var shouldPayOth = 0.0;
-//											for ( var i = 0; i < viewBillData.length; i++) {
-//												shouldPayOth = shouldPayOth
-//														+ parseFloat(viewBillData[i][4]
-//																.substring(1));
-//											}
-//											document
-//													.getElementById("shouldPayBV").innerHTML = "￥"
-//													+ shouldPayOth;
+											// // 算應收
+											// var shouldPayOth = 0.0;
+											// for ( var i = 0; i <
+											// viewBillData.length; i++) {
+											// shouldPayOth = shouldPayOth
+											// + parseFloat(viewBillData[i][4]
+											// .substring(1));
+											// }
+											// document
+											// .getElementById("shouldPayBV").innerHTML
+											// = "￥"
+											// + shouldPayOth;
 
 											viewBillStore.reload();
 										}
@@ -462,7 +462,7 @@ billDetailGrid.getStore().on('load', function() {
 billDetailWin = new Ext.Window({
 	layout : "fit",
 	width : 1100,
-	height : 200,
+	height : 320,
 	closeAction : "hide",
 	resizable : true,
 	items : billDetailGrid,
@@ -743,6 +743,347 @@ var searchForm = new Ext.Panel({
 	} ]
 });
 
+// 高級搜索彈出框
+var tableTypeDataAdvSrch = [ [ "6", "全部" ], [ "1", "一般" ], [ "2", "外卖" ],
+		[ "3", "并台" ], [ "4", "拼台" ] ];
+var tableTypeCombAdvSrch = new Ext.form.ComboBox({
+	// hideLabel : true,
+	forceSelection : true,
+	fieldLabel : "类型",
+	width : 100,
+	value : "全部",
+	id : "tableTypeCombAdvSrch",
+	store : new Ext.data.SimpleStore({
+		fields : [ "value", "text" ],
+		data : tableTypeDataAdvSrch
+	}),
+	valueField : "value",
+	displayField : "text",
+	typeAhead : true,
+	mode : "local",
+	triggerAction : "all",
+	selectOnFocus : true,
+	allowBlank : false
+});
+
+var payTypeDataAdvSrch = [ [ "6", "全部" ], [ "1", "现金" ], [ "2", "刷卡" ],
+		[ "3", "会员卡" ], [ "4", "签单" ], [ "5", "挂账" ] ];
+var payTypeCombAdvSrch = new Ext.form.ComboBox({
+	// hideLabel : true,
+	forceSelection : true,
+	fieldLabel : "结帐方式",
+	width : 100,
+	value : "全部",
+	id : "payTypeCombAdvSrch",
+	store : new Ext.data.SimpleStore({
+		fields : [ "value", "text" ],
+		data : payTypeDataAdvSrch
+	}),
+	valueField : "value",
+	displayField : "text",
+	typeAhead : true,
+	mode : "local",
+	triggerAction : "all",
+	selectOnFocus : true,
+	allowBlank : false
+});
+
+advSrchForm = new Ext.form.FormPanel({
+	frame : true,
+	border : false,
+	layout : "fit",
+	items : [ {
+		layout : "column",
+		border : false,
+		items : [ {
+			layout : "form",
+			border : false,
+			labelSeparator : '：',
+			labelWidth : 40,
+			width : 170,
+			items : [ {
+				xtype : "timefield",
+				fieldLabel : "时间",
+				format : "H:i:s",
+				width : 100,
+				id : "advSrchStartTime"
+			} ]
+		}, {
+			layout : 'form',
+			border : false,
+			labelWidth : 20,
+			width : 170,
+			labelSeparator : '',
+			items : [ {
+				xtype : "timefield",
+				fieldLabel : "至",
+				format : "H:i:s",
+				width : 100,
+				id : "advSrchEndTime"
+			} ]
+		} ]
+	}, {
+		layout : "column",
+		border : false,
+		items : [ {
+			layout : "form",
+			border : false,
+			labelSeparator : '：',
+			labelWidth : 40,
+			width : 170,
+			items : [ {
+				xtype : "numberfield",
+				fieldLabel : "金額",
+				width : 100,
+				id : "advSrchStartAmt"
+			} ]
+		}, {
+			layout : 'form',
+			border : false,
+			labelWidth : 20,
+			width : 170,
+			labelSeparator : '',
+			items : [ {
+				xtype : "numberfield",
+				fieldLabel : "至",
+				width : 100,
+				id : "advSrchEndAmt"
+			} ]
+		} ]
+	}, {
+		layout : "column",
+		border : false,
+		items : [ {
+			layout : "form",
+			border : false,
+			labelSeparator : '：',
+			labelWidth : 40,
+			width : 170,
+			items : [ {
+				xtype : "textfield",
+				fieldLabel : "台号",
+				width : 100,
+				id : "advSrchTableNbr"
+			} ]
+		}, {
+			layout : "form",
+			border : false,
+			labelSeparator : '：',
+			labelWidth : 60,
+			width : 170,
+			items : payTypeCombAdvSrch
+		} ]
+	}, {
+		layout : "column",
+		border : false,
+		items : [ {
+			layout : "form",
+			border : false,
+			labelSeparator : '：',
+			labelWidth : 40,
+			width : 170,
+			items : tableTypeCombAdvSrch
+		} ]
+	} ]
+});
+
+advSrchWin = new Ext.Window(
+		{
+			layout : "fit",
+			title : "高级搜索",
+			width : 370,
+			height : 190,
+			// height : 500,
+			closeAction : "hide",
+			resizable : false,
+			items : advSrchForm,
+			buttons : [
+					{
+						text : "搜索",
+						handler : function() {
+							advSrchWin.hide();
+
+							// bill adv srch
+							// 1, get parameters
+							var timeBegin = advSrchForm.findById(
+									"advSrchStartTime").getValue();
+							var endBegin = advSrchForm.findById(
+									"advSrchEndTime").getValue();
+							var amountBegin = advSrchForm.findById(
+									"advSrchStartAmt").getValue();
+							var amountEnd = advSrchForm.findById(
+									"advSrchEndAmt").getValue();
+							var tableNumber = advSrchForm.findById(
+									"advSrchTableNbr").getValue();
+
+							var payManner = payTypeCombAdvSrch.getValue();
+							var in_payManner;
+							if (payManner == "全部") {
+								in_payManner = 6;
+							} else {
+								in_payManner = payManner;
+							}
+							;
+
+							var tableType = tableTypeCombAdvSrch.getValue();
+							var in_tableType;
+							if (tableType == "全部") {
+								in_tableType = 6;
+							} else {
+								in_tableType = tableType;
+							}
+							;
+
+							// 2, do the search
+							Ext.Ajax
+									.request({
+										url : "../QueryTodayAdv.do",
+										params : {
+											"pin" : pin,
+											"timeBegin" : timeBegin,
+											"timeEnd" : endBegin,
+											"amountBegin" : amountBegin,
+											"amountEnd" : amountEnd,
+											"tableNumber" : tableNumber,
+											"payManner" : in_payManner,
+											"tableType" : in_tableType
+										},
+										success : function(response, options) {
+											var resultJSON = Ext.util.JSON
+													.decode(response.responseText);
+											if (resultJSON.success == true) {
+												var josnData = resultJSON.data;
+												if (josnData != "") {
+													var billList = josnData
+															.split("，");
+													billsData.length = 0;
+													for ( var i = 0; i < billList.length; i++) {
+														var billInfo = billList[i]
+																.substr(
+																		1,
+																		billList[i].length - 2)
+																.split(",");
+
+														// 格式：["账单号","台号","日期","类型","结帐方式","金额","实收","台号2","就餐人数","最低消","服务费率","会员编号","会员姓名","账单备注","赠券金额","结帐类型","折扣类型","服务员"]
+														// 后台格式：["账单号","台号","日期","类型","结帐方式","金额","实收","台号2","就餐人数","最低消","服务费率","会员编号","会员姓名","账单备注","赠券金额","结帐类型","折扣类型","服务员"]
+														billsData
+																.push([
+																		billInfo[0]
+																				.substr(
+																						1,
+																						billInfo[0].length - 2),// 账单号
+																		billInfo[1]
+																				.substr(
+																						1,
+																						billInfo[1].length - 2),// 台号
+																		billInfo[2]
+																				.substr(
+																						1,
+																						billInfo[2].length - 2),// 日期
+																		billInfo[3]
+																				.substr(
+																						1,
+																						billInfo[3].length - 2),// 类型
+																		billInfo[4]
+																				.substr(
+																						1,
+																						billInfo[4].length - 2), // 结帐方式
+																		billInfo[5]
+																				.substr(
+																						1,
+																						billInfo[5].length - 2), // 金额
+																		billInfo[6]
+																				.substr(
+																						1,
+																						billInfo[6].length - 2), // 实收
+																		billInfo[7]
+																				.substr(
+																						1,
+																						billInfo[7].length - 2), // 台号2
+																		billInfo[8]
+																				.substr(
+																						1,
+																						billInfo[8].length - 2), // 就餐人数
+																		billInfo[9]
+																				.substr(
+																						1,
+																						billInfo[9].length - 2), // 最低消
+																		billInfo[10]
+																				.substr(
+																						1,
+																						billInfo[10].length - 2), // 服务费率
+																		billInfo[11]
+																				.substr(
+																						1,
+																						billInfo[11].length - 2), // 会员编号
+																		billInfo[12]
+																				.substr(
+																						1,
+																						billInfo[12].length - 2), // 会员姓名
+																		billInfo[13]
+																				.substr(
+																						1,
+																						billInfo[13].length - 2), // 账单备注
+																		billInfo[14]
+																				.substr(
+																						1,
+																						billInfo[14].length - 2), // 赠券金额
+																		billInfo[15]
+																				.substr(
+																						1,
+																						billInfo[15].length - 2), // 结帐类型
+																		billInfo[16]
+																				.substr(
+																						1,
+																						billInfo[16].length - 2), // 折扣类型
+																		billInfo[17]
+																				.substr(
+																						1,
+																						billInfo[17].length - 2), // 服务员
+																]);
+
+													}
+
+													// sum the prices
+													var sumShouldPay = 0;
+													var sumActualPay = 0;
+													for ( var i = 0; i < billsData.length; i++) {
+														sumShouldPay = sumShouldPay
+																+ parseFloat(billsData[i][5]);
+														sumActualPay = sumActualPay
+																+ parseFloat(billsData[i][6]);
+													}
+													document
+															.getElementById("shouldPaySum").innerHTML = sumShouldPay
+															.toFixed(2);
+													document
+															.getElementById("actualPaySum").innerHTML = sumActualPay
+															.toFixed(2);
+
+												} else {
+													billsData.length = 0;
+												}
+												billsStore.reload();
+											}
+										},
+										failure : function(response, options) {
+										}
+									});
+						}
+					}, {
+						text : "取消",
+						handler : function() {
+							advSrchWin.hide();
+						}
+					} ],
+			listeners : {
+				"show" : function() {
+					tableTypeCombAdvSrch.setValue("全部");
+					payTypeCombAdvSrch.setValue("全部");
+				}
+			}
+		});
+
 // panel
 var billsQueryCondPanel = new Ext.form.FormPanel({
 	region : "north",
@@ -769,7 +1110,7 @@ var billsQueryCondPanel = new Ext.form.FormPanel({
 		}, searchForm, {
 			layout : 'form',
 			border : false,
-			width : 110,
+			width : 70,
 			items : [ {
 				xtype : "button",
 				hideLabel : true,
@@ -778,6 +1119,23 @@ var billsQueryCondPanel = new Ext.form.FormPanel({
 				width : 100,
 				listeners : {
 					"click" : billQueryHandler
+				}
+			} ]
+		}, {
+			layout : 'form',
+			border : false,
+			width : 110,
+			items : [ {
+				xtype : "button",
+				hideLabel : true,
+				id : "advSrchBtn",
+				text : "高级搜索",
+				width : 100,
+				// disabled : true,
+				listeners : {
+					"click" : function() {
+						advSrchWin.show();
+					}
 				}
 			} ]
 		} ]

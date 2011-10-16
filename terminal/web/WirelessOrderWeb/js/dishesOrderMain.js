@@ -326,13 +326,15 @@ var countAddImgBut = new Ext.ux.ImageButton(
 			tooltip : "数量加1",
 			handler : function(btn) {
 				if (dishOrderCurrRowIndex_ != -1) {
-					orderedData[dishOrderCurrRowIndex_][2] = parseFloat(orderedData[dishOrderCurrRowIndex_][2]) + 1;
-					orderedStore.reload();
-					// 底色处理，已点菜式原色底色
-					dishGridRefresh();
-					orderedGrid.getSelectionModel().selectRow(
-							dishOrderCurrRowIndex_);
-					orderIsChanged = true;
+					if (orderedData[dishOrderCurrRowIndex_][16] == "2") {
+						orderedData[dishOrderCurrRowIndex_][2] = parseFloat(orderedData[dishOrderCurrRowIndex_][2]) + 1;
+						orderedStore.reload();
+						// 底色处理，已点菜式原色底色
+						dishGridRefresh();
+						orderedGrid.getSelectionModel().selectRow(
+								dishOrderCurrRowIndex_);
+						orderIsChanged = true;
+					}
 				}
 			}
 		});
@@ -344,14 +346,16 @@ var countMinusImgBut = new Ext.ux.ImageButton(
 			tooltip : "数量减1",
 			handler : function(btn) {
 				if (dishOrderCurrRowIndex_ != -1) {
-					if (orderedData[dishOrderCurrRowIndex_][2] != "1") {
-						orderedData[dishOrderCurrRowIndex_][2] = parseFloat(orderedData[dishOrderCurrRowIndex_][2]) - 1;
-						orderedStore.reload();
-						// 底色处理，已点菜式原色底色
-						dishGridRefresh();
-						orderedGrid.getSelectionModel().selectRow(
-								dishOrderCurrRowIndex_);
-						orderIsChanged = true;
+					if (orderedData[dishOrderCurrRowIndex_][16] == "2") {
+						if (orderedData[dishOrderCurrRowIndex_][2] != "1") {
+							orderedData[dishOrderCurrRowIndex_][2] = parseFloat(orderedData[dishOrderCurrRowIndex_][2]) - 1;
+							orderedStore.reload();
+							// 底色处理，已点菜式原色底色
+							dishGridRefresh();
+							orderedGrid.getSelectionModel().selectRow(
+									dishOrderCurrRowIndex_);
+							orderIsChanged = true;
+						}
 					}
 				}
 
@@ -364,7 +368,9 @@ var countEqualImgBut = new Ext.ux.ImageButton({
 	tooltip : "数量等于",
 	handler : function(btn) {
 		if (dishOrderCurrRowIndex_ != -1) {
-			dishCountInputWin.show();
+			if (orderedData[dishOrderCurrRowIndex_][16] == "2") {
+				dishCountInputWin.show();
+			}
 		}
 	}
 });
@@ -446,20 +452,19 @@ var orderedGrid = new Ext.grid.GridPanel({
 		}, dishPressImgBut, dishDeleteImgBut, {
 			text : "&nbsp;&nbsp;&nbsp;",
 			disabled : true
+		}, '-', {
+			text : "&nbsp;&nbsp;&nbsp;",
+			disabled : true
+		}, countAddImgBut, {
+			text : "&nbsp;&nbsp;&nbsp;",
+			disabled : true
+		}, countMinusImgBut, {
+			text : "&nbsp;&nbsp;&nbsp;",
+			disabled : true
+		}, countEqualImgBut, {
+			text : "&nbsp;&nbsp;&nbsp;",
+			disabled : true
 		}
-		// , '-', {
-		// text : "&nbsp;&nbsp;&nbsp;",
-		// disabled : true
-		// }, countAddImgBut, {
-		// text : "&nbsp;&nbsp;&nbsp;",
-		// disabled : true
-		// }, countMinusImgBut, {
-		// text : "&nbsp;&nbsp;&nbsp;",
-		// disabled : true
-		// }, countEqualImgBut, {
-		// text : "&nbsp;&nbsp;&nbsp;",
-		// disabled : true
-		// }
 		// , '-', {
 		// text : "&nbsp;&nbsp;&nbsp;",
 		// disabled : true
@@ -588,6 +593,12 @@ var orderedForm = new Ext.form.FormPanel(
 													options) {
 											}
 										});
+							} else if (orderedData.length == 0) {
+								Ext.MessageBox.show({
+									msg : "还没有选择任何菜品，暂时不能提交",
+									width : 300,
+									buttons : Ext.MessageBox.OK
+								});
 							}
 						}
 					}
@@ -716,35 +727,22 @@ var dishTasteGridTas = new Ext.grid.EditorGridPanel({
 		singleSelect : true
 	}),
 	listeners : {
-
-	// rowdblclick : function(thiz, rowIndex, e) {
-	// // 口味格式：[口味，￥价钱，口味编号]
-	// // 以点菜式格式：[菜名，口味，数量，￥单价，操作，￥实价，菜名编号，厨房编号，口味编号1,特,荐,停,送,￥口味价钱,口味编号2,口味编号3]
-	// var selectedTaste = dishTasteData[rowIndex][0];
-	// var tastePrice = dishTasteData[rowIndex][1];
-	// var tasteNbr = dishTasteData[rowIndex][2];
-	// var dishIndex = dishOrderCurrRowIndex_;
-	//
-	// // update taste
-	// orderedData[dishIndex][1] = selectedTaste;
-	//
-	// // update price
-	// var currPrice = parseFloat(orderedData[dishIndex][3].substring(1))
-	// + parseFloat(tastePrice.substring(1));
-	// currPrice = currPrice.toFixed(2);
-	// orderedData[dishIndex][5] = "￥" + currPrice;
-	//
-	// // update taste num
-	// orderedData[dishIndex][8] = tasteNbr;
-	//
-	// orderedStore.reload();
-	// // 底色处理，已点菜式原色底色
-	// dishGridRefresh();
-	// orderIsChanged = true;
-	// dishTasteWindow.hide();
-	// dishOrderCurrRowIndex_ = -1;
-	// }
-
+		"afteredit" : function(e) {
+			var choTasteN = e.record.get("tasteNumber");
+			var choTasteDescr = e.record.get("dishTaste");
+			if (e.record.get("tasteChoose")) {
+				choosenTasteDisplay.push([ choTasteN, choTasteDescr ]);
+			} else {
+				var thisIndex = -1;
+				for ( var i = 0; i < choosenTasteDisplay.length - 1; i++) {
+					if (choosenTasteDisplay[i][0] == choTasteN) {
+						thisIndex = i;
+					}
+				}
+				choosenTasteDisplay.splice(thisIndex, 1);
+			}
+			choosenTasteRefresh();
+		}
 	}
 });
 
@@ -817,7 +815,22 @@ var dishTasteGridPar = new Ext.grid.EditorGridPanel({
 		singleSelect : true
 	}),
 	listeners : {
-
+		"afteredit" : function(e) {
+			var choTasteN = e.record.get("tasteNumber");
+			var choTasteDescr = e.record.get("dishTaste");
+			if (e.record.get("tasteChoose")) {
+				choosenTasteDisplay.push([ choTasteN, choTasteDescr ]);
+			} else {
+				var thisIndex = -1;
+				for ( var i = 0; i < choosenTasteDisplay.length - 1; i++) {
+					if (choosenTasteDisplay[i][0] == choTasteN) {
+						thisIndex = i;
+					}
+				}
+				choosenTasteDisplay.splice(thisIndex, 1);
+			}
+			choosenTasteRefresh();
+		}
 	}
 });
 
@@ -890,28 +903,49 @@ var dishTasteGridSiz = new Ext.grid.EditorGridPanel({
 		singleSelect : true
 	}),
 	listeners : {
-
+		"afteredit" : function(e) {
+			var choTasteN = e.record.get("tasteNumber");
+			var choTasteDescr = e.record.get("dishTaste");
+			if (e.record.get("tasteChoose")) {
+				choosenTasteDisplay.push([ choTasteN, choTasteDescr ]);
+			} else {
+				var thisIndex = -1;
+				for ( var i = 0; i < choosenTasteDisplay.length - 1; i++) {
+					if (choosenTasteDisplay[i][0] == choTasteN) {
+						thisIndex = i;
+					}
+				}
+				choosenTasteDisplay.splice(thisIndex, 1);
+			}
+			choosenTasteRefresh();
+		}
 	}
 });
 
 // tab面版
 var dishTasteTabPanel = new Ext.TabPanel({
 	// layout : "fit",
+	region : "center",
 	tabPosition : "top",
 	width : 300,
-	height : 300,
+	height : 280,
 	activeTab : 0,
 	items : [ dishTasteGridTas, dishTasteGridPar, dishTasteGridSiz ]
 });
 
 var dishTasteWindow = new Ext.Window(
 		{
-			layout : "fit",
+			layout : "border",
 			width : 550,
 			height : 300,
 			closeAction : "hide",
 			// plain: true,
-			items : dishTasteTabPanel,
+			items : [ dishTasteTabPanel, {
+				region : "south",
+				height : 20,
+				bodyStyle : "background-color:#A9D0F5",
+				contentEl : "choosenTaste"
+			} ],
 			buttons : [
 					{
 						text : "清空",
@@ -925,6 +959,8 @@ var dishTasteWindow = new Ext.Window(
 							dishTasteGridSiz.getStore().each(function(record) {
 								record.set("tasteChoose", false);
 							});
+							choosenTasteDisplay.length = 0;
+							choosenTasteRefresh();
 						}
 					},
 					{
@@ -933,7 +969,11 @@ var dishTasteWindow = new Ext.Window(
 							// dishTasteWindow.hide();
 							var choosenCount = 0;
 							// 格式：[{編號,描述,價錢或比例,計算方式}]
-							choosenTaset = [];
+							choosenTaset.length = 0;
+							orderedData[dishOrderCurrRowIndex_][8] = "0";
+							orderedData[dishOrderCurrRowIndex_][14] = "0";
+							orderedData[dishOrderCurrRowIndex_][15] = "0";
+
 							dishTasteGridTas
 									.getStore()
 									.each(
@@ -1052,12 +1092,9 @@ var dishTasteWindow = new Ext.Window(
 								});
 
 							} else if (choosenCount == 0) {
+								// 格式：[菜名，口味，数量，￥单价，操作，￥实价，菜名编号，厨房编号，口味编号1,特,荐,停,送,￥口味价钱,口味编号2,口味编号3,菜品状态]
 								// 未有選擇口味
-								orderedData[dishOrderCurrRowIndex_][8] = "0";
-								orderedData[dishOrderCurrRowIndex_][14] = "0";
-								orderedData[dishOrderCurrRowIndex_][15] = "0";
 								orderedData[dishOrderCurrRowIndex_][1] = "无口味";
-
 								orderedData[dishOrderCurrRowIndex_][5] = orderedData[dishOrderCurrRowIndex_][3];
 
 								// refresh
@@ -1070,7 +1107,7 @@ var dishTasteWindow = new Ext.Window(
 								dishTasteWindow.hide();
 							} else {
 								// 校驗通過
-
+								// 格式：[菜名，口味，数量，￥单价，操作，￥实价，菜名编号，厨房编号，口味编号1,特,荐,停,送,￥口味价钱,口味编号2,口味编号3,菜品状态]
 								// 更新單價,// 格式：[{編號,描述,價錢或比例,計算方式}]
 								var origPrice = orderedData[dishOrderCurrRowIndex_][3]
 										.substring(1);
@@ -1127,6 +1164,7 @@ var dishTasteWindow = new Ext.Window(
 								// hide the window
 								dishTasteWindow.hide();
 							}
+
 						}
 					}, {
 						text : "取消",
@@ -1141,6 +1179,9 @@ var dishTasteWindow = new Ext.Window(
 					var tasteNbr1 = orderedData[dishOrderCurrRowIndex_][8];
 					var tasteNbr2 = orderedData[dishOrderCurrRowIndex_][14];
 					var tasteNbr3 = orderedData[dishOrderCurrRowIndex_][15];
+
+					// alert("tasteNbr1:"+tasteNbr1+" tasteNbr2:"+tasteNbr2+"
+					// tasteNbr3:"+tasteNbr3);
 
 					// 清空选择
 					dishTasteGridTas.getStore().each(function(record) {
