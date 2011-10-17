@@ -361,7 +361,7 @@ function tableSelectOnLoad() {
 	getOperatorName(pin);
 
 	// 随机刷新
-	var x = 180000;  
+	var x = 300000;  
 	var y = 60000;  
 	var rand = parseInt(Math.random() * (x - y + 1) + y);
 	setInterval(function() {
