@@ -794,13 +794,17 @@ advSrchForm = new Ext.form.FormPanel({
 	layout : "fit",
 	items : [ {
 		layout : "column",
+		autoHeight : true, // important!!
+		autoWidth : true,
 		border : false,
+		anchor : '98%',
 		items : [ {
 			layout : "form",
 			border : false,
 			labelSeparator : '：',
 			labelWidth : 40,
-			width : 170,
+			// width : 170,
+			columnWidth : .50,
 			items : [ {
 				xtype : "timefield",
 				fieldLabel : "时间",
@@ -812,7 +816,8 @@ advSrchForm = new Ext.form.FormPanel({
 			layout : 'form',
 			border : false,
 			labelWidth : 20,
-			width : 170,
+			// width : 170,
+			columnWidth : .50,
 			labelSeparator : '',
 			items : [ {
 				xtype : "timefield",
@@ -821,16 +826,13 @@ advSrchForm = new Ext.form.FormPanel({
 				width : 100,
 				id : "advSrchEndTime"
 			} ]
-		} ]
-	}, {
-		layout : "column",
-		border : false,
-		items : [ {
+		}, {
 			layout : "form",
 			border : false,
 			labelSeparator : '：',
 			labelWidth : 40,
-			width : 170,
+			// width : 170,
+			columnWidth : .50,
 			items : [ {
 				xtype : "numberfield",
 				fieldLabel : "金額",
@@ -841,7 +843,8 @@ advSrchForm = new Ext.form.FormPanel({
 			layout : 'form',
 			border : false,
 			labelWidth : 20,
-			width : 170,
+			// width : 170,
+			columnWidth : .50,
 			labelSeparator : '',
 			items : [ {
 				xtype : "numberfield",
@@ -849,16 +852,13 @@ advSrchForm = new Ext.form.FormPanel({
 				width : 100,
 				id : "advSrchEndAmt"
 			} ]
-		} ]
-	}, {
-		layout : "column",
-		border : false,
-		items : [ {
+		}, {
 			layout : "form",
 			border : false,
 			labelSeparator : '：',
 			labelWidth : 40,
-			width : 170,
+			// width : 170,
+			columnWidth : .50,
 			items : [ {
 				xtype : "textfield",
 				fieldLabel : "台号",
@@ -870,18 +870,16 @@ advSrchForm = new Ext.form.FormPanel({
 			border : false,
 			labelSeparator : '：',
 			labelWidth : 60,
-			width : 170,
+			// width : 170,
+			columnWidth : .50,
 			items : payTypeCombAdvSrch
-		} ]
-	}, {
-		layout : "column",
-		border : false,
-		items : [ {
+		}, {
 			layout : "form",
 			border : false,
 			labelSeparator : '：',
 			labelWidth : 40,
-			width : 170,
+			// width : 170,
+			columnWidth : .50,
 			items : tableTypeCombAdvSrch
 		} ]
 	} ]
