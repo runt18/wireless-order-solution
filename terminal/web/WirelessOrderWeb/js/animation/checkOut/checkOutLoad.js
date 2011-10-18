@@ -111,7 +111,8 @@ function checkOutOnLoad() {
 																options) {
 															var resultTasteJSON = Ext.util.JSON
 																	.decode(response.responseText);
-															if (resultTasteJSON.success == true && resultTasteJSON.data != "") {
+															if (resultTasteJSON.success == true
+																	&& resultTasteJSON.data != "") {
 																var josnTasteData = resultTasteJSON.data;
 																var tasteList = josnTasteData
 																		.split("，");
@@ -205,7 +206,7 @@ function checkOutOnLoad() {
 																		price = (parseFloat(checkOutData[i][10])
 																				* discountRate + parseFloat(tastePrice))
 																				* checkOutData[i][3];
-																		
+
 																	}
 																	var priceDisplay = "￥"
 																			+ price
@@ -429,12 +430,14 @@ function checkOutOnLoad() {
 
 															} else {
 																var dataTasteInfo = resultTasteJSON.data;
-																Ext.MessageBox
-																		.show({
-																			msg : dataTasteInfo,
-																			width : 300,
-																			buttons : Ext.MessageBox.OK
-																		});
+																if (dataTasteInfo != "") {
+																	Ext.MessageBox
+																			.show({
+																				msg : dataTasteInfo,
+																				width : 300,
+																				buttons : Ext.MessageBox.OK
+																			});
+																}
 															}
 														},
 														failure : function(
