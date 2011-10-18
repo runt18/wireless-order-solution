@@ -111,33 +111,34 @@ function checkOutOnLoad() {
 																options) {
 															var resultTasteJSON = Ext.util.JSON
 																	.decode(response.responseText);
-															if (resultTasteJSON.success == true
-																	&& resultTasteJSON.data != "") {
-																var josnTasteData = resultTasteJSON.data;
-																var tasteList = josnTasteData
-																		.split("，");
+															if (resultTasteJSON.success == true) {
+																if (resultTasteJSON.data != "") {
+																	var josnTasteData = resultTasteJSON.data;
+																	var tasteList = josnTasteData
+																			.split("，");
 
-																for ( var i = 0; i < tasteList.length; i++) {
-																	var tasteInfo = tasteList[i]
-																			.substr(
-																					1,
-																					tasteList[i].length - 2)
-																			.split(
-																					",");
-																	// 后台格式：[1,"加辣","￥2.50"]，[2,"少盐","￥0.00"]，[3,"少辣","￥5.00"]
-																	// 前后台格式有差异，口味编号前台存储放在最后一位
-																	dishTasteData
-																			.push([
-																					tasteInfo[1]
-																							.substr(
-																									1,
-																									tasteInfo[1].length - 2), // 口味
-																					tasteInfo[2]
-																							.substr(
-																									1,
-																									tasteInfo[2].length - 2), // 价钱
-																					tasteInfo[0] // 口味编号
-																			]);
+																	for ( var i = 0; i < tasteList.length; i++) {
+																		var tasteInfo = tasteList[i]
+																				.substr(
+																						1,
+																						tasteList[i].length - 2)
+																				.split(
+																						",");
+																		// 后台格式：[1,"加辣","￥2.50"]，[2,"少盐","￥0.00"]，[3,"少辣","￥5.00"]
+																		// 前后台格式有差异，口味编号前台存储放在最后一位
+																		dishTasteData
+																				.push([
+																						tasteInfo[1]
+																								.substr(
+																										1,
+																										tasteInfo[1].length - 2), // 口味
+																						tasteInfo[2]
+																								.substr(
+																										1,
+																										tasteInfo[2].length - 2), // 价钱
+																						tasteInfo[0] // 口味编号
+																				]);
+																	}
 																}
 
 																// 4,显示
@@ -430,14 +431,12 @@ function checkOutOnLoad() {
 
 															} else {
 																var dataTasteInfo = resultTasteJSON.data;
-																if (dataTasteInfo != "") {
-																	Ext.MessageBox
-																			.show({
-																				msg : dataTasteInfo,
-																				width : 300,
-																				buttons : Ext.MessageBox.OK
-																			});
-																}
+																Ext.MessageBox
+																		.show({
+																			msg : dataTasteInfo,
+																			width : 300,
+																			buttons : Ext.MessageBox.OK
+																		});
 															}
 														},
 														failure : function(
