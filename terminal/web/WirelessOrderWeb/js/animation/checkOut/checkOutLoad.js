@@ -111,7 +111,7 @@ function checkOutOnLoad() {
 																options) {
 															var resultTasteJSON = Ext.util.JSON
 																	.decode(response.responseText);
-															if (resultTasteJSON.success == true) {
+															if (resultTasteJSON.success == true && resultTasteJSON.data != "") {
 																var josnTasteData = resultTasteJSON.data;
 																var tasteList = josnTasteData
 																		.split("，");
