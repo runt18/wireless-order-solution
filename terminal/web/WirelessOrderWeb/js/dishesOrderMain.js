@@ -731,7 +731,27 @@ var dishTasteGridTas = new Ext.grid.EditorGridPanel({
 			var choTasteN = e.record.get("tasteNumber");
 			var choTasteDescr = e.record.get("dishTaste");
 			if (e.record.get("tasteChoose")) {
-				choosenTasteDisplay.push([ choTasteN, choTasteDescr ]);
+
+				// 校验是否超数
+				tasteChoosenCount = tasteChoosenCount + 1;
+				if (tasteChoosenCount > 3) {
+					Ext.MessageBox.show({
+						msg : "暂不允许选择超过３种口味",
+						width : 300,
+						buttons : Ext.MessageBox.OK
+					});
+
+					dishTasteGridTas.getStore().each(function(record) {
+						if (record.get("tasteNumber") == choTasteN) {
+							record.set("tasteChoose", false);
+						}
+					});
+					tasteChoosenCount = tasteChoosenCount - 1;
+				} else {
+					// 记录选择的口味
+					choosenTasteDisplay.push([ choTasteN, choTasteDescr ]);
+				}
+
 			} else {
 				var thisIndex = -1;
 				for ( var i = 0; i < choosenTasteDisplay.length - 1; i++) {
@@ -740,7 +760,9 @@ var dishTasteGridTas = new Ext.grid.EditorGridPanel({
 					}
 				}
 				choosenTasteDisplay.splice(thisIndex, 1);
+				tasteChoosenCount = tasteChoosenCount - 1;
 			}
+
 			choosenTasteRefresh();
 		}
 	}
@@ -819,7 +841,27 @@ var dishTasteGridPar = new Ext.grid.EditorGridPanel({
 			var choTasteN = e.record.get("tasteNumber");
 			var choTasteDescr = e.record.get("dishTaste");
 			if (e.record.get("tasteChoose")) {
-				choosenTasteDisplay.push([ choTasteN, choTasteDescr ]);
+
+				// 校验是否超数
+				tasteChoosenCount = tasteChoosenCount + 1;
+				if (tasteChoosenCount > 3) {
+					Ext.MessageBox.show({
+						msg : "暂不允许选择超过３种口味",
+						width : 300,
+						buttons : Ext.MessageBox.OK
+					});
+
+					dishTasteGridPar.getStore().each(function(record) {
+						if (record.get("tasteNumber") == choTasteN) {
+							record.set("tasteChoose", false);
+						}
+					});
+					tasteChoosenCount = tasteChoosenCount - 1;
+				} else {
+					// 记录选择的口味
+					choosenTasteDisplay.push([ choTasteN, choTasteDescr ]);
+				}
+
 			} else {
 				var thisIndex = -1;
 				for ( var i = 0; i < choosenTasteDisplay.length - 1; i++) {
@@ -828,7 +870,9 @@ var dishTasteGridPar = new Ext.grid.EditorGridPanel({
 					}
 				}
 				choosenTasteDisplay.splice(thisIndex, 1);
+				tasteChoosenCount = tasteChoosenCount - 1;
 			}
+
 			choosenTasteRefresh();
 		}
 	}
@@ -907,7 +951,27 @@ var dishTasteGridSiz = new Ext.grid.EditorGridPanel({
 			var choTasteN = e.record.get("tasteNumber");
 			var choTasteDescr = e.record.get("dishTaste");
 			if (e.record.get("tasteChoose")) {
-				choosenTasteDisplay.push([ choTasteN, choTasteDescr ]);
+
+				// 校验是否超数
+				tasteChoosenCount = tasteChoosenCount + 1;
+				if (tasteChoosenCount > 3) {
+					Ext.MessageBox.show({
+						msg : "暂不允许选择超过３种口味",
+						width : 300,
+						buttons : Ext.MessageBox.OK
+					});
+
+					dishTasteGridSiz.getStore().each(function(record) {
+						if (record.get("tasteNumber") == choTasteN) {
+							record.set("tasteChoose", false);
+						}
+					});
+					tasteChoosenCount = tasteChoosenCount - 1;
+				} else {
+					// 记录选择的口味
+					choosenTasteDisplay.push([ choTasteN, choTasteDescr ]);
+				}
+
 			} else {
 				var thisIndex = -1;
 				for ( var i = 0; i < choosenTasteDisplay.length - 1; i++) {
@@ -916,7 +980,9 @@ var dishTasteGridSiz = new Ext.grid.EditorGridPanel({
 					}
 				}
 				choosenTasteDisplay.splice(thisIndex, 1);
+				tasteChoosenCount = tasteChoosenCount - 1;
 			}
+
 			choosenTasteRefresh();
 		}
 	}
@@ -961,13 +1027,13 @@ var dishTasteWindow = new Ext.Window(
 							});
 							choosenTasteDisplay.length = 0;
 							choosenTasteRefresh();
+							tasteChoosenCount = 0;
 						}
 					},
 					{
 						text : "确定",
 						handler : function() {
 							// dishTasteWindow.hide();
-							var choosenCount = 0;
 							// 格式：[{編號,描述,價錢或比例,計算方式}]
 							choosenTaset.length = 0;
 							orderedData[dishOrderCurrRowIndex_][8] = "0";
@@ -979,9 +1045,6 @@ var dishTasteWindow = new Ext.Window(
 									.each(
 											function(record) {
 												if (record.get("tasteChoose")) {
-													// 累計選擇數目，準備校驗超數
-													choosenCount = choosenCount + 1;
-
 													if (record
 															.get("tasteCountType") == "0") {
 														choosenTaset
@@ -1015,9 +1078,6 @@ var dishTasteWindow = new Ext.Window(
 									.each(
 											function(record) {
 												if (record.get("tasteChoose")) {
-													// 累計選擇數目，準備校驗超數
-													choosenCount = choosenCount + 1;
-
 													if (record
 															.get("tasteCountType") == "0") {
 														choosenTaset
@@ -1051,9 +1111,6 @@ var dishTasteWindow = new Ext.Window(
 									.each(
 											function(record) {
 												if (record.get("tasteChoose")) {
-													// 累計選擇數目，準備校驗超數
-													choosenCount = choosenCount + 1;
-
 													if (record
 															.get("tasteCountType") == "0") {
 														choosenTaset
@@ -1083,15 +1140,7 @@ var dishTasteWindow = new Ext.Window(
 												}
 											});
 
-							if (choosenCount > 3) {
-								// 超過３個口味
-								Ext.MessageBox.show({
-									msg : "暂不允许选择超过３种口味",
-									width : 300,
-									buttons : Ext.MessageBox.OK
-								});
-
-							} else if (choosenCount == 0) {
+							if (tasteChoosenCount == 0) {
 								// 格式：[菜名，口味，数量，￥单价，操作，￥实价，菜名编号，厨房编号，口味编号1,特,荐,停,送,￥口味价钱,口味编号2,口味编号3,菜品状态]
 								// 未有選擇口味
 								orderedData[dishOrderCurrRowIndex_][1] = "无口味";
@@ -1193,7 +1242,13 @@ var dishTasteWindow = new Ext.Window(
 					dishTasteGridSiz.getStore().each(function(record) {
 						record.set("tasteChoose", false);
 					});
+
+					choosenTasteDisplay.length = 0;
+					tasteChoosenCount = 0;
+
 					if (tasteNbr1 == 0 && tasteNbr2 == 0 && tasteNbr3 == 0) {
+
+						choosenTasteRefresh();
 
 					} else {
 						dishTasteGridTas
@@ -1206,6 +1261,13 @@ var dishTasteWindow = new Ext.Window(
 													|| record
 															.get("tasteNumber") == tasteNbr3) {
 												record.set("tasteChoose", true);
+												choosenTasteDisplay
+														.push([
+																record
+																		.get("tasteNumber"),
+																record
+																		.get("dishTaste") ]);
+												tasteChoosenCount = tasteChoosenCount + 1;
 											}
 										});
 						dishTasteGridPar
@@ -1218,6 +1280,13 @@ var dishTasteWindow = new Ext.Window(
 													|| record
 															.get("tasteNumber") == tasteNbr3) {
 												record.set("tasteChoose", true);
+												choosenTasteDisplay
+												.push([
+														record
+																.get("tasteNumber"),
+														record
+																.get("dishTaste") ])
+												tasteChoosenCount = tasteChoosenCount + 1;
 											}
 										});
 						dishTasteGridSiz
@@ -1230,8 +1299,17 @@ var dishTasteWindow = new Ext.Window(
 													|| record
 															.get("tasteNumber") == tasteNbr3) {
 												record.set("tasteChoose", true);
+												choosenTasteDisplay
+												.push([
+														record
+																.get("tasteNumber"),
+														record
+																.get("dishTaste") ])
+												tasteChoosenCount = tasteChoosenCount + 1;
 											}
 										});
+
+						choosenTasteRefresh();
 					}
 				}
 			}
