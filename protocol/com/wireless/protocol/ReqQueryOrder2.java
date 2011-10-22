@@ -15,7 +15,7 @@ public class ReqQueryOrder2 extends ReqQueryOrder {
 	* table[2]
 	* table[2] - 2-byte indicates the table id 
 	*******************************************************/
-	public ReqQueryOrder2(short tableID){
+	public ReqQueryOrder2(int tableID){
 		super(tableID);
 		header.type = Type.QUERY_ORDER_2;
 	} 
