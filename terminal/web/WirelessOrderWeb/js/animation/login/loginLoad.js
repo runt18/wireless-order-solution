@@ -128,7 +128,7 @@ function loginOnLoad() {
 										});
 					});
 
-	$("#book")
+	$("#menu")
 			.each(
 					function() {
 						$(this)
@@ -137,13 +137,13 @@ function loginOnLoad() {
 											$(this)
 													.stop()
 													.css("background",
-															"url(../images/book_select.png) no-repeat 50%");
+															"url(../images/menu_select.png) no-repeat 50%");
 										},
 										function() {
 											$(this)
 													.stop()
 													.css("background",
-															"url(../images/book.png) no-repeat 50%");
+															"url(../images/menu.png) no-repeat 50%");
 										});
 					});
 
