@@ -54,8 +54,32 @@ public class Common {
    //改单台号
    private String dropplatenum;
    
+   //已点菜
+   private List<Food> alreadfoods;
+   //新点菜
+   private List<Food> newfoods;
    
    
+   
+   
+   
+   
+
+	public List<Food> getAlreadfoods() {
+	return alreadfoods;
+}
+
+public void setAlreadfoods(List<Food> alreadfoods) {
+	this.alreadfoods = alreadfoods;
+}
+
+public List<Food> getNewfoods() {
+	return newfoods;
+}
+
+public void setNewfoods(List<Food> newfoods) {
+	this.newfoods = newfoods;
+}
 
 	public String getDropplatenum() {
 	return dropplatenum;
@@ -303,9 +327,8 @@ public void setKient(KitchenActivity kient) {
 	   * 点菜弹出的删除菜dialog
 	   * 
 	   * */
-	public void getdeleteFoods(final Context context,final List<Food> list, final int position){
+	public void getdeleteFoods(final Context context,final List<Food> list, final int position,final int code){
 		final EditText mycount;
-		order=(orderActivity)context;
 		View mView =LayoutInflater.from(context).inflate(R.layout.alert, null);
 		final Dialog mDialog = new Dialog(context,R.style.FullHeightDialog);
 		mDialog.setContentView(mView);
@@ -335,8 +358,15 @@ public void setKient(KitchenActivity kient) {
 				}else if(food.getCount().floatValue()<Float.parseFloat(mycount.getText().toString())){
 					new AlertDialog.Builder(context).setTitle("提示").setMessage("你输入的删除数量大于你已点数量").setNeutralButton("确定", null).show();
 				}
-
-				order.onRestart();
+                
+				if(code==0){
+					 order=(orderActivity)context;
+					 order.onRestart();
+				}else{
+					drop=(DropActivity)context;
+					drop.onRestart();
+				}
+				
 				 mDialog.cancel();
 			}
 		});
@@ -381,7 +411,7 @@ public void setKient(KitchenActivity kient) {
 					main=(MainActivity)context;
 					main.drop(mycount.getText().toString());
 					setDropplatenum(mycount.getText().toString());
-					 mDialog.cancel();
+					mDialog.cancel();
 				}
 				
 			}
@@ -491,5 +521,62 @@ public void setKient(KitchenActivity kient) {
   		}else{
   			test.setText(food.name+":"+food.tastePref); 
   		}
+	}
+	
+	
+	/*
+	 * 改单退菜的时候弹出得dialog
+	 * 
+	 * */
+	
+	
+	public void dropFoods(final Context context,final List<List<Food>> childs,final int groupPosition, final int childPosition){
+		final EditText mycount;
+		drop=(DropActivity)context;
+		View mView =LayoutInflater.from(context).inflate(R.layout.alert, null);
+		final Dialog mDialog = new Dialog(context,R.style.FullHeightDialog);
+		mDialog.setContentView(mView);
+		mDialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
+		mDialog.show();
+		TextView ordername=(TextView)mView.findViewById(R.id.ordername);
+		ordername.setText("请输入"+childs.get(groupPosition).get(childPosition).name+"的删除数量");
+	    mycount = (EditText)mView.findViewById(R.id.mycount);
+		//mycount.setGravity(Gravity.LEFT);
+		mycount.setText("1");
+		Button mButtonOK = (Button) mView.findViewById(R.id.confirm);
+		mButtonOK.setText("确定");
+		mButtonOK.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Food food = childs.get(groupPosition).get(childPosition);
+				float count;
+				/**
+				 * 遍历已点菜，查找是否存在与新点菜相同的菜品。
+				 * 如果存在就把数量累加上去，否则就当作新菜品添加到已点菜中
+				 */
+				if(food.getCount().floatValue()==Float.parseFloat(mycount.getText().toString())){
+					childs.get(groupPosition).remove(food);
+				}else if(food.getCount().floatValue()>Float.parseFloat(mycount.getText().toString())){
+					count=food.getCount().floatValue()-Float.parseFloat(mycount.getText().toString());
+					food.setCount(count);
+				}else if(food.getCount().floatValue()<Float.parseFloat(mycount.getText().toString())){
+					new AlertDialog.Builder(context).setTitle("提示").setMessage("你输入的删除数量大于你已点数量").setNeutralButton("确定", null).show();
+				}
+
+				 drop.init();
+				 mDialog.cancel();
+			}
+		});
+		
+		Button cancle = (Button) mView.findViewById(R.id.cancle);
+		cancle.setText("取消");
+		cancle.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				mDialog.cancel();
+			}
+		});
+
+		
 	}
 }

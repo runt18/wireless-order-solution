@@ -56,8 +56,7 @@ public class SpecsActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				Intent intent=new Intent(SpecsActivity.this,orderActivity.class);
-				startActivity(intent);
+				finish();
 			}
 		});
 		

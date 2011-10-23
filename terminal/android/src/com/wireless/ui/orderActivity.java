@@ -283,7 +283,7 @@ public class orderActivity extends Activity {
 		if(num==0){
 			Common.getCommon();
 			Common.getCommon().setPosition(position);
-			Common.getCommon().getdeleteFoods(orderActivity.this, Common.getFoodlist(), position);
+			Common.getCommon().getdeleteFoods(orderActivity.this, Common.getFoodlist(), position,0);
 		
 		}else{
 			Intent intent=new Intent(orderActivity.this,TastesTbActivity.class);

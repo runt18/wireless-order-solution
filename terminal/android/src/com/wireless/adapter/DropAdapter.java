@@ -9,18 +9,21 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.wireless.common.Common;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.Order;
+import com.wireless.ui.DropActivity;
 import com.wireless.ui.R;
 
 public class DropAdapter extends BaseExpandableListAdapter  {
   private Context context;
   private List<String> perant;
   private List<List<Food>> childs;
+  DropActivity drop;
 	 public DropAdapter(Context context,List<String> list,List<List<Food>> alist){
 		 this.context=context;
 		 this.perant=list;
 		 this.childs=alist;
+		 drop=(DropActivity)context;
 	 }
 	@Override
 	public int getGroupCount() {
@@ -73,12 +76,21 @@ public class DropAdapter extends BaseExpandableListAdapter  {
 		if(groupPosition==1){
 			ImageView orderimage=(ImageView) view.findViewById(R.id.orderimage);
 			orderimage.setBackgroundResource(R.drawable.commit);
+			
+			orderimage.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					drop.orderfood();
+				}
+			});
 		}
 		return view;
 	}
 
 	@Override
-	public View getChildView(int groupPosition, int childPosition,
+	public View getChildView(final int groupPosition, final int childPosition,
 			boolean isLastChild, View convertView, ViewGroup parent) {
 		// TODO Auto-generated method stub
 		View view=convertView.inflate(context, R.layout.dropchilditem, null);
@@ -96,10 +108,36 @@ public class DropAdapter extends BaseExpandableListAdapter  {
 		ImageView addtaste=(ImageView)view.findViewById(R.id.addtaste);
 		if(groupPosition==0){
 			deletefood.setBackgroundResource(R.drawable.commit);
+			deletefood.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					Common.getCommon().dropFoods(context, childs, groupPosition,childPosition);
+				}
+			});
 			
 		}else{
-			deletefood.setBackgroundResource(R.drawable.commit);
+			 deletefood.setBackgroundResource(R.drawable.commit);
+             deletefood.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+				Common.getCommon().setPosition(childPosition);	
+				Common.getCommon().getdeleteFoods(context, childs.get(groupPosition),Common.getCommon().getPosition(), 1);
+				}
+			});
 			addtaste.setBackgroundResource(R.drawable.commit);
+			addtaste.setOnClickListener(new View.OnClickListener() {
+					
+					@Override
+					public void onClick(View v) {
+						// TODO Auto-generated method stub
+						drop.Foodfunction(childPosition);
+						
+					}
+				});
 		}
 		return view;
 	}

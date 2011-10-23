@@ -58,8 +58,7 @@ String taste="";
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				Intent intent=new Intent(TasteActivity.this,orderActivity.class);
-				startActivity(intent);
+				finish();
 			}
 		});
 		
