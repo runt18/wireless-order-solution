@@ -68,7 +68,7 @@ public class MainActivity extends Activity {
 				if(WirelessOrder.restaurant != null){
 					TextView billBoard = (TextView)findViewById(R.id.notice);
 					if(WirelessOrder.restaurant.info != null){
-						billBoard.setText(WirelessOrder.restaurant.info);
+						billBoard.setText(WirelessOrder.restaurant.info.replaceAll("\n", ""));
 					}else{
 						billBoard.setText("");
 					}
