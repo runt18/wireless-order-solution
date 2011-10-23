@@ -26,7 +26,6 @@ import android.widget.GridView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
-import com.wireless.common.Common;
 import com.wireless.common.WirelessOrder;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.PinGen;
@@ -85,35 +84,25 @@ public class MainActivity extends Activity {
 		}
 	};
 	
-	//private Restaurant _restaurant = new Restaurant();
-	
-//	private float _appVer;
-//	ProtocolPackage _resp;
-//	AlertDialog.Builder _builder;
-//	private AppContext _appContext;
-//	boolean _tag = false;
-//	 Message msg;
-
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
 		
-		ServerConnector.instance().setNetAddr("125.88.20.194");
+		ServerConnector.instance().setNetAddr("10.0.2.2");
 		ServerConnector.instance().setNetPort(55555);
-//		_appContext = (AppContext) getApplication();
-//		_appContext.activityList.add(MainActivity.this);
+
 		ReqPackage.setGen(new PinGen() {
 			@Override
 			public int getDeviceId() {
-				// TODO Auto-generated method stub
+				//FIXME here should use the the id of android's own
 				return 0x2100000A;
 			}
 
 			@Override
 			public short getDeviceType() {
-				// TODO Auto-generated method stub
+				//FIXME here should use the model of android
 				return Terminal.MODEL_BB;
 			}
 
@@ -566,8 +555,6 @@ public class MainActivity extends Activity {
 		
 		public AskTableDialog(int type) {
 			super(MainActivity.this, R.style.FullHeightDialog);
-			// TODO Auto-generated constructor stub
-			//setContentView(LayoutInflater.from(MainActivity.this).inflate(R.layout.alert, null));
 			setContentView(R.layout.alert);
 			getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
 			
