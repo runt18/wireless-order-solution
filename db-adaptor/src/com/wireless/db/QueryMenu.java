@@ -35,7 +35,7 @@ public class QueryMenu {
 			
 			Terminal term = VerifyPin.exec(dbCon, pin, model);
 			
-			return new FoodMenu(queryFoods(dbCon, term.restaurant_id), 
+			return new FoodMenu(queryFoods(dbCon, term.restaurant_id, null), 
 							    queryTastes(dbCon, term.restaurant_id, Taste.CATE_TASTE),
 							    queryTastes(dbCon, term.restaurant_id, Taste.CATE_STYLE),
 							    queryTastes(dbCon, term.restaurant_id, Taste.CATE_SPEC),
@@ -51,13 +51,14 @@ public class QueryMenu {
 	 * Get the food information.
 	 * @param pin the pin to this terminal
 	 * @param model the model to this terminal
+	 * @param extraCondition the extra condition to query foods
 	 * @return the food menu holding all the information
 	 * @throws BusinessException throws if either of cases below.<br>
 	 * 							 - The terminal is NOT attache to any restaurant.<br>
 	 * 							 - The terminal is expired.
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Food[] execFoods(int pin, short model) throws BusinessException, SQLException{
+	public static Food[] execFoods(int pin, short model, String extraCondition) throws BusinessException, SQLException{
 		
 		DBCon dbCon = new DBCon();
 		
@@ -66,7 +67,7 @@ public class QueryMenu {
 			
 			Terminal term = VerifyPin.exec(dbCon, pin, model);		
 			
-			return queryFoods(dbCon, term.restaurant_id);
+			return queryFoods(dbCon, term.restaurant_id, extraCondition);
 			
 		}finally{
 			dbCon.disconnect();
@@ -154,12 +155,12 @@ public class QueryMenu {
 		}
 	}
 	
-	private static Food[] queryFoods(DBCon dbCon, int restaurantID) throws SQLException{
+	private static Food[] queryFoods(DBCon dbCon, int restaurantID, String extraCondition) throws SQLException{
 		ArrayList<Food> foods = new ArrayList<Food>();
         //get all the food information to this restaurant
 		String sql = "SELECT alias_id, name, unit_price, kitchen, status, pinyin FROM " + 
 					 Params.dbName + ".food WHERE restaurant_id=" + restaurantID +
-					 " AND enabled=1";
+					 extraCondition == null ? "" : extraCondition; 
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
 			Food food = new Food(dbCon.rs.getInt("alias_id"),
