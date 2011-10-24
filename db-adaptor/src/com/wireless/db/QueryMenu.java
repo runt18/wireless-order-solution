@@ -51,6 +51,20 @@ public class QueryMenu {
 	 * Get the food information.
 	 * @param pin the pin to this terminal
 	 * @param model the model to this terminal
+	 * @return the food menu holding all the information
+	 * @throws BusinessException throws if either of cases below.<br>
+	 * 							 - The terminal is NOT attache to any restaurant.<br>
+	 * 							 - The terminal is expired.
+	 * @throws SQLException throws if fail to execute any SQL statement
+	 */
+	public static Food[] execFoods(int pin, short model) throws BusinessException, SQLException{
+		return execFoods(pin, model, null);
+	}
+	
+	/**
+	 * Get the food information.
+	 * @param pin the pin to this terminal
+	 * @param model the model to this terminal
 	 * @param extraCondition the extra condition to query foods
 	 * @return the food menu holding all the information
 	 * @throws BusinessException throws if either of cases below.<br>
