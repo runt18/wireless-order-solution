@@ -174,7 +174,7 @@ public class QueryMenu {
         //get all the food information to this restaurant
 		String sql = "SELECT alias_id, name, unit_price, kitchen, status, pinyin FROM " + 
 					 Params.dbName + ".food WHERE restaurant_id=" + restaurantID +
-					 extraCondition == null ? "" : extraCondition; 
+					 (extraCondition == null ? "" : extraCondition); 
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
 			Food food = new Food(dbCon.rs.getInt("alias_id"),
