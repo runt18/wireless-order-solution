@@ -383,51 +383,51 @@ public void setKient(KitchenActivity kient) {
 		
 	}
 	
-	/*
-	 * 点解下单的时候的弹出框
-	 * 
-	 * */
-	public void order(final Context context,final int num){
-		final EditText mycount;
-		View mView =LayoutInflater.from(context).inflate(R.layout.alert, null);
-		final Dialog mDialog = new Dialog(context,R.style.FullHeightDialog);
-		mDialog.setContentView(mView);
-		mDialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
-		mDialog.show();
-		TextView ordername=(TextView)mView.findViewById(R.id.ordername);
-		ordername.setText("请输入台号:");
-	    mycount = (EditText)mView.findViewById(R.id.mycount);
-		Button mButtonOK = (Button) mView.findViewById(R.id.confirm);
-		mButtonOK.setText("确定");
-		mButtonOK.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if(num==0){
-					main=(MainActivity)context;
-					main.order(mycount.getText().toString());
-					setOrderplatenum(mycount.getText().toString());
-					 mDialog.cancel();
-				}else{
-					main=(MainActivity)context;
-					main.drop(mycount.getText().toString());
-					setDropplatenum(mycount.getText().toString());
-					mDialog.cancel();
-				}
-				
-			}
-		});
-		
-		Button cancle = (Button) mView.findViewById(R.id.cancle);
-		cancle.setText("取消");
-		cancle.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				mDialog.cancel();
-			}
-		});
-
-		
-	}
+//	/*
+//	 * 点解下单的时候的弹出框
+//	 * 
+//	 * */
+//	public void order(final Context context,final int num){
+//		final EditText mycount;
+//		View mView =LayoutInflater.from(context).inflate(R.layout.alert, null);
+//		final Dialog mDialog = new Dialog(context,R.style.FullHeightDialog);
+//		mDialog.setContentView(mView);
+//		mDialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
+//		mDialog.show();
+//		TextView ordername=(TextView)mView.findViewById(R.id.ordername);
+//		ordername.setText("请输入台号:");
+//	    mycount = (EditText)mView.findViewById(R.id.mycount);
+//		Button mButtonOK = (Button) mView.findViewById(R.id.confirm);
+//		mButtonOK.setText("确定");
+//		mButtonOK.setOnClickListener(new OnClickListener() {
+//			@Override
+//			public void onClick(View v) {
+//				if(num==0){
+//					main=(MainActivity)context;
+//					main.order(mycount.getText().toString());
+//					setOrderplatenum(mycount.getText().toString());
+//					 mDialog.cancel();
+//				}else{
+//					main=(MainActivity)context;
+//					main.drop(mycount.getText().toString());
+//					setDropplatenum(mycount.getText().toString());
+//					mDialog.cancel();
+//				}
+//				
+//			}
+//		});
+//		
+//		Button cancle = (Button) mView.findViewById(R.id.cancle);
+//		cancle.setText("取消");
+//		cancle.setOnClickListener(new OnClickListener() {
+//			@Override
+//			public void onClick(View v) {
+//				mDialog.cancel();
+//			}
+//		});
+//
+//		
+//	}
 	
 	/*
 	 * 点解分厨出现的二级菜单

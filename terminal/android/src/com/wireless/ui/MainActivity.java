@@ -90,7 +90,7 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		
 		
-		ServerConnector.instance().setNetAddr("10.0.2.2");
+		ServerConnector.instance().setNetAddr("125.88.20.194");
 		ServerConnector.instance().setNetPort(55555);
 
 		ReqPackage.setGen(new PinGen() {
@@ -171,7 +171,7 @@ public class MainActivity extends Activity {
 					break;
 
 				case 6:
-
+					new QueryMenuTask().execute();
 					break;
 
 				case 7:
@@ -205,12 +205,15 @@ public class MainActivity extends Activity {
 	@Override
 	protected Dialog onCreateDialog(int dialogID){
 		if(dialogID == DIALOG_INSERT_ORDER){
+			//下单的餐台输入Dialog
 			return new AskTableDialog(DIALOG_INSERT_ORDER);
 			
 		}else if(dialogID == DIALOG_UPDATE_ORDER){
+			//改单的餐台输入Dialog
 			return new AskTableDialog(DIALOG_UPDATE_ORDER);
 			
 		}else if(dialogID == DIALOG_CANCEL_ORDER){
+			//删单的餐台输入Dialog
 			return new AskTableDialog(DIALOG_CANCEL_ORDER);
 			
 		}else{
@@ -236,7 +239,6 @@ public class MainActivity extends Activity {
 					.setOnKeyListener(new OnKeyListener() {
 						@Override
 						public boolean onKey(DialogInterface arg0, int arg1, KeyEvent arg2) {
-							// TODO Auto-generated method stub
 							return true;
 						}
 					}).show();
@@ -271,7 +273,6 @@ public class MainActivity extends Activity {
 //		_builder.setOnKeyListener(new OnKeyListener() {
 //			public boolean onKey(DialogInterface dialog, int keyCode,
 //					KeyEvent event) {
-//				// TODO Auto-generated method stub
 //				return false;
 //			}
 //
@@ -279,21 +280,27 @@ public class MainActivity extends Activity {
 //	}
 	
 	
-	//跳转到下单界面
-	public void order(String plate){
-		Intent intent = new Intent(MainActivity.this,
-				orderActivity.class);
-		startActivity(intent);
-	}
+//	//跳转到下单界面
+//	public void order(String plate){
+//		Intent intent = new Intent(MainActivity.this,
+//				orderActivity.class);
+//		startActivity(intent);
+//	}
+//	
+//	//跳转到下单界面
+//	public void drop(String plate){
+//		Intent intent = new Intent(MainActivity.this,
+//				DropActivity.class);
+//		intent.putExtra("platform", plate);
+//		startActivity(intent);
+//	}
 	
-	//跳转到下单界面
-	public void drop(String plate){
-		Intent intent = new Intent(MainActivity.this,
-				DropActivity.class);
-		intent.putExtra("platform", plate);
-		startActivity(intent);
-	}
-	
+	/**
+	 * Generate the message according to the error code 
+	 * @param tableID the table id associated with this error
+	 * @param errCode the error code
+	 * @return the error message
+	 */
 	private String genErrMsg(int tableID, byte errCode){
 		if(errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
 			return "终端没有登记到餐厅，请联系管理人员。";
@@ -437,10 +444,14 @@ public class MainActivity extends Activity {
 		}	
 	}
 	
-
-	
+	/**
+	 * 餐台输入的Dialog
+	 */
 	private class AskTableDialog extends Dialog{
 
+		/**
+		 * 请求获得餐台的状态
+		 */
 		private class QueryOrder2Task extends AsyncTask<Void, Void, String>{
 			
 			private int _tableID;
@@ -455,6 +466,9 @@ public class MainActivity extends Activity {
 				_progDialog = ProgressDialog.show(MainActivity.this, "", "查询" + _tableID + "号台信息...请稍候", true);
 			}
 			
+			/**
+			 * 在新的线程中执行请求餐台状态的操作
+			 */
 			@Override
 			protected String doInBackground(Void... arg0) {
 				String errMsg = null;
@@ -494,7 +508,7 @@ public class MainActivity extends Activity {
 							 * 如果返回TABLE_IDLE的error code，表示餐台处于空闲状态，不能改单和删单
 							 */
 							if(resp.header.reserved == ErrorCode.TABLE_IDLE){
-								throw new IOException(_tableID + "号台还未下单");
+								errMsg = _tableID + "号台还未下单";
 							}else{
 								/**
 								 * 如果返回其他的error code，表示餐台不能改单和删单（不如输入的台号不存在）
@@ -514,6 +528,10 @@ public class MainActivity extends Activity {
 				return errMsg;
 			}
 			
+			/**
+			 * 如果相应的操作不符合条件（比如要改单的餐台还未下单），
+			 * 则把相应信息提示给用户，否则，根据不用的动作类型，分别执行下/改/删单的操作。
+			 */
 			@Override
 			protected void onPostExecute(String errMsg){
 				//make the progress dialog disappeared
