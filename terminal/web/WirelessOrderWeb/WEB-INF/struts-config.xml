@@ -67,6 +67,10 @@
 		<action path="/DoShift" type="com.wireless.Actions.shift.DoShiftAction"
 			scope="request">
 		</action>
+		<action path="/QueryMenuMgr" type="com.wireless.Actions.menuMgr.QueryMenuMgrAction"
+			scope="request">
+		</action>
+
 	</action-mappings>
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
 </struts-config>

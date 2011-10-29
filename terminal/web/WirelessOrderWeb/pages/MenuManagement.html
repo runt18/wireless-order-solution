@@ -49,10 +49,14 @@
 	var restaurantID = Request["restaurantID"];
 	var pin = Request["pin"];
 	
-	var menuData = [];
+	//var menuData = [];
 	
 	var currRowIndex = -1;
 	var conditionType = "text";
+	
+	var dishesPageRecordCount = 20;
+	
+	var kitchenTypeData = [];
 	
 </script>
 
@@ -62,10 +66,11 @@
 <script type="text/javascript" src="../js/animation/bills/billsLoad.js"></script>
 <script type="text/javascript" src="../js/billsMain.js"></script>
  -->
+ <script type="text/javascript" src="../js/animation/menuManagement/menuMgrLoad.js"></script>
  <script type="text/javascript" src="../js/menuMgrMain.js"></script>
 
 </head>
-<body>
+<body onload="menuMgrOnLoad()">
 	<script type="text/javascript" src="../extjs/examples.js"></script>
 
 	<!------------------- layout ------------------------>

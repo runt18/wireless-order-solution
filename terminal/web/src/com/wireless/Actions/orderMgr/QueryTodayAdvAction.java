@@ -122,13 +122,6 @@ public class QueryTodayAdvAction extends Action {
 					+ " restaurant_id=" + term.restaurant_id
 					+ " AND total_price IS NOT NULL" + filterCondition;
 
-			// String sql = "SELECT a.minimum_cost, b.* FROM " + Params.dbName +
-			// ".table a, " + Params.dbName + ".order b" +
-			// " WHERE b.restaurant_id=" + term.restaurant_id +
-			// " AND b.total_price IS NOT NULL" +
-			// " AND a.alias_id=b.table_id" +
-			// " AND a.restaurant_id=" + term.restaurant_id +
-			// filterCondition;
 
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 

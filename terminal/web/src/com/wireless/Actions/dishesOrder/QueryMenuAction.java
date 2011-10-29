@@ -40,6 +40,7 @@ public class QueryMenuAction extends Action {
 			 * type : "1" means to query foods 
 			 * 		  "2" means to query tastes
 			 * 		  "3" means to query kitchens
+			 * 		  "4" means to query kitchens for combobox
 			 */
 			
 			String pin = request.getParameter("pin");
@@ -51,6 +52,7 @@ public class QueryMenuAction extends Action {
 			 * 1 - Food
 			 * 2 - Taste
 			 * 3 - Kitchen
+			 * 4 - kitchens for combobox
 			 */
 			short type = Short.parseShort(request.getParameter("type"));
 			
@@ -66,12 +68,16 @@ public class QueryMenuAction extends Action {
 				Kitchen[] kitchens = QueryMenu.execKitchens(Integer.parseInt(pin, 16), Terminal.MODEL_STAFF);
 				jsonResp = jsonResp.replace("$(value)", toJson(kitchens));
 				
+			}else if(type == 4){
+				Kitchen[] kitchens = QueryMenu.execKitchens(Integer.parseInt(pin, 16), Terminal.MODEL_STAFF);
+				jsonResp = toJsonCombo(kitchens);
 			}else{
 				throw new BusinessException(ErrorCode.UNKNOWN);
 			}
 			
-			jsonResp = jsonResp.replace("$(result)", "true");
-
+			if(type != 4){
+				jsonResp = jsonResp.replace("$(result)", "true");
+			}
 
 		}catch(BusinessException e) {
 			e.printStackTrace();
@@ -207,5 +213,30 @@ public class QueryMenuAction extends Action {
 			}
 			return value.toString();
 		}
+	}
+	
+	/**
+	 * Convert the kitchen to json format
+	 * @param kitchens for combobox
+	 * @return
+	 */
+	private String toJsonCombo(Kitchen[] kitchens){
+		String outString = "{\"root\":[";
+		
+		if(kitchens.length == 0){
+					
+		}else{
+			for(int i = 0; i < kitchens.length; i++){
+				
+				outString = outString + "{value:"+ new Short(kitchens[i].alias_id).toString()+ ",";
+				outString = outString + "text:'" + kitchens[i].name + "'},";
+
+			}
+			//outString = outString.substring(0, outString.length()-1);
+			outString = outString + "{value:255,text:'空'}";
+
+		}
+		outString = outString + "]}";
+		return outString;
 	}
 }
