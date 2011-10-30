@@ -79,6 +79,9 @@
 		<action path="InsertMenu" type="com.wireless.Actions.menuMgr.InsertMenuAction"
 			scope="request">
 		</action>
+		<action path="MenuStatistics" type="com.wireless.Actions.menuMgr.MenuStatisticsAction"
+			scope="request">
+		</action>
 
 	</action-mappings>
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
