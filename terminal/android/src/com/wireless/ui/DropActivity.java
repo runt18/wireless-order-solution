@@ -22,6 +22,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ExpandableListView.OnChildClickListener;
+import android.widget.ExpandableListView.OnGroupClickListener;
 
 import com.wireless.adapter.DropAdapter;
 import com.wireless.common.Common;
@@ -38,6 +40,7 @@ import com.wireless.protocol.Util;
 import com.wireless.sccon.ServerConnector;
 
 public class DropActivity extends Activity {
+ private static final String KEY_TABLE_ID = "TableAmount";
  private EditText tabble_num;
  private EditText cutom_num;
  private ImageView orderback;
@@ -56,11 +59,15 @@ public class DropActivity extends Activity {
  private byte errCode;
  Order reqOrder;
  private TextView amountvalue;
+ private String plateForm;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.drop);
+		
+		
+		plateForm=getIntent().getExtras().getString(KEY_TABLE_ID);
 		_appContext=(AppContext) getApplication();
 		_appContext.activityList.add(DropActivity.this);
 		
@@ -92,8 +99,7 @@ public class DropActivity extends Activity {
 				// TODO Auto-generated method stub
 				Common.getCommon().getFoodlist().clear();
 				Common.getCommon().setPosition(0);
-				Intent intent=new Intent(DropActivity.this,MainActivity.class);
-				startActivity(intent);
+				finish();
 			}
 		});
 		
@@ -110,6 +116,30 @@ public class DropActivity extends Activity {
 					handler.sendMessage(msg);
 				}
 			}
+		});
+		
+		mydropListView.setOnGroupClickListener(new OnGroupClickListener(){
+
+				public boolean onGroupClick(ExpandableListView parent, View v,
+						int groupPosition, long id) {
+					mydropListView.setSelectedGroup(groupPosition);
+					return false;
+				}
+		});	
+		
+		mydropListView.setOnChildClickListener(new OnChildClickListener(){
+
+			@Override
+			public boolean onChildClick(ExpandableListView parent, View v,
+					int groupPosition, int childPosition, long id) {
+				// TODO Auto-generated method stub
+				if(groupPosition==1){
+					 Common.getCommon().expandonitem(DropActivity.this,lists,groupPosition,childPosition);
+				}
+				return false;
+			}
+			
+			
 		});
 	}
 
@@ -146,7 +176,7 @@ public class DropActivity extends Activity {
     		 public void run(){
     			 try{
     	    			//根据tableID请求数据
-    	    			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryOrder(Short.valueOf(Common.getCommon().getDropplatenum())));
+    	    			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryOrder(Short.valueOf(plateForm)));
     	    			if(resp.header.type == Type.ACK) {
     	    				//解释的数据请参考com.wireless.util.RespParser2.java
     	    			    order = RespParser.parseQueryOrder(resp, AppContext.getFoodMenu());
@@ -348,8 +378,7 @@ public class DropActivity extends Activity {
     	if(keyCode==KeyEvent.KEYCODE_BACK){
     		Common.getCommon().getFoodlist().clear();
 			Common.getCommon().setPosition(0);
-			Intent intent=new Intent(DropActivity.this,MainActivity.class);
-			startActivity(intent);
+            finish(); 
     	}
 		return super.onKeyDown(keyCode, event);
 	}
@@ -367,6 +396,7 @@ public class DropActivity extends Activity {
 		
 	}
 
+	
 	private Handler handler=new Handler(){
 		public void handleMessage(Message msg){
 			if(!Thread.currentThread().interrupted()){
@@ -430,8 +460,7 @@ public class DropActivity extends Activity {
 				           public void onClick(DialogInterface dialog, int id) {
 				        	    Common.getCommon().getFoodlist().clear();
 				        	    Common.getCommon().setPosition(0);
-				        		Intent intent=new Intent(DropActivity.this,MainActivity.class);
-								startActivity(intent);
+				        		finish();
 				        	 
 				           }
 				       }).show();

@@ -13,17 +13,17 @@ import android.widget.TextView;
 
 import com.wireless.protocol.Food;
 import com.wireless.ui.R;
-import com.wireless.ui.orderActivity;
+import com.wireless.ui.OrderActivity;
 
 public class OderFoodAdapter extends BaseAdapter {
 	private LayoutInflater minflater;
 	private List<Food> foods;
-	private orderActivity orer;
+	private OrderActivity orer;
 
 	public OderFoodAdapter(Context context,List<Food> foods){
 		minflater=LayoutInflater.from(context);
 		this.foods=foods;
-		orer=(orderActivity)context;
+		orer=(OrderActivity)context;
 	}
 	
 	@Override

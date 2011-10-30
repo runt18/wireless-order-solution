@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.wireless.common.Common;
+import com.wireless.common.WirelessOrder;
 import com.wireless.protocol.Food;
 import com.wireless.ui.DropActivity;
 import com.wireless.ui.R;
@@ -113,7 +114,12 @@ public class DropAdapter extends BaseExpandableListAdapter  {
 				@Override
 				public void onClick(View v) {
 					// TODO Auto-generated method stub
-					Common.getCommon().dropFoods(context, childs, groupPosition,childPosition);
+					if(WirelessOrder.restaurant.pwd3.length()==0){
+						Common.getCommon().dropnopawrFoods(context, childs, groupPosition,childPosition);
+					}else{
+						Common.getCommon().dropFoods(context, childs, groupPosition,childPosition);
+					}
+					
 				}
 			});
 			

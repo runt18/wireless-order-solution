@@ -16,6 +16,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.Settings;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
@@ -25,7 +26,9 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.wireless.common.Common;
 import com.wireless.common.WirelessOrder;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.PinGen;
@@ -46,6 +49,7 @@ public class MainActivity extends Activity {
 	private static final int DIALOG_INSERT_ORDER = 0;
 	private static final int DIALOG_UPDATE_ORDER = 1;
 	private static final int DIALOG_CANCEL_ORDER = 2;
+	private static final int DIALOG_BILL_ORDER=3;
 	
 	private static final int REDRAW_FOOD_MENU = 1;
 	private static final int REDRAW_RESTAURANT = 2;
@@ -89,25 +93,6 @@ public class MainActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		
-		ServerConnector.instance().setNetAddr("125.88.20.194");
-		ServerConnector.instance().setNetPort(55555);
-
-		ReqPackage.setGen(new PinGen() {
-			@Override
-			public int getDeviceId() {
-				//FIXME here should use the the id of android's own
-				return 0x2100000A;
-			}
-
-			@Override
-			public short getDeviceType() {
-				//FIXME here should use the model of android
-				return Terminal.MODEL_BB;
-			}
-
-		});
-		
 		setContentView(R.layout.main);
 		
 		int[] imageIcons = { 
@@ -149,17 +134,38 @@ public class MainActivity extends Activity {
 			) {
 				switch (position) {
 				case 0:
-					showDialog(DIALOG_INSERT_ORDER);
+				
+					if(Common.getCommon().isNetworkAvailable(MainActivity.this)){
+						showDialog(DIALOG_INSERT_ORDER);
+					}else{
+						shownet();
+					}
 					break;
 
 				case 1:
-					showDialog(DIALOG_UPDATE_ORDER);
+					
+					if(Common.getCommon().isNetworkAvailable(MainActivity.this)){
+						showDialog(DIALOG_UPDATE_ORDER);
+					}else{
+						shownet();
+					}
 					break;
 				case 2:
-
+				
+					if(Common.getCommon().isNetworkAvailable(MainActivity.this)){
+						showDialog(DIALOG_CANCEL_ORDER);
+					}else{
+						shownet();
+					}
 					break;
 				case 3:
-
+					
+					if(Common.getCommon().isNetworkAvailable(MainActivity.this)){
+						showDialog(DIALOG_BILL_ORDER);
+					}else{
+						shownet();
+					}
+					
 					break;
 
 				case 4:
@@ -171,7 +177,12 @@ public class MainActivity extends Activity {
 					break;
 
 				case 6:
-					new QueryMenuTask().execute();
+					if(Common.getCommon().isNetworkAvailable(MainActivity.this)){
+						new QueryMenuTask().execute();
+					}else{
+						shownet();
+					}
+					
 					break;
 
 				case 7:
@@ -193,13 +204,13 @@ public class MainActivity extends Activity {
 		}catch(NameNotFoundException e) {
 			topTitle.setText("e点通");
 		}
-
+		_handler.sendEmptyMessage(REDRAW_RESTAURANT);
 	}
 
 	@Override
 	protected void onStart(){
 		super.onStart();
-		new QueryMenuTask().execute();
+		//new QueryMenuTask().execute();
 	}
 	
 	@Override
@@ -216,6 +227,9 @@ public class MainActivity extends Activity {
 			//删单的餐台输入Dialog
 			return new AskTableDialog(DIALOG_CANCEL_ORDER);
 			
+		}else if(dialogID == DIALOG_BILL_ORDER){
+			//结账的餐台输入Dialog
+			return new AskTableDialog(DIALOG_BILL_ORDER);
 		}else{
 			return null;
 		}
@@ -280,20 +294,13 @@ public class MainActivity extends Activity {
 //	}
 	
 	
-//	//跳转到下单界面
-//	public void order(String plate){
-//		Intent intent = new Intent(MainActivity.this,
-//				orderActivity.class);
-//		startActivity(intent);
-//	}
-//	
-//	//跳转到下单界面
-//	public void drop(String plate){
-//		Intent intent = new Intent(MainActivity.this,
-//				DropActivity.class);
-//		intent.putExtra("platform", plate);
-//		startActivity(intent);
-//	}
+
+	//跳转到下单界面
+	public void order(String plate){
+		Intent intent = new Intent(MainActivity.this,
+				OrderActivity.class);
+		startActivity(intent);
+	}
 	
 	/**
 	 * Generate the message according to the error code 
@@ -313,6 +320,29 @@ public class MainActivity extends Activity {
 		}
 	}
 	
+	
+	/**
+	 * 如果没有网络就弹出框，用户选择是否跳转到设置网络界面
+	 */
+	private void shownet(){
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+ 		builder.setTitle("提示");
+ 		builder.setMessage("当前没有网络,请设置")
+ 		       .setCancelable(false)
+ 		       .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+ 		           public void onClick(DialogInterface dialog, int id) {
+ 		        	  startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));//进入无线网络配置界面
+ 		           }
+ 		       })
+ 		       .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+ 		           public void onClick(DialogInterface dialog, int id) {
+ 		        	 finish();
+ 		           }
+ 		       });
+ 		AlertDialog alert = builder.create();
+ 		alert.show();
+
+	}
 	/**
 	 * 请求菜谱信息
 	 */
@@ -440,6 +470,8 @@ public class MainActivity extends Activity {
 						dialog.dismiss();
 					}
 				}).show();
+			}else{
+				Toast.makeText(MainActivity.this, "菜谱更新成功", 1).show();
 			}
 		}	
 	}
@@ -449,10 +481,14 @@ public class MainActivity extends Activity {
 	 */
 	private class AskTableDialog extends Dialog{
 
+
+		
+
 		/**
 		 * 请求获得餐台的状态
 		 */
 		private class QueryOrder2Task extends AsyncTask<Void, Void, String>{
+
 			
 			private int _tableID;
 			private ProgressDialog _progDialog;
@@ -497,7 +533,7 @@ public class MainActivity extends Activity {
 								}
 							}
 						}
-					}else if(_type == DIALOG_UPDATE_ORDER || _type == DIALOG_CANCEL_ORDER){
+					}else if(_type == DIALOG_UPDATE_ORDER || _type == DIALOG_CANCEL_ORDER|| _type == DIALOG_BILL_ORDER){
 						if(resp.header.type == Type.ACK){
 							/**
 							 * 如果返回ACK，表示餐台处于占用状态，可以改单和删单
@@ -553,12 +589,20 @@ public class MainActivity extends Activity {
 					
 					if(_type == DIALOG_INSERT_ORDER){
 						//jump to the order activity with the table id
-						Intent intent = new Intent(MainActivity.this, orderActivity.class);
-						intent.putExtra(KEY_TABLE_ID, _tableID);
+						Intent intent = new Intent(MainActivity.this, OrderActivity.class);
+						intent.putExtra(KEY_TABLE_ID,String.valueOf(_tableID));
 						startActivity(intent);
 						dismiss();
 					}else if(_type == DIALOG_UPDATE_ORDER){
 						//TODO jump to the update order activity
+						Intent intent = new Intent(MainActivity.this, DropActivity.class);
+						intent.putExtra(KEY_TABLE_ID, String.valueOf(_tableID));
+						startActivity(intent);
+						dismiss();
+					}else if(_type==DIALOG_BILL_ORDER){
+						Intent intent = new Intent(MainActivity.this, BillActivity.class);
+						intent.putExtra(KEY_TABLE_ID, String.valueOf(_tableID));
+						startActivity(intent);
 						dismiss();
 					}else if(_type == DIALOG_CANCEL_ORDER){
 						//TODO perform to cancel the order associated with this table
@@ -584,6 +628,8 @@ public class MainActivity extends Activity {
 				title.setText("请输入需要改单的台号:");
 			}else if(_type == DIALOG_CANCEL_ORDER){
 				title.setText("请输入需要删单的台号:");
+			}else if(_type == DIALOG_BILL_ORDER){
+				title.setText("请输入需要结账的台号:");
 			}else{
 				title.setText("请输入需要下单的台号:");
 			}
@@ -593,10 +639,11 @@ public class MainActivity extends Activity {
 			ok.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					
-					String tableID = ((EditText)findViewById(R.id.mycount)).getText().toString();
+					EditText table=(EditText)findViewById(R.id.mycount);
+					String tableID = table.getText().toString();
 					new QueryOrder2Task(Integer.parseInt(tableID)).execute();
-
+					table.setText("");
+					dismiss();
 				}
 			});
 			
@@ -606,6 +653,7 @@ public class MainActivity extends Activity {
 				@Override
 				public void onClick(View v) {
 					dismiss();
+					
 				}
 			});
 		}		

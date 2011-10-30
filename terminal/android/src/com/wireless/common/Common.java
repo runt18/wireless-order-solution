@@ -35,14 +35,15 @@ import com.wireless.ui.KitchenActivity;
 import com.wireless.ui.MainActivity;
 import com.wireless.ui.R;
 import com.wireless.ui.TasteActivity;
-import com.wireless.ui.orderActivity;
+import com.wireless.ui.OrderActivity;
+import com.wireless.util.Md5;
 
 public class Common {
 	//单例模式
      private static Common common;
     public static List<Food> foodlist;
    public  static  ProgressDialog dialog;
-   orderActivity order;
+   OrderActivity order;
    private int position;
    TasteActivity taste;
    KitchenActivity kient;
@@ -184,7 +185,7 @@ public void setKient(KitchenActivity kient) {
 	 * 
 	 * */
 	public void onitem(Context context,final List<Food> list, final int position){
-		order=(orderActivity)context;
+		order=(OrderActivity)context;
 		View mView =LayoutInflater.from(context).inflate(R.layout.itemalert, null);
 		final Dialog mDialog = new Dialog(context,R.style.FullHeightDialog);
 		mDialog.setContentView(mView);
@@ -254,6 +255,84 @@ public void setKient(KitchenActivity kient) {
 		});
 		
 	}
+	
+	
+	
+	
+	/*
+	 * 新点菜item显示的操作
+	 * 
+	 * */
+	public void expandonitem(final Context context,final  List<List<Food>> lists, final int grouposition,final int childposition){
+		drop=(DropActivity)context;
+		View mView =LayoutInflater.from(context).inflate(R.layout.itemalert, null);
+		final Dialog mDialog = new Dialog(context,R.style.FullHeightDialog);
+		mDialog.setContentView(mView);
+		mDialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
+		mDialog.show();
+		TextView ordername=(TextView)mView.findViewById(R.id.ordername);
+		ordername.setText("请选择"+lists.get(grouposition).get(childposition).name+"的操作");
+		TextView delete=(TextView)mView.findViewById(R.id.deletefood);
+		RelativeLayout r1=(RelativeLayout)mView.findViewById(R.id.r1);
+		r1.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				mDialog.cancel();
+				//getdeleteFoods(order,list,position);
+				Common.getCommon().setPosition(childposition);	
+				Common.getCommon().getdeleteFoods(context, lists.get(grouposition),Common.getCommon().getPosition(), 1);
+			}
+		});
+		TextView taste=(TextView)mView.findViewById(R.id.taste);
+		RelativeLayout r2=(RelativeLayout)mView.findViewById(R.id.r2);
+		r2.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				mDialog.cancel();
+				drop.Foodfunction(childposition);
+				
+			}
+		});
+		
+	    TextView isfug=(TextView)mView.findViewById(R.id.isfug);
+	    if(lists.get(grouposition).get(childposition).hangStatus==Food.FOOD_NORMAL){
+			isfug.setText("叫起");
+		}else if(lists.get(grouposition).get(childposition).hangStatus==Food.FOOD_HANG_UP){
+			isfug.setText("取消叫起");
+		}
+		RelativeLayout r3=(RelativeLayout)mView.findViewById(R.id.r3);
+		r3.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				if(lists.get(grouposition).get(childposition).hangStatus == Food.FOOD_NORMAL){
+					lists.get(grouposition).get(childposition).hangStatus = Food.FOOD_HANG_UP;
+					mDialog.cancel();
+    			}else if(lists.get(grouposition).get(childposition).hangStatus == Food.FOOD_HANG_UP){
+    				lists.get(grouposition).get(childposition).hangStatus = Food.FOOD_NORMAL;
+    				mDialog.cancel();
+    			}
+
+				
+			}
+		});
+		
+		
+		Button mButtonOK = (Button) mView.findViewById(R.id.back);
+		mButtonOK.setText("返回");
+		
+		mButtonOK.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				 mDialog.cancel();
+			}
+		});
+		
+	}
 
 	  /*
 	   * 点菜弹出的dialog
@@ -265,8 +344,6 @@ public void setKient(KitchenActivity kient) {
 		View mView =LayoutInflater.from(context).inflate(R.layout.alert, null);
 		final Dialog mDialog = new Dialog(context,R.style.FullHeightDialog);
 		mDialog.setContentView(mView);
-//		mDialog.getWindow().setTitle("请输入"+list.get(position).name+"的数量");
-//		mDialog.getWindow().setTitleColor(R.color.grey);
 		mDialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
 		mDialog.show();
 		TextView ordername=(TextView)mView.findViewById(R.id.ordername);
@@ -337,7 +414,6 @@ public void setKient(KitchenActivity kient) {
 		TextView ordername=(TextView)mView.findViewById(R.id.ordername);
 		ordername.setText("请输入"+list.get(position).name+"的删除数量");
 	    mycount = (EditText)mView.findViewById(R.id.mycount);
-		//mycount.setGravity(Gravity.LEFT);
 		mycount.setText("1");
 		Button mButtonOK = (Button) mView.findViewById(R.id.confirm);
 		mButtonOK.setText("确定");
@@ -360,7 +436,7 @@ public void setKient(KitchenActivity kient) {
 				}
                 
 				if(code==0){
-					 order=(orderActivity)context;
+					 order=(OrderActivity)context;
 					 order.onRestart();
 				}else{
 					drop=(DropActivity)context;
@@ -510,7 +586,6 @@ public void setKient(KitchenActivity kient) {
       	  new AlertDialog.Builder(context).setTitle("提示").setMessage("你当前没有选择口味").setNeutralButton("确定", null).show();
         }else{
         	init(food,test);
-        
            
         }
 	}
@@ -525,7 +600,7 @@ public void setKient(KitchenActivity kient) {
 	
 	
 	/*
-	 * 改单退菜的时候弹出得dialog
+	 * 有密码时改单退菜的时候弹出得dialog
 	 * 
 	 * */
 	
@@ -533,38 +608,74 @@ public void setKient(KitchenActivity kient) {
 	public void dropFoods(final Context context,final List<List<Food>> childs,final int groupPosition, final int childPosition){
 		final EditText mycount;
 		drop=(DropActivity)context;
-		View mView =LayoutInflater.from(context).inflate(R.layout.alert, null);
+		View mView =LayoutInflater.from(context).inflate(R.layout.pawalert, null);
 		final Dialog mDialog = new Dialog(context,R.style.FullHeightDialog);
 		mDialog.setContentView(mView);
 		mDialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
 		mDialog.show();
 		TextView ordername=(TextView)mView.findViewById(R.id.ordername);
-		ordername.setText("请输入"+childs.get(groupPosition).get(childPosition).name+"的删除数量");
+		ordername.setText("请输入权限密码");
 	    mycount = (EditText)mView.findViewById(R.id.mycount);
-		//mycount.setGravity(Gravity.LEFT);
-		mycount.setText("1");
 		Button mButtonOK = (Button) mView.findViewById(R.id.confirm);
 		mButtonOK.setText("确定");
 		mButtonOK.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Food food = childs.get(groupPosition).get(childPosition);
-				float count;
-				/**
-				 * 遍历已点菜，查找是否存在与新点菜相同的菜品。
-				 * 如果存在就把数量累加上去，否则就当作新菜品添加到已点菜中
-				 */
-				if(food.getCount().floatValue()==Float.parseFloat(mycount.getText().toString())){
-					childs.get(groupPosition).remove(food);
-				}else if(food.getCount().floatValue()>Float.parseFloat(mycount.getText().toString())){
-					count=food.getCount().floatValue()-Float.parseFloat(mycount.getText().toString());
-					food.setCount(count);
-				}else if(food.getCount().floatValue()<Float.parseFloat(mycount.getText().toString())){
-					new AlertDialog.Builder(context).setTitle("提示").setMessage("你输入的删除数量大于你已点数量").setNeutralButton("确定", null).show();
-				}
+				if(Md5.md5(mycount.getText().toString())==null){
+					new AlertDialog.Builder(context).setTitle("提示").setMessage("出现异常，请重新输入").setNeutralButton("确定", null).show();
+				}else{
+					if(Md5.toHexString(Md5.md5(mycount.getText().toString())).equals(WirelessOrder.restaurant.pwd2)||Md5.toHexString(Md5.md5(mycount.getText().toString())).equals(WirelessOrder.restaurant.pwd3)){
+						final EditText counts;
+						View mView =LayoutInflater.from(context).inflate(R.layout.alert, null);
+						final Dialog myDialog = new Dialog(context,R.style.FullHeightDialog);
+						myDialog.setContentView(mView);
+						myDialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
+						myDialog.show();
+						TextView ordername=(TextView)mView.findViewById(R.id.ordername);
+						ordername.setText("请输入"+childs.get(groupPosition).get(childPosition).name+"的退菜数量");
+						counts = (EditText)mView.findViewById(R.id.mycount);
+						counts.setText("1");
+						Button mButtonOK = (Button) mView.findViewById(R.id.confirm);
+						mButtonOK.setText("确定");
+						mButtonOK.setOnClickListener(new OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								Food food = childs.get(groupPosition).get(childPosition);
+								float count;
+								/**
+								 * 遍历已点菜，查找是否存在与新点菜相同的菜品。
+								 * 如果存在就把数量累加上去，否则就当作新菜品添加到已点菜中
+								 */
+								if(food.getCount().floatValue()==Float.parseFloat(counts.getText().toString())){
+									childs.get(groupPosition).remove(food);
+								}else if(food.getCount().floatValue()>Float.parseFloat(counts.getText().toString())){
+									count=food.getCount().floatValue()-Float.parseFloat(counts.getText().toString());
+									food.setCount(count);
+								}else if(food.getCount().floatValue()<Float.parseFloat(counts.getText().toString())){
+									new AlertDialog.Builder(context).setTitle("提示").setMessage("你输入的退菜数量大于你已点数量").setNeutralButton("确定", null).show();
+								}
 
-				 drop.init();
-				 mDialog.cancel();
+								 drop.init();
+								 myDialog.cancel();
+								 mDialog.cancel();
+							}
+						});
+						
+						Button cancle = (Button) mView.findViewById(R.id.cancle);
+						cancle.setText("取消");
+						cancle.setOnClickListener(new OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								myDialog.cancel();
+							}
+						});
+
+						
+					
+					}else{
+						new AlertDialog.Builder(context).setTitle("提示").setMessage("你输入权限密码不正确").setNeutralButton("确定", null).show();
+					}
+				}
 			}
 		});
 		
@@ -578,5 +689,59 @@ public void setKient(KitchenActivity kient) {
 		});
 
 		
+	}
+	
+	/*
+	 * 用户没有设置密码时进行退菜
+	 * 
+	 * */
+	
+	public void dropnopawrFoods(final Context context,final List<List<Food>> childs,final int groupPosition, final int childPosition){
+		final EditText counts;
+		View mView =LayoutInflater.from(context).inflate(R.layout.alert, null);
+		final Dialog myDialog = new Dialog(context,R.style.FullHeightDialog);
+		myDialog.setContentView(mView);
+		myDialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
+		myDialog.show();
+		TextView ordername=(TextView)mView.findViewById(R.id.ordername);
+		ordername.setText("请输入"+childs.get(groupPosition).get(childPosition).name+"的退菜数量");
+		counts = (EditText)mView.findViewById(R.id.mycount);
+		//mycount.setGravity(Gravity.LEFT);
+		counts.setText("1");
+		Button mButtonOK = (Button) mView.findViewById(R.id.confirm);
+		mButtonOK.setText("确定");
+		mButtonOK.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Food food = childs.get(groupPosition).get(childPosition);
+				float count;
+				/**
+				 * 遍历已点菜，查找是否存在与新点菜相同的菜品。
+				 * 如果存在就把数量累加上去，否则就当作新菜品添加到已点菜中
+				 */
+				if(food.getCount().floatValue()==Float.parseFloat(counts.getText().toString())){
+					childs.get(groupPosition).remove(food);
+				}else if(food.getCount().floatValue()>Float.parseFloat(counts.getText().toString())){
+					count=food.getCount().floatValue()-Float.parseFloat(counts.getText().toString());
+					food.setCount(count);
+				}else if(food.getCount().floatValue()<Float.parseFloat(counts.getText().toString())){
+					new AlertDialog.Builder(context).setTitle("提示").setMessage("你输入的退菜数量大于你已点数量").setNeutralButton("确定", null).show();
+				}
+
+				 drop.init();
+				 myDialog.cancel();
+			}
+		});
+		
+		Button cancle = (Button) mView.findViewById(R.id.cancle);
+		cancle.setText("取消");
+		cancle.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				myDialog.cancel();
+			}
+		});
+
+	
 	}
 }

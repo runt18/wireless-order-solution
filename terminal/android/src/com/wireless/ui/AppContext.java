@@ -111,7 +111,7 @@ public class AppContext extends Application {
 			}
 			ActivityManager activityManager =(ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
 			activityManager.restartPackage("com.wireless.ui");
-			        System.exit(0);
+			        //System.exit(0);
 		}
 	
 	
