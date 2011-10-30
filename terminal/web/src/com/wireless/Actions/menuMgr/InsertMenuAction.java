@@ -85,18 +85,32 @@ public class InsertMenuAction extends Action {
 			/**
 			 * 
 			 */
+			int status = 0x00;
+			if(isSpecial.equals("true")){
+				status |= SPECIAL;
+			};
+			if(isRecommend.equals("true")){
+				status |= RECOMMEND;
+			};
+			if(isStop.equals("true")){
+				status |= SELL_OUT;
+			};
+			if(isFree.equals("true")){
+				status |= GIFT;
+			};
+			
 			String sql = "INSERT INTO " + Params.dbName + ".food" +
-					"( alias_id, name, pingyin, unit_price, reataurant_id, kitchen, status, enabled ) " + 
+					"( alias_id, name, pinyin, unit_price, restaurant_id, kitchen, status, enabled ) " + 
 					" VALUES(" +
-					dishNumber + ", " +
-					dishName + ", " +
-					dishSpill + ", " +
+					dishNumber + ", '" +
+					dishName + "', '" +
+					dishSpill + "', " +
 					dishPrice + ", " +
 					term.restaurant_id + ", " +
 					kitchen + ", " +
-					isSpecial + ", 1, " +
+					status + ", 1 " +
 					") ";
-
+			System.out.println(sql);
 
 			int sqlRowCount = dbCon.stmt.executeUpdate(sql);
 

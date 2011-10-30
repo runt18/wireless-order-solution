@@ -85,15 +85,28 @@ public class UpdateMenuAction extends Action {
 			/**
 			 * 
 			 */
+			int status = 0x00;
+			if(isSpecial.equals("true")){
+				status |= SPECIAL;
+			};
+			if(isRecommend.equals("true")){
+				status |= RECOMMEND;
+			};
+			if(isStop.equals("true")){
+				status |= SELL_OUT;
+			};
+			if(isFree.equals("true")){ 
+				status |= GIFT;
+			};
+			
 			String sql = "UPDATE " + Params.dbName + ".food " +
 					" SET name = '" + dishName + "', " + 
 					" pinyin = '"+ dishSpill + "', " + 
 					" unit_price =  " + dishPrice + ", " + 
 					" kitchen = " + kitchen + ", " + 
-					" status =  " + 
-					"WHERE restaurant_id=" + term.restaurant_id
+					" status =  " + status + 
+					" WHERE restaurant_id=" + term.restaurant_id
 					+ " AND alias_id = " + dishNumber;
-
 
 			int sqlRowCount = dbCon.stmt.executeUpdate(sql);
 

@@ -203,11 +203,11 @@ public class QueryMenuMgrAction extends Action {
 												.toString()))
 								|| (isFree.equals("true") && Boolean
 										.parseBoolean(((HashMap) (resultList
-												.get(i))).get("stop")
+												.get(i))).get("free")
 												.toString()))
 								|| (isStop.equals("true") && Boolean
 										.parseBoolean(((HashMap) (resultList
-												.get(i))).get("free")
+												.get(i))).get("stop")
 												.toString()))) {
 							chooseList.add(resultList.get(i));
 						}

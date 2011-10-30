@@ -70,18 +70,19 @@
 		<action path="/QueryMenuMgr" type="com.wireless.Actions.menuMgr.QueryMenuMgrAction"
 			scope="request">
 		</action>
-		<action path="UpdateMenu" type="com.wireless.Actions.menuMgr.UpdateMenuAction"
+		<action path="/UpdateMenu" type="com.wireless.Actions.menuMgr.UpdateMenuAction"
 			scope="request">
 		</action>
-		<action path="DeleteMenu" type="com.wireless.Actions.menuMgr.DeleteMenuAction"
+		<action path="/DeleteMenu" type="com.wireless.Actions.menuMgr.DeleteMenuAction"
 			scope="request">
 		</action>
-		<action path="InsertMenu" type="com.wireless.Actions.menuMgr.InsertMenuAction"
+		<action path="/InsertMenu" type="com.wireless.Actions.menuMgr.InsertMenuAction"
 			scope="request">
 		</action>
-		<action path="MenuStatistics" type="com.wireless.Actions.menuMgr.MenuStatisticsAction"
+		<action path="/MenuStatistics" type="com.wireless.Actions.menuMgr.MenuStatisticsAction"
 			scope="request">
 		</action>
+
 
 	</action-mappings>
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />

@@ -3,6 +3,7 @@ package com.wireless.Actions.menuMgr;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -47,6 +48,7 @@ public class MenuStatisticsAction extends Action {
 		HashMap rootMap = new HashMap();
 
 		boolean isError = false;
+		float totalPrice = 0;
 
 		try {
 			// 解决后台中文传到前台乱码
@@ -59,10 +61,8 @@ public class MenuStatisticsAction extends Action {
 			 * example, filter the order date greater than or equal 2011-7-14
 			 * 14:30:00 pin=0x1 & type=3 & ope=2 & value=2011-7-14 14:30:00
 			 * 
-			 * pin : the pin the this terminal 
-			 * foodIDs : array "food1,food2,food3" 
-			 * dateBegin: 
-			 * dateEnd :
+			 * pin : the pin the this terminal foodIDs : array
+			 * "food1,food2,food3" dateBegin: dateEnd :
 			 */
 
 			String pin = request.getParameter("pin");
@@ -83,13 +83,23 @@ public class MenuStatisticsAction extends Action {
 			 * belong to this restaurant 2 - has been paid 3 - match extra
 			 * filter condition
 			 */
-			String sql = "SELECT food_id, name, unit_price, is_temporary, "
+			String sql = "SELECT food_id, name, unit_price, is_temporary, kitchen, "
 					+ " count(1) as dishCount, count(1)*unit_price as totalPrice "
-					+ " FROM " + Params.dbName + ".order_food_history "
-					+ " WHERE order_date >= '" + dateBegin + "' "
-					+ " AND order_date <= '" + dateEnd + "' "
-					+ " AND food_id in (" + dishString + ") "
-					+ " GROUP BY food_id, name, unit_price, is_temporary ";
+					+ " FROM "
+					+ Params.dbName
+					+ ".order_food_history "
+					+ " WHERE 1=1 ";
+			if (!dateBegin.equals("")) {
+				sql = sql + " AND order_date >= '" + dateBegin + "' ";
+			}
+			if (!dateEnd.equals("")) {
+				sql = sql + " AND order_date <= '" + dateEnd + "' ";
+			}
+			sql = sql
+					+ " AND food_id in ("
+					+ dishString
+					+ ") "
+					+ " GROUP BY food_id, name, unit_price, is_temporary, kitchen ";
 
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 
@@ -97,19 +107,21 @@ public class MenuStatisticsAction extends Action {
 				HashMap resultMap = new HashMap();
 				/**
 				 * The json to each order looks like below
-				 * 菜品ｉｄ，菜品名稱，菜品單價，是否臨時，總數量，總價格
+				 * 菜品ｉｄ，菜品名稱，菜品單價，是否臨時，厨房，總數量，總價格
 				 */
 				resultMap.put("dishNumber", dbCon.rs.getInt("food_id"));
 				resultMap.put("dishName", dbCon.rs.getString("name"));
 				resultMap.put("dishPrice", dbCon.rs.getFloat("unit_price"));
 				resultMap.put("isTemp", dbCon.rs.getBoolean("is_temporary"));
+				resultMap.put("kitchen", dbCon.rs.getInt("kitchen"));
 				resultMap.put("dishCount", dbCon.rs.getLong("dishCount"));
 				resultMap
 						.put("dishTotalPrice", dbCon.rs.getFloat("totalPrice"));
-				resultMap.put("message", "success");
+				resultMap.put("message", "normal");
 
 				resultList.add(resultMap);
-
+				
+				totalPrice  = totalPrice + dbCon.rs.getFloat("totalPrice");
 			}
 			dbCon.rs.close();
 
@@ -155,6 +167,13 @@ public class MenuStatisticsAction extends Action {
 						// 最后一页可能不足一页，会报错，忽略
 					}
 				}
+				DecimalFormat fnum = new DecimalFormat("##0.00");  
+				String totalPriceDiaplay = fnum.format(totalPrice);
+				HashMap resultMap = new HashMap();
+				resultMap.put("dishCount", "汇总");
+				resultMap.put("dishTotalPrice", totalPriceDiaplay);
+				outputList.add(resultMap);
+
 				rootMap.put("root", outputList);
 			}
 
