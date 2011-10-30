@@ -950,7 +950,7 @@ var searchForm = new Ext.Panel({
 // panel
 var menuQueryCondPanel = new Ext.form.FormPanel({
 	region : "north",
-	border : false,
+	// border : false,
 	height : 23,
 	bodyStyle : "margin-top:5px;",
 	items : [ {
@@ -1112,9 +1112,9 @@ function dishDeleteHandler(rowIndex) {
 	});
 };
 
-function dishRelateHandler(rowIndex) {
-
-};
+//function dishRelateHandler(rowIndex) {
+//
+//};
 
 function menuDishOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
 	return "<center><a href=\"javascript:dishModifyHandler(" + rowIndex
@@ -1122,9 +1122,10 @@ function menuDishOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
 			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
 			+ "<a href=\"javascript:dishDeleteHandler(" + rowIndex + ")\">"
 			+ "<img src='../images/del.png'/>删除</a>"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-			+ "<a href=\"javascript:dishRelateHandler(" + rowIndex + ")\">"
-			+ "<img src='../images/Modify.png'/>关联</a>" + "</center>";
+			// + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+			// + "<a href=\"javascript:dishRelateHandler(" + rowIndex + ")\">"
+			// + "<img src='../images/Modify.png'/>关联</a>"
+			+ "</center>";
 };
 
 // 1，表格的数据store
@@ -1172,35 +1173,115 @@ var menuColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(), {
 	header : "编号",
 	sortable : true,
 	dataIndex : "dishNumber",
-	width : 180
+	width : 80
 }, {
 	header : "名称",
 	sortable : true,
 	dataIndex : "dishNameDisplay",
-	width : 250
+	width : 180
 }, {
 	header : "拼音",
 	sortable : true,
 	dataIndex : "dishSpill",
-	width : 180
+	width : 80
 }, {
 	header : "价格（￥）",
 	sortable : true,
 	dataIndex : "dishPrice",
-	width : 180
+	width : 90
 }, {
 	header : "厨房打印",
 	sortable : true,
 	dataIndex : "kitchenDisplay",
-	width : 180
+	width : 80
 }, {
 	header : "<center>操作</center>",
 	sortable : true,
 	dataIndex : "operator",
-	width : 330,
+	width : 230,
 	renderer : menuDishOpt
 } ]);
 
+// -------------- 關聯食材 ---------------
+var materialStore = new Ext.data.Store({
+	proxy : new Ext.data.MemoryProxy(materialData),
+	reader : new Ext.data.ArrayReader({}, [ {
+		name : "materialNumber"
+	}, {
+		name : "materialName"
+	}, {
+		name : "materialCost"
+	}, {
+		name : "materialOpt"
+	} ])
+});
+
+// 2，栏位模型
+var materialColumnModel = new Ext.grid.ColumnModel([
+		new Ext.grid.RowNumberer(), {
+			header : "编号",
+			sortable : true,
+			dataIndex : "materialNumber",
+			width : 50
+		}, {
+			header : "食材",
+			sortable : true,
+			dataIndex : "materialName",
+			width : 80
+		}, {
+			header : "消耗",
+			sortable : true,
+			dataIndex : "materialCost",
+			width : 50
+		}, {
+			header : "操作",
+			sortable : true,
+			dataIndex : "materialOpt",
+			width : 100
+		} ]);
+
+var materialGrid = new Ext.grid.GridPanel({
+	xtype : "grid",
+	anchor : "99%",
+	border : true,
+	ds : materialStore,
+	cm : materialColumnModel,
+	sm : new Ext.grid.RowSelectionModel({
+		singleSelect : true
+	}),
+	listeners : {
+	// rowclick : function(thiz, rowIndex, e) {
+	// dishOrderCurrRowIndex_ = rowIndex;
+	// },
+	// render : function(thiz) {
+	// orderedDishesOnLoad();
+	// tableStuLoad();
+	// }
+	}
+});
+
+var materialPanel = new Ext.Panel({
+	region : "east",
+	title : "食材关联",
+	layout : "fit",
+	margins : '0 5 0 0',
+	collapsible : true,
+	collapsed : true,
+	titleCollapse : true,
+	frame : true,
+	width : 300,
+	items : materialGrid,
+	listeners : {
+		"collapse" : function(panel) {
+			menuQueryCondPanel.setHeight(27);
+		},
+		"expand" : function(panel) {
+			menuQueryCondPanel.setHeight(27);
+		}
+	}
+});
+
+// -------------- layout ---------------
 Ext
 		.onReady(function() {
 			// 解决ext中文传入后台变问号问题
@@ -1213,7 +1294,8 @@ Ext
 				xtype : "grid",
 				anchor : "99%",
 				region : "center",
-				border : false,
+				frame : true,
+				margins : '0 5 0 0',
 				ds : menuStore,
 				cm : menuColumnModel,
 				sm : new Ext.grid.RowSelectionModel({
@@ -1222,6 +1304,9 @@ Ext
 				listeners : {
 					rowclick : function(thiz, rowIndex, e) {
 						currRowIndex = rowIndex;
+						
+						//關聯食材
+						
 					}
 				},
 				bbar : new Ext.PagingToolbar({
@@ -1380,7 +1465,6 @@ Ext
 								}
 							});
 			// ---------------------end 表格--------------------------
-
 			var centerPanel = new Ext.Panel({
 				region : "center",
 				layout : "fit",
@@ -1388,7 +1472,7 @@ Ext
 				items : [ {
 					layout : "border",
 					title : "<div style='font-size:20px;'>菜品管理<div>",
-					items : [ menuQueryCondPanel, menuGrid ]
+					items : [ menuQueryCondPanel, menuGrid, materialPanel ]
 				} ],
 				tbar : new Ext.Toolbar({
 					height : 55,
