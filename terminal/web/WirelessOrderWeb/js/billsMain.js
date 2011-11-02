@@ -1254,6 +1254,9 @@ Ext
 				border : false,
 				ds : billsStore,
 				cm : billsColumnModel,
+				viewConfig : {
+					forceFit : true
+				},
 				sm : new Ext.grid.RowSelectionModel({
 					singleSelect : true
 				}),

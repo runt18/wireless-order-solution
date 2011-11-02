@@ -98,7 +98,7 @@ Ext.grid.CheckColumn.prototype = {
 			view.mainBody.on('mousedown', this.onMouseDown, this);
 		}, this);
 	},
-	
+
 	onMouseDown : function(e, t) {
 		if (t.id == this.id) {
 			e.stopEvent();
@@ -124,10 +124,17 @@ Ext.grid.CheckColumn.prototype = {
 
 		}
 	},
-	
+
 	renderer : function(v, p, record) {
 		p.css += ' x-grid3-check-col-td';
 		return '<div id="' + this.id + '" class="x-grid3-check-col'
 				+ (v ? '-on' : '') + '">&#160;</div>';
 	}
 };
+
+// 修正日期控件在IE8显示不完全的问题
+Ext.override(Ext.menu.Menu, {
+	autoWidth : function() {
+		this.width += "px";
+	}
+});

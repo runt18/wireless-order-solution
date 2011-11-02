@@ -84,7 +84,7 @@ public class MenuStatisticsAction extends Action {
 			 * filter condition
 			 */
 			String sql = "SELECT food_id, name, unit_price, is_temporary, kitchen, "
-					+ " count(1) as dishCount, count(1)*unit_price as totalPrice "
+					+ " sum(order_count) as dishCount, sum(order_count)*unit_price as totalPrice "
 					+ " FROM "
 					+ Params.dbName
 					+ ".order_food_history "
@@ -114,7 +114,7 @@ public class MenuStatisticsAction extends Action {
 				resultMap.put("dishPrice", dbCon.rs.getFloat("unit_price"));
 				resultMap.put("isTemp", dbCon.rs.getBoolean("is_temporary"));
 				resultMap.put("kitchen", dbCon.rs.getInt("kitchen"));
-				resultMap.put("dishCount", dbCon.rs.getLong("dishCount"));
+				resultMap.put("dishCount", dbCon.rs.getFloat("dishCount"));
 				resultMap
 						.put("dishTotalPrice", dbCon.rs.getFloat("totalPrice"));
 				resultMap.put("message", "normal");
@@ -172,6 +172,7 @@ public class MenuStatisticsAction extends Action {
 				HashMap resultMap = new HashMap();
 				resultMap.put("dishCount", "汇总");
 				resultMap.put("dishTotalPrice", totalPriceDiaplay);
+				resultMap.put("message", "normal");
 				outputList.add(resultMap);
 
 				rootMap.put("root", outputList);

@@ -435,6 +435,9 @@ var orderedGrid = new Ext.grid.GridPanel({
 	border : false,
 	ds : orderedStore,
 	cm : orderedColumnModel,
+	viewConfig : {
+		forceFit : true
+	},
 	sm : new Ext.grid.RowSelectionModel({
 		singleSelect : true
 	}),
@@ -1281,11 +1284,11 @@ var dishTasteWindow = new Ext.Window(
 															.get("tasteNumber") == tasteNbr3) {
 												record.set("tasteChoose", true);
 												choosenTasteDisplay
-												.push([
-														record
-																.get("tasteNumber"),
-														record
-																.get("dishTaste") ])
+														.push([
+																record
+																		.get("tasteNumber"),
+																record
+																		.get("dishTaste") ])
 												tasteChoosenCount = tasteChoosenCount + 1;
 											}
 										});
@@ -1300,11 +1303,11 @@ var dishTasteWindow = new Ext.Window(
 															.get("tasteNumber") == tasteNbr3) {
 												record.set("tasteChoose", true);
 												choosenTasteDisplay
-												.push([
-														record
-																.get("tasteNumber"),
-														record
-																.get("dishTaste") ])
+														.push([
+																record
+																		.get("tasteNumber"),
+																record
+																		.get("dishTaste") ])
 												tasteChoosenCount = tasteChoosenCount + 1;
 											}
 										});
@@ -1601,6 +1604,9 @@ var dishesDisplayGrid = new Ext.grid.GridPanel({
 	region : "center",
 	ds : dishesDisplayStore,
 	cm : dishesDisplayColumnModel,
+	viewConfig : {
+		forceFit : true
+	},
 	sm : new Ext.grid.RowSelectionModel({
 		singleSelect : true
 	}),

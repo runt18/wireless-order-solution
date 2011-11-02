@@ -155,6 +155,8 @@ menuStatWin = new Ext.Window(
 						isFirstStatics = false;
 					}
 					menuStatWin.findById("dishMultSelectMStat").reset();
+					menuStatWin.findById("begDateMStat").setValue("");
+					menuStatWin.findById("endDateMStat").setValue("");
 				}
 			}
 		});
@@ -435,7 +437,6 @@ menuAddWin = new Ext.Window({
 							&& menuAddWin.findById("menuAddName").isValid()
 							&& menuAddWin.findById("menuAddSpill").isValid()
 							&& menuAddWin.findById("menuAddPrice").isValid()) {
-						menuAddWin.hide();
 
 						var dishNumber = menuAddWin.findById("menuAddNumber")
 								.getValue();
@@ -461,49 +462,66 @@ menuAddWin = new Ext.Window({
 						var isStop = menuAddWin.findById("stopCheckboxMA")
 								.getValue();
 
-						Ext.Ajax.request({
-							url : "../InsertMenu.do",
-							params : {
-								"pin" : Request["pin"],
-								"dishNumber" : dishNumber,
-								"dishName" : dishName,
-								"dishSpill" : dishSpill,
-								"dishPrice" : dishPrice,
-								"kitchen" : kitchen,
-								"isSpecial" : isSpecial,
-								"isRecommend" : isRecommend,
-								"isFree" : isFree,
-								"isStop" : isStop
-							},
-							success : function(response, options) {
-								var resultJSON = Ext.util.JSON
-										.decode(response.responseText);
-								if (resultJSON.success == true) {
-									menuStore.reload({
-										params : {
-											start : 0,
-											limit : dishesPageRecordCount
-										}
-									});
-
-									var dataInfo = resultJSON.data;
-									Ext.MessageBox.show({
-										msg : dataInfo,
-										width : 300,
-										buttons : Ext.MessageBox.OK
-									});
-								} else {
-									var dataInfo = resultJSON.data;
-									Ext.MessageBox.show({
-										msg : dataInfo,
-										width : 300,
-										buttons : Ext.MessageBox.OK
-									});
-								}
-							},
-							failure : function(response, options) {
+						var isDuplicate = false;
+						for ( var i = 0; i < dishMultSelectData.length; i++) {
+							if (dishNumber == dishMultSelectData[i][0]) {
+								isDuplicate = true;
 							}
-						});
+						}
+
+						if (!isDuplicate) {
+							menuAddWin.hide();
+
+							Ext.Ajax.request({
+								url : "../InsertMenu.do",
+								params : {
+									"pin" : Request["pin"],
+									"dishNumber" : dishNumber,
+									"dishName" : dishName,
+									"dishSpill" : dishSpill,
+									"dishPrice" : dishPrice,
+									"kitchen" : kitchen,
+									"isSpecial" : isSpecial,
+									"isRecommend" : isRecommend,
+									"isFree" : isFree,
+									"isStop" : isStop
+								},
+								success : function(response, options) {
+									var resultJSON = Ext.util.JSON
+											.decode(response.responseText);
+									if (resultJSON.success == true) {
+										menuStore.reload({
+											params : {
+												start : 0,
+												limit : dishesPageRecordCount
+											}
+										});
+
+										var dataInfo = resultJSON.data;
+										Ext.MessageBox.show({
+											msg : dataInfo,
+											width : 300,
+											buttons : Ext.MessageBox.OK
+										});
+									} else {
+										var dataInfo = resultJSON.data;
+										Ext.MessageBox.show({
+											msg : dataInfo,
+											width : 300,
+											buttons : Ext.MessageBox.OK
+										});
+									}
+								},
+								failure : function(response, options) {
+								}
+							});
+						} else {
+							Ext.MessageBox.show({
+								msg : "该菜品编号已存在！",
+								width : 300,
+								buttons : Ext.MessageBox.OK
+							});
+						}
 
 					}
 
@@ -518,6 +536,23 @@ menuAddWin = new Ext.Window({
 		"show" : function(thiz) {
 			kitchenTypeCombMA.setValue(kitchenTypeData[0][1]);
 			kitchenTypeStoreMA.reload();
+
+			menuAddWin.findById("menuAddNumber").setValue("");
+			menuAddWin.findById("menuAddNumber").clearInvalid();
+
+			menuAddWin.findById("menuAddName").setValue("");
+			menuAddWin.findById("menuAddName").clearInvalid();
+
+			menuAddWin.findById("menuAddSpill").setValue("");
+			menuAddWin.findById("menuAddSpill").clearInvalid();
+
+			menuAddWin.findById("menuAddPrice").setValue("");
+			menuAddWin.findById("menuAddPrice").clearInvalid();
+
+			menuAddWin.findById("specialCheckboxMA").setValue(false);
+			menuAddWin.findById("recommendCheckboxMA").setValue(false);
+			menuAddWin.findById("freeCheckboxMA").setValue(false);
+			menuAddWin.findById("stopCheckboxMA").setValue(false);
 		}
 	}
 });
@@ -1112,9 +1147,9 @@ function dishDeleteHandler(rowIndex) {
 	});
 };
 
-//function dishRelateHandler(rowIndex) {
+// function dishRelateHandler(rowIndex) {
 //
-//};
+// };
 
 function menuDishOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
 	return "<center><a href=\"javascript:dishModifyHandler(" + rowIndex
@@ -1301,12 +1336,15 @@ Ext
 				sm : new Ext.grid.RowSelectionModel({
 					singleSelect : true
 				}),
+				viewConfig : {
+					forceFit : true
+				},
 				listeners : {
 					rowclick : function(thiz, rowIndex, e) {
 						currRowIndex = rowIndex;
-						
-						//關聯食材
-						
+
+						// 關聯食材
+
 					}
 				},
 				bbar : new Ext.PagingToolbar({
@@ -1319,6 +1357,16 @@ Ext
 				autoScroll : true,
 				loadMask : {
 					msg : "数据加载中，请稍等..."
+				},
+				listeners : {
+					"render" : function(thiz) {
+						menuStore.reload({
+							params : {
+								start : 0,
+								limit : dishesPageRecordCount
+							}
+						});
+					}
 				}
 			});
 
