@@ -244,6 +244,7 @@ if($category1 != null && $category1 !="")
 {
 	$sql .= (" AND category = $category1");
 }
+
 switch ($xm)
 {
 	case "is_no":
@@ -297,6 +298,9 @@ switch ($xm)
 			$sql .= " AND category = $category" ;  		
 		break;
 }
+
+$sql .= " LIMIT 100";
+
 $bh=0;
 mysql_query("SET NAMES utf8"); 
 
