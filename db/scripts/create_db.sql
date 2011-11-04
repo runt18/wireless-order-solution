@@ -232,7 +232,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`kitchen` (
   `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this kitchen' ,
   `restaurant_id` INT UNSIGNED NOT NULL ,
   `alias_id` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the alias id to this kitchen' ,
-  `super_kitchen` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the super kitchen that this kitchen belong to. ' ,
+  `dept_id` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the department alias id that this kitchen belong to. ' ,
   `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name of this kitchen' ,
   `discount` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the discount to the food belong to this kitchen, range from 0.00 to 1.00' ,
   `discount_2` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the 2nd discount to the food belong to this kitchen, range from 0.00 to 1.00' ,
@@ -326,15 +326,16 @@ DROP TABLE IF EXISTS `wireless_order_db`.`material` ;
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`material` (
   `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this material' ,
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'the id to related restaurant' ,
-  `alias_id` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the alias id to this material' ,
+  `alias_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the alias id to this material' ,
+  `supplier_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the alias supplier id this material belog to' ,
   `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to this material' ,
   `stock` FLOAT NOT NULL DEFAULT 0 COMMENT 'the remaining amount to this material' ,
   `price` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the unit price to this material' ,
   `warning_threshold` FLOAT NOT NULL DEFAULT 0 COMMENT 'the warning threshold to this material' ,
   `danger_threshold` FLOAT NOT NULL DEFAULT 0 COMMENT 'the danger threshold to this material' ,
   PRIMARY KEY (`id`) ,
-  INDEX `fk_material_restaurant1` (`restaurant_id` ASC) ,
-  CONSTRAINT `fk_material_restaurant1`
+  INDEX `fk_material_restaurant` (`restaurant_id` ASC) ,
+  CONSTRAINT `fk_material_restaurant`
     FOREIGN KEY (`restaurant_id` )
     REFERENCES `wireless_order_db`.`restaurant` (`id` )
     ON DELETE RESTRICT
@@ -350,47 +351,19 @@ COMMENT = 'describe the material information.' ;
 DROP TABLE IF EXISTS `wireless_order_db`.`food_material` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food_material` (
-  `food_id` INT UNSIGNED NOT NULL ,
-  `material_id` INT NOT NULL ,
+  `restaurant_id` INT UNSIGNED NOT NULL ,
+  `material_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the material alias id' ,
+  `food_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the food alias id' ,
   `consumption` FLOAT NOT NULL DEFAULT 0 COMMENT 'the consumption between the food and the material' ,
-  INDEX `fk_food_material_food1` (`food_id` ASC) ,
-  INDEX `fk_food_material_material1` (`material_id` ASC) ,
-  CONSTRAINT `fk_food_material_food1`
-    FOREIGN KEY (`food_id` )
-    REFERENCES `wireless_order_db`.`food` (`id` )
-    ON DELETE RESTRICT
-    ON UPDATE RESTRICT,
-  CONSTRAINT `fk_food_material_material1`
-    FOREIGN KEY (`material_id` )
-    REFERENCES `wireless_order_db`.`material` (`id` )
-    ON DELETE RESTRICT
-    ON UPDATE RESTRICT)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8, 
-COMMENT = 'describe the releation ship between food and material' ;
-
-
--- -----------------------------------------------------
--- Table `wireless_order_db`.`material_history`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `wireless_order_db`.`material_history` ;
-
-CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`material_history` (
-  `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this material history record' ,
-  `material_id` INT NOT NULL ,
-  `date` DATE NOT NULL DEFAULT 19000101 ,
-  `price` DECIMAL(7,2) NOT NULL DEFAULT 0 ,
-  `amount` FLOAT NOT NULL DEFAULT 0 ,
-  PRIMARY KEY (`id`) ,
-  INDEX `fk_material_history_material1` (`material_id` ASC) ,
-  CONSTRAINT `fk_material_history_material1`
-    FOREIGN KEY (`material_id` )
-    REFERENCES `wireless_order_db`.`material` (`id` )
+  INDEX `fk_food_material_restaurant1` (`restaurant_id` ASC) ,
+  CONSTRAINT `fk_food_material_restaurant1`
+    FOREIGN KEY (`restaurant_id` )
+    REFERENCES `wireless_order_db`.`restaurant` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
-COMMENT = 'preserved the material  storage history records' ;
+COMMENT = 'describe the releation ship between food and material' ;
 
 
 -- -----------------------------------------------------
@@ -449,52 +422,6 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food_history` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'descirbe the relationship between the order and food' ;
-
-
--- -----------------------------------------------------
--- Table `wireless_order_db`.`order_food_material`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `wireless_order_db`.`order_food_material` ;
-
-CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food_material` (
-  `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this record' ,
-  `order_food_id` INT NOT NULL ,
-  `material_id` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the alias id to the material' ,
-  `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to the material' ,
-  `price` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the price to this material' ,
-  `consumption` FLOAT NOT NULL DEFAULT 0 COMMENT 'the consumption to this material' ,
-  PRIMARY KEY (`id`) ,
-  INDEX `fk_order_food_material_order_food1` (`order_food_id` ASC) ,
-  CONSTRAINT `fk_order_food_material_order_food1`
-    FOREIGN KEY (`order_food_id` )
-    REFERENCES `wireless_order_db`.`order_food` (`id` )
-    ON DELETE RESTRICT
-    ON UPDATE RESTRICT)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8;
-
-
--- -----------------------------------------------------
--- Table `wireless_order_db`.`order_food_material_history`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `wireless_order_db`.`order_food_material_history` ;
-
-CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food_material_history` (
-  `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this record' ,
-  `order_food_id` INT NOT NULL ,
-  `material_id` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the alias id to the material' ,
-  `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to the material' ,
-  `price` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the price to this material' ,
-  `consumption` FLOAT NOT NULL DEFAULT 0 COMMENT 'the consumption to this material' ,
-  PRIMARY KEY (`id`) ,
-  INDEX `fk_order_food_material_history_order_food_history1` (`order_food_id` ASC) ,
-  CONSTRAINT `fk_order_food_material_history_order_food_history1`
-    FOREIGN KEY (`order_food_id` )
-    REFERENCES `wireless_order_db`.`order_food_history` (`id` )
-    ON DELETE RESTRICT
-    ON UPDATE RESTRICT)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
@@ -595,11 +522,11 @@ COMMENT = 'describe the region information to the tables' ;
 
 
 -- -----------------------------------------------------
--- Table `wireless_order_db`.`super_kitchen`
+-- Table `wireless_order_db`.`department`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `wireless_order_db`.`super_kitchen` ;
+DROP TABLE IF EXISTS `wireless_order_db`.`department` ;
 
-CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`super_kitchen` (
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`department` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `restaurant_id` INT UNSIGNED NOT NULL ,
   `alias_id` TINYINT UNSIGNED NULL ,
@@ -613,7 +540,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`super_kitchen` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
-COMMENT = 'describe the super kitchen information' ;
+COMMENT = 'describe the department information' ;
+
 
 -- -----------------------------------------------------
 -- Table `wireless_order_db`.`temp_order_food_history`
@@ -643,74 +571,91 @@ COMMENT = 'temporary order food history table for performance problem' ;
 
 
 -- -----------------------------------------------------
--- Placeholder table for view `wireless_order_db`.`order_food_view`
+-- Table `wireless_order_db`.`temp_order_food_history`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `wireless_order_db`.`order_food_view` (`order_count` INT, `unit_price` INT, `taste_price` INT, `name` INT, `taste` INT, `taste_id` INT, `discount` INT, `food_status` INT, `order_id` INT, `food_id` INT);
+DROP TABLE IF EXISTS `wireless_order_db`.`temp_order_food_history` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`temp_order_food_history` (
+  `order_id` INT UNSIGNED NOT NULL COMMENT 'the order id to this order detail record' ,
+  `food_id` SMALLINT UNSIGNED NOT NULL COMMENT 'the food id to this order detail record' ,
+  `taste_id` SMALLINT UNSIGNED NOT NULL COMMENT 'the taste id to this order detail record' ,
+  `taste_id2` SMALLINT UNSIGNED NOT NULL COMMENT 'the 2nd taste id to this order detail record' ,
+  `taste_id3` SMALLINT UNSIGNED NOT NULL COMMENT 'the 3rd taste id to this order detail record' ,
+  `is_temporary` TINYINT NOT NULL DEFAULT 0 COMMENT 'the flag indicates whether the food to this record is temporary' ,
+  `name` VARCHAR(45) NOT NULL COMMENT 'the food name to this order detail record' ,
+  `taste` VARCHAR(45) NOT NULL COMMENT 'the taste preference to this order detail record' ,
+  `order_count` DECIMAL(5,2) NOT NULL COMMENT 'the sum of order count to this order detail record' ,
+  `unit_price` DECIMAL(7,2) UNSIGNED NOT NULL COMMENT 'the unit price to this order detail record' ,
+  `taste_price` DECIMAL(7,2) UNSIGNED NOT NULL COMMENT 'the taste price to this order detail record' ,
+  `discount` DECIMAL(3,2) NOT NULL COMMENT 'the discount to this order detail record' ,
+  `food_status` TINYINT NOT NULL COMMENT 'the food status to this order detail record' ,
+  `kitchen` TINYINT UNSIGNED NOT NULL COMMENT 'the kitchen to this order detail record' ,
+  `waiter` VARCHAR(45) NOT NULL COMMENT 'the waiter name to this order detail record' ,
+  PRIMARY KEY (`order_id`, `food_id`, `taste_id`, `taste_id2`, `taste_id3`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'temporary order food history table for performance problem' ;
+
 
 -- -----------------------------------------------------
--- Placeholder table for view `wireless_order_db`.`order_history_view`
+-- Table `wireless_order_db`.`supplier`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `wireless_order_db`.`order_history_view` (`id` INT, `alias_id` INT, `table_name` INT, `order_date` INT, `category` INT, `category_name` INT, `comment` INT, `service_rate` INT, `total_price` INT, `total_price_discount` INT, `total_price_present` INT, `num` INT, `foods` INT, `is_paid` INT, `total_price_2` INT, `restaurant_id` INT, `restaurant_name` INT, `table_id` INT, `waiter` INT, `type_value` INT, `type_name` INT);
+DROP TABLE IF EXISTS `wireless_order_db`.`supplier` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`supplier` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `restaurant_id` INT UNSIGNED NOT NULL ,
+  `alias_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the alias id to this supplier' ,
+  `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to ths supplier' ,
+  `tele` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the telephone to this supplier' ,
+  `addr` VARCHAR(100) NOT NULL DEFAULT '' COMMENT 'the address to this supplier' ,
+  `contact` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the contact person to this supplier' ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_supplier_restaurant` (`restaurant_id` ASC) ,
+  CONSTRAINT `fk_supplier_restaurant1`
+    FOREIGN KEY (`restaurant_id` )
+    REFERENCES `wireless_order_db`.`restaurant` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
 
 -- -----------------------------------------------------
--- Placeholder table for view `wireless_order_db`.`order_view`
+-- Table `wireless_order_db`.`material_detail`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `wireless_order_db`.`order_view` (`id` INT, `alias_id` INT, `table_name` INT, `order_date` INT, `category` INT, `category_name` INT, `comment` INT, `service_rate` INT, `total_price` INT, `total_price_discount` INT, `total_price_present` INT, `num` INT, `foods` INT, `is_paid` INT, `total_price_2` INT, `restaurant_id` INT, `restaurant_name` INT, `table_id` INT, `waiter` INT, `type_value` INT, `type_name` INT);
+DROP TABLE IF EXISTS `wireless_order_db`.`material_detail` ;
 
--- -----------------------------------------------------
--- Placeholder table for view `wireless_order_db`.`restaurant_view`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `wireless_order_db`.`restaurant_view` (`id` INT, `account` INT, `restaurant_name` INT, `tele1` INT, `tele2` INT, `address` INT, `restaurant_info` INT, `record_alive` INT, `order_num` INT, `order_history_num` INT, `terminal_num` INT, `terminal_virtual_num` INT, `food_num` INT, `table_num` INT, `order_paid` INT, `order_history_paid` INT, `table_using` INT);
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`material_detail` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `restaurant_id` INT UNSIGNED NOT NULL ,
+  `supplier_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the supplier alias id that this material detail record belong to' ,
+  `material_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the material alias id that this material detail record belong to' ,
+  `price` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the price to this material record' ,
+  `date` DATETIME NULL DEFAULT NULL COMMENT 'the date to this material detail record' ,
+  `staff` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the staff name to this material detail record' ,
+  `dept_id` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the super kitchen id to this material detail record' ,
+  `dept2_id` TINYINT UNSIGNED NULL DEFAULT NULL COMMENT 'indicates the 调入部门 in case of the type is “调出”' ,
+  `amount` FLOAT NOT NULL DEFAULT 0 COMMENT 'the amount to this material detail record' ,
+  `type` TINYINT NOT NULL DEFAULT 0 COMMENT 'the type is as below.\n0 : 消耗\n1 : 报损 \n2 : 销售\n3 : 退货\n4 : 入库\n5 : 调出\n6 : 调入\n7 : 盘点' ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_material_detail_restaurant` (`restaurant_id` ASC) ,
+  CONSTRAINT `fk_material_detail_restaurant`
+    FOREIGN KEY (`restaurant_id` )
+    REFERENCES `wireless_order_db`.`restaurant` (`id` )
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
 
--- -----------------------------------------------------
--- Placeholder table for view `wireless_order_db`.`terminal_view`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `wireless_order_db`.`terminal_view` (`pin` INT, `restaurant_id` INT, `restaurant_name` INT, `model_name` INT, `model_id` INT, `model_id_name` INT, `entry_date` INT, `discard_date` INT, `idle_month` INT, `work_month` INT, `expire_date` INT, `status` INT, `use_rate` INT, `owner_name` INT, `idle_duration` INT, `work_duration` INT);
-
--- -----------------------------------------------------
--- View `wireless_order_db`.`order_food_view`
--- -----------------------------------------------------
-DROP VIEW IF EXISTS `wireless_order_db`.`order_food_view` ;
-DROP TABLE IF EXISTS `wireless_order_db`.`order_food_view`;
-USE `wireless_order_db`;
-CREATE  OR REPLACE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `wireless_order_db`.`order_food_view` AS select sum(`wireless_order_db`.`order_food`.`order_count`) AS `order_count`,max(`wireless_order_db`.`order_food`.`unit_price`) AS `unit_price`,max(`wireless_order_db`.`order_food`.`taste_price`) AS `taste_price`,max(`wireless_order_db`.`order_food`.`name`) AS `name`,max(`wireless_order_db`.`order_food`.`taste`) AS `taste`,max(`wireless_order_db`.`order_food`.`taste_id`) AS `taste_id`,max(`wireless_order_db`.`order_food`.`discount`) AS `discount`,max(`wireless_order_db`.`order_food`.`food_status`) AS `food_status`,`wireless_order_db`.`order_food`.`order_id` AS `order_id`,`wireless_order_db`.`order_food`.`food_id` AS `food_id` from `wireless_order_db`.`order_food` group by `wireless_order_db`.`order_food`.`order_id`,`wireless_order_db`.`order_food`.`food_id`,`wireless_order_db`.`order_food`.`taste_id`,`wireless_order_db`.`order_food`.`taste_id2`,`wireless_order_db`.`order_food`.`taste_id3` having (sum(`wireless_order_db`.`order_food`.`order_count`) > 0);
-
--- -----------------------------------------------------
--- View `wireless_order_db`.`order_history_view`
--- -----------------------------------------------------
-DROP VIEW IF EXISTS `wireless_order_db`.`order_history_view` ;
-DROP TABLE IF EXISTS `wireless_order_db`.`order_history_view`;
-USE `wireless_order_db`;
-CREATE  OR REPLACE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `wireless_order_db`.`order_history_view` AS select `a`.`id` AS `id`,`a`.`table_id` AS `alias_id`,`a`.`table_name` AS `table_name`,`a`.`order_date` AS `order_date`,`a`.`category` AS `category`,(case `a`.`category` when 1 then '一般' when 2 then '外卖' when 3 then '并台' when 4 then '拼台' end) AS `category_name`,`a`.`comment` AS `comment`,`a`.`service_rate` AS `service_rate`,format((sum((((`b`.`unit_price` * `b`.`discount`) + `b`.`taste_price`) * (case when ((`b`.`food_status` & 8) <> 0) then 0 else `b`.`order_count` end))) * (1 + `a`.`service_rate`)),2) AS `total_price`,format((sum(((`b`.`unit_price` * (1 - `b`.`discount`)) * (case when ((`b`.`food_status` & 8) <> 0) then 0 else `b`.`order_count` end))) * (1 + `a`.`service_rate`)),2) AS `total_price_discount`,format((sum(((`b`.`unit_price` * `b`.`discount`) * (case when ((`b`.`food_status` & 8) = 0) then 0 else `b`.`order_count` end))) * (1 + `a`.`service_rate`)),2) AS `total_price_present`,`a`.`custom_num` AS `num`,group_concat(concat((case `b`.`taste_id` when 0 then `b`.`name` else concat(`b`.`name`,'-',`b`.`taste`) end),'|',format(`b`.`order_count`,2),'|',(case `b`.`food_status` when 1 then '(特)' when 2 then '(荐)' when 3 then '(特,荐)' when 8 then '(赠)' when 9 then '(特,赠)' when 10 then '(荐,赠)' when 11 then '(特,荐,赠)' else '' end),'|',(case when (`b`.`discount` < 1) then concat('(',format((`b`.`discount` * 10),1),'折',')') else '' end),'|',format((((`b`.`unit_price` * `b`.`discount`) + `b`.`taste_price`) * `b`.`order_count`),2)) separator ';') AS `foods`,(`a`.`total_price` is not null) AS `is_paid`,`a`.`total_price_2` AS `total_price_2`,`a`.`restaurant_id` AS `restaurant_id`,`r`.`restaurant_name` AS `restaurant_name`,`d`.`id` AS `table_id`,`a`.`waiter` AS `waiter`,`a`.`type` AS `type_value`,(case `a`.`type` when 1 then '现金' when 2 then '刷卡' when 3 then '会员卡' when 4 then '签单' when 5 then '挂账' end) AS `type_name` from (((((`wireless_order_db`.`order_history` `a` left join `wireless_order_db`.`temp_order_food_history` `b` on((`a`.`id` = `b`.`order_id`))) left join `wireless_order_db`.`food` `c` on(((`b`.`food_id` = `c`.`alias_id`) and (`c`.`restaurant_id` = `a`.`restaurant_id`)))) left join `wireless_order_db`.`table` `d` on(((`a`.`table_id` = `d`.`alias_id`) and (`d`.`restaurant_id` = `a`.`restaurant_id`)))) left join `wireless_order_db`.`restaurant` `r` on((`a`.`restaurant_id` = `r`.`id`))) left join `wireless_order_db`.`terminal` `t` on(((`a`.`terminal_pin` = `t`.`pin`) and (`t`.`model_id` = `a`.`terminal_model`)))) group by `a`.`id`;
-
--- -----------------------------------------------------
--- View `wireless_order_db`.`order_view`
--- -----------------------------------------------------
-DROP VIEW IF EXISTS `wireless_order_db`.`order_view` ;
-DROP TABLE IF EXISTS `wireless_order_db`.`order_view`;
-USE `wireless_order_db`;
-CREATE  OR REPLACE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `wireless_order_db`.`order_view` AS select `a`.`id` AS `id`,`a`.`table_id` AS `alias_id`,`a`.`table_name` AS `table_name`,`a`.`order_date` AS `order_date`,`a`.`category` AS `category`,(case `a`.`category` when 1 then '一般' when 2 then '外卖' when 3 then '并台' when 4 then '拼台' end) AS `category_name`,`a`.`comment` AS `comment`,`a`.`service_rate` AS `service_rate`,format((sum((((`b`.`unit_price` * `b`.`discount`) + `b`.`taste_price`) * (case when ((`b`.`food_status` & 8) <> 0) then 0 else `b`.`order_count` end))) * (1 + `a`.`service_rate`)),2) AS `total_price`,format((sum(((`b`.`unit_price` * (1 - `b`.`discount`)) * (case when ((`b`.`food_status` & 8) <> 0) then 0 else `b`.`order_count` end))) * (1 + `a`.`service_rate`)),2) AS `total_price_discount`,format((sum(((`b`.`unit_price` * `b`.`discount`) * (case when ((`b`.`food_status` & 8) = 0) then 0 else `b`.`order_count` end))) * (1 + `a`.`service_rate`)),2) AS `total_price_present`,`a`.`custom_num` AS `num`,group_concat(concat((case `b`.`taste_id` when 0 then `b`.`name` else concat(`b`.`name`,'-',`b`.`taste`) end),'|',format(`b`.`order_count`,2),'|',(case `b`.`food_status` when 1 then '(特)' when 2 then '(荐)' when 3 then '(特,荐)' when 8 then '(赠)' when 9 then '(特,赠)' when 10 then '(荐,赠)' when 11 then '(特,荐,赠)' else '' end),'|',(case when (`b`.`discount` < 1) then concat('(',format((`b`.`discount` * 10),1),'折',')') else '' end),'|',format((((`b`.`unit_price` * `b`.`discount`) + `b`.`taste_price`) * `b`.`order_count`),2)) separator ';') AS `foods`,(`a`.`total_price` is not null) AS `is_paid`,`a`.`total_price_2` AS `total_price_2`,`a`.`restaurant_id` AS `restaurant_id`,`r`.`restaurant_name` AS `restaurant_name`,`d`.`id` AS `table_id`,`a`.`waiter` AS `waiter`,`a`.`type` AS `type_value`,(case `a`.`type` when 1 then '现金' when 2 then '刷卡' when 3 then '会员卡' when 4 then '签单' when 5 then '挂账' end) AS `type_name` from (((((`wireless_order_db`.`order` `a` left join `wireless_order_db`.`order_food_view` `b` on((`a`.`id` = `b`.`order_id`))) left join `wireless_order_db`.`food` `c` on(((`b`.`food_id` = `c`.`alias_id`) and (`c`.`restaurant_id` = `a`.`restaurant_id`)))) left join `wireless_order_db`.`table` `d` on(((`a`.`table_id` = `d`.`alias_id`) and (`d`.`restaurant_id` = `a`.`restaurant_id`)))) left join `wireless_order_db`.`restaurant` `r` on((`a`.`restaurant_id` = `r`.`id`))) left join `wireless_order_db`.`terminal` `t` on(((`a`.`terminal_pin` = `t`.`pin`) and (`t`.`model_id` = `a`.`terminal_model`)))) group by `a`.`id`;
-
--- -----------------------------------------------------
--- View `wireless_order_db`.`restaurant_view`
--- -----------------------------------------------------
-DROP VIEW IF EXISTS `wireless_order_db`.`restaurant_view` ;
-DROP TABLE IF EXISTS `wireless_order_db`.`restaurant_view`;
-USE `wireless_order_db`;
-CREATE  OR REPLACE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `wireless_order_db`.`restaurant_view` AS select `r`.`id` AS `id`,`r`.`account` AS `account`,`r`.`restaurant_name` AS `restaurant_name`,`r`.`tele1` AS `tele1`,`r`.`tele2` AS `tele2`,`r`.`address` AS `address`,`r`.`restaurant_info` AS `restaurant_info`,`r`.`record_alive` AS `record_alive`,(select count(`wireless_order_db`.`order`.`id`) AS `count(``order``.``id``)` from `wireless_order_db`.`order` where (`wireless_order_db`.`order`.`restaurant_id` = `r`.`id`)) AS `order_num`,(select count(`wireless_order_db`.`order_history`.`id`) AS `count(``order_history``.``id``)` from `wireless_order_db`.`order_history` where (`wireless_order_db`.`order_history`.`restaurant_id` = `r`.`id`)) AS `order_history_num`,(select count(`wireless_order_db`.`terminal`.`pin`) AS `count(``terminal``.``pin``)` from `wireless_order_db`.`terminal` where ((`wireless_order_db`.`terminal`.`restaurant_id` = `r`.`id`) and (`wireless_order_db`.`terminal`.`model_id` <= 0x7f))) AS `terminal_num`,(select count(`wireless_order_db`.`terminal`.`pin`) AS `count(``terminal``.``pin``)` from `wireless_order_db`.`terminal` where ((`wireless_order_db`.`terminal`.`restaurant_id` = `r`.`id`) and (`wireless_order_db`.`terminal`.`model_id` > 0x7f))) AS `terminal_virtual_num`,(select count(`wireless_order_db`.`food`.`id`) AS `count(``food``.``id``)` from `wireless_order_db`.`food` where (`wireless_order_db`.`food`.`restaurant_id` = `r`.`id`)) AS `food_num`,(select count(`wireless_order_db`.`table`.`id`) AS `count(``table``.``id``)` from `wireless_order_db`.`table` where (`wireless_order_db`.`table`.`restaurant_id` = `r`.`id`)) AS `table_num`,(select count(`wireless_order_db`.`order`.`id`) AS `count(``order``.``id``)` from `wireless_order_db`.`order` where ((`wireless_order_db`.`order`.`restaurant_id` = `r`.`id`) and (`wireless_order_db`.`order`.`total_price` is not null))) AS `order_paid`,(select count(`wireless_order_db`.`order_history`.`id`) AS `count(``order_history``.``id``)` from `wireless_order_db`.`order_history` where ((`wireless_order_db`.`order_history`.`restaurant_id` = `r`.`id`) and (`wireless_order_db`.`order_history`.`total_price` is not null))) AS `order_history_paid`,(select count(`wireless_order_db`.`table`.`id`) AS `count(``table``.``id``)` from `wireless_order_db`.`table` where ((`wireless_order_db`.`table`.`restaurant_id` = `r`.`id`) and exists(select 1 AS `1` from `wireless_order_db`.`order` where ((`wireless_order_db`.`order`.`table_id` = `wireless_order_db`.`table`.`alias_id`) and isnull(`wireless_order_db`.`order`.`total_price`) and (`wireless_order_db`.`order`.`restaurant_id` = `r`.`id`))))) AS `table_using` from `wireless_order_db`.`restaurant` `r`;
-
--- -----------------------------------------------------
--- View `wireless_order_db`.`terminal_view`
--- -----------------------------------------------------
-DROP VIEW IF EXISTS `wireless_order_db`.`terminal_view` ;
-DROP TABLE IF EXISTS `wireless_order_db`.`terminal_view`;
-USE `wireless_order_db`;
-CREATE  OR REPLACE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `wireless_order_db`.`terminal_view` AS select `t`.`pin` AS `pin`,`t`.`restaurant_id` AS `restaurant_id`,`r`.`restaurant_name` AS `restaurant_name`,`t`.`model_name` AS `model_name`,`t`.`model_id` AS `model_id`,(case `t`.`model_id` when 0 then 'BlackBerry' when 1 then 'Android' when 2 then 'iPhone' when 3 then 'WindowsMobile' end) AS `model_id_name`,`t`.`entry_date` AS `entry_date`,`t`.`discard_date` AS `discard_date`,format((((`t`.`idle_duration` / 3600) / 24) / 30),1) AS `idle_month`,format((((`t`.`work_duration` / 3600) / 24) / 30),1) AS `work_month`,`t`.`expire_date` AS `expire_date`,(case when (`t`.`restaurant_id` = 2) then '空闲' when (`t`.`restaurant_id` = 3) then '废弃' when ((`t`.`restaurant_id` > 10) and (now() <= `t`.`expire_date`)) then '使用' when ((`t`.`restaurant_id` > 10) and (now() > `t`.`expire_date`)) then '过期' end) AS `status`,format(((`t`.`work_duration` / (`t`.`work_duration` + `t`.`idle_duration`)) * 100),0) AS `use_rate`,`t`.`owner_name` AS `owner_name`,`t`.`idle_duration` AS `idle_duration`,`t`.`work_duration` AS `work_duration` from (`wireless_order_db`.`terminal` `t` left join `wireless_order_db`.`restaurant` `r` on((`t`.`restaurant_id` = `r`.`id`)));
 
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+
+
 
 
 
