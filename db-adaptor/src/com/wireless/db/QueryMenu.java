@@ -196,14 +196,14 @@ public class QueryMenu {
 		ArrayList<Kitchen> kitchens = new ArrayList<Kitchen>();
 		String sql = "SELECT alias_id, name, discount, discount_2, discount_3, " +
 					 "member_discount_1, member_discount_2, member_discount_3, " +
-					 "super_kitchen FROM " + 
+					 "dept_id FROM " + 
 			  		 Params.dbName + ".kitchen WHERE restaurant_id=" + 
 			  		 restaurantID;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
 			kitchens.add(new Kitchen(dbCon.rs.getString("name"),
 									 dbCon.rs.getShort("alias_id"),
-									 dbCon.rs.getShort("super_kitchen"),
+									 dbCon.rs.getShort("dept_id"),
 									 (byte)(dbCon.rs.getFloat("discount") * 100),
 									 (byte)(dbCon.rs.getFloat("discount_2") * 100),
 									 (byte)(dbCon.rs.getFloat("discount_3") * 100),
@@ -219,7 +219,7 @@ public class QueryMenu {
 	private static SKitchen[] querySKitchens(DBCon dbCon, int restaurantID) throws SQLException{
 		//get tall the super kitchen information to this restaurant
 		ArrayList<SKitchen> sKitchens = new ArrayList<SKitchen>();
-		String sql = "SELECT alias_id, name FROM " + Params.dbName + ".super_kitchen WHERE " +
+		String sql = "SELECT alias_id, name FROM " + Params.dbName + ".department WHERE " +
 					 " restaurant_id=" + restaurantID;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
