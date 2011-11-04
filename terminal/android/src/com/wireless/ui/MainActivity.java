@@ -8,10 +8,13 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnKeyListener;
 import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -28,17 +31,14 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.wireless.common.Common;
 import com.wireless.common.WirelessOrder;
 import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.PinGen;
 import com.wireless.protocol.ProtocolPackage;
-import com.wireless.protocol.ReqPackage;
+import com.wireless.protocol.ReqCancelOrder;
 import com.wireless.protocol.ReqQueryMenu;
 import com.wireless.protocol.ReqQueryOrder2;
 import com.wireless.protocol.ReqQueryRestaurant;
 import com.wireless.protocol.RespParser;
-import com.wireless.protocol.Terminal;
 import com.wireless.protocol.Type;
 import com.wireless.sccon.ServerConnector;
 
@@ -49,7 +49,7 @@ public class MainActivity extends Activity {
 	private static final int DIALOG_INSERT_ORDER = 0;
 	private static final int DIALOG_UPDATE_ORDER = 1;
 	private static final int DIALOG_CANCEL_ORDER = 2;
-	private static final int DIALOG_BILL_ORDER=3;
+	private static final int DIALOG_BILL_ORDER = 3;
 	
 	private static final int REDRAW_FOOD_MENU = 1;
 	private static final int REDRAW_RESTAURANT = 2;
@@ -134,42 +134,27 @@ public class MainActivity extends Activity {
 			) {
 				switch (position) {
 				case 0:
-				
-					if(Common.getCommon().isNetworkAvailable(MainActivity.this)){
-						showDialog(DIALOG_INSERT_ORDER);
-					}else{
-						shownet();
-					}
+					//下单
+					showDialog(DIALOG_INSERT_ORDER);
 					break;
 
 				case 1:
-					
-					if(Common.getCommon().isNetworkAvailable(MainActivity.this)){
-						showDialog(DIALOG_UPDATE_ORDER);
-					}else{
-						shownet();
-					}
+					//改单
+					showDialog(DIALOG_UPDATE_ORDER);
 					break;
+					
 				case 2:
-				
-					if(Common.getCommon().isNetworkAvailable(MainActivity.this)){
-						showDialog(DIALOG_CANCEL_ORDER);
-					}else{
-						shownet();
-					}
+					//删单
+					showDialog(DIALOG_CANCEL_ORDER);
 					break;
+					
 				case 3:
-					
-					if(Common.getCommon().isNetworkAvailable(MainActivity.this)){
-						showDialog(DIALOG_BILL_ORDER);
-					}else{
-						shownet();
-					}
-					
+					//结帐
+					showDialog(DIALOG_BILL_ORDER);
 					break;
 
 				case 4:
-
+					
 					break;
 
 				case 5:
@@ -177,12 +162,8 @@ public class MainActivity extends Activity {
 					break;
 
 				case 6:
-					if(Common.getCommon().isNetworkAvailable(MainActivity.this)){
-						new QueryMenuTask().execute();
-					}else{
-						shownet();
-					}
-					
+					//菜谱更新
+					new QueryMenuTask().execute();		
 					break;
 
 				case 7:
@@ -230,6 +211,7 @@ public class MainActivity extends Activity {
 		}else if(dialogID == DIALOG_BILL_ORDER){
 			//结账的餐台输入Dialog
 			return new AskTableDialog(DIALOG_BILL_ORDER);
+			
 		}else{
 			return null;
 		}
@@ -261,46 +243,7 @@ public class MainActivity extends Activity {
 		return super.onKeyDown(keyCode, event);
 	}
 
-	// 提示框，是否退出程序
-//	public void AlertDialog() {
-//		_builder = new AlertDialog.Builder(this);
-//		_builder.setTitle("提示!").setMessage("当前没有网络,请设置你的网络状态")
-//				.setPositiveButton("返回", new DialogInterface.OnClickListener() {
-//					public void onClick(DialogInterface dialog, int which) {
-//						 //android.os.Process.killProcess(android.os.Process.myPid());
-//						//finish();
-//						_appContext.exitClient(MainActivity.this);
-////						int sdk_Version = android.os.Build.VERSION.SDK_INT;
-////						if (sdk_Version >= 8) {           
-////							Intent startMain = new Intent(Intent.ACTION_MAIN);            
-////							startMain.addCategory(Intent.CATEGORY_HOME);            
-////							startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);            
-////							startActivity(startMain);            
-////							System.exit(0);        
-////						} else if (sdk_Version < 8) {           
-////							ActivityManager activityMgr = (ActivityManager) getSystemService(ACTIVITY_SERVICE);            
-////							activityMgr.restartPackage(getPackageName());       
-////						}
-//					}
-//				}).show();
-//
-//		_builder.setOnKeyListener(new OnKeyListener() {
-//			public boolean onKey(DialogInterface dialog, int keyCode,
-//					KeyEvent event) {
-//				return false;
-//			}
-//
-//		});
-//	}
-	
-	
 
-	//跳转到下单界面
-	public void order(String plate){
-		Intent intent = new Intent(MainActivity.this,
-				OrderActivity.class);
-		startActivity(intent);
-	}
 	
 	/**
 	 * Generate the message according to the error code 
@@ -320,27 +263,45 @@ public class MainActivity extends Activity {
 		}
 	}
 	
+	/**
+	 * Determine whether the network is connected or not
+	 * @return true if the network is connected, otherwise return false
+	 */
+	private boolean isNetworkAvail(){
+		ConnectivityManager connectivity = (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+		if(connectivity != null) {
+			NetworkInfo[] info = connectivity.getAllNetworkInfo();
+			if(info != null){
+				for(int i = 0; i < info.length; i++){
+					if (info[i].getState() == NetworkInfo.State.CONNECTED) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
 	
 	/**
 	 * 如果没有网络就弹出框，用户选择是否跳转到设置网络界面
 	 */
-	private void shownet(){
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
- 		builder.setTitle("提示");
- 		builder.setMessage("当前没有网络,请设置")
- 		       .setCancelable(false)
- 		       .setPositiveButton("确定", new DialogInterface.OnClickListener() {
- 		           public void onClick(DialogInterface dialog, int id) {
- 		        	  startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));//进入无线网络配置界面
- 		           }
- 		       })
- 		       .setNegativeButton("取消", new DialogInterface.OnClickListener() {
- 		           public void onClick(DialogInterface dialog, int id) {
- 		        	 finish();
- 		           }
- 		       });
- 		AlertDialog alert = builder.create();
- 		alert.show();
+	private void showNetSetting(){
+		new AlertDialog.Builder(this)
+ 			.setTitle("提示")
+ 			.setMessage("当前没有网络,请设置")
+ 		    .setCancelable(false)
+ 		    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+ 		    	public void onClick(DialogInterface dialog, int id) {
+ 		    		//进入无线网络配置界面
+ 		    		startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
+ 		    	}
+ 		     })
+ 		    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+ 		    	public void onClick(DialogInterface dialog, int id) {
+ 		    		finish();
+ 		        }
+ 		    })
+			.show();
 
 	}
 	/**
@@ -378,7 +339,6 @@ public class MainActivity extends Activity {
 					}else{
 						errMsg = "菜谱下载失败，请检查网络信号或重新连接。";
 					}
-					throw new IOException(errMsg);
 				}
 			}catch(IOException e){
 				errMsg = e.getMessage();
@@ -477,12 +437,72 @@ public class MainActivity extends Activity {
 	}
 	
 	/**
+	 * 删单的请求操作 
+	 */
+	private class CancelOrderTask extends AsyncTask<Void, Void, String>{
+		
+		private ProgressDialog _progDialog;
+		private int _tableID;
+		
+		public CancelOrderTask(int tableID) {
+			_tableID = tableID;
+		}
+		
+		/**
+		 * 在执行请求删单操作前显示提示信息
+		 */
+		@Override
+		protected void onPreExecute(){
+			_progDialog = ProgressDialog.show(MainActivity.this, "", "删除" + _tableID + "号餐台的信息...请稍候", true);
+		}
+
+		/**
+		 * 在新的线程中执行删单的请求
+		 */
+		@Override
+		protected String doInBackground(Void... arg0) {
+			String errMsg = null;
+			try{
+				ProtocolPackage resp = ServerConnector.instance().ask(new ReqCancelOrder(_tableID));
+				if(resp.header.type == Type.NAK){
+					errMsg = _tableID + "号餐台删单失败";
+				}
+			}catch(IOException e){
+				errMsg = e.getMessage();
+			}
+			return errMsg;
+		}
+		
+		/**
+		 * 根据返回的error message判断，如果发错异常则提示用户，
+		 * 如果成功，则提示用户删单成功
+		 */
+		@Override
+		protected void onPostExecute(String errMsg){
+			//make the progress dialog disappeared
+			_progDialog.dismiss();
+			/**
+			 * Prompt user message if any error occurred.
+			 */
+			if(errMsg != null){
+				new AlertDialog.Builder(MainActivity.this)
+				.setTitle("提示")
+				.setMessage(errMsg)
+				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.dismiss();
+					}
+				}).show();
+			}else{
+				Toast.makeText(MainActivity.this, _tableID + "号台删单成功", 1).show();
+			}
+		}
+	}
+	
+	/**
 	 * 餐台输入的Dialog
 	 */
 	private class AskTableDialog extends Dialog{
-
-
-		
 
 		/**
 		 * 请求获得餐台的状态
@@ -585,6 +605,7 @@ public class MainActivity extends Activity {
 							dialog.dismiss();
 						}
 					}).show();
+					
 				}else{
 					
 					if(_type == DIALOG_INSERT_ORDER){
@@ -593,19 +614,24 @@ public class MainActivity extends Activity {
 						intent.putExtra(KEY_TABLE_ID,String.valueOf(_tableID));
 						startActivity(intent);
 						dismiss();
+						
 					}else if(_type == DIALOG_UPDATE_ORDER){
-						//TODO jump to the update order activity
+						//jump to the update order activity
 						Intent intent = new Intent(MainActivity.this, DropActivity.class);
 						intent.putExtra(KEY_TABLE_ID, String.valueOf(_tableID));
 						startActivity(intent);
 						dismiss();
-					}else if(_type==DIALOG_BILL_ORDER){
+						
+					}else if(_type == DIALOG_BILL_ORDER){
+						//jump to the bill activity
 						Intent intent = new Intent(MainActivity.this, BillActivity.class);
 						intent.putExtra(KEY_TABLE_ID, String.valueOf(_tableID));
 						startActivity(intent);
 						dismiss();
+						
 					}else if(_type == DIALOG_CANCEL_ORDER){
-						//TODO perform to cancel the order associated with this table
+						//perform to cancel the order associated with this table
+						new CancelOrderTask(_tableID).execute();
 						dismiss();
 					}
 				}

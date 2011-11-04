@@ -25,7 +25,7 @@ import com.wireless.protocol.Terminal;
 import com.wireless.protocol.Type;
 import com.wireless.sccon.ServerConnector;
 
-public class EnterActivity extends Activity {
+public class StartupActivity extends Activity {
  private ProgressBar pb;
  private TextView message;
 	@Override
@@ -63,7 +63,7 @@ public class EnterActivity extends Activity {
 	@Override
 	protected void onStart(){
 		super.onStart();
-		if(Common.getCommon().isNetworkAvailable(EnterActivity.this)){
+		if(Common.getCommon().isNetworkAvailable(StartupActivity.this)){
 			new QueryMenuTask().execute();
 		}else{
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -152,7 +152,7 @@ public class EnterActivity extends Activity {
 			 */
 			pb.setProgress(50);
 			if(errMsg != null){
-				new AlertDialog.Builder(EnterActivity.this)
+				new AlertDialog.Builder(StartupActivity.this)
 				.setTitle("提示")
 				.setMessage(errMsg)
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
@@ -217,7 +217,7 @@ public class EnterActivity extends Activity {
 			 */
 		
 			if(errMsg != null){
-				new AlertDialog.Builder(EnterActivity.this)
+				new AlertDialog.Builder(StartupActivity.this)
 				.setTitle("提示")
 				.setMessage(errMsg)
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
@@ -228,7 +228,7 @@ public class EnterActivity extends Activity {
 				}).show();
 			}else{
 				pb.setProgress(100);
-				Intent intent=new Intent(EnterActivity.this,MainActivity.class);
+				Intent intent=new Intent(StartupActivity.this,MainActivity.class);
 				startActivity(intent);
 				finish();
 			}
