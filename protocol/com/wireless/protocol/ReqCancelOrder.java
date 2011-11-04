@@ -15,7 +15,7 @@ public class ReqCancelOrder extends ReqPackage{
 	* table[2]
 	* table[2] - 2-byte indicates the table id 
 	*******************************************************/
-	public ReqCancelOrder(short tableID){
+	public ReqCancelOrder(int tableID){
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.CANCEL_ORDER;
 		header.length[0] = 0x02;
