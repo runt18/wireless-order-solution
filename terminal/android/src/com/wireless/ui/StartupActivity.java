@@ -4,15 +4,17 @@ import java.io.IOException;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.wireless.common.Common;
 import com.wireless.common.WirelessOrder;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.PinGen;
@@ -63,28 +65,53 @@ public class StartupActivity extends Activity {
 	@Override
 	protected void onStart(){
 		super.onStart();
-		if(Common.getCommon().isNetworkAvailable(StartupActivity.this)){
+		if(isNetworkAvail()){
 			new QueryMenuTask().execute();
 		}else{
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-	 		builder.setTitle("提示");
-	 		builder.setMessage("当前没有网络,请设置")
-	 		       .setCancelable(false)
-	 		       .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-	 		           public void onClick(DialogInterface dialog, int id) {
-	 		        	  startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));//进入无线网络配置界面
-	 		           }
-	 		       })
-	 		       .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-	 		           public void onClick(DialogInterface dialog, int id) {
-	 		        	 finish();
-	 		           }
-	 		       });
-	 		AlertDialog alert = builder.create();
-	 		alert.show();
-
+			showNetSetting();
+		}		
+	}
+	
+	/**
+	 * Determine whether the network is connected or not
+	 * @return true if the network is connected, otherwise return false
+	 */
+	private boolean isNetworkAvail(){
+		ConnectivityManager connectivity = (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+		if(connectivity != null) {
+			NetworkInfo[] info = connectivity.getAllNetworkInfo();
+			if(info != null){
+				for(int i = 0; i < info.length; i++){
+					if (info[i].getState() == NetworkInfo.State.CONNECTED) {
+						return true;
+					}
+				}
+			}
 		}
-		
+		return false;
+	}
+	
+	/**
+	 * 如果没有网络就弹出框，用户选择是否跳转到设置网络界面
+	 */
+	private void showNetSetting(){
+		new AlertDialog.Builder(this)
+ 			.setTitle("提示")
+ 			.setMessage("当前没有网络,请设置")
+ 		    .setCancelable(false)
+ 		    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+ 		    	public void onClick(DialogInterface dialog, int id) {
+ 		    		//进入无线网络配置界面
+ 		    		startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
+ 		    	}
+ 		     })
+ 		    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+ 		    	public void onClick(DialogInterface dialog, int id) {
+ 		    		finish();
+ 		        }
+ 		    })
+			.show();
+
 	}
 	
 	
