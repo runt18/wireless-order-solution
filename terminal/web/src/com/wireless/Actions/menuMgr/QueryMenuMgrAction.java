@@ -43,8 +43,12 @@ public class QueryMenuMgrAction extends Action {
 
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
-		int index = Integer.parseInt(start);
-		int pageSize = Integer.parseInt(limit);
+		int index = 0;
+		int pageSize = 0;
+		if (!(start == null)) {
+			index = Integer.parseInt(start);
+			pageSize = Integer.parseInt(limit);
+		}
 
 		List resultList = new ArrayList();
 		List outputList = new ArrayList();
@@ -52,6 +56,10 @@ public class QueryMenuMgrAction extends Action {
 		HashMap rootMap = new HashMap();
 
 		boolean isError = false;
+
+		// 是否分頁
+		String isPaging = request.getParameter("isPaging");
+
 		try {
 			// 解决后台中文传到前台乱码
 			response.setContentType("text/json; charset=utf-8");
@@ -71,6 +79,7 @@ public class QueryMenuMgrAction extends Action {
 			 * condition. isFree : additional condition. isStop : additional
 			 * condition.
 			 */
+
 			String pin = request.getParameter("pin");
 			if (pin.startsWith("0x") || pin.startsWith("0X")) {
 				pin = pin.substring(2);
@@ -214,12 +223,19 @@ public class QueryMenuMgrAction extends Action {
 					}
 				}
 
-				// 分页
-				for (int i = index; i < pageSize + index; i++) {
-					try {
+				if (isPaging.equals("true")) {
+					// 分页
+					for (int i = index; i < pageSize + index; i++) {
+						try {
+							outputList.add(chooseList.get(i));
+						} catch (Exception e) {
+							// 最后一页可能不足一页，会报错，忽略
+						}
+					}
+				} else {
+					for (int i = 0; i < chooseList.size(); i++) {
 						outputList.add(chooseList.get(i));
-					} catch (Exception e) {
-						// 最后一页可能不足一页，会报错，忽略
+
 					}
 				}
 				rootMap.put("root", outputList);
@@ -239,5 +255,4 @@ public class QueryMenuMgrAction extends Action {
 		}
 		return null;
 	}
-
 }

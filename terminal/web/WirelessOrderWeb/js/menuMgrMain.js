@@ -150,13 +150,90 @@ menuStatWin = new Ext.Window(
 					} ],
 			listeners : {
 				"show" : function(thiz) {
-					if (isFirstStatics) {
-						dishMultSelectDS.loadData(dishMultSelectData);
-						isFirstStatics = false;
-					}
+
+					dishMultSelectData = [];
 					menuStatWin.findById("dishMultSelectMStat").reset();
 					menuStatWin.findById("begDateMStat").setValue("");
 					menuStatWin.findById("endDateMStat").setValue("");
+
+					var queryTpye = filterTypeComb.getValue();
+					if (queryTpye == "全部") {
+						queryTpye = 0;
+					}
+
+					var queryOperator = operatorComb.getValue();
+					if (queryOperator == "等于") {
+						queryOperator = 1;
+					}
+
+					var queryValue = "";
+					if (conditionType == "text" && queryTpye != 0) {
+						queryValue = searchForm.findById("conditionText")
+								.getValue();
+						if (!searchForm.findById("conditionText").isValid()) {
+							return false;
+						}
+					} else if (conditionType == "number") {
+						queryValue = searchForm.findById("conditionNumber")
+								.getValue();
+						if (!searchForm.findById("conditionNumber").isValid()) {
+							return false;
+						}
+					} else if (conditionType == "kitchenTypeComb") {
+						queryValue = searchForm.findById("kitchenTypeComb")
+								.getValue();
+						if (queryValue == kitchenTypeData[0][1]) {
+							queryValue = 1;
+						}
+					}
+
+					var in_isSpecial = menuQueryCondPanel.findById(
+							"specialCheckbox").getValue();
+					var in_isRecommend = menuQueryCondPanel.findById(
+							"recommendCheckbox").getValue();
+					var in_isFree = menuQueryCondPanel.findById("freeCheckbox")
+							.getValue();
+					var in_isStop = menuQueryCondPanel.findById("stopCheckbox")
+							.getValue();
+
+					// 输入查询条件参数
+					Ext.Ajax.request({
+						url : "../QueryMenuMgr.do",
+						params : {
+							"pin" : pin,
+							"type" : queryTpye,
+							"ope" : queryOperator,
+							"value" : queryValue,
+							"isSpecial" : in_isSpecial,
+							"isRecommend" : in_isRecommend,
+							"isFree" : in_isFree,
+							"isStop" : in_isStop,
+							"isPaging" : false
+						},
+						success : function(response, options) {
+							var resultJSON = Ext.util.JSON
+									.decode(response.responseText);
+							var root = resultJSON.root;
+							if (root[0].message == "normal") {
+								for ( var i = 0; i < root.length; i++) {
+									dishMultSelectData.push([
+											root[i].dishNumber,
+											root[i].dishName ]);
+								}
+								dishMultSelectDS.loadData(dishMultSelectData);
+							} else {
+								Ext.MessageBox.show({
+									msg : root[0].message,
+									width : 300,
+									buttons : Ext.MessageBox.OK
+								});
+							}
+
+						},
+						failure : function(response, options) {
+						}
+					});
+
 				}
 			}
 		});
@@ -738,7 +815,8 @@ menuModifyWin = new Ext.Window(
 													menuStore
 															.reload({
 																params : {
-																	start : 0,
+																	start : (currPageIndex - 1)
+																			* dishesPageRecordCount,
 																	limit : dishesPageRecordCount
 																}
 															});
@@ -1075,6 +1153,9 @@ var menuQueryCondPanel = new Ext.form.FormPanel({
 
 // operator function
 function dishModifyHandler(rowIndex) {
+	// 獲取分頁表格的當前頁碼！神技！！！
+	var toolbar = menuGrid.getBottomToolbar();
+	currPageIndex = toolbar.readPage(toolbar.getPageData());
 
 	var currRecord = menuStore.getAt(rowIndex);
 	menuModifyWin.findById("menuModNumber").setValue(
@@ -1317,6 +1398,7 @@ var materialPanel = new Ext.Panel({
 });
 
 // -------------- layout ---------------
+var menuGrid;
 Ext
 		.onReady(function() {
 			// 解决ext中文传入后台变问号问题
@@ -1324,7 +1406,7 @@ Ext
 			Ext.QuickTips.init();
 
 			// ---------------------表格--------------------------
-			var menuGrid = new Ext.grid.GridPanel({
+			menuGrid = new Ext.grid.GridPanel({
 				title : "菜品",
 				xtype : "grid",
 				anchor : "99%",
@@ -1428,7 +1510,8 @@ Ext
 									"isSpecial" : in_isSpecial,
 									"isRecommend" : in_isRecommend,
 									"isFree" : in_isFree,
-									"isStop" : in_isStop
+									"isStop" : in_isStop,
+									"isPaging" : true
 								};
 
 							});
