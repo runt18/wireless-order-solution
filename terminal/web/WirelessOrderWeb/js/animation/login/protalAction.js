@@ -56,7 +56,17 @@
 	$("#menu").each(function() {
 		$(this).bind("click", function() {	
 			if (currPin != "" && !isPrompt) {
-				location.href = "MenuManagement.html?pin="
+				location.href = "BasicManagement_Module/MenuManagement.html?pin="
+						+ currPin + "&restaurantID="
+						+ restaurantID;
+			}
+		});
+	});
+	
+	$("#inventory").each(function() {
+		$(this).bind("click", function() {	
+			if (currPin != "" && !isPrompt) {
+				location.href = "BasicManagement_Module/MenuManagement.html?pin="
 						+ currPin + "&restaurantID="
 						+ restaurantID;
 			}

@@ -168,7 +168,7 @@ function tableStuLoad() {
 	}
 
 	// update the operator name
-	getOperatorName(Request["pin"]);
+	getOperatorName(Request["pin"], "../");
 };
 
 // 以点菜式数据

@@ -64,9 +64,9 @@ function loginOnLoad() {
 
 	// update the operator name
 	if (currPin != "") {
-		getOperatorName(currPin);
+		getOperatorName(currPin, "../");
 	}
-	
+
 	shiftWin.show();
 	shiftWin.hide();
 
@@ -184,24 +184,43 @@ function loginOnLoad() {
 															"url(../images/logout.png) no-repeat 50%");
 										});
 					});
-	
+
 	$("#shift")
-	.each(
-			function() {
-				$(this)
-						.hover(
-								function() {
-									$(this)
-											.stop()
-											.css("background",
-													"url(../images/shift_selected.png) no-repeat 50%");
-								},
-								function() {
-									$(this)
-											.stop()
-											.css("background",
-													"url(../images/shift.png) no-repeat 50%");
-								});
-			});
+			.each(
+					function() {
+						$(this)
+								.hover(
+										function() {
+											$(this)
+													.stop()
+													.css("background",
+															"url(../images/shift_selected.png) no-repeat 50%");
+										},
+										function() {
+											$(this)
+													.stop()
+													.css("background",
+															"url(../images/shift.png) no-repeat 50%");
+										});
+					});
+
+	$("#inventory")
+			.each(
+					function() {
+						$(this)
+								.hover(
+										function() {
+											$(this)
+													.stop()
+													.css("background",
+															"url(../images/shift_selected.png) no-repeat 50%");
+										},
+										function() {
+											$(this)
+													.stop()
+													.css("background",
+															"url(../images/shift.png) no-repeat 50%");
+										});
+					});
 
 };

@@ -63,7 +63,7 @@ menuStatWin = new Ext.Window(
 					msHeight : 250,
 					valueField : "retrunValue",
 					displayField : "displayText",
-					imagePath : "../extjs/multiselect/images/",
+					imagePath : "../../extjs/multiselect/images/",
 					toLegend : "已选择菜品",
 					fromLegend : "可选择菜品"
 				} ]
@@ -198,7 +198,7 @@ menuStatWin = new Ext.Window(
 
 					// 输入查询条件参数
 					Ext.Ajax.request({
-						url : "../QueryMenuMgr.do",
+						url : "../../QueryMenuMgr.do",
 						params : {
 							"pin" : pin,
 							"type" : queryTpye,
@@ -242,7 +242,7 @@ menuStatWin = new Ext.Window(
 // 后台：[菜品ｉｄ，菜品名稱，菜品單價，是否臨時，總數量，總價格]
 var menuStatResultStore = new Ext.data.Store({
 	proxy : new Ext.data.HttpProxy({
-		url : "../MenuStatistics.do"
+		url : "../../MenuStatistics.do"
 	}),
 	reader : new Ext.data.JsonReader({
 		totalProperty : "totalProperty",
@@ -389,7 +389,7 @@ menuStatResultWin = new Ext.Window({
 // ----------------- 增加新菜 --------------------
 var kitchenTypeStoreMA = new Ext.data.Store({
 	proxy : new Ext.data.HttpProxy({
-		url : "../QueryMenu.do?pin=" + pin + "&type=4"
+		url : "../../QueryMenu.do?pin=" + pin + "&type=4"
 	}),
 	reader : new Ext.data.JsonReader({
 		root : 'root'
@@ -550,7 +550,7 @@ menuAddWin = new Ext.Window({
 							menuAddWin.hide();
 
 							Ext.Ajax.request({
-								url : "../InsertMenu.do",
+								url : "../../InsertMenu.do",
 								params : {
 									"pin" : Request["pin"],
 									"dishNumber" : dishNumber,
@@ -637,7 +637,7 @@ menuAddWin = new Ext.Window({
 // ----------------- 菜谱修改 --------------------
 var kitchenTypeStoreMM = new Ext.data.Store({
 	proxy : new Ext.data.HttpProxy({
-		url : "../QueryMenu.do?pin=" + pin + "&type=4"
+		url : "../../QueryMenu.do?pin=" + pin + "&type=4"
 	}),
 	reader : new Ext.data.JsonReader({
 		root : 'root'
@@ -794,7 +794,7 @@ menuModifyWin = new Ext.Window(
 
 								Ext.Ajax
 										.request({
-											url : "../UpdateMenu.do",
+											url : "../../UpdateMenu.do",
 											params : {
 												"pin" : Request["pin"],
 												"dishNumber" : dishNumber,
@@ -859,7 +859,7 @@ menuModifyWin = new Ext.Window(
 
 // --------------------------------------------------------------------------
 var orderStatiBut = new Ext.ux.ImageButton({
-	imgPath : "../images/orderStatic.png",
+	imgPath : "../../images/orderStatic.png",
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : "点菜统计",
@@ -869,7 +869,7 @@ var orderStatiBut = new Ext.ux.ImageButton({
 });
 
 var dishAddBut = new Ext.ux.ImageButton({
-	imgPath : "../images/dishAdd.png",
+	imgPath : "../../images/dishAdd.png",
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : "添加新菜",
@@ -880,18 +880,18 @@ var dishAddBut = new Ext.ux.ImageButton({
 
 // --
 var pushBackBut = new Ext.ux.ImageButton({
-	imgPath : "../images/UserLogout.png",
+	imgPath : "../../images/UserLogout.png",
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : "返回",
 	handler : function(btn) {
-		location.href = "PersonLogin.html?restaurantID=" + restaurantID
+		location.href = "../PersonLogin.html?restaurantID=" + restaurantID
 				+ "&isNewAccess=false&pin=" + pin;
 	}
 });
 
 var logOutBut = new Ext.ux.ImageButton({
-	imgPath : "../images/ResLogout.png",
+	imgPath : "../../images/ResLogout.png",
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : "登出",
@@ -1189,7 +1189,7 @@ function dishDeleteHandler(rowIndex) {
 				var dishNumber = menuStore.getAt(rowIndex).get("dishNumber");
 
 				Ext.Ajax.request({
-					url : "../DeleteMenu.do",
+					url : "../../DeleteMenu.do",
 					params : {
 						"pin" : pin,
 						"dishNumber" : dishNumber
@@ -1234,10 +1234,10 @@ function dishDeleteHandler(rowIndex) {
 
 function menuDishOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
 	return "<center><a href=\"javascript:dishModifyHandler(" + rowIndex
-			+ ")\">" + "<img src='../images/Modify.png'/>修改</a>"
+			+ ")\">" + "<img src='../../images/Modify.png'/>修改</a>"
 			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
 			+ "<a href=\"javascript:dishDeleteHandler(" + rowIndex + ")\">"
-			+ "<img src='../images/del.png'/>删除</a>"
+			+ "<img src='../../images/del.png'/>删除</a>"
 			// + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
 			// + "<a href=\"javascript:dishRelateHandler(" + rowIndex + ")\">"
 			// + "<img src='../images/Modify.png'/>关联</a>"
@@ -1248,7 +1248,7 @@ function menuDishOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
 // 编号，名称，拼音，价格，厨房打印，操作，特,荐,停,送
 var menuStore = new Ext.data.Store({
 	proxy : new Ext.data.HttpProxy({
-		url : "../QueryMenuMgr.do"
+		url : "../../QueryMenuMgr.do"
 	}),
 	reader : new Ext.data.JsonReader({
 		totalProperty : "totalProperty",
@@ -1559,7 +1559,7 @@ Ext
 																				"dishNameDisplay",
 																				record
 																						.get("dishNameDisplay")
-																						+ "<img src='../images/icon_tip_te.gif'></img>");
+																						+ "<img src='../../images/icon_tip_te.gif'></img>");
 															}
 															if (record
 																	.get("recommend") == true) {
@@ -1568,7 +1568,7 @@ Ext
 																				"dishNameDisplay",
 																				record
 																						.get("dishNameDisplay")
-																						+ "<img src='../images/icon_tip_jian.gif'></img>");
+																						+ "<img src='../../images/icon_tip_jian.gif'></img>");
 															}
 															if (record
 																	.get("stop") == true) {
@@ -1577,7 +1577,7 @@ Ext
 																				"dishNameDisplay",
 																				record
 																						.get("dishNameDisplay")
-																						+ "<img src='../images/icon_tip_ting.gif'></img>");
+																						+ "<img src='../../images/icon_tip_ting.gif'></img>");
 															}
 															if (record
 																	.get("free") == true) {
@@ -1586,7 +1586,7 @@ Ext
 																				"dishNameDisplay",
 																				record
 																						.get("dishNameDisplay")
-																						+ "<img src='../images/forFree.png'></img>");
+																						+ "<img src='../../images/forFree.png'></img>");
 															}
 
 															// 提交，去掉修改標記

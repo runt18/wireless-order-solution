@@ -5,7 +5,7 @@ function billsOnLoad() {
 	pin = Request["pin"];
 
 	// update the operator name
-	getOperatorName(pin);
+	getOperatorName(pin, "../");
 
 	// get the bills
 	billQuery(0, 1, "");

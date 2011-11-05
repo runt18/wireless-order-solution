@@ -358,7 +358,7 @@ function tableSelectOnLoad() {
 	});
 
 	// update the operator name
-	getOperatorName(pin);
+	getOperatorName(pin, "../");
 
 	// 随机刷新
 	var x = 300000;  

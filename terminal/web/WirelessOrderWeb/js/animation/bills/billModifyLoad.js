@@ -34,7 +34,7 @@ var dishKeyboardSelect = function(relateItemId) {
 function billModifyOnLoad() {
 
 	// update the operator name
-	getOperatorName(pin);
+	getOperatorName(pin, "../");
 
 	// keyboard input dish number
 	$("#orderNbr").bind("keyup", function() {
@@ -129,7 +129,7 @@ function billModifyOnLoad() {
 							var josnData = resultJSON.data;
 							var orderList = josnData.split("，");
 							for ( var i = 0; i < orderList.length; i++) {
-								
+
 								var orderInfo = orderList[i].substr(1,
 										orderList[i].length - 2).split(",");
 								// 实价 = 单价 + 口味价钱
@@ -414,12 +414,12 @@ function orderedMenuOnLoad() {
 			});
 };
 
-//口味
-//dishTasteData.push([ "咸死你", "￥8" ]);
-//后台：[口味编号,口味分类,口味名称,价钱,比例,计算方式]
-//“口味分类”的值如下： 0 - 口味 ， 1 - 做法， 2 - 规格
-//“计算方式”的值如下：0 - 按价格，1 - 按比例
-//前台：[口味编号,口味分类,口味名称,价钱,比例,计算方式，计算方式显示，选择]
+// 口味
+// dishTasteData.push([ "咸死你", "￥8" ]);
+// 后台：[口味编号,口味分类,口味名称,价钱,比例,计算方式]
+// “口味分类”的值如下： 0 - 口味 ， 1 - 做法， 2 - 规格
+// “计算方式”的值如下：0 - 按价格，1 - 按比例
+// 前台：[口味编号,口味分类,口味名称,价钱,比例,计算方式，计算方式显示，选择]
 function tasteOnLoad() {
 	var Request = new URLParaQuery();
 	Ext.Ajax.request({
@@ -451,7 +451,7 @@ function tasteOnLoad() {
 						tasteInfo[4], // 比例
 						tasteInfo[5], // 计算方式
 						countTypeDescr, // 计算方式显示
-						false// 选择
+						false // 选择
 						]);
 					} else if (tasteInfo[1] == "1") {
 						dishTasteDataPar.push([ tasteInfo[0], // 口味编号
@@ -461,7 +461,7 @@ function tasteOnLoad() {
 						tasteInfo[4], // 比例
 						tasteInfo[5], // 计算方式
 						countTypeDescr, // 计算方式显示
-						false// 选择
+						false // 选择
 						]);
 					} else {
 						dishTasteDataSiz.push([ tasteInfo[0], // 口味编号
@@ -471,7 +471,7 @@ function tasteOnLoad() {
 						tasteInfo[4], // 比例
 						tasteInfo[5], // 计算方式
 						countTypeDescr, // 计算方式显示
-						false// 选择
+						false // 选择
 						]);
 					}
 

@@ -537,7 +537,7 @@ Ext
 												// + "&restaurantID="
 												// + restaurantID;
 												currPin = pin;
-												getOperatorName(currPin);
+												getOperatorName(currPin, "../");
 												isVerified = true;
 												personLoginWin.hide();
 												personLoginWin.findById(

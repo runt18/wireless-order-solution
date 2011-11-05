@@ -2,7 +2,7 @@
 function menuMgrOnLoad() {
 
 	// update the operator name
-	getOperatorName(pin);
+	getOperatorName(pin, "../../");
 
 	searchForm.remove("conditionText");
 	operatorComb.setDisabled(true);
@@ -11,7 +11,7 @@ function menuMgrOnLoad() {
 	// 后台：[厨房编号,"厨房名称",一般折扣1,一般折扣2,一般折扣3,会员折扣1,会员折扣2,会员折扣3]
 	// 前台：kitchenData：[厨房编号,厨房名称]
 	Ext.Ajax.request({
-		url : "../QueryMenu.do",
+		url : "../../QueryMenu.do",
 		params : {
 			"pin" : Request["pin"],
 			"type" : "3"
@@ -45,7 +45,7 @@ function menuMgrOnLoad() {
 	});
 
 	Ext.Ajax.request({
-		url : "../QueryMenu.do",
+		url : "../../QueryMenu.do",
 		params : {
 			"pin" : pin,
 			"type" : "1"
