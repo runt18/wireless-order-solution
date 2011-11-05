@@ -1,4 +1,4 @@
-SET NAMES utf8;
+﻿SET NAMES utf8;
 USE wireless_order_db;
 
 -- -----------------------------------------------------
@@ -88,5 +88,7 @@ COMMENT = 'describe the department information' ;
 ALTER TABLE `wireless_order_db`.`kitchen` CHANGE COLUMN `super_kitchen` `dept_id` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'the department that this kitchen belong to.'  ;
 
 -- -----------------------------------------------------
--- Insert a '�ֹܲ�' to 'department' for every restaurant
+-- Insert a '仓管部' to 'department' for every restaurant
 -- -----------------------------------------------------
+INSERT INTO wireless_order_db.department(restaurant_id, dept_id, name)
+SELECT id, 0, "仓管部" FROM wireless_order_db.restaurant WHERE id > 10;
