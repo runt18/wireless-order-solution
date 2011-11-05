@@ -10,16 +10,16 @@ Release v1.1.1 <xx/xx/2011>
 1 - Release on xx/xx/2011
 2 - Source code is tagged as "1.1.1" in Google Code's SVN
 <Issues>
-1 - 增加表"supplier"
-2 - 增加字段"supplier_id"到表"material"
-3 - 删除表"material_history"
-4 - 删除表"order_food_material"
-5 - 删除表"order_food_material_history"
-6 - 重新生成表"food_material"
-7 - 修改表"material"的字段"alias_id"为unsigned
-8 - 修改表"super_kitchen"的名字为"department"
-9 - 修改表"kitchen"中的字段"super_kitchen"为"dept_id"
-10 - 增加表"material_detail"
+ - 增加表"supplier"
+ - 增加表"material_detail"
+ - 增加表"department"
+ - 删除表"material_history"
+ - 删除表"order_food_material"
+ - 删除表"order_food_material_history"
+ - 重新生成表"food_material"
+ - 重新生成表"material"
+ - 删除表"super_kitchen"
+ - 修改表"kitchen"中的字段"super_kitchen"为"dept_id"
 ******************************************************************************************************/
 
 /******************************************************************************************************

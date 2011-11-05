@@ -241,7 +241,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`kitchen` (
   `member_discount_2` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the 2nd member discount to the food belong to this kitchen, range from 0.00 to 1.00' ,
   `member_discount_3` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the 3rd member discount to the food belong to this kitchen, range from 0.00 to 1.00' ,
   PRIMARY KEY (`id`) ,
-  INDEX `fk_kitchen_restaurant1` (`restaurant_id` ASC) ,
+  INDEX `fk_kitchen_restaurant` (`restaurant_id` ASC) ,
   CONSTRAINT `fk_kitchen_restaurant1`
     FOREIGN KEY (`restaurant_id` )
     REFERENCES `wireless_order_db`.`restaurant` (`id` )
@@ -324,17 +324,16 @@ COMMENT = 'This table preserves all the order records.' ;
 DROP TABLE IF EXISTS `wireless_order_db`.`material` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`material` (
-  `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this material' ,
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'the id to related restaurant' ,
-  `alias_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the alias id to this material' ,
+  `material_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the alias id to this material' ,
   `supplier_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the alias supplier id this material belog to' ,
   `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to this material' ,
   `stock` FLOAT NOT NULL DEFAULT 0 COMMENT 'the remaining amount to this material' ,
   `price` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the unit price to this material' ,
   `warning_threshold` FLOAT NOT NULL DEFAULT 0 COMMENT 'the warning threshold to this material' ,
   `danger_threshold` FLOAT NOT NULL DEFAULT 0 COMMENT 'the danger threshold to this material' ,
-  PRIMARY KEY (`id`) ,
   INDEX `fk_material_restaurant` (`restaurant_id` ASC) ,
+  PRIMARY KEY (`material_id`, `restaurant_id`) ,
   CONSTRAINT `fk_material_restaurant`
     FOREIGN KEY (`restaurant_id` )
     REFERENCES `wireless_order_db`.`restaurant` (`id` )
@@ -355,7 +354,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food_material` (
   `material_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the material alias id' ,
   `food_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the food alias id' ,
   `consumption` FLOAT NOT NULL DEFAULT 0 COMMENT 'the consumption between the food and the material' ,
-  INDEX `fk_food_material_restaurant1` (`restaurant_id` ASC) ,
+  INDEX `fk_food_material_restaurant` (`restaurant_id` ASC) ,
   CONSTRAINT `fk_food_material_restaurant1`
     FOREIGN KEY (`restaurant_id` )
     REFERENCES `wireless_order_db`.`restaurant` (`id` )
@@ -527,12 +526,11 @@ COMMENT = 'describe the region information to the tables' ;
 DROP TABLE IF EXISTS `wireless_order_db`.`department` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`department` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `restaurant_id` INT UNSIGNED NOT NULL ,
-  `alias_id` TINYINT UNSIGNED NULL ,
+  `dept_id` TINYINT UNSIGNED NOT NULL DEFAULT 0 ,
   `name` VARCHAR(45) NOT NULL DEFAULT '' ,
-  PRIMARY KEY (`id`) ,
-  INDEX `fk_super_kitchen_restaurant1` (`restaurant_id` ASC) ,
+  INDEX `fk_super_kitchen_restaurant` (`restaurant_id` ASC) ,
+  PRIMARY KEY (`dept_id`, `restaurant_id`) ,
   CONSTRAINT `fk_super_kitchen_restaurant1`
     FOREIGN KEY (`restaurant_id` )
     REFERENCES `wireless_order_db`.`restaurant` (`id` )
@@ -603,15 +601,14 @@ COMMENT = 'temporary order food history table for performance problem' ;
 DROP TABLE IF EXISTS `wireless_order_db`.`supplier` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`supplier` (
-  `id` INT NOT NULL AUTO_INCREMENT ,
   `restaurant_id` INT UNSIGNED NOT NULL ,
-  `alias_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the alias id to this supplier' ,
+  `supplier_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the alias id to this supplier' ,
   `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to ths supplier' ,
   `tele` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the telephone to this supplier' ,
   `addr` VARCHAR(100) NOT NULL DEFAULT '' COMMENT 'the address to this supplier' ,
   `contact` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the contact person to this supplier' ,
-  PRIMARY KEY (`id`) ,
   INDEX `fk_supplier_restaurant` (`restaurant_id` ASC) ,
+  PRIMARY KEY (`supplier_id`, `restaurant_id`) ,
   CONSTRAINT `fk_supplier_restaurant1`
     FOREIGN KEY (`restaurant_id` )
     REFERENCES `wireless_order_db`.`restaurant` (`id` )
@@ -653,6 +650,8 @@ DEFAULT CHARACTER SET = utf8;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+
 
 
 

@@ -149,16 +149,17 @@ COMMIT;
 -- Insert super kitchen records, note that each restaruant has ten super kitchens
 -- -----------------------------------------------------
 SET AUTOCOMMIT=0;
-INSERT INTO `wireless_order_db`.`department` (`id`, `restaurant_id`, `alias_id`, `name`) VALUES (NULL, 11, 0, '中厨');
-INSERT INTO `wireless_order_db`.`department` (`id`, `restaurant_id`, `alias_id`, `name`) VALUES (NULL, 11, 1, '点心');
-INSERT INTO `wireless_order_db`.`department` (`id`, `restaurant_id`, `alias_id`, `name`) VALUES (NULL, 11, 2, '大厨3');
-INSERT INTO `wireless_order_db`.`department` (`id`, `restaurant_id`, `alias_id`, `name`) VALUES (NULL, 11, 3, '大厨4');
-INSERT INTO `wireless_order_db`.`department` (`id`, `restaurant_id`, `alias_id`, `name`) VALUES (NULL, 11, 4, '大厨5');
-INSERT INTO `wireless_order_db`.`department` (`id`, `restaurant_id`, `alias_id`, `name`) VALUES (NULL, 11, 5, '大厨6');
-INSERT INTO `wireless_order_db`.`department` (`id`, `restaurant_id`, `alias_id`, `name`) VALUES (NULL, 11, 6, '大厨7');
-INSERT INTO `wireless_order_db`.`department` (`id`, `restaurant_id`, `alias_id`, `name`) VALUES (NULL, 11, 7, '大厨8');
-INSERT INTO `wireless_order_db`.`department` (`id`, `restaurant_id`, `alias_id`, `name`) VALUES (NULL, 11, 8, '大厨9');
-INSERT INTO `wireless_order_db`.`department` (`id`, `restaurant_id`, `alias_id`, `name`) VALUES (NULL, 11, 9, '大厨10');
+INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`) VALUES (11, 0, '仓管部');
+INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`) VALUES (11, 1, '中厨部');
+INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`) VALUES (11, 2, '点心部');
+INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`) VALUES (11, 3, '部门3');
+INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`) VALUES (11, 4, '部门4');
+INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`) VALUES (11, 5, '部门5');
+INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`) VALUES (11, 6, '部门6');
+INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`) VALUES (11, 7, '部门7');
+INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`) VALUES (11, 8, '部门8');
+INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`) VALUES (11, 9, '部门9');
+INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`) VALUES (11, 10, '部门10');
 
 COMMIT;
 
@@ -206,8 +207,8 @@ SET AUTOCOMMIT=1;
 -- Insert supplier records
 -- -----------------------------------------------------
 SET AUTOCOMMIT=0;
-INSERT INTO `wireless_order_db`.`supplier` (`id`, `alias_id`, `restaurant_id`, `name`, `tele`, `addr`, `contact`) VALUES (1, 1, 11, '中联肉品', '020-85412369', '广州市番禺区', '陈生');
-INSERT INTO `wireless_order_db`.`supplier` (`id`, `alias_id`, `restaurant_id`, `name`, `tele`, `addr`, `contact`) VALUES (2, 2, 11, '联和肉品', '020-84125987', '广州市东埔镇', '李生');
+INSERT INTO `wireless_order_db`.`supplier` (`supplier_id`, `restaurant_id`, `name`, `tele`, `addr`, `contact`) VALUES (1, 11, '中联肉品', '020-85412369', '广州市番禺区', '陈生');
+INSERT INTO `wireless_order_db`.`supplier` (`supplier_id`, `restaurant_id`, `name`, `tele`, `addr`, `contact`) VALUES (2, 11, '联和肉品', '020-84125987', '广州市东埔镇', '李生');
 COMMIT;
 SET AUTOCOMMIT=1;
 
@@ -215,11 +216,11 @@ SET AUTOCOMMIT=1;
 -- Insert material records
 -- -----------------------------------------------------
 SET AUTOCOMMIT=0;
-INSERT INTO `wireless_order_db`.`material` (`id`, `restaurant_id`, `supplier_id`, `alias_id`, `name`, `stock`, `price`, `warning_threshold`, `danger_threshold`) VALUES (1, 11, 1, 100, '排骨', 0, 18.5, 10.5, 5.5);
-INSERT INTO `wireless_order_db`.`material` (`id`, `restaurant_id`, `supplier_id`, `alias_id`, `name`, `stock`, `price`, `warning_threshold`, `danger_threshold`) VALUES (2, 11, 1, 101, '鸡肉', 0, 13, 22, 14);
-INSERT INTO `wireless_order_db`.`material` (`id`, `restaurant_id`, `supplier_id`, `alias_id`, `name`, `stock`, `price`, `warning_threshold`, `danger_threshold`) VALUES (3, 11, 1, 102, '牛肉', 0, 16, 27, 13);
-INSERT INTO `wireless_order_db`.`material` (`id`, `restaurant_id`, `supplier_id`, `alias_id`, `name`, `stock`, `price`, `warning_threshold`, `danger_threshold`) VALUES (4, 11, 2, 103, '猪肉', 0, 13.5, 27, 13);
-INSERT INTO `wireless_order_db`.`material` (`id`, `restaurant_id`, `supplier_id`, `alias_id`, `name`, `stock`, `price`, `warning_threshold`, `danger_threshold`) VALUES (5, 11, 2, 104, '酱汁', 0, 1, 30, 20);
+INSERT INTO `wireless_order_db`.`material` (`restaurant_id`, `supplier_id`, `material_id`, `name`, `stock`, `price`, `warning_threshold`, `danger_threshold`) VALUES (11, 1, 100, '排骨', 0, 18.5, 10.5, 5.5);
+INSERT INTO `wireless_order_db`.`material` (`restaurant_id`, `supplier_id`, `material_id`, `name`, `stock`, `price`, `warning_threshold`, `danger_threshold`) VALUES (11, 1, 101, '鸡肉', 0, 13, 22, 14);
+INSERT INTO `wireless_order_db`.`material` (`restaurant_id`, `supplier_id`, `material_id`, `name`, `stock`, `price`, `warning_threshold`, `danger_threshold`) VALUES (11, 1, 102, '牛肉', 0, 16, 27, 13);
+INSERT INTO `wireless_order_db`.`material` (`restaurant_id`, `supplier_id`, `material_id`, `name`, `stock`, `price`, `warning_threshold`, `danger_threshold`) VALUES (11, 2, 103, '猪肉', 0, 13.5, 27, 13);
+INSERT INTO `wireless_order_db`.`material` (`restaurant_id`, `supplier_id`, `material_id`, `name`, `stock`, `price`, `warning_threshold`, `danger_threshold`) VALUES (11, 2, 104, '酱汁', 0, 1, 30, 20);
 COMMIT;
 SET AUTOCOMMIT=1;
 
