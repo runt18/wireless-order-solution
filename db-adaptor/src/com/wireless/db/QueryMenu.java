@@ -219,12 +219,12 @@ public class QueryMenu {
 	private static SKitchen[] querySKitchens(DBCon dbCon, int restaurantID) throws SQLException{
 		//get tall the super kitchen information to this restaurant
 		ArrayList<SKitchen> sKitchens = new ArrayList<SKitchen>();
-		String sql = "SELECT alias_id, name FROM " + Params.dbName + ".department WHERE " +
+		String sql = "SELECT dept_id, name FROM " + Params.dbName + ".department WHERE " +
 					 " restaurant_id=" + restaurantID;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
 			sKitchens.add(new SKitchen(dbCon.rs.getString("name"),
-									   dbCon.rs.getShort("alias_id")));
+									   dbCon.rs.getShort("dept_id")));
 		}
 		dbCon.rs.close();
 		
