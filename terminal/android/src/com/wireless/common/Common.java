@@ -131,6 +131,7 @@ public void setKient(KitchenActivity kient) {
 	}
 
 	public static Common getCommon() {
+	
 		if(common==null){
 			foodlist=new ArrayList<Food>();
 			common=new Common();
@@ -363,26 +364,26 @@ public void setKient(KitchenActivity kient) {
 				 * 遍历已点菜，查找是否存在与新点菜相同的菜品。
 				 * 如果存在就把数量累加上去，否则就当作新菜品添加到已点菜中
 				 */
-				for(int i = 0; i < foodlist.size(); i++){
-					if(foodlist.get(i).equals(food)){
+		
+					for(int i = 0; i < foodlist.size(); i++){
+						if(foodlist.get(i).equals(food)){
+							float count = food.getCount().floatValue() + Float.parseFloat(mycount.getText().toString());
+							if(count > 255){
+								//Dialog.alert(food.name + "最多只能点255份");
+								food.setCount(new Float(255));
+							}else{
+								food.setCount(count);
+							}
 
-						float count = food.getCount().floatValue() + Float.parseFloat(mycount.getText().toString());
-						if(count > 255){
-							//Dialog.alert(food.name + "最多只能点255份");
-							food.setCount(new Float(255));
-						}else{
-							food.setCount(count);
+							isExist = true;
 						}
-
-						isExist = true;
 					}
-				}
+					if(!isExist){
+						foodlist.add(food);
+						food.setCount(Float.parseFloat(mycount.getText().toString()));
+					}
 
-				if(!isExist){
-					foodlist.add(food);
-					food.setCount(Float.parseFloat(mycount.getText().toString()));
-				}
-
+			
 				 mDialog.cancel();
 			}
 		});
@@ -516,7 +517,6 @@ public void setKient(KitchenActivity kient) {
 		View view=LayoutInflater.from(context).inflate(R.layout.expandablelistview, null);
 		mydialog.setTitle("请选择厨房");
 		mydialog.setView(view);
-//		mydialog.show();
 		ExpandableListView mylistview=(ExpandableListView)view.findViewById(R.id.myExpandableListView);
 		
 		ExpandlistAdapter adapter=new ExpandlistAdapter(context,perant,child);
@@ -532,8 +532,6 @@ public void setKient(KitchenActivity kient) {
 		        	kient.getslect(kitchen);
 		        	aler.dismiss();
 		        }
-               Log.e("", "llllllll"+kitchen.name);
-                
 				return true;
 				
 			}
