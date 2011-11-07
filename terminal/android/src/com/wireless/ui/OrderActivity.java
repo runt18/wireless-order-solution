@@ -121,7 +121,7 @@ public class OrderActivity extends Activity {
 	 * */
 		
 	public void account(){
-		if(Common.getCommon().getFoodlist().size()>0){
+		if(Common.getCommon().getFoodlist().size()==0){
 			buttomrelativelayout.setVisibility(View.VISIBLE);
 			float account=0;
 			for(int i=0;i<Common.getCommon().getFoodlist().size();i++){
@@ -178,27 +178,32 @@ public class OrderActivity extends Activity {
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		Log.e("", "DDDDD");
-		adapter=new OderFoodAdapter(OrderActivity.this,Common.getCommon().getFoodlist());
-		myListView.setAdapter(adapter);
+		
 		account();
 		if(Common.getCommon().getFoodlist().size()==0){
 			up.setBackgroundResource(R.drawable.normal);
+			//adapter=new OderFoodAdapter(OrderActivity.this,null);
+			myListView.setAdapter(null);
 		}else{
 			up.setBackgroundResource(R.drawable.expand);
+			adapter=new OderFoodAdapter(OrderActivity.this,Common.getCommon().getFoodlist());
+			myListView.setAdapter(adapter);
 		}
 		super.onResume();
 	}
 
 	@Override
       public void onRestart() {
-		if(Common.getCommon().getFoodlist()==null){
-			adapter=new OderFoodAdapter(OrderActivity.this,null);
+		if(Common.getCommon().getFoodlist().size()==0){
+			//adapter=new OderFoodAdapter(OrderActivity.this,null);
+			myListView.setAdapter(null);
 		}else{
-			Log.e("", "size--->"+Common.getCommon().getFoodlist().size());
+			//Log.e("", "size--->"+Common.getCommon().getFoodlist().size());
 			adapter=new OderFoodAdapter(OrderActivity.this,Common.getCommon().getFoodlist());
+			myListView.setAdapter(adapter);
 		}
 		
-		myListView.setAdapter(adapter);
+		
 		account();
 		if(Common.getCommon().getFoodlist().size()==0){
 			up.setBackgroundResource(R.drawable.normal);
@@ -298,7 +303,7 @@ public class OrderActivity extends Activity {
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
-			Common.getCommon().getFoodlist().clear();;
+			Common.getCommon().getFoodlist().clear();
 			Common.getCommon().setPosition(0);
 			Common.getCommon().setOrderplatenum("");
 			finish();
@@ -316,13 +321,15 @@ public class OrderActivity extends Activity {
 				
 				case 0:
 					mydialog.dismiss();
-					Common.getCommon().getFoodlist().clear();;
+					Common.getCommon().getFoodlist().clear();
+					
 					Common.getCommon().setPosition(0);
 					Common.getCommon().setOrderplatenum("");
 					myListView.setAdapter(adapter);
 					account();
 					new AlertDialog.Builder(OrderActivity.this).setTitle("提示").setMessage("下单成功").setPositiveButton("确定", new DialogInterface.OnClickListener() {
 				           public void onClick(DialogInterface dialog, int id) {
+				        		
 				        		Intent intent=new Intent(OrderActivity.this,MainActivity.class);
 								startActivity(intent);
 				        	 
@@ -335,34 +342,41 @@ public class OrderActivity extends Activity {
 				
 				case 1:
 					mydialog.dismiss();
+					
 					new AlertDialog.Builder(OrderActivity.this).setTitle("提示").setMessage("菜谱有更新，请更新菜谱后再重新下单。").setNeutralButton("确定", null).show();
 				break;
 				case 2:
 					mydialog.dismiss();
+					
 					new AlertDialog.Builder(OrderActivity.this).setTitle("提示").setMessage("号台已被删除，请与餐厅负责人确认。").setNeutralButton("确定", null).show();
 				break;
 					
 				case 3:
 					mydialog.dismiss();
+					
 					new AlertDialog.Builder(OrderActivity.this).setTitle("提示").setMessage("号台已经下单，请与餐厅负责人确认。").setNeutralButton("确定", null).show();
 					
 				break;
 						
                 case 4:
                 	mydialog.dismiss();
+                	
 					new AlertDialog.Builder(OrderActivity.this).setTitle("提示").setMessage("号台下单打印未成功，请与餐厅负责人确认。").setNeutralButton("确定", null).show();
 				break;
                 case 5:
                 	mydialog.dismiss();
+                	
 					new AlertDialog.Builder(OrderActivity.this).setTitle("提示").setMessage("赠送的菜品已超出赠送额度，请与餐厅负责人确认。").setNeutralButton("确定", null).show();
 				break;
 				
                 case 6:
                 	mydialog.dismiss();
+                	
 					new AlertDialog.Builder(OrderActivity.this).setTitle("提示").setMessage("号台下单失败，请重新提交下单。").setNeutralButton("确定", null).show();
                 	break;
                 case 7:
                 	mydialog.dismiss();
+                	
 					new AlertDialog.Builder(OrderActivity.this).setTitle("提示").setMessage("连接服务器超时，请重新请求").setNeutralButton("确定", null).show();
                 	break;
                 case 8:
