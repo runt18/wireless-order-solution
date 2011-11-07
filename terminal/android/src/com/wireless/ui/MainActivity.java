@@ -620,7 +620,7 @@ public class MainActivity extends Activity {
 			ok.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					EditText table=(EditText)findViewById(R.id.mycount);
+					EditText table= (EditText)findViewById(R.id.mycount);
 					String tableID = table.getText().toString();
 					new QueryOrder2Task(Integer.parseInt(tableID)).execute();
 					table.setText("");
