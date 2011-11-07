@@ -57,8 +57,7 @@ public class StartupActivity extends Activity {
 		setContentView(R.layout.enter);
 		pb=(ProgressBar)findViewById(R.id.myprogressbar);
 		message=(TextView)findViewById(R.id.myTextView);
-		pb.setMax(100);  
-        pb.setProgress(0);  
+		
 
 	}
         
@@ -127,7 +126,7 @@ public class StartupActivity extends Activity {
 		 */
 		@Override
 		protected void onPreExecute(){
-			pb.setProgress(10);
+			
 			message.setText("正在下载菜谱...请稍候");
 			//_progDialog = ProgressDialog.show(EnterActivity.this, "", "正在下载菜谱...请稍候", true);
 		}
@@ -137,7 +136,7 @@ public class StartupActivity extends Activity {
 		 */
 		@Override
 		protected String doInBackground(Void... arg0) {
-			pb.setProgress(20);
+			
 			String errMsg = null;
 			try{
 				WirelessOrder.foodMenu = null;
@@ -158,7 +157,7 @@ public class StartupActivity extends Activity {
 			}catch(IOException e){
 				errMsg = e.getMessage();
 			}
-			pb.setProgress(30);
+			
 			return errMsg;
 		}
 		
@@ -205,7 +204,7 @@ public class StartupActivity extends Activity {
 		 */
 		@Override
 		protected void onPreExecute(){
-			pb.setProgress(60);
+			
 			message.setText("更新菜谱信息...请稍候");
 			//_progDialog = ProgressDialog.show(EnterActivity.this, "", "更新菜谱信息...请稍候", true);
 		}
@@ -215,7 +214,7 @@ public class StartupActivity extends Activity {
 		 */
 		@Override
 		protected String doInBackground(Void... arg0) {
-			pb.setProgress(70);
+		
 			String errMsg = null;
 			try{
 				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryRestaurant());
@@ -225,7 +224,7 @@ public class StartupActivity extends Activity {
 			}catch(IOException e){
 				errMsg = e.getMessage();
 			}
-			pb.setProgress(80);
+			
 			return errMsg;
 		}
 		
@@ -254,7 +253,7 @@ public class StartupActivity extends Activity {
 					}
 				}).show();
 			}else{
-				pb.setProgress(100);
+				
 				Intent intent=new Intent(StartupActivity.this,MainActivity.class);
 				startActivity(intent);
 				finish();
