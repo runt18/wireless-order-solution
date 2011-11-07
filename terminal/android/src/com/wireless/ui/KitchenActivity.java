@@ -33,15 +33,14 @@ public class KitchenActivity extends Activity {
 	private ImageView ketback;
 	private ArrayAdapter<String> _adapter;
 	List<String> kichens;
-	List<Food> _Foodes;
+	List<Food> Foodes;
 	short _kichencode;
 	private EditText searchpin;
 	private AppContext _appContext;
 	private TextView Spinner01;
 	RelativeLayout sp;
 	Kitchen ken;
-	boolean tag=false;
-	List<Food> seachfoods;;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -59,16 +58,14 @@ public class KitchenActivity extends Activity {
 		
 		searchpin.addTextChangedListener(watcher);
 		ketback = (ImageView) findViewById(R.id.ketback);
-		_Foodes=new ArrayList<Food>();
-		seachfoods=new ArrayList<Food>();
-		// 将可选内容与ArrayAdapter连接起来
-//		_adapter = new ArrayAdapter<String>(this, R.layout.spinner, getKichens());
-//		myspinner.setAdapter(_adapter);
-		adapter = new FoodAdapter(KitchenActivity.this, appcontext.getFoods());
+		Foodes=new ArrayList<Food>();
+		
+		Foodes=appcontext.getFoods();
+		
+		adapter = new FoodAdapter(KitchenActivity.this, Foodes);
 		myListView.setAdapter(adapter);
 		myListView.setOnItemClickListener(new item());
-		// 设置下拉列表的风格
-		//_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
 		ketback.setOnClickListener(new View.OnClickListener() {
 
 			@Override
@@ -82,7 +79,6 @@ public class KitchenActivity extends Activity {
 		 
 		 下拉框的点击事件,内部类实现功能
 		 * */
-		//myspinner.setOnItemSelectedListener(new spinnerListen());
 		
 		sp.setOnClickListener(new View.OnClickListener() {
 			
@@ -90,7 +86,6 @@ public class KitchenActivity extends Activity {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				searchpin.setText("");
-				
 				//大厨房
 				List<SKitchen> skitchen=Arrays.asList(appcontext.getFoodMenu().sKitchens);
 				//小厨房
@@ -101,11 +96,15 @@ public class KitchenActivity extends Activity {
 					for(int j=0;j<kitchens.size();j++){
 					  if(kitchens.get(j).skitchen_id==skitchen.get(i).alias_id){
 						  kitchenes.add(kitchens.get(j));
-						  
 					  }
 					}
 					 kes.add(kitchenes);
 				}
+			   for(int j=0;j<kes.size();j++){
+				  if(kes.get(j).get(0)==null){
+					  kes.remove(kes.get(j));
+				  }
+			   }	
 			 Common.getCommon().showkichent(KitchenActivity.this, skitchen, kes);
 			}
 		});
@@ -121,21 +120,15 @@ public class KitchenActivity extends Activity {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position,
 				long id) {	
-	        if(tag){
-	        	Common.getCommon().getorderFoods(KitchenActivity.this, _Foodes,position);
-
-	        }else{
-	         	Common.getCommon().getorderFoods(KitchenActivity.this, appcontext.getFoods(),position);
-
-	        }  
-			
+	       
+	        	Common.getCommon().getorderFoods(KitchenActivity.this, Foodes,position);
 			
 		  }
 			
 		}
 	// 输入框实时监听
 	private TextWatcher watcher = new TextWatcher() {
-
+		List<Food> _SeachFoods;
 		@Override
 		public void afterTextChanged(Editable s) {
 			// TODO Auto-generated method stub
@@ -151,43 +144,24 @@ public class KitchenActivity extends Activity {
 
 		@Override
 		public void onTextChanged(CharSequence s, int start, int before,
-				int count) {
-					if(tag){
-						seachfoods=_Foodes;
-						_Foodes.clear();
-						for (int i = 0; i <seachfoods.size(); i++) {
-							if (String.valueOf(seachfoods.get(i).alias_id).startsWith(s.toString().trim())) {
-								_Foodes.add(seachfoods.get(i));
-							}
-						}
-						adapter = new FoodAdapter(KitchenActivity.this, _Foodes);
+				int count) {	
+		            _SeachFoods=new ArrayList<Food>();
+					if(s.toString().trim().equals("")){
+						adapter = new FoodAdapter(KitchenActivity.this, Foodes);
 						myListView.setAdapter(adapter);
-						
-						
-						
 					}else{
-						if(s.toString().trim().equals("")){
-							_Foodes.clear();
-							_Foodes=appcontext.getFoods();
-							adapter = new FoodAdapter(KitchenActivity.this, _Foodes);
-							myListView.setAdapter(adapter);
-						}else{
-							seachfoods=_Foodes;
-							_Foodes.clear();
-						for (int i = 0; i < seachfoods.size(); i++) {
-							if (String.valueOf(seachfoods.get(i).alias_id).startsWith(s.toString().trim())) {
-								_Foodes.add(seachfoods.get(i));
-							}
-						}
-						adapter = new FoodAdapter(KitchenActivity.this, _Foodes);
-						myListView.setAdapter(adapter);
+						_SeachFoods=Foodes;
+						Foodes.clear();
+					for (int i = 0; i < _SeachFoods.size(); i++) {
+						if (String.valueOf(_SeachFoods.get(i).alias_id).startsWith(s.toString().trim())) {
+							Foodes.add(_SeachFoods.get(i));
 						}
 					}
-					
-				
-			
-
-		}
+					adapter = new FoodAdapter(KitchenActivity.this, Foodes);
+					myListView.setAdapter(adapter);
+					}
+				}
+	
 
 	};
 	
@@ -195,18 +169,17 @@ public class KitchenActivity extends Activity {
 	 * 根据选择厨房进行判断
 	 * */
 	public  void getslect(Kitchen k){
-		this.ken=k;
-		_Foodes.clear();
+		Foodes.clear();
 		if(k!=null){
 			Spinner01.setText(k.name);
 			for(int i=0;i<appcontext.getFoods().size();i++){
 				if(appcontext.getFoods().get(i).kitchen==k.alias_id){
-					_Foodes.add(appcontext.getFoods().get(i));
+					Foodes.add(appcontext.getFoods().get(i));
 				}
 			}
-			adapter = new FoodAdapter(KitchenActivity.this, _Foodes);
+			adapter = new FoodAdapter(KitchenActivity.this, Foodes);
 			myListView.setAdapter(adapter);
-			tag=true;
+			
 		}
 		
 		
