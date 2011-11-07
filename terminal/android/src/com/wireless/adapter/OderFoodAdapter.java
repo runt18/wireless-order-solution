@@ -11,6 +11,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.wireless.common.Common;
 import com.wireless.protocol.Food;
 import com.wireless.ui.R;
 import com.wireless.ui.OrderActivity;
@@ -28,8 +29,9 @@ public class OderFoodAdapter extends BaseAdapter {
 	
 	@Override
 	public int getCount() {
-		
+	
 		return foods.size();
+	
 	}
 
 	@Override
