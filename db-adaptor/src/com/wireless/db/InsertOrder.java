@@ -177,9 +177,10 @@ public class InsertOrder {
 						
 					//insert the record to table "order_food"
 					sql = "INSERT INTO `" + Params.dbName + "`.`order_food` (" +
-							"`order_id`, `food_id`, `order_count`, `unit_price`, `name`, " +
+							"`restaurant_id`, `order_id`, `food_id`, `order_count`, `unit_price`, `name`, " +
 							"`food_status`, `hang_status`, `discount`, `taste`, `taste_price`, " +
 							"`taste_id`, `taste_id2`, `taste_id3`, `kitchen`, `waiter`, `order_date`, `is_temporary`) VALUES (" +	
+							term.restaurant_id + ", " +
 							orderToInsert.id + ", " + 
 							orderToInsert.foods[i].alias_id + ", " + 
 							orderToInsert.foods[i].getCount() + ", " + 

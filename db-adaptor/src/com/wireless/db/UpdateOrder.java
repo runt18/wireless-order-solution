@@ -311,9 +311,10 @@ public class UpdateOrder {
 			}
 			
 			sql = "INSERT INTO `" + Params.dbName + "`.`order_food` " +
-					"(`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, `hang_status`, " +
+					"(`restaurant_id`, `order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, `hang_status`, " +
 					"`discount`, `taste_id`, `taste_id2`, `taste_id3`, `taste_price`, " +
 					"`taste`, `kitchen`, `waiter`, `order_date`, `is_temporary`) VALUES (" +
+					term.restaurant_id + ", " +
 					orderToUpdate.id + ", " + extraFoods.get(i).alias_id + ", " + 
 					extraFoods.get(i).getCount() + ", " + 
 					extraFoods.get(i).getPrice() + ", '" + 
@@ -343,9 +344,10 @@ public class UpdateOrder {
 			}
 			
 			sql = "INSERT INTO `" + Params.dbName + "`.`order_food` " +
-					"(`order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, `hang_status`, " +
+					"(`restaurant_id`, `order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, `hang_status`, " +
 					"`discount`, `taste_id`, `taste_id2`, `taste_id3`, `taste_price`, `taste`, `kitchen`, " +
 					"`waiter`, `order_date`, `is_temporary`) VALUES (" +
+					term.restaurant_id + ", " +
 					orderToUpdate.id + ", " + canceledFoods.get(i).alias_id + ", " + 
 					"-" + canceledFoods.get(i).getCount() + ", " + 
 					canceledFoods.get(i).getPrice() + ", '" + 
