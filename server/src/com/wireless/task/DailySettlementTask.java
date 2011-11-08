@@ -84,7 +84,7 @@ public class DailySettlementTask extends SchedulerTask{
 									"`waiter`, `type`, `discount_type`,`category`, `member_id`, `member`,`terminal_pin`, `terminal_model`, `table_id`, " +
 									"`table_name`, `table2_id`, `table2_name`, `service_rate`, `comment`";
 			
-			final String orderFoodItem = "`id`,`order_id`, `food_id`, `order_date`, `order_count`," + 
+			final String orderFoodItem = "`id`,`restaurant_id`, `order_id`, `food_id`, `order_date`, `order_count`," + 
 										"`unit_price`,`name`, `food_status`, `taste`,`taste_price`," +
 										"`taste_id`,`taste_id2`,`taste_id3`,`discount`,`kitchen`," +
 										"`comment`,`waiter`,`is_temporary`";
