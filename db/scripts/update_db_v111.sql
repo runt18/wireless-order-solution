@@ -92,3 +92,25 @@ ALTER TABLE `wireless_order_db`.`kitchen` CHANGE COLUMN `super_kitchen` `dept_id
 -- -----------------------------------------------------
 INSERT INTO wireless_order_db.department(restaurant_id, dept_id, name)
 SELECT id, 0, "仓管部" FROM wireless_order_db.restaurant WHERE id > 10;
+
+-- -----------------------------------------------------
+-- Add a 'restaurant_id' to table 'order_food'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_food` ADD COLUMN `restaurant_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the restaurant id to this order detail'  AFTER `order_id` ;
+
+-- -----------------------------------------------------
+-- Insert restaurant id to each order food record
+-- -----------------------------------------------------
+UPDATE wireless_order_db.order_food A SET restaurant_id=(
+SELECT restaurant_id FROM wireless_order_db.order B WHERE A.order_id=B.id);
+
+-- -----------------------------------------------------
+-- Add a 'restaurant_id' to table 'order_food_history'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_food_history` ADD COLUMN `restaurant_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the restaurant id to this order detail'  AFTER `order_id` ;
+
+-- -----------------------------------------------------
+-- Insert restaurant id to each order food history record
+-- -----------------------------------------------------
+UPDATE wireless_order_db.order_food_history A SET restaurant_id=(
+SELECT restaurant_id FROM wireless_order_db.order_history B WHERE A.order_id=B.id);

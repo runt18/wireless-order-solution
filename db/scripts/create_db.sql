@@ -2,7 +2,6 @@
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 
-DROP SCHEMA IF EXISTS `wireless_order_db` ;
 CREATE SCHEMA IF NOT EXISTS `wireless_order_db` DEFAULT CHARACTER SET utf8 ;
 USE `wireless_order_db` ;
 
@@ -108,6 +107,7 @@ DROP TABLE IF EXISTS `wireless_order_db`.`order_food` ;
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food` (
   `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this order detail record' ,
   `order_id` INT UNSIGNED NOT NULL COMMENT 'external key associated with the order table' ,
+  `restaurant_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the restaurant id to this order detail' ,
   `food_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the alias id to this food' ,
   `order_date` DATETIME NOT NULL DEFAULT 19000101 ,
   `order_count` DECIMAL(5,2) NOT NULL DEFAULT 0 COMMENT 'the count that the waiter ordered. the count can be positive or negative.' ,
@@ -395,6 +395,7 @@ DROP TABLE IF EXISTS `wireless_order_db`.`order_food_history` ;
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food_history` (
   `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this order detail record' ,
   `order_id` INT UNSIGNED NOT NULL ,
+  `restaurant_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the restaurant id to this order history detail' ,
   `food_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the alias id to this food' ,
   `order_count` DECIMAL(5,2) NOT NULL DEFAULT 0 COMMENT 'the count that the waiter ordered. the count can be positive or negative.' ,
   `order_date` DATETIME NOT NULL DEFAULT 19000101 ,
@@ -650,12 +651,6 @@ DEFAULT CHARACTER SET = utf8;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
-
-
-
-
-
 
 
 -- -----------------------------------------------------
