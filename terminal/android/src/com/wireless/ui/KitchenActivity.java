@@ -100,11 +100,11 @@ public class KitchenActivity extends Activity {
 					}
 					 kes.add(kitchenes);
 				}
-			   for(int j=0;j<kes.size();j++){
-				  if(kes.get(j).get(0)==null){
-					  kes.remove(kes.get(j));
-				  }
-			   }	
+//			   for(int j=0;j<kes.size();j++){
+//				  if(kes.get(j).get(0)==null){
+//					  kes.remove(kes.get(j));
+//				  }
+//			   }	
 			 Common.getCommon().showkichent(KitchenActivity.this, skitchen, kes);
 			}
 		});

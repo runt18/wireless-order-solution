@@ -121,7 +121,7 @@ public class OrderActivity extends Activity {
 	 * */
 		
 	public void account(){
-		if(Common.getCommon().getFoodlist().size()==0){
+		if(Common.getCommon().getFoodlist().size()!=0){
 			buttomrelativelayout.setVisibility(View.VISIBLE);
 			float account=0;
 			for(int i=0;i<Common.getCommon().getFoodlist().size();i++){

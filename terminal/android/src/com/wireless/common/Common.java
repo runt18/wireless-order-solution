@@ -521,7 +521,7 @@ public void setKient(KitchenActivity kient) {
 		
 		ExpandlistAdapter adapter=new ExpandlistAdapter(context,perant,child);
 		mylistview.setAdapter(adapter);
-		mylistview.setGroupIndicator(context.getResources().getDrawable( R.layout.expander_ic_folder));
+		mylistview.setGroupIndicator(context.getResources().getDrawable( R.layout.expander_folder));
 		
 		mylistview.setOnChildClickListener(new OnChildClickListener() {
 			

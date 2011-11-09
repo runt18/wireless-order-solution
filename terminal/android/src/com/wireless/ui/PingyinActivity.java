@@ -43,8 +43,10 @@ public class PingyinActivity extends Activity {
 
 		foodes = new ArrayList<Food>();
 		foodes=appcontext.getFoods();
+		
 		adapter = new FoodAdapter(PingyinActivity.this, foodes);
 		myListView.setAdapter(adapter);
+		
 		pinback = (ImageView) findViewById(R.id.pinback);
 		myListView.setOnItemClickListener(new item());
 		InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
@@ -102,14 +104,13 @@ public class PingyinActivity extends Activity {
 			} else {
 				foodes.clear();
 				for (int i = 0; i < appcontext.getFoods().size(); i++) {
-				
 					if (appcontext.getFoods().get(i).pinyin.contains(s.toString().trim())) {		
 						foodes.add(appcontext.getFoods().get(i));
 					}
 				}
 				adapter = new FoodAdapter(PingyinActivity.this, foodes);
 				myListView.setAdapter(adapter);
-				Log.e("", foodes.size() + "");
+				
 			}
 
 		}

@@ -82,7 +82,7 @@ public class DropActivity extends Activity {
 	
 		
 		mydropListView=(ExpandableListView)findViewById(R.id.mydropListView);
-		mydropListView.setGroupIndicator(DropActivity.this.getResources().getDrawable(R.layout.expander_ic_folder));
+		mydropListView.setGroupIndicator(DropActivity.this.getResources().getDrawable(R.layout.expander_folder));
 		if(Common.getCommon().isNetworkAvailable(DropActivity.this)){
 			reqestoderfood();
 		}else{
