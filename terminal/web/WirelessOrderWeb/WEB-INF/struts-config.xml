@@ -85,6 +85,9 @@
 		<action path="/QuerySupplierMgr"
 			type="com.wireless.Actions.supplierMgr.QuerySupplierMgrAction" scope="request">
 		</action>
+		<action path="/DeleteSupplier"
+			type="com.wireless.Actions.supplierMgr.DeleteSupplierAction" scope="request">
+		</action>
 
 
 	</action-mappings>

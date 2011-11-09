@@ -109,7 +109,7 @@ public class QuerySupplierMgrAction extends Action {
 					Terminal.MODEL_STAFF);
 
 			String sql = " SELECT supplier_id, name, tele, contact, addr "
-					+ " FROM wireless_order_db.supplier "
+					+ " FROM " + Params.dbName + ".supplier "
 					+ " WHERE restaurant_id = " + term.restaurant_id
 					+ filterCondition;
 

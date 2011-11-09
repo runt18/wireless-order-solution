@@ -2,8 +2,8 @@
 supplierAddWin = new Ext.Window({
 	layout : "fit",
 	title : "添加供应商",
-	width : 315,
-	height : 235,
+	width : 250,
+	height : 190,
 	closeAction : "hide",
 	resizable : false,
 	items : [ {
@@ -17,25 +17,25 @@ supplierAddWin = new Ext.Window({
 			fieldLabel : "编号",
 			id : "supplierAddNumber",
 			allowBlank : false,
-			width : 220
+			width : 180
 		}, {
 			xtype : "textfield",
 			fieldLabel : "名称",
 			id : "supplierAddName",
 			allowBlank : false,
-			width : 220
+			width : 180
 		}, {
 			xtype : "textfield",
 			fieldLabel : "电话",
 			id : "supplierAddPhone",
 			allowBlank : false,
-			width : 220
+			width : 180
 		}, {
 			xtype : "numberfield",
 			fieldLabel : "地址",
 			id : "supplierAddAddress",
 			allowBlank : false,
-			width : 220
+			width : 180
 		} ]
 	} ],
 	buttons : [ {
@@ -301,15 +301,14 @@ var supplierQueryCondPanel = new Ext.form.FormPanel({
 				text : "搜索",
 				width : 100,
 				listeners : {
-
-				// "click" : function(thiz, e) {
-				// menuStore.reload({
-				// params : {
-				// start : 0,
-				// limit : dishesPageRecordCount
-				// }
-				// });
-				// }
+					"click" : function(thiz, e) {
+						supplierStore.reload({
+							params : {
+								start : 0,
+								limit : supplierPageRecordCount
+							}
+						});
+					}
 				}
 			} ]
 		} ]
@@ -323,45 +322,46 @@ function supplierDeleteHandler(rowIndex) {
 		width : 300,
 		buttons : Ext.MessageBox.YESNO,
 		fn : function(btn) {
-			// if (btn == "yes") {
-			// var dishNumber = menuStore.getAt(rowIndex).get("dishNumber");
-			//
-			// Ext.Ajax.request({
-			// url : "../../DeleteMenu.do",
-			// params : {
-			// "pin" : pin,
-			// "dishNumber" : dishNumber
-			// },
-			// success : function(response, options) {
-			// var resultJSON = Ext.util.JSON
-			// .decode(response.responseText);
-			// if (resultJSON.success == true) {
-			// menuStore.reload({
-			// params : {
-			// start : 0,
-			// limit : dishesPageRecordCount
-			// }
-			// });
-			//
-			// var dataInfo = resultJSON.data;
-			// Ext.MessageBox.show({
-			// msg : dataInfo,
-			// width : 300,
-			// buttons : Ext.MessageBox.OK
-			// });
-			// } else {
-			// var dataInfo = resultJSON.data;
-			// Ext.MessageBox.show({
-			// msg : dataInfo,
-			// width : 300,
-			// buttons : Ext.MessageBox.OK
-			// });
-			// }
-			// },
-			// failure : function(response, options) {
-			// }
-			// });
-			// }
+			if (btn == "yes") {
+				var supplierID = supplierStore.getAt(rowIndex)
+						.get("supplierID");
+
+				Ext.Ajax.request({
+					url : "../../DeleteSupplier.do",
+					params : {
+						"pin" : pin,
+						"supplierID" : dishNumber
+					},
+					success : function(response, options) {
+						var resultJSON = Ext.util.JSON
+								.decode(response.responseText);
+						if (resultJSON.success == true) {
+							supplierStore.reload({
+								params : {
+									start : 0,
+									limit : supplierPageRecordCount
+								}
+							});
+
+							var dataInfo = resultJSON.data;
+							Ext.MessageBox.show({
+								msg : dataInfo,
+								width : 300,
+								buttons : Ext.MessageBox.OK
+							});
+						} else {
+							var dataInfo = resultJSON.data;
+							Ext.MessageBox.show({
+								msg : dataInfo,
+								width : 300,
+								buttons : Ext.MessageBox.OK
+							});
+						}
+					},
+					failure : function(response, options) {
+					}
+				});
+			}
 		}
 	});
 };
