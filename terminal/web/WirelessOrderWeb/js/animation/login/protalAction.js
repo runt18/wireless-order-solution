@@ -56,7 +56,7 @@
 	$("#menu").each(function() {
 		$(this).bind("click", function() {	
 			if (currPin != "" && !isPrompt) {
-				location.href = "BasicManagement_Module/MenuManagement.html?pin="
+				location.href = "BasicManagement_Module/MenuProtal.html?pin="
 						+ currPin + "&restaurantID="
 						+ restaurantID;
 			}

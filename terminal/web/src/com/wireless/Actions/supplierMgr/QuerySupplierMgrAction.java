@@ -56,6 +56,8 @@ public class QuerySupplierMgrAction extends Action {
 		HashMap rootMap = new HashMap();
 
 		boolean isError = false;
+		// 是否分頁
+		String isPaging = request.getParameter("isPaging");
 
 		try {
 			// 解决后台中文传到前台乱码
@@ -163,13 +165,18 @@ public class QuerySupplierMgrAction extends Action {
 			if (isError) {
 				rootMap.put("root", resultList);
 			} else {
-
-				// 分页
-				for (int i = index; i < pageSize + index; i++) {
-					try {
+				if (isPaging.equals("true")) {
+					// 分页
+					for (int i = index; i < pageSize + index; i++) {
+						try {
+							outputList.add(resultList.get(i));
+						} catch (Exception e) {
+							// 最后一页可能不足一页，会报错，忽略
+						}
+					}
+				} else {
+					for (int i = 0; i < resultList.size(); i++) {
 						outputList.add(resultList.get(i));
-					} catch (Exception e) {
-						// 最后一页可能不足一页，会报错，忽略
 					}
 				}
 				rootMap.put("root", outputList);

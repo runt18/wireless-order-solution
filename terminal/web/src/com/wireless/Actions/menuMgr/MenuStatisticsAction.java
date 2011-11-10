@@ -88,7 +88,9 @@ public class MenuStatisticsAction extends Action {
 					+ " FROM "
 					+ Params.dbName
 					+ ".order_food_history "
-					+ " WHERE 1=1 ";
+					+ " WHERE 1=1 AND restaurant_id = "
+					+ term.restaurant_id
+					+ " ";
 			if (!dateBegin.equals("")) {
 				sql = sql + " AND order_date >= '" + dateBegin + "' ";
 			}
@@ -120,8 +122,8 @@ public class MenuStatisticsAction extends Action {
 				resultMap.put("message", "normal");
 
 				resultList.add(resultMap);
-				
-				totalPrice  = totalPrice + dbCon.rs.getFloat("totalPrice");
+
+				totalPrice = totalPrice + dbCon.rs.getFloat("totalPrice");
 			}
 			dbCon.rs.close();
 
@@ -167,7 +169,7 @@ public class MenuStatisticsAction extends Action {
 						// 最后一页可能不足一页，会报错，忽略
 					}
 				}
-				DecimalFormat fnum = new DecimalFormat("##0.00");  
+				DecimalFormat fnum = new DecimalFormat("##0.00");
 				String totalPriceDiaplay = fnum.format(totalPrice);
 				HashMap resultMap = new HashMap();
 				resultMap.put("dishCount", "汇总");

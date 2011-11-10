@@ -2,14 +2,14 @@
 supplierAddWin = new Ext.Window({
 	layout : "fit",
 	title : "添加供应商",
-	width : 250,
-	height : 190,
+	width : 260,
+	height : 210,
 	closeAction : "hide",
 	resizable : false,
 	items : [ {
 		layout : "form",
 		id : "supplierAddForm",
-		labelWidth : 30,
+		labelWidth : 40,
 		border : false,
 		frame : true,
 		items : [ {
@@ -31,137 +31,134 @@ supplierAddWin = new Ext.Window({
 			allowBlank : false,
 			width : 180
 		}, {
-			xtype : "numberfield",
+			xtype : "textfield",
+			fieldLabel : "联系人",
+			id : "supplierAddContact",
+			allowBlank : false,
+			width : 180
+		}, {
+			xtype : "textfield",
 			fieldLabel : "地址",
 			id : "supplierAddAddress",
 			allowBlank : false,
 			width : 180
 		} ]
 	} ],
-	buttons : [ {
-		text : "确定",
-		handler : function() {
+	buttons : [
+			{
+				text : "确定",
+				handler : function() {
 
-			// if (menuAddWin.findById("menuAddNumber").isValid()
-			// && menuAddWin.findById("menuAddName").isValid()
-			// && menuAddWin.findById("menuAddSpill").isValid()
-			// && menuAddWin.findById("menuAddPrice").isValid()) {
-			//
-			// var dishNumber = menuAddWin.findById("menuAddNumber")
-			// .getValue();
-			// var dishName = menuAddWin.findById("menuAddName")
-			// .getValue();
-			// var dishSpill = menuAddWin.findById("menuAddSpill")
-			// .getValue();
-			// var dishPrice = menuAddWin.findById("menuAddPrice")
-			// .getValue();
-			// var kitchen = kitchenTypeCombMA.getValue();
-			// // 前台：kitchenTypeData：[厨房编号,厨房名称]
-			// for ( var i = 0; i < kitchenTypeData.length; i++) {
-			// if (kitchen == kitchenTypeData[i][1]) {
-			// kitchen = kitchenTypeData[i][0];
-			// }
-			// }
-			// var isSpecial = menuAddWin
-			// .findById("specialCheckboxMA").getValue();
-			// var isRecommend = menuAddWin.findById(
-			// "recommendCheckboxMA").getValue();
-			// var isFree = menuAddWin.findById("freeCheckboxMA")
-			// .getValue();
-			// var isStop = menuAddWin.findById("stopCheckboxMA")
-			// .getValue();
-			//
-			// var isDuplicate = false;
-			// for ( var i = 0; i < dishMultSelectData.length; i++) {
-			// if (dishNumber == dishMultSelectData[i][0]) {
-			// isDuplicate = true;
-			// }
-			// }
-			//
-			// if (!isDuplicate) {
-			// menuAddWin.hide();
-			//
-			// Ext.Ajax.request({
-			// url : "../../InsertMenu.do",
-			// params : {
-			// "pin" : Request["pin"],
-			// "dishNumber" : dishNumber,
-			// "dishName" : dishName,
-			// "dishSpill" : dishSpill,
-			// "dishPrice" : dishPrice,
-			// "kitchen" : kitchen,
-			// "isSpecial" : isSpecial,
-			// "isRecommend" : isRecommend,
-			// "isFree" : isFree,
-			// "isStop" : isStop
-			// },
-			// success : function(response, options) {
-			// var resultJSON = Ext.util.JSON
-			// .decode(response.responseText);
-			// if (resultJSON.success == true) {
-			// menuStore.reload({
-			// params : {
-			// start : 0,
-			// limit : dishesPageRecordCount
-			// }
-			// });
-			//
-			// var dataInfo = resultJSON.data;
-			// Ext.MessageBox.show({
-			// msg : dataInfo,
-			// width : 300,
-			// buttons : Ext.MessageBox.OK
-			// });
-			// } else {
-			// var dataInfo = resultJSON.data;
-			// Ext.MessageBox.show({
-			// msg : dataInfo,
-			// width : 300,
-			// buttons : Ext.MessageBox.OK
-			// });
-			// }
-			// },
-			// failure : function(response, options) {
-			// }
-			// });
-			// } else {
-			// Ext.MessageBox.show({
-			// msg : "该菜品编号已存在！",
-			// width : 300,
-			// buttons : Ext.MessageBox.OK
-			// });
-			// }
-			//
-			// }
+					if (supplierAddWin.findById("supplierAddNumber").isValid()
+							&& supplierAddWin.findById("supplierAddName")
+									.isValid()
+							&& supplierAddWin.findById("supplierAddPhone")
+									.isValid()
+							&& supplierAddWin.findById("supplierAddContact")
+									.isValid()
+							&& supplierAddWin.findById("supplierAddAddress")
+									.isValid()) {
 
-		}
-	}, {
-		text : "取消",
-		handler : function() {
-			supplierAddWin.hide();
-		}
-	} ],
+						var supplierAddNumber = supplierAddWin.findById(
+								"supplierAddNumber").getValue();
+						var supplierAddName = supplierAddWin.findById(
+								"supplierAddName").getValue();
+						var supplierAddPhone = supplierAddWin.findById(
+								"supplierAddPhone").getValue();
+						var supplierAddContact = supplierAddWin.findById(
+								"supplierAddContact").getValue();
+						var supplierAddAddress = supplierAddWin.findById(
+								"supplierAddAddress").getValue();
+
+						var isDuplicate = false;
+						for ( var i = 0; i < supplierData.length; i++) {
+							if (supplierAddNumber == supplierData[i][0]) {
+								isDuplicate = true;
+							}
+						}
+
+						if (!isDuplicate) {
+							supplierAddWin.hide();
+
+							Ext.Ajax.request({
+								url : "../../InsertSupplier.do",
+								params : {
+									"pin" : pin,
+									"supplierID" : supplierAddNumber,
+									"supplierName" : supplierAddName,
+									"supplierAddress" : supplierAddAddress,
+									"supplierContact" : supplierAddContact,
+									"supplierPhone" : supplierAddPhone
+								},
+								success : function(response, options) {
+									var resultJSON = Ext.util.JSON
+											.decode(response.responseText);
+									if (resultJSON.success == true) {
+										supplierStore.reload({
+											params : {
+												start : 0,
+												limit : supplierPageRecordCount
+											}
+										});
+
+										var dataInfo = resultJSON.data;
+										Ext.MessageBox.show({
+											msg : dataInfo,
+											width : 300,
+											buttons : Ext.MessageBox.OK
+										});
+									} else {
+										var dataInfo = resultJSON.data;
+										Ext.MessageBox.show({
+											msg : dataInfo,
+											width : 300,
+											buttons : Ext.MessageBox.OK
+										});
+									}
+								},
+								failure : function(response, options) {
+								}
+							});
+						} else {
+							Ext.MessageBox.show({
+								msg : "该供应商编号已存在！",
+								width : 300,
+								buttons : Ext.MessageBox.OK
+							});
+						}
+
+					}
+
+				}
+			}, {
+				text : "取消",
+				handler : function() {
+					supplierAddWin.hide();
+				}
+			} ],
 	listeners : {
 		"show" : function(thiz) {
-			// kitchenTypeCombMA.setValue(kitchenTypeData[0][1]);
-			// kitchenTypeStoreMA.reload();
-			//
-			// menuAddWin.findById("menuAddNumber").setValue("");
-			// menuAddWin.findById("menuAddNumber").clearInvalid();
-			//
-			// menuAddWin.findById("menuAddName").setValue("");
-			// menuAddWin.findById("menuAddName").clearInvalid();
-			//
-			// menuAddWin.findById("menuAddSpill").setValue("");
-			// menuAddWin.findById("menuAddSpill").clearInvalid();
-			//
-			// menuAddWin.findById("menuAddPrice").setValue("");
-			// menuAddWin.findById("menuAddPrice").clearInvalid();
-			//
-			// menuAddWin.findById("specialCheckboxMA").setValue(false);
-			// menuAddWin.findById("recommendCheckboxMA").setValue(false);
-			// menuAddWin.findById("freeCheckboxMA").setValue(false);
-			// menuAddWin.findById("stopCheckboxMA").setValue(false);
+
+			loadAllsupplier();
+
+			supplierAddWin.findById("supplierAddNumber").setValue("");
+			supplierAddWin.findById("supplierAddNumber").clearInvalid();
+
+			supplierAddWin.findById("supplierAddName").setValue("");
+			supplierAddWin.findById("supplierAddName").clearInvalid();
+
+			supplierAddWin.findById("supplierAddPhone").setValue("");
+			supplierAddWin.findById("supplierAddPhone").clearInvalid();
+
+			supplierAddWin.findById("supplierAddContact").setValue("");
+			supplierAddWin.findById("supplierAddContact").clearInvalid();
+
+			supplierAddWin.findById("supplierAddAddress").setValue("");
+			supplierAddWin.findById("supplierAddAddress").clearInvalid();
+
+			var f = Ext.get("supplierAddNumber");
+			f.focus.defer(100, f); // 为什么这样才可以！？！？
+
 		}
 	}
 });
@@ -330,7 +327,7 @@ function supplierDeleteHandler(rowIndex) {
 					url : "../../DeleteSupplier.do",
 					params : {
 						"pin" : pin,
-						"supplierID" : dishNumber
+						"supplierID" : supplierID
 					},
 					success : function(response, options) {
 						var resultJSON = Ext.util.JSON
@@ -458,53 +455,147 @@ Ext
 			Ext.QuickTips.init();
 
 			// ---------------------表格--------------------------
-			supplierGrid = new Ext.grid.EditorGridPanel({
-				title : "供应商",
-				xtype : "grid",
-				anchor : "99%",
-				region : "center",
-				frame : true,
-				margins : '0 5 0 0',
-				ds : supplierStore,
-				cm : supplierColumnModel,
-				sm : new Ext.grid.RowSelectionModel({
-					singleSelect : true
-				}),
-				viewConfig : {
-					forceFit : true
-				},
-				listeners : {
-					rowclick : function(thiz, rowIndex, e) {
-						currRowIndex = rowIndex;
-					}
-				},
-				tbar : [ {
-					text : '保存修改',
-					tooltip : '保存修改',
-					iconCls : 'add'
-				} ],
-				bbar : new Ext.PagingToolbar({
-					pageSize : supplierPageRecordCount,
-					store : supplierStore,
-					displayInfo : true,
-					displayMsg : '显示第 {0} 条到 {1} 条记录，共 {2} 条',
-					emptyMsg : "没有记录"
-				}),
-				autoScroll : true,
-				loadMask : {
-					msg : "数据加载中，请稍等..."
-				},
-				listeners : {
-					"render" : function(thiz) {
-						supplierStore.reload({
-							params : {
-								start : 0,
-								limit : supplierPageRecordCount
+			supplierGrid = new Ext.grid.EditorGridPanel(
+					{
+						title : "供应商",
+						xtype : "grid",
+						anchor : "99%",
+						region : "center",
+						frame : true,
+						margins : '0 5 0 0',
+						ds : supplierStore,
+						cm : supplierColumnModel,
+						sm : new Ext.grid.RowSelectionModel({
+							singleSelect : true
+						}),
+						viewConfig : {
+							forceFit : true
+						},
+						listeners : {
+							rowclick : function(thiz, rowIndex, e) {
+								currRowIndex = rowIndex;
 							}
-						});
-					}
-				}
-			});
+						},
+						tbar : [ {
+							text : '保存修改',
+							tooltip : '保存修改',
+							iconCls : 'save',
+							handler : function() {
+								// 修改記錄格式:id field_separator name field_separator phone field_separator contact field_separator address record_separator id field_separator name field_separator phone field_separator contact field_separator address
+								var modfiedArr = [];
+								supplierGrid
+										.getStore()
+										.each(
+												function(record) {
+													if (record
+															.isModified("supplierName") == true
+															|| record
+																	.isModified("supplierPhone") == true
+															|| record
+																	.isModified("supplierContact") == true
+															|| record
+																	.isModified("supplierAddress") == true) {
+														modfiedArr
+																.push(record
+																		.get("supplierID")
+																		+ " field_separator "
+																		+ record
+																				.get("supplierName")
+																		+ " field_separator "
+																		+ record
+																				.get("supplierPhone")
+																		+ " field_separator "
+																		+ record
+																				.get("supplierContact")
+																		+ " field_separator "
+																		+ record
+																				.get("supplierAddress"));
+													}
+												});
+
+								if (modfiedArr.length != 0) {
+									// 獲取分頁表格的當前頁碼！神技！！！
+									var toolbar = supplierGrid
+											.getBottomToolbar();
+									currPageIndex = toolbar.readPage(toolbar
+											.getPageData());
+
+									var modSuppliers = "";
+									for ( var i = 0; i < modfiedArr.length; i++) {
+										modSuppliers = modSuppliers
+												+ modfiedArr[i]
+												+ " record_separator ";
+									}
+									modSuppliers = modSuppliers.substring(0,
+											modSuppliers.length - 18);
+
+									Ext.Ajax
+											.request({
+												url : "../../UpdateSupplier.do",
+												params : {
+													"pin" : pin,
+													"modSuppliers" : modSuppliers
+												},
+												success : function(response,
+														options) {
+													var resultJSON = Ext.util.JSON
+															.decode(response.responseText);
+													if (resultJSON.success == true) {
+														supplierStore
+																.reload({
+																	params : {
+																		start : (currPageIndex - 1)
+																				* supplierPageRecordCount,
+																		limit : supplierPageRecordCount
+																	}
+																});
+
+														var dataInfo = resultJSON.data;
+														Ext.MessageBox
+																.show({
+																	msg : dataInfo,
+																	width : 300,
+																	buttons : Ext.MessageBox.OK
+																});
+													} else {
+														var dataInfo = resultJSON.data;
+														Ext.MessageBox
+																.show({
+																	msg : dataInfo,
+																	width : 300,
+																	buttons : Ext.MessageBox.OK
+																});
+													}
+												},
+												failure : function(response,
+														options) {
+												}
+											});
+								}
+							}
+						} ],
+						bbar : new Ext.PagingToolbar({
+							pageSize : supplierPageRecordCount,
+							store : supplierStore,
+							displayInfo : true,
+							displayMsg : '显示第 {0} 条到 {1} 条记录，共 {2} 条',
+							emptyMsg : "没有记录"
+						}),
+						autoScroll : true,
+						loadMask : {
+							msg : "数据加载中，请稍等..."
+						},
+						listeners : {
+							"render" : function(thiz) {
+								supplierStore.reload({
+									params : {
+										start : 0,
+										limit : supplierPageRecordCount
+									}
+								});
+							}
+						}
+					});
 
 			// 为store配置beforeload监听器
 			supplierGrid.getStore()
@@ -531,7 +622,8 @@ Ext
 								this.baseParams = {
 									"pin" : pin,
 									"type" : queryTpye,
-									"value" : queryValue
+									"value" : queryValue,
+									"isPaging" : true
 								};
 
 							});

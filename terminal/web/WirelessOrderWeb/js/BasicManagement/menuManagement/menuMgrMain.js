@@ -611,6 +611,8 @@ menuAddWin = new Ext.Window({
 			} ],
 	listeners : {
 		"show" : function(thiz) {
+			loadAllDishes();
+
 			kitchenTypeCombMA.setValue(kitchenTypeData[0][1]);
 			kitchenTypeStoreMA.reload();
 
@@ -630,6 +632,9 @@ menuAddWin = new Ext.Window({
 			menuAddWin.findById("recommendCheckboxMA").setValue(false);
 			menuAddWin.findById("freeCheckboxMA").setValue(false);
 			menuAddWin.findById("stopCheckboxMA").setValue(false);
+
+			var f = Ext.get("menuAddNumber");
+			f.focus.defer(100, f); // 为什么这样才可以！？！？
 		}
 	}
 });
@@ -885,7 +890,7 @@ var pushBackBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "返回",
 	handler : function(btn) {
-		location.href = "../PersonLogin.html?restaurantID=" + restaurantID
+		location.href = "MenuProtal.html?restaurantID=" + restaurantID
 				+ "&isNewAccess=false&pin=" + pin;
 	}
 });

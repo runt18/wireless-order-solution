@@ -88,6 +88,12 @@
 		<action path="/DeleteSupplier"
 			type="com.wireless.Actions.supplierMgr.DeleteSupplierAction" scope="request">
 		</action>
+		<action path="/InsertSupplier"
+			type="com.wireless.Actions.supplierMgr.InsertSupplierAction" scope="request">
+		</action>
+		<action path="/UpdateSupplier"
+			type="com.wireless.Actions.supplierMgr.UpdateSupplierAction" scope="request">
+		</action>
 
 
 	</action-mappings>
