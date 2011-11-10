@@ -83,6 +83,28 @@ DEFAULT CHARACTER SET = utf8,
 COMMENT = 'describe the department information' ;
 
 -- -----------------------------------------------------
+-- Table `wireless_order_db`.`supplier`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`supplier` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`supplier` (
+  `restaurant_id` INT UNSIGNED NOT NULL ,
+  `supplier_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the alias id to this supplier' ,
+  `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to ths supplier' ,
+  `tele` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the telephone to this supplier' ,
+  `addr` VARCHAR(100) NOT NULL DEFAULT '' COMMENT 'the address to this supplier' ,
+  `contact` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the contact person to this supplier' ,
+  INDEX `fk_supplier_restaurant` (`restaurant_id` ASC) ,
+  PRIMARY KEY (`supplier_id`, `restaurant_id`) ,
+  CONSTRAINT `fk_supplier_restaurant1`
+    FOREIGN KEY (`restaurant_id` )
+    REFERENCES `wireless_order_db`.`restaurant` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+-- -----------------------------------------------------
 -- Change the field 'super_kitchen' to 'dept_id' in table 'kitchen'
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`kitchen` CHANGE COLUMN `super_kitchen` `dept_id` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'the department that this kitchen belong to.'  ;
