@@ -1,0 +1,78 @@
+package com.wireless.common;
+
+import java.util.ArrayList;
+
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import com.wireless.protocol.Food;
+import com.wireless.protocol.Taste;
+import com.wireless.protocol.Util;
+
+public class FoodParcel extends Food implements Parcelable{
+	
+	public static final String KEY_VALUE = "com.wireless.common.FoodParcel";
+	
+	public FoodParcel(Food food){
+		alias_id = food.alias_id;
+		kitchen = food.kitchen;
+		name = food.name;
+		tastes = food.tastes;
+		hangStatus = food.hangStatus;
+		isTemporary = food.isTemporary;
+		tastePref = food.tastePref;
+		setTastePrice(food.getTastePrice());
+		setCount(food.getCount());
+		setPrice(food.getPrice());
+	}
+	
+	private FoodParcel(Parcel in){
+		alias_id = in.readInt();
+		kitchen = (short)in.readInt();
+		name = in.readString();
+		hangStatus = (short)in.readInt();
+		isTemporary = in.readInt() == 1 ? true : false;
+		tastePref = in.readString();
+		setTastePrice(Util.int2Float(in.readInt()));
+		setCount(Util.int2Float(in.readInt()));
+		setPrice(Util.int2Float(in.readInt()));
+		// un-marshal the tastes
+		ArrayList<TasteParcel> tasteParcels = new ArrayList<TasteParcel>();
+		in.readTypedList(tasteParcels, TasteParcel.CREATOR);
+		tastes = tasteParcels.toArray(new Taste[tasteParcels.size()]);
+	}
+	
+	public static final Parcelable.Creator<FoodParcel> CREATOR = new Parcelable.Creator<FoodParcel>() {
+		public FoodParcel createFromParcel(Parcel in) {
+			return new FoodParcel(in);
+		}
+
+		public FoodParcel[] newArray(int size) {
+			return new FoodParcel[size];
+		}
+	};
+	
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+	
+	@Override
+	public void writeToParcel(Parcel parcel, int flags) {
+		parcel.writeInt(alias_id);
+		parcel.writeInt(kitchen);
+		parcel.writeString(name);
+		parcel.writeInt(hangStatus);
+		parcel.writeInt(isTemporary ? 1 : 0);
+		parcel.writeString(tastePref);
+		parcel.writeInt(Util.float2Int(getTastePrice()));
+		parcel.writeInt(Util.float2Int(getCount()));
+		parcel.writeInt(Util.float2Int(getPrice()));
+		//marshal the tastes
+		ArrayList<TasteParcel> tasteParcels = new ArrayList<TasteParcel>(tastes.length);
+		for(int i = 0; i < tastes.length; i++){
+			tasteParcels.add(new TasteParcel(tastes[i]));
+		}
+		parcel.writeTypedList(tasteParcels);
+	}
+}

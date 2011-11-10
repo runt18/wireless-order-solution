@@ -27,11 +27,14 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.wireless.common.OrderParcel;
 import com.wireless.common.WirelessOrder;
 import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.Order;
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqCancelOrder;
 import com.wireless.protocol.ReqQueryMenu;
+import com.wireless.protocol.ReqQueryOrder;
 import com.wireless.protocol.ReqQueryOrder2;
 import com.wireless.protocol.ReqQueryRestaurant;
 import com.wireless.protocol.RespParser;
@@ -391,6 +394,8 @@ public class MainActivity extends Activity {
 		}	
 	}
 	
+
+	
 	/**
 	 * 删单的请求操作 
 	 */
@@ -474,7 +479,7 @@ public class MainActivity extends Activity {
 			
 			@Override
 			protected void onPreExecute(){
-				_progDialog = ProgressDialog.show(MainActivity.this, "", "查询" + _tableID + "号台信息...请稍候", true);
+				_progDialog = ProgressDialog.show(MainActivity.this, "", "查询" + _tableID + "号餐台信息...请稍候", true);
 			}
 			
 			/**
@@ -571,10 +576,8 @@ public class MainActivity extends Activity {
 						dismiss();
 						
 					}else if(_type == DIALOG_UPDATE_ORDER){
-						//jump to the update order activity
-						Intent intent = new Intent(MainActivity.this, DropActivity.class);
-						intent.putExtra(KEY_TABLE_ID, String.valueOf(_tableID));
-						startActivity(intent);
+						//perform to query the order detail to this table 
+						new QueryOrderTask(_tableID).execute();
 						dismiss();
 						
 					}else if(_type == DIALOG_BILL_ORDER){
@@ -589,6 +592,92 @@ public class MainActivity extends Activity {
 						new CancelOrderTask(_tableID).execute();
 						dismiss();
 					}
+				}
+			}
+			
+		}
+		
+		/**
+		 * 执行请求对应餐台的账单信息 
+		 */
+		private class QueryOrderTask extends AsyncTask<Void, Void, String>{
+
+			private ProgressDialog _progDialog;
+			private int _tableID;
+			private Order _order;
+			
+			QueryOrderTask(int tableID){
+				_tableID = tableID;
+			}
+			
+			/**
+			 * 在执行请求删单操作前显示提示信息
+			 */
+			@Override
+			protected void onPreExecute(){
+				_progDialog = ProgressDialog.show(MainActivity.this, "", "查询" + _tableID + "号餐台的信息...请稍候", true);
+			}
+			
+			@Override
+			protected String doInBackground(Void... arg0) {
+				String errMsg = null;
+				try{
+					//根据tableID请求数据
+					ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryOrder(_tableID));
+					if(resp.header.type == Type.ACK){
+						_order = RespParser.parseQueryOrder(resp, WirelessOrder.foodMenu);
+						
+					}else{
+	    				if(resp.header.reserved == ErrorCode.TABLE_IDLE) {
+	    					errMsg = _tableID + "号台还未下单";
+	    					
+	    				}else if(resp.header.reserved == ErrorCode.TABLE_NOT_EXIST) {
+	    					errMsg = _tableID + "号台信息不存在";
+
+	    				}else if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
+	    					errMsg = "终端没有登记到餐厅，请联系管理人员。";
+
+	    				}else if(resp.header.reserved == ErrorCode.TERMINAL_EXPIRED) {
+	    					errMsg = "终端已过期，请联系管理人员。";
+
+	    				}else{
+	    					errMsg = "未确定的异常错误(" + resp.header.reserved + ")";
+	    				}
+					}
+				}catch(IOException e){
+					errMsg = e.getMessage();
+				}
+				
+				return errMsg;
+			}
+			
+			/**
+			 * 根据返回的error message判断，如果发错异常则提示用户，
+			 * 如果成功，则迁移到改单页面
+			 */
+			@Override
+			protected void onPostExecute(String errMsg){
+				//make the progress dialog disappeared
+				_progDialog.dismiss();
+				/**
+				 * Prompt user message if any error occurred.
+				 */
+				if(errMsg != null){
+					new AlertDialog.Builder(MainActivity.this)
+					.setTitle("提示")
+					.setMessage(errMsg)
+					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							dialog.dismiss();
+						}
+					}).show();
+				}else{
+					//jump to the update order activity
+					Intent intent = new Intent(MainActivity.this, DropActivity.class);
+					Bundle bundle = new Bundle();
+					bundle.putParcelable(OrderParcel.KEY_VALUE, new OrderParcel(_order));
+					intent.putExtras(bundle);
+					startActivity(intent);
 				}
 			}
 			
@@ -622,7 +711,11 @@ public class MainActivity extends Activity {
 				public void onClick(View v) {
 					EditText table= (EditText)findViewById(R.id.mycount);
 					String tableID = table.getText().toString();
-					new QueryOrder2Task(Integer.parseInt(tableID)).execute();
+					if(_type == DIALOG_UPDATE_ORDER){
+						new QueryOrderTask(Integer.parseInt(tableID)).execute();
+					}else{
+						new QueryOrder2Task(Integer.parseInt(tableID)).execute();
+					}
 					table.setText("");
 					dismiss();
 				}
@@ -633,8 +726,7 @@ public class MainActivity extends Activity {
 			cancel.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					dismiss();
-					
+					dismiss();					
 				}
 			});
 		}		
