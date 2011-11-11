@@ -47,19 +47,21 @@ public class DropActivity extends Activity {
 	private EditText cutom_num;
 	private ProgressDialog dialog;
 	private Message msg;
-	private Order order;
-	private ExpandableListView mydropListView;
-	private DropAdapter adapter;
+	//private DropAdapter adapter;
 	private List<String> list = new ArrayList<String>();
 	private RelativeLayout r1;
 	private List<List<Food>> lists;
 	List<Food> foods;
 	List<Food> arrayList;
 	private byte errCode;
-	Order reqOrder;
+	private Order reqOrder;
 	private TextView amountvalue;
 	private String plateForm;
 
+	private Order _oriOrder;
+	private List<Food> _oriFoods;
+	private List<Food> _newFoods;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -70,26 +72,9 @@ public class DropActivity extends Activity {
 
 		list.add("已点菜");
 		list.add("新点菜");
-		tabble_num = (EditText) findViewById(R.id.valueplatform);
-		cutom_num = (EditText) findViewById(R.id.valuepeople);
+
 		r1 = (RelativeLayout) findViewById(R.id.bottom);
 		amountvalue = (TextView) findViewById(R.id.amountvalue);
-
-		mydropListView = (ExpandableListView) findViewById(R.id.mydropListView);
-		mydropListView.setGroupIndicator(DropActivity.this.getResources()
-				.getDrawable(R.layout.expander_folder));
-		if (Common.getCommon().isNetworkAvailable(DropActivity.this)) {
-			// reqestoderfood();
-			OrderParcel orderParcel = getIntent().getParcelableExtra(OrderParcel.KEY_VALUE);
-			order = orderParcel;
-			msg = new Message();
-			msg.what = 0;
-			handler.sendMessage(msg);
-		} else {
-			msg = new Message();
-			msg.what = 7;
-			handler.sendMessage(msg);
-		}
 
 		/**
 		 * "返回"Button
@@ -120,20 +105,29 @@ public class DropActivity extends Activity {
 			}
 		});
 
-		mydropListView.setOnGroupClickListener(new OnGroupClickListener() {
-
-			public boolean onGroupClick(ExpandableListView parent, View v,
-					int groupPosition, long id) {
-				mydropListView.setSelectedGroup(groupPosition);
+		
+		/**
+		 * "已点菜"的ListView
+		 */
+		ExpandableListView oriFoodLstView = (ExpandableListView)findViewById(R.id.oriFoodLstView);
+		oriFoodLstView.setGroupIndicator(getResources().getDrawable(R.layout.expander_folder));
+		oriFoodLstView.setAdapter(new DropAdapter(DropActivity.this, list, lists));
+		
+		oriFoodLstView.setOnGroupClickListener(new OnGroupClickListener() {
+			@Override
+			public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+				//foodListView.setSelectedGroup(groupPosition);
 				return false;
 			}
 		});
 
-		mydropListView.setOnChildClickListener(new OnChildClickListener() {
-
+		oriFoodLstView.setOnChildClickListener(new OnChildClickListener() {
+			/**
+			 * 选择"已点菜"某个菜品后弹出对应的操作菜单
+			 */
 			@Override
 			public boolean onChildClick(ExpandableListView parent, View v,
-					int groupPosition, int childPosition, long id) {
+										int groupPosition, int childPosition, long id) {
 				// TODO Auto-generated method stub
 				if (groupPosition == 1) {
 					Common.getCommon().expandonitem(DropActivity.this, lists,
@@ -142,7 +136,49 @@ public class DropActivity extends Activity {
 				return false;
 			}
 
+		});		
+
+		/**
+		 * "新点菜"的ListView
+		 */
+		ExpandableListView newFoodLstView = (ExpandableListView)findViewById(R.id.oriFoodLstView);
+		newFoodLstView.setGroupIndicator(getResources().getDrawable(R.layout.expander_folder));
+		newFoodLstView.setAdapter(new DropAdapter(DropActivity.this, list, lists));
+		
+		newFoodLstView.setOnGroupClickListener(new OnGroupClickListener() {
+			@Override
+			public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+				//foodListView.setSelectedGroup(groupPosition);
+				return false;
+			}
 		});
+
+		newFoodLstView.setOnChildClickListener(new OnChildClickListener() {
+			/**
+			 * 选择"新点菜"的某个菜品后弹出相应操作菜单
+			 */
+			@Override
+			public boolean onChildClick(ExpandableListView parent, View v,
+										int groupPosition, int childPosition, long id) {
+				// TODO Auto-generated method stub
+				if (groupPosition == 1) {
+					Common.getCommon().expandonitem(DropActivity.this, lists,
+							groupPosition, childPosition);
+				}
+				return false;
+			}
+
+		});	
+		
+		//get the order parcel from the intent sent by main activity
+		OrderParcel orderParcel = getIntent().getParcelableExtra(OrderParcel.KEY_VALUE);
+		_oriOrder = orderParcel;
+			
+		//set the table ID
+		((EditText)findViewById(R.id.valueplatform)).setText(Integer.toString(_oriOrder.table_id));
+		//set the amount of customer
+		((EditText)findViewById(R.id.valuepeople)).setText(Integer.toString(_oriOrder.custom_num));
+			
 	}
 
 	public void init() {
@@ -164,8 +200,6 @@ public class DropActivity extends Activity {
 			}
 			amountvalue.setText(Float.toString(account));
 		}
-		adapter = new DropAdapter(DropActivity.this, list, lists);
-		mydropListView.setAdapter(adapter);
 	}
 
 	/*
@@ -182,7 +216,7 @@ public class DropActivity extends Activity {
 							new ReqQueryOrder(Short.valueOf(plateForm)));
 					if (resp.header.type == Type.ACK) {
 						// 解释的数据请参考com.wireless.util.RespParser2.java
-						order = RespParser.parseQueryOrder(resp,
+						_oriOrder = RespParser.parseQueryOrder(resp,
 								AppContext.getFoodMenu());
 						msg = new Message();
 						msg.what = 0;
@@ -382,7 +416,7 @@ public class DropActivity extends Activity {
 				reqOrder.foods = (Food[]) reqFoods.toArray(new Food[size]);// 菜品列表
 				reqOrder.table_id = Integer.parseInt(tabble_num.getText()
 						.toString().trim());// 新的餐台编号
-				reqOrder.originalTableID = order.table_id;// 原来的餐台编号
+				reqOrder.originalTableID = _oriOrder.table_id;// 原来的餐台编号
 				reqOrder.custom_num = Integer.parseInt(cutom_num.getText()
 						.toString().trim());// 就餐人数
 
@@ -506,15 +540,15 @@ public class DropActivity extends Activity {
 
 					lists = new ArrayList<List<Food>>();
 					// 已点菜的list
-					foods = Arrays.asList(order.foods);
+					foods = Arrays.asList(_oriOrder.foods);
 					// 每组父下面的子类
 					arrayList = new ArrayList<Food>(foods);
 					init();
-					tabble_num.setText(String.valueOf(order.table_id));
-					cutom_num.setText(String.valueOf(order.custom_num));
+					tabble_num.setText(String.valueOf(_oriOrder.table_id));
+					cutom_num.setText(String.valueOf(_oriOrder.custom_num));
 					// dialog.dismiss();
 					Toast.makeText(DropActivity.this,
-							order.table_id + "台号已点菜信息下载成功", 1).show();
+							_oriOrder.table_id + "台号已点菜信息下载成功", 1).show();
 					break;
 
 				case 1:
