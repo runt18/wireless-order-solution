@@ -94,6 +94,15 @@
 		<action path="/UpdateSupplier"
 			type="com.wireless.Actions.supplierMgr.UpdateSupplierAction" scope="request">
 		</action>
+		<action path="/QueryKitchenMgr"
+			type="com.wireless.Actions.kitchenMgr.QueryKitchenMgrAction" scope="request">
+		</action>
+		<action path="/QueryDepartment"
+			type="com.wireless.Actions.deptMgr.QueryDepartmentMgrAction" scope="request">
+		</action>
+		<action path="/UpdateKitchen"
+			type="com.wireless.Actions.kitchenMgr.UpdateKitchenAction" scope="request">
+		</action>
 
 
 	</action-mappings>

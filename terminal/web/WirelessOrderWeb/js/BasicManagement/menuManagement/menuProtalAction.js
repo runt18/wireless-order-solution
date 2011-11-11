@@ -12,13 +12,18 @@
 						});
 			});
 
-	$("#kitchenMgr").each(function() {
-		$(this).bind("click", function() {
-			if (!isPrompt) {
-
-			}
-		});
-	});
+	$("#kitchenMgr").each(
+			function() {
+				$(this).bind(
+						"click",
+						function() {
+							if (!isPrompt) {
+								location.href = "KitchenManagement.html?pin="
+										+ currPin + "&restaurantID="
+										+ restaurantID;
+							}
+						});
+			});
 
 	$("#departmentMgr").each(function() {
 		$(this).bind("click", function() {
