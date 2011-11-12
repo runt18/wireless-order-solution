@@ -210,7 +210,7 @@ var pushBackBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "返回",
 	handler : function(btn) {
-		location.href = "InventoryProtal.html?restaurantID=" + restaurantID
+		location.href = "MenuProtal.html?restaurantID=" + restaurantID
 				+ "&pin=" + pin;
 	}
 });

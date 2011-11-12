@@ -28,7 +28,9 @@
 	$("#departmentMgr").each(function() {
 		$(this).bind("click", function() {
 			if (!isPrompt) {
-
+				location.href = "DepartmentManagement.html?pin="
+					+ currPin + "&restaurantID="
+					+ restaurantID;
 			}
 		});
 	});
