@@ -216,11 +216,11 @@ SET AUTOCOMMIT=1;
 -- Insert material records
 -- -----------------------------------------------------
 SET AUTOCOMMIT=0;
-INSERT INTO `wireless_order_db`.`material` (`restaurant_id`, `supplier_id`, `material_id`, `material_alias`, `name`, `stock`, `price`, `warning_threshold`, `danger_threshold`) VALUES (11, 1, 100, 100, '排骨', 0, 18.5, 10.5, 5.5);
-INSERT INTO `wireless_order_db`.`material` (`restaurant_id`, `supplier_id`, `material_id`, `material_alias`, `name`, `stock`, `price`, `warning_threshold`, `danger_threshold`) VALUES (11, 1, 101, 101, '鸡肉', 0, 13, 22, 14);
-INSERT INTO `wireless_order_db`.`material` (`restaurant_id`, `supplier_id`, `material_id`, `material_alias`, `name`, `stock`, `price`, `warning_threshold`, `danger_threshold`) VALUES (11, 1, 102, 102, '牛肉', 0, 16, 27, 13);
-INSERT INTO `wireless_order_db`.`material` (`restaurant_id`, `supplier_id`, `material_id`, `material_alias`, `name`, `stock`, `price`, `warning_threshold`, `danger_threshold`) VALUES (11, 2, 103, 103, '猪肉', 0, 13.5, 27, 13);
-INSERT INTO `wireless_order_db`.`material` (`restaurant_id`, `supplier_id`, `material_id`, `material_alias`, `name`, `stock`, `price`, `warning_threshold`, `danger_threshold`) VALUES (11, 2, 104, 104, '酱汁', 0, 1, 30, 20);
+INSERT INTO `wireless_order_db`.`material` (`restaurant_id`, `material_id`, `material_alias`, `name`, `stock`, `price`, `warning_threshold`, `danger_threshold`) VALUES (11, 100, 100, '排骨', 0, 18.5, 10.5, 5.5);
+INSERT INTO `wireless_order_db`.`material` (`restaurant_id`, `material_id`, `material_alias`, `name`, `stock`, `price`, `warning_threshold`, `danger_threshold`) VALUES (11, 101, 101, '鸡肉', 0, 13, 22, 14);
+INSERT INTO `wireless_order_db`.`material` (`restaurant_id`, `material_id`, `material_alias`, `name`, `stock`, `price`, `warning_threshold`, `danger_threshold`) VALUES (11, 102, 102, '牛肉', 0, 16, 27, 13);
+INSERT INTO `wireless_order_db`.`material` (`restaurant_id`, `material_id`, `material_alias`, `name`, `stock`, `price`, `warning_threshold`, `danger_threshold`) VALUES (11, 103, 103, '猪肉', 0, 13.5, 27, 13);
+INSERT INTO `wireless_order_db`.`material` (`restaurant_id`, `material_id`, `material_alias`, `name`, `stock`, `price`, `warning_threshold`, `danger_threshold`) VALUES (11, 104, 104, '酱汁', 0, 1, 30, 20);
 COMMIT;
 SET AUTOCOMMIT=1;
 

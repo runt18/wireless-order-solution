@@ -327,7 +327,6 @@ DROP TABLE IF EXISTS `wireless_order_db`.`material` ;
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`material` (
   `material_id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'the id to this material' ,
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'the id to related restaurant' ,
-  `supplier_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the supplier id this material belog to' ,
   `material_alias` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the alias id to this material' ,
   `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to this material' ,
   `stock` FLOAT NOT NULL DEFAULT 0 COMMENT 'the remaining amount to this material' ,
@@ -654,8 +653,6 @@ DEFAULT CHARACTER SET = utf8;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
-
 
 
 -- -----------------------------------------------------
