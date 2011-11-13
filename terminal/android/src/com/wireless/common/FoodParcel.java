@@ -20,6 +20,7 @@ public class FoodParcel extends Food implements Parcelable{
 		tastes = food.tastes;
 		hangStatus = food.hangStatus;
 		isTemporary = food.isTemporary;
+		status = food.status;
 		tastePref = food.tastePref;
 		setTastePrice(food.getTastePrice());
 		setCount(food.getCount());
@@ -32,6 +33,7 @@ public class FoodParcel extends Food implements Parcelable{
 		name = in.readString();
 		hangStatus = (short)in.readInt();
 		isTemporary = in.readInt() == 1 ? true : false;
+		status = (short)in.readInt();
 		tastePref = in.readString();
 		setTastePrice(Util.int2Float(in.readInt()));
 		setCount(Util.int2Float(in.readInt()));
@@ -64,6 +66,7 @@ public class FoodParcel extends Food implements Parcelable{
 		parcel.writeString(name);
 		parcel.writeInt(hangStatus);
 		parcel.writeInt(isTemporary ? 1 : 0);
+		parcel.writeInt(status);
 		parcel.writeString(tastePref);
 		parcel.writeInt(Util.float2Int(getTastePrice()));
 		parcel.writeInt(Util.float2Int(getCount()));

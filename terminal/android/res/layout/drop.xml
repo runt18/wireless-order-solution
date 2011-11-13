@@ -64,17 +64,17 @@
 		android:layout_height="wrap_content" android:src="@drawable/table_line"
 		android:layout_below="@id/restitle" />
 
-	<ExpandableListView android:id="@+id/oriFoodLstView"
+	<com.wireless.ui.view.OrderFoodListView android:id="@+id/oriFoodLstView"
 		android:layout_width="fill_parent" android:layout_height="wrap_content"
 		android:layout_below="@id/line" 
 		android:cacheColorHint="#00000000">
-	</ExpandableListView>
+	</com.wireless.ui.view.OrderFoodListView >
 	
-	<ExpandableListView android:id="@+id/newFoodLstView"
+	<com.wireless.ui.view.OrderFoodListView  android:id="@+id/newFoodLstView"
 		android:layout_width="fill_parent" android:layout_height="wrap_content"
 		android:layout_below="@id/oriFoodLstView" android:layout_above="@id/bottom"
 		android:cacheColorHint="#00000000">
-	</ExpandableListView>
+	</com.wireless.ui.view.OrderFoodListView >
 
 	<RelativeLayout android:id="@+id/bottom"
 		android:layout_width="fill_parent" android:layout_height="wrap_content"
@@ -91,7 +91,7 @@
 			android:layout_centerVertical="true" android:textSize="22sp"
 			android:typeface="sans" android:textStyle="bold"
 			android:layout_toLeftOf="@id/amountvalue" android:layout_marginRight="5dip"
-			android:text="合计:" />
+			android:text="小计:" />
 	</RelativeLayout>
 
 

@@ -61,7 +61,7 @@ public class BillAdapter extends BaseAdapter {
 			
 		    holder.foodname.setText(foods.get(position).name);
 			holder.count.setText(Float.toString(foods.get(position).getCount()));
-			holder.price.setText(Float.toString(foods.get(position).totalPrice2()));
+			holder.price.setText(Float.toString(foods.get(position).calcPrice2()));
 	        if(foods.get(position).tastePref.equals("нч©зн╤")){
 	        	holder.taste.setText("");
 	        }else{

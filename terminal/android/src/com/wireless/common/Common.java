@@ -187,7 +187,7 @@ public void setKient(KitchenActivity kient) {
 	 * */
 	public void onitem(Context context,final List<Food> list, final int position){
 		order=(OrderActivity)context;
-		View mView =LayoutInflater.from(context).inflate(R.layout.itemalert, null);
+		View mView =LayoutInflater.from(context).inflate(R.layout.item_alert, null);
 		final Dialog mDialog = new Dialog(context,R.style.FullHeightDialog);
 		mDialog.setContentView(mView);
 //		mDialog.getWindow().setTitle("请选择"+list.get(position).name+"的操作");
@@ -219,7 +219,7 @@ public void setKient(KitchenActivity kient) {
 			}
 		});
 		
-	    TextView isfug=(TextView)mView.findViewById(R.id.isfug);
+	    TextView isfug=(TextView)mView.findViewById(R.id.item3Txt);
 	    if(list.get(position).hangStatus==Food.FOOD_NORMAL){
 			isfug.setText("叫起");
 		}else if(list.get(position).hangStatus==Food.FOOD_HANG_UP){
@@ -266,7 +266,7 @@ public void setKient(KitchenActivity kient) {
 	 * */
 	public void expandonitem(final Context context,final  List<List<Food>> lists, final int grouposition,final int childposition){
 		drop=(DropActivity)context;
-		View mView =LayoutInflater.from(context).inflate(R.layout.itemalert, null);
+		View mView =LayoutInflater.from(context).inflate(R.layout.item_alert, null);
 		final Dialog mDialog = new Dialog(context,R.style.FullHeightDialog);
 		mDialog.setContentView(mView);
 		mDialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
@@ -297,7 +297,7 @@ public void setKient(KitchenActivity kient) {
 			}
 		});
 		
-	    TextView isfug=(TextView)mView.findViewById(R.id.isfug);
+	    TextView isfug=(TextView)mView.findViewById(R.id.item3Txt);
 	    if(lists.get(grouposition).get(childposition).hangStatus==Food.FOOD_NORMAL){
 			isfug.setText("叫起");
 		}else if(lists.get(grouposition).get(childposition).hangStatus==Food.FOOD_HANG_UP){
@@ -441,14 +441,14 @@ public void setKient(KitchenActivity kient) {
 					 order.onRestart();
 				}else{
 					drop=(DropActivity)context;
-					drop.onRestart();
+					//drop.onRestart();
 				}
 				
 				 mDialog.cancel();
 			}
 		});
 		
-		Button cancle = (Button) mView.findViewById(R.id.cancle);
+		Button cancle = (Button) mView.findViewById(R.id.alert_cancel);
 		cancle.setText("取消");
 		cancle.setOnClickListener(new OnClickListener() {
 			@Override
@@ -606,7 +606,7 @@ public void setKient(KitchenActivity kient) {
 	public void dropFoods(final Context context,final List<List<Food>> childs,final int groupPosition, final int childPosition){
 		final EditText mycount;
 		drop=(DropActivity)context;
-		View mView =LayoutInflater.from(context).inflate(R.layout.pawalert, null);
+		View mView =LayoutInflater.from(context).inflate(R.layout.pwd_alert, null);
 		final Dialog mDialog = new Dialog(context,R.style.FullHeightDialog);
 		mDialog.setContentView(mView);
 		mDialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
@@ -653,7 +653,7 @@ public void setKient(KitchenActivity kient) {
 									new AlertDialog.Builder(context).setTitle("提示").setMessage("你输入的退菜数量大于你已点数量").setNeutralButton("确定", null).show();
 								}
 
-								 drop.init();
+								 //drop.init();
 								 myDialog.cancel();
 								 mDialog.cancel();
 							}
@@ -726,7 +726,7 @@ public void setKient(KitchenActivity kient) {
 					new AlertDialog.Builder(context).setTitle("提示").setMessage("你输入的退菜数量大于你已点数量").setNeutralButton("确定", null).show();
 				}
 
-				 drop.init();
+				 //drop.init();
 				 myDialog.cancel();
 			}
 		});

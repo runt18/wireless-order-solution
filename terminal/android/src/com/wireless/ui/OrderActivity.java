@@ -125,7 +125,7 @@ public class OrderActivity extends Activity {
 			buttomrelativelayout.setVisibility(View.VISIBLE);
 			float account=0;
 			for(int i=0;i<Common.getCommon().getFoodlist().size();i++){
-				account+=Common.getCommon().getFoodlist().get(i).totalPrice2();
+				account+=Common.getCommon().getFoodlist().get(i).calcPrice2();
 			}
 			amountvalue.setText(Float.toString(account));
 			}else{

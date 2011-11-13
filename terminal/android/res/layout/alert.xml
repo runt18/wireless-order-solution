@@ -69,7 +69,7 @@
   />
   
     <Button 
-  android:id="@+id/cancle"
+  android:id="@+id/alert_cancel"
   android:layout_width="80dip"
   android:layout_height="wrap_content"
   android:layout_marginLeft="20dip"

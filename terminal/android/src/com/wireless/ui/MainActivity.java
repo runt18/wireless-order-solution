@@ -721,7 +721,7 @@ public class MainActivity extends Activity {
 				}
 			});
 			
-			Button cancel = (Button)findViewById(R.id.cancle);
+			Button cancel = (Button)findViewById(R.id.alert_cancel);
 			cancel.setText("È¡Ïû");
 			cancel.setOnClickListener(new View.OnClickListener() {
 				@Override

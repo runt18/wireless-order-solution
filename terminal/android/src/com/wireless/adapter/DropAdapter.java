@@ -98,7 +98,7 @@ public class DropAdapter extends BaseExpandableListAdapter  {
 		Food food=childs.get(groupPosition).get(childPosition);
 		((TextView) view.findViewById(R.id.foodname)).setText(food.name);
 		((TextView) view.findViewById(R.id.accountvalue)).setText(String.valueOf(food.getCount()));
-		((TextView) view.findViewById(R.id.pricevalue)).setText(String.valueOf(food.totalPrice2()));
+		((TextView) view.findViewById(R.id.pricevalue)).setText(String.valueOf(food.calcPrice2()));
 		TextView taste=(TextView)view.findViewById(R.id.taste);
 		if(food.tastePref.equals("нч©зн╤")){
 			taste.setText("");
