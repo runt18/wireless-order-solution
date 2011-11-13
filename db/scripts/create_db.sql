@@ -2,6 +2,7 @@
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 
+DROP SCHEMA IF EXISTS `wireless_order_db` ;
 CREATE SCHEMA IF NOT EXISTS `wireless_order_db` DEFAULT CHARACTER SET utf8 ;
 USE `wireless_order_db` ;
 
@@ -325,8 +326,9 @@ DROP TABLE IF EXISTS `wireless_order_db`.`material` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`material` (
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'the id to related restaurant' ,
-  `material_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the alias id to this material' ,
-  `supplier_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the alias supplier id this material belog to' ,
+  `material_id` SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'the id to this material' ,
+  `supplier_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the supplier id this material belog to' ,
+  `material_alias` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the alias id to this material' ,
   `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to this material' ,
   `stock` FLOAT NOT NULL DEFAULT 0 COMMENT 'the remaining amount to this material' ,
   `price` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the unit price to this material' ,
@@ -603,7 +605,8 @@ DROP TABLE IF EXISTS `wireless_order_db`.`supplier` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`supplier` (
   `restaurant_id` INT UNSIGNED NOT NULL ,
-  `supplier_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the alias id to this supplier' ,
+  `supplier_id` SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'the id to this supplier' ,
+  `supplier_alias` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the alias id to this supplier' ,
   `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to ths supplier' ,
   `tele` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the telephone to this supplier' ,
   `addr` VARCHAR(100) NOT NULL DEFAULT '' COMMENT 'the address to this supplier' ,
@@ -651,6 +654,8 @@ DEFAULT CHARACTER SET = utf8;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+
 
 
 -- -----------------------------------------------------
