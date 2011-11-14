@@ -1,11 +1,10 @@
 package com.wireless.db;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 
+import com.wireless.dbReflect.FoodReflector;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.Table;
 
@@ -177,35 +176,12 @@ public class QueryOrder {
 		}
 		dbCon.rs.close();
 		
-		// query the food's id and order count associate with the order id for "order_food" table
-		sql = "SELECT name, food_id, food_status, SUM(order_count) AS order_sum, unit_price, " +
-				"discount, taste, taste_price, taste_id, taste_id2, taste_id3, hang_status, kitchen, is_temporary FROM `"
-				+ Params.dbName
-				+ "`.`order_food` WHERE order_id="
-				+ orderID
-				+ " GROUP BY food_id, taste_id, taste_id2, taste_id3, hang_status, is_temporary HAVING order_sum > 0";
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		ArrayList<Food> foods = new ArrayList<Food>();
-		while (dbCon.rs.next()) {
-			Food food = new Food();
-			food.name = dbCon.rs.getString("name");
-			food.alias_id = dbCon.rs.getInt("food_id");
-			food.status = dbCon.rs.getShort("food_status");
-			food.setCount(dbCon.rs.getFloat("order_sum"));
-			food.setPrice(dbCon.rs.getFloat("unit_price"));
-			food.kitchen = dbCon.rs.getShort("kitchen");
-			food.setDiscount(dbCon.rs.getFloat("discount"));
-			food.tastePref = dbCon.rs.getString("taste");
-			food.setTastePrice(dbCon.rs.getFloat("taste_price"));
-			food.tastes[0].alias_id = dbCon.rs.getInt("taste_id");
-			food.tastes[1].alias_id = dbCon.rs.getInt("taste_id2");
-			food.tastes[2].alias_id = dbCon.rs.getInt("taste_id3");
-			food.hangStatus = dbCon.rs.getShort("hang_status");
-			food.isTemporary = dbCon.rs.getBoolean("is_temporary");
-			foods.add(food);
-		}
-		orderInfo.id = orderID;
-		orderInfo.foods = foods.toArray(new Food[foods.size()]);
+		// query the food's id and order count associate with the order id for "order_food" table		
+		String extraCond = "WHERE order_id=" + 
+						   orderID +
+						   " GROUP BY food_id, taste_id, taste_id2, taste_id3, hang_status, is_temporary HAVING order_sum > 0";		
+
+		orderInfo.foods = FoodReflector.create(dbCon, extraCond);
 
 		return orderInfo;
 	}
