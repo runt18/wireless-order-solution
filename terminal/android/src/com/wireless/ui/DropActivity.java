@@ -3,7 +3,6 @@ package com.wireless.ui;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import android.app.Activity;
@@ -20,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.Common;
+import com.wireless.common.FoodParcel;
 import com.wireless.common.OrderParcel;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Food;
@@ -61,45 +61,50 @@ public class DropActivity extends Activity {
 		commitBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				/**
-				 * 遍历查找已点和新点菜品中是否相同的菜品，
-				 * 如果有就将他们的点菜数量相加
-				 */
-				List<Food> foods = new ArrayList<Food>();
-				Iterator<Food> oriIter = _oriFoods.iterator();
-				while(oriIter.hasNext()){
-					Food oriFood = oriIter.next();
-					Iterator<Food> newIter = _newFoods.iterator();
-					while(newIter.hasNext()){
-						Food newFood = newIter.next();
-						if(oriFood.equals(newFood)){
-							oriFood.setCount(oriFood.getCount() + newFood.getCount());
-							break;
-						}
-					}
-					foods.add(oriFood);
-				}
-				
-				/**
-				 * 遍历新点菜品中是否有新增加的菜品，
-				 * 有则添加到菜品列表中
-				 */
-				Iterator<Food> newIter = _newFoods.iterator();
-				while(newIter.hasNext()){
-					Food newFood = newIter.next();
-					if(!foods.contains(newFood)){
-						foods.add(newFood);
-					}
-				}
-				
-				/**
-				 * 已点菜和新点菜合并后，生成新的Order，执行改单请求
-				 */
-				Order reqOrder = new Order(foods.toArray(new Food[foods.size()]),
-										   Short.parseShort(((EditText)findViewById(R.id.valueplatform)).getText().toString()),
-										   Integer.parseInt(((EditText)findViewById(R.id.valuepeople)).getText().toString()));
-				reqOrder.originalTableID = _oriOrder.table_id;
-				new UpdateOrderTask(reqOrder).execute();
+				Intent intent = new Intent(DropActivity.this, TastesTbActivity.class);
+				Bundle bundle = new Bundle();
+				bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(_oriOrder.foods[0]));
+				intent.putExtras(bundle);
+				startActivity(intent);
+//				/**
+//				 * 遍历查找已点和新点菜品中是否相同的菜品，
+//				 * 如果有就将他们的点菜数量相加
+//				 */
+//				List<Food> foods = new ArrayList<Food>();
+//				Iterator<Food> oriIter = _oriFoods.iterator();
+//				while(oriIter.hasNext()){
+//					Food oriFood = oriIter.next();
+//					Iterator<Food> newIter = _newFoods.iterator();
+//					while(newIter.hasNext()){
+//						Food newFood = newIter.next();
+//						if(oriFood.equals(newFood)){
+//							oriFood.setCount(oriFood.getCount() + newFood.getCount());
+//							break;
+//						}
+//					}
+//					foods.add(oriFood);
+//				}
+//				
+//				/**
+//				 * 遍历新点菜品中是否有新增加的菜品，
+//				 * 有则添加到菜品列表中
+//				 */
+//				Iterator<Food> newIter = _newFoods.iterator();
+//				while(newIter.hasNext()){
+//					Food newFood = newIter.next();
+//					if(!foods.contains(newFood)){
+//						foods.add(newFood);
+//					}
+//				}
+//				
+//				/**
+//				 * 已点菜和新点菜合并后，生成新的Order，执行改单请求
+//				 */
+//				Order reqOrder = new Order(foods.toArray(new Food[foods.size()]),
+//										   Short.parseShort(((EditText)findViewById(R.id.valueplatform)).getText().toString()),
+//										   Integer.parseInt(((EditText)findViewById(R.id.valuepeople)).getText().toString()));
+//				reqOrder.originalTableID = _oriOrder.table_id;
+//				new UpdateOrderTask(reqOrder).execute();
 			}
 		});
 

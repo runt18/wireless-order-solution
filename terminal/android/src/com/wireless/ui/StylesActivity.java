@@ -33,7 +33,7 @@ public class StylesActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.stytle);
+		setContentView(R.layout.style);
 		
 		appcontext = (AppContext) getApplication();
 		appcontext.activityList.add(StylesActivity.this);

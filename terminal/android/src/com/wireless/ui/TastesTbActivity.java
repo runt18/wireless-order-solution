@@ -1,89 +1,191 @@
 package com.wireless.ui;
 
 import android.app.TabActivity;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TabHost;
-import android.widget.TextView;
+import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabHost.TabSpec;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.wireless.common.FoodParcel;
+import com.wireless.common.WirelessOrder;
+import com.wireless.protocol.Food;
+import com.wireless.protocol.Taste;
+import com.wireless.protocol.Util;
 
 public class TastesTbActivity extends TabActivity {
-	private TabHost mTabHost;
-	private AppContext appcontext;
-	/**
-	 * 首加载
-	 */
-	private void setupTabHost() {
-		mTabHost = (TabHost) findViewById(android.R.id.tabhost);
+	
+	private final static String TAG_TASTE = "taste";
+	private final static String TAG_STYLE = "style";
+	private final static String TAG_SPEC = "spec";
+	
+	private Food _selectedFood;
+	private TextView _tasteTxtView;
+	private TabHost _tabHost;
 
-		mTabHost.setup();
-	}
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		// construct the tabhost
-		setContentView(R.layout.tastetable);
-		appcontext = (AppContext) getApplication();
-		appcontext.activityList.add(TastesTbActivity.this);
-		setupTabHost();
-		// mTabHost.getTabWidget().setDividerDrawable(R.drawable.minitab_default);
+		
+		//get the food parcel from the intent
+		FoodParcel foodParcel = getIntent().getParcelableExtra(FoodParcel.KEY_VALUE);
+		_selectedFood = foodParcel;
+		
+		// construct the tab host
+		setContentView(R.layout.tastetable);		
+		_tabHost = getTabHost();
+		
+		//口味Tab
+		TabSpec spec = _tabHost.newTabSpec(TAG_TASTE)
+							   .setIndicator(createTabIndicator("口味", R.drawable.ic_tab_albums))
+							   .setContent(new TabHost.TabContentFactory(){
+								   @Override
+								   public View createTabContent(String arg0) {
+									   return LayoutInflater.from(TastesTbActivity.this).inflate(R.layout.taste, null);
+								   }								   
+							   });
+		_tabHost.addTab(spec);
+		
+		//做法Tab
+		spec = _tabHost.newTabSpec(TAG_STYLE)
+					   .setIndicator(createTabIndicator("做法", R.drawable.ic_tab_artists))
+					   .setContent(new TabHost.TabContentFactory(){
+						   @Override
+						   public View createTabContent(String arg0) {
+							   return LayoutInflater.from(TastesTbActivity.this).inflate(R.layout.style, null);
+						   }								   
+					   });
+		_tabHost.addTab(spec);
+		
+		//规格Tab
+		spec = _tabHost.newTabSpec(TAG_SPEC)
+					   .setIndicator(createTabIndicator("规格", R.drawable.ic_tab_songs))
+					   .setContent(new TabHost.TabContentFactory(){
+						   @Override
+						   public View createTabContent(String arg0) {
+							   return LayoutInflater.from(TastesTbActivity.this).inflate(R.layout.specs, null);
+						   }								   
+					   });
+		_tabHost.addTab(spec);
+		
 		/**
-		 * 添加tab项Activity
+		 * Tab切换时更换相应的Adapter，显示不同种类的口味
 		 */
-		Intent intent = new Intent().setClass(this, TasteActivity.class);
-		setupTab(new TextView(this), "口味", R.drawable.ic_tab_albums, intent);
-		intent = new Intent().setClass(this, StylesActivity.class);
-		setupTab(new TextView(this), "做法", R.drawable.ic_tab_artists, intent);
-		intent = new Intent().setClass(this,  SpecsActivity.class);
-		setupTab(new TextView(this), "规格", R.drawable.ic_tab_songs, intent);
-
+		_tabHost.setOnTabChangedListener(new OnTabChangeListener() {			
+			@Override
+			public void onTabChanged(String tag) {
+				if(tag == TAG_TASTE){
+					_tasteTxtView = (TextView)findViewById(R.id.foodtaste);
+					ListView tasteLstView = (ListView)findViewById(R.id.tasteLstView);
+					tasteLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.tastes));
+					
+				}else if(tag == TAG_STYLE){
+					_tasteTxtView = (TextView)findViewById(R.id.foodtaste);
+					ListView tasteLstView = (ListView)findViewById(R.id.styleLstView);
+					tasteLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.styles));
+					
+				}else if(tag == TAG_SPEC){
+					_tasteTxtView = (TextView)findViewById(R.id.foodtaste);
+					ListView tasteLstView = (ListView)findViewById(R.id.specLstView);
+					tasteLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.specs));
+				}
+			}
+		});
 	}
 
 	/**
-	 * 逐个初始化控件tab
-	 * 
-	 * @param view
-	 *            将要创建的view
-	 * @param tag
-	 *            显示的文字
-	 * @param drawable
-	 *            图片资源文件
-	 * @param intent
-	 *            将要添加的意图（Activity）
-	 */
-	private void setupTab(final View view, final String tag, int drawable,
-			Intent intent) {
-		View tabview = createTabView(mTabHost.getContext(), tag, drawable);
-		TabSpec setContent = mTabHost.newTabSpec(tag).setIndicator(tabview)
-				.setContent(intent);
-		mTabHost.addTab(setContent);
-
-	}
-
-	/**
-	 * 关联布局文件，生成想要的view
-	 * 
-	 * @param context
-	 *            上下文对象
+	 * Create the tab indicator
 	 * @param text
-	 *            显示的文字
 	 * @param drawable
-	 *            图片资源文件
-	 * @return 想要创建的view对象
+	 * @return
 	 */
-	private static View createTabView(final Context context, final String text,
-			int drawable) {
-		View view = LayoutInflater.from(context).inflate(R.layout.tb_bg, null);
-		TextView tv = (TextView) view.findViewById(R.id.tabsText);
-		tv.setText(text);
-		ImageView iv = (ImageView) view.findViewById(R.id.icon);
-		iv.setImageResource(drawable);
+	private View createTabIndicator(String text, int drawable) {
+		View view = LayoutInflater.from(_tabHost.getContext()).inflate(R.layout.tb_bg, null);
+		((TextView)view.findViewById(R.id.tabsText)).setText(text);
+		((ImageView) view.findViewById(R.id.icon)).setImageResource(drawable);
 		return view;
+	}
+	
+	private class TasteAdapter extends BaseAdapter{
+
+		private Taste[] _tastes;
+		
+		TasteAdapter(Taste[] tastes){
+			_tastes = tastes;
+		}
+		
+		@Override
+		public int getCount() {
+			return _tastes.length;
+		}
+
+		@Override
+		public Object getItem(int position) {
+			return _tastes[position];
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return position;
+		}
+
+		@Override
+		public View getView(final int position, View convertView, ViewGroup parent) {
+			View view;
+			if(convertView == null){
+				view = LayoutInflater.from(TastesTbActivity.this).inflate(R.layout.food_item, null);				
+			}else{
+				view = convertView;
+			}
+			//set name to taste
+			((TextView)view.findViewById(R.id.foodname)).setText(_tastes[position].preference);
+			//set the price to taste
+			((TextView)view.findViewById(R.id.foodprice)).setText(Util.CURRENCY_SIGN + Util.float2String2(_tastes[position].getPrice()));
+			//set the status to whether the taste is selected
+			final CheckBox selectChkBox = (CheckBox)view.findViewById(R.id.chioce);
+			selectChkBox.setChecked(false);
+			for(int i = 0; i < _selectedFood.tastes.length; i++){
+				if(_tastes[position].alias_id == _selectedFood.tastes[i].alias_id){
+					selectChkBox.setChecked(true);
+					break;
+				}
+			}
+			
+			/**
+			 * 口味的CheckBox操作
+			 */
+			selectChkBox.setOnClickListener(new OnClickListener() {				
+				@Override
+				public void onClick(View arg0) {
+					if(selectChkBox.isChecked()){
+						int pos = _selectedFood.removeTaste(_tastes[position]);
+						if(pos > 0){
+							selectChkBox.setChecked(false);
+						}
+					}else{
+						int pos = _selectedFood.addTaste(_tastes[position]);
+						if(pos > 0){
+							selectChkBox.setChecked(true);
+						}else{
+							Toast.makeText(TastesTbActivity.this, "最多只能添加" + _selectedFood.tastes.length + "种口味", 0).show();
+						}						
+					}
+					_tasteTxtView.setText(_selectedFood.name + "-" + _selectedFood.tastePref);
+				}
+			});
+			return view;
+		}
+		
 	}
 }
