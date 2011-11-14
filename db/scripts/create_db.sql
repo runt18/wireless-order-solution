@@ -2,7 +2,6 @@
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 
-DROP SCHEMA IF EXISTS `wireless_order_db` ;
 CREATE SCHEMA IF NOT EXISTS `wireless_order_db` DEFAULT CHARACTER SET utf8 ;
 USE `wireless_order_db` ;
 
@@ -329,8 +328,6 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`material` (
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'the id to related restaurant' ,
   `material_alias` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the alias id to this material' ,
   `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to this material' ,
-  `stock` FLOAT NOT NULL DEFAULT 0 COMMENT 'the remaining amount to this material' ,
-  `price` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the unit price to this material' ,
   `warning_threshold` FLOAT NOT NULL DEFAULT 0 COMMENT 'the warning threshold to this material' ,
   `danger_threshold` FLOAT NOT NULL DEFAULT 0 COMMENT 'the danger threshold to this material' ,
   INDEX `fk_material_restaurant` (`restaurant_id` ASC) ,
@@ -649,10 +646,35 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
 
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`material_dept`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`material_dept` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`material_dept` (
+  `restaurant_id` INT UNSIGNED NOT NULL ,
+  `material_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the id to material ' ,
+  `dept_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the id to department' ,
+  `dept_name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to department' ,
+  `material_name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to material' ,
+  `price` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the price to this material' ,
+  `stock` FLOAT NOT NULL DEFAULT 0 COMMENT 'the stock to this material' ,
+  INDEX `fk_material_dept_restaurant1` (`restaurant_id` ASC) ,
+  CONSTRAINT `fk_material_dept_restaurant1`
+    FOREIGN KEY (`restaurant_id` )
+    REFERENCES `wireless_order_db`.`restaurant` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the stock to each material of department' ;
+
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
 
 
 -- -----------------------------------------------------
