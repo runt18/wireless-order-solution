@@ -29,7 +29,7 @@ public class FoodReflector {
 	 * @throws SQLException
 	 *             throws if fail to execute the SQL statement
 	 */
-	public static Food[] getDetailToday(DBCon dbCon, String extraCond)
+	public static Food[] getDetailToday(DBCon dbCon, String extraCond, String orderClause)
 			throws SQLException {
 		String sql;
 		sql = "SELECT name, food_id, food_status, SUM(order_count) AS order_sum, unit_price, "
@@ -37,7 +37,8 @@ public class FoodReflector {
 				+ Params.dbName
 				+ "`.`order_food` "
 				+ (extraCond == null ? "" : extraCond)
-				+ " GROUP BY food_id, taste_id, taste_id2, taste_id3, hang_status, is_temporary HAVING order_sum > 0 ";
+				+ " GROUP BY food_id, taste_id, taste_id2, taste_id3, hang_status, is_temporary HAVING order_sum > 0 "
+				+ orderClause;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		ArrayList<Food> foods = new ArrayList<Food>();
 		while (dbCon.rs.next()) {
@@ -62,7 +63,7 @@ public class FoodReflector {
 		return foods.toArray(new Food[foods.size()]);
 	}
 
-	public static Food[] getDetailHistory(DBCon dbCon, String extraCond)
+	public static Food[] getDetailHistory(DBCon dbCon, String extraCond, String orderClause)
 			throws SQLException {
 		String sql;
 		sql = "SELECT name, food_id, food_status, SUM(order_count) AS order_sum, unit_price, "
@@ -70,7 +71,8 @@ public class FoodReflector {
 				+ Params.dbName
 				+ "`.`order_food_history` "
 				+ (extraCond == null ? "" : extraCond)
-				+ " GROUP BY food_id, taste_id, taste_id2, taste_id3, hang_status, is_temporary HAVING order_sum > 0 ";
+				+ " GROUP BY food_id, taste_id, taste_id2, taste_id3, hang_status, is_temporary HAVING order_sum > 0 "
+				+ orderClause;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		ArrayList<Food> foods = new ArrayList<Food>();
 		while (dbCon.rs.next()) {
