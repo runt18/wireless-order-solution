@@ -177,11 +177,9 @@ public class QueryOrder {
 		dbCon.rs.close();
 		
 		// query the food's id and order count associate with the order id for "order_food" table		
-		String extraCond = "WHERE order_id=" + 
-						   orderID +
-						   " GROUP BY food_id, taste_id, taste_id2, taste_id3, hang_status, is_temporary HAVING order_sum > 0";		
+		String extraCond = "WHERE order_id=" + orderID;		
 
-		orderInfo.foods = FoodReflector.create(dbCon, extraCond);
+		orderInfo.foods = FoodReflector.getDetailToday(dbCon, extraCond);
 
 		return orderInfo;
 	}
