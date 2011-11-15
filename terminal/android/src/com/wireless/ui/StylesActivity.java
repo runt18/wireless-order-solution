@@ -38,7 +38,7 @@ public class StylesActivity extends Activity {
 		appcontext = (AppContext) getApplication();
 		appcontext.activityList.add(StylesActivity.this);
 		myListview=(ListView)findViewById(R.id.myListView);
-		foodtaste=(TextView)findViewById(R.id.foodtaste);
+		foodtaste=(TextView)findViewById(R.id.foodTasteTxtView);
 	    Common.getCommon().init(Common.getCommon().getFoodlist().get(Common.getCommon().getPosition()), foodtaste);
 		adapter=new StylesAdapter(StylesActivity.this,appcontext.getStyles(),foodtaste);
 		myListview.setAdapter(adapter);

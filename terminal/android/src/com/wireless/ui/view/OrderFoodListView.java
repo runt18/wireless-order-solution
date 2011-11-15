@@ -27,6 +27,10 @@ import com.wireless.ui.dialog.AskPwdDialog;
 
 public class OrderFoodListView extends ExpandableListView{
 
+	public final static int PICK_TASTE = 1;
+	public final static int PICK_FOOD = 2;
+	
+	private OnOperListener _operListener;
 	private Context _context;
 	private List<Food> _foods;
 	private byte _type = Type.INSERT_ORDER;
@@ -70,6 +74,10 @@ public class OrderFoodListView extends ExpandableListView{
 		}else{
 			_type = Type.INSERT_ORDER;
 		}
+	}
+	
+	public void setOperListener(OnOperListener operListener){
+		_operListener = operListener;
 	}
 	
 	public void setFoods(List<Food> foods){
@@ -365,6 +373,9 @@ public class OrderFoodListView extends ExpandableListView{
 					@Override
 					public void onClick(View arg0) {
 						// TODO Auto-generated method stub							
+						if(_operListener != null){
+							_operListener.OnOperTaste(selectedFood);
+						}
 					}
 				});
 				
@@ -396,14 +407,18 @@ public class OrderFoodListView extends ExpandableListView{
 				((RelativeLayout)view.findViewById(R.id.r1)).setOnClickListener(new View.OnClickListener() {						
 					@Override
 					public void onClick(View arg0) {
-						dismiss();
-						new AskPwdDialog(_context, AskPwdDialog.PWD_3){							
-							@Override
-							protected void onPwdPass(Context context){
-								dismiss();
-								new AskCancelAmountDialog(selectedFood).show();
-							}
-						}.show();
+						// FIXME
+						if(_operListener != null){
+							_operListener.OnOperTaste(selectedFood);
+						}
+//						dismiss();
+//						new AskPwdDialog(_context, AskPwdDialog.PWD_3){							
+//							@Override
+//							protected void onPwdPass(Context context){
+//								dismiss();
+//								new AskCancelAmountDialog(selectedFood).show();
+//							}
+//						}.show();
 					}
 				});
 				
@@ -483,8 +498,12 @@ public class OrderFoodListView extends ExpandableListView{
 		@Override
 		protected void onStop(){
 			_adapter.notifyDataSetChanged();
-		}
-		
+		}		
+	}
+	
+	public static interface OnOperListener{
+		public void OnOperTaste(Food selectedFood);
+		public void OnOperFood();
 	}
 	
 }

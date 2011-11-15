@@ -41,7 +41,7 @@ String taste="";
 		
 		appcontext = (AppContext) getApplication();
 		appcontext.activityList.add(TasteActivity.this);
-		foodtaste=(TextView)findViewById(R.id.foodtaste);
+		foodtaste=(TextView)findViewById(R.id.foodTasteTxtView);
 	    Common.getCommon().init(Common.getCommon().getFoodlist().get(Common.getCommon().getPosition()), foodtaste);
 			
 		myListview=(ListView)findViewById(R.id.myListView);

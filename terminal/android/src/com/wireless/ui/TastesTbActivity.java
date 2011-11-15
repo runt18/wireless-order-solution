@@ -1,7 +1,10 @@
 package com.wireless.ui;
 
 import android.app.TabActivity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -21,8 +24,16 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Util;
+import com.wireless.ui.view.OrderFoodListView;
 
 public class TastesTbActivity extends TabActivity {
+	
+	private Handler _handler = new Handler(){
+		@Override
+		public void handleMessage(Message message){
+			_tasteTxtView.setText(_selectedFood.name + "-" + _selectedFood.tastePref);
+		}
+	};
 	
 	private final static String TAG_TASTE = "taste";
 	private final static String TAG_STYLE = "style";
@@ -86,24 +97,38 @@ public class TastesTbActivity extends TabActivity {
 			@Override
 			public void onTabChanged(String tag) {
 				if(tag == TAG_TASTE){
-					_tasteTxtView = (TextView)findViewById(R.id.foodtaste);
+					_tasteTxtView = (TextView)findViewById(R.id.foodTasteTxtView);
 					ListView tasteLstView = (ListView)findViewById(R.id.tasteLstView);
 					tasteLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.tastes));
 					
 				}else if(tag == TAG_STYLE){
-					_tasteTxtView = (TextView)findViewById(R.id.foodtaste);
+					_tasteTxtView = (TextView)findViewById(R.id.foodStyleTxtView);
 					ListView tasteLstView = (ListView)findViewById(R.id.styleLstView);
 					tasteLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.styles));
 					
 				}else if(tag == TAG_SPEC){
-					_tasteTxtView = (TextView)findViewById(R.id.foodtaste);
+					_tasteTxtView = (TextView)findViewById(R.id.foodSpecTxtView);
 					ListView tasteLstView = (ListView)findViewById(R.id.specLstView);
 					tasteLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.specs));
 				}
+				_handler.sendEmptyMessage(0);
 			}
 		});
+		
+		_tabHost.setCurrentTabByTag(TAG_SPEC);
 	}
 
+
+	@Override
+	public void onBackPressed(){
+		Intent intent = new Intent(); 
+		Bundle bundle = new Bundle();
+		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(_selectedFood));
+		intent.putExtras(bundle);
+		setResult(RESULT_OK, intent);
+		super.onBackPressed();
+	}
+	
 	/**
 	 * Create the tab indicator
 	 * @param text
@@ -151,7 +176,11 @@ public class TastesTbActivity extends TabActivity {
 			//set name to taste
 			((TextView)view.findViewById(R.id.foodname)).setText(_tastes[position].preference);
 			//set the price to taste
-			((TextView)view.findViewById(R.id.foodprice)).setText(Util.CURRENCY_SIGN + Util.float2String2(_tastes[position].getPrice()));
+			if(_tastes[position].calc == Taste.CALC_RATE){
+				((TextView)view.findViewById(R.id.foodprice)).setText(Util.float2Int(_tastes[position].getRate()) + "%");
+			}else{
+				((TextView)view.findViewById(R.id.foodprice)).setText(Util.CURRENCY_SIGN + Util.float2String2(_tastes[position].getPrice()));
+			}
 			//set the status to whether the taste is selected
 			final CheckBox selectChkBox = (CheckBox)view.findViewById(R.id.chioce);
 			selectChkBox.setChecked(false);
@@ -163,27 +192,32 @@ public class TastesTbActivity extends TabActivity {
 			}
 			
 			/**
-			 * 口味的CheckBox操作
-			 */
-			selectChkBox.setOnClickListener(new OnClickListener() {				
+			 * 口味的View操作
+			 */			
+			view.setOnClickListener(new OnClickListener() {
+				
 				@Override
 				public void onClick(View arg0) {
 					if(selectChkBox.isChecked()){
 						int pos = _selectedFood.removeTaste(_tastes[position]);
-						if(pos > 0){
+						if(pos >= 0){
 							selectChkBox.setChecked(false);
+							Toast.makeText(TastesTbActivity.this, "删除" + _tastes[position].preference, 0).show();
 						}
+						
 					}else{
 						int pos = _selectedFood.addTaste(_tastes[position]);
-						if(pos > 0){
+						if(pos >= 0){
 							selectChkBox.setChecked(true);
+							Toast.makeText(TastesTbActivity.this, "添加" + _tastes[position].preference, 0).show();
 						}else{
 							Toast.makeText(TastesTbActivity.this, "最多只能添加" + _selectedFood.tastes.length + "种口味", 0).show();
-						}						
+						}
 					}
-					_tasteTxtView.setText(_selectedFood.name + "-" + _selectedFood.tastePref);
+					_handler.sendEmptyMessage(0);
 				}
 			});
+
 			return view;
 		}
 		

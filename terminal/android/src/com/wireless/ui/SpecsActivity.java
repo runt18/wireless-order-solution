@@ -38,7 +38,7 @@ public class SpecsActivity extends Activity {
 		appcontext = (AppContext) getApplication();
 		appcontext.activityList.add(SpecsActivity.this);
 		myListview=(ListView)findViewById(R.id.myListView);
-		foodtaste=(TextView)findViewById(R.id.foodtaste);
+		foodtaste=(TextView)findViewById(R.id.foodTasteTxtView);
 	    Common.getCommon().init(Common.getCommon().getFoodlist().get(Common.getCommon().getPosition()), foodtaste);
 		adapter=new SpecAdapter(SpecsActivity.this,appcontext.getSpecs(),foodtaste);
 		myListview.setAdapter(adapter);

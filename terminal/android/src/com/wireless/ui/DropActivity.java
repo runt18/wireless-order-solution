@@ -3,6 +3,7 @@ package com.wireless.ui;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import android.app.Activity;
@@ -32,7 +33,7 @@ import com.wireless.protocol.Util;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.ui.view.OrderFoodListView;
 
-public class DropActivity extends Activity {
+public class DropActivity extends Activity implements OrderFoodListView.OnOperListener {
 
 	private Order _oriOrder;
 	private List<Food> _oriFoods;
@@ -61,50 +62,45 @@ public class DropActivity extends Activity {
 		commitBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(DropActivity.this, TastesTbActivity.class);
-				Bundle bundle = new Bundle();
-				bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(_oriOrder.foods[0]));
-				intent.putExtras(bundle);
-				startActivity(intent);
-//				/**
-//				 * 遍历查找已点和新点菜品中是否相同的菜品，
-//				 * 如果有就将他们的点菜数量相加
-//				 */
-//				List<Food> foods = new ArrayList<Food>();
-//				Iterator<Food> oriIter = _oriFoods.iterator();
-//				while(oriIter.hasNext()){
-//					Food oriFood = oriIter.next();
-//					Iterator<Food> newIter = _newFoods.iterator();
-//					while(newIter.hasNext()){
-//						Food newFood = newIter.next();
-//						if(oriFood.equals(newFood)){
-//							oriFood.setCount(oriFood.getCount() + newFood.getCount());
-//							break;
-//						}
-//					}
-//					foods.add(oriFood);
-//				}
-//				
-//				/**
-//				 * 遍历新点菜品中是否有新增加的菜品，
-//				 * 有则添加到菜品列表中
-//				 */
-//				Iterator<Food> newIter = _newFoods.iterator();
-//				while(newIter.hasNext()){
-//					Food newFood = newIter.next();
-//					if(!foods.contains(newFood)){
-//						foods.add(newFood);
-//					}
-//				}
-//				
-//				/**
-//				 * 已点菜和新点菜合并后，生成新的Order，执行改单请求
-//				 */
-//				Order reqOrder = new Order(foods.toArray(new Food[foods.size()]),
-//										   Short.parseShort(((EditText)findViewById(R.id.valueplatform)).getText().toString()),
-//										   Integer.parseInt(((EditText)findViewById(R.id.valuepeople)).getText().toString()));
-//				reqOrder.originalTableID = _oriOrder.table_id;
-//				new UpdateOrderTask(reqOrder).execute();
+				/**
+				 * 遍历查找已点和新点菜品中是否相同的菜品，
+				 * 如果有就将他们的点菜数量相加
+				 */
+				List<Food> foods = new ArrayList<Food>();
+				Iterator<Food> oriIter = _oriFoods.iterator();
+				while(oriIter.hasNext()){
+					Food oriFood = oriIter.next();
+					Iterator<Food> newIter = _newFoods.iterator();
+					while(newIter.hasNext()){
+						Food newFood = newIter.next();
+						if(oriFood.equals(newFood)){
+							oriFood.setCount(oriFood.getCount() + newFood.getCount());
+							break;
+						}
+					}
+					foods.add(oriFood);
+				}
+				
+				/**
+				 * 遍历新点菜品中是否有新增加的菜品，
+				 * 有则添加到菜品列表中
+				 */
+				Iterator<Food> newIter = _newFoods.iterator();
+				while(newIter.hasNext()){
+					Food newFood = newIter.next();
+					if(!foods.contains(newFood)){
+						foods.add(newFood);
+					}
+				}
+				
+				/**
+				 * 已点菜和新点菜合并后，生成新的Order，执行改单请求
+				 */
+				Order reqOrder = new Order(foods.toArray(new Food[foods.size()]),
+										   Short.parseShort(((EditText)findViewById(R.id.valueplatform)).getText().toString()),
+										   Integer.parseInt(((EditText)findViewById(R.id.valuepeople)).getText().toString()));
+				reqOrder.originalTableID = _oriOrder.table_id;
+				new UpdateOrderTask(reqOrder).execute();
 			}
 		});
 
@@ -120,6 +116,7 @@ public class DropActivity extends Activity {
 		oriFoodLstView.setType(Type.UPDATE_ORDER);
 		_oriFoods = new ArrayList<Food>(Arrays.asList(_oriOrder.foods));
 		oriFoodLstView.setFoods(_oriFoods);
+		oriFoodLstView.setOperListener(this);
 
 
 		/**
@@ -140,13 +137,32 @@ public class DropActivity extends Activity {
 			
 	}
 
-	/*
-	 * 点击点菜跳到点菜界面
-	 */
+	private Food _selectedFood;
+	
+	@Override
+	public void OnOperTaste(Food selectedFood) {
+		_selectedFood = selectedFood;
+		Intent intent = new Intent(DropActivity.this, TastesTbActivity.class);
+		Bundle bundle = new Bundle();
+		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(_selectedFood));
+		intent.putExtras(bundle);
+		startActivityForResult(intent, OrderFoodListView.PICK_TASTE);
+	}
 
-	public void orderfood() {
-		Intent intent = new Intent(DropActivity.this, TabhostActivity.class);
-		startActivity(intent);
+	@Override
+	public void OnOperFood() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data){
+		if(resultCode == RESULT_OK){
+			if(requestCode == OrderFoodListView.PICK_TASTE){
+				FoodParcel foodParcel = data.getParcelableExtra(FoodParcel.KEY_VALUE);
+				_selectedFood = foodParcel;
+			}
+		}
 	}
 
 	/**
@@ -257,5 +273,14 @@ public class DropActivity extends Activity {
 		startActivity(intent);
 
 	}
+
+	/*
+	 * 点击点菜跳到点菜界面
+	 */
+	public void orderfood() {
+		Intent intent = new Intent(DropActivity.this, TabhostActivity.class);
+		startActivity(intent);
+	}
+
 
 }
