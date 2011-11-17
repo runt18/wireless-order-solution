@@ -1,9 +1,5 @@
 package com.wireless.ui.field;
 
-import com.wireless.protocol.Food;
-import com.wireless.protocol.Taste;
-import com.wireless.protocol.Util;
-
 import net.rim.device.api.ui.Field;
 import net.rim.device.api.ui.FieldChangeListener;
 import net.rim.device.api.ui.component.ButtonField;
@@ -12,10 +8,14 @@ import net.rim.device.api.ui.component.SeparatorField;
 import net.rim.device.api.ui.container.PopupScreen;
 import net.rim.device.api.ui.container.VerticalFieldManager;
 
+import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.Taste;
+import com.wireless.protocol.Util;
+
 public class FoodDetailPopup extends PopupScreen {
 	
 	
-	public FoodDetailPopup(Food selectedFood){
+	public FoodDetailPopup(OrderFood selectedFood){
 		super(new VerticalFieldManager(VERTICAL_SCROLL | VERTICAL_SCROLLBAR), DEFAULT_CLOSE);
 		
 		add(new LabelField(selectedFood.name));
@@ -28,9 +28,9 @@ public class FoodDetailPopup extends PopupScreen {
 		}
 		
 		String status = null;
-		if(selectedFood.hangStatus == Food.FOOD_HANG_UP){
+		if(selectedFood.hangStatus == OrderFood.FOOD_HANG_UP){
 			status = "叫";
-		}else if(selectedFood.hangStatus == Food.FOOD_IMMEDIATE){
+		}else if(selectedFood.hangStatus == OrderFood.FOOD_IMMEDIATE){
 			status = "即";
 		}
 		if(selectedFood.isHurried){

@@ -16,17 +16,17 @@ import net.rim.device.api.ui.component.SeparatorField;
 import net.rim.device.api.ui.container.PopupScreen;
 import net.rim.device.api.ui.container.VerticalFieldManager;
 
-import com.wireless.protocol.Food;
+import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
 import com.wireless.terminal.WirelessOrder;
 
 public class SelectTTypePopup extends PopupScreen {
 	
 	private OrderListField _orderField = null;
-	private Food _selectedFood = null;
+	private OrderFood _selectedFood = null;
 	private TasteMap[] _tasteMap = null;
 	
-	public SelectTTypePopup(OrderListField orderField, Food selectedFood){
+	public SelectTTypePopup(OrderListField orderField, OrderFood selectedFood){
 		super(new VerticalFieldManager(VERTICAL_SCROLL | VERTICAL_SCROLLBAR), DEFAULT_CLOSE);
 		
 		_orderField = orderField;

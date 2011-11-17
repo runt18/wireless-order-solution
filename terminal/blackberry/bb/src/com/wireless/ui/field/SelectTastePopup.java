@@ -17,10 +17,8 @@ import net.rim.device.api.ui.component.SeparatorField;
 import net.rim.device.api.ui.component.TextField;
 import net.rim.device.api.ui.container.PopupScreen;
 import net.rim.device.api.ui.container.VerticalFieldManager;
-import net.rim.device.api.util.Arrays;
-import net.rim.device.api.util.Comparator;
 
-import com.wireless.protocol.Food;
+import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Util;
 import com.wireless.terminal.PlatformInfo;
@@ -32,12 +30,12 @@ public class SelectTastePopup extends PopupScreen{
 	private OrderListField _orderListField = null;
 	private EditField _tasteID = null;
 	private Taste[] _tastes = null;
-	private Food _selectedFood = null;
+	private OrderFood _selectedFood = null;
 	private ListField _tasteList = null;
 	int[] _tasteMatchedIdx = null;
 	String _cate = null;
 	
-	public SelectTastePopup(OrderListField orderField, Taste[] tastes, Food food){		
+	public SelectTastePopup(OrderListField orderField, Taste[] tastes, OrderFood food){		
 		super(new VerticalFieldManager(VERTICAL_SCROLL | VERTICAL_SCROLLBAR), DEFAULT_CLOSE);
 		_orderListField = orderField;
 		_tastes = tastes;

@@ -15,7 +15,7 @@ import net.rim.device.api.ui.container.HorizontalFieldManager;
 import net.rim.device.api.ui.container.PopupScreen;
 import net.rim.device.api.ui.container.VerticalFieldManager;
 
-import com.wireless.protocol.Food;
+import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Type;
 import com.wireless.protocol.Util;
 
@@ -26,10 +26,10 @@ class RemoveFoodPopup extends PopupScreen implements FieldChangeListener{
 	private ButtonField _cancel;
 	private OrderListField _orderList;
 	private PopupScreen _parent;
-	private Food _food2Del;
+	private OrderFood _food2Del;
 	private byte _type = Type.INSERT_ORDER;
 	
-	RemoveFoodPopup(OrderListField orderList, Food foodToDel, byte type, PopupScreen parent){
+	RemoveFoodPopup(OrderListField orderList, OrderFood foodToDel, byte type, PopupScreen parent){
 		super(new VerticalFieldManager(), DEFAULT_CLOSE);
 		
 		_orderList = orderList;

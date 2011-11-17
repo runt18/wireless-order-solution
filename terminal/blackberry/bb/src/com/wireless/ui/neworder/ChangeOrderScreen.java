@@ -21,6 +21,7 @@ import net.rim.device.api.ui.container.VerticalFieldManager;
 
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
+import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Type;
 import com.wireless.protocol.Util;
 import com.wireless.terminal.WirelessOrder;
@@ -220,9 +221,9 @@ public class ChangeOrderScreen extends MainScreen implements PostSubmitOrder{
 					 * Combine the foods of original and new list fields. 
 					 */
 					for(int i = 0; i < _oriListField.getSize(); i++){
-						Food originalFood = (Food)_oriListField.getCallback().get(null, i);
+						OrderFood originalFood = (OrderFood)_oriListField.getCallback().get(null, i);
 						for(int j = 0; j < _newListField.getSize(); j++){
-							Food newFood = (Food)_newListField.getCallback().get(null, j);
+							OrderFood newFood = (OrderFood)_newListField.getCallback().get(null, j);
 							if(originalFood.equals(newFood)){
 								int count = Util.float2Int(originalFood.getCount()) + Util.float2Int(newFood.getCount());
 								originalFood.setCount(Util.int2Float(count));
@@ -239,7 +240,7 @@ public class ChangeOrderScreen extends MainScreen implements PostSubmitOrder{
 						}
 					}
 					
-					Food[] foods = new Food[vectFoods.size()];
+					OrderFood[] foods = new OrderFood[vectFoods.size()];
 					vectFoods.copyInto(foods);
 					
 					Order reqOrder = new Order(foods, 

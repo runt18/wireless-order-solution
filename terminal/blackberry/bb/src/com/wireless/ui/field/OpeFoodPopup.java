@@ -13,7 +13,7 @@ import net.rim.device.api.ui.container.HorizontalFieldManager;
 import net.rim.device.api.ui.container.PopupScreen;
 import net.rim.device.api.ui.container.VerticalFieldManager;
 
-import com.wireless.protocol.Food;
+import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Type;
 import com.wireless.terminal.WirelessOrder;
@@ -21,7 +21,7 @@ import com.wireless.terminal.WirelessOrder;
 class OpeFoodPopup extends PopupScreen{
 	
 	private OrderListField _orderList = null;
-	private Food _selectedFood = null;
+	private OrderFood _selectedFood = null;
 	private PopupScreen _self = this;
 	private byte _type = Type.INSERT_ORDER;
 	
@@ -38,26 +38,26 @@ class OpeFoodPopup extends PopupScreen{
 
 		ButtonField hangBtn = null;
 		if(_type == Type.INSERT_ORDER){
-			if(_orderList.getSelectedFood().hangStatus == Food.FOOD_NORMAL){
+			if(_orderList.getSelectedFood().hangStatus == OrderFood.FOOD_NORMAL){
 				hangBtn = new ButtonField("叫起");
 				hangBtn.setChangeListener(new FieldChangeListener() {					
 					public void fieldChanged(Field field, int context) {
 						int resp = Dialog.ask(Dialog.D_YES_NO, "确认叫起" + _orderList.getSelectedFood().name + "?");
 						if(resp == Dialog.YES){
-							_orderList.getSelectedFood().hangStatus = Food.FOOD_HANG_UP;	
+							_orderList.getSelectedFood().hangStatus = OrderFood.FOOD_HANG_UP;	
 							_orderList.invalidate(_orderList.getSelectedIndex());
 							close();
 						}
 					}
 				});
 				
-			}else if(_orderList.getSelectedFood().hangStatus == Food.FOOD_HANG_UP){
+			}else if(_orderList.getSelectedFood().hangStatus == OrderFood.FOOD_HANG_UP){
 				hangBtn = new ButtonField("即起");
 				hangBtn.setChangeListener(new FieldChangeListener() {					
 					public void fieldChanged(Field field, int context) {
 						int resp = Dialog.ask(Dialog.D_YES_NO, "确认取消叫起" + _orderList.getSelectedFood().name + "?");
 						if(resp == Dialog.YES){
-							_orderList.getSelectedFood().hangStatus = Food.FOOD_NORMAL;	
+							_orderList.getSelectedFood().hangStatus = OrderFood.FOOD_NORMAL;	
 							_orderList.invalidate(_orderList.getSelectedIndex());
 							close();
 						}
@@ -67,26 +67,26 @@ class OpeFoodPopup extends PopupScreen{
 			
 
 		}else if(_type == Type.UPDATE_ORDER){
-			if(_orderList.getSelectedFood().hangStatus == Food.FOOD_HANG_UP){
+			if(_orderList.getSelectedFood().hangStatus == OrderFood.FOOD_HANG_UP){
 				hangBtn = new ButtonField("即起");
 				hangBtn.setChangeListener(new FieldChangeListener() {					
 					public void fieldChanged(Field field, int context) {
 						int resp = Dialog.ask(Dialog.D_YES_NO, "确认即起" + _orderList.getSelectedFood().name + "?");
 						if(resp == Dialog.YES){
-							_orderList.getSelectedFood().hangStatus = Food.FOOD_IMMEDIATE;			
+							_orderList.getSelectedFood().hangStatus = OrderFood.FOOD_IMMEDIATE;			
 							_orderList.invalidate(_orderList.getSelectedIndex());
 							close();
 						}
 					}
 				});
 				
-			}else if(_orderList.getSelectedFood().hangStatus == Food.FOOD_IMMEDIATE){
+			}else if(_orderList.getSelectedFood().hangStatus == OrderFood.FOOD_IMMEDIATE){
 				hangBtn = new ButtonField("叫起");
 				hangBtn.setChangeListener(new FieldChangeListener() {					
 					public void fieldChanged(Field field, int context) {
 						int resp = Dialog.ask(Dialog.D_YES_NO, "确认重新叫起" + _orderList.getSelectedFood().name + "?");
 						if(resp == Dialog.YES){
-							_orderList.getSelectedFood().hangStatus = Food.FOOD_HANG_UP;	
+							_orderList.getSelectedFood().hangStatus = OrderFood.FOOD_HANG_UP;	
 							_orderList.invalidate(_orderList.getSelectedIndex());
 							close();
 						}
@@ -214,7 +214,7 @@ class OpeFoodPopup extends PopupScreen{
 		}
 		
 		if(hangBtn != null){
-			if(_type == Type.UPDATE_ORDER && _orderList.getSelectedFood().hangStatus == Food.FOOD_HANG_UP){
+			if(_type == Type.UPDATE_ORDER && _orderList.getSelectedFood().hangStatus == OrderFood.FOOD_HANG_UP){
 				hfm.insert(hangBtn, 0);
 			}else{
 				hfm.add(hangBtn);
