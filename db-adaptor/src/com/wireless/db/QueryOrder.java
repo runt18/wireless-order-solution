@@ -180,7 +180,8 @@ public class QueryOrder {
 		String extraCond = "WHERE order_id=" + orderID;		
 
 		orderInfo.foods = OrderFoodReflector.getDetailToday(dbCon, extraCond, "");
-
+		orderInfo.id = orderID;
+		
 		return orderInfo;
 	}
 	
