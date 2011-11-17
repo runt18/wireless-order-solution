@@ -98,7 +98,7 @@ public class RespParser {
 
 			//get order food's number
 			int foodNum = response.body[14];
-			Food[] orderFoods = new Food[foodNum]; 
+			OrderFood[] orderFoods = new OrderFood[foodNum]; 
 			
 			//get every order food's id and number
 			int offset = 15;
@@ -130,7 +130,7 @@ public class RespParser {
 						name = new String(response.body, offset + 10, len, "UTF-8");
 					}catch(UnsupportedEncodingException e){}
 					
-					orderFoods[i] = new Food();
+					orderFoods[i] = new OrderFood();
 					orderFoods[i].isTemporary = true;
 					orderFoods[i].alias_id = foodID;
 					orderFoods[i].hangStatus = hangStatus;
@@ -168,7 +168,7 @@ public class RespParser {
 					
 					offset += 13;
 					
-					orderFoods[i] = new Food();
+					orderFoods[i] = new OrderFood();
 					orderFoods[i].isTemporary = false;
 					orderFoods[i].alias_id = foodID;
 					orderFoods[i].count = orderAmount;

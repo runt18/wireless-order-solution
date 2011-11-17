@@ -96,7 +96,7 @@ public class ReqParser {
 		//get the number of foods
 		int foodNum = (byte)(req.body[8] & 0x000000FF);
 		
-		Food[] orderFoods = new Food[foodNum];
+		OrderFood[] orderFoods = new OrderFood[foodNum];
 		//table id(2-byte) + 2nd table id(2-byte) + category(1-byte) + custom_num(1-byte) + food_num(1-byte)
 		int offset = 9;
 		//assign each order food's information, including the food's id and order number
@@ -135,7 +135,7 @@ public class ReqParser {
 					name = new String(req.body, offset + 11, len, "UTF-8");
 				}catch(UnsupportedEncodingException e){}
 				
-				orderFoods[i] = new Food();
+				orderFoods[i] = new OrderFood();
 				orderFoods[i].isTemporary = true;
 				orderFoods[i].kitchen = Kitchen.KITCHEN_TEMP;
 				orderFoods[i].alias_id = foodID;
@@ -178,7 +178,7 @@ public class ReqParser {
 				
 				offset += 14;
 				
-				orderFoods[i] = new Food();
+				orderFoods[i] = new OrderFood();
 				orderFoods[i].alias_id = foodID;
 				orderFoods[i].count = orderNum;
 				
