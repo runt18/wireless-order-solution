@@ -5,8 +5,8 @@ import java.sql.Statement;
 
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
+import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Terminal;
@@ -187,7 +187,7 @@ public class InsertOrder {
 							orderToInsert.foods[i].getPrice() + ", '" + 
 							orderToInsert.foods[i].name + "', " +
 							orderToInsert.foods[i].status + ", " +
-							(orderToInsert.foods[i].hangStatus == Food.FOOD_HANG_UP ? Food.FOOD_HANG_UP : Food.FOOD_NORMAL) + ", " +
+							(orderToInsert.foods[i].hangStatus == OrderFood.FOOD_HANG_UP ? OrderFood.FOOD_HANG_UP : OrderFood.FOOD_NORMAL) + ", " +
 							orderToInsert.foods[i].getDiscount() + ", '" +
 							orderToInsert.foods[i].tastePref + "', " + 
 							orderToInsert.foods[i].getTastePrice() + ", " +

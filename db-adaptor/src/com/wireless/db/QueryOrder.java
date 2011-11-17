@@ -2,7 +2,7 @@ package com.wireless.db;
 
 import java.sql.SQLException;
 
-import com.wireless.dbReflect.FoodReflector;
+import com.wireless.dbReflect.OrderFoodReflector;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
@@ -179,7 +179,7 @@ public class QueryOrder {
 		// query the food's id and order count associate with the order id for "order_food" table		
 		String extraCond = "WHERE order_id=" + orderID;		
 
-		orderInfo.foods = FoodReflector.getDetailToday(dbCon, extraCond, "");
+		orderInfo.foods = OrderFoodReflector.getDetailToday(dbCon, extraCond, "");
 
 		return orderInfo;
 	}

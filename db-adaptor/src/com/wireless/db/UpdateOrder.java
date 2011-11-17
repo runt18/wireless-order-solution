@@ -6,8 +6,8 @@ import java.util.Iterator;
 
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
+import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Terminal;
@@ -181,14 +181,14 @@ public class UpdateOrder {
 	private static Result updateOrder(DBCon dbCon, Terminal term, Order orderToUpdate, boolean isGiftSkip) throws BusinessException, SQLException{		
 		
 		//query all the food's id ,order count and taste preference of this order
-		ArrayList<Food> originalRecords = new ArrayList<Food>();
+		ArrayList<OrderFood> originalRecords = new ArrayList<OrderFood>();
 		String sql = "SELECT food_id, unit_price, name, food_status, discount, SUM(order_count) AS order_sum, " +
 					"taste, taste_price, taste_id, taste_id2, taste_id3, hang_status, kitchen, is_temporary FROM `" + 
 					Params.dbName + "`.`order_food` WHERE order_id=" + orderToUpdate.id + 
 					" GROUP BY food_id, taste_id, taste_id2, taste_id3, hang_status, is_temporary HAVING order_sum > 0";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
-			Food food = new Food();
+			OrderFood food = new OrderFood();
 			food.alias_id = dbCon.rs.getInt("food_id");
 			food.setPrice(new Float(dbCon.rs.getFloat("unit_price")));
 			food.name = dbCon.rs.getString("name");
@@ -208,9 +208,9 @@ public class UpdateOrder {
 		dbCon.rs.close();
 		
 
-		ArrayList<Food> extraFoods = new ArrayList<Food>();
-		ArrayList<Food> canceledFoods = new ArrayList<Food>();
-		ArrayList<Food> hurriedFoods = new ArrayList<Food>();
+		ArrayList<OrderFood> extraFoods = new ArrayList<OrderFood>();
+		ArrayList<OrderFood> canceledFoods = new ArrayList<OrderFood>();
+		ArrayList<OrderFood> hurriedFoods = new ArrayList<OrderFood>();
 		
 		for(int i = 0; i < orderToUpdate.foods.length; i++){
 					
@@ -218,7 +218,7 @@ public class UpdateOrder {
 			 * Check to see whether the food to update is hurried.
 			 */
 			if(orderToUpdate.foods[i].isHurried){
-				Food food = genFoodDetail(dbCon, term, orderToUpdate.foods[i]);
+				OrderFood food = genFoodDetail(dbCon, term, orderToUpdate.foods[i]);
 				food.setCount(orderToUpdate.foods[i].getCount());
 				hurriedFoods.add(food);
 			}
@@ -261,7 +261,7 @@ public class UpdateOrder {
 			
 			if(status == STATUS.NOT_MATCHED || status == STATUS.FULL_MATCHED_BUT_COUNT){
 				
-				Food food = genFoodDetail(dbCon, term, orderToUpdate.foods[i]);
+				OrderFood food = genFoodDetail(dbCon, term, orderToUpdate.foods[i]);
 				
 				food.setCount(new Float((float)Math.round(Math.abs(diff) * 100) / 100));
 				
@@ -320,7 +320,7 @@ public class UpdateOrder {
 					extraFoods.get(i).getPrice() + ", '" + 
 					extraFoods.get(i).name + "', " + 
 					extraFoods.get(i).status + ", " +
-					(extraFoods.get(i).hangStatus == Food.FOOD_HANG_UP ? Food.FOOD_HANG_UP : Food.FOOD_NORMAL) + ", " +
+					(extraFoods.get(i).hangStatus == OrderFood.FOOD_HANG_UP ? OrderFood.FOOD_HANG_UP : OrderFood.FOOD_NORMAL) + ", " +
 					extraFoods.get(i).getDiscount() + ", " +
 					extraFoods.get(i).tastes[0].alias_id + "," +
 					extraFoods.get(i).tastes[1].alias_id + "," +
@@ -353,7 +353,7 @@ public class UpdateOrder {
 					canceledFoods.get(i).getPrice() + ", '" + 
 					canceledFoods.get(i).name + "', " + 
 					canceledFoods.get(i).status + ", " +
-					(canceledFoods.get(i).hangStatus == Food.FOOD_HANG_UP ? Food.FOOD_HANG_UP : Food.FOOD_NORMAL) + ", " +
+					(canceledFoods.get(i).hangStatus == OrderFood.FOOD_HANG_UP ? OrderFood.FOOD_HANG_UP : OrderFood.FOOD_NORMAL) + ", " +
 					canceledFoods.get(i).getDiscount() + ", " +
 					canceledFoods.get(i).tastes[0].alias_id + "," +
 					canceledFoods.get(i).tastes[1].alias_id + "," +
@@ -404,10 +404,10 @@ public class UpdateOrder {
 		 */
 		if(!extraFoods.isEmpty() || !canceledFoods.isEmpty()){			
 			
-			ArrayList<Food> tmpFoods = new ArrayList<Food>();
+			ArrayList<OrderFood> tmpFoods = new ArrayList<OrderFood>();
 			
-			Iterator<Food> iterExtra;
-			Iterator<Food> iterCancel;
+			Iterator<OrderFood> iterExtra;
+			Iterator<OrderFood> iterCancel;
 			
 			/**
 			 * Find the canceled foods to print
@@ -415,12 +415,12 @@ public class UpdateOrder {
 			tmpFoods.clear();
 			iterCancel = canceledFoods.iterator();
 			while(iterCancel.hasNext()){
-				Food canceledFood = iterCancel.next();
+				OrderFood canceledFood = iterCancel.next();
 				
 				boolean isCancelled = true;	
 				iterExtra = extraFoods.iterator();
 				while(iterExtra.hasNext()){
-					Food extraFood = iterExtra.next();
+					OrderFood extraFood = iterExtra.next();
 					/**
 					 * If the food to cancel is hang up before.
 					 * Check to see whether the same extra food is exist
@@ -428,12 +428,12 @@ public class UpdateOrder {
 					 * If so, means the extra food is immediate
 					 * and NOT need to print this canceled food.
 					 */
-					if(canceledFood.hangStatus == Food.FOOD_HANG_UP){
+					if(canceledFood.hangStatus == OrderFood.FOOD_HANG_UP){
 						if(extraFood.equals2(canceledFood) && 
 						   extraFood.getCount().floatValue() >= canceledFood.getCount().floatValue()){
 							
 							isCancelled = false;
-							extraFood.hangStatus = Food.FOOD_IMMEDIATE;
+							extraFood.hangStatus = OrderFood.FOOD_IMMEDIATE;
 							break;
 						}
 						
@@ -465,7 +465,7 @@ public class UpdateOrder {
 				result.canceledOrder.table_id = orderToUpdate.table_id;
 				result.canceledOrder.table_name = orderToUpdate.table_name;
 				result.canceledOrder.custom_num = orderToUpdate.custom_num;
-				result.canceledOrder.foods = tmpFoods.toArray(new Food[tmpFoods.size()]);
+				result.canceledOrder.foods = tmpFoods.toArray(new OrderFood[tmpFoods.size()]);
 			}
 			
 			/**
@@ -475,7 +475,7 @@ public class UpdateOrder {
 			iterExtra = extraFoods.listIterator();
 			while(iterExtra.hasNext()){
 				
-				Food extraFood = iterExtra.next();
+				OrderFood extraFood = iterExtra.next();
 				
 				boolean isExtra = true;	
 				/**
@@ -488,7 +488,7 @@ public class UpdateOrder {
 				 */
 				iterCancel = canceledFoods.iterator();
 				while(iterCancel.hasNext()){
-					Food canceledFood = iterCancel.next();
+					OrderFood canceledFood = iterCancel.next();
 					if(extraFood.alias_id == canceledFood.alias_id &&
 					   extraFood.getCount().equals(canceledFood.getCount()) &&
 					   extraFood.hangStatus == canceledFood.hangStatus){
@@ -508,7 +508,7 @@ public class UpdateOrder {
 				result.extraOrder.table_id = orderToUpdate.table_id;
 				result.extraOrder.table_name = orderToUpdate.table_name;
 				result.extraOrder.custom_num = orderToUpdate.custom_num;
-				result.extraOrder.foods = tmpFoods.toArray(new Food[tmpFoods.size()]);
+				result.extraOrder.foods = tmpFoods.toArray(new OrderFood[tmpFoods.size()]);
 			}
 		}
 		
@@ -521,7 +521,7 @@ public class UpdateOrder {
 			result.hurriedOrder.table_id = orderToUpdate.table_id;
 			result.hurriedOrder.table_name = orderToUpdate.table_name;
 			result.hurriedOrder.custom_num = orderToUpdate.custom_num;
-			result.hurriedOrder.foods = hurriedFoods.toArray(new Food[hurriedFoods.size()]);
+			result.hurriedOrder.foods = hurriedFoods.toArray(new OrderFood[hurriedFoods.size()]);
 		}
 		
 		return result;
@@ -543,7 +543,7 @@ public class UpdateOrder {
 	 * @throws SQLException
 	 * 			Throws if fail to execute any SQL statement
 	 */
-	private static Food genFoodDetail(DBCon dbCon, Terminal term, Food foodBasic) throws BusinessException, SQLException{
+	private static OrderFood genFoodDetail(DBCon dbCon, Terminal term, OrderFood foodBasic) throws BusinessException, SQLException{
 		/**
 		 * Firstly, check to see whether the submitted food is temporary.
 		 * If temporary, assign food basic's the name and price directly.
@@ -555,7 +555,7 @@ public class UpdateOrder {
 		 * and then sent back an error to tell the terminal to update the menu.
 		 */
 		
-		Food food = new Food();
+		OrderFood food = new OrderFood();
 		
 		if(foodBasic.isTemporary){
 			food.name = foodBasic.name;
