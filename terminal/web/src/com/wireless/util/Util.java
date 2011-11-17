@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
+import com.wireless.protocol.OrderFood;
 
 public class Util {
 	public static String toOrderCate(int type){
@@ -45,16 +46,16 @@ public class Util {
 	 * 			 [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价]...}
 	 * @return the class food array
 	 */
-	public static Food[] toFoodArray(String submitFoods) throws NumberFormatException{
+	public static OrderFood[] toFoodArray(String submitFoods) throws NumberFormatException{
 		//remove the "{}"
 		submitFoods = submitFoods.substring(1, submitFoods.length() - 1);
 		//extract each food item string
 		String[] foodItems = submitFoods.split("，");
-		Food[] foods = new Food[foodItems.length];
+		OrderFood[] foods = new OrderFood[foodItems.length];
 		for(int i = 0; i < foodItems.length; i++){
 			//remove the "[]"
 			String foodItem = foodItems[i].substring(1, foodItems[i].length() - 1);
-			foods[i] = new Food();
+			foods[i] = new OrderFood();
 			//extract each food detail information string			
 			String[] values = foodItem.split(",");		
 			//extract the food alias id
@@ -81,12 +82,12 @@ public class Util {
 		/**
 		 * Combine the amount of the same food.
 		 */
-		ArrayList<Food> tmpFoods = new ArrayList<Food>();
+		ArrayList<OrderFood> tmpFoods = new ArrayList<OrderFood>();
 		for(int i = 0; i < foods.length; i++){
 			
 			int index = tmpFoods.indexOf(foods[i]);
 			if(index != -1){
-				Food food = tmpFoods.get(index);
+				OrderFood food = tmpFoods.get(index);
 				float count = food.getCount().floatValue() + foods[i].getCount().floatValue();
 				food.setCount(count);
 			}else{
@@ -95,6 +96,6 @@ public class Util {
 			
 		}
 		
-		return tmpFoods.toArray(new Food[tmpFoods.size()]);
+		return tmpFoods.toArray(new OrderFood[tmpFoods.size()]);
 	}
 }
