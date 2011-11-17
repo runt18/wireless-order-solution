@@ -2,24 +2,22 @@ package com.wireless.adapter;
 
 import java.util.List;
 
-import com.wireless.adapter.OderFoodAdapter.Holder;
-import com.wireless.protocol.Food;
-import com.wireless.ui.R;
-
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.wireless.protocol.Food;
+import com.wireless.protocol.OrderFood;
+import com.wireless.ui.R;
 
 public class BillAdapter extends BaseAdapter {
 	private LayoutInflater minflater;
-	private List<Food> foods;
+	private List<OrderFood> foods;
 	
-	public BillAdapter(Context context,List<Food> foods){
+	public BillAdapter(Context context,List<OrderFood> foods){
 		minflater=LayoutInflater.from(context);
 		this.foods=foods;
 	}

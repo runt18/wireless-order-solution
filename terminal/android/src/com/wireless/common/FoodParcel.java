@@ -5,15 +5,15 @@ import java.util.ArrayList;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.wireless.protocol.Food;
+import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Util;
 
-public class FoodParcel extends Food implements Parcelable{
+public class FoodParcel extends OrderFood implements Parcelable{
 	
 	public static final String KEY_VALUE = "com.wireless.common.FoodParcel";
 	
-	public FoodParcel(Food food){
+	public FoodParcel(OrderFood food){
 		alias_id = food.alias_id;
 		kitchen = food.kitchen;
 		name = food.name;

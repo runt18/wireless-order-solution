@@ -11,17 +11,16 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.wireless.common.Common;
-import com.wireless.protocol.Food;
-import com.wireless.ui.R;
+import com.wireless.protocol.OrderFood;
 import com.wireless.ui.OrderActivity;
+import com.wireless.ui.R;
 
 public class OderFoodAdapter extends BaseAdapter {
 	private LayoutInflater minflater;
-	private List<Food> foods;
+	private List<OrderFood> foods;
 	private OrderActivity orer;
 
-	public OderFoodAdapter(Context context,List<Food> foods){
+	public OderFoodAdapter(Context context,List<OrderFood> foods){
 		minflater=LayoutInflater.from(context);
 		this.foods=foods;
 		orer=(OrderActivity)context;
@@ -65,10 +64,10 @@ public class OderFoodAdapter extends BaseAdapter {
 		}
 		
 		String taste="";
-	    if(foods.get(position).hangStatus==Food.FOOD_HANG_UP){
+	    if(foods.get(position).hangStatus==OrderFood.FOOD_HANG_UP){
 	    	holder.foodname.setText("(На)"+foods.get(position).name);
 	    	Log.e("", "(На)"+foods.get(position).name);
-	    }else if(foods.get(position).hangStatus==Food.FOOD_NORMAL){
+	    }else if(foods.get(position).hangStatus==OrderFood.FOOD_NORMAL){
 	    	holder.foodname.setText(foods.get(position).name);
 	    }
 		

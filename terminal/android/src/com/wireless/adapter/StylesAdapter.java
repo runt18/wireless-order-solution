@@ -11,11 +11,10 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.wireless.common.Common;
-import com.wireless.protocol.Food;
+import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Util;
 import com.wireless.ui.R;
-import com.wireless.ui.SpecsActivity;
 
 public class StylesAdapter extends BaseAdapter {
 	private LayoutInflater minflater;
@@ -64,7 +63,7 @@ public class StylesAdapter extends BaseAdapter {
 		holder.foodname.setText(stytles.get(position).preference);
 		holder.foodprice.setText(Util.CURRENCY_SIGN +Float.toString(stytles.get(position).getPrice()));
 		
-		Food food=Common.getCommon().getFoodlist().get(Common.getCommon().getPosition());
+		OrderFood food=Common.getCommon().getFoodlist().get(Common.getCommon().getPosition());
 		for(int i=0;i<food.tastes.length;i++){
 			  if(food.tastes[i].alias_id==stytles.get(position).alias_id){
 				 // tastes.get(position).setChoice(true);

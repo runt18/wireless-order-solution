@@ -19,7 +19,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.wireless.protocol.Food;
+import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Type;
 import com.wireless.protocol.Util;
 import com.wireless.ui.R;
@@ -32,7 +32,7 @@ public class OrderFoodListView extends ExpandableListView{
 	
 	private OnOperListener _operListener;
 	private Context _context;
-	private List<Food> _foods;
+	private List<OrderFood> _foods;
 	private byte _type = Type.INSERT_ORDER;
 	private BaseExpandableListAdapter _adapter;
 	
@@ -80,7 +80,7 @@ public class OrderFoodListView extends ExpandableListView{
 		_operListener = operListener;
 	}
 	
-	public void setFoods(List<Food> foods){
+	public void setFoods(List<OrderFood> foods){
 		if(foods != null){
 			_foods = foods;
 			if(_type == Type.INSERT_ORDER){
@@ -116,7 +116,7 @@ public class OrderFoodListView extends ExpandableListView{
 		@Override
 		public View getChildView(int groupPosition, final int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
 			View view = View.inflate(_context, R.layout.dropchilditem, null);
-			Food food = _foods.get(childPosition);
+			OrderFood food = _foods.get(childPosition);
 			//show the name to each food
 			String status = "";
 			if(food.isSpecial()){
@@ -148,9 +148,9 @@ public class OrderFoodListView extends ExpandableListView{
 			}
 			
 			String hangStatus = null;
-			if(food.hangStatus == Food.FOOD_HANG_UP){
+			if(food.hangStatus == OrderFood.FOOD_HANG_UP){
 				hangStatus = "叫";
-			}else if(food.hangStatus == Food.FOOD_IMMEDIATE){
+			}else if(food.hangStatus == OrderFood.FOOD_IMMEDIATE){
 				hangStatus = "即";
 			}else{
 				hangStatus = "";
@@ -281,7 +281,7 @@ public class OrderFoodListView extends ExpandableListView{
 	 */
 	private class AskCancelAmountDialog extends Dialog{
 	
-		AskCancelAmountDialog(final Food selectedFood) {
+		AskCancelAmountDialog(final OrderFood selectedFood) {
 			super(_context, R.style.FullHeightDialog);
 			
 			View view = LayoutInflater.from(_context).inflate(R.layout.alert, null);
@@ -347,7 +347,7 @@ public class OrderFoodListView extends ExpandableListView{
 	 */
 	private class ExtOperDialg extends Dialog{
 
-		ExtOperDialg(final Food selectedFood) {
+		ExtOperDialg(final OrderFood selectedFood) {
 			super(_context, R.style.FullHeightDialog);
 			final View view =LayoutInflater.from(_context).inflate(R.layout.item_alert, null);
 			setContentView(view);
@@ -380,7 +380,7 @@ public class OrderFoodListView extends ExpandableListView{
 				});
 				
 				//叫起/取消叫起
-				if(selectedFood.hangStatus == Food.FOOD_NORMAL){
+				if(selectedFood.hangStatus == OrderFood.FOOD_NORMAL){
 					((TextView)view.findViewById(R.id.item3Txt)).setText("叫起");						
 				}else{
 					((TextView)view.findViewById(R.id.item3Txt)).setText("取消叫起");
@@ -388,11 +388,11 @@ public class OrderFoodListView extends ExpandableListView{
 				((RelativeLayout)view.findViewById(R.id.r3)).setOnClickListener(new View.OnClickListener() {						
 					@Override
 					public void onClick(View arg0) {
-						if(selectedFood.hangStatus == Food.FOOD_NORMAL){
-							selectedFood.hangStatus = Food.FOOD_HANG_UP;
+						if(selectedFood.hangStatus == OrderFood.FOOD_NORMAL){
+							selectedFood.hangStatus = OrderFood.FOOD_HANG_UP;
 							((TextView)view.findViewById(R.id.item3Txt)).setText("取消叫起");
 						}else{
-							selectedFood.hangStatus = Food.FOOD_NORMAL;
+							selectedFood.hangStatus = OrderFood.FOOD_NORMAL;
 							((TextView)view.findViewById(R.id.item3Txt)).setText("叫起");								
 						}
 					}
@@ -423,17 +423,17 @@ public class OrderFoodListView extends ExpandableListView{
 				});
 				
 				//如果菜品是叫起状态，显示"即起"功能
-				if(selectedFood.hangStatus == Food.FOOD_HANG_UP){
+				if(selectedFood.hangStatus == OrderFood.FOOD_HANG_UP){
 					((TextView)view.findViewById(R.id.item2Txt)).setText("即起");
 					((RelativeLayout)view.findViewById(R.id.r2)).setOnClickListener(new View.OnClickListener() {						
 						@Override
 						public void onClick(View arg0) {
-			    			if(selectedFood.hangStatus == Food.FOOD_HANG_UP){
-			    				selectedFood.hangStatus = Food.FOOD_IMMEDIATE;
+			    			if(selectedFood.hangStatus == OrderFood.FOOD_HANG_UP){
+			    				selectedFood.hangStatus = OrderFood.FOOD_IMMEDIATE;
 								((TextView)view.findViewById(R.id.item2Txt)).setText("即起");
 			    				
-			    			}else if(selectedFood.hangStatus == Food.FOOD_IMMEDIATE){
-			    				selectedFood.hangStatus = Food.FOOD_HANG_UP;
+			    			}else if(selectedFood.hangStatus == OrderFood.FOOD_IMMEDIATE){
+			    				selectedFood.hangStatus = OrderFood.FOOD_HANG_UP;
 								((TextView)view.findViewById(R.id.item2Txt)).setText("重新叫起");
 			    			}						
 						}
@@ -502,7 +502,7 @@ public class OrderFoodListView extends ExpandableListView{
 	}
 	
 	public static interface OnOperListener{
-		public void OnOperTaste(Food selectedFood);
+		public void OnOperTaste(OrderFood selectedFood);
 		public void OnOperFood();
 	}
 	

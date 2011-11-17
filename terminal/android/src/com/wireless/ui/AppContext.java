@@ -6,18 +6,11 @@ import java.util.List;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Application;
-import android.app.Dialog;
 import android.content.Context;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
 
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodMenu;
+import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
 
 public class AppContext extends Application {

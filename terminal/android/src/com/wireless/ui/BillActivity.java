@@ -16,7 +16,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -29,6 +28,7 @@ import com.wireless.common.Common;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
+import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqPayOrder;
 import com.wireless.protocol.ReqQueryOrder;
@@ -53,7 +53,7 @@ private ImageView allowance;
 private ImageView billback;
 private Order order;
 private String plateForm;
-private List<Food> foods;
+private List<OrderFood> foods;
 private static final int ORDER_MESSAGE=1;
 
 	@Override
@@ -91,7 +91,7 @@ private static final int ORDER_MESSAGE=1;
 	  * ¸³Öµ·½·¨
 	  * */
 	public void init(){
-		foods=new ArrayList<Food>();
+		foods=new ArrayList<OrderFood>();
 		foods=Arrays.asList(order.foods);
 		BillAdapter adapter=new BillAdapter(BillActivity.this,foods);
 		valueplatform.setText(String.valueOf(order.table_id));

@@ -10,6 +10,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.wireless.protocol.Food;
+import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Util;
 import com.wireless.ui.R;
 

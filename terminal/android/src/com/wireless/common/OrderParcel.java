@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
+import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Util;
 
 public class OrderParcel extends Order implements Parcelable{
@@ -69,7 +69,7 @@ public class OrderParcel extends Order implements Parcelable{
 		//unmarshal the foods
 		ArrayList<FoodParcel> foodParcels = new ArrayList<FoodParcel>();
 		in.readTypedList(foodParcels, FoodParcel.CREATOR);
-		foods = foodParcels.toArray(new Food[foodParcels.size()]);
+		foods = foodParcels.toArray(new OrderFood[foodParcels.size()]);
 	}
 	
 	public static final Parcelable.Creator<OrderParcel> CREATOR = new Parcelable.Creator<OrderParcel>() {

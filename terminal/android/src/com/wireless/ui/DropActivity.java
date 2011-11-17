@@ -25,6 +25,7 @@ import com.wireless.common.OrderParcel;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
+import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqInsertOrder;
 import com.wireless.protocol.Reserved;
@@ -36,8 +37,8 @@ import com.wireless.ui.view.OrderFoodListView;
 public class DropActivity extends Activity implements OrderFoodListView.OnOperListener {
 
 	private Order _oriOrder;
-	private List<Food> _oriFoods;
-	private List<Food> _newFoods;
+	private List<OrderFood> _oriFoods;
+	private List<OrderFood> _newFoods;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -67,12 +68,12 @@ public class DropActivity extends Activity implements OrderFoodListView.OnOperLi
 				 * 如果有就将他们的点菜数量相加
 				 */
 				List<Food> foods = new ArrayList<Food>();
-				Iterator<Food> oriIter = _oriFoods.iterator();
+				Iterator<OrderFood> oriIter = _oriFoods.iterator();
 				while(oriIter.hasNext()){
-					Food oriFood = oriIter.next();
-					Iterator<Food> newIter = _newFoods.iterator();
+					OrderFood oriFood = oriIter.next();
+					Iterator<OrderFood> newIter = _newFoods.iterator();
 					while(newIter.hasNext()){
-						Food newFood = newIter.next();
+						OrderFood newFood = newIter.next();
 						if(oriFood.equals(newFood)){
 							oriFood.setCount(oriFood.getCount() + newFood.getCount());
 							break;
@@ -85,7 +86,7 @@ public class DropActivity extends Activity implements OrderFoodListView.OnOperLi
 				 * 遍历新点菜品中是否有新增加的菜品，
 				 * 有则添加到菜品列表中
 				 */
-				Iterator<Food> newIter = _newFoods.iterator();
+				Iterator<OrderFood> newIter = _newFoods.iterator();
 				while(newIter.hasNext()){
 					Food newFood = newIter.next();
 					if(!foods.contains(newFood)){
@@ -96,7 +97,7 @@ public class DropActivity extends Activity implements OrderFoodListView.OnOperLi
 				/**
 				 * 已点菜和新点菜合并后，生成新的Order，执行改单请求
 				 */
-				Order reqOrder = new Order(foods.toArray(new Food[foods.size()]),
+				Order reqOrder = new Order(foods.toArray(new OrderFood[foods.size()]),
 										   Short.parseShort(((EditText)findViewById(R.id.valueplatform)).getText().toString()),
 										   Integer.parseInt(((EditText)findViewById(R.id.valuepeople)).getText().toString()));
 				reqOrder.originalTableID = _oriOrder.table_id;
@@ -114,7 +115,7 @@ public class DropActivity extends Activity implements OrderFoodListView.OnOperLi
 		OrderFoodListView oriFoodLstView = (OrderFoodListView)findViewById(R.id.oriFoodLstView);
 		oriFoodLstView.setGroupIndicator(getResources().getDrawable(R.layout.expander_folder));
 		oriFoodLstView.setType(Type.UPDATE_ORDER);
-		_oriFoods = new ArrayList<Food>(Arrays.asList(_oriOrder.foods));
+		_oriFoods = new ArrayList<OrderFood>(Arrays.asList(_oriOrder.foods));
 		oriFoodLstView.setFoods(_oriFoods);
 		oriFoodLstView.setOperListener(this);
 
@@ -125,7 +126,7 @@ public class DropActivity extends Activity implements OrderFoodListView.OnOperLi
 		OrderFoodListView newFoodLstView = (OrderFoodListView)findViewById(R.id.newFoodLstView);
 		newFoodLstView.setGroupIndicator(getResources().getDrawable(R.layout.expander_folder));
 		newFoodLstView.setType(Type.INSERT_ORDER);
-		_newFoods = new ArrayList<Food>();
+		_newFoods = new ArrayList<OrderFood>();
 		newFoodLstView.setFoods(_newFoods);
 			
 		//set the table ID
@@ -133,14 +134,14 @@ public class DropActivity extends Activity implements OrderFoodListView.OnOperLi
 		//set the amount of customer
 		((EditText)findViewById(R.id.valuepeople)).setText(Integer.toString(_oriOrder.custom_num));
 		//set the total price to this order
-		((TextView)findViewById(R.id.amountvalue)).setText(Util.float2String(_oriOrder.calcPrice() + new Order(_newFoods.toArray(new Food[_newFoods.size()])).calcPrice()));
+		((TextView)findViewById(R.id.amountvalue)).setText(Util.float2String(_oriOrder.calcPrice() + new Order(_newFoods.toArray(new OrderFood[_newFoods.size()])).calcPrice()));
 			
 	}
 
-	private Food _selectedFood;
+	private OrderFood _selectedFood;
 	
 	@Override
-	public void OnOperTaste(Food selectedFood) {
+	public void OnOperTaste(OrderFood selectedFood) {
 		_selectedFood = selectedFood;
 		Intent intent = new Intent(DropActivity.this, TastesTbActivity.class);
 		Bundle bundle = new Bundle();

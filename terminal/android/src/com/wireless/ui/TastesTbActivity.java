@@ -21,10 +21,9 @@ import android.widget.Toast;
 
 import com.wireless.common.FoodParcel;
 import com.wireless.common.WirelessOrder;
-import com.wireless.protocol.Food;
+import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Util;
-import com.wireless.ui.view.OrderFoodListView;
 
 public class TastesTbActivity extends TabActivity {
 	
@@ -39,7 +38,7 @@ public class TastesTbActivity extends TabActivity {
 	private final static String TAG_STYLE = "style";
 	private final static String TAG_SPEC = "spec";
 	
-	private Food _selectedFood;
+	private OrderFood _selectedFood;
 	private TextView _tasteTxtView;
 	private TabHost _tabHost;
 

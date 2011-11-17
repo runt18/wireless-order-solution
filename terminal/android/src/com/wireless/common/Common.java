@@ -12,7 +12,6 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnKeyListener;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,20 +27,21 @@ import android.widget.TextView;
 import com.wireless.adapter.ExpandlistAdapter;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.SKitchen;
 import com.wireless.protocol.Taste;
 import com.wireless.ui.DropActivity;
 import com.wireless.ui.KitchenActivity;
 import com.wireless.ui.MainActivity;
+import com.wireless.ui.OrderActivity;
 import com.wireless.ui.R;
 import com.wireless.ui.TasteActivity;
-import com.wireless.ui.OrderActivity;
 import com.wireless.util.Md5;
 
 public class Common {
 	//单例模式
      private static Common common;
-    public static List<Food> foodlist;
+    public static List<OrderFood> foodlist;
    public  static  ProgressDialog dialog;
    OrderActivity order;
    private int position;
@@ -122,18 +122,18 @@ public void setKient(KitchenActivity kient) {
 		this.position = position;
 	}
      
-	 public static List<Food> getFoodlist() {
+	 public static List<OrderFood> getFoodlist() {
 		return foodlist;
 	}
 
-	public static void setFoodlist(List<Food> foodlist) {
+	public static void setFoodlist(List<OrderFood> foodlist) {
 		Common.foodlist = foodlist;
 	}
 
 	public static Common getCommon() {
 	
 		if(common==null){
-			foodlist=new ArrayList<Food>();
+			foodlist=new ArrayList<OrderFood>();
 			common=new Common();
 		}
 		return common;
@@ -185,7 +185,7 @@ public void setKient(KitchenActivity kient) {
 	 * 點擊已訂菜單item显示的操作
 	 * 
 	 * */
-	public void onitem(Context context,final List<Food> list, final int position){
+	public void onitem(Context context,final List<OrderFood> list, final int position){
 		order=(OrderActivity)context;
 		View mView =LayoutInflater.from(context).inflate(R.layout.item_alert, null);
 		final Dialog mDialog = new Dialog(context,R.style.FullHeightDialog);
@@ -220,9 +220,9 @@ public void setKient(KitchenActivity kient) {
 		});
 		
 	    TextView isfug=(TextView)mView.findViewById(R.id.item3Txt);
-	    if(list.get(position).hangStatus==Food.FOOD_NORMAL){
+	    if(list.get(position).hangStatus==OrderFood.FOOD_NORMAL){
 			isfug.setText("叫起");
-		}else if(list.get(position).hangStatus==Food.FOOD_HANG_UP){
+		}else if(list.get(position).hangStatus==OrderFood.FOOD_HANG_UP){
 			isfug.setText("取消叫起");
 		}
 		RelativeLayout r3=(RelativeLayout)mView.findViewById(R.id.r3);
@@ -230,11 +230,11 @@ public void setKient(KitchenActivity kient) {
 			
 			@Override
 			public void onClick(View v) {
-				if(list.get(position).hangStatus == Food.FOOD_NORMAL){
-					list.get(position).hangStatus = Food.FOOD_HANG_UP;
+				if(list.get(position).hangStatus == OrderFood.FOOD_NORMAL){
+					list.get(position).hangStatus = OrderFood.FOOD_HANG_UP;
 					mDialog.cancel();
-    			}else if(list.get(position).hangStatus == Food.FOOD_HANG_UP){
-    				list.get(position).hangStatus = Food.FOOD_NORMAL;
+    			}else if(list.get(position).hangStatus == OrderFood.FOOD_HANG_UP){
+    				list.get(position).hangStatus = OrderFood.FOOD_NORMAL;
     				mDialog.cancel();
     			}
 
@@ -264,7 +264,7 @@ public void setKient(KitchenActivity kient) {
 	 * 新点菜item显示的操作
 	 * 
 	 * */
-	public void expandonitem(final Context context,final  List<List<Food>> lists, final int grouposition,final int childposition){
+	public void expandonitem(final Context context,final  List<List<OrderFood>> lists, final int grouposition,final int childposition){
 		drop=(DropActivity)context;
 		View mView =LayoutInflater.from(context).inflate(R.layout.item_alert, null);
 		final Dialog mDialog = new Dialog(context,R.style.FullHeightDialog);
@@ -298,9 +298,9 @@ public void setKient(KitchenActivity kient) {
 		});
 		
 	    TextView isfug=(TextView)mView.findViewById(R.id.item3Txt);
-	    if(lists.get(grouposition).get(childposition).hangStatus==Food.FOOD_NORMAL){
+	    if(lists.get(grouposition).get(childposition).hangStatus==OrderFood.FOOD_NORMAL){
 			isfug.setText("叫起");
-		}else if(lists.get(grouposition).get(childposition).hangStatus==Food.FOOD_HANG_UP){
+		}else if(lists.get(grouposition).get(childposition).hangStatus==OrderFood.FOOD_HANG_UP){
 			isfug.setText("取消叫起");
 		}
 		RelativeLayout r3=(RelativeLayout)mView.findViewById(R.id.r3);
@@ -308,11 +308,11 @@ public void setKient(KitchenActivity kient) {
 			
 			@Override
 			public void onClick(View v) {
-				if(lists.get(grouposition).get(childposition).hangStatus == Food.FOOD_NORMAL){
-					lists.get(grouposition).get(childposition).hangStatus = Food.FOOD_HANG_UP;
+				if(lists.get(grouposition).get(childposition).hangStatus == OrderFood.FOOD_NORMAL){
+					lists.get(grouposition).get(childposition).hangStatus = OrderFood.FOOD_HANG_UP;
 					mDialog.cancel();
-    			}else if(lists.get(grouposition).get(childposition).hangStatus == Food.FOOD_HANG_UP){
-    				lists.get(grouposition).get(childposition).hangStatus = Food.FOOD_NORMAL;
+    			}else if(lists.get(grouposition).get(childposition).hangStatus == OrderFood.FOOD_HANG_UP){
+    				lists.get(grouposition).get(childposition).hangStatus = OrderFood.FOOD_NORMAL;
     				mDialog.cancel();
     			}
 
@@ -357,7 +357,7 @@ public void setKient(KitchenActivity kient) {
 		mButtonOK.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Food food = list.get(position);
+				OrderFood food = new OrderFood(list.get(position));
 
 				boolean isExist = false;
 				/**
@@ -405,7 +405,7 @@ public void setKient(KitchenActivity kient) {
 	   * 点菜弹出的删除菜dialog
 	   * 
 	   * */
-	public void getdeleteFoods(final Context context,final List<Food> list, final int position,final int code){
+	public void getdeleteFoods(final Context context,final List<OrderFood> list, final int position,final int code){
 		final EditText mycount;
 		View mView =LayoutInflater.from(context).inflate(R.layout.alert, null);
 		final Dialog mDialog = new Dialog(context,R.style.FullHeightDialog);
@@ -421,7 +421,7 @@ public void setKient(KitchenActivity kient) {
 		mButtonOK.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Food food = list.get(position);
+				OrderFood food = list.get(position);
 				float count;
 				/**
 				 * 遍历已点菜，查找是否存在与新点菜相同的菜品。
@@ -556,9 +556,9 @@ public void setKient(KitchenActivity kient) {
 	   * 点菜弹出的添加口味dialog
 	   * 
 	   * */
-	public void addtaste(final Context context,final List<Food> foodes, final List<Taste> list, final int position,final int tastepositon,String title,final TextView test,CheckBox checkbox){
+	public void addtaste(final Context context,final List<OrderFood> foodes, final List<Taste> list, final int position,final int tastepositon,String title,final TextView test,CheckBox checkbox){
 		  int num;
-          Food food=foodes.get(position);
+          OrderFood food=foodes.get(position);
           Taste taste=list.get(tastepositon);
           num=food.addTaste(taste);
           if(num<0){
@@ -575,9 +575,9 @@ public void setKient(KitchenActivity kient) {
 	   * 点菜弹出的删除口味dialog
 	   * 
 	   * */
-	public void deletetaste(final Context context,final List<Food> foodes, final List<Taste> list, final int position,final int tastepositon,String title,final TextView test){
+	public void deletetaste(final Context context,final List<OrderFood> foodes, final List<Taste> list, final int position,final int tastepositon,String title,final TextView test){
 		  int num;
-        Food food=foodes.get(position);
+        OrderFood food=foodes.get(position);
         Taste taste=list.get(tastepositon);
         num=food.removeTaste(taste);
         if(num<0){
@@ -588,7 +588,7 @@ public void setKient(KitchenActivity kient) {
         }
 	}
 	
-	public void init(Food food,TextView test){
+	public void init(OrderFood food,TextView test){
 		if(food.tastePref.equals("无口味")){
   			test.setText(food.name+":");
   		}else{
@@ -603,7 +603,7 @@ public void setKient(KitchenActivity kient) {
 	 * */
 	
 	
-	public void dropFoods(final Context context,final List<List<Food>> childs,final int groupPosition, final int childPosition){
+	public void dropFoods(final Context context,final List<List<OrderFood>> childs,final int groupPosition, final int childPosition){
 		final EditText mycount;
 		drop=(DropActivity)context;
 		View mView =LayoutInflater.from(context).inflate(R.layout.pwd_alert, null);
@@ -638,7 +638,7 @@ public void setKient(KitchenActivity kient) {
 						mButtonOK.setOnClickListener(new OnClickListener() {
 							@Override
 							public void onClick(View v) {
-								Food food = childs.get(groupPosition).get(childPosition);
+								OrderFood food = childs.get(groupPosition).get(childPosition);
 								float count;
 								/**
 								 * 遍历已点菜，查找是否存在与新点菜相同的菜品。
@@ -694,7 +694,7 @@ public void setKient(KitchenActivity kient) {
 	 * 
 	 * */
 	
-	public void dropnopawrFoods(final Context context,final List<List<Food>> childs,final int groupPosition, final int childPosition){
+	public void dropnopawrFoods(final Context context,final List<List<OrderFood>> childs,final int groupPosition, final int childPosition){
 		final EditText counts;
 		View mView =LayoutInflater.from(context).inflate(R.layout.alert, null);
 		final Dialog myDialog = new Dialog(context,R.style.FullHeightDialog);
@@ -711,7 +711,7 @@ public void setKient(KitchenActivity kient) {
 		mButtonOK.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Food food = childs.get(groupPosition).get(childPosition);
+				OrderFood food = childs.get(groupPosition).get(childPosition);
 				float count;
 				/**
 				 * 遍历已点菜，查找是否存在与新点菜相同的菜品。

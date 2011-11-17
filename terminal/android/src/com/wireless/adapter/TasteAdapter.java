@@ -3,7 +3,6 @@ package com.wireless.adapter;
 import java.util.List;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +11,7 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.wireless.common.Common;
-import com.wireless.protocol.Food;
+import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Util;
 import com.wireless.ui.R;
@@ -66,7 +65,7 @@ public class TasteAdapter extends BaseAdapter {
 		holder.foodname.setText(tastes.get(position).preference);
 		holder.foodprice.setText(Util.CURRENCY_SIGN +Float.toString(tastes.get(position).getPrice()));
 		
-		Food food=Common.getCommon().getFoodlist().get(Common.getCommon().getPosition());
+		OrderFood food=Common.getCommon().getFoodlist().get(Common.getCommon().getPosition());
 		for(int i=0;i<food.tastes.length;i++){
 			  if(food.tastes[i].alias_id==tastes.get(position).alias_id){
 				 // tastes.get(position).setChoice(true);

@@ -5,11 +5,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -23,6 +21,7 @@ import com.wireless.adapter.FoodAdapter;
 import com.wireless.common.Common;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.SKitchen;
 import com.wireless.util.DragListView;
 
@@ -60,9 +59,9 @@ public class KitchenActivity extends Activity {
 		ketback = (ImageView) findViewById(R.id.ketback);
 		Foodes=new ArrayList<Food>();
 		
-		Foodes=appcontext.getFoods();
+		//Foodes=;
 		
-		adapter = new FoodAdapter(KitchenActivity.this, Foodes);
+		adapter = new FoodAdapter(KitchenActivity.this, appcontext.getFoods());
 		myListView.setAdapter(adapter);
 		myListView.setOnItemClickListener(new item());
 

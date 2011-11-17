@@ -12,15 +12,16 @@ import android.widget.TextView;
 import com.wireless.common.Common;
 import com.wireless.common.WirelessOrder;
 import com.wireless.protocol.Food;
+import com.wireless.protocol.OrderFood;
 import com.wireless.ui.DropActivity;
 import com.wireless.ui.R;
 
 public class DropAdapter extends BaseExpandableListAdapter  {
   private Context context;
   private List<String> perant;
-  private List<List<Food>> childs;
+  private List<List<OrderFood>> childs;
   DropActivity drop;
-	 public DropAdapter(Context context,List<String> list,List<List<Food>> alist){
+	 public DropAdapter(Context context,List<String> list,List<List<OrderFood>> alist){
 		 this.context=context;
 		 this.perant=list;
 		 this.childs=alist;
@@ -95,7 +96,7 @@ public class DropAdapter extends BaseExpandableListAdapter  {
 			boolean isLastChild, View convertView, ViewGroup parent) {
 		// TODO Auto-generated method stub
 		View view=convertView.inflate(context, R.layout.dropchilditem, null);
-		Food food=childs.get(groupPosition).get(childPosition);
+		OrderFood food=childs.get(groupPosition).get(childPosition);
 		((TextView) view.findViewById(R.id.foodname)).setText(food.name);
 		((TextView) view.findViewById(R.id.accountvalue)).setText(String.valueOf(food.getCount()));
 		((TextView) view.findViewById(R.id.pricevalue)).setText(String.valueOf(food.calcPrice2()));

@@ -26,6 +26,7 @@ import com.wireless.common.Common;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
+import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqInsertOrder;
 import com.wireless.protocol.Reserved;
@@ -158,7 +159,7 @@ public class OrderActivity extends Activity {
 				mydialog=ProgressDialog.show(OrderActivity.this, "", "正在下单，请稍候....");				
 				new Thread(){
 					public void run(){
-						commit(Common.getCommon().getFoodlist().toArray(new Food[Common.getCommon().getFoodlist().size()]),Short.valueOf(tables),Short.valueOf(peoples));
+						commit(Common.getCommon().getFoodlist().toArray(new OrderFood[Common.getCommon().getFoodlist().size()]),Short.valueOf(tables),Short.valueOf(peoples));
 					}
 					
 				}.start();
@@ -217,7 +218,7 @@ public class OrderActivity extends Activity {
 	 * 提交订单到服务器
 	 * 请求看是否成功
 	 * */
-	public void commit(Food[] foods,short tatleNo,int customNum){
+	public void commit(OrderFood[] foods,short tatleNo,int customNum){
 		Order reqOrder = new Order(foods,tatleNo,customNum);
 		try {
 
