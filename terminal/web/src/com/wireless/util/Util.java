@@ -2,7 +2,6 @@ package com.wireless.util;
 
 import java.util.ArrayList;
 
-import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 
