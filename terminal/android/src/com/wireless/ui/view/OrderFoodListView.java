@@ -33,6 +33,7 @@ public class OrderFoodListView extends ExpandableListView{
 	private OnOperListener _operListener;
 	private Context _context;
 	private List<OrderFood> _foods;
+	private int _selectedPos;
 	private byte _type = Type.INSERT_ORDER;
 	private BaseExpandableListAdapter _adapter;
 	
@@ -47,10 +48,12 @@ public class OrderFoodListView extends ExpandableListView{
 			public boolean onChildClick(ExpandableListView parent, View v,
 										int groupPosition, int childPosition, long id) {
 				if(_type == Type.INSERT_ORDER){
+					_selectedPos = childPosition;
 					new ExtOperDialg(_foods.get(childPosition)).show();
 					return true;
 					
 				}else if(_type == Type.UPDATE_ORDER){
+					_selectedPos = childPosition;
 					new ExtOperDialg(_foods.get(childPosition)).show();
 					return true;
 					
@@ -66,6 +69,13 @@ public class OrderFoodListView extends ExpandableListView{
 		super.onDraw(canvas);
 	}
 	
+	/**
+	 * 设置ListView的类型，目前分为"新点菜"和"已点菜"两种
+	 * @param type
+	 * 			One of values blew.<br>
+	 * 			Type.INSERT_ORDER - 新点菜
+	 * 			Type.UPDATE_ORDER - 已点菜
+	 */
 	public void setType(int type){
 		if(type == Type.INSERT_ORDER){
 			_type = Type.INSERT_ORDER;
@@ -76,24 +86,62 @@ public class OrderFoodListView extends ExpandableListView{
 		}
 	}
 	
+	/**
+	 * 设置菜品操作的回调接口
+	 * @param operListener
+	 */
 	public void setOperListener(OnOperListener operListener){
 		_operListener = operListener;
 	}
-	
-	public void setFoods(List<OrderFood> foods){
+	     
+	/**
+	 * 在source data变化的时候，调用此函数来更新ListView的数据。
+	 */
+	public void notifyDataChanged(){
+		if(_adapter != null){
+			_adapter.notifyDataSetChanged();
+		}
+	}
+
+	/**
+	 * 函数用于更新ListView的source data，第一次调用此函数的时候，会中同时创建相应的Adapter。
+	 * @param foods
+	 * 			在ListView上显示的菜品数据
+	 */
+	public void notifyDataChanged(List<OrderFood> foods){
 		if(foods != null){
 			_foods = foods;
-			if(_type == Type.INSERT_ORDER){
-				_adapter = new Adapter("新点菜");
+			if(_adapter != null){
+				_adapter.notifyDataSetChanged();
 			}else{
-				_adapter = new Adapter("已点菜");
+				if(_type == Type.INSERT_ORDER){
+					_adapter = new Adapter("新点菜");
+				}else{
+					_adapter = new Adapter("已点菜");
+				}
+				setAdapter(_adapter);				
 			}
-			setAdapter(_adapter);
 		}else{
 			throw new NullPointerException();
 		}
 	}
-	                                  
+	
+	/**
+	 * 此函数用于更新选中的菜品，比如"口味"操作，需要从TasteActivity将结果回传ListView，
+	 * 这种情况就调用此函数来更新选中的菜品
+	 * @param food
+	 */
+	public void notifyDataChanged(OrderFood food){
+		if(food != null){
+			if(_adapter != null){
+				_foods.set(_selectedPos, food);
+				_adapter.notifyDataSetChanged();
+			}
+		}else{
+			throw new NullPointerException();
+		}
+
+	}
 	
 	public class Adapter extends BaseExpandableListAdapter{
 
@@ -196,7 +244,10 @@ public class OrderFoodListView extends ExpandableListView{
 				addTasteImgView.setOnClickListener(new View.OnClickListener() {				
 					@Override
 					public void onClick(View v) {
-						// TODO Jump to taste activity					
+						_selectedPos = childPosition;
+						if(_operListener != null){
+							_operListener.OnPickTaste(_foods.get(childPosition));
+						}
 					}
 				});
 				
@@ -249,6 +300,9 @@ public class OrderFoodListView extends ExpandableListView{
 			View view = View.inflate(_context, R.layout.dropgrounpitem, null);
 			((TextView)view.findViewById(R.id.grounname)).setText(_groupTitle);
 			
+			/**
+			 * "新点菜"的Group显示"点菜"Button
+			 */
 			if(_type == Type.INSERT_ORDER){
 				ImageView orderImg = (ImageView)view.findViewById(R.id.orderimage);
 				orderImg.setBackgroundResource(R.drawable.commit);
@@ -256,8 +310,9 @@ public class OrderFoodListView extends ExpandableListView{
 				orderImg.setOnClickListener(new View.OnClickListener() {				
 					@Override
 					public void onClick(View v) {
-						// TODO 跳转到点菜页面
-						//drop.orderfood();
+						if(_operListener != null){
+							_operListener.OnPickFood();
+						}
 					}
 				});
 			}
@@ -374,7 +429,7 @@ public class OrderFoodListView extends ExpandableListView{
 					public void onClick(View arg0) {
 						// TODO Auto-generated method stub							
 						if(_operListener != null){
-							_operListener.OnOperTaste(selectedFood);
+							_operListener.OnPickTaste(selectedFood);
 						}
 					}
 				});
@@ -407,18 +462,14 @@ public class OrderFoodListView extends ExpandableListView{
 				((RelativeLayout)view.findViewById(R.id.r1)).setOnClickListener(new View.OnClickListener() {						
 					@Override
 					public void onClick(View arg0) {
-						// FIXME
-						if(_operListener != null){
-							_operListener.OnOperTaste(selectedFood);
-						}
-//						dismiss();
-//						new AskPwdDialog(_context, AskPwdDialog.PWD_3){							
-//							@Override
-//							protected void onPwdPass(Context context){
-//								dismiss();
-//								new AskCancelAmountDialog(selectedFood).show();
-//							}
-//						}.show();
+						dismiss();
+						new AskPwdDialog(_context, AskPwdDialog.PWD_3){							
+							@Override
+							protected void onPwdPass(Context context){
+								dismiss();
+								new AskCancelAmountDialog(selectedFood).show();
+							}
+						}.show();
 					}
 				});
 				
@@ -502,8 +553,8 @@ public class OrderFoodListView extends ExpandableListView{
 	}
 	
 	public static interface OnOperListener{
-		public void OnOperTaste(OrderFood selectedFood);
-		public void OnOperFood();
+		public void OnPickTaste(OrderFood selectedFood);
+		public void OnPickFood();
 	}
 	
 }

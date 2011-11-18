@@ -32,6 +32,8 @@ public class NumberActivity extends Activity {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 
+		int i = getIntent().getExtras().getInt("a");
+		
 		setContentView(R.layout.number);
 		
 		appcontext = (AppContext) getApplication();
@@ -60,6 +62,22 @@ public class NumberActivity extends Activity {
 			}
 		});
 	}
+	
+	@Override
+	protected void onStart(){
+		super.onStart();
+	}
+	
+	@Override
+	protected void onResume(){
+		super.onResume();
+	}
+	
+	@Override
+	protected void onStop(){
+		super.onStop();
+	}
+	
    /*
     * 点解list的item的事件
     * 

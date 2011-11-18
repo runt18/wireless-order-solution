@@ -37,6 +37,8 @@ import com.wireless.ui.view.OrderFoodListView;
 public class DropActivity extends Activity implements OrderFoodListView.OnOperListener {
 
 	private Order _oriOrder;
+	private OrderFoodListView _oriFoodLstView;
+	private OrderFoodListView _newFoodLstView;
 	private List<OrderFood> _oriFoods;
 	private List<OrderFood> _newFoods;
 	
@@ -112,22 +114,23 @@ public class DropActivity extends Activity implements OrderFoodListView.OnOperLi
 		/**
 		 * "已点菜"的ListView
 		 */
-		OrderFoodListView oriFoodLstView = (OrderFoodListView)findViewById(R.id.oriFoodLstView);
-		oriFoodLstView.setGroupIndicator(getResources().getDrawable(R.layout.expander_folder));
-		oriFoodLstView.setType(Type.UPDATE_ORDER);
+		_oriFoodLstView = (OrderFoodListView)findViewById(R.id.oriFoodLstView);
+		_oriFoodLstView.setGroupIndicator(getResources().getDrawable(R.layout.expander_folder));
+		_oriFoodLstView.setType(Type.UPDATE_ORDER);
 		_oriFoods = new ArrayList<OrderFood>(Arrays.asList(_oriOrder.foods));
-		oriFoodLstView.setFoods(_oriFoods);
-		oriFoodLstView.setOperListener(this);
+		_oriFoodLstView.notifyDataChanged(_oriFoods);
+		_oriFoodLstView.setOperListener(this);
 
 
 		/**
 		 * "新点菜"的ListView
 		 */
-		OrderFoodListView newFoodLstView = (OrderFoodListView)findViewById(R.id.newFoodLstView);
-		newFoodLstView.setGroupIndicator(getResources().getDrawable(R.layout.expander_folder));
-		newFoodLstView.setType(Type.INSERT_ORDER);
+		_newFoodLstView = (OrderFoodListView)findViewById(R.id.newFoodLstView);
+		_newFoodLstView.setGroupIndicator(getResources().getDrawable(R.layout.expander_folder));
+		_newFoodLstView.setType(Type.INSERT_ORDER);
 		_newFoods = new ArrayList<OrderFood>();
-		newFoodLstView.setFoods(_newFoods);
+		_newFoodLstView.notifyDataChanged(_newFoods);
+		_newFoodLstView.setOperListener(this);
 			
 		//set the table ID
 		((EditText)findViewById(R.id.valueplatform)).setText(Integer.toString(_oriOrder.table_id));
@@ -138,22 +141,26 @@ public class DropActivity extends Activity implements OrderFoodListView.OnOperLi
 			
 	}
 
-	private OrderFood _selectedFood;
-	
+	/**
+	 * 选择相应菜品的"口味"操作，跳转到口味Activity进行口味的添加、删除操作
+	 */
 	@Override
-	public void OnOperTaste(OrderFood selectedFood) {
-		_selectedFood = selectedFood;
+	public void OnPickTaste(OrderFood selectedFood) {
 		Intent intent = new Intent(DropActivity.this, TastesTbActivity.class);
 		Bundle bundle = new Bundle();
-		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(_selectedFood));
+		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(selectedFood));
 		intent.putExtras(bundle);
 		startActivityForResult(intent, OrderFoodListView.PICK_TASTE);
 	}
 
+	/**
+	 * "点菜"操作，跳转到点菜的Activity进行选菜
+	 */
 	@Override
-	public void OnOperFood() {
+	public void OnPickFood() {
 		// TODO Auto-generated method stub
-		
+		Intent intent = new Intent(DropActivity.this, TabhostActivity.class);
+		startActivity(intent);		
 	}
 	
 	@Override
@@ -161,7 +168,7 @@ public class DropActivity extends Activity implements OrderFoodListView.OnOperLi
 		if(resultCode == RESULT_OK){
 			if(requestCode == OrderFoodListView.PICK_TASTE){
 				FoodParcel foodParcel = data.getParcelableExtra(FoodParcel.KEY_VALUE);
-				_selectedFood = foodParcel;
+				_newFoodLstView.notifyDataChanged(foodParcel);
 			}
 		}
 	}

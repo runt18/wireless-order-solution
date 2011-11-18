@@ -36,11 +36,11 @@ public class TabhostActivity extends TabActivity {
 		/**
 		 * ÃÌº”tabœÓActivity
 		 */
-		Intent intent = new Intent().setClass(this, NumberActivity.class);
+		Intent intent = new Intent().setClass(this, NumberActivity.class).putExtra("a", 1);
 		setupTab(new TextView(this), "±‡∫≈", R.drawable.ic_tab_albums, intent);
-		intent = new Intent().setClass(this, KitchenActivity.class);
+		intent = new Intent().setClass(this, KitchenActivity.class).putExtra("b", 2);
 		setupTab(new TextView(this), "∑÷≥¯", R.drawable.ic_tab_artists, intent);
-		intent = new Intent().setClass(this, PingyinActivity.class);
+		intent = new Intent().setClass(this, PingyinActivity.class).putExtra("c", 3);
 		setupTab(new TextView(this), "∆¥“Ù", R.drawable.ic_tab_songs, intent);
 
 	}
