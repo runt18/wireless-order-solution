@@ -72,7 +72,7 @@ supplierAddWin = new Ext.Window({
 
 						var isDuplicate = false;
 						for ( var i = 0; i < supplierData.length; i++) {
-							if (supplierAddNumber == supplierData[i][0]) {
+							if (supplierAddNumber == supplierData[i][1]) {
 								isDuplicate = true;
 							}
 						}
@@ -84,7 +84,7 @@ supplierAddWin = new Ext.Window({
 								url : "../../InsertSupplier.do",
 								params : {
 									"pin" : pin,
-									"supplierID" : supplierAddNumber,
+									"supplierAlias" : supplierAddNumber,
 									"supplierName" : supplierAddName,
 									"supplierAddress" : supplierAddAddress,
 									"supplierContact" : supplierAddContact,
@@ -379,6 +379,8 @@ var supplierStore = new Ext.data.Store({
 	}, [ {
 		name : "supplierID"
 	}, {
+		name : "supplierAlias"
+	}, {
 		name : "supplierName"
 	}, {
 		name : "supplierPhone"
@@ -400,8 +402,28 @@ var supplierColumnModel = new Ext.grid.ColumnModel([
 		new Ext.grid.RowNumberer(), {
 			header : "编号",
 			sortable : true,
-			dataIndex : "supplierID",
+			dataIndex : "supplierAlias",
 			width : 80
+		// ,
+		// editor : new Ext.form.TextField({
+		// allowBlank : false,
+		// allowNegative : false
+		// ,
+		// validator : function(v) {
+		// var isDuplicate = false;
+		// for ( var i = 0; i < supplierData.length; i++) {
+		// if (v == supplierData[i][1]) {
+		// isDuplicate = true;
+		// }
+		// }
+		//
+		// if (!isDuplicate) {
+		// return true;
+		// } else {
+		// return "该供应商编号已存在！";
+		// }
+		// }
+		// })
 		}, {
 			header : "名称",
 			sortable : true,
@@ -481,14 +503,21 @@ Ext
 							tooltip : '保存修改',
 							iconCls : 'save',
 							handler : function() {
-								// 修改記錄格式:id field_separator name field_separator phone field_separator contact field_separator address record_separator id field_separator name field_separator phone field_separator contact field_separator address
+								// 修改記錄格式:id field_separator name
+								// field_separator phone field_separator contact
+								// field_separator address record_separator id
+								// field_separator name field_separator phone
+								// field_separator contact field_separator
+								// address
 								var modfiedArr = [];
 								supplierGrid
 										.getStore()
 										.each(
 												function(record) {
 													if (record
-															.isModified("supplierName") == true
+															.isModified("supplierAlias") == true
+															|| record
+																	.isModified("supplierName") == true
 															|| record
 																	.isModified("supplierPhone") == true
 															|| record
@@ -498,6 +527,9 @@ Ext
 														modfiedArr
 																.push(record
 																		.get("supplierID")
+																		+ " field_separator "
+																		+ record
+																				.get("supplierAlias")
 																		+ " field_separator "
 																		+ record
 																				.get("supplierName")

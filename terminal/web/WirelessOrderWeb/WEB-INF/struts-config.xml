@@ -103,6 +103,35 @@
 		<action path="/UpdateKitchen"
 			type="com.wireless.Actions.kitchenMgr.UpdateKitchenAction" scope="request">
 		</action>
+		<action path="/kitchenStatistics"
+			type="com.wireless.Actions.kitchenMgr.KitchenStatisticsAction" scope="request">
+		</action>
+		<action path="/UpdateDepartment"
+			type="com.wireless.Actions.deptMgr.UpdateDepartmentAction" scope="request">
+		</action>
+		<action path="/QueryMaterialMgr"
+			type="com.wireless.Actions.inventoryMgr.QueryMaterialMgrAction"
+			scope="request">
+		</action>
+		<action path="/UpdateMaterial"
+			type="com.wireless.Actions.inventoryMgr.UpdateMaterialAction" scope="request">
+		</action>
+		<action path="/DeleteMaterial"
+			type="com.wireless.Actions.inventoryMgr.DeleteMaterialAciton" scope="request">
+		</action>
+		<action path="/InsertMaterial"
+			type="com.wireless.Actions.inventoryMgr.InsertMaterialAction" scope="request">
+		</action>
+		<action path="/InventoryIn"
+			type="com.wireless.Actions.inventoryMgr.InventoryInAction" scope="request">
+		</action>
+		<action path="/InventoryOut"
+			type="com.wireless.Actions.inventoryMgr.InventoryOutAction" scope="request">
+		</action>
+		<action path="/InventoryChange"
+			type="com.wireless.Actions.inventoryMgr.InventoryChangeAction" scope="request">
+		</action>
+
 
 
 	</action-mappings>

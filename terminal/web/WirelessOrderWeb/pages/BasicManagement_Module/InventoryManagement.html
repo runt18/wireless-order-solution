@@ -60,26 +60,25 @@
 
 	var currPageIndex = 0;
 	var currRowIndex = -1;
-	var kitchenPageRecordCount = 20;
-	var kitchenStaticRecordCount = 10;
+	var materialPageRecordCount = 20;
 	
+	var conditionType = "text";
+	
+	var materialData = [];
+	var supplierData = [];
 	var departmentData = [];
 	
-	var kitchenStaticBeginDate;
-	var kitchenStaticEndDate;
-	var kitchenStaticString;
-	var kitchenMultSelectData = [];
+	var isPrompt = false;
 	
 </script>
 
- 
- <script type="text/javascript"
-	src="../../js/BasicManagement/menuManagement/kitchenMgrLoad.js"></script>
- <script type="text/javascript"
-	src="../../js/BasicManagement/menuManagement/kitchenMgrMain.js"></script>
- 
+<script type="text/javascript"
+	src="../../js/BasicManagement/Inventory/inventoryMgrLoad.js"></script>
+<script type="text/javascript"
+	src="../../js/BasicManagement/Inventory/inventoryMgrMain.js"></script>
+
 </head>
- <body onload="kitchenMgrOnLoad()"> 
+<body onload="inventoryMgrOnLoad()">
 	<script type="text/javascript" src="../../extjs/examples.js"></script>
 
 	<!------------------- layout ------------------------>

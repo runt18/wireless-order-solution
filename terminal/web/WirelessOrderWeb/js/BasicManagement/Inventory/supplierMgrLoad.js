@@ -10,13 +10,15 @@
 		},
 		success : function(response, options) {
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
-			// 格式：[供應商编号，供應商名称]
-			// 后台格式：[供應商編號，名稱，電話，聯係人，地址]
+			// 格式：[供應商ID，供應商別名，供應商名称]
+			// 后台格式：[供應商ID，供應商別名，名稱，電話，聯係人，地址]
 			var rootData = resultJSON.root;
 			if (rootData[0].message == "normal") {
 				for ( var i = 0; i < rootData.length; i++) {
-					supplierData.push([ rootData[i].supplierID,
-							rootData[i].supplierName ]);
+					supplierData
+							.push([ rootData[i].supplierID,
+									rootData[i].supplierAlias,
+									rootData[i].supplierName ]);
 				}
 			} else {
 				Ext.MessageBox.show({

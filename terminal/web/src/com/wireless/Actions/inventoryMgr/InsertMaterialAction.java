@@ -1,4 +1,4 @@
-package com.wireless.Actions.supplierMgr;
+package com.wireless.Actions.inventoryMgr;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -19,7 +19,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Terminal;
 
-public class UpdateSupplierAction extends Action {
+public class InsertMaterialAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -39,14 +39,8 @@ public class UpdateSupplierAction extends Action {
 			 * example, filter the order date greater than or equal 2011-7-14
 			 * 14:30:00 pin=0x1 & type=3 & ope=2 & value=2011-7-14 14:30:00
 			 * 
-			 * pin : the pin the this terminal modSuppliers:
-			 * 修改記錄格式:id{field_separator
-			 * }name{field_separator}phone{field_separator
-			 * }contact{field_separator
-			 * }address{record_separator}id{field_separator
-			 * }name{field_separator}
-			 * phone{field_separator}contact{field_separator}address
-			 * 
+			 * pin : the pin the this terminal supplierID: supplierName:
+			 * supplierAddress: supplierContact: supplierPhone:
 			 */
 
 			String pin = request.getParameter("pin");
@@ -57,32 +51,25 @@ public class UpdateSupplierAction extends Action {
 			Terminal term = VerifyPin.exec(dbCon, Integer.parseInt(pin, 16),
 					Terminal.MODEL_STAFF);
 
-			// get parameter
-			String modSuppliers = request.getParameter("modSuppliers");
+			// get the query condition
+			int materialAlias = Integer.parseInt(request
+					.getParameter("materialAlias"));
+			String materialName = request.getParameter("materialName");
+			String materialWarning = request.getParameter("materialWarning");
+			String materialDanger = request.getParameter("materialDanger");
 
-			/**
-			 * 
-			 */
-			String[] suppliers = modSuppliers.split(" record_separator ");
-			int sqlRowCount;
-			for (int i = 0; i < suppliers.length; i++) {
+			String sql = "INSERT INTO "
+					+ Params.dbName
+					+ ".material"
+					+ "( restaurant_id, material_alias, name, warning_threshold, danger_threshold ) "
+					+ " VALUES(" + term.restaurant_id + ", " + materialAlias
+					+ ", '" + materialName + "', " + materialWarning + ", "
+					+ materialDanger + " ) ";
 
-				String[] fieldValues = suppliers[i].split(" field_separator ");
-
-				String sql = "UPDATE " + Params.dbName + ".supplier "
-						+ " SET name = '" + fieldValues[2] + "', "
-						+ " tele = '" + fieldValues[3] + "', " + " addr =  '"
-						+ fieldValues[5] + "', " + " contact = '"
-						+ fieldValues[4] + "', " + " supplier_alias =  "
-						+ fieldValues[1] + " " + " WHERE restaurant_id="
-						+ term.restaurant_id + " AND supplier_id = "
-						+ fieldValues[0];
-
-				sqlRowCount = dbCon.stmt.executeUpdate(sql);
-			}
+			int sqlRowCount = dbCon.stmt.executeUpdate(sql);
 
 			jsonResp = jsonResp.replace("$(result)", "true");
-			jsonResp = jsonResp.replace("$(value)", "供应商修改成功！");
+			jsonResp = jsonResp.replace("$(value)", "添加食材成功！");
 
 			dbCon.rs.close();
 

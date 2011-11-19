@@ -1,4 +1,4 @@
-package com.wireless.Actions.kitchenMgr;
+package com.wireless.Actions.inventoryMgr;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -20,12 +20,15 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.QueryMenu;
 import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.Food;
 import com.wireless.protocol.Terminal;
+import com.wireless.protocol.Util;
 
-public class QueryKitchenMgrAction extends Action {
+public class QueryMaterialMgrAction extends Action {
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
@@ -46,10 +49,11 @@ public class QueryKitchenMgrAction extends Action {
 
 		List resultList = new ArrayList();
 		List outputList = new ArrayList();
-		// List chooseList = new ArrayList();
+		List chooseList = new ArrayList();
 		HashMap rootMap = new HashMap();
 
 		boolean isError = false;
+
 		// 是否分頁
 		String isPaging = request.getParameter("isPaging");
 
@@ -65,11 +69,12 @@ public class QueryKitchenMgrAction extends Action {
 			 * 14:30:00 pin=0x1 & type=3 & ope=2 & value=2011-7-14 14:30:00
 			 * 
 			 * pin : the pin the this terminal type : the type is one of the
-			 * values below. 0 - 全部 1 - 名称 2 - 电话 3 - 地址 ope : the operator is
-			 * one of the values below. 1 - 等于 2 - 大于等于 3 - 小于等于 value : the
-			 * value to search, the content is depending on the type isSpecial :
-			 * additional condition. isRecommend : additional condition. isFree
-			 * : additional condition. isStop : additional condition.
+			 * values below. 0 - 全部全部 1 - 编号 2 - 名称 3 - 拼音 4 - 价格 5 - 厨房 ope :
+			 * the operator is one of the values below. 1 - 等于 2 - 大于等于 3 - 小于等于
+			 * value : the value to search, the content is depending on the type
+			 * isSpecial : additional condition. isRecommend : additional
+			 * condition. isFree : additional condition. isStop : additional
+			 * condition.
 			 */
 
 			String pin = request.getParameter("pin");
@@ -77,32 +82,92 @@ public class QueryKitchenMgrAction extends Action {
 				pin = pin.substring(2);
 			}
 
+			// get the type to filter
+			int type = Integer.parseInt(request.getParameter("type"));
+
+			// get the operator to filter
+			String ope = request.getParameter("ope");
+			if (ope != null) {
+				int opeType = Integer.parseInt(ope);
+
+				if (opeType == 1) {
+					ope = "=";
+				} else if (opeType == 2) {
+					ope = ">=";
+				} else if (opeType == 3) {
+					ope = "<=";
+				} else {
+					// 不可能到这里
+					ope = "=";
+				}
+			} else {
+				// 不可能到这里
+				ope = "";
+			}
+
+			// get the value to filter
+			String filterVal = request.getParameter("value");
+
+			// combine the operator and filter value
+			String filterCondition = null;
+
+			if (type == 1) {
+				// 按编号
+				filterCondition = " AND A.material_alias " + ope + filterVal;
+			} else if (type == 2) {
+				// 按名称
+				filterCondition = " AND A.name like '" + filterVal + "%'";
+			} else if (type == 3) {
+				// 按库存量
+				filterCondition = " AND stock " + ope + filterVal;
+			} else if (type == 4) {
+				// 按价格
+				filterCondition = " AND B.price " + ope + filterVal;
+			} else if (type == 5) {
+				// 按预警阀值
+				filterCondition = " AND A.warning_threshold " + ope + filterVal;
+			} else if (type == 6) {
+				// 按危险阀值
+				filterCondition = " AND A.danger_threshold " + ope + filterVal;
+			} else {
+				// 全部
+				filterCondition = "";
+			}
+
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, Integer.parseInt(pin, 16),
 					Terminal.MODEL_STAFF);
-
-			String sql = " SELECT alias_id, name, discount, discount_2, discount_3, "
-				    + " member_discount_1, member_discount_2, member_discount_3, dept_id "
-					+ " FROM " + Params.dbName + ".kitchen "
-					+ " WHERE restaurant_id = " + term.restaurant_id 
-					+ " AND alias_id IN (0,1,2,3,4,5,6,7,8,9) ";
+			// 编号 名称 库存量 价格（￥） 预警阀值 危险阀值
+			String sql = " SELECT A.material_id, A.material_alias, A.name, SUM(B.stock) AS stock, B.price, A.warning_threshold, A.danger_threshold "
+					+ " FROM "
+					+ Params.dbName
+					+ ".material A LEFT OUTER JOIN "
+					+ Params.dbName
+					+ ".material_dept B ON ( A.restaurant_id = B.restaurant_id AND A.material_id = B.material_id ) "
+					+ " WHERE A.restaurant_id = "
+					+ term.restaurant_id
+					+ " "
+					+ filterCondition
+					+ " GROUP BY A.material_id, A.material_alias, A.name, B.price, A.warning_threshold, A.danger_threshold  ";
 
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 
 			while (dbCon.rs.next()) {
 				HashMap resultMap = new HashMap();
 				/**
-				 * The json to each order looks like below 分廚編號，名稱，一般折扣１，一般折扣２，一般折扣３，會員折扣１，會員折扣２，會員折扣３，部門
+				 * The json to each order looks like below 编号 名称 库存量 价格（￥） 预警阀值
+				 * 危险阀值
 				 */
-				resultMap.put("kitchenID", dbCon.rs.getInt("alias_id"));
-				resultMap.put("kitchenName", dbCon.rs.getString("name"));
-				resultMap.put("normalDiscount1", dbCon.rs.getFloat("discount"));
-				resultMap.put("normalDiscount2", dbCon.rs.getFloat("discount_2"));
-				resultMap.put("normalDiscount3", dbCon.rs.getFloat("discount_3"));
-				resultMap.put("memberDiscount1", dbCon.rs.getFloat("member_discount_1"));
-				resultMap.put("memberDiscount2", dbCon.rs.getFloat("member_discount_2"));
-				resultMap.put("memberDiscount3", dbCon.rs.getFloat("member_discount_3"));
-				resultMap.put("department", dbCon.rs.getInt("dept_id"));
+				resultMap.put("materialID", dbCon.rs.getInt("material_id"));
+				resultMap.put("materialAlias",
+						dbCon.rs.getInt("material_alias"));
+				resultMap.put("materialName", dbCon.rs.getString("name"));
+				resultMap.put("storage", dbCon.rs.getFloat("stock"));
+				resultMap.put("price", dbCon.rs.getFloat("price"));
+				resultMap.put("warningNbr",
+						dbCon.rs.getFloat("warning_threshold"));
+				resultMap.put("dangerNbr",
+						dbCon.rs.getFloat("danger_threshold"));
 
 				resultMap.put("message", "normal");
 
@@ -119,7 +184,7 @@ public class QueryKitchenMgrAction extends Action {
 			} else if (e.errCode == ErrorCode.TERMINAL_EXPIRED) {
 				resultMap.put("message", "终端已过期，请重新确认");
 			} else {
-				resultMap.put("message", "没有获取到分厨信息，请重新确认");
+				resultMap.put("message", "没有获取到食材信息，请重新确认");
 			}
 			resultList.add(resultMap);
 			isError = true;

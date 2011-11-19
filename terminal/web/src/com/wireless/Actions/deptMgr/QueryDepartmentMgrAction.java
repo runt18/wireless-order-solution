@@ -112,7 +112,7 @@ public class QueryDepartmentMgrAction extends Action {
 			} else if (e.errCode == ErrorCode.TERMINAL_EXPIRED) {
 				resultMap.put("message", "终端已过期，请重新确认");
 			} else {
-				resultMap.put("message", "没有获取到菜谱信息，请重新确认");
+				resultMap.put("message", "没有获取到部门信息，请重新确认");
 			}
 			resultList.add(resultMap);
 			isError = true;

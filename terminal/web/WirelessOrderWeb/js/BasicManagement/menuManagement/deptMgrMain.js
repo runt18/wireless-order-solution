@@ -22,7 +22,7 @@ var logOutBut = new Ext.ux.ImageButton({
 // 1，表格的数据store
 var deptStore = new Ext.data.Store({
 	proxy : new Ext.data.HttpProxy({
-		url : "../../QueryDeptMgr.do"
+		url : "../../QueryDepartment.do"
 	}),
 	reader : new Ext.data.JsonReader({
 		totalProperty : "totalProperty",
@@ -51,7 +51,14 @@ var deptColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(), {
 	width : 100,
 	editor : new Ext.form.TextField({
 		allowBlank : false,
-		allowNegative : false
+		allowNegative : false,
+		validator : function(v) {
+			if (currRowIndex == 0) {
+				return "“仓管部”名称不允许修改！";
+			} else {
+				return true;
+			}
+		}
 	})
 } ]);
 
@@ -65,7 +72,7 @@ Ext
 
 			// ---------------------表格--------------------------
 			deptGrid = new Ext.grid.EditorGridPanel({
-				title : "部门",
+				// title : "部门",
 				xtype : "grid",
 				anchor : "99%",
 				region : "center",
@@ -109,7 +116,7 @@ Ext
 
 						if (modfiedArr.length != 0) {
 							// 獲取分頁表格的當前頁碼！神技！！！
-							var toolbar = deptID.getBottomToolbar();
+							var toolbar = deptGrid.getBottomToolbar();
 							currPageIndex = toolbar.readPage(toolbar
 									.getPageData());
 
@@ -179,6 +186,9 @@ Ext
 								limit : deptPageRecordCount
 							}
 						});
+					},
+					"rowclick" : function(thiz, rowIndex, e) {
+						currRowIndex = rowIndex;
 					}
 				}
 			});
@@ -189,7 +199,8 @@ Ext
 				// 输入查询条件参数
 				this.baseParams = {
 					"pin" : pin,
-					"isPaging" : true
+					"isPaging" : true,
+					"isCombo" : false
 				};
 
 			});

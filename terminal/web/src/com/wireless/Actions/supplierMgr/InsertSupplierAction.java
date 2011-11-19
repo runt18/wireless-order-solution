@@ -52,8 +52,8 @@ public class InsertSupplierAction extends Action {
 					Terminal.MODEL_STAFF);
 
 			// get the query condition
-			int supplierID = Integer.parseInt(request
-					.getParameter("supplierID"));
+			int supplierAlias = Integer.parseInt(request
+					.getParameter("supplierAlias"));
 			String supplierName = request.getParameter("supplierName");
 			String supplierAddress = request.getParameter("supplierAddress");
 			String supplierContact = request.getParameter("supplierContact");
@@ -62,8 +62,8 @@ public class InsertSupplierAction extends Action {
 			String sql = "INSERT INTO "
 					+ Params.dbName
 					+ ".supplier"
-					+ "( restaurant_id, supplier_id, name, tele, addr, contact ) "
-					+ " VALUES(" + term.restaurant_id + ", " + supplierID
+					+ "( restaurant_id, supplier_alias, name, tele, addr, contact ) "
+					+ " VALUES(" + term.restaurant_id + ", " + supplierAlias
 					+ ", '" + supplierName + "', '" + supplierPhone + "', '"
 					+ supplierAddress + "', '" + supplierContact + "') ";
 			System.out.println(sql);

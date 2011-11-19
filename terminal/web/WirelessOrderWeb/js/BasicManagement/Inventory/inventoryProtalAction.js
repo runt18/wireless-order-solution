@@ -12,7 +12,9 @@
 	$("#inventoryMgr").each(function() {
 		$(this).bind("click", function() {
 			if (!isPrompt) {
-
+				location.href = "InventoryManagement.html?pin="
+					 + currPin + "&restaurantID="
+					 + restaurantID;
 			}
 		});
 	});

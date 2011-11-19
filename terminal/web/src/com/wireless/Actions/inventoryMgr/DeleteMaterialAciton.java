@@ -1,4 +1,4 @@
-package com.wireless.Actions.supplierMgr;
+package com.wireless.Actions.inventoryMgr;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -19,7 +19,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Terminal;
 
-public class UpdateSupplierAction extends Action {
+public class DeleteMaterialAciton extends Action { 
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -39,16 +39,9 @@ public class UpdateSupplierAction extends Action {
 			 * example, filter the order date greater than or equal 2011-7-14
 			 * 14:30:00 pin=0x1 & type=3 & ope=2 & value=2011-7-14 14:30:00
 			 * 
-			 * pin : the pin the this terminal modSuppliers:
-			 * 修改記錄格式:id{field_separator
-			 * }name{field_separator}phone{field_separator
-			 * }contact{field_separator
-			 * }address{record_separator}id{field_separator
-			 * }name{field_separator}
-			 * phone{field_separator}contact{field_separator}address
+			 * pin : the pin the this terminal dishNumber:
 			 * 
 			 */
-
 			String pin = request.getParameter("pin");
 			if (pin.startsWith("0x") || pin.startsWith("0X")) {
 				pin = pin.substring(2);
@@ -57,32 +50,21 @@ public class UpdateSupplierAction extends Action {
 			Terminal term = VerifyPin.exec(dbCon, Integer.parseInt(pin, 16),
 					Terminal.MODEL_STAFF);
 
-			// get parameter
-			String modSuppliers = request.getParameter("modSuppliers");
+			// get the query condition
+			int materialID = Integer.parseInt(request
+					.getParameter("materialID"));
 
 			/**
 			 * 
 			 */
-			String[] suppliers = modSuppliers.split(" record_separator ");
-			int sqlRowCount;
-			for (int i = 0; i < suppliers.length; i++) {
+			String sql = "DELETE FROM " + Params.dbName + ".material "
+					+ "WHERE restaurant_id=" + term.restaurant_id
+					+ " AND material_id = " + materialID;
 
-				String[] fieldValues = suppliers[i].split(" field_separator ");
-
-				String sql = "UPDATE " + Params.dbName + ".supplier "
-						+ " SET name = '" + fieldValues[2] + "', "
-						+ " tele = '" + fieldValues[3] + "', " + " addr =  '"
-						+ fieldValues[5] + "', " + " contact = '"
-						+ fieldValues[4] + "', " + " supplier_alias =  "
-						+ fieldValues[1] + " " + " WHERE restaurant_id="
-						+ term.restaurant_id + " AND supplier_id = "
-						+ fieldValues[0];
-
-				sqlRowCount = dbCon.stmt.executeUpdate(sql);
-			}
+			int sqlRowCount = dbCon.stmt.executeUpdate(sql);
 
 			jsonResp = jsonResp.replace("$(result)", "true");
-			jsonResp = jsonResp.replace("$(value)", "供应商修改成功！");
+			jsonResp = jsonResp.replace("$(value)", "食材刪除成功！");
 
 			dbCon.rs.close();
 

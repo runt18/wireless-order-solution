@@ -110,7 +110,7 @@ public class QuerySupplierMgrAction extends Action {
 			Terminal term = VerifyPin.exec(dbCon, Integer.parseInt(pin, 16),
 					Terminal.MODEL_STAFF);
 
-			String sql = " SELECT supplier_id, name, tele, contact, addr "
+			String sql = " SELECT supplier_id, supplier_alias, name, tele, contact, addr "
 					+ " FROM " + Params.dbName + ".supplier "
 					+ " WHERE restaurant_id = " + term.restaurant_id
 					+ filterCondition;
@@ -120,9 +120,10 @@ public class QuerySupplierMgrAction extends Action {
 			while (dbCon.rs.next()) {
 				HashMap resultMap = new HashMap();
 				/**
-				 * The json to each order looks like below 供應商編號，名稱，電話，聯係人，地址
+				 * The json to each order looks like below 供應商ID，供應商別名，名稱，電話，聯係人，地址
 				 */
 				resultMap.put("supplierID", dbCon.rs.getInt("supplier_id"));
+				resultMap.put("supplierAlias", dbCon.rs.getInt("supplier_alias"));
 				resultMap.put("supplierName", dbCon.rs.getString("name"));
 				resultMap.put("supplierPhone", dbCon.rs.getString("tele"));
 				resultMap.put("supplierContact", dbCon.rs.getString("contact"));
@@ -143,7 +144,7 @@ public class QuerySupplierMgrAction extends Action {
 			} else if (e.errCode == ErrorCode.TERMINAL_EXPIRED) {
 				resultMap.put("message", "终端已过期，请重新确认");
 			} else {
-				resultMap.put("message", "没有获取到菜谱信息，请重新确认");
+				resultMap.put("message", "没有获取到供应商信息，请重新确认");
 			}
 			resultList.add(resultMap);
 			isError = true;
