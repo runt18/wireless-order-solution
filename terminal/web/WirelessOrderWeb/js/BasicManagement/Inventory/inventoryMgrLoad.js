@@ -1,5 +1,6 @@
 ﻿function loadAllMaterial() {
 	materialData = [];
+	materialComboData = [];
 	Ext.Ajax.request({
 		url : "../../QueryMaterialMgr.do",
 		params : {
@@ -20,6 +21,8 @@
 							.push([ rootData[i].materialID,
 									rootData[i].materialAlias,
 									rootData[i].materialName ]);
+					materialComboData.push([ rootData[i].materialID,
+							rootData[i].materialName ]);
 				}
 			} else {
 				Ext.MessageBox.show({
@@ -41,6 +44,7 @@
 
 function loadAllsupplier() {
 	supplierData = [];
+	supplierComboData = [];
 	Ext.Ajax.request({
 		url : "../../QuerySupplierMgr.do",
 		params : {
@@ -55,11 +59,14 @@ function loadAllsupplier() {
 			// 后台格式：[供應商ID，供應商別名，名稱，電話，聯係人，地址]
 			var rootData = resultJSON.root;
 			if (rootData[0].message == "normal") {
+				supplierComboData.push([ "-1", "全部" ]);
 				for ( var i = 0; i < rootData.length; i++) {
 					supplierData
 							.push([ rootData[i].supplierID,
 									rootData[i].supplierAlias,
 									rootData[i].supplierName ]);
+					supplierComboData.push([ rootData[i].supplierID,
+							rootData[i].supplierName ]);
 				}
 			} else {
 				Ext.MessageBox.show({

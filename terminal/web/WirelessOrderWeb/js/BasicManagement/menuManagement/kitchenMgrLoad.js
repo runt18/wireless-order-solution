@@ -53,6 +53,7 @@ function loadAddKitchens() {
 					kitchenMultSelectData.push([ rootData[i].kitchenID,
 							rootData[i].kitchenName ]);
 				}
+				kitchenStore.reload();
 			} else {
 				Ext.MessageBox.show({
 					msg : rootData[0].message,

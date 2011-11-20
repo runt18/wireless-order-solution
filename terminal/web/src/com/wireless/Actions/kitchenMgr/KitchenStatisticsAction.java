@@ -81,6 +81,12 @@ public class KitchenStatisticsAction extends Action {
 			String kitchenIDs = request.getParameter("kitchenIDs");
 
 			String condition = " AND A.kitchen IN (" + kitchenIDs + ") ";
+			if (!dateBegin.equals("")) {
+				condition = condition + " AND A.order_date >= '" + dateBegin + "' ";
+			}
+			if (!dateEnd.equals("")) {
+				condition = condition + " AND A.order_date <= '" + dateEnd + "' ";
+			}
 
 			OrderFoodReflector foodRef = new OrderFoodReflector();
 			String orderClause = " ORDER BY A.order_date, A.kitchen ";
@@ -232,6 +238,7 @@ public class KitchenStatisticsAction extends Action {
 				DecimalFormat fnum = new DecimalFormat("##0.00");
 				String totalPriceDiaplay = fnum.format(allTotalCount);
 				HashMap resultMap = new HashMap();
+				resultMap.put("kitchenName", "SUM");
 				resultMap.put("sign", "汇总");
 				resultMap.put("total", totalPriceDiaplay);
 				resultMap.put("message", "normal");

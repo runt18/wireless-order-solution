@@ -213,13 +213,13 @@ function loginOnLoad() {
 											$(this)
 													.stop()
 													.css("background",
-															"url(../images/shift_selected.png) no-repeat 50%");
+															"url(../images/inventory_select.png) no-repeat 50%");
 										},
 										function() {
 											$(this)
 													.stop()
 													.css("background",
-															"url(../images/shift.png) no-repeat 50%");
+															"url(../images/inventory.png) no-repeat 50%");
 										});
 					});
 

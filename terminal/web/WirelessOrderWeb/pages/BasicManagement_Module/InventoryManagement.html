@@ -56,24 +56,26 @@
 	// global variable
 	var restaurantID = Request["restaurantID"];
 	var pin = Request["pin"];
-	
 
 	var currPageIndex = 0;
 	var currRowIndex = -1;
 	var materialPageRecordCount = 20;
-	
+
 	var conditionType = "text";
-	
+
 	var materialData = [];
+	var materialComboData = [];
 	var supplierData = [];
+	var supplierComboData = [];
 	var departmentData = [];
-	
+
 	var isPrompt = false;
-	
 </script>
 
 <script type="text/javascript"
 	src="../../js/BasicManagement/Inventory/inventoryMgrLoad.js"></script>
+<script type="text/javascript"
+	src="../../js/BasicManagement/Inventory/inventoryMgrStatistics.js"></script>
 <script type="text/javascript"
 	src="../../js/BasicManagement/Inventory/inventoryMgrMain.js"></script>
 

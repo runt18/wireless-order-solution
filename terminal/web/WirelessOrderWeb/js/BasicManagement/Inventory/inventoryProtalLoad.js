@@ -27,13 +27,13 @@ function loginOnLoad() {
 											$(this)
 													.stop()
 													.css("background",
-															"url(../../images/order_select.png) no-repeat 50%");
+															"url(../../images/supplierMgr_select.png) no-repeat 50%");
 										},
 										function() {
 											$(this)
 													.stop()
 													.css("background",
-															"url(../../images/order.png) no-repeat 50%");
+															"url(../../images/supplierMgr.png) no-repeat 50%");
 										});
 					});
 
@@ -46,13 +46,13 @@ function loginOnLoad() {
 											$(this)
 													.stop()
 													.css("background",
-															"url(../../images/bill_select.png) no-repeat 50%");
+															"url(../../images/inventoryMgr_select.png) no-repeat 50%");
 										},
 										function() {
 											$(this)
 													.stop()
 													.css("background",
-															"url(../../images/bill.png) no-repeat 50%");
+															"url(../../images/inventoryMgr.png) no-repeat 50%");
 										});
 					});
 };

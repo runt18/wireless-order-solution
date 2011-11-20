@@ -246,6 +246,9 @@ var kitchenStatResultGrid = new Ext.grid.GridPanel({
 	sm : new Ext.grid.RowSelectionModel({
 		singleSelect : true
 	}),
+	viewConfig : {
+		forceFit : true
+	},
 	bbar : new Ext.PagingToolbar({
 		pageSize : kitchenStaticRecordCount,
 		store : kitchenStatResultStore,
@@ -295,13 +298,17 @@ kitchenStatResultGrid
 												// 廚房顯示
 												for ( var i = 0; i < kitchenMultSelectData.length; i++) {
 													if (record
-															.get("kitchenName") == kitchenMultSelectData[i][0]
-															&& record
-																	.get("kitchenName") != null) {
+															.get("kitchenName") == kitchenMultSelectData[i][0]) {
 														record
 																.set(
 																		"kitchenName",
 																		kitchenMultSelectData[i][1]);
+													}
+													if (record
+															.get("kitchenName") == "SUM") {
+														record.set(
+																"kitchenName",
+																"");
 													}
 												}
 
@@ -314,7 +321,7 @@ kitchenStatResultGrid
 
 kitchenStatResultWin = new Ext.Window({
 	title : "统计结果",
-	width : 750,
+	width : 800,
 	height : 370,
 	closeAction : "hide",
 	resizable : false,
@@ -438,12 +445,12 @@ var kitchenColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(),
 			header : "编号",
 			sortable : true,
 			dataIndex : "kitchenID",
-			width : 80
+			width : 100
 		}, {
 			header : "名称",
 			sortable : true,
 			dataIndex : "kitchenName",
-			width : 100,
+			width : 140,
 			editor : new Ext.form.TextField({
 				allowBlank : false,
 				allowNegative : false
@@ -452,7 +459,7 @@ var kitchenColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(),
 			header : "一般折扣1",
 			sortable : true,
 			dataIndex : "normalDiscount1",
-			width : 100,
+			width : 140,
 			editor : new Ext.form.NumberField({
 				allowBlank : false,
 				allowNegative : false
@@ -461,7 +468,7 @@ var kitchenColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(),
 			header : "一般折扣2",
 			sortable : true,
 			dataIndex : "normalDiscount2",
-			width : 100,
+			width : 140,
 			editor : new Ext.form.NumberField({
 				allowBlank : false,
 				allowNegative : false
@@ -470,7 +477,7 @@ var kitchenColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(),
 			header : "一般折扣3",
 			sortable : true,
 			dataIndex : "normalDiscount3",
-			width : 100,
+			width : 140,
 			editor : new Ext.form.NumberField({
 				allowBlank : false,
 				allowNegative : false
@@ -479,7 +486,7 @@ var kitchenColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(),
 			header : "会员折扣1",
 			sortable : true,
 			dataIndex : "memberDiscount1",
-			width : 100,
+			width : 140,
 			editor : new Ext.form.NumberField({
 				allowBlank : false,
 				allowNegative : false
@@ -488,7 +495,7 @@ var kitchenColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(),
 			header : "会员折扣2",
 			sortable : true,
 			dataIndex : "memberDiscount2",
-			width : 100,
+			width : 140,
 			editor : new Ext.form.NumberField({
 				allowBlank : false,
 				allowNegative : false
@@ -497,7 +504,7 @@ var kitchenColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(),
 			header : "会员折扣3",
 			sortable : true,
 			dataIndex : "memberDiscount3",
-			width : 100,
+			width : 140,
 			editor : new Ext.form.NumberField({
 				allowBlank : false,
 				allowNegative : false
@@ -541,9 +548,9 @@ Ext
 						sm : new Ext.grid.RowSelectionModel({
 							singleSelect : true
 						}),
-						viewConfig : {
-							forceFit : true
-						},
+						// viewConfig : {
+						// forceFit : true
+						// },
 						listeners : {
 							"rowclick" : function(thiz, rowIndex, e) {
 								currRowIndex = rowIndex;

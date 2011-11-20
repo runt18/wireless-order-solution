@@ -947,7 +947,7 @@ var inStatBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "入库统计",
 	handler : function(btn) {
-		// supplierAddWin.show();
+		inventoryInStatWin.show();
 	}
 });
 

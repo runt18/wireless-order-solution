@@ -59,6 +59,7 @@ function menuMgrOnLoad() {
 					]);
 				}
 				kitchenTypeData.push([ 255, "空" ]);
+				menuStore.reload();
 			} else {
 				var dataInfo = resultJSON.data;
 				// Ext.Msg.alert(tableData);

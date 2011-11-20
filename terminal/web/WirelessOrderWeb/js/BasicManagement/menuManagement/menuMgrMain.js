@@ -864,7 +864,7 @@ menuModifyWin = new Ext.Window(
 
 // --------------------------------------------------------------------------
 var orderStatiBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/orderStatic.png",
+	imgPath : "../../images/menuDishStatis.png",
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : "点菜统计",
@@ -874,7 +874,7 @@ var orderStatiBut = new Ext.ux.ImageButton({
 });
 
 var dishAddBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/dishAdd.png",
+	imgPath : "../../images/menuDishAdd.png",
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : "添加新菜",
