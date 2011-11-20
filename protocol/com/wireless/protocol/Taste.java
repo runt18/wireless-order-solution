@@ -36,7 +36,7 @@ public class Taste {
 	
 	public Taste(int id, String pref){
 		alias_id = id;
-		preference = pref;
+		preference = pref.trim();
 	}
 	
 	public Taste(int id, String pref, short cate, short calcType, Float _rate, Float _price){
