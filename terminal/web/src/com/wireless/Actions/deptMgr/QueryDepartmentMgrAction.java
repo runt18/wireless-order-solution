@@ -85,7 +85,8 @@ public class QueryDepartmentMgrAction extends Action {
 
 			String sql = " SELECT dept_id, name " + " FROM " + Params.dbName
 					+ ".department " + " WHERE restaurant_id = "
-					+ term.restaurant_id;
+					+ term.restaurant_id 
+					+ " ORDER BY dept_id ";
 
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 

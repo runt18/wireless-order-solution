@@ -947,7 +947,10 @@ var inStatBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "入库统计",
 	handler : function(btn) {
-		inventoryInStatWin.show();
+		if (!isPrompt) {
+			isPrompt = true;
+			inventoryInStatWin.show();
+		}
 	}
 });
 
@@ -1335,12 +1338,12 @@ var materialColumnModel = new Ext.grid.ColumnModel([
 			header : "编号",
 			sortable : true,
 			dataIndex : "materialAlias",
-			width : 60
+			width : 80
 		}, {
 			header : "名称",
 			sortable : true,
 			dataIndex : "materialName",
-			width : 80,
+			width : 160,
 			editor : new Ext.form.TextField({
 				allowBlank : false,
 				allowNegative : false
@@ -1349,17 +1352,17 @@ var materialColumnModel = new Ext.grid.ColumnModel([
 			header : "库存量",
 			sortable : true,
 			dataIndex : "storage",
-			width : 80
+			width : 130
 		}, {
 			header : "价格（￥）",
 			sortable : true,
 			dataIndex : "price",
-			width : 80
+			width : 130
 		}, {
 			header : "预警阀值",
 			sortable : true,
 			dataIndex : "warningNbr",
-			width : 80,
+			width : 130,
 			editor : new Ext.form.NumberField({
 				allowBlank : false,
 				allowNegative : false
@@ -1368,7 +1371,7 @@ var materialColumnModel = new Ext.grid.ColumnModel([
 			header : "危险阀值",
 			sortable : true,
 			dataIndex : "dangerNbr",
-			width : 80,
+			width : 130,
 			editor : new Ext.form.NumberField({
 				allowBlank : false,
 				allowNegative : false
@@ -1377,7 +1380,7 @@ var materialColumnModel = new Ext.grid.ColumnModel([
 			header : "<center>操作</center>",
 			sortable : true,
 			dataIndex : "operator",
-			width : 250,
+			width : 350,
 			renderer : materialOpt
 		} ]);
 
@@ -1403,9 +1406,9 @@ Ext
 						sm : new Ext.grid.RowSelectionModel({
 							singleSelect : true
 						}),
-						viewConfig : {
-							forceFit : true
-						},
+						// viewConfig : {
+						// forceFit : true
+						// },
 						listeners : {
 							rowclick : function(thiz, rowIndex, e) {
 								currRowIndex = rowIndex;

@@ -1,4 +1,4 @@
-package com.wireless.Actions.menuMgr;
+package com.wireless.Actions.inventoryMgr;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -24,12 +24,13 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.VerifyPin;
+import com.wireless.dbReflect.OrderFoodReflector;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Terminal;
-import com.wireless.util.Util;
 
-public class MenuStatisticsAction extends Action {
+public class StatInventoryInDetail extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -38,17 +39,12 @@ public class MenuStatisticsAction extends Action {
 
 		PrintWriter out = null;
 
-		String start = request.getParameter("start");
-		String limit = request.getParameter("limit");
-		int index = Integer.parseInt(start);
-		int pageSize = Integer.parseInt(limit);
-
 		List resultList = new ArrayList();
-		List outputList = new ArrayList();
 		HashMap rootMap = new HashMap();
 
 		boolean isError = false;
-		float totalPrice = 0;
+		float allTotalCount = 0;
+		int allTotalAmount = 0;
 
 		try {
 			// 解决后台中文传到前台乱码
@@ -74,57 +70,76 @@ public class MenuStatisticsAction extends Action {
 					Terminal.MODEL_STAFF);
 
 			// get the query condition
-			String dateBegin = request.getParameter("dateBegin");
-			String dateEnd = request.getParameter("dateEnd");
-			String dishString = request.getParameter("foodIDs");
+			String beginDate = request.getParameter("beginDate");
+			String endDate = request.getParameter("endDate");
+			String supplier = request.getParameter("supplier");
+			String departments = request.getParameter("departments");
+			String materials = request.getParameter("materials");
 
-			/**
-			 * Select all the today orders matched the conditions below. 1 -
-			 * belong to this restaurant 2 - has been paid 3 - match extra
-			 * filter condition
+			String condition = "";
+
+			if (!beginDate.equals("")) {
+				condition = condition + " AND date >= '" + beginDate + "' ";
+			}
+			if (!endDate.equals("")) {
+				condition = condition + " AND date <= '" + endDate + "' ";
+			}
+
+			if (!supplier.equals("-1")) {
+				condition = condition + " AND supplier_id = " + supplier + " ";
+			}
+
+			if (!departments.equals("")) {
+				condition = condition + " AND dept_id IN (" + departments
+						+ ") ";
+			}
+
+			condition = condition + " AND material_id IN (" + materials + ") ";
+
+			/*
+			 * rootData[i].materialID, materialN, rootData[i].date,
+			 * rootData[i].supplierID, supplierN, rootData[i].operator,
+			 * rootData[i].departmentID, deptN, rootData[i].price,
+			 * rootData[i].amount, rootData[i].total
 			 */
-			String sql = "SELECT food_id, name, unit_price, is_temporary, kitchen, "
-					+ " sum(order_count) as dishCount, sum(order_count)*unit_price as totalPrice "
+
+			String sql = " SELECT material_id, date, supplier_id, staff, dept_id, "
+					+ " price, amount, price*amount as total "
 					+ " FROM "
 					+ Params.dbName
-					+ ".order_food_history "
-					+ " WHERE 1=1 AND restaurant_id = "
+					+ ".material_detail "
+					+ " WHERE restaurant_id = "
 					+ term.restaurant_id
-					+ " ";
-			if (!dateBegin.equals("")) {
-				sql = sql + " AND order_date >= '" + dateBegin + "' ";
-			}
-			if (!dateEnd.equals("")) {
-				sql = sql + " AND order_date <= '" + dateEnd + "' ";
-			}
-			sql = sql
-					+ " AND food_id in ("
-					+ dishString
-					+ ") "
-					+ " GROUP BY food_id, name, unit_price, is_temporary, kitchen ";
+					+ condition;
 
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
-System.out.println(sql);
+
+			/**
+			 * The json to each order looks like below
+			 */
 			while (dbCon.rs.next()) {
+
 				HashMap resultMap = new HashMap();
-				/**
-				 * The json to each order looks like below
-				 * 菜品ｉｄ，菜品名稱，菜品單價，是否臨時，厨房，總數量，總價格
-				 */
-				resultMap.put("dishNumber", dbCon.rs.getInt("food_id"));
-				resultMap.put("dishName", dbCon.rs.getString("name"));
-				resultMap.put("dishPrice", dbCon.rs.getFloat("unit_price"));
-				resultMap.put("isTemp", dbCon.rs.getBoolean("is_temporary"));
-				resultMap.put("kitchen", dbCon.rs.getInt("kitchen"));
-				resultMap.put("dishCount", dbCon.rs.getFloat("dishCount"));
-				resultMap
-						.put("dishTotalPrice", dbCon.rs.getFloat("totalPrice"));
+				resultMap.put("materialID", dbCon.rs.getInt("material_id"));
+				resultMap.put("date", new SimpleDateFormat("yyyy-MM-dd")
+						.format(dbCon.rs.getDate("date")));
+				resultMap.put("supplierID", dbCon.rs.getInt("supplier_id"));
+				resultMap.put("operator", dbCon.rs.getString("staff"));
+				resultMap.put("departmentID", dbCon.rs.getInt("dept_id"));
+				resultMap.put("price", dbCon.rs.getFloat("price"));
+				resultMap.put("amount", dbCon.rs.getInt("amount"));
+				resultMap.put("total", dbCon.rs.getFloat("total"));
+
 				resultMap.put("message", "normal");
 
 				resultList.add(resultMap);
 
-				totalPrice = totalPrice + dbCon.rs.getFloat("totalPrice");
+				allTotalCount = (float) Math.round((allTotalCount + dbCon.rs
+						.getFloat("total")) * 100) / 100;
+				allTotalAmount = allTotalAmount + dbCon.rs.getInt("amount");
+
 			}
+
 			dbCon.rs.close();
 
 		} catch (BusinessException e) {
@@ -137,7 +152,7 @@ System.out.println(sql);
 				resultMap.put("message", "终端已过期，请重新确认");
 
 			} else {
-				resultMap.put("message", "没有获取到当日账单信息，请重新确认");
+				resultMap.put("message", "没有获取到信息，请重新确认");
 			}
 			resultList.add(resultMap);
 			isError = true;
@@ -161,31 +176,29 @@ System.out.println(sql);
 			if (isError) {
 				rootMap.put("root", resultList);
 			} else {
-				// 分页
-				for (int i = index; i < pageSize + index; i++) {
-					try {
-						outputList.add(resultList.get(i));
-					} catch (Exception e) {
-						// 最后一页可能不足一页，会报错，忽略
-					}
-				}
-				DecimalFormat fnum = new DecimalFormat("##0.00");
-				String totalPriceDiaplay = fnum.format(totalPrice);
-				HashMap resultMap = new HashMap();
-				resultMap.put("dishCount", "汇总");
-				resultMap.put("dishTotalPrice", totalPriceDiaplay);
-				resultMap.put("message", "normal");
-				outputList.add(resultMap);
 
-				rootMap.put("root", outputList);
+				DecimalFormat fnum = new DecimalFormat("##0.00");
+				String totalPriceDiaplay = fnum.format(allTotalCount);
+				HashMap resultMap = new HashMap();
+				resultMap.put("materialID", "SUM");
+				resultMap.put("price", "汇总");
+				resultMap.put("amount", allTotalAmount);
+				resultMap.put("total", totalPriceDiaplay);
+				resultMap.put("message", "normal");
+				resultList.add(resultMap);
+
+				rootMap.put("root", resultList);
 			}
 
 			JsonConfig jsonConfig = new JsonConfig();
 
 			JSONObject obj = JSONObject.fromObject(rootMap, jsonConfig);
 
-			String outputJson = "{\"totalProperty\":" + resultList.size() + ","
-					+ obj.toString().substring(1);
+			// String outputJson = "{\"totalProperty\":" + resultList.size() +
+			// ","
+			// + obj.toString().substring(1);
+
+			String outputJson = obj.toString();
 
 			System.out.println(outputJson);
 
@@ -194,5 +207,4 @@ System.out.println(sql);
 
 		return null;
 	}
-
 }
