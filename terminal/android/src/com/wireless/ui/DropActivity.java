@@ -75,7 +75,8 @@ public class DropActivity extends Activity implements OrderFoodListView.OnOperLi
 					while(newIter.hasNext()){
 						OrderFood newFood = newIter.next();
 						if(oriFood.equals(newFood)){
-							oriFood.setCount(oriFood.getCount() + newFood.getCount());
+							float orderAmount = oriFood.getCount() + newFood.getCount();
+							oriFood.setCount(orderAmount);
 							break;
 						}
 					}
