@@ -23,7 +23,7 @@ import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.SKitchen;
-import com.wireless.util.DragListView;
+import com.wireless.ui.view.DragListView;
 
 public class KitchenActivity extends Activity {
 	private DragListView myListView;
@@ -44,7 +44,7 @@ public class KitchenActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.ketchen);
+		setContentView(R.layout.kitchen);
 		
 		Common.getCommon().setKient(KitchenActivity.this);
 		appcontext = (AppContext) getApplication();
@@ -52,7 +52,7 @@ public class KitchenActivity extends Activity {
 		myListView = (DragListView) findViewById(R.id.myListView);
 		Spinner01=(TextView)findViewById(R.id.Spinner01);
 		Spinner01.setText("³ø·¿");
-		searchpin=(EditText)findViewById(R.id.searchpin);
+		searchpin=(EditText)findViewById(R.id.filterKitchenEdtTxt);
 		sp=(RelativeLayout)findViewById(R.id.sp);
 		
 		searchpin.addTextChangedListener(watcher);

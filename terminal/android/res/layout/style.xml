@@ -46,8 +46,9 @@
 		android:layout_height="wrap_content" android:src="@drawable/table_line"
 		android:layout_below="@id/second" />
 
-	<com.wireless.util.DragListView
+	<ListView
 		android:id="@+id/styleLstView" android:layout_width="fill_parent"
 		android:layout_height="wrap_content" android:layout_below="@id/line"
-		android:divider="@drawable/table_line" android:cacheColorHint="#00000000"></com.wireless.util.DragListView>
+		android:divider="@drawable/table_line" android:cacheColorHint="#00000000">
+	</ListView>
 </RelativeLayout>

@@ -19,7 +19,7 @@ import com.wireless.adapter.FoodAdapter;
 import com.wireless.common.Common;
 import com.wireless.protocol.Food;
 import com.wireless.ui.KitchenActivity.item;
-import com.wireless.util.DragListView;
+import com.wireless.ui.view.DragListView;
 
 public class PingyinActivity extends Activity {
 	private DragListView myListView;
@@ -38,7 +38,7 @@ public class PingyinActivity extends Activity {
 		appcontext = (AppContext) getApplication();
 		appcontext.activityList.add(PingyinActivity.this);
 		myListView = (DragListView) findViewById(R.id.myListView);
-		searchpin = (EditText) findViewById(R.id.searchpin);
+		searchpin = (EditText) findViewById(R.id.filterPinyinEdtTxt);
 		
 
 		foodes = new ArrayList<Food>();

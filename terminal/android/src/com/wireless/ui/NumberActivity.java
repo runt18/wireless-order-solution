@@ -17,7 +17,7 @@ import android.widget.ImageView;
 import com.wireless.adapter.FoodAdapter;
 import com.wireless.common.Common;
 import com.wireless.protocol.Food;
-import com.wireless.util.DragListView;
+import com.wireless.ui.view.DragListView;
 
 public class NumberActivity extends Activity {
 	private DragListView myListView;

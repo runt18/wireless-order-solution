@@ -12,7 +12,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
@@ -36,7 +35,7 @@ public class PickFoodListView extends ListView {
 		setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position,	long rowID) {
-				new AskOrderAmountDialog(_foods[position]);
+				new AskOrderAmountDialog(_foods[position]).show();
 			}
 		});
 	}
@@ -83,7 +82,7 @@ public class PickFoodListView extends ListView {
 			View view;
 			
 			if(convertView == null){
-				view = LayoutInflater.from(_context).inflate(R.layout.food_item, null);
+				view = LayoutInflater.from(_context).inflate(R.layout.fooditem, null);
 			}else{
 				view = convertView;
 			}
@@ -127,27 +126,23 @@ public class PickFoodListView extends ListView {
 		public AskOrderAmountDialog(final Food selectedFood) {
 			super(_context, R.style.FullHeightDialog);
 			
-			final View view = LayoutInflater.from(_context).inflate(R.layout.alert, null);
+			setContentView(R.layout.alert);
+			
 			getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
 			
-			((TextView)view.findViewById(R.id.ordername)).setText("请输入" + selectedFood.name + "的点菜数量");
-			((EditText)view.findViewById(R.id.mycount)).setText("1");
+			((TextView)findViewById(R.id.ordername)).setText("请输入" + selectedFood.name + "的点菜数量");
+			((EditText)findViewById(R.id.mycount)).setText("1");
 			
 			//"确定"Button
-			Button okBtn = (Button)view.findViewById(R.id.confirm);
+			Button okBtn = (Button)findViewById(R.id.confirm);
 			okBtn.setText("确定");
 			okBtn.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					OrderFood food = new OrderFood(selectedFood);
 
-					float orderAmount = Float.parseFloat(((EditText)view.findViewById(R.id.mycount)).getText().toString());
-					if(orderAmount > 255){
-						Toast.makeText(_context, "删除" + "对不起，相同的菜品最多只能点255份", 0).show();
-						food.setCount(new Float(255));
-					}else{
-						food.setCount(orderAmount);
-					}	
+					float orderAmount = Float.parseFloat(((EditText)findViewById(R.id.mycount)).getText().toString());
+					food.setCount(orderAmount);
 					
 					if(_foodPickedListener != null){
 						_foodPickedListener.OnPicked(food);
@@ -158,7 +153,7 @@ public class PickFoodListView extends ListView {
 			});
 			
 			//"取消"Button
-			Button cancelBtn = (Button)view.findViewById(R.id.alert_cancel);
+			Button cancelBtn = (Button)findViewById(R.id.alert_cancel);
 			cancelBtn.setText("取消");
 			cancelBtn.setOnClickListener(new View.OnClickListener(){
 				@Override

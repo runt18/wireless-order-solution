@@ -39,8 +39,6 @@ public class DropActivity extends Activity implements OrderFoodListView.OnOperLi
 	private Order _oriOrder;
 	private OrderFoodListView _oriFoodLstView;
 	private OrderFoodListView _newFoodLstView;
-	private List<OrderFood> _oriFoods;
-	private List<OrderFood> _newFoods;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -70,10 +68,10 @@ public class DropActivity extends Activity implements OrderFoodListView.OnOperLi
 				 * 如果有就将他们的点菜数量相加
 				 */
 				List<Food> foods = new ArrayList<Food>();
-				Iterator<OrderFood> oriIter = _oriFoods.iterator();
+				Iterator<OrderFood> oriIter = _oriFoodLstView.getSourceData().iterator();
 				while(oriIter.hasNext()){
 					OrderFood oriFood = oriIter.next();
-					Iterator<OrderFood> newIter = _newFoods.iterator();
+					Iterator<OrderFood> newIter = _newFoodLstView.getSourceData().iterator();
 					while(newIter.hasNext()){
 						OrderFood newFood = newIter.next();
 						if(oriFood.equals(newFood)){
@@ -88,7 +86,7 @@ public class DropActivity extends Activity implements OrderFoodListView.OnOperLi
 				 * 遍历新点菜品中是否有新增加的菜品，
 				 * 有则添加到菜品列表中
 				 */
-				Iterator<OrderFood> newIter = _newFoods.iterator();
+				Iterator<OrderFood> newIter = _newFoodLstView.getSourceData().iterator();
 				while(newIter.hasNext()){
 					Food newFood = newIter.next();
 					if(!foods.contains(newFood)){
@@ -117,8 +115,7 @@ public class DropActivity extends Activity implements OrderFoodListView.OnOperLi
 		_oriFoodLstView = (OrderFoodListView)findViewById(R.id.oriFoodLstView);
 		_oriFoodLstView.setGroupIndicator(getResources().getDrawable(R.layout.expander_folder));
 		_oriFoodLstView.setType(Type.UPDATE_ORDER);
-		_oriFoods = new ArrayList<OrderFood>(Arrays.asList(_oriOrder.foods));
-		_oriFoodLstView.notifyDataChanged(_oriFoods);
+		_oriFoodLstView.notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(_oriOrder.foods)));
 		_oriFoodLstView.setOperListener(this);
 
 
@@ -128,8 +125,7 @@ public class DropActivity extends Activity implements OrderFoodListView.OnOperLi
 		_newFoodLstView = (OrderFoodListView)findViewById(R.id.newFoodLstView);
 		_newFoodLstView.setGroupIndicator(getResources().getDrawable(R.layout.expander_folder));
 		_newFoodLstView.setType(Type.INSERT_ORDER);
-		_newFoods = new ArrayList<OrderFood>();
-		_newFoodLstView.notifyDataChanged(_newFoods);
+		_newFoodLstView.notifyDataChanged(new ArrayList<OrderFood>());
 		_newFoodLstView.setOperListener(this);
 			
 		//set the table ID
@@ -137,7 +133,8 @@ public class DropActivity extends Activity implements OrderFoodListView.OnOperLi
 		//set the amount of customer
 		((EditText)findViewById(R.id.valuepeople)).setText(Integer.toString(_oriOrder.custom_num));
 		//set the total price to this order
-		((TextView)findViewById(R.id.amountvalue)).setText(Util.float2String(_oriOrder.calcPrice() + new Order(_newFoods.toArray(new OrderFood[_newFoods.size()])).calcPrice()));
+		((TextView)findViewById(R.id.amountvalue)).setText(Util.float2String(_oriOrder.calcPrice() + 
+								new Order(_newFoodLstView.getSourceData().toArray(new OrderFood[_newFoodLstView.getSourceData().size()])).calcPrice()));
 			
 	}
 
@@ -158,18 +155,34 @@ public class DropActivity extends Activity implements OrderFoodListView.OnOperLi
 	 */
 	@Override
 	public void OnPickFood() {
-		// TODO Auto-generated method stub
+		// 调转到选菜Activity，并将新点菜的已有菜品传递过去
 		Intent intent = new Intent(DropActivity.this, TabhostActivity.class);
-		startActivity(intent);		
+		Bundle bundle = new Bundle();
+		Order tmpOrder = new Order();
+		tmpOrder.foods = _newFoodLstView.getSourceData().toArray(new OrderFood[_newFoodLstView.getSourceData().size()]);
+		bundle.putParcelable(OrderParcel.KEY_VALUE, new OrderParcel(tmpOrder));
+		intent.putExtras(bundle);
+		startActivityForResult(intent, OrderFoodListView.PICK_FOOD);		
 	}
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data){
-		if(resultCode == RESULT_OK){
+		if(resultCode == RESULT_OK){			
 			if(requestCode == OrderFoodListView.PICK_TASTE){
+				/**
+				 * 口味改变时通知ListView进行更新
+				 */
 				FoodParcel foodParcel = data.getParcelableExtra(FoodParcel.KEY_VALUE);
 				_newFoodLstView.notifyDataChanged(foodParcel);
+				
+			}else if(requestCode == OrderFoodListView.PICK_FOOD){
+				/**
+				 * 选菜改变时通知新点菜的ListView进行更新
+				 */
+				OrderParcel orderParcel = data.getParcelableExtra(OrderParcel.KEY_VALUE);
+				_newFoodLstView.notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(orderParcel.foods)));
 			}
+			
 		}
 	}
 

@@ -1,5 +1,6 @@
 package com.wireless.ui.view;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.app.AlertDialog;
@@ -32,7 +33,7 @@ public class OrderFoodListView extends ExpandableListView{
 	
 	private OnOperListener _operListener;
 	private Context _context;
-	private List<OrderFood> _foods;
+	private List<OrderFood> _foods = new ArrayList<OrderFood>();
 	private int _selectedPos;
 	private byte _type = Type.INSERT_ORDER;
 	private BaseExpandableListAdapter _adapter;
@@ -94,6 +95,15 @@ public class OrderFoodListView extends ExpandableListView{
 		_operListener = operListener;
 	}
 	     
+	/**
+	 * 取得List中的数据源（就是菜品的List信息）
+	 * @return
+	 * 		OrderFood的List
+	 */
+	public List<OrderFood> getSourceData(){
+		return _foods;
+	}
+	
 	/**
 	 * 在source data变化的时候，调用此函数来更新ListView的数据。
 	 */
@@ -217,7 +227,7 @@ public class OrderFoodListView extends ExpandableListView{
 			//show the order amount to each food
 			((TextView) view.findViewById(R.id.accountvalue)).setText(Util.float2String2(food.getCount()));
 			//show the price to each food
-			((TextView) view.findViewById(R.id.pricevalue)).setText(Util.float2String(food.calcPrice2()));
+			((TextView) view.findViewById(R.id.pricevalue)).setText(Util.CURRENCY_SIGN + Util.float2String2(food.calcPrice2()));
 			//show the taste to each food
 			((TextView)view.findViewById(R.id.taste)).setText(food.tastePref);
 			/**
@@ -404,17 +414,16 @@ public class OrderFoodListView extends ExpandableListView{
 
 		ExtOperDialg(final OrderFood selectedFood) {
 			super(_context, R.style.FullHeightDialog);
-			final View view =LayoutInflater.from(_context).inflate(R.layout.item_alert, null);
-			setContentView(view);
+			setContentView(R.layout.item_alert);
 			getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
-			((TextView)view.findViewById(R.id.ordername)).setText("请选择" + selectedFood.name + "的操作");
+			((TextView)findViewById(R.id.ordername)).setText("请选择" + selectedFood.name + "的操作");
 			if(_type == Type.INSERT_ORDER){
 				/**
 				 * 新点菜是扩展功能为"删菜"、"口味"、"叫起/取消叫起"
 				 */
 				//删菜功能
-				((TextView)view.findViewById(R.id.item1Txt)).setText("删菜");
-				((RelativeLayout)view.findViewById(R.id.r1)).setOnClickListener(new View.OnClickListener() {						
+				((TextView)findViewById(R.id.item1Txt)).setText("删菜");
+				((RelativeLayout)findViewById(R.id.r1)).setOnClickListener(new View.OnClickListener() {						
 					@Override
 					public void onClick(View arg0) {
 						dismiss();
@@ -423,12 +432,12 @@ public class OrderFoodListView extends ExpandableListView{
 				});
 				
 				//口味功能
-				((TextView)view.findViewById(R.id.item2Txt)).setText("口味");
-				((RelativeLayout)view.findViewById(R.id.r2)).setOnClickListener(new View.OnClickListener() {						
+				((TextView)findViewById(R.id.item2Txt)).setText("口味");
+				((RelativeLayout)findViewById(R.id.r2)).setOnClickListener(new View.OnClickListener() {						
 					@Override
 					public void onClick(View arg0) {
-						// TODO Auto-generated method stub							
 						if(_operListener != null){
+							dismiss();
 							_operListener.OnPickTaste(selectedFood);
 						}
 					}
@@ -436,19 +445,19 @@ public class OrderFoodListView extends ExpandableListView{
 				
 				//叫起/取消叫起
 				if(selectedFood.hangStatus == OrderFood.FOOD_NORMAL){
-					((TextView)view.findViewById(R.id.item3Txt)).setText("叫起");						
+					((TextView)findViewById(R.id.item3Txt)).setText("叫起");						
 				}else{
-					((TextView)view.findViewById(R.id.item3Txt)).setText("取消叫起");
+					((TextView)findViewById(R.id.item3Txt)).setText("取消叫起");
 				}
-				((RelativeLayout)view.findViewById(R.id.r3)).setOnClickListener(new View.OnClickListener() {						
+				((RelativeLayout)findViewById(R.id.r3)).setOnClickListener(new View.OnClickListener() {						
 					@Override
 					public void onClick(View arg0) {
 						if(selectedFood.hangStatus == OrderFood.FOOD_NORMAL){
 							selectedFood.hangStatus = OrderFood.FOOD_HANG_UP;
-							((TextView)view.findViewById(R.id.item3Txt)).setText("取消叫起");
+							((TextView)findViewById(R.id.item3Txt)).setText("取消叫起");
 						}else{
 							selectedFood.hangStatus = OrderFood.FOOD_NORMAL;
-							((TextView)view.findViewById(R.id.item3Txt)).setText("叫起");								
+							((TextView)findViewById(R.id.item3Txt)).setText("叫起");								
 						}
 					}
 				});
@@ -458,8 +467,8 @@ public class OrderFoodListView extends ExpandableListView{
 				 * 已点菜的扩展功能为"退菜"、"即起"、"催菜/取消催菜"
 				 */
 				//退菜功能
-				((TextView)view.findViewById(R.id.item1Txt)).setText("退菜");
-				((RelativeLayout)view.findViewById(R.id.r1)).setOnClickListener(new View.OnClickListener() {						
+				((TextView)findViewById(R.id.item1Txt)).setText("退菜");
+				((RelativeLayout)findViewById(R.id.r1)).setOnClickListener(new View.OnClickListener() {						
 					@Override
 					public void onClick(View arg0) {
 						dismiss();
@@ -475,36 +484,36 @@ public class OrderFoodListView extends ExpandableListView{
 				
 				//如果菜品是叫起状态，显示"即起"功能
 				if(selectedFood.hangStatus == OrderFood.FOOD_HANG_UP){
-					((TextView)view.findViewById(R.id.item2Txt)).setText("即起");
-					((RelativeLayout)view.findViewById(R.id.r2)).setOnClickListener(new View.OnClickListener() {						
+					((TextView)findViewById(R.id.item2Txt)).setText("即起");
+					((RelativeLayout)findViewById(R.id.r2)).setOnClickListener(new View.OnClickListener() {						
 						@Override
 						public void onClick(View arg0) {
 			    			if(selectedFood.hangStatus == OrderFood.FOOD_HANG_UP){
 			    				selectedFood.hangStatus = OrderFood.FOOD_IMMEDIATE;
-								((TextView)view.findViewById(R.id.item2Txt)).setText("即起");
+								((TextView)findViewById(R.id.item2Txt)).setText("即起");
 			    				
 			    			}else if(selectedFood.hangStatus == OrderFood.FOOD_IMMEDIATE){
 			    				selectedFood.hangStatus = OrderFood.FOOD_HANG_UP;
-								((TextView)view.findViewById(R.id.item2Txt)).setText("重新叫起");
+								((TextView)findViewById(R.id.item2Txt)).setText("重新叫起");
 			    			}						
 						}
 					});
 					
 					//催菜/取消催菜功能
 					if(selectedFood.isHurried){
-						((TextView)view.findViewById(R.id.item3Txt)).setText("取消催菜");							
+						((TextView)findViewById(R.id.item3Txt)).setText("取消催菜");							
 					}else{
-						((TextView)view.findViewById(R.id.item3Txt)).setText("催菜");						
+						((TextView)findViewById(R.id.item3Txt)).setText("催菜");						
 					}
-					((RelativeLayout)view.findViewById(R.id.r3)).setOnClickListener(new View.OnClickListener() {						
+					((RelativeLayout)findViewById(R.id.r3)).setOnClickListener(new View.OnClickListener() {						
 						@Override
 						public void onClick(View arg0) {
 							if(selectedFood.isHurried){
 								selectedFood.isHurried = false;
-								((TextView)view.findViewById(R.id.item3Txt)).setText("催菜");							
+								((TextView)findViewById(R.id.item3Txt)).setText("催菜");							
 							}else{
 								selectedFood.isHurried = true;
-								((TextView)view.findViewById(R.id.item3Txt)).setText("取消催菜");									
+								((TextView)findViewById(R.id.item3Txt)).setText("取消催菜");									
 							}
 						}
 					});
@@ -513,30 +522,30 @@ public class OrderFoodListView extends ExpandableListView{
 					
 					//催菜/取消催菜功能
 					if(selectedFood.isHurried){
-						((TextView)view.findViewById(R.id.item2Txt)).setText("取消催菜");							
+						((TextView)findViewById(R.id.item2Txt)).setText("取消催菜");							
 					}else{
-						((TextView)view.findViewById(R.id.item2Txt)).setText("催菜");						
+						((TextView)findViewById(R.id.item2Txt)).setText("催菜");						
 					}
-					((RelativeLayout)view.findViewById(R.id.r2)).setOnClickListener(new View.OnClickListener() {						
+					((RelativeLayout)findViewById(R.id.r2)).setOnClickListener(new View.OnClickListener() {						
 						@Override
 						public void onClick(View arg0) {
 							if(selectedFood.isHurried){
 								selectedFood.isHurried = false;
-								((TextView)view.findViewById(R.id.item2Txt)).setText("催菜");	
+								((TextView)findViewById(R.id.item2Txt)).setText("催菜");	
 					
 							}else{
 								selectedFood.isHurried = true;
-								((TextView)view.findViewById(R.id.item2Txt)).setText("取消催菜");									
+								((TextView)findViewById(R.id.item2Txt)).setText("取消催菜");									
 							}						
 						}
 					});
 					
-					((RelativeLayout)view.findViewById(R.id.r3)).setVisibility(View.GONE);
+					((RelativeLayout)findViewById(R.id.r3)).setVisibility(View.GONE);
 				}					
 			}
 			
 			//返回Button
-			Button cancelBtn = (Button)view.findViewById(R.id.back);
+			Button cancelBtn = (Button)findViewById(R.id.back);
 			cancelBtn.setText("返回");				
 			cancelBtn.setOnClickListener(new View.OnClickListener() {					
 				@Override

@@ -1,4 +1,4 @@
-package com.wireless.util;
+package com.wireless.ui.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -17,14 +17,12 @@ public class DragListView extends ListView implements ListView.OnScrollListener 
 	}
 
 	@Override
-	public boolean onInterceptTouchEvent(MotionEvent event) {
-		boolean result = super.onInterceptTouchEvent(event);
-
-		if (mScrollState == OnScrollListener.SCROLL_STATE_FLING) {
+	public boolean onInterceptTouchEvent(MotionEvent event){
+		if(mScrollState == OnScrollListener.SCROLL_STATE_FLING) {
 			return true;
+		}else{
+			return super.onInterceptTouchEvent(event);
 		}
-
-		return result;
 	}
 
 	private OnNeedMoreListener mOnNeedMoreListener;
