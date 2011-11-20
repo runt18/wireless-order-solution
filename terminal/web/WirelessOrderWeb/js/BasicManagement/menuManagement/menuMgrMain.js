@@ -234,6 +234,9 @@ menuStatWin = new Ext.Window(
 						}
 					});
 
+				},
+				"hide" : function(thiz) {
+					isPrompt = false;
 				}
 			}
 		});
@@ -382,6 +385,9 @@ menuStatResultWin = new Ext.Window({
 					limit : dishesStaticRecordCount
 				}
 			});
+		},
+		"hide" : function(thiz) {
+			isPrompt = false;
 		}
 	}
 });
@@ -635,6 +641,9 @@ menuAddWin = new Ext.Window({
 
 			var f = Ext.get("menuAddNumber");
 			f.focus.defer(100, f); // 为什么这样才可以！？！？
+		},
+		"hide" : function(thiz) {
+			isPrompt = false;
 		}
 	}
 });
@@ -858,6 +867,9 @@ menuModifyWin = new Ext.Window(
 			listeners : {
 				"show" : function(thiz) {
 					kitchenTypeStoreMM.reload();
+				},
+				"hide" : function(thiz) {
+					isPrompt = false;
 				}
 			}
 		});

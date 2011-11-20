@@ -209,6 +209,9 @@ inventoryInWin = new Ext.Window(
 					var f = Ext.get("inventoryInCount");
 					f.focus.defer(100, f); // 为什么这样才可以！？！？
 
+				},
+				"hide" : function(thiz) {
+					isPrompt = false;
 				}
 			}
 		});
@@ -422,6 +425,9 @@ inventoryOutWin = new Ext.Window(
 					var f = Ext.get("inventoryOutCount");
 					f.focus.defer(100, f); // 为什么这样才可以！？！？
 
+				},
+				"hide" : function(thiz) {
+					isPrompt = false;
 				}
 			}
 		});
@@ -623,6 +629,9 @@ inventoryChangeWin = new Ext.Window(
 					var f = Ext.get("inventoryChangeCount");
 					f.focus.defer(100, f); // 为什么这样才可以！？！？
 
+				},
+				"hide" : function(thiz) {
+					isPrompt = false;
 				}
 			}
 		});
@@ -784,6 +793,9 @@ var inventInStatWin = new Ext.Window(
 					inventInStatWin.findById("begDateOut").setValue("");
 
 					InMultSelect.loadData(InMultSelectData);
+				},
+				"hide" : function(thiz) {
+					isPrompt = false;
 				}
 			}
 		});
@@ -935,6 +947,9 @@ materialAddWin = new Ext.Window({
 			var f = Ext.get("materialAddNumber");
 			f.focus.defer(100, f); // 为什么这样才可以！？！？
 
+		},
+		"hide" : function(thiz) {
+			isPrompt = false;
 		}
 	}
 });
