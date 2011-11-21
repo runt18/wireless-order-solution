@@ -86,49 +86,54 @@ inventoryInWin = new Ext.Window(
 
 								// type: 0 : 消耗 1 : 报损 2 : 销售 3 : 退货 4 : 入库 5 :
 								// 调出 6 : 调入 7 : 盘点
-								Ext.Ajax.request({
-									url : "../../InventoryIn.do",
-									params : {
-										"pin" : pin,
-										"supplierID" : supplier,
-										"materialID" : material,
-										"price" : inventoryInPrice,
-										"date" : inventoryInDate,
-										"deptID" : department,
-										"amount" : inventoryInCount,
-										"staff" : staff,
-										"type" : 4
-									},
-									success : function(response, options) {
-										var resultJSON = Ext.util.JSON
-												.decode(response.responseText);
-										if (resultJSON.success == true) {
-											// materialStore
-											// .reload({
-											// params : {
-											// start : 0,
-											// limit : materialPageRecordCount
-											// }
-											// });
+								Ext.Ajax
+										.request({
+											url : "../../InventoryIn.do",
+											params : {
+												"pin" : pin,
+												"supplierID" : supplier,
+												"materialID" : material,
+												"price" : inventoryInPrice,
+												"date" : inventoryInDate,
+												"deptID" : department,
+												"amount" : inventoryInCount,
+												"staff" : staff,
+												"type" : 4
+											},
+											success : function(response,
+													options) {
+												var resultJSON = Ext.util.JSON
+														.decode(response.responseText);
+												if (resultJSON.success == true) {
+													materialStore
+															.reload({
+																params : {
+																	start : 0,
+																	limit : materialPageRecordCount
+																}
+															});
 
-											var dataInfo = resultJSON.data;
-											Ext.MessageBox.show({
-												msg : dataInfo,
-												width : 300,
-												buttons : Ext.MessageBox.OK
-											});
-										} else {
-											var dataInfo = resultJSON.data;
-											Ext.MessageBox.show({
-												msg : dataInfo,
-												width : 300,
-												buttons : Ext.MessageBox.OK
-											});
-										}
-									},
-									failure : function(response, options) {
-									}
-								});
+													var dataInfo = resultJSON.data;
+													Ext.MessageBox
+															.show({
+																msg : dataInfo,
+																width : 300,
+																buttons : Ext.MessageBox.OK
+															});
+												} else {
+													var dataInfo = resultJSON.data;
+													Ext.MessageBox
+															.show({
+																msg : dataInfo,
+																width : 300,
+																buttons : Ext.MessageBox.OK
+															});
+												}
+											},
+											failure : function(response,
+													options) {
+											}
+										});
 
 							}
 
@@ -308,41 +313,54 @@ inventoryOutWin = new Ext.Window(
 
 								// type: 0 : 消耗 1 : 报损 2 : 销售 3 : 退货 4 : 入库 5 :
 								// 调出 6 : 调入 7 : 盘点
-								Ext.Ajax.request({
-									url : "../../InventoryOut.do",
-									params : {
-										"pin" : pin,
-										"materialID" : material,
-										"price" : inventoryOutPrice,
-										"date" : inventoryOutDate,
-										"deptID" : department,
-										"amount" : inventoryOutCount,
-										"staff" : staff,
-										"type" : outReason
-									},
-									success : function(response, options) {
-										var resultJSON = Ext.util.JSON
-												.decode(response.responseText);
-										if (resultJSON.success == true) {
+								Ext.Ajax
+										.request({
+											url : "../../InventoryOut.do",
+											params : {
+												"pin" : pin,
+												"materialID" : material,
+												"price" : inventoryOutPrice,
+												"date" : inventoryOutDate,
+												"deptID" : department,
+												"amount" : inventoryOutCount,
+												"staff" : staff,
+												"type" : outReason
+											},
+											success : function(response,
+													options) {
+												var resultJSON = Ext.util.JSON
+														.decode(response.responseText);
+												if (resultJSON.success == true) {
 
-											var dataInfo = resultJSON.data;
-											Ext.MessageBox.show({
-												msg : dataInfo,
-												width : 300,
-												buttons : Ext.MessageBox.OK
-											});
-										} else {
-											var dataInfo = resultJSON.data;
-											Ext.MessageBox.show({
-												msg : dataInfo,
-												width : 300,
-												buttons : Ext.MessageBox.OK
-											});
-										}
-									},
-									failure : function(response, options) {
-									}
-								});
+													materialStore
+															.reload({
+																params : {
+																	start : 0,
+																	limit : materialPageRecordCount
+																}
+															});
+
+													var dataInfo = resultJSON.data;
+													Ext.MessageBox
+															.show({
+																msg : dataInfo,
+																width : 300,
+																buttons : Ext.MessageBox.OK
+															});
+												} else {
+													var dataInfo = resultJSON.data;
+													Ext.MessageBox
+															.show({
+																msg : dataInfo,
+																width : 300,
+																buttons : Ext.MessageBox.OK
+															});
+												}
+											},
+											failure : function(response,
+													options) {
+											}
+										});
 
 							}
 
@@ -514,40 +532,53 @@ inventoryChangeWin = new Ext.Window(
 
 								// type: 0 : 消耗 1 : 报损 2 : 销售 3 : 退货 4 : 入库 5 :
 								// 调出 6 : 调入 7 : 盘点
-								Ext.Ajax.request({
-									url : "../../InventoryChange.do",
-									params : {
-										"pin" : pin,
-										"materialID" : material,
-										"date" : inventoryChangeDate,
-										"deptIDOut" : departmentOut,
-										"deptIDIn" : departmentIn,
-										"amount" : inventoryChangeCount,
-										"staff" : staff
-									},
-									success : function(response, options) {
-										var resultJSON = Ext.util.JSON
-												.decode(response.responseText);
-										if (resultJSON.success == true) {
+								Ext.Ajax
+										.request({
+											url : "../../InventoryChange.do",
+											params : {
+												"pin" : pin,
+												"materialID" : material,
+												"date" : inventoryChangeDate,
+												"deptIDOut" : departmentOut,
+												"deptIDIn" : departmentIn,
+												"amount" : inventoryChangeCount,
+												"staff" : staff
+											},
+											success : function(response,
+													options) {
+												var resultJSON = Ext.util.JSON
+														.decode(response.responseText);
+												if (resultJSON.success == true) {
 
-											var dataInfo = resultJSON.data;
-											Ext.MessageBox.show({
-												msg : dataInfo,
-												width : 300,
-												buttons : Ext.MessageBox.OK
-											});
-										} else {
-											var dataInfo = resultJSON.data;
-											Ext.MessageBox.show({
-												msg : dataInfo,
-												width : 300,
-												buttons : Ext.MessageBox.OK
-											});
-										}
-									},
-									failure : function(response, options) {
-									}
-								});
+													materialStore
+															.reload({
+																params : {
+																	start : 0,
+																	limit : materialPageRecordCount
+																}
+															});
+
+													var dataInfo = resultJSON.data;
+													Ext.MessageBox
+															.show({
+																msg : dataInfo,
+																width : 300,
+																buttons : Ext.MessageBox.OK
+															});
+												} else {
+													var dataInfo = resultJSON.data;
+													Ext.MessageBox
+															.show({
+																msg : dataInfo,
+																width : 300,
+																buttons : Ext.MessageBox.OK
+															});
+												}
+											},
+											failure : function(response,
+													options) {
+											}
+										});
 
 							}
 

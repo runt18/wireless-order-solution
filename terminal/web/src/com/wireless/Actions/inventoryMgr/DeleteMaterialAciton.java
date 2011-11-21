@@ -19,7 +19,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Terminal;
 
-public class DeleteMaterialAciton extends Action { 
+public class DeleteMaterialAciton extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -57,11 +57,19 @@ public class DeleteMaterialAciton extends Action {
 			/**
 			 * 
 			 */
+			// 食材基礎表
 			String sql = "DELETE FROM " + Params.dbName + ".material "
 					+ "WHERE restaurant_id=" + term.restaurant_id
 					+ " AND material_id = " + materialID;
 
 			int sqlRowCount = dbCon.stmt.executeUpdate(sql);
+
+			// 食材部門表
+			sql = "DELETE FROM " + Params.dbName + ".material_dept "
+					+ "WHERE restaurant_id=" + term.restaurant_id
+					+ " AND material_id = " + materialID;
+
+			sqlRowCount = dbCon.stmt.executeUpdate(sql);
 
 			jsonResp = jsonResp.replace("$(result)", "true");
 			jsonResp = jsonResp.replace("$(value)", "食材刪除成功！");

@@ -1239,7 +1239,7 @@ var inStatByMateriaGrid = new Ext.grid.EditorGridPanel({
 	animCollapse : false,
 	trackMouseOver : false,
 	// enableColumnMove: false,
-	title : 'Sponsored Projects',
+	title : 'Sponsored Projects'
 // iconCls: 'icon-grid',
 // renderTo: document.body
 });

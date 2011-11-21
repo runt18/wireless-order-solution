@@ -62,6 +62,7 @@ public class InventoryOutAction extends Action {
 			String staff = request.getParameter("staff");
 			String type = request.getParameter("type");
 
+			// 庫存明細
 			String sql = "INSERT INTO "
 					+ Params.dbName
 					+ ".material_detail"
@@ -71,6 +72,24 @@ public class InventoryOutAction extends Action {
 					+ amount + ", " + type + ", '" + staff + "' ) ";
 			System.out.println(sql);
 			int sqlRowCount = dbCon.stmt.executeUpdate(sql);
+
+			// 庫存現狀
+			sql = " SELECT stock FROM " + Params.dbName
+					+ ".material_dept WHERE restaurant_id = "
+					+ term.restaurant_id + " AND material_id = " + materialID
+					+ " AND dept_id =  " + deptID;
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			dbCon.rs.next();
+			float thisStock = dbCon.rs.getFloat("stock");
+			dbCon.rs.close();
+
+			sql = "UPDATE " + Params.dbName + ".material_dept"
+					+ " SET stock = "
+					+ (float) Math.round((thisStock + amount) * 100) / 100
+					+ " WHERE restaurant_id = " + term.restaurant_id
+					+ " AND material_id =  " + materialID + " AND dept_id =  "
+					+ deptID;
+			sqlRowCount = dbCon.stmt.executeUpdate(sql);
 
 			jsonResp = jsonResp.replace("$(result)", "true");
 			jsonResp = jsonResp.replace("$(value)", "出库成功！");

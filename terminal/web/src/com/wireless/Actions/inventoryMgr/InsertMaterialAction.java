@@ -58,6 +58,7 @@ public class InsertMaterialAction extends Action {
 			String materialWarning = request.getParameter("materialWarning");
 			String materialDanger = request.getParameter("materialDanger");
 
+			// 　食材基礎表
 			String sql = "INSERT INTO "
 					+ Params.dbName
 					+ ".material"
@@ -67,6 +68,29 @@ public class InsertMaterialAction extends Action {
 					+ materialDanger + " ) ";
 
 			int sqlRowCount = dbCon.stmt.executeUpdate(sql);
+
+			// 食材部門表
+			for (int i = 0; i < 10; i++) {
+				sql = " SELECT name FROM " + Params.dbName
+						+ ".department WHERE dept_id = " + i
+						+ " AND restaurant_id =  " + term.restaurant_id;
+				dbCon.rs = dbCon.stmt.executeQuery(sql);
+				dbCon.rs.next();
+				String deptName = dbCon.rs.getString("name");
+				dbCon.rs.close();
+
+				sql = "INSERT INTO "
+						+ Params.dbName
+						+ ".material_dept"
+						+ "( restaurant_id, material_id, dept_id, dept_name, material_name, price, stock ) "
+						+ " SELECT restaurant_id, material_id, " + i + ", '"
+						+ deptName + "', '" + materialName + "', 0, 0 "
+						+ " FROM " + Params.dbName
+						+ ".material WHERE material_alias = " + materialAlias
+						+ " AND restaurant_id = " + term.restaurant_id;
+
+				sqlRowCount = dbCon.stmt.executeUpdate(sql);
+			}
 
 			jsonResp = jsonResp.replace("$(result)", "true");
 			jsonResp = jsonResp.replace("$(value)", "添加食材成功！");

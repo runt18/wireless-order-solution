@@ -64,6 +64,7 @@ public class InventoryInAction extends Action {
 			String staff = request.getParameter("staff");
 			String type = request.getParameter("type");
 
+			// 庫存明細
 			String sql = "INSERT INTO "
 					+ Params.dbName
 					+ ".material_detail"
@@ -72,8 +73,51 @@ public class InventoryInAction extends Action {
 					+ ", " + materialID + ", " + price + ", '" + date + "', "
 					+ deptID + ", " + amount + ", " + type + ", '" + staff
 					+ "' ) ";
-
 			int sqlRowCount = dbCon.stmt.executeUpdate(sql);
+
+			// 庫存現狀
+			// 价格 = （库存量 × 价格 + 新入库数量 × 新入库价格）/ （库存量 + 新入库数量）
+			// 更新價錢
+			sql = " SELECT sum(stock) AS stock, max(price) AS price FROM "
+					+ Params.dbName + ".material_dept WHERE restaurant_id = "
+					+ term.restaurant_id + " AND material_id = " + materialID;
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			dbCon.rs.next();
+			float totalStock = dbCon.rs.getFloat("stock");
+			float thisPrice = dbCon.rs.getFloat("price");
+			dbCon.rs.close();
+
+			float allPrice = (float) Math
+					.round((totalStock * thisPrice + amount * price) * 100) / 100;
+			float allStock = (float) Math.round((totalStock + amount) * 100) / 100;
+			float newPrice = (float) Math.round((allPrice / allStock) * 100) / 100;
+			System.out.println("totalStock: " + totalStock
+					+ "   ,  thisPrice: " + thisPrice + "  , allPrice:"
+					+ allPrice + "  , :allStock" + allStock + "  , newPrice"
+					+ newPrice + "  , ");
+
+			sql = "UPDATE " + Params.dbName + ".material_dept"
+					+ " SET price = " + newPrice + " WHERE restaurant_id = "
+					+ term.restaurant_id + " AND material_id =  " + materialID;
+			sqlRowCount = dbCon.stmt.executeUpdate(sql);
+
+			// 更新庫存量
+			sql = " SELECT stock FROM " + Params.dbName
+					+ ".material_dept WHERE restaurant_id = "
+					+ term.restaurant_id + " AND material_id = " + materialID
+					+ " AND dept_id =  " + deptID;
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			dbCon.rs.next();
+			float thisStock = dbCon.rs.getFloat("stock");
+			dbCon.rs.close();
+
+			sql = "UPDATE " + Params.dbName + ".material_dept"
+					+ " SET stock = "
+					+ (float) Math.round((thisStock + amount) * 100) / 100
+					+ " WHERE restaurant_id = " + term.restaurant_id
+					+ " AND material_id =  " + materialID + " AND dept_id =  "
+					+ deptID;
+			sqlRowCount = dbCon.stmt.executeUpdate(sql);
 
 			jsonResp = jsonResp.replace("$(result)", "true");
 			jsonResp = jsonResp.replace("$(value)", "入库成功！");
