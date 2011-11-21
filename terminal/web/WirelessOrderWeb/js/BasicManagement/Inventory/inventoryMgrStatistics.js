@@ -773,226 +773,454 @@ var inStatDetailResultWin = new Ext.Window({
 });
 
 // 结果框 -- 按食材
+// inStatByMaterialResultData = [
+// {materialID: 100, materialName: 'Ext Forms: Field Anchoring', taskId: 112,
+// description: 'Integrate 2.0 Forms with 2.0 Layouts', price: 6, amount: 150,
+// deptName: "department"},
+// {materialID: 100, materialName: 'Ext Forms: Field Anchoring', taskId: 113,
+// description: 'Implement AnchorLayout', price: 4, amount: 150, deptName:
+// "department"},
+// {materialID: 100, materialName: 'Ext Forms: Field Anchoring', taskId: 114,
+// description: 'Add support for multiple types of anchors', price: 4, amount:
+// 150, deptName: "department"},
+// {materialID: 100, materialName: 'Ext Forms: Field Anchoring', taskId: 115,
+// description: 'Testing and debugging', price: 8, amount: 0, deptName:
+// "department"},
+// {materialID: 101, materialName: 'Ext Grid: Single-level Grouping', taskId:
+// 101, description: 'Add required rendering "hooks" to GridView', price: 6,
+// amount: 100, deptName: "department"},
+// {materialID: 101, materialName: 'Ext Grid: Single-level Grouping', taskId:
+// 102, description: 'Extend GridView and override rendering functions', price:
+// 6, amount: 100, deptName: "department"},
+// {materialID: 101, materialName: 'Ext Grid: Single-level Grouping', taskId:
+// 103, description: 'Extend Store with grouping functionality', price: 4,
+// amount: 100, deptName: "department"},
+// {materialID: 101, materialName: 'Ext Grid: Single-level Grouping', taskId:
+// 121, description: 'Default CSS Styling', price: 2, amount: 100, deptName:
+// "department"},
+// {materialID: 101, materialName: 'Ext Grid: Single-level Grouping', taskId:
+// 104, description: 'Testing and debugging', price: 6, amount: 100, deptName:
+// "department"},
+// {materialID: 102, materialName: 'Ext Grid: Summary Rows', taskId: 105,
+// description: 'Ext Grid plugin integration', price: 4, amount: 125, deptName:
+// "department"},
+// {materialID: 102, materialName: 'Ext Grid: Summary Rows', taskId: 106,
+// description: 'Summary creation during rendering phase', price: 4, amount:
+// 125, deptName: "department"},
+// {materialID: 102, materialName: 'Ext Grid: Summary Rows', taskId: 107,
+// description: 'Dynamic summary updates in editor grids', price: 6, amount:
+// 125, deptName: "department"},
+// {materialID: 102, materialName: 'Ext Grid: Summary Rows', taskId: 108,
+// description: 'Remote summary integration', price: 4, amount: 125, deptName:
+// "department"},
+// {materialID: 102, materialName: 'Ext Grid: Summary Rows', taskId: 109,
+// description: 'Summary renderers and calculators', price: 4, amount: 125,
+// deptName: "department"},
+// {materialID: 102, materialName: 'Ext Grid: Summary Rows', taskId: 110,
+// description: 'Integrate summaries with GroupingView', price: 10, amount: 125,
+// deptName: "department"},
+// {materialID: 102, materialName: 'Ext Grid: Summary Rows', taskId: 111,
+// description: 'Testing and debugging', price: 8, amount: 125, deptName:
+// "department"}
+// ];
+//
+// var inStatByMaterialStore = new Ext.data.GroupingStore({
+// reader : new Ext.data.JsonReader({
+// idProperty : 'taskId',
+// fields : [ {
+// name : 'materialID',
+// type : 'int'
+// }, {
+// name : 'materialName',
+// type : 'string'
+// },{name: 'taskId', type: 'int'},
+// {name: 'description', type: 'string'}, {
+// name : 'deptID',
+// type : 'int'
+// }, {
+// name : 'deptName',
+// type : 'string'
+// }, {
+// name : 'price',
+// type : 'float'
+// }, {
+// name : 'amount',
+// type : 'float'
+// }, {
+// name : 'sumPrice',
+// type : 'float'
+// } ]
+// }),
+// data : inStatByMaterialResultData,
+// sortInfo : {
+// field : 'deptID',
+// direction : "ASC"
+// },
+// groupField : 'materialName'
+// });
+//
+// // define a custom summary function
+// Ext.grid.GroupSummary.Calculations['totalPrice'] = function(v, record, field)
+// {
+// return v + (record.data.price * record.data.amount);
+// };
+//
+// var inStatByMateriaSummary = new Ext.grid.GroupSummary();
+//
+// var inStatByMaterialGrid = new Ext.grid.EditorGridPanel({
+// ds : inStatByMaterialStore,
+// columns : [
+// {
+// id : 'description',
+// header : "食材",
+// width : 80,
+// sortable : true,
+// dataIndex : 'description',
+// // summaryType : 'count',
+// hideable : false
+// // summaryRenderer : function(v, params, data) {
+// // return ((v === 0 || v > 1) ? '(' + v + ' Tasks)'
+// // : '(1 Task)');
+// // },
+// // editor : new Ext.form.TextField({
+// // allowBlank : false
+// // })
+// },{
+// header: "materialName",
+// width: 50,
+// sortable: true,
+// dataIndex: 'materialName'
+// },
+// {
+// header : "部门",
+// width : 50,
+// sortable : true,
+// dataIndex : 'deptName'
+// },
+// {
+// header : "价格",
+// width : 50,
+// sortable : true,
+// dataIndex : 'price'
+// // summaryType : 'max',
+// // renderer : Ext.util.Format.dateRenderer('m/d/Y'),
+// // editor : new Ext.form.DateField({
+// // format : 'm/d/Y'
+// // })
+// },
+// {
+// header : "数量",
+// width : 50,
+// sortable : true,
+// dataIndex : 'amount',
+// summaryType : 'sum'
+// // renderer : function(v) {
+// // return v + ' hours';
+// // },
+// // editor : new Ext.form.NumberField({
+// // allowBlank : false,
+// // allowNegative : false,
+// // style : 'text-align:left'
+// // })
+// },
+// {
+// id : 'sumPrice',
+// header : "小计",
+// width : 50,
+// sortable : false,
+// groupable : false,
+// renderer : function(v, params, record) {
+// return Ext.util.Format.usMoney(record.data.price
+// * record.data.amount);
+// },
+// dataIndex : 'sumPrice',
+// summaryType : 'totalCost'
+// // summaryRenderer : Ext.util.Format.usMoney
+// } ],
+//
+// view : new Ext.grid.GroupingView({
+// forceFit : true,
+// showGroupName : false,
+// enableNoGroups : false, // REQUIRED!
+// hideGroupedColumn : true
+// }),
+//
+// plugins : inStatByMateriaSummary,
+//
+// frame : true,
+// width : 800,
+// height : 800,
+// clicksToEdit : 1,
+// collapsible : true,
+// animCollapse : false,
+// trackMouseOver : false,
+// // enableColumnMove: false,
+// // title : 'Sponsored Projects',
+// //iconCls : 'icon-grid'
+// // renderTo : document.body
+// });
+
+// --------------------------------------------------------------------------------------------------------
 inStatByMaterialResultData = [ {
 	materialID : 100,
-	materialName : 'Ext Forms: Field Anchoring',
-	deptID : 112,
-	deptName : 'Integrate 2.0 Forms with 2.0 Layouts',
-	price : 6,
-	amount : 150
+	materialName : '雞肉',
+	taskId : 112,
+	description : 'Integrate 2.0 Forms with 2.0 Layouts',
+	// price : 6,
+	amount : 150,
+	deptName : 'department',
+	sumPrice : 1000
 }, {
 	materialID : 100,
-	materialName : 'Ext Forms: Field Anchoring',
-	deptID : 113,
-	deptName : 'Implement AnchorLayout',
-	price : 4,
-	amount : 150
+	materialName : '雞肉',
+	taskId : 113,
+	description : 'Implement AnchorLayout',
+	// price : 4,
+	amount : 150,
+	deptName : 'department',
+	sumPrice : 1000
 }, {
 	materialID : 100,
-	materialName : 'Ext Forms: Field Anchoring',
-	deptID : 114,
-	deptName : 'Add support for multiple types of anchors',
-	price : 4,
-	amount : 150
+	materialName : '雞肉',
+	taskId : 114,
+	description : 'Add support for multiple types of anchors',
+	// price : 4,
+	amount : 150,
+	deptName : 'department',
+	sumPrice : 1000
 }, {
 	materialID : 100,
-	materialName : 'Ext Forms: Field Anchoring',
-	deptID : 115,
-	deptName : 'Testing and debugging',
-	price : 8,
-	amount : 0
+	materialName : '雞肉',
+	taskId : 115,
+	description : 'Testing and debugging',
+	// price : 8,
+	amount : 100,
+	deptName : 'department',
+	sumPrice : 1000
 }, {
 	materialID : 101,
-	materialName : 'Ext Grid: Single-level Grouping',
-	deptID : 101,
-	deptName : 'Add required rendering "hooks" to GridView',
-	price : 6,
-	amount : 100
+	materialName : '豬肉',
+	taskId : 101,
+	description : 'Add required rendering "hooks" to GridView',
+	// price : 6,
+	amount : 100,
+	deptName : 'department',
+	sumPrice : 1000
 }, {
 	materialID : 101,
-	materialName : 'Ext Grid: Single-level Grouping',
-	deptID : 102,
-	deptName : 'Extend GridView and override rendering functions',
-	price : 6,
-	amount : 100
+	materialName : '豬肉',
+	taskId : 102,
+	description : 'Extend GridView and override rendering functions',
+	// price : 6,
+	amount : 100,
+	deptName : 'department',
+	sumPrice : 1000
 }, {
 	materialID : 101,
-	materialName : 'Ext Grid: Single-level Grouping',
-	deptID : 103,
-	deptName : 'Extend Store with grouping functionality',
-	price : 4,
-	amount : 100
+	materialName : '豬肉',
+	taskId : 103,
+	description : 'Extend Store with grouping functionality',
+	// price : 4,
+	amount : 100,
+	deptName : 'department',
+	sumPrice : 1000
 }, {
 	materialID : 101,
-	materialName : 'Ext Grid: Single-level Grouping',
-	deptID : 121,
-	deptName : 'Default CSS Styling',
-	price : 2,
-	amount : 100
+	materialName : '豬肉',
+	taskId : 121,
+	description : 'Default CSS Styling',
+	// price : 2,
+	amount : 100,
+	deptName : 'department',
+	sumPrice : 1000
 }, {
 	materialID : 101,
-	materialName : 'Ext Grid: Single-level Grouping',
-	deptID : 104,
-	deptName : 'Testing and debugging',
-	price : 6,
-	amount : 100
+	materialName : '豬肉',
+	taskId : 104,
+	description : 'Testing and debugging',
+	// price : 6,
+	amount : 100,
+	deptName : 'department',
+	sumPrice : 1000
 }, {
 	materialID : 102,
-	materialName : 'Ext Grid: Summary Rows',
-	deptID : 105,
-	deptName : 'Ext Grid plugin integration',
-	price : 4,
-	amount : 125
+	materialName : '醬油',
+	taskId : 105,
+	description : 'Ext Grid plugin integration',
+	// price : 4,
+	amount : 125,
+	deptName : 'department',
+	sumPrice : 1000
 }, {
 	materialID : 102,
-	materialName : 'Ext Grid: Summary Rows',
-	deptID : 106,
-	deptName : 'Summary creation during rendering phase',
-	price : 4,
-	amount : 125
+	materialName : '醬油',
+	taskId : 106,
+	description : 'Summary creation during rendering phase',
+	// price : 4,
+	amount : 125,
+	deptName : 'department',
+	sumPrice : 1000
 }, {
 	materialID : 102,
-	materialName : 'Ext Grid: Summary Rows',
-	deptID : 107,
-	deptName : 'Dynamic summary updates in editor grids',
-	price : 6,
-	amount : 125
+	materialName : '醬油',
+	taskId : 107,
+	description : 'Dynamic summary updates in editor grids',
+	// price : 6,
+	amount : 125,
+	deptName : 'department',
+	sumPrice : 1000
 }, {
 	materialID : 102,
-	materialName : 'Ext Grid: Summary Rows',
-	deptID : 108,
-	deptName : 'Remote summary integration',
-	price : 4,
-	amount : 125
+	materialName : '醬油',
+	taskId : 108,
+	description : 'Remote summary integration',
+	// price : 4,
+	amount : 125,
+	deptName : 'department',
+	sumPrice : 1000
 }, {
 	materialID : 102,
-	materialName : 'Ext Grid: Summary Rows',
-	deptID : 109,
-	deptName : 'Summary renderers and calculators',
-	price : 4,
-	amount : 125
+	materialName : '醬油',
+	taskId : 109,
+	description : 'Summary renderers and calculators',
+	// price : 4,
+	amount : 125,
+	deptName : 'department',
+	sumPrice : 1000
 }, {
 	materialID : 102,
-	materialName : 'Ext Grid: Summary Rows',
-	deptID : 110,
-	deptName : 'Integrate summaries with GroupingView',
-	price : 10,
-	amount : 125
+	materialName : '醬油',
+	taskId : 110,
+	description : 'Integrate summaries with GroupingView',
+	// price : 10,
+	amount : 125,
+	deptName : 'department',
+	sumPrice : 1000
 }, {
 	materialID : 102,
-	materialName : 'Ext Grid: Summary Rows',
-	deptID : 111,
-	deptName : 'Testing and debugging',
-	price : 8,
-	amount : 125
+	materialName : '醬油',
+	taskId : 111,
+	description : 'Testing and debugging',
+	// price : 8,
+	amount : 125,
+	deptName : 'department',
+	sumPrice : 1000
 } ];
 
-var inStatByMaterialStore = new Ext.data.GroupingStore({
-	reader : new Ext.data.JsonReader({
-		idProperty : 'deptID',
-		fields : [ {
-			name : 'materialID',
-			type : 'int'
-		}, {
-			name : 'materialName',
-			type : 'string'
-		}, {
-			name : 'deptID',
-			type : 'int'
-		}, {
-			name : 'deptName',
-			type : 'string'
-		}, {
-			name : 'price',
-			type : 'float'
-		}, {
-			name : 'amount',
-			type : 'float'
-		}, {
-			name : 'sumPrice',
-			type : 'float'
-		} ]
-	}),
-	data : inStatByMaterialResultData,
-	sortInfo : {
-		field : 'deptID',
-		direction : "ASC"
-	},
-	groupField : 'materialName'
+var inStatByMateriaReader = new Ext.data.JsonReader({
+	idProperty : 'taskId',
+	fields : [ {
+		name : 'materialID',
+		type : 'int'
+	}, {
+		name : 'materialName',
+		type : 'string'
+	}, {
+		name : 'taskId',
+		type : 'int'
+	}, {
+		name : 'description',
+		type : 'string'
+	}, {
+		name : 'singlePrice',
+		type : 'float'
+	}, {
+		name : 'amount',
+		type : 'float'
+	}, {
+		name : 'sumPrice',
+		type : 'float'
+	}, {
+		name : 'deptName',
+		type : 'string'
+	} ]
+
 });
 
 // define a custom summary function
-Ext.grid.GroupSummary.Calculations['totalPrice'] = function(v, record, field) {
-	return v + (record.data.price * record.data.amount);
+Ext.grid.GroupSummary.Calculations['singlePrice'] = function(v, record, field) {
+	return v + (record.data.sumPrice / record.data.amount);
 };
 
 var inStatByMateriaSummary = new Ext.grid.GroupSummary();
 
-var inStatByMaterialGrid = new Ext.grid.EditorGridPanel({
-	ds : inStatByMaterialStore,
-	columns : [
-			{
-				id : 'materialName',
-				header : "食材",
-				width : 80,
-				sortable : true,
-				dataIndex : 'materialName',
-				// summaryType : 'count',
-				hideable : false
-			// summaryRenderer : function(v, params, data) {
-			// return ((v === 0 || v > 1) ? '(' + v + ' Tasks)'
-			// : '(1 Task)');
-			// },
-			// editor : new Ext.form.TextField({
-			// allowBlank : false
-			// })
-			},
-			{
-				header : "部门",
-				width : 50,
-				sortable : true,
-				dataIndex : 'deptName'
-			},
-			{
-				header : "价格",
-				width : 50,
-				sortable : true,
-				dataIndex : 'price'
-			// summaryType : 'max',
-			// renderer : Ext.util.Format.dateRenderer('m/d/Y'),
-			// editor : new Ext.form.DateField({
-			// format : 'm/d/Y'
-			// })
-			},
-			{
-				header : "数量",
-				width : 50,
-				sortable : true,
-				dataIndex : 'amount',
-				summaryType : 'sum'
-			// renderer : function(v) {
-			// return v + ' hours';
-			// },
-			// editor : new Ext.form.NumberField({
-			// allowBlank : false,
-			// allowNegative : false,
-			// style : 'text-align:left'
-			// })
-			},
-			{
-				id : 'sumPrice',
-				header : "小计",
-				width : 50,
-				sortable : false,
-				groupable : false,
-				renderer : function(v, params, record) {
-					return Ext.util.Format.usMoney(record.data.price
-							* record.data.amount);
-				},
-				dataIndex : 'sumPrice',
-				summaryType : 'totalCost'
-			// summaryRenderer : Ext.util.Format.usMoney
-			} ],
+var inStatByMateriaGrid = new Ext.grid.EditorGridPanel({
+	ds : new Ext.data.GroupingStore({
+		reader : inStatByMateriaReader,
+		data : inStatByMaterialResultData,
+		sortInfo : {
+			field : 'deptName',
+			direction : "ASC"
+		},
+		groupField : 'materialName'
+	}),
+
+	columns : [ {
+		id : 'description',
+		header : "Task",
+		width : 80,
+		sortable : true,
+		dataIndex : 'description',
+		summaryType : 'count',
+		hideable : false,
+		summaryRenderer : function(v, params, data) {
+			return ((v === 0 || v > 1) ? '(' + v + ' Tasks)' : '(1 Task)');
+		},
+		editor : new Ext.form.TextField({
+			allowBlank : false
+		})
+	}, {
+		header : "食材",
+		width : 20,
+		sortable : true,
+		dataIndex : 'materialName'
+	}, {
+		header : "部门",
+		width : 25,
+		sortable : true,
+		dataIndex : 'deptName'
+	}, {
+		id : 'singlePrice',
+		header : "价格",
+		width : 20,
+		sortable : false,
+		groupable : false,
+		renderer : function(v, params, record) {
+			// return Ext.util.Format.usMoney(record.data.sumPrice
+			// / record.data.amount);
+			return record.data.sumPrice / record.data.amount;
+		},
+		dataIndex : 'singlePrice',
+		summaryType : 'singlePrice'
+	// summaryRenderer : Ext.util.Format.usMoney
+	}, {
+		header : "数量",
+		width : 20,
+		sortable : true,
+		// renderer : Ext.util.Format.usMoney,
+		dataIndex : 'amount',
+		summaryType : 'sum'
+	// editor: new Ext.form.NumberField({
+	// allowBlank: false,
+	// allowNegative: false,
+	// style: 'text-align:left'
+	// })
+	}, {
+		header : "小计",
+		width : 20,
+		sortable : true,
+		// renderer : Ext.util.Format.chnMoney,
+		dataIndex : 'sumPrice',
+		summaryType : 'sum'
+	// renderer : function(v) {
+	// return v + ' hours';
+	// },
+	// editor : new Ext.form.NumberField({
+	// allowBlank : false,
+	// allowNegative : false,
+	// style : 'text-align:left'
+	// })
+	} ],
 
 	view : new Ext.grid.GroupingView({
 		forceFit : true,
@@ -1005,25 +1233,27 @@ var inStatByMaterialGrid = new Ext.grid.EditorGridPanel({
 
 	frame : true,
 	width : 800,
-	height : 800,
+	height : 450,
 	clicksToEdit : 1,
 	collapsible : true,
 	animCollapse : false,
 	trackMouseOver : false,
 	// enableColumnMove: false,
-	// title : 'Sponsored Projects',
-	iconCls : 'icon-grid'
-// renderTo : document.body
+	title : 'Sponsored Projects',
+// iconCls: 'icon-grid',
+// renderTo: document.body
 });
+
+// --------------------------------------------------------------------------------------------------------
 
 var inStatByMaterialResultWin = new Ext.Window({
 	title : "入库汇总-按食材",
-	width : 1000,
-	height : 1000,
+	width : 800,
+	height : 500,
 	closeAction : "hide",
 	resizable : false,
 	layout : "fit",
-	items : inStatByMaterialGrid,
+	items : inStatByMateriaGrid,
 	buttons : [ {
 		text : "退出",
 		handler : function() {
