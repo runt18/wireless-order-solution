@@ -182,7 +182,7 @@ SELECT id, 2, "部门2" FROM wireless_order_db.restaurant WHERE id > 10;
 -- Insert a '部门3' to 'department' for every restaurant
 -- -----------------------------------------------------
 INSERT INTO wireless_order_db.department(restaurant_id, dept_id, name)
-SELECT id, 3, "部门13" FROM wireless_order_db.restaurant WHERE id > 10;
+SELECT id, 3, "部门3" FROM wireless_order_db.restaurant WHERE id > 10;
 
 -- Insert a '部门4' to 'department' for every restaurant
 -- -----------------------------------------------------
