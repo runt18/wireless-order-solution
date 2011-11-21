@@ -73,8 +73,6 @@ public class OrderFoodReflector {
 				+ orderClause;
 		
 
-		System.out.println(sql);
-
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		ArrayList<OrderFood> orderFoods = new ArrayList<OrderFood>();
 		while (dbCon.rs.next()) {
