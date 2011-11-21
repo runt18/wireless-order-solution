@@ -159,7 +159,6 @@ INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`
 INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`) VALUES (11, 7, '部门7');
 INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`) VALUES (11, 8, '部门8');
 INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`) VALUES (11, 9, '部门9');
-INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`) VALUES (11, 10, '部门10');
 
 COMMIT;
 
