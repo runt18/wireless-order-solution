@@ -131,6 +131,9 @@
 		<action path="/InventoryChange"
 			type="com.wireless.Actions.inventoryMgr.InventoryChangeAction" scope="request">
 		</action>
+<action path="/InventoryInStatDetail"
+			type="com.wireless.Actions.inventoryMgr.StatInventoryInDetail" scope="request">
+		</action>
 
 
 
