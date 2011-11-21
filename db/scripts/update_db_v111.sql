@@ -169,6 +169,52 @@ INSERT INTO wireless_order_db.department(restaurant_id, dept_id, name)
 SELECT id, 0, "仓管部" FROM wireless_order_db.restaurant WHERE id > 10;
 
 -- -----------------------------------------------------
+-- Insert a '部门1' to 'department' for every restaurant
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.department(restaurant_id, dept_id, name)
+SELECT id, 1, "部门1" FROM wireless_order_db.restaurant WHERE id > 10;
+
+-- Insert a '部门2' to 'department' for every restaurant
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.department(restaurant_id, dept_id, name)
+SELECT id, 2, "部门2" FROM wireless_order_db.restaurant WHERE id > 10;
+
+-- Insert a '部门3' to 'department' for every restaurant
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.department(restaurant_id, dept_id, name)
+SELECT id, 3, "部门13" FROM wireless_order_db.restaurant WHERE id > 10;
+
+-- Insert a '部门4' to 'department' for every restaurant
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.department(restaurant_id, dept_id, name)
+SELECT id, 4, "部门4" FROM wireless_order_db.restaurant WHERE id > 10;
+
+-- Insert a '部门5' to 'department' for every restaurant
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.department(restaurant_id, dept_id, name)
+SELECT id, 5, "部门5" FROM wireless_order_db.restaurant WHERE id > 10;
+
+-- Insert a '部门6' to 'department' for every restaurant
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.department(restaurant_id, dept_id, name)
+SELECT id, 6, "部门6" FROM wireless_order_db.restaurant WHERE id > 10;
+
+-- Insert a '部门7' to 'department' for every restaurant
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.department(restaurant_id, dept_id, name)
+SELECT id, 7, "部门7" FROM wireless_order_db.restaurant WHERE id > 10;
+
+-- Insert a '部门8' to 'department' for every restaurant
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.department(restaurant_id, dept_id, name)
+SELECT id, 8, "部门8" FROM wireless_order_db.restaurant WHERE id > 10;
+
+-- Insert a '部门1' to 'department' for every restaurant
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.department(restaurant_id, dept_id, name)
+SELECT id, 9, "部门9" FROM wireless_order_db.restaurant WHERE id > 10;
+
+-- -----------------------------------------------------
 -- Add a 'restaurant_id' to table 'order_food'
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`order_food` ADD COLUMN `restaurant_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the restaurant id to this order detail'  AFTER `order_id` ;
