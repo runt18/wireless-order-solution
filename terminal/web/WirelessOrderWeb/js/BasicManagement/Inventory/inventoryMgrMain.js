@@ -170,7 +170,7 @@ inventoryInWin = new Ext.Window(
 						fieldLabel : "部门",
 						forceSelection : true,
 						width : 160,
-						value : departmentData[0][1],
+						// value : departmentData[0][1],
 						id : "departmentCombIn",
 						store : new Ext.data.SimpleStore({
 							fields : [ "value", "text" ],
@@ -185,11 +185,17 @@ inventoryInWin = new Ext.Window(
 						allowBlank : false
 					});
 
+					if (departmentData.length > 0) {
+						departmentCombIn.setValue(departmentData[0][1]);
+					} else {
+						departmentCombIn.setValue("");
+					}
+
 					var supplierComb = new Ext.form.ComboBox({
 						fieldLabel : "供应商",
 						forceSelection : true,
 						width : 160,
-						value : supplierData[0][2],
+						// value : supplierData[0][2],
 						id : "supplierComb",
 						store : new Ext.data.SimpleStore({
 							fields : [ "value", "alias", "text" ],
@@ -203,6 +209,13 @@ inventoryInWin = new Ext.Window(
 						selectOnFocus : true,
 						allowBlank : false
 					});
+
+					// 防止未錄入供應商，先錄入食材
+					if (supplierData.length > 0) {
+						supplierComb.setValue(supplierData[0][2]);
+					} else {
+						supplierComb.setValue("");
+					}
 
 					inventoryInWin.findById("inventoryInForm").add(
 							"departmentCombIn");
@@ -399,7 +412,7 @@ inventoryOutWin = new Ext.Window(
 						fieldLabel : "部门",
 						forceSelection : true,
 						width : 160,
-						value : departmentData[0][1],
+						// value : departmentData[0][1],
 						id : "departmentCombOut",
 						store : new Ext.data.SimpleStore({
 							fields : [ "value", "text" ],
@@ -413,6 +426,12 @@ inventoryOutWin = new Ext.Window(
 						selectOnFocus : true,
 						allowBlank : false
 					});
+
+					if (departmentData.length > 0) {
+						departmentCombOut.setValue(departmentData[0][1]);
+					} else {
+						departmentCombOut.setValue("");
+					}
 
 					var outReason = new Ext.form.ComboBox({
 						fieldLabel : "出库原因",
@@ -616,7 +635,7 @@ inventoryChangeWin = new Ext.Window(
 						fieldLabel : "调出部门",
 						forceSelection : true,
 						width : 160,
-						value : departmentData[0][1],
+						// value : departmentData[0][1],
 						id : "departmentCombChangeOut",
 						store : new Ext.data.SimpleStore({
 							fields : [ "value", "text" ],
@@ -631,11 +650,17 @@ inventoryChangeWin = new Ext.Window(
 						allowBlank : false
 					});
 
+					if (departmentData.length > 0) {
+						departmentCombChangeOut.setValue(departmentData[0][1]);
+					} else {
+						departmentCombChangeOut.setValue("");
+					}
+
 					var departmentCombChangeIn = new Ext.form.ComboBox({
 						fieldLabel : "调入部门",
 						forceSelection : true,
 						width : 160,
-						value : departmentData[0][1],
+						// value : departmentData[0][1],
 						id : "departmentCombChangeIn",
 						store : new Ext.data.SimpleStore({
 							fields : [ "value", "text" ],
@@ -649,6 +674,12 @@ inventoryChangeWin = new Ext.Window(
 						selectOnFocus : true,
 						allowBlank : false
 					});
+
+					if (departmentData.length > 0) {
+						departmentCombChangeIn.setValue(departmentData[0][1]);
+					} else {
+						departmentCombChangeIn.setValue("");
+					}
 
 					inventoryChangeWin.findById("inventoryChangeForm").add(
 							"departmentCombChangeOut");
@@ -668,44 +699,80 @@ inventoryChangeWin = new Ext.Window(
 		});
 
 // ----------------- 盤點 --------------------
-var inventoryCheckGenPanel = new Ext.Panel({
-	region : "north",
-	height : 35,
-	frame : true,
-	border : false,
-	items : [ {
-		layout : "column",
-		border : false,
-		// frame : true,
-		anchor : "98%",
-		items : [ {
-			layout : "form",
+var inventoryCheckGenPanel = new Ext.Panel(
+		{
+			region : "north",
+			height : 35,
+			frame : true,
 			border : false,
-			labelSeparator : '：',
-			width : 200,
-			labelWidth : 60,
 			items : [ {
-				xtype : "numberfield",
-				id : "currPriceField",
-				disabled : true,
-				width : 120,
-				fieldLabel : "当前价格"
+				layout : "column",
+				border : false,
+				// frame : true,
+				anchor : "98%",
+				items : [
+						{
+							layout : "form",
+							border : false,
+							labelSeparator : '：',
+							width : 200,
+							labelWidth : 60,
+							items : [ {
+								xtype : "numberfield",
+								id : "currPriceField",
+								disabled : true,
+								width : 120,
+								fieldLabel : "当前价格"
+							} ]
+						},
+						{
+							layout : "form",
+							border : false,
+							labelSeparator : '：',
+							width : 200,
+							labelWidth : 60,
+							items : [ {
+								xtype : "numberfield",
+								id : "checkPriceField",
+								width : 120,
+								fieldLabel : "盘点价格",
+								allowBlank : false,
+								listeners : {
+									"blur" : function(thiz) {
+										var currTotalStock = 0;
+										var checkTotalStock = 0;
+										for ( var i = 0; i < inventoryCheckData.length; i++) {
+											currTotalStock = currTotalStock
+													+ inventoryCheckData[i][2];
+										}
+
+										checkTotalStock = currTotalStock
+												- inventoryCheckData[0][2]
+												+ inventoryCheckStore.getAt(0)
+														.get("checkStock");
+
+										// 盈亏=SUM(当前数量 ×当前价格) - SUM(盘点数量 × 盘点价格)
+										var currPrice = inventoryCheckWin
+												.findById("currPriceField")
+												.getValue();
+										var checkPrice = thiz.getValue();
+										var stockDiff = currTotalStock
+												- checkTotalStock;
+										var priceDiff = (currTotalStock * currPrice)
+												.toFixed(2)
+												- (checkTotalStock * checkPrice)
+														.toFixed(2);
+
+										document.getElementById("stockDiff").innerHTML = stockDiff
+												.toFixed(2);
+										document.getElementById("priceDiff").innerHTML = "￥"
+												+ priceDiff.toFixed(2);
+									}
+								}
+							} ]
+						} ]
 			} ]
-		}, {
-			layout : "form",
-			border : false,
-			labelSeparator : '：',
-			width : 200,
-			labelWidth : 60,
-			items : [ {
-				xtype : "numberfield",
-				id : "checkPriceField",
-				width : 120,
-				fieldLabel : "盘点价格"
-			} ]
-		} ]
-	} ]
-});
+		});
 
 var inventoryCheckSumPanel = new Ext.Panel({
 	region : "south",
@@ -776,6 +843,37 @@ var inventoryCheckGrid = new Ext.grid.EditorGridPanel({
 	listeners : {
 		"rowclick" : function(thiz, rowIndex, e) {
 			currRowIndexInvenCheck = rowIndex;
+		},
+		"validateedit" : function(obj) {
+
+			if (obj.value >= 0) {
+				var currTotalStock = 0;
+				var checkTotalStock = 0;
+				for ( var i = 0; i < inventoryCheckData.length; i++) {
+					currTotalStock = currTotalStock + inventoryCheckData[i][2];
+				}
+
+				checkTotalStock = currTotalStock - inventoryCheckData[0][2]
+						+ obj.value;
+
+				// 盈亏=SUM(当前数量 ×当前价格) - SUM(盘点数量 × 盘点价格)
+				var currPrice = inventoryCheckWin.findById("currPriceField")
+						.getValue();
+				var checkPrice = inventoryCheckWin.findById("checkPriceField")
+						.getValue();
+				var stockDiff = currTotalStock - checkTotalStock;
+				var priceDiff = (currTotalStock * currPrice).toFixed(2)
+						- (checkTotalStock * checkPrice).toFixed(2);
+
+				document.getElementById("stockDiff").innerHTML = stockDiff
+						.toFixed(2);
+				document.getElementById("priceDiff").innerHTML = "￥"
+						+ priceDiff.toFixed(2);
+
+				return true;
+			} else {
+				return false;
+			}
 		}
 	}
 });
@@ -788,242 +886,157 @@ var inventoryCheckDtlPanel = new Ext.Panel({
 	items : inventoryCheckGrid
 });
 
-var inventoryCheckWin = new Ext.Window({
-	layout : "fit",
-	title : "盘点",
-	width : 450,
-	height : 400,
-	closeAction : "hide",
-	resizable : false,
-	// closable : false,
-	items : [ {
-		layout : "border",
-		border : false,
-		items : [ inventoryCheckGenPanel, inventoryCheckDtlPanel,
-				inventoryCheckSumPanel ]
-	} ],
-	buttons : [ {
-		text : "确定",
-		handler : function() {
-			isPrompt = false;
-			inventoryCheckWin.hide();
-		}
-	}, {
-		text : "取消",
-		handler : function() {
-			isPrompt = false;
-			inventoryCheckWin.hide();
-		}
-	} ],
-	listeners : {
-		"hide" : function(thiz) {
-			isPrompt = false;
-		},
-		"show" : function(thiz) {
-			var materialID = materialGrid.getStore().getAt(currRowIndex).get(
-					"materialID");
-			Ext.Ajax.request({
-				url : "../../QueryCurrStock.do",
-				params : {
-					"pin" : pin,
-					"materialID" : materialID
-				},
-				success : function(response, options) {
-					var resultJSON = Ext.util.JSON
-							.decode(response.responseText);
-					var rootData = resultJSON.root;
-					if (rootData[0].message == "normal") {
-						for ( var i = 0; i < rootData.length; i++) {
-							inventoryCheckData.push([ rootData[i].deptID,
-									rootData[i].deptName, rootData[i].stock,
-									rootData[i].stock ]);
-						}
-						inventoryCheckStore.reload();
-					} else {
-						Ext.MessageBox.show({
-							msg : rootData[0].message,
-							width : 300,
-							buttons : Ext.MessageBox.OK
-						});
-					}
-				},
-				failure : function(response, options) {
-					Ext.MessageBox.show({
-						msg : " Unknown page error ",
-						width : 300,
-						buttons : Ext.MessageBox.OK
-					});
-				}
-			});
-		}
-	}
-});
-
-// -------------------------------------------------------------------------------------------------------
-// ----------------- 入庫統計 --------------------
-var inventInStatDS = new Ext.data.SimpleStore({
-	fields : [ "retrunValue", "displayText" ],
-	data : []
-});
-
-var inventInStatWin = new Ext.Window(
+var inventoryCheckWin = new Ext.Window(
 		{
-			title : "入库统计",
+			layout : "fit",
+			title : "盘点",
 			width : 450,
-			height : 500,
+			height : 400,
 			closeAction : "hide",
 			resizable : false,
-			layout : "anchor",
+			// closable : false,
 			items : [ {
+				layout : "border",
 				border : false,
-				anchor : "right 10%",
-				items : [ {
-					layout : "column",
-					border : false,
-					frame : true,
-					anchor : "98%",
-					items : [ {
-						layout : "form",
-						border : false,
-						labelSeparator : ' ',
-						width : 200,
-						labelWidth : 30,
-						items : [ {
-							xtype : "datefield",
-							id : "begDateIn",
-							width : 150,
-							fieldLabel : "日期"
-						} ]
-					}, {
-						layout : "form",
-						border : false,
-						labelSeparator : ' ',
-						width : 200,
-						labelWidth : 30,
-						items : [ {
-							xtype : "datefield",
-							id : "endDateIn",
-							width : 150,
-							fieldLabel : "至"
-						} ]
-					} ]
-				} ]
-			}, {
-				layout : "form",
-				border : false,
-				frame : true,
-				hideLabels : true,
-				anchor : "right 91%",
-				items : [ {
-					xtype : "itemselector",
-					name : "InMultSelect",
-					id : "InMultSelect",
-					fromStore : inventInStatDS,
-					dataFields : [ "retrunValue", "displayText" ],
-					toData : [ [ "", "" ] ],
-					msHeight : 250,
-					valueField : "retrunValue",
-					displayField : "displayText",
-					imagePath : "../../extjs/multiselect/images/",
-					toLegend : "已选择食材",
-					fromLegend : "可选择食材"
-				} ]
+				items : [ inventoryCheckGenPanel, inventoryCheckDtlPanel,
+						inventoryCheckSumPanel ]
 			} ],
-			buttons : [
-					{
-						text : "全选",
-						handler : function() {
-							var i = inventInStatWin.findById("InMultSelect").fromMultiselect.view;
-							i.selectRange(0, i.store.length);
-							inventInStatWin.findById("InMultSelect").fromTo();
-							inventInStatWin.findById("InMultSelect").toMultiselect.view
-									.clearSelections();
-						}
-					},
-					{
-						text : "清空",
-						handler : function() {
-							inventInStatWin.findById("InMultSelect").reset();
-						}
-					},
-					{
-						text : "确定",
-						handler : function() {
+			buttons : [ {
+				text : "确定",
+				handler : function() {
 
-							var selectCount = inventInStatWin
-									.findById("InMultSelect").toMultiselect.store
-									.getCount();
+					if (inventoryCheckWin.findById("checkPriceField")
+							.isValid()) {
 
-							if (selectCount != 0) {
-								isPrompt = false;
-								inventInStatWin.hide();
+						var currPrice = inventoryCheckWin.findById("checkPriceField").getValue();
+						var stockDiff = document.getElementById("stockDiff").innerHTML;
+						var material = materialGrid.getStore().getAt(
+								currRowIndex).get("materialID");
+						var staff = document.getElementById("optName").innerHTML;
 
-								var selectMaterials = "";
-								for ( var i = 0; i < selectCount; i++) {
-									var selectItem = inventInStatWin
-											.findById("InMultSelect").toMultiselect.store
-											.getAt(i).get("retrunValue");
-									if (selectItem != "") {
-										selectMaterials = selectMaterials
-												+ selectItem + ",";
+						isPrompt = false;
+						inventoryCheckWin.hide();
+
+						// type: 0 : 消耗 1 : 报损 2 : 销售 3 : 退货 4 : 入库 5 :
+						// 调出 6 : 调入 7 : 盘点
+						Ext.Ajax
+								.request({
+									url : "../../InventoryCheck.do",
+									params : {
+										"pin" : pin,
+										"materialID" : material,
+										"price" : currPrice,
+										"amount" : stockDiff,
+										"staff" : staff,
+										"type" : 7
+									},
+									success : function(response,
+											options) {
+										var resultJSON = Ext.util.JSON
+												.decode(response.responseText);
+										if (resultJSON.success == true) {
+											materialStore
+													.reload({
+														params : {
+															start : 0,
+															limit : materialPageRecordCount
+														}
+													});
+
+											var dataInfo = resultJSON.data;
+											Ext.MessageBox
+													.show({
+														msg : dataInfo,
+														width : 300,
+														buttons : Ext.MessageBox.OK
+													});
+										} else {
+											var dataInfo = resultJSON.data;
+											Ext.MessageBox
+													.show({
+														msg : dataInfo,
+														width : 300,
+														buttons : Ext.MessageBox.OK
+													});
+										}
+									},
+									failure : function(response,
+											options) {
 									}
-								}
-								// 去掉最后一个逗号
-								selectMaterials = selectMaterials.substring(0,
-										selectMaterials.length - 1);
-
-								// 保存条件
-								var begDateIn = inventInStatWin.findById(
-										"begDateIn").getValue();
-								if (begDateIn != "") {
-									var dateFormated = new Date();
-									dateFormated = begDateIn;
-									begDateIn = dateFormated.format('Y-m-d');
-								}
-
-								var endDateIn = inventInStatWin.findById(
-										"endDateIn").getValue();
-								if (endDateIn != "") {
-									var dateFormated = new Date();
-									dateFormated = endDateIn;
-									endDateIn = dateFormated.format('Y-m-d');
-								}
-
-								var materialsString = selectMaterials;
-
-								inventInStatWin.show();
-
-							} else {
-								Ext.MessageBox.show({
-									msg : "至少需要选择一个 食材进行统计",
-									width : 300,
-									buttons : Ext.MessageBox.OK
 								});
-							}
-						}
-					}, {
-						text : "取消",
-						handler : function() {
-							isPrompt = false;
-							inventInStatWin.hide();
-						}
-					} ],
+
+					}
+				}
+			}, {
+				text : "取消",
+				handler : function() {
+					isPrompt = false;
+					inventoryCheckWin.hide();
+				}
+			} ],
 			listeners : {
-				"show" : function(thiz) {
-
-					// kitchenMultSelectData = [];
-					inventInStatWin.findById("InMultSelect").reset();
-					inventInStatWin.findById("begDateIn").setValue("");
-					inventInStatWin.findById("begDateOut").setValue("");
-
-					InMultSelect.loadData(InMultSelectData);
-				},
 				"hide" : function(thiz) {
 					isPrompt = false;
+				},
+				"show" : function(thiz) {
+					var materialID = materialGrid.getStore()
+							.getAt(currRowIndex).get("materialID");
+					Ext.Ajax
+							.request({
+								url : "../../QueryCurrStock.do",
+								params : {
+									"pin" : pin,
+									"materialID" : materialID
+								},
+								success : function(response, options) {
+									var resultJSON = Ext.util.JSON
+											.decode(response.responseText);
+									var rootData = resultJSON.root;
+									if (rootData[0].message == "normal") {
+										var currStock = 0;
+										inventoryCheckData.length = 0;
+										for ( var i = 0; i < rootData.length; i++) {
+											inventoryCheckData.push([
+													rootData[i].deptID,
+													rootData[i].deptName,
+													rootData[i].stock,
+													rootData[i].stock ]);
+											currStock = currStock
+													+ rootData[i].stock;
+										}
+										inventoryCheckWin.findById(
+												"currPriceField").setValue(
+												rootData[0].price);
+										inventoryCheckWin.findById(
+												"checkPriceField").setValue(
+												rootData[0].price);
+
+										document.getElementById("stockDiff").innerHTML = "0.00";
+										document.getElementById("priceDiff").innerHTML = "￥0.00";
+
+										inventoryCheckStore.reload();
+
+									} else {
+										Ext.MessageBox.show({
+											msg : rootData[0].message,
+											width : 300,
+											buttons : Ext.MessageBox.OK
+										});
+									}
+								},
+								failure : function(response, options) {
+									Ext.MessageBox.show({
+										msg : " Unknown page error ",
+										width : 300,
+										buttons : Ext.MessageBox.OK
+									});
+								}
+							});
 				}
 			}
 		});
 
+// -------------------------------------------------------------------------------------------------------
 // ----------------- 添加食材 --------------------
 materialAddWin = new Ext.Window({
 	layout : "fit",
