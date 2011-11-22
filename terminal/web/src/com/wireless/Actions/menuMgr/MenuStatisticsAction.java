@@ -166,7 +166,8 @@ public class MenuStatisticsAction extends Action {
 						resultMap.put("dishName", lastFoodName);
 						// resultMap.put("dishPrice",
 						// dbCon.rs.getFloat("unit_price"));
-						//resultMap.put("isTemp", orderFoods[i].isTemporary);
+						// resultMap.put("isTemp",
+						// orderFoods[i].isTemporary);
 						resultMap.put("kitchen", lastKitchen);
 						resultMap.put("dishCount", sumAmout);
 						resultMap.put("dishTotalPrice", SumPrice);
@@ -187,10 +188,13 @@ public class MenuStatisticsAction extends Action {
 				totalPrice = (float) Math.round((totalPrice + orderFood
 						.getPrice2().floatValue()) * 100) / 100;
 
-				SumPrice = (float) Math.round((SumPrice + orderFood.getPrice2()
-						.floatValue()) * 100) / 100;
+				SumPrice = orderFood.getCount()
+						* (float) Math.round((SumPrice + orderFood.getPrice2()
+								.floatValue()) * 100) / 100;
+				SumPrice = (float) Math.round((SumPrice) * 100) / 100;
 				sumAmout = (float) Math
 						.round((sumAmout + orderFood.getCount()) * 100) / 100;
+
 			}
 
 			if (totalPrice != 0) {
@@ -200,7 +204,7 @@ public class MenuStatisticsAction extends Action {
 				resultMap.put("dishName", lastFoodName);
 				// resultMap.put("dishPrice",
 				// dbCon.rs.getFloat("unit_price"));
-				//resultMap.put("isTemp", orderFoods[i].isTemporary);
+				// resultMap.put("isTemp", orderFoods[i].isTemporary);
 				resultMap.put("kitchen", lastKitchen);
 				resultMap.put("dishCount", sumAmout);
 				resultMap.put("dishTotalPrice", SumPrice);
