@@ -64,6 +64,7 @@
 
 	var currPageIndex = 0;
 	var currRowIndex = -1;
+	var currRowIndexInvenCheck = -1;
 	var materialPageRecordCount = 20;
 
 	var conditionType = "text";
@@ -73,6 +74,7 @@
 	var supplierData = [];
 	var supplierComboData = [];
 	var departmentData = [];
+	var inventoryCheckData = [];
 
 	var inStatDetailResultData = [];
 	var inStatByMaterialResultData = [];
@@ -100,6 +102,19 @@
 	<div id="west"></div>
 	<div id="center"></div>
 	<div id="temp"></div>
+	
+	<!-- inventoryCheckSum -->
+	<div id="inventoryCheckSum" style="font-size: 14px;">
+		<table>
+			<tr>
+				<td style="width: 150px">&nbsp;</td>
+				<td style="width: 50px">损益：</td>
+				<td style="width: 80px" id="stockDiff">32</td>
+				<td style="width: 50px">盈亏：</td>
+				<td style="width: 80px" id="priceDiff">￥1234.12</td>
+			</tr>
+		</table>
+	</div>
 
 </body>
 </html>
