@@ -87,6 +87,7 @@ public class KitchenStatisticsAction extends Action {
 			if (!dateEnd.equals("")) {
 				condition = condition + " AND C.order_date <= '" + dateEnd + "' ";
 			}
+			condition = condition + " AND C.restaurant_id =  " + term.restaurant_id;
 
 			OrderFoodReflector foodRef = new OrderFoodReflector();
 			String orderClause = " ORDER BY C.order_date, C.kitchen ";

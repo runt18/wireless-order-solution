@@ -24,8 +24,10 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.VerifyPin;
+import com.wireless.dbReflect.OrderFoodReflector;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.Util;
 
@@ -83,48 +85,130 @@ public class MenuStatisticsAction extends Action {
 			 * belong to this restaurant 2 - has been paid 3 - match extra
 			 * filter condition
 			 */
-			String sql = "SELECT food_id, name, unit_price, is_temporary, kitchen, "
-					+ " sum(order_count) as dishCount, sum(order_count)*unit_price as totalPrice "
-					+ " FROM "
-					+ Params.dbName
-					+ ".order_food_history "
-					+ " WHERE 1=1 AND restaurant_id = "
-					+ term.restaurant_id
-					+ " ";
+			// String sql =
+			// "SELECT food_id, name, unit_price, is_temporary, kitchen, "
+			// +
+			// " sum(order_count) as dishCount, sum(order_count)*unit_price as totalPrice "
+			// + " FROM "
+			// + Params.dbName
+			// + ".order_food_history "
+			// + " WHERE 1=1 AND restaurant_id = "
+			// + term.restaurant_id
+			// + " ";
+			// if (!dateBegin.equals("")) {
+			// sql = sql + " AND order_date >= '" + dateBegin + "' ";
+			// }
+			// if (!dateEnd.equals("")) {
+			// sql = sql + " AND order_date <= '" + dateEnd + "' ";
+			// }
+			// sql = sql
+			// + " AND food_id in ("
+			// + dishString
+			// + ") "
+			// + " GROUP BY food_id, name, unit_price, is_temporary, kitchen ";
+			//
+			// dbCon.rs = dbCon.stmt.executeQuery(sql);
+
+			String condition = " AND C.food_id IN (" + dishString + ") ";
 			if (!dateBegin.equals("")) {
-				sql = sql + " AND order_date >= '" + dateBegin + "' ";
+				condition = condition + " AND C.order_date >= '" + dateBegin
+						+ "' ";
 			}
 			if (!dateEnd.equals("")) {
-				sql = sql + " AND order_date <= '" + dateEnd + "' ";
+				condition = condition + " AND C.order_date <= '" + dateEnd
+						+ "' ";
 			}
-			sql = sql
-					+ " AND food_id in ("
-					+ dishString
-					+ ") "
-					+ " GROUP BY food_id, name, unit_price, is_temporary, kitchen ";
+			condition = condition + " AND C.restaurant_id =  "
+					+ term.restaurant_id;
 
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-System.out.println(sql);
-			while (dbCon.rs.next()) {
+			String orderClause = " ORDER BY D.food_id, C.order_date ";
+
+			OrderFoodReflector foodRef = new OrderFoodReflector();
+			OrderFood orderFoods[] = foodRef.getDetailHistory(dbCon, condition,
+					orderClause);
+
+			// while (dbCon.rs.next()) {
+			// HashMap resultMap = new HashMap();
+			// /**
+			// * The json to each order looks like below
+			// * 菜品ｉｄ，菜品名稱，菜品單價，是否臨時，厨房，總數量，總價格
+			// */
+			// resultMap.put("dishNumber", dbCon.rs.getInt("food_id"));
+			// resultMap.put("dishName", dbCon.rs.getString("name"));
+			// resultMap.put("dishPrice", dbCon.rs.getFloat("unit_price"));
+			// resultMap.put("isTemp", dbCon.rs.getBoolean("is_temporary"));
+			// resultMap.put("kitchen", dbCon.rs.getInt("kitchen"));
+			// resultMap.put("dishCount", dbCon.rs.getFloat("dishCount"));
+			// resultMap
+			// .put("dishTotalPrice", dbCon.rs.getFloat("totalPrice"));
+			// resultMap.put("message", "normal");
+			//
+			// resultList.add(resultMap);
+			//
+			// totalPrice = totalPrice + dbCon.rs.getFloat("totalPrice");
+			// }
+
+			int lastFoodId = -100;
+			int lastKitchen = -1;
+			String lastFoodName = "";
+			int rowCount = 0;
+			float sumAmout = 0;
+			float SumPrice = 0;
+			for (int i = 0; i < orderFoods.length; i++) {
+				OrderFood orderFood = orderFoods[i];
+				int thisFoodId = orderFood.alias_id;
+
+				if (thisFoodId != lastFoodId) {
+					if (rowCount != 0) {
+						HashMap resultMap = new HashMap();
+
+						resultMap.put("dishNumber", lastFoodId);
+						resultMap.put("dishName", lastFoodName);
+						// resultMap.put("dishPrice",
+						// dbCon.rs.getFloat("unit_price"));
+						//resultMap.put("isTemp", orderFoods[i].isTemporary);
+						resultMap.put("kitchen", lastKitchen);
+						resultMap.put("dishCount", sumAmout);
+						resultMap.put("dishTotalPrice", SumPrice);
+						resultMap.put("message", "normal");
+
+						resultList.add(resultMap);
+
+					}
+
+					sumAmout = 0;
+					SumPrice = 0;
+				}
+
+				rowCount = rowCount + 1;
+				lastFoodId = thisFoodId;
+				lastKitchen = orderFoods[i].kitchen;
+				lastFoodName = orderFoods[i].name;
+				totalPrice = (float) Math.round((totalPrice + orderFood
+						.getPrice2().floatValue()) * 100) / 100;
+
+				SumPrice = (float) Math.round((SumPrice + orderFood.getPrice2()
+						.floatValue()) * 100) / 100;
+				sumAmout = (float) Math
+						.round((sumAmout + orderFood.getCount()) * 100) / 100;
+			}
+
+			if (totalPrice != 0) {
 				HashMap resultMap = new HashMap();
-				/**
-				 * The json to each order looks like below
-				 * 菜品ｉｄ，菜品名稱，菜品單價，是否臨時，厨房，總數量，總價格
-				 */
-				resultMap.put("dishNumber", dbCon.rs.getInt("food_id"));
-				resultMap.put("dishName", dbCon.rs.getString("name"));
-				resultMap.put("dishPrice", dbCon.rs.getFloat("unit_price"));
-				resultMap.put("isTemp", dbCon.rs.getBoolean("is_temporary"));
-				resultMap.put("kitchen", dbCon.rs.getInt("kitchen"));
-				resultMap.put("dishCount", dbCon.rs.getFloat("dishCount"));
-				resultMap
-						.put("dishTotalPrice", dbCon.rs.getFloat("totalPrice"));
+
+				resultMap.put("dishNumber", lastFoodId);
+				resultMap.put("dishName", lastFoodName);
+				// resultMap.put("dishPrice",
+				// dbCon.rs.getFloat("unit_price"));
+				//resultMap.put("isTemp", orderFoods[i].isTemporary);
+				resultMap.put("kitchen", lastKitchen);
+				resultMap.put("dishCount", sumAmout);
+				resultMap.put("dishTotalPrice", SumPrice);
 				resultMap.put("message", "normal");
 
 				resultList.add(resultMap);
-
-				totalPrice = totalPrice + dbCon.rs.getFloat("totalPrice");
 			}
+
 			dbCon.rs.close();
 
 		} catch (BusinessException e) {
