@@ -82,12 +82,15 @@ public class KitchenStatisticsAction extends Action {
 
 			String condition = " AND C.kitchen IN (" + kitchenIDs + ") ";
 			if (!dateBegin.equals("")) {
-				condition = condition + " AND C.order_date >= '" + dateBegin + "' ";
+				condition = condition + " AND C.order_date >= '" + dateBegin
+						+ "' ";
 			}
 			if (!dateEnd.equals("")) {
-				condition = condition + " AND C.order_date <= '" + dateEnd + "' ";
+				condition = condition + " AND C.order_date <= '" + dateEnd
+						+ "' ";
 			}
-			condition = condition + " AND C.restaurant_id =  " + term.restaurant_id;
+			condition = condition + " AND C.restaurant_id =  "
+					+ term.restaurant_id;
 
 			OrderFoodReflector foodRef = new OrderFoodReflector();
 			String orderClause = " ORDER BY C.order_date, C.kitchen ";
@@ -109,70 +112,73 @@ public class KitchenStatisticsAction extends Action {
 			float totalCount = 0;
 			int rowCount = 0;
 			for (int i = 0; i < orderFoods.length; i++) {
-				OrderFood orderFood = orderFoods[i];
-				String orderDate = new SimpleDateFormat("yyyy-MM-dd")
-						.format(new Date(orderFood.orderDate));
-				int kitchen = orderFood.kitchen;
+				if (!orderFoods[i].isGift()) {
+					OrderFood orderFood = orderFoods[i];
+					String orderDate = new SimpleDateFormat("yyyy-MM-dd")
+							.format(new Date(orderFood.orderDate));
+					int kitchen = orderFood.kitchen;
 
-				if (!orderDate.equals(lastDate) || kitchen != lastKitchen) {
-					if (rowCount != 0) {
-						HashMap resultMap = new HashMap();
+					if (!orderDate.equals(lastDate) || kitchen != lastKitchen) {
+						if (rowCount != 0) {
+							HashMap resultMap = new HashMap();
 
-						resultMap.put("statDate", lastDate);
-						resultMap.put("kitchenName", lastKitchen);
-						resultMap.put("cash", cashCount);
-						resultMap.put("bankCard", bankCardCount);
-						resultMap.put("memberCard", memberCardCount);
-						resultMap.put("credit", handCount);
-						resultMap.put("sign", signCount);
-						resultMap.put("total", totalCount);
+							resultMap.put("statDate", lastDate);
+							resultMap.put("kitchenName", lastKitchen);
+							resultMap.put("cash", cashCount);
+							resultMap.put("bankCard", bankCardCount);
+							resultMap.put("memberCard", memberCardCount);
+							resultMap.put("credit", handCount);
+							resultMap.put("sign", signCount);
+							resultMap.put("total", totalCount);
 
-						resultMap.put("message", "normal");
+							resultMap.put("message", "normal");
 
-						resultList.add(resultMap);
+							resultList.add(resultMap);
+						}
+
+						cashCount = 0;
+						bankCardCount = 0;
+						memberCardCount = 0;
+						handCount = 0;
+						signCount = 0;
+						totalCount = 0;
 					}
 
-					cashCount = 0;
-					bankCardCount = 0;
-					memberCardCount = 0;
-					handCount = 0;
-					signCount = 0;
-					totalCount = 0;
-				}
-
-				rowCount = rowCount + 1;
-				lastDate = orderDate;
-				lastKitchen = kitchen;
-				allTotalCount = (float) Math.round((allTotalCount + orderFood
-						.getPrice2().floatValue()) * 100) / 100;
-
-				int payManner = orderFood.payManner;
-				switch (payManner) {
-				case 1:
-					cashCount = (float) Math.round((cashCount + orderFood
-							.getPrice2().floatValue()) * 100) / 100;
-					break;
-				case 2:
-					bankCardCount = (float) Math
-							.round((bankCardCount + orderFood.getPrice2()
+					rowCount = rowCount + 1;
+					lastDate = orderDate;
+					lastKitchen = kitchen;
+					allTotalCount = (float) Math
+							.round((allTotalCount + orderFood.getPrice2()
 									.floatValue()) * 100) / 100;
-					break;
-				case 3:
-					memberCardCount = (float) Math
-							.round((memberCardCount + orderFood.getPrice2()
-									.floatValue()) * 100) / 100;
-					break;
-				case 4:
-					signCount = (float) Math.round((signCount + orderFood
+
+					int payManner = orderFood.payManner;
+					switch (payManner) {
+					case 1:
+						cashCount = (float) Math.round((cashCount + orderFood
+								.getPrice2().floatValue()) * 100) / 100;
+						break;
+					case 2:
+						bankCardCount = (float) Math
+								.round((bankCardCount + orderFood.getPrice2()
+										.floatValue()) * 100) / 100;
+						break;
+					case 3:
+						memberCardCount = (float) Math
+								.round((memberCardCount + orderFood.getPrice2()
+										.floatValue()) * 100) / 100;
+						break;
+					case 4:
+						signCount = (float) Math.round((signCount + orderFood
+								.getPrice2().floatValue()) * 100) / 100;
+						break;
+					case 5:
+						handCount = (float) Math.round((handCount + orderFood
+								.getPrice2().floatValue()) * 100) / 100;
+						break;
+					}
+					totalCount = (float) Math.round((totalCount + orderFood
 							.getPrice2().floatValue()) * 100) / 100;
-					break;
-				case 5:
-					handCount = (float) Math.round((handCount + orderFood
-							.getPrice2().floatValue()) * 100) / 100;
-					break;
 				}
-				totalCount = (float) Math.round((totalCount + orderFood
-						.getPrice2().floatValue()) * 100) / 100;
 			}
 
 			if (totalCount != 0) {
