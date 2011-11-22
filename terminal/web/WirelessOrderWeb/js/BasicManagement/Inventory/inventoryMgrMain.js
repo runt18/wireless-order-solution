@@ -666,6 +666,199 @@ inventoryChangeWin = new Ext.Window(
 				}
 			}
 		});
+
+// ----------------- 盤點 --------------------
+var inventoryCheckGenPanel = new Ext.Panel({
+	region : "north",
+	height : 35,
+	frame : true,
+	border : false,
+	items : [ {
+		layout : "column",
+		border : false,
+		// frame : true,
+		anchor : "98%",
+		items : [ {
+			layout : "form",
+			border : false,
+			labelSeparator : '：',
+			width : 200,
+			labelWidth : 60,
+			items : [ {
+				xtype : "numberfield",
+				id : "currPriceField",
+				disabled : true,
+				width : 120,
+				fieldLabel : "当前价格"
+			} ]
+		}, {
+			layout : "form",
+			border : false,
+			labelSeparator : '：',
+			width : 200,
+			labelWidth : 60,
+			items : [ {
+				xtype : "numberfield",
+				id : "checkPriceField",
+				width : 120,
+				fieldLabel : "盘点价格"
+			} ]
+		} ]
+	} ]
+});
+
+var inventoryCheckSumPanel = new Ext.Panel({
+	region : "south",
+	height : 35,
+	frame : true,
+	items : [ {
+		border : false,
+		contentEl : "inventoryCheckSum"
+	} ]
+});
+
+// 1，表格的数据store
+var inventoryCheckStore = new Ext.data.Store({
+	proxy : new Ext.data.MemoryProxy(inventoryCheckData),
+	reader : new Ext.data.ArrayReader({}, [ {
+		name : "deptID"
+	}, {
+		name : "deptName"
+	}, {
+		name : "currStock"
+	}, {
+		name : "checkStock"
+	} ])
+});
+
+// 2，栏位模型
+var inventoryCheckColumnModel = new Ext.grid.ColumnModel([
+		new Ext.grid.RowNumberer(), {
+			header : "部门",
+			sortable : true,
+			dataIndex : "deptName",
+			width : 50
+		}, {
+			header : "当前数量",
+			sortable : true,
+			dataIndex : "currStock",
+			width : 50
+		}, {
+			header : "盘点数量",
+			sortable : true,
+			dataIndex : "checkStock",
+			width : 50,
+			editor : new Ext.form.NumberField({
+				allowBlank : false,
+				allowNegative : false,
+				validator : function(v) {
+					if (currRowIndexInvenCheck != 0) {
+						return "只能修改仓管部的盘点数量！";
+					} else {
+						return true;
+					}
+				}
+			})
+		} ]);
+
+// 3,表格
+var inventoryCheckGrid = new Ext.grid.EditorGridPanel({
+	// title : "已点菜",
+	border : false,
+	ds : inventoryCheckStore,
+	cm : inventoryCheckColumnModel,
+	sm : new Ext.grid.RowSelectionModel({
+		singleSelect : true
+	}),
+	viewConfig : {
+		forceFit : true
+	},
+	listeners : {
+		"rowclick" : function(thiz, rowIndex, e) {
+			currRowIndexInvenCheck = rowIndex;
+		}
+	}
+});
+
+var inventoryCheckDtlPanel = new Ext.Panel({
+	region : "center",
+	layout : "fit",
+	// height : 260,
+	frame : true,
+	items : inventoryCheckGrid
+});
+
+var inventoryCheckWin = new Ext.Window({
+	layout : "fit",
+	title : "盘点",
+	width : 450,
+	height : 400,
+	closeAction : "hide",
+	resizable : false,
+	// closable : false,
+	items : [ {
+		layout : "border",
+		border : false,
+		items : [ inventoryCheckGenPanel, inventoryCheckDtlPanel,
+				inventoryCheckSumPanel ]
+	} ],
+	buttons : [ {
+		text : "确定",
+		handler : function() {
+			isPrompt = false;
+			inventoryCheckWin.hide();
+		}
+	}, {
+		text : "取消",
+		handler : function() {
+			isPrompt = false;
+			inventoryCheckWin.hide();
+		}
+	} ],
+	listeners : {
+		"hide" : function(thiz) {
+			isPrompt = false;
+		},
+		"show" : function(thiz) {
+			var materialID = materialGrid.getStore().getAt(currRowIndex).get(
+					"materialID");
+			Ext.Ajax.request({
+				url : "../../QueryCurrStock.do",
+				params : {
+					"pin" : pin,
+					"materialID" : materialID
+				},
+				success : function(response, options) {
+					var resultJSON = Ext.util.JSON
+							.decode(response.responseText);
+					var rootData = resultJSON.root;
+					if (rootData[0].message == "normal") {
+						for ( var i = 0; i < rootData.length; i++) {
+							inventoryCheckData.push([ rootData[i].deptID,
+									rootData[i].deptName, rootData[i].stock,
+									rootData[i].stock ]);
+						}
+						inventoryCheckStore.reload();
+					} else {
+						Ext.MessageBox.show({
+							msg : rootData[0].message,
+							width : 300,
+							buttons : Ext.MessageBox.OK
+						});
+					}
+				},
+				failure : function(response, options) {
+					Ext.MessageBox.show({
+						msg : " Unknown page error ",
+						width : 300,
+						buttons : Ext.MessageBox.OK
+					});
+				}
+			});
+		}
+	}
+});
+
 // -------------------------------------------------------------------------------------------------------
 // ----------------- 入庫統計 --------------------
 var inventInStatDS = new Ext.data.SimpleStore({
@@ -1277,7 +1470,10 @@ function changeHandler(rowIndex) {
 }
 
 function checkHandler(rowIndex) {
-
+	if (!isPrompt) {
+		inventoryCheckWin.show();
+		isPrompt = true;
+	}
 }
 
 function materialDeleteHandler(rowIndex) {
