@@ -349,8 +349,8 @@ DROP TABLE IF EXISTS `wireless_order_db`.`food_material` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food_material` (
   `restaurant_id` INT UNSIGNED NOT NULL ,
-  `material_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the material alias id' ,
-  `food_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the food alias id' ,
+  `material_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the material alias id' ,
+  `food_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the food alias id' ,
   `consumption` FLOAT NOT NULL DEFAULT 0 COMMENT 'the consumption between the food and the material' ,
   INDEX `fk_food_material_restaurant` (`restaurant_id` ASC) ,
   CONSTRAINT `fk_food_material_restaurant1`
