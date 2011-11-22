@@ -185,15 +185,13 @@ public class MenuStatisticsAction extends Action {
 				lastFoodId = thisFoodId;
 				lastKitchen = orderFoods[i].kitchen;
 				lastFoodName = orderFoods[i].name;
-				totalPrice = orderFood.getCount()
-						* (float) Math.round((totalPrice + orderFood
-								.getPrice2().floatValue()) * 100) / 100;
-				totalPrice = (float) Math.round((totalPrice) * 100) / 100;
 
-				SumPrice = orderFood.getCount()
-						* (float) Math.round((SumPrice + orderFood.getPrice2()
-								.floatValue()) * 100) / 100;
-				SumPrice = (float) Math.round((SumPrice) * 100) / 100;
+				float allPrice = (float) Math.round((orderFood.getPrice2()
+						.floatValue() * orderFood.getCount()) * 100) / 100;
+
+				totalPrice = (float) Math.round((totalPrice + allPrice) * 100) / 100;
+
+				SumPrice = (float) Math.round((SumPrice + allPrice) * 100) / 100;
 				sumAmout = (float) Math
 						.round((sumAmout + orderFood.getCount()) * 100) / 100;
 
