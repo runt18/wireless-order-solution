@@ -147,37 +147,38 @@ public class KitchenStatisticsAction extends Action {
 					rowCount = rowCount + 1;
 					lastDate = orderDate;
 					lastKitchen = kitchen;
+
+					float allPrice = (float) Math.round((orderFood.getPrice2()
+							.floatValue() * orderFood.getCount()) * 100) / 100;
+
 					allTotalCount = (float) Math
-							.round((allTotalCount + orderFood.getPrice2()
-									.floatValue()) * 100) / 100;
+							.round((allTotalCount + allPrice) * 100) / 100;
 
 					int payManner = orderFood.payManner;
 					switch (payManner) {
 					case 1:
-						cashCount = (float) Math.round((cashCount + orderFood
-								.getPrice2().floatValue()) * 100) / 100;
+						cashCount = (float) Math
+								.round((cashCount + allPrice) * 100) / 100;
 						break;
 					case 2:
 						bankCardCount = (float) Math
-								.round((bankCardCount + orderFood.getPrice2()
-										.floatValue()) * 100) / 100;
+								.round((bankCardCount + allPrice) * 100) / 100;
 						break;
 					case 3:
 						memberCardCount = (float) Math
-								.round((memberCardCount + orderFood.getPrice2()
-										.floatValue()) * 100) / 100;
+								.round((memberCardCount + allPrice) * 100) / 100;
 						break;
 					case 4:
-						signCount = (float) Math.round((signCount + orderFood
-								.getPrice2().floatValue()) * 100) / 100;
+						signCount = (float) Math
+								.round((signCount + allPrice) * 100) / 100;
 						break;
 					case 5:
-						handCount = (float) Math.round((handCount + orderFood
-								.getPrice2().floatValue()) * 100) / 100;
+						handCount = (float) Math
+								.round((handCount + allPrice) * 100) / 100;
 						break;
 					}
-					totalCount = (float) Math.round((totalCount + orderFood
-							.getPrice2().floatValue()) * 100) / 100;
+					totalCount = (float) Math
+							.round((totalCount + allPrice) * 100) / 100;
 				}
 			}
 
