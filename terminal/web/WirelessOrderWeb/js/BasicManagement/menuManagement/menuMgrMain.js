@@ -95,6 +95,7 @@ menuStatWin = new Ext.Window(
 									.getCount();
 
 							if (selectCount != 0) {
+								isPrompt = false;
 								menuStatWin.hide();
 
 								var selectDishes = "";
@@ -132,6 +133,7 @@ menuStatWin = new Ext.Window(
 
 								orderStaticDishesString = selectDishes;
 
+								isPrompt = true;
 								menuStatResultWin.show();
 
 							} else {
@@ -145,6 +147,7 @@ menuStatWin = new Ext.Window(
 					}, {
 						text : "取消",
 						handler : function() {
+							isPrompt = false;
 							menuStatWin.hide();
 						}
 					} ],
@@ -374,6 +377,7 @@ menuStatResultWin = new Ext.Window({
 	buttons : [ {
 		text : "退出",
 		handler : function() {
+			isPrompt = false;
 			menuStatResultWin.hide();
 		}
 	} ],
@@ -553,6 +557,7 @@ menuAddWin = new Ext.Window({
 						}
 
 						if (!isDuplicate) {
+							isPrompt = false;
 							menuAddWin.hide();
 
 							Ext.Ajax.request({
@@ -612,6 +617,7 @@ menuAddWin = new Ext.Window({
 			}, {
 				text : "取消",
 				handler : function() {
+					isPrompt = false;
 					menuAddWin.hide();
 				}
 			} ],
@@ -780,6 +786,7 @@ menuModifyWin = new Ext.Window(
 											.isValid()
 									&& menuModifyWin.findById("menuModPrice")
 											.isValid()) {
+								isPrompt = false;
 								menuModifyWin.hide();
 
 								var dishNumber = menuModifyWin.findById(
@@ -861,6 +868,7 @@ menuModifyWin = new Ext.Window(
 					}, {
 						text : "取消",
 						handler : function() {
+							isPrompt = false;
 							menuModifyWin.hide();
 						}
 					} ],
@@ -881,7 +889,10 @@ var orderStatiBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "点菜统计",
 	handler : function(btn) {
-		menuStatWin.show();
+		if (!isPrompt) {
+			isPrompt = true;
+			menuStatWin.show();
+		}
 	}
 });
 
@@ -891,7 +902,10 @@ var dishAddBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "添加新菜",
 	handler : function(btn) {
-		menuAddWin.show();
+		if (!isPrompt) {
+			isPrompt = true;
+			menuAddWin.show();
+		}
 	}
 });
 
@@ -1192,7 +1206,10 @@ function dishModifyHandler(rowIndex) {
 	menuModifyWin.findById("freeCheckboxMM").setValue(currRecord.get("free"));
 	menuModifyWin.findById("stopCheckboxMM").setValue(currRecord.get("stop"));
 
-	menuModifyWin.show();
+	if (!isPrompt) {
+		isPrompt = true;
+		menuModifyWin.show();
+	}
 
 };
 
@@ -1338,6 +1355,144 @@ var menuColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(), {
 } ]);
 
 // -------------- 關聯食材 ---------------
+// material add
+var materialAddStore = new Ext.data.SimpleStore({
+	fields : [ "value", "text" ],
+	data : []
+});
+
+var materialAddComb = new Ext.form.ComboBox({
+	fieldLabel : "食材",
+	forceSelection : true,
+	width : 140,
+	// value : "等于",
+	id : "materialAddComb",
+	// disabled : true,
+	store : materialAddStore,
+	valueField : "value",
+	displayField : "text",
+	typeAhead : true,
+	mode : "local",
+	triggerAction : "all",
+	selectOnFocus : true,
+	allowBlank : false
+});
+
+var materialAddWin = new Ext.Window({
+	layout : "fit",
+	title : "添加食材",
+	width : 210,
+	height : 140,
+	closeAction : "hide",
+	resizable : false,
+	items : [ {
+		layout : "form",
+		id : "materialAddForm",
+		labelWidth : 35,
+		border : false,
+		frame : true,
+		items : [ materialAddComb, {
+			xtype : "numberfield",
+			fieldLabel : "消耗",
+			id : "materialAddCost",
+			allowBlank : false,
+			width : 140
+		} ]
+	} ],
+	buttons : [
+			{
+				text : "确定",
+				handler : function() {
+
+					if (materialAddWin.findById("materialAddCost").isValid()
+							&& materialAddComb.isValid()) {
+
+						var foodID = menuStore.getAt(currRowIndex)
+								.get("foodID");
+						var cost = materialAddWin.findById("materialAddCost")
+								.getValue();
+						var materialID = materialAddComb.getValue();
+						if (materialID == materialComboData[0][1]) {
+							materialID = materialComboData[0][0];
+						}
+
+						var isDuplicate = false;
+						materialGrid.getStore().each(function(record) {
+							if (record.get("materialID") == materialID) {
+								isDuplicate = true;
+							}
+						});
+
+						if (!isDuplicate) {
+							isPrompt = false;
+							materialAddWin.hide();
+
+							Ext.Ajax.request({
+								url : "../../InsertFoodMaterial.do",
+								params : {
+									"pin" : pin,
+									"materialID" : materialID,
+									"foodID" : foodID,
+									"cost" : cost
+								},
+								success : function(response, options) {
+									var resultJSON = Ext.util.JSON
+											.decode(response.responseText);
+									if (resultJSON.success == true) {
+
+										loadFoodMaterial();
+
+										var dataInfo = resultJSON.data;
+										Ext.MessageBox.show({
+											msg : dataInfo,
+											width : 300,
+											buttons : Ext.MessageBox.OK
+										});
+									} else {
+										var dataInfo = resultJSON.data;
+										Ext.MessageBox.show({
+											msg : dataInfo,
+											width : 300,
+											buttons : Ext.MessageBox.OK
+										});
+									}
+								},
+								failure : function(response, options) {
+								}
+							});
+						} else {
+							Ext.MessageBox.show({
+								msg : "改食材已存在，不能重复添加！",
+								width : 300,
+								buttons : Ext.MessageBox.OK
+							});
+						}
+					}
+
+				}
+			}, {
+				text : "取消",
+				handler : function() {
+					isPrompt = false;
+					materialAddWin.hide();
+				}
+			} ],
+	listeners : {
+		"show" : function(thiz) {
+
+			materialAddComb.setValue(materialComboData[0][1]);
+
+			materialAddWin.findById("materialAddCost").setValue("");
+			materialAddWin.findById("materialAddCost").clearInvalid();
+
+		},
+		"hide" : function(thiz) {
+			isPrompt = false;
+		}
+	}
+});
+
+// easten panel
 var materialStore = new Ext.data.Store({
 	proxy : new Ext.data.MemoryProxy(materialData),
 	reader : new Ext.data.ArrayReader({}, [ {
@@ -1355,7 +1510,51 @@ var materialStore = new Ext.data.Store({
 
 // 2，栏位模型
 function materialDeleteHandler(rowIndex) {
+	Ext.MessageBox.show({
+		msg : "确定删除？",
+		width : 300,
+		buttons : Ext.MessageBox.YESNO,
+		fn : function(btn) {
+			if (btn == "yes") {
+				var foodID = menuStore.getAt(currRowIndex).get("foodID");
+				var materialID = materialStore.getAt(rowIndex)
+						.get("materialID");
 
+				Ext.Ajax.request({
+					url : "../../DeleteFoodMaterial.do",
+					params : {
+						"pin" : pin,
+						"foodID" : foodID,
+						"materialID" : materialID
+					},
+					success : function(response, options) {
+						var resultJSON = Ext.util.JSON
+								.decode(response.responseText);
+						if (resultJSON.success == true) {
+
+							loadFoodMaterial();
+
+							var dataInfo = resultJSON.data;
+							Ext.MessageBox.show({
+								msg : dataInfo,
+								width : 300,
+								buttons : Ext.MessageBox.OK
+							});
+						} else {
+							var dataInfo = resultJSON.data;
+							Ext.MessageBox.show({
+								msg : dataInfo,
+								width : 300,
+								buttons : Ext.MessageBox.OK
+							});
+						}
+					},
+					failure : function(response, options) {
+					}
+				});
+			}
+		}
+	});
 };
 
 function materialOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
@@ -1383,7 +1582,7 @@ var materialColumnModel = new Ext.grid.ColumnModel([
 			header : "<center>操作</center>",
 			sortable : true,
 			dataIndex : "materialOpt",
-			width : 100,
+			width : 80,
 			renderer : materialOpt
 		} ]);
 
@@ -1401,6 +1600,10 @@ var materialGrid = new Ext.grid.GridPanel({
 		tooltip : '添加食材',
 		iconCls : 'save',
 		handler : function() {
+			if (currRowIndex != -1 && !isPrompt) {
+				isPrompt = true;
+				materialAddWin.show();
+			}
 		}
 	} ],
 	listeners : {
@@ -1444,93 +1647,49 @@ Ext
 			Ext.QuickTips.init();
 
 			// ---------------------表格--------------------------
-			menuGrid = new Ext.grid.GridPanel(
-					{
-						title : "菜品",
-						xtype : "grid",
-						anchor : "99%",
-						region : "center",
-						frame : true,
-						margins : '0 5 0 0',
-						ds : menuStore,
-						cm : menuColumnModel,
-						sm : new Ext.grid.RowSelectionModel({
-							singleSelect : true
-						}),
-						viewConfig : {
-							forceFit : true
-						},
-						bbar : new Ext.PagingToolbar({
-							pageSize : dishesPageRecordCount,
-							store : menuStore,
-							displayInfo : true,
-							displayMsg : '显示第 {0} 条到 {1} 条记录，共 {2} 条',
-							emptyMsg : "没有记录"
-						}),
-						autoScroll : true,
-						loadMask : {
-							msg : "数据加载中，请稍等..."
-						},
-						listeners : {
-							"render" : function(thiz) {
-								menuStore.reload({
-									params : {
-										start : 0,
-										limit : dishesPageRecordCount
-									}
-								});
-							},
-							"rowclick" : function(thiz, rowIndex, e) {
-								currRowIndex = rowIndex;
-
-								// 關聯食材
-								var foodID = menuStore.getAt(rowIndex).get(
-										"foodID");
-
-								Ext.Ajax
-										.request({
-											url : "../../QueryFoodMaterial.do",
-											params : {
-												"pin" : pin,
-												"foodID" : foodID
-											},
-											success : function(response,
-													options) {
-												var resultJSON = Ext.util.JSON
-														.decode(response.responseText);
-												var root = resultJSON.root;
-												if (root[0].message == "normal") {
-													materialData.length = 0;
-													if (root.length == 1
-															&& root[0].materialNumber == "NO_DATA") {
-													} else {
-														for ( var i = 0; i < root.length; i++) {
-															materialData
-																	.push([
-																			root[i].materialID,
-																			root[i].materialNumber,
-																			root[i].materialName,
-																			root[i].materialCost ]);
-														}
-													}
-													materialStore.reload();
-												} else {
-													Ext.MessageBox
-															.show({
-																msg : root[0].message,
-																width : 300,
-																buttons : Ext.MessageBox.OK
-															});
-												}
-
-											},
-											failure : function(response,
-													options) {
-											}
-										});
+			menuGrid = new Ext.grid.GridPanel({
+				title : "菜品",
+				xtype : "grid",
+				anchor : "99%",
+				region : "center",
+				frame : true,
+				margins : '0 5 0 0',
+				ds : menuStore,
+				cm : menuColumnModel,
+				sm : new Ext.grid.RowSelectionModel({
+					singleSelect : true
+				}),
+				viewConfig : {
+					forceFit : true
+				},
+				bbar : new Ext.PagingToolbar({
+					pageSize : dishesPageRecordCount,
+					store : menuStore,
+					displayInfo : true,
+					displayMsg : '显示第 {0} 条到 {1} 条记录，共 {2} 条',
+					emptyMsg : "没有记录"
+				}),
+				autoScroll : true,
+				loadMask : {
+					msg : "数据加载中，请稍等..."
+				},
+				listeners : {
+					"render" : function(thiz) {
+						menuStore.reload({
+							params : {
+								start : 0,
+								limit : dishesPageRecordCount
 							}
-						}
-					});
+						});
+					},
+					"rowclick" : function(thiz, rowIndex, e) {
+						currRowIndex = rowIndex;
+						materialPanel.setTitle("食材关联 --"
+								+ menuStore.getAt(rowIndex).get("dishName"));
+						loadFoodMaterial();
+					}
+				}
+			});
 
 			// 为store配置beforeload监听器
 			menuGrid.getStore()

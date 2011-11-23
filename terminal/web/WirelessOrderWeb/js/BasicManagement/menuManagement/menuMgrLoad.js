@@ -1,4 +1,46 @@
-﻿function loadAllDishes() {
+﻿function loadAllMaterial() {
+	materialComboData = [];
+	Ext.Ajax.request({
+		url : "../../QueryMaterialMgr.do",
+		params : {
+			"pin" : pin,
+			"type" : 0,
+			"ope" : 1,
+			"value" : "",
+			"isPaging" : false
+		},
+		success : function(response, options) {
+			var resultJSON = Ext.util.JSON.decode(response.responseText);
+			// 格式：[食材ID，食材別名，食材名稱]
+			// 后台格式：[id 编号 名称 库存量 价格（￥） 预警阀值 危险阀值]
+			var rootData = resultJSON.root;
+			if (rootData.length != 0) {
+				if (rootData[0].message == "normal") {
+					for ( var i = 0; i < rootData.length; i++) {
+						materialComboData.push([ rootData[i].materialID,
+								rootData[i].materialName ]);
+					}
+					materialAddStore.loadData(materialComboData);
+				} else {
+					Ext.MessageBox.show({
+						msg : rootData[0].message,
+						width : 300,
+						buttons : Ext.MessageBox.OK
+					});
+				}
+			}
+		},
+		failure : function(response, options) {
+			Ext.MessageBox.show({
+				msg : " Unknown page error ",
+				width : 300,
+				buttons : Ext.MessageBox.OK
+			});
+		}
+	});
+}
+
+function loadAllDishes() {
 	dishMultSelectData = [];
 	Ext.Ajax.request({
 		url : "../../QueryMenu.do",
@@ -75,4 +117,5 @@ function menuMgrOnLoad() {
 	});
 
 	loadAllDishes();
+	loadAllMaterial();
 };

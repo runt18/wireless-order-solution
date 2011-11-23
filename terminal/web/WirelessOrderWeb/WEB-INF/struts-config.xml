@@ -143,6 +143,13 @@
 		<action path="/QueryFoodMaterial" type="com.wireless.Actions.menuMgr.QueryFoodMaterial"
 			scope="request">
 		</action>
+		<action path="/InsertFoodMaterial"
+			type="com.wireless.Actions.menuMgr.InsertFoodMaterialAction" scope="request">
+		</action>
+		<action path="/DeleteFoodMaterial"
+			type="com.wireless.Actions.menuMgr.DeleteFoodMaterialAction" scope="request">
+		</action>
+
 
 
 
