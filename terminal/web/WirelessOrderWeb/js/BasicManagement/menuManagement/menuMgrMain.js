@@ -1598,7 +1598,7 @@ var materialGrid = new Ext.grid.GridPanel({
 	tbar : [ {
 		text : '添加食材',
 		tooltip : '添加食材',
-		iconCls : 'save',
+		iconCls : 'add',
 		handler : function() {
 			if (currRowIndex != -1 && !isPrompt) {
 				isPrompt = true;
