@@ -1271,6 +1271,8 @@ var menuStore = new Ext.data.Store({
 		totalProperty : "totalProperty",
 		root : "root"
 	}, [ {
+		name : "foodID"
+	}, {
 		name : "dishNumber"
 	}, {
 		name : "dishName"
@@ -1339,6 +1341,8 @@ var menuColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(), {
 var materialStore = new Ext.data.Store({
 	proxy : new Ext.data.MemoryProxy(materialData),
 	reader : new Ext.data.ArrayReader({}, [ {
+		name : "materialID"
+	}, {
 		name : "materialNumber"
 	}, {
 		name : "materialName"
@@ -1350,6 +1354,15 @@ var materialStore = new Ext.data.Store({
 });
 
 // 2，栏位模型
+function materialDeleteHandler(rowIndex) {
+
+};
+
+function materialOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
+	return "<center><a href=\"javascript:materialDeleteHandler(" + rowIndex
+			+ ")\">" + "<img src='../../images/del.png'/>删除</a>" + "</center>";
+};
+
 var materialColumnModel = new Ext.grid.ColumnModel([
 		new Ext.grid.RowNumberer(), {
 			header : "编号",
@@ -1367,10 +1380,11 @@ var materialColumnModel = new Ext.grid.ColumnModel([
 			dataIndex : "materialCost",
 			width : 50
 		}, {
-			header : "操作",
+			header : "<center>操作</center>",
 			sortable : true,
 			dataIndex : "materialOpt",
-			width : 100
+			width : 100,
+			renderer : materialOpt
 		} ]);
 
 var materialGrid = new Ext.grid.GridPanel({
@@ -1382,6 +1396,13 @@ var materialGrid = new Ext.grid.GridPanel({
 	sm : new Ext.grid.RowSelectionModel({
 		singleSelect : true
 	}),
+	tbar : [ {
+		text : '添加食材',
+		tooltip : '添加食材',
+		iconCls : 'save',
+		handler : function() {
+		}
+	} ],
 	listeners : {
 	// rowclick : function(thiz, rowIndex, e) {
 	// dishOrderCurrRowIndex_ = rowIndex;
@@ -1423,51 +1444,93 @@ Ext
 			Ext.QuickTips.init();
 
 			// ---------------------表格--------------------------
-			menuGrid = new Ext.grid.GridPanel({
-				title : "菜品",
-				xtype : "grid",
-				anchor : "99%",
-				region : "center",
-				frame : true,
-				margins : '0 5 0 0',
-				ds : menuStore,
-				cm : menuColumnModel,
-				sm : new Ext.grid.RowSelectionModel({
-					singleSelect : true
-				}),
-				viewConfig : {
-					forceFit : true
-				},
-				listeners : {
-					rowclick : function(thiz, rowIndex, e) {
-						currRowIndex = rowIndex;
+			menuGrid = new Ext.grid.GridPanel(
+					{
+						title : "菜品",
+						xtype : "grid",
+						anchor : "99%",
+						region : "center",
+						frame : true,
+						margins : '0 5 0 0',
+						ds : menuStore,
+						cm : menuColumnModel,
+						sm : new Ext.grid.RowSelectionModel({
+							singleSelect : true
+						}),
+						viewConfig : {
+							forceFit : true
+						},
+						bbar : new Ext.PagingToolbar({
+							pageSize : dishesPageRecordCount,
+							store : menuStore,
+							displayInfo : true,
+							displayMsg : '显示第 {0} 条到 {1} 条记录，共 {2} 条',
+							emptyMsg : "没有记录"
+						}),
+						autoScroll : true,
+						loadMask : {
+							msg : "数据加载中，请稍等..."
+						},
+						listeners : {
+							"render" : function(thiz) {
+								menuStore.reload({
+									params : {
+										start : 0,
+										limit : dishesPageRecordCount
+									}
+								});
+							},
+							"rowclick" : function(thiz, rowIndex, e) {
+								currRowIndex = rowIndex;
 
-						// 關聯食材
+								// 關聯食材
+								var foodID = menuStore.getAt(rowIndex).get(
+										"foodID");
 
-					}
-				},
-				bbar : new Ext.PagingToolbar({
-					pageSize : dishesPageRecordCount,
-					store : menuStore,
-					displayInfo : true,
-					displayMsg : '显示第 {0} 条到 {1} 条记录，共 {2} 条',
-					emptyMsg : "没有记录"
-				}),
-				autoScroll : true,
-				loadMask : {
-					msg : "数据加载中，请稍等..."
-				},
-				listeners : {
-					"render" : function(thiz) {
-						menuStore.reload({
-							params : {
-								start : 0,
-								limit : dishesPageRecordCount
+								Ext.Ajax
+										.request({
+											url : "../../QueryFoodMaterial.do",
+											params : {
+												"pin" : pin,
+												"foodID" : foodID
+											},
+											success : function(response,
+													options) {
+												var resultJSON = Ext.util.JSON
+														.decode(response.responseText);
+												var root = resultJSON.root;
+												if (root[0].message == "normal") {
+													materialData.length = 0;
+													if (root.length == 1
+															&& root[0].materialNumber == "NO_DATA") {
+													} else {
+														for ( var i = 0; i < root.length; i++) {
+															materialData
+																	.push([
+																			root[i].materialID,
+																			root[i].materialNumber,
+																			root[i].materialName,
+																			root[i].materialCost ]);
+														}
+													}
+													materialStore.reload();
+												} else {
+													Ext.MessageBox
+															.show({
+																msg : root[0].message,
+																width : 300,
+																buttons : Ext.MessageBox.OK
+															});
+												}
+
+											},
+											failure : function(response,
+													options) {
+											}
+										});
 							}
-						});
-					}
-				}
-			});
+						}
+					});
 
 			// 为store配置beforeload监听器
 			menuGrid.getStore()

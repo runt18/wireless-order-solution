@@ -3,6 +3,7 @@ package com.wireless.Actions.inventoryMgr;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,7 +20,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Terminal;
 
-public class InventoryInAction extends Action {
+public class InventoryCheckAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -52,14 +53,18 @@ public class InventoryInAction extends Action {
 					Terminal.MODEL_STAFF);
 
 			// get the query condition
+			/*
+			 * "materialID" : material, "price" : currPrice, "amount" :
+			 * stockDiff, "staff" : staff, "type" : 7
+			 */
 
-			int supplierID = Integer.parseInt(request
-					.getParameter("supplierID"));
 			int materialID = Integer.parseInt(request
 					.getParameter("materialID"));
 			float price = Float.parseFloat(request.getParameter("price"));
-			String date = request.getParameter("date");
-			int deptID = Integer.parseInt(request.getParameter("deptID"));
+
+			SimpleDateFormat tempDate = new SimpleDateFormat("yyyy-MM-dd");
+			String date = tempDate.format(new java.util.Date());
+
 			float amount = Float.parseFloat(request.getParameter("amount"));
 			String staff = request.getParameter("staff");
 			String type = request.getParameter("type");
@@ -68,32 +73,17 @@ public class InventoryInAction extends Action {
 			String sql = "INSERT INTO "
 					+ Params.dbName
 					+ ".material_detail"
-					+ "( restaurant_id, supplier_id, material_id, price, date, dept_id, amount, type, staff ) "
-					+ " VALUES(" + term.restaurant_id + ", " + supplierID
-					+ ", " + materialID + ", " + price + ", '" + date + "', "
-					+ deptID + ", " + amount + ", " + type + ", '" + staff
-					+ "' ) ";
+					+ "( restaurant_id, material_id, price, date, amount, type, staff ) "
+					+ " VALUES(" + term.restaurant_id + ", " + materialID
+					+ ", " + price + ", '" + date + "', " + amount + ", " + type
+					+ ", '" + staff + "' ) ";
 			int sqlRowCount = dbCon.stmt.executeUpdate(sql);
 
 			// 庫存現狀
 			// 价格 = （库存量 × 价格 + 新入库数量 × 新入库价格）/ （库存量 + 新入库数量）
 			// 更新價錢
-			sql = " SELECT sum(stock) AS stock, max(price) AS price FROM "
-					+ Params.dbName + ".material_dept WHERE restaurant_id = "
-					+ term.restaurant_id + " AND material_id = " + materialID;
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			dbCon.rs.next();
-			float totalStock = dbCon.rs.getFloat("stock");
-			float thisPrice = dbCon.rs.getFloat("price");
-			dbCon.rs.close();
-
-			float allPrice = (float) Math
-					.round((totalStock * thisPrice + amount * price) * 100) / 100;
-			float allStock = (float) Math.round((totalStock + amount) * 100) / 100;
-			float newPrice = (float) Math.round((allPrice / allStock) * 100) / 100;
-	
 			sql = "UPDATE " + Params.dbName + ".material_dept"
-					+ " SET price = " + newPrice + " WHERE restaurant_id = "
+					+ " SET price = " + price + " WHERE restaurant_id = "
 					+ term.restaurant_id + " AND material_id =  " + materialID;
 			sqlRowCount = dbCon.stmt.executeUpdate(sql);
 
@@ -101,7 +91,7 @@ public class InventoryInAction extends Action {
 			sql = " SELECT stock FROM " + Params.dbName
 					+ ".material_dept WHERE restaurant_id = "
 					+ term.restaurant_id + " AND material_id = " + materialID
-					+ " AND dept_id =  " + deptID;
+					+ " AND dept_id = 0 ";
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			dbCon.rs.next();
 			float thisStock = dbCon.rs.getFloat("stock");
@@ -109,14 +99,13 @@ public class InventoryInAction extends Action {
 
 			sql = "UPDATE " + Params.dbName + ".material_dept"
 					+ " SET stock = "
-					+ (float) Math.round((thisStock + amount) * 100) / 100
+					+ (float) Math.round((thisStock - amount) * 100) / 100
 					+ " WHERE restaurant_id = " + term.restaurant_id
-					+ " AND material_id =  " + materialID + " AND dept_id =  "
-					+ deptID;
+					+ " AND material_id =  " + materialID + " AND dept_id = 0 ";
 			sqlRowCount = dbCon.stmt.executeUpdate(sql);
 
 			jsonResp = jsonResp.replace("$(result)", "true");
-			jsonResp = jsonResp.replace("$(value)", "入库成功！");
+			jsonResp = jsonResp.replace("$(value)", "盘点成功！");
 
 			dbCon.rs.close();
 

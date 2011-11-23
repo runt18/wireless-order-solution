@@ -134,8 +134,14 @@
 		<action path="/InventoryInStatDetail"
 			type="com.wireless.Actions.inventoryMgr.StatInventoryInDetail" scope="request">
 		</action>
-		<action path="/QueryCurrStock"
-			type="com.wireless.Actions.inventoryMgr.QueryCurrStock" scope="request">
+		<action path="/QueryCurrStock" type="com.wireless.Actions.inventoryMgr.QueryCurrStock"
+			scope="request">
+		</action>
+		<action path="/InventoryCheck"
+			type="com.wireless.Actions.inventoryMgr.InventoryCheckAction" scope="request">
+		</action>
+		<action path="/QueryFoodMaterial" type="com.wireless.Actions.menuMgr.QueryFoodMaterial"
+			scope="request">
 		</action>
 
 
