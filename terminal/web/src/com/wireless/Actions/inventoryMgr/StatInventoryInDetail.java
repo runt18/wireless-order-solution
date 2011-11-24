@@ -79,10 +79,12 @@ public class StatInventoryInDetail extends Action {
 			String condition = "";
 
 			if (!beginDate.equals("")) {
-				condition = condition + " AND date >= '" + beginDate + "' ";
+				condition = condition + " AND date >= '" + beginDate
+						+ " 00:00:00" + "' ";
 			}
 			if (!endDate.equals("")) {
-				condition = condition + " AND date <= '" + endDate + "' ";
+				condition = condition + " AND date <= '" + endDate
+						+ " 23:59:59" + "' ";
 			}
 
 			if (!supplier.equals("-1")) {
@@ -109,8 +111,8 @@ public class StatInventoryInDetail extends Action {
 					+ Params.dbName
 					+ ".material_detail "
 					+ " WHERE restaurant_id = "
-					+ term.restaurant_id + " AND type = 4 "
-					+ condition;
+					+ term.restaurant_id
+					+ " AND type = 4 " + condition;
 
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 
