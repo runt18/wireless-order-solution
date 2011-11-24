@@ -54,7 +54,7 @@ public class OrderFoodReflector {
 
 		sql = "SELECT C.name, D.food_id, C.food_status, D.order_sum, C.unit_price, C.order_date, "
 				+ " C.discount, C.taste, C.taste_price, D.taste_id, D.taste_id2, D.taste_id3, "
-				+ " D.hang_status, C.kitchen, D.is_temporary, D.type "
+				+ " D.hang_status, C.kitchen, D.is_temporary, D.type, D.pay_date "
 				+ " FROM (SELECT A.order_id, A.food_id, A.taste_id, A.taste_id2, A.taste_id3, A.hang_status, A.is_temporary, B.type, B.order_date AS pay_date, "
 				+ " SUM(A.order_count) AS order_sum, MAX(A.id) AS id "
 				+ " FROM "
@@ -81,7 +81,7 @@ public class OrderFoodReflector {
 			food.status = dbCon.rs.getShort("food_status");
 			food.setCount(dbCon.rs.getFloat("order_sum"));
 			food.setPrice(dbCon.rs.getFloat("unit_price"));
-			food.orderDate = dbCon.rs.getTimestamp("order_date").getTime();
+			food.orderDate = dbCon.rs.getTimestamp("pay_date").getTime();
 			food.kitchen = dbCon.rs.getShort("kitchen");
 			food.setDiscount(dbCon.rs.getFloat("discount"));
 			food.tastePref = dbCon.rs.getString("taste");
@@ -136,7 +136,7 @@ public class OrderFoodReflector {
 
 		sql = "SELECT C.name, D.food_id, C.food_status, D.order_sum, C.unit_price, C.order_date, "
 				+ " C.discount, C.taste, C.taste_price, D.taste_id, D.taste_id2, D.taste_id3, "
-				+ " C.kitchen, D.is_temporary, D.type "
+				+ " C.kitchen, D.is_temporary, D.type, D.pay_date "
 				+ " FROM (SELECT A.order_id, A.food_id, A.taste_id, A.taste_id2, A.taste_id3, A.is_temporary, B.type, B.order_date AS pay_date, "
 				+ "SUM(A.order_count) AS order_sum, MAX(A.id) AS id "
 				+ " FROM "
@@ -163,7 +163,7 @@ public class OrderFoodReflector {
 			food.status = dbCon.rs.getShort("food_status");
 			food.setCount(dbCon.rs.getFloat("order_sum"));
 			food.setPrice(dbCon.rs.getFloat("unit_price"));
-			food.orderDate = dbCon.rs.getTimestamp("order_date").getTime();
+			food.orderDate = dbCon.rs.getTimestamp("pay_date").getTime();
 			food.kitchen = dbCon.rs.getShort("kitchen");
 			food.setDiscount(dbCon.rs.getFloat("discount"));
 			food.tastePref = dbCon.rs.getString("taste");

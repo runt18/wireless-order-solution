@@ -94,7 +94,7 @@ public class KitchenStatisticsAction extends Action {
 					+ term.restaurant_id;
 
 			OrderFoodReflector foodRef = new OrderFoodReflector();
-			String orderClause = " ORDER BY C.order_date, C.kitchen ";
+			String orderClause = " ORDER BY D.pay_date, C.kitchen ";
 			OrderFood orderFoods[] = foodRef.getDetailHistory(dbCon, condition,
 					orderClause);
 
