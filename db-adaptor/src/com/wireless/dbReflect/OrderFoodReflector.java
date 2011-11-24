@@ -54,8 +54,9 @@ public class OrderFoodReflector {
 
 		sql = "SELECT C.name, D.food_id, C.food_status, D.order_sum, C.unit_price, C.order_date, "
 				+ " C.discount, C.taste, C.taste_price, D.taste_id, D.taste_id2, D.taste_id3, "
-				+ " D.hang_status, C.kitchen, D.is_temporary, D.type, D.pay_date "
-				+ " FROM (SELECT A.order_id, A.food_id, A.taste_id, A.taste_id2, A.taste_id3, A.hang_status, A.is_temporary, B.type, B.order_date AS pay_date, "
+				+ " D.hang_status, C.kitchen, D.is_temporary, D.type, D.pay_datetime, D.pay_date "
+				+ " FROM (SELECT A.order_id, A.food_id, A.taste_id, A.taste_id2, A.taste_id3, A.hang_status, A.is_temporary, "
+				+ " B.type, B.order_date AS pay_datetime, date_format(B.order_date, '%Y-%m-%d') AS pay_date, "
 				+ " SUM(A.order_count) AS order_sum, MAX(A.id) AS id "
 				+ " FROM "
 				+ Params.dbName
@@ -63,7 +64,8 @@ public class OrderFoodReflector {
 				+ Params.dbName
 				+ ".order B "
 				+ " WHERE A.order_id = B.id AND A.restaurant_id = B.restaurant_id "
-				+ " GROUP BY A.order_id, A.food_id, A.taste_id, A.taste_id2, A.taste_id3, A.hang_status,  A.is_temporary, B.type, pay_date "
+				+ " GROUP BY A.order_id, A.food_id, A.taste_id, A.taste_id2, A.taste_id3, A.hang_status,  A.is_temporary, "
+				+ " B.type, pay_datetime, pay_date "
 				+ " HAVING order_sum > 0 "
 				+ " ) AS D, "
 				+ Params.dbName
@@ -81,7 +83,7 @@ public class OrderFoodReflector {
 			food.status = dbCon.rs.getShort("food_status");
 			food.setCount(dbCon.rs.getFloat("order_sum"));
 			food.setPrice(dbCon.rs.getFloat("unit_price"));
-			food.orderDate = dbCon.rs.getTimestamp("pay_date").getTime();
+			food.orderDate = dbCon.rs.getTimestamp("pay_datetime").getTime();
 			food.kitchen = dbCon.rs.getShort("kitchen");
 			food.setDiscount(dbCon.rs.getFloat("discount"));
 			food.tastePref = dbCon.rs.getString("taste");
@@ -136,8 +138,9 @@ public class OrderFoodReflector {
 
 		sql = "SELECT C.name, D.food_id, C.food_status, D.order_sum, C.unit_price, C.order_date, "
 				+ " C.discount, C.taste, C.taste_price, D.taste_id, D.taste_id2, D.taste_id3, "
-				+ " C.kitchen, D.is_temporary, D.type, D.pay_date "
-				+ " FROM (SELECT A.order_id, A.food_id, A.taste_id, A.taste_id2, A.taste_id3, A.is_temporary, B.type, B.order_date AS pay_date, "
+				+ " C.kitchen, D.is_temporary, D.type, D.pay_datetime, D.pay_date "
+				+ " FROM (SELECT A.order_id, A.food_id, A.taste_id, A.taste_id2, A.taste_id3, A.is_temporary, "
+				+ " B.type, B.order_date AS pay_datetime, date_format(B.order_date, '%Y-%m-%d') AS pay_date, "
 				+ "SUM(A.order_count) AS order_sum, MAX(A.id) AS id "
 				+ " FROM "
 				+ Params.dbName
@@ -145,7 +148,8 @@ public class OrderFoodReflector {
 				+ Params.dbName
 				+ ".order_history B "
 				+ " WHERE A.order_id = B.id AND A.restaurant_id = B.restaurant_id "
-				+ " GROUP BY A.order_id, A.food_id, A.taste_id, A.taste_id2, A.taste_id3, A.is_temporary, B.type, pay_date "
+				+ " GROUP BY A.order_id, A.food_id, A.taste_id, A.taste_id2, A.taste_id3, A.is_temporary, "
+				+ " B.type, pay_datetime, pay_date "
 				+ " HAVING order_sum > 0 "
 				+ " ) AS D, "
 				+ Params.dbName
@@ -153,7 +157,7 @@ public class OrderFoodReflector {
 				+ " WHERE D.id = C.id "
 				+ (extraCond == null ? "" : extraCond)
 				+ orderClause;
-		
+
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		ArrayList<OrderFood> orderFoods = new ArrayList<OrderFood>();
 		while (dbCon.rs.next()) {
@@ -163,7 +167,7 @@ public class OrderFoodReflector {
 			food.status = dbCon.rs.getShort("food_status");
 			food.setCount(dbCon.rs.getFloat("order_sum"));
 			food.setPrice(dbCon.rs.getFloat("unit_price"));
-			food.orderDate = dbCon.rs.getTimestamp("pay_date").getTime();
+			food.orderDate = dbCon.rs.getTimestamp("pay_datetime").getTime();
 			food.kitchen = dbCon.rs.getShort("kitchen");
 			food.setDiscount(dbCon.rs.getFloat("discount"));
 			food.tastePref = dbCon.rs.getString("taste");
