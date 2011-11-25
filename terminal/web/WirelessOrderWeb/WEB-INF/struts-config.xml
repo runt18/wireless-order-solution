@@ -149,6 +149,10 @@
 		<action path="/DeleteFoodMaterial"
 			type="com.wireless.Actions.menuMgr.DeleteFoodMaterialAction" scope="request">
 		</action>
+		<action path="/InventoryInStatByMaterial"
+			type="com.wireless.Actions.inventoryMgr.StatInventoryInByMaterial"
+			scope="request">
+		</action>
 
 
 

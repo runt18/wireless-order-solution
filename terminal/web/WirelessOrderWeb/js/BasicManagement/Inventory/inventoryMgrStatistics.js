@@ -563,11 +563,11 @@ inventoryInStatWin = new Ext.Window(
 										"sumByMaterialInStat").getValue() == true) {
 									isPrompt = true;
 									inStatByMaterialResultWin.show();
-									
-									// ＃＃＃＃＃＃＃＃＃＃＃＃明細統計＃＃＃＃＃＃＃＃＃＃＃＃
+
+									// ＃＃＃＃＃＃＃＃＃＃＃＃按食材統計＃＃＃＃＃＃＃＃＃＃＃＃
 									Ext.Ajax
 											.request({
-												url : "../../InventoryInStatDetail.do",
+												url : "../../InventoryInStatByMaterial.do",
 												params : {
 													"pin" : pin,
 													"beginDate" : beginDate,
@@ -580,49 +580,15 @@ inventoryInStatWin = new Ext.Window(
 														options) {
 													var resultJSON = Ext.util.JSON
 															.decode(response.responseText);
-													// 格式：[食材id，日期，供應商id，經辦人，部門id，價格，數量，小計]
+
 													var rootData = resultJSON.root;
 													if (rootData[0].message == "normal") {
-														inStatDetailResultData.length = 0;
-														for ( var i = 0; i < rootData.length; i++) {
-															var materialN = "";
-															for ( var j = 0; j < materialData.length; j++) {
-																if (materialData[j][0] == rootData[i].materialID) {
-																	materialN = materialData[j][2];
-																}
-															}
-															var supplierN = "";
-															for ( var j = 0; j < supplierData.length; j++) {
-																if (supplierData[j][0] == rootData[i].supplierID) {
-																	supplierN = supplierData[j][2];
-																}
-															}
-															var deptN = "";
-															for ( var j = 0; j < departmentData.length; j++) {
-																if (departmentData[j][0] == rootData[i].departmentID) {
-																	deptN = departmentData[j][1];
-																}
-															}
 
-															inStatDetailResultData
-																	.push([
-																			rootData[i].materialID,
-																			materialN,
-																			rootData[i].date,
-																			rootData[i].supplierID,
-																			supplierN,
-																			rootData[i].operator,
-																			rootData[i].departmentID,
-																			deptN,
-																			rootData[i].price,
-																			rootData[i].amount,
-																			rootData[i].total
-
-																	]);
-														}
-
-														inStatDetailResultStore
-																.reload();
+														inStatByMaterialResultData = rootData;
+														inStatByMateriaGrid
+																.getStore()
+																.loadData(
+																		inStatByMaterialResultData);
 
 													} else {
 														Ext.MessageBox
@@ -855,151 +821,151 @@ var inStatDetailResultWin = new Ext.Window({
 
 // 结果框 -- 按食材
 // --------------------------------------------------------------------------------------------------------
-inStatByMaterialResultData = [ {
-	materialID : 100,
-	materialName : '雞肉',
-	groupID : 112,
-	groupDescr : '',
-	// price : 6,
-	amount : 150,
-	deptName : 'department',
-	sumPrice : 1000
-}, {
-	materialID : 100,
-	materialName : '雞肉',
-	groupID : 113,
-	groupDescr : '',
-	// price : 4,
-	amount : 150,
-	deptName : 'department',
-	sumPrice : 1000
-}, {
-	materialID : 100,
-	materialName : '雞肉',
-	groupID : 114,
-	groupDescr : '',
-	// price : 4,
-	amount : 150,
-	deptName : 'department',
-	sumPrice : 1000
-}, {
-	materialID : 100,
-	materialName : '雞肉',
-	groupID : 115,
-	groupDescr : '',
-	// price : 8,
-	amount : 100,
-	deptName : 'department',
-	sumPrice : 1000
-}, {
-	materialID : 101,
-	materialName : '豬肉',
-	groupID : 101,
-	groupDescr : '',
-	// price : 6,
-	amount : 100,
-	deptName : 'department',
-	sumPrice : 1000
-}, {
-	materialID : 101,
-	materialName : '豬肉',
-	groupID : 102,
-	groupDescr : '',
-	// price : 6,
-	amount : 100,
-	deptName : 'department',
-	sumPrice : 1000
-}, {
-	materialID : 101,
-	materialName : '豬肉',
-	groupID : 103,
-	groupDescr : '',
-	// price : 4,
-	amount : 100,
-	deptName : 'department',
-	sumPrice : 1000
-}, {
-	materialID : 101,
-	materialName : '豬肉',
-	groupID : 121,
-	groupDescr : '',
-	// price : 2,
-	amount : 100,
-	deptName : 'department',
-	sumPrice : 1000
-}, {
-	materialID : 101,
-	materialName : '豬肉',
-	groupID : 104,
-	groupDescr : '',
-	// price : 6,
-	amount : 100,
-	deptName : 'department',
-	sumPrice : 1000
-}, {
-	materialID : 102,
-	materialName : '醬油',
-	groupID : 105,
-	groupDescr : '',
-	// price : 4,
-	amount : 125,
-	deptName : 'department',
-	sumPrice : 1000
-}, {
-	materialID : 102,
-	materialName : '醬油',
-	groupID : 106,
-	groupDescr : '',
-	// price : 4,
-	amount : 125,
-	deptName : 'department',
-	sumPrice : 1000
-}, {
-	materialID : 102,
-	materialName : '醬油',
-	groupID : 107,
-	groupDescr : '',
-	// price : 6,
-	amount : 125,
-	deptName : 'department',
-	sumPrice : 1000
-}, {
-	materialID : 102,
-	materialName : '醬油',
-	groupID : 108,
-	groupDescr : '',
-	// price : 4,
-	amount : 125,
-	deptName : 'department',
-	sumPrice : 1000
-}, {
-	materialID : 102,
-	materialName : '醬油',
-	groupID : 109,
-	groupDescr : '',
-	// price : 4,
-	amount : 125,
-	deptName : 'department',
-	sumPrice : 1000
-}, {
-	materialID : 102,
-	materialName : '醬油',
-	groupID : 110,
-	groupDescr : '',
-	// price : 10,
-	amount : 125,
-	deptName : 'department',
-	sumPrice : 1000
-}, {
-	materialID : 102,
-	materialName : '醬油',
-	groupID : 111,
-	groupDescr : '',
-	// price : 8,
-	amount : 125,
-	deptName : 'department',
-	sumPrice : 1000
-} ];
+//inStatByMaterialResultData = [ {
+//	materialID : 100,
+//	materialName : '雞肉',
+//	groupID : 112,
+//	groupDescr : '',
+//	// price : 6,
+//	amount : 150,
+//	deptName : 'department',
+//	sumPrice : 1000
+//}, {
+//	materialID : 100,
+//	materialName : '雞肉',
+//	groupID : 113,
+//	groupDescr : '',
+//	// price : 4,
+//	amount : 150,
+//	deptName : 'department',
+//	sumPrice : 1000
+//}, {
+//	materialID : 100,
+//	materialName : '雞肉',
+//	groupID : 114,
+//	groupDescr : '',
+//	// price : 4,
+//	amount : 150,
+//	deptName : 'department',
+//	sumPrice : 1000
+//}, {
+//	materialID : 100,
+//	materialName : '雞肉',
+//	groupID : 115,
+//	groupDescr : '',
+//	// price : 8,
+//	amount : 100,
+//	deptName : 'department',
+//	sumPrice : 1000
+//}, {
+//	materialID : 101,
+//	materialName : '豬肉',
+//	groupID : 101,
+//	groupDescr : '',
+//	// price : 6,
+//	amount : 100,
+//	deptName : 'department',
+//	sumPrice : 1000
+//}, {
+//	materialID : 101,
+//	materialName : '豬肉',
+//	groupID : 102,
+//	groupDescr : '',
+//	// price : 6,
+//	amount : 100,
+//	deptName : 'department',
+//	sumPrice : 1000
+//}, {
+//	materialID : 101,
+//	materialName : '豬肉',
+//	groupID : 103,
+//	groupDescr : '',
+//	// price : 4,
+//	amount : 100,
+//	deptName : 'department',
+//	sumPrice : 1000
+//}, {
+//	materialID : 101,
+//	materialName : '豬肉',
+//	groupID : 121,
+//	groupDescr : '',
+//	// price : 2,
+//	amount : 100,
+//	deptName : 'department',
+//	sumPrice : 1000
+//}, {
+//	materialID : 101,
+//	materialName : '豬肉',
+//	groupID : 104,
+//	groupDescr : '',
+//	// price : 6,
+//	amount : 100,
+//	deptName : 'department',
+//	sumPrice : 1000
+//}, {
+//	materialID : 102,
+//	materialName : '醬油',
+//	groupID : 105,
+//	groupDescr : '',
+//	// price : 4,
+//	amount : 125,
+//	deptName : 'department',
+//	sumPrice : 1000
+//}, {
+//	materialID : 102,
+//	materialName : '醬油',
+//	groupID : 106,
+//	groupDescr : '',
+//	// price : 4,
+//	amount : 125,
+//	deptName : 'department',
+//	sumPrice : 1000
+//}, {
+//	materialID : 102,
+//	materialName : '醬油',
+//	groupID : 107,
+//	groupDescr : '',
+//	// price : 6,
+//	amount : 125,
+//	deptName : 'department',
+//	sumPrice : 1000
+//}, {
+//	materialID : 102,
+//	materialName : '醬油',
+//	groupID : 108,
+//	groupDescr : '',
+//	// price : 4,
+//	amount : 125,
+//	deptName : 'department',
+//	sumPrice : 1000
+//}, {
+//	materialID : 102,
+//	materialName : '醬油',
+//	groupID : 109,
+//	groupDescr : '',
+//	// price : 4,
+//	amount : 125,
+//	deptName : 'department',
+//	sumPrice : 1000
+//}, {
+//	materialID : 102,
+//	materialName : '醬油',
+//	groupID : 110,
+//	groupDescr : '',
+//	// price : 10,
+//	amount : 125,
+//	deptName : 'department',
+//	sumPrice : 1000
+//}, {
+//	materialID : 102,
+//	materialName : '醬油',
+//	groupID : 111,
+//	groupDescr : '',
+//	// price : 8,
+//	amount : 125,
+//	deptName : 'department',
+//	sumPrice : 1000
+//} ];
 
 var inStatByMateriaReader = new Ext.data.JsonReader({
 	idProperty : 'groupID',
@@ -1025,6 +991,8 @@ var inStatByMateriaReader = new Ext.data.JsonReader({
 		name : 'sumPrice',
 		type : 'float'
 	}, {
+		name : 'deptID'
+	}, {
 		name : 'deptName',
 		type : 'string'
 	} ]
@@ -1041,7 +1009,7 @@ var inStatByMateriaSummary = new Ext.grid.GroupSummary();
 var inStatByMateriaGrid = new Ext.grid.EditorGridPanel({
 	ds : new Ext.data.GroupingStore({
 		reader : inStatByMateriaReader,
-		data : inStatByMaterialResultData,
+		data : [],
 		sortInfo : {
 			field : 'deptName',
 			direction : "ASC"
