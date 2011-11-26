@@ -136,9 +136,9 @@ android:layout_centerHorizontal="true"
   <RelativeLayout 
 android:id="@+id/bottom"
 android:layout_width="fill_parent"
-android:layout_height="50dip"
+android:layout_height="40dip"
 android:layout_alignParentBottom="true"
-android:background="@drawable/titlebg"
+android:background="@drawable/foot_bg"
 >
 <ImageView 
 android:id="@+id/normal"
@@ -240,15 +240,15 @@ android:layout_centerVertical="true"
   
 
 
- <ListView
-   android:id="@+id/mybillListView"  
+ <com.wireless.ui.view.BillFoodListView
+   android:id="@+id/billListView"  
    android:layout_width="fill_parent" 
    android:layout_height="wrap_content"
    android:layout_below="@id/t_line"
    android:layout_above="@id/myline"
    android:divider="@drawable/table_line"
    android:cacheColorHint="#00000000">
-   </ListView> 
+   </com.wireless.ui.view.BillFoodListView> 
 
 </RelativeLayout>
 

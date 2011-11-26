@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -37,47 +38,23 @@ import com.wireless.protocol.RespParser;
 import com.wireless.protocol.Type;
 import com.wireless.protocol.Util;
 import com.wireless.sccon.ServerConnector;
+import com.wireless.ui.view.BillFoodListView;
 
 
 public class BillActivity extends Activity {
 	
-private static final String KEY_TABLE_ID = "TableAmount";	
-private AppContext appContext;
-private TextView valueplatform;
-private TextView valuepeople;
-private ListView mybillListView;
-private TextView valuehandsel;
-private TextView valueconfirmed;
-private ImageView normal;
-private ImageView allowance;
-private ImageView billback;
-private Order order;
-private String plateForm;
-private List<OrderFood> foods;
-private static final int ORDER_MESSAGE=1;
-
+	private static final String KEY_TABLE_ID = "TableAmount";	
+	private static final int ORDER_MESSAGE = 1;
+	private Order _order;
+	private String _plateForm;
+  
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.bill);
 		
-		plateForm=getIntent().getExtras().getString(KEY_TABLE_ID);
-		appContext=(AppContext) getApplication();
-		appContext.activityList.add(BillActivity.this);
-		
-		valueplatform=(TextView)findViewById(R.id.valueplatform);
-		valuepeople=(TextView)findViewById(R.id.valuepeople);
-		mybillListView=(ListView)findViewById(R.id.mybillListView);
-		valuehandsel=(TextView)findViewById(R.id.valuehandsel);
-		valueconfirmed=(TextView)findViewById(R.id.valueconfirmed);
-		normal=(ImageView)findViewById(R.id.normal);
-		allowance=(ImageView)findViewById(R.id.allowance);
-		billback=(ImageView)findViewById(R.id.billback);
-		
-		billback.setOnClickListener(new onlistener());
-		normal.setOnClickListener(new onlistener());
-		allowance.setOnClickListener(new onlistener());
+		_plateForm = getIntent().getExtras().getString(KEY_TABLE_ID);
 		
 		if(Common.getCommon().isNetworkAvailable(BillActivity.this)){
 		    new orderbill().execute();
@@ -88,17 +65,20 @@ private static final int ORDER_MESSAGE=1;
 	}
    
 	 /*
-	  * 赋值方法
+	  * 初始化方法
 	  * */
 	public void init(){
-		foods=new ArrayList<OrderFood>();
-		foods=Arrays.asList(order.foods);
-		BillAdapter adapter=new BillAdapter(BillActivity.this,foods);
-		valueplatform.setText(String.valueOf(order.table_id));
-		valuepeople.setText(String.valueOf(order.custom_num));
-		mybillListView.setAdapter(adapter);
-		valuehandsel.setText(Util.CURRENCY_SIGN+Float.toString(order.calcGiftPrice()));
-		valueconfirmed.setText(Util.CURRENCY_SIGN+Float.toString(order.calcPrice2()));
+	
+		((TextView)findViewById(R.id.valueplatform)).setText(String.valueOf(_order.table_id));
+		((TextView)findViewById(R.id.valuepeople)).setText(String.valueOf(_order.custom_num));
+		((TextView)findViewById(R.id.valuehandsel)).setText(Util.CURRENCY_SIGN+Float.toString(_order.calcGiftPrice()));
+		((TextView)findViewById(R.id.valueconfirmed)).setText(Util.CURRENCY_SIGN+Float.toString(_order.calcPrice2()));
+		
+		
+		((ImageView)findViewById(R.id.billback)).setOnClickListener(new onlistener());
+		((ImageView)findViewById(R.id.normal)).setOnClickListener(new onlistener());
+		((ImageView)findViewById(R.id.allowance)).setOnClickListener(new onlistener());
+		((BillFoodListView)findViewById(R.id.billListView)).notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(_order.foods)));
 	}
 	
 	
@@ -216,7 +196,7 @@ private static final int ORDER_MESSAGE=1;
 			}else{
 				new AlertDialog.Builder(BillActivity.this)
 				.setTitle("提示")
-				.setMessage(order.table_id + "号台结帐成功")
+				.setMessage(_order.table_id + "号台结帐成功")
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						finish();
@@ -247,16 +227,16 @@ private static final int ORDER_MESSAGE=1;
 	     String err=null;	
 	     try{
  			//根据tableID请求数据
- 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryOrder(Short.valueOf(plateForm)));
+ 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryOrder(Short.valueOf(_plateForm)));
  			if(resp.header.type == Type.ACK) {
  				//解释的数据请参考com.wireless.util.RespParser2.java
- 			    order = RespParser.parseQueryOrder(resp, AppContext.getFoodMenu());
+ 			    _order = RespParser.parseQueryOrder(resp, AppContext.getFoodMenu());
  			    
  			}else{
  				if(resp.header.reserved == ErrorCode.TABLE_IDLE) {
- 					err=plateForm+"号台还未下单";
+ 					err=_plateForm+"号台还未下单";
  				}else if(resp.header.reserved == ErrorCode.TABLE_NOT_EXIST) {
- 					err=plateForm+"号台信息不存在";
+ 					err=_plateForm+"号台信息不存在";
  				}else if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
  					err="终端没有登记到餐厅，请联系管理人员。";
  				}else if(resp.header.reserved == ErrorCode.TERMINAL_EXPIRED) {
@@ -275,7 +255,6 @@ private static final int ORDER_MESSAGE=1;
 		protected void onPostExecute(String err) {
 			// TODO Auto-generated method stub
 			_progDialog.dismiss();
-			handler.sendEmptyMessage(ORDER_MESSAGE);
 			if(err!=null){
 				new AlertDialog.Builder(BillActivity.this)
 				.setTitle("提示")
@@ -285,6 +264,8 @@ private static final int ORDER_MESSAGE=1;
 						finish();
 					}
 				}).show();
+			}else{
+				handler.sendEmptyMessage(ORDER_MESSAGE);
 			}
 			
 		}
@@ -293,7 +274,7 @@ private static final int ORDER_MESSAGE=1;
 	/*
 	 * 請求完服务器后操作界面
 	 * */
-   private Handler handler=new Handler(){
+   private Handler handler = new Handler(){
 		public void handleMessage(Message message){
 			switch (message.what) {
 			
@@ -301,11 +282,10 @@ private static final int ORDER_MESSAGE=1;
 				init();
 				break;
 
-			default:
-				break;
 			}
 		}
 	};
+	
 	
 	@Override
 	protected Dialog onCreateDialog(int dialogID){
@@ -318,6 +298,8 @@ private static final int ORDER_MESSAGE=1;
 			return null;
 		}
 	}
+	
+	
 	/*弹出的alertDialog
 	 * 
 	 * */
@@ -335,16 +317,16 @@ private static final int ORDER_MESSAGE=1;
 				@Override
 				public void onClick(View v) {
 					// TODO Auto-generated method stub
-					order.pay_type=Order.PAY_NORMAL;
-					order.pay_manner=Order.MANNER_CASH;
+					_order.pay_type=Order.PAY_NORMAL;
+					_order.pay_manner=Order.MANNER_CASH;
 					if(num==1){
-						order.discount_type=Order.DISCOUNT_1;
+						_order.discount_type=Order.DISCOUNT_1;
 					}else{
-						order.discount_type=Order.DISCOUNT_2;
+						_order.discount_type=Order.DISCOUNT_2;
 					}
 					Alertdialog.this.cancel();
 					if(Common.getCommon().isNetworkAvailable(BillActivity.this)){
-						new ordertoPay(order).execute();
+						new ordertoPay(_order).execute();
 					}else{
 						shownet();
 					}
@@ -358,16 +340,16 @@ private static final int ORDER_MESSAGE=1;
 				@Override
 				public void onClick(View v) {
 					// TODO Auto-generated method stub
-					order.pay_type=Order.PAY_NORMAL;
-					order.pay_manner=Order.MANNER_CREDIT_CARD;
+					_order.pay_type=Order.PAY_NORMAL;
+					_order.pay_manner=Order.MANNER_CREDIT_CARD;
 					if(num==1){
-						order.discount_type=Order.DISCOUNT_1;
+						_order.discount_type=Order.DISCOUNT_1;
 					}else{
-						order.discount_type=Order.DISCOUNT_2;
+						_order.discount_type=Order.DISCOUNT_2;
 					}
 					Alertdialog.this.cancel();
 					if(Common.getCommon().isNetworkAvailable(BillActivity.this)){
-						new ordertoPay(order).execute();
+						new ordertoPay(_order).execute();
 					}else{
 						shownet();
 					}
