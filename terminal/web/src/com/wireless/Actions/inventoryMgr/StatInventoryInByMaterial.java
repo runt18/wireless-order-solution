@@ -69,7 +69,7 @@ public class StatInventoryInByMaterial extends Action {
 			String endDate = request.getParameter("endDate");
 			String supplier = request.getParameter("supplier");
 			String departments = request.getParameter("departments");
-			String materials = request.getParameter("selectMaterials");
+			String materials = request.getParameter("materials");
 
 			String condition = "";
 
