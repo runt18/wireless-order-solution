@@ -143,8 +143,7 @@ public class QueryMenuMgrAction extends Action {
 			// 格式：[编号，名称，拼音，价格，厨房，特价，推荐，停售，赠送]
 			for (int i = 0; i < foods.length; i++) {
 				HashMap resultMap = new HashMap();
-				resultMap.put("foodID",
-						new Integer(foods[i].alias_id).toString());
+				resultMap.put("foodID", new Long(foods[i].food_id).toString());
 				resultMap.put("dishNumber",
 						new Integer(foods[i].alias_id).toString());
 				resultMap.put("dishName", foods[i].name);
