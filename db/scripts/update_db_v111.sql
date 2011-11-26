@@ -17,16 +17,17 @@ DROP TABLE `wireless_order_db`.`order_food_material`;
 DROP TABLE `wireless_order_db`.`order_food_material_history`;
 
 -- -----------------------------------------------------
--- Recreate table 'food_material'
+-- Table `wireless_order_db`.`food_material`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `wireless_order_db`.`food_material` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food_material` (
   `restaurant_id` INT UNSIGNED NOT NULL ,
-  `material_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the material alias id' ,
-  `food_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the food alias id' ,
+  `material_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the material id' ,
+  `food_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the food id' ,
   `consumption` FLOAT NOT NULL DEFAULT 0 COMMENT 'the consumption between the food and the material' ,
   INDEX `fk_food_material_restaurant` (`restaurant_id` ASC) ,
+  PRIMARY KEY (`restaurant_id`, `material_id`, `food_id`) ,
   CONSTRAINT `fk_food_material_restaurant1`
     FOREIGN KEY (`restaurant_id` )
     REFERENCES `wireless_order_db`.`restaurant` (`id` )
@@ -73,6 +74,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`material_dept` (
   `price` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the price to this material' ,
   `stock` FLOAT NOT NULL DEFAULT 0 COMMENT 'the stock to this material' ,
   INDEX `fk_material_dept_restaurant1` (`restaurant_id` ASC) ,
+  PRIMARY KEY (`restaurant_id`, `material_id`, `dept_id`) ,
   CONSTRAINT `fk_material_dept_restaurant1`
     FOREIGN KEY (`restaurant_id` )
     REFERENCES `wireless_order_db`.`restaurant` (`id` )
