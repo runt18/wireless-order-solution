@@ -3,8 +3,6 @@ package com.wireless.Actions.inventoryMgr;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +25,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Terminal;
 
-public class StatInventoryInByMaterial extends Action {
+public class StatInventoryInByDept extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -96,9 +94,6 @@ public class StatInventoryInByMaterial extends Action {
 					+ ") ";
 
 			/*
-			 * materialID : 100, materialName : '雞肉', groupID : 112, groupDescr
-			 * : '', // price : 6, amount : 150, deptName : 'department',
-			 * sumPrice : 1000
 			 */
 
 			String sql = " SELECT a.material_id, a.dept_id, b.name as material_name, c.name as dept_name, "
@@ -116,8 +111,8 @@ public class StatInventoryInByMaterial extends Action {
 					+ " AND a.restaurant_id = c.restaurant_id AND a.dept_id = c.dept_id "
 					+ " AND a.type = 4 "
 					+ condition
-					+ " GROUP BY a.material_id, material_name, a.dept_id, dept_name "
-					+ " ORDER BY a.material_id, a.dept_id ";
+					+ " GROUP BY a.dept_id, dept_name, a.material_id, material_name "
+					+ " ORDER BY a.dept_id, a.material_id ";
 
 			System.out.println(sql);
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -129,13 +124,13 @@ public class StatInventoryInByMaterial extends Action {
 			while (dbCon.rs.next()) {
 
 				HashMap resultMap = new HashMap();
+				resultMap.put("deptID", dbCon.rs.getInt("dept_id"));
+				resultMap.put("deptName", dbCon.rs.getString("dept_name"));
+				resultMap.put("groupID", groupID);
+				resultMap.put("groupDescr", "");
 				resultMap.put("materialID", dbCon.rs.getInt("material_id"));
 				resultMap.put("materialName",
 						dbCon.rs.getString("material_name"));
-				resultMap.put("groupID", groupID);
-				resultMap.put("groupDescr", "");
-				resultMap.put("deptID", dbCon.rs.getInt("dept_id"));
-				resultMap.put("deptName", dbCon.rs.getString("dept_name"));
 				resultMap.put("amount", dbCon.rs.getFloat("amount"));
 				resultMap.put("sumPrice", dbCon.rs.getFloat("total_price"));
 

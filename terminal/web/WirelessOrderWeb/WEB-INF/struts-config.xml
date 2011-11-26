@@ -153,7 +153,13 @@
 			type="com.wireless.Actions.inventoryMgr.StatInventoryInByMaterial"
 			scope="request">
 		</action>
-
+		<action path="/InventoryInStatByDept"
+			type="com.wireless.Actions.inventoryMgr.StatInventoryInByDept" scope="request">
+		</action>
+		<action path="/InventoryInStatBySupplier"
+			type="com.wireless.Actions.inventoryMgr.StatInventoryInBySupplier"
+			scope="request">
+		</action>
 
 
 
