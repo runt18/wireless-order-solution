@@ -1,11 +1,18 @@
 package com.wireless.db;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Iterator;
 
+import com.wireless.dbObject.FoodMaterial;
+import com.wireless.dbObject.Material;
+import com.wireless.dbObject.MaterialDetail;
+import com.wireless.dbReflect.OrderFoodReflector;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Member;
 import com.wireless.protocol.Order;
+import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 
@@ -177,6 +184,68 @@ public class PayOrder {
 		}
 		dbCon.stmt.executeBatch();
 			
+		//get the food details to this order
+		OrderFood[] foods = OrderFoodReflector.getDetailToday(dbCon, " AND C.order_id=" + orderInfo.id, "");
+		for(int i = 0; i < foods.length; i++){
+			//get each material consumption to every food
+			sql = "SELECT consumption, material_id FROM " +
+					Params.dbName + ".food_material WHERE " +
+					"food_id=" +
+					"(SELECT id FROM " + 
+					Params.dbName +
+					".food WHERE alias_id=" + foods[i].alias_id +
+					" AND restaurant_id="+ orderInfo.restaurant_id + ")"; 
+			
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			
+			ArrayList<FoodMaterial> foodMaterials = new ArrayList<FoodMaterial>();
+			while(dbCon.rs.next()){				
+				foodMaterials.add(new FoodMaterial(foods[i],
+												   new Material(dbCon.rs.getLong("material_id")),
+												   dbCon.rs.getFloat("consumption")));
+			}
+			
+			//calculate the 库存对冲 and insert the record to material_detail
+			Iterator<FoodMaterial> iter = foodMaterials.iterator();
+			while(iter.hasNext()){
+				dbCon.stmt.clearBatch();
+				FoodMaterial foodMaterial = iter.next();
+				//calculate the 库存对冲
+				float amount = (float)Math.round(foodMaterial.food.getCount().floatValue() * foodMaterial.consumption * 100) /100;
+				
+				//insert the corresponding detail record to material_detail
+				sql = "INSERT INTO " + Params.dbName + ".material_detail (" + 
+					  "restaurant_id, material_id, price, date, staff, dept_id, amount, type) VALUES(" +
+					  orderInfo.restaurant_id + ", " +				//restaurant_id
+					  foodMaterial.material.materialID + ", " +		//material_id
+					  "(SELECT price FROM " + Params.dbName + ".material_dept WHERE restaurant_id=" + 
+					  orderInfo.restaurant_id + 
+					  " AND material_id=" + foodMaterial.material.materialID + 	
+					  " AND dept_id=0), " +	//price
+					  "NOW(), " +			//date
+					  "(SELECT owner_name FROM " + Params.dbName + 
+					  ".terminal WHERE pin=" + "0x" + Integer.toHexString(pin) + " AND model_id=" + model + "), " +	//staff
+					  "(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + 
+					  orderInfo.restaurant_id + " AND alias_id=" + foodMaterial.food.kitchen + "), " +				//dept_id
+					  amount + ", " + 				//amount
+					  MaterialDetail.TYPE_CONSUME + //type
+					  ")";
+				dbCon.stmt.addBatch(sql);
+				
+				//update the stock of material_dept to this material
+				sql = "UPDATE " + Params.dbName + ".material_dept SET " +
+					  "stock = stock - " + amount +
+					  " WHERE restaurant_id=" + orderInfo.restaurant_id + 
+					  " AND material_id=" + foodMaterial.material.materialID +
+					  " AND dept_id=" + "(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + 
+					  orderInfo.restaurant_id + " AND alias_id=" + foodMaterial.food.kitchen + ")";
+				dbCon.stmt.addBatch(sql);
+			}
+			
+			dbCon.stmt.executeBatch();
+			
+		}
+		
 		return orderInfo;
 
 	}
