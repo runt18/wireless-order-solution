@@ -172,12 +172,13 @@ public class QueryMenu {
 	private static Food[] queryFoods(DBCon dbCon, int restaurantID, String extraCondition) throws SQLException{
 		ArrayList<Food> foods = new ArrayList<Food>();
         //get all the food information to this restaurant
-		String sql = "SELECT alias_id, name, unit_price, kitchen, status, pinyin FROM " + 
+		String sql = "SELECT id, alias_id, name, unit_price, kitchen, status, pinyin FROM " + 
 					 Params.dbName + ".food WHERE restaurant_id=" + restaurantID +
 					 (extraCondition == null ? "" : extraCondition); 
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
-			Food food = new Food(dbCon.rs.getInt("alias_id"),
+			Food food = new Food(dbCon.rs.getLong("id"),
+								 dbCon.rs.getInt("alias_id"),
 								 dbCon.rs.getString("name"),
 								 new Float(dbCon.rs.getFloat("unit_price")),
 								 dbCon.rs.getShort("kitchen"),
