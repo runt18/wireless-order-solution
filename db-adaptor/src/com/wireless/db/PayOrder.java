@@ -203,7 +203,8 @@ public class PayOrder {
 				foodMaterials.add(new FoodMaterial(foods[i],
 												   new Material(dbCon.rs.getLong("material_id")),
 												   dbCon.rs.getFloat("consumption")));
-			}
+			}			
+			dbCon.rs.close();
 			
 			//calculate the 库存对冲 and insert the record to material_detail
 			Iterator<FoodMaterial> iter = foodMaterials.iterator();

@@ -1,42 +1,75 @@
 package com.wireless.dbObject;
 
-import com.wireless.protocol.Util;
-
 public class MaterialDetail{
-	public int restaurantID;
+	private int restaurantID;
 	
-	int price;
+	private float price;
 	
-	public void setPrice(Float _price){
-		price = Util.float2Int(_price);
-	}
+	private long date;
 	
-	public Float getPrice(){
-		return Util.int2Float(price);
-	}
+	private String staff;
 	
-	public long date;
+	private float amount;
 	
-	public String staff;
-	
-	int amount;
-	
-	public void setAmount(Float _amount){
-		amount = Util.float2Int(_amount);
-	}
-	
-	public Float getAmount(){
-		return Util.int2Float(amount);
-	}
+	private int type = TYPE_CONSUME;
 	
 	public final static int TYPE_CONSUME = 0;	//消耗
 	public final static int TYPE_WEAR = 1;		//报损
 	public final static int TYPE_SELL = 2;		//销售
 	public final static int TYPE_RETURN = 3;	//退货
-	public final static int TYPE_INCOME = 4;	//入库
-	public final static int TYPE_OUT = 5;		//调出
-	public final static int TYPE_IN = 6;		//调入
-	public final static int TYPE_CHECK = 7;		//盘点
-	public int type = TYPE_CONSUME;
+	public final static int TYPE_OUT_WARE = 4;	//出仓
+	public final static int TYPE_INCOME = 5;	//入库
+	public final static int TYPE_OUT = 6;		//调出
+	public final static int TYPE_IN = 7;		//调入
+	public final static int TYPE_CHECK = 8;		//盘点
+	
+	public int getRestaurantID() {
+		return restaurantID;
+	}
+
+	public void setRestaurantID(int restaurantID) {
+		this.restaurantID = restaurantID;
+	}
+
+	public float getPrice() {
+		return price;
+	}
+
+	public void setPrice(float price) {
+		this.price = price;
+	}
+
+	public long getDate() {
+		return date;
+	}
+
+	public void setDate(long date) {
+		this.date = date;
+	}
+
+	public String getStaff() {
+		return staff;
+	}
+
+	public void setStaff(String staff) {
+		this.staff = staff;
+	}
+
+	public float getAmount() {
+		return amount;
+	}
+
+	public void setAmount(float amount) {
+		this.amount = amount;
+	}
+
+	public int getType() {
+		return type;
+	}
+
+	public void setType(int type) {
+		this.type = type;
+	}
+
 	
 }
