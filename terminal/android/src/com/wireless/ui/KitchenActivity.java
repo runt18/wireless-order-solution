@@ -53,7 +53,7 @@ public class KitchenActivity extends Activity {
 		Spinner01=(TextView)findViewById(R.id.Spinner01);
 		Spinner01.setText("³ø·¿");
 		searchpin=(EditText)findViewById(R.id.filterKitchenEdtTxt);
-		sp=(RelativeLayout)findViewById(R.id.sp);
+		sp=(RelativeLayout)findViewById(R.id.filterKitchenRelaLayout);
 		
 		searchpin.addTextChangedListener(watcher);
 		ketback = (ImageView) findViewById(R.id.ketback);

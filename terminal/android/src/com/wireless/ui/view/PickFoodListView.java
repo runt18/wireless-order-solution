@@ -41,6 +41,14 @@ public class PickFoodListView extends ListView {
 	}
 	
 	/**
+	 * 取得ListView的数据源
+	 * @return
+	 */
+	public Food[] getSourceData(){
+		return _foods;
+	}
+	
+	/**
 	 * 
 	 * @param foods
 	 */

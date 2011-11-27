@@ -514,10 +514,10 @@ public void setKient(KitchenActivity kient) {
 	public void showkichent(Context context,final List<SKitchen> perant,final List<List<Kitchen>> child){
 		
 	final AlertDialog.Builder mydialog=new  AlertDialog.Builder(context);
-		View view=LayoutInflater.from(context).inflate(R.layout.expandablelistview, null);
+		View view=LayoutInflater.from(context).inflate(R.layout.expander_list_view, null);
 		mydialog.setTitle("ÇëÑ¡Ôñ³ø·¿");
 		mydialog.setView(view);
-		ExpandableListView mylistview=(ExpandableListView)view.findViewById(R.id.myExpandableListView);
+		ExpandableListView mylistview=(ExpandableListView)view.findViewById(R.id.kitchenSelectLstView);
 		
 		ExpandlistAdapter adapter=new ExpandlistAdapter(context,perant,child);
 		mylistview.setAdapter(adapter);

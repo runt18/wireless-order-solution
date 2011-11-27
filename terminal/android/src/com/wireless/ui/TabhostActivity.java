@@ -1,8 +1,12 @@
 package com.wireless.ui;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 
+import android.app.Dialog;
 import android.app.TabActivity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,8 +14,13 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseExpandableListAdapter;
 import android.widget.EditText;
+import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabHost.TabSpec;
@@ -21,8 +30,10 @@ import android.widget.Toast;
 import com.wireless.common.OrderParcel;
 import com.wireless.common.WirelessOrder;
 import com.wireless.protocol.Food;
+import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.SKitchen;
 import com.wireless.protocol.Util;
 import com.wireless.ui.view.PickFoodListView;
 
@@ -212,27 +223,29 @@ public class TabhostActivity extends TabActivity implements PickFoodListView.OnF
 	 */
 	private void setupKitchenView(){
 		final PickFoodListView pickLstView = (PickFoodListView)findViewById(R.id.pickByKitchenLstView);
+		RelativeLayout filterKitchen = (RelativeLayout)findViewById(R.id.filterKitchenRelaLayout);
 		EditText filterKitEdtTxt = (EditText)findViewById(R.id.filterKitchenEdtTxt);
 		pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods);
 		pickLstView.setFoodPickedListener(this);
 		/**
-		 * 按分厨进行菜品的筛选
+		 * 在分厨选择页面中按编号进行菜品的筛选
 		 */
 		filterKitEdtTxt.addTextChangedListener(new TextWatcher() {
 			
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				if(s.toString().length() != 0){
+					Food[] foods = pickLstView.getSourceData();
 					ArrayList<Food> filterFoods = new ArrayList<Food>();
-					for(int i = 0; i < WirelessOrder.foodMenu.foods.length; i++){
-						if(String.valueOf(WirelessOrder.foodMenu.foods[i].alias_id).startsWith(s.toString().trim())){
-							filterFoods.add(WirelessOrder.foodMenu.foods[i]);
+					for(int i = 0; i < foods.length; i++){
+						if(String.valueOf(foods[i].alias_id).startsWith(s.toString().trim())){
+							filterFoods.add(foods[i]);
 						}
 					}
 					pickLstView.notifyDataChanged(filterFoods.toArray(new Food[filterFoods.size()]));
 					
 				}else{
-					pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods);
+					pickLstView.notifyDataChanged(pickLstView.getSourceData());
 				}
 			}
 			
@@ -241,6 +254,16 @@ public class TabhostActivity extends TabActivity implements PickFoodListView.OnF
 			
 			@Override
 			public void afterTextChanged(Editable s) {}
+		});
+		
+		/**
+		 * 弹出厨房选择页面并筛选出相应的菜品
+		 */
+		filterKitchen.setOnClickListener(new View.OnClickListener() {			
+			@Override
+			public void onClick(View arg0) {
+				new KitchenSelectDialog(pickLstView).show();
+			}
 		});
 	}
 	
@@ -283,6 +306,187 @@ public class TabhostActivity extends TabActivity implements PickFoodListView.OnF
 			@Override
 			public void afterTextChanged(Editable s) {}
 		});
+	}
+	
+	/**
+	 * 分厨页面中厨房选择的Dialog
+	 */
+	private class KitchenSelectDialog extends Dialog{
+
+		private List<SKitchen> _deptParent;
+		private List<List<Kitchen>> _kitchenChild;
+		
+		KitchenSelectDialog(final PickFoodListView foodLstView) {
+			super(TabhostActivity.this, R.style.FullHeightDialog);
+			
+			/**
+			 * 将所有菜品进行按厨房编号进行排序
+			 */
+			Food[] tmpFoods = new Food[WirelessOrder.foodMenu.foods.length];
+			System.arraycopy(WirelessOrder.foodMenu.foods, 0, tmpFoods, 0, WirelessOrder.foodMenu.foods.length);
+			Arrays.sort(tmpFoods, new Comparator<Food>(){
+				@Override
+				public int compare(Food food1, Food food2) {
+					if(food1.kitchen > food2.kitchen){
+						return 1;
+					}else if(food1.kitchen < food2.kitchen){
+						return -1;
+					}else{
+						return 0;
+					}
+				}				
+			});
+			
+			/**
+			 * 使用二分查找算法筛选出有菜品的厨房
+			 */
+			ArrayList<Kitchen> validKitchens = new ArrayList<Kitchen>();
+			for(int i = 0; i < WirelessOrder.foodMenu.kitchens.length; i++){
+				Food keyFood = new Food();
+				keyFood.kitchen = WirelessOrder.foodMenu.kitchens[i].alias_id;
+				int index = Arrays.binarySearch(tmpFoods, keyFood, new Comparator<Food>(){
+
+					public int compare(Food food1, Food food2) {
+						if(food1.kitchen > food2.kitchen){
+							return 1;
+						}else if(food1.kitchen < food2.kitchen){
+							return -1;
+						}else{
+							return 0;
+						}
+					}
+				});
+				
+				if(index >= 0){
+					validKitchens.add(WirelessOrder.foodMenu.kitchens[i]);
+				}
+			}
+			
+			/**
+			 * 筛选出有菜品的部门
+			 */
+			_deptParent = new ArrayList<SKitchen>();
+			for(int i = 0; i < WirelessOrder.foodMenu.sKitchens.length; i++){
+				for(int j = 0; j < validKitchens.size(); j++){
+					if(WirelessOrder.foodMenu.sKitchens[i].alias_id == validKitchens.get(j).skitchen_id){
+						_deptParent.add(WirelessOrder.foodMenu.sKitchens[i]);
+						break;
+					}
+				}
+			}
+			
+			/**
+			 * 筛选出部门中有菜品的厨房
+			 */
+			_kitchenChild = new ArrayList<List<Kitchen>>();
+			for(int i = 0; i < _deptParent.size(); i++){
+				List<Kitchen> kitchens = new ArrayList<Kitchen>();
+				for(int j = 0; j < validKitchens.size(); j++){
+					if(validKitchens.get(j).skitchen_id == _deptParent.get(i).alias_id) {
+						kitchens.add(validKitchens.get(j));
+					}
+				}
+				_kitchenChild.add(kitchens);
+			}
+			
+			setContentView(R.layout.expander_list_view);
+			setTitle("请选择厨房");
+			ExpandableListView kitchenLstView = (ExpandableListView)findViewById(R.id.kitchenSelectLstView);
+			kitchenLstView.setGroupIndicator(getResources().getDrawable(R.layout.expander_folder));
+			
+			//设置ListView的Adaptor
+			kitchenLstView.setAdapter(new BaseExpandableListAdapter() {
+				
+				@Override
+				public int getGroupCount() {
+					return _deptParent.size();
+				}
+
+				@Override
+				public int getChildrenCount(int groupPosition) {
+					return _kitchenChild.get(groupPosition).size();
+				}
+
+				@Override
+				public Object getGroup(int groupPosition) {
+					return _deptParent.get(groupPosition);
+				}
+
+				@Override
+				public Object getChild(int groupPosition, int childPosition) {
+					return _kitchenChild.get(groupPosition).get(childPosition);
+				}
+
+				@Override
+				public long getGroupId(int groupPosition) {
+					return groupPosition;
+				}
+
+				@Override
+				public long getChildId(int groupPosition, int childPosition) {
+					return childPosition;
+				}
+
+				@Override
+				public boolean hasStableIds() {
+					return false;
+				}
+
+				@Override
+				public View getGroupView(int groupPosition, boolean isExpanded,
+										View convertView, ViewGroup parent) {
+					View view;
+					if(convertView != null){
+						view = convertView;
+					}else{
+						view = View.inflate(TabhostActivity.this, R.layout.grounp, null);
+					}
+					
+					((TextView)view.findViewById(R.id.mygroup)).setText(_deptParent.get(groupPosition).name);
+					return view;
+				}
+
+				@Override
+				public View getChildView(int groupPosition, int childPosition,
+						boolean isLastChild, View convertView, ViewGroup parent) {
+					View view;
+					if(convertView != null){
+						view = convertView;
+					}else{
+						view = View.inflate(TabhostActivity.this, R.layout.child, null);
+					}
+					((TextView)view.findViewById(R.id.mychild)).setText(_kitchenChild.get(groupPosition).get(childPosition).name);
+					return view;
+				}
+
+				@Override
+				public boolean isChildSelectable(int groupPosition, int childPosition) {
+					return true;
+				}
+			});
+			
+			/**
+			 * 选择某个厨房后，筛选出相应的菜品，并更新ListView
+			 */
+			kitchenLstView.setOnChildClickListener(new OnChildClickListener() {
+				
+				public boolean onChildClick(ExpandableListView parent, View v,
+											int groupPosition, int childPosition, long id) {
+					Kitchen selectedKitchen = _kitchenChild.get(groupPosition).get(childPosition);
+					List<Food> filterFoods = new ArrayList<Food>();
+					for(int i = 0; i < WirelessOrder.foodMenu.foods.length; i++){
+						if(WirelessOrder.foodMenu.foods[i].kitchen == selectedKitchen.alias_id){
+							filterFoods.add(WirelessOrder.foodMenu.foods[i]);
+						}
+					}
+					
+					foodLstView.notifyDataChanged(filterFoods.toArray(new Food[filterFoods.size()]));
+					dismiss();
+					return true;					
+				}
+			});
+		}
+		
 	}
 	
 }
