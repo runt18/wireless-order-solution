@@ -206,10 +206,10 @@ public class PayOrder {
 			}			
 			dbCon.rs.close();
 			
+			dbCon.stmt.clearBatch();
 			//calculate the 库存对冲 and insert the record to material_detail
 			Iterator<FoodMaterial> iter = foodMaterials.iterator();
 			while(iter.hasNext()){
-				dbCon.stmt.clearBatch();
 				FoodMaterial foodMaterial = iter.next();
 				//calculate the 库存对冲
 				float amount = (float)Math.round(foodMaterial.food.getCount().floatValue() * foodMaterial.consumption * 100) /100;
