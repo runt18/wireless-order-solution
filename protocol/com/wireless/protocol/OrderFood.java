@@ -242,7 +242,8 @@ public class OrderFood extends Food {
 	}
 
 	public OrderFood(Food food){
-		super(food.alias_id,
+		super(food.food_id,
+			  food.alias_id,
 			  food.name,
 			  food.getPrice(),
 			  food.kitchen,
