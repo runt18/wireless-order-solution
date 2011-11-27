@@ -217,7 +217,7 @@ public class PayOrder {
 				//insert the corresponding detail record to material_detail
 				sql = "INSERT INTO " + Params.dbName + ".material_detail (" + 
 					  "restaurant_id, material_id, price, date, staff, dept_id, amount, type) VALUES(" +
-					  orderInfo.restaurant_id + ", " +				//restaurant_id
+					  orderInfo.restaurant_id + ", " +						//restaurant_id
 					  foodMaterial.material.getMaterialID() + ", " +		//material_id
 					  "(SELECT price FROM " + Params.dbName + ".material_dept WHERE restaurant_id=" + 
 					  orderInfo.restaurant_id + 
@@ -228,7 +228,7 @@ public class PayOrder {
 					  ".terminal WHERE pin=" + "0x" + Integer.toHexString(pin) + " AND model_id=" + model + "), " +	//staff
 					  "(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + 
 					  orderInfo.restaurant_id + " AND alias_id=" + foodMaterial.food.kitchen + "), " +				//dept_id
-					  amount + ", " + 				//amount
+					  -amount + ", " + 				//amount
 					  MaterialDetail.TYPE_CONSUME + //type
 					  ")";
 				dbCon.stmt.addBatch(sql);
