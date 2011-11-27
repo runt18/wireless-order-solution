@@ -218,10 +218,10 @@ public class PayOrder {
 				sql = "INSERT INTO " + Params.dbName + ".material_detail (" + 
 					  "restaurant_id, material_id, price, date, staff, dept_id, amount, type) VALUES(" +
 					  orderInfo.restaurant_id + ", " +				//restaurant_id
-					  foodMaterial.material.materialID + ", " +		//material_id
+					  foodMaterial.material.getMaterialID() + ", " +		//material_id
 					  "(SELECT price FROM " + Params.dbName + ".material_dept WHERE restaurant_id=" + 
 					  orderInfo.restaurant_id + 
-					  " AND material_id=" + foodMaterial.material.materialID + 	
+					  " AND material_id=" + foodMaterial.material.getMaterialID() + 	
 					  " AND dept_id=0), " +	//price
 					  "NOW(), " +			//date
 					  "(SELECT owner_name FROM " + Params.dbName + 
@@ -237,7 +237,7 @@ public class PayOrder {
 				sql = "UPDATE " + Params.dbName + ".material_dept SET " +
 					  "stock = stock - " + amount +
 					  " WHERE restaurant_id=" + orderInfo.restaurant_id + 
-					  " AND material_id=" + foodMaterial.material.materialID +
+					  " AND material_id=" + foodMaterial.material.getMaterialID() +
 					  " AND dept_id=" + "(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + 
 					  orderInfo.restaurant_id + " AND alias_id=" + foodMaterial.food.kitchen + ")";
 				dbCon.stmt.addBatch(sql);
