@@ -30,7 +30,7 @@
 			android:layout_height="wrap_content" android:layout_centerVertical="true"
 			android:layout_toRightOf="@id/ordernum" android:layout_marginLeft="5dip" />
 
-		<RelativeLayout android:id="@+id/sp"
+		<RelativeLayout android:id="@+id/filterKitchenRelaLayout"
 			android:layout_width="fill_parent" android:layout_height="40dip"
 			android:background="@drawable/xiala" android:layout_toRightOf="@id/filterKitchenEdtTxt"
 			android:layout_marginLeft="5dip">
