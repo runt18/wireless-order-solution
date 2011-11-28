@@ -153,7 +153,7 @@ public class PickFoodListView extends ListView {
 					food.setCount(orderAmount);
 					
 					if(_foodPickedListener != null){
-						_foodPickedListener.OnPicked(food);
+						_foodPickedListener.onPicked(food);
 					}
 					
 					dismiss();
@@ -179,7 +179,7 @@ public class PickFoodListView extends ListView {
 		 * @param food
 		 * 			选中Food的信息
 		 */
-		public void OnPicked(OrderFood food);
+		public void onPicked(OrderFood food);
 	}
 
 }

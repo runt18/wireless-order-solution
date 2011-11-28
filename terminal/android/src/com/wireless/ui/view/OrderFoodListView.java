@@ -256,7 +256,7 @@ public class OrderFoodListView extends ExpandableListView{
 					public void onClick(View v) {
 						_selectedPos = childPosition;
 						if(_operListener != null){
-							_operListener.OnPickTaste(_foods.get(childPosition));
+							_operListener.onPickTaste(_foods.get(childPosition));
 						}
 					}
 				});
@@ -321,7 +321,7 @@ public class OrderFoodListView extends ExpandableListView{
 					@Override
 					public void onClick(View v) {
 						if(_operListener != null){
-							_operListener.OnPickFood();
+							_operListener.onPickFood();
 						}
 					}
 				});
@@ -438,7 +438,7 @@ public class OrderFoodListView extends ExpandableListView{
 					public void onClick(View arg0) {
 						if(_operListener != null){
 							dismiss();
-							_operListener.OnPickTaste(selectedFood);
+							_operListener.onPickTaste(selectedFood);
 						}
 					}
 				});
@@ -562,8 +562,8 @@ public class OrderFoodListView extends ExpandableListView{
 	}
 	
 	public static interface OnOperListener{
-		public void OnPickTaste(OrderFood selectedFood);
-		public void OnPickFood();
+		public void onPickTaste(OrderFood selectedFood);
+		public void onPickFood();
 	}
 	
 }

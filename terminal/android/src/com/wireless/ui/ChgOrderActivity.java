@@ -143,7 +143,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 	 * 选择相应菜品的"口味"操作，跳转到口味Activity进行口味的添加、删除操作
 	 */
 	@Override
-	public void OnPickTaste(OrderFood selectedFood) {
+	public void onPickTaste(OrderFood selectedFood) {
 		Intent intent = new Intent(ChgOrderActivity.this, PickTasteActivity.class);
 		Bundle bundle = new Bundle();
 		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(selectedFood));
@@ -155,7 +155,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 	 * "点菜"操作，跳转到点菜的Activity进行选菜
 	 */
 	@Override
-	public void OnPickFood() {
+	public void onPickFood() {
 		// 调转到选菜Activity，并将新点菜的已有菜品传递过去
 		Intent intent = new Intent(ChgOrderActivity.this, PickFoodActivity.class);
 		Bundle bundle = new Bundle();

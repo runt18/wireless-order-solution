@@ -152,7 +152,7 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 	 * 			选中菜品的信息
 	 */
 	@Override
-	public void OnPicked(OrderFood food) {
+	public void onPicked(OrderFood food) {
 		boolean isExist = false;
 		Iterator<OrderFood> iter = _pickFoods.iterator();
 		while(iter.hasNext()){
