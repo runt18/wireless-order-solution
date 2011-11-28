@@ -19,7 +19,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.wireless.common.Common;
+
 import com.wireless.common.FoodParcel;
 import com.wireless.common.OrderParcel;
 import com.wireless.protocol.ErrorCode;
@@ -291,7 +291,6 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 	 */
 	public void Foodfunction(int position) {
 		Intent intent = new Intent(ChgOrderActivity.this, PickTasteActivity.class);
-		Common.getCommon().setPosition(position);
 		startActivity(intent);
 
 	}

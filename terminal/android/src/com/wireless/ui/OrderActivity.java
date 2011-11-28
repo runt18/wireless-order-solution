@@ -17,7 +17,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.wireless.common.Common;
 import com.wireless.common.FoodParcel;
 import com.wireless.common.OrderParcel;
 import com.wireless.protocol.ErrorCode;
@@ -173,23 +172,8 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 		}
 		
 	}	
-	/*
-	 * 
-	 * 处理ListView的删除菜功能和添加口味功能
-	 * 
-	 * */
-	public void Foodfunction(int num,int position){
-		if(num==0){
-			Common.getCommon();
-			Common.getCommon().setPosition(position);
-			Common.getCommon().getdeleteFoods(OrderActivity.this, Common.getFoodlist(), position,0);
-		
-		}else{
-			Intent intent=new Intent(OrderActivity.this,PickTasteActivity.class);
-			Common.getCommon().setPosition(position);
-			startActivity(intent);
-		}
-	}
+
+	
 	
 	/**
 	 * 选择相应菜品的"口味"操作，跳转到口味Activity进行口味的添加、删除操作
