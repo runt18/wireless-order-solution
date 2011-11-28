@@ -1,205 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  android:background="#FFFFFF"
-  android:layout_width="fill_parent"
-  android:layout_height="fill_parent">
-  <RelativeLayout 
-android:id="@+id/top"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:background="@drawable/top_bg"
-android:layout_alignParentTop="true"
->
-<ImageView
-android:id="@+id/orderback"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:src="@drawable/back_high"
-android:layout_marginLeft="20dip"
-android:layout_centerVertical="true"
- >
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:background="#FFFFFF" android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+	<RelativeLayout android:id="@+id/top"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:background="@drawable/top_bg" android:layout_alignParentTop="true">
+		<ImageView android:id="@+id/orderback" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:src="@drawable/back_high"
+			android:layout_marginLeft="20dip" android:layout_centerVertical="true">
 
-</ImageView>
-<TextView 
-android:id="@+id/ordertitle"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:textColor="#FFFFFF"
-android:textSize="22sp"
-android:textStyle="bold"
-android:typeface="monospace"
-android:shadowDx="1"
-android:shadowDy="1"
-android:shadowRadius="3.0"
-android:text="下单"
-android:layout_centerVertical="true"
-android:layout_centerHorizontal="true"
->
-</TextView>
+		</ImageView>
+		<TextView android:id="@+id/ordertitle" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:textColor="#FFFFFF"
+			android:textSize="22sp" android:textStyle="bold" android:typeface="monospace"
+			android:shadowDx="1" android:shadowDy="1" android:shadowRadius="3.0"
+			android:text="下单" android:layout_centerVertical="true"
+			android:layout_centerHorizontal="true">
+		</TextView>
 
-<ImageView
-android:id="@+id/ordercommit"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:src="@drawable/commit"
-android:layout_centerVertical="true"
-android:layout_alignParentRight="true"
-android:layout_marginRight="20dip"
- >
+		<ImageView android:id="@+id/ordercommit"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:src="@drawable/commit" android:layout_centerVertical="true"
+			android:layout_alignParentRight="true" android:layout_marginRight="20dip">
 
-</ImageView>
-</RelativeLayout>
-  <RelativeLayout 
-  android:id="@+id/restitle"
-  android:layout_width="fill_parent"
-  android:layout_height="50dip"
-  android:layout_below="@id/top"
+		</ImageView>
+	</RelativeLayout>
+	<RelativeLayout android:id="@+id/restitle"
+		android:layout_width="fill_parent" android:layout_height="50dip"
+		android:layout_below="@id/top">
+		<TextView android:id="@+id/platform" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:textSize="20sp"
+			android:textColor="#000000" android:layout_centerVertical="true"
+			android:layout_marginLeft="10dip" android:text="台号:">
+		</TextView>
 
-  >
-  <TextView
-  android:id="@+id/platform"
-  android:layout_width="wrap_content"
-  android:layout_height="wrap_content"
-  android:textSize="20sp"
-  android:textColor="#000000"
-  android:layout_centerVertical="true"
-  android:layout_marginLeft="10dip"
-  android:text="台号:"
-  ></TextView>
-  
-  <EditText
-  android:focusable="true"
-  android:focusableInTouchMode="true"
-  android:id="@+id/valueplatform"
-  android:layout_width="90dip"
-  android:layout_height="wrap_content"
-  android:textSize="20sp"
-  android:textColor="#000000"
-  android:layout_centerVertical="true"
-  android:layout_toRightOf="@id/platform"
-  android:layout_marginLeft="5dip"
-  android:background = "#00000000"
-  android:inputType="numberSigned|text"  
-  ></EditText>
-  
-  
-  
-     <TextView 
-  android:id="@+id/people"
-  android:layout_width="wrap_content"
-  android:layout_height="wrap_content"
-  android:textSize="20sp"
-  android:textColor="#000000"
-  android:layout_centerVertical="true"
-  android:layout_toRightOf="@id/platform"
-  android:layout_marginLeft="110dip"
-  android:text="人数:"
-  ></TextView>
-  
-  <EditText
-  android:focusable="true"
-  android:focusableInTouchMode="true"
-  android:id="@+id/valuepeople"
-  android:layout_width="100dip"
-  android:layout_height="wrap_content"
-  android:textSize="20sp"
-  android:textColor="#000000"
-  android:layout_centerVertical="true"
-  android:layout_toRightOf="@id/people"
-  android:layout_marginLeft="3dip"
-  android:background = "#00000000"
-  android:inputType="numberSigned|text"  
-  ></EditText>
-  
- 
-  </RelativeLayout>
-    
-    
-   <RelativeLayout 
-  android:id="@+id/t_line"
-  android:layout_width="fill_parent"
-  android:layout_height="40dip"
-  android:background="@drawable/titlebg"
-  android:layout_below="@id/restitle"
-   >
- <ImageView 
- android:id="@+id/up"
- android:layout_width="wrap_content"
- android:layout_height="wrap_content"
- android:layout_centerVertical="true"
- android:layout_marginLeft="10dip"
- />
-<TextView 
- android:id="@+id/ordermenu"
-  android:layout_width="wrap_content"
-  android:layout_height="wrap_content"
-  android:textSize="20sp"
-  android:textColor="#FFFFFF"
-  android:layout_centerVertical="true"
-  android:layout_toRightOf="@id/up"
-  android:layout_marginLeft="15dip"
-  android:text="已点菜"
-/>
-
-<ImageView 
-android:id="@+id/orderbutton"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:layout_centerVertical="true"
-android:layout_alignParentRight="true"
-android:layout_marginRight="20dip"
-android:src="@drawable/commit"
-/>
-  </RelativeLayout> 
+		<EditText android:focusable="true"
+			android:focusableInTouchMode="true" android:id="@+id/tblNoEdtTxt"
+			android:layout_width="90dip" android:layout_height="wrap_content"
+			android:textSize="20sp" android:textColor="#000000"
+			android:layout_centerVertical="true" android:layout_toRightOf="@id/platform"
+			android:layout_marginLeft="5dip" android:background="#00000000"
+			android:inputType="numberSigned|text">
+		</EditText>
 
 
-  
-<RelativeLayout 
-android:id="@+id/bottom"
-android:layout_width="fill_parent"
-android:layout_height="50dip"
-android:layout_alignParentBottom="true"
-android:background="@drawable/titlebg"
->
-<TextView 
-android:id="@+id/amountvalue"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:textColor="#FFFFFF"
-android:layout_centerVertical="true"
-android:layout_marginLeft="10dip"
-android:layout_alignParentRight="true"
-android:textSize="22sp"
-android:typeface="sans"
-android:textStyle="bold"
-android:layout_marginRight="10dip"
-/>
 
-<TextView 
-android:id="@+id/amount"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:textColor="#FFFFFF"
-android:layout_centerVertical="true"
-android:textSize="22sp"
-android:typeface="sans"
-android:textStyle="bold"
-android:layout_toLeftOf="@id/amountvalue"
-android:layout_marginRight="5dip"
-android:text="合计:"
-/>
-</RelativeLayout>  
+		<TextView android:id="@+id/people" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:textSize="20sp"
+			android:textColor="#000000" android:layout_centerVertical="true"
+			android:layout_toRightOf="@id/platform" android:layout_marginLeft="110dip"
+			android:text="人数:"></TextView>
 
-  
-<com.wireless.util.DragListView 
-android:id="@+id/myListView"
-android:layout_width="fill_parent"
-android:layout_height="wrap_content"
-android:layout_below="@id/t_line"
-android:divider="@drawable/table_line"
-android:cacheColorHint="#00000000"
-android:layout_above="@id/bottom"
-></com.wireless.util.DragListView >
+		<EditText android:focusable="true"
+			android:focusableInTouchMode="true" android:id="@+id/customerNumEdtTxt"
+			android:layout_width="100dip" android:layout_height="wrap_content"
+			android:textSize="20sp" android:textColor="#000000"
+			android:layout_centerVertical="true" android:layout_toRightOf="@id/people"
+			android:layout_marginLeft="3dip" android:background="#00000000"
+			android:inputType="numberSigned|text"></EditText>
+
+
+	</RelativeLayout>
+
+	<com.wireless.ui.view.OrderFoodListView
+		android:id="@+id/orderLstView" android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:layout_below="@id/restitle"
+		android:divider="@drawable/table_line" android:cacheColorHint="#00000000"
+		android:layout_above="@id/bottom">
+	</com.wireless.ui.view.OrderFoodListView>
+	
+	<RelativeLayout android:id="@+id/bottom"
+		android:layout_width="fill_parent" android:layout_height="50dip"
+		android:layout_alignParentBottom="true" android:background="@drawable/titlebg">
+		<TextView android:id="@+id/totalTxtView" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:textColor="#FFFFFF"
+			android:layout_centerVertical="true" android:layout_marginLeft="10dip"
+			android:layout_alignParentRight="true" android:textSize="22sp"
+			android:typeface="sans" android:textStyle="bold"
+			android:layout_marginRight="10dip" />
+
+		<TextView android:id="@+id/amount" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:textColor="#FFFFFF"
+			android:layout_centerVertical="true" android:textSize="22sp"
+			android:typeface="sans" android:textStyle="bold"
+			android:layout_toLeftOf="@id/amountvalue" android:layout_marginRight="5dip"
+			android:text="小计:" />
+	</RelativeLayout>
+
+
+
 
 </RelativeLayout>

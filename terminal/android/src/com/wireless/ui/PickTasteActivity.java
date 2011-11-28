@@ -25,7 +25,7 @@ import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Util;
 
-public class TastesTbActivity extends TabActivity {
+public class PickTasteActivity extends TabActivity {
 	
 	private Handler _handler = new Handler(){
 		@Override
@@ -62,7 +62,7 @@ public class TastesTbActivity extends TabActivity {
 							   .setContent(new TabHost.TabContentFactory(){
 								   @Override
 								   public View createTabContent(String arg0) {
-									   return LayoutInflater.from(TastesTbActivity.this).inflate(R.layout.taste, null);
+									   return LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.taste, null);
 								   }								   
 							   });
 		_tabHost.addTab(spec);
@@ -73,7 +73,7 @@ public class TastesTbActivity extends TabActivity {
 					   .setContent(new TabHost.TabContentFactory(){
 						   @Override
 						   public View createTabContent(String arg0) {
-							   return LayoutInflater.from(TastesTbActivity.this).inflate(R.layout.style, null);
+							   return LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.style, null);
 						   }								   
 					   });
 		_tabHost.addTab(spec);
@@ -84,7 +84,7 @@ public class TastesTbActivity extends TabActivity {
 					   .setContent(new TabHost.TabContentFactory(){
 						   @Override
 						   public View createTabContent(String arg0) {
-							   return LayoutInflater.from(TastesTbActivity.this).inflate(R.layout.specs, null);
+							   return LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.specs, null);
 						   }								   
 					   });
 		_tabHost.addTab(spec);
@@ -168,7 +168,7 @@ public class TastesTbActivity extends TabActivity {
 		public View getView(final int position, View convertView, ViewGroup parent) {
 			View view;
 			if(convertView == null){
-				view = LayoutInflater.from(TastesTbActivity.this).inflate(R.layout.food_item, null);				
+				view = LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.food_item, null);				
 			}else{
 				view = convertView;
 			}
@@ -201,16 +201,16 @@ public class TastesTbActivity extends TabActivity {
 						int pos = _selectedFood.removeTaste(_tastes[position]);
 						if(pos >= 0){
 							selectChkBox.setChecked(false);
-							Toast.makeText(TastesTbActivity.this, "删除" + _tastes[position].preference, 0).show();
+							Toast.makeText(PickTasteActivity.this, "删除" + _tastes[position].preference, 0).show();
 						}
 						
 					}else{
 						int pos = _selectedFood.addTaste(_tastes[position]);
 						if(pos >= 0){
 							selectChkBox.setChecked(true);
-							Toast.makeText(TastesTbActivity.this, "添加" + _tastes[position].preference, 0).show();
+							Toast.makeText(PickTasteActivity.this, "添加" + _tastes[position].preference, 0).show();
 						}else{
-							Toast.makeText(TastesTbActivity.this, "最多只能添加" + _selectedFood.tastes.length + "种口味", 0).show();
+							Toast.makeText(PickTasteActivity.this, "最多只能添加" + _selectedFood.tastes.length + "种口味", 0).show();
 						}
 					}
 					_handler.sendEmptyMessage(0);

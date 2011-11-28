@@ -78,7 +78,7 @@ android:layout_centerVertical="true"
 android:layout_marginLeft="3dip"
 android:src="@drawable/voice"
 />
-<com.wireless.textview.MarqueeText
+<com.wireless.ui.view.MarqueeText
     android:id="@+id/notice"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"        

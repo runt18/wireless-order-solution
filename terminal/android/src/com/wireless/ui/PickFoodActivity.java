@@ -37,7 +37,7 @@ import com.wireless.protocol.SKitchen;
 import com.wireless.protocol.Util;
 import com.wireless.ui.view.PickFoodListView;
 
-public class TabhostActivity extends TabActivity implements PickFoodListView.OnFoodPickedListener{
+public class PickFoodActivity extends TabActivity implements PickFoodListView.OnFoodPickedListener{
 	
 	private final static String TAG_NUMBER = "number";
 	private final static String TAG_KITCHEN = "kitchen";
@@ -68,7 +68,7 @@ public class TabhostActivity extends TabActivity implements PickFoodListView.OnF
 							   .setContent(new TabHost.TabContentFactory(){
 								   @Override
 								   public View createTabContent(String arg0) {
-									   return LayoutInflater.from(TabhostActivity.this).inflate(R.layout.number, null);
+									   return LayoutInflater.from(PickFoodActivity.this).inflate(R.layout.number, null);
 								   }								   
 							   });
 		_tabHost.addTab(spec);
@@ -79,7 +79,7 @@ public class TabhostActivity extends TabActivity implements PickFoodListView.OnF
 					   .setContent(new TabHost.TabContentFactory(){
 						   @Override
 						   public View createTabContent(String arg0) {
-							   return LayoutInflater.from(TabhostActivity.this).inflate(R.layout.kitchen, null);
+							   return LayoutInflater.from(PickFoodActivity.this).inflate(R.layout.kitchen, null);
 						   }								   
 					   });
 		_tabHost.addTab(spec);
@@ -90,7 +90,7 @@ public class TabhostActivity extends TabActivity implements PickFoodListView.OnF
 					   .setContent(new TabHost.TabContentFactory(){
 						   @Override
 						   public View createTabContent(String arg0) {
-							   return LayoutInflater.from(TabhostActivity.this).inflate(R.layout.pinyin, null);
+							   return LayoutInflater.from(PickFoodActivity.this).inflate(R.layout.pinyin, null);
 						   }								   
 					   });
 		_tabHost.addTab(spec);
@@ -317,7 +317,7 @@ public class TabhostActivity extends TabActivity implements PickFoodListView.OnF
 		private List<List<Kitchen>> _kitchenChild;
 		
 		KitchenSelectDialog(final PickFoodListView foodLstView) {
-			super(TabhostActivity.this, R.style.FullHeightDialog);
+			super(PickFoodActivity.this, R.style.FullHeightDialog);
 			
 			/**
 			 * 将所有菜品进行按厨房编号进行排序
@@ -439,7 +439,7 @@ public class TabhostActivity extends TabActivity implements PickFoodListView.OnF
 					if(convertView != null){
 						view = convertView;
 					}else{
-						view = View.inflate(TabhostActivity.this, R.layout.grounp, null);
+						view = View.inflate(PickFoodActivity.this, R.layout.grounp, null);
 					}
 					
 					((TextView)view.findViewById(R.id.mygroup)).setText(_deptParent.get(groupPosition).name);
@@ -453,7 +453,7 @@ public class TabhostActivity extends TabActivity implements PickFoodListView.OnF
 					if(convertView != null){
 						view = convertView;
 					}else{
-						view = View.inflate(TabhostActivity.this, R.layout.child, null);
+						view = View.inflate(PickFoodActivity.this, R.layout.child, null);
 					}
 					((TextView)view.findViewById(R.id.mychild)).setText(_kitchenChild.get(groupPosition).get(childPosition).name);
 					return view;

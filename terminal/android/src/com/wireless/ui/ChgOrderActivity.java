@@ -34,7 +34,7 @@ import com.wireless.protocol.Util;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.ui.view.OrderFoodListView;
 
-public class DropActivity extends Activity implements OrderFoodListView.OnOperListener {
+public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOperListener {
 
 	private Order _oriOrder;
 	private OrderFoodListView _oriFoodLstView;
@@ -135,7 +135,7 @@ public class DropActivity extends Activity implements OrderFoodListView.OnOperLi
 		((EditText)findViewById(R.id.valuepeople)).setText(Integer.toString(_oriOrder.custom_num));
 		//set the total price to this order
 		((TextView)findViewById(R.id.amountvalue)).setText(Util.float2String(_oriOrder.calcPrice() + 
-								new Order(_newFoodLstView.getSourceData().toArray(new OrderFood[_newFoodLstView.getSourceData().size()])).calcPrice()));
+								new Order(_newFoodLstView.getSourceData().toArray(new OrderFood[_newFoodLstView.getSourceData().size()])).calcPrice2()));
 			
 	}
 
@@ -144,7 +144,7 @@ public class DropActivity extends Activity implements OrderFoodListView.OnOperLi
 	 */
 	@Override
 	public void OnPickTaste(OrderFood selectedFood) {
-		Intent intent = new Intent(DropActivity.this, TastesTbActivity.class);
+		Intent intent = new Intent(ChgOrderActivity.this, PickTasteActivity.class);
 		Bundle bundle = new Bundle();
 		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(selectedFood));
 		intent.putExtras(bundle);
@@ -157,7 +157,7 @@ public class DropActivity extends Activity implements OrderFoodListView.OnOperLi
 	@Override
 	public void OnPickFood() {
 		// 调转到选菜Activity，并将新点菜的已有菜品传递过去
-		Intent intent = new Intent(DropActivity.this, TabhostActivity.class);
+		Intent intent = new Intent(ChgOrderActivity.this, PickFoodActivity.class);
 		Bundle bundle = new Bundle();
 		Order tmpOrder = new Order();
 		tmpOrder.foods = _newFoodLstView.getSourceData().toArray(new OrderFood[_newFoodLstView.getSourceData().size()]);
@@ -204,7 +204,7 @@ public class DropActivity extends Activity implements OrderFoodListView.OnOperLi
 		 */
 		@Override
 		protected void onPreExecute(){
-			_progDialog = ProgressDialog.show(DropActivity.this, "", "提交" + _reqOrder.table_id + "号餐台的改单信息...请稍候", true);
+			_progDialog = ProgressDialog.show(ChgOrderActivity.this, "", "提交" + _reqOrder.table_id + "号餐台的改单信息...请稍候", true);
 		}
 		
 		/**
@@ -261,7 +261,7 @@ public class DropActivity extends Activity implements OrderFoodListView.OnOperLi
 			 * Prompt user message if any error occurred.
 			 */
 			if(errMsg != null){
-				new AlertDialog.Builder(DropActivity.this)
+				new AlertDialog.Builder(ChgOrderActivity.this)
 				.setTitle("提示")
 				.setMessage(errMsg)
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
@@ -270,8 +270,8 @@ public class DropActivity extends Activity implements OrderFoodListView.OnOperLi
 					}
 				}).show();
 			}else{
-				//jump to the update order activity
-				DropActivity.this.finish();
+				//return to the main activity and show the successful message
+				ChgOrderActivity.this.finish();
 				String promptMsg;
 				if(_reqOrder.table_id == _reqOrder.originalTableID){
 					promptMsg = _reqOrder.table_id + "号台改单成功。";
@@ -279,7 +279,7 @@ public class DropActivity extends Activity implements OrderFoodListView.OnOperLi
 					promptMsg = _reqOrder.originalTableID + "号台转至" + 
 							 	 _reqOrder.table_id + "号台，并改单成功。";
 				}
-				Toast.makeText(DropActivity.this, promptMsg, 1).show();
+				Toast.makeText(ChgOrderActivity.this, promptMsg, 0).show();
 			}
 		}
 		
@@ -290,7 +290,7 @@ public class DropActivity extends Activity implements OrderFoodListView.OnOperLi
 	 * 处理ListView的删除菜功能和添加口味功能
 	 */
 	public void Foodfunction(int position) {
-		Intent intent = new Intent(DropActivity.this, TastesTbActivity.class);
+		Intent intent = new Intent(ChgOrderActivity.this, PickTasteActivity.class);
 		Common.getCommon().setPosition(position);
 		startActivity(intent);
 
@@ -300,7 +300,7 @@ public class DropActivity extends Activity implements OrderFoodListView.OnOperLi
 	 * 点击点菜跳到点菜界面
 	 */
 	public void orderfood() {
-		Intent intent = new Intent(DropActivity.this, TabhostActivity.class);
+		Intent intent = new Intent(ChgOrderActivity.this, PickFoodActivity.class);
 		startActivity(intent);
 	}
 

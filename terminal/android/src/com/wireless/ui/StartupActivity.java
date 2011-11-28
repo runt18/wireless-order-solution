@@ -143,7 +143,6 @@ public class StartupActivity extends Activity {
 				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryMenu());
 				if(resp.header.type == Type.ACK){
 					WirelessOrder.foodMenu = RespParser.parseQueryMenu(resp);
-					AppContext.setFoodMenu(RespParser.parseQueryMenu(resp));
 				}else{
 					if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
 						errMsg = "终端没有登记到餐厅，请联系管理人员。";

@@ -3,38 +3,28 @@ package com.wireless.ui;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.provider.Settings;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.wireless.adapter.BillAdapter;
-import com.wireless.common.Common;
+import com.wireless.common.OrderParcel;
 import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqPayOrder;
-import com.wireless.protocol.ReqQueryOrder;
 import com.wireless.protocol.Reserved;
-import com.wireless.protocol.RespParser;
 import com.wireless.protocol.Type;
 import com.wireless.protocol.Util;
 import com.wireless.sccon.ServerConnector;
@@ -43,145 +33,140 @@ import com.wireless.ui.view.BillFoodListView;
 
 public class BillActivity extends Activity {
 	
-	private static final String KEY_TABLE_ID = "TableAmount";	
-	private static final int ORDER_MESSAGE = 1;
-	private Order _order;
-	private String _plateForm;
+	private Order _orderToPay;
   
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.bill);
 		
-		_plateForm = getIntent().getExtras().getString(KEY_TABLE_ID);
+		//get the order detail passed by main activity
+		OrderParcel orderParcel = getIntent().getParcelableExtra(OrderParcel.KEY_VALUE);
+		_orderToPay = orderParcel;
 		
-		if(Common.getCommon().isNetworkAvailable(BillActivity.this)){
-		    new orderbill().execute();
-		}else{
-			shownet();
-		}
+		((TextView)findViewById(R.id.valueplatform)).setText(String.valueOf(_orderToPay.table_id));
+		((TextView)findViewById(R.id.valuepeople)).setText(String.valueOf(_orderToPay.custom_num));
+		((TextView)findViewById(R.id.valuehandsel)).setText(Util.CURRENCY_SIGN+Float.toString(_orderToPay.calcGiftPrice()));
+		((TextView)findViewById(R.id.valueconfirmed)).setText(Util.CURRENCY_SIGN+Float.toString(_orderToPay.calcPrice2()));
+		
+		/**
+		 * "返回"Button
+		 */
+		((ImageView)findViewById(R.id.billback)).setOnClickListener(new View.OnClickListener() {			
+			@Override
+			public void onClick(View arg0) {
+				finish();				
+			}
+		});
+		/**
+		 * "一般"Button
+		 */
+		((ImageView)findViewById(R.id.normal)).setOnClickListener(new View.OnClickListener() {			
+			@Override
+			public void onClick(View arg0) {
+				showDialog(Order.DISCOUNT_1);				
+			}
+		});
+		/**
+		 * "折扣"Button
+		 */
+		((ImageView)findViewById(R.id.allowance)).setOnClickListener(new View.OnClickListener() {			
+			@Override
+			public void onClick(View arg0) {
+				showDialog(Order.DISCOUNT_2);					
+			}
+		});		
+		/**
+		 * "已点菜"的ListView
+		 */
+		((BillFoodListView)findViewById(R.id.billListView)).notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(_orderToPay.foods)));
 		
 	}
    
-	 /*
-	  * 初始化方法
-	  * */
-	public void init(){
-	
-		((TextView)findViewById(R.id.valueplatform)).setText(String.valueOf(_order.table_id));
-		((TextView)findViewById(R.id.valuepeople)).setText(String.valueOf(_order.custom_num));
-		((TextView)findViewById(R.id.valuehandsel)).setText(Util.CURRENCY_SIGN+Float.toString(_order.calcGiftPrice()));
-		((TextView)findViewById(R.id.valueconfirmed)).setText(Util.CURRENCY_SIGN+Float.toString(_order.calcPrice2()));
-		
-		
-		((ImageView)findViewById(R.id.billback)).setOnClickListener(new onlistener());
-		((ImageView)findViewById(R.id.normal)).setOnClickListener(new onlistener());
-		((ImageView)findViewById(R.id.allowance)).setOnClickListener(new onlistener());
-		((BillFoodListView)findViewById(R.id.billListView)).notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(_order.foods)));
-	}
-	
-	
 	/**
 	 * 如果没有网络就弹出框，用户选择是否跳转到设置网络界面
 	 */
-	private void shownet(){
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
- 		builder.setTitle("提示");
- 		builder.setMessage("当前没有网络,请设置")
- 		       .setCancelable(false)
- 		       .setPositiveButton("确定", new DialogInterface.OnClickListener() {
- 		           public void onClick(DialogInterface dialog, int id) {
- 		        	  startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));//进入无线网络配置界面
- 		           }
- 		       })
- 		       .setNegativeButton("取消", new DialogInterface.OnClickListener() {
- 		           public void onClick(DialogInterface dialog, int id) {
- 		        	 finish();
- 		           }
- 		       });
- 		AlertDialog alert = builder.create();
- 		alert.show();
-
-	}
+//	private void shownet(){
+//		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+// 		builder.setTitle("提示");
+// 		builder.setMessage("当前没有网络,请设置")
+// 		       .setCancelable(false)
+// 		       .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+// 		           public void onClick(DialogInterface dialog, int id) {
+// 		        	  startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));//进入无线网络配置界面
+// 		           }
+// 		       })
+// 		       .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+// 		           public void onClick(DialogInterface dialog, int id) {
+// 		        	 finish();
+// 		           }
+// 		       });
+// 		AlertDialog alert = builder.create();
+// 		alert.show();
+//
+//	}
 	
-	/*
-	 * 
-	 * button的点击事件处理
+	/**
+	 * 执行结帐请求操作
 	 */
-	private class onlistener implements View.OnClickListener{
-
-		@Override
-		public void onClick(View v) {
-			// TODO Auto-generated method stub
-			switch (v.getId()) {
-			case R.id.billback:
-				finish();
-				break;
-
-			case R.id.normal:
-				showDialog(1);
-				break;
-				
-			case R.id.allowance:
-				showDialog(2);
-				break;	
-			}
-		}
-		
-	}
-	
-	
-	/*
-	 * 对应的台号进行结账
-	 * */
-	public class ordertoPay extends AsyncTask<Void,Void,String>{
+	private class PayOrderTask extends AsyncTask<Void,Void,String>{
 		
 		private ProgressDialog _progDialog;
-		private String errMsg=null;
-		private Order myorderpay;
+		private Order _orderToPay;
 		
-		public ordertoPay(Order order){
-			this.myorderpay=order;
+		PayOrderTask(Order order){
+			_orderToPay = order;
 		}
+		
+		/**
+		 * 在执行请求结帐操作前显示提示信息
+		 */
 		@Override
 		protected void onPreExecute() {
-			// TODO Auto-generated method stub
-			_progDialog = ProgressDialog.show(BillActivity.this, "", "正在结账...请稍候", true);
+			_progDialog = ProgressDialog.show(BillActivity.this, "", "提交" + _orderToPay.table_id + "号台结帐信息...请稍候", true);
 			super.onPreExecute();
 		}
 
+		/**
+		 * 在新的线程中执行结帐的请求操作
+		 */
 		@Override
 		protected String doInBackground(Void... params) {
-			// TODO Auto-generated method stub
-			byte printType = Reserved.PRINT_SYNC | Reserved.PRINT_RECEIPT_2;
+			
+			String errMsg = null;
+			
+			byte printType = Reserved.DEFAULT_CONF | Reserved.PRINT_RECEIPT_2;
 			ProtocolPackage resp;
 			try {
-				resp = ServerConnector.instance().ask(new ReqPayOrder(myorderpay, printType));
-				if(resp.header.type == Type.ACK){
-					//Dialog.alert(order.table_id + "号台结帐成功");
-				}else{
+				resp = ServerConnector.instance().ask(new ReqPayOrder(_orderToPay, printType));
+				if(resp.header.type == Type.NAK){
+					
 					byte errCode = resp.header.reserved;
+								
 					if(errCode == ErrorCode.TABLE_NOT_EXIST){
-						errMsg=myorderpay.table_id + "号台已被删除，请与餐厅负责人确认。";
+						errMsg=_orderToPay.table_id + "号台已被删除，请与餐厅负责人确认。";
 					}else if(errCode == ErrorCode.TABLE_IDLE){
-						errMsg=myorderpay.table_id + "号台的账单已结帐或删除，请与餐厅负责人确认。";
+						errMsg=_orderToPay.table_id + "号台的账单已结帐或删除，请与餐厅负责人确认。";
+					}else if(errCode == ErrorCode.PRINT_FAIL){
+						errMsg = _orderToPay.table_id + "号结帐打印未成功，请与餐厅负责人确认。";
 					}else{
-						errMsg=myorderpay.table_id + "号台结帐未成功，请重新结帐";
+						errMsg=_orderToPay.table_id + "号台结帐未成功，请重新结帐";
 					}
 				}
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				errMsg=e.getMessage();
+				
+			}catch(IOException e) {
+				errMsg = e.getMessage();
 			}
 			
 			return errMsg;
 		}
 		
+		/**
+		 * 根据返回的error message判断，如果发错异常则提示用户，
+		 * 如果成功，则返回到主界面，并提示用户结帐成功
+		 */
 		@Override
 		protected void onPostExecute(String errMsg) {
-			// TODO Auto-generated method stub
 			_progDialog.dismiss();
 			
 			if(errMsg!=null){
@@ -193,177 +178,85 @@ public class BillActivity extends Activity {
 						finish();
 					}
 				}).show();
+				
 			}else{
-				new AlertDialog.Builder(BillActivity.this)
-				.setTitle("提示")
-				.setMessage(_order.table_id + "号台结帐成功")
-				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						finish();
-					}
-				}).show();
+				//return to main activity and show the successful message
+				BillActivity.this.finish();
+				
+				Toast.makeText(BillActivity.this, _orderToPay.table_id + "号台结帐成功", 0).show();
+				
 			}
 		}
-		
-	}
-	
-	
-	/*
-	 * 請求对应台号信息
-	 * */
-	public class orderbill extends AsyncTask<Void, Void, String>{
-		private ProgressDialog _progDialog;
-		
-		@Override
-		protected void onPreExecute() {
-			// TODO Auto-generated method stub
-			_progDialog = ProgressDialog.show(BillActivity.this, "", "正在查询台号信息...请稍候", true);
-			super.onPreExecute();
-		}
-
-		@Override
-		protected String doInBackground(Void... params) {
-			// TODO Auto-generated method stub
-	     String err=null;	
-	     try{
- 			//根据tableID请求数据
- 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryOrder(Short.valueOf(_plateForm)));
- 			if(resp.header.type == Type.ACK) {
- 				//解释的数据请参考com.wireless.util.RespParser2.java
- 			    _order = RespParser.parseQueryOrder(resp, AppContext.getFoodMenu());
- 			    
- 			}else{
- 				if(resp.header.reserved == ErrorCode.TABLE_IDLE) {
- 					err=_plateForm+"号台还未下单";
- 				}else if(resp.header.reserved == ErrorCode.TABLE_NOT_EXIST) {
- 					err=_plateForm+"号台信息不存在";
- 				}else if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
- 					err="终端没有登记到餐厅，请联系管理人员。";
- 				}else if(resp.header.reserved == ErrorCode.TERMINAL_EXPIRED) {
- 					err="终端已过期，请联系管理人员。";
- 				}else{
- 					err="未确定的异常错误";
- 				}
- 			}
- 		}catch(IOException e){
- 			err=e.getMessage();
- 		} 
-			return err;
-		}
-		
-		@Override
-		protected void onPostExecute(String err) {
-			// TODO Auto-generated method stub
-			_progDialog.dismiss();
-			if(err!=null){
-				new AlertDialog.Builder(BillActivity.this)
-				.setTitle("提示")
-				.setMessage(err)
-				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						finish();
-					}
-				}).show();
-			}else{
-				handler.sendEmptyMessage(ORDER_MESSAGE);
-			}
-			
-		}
-	}
-	
-	/*
-	 * 請求完服务器后操作界面
-	 * */
-   private Handler handler = new Handler(){
-		public void handleMessage(Message message){
-			switch (message.what) {
-			
-			case ORDER_MESSAGE:
-				init();
-				break;
-
-			}
-		}
-	};
-	
+	}	
 	
 	@Override
 	protected Dialog onCreateDialog(int dialogID){
-		if(dialogID == 1){
-			//点击一般或者折扣方式
-			return new Alertdialog(1);
-		}else if(dialogID == 2){
-			return new Alertdialog(2);
+		if(dialogID == Order.DISCOUNT_1){
+			//选择"一般"结帐
+			return new AskMannerDialog(Order.DISCOUNT_1);
+			
+		}else if(dialogID == Order.DISCOUNT_2){
+			//选择"折扣"结帐
+			return new AskMannerDialog(Order.DISCOUNT_2);
+			
 		}else{
 			return null;
 		}
 	}
 	
-	
-	/*弹出的alertDialog
-	 * 
-	 * */
-	private class Alertdialog extends Dialog{
+	/**
+	 * 选择"付款方式"的Dialog	
+	 */
+	private class AskMannerDialog extends Dialog{
 
-		public Alertdialog(final int num) {
+		public AskMannerDialog(final int discount) {
 			super(BillActivity.this,R.style.FullHeightDialog);
-			// TODO Auto-generated constructor stub
 			setContentView(R.layout.billalert);
 			getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
 		    
+			/**
+			 * 选择"现金"付款方式
+			 */
 			RelativeLayout l1=(RelativeLayout)findViewById(R.id.l1);
 			l1.setOnClickListener(new View.OnClickListener() {
 				
 				@Override
 				public void onClick(View v) {
-					// TODO Auto-generated method stub
-					_order.pay_type=Order.PAY_NORMAL;
-					_order.pay_manner=Order.MANNER_CASH;
-					if(num==1){
-						_order.discount_type=Order.DISCOUNT_1;
-					}else{
-						_order.discount_type=Order.DISCOUNT_2;
-					}
-					Alertdialog.this.cancel();
-					if(Common.getCommon().isNetworkAvailable(BillActivity.this)){
-						new ordertoPay(_order).execute();
-					}else{
-						shownet();
-					}
+					//
+					_orderToPay.pay_type = Order.PAY_NORMAL;
+					_orderToPay.pay_manner = Order.MANNER_CASH;					
+					_orderToPay.discount_type = discount;
+					
+					new PayOrderTask(_orderToPay).execute();
+					dismiss();
 				}
 			});
 		
+			/**
+			 * 选择"刷卡"付款方式
+			 */
 			RelativeLayout r1=(RelativeLayout)findViewById(R.id.r1);
 			
-             r1.setOnClickListener(new View.OnClickListener() {
-				
+			r1.setOnClickListener(new View.OnClickListener() {
+
 				@Override
 				public void onClick(View v) {
-					// TODO Auto-generated method stub
-					_order.pay_type=Order.PAY_NORMAL;
-					_order.pay_manner=Order.MANNER_CREDIT_CARD;
-					if(num==1){
-						_order.discount_type=Order.DISCOUNT_1;
-					}else{
-						_order.discount_type=Order.DISCOUNT_2;
-					}
-					Alertdialog.this.cancel();
-					if(Common.getCommon().isNetworkAvailable(BillActivity.this)){
-						new ordertoPay(_order).execute();
-					}else{
-						shownet();
-					}
+					_orderToPay.pay_type = Order.PAY_NORMAL;
+					_orderToPay.pay_manner = Order.MANNER_CREDIT_CARD;
+					_orderToPay.discount_type = discount;
+					
+					new PayOrderTask(_orderToPay).execute();
+					dismiss();
 				}
 			});
              
-            Button back=(Button)findViewById(R.id.back);
-            back.setOnClickListener(new View.OnClickListener() {
-				
+			/**
+			 * “返回”Button
+			 */
+            ((Button)findViewById(R.id.back)).setOnClickListener(new View.OnClickListener() {				
 				@Override
 				public void onClick(View v) {
-					// TODO Auto-generated method stub
-					Alertdialog.this.cancel();
-					
+					dismiss();
 				}
 			});
 		

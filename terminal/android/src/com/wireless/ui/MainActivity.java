@@ -288,7 +288,6 @@ public class MainActivity extends Activity {
 				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryMenu());
 				if(resp.header.type == Type.ACK){
 					WirelessOrder.foodMenu = RespParser.parseQueryMenu(resp);
-					AppContext.setFoodMenu(RespParser.parseQueryMenu(resp));
 				}else{
 					if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
 						errMsg = "终端没有登记到餐厅，请联系管理人员。";
@@ -527,7 +526,7 @@ public class MainActivity extends Activity {
 								errMsg = _tableID + "号台还未下单";
 							}else{
 								/**
-								 * 如果返回其他的error code，表示餐台不能改单和删单（不如输入的台号不存在）
+								 * 如果返回其他的error code，表示餐台不能改单和删单（比如输入的台号不存在）
 								 */
 								errMsg = genErrMsg(_tableID, resp.header.reserved);
 								if(errMsg == null){
@@ -577,14 +576,12 @@ public class MainActivity extends Activity {
 						
 					}else if(_type == DIALOG_UPDATE_ORDER){
 						//perform to query the order detail to this table 
-						new QueryOrderTask(_tableID).execute();
+						new QueryOrderTask(_tableID, _type).execute();
 						dismiss();
 						
 					}else if(_type == DIALOG_BILL_ORDER){
-						//jump to the bill activity
-						Intent intent = new Intent(MainActivity.this, BillActivity.class);
-						intent.putExtra(KEY_TABLE_ID, String.valueOf(_tableID));
-						startActivity(intent);
+						//perform to query the order detail to this table
+						new QueryOrderTask(_tableID, _type).execute();
 						dismiss();
 						
 					}else if(_type == DIALOG_CANCEL_ORDER){
@@ -605,9 +602,11 @@ public class MainActivity extends Activity {
 			private ProgressDialog _progDialog;
 			private int _tableID;
 			private Order _order;
+			private int _type = Type.UPDATE_ORDER;;
 			
-			QueryOrderTask(int tableID){
+			QueryOrderTask(int tableID, int type){
 				_tableID = tableID;
+				_type = type;
 			}
 			
 			/**
@@ -672,12 +671,22 @@ public class MainActivity extends Activity {
 						}
 					}).show();
 				}else{
-					//jump to the update order activity
-					Intent intent = new Intent(MainActivity.this, DropActivity.class);
-					Bundle bundle = new Bundle();
-					bundle.putParcelable(OrderParcel.KEY_VALUE, new OrderParcel(_order));
-					intent.putExtras(bundle);
-					startActivity(intent);
+					if(_type == Type.UPDATE_ORDER){
+						//jump to the update order activity
+						Intent intent = new Intent(MainActivity.this, ChgOrderActivity.class);
+						Bundle bundle = new Bundle();
+						bundle.putParcelable(OrderParcel.KEY_VALUE, new OrderParcel(_order));
+						intent.putExtras(bundle);
+						startActivity(intent);
+						
+					}else if(_type == Type.PAY_ORDER){
+						//jump to the pay order activity
+						Intent intent = new Intent(MainActivity.this, BillActivity.class);
+						Bundle bundle = new Bundle();
+						bundle.putParcelable(OrderParcel.KEY_VALUE, new OrderParcel(_order));
+						intent.putExtras(bundle);
+						startActivity(intent);
+					}
 				}
 			}
 			
@@ -712,7 +721,11 @@ public class MainActivity extends Activity {
 					EditText table= (EditText)findViewById(R.id.mycount);
 					String tableID = table.getText().toString();
 					if(_type == DIALOG_UPDATE_ORDER){
-						new QueryOrderTask(Integer.parseInt(tableID)).execute();
+						new QueryOrderTask(Integer.parseInt(tableID), Type.UPDATE_ORDER).execute();
+						
+					}else if(_type == DIALOG_BILL_ORDER){
+						new QueryOrderTask(Integer.parseInt(tableID), Type.PAY_ORDER).execute();
+						
 					}else{
 						new QueryOrder2Task(Integer.parseInt(tableID)).execute();
 					}

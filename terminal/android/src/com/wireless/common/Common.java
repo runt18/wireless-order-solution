@@ -19,24 +19,16 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ExpandableListView;
-import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.wireless.adapter.ExpandlistAdapter;
 import com.wireless.protocol.Food;
-import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.SKitchen;
 import com.wireless.protocol.Taste;
-import com.wireless.ui.DropActivity;
-import com.wireless.ui.KitchenActivity;
+import com.wireless.ui.ChgOrderActivity;
 import com.wireless.ui.MainActivity;
 import com.wireless.ui.OrderActivity;
 import com.wireless.ui.R;
-import com.wireless.ui.TasteActivity;
-import com.wireless.util.Md5;
 
 public class Common {
 	//单例模式
@@ -45,10 +37,8 @@ public class Common {
    public  static  ProgressDialog dialog;
    OrderActivity order;
    private int position;
-   TasteActivity taste;
-   KitchenActivity kient;
    MainActivity main;
-   DropActivity drop;
+   ChgOrderActivity drop;
    public static List<Food> dropfoods;
    //下单台号
    private String orderplatenum;
@@ -106,13 +96,9 @@ public void setOrderplatenum(String orderplatenum) {
 	Common.dropfoods = dropfoods;
    }
 
-	public KitchenActivity getKient() {
-	return kient;
-}
 
-public void setKient(KitchenActivity kient) {
-	this.kient = kient;
-}
+
+
 
 	public int getPosition() {
 		return position;
@@ -265,7 +251,7 @@ public void setKient(KitchenActivity kient) {
 	 * 
 	 * */
 	public void expandonitem(final Context context,final  List<List<OrderFood>> lists, final int grouposition,final int childposition){
-		drop=(DropActivity)context;
+		drop=(ChgOrderActivity)context;
 		View mView =LayoutInflater.from(context).inflate(R.layout.item_alert, null);
 		final Dialog mDialog = new Dialog(context,R.style.FullHeightDialog);
 		mDialog.setContentView(mView);
@@ -438,9 +424,9 @@ public void setKient(KitchenActivity kient) {
                 
 				if(code==0){
 					 order=(OrderActivity)context;
-					 order.onRestart();
+					 //order.onRestart();
 				}else{
-					drop=(DropActivity)context;
+					drop=(ChgOrderActivity)context;
 					//drop.onRestart();
 				}
 				
@@ -506,50 +492,7 @@ public void setKient(KitchenActivity kient) {
 //		
 //	}
 	
-	/*
-	 * 点解分厨出现的二级菜单
-	 * 
-	 * */
-	AlertDialog aler;
-	public void showkichent(Context context,final List<SKitchen> perant,final List<List<Kitchen>> child){
-		
-	final AlertDialog.Builder mydialog=new  AlertDialog.Builder(context);
-		View view=LayoutInflater.from(context).inflate(R.layout.expander_list_view, null);
-		mydialog.setTitle("请选择厨房");
-		mydialog.setView(view);
-		ExpandableListView mylistview=(ExpandableListView)view.findViewById(R.id.kitchenSelectLstView);
-		
-		ExpandlistAdapter adapter=new ExpandlistAdapter(context,perant,child);
-		mylistview.setAdapter(adapter);
-		mylistview.setGroupIndicator(context.getResources().getDrawable( R.layout.expander_folder));
-		
-		mylistview.setOnChildClickListener(new OnChildClickListener() {
-			
-			public boolean onChildClick(ExpandableListView parent, View v,
-					int groupPosition, int childPosition, long id) {
-		       Kitchen kitchen =child.get(groupPosition).get(childPosition);;
-		        if(kient!=null){
-		        	kient.getslect(kitchen);
-		        	aler.dismiss();
-		        }
-				return true;
-				
-			}
-		});
-		mydialog.setNegativeButton("返回", null).setOnKeyListener(new OnKeyListener() {
 
-			@Override
-			public boolean onKey(DialogInterface arg0, int arg1,
-					KeyEvent arg2) {
-				// TODO Auto-generated method stub
-				return true;
-			}
-		});
-		
-		 aler=mydialog.create();
-		aler.show();
-		
-	}
 	
 	
 	 /*
@@ -597,97 +540,7 @@ public void setKient(KitchenActivity kient) {
 	}
 	
 	
-	/*
-	 * 有密码时改单退菜的时候弹出得dialog
-	 * 
-	 * */
 	
-	
-	public void dropFoods(final Context context,final List<List<OrderFood>> childs,final int groupPosition, final int childPosition){
-		final EditText mycount;
-		drop=(DropActivity)context;
-		View mView =LayoutInflater.from(context).inflate(R.layout.pwd_alert, null);
-		final Dialog mDialog = new Dialog(context,R.style.FullHeightDialog);
-		mDialog.setContentView(mView);
-		mDialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
-		mDialog.show();
-		TextView ordername=(TextView)mView.findViewById(R.id.ordername);
-		ordername.setText("请输入权限密码");
-	    mycount = (EditText)mView.findViewById(R.id.mycount);
-		Button mButtonOK = (Button) mView.findViewById(R.id.confirm);
-		mButtonOK.setText("确定");
-		mButtonOK.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if(Md5.md5(mycount.getText().toString())==null){
-					new AlertDialog.Builder(context).setTitle("提示").setMessage("出现异常，请重新输入").setNeutralButton("确定", null).show();
-				}else{
-					if(Md5.toHexString(Md5.md5(mycount.getText().toString())).equals(WirelessOrder.restaurant.pwd2)||Md5.toHexString(Md5.md5(mycount.getText().toString())).equals(WirelessOrder.restaurant.pwd3)){
-						final EditText counts;
-						View mView =LayoutInflater.from(context).inflate(R.layout.alert, null);
-						final Dialog myDialog = new Dialog(context,R.style.FullHeightDialog);
-						myDialog.setContentView(mView);
-						myDialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
-						myDialog.show();
-						TextView ordername=(TextView)mView.findViewById(R.id.ordername);
-						ordername.setText("请输入"+childs.get(groupPosition).get(childPosition).name+"的退菜数量");
-						counts = (EditText)mView.findViewById(R.id.mycount);
-						counts.setText("1");
-						Button mButtonOK = (Button) mView.findViewById(R.id.confirm);
-						mButtonOK.setText("确定");
-						mButtonOK.setOnClickListener(new OnClickListener() {
-							@Override
-							public void onClick(View v) {
-								OrderFood food = childs.get(groupPosition).get(childPosition);
-								float count;
-								/**
-								 * 遍历已点菜，查找是否存在与新点菜相同的菜品。
-								 * 如果存在就把数量累加上去，否则就当作新菜品添加到已点菜中
-								 */
-								if(food.getCount().floatValue()==Float.parseFloat(counts.getText().toString())){
-									childs.get(groupPosition).remove(food);
-								}else if(food.getCount().floatValue()>Float.parseFloat(counts.getText().toString())){
-									count=food.getCount().floatValue()-Float.parseFloat(counts.getText().toString());
-									food.setCount(count);
-								}else if(food.getCount().floatValue()<Float.parseFloat(counts.getText().toString())){
-									new AlertDialog.Builder(context).setTitle("提示").setMessage("你输入的退菜数量大于你已点数量").setNeutralButton("确定", null).show();
-								}
-
-								 //drop.init();
-								 myDialog.cancel();
-								 mDialog.cancel();
-							}
-						});
-						
-						Button cancle = (Button) mView.findViewById(R.id.cancle);
-						cancle.setText("取消");
-						cancle.setOnClickListener(new OnClickListener() {
-							@Override
-							public void onClick(View v) {
-								myDialog.cancel();
-							}
-						});
-
-						
-					
-					}else{
-						new AlertDialog.Builder(context).setTitle("提示").setMessage("你输入权限密码不正确").setNeutralButton("确定", null).show();
-					}
-				}
-			}
-		});
-		
-		Button cancle = (Button) mView.findViewById(R.id.cancle);
-		cancle.setText("取消");
-		cancle.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				mDialog.cancel();
-			}
-		});
-
-		
-	}
 	
 	/*
 	 * 用户没有设置密码时进行退菜
