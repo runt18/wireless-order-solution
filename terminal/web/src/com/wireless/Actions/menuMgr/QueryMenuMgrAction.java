@@ -142,6 +142,16 @@ public class QueryMenuMgrAction extends Action {
 
 			// 格式：[编号，名称，拼音，价格，厨房，特价，推荐，停售，赠送]
 			for (int i = 0; i < foods.length; i++) {
+				//
+				// String sql = " SELECT id FROM "
+				// + Params.dbName + ".food WHERE restaurant_id = "
+				// + term.restaurant_id + " AND material_id = " + materialID;
+				// dbCon.rs = dbCon.stmt.executeQuery(sql);
+				// dbCon.rs.next();
+				// float totalStock = dbCon.rs.getFloat("stock");
+				// float thisPrice = dbCon.rs.getFloat("price");
+				// dbCon.rs.close();
+
 				HashMap resultMap = new HashMap();
 				resultMap.put("foodID", new Long(foods[i].food_id).toString());
 				resultMap.put("dishNumber",

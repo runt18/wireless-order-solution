@@ -21,6 +21,7 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.VerifyPin;
+import com.wireless.dbObject.MaterialDetail;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Terminal;
@@ -109,7 +110,9 @@ public class StatInventoryInBySupplier extends Action {
 					+ term.restaurant_id
 					+ " AND a.restaurant_id = b.restaurant_id AND a.material_id = b.material_id "
 					+ " AND a.restaurant_id = c.restaurant_id AND a.supplier_id = c.supplier_id "
-					+ " AND a.type = 4 "
+					+ " AND a.type = "
+					+ MaterialDetail.TYPE_INCOME
+					+ " "
 					+ condition
 					+ " GROUP BY a.supplier_id, supplier_name, a.material_id, material_name "
 					+ " ORDER BY a.supplier_id, a.material_id ";
@@ -125,7 +128,8 @@ public class StatInventoryInBySupplier extends Action {
 
 				HashMap resultMap = new HashMap();
 				resultMap.put("supplierID", dbCon.rs.getInt("supplier_id"));
-				resultMap.put("supplierName", dbCon.rs.getString("supplier_name"));
+				resultMap.put("supplierName",
+						dbCon.rs.getString("supplier_name"));
 				resultMap.put("groupID", groupID);
 				resultMap.put("groupDescr", "");
 				resultMap.put("materialID", dbCon.rs.getInt("material_id"));

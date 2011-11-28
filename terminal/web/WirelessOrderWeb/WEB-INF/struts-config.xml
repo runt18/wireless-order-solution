@@ -160,6 +160,63 @@
 			type="com.wireless.Actions.inventoryMgr.StatInventoryInBySupplier"
 			scope="request">
 		</action>
+		<action path="/InventoryOutStatDetail"
+			type="com.wireless.Actions.inventoryMgr.StatInventoryOutDetail"
+			scope="request">
+		</action>
+		<action path="/InventoryOutStatByMaterial"
+			type="com.wireless.Actions.inventoryMgr.StatInventoryOutByMaterial"
+			scope="request">
+		</action>
+		<action path="/InventoryOutStatByDept"
+			type="com.wireless.Actions.inventoryMgr.StatInventoryOutByDept"
+			scope="request">
+		</action>
+		<action path="/InventoryOutStatByReason"
+			type="com.wireless.Actions.inventoryMgr.StatInventoryOutByReason"
+			scope="request">
+		</action>
+		<action path="/InventoryChangeStatDetail"
+			type="com.wireless.Actions.inventoryMgr.StatInventoryChangeDetail"
+			scope="request">
+		</action>
+		<action path="/InventoryChangeStatByMaterial"
+			type="com.wireless.Actions.inventoryMgr.StatInventoryChangeByMaterial"
+			scope="request">
+		</action>
+		<action path="/InventoryChangeStatByOutDept"
+			type="com.wireless.Actions.inventoryMgr.StatInventoryChangeByOutDept"
+			scope="request">
+		</action>
+		<action path="/InventoryChangeStatByInDept"
+			type="com.wireless.Actions.inventoryMgr.StatInventoryChangeByInDept"
+			scope="request">
+		</action>
+		<action path="/InventoryCostStatDetail"
+			type="com.wireless.Actions.inventoryMgr.StatInventoryCostDetail"
+			scope="request">
+		</action>
+		<action path="/InventoryCostStatByMaterial"
+			type="com.wireless.Actions.inventoryMgr.StatInventoryCostByMaterial"
+			scope="request">
+		</action>
+		<action path="/InventoryCostStatByDept"
+			type="com.wireless.Actions.inventoryMgr.StatInventoryCostByDept"
+			scope="request">
+		</action>
+		<action path="/InventoryAllStatDetail"
+			type="com.wireless.Actions.inventoryMgr.StatInventoryAllDetail"
+			scope="request">
+		</action>
+		<action path="/InventoryAllStatByMaterial"
+			type="com.wireless.Actions.inventoryMgr.StatInventoryAllByMaterial"
+			scope="request">
+		</action>
+		<action path="/InventoryAllStatByDept"
+			type="com.wireless.Actions.inventoryMgr.StatInventoryAllByDept"
+			scope="request">
+		</action>
+
 
 
 

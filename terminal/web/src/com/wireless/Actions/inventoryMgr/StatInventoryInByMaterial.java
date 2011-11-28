@@ -23,6 +23,7 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.VerifyPin;
+import com.wireless.dbObject.MaterialDetail;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Terminal;
@@ -114,12 +115,13 @@ public class StatInventoryInByMaterial extends Action {
 					+ term.restaurant_id
 					+ " AND a.restaurant_id = b.restaurant_id AND a.material_id = b.material_id "
 					+ " AND a.restaurant_id = c.restaurant_id AND a.dept_id = c.dept_id "
-					+ " AND a.type = 4 "
+					+ " AND a.type = "
+					+ MaterialDetail.TYPE_INCOME
+					+ " "
 					+ condition
 					+ " GROUP BY a.material_id, material_name, a.dept_id, dept_name "
 					+ " ORDER BY a.material_id, a.dept_id ";
 
-			System.out.println(sql);
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 
 			/**

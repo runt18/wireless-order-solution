@@ -60,49 +60,68 @@ public class InventoryCheckAction extends Action {
 
 			int materialID = Integer.parseInt(request
 					.getParameter("materialID"));
-			float price = Float.parseFloat(request.getParameter("price"));
+			float currPrice = Float.parseFloat(request
+					.getParameter("currPrice"));
+			float checkPrice = Float.parseFloat(request
+					.getParameter("checkPrice"));
 
-			SimpleDateFormat tempDate = new SimpleDateFormat("yyyy-MM-dd");
+			SimpleDateFormat tempDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 			String date = tempDate.format(new java.util.Date());
 
-			float amount = Float.parseFloat(request.getParameter("amount"));
+			String amountString = request.getParameter("amountInfo");
+
 			String staff = request.getParameter("staff");
 			String type = request.getParameter("type");
 
 			// 庫存明細
-			String sql = "INSERT INTO "
-					+ Params.dbName
-					+ ".material_detail"
-					+ "( restaurant_id, material_id, price, date, amount, type, staff ) "
-					+ " VALUES(" + term.restaurant_id + ", " + materialID
-					+ ", " + price + ", '" + date + "', " + amount + ", " + type
-					+ ", '" + staff + "' ) ";
-			int sqlRowCount = dbCon.stmt.executeUpdate(sql);
+			String sql = "";
+			int sqlRowCount = 0;
+
+			String[] deptAmounts = amountString.split("；");
+			for (int i = 0; i < deptAmounts.length; i++) {
+				String[] thisDeptAmount = deptAmounts[i].split(",");
+				sql = "INSERT INTO "
+						+ Params.dbName
+						+ ".material_detail"
+						+ "( restaurant_id, material_id, price, price_prev, date, amount, amount_prev, type, staff, dept_id ) "
+						+ " VALUES("
+						+ term.restaurant_id
+						+ ", "
+						+ materialID
+						+ ", "
+						+ checkPrice
+						+ ", "
+						+ currPrice
+						+ ", '"
+						+ date
+						+ "', "
+						+ (Float.parseFloat(thisDeptAmount[0]) - Float
+								.parseFloat(thisDeptAmount[1])) + ", "
+						+ thisDeptAmount[0] + ", " + type + ", '" + staff
+						+ "', " + i + " ) ";
+				sqlRowCount = dbCon.stmt.executeUpdate(sql);
+			}
 
 			// 庫存現狀
 			// 价格 = （库存量 × 价格 + 新入库数量 × 新入库价格）/ （库存量 + 新入库数量）
 			// 更新價錢
 			sql = "UPDATE " + Params.dbName + ".material_dept"
-					+ " SET price = " + price + " WHERE restaurant_id = "
+					+ " SET price = " + checkPrice + " WHERE restaurant_id = "
 					+ term.restaurant_id + " AND material_id =  " + materialID;
 			sqlRowCount = dbCon.stmt.executeUpdate(sql);
 
 			// 更新庫存量
-			sql = " SELECT stock FROM " + Params.dbName
-					+ ".material_dept WHERE restaurant_id = "
-					+ term.restaurant_id + " AND material_id = " + materialID
-					+ " AND dept_id = 0 ";
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			dbCon.rs.next();
-			float thisStock = dbCon.rs.getFloat("stock");
-			dbCon.rs.close();
+			for (int i = 0; i < deptAmounts.length; i++) {
+				String[] thisDeptAmount = deptAmounts[i].split(",");
 
-			sql = "UPDATE " + Params.dbName + ".material_dept"
-					+ " SET stock = "
-					+ (float) Math.round((thisStock - amount) * 100) / 100
-					+ " WHERE restaurant_id = " + term.restaurant_id
-					+ " AND material_id =  " + materialID + " AND dept_id = 0 ";
-			sqlRowCount = dbCon.stmt.executeUpdate(sql);
+				sql = "UPDATE " + Params.dbName + ".material_dept"
+						+ " SET stock = " + thisDeptAmount[1]
+						+ " WHERE restaurant_id = " + term.restaurant_id
+						+ " AND material_id =  " + materialID
+						+ " AND dept_id = " + i + " ";
+				sqlRowCount = dbCon.stmt.executeUpdate(sql);
+
+			}
 
 			jsonResp = jsonResp.replace("$(result)", "true");
 			jsonResp = jsonResp.replace("$(value)", "盘点成功！");

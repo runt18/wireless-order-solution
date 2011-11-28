@@ -98,7 +98,7 @@ inventoryInWin = new Ext.Window(
 												"deptID" : department,
 												"amount" : inventoryInCount,
 												"staff" : staff,
-												"type" : 4
+												"type" : TYPE_INCOME
 											},
 											success : function(response,
 													options) {
@@ -235,7 +235,8 @@ inventoryInWin = new Ext.Window(
 		});
 
 // ----------------- 出庫 --------------------
-var outReasonData = [ [ 1, "报损" ], [ 2, "销售" ], [ 3, "退货" ] ];
+var outReasonData = [ [ TYPE_WEAR, "报损" ], [ TYPE_SELL, "销售" ],
+		[ TYPE_RETURN, "退货" ], [ TYPE_OUT_WARE, "出仓" ] ];
 
 inventoryOutWin = new Ext.Window(
 		{
@@ -699,80 +700,71 @@ inventoryChangeWin = new Ext.Window(
 		});
 
 // ----------------- 盤點 --------------------
-var inventoryCheckGenPanel = new Ext.Panel(
-		{
-			region : "north",
-			height : 35,
-			frame : true,
+function refreshCheck() {
+	var currPrice = inventoryCheckWin.findById("checkPriceField").getValue();
+
+	var currTotalStock = 0.0;
+	inventoryCheckStore.each(function(record) {
+		currTotalStock = currTotalStock + record.get("checkStock");
+
+	});
+	var preTotalStock = 0.0;
+	for ( var i = 0; i < inventoryCheckData.length; i++) {
+		preTotalStock = preTotalStock + inventoryCheckData[i][2];
+	}
+
+	var stockDiff = prePrice - currPrice;
+	var priceDiff = (preTotalStock * prePrice).toFixed(2)
+			- (currTotalStock * currPrice).toFixed(2);
+
+	document.getElementById("stockDiff").innerHTML = stockDiff.toFixed(2);
+	document.getElementById("priceDiff").innerHTML = "￥" + priceDiff.toFixed(2);
+};
+
+var inventoryCheckGenPanel = new Ext.Panel({
+	region : "north",
+	height : 35,
+	frame : true,
+	border : false,
+	items : [ {
+		layout : "column",
+		border : false,
+		// frame : true,
+		anchor : "98%",
+		items : [ {
+			layout : "form",
 			border : false,
+			labelSeparator : '：',
+			width : 200,
+			labelWidth : 60,
 			items : [ {
-				layout : "column",
-				border : false,
-				// frame : true,
-				anchor : "98%",
-				items : [
-						{
-							layout : "form",
-							border : false,
-							labelSeparator : '：',
-							width : 200,
-							labelWidth : 60,
-							items : [ {
-								xtype : "numberfield",
-								id : "currPriceField",
-								disabled : true,
-								width : 120,
-								fieldLabel : "当前价格"
-							} ]
-						},
-						{
-							layout : "form",
-							border : false,
-							labelSeparator : '：',
-							width : 200,
-							labelWidth : 60,
-							items : [ {
-								xtype : "numberfield",
-								id : "checkPriceField",
-								width : 120,
-								fieldLabel : "盘点价格",
-								allowBlank : false,
-								listeners : {
-									"blur" : function(thiz) {
-										var currTotalStock = 0;
-										var checkTotalStock = 0;
-										for ( var i = 0; i < inventoryCheckData.length; i++) {
-											currTotalStock = currTotalStock
-													+ inventoryCheckData[i][2];
-										}
-
-										checkTotalStock = currTotalStock
-												- inventoryCheckData[0][2]
-												+ inventoryCheckStore.getAt(0)
-														.get("checkStock");
-
-										// 盈亏=SUM(当前数量 ×当前价格) - SUM(盘点数量 × 盘点价格)
-										var currPrice = inventoryCheckWin
-												.findById("currPriceField")
-												.getValue();
-										var checkPrice = thiz.getValue();
-										var stockDiff = currTotalStock
-												- checkTotalStock;
-										var priceDiff = (currTotalStock * currPrice)
-												.toFixed(2)
-												- (checkTotalStock * checkPrice)
-														.toFixed(2);
-
-										document.getElementById("stockDiff").innerHTML = stockDiff
-												.toFixed(2);
-										document.getElementById("priceDiff").innerHTML = "￥"
-												+ priceDiff.toFixed(2);
-									}
-								}
-							} ]
-						} ]
+				xtype : "numberfield",
+				id : "currPriceField",
+				disabled : true,
+				width : 120,
+				fieldLabel : "当前价格"
 			} ]
-		});
+		}, {
+			layout : "form",
+			border : false,
+			labelSeparator : '：',
+			width : 200,
+			labelWidth : 60,
+			items : [ {
+				xtype : "numberfield",
+				id : "checkPriceField",
+				width : 120,
+				fieldLabel : "盘点价格",
+				allowBlank : false,
+				listeners : {
+					"blur" : function(thiz) {
+						refreshCheck();
+					}
+				}
+			} ]
+		} ]
+	} ]
+});
 
 var inventoryCheckSumPanel = new Ext.Panel({
 	region : "south",
@@ -817,14 +809,21 @@ var inventoryCheckColumnModel = new Ext.grid.ColumnModel([
 			width : 50,
 			editor : new Ext.form.NumberField({
 				allowBlank : false,
-				allowNegative : false,
-				validator : function(v) {
-					if (currRowIndexInvenCheck != 0) {
-						return "只能修改仓管部的盘点数量！";
-					} else {
-						return true;
-					}
-				}
+				allowNegative : false
+			// ,
+			// listeners : {
+			// "blur" : function(thiz) {
+			// refreshCheck();
+			// }
+			// }
+			// ,
+			// validator : function(v) {
+			// if (currRowIndexInvenCheck != 0) {
+			// return "只能修改仓管部的盘点数量！";
+			// } else {
+			// return true;
+			// }
+			// }
 			})
 		} ]);
 
@@ -844,32 +843,10 @@ var inventoryCheckGrid = new Ext.grid.EditorGridPanel({
 		"rowclick" : function(thiz, rowIndex, e) {
 			currRowIndexInvenCheck = rowIndex;
 		},
-		"validateedit" : function(obj) {
+		"afteredit" : function(obj) {
 
 			if (obj.value >= 0) {
-				var currTotalStock = 0;
-				var checkTotalStock = 0;
-				for ( var i = 0; i < inventoryCheckData.length; i++) {
-					currTotalStock = currTotalStock + inventoryCheckData[i][2];
-				}
-
-				checkTotalStock = currTotalStock - inventoryCheckData[0][2]
-						+ obj.value;
-
-				// 盈亏=SUM(当前数量 ×当前价格) - SUM(盘点数量 × 盘点价格)
-				var currPrice = inventoryCheckWin.findById("currPriceField")
-						.getValue();
-				var checkPrice = inventoryCheckWin.findById("checkPriceField")
-						.getValue();
-				var stockDiff = currTotalStock - checkTotalStock;
-				var priceDiff = (currTotalStock * currPrice).toFixed(2)
-						- (checkTotalStock * checkPrice).toFixed(2);
-
-				document.getElementById("stockDiff").innerHTML = stockDiff
-						.toFixed(2);
-				document.getElementById("priceDiff").innerHTML = "￥"
-						+ priceDiff.toFixed(2);
-
+				refreshCheck();
 				return true;
 			} else {
 				return false;
@@ -901,79 +878,98 @@ var inventoryCheckWin = new Ext.Window(
 				items : [ inventoryCheckGenPanel, inventoryCheckDtlPanel,
 						inventoryCheckSumPanel ]
 			} ],
-			buttons : [ {
-				text : "确定",
-				handler : function() {
+			buttons : [
+					{
+						text : "确定",
+						handler : function() {
 
-					if (inventoryCheckWin.findById("checkPriceField")
-							.isValid()) {
+							if (inventoryCheckWin.findById("checkPriceField")
+									.isValid()) {
 
-						var currPrice = inventoryCheckWin.findById("checkPriceField").getValue();
-						var stockDiff = document.getElementById("stockDiff").innerHTML;
-						var material = materialGrid.getStore().getAt(
-								currRowIndex).get("materialID");
-						var staff = document.getElementById("optName").innerHTML;
+								var checkPrice = inventoryCheckWin.findById(
+										"checkPriceField").getValue();
+								var currPrice = inventoryCheckWin.findById(
+										"currPriceField").getValue();
+								var stockDiff = document
+										.getElementById("stockDiff").innerHTML;
+								var material = materialGrid.getStore().getAt(
+										currRowIndex).get("materialID");
+								var staff = document.getElementById("optName").innerHTML;
 
-						isPrompt = false;
-						inventoryCheckWin.hide();
+								var amountString = "";
+								for ( var i = 0; i < inventoryCheckData.length; i++) {
+									var deptAcountString = inventoryCheckData[i][2]
+											+ ","
+											+ inventoryCheckStore.getAt(i).get(
+													"checkStock");
+									amountString = amountString
+											+ deptAcountString + "；";
+								}
 
-						// type: 0 : 消耗 1 : 报损 2 : 销售 3 : 退货 4 : 入库 5 :
-						// 调出 6 : 调入 7 : 盘点
-						Ext.Ajax
-								.request({
-									url : "../../InventoryCheck.do",
-									params : {
-										"pin" : pin,
-										"materialID" : material,
-										"price" : currPrice,
-										"amount" : stockDiff,
-										"staff" : staff,
-										"type" : 7
-									},
-									success : function(response,
-											options) {
-										var resultJSON = Ext.util.JSON
-												.decode(response.responseText);
-										if (resultJSON.success == true) {
-											materialStore
-													.reload({
-														params : {
-															start : 0,
-															limit : materialPageRecordCount
-														}
-													});
+								amountString = amountString.substring(0,
+										amountString.length - 1);
 
-											var dataInfo = resultJSON.data;
-											Ext.MessageBox
-													.show({
-														msg : dataInfo,
-														width : 300,
-														buttons : Ext.MessageBox.OK
-													});
-										} else {
-											var dataInfo = resultJSON.data;
-											Ext.MessageBox
-													.show({
-														msg : dataInfo,
-														width : 300,
-														buttons : Ext.MessageBox.OK
-													});
-										}
-									},
-									failure : function(response,
-											options) {
-									}
-								});
+								isPrompt = false;
+								inventoryCheckWin.hide();
 
-					}
-				}
-			}, {
-				text : "取消",
-				handler : function() {
-					isPrompt = false;
-					inventoryCheckWin.hide();
-				}
-			} ],
+								// type: 0 : 消耗 1 : 报损 2 : 销售 3 : 退货 4 : 入库 5 :
+								// 调出 6 : 调入 7 : 盘点
+								Ext.Ajax
+										.request({
+											url : "../../InventoryCheck.do",
+											params : {
+												"pin" : pin,
+												"materialID" : material,
+												"currPrice" : currPrice,
+												"checkPrice" : checkPrice,
+												"amountInfo" : amountString,
+												"staff" : staff,
+												"type" : TYPE_CHECK
+											},
+											success : function(response,
+													options) {
+												var resultJSON = Ext.util.JSON
+														.decode(response.responseText);
+												if (resultJSON.success == true) {
+													materialStore
+															.reload({
+																params : {
+																	start : 0,
+																	limit : materialPageRecordCount
+																}
+															});
+
+													var dataInfo = resultJSON.data;
+													Ext.MessageBox
+															.show({
+																msg : dataInfo,
+																width : 300,
+																buttons : Ext.MessageBox.OK
+															});
+												} else {
+													var dataInfo = resultJSON.data;
+													Ext.MessageBox
+															.show({
+																msg : dataInfo,
+																width : 300,
+																buttons : Ext.MessageBox.OK
+															});
+												}
+											},
+											failure : function(response,
+													options) {
+											}
+										});
+
+							}
+						}
+					}, {
+						text : "取消",
+						handler : function() {
+							isPrompt = false;
+							inventoryCheckWin.hide();
+						}
+					} ],
 			listeners : {
 				"hide" : function(thiz) {
 					isPrompt = false;
@@ -1007,6 +1003,7 @@ var inventoryCheckWin = new Ext.Window(
 										inventoryCheckWin.findById(
 												"currPriceField").setValue(
 												rootData[0].price);
+										prePrice = rootData[0].price;
 										inventoryCheckWin.findById(
 												"checkPriceField").setValue(
 												rootData[0].price);
@@ -1212,7 +1209,10 @@ var outStatBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "出库统计",
 	handler : function(btn) {
-		// supplierAddWin.show();
+		if (!isPrompt) {
+			isPrompt = true;
+			inventoryOutStatWin.show();
+		}
 	}
 });
 
@@ -1222,7 +1222,10 @@ var changeStatBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "调拨统计",
 	handler : function(btn) {
-		// supplierAddWin.show();
+		if (!isPrompt) {
+			isPrompt = true;
+			inventoryChangeStatWin.show();
+		}
 	}
 });
 
@@ -1232,7 +1235,10 @@ var costStatBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "消耗统计",
 	handler : function(btn) {
-		// supplierAddWin.show();
+		if (!isPrompt) {
+			isPrompt = true;
+			inventoryCostStatWin.show();
+		}
 	}
 });
 
@@ -1252,7 +1258,10 @@ var inventoryStatBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "库存统计",
 	handler : function(btn) {
-		// supplierAddWin.show();
+		if (!isPrompt) {
+			isPrompt = true;
+			inventoryAllStatWin.show();
+		}
 	}
 });
 
@@ -1849,22 +1858,10 @@ Ext
 						});
 						this.removeAll();
 					} else {
-						// materialGrid
-						// .getStore()
-						// .each(
-						// function(record) {
-						// // 廚房顯示
-						// for ( var i = 0; i < kitchenTypeData.length; i++) {
-						// if (record
-						// .get("kitchen") == kitchenTypeData[i][0]) {
-						// record
-						// .set(
-						// "kitchenDisplay",
-						// kitchenTypeData[i][1]);
-						// }
-						// }
-						//
-						// });
+						// 無奈之舉
+						// loadAllMaterial();
+						materialAddWin.show();
+						materialAddWin.hide();
 					}
 				}
 			});

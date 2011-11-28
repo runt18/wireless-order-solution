@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -25,13 +24,11 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.VerifyPin;
 import com.wireless.dbObject.MaterialDetail;
-import com.wireless.dbReflect.OrderFoodReflector;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Terminal;
 
-public class StatInventoryInDetail extends Action {
+public class StatInventoryCostDetail extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -73,49 +70,40 @@ public class StatInventoryInDetail extends Action {
 			// get the query condition
 			String beginDate = request.getParameter("beginDate");
 			String endDate = request.getParameter("endDate");
-			String supplier = request.getParameter("supplier");
 			String departments = request.getParameter("departments");
 			String materials = request.getParameter("materials");
 
 			String condition = "";
 
 			if (!beginDate.equals("")) {
-				condition = condition + " AND date >= '" + beginDate
+				condition = condition + " AND a.date >= '" + beginDate
 						+ " 00:00:00" + "' ";
 			}
 			if (!endDate.equals("")) {
-				condition = condition + " AND date <= '" + endDate
+				condition = condition + " AND a.date <= '" + endDate
 						+ " 23:59:59" + "' ";
 			}
 
-			if (!supplier.equals("-1")) {
-				condition = condition + " AND supplier_id = " + supplier + " ";
-			}
-
 			if (!departments.equals("")) {
-				condition = condition + " AND dept_id IN (" + departments
+				condition = condition + " AND a.dept_id IN (" + departments
 						+ ") ";
 			}
 
-			condition = condition + " AND material_id IN (" + materials + ") ";
+			condition = condition + " AND a.material_id IN (" + materials
+					+ ") ";
 
 			/*
+			 * 
 			 * rootData[i].materialID, materialN, rootData[i].date,
-			 * rootData[i].supplierID, supplierN, rootData[i].operator,
-			 * rootData[i].departmentID, deptN, rootData[i].price,
-			 * rootData[i].amount, rootData[i].total
+			 * rootData[i].deptID, deptN, rootData[i].price, rootData[i].amount,
+			 * rootData[i].total
 			 */
 
-			String sql = " SELECT material_id, date, supplier_id, staff, dept_id, "
-					+ " price, amount, price*amount as total "
-					+ " FROM "
-					+ Params.dbName
-					+ ".material_detail "
-					+ " WHERE restaurant_id = "
-					+ term.restaurant_id
-					+ " AND type = "
-					+ MaterialDetail.TYPE_INCOME
-					+ " "
+			String sql = " SELECT a.material_id, a.date, a.dept_id, "
+					+ " a.price, a.amount, a.price*a.amount as total "
+					+ " FROM " + Params.dbName + ".material_detail a "
+					+ " WHERE a.restaurant_id = " + term.restaurant_id
+					+ " AND a.type = " + MaterialDetail.TYPE_CONSUME + " "
 					+ condition;
 
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -129,9 +117,7 @@ public class StatInventoryInDetail extends Action {
 				resultMap.put("materialID", dbCon.rs.getInt("material_id"));
 				resultMap.put("date", new SimpleDateFormat("yyyy-MM-dd")
 						.format(dbCon.rs.getDate("date")));
-				resultMap.put("supplierID", dbCon.rs.getInt("supplier_id"));
-				resultMap.put("operator", dbCon.rs.getString("staff"));
-				resultMap.put("departmentID", dbCon.rs.getInt("dept_id"));
+				resultMap.put("deptID", dbCon.rs.getInt("dept_id"));
 				resultMap.put("price", dbCon.rs.getFloat("price"));
 				resultMap.put("amount", dbCon.rs.getInt("amount"));
 				resultMap.put("total", dbCon.rs.getFloat("total"));

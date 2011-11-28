@@ -15,6 +15,7 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.VerifyPin;
+import com.wireless.dbObject.MaterialDetail;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Terminal;
@@ -67,7 +68,7 @@ public class InventoryChangeAction extends Action {
 					+ "( restaurant_id, material_id, date, dept_id, dept2_id, amount, type, staff ) "
 					+ " VALUES(" + term.restaurant_id + ", " + materialID
 					+ ", '" + date + "', " + deptIDIn + ", " + deptIDOut + ", "
-					+ amount + ", " + 5 + ", '" + staff + "' ) ";
+					+ amount + ", " + MaterialDetail.TYPE_IN + ", '" + staff + "' ) ";
 			int sqlRowCount = dbCon.stmt.executeUpdate(sql);
 
 			sql = " SELECT stock FROM " + Params.dbName
@@ -94,7 +95,7 @@ public class InventoryChangeAction extends Action {
 					+ "( restaurant_id, material_id, date, dept_id, dept2_id, amount, type, staff ) "
 					+ " VALUES(" + term.restaurant_id + ", " + materialID
 					+ ", '" + date + "', " + deptIDOut + ", " + deptIDIn + ", "
-					+ amount * (-1) + ", " + 6 + ", '" + staff + "' ) ";
+					+ amount * (-1) + ", " + MaterialDetail.TYPE_OUT + ", '" + staff + "' ) ";
 			sqlRowCount = dbCon.stmt.executeUpdate(sql);
 
 			sql = " SELECT stock FROM " + Params.dbName

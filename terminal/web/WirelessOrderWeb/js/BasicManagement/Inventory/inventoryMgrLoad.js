@@ -1,6 +1,6 @@
 ﻿function loadAllMaterial() {
-	materialData = [];
-	materialComboData = [];
+	materialData.length = 0;
+	materialComboData.length = 0;
 	Ext.Ajax.request({
 		url : "../../QueryMaterialMgr.do",
 		params : {

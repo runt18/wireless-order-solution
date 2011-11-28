@@ -56,6 +56,16 @@
 </style>
 
 <script type="text/javascript">
+	var TYPE_CONSUME = 0; //消耗
+	var TYPE_WEAR = 1; //报损
+	var TYPE_SELL = 2; //销售
+	var TYPE_RETURN = 3; //退货
+	var TYPE_OUT_WARE = 4; //出仓
+	var TYPE_INCOME = 5; //入库
+	var TYPE_OUT = 6; //调出
+	var TYPE_IN = 7; //调入
+	var TYPE_CHECK = 8; //盘点
+
 	var Request = new URLParaQuery();
 
 	// global variable
@@ -80,6 +90,26 @@
 	var inStatByMaterialResultData = [];
 	var inStatByDeptResultData = [];
 	var inStatBySupplierResultData = [];
+
+	var outStatDetailResultData = [];
+	var outStatByMaterialResultData = [];
+	var outStatByDeptResultData = [];
+	var outStatByReasonResultData = [];
+
+	var changeStatDetailResultData = [];
+	var changeStatByMaterialResultData = [];
+	var changeStatByOutDeptResultData = [];
+	var changeStatByInDeptResultData = [];
+	
+	var costStatDetailResultData = [];
+	var costStatByMaterialResultData = [];
+	var costStatByDeptResultData = [];
+	
+	var allStatDetailResultData = [];
+	var allStatByMaterialResultData = [];
+	var allStatByDeptResultData = [];
+	
+	var prePrice = 0.0;
 
 	var isPrompt = false;
 </script>
