@@ -114,7 +114,11 @@ public class PickTasteActivity extends TabActivity {
 			}
 		});
 		
-		_tabHost.setCurrentTabByTag(TAG_SPEC);
+		_tabHost.setCurrentTabByTag(TAG_TASTE);
+		_tasteTxtView = (TextView)findViewById(R.id.foodTasteTxtView);
+		ListView tasteLstView = (ListView)findViewById(R.id.tasteLstView);
+		tasteLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.tastes));
+		_handler.sendEmptyMessage(0);
 	}
 
 

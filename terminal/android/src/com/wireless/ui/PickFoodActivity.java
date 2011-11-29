@@ -113,8 +113,8 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 			}
 		});
 		
-		_tabHost.setCurrentTabByTag(TAG_PINYIN);
-
+		_tabHost.setCurrentTabByTag(TAG_NUMBER);
+		setupNumberView();
 	}
 
 	/**
