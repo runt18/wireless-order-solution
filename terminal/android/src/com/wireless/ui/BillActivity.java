@@ -83,29 +83,7 @@ public class BillActivity extends Activity {
 		
 	}
    
-	/**
-	 * 如果没有网络就弹出框，用户选择是否跳转到设置网络界面
-	 */
-//	private void shownet(){
-//		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-// 		builder.setTitle("提示");
-// 		builder.setMessage("当前没有网络,请设置")
-// 		       .setCancelable(false)
-// 		       .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-// 		           public void onClick(DialogInterface dialog, int id) {
-// 		        	  startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));//进入无线网络配置界面
-// 		           }
-// 		       })
-// 		       .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-// 		           public void onClick(DialogInterface dialog, int id) {
-// 		        	 finish();
-// 		           }
-// 		       });
-// 		AlertDialog alert = builder.create();
-// 		alert.show();
-//
-//	}
-	
+
 	/**
 	 * 执行结帐请求操作
 	 */
@@ -169,7 +147,7 @@ public class BillActivity extends Activity {
 		protected void onPostExecute(String errMsg) {
 			_progDialog.dismiss();
 			
-			if(errMsg!=null){
+			if(errMsg != null){
 				new AlertDialog.Builder(BillActivity.this)
 				.setTitle("提示")
 				.setMessage(errMsg)
