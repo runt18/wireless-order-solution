@@ -139,7 +139,7 @@ public class QueryTable {
 		 */
 		String sql = "SELECT name, minimum_cost FROM `" + Params.dbName +
 					"`.`table` WHERE alias_id=" + tableID + 
-					" AND restaurant_id=" + term.restaurant_id + " AND enabled=1";
+					" AND restaurant_id=" + term.restaurant_id;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			String tableName = dbCon.rs.getString("name");
