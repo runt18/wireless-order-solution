@@ -82,8 +82,10 @@ public class TransTableAction extends Action implements PinGen{
 				
 				int orderID = com.wireless.db.Util.getUnPaidOrderID(dbCon, oldTable);
 				
-				String sql = "UPDATE " + Params.dbName + ".order SET table_id=" +
-							 newTable.alias_id +
+				String sql = "UPDATE " + Params.dbName + ".order SET " +
+							 "table_id=" + newTable.alias_id + 
+							 ((newTable.name == null) ? " " : ", " +
+							 "table_name='" + newTable.name + "'") +  
 							 " WHERE id=" + orderID;
 				
 				dbCon.stmt.execute(sql);
