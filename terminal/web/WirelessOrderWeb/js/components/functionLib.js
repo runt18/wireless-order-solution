@@ -138,3 +138,28 @@ Ext.override(Ext.menu.Menu, {
 		this.width += "px";
 	}
 });
+
+// 庫存類型code到描述轉化
+function inventoryTypeCode2Descr(typeCode) {
+	var typeN = "";
+	if (typeCode == TYPE_CONSUME) {
+		typeN = "消耗";
+	} else if (typeCode == TYPE_WEAR) {
+		typeN = "报损";
+	} else if (typeCode == TYPE_SELL) {
+		typeN = "销售";
+	} else if (typeCode == TYPE_RETURN) {
+		typeN = "退货";
+	} else if (typeCode == TYPE_OUT_WARE) {
+		typeN = "出仓";
+	} else if (typeCode == TYPE_INCOME) {
+		typeN = "入库";
+	} else if (typeCode == TYPE_OUT) {
+		typeN = "调出";
+	} else if (typeCode == TYPE_IN) {
+		typeN = "调入";
+	} else if (typeCode == TYPE_CHECK) {
+		typeN = "盘点";
+	}
+	return typeN;
+}
