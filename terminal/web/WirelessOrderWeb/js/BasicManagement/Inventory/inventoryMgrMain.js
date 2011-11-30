@@ -1863,8 +1863,8 @@ Ext
 					} else {
 						// 無奈之舉
 						// loadAllMaterial();
-						materialAddWin.show();
-						materialAddWin.hide();
+//						materialAddWin.show();
+//						materialAddWin.hide();
 					}
 				}
 			});
