@@ -129,20 +129,22 @@ public class StatInventoryOutByReason extends Action {
 				resultMap.put("reasonCode", dbCon.rs.getInt("type"));
 
 				// type: 0 : 消耗 1 :报损 2 : 销售 3 : 退货 4 : 入库 5 : 调出 6 : 调入 7 : 盘点
-				if (dbCon.rs.getInt("type") == 1) {
+				if (dbCon.rs.getInt("type") == MaterialDetail.TYPE_WEAR) {
 					resultMap.put("reasonName", "报损 ");
-				} else if (dbCon.rs.getInt("type") == 2) {
+				} else if (dbCon.rs.getInt("type") == MaterialDetail.TYPE_SELL) {
 					resultMap.put("reasonName", "销售 ");
-				} else if (dbCon.rs.getInt("type") == 3) {
+				} else if (dbCon.rs.getInt("type") == MaterialDetail.TYPE_RETURN) {
 					resultMap.put("reasonName", "退货 ");
+				} else if (dbCon.rs.getInt("type") == MaterialDetail.TYPE_OUT_WARE) {
+					resultMap.put("reasonName", "出仓 ");
 				}
 				resultMap.put("groupID", groupID);
 				resultMap.put("groupDescr", "");
 				resultMap.put("materialID", dbCon.rs.getInt("material_id"));
 				resultMap.put("materialName",
 						dbCon.rs.getString("material_name"));
-				resultMap.put("amount", dbCon.rs.getFloat("amount"));
-				resultMap.put("sumPrice", dbCon.rs.getFloat("total_price"));
+				resultMap.put("amount", (-1)*dbCon.rs.getFloat("amount"));
+				resultMap.put("sumPrice", (-1)*dbCon.rs.getFloat("total_price"));
 
 				resultMap.put("message", "normal");
 
@@ -150,6 +152,13 @@ public class StatInventoryOutByReason extends Action {
 
 				groupID = groupID + 1;
 
+			}
+
+			if (resultList.size() == 0) {
+				HashMap resultMap = new HashMap();
+				resultMap.put("materialID", "NO_DATA");
+				resultMap.put("message", "normal");
+				resultList.add(resultMap);
 			}
 
 			dbCon.rs.close();

@@ -216,6 +216,14 @@
 			type="com.wireless.Actions.inventoryMgr.StatInventoryAllByDept"
 			scope="request">
 		</action>
+		<action path="/InventoryCheckStatDetail"
+			type="com.wireless.Actions.inventoryMgr.StatInventoryCheckDetail"
+			scope="request">
+		</action>
+		<action path="/InventoryCheckStatSum"
+			type="com.wireless.Actions.inventoryMgr.StatInventoryCheckSum"
+			scope="request">
+		</action>
 
 
 

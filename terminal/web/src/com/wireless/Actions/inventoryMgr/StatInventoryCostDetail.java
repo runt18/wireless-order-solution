@@ -119,8 +119,8 @@ public class StatInventoryCostDetail extends Action {
 						.format(dbCon.rs.getDate("date")));
 				resultMap.put("deptID", dbCon.rs.getInt("dept_id"));
 				resultMap.put("price", dbCon.rs.getFloat("price"));
-				resultMap.put("amount", dbCon.rs.getInt("amount"));
-				resultMap.put("total", dbCon.rs.getFloat("total"));
+				resultMap.put("amount", (-1)*dbCon.rs.getInt("amount"));
+				resultMap.put("total", (-1)*dbCon.rs.getFloat("total"));
 
 				resultMap.put("message", "normal");
 
@@ -170,11 +170,11 @@ public class StatInventoryCostDetail extends Action {
 			} else {
 
 				DecimalFormat fnum = new DecimalFormat("##0.00");
-				String totalPriceDiaplay = fnum.format(allTotalCount);
+				String totalPriceDiaplay = fnum.format((-1)*allTotalCount);
 				HashMap resultMap = new HashMap();
 				resultMap.put("materialID", "SUM");
 				resultMap.put("price", "汇总");
-				resultMap.put("amount", allTotalAmount);
+				resultMap.put("amount", (-1)*allTotalAmount);
 				resultMap.put("total", totalPriceDiaplay);
 				resultMap.put("message", "normal");
 				resultList.add(resultMap);

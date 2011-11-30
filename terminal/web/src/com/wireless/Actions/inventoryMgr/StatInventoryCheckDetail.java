@@ -28,7 +28,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Terminal;
 
-public class StatInventoryChangeDetail extends Action {
+public class StatInventoryCheckDetail extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -70,9 +70,9 @@ public class StatInventoryChangeDetail extends Action {
 			// get the query condition
 			String beginDate = request.getParameter("beginDate");
 			String endDate = request.getParameter("endDate");
-			String outDepartments = request.getParameter("outDepartments");
-			String inDepartments = request.getParameter("inDepartments");
+			String departments = request.getParameter("departments");
 			String materials = request.getParameter("materials");
+			String isDiff = request.getParameter("isDiff");
 
 			String condition = "";
 
@@ -85,36 +85,27 @@ public class StatInventoryChangeDetail extends Action {
 						+ " 23:59:59" + "' ";
 			}
 
-			if (!outDepartments.equals("")) {
-				condition = condition + " AND a.dept_id IN (" + outDepartments
+			if (!departments.equals("")) {
+				condition = condition + " AND a.dept_id IN (" + departments
 						+ ") ";
-			}
-
-			if (!inDepartments.equals("")) {
-				condition = condition + " AND a.dept2_id IN (" + inDepartments
-						+ ") ";
-
 			}
 
 			condition = condition + " AND a.material_id IN (" + materials
 					+ ") ";
 
+			if (isDiff.equals("true")) {
+				condition = condition
+						+ " AND (a.amount <> 0 OR a.price_prev <> a.price) ";
+			}
+
 			/*
 			 */
 
-			String sql = " SELECT a.material_id, a.date, a.dept_id, a.dept2_id, a.staff, "
-					+ " b.price, a.amount, b.price*a.amount as total "
-					+ " FROM "
-					+ Params.dbName
-					+ ".material_detail a, "
-					+ Params.dbName
-					+ ".material_dept b "
-					+ " WHERE a.restaurant_id = "
-					+ term.restaurant_id
-					+ " AND a.restaurant_id = b.restaurant_id AND a.material_id = b.material_id AND a.dept_id = b.dept_id "
-					+ " AND a.type = "
-					+ MaterialDetail.TYPE_OUT
-					+ " "
+			String sql = " SELECT a.material_id, a.date, a.dept_id, a.staff, "
+					+ " a.price_prev, a.amount_prev, a.price, (a.amount_prev - a.amount) AS amount "
+					+ " FROM " + Params.dbName + ".material_detail a "
+					+ " WHERE a.restaurant_id = " + term.restaurant_id
+					+ " AND a.type = " + MaterialDetail.TYPE_CHECK + " "
 					+ condition;
 
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -126,23 +117,34 @@ public class StatInventoryChangeDetail extends Action {
 
 				HashMap resultMap = new HashMap();
 				resultMap.put("materialID", dbCon.rs.getInt("material_id"));
-				resultMap.put("date", new SimpleDateFormat("yyyy-MM-dd")
-						.format(dbCon.rs.getDate("date")));
-				resultMap.put("outDeptID", dbCon.rs.getInt("dept_id"));
-				resultMap.put("inDeptID", dbCon.rs.getInt("dept2_id"));
+				// resultMap.put("date", new SimpleDateFormat("yyyy-MM-dd")
+				// .format(dbCon.rs.getDate("date")));
+				resultMap
+						.put("date",
+								new SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
+										.format(dbCon.rs.getDate("date")));
+				resultMap.put("deptID", dbCon.rs.getInt("dept_id"));
 				resultMap.put("operator", dbCon.rs.getString("staff"));
+				resultMap.put("pricePrevious", dbCon.rs.getFloat("price_prev"));
+				resultMap.put("amountPrevious", dbCon.rs.getInt("amount_prev"));
 				resultMap.put("price", dbCon.rs.getFloat("price"));
-				resultMap.put("amount", (-1)*dbCon.rs.getInt("amount"));
-				resultMap.put("total", (-1)*dbCon.rs.getFloat("total"));
+				resultMap.put("amount", dbCon.rs.getInt("amount"));
 
 				resultMap.put("message", "normal");
 
 				resultList.add(resultMap);
 
-				allTotalCount = (float) Math.round((allTotalCount + dbCon.rs
-						.getFloat("total")) * 100) / 100;
-				allTotalAmount = allTotalAmount + dbCon.rs.getInt("amount");
+				// allTotalCount = (float) Math.round((allTotalCount + dbCon.rs
+				// .getFloat("total")) * 100) / 100;
+				// allTotalAmount = allTotalAmount + dbCon.rs.getInt("amount");
 
+			}
+
+			if (resultList.size() == 0) {
+				HashMap resultMap = new HashMap();
+				resultMap.put("materialID", "NO_DATA");
+				resultMap.put("message", "normal");
+				resultList.add(resultMap);
 			}
 
 			dbCon.rs.close();
@@ -182,15 +184,15 @@ public class StatInventoryChangeDetail extends Action {
 				rootMap.put("root", resultList);
 			} else {
 
-				DecimalFormat fnum = new DecimalFormat("##0.00");
-				String totalPriceDiaplay = fnum.format((-1)*allTotalCount);
-				HashMap resultMap = new HashMap();
-				resultMap.put("materialID", "SUM");
-				resultMap.put("price", "汇总");
-				resultMap.put("amount", (-1)*allTotalAmount);
-				resultMap.put("total", totalPriceDiaplay);
-				resultMap.put("message", "normal");
-				resultList.add(resultMap);
+				// DecimalFormat fnum = new DecimalFormat("##0.00");
+				// String totalPriceDiaplay = fnum.format(allTotalCount);
+				// HashMap resultMap = new HashMap();
+				// resultMap.put("materialID", "SUM");
+				// resultMap.put("price", "汇总");
+				// resultMap.put("amount", allTotalAmount);
+				// resultMap.put("total", totalPriceDiaplay);
+				// resultMap.put("message", "normal");
+				// resultList.add(resultMap);
 
 				rootMap.put("root", resultList);
 			}

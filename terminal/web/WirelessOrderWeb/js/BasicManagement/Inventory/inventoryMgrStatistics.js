@@ -26,6 +26,69 @@ var inStatSupplierCombo = new Ext.form.ComboBox({
 	allowBlank : false
 });
 
+var inventoryInStatFrom = new Ext.form.FormPanel({
+	border : false,
+	anchor : "right 10%",
+	id : "InStatForm",
+	items : [ {
+		layout : "column",
+		border : false,
+		frame : true,
+		items : [ {
+			layout : "form",
+			border : false,
+			width : 70,
+			items : [ {
+				xtype : 'radio',
+				hideLabel : true,
+				boxLabel : "明细",
+				checked : true,
+				name : 'InStat',
+				inputValue : 'detail'
+			} ]
+		}, {
+			layout : "form",
+			border : false,
+			labelSeparator : '',
+			width : 110,
+			items : [ {
+				xtype : 'radio',
+				hideLabel : true,
+				boxLabel : "按食材汇总",
+				// checked : true,
+				name : 'InStat',
+				inputValue : 'sumByMaterial'
+			} ]
+		}, {
+			layout : "form",
+			border : false,
+			labelSeparator : '',
+			width : 110,
+			items : [ {
+				xtype : 'radio',
+				hideLabel : true,
+				boxLabel : "按部门汇总",
+				// checked : true,
+				name : 'InStat',
+				inputValue : 'sumByDept'
+			} ]
+		}, {
+			layout : "form",
+			border : false,
+			labelSeparator : '',
+			width : 110,
+			items : [ {
+				xtype : 'radio',
+				hideLabel : true,
+				boxLabel : "按供应商汇总",
+				// checked : true,
+				name : 'InStat',
+				inputValue : 'sumBySupplier'
+			} ]
+		} ]
+	} ]
+});
+
 inventoryInStatWin = new Ext.Window(
 		{
 			title : "入库统计",
@@ -222,185 +285,7 @@ inventoryInStatWin = new Ext.Window(
 					toLegend : "已选择食材",
 					fromLegend : "可选择食材"
 				} ]
-			}, {
-				layout : "column",
-				border : false,
-				anchor : "right 10%",
-				frame : true,
-				items : [ {
-					layout : "form",
-					border : false,
-					width : 70,
-					items : [ {
-						xtype : 'radio',
-						hideLabel : true,
-						boxLabel : "明细",
-						checked : true,
-						name : 'InStat',
-						inputValue : 'detail'
-					} ]
-				}, {
-					layout : "form",
-					border : false,
-					labelSeparator : '',
-					width : 110,
-					items : [ {
-						xtype : 'radio',
-						hideLabel : true,
-						boxLabel : "按食材汇总",
-						//checked : true,
-						name : 'InStat',
-						inputValue : 'sumByMaterial'
-					} ]
-				}, {
-					layout : "form",
-					border : false,
-					labelSeparator : '',
-					width : 110,
-					items : [ {
-						xtype : 'radio',
-						hideLabel : true,
-						boxLabel : "按部门汇总",
-						//checked : true,
-						name : 'InStat',
-						inputValue : 'sumByDept'
-					} ]
-				}, {
-					layout : "form",
-					border : false,
-					labelSeparator : '',
-					width : 110,
-					items : [ {
-						xtype : 'radio',
-						hideLabel : true,
-						boxLabel : "按供应商汇总",
-						//checked : true,
-						name : 'InStat',
-						inputValue : 'sumBySupplier'
-					} ]
-				}
-				// {
-				// layout : "form",
-				// border : false,
-				// labelSeparator : '',
-				// width : 70,
-				// labelWidth : 30,
-				// items : [ {
-				// xtype : "checkbox",
-				// id : "detailInStat",
-				// fieldLabel : "明细",
-				// listeners : {
-				// "check" : function(thiz, checked) {
-				// if (checked) {
-				// inventoryInStatWin
-				// .findById(
-				// "sumByMaterialInStat")
-				// .setValue(false);
-				// inventoryInStatWin
-				// .findById(
-				// "sumByDeptInStat")
-				// .setValue(false);
-				// inventoryInStatWin
-				// .findById(
-				// "sumBySuplierInStat")
-				// .setValue(false);
-				// }
-				// }
-				// }
-				// } ]
-				// },
-				// {
-				// layout : "form",
-				// border : false,
-				// labelSeparator : '',
-				// width : 110,
-				// labelWidth : 70,
-				// items : [ {
-				// xtype : "checkbox",
-				// id : "sumByMaterialInStat",
-				// fieldLabel : "按食材汇总",
-				// listeners : {
-				// "check" : function(thiz, checked) {
-				// if (checked) {
-				// inventoryInStatWin
-				// .findById(
-				// "detailInStat")
-				// .setValue(false);
-				// inventoryInStatWin
-				// .findById(
-				// "sumByDeptInStat")
-				// .setValue(false);
-				// inventoryInStatWin
-				// .findById(
-				// "sumBySuplierInStat")
-				// .setValue(false);
-				// }
-				// }
-				// }
-				// } ]
-				// },
-				// {
-				// layout : "form",
-				// border : false,
-				// labelSeparator : '',
-				// width : 110,
-				// labelWidth : 70,
-				// items : [ {
-				// xtype : "checkbox",
-				// id : "sumByDeptInStat",
-				// fieldLabel : "按部门汇总",
-				// listeners : {
-				// "check" : function(thiz, checked) {
-				// if (checked) {
-				// inventoryInStatWin
-				// .findById(
-				// "detailInStat")
-				// .setValue(false);
-				// inventoryInStatWin
-				// .findById(
-				// "sumByMaterialInStat")
-				// .setValue(false);
-				// inventoryInStatWin
-				// .findById(
-				// "sumBySuplierInStat")
-				// .setValue(false);
-				// }
-				// }
-				// }
-				// } ]
-				// },
-				// {
-				// layout : "form",
-				// border : false,
-				// labelSeparator : '',
-				// width : 110,
-				// labelWidth : 80,
-				// items : [ {
-				// xtype : "checkbox",
-				// id : "sumBySuplierInStat",
-				// fieldLabel : "按供应商汇总",
-				// listeners : {
-				// "check" : function(thiz, checked) {
-				// if (checked) {
-				// inventoryInStatWin
-				// .findById(
-				// "detailInStat")
-				// .setValue(false);
-				// inventoryInStatWin
-				// .findById(
-				// "sumByMaterialInStat")
-				// .setValue(false);
-				// inventoryInStatWin
-				// .findById(
-				// "sumByDeptInStat")
-				// .setValue(false);
-				// }
-				// }
-				// }
-				// } ]
-				// }
-				]
-			} ],
+			}, inventoryInStatFrom ],
 			buttons : [
 					{
 						text : "全选",
@@ -521,8 +406,9 @@ inventoryInStatWin = new Ext.Window(
 								}
 
 								// -- 獲取統計類型 --
-								if (inventoryInStatWin.findById("detailInStat")
-										.getValue() == true) {
+								var staticType = inventoryInStatFrom.getForm()
+										.findField("InStat").getGroupValue();
+								if (staticType == "detail") {
 									isPrompt = true;
 									inStatDetailResultWin.show();
 
@@ -606,8 +492,7 @@ inventoryInStatWin = new Ext.Window(
 												}
 											});
 
-								} else if (inventoryInStatWin.findById(
-										"sumByMaterialInStat").getValue() == true) {
+								} else if (staticType == "sumByMaterial") {
 									isPrompt = true;
 									inStatByMaterialResultWin.show();
 
@@ -636,6 +521,11 @@ inventoryInStatWin = new Ext.Window(
 																.getStore()
 																.loadData(
 																		inStatByMaterialResultData);
+														if (rootData[0].materialID == "NO_DATA") {
+															inStatByMateriaGrid
+																	.getStore()
+																	.removeAll();
+														}
 
 													} else {
 														Ext.MessageBox
@@ -657,8 +547,7 @@ inventoryInStatWin = new Ext.Window(
 												}
 											});
 
-								} else if (inventoryInStatWin.findById(
-										"sumByDeptInStat").getValue() == true) {
+								} else if (staticType == "sumByDept") {
 
 									isPrompt = true;
 									inStatByDeptResultWin.show();
@@ -688,6 +577,11 @@ inventoryInStatWin = new Ext.Window(
 																.getStore()
 																.loadData(
 																		inStatByDeptResultData);
+														if (rootData[0].materialID == "NO_DATA") {
+															inStatByDeptGrid
+																	.getStore()
+																	.removeAll();
+														}
 
 													} else {
 														Ext.MessageBox
@@ -709,8 +603,7 @@ inventoryInStatWin = new Ext.Window(
 												}
 											});
 
-								} else if (inventoryInStatWin.findById(
-										"sumBySuplierInStat").getValue() == true) {
+								} else if (staticType == "sumBySupplier") {
 
 									isPrompt = true;
 									inStatBySupplierResultWin.show();
@@ -740,6 +633,11 @@ inventoryInStatWin = new Ext.Window(
 																.getStore()
 																.loadData(
 																		inStatBySupplierResultData);
+														if (rootData[0].materialID == "NO_DATA") {
+															inStatBySupplierGrid
+																	.getStore()
+																	.removeAll();
+														}
 
 													} else {
 														Ext.MessageBox
@@ -834,14 +732,8 @@ inventoryInStatWin = new Ext.Window(
 					inventoryInStatWin.findById("dept9InStat").setValue(false);
 					inventoryInStatWin.findById("dept10InStat").setValue(false);
 
-					// inventoryInStatWin.findById("detailInStat").setValue(true);
-					// inventoryInStatWin.findById("sumByMaterialInStat")
-					// .setValue(false);
-					// inventoryInStatWin.findById("sumByDeptInStat").setValue(
-					// false);
-					// inventoryInStatWin.findById("sumBySuplierInStat").setValue(
-					// false);
-					inventoryInStatWin.finByName("InStat").setValue();
+					inventoryInStatFrom.getForm().findField("InStat").setValue(
+							"detail");
 
 				},
 				"hide" : function(thiz) {
@@ -1461,6 +1353,69 @@ var inventoryOutStatMSDS = new Ext.data.SimpleStore({
 	data : []
 });
 
+var inventoryOutStatFrom = new Ext.form.FormPanel({
+	border : false,
+	anchor : "right 10%",
+	id : "OutStatForm",
+	items : [ {
+		layout : "column",
+		border : false,
+		frame : true,
+		items : [ {
+			layout : "form",
+			border : false,
+			width : 70,
+			items : [ {
+				xtype : 'radio',
+				hideLabel : true,
+				boxLabel : "明细",
+				checked : true,
+				name : 'OutStat',
+				inputValue : 'detail'
+			} ]
+		}, {
+			layout : "form",
+			border : false,
+			labelSeparator : '',
+			width : 110,
+			items : [ {
+				xtype : 'radio',
+				hideLabel : true,
+				boxLabel : "按食材汇总",
+				// checked : true,
+				name : 'OutStat',
+				inputValue : 'sumByMaterial'
+			} ]
+		}, {
+			layout : "form",
+			border : false,
+			labelSeparator : '',
+			width : 110,
+			items : [ {
+				xtype : 'radio',
+				hideLabel : true,
+				boxLabel : "按部门汇总",
+				// checked : true,
+				name : 'OutStat',
+				inputValue : 'sumByDept'
+			} ]
+		}, {
+			layout : "form",
+			border : false,
+			labelSeparator : '',
+			width : 110,
+			items : [ {
+				xtype : 'radio',
+				hideLabel : true,
+				boxLabel : "按原因汇总",
+				// checked : true,
+				name : 'OutStat',
+				inputValue : 'sumByReason'
+			} ]
+		} ]
+	} ]
+});
+
 inventoryOutStatWin = new Ext.Window(
 		{
 			title : "出库统计",
@@ -1469,363 +1424,232 @@ inventoryOutStatWin = new Ext.Window(
 			closeAction : "hide",
 			resizable : false,
 			layout : "anchor",
-			items : [
-					{
-						border : false,
-						anchor : "right 10%",
-						items : [ {
-							layout : "column",
-							border : false,
-							frame : true,
-							anchor : "98%",
-							items : [ {
-								layout : "form",
-								border : false,
-								labelSeparator : ' ',
-								width : 200,
-								labelWidth : 50,
-								items : [ {
-									xtype : "datefield",
-									id : "begDateOutStat",
-									width : 120,
-									fieldLabel : "日期"
-								} ]
-							}, {
-								layout : "form",
-								border : false,
-								labelSeparator : ' ',
-								width : 200,
-								labelWidth : 50,
-								items : [ {
-									xtype : "datefield",
-									id : "endDateOutStat",
-									width : 120,
-									fieldLabel : "至"
-								} ]
-							} ]
-						} ]
-					},
-					{
-						border : false,
-						anchor : "right 10%",
-						items : [ {
-							layout : "column",
-							border : false,
-							frame : true,
-							anchor : "98%",
-							items : [ {
-								layout : "form",
-								border : false,
-								labelSeparator : '：',
-								width : 80,
-								labelWidth : 40,
-								items : [ {
-									xtype : "checkbox",
-									id : "destroyOutStat",
-									fieldLabel : "报损"
-								} ]
-							}, {
-								layout : "form",
-								border : false,
-								labelSeparator : '：',
-								width : 80,
-								labelWidth : 40,
-								items : [ {
-									xtype : "checkbox",
-									id : "saleOutStat",
-									fieldLabel : "销售"
-								} ]
-							}, {
-								layout : "form",
-								border : false,
-								labelSeparator : '：',
-								width : 80,
-								labelWidth : 40,
-								items : [ {
-									xtype : "checkbox",
-									id : "returnOutStat",
-									fieldLabel : "退货"
-								} ]
-							}, {
-								layout : "form",
-								border : false,
-								labelSeparator : '：',
-								width : 80,
-								labelWidth : 40,
-								items : [ {
-									xtype : "checkbox",
-									id : "outInventOutStat",
-									fieldLabel : "出仓"
-								} ]
-							} ]
-						} ]
-					},
-					{
-						layout : "column",
-						border : false,
-						anchor : "99% 15%",
-						autoScroll : true,
-						frame : true,
-						items : [ {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept1OutStat"
-							// fieldLabel : departmentData[0][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept2OutStat"
-							// fieldLabel : departmentData[1][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept3OutStat"
-							// fieldLabel : departmentData[2][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept4OutStat"
-							// fieldLabel : departmentData[3][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept5OutStat"
-							// fieldLabel : departmentData[4][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept6OutStat"
-							// fieldLabel : departmentData[5][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept7OutStat"
-							// fieldLabel : departmentData[6][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept8OutStat"
-							// fieldLabel : departmentData[7][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept9OutStat"
-							// fieldLabel : departmentData[8][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept10OutStat"
-							// fieldLabel : departmentData[9][1]
-							} ]
-						} ]
-					},
-					{
+			items : [ {
+				border : false,
+				anchor : "right 10%",
+				items : [ {
+					layout : "column",
+					border : false,
+					frame : true,
+					anchor : "98%",
+					items : [ {
 						layout : "form",
 						border : false,
-						frame : true,
-						hideLabels : true,
-						anchor : "right 56%",
+						labelSeparator : ' ',
+						width : 200,
+						labelWidth : 50,
 						items : [ {
-							xtype : "itemselector",
-							name : "materialOutStatMultSelect",
-							id : "materialOutStatMultSelect",
-							fromStore : inventoryOutStatMSDS,
-							dataFields : [ "retrunValue", "displayText" ],
-							toData : [ [ "", "" ] ],
-							msHeight : 175,
-							valueField : "retrunValue",
-							displayField : "displayText",
-							imagePath : "../../extjs/multiselect/images/",
-							toLegend : "已选择食材",
-							fromLegend : "可选择食材"
+							xtype : "datefield",
+							id : "begDateOutStat",
+							width : 120,
+							fieldLabel : "日期"
 						} ]
-					},
-					{
-						layout : "column",
+					}, {
+						layout : "form",
 						border : false,
-						anchor : "right 10%",
-						frame : true,
-						items : [
-								{
-									layout : "form",
-									border : false,
-									labelSeparator : '',
-									width : 70,
-									labelWidth : 30,
-									items : [ {
-										xtype : "checkbox",
-										id : "detailOutStat",
-										fieldLabel : "明细",
-										listeners : {
-											"check" : function(thiz, checked) {
-												if (checked) {
-													inventoryOutStatWin
-															.findById(
-																	"sumByMaterialOutStat")
-															.setValue(false);
-													inventoryOutStatWin
-															.findById(
-																	"sumByDeptOutStat")
-															.setValue(false);
-													inventoryOutStatWin
-															.findById(
-																	"sumByReasonOutStat")
-															.setValue(false);
-												}
-											}
-										}
-									} ]
-								},
-								{
-									layout : "form",
-									border : false,
-									labelSeparator : '',
-									width : 110,
-									labelWidth : 70,
-									items : [ {
-										xtype : "checkbox",
-										id : "sumByMaterialOutStat",
-										fieldLabel : "按食材汇总",
-										listeners : {
-											"check" : function(thiz, checked) {
-												if (checked) {
-													inventoryOutStatWin
-															.findById(
-																	"detailOutStat")
-															.setValue(false);
-													inventoryOutStatWin
-															.findById(
-																	"sumByDeptOutStat")
-															.setValue(false);
-													inventoryOutStatWin
-															.findById(
-																	"sumByReasonOutStat")
-															.setValue(false);
-												}
-											}
-										}
-									} ]
-								},
-								{
-									layout : "form",
-									border : false,
-									labelSeparator : '',
-									width : 110,
-									labelWidth : 70,
-									items : [ {
-										xtype : "checkbox",
-										id : "sumByDeptOutStat",
-										fieldLabel : "按部门汇总",
-										listeners : {
-											"check" : function(thiz, checked) {
-												if (checked) {
-													inventoryOutStatWin
-															.findById(
-																	"detailOutStat")
-															.setValue(false);
-													inventoryOutStatWin
-															.findById(
-																	"sumByMaterialOutStat")
-															.setValue(false);
-													inventoryOutStatWin
-															.findById(
-																	"sumByReasonOutStat")
-															.setValue(false);
-												}
-											}
-										}
-									} ]
-								},
-								{
-									layout : "form",
-									border : false,
-									labelSeparator : '',
-									width : 110,
-									labelWidth : 70,
-									items : [ {
-										xtype : "checkbox",
-										id : "sumByReasonOutStat",
-										fieldLabel : "按原因汇总",
-										listeners : {
-											"check" : function(thiz, checked) {
-												if (checked) {
-													inventoryOutStatWin
-															.findById(
-																	"detailOutStat")
-															.setValue(false);
-													inventoryOutStatWin
-															.findById(
-																	"sumByMaterialOutStat")
-															.setValue(false);
-													inventoryOutStatWin
-															.findById(
-																	"sumByDeptOutStat")
-															.setValue(false);
-												}
-											}
-										}
-									} ]
-								} ]
-					} ],
+						labelSeparator : ' ',
+						width : 200,
+						labelWidth : 50,
+						items : [ {
+							xtype : "datefield",
+							id : "endDateOutStat",
+							width : 120,
+							fieldLabel : "至"
+						} ]
+					} ]
+				} ]
+			}, {
+				border : false,
+				anchor : "right 10%",
+				items : [ {
+					layout : "column",
+					border : false,
+					frame : true,
+					anchor : "98%",
+					items : [ {
+						layout : "form",
+						border : false,
+						labelSeparator : '：',
+						width : 80,
+						labelWidth : 40,
+						items : [ {
+							xtype : "checkbox",
+							id : "destroyOutStat",
+							fieldLabel : "报损"
+						} ]
+					}, {
+						layout : "form",
+						border : false,
+						labelSeparator : '：',
+						width : 80,
+						labelWidth : 40,
+						items : [ {
+							xtype : "checkbox",
+							id : "saleOutStat",
+							fieldLabel : "销售"
+						} ]
+					}, {
+						layout : "form",
+						border : false,
+						labelSeparator : '：',
+						width : 80,
+						labelWidth : 40,
+						items : [ {
+							xtype : "checkbox",
+							id : "returnOutStat",
+							fieldLabel : "退货"
+						} ]
+					}, {
+						layout : "form",
+						border : false,
+						labelSeparator : '：',
+						width : 80,
+						labelWidth : 40,
+						items : [ {
+							xtype : "checkbox",
+							id : "outInventOutStat",
+							fieldLabel : "出仓"
+						} ]
+					} ]
+				} ]
+			}, {
+				layout : "column",
+				border : false,
+				anchor : "99% 15%",
+				autoScroll : true,
+				frame : true,
+				items : [ {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept1OutStat"
+					// fieldLabel : departmentData[0][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept2OutStat"
+					// fieldLabel : departmentData[1][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept3OutStat"
+					// fieldLabel : departmentData[2][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept4OutStat"
+					// fieldLabel : departmentData[3][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept5OutStat"
+					// fieldLabel : departmentData[4][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept6OutStat"
+					// fieldLabel : departmentData[5][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept7OutStat"
+					// fieldLabel : departmentData[6][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept8OutStat"
+					// fieldLabel : departmentData[7][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept9OutStat"
+					// fieldLabel : departmentData[8][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept10OutStat"
+					// fieldLabel : departmentData[9][1]
+					} ]
+				} ]
+			}, {
+				layout : "form",
+				border : false,
+				frame : true,
+				hideLabels : true,
+				anchor : "right 56%",
+				items : [ {
+					xtype : "itemselector",
+					name : "materialOutStatMultSelect",
+					id : "materialOutStatMultSelect",
+					fromStore : inventoryOutStatMSDS,
+					dataFields : [ "retrunValue", "displayText" ],
+					toData : [ [ "", "" ] ],
+					msHeight : 175,
+					valueField : "retrunValue",
+					displayField : "displayText",
+					imagePath : "../../extjs/multiselect/images/",
+					toLegend : "已选择食材",
+					fromLegend : "可选择食材"
+				} ]
+			}, inventoryOutStatFrom ],
 			buttons : [
 					{
 						text : "全选",
@@ -1965,8 +1789,9 @@ inventoryOutStatWin = new Ext.Window(
 								}
 
 								// -- 獲取統計類型 --
-								if (inventoryOutStatWin.findById(
-										"detailOutStat").getValue() == true) {
+								var staticType = inventoryOutStatFrom.getForm()
+										.findField("OutStat").getGroupValue();
+								if (staticType == "detail") {
 									isPrompt = true;
 									outStatDetailResultWin.show();
 
@@ -2050,8 +1875,7 @@ inventoryOutStatWin = new Ext.Window(
 												}
 											});
 
-								} else if (inventoryOutStatWin.findById(
-										"sumByMaterialOutStat").getValue() == true) {
+								} else if (staticType == "sumByMaterial") {
 									isPrompt = true;
 									outStatByMaterialResultWin.show();
 
@@ -2080,6 +1904,11 @@ inventoryOutStatWin = new Ext.Window(
 																.getStore()
 																.loadData(
 																		outStatByMaterialResultData);
+														if (rootData[0].materialID == "NO_DATA") {
+															outStatByMateriaGrid
+																	.getStore()
+																	.removeAll();
+														}
 
 													} else {
 														Ext.MessageBox
@@ -2101,8 +1930,7 @@ inventoryOutStatWin = new Ext.Window(
 												}
 											});
 
-								} else if (inventoryOutStatWin.findById(
-										"sumByDeptOutStat").getValue() == true) {
+								} else if (staticType == "sumByDept") {
 
 									isPrompt = true;
 									outStatByDeptResultWin.show();
@@ -2132,6 +1960,11 @@ inventoryOutStatWin = new Ext.Window(
 																.getStore()
 																.loadData(
 																		outStatByDeptResultData);
+														if (rootData[0].materialID == "NO_DATA") {
+															outStatByDeptGrid
+																	.getStore()
+																	.removeAll();
+														}
 
 													} else {
 														Ext.MessageBox
@@ -2153,8 +1986,7 @@ inventoryOutStatWin = new Ext.Window(
 												}
 											});
 
-								} else if (inventoryOutStatWin.findById(
-										"sumByReasonOutStat").getValue() == true) {
+								} else if (staticType == "sumByReason") {
 
 									isPrompt = true;
 									outStatByReasonResultWin.show();
@@ -2184,6 +2016,11 @@ inventoryOutStatWin = new Ext.Window(
 																.getStore()
 																.loadData(
 																		outStatByReasonResultData);
+														if (rootData[0].materialID == "NO_DATA") {
+															outStatByReasonGrid
+																	.getStore()
+																	.removeAll();
+														}
 
 													} else {
 														Ext.MessageBox
@@ -2293,14 +2130,8 @@ inventoryOutStatWin = new Ext.Window(
 					inventoryOutStatWin.findById("dept10OutStat").setValue(
 							false);
 
-					inventoryOutStatWin.findById("detailOutStat")
-							.setValue(true);
-					inventoryOutStatWin.findById("sumByMaterialOutStat")
-							.setValue(false);
-					inventoryOutStatWin.findById("sumByDeptOutStat").setValue(
-							false);
-					inventoryOutStatWin.findById("sumByReasonOutStat")
-							.setValue(false);
+					inventoryOutStatFrom.getForm().findField("OutStat")
+							.setValue("detail");
 
 				},
 				"hide" : function(thiz) {
@@ -2913,6 +2744,69 @@ var inventoryChangeStatMSDS = new Ext.data.SimpleStore({
 	data : []
 });
 
+var inventoryChangeStatFrom = new Ext.form.FormPanel({
+	border : false,
+	anchor : "right 10%",
+	id : "ChangeStatForm",
+	items : [ {
+		layout : "column",
+		border : false,
+		frame : true,
+		items : [ {
+			layout : "form",
+			border : false,
+			width : 70,
+			items : [ {
+				xtype : 'radio',
+				hideLabel : true,
+				boxLabel : "明细",
+				checked : true,
+				name : 'ChangeStat',
+				inputValue : 'detail'
+			} ]
+		}, {
+			layout : "form",
+			border : false,
+			labelSeparator : '',
+			width : 110,
+			items : [ {
+				xtype : 'radio',
+				hideLabel : true,
+				boxLabel : "按食材汇总",
+				// checked : true,
+				name : 'ChangeStat',
+				inputValue : 'sumByMaterial'
+			} ]
+		}, {
+			layout : "form",
+			border : false,
+			labelSeparator : '',
+			width : 125,
+			items : [ {
+				xtype : 'radio',
+				hideLabel : true,
+				boxLabel : "按调出部门汇总",
+				// checked : true,
+				name : 'ChangeStat',
+				inputValue : 'sumByOutDept'
+			} ]
+		}, {
+			layout : "form",
+			border : false,
+			labelSeparator : '',
+			width : 110,
+			items : [ {
+				xtype : 'radio',
+				hideLabel : true,
+				boxLabel : "按调入部门汇总",
+				// checked : true,
+				name : 'ChangeStat',
+				inputValue : 'sumByInDept'
+			} ]
+		} ]
+	} ]
+});
+
 inventoryChangeStatWin = new Ext.Window(
 		{
 			title : "调拨统计",
@@ -2921,426 +2815,295 @@ inventoryChangeStatWin = new Ext.Window(
 			closeAction : "hide",
 			resizable : false,
 			layout : "anchor",
-			items : [
-					{
-						border : false,
-						anchor : "right 10%",
-						items : [ {
-							layout : "column",
-							border : false,
-							frame : true,
-							anchor : "98%",
-							items : [ {
-								layout : "form",
-								border : false,
-								labelSeparator : ' ',
-								width : 200,
-								labelWidth : 50,
-								items : [ {
-									xtype : "datefield",
-									id : "begDateChangeStat",
-									width : 120,
-									fieldLabel : "日期"
-								} ]
-							}, {
-								layout : "form",
-								border : false,
-								labelSeparator : ' ',
-								width : 200,
-								labelWidth : 50,
-								items : [ {
-									xtype : "datefield",
-									id : "endDateChangeStat",
-									width : 120,
-									fieldLabel : "至"
-								} ]
-							} ]
-						} ]
-					},
-					{
-						layout : "column",
-						border : false,
-						anchor : "99% 15%",
-						autoScroll : true,
-						frame : true,
-						items : [ {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept1ChengeOutStat"
-							// fieldLabel : departmentData[0][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept2ChengeOutStat"
-							// fieldLabel : departmentData[1][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept3ChengeOutStat"
-							// fieldLabel : departmentData[2][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept4ChengeOutStat"
-							// fieldLabel : departmentData[3][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept5ChengeOutStat"
-							// fieldLabel : departmentData[4][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept6ChengeOutStat"
-							// fieldLabel : departmentData[5][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept7ChengeOutStat"
-							// fieldLabel : departmentData[6][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept8ChengeOutStat"
-							// fieldLabel : departmentData[7][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept9ChengeOutStat"
-							// fieldLabel : departmentData[8][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept10ChengeOutStat"
-							// fieldLabel : departmentData[9][1]
-							} ]
-						} ]
-					},
-					{
-						layout : "column",
-						border : false,
-						anchor : "99% 15%",
-						autoScroll : true,
-						frame : true,
-						items : [ {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept1ChengeInStat"
-							// fieldLabel : departmentData[0][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept2ChengeInStat"
-							// fieldLabel : departmentData[1][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept3ChengeInStat"
-							// fieldLabel : departmentData[2][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept4ChengeInStat"
-							// fieldLabel : departmentData[3][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept5ChengeInStat"
-							// fieldLabel : departmentData[4][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept6ChengeInStat"
-							// fieldLabel : departmentData[5][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept7ChengeInStat"
-							// fieldLabel : departmentData[6][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept8ChengeInStat"
-							// fieldLabel : departmentData[7][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept9ChengeInStat"
-							// fieldLabel : departmentData[8][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept10ChengeInStat"
-							// fieldLabel : departmentData[9][1]
-							} ]
-						} ]
-					},
-					{
+			items : [ {
+				border : false,
+				anchor : "right 10%",
+				items : [ {
+					layout : "column",
+					border : false,
+					frame : true,
+					anchor : "98%",
+					items : [ {
 						layout : "form",
 						border : false,
-						frame : true,
-						hideLabels : true,
-						anchor : "right 51%",
+						labelSeparator : ' ',
+						width : 200,
+						labelWidth : 50,
 						items : [ {
-							xtype : "itemselector",
-							name : "materialChangeStatMultSelect",
-							id : "materialChangeStatMultSelect",
-							fromStore : inventoryChangeStatMSDS,
-							dataFields : [ "retrunValue", "displayText" ],
-							toData : [ [ "", "" ] ],
-							msHeight : 155,
-							valueField : "retrunValue",
-							displayField : "displayText",
-							imagePath : "../../extjs/multiselect/images/",
-							toLegend : "已选择食材",
-							fromLegend : "可选择食材"
+							xtype : "datefield",
+							id : "begDateChangeStat",
+							width : 120,
+							fieldLabel : "日期"
 						} ]
-					},
-					{
-						layout : "column",
+					}, {
+						layout : "form",
 						border : false,
-						anchor : "right 10%",
-						frame : true,
-						items : [
-								{
-									layout : "form",
-									border : false,
-									labelSeparator : '',
-									width : 70,
-									labelWidth : 30,
-									items : [ {
-										xtype : "checkbox",
-										id : "detailChangeStat",
-										fieldLabel : "明细",
-										listeners : {
-											"check" : function(thiz, checked) {
-												if (checked) {
-													inventoryChangeStatWin
-															.findById(
-																	"sumByMaterialChangeStat")
-															.setValue(false);
-													inventoryChangeStatWin
-															.findById(
-																	"sumByOutDeptChangeStat")
-															.setValue(false);
-													inventoryChangeStatWin
-															.findById(
-																	"sumByInDeptChangeStat")
-															.setValue(false);
-												}
-											}
-										}
-									} ]
-								},
-								{
-									layout : "form",
-									border : false,
-									labelSeparator : '',
-									width : 110,
-									labelWidth : 70,
-									items : [ {
-										xtype : "checkbox",
-										id : "sumByMaterialChangeStat",
-										fieldLabel : "按食材汇总",
-										listeners : {
-											"check" : function(thiz, checked) {
-												if (checked) {
-													inventoryChangeStatWin
-															.findById(
-																	"detailChangeStat")
-															.setValue(false);
-													inventoryChangeStatWin
-															.findById(
-																	"sumByOutDeptChangeStat")
-															.setValue(false);
-													inventoryChangeStatWin
-															.findById(
-																	"sumByInDeptChangeStat")
-															.setValue(false);
-												}
-											}
-										}
-									} ]
-								},
-								{
-									layout : "form",
-									border : false,
-									labelSeparator : '',
-									width : 120,
-									labelWidth : 90,
-									items : [ {
-										xtype : "checkbox",
-										id : "sumByOutDeptChangeStat",
-										fieldLabel : "按调出部门汇总",
-										listeners : {
-											"check" : function(thiz, checked) {
-												if (checked) {
-													inventoryChangeStatWin
-															.findById(
-																	"detailChangeStat")
-															.setValue(false);
-													inventoryChangeStatWin
-															.findById(
-																	"sumByMaterialChangeStat")
-															.setValue(false);
-													inventoryChangeStatWin
-															.findById(
-																	"sumByInDeptChangeStat")
-															.setValue(false);
-												}
-											}
-										}
-									} ]
-								},
-								{
-									layout : "form",
-									border : false,
-									labelSeparator : '',
-									width : 120,
-									labelWidth : 90,
-									items : [ {
-										xtype : "checkbox",
-										id : "sumByInDeptChangeStat",
-										fieldLabel : "按调入部门汇总",
-										listeners : {
-											"check" : function(thiz, checked) {
-												if (checked) {
-													inventoryChangeStatWin
-															.findById(
-																	"detailChangeStat")
-															.setValue(false);
-													inventoryChangeStatWin
-															.findById(
-																	"sumByMaterialChangeStat")
-															.setValue(false);
-													inventoryChangeStatWin
-															.findById(
-																	"sumByOutDeptChangeStat")
-															.setValue(false);
-												}
-											}
-										}
-									} ]
-								} ]
-					} ],
+						labelSeparator : ' ',
+						width : 200,
+						labelWidth : 50,
+						items : [ {
+							xtype : "datefield",
+							id : "endDateChangeStat",
+							width : 120,
+							fieldLabel : "至"
+						} ]
+					} ]
+				} ]
+			}, {
+				layout : "column",
+				border : false,
+				anchor : "99% 15%",
+				autoScroll : true,
+				frame : true,
+				items : [ {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept1ChengeOutStat"
+					// fieldLabel : departmentData[0][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept2ChengeOutStat"
+					// fieldLabel : departmentData[1][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept3ChengeOutStat"
+					// fieldLabel : departmentData[2][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept4ChengeOutStat"
+					// fieldLabel : departmentData[3][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept5ChengeOutStat"
+					// fieldLabel : departmentData[4][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept6ChengeOutStat"
+					// fieldLabel : departmentData[5][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept7ChengeOutStat"
+					// fieldLabel : departmentData[6][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept8ChengeOutStat"
+					// fieldLabel : departmentData[7][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept9ChengeOutStat"
+					// fieldLabel : departmentData[8][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept10ChengeOutStat"
+					// fieldLabel : departmentData[9][1]
+					} ]
+				} ]
+			}, {
+				layout : "column",
+				border : false,
+				anchor : "99% 15%",
+				autoScroll : true,
+				frame : true,
+				items : [ {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept1ChengeInStat"
+					// fieldLabel : departmentData[0][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept2ChengeInStat"
+					// fieldLabel : departmentData[1][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept3ChengeInStat"
+					// fieldLabel : departmentData[2][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept4ChengeInStat"
+					// fieldLabel : departmentData[3][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept5ChengeInStat"
+					// fieldLabel : departmentData[4][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept6ChengeInStat"
+					// fieldLabel : departmentData[5][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept7ChengeInStat"
+					// fieldLabel : departmentData[6][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept8ChengeInStat"
+					// fieldLabel : departmentData[7][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept9ChengeInStat"
+					// fieldLabel : departmentData[8][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept10ChengeInStat"
+					// fieldLabel : departmentData[9][1]
+					} ]
+				} ]
+			}, {
+				layout : "form",
+				border : false,
+				frame : true,
+				hideLabels : true,
+				anchor : "right 51%",
+				items : [ {
+					xtype : "itemselector",
+					name : "materialChangeStatMultSelect",
+					id : "materialChangeStatMultSelect",
+					fromStore : inventoryChangeStatMSDS,
+					dataFields : [ "retrunValue", "displayText" ],
+					toData : [ [ "", "" ] ],
+					msHeight : 155,
+					valueField : "retrunValue",
+					displayField : "displayText",
+					imagePath : "../../extjs/multiselect/images/",
+					toLegend : "已选择食材",
+					fromLegend : "可选择食材"
+				} ]
+			}, inventoryChangeStatFrom ],
 			buttons : [
 					{
 						text : "全选",
@@ -3504,8 +3267,10 @@ inventoryChangeStatWin = new Ext.Window(
 								}
 
 								// -- 獲取統計類型 --
-								if (inventoryChangeStatWin.findById(
-										"detailChangeStat").getValue() == true) {
+								var staticType = inventoryChangeStatFrom
+										.getForm().findField("ChangeStat")
+										.getGroupValue();
+								if (staticType == "detail") {
 									isPrompt = true;
 									changeStatDetailResultWin.show();
 
@@ -3591,8 +3356,7 @@ inventoryChangeStatWin = new Ext.Window(
 												}
 											});
 
-								} else if (inventoryChangeStatWin.findById(
-										"sumByMaterialChangeStat").getValue() == true) {
+								} else if (staticType == "sumByMaterial") {
 									isPrompt = true;
 									changeStatByMaterialResultWin.show();
 
@@ -3621,6 +3385,11 @@ inventoryChangeStatWin = new Ext.Window(
 																.getStore()
 																.loadData(
 																		changeStatByMaterialResultData);
+														if (rootData[0].materialID == "NO_DATA") {
+															changeStatByMateriaGrid
+																	.getStore()
+																	.removeAll();
+														}
 
 													} else {
 														Ext.MessageBox
@@ -3642,8 +3411,7 @@ inventoryChangeStatWin = new Ext.Window(
 												}
 											});
 
-								} else if (inventoryChangeStatWin.findById(
-										"sumByOutDeptChangeStat").getValue() == true) {
+								} else if (staticType == "sumByOutDept") {
 
 									isPrompt = true;
 									changeStatByOutDeptResultWin.show();
@@ -3673,6 +3441,11 @@ inventoryChangeStatWin = new Ext.Window(
 																.getStore()
 																.loadData(
 																		changeStatByOutDeptResultData);
+														if (rootData[0].materialID == "NO_DATA") {
+															changeStatByOutDeptGrid
+																	.getStore()
+																	.removeAll();
+														}
 
 													} else {
 														Ext.MessageBox
@@ -3694,8 +3467,7 @@ inventoryChangeStatWin = new Ext.Window(
 												}
 											});
 
-								} else if (inventoryChangeStatWin.findById(
-										"sumByInDeptChangeStat").getValue() == true) {
+								} else if (staticType == "sumByInDept") {
 
 									isPrompt = true;
 									changeStatByInDeptResultWin.show();
@@ -3725,6 +3497,11 @@ inventoryChangeStatWin = new Ext.Window(
 																.getStore()
 																.loadData(
 																		changeStatByInDeptResultData);
+														if (rootData[0].materialID == "NO_DATA") {
+															changeStatByInDeptGrid
+																	.getStore()
+																	.removeAll();
+														}
 
 													} else {
 														Ext.MessageBox
@@ -3880,14 +3657,8 @@ inventoryChangeStatWin = new Ext.Window(
 					inventoryChangeStatWin.findById("dept10ChengeInStat")
 							.setValue(false);
 
-					inventoryChangeStatWin.findById("detailChangeStat")
-							.setValue(true);
-					inventoryChangeStatWin.findById("sumByMaterialChangeStat")
-							.setValue(false);
-					inventoryChangeStatWin.findById("sumByOutDeptChangeStat")
-							.setValue(false);
-					inventoryChangeStatWin.findById("sumByInDeptChangeStat")
-							.setValue(false);
+					inventoryChangeStatFrom.getForm().findField("ChangeStat")
+							.setValue("detail");
 
 				},
 				"hide" : function(thiz) {
@@ -4508,6 +4279,56 @@ var inventoryCostStatMSDS = new Ext.data.SimpleStore({
 	data : []
 });
 
+var inventoryCostStatFrom = new Ext.form.FormPanel({
+	border : false,
+	anchor : "right 10%",
+	id : "CostStatForm",
+	items : [ {
+		layout : "column",
+		border : false,
+		frame : true,
+		items : [ {
+			layout : "form",
+			border : false,
+			width : 70,
+			items : [ {
+				xtype : 'radio',
+				hideLabel : true,
+				boxLabel : "明细",
+				checked : true,
+				name : 'CostStat',
+				inputValue : 'detail'
+			} ]
+		}, {
+			layout : "form",
+			border : false,
+			labelSeparator : '',
+			width : 110,
+			items : [ {
+				xtype : 'radio',
+				hideLabel : true,
+				boxLabel : "按食材汇总",
+				// checked : true,
+				name : 'CostStat',
+				inputValue : 'sumByMaterial'
+			} ]
+		}, {
+			layout : "form",
+			border : false,
+			labelSeparator : '',
+			width : 110,
+			items : [ {
+				xtype : 'radio',
+				hideLabel : true,
+				boxLabel : "按部门汇总",
+				// checked : true,
+				name : 'CostStat',
+				inputValue : 'sumByDept'
+			} ]
+		} ]
+	} ]
+});
+
 inventoryCostStatWin = new Ext.Window(
 		{
 			title : "消耗统计",
@@ -4516,266 +4337,178 @@ inventoryCostStatWin = new Ext.Window(
 			closeAction : "hide",
 			resizable : false,
 			layout : "anchor",
-			items : [
-					{
-						border : false,
-						anchor : "right 10%",
-						items : [ {
-							layout : "column",
-							border : false,
-							frame : true,
-							anchor : "98%",
-							items : [ {
-								layout : "form",
-								border : false,
-								labelSeparator : ' ',
-								width : 200,
-								labelWidth : 50,
-								items : [ {
-									xtype : "datefield",
-									id : "begDateCostStat",
-									width : 120,
-									fieldLabel : "日期"
-								} ]
-							}, {
-								layout : "form",
-								border : false,
-								labelSeparator : ' ',
-								width : 200,
-								labelWidth : 50,
-								items : [ {
-									xtype : "datefield",
-									id : "endDateCostStat",
-									width : 120,
-									fieldLabel : "至"
-								} ]
-							} ]
-						} ]
-					},
-					{
-						layout : "column",
-						border : false,
-						anchor : "99% 15%",
-						autoScroll : true,
-						frame : true,
-						items : [ {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept1CostStat"
-							// fieldLabel : departmentData[0][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept2CostStat"
-							// fieldLabel : departmentData[1][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept3CostStat"
-							// fieldLabel : departmentData[2][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept4CostStat"
-							// fieldLabel : departmentData[3][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept5CostStat"
-							// fieldLabel : departmentData[4][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept6CostStat"
-							// fieldLabel : departmentData[5][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept7CostStat"
-							// fieldLabel : departmentData[6][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept8CostStat"
-							// fieldLabel : departmentData[7][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept9CostStat"
-							// fieldLabel : departmentData[8][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept10CostStat"
-							// fieldLabel : departmentData[9][1]
-							} ]
-						} ]
-					},
-					{
+			items : [ {
+				border : false,
+				anchor : "right 10%",
+				items : [ {
+					layout : "column",
+					border : false,
+					frame : true,
+					anchor : "98%",
+					items : [ {
 						layout : "form",
 						border : false,
-						frame : true,
-						hideLabels : true,
-						anchor : "right 67%",
+						labelSeparator : ' ',
+						width : 200,
+						labelWidth : 50,
 						items : [ {
-							xtype : "itemselector",
-							name : "materialCostStatMultSelect",
-							id : "materialCostStatMultSelect",
-							fromStore : inventoryCostStatMSDS,
-							dataFields : [ "retrunValue", "displayText" ],
-							toData : [ [ "", "" ] ],
-							msHeight : 215,
-							valueField : "retrunValue",
-							displayField : "displayText",
-							imagePath : "../../extjs/multiselect/images/",
-							toLegend : "已选择食材",
-							fromLegend : "可选择食材"
+							xtype : "datefield",
+							id : "begDateCostStat",
+							width : 120,
+							fieldLabel : "日期"
 						} ]
-					},
-					{
-						layout : "column",
+					}, {
+						layout : "form",
 						border : false,
-						anchor : "right 10%",
-						frame : true,
-						items : [
-								{
-									layout : "form",
-									border : false,
-									labelSeparator : '',
-									width : 70,
-									labelWidth : 30,
-									items : [ {
-										xtype : "checkbox",
-										id : "detailCostStat",
-										fieldLabel : "明细",
-										listeners : {
-											"check" : function(thiz, checked) {
-												if (checked) {
-													inventoryCostStatWin
-															.findById(
-																	"sumByMaterialCostStat")
-															.setValue(false);
-													inventoryCostStatWin
-															.findById(
-																	"sumByDeptCostStat")
-															.setValue(false);
-												}
-											}
-										}
-									} ]
-								},
-								{
-									layout : "form",
-									border : false,
-									labelSeparator : '',
-									width : 110,
-									labelWidth : 70,
-									items : [ {
-										xtype : "checkbox",
-										id : "sumByMaterialCostStat",
-										fieldLabel : "按食材汇总",
-										listeners : {
-											"check" : function(thiz, checked) {
-												if (checked) {
-													inventoryCostStatWin
-															.findById(
-																	"detailCostStat")
-															.setValue(false);
-													inventoryCostStatWin
-															.findById(
-																	"sumByDeptCostStat")
-															.setValue(false);
-												}
-											}
-										}
-									} ]
-								},
-								{
-									layout : "form",
-									border : false,
-									labelSeparator : '',
-									width : 120,
-									labelWidth : 70,
-									items : [ {
-										xtype : "checkbox",
-										id : "sumByDeptCostStat",
-										fieldLabel : "按部门汇总",
-										listeners : {
-											"check" : function(thiz, checked) {
-												if (checked) {
-													inventoryCostStatWin
-															.findById(
-																	"detailCostStat")
-															.setValue(false);
-													inventoryCostStatWin
-															.findById(
-																	"sumByMaterialCostStat")
-															.setValue(false);
-												}
-											}
-										}
-									} ]
-								} ]
-					} ],
+						labelSeparator : ' ',
+						width : 200,
+						labelWidth : 50,
+						items : [ {
+							xtype : "datefield",
+							id : "endDateCostStat",
+							width : 120,
+							fieldLabel : "至"
+						} ]
+					} ]
+				} ]
+			}, {
+				layout : "column",
+				border : false,
+				anchor : "99% 15%",
+				autoScroll : true,
+				frame : true,
+				items : [ {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept1CostStat"
+					// fieldLabel : departmentData[0][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept2CostStat"
+					// fieldLabel : departmentData[1][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept3CostStat"
+					// fieldLabel : departmentData[2][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept4CostStat"
+					// fieldLabel : departmentData[3][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept5CostStat"
+					// fieldLabel : departmentData[4][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept6CostStat"
+					// fieldLabel : departmentData[5][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept7CostStat"
+					// fieldLabel : departmentData[6][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept8CostStat"
+					// fieldLabel : departmentData[7][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept9CostStat"
+					// fieldLabel : departmentData[8][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept10CostStat"
+					// fieldLabel : departmentData[9][1]
+					} ]
+				} ]
+			}, {
+				layout : "form",
+				border : false,
+				frame : true,
+				hideLabels : true,
+				anchor : "right 67%",
+				items : [ {
+					xtype : "itemselector",
+					name : "materialCostStatMultSelect",
+					id : "materialCostStatMultSelect",
+					fromStore : inventoryCostStatMSDS,
+					dataFields : [ "retrunValue", "displayText" ],
+					toData : [ [ "", "" ] ],
+					msHeight : 215,
+					valueField : "retrunValue",
+					displayField : "displayText",
+					imagePath : "../../extjs/multiselect/images/",
+					toLegend : "已选择食材",
+					fromLegend : "可选择食材"
+				} ]
+			}, inventoryCostStatFrom ],
 			buttons : [
 					{
 						text : "全选",
@@ -4890,8 +4623,10 @@ inventoryCostStatWin = new Ext.Window(
 								}
 
 								// -- 獲取統計類型 --
-								if (inventoryCostStatWin.findById(
-										"detailCostStat").getValue() == true) {
+								var staticType = inventoryCostStatFrom
+										.getForm().findField("CostStat")
+										.getGroupValue();
+								if (staticType == "detail") {
 									isPrompt = true;
 									costStatDetailResultWin.show();
 
@@ -4967,8 +4702,7 @@ inventoryCostStatWin = new Ext.Window(
 												}
 											});
 
-								} else if (inventoryCostStatWin.findById(
-										"sumByMaterialCostStat").getValue() == true) {
+								} else if (staticType == "sumByMaterial") {
 									isPrompt = true;
 									costStatByMaterialResultWin.show();
 
@@ -4996,6 +4730,11 @@ inventoryCostStatWin = new Ext.Window(
 																.getStore()
 																.loadData(
 																		costStatByMaterialResultData);
+														if (rootData[0].materialID == "NO_DATA") {
+															costStatByMateriaGrid
+																	.getStore()
+																	.removeAll();
+														}
 
 													} else {
 														Ext.MessageBox
@@ -5017,8 +4756,7 @@ inventoryCostStatWin = new Ext.Window(
 												}
 											});
 
-								} else if (inventoryCostStatWin.findById(
-										"sumByDeptCostStat").getValue() == true) {
+								} else if (staticType == "sumByDept") {
 
 									isPrompt = true;
 									costStatByDeptResultWin.show();
@@ -5047,6 +4785,11 @@ inventoryCostStatWin = new Ext.Window(
 																.getStore()
 																.loadData(
 																		costStatByDeptResultData);
+														if (rootData[0].materialID == "NO_DATA") {
+															costStatByDeptGrid
+																	.getStore()
+																	.removeAll();
+														}
 
 													} else {
 														Ext.MessageBox
@@ -5150,12 +4893,8 @@ inventoryCostStatWin = new Ext.Window(
 					inventoryCostStatWin.findById("dept10CostStat").setValue(
 							false);
 
-					inventoryCostStatWin.findById("detailCostStat").setValue(
-							true);
-					inventoryCostStatWin.findById("sumByMaterialCostStat")
-							.setValue(false);
-					inventoryCostStatWin.findById("sumByDeptCostStat")
-							.setValue(false);
+					inventoryCostStatFrom.getForm().findField("CostStat")
+							.setValue("detail");
 
 				},
 				"hide" : function(thiz) {
@@ -5590,6 +5329,56 @@ var inventoryAllStatMSDS = new Ext.data.SimpleStore({
 	data : []
 });
 
+var inventoryAllStatFrom = new Ext.form.FormPanel({
+	border : false,
+	anchor : "right 10%",
+	id : "AllStatForm",
+	items : [ {
+		layout : "column",
+		border : false,
+		frame : true,
+		items : [ {
+			layout : "form",
+			border : false,
+			width : 70,
+			items : [ {
+				xtype : 'radio',
+				hideLabel : true,
+				boxLabel : "明细",
+				checked : true,
+				name : 'AllStat',
+				inputValue : 'detail'
+			} ]
+		}, {
+			layout : "form",
+			border : false,
+			labelSeparator : '',
+			width : 110,
+			items : [ {
+				xtype : 'radio',
+				hideLabel : true,
+				boxLabel : "按食材汇总",
+				// checked : true,
+				name : 'AllStat',
+				inputValue : 'sumByMaterial'
+			} ]
+		}, {
+			layout : "form",
+			border : false,
+			labelSeparator : '',
+			width : 110,
+			items : [ {
+				xtype : 'radio',
+				hideLabel : true,
+				boxLabel : "按部门汇总",
+				// checked : true,
+				name : 'AllStat',
+				inputValue : 'sumByDept'
+			} ]
+		} ]
+	} ]
+});
+
 inventoryAllStatWin = new Ext.Window(
 		{
 			title : "库存统计",
@@ -5598,266 +5387,178 @@ inventoryAllStatWin = new Ext.Window(
 			closeAction : "hide",
 			resizable : false,
 			layout : "anchor",
-			items : [
-					{
-						border : false,
-						anchor : "right 10%",
-						items : [ {
-							layout : "column",
-							border : false,
-							frame : true,
-							anchor : "98%",
-							items : [ {
-								layout : "form",
-								border : false,
-								labelSeparator : ' ',
-								width : 200,
-								labelWidth : 50,
-								items : [ {
-									xtype : "datefield",
-									id : "begDateAllStat",
-									width : 120,
-									fieldLabel : "日期"
-								} ]
-							}, {
-								layout : "form",
-								border : false,
-								labelSeparator : ' ',
-								width : 200,
-								labelWidth : 50,
-								items : [ {
-									xtype : "datefield",
-									id : "endDateAllStat",
-									width : 120,
-									fieldLabel : "至"
-								} ]
-							} ]
-						} ]
-					},
-					{
-						layout : "column",
-						border : false,
-						anchor : "99% 15%",
-						autoScroll : true,
-						frame : true,
-						items : [ {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept1AllStat"
-							// fieldLabel : departmentData[0][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept2AllStat"
-							// fieldLabel : departmentData[1][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept3AllStat"
-							// fieldLabel : departmentData[2][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept4AllStat"
-							// fieldLabel : departmentData[3][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept5AllStat"
-							// fieldLabel : departmentData[4][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept6AllStat"
-							// fieldLabel : departmentData[5][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept7AllStat"
-							// fieldLabel : departmentData[6][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept8AllStat"
-							// fieldLabel : departmentData[7][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept9AllStat"
-							// fieldLabel : departmentData[8][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept10AllStat"
-							// fieldLabel : departmentData[9][1]
-							} ]
-						} ]
-					},
-					{
+			items : [ {
+				border : false,
+				anchor : "right 10%",
+				items : [ {
+					layout : "column",
+					border : false,
+					frame : true,
+					anchor : "98%",
+					items : [ {
 						layout : "form",
 						border : false,
-						frame : true,
-						hideLabels : true,
-						anchor : "right 67%",
+						labelSeparator : ' ',
+						width : 200,
+						labelWidth : 50,
 						items : [ {
-							xtype : "itemselector",
-							name : "materialAllStatMultSelect",
-							id : "materialAllStatMultSelect",
-							fromStore : inventoryAllStatMSDS,
-							dataFields : [ "retrunValue", "displayText" ],
-							toData : [ [ "", "" ] ],
-							msHeight : 215,
-							valueField : "retrunValue",
-							displayField : "displayText",
-							imagePath : "../../extjs/multiselect/images/",
-							toLegend : "已选择食材",
-							fromLegend : "可选择食材"
+							xtype : "datefield",
+							id : "begDateAllStat",
+							width : 120,
+							fieldLabel : "日期"
 						} ]
-					},
-					{
-						layout : "column",
+					}, {
+						layout : "form",
 						border : false,
-						anchor : "right 10%",
-						frame : true,
-						items : [
-								{
-									layout : "form",
-									border : false,
-									labelSeparator : '',
-									width : 70,
-									labelWidth : 30,
-									items : [ {
-										xtype : "checkbox",
-										id : "detailAllStat",
-										fieldLabel : "明细",
-										listeners : {
-											"check" : function(thiz, checked) {
-												if (checked) {
-													inventoryAllStatWin
-															.findById(
-																	"sumByMaterialAllStat")
-															.setValue(false);
-													inventoryAllStatWin
-															.findById(
-																	"sumByDeptAllStat")
-															.setValue(false);
-												}
-											}
-										}
-									} ]
-								},
-								{
-									layout : "form",
-									border : false,
-									labelSeparator : '',
-									width : 110,
-									labelWidth : 70,
-									items : [ {
-										xtype : "checkbox",
-										id : "sumByMaterialAllStat",
-										fieldLabel : "按食材汇总",
-										listeners : {
-											"check" : function(thiz, checked) {
-												if (checked) {
-													inventoryAllStatWin
-															.findById(
-																	"detailAllStat")
-															.setValue(false);
-													inventoryAllStatWin
-															.findById(
-																	"sumByDeptAllStat")
-															.setValue(false);
-												}
-											}
-										}
-									} ]
-								},
-								{
-									layout : "form",
-									border : false,
-									labelSeparator : '',
-									width : 120,
-									labelWidth : 70,
-									items : [ {
-										xtype : "checkbox",
-										id : "sumByDeptAllStat",
-										fieldLabel : "按部门汇总",
-										listeners : {
-											"check" : function(thiz, checked) {
-												if (checked) {
-													inventoryAllStatWin
-															.findById(
-																	"detailAllStat")
-															.setValue(false);
-													inventoryAllStatWin
-															.findById(
-																	"sumByMaterialAllStat")
-															.setValue(false);
-												}
-											}
-										}
-									} ]
-								} ]
-					} ],
+						labelSeparator : ' ',
+						width : 200,
+						labelWidth : 50,
+						items : [ {
+							xtype : "datefield",
+							id : "endDateAllStat",
+							width : 120,
+							fieldLabel : "至"
+						} ]
+					} ]
+				} ]
+			}, {
+				layout : "column",
+				border : false,
+				anchor : "99% 15%",
+				autoScroll : true,
+				frame : true,
+				items : [ {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept1AllStat"
+					// fieldLabel : departmentData[0][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept2AllStat"
+					// fieldLabel : departmentData[1][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept3AllStat"
+					// fieldLabel : departmentData[2][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept4AllStat"
+					// fieldLabel : departmentData[3][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept5AllStat"
+					// fieldLabel : departmentData[4][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept6AllStat"
+					// fieldLabel : departmentData[5][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept7AllStat"
+					// fieldLabel : departmentData[6][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept8AllStat"
+					// fieldLabel : departmentData[7][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept9AllStat"
+					// fieldLabel : departmentData[8][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept10AllStat"
+					// fieldLabel : departmentData[9][1]
+					} ]
+				} ]
+			}, {
+				layout : "form",
+				border : false,
+				frame : true,
+				hideLabels : true,
+				anchor : "right 67%",
+				items : [ {
+					xtype : "itemselector",
+					name : "materialAllStatMultSelect",
+					id : "materialAllStatMultSelect",
+					fromStore : inventoryAllStatMSDS,
+					dataFields : [ "retrunValue", "displayText" ],
+					toData : [ [ "", "" ] ],
+					msHeight : 215,
+					valueField : "retrunValue",
+					displayField : "displayText",
+					imagePath : "../../extjs/multiselect/images/",
+					toLegend : "已选择食材",
+					fromLegend : "可选择食材"
+				} ]
+			}, inventoryAllStatFrom ],
 			buttons : [
 					{
 						text : "全选",
@@ -5972,8 +5673,9 @@ inventoryAllStatWin = new Ext.Window(
 								}
 
 								// -- 獲取統計類型 --
-								if (inventoryAllStatWin.findById(
-										"detailAllStat").getValue() == true) {
+								var staticType = inventoryAllStatFrom.getForm()
+										.findField("AllStat").getGroupValue();
+								if (staticType == "detail") {
 									isPrompt = true;
 									allStatDetailResultWin.show();
 
@@ -6055,8 +5757,7 @@ inventoryAllStatWin = new Ext.Window(
 												}
 											});
 
-								} else if (inventoryAllStatWin.findById(
-										"sumByMaterialAllStat").getValue() == true) {
+								} else if (staticType == "sumByMaterial") {
 									isPrompt = true;
 									allStatByMaterialResultWin.show();
 
@@ -6084,6 +5785,11 @@ inventoryAllStatWin = new Ext.Window(
 																.getStore()
 																.loadData(
 																		allStatByMaterialResultData);
+														if (rootData[0].materialID == "NO_DATA") {
+															allStatByMateriaGrid
+																	.getStore()
+																	.removeAll();
+														}
 
 													} else {
 														Ext.MessageBox
@@ -6105,8 +5811,7 @@ inventoryAllStatWin = new Ext.Window(
 												}
 											});
 
-								} else if (inventoryAllStatWin.findById(
-										"sumByDeptAllStat").getValue() == true) {
+								} else if (staticType == "sumByDept") {
 
 									isPrompt = true;
 									allStatByDeptResultWin.show();
@@ -6135,6 +5840,11 @@ inventoryAllStatWin = new Ext.Window(
 																.getStore()
 																.loadData(
 																		allStatByDeptResultData);
+														if (rootData[0].materialID == "NO_DATA") {
+															allStatByDeptGrid
+																	.getStore()
+																	.removeAll();
+														}
 
 													} else {
 														Ext.MessageBox
@@ -6236,13 +5946,8 @@ inventoryAllStatWin = new Ext.Window(
 					inventoryAllStatWin.findById("dept10AllStat").setValue(
 							false);
 
-					inventoryAllStatWin.findById("detailAllStat")
-							.setValue(true);
-					inventoryAllStatWin.findById("sumByMaterialAllStat")
-							.setValue(false);
-					inventoryAllStatWin.findById("sumByDeptAllStat").setValue(
-							false);
-
+					inventoryAllStatFrom.getForm().findField("AllStat")
+							.setValue("detail");
 				},
 				"hide" : function(thiz) {
 					isPrompt = false;
@@ -6692,6 +6397,54 @@ var inventoryCheckStatMSDS = new Ext.data.SimpleStore({
 	data : []
 });
 
+var inventoryCheckStatFrom = new Ext.form.FormPanel({
+	border : false,
+	anchor : "right 10%",
+	id : "CheckStatForm",
+	items : [ {
+		layout : "column",
+		border : false,
+		frame : true,
+		items : [ {
+			layout : "form",
+			border : false,
+			width : 70,
+			items : [ {
+				xtype : 'radio',
+				hideLabel : true,
+				boxLabel : "明细",
+				checked : true,
+				name : 'CheckStat',
+				inputValue : 'detail'
+			} ]
+		}, {
+			layout : "form",
+			border : false,
+			labelSeparator : '',
+			width : 120,
+			items : [ {
+				xtype : 'radio',
+				hideLabel : true,
+				boxLabel : "汇总",
+				// checked : true,
+				name : 'CheckStat',
+				inputValue : 'sum'
+			} ]
+		}, {
+			layout : "form",
+			border : false,
+			labelSeparator : '：',
+			width : 80,
+			labelWidth : 60,
+			items : [ {
+				xtype : "checkbox",
+				id : "isDifferentCheck",
+				fieldLabel : "有差异"
+			} ]
+		} ]
+	} ]
+});
+
 inventoryCheckStatWin = new Ext.Window(
 		{
 			title : "盘点统计",
@@ -6700,304 +6453,216 @@ inventoryCheckStatWin = new Ext.Window(
 			closeAction : "hide",
 			resizable : false,
 			layout : "anchor",
-			items : [
-					{
-						border : false,
-						anchor : "right 10%",
-						items : [ {
-							layout : "column",
-							border : false,
-							frame : true,
-							anchor : "98%",
-							items : [ {
-								layout : "form",
-								border : false,
-								labelSeparator : ' ',
-								width : 200,
-								labelWidth : 50,
-								items : [ {
-									xtype : "datefield",
-									id : "begDateCheckStat",
-									width : 120,
-									fieldLabel : "日期"
-								} ]
-							}, {
-								layout : "form",
-								border : false,
-								labelSeparator : ' ',
-								width : 200,
-								labelWidth : 50,
-								items : [ {
-									xtype : "datefield",
-									id : "endDateCheckStat",
-									width : 120,
-									fieldLabel : "至"
-								} ]
-							} ]
-						} ]
-					},
-					{
-						layout : "column",
-						border : false,
-						anchor : "99% 15%",
-						autoScroll : true,
-						frame : true,
-						items : [ {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept1CheckStat"
-							// fieldLabel : departmentData[0][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept2CheckStat"
-							// fieldLabel : departmentData[1][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept3CheckStat"
-							// fieldLabel : departmentData[2][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept4CheckStat"
-							// fieldLabel : departmentData[3][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept5CheckStat"
-							// fieldLabel : departmentData[4][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept6CheckStat"
-							// fieldLabel : departmentData[5][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept7CheckStat"
-							// fieldLabel : departmentData[6][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept8CheckStat"
-							// fieldLabel : departmentData[7][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept9CheckStat"
-							// fieldLabel : departmentData[8][1]
-							} ]
-						}, {
-							layout : "form",
-							border : false,
-							labelSeparator : '',
-							width : 80,
-							labelWidth : 40,
-							items : [ {
-								xtype : "checkbox",
-								id : "dept10CheckStat"
-							// fieldLabel : departmentData[9][1]
-							} ]
-						} ]
-					},
-					{
+			items : [ {
+				border : false,
+				anchor : "right 10%",
+				items : [ {
+					layout : "column",
+					border : false,
+					frame : true,
+					anchor : "98%",
+					items : [ {
 						layout : "form",
 						border : false,
-						frame : true,
-						hideLabels : true,
-						anchor : "right 67%",
+						labelSeparator : ' ',
+						width : 200,
+						labelWidth : 50,
 						items : [ {
-							xtype : "itemselector",
-							name : "materialCheckStatMultSelect",
-							id : "materialCheckStatMultSelect",
-							fromStore : inventoryCheckStatMSDS,
-							dataFields : [ "retrunValue", "displayText" ],
-							toData : [ [ "", "" ] ],
-							msHeight : 215,
-							valueField : "retrunValue",
-							displayField : "displayText",
-							imagePath : "../../extjs/multiselect/images/",
-							toLegend : "已选择食材",
-							fromLegend : "可选择食材"
+							xtype : "datefield",
+							id : "begDateCheckStat",
+							width : 120,
+							fieldLabel : "日期"
 						} ]
-					},
-					{
-						layout : "column",
+					}, {
+						layout : "form",
 						border : false,
-						anchor : "right 10%",
-						frame : true,
-						items : [
-								{
-									layout : "form",
-									border : false,
-									labelSeparator : '',
-									width : 70,
-									labelWidth : 30,
-									items : [ {
-										xtype : "checkbox",
-										id : "detailCheckStat",
-										fieldLabel : "明细",
-										listeners : {
-											"check" : function(thiz, checked) {
-												if (checked) {
-													inventoryAllStatWin
-															.findById(
-																	"sumByMaterialAllStat")
-															.setValue(false);
-													inventoryAllStatWin
-															.findById(
-																	"sumByDeptAllStat")
-															.setValue(false);
-												}
-											}
-										}
-									} ]
-								},
-								{
-									layout : "form",
-									border : false,
-									labelSeparator : '',
-									width : 110,
-									labelWidth : 70,
-									items : [ {
-										xtype : "checkbox",
-										id : "sumCheckStat",
-										fieldLabel : "汇总",
-										listeners : {
-											"check" : function(thiz, checked) {
-												if (checked) {
-													inventoryAllStatWin
-															.findById(
-																	"detailAllStat")
-															.setValue(false);
-													inventoryAllStatWin
-															.findById(
-																	"sumByDeptAllStat")
-															.setValue(false);
-												}
-											}
-										}
-									} ]
-								},
-								{
-									layout : "form",
-									border : false,
-									labelSeparator : '',
-									width : 120,
-									labelWidth : 70,
-									items : [ {
-										xtype : "checkbox",
-										id : "sumByDeptAllStat",
-										fieldLabel : "按部门汇总",
-										listeners : {
-											"check" : function(thiz, checked) {
-												if (checked) {
-													inventoryAllStatWin
-															.findById(
-																	"detailAllStat")
-															.setValue(false);
-													inventoryAllStatWin
-															.findById(
-																	"sumByMaterialAllStat")
-															.setValue(false);
-												}
-											}
-										}
-									} ]
-								} ]
-					} ],
+						labelSeparator : ' ',
+						width : 200,
+						labelWidth : 50,
+						items : [ {
+							xtype : "datefield",
+							id : "endDateCheckStat",
+							width : 120,
+							fieldLabel : "至"
+						} ]
+					} ]
+				} ]
+			}, {
+				layout : "column",
+				border : false,
+				anchor : "99% 15%",
+				autoScroll : true,
+				frame : true,
+				items : [ {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept1CheckStat"
+					// fieldLabel : departmentData[0][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept2CheckStat"
+					// fieldLabel : departmentData[1][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept3CheckStat"
+					// fieldLabel : departmentData[2][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept4CheckStat"
+					// fieldLabel : departmentData[3][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept5CheckStat"
+					// fieldLabel : departmentData[4][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept6CheckStat"
+					// fieldLabel : departmentData[5][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept7CheckStat"
+					// fieldLabel : departmentData[6][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept8CheckStat"
+					// fieldLabel : departmentData[7][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept9CheckStat"
+					// fieldLabel : departmentData[8][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept10CheckStat"
+					// fieldLabel : departmentData[9][1]
+					} ]
+				} ]
+			}, {
+				layout : "form",
+				border : false,
+				frame : true,
+				hideLabels : true,
+				anchor : "right 67%",
+				items : [ {
+					xtype : "itemselector",
+					name : "materialCheckStatMultSelect",
+					id : "materialCheckStatMultSelect",
+					fromStore : inventoryCheckStatMSDS,
+					dataFields : [ "retrunValue", "displayText" ],
+					toData : [ [ "", "" ] ],
+					msHeight : 215,
+					valueField : "retrunValue",
+					displayField : "displayText",
+					imagePath : "../../extjs/multiselect/images/",
+					toLegend : "已选择食材",
+					fromLegend : "可选择食材"
+				} ]
+			}, inventoryCheckStatFrom ],
 			buttons : [
 					{
 						text : "全选",
 						handler : function() {
-							var i = inventoryAllStatWin
-									.findById("materialAllStatMultSelect").fromMultiselect.view;
+							var i = inventoryCheckStatWin
+									.findById("materialCheckStatMultSelect").fromMultiselect.view;
 							i.selectRange(0, i.store.length);
-							inventoryAllStatWin.findById(
-									"materialAllStatMultSelect").fromTo();
-							inventoryAllStatWin
-									.findById("materialAllStatMultSelect").toMultiselect.view
+							inventoryCheckStatWin.findById(
+									"materialCheckStatMultSelect").fromTo();
+							inventoryCheckStatWin
+									.findById("materialCheckStatMultSelect").toMultiselect.view
 									.clearSelections();
 						}
 					},
 					{
 						text : "清空",
 						handler : function() {
-							inventoryAllStatWin.findById(
-									"materialAllStatMultSelect").reset();
+							inventoryCheckStatWin.findById(
+									"materialCheckStatMultSelect").reset();
 						}
 					},
 					{
 						text : "确定",
 						handler : function() {
 
-							var selectCount = inventoryAllStatWin
-									.findById("materialAllStatMultSelect").toMultiselect.store
+							var selectCount = inventoryCheckStatWin
+									.findById("materialCheckStatMultSelect").toMultiselect.store
 									.getCount();
 
 							if (selectCount != 0) {
 								isPrompt = false;
-								inventoryAllStatWin.hide();
+								inventoryCheckStatWin.hide();
 
 								// -- 獲取選擇的食材 --
 								var selectMaterials = "";
 								for ( var i = 0; i < selectCount; i++) {
-									var selectItem = inventoryAllStatWin
-											.findById("materialAllStatMultSelect").toMultiselect.store
+									var selectItem = inventoryCheckStatWin
+											.findById("materialCheckStatMultSelect").toMultiselect.store
 											.getAt(i).get("retrunValue");
 									// if (selectItem != "") {
 									selectMaterials = selectMaterials
@@ -7009,16 +6674,16 @@ inventoryCheckStatWin = new Ext.Window(
 										selectMaterials.length - 1);
 
 								// -- 獲取時間 --
-								var beginDate = inventoryAllStatWin.findById(
-										"begDateAllStat").getValue();
+								var beginDate = inventoryCheckStatWin.findById(
+										"begDateCheckStat").getValue();
 								if (beginDate != "") {
 									var dateFormated = new Date();
 									dateFormated = beginDate;
 									beginDate = dateFormated.format('Y-m-d');
 								}
 
-								var endDate = inventoryAllStatWin.findById(
-										"endDateAllStat").getValue();
+								var endDate = inventoryCheckStatWin.findById(
+										"endDateCheckStat").getValue();
 								if (endDate != "") {
 									var dateFormated = new Date();
 									dateFormated = endDate;
@@ -7027,44 +6692,44 @@ inventoryCheckStatWin = new Ext.Window(
 
 								// -- 獲取部門 --
 								var departments = "";
-								if (inventoryAllStatWin
-										.findById("dept1AllStat").getValue() == true) {
+								if (inventoryCheckStatWin.findById(
+										"dept1CheckStat").getValue() == true) {
 									departments = departments + "0,";
 								}
-								if (inventoryAllStatWin
-										.findById("dept2AllStat").getValue() == true) {
+								if (inventoryCheckStatWin.findById(
+										"dept2CheckStat").getValue() == true) {
 									departments = departments + "1,";
 								}
-								if (inventoryAllStatWin
-										.findById("dept3AllStat").getValue() == true) {
+								if (inventoryCheckStatWin.findById(
+										"dept3CheckStat").getValue() == true) {
 									departments = departments + "2,";
 								}
-								if (inventoryAllStatWin
-										.findById("dept4AllStat").getValue() == true) {
+								if (inventoryCheckStatWin.findById(
+										"dept4CheckStat").getValue() == true) {
 									departments = departments + "3,";
 								}
-								if (inventoryAllStatWin
-										.findById("dept5AllStat").getValue() == true) {
+								if (inventoryCheckStatWin.findById(
+										"dept5CheckStat").getValue() == true) {
 									departments = departments + "4,";
 								}
-								if (inventoryAllStatWin
-										.findById("dept6AllStat").getValue() == true) {
+								if (inventoryCheckStatWin.findById(
+										"dept6CheckStat").getValue() == true) {
 									departments = departments + "5,";
 								}
-								if (inventoryAllStatWin
-										.findById("dept7AllStat").getValue() == true) {
+								if (inventoryCheckStatWin.findById(
+										"dept7CheckStat").getValue() == true) {
 									departments = departments + "6,";
 								}
-								if (inventoryAllStatWin
-										.findById("dept8AllStat").getValue() == true) {
+								if (inventoryCheckStatWin.findById(
+										"dept8CheckStat").getValue() == true) {
 									departments = departments + "7,";
 								}
-								if (inventoryAllStatWin
-										.findById("dept9AllStat").getValue() == true) {
+								if (inventoryCheckStatWin.findById(
+										"dept9CheckStat").getValue() == true) {
 									departments = departments + "8,";
 								}
-								if (inventoryAllStatWin.findById(
-										"dept10AllStat").getValue() == true) {
+								if (inventoryCheckStatWin.findById(
+										"dept10CheckStat").getValue() == true) {
 									departments = departments + "9,";
 								}
 
@@ -7073,33 +6738,40 @@ inventoryCheckStatWin = new Ext.Window(
 											departments.length - 1);
 								}
 
+								// -- 是否有差異 --
+								var isDiff = inventoryCheckStatWin.findById(
+										"isDifferentCheck").getValue();
+
 								// -- 獲取統計類型 --
-								if (inventoryAllStatWin.findById(
-										"detailAllStat").getValue() == true) {
+								var staticType = inventoryCheckStatFrom
+										.getForm().findField("CheckStat")
+										.getGroupValue();
+								if (staticType == "detail") {
 									isPrompt = true;
-									allStatDetailResultWin.show();
+									checkStatDetailResultWin.show();
 
 									// ＃＃＃＃＃＃＃＃＃＃＃＃明細統計＃＃＃＃＃＃＃＃＃＃＃＃
 									Ext.Ajax
 											.request({
-												url : "../../InventoryAllStatDetail.do",
+												url : "../../InventoryCheckStatDetail.do",
 												params : {
 													"pin" : pin,
 													"beginDate" : beginDate,
 													"endDate" : endDate,
 													"departments" : departments,
-													"materials" : selectMaterials
+													"materials" : selectMaterials,
+													"isDiff" : isDiff
 												},
 												success : function(response,
 														options) {
 													var resultJSON = Ext.util.JSON
 															.decode(response.responseText);
 
-													// 格式：[食材 日期 操作 经手人 部门 价格 数量
-													// 小计]
+													// 格式：[食材 日期 部门 经手人 盘点前价格
+													// 盘点前数量 盘点后价格 盘点后数量]
 													var rootData = resultJSON.root;
 													if (rootData[0].message == "normal") {
-														allStatDetailResultData.length = 0;
+														checkStatDetailResultData.length = 0;
 														for ( var i = 0; i < rootData.length; i++) {
 															var materialN = "";
 															for ( var j = 0; j < materialData.length; j++) {
@@ -7115,28 +6787,30 @@ inventoryCheckStatWin = new Ext.Window(
 																}
 															}
 
-															var typeN = inventoryTypeCode2Descr(rootData[i].typeCode);
-
-															allStatDetailResultData
+															checkStatDetailResultData
 																	.push([
 																			rootData[i].materialID,
 																			materialN,
 																			rootData[i].date,
-																			rootData[i].typeCode,
-																			typeN,
-																			rootData[i].operator,
 																			rootData[i].deptID,
 																			deptN,
+																			rootData[i].operator,
+																			rootData[i].pricePrevious,
+																			rootData[i].amountPrevious,
 																			rootData[i].price,
-																			rootData[i].amount,
-																			rootData[i].total
+																			rootData[i].amount
 
 																	]);
 														}
 
-														allStatDetailResultStore
+														checkStatDetailResultStore
 																.reload();
 
+														if (rootData[0].materialID == "NO_DATA") {
+															checkStatDetailResultStore
+																	.removeAll();
+														}
+
 													} else {
 														Ext.MessageBox
 																.show({
@@ -7157,106 +6831,83 @@ inventoryCheckStatWin = new Ext.Window(
 												}
 											});
 
-								} else if (inventoryAllStatWin.findById(
-										"sumByMaterialAllStat").getValue() == true) {
+								} else if (staticType == "sum") {
 									isPrompt = true;
-									allStatByMaterialResultWin.show();
+									checkStatSumResultWin.show();
 
-									// ＃＃＃＃＃＃＃＃＃＃＃＃按食材統計＃＃＃＃＃＃＃＃＃＃＃＃
+									// ＃＃＃＃＃＃＃＃＃＃＃＃匯總統計＃＃＃＃＃＃＃＃＃＃＃＃
 									Ext.Ajax
-											.request({
-												url : "../../InventoryAllStatByMaterial.do",
-												params : {
-													"pin" : pin,
-													"beginDate" : beginDate,
-													"endDate" : endDate,
-													"departments" : departments,
-													"materials" : selectMaterials
-												},
-												success : function(response,
-														options) {
-													var resultJSON = Ext.util.JSON
-															.decode(response.responseText);
+									.request({
+										url : "../../InventoryCheckStatSum.do",
+										params : {
+											"pin" : pin,
+											"beginDate" : beginDate,
+											"endDate" : endDate,
+											"departments" : departments,
+											"materials" : selectMaterials,
+											"isDiff" : isDiff
+										},
+										success : function(response,
+												options) {
+											var resultJSON = Ext.util.JSON
+													.decode(response.responseText);
 
-													var rootData = resultJSON.root;
-													if (rootData[0].message == "normal") {
-
-														allStatByMaterialResultData = rootData;
-														allStatByMateriaGrid
-																.getStore()
-																.loadData(
-																		allStatByMaterialResultData);
-
-													} else {
-														Ext.MessageBox
-																.show({
-																	msg : rootData[0].message,
-																	width : 300,
-																	buttons : Ext.MessageBox.OK
-																});
+											// 格式：[食材   日期	盘点前价格	盘点前数量	盘点前合计	盘点后价格	盘点后数量	盘点后合计    损益	盈亏]
+											var rootData = resultJSON.root;
+											if (rootData[0].message == "normal") {
+												checkStatDetailResultData.length = 0;
+												for ( var i = 0; i < rootData.length; i++) {
+													var materialN = "";
+													for ( var j = 0; j < materialData.length; j++) {
+														if (materialData[j][0] == rootData[i].materialID) {
+															materialN = materialData[j][2];
+														}
 													}
-												},
-												failure : function(response,
-														options) {
-													Ext.MessageBox
-															.show({
-																msg : " Unknown page error ",
-																width : 300,
-																buttons : Ext.MessageBox.OK
-															});
+
+													checkStatSumResultData
+															.push([
+																	rootData[i].materialID,
+																	materialN,
+																	rootData[i].date,
+																	rootData[i].pricePrevious,
+																	rootData[i].amountPrevious,
+																	"",
+																	rootData[i].price,
+																	rootData[i].amount,
+																	"",
+																	"",
+																	""
+
+															]);
 												}
-											});
 
-								} else if (inventoryAllStatWin.findById(
-										"sumByDeptAllStat").getValue() == true) {
+												checkStatSumResultStore
+														.reload();
 
-									isPrompt = true;
-									allStatByDeptResultWin.show();
-
-									// ＃＃＃＃＃＃＃＃＃＃＃＃按部門統計＃＃＃＃＃＃＃＃＃＃＃＃
-									Ext.Ajax
-											.request({
-												url : "../../InventoryAllStatByDept.do",
-												params : {
-													"pin" : pin,
-													"beginDate" : beginDate,
-													"endDate" : endDate,
-													"departments" : departments,
-													"materials" : selectMaterials
-												},
-												success : function(response,
-														options) {
-													var resultJSON = Ext.util.JSON
-															.decode(response.responseText);
-
-													var rootData = resultJSON.root;
-													if (rootData[0].message == "normal") {
-
-														allStatByDeptResultData = rootData;
-														allStatByDeptGrid
-																.getStore()
-																.loadData(
-																		allStatByDeptResultData);
-
-													} else {
-														Ext.MessageBox
-																.show({
-																	msg : rootData[0].message,
-																	width : 300,
-																	buttons : Ext.MessageBox.OK
-																});
-													}
-												},
-												failure : function(response,
-														options) {
-													Ext.MessageBox
-															.show({
-																msg : " Unknown page error ",
-																width : 300,
-																buttons : Ext.MessageBox.OK
-															});
+												if (rootData[0].materialID == "NO_DATA") {
+													checkStatSumResultStore
+															.removeAll();
 												}
-											});
+
+											} else {
+												Ext.MessageBox
+														.show({
+															msg : rootData[0].message,
+															width : 300,
+															buttons : Ext.MessageBox.OK
+														});
+											}
+										},
+										failure : function(response,
+												options) {
+											Ext.MessageBox
+													.show({
+														msg : " Unknown page error ",
+														width : 300,
+														buttons : Ext.MessageBox.OK
+													});
+										}
+									});
 
 								}
 
@@ -7272,78 +6923,79 @@ inventoryCheckStatWin = new Ext.Window(
 						text : "取消",
 						handler : function() {
 							isPrompt = false;
-							inventoryAllStatWin.hide();
+							inventoryCheckStatWin.hide();
 						}
 					} ],
 			listeners : {
 				"show" : function(thiz) {
 
-					inventoryAllStatWin.findById("materialAllStatMultSelect")
-							.reset();
-					inventoryAllStatWin.findById("begDateAllStat").setValue("");
-					inventoryAllStatWin.findById("endDateAllStat").setValue("");
+					inventoryCheckStatWin.findById(
+							"materialCheckStatMultSelect").reset();
+					inventoryCheckStatWin.findById("begDateCheckStat")
+							.setValue("");
+					inventoryCheckStatWin.findById("endDateCheckStat")
+							.setValue("");
 
-					inventoryAllStatMSDS.loadData(materialComboData);
+					inventoryCheckStatMSDS.loadData(materialComboData);
 
 					// 神技！動態改變form中component的label！！！
-					inventoryAllStatWin.findById("dept1AllStat").el.parent()
-							.parent().parent().first().dom.innerHTML = departmentData[0][1]
+					inventoryCheckStatWin.findById("dept1CheckStat").el
+							.parent().parent().parent().first().dom.innerHTML = departmentData[0][1]
 							+ ":";
-					inventoryAllStatWin.findById("dept2AllStat").el.parent()
-							.parent().parent().first().dom.innerHTML = departmentData[1][1]
+					inventoryCheckStatWin.findById("dept2CheckStat").el
+							.parent().parent().parent().first().dom.innerHTML = departmentData[1][1]
 							+ ":";
-					inventoryAllStatWin.findById("dept3AllStat").el.parent()
-							.parent().parent().first().dom.innerHTML = departmentData[2][1]
+					inventoryCheckStatWin.findById("dept3CheckStat").el
+							.parent().parent().parent().first().dom.innerHTML = departmentData[2][1]
 							+ ":";
-					inventoryAllStatWin.findById("dept4AllStat").el.parent()
-							.parent().parent().first().dom.innerHTML = departmentData[3][1]
+					inventoryCheckStatWin.findById("dept4CheckStat").el
+							.parent().parent().parent().first().dom.innerHTML = departmentData[3][1]
 							+ ":";
-					inventoryAllStatWin.findById("dept5AllStat").el.parent()
-							.parent().parent().first().dom.innerHTML = departmentData[4][1]
+					inventoryCheckStatWin.findById("dept5CheckStat").el
+							.parent().parent().parent().first().dom.innerHTML = departmentData[4][1]
 							+ ":";
-					inventoryAllStatWin.findById("dept6AllStat").el.parent()
-							.parent().parent().first().dom.innerHTML = departmentData[5][1]
+					inventoryCheckStatWin.findById("dept6CheckStat").el
+							.parent().parent().parent().first().dom.innerHTML = departmentData[5][1]
 							+ ":";
-					inventoryAllStatWin.findById("dept7AllStat").el.parent()
-							.parent().parent().first().dom.innerHTML = departmentData[6][1]
+					inventoryCheckStatWin.findById("dept7CheckStat").el
+							.parent().parent().parent().first().dom.innerHTML = departmentData[6][1]
 							+ ":";
-					inventoryAllStatWin.findById("dept8AllStat").el.parent()
-							.parent().parent().first().dom.innerHTML = departmentData[7][1]
+					inventoryCheckStatWin.findById("dept8CheckStat").el
+							.parent().parent().parent().first().dom.innerHTML = departmentData[7][1]
 							+ ":";
-					inventoryAllStatWin.findById("dept9AllStat").el.parent()
-							.parent().parent().first().dom.innerHTML = departmentData[8][1]
+					inventoryCheckStatWin.findById("dept9CheckStat").el
+							.parent().parent().parent().first().dom.innerHTML = departmentData[8][1]
 							+ ":";
-					inventoryAllStatWin.findById("dept10AllStat").el.parent()
-							.parent().parent().first().dom.innerHTML = departmentData[9][1]
+					inventoryCheckStatWin.findById("dept10CheckStat").el
+							.parent().parent().parent().first().dom.innerHTML = departmentData[9][1]
 							+ ":";
 
-					inventoryAllStatWin.findById("dept1AllStat")
-							.setValue(false);
-					inventoryAllStatWin.findById("dept2AllStat")
-							.setValue(false);
-					inventoryAllStatWin.findById("dept3AllStat")
-							.setValue(false);
-					inventoryAllStatWin.findById("dept4AllStat")
-							.setValue(false);
-					inventoryAllStatWin.findById("dept5AllStat")
-							.setValue(false);
-					inventoryAllStatWin.findById("dept6AllStat")
-							.setValue(false);
-					inventoryAllStatWin.findById("dept7AllStat")
-							.setValue(false);
-					inventoryAllStatWin.findById("dept8AllStat")
-							.setValue(false);
-					inventoryAllStatWin.findById("dept9AllStat")
-							.setValue(false);
-					inventoryAllStatWin.findById("dept10AllStat").setValue(
+					inventoryCheckStatWin.findById("dept1CheckStat").setValue(
+							false);
+					inventoryCheckStatWin.findById("dept2CheckStat").setValue(
+							false);
+					inventoryCheckStatWin.findById("dept3CheckStat").setValue(
+							false);
+					inventoryCheckStatWin.findById("dept4CheckStat").setValue(
+							false);
+					inventoryCheckStatWin.findById("dept5CheckStat").setValue(
+							false);
+					inventoryCheckStatWin.findById("dept6CheckStat").setValue(
+							false);
+					inventoryCheckStatWin.findById("dept7CheckStat").setValue(
+							false);
+					inventoryCheckStatWin.findById("dept8CheckStat").setValue(
+							false);
+					inventoryCheckStatWin.findById("dept9CheckStat").setValue(
+							false);
+					inventoryCheckStatWin.findById("dept10CheckStat").setValue(
 							false);
 
-					inventoryAllStatWin.findById("detailAllStat")
-							.setValue(true);
-					inventoryAllStatWin.findById("sumByMaterialAllStat")
+					inventoryCheckStatFrom.getForm().findField("CheckStat")
+							.setValue("detail");
+
+					inventoryCheckStatWin.findById("isDifferentCheck")
 							.setValue(false);
-					inventoryAllStatWin.findById("sumByDeptAllStat").setValue(
-							false);
 
 				},
 				"hide" : function(thiz) {
@@ -7354,8 +7006,8 @@ inventoryCheckStatWin = new Ext.Window(
 
 // 结果框 -- 明細
 // 前台：[食材 日期 操作 经手人 部门 价格 数量 小计]
-var allStatDetailResultStore = new Ext.data.Store({
-	proxy : new Ext.data.MemoryProxy(allStatDetailResultData),
+var checkStatDetailResultStore = new Ext.data.Store({
+	proxy : new Ext.data.MemoryProxy(checkStatDetailResultData),
 	reader : new Ext.data.ArrayReader({}, [ {
 		name : "materialID"
 	}, {
@@ -7363,28 +7015,79 @@ var allStatDetailResultStore = new Ext.data.Store({
 	}, {
 		name : "date"
 	}, {
-		name : "typeCode"
-	}, {
-		name : "typeName"
-	}, {
-		name : "operator"
-	}, {
 		name : "deptID"
 	}, {
 		name : "deptName"
+	}, {
+		name : "operator"
+	}, {
+		name : "pricePrevious"
+	}, {
+		name : "amountPrevious"
 	}, {
 		name : "price"
 	}, {
 		name : "amount"
 	}, {
-		name : "total"
-	}, {
 		name : "message"
-	} ])
+	} ]),
+	listeners : {
+		"load" : function(thiz, records, options) {
+			thiz.each(function(record) {
+				var beforePrice = parseFloat(record.get("pricePrevious"));
+				var afterPrice = parseFloat(record.get("price"));
+				var beforeAmount = parseFloat(record.get("amountPrevious"));
+				var afterAmount = parseFloat(record.get("amount"));
+
+				var priceDiffDisplay = "";
+				if (beforePrice > afterPrice) {
+
+					priceDiffDisplay = afterPrice - beforePrice;
+					priceDiffDisplay = priceDiffDisplay.toFixed(2);
+					record.set("price", "<font color='red'>" + afterPrice
+							+ " ( " + priceDiffDisplay + " ) </font>");
+					// 提交，去掉修改標記
+					record.commit();
+
+				} else if (afterPrice > beforePrice) {
+
+					priceDiffDisplay = "+"
+							+ (afterPrice - beforePrice).toFixed(2);
+					record.set("price", "<font color='green'>" + afterPrice
+							+ " ( " + priceDiffDisplay + " ) </font>");
+					// 提交，去掉修改標記
+					record.commit();
+
+				}
+
+				var amountDiffDisplay = "";
+				if (beforeAmount > afterAmount) {
+
+					amountDiffDisplay = afterAmount - beforeAmount;
+					amountDiffDisplay = amountDiffDisplay.toFixed(2);
+					record.set("amount", "<font color='red'>" + afterAmount
+							+ " ( " + amountDiffDisplay + " ) </font>");
+					// 提交，去掉修改標記
+					record.commit();
+
+				} else if (afterAmount > beforeAmount) {
+
+					amountDiffDisplay = "+"
+							+ (afterAmount - beforeAmount).toFixed(2);
+					record.set("amount", "<font color='green'>" + afterAmount
+							+ " ( " + amountDiffDisplay + " ) </font>");
+					// 提交，去掉修改標記
+					record.commit();
+
+				}
+
+			});
+		}
+	}
 });
 
 // 2，栏位模型
-var allStatDetailResultColumnModel = new Ext.grid.ColumnModel([
+var checkStatDetailResultColumnModel = new Ext.grid.ColumnModel([
 		new Ext.grid.RowNumberer(), {
 			header : "食材",
 			sortable : true,
@@ -7394,11 +7097,11 @@ var allStatDetailResultColumnModel = new Ext.grid.ColumnModel([
 			header : "日期",
 			sortable : true,
 			dataIndex : "date",
-			width : 80
+			width : 120
 		}, {
-			header : "操作",
+			header : "部门",
 			sortable : true,
-			dataIndex : "typeName",
+			dataIndex : "deptName",
 			width : 80
 		}, {
 			header : "经手人",
@@ -7406,33 +7109,33 @@ var allStatDetailResultColumnModel = new Ext.grid.ColumnModel([
 			dataIndex : "operator",
 			width : 80
 		}, {
-			header : "部门",
+			header : "盘点前价格",
 			sortable : true,
-			dataIndex : "deptName",
+			dataIndex : "pricePrevious",
 			width : 80
 		}, {
-			header : "价钱",
+			header : "盘点前数量",
+			sortable : true,
+			dataIndex : "amountPrevious",
+			width : 80
+		}, {
+			header : "盘点后价格",
 			sortable : true,
 			dataIndex : "price",
 			width : 80
 		}, {
-			header : "数量",
+			header : "盘点后数量",
 			sortable : true,
 			dataIndex : "amount",
 			width : 80
-		}, {
-			header : "小计（￥）",
-			sortable : true,
-			dataIndex : "total",
-			width : 80
 		} ]);
 
-var allStatDetailResultGrid = new Ext.grid.GridPanel({
+var checkStatDetailResultGrid = new Ext.grid.GridPanel({
 	xtype : "grid",
 	anchor : "99%",
 	border : false,
-	ds : allStatDetailResultStore,
-	cm : allStatDetailResultColumnModel,
+	ds : checkStatDetailResultStore,
+	cm : checkStatDetailResultColumnModel,
 	sm : new Ext.grid.RowSelectionModel({
 		singleSelect : true
 	}),
@@ -7445,19 +7148,24 @@ var allStatDetailResultGrid = new Ext.grid.GridPanel({
 	}
 });
 
-var allStatDetailResultWin = new Ext.Window({
-	title : "库存明细",
-	width : 800,
+var checkStatDetailResultWin = new Ext.Window({
+	title : "盘点明细",
+	width : 900,
 	height : 370,
 	closeAction : "hide",
 	resizable : false,
 	layout : "fit",
-	items : allStatDetailResultGrid,
+	items : checkStatDetailResultGrid,
 	buttons : [ {
-		text : "退出",
+		text : "打印",
+		handler : function() {
+
+		}
+	}, {
+		text : "关闭",
 		handler : function() {
 			isPrompt = false;
-			allStatDetailResultWin.hide();
+			checkStatDetailResultWin.hide();
 		}
 	} ],
 	listeners : {
@@ -7467,317 +7175,167 @@ var allStatDetailResultWin = new Ext.Window({
 	}
 });
 
-// 结果框 -- 按食材
-// --------------------------------------------------------------------------------------------------------
-var allStatByMateriaReader = new Ext.data.JsonReader({
-	idProperty : 'groupID',
-	fields : [ {
-		name : 'materialID',
-		type : 'int'
+// 结果框 -- 匯總
+//前台：[食材   日期	盘点前价格	盘点前数量	盘点前合计	盘点后价格	盘点后数量	盘点后合计    损益	盈亏]
+var checkStatSumResultStore = new Ext.data.Store({
+	proxy : new Ext.data.MemoryProxy(checkStatSumResultData),
+	reader : new Ext.data.ArrayReader({}, [ {
+		name : "materialID"
 	}, {
-		name : 'materialName',
-		type : 'string'
+		name : "materialName"
 	}, {
-		name : 'groupID',
-		type : 'int'
+		name : "date"
 	}, {
-		name : 'groupDescr',
-		type : 'string'
+		name : "pricePrevious"
 	}, {
-		name : 'singlePrice',
-		type : 'float'
+		name : "amountPrevious"
+	},{
+		name : "totalPrevious"
 	}, {
-		name : 'amount',
-		type : 'float'
+		name : "price"
 	}, {
-		name : 'sumPrice',
-		type : 'float'
+		name : "amount"
+	},{
+		name : "total"
 	}, {
-		name : 'deptID'
-	}, {
-		name : 'deptName',
-		type : 'string'
-	} ]
-
-});
-
-var allStatByMateriaSummary = new Ext.grid.GroupSummary();
-
-var allStatByMateriaGrid = new Ext.grid.EditorGridPanel({
-	ds : new Ext.data.GroupingStore({
-		reader : allStatByMateriaReader,
-		data : [],
-		sortInfo : {
-			field : 'deptName',
-			direction : "ASC"
-		},
-		groupField : 'materialName'
-	}),
-
-	columns : [ {
-		id : 'groupDescr',
-		header : "食材",
-		width : 20,
-		sortable : true,
-		dataIndex : 'groupDescr',
-		// summaryType : 'count',
-		hideable : false,
-		// summaryRenderer : function(v, params, data) {
-		// return ((v === 0 || v > 1) ? '(' + v + ' Tasks)' : '(1 Task)');
-		// }
-		summaryRenderer : function(v, params, data) {
-			return "合计";
-		}
-	}, {
-		header : "NOT SHOW",
-		width : 20,
-		sortable : false,
-		dataIndex : 'materialName'
-	}, {
-		header : "部门",
-		width : 25,
-		sortable : true,
-		dataIndex : 'deptName'
-	}, {
-		id : 'singlePrice',
-		header : "价格",
-		width : 20,
-		sortable : false, // 計出來的列排序不起作用
-		groupable : false,
-		renderer : function(v, params, record) {
-			// return Ext.util.Format.usMoney(record.data.sumPrice
-			// / record.data.amount);
-			return (record.data.sumPrice / record.data.amount).toFixed(2);
-		},
-		dataIndex : 'singlePrice',
-		summaryType : 'singlePrice'
-	// summaryRenderer : Ext.util.Format.usMoney
-	}, {
-		header : "数量",
-		width : 20,
-		sortable : true,
-		// renderer : Ext.util.Format.usMoney,
-		dataIndex : 'amount',
-		summaryType : 'sum'
-	// editor: new Ext.form.NumberField({
-	// allowBlank: false,
-	// allowNegative: false,
-	// style: 'text-align:left'
-	// })
-	}, {
-		header : "小计",
-		width : 20,
-		sortable : true,
-		// renderer : Ext.util.Format.chnMoney,
-		dataIndex : 'sumPrice',
-		summaryType : 'sum',
-		renderer : function(v) {
-			return parseFloat(v).toFixed(2);
-		}
-	// editor : new Ext.form.NumberField({
-	// allowBlank : false,
-	// allowNegative : false,
-	// style : 'text-align:left'
-	// })
-	} ],
-
-	view : new Ext.grid.GroupingView({
-		forceFit : true,
-		showGroupName : false,
-		enableNoGroups : false, // REQUIRED!
-		hideGroupedColumn : true
-	}),
-
-	plugins : allStatByMateriaSummary,
-
-	frame : true,
-	width : 800,
-	height : 450,
-	clicksToEdit : 1,
-	collapsible : true,
-	animCollapse : false,
-	trackMouseOver : false
-// enableColumnMove: false,
-// title : 'Sponsored Projects'
-// iconCls: 'icon-grid',
-// renderTo: document.body
-});
-
-// --------------------------------------------------------------------------------------------------------
-
-var allStatByMaterialResultWin = new Ext.Window({
-	title : "库存汇总-按食材",
-	width : 400,
-	height : 500,
-	closeAction : "hide",
-	resizable : false,
-	layout : "fit",
-	items : allStatByMateriaGrid,
-	buttons : [ {
-		text : "退出",
-		handler : function() {
-			isPrompt = false;
-			allStatByMaterialResultWin.hide();
-		}
-	} ],
+		name : "amountDiff"
+	},{
+		name : "totalDiff"
+	},{
+		name : "message"
+	} ]),
 	listeners : {
-		"hide" : function(thiz) {
-			isPrompt = false;
+		"load" : function(thiz, records, options) {
+			thiz.each(function(record) {
+				var beforePrice = parseFloat(record.get("pricePrevious"));
+				var afterPrice = parseFloat(record.get("price"));
+				var beforeAmount = parseFloat(record.get("amountPrevious"));
+				var afterAmount = parseFloat(record.get("amount"));
+				
+				record.set("totalPrevious", (beforePrice * beforeAmount).toFixed(2) );
+				record.set("total", (afterPrice * afterAmount).toFixed(2) );
+
+				var amountDiff = afterAmount - beforeAmount;
+				amountDiff = amountDiff.toFixed(2);
+				var totalDiff = (afterPrice * afterAmount).toFixed(2) - (beforePrice * beforeAmount).toFixed(2);
+				totalDiff = totalDiff.toFixed(2);
+				
+				if (totalDiff <0) {
+					record.set("totalDiff", "<font color='red'>￥" + totalDiff +"</font>");
+
+				} else if (totalDiff > 0) {
+					record.set("totalDiff", "<font color='green'>￥" + totalDiff +"</font>");
+				}else{
+					record.set("totalDiff", totalDiff );
+				}
+
+				if (totalDiff <0) {
+					record.set("totalDiff", "<font color='red'>￥" + totalDiff +"</font>");
+
+				} else if (totalDiff > 0) {
+					record.set("totalDiff", "<font color='green'>￥" + totalDiff +"</font>");
+				}else{
+					record.set("totalDiff", totalDiff );
+				}
+				
+				// 提交，去掉修改標記
+				record.commit();
+
+			});
 		}
 	}
 });
 
-// 结果框 -- 按部門
-// --------------------------------------------------------------------------------------------------------
-var allStatByDeptReader = new Ext.data.JsonReader({
-	idProperty : 'groupID',
-	fields : [ {
-		name : 'deptID',
-		type : 'int'
-	}, {
-		name : 'deptName',
-		type : 'string'
-	}, {
-		name : 'groupID',
-		type : 'int'
-	}, {
-		name : 'groupDescr',
-		type : 'string'
-	}, {
-		name : 'singlePrice',
-		type : 'float'
-	}, {
-		name : 'amount',
-		type : 'float'
-	}, {
-		name : 'sumPrice',
-		type : 'float'
-	}, {
-		name : 'materialID'
-	}, {
-		name : 'materialName',
-		type : 'string'
-	} ]
+// 2，栏位模型
+var checkStatSumResultColumnModel = new Ext.grid.ColumnModel([
+		new Ext.grid.RowNumberer(), {
+			header : "食材",
+			sortable : true,
+			dataIndex : "materialName",
+			width : 80
+		}, {
+			header : "日期",
+			sortable : true,
+			dataIndex : "date",
+			width : 120
+		}, {
+			header : "盘点前价格",
+			sortable : true,
+			dataIndex : "pricePrevious",
+			width : 80
+		}, {
+			header : "盘点前数量",
+			sortable : true,
+			dataIndex : "amountPrevious",
+			width : 80
+		}, {
+			header : "盘点前合计",
+			sortable : true,
+			dataIndex : "totalPrevious",
+			width : 80
+		},{
+			header : "盘点后价格",
+			sortable : true,
+			dataIndex : "price",
+			width : 80
+		}, {
+			header : "盘点后数量",
+			sortable : true,
+			dataIndex : "amount",
+			width : 80
+		} , {
+			header : "盘点后合计",
+			sortable : true,
+			dataIndex : "total",
+			width : 80
+		}, {
+			header : "损益",
+			sortable : true,
+			dataIndex : "amountDiff",
+			width : 80
+		} , {
+			header : "盈亏",
+			sortable : true,
+			dataIndex : "totalDiff",
+			width : 80
+		} ]);
 
+var checkStatSumResultGrid = new Ext.grid.GridPanel({
+	xtype : "grid",
+	anchor : "99%",
+	border : false,
+	ds : checkStatSumResultStore,
+	cm : checkStatSumResultColumnModel,
+	sm : new Ext.grid.RowSelectionModel({
+		singleSelect : true
+	}),
+	viewConfig : {
+		forceFit : true
+	},
+	autoScroll : true,
+	loadMask : {
+		msg : "数据加载中，请稍等..."
+	}
 });
 
-var allStatByDeptSummary = new Ext.grid.GroupSummary();
-
-var allStatByDeptGrid = new Ext.grid.EditorGridPanel({
-	ds : new Ext.data.GroupingStore({
-		reader : allStatByDeptReader,
-		data : [],
-		sortInfo : {
-			field : 'materialName',
-			direction : "ASC"
-		},
-		groupField : 'deptName'
-	}),
-
-	columns : [ {
-		id : 'groupDescr',
-		header : "部门",
-		width : 20,
-		sortable : true,
-		dataIndex : 'groupDescr',
-		// summaryType : 'count',
-		hideable : false,
-		// summaryRenderer : function(v, params, data) {
-		// return ((v === 0 || v > 1) ? '(' + v + ' Tasks)' : '(1 Task)');
-		// }
-		summaryRenderer : function(v, params, data) {
-			return "合计";
-		}
-	}, {
-		header : "NOT SHOW",
-		width : 20,
-		sortable : false,
-		dataIndex : 'deptName'
-	}, {
-		header : "食材",
-		width : 25,
-		sortable : true,
-		dataIndex : 'materialName'
-	}, {
-		id : 'singlePrice',
-		header : "价格",
-		width : 20,
-		sortable : false, // 計出來的列排序不起作用
-		groupable : false,
-		renderer : function(v, params, record) {
-			// return Ext.util.Format.usMoney(record.data.sumPrice
-			// / record.data.amount);
-			return (record.data.sumPrice / record.data.amount).toFixed(2);
-		},
-		dataIndex : 'singlePrice',
-		summaryType : 'singlePrice'
-	// summaryRenderer : Ext.util.Format.usMoney
-	}, {
-		header : "数量",
-		width : 20,
-		sortable : true,
-		// renderer : Ext.util.Format.usMoney,
-		dataIndex : 'amount',
-		summaryType : 'sum'
-	// editor: new Ext.form.NumberField({
-	// allowBlank: false,
-	// allowNegative: false,
-	// style: 'text-align:left'
-	// })
-	}, {
-		header : "小计",
-		width : 20,
-		sortable : true,
-		// renderer : Ext.util.Format.chnMoney,
-		dataIndex : 'sumPrice',
-		summaryType : 'sum',
-		renderer : function(v) {
-			return parseFloat(v).toFixed(2);
-		}
-	// editor : new Ext.form.NumberField({
-	// allowBlank : false,
-	// allowNegative : false,
-	// style : 'text-align:left'
-	// })
-	} ],
-
-	view : new Ext.grid.GroupingView({
-		forceFit : true,
-		showGroupName : false,
-		enableNoGroups : false, // REQUIRED!
-		hideGroupedColumn : true
-	}),
-
-	plugins : allStatByDeptSummary,
-
-	frame : true,
-	width : 800,
-	height : 450,
-	clicksToEdit : 1,
-	collapsible : true,
-	animCollapse : false,
-	trackMouseOver : false
-// enableColumnMove: false,
-// title : 'Sponsored Projects'
-// iconCls: 'icon-grid',
-// renderTo: document.body
-});
-
-// --------------------------------------------------------------------------------------------------------
-
-var allStatByDeptResultWin = new Ext.Window({
-	title : "库存汇总-按部门",
-	width : 400,
-	height : 500,
+var checkStatSumResultWin = new Ext.Window({
+	title : "盘点汇总",
+	width : 1000,
+	height : 370,
 	closeAction : "hide",
 	resizable : false,
 	layout : "fit",
-	items : allStatByDeptGrid,
+	items : checkStatSumResultGrid,
 	buttons : [ {
-		text : "退出",
+		text : "打印",
+		handler : function() {
+
+		}
+	}, {
+		text : "关闭",
 		handler : function() {
 			isPrompt = false;
-			allStatByDeptResultWin.hide();
+			checkStatSumResultWin.hide();
 		}
 	} ],
 	listeners : {

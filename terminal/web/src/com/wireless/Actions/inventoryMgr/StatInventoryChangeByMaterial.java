@@ -155,6 +155,13 @@ public class StatInventoryChangeByMaterial extends Action {
 				groupID = groupID + 1;
 
 			}
+			
+			if(resultList.size() == 0){
+				HashMap resultMap = new HashMap();
+				resultMap.put("materialID", "NO_DATA");
+				resultMap.put("message", "normal");
+				resultList.add(resultMap);
+			}
 
 			dbCon.rs.close();
 

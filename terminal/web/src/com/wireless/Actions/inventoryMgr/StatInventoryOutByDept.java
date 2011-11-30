@@ -136,8 +136,8 @@ public class StatInventoryOutByDept extends Action {
 				resultMap.put("materialID", dbCon.rs.getInt("material_id"));
 				resultMap.put("materialName",
 						dbCon.rs.getString("material_name"));
-				resultMap.put("amount", dbCon.rs.getFloat("amount"));
-				resultMap.put("sumPrice", dbCon.rs.getFloat("total_price"));
+				resultMap.put("amount", (-1)*dbCon.rs.getFloat("amount"));
+				resultMap.put("sumPrice", (-1)*dbCon.rs.getFloat("total_price"));
 
 				resultMap.put("message", "normal");
 
@@ -145,6 +145,13 @@ public class StatInventoryOutByDept extends Action {
 
 				groupID = groupID + 1;
 
+			}
+			
+			if(resultList.size() == 0){
+				HashMap resultMap = new HashMap();
+				resultMap.put("materialID", "NO_DATA");
+				resultMap.put("message", "normal");
+				resultList.add(resultMap);
 			}
 
 			dbCon.rs.close();

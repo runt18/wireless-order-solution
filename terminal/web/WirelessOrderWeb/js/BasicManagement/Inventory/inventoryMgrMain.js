@@ -1248,7 +1248,10 @@ var checkStatBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "盘点统计",
 	handler : function(btn) {
-		// supplierAddWin.show();
+		if (!isPrompt) {
+			isPrompt = true;
+			inventoryCheckStatWin.show();
+		}
 	}
 });
 
