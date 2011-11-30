@@ -118,6 +118,7 @@ public class StatInventoryInDetail extends Action {
 					+ " "
 					+ condition;
 
+			System.out.println(sql);
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 
 			/**
