@@ -124,7 +124,6 @@ public class StatInventoryCheckSum extends Action {
 				resultMap.put("materialID", dbCon.rs.getInt("material_id"));
 				// resultMap.put("date", new SimpleDateFormat("yyyy-MM-dd")
 				// .format(dbCon.rs.getDate("date")));
-				System.out.println(dbCon.rs.getDate("date"));
 				resultMap
 						.put("date",
 								new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
