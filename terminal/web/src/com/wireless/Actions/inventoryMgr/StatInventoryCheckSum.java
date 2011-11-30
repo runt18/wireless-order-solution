@@ -124,10 +124,11 @@ public class StatInventoryCheckSum extends Action {
 				resultMap.put("materialID", dbCon.rs.getInt("material_id"));
 				// resultMap.put("date", new SimpleDateFormat("yyyy-MM-dd")
 				// .format(dbCon.rs.getDate("date")));
+				System.out.println(dbCon.rs.getDate("date"));
 				resultMap
 						.put("date",
-								new SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
-										.format(dbCon.rs.getDate("date")));
+								new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+										.format(dbCon.rs.getTimestamp("date")));
 				resultMap.put("pricePrevious", dbCon.rs.getFloat("price_prev"));
 				resultMap.put("amountPrevious", dbCon.rs.getInt("amount_prev"));
 				resultMap.put("price", dbCon.rs.getFloat("price"));

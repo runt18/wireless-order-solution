@@ -119,10 +119,9 @@ public class StatInventoryCheckDetail extends Action {
 				resultMap.put("materialID", dbCon.rs.getInt("material_id"));
 				// resultMap.put("date", new SimpleDateFormat("yyyy-MM-dd")
 				// .format(dbCon.rs.getDate("date")));
-				resultMap
-						.put("date",
-								new SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
-										.format(dbCon.rs.getDate("date")));
+				resultMap.put("date", new SimpleDateFormat(
+						"yyyy-MM-dd HH:mm:ss").format(dbCon.rs
+						.getTimestamp("date")));
 				resultMap.put("deptID", dbCon.rs.getInt("dept_id"));
 				resultMap.put("operator", dbCon.rs.getString("staff"));
 				resultMap.put("pricePrevious", dbCon.rs.getFloat("price_prev"));

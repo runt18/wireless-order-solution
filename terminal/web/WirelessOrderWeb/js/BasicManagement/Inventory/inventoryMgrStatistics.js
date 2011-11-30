@@ -28,7 +28,7 @@ var inStatSupplierCombo = new Ext.form.ComboBox({
 
 var inventoryInStatFrom = new Ext.form.FormPanel({
 	border : false,
-	anchor : "right 10%",
+	anchor : "right 8%",
 	id : "InStatForm",
 	items : [ {
 		layout : "column",
@@ -1355,7 +1355,7 @@ var inventoryOutStatMSDS = new Ext.data.SimpleStore({
 
 var inventoryOutStatFrom = new Ext.form.FormPanel({
 	border : false,
-	anchor : "right 10%",
+	anchor : "right 8%",
 	id : "OutStatForm",
 	items : [ {
 		layout : "column",
@@ -2746,7 +2746,7 @@ var inventoryChangeStatMSDS = new Ext.data.SimpleStore({
 
 var inventoryChangeStatFrom = new Ext.form.FormPanel({
 	border : false,
-	anchor : "right 10%",
+	anchor : "right 8%",
 	id : "ChangeStatForm",
 	items : [ {
 		layout : "column",
@@ -4281,7 +4281,7 @@ var inventoryCostStatMSDS = new Ext.data.SimpleStore({
 
 var inventoryCostStatFrom = new Ext.form.FormPanel({
 	border : false,
-	anchor : "right 10%",
+	anchor : "right 8%",
 	id : "CostStatForm",
 	items : [ {
 		layout : "column",
@@ -5331,7 +5331,7 @@ var inventoryAllStatMSDS = new Ext.data.SimpleStore({
 
 var inventoryAllStatFrom = new Ext.form.FormPanel({
 	border : false,
-	anchor : "right 10%",
+	anchor : "right 8%",
 	id : "AllStatForm",
 	items : [ {
 		layout : "column",
@@ -6434,7 +6434,7 @@ var inventoryCheckStatFrom = new Ext.form.FormPanel({
 			layout : "form",
 			border : false,
 			labelSeparator : '：',
-			width : 80,
+			width : 100,
 			labelWidth : 60,
 			items : [ {
 				xtype : "checkbox",
@@ -6837,77 +6837,79 @@ inventoryCheckStatWin = new Ext.Window(
 
 									// ＃＃＃＃＃＃＃＃＃＃＃＃匯總統計＃＃＃＃＃＃＃＃＃＃＃＃
 									Ext.Ajax
-									.request({
-										url : "../../InventoryCheckStatSum.do",
-										params : {
-											"pin" : pin,
-											"beginDate" : beginDate,
-											"endDate" : endDate,
-											"departments" : departments,
-											"materials" : selectMaterials,
-											"isDiff" : isDiff
-										},
-										success : function(response,
-												options) {
-											var resultJSON = Ext.util.JSON
-													.decode(response.responseText);
+											.request({
+												url : "../../InventoryCheckStatSum.do",
+												params : {
+													"pin" : pin,
+													"beginDate" : beginDate,
+													"endDate" : endDate,
+													"departments" : departments,
+													"materials" : selectMaterials,
+													"isDiff" : isDiff
+												},
+												success : function(response,
+														options) {
+													var resultJSON = Ext.util.JSON
+															.decode(response.responseText);
 
-											// 格式：[食材   日期	盘点前价格	盘点前数量	盘点前合计	盘点后价格	盘点后数量	盘点后合计    损益	盈亏]
-											var rootData = resultJSON.root;
-											if (rootData[0].message == "normal") {
-												checkStatDetailResultData.length = 0;
-												for ( var i = 0; i < rootData.length; i++) {
-													var materialN = "";
-													for ( var j = 0; j < materialData.length; j++) {
-														if (materialData[j][0] == rootData[i].materialID) {
-															materialN = materialData[j][2];
+													// 格式：[食材 日期 盘点前价格 盘点前数量
+													// 盘点前合计 盘点后价格 盘点后数量 盘点后合计
+													// 损益 盈亏]
+													var rootData = resultJSON.root;
+													if (rootData[0].message == "normal") {
+														checkStatSumResultData.length = 0;
+														for ( var i = 0; i < rootData.length; i++) {
+															var materialN = "";
+															for ( var j = 0; j < materialData.length; j++) {
+																if (materialData[j][0] == rootData[i].materialID) {
+																	materialN = materialData[j][2];
+																}
+															}
+
+															checkStatSumResultData
+																	.push([
+																			rootData[i].materialID,
+																			materialN,
+																			rootData[i].date,
+																			rootData[i].pricePrevious,
+																			rootData[i].amountPrevious,
+																			"",
+																			rootData[i].price,
+																			rootData[i].amount,
+																			"",
+																			"",
+																			""
+
+																	]);
 														}
+
+														checkStatSumResultStore
+																.reload();
+
+														if (rootData[0].materialID == "NO_DATA") {
+															checkStatSumResultStore
+																	.removeAll();
+														}
+
+													} else {
+														Ext.MessageBox
+																.show({
+																	msg : rootData[0].message,
+																	width : 300,
+																	buttons : Ext.MessageBox.OK
+																});
 													}
-
-													checkStatSumResultData
-															.push([
-																	rootData[i].materialID,
-																	materialN,
-																	rootData[i].date,
-																	rootData[i].pricePrevious,
-																	rootData[i].amountPrevious,
-																	"",
-																	rootData[i].price,
-																	rootData[i].amount,
-																	"",
-																	"",
-																	""
-
-															]);
+												},
+												failure : function(response,
+														options) {
+													Ext.MessageBox
+															.show({
+																msg : " Unknown page error ",
+																width : 300,
+																buttons : Ext.MessageBox.OK
+															});
 												}
-
-												checkStatSumResultStore
-														.reload();
-
-												if (rootData[0].materialID == "NO_DATA") {
-													checkStatSumResultStore
-															.removeAll();
-												}
-
-											} else {
-												Ext.MessageBox
-														.show({
-															msg : rootData[0].message,
-															width : 300,
-															buttons : Ext.MessageBox.OK
-														});
-											}
-										},
-										failure : function(response,
-												options) {
-											Ext.MessageBox
-													.show({
-														msg : " Unknown page error ",
-														width : 300,
-														buttons : Ext.MessageBox.OK
-													});
-										}
-									});
+											});
 
 								}
 
@@ -7176,7 +7178,7 @@ var checkStatDetailResultWin = new Ext.Window({
 });
 
 // 结果框 -- 匯總
-//前台：[食材   日期	盘点前价格	盘点前数量	盘点前合计	盘点后价格	盘点后数量	盘点后合计    损益	盈亏]
+// 前台：[食材 日期 盘点前价格 盘点前数量 盘点前合计 盘点后价格 盘点后数量 盘点后合计 损益 盈亏]
 var checkStatSumResultStore = new Ext.data.Store({
 	proxy : new Ext.data.MemoryProxy(checkStatSumResultData),
 	reader : new Ext.data.ArrayReader({}, [ {
@@ -7189,19 +7191,19 @@ var checkStatSumResultStore = new Ext.data.Store({
 		name : "pricePrevious"
 	}, {
 		name : "amountPrevious"
-	},{
+	}, {
 		name : "totalPrevious"
 	}, {
 		name : "price"
 	}, {
 		name : "amount"
-	},{
+	}, {
 		name : "total"
 	}, {
 		name : "amountDiff"
-	},{
+	}, {
 		name : "totalDiff"
-	},{
+	}, {
 		name : "message"
 	} ]),
 	listeners : {
@@ -7211,33 +7213,39 @@ var checkStatSumResultStore = new Ext.data.Store({
 				var afterPrice = parseFloat(record.get("price"));
 				var beforeAmount = parseFloat(record.get("amountPrevious"));
 				var afterAmount = parseFloat(record.get("amount"));
-				
-				record.set("totalPrevious", (beforePrice * beforeAmount).toFixed(2) );
-				record.set("total", (afterPrice * afterAmount).toFixed(2) );
+
+				record.set("totalPrevious", (beforePrice * beforeAmount)
+						.toFixed(2));
+				record.set("total", (afterPrice * afterAmount).toFixed(2));
 
 				var amountDiff = afterAmount - beforeAmount;
 				amountDiff = amountDiff.toFixed(2);
-				var totalDiff = (afterPrice * afterAmount).toFixed(2) - (beforePrice * beforeAmount).toFixed(2);
+				var totalDiff = (afterPrice * afterAmount).toFixed(2)
+						- (beforePrice * beforeAmount).toFixed(2);
 				totalDiff = totalDiff.toFixed(2);
-				
-				if (totalDiff <0) {
-					record.set("totalDiff", "<font color='red'>￥" + totalDiff +"</font>");
+
+				if (totalDiff < 0) {
+					record.set("totalDiff", "<font color='red'>￥" + totalDiff
+							+ "</font>");
 
 				} else if (totalDiff > 0) {
-					record.set("totalDiff", "<font color='green'>￥" + totalDiff +"</font>");
-				}else{
-					record.set("totalDiff", totalDiff );
+					record.set("totalDiff", "<font color='green'>￥" + totalDiff
+							+ "</font>");
+				} else {
+					record.set("totalDiff", "￥" + totalDiff);
 				}
 
-				if (totalDiff <0) {
-					record.set("totalDiff", "<font color='red'>￥" + totalDiff +"</font>");
+				if (amountDiff < 0) {
+					record.set("amountDiff", "<font color='red'>￥" + amountDiff
+							+ "</font>");
 
-				} else if (totalDiff > 0) {
-					record.set("totalDiff", "<font color='green'>￥" + totalDiff +"</font>");
-				}else{
-					record.set("totalDiff", totalDiff );
+				} else if (amountDiff > 0) {
+					record.set("amountDiff", "<font color='green'>￥"
+							+ amountDiff + "</font>");
+				} else {
+					record.set("amountDiff", amountDiff);
 				}
-				
+
 				// 提交，去掉修改標記
 				record.commit();
 
@@ -7273,7 +7281,7 @@ var checkStatSumResultColumnModel = new Ext.grid.ColumnModel([
 			sortable : true,
 			dataIndex : "totalPrevious",
 			width : 80
-		},{
+		}, {
 			header : "盘点后价格",
 			sortable : true,
 			dataIndex : "price",
@@ -7283,7 +7291,7 @@ var checkStatSumResultColumnModel = new Ext.grid.ColumnModel([
 			sortable : true,
 			dataIndex : "amount",
 			width : 80
-		} , {
+		}, {
 			header : "盘点后合计",
 			sortable : true,
 			dataIndex : "total",
@@ -7293,7 +7301,7 @@ var checkStatSumResultColumnModel = new Ext.grid.ColumnModel([
 			sortable : true,
 			dataIndex : "amountDiff",
 			width : 80
-		} , {
+		}, {
 			header : "盈亏",
 			sortable : true,
 			dataIndex : "totalDiff",
