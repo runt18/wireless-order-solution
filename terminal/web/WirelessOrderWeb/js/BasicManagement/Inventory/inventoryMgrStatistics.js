@@ -686,7 +686,7 @@ inventoryInStatWin = new Ext.Window(
 
 					inStatSupplierCombo.setValue("全部");
 
-					inventoryInStatMSDS.loadData(materialComboData);
+					//inventoryInStatMSDS.loadData(materialComboData);
 					inStatSupplierComboStore.loadData(supplierComboData);
 
 					// 神技！動態改變form中component的label！！！
@@ -2075,7 +2075,7 @@ inventoryOutStatWin = new Ext.Window(
 					inventoryOutStatWin.findById("outInventOutStat").setValue(
 							false);
 
-					inventoryOutStatMSDS.loadData(materialComboData);
+					//inventoryOutStatMSDS.loadData(materialComboData);
 
 					// 神技！動態改變form中component的label！！！
 					inventoryOutStatWin.findById("dept1OutStat").el.parent()
@@ -3550,7 +3550,7 @@ inventoryChangeStatWin = new Ext.Window(
 					inventoryChangeStatWin.findById("endDateChangeStat")
 							.setValue("");
 
-					inventoryChangeStatMSDS.loadData(materialComboData);
+					//inventoryChangeStatMSDS.loadData(materialComboData);
 
 					// 神技！動態改變form中component的label！！！
 					inventoryChangeStatWin.findById("dept1ChengeOutStat").el
@@ -4838,7 +4838,7 @@ inventoryCostStatWin = new Ext.Window(
 					inventoryCostStatWin.findById("endDateCostStat").setValue(
 							"");
 
-					inventoryCostStatMSDS.loadData(materialComboData);
+					//inventoryCostStatMSDS.loadData(materialComboData);
 
 					// 神技！動態改變form中component的label！！！
 					inventoryCostStatWin.findById("dept1CostStat").el.parent()
@@ -5891,7 +5891,7 @@ inventoryAllStatWin = new Ext.Window(
 					inventoryAllStatWin.findById("begDateAllStat").setValue("");
 					inventoryAllStatWin.findById("endDateAllStat").setValue("");
 
-					inventoryAllStatMSDS.loadData(materialComboData);
+					//inventoryAllStatMSDS.loadData(materialComboData);
 
 					// 神技！動態改變form中component的label！！！
 					inventoryAllStatWin.findById("dept1AllStat").el.parent()
@@ -6938,7 +6938,7 @@ inventoryCheckStatWin = new Ext.Window(
 					inventoryCheckStatWin.findById("endDateCheckStat")
 							.setValue("");
 
-					inventoryCheckStatMSDS.loadData(materialComboData);
+					//inventoryCheckStatMSDS.loadData(materialComboData);
 
 					// 神技！動態改變form中component的label！！！
 					inventoryCheckStatWin.findById("dept1CheckStat").el

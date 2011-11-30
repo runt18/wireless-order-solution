@@ -32,6 +32,12 @@
 					});
 				}
 			}
+			inventoryInStatMSDS.loadData(materialComboData);
+			inventoryOutStatMSDS.loadData(materialComboData);
+			inventoryChangeStatMSDS.loadData(materialComboData);
+			inventoryCostStatMSDS.loadData(materialComboData);
+			inventoryAllStatMSDS.loadData(materialComboData);
+			inventoryCheckStatMSDS.loadData(materialComboData);
 		},
 		failure : function(response, options) {
 			Ext.MessageBox.show({
