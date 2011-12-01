@@ -713,9 +713,9 @@ function refreshCheck() {
 		preTotalStock = preTotalStock + inventoryCheckData[i][2];
 	}
 
-	var stockDiff = prePrice - currPrice;
-	var priceDiff = (preTotalStock * prePrice).toFixed(2)
-			- (currTotalStock * currPrice).toFixed(2);
+	var stockDiff = currTotalStock - preTotalStock;
+	var priceDiff = (currTotalStock * currPrice).toFixed(2)
+			- (preTotalStock * prePrice).toFixed(2);
 
 	document.getElementById("stockDiff").innerHTML = stockDiff.toFixed(2);
 	document.getElementById("priceDiff").innerHTML = "￥" + priceDiff.toFixed(2);

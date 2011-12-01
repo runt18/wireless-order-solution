@@ -75,6 +75,13 @@ public class UpdateDepartmentAction extends Action {
 						+ " AND dept_id = " + fieldValues[0];
 
 				sqlRowCount = dbCon.stmt.executeUpdate(sql);
+
+				sql = "UPDATE " + Params.dbName + ".material_dept "
+						+ " SET dept_name = '" + fieldValues[1] + "'"
+						+ " WHERE restaurant_id=" + term.restaurant_id
+						+ " AND dept_id = " + fieldValues[0];
+
+				sqlRowCount = dbCon.stmt.executeUpdate(sql);
 			}
 
 			jsonResp = jsonResp.replace("$(result)", "true");
