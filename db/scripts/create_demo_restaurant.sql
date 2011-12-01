@@ -14,6 +14,7 @@ DELETE FROM wireless_order_db.staff WHERE restaurant_id=11;
 
 DELETE FROM wireless_order_db.food_material WHERE restaurant_id=11;
 DELETE FROM wireless_order_db.material_detail WHERE restaurant_id=11;
+DELETE FROM wireless_order_db.material_dept WHERE restaurant_id=11;
 DELETE FROM wireless_order_db.material WHERE restaurant_id=11;
 DELETE FROM wireless_order_db.supplier WHERE restaurant_id=11;
 DELETE FROM wireless_order_db.terminal WHERE restaurant_id=11;
@@ -216,12 +217,68 @@ SET AUTOCOMMIT=1;
 -- -----------------------------------------------------
 SET AUTOCOMMIT=0;
 INSERT INTO `wireless_order_db`.`material` (`restaurant_id`, `material_id`, `material_alias`, `name`, `warning_threshold`, `danger_threshold`) VALUES (11, 100, 100, '排骨', 10.5, 5.5);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 100, 0, '仓管部', '排骨', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 100, 1, '中厨部', '排骨', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 100, 2, '点心部', '排骨', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 100, 3, '部门3', '排骨', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 100, 4, '部门4', '排骨', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 100, 5, '部门5', '排骨', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 100, 6, '部门6', '排骨', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 100, 7, '部门7', '排骨', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 100, 8, '部门8', '排骨', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 100, 9, '部门9', '排骨', 0, 0);
+
 INSERT INTO `wireless_order_db`.`material` (`restaurant_id`, `material_id`, `material_alias`, `name`, `warning_threshold`, `danger_threshold`) VALUES (11, 101, 101, '鸡肉', 22, 14);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 101, 0, '仓管部', '鸡肉', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 101, 1, '中厨部', '鸡肉', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 101, 2, '点心部', '鸡肉', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 101, 3, '部门3', '鸡肉', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 101, 4, '部门4', '鸡肉', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 101, 5, '部门5', '鸡肉', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 101, 6, '部门6', '鸡肉', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 101, 7, '部门7', '鸡肉', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 101, 8, '部门8', '鸡肉', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 101, 9, '部门9', '鸡肉', 0, 0);
+
 INSERT INTO `wireless_order_db`.`material` (`restaurant_id`, `material_id`, `material_alias`, `name`, `warning_threshold`, `danger_threshold`) VALUES (11, 102, 102, '牛肉', 27, 13);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 102, 0, '仓管部', '牛肉', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 102, 1, '中厨部', '牛肉', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 102, 2, '点心部', '牛肉', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 102, 3, '部门3', '牛肉', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 102, 4, '部门4', '牛肉', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 102, 5, '部门5', '牛肉', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 102, 6, '部门6', '牛肉', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 102, 7, '部门7', '牛肉', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 102, 8, '部门8', '牛肉', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 102, 9, '部门9', '牛肉', 0, 0);
+
 INSERT INTO `wireless_order_db`.`material` (`restaurant_id`, `material_id`, `material_alias`, `name`, `warning_threshold`, `danger_threshold`) VALUES (11, 103, 103, '猪肉', 27, 13);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 103, 0, '仓管部', '猪肉', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 103, 1, '中厨部', '猪肉', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 103, 2, '点心部', '猪肉', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 103, 3, '部门3', '猪肉', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 103, 4, '部门4', '猪肉', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 103, 5, '部门5', '猪肉', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 103, 6, '部门6', '猪肉', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 103, 7, '部门7', '猪肉', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 103, 8, '部门8', '猪肉', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 103, 9, '部门9', '猪肉', 0, 0);
+
 INSERT INTO `wireless_order_db`.`material` (`restaurant_id`, `material_id`, `material_alias`, `name`, `warning_threshold`, `danger_threshold`) VALUES (11, 104, 104, '酱汁', 30, 20);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 104, 0, '仓管部', '酱汁', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 104, 1, '中厨部', '酱汁', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 104, 2, '点心部', '酱汁', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 104, 3, '部门3', '酱汁', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 104, 4, '部门4', '酱汁', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 104, 5, '部门5', '酱汁', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 104, 6, '部门6', '酱汁', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 104, 7, '部门7', '酱汁', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 104, 8, '部门8', '酱汁', 0, 0);
+INSERT INTO `wireless_order_db`.`material_dept` (`restaurant_id`, `material_id`, `dept_id`, `dept_name`, `material_name`, `price`, `stock` ) VALUES (11, 104, 9, '部门9', '酱汁', 0, 0);
+
 COMMIT;
 SET AUTOCOMMIT=1;
+
 
 -- -----------------------------------------------------
 -- Insert material records
