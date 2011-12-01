@@ -119,7 +119,7 @@ public class StatInventoryCostDetail extends Action {
 						.format(dbCon.rs.getDate("date")));
 				resultMap.put("deptID", dbCon.rs.getInt("dept_id"));
 				resultMap.put("price", dbCon.rs.getFloat("price"));
-				resultMap.put("amount", (-1)*dbCon.rs.getInt("amount"));
+				resultMap.put("amount", (-1)*dbCon.rs.getFloat("amount"));
 				resultMap.put("total", (-1)*dbCon.rs.getFloat("total"));
 
 				resultMap.put("message", "normal");
