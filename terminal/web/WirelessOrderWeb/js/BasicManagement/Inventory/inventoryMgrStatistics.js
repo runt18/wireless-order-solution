@@ -848,12 +848,12 @@ var inStatDetailResultWin = new Ext.Window({
 	resizable : false,
 	layout : "fit",
 	items : inStatDetailResultGrid,
-	buttons : [  {
+	buttons : [ {
 		text : "打印",
 		handler : function() {
 
 		}
-	},{
+	}, {
 		text : "关闭",
 		handler : function() {
 			isPrompt = false;
@@ -903,9 +903,13 @@ var inStatByMateriaReader = new Ext.data.JsonReader({
 
 // define a custom summary function
 Ext.grid.GroupSummary.Calculations['singlePrice'] = function(v, record, field) {
-	return parseFloat(
-			(parseFloat(v).toFixed(2) + (record.data.sumPrice / record.data.amount)
-					.toFixed(2))).toFixed(2);
+	if (record.data.amount != 0) {
+		return parseFloat(
+				(parseFloat(v).toFixed(2) + (record.data.sumPrice / record.data.amount)
+						.toFixed(2))).toFixed(2);
+	} else {
+		return 0.00;
+	}
 };
 
 var inStatByMateriaSummary = new Ext.grid.GroupSummary();
@@ -954,7 +958,11 @@ var inStatByMateriaGrid = new Ext.grid.EditorGridPanel({
 		renderer : function(v, params, record) {
 			// return Ext.util.Format.usMoney(record.data.sumPrice
 			// / record.data.amount);
-			return (record.data.sumPrice / record.data.amount).toFixed(2);
+			if (record.data.amount != 0) {
+				return (record.data.sumPrice / record.data.amount).toFixed(2);
+			} else {
+				return 0.00;
+			}
 		},
 		dataIndex : 'singlePrice',
 		summaryType : 'singlePrice'
@@ -1025,7 +1033,7 @@ var inStatByMaterialResultWin = new Ext.Window({
 		handler : function() {
 
 		}
-	},{
+	}, {
 		text : "关闭",
 		handler : function() {
 			isPrompt = false;
@@ -1119,7 +1127,11 @@ var inStatByDeptGrid = new Ext.grid.EditorGridPanel({
 		renderer : function(v, params, record) {
 			// return Ext.util.Format.usMoney(record.data.sumPrice
 			// / record.data.amount);
-			return (record.data.sumPrice / record.data.amount).toFixed(2);
+			if (record.data.amount != 0) {
+				return (record.data.sumPrice / record.data.amount).toFixed(2);
+			} else {
+				return 0.00;
+			}
 		},
 		dataIndex : 'singlePrice',
 		summaryType : 'singlePrice'
@@ -1190,7 +1202,7 @@ var inStatByDeptResultWin = new Ext.Window({
 		handler : function() {
 
 		}
-	},{
+	}, {
 		text : "关闭",
 		handler : function() {
 			isPrompt = false;
@@ -1284,7 +1296,11 @@ var inStatBySupplierGrid = new Ext.grid.EditorGridPanel({
 		renderer : function(v, params, record) {
 			// return Ext.util.Format.usMoney(record.data.sumPrice
 			// / record.data.amount);
-			return (record.data.sumPrice / record.data.amount).toFixed(2);
+			if (record.data.amount != 0) {
+				return (record.data.sumPrice / record.data.amount).toFixed(2);
+			} else {
+				return 0.00;
+			}
 		},
 		dataIndex : 'singlePrice',
 		summaryType : 'singlePrice'
@@ -1355,7 +1371,7 @@ var inStatBySupplierResultWin = new Ext.Window({
 		handler : function() {
 
 		}
-	},{
+	}, {
 		text : "关闭",
 		handler : function() {
 			isPrompt = false;
@@ -2276,7 +2292,7 @@ var outStatDetailResultWin = new Ext.Window({
 		handler : function() {
 
 		}
-	},{
+	}, {
 		text : "关闭",
 		handler : function() {
 			isPrompt = false;
@@ -2370,7 +2386,11 @@ var outStatByMateriaGrid = new Ext.grid.EditorGridPanel({
 		renderer : function(v, params, record) {
 			// return Ext.util.Format.usMoney(record.data.sumPrice
 			// / record.data.amount);
-			return (record.data.sumPrice / record.data.amount).toFixed(2);
+			if (record.data.amount != 0) {
+				return (record.data.sumPrice / record.data.amount).toFixed(2);
+			} else {
+				return 0.00;
+			}
 		},
 		dataIndex : 'singlePrice',
 		summaryType : 'singlePrice'
@@ -2441,7 +2461,7 @@ var outStatByMaterialResultWin = new Ext.Window({
 		handler : function() {
 
 		}
-	},{
+	}, {
 		text : "关闭",
 		handler : function() {
 			isPrompt = false;
@@ -2535,7 +2555,11 @@ var outStatByDeptGrid = new Ext.grid.EditorGridPanel({
 		renderer : function(v, params, record) {
 			// return Ext.util.Format.usMoney(record.data.sumPrice
 			// / record.data.amount);
-			return (record.data.sumPrice / record.data.amount).toFixed(2);
+			if (record.data.amount != 0) {
+				return (record.data.sumPrice / record.data.amount).toFixed(2);
+			} else {
+				return 0.00;
+			}
 		},
 		dataIndex : 'singlePrice',
 		summaryType : 'singlePrice'
@@ -2606,7 +2630,7 @@ var outStatByDeptResultWin = new Ext.Window({
 		handler : function() {
 
 		}
-	},{
+	}, {
 		text : "关闭",
 		handler : function() {
 			isPrompt = false;
@@ -2700,7 +2724,11 @@ var outStatByReasonGrid = new Ext.grid.EditorGridPanel({
 		renderer : function(v, params, record) {
 			// return Ext.util.Format.usMoney(record.data.sumPrice
 			// / record.data.amount);
-			return (record.data.sumPrice / record.data.amount).toFixed(2);
+			if (record.data.amount != 0) {
+				return (record.data.sumPrice / record.data.amount).toFixed(2);
+			} else {
+				return 0.00;
+			}
 		},
 		dataIndex : 'singlePrice',
 		summaryType : 'singlePrice'
@@ -2771,7 +2799,7 @@ var outStatByReasonResultWin = new Ext.Window({
 		handler : function() {
 
 		}
-	},{
+	}, {
 		text : "关闭",
 		handler : function() {
 			isPrompt = false;
@@ -3828,7 +3856,7 @@ var changeStatDetailResultWin = new Ext.Window({
 		handler : function() {
 
 		}
-	},{
+	}, {
 		text : "关闭",
 		handler : function() {
 			isPrompt = false;
@@ -3932,7 +3960,11 @@ var changeStatByMateriaGrid = new Ext.grid.EditorGridPanel({
 		renderer : function(v, params, record) {
 			// return Ext.util.Format.usMoney(record.data.sumPrice
 			// / record.data.amount);
-			return (record.data.sumPrice / record.data.amount).toFixed(2);
+			if (record.data.amount != 0) {
+				return (record.data.sumPrice / record.data.amount).toFixed(2);
+			} else {
+				return 0.00;
+			}
 		},
 		dataIndex : 'singlePrice',
 		summaryType : 'singlePrice'
@@ -4003,7 +4035,7 @@ var changeStatByMaterialResultWin = new Ext.Window({
 		handler : function() {
 
 		}
-	},{
+	}, {
 		text : "关闭",
 		handler : function() {
 			isPrompt = false;
@@ -4097,7 +4129,11 @@ var changeStatByOutDeptGrid = new Ext.grid.EditorGridPanel({
 		renderer : function(v, params, record) {
 			// return Ext.util.Format.usMoney(record.data.sumPrice
 			// / record.data.amount);
-			return (record.data.sumPrice / record.data.amount).toFixed(2);
+			if (record.data.amount != 0) {
+				return (record.data.sumPrice / record.data.amount).toFixed(2);
+			} else {
+				return 0.00;
+			}
 		},
 		dataIndex : 'singlePrice',
 		summaryType : 'singlePrice'
@@ -4163,12 +4199,12 @@ var changeStatByOutDeptResultWin = new Ext.Window({
 	resizable : false,
 	layout : "fit",
 	items : changeStatByOutDeptGrid,
-	buttons : [{
+	buttons : [ {
 		text : "打印",
 		handler : function() {
 
 		}
-	},{
+	}, {
 		text : "关闭",
 		handler : function() {
 			isPrompt = false;
@@ -4262,7 +4298,11 @@ var changeStatByInDeptGrid = new Ext.grid.EditorGridPanel({
 		renderer : function(v, params, record) {
 			// return Ext.util.Format.usMoney(record.data.sumPrice
 			// / record.data.amount);
-			return (record.data.sumPrice / record.data.amount).toFixed(2);
+			if (record.data.amount != 0) {
+				return (record.data.sumPrice / record.data.amount).toFixed(2);
+			} else {
+				return 0.00;
+			}
 		},
 		dataIndex : 'singlePrice',
 		summaryType : 'singlePrice'
@@ -4333,7 +4373,7 @@ var changeStatByInDeptResultWin = new Ext.Window({
 		handler : function() {
 
 		}
-	},{
+	}, {
 		text : "关闭",
 		handler : function() {
 			isPrompt = false;
@@ -5073,7 +5113,7 @@ var costStatDetailResultWin = new Ext.Window({
 		handler : function() {
 
 		}
-	},{
+	}, {
 		text : "关闭",
 		handler : function() {
 			isPrompt = false;
@@ -5167,7 +5207,11 @@ var costStatByMateriaGrid = new Ext.grid.EditorGridPanel({
 		renderer : function(v, params, record) {
 			// return Ext.util.Format.usMoney(record.data.sumPrice
 			// / record.data.amount);
-			return (record.data.sumPrice / record.data.amount).toFixed(2);
+			if (record.data.amount != 0) {
+				return (record.data.sumPrice / record.data.amount).toFixed(2);
+			} else {
+				return 0.00;
+			}
 		},
 		dataIndex : 'singlePrice',
 		summaryType : 'singlePrice'
@@ -5238,7 +5282,7 @@ var costStatByMaterialResultWin = new Ext.Window({
 		handler : function() {
 
 		}
-	},{
+	}, {
 		text : "关闭",
 		handler : function() {
 			isPrompt = false;
@@ -5332,7 +5376,11 @@ var costStatByDeptGrid = new Ext.grid.EditorGridPanel({
 		renderer : function(v, params, record) {
 			// return Ext.util.Format.usMoney(record.data.sumPrice
 			// / record.data.amount);
-			return (record.data.sumPrice / record.data.amount).toFixed(2);
+			if (record.data.amount != 0) {
+				return (record.data.sumPrice / record.data.amount).toFixed(2);
+			} else {
+				return 0.00;
+			}
 		},
 		dataIndex : 'singlePrice',
 		summaryType : 'singlePrice'
@@ -5403,7 +5451,7 @@ var costStatByDeptResultWin = new Ext.Window({
 		handler : function() {
 
 		}
-	},{
+	}, {
 		text : "关闭",
 		handler : function() {
 			isPrompt = false;
@@ -6161,7 +6209,7 @@ var allStatDetailResultWin = new Ext.Window({
 		handler : function() {
 
 		}
-	},{
+	}, {
 		text : "关闭",
 		handler : function() {
 			isPrompt = false;
@@ -6255,7 +6303,11 @@ var allStatByMateriaGrid = new Ext.grid.EditorGridPanel({
 		renderer : function(v, params, record) {
 			// return Ext.util.Format.usMoney(record.data.sumPrice
 			// / record.data.amount);
-			return (record.data.sumPrice / record.data.amount).toFixed(2);
+			if (record.data.amount != 0) {
+				return (record.data.sumPrice / record.data.amount).toFixed(2);
+			} else {
+				return 0.00;
+			}
 		},
 		dataIndex : 'singlePrice',
 		summaryType : 'singlePrice'
@@ -6326,7 +6378,7 @@ var allStatByMaterialResultWin = new Ext.Window({
 		handler : function() {
 
 		}
-	},{
+	}, {
 		text : "关闭",
 		handler : function() {
 			isPrompt = false;
@@ -6420,7 +6472,11 @@ var allStatByDeptGrid = new Ext.grid.EditorGridPanel({
 		renderer : function(v, params, record) {
 			// return Ext.util.Format.usMoney(record.data.sumPrice
 			// / record.data.amount);
-			return (record.data.sumPrice / record.data.amount).toFixed(2);
+			if (record.data.amount != 0) {
+				return (record.data.sumPrice / record.data.amount).toFixed(2);
+			} else {
+				return 0.00;
+			}
 		},
 		dataIndex : 'singlePrice',
 		summaryType : 'singlePrice'
@@ -6491,7 +6547,7 @@ var allStatByDeptResultWin = new Ext.Window({
 		handler : function() {
 
 		}
-	},{
+	}, {
 		text : "关闭",
 		handler : function() {
 			isPrompt = false;
@@ -6906,7 +6962,7 @@ inventoryCheckStatWin = new Ext.Window(
 																	deptN = departmentData[j][1];
 																}
 															}
-															
+
 															checkStatDetailResultData
 																	.push([
 																			rootData[i].materialID,
