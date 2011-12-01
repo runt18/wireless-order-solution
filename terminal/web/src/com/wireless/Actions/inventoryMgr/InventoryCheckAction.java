@@ -65,7 +65,8 @@ public class InventoryCheckAction extends Action {
 			float checkPrice = Float.parseFloat(request
 					.getParameter("checkPrice"));
 
-			SimpleDateFormat tempDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+			SimpleDateFormat tempDate = new SimpleDateFormat(
+					"yyyy-MM-dd hh:mm:ss");
 			String date = tempDate.format(new java.util.Date());
 
 			String amountString = request.getParameter("amountInfo");
@@ -95,10 +96,11 @@ public class InventoryCheckAction extends Action {
 						+ ", '"
 						+ date
 						+ "', "
-						+ (Float.parseFloat(thisDeptAmount[1]) - Float
-								.parseFloat(thisDeptAmount[0])) + ", "
-						+ thisDeptAmount[0] + ", " + type + ", '" + staff
-						+ "', " + i + " ) ";
+						+ (float) Math.round((Float
+								.parseFloat(thisDeptAmount[1]) - Float
+								.parseFloat(thisDeptAmount[0])) * 100) / 100
+						+ ", " + thisDeptAmount[0] + ", " + type + ", '"
+						+ staff + "', " + i + " ) ";
 				sqlRowCount = dbCon.stmt.executeUpdate(sql);
 			}
 

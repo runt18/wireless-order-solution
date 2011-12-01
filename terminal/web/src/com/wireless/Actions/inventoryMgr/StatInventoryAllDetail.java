@@ -42,7 +42,7 @@ public class StatInventoryAllDetail extends Action {
 
 		boolean isError = false;
 		float allTotalCount = 0;
-		int allTotalAmount = 0;
+		float allTotalAmount = 0;
 
 		try {
 			// 解决后台中文传到前台乱码
@@ -134,7 +134,8 @@ public class StatInventoryAllDetail extends Action {
 
 				allTotalCount = (float) Math.round((allTotalCount + dbCon.rs
 						.getFloat("total")) * 100) / 100;
-				allTotalAmount = allTotalAmount + dbCon.rs.getInt("amount");
+				allTotalAmount = (float) Math.round((allTotalAmount + dbCon.rs
+						.getFloat("amount")) * 100) / 100;
 
 			}
 

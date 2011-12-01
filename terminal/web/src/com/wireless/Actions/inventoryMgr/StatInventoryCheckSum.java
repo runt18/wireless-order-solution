@@ -41,7 +41,7 @@ public class StatInventoryCheckSum extends Action {
 
 		boolean isError = false;
 		float allTotalCount = 0;
-		int allTotalAmount = 0;
+		float allTotalAmount = 0;
 
 		try {
 			// 解决后台中文传到前台乱码
@@ -129,7 +129,7 @@ public class StatInventoryCheckSum extends Action {
 								new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 										.format(dbCon.rs.getTimestamp("date")));
 				resultMap.put("pricePrevious", dbCon.rs.getFloat("price_prev"));
-				resultMap.put("amountPrevious", dbCon.rs.getInt("amount_prev"));
+				resultMap.put("amountPrevious", dbCon.rs.getFloat("amount_prev"));
 				resultMap.put("price", dbCon.rs.getFloat("price"));
 				resultMap.put("amount", dbCon.rs.getFloat("amount"));
 

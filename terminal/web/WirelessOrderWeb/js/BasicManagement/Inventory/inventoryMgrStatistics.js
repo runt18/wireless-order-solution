@@ -6906,7 +6906,7 @@ inventoryCheckStatWin = new Ext.Window(
 																	deptN = departmentData[j][1];
 																}
 															}
-
+															
 															checkStatDetailResultData
 																	.push([
 																			rootData[i].materialID,

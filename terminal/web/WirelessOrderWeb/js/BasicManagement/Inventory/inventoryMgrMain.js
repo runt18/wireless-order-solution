@@ -1643,7 +1643,10 @@ var materialColumnModel = new Ext.grid.ColumnModel([
 			header : "库存量",
 			sortable : true,
 			dataIndex : "storage",
-			width : 130
+			width : 130,
+			renderer : function(v) {
+				return parseFloat(v).toFixed(2);
+			}
 		}, {
 			header : "价格（￥）",
 			sortable : true,
