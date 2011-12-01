@@ -392,8 +392,39 @@ var pushBackBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "返回",
 	handler : function(btn) {
-		location.href = "MenuProtal.html?restaurantID=" + restaurantID
-				+ "&pin=" + pin;
+		var isChange = false;
+		kitchenGrid.getStore().each(
+				function(record) {
+					if (record.isModified("kitchenName") == true
+							|| record.isModified("normalDiscount1") == true
+							|| record.isModified("normalDiscount2") == true
+							|| record.isModified("normalDiscount3") == true
+							|| record.isModified("memberDiscount1") == true
+							|| record.isModified("memberDiscount2") == true
+							|| record.isModified("memberDiscount3") == true
+							|| record.isModified("department") == true) {
+
+						isChange = true;
+
+					}
+				});
+
+		if (isChange) {
+			Ext.MessageBox.show({
+				msg : "修改尚未保存，是否确认返回？",
+				width : 300,
+				buttons : Ext.MessageBox.YESNO,
+				fn : function(btn) {
+					if (btn == "yes") {
+						location.href = "MenuProtal.html?restaurantID="
+								+ restaurantID + "&pin=" + pin;
+					}
+				}
+			});
+		} else {
+			location.href = "MenuProtal.html?restaurantID=" + restaurantID
+					+ "&pin=" + pin;
+		}
 	}
 });
 
@@ -441,90 +472,133 @@ var kitchenStore = new Ext.data.Store({
 
 // 2，栏位模型
 var kitchenColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(),
-		{
-			header : "编号",
-			sortable : true,
-			dataIndex : "kitchenID",
-			width : 100
-		}, {
-			header : "名称",
-			sortable : true,
-			dataIndex : "kitchenName",
-			width : 140,
-			editor : new Ext.form.TextField({
-				allowBlank : false,
-				allowNegative : false
-			})
-		}, {
-			header : "一般折扣1",
-			sortable : true,
-			dataIndex : "normalDiscount1",
-			width : 140,
-			editor : new Ext.form.NumberField({
-				allowBlank : false,
-				allowNegative : false
-			})
-		}, {
-			header : "一般折扣2",
-			sortable : true,
-			dataIndex : "normalDiscount2",
-			width : 140,
-			editor : new Ext.form.NumberField({
-				allowBlank : false,
-				allowNegative : false
-			})
-		}, {
-			header : "一般折扣3",
-			sortable : true,
-			dataIndex : "normalDiscount3",
-			width : 140,
-			editor : new Ext.form.NumberField({
-				allowBlank : false,
-				allowNegative : false
-			})
-		}, {
-			header : "会员折扣1",
-			sortable : true,
-			dataIndex : "memberDiscount1",
-			width : 140,
-			editor : new Ext.form.NumberField({
-				allowBlank : false,
-				allowNegative : false
-			})
-		}, {
-			header : "会员折扣2",
-			sortable : true,
-			dataIndex : "memberDiscount2",
-			width : 140,
-			editor : new Ext.form.NumberField({
-				allowBlank : false,
-				allowNegative : false
-			})
-		}, {
-			header : "会员折扣3",
-			sortable : true,
-			dataIndex : "memberDiscount3",
-			width : 140,
-			editor : new Ext.form.NumberField({
-				allowBlank : false,
-				allowNegative : false
-			})
-		}, {
-			header : "部门",
-			sortable : true,
-			dataIndex : "department",
-			width : 100,
-			editor : departmentComb,
-			renderer : function(value, cellmeta, record) {
-				var deptDesc = "";
-				for ( var i = 0; i < departmentData.length; i++) {
-					if (departmentData[i][0] == value) {
-						deptDesc = departmentData[i][1];
-					}
-				}
-				return deptDesc;
+// {
+// header : "编号",
+// sortable : true,
+// dataIndex : "kitchenID",
+// width : 100
+// },
+{
+	header : "名称",
+	sortable : true,
+	dataIndex : "kitchenName",
+	width : 140,
+	editor : new Ext.form.TextField({
+		allowBlank : false,
+		allowNegative : false
+	})
+}, {
+	header : "一般折扣1",
+	sortable : true,
+	dataIndex : "normalDiscount1",
+	width : 140,
+	editor : new Ext.form.NumberField({
+		allowBlank : false,
+		allowNegative : false,
+		validator : function(v) {
+			if (v <= 0.0 || v > 1) {
+				return "折扣范围是0.0至1.0！";
+			} else {
+				return true;
 			}
-		} ]);
+		}
+	})
+}, {
+	header : "一般折扣2",
+	sortable : true,
+	dataIndex : "normalDiscount2",
+	width : 140,
+	editor : new Ext.form.NumberField({
+		allowBlank : false,
+		allowNegative : false,
+		validator : function(v) {
+			if (v <= 0.0 || v > 1) {
+				return "折扣范围是0.0至1.0！";
+			} else {
+				return true;
+			}
+		}
+	})
+}, {
+	header : "一般折扣3",
+	sortable : true,
+	dataIndex : "normalDiscount3",
+	width : 140,
+	editor : new Ext.form.NumberField({
+		allowBlank : false,
+		allowNegative : false,
+		validator : function(v) {
+			if (v <= 0.0 || v > 1) {
+				return "折扣范围是0.0至1.0！";
+			} else {
+				return true;
+			}
+		}
+	})
+}, {
+	header : "会员折扣1",
+	sortable : true,
+	dataIndex : "memberDiscount1",
+	width : 140,
+	editor : new Ext.form.NumberField({
+		allowBlank : false,
+		allowNegative : false,
+		validator : function(v) {
+			if (v <= 0.0 || v > 1) {
+				return "折扣范围是0.0至1.0！";
+			} else {
+				return true;
+			}
+		}
+	})
+}, {
+	header : "会员折扣2",
+	sortable : true,
+	dataIndex : "memberDiscount2",
+	width : 140,
+	editor : new Ext.form.NumberField({
+		allowBlank : false,
+		allowNegative : false,
+		validator : function(v) {
+			if (v <= 0.0 || v > 1) {
+				return "折扣范围是0.0至1.0！";
+			} else {
+				return true;
+			}
+		}
+	})
+}, {
+	header : "会员折扣3",
+	sortable : true,
+	dataIndex : "memberDiscount3",
+	width : 140,
+	editor : new Ext.form.NumberField({
+		allowBlank : false,
+		allowNegative : false,
+		validator : function(v) {
+			if (v <= 0.0 || v > 1) {
+				return "折扣范围是0.0至1.0！";
+			} else {
+				return true;
+			}
+		}
+	})
+}, {
+	header : "部门",
+	sortable : true,
+	dataIndex : "department",
+	width : 100,
+	editor : departmentComb,
+	renderer : function(value, cellmeta, record) {
+		var deptDesc = "";
+		for ( var i = 0; i < departmentData.length; i++) {
+			if (departmentData[i][0] == value) {
+				deptDesc = departmentData[i][1];
+			}
+		}
+		return deptDesc;
+	}
+} ]);
 
 // -------------- layout ---------------
 var kitchenGrid;

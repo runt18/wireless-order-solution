@@ -5,8 +5,29 @@ var pushBackBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "返回",
 	handler : function(btn) {
-		location.href = "MenuProtal.html?restaurantID=" + restaurantID
-				+ "&pin=" + pin;
+		var isChange = false;
+		deptGrid.getStore().each(function(record) {
+			if (record.isModified("deptName") == true) {
+				isChange = true;
+			}
+		});
+
+		if (isChange) {
+			Ext.MessageBox.show({
+				msg : "修改尚未保存，是否确认返回？",
+				width : 300,
+				buttons : Ext.MessageBox.YESNO,
+				fn : function(btn) {
+					if (btn == "yes") {
+						location.href = "MenuProtal.html?restaurantID="
+								+ restaurantID + "&pin=" + pin;
+					}
+				}
+			});
+		} else {
+			location.href = "MenuProtal.html?restaurantID=" + restaurantID
+					+ "&pin=" + pin;
+		}
 	}
 });
 
@@ -39,12 +60,14 @@ var deptStore = new Ext.data.Store({
 // menuStore.reload();
 
 // 2，栏位模型
-var deptColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(), {
-	header : "编号",
-	sortable : true,
-	dataIndex : "deptID",
-	width : 80
-}, {
+var deptColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(),
+// {
+// header : "编号",
+// sortable : true,
+// dataIndex : "deptID",
+// width : 80
+// },
+{
 	header : "名称",
 	sortable : true,
 	dataIndex : "deptName",
