@@ -142,7 +142,7 @@ function inventoryMgrOnLoad() {
 	searchForm.remove("conditionText");
 	operatorComb.setDisabled(true);
 
-	loadAllMaterial();
+	//loadAllMaterial();
 	loadAllsupplier();
 	loadDepartment();
 };
