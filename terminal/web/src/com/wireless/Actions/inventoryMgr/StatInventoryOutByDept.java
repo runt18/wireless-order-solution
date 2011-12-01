@@ -119,7 +119,6 @@ public class StatInventoryOutByDept extends Action {
 					+ " GROUP BY a.dept_id, dept_name, a.material_id, material_name "
 					+ " ORDER BY a.dept_id, a.material_id ";
 
-			System.out.println(sql);
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 
 			/**

@@ -132,7 +132,7 @@ public class StatInventoryChangeDetail extends Action {
 				resultMap.put("inDeptID", dbCon.rs.getInt("dept2_id"));
 				resultMap.put("operator", dbCon.rs.getString("staff"));
 				resultMap.put("price", dbCon.rs.getFloat("price"));
-				resultMap.put("amount", (-1)*dbCon.rs.getInt("amount"));
+				resultMap.put("amount", (-1)*dbCon.rs.getFloat("amount"));
 				resultMap.put("total", (-1)*dbCon.rs.getFloat("total"));
 
 				resultMap.put("message", "normal");

@@ -131,7 +131,7 @@ public class StatInventoryCheckSum extends Action {
 				resultMap.put("pricePrevious", dbCon.rs.getFloat("price_prev"));
 				resultMap.put("amountPrevious", dbCon.rs.getInt("amount_prev"));
 				resultMap.put("price", dbCon.rs.getFloat("price"));
-				resultMap.put("amount", dbCon.rs.getInt("amount"));
+				resultMap.put("amount", dbCon.rs.getFloat("amount"));
 
 				resultMap.put("message", "normal");
 

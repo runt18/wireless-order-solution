@@ -125,7 +125,7 @@ public class StatInventoryAllDetail extends Action {
 				resultMap.put("operator", dbCon.rs.getString("staff"));
 				resultMap.put("deptID", dbCon.rs.getInt("dept_id"));
 				resultMap.put("price", dbCon.rs.getFloat("price"));
-				resultMap.put("amount", dbCon.rs.getInt("amount"));
+				resultMap.put("amount", dbCon.rs.getFloat("amount"));
 				resultMap.put("total", dbCon.rs.getFloat("total"));
 
 				resultMap.put("message", "normal");
