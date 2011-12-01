@@ -105,7 +105,7 @@ public class StatInventoryCheckSum extends Action {
 
 			String sql = " SELECT a.material_id, a.date,"
 					+ " a.price_prev, sum(a.amount_prev) AS amount_prev, a.price, "
-					+ " sum(a.amount_prev - a.amount) AS amount " + " FROM "
+					+ " sum(a.amount_prev + a.amount) AS amount " + " FROM "
 					+ Params.dbName + ".material_detail a "
 					+ " WHERE a.restaurant_id = " + term.restaurant_id
 					+ " AND a.type = " + MaterialDetail.TYPE_CHECK + " "

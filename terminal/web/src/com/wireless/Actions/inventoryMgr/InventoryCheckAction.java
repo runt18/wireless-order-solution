@@ -95,8 +95,8 @@ public class InventoryCheckAction extends Action {
 						+ ", '"
 						+ date
 						+ "', "
-						+ (Float.parseFloat(thisDeptAmount[0]) - Float
-								.parseFloat(thisDeptAmount[1])) + ", "
+						+ (Float.parseFloat(thisDeptAmount[1]) - Float
+								.parseFloat(thisDeptAmount[0])) + ", "
 						+ thisDeptAmount[0] + ", " + type + ", '" + staff
 						+ "', " + i + " ) ";
 				sqlRowCount = dbCon.stmt.executeUpdate(sql);
