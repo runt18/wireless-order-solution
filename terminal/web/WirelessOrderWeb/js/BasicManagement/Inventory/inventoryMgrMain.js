@@ -1651,7 +1651,10 @@ var materialColumnModel = new Ext.grid.ColumnModel([
 			header : "价格（￥）",
 			sortable : true,
 			dataIndex : "price",
-			width : 130
+			width : 130,
+			renderer : function(v) {
+				return parseFloat(v).toFixed(2);
+			}
 		}, {
 			header : "预警阀值",
 			sortable : true,
