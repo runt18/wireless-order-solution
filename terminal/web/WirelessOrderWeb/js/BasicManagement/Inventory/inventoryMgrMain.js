@@ -1035,158 +1035,182 @@ var inventoryCheckWin = new Ext.Window(
 
 // -------------------------------------------------------------------------------------------------------
 // ----------------- 添加食材 --------------------
-materialAddWin = new Ext.Window({
-	layout : "fit",
-	title : "添加食材",
-	width : 260,
-	height : 190,
-	closeAction : "hide",
-	resizable : false,
-	items : [ {
-		layout : "form",
-		id : "materialAddForm",
-		labelWidth : 60,
-		border : false,
-		frame : true,
-		items : [ {
-			xtype : "numberfield",
-			fieldLabel : "编号",
-			id : "materialAddNumber",
-			allowBlank : false,
-			width : 160
-		}, {
-			xtype : "textfield",
-			fieldLabel : "名称",
-			id : "materialAddName",
-			allowBlank : false,
-			width : 160
-		}, {
-			xtype : "numberfield",
-			fieldLabel : "预警阀值",
-			id : "materialAddWarning",
-			allowBlank : false,
-			width : 160
-		}, {
-			xtype : "numberfield",
-			fieldLabel : "危险阀值",
-			id : "materialAddDanger",
-			allowBlank : false,
-			width : 160
-		} ]
-	} ],
-	buttons : [
-			{
-				text : "确定",
-				handler : function() {
+materialAddWin = new Ext.Window(
+		{
+			layout : "fit",
+			title : "添加食材",
+			width : 260,
+			height : 190,
+			closeAction : "hide",
+			resizable : false,
+			items : [ {
+				layout : "form",
+				id : "materialAddForm",
+				labelWidth : 60,
+				border : false,
+				frame : true,
+				items : [ {
+					xtype : "numberfield",
+					fieldLabel : "编号",
+					id : "materialAddNumber",
+					allowBlank : false,
+					width : 160
+				}, {
+					xtype : "textfield",
+					fieldLabel : "名称",
+					id : "materialAddName",
+					allowBlank : false,
+					width : 160
+				}, {
+					xtype : "numberfield",
+					fieldLabel : "预警阀值",
+					id : "materialAddWarning",
+					allowBlank : false,
+					width : 160
+				}, {
+					xtype : "numberfield",
+					fieldLabel : "危险阀值",
+					id : "materialAddDanger",
+					allowBlank : false,
+					width : 160
+				} ]
+			} ],
+			buttons : [
+					{
+						text : "确定",
+						listeners : {
+							"click" : function() {
 
-					if (materialAddWin.findById("materialAddNumber").isValid()
-							&& materialAddWin.findById("materialAddName")
-									.isValid()
-							&& materialAddWin.findById("materialAddWarning")
-									.isValid()
-							&& materialAddWin.findById("materialAddDanger")
-									.isValid()) {
+								if (materialAddWin
+										.findById("materialAddNumber")
+										.isValid()
+										&& materialAddWin.findById(
+												"materialAddName").isValid()
+										&& materialAddWin.findById(
+												"materialAddWarning").isValid()
+										&& materialAddWin.findById(
+												"materialAddDanger").isValid()) {
 
-						var materialAddNumber = materialAddWin.findById(
-								"materialAddNumber").getValue();
-						var materialAddName = materialAddWin.findById(
-								"materialAddName").getValue();
-						var materialAddWarning = materialAddWin.findById(
-								"materialAddWarning").getValue();
-						var materialAddDanger = materialAddWin.findById(
-								"materialAddDanger").getValue();
+									var materialAddNumber = materialAddWin
+											.findById("materialAddNumber")
+											.getValue();
+									var materialAddName = materialAddWin
+											.findById("materialAddName")
+											.getValue();
+									var materialAddWarning = materialAddWin
+											.findById("materialAddWarning")
+											.getValue();
+									var materialAddDanger = materialAddWin
+											.findById("materialAddDanger")
+											.getValue();
 
-						var isDuplicate = false;
-						for ( var i = 0; i < materialData.length; i++) {
-							if (materialAddNumber == materialData[i][1]) {
-								isDuplicate = true;
-							}
-						}
+									var isDuplicate = false;
+									for ( var i = 0; i < materialData.length; i++) {
+										if (materialAddNumber == materialData[i][1]) {
+											isDuplicate = true;
+										}
+									}
 
-						if (!isDuplicate) {
-							materialAddWin.hide();
+									if (!isDuplicate) {
+										materialAddWin.hide();
 
-							Ext.Ajax.request({
-								url : "../../InsertMaterial.do",
-								params : {
-									"pin" : pin,
-									"materialAlias" : materialAddNumber,
-									"materialName" : materialAddName,
-									"materialWarning" : materialAddWarning,
-									"materialDanger" : materialAddDanger
-								},
-								success : function(response, options) {
-									var resultJSON = Ext.util.JSON
-											.decode(response.responseText);
-									if (resultJSON.success == true) {
-										materialStore.reload({
-											params : {
-												start : 0,
-												limit : materialPageRecordCount
-											}
-										});
+										Ext.Ajax
+												.request({
+													url : "../../InsertMaterial.do",
+													params : {
+														"pin" : pin,
+														"materialAlias" : materialAddNumber,
+														"materialName" : materialAddName,
+														"materialWarning" : materialAddWarning,
+														"materialDanger" : materialAddDanger
+													},
+													success : function(
+															response, options) {
+														var resultJSON = Ext.util.JSON
+																.decode(response.responseText);
+														if (resultJSON.success == true) {
+															materialStore
+																	.reload({
+																		params : {
+																			start : 0,
+																			limit : materialPageRecordCount
+																		}
+																	});
 
-										var dataInfo = resultJSON.data;
-										Ext.MessageBox.show({
-											msg : dataInfo,
-											width : 300,
-											buttons : Ext.MessageBox.OK
-										});
+															var dataInfo = resultJSON.data;
+															Ext.MessageBox
+																	.show({
+																		msg : dataInfo,
+																		width : 300,
+																		buttons : Ext.MessageBox.OK
+																	});
+														} else {
+															var dataInfo = resultJSON.data;
+															Ext.MessageBox
+																	.show({
+																		msg : dataInfo,
+																		width : 300,
+																		buttons : Ext.MessageBox.OK
+																	});
+														}
+													},
+													failure : function(
+															response, options) {
+													}
+												});
 									} else {
-										var dataInfo = resultJSON.data;
 										Ext.MessageBox.show({
-											msg : dataInfo,
+											msg : "该食材编号已存在！",
 											width : 300,
 											buttons : Ext.MessageBox.OK
 										});
 									}
-								},
-								failure : function(response, options) {
+
 								}
-							});
-						} else {
-							Ext.MessageBox.show({
-								msg : "该食材编号已存在！",
-								width : 300,
-								buttons : Ext.MessageBox.OK
-							});
+
+							}
 						}
-
-					}
-
-				}
-			}, {
-				text : "取消",
-				handler : function() {
-					materialAddWin.hide();
-				}
+					// handler :
+					}, {
+						text : "取消",
+						handler : function() {
+							materialAddWin.hide();
+						}
+					} ],
+			keys : [ {
+				key : Ext.EventObject.ENTER,
+				fn : function() {
+					materialAddWin.buttons[0].fireEvent("click");
+				},
+				scope : this
 			} ],
-	listeners : {
-		"show" : function(thiz) {
+			listeners : {
+				"show" : function(thiz) {
 
-			loadAllMaterial();
+					loadAllMaterial();
 
-			materialAddWin.findById("materialAddNumber").setValue("");
-			materialAddWin.findById("materialAddNumber").clearInvalid();
+					materialAddWin.findById("materialAddNumber").setValue("");
+					materialAddWin.findById("materialAddNumber").clearInvalid();
 
-			materialAddWin.findById("materialAddName").setValue("");
-			materialAddWin.findById("materialAddName").clearInvalid();
+					materialAddWin.findById("materialAddName").setValue("");
+					materialAddWin.findById("materialAddName").clearInvalid();
 
-			materialAddWin.findById("materialAddWarning").setValue("");
-			materialAddWin.findById("materialAddWarning").clearInvalid();
+					materialAddWin.findById("materialAddWarning").setValue("");
+					materialAddWin.findById("materialAddWarning")
+							.clearInvalid();
 
-			materialAddWin.findById("materialAddDanger").setValue("");
-			materialAddWin.findById("materialAddDanger").clearInvalid();
+					materialAddWin.findById("materialAddDanger").setValue("");
+					materialAddWin.findById("materialAddDanger").clearInvalid();
 
-			var f = Ext.get("materialAddNumber");
-			f.focus.defer(100, f); // 为什么这样才可以！？！？
+					var f = Ext.get("materialAddNumber");
+					f.focus.defer(100, f); // 为什么这样才可以！？！？
 
-		},
-		"hide" : function(thiz) {
-			isPrompt = false;
-		}
-	}
-});
+				},
+				"hide" : function(thiz) {
+					isPrompt = false;
+				}
+			}
+		});
 // -------------------------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------
 // 入库统计 出库统计 调拨统计 消耗统计 盘点统计 库存统计 添加食材
@@ -1863,8 +1887,8 @@ Ext
 					} else {
 						// 無奈之舉
 						// loadAllMaterial();
-//						materialAddWin.show();
-//						materialAddWin.hide();
+						// materialAddWin.show();
+						// materialAddWin.hide();
 					}
 				}
 			});

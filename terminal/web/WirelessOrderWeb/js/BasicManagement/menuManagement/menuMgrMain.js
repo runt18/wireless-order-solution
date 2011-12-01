@@ -428,231 +428,252 @@ var kitchenTypeCombMA = new Ext.form.ComboBox({
 	allowBlank : false
 });
 
-menuAddWin = new Ext.Window({
-	layout : "fit",
-	title : "添加新菜",
-	width : 315,
-	height : 235,
-	closeAction : "hide",
-	resizable : false,
-	items : [ {
-		layout : "form",
-		id : "menuAddForm",
-		labelWidth : 30,
-		border : false,
-		frame : true,
-		items : [ {
-			xtype : "numberfield",
-			fieldLabel : "编号",
-			id : "menuAddNumber",
-			allowBlank : false,
-			width : 220
-		}, {
-			xtype : "textfield",
-			fieldLabel : "菜名",
-			id : "menuAddName",
-			allowBlank : false,
-			width : 220
-		}, {
-			xtype : "textfield",
-			fieldLabel : "拼音",
-			id : "menuAddSpill",
-			allowBlank : false,
-			width : 220
-		}, {
-			xtype : "numberfield",
-			fieldLabel : "价格",
-			id : "menuAddPrice",
-			allowBlank : false,
-			width : 220
-		}, kitchenTypeCombMA, {
-			layout : "column",
-			border : false,
-			anchor : "98%",
+menuAddWin = new Ext.Window(
+		{
+			layout : "fit",
+			title : "添加新菜",
+			width : 315,
+			height : 235,
+			closeAction : "hide",
+			resizable : false,
 			items : [ {
 				layout : "form",
-				border : false,
-				labelSeparator : '',
-				width : 70,
+				id : "menuAddForm",
 				labelWidth : 30,
-				items : [ {
-					xtype : "checkbox",
-					id : "specialCheckboxMA",
-					fieldLabel : "特价"
-				} ]
-			}, {
-				layout : "form",
 				border : false,
-				labelSeparator : '',
-				width : 70,
-				labelWidth : 30,
+				frame : true,
 				items : [ {
-					xtype : "checkbox",
-					id : "recommendCheckboxMA",
-					fieldLabel : "推荐"
+					xtype : "numberfield",
+					fieldLabel : "编号",
+					id : "menuAddNumber",
+					allowBlank : false,
+					width : 220
+				}, {
+					xtype : "textfield",
+					fieldLabel : "菜名",
+					id : "menuAddName",
+					allowBlank : false,
+					width : 220
+				}, {
+					xtype : "textfield",
+					fieldLabel : "拼音",
+					id : "menuAddSpill",
+					allowBlank : false,
+					width : 220
+				}, {
+					xtype : "numberfield",
+					fieldLabel : "价格",
+					id : "menuAddPrice",
+					allowBlank : false,
+					width : 220
+				}, kitchenTypeCombMA, {
+					layout : "column",
+					border : false,
+					anchor : "98%",
+					items : [ {
+						layout : "form",
+						border : false,
+						labelSeparator : '',
+						width : 70,
+						labelWidth : 30,
+						items : [ {
+							xtype : "checkbox",
+							id : "specialCheckboxMA",
+							fieldLabel : "特价"
+						} ]
+					}, {
+						layout : "form",
+						border : false,
+						labelSeparator : '',
+						width : 70,
+						labelWidth : 30,
+						items : [ {
+							xtype : "checkbox",
+							id : "recommendCheckboxMA",
+							fieldLabel : "推荐"
+						} ]
+					}, {
+						layout : "form",
+						border : false,
+						labelSeparator : '',
+						width : 70,
+						labelWidth : 30,
+						items : [ {
+							xtype : "checkbox",
+							id : "freeCheckboxMA",
+							fieldLabel : "赠送"
+						} ]
+					}, {
+						layout : "form",
+						border : false,
+						labelSeparator : '',
+						width : 70,
+						labelWidth : 30,
+						items : [ {
+							xtype : "checkbox",
+							id : "stopCheckboxMA",
+							fieldLabel : "停售"
+						} ]
+					} ]
 				} ]
-			}, {
-				layout : "form",
-				border : false,
-				labelSeparator : '',
-				width : 70,
-				labelWidth : 30,
-				items : [ {
-					xtype : "checkbox",
-					id : "freeCheckboxMA",
-					fieldLabel : "赠送"
-				} ]
-			}, {
-				layout : "form",
-				border : false,
-				labelSeparator : '',
-				width : 70,
-				labelWidth : 30,
-				items : [ {
-					xtype : "checkbox",
-					id : "stopCheckboxMA",
-					fieldLabel : "停售"
-				} ]
-			} ]
-		} ]
-	} ],
-	buttons : [
-			{
-				text : "确定",
-				handler : function() {
-					if (menuAddWin.findById("menuAddNumber").isValid()
-							&& menuAddWin.findById("menuAddName").isValid()
-							&& menuAddWin.findById("menuAddSpill").isValid()
-							&& menuAddWin.findById("menuAddPrice").isValid()) {
+			} ],
+			buttons : [
+					{
+						text : "确定",
+						listeners : {
+							"click" : function() {
+								if (menuAddWin.findById("menuAddNumber")
+										.isValid()
+										&& menuAddWin.findById("menuAddName")
+												.isValid()
+										&& menuAddWin.findById("menuAddSpill")
+												.isValid()
+										&& menuAddWin.findById("menuAddPrice")
+												.isValid()) {
 
-						var dishNumber = menuAddWin.findById("menuAddNumber")
-								.getValue();
-						var dishName = menuAddWin.findById("menuAddName")
-								.getValue();
-						var dishSpill = menuAddWin.findById("menuAddSpill")
-								.getValue();
-						var dishPrice = menuAddWin.findById("menuAddPrice")
-								.getValue();
-						var kitchen = kitchenTypeCombMA.getValue();
-						// 前台：kitchenTypeData：[厨房编号,厨房名称]
-						for ( var i = 0; i < kitchenTypeData.length; i++) {
-							if (kitchen == kitchenTypeData[i][1]) {
-								kitchen = kitchenTypeData[i][0];
-							}
-						}
-						var isSpecial = menuAddWin
-								.findById("specialCheckboxMA").getValue();
-						var isRecommend = menuAddWin.findById(
-								"recommendCheckboxMA").getValue();
-						var isFree = menuAddWin.findById("freeCheckboxMA")
-								.getValue();
-						var isStop = menuAddWin.findById("stopCheckboxMA")
-								.getValue();
+									var dishNumber = menuAddWin.findById(
+											"menuAddNumber").getValue();
+									var dishName = menuAddWin.findById(
+											"menuAddName").getValue();
+									var dishSpill = menuAddWin.findById(
+											"menuAddSpill").getValue();
+									var dishPrice = menuAddWin.findById(
+											"menuAddPrice").getValue();
+									var kitchen = kitchenTypeCombMA.getValue();
+									// 前台：kitchenTypeData：[厨房编号,厨房名称]
+									for ( var i = 0; i < kitchenTypeData.length; i++) {
+										if (kitchen == kitchenTypeData[i][1]) {
+											kitchen = kitchenTypeData[i][0];
+										}
+									}
+									var isSpecial = menuAddWin.findById(
+											"specialCheckboxMA").getValue();
+									var isRecommend = menuAddWin.findById(
+											"recommendCheckboxMA").getValue();
+									var isFree = menuAddWin.findById(
+											"freeCheckboxMA").getValue();
+									var isStop = menuAddWin.findById(
+											"stopCheckboxMA").getValue();
 
-						var isDuplicate = false;
-						for ( var i = 0; i < dishMultSelectData.length; i++) {
-							if (dishNumber == dishMultSelectData[i][0]) {
-								isDuplicate = true;
-							}
-						}
+									var isDuplicate = false;
+									for ( var i = 0; i < dishMultSelectData.length; i++) {
+										if (dishNumber == dishMultSelectData[i][0]) {
+											isDuplicate = true;
+										}
+									}
 
-						if (!isDuplicate) {
-							isPrompt = false;
-							menuAddWin.hide();
+									if (!isDuplicate) {
+										isPrompt = false;
+										menuAddWin.hide();
 
-							Ext.Ajax.request({
-								url : "../../InsertMenu.do",
-								params : {
-									"pin" : Request["pin"],
-									"dishNumber" : dishNumber,
-									"dishName" : dishName,
-									"dishSpill" : dishSpill,
-									"dishPrice" : dishPrice,
-									"kitchen" : kitchen,
-									"isSpecial" : isSpecial,
-									"isRecommend" : isRecommend,
-									"isFree" : isFree,
-									"isStop" : isStop
-								},
-								success : function(response, options) {
-									var resultJSON = Ext.util.JSON
-											.decode(response.responseText);
-									if (resultJSON.success == true) {
-										menuStore.reload({
-											params : {
-												start : 0,
-												limit : dishesPageRecordCount
-											}
-										});
+										Ext.Ajax
+												.request({
+													url : "../../InsertMenu.do",
+													params : {
+														"pin" : Request["pin"],
+														"dishNumber" : dishNumber,
+														"dishName" : dishName,
+														"dishSpill" : dishSpill,
+														"dishPrice" : dishPrice,
+														"kitchen" : kitchen,
+														"isSpecial" : isSpecial,
+														"isRecommend" : isRecommend,
+														"isFree" : isFree,
+														"isStop" : isStop
+													},
+													success : function(
+															response, options) {
+														var resultJSON = Ext.util.JSON
+																.decode(response.responseText);
+														if (resultJSON.success == true) {
+															menuStore
+																	.reload({
+																		params : {
+																			start : 0,
+																			limit : dishesPageRecordCount
+																		}
+																	});
 
-										var dataInfo = resultJSON.data;
-										Ext.MessageBox.show({
-											msg : dataInfo,
-											width : 300,
-											buttons : Ext.MessageBox.OK
-										});
+															var dataInfo = resultJSON.data;
+															Ext.MessageBox
+																	.show({
+																		msg : dataInfo,
+																		width : 300,
+																		buttons : Ext.MessageBox.OK
+																	});
+														} else {
+															var dataInfo = resultJSON.data;
+															Ext.MessageBox
+																	.show({
+																		msg : dataInfo,
+																		width : 300,
+																		buttons : Ext.MessageBox.OK
+																	});
+														}
+													},
+													failure : function(
+															response, options) {
+													}
+												});
 									} else {
-										var dataInfo = resultJSON.data;
 										Ext.MessageBox.show({
-											msg : dataInfo,
+											msg : "该菜品编号已存在！",
 											width : 300,
 											buttons : Ext.MessageBox.OK
 										});
 									}
-								},
-								failure : function(response, options) {
+
 								}
-							});
-						} else {
-							Ext.MessageBox.show({
-								msg : "该菜品编号已存在！",
-								width : 300,
-								buttons : Ext.MessageBox.OK
-							});
+
+							}
 						}
-
-					}
-
-				}
-			}, {
-				text : "取消",
-				handler : function() {
-					isPrompt = false;
-					menuAddWin.hide();
-				}
+					// handler :
+					}, {
+						text : "取消",
+						handler : function() {
+							isPrompt = false;
+							menuAddWin.hide();
+						}
+					} ],
+			keys : [ {
+				key : Ext.EventObject.ENTER,
+				fn : function() {
+					menuAddWin.buttons[0].fireEvent("click");
+				},
+				scope : this
 			} ],
-	listeners : {
-		"show" : function(thiz) {
-			loadAllDishes();
+			listeners : {
+				"show" : function(thiz) {
+					loadAllDishes();
 
-			kitchenTypeCombMA.setValue(kitchenTypeData[0][1]);
-			kitchenTypeStoreMA.reload();
+					kitchenTypeCombMA.setValue(kitchenTypeData[0][1]);
+					kitchenTypeStoreMA.reload();
 
-			menuAddWin.findById("menuAddNumber").setValue("");
-			menuAddWin.findById("menuAddNumber").clearInvalid();
+					menuAddWin.findById("menuAddNumber").setValue("");
+					menuAddWin.findById("menuAddNumber").clearInvalid();
 
-			menuAddWin.findById("menuAddName").setValue("");
-			menuAddWin.findById("menuAddName").clearInvalid();
+					menuAddWin.findById("menuAddName").setValue("");
+					menuAddWin.findById("menuAddName").clearInvalid();
 
-			menuAddWin.findById("menuAddSpill").setValue("");
-			menuAddWin.findById("menuAddSpill").clearInvalid();
+					menuAddWin.findById("menuAddSpill").setValue("");
+					menuAddWin.findById("menuAddSpill").clearInvalid();
 
-			menuAddWin.findById("menuAddPrice").setValue("");
-			menuAddWin.findById("menuAddPrice").clearInvalid();
+					menuAddWin.findById("menuAddPrice").setValue("");
+					menuAddWin.findById("menuAddPrice").clearInvalid();
 
-			menuAddWin.findById("specialCheckboxMA").setValue(false);
-			menuAddWin.findById("recommendCheckboxMA").setValue(false);
-			menuAddWin.findById("freeCheckboxMA").setValue(false);
-			menuAddWin.findById("stopCheckboxMA").setValue(false);
+					menuAddWin.findById("specialCheckboxMA").setValue(false);
+					menuAddWin.findById("recommendCheckboxMA").setValue(false);
+					menuAddWin.findById("freeCheckboxMA").setValue(false);
+					menuAddWin.findById("stopCheckboxMA").setValue(false);
 
-			var f = Ext.get("menuAddNumber");
-			f.focus.defer(100, f); // 为什么这样才可以！？！？
-		},
-		"hide" : function(thiz) {
-			isPrompt = false;
-		}
-	}
-});
+					var f = Ext.get("menuAddNumber");
+					f.focus.defer(100, f); // 为什么这样才可以！？！？
+				},
+				"hide" : function(thiz) {
+					isPrompt = false;
+				}
+			}
+		});
 
 // ----------------- 菜谱修改 --------------------
 var kitchenTypeStoreMM = new Ext.data.Store({

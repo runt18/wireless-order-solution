@@ -848,8 +848,13 @@ var inStatDetailResultWin = new Ext.Window({
 	resizable : false,
 	layout : "fit",
 	items : inStatDetailResultGrid,
-	buttons : [ {
-		text : "退出",
+	buttons : [  {
+		text : "打印",
+		handler : function() {
+
+		}
+	},{
+		text : "关闭",
 		handler : function() {
 			isPrompt = false;
 			inStatDetailResultWin.hide();
@@ -1016,7 +1021,12 @@ var inStatByMaterialResultWin = new Ext.Window({
 	layout : "fit",
 	items : inStatByMateriaGrid,
 	buttons : [ {
-		text : "退出",
+		text : "打印",
+		handler : function() {
+
+		}
+	},{
+		text : "关闭",
 		handler : function() {
 			isPrompt = false;
 			inStatByMaterialResultWin.hide();
@@ -1176,7 +1186,12 @@ var inStatByDeptResultWin = new Ext.Window({
 	layout : "fit",
 	items : inStatByDeptGrid,
 	buttons : [ {
-		text : "退出",
+		text : "打印",
+		handler : function() {
+
+		}
+	},{
+		text : "关闭",
 		handler : function() {
 			isPrompt = false;
 			inStatByDeptResultWin.hide();
@@ -1336,7 +1351,12 @@ var inStatBySupplierResultWin = new Ext.Window({
 	layout : "fit",
 	items : inStatBySupplierGrid,
 	buttons : [ {
-		text : "退出",
+		text : "打印",
+		handler : function() {
+
+		}
+	},{
+		text : "关闭",
 		handler : function() {
 			isPrompt = false;
 			inStatBySupplierResultWin.hide();
@@ -2252,7 +2272,12 @@ var outStatDetailResultWin = new Ext.Window({
 	layout : "fit",
 	items : outStatDetailResultGrid,
 	buttons : [ {
-		text : "退出",
+		text : "打印",
+		handler : function() {
+
+		}
+	},{
+		text : "关闭",
 		handler : function() {
 			isPrompt = false;
 			outStatDetailResultWin.hide();
@@ -2412,7 +2437,12 @@ var outStatByMaterialResultWin = new Ext.Window({
 	layout : "fit",
 	items : outStatByMateriaGrid,
 	buttons : [ {
-		text : "退出",
+		text : "打印",
+		handler : function() {
+
+		}
+	},{
+		text : "关闭",
 		handler : function() {
 			isPrompt = false;
 			outStatByMaterialResultWin.hide();
@@ -2572,7 +2602,12 @@ var outStatByDeptResultWin = new Ext.Window({
 	layout : "fit",
 	items : outStatByDeptGrid,
 	buttons : [ {
-		text : "退出",
+		text : "打印",
+		handler : function() {
+
+		}
+	},{
+		text : "关闭",
 		handler : function() {
 			isPrompt = false;
 			outStatByDeptResultWin.hide();
@@ -2732,7 +2767,12 @@ var outStatByReasonResultWin = new Ext.Window({
 	layout : "fit",
 	items : outStatByReasonGrid,
 	buttons : [ {
-		text : "退出",
+		text : "打印",
+		handler : function() {
+
+		}
+	},{
+		text : "关闭",
 		handler : function() {
 			isPrompt = false;
 			outStatByReasonResultWin.hide();
@@ -3784,7 +3824,12 @@ var changeStatDetailResultWin = new Ext.Window({
 	layout : "fit",
 	items : changeStatDetailResultGrid,
 	buttons : [ {
-		text : "退出",
+		text : "打印",
+		handler : function() {
+
+		}
+	},{
+		text : "关闭",
 		handler : function() {
 			isPrompt = false;
 			changeStatDetailResultWin.hide();
@@ -3954,7 +3999,12 @@ var changeStatByMaterialResultWin = new Ext.Window({
 	layout : "fit",
 	items : changeStatByMateriaGrid,
 	buttons : [ {
-		text : "退出",
+		text : "打印",
+		handler : function() {
+
+		}
+	},{
+		text : "关闭",
 		handler : function() {
 			isPrompt = false;
 			changeStatByMaterialResultWin.hide();
@@ -4113,8 +4163,13 @@ var changeStatByOutDeptResultWin = new Ext.Window({
 	resizable : false,
 	layout : "fit",
 	items : changeStatByOutDeptGrid,
-	buttons : [ {
-		text : "退出",
+	buttons : [{
+		text : "打印",
+		handler : function() {
+
+		}
+	},{
+		text : "关闭",
 		handler : function() {
 			isPrompt = false;
 			changeStatByOutDeptResultWin.hide();
@@ -4274,7 +4329,12 @@ var changeStatByInDeptResultWin = new Ext.Window({
 	layout : "fit",
 	items : changeStatByInDeptGrid,
 	buttons : [ {
-		text : "退出",
+		text : "打印",
+		handler : function() {
+
+		}
+	},{
+		text : "关闭",
 		handler : function() {
 			isPrompt = false;
 			changeStatByInDeptResultWin.hide();
@@ -5009,7 +5069,12 @@ var costStatDetailResultWin = new Ext.Window({
 	layout : "fit",
 	items : costStatDetailResultGrid,
 	buttons : [ {
-		text : "退出",
+		text : "打印",
+		handler : function() {
+
+		}
+	},{
+		text : "关闭",
 		handler : function() {
 			isPrompt = false;
 			costStatDetailResultWin.hide();
@@ -5169,7 +5234,12 @@ var costStatByMaterialResultWin = new Ext.Window({
 	layout : "fit",
 	items : costStatByMateriaGrid,
 	buttons : [ {
-		text : "退出",
+		text : "打印",
+		handler : function() {
+
+		}
+	},{
+		text : "关闭",
 		handler : function() {
 			isPrompt = false;
 			costStatByMaterialResultWin.hide();
@@ -5329,7 +5399,12 @@ var costStatByDeptResultWin = new Ext.Window({
 	layout : "fit",
 	items : costStatByDeptGrid,
 	buttons : [ {
-		text : "退出",
+		text : "打印",
+		handler : function() {
+
+		}
+	},{
+		text : "关闭",
 		handler : function() {
 			isPrompt = false;
 			costStatByDeptResultWin.hide();
@@ -6082,7 +6157,12 @@ var allStatDetailResultWin = new Ext.Window({
 	layout : "fit",
 	items : allStatDetailResultGrid,
 	buttons : [ {
-		text : "退出",
+		text : "打印",
+		handler : function() {
+
+		}
+	},{
+		text : "关闭",
 		handler : function() {
 			isPrompt = false;
 			allStatDetailResultWin.hide();
@@ -6242,7 +6322,12 @@ var allStatByMaterialResultWin = new Ext.Window({
 	layout : "fit",
 	items : allStatByMateriaGrid,
 	buttons : [ {
-		text : "退出",
+		text : "打印",
+		handler : function() {
+
+		}
+	},{
+		text : "关闭",
 		handler : function() {
 			isPrompt = false;
 			allStatByMaterialResultWin.hide();
@@ -6402,7 +6487,12 @@ var allStatByDeptResultWin = new Ext.Window({
 	layout : "fit",
 	items : allStatByDeptGrid,
 	buttons : [ {
-		text : "退出",
+		text : "打印",
+		handler : function() {
+
+		}
+	},{
+		text : "关闭",
 		handler : function() {
 			isPrompt = false;
 			allStatByDeptResultWin.hide();
