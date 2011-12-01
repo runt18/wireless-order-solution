@@ -808,8 +808,8 @@ var inventoryCheckColumnModel = new Ext.grid.ColumnModel([
 			dataIndex : "checkStock",
 			width : 50,
 			editor : new Ext.form.NumberField({
-				allowBlank : false,
-				allowNegative : false
+				allowBlank : false
+			// allowNegative : false
 			// ,
 			// listeners : {
 			// "blur" : function(thiz) {
@@ -1187,7 +1187,7 @@ materialAddWin = new Ext.Window(
 			listeners : {
 				"show" : function(thiz) {
 
-					//loadAllMaterial();
+					// loadAllMaterial();
 
 					materialAddWin.findById("materialAddNumber").setValue("");
 					materialAddWin.findById("materialAddNumber").clearInvalid();
@@ -1892,7 +1892,7 @@ Ext
 						this.removeAll();
 					} else {
 						// 無奈之舉
-						 loadAllMaterial();
+						loadAllMaterial();
 						// materialAddWin.show();
 						// materialAddWin.hide();
 					}
