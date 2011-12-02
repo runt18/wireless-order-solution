@@ -236,7 +236,7 @@ inventoryInWin = new Ext.Window(
 
 // ----------------- 出庫 --------------------
 var outReasonData = [ [ TYPE_WEAR, "报损" ], [ TYPE_SELL, "销售" ],
-		[ TYPE_RETURN, "退货" ], [ TYPE_OUT_WARE, "出仓" ] ];
+		[ TYPE_OUT_WARE, "出仓" ] ];
 
 inventoryOutWin = new Ext.Window(
 		{
@@ -461,6 +461,252 @@ inventoryOutWin = new Ext.Window(
 					inventoryOutWin.doLayout();
 
 					var f = Ext.get("inventoryOutCount");
+					f.focus.defer(100, f); // 为什么这样才可以！？！？
+
+				},
+				"hide" : function(thiz) {
+					isPrompt = false;
+				}
+			}
+		});
+
+// ----------------- 退貨 --------------------
+inventoryReturnWin = new Ext.Window(
+		{
+			layout : "fit",
+			// title : "入庫 -- ",
+			width : 260,
+			height : 190,
+			closeAction : "hide",
+			resizable : false,
+			items : [ {
+				layout : "form",
+				id : "inventoryReturnForm",
+				labelWidth : 60,
+				border : false,
+				frame : true,
+				items : [ {
+					xtype : "numberfield",
+					fieldLabel : "数量",
+					id : "inventoryReturnCount",
+					allowBlank : false,
+					width : 160
+				}, {
+					xtype : "numberfield",
+					fieldLabel : "价格",
+					id : "inventoryReturnPrice",
+					allowBlank : false,
+					width : 160
+				}, {
+					xtype : "datefield",
+					fieldLabel : "日期",
+					id : "inventoryReturnDate",
+					allowBlank : false,
+					width : 160
+				} ]
+			} ],
+			buttons : [
+					{
+						text : "确定",
+						handler : function() {
+
+							if (inventoryReturnWin.findById(
+									"inventoryReturnCount").isValid()
+									&& inventoryReturnWin.findById(
+											"inventoryReturnPrice").isValid()
+									&& inventoryReturnWin.findById(
+											"inventoryReturnDate").isValid()
+									&& inventoryReturnWin.findById(
+											"departmentCombReturn").isValid()
+									&& inventoryReturnWin.findById(
+											"supplierCombReturn").isValid()) {
+
+								var inventoryReturnCount = inventoryReturnWin
+										.findById("inventoryReturnCount")
+										.getValue();
+								var inventoryReturnPrice = inventoryReturnWin
+										.findById("inventoryReturnPrice")
+										.getValue();
+
+								var inventoryReturnDate = inventoryReturnWin
+										.findById("inventoryReturnDate")
+										.getValue();
+								var dateFormated = new Date();
+								dateFormated = inventoryReturnDate;
+								inventoryReturnDate = dateFormated
+										.format('Y-m-d');
+
+								var department = inventoryReturnWin.findById(
+										"departmentCombReturn").getValue();
+								for ( var i = 0; i < departmentData.length; i++) {
+									if (department == departmentData[i][1]) {
+										department = departmentData[i][0];
+									}
+								}
+
+								var supplier = inventoryReturnWin.findById(
+										"supplierCombReturn").getValue();
+								for ( var i = 0; i < supplierData.length; i++) {
+									if (supplier == supplierData[i][2]) {
+										supplier = supplierData[i][0];
+									}
+								}
+
+								var material = materialGrid.getStore().getAt(
+										currRowIndex).get("materialID");
+
+								var staff = document.getElementById("optName").innerHTML;
+
+								isPrompt = false;
+								inventoryReturnWin.hide();
+
+								// type: 0 : 消耗 1 : 报损 2 : 销售 3 : 退货 4 : 入库 5 :
+								// 调出 6 : 调入 7 : 盘点
+								Ext.Ajax
+										.request({
+											url : "../../InventoryReturn.do",
+											params : {
+												"pin" : pin,
+												"supplierID" : supplier,
+												"materialID" : material,
+												"price" : inventoryReturnPrice,
+												"date" : inventoryReturnDate,
+												"deptID" : department,
+												"amount" : inventoryReturnCount,
+												"staff" : staff,
+												"type" : TYPE_RETURN
+											},
+											success : function(response,
+													options) {
+												var resultJSON = Ext.util.JSON
+														.decode(response.responseText);
+												if (resultJSON.success == true) {
+													materialStore
+															.reload({
+																params : {
+																	start : 0,
+																	limit : materialPageRecordCount
+																}
+															});
+
+													var dataInfo = resultJSON.data;
+													Ext.MessageBox
+															.show({
+																msg : dataInfo,
+																width : 300,
+																buttons : Ext.MessageBox.OK
+															});
+												} else {
+													var dataInfo = resultJSON.data;
+													Ext.MessageBox
+															.show({
+																msg : dataInfo,
+																width : 300,
+																buttons : Ext.MessageBox.OK
+															});
+												}
+											},
+											failure : function(response,
+													options) {
+											}
+										});
+
+							}
+
+						}
+					}, {
+						text : "取消",
+						handler : function() {
+							isPrompt = false;
+							inventoryReturnWin.hide();
+						}
+					} ],
+			listeners : {
+				"show" : function(thiz) {
+
+					inventoryReturnWin.setTitle("退货 -- "
+							+ materialGrid.getStore().getAt(currRowIndex).get(
+									"materialName"));
+
+					inventoryReturnWin.findById("inventoryReturnCount")
+							.setValue("");
+					inventoryReturnWin.findById("inventoryReturnCount")
+							.clearInvalid();
+
+					inventoryReturnWin.findById("inventoryReturnPrice")
+							.setValue("");
+					inventoryReturnWin.findById("inventoryReturnPrice")
+							.clearInvalid();
+
+					inventoryReturnWin.findById("inventoryReturnDate")
+							.setValue("");
+					inventoryReturnWin.findById("inventoryReturnDate")
+							.clearInvalid();
+
+					inventoryReturnWin.findById("inventoryReturnForm").remove(
+							"departmentCombReturn");
+					inventoryReturnWin.findById("inventoryReturnForm").remove(
+							"supplierCombReturn");
+
+					var departmentCombReturn = new Ext.form.ComboBox({
+						fieldLabel : "部门",
+						forceSelection : true,
+						width : 160,
+						// value : departmentData[0][1],
+						id : "departmentCombReturn",
+						store : new Ext.data.SimpleStore({
+							fields : [ "value", "text" ],
+							data : departmentData
+						}),
+						valueField : "value",
+						displayField : "text",
+						typeAhead : true,
+						mode : "local",
+						triggerAction : "all",
+						selectOnFocus : true,
+						allowBlank : false
+					});
+
+					if (departmentData.length > 0) {
+						departmentCombReturn.setValue(departmentData[0][1]);
+					} else {
+						departmentCombReturn.setValue("");
+					}
+
+					var supplierCombReturn = new Ext.form.ComboBox({
+						fieldLabel : "供应商",
+						forceSelection : true,
+						width : 160,
+						// value : supplierData[0][2],
+						id : "supplierCombReturn",
+						store : new Ext.data.SimpleStore({
+							fields : [ "value", "alias", "text" ],
+							data : supplierData
+						}),
+						valueField : "value",
+						displayField : "text",
+						typeAhead : true,
+						mode : "local",
+						triggerAction : "all",
+						selectOnFocus : true,
+						allowBlank : false
+					});
+
+					// 防止未錄入供應商，先錄入食材
+					if (supplierData.length > 0) {
+						supplierCombReturn.setValue(supplierData[0][2]);
+					} else {
+						supplierCombReturn.setValue("");
+					}
+
+					inventoryReturnWin.findById("inventoryReturnForm").add(
+							"departmentCombReturn");
+					inventoryReturnWin.findById("inventoryReturnForm").add(
+							"supplierCombReturn");
+
+					inventoryReturnWin.doLayout();
+
+					var f = Ext.get("inventoryReturnCount");
 					f.focus.defer(100, f); // 为什么这样才可以！？！？
 
 				},
@@ -1240,6 +1486,19 @@ var outStatBut = new Ext.ux.ImageButton({
 	}
 });
 
+var returnStatBut = new Ext.ux.ImageButton({
+	imgPath : "../../images/dishAdd.png",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "退货统计",
+	handler : function(btn) {
+		if (!isPrompt) {
+			 isPrompt = true;
+			 inventoryReturnStatWin.show();
+		}
+	}
+});
+
 var changeStatBut = new Ext.ux.ImageButton({
 	imgPath : "../../images/dishAdd.png",
 	imgWidth : 50,
@@ -1511,6 +1770,13 @@ function outHandler(rowIndex) {
 	}
 }
 
+function returnHandler(rowIndex) {
+	if (!isPrompt) {
+		inventoryReturnWin.show();
+		isPrompt = true;
+	}
+}
+
 function changeHandler(rowIndex) {
 	if (!isPrompt) {
 		inventoryChangeWin.show();
@@ -1581,6 +1847,9 @@ function materialOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
 			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
 			+ "<a href=\"javascript:outHandler(" + rowIndex + ")\">"
 			+ "<img src='../../images/del.png'/>出库</a>"
+			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+			+ "<a href=\"javascript:returnHandler(" + rowIndex + ")\">"
+			+ "<img src='../../images/del.png'/>退货</a>"
 			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
 			+ "<a href=\"javascript:changeHandler(" + rowIndex + ")\">"
 			+ "<img src='../../images/del.png'/>调拨</a>"
@@ -1677,7 +1946,7 @@ var materialColumnModel = new Ext.grid.ColumnModel([
 			header : "<center>操作</center>",
 			sortable : true,
 			dataIndex : "operator",
-			width : 350,
+			width : 400,
 			renderer : materialOpt
 		} ]);
 
@@ -1915,6 +2184,9 @@ Ext
 						text : "&nbsp;&nbsp;&nbsp;",
 						disabled : true
 					}, outStatBut, {
+						text : "&nbsp;&nbsp;&nbsp;",
+						disabled : true
+					}, returnStatBut, {
 						text : "&nbsp;&nbsp;&nbsp;",
 						disabled : true
 					}, changeStatBut, {

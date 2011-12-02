@@ -7529,3 +7529,1381 @@ var checkStatSumResultWin = new Ext.Window({
 	}
 });
 // --------------------------------------end盤點統計----------------------------------------------
+//--------------------------------------- 出貨統計 --------------------------------------------------------
+//条件框
+var inventoryReturnStatMSDS = new Ext.data.SimpleStore({
+	fields : [ "retrunValue", "displayText" ],
+	data : []
+});
+
+var returnStatSupplierComboStore = new Ext.data.SimpleStore({
+	fields : [ "value", "text" ],
+	data : []
+});
+
+var returnStatSupplierCombo = new Ext.form.ComboBox({
+	fieldLabel : "供应商",
+	forceSelection : true,
+	width : 120,
+	value : "全部",
+	id : "returnStatSupplierCombo",
+	store : returnStatSupplierComboStore,
+	valueField : "value",
+	displayField : "text",
+	typeAhead : true,
+	mode : "local",
+	triggerAction : "all",
+	selectOnFocus : true,
+	allowBlank : false
+});
+
+var inventoryReturnStatFrom = new Ext.form.FormPanel({
+	border : false,
+	anchor : "right 8%",
+	id : "ReturnStatForm",
+	items : [ {
+		layout : "column",
+		border : false,
+		frame : true,
+		items : [ {
+			layout : "form",
+			border : false,
+			width : 70,
+			items : [ {
+				xtype : 'radio',
+				hideLabel : true,
+				boxLabel : "明细",
+				checked : true,
+				name : 'ReturnStat',
+				inputValue : 'detail'
+			} ]
+		}, {
+			layout : "form",
+			border : false,
+			labelSeparator : '',
+			width : 110,
+			items : [ {
+				xtype : 'radio',
+				hideLabel : true,
+				boxLabel : "按食材汇总",
+				// checked : true,
+				name : 'ReturnStat',
+				inputValue : 'sumByMaterial'
+			} ]
+		}, {
+			layout : "form",
+			border : false,
+			labelSeparator : '',
+			width : 110,
+			items : [ {
+				xtype : 'radio',
+				hideLabel : true,
+				boxLabel : "按部门汇总",
+				// checked : true,
+				name : 'ReturnStat',
+				inputValue : 'sumByDept'
+			} ]
+		}, {
+			layout : "form",
+			border : false,
+			labelSeparator : '',
+			width : 110,
+			items : [ {
+				xtype : 'radio',
+				hideLabel : true,
+				boxLabel : "按供应商汇总",
+				// checked : true,
+				name : 'ReturnStat',
+				inputValue : 'sumBySupplier'
+			} ]
+		} ]
+	} ]
+});
+
+inventoryReturnStatWin = new Ext.Window(
+		{
+			title : "出货统计",
+			width : 450,
+			height : 430,
+			closeAction : "hide",
+			resizable : false,
+			layout : "anchor",
+			items : [ {
+				border : false,
+				anchor : "right 10%",
+				items : [ {
+					layout : "column",
+					border : false,
+					frame : true,
+					anchor : "98%",
+					items : [ {
+						layout : "form",
+						border : false,
+						labelSeparator : ' ',
+						width : 200,
+						labelWidth : 50,
+						items : [ {
+							xtype : "datefield",
+							id : "begDateReturnStat",
+							width : 120,
+							fieldLabel : "日期"
+						} ]
+					}, {
+						layout : "form",
+						border : false,
+						labelSeparator : ' ',
+						width : 200,
+						labelWidth : 50,
+						items : [ {
+							xtype : "datefield",
+							id : "endDateReturnStat",
+							width : 120,
+							fieldLabel : "至"
+						} ]
+					} ]
+				} ]
+			}, {
+				border : false,
+				anchor : "right 10%",
+				items : [ {
+					layout : "column",
+					border : false,
+					frame : true,
+					anchor : "98%",
+					items : [ {
+						layout : "form",
+						border : false,
+						labelSeparator : '：',
+						width : 300,
+						labelWidth : 50,
+						items : returnStatSupplierCombo
+					} ]
+				} ]
+			}, {
+				layout : "column",
+				border : false,
+				anchor : "99% 15%",
+				autoScroll : true,
+				frame : true,
+				items : [ {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept1ReturnStat"
+					// fieldLabel : departmentData[0][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept2ReturnStat"
+					// fieldLabel : departmentData[1][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept3ReturnStat"
+					// fieldLabel : departmentData[2][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept4ReturnStat"
+					// fieldLabel : departmentData[3][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept5ReturnStat"
+					// fieldLabel : departmentData[4][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept6ReturnStat"
+					// fieldLabel : departmentData[5][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept7ReturnStat"
+					// fieldLabel : departmentData[6][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept8ReturnStat"
+					// fieldLabel : departmentData[7][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept9ReturnStat"
+					// fieldLabel : departmentData[8][1]
+					} ]
+				}, {
+					layout : "form",
+					border : false,
+					labelSeparator : '',
+					width : 80,
+					labelWidth : 40,
+					items : [ {
+						xtype : "checkbox",
+						id : "dept10ReturnStat"
+					// fieldLabel : departmentData[9][1]
+					} ]
+				} ]
+			}, {
+				layout : "form",
+				border : false,
+				frame : true,
+				hideLabels : true,
+				anchor : "right 56%",
+				items : [ {
+					xtype : "itemselector",
+					name : "materialReturnStatMultSelect",
+					id : "materialReturnStatMultSelect",
+					fromStore : inventoryReturnStatMSDS,
+					dataFields : [ "retrunValue", "displayText" ],
+					toData : [ [ "", "" ] ],
+					msHeight : 173,
+					valueField : "retrunValue",
+					displayField : "displayText",
+					imagePath : "../../extjs/multiselect/images/",
+					toLegend : "已选择食材",
+					fromLegend : "可选择食材"
+				} ]
+			}, inventoryReturnStatFrom ],
+			buttons : [
+					{
+						text : "全选",
+						handler : function() {
+							var i = inventoryReturnStatWin
+									.findById("materialReturnStatMultSelect").fromMultiselect.view;
+							i.selectRange(0, i.store.length);
+							inventoryReturnStatWin.findById(
+									"materialReturnStatMultSelect").fromTo();
+							inventoryReturnStatWin
+									.findById("materialReturnStatMultSelect").toMultiselect.view
+									.clearSelections();
+						}
+					},
+					{
+						text : "清空",
+						handler : function() {
+							inventoryReturnStatWin.findById(
+									"materialReturnStatMultSelect").reset();
+						}
+					},
+					{
+						text : "确定",
+						handler : function() {
+
+							var selectCount = inventoryReturnStatWin
+									.findById("materialReturnStatMultSelect").toMultiselect.store
+									.getCount();
+
+							if (selectCount != 0) {
+								isPrompt = false;
+								inventoryReturnStatWin.hide();
+
+								// -- 獲取選擇的食材 --
+								var selectMaterials = "";
+								for ( var i = 0; i < selectCount; i++) {
+									var selectItem = inventoryReturnStatWin
+											.findById("materialReturnStatMultSelect").toMultiselect.store
+											.getAt(i).get("retrunValue");
+									// if (selectItem != "") {
+									selectMaterials = selectMaterials
+											+ selectItem + ",";
+									// }
+								}
+								// 去掉最后一个逗号
+								selectMaterials = selectMaterials.substring(0,
+										selectMaterials.length - 1);
+								if (selectMaterials.substring(0, 1) == ",") {
+									selectMaterials = selectMaterials
+											.substring(1,
+													selectMaterials.length);
+								}
+
+								// -- 獲取時間 --
+								var beginDate = inventoryReturnStatWin.findById(
+										"begDateReturnStat").getValue();
+								if (beginDate != "") {
+									var dateFormated = new Date();
+									dateFormated = beginDate;
+									beginDate = dateFormated.format('Y-m-d');
+								}
+
+								var endDate = inventoryReturnStatWin.findById(
+										"endDateReturnStat").getValue();
+								if (endDate != "") {
+									var dateFormated = new Date();
+									dateFormated = endDate;
+									endDate = dateFormated.format('Y-m-d');
+								}
+
+								// -- 獲取供應商 --
+								var supplier = returnStatSupplierCombo.getValue();
+								if (supplier == "全部") {
+									supplier = "-1";
+								}
+
+								// -- 獲取部門 --
+								var departments = "";
+								if (inventoryReturnStatWin.findById("dept1ReturnStat")
+										.getValue() == true) {
+									departments = departments + "0,";
+								}
+								if (inventoryReturnStatWin.findById("dept2ReturnStat")
+										.getValue() == true) {
+									departments = departments + "1,";
+								}
+								if (inventoryReturnStatWin.findById("dept3ReturnStat")
+										.getValue() == true) {
+									departments = departments + "2,";
+								}
+								if (inventoryReturnStatWin.findById("dept4ReturnStat")
+										.getValue() == true) {
+									departments = departments + "3,";
+								}
+								if (inventoryReturnStatWin.findById("dept5ReturnStat")
+										.getValue() == true) {
+									departments = departments + "4,";
+								}
+								if (inventoryReturnStatWin.findById("dept6ReturnStat")
+										.getValue() == true) {
+									departments = departments + "5,";
+								}
+								if (inventoryReturnStatWin.findById("dept7ReturnStat")
+										.getValue() == true) {
+									departments = departments + "6,";
+								}
+								if (inventoryReturnStatWin.findById("dept8ReturnStat")
+										.getValue() == true) {
+									departments = departments + "7,";
+								}
+								if (inventoryReturnStatWin.findById("dept9ReturnStat")
+										.getValue() == true) {
+									departments = departments + "8,";
+								}
+								if (inventoryReturnStatWin.findById("dept10ReturnStat")
+										.getValue() == true) {
+									departments = departments + "9,";
+								}
+
+								if (departments != "") {
+									departments = departments.substring(0,
+											departments.length - 1);
+								}
+
+								// -- 獲取統計類型 --
+								var staticType = inventoryReturnStatFrom.getForm()
+										.findField("ReturnStat").getGroupValue();
+								if (staticType == "detail") {
+									isPrompt = true;
+									returnStatDetailResultWin.show();
+
+									// ＃＃＃＃＃＃＃＃＃＃＃＃明細統計＃＃＃＃＃＃＃＃＃＃＃＃
+									Ext.Ajax
+											.request({
+												url : "../../InventoryReturnStatDetail.do",
+												params : {
+													"pin" : pin,
+													"beginDate" : beginDate,
+													"endDate" : endDate,
+													"supplier" : supplier,
+													"departments" : departments,
+													"materials" : selectMaterials
+												},
+												success : function(response,
+														options) {
+													var resultJSON = Ext.util.JSON
+															.decode(response.responseText);
+													// 格式：[食材id，日期，供應商id，經辦人，部門id，價格，數量，小計]
+													var rootData = resultJSON.root;
+													if (rootData[0].message == "normal") {
+														returnStatDetailResultData.length = 0;
+														for ( var i = 0; i < rootData.length; i++) {
+															var materialN = "";
+															for ( var j = 0; j < materialData.length; j++) {
+																if (materialData[j][0] == rootData[i].materialID) {
+																	materialN = materialData[j][2];
+																}
+															}
+															var supplierN = "";
+															for ( var j = 0; j < supplierData.length; j++) {
+																if (supplierData[j][0] == rootData[i].supplierID) {
+																	supplierN = supplierData[j][2];
+																}
+															}
+															var deptN = "";
+															for ( var j = 0; j < departmentData.length; j++) {
+																if (departmentData[j][0] == rootData[i].departmentID) {
+																	deptN = departmentData[j][1];
+																}
+															}
+
+															returnStatDetailResultData
+																	.push([
+																			rootData[i].materialID,
+																			materialN,
+																			rootData[i].date,
+																			rootData[i].supplierID,
+																			supplierN,
+																			rootData[i].operator,
+																			rootData[i].departmentID,
+																			deptN,
+																			rootData[i].price,
+																			rootData[i].amount,
+																			rootData[i].total
+
+																	]);
+														}
+
+														returnStatDetailResultStore
+																.reload();
+
+													} else {
+														Ext.MessageBox
+																.show({
+																	msg : rootData[0].message,
+																	width : 300,
+																	buttons : Ext.MessageBox.OK
+																});
+													}
+												},
+												failure : function(response,
+														options) {
+													Ext.MessageBox
+															.show({
+																msg : " Unknown page error ",
+																width : 300,
+																buttons : Ext.MessageBox.OK
+															});
+												}
+											});
+
+								} else if (staticType == "sumByMaterial") {
+									isPrompt = true;
+									returnStatByMaterialResultWin.show();
+
+									// ＃＃＃＃＃＃＃＃＃＃＃＃按食材統計＃＃＃＃＃＃＃＃＃＃＃＃
+									Ext.Ajax
+											.request({
+												url : "../../InventoryReturnStatByMaterial.do",
+												params : {
+													"pin" : pin,
+													"beginDate" : beginDate,
+													"endDate" : endDate,
+													"supplier" : supplier,
+													"departments" : departments,
+													"materials" : selectMaterials
+												},
+												success : function(response,
+														options) {
+													var resultJSON = Ext.util.JSON
+															.decode(response.responseText);
+
+													var rootData = resultJSON.root;
+													if (rootData[0].message == "normal") {
+
+														returnStatByMaterialResultData = rootData;
+														returnStatByMateriaGrid
+																.getStore()
+																.loadData(
+																		returnStatByMaterialResultData);
+														if (rootData[0].materialID == "NO_DATA") {
+															returnStatByMateriaGrid
+																	.getStore()
+																	.removeAll();
+														}
+
+													} else {
+														Ext.MessageBox
+																.show({
+																	msg : rootData[0].message,
+																	width : 300,
+																	buttons : Ext.MessageBox.OK
+																});
+													}
+												},
+												failure : function(response,
+														options) {
+													Ext.MessageBox
+															.show({
+																msg : " Unknown page error ",
+																width : 300,
+																buttons : Ext.MessageBox.OK
+															});
+												}
+											});
+
+								} else if (staticType == "sumByDept") {
+
+									isPrompt = true;
+									returnStatByDeptResultWin.show();
+
+									// ＃＃＃＃＃＃＃＃＃＃＃＃按部門統計＃＃＃＃＃＃＃＃＃＃＃＃
+									Ext.Ajax
+											.request({
+												url : "../../InventoryReturnStatByDept.do",
+												params : {
+													"pin" : pin,
+													"beginDate" : beginDate,
+													"endDate" : endDate,
+													"supplier" : supplier,
+													"departments" : departments,
+													"materials" : selectMaterials
+												},
+												success : function(response,
+														options) {
+													var resultJSON = Ext.util.JSON
+															.decode(response.responseText);
+
+													var rootData = resultJSON.root;
+													if (rootData[0].message == "normal") {
+
+														returnStatByDeptResultData = rootData;
+														returnStatByDeptGrid
+																.getStore()
+																.loadData(
+																		returnStatByDeptResultData);
+														if (rootData[0].materialID == "NO_DATA") {
+															returnStatByDeptGrid
+																	.getStore()
+																	.removeAll();
+														}
+
+													} else {
+														Ext.MessageBox
+																.show({
+																	msg : rootData[0].message,
+																	width : 300,
+																	buttons : Ext.MessageBox.OK
+																});
+													}
+												},
+												failure : function(response,
+														options) {
+													Ext.MessageBox
+															.show({
+																msg : " Unknown page error ",
+																width : 300,
+																buttons : Ext.MessageBox.OK
+															});
+												}
+											});
+
+								} else if (staticType == "sumBySupplier") {
+
+									isPrompt = true;
+									returnStatBySupplierResultWin.show();
+
+									// ＃＃＃＃＃＃＃＃＃＃＃＃按供應商統計＃＃＃＃＃＃＃＃＃＃＃＃
+									Ext.Ajax
+											.request({
+												url : "../../InventoryReturnStatBySupplier.do",
+												params : {
+													"pin" : pin,
+													"beginDate" : beginDate,
+													"endDate" : endDate,
+													"supplier" : supplier,
+													"departments" : departments,
+													"materials" : selectMaterials
+												},
+												success : function(response,
+														options) {
+													var resultJSON = Ext.util.JSON
+															.decode(response.responseText);
+
+													var rootData = resultJSON.root;
+													if (rootData[0].message == "normal") {
+
+														returnStatBySupplierResultData = rootData;
+														returnStatBySupplierGrid
+																.getStore()
+																.loadData(
+																		returnStatBySupplierResultData);
+														if (rootData[0].materialID == "NO_DATA") {
+															returnStatBySupplierGrid
+																	.getStore()
+																	.removeAll();
+														}
+
+													} else {
+														Ext.MessageBox
+																.show({
+																	msg : rootData[0].message,
+																	width : 300,
+																	buttons : Ext.MessageBox.OK
+																});
+													}
+												},
+												failure : function(response,
+														options) {
+													Ext.MessageBox
+															.show({
+																msg : " Unknown page error ",
+																width : 300,
+																buttons : Ext.MessageBox.OK
+															});
+												}
+											});
+
+								}
+
+							} else {
+								Ext.MessageBox.show({
+									msg : "至少需要选择一个食材进行统计",
+									width : 300,
+									buttons : Ext.MessageBox.OK
+								});
+							}
+						}
+					}, {
+						text : "取消",
+						handler : function() {
+							isPrompt = false;
+							inventoryReturnStatWin.hide();
+						}
+					} ],
+			listeners : {
+				"show" : function(thiz) {
+
+					inventoryReturnStatWin.findById("materialReturnStatMultSelect")
+							.reset();
+					inventoryReturnStatWin.findById("begDateReturnStat").setValue("");
+					inventoryReturnStatWin.findById("endDateReturnStat").setValue("");
+
+					returnStatSupplierCombo.setValue("全部");
+
+					// inventoryInStatMSDS.loadData(materialComboData);
+					returnStatSupplierComboStore.loadData(supplierComboData);
+
+					// 神技！動態改變form中component的label！！！
+					inventoryReturnStatWin.findById("dept1ReturnStat").el.parent()
+							.parent().parent().first().dom.innerHTML = departmentData[0][1]
+							+ ":";
+					inventoryReturnStatWin.findById("dept2ReturnStat").el.parent()
+							.parent().parent().first().dom.innerHTML = departmentData[1][1]
+							+ ":";
+					inventoryReturnStatWin.findById("dept3ReturnStat").el.parent()
+							.parent().parent().first().dom.innerHTML = departmentData[2][1]
+							+ ":";
+					inventoryReturnStatWin.findById("dept4ReturnStat").el.parent()
+							.parent().parent().first().dom.innerHTML = departmentData[3][1]
+							+ ":";
+					inventoryReturnStatWin.findById("dept5ReturnStat").el.parent()
+							.parent().parent().first().dom.innerHTML = departmentData[4][1]
+							+ ":";
+					inventoryReturnStatWin.findById("dept6ReturnStat").el.parent()
+							.parent().parent().first().dom.innerHTML = departmentData[5][1]
+							+ ":";
+					inventoryReturnStatWin.findById("dept7ReturnStat").el.parent()
+							.parent().parent().first().dom.innerHTML = departmentData[6][1]
+							+ ":";
+					inventoryReturnStatWin.findById("dept8ReturnStat").el.parent()
+							.parent().parent().first().dom.innerHTML = departmentData[7][1]
+							+ ":";
+					inventoryReturnStatWin.findById("dept9ReturnStat").el.parent()
+							.parent().parent().first().dom.innerHTML = departmentData[8][1]
+							+ ":";
+					inventoryReturnStatWin.findById("dept10ReturnStat").el.parent()
+							.parent().parent().first().dom.innerHTML = departmentData[9][1]
+							+ ":";
+
+					inventoryReturnStatWin.findById("dept1ReturnStat").setValue(false);
+					inventoryReturnStatWin.findById("dept2ReturnStat").setValue(false);
+					inventoryReturnStatWin.findById("dept3ReturnStat").setValue(false);
+					inventoryReturnStatWin.findById("dept4ReturnStat").setValue(false);
+					inventoryReturnStatWin.findById("dept5ReturnStat").setValue(false);
+					inventoryReturnStatWin.findById("dept6ReturnStat").setValue(false);
+					inventoryReturnStatWin.findById("dept7ReturnStat").setValue(false);
+					inventoryReturnStatWin.findById("dept8ReturnStat").setValue(false);
+					inventoryReturnStatWin.findById("dept9ReturnStat").setValue(false);
+					inventoryReturnStatWin.findById("dept10ReturnStat").setValue(false);
+
+					inventoryReturnStatFrom.getForm().findField("ReturnStat").setValue(
+							"detail");
+
+				},
+				"hide" : function(thiz) {
+					isPrompt = false;
+				}
+			}
+		});
+
+//结果框 -- 明細
+//前台：[食材 日期 供应商 经手人 部门 价格 数量 小计]
+var returnStatDetailResultStore = new Ext.data.Store({
+	proxy : new Ext.data.MemoryProxy(returnStatDetailResultData),
+	reader : new Ext.data.ArrayReader({}, [ {
+		name : "materialID"
+	}, {
+		name : "materialName"
+	}, {
+		name : "date"
+	}, {
+		name : "supplierID"
+	}, {
+		name : "supplierName"
+	}, {
+		name : "operator"
+	}, {
+		name : "departmentID"
+	}, {
+		name : "departmentName"
+	}, {
+		name : "price"
+	}, {
+		name : "amount"
+	}, {
+		name : "total"
+	}, {
+		name : "message"
+	} ])
+});
+
+//2，栏位模型
+var returnStatDetailResultColumnModel = new Ext.grid.ColumnModel([
+		new Ext.grid.RowNumberer(), {
+			header : "食材",
+			sortable : true,
+			dataIndex : "materialName",
+			width : 80
+		}, {
+			header : "日期",
+			sortable : true,
+			dataIndex : "date",
+			width : 80
+		}, {
+			header : "供应商",
+			sortable : true,
+			dataIndex : "supplierName",
+			width : 80
+		}, {
+			header : "经手人",
+			sortable : true,
+			dataIndex : "operator",
+			width : 80
+		}, {
+			header : "部门",
+			sortable : true,
+			dataIndex : "departmentName",
+			width : 80
+		}, {
+			header : "价钱",
+			sortable : true,
+			dataIndex : "price",
+			width : 80
+		}, {
+			header : "数量",
+			sortable : true,
+			dataIndex : "amount",
+			width : 80
+		}, {
+			header : "小计（￥）",
+			sortable : true,
+			dataIndex : "total",
+			width : 80
+		} ]);
+
+var returnStatDetailResultGrid = new Ext.grid.GridPanel({
+	xtype : "grid",
+	anchor : "99%",
+	border : false,
+	ds : returnStatDetailResultStore,
+	cm : returnStatDetailResultColumnModel,
+	sm : new Ext.grid.RowSelectionModel({
+		singleSelect : true
+	}),
+	viewConfig : {
+		forceFit : true
+	},
+	autoScroll : true,
+	loadMask : {
+		msg : "数据加载中，请稍等..."
+	}
+});
+
+var returnStatDetailResultWin = new Ext.Window({
+	title : "出货明细",
+	width : 800,
+	height : 370,
+	closeAction : "hide",
+	resizable : false,
+	layout : "fit",
+	items : returnStatDetailResultGrid,
+	buttons : [ {
+		text : "打印",
+		handler : function() {
+
+		}
+	}, {
+		text : "关闭",
+		handler : function() {
+			isPrompt = false;
+			returnStatDetailResultWin.hide();
+		}
+	} ],
+	listeners : {
+		"hide" : function(thiz) {
+			isPrompt = false;
+		}
+	}
+});
+
+//结果框 -- 按食材
+//--------------------------------------------------------------------------------------------------------
+var returnStatByMateriaReader = new Ext.data.JsonReader({
+	idProperty : 'groupID',
+	fields : [ {
+		name : 'materialID',
+		type : 'int'
+	}, {
+		name : 'materialName',
+		type : 'string'
+	}, {
+		name : 'groupID',
+		type : 'int'
+	}, {
+		name : 'groupDescr',
+		type : 'string'
+	}, {
+		name : 'singlePrice',
+		type : 'float'
+	}, {
+		name : 'amount',
+		type : 'float'
+	}, {
+		name : 'sumPrice',
+		type : 'float'
+	}, {
+		name : 'deptID'
+	}, {
+		name : 'deptName',
+		type : 'string'
+	} ]
+
+});
+
+
+var returnStatByMateriaSummary = new Ext.grid.GroupSummary();
+
+var returnStatByMateriaGrid = new Ext.grid.EditorGridPanel({
+	ds : new Ext.data.GroupingStore({
+		reader : returnStatByMateriaReader,
+		data : [],
+		sortInfo : {
+			field : 'deptName',
+			direction : "ASC"
+		},
+		groupField : 'materialName'
+	}),
+
+	columns : [ {
+		id : 'groupDescr',
+		header : "食材",
+		width : 20,
+		sortable : true,
+		dataIndex : 'groupDescr',
+		// summaryType : 'count',
+		hideable : false,
+		// summaryRenderer : function(v, params, data) {
+		// return ((v === 0 || v > 1) ? '(' + v + ' Tasks)' : '(1 Task)');
+		// }
+		summaryRenderer : function(v, params, data) {
+			return "合计";
+		}
+	}, {
+		header : "NOT SHOW",
+		width : 20,
+		sortable : false,
+		dataIndex : 'materialName'
+	}, {
+		header : "部门",
+		width : 25,
+		sortable : true,
+		dataIndex : 'deptName'
+	}, {
+		id : 'singlePrice',
+		header : "价格",
+		width : 20,
+		sortable : false, // 計出來的列排序不起作用
+		groupable : false,
+		renderer : function(v, params, record) {
+			// return Ext.util.Format.usMoney(record.data.sumPrice
+			// / record.data.amount);
+			if (record.data.amount != 0) {
+				return (record.data.sumPrice / record.data.amount).toFixed(2);
+			} else {
+				return 0.00;
+			}
+		},
+		dataIndex : 'singlePrice',
+		summaryType : 'singlePrice'
+	// summaryRenderer : Ext.util.Format.usMoney
+	}, {
+		header : "数量",
+		width : 20,
+		sortable : true,
+		// renderer : Ext.util.Format.usMoney,
+		dataIndex : 'amount',
+		summaryType : 'sum'
+	// editor: new Ext.form.NumberField({
+	// allowBlank: false,
+	// allowNegative: false,
+	// style: 'text-align:left'
+	// })
+	}, {
+		header : "小计",
+		width : 20,
+		sortable : true,
+		// renderer : Ext.util.Format.chnMoney,
+		dataIndex : 'sumPrice',
+		summaryType : 'sum',
+		renderer : function(v) {
+			return parseFloat(v).toFixed(2);
+		}
+	// editor : new Ext.form.NumberField({
+	// allowBlank : false,
+	// allowNegative : false,
+	// style : 'text-align:left'
+	// })
+	} ],
+
+	view : new Ext.grid.GroupingView({
+		forceFit : true,
+		showGroupName : false,
+		enableNoGroups : false, // REQUIRED!
+		hideGroupedColumn : true
+	}),
+
+	plugins : returnStatByMateriaSummary,
+
+	frame : true,
+	width : 800,
+	height : 450,
+	clicksToEdit : 1,
+	collapsible : true,
+	animCollapse : false,
+	trackMouseOver : false
+//enableColumnMove: false,
+//title : 'Sponsored Projects'
+//iconCls: 'icon-grid',
+//renderTo: document.body
+});
+
+//--------------------------------------------------------------------------------------------------------
+
+var returnStatByMaterialResultWin = new Ext.Window({
+	title : "出货汇总-按食材",
+	width : 400,
+	height : 500,
+	closeAction : "hide",
+	resizable : false,
+	layout : "fit",
+	items : returnStatByMateriaGrid,
+	buttons : [ {
+		text : "打印",
+		handler : function() {
+
+		}
+	}, {
+		text : "关闭",
+		handler : function() {
+			isPrompt = false;
+			returnStatByMaterialResultWin.hide();
+		}
+	} ],
+	listeners : {
+		"hide" : function(thiz) {
+			isPrompt = false;
+		}
+	}
+});
+
+//结果框 -- 按部門
+//--------------------------------------------------------------------------------------------------------
+var returnStatByDeptReader = new Ext.data.JsonReader({
+	idProperty : 'groupID',
+	fields : [ {
+		name : 'deptID',
+		type : 'int'
+	}, {
+		name : 'deptName',
+		type : 'string'
+	}, {
+		name : 'groupID',
+		type : 'int'
+	}, {
+		name : 'groupDescr',
+		type : 'string'
+	}, {
+		name : 'singlePrice',
+		type : 'float'
+	}, {
+		name : 'amount',
+		type : 'float'
+	}, {
+		name : 'sumPrice',
+		type : 'float'
+	}, {
+		name : 'materialID'
+	}, {
+		name : 'materialName',
+		type : 'string'
+	} ]
+
+});
+
+var returnStatByDeptSummary = new Ext.grid.GroupSummary();
+
+var returnStatByDeptGrid = new Ext.grid.EditorGridPanel({
+	ds : new Ext.data.GroupingStore({
+		reader : returnStatByDeptReader,
+		data : [],
+		sortInfo : {
+			field : 'materialName',
+			direction : "ASC"
+		},
+		groupField : 'deptName'
+	}),
+
+	columns : [ {
+		id : 'groupDescr',
+		header : "部门",
+		width : 20,
+		sortable : true,
+		dataIndex : 'groupDescr',
+		// summaryType : 'count',
+		hideable : false,
+		// summaryRenderer : function(v, params, data) {
+		// return ((v === 0 || v > 1) ? '(' + v + ' Tasks)' : '(1 Task)');
+		// }
+		summaryRenderer : function(v, params, data) {
+			return "合计";
+		}
+	}, {
+		header : "NOT SHOW",
+		width : 20,
+		sortable : false,
+		dataIndex : 'deptName'
+	}, {
+		header : "食材",
+		width : 25,
+		sortable : true,
+		dataIndex : 'materialName'
+	}, {
+		id : 'singlePrice',
+		header : "价格",
+		width : 20,
+		sortable : false, // 計出來的列排序不起作用
+		groupable : false,
+		renderer : function(v, params, record) {
+			// return Ext.util.Format.usMoney(record.data.sumPrice
+			// / record.data.amount);
+			if (record.data.amount != 0) {
+				return (record.data.sumPrice / record.data.amount).toFixed(2);
+			} else {
+				return 0.00;
+			}
+		},
+		dataIndex : 'singlePrice',
+		summaryType : 'singlePrice'
+	// summaryRenderer : Ext.util.Format.usMoney
+	}, {
+		header : "数量",
+		width : 20,
+		sortable : true,
+		// renderer : Ext.util.Format.usMoney,
+		dataIndex : 'amount',
+		summaryType : 'sum'
+	// editor: new Ext.form.NumberField({
+	// allowBlank: false,
+	// allowNegative: false,
+	// style: 'text-align:left'
+	// })
+	}, {
+		header : "小计",
+		width : 20,
+		sortable : true,
+		// renderer : Ext.util.Format.chnMoney,
+		dataIndex : 'sumPrice',
+		summaryType : 'sum',
+		renderer : function(v) {
+			return parseFloat(v).toFixed(2);
+		}
+	// editor : new Ext.form.NumberField({
+	// allowBlank : false,
+	// allowNegative : false,
+	// style : 'text-align:left'
+	// })
+	} ],
+
+	view : new Ext.grid.GroupingView({
+		forceFit : true,
+		showGroupName : false,
+		enableNoGroups : false, // REQUIRED!
+		hideGroupedColumn : true
+	}),
+
+	plugins : returnStatByDeptSummary,
+
+	frame : true,
+	width : 800,
+	height : 450,
+	clicksToEdit : 1,
+	collapsible : true,
+	animCollapse : false,
+	trackMouseOver : false
+//enableColumnMove: false,
+//title : 'Sponsored Projects'
+//iconCls: 'icon-grid',
+//renderTo: document.body
+});
+
+//--------------------------------------------------------------------------------------------------------
+
+var returnStatByDeptResultWin = new Ext.Window({
+	title : "出货汇总-按部门",
+	width : 400,
+	height : 500,
+	closeAction : "hide",
+	resizable : false,
+	layout : "fit",
+	items : returnStatByDeptGrid,
+	buttons : [ {
+		text : "打印",
+		handler : function() {
+
+		}
+	}, {
+		text : "关闭",
+		handler : function() {
+			isPrompt = false;
+			returnStatByDeptResultWin.hide();
+		}
+	} ],
+	listeners : {
+		"hide" : function(thiz) {
+			isPrompt = false;
+		}
+	}
+});
+
+//结果框 -- 按供應商
+//--------------------------------------------------------------------------------------------------------
+var returnStatBySupplierReader = new Ext.data.JsonReader({
+	idProperty : 'groupID',
+	fields : [ {
+		name : 'supplierID',
+		type : 'int'
+	}, {
+		name : 'supplierName',
+		type : 'string'
+	}, {
+		name : 'groupID',
+		type : 'int'
+	}, {
+		name : 'groupDescr',
+		type : 'string'
+	}, {
+		name : 'singlePrice',
+		type : 'float'
+	}, {
+		name : 'amount',
+		type : 'float'
+	}, {
+		name : 'sumPrice',
+		type : 'float'
+	}, {
+		name : 'materialID'
+	}, {
+		name : 'materialName',
+		type : 'string'
+	} ]
+
+});
+
+var returnStatBySupplierSummary = new Ext.grid.GroupSummary();
+
+var returnStatBySupplierGrid = new Ext.grid.EditorGridPanel({
+	ds : new Ext.data.GroupingStore({
+		reader : returnStatBySupplierReader,
+		data : [],
+		sortInfo : {
+			field : 'materialName',
+			direction : "ASC"
+		},
+		groupField : 'supplierName'
+	}),
+
+	columns : [ {
+		id : 'groupDescr',
+		header : "供应商",
+		width : 20,
+		sortable : true,
+		dataIndex : 'groupDescr',
+		// summaryType : 'count',
+		hideable : false,
+		// summaryRenderer : function(v, params, data) {
+		// return ((v === 0 || v > 1) ? '(' + v + ' Tasks)' : '(1 Task)');
+		// }
+		summaryRenderer : function(v, params, data) {
+			return "合计";
+		}
+	}, {
+		header : "NOT SHOW",
+		width : 20,
+		sortable : false,
+		dataIndex : 'supplierName'
+	}, {
+		header : "食材",
+		width : 25,
+		sortable : true,
+		dataIndex : 'materialName'
+	}, {
+		id : 'singlePrice',
+		header : "价格",
+		width : 20,
+		sortable : false, // 計出來的列排序不起作用
+		groupable : false,
+		renderer : function(v, params, record) {
+			// return Ext.util.Format.usMoney(record.data.sumPrice
+			// / record.data.amount);
+			if (record.data.amount != 0) {
+				return (record.data.sumPrice / record.data.amount).toFixed(2);
+			} else {
+				return 0.00;
+			}
+		},
+		dataIndex : 'singlePrice',
+		summaryType : 'singlePrice'
+	// summaryRenderer : Ext.util.Format.usMoney
+	}, {
+		header : "数量",
+		width : 20,
+		sortable : true,
+		// renderer : Ext.util.Format.usMoney,
+		dataIndex : 'amount',
+		summaryType : 'sum'
+	// editor: new Ext.form.NumberField({
+	// allowBlank: false,
+	// allowNegative: false,
+	// style: 'text-align:left'
+	// })
+	}, {
+		header : "小计",
+		width : 20,
+		sortable : true,
+		// renderer : Ext.util.Format.chnMoney,
+		dataIndex : 'sumPrice',
+		summaryType : 'sum',
+		renderer : function(v) {
+			return parseFloat(v).toFixed(2);
+		}
+	// editor : new Ext.form.NumberField({
+	// allowBlank : false,
+	// allowNegative : false,
+	// style : 'text-align:left'
+	// })
+	} ],
+
+	view : new Ext.grid.GroupingView({
+		forceFit : true,
+		showGroupName : false,
+		enableNoGroups : false, // REQUIRED!
+		hideGroupedColumn : true
+	}),
+
+	plugins : returnStatBySupplierSummary,
+
+	frame : true,
+	width : 800,
+	height : 450,
+	clicksToEdit : 1,
+	collapsible : true,
+	animCollapse : false,
+	trackMouseOver : false
+//enableColumnMove: false,
+//title : 'Sponsored Projects'
+//iconCls: 'icon-grid',
+//renderTo: document.body
+});
+
+//--------------------------------------------------------------------------------------------------------
+
+var returnStatBySupplierResultWin = new Ext.Window({
+	title : "出货汇总-按供应商",
+	width : 400,
+	height : 500,
+	closeAction : "hide",
+	resizable : false,
+	layout : "fit",
+	items : returnStatBySupplierGrid,
+	buttons : [ {
+		text : "打印",
+		handler : function() {
+
+		}
+	}, {
+		text : "关闭",
+		handler : function() {
+			isPrompt = false;
+			returnStatBySupplierResultWin.hide();
+		}
+	} ],
+	listeners : {
+		"hide" : function(thiz) {
+			isPrompt = false;
+		}
+	}
+});
+
+//--------------------------------------end出貨統計----------------------------------------------

@@ -38,6 +38,7 @@
 			inventoryCostStatMSDS.loadData(materialComboData);
 			inventoryAllStatMSDS.loadData(materialComboData);
 			inventoryCheckStatMSDS.loadData(materialComboData);
+			inventoryReturnStatMSDS.loadData(materialComboData);
 		},
 		failure : function(response, options) {
 			Ext.MessageBox.show({

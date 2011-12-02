@@ -3,6 +3,8 @@ package com.wireless.Actions.inventoryMgr;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +28,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Terminal;
 
-public class StatInventoryOutByMaterial extends Action {
+public class StatInventoryReturnDetail extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -39,6 +41,8 @@ public class StatInventoryOutByMaterial extends Action {
 		HashMap rootMap = new HashMap();
 
 		boolean isError = false;
+		float allTotalCount = 0;
+		float allTotalAmount = 0;
 
 		try {
 			// 解决后台中文传到前台乱码
@@ -66,95 +70,78 @@ public class StatInventoryOutByMaterial extends Action {
 			// get the query condition
 			String beginDate = request.getParameter("beginDate");
 			String endDate = request.getParameter("endDate");
-			String reasons = request.getParameter("reasons");
+			String supplier = request.getParameter("supplier");
 			String departments = request.getParameter("departments");
 			String materials = request.getParameter("materials");
 
 			String condition = "";
 
 			if (!beginDate.equals("")) {
-				condition = condition + " AND a.date >= '" + beginDate
+				condition = condition + " AND date >= '" + beginDate
 						+ " 00:00:00" + "' ";
 			}
 			if (!endDate.equals("")) {
-				condition = condition + " AND a.date <= '" + endDate
+				condition = condition + " AND date <= '" + endDate
 						+ " 23:59:59" + "' ";
 			}
 
-			if (!reasons.equals("")) {
-				condition = condition + " AND type IN (" + reasons + ") ";
-			} else {
-				condition = condition + " AND type IN ("
-						+ MaterialDetail.TYPE_WEAR + ", "
-						+ MaterialDetail.TYPE_SELL + ", "
-						// + MaterialDetail.TYPE_RETURN + ", "
-						+ MaterialDetail.TYPE_OUT_WARE + ") ";
+			if (!supplier.equals("-1")) {
+				condition = condition + " AND supplier_id = " + supplier + " ";
 			}
 
 			if (!departments.equals("")) {
-				condition = condition + " AND a.dept_id IN (" + departments
+				condition = condition + " AND dept_id IN (" + departments
 						+ ") ";
 			}
 
-			condition = condition + " AND a.material_id IN (" + materials
-					+ ") ";
+			condition = condition + " AND material_id IN (" + materials + ") ";
 
 			/*
-			 * materialID : 100, materialName : '雞肉', groupID : 112, groupDescr
-			 * : '', // price : 6, amount : 150, deptName : 'department',
-			 * sumPrice : 1000
+			 * rootData[i].materialID, materialN, rootData[i].date,
+			 * rootData[i].supplierID, supplierN, rootData[i].operator,
+			 * rootData[i].departmentID, deptN, rootData[i].price,
+			 * rootData[i].amount, rootData[i].total
 			 */
 
-			String sql = " SELECT a.material_id, a.dept_id, b.name as material_name, c.name as dept_name, "
-					+ " sum(a.amount) as amount, sum(a.amount*a.price) as total_price "
+			String sql = " SELECT material_id, date, supplier_id, staff, dept_id, "
+					+ " price, amount, price*amount as total "
 					+ " FROM "
 					+ Params.dbName
-					+ ".material_detail a, "
-					+ Params.dbName
-					+ ".material b, "
-					+ Params.dbName
-					+ ".department c "
-					+ " WHERE a.restaurant_id = "
+					+ ".material_detail "
+					+ " WHERE restaurant_id = "
 					+ term.restaurant_id
-					+ " AND a.restaurant_id = b.restaurant_id AND a.material_id = b.material_id "
-					+ " AND a.restaurant_id = c.restaurant_id AND a.dept_id = c.dept_id "
-					+ condition
-					+ " GROUP BY a.material_id, material_name, a.dept_id, dept_name "
-					+ " ORDER BY a.material_id, a.dept_id ";
+					+ " AND type = "
+					+ MaterialDetail.TYPE_RETURN
+					+ " "
+					+ condition;
 
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 
 			/**
 			 * The json to each order looks like below
 			 */
-			int groupID = 1;
 			while (dbCon.rs.next()) {
 
 				HashMap resultMap = new HashMap();
 				resultMap.put("materialID", dbCon.rs.getInt("material_id"));
-				resultMap.put("materialName",
-						dbCon.rs.getString("material_name"));
-				resultMap.put("groupID", groupID);
-				resultMap.put("groupDescr", "");
-				resultMap.put("deptID", dbCon.rs.getInt("dept_id"));
-				resultMap.put("deptName", dbCon.rs.getString("dept_name"));
-				resultMap.put("amount", (-1) * dbCon.rs.getFloat("amount"));
-				resultMap.put("sumPrice",
-						(-1) * dbCon.rs.getFloat("total_price"));
+				resultMap.put("date", new SimpleDateFormat("yyyy-MM-dd")
+						.format(dbCon.rs.getDate("date")));
+				resultMap.put("supplierID", dbCon.rs.getInt("supplier_id"));
+				resultMap.put("operator", dbCon.rs.getString("staff"));
+				resultMap.put("departmentID", dbCon.rs.getInt("dept_id"));
+				resultMap.put("price", dbCon.rs.getFloat("price"));
+				resultMap.put("amount", (-1)*dbCon.rs.getFloat("amount"));
+				resultMap.put("total", (-1)*dbCon.rs.getFloat("total"));
 
 				resultMap.put("message", "normal");
 
 				resultList.add(resultMap);
 
-				groupID = groupID + 1;
+				allTotalCount = (float) Math.round((allTotalCount + (-1)*dbCon.rs
+						.getFloat("total")) * 100) / 100;
+				allTotalAmount = (float) Math.round((allTotalAmount + (-1)*dbCon.rs
+						.getFloat("amount")) * 100) / 100;
 
-			}
-
-			if (resultList.size() == 0) {
-				HashMap resultMap = new HashMap();
-				resultMap.put("materialID", "NO_DATA");
-				resultMap.put("message", "normal");
-				resultList.add(resultMap);
 			}
 
 			dbCon.rs.close();
@@ -193,6 +180,17 @@ public class StatInventoryOutByMaterial extends Action {
 			if (isError) {
 				rootMap.put("root", resultList);
 			} else {
+
+				DecimalFormat fnum = new DecimalFormat("##0.00");
+				String totalPriceDiaplay = fnum.format(allTotalCount);
+				HashMap resultMap = new HashMap();
+				resultMap.put("materialID", "SUM");
+				resultMap.put("price", "汇总");
+				resultMap.put("amount", allTotalAmount);
+				resultMap.put("total", totalPriceDiaplay);
+				resultMap.put("message", "normal");
+				resultList.add(resultMap);
+
 				rootMap.put("root", resultList);
 			}
 

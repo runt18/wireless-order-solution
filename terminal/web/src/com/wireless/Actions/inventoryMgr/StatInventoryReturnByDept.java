@@ -26,7 +26,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Terminal;
 
-public class StatInventoryOutByMaterial extends Action {
+public class StatInventoryReturnByDept extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -66,7 +66,7 @@ public class StatInventoryOutByMaterial extends Action {
 			// get the query condition
 			String beginDate = request.getParameter("beginDate");
 			String endDate = request.getParameter("endDate");
-			String reasons = request.getParameter("reasons");
+			String supplier = request.getParameter("supplier");
 			String departments = request.getParameter("departments");
 			String materials = request.getParameter("materials");
 
@@ -81,14 +81,9 @@ public class StatInventoryOutByMaterial extends Action {
 						+ " 23:59:59" + "' ";
 			}
 
-			if (!reasons.equals("")) {
-				condition = condition + " AND type IN (" + reasons + ") ";
-			} else {
-				condition = condition + " AND type IN ("
-						+ MaterialDetail.TYPE_WEAR + ", "
-						+ MaterialDetail.TYPE_SELL + ", "
-						// + MaterialDetail.TYPE_RETURN + ", "
-						+ MaterialDetail.TYPE_OUT_WARE + ") ";
+			if (!supplier.equals("-1")) {
+				condition = condition + " AND a.supplier_id = " + supplier
+						+ " ";
 			}
 
 			if (!departments.equals("")) {
@@ -100,9 +95,6 @@ public class StatInventoryOutByMaterial extends Action {
 					+ ") ";
 
 			/*
-			 * materialID : 100, materialName : '雞肉', groupID : 112, groupDescr
-			 * : '', // price : 6, amount : 150, deptName : 'department',
-			 * sumPrice : 1000
 			 */
 
 			String sql = " SELECT a.material_id, a.dept_id, b.name as material_name, c.name as dept_name, "
@@ -118,9 +110,12 @@ public class StatInventoryOutByMaterial extends Action {
 					+ term.restaurant_id
 					+ " AND a.restaurant_id = b.restaurant_id AND a.material_id = b.material_id "
 					+ " AND a.restaurant_id = c.restaurant_id AND a.dept_id = c.dept_id "
+					+ " AND a.type = "
+					+ MaterialDetail.TYPE_RETURN
+					+ " "
 					+ condition
-					+ " GROUP BY a.material_id, material_name, a.dept_id, dept_name "
-					+ " ORDER BY a.material_id, a.dept_id ";
+					+ " GROUP BY a.dept_id, dept_name, a.material_id, material_name "
+					+ " ORDER BY a.dept_id, a.material_id ";
 
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 
@@ -131,16 +126,15 @@ public class StatInventoryOutByMaterial extends Action {
 			while (dbCon.rs.next()) {
 
 				HashMap resultMap = new HashMap();
+				resultMap.put("deptID", dbCon.rs.getInt("dept_id"));
+				resultMap.put("deptName", dbCon.rs.getString("dept_name"));
+				resultMap.put("groupID", groupID);
+				resultMap.put("groupDescr", "");
 				resultMap.put("materialID", dbCon.rs.getInt("material_id"));
 				resultMap.put("materialName",
 						dbCon.rs.getString("material_name"));
-				resultMap.put("groupID", groupID);
-				resultMap.put("groupDescr", "");
-				resultMap.put("deptID", dbCon.rs.getInt("dept_id"));
-				resultMap.put("deptName", dbCon.rs.getString("dept_name"));
-				resultMap.put("amount", (-1) * dbCon.rs.getFloat("amount"));
-				resultMap.put("sumPrice",
-						(-1) * dbCon.rs.getFloat("total_price"));
+				resultMap.put("amount", (-1)*dbCon.rs.getFloat("amount"));
+				resultMap.put("sumPrice", (-1)*dbCon.rs.getFloat("total_price"));
 
 				resultMap.put("message", "normal");
 
@@ -149,8 +143,8 @@ public class StatInventoryOutByMaterial extends Action {
 				groupID = groupID + 1;
 
 			}
-
-			if (resultList.size() == 0) {
+			
+			if(resultList.size() == 0){
 				HashMap resultMap = new HashMap();
 				resultMap.put("materialID", "NO_DATA");
 				resultMap.put("message", "normal");

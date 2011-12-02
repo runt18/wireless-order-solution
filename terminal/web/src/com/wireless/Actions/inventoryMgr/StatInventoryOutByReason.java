@@ -87,7 +87,7 @@ public class StatInventoryOutByReason extends Action {
 				condition = condition + " AND type IN ("
 						+ MaterialDetail.TYPE_WEAR + ", "
 						+ MaterialDetail.TYPE_SELL + ", "
-						+ MaterialDetail.TYPE_RETURN + ", "
+						// + MaterialDetail.TYPE_RETURN + ", "
 						+ MaterialDetail.TYPE_OUT_WARE + ") ";
 			}
 
@@ -143,8 +143,9 @@ public class StatInventoryOutByReason extends Action {
 				resultMap.put("materialID", dbCon.rs.getInt("material_id"));
 				resultMap.put("materialName",
 						dbCon.rs.getString("material_name"));
-				resultMap.put("amount", (-1)*dbCon.rs.getFloat("amount"));
-				resultMap.put("sumPrice", (-1)*dbCon.rs.getFloat("total_price"));
+				resultMap.put("amount", (-1) * dbCon.rs.getFloat("amount"));
+				resultMap.put("sumPrice",
+						(-1) * dbCon.rs.getFloat("total_price"));
 
 				resultMap.put("message", "normal");
 

@@ -91,7 +91,7 @@ public class StatInventoryOutDetail extends Action {
 				condition = condition + " AND type IN ("
 						+ MaterialDetail.TYPE_WEAR + ", "
 						+ MaterialDetail.TYPE_SELL + ", "
-						+ MaterialDetail.TYPE_RETURN + ", "
+						// + MaterialDetail.TYPE_RETURN + ", "
 						+ MaterialDetail.TYPE_OUT_WARE + ") ";
 			}
 
