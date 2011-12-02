@@ -2,6 +2,7 @@
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 
+DROP SCHEMA IF EXISTS `wireless_order_db` ;
 CREATE SCHEMA IF NOT EXISTS `wireless_order_db` DEFAULT CHARACTER SET utf8 ;
 USE `wireless_order_db` ;
 
@@ -630,14 +631,13 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`material_detail` (
   `supplier_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the supplier alias id that this material detail record belong to' ,
   `material_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the material alias id that this material detail record belong to' ,
   `price` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the price to this material record' ,
-  `price_prev` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the previous price to this material detail record' ,
   `date` DATETIME NULL DEFAULT NULL COMMENT 'the date to this material detail record' ,
   `staff` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the staff name to this material detail record' ,
   `dept_id` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the super kitchen id to this material detail record' ,
   `dept2_id` TINYINT UNSIGNED NULL DEFAULT NULL COMMENT 'indicates the 调入部门 in case of the type is “调出”' ,
   `amount` FLOAT NOT NULL DEFAULT 0 COMMENT 'the amount to this material detail record' ,
-  `amount_prev` FLOAT NOT NULL DEFAULT 0 COMMENT 'the previous amount to this material detail record' ,
   `type` TINYINT NOT NULL DEFAULT 0 COMMENT 'the type is as below.\n0 : 消耗\n1 : 报损 \n2 : 销售\n3 : 退货\n4 : 出仓\n5 : 入库\n6 : 调出\n7 : 调入\n8 : 盘点' ,
+  `comment` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the comment to this material detail' ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_material_detail_restaurant` (`restaurant_id` ASC) ,
   CONSTRAINT `fk_material_detail_restaurant`
@@ -647,38 +647,6 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`material_detail` (
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
-
-
--- -----------------------------------------------------
--- Table `wireless_order_db`.`material_dept`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `wireless_order_db`.`material_dept` ;
-
-CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`material_dept` (
-  `restaurant_id` INT UNSIGNED NOT NULL ,
-  `material_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the id to material ' ,
-  `dept_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the id to department' ,
-  `dept_name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to department' ,
-  `material_name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to material' ,
-  `price` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the price to this material' ,
-  `stock` FLOAT NOT NULL DEFAULT 0 COMMENT 'the stock to this material' ,
-  INDEX `fk_material_dept_restaurant1` (`restaurant_id` ASC) ,
-  PRIMARY KEY (`restaurant_id`, `material_id`, `dept_id`) ,
-  CONSTRAINT `fk_material_dept_restaurant1`
-    FOREIGN KEY (`restaurant_id` )
-    REFERENCES `wireless_order_db`.`restaurant` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8, 
-COMMENT = 'describe the stock to each material of department' ;
-
-
-
-SET SQL_MODE=@OLD_SQL_MODE;
-SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
-SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
 
 
 -- -----------------------------------------------------
