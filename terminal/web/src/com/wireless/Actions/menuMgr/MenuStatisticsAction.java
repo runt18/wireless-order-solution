@@ -111,11 +111,11 @@ public class MenuStatisticsAction extends Action {
 
 			String condition = " AND C.food_id IN (" + dishString + ") ";
 			if (!dateBegin.equals("")) {
-				condition = condition + " AND D.pay_date >= '" + dateBegin
+				condition = condition + " AND D.pay_datetime >= '" + dateBegin
 						+ " 00:00:00" + "' ";
 			}
 			if (!dateEnd.equals("")) {
-				condition = condition + " AND D.pay_date <= '" + dateEnd
+				condition = condition + " AND D.pay_datetime <= '" + dateEnd
 						+ " 23:59:59" + "' ";
 			}
 			condition = condition + " AND C.restaurant_id =  "
