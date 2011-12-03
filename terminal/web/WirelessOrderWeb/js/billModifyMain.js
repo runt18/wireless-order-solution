@@ -81,8 +81,10 @@ var orderedStore = new Ext.data.Store({
 		name : "soldOut"
 	}, {
 		name : "forFree"
-	}, {
+	},{
 		name : "discountRate"
+	},{
+		name : "currPrice"
 	} ])
 });
 
@@ -1294,8 +1296,8 @@ var dishesDisplayGrid = new Ext.grid.GridPanel({
 		rowdblclick : function(thiz, rowIndex, e) {
 
 			if (dishesDisplayDataShow[rowIndex][7] == "false") {
-				// mune格式：[菜名，菜名编号，菜名拼音，单价，厨房编号,特,荐,停,送]
-				// ordered格式：[菜名，口味，数量，￥单价，操作，￥实价，菜名编号，厨房编号，口味编号1,特,荐,停,送,折扣率,￥口味价钱,口味编号2,口味编号3]
+				// mune格式：[菜名，菜名编号，菜名拼音，单价，厨房编号,特,荐,停,送,時]
+				// ordered格式：[菜名，口味，数量，￥单价，操作，￥实价，菜名编号，厨房编号，口味编号1,特,荐,停,送,折扣率,￥口味价钱,口味编号2,口味编号3,時]
 				// var dishCurrCount = dishesOrderEastPanel.findById(
 				// "orderCountNum").getValue();
 				var dishCurrName = dishesDisplayDataShow[rowIndex][0];
@@ -1329,7 +1331,8 @@ var dishesDisplayGrid = new Ext.grid.GridPanel({
 					"1",// 折扣率
 					"￥0",// ￥口味价钱
 					0,// 口味编号2
-					0 // 口味编号3
+					0, // 口味编号3
+					dishesDisplayDataShow[rowIndex][9]// 時
 					]);
 				}
 				orderedStore.reload();
@@ -1378,7 +1381,7 @@ var dishesChooseBySpellForm = new Ext.form.FormPanel({
 				anchor : "90%",
 				listeners : {
 					focus : function(thiz) {
-						softKeyBoardDO.hide();
+						//softKeyBoardDO.hide();
 					},
 					render : function(thiz) {
 						dishSpellOnLoad();
@@ -1506,7 +1509,8 @@ var dishesDisplayTabPanel = new Ext.TabPanel({
 						dishesDisplayData[i][1], dishesDisplayData[i][2],
 						dishesDisplayData[i][3], dishesDisplayData[i][4],
 						dishesDisplayData[i][5], dishesDisplayData[i][6],
-						dishesDisplayData[i][7], dishesDisplayData[i][8] ]);
+						dishesDisplayData[i][7], dishesDisplayData[i][8],
+						dishesDisplayData[i][9] ]);
 			}
 			dishesDisplayStore.reload();
 

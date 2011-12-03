@@ -140,7 +140,7 @@ public class QueryMenuMgrAction extends Action {
 			Food[] foods = QueryMenu.execFoods(Integer.parseInt(pin, 16),
 					Terminal.MODEL_STAFF, filterCondition);
 
-			// 格式：[编号，名称，拼音，价格，厨房，特价，推荐，停售，赠送]
+			// 格式：[编号，名称，拼音，价格，厨房，特价，推荐，停售，赠送，時價]
 			for (int i = 0; i < foods.length; i++) {
 				//
 				// String sql = " SELECT id FROM "
@@ -167,6 +167,7 @@ public class QueryMenuMgrAction extends Action {
 				resultMap.put("recommend", foods[i].isRecommend());
 				resultMap.put("stop", foods[i].isSellOut());
 				resultMap.put("free", foods[i].isGift());
+				resultMap.put("currPrice", foods[i].isCurPrice());
 				resultMap.put("message", "normal");
 
 				resultList.add(resultMap);
@@ -202,13 +203,15 @@ public class QueryMenuMgrAction extends Action {
 			if (isError) {
 				rootMap.put("root", resultList);
 			} else {
-				// 特荐停送 筛选
+				// 特荐停送時 筛选
 				String isSpecial = request.getParameter("isSpecial");
 				String isRecommend = request.getParameter("isRecommend");
 				String isFree = request.getParameter("isFree");
 				String isStop = request.getParameter("isStop");
+				String isCurrPrice = request.getParameter("isCurrPrice");
 				if (isSpecial.equals("false") && isRecommend.equals("false")
-						&& isFree.equals("false") && isStop.equals("false")) {
+						&& isFree.equals("false") && isStop.equals("false")
+						&& isCurrPrice.equals("false")) {
 					for (int i = 0; i < resultList.size(); i++) {
 						chooseList.add(resultList.get(i));
 					}
@@ -228,6 +231,10 @@ public class QueryMenuMgrAction extends Action {
 								|| (isStop.equals("true") && Boolean
 										.parseBoolean(((HashMap) (resultList
 												.get(i))).get("stop")
+												.toString()))
+								|| (isCurrPrice.equals("true") && Boolean
+										.parseBoolean(((HashMap) (resultList
+												.get(i))).get("currPrice")
 												.toString()))) {
 							chooseList.add(resultList.get(i));
 						}

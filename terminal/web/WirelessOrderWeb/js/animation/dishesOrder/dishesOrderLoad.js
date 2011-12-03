@@ -53,7 +53,8 @@ var dishKeyboardSelect = function(relateItemId) {
 						dishesDisplayData[i][1], dishesDisplayData[i][2],
 						dishesDisplayData[i][3], dishesDisplayData[i][4],
 						dishesDisplayData[i][5], dishesDisplayData[i][6],
-						dishesDisplayData[i][7], dishesDisplayData[i][8] ]);
+						dishesDisplayData[i][7], dishesDisplayData[i][8],
+						dishesDisplayData[i][9] ]);
 			}
 		} else {
 			dishesDisplayDataShow.length = 0;
@@ -64,7 +65,8 @@ var dishKeyboardSelect = function(relateItemId) {
 							dishesDisplayData[i][1], dishesDisplayData[i][2],
 							dishesDisplayData[i][3], dishesDisplayData[i][4],
 							dishesDisplayData[i][5], dishesDisplayData[i][6],
-							dishesDisplayData[i][7], dishesDisplayData[i][8] ]);
+							dishesDisplayData[i][7], dishesDisplayData[i][8],
+							dishesDisplayData[i][9] ]);
 				}
 			}
 		}
@@ -102,7 +104,8 @@ function dishSpellOnLoad() {
 										dishesDisplayData[i][5],
 										dishesDisplayData[i][6],
 										dishesDisplayData[i][7],
-										dishesDisplayData[i][8] ]);
+										dishesDisplayData[i][8],
+										dishesDisplayData[i][9] ]);
 							}
 						} else {
 							dishesDisplayDataShow.length = 0;
@@ -118,7 +121,8 @@ function dishSpellOnLoad() {
 											dishesDisplayData[i][5],
 											dishesDisplayData[i][6],
 											dishesDisplayData[i][7],
-											dishesDisplayData[i][8] ]);
+											dishesDisplayData[i][8],
+											dishesDisplayData[i][9] ]);
 								}
 							}
 						}
@@ -173,10 +177,10 @@ function tableStuLoad() {
 
 // 以点菜式数据
 // 菜品状态: 1：已点，2：新点，3：修改
-// 格式：[菜名，口味，数量，￥单价，操作，￥实价，菜名编号，厨房编号，口味编号1,特,荐,停,送,￥口味价钱,口味编号2,口味编号3,菜品状态]
+// 格式：[菜名，口味，数量，￥单价，操作，￥实价，菜名编号，厨房编号，口味编号1,特,荐,停,送,￥口味价钱,口味编号2,口味编号3,菜品状态,時]
 // orderedData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "", "￥56.2" ]);
 // orderedData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "", "￥56.2" ]);
-// 后台：["菜名",菜名编号,厨房编号,"口味",口味编号,数量,￥单价,是否特价,是否推荐,是否停售,是否赠送,折扣率,口味编号2,口味编号3,￥口味价钱]
+// 后台：["菜名",菜名编号,厨房编号,"口味",口味编号,数量,￥单价,是否特价,是否推荐,是否停售,是否赠送,折扣率,口味编号2,口味编号3,￥口味价钱,時]
 function orderedDishesOnLoad() {
 	var Request = new URLParaQuery();
 	// 外卖不查询已点菜式
@@ -228,7 +232,9 @@ function orderedDishesOnLoad() {
 											tastePrice,// 口味价钱
 											orderInfo[12],// 口味编号2
 											orderInfo[13], // 口味编号3
-											"1"// 菜品状态
+											"1",// 菜品状态
+											orderInfo[15] // 時
+
 									]);
 								}
 
@@ -253,6 +259,11 @@ function orderedDishesOnLoad() {
 										// 送
 										orderedData[i][0] = orderedData[i][0]
 												+ "<img src='../images/forFree.png'></img>";
+									}
+									if (orderedData[i][17] == "true") {
+										// 時
+										orderedData[i][0] = orderedData[i][0]
+												+ "<img src='../images/currPrice.png'></img>";
 									}
 								}
 
@@ -364,8 +375,8 @@ function orderedMenuOnLoad() {
 						for ( var i = 0; i < menuList.length; i++) {
 							var menuInfo = menuList[i].substr(1,
 									menuList[i].length - 2).split(",");
-							// 格式：[菜名，菜名编号，菜名拼音，单价，厨房编号,特,荐,停,送]
-							// 后台格式：[厨房编号,"菜品名称",菜品编号,"菜品拼音","￥菜品单价",特,荐,停,送]
+							// 格式：[菜名，菜名编号，菜名拼音，单价，厨房编号,特,荐,停,送,時]
+							// 后台格式：[厨房编号,"菜品名称",菜品编号,"菜品拼音","￥菜品单价",特,荐,停,送,時]
 							// 前后台格式有差异，厨房编号前台存储放在最后一位
 							dishesDisplayData.push([
 									menuInfo[1].substr(1,
@@ -379,7 +390,8 @@ function orderedMenuOnLoad() {
 									menuInfo[5], // 特
 									menuInfo[6], // 荐
 									menuInfo[7], // 停
-									menuInfo[8] // 送
+									menuInfo[8], // 送
+									menuInfo[9] // 時
 							]);
 						}
 						// 根据“特荐停”重新写菜名
@@ -404,6 +416,11 @@ function orderedMenuOnLoad() {
 								dishesDisplayData[i][0] = dishesDisplayData[i][0]
 										+ "<img src='../images/forFree.png'></img>";
 							}
+							if (dishesDisplayData[i][9] == "true") {
+								// 時
+								dishesDisplayData[i][0] = dishesDisplayData[i][0]
+										+ "<img src='../images/currPrice.png'></img>";
+							}
 						}
 						for ( var i = 0; i < dishesDisplayData.length; i++) {
 							dishesDisplayDataShow.push([
@@ -415,7 +432,8 @@ function orderedMenuOnLoad() {
 									dishesDisplayData[i][5],
 									dishesDisplayData[i][6],
 									dishesDisplayData[i][7],
-									dishesDisplayData[i][8] ]);
+									dishesDisplayData[i][8],
+									dishesDisplayData[i][9] ]);
 						}
 						dishesDisplayStore.reload();
 					}

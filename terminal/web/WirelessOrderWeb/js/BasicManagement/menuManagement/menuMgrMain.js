@@ -198,6 +198,8 @@ menuStatWin = new Ext.Window(
 							.getValue();
 					var in_isStop = menuQueryCondPanel.findById("stopCheckbox")
 							.getValue();
+					var in_isCurrPrice = menuQueryCondPanel.findById(
+							"currPriceCheckbox").getValue();
 
 					// 输入查询条件参数
 					Ext.Ajax.request({
@@ -211,6 +213,7 @@ menuStatWin = new Ext.Window(
 							"isRecommend" : in_isRecommend,
 							"isFree" : in_isFree,
 							"isStop" : in_isStop,
+							"isCurrPrice" : in_isCurrPrice,
 							"isPaging" : false
 						},
 						success : function(response, options) {
@@ -415,7 +418,7 @@ var kitchenTypeStoreMA = new Ext.data.Store({
 var kitchenTypeCombMA = new Ext.form.ComboBox({
 	fieldLabel : "厨房",
 	forceSelection : true,
-	width : 220,
+	width : 180,
 	// value : kitchenTypeData[0][1],
 	id : "kitchenTypeCombMA",
 	store : kitchenTypeStoreMA,
@@ -432,8 +435,8 @@ menuAddWin = new Ext.Window(
 		{
 			layout : "fit",
 			title : "添加新菜",
-			width : 315,
-			height : 235,
+			width : 245,
+			height : 245,
 			closeAction : "hide",
 			resizable : false,
 			items : [ {
@@ -447,25 +450,25 @@ menuAddWin = new Ext.Window(
 					fieldLabel : "编号",
 					id : "menuAddNumber",
 					allowBlank : false,
-					width : 220
+					width : 180
 				}, {
 					xtype : "textfield",
 					fieldLabel : "菜名",
 					id : "menuAddName",
 					allowBlank : false,
-					width : 220
+					width : 180
 				}, {
 					xtype : "textfield",
 					fieldLabel : "拼音",
 					id : "menuAddSpill",
 					allowBlank : false,
-					width : 220
+					width : 180
 				}, {
 					xtype : "numberfield",
 					fieldLabel : "价格",
 					id : "menuAddPrice",
 					allowBlank : false,
-					width : 220
+					width : 180
 				}, kitchenTypeCombMA, {
 					layout : "column",
 					border : false,
@@ -514,6 +517,17 @@ menuAddWin = new Ext.Window(
 							id : "stopCheckboxMA",
 							fieldLabel : "停售"
 						} ]
+					}, {
+						layout : "form",
+						border : false,
+						labelSeparator : '',
+						width : 70,
+						labelWidth : 30,
+						items : [ {
+							xtype : "checkbox",
+							id : "currPriceCheckboxMA",
+							fieldLabel : "时价"
+						} ]
 					} ]
 				} ]
 			} ],
@@ -554,6 +568,8 @@ menuAddWin = new Ext.Window(
 											"freeCheckboxMA").getValue();
 									var isStop = menuAddWin.findById(
 											"stopCheckboxMA").getValue();
+									var isCurrPrice = menuAddWin.findById(
+											"currPriceCheckboxMA").getValue();
 
 									var isDuplicate = false;
 									for ( var i = 0; i < dishMultSelectData.length; i++) {
@@ -579,7 +595,8 @@ menuAddWin = new Ext.Window(
 														"isSpecial" : isSpecial,
 														"isRecommend" : isRecommend,
 														"isFree" : isFree,
-														"isStop" : isStop
+														"isStop" : isStop,
+														"isCurrPrice" : isCurrPrice
 													},
 													success : function(
 															response, options) {
@@ -665,6 +682,7 @@ menuAddWin = new Ext.Window(
 					menuAddWin.findById("recommendCheckboxMA").setValue(false);
 					menuAddWin.findById("freeCheckboxMA").setValue(false);
 					menuAddWin.findById("stopCheckboxMA").setValue(false);
+					menuAddWin.findById("currPriceCheckboxMA").setValue(false);
 
 					var f = Ext.get("menuAddNumber");
 					f.focus.defer(100, f); // 为什么这样才可以！？！？
@@ -694,7 +712,7 @@ var kitchenTypeStoreMM = new Ext.data.Store({
 var kitchenTypeCombMM = new Ext.form.ComboBox({
 	fieldLabel : "厨房",
 	forceSelection : true,
-	width : 220,
+	width : 180,
 	// value : kitchenTypeData[0][1],
 	id : "kitchenTypeCombMM",
 	store : kitchenTypeStoreMM,
@@ -711,8 +729,8 @@ menuModifyWin = new Ext.Window(
 		{
 			layout : "fit",
 			title : "修改菜谱",
-			width : 315,
-			height : 235,
+			width : 245,
+			height : 245,
 			closeAction : "hide",
 			resizable : false,
 			items : [ {
@@ -725,25 +743,25 @@ menuModifyWin = new Ext.Window(
 					fieldLabel : "编号",
 					id : "menuModNumber",
 					disabled : true,
-					width : 220
+					width : 180
 				}, {
 					xtype : "textfield",
 					fieldLabel : "菜名",
 					id : "menuModName",
 					allowBlank : false,
-					width : 220
+					width : 180
 				}, {
 					xtype : "textfield",
 					fieldLabel : "拼音",
 					id : "menuModSpill",
 					allowBlank : false,
-					width : 220
+					width : 180
 				}, {
 					xtype : "numberfield",
 					fieldLabel : "价格",
 					id : "menuModPrice",
 					allowBlank : false,
-					width : 220
+					width : 180
 				}, kitchenTypeCombMM, {
 					layout : "column",
 					border : false,
@@ -792,6 +810,17 @@ menuModifyWin = new Ext.Window(
 							id : "stopCheckboxMM",
 							fieldLabel : "停售"
 						} ]
+					}, {
+						layout : "form",
+						border : false,
+						labelSeparator : '',
+						width : 70,
+						labelWidth : 30,
+						items : [ {
+							xtype : "checkbox",
+							id : "currPriceCheckboxMM",
+							fieldLabel : "时价"
+						} ]
 					} ]
 				} ]
 			} ],
@@ -833,6 +862,8 @@ menuModifyWin = new Ext.Window(
 										"freeCheckboxMM").getValue();
 								var isStop = menuModifyWin.findById(
 										"stopCheckboxMM").getValue();
+								var isCurrPrice = menuModifyWin.findById(
+										"currPriceCheckboxMM").getValue();
 
 								Ext.Ajax
 										.request({
@@ -847,7 +878,8 @@ menuModifyWin = new Ext.Window(
 												"isSpecial" : isSpecial,
 												"isRecommend" : isRecommend,
 												"isFree" : isFree,
-												"isStop" : isStop
+												"isStop" : isStop,
+												"isCurrPrice" : isCurrPrice
 											},
 											success : function(response,
 													options) {
@@ -1179,6 +1211,17 @@ var menuQueryCondPanel = new Ext.form.FormPanel({
 				fieldLabel : "停售"
 			} ]
 		}, {
+			layout : "form",
+			border : false,
+			labelSeparator : '',
+			width : 70,
+			labelWidth : 30,
+			items : [ {
+				xtype : "checkbox",
+				id : "currPriceCheckbox",
+				fieldLabel : "时价"
+			} ]
+		}, {
 			layout : 'form',
 			border : false,
 			width : 70,
@@ -1226,6 +1269,8 @@ function dishModifyHandler(rowIndex) {
 			currRecord.get("recommend"));
 	menuModifyWin.findById("freeCheckboxMM").setValue(currRecord.get("free"));
 	menuModifyWin.findById("stopCheckboxMM").setValue(currRecord.get("stop"));
+	menuModifyWin.findById("currPriceCheckboxMM").setValue(
+			currRecord.get("currPrice"));
 
 	if (!isPrompt) {
 		isPrompt = true;
@@ -1300,7 +1345,7 @@ function menuDishOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
 };
 
 // 1，表格的数据store
-// 编号，名称，拼音，价格，厨房打印，操作，特,荐,停,送
+// 编号，名称，拼音，价格，厨房打印，操作，特,荐,停,送,時
 var menuStore = new Ext.data.Store({
 	proxy : new Ext.data.HttpProxy({
 		url : "../../QueryMenuMgr.do"
@@ -1334,6 +1379,8 @@ var menuStore = new Ext.data.Store({
 		name : "stop"
 	}, {
 		name : "free"
+	}, {
+		name : "currPrice"
 	}, {
 		name : "message"
 	} ])
@@ -1760,6 +1807,9 @@ Ext
 										"freeCheckbox").getValue();
 								var in_isStop = menuQueryCondPanel.findById(
 										"stopCheckbox").getValue();
+								var in_isCurrPrice = menuQueryCondPanel
+										.findById("currPriceCheckbox")
+										.getValue();
 
 								// 输入查询条件参数
 								this.baseParams = {
@@ -1771,6 +1821,7 @@ Ext
 									"isRecommend" : in_isRecommend,
 									"isFree" : in_isFree,
 									"isStop" : in_isStop,
+									"isCurrPrice" : in_isCurrPrice,
 									"isPaging" : true
 								};
 
@@ -1847,6 +1898,15 @@ Ext
 																				record
 																						.get("dishNameDisplay")
 																						+ "<img src='../../images/forFree.png'></img>");
+															}
+															if (record
+																	.get("currPrice") == true) {
+																record
+																		.set(
+																				"dishNameDisplay",
+																				record
+																						.get("dishNameDisplay")
+																						+ "<img src='../../images/currPrice.png'></img>");
 															}
 
 															// 提交，去掉修改標記

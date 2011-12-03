@@ -1634,14 +1634,13 @@ var dishesDisplayGrid = new Ext.grid.GridPanel({
 				}
 
 				if (isAlreadyOrderd == false) {
-					orderedData
-							.push([ dishCurrName, "无口味", 1, dishCurrPrice, "",
-									dishCurrPrice, dishNbr, kitchenNbr, 0,
-									dishesDisplayDataShow[rowIndex][5],
-									dishesDisplayDataShow[rowIndex][6],
-									dishesDisplayDataShow[rowIndex][7],
-									dishesDisplayDataShow[rowIndex][8], "￥0",
-									0, 0, "2" ]);
+					orderedData.push([ dishCurrName, "无口味", 1, dishCurrPrice,
+							"", dishCurrPrice, dishNbr, kitchenNbr, 0,
+							dishesDisplayDataShow[rowIndex][5],
+							dishesDisplayDataShow[rowIndex][6],
+							dishesDisplayDataShow[rowIndex][7],
+							dishesDisplayDataShow[rowIndex][8], "￥0", 0, 0,
+							"2", dishesDisplayDataShow[rowIndex][9] ]);
 				}
 				orderedStore.reload();
 				// 底色处理，已点菜式原色底色
@@ -1817,7 +1816,8 @@ var dishesDisplayTabPanel = new Ext.TabPanel({
 						dishesDisplayData[i][1], dishesDisplayData[i][2],
 						dishesDisplayData[i][3], dishesDisplayData[i][4],
 						dishesDisplayData[i][5], dishesDisplayData[i][6],
-						dishesDisplayData[i][7] ]);
+						dishesDisplayData[i][7],dishesDisplayData[i][8],
+						dishesDisplayData[i][9] ]);
 			}
 			dishesDisplayStore.reload();
 

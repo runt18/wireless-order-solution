@@ -10,7 +10,8 @@ var dishKeyboardSelect = function(relateItemId) {
 						dishesDisplayData[i][1], dishesDisplayData[i][2],
 						dishesDisplayData[i][3], dishesDisplayData[i][4],
 						dishesDisplayData[i][5], dishesDisplayData[i][6],
-						dishesDisplayData[i][7], dishesDisplayData[i][8] ]);
+						dishesDisplayData[i][7], dishesDisplayData[i][8],
+						dishesDisplayData[i][9] ]);
 			}
 		} else {
 			dishesDisplayDataShow.length = 0;
@@ -21,7 +22,8 @@ var dishKeyboardSelect = function(relateItemId) {
 							dishesDisplayData[i][1], dishesDisplayData[i][2],
 							dishesDisplayData[i][3], dishesDisplayData[i][4],
 							dishesDisplayData[i][5], dishesDisplayData[i][6],
-							dishesDisplayData[i][7], dishesDisplayData[i][8] ]);
+							dishesDisplayData[i][7], dishesDisplayData[i][8],
+							dishesDisplayData[i][9] ]);
 				}
 			}
 		}
@@ -30,17 +32,7 @@ var dishKeyboardSelect = function(relateItemId) {
 	}
 };
 
-// on page load function
-function billModifyOnLoad() {
-
-	// update the operator name
-	getOperatorName(pin, "../");
-
-	// keyboard input dish number
-	$("#orderNbr").bind("keyup", function() {
-		dishKeyboardSelect("orderNbr");
-	});
-
+function dishSpellOnLoad(){
 	// keyboard input dish spell
 	$("#orderSpell")
 			.bind(
@@ -61,7 +53,8 @@ function billModifyOnLoad() {
 										dishesDisplayData[i][5],
 										dishesDisplayData[i][6],
 										dishesDisplayData[i][7],
-										dishesDisplayData[i][8] ]);
+										dishesDisplayData[i][8],
+										dishesDisplayData[i][9] ]);
 							}
 						} else {
 							dishesDisplayDataShow.length = 0;
@@ -77,12 +70,25 @@ function billModifyOnLoad() {
 											dishesDisplayData[i][5],
 											dishesDisplayData[i][6],
 											dishesDisplayData[i][7],
-											dishesDisplayData[i][8] ]);
+											dishesDisplayData[i][8],
+											dishesDisplayData[i][9] ]);
 								}
 							}
 						}
 						dishesDisplayStore.reload();
 					});
+}
+
+// on page load function
+function billModifyOnLoad() {
+
+	// update the operator name
+	getOperatorName(pin, "../");
+
+	// keyboard input dish number
+	$("#orderNbr").bind("keyup", function() {
+		dishKeyboardSelect("orderNbr");
+	});
 
 	// update table status
 	// 对"拼台""外卖"，台号特殊处理
@@ -112,8 +118,8 @@ function billModifyOnLoad() {
 	// .setTitle("<div style='font-size:18px;padding-left:2px'>帐单修改<div>");
 
 	// 已点菜式查询
-	// 格式：[菜名，口味，数量，￥单价，操作，￥实价，菜名编号，厨房编号，口味编号1,特,荐,停,送,折扣率,￥口味价钱,口味编号2,口味编号3]
-	// 后台：["菜名",菜名编号,厨房编号,"口味",口味编号,数量,￥单价,是否特价,是否推荐,是否停售,是否赠送,折扣率,口味编号2,口味编号3,￥口味价钱]
+	// 格式：[菜名，口味，数量，￥单价，操作，￥实价，菜名编号，厨房编号，口味编号1,特,荐,停,送,折扣率,￥口味价钱,口味编号2,口味编号3,時]
+	// 后台：["菜名",菜名编号,厨房编号,"口味",口味编号,数量,￥单价,是否特价,是否推荐,是否停售,是否赠送,折扣率,口味编号2,口味编号3,￥口味价钱,時]
 	Ext.Ajax
 			.request({
 				url : "../QueryOrder.do",
@@ -160,7 +166,8 @@ function billModifyOnLoad() {
 										orderInfo[11], // 折扣率
 										tastePrice,// 口味价钱
 										orderInfo[12],// 口味编号2
-										orderInfo[13] // 口味编号3
+										orderInfo[13], // 口味编号3
+										orderInfo[15] // 時
 								]);
 							}
 
@@ -185,6 +192,11 @@ function billModifyOnLoad() {
 									// 送
 									orderedData[i][0] = orderedData[i][0]
 											+ "<img src='../images/forFree.png'></img>";
+								}
+								if (orderedData[i][17] == "true") {
+									// 時
+									orderedData[i][0] = orderedData[i][0]
+											+ "<img src='../images/currPrice.png'></img>";
 								}
 							}
 
@@ -353,8 +365,8 @@ function orderedMenuOnLoad() {
 						for ( var i = 0; i < menuList.length; i++) {
 							var menuInfo = menuList[i].substr(1,
 									menuList[i].length - 2).split(",");
-							// 格式：[菜名，菜名编号，菜名拼音，单价，厨房编号,特,荐,停,送]
-							// 后台格式：[厨房编号,"菜品名称",菜品编号,"菜品拼音","￥菜品单价",特,荐,停,送]
+							// 格式：[菜名，菜名编号，菜名拼音，单价，厨房编号,特,荐,停,送,時]
+							// 后台格式：[厨房编号,"菜品名称",菜品编号,"菜品拼音","￥菜品单价",特,荐,停,送,時]
 							// 前后台格式有差异，厨房编号前台存储放在最后一位
 							dishesDisplayData.push([
 									menuInfo[1].substr(1,
@@ -368,7 +380,8 @@ function orderedMenuOnLoad() {
 									menuInfo[5], // 特
 									menuInfo[6], // 荐
 									menuInfo[7], // 停
-									menuInfo[8] // 送
+									menuInfo[8], // 送
+									menuInfo[9] // 時
 							]);
 						}
 						// 根据“特荐停”重新写菜名
@@ -393,6 +406,11 @@ function orderedMenuOnLoad() {
 								dishesDisplayData[i][0] = dishesDisplayData[i][0]
 										+ "<img src='../images/forFree.png'></img>";
 							}
+							if (dishesDisplayData[i][9] == "true") {
+								// 時
+								dishesDisplayData[i][0] = dishesDisplayData[i][0]
+										+ "<img src='../images/currPrice.png'></img>";
+							}
 						}
 						for ( var i = 0; i < dishesDisplayData.length; i++) {
 							dishesDisplayDataShow.push([
@@ -404,7 +422,8 @@ function orderedMenuOnLoad() {
 									dishesDisplayData[i][5],
 									dishesDisplayData[i][6],
 									dishesDisplayData[i][7],
-									dishesDisplayData[i][8] ]);
+									dishesDisplayData[i][8],
+									dishesDisplayData[i][9] ]);
 						}
 						dishesDisplayStore.reload();
 					}

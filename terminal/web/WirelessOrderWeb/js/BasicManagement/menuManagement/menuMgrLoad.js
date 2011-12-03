@@ -57,7 +57,7 @@ function loadAllDishes() {
 					var menuInfo = menuList[i]
 							.substr(1, menuList[i].length - 2).split(",");
 					// 格式：[菜品编号，菜品名称]
-					// 后台格式：[厨房编号,"菜品名称",菜品编号,"菜品拼音","￥菜品单价",特,荐,停,送]
+					// 后台格式：[厨房编号,"菜品名称",菜品编号,"菜品拼音","￥菜品单价",特,荐,停,送,時]
 					dishMultSelectData.push([ menuInfo[2],// 菜名编号
 					menuInfo[1].substr(1, menuInfo[1].length - 2) // 菜名
 					]);

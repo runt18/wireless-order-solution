@@ -133,7 +133,8 @@ var checkOurListRefresh = function() {
 					checkOutData[i][5],// 特
 					checkOutData[i][6],// 荐
 					checkOutData[i][7], // 停
-					checkOutData[i][8] // 送
+					checkOutData[i][8], // 送
+					checkOutData[i][11] // 時
 			]);
 		} else {
 			checkOutDataDisplay.push([ checkOutData[i][1], checkOutData[i][2],
@@ -142,7 +143,8 @@ var checkOurListRefresh = function() {
 					checkOutData[i][5],// 特
 					checkOutData[i][6],// 荐
 					checkOutData[i][7], // 停
-					checkOutData[i][8] // 送
+					checkOutData[i][8], // 送
+					checkOutData[i][11] // 時
 			]);
 		}
 	}
@@ -168,6 +170,11 @@ var checkOurListRefresh = function() {
 			// 送
 			checkOutDataDisplay[i][0] = checkOutDataDisplay[i][0]
 					+ "<img src='../images/forFree.png'></img>";
+		}
+		if (checkOutDataDisplay[i][10] == "true") {
+			// 時
+			checkOutDataDisplay[i][0] = checkOutDataDisplay[i][0]
+					+ "<img src='../images/currPrice.png'></img>";
 		}
 	}
 

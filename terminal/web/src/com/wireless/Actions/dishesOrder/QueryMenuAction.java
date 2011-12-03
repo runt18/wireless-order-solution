@@ -121,9 +121,9 @@ public class QueryMenuAction extends Action {
 			for (int i = 0; i < foods.length; i++) {
 				/**
 				 * The json format to each food item looks like below.
-				 * [厨房编号,"菜品名称",菜品编号,"菜品拼音","￥菜品单价",是否特价,是否推荐,是否停售,是否赠送]
+				 * [厨房编号,"菜品名称",菜品编号,"菜品拼音","￥菜品单价",是否特价,是否推荐,是否停售,是否赠送,是否時價]
 				 */
-				String jsonFood = "[$(kitchen_id),\"$(name)\",$(alias_id),\"$(pinyin)\",\"$(unit)\",$(special),$(recommend),$(soldout),$(gift)]";
+				String jsonFood = "[$(kitchen_id),\"$(name)\",$(alias_id),\"$(pinyin)\",\"$(unit)\",$(special),$(recommend),$(soldout),$(gift),$(currPrice)]";
 				jsonFood = jsonFood.replace("$(kitchen_id)", new Short(foods[i].kitchen).toString());
 				jsonFood = jsonFood.replace("$(name)", foods[i].name);
 				jsonFood = jsonFood.replace("$(alias_id)", new Integer(foods[i].alias_id).toString());
@@ -133,6 +133,7 @@ public class QueryMenuAction extends Action {
 				jsonFood = jsonFood.replace("$(recommend)", foods[i].isRecommend() ? "true" : "false");
 				jsonFood = jsonFood.replace("$(soldout)", foods[i].isSellOut() ? "true" : "false");
 				jsonFood = jsonFood.replace("$(gift)", foods[i].isGift() ? "true" : "false");
+				jsonFood = jsonFood.replace("$(currPrice)", foods[i].isCurPrice() ? "true" : "false");
 				// put each json food info to the value
 				value.append(jsonFood);
 				// the string is separated by comma

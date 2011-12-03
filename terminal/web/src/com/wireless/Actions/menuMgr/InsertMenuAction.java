@@ -58,6 +58,7 @@ public class InsertMenuAction extends Action {
 			byte RECOMMEND = 0x02;	/* 推荐 */ 
 			byte SELL_OUT = 0x04;	/* 售完 */
 			byte GIFT = 0x08;		/* 赠送 */
+			byte CUR_PRICE = 0x10;	/* 时价 */
 			
 			String pin = request.getParameter("pin");
 			if (pin.startsWith("0x") || pin.startsWith("0X")) {
@@ -79,7 +80,7 @@ public class InsertMenuAction extends Action {
 			String isRecommend = request.getParameter("isRecommend");
 			String isFree = request.getParameter("isFree");
 			String isStop = request.getParameter("isStop");
-			
+			String isCurrPrice = request.getParameter("isCurrPrice");
 
 			
 			/**
@@ -97,6 +98,9 @@ public class InsertMenuAction extends Action {
 			};
 			if(isFree.equals("true")){
 				status |= GIFT;
+			};
+			if(isCurrPrice.equals("true")){ 
+				status |= CUR_PRICE;
 			};
 			
 			String sql = "INSERT INTO " + Params.dbName + ".food" +

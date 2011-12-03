@@ -20,12 +20,12 @@ function checkOutOnLoad() {
 	}
 
 	// 2,get the ordered dishes and discount
-	// checkOutData [ 厨房编号,"菜名", "口味", 数量, "实价",特,荐,停,送 ,口味价钱,单价]
+	// checkOutData [ 厨房编号,"菜名", "口味", 数量, "实价",特,荐,停,送 ,口味价钱,单价,時]
 	// 后台已点菜式
-	// ["菜名",菜名编号,厨房编号,"口味",口味编号,数量,单价,是否特价,是否推荐,是否停售,是否赠送,折扣率,口味编号2,口味编号3,口味价钱]
+	// ["菜名",菜名编号,厨房编号,"口味",口味编号,数量,单价,是否特价,是否推荐,是否停售,是否赠送,折扣率,口味编号2,口味编号3,口味价钱,時]
 	// discountData [厨房编号,一般折扣1,一般折扣2,一般折扣3,会员折扣1,会员折扣2,会员折扣3]
 	// 后台折扣率 [厨房编号,"厨房名称",一般折扣1,一般折扣2,一般折扣3,会员折扣1,会员折扣2,会员折扣3]
-	// checkOutDataDisplay ["菜名", "口味", 数量, "单价" ,"折扣率","实价",特,荐,停,送]
+	// checkOutDataDisplay ["菜名", "口味", 数量, "单价" ,"折扣率","实价",特,荐,停,送,時]
 	Ext.Ajax
 			.request({
 				url : "../QueryOrder.do",
@@ -62,7 +62,8 @@ function checkOutOnLoad() {
 							orderInfo[9], // 停
 							orderInfo[10], // 送
 							orderInfo[14].substr(2, orderInfo[14].length - 3),// 口味价钱
-							orderInfo[6].substr(2, orderInfo[6].length - 3) // 单价
+							orderInfo[6].substr(2, orderInfo[6].length - 3), // 单价
+							orderInfo[15] // 送
 							]);
 						}
 
@@ -232,7 +233,8 @@ function checkOutOnLoad() {
 																						checkOutData[i][5],// 特
 																						checkOutData[i][6],// 荐
 																						checkOutData[i][7], // 停
-																						checkOutData[i][8] // 送
+																						checkOutData[i][8], // 送
+																						checkOutData[i][11] // 時
 																				]);
 																	} else {
 																		checkOutDataDisplay
@@ -249,7 +251,8 @@ function checkOutOnLoad() {
 																						checkOutData[i][5],// 特
 																						checkOutData[i][6],// 荐
 																						checkOutData[i][7], // 停
-																						checkOutData[i][8] // 送
+																						checkOutData[i][8], // 送
+																						checkOutData[i][11] // 時
 																				]);
 																	}
 																}
@@ -274,6 +277,11 @@ function checkOutOnLoad() {
 																		// 送
 																		checkOutDataDisplay[i][0] = checkOutDataDisplay[i][0]
 																				+ "<img src='../images/forFree.png'></img>";
+																	}
+																	if (checkOutDataDisplay[i][10] == "true") {
+																		// 時
+																		checkOutDataDisplay[i][0] = checkOutDataDisplay[i][0]
+																				+ "<img src='../images/currPrice.png'></img>";
 																	}
 																}
 

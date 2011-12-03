@@ -211,7 +211,7 @@ var viewBillWin = new Ext.Window(
 					document.getElementById("actrualPayBV").innerHTML = "￥"
 							+ billAvtrualPay;
 
-					// 后台：["菜名",菜名编号,厨房编号,"口味",口味编号,数量,￥单价,是否特价,是否推荐,是否停售,是否赠送,折扣率,口味编号2,口味编号3,￥口味价钱]
+					// 后台：["菜名",菜名编号,厨房编号,"口味",口味编号,数量,￥单价,是否特价,是否推荐,是否停售,是否赠送,折扣率,口味编号2,口味编号3,￥口味价钱,是否時價]
 					Ext.Ajax
 							.request({
 								url : "../QueryOrder.do",
