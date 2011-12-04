@@ -950,7 +950,7 @@ var orderStatiBut = new Ext.ux.ImageButton({
 });
 
 var dishAddBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/menuDishAdd.png",
+	imgPath : "../../images/material_add.png",
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : "添加新菜",

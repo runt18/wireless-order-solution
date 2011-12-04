@@ -165,7 +165,7 @@ supplierAddWin = new Ext.Window({
 
 // --------------------------------------------------------------------------
 var supplierAddBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/dishAdd.png",
+	imgPath : "../../images/material_add.png",
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : "添加供应商",
