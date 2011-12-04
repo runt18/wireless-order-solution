@@ -2889,7 +2889,7 @@ inventoryChangeStatWin = new Ext.Window(
 		{
 			title : "调拨统计",
 			width : 450,
-			height : 430,
+			height : 460,
 			closeAction : "hide",
 			resizable : false,
 			layout : "anchor",
@@ -2929,8 +2929,9 @@ inventoryChangeStatWin = new Ext.Window(
 				} ]
 			}, {
 				layout : "column",
+				title:"调出部门",
 				border : false,
-				anchor : "99% 15%",
+				anchor : "99% 20%",
 				autoScroll : true,
 				frame : true,
 				items : [ {
@@ -3046,8 +3047,9 @@ inventoryChangeStatWin = new Ext.Window(
 				} ]
 			}, {
 				layout : "column",
+				title:"调入部门",
 				border : false,
-				anchor : "99% 15%",
+				anchor : "99% 20%",
 				autoScroll : true,
 				frame : true,
 				items : [ {
@@ -3166,7 +3168,7 @@ inventoryChangeStatWin = new Ext.Window(
 				border : false,
 				frame : true,
 				hideLabels : true,
-				anchor : "right 51%",
+				anchor : "right 42%",
 				items : [ {
 					xtype : "itemselector",
 					name : "materialChangeStatMultSelect",
@@ -3174,7 +3176,7 @@ inventoryChangeStatWin = new Ext.Window(
 					fromStore : inventoryChangeStatMSDS,
 					dataFields : [ "retrunValue", "displayText" ],
 					toData : [ [ "", "" ] ],
-					msHeight : 155,
+					msHeight : 140,
 					valueField : "retrunValue",
 					displayField : "displayText",
 					imagePath : "../../extjs/multiselect/images/",
