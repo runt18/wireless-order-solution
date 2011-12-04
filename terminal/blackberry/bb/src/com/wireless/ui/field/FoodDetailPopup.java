@@ -56,6 +56,9 @@ public class FoodDetailPopup extends PopupScreen {
 		if(selectedFood.isSellOut()){
 			foodProperty = (foodProperty == null ? "停" : (foodProperty + "," + "停"));
 		}
+		if(selectedFood.isCurPrice()){
+			foodProperty = (foodProperty == null ? "时" : (foodProperty + "," + "时"));
+		}
 		if(foodProperty != null){
 			add(new LabelField("属性：" + foodProperty));
 		}

@@ -82,7 +82,8 @@ public class RemoveTastePopup extends PopupScreen {
 				if(resp == Dialog.YES){
 					
 					_selectedFood.removeTaste(_tastes[getSelectedIndex()]);
-					_orderField.invalidate(_orderField.getSelectedIndex());
+					//_orderField.setSize(_orderField.getSize(), _orderField.getSelectedIndex());
+					_orderField.invalid(_selectedFood);
 					
 					/**
 					 * Redraw the remove taste pop up screen after removing the taste

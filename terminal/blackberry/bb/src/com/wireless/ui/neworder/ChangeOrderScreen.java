@@ -226,7 +226,11 @@ public class ChangeOrderScreen extends MainScreen implements PostSubmitOrder{
 							OrderFood newFood = (OrderFood)_newListField.getCallback().get(null, j);
 							if(originalFood.equals(newFood)){
 								int count = Util.float2Int(originalFood.getCount()) + Util.float2Int(newFood.getCount());
-								originalFood.setCount(Util.int2Float(count));
+								if(count / 100 > 255){
+									originalFood.setCount(new Float(255));
+								}else{
+									originalFood.setCount(Util.int2Float(count));
+								}
 								break;
 							}
 						}

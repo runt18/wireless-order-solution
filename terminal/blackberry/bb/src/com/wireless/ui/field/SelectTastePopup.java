@@ -132,7 +132,8 @@ public class SelectTastePopup extends PopupScreen{
 						if(tastePos < 0){
 							Dialog.alert("最多只能添加" + _selectedFood.tastes.length + "个口味");
 						}
-						_orderListField.invalidate(_orderListField.getSelectedIndex());						
+						//_orderListField.setSize(_orderListField.getSize(), _orderListField.getSelectedIndex());
+						_orderListField.invalid(_selectedFood);
 					}
 				}
 				
