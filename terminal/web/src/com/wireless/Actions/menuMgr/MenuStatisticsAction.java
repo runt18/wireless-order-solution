@@ -121,7 +121,8 @@ public class MenuStatisticsAction extends Action {
 			condition = condition + " AND C.restaurant_id =  "
 					+ term.restaurant_id;
 
-			String orderClause = " ORDER BY D.food_id DESC, D.pay_date ";
+			//String orderClause = " ORDER BY D.food_id DESC, D.pay_date ";
+			String orderClause = " ORDER BY D.food_id ASC, D.pay_date ";
 
 			OrderFoodReflector foodRef = new OrderFoodReflector();
 			OrderFood orderFoods[] = foodRef.getDetailHistory(dbCon, condition,
