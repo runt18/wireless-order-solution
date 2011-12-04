@@ -119,7 +119,7 @@ public class QueryMenuMgrAction extends Action {
 				filterCondition = " AND alias_id " + ope + filterVal;
 			} else if (type == 2) {
 				// 按名称
-				filterCondition = " AND name like '" + filterVal + "%'";
+				filterCondition = " AND name like '%" + filterVal + "%'";
 			} else if (type == 3) {
 				// 按拼音
 				filterCondition = " AND pinyin like '" + filterVal + "%'";
