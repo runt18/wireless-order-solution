@@ -137,10 +137,10 @@ public class StatInventoryOutDetail extends Action {
 
 				resultList.add(resultMap);
 
-				allTotalCount = (float) Math.round((allTotalCount + dbCon.rs
-						.getFloat("total")) * 100) / 100;
-				allTotalAmount = (float) Math.round((allTotalAmount + dbCon.rs
-						.getFloat("amount")) * 100) / 100;
+				allTotalCount = (float) Math.round((allTotalCount + (-1)
+						* dbCon.rs.getFloat("total")) * 100) / 100;
+				allTotalAmount = (float) Math.round((allTotalAmount + (-1)
+						* dbCon.rs.getFloat("amount")) * 100) / 100;
 
 			}
 
@@ -182,11 +182,11 @@ public class StatInventoryOutDetail extends Action {
 			} else {
 
 				DecimalFormat fnum = new DecimalFormat("##0.00");
-				String totalPriceDiaplay = fnum.format((-1) * allTotalCount);
+				String totalPriceDiaplay = fnum.format(allTotalCount);
 				HashMap resultMap = new HashMap();
 				resultMap.put("materialID", "SUM");
 				resultMap.put("price", "汇总");
-				resultMap.put("amount", (-1) * allTotalAmount);
+				resultMap.put("amount", allTotalAmount);
 				resultMap.put("total", totalPriceDiaplay);
 				resultMap.put("message", "normal");
 				resultList.add(resultMap);

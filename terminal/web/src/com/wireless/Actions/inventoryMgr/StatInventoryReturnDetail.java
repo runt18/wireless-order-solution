@@ -130,17 +130,17 @@ public class StatInventoryReturnDetail extends Action {
 				resultMap.put("operator", dbCon.rs.getString("staff"));
 				resultMap.put("departmentID", dbCon.rs.getInt("dept_id"));
 				resultMap.put("price", dbCon.rs.getFloat("price"));
-				resultMap.put("amount", (-1)*dbCon.rs.getFloat("amount"));
-				resultMap.put("total", (-1)*dbCon.rs.getFloat("total"));
+				resultMap.put("amount", (-1) * dbCon.rs.getFloat("amount"));
+				resultMap.put("total", (-1) * dbCon.rs.getFloat("total"));
 
 				resultMap.put("message", "normal");
 
 				resultList.add(resultMap);
 
-				allTotalCount = (float) Math.round((allTotalCount + (-1)*dbCon.rs
-						.getFloat("total")) * 100) / 100;
-				allTotalAmount = (float) Math.round((allTotalAmount + (-1)*dbCon.rs
-						.getFloat("amount")) * 100) / 100;
+				allTotalCount = (float) Math.round((allTotalCount + (-1)
+						* dbCon.rs.getFloat("total")) * 100) / 100;
+				allTotalAmount = (float) Math.round((allTotalAmount + (-1)
+						* dbCon.rs.getFloat("amount")) * 100) / 100;
 
 			}
 
