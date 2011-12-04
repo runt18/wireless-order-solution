@@ -436,7 +436,7 @@ menuAddWin = new Ext.Window(
 			layout : "fit",
 			title : "添加新菜",
 			width : 245,
-			height : 245,
+			height : 255,
 			closeAction : "hide",
 			resizable : false,
 			items : [ {
@@ -730,7 +730,7 @@ menuModifyWin = new Ext.Window(
 			layout : "fit",
 			title : "修改菜谱",
 			width : 245,
-			height : 245,
+			height : 255,
 			closeAction : "hide",
 			resizable : false,
 			items : [ {

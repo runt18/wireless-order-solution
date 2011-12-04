@@ -27,13 +27,13 @@ function loginOnLoad() {
 											$(this)
 													.stop()
 													.css("background",
-															"url(../../images/menu_select.png) no-repeat 50%");
+															"url(../../images/menuMgr_select.png) no-repeat 50%");
 										},
 										function() {
 											$(this)
 													.stop()
 													.css("background",
-															"url(../../images/menu.png) no-repeat 50%");
+															"url(../../images/menuMgr.png) no-repeat 50%");
 										});
 					});
 
@@ -46,13 +46,13 @@ function loginOnLoad() {
 											$(this)
 													.stop()
 													.css("background",
-															"url(../../images/bill_select.png) no-repeat 50%");
+															"url(../../images/kitchenMgr_select.png) no-repeat 50%");
 										},
 										function() {
 											$(this)
 													.stop()
 													.css("background",
-															"url(../../images/bill.png) no-repeat 50%");
+															"url(../../images/kitchenMgr.png) no-repeat 50%");
 										});
 					});
 
@@ -65,13 +65,13 @@ function loginOnLoad() {
 											$(this)
 													.stop()
 													.css("background",
-															"url(../../images/order_select.png) no-repeat 50%");
+															"url(../../images/departmentMgr_select.png) no-repeat 50%");
 										},
 										function() {
 											$(this)
 													.stop()
 													.css("background",
-															"url(../../images/order.png) no-repeat 50%");
+															"url(../../images/departmentMgr.png) no-repeat 50%");
 										});
 					});
 };

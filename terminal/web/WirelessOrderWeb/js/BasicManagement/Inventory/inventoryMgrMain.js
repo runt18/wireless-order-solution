@@ -1461,7 +1461,7 @@ materialAddWin = new Ext.Window(
 // --------------------------------------------------------------------------
 // 入库统计 出库统计 调拨统计 消耗统计 盘点统计 库存统计 添加食材
 var inStatBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/dishAdd.png",
+	imgPath : "../../images/inventory_in.png",
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : "入库统计",
@@ -1474,7 +1474,7 @@ var inStatBut = new Ext.ux.ImageButton({
 });
 
 var outStatBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/dishAdd.png",
+	imgPath : "../../images/inventory_out.png",
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : "出库统计",
@@ -1487,7 +1487,7 @@ var outStatBut = new Ext.ux.ImageButton({
 });
 
 var returnStatBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/dishAdd.png",
+	imgPath : "../../images/inventory_return.png",
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : "退货统计",
@@ -1500,7 +1500,7 @@ var returnStatBut = new Ext.ux.ImageButton({
 });
 
 var changeStatBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/dishAdd.png",
+	imgPath : "../../images/inventory_change.png",
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : "调拨统计",
@@ -1526,7 +1526,7 @@ var costStatBut = new Ext.ux.ImageButton({
 });
 
 var checkStatBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/dishAdd.png",
+	imgPath : "../../images/inventory_check.png",
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : "盘点统计",
@@ -1539,7 +1539,7 @@ var checkStatBut = new Ext.ux.ImageButton({
 });
 
 var inventoryStatBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/dishAdd.png",
+	imgPath : "../../images/inventory_all.png",
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : "库存统计",
@@ -1552,7 +1552,7 @@ var inventoryStatBut = new Ext.ux.ImageButton({
 });
 
 var materialAddBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/dishAdd.png",
+	imgPath : "../../images/material_add.png",
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : "添加食材",
