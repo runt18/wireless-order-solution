@@ -155,10 +155,13 @@ inventoryInWin = new Ext.Window(
 					inventoryInWin.findById("inventoryInCount").setValue("");
 					inventoryInWin.findById("inventoryInCount").clearInvalid();
 
-					inventoryInWin.findById("inventoryInPrice").setValue("");
+					inventoryInWin.findById("inventoryInPrice").setValue(
+							materialGrid.getStore().getAt(currRowIndex).get(
+									"price"));
 					inventoryInWin.findById("inventoryInPrice").clearInvalid();
 
-					inventoryInWin.findById("inventoryInDate").setValue("");
+					inventoryInWin.findById("inventoryInDate").setValue(
+							new Date());
 					inventoryInWin.findById("inventoryInDate").clearInvalid();
 
 					inventoryInWin.findById("inventoryInForm").remove(
