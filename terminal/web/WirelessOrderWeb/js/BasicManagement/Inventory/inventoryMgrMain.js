@@ -148,7 +148,7 @@ inventoryInWin = new Ext.Window(
 			listeners : {
 				"show" : function(thiz) {
 
-					inventoryInWin.setTitle("入库 -- "
+					inventoryInWin.setTitle("进货 -- "
 							+ materialGrid.getStore().getAt(currRowIndex).get(
 									"materialName"));
 
@@ -1464,7 +1464,7 @@ var inStatBut = new Ext.ux.ImageButton({
 	imgPath : "../../images/inventory_in.png",
 	imgWidth : 50,
 	imgHeight : 50,
-	tooltip : "入库统计",
+	tooltip : "进货统计",
 	handler : function(btn) {
 		if (!isPrompt) {
 			isPrompt = true;
@@ -1493,8 +1493,8 @@ var returnStatBut = new Ext.ux.ImageButton({
 	tooltip : "退货统计",
 	handler : function(btn) {
 		if (!isPrompt) {
-			 isPrompt = true;
-			 inventoryReturnStatWin.show();
+			isPrompt = true;
+			inventoryReturnStatWin.show();
 		}
 	}
 });
@@ -1843,13 +1843,13 @@ function materialDeleteHandler(rowIndex) {
 
 function materialOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
 	return "<center>" + "<a href=\"javascript:inHandler(" + rowIndex + ")\">"
-			+ "<img src='../../images/del.png'/>入库</a>"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-			+ "<a href=\"javascript:outHandler(" + rowIndex + ")\">"
-			+ "<img src='../../images/del.png'/>出库</a>"
+			+ "<img src='../../images/del.png'/>进货</a>"
 			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
 			+ "<a href=\"javascript:returnHandler(" + rowIndex + ")\">"
 			+ "<img src='../../images/del.png'/>退货</a>"
+			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+			+ "<a href=\"javascript:outHandler(" + rowIndex + ")\">"
+			+ "<img src='../../images/del.png'/>出库</a>"
 			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
 			+ "<a href=\"javascript:changeHandler(" + rowIndex + ")\">"
 			+ "<img src='../../images/del.png'/>调拨</a>"
@@ -2183,10 +2183,10 @@ Ext
 					items : [ inStatBut, {
 						text : "&nbsp;&nbsp;&nbsp;",
 						disabled : true
-					}, outStatBut, {
+					}, returnStatBut, {
 						text : "&nbsp;&nbsp;&nbsp;",
 						disabled : true
-					}, returnStatBut, {
+					}, outStatBut, {
 						text : "&nbsp;&nbsp;&nbsp;",
 						disabled : true
 					}, changeStatBut, {

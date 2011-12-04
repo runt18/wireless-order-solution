@@ -91,7 +91,7 @@ var inventoryInStatFrom = new Ext.form.FormPanel({
 
 inventoryInStatWin = new Ext.Window(
 		{
-			title : "入库统计",
+			title : "进货统计",
 			width : 450,
 			height : 430,
 			closeAction : "hide",
@@ -841,7 +841,7 @@ var inStatDetailResultGrid = new Ext.grid.GridPanel({
 });
 
 var inStatDetailResultWin = new Ext.Window({
-	title : "入库明细",
+	title : "进货明细",
 	width : 800,
 	height : 370,
 	closeAction : "hide",
@@ -1021,7 +1021,7 @@ var inStatByMateriaGrid = new Ext.grid.EditorGridPanel({
 // --------------------------------------------------------------------------------------------------------
 
 var inStatByMaterialResultWin = new Ext.Window({
-	title : "入库汇总-按食材",
+	title : "进货汇总-按食材",
 	width : 400,
 	height : 500,
 	closeAction : "hide",
@@ -1190,7 +1190,7 @@ var inStatByDeptGrid = new Ext.grid.EditorGridPanel({
 // --------------------------------------------------------------------------------------------------------
 
 var inStatByDeptResultWin = new Ext.Window({
-	title : "入库汇总-按部门",
+	title : "进货汇总-按部门",
 	width : 400,
 	height : 500,
 	closeAction : "hide",
@@ -1359,7 +1359,7 @@ var inStatBySupplierGrid = new Ext.grid.EditorGridPanel({
 // --------------------------------------------------------------------------------------------------------
 
 var inStatBySupplierResultWin = new Ext.Window({
-	title : "入库汇总-按供应商",
+	title : "进货汇总-按供应商",
 	width : 400,
 	height : 500,
 	closeAction : "hide",
@@ -7622,7 +7622,7 @@ var inventoryReturnStatFrom = new Ext.form.FormPanel({
 
 inventoryReturnStatWin = new Ext.Window(
 		{
-			title : "出货统计",
+			title : "退货统计",
 			width : 450,
 			height : 430,
 			closeAction : "hide",
@@ -8372,7 +8372,7 @@ var returnStatDetailResultGrid = new Ext.grid.GridPanel({
 });
 
 var returnStatDetailResultWin = new Ext.Window({
-	title : "出货明细",
+	title : "退货明细",
 	width : 800,
 	height : 370,
 	closeAction : "hide",
@@ -8542,7 +8542,7 @@ var returnStatByMateriaGrid = new Ext.grid.EditorGridPanel({
 //--------------------------------------------------------------------------------------------------------
 
 var returnStatByMaterialResultWin = new Ext.Window({
-	title : "出货汇总-按食材",
+	title : "退货汇总-按食材",
 	width : 400,
 	height : 500,
 	closeAction : "hide",
@@ -8711,7 +8711,7 @@ var returnStatByDeptGrid = new Ext.grid.EditorGridPanel({
 //--------------------------------------------------------------------------------------------------------
 
 var returnStatByDeptResultWin = new Ext.Window({
-	title : "出货汇总-按部门",
+	title : "退货汇总-按部门",
 	width : 400,
 	height : 500,
 	closeAction : "hide",
@@ -8880,7 +8880,7 @@ var returnStatBySupplierGrid = new Ext.grid.EditorGridPanel({
 //--------------------------------------------------------------------------------------------------------
 
 var returnStatBySupplierResultWin = new Ext.Window({
-	title : "出货汇总-按供应商",
+	title : "退货汇总-按供应商",
 	width : 400,
 	height : 500,
 	closeAction : "hide",
