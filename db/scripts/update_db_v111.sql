@@ -45,6 +45,7 @@ DROP TABLE IF EXISTS `wireless_order_db`.`material` ;
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`material` (
   `material_id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'the id to this material' ,
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'the id to related restaurant' ,
+  `cate_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the catagory alias id to this material' ,
   `material_alias` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the alias id to this material' ,
   `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to this material' ,
   `warning_threshold` FLOAT NOT NULL DEFAULT 0 COMMENT 'the warning threshold to this material' ,
@@ -59,6 +60,26 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`material` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the material information.' ;
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`material_cate`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`material_cate` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`material_cate` (
+  `cate_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 ,
+  `restaurant_id` INT UNSIGNED NOT NULL ,
+  `name` VARCHAR(45) NOT NULL DEFAULT '' ,
+  PRIMARY KEY (`cate_id`, `restaurant_id`) ,
+  INDEX `fk_material_cate_restaurant1` (`restaurant_id` ASC) ,
+  CONSTRAINT `fk_material_cate_restaurant1`
+    FOREIGN KEY (`restaurant_id` )
+    REFERENCES `wireless_order_db`.`restaurant` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the category of material' ;
 
 -- -----------------------------------------------------
 -- Table `wireless_order_db`.`material_dept`
@@ -216,6 +237,66 @@ SELECT id, 8, "部门8" FROM wireless_order_db.restaurant WHERE id > 10;
 -- -----------------------------------------------------
 INSERT INTO wireless_order_db.department(restaurant_id, dept_id, name)
 SELECT id, 9, "部门9" FROM wireless_order_db.restaurant WHERE id > 10;
+
+-- -----------------------------------------------------
+-- Insert a '种类1' to 'material_cate' for every restaurant
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.material_cate(restaurant_id, cate_id, name)
+SELECT id, 0, "种类1" FROM wireless_order_db.restaurant WHERE id > 10;
+
+-- -----------------------------------------------------
+-- Insert a '种类2' to 'material_cate' for every restaurant
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.material_cate(restaurant_id, cate_id, name)
+SELECT id, 1, "种类2" FROM wireless_order_db.restaurant WHERE id > 10;
+
+-- -----------------------------------------------------
+-- Insert a '种类3' to 'material_cate' for every restaurant
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.material_cate(restaurant_id, cate_id, name)
+SELECT id, 2, "种类3" FROM wireless_order_db.restaurant WHERE id > 10;
+
+-- -----------------------------------------------------
+-- Insert a '种类4' to 'material_cate' for every restaurant
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.material_cate(restaurant_id, cate_id, name)
+SELECT id, 3, "种类4" FROM wireless_order_db.restaurant WHERE id > 10;
+
+-- -----------------------------------------------------
+-- Insert a '种类5' to 'material_cate' for every restaurant
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.material_cate(restaurant_id, cate_id, name)
+SELECT id, 4, "种类2" FROM wireless_order_db.restaurant WHERE id > 10;
+
+-- -----------------------------------------------------
+-- Insert a '种类6' to 'material_cate' for every restaurant
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.material_cate(restaurant_id, cate_id, name)
+SELECT id, 5, "种类6" FROM wireless_order_db.restaurant WHERE id > 10;
+
+-- -----------------------------------------------------
+-- Insert a '种类7' to 'material_cate' for every restaurant
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.material_cate(restaurant_id, cate_id, name)
+SELECT id, 6, "种类7" FROM wireless_order_db.restaurant WHERE id > 10;
+
+-- -----------------------------------------------------
+-- Insert a '种类8' to 'material_cate' for every restaurant
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.material_cate(restaurant_id, cate_id, name)
+SELECT id, 7, "种类8" FROM wireless_order_db.restaurant WHERE id > 10;
+
+-- -----------------------------------------------------
+-- Insert a '种类9' to 'material_cate' for every restaurant
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.material_cate(restaurant_id, cate_id, name)
+SELECT id, 8, "种类9" FROM wireless_order_db.restaurant WHERE id > 10;
+
+-- -----------------------------------------------------
+-- Insert a '种类10' to 'material_cate' for every restaurant
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.material_cate(restaurant_id, cate_id, name)
+SELECT id, 9, "种类10" FROM wireless_order_db.restaurant WHERE id > 10;
 
 -- -----------------------------------------------------
 -- Add a 'restaurant_id' to table 'order_food'

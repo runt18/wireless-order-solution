@@ -147,7 +147,7 @@ INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region`, `restaurant
 COMMIT;
 
 -- -----------------------------------------------------
--- Insert super kitchen records, note that each restaruant has ten super kitchens
+-- Insert department records, note that each restaruant has ten department
 -- -----------------------------------------------------
 SET AUTOCOMMIT=0;
 INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`) VALUES (11, 0, '仓管部');
@@ -160,6 +160,23 @@ INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`
 INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`) VALUES (11, 7, '部门7');
 INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`) VALUES (11, 8, '部门8');
 INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`) VALUES (11, 9, '部门9');
+
+COMMIT;
+
+-- -----------------------------------------------------
+-- Insert material category records, note that each restaruant has ten material category
+-- -----------------------------------------------------
+SET AUTOCOMMIT=0;
+INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES (11, 0, '种类1');
+INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES (11, 1, '种类2');
+INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES (11, 2, '种类3');
+INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES (11, 3, '种类4');
+INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES (11, 4, '种类5');
+INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES (11, 5, '种类6');
+INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES (11, 6, '种类7');
+INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES (11, 7, '种类8');
+INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES (11, 8, '种类9');
+INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES (11, 9, '种类10');
 
 COMMIT;
 

@@ -327,6 +327,7 @@ DROP TABLE IF EXISTS `wireless_order_db`.`material` ;
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`material` (
   `material_id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'the id to this material' ,
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'the id to related restaurant' ,
+  `cate_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the catagory alias id to this material' ,
   `material_alias` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the alias id to this material' ,
   `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to this material' ,
   `warning_threshold` FLOAT NOT NULL DEFAULT 0 COMMENT 'the warning threshold to this material' ,
@@ -674,6 +675,27 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`material_dept` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the stock to each material of department' ;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`material_cate`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`material_cate` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`material_cate` (
+  `cate_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 ,
+  `restaurant_id` INT UNSIGNED NOT NULL ,
+  `name` VARCHAR(45) NOT NULL DEFAULT '' ,
+  PRIMARY KEY (`cate_id`, `restaurant_id`) ,
+  INDEX `fk_material_cate_restaurant1` (`restaurant_id` ASC) ,
+  CONSTRAINT `fk_material_cate_restaurant1`
+    FOREIGN KEY (`restaurant_id` )
+    REFERENCES `wireless_order_db`.`restaurant` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the category of material' ;
 
 
 

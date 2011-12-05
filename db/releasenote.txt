@@ -13,6 +13,7 @@ Release v1.1.1 <xx/xx/2011>
  - 增加表"supplier"
  - 增加表"material_detail"
  - 增加表"department"
+ - 增加表"material_cate"
  - 删除表"material_history"
  - 删除表"order_food_material"
  - 删除表"order_food_material_history"
