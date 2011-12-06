@@ -16,6 +16,7 @@ DELETE FROM wireless_order_db.food_material WHERE restaurant_id=11;
 DELETE FROM wireless_order_db.material_detail WHERE restaurant_id=11;
 DELETE FROM wireless_order_db.material_dept WHERE restaurant_id=11;
 DELETE FROM wireless_order_db.material WHERE restaurant_id=11;
+DELETE FROM wireless_order_db.material_cate WHERE restaurant_id=11;
 DELETE FROM wireless_order_db.supplier WHERE restaurant_id=11;
 DELETE FROM wireless_order_db.terminal WHERE restaurant_id=11;
 DELETE FROM wireless_order_db.table WHERE restaurant_id=11;
