@@ -448,6 +448,96 @@ var shiftVerifyWin = new Ext.Window(
 			}
 		});
 
+// menuVerifyWin
+var menuVerifyWin = new Ext.Window(
+		{
+			layout : "fit",
+			width : 200,
+			height : 100,
+			closeAction : "hide",
+			resizable : false,
+			closable : false,
+			items : [ {
+				layout : "form",
+				labelWidth : 30,
+				border : false,
+				frame : true,
+				items : [ {
+					xtype : "textfield",
+					inputType : "password",
+					fieldLabel : "密码",
+					id : "menuVerifyPwd",
+					width : 110
+				} ]
+			} ],
+			buttons : [
+					{
+						text : "确定",
+						handler : function() {
+							var menuVerifyPwd = menuVerifyWin.findById(
+									"menuVerifyPwd").getValue();
+							menuVerifyWin.findById("menuVerifyPwd")
+									.setValue("");
+
+							var pwdTrans;
+							if (menuVerifyPwd != "") {
+								pwdTrans = MD5(menuVerifyPwd);
+							} else {
+								pwdTrans = menuVerifyPwd;
+							}
+
+							menuVerifyWin.hide();
+							isPrompt = false;
+							menuVerifyWin.findById("menuVerifyPwd")
+									.setValue("");
+
+							Ext.Ajax
+									.request({
+										url : "../VerifyPwd.do",
+										params : {
+											"pin" : currPin,
+											"type" : "2",
+											"pwd" : pwdTrans
+										},
+										success : function(response, options) {
+											var resultJSON = Ext.util.JSON
+													.decode(response.responseText);
+											if (resultJSON.success == true) {
+												location.href = "BasicManagement_Module/MenuProtal.html?pin="
+														+ currPin
+														+ "&restaurantID="
+														+ restaurantID;
+											} else {
+												Ext.MessageBox.show({
+													msg : resultJSON.data,
+													width : 300,
+													buttons : Ext.MessageBox.OK
+												});
+											}
+										},
+										failure : function(response, options) {
+										}
+									});
+						}
+					},
+					{
+						text : "取消",
+						handler : function() {
+							menuVerifyWin.hide();
+							isPrompt = false;
+							menuVerifyWin.findById("menuVerifyPwd")
+									.setValue("");
+						}
+					} ],
+			listeners : {
+				show : function(thiz) {
+					// thiz.findById("personCountInput").focus();
+					var f = Ext.get("menuVerifyPwd");
+					f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
+				}
+			}
+		});
+
 Ext
 		.onReady(function() {
 			// 解决ext中文传入后台变问号问题

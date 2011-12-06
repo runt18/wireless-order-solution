@@ -35,7 +35,7 @@
 
 	$("#logout").each(function() {
 		$(this).bind("click", function() {
-			if(!isPrompt){
+			if (!isPrompt) {
 				currPin = "";
 				document.getElementById("optName").innerHTML = "";
 				isVerified = false;
@@ -43,33 +43,39 @@
 			}
 		});
 	});
-	
+
 	$("#shift").each(function() {
-		$(this).bind("click", function() {	
-			if (currPin != "" && !isPrompt){
+		$(this).bind("click", function() {
+			if (currPin != "" && !isPrompt) {
 				isPrompt = true;
 				shiftVerifyWin.show();
 			}
 		});
 	});
-	
+
 	$("#menu").each(function() {
-		$(this).bind("click", function() {	
+		$(this).bind("click", function() {
 			if (currPin != "" && !isPrompt) {
-				location.href = "BasicManagement_Module/MenuProtal.html?pin="
-						+ currPin + "&restaurantID="
-						+ restaurantID;
+				// 密码校验
+				menuVerifyWin.show();
+				isPrompt = true;
 			}
 		});
 	});
-	
-	$("#inventory").each(function() {
-		$(this).bind("click", function() {	
-			if (currPin != "" && !isPrompt) {
-				location.href = "BasicManagement_Module/InventoryProtal.html?pin="
-						+ currPin + "&restaurantID="
-						+ restaurantID;
-			}
-		});
-	});
+
+	$("#inventory")
+			.each(
+					function() {
+						$(this)
+								.bind(
+										"click",
+										function() {
+											if (currPin != "" && !isPrompt) {
+												location.href = "BasicManagement_Module/InventoryProtal.html?pin="
+														+ currPin
+														+ "&restaurantID="
+														+ restaurantID;
+											}
+										});
+					});
 };
