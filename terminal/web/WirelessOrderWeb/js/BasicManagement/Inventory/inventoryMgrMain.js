@@ -155,9 +155,10 @@ inventoryInWin = new Ext.Window(
 					inventoryInWin.findById("inventoryInCount").setValue("");
 					inventoryInWin.findById("inventoryInCount").clearInvalid();
 
-					inventoryInWin.findById("inventoryInPrice").setValue(
-							materialGrid.getStore().getAt(currRowIndex).get(
-									"price"));
+					// inventoryInWin.findById("inventoryInPrice").setValue(
+					// materialGrid.getStore().getAt(currRowIndex).get(
+					// "price"));
+					inventoryInWin.findById("inventoryInPrice").setValue("");
 					inventoryInWin.findById("inventoryInPrice").clearInvalid();
 
 					inventoryInWin.findById("inventoryInDate").setValue(
@@ -400,7 +401,10 @@ inventoryOutWin = new Ext.Window(
 					inventoryOutWin.findById("inventoryOutCount")
 							.clearInvalid();
 
-					inventoryOutWin.findById("inventoryOutPrice").setValue("");
+					// inventoryOutWin.findById("inventoryOutPrice").setValue("");
+					inventoryOutWin.findById("inventoryOutPrice").setValue(
+							materialGrid.getStore().getAt(currRowIndex).get(
+									"price"));
 					inventoryOutWin.findById("inventoryOutPrice")
 							.clearInvalid();
 
