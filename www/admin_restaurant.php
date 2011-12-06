@@ -104,25 +104,68 @@ else if($editType == "addRestaurant" || $editType == "editAdminRestaurant")
 					$sql = "SELECT id FROM restaurant WHERE account='$account'";
 					$rs = $db ->GetOne($sql);		
 					$id = $rs;
-					$sql = "INSERT INTO kitchen(restaurant_id,alias_id,name) VALUES($id,0,'厨房1')";
+					//insert the kitchen
+					$sql = "INSERT INTO kitchen(restaurant_id,alias_id,name) VALUES($id, 0, '厨房1')";
 					$db->Execute($sql);
-					$sql = "INSERT INTO kitchen(restaurant_id,alias_id,name) VALUES($id,1,'厨房2')";
+					$sql = "INSERT INTO kitchen(restaurant_id,alias_id,name) VALUES($id, 1, '厨房2')";
 					$db->Execute($sql);
-					$sql = "INSERT INTO kitchen(restaurant_id,alias_id,name) VALUES($id,2,'厨房3')";
+					$sql = "INSERT INTO kitchen(restaurant_id,alias_id,name) VALUES($id, 2, '厨房3')";
 					$db->Execute($sql);
-					$sql = "INSERT INTO kitchen(restaurant_id,alias_id,name) VALUES($id,3,'厨房4')";
+					$sql = "INSERT INTO kitchen(restaurant_id,alias_id,name) VALUES($id, 3, '厨房4')";
 					$db->Execute($sql);
-					$sql = "INSERT INTO kitchen(restaurant_id,alias_id,name) VALUES($id,4,'厨房5')";
+					$sql = "INSERT INTO kitchen(restaurant_id,alias_id,name) VALUES($id, 4, '厨房5')";
 					$db->Execute($sql);
-					$sql = "INSERT INTO kitchen(restaurant_id,alias_id,name) VALUES($id,5,'厨房6')";
+					$sql = "INSERT INTO kitchen(restaurant_id,alias_id,name) VALUES($id, 5, '厨房6')";
 					$db->Execute($sql);
-					$sql = "INSERT INTO kitchen(restaurant_id,alias_id,name) VALUES($id,6,'厨房7')";
+					$sql = "INSERT INTO kitchen(restaurant_id,alias_id,name) VALUES($id, 6, '厨房7')";
 					$db->Execute($sql);
-					$sql = "INSERT INTO kitchen(restaurant_id,alias_id,name) VALUES($id,7,'厨房8')";
+					$sql = "INSERT INTO kitchen(restaurant_id,alias_id,name) VALUES($id, 7, '厨房8')";
 					$db->Execute($sql);
-					$sql = "INSERT INTO kitchen(restaurant_id,alias_id,name) VALUES($id,8,'厨房9')";
+					$sql = "INSERT INTO kitchen(restaurant_id,alias_id,name) VALUES($id, 8, '厨房9')";
 					$db->Execute($sql);
-					$sql = "INSERT INTO kitchen(restaurant_id,alias_id,name) VALUES($id,9,'厨房10')";
+					$sql = "INSERT INTO kitchen(restaurant_id,alias_id,name) VALUES($id, 9, '厨房10')";
+					$db->Execute($sql);
+					//insert the material category
+					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 0, '种类1')";
+					$db->Execute($sql);
+					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 1, '种类2')";
+					$db->Execute($sql);
+					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 2, '种类3')";
+					$db->Execute($sql);
+					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 3, '种类4')";
+					$db->Execute($sql);
+					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 4, '种类5')";
+					$db->Execute($sql);
+					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 5, '种类6')";
+					$db->Execute($sql);
+					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 6, '种类7')";
+					$db->Execute($sql);
+					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 7, '种类8')";
+					$db->Execute($sql);
+					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 8, '种类9')";
+					$db->Execute($sql);
+					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 9, '种类10')";
+					$db->Execute($sql);
+					//insert the department
+					$sql = "INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`) VALUES ($id, 0, '仓管部')";
+					$db->Execute($sql);
+					$sql = "INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`) VALUES ($id, 1, '部门1')";
+					$db->Execute($sql);
+					$sql = "INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`) VALUES ($id, 2, '部门2')";
+					$db->Execute($sql);
+					$sql = "INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`) VALUES ($id, 3, '部门3')";
+					$db->Execute($sql);
+					$sql = "INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`) VALUES ($id, 4, '部门4')";
+					$db->Execute($sql);
+					$sql = "INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`) VALUES ($id, 5, '部门5')";
+					$db->Execute($sql);
+					$sql = "INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`) VALUES ($id, 6, '部门6')";
+					$db->Execute($sql);
+					$sql = "INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`) VALUES ($id, 7, '部门7')";
+					$db->Execute($sql);
+					$sql = "INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`) VALUES ($id, 8, '部门8')";
+					$db->Execute($sql);
+					$sql = "INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`) VALUES ($id, 9, '部门9')";
 					$db->Execute($sql);
 					$admin_pin = "9". randomNumber(6);
 					$sql = "SELECT id FROM terminal WHERE pin='$admin_pin'";
@@ -150,26 +193,31 @@ else if($editType == "addRestaurant" || $editType == "editAdminRestaurant")
 			$password = $_POST["password"];
 			if($password == $_SESSION["password"])
 			{
-				if($db->Execute("DELETE FROM wireless_order_db.order_food_material_history WHERE order_food_id IN (SELECT id FROM wireless_order_db.order_food_history WHERE order_id IN (SELECT id FROM wireless_order_db.order_history WHERE restaurant_id=$id) )")
+				if($db->Execute("DELETE FROM wireless_order_db.food_material WHERE restaurant_id=$id")
+						&& $db->Execute("DELETE FROM wireless_order_db.material_detail WHERE restaurant_id=$id")
+						&& $db->Execute("DELETE FROM wireless_order_db.material_dept WHERE restaurant_id=$id")
+						&& $db->Execute("DELETE FROM wireless_order_db.material WHERE restaurant_id=$id")
+						&& $db->Execute("DELETE FROM wireless_order_db.material_cate WHERE restaurant_id=$id")
+						&& $db->Execute("DELETE FROM wireless_order_db.supplier WHERE restaurant_id=$id")
+						&& $db->Execute("DELETE FROM wireless_order_db.department WHERE restaurant_id=$id")
 						&& $db->Execute("DELETE FROM wireless_order_db.order_food_history WHERE order_id IN (SELECT id FROM wireless_order_db.order_history WHERE restaurant_id=$id)")
+						&& $db->Execute("DELETE FROM wireless_order_db.temp_order_food_history WHERE order_id IN (SELECT id FROM wireless_order_db.order_history WHERE restaurant_id=$id)")
 						&& $db->Execute("DELETE FROM wireless_order_db.order_history WHERE restaurant_id=$id")
-						&& $db->Execute("DELETE FROM wireless_order_db.order_food_material WHERE order_food_id IN (SELECT id FROM wireless_order_db.order_food WHERE order_id IN (SELECT id FROM wireless_order_db.order WHERE restaurant_id=$id) )")
 						&& $db->Execute("DELETE FROM wireless_order_db.order_food WHERE order_id IN (SELECT id FROM wireless_order_db.order WHERE restaurant_id=$id)")
 						&& $db->Execute("DELETE FROM wireless_order_db.order WHERE restaurant_id=$id")
 						&& $db->Execute("DELETE FROM wireless_order_db.staff WHERE restaurant_id=$id")
-						&& $db->Execute("DELETE FROM wireless_order_db.food_material WHERE food_id IN (SELECT id FROM wireless_order_db.food WHERE restaurant_id=$id)")
-						&& $db->Execute("DELETE FROM wireless_order_db.material_history WHERE material_id IN (SELECT id FROM wireless_order_db.material WHERE restaurant_id=$id)")
-						&& $db->Execute("DELETE FROM wireless_order_db.material WHERE restaurant_id=$id")
 						&& $db->Execute("DELETE FROM wireless_order_db.terminal WHERE restaurant_id=$id AND model_id > 0x7F")
 						&& $db->Execute("UPDATE wireless_order_db.terminal SET restaurant_id=2,idle_date=NOW(),discard_date=NULL WHERE restaurant_id=$id AND model_id <= 0x7F")
 						&& $db->Execute("DELETE FROM wireless_order_db.table WHERE restaurant_id=$id")
+						&& $db->Execute("DELETE FROM wireless_order_db.region WHERE restaurant_id=$id")
 						&& $db->Execute("DELETE FROM wireless_order_db.food WHERE restaurant_id=$id")
 						&& $db->Execute("DELETE FROM wireless_order_db.taste WHERE restaurant_id=$id")
 						&& $db->Execute("DELETE FROM wireless_order_db.kitchen WHERE restaurant_id=$id")
 						&& $db->Execute("DELETE FROM wireless_order_db.member_charge WHERE member_id IN (SELECT id FROM wireless_order_db.member WHERE restaurant_id=$id)")
 						&& $db->Execute("DELETE FROM wireless_order_db.setting WHERE restaurant_id=$id")
 						&& $db->Execute("DELETE FROM wireless_order_db.member WHERE restaurant_id=$id")
-				&& $db->Execute("DELETE FROM wireless_order_db.restaurant WHERE id=$id")){			
+						&& $db->Execute("DELETE FROM wireless_order_db.shift WHERE restaurant_id=$id")
+						&& $db->Execute("DELETE FROM wireless_order_db.restaurant WHERE id=$id")){			
 					echo "<script>alert('删除成功！');</script>";
 				}	
 				else{
