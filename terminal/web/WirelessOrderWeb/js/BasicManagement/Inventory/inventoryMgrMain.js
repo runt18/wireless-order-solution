@@ -404,7 +404,9 @@ inventoryOutWin = new Ext.Window(
 					inventoryOutWin.findById("inventoryOutPrice")
 							.clearInvalid();
 
-					inventoryOutWin.findById("inventoryOutDate").setValue("");
+					// inventoryOutWin.findById("inventoryOutDate").setValue("");
+					inventoryOutWin.findById("inventoryOutDate").setValue(
+							new Date());
 					inventoryOutWin.findById("inventoryOutDate").clearInvalid();
 
 					inventoryOutWin.findById("inventoryOutForm").remove(
@@ -641,8 +643,10 @@ inventoryReturnWin = new Ext.Window(
 					inventoryReturnWin.findById("inventoryReturnPrice")
 							.clearInvalid();
 
+					// inventoryReturnWin.findById("inventoryReturnDate")
+					// .setValue("");
 					inventoryReturnWin.findById("inventoryReturnDate")
-							.setValue("");
+							.setValue(new Date());
 					inventoryReturnWin.findById("inventoryReturnDate")
 							.clearInvalid();
 
@@ -871,8 +875,10 @@ inventoryChangeWin = new Ext.Window(
 					inventoryChangeWin.findById("inventoryChangeCount")
 							.clearInvalid();
 
+					// inventoryChangeWin.findById("inventoryChangeDate")
+					// .setValue("");
 					inventoryChangeWin.findById("inventoryChangeDate")
-							.setValue("");
+							.setValue(new Date());
 					inventoryChangeWin.findById("inventoryChangeDate")
 							.clearInvalid();
 
