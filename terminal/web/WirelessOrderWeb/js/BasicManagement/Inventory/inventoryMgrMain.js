@@ -1125,7 +1125,7 @@ var inventoryCheckDtlPanel = new Ext.Panel({
 var inventoryCheckWin = new Ext.Window(
 		{
 			layout : "fit",
-			title : "盘点",
+			// title : "盘点",
 			width : 450,
 			height : 400,
 			closeAction : "hide",
@@ -1234,6 +1234,10 @@ var inventoryCheckWin = new Ext.Window(
 					isPrompt = false;
 				},
 				"show" : function(thiz) {
+					inventoryCheckWin.setTitle("盘点 -- "
+							+ materialGrid.getStore().getAt(currRowIndex).get(
+									"materialName"));
+
 					var materialID = materialGrid.getStore()
 							.getAt(currRowIndex).get("materialID");
 					Ext.Ajax
