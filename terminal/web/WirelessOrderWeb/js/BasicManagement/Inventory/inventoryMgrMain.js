@@ -1810,7 +1810,9 @@ function checkHandler(rowIndex) {
 
 function materialDeleteHandler(rowIndex) {
 	Ext.MessageBox.show({
-		msg : "确定删除？",
+		msg : "确定删除"
+				+ materialGrid.getStore().getAt(currRowIndex).get(
+						"materialName") + "？",
 		width : 300,
 		buttons : Ext.MessageBox.YESNO,
 		fn : function(btn) {
