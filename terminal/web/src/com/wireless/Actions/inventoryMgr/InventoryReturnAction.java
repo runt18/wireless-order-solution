@@ -63,16 +63,17 @@ public class InventoryReturnAction extends Action {
 			float amount = Float.parseFloat(request.getParameter("amount"));
 			String staff = request.getParameter("staff");
 			String type = request.getParameter("type");
+			String remark = request.getParameter("remark");
 
 			// 庫存明細
 			String sql = "INSERT INTO "
 					+ Params.dbName
 					+ ".material_detail"
-					+ "( restaurant_id, supplier_id, material_id, price, date, dept_id, amount, type, staff ) "
+					+ "( restaurant_id, supplier_id, material_id, price, date, dept_id, amount, type, staff, comment ) "
 					+ " VALUES(" + term.restaurant_id + ", " + supplierID
 					+ ", " + materialID + ", " + price + ", '" + date + "', "
-					+ deptID + ", " + (-1)*amount + ", " + type + ", '" + staff
-					+ "' ) ";
+					+ deptID + ", " + (-1) * amount + ", " + type + ", '"
+					+ staff + "', '" + remark + "' ) ";
 			int sqlRowCount = dbCon.stmt.executeUpdate(sql);
 
 			// 庫存現狀
@@ -91,7 +92,7 @@ public class InventoryReturnAction extends Action {
 					.round((totalStock * thisPrice - amount * price) * 100) / 100;
 			float allStock = (float) Math.round((totalStock - amount) * 100) / 100;
 			float newPrice = (float) Math.round((allPrice / allStock) * 100) / 100;
-	
+
 			sql = "UPDATE " + Params.dbName + ".material_dept"
 					+ " SET price = " + newPrice + " WHERE restaurant_id = "
 					+ term.restaurant_id + " AND material_id =  " + materialID;

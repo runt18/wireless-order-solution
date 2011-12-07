@@ -1,10 +1,48 @@
 ﻿// ----------------- 入庫 --------------------
+var departmentCombIn = new Ext.form.ComboBox({
+	fieldLabel : "部门",
+	forceSelection : true,
+	width : 160,
+	// value : departmentData[0][1],
+	id : "departmentCombIn",
+	store : new Ext.data.SimpleStore({
+		fields : [ "value", "text" ],
+		data : []
+	}),
+	valueField : "value",
+	displayField : "text",
+	typeAhead : true,
+	mode : "local",
+	triggerAction : "all",
+	selectOnFocus : true,
+	allowBlank : false
+});
+
+var supplierCombIn = new Ext.form.ComboBox({
+	fieldLabel : "供应商",
+	forceSelection : true,
+	width : 160,
+	// value : supplierData[0][2],
+	id : "supplierCombIn",
+	store : new Ext.data.SimpleStore({
+		fields : [ "value", "alias", "text" ],
+		data : []
+	}),
+	valueField : "value",
+	displayField : "text",
+	typeAhead : true,
+	mode : "local",
+	triggerAction : "all",
+	selectOnFocus : true,
+	allowBlank : false
+});
+
 inventoryInWin = new Ext.Window(
 		{
 			layout : "fit",
 			// title : "入庫 -- ",
 			width : 260,
-			height : 190,
+			height : 210,
 			closeAction : "hide",
 			resizable : false,
 			items : [ {
@@ -31,6 +69,12 @@ inventoryInWin = new Ext.Window(
 					id : "inventoryInDate",
 					allowBlank : false,
 					width : 160
+				}, departmentCombIn, supplierCombIn, {
+					xtype : "textfield",
+					fieldLabel : "备注",
+					id : "inventoryInRemark",
+					allowBlank : true,
+					width : 160
 				} ]
 			} ],
 			buttons : [
@@ -46,7 +90,8 @@ inventoryInWin = new Ext.Window(
 											"inventoryInDate").isValid()
 									&& inventoryInWin.findById(
 											"departmentCombIn").isValid()
-									&& inventoryInWin.findById("supplierComb")
+									&& inventoryInWin
+											.findById("supplierCombIn")
 											.isValid()) {
 
 								var inventoryInCount = inventoryInWin.findById(
@@ -69,7 +114,7 @@ inventoryInWin = new Ext.Window(
 								}
 
 								var supplier = inventoryInWin.findById(
-										"supplierComb").getValue();
+										"supplierCombIn").getValue();
 								for ( var i = 0; i < supplierData.length; i++) {
 									if (supplier == supplierData[i][2]) {
 										supplier = supplierData[i][0];
@@ -80,6 +125,9 @@ inventoryInWin = new Ext.Window(
 										currRowIndex).get("materialID");
 
 								var staff = document.getElementById("optName").innerHTML;
+
+								var remark = inventoryInWin.findById(
+										"inventoryInRemark").getValue();
 
 								isPrompt = false;
 								inventoryInWin.hide();
@@ -98,6 +146,7 @@ inventoryInWin = new Ext.Window(
 												"deptID" : department,
 												"amount" : inventoryInCount,
 												"staff" : staff,
+												"remark" : remark,
 												"type" : TYPE_INCOME
 											},
 											success : function(response,
@@ -165,29 +214,10 @@ inventoryInWin = new Ext.Window(
 							new Date());
 					inventoryInWin.findById("inventoryInDate").clearInvalid();
 
-					inventoryInWin.findById("inventoryInForm").remove(
-							"departmentCombIn");
-					inventoryInWin.findById("inventoryInForm").remove(
-							"supplierComb");
+					inventoryInWin.findById("inventoryInRemark").setValue("");
 
-					var departmentCombIn = new Ext.form.ComboBox({
-						fieldLabel : "部门",
-						forceSelection : true,
-						width : 160,
-						// value : departmentData[0][1],
-						id : "departmentCombIn",
-						store : new Ext.data.SimpleStore({
-							fields : [ "value", "text" ],
-							data : departmentData
-						}),
-						valueField : "value",
-						displayField : "text",
-						typeAhead : true,
-						mode : "local",
-						triggerAction : "all",
-						selectOnFocus : true,
-						allowBlank : false
-					});
+					departmentCombIn.store.loadData(departmentData);
+					supplierCombIn.store.loadData(supplierData);
 
 					if (departmentData.length > 0) {
 						departmentCombIn.setValue(departmentData[0][1]);
@@ -195,36 +225,12 @@ inventoryInWin = new Ext.Window(
 						departmentCombIn.setValue("");
 					}
 
-					var supplierComb = new Ext.form.ComboBox({
-						fieldLabel : "供应商",
-						forceSelection : true,
-						width : 160,
-						// value : supplierData[0][2],
-						id : "supplierComb",
-						store : new Ext.data.SimpleStore({
-							fields : [ "value", "alias", "text" ],
-							data : supplierData
-						}),
-						valueField : "value",
-						displayField : "text",
-						typeAhead : true,
-						mode : "local",
-						triggerAction : "all",
-						selectOnFocus : true,
-						allowBlank : false
-					});
-
 					// 防止未錄入供應商，先錄入食材
 					if (supplierData.length > 0) {
-						supplierComb.setValue(supplierData[0][2]);
+						supplierCombIn.setValue(supplierData[0][2]);
 					} else {
-						supplierComb.setValue("");
+						supplierCombIn.setValue("");
 					}
-
-					inventoryInWin.findById("inventoryInForm").add(
-							"departmentCombIn");
-					inventoryInWin.findById("inventoryInForm").add(
-							"supplierComb");
 
 					inventoryInWin.doLayout();
 
@@ -239,14 +245,52 @@ inventoryInWin = new Ext.Window(
 		});
 
 // ----------------- 出庫 --------------------
+var departmentCombOut = new Ext.form.ComboBox({
+	fieldLabel : "部门",
+	forceSelection : true,
+	width : 160,
+	// value : departmentData[0][1],
+	id : "departmentCombOut",
+	store : new Ext.data.SimpleStore({
+		fields : [ "value", "text" ],
+		data : []
+	}),
+	valueField : "value",
+	displayField : "text",
+	typeAhead : true,
+	mode : "local",
+	triggerAction : "all",
+	selectOnFocus : true,
+	allowBlank : false
+});
+
 var outReasonData = [ [ TYPE_WEAR, "报损" ], [ TYPE_SELL, "销售" ],
 		[ TYPE_OUT_WARE, "出仓" ] ];
+
+var outReason = new Ext.form.ComboBox({
+	fieldLabel : "出库原因",
+	forceSelection : true,
+	width : 160,
+	value : "报损",
+	id : "outReason",
+	store : new Ext.data.SimpleStore({
+		fields : [ "value", "text" ],
+		data : []
+	}),
+	valueField : "value",
+	displayField : "text",
+	typeAhead : true,
+	mode : "local",
+	triggerAction : "all",
+	selectOnFocus : true,
+	allowBlank : false
+});
 
 inventoryOutWin = new Ext.Window(
 		{
 			layout : "fit",
 			width : 260,
-			height : 190,
+			height : 210,
 			closeAction : "hide",
 			resizable : false,
 			items : [ {
@@ -272,6 +316,12 @@ inventoryOutWin = new Ext.Window(
 					fieldLabel : "日期",
 					id : "inventoryOutDate",
 					allowBlank : false,
+					width : 160
+				}, departmentCombOut, outReason, {
+					xtype : "textfield",
+					fieldLabel : "备注",
+					id : "inventoryOutRemark",
+					allowBlank : true,
 					width : 160
 				} ]
 			} ],
@@ -326,6 +376,9 @@ inventoryOutWin = new Ext.Window(
 
 								var staff = document.getElementById("optName").innerHTML;
 
+								var remark = inventoryOutWin.findById(
+										"inventoryOutRemark").getValue();
+
 								isPrompt = false;
 								inventoryOutWin.hide();
 
@@ -342,6 +395,7 @@ inventoryOutWin = new Ext.Window(
 												"deptID" : department,
 												"amount" : inventoryOutCount,
 												"staff" : staff,
+												"remark" : remark,
 												"type" : outReason
 											},
 											success : function(response,
@@ -413,29 +467,8 @@ inventoryOutWin = new Ext.Window(
 							new Date());
 					inventoryOutWin.findById("inventoryOutDate").clearInvalid();
 
-					inventoryOutWin.findById("inventoryOutForm").remove(
-							"departmentCombOut");
-					inventoryOutWin.findById("inventoryOutForm").remove(
-							"outReason");
-
-					var departmentCombOut = new Ext.form.ComboBox({
-						fieldLabel : "部门",
-						forceSelection : true,
-						width : 160,
-						// value : departmentData[0][1],
-						id : "departmentCombOut",
-						store : new Ext.data.SimpleStore({
-							fields : [ "value", "text" ],
-							data : departmentData
-						}),
-						valueField : "value",
-						displayField : "text",
-						typeAhead : true,
-						mode : "local",
-						triggerAction : "all",
-						selectOnFocus : true,
-						allowBlank : false
-					});
+					departmentCombOut.store.loadData(departmentData);
+					outReason.store.loadData(outReasonData);
 
 					if (departmentData.length > 0) {
 						departmentCombOut.setValue(departmentData[0][1]);
@@ -443,29 +476,7 @@ inventoryOutWin = new Ext.Window(
 						departmentCombOut.setValue("");
 					}
 
-					var outReason = new Ext.form.ComboBox({
-						fieldLabel : "出库原因",
-						forceSelection : true,
-						width : 160,
-						value : "报损",
-						id : "outReason",
-						store : new Ext.data.SimpleStore({
-							fields : [ "value", "text" ],
-							data : outReasonData
-						}),
-						valueField : "value",
-						displayField : "text",
-						typeAhead : true,
-						mode : "local",
-						triggerAction : "all",
-						selectOnFocus : true,
-						allowBlank : false
-					});
-
-					inventoryOutWin.findById("inventoryOutForm").add(
-							"departmentCombOut");
-					inventoryOutWin.findById("inventoryOutForm").add(
-							"outReason");
+					inventoryOutWin.findById("inventoryOutRemark").setValue("");
 
 					inventoryOutWin.doLayout();
 
@@ -480,12 +491,50 @@ inventoryOutWin = new Ext.Window(
 		});
 
 // ----------------- 退貨 --------------------
+var departmentCombReturn = new Ext.form.ComboBox({
+	fieldLabel : "部门",
+	forceSelection : true,
+	width : 160,
+	// value : departmentData[0][1],
+	id : "departmentCombReturn",
+	store : new Ext.data.SimpleStore({
+		fields : [ "value", "text" ],
+		data : []
+	}),
+	valueField : "value",
+	displayField : "text",
+	typeAhead : true,
+	mode : "local",
+	triggerAction : "all",
+	selectOnFocus : true,
+	allowBlank : false
+});
+
+var supplierCombReturn = new Ext.form.ComboBox({
+	fieldLabel : "供应商",
+	forceSelection : true,
+	width : 160,
+	// value : supplierData[0][2],
+	id : "supplierCombReturn",
+	store : new Ext.data.SimpleStore({
+		fields : [ "value", "alias", "text" ],
+		data : []
+	}),
+	valueField : "value",
+	displayField : "text",
+	typeAhead : true,
+	mode : "local",
+	triggerAction : "all",
+	selectOnFocus : true,
+	allowBlank : false
+});
+
 inventoryReturnWin = new Ext.Window(
 		{
 			layout : "fit",
 			// title : "入庫 -- ",
 			width : 260,
-			height : 190,
+			height : 210,
 			closeAction : "hide",
 			resizable : false,
 			items : [ {
@@ -511,6 +560,12 @@ inventoryReturnWin = new Ext.Window(
 					fieldLabel : "日期",
 					id : "inventoryReturnDate",
 					allowBlank : false,
+					width : 160
+				}, departmentCombReturn, supplierCombReturn, {
+					xtype : "textfield",
+					fieldLabel : "备注",
+					id : "inventoryReturnRemark",
+					allowBlank : true,
 					width : 160
 				} ]
 			} ],
@@ -566,6 +621,9 @@ inventoryReturnWin = new Ext.Window(
 
 								var staff = document.getElementById("optName").innerHTML;
 
+								var remark = inventoryReturnWin.findById(
+										"inventoryReturnRemark").getValue();
+
 								isPrompt = false;
 								inventoryReturnWin.hide();
 
@@ -583,6 +641,7 @@ inventoryReturnWin = new Ext.Window(
 												"deptID" : department,
 												"amount" : inventoryReturnCount,
 												"staff" : staff,
+												"remark" : remark,
 												"type" : TYPE_RETURN
 											},
 											success : function(response,
@@ -654,54 +713,14 @@ inventoryReturnWin = new Ext.Window(
 					inventoryReturnWin.findById("inventoryReturnDate")
 							.clearInvalid();
 
-					inventoryReturnWin.findById("inventoryReturnForm").remove(
-							"departmentCombReturn");
-					inventoryReturnWin.findById("inventoryReturnForm").remove(
-							"supplierCombReturn");
-
-					var departmentCombReturn = new Ext.form.ComboBox({
-						fieldLabel : "部门",
-						forceSelection : true,
-						width : 160,
-						// value : departmentData[0][1],
-						id : "departmentCombReturn",
-						store : new Ext.data.SimpleStore({
-							fields : [ "value", "text" ],
-							data : departmentData
-						}),
-						valueField : "value",
-						displayField : "text",
-						typeAhead : true,
-						mode : "local",
-						triggerAction : "all",
-						selectOnFocus : true,
-						allowBlank : false
-					});
+					departmentCombReturn.store.loadData(departmentData);
+					supplierCombReturn.store.loadData(supplierData);
 
 					if (departmentData.length > 0) {
 						departmentCombReturn.setValue(departmentData[0][1]);
 					} else {
 						departmentCombReturn.setValue("");
 					}
-
-					var supplierCombReturn = new Ext.form.ComboBox({
-						fieldLabel : "供应商",
-						forceSelection : true,
-						width : 160,
-						// value : supplierData[0][2],
-						id : "supplierCombReturn",
-						store : new Ext.data.SimpleStore({
-							fields : [ "value", "alias", "text" ],
-							data : supplierData
-						}),
-						valueField : "value",
-						displayField : "text",
-						typeAhead : true,
-						mode : "local",
-						triggerAction : "all",
-						selectOnFocus : true,
-						allowBlank : false
-					});
 
 					// 防止未錄入供應商，先錄入食材
 					if (supplierData.length > 0) {
@@ -710,10 +729,8 @@ inventoryReturnWin = new Ext.Window(
 						supplierCombReturn.setValue("");
 					}
 
-					inventoryReturnWin.findById("inventoryReturnForm").add(
-							"departmentCombReturn");
-					inventoryReturnWin.findById("inventoryReturnForm").add(
-							"supplierCombReturn");
+					inventoryReturnWin.findById("inventoryReturnRemark")
+							.setValue("");
 
 					inventoryReturnWin.doLayout();
 
@@ -728,6 +745,44 @@ inventoryReturnWin = new Ext.Window(
 		});
 
 // ----------------- 調撥 --------------------
+var departmentCombChangeOut = new Ext.form.ComboBox({
+	fieldLabel : "调出部门",
+	forceSelection : true,
+	width : 160,
+	// value : departmentData[0][1],
+	id : "departmentCombChangeOut",
+	store : new Ext.data.SimpleStore({
+		fields : [ "value", "text" ],
+		data : []
+	}),
+	valueField : "value",
+	displayField : "text",
+	typeAhead : true,
+	mode : "local",
+	triggerAction : "all",
+	selectOnFocus : true,
+	allowBlank : false
+});
+
+var departmentCombChangeIn = new Ext.form.ComboBox({
+	fieldLabel : "调入部门",
+	forceSelection : true,
+	width : 160,
+	// value : departmentData[0][1],
+	id : "departmentCombChangeIn",
+	store : new Ext.data.SimpleStore({
+		fields : [ "value", "text" ],
+		data : []
+	}),
+	valueField : "value",
+	displayField : "text",
+	typeAhead : true,
+	mode : "local",
+	triggerAction : "all",
+	selectOnFocus : true,
+	allowBlank : false
+});
+
 inventoryChangeWin = new Ext.Window(
 		{
 			layout : "fit",
@@ -752,6 +807,12 @@ inventoryChangeWin = new Ext.Window(
 					fieldLabel : "日期",
 					id : "inventoryChangeDate",
 					allowBlank : false,
+					width : 160
+				}, departmentCombChangeOut, departmentCombChangeIn, {
+					xtype : "textfield",
+					fieldLabel : "备注",
+					id : "inventoryChangeRemark",
+					allowBlank : true,
 					width : 160
 				} ]
 			} ],
@@ -804,6 +865,9 @@ inventoryChangeWin = new Ext.Window(
 
 								var staff = document.getElementById("optName").innerHTML;
 
+								var remark = inventoryChangeWin.findById(
+										"inventoryChangeRemark").getValue();
+
 								isPrompt = false;
 								inventoryChangeWin.hide();
 
@@ -819,7 +883,8 @@ inventoryChangeWin = new Ext.Window(
 												"deptIDOut" : departmentOut,
 												"deptIDIn" : departmentIn,
 												"amount" : inventoryChangeCount,
-												"staff" : staff
+												"staff" : staff,
+												"remark" : remark
 											},
 											success : function(response,
 													options) {
@@ -886,29 +951,8 @@ inventoryChangeWin = new Ext.Window(
 					inventoryChangeWin.findById("inventoryChangeDate")
 							.clearInvalid();
 
-					inventoryChangeWin.findById("inventoryChangeForm").remove(
-							"departmentCombChangeOut");
-					inventoryChangeWin.findById("inventoryChangeForm").remove(
-							"departmentCombChangeIn");
-
-					var departmentCombChangeOut = new Ext.form.ComboBox({
-						fieldLabel : "调出部门",
-						forceSelection : true,
-						width : 160,
-						// value : departmentData[0][1],
-						id : "departmentCombChangeOut",
-						store : new Ext.data.SimpleStore({
-							fields : [ "value", "text" ],
-							data : departmentData
-						}),
-						valueField : "value",
-						displayField : "text",
-						typeAhead : true,
-						mode : "local",
-						triggerAction : "all",
-						selectOnFocus : true,
-						allowBlank : false
-					});
+					departmentCombChangeOut.store.loadData(departmentData);
+					departmentCombChangeIn.store.loadData(departmentData);
 
 					if (departmentData.length > 0) {
 						departmentCombChangeOut.setValue(departmentData[0][1]);
@@ -916,35 +960,14 @@ inventoryChangeWin = new Ext.Window(
 						departmentCombChangeOut.setValue("");
 					}
 
-					var departmentCombChangeIn = new Ext.form.ComboBox({
-						fieldLabel : "调入部门",
-						forceSelection : true,
-						width : 160,
-						// value : departmentData[0][1],
-						id : "departmentCombChangeIn",
-						store : new Ext.data.SimpleStore({
-							fields : [ "value", "text" ],
-							data : departmentData
-						}),
-						valueField : "value",
-						displayField : "text",
-						typeAhead : true,
-						mode : "local",
-						triggerAction : "all",
-						selectOnFocus : true,
-						allowBlank : false
-					});
-
 					if (departmentData.length > 0) {
 						departmentCombChangeIn.setValue(departmentData[0][1]);
 					} else {
 						departmentCombChangeIn.setValue("");
 					}
 
-					inventoryChangeWin.findById("inventoryChangeForm").add(
-							"departmentCombChangeOut");
-					inventoryChangeWin.findById("inventoryChangeForm").add(
-							"departmentCombChangeIn");
+					inventoryChangeWin.findById("inventoryChangeRemark")
+							.setValue("");
 
 					inventoryChangeWin.doLayout();
 

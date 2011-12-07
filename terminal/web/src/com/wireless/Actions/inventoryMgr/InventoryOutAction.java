@@ -61,15 +61,17 @@ public class InventoryOutAction extends Action {
 			amount = amount * (-1);
 			String staff = request.getParameter("staff");
 			String type = request.getParameter("type");
+			String remark = request.getParameter("remark");
 
 			// 庫存明細
 			String sql = "INSERT INTO "
 					+ Params.dbName
 					+ ".material_detail"
-					+ "( restaurant_id, material_id, price, date, dept_id, amount, type, staff ) "
+					+ "( restaurant_id, material_id, price, date, dept_id, amount, type, staff, comment ) "
 					+ " VALUES(" + term.restaurant_id + ", " + materialID
 					+ ", " + price + ", '" + date + "', " + deptID + ", "
-					+ amount + ", " + type + ", '" + staff + "' ) ";
+					+ amount + ", " + type + ", '" + staff + "', '" + remark
+					+ "' ) ";
 			System.out.println(sql);
 			int sqlRowCount = dbCon.stmt.executeUpdate(sql);
 

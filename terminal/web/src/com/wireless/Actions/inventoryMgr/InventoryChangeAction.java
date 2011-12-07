@@ -60,15 +60,17 @@ public class InventoryChangeAction extends Action {
 			int deptIDIn = Integer.parseInt(request.getParameter("deptIDIn"));
 			float amount = Float.parseFloat(request.getParameter("amount"));
 			String staff = request.getParameter("staff");
+			String remark = request.getParameter("remark");
 
 			// 調入
 			String sql = "INSERT INTO "
 					+ Params.dbName
 					+ ".material_detail"
-					+ "( restaurant_id, material_id, date, dept_id, dept2_id, amount, type, staff ) "
+					+ "( restaurant_id, material_id, date, dept_id, dept2_id, amount, type, staff, comment ) "
 					+ " VALUES(" + term.restaurant_id + ", " + materialID
 					+ ", '" + date + "', " + deptIDIn + ", " + deptIDOut + ", "
-					+ amount + ", " + MaterialDetail.TYPE_IN + ", '" + staff + "' ) ";
+					+ amount + ", " + MaterialDetail.TYPE_IN + ", '" + staff
+					+ "', '" + remark + "' ) ";
 			int sqlRowCount = dbCon.stmt.executeUpdate(sql);
 
 			sql = " SELECT stock FROM " + Params.dbName
@@ -95,7 +97,8 @@ public class InventoryChangeAction extends Action {
 					+ "( restaurant_id, material_id, date, dept_id, dept2_id, amount, type, staff ) "
 					+ " VALUES(" + term.restaurant_id + ", " + materialID
 					+ ", '" + date + "', " + deptIDOut + ", " + deptIDIn + ", "
-					+ amount * (-1) + ", " + MaterialDetail.TYPE_OUT + ", '" + staff + "' ) ";
+					+ amount * (-1) + ", " + MaterialDetail.TYPE_OUT + ", '"
+					+ staff + "' ) ";
 			sqlRowCount = dbCon.stmt.executeUpdate(sql);
 
 			sql = " SELECT stock FROM " + Params.dbName
