@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:background="@drawable/bgcolor"
+	>
+
+	<RelativeLayout android:id="@+id/top_num"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:background="@drawable/bg01" android:layout_alignParentTop="true">
+		<ImageView android:id="@+id/tasteback" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:src="@drawable/back_selector"
+			android:layout_marginLeft="20dip" android:layout_centerVertical="true">
+
+		</ImageView>
+		<TextView android:id="@+id/numtitle" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:textColor="#FFFFFF"
+			android:textSize="22sp" android:textStyle="bold" android:typeface="monospace"
+			android:shadowDx="1" android:shadowDy="1" android:shadowRadius="3.0"
+			android:text="口味" android:layout_centerVertical="true"
+			android:layout_centerHorizontal="true">
+		</TextView>
+	</RelativeLayout>
+
+
+	<RelativeLayout android:id="@+id/r_taste"
+		android:layout_width="fill_parent" android:layout_height="40dip"
+		android:layout_below="@id/top_num">
+		<TextView android:id="@+id/foodTasteTxtView" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:textSize="20sp"
+			android:textColor="#000000" android:layout_centerVertical="true"
+			android:layout_marginLeft="5dip"></TextView>
+
+	</RelativeLayout>
+
+	<RelativeLayout android:id="@+id/second"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:layout_below="@id/r_taste" android:background="@drawable/bg02">
+		<TextView android:id="@+id/ordernum" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:textColor="#000000"
+			android:layout_centerVertical="true" android:textSize="20sp"
+			android:text="编号:" android:layout_marginLeft="5dip" />
+		<EditText android:id="@+id/tastesearch" android:layout_width="250dip"
+		    android:inputType="number"
+			android:layout_height="wrap_content" android:layout_centerVertical="true"
+			android:layout_toRightOf="@id/ordernum" android:layout_marginLeft="10dip" />
+	</RelativeLayout>
+	
+	<ImageView android:id="@+id/line" android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:src="@drawable/line"
+		android:layout_below="@id/second" />
+
+	<ListView
+		android:id="@+id/tasteLstView" android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:layout_below="@id/line"
+		android:divider="@drawable/line" android:cacheColorHint="#00000000">
+	</ListView>
+</RelativeLayout>
