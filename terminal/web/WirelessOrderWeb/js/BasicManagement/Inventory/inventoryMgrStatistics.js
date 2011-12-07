@@ -469,7 +469,8 @@ inventoryInStatWin = new Ext.Window(
 																			deptN,
 																			rootData[i].price,
 																			rootData[i].amount,
-																			rootData[i].total
+																			rootData[i].total,
+																			rootData[i].comment
 
 																	]);
 														}
@@ -774,6 +775,8 @@ var inStatDetailResultStore = new Ext.data.Store({
 	}, {
 		name : "total"
 	}, {
+		name : "comment"
+	}, {
 		name : "message"
 	} ])
 });
@@ -819,6 +822,11 @@ var inStatDetailResultColumnModel = new Ext.grid.ColumnModel([
 			header : "小计（￥）",
 			sortable : true,
 			dataIndex : "total",
+			width : 80
+		}, {
+			header : "备注",
+			sortable : true,
+			dataIndex : "comment",
 			width : 80
 		} ]);
 
@@ -1893,9 +1901,8 @@ inventoryOutStatWin = new Ext.Window(
 																			deptN,
 																			rootData[i].price,
 																			rootData[i].amount,
-																			rootData[i].total
-
-																	]);
+																			rootData[i].total,
+																			rootData[i].comment ]);
 														}
 
 														outStatDetailResultStore
@@ -2213,6 +2220,8 @@ var outStatDetailResultStore = new Ext.data.Store({
 	}, {
 		name : "total"
 	}, {
+		name : "comment"
+	}, {
 		name : "message"
 	} ])
 });
@@ -2258,6 +2267,11 @@ var outStatDetailResultColumnModel = new Ext.grid.ColumnModel([
 			header : "小计（￥）",
 			sortable : true,
 			dataIndex : "total",
+			width : 80
+		}, {
+			header : "备注",
+			sortable : true,
+			dataIndex : "comment",
 			width : 80
 		} ]);
 
@@ -2929,7 +2943,7 @@ inventoryChangeStatWin = new Ext.Window(
 				} ]
 			}, {
 				layout : "column",
-				title:"调出部门",
+				title : "调出部门",
 				border : false,
 				anchor : "99% 20%",
 				autoScroll : true,
@@ -3047,7 +3061,7 @@ inventoryChangeStatWin = new Ext.Window(
 				} ]
 			}, {
 				layout : "column",
-				title:"调入部门",
+				title : "调入部门",
 				border : false,
 				anchor : "99% 20%",
 				autoScroll : true,
@@ -3413,7 +3427,8 @@ inventoryChangeStatWin = new Ext.Window(
 																			rootData[i].operator,
 																			rootData[i].price,
 																			rootData[i].amount,
-																			rootData[i].total
+																			rootData[i].total,
+																			rootData[i].comment
 
 																	]);
 														}
@@ -3779,6 +3794,8 @@ var changeStatDetailResultStore = new Ext.data.Store({
 	}, {
 		name : "total"
 	}, {
+		name : "comment"
+	}, {
 		name : "message"
 	} ])
 });
@@ -3824,6 +3841,11 @@ var changeStatDetailResultColumnModel = new Ext.grid.ColumnModel([
 			header : "小计（￥）",
 			sortable : true,
 			dataIndex : "total",
+			width : 80
+		}, {
+			header : "备注",
+			sortable : true,
+			dataIndex : "comment",
 			width : 80
 		} ]);
 
@@ -7531,8 +7553,9 @@ var checkStatSumResultWin = new Ext.Window({
 	}
 });
 // --------------------------------------end盤點統計----------------------------------------------
-//--------------------------------------- 出貨統計 --------------------------------------------------------
-//条件框
+// --------------------------------------- 出貨統計
+// --------------------------------------------------------
+// 条件框
 var inventoryReturnStatMSDS = new Ext.data.SimpleStore({
 	fields : [ "retrunValue", "displayText" ],
 	data : []
@@ -7873,8 +7896,9 @@ inventoryReturnStatWin = new Ext.Window(
 								}
 
 								// -- 獲取時間 --
-								var beginDate = inventoryReturnStatWin.findById(
-										"begDateReturnStat").getValue();
+								var beginDate = inventoryReturnStatWin
+										.findById("begDateReturnStat")
+										.getValue();
 								if (beginDate != "") {
 									var dateFormated = new Date();
 									dateFormated = beginDate;
@@ -7890,51 +7914,52 @@ inventoryReturnStatWin = new Ext.Window(
 								}
 
 								// -- 獲取供應商 --
-								var supplier = returnStatSupplierCombo.getValue();
+								var supplier = returnStatSupplierCombo
+										.getValue();
 								if (supplier == "全部") {
 									supplier = "-1";
 								}
 
 								// -- 獲取部門 --
 								var departments = "";
-								if (inventoryReturnStatWin.findById("dept1ReturnStat")
-										.getValue() == true) {
+								if (inventoryReturnStatWin.findById(
+										"dept1ReturnStat").getValue() == true) {
 									departments = departments + "0,";
 								}
-								if (inventoryReturnStatWin.findById("dept2ReturnStat")
-										.getValue() == true) {
+								if (inventoryReturnStatWin.findById(
+										"dept2ReturnStat").getValue() == true) {
 									departments = departments + "1,";
 								}
-								if (inventoryReturnStatWin.findById("dept3ReturnStat")
-										.getValue() == true) {
+								if (inventoryReturnStatWin.findById(
+										"dept3ReturnStat").getValue() == true) {
 									departments = departments + "2,";
 								}
-								if (inventoryReturnStatWin.findById("dept4ReturnStat")
-										.getValue() == true) {
+								if (inventoryReturnStatWin.findById(
+										"dept4ReturnStat").getValue() == true) {
 									departments = departments + "3,";
 								}
-								if (inventoryReturnStatWin.findById("dept5ReturnStat")
-										.getValue() == true) {
+								if (inventoryReturnStatWin.findById(
+										"dept5ReturnStat").getValue() == true) {
 									departments = departments + "4,";
 								}
-								if (inventoryReturnStatWin.findById("dept6ReturnStat")
-										.getValue() == true) {
+								if (inventoryReturnStatWin.findById(
+										"dept6ReturnStat").getValue() == true) {
 									departments = departments + "5,";
 								}
-								if (inventoryReturnStatWin.findById("dept7ReturnStat")
-										.getValue() == true) {
+								if (inventoryReturnStatWin.findById(
+										"dept7ReturnStat").getValue() == true) {
 									departments = departments + "6,";
 								}
-								if (inventoryReturnStatWin.findById("dept8ReturnStat")
-										.getValue() == true) {
+								if (inventoryReturnStatWin.findById(
+										"dept8ReturnStat").getValue() == true) {
 									departments = departments + "7,";
 								}
-								if (inventoryReturnStatWin.findById("dept9ReturnStat")
-										.getValue() == true) {
+								if (inventoryReturnStatWin.findById(
+										"dept9ReturnStat").getValue() == true) {
 									departments = departments + "8,";
 								}
-								if (inventoryReturnStatWin.findById("dept10ReturnStat")
-										.getValue() == true) {
+								if (inventoryReturnStatWin.findById(
+										"dept10ReturnStat").getValue() == true) {
 									departments = departments + "9,";
 								}
 
@@ -7944,8 +7969,9 @@ inventoryReturnStatWin = new Ext.Window(
 								}
 
 								// -- 獲取統計類型 --
-								var staticType = inventoryReturnStatFrom.getForm()
-										.findField("ReturnStat").getGroupValue();
+								var staticType = inventoryReturnStatFrom
+										.getForm().findField("ReturnStat")
+										.getGroupValue();
 								if (staticType == "detail") {
 									isPrompt = true;
 									returnStatDetailResultWin.show();
@@ -8002,7 +8028,8 @@ inventoryReturnStatWin = new Ext.Window(
 																			deptN,
 																			rootData[i].price,
 																			rootData[i].amount,
-																			rootData[i].total
+																			rootData[i].total,
+																			rootData[i].comment
 
 																	]);
 														}
@@ -8217,10 +8244,12 @@ inventoryReturnStatWin = new Ext.Window(
 			listeners : {
 				"show" : function(thiz) {
 
-					inventoryReturnStatWin.findById("materialReturnStatMultSelect")
-							.reset();
-					inventoryReturnStatWin.findById("begDateReturnStat").setValue("");
-					inventoryReturnStatWin.findById("endDateReturnStat").setValue("");
+					inventoryReturnStatWin.findById(
+							"materialReturnStatMultSelect").reset();
+					inventoryReturnStatWin.findById("begDateReturnStat")
+							.setValue("");
+					inventoryReturnStatWin.findById("endDateReturnStat")
+							.setValue("");
 
 					returnStatSupplierCombo.setValue("全部");
 
@@ -8228,50 +8257,60 @@ inventoryReturnStatWin = new Ext.Window(
 					returnStatSupplierComboStore.loadData(supplierComboData);
 
 					// 神技！動態改變form中component的label！！！
-					inventoryReturnStatWin.findById("dept1ReturnStat").el.parent()
-							.parent().parent().first().dom.innerHTML = departmentData[0][1]
+					inventoryReturnStatWin.findById("dept1ReturnStat").el
+							.parent().parent().parent().first().dom.innerHTML = departmentData[0][1]
 							+ ":";
-					inventoryReturnStatWin.findById("dept2ReturnStat").el.parent()
-							.parent().parent().first().dom.innerHTML = departmentData[1][1]
+					inventoryReturnStatWin.findById("dept2ReturnStat").el
+							.parent().parent().parent().first().dom.innerHTML = departmentData[1][1]
 							+ ":";
-					inventoryReturnStatWin.findById("dept3ReturnStat").el.parent()
-							.parent().parent().first().dom.innerHTML = departmentData[2][1]
+					inventoryReturnStatWin.findById("dept3ReturnStat").el
+							.parent().parent().parent().first().dom.innerHTML = departmentData[2][1]
 							+ ":";
-					inventoryReturnStatWin.findById("dept4ReturnStat").el.parent()
-							.parent().parent().first().dom.innerHTML = departmentData[3][1]
+					inventoryReturnStatWin.findById("dept4ReturnStat").el
+							.parent().parent().parent().first().dom.innerHTML = departmentData[3][1]
 							+ ":";
-					inventoryReturnStatWin.findById("dept5ReturnStat").el.parent()
-							.parent().parent().first().dom.innerHTML = departmentData[4][1]
+					inventoryReturnStatWin.findById("dept5ReturnStat").el
+							.parent().parent().parent().first().dom.innerHTML = departmentData[4][1]
 							+ ":";
-					inventoryReturnStatWin.findById("dept6ReturnStat").el.parent()
-							.parent().parent().first().dom.innerHTML = departmentData[5][1]
+					inventoryReturnStatWin.findById("dept6ReturnStat").el
+							.parent().parent().parent().first().dom.innerHTML = departmentData[5][1]
 							+ ":";
-					inventoryReturnStatWin.findById("dept7ReturnStat").el.parent()
-							.parent().parent().first().dom.innerHTML = departmentData[6][1]
+					inventoryReturnStatWin.findById("dept7ReturnStat").el
+							.parent().parent().parent().first().dom.innerHTML = departmentData[6][1]
 							+ ":";
-					inventoryReturnStatWin.findById("dept8ReturnStat").el.parent()
-							.parent().parent().first().dom.innerHTML = departmentData[7][1]
+					inventoryReturnStatWin.findById("dept8ReturnStat").el
+							.parent().parent().parent().first().dom.innerHTML = departmentData[7][1]
 							+ ":";
-					inventoryReturnStatWin.findById("dept9ReturnStat").el.parent()
-							.parent().parent().first().dom.innerHTML = departmentData[8][1]
+					inventoryReturnStatWin.findById("dept9ReturnStat").el
+							.parent().parent().parent().first().dom.innerHTML = departmentData[8][1]
 							+ ":";
-					inventoryReturnStatWin.findById("dept10ReturnStat").el.parent()
-							.parent().parent().first().dom.innerHTML = departmentData[9][1]
+					inventoryReturnStatWin.findById("dept10ReturnStat").el
+							.parent().parent().parent().first().dom.innerHTML = departmentData[9][1]
 							+ ":";
 
-					inventoryReturnStatWin.findById("dept1ReturnStat").setValue(false);
-					inventoryReturnStatWin.findById("dept2ReturnStat").setValue(false);
-					inventoryReturnStatWin.findById("dept3ReturnStat").setValue(false);
-					inventoryReturnStatWin.findById("dept4ReturnStat").setValue(false);
-					inventoryReturnStatWin.findById("dept5ReturnStat").setValue(false);
-					inventoryReturnStatWin.findById("dept6ReturnStat").setValue(false);
-					inventoryReturnStatWin.findById("dept7ReturnStat").setValue(false);
-					inventoryReturnStatWin.findById("dept8ReturnStat").setValue(false);
-					inventoryReturnStatWin.findById("dept9ReturnStat").setValue(false);
-					inventoryReturnStatWin.findById("dept10ReturnStat").setValue(false);
+					inventoryReturnStatWin.findById("dept1ReturnStat")
+							.setValue(false);
+					inventoryReturnStatWin.findById("dept2ReturnStat")
+							.setValue(false);
+					inventoryReturnStatWin.findById("dept3ReturnStat")
+							.setValue(false);
+					inventoryReturnStatWin.findById("dept4ReturnStat")
+							.setValue(false);
+					inventoryReturnStatWin.findById("dept5ReturnStat")
+							.setValue(false);
+					inventoryReturnStatWin.findById("dept6ReturnStat")
+							.setValue(false);
+					inventoryReturnStatWin.findById("dept7ReturnStat")
+							.setValue(false);
+					inventoryReturnStatWin.findById("dept8ReturnStat")
+							.setValue(false);
+					inventoryReturnStatWin.findById("dept9ReturnStat")
+							.setValue(false);
+					inventoryReturnStatWin.findById("dept10ReturnStat")
+							.setValue(false);
 
-					inventoryReturnStatFrom.getForm().findField("ReturnStat").setValue(
-							"detail");
+					inventoryReturnStatFrom.getForm().findField("ReturnStat")
+							.setValue("detail");
 
 				},
 				"hide" : function(thiz) {
@@ -8280,8 +8319,8 @@ inventoryReturnStatWin = new Ext.Window(
 			}
 		});
 
-//结果框 -- 明細
-//前台：[食材 日期 供应商 经手人 部门 价格 数量 小计]
+// 结果框 -- 明細
+// 前台：[食材 日期 供应商 经手人 部门 价格 数量 小计]
 var returnStatDetailResultStore = new Ext.data.Store({
 	proxy : new Ext.data.MemoryProxy(returnStatDetailResultData),
 	reader : new Ext.data.ArrayReader({}, [ {
@@ -8307,11 +8346,13 @@ var returnStatDetailResultStore = new Ext.data.Store({
 	}, {
 		name : "total"
 	}, {
+		name : "comment"
+	}, {
 		name : "message"
 	} ])
 });
 
-//2，栏位模型
+// 2，栏位模型
 var returnStatDetailResultColumnModel = new Ext.grid.ColumnModel([
 		new Ext.grid.RowNumberer(), {
 			header : "食材",
@@ -8352,6 +8393,11 @@ var returnStatDetailResultColumnModel = new Ext.grid.ColumnModel([
 			header : "小计（￥）",
 			sortable : true,
 			dataIndex : "total",
+			width : 80
+		}, {
+			header : "备注",
+			sortable : true,
+			dataIndex : "comment",
 			width : 80
 		} ]);
 
@@ -8400,8 +8446,8 @@ var returnStatDetailResultWin = new Ext.Window({
 	}
 });
 
-//结果框 -- 按食材
-//--------------------------------------------------------------------------------------------------------
+// 结果框 -- 按食材
+// --------------------------------------------------------------------------------------------------------
 var returnStatByMateriaReader = new Ext.data.JsonReader({
 	idProperty : 'groupID',
 	fields : [ {
@@ -8433,7 +8479,6 @@ var returnStatByMateriaReader = new Ext.data.JsonReader({
 	} ]
 
 });
-
 
 var returnStatByMateriaSummary = new Ext.grid.GroupSummary();
 
@@ -8535,13 +8580,13 @@ var returnStatByMateriaGrid = new Ext.grid.EditorGridPanel({
 	collapsible : true,
 	animCollapse : false,
 	trackMouseOver : false
-//enableColumnMove: false,
-//title : 'Sponsored Projects'
-//iconCls: 'icon-grid',
-//renderTo: document.body
+// enableColumnMove: false,
+// title : 'Sponsored Projects'
+// iconCls: 'icon-grid',
+// renderTo: document.body
 });
 
-//--------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------
 
 var returnStatByMaterialResultWin = new Ext.Window({
 	title : "退货汇总-按食材",
@@ -8570,8 +8615,8 @@ var returnStatByMaterialResultWin = new Ext.Window({
 	}
 });
 
-//结果框 -- 按部門
-//--------------------------------------------------------------------------------------------------------
+// 结果框 -- 按部門
+// --------------------------------------------------------------------------------------------------------
 var returnStatByDeptReader = new Ext.data.JsonReader({
 	idProperty : 'groupID',
 	fields : [ {
@@ -8704,13 +8749,13 @@ var returnStatByDeptGrid = new Ext.grid.EditorGridPanel({
 	collapsible : true,
 	animCollapse : false,
 	trackMouseOver : false
-//enableColumnMove: false,
-//title : 'Sponsored Projects'
-//iconCls: 'icon-grid',
-//renderTo: document.body
+// enableColumnMove: false,
+// title : 'Sponsored Projects'
+// iconCls: 'icon-grid',
+// renderTo: document.body
 });
 
-//--------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------
 
 var returnStatByDeptResultWin = new Ext.Window({
 	title : "退货汇总-按部门",
@@ -8739,8 +8784,8 @@ var returnStatByDeptResultWin = new Ext.Window({
 	}
 });
 
-//结果框 -- 按供應商
-//--------------------------------------------------------------------------------------------------------
+// 结果框 -- 按供應商
+// --------------------------------------------------------------------------------------------------------
 var returnStatBySupplierReader = new Ext.data.JsonReader({
 	idProperty : 'groupID',
 	fields : [ {
@@ -8873,13 +8918,13 @@ var returnStatBySupplierGrid = new Ext.grid.EditorGridPanel({
 	collapsible : true,
 	animCollapse : false,
 	trackMouseOver : false
-//enableColumnMove: false,
-//title : 'Sponsored Projects'
-//iconCls: 'icon-grid',
-//renderTo: document.body
+// enableColumnMove: false,
+// title : 'Sponsored Projects'
+// iconCls: 'icon-grid',
+// renderTo: document.body
 });
 
-//--------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------
 
 var returnStatBySupplierResultWin = new Ext.Window({
 	title : "退货汇总-按供应商",
@@ -8908,4 +8953,4 @@ var returnStatBySupplierResultWin = new Ext.Window({
 	}
 });
 
-//--------------------------------------end出貨統計----------------------------------------------
+// --------------------------------------end出貨統計----------------------------------------------

@@ -103,7 +103,7 @@ public class StatInventoryChangeDetail extends Action {
 			 */
 
 			String sql = " SELECT a.material_id, a.date, a.dept_id, a.dept2_id, a.staff, "
-					+ " b.price, a.amount, b.price*a.amount as total "
+					+ " b.price, a.amount, b.price*a.amount as total, a.comment "
 					+ " FROM "
 					+ Params.dbName
 					+ ".material_detail a, "
@@ -134,6 +134,7 @@ public class StatInventoryChangeDetail extends Action {
 				resultMap.put("price", dbCon.rs.getFloat("price"));
 				resultMap.put("amount", (-1) * dbCon.rs.getFloat("amount"));
 				resultMap.put("total", (-1) * dbCon.rs.getFloat("total"));
+				resultMap.put("comment", dbCon.rs.getString("comment"));
 
 				resultMap.put("message", "normal");
 

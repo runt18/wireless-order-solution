@@ -104,7 +104,7 @@ public class StatInventoryReturnDetail extends Action {
 			 */
 
 			String sql = " SELECT material_id, date, supplier_id, staff, dept_id, "
-					+ " price, amount, price*amount as total "
+					+ " price, amount, price*amount as total, comment "
 					+ " FROM "
 					+ Params.dbName
 					+ ".material_detail "
@@ -132,6 +132,7 @@ public class StatInventoryReturnDetail extends Action {
 				resultMap.put("price", dbCon.rs.getFloat("price"));
 				resultMap.put("amount", (-1) * dbCon.rs.getFloat("amount"));
 				resultMap.put("total", (-1) * dbCon.rs.getFloat("total"));
+				resultMap.put("comment", dbCon.rs.getString("comment"));
 
 				resultMap.put("message", "normal");
 

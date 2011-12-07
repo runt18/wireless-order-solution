@@ -94,11 +94,11 @@ public class InventoryChangeAction extends Action {
 			sql = "INSERT INTO "
 					+ Params.dbName
 					+ ".material_detail"
-					+ "( restaurant_id, material_id, date, dept_id, dept2_id, amount, type, staff ) "
+					+ "( restaurant_id, material_id, date, dept_id, dept2_id, amount, type, staff, comment ) "
 					+ " VALUES(" + term.restaurant_id + ", " + materialID
 					+ ", '" + date + "', " + deptIDOut + ", " + deptIDIn + ", "
 					+ amount * (-1) + ", " + MaterialDetail.TYPE_OUT + ", '"
-					+ staff + "' ) ";
+					+ staff + "', '" + remark + "' ) ";
 			sqlRowCount = dbCon.stmt.executeUpdate(sql);
 
 			sql = " SELECT stock FROM " + Params.dbName
