@@ -95,9 +95,9 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.main);
 		
 		int[] imageIcons = { 
-							 R.drawable.icon03, R.drawable.icon08, R.drawable.icon11, 
-							 R.drawable.icon04, R.drawable.icon05, R.drawable.icon06, 
-							 R.drawable.icon07, R.drawable.icon01, R.drawable.icon09 
+							 R.drawable.btnup01, R.drawable.btnup02, R.drawable.btnup03, 
+							 R.drawable.btnup04, R.drawable.btnup05, R.drawable.btnup06, 
+							 R.drawable.btnup07, R.drawable.btnup08, R.drawable.btnup09 
 						   };
 
 		String[] iconDes = { 
@@ -719,8 +719,10 @@ public class MainActivity extends Activity {
 				@Override
 				public void onClick(View v) {
 					EditText table= (EditText)findViewById(R.id.mycount);
-					String tableID = table.getText().toString();
-					if(_type == DIALOG_UPDATE_ORDER){
+					String tableID = table.getText().toString().trim();
+					if(tableID.equals("")){
+						Toast.makeText(MainActivity.this, "台号不能为空", 0).show();
+					}else if(_type == DIALOG_UPDATE_ORDER){
 						new QueryOrderTask(Integer.parseInt(tableID), Type.UPDATE_ORDER).execute();
 						
 					}else if(_type == DIALOG_BILL_ORDER){

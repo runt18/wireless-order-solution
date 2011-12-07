@@ -174,7 +174,7 @@ public class OrderFoodListView extends ExpandableListView{
 		@Override
 		public View getChildView(int groupPosition, final int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
 			View view = View.inflate(_context, R.layout.dropchilditem, null);
-			OrderFood food = _foods.get(childPosition);
+			final OrderFood food = _foods.get(childPosition);
 			//show the name to each food
 			String status = "";
 			if(food.isSpecial()){
@@ -237,7 +237,7 @@ public class OrderFoodListView extends ExpandableListView{
 			if(_type == Type.INSERT_ORDER){
 				//"删菜"操作			 
 				ImageView delFoodImgView = (ImageView)view.findViewById(R.id.deletefood);
-				delFoodImgView.setBackgroundResource(R.drawable.commit);
+				delFoodImgView.setBackgroundResource(R.drawable.delete_selector);
 				delFoodImgView.setOnClickListener(new View.OnClickListener() {
 					/**
 					 * "新点菜"时直接显示删菜数量Dialog
@@ -250,7 +250,7 @@ public class OrderFoodListView extends ExpandableListView{
 
 				//"口味"操作
 				ImageView addTasteImgView = (ImageView)view.findViewById(R.id.addtaste);
-				addTasteImgView.setBackgroundResource(R.drawable.commit);
+				addTasteImgView.setBackgroundResource(R.drawable.taste_selector);
 				addTasteImgView.setOnClickListener(new View.OnClickListener() {				
 					@Override
 					public void onClick(View v) {
@@ -264,7 +264,7 @@ public class OrderFoodListView extends ExpandableListView{
 			}else{
 				//"退菜"操作
 				ImageView cancelFoodImgView = (ImageView)view.findViewById(R.id.deletefood);
-				cancelFoodImgView.setBackgroundResource(R.drawable.commit);
+				cancelFoodImgView.setBackgroundResource(R.drawable.tuicai_selector);
 				cancelFoodImgView.setOnClickListener(new View.OnClickListener() {				
 					@Override
 					public void onClick(View v) {
@@ -280,7 +280,24 @@ public class OrderFoodListView extends ExpandableListView{
 						}.show();
 					}
 				});
-
+				//"催菜"操作
+				ImageView addTasteImgView = (ImageView)view.findViewById(R.id.addtaste);
+				addTasteImgView.setBackgroundResource(R.drawable.cuicai_selector);
+				addTasteImgView.setOnClickListener(new View.OnClickListener() {				
+					@Override
+					public void onClick(View v) {
+						if(food.isHurried){
+							food.isHurried = false;
+							Toast.makeText(_context, "取消催菜成功", 0).show();
+							_adapter.notifyDataSetChanged();
+				
+						}else{
+							food.isHurried = true;
+							Toast.makeText(_context, "催菜成功", 0).show();	
+							_adapter.notifyDataSetChanged();
+						}			
+					}
+				}); 
 			}
 			return view;
 		}
@@ -315,7 +332,7 @@ public class OrderFoodListView extends ExpandableListView{
 			 */
 			if(_type == Type.INSERT_ORDER){
 				ImageView orderImg = (ImageView)view.findViewById(R.id.orderimage);
-				orderImg.setBackgroundResource(R.drawable.commit);
+				orderImg.setBackgroundResource(R.drawable.order_selector);
 				
 				orderImg.setOnClickListener(new View.OnClickListener() {				
 					@Override
@@ -325,6 +342,11 @@ public class OrderFoodListView extends ExpandableListView{
 						}
 					}
 				});
+			}
+			if(isExpanded){
+				((ImageView)view.findViewById(R.id.arrow)).setBackgroundResource(R.drawable.point);
+			}else{
+				((ImageView)view.findViewById(R.id.arrow)).setBackgroundResource(R.drawable.point02);
 			}
 			return view;
 		}
@@ -510,7 +532,8 @@ public class OrderFoodListView extends ExpandableListView{
 						public void onClick(View arg0) {
 							if(selectedFood.isHurried){
 								selectedFood.isHurried = false;
-								((TextView)findViewById(R.id.item3Txt)).setText("催菜");							
+								((TextView)findViewById(R.id.item3Txt)).setText("催菜");	
+								
 							}else{
 								selectedFood.isHurried = true;
 								((TextView)findViewById(R.id.item3Txt)).setText("取消催菜");									

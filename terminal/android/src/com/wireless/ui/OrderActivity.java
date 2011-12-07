@@ -83,7 +83,7 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 		 * ÐÂµã²ËµÄListView
 		 */
 		_newFoodLstView = (OrderFoodListView)findViewById(R.id.orderLstView);
-		_newFoodLstView.setGroupIndicator(getResources().getDrawable(R.layout.expander_folder));
+		//_newFoodLstView.setGroupIndicator(getResources().getDrawable(R.layout.expander_folder));
 		_newFoodLstView.setType(Type.INSERT_ORDER);
 		_newFoodLstView.notifyDataChanged(new ArrayList<OrderFood>());
 		_newFoodLstView.setOperListener(this);
@@ -211,6 +211,7 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 				 */
 				FoodParcel foodParcel = data.getParcelableExtra(FoodParcel.KEY_VALUE);
 				_newFoodLstView.notifyDataChanged(foodParcel);
+				 
 				
 			}else if(requestCode == OrderFoodListView.PICK_FOOD){
 				/**

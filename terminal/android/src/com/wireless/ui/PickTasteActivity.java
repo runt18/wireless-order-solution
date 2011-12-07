@@ -1,16 +1,25 @@
 package com.wireless.ui;
 
+import java.util.ArrayList;
+
 import android.app.TabActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.GestureDetector;
+import android.view.GestureDetector.OnGestureListener;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TabHost;
@@ -25,8 +34,12 @@ import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Util;
 
-public class PickTasteActivity extends TabActivity {
-	
+public class PickTasteActivity extends TabActivity implements OnGestureListener{
+	int _currentView = 0; 
+	private static int _maxTabIndex = 3; 
+	private GestureDetector _detector; 
+
+
 	private Handler _handler = new Handler(){
 		@Override
 		public void handleMessage(Message message){
@@ -41,13 +54,14 @@ public class PickTasteActivity extends TabActivity {
 	private OrderFood _selectedFood;
 	private TextView _tasteTxtView;
 	private TabHost _tabHost;
-
+	
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
+		 _detector = new GestureDetector(this); 
 		//get the food parcel from the intent
 		FoodParcel foodParcel = getIntent().getParcelableExtra(FoodParcel.KEY_VALUE);
 		_selectedFood = foodParcel;
@@ -67,6 +81,8 @@ public class PickTasteActivity extends TabActivity {
 							   });
 		_tabHost.addTab(spec);
 		
+		
+		
 		//做法Tab
 		spec = _tabHost.newTabSpec(TAG_STYLE)
 					   .setIndicator(createTabIndicator("做法", R.drawable.ic_tab_artists))
@@ -77,6 +93,8 @@ public class PickTasteActivity extends TabActivity {
 						   }								   
 					   });
 		_tabHost.addTab(spec);
+		
+		
 		
 		//规格Tab
 		spec = _tabHost.newTabSpec(TAG_SPEC)
@@ -89,6 +107,8 @@ public class PickTasteActivity extends TabActivity {
 					   });
 		_tabHost.addTab(spec);
 		
+		
+		
 		/**
 		 * Tab切换时更换相应的Adapter，显示不同种类的口味
 		 */
@@ -96,32 +116,166 @@ public class PickTasteActivity extends TabActivity {
 			@Override
 			public void onTabChanged(String tag) {
 				if(tag == TAG_TASTE){
-					_tasteTxtView = (TextView)findViewById(R.id.foodTasteTxtView);
-					ListView tasteLstView = (ListView)findViewById(R.id.tasteLstView);
-					tasteLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.tastes));
-					
+					setTasteView();		
 				}else if(tag == TAG_STYLE){
-					_tasteTxtView = (TextView)findViewById(R.id.foodStyleTxtView);
-					ListView tasteLstView = (ListView)findViewById(R.id.styleLstView);
-					tasteLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.styles));
-					
+					setStyleView();
 				}else if(tag == TAG_SPEC){
-					_tasteTxtView = (TextView)findViewById(R.id.foodSpecTxtView);
-					ListView tasteLstView = (ListView)findViewById(R.id.specLstView);
-					tasteLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.specs));
+					setSpecView();
 				}
 				_handler.sendEmptyMessage(0);
 			}
 		});
 		
 		_tabHost.setCurrentTabByTag(TAG_TASTE);
-		_tasteTxtView = (TextView)findViewById(R.id.foodTasteTxtView);
-		ListView tasteLstView = (ListView)findViewById(R.id.tasteLstView);
-		tasteLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.tastes));
+		setTasteView();
 		_handler.sendEmptyMessage(0);
+		
+		
+		
+		
+		
 	}
 
+   //设置口味View
+	public void setTasteView(){
+		_tasteTxtView = (TextView)findViewById(R.id.foodTasteTxtView);
+	    final ListView tasteLstView = (ListView)findViewById(R.id.tasteLstView);
+		tasteLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.tastes));
+		
+		//口味返回按钮
+		((ImageView)findViewById(R.id.tasteback)).setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+			onBackPressed();	
+			finish();
+				
+			}
+		});
+		
+		/**
+		 * 在口味选择页面中按编号进行口味的筛选
+		 */
+		((EditText)findViewById(R.id.tastesearch)).addTextChangedListener(new TextWatcher() {
+			
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				ArrayList<Taste> tastes = new ArrayList<Taste>();
+				if(s.toString().length() != 0){
+				    for(int i = 0; i < WirelessOrder.foodMenu.tastes.length;i++){
+				    	 if(String.valueOf(WirelessOrder.foodMenu.tastes[i].alias_id).startsWith(s.toString().trim())){
+				    		 tastes.add(WirelessOrder.foodMenu.tastes[i]);
+				    	 }
+				    }
+				    tasteLstView.setAdapter(new TasteAdapter(tastes.toArray(new Taste[tastes.size()])));
+				}else{
+					tasteLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.tastes));
+				}
+			}
+			
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,	int after) {}
+			
+			@Override
+			public void afterTextChanged(Editable s) {}
+		});
+		
+		
+	}
+	
+	
+	//设置做法View
+	public void setStyleView(){
+		_tasteTxtView = (TextView)findViewById(R.id.foodStyleTxtView);
+    	final ListView styleLstView = (ListView)findViewById(R.id.styleLstView);
+		styleLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.styles));
+		
+		//做法返回按钮
+	    ((ImageView)findViewById(R.id.styleback)).setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+				onBackPressed();	
+				finish();
+					
+				}
+			});
+	    
+	    /**
+		 * 在做法选择页面中按编号进行做法的筛选
+		 */
+		((EditText)findViewById(R.id.stylesearch)).addTextChangedListener(new TextWatcher() {
+			
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				ArrayList<Taste> styles = new ArrayList<Taste>();
+				if(s.toString().length() != 0){
+					 for(int i = 0; i < WirelessOrder.foodMenu.styles.length;i++){
+				    	 if(String.valueOf(WirelessOrder.foodMenu.styles[i].alias_id).startsWith(s.toString().trim())){
+				    		 styles.add(WirelessOrder.foodMenu.styles[i]);
+				    	 }
+				    }
+					styleLstView.setAdapter(new TasteAdapter(styles.toArray(new Taste[styles.size()])));
+					
+				}else{
+					styleLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.styles));
+				}
+			}
+			
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,	int after) {}
+			
+			@Override
+			public void afterTextChanged(Editable s) {}
+		});
+	}
+	
+	//设置规格View
+	public void setSpecView(){
+		_tasteTxtView = (TextView)findViewById(R.id.foodSpecTxtView);
+		final ListView specLstView = (ListView)findViewById(R.id.specLstView);
+		specLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.specs));
+		
+		//做法返回按钮
+	    ((ImageView)findViewById(R.id.specback)).setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+				onBackPressed();	
+				finish();
+					
+				}
+			});
 
+	    /**
+		 * 在规格选择页面中按编号进行规格的筛选
+		 */
+		((EditText)findViewById(R.id.specsearch)).addTextChangedListener(new TextWatcher() {
+			
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				ArrayList<Taste> specs = new ArrayList<Taste>();
+				if(s.toString().length() != 0){
+					 for(int i = 0; i < WirelessOrder.foodMenu.specs.length;i++){
+				    	 if(String.valueOf(WirelessOrder.foodMenu.specs[i].alias_id).startsWith(s.toString().trim())){
+				    		 specs.add(WirelessOrder.foodMenu.specs[i]);
+				    	 }
+				    }
+					 specLstView.setAdapter(new TasteAdapter(specs.toArray(new Taste[specs.size()])));
+					
+				}else{
+					specLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.specs));
+				}
+			}
+			
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,	int after) {}
+			
+			@Override
+			public void afterTextChanged(Editable s) {}
+		});
+	}
+	
 	@Override
 	public void onBackPressed(){
 		Intent intent = new Intent(); 
@@ -178,6 +332,8 @@ public class PickTasteActivity extends TabActivity {
 			}
 			//set name to taste
 			((TextView)view.findViewById(R.id.foodname)).setText(_tastes[position].preference);
+			//set number to taste
+			((TextView)view.findViewById(R.id.nums)).setText(String.valueOf(_tastes[position].alias_id));
 			//set the price to taste
 			if(_tastes[position].calc == Taste.CALC_RATE){
 				((TextView)view.findViewById(R.id.foodprice)).setText(Util.float2Int(_tastes[position].getRate()) + "%");
@@ -187,6 +343,7 @@ public class PickTasteActivity extends TabActivity {
 			//set the status to whether the taste is selected
 			final CheckBox selectChkBox = (CheckBox)view.findViewById(R.id.chioce);
 			selectChkBox.setChecked(false);
+			selectChkBox.requestFocus();
 			for(int i = 0; i < _selectedFood.tastes.length; i++){
 				if(_tastes[position].alias_id == _selectedFood.tastes[i].alias_id){
 					selectChkBox.setChecked(true);
@@ -197,10 +354,11 @@ public class PickTasteActivity extends TabActivity {
 			/**
 			 * 口味的View操作
 			 */			
-			view.setOnClickListener(new OnClickListener() {
+			view.setOnClickListener(new View.OnClickListener() {
 				
 				@Override
 				public void onClick(View arg0) {
+			        
 					if(selectChkBox.isChecked()){
 						int pos = _selectedFood.removeTaste(_tastes[position]);
 						if(pos >= 0){
@@ -225,4 +383,79 @@ public class PickTasteActivity extends TabActivity {
 		}
 		
 	}
+    @Override  
+    public boolean onTouchEvent(MotionEvent event) {  
+      
+        return this._detector.onTouchEvent(event);  
+    }  
+    
+    @Override
+	public boolean dispatchTouchEvent(MotionEvent ev) {
+    	_detector.onTouchEvent(ev);
+		return super.dispatchTouchEvent(ev);
+	}
+
+
+	@Override
+	public boolean onDown(MotionEvent e) {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+	@Override
+	public void onShowPress(MotionEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean onSingleTapUp(MotionEvent e) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
+			float distanceY) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void onLongPress(MotionEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+	  /*
+     * 手势滑动执行方法
+     */
+	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, 
+			float velocityY) { 
+		      if(e1.getY()-e2.getY()>80){
+		    	  return false;
+		      }else{
+		    	  if(e1.getX()-e2.getX()>280){	   
+						if(_tabHost.getCurrentTab() == 3)
+							return false; 
+						_tabHost.setCurrentTab(_tabHost.getCurrentTab()+1);
+
+					 }else {	    
+				      if(_tabHost.getCurrentTab() == 0)
+							return false; 
+						_tabHost.setCurrentTab(_tabHost.getCurrentTab()-1);		
+				    }		return true;  		
+
+		      }
+		      
+			} 
+	
+		
+		//	/*
+		//	 * 手势切换添加动画效果
+		//	 */
+		//	Animation anim = AnimationUtils.loadAnimation(PickTasteActivity.this, android.R.anim.slide_in_left);
+		//	_tabHost.startAnimation(anim);
+
+	
+	
 }

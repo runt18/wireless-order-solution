@@ -27,8 +27,8 @@ import com.wireless.protocol.Terminal;
 import com.wireless.protocol.Type;
 import com.wireless.sccon.ServerConnector;
 
+
 public class StartupActivity extends Activity {
- private ProgressBar pb;
  private TextView message;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +55,6 @@ public class StartupActivity extends Activity {
 		});
 		
 		setContentView(R.layout.enter);
-		pb=(ProgressBar)findViewById(R.id.myprogressbar);
 		message=(TextView)findViewById(R.id.myTextView);
 		
 
@@ -175,7 +174,6 @@ public class StartupActivity extends Activity {
 			 * Prompt user message if any error occurred,
 			 * otherwise continue to query restaurant info.
 			 */
-			pb.setProgress(50);
 			if(errMsg != null){
 				new AlertDialog.Builder(StartupActivity.this)
 				.setTitle("ÌבÊ¾")
@@ -255,6 +253,7 @@ public class StartupActivity extends Activity {
 				
 				Intent intent=new Intent(StartupActivity.this,MainActivity.class);
 				startActivity(intent);
+				overridePendingTransition(R.anim.enter,android.R.anim.fade_out);    
 				finish();
 			}
 		}	

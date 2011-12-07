@@ -114,7 +114,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 		 * "已点菜"的ListView
 		 */
 		_oriFoodLstView = (OrderFoodListView)findViewById(R.id.oriFoodLstView);
-		_oriFoodLstView.setGroupIndicator(getResources().getDrawable(R.layout.expander_folder));
+		//_oriFoodLstView.setGroupIndicator(getResources().getDrawable(R.layout.expander_folder));
 		_oriFoodLstView.setType(Type.UPDATE_ORDER);
 		_oriFoodLstView.notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(_oriOrder.foods)));
 		_oriFoodLstView.setOperListener(this);
@@ -124,7 +124,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 		 * "新点菜"的ListView
 		 */
 		_newFoodLstView = (OrderFoodListView)findViewById(R.id.newFoodLstView);
-		_newFoodLstView.setGroupIndicator(getResources().getDrawable(R.layout.expander_folder));
+		//_newFoodLstView.setGroupIndicator(getResources().getDrawable(R.layout.expander_folder));
 		_newFoodLstView.setType(Type.INSERT_ORDER);
 		_newFoodLstView.notifyDataChanged(new ArrayList<OrderFood>());
 		_newFoodLstView.setOperListener(this);
