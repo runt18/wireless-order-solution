@@ -1954,10 +1954,11 @@ var materialColumnModel = new Ext.grid.ColumnModel([
 			header : "库存量",
 			sortable : true,
 			dataIndex : "storage",
-			width : 130,
-			renderer : function(v) {
-				return parseFloat(v).toFixed(2);
-			}
+			width : 130
+		// ,
+		// renderer : function(v) {
+		// return parseFloat(v).toFixed(2);
+		// }
 		}, {
 			header : "价格（￥）",
 			sortable : true,
@@ -2191,24 +2192,61 @@ Ext
 							});
 
 			// 为store配置load监听器(即load完后动作)
-			materialGrid.getStore().on('load', function() {
-				if (materialGrid.getStore().getTotalCount() != 0) {
-					var msg = this.getAt(0).get("message");
-					if (msg != "normal") {
-						Ext.MessageBox.show({
-							msg : msg,
-							width : 300,
-							buttons : Ext.MessageBox.OK
-						});
-						this.removeAll();
-					} else {
-						// 無奈之舉
-						loadAllMaterial();
-						// materialAddWin.show();
-						// materialAddWin.hide();
-					}
-				}
-			});
+			materialGrid
+					.getStore()
+					.on(
+							'load',
+							function() {
+								if (materialGrid.getStore().getTotalCount() != 0) {
+									var msg = this.getAt(0).get("message");
+									if (msg != "normal") {
+										Ext.MessageBox.show({
+											msg : msg,
+											width : 300,
+											buttons : Ext.MessageBox.OK
+										});
+										this.removeAll();
+									} else {
+										// 無奈之舉
+										loadAllMaterial();
+										// materialAddWin.show();
+										// materialAddWin.hide();
+
+										materialStore
+												.each(function(record) {
+													var thresholdWarining = record
+															.get("warningNbr");
+													var thresholdError = record
+															.get("dangerNbr");
+													var stock = record
+															.get("storage");
+													stock = parseFloat(stock)
+															.toFixed(2);
+
+													if (thresholdWarining != 0) {
+														if (stock < thresholdWarining
+																&& stock >= thresholdError) {
+															record
+																	.set(
+																			"storage",
+																			"<font color='#C6A300'>"
+																					+ stock
+																					+ "</font>");
+															record.commit();
+														} else if (stock < thresholdError) {
+															record
+																	.set(
+																			"storage",
+																			"<font color='red'>"
+																					+ stock
+																					+ "</font>");
+															record.commit();
+														}
+													}
+												});
+									}
+								}
+							});
 			// ---------------------end 表格--------------------------
 
 			var centerPanel = new Ext.Panel({
