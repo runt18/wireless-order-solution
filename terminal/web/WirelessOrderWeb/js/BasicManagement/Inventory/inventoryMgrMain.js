@@ -1530,7 +1530,7 @@ var changeStatBut = new Ext.ux.ImageButton({
 });
 
 var costStatBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/dishAdd.png",
+	imgPath : "../../images/inventory_cost.png",
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : "消耗统计",
