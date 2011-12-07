@@ -85,7 +85,8 @@ class RemoveFoodPopup extends PopupScreen implements FieldChangeListener{
 			}else{
 				//update the remaining amount to the food
 				_food2Del.setCount(Util.int2Float(foodAmount - removeAmount));
-		
+				_orderList.setSize(_orderList.getSize(), _orderList.getSelectedIndex());
+				
 				close();
 				if(_parent != null){
 					_parent.close();
