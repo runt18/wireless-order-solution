@@ -6,14 +6,7 @@
   android:layout_width="fill_parent"
   android:layout_height="fill_parent">
   
-  <ProgressBar 
-  android:id="@+id/myprogressbar"
-  android:layout_width="300dip"
-  android:layout_height="wrap_content"
-  style="?android:attr/progressBarStyleHorizontal"
-  android:layout_centerHorizontal="true"
-  android:layout_centerVertical="true"
-  />
+
   <TextView 
   android:id="@+id/myTextView"
   android:layout_width="wrap_content"
@@ -23,9 +16,9 @@
   android:shadowDx="1"
   android:shadowDy="1"
   android:shadowRadius="1"
-  android:textSize="22sp"
-  android:layout_below="@id/myprogressbar"
+  android:textSize="18sp"
+  android:layout_alignParentBottom="true"
   android:layout_centerHorizontal="true"
-  android:layout_marginTop="8dip"
+  android:layout_marginBottom="120dip"
   />  
 </RelativeLayout>
