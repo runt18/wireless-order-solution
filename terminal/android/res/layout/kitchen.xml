@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:background="@drawable/bgcolor"
+	>
+	<RelativeLayout android:id="@+id/top_ket"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:background="@drawable/bg01" android:layout_alignParentTop="true">
+		<ImageView android:id="@+id/ketback" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:src="@drawable/back_selector"
+			android:layout_marginLeft="20dip" android:layout_centerVertical="true">
+
+		</ImageView>
+		<TextView android:id="@+id/kettitle" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:textColor="#FFFFFF"
+			android:textSize="22sp" android:textStyle="bold" android:typeface="monospace"
+			android:shadowDx="1" android:shadowDy="1" android:shadowRadius="3.0"
+			android:text="下单-分厨" android:layout_centerVertical="true"
+			android:layout_centerHorizontal="true">
+		</TextView>
+	</RelativeLayout>
+
+	<RelativeLayout android:id="@+id/second"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:layout_below="@id/top_ket" android:background="@drawable/bg02">
+		<TextView android:id="@+id/ordernum" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:textColor="#000000"
+			android:layout_centerVertical="true" android:textSize="20sp"
+			android:text="拼音 :" android:layout_marginLeft="5dip" />
+		<EditText android:id="@+id/filterKitchenEdtTxt" android:layout_width="160dip"
+			android:layout_height="wrap_content" android:layout_centerVertical="true"
+			android:layout_toRightOf="@id/ordernum" android:layout_marginLeft="5dip" />
+
+		<RelativeLayout android:id="@+id/filterKitchenRelaLayout"
+			android:layout_width="fill_parent" android:layout_height="40dip"
+			android:layout_marginTop="3dip"
+			android:background="@drawable/bg06" android:layout_toRightOf="@id/filterKitchenEdtTxt"
+			android:layout_marginLeft="5dip">
+			<TextView android:id="@+id/Spinner01" android:layout_width="wrap_content"
+				android:textColor="#FFFFFF" android:layout_height="wrap_content"
+				android:layout_centerVertical="true" android:textStyle="bold"
+				android:layout_marginRight="2dip"
+				android:layout_marginLeft="2dip"
+				android:typeface="serif" android:textSize="20sp" />
+		</RelativeLayout>
+	</RelativeLayout>
+	<ImageView android:id="@+id/line" android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:src="@drawable/line"
+		android:layout_below="@id/second" />
+
+	<com.wireless.ui.view.PickFoodListView
+		android:id="@+id/pickByKitchenLstView" android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:layout_below="@id/line"
+		android:divider="@drawable/line" android:cacheColorHint="#00000000">
+	</com.wireless.ui.view.PickFoodListView>
+
+</LinearLayout>

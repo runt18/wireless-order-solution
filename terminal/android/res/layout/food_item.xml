@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent"
+  android:minHeight="40dip"
+  >
+    <TextView 
+    android:id="@+id/foodname"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textColor="#000000"
+    android:textSize="20sp"
+    android:layout_marginLeft="5dip"
+    />
+    
+    <TextView
+    android:id="@+id/num"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textColor="#000000"
+    android:textSize="15sp"
+    android:layout_marginLeft="5dip"
+    android:text="编号："
+    android:layout_below="@id/foodname"
+    >
+    </TextView>
+    
+      <TextView
+    android:id="@+id/nums"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textColor="#FF6600"
+    android:textSize="15sp"
+    android:layout_alignTop="@id/num"
+    android:layout_toRightOf="@id/num"
+    >
+    </TextView>
+    
+    <TextView
+    android:id="@+id/tasteprice"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textColor="#000000"
+    android:textSize="15sp"
+    android:layout_marginLeft="5dip"
+    android:text="价格："
+    android:layout_alignTop="@id/nums"
+    android:layout_toRightOf="@id/nums"
+    >
+    </TextView>
+        <TextView 
+    android:id="@+id/foodprice"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textColor="#FF6600"
+    android:textSize="15sp"
+    android:layout_alignTop="@id/tasteprice"
+    android:layout_toRightOf="@id/tasteprice"
+  
+    />
+    
+    <CheckBox 
+    android:id="@+id/chioce"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_centerVertical="true"
+    android:focusable="false"
+    android:layout_alignParentRight="true"
+    android:layout_marginRight="3dip"
+    />
+</RelativeLayout>
