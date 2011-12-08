@@ -197,7 +197,7 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 		final PickFoodListView pickLstView = (PickFoodListView)findViewById(R.id.pickByNumLstView);
 		EditText filterNumEdtTxt = ((EditText)findViewById(R.id.filterNumEdtTxt));
 		filterNumEdtTxt.setText("");
-		pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods,"num");
+		pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods, PickFoodListView.TAG_NUM);
 		pickLstView.setFoodPickedListener(this);
 		((ImageView)findViewById(R.id.numback)).setOnClickListener(new View.OnClickListener() {
 			
@@ -223,10 +223,10 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 							filterFoods.add(WirelessOrder.foodMenu.foods[i]);
 						}
 					}
-					pickLstView.notifyDataChanged(filterFoods.toArray(new Food[filterFoods.size()]),"num");
+					pickLstView.notifyDataChanged(filterFoods.toArray(new Food[filterFoods.size()]), PickFoodListView.TAG_NUM);
 					
 				}else{
-					pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods,"num");
+					pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods, PickFoodListView.TAG_NUM);
 				}
 			}
 			
@@ -248,7 +248,7 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 		//初始化的时候厨房默认显示的厨房信息
 		ketchenName = (TextView)findViewById(R.id.Spinner01);
 		ketchenName.setText("全部");
-		pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods,"");
+		pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods, PickFoodListView.TAG_PINYIN);
 		pickLstView.setFoodPickedListener(this);
         ((ImageView)findViewById(R.id.ketback)).setOnClickListener(new View.OnClickListener() {
 			
@@ -275,14 +275,14 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 						}
 					}
 					
-					pickLstView.notifyDataChanged(filterFoods.toArray(new Food[filterFoods.size()]),"pinyin");
+					pickLstView.notifyDataChanged(filterFoods.toArray(new Food[filterFoods.size()]), PickFoodListView.TAG_PINYIN);
 					
 					
 				}else{
 					if(dialogTag){
-						 pickLstView.notifyDataChanged(_filterFoods.toArray(new Food[_filterFoods.size()]),"pinyin");
+						 pickLstView.notifyDataChanged(_filterFoods.toArray(new Food[_filterFoods.size()]), PickFoodListView.TAG_PINYIN);
 					}else{
-						 pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods,"pinyin");
+						 pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods, PickFoodListView.TAG_PINYIN);
 					}
 					  
 				
@@ -313,7 +313,7 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 	private void setupPinyinView(){
 		final PickFoodListView pickLstView = (PickFoodListView)findViewById(R.id.pickByPinyinLstView);
 		EditText filterPinyinEdtTxt = (EditText)findViewById(R.id.filterPinyinEdtTxt);
-		pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods,"pin");
+		pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods, PickFoodListView.TAG_PINYIN);
 		pickLstView.setFoodPickedListener(this);
         ((ImageView)findViewById(R.id.pinback)).setOnClickListener(new View.OnClickListener() {
 			
@@ -342,10 +342,10 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 							filterFoods.add(WirelessOrder.foodMenu.foods[i]);
 						}
 					}
-					pickLstView.notifyDataChanged(filterFoods.toArray(new Food[filterFoods.size()]),"pinyin");
+					pickLstView.notifyDataChanged(filterFoods.toArray(new Food[filterFoods.size()]), PickFoodListView.TAG_PINYIN);
 					
 				}else{
-					pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods,"pinyin");
+					pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods, PickFoodListView.TAG_PINYIN);
 				}
 			}
 			
@@ -540,7 +540,7 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 					ketchenName.setText(_ketchenName);
 					dialogTag = true;
 					
-					foodLstView.notifyDataChanged(_filterFoods.toArray(new Food[_filterFoods.size()]),"pinyin");
+					foodLstView.notifyDataChanged(_filterFoods.toArray(new Food[_filterFoods.size()]), PickFoodListView.TAG_PINYIN);
 					dismiss();
 					return true;					
 				}

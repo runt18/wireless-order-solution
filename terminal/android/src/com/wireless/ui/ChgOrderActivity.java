@@ -13,12 +13,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 
 import com.wireless.common.FoodParcel;
 import com.wireless.common.OrderParcel;
@@ -39,6 +40,14 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 	private Order _oriOrder;
 	private OrderFoodListView _oriFoodLstView;
 	private OrderFoodListView _newFoodLstView;
+	
+	private Handler _handler = new Handler(){
+		public void handleMessage(Message message){
+			float totalPrice = new Order(_oriFoodLstView.getSourceData().toArray(new OrderFood[_oriFoodLstView.getSourceData().size()])).calcPrice2() +
+							   new Order(_newFoodLstView.getSourceData().toArray(new OrderFood[_newFoodLstView.getSourceData().size()])).calcPrice2();
+			((TextView)findViewById(R.id.amountvalue)).setText(Util.float2String(totalPrice));
+		}
+	};
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -116,9 +125,14 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 		_oriFoodLstView = (OrderFoodListView)findViewById(R.id.oriFoodLstView);
 		//_oriFoodLstView.setGroupIndicator(getResources().getDrawable(R.layout.expander_folder));
 		_oriFoodLstView.setType(Type.UPDATE_ORDER);
-		_oriFoodLstView.notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(_oriOrder.foods)));
 		_oriFoodLstView.setOperListener(this);
-
+		_oriFoodLstView.setChangedListener(new OrderFoodListView.OnChangedListener() {			
+			@Override
+			public void onSourceChanged() {
+				_handler.sendEmptyMessage(0);
+			}
+		});
+		_oriFoodLstView.notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(_oriOrder.foods)));
 
 		/**
 		 * "ÐÂµã²Ë"µÄListView
@@ -126,17 +140,20 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 		_newFoodLstView = (OrderFoodListView)findViewById(R.id.newFoodLstView);
 		//_newFoodLstView.setGroupIndicator(getResources().getDrawable(R.layout.expander_folder));
 		_newFoodLstView.setType(Type.INSERT_ORDER);
-		_newFoodLstView.notifyDataChanged(new ArrayList<OrderFood>());
 		_newFoodLstView.setOperListener(this);
-			
+		_newFoodLstView.setChangedListener(new OrderFoodListView.OnChangedListener() {			
+			@Override
+			public void onSourceChanged() {
+				_handler.sendEmptyMessage(0);
+			}
+		});	
+		_newFoodLstView.notifyDataChanged(new ArrayList<OrderFood>());
+		
 		//set the table ID
 		((EditText)findViewById(R.id.valueplatform)).setText(Integer.toString(_oriOrder.table_id));
 		//set the amount of customer
 		((EditText)findViewById(R.id.valuepeople)).setText(Integer.toString(_oriOrder.custom_num));
-		//set the total price to this order
-		((TextView)findViewById(R.id.amountvalue)).setText(Util.float2String(_oriOrder.calcPrice() + 
-								new Order(_newFoodLstView.getSourceData().toArray(new OrderFood[_newFoodLstView.getSourceData().size()])).calcPrice2()));
-			
+
 	}
 
 	/**

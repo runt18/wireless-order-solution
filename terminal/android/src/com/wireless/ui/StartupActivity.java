@@ -12,7 +12,6 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.wireless.common.WirelessOrder;
@@ -32,7 +31,6 @@ public class StartupActivity extends Activity {
  private TextView message;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		
 

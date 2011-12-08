@@ -15,8 +15,6 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -36,7 +34,7 @@ import com.wireless.protocol.Util;
 
 public class PickTasteActivity extends TabActivity implements OnGestureListener{
 	int _currentView = 0; 
-	private static int _maxTabIndex = 3; 
+	//private static int _maxTabIndex = 3; 
 	private GestureDetector _detector; 
 
 
@@ -147,9 +145,8 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 			
 			@Override
 			public void onClick(View v) {
-			onBackPressed();	
-			finish();
-				
+				onBackPressed();	
+				finish();				
 			}
 		});
 		
@@ -426,28 +423,30 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 		// TODO Auto-generated method stub
 		
 	}
-	  /*
-     * 手势滑动执行方法
-     */
-	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, 
-			float velocityY) { 
-		      if(e1.getY()-e2.getY()>80){
-		    	  return false;
-		      }else{
-		    	  if(e1.getX()-e2.getX()>280){	   
-						if(_tabHost.getCurrentTab() == 3)
-							return false; 
-						_tabHost.setCurrentTab(_tabHost.getCurrentTab()+1);
 
-					 }else {	    
-				      if(_tabHost.getCurrentTab() == 0)
-							return false; 
-						_tabHost.setCurrentTab(_tabHost.getCurrentTab()-1);		
-				    }		return true;  		
+	/*
+	 * 手势滑动执行方法
+	 */
+	@Override
+	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,	float velocityY) {
+		if (e1.getY() - e2.getY() > 80) {
+			return false;
+		} else {
+			if (e1.getX() - e2.getX() > 280) {
+				if (_tabHost.getCurrentTab() == 3)
+					return false;
+				_tabHost.setCurrentTab(_tabHost.getCurrentTab() + 1);
 
-		      }
-		      
-			} 
+			} else {
+				if (_tabHost.getCurrentTab() == 0)
+					return false;
+				_tabHost.setCurrentTab(_tabHost.getCurrentTab() - 1);
+			}
+			return true;
+
+		}
+
+	}
 	
 		
 		//	/*

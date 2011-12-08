@@ -52,8 +52,6 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 		
 		//set the table No
 		((EditText)findViewById(R.id.tblNoEdtTxt)).setText(getIntent().getExtras().getString("TableAmount"));
-		//set the total price 
-		((TextView)findViewById(R.id.totalTxtView)).setText("гд0.00");
 		//set the default customer to 1
 		((EditText)findViewById(R.id.customerNumEdtTxt)).setText("1");
 		
@@ -85,8 +83,16 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 		_newFoodLstView = (OrderFoodListView)findViewById(R.id.orderLstView);
 		//_newFoodLstView.setGroupIndicator(getResources().getDrawable(R.layout.expander_folder));
 		_newFoodLstView.setType(Type.INSERT_ORDER);
-		_newFoodLstView.notifyDataChanged(new ArrayList<OrderFood>());
 		_newFoodLstView.setOperListener(this);
+		_newFoodLstView.setChangedListener(new OrderFoodListView.OnChangedListener() {			
+			@Override
+			public void onSourceChanged(){
+				//update the total price
+				Order tmpOrder = new Order(_newFoodLstView.getSourceData().toArray(new OrderFood[_newFoodLstView.getSourceData().size()]));
+				((TextView)findViewById(R.id.totalTxtView)).setText(Util.CURRENCY_SIGN + Util.float2String(tmpOrder.calcPrice2()));	
+			}
+		});
+		_newFoodLstView.notifyDataChanged(new ArrayList<OrderFood>());
 	}
 
 
@@ -221,9 +227,6 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 				_newFoodLstView.notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(orderParcel.foods)));
 			}
 			
-			//update the total price
-			Order tmpOrder = new Order(_newFoodLstView.getSourceData().toArray(new OrderFood[_newFoodLstView.getSourceData().size()]));
-			((TextView)findViewById(R.id.totalTxtView)).setText(Util.CURRENCY_SIGN + Util.float2String(tmpOrder.calcPrice2()));			
 		}
 	}
 

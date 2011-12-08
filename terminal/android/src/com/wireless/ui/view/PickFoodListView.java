@@ -12,7 +12,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
@@ -21,11 +20,14 @@ import com.wireless.ui.R;
 
 public class PickFoodListView extends ListView {
 
+	public final static int TAG_NUM = 0;
+	public final static int TAG_PINYIN = 1;
+	
 	private Context _context;
 	private Food[] _foods = null;
 	private BaseAdapter _adapter = null;
 	private OnFoodPickedListener _foodPickedListener;
-	private String _tag;
+	private int _tag;
 	
 	public PickFoodListView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -54,22 +56,7 @@ public class PickFoodListView extends ListView {
 	 * 
 	 * @param foods
 	 */
-	public void notifyDataChanged(Food[] foods,String tag){
-		_foods = foods;
-		_tag = tag;
-		if(_adapter != null){
-			_adapter.notifyDataSetChanged();
-		}else{
-			setAdapter(new Adapter());
-		}
-	}
-	
-	
-	/**
-	 * 
-	 * @param foods
-	 */
-	public void DataChanged(Food[] foods,String tag){
+	public void notifyDataChanged(Food[] foods, int tag){
 		_foods = foods;
 		_tag = tag;
 		if(_adapter != null){
@@ -135,15 +122,15 @@ public class PickFoodListView extends ListView {
 				status = "(" + status + ")";
 			}
 			
-			((TextView)view.findViewById(R.id.foodname)).setText(_foods[position].name+status);
-			if(_tag.equals("num")){
+			((TextView)view.findViewById(R.id.foodname)).setText(_foods[position].name + status);
+			if(_tag == TAG_NUM){
 				((TextView)view.findViewById(R.id.foodpinyin)).setText("±‡∫≈£∫");
 				((TextView)view.findViewById(R.id.foodpinyins)).setText(String.valueOf(_foods[position].alias_id));
 			}else{
 				((TextView)view.findViewById(R.id.foodpinyin)).setText("∆¥“Ù£∫");
 				((TextView)view.findViewById(R.id.foodpinyins)).setText(_foods[position].pinyin);
 			}
-			((TextView)view.findViewById(R.id.foodprices)).setText(Util.CURRENCY_SIGN +Float.toString(_foods[position].getPrice()));
+			((TextView)view.findViewById(R.id.foodprices)).setText(Util.CURRENCY_SIGN + Float.toString(_foods[position].getPrice()));
 			
 			return view;
 		}

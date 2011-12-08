@@ -32,6 +32,7 @@ public class OrderFoodListView extends ExpandableListView{
 	public final static int PICK_FOOD = 2;
 	
 	private OnOperListener _operListener;
+	private OnChangedListener _chgListener;
 	private Context _context;
 	private List<OrderFood> _foods = new ArrayList<OrderFood>();
 	private int _selectedPos;
@@ -96,6 +97,14 @@ public class OrderFoodListView extends ExpandableListView{
 	}
 	     
 	/**
+	 * 设置数据源变化的回调接口
+	 * @param chgListener
+	 */
+	public void setChangedListener(OnChangedListener chgListener){
+		_chgListener = chgListener;
+	}
+	
+	/**
 	 * 取得List中的数据源（就是菜品的List信息）
 	 * @return
 	 * 		OrderFood的List
@@ -125,12 +134,32 @@ public class OrderFoodListView extends ExpandableListView{
 				_adapter.notifyDataSetChanged();
 			}else{
 				if(_type == Type.INSERT_ORDER){
-					_adapter = new Adapter("新点菜");
+					_adapter = new Adapter("新点菜"){
+						@Override
+						public void notifyDataSetChanged(){
+							super.notifyDataSetChanged();
+							if(_chgListener != null){
+								_chgListener.onSourceChanged();
+							}
+						}
+					};
 				}else{
-					_adapter = new Adapter("已点菜");
+					_adapter = new Adapter("已点菜"){
+						@Override
+						public void notifyDataSetChanged(){
+							super.notifyDataSetChanged();
+							if(_chgListener != null){
+								_chgListener.onSourceChanged();
+							}
+						}						
+					};
 				}
-				setAdapter(_adapter);				
+				setAdapter(_adapter);	
+				if(_chgListener != null){
+					_chgListener.onSourceChanged();
+				}
 			}
+
 		}else{
 			throw new NullPointerException();
 		}
@@ -582,6 +611,10 @@ public class OrderFoodListView extends ExpandableListView{
 		protected void onStop(){
 			_adapter.notifyDataSetChanged();
 		}		
+	}
+	
+	public static interface OnChangedListener{
+		public void onSourceChanged();
 	}
 	
 	public static interface OnOperListener{
