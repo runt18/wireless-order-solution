@@ -226,4 +226,6 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 			((TextView)findViewById(R.id.totalTxtView)).setText(Util.CURRENCY_SIGN + Util.float2String(tmpOrder.calcPrice2()));			
 		}
 	}
+
+	
 }
