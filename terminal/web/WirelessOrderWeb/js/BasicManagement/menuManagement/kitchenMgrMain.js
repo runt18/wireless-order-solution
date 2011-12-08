@@ -376,7 +376,7 @@ var departmentComb = new Ext.form.ComboBox({
 });
 
 var kitchenStaticBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/dishAdd.png",
+	imgPath : "../../images/kitchenStatis.png",
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : "分厨统计",

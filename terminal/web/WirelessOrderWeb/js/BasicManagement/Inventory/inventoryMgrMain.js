@@ -2223,7 +2223,8 @@ Ext
 													stock = parseFloat(stock)
 															.toFixed(2);
 
-													if (thresholdWarining != 0) {
+													if (thresholdWarining != 0
+															&& thresholdError != 0) {
 														if (stock < thresholdWarining
 																&& stock >= thresholdError) {
 															record
@@ -2234,6 +2235,28 @@ Ext
 																					+ "</font>");
 															record.commit();
 														} else if (stock < thresholdError) {
+															record
+																	.set(
+																			"storage",
+																			"<font color='red'>"
+																					+ stock
+																					+ "</font>");
+															record.commit();
+														}
+													} else if (thresholdWarining != 0
+															&& thresholdError == 0) {
+														if (stock < thresholdWarining) {
+															record
+																	.set(
+																			"storage",
+																			"<font color='#C6A300'>"
+																					+ stock
+																					+ "</font>");
+															record.commit();
+														}
+													} else if (thresholdWarining == 0
+															&& thresholdError != 0) {
+														if (stock < thresholdError) {
 															record
 																	.set(
 																			"storage",

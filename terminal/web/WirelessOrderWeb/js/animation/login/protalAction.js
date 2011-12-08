@@ -63,19 +63,13 @@
 		});
 	});
 
-	$("#inventory")
-			.each(
-					function() {
-						$(this)
-								.bind(
-										"click",
-										function() {
-											if (currPin != "" && !isPrompt) {
-												location.href = "BasicManagement_Module/InventoryProtal.html?pin="
-														+ currPin
-														+ "&restaurantID="
-														+ restaurantID;
-											}
-										});
-					});
+	$("#inventory").each(function() {
+		$(this).bind("click", function() {
+			if (currPin != "" && !isPrompt) {
+				// 密码校验
+				inventoryVerifyWin.show();
+				isPrompt = true;
+			}
+		});
+	});
 };
