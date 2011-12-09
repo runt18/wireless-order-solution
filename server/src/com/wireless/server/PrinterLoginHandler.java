@@ -95,7 +95,7 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 						int len = loginReq.body[0];
 						String user = new String(loginReq.body, 1, len);
 						len = loginReq.body[len + 1];
-						String pwd = new String(loginReq.body, loginReq.body[0] + 2, len);
+						//String pwd = new String(loginReq.body, loginReq.body[0] + 2, len);
 						
 						//access the database to get the password and restaurant id according to the user
 						dbCon.connect();
@@ -105,7 +105,7 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 						//check to see whether the account exist or not
 						if(dbCon.rs.next()){	
 							//check to see whether the password is matched or not
-							if(pwd.equals(dbCon.rs.getString("pwd"))){
+							//if(pwd.equals(dbCon.rs.getString("pwd"))){
 								
 								int restaurantID = dbCon.rs.getInt("id");
 								String restaurantName = dbCon.rs.getString("restaurant_name");
@@ -167,9 +167,9 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 								 */
 								WirelessSocketServer.threadPool.execute(new PrintLossHandler(connection, restaurantID));
 								
-							}else{
-								throw new BusinessException("The password is not correct.", ErrorCode.PWD_NOT_MATCH);
-							}						
+							//}else{
+							//	throw new BusinessException("The password is not correct.", ErrorCode.PWD_NOT_MATCH);
+							//}						
 						}else{
 							throw new BusinessException("The user \"" + user + "\" doesn't exist.", ErrorCode.ACCOUNT_NOT_EXIST);						
 						}
