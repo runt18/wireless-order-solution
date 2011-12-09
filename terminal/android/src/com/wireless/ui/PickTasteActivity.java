@@ -429,22 +429,26 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 	 */
 	@Override
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,	float velocityY) {
-		if (e1.getY() - e2.getY() > 80) {
-			return false;
-		} else {
-			if (e1.getX() - e2.getX() > 280) {
-				if (_tabHost.getCurrentTab() == 3)
-					return false;
-				_tabHost.setCurrentTab(_tabHost.getCurrentTab() + 1);
+		float scrollX = e1.getX()-e2.getX();
+	    if(Math.abs(velocityX) > 200 && velocityY != 0 && Math.abs(scrollX)/Math.abs(e1.getY()-e2.getY()) > 1){
+	    	if(scrollX>0){
+	    		//此处添加代码用来显示下一个页面
+	    		if(_tabHost.getCurrentTab() == 3)
+ 					return false; 
+ 				_tabHost.setCurrentTab(_tabHost.getCurrentTab()+1);
 
-			} else {
-				if (_tabHost.getCurrentTab() == 0)
-					return false;
-				_tabHost.setCurrentTab(_tabHost.getCurrentTab() - 1);
-			}
-			return true;
-
-		}
+	    	}
+	    	else{
+	    		//此处添加代码用来显示上一个页面
+	    		  if(_tabHost.getCurrentTab() == 0)
+	 					return false; 
+	 				_tabHost.setCurrentTab(_tabHost.getCurrentTab()-1);		
+	    	}
+	    	
+	    	return true;
+	    }
+		
+	   return false;
 
 	}
 	
