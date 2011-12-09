@@ -104,7 +104,7 @@ class OrderHandler extends Handler implements Runnable{
 
 				//handle query order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_ORDER){
-				short tableToQuery = ReqParser.parseQueryOrder(request);
+				int tableToQuery = ReqParser.parseQueryOrder(request);
 				try{
 					response = new RespQueryOrder(request.header, QueryOrder.exec(_term.pin, _term.modelID, tableToQuery));
 				}catch(BusinessException e){
@@ -117,7 +117,7 @@ class OrderHandler extends Handler implements Runnable{
 
 				//handle query order 2 request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_ORDER_2){
-				short tableToQuery = ReqParser.parseQueryOrder(request);
+				int tableToQuery = ReqParser.parseQueryOrder(request);
 				Table table = QueryTable.exec(_term.pin, _term.modelID, tableToQuery);
 				if(table.status == Table.TABLE_BUSY){
 					response = new RespACK(request.header);
