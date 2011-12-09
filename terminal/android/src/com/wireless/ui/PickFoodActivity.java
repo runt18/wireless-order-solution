@@ -12,13 +12,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.GestureDetector;
+import android.view.GestureDetector.OnGestureListener;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.GestureDetector.OnGestureListener;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
@@ -246,6 +245,7 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 		final PickFoodListView pickLstView = (PickFoodListView)findViewById(R.id.pickByKitchenLstView);
 		RelativeLayout filterKitchen = (RelativeLayout)findViewById(R.id.filterKitchenRelaLayout);
 		EditText filterKitEdtTxt = (EditText)findViewById(R.id.filterKitchenEdtTxt);
+		filterKitEdtTxt.setText("");
 		//初始化的时候厨房默认显示的厨房信息
 		ketchenName = (TextView)findViewById(R.id.Spinner01);
 		ketchenName.setText("全部");
@@ -314,6 +314,7 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 	private void setupPinyinView(){
 		final PickFoodListView pickLstView = (PickFoodListView)findViewById(R.id.pickByPinyinLstView);
 		EditText filterPinyinEdtTxt = (EditText)findViewById(R.id.filterPinyinEdtTxt);
+		filterPinyinEdtTxt.setText("");
 		pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods, PickFoodListView.TAG_PINYIN);
 		pickLstView.setFoodPickedListener(this);
         ((ImageView)findViewById(R.id.pinback)).setOnClickListener(new View.OnClickListener() {
@@ -541,7 +542,7 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 					ketchenName.setText(_ketchenName);
 					dialogTag = true;
 					
-					foodLstView.notifyDataChanged(_filterFoods.toArray(new Food[_filterFoods.size()]), PickFoodListView.TAG_PINYIN);
+					foodLstView.notifyDataChanged(_filterFoods.toArray(new Food[_filterFoods.size()]),PickFoodListView.TAG_PINYIN);
 					dismiss();
 					return true;					
 				}
@@ -552,7 +553,6 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 
 	@Override
 	public boolean onDown(MotionEvent e) {
-		// TODO Auto-generated method stub
 		return true;
 	}
 	 @Override
@@ -562,26 +562,22 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 	}
 	@Override
 	public void onShowPress(MotionEvent e) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public boolean onSingleTapUp(MotionEvent e) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
 			float distanceY) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public void onLongPress(MotionEvent e) {
-		// TODO Auto-generated method stub
 		
 	}
     /*

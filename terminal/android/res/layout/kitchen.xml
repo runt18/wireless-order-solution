@@ -29,6 +29,7 @@
 			android:layout_centerVertical="true" android:textSize="20sp"
 			android:text="拼音 :" android:layout_marginLeft="5dip" />
 		<EditText android:id="@+id/filterKitchenEdtTxt" android:layout_width="160dip"
+		    android:inputType="text"
 			android:layout_height="wrap_content" android:layout_centerVertical="true"
 			android:layout_toRightOf="@id/ordernum" android:layout_marginLeft="5dip" />
 

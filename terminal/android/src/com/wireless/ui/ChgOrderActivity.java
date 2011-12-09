@@ -11,10 +11,12 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.DialogInterface.OnKeyListener;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -61,7 +63,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 		backBtn.setOnClickListener(new View.OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				finish();
+				promptDialog();
 			}
 		});
 
@@ -320,5 +322,40 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 		startActivity(intent);
 	}
 
+	/*
+	 *点解返回键进行监听弹出的Dialog
+	 * 
+	 */
+	public void promptDialog(){
+		new AlertDialog.Builder(this)
+		.setTitle("提示")
+		.setMessage("账单还未提交，是否确认退出?")
+		.setNeutralButton("确定",
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog,	int which){
+						finish();
+					}
+				})
+		.setNegativeButton("取消", null)
+		.setOnKeyListener(new OnKeyListener() {
+			@Override
+			public boolean onKey(DialogInterface arg0, int arg1, KeyEvent arg2) {
+				return true;
+			}
+		}).show();
+	}
 
+	/*
+	 * 监听返回键
+	 * 
+	 */
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if(keyCode == KeyEvent.KEYCODE_BACK){
+			promptDialog();
+		}
+		return super.onKeyDown(keyCode, event);
+	}
+ 
 }

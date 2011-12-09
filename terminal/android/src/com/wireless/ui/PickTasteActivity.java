@@ -34,7 +34,6 @@ import com.wireless.protocol.Util;
 
 public class PickTasteActivity extends TabActivity implements OnGestureListener{
 	int _currentView = 0; 
-	//private static int _maxTabIndex = 3; 
 	private GestureDetector _detector; 
 
 
@@ -138,6 +137,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 	public void setTasteView(){
 		_tasteTxtView = (TextView)findViewById(R.id.foodTasteTxtView);
 	    final ListView tasteLstView = (ListView)findViewById(R.id.tasteLstView);
+	   ((EditText)findViewById(R.id.tastesearch)).setText("");
 		tasteLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.tastes));
 		
 		//口味返回按钮
@@ -185,6 +185,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 	public void setStyleView(){
 		_tasteTxtView = (TextView)findViewById(R.id.foodStyleTxtView);
     	final ListView styleLstView = (ListView)findViewById(R.id.styleLstView);
+    	((EditText)findViewById(R.id.stylesearch)).setText("");
 		styleLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.styles));
 		
 		//做法返回按钮
@@ -231,6 +232,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 	public void setSpecView(){
 		_tasteTxtView = (TextView)findViewById(R.id.foodSpecTxtView);
 		final ListView specLstView = (ListView)findViewById(R.id.specLstView);
+		((EditText)findViewById(R.id.specsearch)).setText("");
 		specLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.specs));
 		
 		//做法返回按钮
@@ -395,32 +397,27 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 
 	@Override
 	public boolean onDown(MotionEvent e) {
-		// TODO Auto-generated method stub
 		return true;
 	}
 
 	@Override
 	public void onShowPress(MotionEvent e) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public boolean onSingleTapUp(MotionEvent e) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
 			float distanceY) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public void onLongPress(MotionEvent e) {
-		// TODO Auto-generated method stub
 		
 	}
 

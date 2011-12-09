@@ -30,6 +30,7 @@
 			android:layout_centerVertical="true" android:textSize="20sp"
 			android:text="编号:" android:layout_marginLeft="5dip" />
 		<EditText android:id="@+id/filterNumEdtTxt" android:layout_width="250dip"
+		    android:inputType="number"
 			android:layout_height="wrap_content" android:layout_centerVertical="true"
 			android:layout_toRightOf="@id/ordernum" android:layout_marginLeft="10dip" />
 	</RelativeLayout>

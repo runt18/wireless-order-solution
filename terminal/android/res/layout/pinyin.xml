@@ -31,6 +31,7 @@
 			android:layout_centerVertical="true" android:textSize="20sp"
 			android:text="拼音:" android:layout_marginLeft="5dip" />
 		<EditText android:id="@+id/filterPinyinEdtTxt" android:layout_width="250dip"
+		    android:inputType="text"
 			android:layout_height="wrap_content" android:layout_centerVertical="true"
 			android:layout_toRightOf="@id/orderpin" android:layout_marginLeft="10dip" />
 	</RelativeLayout>
