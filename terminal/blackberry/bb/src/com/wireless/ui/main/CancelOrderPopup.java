@@ -31,7 +31,7 @@ class CancelOrderPopup extends PopupScreen implements FieldChangeListener, IPost
 		super(new VerticalFieldManager());
 		add(new LabelField("输入需要删单的台号", LabelField.USE_ALL_WIDTH | DrawStyle.LEFT));
 		add(new SeparatorField());
-		_tableID = new EditField("台号：", "", 4, TextField.NO_NEWLINE | TextField.NO_LEARNING | EditField.FILTER_NUMERIC);
+		_tableID = new EditField("台号：", "", 5, TextField.NO_NEWLINE | TextField.NO_LEARNING | EditField.FILTER_NUMERIC);
 		add(_tableID);
 		add(new SeparatorField());
 		_ok = new ButtonField("确定", ButtonField.CONSUME_CLICK);
