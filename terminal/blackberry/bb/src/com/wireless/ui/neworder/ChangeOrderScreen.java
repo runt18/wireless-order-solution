@@ -36,10 +36,10 @@ public class ChangeOrderScreen extends MainScreen implements PostSubmitOrder{
 	
 	private OrderListField _oriListField;
 	private OrderListField _newListField;
-	private LabelField _tableTitle = null;
-	private EditField _table = null;
-	private EditField _customNum = null;
-	private LabelField _totalPrice = null;
+	private LabelField _tableTitleLabel = null;
+	private EditField _tableEdt = null;
+	private EditField _customNumEdt = null;
+	private LabelField _totalPriceLabel = null;
 	private final Order _originalOrder;
 	private ChangeOrderScreen _self = this;
 	
@@ -90,7 +90,7 @@ public class ChangeOrderScreen extends MainScreen implements PostSubmitOrder{
 			category = "";
 		}
 		
-		_tableTitle = new LabelField(_originalOrder.table_id + "号餐台信息" + category, LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
+		_tableTitleLabel = new LabelField(_originalOrder.table_id + "号餐台信息" + category, LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
 			protected void paintBackground(Graphics g) {
 				g.clear();
 				g.setBackgroundColor(Color.BLUE);
@@ -103,22 +103,22 @@ public class ChangeOrderScreen extends MainScreen implements PostSubmitOrder{
 			}
 		};
 
-		vfm.add(_tableTitle);
+		vfm.add(_tableTitleLabel);
 		
-		_table = new EditField("台号：", Integer.toString(_originalOrder.table_id),
-			   	   			   4, TextField.NO_NEWLINE | EditField.FILTER_NUMERIC);
+		_tableEdt = new EditField("台号：", Integer.toString(_originalOrder.table_id),
+			   	   			   5, TextField.NO_NEWLINE | EditField.FILTER_NUMERIC);
 		if(bill.category == Order.CATE_NORMAL){
-			vfm.add(_table);			
+			vfm.add(_tableEdt);			
 		}
 
-		_customNum = new EditField("人数：", Integer.toString(_originalOrder.custom_num), 2,
+		_customNumEdt = new EditField("人数：", Integer.toString(_originalOrder.custom_num), 2,
 								   TextField.NO_NEWLINE | EditField.FILTER_NUMERIC) {
 			protected boolean navigationClick(int status, int time) {
 				return true;
 			}
 		};		
 
-		vfm.add(_customNum);
+		vfm.add(_customNumEdt);
 		vfm.add(new SeparatorField());
 		if(_originalOrder.foods.length != 0){
 			_oriListTitle.setText("已点菜" + "(" + _originalOrder.foods.length + ")");
@@ -138,7 +138,7 @@ public class ChangeOrderScreen extends MainScreen implements PostSubmitOrder{
 					_oriListTitle.setText("已点菜");
 				}
 				int total = Util.float2Int(_oriListField.calcPrice()) + Util.float2Int(_newListField.calcPrice());
-				_totalPrice.setText("小计：" + Util.CURRENCY_SIGN + Util.float2String(Util.int2Float(total)));
+				_totalPriceLabel.setText("小计：" + Util.CURRENCY_SIGN + Util.float2String(Util.int2Float(total)));
 			}
 		});	
 		vfm.add(_oriListField);
@@ -159,7 +159,7 @@ public class ChangeOrderScreen extends MainScreen implements PostSubmitOrder{
 					_newListTitle.setText("新点菜");
 				}
 				int total = Util.float2Int(_oriListField.calcPrice()) + Util.float2Int(_newListField.calcPrice());
-				_totalPrice.setText("小计：" + Util.CURRENCY_SIGN + Util.float2String(Util.int2Float(total)));
+				_totalPriceLabel.setText("小计：" + Util.CURRENCY_SIGN + Util.float2String(Util.int2Float(total)));
 			}
 		});
 		vfm.add(_newListField);
@@ -167,9 +167,9 @@ public class ChangeOrderScreen extends MainScreen implements PostSubmitOrder{
 		vfm.add(new SeparatorField());
 		add(vfm);
 		
-		_totalPrice = new LabelField("小计：" + Util.CURRENCY_SIGN + Util.float2String(_oriListField.calcPrice()), 
+		_totalPriceLabel = new LabelField("小计：" + Util.CURRENCY_SIGN + Util.float2String(_oriListField.calcPrice()), 
 									LabelField.USE_ALL_WIDTH | DrawStyle.RIGHT);
-		add(_totalPrice);
+		add(_totalPriceLabel);
 		add(new SeparatorField());		
 		
 		//Three buttons would be shown in the bottom of the screen
@@ -248,8 +248,8 @@ public class ChangeOrderScreen extends MainScreen implements PostSubmitOrder{
 					vectFoods.copyInto(foods);
 					
 					Order reqOrder = new Order(foods, 
-											   Short.parseShort(_table.getText()), 
-											   Integer.parseInt(_customNum.getText()));
+											   Integer.parseInt(_tableEdt.getText()), 
+											   Integer.parseInt(_customNumEdt.getText()));
 					reqOrder.originalTableID = _originalOrder.table_id;
 					
 					UiApplication.getUiApplication().pushScreen(new SubmitChangePopup(reqOrder, _self));
