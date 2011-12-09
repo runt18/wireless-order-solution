@@ -567,7 +567,7 @@
 													url : "../VerifyPwd.do",
 													params : {
 														"pin" : Request["pin"],
-														"type" : "2",
+														"type" : "1",
 														"pwd" : pwdTrans
 													},
 													success : function(
