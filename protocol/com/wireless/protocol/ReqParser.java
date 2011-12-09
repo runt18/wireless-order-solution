@@ -19,9 +19,9 @@ public class ReqParser {
 	* table[2]
 	* table[2] - 2-byte indicates the table id
 	*******************************************************/
-	public static short parseQueryOrder(ProtocolPackage req){
+	public static int parseQueryOrder(ProtocolPackage req){
 		//return the table to query
-		return (short)((req.body[0] & 0x00FF) | ((req.body[1] & 0x00FF) << 8));
+		return ((req.body[0] & 0x000000FF) | ((req.body[1] & 0x000000FF) << 8));
 	}
 	
 	/******************************************************
