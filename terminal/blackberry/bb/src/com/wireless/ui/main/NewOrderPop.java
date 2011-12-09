@@ -23,9 +23,9 @@ import com.wireless.ui.neworder.NewOrderScreen;
 
 class NewOrderPopup extends PopupScreen implements FieldChangeListener,	IPostQueryOrder {
 
-	private ButtonField _ok;
-	private ButtonField _cancel;
-	private EditField _tableID;
+	private ButtonField _okBtn;
+	private ButtonField _cancelBtn;
+	private EditField _tableIDEdt;
 	//private EditField _customNum;
 	private NewOrderPopup _self = this;
 
@@ -34,29 +34,29 @@ class NewOrderPopup extends PopupScreen implements FieldChangeListener,	IPostQue
 		add(new LabelField("输入需要下单的台号", LabelField.USE_ALL_WIDTH
 				| DrawStyle.LEFT));
 		add(new SeparatorField());
-		_tableID = new EditField("台号：", "", 5, TextField.NO_NEWLINE
+		_tableIDEdt = new EditField("台号：", "", 5, TextField.NO_NEWLINE
 				| TextField.NO_LEARNING | EditField.FILTER_NUMERIC);
 
-		add(_tableID);
+		add(_tableIDEdt);
 
 		add(new SeparatorField());
 
 		HorizontalFieldManager _hfm = new HorizontalFieldManager(
 				Manager.FIELD_HCENTER);
 
-		_ok = new ButtonField("确定", ButtonField.CONSUME_CLICK);
-		_ok.setChangeListener(this);
-		_cancel = new ButtonField("取消", ButtonField.CONSUME_CLICK);
-		_cancel.setChangeListener(this);
-		_hfm.add(_ok);
-		_hfm.add(_cancel);
+		_okBtn = new ButtonField("确定", ButtonField.CONSUME_CLICK);
+		_okBtn.setChangeListener(this);
+		_cancelBtn = new ButtonField("取消", ButtonField.CONSUME_CLICK);
+		_cancelBtn.setChangeListener(this);
+		_hfm.add(_okBtn);
+		_hfm.add(_cancelBtn);
 		add(_hfm);
 	}
 
 	public void fieldChanged(Field field, int context) {
-		if (field == _ok) {
+		if (field == _okBtn) {
 			execute();
-		} else if (field == _cancel) {
+		} else if (field == _cancelBtn) {
 			close();
 		}
 	}
@@ -74,25 +74,25 @@ class NewOrderPopup extends PopupScreen implements FieldChangeListener,	IPostQue
 	}
 
 	private void execute() {
-		if (_tableID.getText().equals("")) {
+		if (_tableIDEdt.getText().equals("")) {
 			Dialog.alert("请输入客人就餐的台号");
-			_tableID.setFocus();
+			_tableIDEdt.setFocus();
 			return;
 		}
 
 		close();
 		UiApplication.getUiApplication().pushScreen(
-				new QueryOrderPopup(Short.parseShort(_tableID.getText()),
+				new QueryOrderPopup(Integer.parseInt(_tableIDEdt.getText()),
 						Type.QUERY_ORDER_2, _self));
 	}
 
 	public void postQueryOrder(ProtocolPackage response) {
 		if (response.header.type == Type.NAK) {
 			if (response.header.reserved == ErrorCode.TABLE_IDLE) {
-				UiApplication.getUiApplication().pushScreen(new NewOrderScreen(Short.parseShort(_tableID.getText()), 1));
+				UiApplication.getUiApplication().pushScreen(new NewOrderScreen(Integer.parseInt(_tableIDEdt.getText()), 1));
 				
 			} else if (response.header.reserved == ErrorCode.TABLE_NOT_EXIST) {
-				Dialog.alert(_tableID + "号台信息不存在");
+				Dialog.alert(_tableIDEdt + "号台信息不存在");
 
 			} else if (response.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
 				Dialog.alert("终端没有登记到餐厅，请联系管理人员。");
@@ -104,7 +104,7 @@ class NewOrderPopup extends PopupScreen implements FieldChangeListener,	IPostQue
 				Dialog.alert("未确定的异常错误(" + response.header.reserved + ")");
 			}
 		} else {
-			Dialog.alert(_tableID + "号台已经下单");
+			Dialog.alert(_tableIDEdt + "号台已经下单");
 		}
 	}
 }
