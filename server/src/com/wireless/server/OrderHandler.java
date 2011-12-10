@@ -194,7 +194,7 @@ class OrderHandler extends Handler implements Runnable{
 
 				//handle the cancel order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.CANCEL_ORDER){
-				short tableToCancel = ReqParser.parseCancelOrder(request);
+				int tableToCancel = ReqParser.parseCancelOrder(request);
 				CancelOrder.exec(_term.pin, _term.modelID, tableToCancel);
 				response = new RespACK(request.header);
 
