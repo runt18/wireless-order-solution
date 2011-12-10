@@ -82,10 +82,10 @@ public class ReqParser {
 		order.print_type = ((req.body[0] & 0x000000FF) | ((req.body[1] & 0x000000FF) << 8));
 		
 		//get the table id
-		order.table_id = (short)((req.body[2] & 0x00FF) | ((req.body[3] & 0x00FF) << 8));
+		order.table_id = ((req.body[2] & 0x000000FF) | ((req.body[3] & 0x000000FF) << 8));
 		
 		//get the 2nd table id
-		order.table2_id = (short)((req.body[4] & 0x00FF) | ((req.body[5] & 0x00FF) << 8));
+		order.table2_id = ((req.body[4] & 0x000000FF) | ((req.body[5] & 0x000000FF) << 8));
 		
 		//get the category
 		order.category = (short)(req.body[6] & 0x000000FF);
@@ -268,9 +268,9 @@ public class ReqParser {
 	* table[2]
 	* table[2] - 2-byte indicates the table id
 	*******************************************************/
-	public static short parseCancelOrder(ProtocolPackage req){
+	public static int parseCancelOrder(ProtocolPackage req){
 		//return the table to cancel
-		return (short)((req.body[0] & 0x00FF) | ((req.body[1] & 0x00FF) << 8));
+		return ((req.body[0] & 0x000000FF) | ((req.body[1] & 0x000000FF) << 8));
 	}
 	
 	/******************************************************
@@ -304,7 +304,7 @@ public class ReqParser {
 		int printType = ((req.body[0] & 0x000000FF) | ((req.body[1] & 0x000000FF) << 8));
 		
 		//get the table id
-		short tableToPay = (short)((req.body[2] & 0x00FF) | ((req.body[3] & 0x00FF) << 8));
+		int tableToPay = ((req.body[2] & 0x000000FF) | ((req.body[3] & 0x000000FF) << 8));
 		//get the actual total price
 		int cashIncome = (req.body[4] & 0x000000FF) | 
 						 ((req.body[5] & 0x000000FF) << 8) | 
