@@ -126,7 +126,7 @@ public class QueryOrder {
 
 		if(dbCon.rs.next()) {
 			orderInfo.restaurant_id = dbCon.rs.getInt("restaurant_id");
-			orderInfo.table_id = dbCon.rs.getShort("table_id");
+			orderInfo.table_id = dbCon.rs.getInt("table_id");
 			orderInfo.table_name = dbCon.rs.getString("table_name");
 			orderInfo.table2_id = dbCon.rs.getShort("table2_id");
 			orderInfo.table2_name = dbCon.rs.getString("table2_name");

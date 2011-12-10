@@ -60,10 +60,10 @@ public class TransTableAction extends Action implements PinGen{
 			
 			dbCon.connect();
 			oldTable = QueryTable.exec(dbCon, _pin, 
-						 			   Terminal.MODEL_STAFF, Short.parseShort(oldTableID));
+						 			   Terminal.MODEL_STAFF, Integer.parseInt(oldTableID));
 			
 			newTable = QueryTable.exec(dbCon, _pin, 
-						  			   Terminal.MODEL_STAFF, Short.parseShort(newTableID));
+						  			   Terminal.MODEL_STAFF, Integer.parseInt(newTableID));
 			
 			/**
 			 * Need to assure two conditions before table transfer

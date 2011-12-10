@@ -80,11 +80,11 @@ public class InsertOrderAction extends Action implements PinGen {
 			_pin = Integer.parseInt(pin, 16);
 			
 			Order orderToInsert = new Order();
-			int tableID = request.getParameter("tableID") != null ? Short.parseShort(request.getParameter("tableID")) : 0;
+			int tableID = request.getParameter("tableID") != null ? Integer.parseInt(request.getParameter("tableID")) : 0;
 			orderToInsert.table_id = tableID;
 			String table2ID = request.getParameter("tableID_2");
 			if(table2ID != null){
-				orderToInsert.table2_id = Short.parseShort(table2ID);
+				orderToInsert.table2_id = Integer.parseInt(table2ID);
 			}			
 			orderToInsert.category = Short.parseShort(request.getParameter("category"));
 			orderToInsert.custom_num = Integer.parseInt(request.getParameter("customNum"));
@@ -101,7 +101,7 @@ public class InsertOrderAction extends Action implements PinGen {
 				if(oriTableID == null){
 					orderToInsert.originalTableID = orderToInsert.table_id;
 				}else{
-					orderToInsert.originalTableID = Short.parseShort(oriTableID);
+					orderToInsert.originalTableID = Integer.parseInt(oriTableID);
 				}
 				printType |= Reserved.PRINT_EXTRA_FOOD_2 | 
 							 Reserved.PRINT_CANCELLED_FOOD_2 | 
