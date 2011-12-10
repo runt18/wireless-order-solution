@@ -8,10 +8,7 @@
 order_socket=$(ps aux | grep -c "wireless_order_socket.jar")
 if [ "$order_socket" -eq 1 ]; then
 	sudo ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
-	cur_dir=$(pwd);
-	cd ~/socket
-	echo 'java -Duser.timezone=Asia/Shanghai -jar ~/socket/wireless_order_socket.jar ~/socket/conf.xml' | at now
-	cd "$cur_dir"
+	sh ~/socket/scripts/jsocket.sh	
 	echo -e 'Start the wireless order socket.'
 else
 	echo -e 'Wireless order socket has been running.'
