@@ -20,7 +20,7 @@ public class CancelOrder {
 	 * 						     - The table associated with this order is idle.
 	 * @throws SQLException throws if fail to execute any SQL statement.
 	 */
-	public static void exec(int pin, short model, short tableID) throws BusinessException, SQLException{		
+	public static void exec(int pin, short model, int tableID) throws BusinessException, SQLException{		
 		
 		DBCon dbCon = new DBCon();
 		
