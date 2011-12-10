@@ -23,7 +23,7 @@ public class CancelOrderAction extends Action {
 			throws Exception {
 		
 		PrintWriter out = null;
-		short tableID = 0;
+		int tableID = 0;
 		String jsonResp = "{success:$(result), data:'$(value)'}";
 		try {
 			// 解决后台中文传到前台乱码
@@ -35,7 +35,7 @@ public class CancelOrderAction extends Action {
 				pin = pin.substring(2);
 			}
 			
-			tableID = Short.parseShort(request.getParameter("tableID"));
+			tableID = Integer.parseInt(request.getParameter("tableID"));
 			
 			CancelOrder.exec(Integer.parseInt(pin, 16), Terminal.MODEL_STAFF, tableID);
 			jsonResp = jsonResp.replace("$(result)", "true");
