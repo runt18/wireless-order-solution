@@ -1423,9 +1423,51 @@ var menuColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(), {
 } ]);
 
 // -------------- 關聯食材 ---------------
+var materialCateCombAdd = new Ext.form.ComboBox(
+		{
+			fieldLabel : "种类",
+			forceSelection : true,
+			width : 140,
+			// value : departmentData[0][1],
+			id : "materialCateCombAdd",
+			store : new Ext.data.SimpleStore({
+				fields : [ "value", "text" ],
+				data : []
+			}),
+			valueField : "value",
+			displayField : "text",
+			typeAhead : true,
+			mode : "local",
+			triggerAction : "all",
+			selectOnFocus : true,
+			allowBlank : false,
+			listeners : {
+				select : function(combo, record, index) {
+					var selectedCateID = record.get("value");
+					materialAddStore.removeAll();
+					materialComboDisplayData.length = 0;
+					for ( var i = 0; i < materialComboData.length; i++) {
+						if (materialComboData[i][2] == selectedCateID) {
+							materialComboDisplayData.push([
+									materialComboData[i][0],
+									materialComboData[i][1],
+									materialComboData[i][2] ]);
+						}
+					}
+					materialAddStore.loadData(materialComboDisplayData);
+					if (materialComboDisplayData.length > 0) {
+						materialAddComb
+								.setValue(materialComboDisplayData[0][1]);
+					} else {
+						materialAddComb.setValue();
+					}
+				}
+			}
+		});
+
 // material add
 var materialAddStore = new Ext.data.SimpleStore({
-	fields : [ "value", "text" ],
+	fields : [ "value", "text", "cateID" ],
 	data : []
 });
 
@@ -1450,7 +1492,7 @@ var materialAddWin = new Ext.Window({
 	layout : "fit",
 	title : "添加食材",
 	width : 210,
-	height : 140,
+	height : 150,
 	closeAction : "hide",
 	resizable : false,
 	items : [ {
@@ -1459,7 +1501,7 @@ var materialAddWin = new Ext.Window({
 		labelWidth : 35,
 		border : false,
 		frame : true,
-		items : [ materialAddComb, {
+		items : [ materialCateCombAdd, materialAddComb, {
 			xtype : "numberfield",
 			fieldLabel : "消耗",
 			id : "materialAddCost",
@@ -1547,8 +1589,19 @@ var materialAddWin = new Ext.Window({
 			} ],
 	listeners : {
 		"show" : function(thiz) {
+			materialComboDisplayData.length = 0;
+			for ( var i = 0; i < materialComboData.length; i++) {
+				if (materialComboData[i][2] == materialComboData[0][2]) {
+					materialComboDisplayData.push([
+							materialComboData[i][0],
+							materialComboData[i][1],
+							materialComboData[i][2] ]);
+				}
+			}
+			materialAddStore.loadData(materialComboDisplayData);
 
-			materialAddComb.setValue(materialComboData[0][1]);
+			materialAddComb.setValue(materialComboDisplayData[0][1]);
+			materialCateCombAdd.setValue(materialComboDisplayData[0][2]);
 
 			materialAddWin.findById("materialAddCost").setValue("");
 			materialAddWin.findById("materialAddCost").clearInvalid();

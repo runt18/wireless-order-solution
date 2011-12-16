@@ -8,6 +8,16 @@
 			}
 		});
 	});
+	
+	$("#materialCateMgr").each(function() {
+		$(this).bind("click", function() {
+			if (!isPrompt) {
+				 location.href = "MaterialCateManagement.html?pin="
+				 + currPin + "&restaurantID="
+				 + restaurantID;
+			}
+		});
+	});
 
 	$("#inventoryMgr").each(function() {
 		$(this).bind("click", function() {

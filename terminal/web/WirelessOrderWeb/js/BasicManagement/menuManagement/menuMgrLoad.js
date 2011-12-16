@@ -1,43 +1,55 @@
 ﻿function loadAllMaterial() {
 	materialComboData = [];
-	Ext.Ajax.request({
-		url : "../../QueryMaterialMgr.do",
-		params : {
-			"pin" : pin,
-			"type" : 0,
-			"ope" : 1,
-			"value" : "",
-			"isPaging" : false
-		},
-		success : function(response, options) {
-			var resultJSON = Ext.util.JSON.decode(response.responseText);
-			// 格式：[食材ID，食材別名，食材名稱]
-			// 后台格式：[id 编号 名称 库存量 价格（￥） 预警阀值 危险阀值]
-			var rootData = resultJSON.root;
-			if (rootData.length != 0) {
-				if (rootData[0].message == "normal") {
-					for ( var i = 0; i < rootData.length; i++) {
-						materialComboData.push([ rootData[i].materialID,
-								rootData[i].materialName ]);
+	Ext.Ajax
+			.request({
+				url : "../../QueryMaterialMgr.do",
+				params : {
+					"pin" : pin,
+					"type" : 0,
+					"ope" : 1,
+					"value" : "",
+					"isPaging" : false
+				},
+				success : function(response, options) {
+					var resultJSON = Ext.util.JSON
+							.decode(response.responseText);
+					// 格式：[食材ID，食材名稱,種類]
+					// 后台格式：[id 编号 名称 库存量 价格（￥） 预警阀值 危险阀值 ,種類]
+					var rootData = resultJSON.root;
+					if (rootData.length != 0) {
+						if (rootData[0].message == "normal") {
+							for ( var i = 0; i < rootData.length; i++) {
+								materialComboData.push([
+										rootData[i].materialID,
+										rootData[i].materialName,
+										rootData[i].cateID ]);
+							}
+							for ( var i = 0; i < materialComboData.length; i++) {
+								if (materialComboData[i][2] == materialComboData[0][2]) {
+									materialComboDisplayData.push([
+											materialComboData[i][0],
+											materialComboData[i][1],
+											materialComboData[i][2] ]);
+								}
+							}
+							materialAddStore.loadData(materialComboDisplayData);
+						} else {
+							Ext.MessageBox.show({
+								msg : rootData[0].message,
+								width : 300,
+								buttons : Ext.MessageBox.OK
+							});
+						}
 					}
-					materialAddStore.loadData(materialComboData);
-				} else {
+				},
+				failure : function(response, options) {
 					Ext.MessageBox.show({
-						msg : rootData[0].message,
+						msg : " Unknown page error ",
 						width : 300,
 						buttons : Ext.MessageBox.OK
 					});
 				}
-			}
-		},
-		failure : function(response, options) {
-			Ext.MessageBox.show({
-				msg : " Unknown page error ",
-				width : 300,
-				buttons : Ext.MessageBox.OK
 			});
-		}
-	});
 }
 
 function loadAllDishes() {
@@ -65,6 +77,46 @@ function loadAllDishes() {
 			}
 		},
 		failure : function(response, options) {
+		}
+	});
+}
+
+function loadMaterialCate() {
+	materialCateComboData = [];
+	Ext.Ajax.request({
+		url : "../../QueryMaterialCate.do",
+		params : {
+			"pin" : pin,
+			"isPaging" : false,
+			"isCombo" : false
+		},
+		success : function(response, options) {
+			var resultJSON = Ext.util.JSON.decode(response.responseText);
+			// 格式：[编号，名称]
+			// 后台格式：[编号，名称]
+			var rootData = resultJSON.root;
+			if (rootData.length != 0) {
+				if (rootData[0].message == "normal") {
+					for ( var i = 0; i < rootData.length; i++) {
+						materialCateComboData.push([ rootData[i].cateID,
+								rootData[i].cateName ]);
+					}
+					materialCateCombAdd.store.loadData(materialCateComboData);
+				} else {
+					Ext.MessageBox.show({
+						msg : rootData[0].message,
+						width : 300,
+						buttons : Ext.MessageBox.OK
+					});
+				}
+			}
+		},
+		failure : function(response, options) {
+			Ext.MessageBox.show({
+				msg : " Unknown page error ",
+				width : 300,
+				buttons : Ext.MessageBox.OK
+			});
 		}
 	});
 }
@@ -118,4 +170,5 @@ function menuMgrOnLoad() {
 
 	loadAllDishes();
 	loadAllMaterial();
+	loadMaterialCate();
 };

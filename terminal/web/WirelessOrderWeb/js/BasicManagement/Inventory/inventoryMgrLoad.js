@@ -134,6 +134,53 @@ function loadDepartment() {
 	});
 }
 
+function loadMaterialCate() {
+	materialCateComboData = [];
+	Ext.Ajax.request({
+		url : "../../QueryMaterialCate.do",
+		params : {
+			"pin" : pin,
+			"isPaging" : false,
+			"isCombo" : false
+		},
+		success : function(response, options) {
+			var resultJSON = Ext.util.JSON.decode(response.responseText);
+			// 格式：[编号，名称]
+			// 后台格式：[编号，名称]
+			var rootData = resultJSON.root;
+			if (rootData.length != 0) {
+				if (rootData[0].message == "normal") {
+					for ( var i = 0; i < rootData.length; i++) {
+						materialCateComboData.push([ rootData[i].cateID,
+								rootData[i].cateName ]);
+					}
+					materialCateCombAdd.store.loadData(materialCateComboData);
+					materialCateComb.store.loadData(materialCateComboData);
+					materialStore.reload({
+						params : {
+							start : 0,
+							limit : materialPageRecordCount
+						}
+					});
+				} else {
+					Ext.MessageBox.show({
+						msg : rootData[0].message,
+						width : 300,
+						buttons : Ext.MessageBox.OK
+					});
+				}
+			}
+		},
+		failure : function(response, options) {
+			Ext.MessageBox.show({
+				msg : " Unknown page error ",
+				width : 300,
+				buttons : Ext.MessageBox.OK
+			});
+		}
+	});
+}
+
 // on page load function
 function inventoryMgrOnLoad() {
 
@@ -143,7 +190,8 @@ function inventoryMgrOnLoad() {
 	searchForm.remove("conditionText");
 	operatorComb.setDisabled(true);
 
-	//loadAllMaterial();
+	// loadAllMaterial();
 	loadAllsupplier();
 	loadDepartment();
+	loadMaterialCate();
 };

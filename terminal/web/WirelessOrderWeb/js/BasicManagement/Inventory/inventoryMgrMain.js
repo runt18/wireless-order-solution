@@ -1321,12 +1321,31 @@ var inventoryCheckWin = new Ext.Window(
 
 // -------------------------------------------------------------------------------------------------------
 // ----------------- 添加食材 --------------------
+var materialCateCombAdd = new Ext.form.ComboBox({
+	fieldLabel : "种类",
+	forceSelection : true,
+	width : 160,
+	// value : departmentData[0][1],
+	id : "materialCateCombAdd",
+	store : new Ext.data.SimpleStore({
+		fields : [ "value", "text" ],
+		data : []
+	}),
+	valueField : "value",
+	displayField : "text",
+	typeAhead : true,
+	mode : "local",
+	triggerAction : "all",
+	selectOnFocus : true,
+	allowBlank : false
+});
+
 materialAddWin = new Ext.Window(
 		{
 			layout : "fit",
 			title : "添加食材",
 			width : 260,
-			height : 190,
+			height : 200,
 			closeAction : "hide",
 			resizable : false,
 			items : [ {
@@ -1347,7 +1366,7 @@ materialAddWin = new Ext.Window(
 					id : "materialAddName",
 					allowBlank : false,
 					width : 160
-				}, {
+				}, materialCateCombAdd, {
 					xtype : "numberfield",
 					fieldLabel : "预警阀值",
 					id : "materialAddWarning",
@@ -1390,6 +1409,14 @@ materialAddWin = new Ext.Window(
 											.findById("materialAddDanger")
 											.getValue();
 
+									var materialCate = materialCateCombAdd
+											.getValue();
+									for ( var i = 0; i < materialCateComboData.length; i++) {
+										if (materialCate == materialCateComboData[i][1]) {
+											materialCate = materialCateComboData[i][0];
+										}
+									}
+
 									var isDuplicate = false;
 									for ( var i = 0; i < materialData.length; i++) {
 										if (materialAddNumber == materialData[i][1]) {
@@ -1408,7 +1435,8 @@ materialAddWin = new Ext.Window(
 														"materialAlias" : materialAddNumber,
 														"materialName" : materialAddName,
 														"materialWarning" : materialAddWarning,
-														"materialDanger" : materialAddDanger
+														"materialDanger" : materialAddDanger,
+														"materialCate" : materialCate
 													},
 													success : function(
 															response, options) {
@@ -1487,6 +1515,8 @@ materialAddWin = new Ext.Window(
 
 					materialAddWin.findById("materialAddDanger").setValue("");
 					materialAddWin.findById("materialAddDanger").clearInvalid();
+
+					materialCateCombAdd.setValue(materialCateComboData[0][1]);
 
 					var f = Ext.get("materialAddNumber");
 					f.focus.defer(100, f); // 为什么这样才可以！？！？
@@ -1608,8 +1638,33 @@ var pushBackBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "返回",
 	handler : function(btn) {
-		location.href = "InventoryProtal.html?restaurantID=" + restaurantID
-				+ "&pin=" + pin;
+		var isChange = false;
+		materialGrid.getStore().each(
+				function(record) {
+					if (record.isModified("materialName") == true
+							|| record.isModified("warningNbr") == true
+							|| record.isModified("dangerNbr") == true
+							|| record.isModified("cateID") == true) {
+						isChange = true;
+					}
+				});
+
+		if (isChange) {
+			Ext.MessageBox.show({
+				msg : "修改尚未保存，是否确认返回？",
+				width : 300,
+				buttons : Ext.MessageBox.YESNO,
+				fn : function(btn) {
+					if (btn == "yes") {
+						location.href = "InventoryProtal.html?restaurantID="
+								+ restaurantID + "&pin=" + pin;
+					}
+				}
+			});
+		} else {
+			location.href = "InventoryProtal.html?restaurantID=" + restaurantID
+					+ "&pin=" + pin;
+		}
 	}
 });
 
@@ -1926,6 +1981,8 @@ var materialStore = new Ext.data.Store({
 	}, {
 		name : "dangerNbr"
 	}, {
+		name : "cateID"
+	}, {
 		name : "operator"
 	}, {
 		name : "message"
@@ -1933,6 +1990,22 @@ var materialStore = new Ext.data.Store({
 });
 
 // menuStore.reload();
+
+var materialCateComb = new Ext.form.ComboBox({
+	forceSelection : true,
+	id : "materialCateComb",
+	store : new Ext.data.SimpleStore({
+		fields : [ "value", "text" ],
+		data : []
+	}),
+	valueField : "value",
+	displayField : "text",
+	typeAhead : true,
+	mode : "local",
+	triggerAction : "all",
+	selectOnFocus : true,
+	allowBlank : false
+});
 
 // 2，栏位模型
 var materialColumnModel = new Ext.grid.ColumnModel([
@@ -1945,7 +2018,7 @@ var materialColumnModel = new Ext.grid.ColumnModel([
 			header : "名称",
 			sortable : true,
 			dataIndex : "materialName",
-			width : 160,
+			width : 140,
 			editor : new Ext.form.TextField({
 				allowBlank : false,
 				allowNegative : false
@@ -1954,7 +2027,7 @@ var materialColumnModel = new Ext.grid.ColumnModel([
 			header : "库存量",
 			sortable : true,
 			dataIndex : "storage",
-			width : 130
+			width : 120
 		// ,
 		// renderer : function(v) {
 		// return parseFloat(v).toFixed(2);
@@ -1963,7 +2036,7 @@ var materialColumnModel = new Ext.grid.ColumnModel([
 			header : "价格（￥）",
 			sortable : true,
 			dataIndex : "price",
-			width : 130,
+			width : 120,
 			renderer : function(v) {
 				return parseFloat(v).toFixed(2);
 			}
@@ -1971,7 +2044,7 @@ var materialColumnModel = new Ext.grid.ColumnModel([
 			header : "预警阀值",
 			sortable : true,
 			dataIndex : "warningNbr",
-			width : 130,
+			width : 120,
 			editor : new Ext.form.NumberField({
 				allowBlank : false,
 				allowNegative : false
@@ -1980,11 +2053,26 @@ var materialColumnModel = new Ext.grid.ColumnModel([
 			header : "危险阀值",
 			sortable : true,
 			dataIndex : "dangerNbr",
-			width : 130,
+			width : 120,
 			editor : new Ext.form.NumberField({
 				allowBlank : false,
 				allowNegative : false
 			})
+		}, {
+			header : "种类",
+			sortable : true,
+			dataIndex : "cateID",
+			width : 120,
+			editor : materialCateComb,
+			renderer : function(value, cellmeta, record) {
+				var materialCateDesc = "";
+				for ( var i = 0; i < materialCateComboData.length; i++) {
+					if (materialCateComboData[i][0] == value) {
+						materialCateDesc = materialCateComboData[i][1];
+					}
+				}
+				return materialCateDesc;
+			}
 		}, {
 			header : "<center>操作</center>",
 			sortable : true,
@@ -2044,7 +2132,9 @@ Ext
 															|| record
 																	.isModified("dangerNbr") == true
 															|| record
-																	.isModified("warningNbr") == true) {
+																	.isModified("warningNbr") == true
+															|| record
+																	.isModified("cateID") == true) {
 														modfiedArr
 																.push(record
 																		.get("materialID")
@@ -2056,7 +2146,10 @@ Ext
 																				.get("warningNbr")
 																		+ " field_separator "
 																		+ record
-																				.get("dangerNbr"));
+																				.get("dangerNbr")
+																		+ " field_separator "
+																		+ record
+																				.get("cateID"));
 													}
 												});
 

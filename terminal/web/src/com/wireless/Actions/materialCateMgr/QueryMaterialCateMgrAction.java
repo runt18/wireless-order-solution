@@ -1,4 +1,4 @@
-package com.wireless.Actions.inventoryMgr;
+package com.wireless.Actions.materialCateMgr;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -20,15 +20,12 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.QueryMenu;
 import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.Food;
 import com.wireless.protocol.Terminal;
-import com.wireless.protocol.Util;
 
-public class QueryMaterialMgrAction extends Action {
+public class QueryMaterialCateMgrAction extends Action {
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
@@ -49,13 +46,14 @@ public class QueryMaterialMgrAction extends Action {
 
 		List resultList = new ArrayList();
 		List outputList = new ArrayList();
-		List chooseList = new ArrayList();
+		// List chooseList = new ArrayList();
 		HashMap rootMap = new HashMap();
 
 		boolean isError = false;
-
 		// 是否分頁
 		String isPaging = request.getParameter("isPaging");
+		// 是否combo
+		String isCombo = request.getParameter("isCombo");
 
 		try {
 			// 解决后台中文传到前台乱码
@@ -69,12 +67,11 @@ public class QueryMaterialMgrAction extends Action {
 			 * 14:30:00 pin=0x1 & type=3 & ope=2 & value=2011-7-14 14:30:00
 			 * 
 			 * pin : the pin the this terminal type : the type is one of the
-			 * values below. 0 - 全部全部 1 - 编号 2 - 名称 3 - 拼音 4 - 价格 5 - 厨房 ope :
-			 * the operator is one of the values below. 1 - 等于 2 - 大于等于 3 - 小于等于
-			 * value : the value to search, the content is depending on the type
-			 * isSpecial : additional condition. isRecommend : additional
-			 * condition. isFree : additional condition. isStop : additional
-			 * condition.
+			 * values below. 0 - 全部 1 - 名称 2 - 电话 3 - 地址 ope : the operator is
+			 * one of the values below. 1 - 等于 2 - 大于等于 3 - 小于等于 value : the
+			 * value to search, the content is depending on the type isSpecial :
+			 * additional condition. isRecommend : additional condition. isFree
+			 * : additional condition. isStop : additional condition.
 			 */
 
 			String pin = request.getParameter("pin");
@@ -82,93 +79,23 @@ public class QueryMaterialMgrAction extends Action {
 				pin = pin.substring(2);
 			}
 
-			// get the type to filter
-			int type = Integer.parseInt(request.getParameter("type"));
-
-			// get the operator to filter
-			String ope = request.getParameter("ope");
-			if (ope != null) {
-				int opeType = Integer.parseInt(ope);
-
-				if (opeType == 1) {
-					ope = "=";
-				} else if (opeType == 2) {
-					ope = ">=";
-				} else if (opeType == 3) {
-					ope = "<=";
-				} else {
-					// 不可能到这里
-					ope = "=";
-				}
-			} else {
-				// 不可能到这里
-				ope = "";
-			}
-
-			// get the value to filter
-			String filterVal = request.getParameter("value");
-
-			// combine the operator and filter value
-			String filterCondition = null;
-
-			if (type == 1) {
-				// 按编号
-				filterCondition = " AND A.material_alias " + ope + filterVal;
-			} else if (type == 2) {
-				// 按名称
-				filterCondition = " AND A.name like '" + filterVal + "%'";
-			} else if (type == 3) {
-				// 按库存量
-				filterCondition = " AND stock " + ope + filterVal;
-			} else if (type == 4) {
-				// 按价格
-				filterCondition = " AND B.price " + ope + filterVal;
-			} else if (type == 5) {
-				// 按预警阀值
-				filterCondition = " AND A.warning_threshold " + ope + filterVal;
-			} else if (type == 6) {
-				// 按危险阀值
-				filterCondition = " AND A.danger_threshold " + ope + filterVal;
-			} else {
-				// 全部
-				filterCondition = "";
-			}
-
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, Integer.parseInt(pin, 16),
 					Terminal.MODEL_STAFF);
-			// 编号 名称 库存量 价格（￥） 预警阀值 危险阀值
-			String sql = " SELECT A.material_id, A.material_alias, A.name, SUM(B.stock) AS stock, B.price, A.warning_threshold, A.danger_threshold, A.cate_id "
-					+ " FROM "
-					+ Params.dbName
-					+ ".material A LEFT OUTER JOIN "
-					+ Params.dbName
-					+ ".material_dept B ON ( A.restaurant_id = B.restaurant_id AND A.material_id = B.material_id ) "
-					+ " WHERE A.restaurant_id = "
-					+ term.restaurant_id
-					+ " "
-					+ filterCondition
-					+ " GROUP BY A.material_id, A.material_alias, A.name, B.price, A.warning_threshold, A.danger_threshold  ";
+
+			String sql = " SELECT cate_id, name " + " FROM " + Params.dbName
+					+ ".material_cate " + " WHERE restaurant_id = "
+					+ term.restaurant_id + " ORDER BY cate_id ";
 
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 
 			while (dbCon.rs.next()) {
 				HashMap resultMap = new HashMap();
 				/**
-				 * The json to each order looks like below 编号 名称 库存量 价格（￥） 预警阀值
-				 * 危险阀值
+				 * The json to each order looks like below 編號，名稱
 				 */
-				resultMap.put("materialID", dbCon.rs.getInt("material_id"));
-				resultMap.put("materialAlias",
-						dbCon.rs.getInt("material_alias"));
-				resultMap.put("materialName", dbCon.rs.getString("name"));
-				resultMap.put("storage", dbCon.rs.getFloat("stock"));
-				resultMap.put("price", dbCon.rs.getFloat("price"));
-				resultMap.put("warningNbr",
-						dbCon.rs.getFloat("warning_threshold"));
-				resultMap.put("dangerNbr",
-						dbCon.rs.getFloat("danger_threshold"));
 				resultMap.put("cateID", dbCon.rs.getInt("cate_id"));
+				resultMap.put("cateName", dbCon.rs.getString("name"));
 
 				resultMap.put("message", "normal");
 
@@ -185,7 +112,7 @@ public class QueryMaterialMgrAction extends Action {
 			} else if (e.errCode == ErrorCode.TERMINAL_EXPIRED) {
 				resultMap.put("message", "终端已过期，请重新确认");
 			} else {
-				resultMap.put("message", "没有获取到食材信息，请重新确认");
+				resultMap.put("message", "没有获取到食材种类信息，请重新确认");
 			}
 			resultList.add(resultMap);
 			isError = true;
@@ -204,8 +131,32 @@ public class QueryMaterialMgrAction extends Action {
 		} finally {
 			dbCon.disconnect();
 
+			String outString = "";
+
 			if (isError) {
 				rootMap.put("root", resultList);
+			} else if (isCombo.equals("true")) {
+				outString = "{\"root\":[";
+
+				if (resultList.size() == 0) {
+
+				} else {
+					for (int i = 0; i < resultList.size(); i++) {
+
+						outString = outString
+								+ "{cateID:"
+								+ ((HashMap) (resultList.get(i))).get("cateID")
+										.toString() + ",";
+						outString = outString
+								+ "cateName:'"
+								+ ((HashMap) (resultList.get(i))).get(
+										"cateName").toString() + "'},";
+
+					}
+					outString = outString.substring(0, outString.length() - 1);
+
+				}
+				outString = outString + "]}";
 			} else {
 				if (isPaging.equals("true")) {
 					// 分页
@@ -231,9 +182,13 @@ public class QueryMaterialMgrAction extends Action {
 			String outputJson = "{\"totalProperty\":" + resultList.size() + ","
 					+ obj.toString().substring(1);
 
-			System.out.println(outputJson);
-
-			out.write(outputJson);
+			if (isCombo.equals("true")) {
+				System.out.println(outString);
+				out.write(outString);
+			} else {
+				System.out.println(outputJson);
+				out.write(outputJson);
+			}
 
 		}
 		return null;

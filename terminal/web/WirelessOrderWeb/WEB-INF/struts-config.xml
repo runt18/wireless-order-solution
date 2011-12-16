@@ -241,6 +241,14 @@
 			type="com.wireless.Actions.inventoryMgr.StatInventoryReturnBySupplier"
 			scope="request">
 		</action>
+		<action path="/QueryMaterialCate"
+			type="com.wireless.Actions.materialCateMgr.QueryMaterialCateMgrAction"
+			scope="request">
+		</action>
+		<action path="/UpdateMaterialCate"
+			type="com.wireless.Actions.materialCateMgr.UpdateMaterialCateAction"
+			scope="request">
+		</action>
 
 
 

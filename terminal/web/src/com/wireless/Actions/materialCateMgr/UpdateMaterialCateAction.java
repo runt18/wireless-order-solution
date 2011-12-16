@@ -1,4 +1,4 @@
-package com.wireless.Actions.inventoryMgr;
+package com.wireless.Actions.materialCateMgr;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -19,7 +19,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Terminal;
 
-public class UpdateMaterialAction extends Action {
+public class UpdateMaterialCateAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -58,30 +58,28 @@ public class UpdateMaterialAction extends Action {
 					Terminal.MODEL_STAFF);
 
 			// get parameter
-			String modMaterials = request.getParameter("modMaterials");
+			String modCates = request.getParameter("modCates");
 
 			/**
 			 * 
 			 */
-			String[] materials = modMaterials.split(" record_separator ");
+			String[] cates = modCates.split(" record_separator ");
 			int sqlRowCount;
-			for (int i = 0; i < materials.length; i++) {
+			for (int i = 0; i < cates.length; i++) {
 
-				String[] fieldValues = materials[i].split(" field_separator ");
+				String[] fieldValues = cates[i].split(" field_separator ");
 
-				String sql = "UPDATE " + Params.dbName + ".material "
-						+ " SET name = '" + fieldValues[1] + "', "
-						+ " warning_threshold = " + fieldValues[2] + ", "
-						+ " danger_threshold =  " + fieldValues[3] + ", "
-						+ " cate_id =  " + fieldValues[4] + " "
+				String sql = " UPDATE " + Params.dbName + ".material_cate "
+						+ " SET name = '" + fieldValues[1] + "'"
 						+ " WHERE restaurant_id=" + term.restaurant_id
-						+ " AND material_id = " + fieldValues[0];
+						+ " AND cate_id = " + fieldValues[0];
 
 				sqlRowCount = dbCon.stmt.executeUpdate(sql);
+
 			}
 
 			jsonResp = jsonResp.replace("$(result)", "true");
-			jsonResp = jsonResp.replace("$(value)", "食材修改成功！");
+			jsonResp = jsonResp.replace("$(value)", "食材种类修改成功！");
 
 			dbCon.rs.close();
 

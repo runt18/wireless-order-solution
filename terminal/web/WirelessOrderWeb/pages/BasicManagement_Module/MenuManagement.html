@@ -14,14 +14,16 @@
 
 <!-- 实现多选JS -->
 <script type="text/javascript" src="../../extjs/multiselect/DDView.js"></script>
-<script type="text/javascript" src="../../extjs/multiselect/MultiSelect.js"></script>
+<script type="text/javascript"
+	src="../../extjs/multiselect/MultiSelect.js"></script>
 <script type="text/javascript"
 	src="../../extjs/multiselect/ItemSelector.js"></script>
 <link rel="stylesheet" type="text/css"
 	href="../../extjs/multiselect/multiselect.css" />
 
 <!-- css -->
-<link rel="stylesheet" type="text/css" href="../../css/systemSetting.css" />
+<link rel="stylesheet" type="text/css"
+	href="../../css/systemSetting.css" />
 <link rel="stylesheet" type="text/css" href="../../css/header.css" />
 <link rel="stylesheet" type="text/css" href="../../css/tableList.css" />
 <link rel="stylesheet" type="text/css" href="../../css/tableStatus.css" />
@@ -54,34 +56,38 @@
 	// global variable
 	var restaurantID = Request["restaurantID"];
 	var pin = Request["pin"];
-	
+
 	//var menuData = [];
-	
+
 	var currPageIndex = 0;
 	var currRowIndex = -1;
 	var conditionType = "text";
-	
+
 	var dishesPageRecordCount = 20;
 	var dishesStaticRecordCount = 11;
-	
+
 	var kitchenTypeData = [];//前台：kitchenTypeData：[厨房编号,厨房名称]
 	var dishMultSelectData = [];//[菜品编号，菜品名称]
-	
+	var materialCateComboData = [];
+
 	var isFirstStatics = true;
-	
+
 	var orderStaticBeginDate = "";
 	var orderStaticEndDate = "";
 	var orderStaticDishesString = "";
-	
+
 	var materialData = [];
 	var materialComboData = [];
-	
+	var materialComboDisplayData = [];
+
 	var isPrompt = false;
-	
 </script>
- <script type="text/javascript" src="../../js/BasicManagement/menuManagement/menuFuncLib.js"></script>
- <script type="text/javascript" src="../../js/BasicManagement/menuManagement/menuMgrLoad.js"></script>
- <script type="text/javascript" src="../../js/BasicManagement/menuManagement/menuMgrMain.js"></script> 
+<script type="text/javascript"
+	src="../../js/BasicManagement/menuManagement/menuFuncLib.js"></script>
+<script type="text/javascript"
+	src="../../js/BasicManagement/menuManagement/menuMgrLoad.js"></script>
+<script type="text/javascript"
+	src="../../js/BasicManagement/menuManagement/menuMgrMain.js"></script>
 
 </head>
 <body onload="menuMgrOnLoad()">

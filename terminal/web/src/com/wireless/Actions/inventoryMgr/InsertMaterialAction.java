@@ -57,15 +57,16 @@ public class InsertMaterialAction extends Action {
 			String materialName = request.getParameter("materialName");
 			String materialWarning = request.getParameter("materialWarning");
 			String materialDanger = request.getParameter("materialDanger");
+			String materialCate = request.getParameter("materialCate");
 
 			// 　食材基礎表
 			String sql = "INSERT INTO "
 					+ Params.dbName
 					+ ".material"
-					+ "( restaurant_id, material_alias, name, warning_threshold, danger_threshold ) "
+					+ "( restaurant_id, material_alias, name, warning_threshold, danger_threshold, cate_id ) "
 					+ " VALUES(" + term.restaurant_id + ", " + materialAlias
 					+ ", '" + materialName + "', " + materialWarning + ", "
-					+ materialDanger + " ) ";
+					+ materialDanger + ", " + materialCate + " ) ";
 
 			int sqlRowCount = dbCon.stmt.executeUpdate(sql);
 
