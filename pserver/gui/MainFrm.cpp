@@ -240,7 +240,7 @@ static unsigned __stdcall StopPrinterProc(LPVOID pvParam){
 	PServer::instance().terminate();
 	g_isPrinterStarted = false;
 	CString title;
-	title.Format(_T("%s打印服务 - 停止"), g_Restaurant);
+	title.Format(_T("%s打印服务%s - 停止"), g_Restaurant, _PROG_VER_);
 	pMainFrame->SetWindowText(title);
 	pMainFrame->m_TrayIcon.SetTooltipText(title);
 	pMainFrame->m_TrayIcon.SetIcon(IDI_SYS_TRAY);
@@ -259,7 +259,7 @@ static unsigned _stdcall StartPrinterProc(LPVOID pvParam){
 	}
 
 	CString title;
-	title.Format(_T("%s打印服务 - 启动"), g_Restaurant);
+	title.Format(_T("%s打印服务%s - 启动"), g_Restaurant, _PROG_VER_);
 	pMainFrame->SetWindowText(title);
 	pMainFrame->m_TrayIcon.SetTooltipText(title);
 	g_isPrinterStarted = true;
@@ -413,9 +413,9 @@ void CMainFrame::OnRetrieveRestaurant(const std::string& restaurant){
 	g_Restaurant = pRestaurant.get();
 	CString title;
 	if(g_isPrinterStarted){
-		title.Format(_T("%s打印服务 - 启动"), g_Restaurant);
+		title.Format(_T("%s打印服务%s - 启动"), g_Restaurant, _PROG_VER_);
 	}else{
-		title.Format(_T("%s打印服务 - 停止"), g_Restaurant);
+		title.Format(_T("%s打印服务%s - 停止"), g_Restaurant, _PROG_VER_);
 	}
 	SetWindowText(title);
 	m_TrayIcon.SetTooltipText(title);

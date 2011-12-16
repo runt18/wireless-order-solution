@@ -211,6 +211,10 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 
 						//responds with an ACK
 						iResult = Protocol::send(g_ConnectSocket, RespACK(printReq.header));
+
+					}else if(printReq.header.mode == Mode::TEST && printReq.header.type == Type::PING){
+						//responds with an ACK if the server sent a PING request to check if connected
+						iResult = Protocol::send(g_ConnectSocket, RespACK(printReq.header));
 					}
 
 				}else if(iResult == 0){
@@ -240,7 +244,7 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 		//in case receiving the g_hEndPrintMgrEvent
 		//exit the while loop so as to end the thread
 		}else if(WAIT_OBJECT_0 + 1 == dwEvent){
-			ResetEvent(g_hPrintMgrEvent);
+			ResetEvent(g_hEndPrintMgrEvent);
 			break;
 		}
 	}
