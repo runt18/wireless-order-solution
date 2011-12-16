@@ -1858,7 +1858,7 @@ var dishesOrderNorthPanel = new Ext.Panel({
 			layout : "form",
 			border : false,
 			id : "tableNbrFrom",
-			width : 80,
+			width : 120,
 			contentEl : "tableStatusTableNbr"
 		}, {
 			layout : "form",
