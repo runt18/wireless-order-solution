@@ -1,9 +1,5 @@
 package com.wireless.server;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -20,6 +16,7 @@ import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Mode;
 import com.wireless.protocol.ProtocolPackage;
+import com.wireless.protocol.ReqPing;
 import com.wireless.protocol.RespNAK;
 import com.wireless.protocol.RespOTAUpdate;
 import com.wireless.protocol.RespPrintLogin;
@@ -64,10 +61,11 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 				DBCon dbCon = new DBCon();
 				try{
 					connection = _server.accept();
+					connection.setKeepAlive(true);
 					connection.setTcpNoDelay(true);
-					connection.setSendBufferSize(10);
-					_in = new BufferedInputStream(new DataInputStream(connection.getInputStream()));
-					_out = new BufferedOutputStream(new DataOutputStream(connection.getOutputStream()));
+					//connection.setSendBufferSize(10);
+					_in = connection.getInputStream();
+					_out = connection.getOutputStream();
 
 					/**
 					 * The login request is as below
@@ -137,7 +135,9 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 										while(iter.hasNext()){
 											Socket conn = iter.next();
 											try{
-												conn.sendUrgentData(0);
+												send(conn.getOutputStream(), new ReqPing());
+												recv(conn.getInputStream(), 3 * 1000);
+												//conn.sendUrgentData(0);
 											}catch(IOException e){
 												try{
 													conn.close();
@@ -265,6 +265,7 @@ class PrintLossHandler extends Handler implements Runnable{
 		_restaurantID = restaurantID;
 	}
 	
+	@Override
 	public void run(){
 		/**
 		 * Copy the unprinted request to a temporary list
@@ -334,3 +335,4 @@ class PrintLossHandler extends Handler implements Runnable{
 
 	}	
 }
+
