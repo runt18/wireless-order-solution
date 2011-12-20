@@ -122,13 +122,29 @@ IF NOT EXIST terminal\blackberry\deliverables\Web\4.5.0\WirelessOrderTerminal.co
 	%pwd%\terminal\blackberry\UpdateJad -n WirelessOrderTerminal_BB50.jad WirelessOrderTerminal.jad 
 	cd %pwd%
 	del dist\www\ota\bb50\WirelessOrderTerminal.jad > nul
-	GOTO pserver_files
+	GOTO android_apk
 
 :cod_50_not_exist
 	@echo the terminal cod for blackberry 5.0 file missing
 	@pause
 	GOTO end
 
+Rem copy the AndroidManifest.xml and apk file
+:android_apk
+IF EXIST terminal\android\bin\WirelessOrderTerminal_Android.apk GOTO apk_exist
+IF NOT EXIST terminal\android\bin\WirelessOrderTerminal_Android.apk GOTO apk_not_exist
+:apk_exist
+	@echo copying the android apk files...
+	IF NOT EXIST dist\www\ota\android\phone mkdir dist\www\ota\android\phone
+	@copy terminal\android\version.php dist\www\ota\android\phone > nul
+	@copy terminal\android\AndroidManifest.xml dist\www\ota\android\phone > nul
+	@copy terminal\android\bin\WirelessOrderTerminal_Android.apk dist\www\ota\android\phone > nul
+	GOTO pserver_files
+:apk_not_exist
+	@echo the apk file for android phone terminal missing
+	@pause
+	GOTO end
+	
 :pserver_files
 IF EXIST pserver\setup_nsis\pserver.exe GOTO pserver_exist
 IF NOT EXIST pserver\setup_nsis\pserver.exe GOTO pserver_not_exist
