@@ -44,6 +44,7 @@ import com.wireless.sccon.ServerConnector;
 public class MainActivity extends Activity {
 
 	private static final String KEY_TABLE_ID = "TableAmount";
+	public static final int NETWORK_SET = 6;
 	
 	private static final int DIALOG_INSERT_ORDER = 0;
 	private static final int DIALOG_UPDATE_ORDER = 1;
@@ -153,11 +154,13 @@ public class MainActivity extends Activity {
 					break;
 
 				case 4:
-					
+					Intent functionintent = new Intent(MainActivity.this,FunctionAtivity.class);
+                    startActivity(functionintent);
 					break;
 
 				case 5:
-
+					Intent netsetintent = new Intent(MainActivity.this,NetworkSettingActivity.class);
+                   startActivityForResult(netsetintent, NETWORK_SET);
 					break;
 
 				case 6:
@@ -170,7 +173,8 @@ public class MainActivity extends Activity {
 					break;
 
 				case 8:
-
+                     Intent intent = new Intent(MainActivity.this,AboutActivity.class);
+                     startActivity(intent);
 					break;
 				}
 			}
@@ -242,8 +246,23 @@ public class MainActivity extends Activity {
 		return super.onKeyDown(keyCode, event);
 	}
 
-
 	
+	
+
+	/**
+	 * 判断是哪一个Activity返回的
+	 */
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if(requestCode == NETWORK_SET ){
+		     if(resultCode == RESULT_OK){
+		          	//菜谱更新
+				new QueryMenuTask().execute();
+		     }
+		}
+		super.onActivityResult(requestCode, resultCode, data);
+	}
+
 	/**
 	 * Generate the message according to the error code 
 	 * @param tableID the table id associated with this error
@@ -712,7 +731,7 @@ public class MainActivity extends Activity {
 			}else{
 				title.setText("请输入需要下单的台号:");
 			}
-			
+			((TextView)findViewById(R.id.table)).setText("台号：");
 			Button ok = (Button)findViewById(R.id.confirm);
 			ok.setText("确定");
 			ok.setOnClickListener(new View.OnClickListener() {

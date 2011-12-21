@@ -22,6 +22,7 @@ public class PickFoodListView extends ListView {
 
 	public final static int TAG_NUM = 0;
 	public final static int TAG_PINYIN = 1;
+	public final static int TAG_OCCASINAL = 2;
 	
 	private Context _context;
 	private Food[] _foods = null;
@@ -153,6 +154,7 @@ public class PickFoodListView extends ListView {
 			((TextView)findViewById(R.id.ordername)).setText("请输入" + selectedFood.name + "的点菜数量");
 			((EditText)findViewById(R.id.mycount)).setText("1");
 			
+			((TextView)findViewById(R.id.table)).setText("数量：");
 			//"确定"Button
 			Button okBtn = (Button)findViewById(R.id.confirm);
 			okBtn.setText("确定");

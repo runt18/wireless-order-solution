@@ -23,7 +23,6 @@ public class BillFoodListView extends ListView {
     
 	public BillFoodListView(Context context,AttributeSet attrs) {
 		super(context,attrs);
-		// TODO Auto-generated constructor stub
 		this._context = context;
 	}
 	

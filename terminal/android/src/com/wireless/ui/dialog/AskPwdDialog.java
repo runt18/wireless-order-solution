@@ -28,9 +28,9 @@ public class AskPwdDialog extends Dialog{
 		super(context, R.style.FullHeightDialog);
 		_pwdType = pwdType;
 		_context = context;
-		View view = LayoutInflater.from(context).inflate(R.layout.pwd_alert, null);
+		View view = LayoutInflater.from(context).inflate(R.layout.alert, null);
 		setContentView(view);
-		getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
+		//getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
 
 		String title;
 		if(_pwdType == PWD_1){
@@ -45,7 +45,7 @@ public class AskPwdDialog extends Dialog{
 		((TextView)view.findViewById(R.id.ordername)).setText(title);
 		
 		_pwdEdtTxt = (EditText)view.findViewById(R.id.mycount);
-		
+		((TextView)findViewById(R.id.table)).setText("密码：");
 		Button okBtn = (Button)view.findViewById(R.id.confirm);
 		okBtn.setText("确定");
 		okBtn.setOnClickListener(new View.OnClickListener() {				
@@ -71,7 +71,7 @@ public class AskPwdDialog extends Dialog{
 			}
 		});
 		
-		Button cancle = (Button)view.findViewById(R.id.cancle);
+		Button cancle = (Button)view.findViewById(R.id.alert_cancel);
 		cancle.setText("取消");
 		cancle.setOnClickListener(new View.OnClickListener() {
 			@Override

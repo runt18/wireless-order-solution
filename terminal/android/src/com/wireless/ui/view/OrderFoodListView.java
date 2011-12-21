@@ -405,6 +405,7 @@ public class OrderFoodListView extends ExpandableListView{
 			getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
 			((TextView)view.findViewById(R.id.ordername)).setText("请输入" + selectedFood.name + "的删除数量");
 			
+			((TextView)findViewById(R.id.table)).setText("数量：");
 			//删除数量默认为此菜品的点菜数量
 			final EditText cancelEdtTxt = (EditText)view.findViewById(R.id.mycount);			
 			cancelEdtTxt.setText(Util.float2String2(selectedFood.getCount()));
@@ -506,9 +507,11 @@ public class OrderFoodListView extends ExpandableListView{
 						if(selectedFood.hangStatus == OrderFood.FOOD_NORMAL){
 							selectedFood.hangStatus = OrderFood.FOOD_HANG_UP;
 							((TextView)findViewById(R.id.item3Txt)).setText("取消叫起");
+							dismiss();
 						}else{
 							selectedFood.hangStatus = OrderFood.FOOD_NORMAL;
-							((TextView)findViewById(R.id.item3Txt)).setText("叫起");								
+							((TextView)findViewById(R.id.item3Txt)).setText("叫起");		
+							dismiss();
 						}
 					}
 				});
@@ -542,10 +545,12 @@ public class OrderFoodListView extends ExpandableListView{
 			    			if(selectedFood.hangStatus == OrderFood.FOOD_HANG_UP){
 			    				selectedFood.hangStatus = OrderFood.FOOD_IMMEDIATE;
 								((TextView)findViewById(R.id.item2Txt)).setText("即起");
+								dismiss();
 			    				
 			    			}else if(selectedFood.hangStatus == OrderFood.FOOD_IMMEDIATE){
 			    				selectedFood.hangStatus = OrderFood.FOOD_HANG_UP;
 								((TextView)findViewById(R.id.item2Txt)).setText("重新叫起");
+								dismiss();
 			    			}						
 						}
 					});
@@ -562,10 +567,12 @@ public class OrderFoodListView extends ExpandableListView{
 							if(selectedFood.isHurried){
 								selectedFood.isHurried = false;
 								((TextView)findViewById(R.id.item3Txt)).setText("催菜");	
+								dismiss();
 								
 							}else{
 								selectedFood.isHurried = true;
-								((TextView)findViewById(R.id.item3Txt)).setText("取消催菜");									
+								((TextView)findViewById(R.id.item3Txt)).setText("取消催菜");	
+								dismiss();
 							}
 						}
 					});
@@ -584,10 +591,12 @@ public class OrderFoodListView extends ExpandableListView{
 							if(selectedFood.isHurried){
 								selectedFood.isHurried = false;
 								((TextView)findViewById(R.id.item2Txt)).setText("催菜");	
+								dismiss();
 					
 							}else{
 								selectedFood.isHurried = true;
-								((TextView)findViewById(R.id.item2Txt)).setText("取消催菜");									
+								((TextView)findViewById(R.id.item2Txt)).setText("取消催菜");	
+								dismiss();
 							}						
 						}
 					});
@@ -597,8 +606,7 @@ public class OrderFoodListView extends ExpandableListView{
 			}
 			
 			//返回Button
-			Button cancelBtn = (Button)findViewById(R.id.back);
-			cancelBtn.setText("返回");				
+			Button cancelBtn = (Button)findViewById(R.id.back);		
 			cancelBtn.setOnClickListener(new View.OnClickListener() {					
 				@Override
 				public void onClick(View v) {
