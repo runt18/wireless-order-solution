@@ -16,7 +16,7 @@
 			android:layout_height="wrap_content" android:textColor="#FFFFFF"
 			android:textSize="22sp" android:textStyle="bold" android:typeface="monospace"
 			android:shadowDx="1" android:shadowDy="1" android:shadowRadius="3.0"
-			android:text="下单-拼音" android:layout_centerVertical="true"
+			android:text="点菜-拼音" android:layout_centerVertical="true"
 			android:layout_centerHorizontal="true">
 		</TextView>
 
@@ -42,6 +42,9 @@
 	<com.wireless.ui.view.PickFoodListView
 		android:id="@+id/pickByPinyinLstView" android:layout_width="fill_parent"
 		android:layout_height="wrap_content" android:layout_below="@id/line"
+		android:fadeScrollbars="false"
+		android:fadingEdge="none"
+		android:fastScrollEnabled="true" 
 		android:divider="@drawable/line" android:cacheColorHint="#00000000">
 	</com.wireless.ui.view.PickFoodListView>
 

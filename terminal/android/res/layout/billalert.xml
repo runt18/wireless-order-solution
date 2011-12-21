@@ -93,18 +93,17 @@
     <RelativeLayout 
    android:id="@+id/r2"
   android:layout_width="fill_parent"
-  android:layout_height="40dip"
+  android:layout_height="60dip"
   android:layout_below="@id/line2"
   >
     <Button 
   android:id="@+id/back"
-  android:layout_width="wrap_content"
+  android:layout_width="80dip"
   android:layout_height="wrap_content"
   android:layout_centerVertical="true"
   android:textColor="#FFFFFF"
-  android:background="@drawable/wenzibg"
+  android:background="@drawable/cancle_selector"
   android:layout_centerHorizontal="true"
-  android:text="返回"
   />
   
   </RelativeLayout>
