@@ -107,13 +107,13 @@ public class StartupActivity extends Activity {
 			@Override
 			public int getDeviceId() {
 				//FIXME here should use the the id of android's own
-				return 0x2100000A;
+				return 0x10000001;
 			}
 
 			@Override
 			public short getDeviceType() {
 				//FIXME here should use the model of android
-				return Terminal.MODEL_BB;
+				return Terminal.MODEL_ANDROID;
 			}
 
 		});
@@ -128,8 +128,8 @@ public class StartupActivity extends Activity {
 	protected void onStart(){
 		super.onStart();
 		if(isNetworkAvail()){
-			new CheckVersion().execute();
-//			new QueryMenuTask().execute();
+			//new CheckVersion().execute();
+			new QueryMenuTask().execute();
 		}else{
 			showNetSetting();
 		}		
@@ -371,7 +371,8 @@ public class StartupActivity extends Activity {
 				
 				String [] message = str.split("</br>");
 				_uri = message[2];
-				float version = Float.parseFloat(message[0].toString().trim());
+				//float version = Float.parseFloat(message[0].toString().trim());
+				float version = Float.parseFloat("1.1");
 				 Log.e("aaa", version+"");
 				if( version > _appVersion ){
 					new AlertDialog.Builder(StartupActivity.this)

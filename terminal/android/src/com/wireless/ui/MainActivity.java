@@ -154,13 +154,15 @@ public class MainActivity extends Activity {
 					break;
 
 				case 4:
-					Intent functionintent = new Intent(MainActivity.this,FunctionAtivity.class);
-                    startActivity(functionintent);
+					//功能设置
+					Intent funcIntent = new Intent(MainActivity.this,FuncSettingActivity.class);
+                    startActivity(funcIntent);
 					break;
 
 				case 5:
-					Intent netsetintent = new Intent(MainActivity.this,NetworkSettingActivity.class);
-                   startActivityForResult(netsetintent, NETWORK_SET);
+					//网络设置
+					Intent netIntent = new Intent(MainActivity.this,NetworkSettingActivity.class);
+					startActivityForResult(netIntent, NETWORK_SET);
 					break;
 
 				case 6:
@@ -173,8 +175,8 @@ public class MainActivity extends Activity {
 					break;
 
 				case 8:
-                     Intent intent = new Intent(MainActivity.this,AboutActivity.class);
-                     startActivity(intent);
+					Intent intent = new Intent(MainActivity.this, AboutActivity.class);
+					startActivity(intent);
 					break;
 				}
 			}
