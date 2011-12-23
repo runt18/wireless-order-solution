@@ -1,14 +1,8 @@
 package com.wireless.ui;
 
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-
-import java.io.InputStreamReader;
-
-import com.wireless.common.Params;
-
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import android.app.Activity;
 import android.content.Context;
@@ -23,33 +17,87 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.wireless.common.Params;
+import com.wireless.common.PinReader;
+
 public class FuncSettingActivity extends Activity {
 	
 	private ArrayAdapter<String> _adapter;
 	private ArrayAdapter<String> _timeAdapter;
     private String _values[] = { "异步", "同步" };
     private String _connectTimeouts[] = { "10秒", "15秒", "20秒" };
-    
-    private static final int METHOD = 0;
-    private static final int TIMEOUT = 0;
-    
-    private String _method;
-    private String _timeout;
+        
     Spinner _printSettingSpinner;
     Spinner _connTimeoutSpinner;
+    private int _printSetting = Params.PRINT_ASYNC;
+    private int _connTimeout = Params.TIME_OUT_10s;
     
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.function);
 		
-		SharedPreferences sharedPreferences = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE);
+		_printSettingSpinner = (Spinner)findViewById(R.id.afterketchenmethod);
+		// 将可选内容与ArrayAdapter连接起来
+		_adapter = new ArrayAdapter<String>(this, R.layout.spinner, _values);
+		// 设置下拉列表的风格
+		_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		// 将adapter 添加到spinner中
+		_printSettingSpinner.setAdapter(_adapter);		
+		//后厨打印设置中分为“同步”和“异步”
+		_printSettingSpinner.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
+
+			@Override
+			public void onItemSelected(AdapterView<?> arg0, View view, int position, long rowID) {
+				if(rowID  == 0){
+					_printSetting = Params.PRINT_ASYNC;
+				}else if(rowID  == 1){
+					_printSetting = Params.PRINT_SYNC;
+				}else{
+					_printSetting = Params.PRINT_ASYNC;
+				}
+			}
+            
+			@Override
+			public void onNothingSelected(AdapterView<?> arg0) {
+				
+			}			
+		});	
+		
+		_connTimeoutSpinner = (Spinner)findViewById(R.id.connectiontime);
+		// 将可选内容与ArrayAdapter连接起来
+		_timeAdapter = new ArrayAdapter<String>(this, R.layout.spinner, _connectTimeouts);
+		// 设置下拉列表的风格
+		_timeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		// 将adapter 添加到spinner中
+		_connTimeoutSpinner.setAdapter(_timeAdapter);
+		// 超时链接分为10s, 15s, 20s
+		_connTimeoutSpinner.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
+
+			@Override
+			public void onItemSelected(AdapterView<?> arg0, View view , int position, long rowID) {
+				if(rowID == 0){
+					_connTimeout = Params.TIME_OUT_10s;
+				}else if(rowID == 1){
+					_connTimeout = Params.TIME_OUT_15s;
+				}else if(rowID == 2){
+					_connTimeout = Params.TIME_OUT_20s;
+				}else{
+					_connTimeout = Params.TIME_OUT_10s;
+				}
+			}
+            
+			@Override
+			public void onNothingSelected(AdapterView<?> arg0) {
+				
+			}
+			
+		});			
+		
+		SharedPreferences sharedPreferences = getSharedPreferences(Params.PREFS_NAME, Context.MODE_WORLD_READABLE);
 		int printSetting = sharedPreferences.getInt(Params.PRINT_SETTING, Params.PRINT_ASYNC);
 		int timeout = sharedPreferences.getInt(Params.CONN_TIME_OUT, Params.TIME_OUT_10s);		
-		
-		
-		_printSettingSpinner = (Spinner)findViewById(R.id.afterketchenmethod);
-		_connTimeoutSpinner = (Spinner)findViewById(R.id.connectiontime);
+				
 
 		//显示后厨打印的设置
 		if(printSetting == Params.PRINT_ASYNC) {
@@ -69,57 +117,17 @@ public class FuncSettingActivity extends Activity {
 			_connTimeoutSpinner.setSelection(0);
 		}
 		
-		((TextView)findViewById(R.id.pinnum)).setText("0x"+readfile());
-		
-		
-		
-		// 将可选内容与ArrayAdapter连接起来
-		_adapter = new ArrayAdapter<String>(this, R.layout.spinner, _values);
-		// 设置下拉列表的风格
-		_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		// 将adapter 添加到spinner中
-		_printSettingSpinner.setAdapter(_adapter);
-		
-		_printSettingSpinner.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
-
-			@Override
-			public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long arg3) {
-				_method = _values[position];
-			}
-            
-			@Override
-			public void onNothingSelected(AdapterView<?> arg0) {
-				// TODO Auto-generated method stub
-				
-			}
+		//显示PIN值
+		try{
+			String pin = PinReader.read();
+			((TextView)findViewById(R.id.pinnum)).setText("0x" + pin);
 			
-		});
-		
-		
-		
-		
-		// 将可选内容与ArrayAdapter连接起来
-		_timeAdapter = new ArrayAdapter<String>(this, R.layout.spinner, _connectTimeouts);
-		// 设置下拉列表的风格
-		_timeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		// 将adapter 添加到spinner中
-		_connTimeoutSpinner.setAdapter(_timeAdapter);
-		
-		_connTimeoutSpinner.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
-
-			@Override
-			public void onItemSelected(AdapterView<?> arg0, View arg1,
-					int position, long arg3) {
-				_timeout = _connectTimeouts[position];
-			}
-            
-			@Override
-			public void onNothingSelected(AdapterView<?> arg0) {
-				// TODO Auto-generated method stub
-				
-			}
+		}catch(FileNotFoundException e){
+			((TextView)findViewById(R.id.pinnum)).setText("PIN验证文件缺失");
 			
-		});		
+		}catch(IOException e){
+			((TextView)findViewById(R.id.pinnum)).setText("读取PIN文件出错");
+		}	
 
 		/**
 		 * 返回Button
@@ -139,9 +147,9 @@ public class FuncSettingActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				((TextView)findViewById(R.id.pinnum)).setText("0x" + readfile());
-				_printSettingSpinner.setSelection(METHOD);
-				_connTimeoutSpinner.setSelection(TIMEOUT);				
+				//((TextView)findViewById(R.id.pinnum)).setText("0x" + readfile());
+				_printSettingSpinner.setSelection(0);
+				_connTimeoutSpinner.setSelection(0);				
 			}
 		});  
        
@@ -152,9 +160,9 @@ public class FuncSettingActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				 Editor editor = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).edit();//获取编辑器
-				 editor.putString("printmethod", _method);
-				 editor.putString("timeout", _timeout);
-				 editor.commit();
+				 editor.putInt(Params.PRINT_SETTING, _printSetting);
+				 editor.putInt(Params.CONN_TIME_OUT, _connTimeout);
+				 editor.commit();				
 				 Toast.makeText(FuncSettingActivity.this, "功能设置成功", 0).show();
 				 finish();
 			}
@@ -168,27 +176,7 @@ public class FuncSettingActivity extends Activity {
 			public void onClick(View v) {
 				finish();
 			}
-		});
-    
-    
+		});	
+	}	
 
-	
-	}
-	
-	
-	public String readfile(){
-		String code = "";
-		String sdcardroot = android.os.Environment.getExternalStorageDirectory().getPath()+"/digi-e/android/pin";//获取跟目录 
-		try{	
-			 File file = new File(sdcardroot);
-			  BufferedReader br=new BufferedReader(new InputStreamReader(new FileInputStream(file))) ;   
-	          while(br.ready()){
-	        	  code+=br.readLine();
-	          }
-		} catch (Exception e) {
-		}
-		return code;
-		}
-	
-	
 }

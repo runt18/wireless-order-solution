@@ -4,6 +4,7 @@ import com.wireless.protocol.FoodMenu;
 import com.wireless.protocol.Restaurant;
 
 public class WirelessOrder {
+	public static int pin;
 	public static FoodMenu foodMenu;
 	public static Restaurant restaurant;
 }

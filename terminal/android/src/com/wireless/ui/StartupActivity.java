@@ -3,6 +3,7 @@ package com.wireless.ui;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,12 +16,11 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnKeyListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.DialogInterface.OnKeyListener;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -29,11 +29,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.TextView;
 
-
+import com.wireless.common.Params;
+import com.wireless.common.PinReader;
 import com.wireless.common.WirelessOrder;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.PinGen;
@@ -47,81 +47,62 @@ import com.wireless.protocol.Type;
 import com.wireless.sccon.ServerConnector;
 
 
-
 public class StartupActivity extends Activity {
- private TextView message;
- private String _netaddress;
- private int _netport;
-// private String _netapn;
-// private String _username;
-// private String _password;
-// private String _printmethod;
-// private String _timeout;
- 
- ProgressDialog _pd;
- float _appVersion;
- String _uri;
- int _downLoadFileSize;
- int _fileSize;
- ProgressDialog pd;
- String _fileName;
+	
+	private TextView _msgTxtView;
+
+	ProgressDialog _pd;
+	float _appVersion;
+	int _downLoadFileSize;
+	int _fileSize;
+	ProgressDialog pd;
+	String _fileName;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		SharedPreferences sharedPreferencesone = getSharedPreferences("set", Context.MODE_PRIVATE);
-		//getString()第二个参数为缺省值，如果preference中不存在该key，将返回缺省值
-		_netaddress = sharedPreferencesone.getString("address", "");
-		if(_netaddress.equals("")){
-			SharedPreferences sharedPreferences = getSharedPreferences("set", Context.MODE_PRIVATE);
-			 Editor editor = sharedPreferences.edit();//获取编辑器
-			 editor.putString("address", "125.88.20.194");
-			 editor.putInt("port", 55555);
-			 editor.putString("apn", "cmnet");
-			 editor.putString("username", "");
-			 editor.putString("password", "");
-			 editor.putString("printmethod", "异步");
-			 editor.putString("timeout", "10秒");
-			 editor.commit();//提交修改
+		SharedPreferences sharedPrefs = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE);
+		/*
+		 * getString()第二个参数为缺省值，如果preference中不存在该key，将返回缺省值，
+		 * 返回缺省值表示配置文件还未创建，需要初始化配置文件
+		 */
+		if(sharedPrefs.getString(Params.IP_ADDR, "").equals("")){
+			Editor editor = sharedPrefs.edit();//获取编辑器
+			editor.putString(Params.IP_ADDR, Params.DEF_IP_ADDR);
+			editor.putInt(Params.IP_PORT, Params.DEF_IP_PORT);
+			editor.putString(Params.APN, "cmnet");
+			editor.putString(Params.USER_NAME, "");
+			editor.putString(Params.PWD, "");
+			editor.putInt(Params.PRINT_SETTING, Params.PRINT_ASYNC);
+			editor.putInt(Params.CONN_TIME_OUT, Params.TIME_OUT_10s);
+			editor.commit();//提交修改
+			
+		}else{
+			ServerConnector.instance().setNetAddr(sharedPrefs.getString(Params.IP_ADDR, Params.DEF_IP_ADDR));
+			ServerConnector.instance().setNetPort(sharedPrefs.getInt(Params.IP_PORT, Params.DEF_IP_PORT));
+//			ServerConnector.instance().setNetAPN(_netapn);
+//			ServerConnector.instance().setNetUser(_username);
+//			ServerConnector.instance().setNetPwd(_password);
+//			ServerConnector.instance().setTimeout(Integer.parseInt(_timeout));
+//			ServerConnector.instance().setConnType(Integer.parseInt(_printmethod));
 		}
-			SharedPreferences sharedPreferences = StartupActivity.this.getSharedPreferences("set", Context.MODE_WORLD_READABLE);
-			_netaddress = sharedPreferences.getString("address", "");
-			_netport = sharedPreferences.getInt("port", 0);
-//			_netapn = sharedPreferences.getString("apn", "");
-//			_username = sharedPreferences.getString("username", "");
-//			_password = sharedPreferences.getString("password", "");
-//			_printmethod = sharedPreferences.getString("printmethod", "");
-//			_timeout = sharedPreferences.getString("timeout", "");
-	
 
-		
-
-		ServerConnector.instance().setNetAddr(_netaddress);
-		ServerConnector.instance().setNetPort(_netport);
-//		ServerConnector.instance().setNetAPN(_netapn);
-//		ServerConnector.instance().setNetUser(_username);
-//		ServerConnector.instance().setNetPwd(_password);
-//		ServerConnector.instance().setTimeout(Integer.parseInt(_timeout));
-//		ServerConnector.instance().setConnType(Integer.parseInt(_printmethod));
 		ReqPackage.setGen(new PinGen() {
 			@Override
 			public int getDeviceId() {
-				//FIXME here should use the the id of android's own
-				return 0x10000001;
+				return WirelessOrder.pin;
 			}
 
 			@Override
 			public short getDeviceType() {
-				//FIXME here should use the model of android
 				return Terminal.MODEL_ANDROID;
 			}
 
 		});
 		
 		setContentView(R.layout.enter);
-		message=(TextView)findViewById(R.id.myTextView);
-		
-
+		_msgTxtView = (TextView)findViewById(R.id.myTextView);
 	}
         
 	@Override
@@ -129,7 +110,7 @@ public class StartupActivity extends Activity {
 		super.onStart();
 		if(isNetworkAvail()){
 			//new CheckVersion().execute();
-			new QueryMenuTask().execute();
+			new ReadPinTask().execute();
 		}else{
 			showNetSetting();
 		}		
@@ -191,7 +172,7 @@ public class StartupActivity extends Activity {
 		@Override
 		protected void onPreExecute(){
 			
-			message.setText("正在下载菜谱...请稍候");
+			_msgTxtView.setText("正在下载菜谱...请稍候");
 			//_progDialog = ProgressDialog.show(EnterActivity.this, "", "正在下载菜谱...请稍候", true);
 		}
 		
@@ -245,9 +226,12 @@ public class StartupActivity extends Activity {
 				.setMessage(errMsg)
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
-					 finish();
+						Intent intent = new Intent(StartupActivity.this, MainActivity.class);
+						startActivity(intent);
+						finish();
 					}
 				}).show();
+				
 			}else{
 				new QueryRestaurantTask().execute();
 			}
@@ -259,16 +243,12 @@ public class StartupActivity extends Activity {
 	 */
 	private class QueryRestaurantTask extends AsyncTask<Void, Void, String>{
 		
-		//private ProgressDialog _progDialog;
-		
 		/**
 		 * 在执行请求餐厅请求信息前显示提示信息
 		 */
 		@Override
-		protected void onPreExecute(){
-			
-			message.setText("更新菜谱信息...请稍候");
-			//_progDialog = ProgressDialog.show(EnterActivity.this, "", "更新菜谱信息...请稍候", true);
+		protected void onPreExecute(){			
+			_msgTxtView.setText("更新菜谱信息...请稍候");
 		}
 		
 		/**
@@ -314,9 +294,9 @@ public class StartupActivity extends Activity {
 						
 					}
 				}).show();
-			}else{
 				
-				Intent intent=new Intent(StartupActivity.this,MainActivity.class);
+			}else{				
+				Intent intent = new Intent(StartupActivity.this,MainActivity.class);
 				startActivity(intent);
 				overridePendingTransition(R.anim.enter,android.R.anim.fade_out);    
 				finish();
@@ -324,157 +304,214 @@ public class StartupActivity extends Activity {
 		}	
 	}
 	
-	
-   public class CheckVersion extends AsyncTask<Void, Void, String>{
-
-	   
-	   
-	@Override
-	protected void onPreExecute() {
+	/**
+	 * 从SDCard中读取PIN的验证信息
+	 */
+	private class ReadPinTask extends AsyncTask<Void, Void, String>{
 		
-		
-		super.onPreExecute();
-	}
-
-	
-
-	@Override
-	protected String doInBackground(Void... params) {
-		/*
-		 * 获取本地的版本号
+		/**
+		 * 在读取Pin信息前显示提示信息
 		 */
-		try {
-			 PackageManager manager = StartupActivity.this.getPackageManager();
-			 PackageInfo info = manager.getPackageInfo(StartupActivity.this.getPackageName(), 0);
-			 _appVersion = new Float(info.versionName); // 版本名1.0
-			 Log.e("aaa", _appVersion+"");
-		} catch (Exception e) {
-			 
+		@Override
+		protected void onPreExecute(){			
+			_msgTxtView.setText("正在读取验证PIN码...请稍候");
 		}
-		 String uri = getString(R.string.versionurl); 
-		   try {
-			    HttpURLConnection conn = (HttpURLConnection)new URL(uri).openConnection();
-				conn.setConnectTimeout(6* 1000);
-				conn.setReadTimeout(20*1000);
-				conn.setDoOutput(true);//允许输出
-				conn.setDoInput(true);
-				conn.setUseCaches(false);//不使用Cache
-				conn.setRequestMethod("POST");	        
-				conn.setRequestProperty("Connection", "Keep-Alive");//维持长连接
-				conn.setRequestProperty("Charset", "UTF-8");
-				DataInputStream is=new DataInputStream(conn.getInputStream());
-				BufferedReader reader=new BufferedReader(new InputStreamReader(is,"utf-8"));
-				String str="";
-				while(reader.ready()){
-					str+=reader.readLine();
-				}
+		
+		/**
+		 * 从SDCard的指定位置读取Pin的值
+		 */
+		@Override
+		protected String doInBackground(Void... arg0) {
+			String errMsg = null;
+			
+			try{
+				WirelessOrder.pin = Integer.parseInt(PinReader.read(), 16);
+			}catch(FileNotFoundException e){
+				errMsg = "找不到PIN验证文件，请确认是否已插入验证用的SDCard";
+			}catch(IOException e){
+				errMsg = "读取PIN验证信息失败";
+			}catch(NumberFormatException e){
+				errMsg = "PIN验证信息的格式不正确";
+			}
+			return errMsg;
+		}
+		
+		@Override
+		protected void onPostExecute(String errMsg){
+			if(errMsg != null){
+				new AlertDialog.Builder(StartupActivity.this)
+				.setTitle("提示")
+				.setMessage(errMsg)
+				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						finish();
+					}
+				}).show();				
 				
-				String [] message = str.split("</br>");
-				_uri = message[2];
-				//float version = Float.parseFloat(message[0].toString().trim());
-				float version = Float.parseFloat("1.1");
-				 Log.e("aaa", version+"");
-				if( version > _appVersion ){
-					new AlertDialog.Builder(StartupActivity.this)
+			}else{
+				// FIXME
+				new CheckVersionTask().execute();
+				//new QueryMenuTask().execute();
+			}
+		}
+	}
+	
+	
+	
+	private class CheckVersionTask extends AsyncTask<Void, Void, String>{   
+	   
+		@Override
+		protected void onPreExecute() {
+
+		}	
+
+		@Override
+		protected String doInBackground(Void... params) {
+
+		   try {
+			   
+			   /**
+			    * 获取本地的版本号
+			    */
+			   PackageInfo info = getPackageManager().getPackageInfo(StartupActivity.this.getPackageName(), 0);
+			   _appVersion = new Float(info.versionName); // 版本名1.0
+
+			   
+			   HttpURLConnection conn = (HttpURLConnection)new URL(getString(R.string.versionurl)).openConnection();
+			   conn.setConnectTimeout(6 * 1000);
+			   conn.setReadTimeout(20 * 1000);
+			   conn.setDoOutput(true);//允许输出
+			   conn.setDoInput(true);
+			   conn.setUseCaches(false);//不使用Cache
+			   conn.setRequestMethod("POST");	        
+			   conn.setRequestProperty("Connection", "Keep-Alive");//维持长连接
+			   conn.setRequestProperty("Charset", "UTF-8");
+			   BufferedReader reader = new BufferedReader(new InputStreamReader(new DataInputStream(conn.getInputStream()), "utf-8"));
+			   StringBuffer updateString = new StringBuffer();
+			   while(reader.ready()){
+				   updateString.append(reader.readLine());
+			   }
+				
+			   final String[] message = updateString.toString().split("</br>");
+			   //float version = Float.parseFloat(message[0].toString().trim());
+			   float version = Float.parseFloat("1.1");
+			   if( version > _appVersion ){
+
+	
+				}else{					
+					new QueryMenuTask().execute();
+				}
+					
+			} catch (Exception e) {
+				handler.sendEmptyMessage(2);
+			}
+			return null;
+		}
+		
+		@Override
+		protected void onPostExecute(boolean errMsg) {
+			if(errMsg == null){
+				new AlertDialog.Builder(StartupActivity.this)
 					.setTitle("提示")
 					.setMessage(message[1])
 					.setNeutralButton("确定",
 							new DialogInterface.OnClickListener() {
 								@Override
 								public void onClick(DialogInterface dialog,	int which){
-									new ApkDownload().execute();
+									new ApkDownload(message[2]).execute();
 								}
 							})
 					.setNegativeButton("取消", null)
-					.setOnKeyListener(new OnKeyListener() {
-						@Override
-						public boolean onKey(DialogInterface arg0, int arg1, KeyEvent arg2) {
-							return true;
-							
-						}
-					}).show();
-
-				}else{
-					
-					new QueryMenuTask().execute();
-				}
-				
-		} catch (Exception e) {
-			handler.sendEmptyMessage(2);
+					.show();
+			}
 		}
-		return null;
-	}
-	@Override
-	protected void onPostExecute(String result) {
-		
-		super.onPostExecute(result);
-	}
 	
    }
 	
 	
-	public class ApkDownload extends AsyncTask<Void, Void, String>{
-		String path = "";
-		File file = null;
-		HttpURLConnection conn;
+	private class ApkDownload extends AsyncTask<Void, Void, String>{
+		
+		private HttpURLConnection conn;
+		private String _url;
+		private final static String FILE_DIR = "/sdcard/digi-e/update/";
+		
+		ApkDownload(String url){
+			_url = url;
+		}
+		
 		@Override
 		protected void onPreExecute() {
 			pd = new ProgressDialog(StartupActivity.this);
 			pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);//设置风格为长进度条
 			pd.setTitle("提示");//设置标题  
-			pd.setMessage("正在下载中，请稍后");
+			pd.setMessage("正在下载中...请稍后");
 			pd.setIndeterminate(false);//设置进度条是否为不明确  false 就是不设置为不明确  
 			pd.setCancelable(true);//设置进度条是否可以按退回键取消
 			pd.setProgress(0);
 			pd.setMax(100);
 			pd.incrementProgressBy(1); //增加和减少进度，这个属性必须的
 			pd.show(); 
-			super.onPreExecute();
 		}
         
 		@Override
 		protected String doInBackground(Void... params) {
-			_fileName = _uri.substring(_uri.lastIndexOf("/"), _uri.length());
-			file=new File("/sdcard/"+_fileName);
+			
+			String errMsg = null;			
+			_fileName = _url.substring(_url.lastIndexOf("/"), _url.length());
 			try {
+				File file = new File(FILE_DIR + _fileName);
 				if(file.exists()){
 					file.createNewFile();
 				}
-				conn=(HttpURLConnection)new URL(_uri).openConnection();
-				conn.setConnectTimeout(6* 1000);
-				conn.setReadTimeout(20*1000);
-				conn.setDoOutput(true);//允许输出
-				conn.setDoInput(true);
-				conn.setUseCaches(false);//不使用Cache
-				conn.setRequestMethod("POST");	        
-				conn.setRequestProperty("Connection", "Keep-Alive");//维持长连接
-				conn.setRequestProperty("Charset", "UTF-8");
-				conn.setRequestProperty("Content-Type", "text/xml; charset=UTF-8");
+				conn = (HttpURLConnection)new URL(_url).openConnection();
+//				conn.setConnectTimeout(6 * 1000);
+//				conn.setReadTimeout(20 * 1000);
+//				conn.setDoOutput(true);//允许输出
+//				conn.setDoInput(true);
+//				conn.setUseCaches(false);//不使用Cache
+//				conn.setRequestMethod("POST");	        
+//				conn.setRequestProperty("Connection", "Keep-Alive");//维持长连接
+//				conn.setRequestProperty("Charset", "UTF-8");
+//				conn.setRequestProperty("Content-Type", "text/xml; charset=UTF-8");
 				
-				InputStream is = conn.getInputStream();
-				_fileSize=conn.getContentLength();
+				int fileSize = conn.getContentLength();
 
 				FileOutputStream fos = new FileOutputStream(file);
-				_downLoadFileSize = 0;
+				int recvSize = 0;
 
-				byte[] buff = new byte[1024*100];
-				int rc = 0;
-				while ((rc = is.read(buff, 0, 100)) > 0) {
-					fos.write(buff,0,rc);
-					_downLoadFileSize += rc;
-					handler.sendEmptyMessage(0);
+				byte[] buff = new byte[100];
+				int bytesToRead = 0;
+				InputStream is = conn.getInputStream();
+				while((bytesToRead = is.read(buff, 0, 100)) != -1) {
+					fos.write(buff, 0, bytesToRead);
+					recvSize += bytesToRead;
+					int progress = recvSize * 100 / fileSize;  
+				    pd.setProgress(progress);
+					//handler.sendEmptyMessage(0);
 				}
-			} catch (Exception e) {
-				handler.sendEmptyMessage(3);
+				
+			}catch(IOException e){
+				errMsg = e.getMessage();
 			}
 			
-			return null;
+//			} catch (Exception e) {
+//				
+//				handler.sendEmptyMessage(3);
+//			}
+			
+			return errMsg;
 		}
 		
 		@Override
 		protected void onPostExecute(String result) {
-			handler.sendEmptyMessage(1);
-			super.onPostExecute(result);
+			pd.dismiss();
+			// 得到Intent对象，其Action为ACTION_VIEW.
+			Intent intent = new Intent(Intent.ACTION_VIEW);  
+			// 同时Intent对象设置数据类型
+			intent.setDataAndType(Uri.fromFile(new File(FILE_DIR + _fileName)), "application/vnd.android.package-archive"); 
+			startActivity(intent);  
+//			handler.sendEmptyMessage(1);
+//			super.onPostExecute(result);
 		}
 
 		

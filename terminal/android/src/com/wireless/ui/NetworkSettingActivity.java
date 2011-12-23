@@ -18,22 +18,23 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.wireless.common.Params;
 import com.wireless.protocol.ReqPing;
 import com.wireless.sccon.ServerConnector;
 
 public class NetworkSettingActivity extends Activity {
 
 	private String _address;
-	private int _addressport;
+	private int _port;
 	private String _apn;
 	private String _username;
 	private String _password;
 	
-	EditText _ipnum;
-	EditText _portnum;
-	EditText _apnnum;
-	EditText _usernamenum;
-	EditText _passwordnum;
+	private EditText _ipEdtTxt;
+	private EditText _portEdtTxt;
+	private EditText _apnEdtTxt;
+	private EditText _userEdtTxt;
+	private EditText _pwdEdtTxt;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -41,37 +42,35 @@ public class NetworkSettingActivity extends Activity {
 		setContentView(R.layout.networkseting);
 	
 		
-		_ipnum = (EditText)findViewById(R.id.ipnum);
-		_portnum = (EditText)findViewById(R.id.portnum);
-		_apnnum = (EditText)findViewById(R.id.apnnum);
-		_usernamenum = (EditText)findViewById(R.id.usernamenum);
-		_passwordnum = (EditText)findViewById(R.id.passwordnum);
+		_ipEdtTxt = (EditText)findViewById(R.id.ipnum);
+		_portEdtTxt = (EditText)findViewById(R.id.portnum);
+		_apnEdtTxt = (EditText)findViewById(R.id.apnnum);
+		_userEdtTxt = (EditText)findViewById(R.id.usernamenum);
+		_pwdEdtTxt = (EditText)findViewById(R.id.passwordnum);
 		
 		
-       /**
+       /*
         * 获取文件保存的网络设置值
-        * 
         */
-		SharedPreferences sharedPreferences = NetworkSettingActivity.this.getSharedPreferences("set", Context.MODE_WORLD_READABLE);
-		_address = sharedPreferences.getString("address", "");
-		_addressport = sharedPreferences.getInt("port", 0);
-		_apn = sharedPreferences.getString("apn", "");
-		_username = sharedPreferences.getString("username", "");
-		_password = sharedPreferences.getString("password", "");
+		SharedPreferences sharedPreferences = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE);
+		_address = sharedPreferences.getString(Params.IP_ADDR, Params.DEF_IP_ADDR);
+		_port = sharedPreferences.getInt(Params.IP_PORT, Params.DEF_IP_PORT);
+		_apn = sharedPreferences.getString(Params.APN, "");
+		_username = sharedPreferences.getString(Params.USER_NAME, "");
+		_password = sharedPreferences.getString(Params.PWD, "");
 		
 		
-	  /**
-        * 显示网络设置值
-        * 
-        */
-		_ipnum.setText(_address);
-		_portnum.setText(String.valueOf(_addressport));
-		_apnnum.setText(_apn);
-		_usernamenum.setText(_username);
-		_passwordnum.setText(_password);
+		/*
+		 * 显示网络设置的值
+		 */
+		_ipEdtTxt.setText(_address);
+		_portEdtTxt.setText(String.valueOf(_port));
+		_apnEdtTxt.setText(_apn);
+		_userEdtTxt.setText(_username);
+		_pwdEdtTxt.setText(_password);
 		
-		/**
-		 * 返回按钮
+		/*
+		 * 返回Button
 		 */
 		((ImageView)findViewById(R.id.networkback)).setOnClickListener(new View.OnClickListener() {	
 			@Override
@@ -80,45 +79,46 @@ public class NetworkSettingActivity extends Activity {
 			}
 		});
 		
-		/**
-		 * 测试按钮
+		/*
+		 * 测试Button
 		 */
 		((ImageView)findViewById(R.id.testnet)).setOnClickListener(new View.OnClickListener() {	
 			@Override
 			public void onClick(View v) {
 				
-			new TestNet().execute();
+			new TestNetTask().execute();
 				
 			}
 		});
 		
 		
-		/**
-		 * 确认按钮
+		/*
+		 * 确认Button
 		 */
 		((ImageView)findViewById(R.id.netdefinite)).setOnClickListener(new View.OnClickListener() {	
 			@Override
 			public void onClick(View v) {
 				//保存信息到文件里面
-				SharedPreferences sharedPreferences = getSharedPreferences("set", Context.MODE_PRIVATE);
-				 Editor editor = sharedPreferences.edit();//获取编辑器
-				 editor.putString("address", _ipnum.getText().toString());
-				 editor.putInt("port",Integer.parseInt( _portnum.getText().toString()));
-				 editor.putString("apn", _apnnum.getText().toString());
-				 editor.putString("username", _usernamenum.getText().toString());
-				 editor.putString("password", _passwordnum.getText().toString());
-				 editor.commit();//提交修改
+				Editor editor = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).edit();//获取编辑器
+				editor.putString(Params.IP_ADDR, _ipEdtTxt.getText().toString());
+				editor.putInt(Params.IP_PORT, Integer.parseInt( _portEdtTxt.getText().toString()));
+				editor.putString(Params.APN, _apnEdtTxt.getText().toString());
+				editor.putString(Params.USER_NAME, _userEdtTxt.getText().toString());
+				editor.putString(Params.PWD, _pwdEdtTxt.getText().toString());
+				//提交修改
+				editor.commit();				 
 				 
-				 
-				 ServerConnector.instance().setNetAddr(_ipnum.getText().toString());
-				 ServerConnector.instance().setNetPort(Integer.parseInt( _portnum.getText().toString()));
-				 Toast.makeText(NetworkSettingActivity.this, "网络设置成功", 0).show();
-				 if(!_address.equals(_ipnum.getText().toString())||!String.valueOf(_addressport).equals(_portnum.getText().toString())||!_apn.equals(_apnnum.getText().toString())||!_username.equals(_usernamenum.getText().toString())||!_password.equals(_passwordnum.getText().toString())){
-					 setResult(RESULT_OK);
-				 }
-					finish();
-				
-				
+				ServerConnector.instance().setNetAddr(_ipEdtTxt.getText().toString());
+				ServerConnector.instance().setNetPort(Integer.parseInt( _portEdtTxt.getText().toString()));
+				Toast.makeText(NetworkSettingActivity.this, "网络设置成功", 0).show();
+				if(!_address.equals(_ipEdtTxt.getText().toString()) ||
+				   !String.valueOf(_port).equals(_portEdtTxt.getText().toString()) ||
+				   !_apn.equals(_apnEdtTxt.getText().toString()) || 
+				   !_username.equals(_userEdtTxt.getText().toString()) || 
+				   !_password.equals(_pwdEdtTxt.getText().toString())){
+					setResult(RESULT_OK);
+				}
+				finish();				
 			}
 		});
 		
@@ -129,24 +129,26 @@ public class NetworkSettingActivity extends Activity {
 		((ImageView)findViewById(R.id.netcancle)).setOnClickListener(new View.OnClickListener() {	
 			@Override
 			public void onClick(View v) {
-				finish();
-				
+				finish();				
 			}
 		});
 	}
 	
-     /*
-      * 测试网络
-      */
-	public class TestNet extends AsyncTask<Void, Void, String>{
-       ProgressDialog pd;
-	   String error = "";
+
+	/**
+	 * 请求测试网络
+	 * @author Ying.Zhang
+	 */
+	private class TestNetTask extends AsyncTask<Void, Void, String>{
+		
+		ProgressDialog _progDialog;
+		String _errMsg = null;
+		
 		@Override
 		protected void onPreExecute() {
-			pd = ProgressDialog.show(NetworkSettingActivity.this, "", "网络连接中.....请稍候");
-			ServerConnector.instance().setNetAddr( _ipnum.getText().toString());
-			ServerConnector.instance().setNetPort(Integer.parseInt( _portnum.getText().toString()));
-			super.onPreExecute();
+			_progDialog = ProgressDialog.show(NetworkSettingActivity.this, "", "网络连接中.....请稍候");
+			ServerConnector.instance().setNetAddr( _ipEdtTxt.getText().toString());
+			ServerConnector.instance().setNetPort(Integer.parseInt( _portEdtTxt.getText().toString()));
 		}
 
 		@Override
@@ -154,33 +156,32 @@ public class NetworkSettingActivity extends Activity {
 			try {
 				ServerConnector.instance().ask(new ReqPing());
 			} catch (IOException e) {
-				e.printStackTrace();
-				error = "网络连接失败，请检查网络参数是否正确。";
+				_errMsg = "网络连接失败，请检查网络参数是否正确。";
 			} 
-			return error;
+			return _errMsg;
 		}
 		
 		@Override
 		protected void onPostExecute(String result) {
-			if(!error.equals("")){
-				pd.dismiss();
+			if(_errMsg != null){
+				_progDialog.dismiss();
 				new AlertDialog.Builder(NetworkSettingActivity.this)
-				.setTitle("提示")
-				.setMessage(error)
-				.setNegativeButton("返回", null)
-				.setOnKeyListener(new OnKeyListener() {
-					@Override
-					public boolean onKey(DialogInterface arg0, int arg1, KeyEvent arg2) {
-						return true;
-					}
-				}).show();
+					.setTitle("提示")
+					.setMessage(_errMsg)
+					.setNegativeButton("返回", null)
+					.setOnKeyListener(new OnKeyListener() {
+						@Override
+						public boolean onKey(DialogInterface arg0, int arg1, KeyEvent arg2) {
+							return true;
+						}
+					}).show();
 			}else{
-				pd.dismiss();
+				_progDialog.dismiss();
 				Toast.makeText(NetworkSettingActivity.this, "网络连接成功", 0).show();
 			}
 			
 			ServerConnector.instance().setNetAddr(_address);
-			ServerConnector.instance().setNetPort(_addressport);
+			ServerConnector.instance().setNetPort(_port);
 		}
 	}
 	
