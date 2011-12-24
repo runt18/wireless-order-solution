@@ -1,5 +1,6 @@
 package com.wireless.ui;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.File;
@@ -8,6 +9,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -16,20 +18,17 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnKeyListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.provider.Settings;
-import android.view.KeyEvent;
 import android.widget.TextView;
 
 import com.wireless.common.Params;
@@ -50,13 +49,8 @@ import com.wireless.sccon.ServerConnector;
 public class StartupActivity extends Activity {
 	
 	private TextView _msgTxtView;
-
-	ProgressDialog _pd;
 	float _appVersion;
-	int _downLoadFileSize;
-	int _fileSize;
-	ProgressDialog pd;
-	String _fileName;
+
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -358,33 +352,27 @@ public class StartupActivity extends Activity {
 	
 	
 	
-	private class CheckVersionTask extends AsyncTask<Void, Void, String>{   
+	private class CheckVersionTask extends AsyncTask<Void, Void, Boolean>{   
 	   
+		private String[] _msg;
+		
 		@Override
 		protected void onPreExecute() {
 
 		}	
 
 		@Override
-		protected String doInBackground(Void... params) {
+		protected Boolean doInBackground(Void... params) {
 
 		   try {
-			   
 			   /**
 			    * 获取本地的版本号
 			    */
 			   PackageInfo info = getPackageManager().getPackageInfo(StartupActivity.this.getPackageName(), 0);
 			   _appVersion = new Float(info.versionName); // 版本名1.0
-
 			   
 			   HttpURLConnection conn = (HttpURLConnection)new URL(getString(R.string.versionurl)).openConnection();
-			   conn.setConnectTimeout(6 * 1000);
-			   conn.setReadTimeout(20 * 1000);
-			   conn.setDoOutput(true);//允许输出
-			   conn.setDoInput(true);
-			   conn.setUseCaches(false);//不使用Cache
-			   conn.setRequestMethod("POST");	        
-			   conn.setRequestProperty("Connection", "Keep-Alive");//维持长连接
+
 			   conn.setRequestProperty("Charset", "UTF-8");
 			   BufferedReader reader = new BufferedReader(new InputStreamReader(new DataInputStream(conn.getInputStream()), "utf-8"));
 			   StringBuffer updateString = new StringBuffer();
@@ -392,36 +380,38 @@ public class StartupActivity extends Activity {
 				   updateString.append(reader.readLine());
 			   }
 				
-			   final String[] message = updateString.toString().split("</br>");
+			   _msg = updateString.toString().split("</br>");
+			   // FIXME
 			   //float version = Float.parseFloat(message[0].toString().trim());
 			   float version = Float.parseFloat("1.1");
-			   if( version > _appVersion ){
-
-	
-				}else{					
-					new QueryMenuTask().execute();
-				}
+			   if(version > _appVersion){
+				   return Boolean.TRUE;
+			   }else{					
+				   new QueryMenuTask().execute();
+				   return Boolean.FALSE;
+			   }
 					
-			} catch (Exception e) {
-				handler.sendEmptyMessage(2);
-			}
-			return null;
+		   }catch(NameNotFoundException e){
+			   return Boolean.FALSE;
+		   }catch(IOException e){
+			   return Boolean.FALSE;
+			   //handler.sendEmptyMessage(2);
+		   }
 		}
 		
 		@Override
-		protected void onPostExecute(boolean errMsg) {
-			if(errMsg == null){
+		protected void onPostExecute(Boolean isUpdateAvail) {
+			if(isUpdateAvail){
 				new AlertDialog.Builder(StartupActivity.this)
 					.setTitle("提示")
-					.setMessage(message[1])
+					.setMessage(_msg[1])
 					.setNeutralButton("确定",
 							new DialogInterface.OnClickListener() {
 								@Override
 								public void onClick(DialogInterface dialog,	int which){
-									new ApkDownload(message[2]).execute();
+									new ApkDownload(_msg[2]).execute();
 								}
 							})
-					.setNegativeButton("取消", null)
 					.show();
 			}
 		}
@@ -431,9 +421,11 @@ public class StartupActivity extends Activity {
 	
 	private class ApkDownload extends AsyncTask<Void, Void, String>{
 		
+		private ProgressDialog _progDialog;
 		private HttpURLConnection conn;
 		private String _url;
-		private final static String FILE_DIR = "/sdcard/digi-e/update/";
+		private String _fileName;
+		private final String FILE_DIR = android.os.Environment.getExternalStorageDirectory().getPath() + "/digi-e/download/";
 		
 		ApkDownload(String url){
 			_url = url;
@@ -441,77 +433,79 @@ public class StartupActivity extends Activity {
 		
 		@Override
 		protected void onPreExecute() {
-			pd = new ProgressDialog(StartupActivity.this);
-			pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);//设置风格为长进度条
-			pd.setTitle("提示");//设置标题  
-			pd.setMessage("正在下载中...请稍后");
-			pd.setIndeterminate(false);//设置进度条是否为不明确  false 就是不设置为不明确  
-			pd.setCancelable(true);//设置进度条是否可以按退回键取消
-			pd.setProgress(0);
-			pd.setMax(100);
-			pd.incrementProgressBy(1); //增加和减少进度，这个属性必须的
-			pd.show(); 
+			_progDialog = new ProgressDialog(StartupActivity.this);
+			_progDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);//设置风格为长进度条
+			_progDialog.setTitle("提示");//设置标题  
+			_progDialog.setMessage("正在下载中...请稍后");
+			_progDialog.setIndeterminate(false);//设置进度条是否为不明确  false 就是不设置为不明确  
+			_progDialog.setCancelable(true);//设置进度条是否可以按退回键取消
+			_progDialog.setProgress(0);
+			_progDialog.setMax(100);
+			_progDialog.incrementProgressBy(1); //增加和减少进度，这个属性必须的
+			_progDialog.show(); 
 		}
         
 		@Override
 		protected String doInBackground(Void... params) {
 			
 			String errMsg = null;			
-			_fileName = _url.substring(_url.lastIndexOf("/"), _url.length());
+			_fileName = _url.substring(_url.lastIndexOf("/") + 1, _url.length());
 			try {
+
+				conn = (HttpURLConnection)new URL(_url).openConnection();
+				
+				File dir = new File(FILE_DIR);
+				if(!dir.exists()){
+					dir.mkdir();
+				}
 				File file = new File(FILE_DIR + _fileName);
-				if(file.exists()){
+				if(!file.exists()){
 					file.createNewFile();
 				}
-				conn = (HttpURLConnection)new URL(_url).openConnection();
-//				conn.setConnectTimeout(6 * 1000);
-//				conn.setReadTimeout(20 * 1000);
-//				conn.setDoOutput(true);//允许输出
-//				conn.setDoInput(true);
-//				conn.setUseCaches(false);//不使用Cache
-//				conn.setRequestMethod("POST");	        
-//				conn.setRequestProperty("Connection", "Keep-Alive");//维持长连接
-//				conn.setRequestProperty("Charset", "UTF-8");
-//				conn.setRequestProperty("Content-Type", "text/xml; charset=UTF-8");
-				
-				int fileSize = conn.getContentLength();
-
-				FileOutputStream fos = new FileOutputStream(file);
+				OutputStream fos = new BufferedOutputStream(new FileOutputStream(file));
 				int recvSize = 0;
 
-				byte[] buff = new byte[100];
+				final int BUF_SIZE = 100 * 1024;
+				byte[] buf = new byte[BUF_SIZE];
 				int bytesToRead = 0;
+				int fileSize = conn.getContentLength();
 				InputStream is = conn.getInputStream();
-				while((bytesToRead = is.read(buff, 0, 100)) != -1) {
-					fos.write(buff, 0, bytesToRead);
+				while((bytesToRead = is.read(buf, 0, BUF_SIZE)) != -1) {
+					fos.write(buf, 0, bytesToRead);
 					recvSize += bytesToRead;
 					int progress = recvSize * 100 / fileSize;  
-				    pd.setProgress(progress);
+					_progDialog.setProgress(progress);
 					//handler.sendEmptyMessage(0);
 				}
+				fos.close();
 				
 			}catch(IOException e){
 				errMsg = e.getMessage();
+				
+			}finally{
+				_progDialog.dismiss();
 			}
-			
-//			} catch (Exception e) {
-//				
-//				handler.sendEmptyMessage(3);
-//			}
 			
 			return errMsg;
 		}
 		
 		@Override
-		protected void onPostExecute(String result) {
-			pd.dismiss();
-			// 得到Intent对象，其Action为ACTION_VIEW.
-			Intent intent = new Intent(Intent.ACTION_VIEW);  
-			// 同时Intent对象设置数据类型
-			intent.setDataAndType(Uri.fromFile(new File(FILE_DIR + _fileName)), "application/vnd.android.package-archive"); 
-			startActivity(intent);  
-//			handler.sendEmptyMessage(1);
-//			super.onPostExecute(result);
+		protected void onPostExecute(String errMsg) {
+			if(errMsg != null){
+				new AlertDialog.Builder(StartupActivity.this)
+					.setTitle("提示")
+					.setMessage(errMsg)
+					.setNeutralButton("确定", null)
+					.show();
+			}else{
+				// 得到Intent对象，其Action为ACTION_VIEW.
+				Intent intent = new Intent(Intent.ACTION_VIEW);  
+				// 同时Intent对象设置数据类型
+				intent.setDataAndType(Uri.fromFile(new File(FILE_DIR + _fileName)), "application/vnd.android.package-archive"); 
+				startActivity(intent);  
+//				handler.sendEmptyMessage(1);
+				
+			}
 		}
 
 		
@@ -519,52 +513,52 @@ public class StartupActivity extends Activity {
 	}
 	
 
-	private Handler handler=new Handler(){
-		@Override
-		public void handleMessage(Message msg){
-			switch (msg.what) {
-			case 0:
-				int result=_downLoadFileSize*100/_fileSize;  
-			    pd.setProgress(result);
-				break;
-
-			case 1:
-				pd.dismiss();
-				File file = new File("/sdcard/"+_fileName);
-				Intent intent = new Intent(Intent.ACTION_VIEW);  // 得到Intent对象，其Action为ACTION_VIEW.
-				intent.setDataAndType(Uri.fromFile(file),
-				"application/vnd.android.package-archive"); // 同时Intent对象设置数据类型
-				startActivity(intent);  
-				break;
-				
-
-			case 2:
-				new AlertDialog.Builder(StartupActivity.this)
-				.setTitle("提示")
-				.setMessage("网络连接超时，请重试")
-				.setNegativeButton("返回", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						 finish();
-					}
-				}).show();
-				break;
-			case 3:
-				pd.dismiss();
-				new AlertDialog.Builder(StartupActivity.this)
-				.setTitle("提示")
-				.setMessage("网络连接超时，请重试")
-				.setNegativeButton("返回", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						 finish();
-					}
-				}).show();
-				break;
-			case 4:
-				
-				
-				break;
-			}
-			
-		 }
-		};
+//	private Handler handler=new Handler(){
+//		@Override
+//		public void handleMessage(Message msg){
+//			switch (msg.what) {
+//			case 0:
+//				int result=_downLoadFileSize*100/_fileSize;  
+//			    pd.setProgress(result);
+//				break;
+//
+//			case 1:
+//				pd.dismiss();
+//				File file = new File("/sdcard/"+_fileName);
+//				Intent intent = new Intent(Intent.ACTION_VIEW);  // 得到Intent对象，其Action为ACTION_VIEW.
+//				intent.setDataAndType(Uri.fromFile(file),
+//				"application/vnd.android.package-archive"); // 同时Intent对象设置数据类型
+//				startActivity(intent);  
+//				break;
+//				
+//
+//			case 2:
+//				new AlertDialog.Builder(StartupActivity.this)
+//				.setTitle("提示")
+//				.setMessage("网络连接超时，请重试")
+//				.setNegativeButton("返回", new DialogInterface.OnClickListener() {
+//					public void onClick(DialogInterface dialog, int id) {
+//						 finish();
+//					}
+//				}).show();
+//				break;
+//			case 3:
+//				pd.dismiss();
+//				new AlertDialog.Builder(StartupActivity.this)
+//				.setTitle("提示")
+//				.setMessage("网络连接超时，请重试")
+//				.setNegativeButton("返回", new DialogInterface.OnClickListener() {
+//					public void onClick(DialogInterface dialog, int id) {
+//						 finish();
+//					}
+//				}).show();
+//				break;
+//			case 4:
+//				
+//				
+//				break;
+//			}
+//			
+//		 }
+//		};
 }
