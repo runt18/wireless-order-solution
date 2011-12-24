@@ -186,7 +186,7 @@ public class MainActivity extends Activity {
 		//取得并显示软件版本号
 		TextView topTitle = (TextView)findViewById(R.id.toptitle);
 		try{
-			topTitle.setText("e点通(v" + new Float(getPackageManager().getPackageInfo(getPackageName(), 0).versionName) + ")");
+			topTitle.setText("e点通(v" + getPackageManager().getPackageInfo(getPackageName(), 0).versionName + ")");
 		}catch(NameNotFoundException e) {
 			topTitle.setText("e点通");
 		}

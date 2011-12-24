@@ -2,7 +2,6 @@ package com.wireless.ui;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -21,7 +20,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -37,6 +35,7 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.PinGen;
 import com.wireless.protocol.ProtocolPackage;
+import com.wireless.protocol.ReqOTAUpdate;
 import com.wireless.protocol.ReqPackage;
 import com.wireless.protocol.ReqQueryMenu;
 import com.wireless.protocol.ReqQueryRestaurant;
@@ -49,8 +48,6 @@ import com.wireless.sccon.ServerConnector;
 public class StartupActivity extends Activity {
 	
 	private TextView _msgTxtView;
-	float _appVersion;
-
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -266,14 +263,10 @@ public class StartupActivity extends Activity {
 		
 		/**
 		 * 根据返回的error message判断，如果发错异常则提示用户，
-		 * 如果成功，则通知Handler更新界面的相关控件。
+		 * 如果成功，则跳转到主界面。
 		 */
 		@Override
 		protected void onPostExecute(String errMsg){
-			//make the progress dialog disappeared
-			//_progDialog.dismiss();
-			//notify the main activity to update the food menu
-			//_handler.sendEmptyMessage(REDRAW_RESTAURANT);
 			/**
 			 * Prompt user message if any error occurred.
 			 */
@@ -350,84 +343,135 @@ public class StartupActivity extends Activity {
 		}
 	}
 	
-	
-	
+	/**
+	 * 检查版本信息的Task
+	 */
 	private class CheckVersionTask extends AsyncTask<Void, Void, Boolean>{   
 	   
-		private String[] _msg;
+		private String[] _updateInfo;
+		
+		private Boolean compareVer(String local, String remote){
+
+			String[] verLocal = local.split("\\.");
+			//extract the major to local version
+			int majorLocal = Integer.parseInt(verLocal[0]);
+			//extract the minor to local version
+			int minorLocal = Integer.parseInt(verLocal[1]);
+			//extract the revision to local version
+			int revLocal = Integer.parseInt(verLocal[2]);
+
+			char[] indicator = {0xfeff};
+			remote = remote.replace(new String(indicator), "");
+			String[] verRemote = remote.split("\\.");			
+			//extract the major to remote version
+			int majorRemote = Integer.parseInt(verRemote[0]);
+			//extract the major to remote version
+			int minorRemote = Integer.parseInt(verRemote[1]);
+			//extract the revision to remote version
+			int revRemote = Integer.parseInt(verRemote[2]);
+			
+			//compare the remote version with the local 
+			boolean isUpdate = Boolean.FALSE;
+			if(majorRemote > majorLocal){
+				isUpdate = Boolean.TRUE;
+			}else if(majorRemote == majorLocal){
+				if(minorRemote > minorLocal){
+					isUpdate = Boolean.TRUE;
+				}else if(minorRemote == minorLocal){
+					if(revRemote > revLocal){
+						isUpdate = Boolean.TRUE;
+					}
+				}
+			}
+			return isUpdate;
+		}
 		
 		@Override
 		protected void onPreExecute() {
-
+			_msgTxtView.setText("检查版本更新...请稍候");
 		}	
 
 		@Override
 		protected Boolean doInBackground(Void... params) {
 
-		   try {
-			   /**
-			    * 获取本地的版本号
-			    */
-			   PackageInfo info = getPackageManager().getPackageInfo(StartupActivity.this.getPackageName(), 0);
-			   _appVersion = new Float(info.versionName); // 版本名1.0
+			HttpURLConnection conn = null; 
+		    try {
 			   
-			   HttpURLConnection conn = (HttpURLConnection)new URL(getString(R.string.versionurl)).openConnection();
+			   //从服务器取得OTA的配置（IP地址和端口）
+			   ProtocolPackage resp = ServerConnector.instance().ask(new ReqOTAUpdate());
+			   if(resp.header.type == Type.NAK){
+				   throw new IOException("无法获取更新服务器信息，请检查网络设置");
+			   }
+			   //parse the ip address from the response
+			   String otaIP = new Short((short)(resp.body[0] & 0xFF)) + "." + 
+								new Short((short)(resp.body[1] & 0xFF)) + "." + 
+								new Short((short)(resp.body[2] & 0xFF)) + "." + 
+								new Short((short)(resp.body[3] & 0xFF));
+			   int otaPort = (resp.body[4] & 0x000000FF) | ((resp.body[5] & 0x000000FF ) << 8);			   
+			   
+			   conn = (HttpURLConnection)new URL("http://" + otaIP + ":" + otaPort + "/ota/android/phone/version.php").openConnection();
 
-			   conn.setRequestProperty("Charset", "UTF-8");
-			   BufferedReader reader = new BufferedReader(new InputStreamReader(new DataInputStream(conn.getInputStream()), "utf-8"));
+			   //conn.setRequestProperty("Charset", "UTF-8");
+			   BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 			   StringBuffer updateString = new StringBuffer();
-			   while(reader.ready()){
-				   updateString.append(reader.readLine());
+			   String inputLine;
+			   while((inputLine = reader.readLine()) != null){
+				   updateString.append(inputLine);
 			   }
-				
-			   _msg = updateString.toString().split("</br>");
-			   // FIXME
-			   //float version = Float.parseFloat(message[0].toString().trim());
-			   float version = Float.parseFloat("1.1");
-			   if(version > _appVersion){
-				   return Boolean.TRUE;
-			   }else{					
-				   new QueryMenuTask().execute();
-				   return Boolean.FALSE;
-			   }
+			   reader.close();
+			
+			   _updateInfo = updateString.toString().split("</br>");
+			   
+			   return compareVer(getPackageManager().getPackageInfo(StartupActivity.this.getPackageName(), 0).versionName.trim(), _updateInfo[0]);			   
 					
 		   }catch(NameNotFoundException e){
 			   return Boolean.FALSE;
 		   }catch(IOException e){
 			   return Boolean.FALSE;
-			   //handler.sendEmptyMessage(2);
+		   }finally{
+			   if(conn != null){
+				   conn.disconnect();
+			   }
 		   }
 		}
 		
+		/**
+		 * 如果发现新版本，则下载并安装新版本程序，
+		 * 否则执行菜单请求操作
+		 */
 		@Override
 		protected void onPostExecute(Boolean isUpdateAvail) {
 			if(isUpdateAvail){
 				new AlertDialog.Builder(StartupActivity.this)
 					.setTitle("提示")
-					.setMessage(_msg[1])
+					.setMessage(_updateInfo[1])
 					.setNeutralButton("确定",
 							new DialogInterface.OnClickListener() {
 								@Override
 								public void onClick(DialogInterface dialog,	int which){
-									new ApkDownload(_msg[2]).execute();
+									new ApkDownloadTask(_updateInfo[2]).execute();
 								}
 							})
 					.show();
+			}else{
+				new QueryMenuTask().execute();
 			}
 		}
+	}	
 	
-   }
-	
-	
-	private class ApkDownload extends AsyncTask<Void, Void, String>{
+	/**
+	 * 
+	 * @author Ying.Zhang
+	 *
+	 */
+	private class ApkDownloadTask extends AsyncTask<Void, Void, String>{
 		
 		private ProgressDialog _progDialog;
-		private HttpURLConnection conn;
 		private String _url;
 		private String _fileName;
 		private final String FILE_DIR = android.os.Environment.getExternalStorageDirectory().getPath() + "/digi-e/download/";
 		
-		ApkDownload(String url){
+		ApkDownloadTask(String url){
 			_url = url;
 		}
 		
@@ -448,42 +492,54 @@ public class StartupActivity extends Activity {
 		@Override
 		protected String doInBackground(Void... params) {
 			
+			OutputStream fos = null;
 			String errMsg = null;			
+			HttpURLConnection conn = null;
 			_fileName = _url.substring(_url.lastIndexOf("/") + 1, _url.length());
 			try {
-
-				conn = (HttpURLConnection)new URL(_url).openConnection();
-				
+				//create the file
 				File dir = new File(FILE_DIR);
 				if(!dir.exists()){
 					dir.mkdir();
 				}
 				File file = new File(FILE_DIR + _fileName);
-				if(!file.exists()){
-					file.createNewFile();
+				if(file.exists()){
+					file.delete();
 				}
-				OutputStream fos = new BufferedOutputStream(new FileOutputStream(file));
-				int recvSize = 0;
+				file.createNewFile();
 
+				//open the http URL and create the input stream
+				conn = (HttpURLConnection)new URL(_url).openConnection();
+				InputStream is = conn.getInputStream();
+				//get the size to apk file
+				int fileSize = conn.getContentLength();
+				//open the file to store the apk file
+				fos = new BufferedOutputStream(new FileOutputStream(file));
+				
 				final int BUF_SIZE = 100 * 1024;
 				byte[] buf = new byte[BUF_SIZE];
 				int bytesToRead = 0;
-				int fileSize = conn.getContentLength();
-				InputStream is = conn.getInputStream();
+				int recvSize = 0;
 				while((bytesToRead = is.read(buf, 0, BUF_SIZE)) != -1) {
 					fos.write(buf, 0, bytesToRead);
 					recvSize += bytesToRead;
 					int progress = recvSize * 100 / fileSize;  
 					_progDialog.setProgress(progress);
-					//handler.sendEmptyMessage(0);
 				}
-				fos.close();
 				
 			}catch(IOException e){
 				errMsg = e.getMessage();
 				
 			}finally{
 				_progDialog.dismiss();
+				if(fos != null){
+					try{
+						fos.close();
+					}catch(IOException e){}
+				}
+				if(conn != null){
+					conn.disconnect();
+				}
 			}
 			
 			return errMsg;
@@ -495,70 +551,23 @@ public class StartupActivity extends Activity {
 				new AlertDialog.Builder(StartupActivity.this)
 					.setTitle("提示")
 					.setMessage(errMsg)
-					.setNeutralButton("确定", null)
+					.setNeutralButton("确定", 
+							new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog,	int which){
+								finish();
+							}
+					})
 					.show();
 			}else{
 				// 得到Intent对象，其Action为ACTION_VIEW.
 				Intent intent = new Intent(Intent.ACTION_VIEW);  
 				// 同时Intent对象设置数据类型
 				intent.setDataAndType(Uri.fromFile(new File(FILE_DIR + _fileName)), "application/vnd.android.package-archive"); 
-				startActivity(intent);  
-//				handler.sendEmptyMessage(1);
-				
+				startActivity(intent);  				
 			}
-		}
-
-		
+		}		
 		
 	}
-	
 
-//	private Handler handler=new Handler(){
-//		@Override
-//		public void handleMessage(Message msg){
-//			switch (msg.what) {
-//			case 0:
-//				int result=_downLoadFileSize*100/_fileSize;  
-//			    pd.setProgress(result);
-//				break;
-//
-//			case 1:
-//				pd.dismiss();
-//				File file = new File("/sdcard/"+_fileName);
-//				Intent intent = new Intent(Intent.ACTION_VIEW);  // 得到Intent对象，其Action为ACTION_VIEW.
-//				intent.setDataAndType(Uri.fromFile(file),
-//				"application/vnd.android.package-archive"); // 同时Intent对象设置数据类型
-//				startActivity(intent);  
-//				break;
-//				
-//
-//			case 2:
-//				new AlertDialog.Builder(StartupActivity.this)
-//				.setTitle("提示")
-//				.setMessage("网络连接超时，请重试")
-//				.setNegativeButton("返回", new DialogInterface.OnClickListener() {
-//					public void onClick(DialogInterface dialog, int id) {
-//						 finish();
-//					}
-//				}).show();
-//				break;
-//			case 3:
-//				pd.dismiss();
-//				new AlertDialog.Builder(StartupActivity.this)
-//				.setTitle("提示")
-//				.setMessage("网络连接超时，请重试")
-//				.setNegativeButton("返回", new DialogInterface.OnClickListener() {
-//					public void onClick(DialogInterface dialog, int id) {
-//						 finish();
-//					}
-//				}).show();
-//				break;
-//			case 4:
-//				
-//				
-//				break;
-//			}
-//			
-//		 }
-//		};
 }
