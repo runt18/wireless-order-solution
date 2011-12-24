@@ -49,7 +49,6 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 	private final static String TAG_OCCASIONAL = "occasional";
 	
 	private ArrayList<OrderFood> _pickFoods = new ArrayList<OrderFood>();
-	private ArrayList<OrderFood> _tempFoods = new ArrayList<OrderFood>();
 	private TabHost _tabHost;
 	private GestureDetector _detector; 
     private String _ketchenName;
@@ -135,7 +134,8 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 					
 				}else if(tag == TAG_PINYIN){
 					setupPinyinView();
-				} else if(tag == TAG_OCCASIONAL){
+					
+				} else if(tag == TAG_OCCASIONAL){					
 					setTempView();
 				}
 			}
@@ -150,18 +150,8 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 	 */
 	@Override
 	public void onBackPressed(){
-		if(_tempLstView !=null){
-			if(_tempLstView.getSourceData().length != 0){
-				_tempFoods = new ArrayList<OrderFood>(Arrays.asList(_tempLstView.getSourceData()));
-				if(_tempFoods.size()!=0){
-					Iterator<OrderFood> temp = _tempFoods.iterator();
-					while(temp.hasNext()){
-						OrderFood tempFood = temp.next();
-						_pickFoods.add(tempFood);
-					}
-				}
-			}
-		}
+		//Add the temporary foods to the picked food list
+		_pickFoods.addAll(Arrays.asList(_tempLstView.getSourceData()));
 		
 		Intent intent = new Intent(); 
 		Bundle bundle = new Bundle();
@@ -397,7 +387,7 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 	private void setTempView(){
 		
 		_tempLstView = (TempListView)findViewById(R.id.tempListView);
-		_tempLstView.notifyDataChanged(_tempFoods.toArray(new OrderFood[_tempFoods.size()]));
+		_tempLstView.notifyDataChanged();
 		
 		//¡Ÿ ±≤À∑µªÿº¸
 		((ImageView)findViewById(R.id.tempback)).setOnClickListener(new View.OnClickListener() {
@@ -408,15 +398,12 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 				finish();
 			}
 		}); 
+		
 		//¡Ÿ ±≤ÀÃÌº”
-       ((ImageView)findViewById(R.id.add)).setOnClickListener(new View.OnClickListener() {
-			
+       ((ImageView)findViewById(R.id.add)).setOnClickListener(new View.OnClickListener() {			
 			@Override
 			public void onClick(View v) {
-				_tempFoods = new ArrayList<OrderFood>(Arrays.asList(_tempLstView.getSourceData()));
-				OrderFood order = new OrderFood();
-				_tempFoods.add(order);
-				_tempLstView.notifyDataChanged(_tempFoods.toArray(new OrderFood[_tempFoods.size()]));
+				_tempLstView.addTemp();
 			}
 		}); 
 	}

@@ -1,14 +1,12 @@
 package com.wireless.ui.view;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,12 +23,15 @@ import com.wireless.ui.R;
 
 
 public class TempListView extends ListView {
+	
 	private Context _context;
-	private OrderFood[] _orderfoods = null;
-	private BaseAdapter _adapter = null;
+	private List<OrderFood> _tmpFoods = new ArrayList<OrderFood>();
+	private BaseAdapter _adapter = new Adapter();
+	
 	public TempListView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		this._context = context;
+		setAdapter(_adapter);		
 	}
 
 	
@@ -38,23 +39,25 @@ public class TempListView extends ListView {
 	 *listView的数据源
 	 * @return
 	 */
-	public OrderFood[] getSourceData(){
-		
-		return _orderfoods;
-	}
+	public OrderFood[] getSourceData(){		
+		return _tmpFoods.toArray(new OrderFood[_tmpFoods.size()]);
+	}	
 	
+	public void addTemp(){
+		OrderFood tmpFood = new OrderFood();
+		tmpFood.isTemporary = true;
+		tmpFood.alias_id = Util.genTempFoodID();
+		tmpFood.hangStatus = OrderFood.FOOD_NORMAL;
+		_tmpFoods.add(tmpFood);
+		_adapter.notifyDataSetChanged();
+	}
 	
 	/**
 	 * 
 	 * @param foods
 	 */
-	public void notifyDataChanged(OrderFood[] foods){
-		_orderfoods = foods;
-		if(_adapter != null){
-			_adapter.notifyDataSetChanged();
-		}else{
-			setAdapter(new Adapter());
-		}
+	public void notifyDataChanged(){
+		_adapter.notifyDataSetChanged();
 	}	
 	
 	
@@ -62,12 +65,12 @@ public class TempListView extends ListView {
 
 		@Override
 		public int getCount() {
-			return _orderfoods.length;
+			return _tmpFoods.size();
 		}
 
 		@Override
 		public Object getItem(int position) {
-			return _orderfoods[position];
+			return _tmpFoods.get(position);
 		}
 
 		@Override
@@ -83,31 +86,31 @@ public class TempListView extends ListView {
 			}else{
 				view = convertView;
 			}
-			((TextView)view.findViewById(R.id.occasin)).setText("临时菜"+position);
+			((TextView)view.findViewById(R.id.occasin)).setText("临时菜" + (position + 1));
+			
+			final OrderFood food = _tmpFoods.get(position);
 			
 			/**
 			 * 菜名赋值
 			 */
-			final EditText foodname = (EditText)view.findViewById(R.id.occasiname);
-			foodname .setText(_orderfoods[position].name);
-			foodname.addTextChangedListener(new TextWatcher() {
+			final EditText foodNameEdtTxt = (EditText)view.findViewById(R.id.occasiname);
+			foodNameEdtTxt.setText(food.name);
+			foodNameEdtTxt.addTextChangedListener(new TextWatcher() {
 				@Override
-				public void onTextChanged(CharSequence s, int start, int before,
-						int count) {
+				public void onTextChanged(CharSequence s, int start, int before, int count) {
 				}
 
 				@Override
-				public void beforeTextChanged(CharSequence s, int start, int count,
-						int after) {
+				public void beforeTextChanged(CharSequence s, int start, int count,	int after) {
 
 				}
 
 				@Override
 				public void afterTextChanged(Editable s) {
-					if(!s.equals("")){
-						_orderfoods[position].name = s.toString();
-					}
-					
+//					if(!s.toString().equals(food.name)){
+//						food.name = s.toString();
+//						_tmpFoods.set(position, food);						
+//					}
 				}
 			});
 
@@ -115,34 +118,28 @@ public class TempListView extends ListView {
 			/**
 			 * 价钱赋值
 			 */
-			final EditText foodprice = (EditText)view.findViewById(R.id.occasiprice);
-			if(!foodprice.getText().toString().equals("")){
-				foodprice.setText(String.valueOf(_orderfoods[position].getPrice()));
+			final EditText foodPriceEdtTxt = (EditText)view.findViewById(R.id.occasiprice);
+			if(!foodPriceEdtTxt.getText().toString().equals("")){
+				foodPriceEdtTxt.setText(String.valueOf(food.getPrice()));
 			}
-			foodprice.addTextChangedListener(new TextWatcher() {
+			foodPriceEdtTxt.addTextChangedListener(new TextWatcher() {
 				@Override
-				public void onTextChanged(CharSequence s, int start, int before,
-						int count) {
+				public void onTextChanged(CharSequence s, int start, int before, int count) {
 				}
 
 				@Override
-				public void beforeTextChanged(CharSequence s, int start, int count,
-						int after) {
+				public void beforeTextChanged(CharSequence s, int start, int count,	int after) {
 
 				}
 
 				@Override
 				public void afterTextChanged(Editable s) {
-					if(!s.equals("")){
-						try {
-							_orderfoods[position].setPrice(Float.parseFloat(s.toString()));
-							Log.e("dsd", _orderfoods[position].getPrice()+"");
-						} catch (Exception e) {
-							Toast.makeText(_context, "请输入数字", 0).show();
-						}
-						
-					}
-					
+					try{
+						food.setPrice(Float.parseFloat(s.toString()));
+						_tmpFoods.set(position, food);
+					}catch(NumberFormatException e) {
+						Toast.makeText(_context, "请输入数字", 0).show();
+					}						
 				}
 			});
 			
@@ -150,44 +147,27 @@ public class TempListView extends ListView {
 			/**
 			 * 数量赋值
 			 */
-			final EditText foodcount = (EditText)view.findViewById(R.id.occasicount);
-			if(!foodcount.getText().toString().equals("")){
-				foodcount.setText(String.valueOf(_orderfoods[position].getCount()));
+			final EditText foodCountEdtTxt = (EditText)view.findViewById(R.id.occasicount);
+			if(!foodCountEdtTxt.getText().toString().equals("")){
+				foodCountEdtTxt.setText(String.valueOf(food.getCount()));
 			}	
-			foodcount.addTextChangedListener(new TextWatcher() {
+			foodCountEdtTxt.addTextChangedListener(new TextWatcher() {
 				@Override
-				public void onTextChanged(CharSequence s, int start, int before,
-						int count) {
-				}
+				public void onTextChanged(CharSequence s, int start, int before, int count) {	}
 
 				@Override
-				public void beforeTextChanged(CharSequence s, int start, int count,
-						int after) {
-
-				}
+				public void beforeTextChanged(CharSequence s, int start, int count, int after) {	}
 
 				@Override
 				public void afterTextChanged(Editable s) {
-					if(!s.equals("")){
-						try {
-							_orderfoods[position].setCount(Float.parseFloat(s.toString()));
-							Log.e("qqqqq", _orderfoods[position].getCount()+"");
-						} catch (Exception e) {
-							Toast.makeText(_context, "请输入数字", 0).show();
-						}
-						
-					}
-					
+					try {
+						food.setCount(Float.parseFloat(s.toString()));
+						_tmpFoods.set(position, food);
+					} catch(NumberFormatException e) {
+						Toast.makeText(_context, "请输入数字", 0).show();
+					}						
 				}
-			});
-		    
-			/**
-			 * 其他属性赋值
-			 */
-			_orderfoods[position].isTemporary = true;
-			_orderfoods[position].alias_id = Util.genTempFoodID();
-			_orderfoods[position].hangStatus = OrderFood.FOOD_HANG_UP;
-			
+			});			
 			
 			/**
 			 * 点击删除菜按钮
@@ -196,19 +176,13 @@ public class TempListView extends ListView {
 			removefood.setOnClickListener(new View.OnClickListener() {
 				
 				@Override
-				public void onClick(View v) {
-					
-					List<OrderFood> orderlist = new ArrayList<OrderFood>(Arrays.asList(_orderfoods));
-					
-					orderlist.remove(orderlist.get(position));
-				
-					notifyDataChanged(orderlist.toArray(new OrderFood[orderlist.size()]));
+				public void onClick(View v) {				
+					_tmpFoods.remove(position);					
+					_adapter.notifyDataSetChanged();
 				}
 			});
 			return view;
-		}
-		
-		
+		}		
 		
 	}
 }
