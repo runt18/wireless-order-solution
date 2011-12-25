@@ -84,21 +84,24 @@
 		android:layout_alignParentBottom="true" android:background="@drawable/bg03">
 	
 
-		<TextView android:id="@+id/amount" android:layout_width="wrap_content"
-			android:layout_height="wrap_content" android:textColor="#FFFFFF"
-			android:layout_centerVertical="true" android:textSize="18sp"
-			android:typeface="sans" android:textStyle="bold"
-			android:layout_alignParentLeft="true"
-			android:layout_marginLeft="10dip"
-			android:text="小计:" />
 			
 				<TextView android:id="@+id/amountvalue" android:layout_width="wrap_content"
 			android:layout_height="wrap_content" android:textColor="#FFFFFF"
 			android:layout_centerVertical="true" 
 			 android:textSize="18sp"
-			android:layout_toRightOf="@id/amount" android:layout_marginLeft="10dip"
+			android:layout_alignParentRight="true"
+			android:layout_marginRight="10dip"
 			android:typeface="sans" android:textStyle="bold"
 			 />
+			 
+			 
+		<TextView android:id="@+id/amount" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:textColor="#FFFFFF"
+			android:layout_centerVertical="true" android:textSize="18sp"
+			android:typeface="sans" android:textStyle="bold"
+			android:layout_toLeftOf="@id/amountvalue"
+			android:layout_marginRight="5dip"
+			android:text="小计:" />
 	</RelativeLayout>
 
 
