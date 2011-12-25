@@ -81,7 +81,11 @@ public class MainActivity extends Activity {
 					
 					TextView userName = (TextView)findViewById(R.id.username);
 					if(WirelessOrder.restaurant.owner != null){
-						userName.setText(WirelessOrder.restaurant.name + "(" + WirelessOrder.restaurant.owner + ")");
+						if(WirelessOrder.restaurant.owner.length() != 0){
+							userName.setText(WirelessOrder.restaurant.name + "(" + WirelessOrder.restaurant.owner + ")");							
+						}else{
+							userName.setText(WirelessOrder.restaurant.name);
+						}
 					}else{
 						userName.setText("");
 					}					
