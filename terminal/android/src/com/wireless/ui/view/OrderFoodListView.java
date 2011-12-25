@@ -20,6 +20,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.wireless.common.WirelessOrder;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Type;
 import com.wireless.protocol.Util;
@@ -297,16 +298,20 @@ public class OrderFoodListView extends ExpandableListView{
 				cancelFoodImgView.setOnClickListener(new View.OnClickListener() {				
 					@Override
 					public void onClick(View v) {
-						/**
-						 * 提示输入权限密码2，验证通过的情况下显示删菜数量Dialog
-						 */
-						new AskPwdDialog(_context, AskPwdDialog.PWD_3){
-							@Override
-							protected void onPwdPass(Context context){
-								dismiss();
-								new AskCancelAmountDialog(_foods.get(childPosition)).show();
-							}
-						}.show();
+						if(WirelessOrder.restaurant.pwd3 != null){
+							/**
+							 * 提示输入权限密码2，验证通过的情况下显示删菜数量Dialog
+							 */
+							new AskPwdDialog(_context, AskPwdDialog.PWD_3){
+								@Override
+								protected void onPwdPass(Context context){
+									dismiss();
+									new AskCancelAmountDialog(_foods.get(childPosition)).show();
+								}
+							}.show();
+						}else{
+							new AskCancelAmountDialog(_foods.get(childPosition)).show();
+						}
 					}
 				});
 				//"催菜"操作
@@ -526,19 +531,27 @@ public class OrderFoodListView extends ExpandableListView{
 					@Override
 					public void onClick(View arg0) {
 						dismiss();
-						new AskPwdDialog(_context, AskPwdDialog.PWD_3){							
-							@Override
-							protected void onPwdPass(Context context){
-								dismiss();
-								new AskCancelAmountDialog(selectedFood).show();
-							}
-						}.show();
+						if(WirelessOrder.restaurant.pwd3 != null){
+							new AskPwdDialog(_context, AskPwdDialog.PWD_3){							
+								@Override
+								protected void onPwdPass(Context context){
+									dismiss();
+									new AskCancelAmountDialog(selectedFood).show();
+								}
+							}.show();
+						}else{
+							new AskCancelAmountDialog(selectedFood).show(); 
+						}
 					}
 				});
 				
 				//如果菜品是叫起状态，显示"即起"功能
-				if(selectedFood.hangStatus == OrderFood.FOOD_HANG_UP){
-					((TextView)findViewById(R.id.item2Txt)).setText("即起");
+				if(selectedFood.hangStatus == OrderFood.FOOD_HANG_UP || selectedFood.hangStatus == OrderFood.FOOD_IMMEDIATE){
+					if(selectedFood.hangStatus == OrderFood.FOOD_HANG_UP){
+						((TextView)findViewById(R.id.item2Txt)).setText("即起");						
+					}else{
+						((TextView)findViewById(R.id.item2Txt)).setText("重新叫起");
+					}
 					((RelativeLayout)findViewById(R.id.r2)).setOnClickListener(new View.OnClickListener() {						
 						@Override
 						public void onClick(View arg0) {

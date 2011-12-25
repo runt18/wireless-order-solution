@@ -151,7 +151,17 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 	@Override
 	public void onBackPressed(){
 		//Add the temporary foods to the picked food list
-		_pickFoods.addAll(Arrays.asList(_tempLstView.getSourceData()));
+		//except the ones without food name
+		if(_tempLstView != null){
+			List<OrderFood> tmpFoods = _tempLstView.getSourceData();
+			Iterator<OrderFood> iter = tmpFoods.iterator();
+			while(iter.hasNext()){
+				if(iter.next().name.equals("")){
+					iter.remove();
+				}
+			}
+			_pickFoods.addAll(tmpFoods);
+		}
 		
 		Intent intent = new Intent(); 
 		Bundle bundle = new Bundle();

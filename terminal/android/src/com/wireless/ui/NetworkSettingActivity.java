@@ -110,6 +110,7 @@ public class NetworkSettingActivity extends Activity {
 				 
 				ServerConnector.instance().setNetAddr(_ipEdtTxt.getText().toString());
 				ServerConnector.instance().setNetPort(Integer.parseInt( _portEdtTxt.getText().toString()));
+				
 				Toast.makeText(NetworkSettingActivity.this, "Õ¯¬Á…Ë÷√≥…π¶", 0).show();
 				if(!_address.equals(_ipEdtTxt.getText().toString()) ||
 				   !String.valueOf(_port).equals(_portEdtTxt.getText().toString()) ||

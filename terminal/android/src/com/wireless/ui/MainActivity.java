@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnKeyListener;
 import android.content.Intent;
@@ -40,6 +41,7 @@ import com.wireless.protocol.ReqQueryRestaurant;
 import com.wireless.protocol.RespParser;
 import com.wireless.protocol.Type;
 import com.wireless.sccon.ServerConnector;
+import com.wireless.ui.dialog.AskPwdDialog;
 
 public class MainActivity extends Activity {
 
@@ -145,7 +147,22 @@ public class MainActivity extends Activity {
 					
 				case 2:
 					//删单
-					showDialog(DIALOG_CANCEL_ORDER);
+					/**
+					 * 提示输入密码，验证通过的情况下执行删单，
+					 * 否则直接执行删单
+					 */
+					if(WirelessOrder.restaurant.pwd != null){
+						new AskPwdDialog(MainActivity.this, AskPwdDialog.PWD_1){
+							@Override
+							protected void onPwdPass(Context context){
+								dismiss();
+								showDialog(DIALOG_CANCEL_ORDER);
+							}
+						}.show();						
+					}else{
+						showDialog(DIALOG_CANCEL_ORDER);
+					}
+					
 					break;
 					
 				case 3:
@@ -607,7 +624,7 @@ public class MainActivity extends Activity {
 						
 					}else if(_type == DIALOG_CANCEL_ORDER){
 						//perform to cancel the order associated with this table
-						new CancelOrderTask(_tableID).execute();
+						new CancelOrderTask(_tableID).execute();					
 						dismiss();
 					}
 				}
