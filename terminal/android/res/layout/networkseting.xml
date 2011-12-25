@@ -227,6 +227,7 @@
 	android:textSize="15sp"
 	android:layout_marginTop="2dip"
 	android:layout_marginLeft="20dip"
+	android:inputType="textPassword"
 	android:background="@null"
 	android:layout_below="@id/password"
 	/>

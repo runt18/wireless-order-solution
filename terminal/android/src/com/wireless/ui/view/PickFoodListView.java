@@ -149,7 +149,7 @@ public class PickFoodListView extends ListView {
 			
 			setContentView(R.layout.alert);
 			
-			getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
+			//getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
 			
 			((TextView)findViewById(R.id.ordername)).setText("请输入" + selectedFood.name + "的点菜数量");
 			((EditText)findViewById(R.id.mycount)).setText("1");

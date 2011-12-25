@@ -6,6 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -30,7 +31,7 @@ public class AskPwdDialog extends Dialog{
 		_context = context;
 		View view = LayoutInflater.from(context).inflate(R.layout.alert, null);
 		setContentView(view);
-		//getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
+	   // getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
 
 		String title;
 		if(_pwdType == PWD_1){
@@ -45,6 +46,8 @@ public class AskPwdDialog extends Dialog{
 		((TextView)view.findViewById(R.id.ordername)).setText(title);
 		
 		_pwdEdtTxt = (EditText)view.findViewById(R.id.mycount);
+		_pwdEdtTxt.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+
 		((TextView)findViewById(R.id.table)).setText("√‹¬Î£∫");
 		Button okBtn = (Button)view.findViewById(R.id.confirm);
 		okBtn.setText("»∑∂®");

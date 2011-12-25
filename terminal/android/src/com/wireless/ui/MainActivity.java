@@ -735,7 +735,7 @@ public class MainActivity extends Activity {
 		public AskTableDialog(int type) {
 			super(MainActivity.this, R.style.FullHeightDialog);
 			setContentView(R.layout.alert);
-			getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
+			//getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
 			
 			_type = type;
 			TextView title = (TextView)findViewById(R.id.ordername);

@@ -407,7 +407,7 @@ public class OrderFoodListView extends ExpandableListView{
 			
 			View view = LayoutInflater.from(_context).inflate(R.layout.alert, null);
 			setContentView(view);
-			getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
+			//getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
 			((TextView)view.findViewById(R.id.ordername)).setText("请输入" + selectedFood.name + "的删除数量");
 			
 			((TextView)findViewById(R.id.table)).setText("数量：");
