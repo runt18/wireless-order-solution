@@ -135,6 +135,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 			}
 		});
 		_oriFoodLstView.notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(_oriOrder.foods)));
+		_oriFoodLstView.expandGroup(0);
 
 		/**
 		 * "ÐÂµã²Ë"µÄListView
@@ -194,6 +195,8 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 				 */
 				FoodParcel foodParcel = data.getParcelableExtra(FoodParcel.KEY_VALUE);
 				_newFoodLstView.notifyDataChanged(foodParcel);
+				_newFoodLstView.expandGroup(0);
+				_oriFoodLstView.collapseGroup(0);
 				
 			}else if(requestCode == OrderFoodListView.PICK_FOOD){
 				/**
@@ -201,6 +204,8 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 				 */
 				OrderParcel orderParcel = data.getParcelableExtra(OrderParcel.KEY_VALUE);
 				_newFoodLstView.notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(orderParcel.foods)));
+				_newFoodLstView.expandGroup(0);
+				_oriFoodLstView.collapseGroup(0);
 			}
 			
 		}

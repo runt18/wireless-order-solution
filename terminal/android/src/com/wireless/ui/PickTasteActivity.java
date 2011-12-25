@@ -14,6 +14,7 @@ import android.view.GestureDetector.OnGestureListener;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
@@ -125,11 +126,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 		
 		_tabHost.setCurrentTabByTag(TAG_TASTE);
 		setTasteView();
-		_handler.sendEmptyMessage(0);
-		
-		
-		
-		
+		_handler.sendEmptyMessage(0);	
 		
 	}
 
@@ -349,6 +346,29 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 					break;
 				}
 			}
+			
+			selectChkBox.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View arg0) {
+					if(selectChkBox.isChecked()){
+						int pos = _selectedFood.addTaste(_tastes[position]);
+						if(pos >= 0){
+							Toast.makeText(PickTasteActivity.this, "添加" + _tastes[position].preference, 0).show();
+						}else{
+							Toast.makeText(PickTasteActivity.this, "最多只能添加" + _selectedFood.tastes.length + "种口味", 0).show();
+							selectChkBox.setChecked(false);
+						}						
+						
+					}else{
+						int pos = _selectedFood.removeTaste(_tastes[position]);
+						if(pos >= 0){
+							Toast.makeText(PickTasteActivity.this, "删除" + _tastes[position].preference, 0).show();
+						}
+					}
+					_handler.sendEmptyMessage(0);
+				}
+			});
 			
 			/**
 			 * 口味的View操作

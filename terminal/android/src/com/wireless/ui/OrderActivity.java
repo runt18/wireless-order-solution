@@ -219,6 +219,7 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 				 */
 				FoodParcel foodParcel = data.getParcelableExtra(FoodParcel.KEY_VALUE);
 				_newFoodLstView.notifyDataChanged(foodParcel);
+				_newFoodLstView.expandGroup(0);
 				 
 				
 			}else if(requestCode == OrderFoodListView.PICK_FOOD){
@@ -227,6 +228,7 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 				 */
 				OrderParcel orderParcel = data.getParcelableExtra(OrderParcel.KEY_VALUE);
 				_newFoodLstView.notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(orderParcel.foods)));
+				_newFoodLstView.expandGroup(0);
 			}
 			
 		}
