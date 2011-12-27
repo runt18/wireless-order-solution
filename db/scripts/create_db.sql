@@ -181,7 +181,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`table` (
   `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this table' ,
   `alias_id` SMALLINT UNSIGNED NULL ,
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'Indicates the table belongs to which restaurant.' ,
-  `region` TINYINT UNSIGNED NOT NULL DEFAULT 255 COMMENT 'the region alias id to this table. 255 means the table does NOT belong to any region.' ,
+  `region_id` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the region alias id to this table. 255 means the table does NOT belong to any region.' ,
   `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to this table' ,
   `enabled` TINYINT NOT NULL DEFAULT 1 COMMENT 'indicates whether the table information is enabled or not' ,
   `minimum_cost` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the minimum cost to this table' ,
@@ -506,11 +506,10 @@ COMMENT = 'the shift history to each restaurant' ;
 DROP TABLE IF EXISTS `wireless_order_db`.`region` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`region` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'the id to this record' ,
   `restaurant_id` INT UNSIGNED NOT NULL ,
-  `alias_id` TINYINT UNSIGNED NULL COMMENT 'the alias id to this table region' ,
+  `region_id` TINYINT UNSIGNED NOT NULL COMMENT 'the alias id to this table region' ,
   `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to this table region' ,
-  PRIMARY KEY (`id`, `restaurant_id`) ,
+  PRIMARY KEY (`restaurant_id`, `region_id`) ,
   INDEX `fk_region_restaurant1` (`restaurant_id` ASC) ,
   CONSTRAINT `fk_region_restaurant1`
     FOREIGN KEY (`restaurant_id` )
@@ -702,6 +701,8 @@ COMMENT = 'describe the category of material' ;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+
 
 
 -- -----------------------------------------------------

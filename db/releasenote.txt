@@ -5,25 +5,34 @@
 *******************************************************************************/
 
 /******************************************************************************************************
+Release v1.1.2 <xx/xx/2012> 
+<General Info>
+1 - Release on xx/xx/2012
+2 - Source code is tagged as "1.1.2" in Google Code's SVN
+<Issues>
+1 - 修改region表 
+******************************************************************************************************/
+
+/******************************************************************************************************
 Release v1.1.1 <10/12/2011> 
 <General Info>
 1 - Release on 10/12/2011
 2 - Source code is tagged as "1.1.1" in Google Code's SVN
 <Issues>
- - 增加表"supplier"
- - 增加表"material_detail"
- - 增加表"department"
- - 增加表"material_cate"
- - 删除表"material_history"
- - 删除表"order_food_material"
- - 删除表"order_food_material_history"
- - 重新生成表"food_material"
- - 重新生成表"material"
- - 删除表"super_kitchen"
- - 修改表"kitchen"中的字段"super_kitchen"为"dept_id"
- - 增加字段"restaurant_id"到表"order_food"
- - 增加字段"restaurant_id"到表"order_food_history"
- - 修改表"order"中的字段"table_id"和"table2_id"的数据类型为unsigned small int
+1 - 增加表"supplier"
+2 - 增加表"material_detail"
+3 - 增加表"department"
+4 - 增加表"material_cate"
+5 - 删除表"material_history"
+6 - 删除表"order_food_material"
+7 - 删除表"order_food_material_history"
+8 - 重新生成表"food_material"
+9 - 重新生成表"material"
+10 - 删除表"super_kitchen"
+11 - 修改表"kitchen"中的字段"super_kitchen"为"dept_id"
+12 - 增加字段"restaurant_id"到表"order_food"
+13 - 增加字段"restaurant_id"到表"order_food_history"
+14 - 修改表"order"中的字段"table_id"和"table2_id"的数据类型为unsigned small int
 ******************************************************************************************************/
 
 /******************************************************************************************************
