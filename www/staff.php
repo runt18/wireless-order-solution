@@ -68,11 +68,13 @@ if($editType == "addStaff" || $editType == "editStaff")
 		$terminal_id = $db ->GetOne($sql);	
 		if($quota < 0)
 		{
-			$db->Execute("UPDATE terminal SET `owner_name`='$name',gift_quota=-1 WHERE id=$terminal_id");
+			$sql = "UPDATE terminal SET `owner_name`='$name',gift_quota=-1 WHERE id=$terminal_id";
+			$db->Execute($sql);
 		}
 		else
 		{
-			$db->Execute("UPDATE terminal SET `owner_name`='$name',gift_quota=$quota WHERE id=$terminal_id");
+			$sql = "UPDATE terminal SET `owner_name`='$name',gift_quota=-1 WHERE id=$terminal_id";
+			$db->Execute($sql);
 		}
 		
 		if($pwd != $random)
