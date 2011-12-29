@@ -1,5 +1,6 @@
 package com.wireless.protocol;
 
+
 public class Restaurant {
 	public int id;
 	public String name;
@@ -11,7 +12,7 @@ public class Restaurant {
 	public String pwd;
 	public String pwd2;
 	public String pwd3;
-	public Setting setting = new Setting();
+	//public Setting setting = new Setting();
 	
 	public Restaurant(){
 		this.name = "";
