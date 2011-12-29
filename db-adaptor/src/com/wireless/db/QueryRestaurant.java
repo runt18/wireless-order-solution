@@ -76,7 +76,7 @@ public class QueryRestaurant {
 	 * @throws SQLException 
 	 * 			throws if fail to execute any SQL statement
 	 */
-	static Restaurant exec(DBCon dbCon, int restaurantID) throws BusinessException, SQLException{
+	public static Restaurant exec(DBCon dbCon, int restaurantID) throws BusinessException, SQLException{
 		Restaurant restaurant = new Restaurant();
 		String sql = "SELECT restaurant_name, restaurant_info, tele1, tele2, address, pwd, pwd2, pwd3 FROM " + Params.dbName + "." +
 					 "restaurant WHERE id=" + restaurantID; 
@@ -108,16 +108,7 @@ public class QueryRestaurant {
 			}
 			dbCon.rs.close();
 		}		
-		/**
-		 * Get the corresponding restaurant setting
-		 */
-		sql = "SELECT price_tail, auto_reprint FROM " + Params.dbName +
-			  ".setting WHERE restaurant_id=" + restaurantID;
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			restaurant.setting.price_tail = dbCon.rs.getInt("price_tail");
-			restaurant.setting.auto_reprint = dbCon.rs.getBoolean("auto_reprint");
-		}
+
 		dbCon.rs.close();
 		return restaurant;
 	}

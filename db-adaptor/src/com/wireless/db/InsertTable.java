@@ -80,7 +80,7 @@ public class InsertTable {
 			sql = "SELECT MAX(alias_id) + 1 FROM " + Params.dbName + ".table WHERE restaurant_id=" + term.restaurant_id;
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			if(dbCon.rs.next()){
-				table.alias_id = dbCon.rs.getShort(1);
+				table.alias_id = dbCon.rs.getInt(1);
 			}else{
 				throw new BusinessException("Fail to generate the table alias id.");
 			}
