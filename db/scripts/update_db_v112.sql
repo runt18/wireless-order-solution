@@ -24,7 +24,7 @@ ADD COLUMN `custom_num` TINYINT UNSIGNED DEFAULT NULL COMMENT 'the amount of cus
 ADD COLUMN `category` TINYINT DEFAULT NULL COMMENT 'the category to this table, it should be one the values below.\n一般 : 1\n外卖 : 2\n并台 : 3\n拼台 : 4'  AFTER `custom_num` , 
 ADD COLUMN `status` TINYINT COMMENT 'the status to this table, one of the values below.\n空闲 : 0\n就餐 : 1\n预定 : 2'  AFTER `category` , 
 CHANGE COLUMN `minimum_cost` `minimum_cost` DECIMAL(7,2) NOT NULL DEFAULT '0.00' COMMENT 'the minimum cost to this table'  AFTER `name` , 
-CHANGE COLUMN `id` `id` INT(11) NOT NULL AUTO_INCREMENT  , CHANGE COLUMN `region` `region_id` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the region alias id to this table.'  ;
+CHANGE COLUMN `region` `region_id` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the region alias id to this table.'  ;
 
 -- -----------------------------------------------------
 -- Update the field 'region_id' to 0
