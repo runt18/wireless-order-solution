@@ -12,7 +12,10 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import com.wireless.db.DBCon;
 import com.wireless.db.QueryRestaurant;
+import com.wireless.db.QuerySetting;
+import com.wireless.dbObject.Setting;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.Restaurant;
 
@@ -23,6 +26,8 @@ public class QueryRestaurantAction extends Action {
 
 		PrintWriter out = null;
 
+		DBCon dbCon = new DBCon();
+		
 		String jsonResp = "{success:$(result), data:'$(value)'}";
 		try {
 			// 解决后台中文传到前台乱码
@@ -30,7 +35,9 @@ public class QueryRestaurantAction extends Action {
 			out = response.getWriter();
 			
 			int restaurantID = Integer.parseInt(request.getParameter("restaurantID"));
-			Restaurant restaurant = QueryRestaurant.exec(restaurantID);
+			dbCon.connect();
+			Restaurant restaurant = QueryRestaurant.exec(dbCon, restaurantID);
+			Setting setting = QuerySetting.exec(dbCon, restaurantID) ;
 			
 			jsonResp = jsonResp.replace("$(result)", "true");
 			/**
@@ -54,8 +61,8 @@ public class QueryRestaurantAction extends Action {
 			value = value.replace("$(tele_1)", restaurant.tele_1);	
 			value = value.replace("$(tele_2)", restaurant.tele_2);	
 			value = value.replace("$(addr)", restaurant.addr);	
-			value = value.replace("$(price_tail)", Integer.toString(restaurant.setting.price_tail));	
-			value = value.replace("$(auto_reprint)", restaurant.setting.auto_reprint ? "1" : "0");	
+			value = value.replace("$(price_tail)", Integer.toString(setting.priceTail));	
+			value = value.replace("$(auto_reprint)", setting.autoReprint ? "1" : "0");	
 			jsonResp = jsonResp.replace("$(value)", value);
 			
 		}catch(BusinessException e){
@@ -72,6 +79,7 @@ public class QueryRestaurantAction extends Action {
 			e.printStackTrace();
 			
 		}finally{
+			dbCon.disconnect();
 			//Just for debug
 			System.out.println(jsonResp);
 			out.write(jsonResp);
