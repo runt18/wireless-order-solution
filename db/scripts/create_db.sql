@@ -183,11 +183,11 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`table` (
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'Indicates the table belongs to which restaurant.' ,
   `region_id` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the region alias id to this table. 255 means the table does NOT belong to any region.' ,
   `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to this table' ,
-  `enabled` TINYINT NOT NULL DEFAULT 1 COMMENT 'indicates whether the table information is enabled or not' ,
   `minimum_cost` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the minimum cost to this table' ,
-  `custom_num` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the amount of customer to this table if the status is not idle' ,
-  `category` TINYINT NOT NULL DEFAULT 1 COMMENT 'the category to this table, it should be one the values below.\n一般 : 1\n外卖 : 2\n并台 : 3\n拼台 : 4' ,
+  `custom_num` TINYINT UNSIGNED NULL DEFAULT NULL COMMENT 'the amount of customer to this table if the status is not idle' ,
+  `category` TINYINT NULL DEFAULT NULL COMMENT 'the category to this table, it should be one the values below.\n一般 : 1\n外卖 : 2\n并台 : 3\n拼台 : 4' ,
   `status` TINYINT NOT NULL DEFAULT 0 COMMENT 'the status to this table, one of the values below.\n空闲 : 0\n就餐 : 1\n预定 : 2' ,
+  `enabled` TINYINT NOT NULL DEFAULT 1 COMMENT 'indicates whether the table information is enabled or not' ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_table_restaurant` (`restaurant_id` ASC) ,
   INDEX `ix_table_alias_id` (`alias_id` ASC) ,
@@ -704,6 +704,7 @@ COMMENT = 'describe the category of material' ;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
 
 
 

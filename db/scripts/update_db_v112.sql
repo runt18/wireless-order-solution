@@ -20,33 +20,44 @@ ADD INDEX `fk_region_restaurant` (`restaurant_id` ASC) ;
 -- 4、add the field "status"
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`table` 
-ADD COLUMN `custom_num` TINYINT UNSIGNED COMMENT 'the amount of customer to this table if the status is not idle'  AFTER `enabled` , 
-ADD COLUMN `category` TINYINT COMMENT 'the category to this table, it should be one the values below.\n一般 : 1\n外卖 : 2\n并台 : 3\n拼台 : 4'  AFTER `custom_num` , 
+ADD COLUMN `custom_num` TINYINT UNSIGNED DEFAULT NULL COMMENT 'the amount of customer to this table if the status is not idle'  AFTER `enabled` , 
+ADD COLUMN `category` TINYINT DEFAULT NULL COMMENT 'the category to this table, it should be one the values below.\n一般 : 1\n外卖 : 2\n并台 : 3\n拼台 : 4'  AFTER `custom_num` , 
 ADD COLUMN `status` TINYINT COMMENT 'the status to this table, one of the values below.\n空闲 : 0\n就餐 : 1\n预定 : 2'  AFTER `category` , 
 CHANGE COLUMN `minimum_cost` `minimum_cost` DECIMAL(7,2) NOT NULL DEFAULT '0.00' COMMENT 'the minimum cost to this table'  AFTER `name` , 
-CHANGE COLUMN `id` `id` INT(11) NOT NULL AUTO_INCREMENT  , CHANGE COLUMN `region` `region_id` TINYINT(3) UNSIGNED NOT NULL DEFAULT '255' COMMENT 'the region alias id to this table.'  ;
+CHANGE COLUMN `id` `id` INT(11) NOT NULL AUTO_INCREMENT  , CHANGE COLUMN `region` `region_id` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the region alias id to this table.'  ;
 
+-- -----------------------------------------------------
+-- Update the field 'region_id' to 0
+-- -----------------------------------------------------
+UPDATE wireless_order_db.table SET region_id = 0;
 
-update wireless_order_db.table a
-set a.custom_num = (select custom_num from wireless_order_db.order b
-		    where b.id = (select max(id) from wireless_order_db.order b1
-                                  where a.restaurant_id = b1.restaurant_id
-                                    and a.alias_id = b1.table_id)
-                      and b.total_price is null),
-a.category = (select category from wireless_order_db.order c
-	       where c.id = (select max(id) from wireless_order_db.order c1
-                              where a.restaurant_id = c1.restaurant_id
-                                and a.alias_id = c1.table_id)
-	              and c.total_price is null),
-a.status = (select (case when d.total_price is null then 1 else 0 end)
-              from wireless_order_db.order d
-	     where d.id = (select max(id) from wireless_order_db.order d1
-                            where a.restaurant_id = d1.restaurant_id
-                              and a.alias_id = d1.table_id));
+-- -----------------------------------------------------
+-- Update the custom_num, category, status of table.
+-- Note that removing the NOT NULL restriction of field status before invoking the update.
+-- -----------------------------------------------------
+UPDATE wireless_order_db.table a
+SET a.custom_num = (SELECT custom_num FROM wireless_order_db.order b
+		    WHERE b.id = (SELECT max(id) FROM wireless_order_db.order b1
+                                  WHERE a.restaurant_id = b1.restaurant_id
+                                    AND a.alias_id = b1.table_id)
+                      AND b.total_price IS NULL),
+a.category = (SELECT category FROM wireless_order_db.order c
+	       WHERE c.id = (SELECT max(id) FROM wireless_order_db.order c1
+                              WHERE a.restaurant_id = c1.restaurant_id
+                                AND a.alias_id = c1.table_id)
+	              AND c.total_price is null),
+a.status = (SELECT (CASE WHEN d.total_price IS NULL THEN 1 ELSE 0 END)
+              FROM wireless_order_db.order d
+	     WHERE d.id = (SELECT max(id) FROM wireless_order_db.order d1
+                            WHERE a.restaurant_id = d1.restaurant_id
+                              AND a.alias_id = d1.table_id));
 
-update wireless_order_db.table
-set status = 0
-where status is null;
+UPDATE wireless_order_db.table
+SET status = 0
+WHERE status IS NULL;
 
+-- -----------------------------------------------------
+-- Restore field 'status' to NOT NULL 
+-- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`table`
 CHANGE COLUMN `status` `status` TINYINT NOT NULL DEFAULT 0 COMMENT 'the status to this table, one of the values below.\n空闲 : 0\n就餐 : 1\n预定 : 2'  AFTER `category`;
