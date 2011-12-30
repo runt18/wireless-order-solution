@@ -56,7 +56,7 @@ public class SelectKitchenPopup extends PopupScreen{
 		_kitchens = new Vector();
 		for(int i = 0; i < WirelessOrder.foodMenu.kitchens.length; i++){
 			Food food = new Food();
-			food.kitchen = WirelessOrder.foodMenu.kitchens[i].alias_id;
+			food.kitchen = WirelessOrder.foodMenu.kitchens[i].kitchenID;
 			int index = Arrays.binarySearch(tmpFoods, food, new Comparator(){
 
 				public int compare(Object o1, Object o2) {
@@ -120,7 +120,7 @@ public class SelectKitchenPopup extends PopupScreen{
 				int nCount = 0;
 				Vector vectFoods = new Vector();
 				for(int i = 0; i < WirelessOrder.foodMenu.foods.length; i++){
-					if(WirelessOrder.foodMenu.foods[i].kitchen == ((Kitchen)_kitchens.elementAt(getSelectedIndex())).alias_id){
+					if(WirelessOrder.foodMenu.foods[i].kitchen == ((Kitchen)_kitchens.elementAt(getSelectedIndex())).kitchenID){
 						nCount++;
 						vectFoods.addElement(WirelessOrder.foodMenu.foods[i]);
 					}
