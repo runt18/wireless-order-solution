@@ -196,7 +196,7 @@ public class QueryMenuAction extends Action {
 				 * [厨房编号,"厨房名称",一般折扣1,一般折扣2,一般折扣3,会员折扣1,会员折扣2,会员折扣3]
 				 */
 				String jsonKitchen = "[$(kitchen_id),\"$(name)\",$(dist1),$(dist2),$(dist3),$(memDist1),$(memDist2),$(memDist3)]";
-				jsonKitchen = jsonKitchen.replace("$(kitchen_id)", new Short(kitchens[i].alias_id).toString());
+				jsonKitchen = jsonKitchen.replace("$(kitchen_id)", new Short(kitchens[i].kitchenID).toString());
 				jsonKitchen = jsonKitchen.replace("$(name)", kitchens[i].name);
 				jsonKitchen = jsonKitchen.replace("$(dist1)", new Float((float)kitchens[i].discount / 100).toString());
 				jsonKitchen = jsonKitchen.replace("$(dist2)", new Float((float)kitchens[i].discount_2 / 100).toString());
@@ -229,7 +229,7 @@ public class QueryMenuAction extends Action {
 		}else{
 			for(int i = 0; i < kitchens.length; i++){
 				
-				outString = outString + "{value:"+ new Short(kitchens[i].alias_id).toString()+ ",";
+				outString = outString + "{value:"+ new Short(kitchens[i].kitchenID).toString()+ ",";
 				outString = outString + "text:'" + kitchens[i].name + "'},";
 
 			}

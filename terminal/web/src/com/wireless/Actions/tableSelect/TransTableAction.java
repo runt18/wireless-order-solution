@@ -82,13 +82,29 @@ public class TransTableAction extends Action implements PinGen{
 				
 				int orderID = com.wireless.db.Util.getUnPaidOrderID(dbCon, oldTable);
 				
+				dbCon.stmt.clearBatch();
+
+				//update the order 
 				String sql = "UPDATE " + Params.dbName + ".order SET " +
 							 "table_id=" + newTable.alias_id + 
 							 ((newTable.name == null) ? " " : ", " +
 							 "table_name='" + newTable.name + "'") +  
 							 " WHERE id=" + orderID;
+				dbCon.stmt.addBatch(sql);
 				
-				dbCon.stmt.execute(sql);
+				//update the new table status to busy
+				sql = "UPDATE " + Params.dbName + ".table SET status=" + Table.TABLE_BUSY +
+					  " WHERE restaurant_id=" + newTable.restaurantID +
+					  " AND alias_id=" + newTable.alias_id;
+				dbCon.stmt.addBatch(sql);
+				
+				//update the original table status to idle
+				sql = "UPDATE " + Params.dbName + ".table SET status=" + Table.TABLE_IDLE + 
+					  " WHERE restaurant_id=" + oldTable.restaurantID + 
+					  " AND alias_id=" + oldTable.alias_id;
+				dbCon.stmt.addBatch(sql);
+				
+				dbCon.stmt.executeBatch();
 				
 				jsonResp = jsonResp.replace("$(result)", "true");
 				jsonResp = jsonResp.replace("$(value)", oldTable.alias_id + "号台转至" + newTable.alias_id + "号台成功");
@@ -126,13 +142,11 @@ public class TransTableAction extends Action implements PinGen{
 
 	@Override
 	public int getDeviceId() {
-		// TODO Auto-generated method stub
 		return _pin;
 	}
 
 	@Override
 	public short getDeviceType() {
-		// TODO Auto-generated method stub
 		return Terminal.MODEL_STAFF;
 	}
 }

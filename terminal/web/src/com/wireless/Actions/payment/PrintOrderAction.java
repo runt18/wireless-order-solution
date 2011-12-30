@@ -86,7 +86,7 @@ public class PrintOrderAction extends Action implements PinGen{
 					table.alias_id = tableID;
 					dbCon.connect();
 					Terminal term = VerifyPin.exec(dbCon, _pin, Terminal.MODEL_STAFF);
-					table.restaurant_id = term.restaurant_id;
+					table.restaurantID = term.restaurant_id;
 					orderID = com.wireless.db.Util.getUnPaidOrderID(dbCon, table);
 				}
 			}
