@@ -99,7 +99,9 @@ public class TransTableAction extends Action implements PinGen{
 				dbCon.stmt.addBatch(sql);
 				
 				//update the original table status to idle
-				sql = "UPDATE " + Params.dbName + ".table SET status=" + Table.TABLE_IDLE + 
+				sql = "UPDATE " + Params.dbName + ".table SET status=" + Table.TABLE_IDLE + "," +
+					  "custom_num=NULL," +
+					  "category=NULL" +
 					  " WHERE restaurant_id=" + oldTable.restaurantID + 
 					  " AND alias_id=" + oldTable.alias_id;
 				dbCon.stmt.addBatch(sql);
