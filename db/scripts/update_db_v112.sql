@@ -13,6 +13,40 @@ DROP INDEX `fk_region_restaurant1` ,
 ADD INDEX `fk_region_restaurant` (`restaurant_id` ASC) ;
 
 -- -----------------------------------------------------
+-- Insert a '区域1 - 10' to 'region' for every restaurant
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.region(restaurant_id, region_id, name)
+SELECT id, 0, "区域1" FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.region(restaurant_id, region_id, name)
+SELECT id, 1, "区域2" FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.region(restaurant_id, region_id, name)
+SELECT id, 2, "区域3" FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.region(restaurant_id, region_id, name)
+SELECT id, 3, "区域4" FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.region(restaurant_id, region_id, name)
+SELECT id, 4, "区域5" FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.region(restaurant_id, region_id, name)
+SELECT id, 5, "区域6" FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.region(restaurant_id, region_id, name)
+SELECT id, 6, "区域7" FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.region(restaurant_id, region_id, name)
+SELECT id, 7, "区域8" FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.region(restaurant_id, region_id, name)
+SELECT id, 8, "区域9" FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.region(restaurant_id, region_id, name)
+SELECT id, 9, "区域10" FROM wireless_order_db.restaurant WHERE id > 10;
+
+
+-- -----------------------------------------------------
 -- Modify the `table` table
 -- 1、rename the field "region" to "region_id"
 -- 2、add the field "custom_num"
