@@ -32,11 +32,11 @@ import android.widget.Toast;
 
 import com.wireless.common.OrderParcel;
 import com.wireless.common.WirelessOrder;
+import com.wireless.protocol.Department;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.SKitchen;
 import com.wireless.protocol.Util;
 import com.wireless.ui.view.PickFoodListView;
 import com.wireless.ui.view.TempListView;
@@ -424,7 +424,7 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 	 */
 	private class KitchenSelectDialog extends Dialog{
 
-		private List<SKitchen> _deptParent;
+		private List<Department> _deptParent;
 		private List<List<Kitchen>> _kitchenChild;
 		
 		KitchenSelectDialog(final PickFoodListView foodLstView) {
@@ -454,7 +454,7 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 			ArrayList<Kitchen> validKitchens = new ArrayList<Kitchen>();
 			for(int i = 0; i < WirelessOrder.foodMenu.kitchens.length; i++){
 				Food keyFood = new Food();
-				keyFood.kitchen = WirelessOrder.foodMenu.kitchens[i].alias_id;
+				keyFood.kitchen = WirelessOrder.foodMenu.kitchens[i].kitchenID;
 				int index = Arrays.binarySearch(tmpFoods, keyFood, new Comparator<Food>(){
 
 					public int compare(Food food1, Food food2) {
@@ -476,10 +476,10 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 			/**
 			 * 筛选出有菜品的部门
 			 */
-			_deptParent = new ArrayList<SKitchen>();
+			_deptParent = new ArrayList<Department>();
 			for(int i = 0; i < WirelessOrder.foodMenu.sKitchens.length; i++){
 				for(int j = 0; j < validKitchens.size(); j++){
-					if(WirelessOrder.foodMenu.sKitchens[i].alias_id == validKitchens.get(j).skitchen_id){
+					if(WirelessOrder.foodMenu.sKitchens[i].deptID == validKitchens.get(j).deptID){
 						_deptParent.add(WirelessOrder.foodMenu.sKitchens[i]);
 						break;
 					}
@@ -493,7 +493,7 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 			for(int i = 0; i < _deptParent.size(); i++){
 				List<Kitchen> kitchens = new ArrayList<Kitchen>();
 				for(int j = 0; j < validKitchens.size(); j++){
-					if(validKitchens.get(j).skitchen_id == _deptParent.get(i).alias_id) {
+					if(validKitchens.get(j).deptID == _deptParent.get(i).deptID) {
 						kitchens.add(validKitchens.get(j));
 					}
 				}
@@ -593,7 +593,7 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 					Kitchen selectedKitchen = _kitchenChild.get(groupPosition).get(childPosition);
 					_filterFoods = new ArrayList<Food>();
 					for(int i = 0; i < WirelessOrder.foodMenu.foods.length; i++){
-						if(WirelessOrder.foodMenu.foods[i].kitchen == selectedKitchen.alias_id){
+						if(WirelessOrder.foodMenu.foods[i].kitchen == selectedKitchen.kitchenID){
 							_filterFoods.add(WirelessOrder.foodMenu.foods[i]);
 						}
 					}
