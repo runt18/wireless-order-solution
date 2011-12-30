@@ -88,7 +88,7 @@ public class InsertOrder {
 						//get the associated foods' unit price and name
 						sql = "SELECT unit_price, name, status FROM " +  Params.dbName + 
 						 	  ".food WHERE alias_id=" + orderToInsert.foods[i].alias_id + 
-						 	  " AND restaurant_id=" + table.restaurant_id;
+						 	  " AND restaurant_id=" + table.restaurantID;
 						dbCon.rs = dbCon.stmt.executeQuery(sql);
 						//check if the food exist in db 
 						if(dbCon.rs.next()){
@@ -104,7 +104,7 @@ public class InsertOrder {
 						for(int j = 0; j < orderToInsert.foods[i].tastes.length; j++){
 							if(orderToInsert.foods[i].tastes[j].alias_id != Taste.NO_TASTE){
 								sql = "SELECT preference, price, category, rate, calc FROM " + Params.dbName + 
-									  ".taste WHERE restaurant_id=" + table.restaurant_id + 
+									  ".taste WHERE restaurant_id=" + table.restaurantID + 
 									  " AND alias_id=" + orderToInsert.foods[i].tastes[j].alias_id;
 								dbCon.rs = dbCon.stmt.executeQuery(sql);
 								if(dbCon.rs.next()){
@@ -142,16 +142,16 @@ public class InsertOrder {
 						dbCon.stmt.executeUpdate(sql);
 					}
 				}
-				
 
-				
-				//insert to order table
+				/**
+				 * Insert to 'order' table.
+				 */
 				sql = "INSERT INTO `" + Params.dbName + "`.`order` (" +
 						"`id`, `restaurant_id`, `category`, `table_id`, " +
 						"`table_name`, `table2_id`, `table2_name`, `terminal_model`, " +
 						"`terminal_pin`, `order_date`, `custom_num`, `waiter`) VALUES (" +
 						"NULL, " + 
-						table.restaurant_id + ", " + 
+						table.restaurantID + ", " + 
 						orderToInsert.category + ", " +
 						orderToInsert.table_id + ", '" + 
 						orderToInsert.table_name + "', " +
@@ -172,7 +172,9 @@ public class InsertOrder {
 				}
 					
 				dbCon.stmt.clearBatch();
-				//insert each ordered food
+				/**
+				 * Insert the detail records to 'order_food' table
+				 */
 				for(int i = 0; i < orderToInsert.foods.length; i++){
 						
 					//insert the record to table "order_food"
@@ -200,6 +202,30 @@ public class InsertOrder {
 						
 					dbCon.stmt.addBatch(sql);
 				}		
+				
+				/**
+				 * Update the 2nd table to busy if the category is for merger
+				 */
+				if(orderToInsert.category == Order.CATE_MERGER_TABLE){
+					sql = "UPDATE " + Params.dbName + "table SET " +
+						  "status=" + Table.TABLE_BUSY + ", " +
+						  "category=" + orderToInsert.category + ", " +
+						  "custom_num=" + orderToInsert.custom_num +
+						  " WHERE restaurant_id=" + term.restaurant_id +
+						  " AND alias_id=" + orderToInsert.table2_id;
+					dbCon.stmt.addBatch(sql);
+				}
+				/**
+				 * Update the table status to busy.
+				 */
+				sql = "UPDATE " + Params.dbName + ".table SET " +
+					  "status=" + Table.TABLE_BUSY + ", " +
+					  "category=" + orderToInsert.category + ", " +
+					  "custom_num=" + orderToInsert.custom_num +
+					  " WHERE restaurant_id=" + term.restaurant_id + 
+					  " AND alias_id=" + orderToInsert.table_id;
+				dbCon.stmt.addBatch(sql);
+				
 				dbCon.stmt.executeBatch();
 				
 				return orderToInsert;

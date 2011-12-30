@@ -44,7 +44,7 @@ public class PayOrder {
 			 */		
 			Table table = QueryTable.exec(dbCon, pin, model, orderToPay.table_id);
 			orderToPay.id = Util.getUnPaidOrderID(dbCon, table);
-			orderToPay.restaurant_id = table.restaurant_id;
+			orderToPay.restaurant_id = table.restaurantID;
 			
 			return execByID(dbCon, pin, model, orderToPay);			
 			
@@ -176,10 +176,18 @@ public class PayOrder {
 		/**
 		 * Delete the table in the case of "并台" or "外卖",
 		 * since the table to these order is temporary. 
+		 * Otherwise update the table status to idle.
 		 */
 		if(orderInfo.category == Order.CATE_JOIN_TABLE || orderInfo.category == Order.CATE_TAKE_OUT){
 			sql = "DELETE FROM " + Params.dbName + ".table WHERE alias_id=" +
 				  orderInfo.table_id + " AND restaurant_id=" + orderInfo.restaurant_id;
+			dbCon.stmt.addBatch(sql);
+		}else{
+			sql = "UPDATE " + Params.dbName + ".table SET " +
+				  "status=" + Table.TABLE_IDLE + ", " +
+				  "custom_num=NULL, " +
+				  "category=NULL " +
+				  "WHERE alias_id=" + orderInfo.table_id + " AND restaurant_id=" + orderInfo.restaurant_id;
 			dbCon.stmt.addBatch(sql);
 		}
 		dbCon.stmt.executeBatch();
@@ -277,7 +285,7 @@ public class PayOrder {
 			 */
 			Table table = QueryTable.exec(dbCon, pin, model, orderToPay.table_id);
 			orderToPay.id = Util.getUnPaidOrderID(dbCon, table);
-			orderToPay.restaurant_id = table.restaurant_id;
+			orderToPay.restaurant_id = table.restaurantID;
 			
 			return queryOrderByID(dbCon, pin, model, orderToPay);
 		}finally{

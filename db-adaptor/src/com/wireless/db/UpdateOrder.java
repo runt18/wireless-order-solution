@@ -396,6 +396,14 @@ public class UpdateOrder {
 				" WHERE id=" + orderToUpdate.id;
 		dbCon.stmt.addBatch(sql);
 
+		/**
+		 * Update the custom_num to the table
+		 */
+		sql = "UPDATE " + Params.dbName + ".table SET custom_num=" + orderToUpdate.custom_num +
+			  " WHERE restaurant_id=" + term.restaurant_id + 
+			  " AND alias_id=" + orderToUpdate.table_id;
+		dbCon.stmt.addBatch(sql);
+		
 		dbCon.stmt.executeBatch();
 		
 		Result result = new Result();			

@@ -69,12 +69,21 @@ public class CancelOrder {
 			/**
 			 * Delete the table if the order category is "并台" or "外卖",
 			 * since the table to these two category is temporary.
+			 * Otherwise update the table status to idle
 			 */
 			dbCon.stmt.clearBatch();
 			if(isDelTable){
 				sql = "DELETE FROM " + Params.dbName + ".table WHERE alias_id=" +
 					  table.alias_id + 
-					  " AND restaurant_id=" + table.restaurant_id;
+					  " AND restaurant_id=" + table.restaurantID;
+				dbCon.stmt.addBatch(sql);
+			}else{
+				sql = "UPDATE " + Params.dbName + ".table SET " +
+					  "status=" + Table.TABLE_IDLE + ", " +
+					  "custom_num=NULL, " +
+					  "category=NULL " +
+					  "WHERE restaurant_id=" + table.restaurantID + 
+					  " AND alias_id=" + table.alias_id;
 				dbCon.stmt.addBatch(sql);
 			}
 			//delete the records related to the order id and food id in "order_food" table

@@ -7,7 +7,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodMenu;
 import com.wireless.protocol.Kitchen;
-import com.wireless.protocol.SKitchen;
+import com.wireless.protocol.Department;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Terminal;
 
@@ -156,7 +156,7 @@ public class QueryMenu {
 	 * @throws SQLException 
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static SKitchen[] execSKitchens(int pin, short model) throws BusinessException, SQLException{
+	public static Department[] execSKitchens(int pin, short model) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		
 		try {
@@ -217,19 +217,19 @@ public class QueryMenu {
 		return kitchens.toArray(new Kitchen[kitchens.size()]);
 	}
 	
-	private static SKitchen[] querySKitchens(DBCon dbCon, int restaurantID) throws SQLException{
+	private static Department[] querySKitchens(DBCon dbCon, int restaurantID) throws SQLException{
 		//get tall the super kitchen information to this restaurant
-		ArrayList<SKitchen> sKitchens = new ArrayList<SKitchen>();
+		ArrayList<Department> sKitchens = new ArrayList<Department>();
 		String sql = "SELECT dept_id, name FROM " + Params.dbName + ".department WHERE " +
 					 " restaurant_id=" + restaurantID;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
-			sKitchens.add(new SKitchen(dbCon.rs.getString("name"),
+			sKitchens.add(new Department(dbCon.rs.getString("name"),
 									   dbCon.rs.getShort("dept_id")));
 		}
 		dbCon.rs.close();
 		
-		return sKitchens.toArray(new SKitchen[sKitchens.size()]);
+		return sKitchens.toArray(new Department[sKitchens.size()]);
 	}
 	
 	/**
