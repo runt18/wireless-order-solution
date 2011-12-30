@@ -207,10 +207,10 @@ public class RespQueryMenu extends RespPackage{
 		//assign each kitchen to the body
 		for(int i = 0; i < foodMenu.kitchens.length; i++){
 			//assign the kitchen id
-			body[index] = (byte)(foodMenu.kitchens[i].alias_id & 0x00FF);
+			body[index] = (byte)(foodMenu.kitchens[i].kitchenID & 0x00FF);
 			
 			//assign the super kitchen id that this kitchen belong to 
-			body[index + 1] = (byte)(foodMenu.kitchens[i].skitchen_id & 0x00FF);
+			body[index + 1] = (byte)(foodMenu.kitchens[i].deptID & 0x00FF);
 			
 			//assign 3 normal discounts
 			body[index + 2] = foodMenu.kitchens[i].discount;
@@ -244,7 +244,7 @@ public class RespQueryMenu extends RespPackage{
 		//assign each super kitchen to the body
 		for(int i = 0; i < foodMenu.sKitchens.length; i++){
 			//assign the super kitchen id
-			body[index] = (byte)(foodMenu.sKitchens[i].alias_id & 0x00FF);
+			body[index] = (byte)(foodMenu.sKitchens[i].deptID & 0x00FF);
 			
 			//assign the length of the super kitchen name
 			byte[] sKname = foodMenu.sKitchens[i].name.getBytes("UTF-16BE");

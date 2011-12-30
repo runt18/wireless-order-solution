@@ -6,11 +6,11 @@ public class FoodMenu {
 	public Taste[] styles = null;		//做法信息
 	public Taste[] specs = null;		//规格信息
 	public Kitchen[] kitchens = null;	//厨房信息
-	public SKitchen[] sKitchens = null;//大厨房信息
+	public Department[] sKitchens = null;//大厨房信息
 	
 	public FoodMenu(){}
 	
-	public FoodMenu(Food[] foods, Taste[] tastes, Taste[] styles, Taste[] specs, Kitchen[] kitchens, SKitchen[] sKitchens){
+	public FoodMenu(Food[] foods, Taste[] tastes, Taste[] styles, Taste[] specs, Kitchen[] kitchens, Department[] sKitchens){
 		this.foods = foods;
 		this.tastes = tastes;
 		this.styles = styles;

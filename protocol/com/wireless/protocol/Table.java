@@ -6,7 +6,7 @@ public class Table {
 	public static final byte TABLE_BUSY = 1;
 
 	//the restaurant id that this table is attached to
-	public int restaurant_id = 0;
+	public int restaurantID = 0;
 	//the alias id to this table
 	public int alias_id = 0;
 	//the alias name to this table
@@ -17,19 +17,21 @@ public class Table {
 	public short status = TABLE_IDLE;
 	//the category to this table
 	public short category = Order.CATE_NORMAL;
+	//the region to this table
+	public short regionID = Region.REGION_1;
 	/**
 	 * The value of minimum cost to this table, ranges from 99999.99 through 0.00
 	 * Since the 8100 doesn't support float, we instead to use 0 through 9999999.
 	 * So the real price should be divided 100 at last. 
 	 */
-	int minimum_cost = 0;
+	int minimumCost = 0;
 	
 	public void setMinimumCost(Float cost){
-		minimum_cost = Util.float2Int(cost);
+		minimumCost = Util.float2Int(cost);
 	}
 	
 	public Float getMinimumCost(){
-		return Util.int2Float(minimum_cost);
+		return Util.int2Float(minimumCost);
 	}
 	
 }

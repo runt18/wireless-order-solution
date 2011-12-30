@@ -462,7 +462,7 @@ public class RespParser {
 			int nSKitchen = response.body[index] & 0x000000FF;
 			index++;
 			//allocate the memory for super kitchens
-			SKitchen[] sKitchens = new SKitchen[nSKitchen];
+			Department[] sKitchens = new Department[nSKitchen];
 			//get each super kitchen's information
 			for(int i = 0; i < sKitchens.length; i++){
 				//get the alias id to super kitchen
@@ -479,13 +479,13 @@ public class RespParser {
 				
 				index += 2 + length;
 				
-				sKitchens[i] = new SKitchen(sKname, sKitchenID);
+				sKitchens[i] = new Department(sKname, sKitchenID);
 			}
 			
 			return new FoodMenu(foods, tastes, styles, specs, kitchens, sKitchens);
 			
 		}else{
-			return new FoodMenu(new Food[0], new Taste[0], new Taste[0], new Taste[0], new Kitchen[0], new SKitchen[0]);
+			return new FoodMenu(new Food[0], new Taste[0], new Taste[0], new Taste[0], new Kitchen[0], new Department[0]);
 		}
 	}
 	
