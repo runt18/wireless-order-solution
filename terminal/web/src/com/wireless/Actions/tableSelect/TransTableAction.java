@@ -102,6 +102,10 @@ public class TransTableAction extends Action implements PinGen {
 						+ ", category = ( SELECT category FROM "
 						+ Params.dbName + ".table WHERE restaurant_id = "
 						+ oldTable.restaurantID + " AND alias_id = "
+						+ oldTable.alias_id
+						+ " ), custom_num = ( SELECT custom_num FROM "
+						+ Params.dbName + ".table WHERE restaurant_id = "
+						+ oldTable.restaurantID + " AND alias_id = "
 						+ oldTable.alias_id + " )" + " WHERE restaurant_id="
 						+ newTable.restaurantID + " AND alias_id="
 						+ newTable.alias_id;
