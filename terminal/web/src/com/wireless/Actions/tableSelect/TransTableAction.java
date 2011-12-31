@@ -80,10 +80,7 @@ public class TransTableAction extends Action implements PinGen {
 
 			} else {
 
-				int orderID = com.wireless.db.Util.getUnPaidOrderID(dbCon,
-						oldTable);
-
-				dbCon.stmt.clearBatch();
+				int orderID = com.wireless.db.Util.getUnPaidOrderID(dbCon, oldTable);
 
 				// update the order
 				String sql = "UPDATE "
@@ -94,22 +91,26 @@ public class TransTableAction extends Action implements PinGen {
 						+ ((newTable.name == null) ? " " : ", "
 								+ "table_name='" + newTable.name + "'")
 						+ " WHERE id=" + orderID;
-				dbCon.stmt.addBatch(sql);
+				dbCon.stmt.execute(sql);
 
 				// update the new table status to busy
-				sql = "UPDATE " + Params.dbName + ".table SET status="
-						+ Table.TABLE_BUSY
-						+ ", category = ( SELECT category FROM "
-						+ Params.dbName + ".table WHERE restaurant_id = "
-						+ oldTable.restaurantID + " AND alias_id = "
-						+ oldTable.alias_id
-						+ " ), custom_num = ( SELECT custom_num FROM "
-						+ Params.dbName + ".table WHERE restaurant_id = "
-						+ oldTable.restaurantID + " AND alias_id = "
-						+ oldTable.alias_id + " )" + " WHERE restaurant_id="
-						+ newTable.restaurantID + " AND alias_id="
-						+ newTable.alias_id;
-				dbCon.stmt.addBatch(sql);
+				sql = "SELECT category, custom_num FROM " + Params.dbName + 
+				  	  ".table WHERE restaurant_id=" + oldTable.restaurantID +
+				  	  " AND alias_id=" + oldTable.alias_id;
+				dbCon.rs = dbCon.stmt.executeQuery(sql);
+				if(dbCon.rs.next()){
+					short category = dbCon.rs.getShort("category");
+					short customNum = dbCon.rs.getShort("custom_num");
+					sql = "UPDATE " + Params.dbName + ".table SET " +
+						  "status=" + Table.TABLE_BUSY + ", " +
+						  "category=" + category + ", " +
+						  "custom_num=" + customNum + 
+						  " WHERE restaurant_id=" + newTable.restaurantID + 
+						  " AND alias_id=" + newTable.alias_id;
+					dbCon.stmt.execute(sql);
+				}
+				dbCon.rs.close();
+			
 
 				// update the original table status to idle
 				sql = "UPDATE " + Params.dbName + ".table SET status="
@@ -117,10 +118,8 @@ public class TransTableAction extends Action implements PinGen {
 						+ "category=NULL" + " WHERE restaurant_id="
 						+ oldTable.restaurantID + " AND alias_id="
 						+ oldTable.alias_id;
-				dbCon.stmt.addBatch(sql);
-
-				dbCon.stmt.executeBatch();
-
+				dbCon.stmt.execute(sql);
+				
 				jsonResp = jsonResp.replace("$(result)", "true");
 				jsonResp = jsonResp.replace("$(value)", oldTable.alias_id
 						+ "号台转至" + newTable.alias_id + "号台成功");
