@@ -70,11 +70,13 @@ public class QueryOrderAction extends Action {
 				for (int i = 0; i < order.foods.length; i++) {
 					/**
 					 * The json to order food looks like below.
-					 * ["菜名",菜名编号,厨房编号,"口味",口味编号,数量,单价,是否特价,是否推荐,是否停售,是否赠送,折扣率,口味编号2,口味编号3,口味价钱,是否临时菜]
+					 * ["菜名",菜名编号,厨房编号,"口味",口味编号,数量,单价,
+					 *   是否特价,是否推荐,是否停售,是否赠送,折扣率,口味编号2,
+					 *   口味编号3,口味价钱,是否时价,是否临时菜]
 					 */
 					String jsonOrderFood = "[\"$(food)\",$(food_id),$(kitchen),\"$(taste)\",$(taste_id)," +
 										   "$(count),\"$(unit_price)\",$(special),$(recommend),$(soldout)," +
-										   "$(gift),$(discount),$(taste_id2),$(taste_id3),\"$(taste_price)\",$(currPrice)]";
+										   "$(gift),$(discount),$(taste_id2),$(taste_id3),\"$(taste_price)\",$(currPrice),$(temporary)]";
 					jsonOrderFood = jsonOrderFood.replace("$(food)", order.foods[i].name);
 					jsonOrderFood = jsonOrderFood.replace("$(food_id)", new Integer(order.foods[i].alias_id).toString());
 					jsonOrderFood = jsonOrderFood.replace("$(kitchen)", new Short(order.foods[i].kitchen).toString());
@@ -93,6 +95,7 @@ public class QueryOrderAction extends Action {
 					jsonOrderFood = jsonOrderFood.replace("$(taste_id2)", Integer.toString(order.foods[i].tastes[1].alias_id));
 					jsonOrderFood = jsonOrderFood.replace("$(taste_id3)", Integer.toString(order.foods[i].tastes[2].alias_id));
 					jsonOrderFood = jsonOrderFood.replace("$(currPrice)", order.foods[i].isCurPrice() ? "true" : "false");
+					jsonOrderFood = jsonOrderFood.replace("$(temporary)", order.foods[i].isTemporary ? "true" : "false");
 
 					// put each json order food info to the value
 					value.append(jsonOrderFood);

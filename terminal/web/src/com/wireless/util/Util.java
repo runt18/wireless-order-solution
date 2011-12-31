@@ -57,25 +57,59 @@ public class Util {
 			foods[i] = new OrderFood();
 			//extract each food detail information string			
 			String[] values = foodItem.split(",");		
-			//extract the food alias id
-			foods[i].alias_id = Integer.parseInt(values[0]);
-			//extract the amount to order food
-			foods[i].setCount(Float.parseFloat(values[1]));
-			//extract the taste alias id
-			foods[i].tastes[0].alias_id = Short.parseShort(values[2]);
-			//extract the kitchen number
-			foods[i].kitchen = Short.parseShort(values[3]);
-			//extract the discount
-			if(values.length > 4){
-				//foods[i].discount = (byte)(Float.parseFloat(values[4]) * 100);
-				foods[i].setDiscount(Float.parseFloat(values[4]));
+			//extract the temporary flag
+			if(Boolean.parseBoolean(values[0])){
+				//set the temporary flat
+				foods[i].isTemporary = true;
+				//extract the alias id to this temporary food
+				foods[i].alias_id = Integer.parseInt(values[1]);
+				//extract the name to this temporary food
+				foods[i].name = values[2];
+				//extract the amount to this temporary food
+				foods[i].setCount(Float.parseFloat(values[3]));
+				//extract the unit price to this temporary food
+				foods[i].setPrice(Float.parseFloat(values[4]));
+			}else{
+				//extract the food alias id
+				foods[i].alias_id = Integer.parseInt(values[1]);
+				//extract the amount to order food
+				foods[i].setCount(Float.parseFloat(values[2]));
+				//extract the taste alias id
+				foods[i].tastes[0].alias_id = Short.parseShort(values[3]);
+				//extract the kitchen number
+				foods[i].kitchen = Short.parseShort(values[4]);
+				//extract the discount
+				if(values.length > 5){
+					//foods[i].discount = (byte)(Float.parseFloat(values[4]) * 100);
+					foods[i].setDiscount(Float.parseFloat(values[5]));
+				}
+				if(values.length > 6){
+					//extract the 2nd taste alias id
+					foods[i].tastes[1].alias_id = Short.parseShort(values[6]);
+					//extract the 3rd taste alias id
+					foods[i].tastes[2].alias_id = Short.parseShort(values[7]);
+				}
 			}
-			if(values.length > 5){
-				//extract the 2nd taste alias id
-				foods[i].tastes[1].alias_id = Short.parseShort(values[5]);
-				//extract the 3rd taste alias id
-				foods[i].tastes[2].alias_id = Short.parseShort(values[6]);
-			}
+			
+//			//extract the food alias id
+//			foods[i].alias_id = Integer.parseInt(values[0]);
+//			//extract the amount to order food
+//			foods[i].setCount(Float.parseFloat(values[1]));
+//			//extract the taste alias id
+//			foods[i].tastes[0].alias_id = Short.parseShort(values[2]);
+//			//extract the kitchen number
+//			foods[i].kitchen = Short.parseShort(values[3]);
+//			//extract the discount
+//			if(values.length > 4){
+//				//foods[i].discount = (byte)(Float.parseFloat(values[4]) * 100);
+//				foods[i].setDiscount(Float.parseFloat(values[4]));
+//			}
+//			if(values.length > 5){
+//				//extract the 2nd taste alias id
+//				foods[i].tastes[1].alias_id = Short.parseShort(values[5]);
+//				//extract the 3rd taste alias id
+//				foods[i].tastes[2].alias_id = Short.parseShort(values[6]);
+//			}
 		}
 		
 		/**
