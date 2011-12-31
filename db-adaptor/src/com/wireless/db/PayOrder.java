@@ -183,6 +183,14 @@ public class PayOrder {
 				  orderInfo.table_id + " AND restaurant_id=" + orderInfo.restaurant_id;
 			dbCon.stmt.addBatch(sql);
 		}else{
+			if(orderInfo.category == Order.CATE_MERGER_TABLE){
+				sql = "UPDATE " + Params.dbName + ".table SET " +
+				  	  "status=" + Table.TABLE_IDLE + ", " +
+				  	  "custom_num=NULL, " +
+				  	  "category=NULL " +
+				  	  "WHERE alias_id=" + orderInfo.table2_id + " AND restaurant_id=" + orderInfo.restaurant_id;
+				dbCon.stmt.addBatch(sql);
+			}
 			sql = "UPDATE " + Params.dbName + ".table SET " +
 				  "status=" + Table.TABLE_IDLE + ", " +
 				  "custom_num=NULL, " +

@@ -207,7 +207,7 @@ public class InsertOrder {
 				 * Update the 2nd table to busy if the category is for merger
 				 */
 				if(orderToInsert.category == Order.CATE_MERGER_TABLE){
-					sql = "UPDATE " + Params.dbName + "table SET " +
+					sql = "UPDATE " + Params.dbName + ".table SET " +
 						  "status=" + Table.TABLE_BUSY + ", " +
 						  "category=" + orderToInsert.category + ", " +
 						  "custom_num=" + orderToInsert.custom_num +

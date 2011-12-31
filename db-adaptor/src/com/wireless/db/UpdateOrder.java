@@ -399,6 +399,12 @@ public class UpdateOrder {
 		/**
 		 * Update the custom_num to the table
 		 */
+		if(orderToUpdate.category == Order.CATE_MERGER_TABLE){
+			sql = "UPDATE " + Params.dbName + ".table SET custom_num=" + orderToUpdate.custom_num +
+			  	  " WHERE restaurant_id=" + term.restaurant_id + 
+			  	  " AND alias_id=" + orderToUpdate.table2_id;
+			dbCon.stmt.addBatch(sql);
+		}
 		sql = "UPDATE " + Params.dbName + ".table SET custom_num=" + orderToUpdate.custom_num +
 			  " WHERE restaurant_id=" + term.restaurant_id + 
 			  " AND alias_id=" + orderToUpdate.table_id;

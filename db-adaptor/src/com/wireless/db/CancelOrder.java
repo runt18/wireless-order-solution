@@ -57,11 +57,14 @@ public class CancelOrder {
 				dbCon.stmt.executeUpdate(sql);
 			}
 			
+			short category = Order.CATE_NORMAL;
+			int table2ID = 0;
 			boolean isDelTable = false;
-			sql = "SELECT category FROM " + Params.dbName + ".order WHERE id=" + orderID;
+			sql = "SELECT category, table2_id FROM " + Params.dbName + ".order WHERE id=" + orderID;
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			if(dbCon.rs.next()){
-				short category = dbCon.rs.getShort("category");
+				category = dbCon.rs.getShort("category");
+				table2ID = dbCon.rs.getInt("table2_id");
 				if(category == Order.CATE_JOIN_TABLE || category == Order.CATE_TAKE_OUT){
 					isDelTable = true;
 				}
@@ -78,6 +81,14 @@ public class CancelOrder {
 					  " AND restaurant_id=" + table.restaurantID;
 				dbCon.stmt.addBatch(sql);
 			}else{
+				if(category == Order.CATE_MERGER_TABLE){
+					sql = "UPDATE " + Params.dbName + ".table SET " +
+					  	  "status=" + Table.TABLE_IDLE + ", " +
+					  	  "custom_num=NULL, " +
+					  	  "category=NULL " +
+					  	  "WHERE alias_id=" + table2ID + " AND restaurant_id=" + table.restaurantID;
+					dbCon.stmt.addBatch(sql);
+				}
 				sql = "UPDATE " + Params.dbName + ".table SET " +
 					  "status=" + Table.TABLE_IDLE + ", " +
 					  "custom_num=NULL, " +
