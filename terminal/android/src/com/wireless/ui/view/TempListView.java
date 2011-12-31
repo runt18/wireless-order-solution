@@ -106,7 +106,7 @@ public class TempListView extends ListView {
 							if(name.equals("")){
 								Toast.makeText(_context, "请输入临时菜" + (position + 1) + "的名称", 0).show();
 							}else{
-								food.name = foodNameEdtTxt.getEditableText().toString().trim();
+								food.name = foodNameEdtTxt.getEditableText().toString().replace(",", ";").replace("，", "；").trim();
 								_tmpFoods.set(position, food);
 							}
 						}
@@ -118,7 +118,7 @@ public class TempListView extends ListView {
 			 * 价钱赋值
 			 */
 			final EditText foodPriceEdtTxt = (EditText)view.findViewById(R.id.occasiprice);
-			foodPriceEdtTxt.setText(Util.float2String(food.getPrice()));
+			foodPriceEdtTxt.setText(Util.float2String2(food.getPrice()));
 			foodPriceEdtTxt.setOnFocusChangeListener(new OnFocusChangeListener() {
 				
 				@Override

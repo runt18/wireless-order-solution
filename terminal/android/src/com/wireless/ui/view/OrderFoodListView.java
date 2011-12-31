@@ -286,7 +286,11 @@ public class OrderFoodListView extends ExpandableListView{
 					public void onClick(View v) {
 						_selectedPos = childPosition;
 						if(_operListener != null){
-							_operListener.onPickTaste(_foods.get(childPosition));
+							if(_foods.get(childPosition).isTemporary){
+								Toast.makeText(_context, "临时菜不能添加口味", 0).show();
+							}else{
+								_operListener.onPickTaste(_foods.get(childPosition));								
+							}
 						}
 					}
 				});
