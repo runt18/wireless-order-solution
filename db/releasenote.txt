@@ -11,10 +11,12 @@ Release v1.1.2 <xx/xx/2012>
 2 - Source code is tagged as "1.1.2" in Google Code's SVN
 <Issues>
 1 - 修改region表 
-2 - Table表“region”字段改为“region_id”
-3 - Table表增加“custom_num”字段
-4 - Table表增加“category”字段
-5 - Table表增加“status”字段
+2 - table表“region”字段改为“region_id”
+3 - table表增加“custom_num”字段
+4 - table表增加“category”字段
+5 - table表增加“status”字段
+6 - order表增加“region_id”和“region_name”字段
+7 - order_history表增加“region_id”和“region_name”字段
 ******************************************************************************************************/
 
 /******************************************************************************************************

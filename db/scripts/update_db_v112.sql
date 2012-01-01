@@ -95,3 +95,59 @@ WHERE status IS NULL;
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`table`
 CHANGE COLUMN `status` `status` TINYINT NOT NULL DEFAULT 0 COMMENT 'the status to this table, one of the values below.\n空闲 : 0\n就餐 : 1\n预定 : 2'  AFTER `category`;
+
+-- -----------------------------------------------------
+-- Add 'region_id' and 'region_name' to 'order' table
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order` 
+ADD COLUMN `region_id` TINYINT UNSIGNED DEFAULT 0 COMMENT 'the region id to this order'  AFTER `terminal_pin` , 
+ADD COLUMN `region_name` VARCHAR(45) DEFAULT '' COMMENT 'the region name to this order'  AFTER `region_id` ;
+
+-- -----------------------------------------------------
+-- Update the 'region_id' and 'region_name'
+-- -----------------------------------------------------
+UPDATE wireless_order_db.order A SET 
+A.region_id = (SELECT region_id FROM wireless_order_db.region WHERE region_id=(SELECT region_id FROM wireless_order_db.table WHERE alias_id=A.table_id AND restaurant_id=A.restaurant_id) AND restaurant_id=A.restaurant_id), 
+A.region_name = (SELECT name FROM wireless_order_db.region WHERE region_id=(SELECT region_id FROM wireless_order_db.table WHERE alias_id=A.table_id AND restaurant_id=A.restaurant_id) AND restaurant_id=A.restaurant_id);
+
+UPDATE wireless_order_db.order SET
+region_id = 0 WHERE region_id IS NULL;
+
+UPDATE wireless_order_db.order A SET 
+A.region_name = (SELECT name FROM wireless_order_db.region WHERE region_id=0 AND restaurant_id=A.restaurant_id) WHERE region_name IS NULL;
+
+-- -----------------------------------------------------
+-- Restore the 'region_id' and 'region_name' to NOT NULL
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order` 
+CHANGE COLUMN `region_id` `region_id` TINYINT UNSIGNED NOT NULL DEFAULT '0' COMMENT 'the region id to this order'  , 
+CHANGE COLUMN `region_name` `region_name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the region name to this order'  ;
+
+-- -----------------------------------------------------
+-- Add 'region_id' and 'region_name' to 'order_history' table
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_history` 
+ADD COLUMN `region_id` TINYINT UNSIGNED DEFAULT 0 COMMENT 'the region id to this order'  AFTER `terminal_pin` , 
+ADD COLUMN `region_name` VARCHAR(45) DEFAULT '' COMMENT 'the region name to this order'  AFTER `region_id` ;
+
+-- -----------------------------------------------------
+-- Update the 'region_id' and 'region_name'
+-- -----------------------------------------------------
+UPDATE wireless_order_db.order_history A SET 
+A.region_id = (SELECT region_id FROM wireless_order_db.region WHERE region_id=(SELECT region_id FROM wireless_order_db.table WHERE alias_id=A.table_id AND restaurant_id=A.restaurant_id) AND restaurant_id=A.restaurant_id), 
+A.region_name = (SELECT name FROM wireless_order_db.region WHERE region_id=(SELECT region_id FROM wireless_order_db.table WHERE alias_id=A.table_id AND restaurant_id=A.restaurant_id) AND restaurant_id=A.restaurant_id);
+
+UPDATE wireless_order_db.order_history SET
+region_id = 0 WHERE region_id IS NULL;
+
+UPDATE wireless_order_db.order_history A SET 
+A.region_name = (SELECT name FROM wireless_order_db.region WHERE region_id=0 AND restaurant_id=A.restaurant_id) WHERE region_name IS NULL;
+
+-- -----------------------------------------------------
+-- Restore the 'region_id' and 'region_name' to NOT NULL
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_history` 
+CHANGE COLUMN `region_id` `region_id` TINYINT UNSIGNED NOT NULL DEFAULT '0' COMMENT 'the region id to this order'  , 
+CHANGE COLUMN `region_name` `region_name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the region name to this order'  ;
+
+

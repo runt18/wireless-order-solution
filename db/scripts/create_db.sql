@@ -2,7 +2,6 @@
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 
-DROP SCHEMA IF EXISTS `wireless_order_db` ;
 CREATE SCHEMA IF NOT EXISTS `wireless_order_db` DEFAULT CHARACTER SET utf8 ;
 USE `wireless_order_db` ;
 
@@ -82,6 +81,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order` (
   `member` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the member name' ,
   `terminal_model` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the terminal model to this order' ,
   `terminal_pin` INT NOT NULL DEFAULT 0 COMMENT 'the terminal pin to this order' ,
+  `region_id` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the region id to this order' ,
+  `region_name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the region name to this order' ,
   `table_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the table alias id to this order' ,
   `table_name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the table to this order' ,
   `table2_id` SMALLINT UNSIGNED NULL DEFAULT NULL COMMENT 'the 2nd table alias id to this order(used for table merger)' ,
@@ -304,6 +305,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_history` (
   `member` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the member name' ,
   `terminal_model` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the terminal model to this order' ,
   `terminal_pin` INT NOT NULL DEFAULT 0 COMMENT 'the terminal pin to this order' ,
+  `region_id` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the region id to this order' ,
+  `region_name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the region name to this order' ,
   `table_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the table alias id to this order' ,
   `table_name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the table name to this order' ,
   `table2_id` SMALLINT UNSIGNED NULL DEFAULT NULL COMMENT 'the 2nd table alias id to this order(used for table merger)' ,
@@ -704,7 +707,6 @@ COMMENT = 'describe the category of material' ;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
 
 
 
