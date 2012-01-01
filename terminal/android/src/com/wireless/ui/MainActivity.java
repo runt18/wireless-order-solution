@@ -68,6 +68,8 @@ public class MainActivity extends Activity {
 				 */
 				if(WirelessOrder.foodMenu == null){
 					//TODO make the order related button disabled  
+					((TextView)findViewById(R.id.username)).setText("");
+					((TextView)findViewById(R.id.notice)).setText("");
 				}
 				
 			}else if(message.what == REDRAW_RESTAURANT){
