@@ -81,9 +81,9 @@ var orderedStore = new Ext.data.Store({
 		name : "soldOut"
 	}, {
 		name : "forFree"
-	},{
+	}, {
 		name : "discountRate"
-	},{
+	}, {
 		name : "currPrice"
 	} ])
 });
@@ -93,8 +93,16 @@ orderedStore.reload();
 // 3，栏位模型
 function dishOptTasteHandler(rowIndex) {
 	if (dishOrderCurrRowIndex_ != -1) {
-		dishOrderCurrRowIndex_ = rowIndex;
-		dishTasteWindow.show();
+		if (orderedData[rowIndex][18] == "false") {
+			dishOrderCurrRowIndex_ = rowIndex;
+			dishTasteWindow.show();
+		} else {
+			Ext.MessageBox.show({
+				msg : "临时菜不支持口味选择",
+				width : 300,
+				buttons : Ext.MessageBox.OK
+			});
+		}
 	}
 };
 
@@ -347,15 +355,29 @@ var orderedForm = new Ext.form.FormPanel(
 
 								var foodPara = "";
 								for ( var i = 0; i < orderedData.length; i++) {
-									foodPara = foodPara + "["
-											+ orderedData[i][6] + "," // 菜品1编号
-											+ orderedData[i][2] + "," // 菜品1数量
-											+ orderedData[i][8] + "," // 口味1编号
-											+ orderedData[i][7] + ","// 厨房1编号
-											+ orderedData[i][13] + "," // 折扣率
-											+ orderedData[i][15] + ","// 2nd口味1编号
-											+ orderedData[i][16] // 3rd口味1编号
-											+ "]，";
+									if (orderedData[i][18] == "false") {
+										// [是否临时菜(false),菜品1编号,菜品1数量,口味1编号,厨房1编号,菜品1折扣,2nd口味1编号,3rd口味1编号]
+										foodPara = foodPara + "[false,"// 是否临时菜(false)
+												+ orderedData[i][6] + "," // 菜品1编号
+												+ orderedData[i][2] + "," // 菜品1数量
+												+ orderedData[i][8] + "," // 口味1编号
+												+ orderedData[i][7] + ","// 厨房1编号
+												+ orderedData[i][13] + "," // 折扣率
+												+ orderedData[i][15] + ","// 2nd口味1编号
+												+ orderedData[i][16] // 3rd口味1编号
+												+ "]，";
+									} else {
+										// 是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价
+										var price = orderedData[i][3].substr(1,
+												orderedData[i][3].length - 1);
+										foodPara = foodPara + "[true,"// 是否临时菜(true)
+												+ orderedData[i][6] + "," // 临时菜1编号
+												+ orderedData[i][19] + "," // 临时菜1名称
+												+ orderedData[i][2] + "," // 临时菜1数量
+												+ price + "" // 临时菜1单价(原材料單價)
+												+ "]，";
+									}
+
 								}
 								foodPara = "{"
 										+ foodPara.substr(0,
@@ -1332,7 +1354,7 @@ var dishesDisplayGrid = new Ext.grid.GridPanel({
 					"￥0",// ￥口味价钱
 					0,// 口味编号2
 					0, // 口味编号3
-					dishesDisplayDataShow[rowIndex][9]// 時
+					dishesDisplayDataShow[rowIndex][9] // 時
 					]);
 				}
 				orderedStore.reload();
@@ -1381,7 +1403,7 @@ var dishesChooseBySpellForm = new Ext.form.FormPanel({
 				anchor : "90%",
 				listeners : {
 					focus : function(thiz) {
-						//softKeyBoardDO.hide();
+						// softKeyBoardDO.hide();
 					},
 					render : function(thiz) {
 						dishSpellOnLoad();

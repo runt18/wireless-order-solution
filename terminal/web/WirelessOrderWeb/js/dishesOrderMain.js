@@ -513,16 +513,29 @@ var orderedForm = new Ext.form.FormPanel(
 
 								var foodPara = "";
 								for ( var i = 0; i < orderedData.length; i++) {
-									// 菜品1编号,菜品1数量,口味1编号,厨房1编号,菜品1折扣,2nd口味1编号,3rd口味1编号
-									foodPara = foodPara + "["
-											+ orderedData[i][6] + "," // 菜品1编号
-											+ orderedData[i][2] + "," // 菜品1数量
-											+ orderedData[i][8] + "," // 口味1编号
-											+ orderedData[i][7] + ","// 厨房1编号
-											+ "0,"// 菜品1折扣
-											+ orderedData[i][14] + ","// 2nd口味1编号
-											+ orderedData[i][15] // 3rd口味1编号
-											+ "]，";
+									if (orderedData[i][18] == "false") {
+										// [是否临时菜(false),菜品1编号,菜品1数量,口味1编号,厨房1编号,菜品1折扣,2nd口味1编号,3rd口味1编号]，
+										foodPara = foodPara + "[false,"// 是否临时菜(false)
+												+ orderedData[i][6] + "," // 菜品1编号
+												+ orderedData[i][2] + "," // 菜品1数量
+												+ orderedData[i][8] + "," // 口味1编号
+												+ orderedData[i][7] + ","// 厨房1编号
+												+ "0,"// 菜品1折扣
+												+ orderedData[i][14] + ","// 2nd口味1编号
+												+ orderedData[i][15] // 3rd口味1编号
+												+ "]，";
+									} else {
+										// [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价]，
+										var price = orderedData[i][3].substr(1,
+												orderedData[i][3].length - 1);
+										foodPara = foodPara + "[true,"// 是否临时菜(true)
+												+ orderedData[i][6] + "," // 临时菜1编号
+												+ orderedData[i][19] + "," // 临时菜1名称
+												+ orderedData[i][2] + "," // 临时菜1数量
+												+ price + "" // 临时菜1单价(原料單價)
+												+ "]，";
+									}
+
 								}
 								foodPara = "{"
 										+ foodPara.substr(0,
@@ -1816,7 +1829,7 @@ var dishesDisplayTabPanel = new Ext.TabPanel({
 						dishesDisplayData[i][1], dishesDisplayData[i][2],
 						dishesDisplayData[i][3], dishesDisplayData[i][4],
 						dishesDisplayData[i][5], dishesDisplayData[i][6],
-						dishesDisplayData[i][7],dishesDisplayData[i][8],
+						dishesDisplayData[i][7], dishesDisplayData[i][8],
 						dishesDisplayData[i][9] ]);
 			}
 			dishesDisplayStore.reload();

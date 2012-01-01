@@ -190,9 +190,12 @@ var billListRefresh = function() {
 			}
 		}
 		// alert(orderedData[i][12]);
-		if (orderedData[i][9] == "true" || orderedData[i][12] == "true") {
+		if (orderedData[i][9] == "true" || orderedData[i][12] == "true"
+				|| orderedData[i][18] == "true") {
+			// 特价，送，臨時菜 不打折
 			orderedData[i][13] = "1.0";
 		} else {
+			// 非 特价，送，臨時菜
 			orderedData[i][13] = discountRate;
 		}
 	}

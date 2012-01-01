@@ -32,7 +32,7 @@ var dishKeyboardSelect = function(relateItemId) {
 	}
 };
 
-function dishSpellOnLoad(){
+function dishSpellOnLoad() {
 	// keyboard input dish spell
 	$("#orderSpell")
 			.bind(
@@ -118,8 +118,8 @@ function billModifyOnLoad() {
 	// .setTitle("<div style='font-size:18px;padding-left:2px'>帐单修改<div>");
 
 	// 已点菜式查询
-	// 格式：[菜名，口味，数量，￥单价，操作，￥实价，菜名编号，厨房编号，口味编号1,特,荐,停,送,折扣率,￥口味价钱,口味编号2,口味编号3,時]
-	// 后台：["菜名",菜名编号,厨房编号,"口味",口味编号,数量,￥单价,是否特价,是否推荐,是否停售,是否赠送,折扣率,口味编号2,口味编号3,￥口味价钱,時]
+	// 格式：[菜名，口味，数量，￥单价，操作，￥实价，菜名编号，厨房编号，口味编号1,特,荐,停,送,折扣率,￥口味价钱,口味编号2,口味编号3,時,是否临时菜,菜名ORIG]
+	// 后台：["菜名",菜名编号,厨房编号,"口味",口味编号,数量,￥单价,是否特价,是否推荐,是否停售,是否赠送,折扣率,口味编号2,口味编号3,￥口味价钱,時,是否临时菜]
 	Ext.Ajax
 			.request({
 				url : "../QueryOrder.do",
@@ -167,7 +167,10 @@ function billModifyOnLoad() {
 										tastePrice,// 口味价钱
 										orderInfo[12],// 口味编号2
 										orderInfo[13], // 口味编号3
-										orderInfo[15] // 時
+										orderInfo[15], // 時
+										orderInfo[16], // 是否临时菜
+										orderInfo[0].substr(1,
+												orderInfo[0].length - 2) // 菜名ORIG
 								]);
 							}
 
@@ -197,6 +200,11 @@ function billModifyOnLoad() {
 									// 時
 									orderedData[i][0] = orderedData[i][0]
 											+ "<img src='../images/currPrice.png'></img>";
+								}
+								if (orderedData[i][18] == "true") {
+									// 臨
+									orderedData[i][0] = orderedData[i][0]
+											+ "<img src='../images/tempDish.png'></img>";
 								}
 							}
 
