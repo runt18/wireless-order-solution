@@ -133,6 +133,7 @@ public class QueryTable {
 			table.custom_num = dbCon.rs.getShort("custom_num");
 			table.category = dbCon.rs.getShort("category");
 			table.status = dbCon.rs.getShort("status");
+			table.regionID = dbCon.rs.getShort("region_id");
 		}else{
 			throw new BusinessException("The table(alias_id=" + tableID + ") to query does NOT exist.", ErrorCode.TABLE_NOT_EXIST);
 		}

@@ -7,6 +7,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.Region;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Terminal;
@@ -144,15 +145,22 @@ public class InsertOrder {
 				}
 
 				/**
+				 * Get the region to this table
+				 */
+				Region region = QueryRegion.exec(dbCon, table.restaurantID, table.alias_id);
+				
+				/**
 				 * Insert to 'order' table.
 				 */
 				sql = "INSERT INTO `" + Params.dbName + "`.`order` (" +
-						"`id`, `restaurant_id`, `category`, `table_id`, " +
-						"`table_name`, `table2_id`, `table2_name`, `terminal_model`, " +
+						"`id`, `restaurant_id`, `category`, `region_id`, `region_name`, " +
+						"`table_id`, `table_name`, `table2_id`, `table2_name`, `terminal_model`, " +
 						"`terminal_pin`, `order_date`, `custom_num`, `waiter`) VALUES (" +
 						"NULL, " + 
 						table.restaurantID + ", " + 
 						orderToInsert.category + ", " +
+						region.regionID + ", '" +
+						region.name + "', " +
 						orderToInsert.table_id + ", '" + 
 						orderToInsert.table_name + "', " +
 						(orderToInsert.category == Order.CATE_MERGER_TABLE ? orderToInsert.table2_id : "NULL") + ", " +

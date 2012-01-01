@@ -80,4 +80,58 @@ public class QueryRegion {
 		
 		return regions.toArray(new Region[regions.size()]);
 	}
+	
+	/**
+	 * Get the region to a specific restaurant and table
+	 * @param dbCon
+	 * 			the database connection
+	 * @param restaurantID
+	 * 			the restaurant id
+	 * @param tableID
+	 * 			the table id
+	 * @return the region information to a specific restaurant and table
+	 * @throws SQLException
+	 * 			throws if fail to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the table does NOT belong to any region
+	 */
+	public static Region exec(int restaurantID, int tableID) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return exec(dbCon, restaurantID, tableID);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the region to a specific restaurant and table
+	 * @param dbCon
+	 * 			the database connection
+	 * @param restaurantID
+	 * 			the restaurant id
+	 * @param tableID
+	 * 			the table id
+	 * @return the region information to a specific restaurant and table
+	 * @throws SQLException
+	 * 			throws if fail to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the table does NOT belong to any region
+	 */
+	public static Region exec(DBCon dbCon, int restaurantID, int tableID) throws SQLException, BusinessException{
+		String sql = "SELECT * FROM " + Params.dbName + 
+					 ".region WHERE restaurant_id=" + restaurantID +
+					 " AND region_id=" +
+					 "(SELECT region_id FROM " + Params.dbName + ".table WHERE restaurant_id=" + restaurantID +
+					 " AND alias_id=" + tableID + ")";
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		
+		if(dbCon.rs.next()){
+			return new Region(dbCon.rs.getShort("region_id"),
+							  dbCon.rs.getString("name"));
+		}else{
+			throw new BusinessException("The table(id=" + tableID + ") to restaurant(id=" + restaurantID + ") does NOT belong to any region.");
+		}
+	}
 }

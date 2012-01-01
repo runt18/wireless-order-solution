@@ -8,6 +8,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.Region;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Terminal;
@@ -386,12 +387,19 @@ public class UpdateOrder {
 		}
 
 		/**
+		 * Get the region to this table
+		 */
+		Region region = QueryRegion.exec(dbCon, term.restaurant_id, orderToUpdate.table_id);
+		
+		/**
 		 * Update the related info to this order
 		 */
 		sql = "UPDATE `" + Params.dbName + "`.`order` SET custom_num=" + orderToUpdate.custom_num +
 				", terminal_pin=" + term.pin + 
-				", waiter='" + term.owner + 
-				"', table_id=" + orderToUpdate.table_id + 
+				", waiter='" + term.owner + "'" +
+				", region_id=" + region.regionID +
+				", region_name='" + region.name + "'" + 
+				", table_id=" + orderToUpdate.table_id + 
 				", table_name='" + orderToUpdate.table_name + "'" +
 				" WHERE id=" + orderToUpdate.id;
 		dbCon.stmt.addBatch(sql);
