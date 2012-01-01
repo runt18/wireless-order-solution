@@ -47,6 +47,7 @@
   android:layout_toRightOf="@id/table"
   android:inputType="numberSigned|text"  
   android:background="@drawable/input"  
+  android:focusableInTouchMode="true"
   android:singleLine="true" 
   android:layout_marginTop="10dip"
   />  
