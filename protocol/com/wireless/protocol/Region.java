@@ -16,6 +16,10 @@ public class Region {
 	public short regionID = REGION_1;
 	public String name;
 	
+	public Region(){
+		
+	}
+	
 	public Region(short regionID, String name){
 		this.regionID = regionID;
 		this.name = name;
