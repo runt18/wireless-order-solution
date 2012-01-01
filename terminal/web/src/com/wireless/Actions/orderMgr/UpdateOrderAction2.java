@@ -75,8 +75,11 @@ public class UpdateOrderAction2 extends Action{
 			 *           No need to pass this parameter if no comment input. 
 			 *           
 			 * foods : the food string whose format looks like below.
-			 *         {[菜品1编号,菜品1数量,口味1编号,厨房1编号,菜品1折扣]，[菜品2编号,菜品2数量,口味2编号,厨房2编号,菜品2折扣]，...}
-			 */
+			 * 			{[是否临时菜(false),菜品1编号,菜品1数量,口味1编号,厨房1编号,菜品1折扣,2nd口味1编号,3rd口味1编号]，
+			 * 			 [是否临时菜(false),菜品2编号,菜品2数量,口味2编号,厨房2编号,菜品2折扣,2nd口味1编号,3rd口味1编号]，...
+			 * 			 [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价]，
+			 * 			 [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价]...}			 
+			 **/
 			String pin = request.getParameter("pin");
 			if(pin.startsWith("0x") || pin.startsWith("0X")){
 				pin = pin.substring(2);
