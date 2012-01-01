@@ -86,9 +86,9 @@ $editType = $_POST["editType"];
 if($editType == "dailyCheckOut")
 {	
 	$sql1 = "INSERT INTO `order_history`(`id`, `restaurant_id`,`order_date`, `total_price`,`total_price_2`, `custom_num`, 
-			`waiter`,`type`, `discount_type`, `member_id`, `member`,`terminal_pin`, `terminal_model`, `table_id`, `table_name`,service_rate,comment)
+			`waiter`,`type`, `discount_type`, `member_id`, `member`,`terminal_pin`, `terminal_model`, `region_id`, `region_name`, `table_id`, `table_name`,service_rate,comment)
 			SELECT `id`, `restaurant_id`,`order_date`, `total_price`,`total_price_2`, `custom_num`, 
-			`waiter`,`type`, `discount_type`, `member_id`, `member`,`terminal_pin`, `terminal_model`, `table_id`, `table_name`,service_rate,comment FROM `order` WHERE total_price IS NOT NULL AND restaurant_id=" . $_SESSION["restaurant_id"];		
+			`waiter`,`type`, `discount_type`, `member_id`, `member`,`terminal_pin`, `terminal_model`, `region_id`, `region_name`, `table_id`, `table_name`,service_rate,comment FROM `order` WHERE total_price IS NOT NULL AND restaurant_id=" . $_SESSION["restaurant_id"];		
 
 	$sql2 = "INSERT INTO `order_food_history`(`id`,`restaurant_id`, `order_id`, `food_id`, `order_date`, `order_count`, 
 			`unit_price`,`name`, `taste`,`taste_price`,`taste_id`,`taste_id2`,`taste_id3`,`discount`,
