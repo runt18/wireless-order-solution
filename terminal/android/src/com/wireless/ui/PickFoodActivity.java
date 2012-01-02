@@ -8,6 +8,7 @@ import java.util.List;
 
 import android.app.Dialog;
 import android.app.TabActivity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -18,7 +19,11 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
@@ -32,6 +37,7 @@ import android.widget.Toast;
 
 import com.wireless.common.OrderParcel;
 import com.wireless.common.WirelessOrder;
+import com.wireless.protocol.Department;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Order;
@@ -225,7 +231,7 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 	 */
 	private void setupNumberView(){
 		final PickFoodListView pickLstView = (PickFoodListView)findViewById(R.id.pickByNumLstView);
-		EditText filterNumEdtTxt = ((EditText)findViewById(R.id.filterNumEdtTxt));
+		final EditText filterNumEdtTxt = ((EditText)findViewById(R.id.filterNumEdtTxt));
 		filterNumEdtTxt.setText("");
 		pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods, PickFoodListView.TAG_NUM);
 		pickLstView.setFoodPickedListener(this);
@@ -235,6 +241,22 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 			public void onClick(View v) {
 				onBackPressed();
 				finish();
+				
+			}
+		});
+		
+		pickLstView.setOnScrollListener(new OnScrollListener() {
+			
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
+				InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.hideSoftInputFromWindow(filterNumEdtTxt.getWindowToken(), 0);
+			}
+			
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem,
+					int visibleItemCount, int totalItemCount) {
+				// TODO Auto-generated method stub
 				
 			}
 		});
@@ -274,7 +296,7 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 	private void setupKitchenView(){
 		final PickFoodListView pickLstView = (PickFoodListView)findViewById(R.id.pickByKitchenLstView);
 		RelativeLayout filterKitchen = (RelativeLayout)findViewById(R.id.filterKitchenRelaLayout);
-		EditText filterKitEdtTxt = (EditText)findViewById(R.id.filterKitchenEdtTxt);
+		final EditText filterKitEdtTxt = (EditText)findViewById(R.id.filterKitchenEdtTxt);
 		filterKitEdtTxt.setText("");
 		//初始化的时候厨房默认显示的厨房信息
 		ketchenName = (TextView)findViewById(R.id.Spinner01);
@@ -287,6 +309,22 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 			public void onClick(View v) {
 				onBackPressed();
 				finish();
+				
+			}
+		});
+        
+	     pickLstView.setOnScrollListener(new OnScrollListener() {
+			
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
+				InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.hideSoftInputFromWindow(filterKitEdtTxt.getWindowToken(), 0);
+			}
+			
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem,
+					int visibleItemCount, int totalItemCount) {
+				// TODO Auto-generated method stub
 				
 			}
 		});
@@ -343,7 +381,7 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 	 */
 	private void setupPinyinView(){
 		final PickFoodListView pickLstView = (PickFoodListView)findViewById(R.id.pickByPinyinLstView);
-		EditText filterPinyinEdtTxt = (EditText)findViewById(R.id.filterPinyinEdtTxt);
+		final EditText filterPinyinEdtTxt = (EditText)findViewById(R.id.filterPinyinEdtTxt);
 		filterPinyinEdtTxt.setText("");
 		pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods, PickFoodListView.TAG_PINYIN);
 		pickLstView.setFoodPickedListener(this);
@@ -356,6 +394,23 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 				
 			}
 		});
+        
+           pickLstView.setOnScrollListener(new OnScrollListener() {
+			
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
+				InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.hideSoftInputFromWindow(filterPinyinEdtTxt.getWindowToken(), 0);
+			}
+			
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem,
+					int visibleItemCount, int totalItemCount) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+        
 		/**
 		 * 按拼音进行菜品的筛选
 		 */
@@ -499,14 +554,19 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 				_kitchenChild.add(kitchens);
 			}
 			
-			setContentView(R.layout.expander_list_view);
+		
+
+			
+			View dialogContent = View.inflate(PickFoodActivity.this, 
+					R.layout.expander_list_view, null);
 			setTitle("请选择厨房");
-			ExpandableListView kitchenLstView = (ExpandableListView)findViewById(R.id.kitchenSelectLstView);
+			ExpandableListView kitchenLstView = (ExpandableListView)dialogContent.findViewById(R.id.kitchenSelectLstView);
 			//kitchenLstView.setGroupIndicator(getResources().getDrawable(R.layout.expander_folder));
 			
 			//设置ListView的Adaptor
 			kitchenLstView.setAdapter(new BaseExpandableListAdapter() {
 				
+
 				@Override
 				public int getGroupCount() {
 					return _deptParent.size();
@@ -563,6 +623,7 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 					return view;
 				}
 
+				
 				@Override
 				public View getChildView(int groupPosition, int childPosition,
 						boolean isLastChild, View convertView, ViewGroup parent) {
@@ -581,6 +642,11 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 					return true;
 				}
 			});
+			
+//			设置展开所有的二级菜单
+			for(int i=0;i<_deptParent.size();i++)
+				kitchenLstView.expandGroup(i);
+
 			
 			/**
 			 * 选择某个厨房后，筛选出相应的菜品，并更新ListView
@@ -606,6 +672,15 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 					return true;					
 				}
 			});
+			
+			Button dialogBackBtn = (Button) dialogContent.findViewById(R.id.dialog_back_btn);
+			dialogBackBtn.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					dismiss();
+				}
+			});
+			setContentView(dialogContent);
 		}
 		
 	}
@@ -665,6 +740,21 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 	    }
 		
 	   return false;
+	}
+
+	@Override
+	public void cleanEditText() {
+		if(_tabHost.getCurrentTab() == 0){
+			final EditText filterNumEdtTxt = ((EditText)findViewById(R.id.filterNumEdtTxt));
+			filterNumEdtTxt.setText("");
+		}else if(_tabHost.getCurrentTab() == 1){
+			final EditText filterKitEdtTxt = (EditText)findViewById(R.id.filterKitchenEdtTxt);
+			filterKitEdtTxt.setText("");
+		}else if(_tabHost.getCurrentTab() == 2){
+			final EditText filterPinyinEdtTxt = (EditText)findViewById(R.id.filterPinyinEdtTxt);
+			filterPinyinEdtTxt.setText("");
+		}
+		
 	}
 	        
 
