@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
@@ -29,10 +30,10 @@ public class PickFoodListView extends ListView {
 	private BaseAdapter _adapter = null;
 	private OnFoodPickedListener _foodPickedListener;
 	private int _tag;
-	
 	public PickFoodListView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		_context = context;
+
 
 		/**
 		 * 点击每个菜品后弹出点菜数量Dialog
@@ -160,16 +161,20 @@ public class PickFoodListView extends ListView {
 			okBtn.setText("确定");
 			okBtn.setOnClickListener(new View.OnClickListener() {
 				@Override
-				public void onClick(View v) {
+				public void onClick(View v) {		
 					OrderFood food = new OrderFood(selectedFood);
-
-					float orderAmount = Float.parseFloat(((EditText)findViewById(R.id.mycount)).getText().toString());
-					food.setCount(orderAmount);
-					
-					if(_foodPickedListener != null){
-						_foodPickedListener.onPicked(food);
+					if(((EditText)findViewById(R.id.mycount)).getText().toString().equals("")||((EditText)findViewById(R.id.mycount)).getText().toString()== null){
+						Toast.makeText(_context, "输入的数量不能为空", 0).show();
+					}else{
+						float orderAmount = Float.parseFloat(((EditText)findViewById(R.id.mycount)).getText().toString());
+						food.setCount(orderAmount);
+						
+						if(_foodPickedListener != null){
+							_foodPickedListener.onPicked(food);
+						}
 					}
 					
+					_foodPickedListener.cleanEditText();
 					dismiss();
 				}
 			});
@@ -194,6 +199,8 @@ public class PickFoodListView extends ListView {
 		 * 			选中Food的信息
 		 */
 		public void onPicked(OrderFood food);
+		
+		public void cleanEditText();
 	}
 
 }
