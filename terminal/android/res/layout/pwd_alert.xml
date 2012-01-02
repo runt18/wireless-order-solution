@@ -39,6 +39,8 @@
   android:typeface="sans"
   android:textStyle="bold"
   android:background="@null"
+  android:singleLine="true"
+  android:inputType="number|text"
   android:layout_below="@id/line1"
   android:layout_marginLeft="10dip"   
 

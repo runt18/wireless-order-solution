@@ -26,6 +26,7 @@
     android:layout_centerVertical="true"
     android:hint="菜名"
     android:gravity="center"
+    android:singleLine="true"
     android:layout_toRightOf="@id/occasin"
     android:layout_alignTop="@id/occasin"
     android:layout_marginLeft="10dip"
@@ -51,6 +52,9 @@
     android:layout_below="@id/occasiname"
     android:layout_marginTop="10dip"
     android:layout_alignLeft="@id/occasiname"
+    android:digits="0123456789."
+	android:singleLine="true"
+	android:inputType="number"
     />
     
       <EditText 
@@ -64,6 +68,9 @@
     android:hint="数量"
     android:gravity="center"
     android:layout_alignLeft="@id/occasiname"
+    android:digits="0123456789."
+	android:singleLine="true"
+	android:inputType="number"
     />
     <TextView 
     android:layout_width="fill_parent"

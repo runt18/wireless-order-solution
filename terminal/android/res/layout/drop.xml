@@ -38,6 +38,8 @@
 			android:focusableInTouchMode="true" android:id="@+id/valueplatform"
 			android:layout_width="90dip" android:layout_height="wrap_content"
 			android:textSize="20sp" android:textColor="#000000"
+			android:digits="0123456789."
+			android:singleLine="true"
 			android:layout_centerVertical="true" android:layout_toRightOf="@id/platform"
 			android:layout_marginLeft="5dip" android:background="#00000000"
 			android:inputType="numberSigned|text"></EditText>
@@ -54,6 +56,8 @@
 			android:focusableInTouchMode="true" android:id="@+id/valuepeople"
 			android:layout_width="100dip" android:layout_height="wrap_content"
 			android:textSize="20sp" android:textColor="#000000"
+			android:digits="0123456789."
+			android:singleLine="true"
 			android:layout_centerVertical="true" android:layout_toRightOf="@id/people"
 			android:layout_marginLeft="3dip" android:background="#00000000"
 			android:inputType="numberSigned|text"></EditText>
