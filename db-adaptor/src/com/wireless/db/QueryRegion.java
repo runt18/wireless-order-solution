@@ -72,7 +72,7 @@ public class QueryRegion {
 			 ".region WHERE restaurant_id=" + restaurantID;
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
+		while(dbCon.rs.next()){
 			regions.add(new Region(dbCon.rs.getShort("region_id"),
 								   dbCon.rs.getString("name")));
 		}
