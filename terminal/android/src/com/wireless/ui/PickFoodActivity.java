@@ -32,7 +32,6 @@ import android.widget.Toast;
 
 import com.wireless.common.OrderParcel;
 import com.wireless.common.WirelessOrder;
-import com.wireless.protocol.Department;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Order;
