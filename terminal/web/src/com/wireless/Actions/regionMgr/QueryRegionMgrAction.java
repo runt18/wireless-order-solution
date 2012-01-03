@@ -1,4 +1,4 @@
-package com.wireless.Actions.tableSelect;
+package com.wireless.Actions.regionMgr;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -19,26 +19,24 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.QueryTable;
+import com.wireless.db.Params;
+import com.wireless.db.QueryRegion;
 import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.Order;
-import com.wireless.protocol.Table;
+import com.wireless.protocol.Region;
 import com.wireless.protocol.Terminal;
 
-public class QueryTableAction extends Action {
-
-	private static final long serialVersionUID = 1L;
+public class QueryRegionMgrAction extends Action {
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 
-		PrintWriter out = null;
-		
 		DBCon dbCon = new DBCon();
-		
+
+		PrintWriter out = null;
+
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
 		int index = 0;
@@ -59,104 +57,61 @@ public class QueryTableAction extends Action {
 		// 是否combo
 		String isCombo = request.getParameter("isCombo");
 
-		//String jsonResp = "{success:$(result), data:'$(value)'}";
 		try {
 			// 解决后台中文传到前台乱码
 			response.setContentType("text/json; charset=utf-8");
 			out = response.getWriter();
-			
+
+			/**
+			 * The parameters looks like below. 1st example, filter the order
+			 * whose id equals 321 pin=0x1 & type=1 & ope=1 & value=321 2nd
+			 * example, filter the order date greater than or equal 2011-7-14
+			 * 14:30:00 pin=0x1 & type=3 & ope=2 & value=2011-7-14 14:30:00
+			 * 
+			 * pin : the pin the this terminal type : the type is one of the
+			 * values below. 0 - 全部 1 - 名称 2 - 电话 3 - 地址 ope : the operator is
+			 * one of the values below. 1 - 等于 2 - 大于等于 3 - 小于等于 value : the
+			 * value to search, the content is depending on the type isSpecial :
+			 * additional condition. isRecommend : additional condition. isFree
+			 * : additional condition. isStop : additional condition.
+			 */
+
 			String pin = request.getParameter("pin");
-			if(pin.startsWith("0x") || pin.startsWith("0X")){
+			if (pin.startsWith("0x") || pin.startsWith("0X")) {
 				pin = pin.substring(2);
 			}
-			
+
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, Integer.parseInt(pin, 16),
 					Terminal.MODEL_STAFF);
-			
-			Table[] tables = QueryTable.exec(Integer.parseInt(pin, 16), Terminal.MODEL_STAFF);
-			
-//			jsonResp = jsonResp.replace("$(result)", "true");
-//			// format the table results into response string in the form of JSON
-//			if (tables.length == 0) {
-//				jsonResp = jsonResp.replace("$(value)", "");
-//			} else {
-//
-//				StringBuffer value = new StringBuffer();
-//				for (int i = 0; i < tables.length; i++) {
-//					/**
-//					 * The json format of table query looks like below.
-//					 * ID，別名編號，名稱，區域，人數，狀態，種類，最低消費
-//					 * ["餐台1编号","餐台1人数","占用","餐台1名称","一般",0]，["餐台2编号","餐台2人数","空桌","餐台2名称","外卖",300.50]
-//					 */
-//					String jsonTable = "[\"$(alias_id)\",\"$(custom_num)\",\"$(status)\",\"$(alias_name)\",\"$(category)\",$(minimum_cost)]";
-//					jsonTable = jsonTable.replace("$(alias_id)", Integer.toString(tables[i].alias_id));
-//					jsonTable = jsonTable.replace("$(custom_num)", new Short(tables[i].custom_num).toString());
-//					
-//					if(tables[i].name != null){
-//						jsonTable = jsonTable.replace("$(alias_name)", tables[i].name);						
-//					}else{
-//						jsonTable = jsonTable.replace("$(alias_name)", "");		
-//					}
-//					
-//					if(tables[i].status == Table.TABLE_BUSY) {
-//						jsonTable = jsonTable.replace("$(status)", "占用");
-//					}else{
-//						jsonTable = jsonTable.replace("$(status)", "空桌");
-//					}
-//					
-//					if(tables[i].category == Order.CATE_NORMAL){
-//						jsonTable = jsonTable.replace("$(category)", "一般");
-//						
-//					}else if(tables[i].category == Order.CATE_TAKE_OUT){
-//						jsonTable = jsonTable.replace("$(category)", "外卖");
-//						
-//					}else if(tables[i].category == Order.CATE_JOIN_TABLE){
-//						jsonTable = jsonTable.replace("$(category)", "并台");
-//						
-//					}else if(tables[i].category == Order.CATE_MERGER_TABLE){
-//						jsonTable = jsonTable.replace("$(category)", "拼台");
-//						
-//					}else{
-//						jsonTable = jsonTable.replace("$(category)", "一般");
-//					}
-//					
-//					jsonTable = jsonTable.replace("$(minimum_cost)", tables[i].getMinimumCost().toString());
-//					
-//					// put each json table info to the value
-//					value.append(jsonTable);
-//					// the string is separated by comma
-//					if (i != tables.length - 1) {
-//						value.append("，");
-//					}
-//				}
-//
-//				jsonResp = jsonResp.replace("$(value)", value);
-//			}
-			
-			
-			for(int i=0;i<tables.length;i++) {
-				//ID，別名編號，名稱，區域，人數，狀態，種類，最低消費
+
+			Region[] regions = QueryRegion.exec(Integer.parseInt(pin, 16),
+					Terminal.MODEL_STAFF);
+
+			// String sql = " SELECT region_id, name " + " FROM " +
+			// Params.dbName
+			// + ".region " + " WHERE restaurant_id = "
+			// + term.restaurant_id + " ORDER BY region_id ";
+			//
+			// dbCon.rs = dbCon.stmt.executeQuery(sql);
+
+			// while (dbCon.rs.next()) {
+			for (int i = 0; i < regions.length; i++) {
 				HashMap resultMap = new HashMap();
-				
-				resultMap.put("tableID", tables[i].alias_id);
-				resultMap.put("tableAlias", tables[i].alias_id);
-				resultMap.put("tableName", tables[i].name);
-				resultMap.put("tableRegion", tables[i].regionID);
-				resultMap.put("tableCustNbr", tables[i].custom_num);
-				resultMap.put("tableStatus", tables[i].status);
-				resultMap.put("tableCategory", tables[i].category);
-				resultMap.put("tableMinCost", tables[i].getMinimumCost());	
+				/**
+				 * The json to each order looks like below 編號，名稱
+				 */
+				resultMap.put("regionID", regions[i].regionID);
+				resultMap.put("regionName", regions[i].name);
 
 				resultMap.put("message", "normal");
 
 				resultList.add(resultMap);
 
 			}
-			
-			
+			dbCon.rs.close();
 
-		} catch(BusinessException e){
+		} catch (BusinessException e) {
 			e.printStackTrace();
 			HashMap resultMap = new HashMap();
 			if (e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
@@ -164,23 +119,23 @@ public class QueryTableAction extends Action {
 			} else if (e.errCode == ErrorCode.TERMINAL_EXPIRED) {
 				resultMap.put("message", "终端已过期，请重新确认");
 			} else {
-				resultMap.put("message", "没有获取到信息，请重新确认");
+				resultMap.put("message", "没有获取到区域信息，请重新确认");
 			}
 			resultList.add(resultMap);
 			isError = true;
-		}catch(SQLException e){
+		} catch (SQLException e) {
 			e.printStackTrace();
 			HashMap resultMap = new HashMap();
 			resultMap.put("message", "数据库请求发生错误，请确认网络是否连接正常");
 			resultList.add(resultMap);
 			isError = true;
-		}catch(IOException e){
+		} catch (IOException e) {
 			e.printStackTrace();
 			HashMap resultMap = new HashMap();
 			resultMap.put("message", "数据库请求发生错误，请确认网络是否连接正常");
 			resultList.add(resultMap);
 			isError = true;
-		}finally{
+		} finally {
 			dbCon.disconnect();
 
 			String outString = "";
@@ -196,13 +151,13 @@ public class QueryTableAction extends Action {
 					for (int i = 0; i < resultList.size(); i++) {
 
 						outString = outString
-								+ "{tableID:"
-								+ ((HashMap) (resultList.get(i))).get("tableID")
-										.toString() + ",";
-						outString = outString
-								+ "tableName:'"
+								+ "{regionID:"
 								+ ((HashMap) (resultList.get(i))).get(
-										"tableName").toString() + "'},";
+										"regionID").toString() + ",";
+						outString = outString
+								+ "regionName:'"
+								+ ((HashMap) (resultList.get(i))).get(
+										"regionName").toString() + "'},";
 
 					}
 					outString = outString.substring(0, outString.length() - 1);
@@ -245,5 +200,4 @@ public class QueryTableAction extends Action {
 		}
 		return null;
 	}
-
 }
