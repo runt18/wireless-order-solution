@@ -29,7 +29,37 @@ public class QueryRegion {
 		try{
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, pin, model);
-			return exec(dbCon, term.restaurant_id);
+			return exec(dbCon, term.restaurant_id, null, null);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the regions that this terminal attached to.
+	 * @param extraCond
+	 * 			the extra condition to the SQL statement
+	 * @param orderClause
+	 * 			the order clause to the SQL statement
+	 * @param pin 
+	 * 			the pin value to this terminal
+	 * @param model
+	 * 			the model value to this terminal
+	 * @return the regions that the terminal attached to
+	 * @throws SQLException
+	 * 			throws if fail to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if either of cases below.<br>
+	 * 			- The terminal is NOT attached to any restaurant.<br>
+	 * 			- The terminal is expired.<br>
+	 * 			- The restaurant this terminal attached to does NOT exist.
+	 */
+	public static Region[] exec(int pin, short model, String extraCond, String orderClause) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			Terminal term = VerifyPin.exec(dbCon, pin, model);
+			return exec(dbCon, term.restaurant_id, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -47,7 +77,29 @@ public class QueryRegion {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return exec(dbCon, restaurantID);
+			return exec(dbCon, restaurantID, null, null);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the regions according to a specific restaurant id.
+	 * @param extraCond
+	 * 			the extra condition to the SQL statement
+	 * @param orderClause
+	 * 			the order clause to the SQL statement
+	 * @param restaurantID 
+	 * 			the restaurant id
+	 * @return the regions to this restaurant
+	 * @throws SQLException 
+	 * 			throws if any error occurred while execute the SQL statement
+	 */
+	public static Region[] exec(int restaurantID, String extraCond, String orderClause) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return exec(dbCon, restaurantID, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -64,12 +116,33 @@ public class QueryRegion {
 	 * @throws SQLException 
 	 * 			throws if any error occurred while execute the SQL statement
 	 */
-	public static Region[] exec(DBCon dbCon, int restaurantID) throws SQLException{ 
+	public static Region[] exec(DBCon dbCon, int restaurantID) throws SQLException{		
+		return exec(dbCon, restaurantID, null, null);
+	}
+	
+	/**
+	 * Get the regions according to a specific restaurant id.
+	 * Note that the database should be connected before invoking this method.
+	 * @param restaurantID 
+	 * 			the restaurant id
+	 * @param dbCon
+	 * 			the database connection
+	 * @param extraCond
+	 * 			the extra condition for the SQL statement
+	 * @param orderClause
+	 * 			
+	 * @return the regions to this restaurant
+	 * @throws SQLException 
+	 * 			throws if any error occurred while execute the SQL statement
+	 */
+	public static Region[] exec(DBCon dbCon, int restaurantID, String extraCond, String orderClause) throws SQLException{
 		
 		ArrayList<Region> regions = new ArrayList<Region>();
 		
 		String sql = "SELECT * FROM " + Params.dbName +
-			 ".region WHERE restaurant_id=" + restaurantID;
+			 		 ".region WHERE restaurant_id=" + restaurantID +
+			 		 (extraCond == null ? "" : extraCond) +
+			 		 (orderClause == null ? "" : orderClause);
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
