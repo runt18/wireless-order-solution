@@ -249,6 +249,26 @@
 			type="com.wireless.Actions.materialCateMgr.UpdateMaterialCateAction"
 			scope="request">
 		</action>
+		<action path="/QueryRegion"
+			type="com.wireless.Actions.regionMgr.QueryRegionMgrAction"
+			scope="request">
+		</action>
+		<action path="/UpdateRegion"
+			type="com.wireless.Actions.regionMgr.UpdateRegionAction"
+			scope="request">
+		</action>
+		<action path="/DeleteTable"
+			type="com.wireless.Actions.tableMgr.DeleteTableAction"
+			scope="request">
+		</action>
+		<action path="/UpdateTable"
+			type="com.wireless.Actions.tableMgr.UpdateTableAction"
+			scope="request">
+		</action>
+		<action path="/InsertTable"
+			type="com.wireless.Actions.tableMgr.InsertTableAction"
+			scope="request">
+		</action>
 
 
 
