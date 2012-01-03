@@ -149,6 +149,17 @@ public class PrintOrderAction extends Action implements PinGen{
 				conf &= ~Reserved.PRINT_SHIFT_RECEIPT_2;
 			}
 			
+			param = request.getParameter("printTmpShift");
+			if(param != null){
+				if(Byte.parseByte(param) == 0){
+					conf &= ~Reserved.PRINT_TEMP_SHIFT_RECEIPT_2;
+				}else{
+					conf |= Reserved.PRINT_TEMP_SHIFT_RECEIPT_2;
+				}
+			}else{
+				conf &= ~Reserved.PRINT_TEMP_SHIFT_RECEIPT_2;
+			}
+			
 			ReqPackage.setGen(this);
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqPrintOrder2(conf, orderID, 0, 0));
 			if(resp.header.type == Type.ACK){
@@ -159,7 +170,7 @@ public class PrintOrderAction extends Action implements PinGen{
 				}else if(request.getParameter("tableID") != null){
 					jsonResp = jsonResp.replace("$(value)", tableID + "号餐台的账单打印成功");
 					
-				}else if(request.getParameter("printShift") != null){
+				}else if(request.getParameter("printShift") != null || request.getParameter("printTmpShift") != null){
 					jsonResp = jsonResp.replace("$(value)", "交班对账单打印成功");
 					
 				}else{
