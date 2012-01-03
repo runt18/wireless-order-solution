@@ -166,7 +166,29 @@ else if($editType == "addRestaurant" || $editType == "editAdminRestaurant")
 					$sql = "INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`) VALUES ($id, 8, '部门8')";
 					$db->Execute($sql);
 					$sql = "INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`) VALUES ($id, 9, '部门9')";
+					$db->Execute($sql);					
+					//insert the regions
+					$sql = "INSERT INTO `wireless_order_db`.`region` (`restaurant_id`, `region_id`, `name`) VALUES ($id, 0, '区域1')";
 					$db->Execute($sql);
+					$sql = "INSERT INTO `wireless_order_db`.`region` (`restaurant_id`, `region_id`, `name`) VALUES ($id, 1, '区域2')";
+					$db->Execute($sql);
+					$sql = "INSERT INTO `wireless_order_db`.`region` (`restaurant_id`, `region_id`, `name`) VALUES ($id, 2, '区域3')";
+					$db->Execute($sql);
+					$sql = "INSERT INTO `wireless_order_db`.`region` (`restaurant_id`, `region_id`, `name`) VALUES ($id, 3, '区域4')";
+					$db->Execute($sql);
+					$sql = "INSERT INTO `wireless_order_db`.`region` (`restaurant_id`, `region_id`, `name`) VALUES ($id, 4, '区域5')";
+					$db->Execute($sql);
+					$sql = "INSERT INTO `wireless_order_db`.`region` (`restaurant_id`, `region_id`, `name`) VALUES ($id, 5, '区域6')";
+					$db->Execute($sql);
+					$sql = "INSERT INTO `wireless_order_db`.`region` (`restaurant_id`, `region_id`, `name`) VALUES ($id, 6, '区域7')";
+					$db->Execute($sql);
+					$sql = "INSERT INTO `wireless_order_db`.`region` (`restaurant_id`, `region_id`, `name`) VALUES ($id, 7, '区域8')";
+					$db->Execute($sql);
+					$sql = "INSERT INTO `wireless_order_db`.`region` (`restaurant_id`, `region_id`, `name`) VALUES ($id, 8, '区域9')";
+					$db->Execute($sql);
+					$sql = "INSERT INTO `wireless_order_db`.`region` (`restaurant_id`, `region_id`, `name`) VALUES ($id, 9, '区域10')";
+					$db->Execute($sql);
+
 					$admin_pin = "9". randomNumber(6);
 					$sql = "SELECT id FROM terminal WHERE pin='$admin_pin'";
 					$rs = $db ->GetOne($sql);		
