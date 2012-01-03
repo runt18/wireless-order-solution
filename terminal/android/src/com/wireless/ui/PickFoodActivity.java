@@ -46,7 +46,8 @@ import com.wireless.protocol.Util;
 import com.wireless.ui.view.PickFoodListView;
 import com.wireless.ui.view.TempListView;
 
-public class PickFoodActivity extends TabActivity implements PickFoodListView.OnFoodPickedListener,OnGestureListener{
+public class PickFoodActivity extends TabActivity 
+							  implements PickFoodListView.OnFoodPickedListener, OnGestureListener{
 	
 	private final static String TAG_NUMBER = "number";
 	private final static String TAG_KITCHEN = "kitchen";
@@ -207,7 +208,7 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 				float orderAmount = food.getCount() + pickedFood.getCount();
        			if(orderAmount > 255){
        				Toast.makeText(this, "对不起，" + food.name + "最多只能点255份", 0).show();
-       				pickedFood.setCount(new Float(255));
+       				//pickedFood.setCount(new Float(255));
        			}else{
        				Toast.makeText(this, "添加" + food.name + Util.float2String2(food.getCount()) + "份", 0).show();
        				pickedFood.setCount(orderAmount);        				
@@ -221,8 +222,16 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 				Toast.makeText(this, "对不起，" + food.name + "最多只能点255份", 0).show();
 			}else{
 				Toast.makeText(this, "新增" + food.name + Util.float2String2(food.getCount()) + "份", 0).show();
+				_pickFoods.add(food);			
 			}
-			_pickFoods.add(food);			
+		}
+		
+		if(_tabHost.getCurrentTabTag() == TAG_NUMBER){
+			(((EditText)findViewById(R.id.filterNumEdtTxt))).setText("");
+		}else if(_tabHost.getCurrentTabTag() == TAG_KITCHEN){
+			((EditText)findViewById(R.id.filterKitchenEdtTxt)).setText("");
+		}else if(_tabHost.getCurrentTabTag() == TAG_PINYIN){
+			((EditText)findViewById(R.id.filterPinyinEdtTxt)).setText("");
 		}
 	}
 	
@@ -741,22 +750,5 @@ public class PickFoodActivity extends TabActivity implements PickFoodListView.On
 		
 	   return false;
 	}
-
-	@Override
-	public void cleanEditText() {
-		if(_tabHost.getCurrentTab() == 0){
-			final EditText filterNumEdtTxt = ((EditText)findViewById(R.id.filterNumEdtTxt));
-			filterNumEdtTxt.setText("");
-		}else if(_tabHost.getCurrentTab() == 1){
-			final EditText filterKitEdtTxt = (EditText)findViewById(R.id.filterKitchenEdtTxt);
-			filterKitEdtTxt.setText("");
-		}else if(_tabHost.getCurrentTab() == 2){
-			final EditText filterPinyinEdtTxt = (EditText)findViewById(R.id.filterPinyinEdtTxt);
-			filterPinyinEdtTxt.setText("");
-		}
-		
-	}
-	        
-
 	
 }

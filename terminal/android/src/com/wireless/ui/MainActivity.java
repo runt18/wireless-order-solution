@@ -763,20 +763,26 @@ public class MainActivity extends Activity {
 				@Override
 				public void onClick(View v) {
 					EditText table= (EditText)findViewById(R.id.mycount);
-					String tableID = table.getText().toString().trim();
-					if(tableID.equals("")){
-						Toast.makeText(MainActivity.this, "台号不能为空", 0).show();
-					}else if(_type == DIALOG_UPDATE_ORDER){
-						new QueryOrderTask(Integer.parseInt(tableID), Type.UPDATE_ORDER).execute();
-						
-					}else if(_type == DIALOG_BILL_ORDER){
-						new QueryOrderTask(Integer.parseInt(tableID), Type.PAY_ORDER).execute();
-						
-					}else{
-						new QueryOrder2Task(Integer.parseInt(tableID)).execute();
+					try{
+						int tableID = Integer.parseInt(table.getText().toString().trim());
+						if(_type == DIALOG_UPDATE_ORDER){
+							new QueryOrderTask(tableID, Type.UPDATE_ORDER).execute();
+							dismiss();
+							
+						}else if(_type == DIALOG_BILL_ORDER){
+							new QueryOrderTask(tableID, Type.PAY_ORDER).execute();
+							dismiss();
+							table.setText("");
+							
+						}else{
+							new QueryOrder2Task(tableID).execute();
+							dismiss();
+							table.setText("");
+						}
+					}catch(NumberFormatException e){
+						Toast.makeText(MainActivity.this, "您输入的台号" + table.getText().toString().trim() + "格式不正确，请重新输入" , 0).show();
 					}
-					table.setText("");
-					dismiss();
+
 				}
 			});
 			
@@ -788,7 +794,12 @@ public class MainActivity extends Activity {
 					dismiss();					
 				}
 			});
-		}		
+		}
+
+		@Override
+		public void onAttachedToWindow(){
+			((EditText)findViewById(R.id.mycount)).setText("");
+		}
 	}
 	
 }

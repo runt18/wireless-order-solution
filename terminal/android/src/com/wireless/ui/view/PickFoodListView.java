@@ -163,19 +163,22 @@ public class PickFoodListView extends ListView {
 				@Override
 				public void onClick(View v) {		
 					OrderFood food = new OrderFood(selectedFood);
-					if(((EditText)findViewById(R.id.mycount)).getText().toString().equals("")||((EditText)findViewById(R.id.mycount)).getText().toString()== null){
-						Toast.makeText(_context, "输入的数量不能为空", 0).show();
-					}else{
+					try{
 						float orderAmount = Float.parseFloat(((EditText)findViewById(R.id.mycount)).getText().toString());
-						food.setCount(orderAmount);
 						
-						if(_foodPickedListener != null){
-							_foodPickedListener.onPicked(food);
-						}
+		       			if(orderAmount > 255){
+		       				Toast.makeText(_context, "对不起，" + food.name + "最多只能点255份", 0).show();
+		       			}else{
+							food.setCount(orderAmount);
+		       				if(_foodPickedListener != null){		       			
+		       					_foodPickedListener.onPicked(food);
+		       				}
+							dismiss();
+		       			}
+						
+					}catch(NumberFormatException e){
+						Toast.makeText(_context, "您输入的数量格式不正确，请重新输入", 0).show();
 					}
-					
-					_foodPickedListener.cleanEditText();
-					dismiss();
 				}
 			});
 			
@@ -199,8 +202,6 @@ public class PickFoodListView extends ListView {
 		 * 			选中Food的信息
 		 */
 		public void onPicked(OrderFood food);
-		
-		public void cleanEditText();
 	}
 
 }

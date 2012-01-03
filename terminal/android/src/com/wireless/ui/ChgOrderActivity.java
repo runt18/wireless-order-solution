@@ -308,24 +308,6 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 		}
 		
 	}
-	
-	/*
-	 * 
-	 * 处理ListView的删除菜功能和添加口味功能
-	 */
-	public void Foodfunction(int position) {
-		Intent intent = new Intent(ChgOrderActivity.this, PickTasteActivity.class);
-		startActivity(intent);
-
-	}
-
-	/*
-	 * 点击点菜跳到点菜界面
-	 */
-	public void orderfood() {
-		Intent intent = new Intent(ChgOrderActivity.this, PickFoodActivity.class);
-		startActivity(intent);
-	}
 
 	/**
 	 * 退出是如果有新点菜，提示确认退出
