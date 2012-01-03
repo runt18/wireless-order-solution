@@ -480,7 +480,7 @@ public class StartupActivity extends Activity {
 			_progDialog = new ProgressDialog(StartupActivity.this);
 			_progDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);//设置风格为长进度条
 			_progDialog.setTitle("提示");//设置标题  
-			_progDialog.setMessage("正在下载中...请稍后");
+			_progDialog.setMessage("正在下载中...请稍侯");
 			_progDialog.setIndeterminate(false);//设置进度条是否为不明确  false 就是不设置为不明确  
 			_progDialog.setCancelable(true);//设置进度条是否可以按退回键取消
 			_progDialog.setProgress(0);
