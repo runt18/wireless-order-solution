@@ -441,19 +441,64 @@ var orderedForm = new Ext.form.FormPanel(
 												var resultJSON = Ext.util.JSON
 														.decode(response.responseText);
 												if (resultJSON.success == true) {
+
+													// var
+													// Request =
+													// new
+													// URLParaQuery();
+
+													// 彈出成功提示語，打印提示語
 													Ext.MessageBox
 															.show({
-																msg : resultJSON.data,
+																msg : resultJSON.data
+																		+ "，是否打印账单？",
 																width : 300,
-																buttons : Ext.MessageBox.OK,
-																fn : function() {
-																	var Request = new URLParaQuery();
-																	location.href = "Bills.html?pin="
-																			+ pin
-																			+ "&restaurantID="
-																			+ restaurantID;
+																buttons : Ext.MessageBox.YESNO,
+																fn : function(
+																		btn) {
+																	if (btn == "yes") {
+
+																		Ext.Ajax
+																				.request({
+																					url : "../PrintOrder.do",
+																					params : {
+																						"pin" : pin,
+																						"orderID" : Request["orderID"],
+																						"printReceipt" : 1
+																					},
+																					success : function(
+																							response,
+																							options) {
+																						var resultJSON1 = Ext.util.JSON
+																								.decode(response.responseText);
+																						Ext.MessageBox
+																								.show({
+																									msg : resultJSON1.data,
+																									width : 300,
+																									buttons : Ext.MessageBox.OK,
+																									fn : function() {
+																										location.href = "Bills.html?pin="
+																												+ pin
+																												+ "&restaurantID="
+																												+ restaurantID;
+																									}
+																								});
+
+																					},
+																					failure : function(
+																							response,
+																							options) {
+																					}
+																				});
+																	} else {
+																		location.href = "Bills.html?pin="
+																				+ pin
+																				+ "&restaurantID="
+																				+ restaurantID;
+																	}
 																}
 															});
+
 												} else {
 													Ext.MessageBox
 															.show({
