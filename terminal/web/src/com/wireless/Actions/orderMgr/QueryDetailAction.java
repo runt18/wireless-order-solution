@@ -77,11 +77,19 @@ public class QueryDetailAction extends Action {
 			int nCount = 0;
 			StringBuffer value = new StringBuffer();
 
+			// String sql = "SELECT a.*, b.name AS kitchen_name FROM "
+			// + Params.dbName + ".order_food a, " + Params.dbName
+			// + ".kitchen b " + "WHERE order_id=" + orderID
+			// + " AND a.kitchen=b.alias_id AND b.restaurant_id="
+			// + term.restaurant_id;
+			
 			String sql = "SELECT a.*, b.name AS kitchen_name FROM "
-					+ Params.dbName + ".order_food a, " + Params.dbName
-					+ ".kitchen b " + "WHERE order_id=" + orderID
-					+ " AND a.kitchen=b.alias_id AND b.restaurant_id="
+					+ Params.dbName + ".order_food a LEFT OUTER JOIN " + Params.dbName
+					+ ".kitchen b ON (a.kitchen=b.alias_id AND a.restaurant_id = b.restaurant_id)" + 
+					"WHERE a.order_id=" + orderID
+					+ "  AND a.restaurant_id="
 					+ term.restaurant_id;
+			
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while (dbCon.rs.next()) {
 				// the string is separated by comma
