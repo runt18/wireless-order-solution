@@ -83,7 +83,7 @@ public class QueryDetailAction extends Action {
 			// + " AND a.kitchen=b.alias_id AND b.restaurant_id="
 			// + term.restaurant_id;
 			
-			String sql = "SELECT a.*, b.name AS kitchen_name FROM "
+			String sql = "SELECT a.*, (CASE WHEN b.name IS NOT NULL THEN b.name ELSE '临时' END) AS kitchen_name FROM "
 					+ Params.dbName + ".order_food a LEFT OUTER JOIN " + Params.dbName
 					+ ".kitchen b ON (a.kitchen=b.alias_id AND a.restaurant_id = b.restaurant_id)" + 
 					"WHERE a.order_id=" + orderID
