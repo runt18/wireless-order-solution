@@ -540,6 +540,8 @@ var orderedForm = new Ext.form.FormPanel(
 								foodPara = "{"
 										+ foodPara.substr(0,
 												foodPara.length - 1) + "}";
+								
+								alert(foodPara);
 
 								var type = 9;
 								if (Request["tableStat"] == "free") {
@@ -1609,71 +1611,75 @@ var dishesDisplayColumnModel = new Ext.grid.ColumnModel([
 		} ]);
 
 // 4，表格
-var dishesDisplayGrid = new Ext.grid.GridPanel({
-	xtype : "grid",
-	// height : 400,
-	anchor : "98%",
-	autoScroll : true,
-	region : "center",
-	ds : dishesDisplayStore,
-	cm : dishesDisplayColumnModel,
-	viewConfig : {
-		forceFit : true
-	},
-	sm : new Ext.grid.RowSelectionModel({
-		singleSelect : true
-	}),
-	listeners : {
-		rowdblclick : function(thiz, rowIndex, e) {
+var dishesDisplayGrid = new Ext.grid.GridPanel(
+		{
+			xtype : "grid",
+			// height : 400,
+			anchor : "98%",
+			autoScroll : true,
+			region : "center",
+			ds : dishesDisplayStore,
+			cm : dishesDisplayColumnModel,
+			viewConfig : {
+				forceFit : true
+			},
+			sm : new Ext.grid.RowSelectionModel({
+				singleSelect : true
+			}),
+			listeners : {
+				rowdblclick : function(thiz, rowIndex, e) {
 
-			if (dishesDisplayDataShow[rowIndex][7] == "false") {
-				// mune格式：[菜名，菜名编号，菜名拼音，单价，厨房编号,特,荐,停,送,菜品状态]
-				// ordered格式：[菜名，口味，数量，￥单价，操作，￥实价，菜名编号，厨房编号，口味编号1,特,荐,停,送,￥口味价钱,口味编号2,口味编号3]
-				// var dishCurrCount = dishesOrderEastPanel.findById(
-				// "orderCountNum").getValue();
-				var dishCurrName = dishesDisplayDataShow[rowIndex][0];
-				var dishCurrPrice = dishesDisplayDataShow[rowIndex][3];
-				var dishNbr = dishesDisplayDataShow[rowIndex][1];
-				var kitchenNbr = dishesDisplayDataShow[rowIndex][4];
+					if (dishesDisplayDataShow[rowIndex][7] == "false") {
+						// mune格式：[菜名，菜名编号，菜名拼音，单价，厨房编号,特,荐,停,送,菜品状态]
+						// ordered格式：[菜名，口味，数量，￥单价，操作，￥实价，菜名编号，厨房编号，口味编号1,特,荐,停,送,￥口味价钱,口味编号2,口味编号3]
+						// var dishCurrCount = dishesOrderEastPanel.findById(
+						// "orderCountNum").getValue();
+						var dishCurrName = dishesDisplayDataShow[rowIndex][0];
+						var dishCurrPrice = dishesDisplayDataShow[rowIndex][3];
+						var dishNbr = dishesDisplayDataShow[rowIndex][1];
+						var kitchenNbr = dishesDisplayDataShow[rowIndex][4];
 
-				var isAlreadyOrderd = false;
+						var isAlreadyOrderd = false;
 
-				for ( var i = 0; i < orderedData.length; i++) {
-					if (orderedData[i][6] == dishNbr
-							&& orderedData[i][16] == "2") {
-						orderedData[i][2] = parseFloat(orderedData[i][2]) + 1;
-						isAlreadyOrderd = true;
+						for ( var i = 0; i < orderedData.length; i++) {
+							if (orderedData[i][6] == dishNbr
+									&& orderedData[i][16] == "2") {
+								orderedData[i][2] = parseFloat(orderedData[i][2]) + 1;
+								isAlreadyOrderd = true;
+							}
+						}
+
+						if (isAlreadyOrderd == false) {
+							orderedData.push([ dishCurrName, "无口味", 1,
+											dishCurrPrice, "", dishCurrPrice,
+											dishNbr, kitchenNbr, 0,
+											dishesDisplayDataShow[rowIndex][5],
+											dishesDisplayDataShow[rowIndex][6],
+											dishesDisplayDataShow[rowIndex][7],
+											dishesDisplayDataShow[rowIndex][8],
+											"￥0", 0, 0, "2",
+											dishesDisplayDataShow[rowIndex][9],
+											"false" ]);
+						}
+						orderedStore.reload();
+						// 底色处理，已点菜式原色底色
+						dishGridRefresh();
+						orderIsChanged = true;
+						dishOrderCurrRowIndex_ = -1;
+					} else {
+						Ext.MessageBox.show({
+							msg : "该菜品已售完！",
+							width : 300,
+							buttons : Ext.MessageBox.OK
+						});
 					}
+				},
+				render : function(thiz) {
+					orderedMenuOnLoad();
+					tasteOnLoad();
 				}
-
-				if (isAlreadyOrderd == false) {
-					orderedData.push([ dishCurrName, "无口味", 1, dishCurrPrice,
-							"", dishCurrPrice, dishNbr, kitchenNbr, 0,
-							dishesDisplayDataShow[rowIndex][5],
-							dishesDisplayDataShow[rowIndex][6],
-							dishesDisplayDataShow[rowIndex][7],
-							dishesDisplayDataShow[rowIndex][8], "￥0", 0, 0,
-							"2", dishesDisplayDataShow[rowIndex][9] ]);
-				}
-				orderedStore.reload();
-				// 底色处理，已点菜式原色底色
-				dishGridRefresh();
-				orderIsChanged = true;
-				dishOrderCurrRowIndex_ = -1;
-			} else {
-				Ext.MessageBox.show({
-					msg : "该菜品已售完！",
-					width : 300,
-					buttons : Ext.MessageBox.OK
-				});
 			}
-		},
-		render : function(thiz) {
-			orderedMenuOnLoad();
-			tasteOnLoad();
-		}
-	}
-});
+		});
 
 dishesDisplayStore.reload();
 
