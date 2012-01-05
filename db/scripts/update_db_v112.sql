@@ -116,6 +116,9 @@ region_id = 0 WHERE region_id IS NULL;
 UPDATE wireless_order_db.order A SET 
 A.region_name = (SELECT name FROM wireless_order_db.region WHERE region_id=0 AND restaurant_id=A.restaurant_id) WHERE region_name IS NULL;
 
+UPDATE wireless_order_db.order A SET 
+A.region_name = "" WHERE region_name IS NULL AND restaurant_id=1;
+
 -- -----------------------------------------------------
 -- Restore the 'region_id' and 'region_name' to NOT NULL
 -- -----------------------------------------------------
