@@ -467,7 +467,7 @@ menuAddWin = new Ext.Window(
 					xtype : "textfield",
 					fieldLabel : "拼音",
 					id : "menuAddSpill",
-					allowBlank : false,
+					// allowBlank : false,
 					width : 180
 				}, {
 					xtype : "numberfield",
@@ -771,7 +771,7 @@ menuModifyWin = new Ext.Window(
 					xtype : "textfield",
 					fieldLabel : "拼音",
 					id : "menuModSpill",
-					allowBlank : false,
+					// allowBlank : false,
 					width : 180
 				}, {
 					xtype : "numberfield",

@@ -541,7 +541,6 @@ var orderedForm = new Ext.form.FormPanel(
 										+ foodPara.substr(0,
 												foodPara.length - 1) + "}";
 								
-								alert(foodPara);
 
 								var type = 9;
 								if (Request["tableStat"] == "free") {
