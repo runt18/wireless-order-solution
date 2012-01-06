@@ -253,4 +253,24 @@ public class OrderFood extends Food {
 			tastes[i] = new Taste();
 		}
 	}
+	
+	/**
+	 * Return the order food string.
+	 * The string format is as below.
+	 * name-taste1,taste2,taste3
+	 */
+	public String toString(){
+		String taste = null;
+		for(int i = 0; i < tastes.length; i++){
+			if(tastes[i].alias_id != Taste.NO_TASTE){
+				if(taste != null){
+					taste += "," + tastes[i].preference;
+				}else{
+					taste = tastes[i].preference;
+				}
+			}
+		}
+		
+		return name + (taste != null ? "-" + taste : "");
+	}
 }
