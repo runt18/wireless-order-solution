@@ -55,8 +55,8 @@ else{
 				<th><h3>现金（￥）</h3></th>
 				<th><h3>刷卡（￥）</h3></th>
 				<th><h3>会员卡（￥）</h3></th>
-				<th><h3>挂账（￥）</h3></th>
 				<th><h3>签单（￥）</h3></th>
+				<th><h3>挂账（￥）</h3></th>
 				<th><h3>折扣额（￥）</h3></th>	
 				<th><h3>赠送额（￥）</h3></th>	
 				<th><h3>金额（￥）</h3></th>	
@@ -91,8 +91,8 @@ if($statType == "daily")
 				Sum(CASE type_value WHEN 1 THEN t_price ELSE 0.00 END) AS '现金',
 				Sum(CASE type_value WHEN 2 THEN t_price ELSE 0.00 END) AS '刷卡',
 				Sum(CASE type_value WHEN 3 THEN t_price ELSE 0.00 END) AS '会员卡',
-				Sum(CASE type_value WHEN 4 THEN t_price ELSE 0.00 END) AS '挂账',
-				Sum(CASE type_value WHEN 5 THEN t_price ELSE 0.00 END) AS '签单',
+				Sum(CASE type_value WHEN 4 THEN t_price ELSE 0.00 END) AS '签单',
+				Sum(CASE type_value WHEN 5 THEN t_price ELSE 0.00 END) AS '挂账',
 				SUM(t_price_discount) AS '折扣额',	
 				SUM(t_price_present) AS '赠送额',	
 				SUM(t_price) AS '金额',		
@@ -128,8 +128,8 @@ else
 				Sum(CASE type_value WHEN 1 THEN t_price ELSE 0.00 END) AS '现金',
 				Sum(CASE type_value WHEN 2 THEN t_price ELSE 0.00 END) AS '刷卡',
 				Sum(CASE type_value WHEN 3 THEN t_price ELSE 0.00 END) AS '会员卡',
-				Sum(CASE type_value WHEN 4 THEN t_price ELSE 0.00 END) AS '挂账',
-				Sum(CASE type_value WHEN 5 THEN t_price ELSE 0.00 END) AS '签单',
+				Sum(CASE type_value WHEN 4 THEN t_price ELSE 0.00 END) AS '签单',
+				Sum(CASE type_value WHEN 5 THEN t_price ELSE 0.00 END) AS '挂账',
 				SUM(t_price_discount) AS '折扣额',	
 				SUM(t_price_present) AS '赠送额',	
 				SUM(t_price) AS '金额',
@@ -181,8 +181,8 @@ foreach ($rs as $row){
 	$total_1+=$row["现金"];
 	$total_2+=$row["刷卡"];
 	$total_3+=$row["会员卡"];
-	$total_4+=$row["挂账"];
-	$total_5+=$row["签单"];
+	$total_4+=$row["签单"];
+	$total_5+=$row["挂账"];
 	$total_all+=$row["金额"];	
 	$total_2_all+=$row["实收"];
 	$total_discount_all+=$row["折扣额"];
@@ -194,8 +194,8 @@ foreach ($rs as $row){
 	echo "<td>" .number_format($row["现金"],2) ."</td>";
 	echo "<td>" .number_format($row["刷卡"],2) ."</td>";
 	echo "<td>" .number_format($row["会员卡"],2) ."</td>";
-	echo "<td>" .number_format($row["挂账"],2) ."</td>";
 	echo "<td>" .number_format($row["签单"],2) ."</td>";
+	echo "<td>" .number_format($row["挂账"],2) ."</td>";
 	echo "<td>" .number_format($row["折扣额"],2) ."</td>";	
 	echo "<td>" .number_format($row["赠送额"],2) ."</td>";	
 	echo "<td>" .number_format($row["金额"],2) ."</td>";	
