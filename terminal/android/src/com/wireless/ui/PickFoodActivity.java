@@ -35,6 +35,7 @@ import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.wireless.common.FoodParcel;
 import com.wireless.common.OrderParcel;
 import com.wireless.common.WirelessOrder;
 import com.wireless.protocol.Department;
@@ -53,6 +54,8 @@ public class PickFoodActivity extends TabActivity
 	private final static String TAG_KITCHEN = "kitchen";
 	private final static String TAG_PINYIN = "pinyin";
 	private final static String TAG_OCCASIONAL = "occasional";
+	
+	private final static int PICK_WITH_TASTE = 0;
 	
 	private ArrayList<OrderFood> _pickFoods = new ArrayList<OrderFood>();
 	private TabHost _tabHost;
@@ -200,31 +203,83 @@ public class PickFoodActivity extends TabActivity
 	 */
 	@Override
 	public void onPicked(OrderFood food) {
-		boolean isExist = false;
-		Iterator<OrderFood> iter = _pickFoods.iterator();
-		while(iter.hasNext()){
-			OrderFood pickedFood = iter.next();
-			if(pickedFood.equals(food)){
-				float orderAmount = food.getCount() + pickedFood.getCount();
-       			if(orderAmount > 255){
-       				Toast.makeText(this, "对不起，" + food.name + "最多只能点255份", 0).show();
-       				//pickedFood.setCount(new Float(255));
-       			}else{
-       				Toast.makeText(this, "添加" + food.name + Util.float2String2(food.getCount()) + "份", 0).show();
-       				pickedFood.setCount(orderAmount);        				
-       			}
-				isExist = true;
-				break;
-			}
-		}
-		if(!isExist){
+		addFood(food);
+	}
+	
+	/**
+	 * 通过"编号"、"分厨"、"拼音"方式选中菜品后，
+	 * 将菜品保存到List中，并跳转到口味Activity选择口味
+	 * @param food
+	 * 			选中菜品的信息
+	 */
+	@Override
+	public void onPickedWithTaste(OrderFood food) {
+		Intent intent = new Intent(this, PickTasteActivity.class);
+		Bundle bundle = new Bundle();
+		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(food));
+		intent.putExtras(bundle);
+		startActivityForResult(intent, PICK_WITH_TASTE);
+	}
+	
+	/**
+	 * 添加菜品到已点菜的List中
+	 * @param food
+	 * 			选中的菜品信息
+	 */
+	private void addFood(OrderFood food){
+		
+		int index = _pickFoods.indexOf(food);
+
+		if(index != -1){
+			/**
+			 * 如果原来的菜品列表中已包含有相同的菜品，
+			 * 则将新点菜的数量累加到原来的菜品中
+			 */
+			OrderFood pickedFood = _pickFoods.get(index);
+			
+			float orderAmount = food.getCount() + pickedFood.getCount();
+   			if(orderAmount > 255){
+   				Toast.makeText(this, "对不起，\"" + food.toString() + "\"最多只能点255份", 0).show();
+   				//pickedFood.setCount(new Float(255));
+   			}else{
+   				Toast.makeText(this, "添加" + (food.hangStatus == OrderFood.FOOD_HANG_UP ? "并叫起\"" : "\"") + food.toString() + "\"" + Util.float2String2(food.getCount()) + "份", 0).show();
+   				pickedFood.setCount(orderAmount);
+   				_pickFoods.set(index, pickedFood);
+   			}
+		}else{
 			if(food.getCount() > 255){
-				Toast.makeText(this, "对不起，" + food.name + "最多只能点255份", 0).show();
+				Toast.makeText(this, "对不起，\"" + food.toString() + "\"最多只能点255份", 0).show();
 			}else{
-				Toast.makeText(this, "新增" + food.name + Util.float2String2(food.getCount()) + "份", 0).show();
-				_pickFoods.add(food);			
+				Toast.makeText(this, "新增" + (food.hangStatus == OrderFood.FOOD_HANG_UP ? "并叫起\"" : "\"") + food.toString() + "\"" + Util.float2String2(food.getCount()) + "份", 0).show();
+				_pickFoods.add(food);
 			}
 		}
+		
+//		boolean isExist = false;
+//		Iterator<OrderFood> iter = _pickFoods.iterator();
+//		while(iter.hasNext()){
+//			OrderFood pickedFood = iter.next();
+//			if(pickedFood.equals(food)){
+//				float orderAmount = food.getCount() + pickedFood.getCount();
+//       			if(orderAmount > 255){
+//       				Toast.makeText(this, "对不起，\"" + food.toString() + "\"最多只能点255份", 0).show();
+//       				//pickedFood.setCount(new Float(255));
+//       			}else{
+//       				Toast.makeText(this, "添加\"" + food.toString() + "\"" + Util.float2String2(food.getCount()) + "份", 0).show();
+//       				pickedFood.setCount(orderAmount);
+//       			}
+//				isExist = true;
+//				break;
+//			}
+//		}
+//		if(!isExist){
+//			if(food.getCount() > 255){
+//				Toast.makeText(this, "对不起，\"" + food.toString() + "\"最多只能点255份", 0).show();
+//			}else{
+//				Toast.makeText(this, "新增\"" + food.toString() + "\"" + Util.float2String2(food.getCount()) + "份", 0).show();
+//				_pickFoods.add(food);
+//			}
+//		}
 		
 		if(_tabHost.getCurrentTabTag() == TAG_NUMBER){
 			(((EditText)findViewById(R.id.filterNumEdtTxt))).setText("");
@@ -232,6 +287,19 @@ public class PickFoodActivity extends TabActivity
 			((EditText)findViewById(R.id.filterKitchenEdtTxt)).setText("");
 		}else if(_tabHost.getCurrentTabTag() == TAG_PINYIN){
 			((EditText)findViewById(R.id.filterPinyinEdtTxt)).setText("");
+		}
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data){
+		if(resultCode == RESULT_OK){			
+			if(requestCode == PICK_WITH_TASTE){
+				/**
+				 * 添加口味后添加到pickList中
+				 */
+				FoodParcel foodParcel = data.getParcelableExtra(FoodParcel.KEY_VALUE);	
+				addFood(foodParcel);
+			}			
 		}
 	}
 	
@@ -258,8 +326,7 @@ public class PickFoodActivity extends TabActivity
 			
 			@Override
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
-				InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.hideSoftInputFromWindow(filterNumEdtTxt.getWindowToken(), 0);
+				((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(filterNumEdtTxt.getWindowToken(), 0);
 			}
 			
 			@Override
@@ -322,12 +389,11 @@ public class PickFoodActivity extends TabActivity
 			}
 		});
         
-	     pickLstView.setOnScrollListener(new OnScrollListener() {
+	    pickLstView.setOnScrollListener(new OnScrollListener() {
 			
 			@Override
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
-				InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.hideSoftInputFromWindow(filterKitEdtTxt.getWindowToken(), 0);
+				((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(filterKitEdtTxt.getWindowToken(), 0);
 			}
 			
 			@Override
@@ -404,12 +470,11 @@ public class PickFoodActivity extends TabActivity
 			}
 		});
         
-           pickLstView.setOnScrollListener(new OnScrollListener() {
+        pickLstView.setOnScrollListener(new OnScrollListener() {
 			
 			@Override
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
-				InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.hideSoftInputFromWindow(filterPinyinEdtTxt.getWindowToken(), 0);
+				((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(filterPinyinEdtTxt.getWindowToken(), 0);
 			}
 			
 			@Override

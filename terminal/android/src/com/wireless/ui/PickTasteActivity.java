@@ -186,15 +186,13 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 		styleLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.styles));
 		
 		//做法返回按钮
-	    ((ImageView)findViewById(R.id.styleback)).setOnClickListener(new View.OnClickListener() {
-				
-				@Override
-				public void onClick(View v) {
+	    ((ImageView)findViewById(R.id.styleback)).setOnClickListener(new View.OnClickListener() {				
+			@Override
+			public void onClick(View v) {
 				onBackPressed();	
-				finish();
-					
-				}
-			});
+				finish();	
+			}
+		});
 	    
 	    /**
 		 * 在做法选择页面中按编号进行做法的筛选

@@ -435,7 +435,7 @@ public class OrderFoodListView extends ExpandableListView{
 						_foods.remove(selectedFood);
 						_adapter.notifyDataSetChanged();
 						dismiss();
-						Toast.makeText(_context, "删除" + selectedFood.name + cancelAmount + "份成功", 1).show();
+						Toast.makeText(_context, "删除\"" + selectedFood.toString() + "\"" + cancelAmount + "份成功", 1).show();
 						
 					}else if(foodAmount > cancelAmount){
 						/**
@@ -444,7 +444,7 @@ public class OrderFoodListView extends ExpandableListView{
 						selectedFood.setCount(foodAmount - cancelAmount);
 						_adapter.notifyDataSetChanged();
 						dismiss();
-						Toast.makeText(_context, "删除" + selectedFood.name + cancelAmount + "份成功", 1).show();
+						Toast.makeText(_context, "删除\"" + selectedFood.toString() + "\"" + cancelAmount + "份成功", 1).show();
 						
 					}else{
 						new AlertDialog.Builder(_context)

@@ -9,6 +9,9 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -145,14 +148,18 @@ public class PickFoodListView extends ListView {
 	 */
 	private class AskOrderAmountDialog extends Dialog{
 
-		public AskOrderAmountDialog(final Food selectedFood) {
+		private OrderFood _selectedFood;
+		
+		public AskOrderAmountDialog(Food food) {
 			super(_context, R.style.FullHeightDialog);
+			
+			_selectedFood = new OrderFood(food);
 			
 			setContentView(R.layout.alert);
 			
 			//getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
 			
-			((TextView)findViewById(R.id.ordername)).setText("请输入" + selectedFood.name + "的点菜数量");
+			((TextView)findViewById(R.id.ordername)).setText("请输入" + _selectedFood.name + "的点菜数量");
 			((EditText)findViewById(R.id.mycount)).setText("1");
 			
 			((TextView)findViewById(R.id.table)).setText("数量：");
@@ -162,23 +169,17 @@ public class PickFoodListView extends ListView {
 			okBtn.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {		
-					OrderFood food = new OrderFood(selectedFood);
-					try{
-						float orderAmount = Float.parseFloat(((EditText)findViewById(R.id.mycount)).getText().toString());
-						
-		       			if(orderAmount > 255){
-		       				Toast.makeText(_context, "对不起，" + food.name + "最多只能点255份", 0).show();
-		       			}else{
-							food.setCount(orderAmount);
-		       				if(_foodPickedListener != null){		       			
-		       					_foodPickedListener.onPicked(food);
-		       				}
-							dismiss();
-		       			}
-						
-					}catch(NumberFormatException e){
-						Toast.makeText(_context, "您输入的数量格式不正确，请重新输入", 0).show();
-					}
+					onPick(false);
+				}
+			});
+			
+			//"口味"Button
+			Button tasteBtn = (Button)findViewById(R.id.tasteBtn);
+			tasteBtn.setText("口味");
+			tasteBtn.setOnClickListener(new View.OnClickListener() {				
+				@Override
+				public void onClick(View arg0) {
+					onPick(true);
 				}
 			});
 			
@@ -191,6 +192,51 @@ public class PickFoodListView extends ListView {
 					dismiss();
 				}
 			});
+			
+			//"叫起"CheckBox
+			CheckBox hurriedChkBox = (CheckBox)findViewById(R.id.hurriedChk);
+			hurriedChkBox.setText("叫起");
+			hurriedChkBox.setOnCheckedChangeListener(new OnCheckedChangeListener(){				
+				@Override
+				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+					if(isChecked){
+						_selectedFood.hangStatus = OrderFood.FOOD_HANG_UP;
+						Toast.makeText(_context, "叫起\"" + _selectedFood.toString() + "\"", 0).show();
+					}else{
+						_selectedFood.hangStatus = OrderFood.FOOD_NORMAL;
+						Toast.makeText(_context, "取消叫起\"" + _selectedFood.toString() + "\"", 0).show();
+					}
+					
+				}
+			});
+		}
+		
+		/**
+		 * 
+		 * @param selectedFood
+		 * @param pickTaste
+		 */
+		private void onPick(boolean pickTaste){
+			try{
+				float orderAmount = Float.parseFloat(((EditText)findViewById(R.id.mycount)).getText().toString());
+				
+       			if(orderAmount > 255){
+       				Toast.makeText(_context, "对不起，\"" + _selectedFood.toString() + "\"最多只能点255份", 0).show();
+       			}else{
+       				_selectedFood.setCount(orderAmount);
+       				if(_foodPickedListener != null){	
+       					if(pickTaste){
+       						_foodPickedListener.onPickedWithTaste(_selectedFood);
+       					}else{
+       						_foodPickedListener.onPicked(_selectedFood);
+       					}
+       				}
+					dismiss();
+       			}
+				
+			}catch(NumberFormatException e){
+				Toast.makeText(_context, "您输入的数量格式不正确，请重新输入", 0).show();
+			}
 		}
 		
 	}
@@ -202,6 +248,13 @@ public class PickFoodListView extends ListView {
 		 * 			选中Food的信息
 		 */
 		public void onPicked(OrderFood food);
+		
+		/**
+		 * 当PickFoodListView选中菜品后，回调此函数通知Activity选中的Food信息，并跳转到口味Activity
+		 * @param food
+		 * 			选中Food的信息
+		 */
+		public void onPickedWithTaste(OrderFood food);
 	}
 
 }
