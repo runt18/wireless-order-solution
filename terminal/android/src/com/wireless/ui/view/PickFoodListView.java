@@ -33,6 +33,9 @@ public class PickFoodListView extends ListView {
 	private BaseAdapter _adapter = null;
 	private OnFoodPickedListener _foodPickedListener;
 	private int _tag;
+
+	
+
 	public PickFoodListView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		_context = context;
@@ -45,6 +48,7 @@ public class PickFoodListView extends ListView {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position,	long rowID) {
 				new AskOrderAmountDialog(_foods[position]).show();
+			   
 			}
 		});
 	}
@@ -168,7 +172,7 @@ public class PickFoodListView extends ListView {
 			okBtn.setText("È·¶¨");
 			okBtn.setOnClickListener(new View.OnClickListener() {
 				@Override
-				public void onClick(View v) {		
+				public void onClick(View v) {			
 					onPick(false);
 				}
 			});
@@ -240,6 +244,8 @@ public class PickFoodListView extends ListView {
 		}
 		
 	}
+	
+	
 	
 	public static interface OnFoodPickedListener{
 		/**

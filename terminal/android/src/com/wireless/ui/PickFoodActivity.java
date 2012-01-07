@@ -544,6 +544,28 @@ public class PickFoodActivity extends TabActivity
 				_tempLstView.addTemp();
 			}
 		}); 
+       
+       
+       /**
+		 * list滚动的时候屏蔽软键盘
+		 */
+       _tempLstView.setOnScrollListener(new OnScrollListener() {
+			
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
+				InputMethodManager input = (InputMethodManager) PickFoodActivity.this
+                .getSystemService(Context.INPUT_METHOD_SERVICE); 
+				input.hideSoftInputFromWindow(view.getWindowToken(), 
+                InputMethodManager.HIDE_NOT_ALWAYS);
+			}
+			
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem,
+					int visibleItemCount, int totalItemCount) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 	}
 	
 	
@@ -765,7 +787,7 @@ public class PickFoodActivity extends TabActivity
 	}
 	 @Override
 	public boolean dispatchTouchEvent(MotionEvent ev) {
-	    	_detector.onTouchEvent(ev);
+	    	 _detector.onTouchEvent(ev);
 			return super.dispatchTouchEvent(ev);
 	}
 	@Override
@@ -796,6 +818,7 @@ public class PickFoodActivity extends TabActivity
 			float velocityY) {	   
 		float scrollX = e1.getX()-e2.getX();
 	    if(Math.abs(velocityX) > 200 && velocityY != 0 && Math.abs(scrollX)/Math.abs(e1.getY()-e2.getY()) > 1){
+
 	    	if(scrollX>0){
 	    		//此处添加代码用来显示下一个页面
 	    		if(_tabHost.getCurrentTab() == 4)
@@ -807,12 +830,12 @@ public class PickFoodActivity extends TabActivity
 	    		//此处添加代码用来显示上一个页面
 	    		  if(_tabHost.getCurrentTab() == 0)
 	 					return false; 
-	 				_tabHost.setCurrentTab(_tabHost.getCurrentTab()-1);		
+	 				_tabHost.setCurrentTab(_tabHost.getCurrentTab()-1);	
 	    	}
 	    	
 	    	return true;
 	    }
-		
+
 	   return false;
 	}
 	
