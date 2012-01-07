@@ -369,6 +369,9 @@ public class OrderFoodListView extends ExpandableListView{
 			 * "新点菜"的Group显示"点菜"Button
 			 */
 			if(_type == Type.INSERT_ORDER){
+				/**
+				 * 点击点菜按钮
+				 */
 				ImageView orderImg = (ImageView)view.findViewById(R.id.orderimage);
 				orderImg.setBackgroundResource(R.drawable.order_selector);
 				
@@ -380,7 +383,58 @@ public class OrderFoodListView extends ExpandableListView{
 						}
 					}
 				});
+				/**
+				 * 点击全单叫起按钮
+				 */
+				ImageView operateImg = (ImageView)view.findViewById(R.id.operateimage);
+				operateImg.setBackgroundResource(R.drawable.jiaoqi_selector);
+				
+				operateImg.setOnClickListener(new View.OnClickListener() {				
+					@Override
+					public void onClick(View v) {
+						
+						if(_foods.size()>0){
+							for(int i = 0;i<_foods.size();i++){
+								OrderFood food = _foods.get(i);
+								if(food.hangStatus == OrderFood.FOOD_NORMAL){
+									food.hangStatus = OrderFood.FOOD_HANG_UP;
+								}else{
+									food.hangStatus = OrderFood.FOOD_NORMAL;
+								}
+								
+							}
+							_adapter.notifyDataSetChanged();
+						}
+						
+					}
+				});
+			}else{
+				
+				/**
+				 * 点击全单即起按钮
+				 */
+				ImageView  immediateImg = (ImageView)view.findViewById(R.id.orderimage);
+				immediateImg.setBackgroundResource(R.drawable.jiqi_selector);
+				immediateImg.setOnClickListener(new View.OnClickListener() {				
+					@Override
+					public void onClick(View v) {
+						
+						if(_foods.size()>0){
+							for(int i = 0;i<_foods.size();i++){
+								OrderFood food = _foods.get(i);
+								if(food.hangStatus == OrderFood.FOOD_NORMAL){
+									food.hangStatus = OrderFood.FOOD_IMMEDIATE;
+								}else{
+									food.hangStatus = OrderFood.FOOD_NORMAL;
+								}
+								
+							}
+							_adapter.notifyDataSetChanged();
+						}
+					}
+				});
 			}
+			
 			if(isExpanded){
 				((ImageView)view.findViewById(R.id.arrow)).setBackgroundResource(R.drawable.point);
 			}else{
