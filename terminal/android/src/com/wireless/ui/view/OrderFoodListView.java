@@ -6,6 +6,7 @@ import java.util.List;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -386,53 +387,80 @@ public class OrderFoodListView extends ExpandableListView{
 				/**
 				 * 点击全单叫起按钮
 				 */
-				ImageView operateImg = (ImageView)view.findViewById(R.id.operateimage);
-				operateImg.setBackgroundResource(R.drawable.jiaoqi_selector);
+				ImageView hurriedImgView = (ImageView)view.findViewById(R.id.operateimage);
+				hurriedImgView.setBackgroundResource(R.drawable.jiaoqi_selector);
 				
-				operateImg.setOnClickListener(new View.OnClickListener() {				
+				hurriedImgView.setOnClickListener(new View.OnClickListener() {				
 					@Override
-					public void onClick(View v) {
-						
-						if(_foods.size()>0){
-							for(int i = 0;i<_foods.size();i++){
-								OrderFood food = _foods.get(i);
-								if(food.hangStatus == OrderFood.FOOD_NORMAL){
-									food.hangStatus = OrderFood.FOOD_HANG_UP;
-								}else{
-									food.hangStatus = OrderFood.FOOD_NORMAL;
-								}
-								
-							}
-							_adapter.notifyDataSetChanged();
-						}
-						
+					public void onClick(View v) {						
+						if(_foods.size() > 0){
+							new AlertDialog.Builder(_context)
+								.setTitle("提示")
+								.setMessage("确定全单叫起吗?")
+								.setNeutralButton("确定", new DialogInterface.OnClickListener() {
+										@Override
+										public void onClick(DialogInterface dialog,	int which){
+											for(int i = 0; i < _foods.size(); i++){
+												OrderFood food = _foods.get(i);
+												if(food.hangStatus == OrderFood.FOOD_NORMAL){
+													food.hangStatus = OrderFood.FOOD_HANG_UP;
+												}							
+											}
+											_adapter.notifyDataSetChanged();
+										}
+									})
+									.setNegativeButton("取消", null)
+									.show();	
+						}						
 					}
 				});
+				
 			}else{
-				
-				/**
-				 * 点击全单即起按钮
-				 */
-				ImageView  immediateImg = (ImageView)view.findViewById(R.id.orderimage);
-				immediateImg.setBackgroundResource(R.drawable.jiqi_selector);
-				immediateImg.setOnClickListener(new View.OnClickListener() {				
-					@Override
-					public void onClick(View v) {
-						
-						if(_foods.size()>0){
-							for(int i = 0;i<_foods.size();i++){
-								OrderFood food = _foods.get(i);
-								if(food.hangStatus == OrderFood.FOOD_NORMAL){
-									food.hangStatus = OrderFood.FOOD_IMMEDIATE;
-								}else{
-									food.hangStatus = OrderFood.FOOD_NORMAL;
-								}
-								
-							}
-							_adapter.notifyDataSetChanged();
-						}
+				boolean hasHangupFood = false;
+				for(int i = 0; i < _foods.size(); i++){
+					if(_foods.get(i).hangStatus == OrderFood.FOOD_HANG_UP){
+						hasHangupFood = true;
+						break;
 					}
-				});
+				}
+				
+				if(hasHangupFood){
+					/**
+					 * 点击全单即起按钮
+					 */
+					ImageView immediateImgView = (ImageView)view.findViewById(R.id.orderimage);
+					immediateImgView.setVisibility(View.VISIBLE);
+					immediateImgView.setBackgroundResource(R.drawable.jiqi_selector);
+					immediateImgView.setOnClickListener(new View.OnClickListener() {				
+						@Override
+						public void onClick(View v) {						
+							if(_foods.size() > 0){
+								new AlertDialog.Builder(_context)
+								.setTitle("提示")
+								.setMessage("确定全单即起吗?")
+								.setNeutralButton("确定", new DialogInterface.OnClickListener() {
+										@Override
+										public void onClick(DialogInterface dialog,	int which){
+											for(int i = 0; i < _foods.size(); i++){
+												OrderFood food = _foods.get(i);
+												if(food.hangStatus == OrderFood.FOOD_HANG_UP){
+													food.hangStatus = OrderFood.FOOD_IMMEDIATE;
+												}								
+											}
+											_adapter.notifyDataSetChanged();
+										}
+									})
+									.setNegativeButton("取消", null)
+									.show();	
+							}
+						}
+					});
+				}else{
+					/**
+					 * 如果没有叫起的菜品则不显示叫起Button
+					 */
+					((ImageView)view.findViewById(R.id.orderimage)).setVisibility(View.INVISIBLE);
+				}
 			}
 			
 			if(isExpanded){
