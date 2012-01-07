@@ -2,8 +2,8 @@
 <RelativeLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
   android:orientation="vertical"
-  android:background="@drawable/bg04"
   android:layout_width="fill_parent"
+  android:background="@drawable/bg04_2"
   android:minHeight="40dip"
   android:layout_height="fill_parent">
   <ImageView 
