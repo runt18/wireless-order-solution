@@ -21,59 +21,109 @@ public class QueryTable {
 	 * @throws BusinessException throws if the terminal is NOT attached to any restaurant
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Table[] exec(int pin, short model) throws BusinessException, SQLException{
-		
-		
+	public static Table[] exec(int pin, short model) throws BusinessException, SQLException{		
 
 		DBCon dbCon = new DBCon();
 
 		try {   
-			
-			dbCon.connect();			
-			
-			Terminal term = VerifyPin.exec(dbCon, pin, model);
-			
-			ArrayList<Table> tables = new ArrayList<Table>();
-			
-			//get the tables
-			String sql = "SELECT * FROM " + Params.dbName + 
-						 ".table WHERE restaurant_id=" +
-						 term.restaurant_id;
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			while(dbCon.rs.next()){
-				Table table = new Table();
-				table.restaurantID = term.restaurant_id;
-				table.alias_id = dbCon.rs.getInt("alias_id");
-				table.name = dbCon.rs.getString("name");
-				table.setMinimumCost(dbCon.rs.getFloat("minimum_cost"));
-				table.custom_num = dbCon.rs.getShort("custom_num");
-				table.category = dbCon.rs.getShort("category");
-				table.status = dbCon.rs.getShort("status");
-				table.regionID = dbCon.rs.getShort("region_id");
-				tables.add(table);
-			}
-			dbCon.rs.close();
-	
-
-			Collections.sort(tables, new Comparator<Table>(){
-
-				public int compare(Table table1, Table table2) {
-					// TODO Auto-generated method stub
-					if(table1.alias_id > table2.alias_id){
-						return 1;
-					}else if(table1.alias_id < table2.alias_id){
-						return -1;
-					}else{
-						return 0;
-					}
-				}
-				
-			});
-			return tables.toArray(new Table[tables.size()]);
-			
+			dbCon.connect();
+			return exec(dbCon, pin, model, null, null);			
 		}finally{
 			dbCon.disconnect();
 		}
+	}
+	
+	/**
+	 * Get all the table information to restaurant that the terminal is attached to. 
+	 * Note that the database should be connected before invoking this method.
+	 * @param dbCon 
+	 * 			the database connection
+	 * @param pin 
+	 * 			the pin to this terminal
+	 * @param model 
+	 * 			the model to this terminal
+	 * @param extraCond
+	 * 			the extra condition to the SQL statement
+	 * @param orderClause
+	 * 			the order clause to the SQL statement
+	 * @return An array holding all the table information
+	 * @throws BusinessException 
+	 * 			throws if the terminal is NOT attached to any restaurant
+	 * @throws SQLException 
+	 * 			throws if fail to execute any SQL statement
+	 */
+	public static Table[] exec(int pin, short model, String extraCond, String orderClause) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return exec(dbCon, pin, model, extraCond, orderClause);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get all the table information to restaurant that the terminal is attached to. 
+	 * Note that the database should be connected before invoking this method.
+	 * @param dbCon 
+	 * 			the database connection
+	 * @param pin 
+	 * 			the pin to this terminal
+	 * @param model 
+	 * 			the model to this terminal
+	 * @param extraCond
+	 * 			the extra condition to the SQL statement
+	 * @param orderClause
+	 * 			the order clause to the SQL statement
+	 * @return An array holding all the table information
+	 * @throws BusinessException 
+	 * 			throws if the terminal is NOT attached to any restaurant
+	 * @throws SQLException 
+	 * 			throws if fail to execute any SQL statement
+	 */
+	public static Table[] exec(DBCon dbCon, int pin, short model, String extraCond, String orderClause) throws BusinessException, SQLException{
+		
+		Terminal term = VerifyPin.exec(dbCon, pin, model);
+		
+		ArrayList<Table> tables = new ArrayList<Table>();
+		
+		//get the tables
+		String sql = "SELECT * FROM " + Params.dbName + 
+					 ".table WHERE restaurant_id=" +
+					 term.restaurant_id + " " +
+					 (extraCond != null ? extraCond : "") +
+					 (orderClause != null ? orderClause : "");
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		while(dbCon.rs.next()){
+			Table table = new Table();
+			table.restaurantID = term.restaurant_id;
+			table.alias_id = dbCon.rs.getInt("alias_id");
+			table.name = dbCon.rs.getString("name");
+			table.setMinimumCost(dbCon.rs.getFloat("minimum_cost"));
+			table.custom_num = dbCon.rs.getShort("custom_num");
+			table.category = dbCon.rs.getShort("category");
+			table.status = dbCon.rs.getShort("status");
+			table.regionID = dbCon.rs.getShort("region_id");
+			tables.add(table);
+		}
+		dbCon.rs.close();
+
+
+		Collections.sort(tables, new Comparator<Table>(){
+
+			public int compare(Table table1, Table table2) {
+				// TODO Auto-generated method stub
+				if(table1.alias_id > table2.alias_id){
+					return 1;
+				}else if(table1.alias_id < table2.alias_id){
+					return -1;
+				}else{
+					return 0;
+				}
+			}
+			
+		});
+		return tables.toArray(new Table[tables.size()]);
 	}
 	
 	/**
