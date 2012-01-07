@@ -159,16 +159,15 @@ public class PickFoodListView extends ListView {
 			
 			_selectedFood = new OrderFood(food);
 			
-			setContentView(R.layout.alert);
+			setContentView(R.layout.order_confirm);
 			
 			//getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
 			
-			((TextView)findViewById(R.id.ordername)).setText("请输入" + _selectedFood.name + "的点菜数量");
-			((EditText)findViewById(R.id.mycount)).setText("1");
+			((TextView)findViewById(R.id.orderTitleTxt)).setText("请输入" + _selectedFood.name + "的点菜数量");
+			((EditText)findViewById(R.id.amountEdtTxt)).setText("1");
 			
-			((TextView)findViewById(R.id.table)).setText("数量：");
 			//"确定"Button
-			Button okBtn = (Button)findViewById(R.id.confirm);
+			Button okBtn = (Button)findViewById(R.id.orderConfirmBtn);
 			okBtn.setText("确定");
 			okBtn.setOnClickListener(new View.OnClickListener() {
 				@Override
@@ -178,7 +177,7 @@ public class PickFoodListView extends ListView {
 			});
 			
 			//"口味"Button
-			Button tasteBtn = (Button)findViewById(R.id.tasteBtn);
+			Button tasteBtn = (Button)findViewById(R.id.orderTasteBtn);
 			tasteBtn.setText("口味");
 			tasteBtn.setOnClickListener(new View.OnClickListener() {				
 				@Override
@@ -188,7 +187,7 @@ public class PickFoodListView extends ListView {
 			});
 			
 			//"取消"Button
-			Button cancelBtn = (Button)findViewById(R.id.alert_cancel);
+			Button cancelBtn = (Button)findViewById(R.id.orderCancelBtn);
 			cancelBtn.setText("取消");
 			cancelBtn.setOnClickListener(new View.OnClickListener(){
 				@Override
@@ -198,7 +197,7 @@ public class PickFoodListView extends ListView {
 			});
 			
 			//"叫起"CheckBox
-			CheckBox hurriedChkBox = (CheckBox)findViewById(R.id.hurriedChk);
+			CheckBox hurriedChkBox = (CheckBox)findViewById(R.id.orderHurriedChk);
 			hurriedChkBox.setText("叫起");
 			hurriedChkBox.setOnCheckedChangeListener(new OnCheckedChangeListener(){				
 				@Override
@@ -222,7 +221,7 @@ public class PickFoodListView extends ListView {
 		 */
 		private void onPick(boolean pickTaste){
 			try{
-				float orderAmount = Float.parseFloat(((EditText)findViewById(R.id.mycount)).getText().toString());
+				float orderAmount = Float.parseFloat(((EditText)findViewById(R.id.amountEdtTxt)).getText().toString());
 				
        			if(orderAmount > 255){
        				Toast.makeText(_context, "对不起，\"" + _selectedFood.toString() + "\"最多只能点255份", 0).show();
