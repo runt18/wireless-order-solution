@@ -173,17 +173,52 @@ public class OrderFoodListView extends ExpandableListView{
 	 * @param food
 	 */
 	public void notifyDataChanged(OrderFood food){
-		if(food != null){
-			if(_adapter != null){
-				_foods.set(_selectedPos, food);
-				_adapter.notifyDataSetChanged();
-			}
+		if(food != null && _adapter != null){
+			_foods.set(_selectedPos, food);
+			trim(food);
+			_adapter.notifyDataSetChanged();
+		
 		}else{
 			throw new NullPointerException();
 		}
-
 	}
-	
+
+	private void trim(OrderFood food){
+	   	/**
+    	 * Keep track of the first food and position in the list that matched the food modified.
+    	 * Combine the food if there is the same food exist in the following position.    	  
+    	 */
+    	int pos = -1;
+		OrderFood firstFood = null;
+    	int firstPos = -1;
+    	int srchPos = 0;
+    	int nCount = 0;
+    	List<OrderFood> tmpFoods = _foods.subList(0, _foods.size());
+    	while((pos = tmpFoods.indexOf(food)) != -1){
+    		nCount++;
+    		if(nCount == 1){
+    			firstFood = tmpFoods.get(pos);
+    			firstPos = pos;
+    		}else{
+   	   			int count = Util.float2Int(firstFood.getCount()) + Util.float2Int(tmpFoods.get(pos).getCount());
+       			if((count / 100) > 255){
+       				Toast.makeText(_context, "对不起，\"" + firstFood.toString() + "\"最多只能点255份", 0).show();
+       				firstFood.setCount(new Float(255));
+       			}else{
+       				firstFood.setCount(Util.int2Float(count));        				
+       			}
+    			_foods.set(firstPos, firstFood);
+    			_foods.remove(srchPos + pos);
+    		}
+			srchPos += pos + 1;
+			if(srchPos >= _foods.size()){
+				break;
+			}else{
+				tmpFoods = _foods.subList(srchPos, _foods.size());
+			}
+    	}
+	}
+
 	public class Adapter extends BaseExpandableListAdapter{
 
 		private String _groupTitle;
