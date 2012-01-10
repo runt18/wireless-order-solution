@@ -165,6 +165,50 @@ public class QueryTable {
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
 	public static Table exec(DBCon dbCon, int pin, short model, int tableID) throws BusinessException, SQLException{
+		return exec(dbCon, pin, model, tableID, null, null);
+	}
+	
+	/**
+	 * Get the table information according the specific table alias id and restaurant id.
+	 * Assure the terminal with this pin is NOT expired before invoking this method.
+	 * @param dbCon the database connection
+	 * @param pin the pin to this terminal
+	 * @param model the model to this terminal
+	 * @param tableID the table alias id to query
+	 * @param extraCond the extra condition to the SQL statement
+	 * @param orderClause the order clause to the SQL statement
+	 * @return the table information
+	 * @throws BusinessException throws if the table to query does NOT exist
+	 * @throws SQLException throws if fail to execute any SQL statement
+	 */
+	public static Table exec(int pin, short model, int tableID, String extraCond, String orderClause) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();		
+		
+		try{
+			dbCon.connect();
+
+			return exec(dbCon, pin, model, tableID, extraCond, orderClause);
+			
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the table information according the specific table alias id and restaurant id.
+	 * Assure the terminal with this pin is NOT expired before invoking this method.
+	 * Note that the database should be connected before invoking this method
+	 * @param dbCon the database connection
+	 * @param pin the pin to this terminal
+	 * @param model the model to this terminal
+	 * @param tableID the table alias id to query
+	 * @param extraCond the extra condition to the SQL statement
+	 * @param orderClause the order clause to the SQL statement
+	 * @return the table information
+	 * @throws BusinessException throws if the table to query does NOT exist
+	 * @throws SQLException throws if fail to execute any SQL statement
+	 */
+	public static Table exec(DBCon dbCon, int pin, short model, int tableID, String extraCond, String orderClause) throws BusinessException, SQLException{
 		
 		Terminal term = VerifyPin.exec(dbCon, pin, model);
 		
@@ -172,7 +216,9 @@ public class QueryTable {
 		String sql = "SELECT * FROM " + Params.dbName + 
 					 ".table WHERE restaurant_id=" +
 					 term.restaurant_id + " AND alias_id=" +
-					 tableID;
+					 tableID + " " +
+					 (extraCond != null ? extraCond : " ") +
+					 (orderClause != null ? orderClause : "");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		Table table = new Table();
 		if(dbCon.rs.next()){
