@@ -1,7 +1,10 @@
 package com.wireless.ui.view;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -132,6 +135,7 @@ public class OrderFoodListView extends ExpandableListView{
 	public void notifyDataChanged(List<OrderFood> foods){
 		if(foods != null){
 			_foods = foods;
+			trim();
 			if(_adapter != null){
 				_adapter.notifyDataSetChanged();
 			}else{
@@ -139,6 +143,7 @@ public class OrderFoodListView extends ExpandableListView{
 					_adapter = new Adapter("新点菜"){
 						@Override
 						public void notifyDataSetChanged(){
+							trim();
 							super.notifyDataSetChanged();
 							if(_chgListener != null){
 								_chgListener.onSourceChanged();
@@ -149,6 +154,7 @@ public class OrderFoodListView extends ExpandableListView{
 					_adapter = new Adapter("已点菜"){
 						@Override
 						public void notifyDataSetChanged(){
+							trim();
 							super.notifyDataSetChanged();
 							if(_chgListener != null){
 								_chgListener.onSourceChanged();
@@ -175,7 +181,7 @@ public class OrderFoodListView extends ExpandableListView{
 	public void notifyDataChanged(OrderFood food){
 		if(food != null && _adapter != null){
 			_foods.set(_selectedPos, food);
-			trim(food);
+			//trim(food);
 			_adapter.notifyDataSetChanged();
 		
 		}else{
@@ -183,41 +189,65 @@ public class OrderFoodListView extends ExpandableListView{
 		}
 	}
 
-	private void trim(OrderFood food){
-	   	/**
-    	 * Keep track of the first food and position in the list that matched the food modified.
-    	 * Combine the food if there is the same food exist in the following position.    	  
-    	 */
-    	int pos = -1;
-		OrderFood firstFood = null;
-    	int firstPos = -1;
-    	int srchPos = 0;
-    	int nCount = 0;
-    	List<OrderFood> tmpFoods = _foods.subList(0, _foods.size());
-    	while((pos = tmpFoods.indexOf(food)) != -1){
-    		nCount++;
-    		if(nCount == 1){
-    			firstFood = tmpFoods.get(pos);
-    			firstPos = pos;
-    		}else{
-   	   			int count = Util.float2Int(firstFood.getCount()) + Util.float2Int(tmpFoods.get(pos).getCount());
-       			if((count / 100) > 255){
-       				Toast.makeText(_context, "对不起，\"" + firstFood.toString() + "\"最多只能点255份", 0).show();
-       				firstFood.setCount(new Float(255));
-       			}else{
-       				firstFood.setCount(Util.int2Float(count));        				
-       			}
-    			_foods.set(firstPos, firstFood);
-    			_foods.remove(srchPos + pos);
-    		}
-			srchPos += pos + 1;
-			if(srchPos >= _foods.size()){
-				break;
+	private void trim(){
+		Iterator<OrderFood> iter = _foods.iterator();
+		HashMap<OrderFood, Integer> foodMap = new HashMap<OrderFood, Integer>();
+		while(iter.hasNext()){
+			OrderFood food = iter.next();
+			if(foodMap.containsKey(food)){
+				int amount = foodMap.get(food).intValue() + Util.float2Int(food.getCount());
+				foodMap.put(food, amount);
 			}else{
-				tmpFoods = _foods.subList(srchPos, _foods.size());
+				foodMap.put(food, Util.float2Int(food.getCount()));
 			}
-    	}
+		}
+		if(_foods.size() != foodMap.size()){
+			_foods.clear();
+			Iterator<Map.Entry<OrderFood, Integer>> iter2 = foodMap.entrySet().iterator();
+			while(iter2.hasNext()){
+				Map.Entry<OrderFood, Integer> entry = iter2.next();
+				OrderFood food = entry.getKey();
+				food.setCount(Util.int2Float(entry.getValue().intValue()));
+				_foods.add(food);
+			}			
+		}
 	}
+	
+//	private void trim(OrderFood food){
+//	   	/**
+//    	 * Keep track of the first food and position in the list that matched the food modified.
+//    	 * Combine the food if there is the same food exist in the following position.    	  
+//    	 */
+//    	int pos = -1;
+//		OrderFood firstFood = null;
+//    	int firstPos = -1;
+//    	int srchPos = 0;
+//    	int nCount = 0;
+//    	List<OrderFood> tmpFoods = _foods.subList(0, _foods.size());
+//    	while((pos = tmpFoods.indexOf(food)) != -1){
+//    		nCount++;
+//    		if(nCount == 1){
+//    			firstFood = tmpFoods.get(pos);
+//    			firstPos = pos;
+//    		}else{
+//   	   			int count = Util.float2Int(firstFood.getCount()) + Util.float2Int(tmpFoods.get(pos).getCount());
+//       			if((count / 100) > 255){
+//       				Toast.makeText(_context, "对不起，\"" + firstFood.toString() + "\"最多只能点255份", 0).show();
+//       				firstFood.setCount(new Float(255));
+//       			}else{
+//       				firstFood.setCount(Util.int2Float(count));        				
+//       			}
+//    			_foods.set(firstPos, firstFood);
+//    			_foods.remove(srchPos + pos);
+//    		}
+//			srchPos += pos + 1;
+//			if(srchPos >= _foods.size()){
+//				break;
+//			}else{
+//				tmpFoods = _foods.subList(srchPos, _foods.size());
+//			}
+//    	}
+//	}
 
 	public class Adapter extends BaseExpandableListAdapter{
 
@@ -590,6 +620,7 @@ public class OrderFoodListView extends ExpandableListView{
 	 */
 	private class ExtOperDialg extends Dialog{
 
+		
 		ExtOperDialg(final OrderFood selectedFood) {
 			super(_context, R.style.FullHeightDialog);
 			setContentView(R.layout.item_alert);
@@ -751,6 +782,7 @@ public class OrderFoodListView extends ExpandableListView{
 		
 		@Override
 		protected void onStop(){
+			//trim(_selectedFood);
 			_adapter.notifyDataSetChanged();
 		}		
 	}

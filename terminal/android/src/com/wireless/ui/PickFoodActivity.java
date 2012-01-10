@@ -255,32 +255,6 @@ public class PickFoodActivity extends TabActivity
 			}
 		}
 		
-//		boolean isExist = false;
-//		Iterator<OrderFood> iter = _pickFoods.iterator();
-//		while(iter.hasNext()){
-//			OrderFood pickedFood = iter.next();
-//			if(pickedFood.equals(food)){
-//				float orderAmount = food.getCount() + pickedFood.getCount();
-//       			if(orderAmount > 255){
-//       				Toast.makeText(this, "对不起，\"" + food.toString() + "\"最多只能点255份", 0).show();
-//       				//pickedFood.setCount(new Float(255));
-//       			}else{
-//       				Toast.makeText(this, "添加\"" + food.toString() + "\"" + Util.float2String2(food.getCount()) + "份", 0).show();
-//       				pickedFood.setCount(orderAmount);
-//       			}
-//				isExist = true;
-//				break;
-//			}
-//		}
-//		if(!isExist){
-//			if(food.getCount() > 255){
-//				Toast.makeText(this, "对不起，\"" + food.toString() + "\"最多只能点255份", 0).show();
-//			}else{
-//				Toast.makeText(this, "新增\"" + food.toString() + "\"" + Util.float2String2(food.getCount()) + "份", 0).show();
-//				_pickFoods.add(food);
-//			}
-//		}
-		
 		if(_tabHost.getCurrentTabTag() == TAG_NUMBER){
 			(((EditText)findViewById(R.id.filterNumEdtTxt))).setText("");
 		}else if(_tabHost.getCurrentTabTag() == TAG_KITCHEN){
