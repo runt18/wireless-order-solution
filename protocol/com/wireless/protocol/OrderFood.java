@@ -79,20 +79,39 @@ public class OrderFood extends Food {
 	 *     They are the same if all of the things above are matched.
 	 */
 	public boolean equals(Object obj){
-		OrderFood food = (OrderFood)obj;
-		if(isTemporary != food.isTemporary){
+		if(obj == null || !(obj instanceof OrderFood)){
 			return false;
-		}else if(isTemporary && food.isTemporary){
-			return name.equals(food.name) && (price == food.price) && (hangStatus == food.hangStatus);
 		}else{
-			return alias_id == food.alias_id &&
-				   tastes[0].alias_id == food.tastes[0].alias_id &&
-				   tastes[1].alias_id == food.tastes[1].alias_id &&
-				   tastes[2].alias_id == food.tastes[2].alias_id &&
-				   hangStatus == food.hangStatus;
+			OrderFood food = (OrderFood)obj;
+			if(isTemporary != food.isTemporary){
+				return false;
+			}else if(isTemporary && food.isTemporary){
+				return name.equals(food.name) && (price == food.price) && (hangStatus == food.hangStatus);
+			}else{
+				return alias_id == food.alias_id &&
+					   tastes[0].alias_id == food.tastes[0].alias_id &&
+					   tastes[1].alias_id == food.tastes[1].alias_id &&
+					   tastes[2].alias_id == food.tastes[2].alias_id &&
+					   hangStatus == food.hangStatus;
+			}
 		}
 	}
 
+	/**
+	 * Generate the hash code according to the equals method.
+	 */
+	public int hashCode(){
+		if(isTemporary){
+			return name.hashCode() ^ price ^ hangStatus;
+		}else{
+			return new Integer(alias_id).hashCode() ^ 
+				   new Integer(tastes[0].alias_id).hashCode() ^ 
+				   new Integer(tastes[1].alias_id).hashCode() ^ 
+				   new Integer(tastes[2].alias_id).hashCode() ^ 
+				   new Short(hangStatus).hashCode();
+		}
+	}
+	
 	/**
 	 * Two foods are the same if both food and taste id is matched
 	 * @param food
