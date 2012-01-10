@@ -257,6 +257,8 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 					return true;
 				}
 			}).show();
+		}else{
+			finish();
 		}
 	}
 

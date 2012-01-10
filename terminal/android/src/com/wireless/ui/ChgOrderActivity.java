@@ -331,6 +331,8 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 					return true;
 				}
 			}).show();
+		}else{
+			finish();
 		}
 	}
 
