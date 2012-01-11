@@ -125,7 +125,7 @@ public class SelectTastePopup extends PopupScreen{
 			
 			private void addTaste(){
 				if(getSelectedIndex() != -1){
-					int resp = Dialog.ask(Dialog.D_YES_NO, "确认" + _cate + "-" + _tastes[getSelectedIndex()].preference + " ?", Dialog.YES);
+					int resp = Dialog.ask(Dialog.D_YES_NO, "确认" + _cate + "-" + _tastes[_tasteMatchedIdx[getSelectedIndex()]].preference + " ?", Dialog.YES);
 					if(resp == Dialog.YES){
 
 						int tastePos = _selectedFood.addTaste(_tastes[_tasteMatchedIdx[getSelectedIndex()]]);
