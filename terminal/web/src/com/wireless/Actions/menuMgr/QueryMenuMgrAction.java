@@ -133,12 +133,14 @@ public class QueryMenuMgrAction extends Action {
 				// 全部
 				filterCondition = "";
 			}
-
+			
+			String orderClause = " ORDER BY alias_id ";
+			
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, Integer.parseInt(pin, 16),
 					Terminal.MODEL_STAFF);
 			Food[] foods = QueryMenu.execFoods(Integer.parseInt(pin, 16),
-					Terminal.MODEL_STAFF, filterCondition);
+					Terminal.MODEL_STAFF, filterCondition, orderClause);
 
 			// 格式：[编号，名称，拼音，价格，厨房，特价，推荐，停售，赠送，時價]
 			for (int i = 0; i < foods.length; i++) {
