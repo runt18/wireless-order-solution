@@ -1,4 +1,4 @@
-package com.wireless.Actions.tableMgr;
+package com.wireless.Actions.tasteMgr;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -19,7 +19,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Terminal;
 
-public class InsertTableAction extends Action {
+public class InsertTasteAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -39,14 +39,11 @@ public class InsertTableAction extends Action {
 			 * example, filter the order date greater than or equal 2011-7-14
 			 * 14:30:00 pin=0x1 & type=3 & ope=2 & value=2011-7-14 14:30:00
 			 * 
-			 * pin : the pin the this terminal
-			 * tableNumber
-			 * tableName
-			 * region
+			 * pin : the pin the this terminal tableNumber tableName region
 			 * tableMincost
 			 * 
 			 */
-			
+
 			String pin = request.getParameter("pin");
 			if (pin.startsWith("0x") || pin.startsWith("0X")) {
 				pin = pin.substring(2);
@@ -54,32 +51,37 @@ public class InsertTableAction extends Action {
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, Integer.parseInt(pin, 16),
 					Terminal.MODEL_STAFF);
-			
 
+			/**
+			 * “口味分类”的值如下： 0 - 口味 ， 1 - 做法， 2 - 规格 “计算方式”的值如下：0 - 按价格，1 - 按比例
+			 */
 			// get the query condition
-			int tableNumber = Integer.parseInt(request.getParameter("tableNumber"));
-			String tableName = request.getParameter("tableName");
-			int region = Integer.parseInt(request.getParameter("region"));
-			float tableMincost = Float.parseFloat(request.getParameter("tableMincost"));
+			int tasteNumber = Integer.parseInt(request
+					.getParameter("tasteNumber"));
+			String tasteName = request.getParameter("tasteName");
+			float tastePrice = Float.parseFloat(request
+					.getParameter("tastePrice"));
+			float tasteRate = Float.parseFloat(request
+					.getParameter("tasteRate"));
+			int cal = Integer.parseInt(request.getParameter("cal"));
+			int type = Integer.parseInt(request.getParameter("type"));
 
 			/**
 			 * 
-			 */			
-			String sql = "INSERT INTO " + Params.dbName + ".table" +
-					"( alias_id, restaurant_id, region_id, name, minimum_cost, enabled, status ) " + 
-					" VALUES(" +
-					tableNumber + ", " +
-					term.restaurant_id + ", " +
-					region + ", '" +
-					tableName + "', " +
-					tableMincost + ", " +
-					"1, 0 ) ";
+			 */
+			String sql = "INSERT INTO "
+					+ Params.dbName
+					+ ".taste"
+					+ "( restaurant_id, alias_id, preference, price, category, rate, calc ) "
+					+ " VALUES(" + term.restaurant_id + ", " + tasteNumber
+					+ ", '" + tasteName + "', " + tastePrice + ", " + type
+					+ "," + tasteRate + "," + cal + " ) ";
 
 			int sqlRowCount = dbCon.stmt.executeUpdate(sql);
 
 			jsonResp = jsonResp.replace("$(result)", "true");
-			jsonResp = jsonResp.replace("$(value)", "添加新餐台成功！");
-			
+			jsonResp = jsonResp.replace("$(value)", "添加新口味成功！");
+
 			dbCon.rs.close();
 
 		} catch (BusinessException e) {

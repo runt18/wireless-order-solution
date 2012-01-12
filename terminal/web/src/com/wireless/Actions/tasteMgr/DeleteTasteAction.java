@@ -1,4 +1,4 @@
-package com.wireless.Actions.tableMgr;
+package com.wireless.Actions.tasteMgr;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -19,7 +19,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Terminal;
 
-public class InsertTableAction extends Action {
+public class DeleteTasteAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -40,13 +40,9 @@ public class InsertTableAction extends Action {
 			 * 14:30:00 pin=0x1 & type=3 & ope=2 & value=2011-7-14 14:30:00
 			 * 
 			 * pin : the pin the this terminal
-			 * tableNumber
-			 * tableName
-			 * region
-			 * tableMincost
+			 * dishNumber: 
 			 * 
 			 */
-			
 			String pin = request.getParameter("pin");
 			if (pin.startsWith("0x") || pin.startsWith("0X")) {
 				pin = pin.substring(2);
@@ -57,28 +53,20 @@ public class InsertTableAction extends Action {
 			
 
 			// get the query condition
-			int tableNumber = Integer.parseInt(request.getParameter("tableNumber"));
-			String tableName = request.getParameter("tableName");
-			int region = Integer.parseInt(request.getParameter("region"));
-			float tableMincost = Float.parseFloat(request.getParameter("tableMincost"));
-
+			int tasteID = Integer.parseInt(request.getParameter("tasteID"));
+	
 			/**
 			 * 
-			 */			
-			String sql = "INSERT INTO " + Params.dbName + ".table" +
-					"( alias_id, restaurant_id, region_id, name, minimum_cost, enabled, status ) " + 
-					" VALUES(" +
-					tableNumber + ", " +
-					term.restaurant_id + ", " +
-					region + ", '" +
-					tableName + "', " +
-					tableMincost + ", " +
-					"1, 0 ) ";
+			 */
+			String sql = "DELETE FROM " + Params.dbName + ".taste " +
+					"WHERE restaurant_id=" + term.restaurant_id
+					+ " AND alias_id = " + tasteID;
+
 
 			int sqlRowCount = dbCon.stmt.executeUpdate(sql);
 
 			jsonResp = jsonResp.replace("$(result)", "true");
-			jsonResp = jsonResp.replace("$(value)", "添加新餐台成功！");
+			jsonResp = jsonResp.replace("$(value)", "口味刪除成功！");
 			
 			dbCon.rs.close();
 
