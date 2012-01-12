@@ -1,0 +1,152 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>无线点餐网页终端</title>
+
+<link rel="stylesheet" type="text/css"
+	href="../../extjs/resources/css/ext-all.css" />
+<script type="text/javascript" src="../../extjs/ext-base.js"></script>
+<script type="text/javascript" src="../../extjs/ext-all.js"></script>
+<!-- 解决Grid不能选择复制问题 -->
+<script type="text/javascript" src="../../js/GridViewRewrite.js"></script>
+<script type="text/javascript" src="../../extjs/ext-lang-zh_CN.js"></script>
+
+<!-- 实现多选JS -->
+<script type="text/javascript" src="../../extjs/multiselect/DDView.js"></script>
+<script type="text/javascript"
+	src="../../extjs/multiselect/MultiSelect.js"></script>
+<script type="text/javascript"
+	src="../../extjs/multiselect/ItemSelector.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="../../extjs/multiselect/multiselect.css" />
+
+<!-- css -->
+<link rel="stylesheet" type="text/css" href="../../css/header.css" />
+<link rel="stylesheet" type="text/css" href="../../css/tableStatus.css" />
+
+<script type="text/javascript" src="../../js/components/functionLib.js"></script>
+
+<script type="text/javascript">
+	// 解决combobox图标异常问题
+	Ext.onReady(function() {
+		Ext.BLANK_IMAGE_URL = "../../extjs/resources/images/default/s.gif";
+	});
+</script>
+
+<script type="text/javascript">
+	// global variable
+	var gridHeightOffset = 190; // bill grid heigth offset
+	var checkOutData = []
+	// the ordered dished display list
+	var discountData = []
+	// discount rate list
+	var dishTasteData = []; // taste date
+	var checkOutDataDisplay = []
+	// check out dishes display
+
+	var discountType = 1; // discount type, default normal
+	var payType = 1; // pay type, default type 1
+	var actualMemberID = -1
+	//menber id
+
+	var restaurantID = "";
+	var restaurantData = [];
+
+	var operatorName = "XXX";
+
+	var mBalance = -1;
+
+	var originalTotalCount = -1
+	// important!!!
+</script>
+
+<script type="text/javascript"
+	src="../../js/FrontBusiness/checkOut/checkOutLoad.js"></script>
+<script type="text/javascript"
+	src="../../js/FrontBusiness/checkOut/checkOutTypeChoose.js"></script>
+<script type="text/javascript"
+	src="../../js/FrontBusiness/checkOut/checkOutPay.js"></script>
+<script type="text/javascript"
+	src="../../js/FrontBusiness/checkOut/checkOutMain.js"></script>
+
+
+
+</head>
+<body onload="checkOutOnLoad()">
+	<script type="text/javascript" src="../../extjs/examples.js"></script>
+
+	<div id="west"></div>
+	<div id="north">
+		<p>icons here.</p>
+	</div>
+	<div id="south"></div>
+	<div id="west"></div>
+	<div id="center"></div>
+	<div id="temp">
+		<p>建设中......</p>
+	</div>
+
+
+	<!-- table status -->
+	<div id="tableStatusCO" style="padding-left: 5px">
+		<img title="桌号" src='../../images/TableID.png' style='float: left;' />
+		<div id="tblNbrDivTS" class="tableStatusChar">100&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+		<img title="人数" src='../../images/DinnerAmount.png'
+			style='float: left;' />
+		<div id="perCountDivTS" class="tableStatusChar">4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+		<img title="最低消费" id="minCostImgTS" src='../../images/minCost.png'
+			style='float: left;' />
+		<div id="minCostDivTS" class="tableStatusChar">4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+	</div>
+
+
+	<!-- member infomation -->
+	<div id="memberInfo" style="padding-left: 5px">
+		<img title="会员号" src='../../images/MemberID.png' style='float: left;' />
+		<div id="memberNbr" class="tableStatusChar">000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+		<img title="姓名" src='../../images/MemberName.png' style='float: left;' />
+		<div id="memberName" class="tableStatusChar">XXX&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+		<img title="电话" src='../../images/MemberTele.png.png'
+			style='float: left;' />
+		<div id="memberPhone" class="tableStatusChar">1234567890&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+		<img title="会员卡余额" src='../../images/MemberBalance.png'
+			style='float: left;' />
+		<div id="memberBalance" class="tableStatusChar">10.0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+	</div>
+
+	<!-- pay infomation -->
+	<div id="payInfo" class="billList">
+		<table>
+			<tr>
+				<td>服务费：</td>
+				<td><input id="serviceCharge" type="text" value="0"
+					style="width: 50px;"></input></td>
+				<td>%</td>
+				<td style="width: 60px;">&nbsp;</td>
+				<td>赠送：￥</td>
+				<td><div id="forFree"></div></td>
+				<td style="width: 60px;">&nbsp;</td>
+				<td>合计：￥</td>
+				<td><div id="totalCount"></div></td>
+			</tr>
+			<tr>
+				<td>现金实收：￥</td>
+				<td><input id="actualCount" type="text" style="width: 50px;"></input>
+				</td>
+				<td>&nbsp;&nbsp;&nbsp;</td>
+				<td style="width: 60px;">&nbsp;</td>
+				<td>应收：￥</td>
+				<td><div id="shouldPay"></div></td>
+				<td style="width: 60px;">&nbsp;</td>
+				<td>找零：￥</td>
+				<td><div id="change"></div></td>
+				<td style="width: 40px;">&nbsp;</td>
+				<td><input type="button" value="计算" style="width: 80px;"
+					onclick="moneyCount('button')"></input></td>
+			</tr>
+		</table>
+	</div>
+
+</body>
+</html>
