@@ -64,7 +64,7 @@ public class FuncSettingScreen extends MainScreen{
 		}else{
 			_autoStartup = new CheckboxField("开机自动运行", true);
 		}
-		vfm.add(_autoStartup);
+		//vfm.add(_autoStartup);
 		
 		//add the restore button
 		_restore = new ButtonField("恢复默认值", Field.FIELD_RIGHT | ButtonField.CONSUME_CLICK);
@@ -74,7 +74,7 @@ public class FuncSettingScreen extends MainScreen{
 				_printParam.setSelectedIndex(Params.PRINT_ASYNC);
 				_connTimeout.setSelectedIndex(Params.CONN_TIMEOUT_10);
 				_connType.setSelectedIndex(Params.CONN_MOBILE);
-				_autoStartup.setChecked(true);
+				_autoStartup.setChecked(false);
 			}
 		});
 		vfm.add(_restore);
