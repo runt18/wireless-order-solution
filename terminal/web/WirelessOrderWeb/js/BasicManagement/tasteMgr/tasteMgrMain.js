@@ -904,7 +904,7 @@ Ext
 				frame : true,
 				items : [ {
 					layout : "border",
-					title : "<div style='font-size:20px;'>餐台管理<div>",
+					title : "<div style='font-size:20px;'>口味管理<div>",
 					items : [ tasteQueryCondPanel, tasteGrid ]
 				} ],
 				tbar : new Ext.Toolbar({
