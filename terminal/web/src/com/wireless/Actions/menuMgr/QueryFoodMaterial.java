@@ -153,7 +153,7 @@ public class QueryFoodMaterial extends Action {
 
 			String outputJson = obj.toString();
 
-			System.out.println(outputJson);
+			//System.out.println(outputJson);
 
 			out.write(outputJson);
 

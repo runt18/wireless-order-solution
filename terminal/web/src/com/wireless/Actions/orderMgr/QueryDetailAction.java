@@ -261,7 +261,7 @@ public class QueryDetailAction extends Action {
 			String outputJson = "{\"totalProperty\":" + resultList.size() + ","
 					+ obj.toString().substring(1);
 
-			System.out.println(outputJson);
+			//System.out.println(outputJson);
 
 			// out.write(jsonResp);
 			out.write(outputJson);

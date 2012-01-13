@@ -84,7 +84,7 @@ public class QueryMemberAction extends Action {
 			dbCon.disconnect();
 			
 			//just for debug
-			System.out.println(jsonResp);
+			//System.out.println(jsonResp);
 			out.write(jsonResp);
 		}
 		

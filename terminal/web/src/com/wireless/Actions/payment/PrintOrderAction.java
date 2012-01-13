@@ -207,7 +207,7 @@ public class PrintOrderAction extends Action implements PinGen{
 		}finally{
 			dbCon.disconnect();
 			//just for debug
-			System.out.println(jsonResp);
+			//System.out.println(jsonResp);
 			out.write(jsonResp);
 		}
 

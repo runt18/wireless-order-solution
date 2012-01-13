@@ -66,7 +66,7 @@ public class InsertSupplierAction extends Action {
 					+ " VALUES(" + term.restaurant_id + ", " + supplierAlias
 					+ ", '" + supplierName + "', '" + supplierPhone + "', '"
 					+ supplierAddress + "', '" + supplierContact + "') ";
-			System.out.println(sql);
+			//System.out.println(sql);
 
 			int sqlRowCount = dbCon.stmt.executeUpdate(sql);
 
@@ -101,7 +101,7 @@ public class InsertSupplierAction extends Action {
 		} finally {
 			dbCon.disconnect();
 			// just for debug
-			System.out.println(jsonResp);
+			//System.out.println(jsonResp);
 			out.write(jsonResp);
 		}
 

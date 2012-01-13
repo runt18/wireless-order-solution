@@ -116,7 +116,7 @@ public class StatInventoryOutByReason extends Action {
 					+ " GROUP BY a.type, a.material_id, material_name "
 					+ " ORDER BY a.type, a.material_id ";
 
-			System.out.println(sql);
+			//System.out.println(sql);
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 
 			/**
@@ -211,7 +211,7 @@ public class StatInventoryOutByReason extends Action {
 
 			String outputJson = obj.toString();
 
-			System.out.println(outputJson);
+			//System.out.println(outputJson);
 
 			out.write(outputJson);
 		}

@@ -268,7 +268,7 @@ public class QueryMenuMgrAction extends Action {
 			String outputJson = "{\"totalProperty\":" + chooseList.size() + ","
 					+ obj.toString().substring(1);
 
-			System.out.println(outputJson);
+			//System.out.println(outputJson);
 
 			out.write(outputJson);
 

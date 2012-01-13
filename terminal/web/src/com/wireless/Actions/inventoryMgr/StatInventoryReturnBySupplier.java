@@ -117,7 +117,7 @@ public class StatInventoryReturnBySupplier extends Action {
 					+ " GROUP BY a.supplier_id, supplier_name, a.material_id, material_name "
 					+ " ORDER BY a.supplier_id, a.material_id ";
 
-			System.out.println(sql);
+			//System.out.println(sql);
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 
 			/**
@@ -202,7 +202,7 @@ public class StatInventoryReturnBySupplier extends Action {
 
 			String outputJson = obj.toString();
 
-			System.out.println(outputJson);
+			//System.out.println(outputJson);
 
 			out.write(outputJson);
 		}

@@ -72,7 +72,7 @@ public class InventoryOutAction extends Action {
 					+ ", " + price + ", '" + date + "', " + deptID + ", "
 					+ amount + ", " + type + ", '" + staff + "', '" + remark
 					+ "' ) ";
-			System.out.println(sql);
+			//System.out.println(sql);
 			int sqlRowCount = dbCon.stmt.executeUpdate(sql);
 
 			// 庫存現狀
@@ -124,7 +124,7 @@ public class InventoryOutAction extends Action {
 		} finally {
 			dbCon.disconnect();
 			// just for debug
-			System.out.println(jsonResp);
+			//System.out.println(jsonResp);
 			out.write(jsonResp);
 		}
 

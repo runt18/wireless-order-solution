@@ -114,7 +114,7 @@ public class InsertMenuAction extends Action {
 					kitchen + ", " +
 					status + ", 1 " +
 					") ";
-			System.out.println(sql);
+			//System.out.println(sql);
 
 			int sqlRowCount = dbCon.stmt.executeUpdate(sql);
 
@@ -149,7 +149,7 @@ public class InsertMenuAction extends Action {
 		} finally {
 			dbCon.disconnect();
 			// just for debug
-			System.out.println(jsonResp);
+			//System.out.println(jsonResp);
 			out.write(jsonResp);
 		}
 

@@ -151,7 +151,7 @@ public class UpdateOrderAction2 extends Action{
 			
 		}finally{
 			//just for debug
-			System.out.println(jsonResp);
+			//System.out.println(jsonResp);
 			out.write(jsonResp);
 		}
 		

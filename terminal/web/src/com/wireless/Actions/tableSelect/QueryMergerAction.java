@@ -75,7 +75,7 @@ public class QueryMergerAction extends Action {
 			
 			dbCon.disconnect();
 			//Just for debug
-			System.out.println(jsonResp);
+			//System.out.println(jsonResp);
 			out.write(jsonResp);
 		}
 		return null;

@@ -190,10 +190,10 @@ public class QueryRegionMgrAction extends Action {
 					+ obj.toString().substring(1);
 
 			if (isCombo.equals("true")) {
-				System.out.println(outString);
+				//System.out.println(outString);
 				out.write(outString);
 			} else {
-				System.out.println(outputJson);
+				//System.out.println(outputJson);
 				out.write(outputJson);
 			}
 

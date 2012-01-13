@@ -81,7 +81,7 @@ public class QueryRestaurantAction extends Action {
 		}finally{
 			dbCon.disconnect();
 			//Just for debug
-			System.out.println(jsonResp);
+			//System.out.println(jsonResp);
 			out.write(jsonResp);
 		}
 		return null;

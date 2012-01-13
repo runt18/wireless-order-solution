@@ -176,7 +176,7 @@ public class InsertOrderAction extends Action implements PinGen {
 			
 		}finally{
 			//just for debug
-			System.out.println(jsonResp);
+			//System.out.println(jsonResp);
 			out.write(jsonResp);
 		}
 

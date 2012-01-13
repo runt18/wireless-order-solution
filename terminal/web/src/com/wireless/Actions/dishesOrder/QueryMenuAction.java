@@ -102,7 +102,7 @@ public class QueryMenuAction extends Action {
 			
 		}finally{
 			//just for debug
-			System.out.println(jsonResp);
+			//System.out.println(jsonResp);
 			out.write(jsonResp);			
 		}
 		return null;

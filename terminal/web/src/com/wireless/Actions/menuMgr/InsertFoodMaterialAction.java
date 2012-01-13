@@ -64,7 +64,7 @@ public class InsertFoodMaterialAction extends Action {
 					+ "( restaurant_id, material_id, food_id, consumption ) "
 					+ " VALUES( " + term.restaurant_id + ", " + materialID
 					+ ", " + foodID + ", " + cost + " ) ";
-			System.out.println(sql);
+			//System.out.println(sql);
 
 			int sqlRowCount = dbCon.stmt.executeUpdate(sql);
 
@@ -99,7 +99,7 @@ public class InsertFoodMaterialAction extends Action {
 		} finally {
 			dbCon.disconnect(); 
 			// just for debug
-			System.out.println(jsonResp);
+			//System.out.println(jsonResp);
 			out.write(jsonResp);
 		}
 
