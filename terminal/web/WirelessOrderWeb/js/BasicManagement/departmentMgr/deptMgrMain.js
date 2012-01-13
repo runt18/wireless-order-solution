@@ -109,11 +109,6 @@ Ext
 				viewConfig : {
 					forceFit : true
 				},
-				listeners : {
-					"rowclick" : function(thiz, rowIndex, e) {
-						currRowIndex = rowIndex;
-					}
-				},
 				tbar : [ {
 					text : '保存修改',
 					tooltip : '保存修改',

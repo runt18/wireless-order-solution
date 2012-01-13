@@ -238,8 +238,36 @@ var pushBackBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "返回",
 	handler : function(btn) {
-		location.href = "BasicMgrProtal.html?restaurantID=" + restaurantID
-				+ "&pin=" + pin;
+
+		var isChange = false;
+		tasteGrid.getStore().each(
+				function(record) {
+					if (record.isModified("tasteName") == true
+							|| record.isModified("tastePrice") == true
+							|| record.isModified("tasteRate") == true
+							|| record.isModified("tasteCalc") == true
+							|| record.isModified("tasteCategory") == true) {
+						isChange = true;
+					}
+				});
+
+		if (isChange) {
+			Ext.MessageBox.show({
+				msg : "修改尚未保存，是否确认返回？",
+				width : 300,
+				buttons : Ext.MessageBox.YESNO,
+				fn : function(btn) {
+					if (btn == "yes") {
+						location.href = "BasicMgrProtal.html?restaurantID="
+								+ restaurantID + "&pin=" + pin;
+					}
+				}
+			});
+		} else {
+			location.href = "BasicMgrProtal.html?restaurantID=" + restaurantID
+					+ "&pin=" + pin;
+		}
+
 	}
 });
 

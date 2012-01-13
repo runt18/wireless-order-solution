@@ -49,13 +49,13 @@ tableAddWin = new Ext.Window({
 			xtype : "textfield",
 			fieldLabel : "名称",
 			id : "tableAddName",
-			//allowBlank : false,
+			// allowBlank : false,
 			width : 160
 		}, regionAddComb, {
 			xtype : "numberfield",
 			fieldLabel : "最低消费",
 			id : "tableAddMincost",
-			//allowBlank : false,
+			// allowBlank : false,
 			width : 160
 		} ]
 	} ],
@@ -75,10 +75,10 @@ tableAddWin = new Ext.Window({
 						var tableAddName = tableAddWin.findById("tableAddName")
 								.getValue();
 						var region = regionAddComb.getValue();
-						
+
 						var tableAddMincost = tableAddWin.findById(
 								"tableAddMincost").getValue();
-						if(tableAddMincost == ""){
+						if (tableAddMincost == "") {
 							tableAddMincost = 0;
 						}
 
@@ -193,8 +193,32 @@ var pushBackBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "返回",
 	handler : function(btn) {
-		location.href = "BasicMgrProtal.html?restaurantID=" + restaurantID
-				+ "&pin=" + pin;
+		var isChange = false;
+		tableGrid.getStore().each(
+				function(record) {
+					if (record.isModified("tableName") == true
+							|| record.isModified("tableRegion") == true
+							|| record.isModified("tableMinCost") == true) {
+						isChange = true;
+					}
+				});
+
+		if (isChange) {
+			Ext.MessageBox.show({
+				msg : "修改尚未保存，是否确认返回？",
+				width : 300,
+				buttons : Ext.MessageBox.YESNO,
+				fn : function(btn) {
+					if (btn == "yes") {
+						location.href = "BasicMgrProtal.html?restaurantID="
+								+ restaurantID + "&pin=" + pin;
+					}
+				}
+			});
+		} else {
+			location.href = "BasicMgrProtal.html?restaurantID=" + restaurantID
+					+ "&pin=" + pin;
+		}
 	}
 });
 
@@ -265,7 +289,7 @@ var filterTypeComb = new Ext.form.ComboBox({
 				allowBlank : false
 			});
 
-			var statusData = [ [ "1", "空闲" ], [ "2", "就餐" ] ];
+			var statusData = [ [ "0", "空闲" ], [ "1", "就餐" ] ];
 			var statusComb = new Ext.form.ComboBox({
 				hideLabel : true,
 				forceSelection : true,
@@ -420,53 +444,63 @@ var tableQueryCondPanel = new Ext.form.FormPanel({
 
 // operator function
 function tableDeleteHandler(rowIndex) {
-	Ext.MessageBox.show({
-		msg : "确定删除？",
-		width : 300,
-		buttons : Ext.MessageBox.YESNO,
-		fn : function(btn) {
-			if (btn == "yes") {
-				var tableID = tableStore.getAt(rowIndex).get("tableID");
 
-				Ext.Ajax.request({
-					url : "../../DeleteTable.do",
-					params : {
-						"pin" : pin,
-						"tableID" : tableID
-					},
-					success : function(response, options) {
-						var resultJSON = Ext.util.JSON
-								.decode(response.responseText);
-						if (resultJSON.success == true) {
-							loadAllTable();
-							tableStore.reload({
-								params : {
-									start : 0,
-									limit : pageRecordCount
-								}
-							});
+	if (tableGrid.getStore().getAt(rowIndex).get("tableStatus") == 1) {
+		Ext.MessageBox.show({
+			msg : "就餐状态餐台不能删除",
+			width : 300,
+			buttons : Ext.MessageBox.OK
+		});
+	} else {
 
-							var dataInfo = resultJSON.data;
-							Ext.MessageBox.show({
-								msg : dataInfo,
-								width : 300,
-								buttons : Ext.MessageBox.OK
-							});
-						} else {
-							var dataInfo = resultJSON.data;
-							Ext.MessageBox.show({
-								msg : dataInfo,
-								width : 300,
-								buttons : Ext.MessageBox.OK
-							});
+		Ext.MessageBox.show({
+			msg : "确定删除？",
+			width : 300,
+			buttons : Ext.MessageBox.YESNO,
+			fn : function(btn) {
+				if (btn == "yes") {
+					var tableID = tableStore.getAt(rowIndex).get("tableID");
+
+					Ext.Ajax.request({
+						url : "../../DeleteTable.do",
+						params : {
+							"pin" : pin,
+							"tableID" : tableID
+						},
+						success : function(response, options) {
+							var resultJSON = Ext.util.JSON
+									.decode(response.responseText);
+							if (resultJSON.success == true) {
+								loadAllTable();
+								tableStore.reload({
+									params : {
+										start : 0,
+										limit : pageRecordCount
+									}
+								});
+
+								var dataInfo = resultJSON.data;
+								Ext.MessageBox.show({
+									msg : dataInfo,
+									width : 300,
+									buttons : Ext.MessageBox.OK
+								});
+							} else {
+								var dataInfo = resultJSON.data;
+								Ext.MessageBox.show({
+									msg : dataInfo,
+									width : 300,
+									buttons : Ext.MessageBox.OK
+								});
+							}
+						},
+						failure : function(response, options) {
 						}
-					},
-					failure : function(response, options) {
-					}
-				});
+					});
+				}
 			}
-		}
-	});
+		});
+	}
 };
 
 var regionCombStore = new Ext.data.Store({
@@ -485,9 +519,9 @@ var regionCombStore = new Ext.data.Store({
 	} ])
 });
 
-var regionComb = new Ext.form.ComboBox({
+var regionModComb = new Ext.form.ComboBox({
 	forceSelection : true,
-	id : "regionComb",
+	id : "regionModComb",
 	store : regionCombStore,
 	valueField : "regionID",
 	displayField : "regionName",
@@ -495,7 +529,14 @@ var regionComb = new Ext.form.ComboBox({
 	mode : "local",
 	triggerAction : "all",
 	selectOnFocus : true,
-	allowBlank : false
+	allowBlank : false,
+	validator : function(v) {
+		if (tableGrid.getStore().getAt(currRowIndex).get("tableStatus") == 1) {
+			return "就餐状态餐台不能修改";
+		} else {
+			return true;
+		}
+	}
 });
 
 function tableOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
@@ -524,7 +565,11 @@ var tableStore = new Ext.data.Store({
 	}, {
 		name : "tableStatus"
 	}, {
+		name : "tableStatusDisplay"
+	}, {
 		name : "tableCategory"
+	}, {
+		name : "tableCategoryDisplay"
 	}, {
 		name : "tableMinCost"
 	}, {
@@ -537,56 +582,82 @@ var tableStore = new Ext.data.Store({
 // menuStore.reload();
 
 // 2，栏位模型
-var tableColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(), {
-	header : "编号",
-	sortable : true,
-	dataIndex : "tableAlias",
-	width : 80
-}, {
-	header : "名称",
-	sortable : true,
-	dataIndex : "tableName",
-	width : 100,
-	editor : new Ext.form.TextField({
-		//allowBlank : false,
-		allowNegative : false
-	})
-}, {
-	header : "区域",
-	sortable : true,
-	dataIndex : "tableRegion",
-	width : 100,
-	editor : regionComb,
-	renderer : function(value, cellmeta, record) {
-		var regionDesc = "";
-		for ( var i = 0; i < regionData.length; i++) {
-			if (regionData[i][0] == value) {
-				regionDesc = regionData[i][1];
+var tableColumnModel = new Ext.grid.ColumnModel([
+		new Ext.grid.RowNumberer(),
+		{
+			header : "编号",
+			sortable : true,
+			dataIndex : "tableAlias",
+			width : 80
+		},
+		{
+			header : "名称",
+			sortable : true,
+			dataIndex : "tableName",
+			width : 100,
+			editor : new Ext.form.TextField({
+				// allowBlank : false,
+				allowNegative : false,
+				validator : function(v) {
+					if (tableGrid.getStore().getAt(currRowIndex).get(
+							"tableStatus") == 1) {
+						return "就餐状态餐台不能修改";
+					} else {
+						return true;
+					}
+				}
+			})
+		},
+		{
+			header : "区域",
+			sortable : true,
+			dataIndex : "tableRegion",
+			width : 100,
+			editor : regionModComb,
+			renderer : function(value, cellmeta, record) {
+				var regionDesc = "";
+				for ( var i = 0; i < regionData.length; i++) {
+					if (regionData[i][0] == value) {
+						regionDesc = regionData[i][1];
+					}
+				}
+				return regionDesc;
 			}
-		}
-		return regionDesc;
-	}
-}, {
-	header : "最低消（￥）",
-	sortable : true,
-	dataIndex : "tableMinCost",
-	width : 100,
-	editor : new Ext.form.NumberField({
-		allowBlank : false,
-		allowNegative : false
-	})
-}, {
-	header : "状态",
-	sortable : true,
-	dataIndex : "tableStatus",
-	width : 90
-}, {
-	header : "<center>操作</center>",
-	sortable : true,
-	dataIndex : "operator",
-	width : 180,
-	renderer : tableOpt
-} ]);
+		},
+		{
+			header : "最低消（￥）",
+			sortable : true,
+			dataIndex : "tableMinCost",
+			width : 100,
+			editor : new Ext.form.NumberField({
+				allowBlank : false,
+				allowNegative : false,
+				validator : function(v) {
+					if (tableGrid.getStore().getAt(currRowIndex).get(
+							"tableStatus") == 1) {
+						return "就餐状态餐台不能修改";
+					} else {
+						return true;
+					}
+				}
+			})
+		}, {
+			header : "状态",
+			sortable : true,
+			dataIndex : "tableStatusDisplay",
+			width : 90
+		}, {
+			header : "类型",
+			sortable : true,
+			dataIndex : "tableCategoryDisplay",
+			width : 90
+		}, {
+			header : "<center>操作</center>",
+			sortable : true,
+			dataIndex : "operator",
+			width : 180,
+			renderer : tableOpt
+		} ]);
 
 // -------------- layout ---------------
 var tableGrid;
@@ -612,11 +683,6 @@ Ext
 						}),
 						viewConfig : {
 							forceFit : true
-						},
-						listeners : {
-							rowclick : function(thiz, rowIndex, e) {
-								currRowIndex = rowIndex;
-							}
 						},
 						tbar : [ {
 							text : '保存修改',
@@ -727,13 +793,15 @@ Ext
 						},
 						listeners : {
 							"render" : function(thiz) {
-								// alert("here");
 								tableStore.reload({
 									params : {
 										start : 0,
 										limit : pageRecordCount
 									}
 								});
+							},
+							"rowclick" : function(thiz, rowIndex, e) {
+								currRowIndex = rowIndex;
 							}
 						}
 					});
@@ -801,7 +869,28 @@ Ext
 						});
 						this.removeAll();
 					} else {
+						tableGrid.getStore().each(function(record) {
+							// 狀態顯示
+							if (record.get("tableStatus") == 0) {
+								record.set("tableStatusDisplay", "空闲");
+							} else {
+								record.set("tableStatusDisplay", "就餐");
+							}
 
+							// 類型顯示: 一般 : 1\n外卖 : 2\n并台 : 3\n拼台 : 4
+							if (record.get("tableCategory") == 1) {
+								record.set("tableCategoryDisplay", "一般");
+							} else if (record.get("tableCategory") == 2) {
+								record.set("tableCategoryDisplay", "外卖");
+							} else if (record.get("tableCategory") == 3) {
+								record.set("tableCategoryDisplay", "并台");
+							} else if (record.get("tableCategory") == 4) {
+								record.set("tableCategoryDisplay", "拼台");
+							}
+
+							// 提交，去掉修改標記
+							record.commit();
+						});
 					}
 				}
 			});
