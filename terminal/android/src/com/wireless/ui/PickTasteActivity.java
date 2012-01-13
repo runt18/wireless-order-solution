@@ -3,6 +3,7 @@ package com.wireless.ui;
 import java.util.ArrayList;
 
 import android.app.TabActivity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,6 +17,12 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -147,6 +154,25 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 			}
 		});
 		
+		
+		
+		//滚动的时候隐藏输入法
+		tasteLstView.setOnScrollListener(new OnScrollListener() {
+				
+				@Override
+				public void onScrollStateChanged(AbsListView view, int scrollState) {
+					((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(((EditText)findViewById(R.id.tastesearch)).getWindowToken(), 0);
+				}
+				
+				@Override
+				public void onScroll(AbsListView view, int firstVisibleItem,
+						int visibleItemCount, int totalItemCount) {
+					// TODO Auto-generated method stub
+					
+				}
+			});
+		
+		
 		/**
 		 * 在口味选择页面中按编号进行口味的筛选
 		 */
@@ -194,6 +220,22 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 			}
 		});
 	    
+	  //滚动的时候隐藏输入法
+	    styleLstView.setOnScrollListener(new OnScrollListener() {
+				
+				@Override
+				public void onScrollStateChanged(AbsListView view, int scrollState) {
+					((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(((EditText)findViewById(R.id.stylesearch)).getWindowToken(), 0);
+				}
+				
+				@Override
+				public void onScroll(AbsListView view, int firstVisibleItem,
+						int visibleItemCount, int totalItemCount) {
+					// TODO Auto-generated method stub
+					
+				}
+			});
+	    
 	    /**
 		 * 在做法选择页面中按编号进行做法的筛选
 		 */
@@ -240,7 +282,24 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 					
 				}
 			});
-
+	    
+	    
+	    
+	    //滚动的时候隐藏输入法
+	    specLstView.setOnScrollListener(new OnScrollListener() {
+				
+				@Override
+				public void onScrollStateChanged(AbsListView view, int scrollState) {
+					((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(((EditText)findViewById(R.id.specsearch)).getWindowToken(), 0);
+				}
+				
+				@Override
+				public void onScroll(AbsListView view, int firstVisibleItem,
+						int visibleItemCount, int totalItemCount) {
+					// TODO Auto-generated method stub
+					
+				}
+			});
 	    /**
 		 * 在规格选择页面中按编号进行规格的筛选
 		 */
