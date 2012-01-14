@@ -9,17 +9,18 @@
 		android:cacheColorHint="#00000000"
 		android:layout_weight="9"
 	/>
+
 	<Button
 		android:id="@+id/dialog_back_btn"
 		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
+		android:layout_height="35dip"
 		android:text="返回"
-		android:textColor="#000000"
+		android:textColor="#FFFFFF"
         android:textSize="22sp"
         android:typeface="serif"
         android:textStyle="italic"
 		android:background="@drawable/dialogback_selector"
 		android:layout_gravity="center_horizontal"
-		android:layout_weight="1"
 	/>
+
 </LinearLayout>
