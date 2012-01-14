@@ -20,9 +20,6 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -170,7 +167,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 					// TODO Auto-generated method stub
 					
 				}
-			});
+		});
 		
 		
 		/**

@@ -9,6 +9,7 @@ import java.util.List;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnKeyListener;
@@ -18,10 +19,13 @@ import android.os.Handler;
 import android.os.Message;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.AbsListView.OnScrollListener;
 
 import com.wireless.common.FoodParcel;
 import com.wireless.common.OrderParcel;
@@ -128,6 +132,16 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 		//_oriFoodLstView.setGroupIndicator(getResources().getDrawable(R.layout.expander_folder));
 		_oriFoodLstView.setType(Type.UPDATE_ORDER);
 		_oriFoodLstView.setOperListener(this);
+		//滚动的时候隐藏输入法
+		_oriFoodLstView.setOnScrollListener(new OnScrollListener() {				
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
+				((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(((EditText)findViewById(R.id.valueplatform)).getWindowToken(), 0);
+			}
+				
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {}
+		});	
 		_oriFoodLstView.setChangedListener(new OrderFoodListView.OnChangedListener() {			
 			@Override
 			public void onSourceChanged() {
@@ -144,6 +158,16 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 		//_newFoodLstView.setGroupIndicator(getResources().getDrawable(R.layout.expander_folder));
 		_newFoodLstView.setType(Type.INSERT_ORDER);
 		_newFoodLstView.setOperListener(this);
+		//滚动的时候隐藏输入法
+		_newFoodLstView.setOnScrollListener(new OnScrollListener() {				
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
+				((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(((EditText)findViewById(R.id.valueplatform)).getWindowToken(), 0);
+			}
+				
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {}
+		});	
 		_newFoodLstView.setChangedListener(new OrderFoodListView.OnChangedListener() {			
 			@Override
 			public void onSourceChanged() {
