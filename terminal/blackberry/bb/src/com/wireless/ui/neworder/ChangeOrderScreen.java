@@ -8,11 +8,13 @@ import net.rim.device.api.ui.Field;
 import net.rim.device.api.ui.FieldChangeListener;
 import net.rim.device.api.ui.Graphics;
 import net.rim.device.api.ui.Manager;
+import net.rim.device.api.ui.MenuItem;
 import net.rim.device.api.ui.UiApplication;
 import net.rim.device.api.ui.component.ButtonField;
 import net.rim.device.api.ui.component.Dialog;
 import net.rim.device.api.ui.component.EditField;
 import net.rim.device.api.ui.component.LabelField;
+import net.rim.device.api.ui.component.Menu;
 import net.rim.device.api.ui.component.SeparatorField;
 import net.rim.device.api.ui.component.TextField;
 import net.rim.device.api.ui.container.HorizontalFieldManager;
@@ -260,6 +262,39 @@ public class ChangeOrderScreen extends MainScreen implements PostSubmitOrder{
 		//Focus on order button
 		byNoBtn.setFocus();
 	}  
+	
+	protected void makeMenu(Menu menu, int instance){
+		menu.add(new MenuItem("全单叫起", 100, 1){
+			public void run(){
+				if(Dialog.ask(Dialog.D_YES_NO, "确认全单叫起吗?", Dialog.NO) == Dialog.YES){
+					for(int i = 0; i < _newListField.getSize(); i++){
+						((OrderFood)_newListField.getCallback().get(null, i)).hangStatus = OrderFood.FOOD_HANG_UP;
+					}	
+					_newListField.invalidate();
+				}
+			}
+		});
+		
+		menu.add(new MenuItem("全单即起", 100, 2){
+			public void run(){
+				if(Dialog.ask(Dialog.D_YES_NO, "确认全单即起吗?", Dialog.NO) == Dialog.YES){
+					for(int i = 0; i < _oriListField.getSize(); i++){
+						OrderFood food = (OrderFood)_oriListField.getCallback().get(null, i);
+						if(food.hangStatus == OrderFood.FOOD_HANG_UP){
+							food.hangStatus = OrderFood.FOOD_IMMEDIATE;
+						}
+					}		
+					_oriListField.invalidate();
+				}
+			}
+		});
+		
+		menu.add(new MenuItem("关闭", 196610, 1){
+			public void run(){
+				onClose();
+			}
+		});
+	}
 	
 	protected boolean onSavePrompt(){
 		return true;
