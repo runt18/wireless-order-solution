@@ -1,5 +1,5 @@
 ﻿var paySubmit = function(submitType) {
-	
+
 	var canSubmit = true;
 	// var actualPrice = checkOutForm.findById("actualCount").getValue();
 	var actualPrice = document.getElementById("actualCount").value;
@@ -83,15 +83,21 @@
 							}
 						}
 					});
-				} else {
-					
 					checkOutForm.buttons[0].setDisabled(false);
 					checkOutForm.buttons[1].setDisabled(false);
 					checkOutForm.buttons[2].setDisabled(false);
 					checkOutForm.buttons[3].setDisabled(false);
 					checkOutForm.buttons[4].setDisabled(false);
 					checkOutForm.buttons[5].setDisabled(false);
-					
+				} else {
+
+					checkOutForm.buttons[0].setDisabled(false);
+					checkOutForm.buttons[1].setDisabled(false);
+					checkOutForm.buttons[2].setDisabled(false);
+					checkOutForm.buttons[3].setDisabled(false);
+					checkOutForm.buttons[4].setDisabled(false);
+					checkOutForm.buttons[5].setDisabled(false);
+
 					var dataInfo = resultJSON.data;
 					Ext.MessageBox.show({
 						msg : dataInfo,
@@ -107,7 +113,7 @@
 				checkOutForm.buttons[3].setDisabled(false);
 				checkOutForm.buttons[4].setDisabled(false);
 				checkOutForm.buttons[5].setDisabled(false);
-				
+
 				Ext.MessageBox.show({
 					msg : "Unknow page error",
 					width : 300,
