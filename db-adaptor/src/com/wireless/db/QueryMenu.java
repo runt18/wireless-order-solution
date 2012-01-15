@@ -317,8 +317,8 @@ public class QueryMenu {
 		ArrayList<Department> sKitchens = new ArrayList<Department>();
 		String sql = "SELECT dept_id, name FROM " + Params.dbName + ".department WHERE " +
 					 " restaurant_id=" + restaurantID + " " +
-					 (extraCond == null ? extraCond : "") + " " +
-					 (orderClause == null ? orderClause : "");
+					 (extraCond != null ? extraCond : "") + " " +
+					 (orderClause != null ? orderClause : "");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
 			sKitchens.add(new Department(dbCon.rs.getString("name"),
