@@ -55,6 +55,8 @@ public class UpdateOrder {
 			
 			Terminal term = VerifyPin.exec(dbCon, pin, model);
 			
+			Table oriTbl = null, newTbl = null;
+			
 			/**
 			 * There are two update order condition to deal with.
 			 * 1 - The table is the same
@@ -90,23 +92,23 @@ public class UpdateOrder {
 			 */
 			}else{			
 				
-				Table originalTable = QueryTable.exec(dbCon, pin, model, orderToUpdate.originalTableID);
-				Table transferredTable = QueryTable.exec(dbCon, pin, model, orderToUpdate.table_id);
+				oriTbl = QueryTable.exec(dbCon, pin, model, orderToUpdate.originalTableID);
+				newTbl = QueryTable.exec(dbCon, pin, model, orderToUpdate.table_id);
 				
-				if(transferredTable.status == Table.TABLE_BUSY){
+				if(newTbl.status == Table.TABLE_BUSY){
 					throw new BusinessException("The table(alias_id=" + orderToUpdate.table_id + ") to be transferred is BUSY.",
 												ErrorCode.TABLE_BUSY);
 					
-				}else if(originalTable.status == Table.TABLE_IDLE){
+				}else if(oriTbl.status == Table.TABLE_IDLE){
 					throw new BusinessException("The original table(alias_id=" + orderToUpdate.originalTableID + ") to be transferred is IDLE.",
 												ErrorCode.TABLE_IDLE);
 				}
-				orderToUpdate.table_name = transferredTable.name;
-				orderToUpdate.id = Util.getUnPaidOrderID(dbCon, originalTable);
+				orderToUpdate.table_name = newTbl.name;
+				orderToUpdate.id = Util.getUnPaidOrderID(dbCon, oriTbl);
 			}
 			
 			
-			return updateOrder(dbCon, term, orderToUpdate, false);
+			return updateOrder(dbCon, term, orderToUpdate, oriTbl, newTbl, false);
 			
 		}finally{
 			dbCon.disconnect();
@@ -168,10 +170,10 @@ public class UpdateOrder {
 		if(dbCon.rs.next()){
 			orderToUpdate.table_id = dbCon.rs.getInt("table_id");
 			String tblName = dbCon.rs.getString("table_name");
-			orderToUpdate.table_name = tblName != null ? tblName : "";
+			orderToUpdate.table_name = (tblName != null ? tblName : "");
 			dbCon.rs.close();
 			
-			return updateOrder(dbCon, term, orderToUpdate, isGiftSkip);
+			return updateOrder(dbCon, term, orderToUpdate, null, null, isGiftSkip);
 			
 		}else{
 			throw new BusinessException("Order(id=" + orderToUpdate.id + ") to query does NOT exist.", ErrorCode.ORDER_NOT_EXIST);
@@ -179,7 +181,8 @@ public class UpdateOrder {
 	
 	}
 	
-	private static Result updateOrder(DBCon dbCon, Terminal term, Order orderToUpdate, boolean isGiftSkip) throws BusinessException, SQLException{		
+	private static Result updateOrder(DBCon dbCon, Terminal term, Order orderToUpdate, 
+									  Table oriTbl, Table newTbl, boolean isGiftSkip) throws BusinessException, SQLException{		
 		
 		//query all the food's id ,order count and taste preference of this order
 		ArrayList<OrderFood> originalRecords = new ArrayList<OrderFood>();
@@ -544,6 +547,25 @@ public class UpdateOrder {
 			result.hurriedOrder.table_name = orderToUpdate.table_name;
 			result.hurriedOrder.custom_num = orderToUpdate.custom_num;
 			result.hurriedOrder.foods = hurriedFoods.toArray(new OrderFood[hurriedFoods.size()]);
+		}
+		
+		if(oriTbl != null && newTbl != null){
+			// update the original table status to idle
+			sql = "UPDATE " + Params.dbName + ".table SET status="
+					+ Table.TABLE_IDLE + "," + "custom_num=NULL,"
+					+ "category=NULL" + " WHERE restaurant_id="
+					+ oriTbl.restaurantID + " AND alias_id="
+					+ oriTbl.alias_id;
+			dbCon.stmt.execute(sql);
+			
+			// update the new table status to busy
+			sql = "UPDATE " + Params.dbName + ".table SET " +
+					  "status=" + Table.TABLE_BUSY + ", " +
+					  "category=" + oriTbl.category + ", " +
+					  "custom_num=" + oriTbl.custom_num + 
+					  " WHERE restaurant_id=" + newTbl.restaurantID + 
+					  " AND alias_id=" + newTbl.alias_id;
+			dbCon.stmt.execute(sql);
 		}
 		
 		return result;
