@@ -496,7 +496,7 @@ var menuVerifyWin = new Ext.Window(
 										url : "../VerifyPwd.do",
 										params : {
 											"pin" : currPin,
-											"type" : "2",
+											"type" : "3",
 											"pwd" : pwdTrans
 										},
 										success : function(response, options) {
