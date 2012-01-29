@@ -501,7 +501,8 @@ var orderedForm = new Ext.form.FormPanel(
 															});
 
 												} else {
-													orderedForm.buttons[0].setDisabled(false);
+													orderedForm.buttons[0]
+															.setDisabled(false);
 													Ext.MessageBox
 															.show({
 																msg : resultJSON.data,
@@ -512,13 +513,13 @@ var orderedForm = new Ext.form.FormPanel(
 											},
 											failure : function(response,
 													options) {
-												orderedForm.buttons[0].setDisabled(false);
-												Ext.MessageBox
-														.show({
-															msg : "Unknow page error",
-															width : 300,
-															buttons : Ext.MessageBox.OK
-														});
+												orderedForm.buttons[0]
+														.setDisabled(false);
+												Ext.MessageBox.show({
+													msg : "Unknow page error",
+													width : 300,
+													buttons : Ext.MessageBox.OK
+												});
 											}
 										});
 							}
@@ -1408,7 +1409,9 @@ var dishesDisplayGrid = new Ext.grid.GridPanel({
 					"￥0",// ￥口味价钱
 					0,// 口味编号2
 					0, // 口味编号3
-					dishesDisplayDataShow[rowIndex][9] // 時
+					dishesDisplayDataShow[rowIndex][9], // 時
+					"false", // 是否临时菜
+					"" // 菜名ORIG
 					]);
 				}
 				orderedStore.reload();
