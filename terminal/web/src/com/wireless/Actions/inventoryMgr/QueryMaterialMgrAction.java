@@ -108,6 +108,10 @@ public class QueryMaterialMgrAction extends Action {
 			// get the value to filter
 			String filterVal = request.getParameter("value");
 
+			// get the checkbox values
+			String isWarning = request.getParameter("isWarning");
+			String isDanger = request.getParameter("isDanger");
+
 			// combine the operator and filter value
 			String filterCondition = null;
 
@@ -134,6 +138,21 @@ public class QueryMaterialMgrAction extends Action {
 				filterCondition = "";
 			}
 
+			String havingCondition = "";
+			if (isDanger.equals("true")) {
+				// 低於危險閥值
+				havingCondition = " HAVING stock < A.danger_threshold ";
+			}
+			if (isWarning.equals("true")) {
+				// 低於預警閥值
+				if (havingCondition.equals("")) {
+					havingCondition = " HAVING stock < A.warning_threshold ";
+				} else {
+					havingCondition = havingCondition
+							+ " AND stock < A.warning_threshold ";
+				}
+			}
+
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, Integer.parseInt(pin, 16),
 					Terminal.MODEL_STAFF);
@@ -148,7 +167,8 @@ public class QueryMaterialMgrAction extends Action {
 					+ term.restaurant_id
 					+ " "
 					+ filterCondition
-					+ " GROUP BY A.material_id, A.material_alias, A.name, B.price, A.warning_threshold, A.danger_threshold  ";
+					+ " GROUP BY A.material_id, A.material_alias, A.name, B.price, A.warning_threshold, A.danger_threshold  "
+					+ havingCondition;
 
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 
@@ -231,7 +251,7 @@ public class QueryMaterialMgrAction extends Action {
 			String outputJson = "{\"totalProperty\":" + resultList.size() + ","
 					+ obj.toString().substring(1);
 
-			//System.out.println(outputJson);
+			// System.out.println(outputJson);
 
 			out.write(outputJson);
 

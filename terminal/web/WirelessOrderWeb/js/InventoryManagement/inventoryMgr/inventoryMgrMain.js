@@ -1826,6 +1826,28 @@ var materialQueryCondPanel = new Ext.form.FormPanel({
 			width : 110,
 			items : operatorComb
 		}, searchForm, {
+			layout : "form",
+			border : false,
+			labelSeparator : '',
+			width : 90,
+			labelWidth : 55,
+			items : [ {
+				xtype : "checkbox",
+				id : "warnCheckbox",
+				fieldLabel : "低于预警"
+			} ]
+		}, {
+			layout : "form",
+			border : false,
+			labelSeparator : '',
+			width : 90,
+			labelWidth : 55,
+			items : [ {
+				xtype : "checkbox",
+				id : "dangerCheckbox",
+				fieldLabel : "低于危险"
+			} ]
+		}, {
 			layout : 'form',
 			border : false,
 			width : 70,
@@ -2273,13 +2295,20 @@ Ext
 									}
 								}
 
+								var isWarning = materialQueryCondPanel
+										.findById("warnCheckbox").getValue();
+								var isDanger = materialQueryCondPanel.findById(
+										"dangerCheckbox").getValue();
+
 								// 输入查询条件参数
 								this.baseParams = {
 									"pin" : pin,
 									"type" : queryTpye,
 									"ope" : queryOperator,
 									"value" : queryValue,
-									"isPaging" : true
+									"isPaging" : true,
+									"isWarning" : isWarning,
+									"isDanger" : isDanger
 								};
 
 							});

@@ -8,7 +8,9 @@
 			"type" : 0,
 			"ope" : 1,
 			"value" : "",
-			"isPaging" : false
+			"isPaging" : false,
+			"isWarning" : false,
+			"isDanger" : false
 		},
 		success : function(response, options) {
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
