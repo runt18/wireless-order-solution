@@ -665,6 +665,12 @@ Ext
 					bodyStyle : "background-color:#d8ebef;",
 					height : 60,
 					contentEl : "tableListPageCount"
+				}, {
+					region : "north",
+					border : false,
+					bodyStyle : "background-color:#d8ebef;",
+					height : 40,
+					contentEl : "tableListRegionInfo"
 				} ]
 
 			});
@@ -772,22 +778,7 @@ Ext
 									if (category != CATE_MERGER_TABLE) {
 										minCost = tableStatusListTSDisplay[tableIndex].tableMinCost;
 									} else {
-										// 取較大最低消
-										var tblArray = getMergeTable(selectedTable);
-										var table1Index = -1;
-										var table2Index = -1;
-										for ( var i = 0; i < tableStatusListTS.length; i++) {
-											if (tableStatusListTS[i].tableAlias == tblArray[0]) {
-												table1Index = i;
-											}
-											if (tableStatusListTS[i].tableAlias == tblArray[1]) {
-												table2Index = i;
-											}
-										}
-										minCost = tableStatusListTS[table1Index].tableMinCost;
-										if (minCost < tableStatusListTS[table2Index].tableMinCost) {
-											minCost = tableStatusListTS[table2Index].tableMinCost;
-										}
+										minCost = getMaxMinCostMT(selectedTable);
 									}
 
 									location.href = "OrderMain.html?tableNbr="
@@ -845,22 +836,7 @@ Ext
 									if (tableStatusListTSDisplay[tableIndex].tableCategory != CATE_MERGER_TABLE) {
 										minCost = tableStatusListTSDisplay[tableIndex].tableMinCost;
 									} else {
-										// 取較大最低消
-										var tblArray = getMergeTable(selectedTable);
-										var table1Index = -1;
-										var table2Index = -1;
-										for ( var i = 0; i < tableStatusListTS.length; i++) {
-											if (tableStatusListTS[i].tableAlias == tblArray[0]) {
-												table1Index = i;
-											}
-											if (tableStatusListTS[i].tableAlias == tblArray[1]) {
-												table2Index = i;
-											}
-										}
-										minCost = tableStatusListTS[table1Index].tableMinCost;
-										if (minCost < tableStatusListTS[table2Index].tableMinCost) {
-											minCost = tableStatusListTS[table2Index].tableMinCost;
-										}
+										minCost = getMaxMinCostMT(selectedTable);
 									}
 
 									location.href = "CheckOut.html?tableNbr="

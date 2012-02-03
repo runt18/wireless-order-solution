@@ -52,7 +52,7 @@
 	color: #fff;
 	cursor: pointer;
 	font-size: 13px;
-	font-weight : bold;
+	font-weight: bold;
 }
 
 .table_list li.normal_null {
@@ -85,7 +85,7 @@
 	height: 45px;
 	padding-top: 40px;
 	margin-top: 20px;
-	filter: alpha(opacity =   0);
+	filter: alpha(opacity =     0);
 	opacity: 0.0;
 }
 
@@ -95,4 +95,14 @@
 	font-size: 18px;
 	font-weight: bold;
 	color: black;
+}
+
+#tableListRegionInfo.regionInfo {
+	text-align: center;
+	padding-right: 40px;
+	padding-top: 20px; 
+	font-size : 18px;
+	font-weight: bold;
+	color: black;
+	font-size: 18px;
 }

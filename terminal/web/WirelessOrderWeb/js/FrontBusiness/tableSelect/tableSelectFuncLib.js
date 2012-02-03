@@ -1,4 +1,53 @@
-﻿// deselect the selected table
+﻿// 拼台时，获取主/副台号
+// 此函数要求页面上有tableMergeList全局变量
+function getMergeTable(tableNbr) {
+	var mainTblNbr = 0;
+	var mergeTblNbr = 0;
+	var isFound = false;
+	for ( var i = 0; i < tableMergeList.length; i++) {
+		if (tableMergeList[i][0] == tableNbr) {
+			mainTblNbr = tableNbr;
+			mergeTblNbr = tableMergeList[i][1];
+			isFound = true;
+		}
+	}
+	if (!isFound) {
+		for ( var i = 0; i < tableMergeList.length; i++) {
+			if (tableMergeList[i][1] == tableNbr) {
+				mainTblNbr = tableMergeList[i][0];
+				mergeTblNbr = tableNbr;
+			}
+		}
+	}
+	var tblArr = [];
+	tblArr.push(mainTblNbr);
+	tblArr.push(mergeTblNbr);
+	return tblArr;
+};
+
+function getMaxMinCostMT(tableNbr) {
+	// 取較大最低消
+	var minCost;
+	var tblArray = getMergeTable(tableNbr);
+	var table1Index = -1;
+	var table2Index = -1;
+	for ( var i = 0; i < tableStatusListTS.length; i++) {
+		if (tableStatusListTS[i].tableAlias == tblArray[0]) {
+			table1Index = i;
+		}
+		if (tableStatusListTS[i].tableAlias == tblArray[1]) {
+			table2Index = i;
+		}
+	}
+	minCost = tableStatusListTS[table1Index].tableMinCost;
+	if (minCost < tableStatusListTS[table2Index].tableMinCost) {
+		minCost = tableStatusListTS[table2Index].tableMinCost;
+	}
+
+	return minCost;
+}
+
+// deselect the selected table
 var deselectTable = function() {
 	if (selectedTable != "") {
 		var selectedTableIndex = -1;
@@ -152,6 +201,18 @@ var tableListReflash = function(node) {
 		}
 	}
 
+	// 改變區域名稱
+	var regionNameSpan = document.getElementById("listRegionName");
+	if (currNodeId == "regionTreeRoot") {
+		regionNameSpan.innerHTML = "全部区域";
+	} else {
+		if (node != null) {
+			regionNameSpan.innerHTML = node.text;
+		} else {
+			regionNameSpan.innerHTML = regionTree.getSelectionModel()
+					.getSelectedNode().text;
+		}
+	}
 	// 2 ********** create table list **********
 	// 2.1,get the page total count
 	var pageTotalCount = parseInt(tableStatusListTSDisplay.length / 32);
@@ -307,22 +368,7 @@ var tableListReflash = function(node) {
 												if (tableStatusListTSDisplay[tableIndex].tableCategory != CATE_MERGER_TABLE) {
 													minCost = tableStatusListTSDisplay[tableIndex].tableMinCost;
 												} else {
-													// 取較大最低消
-													var tblArray = getMergeTable(selectedTable);
-													var table1Index = -1;
-													var table2Index = -1;
-													for ( var i = 0; i < tableStatusListTS.length; i++) {
-														if (tableStatusListTS[i].tableAlias == tblArray[0]) {
-															table1Index = i;
-														}
-														if (tableStatusListTS[i].tableAlias == tblArray[1]) {
-															table2Index = i;
-														}
-													}
-													minCost = tableStatusListTS[table1Index].tableMinCost;
-													if (minCost < tableStatusListTS[table2Index].tableMinCost) {
-														minCost = tableStatusListTS[table2Index].tableMinCost;
-													}
+													minCost = getMaxMinCostMT(selectedTable);
 												}
 
 												location.href = "CheckOut.html?tableNbr="
