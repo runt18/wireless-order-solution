@@ -285,10 +285,6 @@
 			type="com.wireless.Actions.tasteMgr.DeleteTasteAction"
 			scope="request">
 		</action>
-
-
-
-
 	</action-mappings>
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
 </struts-config>
