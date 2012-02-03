@@ -42,62 +42,50 @@
 
 .table_list li {
 	float: left;
-	width: 62px;
-	height: 32px;
 	display: block;
-	margin: 20px 27px;
-	padding: 40px 0 0 10px;
-	font-size: 18px;
-	font-weight: bold;
+	width: 85px;
+	height: 45px;
+	padding-left: 13px;
+	padding-top: 40px;
+	margin-top: 20px;
+	font-size: 13px;
 	color: #fff;
 	cursor: pointer;
+	font-size: 13px;
+	font-weight : bold;
 }
 
 .table_list li.normal_null {
-	background: url(../images/table_null_normal.png) no-repeat 50%;
+	background: url(../images/table_null_normal.png) no-repeat;
 }
 
 .table_list li.normal_on {
 	background: url(../images/table_on_normal.png) no-repeat;
 }
 
-.table_list li.merge_null {
-	background: url(../images/table_null_merge.png) no-repeat 50%;
-}
-
 .table_list li.merge_on {
-	background: url(../images/table_on_merge.gif) no-repeat 50%;
-}
-
-.table_list li.package_null {
-	background: url(../images/table_null_package.png) no-repeat 50%;
+	background: url(../images/table_on_merge.gif) no-repeat;
 }
 
 .table_list li.package_on {
 	background: url(../images/table_on_package.gif) no-repeat;
 }
 
-.table_list li.separate_null {
-	background: url(../images/table_null_separate.png) no-repeat 50%;
-}
-
 .table_list li.separate_on {
-	background: url(../images/table_on_separate.gif) no-repeat;
+	background: url(../images/table_on_separate.png) no-repeat;
 }
 
 .table_list li.placeHolder {
 	float: left;
-	background: url(../images/table_on_normal.png) no-repeat 50%;
-	width: 1px;
-	height: 32px;
+	background: url(../images/table_on_normal.png) no-repeat;
 	display: block;
-	margin: 20px 1px;
-	padding: 40px 0 0 1px;
 	cursor: auto;
 	overflow: hidden;
-	filter: alpha(opacity =           0);
-	-moz-opacity: 0.0;
-	-khtml-opacity: 0.0;
+	width: 1px;
+	height: 45px;
+	padding-top: 40px;
+	margin-top: 20px;
+	filter: alpha(opacity =   0);
 	opacity: 0.0;
 }
 
