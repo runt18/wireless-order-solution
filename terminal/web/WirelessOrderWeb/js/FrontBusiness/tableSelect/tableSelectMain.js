@@ -212,72 +212,72 @@ Ext
 					});
 
 			// table separate pop window
-//			tableSeparateWin = new Ext.Window(
-//					{
-//						layout : "fit",
-//						width : 200,
-//						height : 100,
-//						closeAction : "hide",
-//						resizable : false,
-//						items : [ {
-//							layout : "form",
-//							labelWidth : 30,
-//							border : false,
-//							frame : true,
-//							items : [ {
-//								xtype : "numberfield",
-//								fieldLabel : "人数",
-//								id : "personCountInputSep",
-//								width : 110
-//							} ]
-//						} ],
-//						buttons : [
-//								{
-//									text : "确定",
-//									handler : function() {
-//										var inputCount = tableSeparateWin
-//												.findById("personCountInputSep")
-//												.getValue();
-//										if (inputCount != 0 && inputCount != "") {
-//											tableSeparateWin.hide();
-//											// for forward the page
-//											var tableIndex = -1;
-//											for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
-//												if (tableStatusListTSDisplay[i].tableAlias == selectedTable) {
-//													tableIndex = i;
-//												}
-//											}
-//											location.href = "OrderMain.html?tableNbr="
-//													+ selectedTable
-//													+ "&personCount="
-//													+ inputCount
-//													+ "&tableStat=free"
-//													+ "&category="
-//													+ CATE_JOIN_TABLE
-//													+ "&tableNbr2=0"
-//													+ "&pin="
-//													+ pin
-//													+ "&restaurantID="
-//													+ restaurantID
-//													+ "&minCost="
-//													+ tableStatusListTSDisplay[tableIndex].tableMinCost;
-//
-//										}
-//									}
-//								}, {
-//									text : "取消",
-//									handler : function() {
-//										tableSeparateWin.hide();
-//									}
-//								} ],
-//						listeners : {
-//							show : function(thiz) {
-//								// thiz.findById("personCountInput").focus();
-//								var f = Ext.get("personCountInputSep");
-//								f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
-//							}
-//						}
-//					});
+			// tableSeparateWin = new Ext.Window(
+			// {
+			// layout : "fit",
+			// width : 200,
+			// height : 100,
+			// closeAction : "hide",
+			// resizable : false,
+			// items : [ {
+			// layout : "form",
+			// labelWidth : 30,
+			// border : false,
+			// frame : true,
+			// items : [ {
+			// xtype : "numberfield",
+			// fieldLabel : "人数",
+			// id : "personCountInputSep",
+			// width : 110
+			// } ]
+			// } ],
+			// buttons : [
+			// {
+			// text : "确定",
+			// handler : function() {
+			// var inputCount = tableSeparateWin
+			// .findById("personCountInputSep")
+			// .getValue();
+			// if (inputCount != 0 && inputCount != "") {
+			// tableSeparateWin.hide();
+			// // for forward the page
+			// var tableIndex = -1;
+			// for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
+			// if (tableStatusListTSDisplay[i].tableAlias == selectedTable) {
+			// tableIndex = i;
+			// }
+			// }
+			// location.href = "OrderMain.html?tableNbr="
+			// + selectedTable
+			// + "&personCount="
+			// + inputCount
+			// + "&tableStat=free"
+			// + "&category="
+			// + CATE_JOIN_TABLE
+			// + "&tableNbr2=0"
+			// + "&pin="
+			// + pin
+			// + "&restaurantID="
+			// + restaurantID
+			// + "&minCost="
+			// + tableStatusListTSDisplay[tableIndex].tableMinCost;
+			//
+			// }
+			// }
+			// }, {
+			// text : "取消",
+			// handler : function() {
+			// tableSeparateWin.hide();
+			// }
+			// } ],
+			// listeners : {
+			// show : function(thiz) {
+			// // thiz.findById("personCountInput").focus();
+			// var f = Ext.get("personCountInputSep");
+			// f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
+			// }
+			// }
+			// });
 
 			// ***************tableSelectNorthPanel******************
 			// soft key board
@@ -767,21 +767,38 @@ Ext
 										tableNbr = tblArray[0];
 										tableNbr2 = tblArray[1];
 									}
+
+									var minCost;
+									if (category != CATE_MERGER_TABLE) {
+										minCost = tableStatusListTSDisplay[tableIndex].tableMinCost;
+									} else {
+										// 取較大最低消
+										var tblArray = getMergeTable(selectedTable);
+										var table1Index = -1;
+										var table2Index = -1;
+										for ( var i = 0; i < tableStatusListTS.length; i++) {
+											if (tableStatusListTS[i].tableAlias == tblArray[0]) {
+												table1Index = i;
+											}
+											if (tableStatusListTS[i].tableAlias == tblArray[1]) {
+												table2Index = i;
+											}
+										}
+										minCost = tableStatusListTS[table1Index].tableMinCost;
+										if (minCost < tableStatusListTS[table2Index].tableMinCost) {
+											minCost = tableStatusListTS[table2Index].tableMinCost;
+										}
+									}
+
 									location.href = "OrderMain.html?tableNbr="
 											+ tableNbr
 											+ "&personCount="
 											+ tableStatusListTSDisplay[tableIndex].tableCustNbr
-											+ "&tableStat=used"
-											+ "&category="
-											+ category
-											+ "&tableNbr2="
-											+ tableNbr2
-											+ "&pin="
-											+ pin
-											+ "&restaurantID="
-											+ restaurantID
-											+ "&minCost="
-											+ tableStatusListTSDisplay[tableIndex].tableMinCost;
+											+ "&tableStat=used" + "&category="
+											+ category + "&tableNbr2="
+											+ tableNbr2 + "&pin=" + pin
+											+ "&restaurantID=" + restaurantID
+											+ "&minCost=" + minCost;
 								} else if (tableStatusListTSDisplay[tableIndex].tableStatus == TABLE_IDLE) {
 									// personCountInputWin.show();
 									// for forward the page
@@ -823,16 +840,36 @@ Ext
 								if (tableStatusListTSDisplay[tableIndex].tableStatus == TABLE_IDLE) {
 									Ext.Msg.alert("", "<b>此桌没有下单，不能结账！</b>");
 								} else {
+
+									var minCost;
+									if (tableStatusListTSDisplay[tableIndex].tableCategory != CATE_MERGER_TABLE) {
+										minCost = tableStatusListTSDisplay[tableIndex].tableMinCost;
+									} else {
+										// 取較大最低消
+										var tblArray = getMergeTable(selectedTable);
+										var table1Index = -1;
+										var table2Index = -1;
+										for ( var i = 0; i < tableStatusListTS.length; i++) {
+											if (tableStatusListTS[i].tableAlias == tblArray[0]) {
+												table1Index = i;
+											}
+											if (tableStatusListTS[i].tableAlias == tblArray[1]) {
+												table2Index = i;
+											}
+										}
+										minCost = tableStatusListTS[table1Index].tableMinCost;
+										if (minCost < tableStatusListTS[table2Index].tableMinCost) {
+											minCost = tableStatusListTS[table2Index].tableMinCost;
+										}
+									}
+
 									location.href = "CheckOut.html?tableNbr="
 											+ selectedTable
 											+ "&personCount="
 											+ tableStatusListTSDisplay[tableIndex].tableCustNbr
-											+ "&pin="
-											+ pin
-											+ "&restaurantID="
-											+ restaurantID
-											+ "&minCost="
-											+ tableStatusListTSDisplay[tableIndex].tableMinCost;
+											+ "&pin=" + pin + "&restaurantID="
+											+ restaurantID + "&minCost="
+											+ minCost;
 								}
 							}
 						}
@@ -930,37 +967,39 @@ Ext
 								if (tableStatusListTSDisplay[tableIndex].tableStatus == TABLE_BUSY
 										&& tableStatusListTSDisplay[tableIndex].tableCategory == CATE_NORMAL) {
 
-									Ext.MessageBox.show({
-										msg : "并到" + selectedTable
-												+ "号台后，将新增加一张临时餐台，是否确定？",
-										width : 300,
-										buttons : Ext.MessageBox.YESNO,
-										fn : function(btn) {
-											if (btn == "yes") {
-												//tableSeparateWin.show();
-												// for forward the page
-												var tableIndex = -1;
-												for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
-													if (tableStatusListTSDisplay[i].tableAlias == selectedTable) {
-														tableIndex = i;
+									Ext.MessageBox
+											.show({
+												msg : "并到"
+														+ selectedTable
+														+ "号台后，将新增加一张临时餐台，是否确定？",
+												width : 300,
+												buttons : Ext.MessageBox.YESNO,
+												fn : function(btn) {
+													if (btn == "yes") {
+														// tableSeparateWin.show();
+														// for forward the page
+														var tableIndex = -1;
+														for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
+															if (tableStatusListTSDisplay[i].tableAlias == selectedTable) {
+																tableIndex = i;
+															}
+														}
+														location.href = "OrderMain.html?tableNbr="
+																+ selectedTable
+																+ "&personCount=1"
+																+ "&tableStat=free"
+																+ "&category="
+																+ CATE_JOIN_TABLE
+																+ "&tableNbr2=0"
+																+ "&pin="
+																+ pin
+																+ "&restaurantID="
+																+ restaurantID
+																+ "&minCost="
+																+ tableStatusListTSDisplay[tableIndex].tableMinCost;
 													}
 												}
-												location.href = "OrderMain.html?tableNbr="
-														+ selectedTable
-														+ "&personCount=1"
-														+ "&tableStat=free"
-														+ "&category="
-														+ CATE_JOIN_TABLE
-														+ "&tableNbr2=0"
-														+ "&pin="
-														+ pin
-														+ "&restaurantID="
-														+ restaurantID
-														+ "&minCost="
-														+ tableStatusListTSDisplay[tableIndex].tableMinCost;
-											}
-										}
-									});
+											});
 								} else {
 									if (tableStatusListTSDisplay[tableIndex].tableStatus != TABLE_BUSY) {
 										Ext.Msg.alert("", "<b>空台不能并台！</b>");

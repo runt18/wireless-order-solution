@@ -133,7 +133,7 @@ var tableListReflash = function(node) {
 	// 標記改為未選擇餐桌
 	selectedTable = "";
 	tableStatusListTSDisplay.length = 0;
-	if (currNodeId == "regionTreeRoot") {	
+	if (currNodeId == "regionTreeRoot") {
 		tableStatusListTSDisplay = tableStatusListTS.slice(0);
 	} else {
 		for ( var i = 0; i < tableStatusListTS.length; i++) {
@@ -303,6 +303,28 @@ var tableListReflash = function(node) {
 														+ tableStatusListTSDisplay[tableIndex].tableMinCost;
 											} else {
 
+												var minCost;
+												if (tableStatusListTSDisplay[tableIndex].tableCategory != CATE_MERGER_TABLE) {
+													minCost = tableStatusListTSDisplay[tableIndex].tableMinCost;
+												} else {
+													// 取較大最低消
+													var tblArray = getMergeTable(selectedTable);
+													var table1Index = -1;
+													var table2Index = -1;
+													for ( var i = 0; i < tableStatusListTS.length; i++) {
+														if (tableStatusListTS[i].tableAlias == tblArray[0]) {
+															table1Index = i;
+														}
+														if (tableStatusListTS[i].tableAlias == tblArray[1]) {
+															table2Index = i;
+														}
+													}
+													minCost = tableStatusListTS[table1Index].tableMinCost;
+													if (minCost < tableStatusListTS[table2Index].tableMinCost) {
+														minCost = tableStatusListTS[table2Index].tableMinCost;
+													}
+												}
+
 												location.href = "CheckOut.html?tableNbr="
 														+ selectedTable
 														+ "&personCount="
@@ -311,8 +333,7 @@ var tableListReflash = function(node) {
 														+ pin
 														+ "&restaurantID="
 														+ restaurantID
-														+ "&minCost="
-														+ tableStatusListTSDisplay[tableIndex].tableMinCost;
+														+ "&minCost=" + minCost;
 											}
 										});
 					});
