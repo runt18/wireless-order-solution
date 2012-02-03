@@ -1,0 +1,74 @@
+package com.wireless.Actions.tableSelect;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.SQLException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.struts.action.Action;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+
+import com.wireless.db.CancelOrder;
+import com.wireless.exception.BusinessException;
+import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.Terminal;
+
+public class CancelOrderAction extends Action {
+	public ActionForward execute(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		
+		PrintWriter out = null;
+		int tableID = 0;
+		String jsonResp = "{success:$(result), data:'$(value)'}";
+		try {
+			// 解决后台中文传到前台乱码
+			response.setContentType("text/json; charset=utf-8");
+			out = response.getWriter();
+			
+			String pin = request.getParameter("pin");
+			if(pin.startsWith("0x") || pin.startsWith("0X")){
+				pin = pin.substring(2);
+			}
+			
+			tableID = Integer.parseInt(request.getParameter("tableID"));
+			
+			CancelOrder.exec(Integer.parseInt(pin, 16), Terminal.MODEL_STAFF, tableID);
+			jsonResp = jsonResp.replace("$(result)", "true");
+			jsonResp = jsonResp.replace("$(value)", tableID + "号餐台删单成功");
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jsonResp = jsonResp.replace("$(result)", "false");
+			if(e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED){
+				jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");
+				
+			}else if(e.errCode == ErrorCode.TABLE_NOT_EXIST){
+				jsonResp = jsonResp.replace("$(value)", tableID + "号餐台信息不存在，请重新确认");
+				
+			}else if(e.errCode == ErrorCode.TABLE_IDLE){
+				jsonResp = jsonResp.replace("$(value)", tableID + "号餐台是空闲状态，可能已结帐，请与餐厅管理人员确认");
+				
+			}else{
+				jsonResp = jsonResp.replace("$(value)", "删除" + tableID + "号餐台信息不成功，请确认网络连接是否正常");
+			}
+		}catch(SQLException e){
+			e.printStackTrace();
+			jsonResp = jsonResp.replace("$(result)", "false");
+			jsonResp = jsonResp.replace("$(value)", "数据库请求发生错误，请确认网络是否连接正常");
+			
+		}catch(IOException e){
+			e.printStackTrace();
+			
+		}finally{
+			//Just for debug
+			//System.out.println(jsonResp);
+			out.write(jsonResp);
+		}
+		return null;
+	}
+}
