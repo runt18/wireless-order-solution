@@ -10,7 +10,7 @@ public:
 	 * to indicate which kitchen the food belong to. 
 	 */
 	static const int KITCHEN_NULL = 255;
-	static const int KITCHEN_FULL = 254;
+	static const int KITCHEN_ALL = 254;
 	static const int KITCHEN_TEMP = 253;
 	static const int KITCHEN_1 = 0;
 	static const int KITCHEN_2 = 1;

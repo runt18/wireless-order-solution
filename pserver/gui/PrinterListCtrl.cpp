@@ -120,12 +120,12 @@ void CPrinterListCtrl::Update(TiXmlDocument& conf){
 						SetItemText(row, COLUMN_FUNC_CODE, _FuncDesc[func]);
 
 					}else if(kitchen > (int)g_Kitchens.size() - 1 && 
-						kitchen != Kitchen::KITCHEN_FULL && kitchen != Kitchen::KITCHEN_NULL && kitchen != Kitchen::KITCHEN_TEMP){
+						kitchen != Kitchen::KITCHEN_ALL && kitchen != Kitchen::KITCHEN_NULL && kitchen != Kitchen::KITCHEN_TEMP){
 
 						SetItemText(row, COLUMN_FUNC_CODE, _FuncDesc[func]);
 
 					}else{
-						if(kitchen == Kitchen::KITCHEN_FULL){
+						if(kitchen == Kitchen::KITCHEN_ALL){
 							kitchen = g_Kitchens.size() - 1;
 						}else if(kitchen == Kitchen::KITCHEN_TEMP){
 							kitchen = g_Kitchens.size() - 2;

@@ -104,11 +104,11 @@ void CPrinterSettingDlg::Update(){
 				if(ret == TIXML_NO_ATTRIBUTE){
 					m_ListCtrl.SetItemText(row, COLUMN_FUNC_CODE, _FuncDesc[func]);
 
-				}else if(kitchen > (int)g_Kitchens.size() - 1 && kitchen != Kitchen::KITCHEN_FULL && kitchen != Kitchen::KITCHEN_NULL){
+				}else if(kitchen > (int)g_Kitchens.size() - 1 && kitchen != Kitchen::KITCHEN_ALL && kitchen != Kitchen::KITCHEN_NULL){
 					m_ListCtrl.SetItemText(row, COLUMN_FUNC_CODE, _FuncDesc[func]);
 
 				}else{
-					if(kitchen == Kitchen::KITCHEN_FULL){
+					if(kitchen == Kitchen::KITCHEN_ALL){
 						kitchen = g_Kitchens.size() - 1;
 					}
 					CString tmp;

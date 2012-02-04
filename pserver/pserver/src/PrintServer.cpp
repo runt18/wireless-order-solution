@@ -108,7 +108,7 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 
 		//get the kitchen for functions below
 		//otherwise set the kitchen to full
-		int kitchen = Kitchen::KITCHEN_FULL;
+		int kitchen = Kitchen::KITCHEN_ALL;
 		if(func == Reserved::PRINT_ORDER_DETAIL ||
 			func == Reserved::PRINT_EXTRA_FOOD ||
 			func == Reserved::PRINT_CANCELLED_FOOD ||
@@ -116,7 +116,7 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 		{	
 			pPrinter->QueryIntAttribute(ConfTags::KITCHEN, &kitchen);
 		}else{
-			kitchen = Kitchen::KITCHEN_FULL;
+			kitchen = Kitchen::KITCHEN_ALL;
 		}
 
 		vector< boost::shared_ptr<PrinterInstance> >::iterator it = g_PrintInstances.begin();

@@ -140,13 +140,13 @@ void CAddPrinterDlg::OnOK(){
 					func == Reserved::PRINT_CANCELLED_FOOD)
 				{
 					//get the kitchen to this printer instance
-					int kitchen = Kitchen::KITCHEN_FULL;;
+					int kitchen = Kitchen::KITCHEN_ALL;;
 					pPrinter->QueryIntAttribute(ConfTags::KITCHEN, &kitchen);
 
 					//get the kitchen to add
 					int kitchen2Add = m_PrintKitchen.GetCurSel();
 					if(kitchen2Add == g_Kitchens.size() - 1){
-						kitchen2Add = Kitchen::KITCHEN_FULL;
+						kitchen2Add = Kitchen::KITCHEN_ALL;
 					}else if(kitchen2Add == g_Kitchens.size() - 2){
 						kitchen2Add = Kitchen::KITCHEN_TEMP;
 					}
@@ -208,7 +208,7 @@ void CAddPrinterDlg::OnOK(){
 				(selected + 1) == Reserved::PRINT_CANCELLED_FOOD){
 				int kitchen = m_PrintKitchen.GetCurSel();
 				if(kitchen == g_Kitchens.size() - 1){
-					kitchen = Kitchen::KITCHEN_FULL;
+					kitchen = Kitchen::KITCHEN_ALL;
 				}else if(kitchen == g_Kitchens.size() - 2){
 					kitchen = Kitchen::KITCHEN_TEMP;
 				}

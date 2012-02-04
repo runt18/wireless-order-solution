@@ -359,10 +359,10 @@ void PrinterInstance::split2Details(const string& print_content, const vector<in
 				for(it; it != kitchens.end(); it++){		
 					/************************************************************************
 					* Either of two cases below means kitchen between print request and printer instance is matched     
-					* 1 - the kitchen equals to Kitchen.KITCHEN_FULL
+					* 1 - the kitchen equals to Kitchen.KITCHEN_ALL
 					* 2 - the kitchen equals to print request
 					************************************************************************/
-					if(*it == Kitchen::KITCHEN_FULL || *it == kit2Print){
+					if(*it == Kitchen::KITCHEN_ALL || *it == kit2Print){
 						detail_content.push_back(string(print_content.begin() + offset + 3, print_content.begin() + offset + 3 + length));
 						break;
 					}
