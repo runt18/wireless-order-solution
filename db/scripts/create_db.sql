@@ -145,7 +145,7 @@ COMMENT = 'descirbe the relationship between the order and food' ;
 DROP TABLE IF EXISTS `wireless_order_db`.`terminal` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`terminal` (
-  `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this terminal' ,
+  `terminal_id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this terminal' ,
   `pin` INT UNSIGNED NOT NULL COMMENT 'the pin to identify the phone' ,
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'indicates the terminal belong to which restaurant' ,
   `model_id` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the model to this terminal.\nBlackBerry : 0x00\nAndroid : 0x01\nAdmin : 0xFE\nStaff : 0xFF' ,
@@ -160,7 +160,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`terminal` (
   `discard_date` DATETIME NULL COMMENT 'the date make the phone discarded' ,
   `idle_duration` BIGINT NOT NULL DEFAULT 0 COMMENT 'the phone\'s idle duration (expressed by second)' ,
   `work_duration` BIGINT NOT NULL DEFAULT 0 COMMENT 'the phone\'s work duration(expressed by second)' ,
-  PRIMARY KEY (`id`) ,
+  PRIMARY KEY (`terminal_id`) ,
   INDEX `fk_terminal_restaurant1` (`restaurant_id` ASC) ,
   INDEX `ix_terminal_pm` (`pin` ASC, `model_id` ASC) ,
   CONSTRAINT `fk_terminal_restaurant1`
@@ -445,16 +445,16 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`staff` (
   `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to this staff' ,
   `pwd` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the password to this staff whose format is MD5' ,
   PRIMARY KEY (`staff_id`) ,
-  INDEX `fk_staff_restaurant1` (`restaurant_id` ASC) ,
-  INDEX `fk_staff_terminal1` (`terminal_id` ASC) ,
-  CONSTRAINT `fk_staff_restaurant1`
+  INDEX `fk_staff_restaurant` (`restaurant_id` ASC) ,
+  INDEX `fk_staff_terminal` (`terminal_id` ASC) ,
+  CONSTRAINT `fk_staff_restaurant`
     FOREIGN KEY (`restaurant_id` )
     REFERENCES `wireless_order_db`.`restaurant` (`id` )
     ON DELETE RESTRICT
     ON UPDATE RESTRICT,
-  CONSTRAINT `fk_staff_terminal1`
+  CONSTRAINT `fk_staff_terminal`
     FOREIGN KEY (`terminal_id` )
-    REFERENCES `wireless_order_db`.`terminal` (`id` )
+    REFERENCES `wireless_order_db`.`terminal` (`terminal_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -708,6 +708,8 @@ COMMENT = 'describe the category of material' ;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+
 
 
 

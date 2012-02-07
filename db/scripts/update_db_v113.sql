@@ -16,3 +16,24 @@ CHANGE COLUMN `alias_id` `staff_alias` SMALLINT(6) NOT NULL DEFAULT '0' COMMENT 
 DROP PRIMARY KEY ,
 ADD PRIMARY KEY (`staff_id`) ;
 
+-- -----------------------------------------------------
+-- Drop the foreign key to terminal_id in table 'staff'
+-- Rename field 'id' to 'terminal_id' in table 'terminal'
+-- Recreate the foreign key 
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`staff` DROP FOREIGN KEY `fk_staff_terminal1` ;
+
+ALTER TABLE `wireless_order_db`.`terminal` CHANGE COLUMN `id` `terminal_id` INT(11) NOT NULL AUTO_INCREMENT COMMENT 'the id to this terminal'  ,
+DROP PRIMARY KEY , 
+ADD PRIMARY KEY (`terminal_id`) ;
+
+ALTER TABLE `wireless_order_db`.`staff` 
+  ADD CONSTRAINT `fk_staff_terminal`
+  FOREIGN KEY (`terminal_id` )
+  REFERENCES `wireless_order_db`.`terminal` (`terminal_id` )
+  ON DELETE RESTRICT
+  ON UPDATE RESTRICT
+, ADD INDEX `fk_staff_terminal` (`terminal_id` ASC) ;
+
+ALTER TABLE `wireless_order_db`.`staff` 
+DROP INDEX `fk_staff_terminal1` ;
