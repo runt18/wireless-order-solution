@@ -16,6 +16,7 @@ import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Mode;
 import com.wireless.protocol.ProtocolPackage;
+import com.wireless.protocol.Region;
 import com.wireless.protocol.ReqPing;
 import com.wireless.protocol.RespNAK;
 import com.wireless.protocol.RespOTAUpdate;
@@ -108,6 +109,7 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 								int restaurantID = dbCon.rs.getInt("id");
 								String restaurantName = dbCon.rs.getString("restaurant_name");
 								dbCon.rs.close();
+								
 								//get the related kitchen information 
 								sql = "SELECT alias_id, name, dept_id FROM " + WirelessSocketServer.database + ".kitchen WHERE restaurant_id=" + restaurantID;
 								dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -118,8 +120,21 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 															 dbCon.rs.getShort("dept_id")));															
 								}
 								dbCon.rs.close();
+								
+								//get the related region information
+								sql = "SELECT region_id, name FROM " + WirelessSocketServer.database + ".region WHERE restaurant_id=" + restaurantID;
+								dbCon.rs = dbCon.stmt.executeQuery(sql);
+								ArrayList<Region> regions = new ArrayList<Region>();
+								while(dbCon.rs.next()){
+									regions.add(new Region(dbCon.rs.getShort("region_id"),
+														   dbCon.rs.getString("name")));
+								}
+								
 								//respond with the related kitchen information
-								send(_out, new RespPrintLogin(loginReq.header, kitchens.toArray(new Kitchen[kitchens.size()]), restaurantName));
+								send(_out, new RespPrintLogin(loginReq.header, 
+															  kitchens.toArray(new Kitchen[kitchens.size()]), 
+															  regions.toArray(new Region[regions.size()]),
+															  restaurantName));
 								
 								//put the restaurant id and the associated socket to the tree map's socket list
 								synchronized(WirelessSocketServer.printerConnections){
