@@ -21,14 +21,14 @@ public class OrderParcel extends Order implements Parcelable{
 		price_tail = order.price_tail;
 		service_rate = order.service_rate;
 		id = order.id;
-		restaurant_id = order.restaurant_id;
+		restaurantID = order.restaurantID;
 		table_id = order.table_id;
 		this.table_name = order.table_name;
 		table2_id = order.table2_id;
 		table2_name = order.table2_name;
 		originalTableID = order.originalTableID;
 		custom_num = order.custom_num;
-		this.member_id = order.member_id;
+		this.memberID = order.memberID;
 		this.comment = order.comment;
 		print_type = order.print_type;
 		setMinimumCost(order.getMinimumCost());
@@ -47,7 +47,7 @@ public class OrderParcel extends Order implements Parcelable{
 		price_tail = (short)in.readInt();
 		service_rate = (byte)in.readInt();
 		id = in.readInt();
-		restaurant_id = in.readInt();
+		restaurantID = in.readInt();
 		table_id = in.readInt();
 		String tableName = in.readString();
 		this.table_name = tableName.equals("") ? null : tableName;
@@ -57,7 +57,7 @@ public class OrderParcel extends Order implements Parcelable{
 		originalTableID = in.readInt();
 		custom_num = in.readInt();
 		String memberID = in.readString();
-		this.member_id = memberID.equals("") ? null : memberID;
+		this.memberID = memberID.equals("") ? null : memberID;
 		String comment = in.readString();
 		this.comment = comment.equals("") ? null : comment;
 		print_type = in.readInt();
@@ -89,7 +89,6 @@ public class OrderParcel extends Order implements Parcelable{
 
 	@Override
 	public void writeToParcel(Parcel parcel, int flags) {
-		// TODO Auto-generated method stub
 		parcel.writeInt(pay_type);
 		parcel.writeInt(discount_type);
 		parcel.writeInt(pay_manner);
@@ -97,14 +96,14 @@ public class OrderParcel extends Order implements Parcelable{
 		parcel.writeInt(price_tail);
 		parcel.writeInt(service_rate);
 		parcel.writeInt(id);
-		parcel.writeInt(restaurant_id);
+		parcel.writeInt(restaurantID);
 		parcel.writeInt(table_id);
 		parcel.writeString(table_name == null ? "" : table_name);
 		parcel.writeInt(table2_id);
 		parcel.writeString(table2_name == null ? "" : table2_name);
 		parcel.writeInt(originalTableID);
 		parcel.writeInt(custom_num);
-		parcel.writeString(member_id == null ? "" : member_id);
+		parcel.writeString(memberID == null ? "" : memberID);
 		parcel.writeString(comment == null ? "" : comment);
 		parcel.writeInt(print_type);
 		parcel.writeInt(Util.float2Int(getMinimumCost()));
