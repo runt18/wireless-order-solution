@@ -88,10 +88,10 @@ COMMIT;
 -- -----------------------------------------------------
 SET AUTOCOMMIT=0;
 -- belong to VIP
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region_id`, `restaurant_id`, `name`, `minimum_cost`) VALUES (NULL, 100, 3, 11, '菊花厅', 150);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region_id`, `restaurant_id`, `name`, `minimum_cost`, `service_rate`) VALUES (NULL, 100, 3, 11, '菊花厅', 150, 0.1);
 -- belong to 包房
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region_id`, `restaurant_id`, `name`, `minimum_cost`) VALUES (NULL, 101, 2, 11, '水仙厅', 300.50);
-INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region_id`, `restaurant_id`, `name`, `minimum_cost`) VALUES (NULL, 102, 2, 11, '兰花厅', 500);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region_id`, `restaurant_id`, `name`, `minimum_cost`, `service_rate`) VALUES (NULL, 101, 2, 11, '水仙厅', 300.50, 0.05);
+INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region_id`, `restaurant_id`, `name`, `minimum_cost`, `service_rate`) VALUES (NULL, 102, 2, 11, '兰花厅', 500, 0.1);
 -- belong to 大厅1楼
 INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region_id`, `restaurant_id`) VALUES (NULL, 103, 0, 11);
 INSERT INTO `wireless_order_db`.`table` (`id`, `alias_id`, `region_id`, `restaurant_id`) VALUES (NULL, 104, 0, 11);
@@ -641,10 +641,10 @@ SET AUTOCOMMIT=1;
 SET AUTOCOMMIT=0;
 
 INSERT INTO `wireless_order_db`.`terminal` (`pin`, `restaurant_id`, `model_id`, `model_name`, `owner_name`) VALUES (1, 11, 0xFF, 'Staff', '张宁远');
-INSERT INTO `wireless_order_db`.`staff` (`restaurant_id`, `terminal_id`, `alias_id`, `name`, `pwd`) VALUES (11, LAST_INSERT_ID(), 1000, '张宁远', md5('1'));
+INSERT INTO `wireless_order_db`.`staff` (`restaurant_id`, `terminal_id`, `staff_alias`, `name`, `pwd`) VALUES (11, LAST_INSERT_ID(), 1000, '张宁远', md5('1'));
 
 INSERT INTO `wireless_order_db`.`terminal` (`pin`, `restaurant_id`, `model_id`, `model_name`, `owner_name`, `gift_quota`) VALUES (2, 11, 0xFF, 'Staff', '李颖宜', 100);
-INSERT INTO `wireless_order_db`.`staff` (`restaurant_id`, `terminal_id`, `alias_id`, `name`, `pwd`) VALUES (11, LAST_INSERT_ID(), 1001, '李颖宜', md5('2'));
+INSERT INTO `wireless_order_db`.`staff` (`restaurant_id`, `terminal_id`, `staff_alias`, `name`, `pwd`) VALUES (11, LAST_INSERT_ID(), 1001, '李颖宜', md5('2'));
 
 COMMIT;
 SET AUTOCOMMIT=1;

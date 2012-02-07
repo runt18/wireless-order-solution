@@ -188,6 +188,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`table` (
   `custom_num` TINYINT UNSIGNED NULL DEFAULT NULL COMMENT 'the amount of customer to this table if the status is not idle' ,
   `category` TINYINT NULL DEFAULT NULL COMMENT 'the category to this table, it should be one the values below.\n一般 : 1\n外卖 : 2\n并台 : 3\n拼台 : 4' ,
   `status` TINYINT NOT NULL DEFAULT 0 COMMENT 'the status to this table, one of the values below.\n空闲 : 0\n就餐 : 1\n预定 : 2' ,
+  `service_rate` DECIMAL(3,2) NOT NULL DEFAULT 0 COMMENT 'the service rate to this table' ,
   `enabled` TINYINT NOT NULL DEFAULT 1 COMMENT 'indicates whether the table information is enabled or not' ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_table_restaurant` (`restaurant_id` ASC) ,
@@ -437,13 +438,13 @@ COMMENT = 'descirbe the relationship between the order and food' ;
 DROP TABLE IF EXISTS `wireless_order_db`.`staff` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`staff` (
-  `id` INT NOT NULL AUTO_INCREMENT ,
+  `staff_id` INT NOT NULL AUTO_INCREMENT ,
   `restaurant_id` INT UNSIGNED NOT NULL ,
   `terminal_id` INT NOT NULL ,
-  `alias_id` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the alias id to this stuff' ,
-  `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to this stuff' ,
+  `staff_alias` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the alias id to this stuff' ,
+  `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to this staff' ,
   `pwd` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the password to this staff whose format is MD5' ,
-  PRIMARY KEY (`id`) ,
+  PRIMARY KEY (`staff_id`) ,
   INDEX `fk_staff_restaurant1` (`restaurant_id` ASC) ,
   INDEX `fk_staff_terminal1` (`terminal_id` ASC) ,
   CONSTRAINT `fk_staff_restaurant1`
@@ -707,6 +708,7 @@ COMMENT = 'describe the category of material' ;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
 
 
 
