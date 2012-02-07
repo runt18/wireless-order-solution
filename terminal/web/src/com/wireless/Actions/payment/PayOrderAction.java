@@ -98,7 +98,7 @@ public class PayOrderAction extends Action implements PinGen{
 			 * Get the member id if the pay type is "会员"
 			 */
 			if(orderToPay.pay_type == Order.PAY_MEMBER){
-				orderToPay.member_id = request.getParameter("memberID");
+				orderToPay.memberID = request.getParameter("memberID");
 			}
 			
 			if(request.getParameter("discountType") != null){
