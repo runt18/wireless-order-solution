@@ -32,7 +32,7 @@ if($editType == "addStaff" || $editType == "editStaff")
 	$validate = true;
 	if($editType == "addStaff")
 	{		
-		$sql = "SELECT * FROM staff WHERE alias_id=$alias_id AND restaurant_id=" . $_SESSION["restaurant_id"];				
+		$sql = "SELECT * FROM staff WHERE staff_alias=$alias_id AND restaurant_id=" . $_SESSION["restaurant_id"];				
 		$rs = $db ->GetOne($sql);		
 		if($rs)
 		{			
@@ -57,14 +57,14 @@ if($editType == "addStaff" || $editType == "editStaff")
 			$db->Execute($sql);
 			$sql = "SELECT id FROM terminal WHERE pin = $pin AND restaurant_id = ".$_SESSION["restaurant_id"];
 			$rs = $db ->GetOne($sql);	
-			$sql = "INSERT INTO staff(restaurant_id,terminal_id,alias_id,name,pwd) VALUES(".$_SESSION["restaurant_id"].",$rs,$alias_id,'$name','".md5($pwd)."')";
+			$sql = "INSERT INTO staff(restaurant_id,terminal_id,staff_alias,name,pwd) VALUES(".$_SESSION["restaurant_id"].",$rs,$alias_id,'$name','".md5($pwd)."')";
 		}
 	}
 	else
 	{
 		$id = $_POST["id"];				
 		$random = $_POST["random"];
-		$sql = "SELECT terminal_id FROM staff WHERE id=$id";
+		$sql = "SELECT terminal_id FROM staff WHERE staff_id=$id";
 		$terminal_id = $db ->GetOne($sql);	
 		if($quota < 0)
 		{
@@ -73,17 +73,17 @@ if($editType == "addStaff" || $editType == "editStaff")
 		}
 		else
 		{
-			$sql = "UPDATE terminal SET `owner_name`='$name',gift_quota=-1 WHERE id=$terminal_id";
+			$sql = "UPDATE terminal SET `owner_name`='$name',gift_quota=$quota WHERE id=$terminal_id";
 			$db->Execute($sql);
 		}
 		
 		if($pwd != $random)
 		{		
-			$sql = "UPDATE staff SET name='$name',pwd='".md5($pwd)."' WHERE id=$id";		
+			$sql = "UPDATE staff SET name='$name',pwd='".md5($pwd)."' WHERE staff_id=$id";		
 		}
 		else
 		{
-			$sql = "UPDATE staff SET name='$name' WHERE id=$id";		
+			$sql = "UPDATE staff SET name='$name' WHERE staff_id=$id";		
 		}
 	}
 	/*echo "<script>alert('$sql');</script>";*/
@@ -101,9 +101,9 @@ if($editType == "addStaff" || $editType == "editStaff")
 else if($editType == "deleteStaff")
 	{
 		$id = $_POST["id"];
-		$sql = "SELECT terminal_id FROM staff WHERE id=$id";
+		$sql = "SELECT terminal_id FROM staff WHERE staff_id=$id";
 		$terminal_id = $db ->GetOne($sql);	
-		if($db->Execute("DELETE FROM staff WHERE id=$id") && $db->Execute("DELETE FROM terminal WHERE id = $terminal_id"))
+		if($db->Execute("DELETE FROM staff WHERE staff_id=$id") && $db->Execute("DELETE FROM terminal WHERE id = $terminal_id"))
 		{			
 			echo "<script>alert('删除成功！');</script>";
 		}	
@@ -159,12 +159,12 @@ include("conn.php");
 include("common.php"); 				
 $xm=$_REQUEST["keyword_type"];
 $kw=$_REQUEST["keyword"]; 
-$sql = "SELECT a.id,a.alias_id,a.name,b.gift_quota,b.gift_amount FROM staff a INNER JOIN terminal b ON a.terminal_id = b.id WHERE a.restaurant_id=" . $_SESSION["restaurant_id"];			
+$sql = "SELECT a.staff_id,a.staff_alias,a.name,b.gift_quota,b.gift_amount FROM staff a INNER JOIN terminal b ON a.terminal_id = b.id WHERE a.restaurant_id=" . $_SESSION["restaurant_id"];			
 switch ($xm)
 {
 	case "alias_id":
 		if ($kw!="")
-			$sql .= " AND a.alias_id = $kw" ;  			
+			$sql .= " AND a.staff_alias = $kw" ;  			
 		break;
 	case "name":
 		if ($kw!="")
@@ -184,13 +184,13 @@ foreach ($rs as $row){
 		$quota = "-";
 	}
 	echo "<tr>";
-	echo "<td>" .$row["alias_id"] ."</td>";
+	echo "<td>" .$row["staff_alias"] ."</td>";
 	echo "<td>" .$row["name"] ."</td>";	
 	echo "<td>" .$row["gift_amount"] ."</td>";	
 	echo "<td>" .$quota ."</td>";		
-	echo "<td><a href='#' onclick='editStaff(&quot;".$row["id"]."&quot;,&quot;".$row["alias_id"]."&quot;,&quot;".$row["name"]."&quot;,&quot;".$pwd."&quot;,&quot;".$pwd."&quot;,&quot;".$quota.
+	echo "<td><a href='#' onclick='editStaff(&quot;".$row["staff_id"]."&quot;,&quot;".$row["staff_alias"]."&quot;,&quot;".$row["name"]."&quot;,&quot;".$pwd."&quot;,&quot;".$pwd."&quot;,&quot;".$quota.
 		"&quot;)'><img src='images/Modify.png'  height='16' width='14' border='0'/>&nbsp;修改</a>&nbsp;&nbsp;&nbsp;&nbsp;" .
-		"<a href='#' onclick='deleteStaff(".$row["id"].")'><img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;删除</a></td>";
+		"<a href='#' onclick='deleteStaff(".$row["staff_id"].")'><img src='images/del.png'  height='16' width='14' border='0'/>&nbsp;删除</a></td>";
 	echo "</tr>";
 }
 //mysql_query("SET NAMES utf8"); 
