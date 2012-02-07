@@ -355,7 +355,7 @@ public class ReqParser {
 		orderToPay.discount_type = discountType;
 		orderToPay.pay_manner = payManner;
 		orderToPay.service_rate = serviceRate;
-		orderToPay.member_id = memberID;
+		orderToPay.memberID = memberID;
 		orderToPay.comment = comment;
 		return orderToPay;
 	}

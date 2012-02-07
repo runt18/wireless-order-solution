@@ -19,6 +19,18 @@ public class Table {
 	public short category = Order.CATE_NORMAL;
 	//the region to this table
 	public short regionID = Region.REGION_1;
+	
+	//the service rate to this table
+	int serviceRate = 0;
+	
+	public void setServiceRate(Float rate){
+		serviceRate = Util.float2Int(rate);
+	}
+	
+	public Float getServiceRate(){
+		return Util.int2Float(serviceRate);
+	}
+	
 	/**
 	 * The value of minimum cost to this table, ranges from 99999.99 through 0.00
 	 * Since the 8100 doesn't support float, we instead to use 0 through 9999999.

@@ -33,9 +33,9 @@ public class ReqPayOrder extends ReqPackage{
 		header.type = Type.PAY_ORDER;
 		
 		byte[] memberIDBytes = new byte[0];
-		if(order.member_id != null){
+		if(order.memberID != null){
 			try{
-				memberIDBytes = order.member_id.getBytes("UTF-8");
+				memberIDBytes = order.memberID.getBytes("UTF-8");
 			}catch(UnsupportedEncodingException e){}
 		}
 		
