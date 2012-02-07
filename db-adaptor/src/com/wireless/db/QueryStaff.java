@@ -20,7 +20,7 @@ public class QueryStaff {
 			ArrayList<Staff> staffs = new ArrayList<Staff>();
 			
 			String sql = "SELECT a.name, a.pwd, b.pin FROM " + Params.dbName + ".staff a, terminal b WHERE a.restaurant_id=" +
-						 + restaurantID + " AND a.restaurant_id=b.restaurant_id AND a.terminal_id=b.id";
+						 + restaurantID + " AND a.restaurant_id=b.restaurant_id AND a.terminal_id=b.terminal_id";
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while(dbCon.rs.next()){
 				staffs.add(new Staff(dbCon.rs.getString(1),
