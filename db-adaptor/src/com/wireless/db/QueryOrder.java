@@ -126,7 +126,7 @@ public class QueryOrder {
 		Order orderInfo = new Order();
 
 		if(dbCon.rs.next()) {
-			orderInfo.restaurant_id = dbCon.rs.getInt("restaurant_id");
+			orderInfo.restaurantID = dbCon.rs.getInt("restaurant_id");
 			orderInfo.table_id = dbCon.rs.getInt("table_id");
 			orderInfo.table_name = dbCon.rs.getString("table_name");
 			orderInfo.table2_id = dbCon.rs.getShort("table2_id");
@@ -159,7 +159,7 @@ public class QueryOrder {
 		 * Get the type to handle the tail of price
 		 */
 		sql = "SELECT price_tail FROM " + Params.dbName +
-			  ".setting WHERE restaurant_id=" + orderInfo.restaurant_id;
+			  ".setting WHERE restaurant_id=" + orderInfo.restaurantID;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			orderInfo.price_tail = dbCon.rs.getShort("price_tail");
@@ -170,7 +170,7 @@ public class QueryOrder {
 		 * Get the minimum cost
 		 */
 		sql = "SELECT minimum_cost FROM " + Params.dbName +	
-			  ".table WHERE restaurant_id=" + orderInfo.restaurant_id +
+			  ".table WHERE restaurant_id=" + orderInfo.restaurantID +
 			  " AND alias_id=" + orderInfo.table_id;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){

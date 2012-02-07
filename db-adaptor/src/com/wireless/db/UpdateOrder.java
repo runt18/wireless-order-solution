@@ -8,7 +8,6 @@ import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.Region;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Terminal;
@@ -392,7 +391,7 @@ public class UpdateOrder {
 		/**
 		 * Get the region to this table
 		 */
-		Region region = QueryRegion.exec(dbCon, term.restaurant_id, orderToUpdate.table_id);
+		orderToUpdate.region = QueryRegion.exec(dbCon, term.restaurant_id, orderToUpdate.table_id);
 		
 		/**
 		 * Update the related info to this order
@@ -400,8 +399,8 @@ public class UpdateOrder {
 		sql = "UPDATE `" + Params.dbName + "`.`order` SET custom_num=" + orderToUpdate.custom_num +
 				", terminal_pin=" + term.pin + 
 				", waiter='" + term.owner + "'" +
-				", region_id=" + region.regionID +
-				", region_name='" + region.name + "'" + 
+				", region_id=" + orderToUpdate.region.regionID +
+				", region_name='" + orderToUpdate.region.name + "'" + 
 				", table_id=" + orderToUpdate.table_id + 
 				", table_name='" + orderToUpdate.table_name + "'" +
 				" WHERE id=" + orderToUpdate.id;
@@ -490,6 +489,7 @@ public class UpdateOrder {
 				result.canceledOrder.table_id = orderToUpdate.table_id;
 				result.canceledOrder.table_name = orderToUpdate.table_name;
 				result.canceledOrder.custom_num = orderToUpdate.custom_num;
+				result.canceledOrder.region = orderToUpdate.region;
 				result.canceledOrder.foods = tmpFoods.toArray(new OrderFood[tmpFoods.size()]);
 			}
 			
@@ -533,6 +533,7 @@ public class UpdateOrder {
 				result.extraOrder.table_id = orderToUpdate.table_id;
 				result.extraOrder.table_name = orderToUpdate.table_name;
 				result.extraOrder.custom_num = orderToUpdate.custom_num;
+				result.extraOrder.region = orderToUpdate.region;
 				result.extraOrder.foods = tmpFoods.toArray(new OrderFood[tmpFoods.size()]);
 			}
 		}
@@ -546,6 +547,7 @@ public class UpdateOrder {
 			result.hurriedOrder.table_id = orderToUpdate.table_id;
 			result.hurriedOrder.table_name = orderToUpdate.table_name;
 			result.hurriedOrder.custom_num = orderToUpdate.custom_num;
+			result.hurriedOrder.region = orderToUpdate.region;
 			result.hurriedOrder.foods = hurriedFoods.toArray(new OrderFood[hurriedFoods.size()]);
 		}
 		

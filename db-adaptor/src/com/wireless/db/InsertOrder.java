@@ -7,7 +7,6 @@ import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.Region;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Terminal;
@@ -44,7 +43,7 @@ public class InsertOrder {
 			 */
 			if(orderToInsert.category == Order.CATE_JOIN_TABLE){
 				Table tmpTable = new Table();
-				tmpTable.name = Integer.toString(orderToInsert.table_id);
+				tmpTable.name = "并" + Integer.toString(orderToInsert.table_id);
 				orderToInsert.table_id = InsertTable.exec(dbCon, pin, model, tmpTable, true);
 				
 			}else if(orderToInsert.category == Order.CATE_TAKE_OUT){
@@ -147,8 +146,8 @@ public class InsertOrder {
 				/**
 				 * Get the region to this table
 				 */
-				Region region = QueryRegion.exec(dbCon, table.restaurantID, table.alias_id);
-				
+				orderToInsert.region = QueryRegion.exec(dbCon, table.restaurantID, table.alias_id);
+
 				/**
 				 * Insert to 'order' table.
 				 */
@@ -159,8 +158,8 @@ public class InsertOrder {
 						"NULL, " + 
 						table.restaurantID + ", " + 
 						orderToInsert.category + ", " +
-						region.regionID + ", '" +
-						region.name + "', " +
+						orderToInsert.region.regionID + ", '" +
+						orderToInsert.region.name + "', " +
 						orderToInsert.table_id + ", '" + 
 						orderToInsert.table_name + "', " +
 						(orderToInsert.category == Order.CATE_MERGER_TABLE ? orderToInsert.table2_id : "NULL") + ", " +

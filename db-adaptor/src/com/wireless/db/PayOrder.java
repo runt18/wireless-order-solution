@@ -44,7 +44,7 @@ public class PayOrder {
 			 */		
 			Table table = QueryTable.exec(dbCon, pin, model, orderToPay.table_id);
 			orderToPay.id = Util.getUnPaidOrderID(dbCon, table);
-			orderToPay.restaurant_id = table.restaurantID;
+			orderToPay.restaurantID = table.restaurantID;
 			
 			return execByID(dbCon, pin, model, orderToPay);			
 			
@@ -71,7 +71,7 @@ public class PayOrder {
 		try{
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, pin, model);
-			orderToPay.restaurant_id = term.restaurant_id;
+			orderToPay.restaurantID = term.restaurant_id;
 			return execByID(dbCon, pin, model, orderToPay);
 		}finally{
 			dbCon.disconnect();
@@ -108,8 +108,8 @@ public class PayOrder {
 		 */
 		Member member = null;
 		if(orderInfo.pay_type == Order.PAY_MEMBER){
-			if(orderInfo.member_id != null){
-				member = QueryMember.exec(dbCon, orderInfo.restaurant_id, orderInfo.member_id);
+			if(orderInfo.memberID != null){
+				member = QueryMember.exec(dbCon, orderInfo.restaurantID, orderInfo.memberID);
 			}else{
 				member = new Member("", "", "", new Float(0));
 			}
@@ -122,10 +122,10 @@ public class PayOrder {
 		 * The formula is as below.
 		 * balance = balance - actualPrice + actualPrice * exchange_rate
 		 */
-		if(orderInfo.pay_type == Order.PAY_MEMBER && orderInfo.pay_manner == Order.MANNER_MEMBER && orderInfo.member_id != null){
+		if(orderInfo.pay_type == Order.PAY_MEMBER && orderInfo.pay_manner == Order.MANNER_MEMBER && orderInfo.memberID != null){
 			sql = "UPDATE " + Params.dbName + ".member SET balance=balance - " + totalPrice2 +
 				  " + " + totalPrice2 + " * exchange_rate" + 
-				  " WHERE restaurant_id=" + orderInfo.restaurant_id +
+				  " WHERE restaurant_id=" + orderInfo.restaurantID +
 				  " AND alias_id=" + member.alias_id;
 			
 			dbCon.stmt.addBatch(sql);
@@ -180,7 +180,7 @@ public class PayOrder {
 		 */
 		if(orderInfo.category == Order.CATE_JOIN_TABLE || orderInfo.category == Order.CATE_TAKE_OUT){
 			sql = "DELETE FROM " + Params.dbName + ".table WHERE alias_id=" +
-				  orderInfo.table_id + " AND restaurant_id=" + orderInfo.restaurant_id;
+				  orderInfo.table_id + " AND restaurant_id=" + orderInfo.restaurantID;
 			dbCon.stmt.addBatch(sql);
 		}else{
 			if(orderInfo.category == Order.CATE_MERGER_TABLE){
@@ -188,14 +188,14 @@ public class PayOrder {
 				  	  "status=" + Table.TABLE_IDLE + ", " +
 				  	  "custom_num=NULL, " +
 				  	  "category=NULL " +
-				  	  "WHERE alias_id=" + orderInfo.table2_id + " AND restaurant_id=" + orderInfo.restaurant_id;
+				  	  "WHERE alias_id=" + orderInfo.table2_id + " AND restaurant_id=" + orderInfo.restaurantID;
 				dbCon.stmt.addBatch(sql);
 			}
 			sql = "UPDATE " + Params.dbName + ".table SET " +
 				  "status=" + Table.TABLE_IDLE + ", " +
 				  "custom_num=NULL, " +
 				  "category=NULL " +
-				  "WHERE alias_id=" + orderInfo.table_id + " AND restaurant_id=" + orderInfo.restaurant_id;
+				  "WHERE alias_id=" + orderInfo.table_id + " AND restaurant_id=" + orderInfo.restaurantID;
 			dbCon.stmt.addBatch(sql);
 		}
 		dbCon.stmt.executeBatch();
@@ -210,7 +210,7 @@ public class PayOrder {
 					"(SELECT id FROM " + 
 					Params.dbName +
 					".food WHERE alias_id=" + foods[i].alias_id +
-					" AND restaurant_id="+ orderInfo.restaurant_id + ")"; 
+					" AND restaurant_id="+ orderInfo.restaurantID + ")"; 
 			
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			
@@ -233,17 +233,17 @@ public class PayOrder {
 				//insert the corresponding detail record to material_detail
 				sql = "INSERT INTO " + Params.dbName + ".material_detail (" + 
 					  "restaurant_id, material_id, price, date, staff, dept_id, amount, type) VALUES(" +
-					  orderInfo.restaurant_id + ", " +						//restaurant_id
+					  orderInfo.restaurantID + ", " +						//restaurant_id
 					  foodMaterial.material.getMaterialID() + ", " +		//material_id
 					  "(SELECT price FROM " + Params.dbName + ".material_dept WHERE restaurant_id=" + 
-					  orderInfo.restaurant_id + 
+					  orderInfo.restaurantID + 
 					  " AND material_id=" + foodMaterial.material.getMaterialID() + 	
 					  " AND dept_id=0), " +	//price
 					  "NOW(), " +			//date
 					  "(SELECT owner_name FROM " + Params.dbName + 
 					  ".terminal WHERE pin=" + "0x" + Integer.toHexString(pin) + " AND model_id=" + model + "), " +	//staff
 					  "(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + 
-					  orderInfo.restaurant_id + " AND alias_id=" + foodMaterial.food.kitchen + "), " +				//dept_id
+					  orderInfo.restaurantID + " AND alias_id=" + foodMaterial.food.kitchen + "), " +				//dept_id
 					  -amount + ", " + 				//amount
 					  MaterialDetail.TYPE_CONSUME + //type
 					  ")";
@@ -252,10 +252,10 @@ public class PayOrder {
 				//update the stock of material_dept to this material
 				sql = "UPDATE " + Params.dbName + ".material_dept SET " +
 					  "stock = stock - " + amount +
-					  " WHERE restaurant_id=" + orderInfo.restaurant_id + 
+					  " WHERE restaurant_id=" + orderInfo.restaurantID + 
 					  " AND material_id=" + foodMaterial.material.getMaterialID() +
 					  " AND dept_id=" + "(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + 
-					  orderInfo.restaurant_id + " AND alias_id=" + foodMaterial.food.kitchen + ")";
+					  orderInfo.restaurantID + " AND alias_id=" + foodMaterial.food.kitchen + ")";
 				dbCon.stmt.addBatch(sql);
 			}
 			
@@ -293,7 +293,7 @@ public class PayOrder {
 			 */
 			Table table = QueryTable.exec(dbCon, pin, model, orderToPay.table_id);
 			orderToPay.id = Util.getUnPaidOrderID(dbCon, table);
-			orderToPay.restaurant_id = table.restaurantID;
+			orderToPay.restaurantID = table.restaurantID;
 			
 			return queryOrderByID(dbCon, pin, model, orderToPay);
 		}finally{
@@ -361,11 +361,11 @@ public class PayOrder {
 			}else if(orderToPay.pay_type == Order.PAY_NORMAL && orderToPay.discount_type == Order.DISCOUNT_3){
 				discount = "discount_3";
 				
-			}else if(orderToPay.pay_type == Order.PAY_MEMBER && orderToPay.member_id != null){
+			}else if(orderToPay.pay_type == Order.PAY_MEMBER && orderToPay.memberID != null){
 				//validate the member id
 				String sql = "SELECT id FROM " + Params.dbName + 
-							 ".member WHERE restaurant_id=" + orderToPay.restaurant_id + 
-							 " AND alias_id='" + orderToPay.member_id + "'";
+							 ".member WHERE restaurant_id=" + orderToPay.restaurantID + 
+							 " AND alias_id='" + orderToPay.memberID + "'";
 				dbCon.rs = dbCon.stmt.executeQuery(sql);
 				if(dbCon.rs.next()){
 					if(orderToPay.discount_type == Order.DISCOUNT_1){
@@ -376,10 +376,10 @@ public class PayOrder {
 						discount = "member_discount_3";
 					}
 				}else{
-					throw new BusinessException("The member id(" + orderToPay.member_id + ") is invalid.", ErrorCode.MEMBER_NOT_EXIST);
+					throw new BusinessException("The member id(" + orderToPay.memberID + ") is invalid.", ErrorCode.MEMBER_NOT_EXIST);
 				}
 				
-			}else if(orderToPay.pay_type == Order.PAY_MEMBER && orderToPay.member_id == null){
+			}else if(orderToPay.pay_type == Order.PAY_MEMBER && orderToPay.memberID == null){
 				if(orderToPay.discount_type == Order.DISCOUNT_1){
 					discount = "member_discount_1";
 				}else if(orderToPay.discount_type == Order.DISCOUNT_2){
@@ -400,7 +400,7 @@ public class PayOrder {
 					 * Get the discount to each food according to the kitchen of this restaurant.
 					 */
 					String sql = "SELECT " + discount + " FROM " + Params.dbName + 
-								 ".kitchen WHERE restaurant_id=" + orderInfo.restaurant_id + 
+								 ".kitchen WHERE restaurant_id=" + orderInfo.restaurantID + 
 								 " AND alias_id=" + orderInfo.foods[i].kitchen;
 					
 					dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -465,10 +465,10 @@ public class PayOrder {
 		
 		orderInfo.setActualPrice(totalPrice2);
 		
-		orderInfo.restaurant_id = orderToPay.restaurant_id;
+		orderInfo.restaurantID = orderToPay.restaurantID;
 		orderInfo.pay_type = orderToPay.pay_type;
 		orderInfo.discount_type = orderToPay.discount_type;
-		orderInfo.member_id = orderToPay.member_id; 
+		orderInfo.memberID = orderToPay.memberID; 
 		orderInfo.setCashIncome(orderToPay.getCashIncome());
 		orderInfo.setGiftPrice(orderToPay.getGiftPrice());
 		orderInfo.pay_manner = orderToPay.pay_manner;

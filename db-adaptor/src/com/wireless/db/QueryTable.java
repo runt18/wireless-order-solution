@@ -104,6 +104,7 @@ public class QueryTable {
 			table.category = dbCon.rs.getShort("category");
 			table.status = dbCon.rs.getShort("status");
 			table.regionID = dbCon.rs.getShort("region_id");
+			table.setServiceRate(dbCon.rs.getFloat("service_rate"));
 			tables.add(table);
 		}
 		dbCon.rs.close();
@@ -112,7 +113,6 @@ public class QueryTable {
 		Collections.sort(tables, new Comparator<Table>(){
 
 			public int compare(Table table1, Table table2) {
-				// TODO Auto-generated method stub
 				if(table1.alias_id > table2.alias_id){
 					return 1;
 				}else if(table1.alias_id < table2.alias_id){
@@ -230,6 +230,7 @@ public class QueryTable {
 			table.category = dbCon.rs.getShort("category");
 			table.status = dbCon.rs.getShort("status");
 			table.regionID = dbCon.rs.getShort("region_id");
+			table.setServiceRate(dbCon.rs.getFloat("service_rate"));
 		}else{
 			throw new BusinessException("The table(alias_id=" + tableID + ") to query does NOT exist.", ErrorCode.TABLE_NOT_EXIST);
 		}
