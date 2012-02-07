@@ -2,6 +2,7 @@
 #include "../inc/PrinterInstance.h"
 #include "../../protocol/inc/Reserved.h"
 #include "../../protocol/inc/Kitchen.h"
+#include "../../protocol/inc/Region.h"
 #include <algorithm>
 #include <sstream>
 #include <process.h>
@@ -220,27 +221,27 @@ void PrinterInstance::run(){
 * Description    : Add the print job to queue and notify the print thread to run
 * Input          : buf - the pointer to the print content
 				   len - the length of the buffer
-				   iFunc - the function code that the printer instance is going to do
+				   func - the function instance indicating the printer instance is going to do
 				   reqFuncCode - the function code sent by request
 * Output         : None
 * Return         : None
 *******************************************************************************/
-void PrinterInstance::addJob(const char* buf, int len, int iFunc, int iReqFuncCode){
+void PrinterInstance::addJob(const char* buf, int len, const PrintFunc& func, int iReqFuncCode){
 
 
 	/************************************************************************
 	* <Header>
-	* mode : type : seq : reserved[4] : pin[6] : len[2] : <Print_1> : <Print_2> : <Print_3> : ...
+	* mode : type : seq : reserved : pin[6] : len[2] : <Print_1> : <Print_2> : <Print_3> : ...
 	* mode - PRINT
 	* type - PRINT_BILL
 	* seq - auto calculated and filled in
-	* reserved[1..3] - 0x00
-	* reserved[0] - one of the print functions
+	* reserved - one of the print functions
 	* pin[6] - auto calculated and filled in
 	* len[2] - length of the <Body>
 	* <Print_1..n>
-	* style : order_id[4] : len : order_date : len[2] : print_content
+	* style : region : order_id[4] : len : order_date : len[2] : print_content
 	* style - 1-byte indicating one of the printer style
+	* region - 1-byte indicating the region to this request
 	* order_id[4] - 4-byte indicating the order id
 	* len - the length to order_date 
 	* order_date - the order date represented as string
@@ -256,6 +257,10 @@ void PrinterInstance::addJob(const char* buf, int len, int iFunc, int iReqFuncCo
 	while(offset < len){
 		//get the style to this order 
 		int printStyle = buf[offset];
+
+		//get the region to this order
+		offset++;
+		int region = buf[offset];
 
 		//get the id to this order
 		offset++;
@@ -276,9 +281,17 @@ void PrinterInstance::addJob(const char* buf, int len, int iFunc, int iReqFuncCo
 		offset += lenOrderDate;
 		int length = (buf[offset] & 0x000000FF) | ((buf[offset + 1] & 0x000000FF) << 8);		
 
-		//get the value of print content if style matched
+		//get the value of print content if both style and region is matched
 		offset += 2;
-		if(printStyle == style){			
+		bool isRegionMatched = false;
+		vector<int>::const_iterator iter_region = func.regions.begin();
+		for(iter_region; iter_region != func.regions.end(); iter_region++){
+			if(*iter_region == region || *iter_region == Region::REGION_ALL){
+				isRegionMatched = true;
+				break;
+			}
+		}
+		if((printStyle == style) && isRegionMatched){			
 			print_content.assign(buf + offset, length);
 			break;
 		}else{
@@ -288,11 +301,11 @@ void PrinterInstance::addJob(const char* buf, int len, int iFunc, int iReqFuncCo
 
 	vector<string> details; 	
 
-	vector<PrintFunc>::iterator iter_func = find(funcs.begin(), funcs.end(), PrintFunc(iFunc));
+	vector<PrintFunc>::iterator iter_func = find(funcs.begin(), funcs.end(), func);
 
-	if(iFunc == Reserved::PRINT_ORDER_DETAIL ||
-		iFunc == Reserved::PRINT_EXTRA_FOOD ||
-		iFunc == Reserved::PRINT_CANCELLED_FOOD){		
+	if(func.code == Reserved::PRINT_ORDER_DETAIL ||
+		func.code == Reserved::PRINT_EXTRA_FOOD ||
+		func.code == Reserved::PRINT_CANCELLED_FOOD){		
 		if(iter_func != funcs.end()){
 			split2Details(print_content, iter_func->kitchens, details);
 		}
@@ -378,24 +391,26 @@ void PrinterInstance::split2Details(const string& print_content, const vector<in
 * Function Name  : addFunc
 * Description    : Add the function code 
 * Input          : iFunc - the code to this function
-				   iKitchen - the kitchen to this function
+				   regions - the regions to this function
+				   kitchens - the kitchens to this function
 				   iRepeat - the repeat times to this function
 * Output         : None
 * Return         : None
 *******************************************************************************/
-void PrinterInstance::addFunc(int iFunc, int iKitchen, int iRepeat){
+void PrinterInstance::addFunc(int iFunc, const vector<int>& regions, const vector<int>& kitchens, int iRepeat){
 	vector<PrintFunc>::iterator iter_func = find(funcs.begin(), funcs.end(), PrintFunc(iFunc));
 	if(iter_func == funcs.end()){
 		//if the function doesn't exist, means the new function
 		//put it to the function list 
-		funcs.push_back(PrintFunc(iFunc, iKitchen, iRepeat));
+		funcs.push_back(PrintFunc(iFunc, regions, kitchens, iRepeat));
 
-	}else{
-		//if the function has been exist, check to see whether this function contains this kitchen or not.
-		//add the kitchen to this function if not exist
-		vector<int>::iterator it = find(iter_func->kitchens.begin(), iter_func->kitchens.end(), iKitchen);
-		if(it == iter_func->kitchens.end()){
-			iter_func->kitchens.push_back(iKitchen);
-		}
 	}
+	//else{
+	//	//if the function has been exist, check to see whether this function contains this kitchen or not.
+	//	//add the kitchen to this function if not exist
+	//	vector<int>::iterator it = find(iter_func->kitchens.begin(), iter_func->kitchens.end(), iKitchen);
+	//	if(it == iter_func->kitchens.end()){
+	//		iter_func->kitchens.push_back(iKitchen);
+	//	}
+	//}
 }

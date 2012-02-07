@@ -45,8 +45,8 @@ public:
 	~PrinterInstance(void);
 
 	void run();
-	void addJob(const char* buf, int len, int iFunc, int reqFuncCode);
-	void addFunc(int iFunc, int iKitchen, int iRepeat);
+	void addJob(const char* buf, int len, const PrintFunc& func, int reqFuncCode);
+	void addFunc(int iFunc, const vector<int>& regions, const vector<int>& kitchens, int iRepeat);
 
 public:
 	//the name of the printer

@@ -5,6 +5,7 @@
 #include "../../protocol/inc/Type.h"
 #include "../../protocol/inc/ErrorCode.h"
 #include "../../protocol/inc/Reserved.h"
+#include "../../protocol/inc/Region.h"
 #include "../../protocol/inc/Kitchen.h"
 #include "../../protocol/inc/RespACK.h"
 #include "../../protocol/inc/RespNAK.h"
@@ -102,22 +103,190 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 		//get the printer style
 		int style = PRINT_STYLE_UNKNOWN;
 		pPrinter->QueryIntAttribute(ConfTags::PRINT_STYLE, &style);
+		//get the regions
+		vector<int> regions;
+		int isOn = 0;
+		pPrinter->QueryIntAttribute(ConfTags::REGION_ALL, &isOn);
+		if(isOn == 1){
+			regions.push_back(Region::REGION_ALL);
+		}else{
+			pPrinter->QueryIntAttribute(ConfTags::REGION_1, &isOn);
+			if(isOn == 1){
+				regions.push_back(Region::REGION_1);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::REGION_2, &isOn);
+			if(isOn == 1){
+				regions.push_back(Region::REGION_2);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::REGION_3, &isOn);
+			if(isOn == 1){
+				regions.push_back(Region::REGION_3);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::REGION_4, &isOn);
+			if(isOn == 1){
+				regions.push_back(Region::REGION_4);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::REGION_5, &isOn);
+			if(isOn == 1){
+				regions.push_back(Region::REGION_5);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::REGION_6, &isOn);
+			if(isOn == 1){
+				regions.push_back(Region::REGION_6);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::REGION_7, &isOn);
+			if(isOn == 1){
+				regions.push_back(Region::REGION_7);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::REGION_8, &isOn);
+			if(isOn == 1){
+				regions.push_back(Region::REGION_8);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::REGION_9, &isOn);
+			if(isOn == 1){
+				regions.push_back(Region::REGION_9);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::REGION_10, &isOn);
+			if(isOn == 1){
+				regions.push_back(Region::REGION_10);
+			}
+		}
+		//get the kitchens
+		vector<int> kitchens;
+		isOn = 0;
+		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_ALL, &isOn);
+		if(isOn == 1){
+			kitchens.push_back(Kitchen::KITCHEN_ALL);
+		}else{
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_TEMP, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_TEMP);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_1, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_1);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_2, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_2);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_3, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_3);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_4, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_4);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_5, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_5);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_6, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_6);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_7, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_7);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_8, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_8);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_9, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_9);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_10, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_10);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_11, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_11);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_12, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_12);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_13, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_13);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_14, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_14);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_15, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_15);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_16, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_16);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_17, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_17);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_18, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_18);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_19, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_19);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_20, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_20);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_21, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_21);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_22, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_22);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_23, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_23);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_24, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_24);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_25, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_25);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_26, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_26);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_27, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_27);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_28, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_28);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_29, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_29);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_30, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_30);
+			}
+
+		}
 		//get the repeat number
 		int repeat = 1;
 		pPrinter->QueryIntAttribute(ConfTags::PRINT_REPEAT, &repeat);
-
-		//get the kitchen for functions below
-		//otherwise set the kitchen to full
-		int kitchen = Kitchen::KITCHEN_ALL;
-		if(func == Reserved::PRINT_ORDER_DETAIL ||
-			func == Reserved::PRINT_EXTRA_FOOD ||
-			func == Reserved::PRINT_CANCELLED_FOOD ||
-			func == Reserved::PRINT_TRANSFER_TABLE)
-		{	
-			pPrinter->QueryIntAttribute(ConfTags::KITCHEN, &kitchen);
-		}else{
-			kitchen = Kitchen::KITCHEN_ALL;
-		}
 
 		vector< boost::shared_ptr<PrinterInstance> >::iterator it = g_PrintInstances.begin();
 		for(it; it != g_PrintInstances.end(); it++){
@@ -129,12 +298,12 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 		if(it == g_PrintInstances.end()){
 			//create the printer instance and put it to the vector if not be found in the exist printer instances
 			boost::shared_ptr<PrinterInstance> pPI(new PrinterInstance(name.c_str(), style, pReport));
-			pPI->addFunc(func, kitchen, repeat);
+			pPI->addFunc(func, regions, kitchens, repeat);
 			g_PrintInstances.push_back(pPI);
 
 		}else{
 			//just add the function to the exist printer instance
-			(*it)->addFunc(func, kitchen, repeat);
+			(*it)->addFunc(func, regions, kitchens, repeat);
 		}
 	}
 
@@ -178,33 +347,33 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 							vector<PrintFunc>::iterator it = (*iter)->funcs.begin();
 							for(it; it != (*iter)->funcs.end(); it++){
 								if(it->code == Reserved::PRINT_ORDER && (printReq.header.reserved == Reserved::PRINT_ORDER)){
-									(*iter)->addJob(printReq.body, len, it->code, printReq.header.reserved);
+									(*iter)->addJob(printReq.body, len, *it, printReq.header.reserved);
 
 								}else if(it->code == Reserved::PRINT_ORDER_DETAIL && (printReq.header.reserved == Reserved::PRINT_ORDER_DETAIL)){
-									(*iter)->addJob(printReq.body, len, it->code, printReq.header.reserved);
+									(*iter)->addJob(printReq.body, len, *it, printReq.header.reserved);
 
 								}else if(it->code == Reserved::PRINT_RECEIPT && (printReq.header.reserved == Reserved::PRINT_RECEIPT || 
 									printReq.header.reserved == Reserved::PRINT_TEMP_RECEIPT || printReq.header.reserved == Reserved::PRINT_SHIFT_RECEIPT ||
 									printReq.header.reserved == Reserved::PRINT_TEMP_SHIFT_RECEIPT)){
-									(*iter)->addJob(printReq.body, len, it->code, printReq.header.reserved);
+									(*iter)->addJob(printReq.body, len, *it, printReq.header.reserved);
 
 								}else if(it->code == Reserved::PRINT_EXTRA_FOOD && (printReq.header.reserved == Reserved::PRINT_EXTRA_FOOD)){
-									(*iter)->addJob(printReq.body, len, it->code, printReq.header.reserved);
+									(*iter)->addJob(printReq.body, len, *it, printReq.header.reserved);
 
 								}else if(it->code == Reserved::PRINT_CANCELLED_FOOD && (printReq.header.reserved == Reserved::PRINT_CANCELLED_FOOD)){
-									(*iter)->addJob(printReq.body, len, it->code, printReq.header.reserved);
+									(*iter)->addJob(printReq.body, len, *it, printReq.header.reserved);
 
 								}else if(it->code == Reserved::PRINT_TRANSFER_TABLE && (printReq.header.reserved == Reserved::PRINT_TRANSFER_TABLE)){
-									(*iter)->addJob(printReq.body, len, it->code, printReq.header.reserved);
+									(*iter)->addJob(printReq.body, len, *it, printReq.header.reserved);
 
 								}else if(it->code == Reserved::PRINT_ALL_EXTRA_FOOD && (printReq.header.reserved == Reserved::PRINT_ALL_EXTRA_FOOD)){
-									(*iter)->addJob(printReq.body, len, it->code, printReq.header.reserved);
+									(*iter)->addJob(printReq.body, len, *it, printReq.header.reserved);
 
 								}else if(it->code == Reserved::PRINT_ALL_CANCELLED_FOOD && (printReq.header.reserved == Reserved::PRINT_ALL_CANCELLED_FOOD)){
-									(*iter)->addJob(printReq.body, len, it->code, printReq.header.reserved);
+									(*iter)->addJob(printReq.body, len, *it, printReq.header.reserved);
 
 								}else if(it->code == Reserved::PRINT_ALL_HURRIED_FOOD && (printReq.header.reserved == Reserved::PRINT_ALL_HURRIED_FOOD)){
-									(*iter)->addJob(printReq.body, len, it->code, printReq.header.reserved);
+									(*iter)->addJob(printReq.body, len, *it, printReq.header.reserved);
 								}
 							}
 						}
@@ -398,15 +567,17 @@ static unsigned __stdcall LoginProc(LPVOID pvParam){
 						if(loginResp.header.seq == reqLogin.header.seq){
 							//check the type to see it's an ACK or NAK
 							if(loginResp.header.type == Type::ACK){
-								vector<Kitchen> kits;
+								vector<Kitchen> kitchens;
+								vector<Region> regions;
 								string rest;
-								RespParse::parsePrintLogin(loginResp, kits, rest);
+								RespParse::parsePrintLogin(loginResp, kitchens, regions, rest);
 								if(pReport){
 									ostringstream os;
 									os << "\"" << rest << "\"" << "µÇÂ¼³É¹¦";
 									pReport->OnPrintReport(0, os.str().c_str());
 									pReport->OnRetrieveRestaurant(rest);
-									pReport->OnRetrieveKitchen(kits);
+									pReport->OnRetrieveKitchen(kitchens);
+									pReport->OnRetrieveRegion(regions);
 								}
 								//notify the print manager thread to run
 								SetEvent(g_hPrintMgrEvent);

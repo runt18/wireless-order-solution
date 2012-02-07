@@ -14,6 +14,7 @@
 // CAddPrinterDlg dialog
 
 extern vector<CString> g_Kitchens;
+extern vector<CString> g_Regions;
 
 IMPLEMENT_DYNAMIC(CAddPrinterDlg, CDialog)
 
@@ -22,7 +23,6 @@ CAddPrinterDlg::CAddPrinterDlg(TiXmlDocument& conf, CWnd* pParent /*=NULL*/)
 {
 	m_Printer = _T("");
 	m_Func = _T("");
-	m_Kitchen = Kitchen::KITCHEN_NULL;
 }
 
 CAddPrinterDlg::~CAddPrinterDlg()
@@ -36,10 +36,53 @@ void CAddPrinterDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO1, m_PrinterNames);
 	DDX_Control(pDX, IDC_COMBO2, m_Funcs);
 	DDX_Control(pDX, IDC_COMBO3, m_PrinterStyle);
-	DDX_Control(pDX, IDC_COMBO4, m_PrintKitchen);
 	DDX_Control(pDX, IDC_RICHEDIT21, m_DescCtrl);
 	DDX_Control(pDX, IDC_EDIT_REPEAT, m_PrintRepeat);
 	DDX_Control(pDX, IDC_SPIN_REPEAT, m_SpinRepeat);
+	DDX_Control(pDX, IDC_CHECK_REGION_ALL, m_RegionAll);
+	DDX_Control(pDX, IDC_CHECK_REGION_1, m_Regions[0]);
+	DDX_Control(pDX, IDC_CHECK_REGION_2, m_Regions[1]);
+	DDX_Control(pDX, IDC_CHECK_REGION_3, m_Regions[2]);
+	DDX_Control(pDX, IDC_CHECK_REGION_4, m_Regions[3]);
+	DDX_Control(pDX, IDC_CHECK_REGION_5, m_Regions[4]);
+	DDX_Control(pDX, IDC_CHECK_REGION_6, m_Regions[5]);
+	DDX_Control(pDX, IDC_CHECK_REGION_7, m_Regions[6]);
+	DDX_Control(pDX, IDC_CHECK_REGION_8, m_Regions[7]);
+	DDX_Control(pDX, IDC_CHECK_REGION_9, m_Regions[8]);
+	DDX_Control(pDX, IDC_CHECK_REGION_10, m_Regions[9]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_ALL, m_KitchenAll);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_TEMP, m_KitchenTemp);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_1, m_Kitchens[0]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_2, m_Kitchens[1]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_3, m_Kitchens[2]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_4, m_Kitchens[3]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_5, m_Kitchens[4]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_6, m_Kitchens[5]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_7, m_Kitchens[6]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_8, m_Kitchens[7]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_9, m_Kitchens[8]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_10, m_Kitchens[9]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_11, m_Kitchens[10]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_12, m_Kitchens[11]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_13, m_Kitchens[12]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_14, m_Kitchens[13]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_15, m_Kitchens[14]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_16, m_Kitchens[15]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_17, m_Kitchens[16]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_18, m_Kitchens[17]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_19, m_Kitchens[18]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_20, m_Kitchens[19]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_21, m_Kitchens[20]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_22, m_Kitchens[21]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_23, m_Kitchens[22]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_24, m_Kitchens[23]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_25, m_Kitchens[24]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_26, m_Kitchens[25]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_27, m_Kitchens[26]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_28, m_Kitchens[27]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_29, m_Kitchens[28]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_30, m_Kitchens[29]);
+
 }
 
 
@@ -76,15 +119,21 @@ BOOL CAddPrinterDlg::OnInitDialog(){
 	//assign the current value of function code
 	m_Funcs.GetLBText(0, m_Func);	
 
-	//set the printer kitchen 
+	//set the kitchen to all as default
+	m_KitchenAll.SetCheck(BST_CHECKED);
+	m_KitchenTemp.EnableWindow(FALSE);
 	for(unsigned int i = 0; i < g_Kitchens.size(); i++){
-		//m_PrintKitchen.AddString(_PrinterKitchen[i]);
-		m_PrintKitchen.InsertString(i, g_Kitchens[i]);
+		m_Kitchens[i].SetWindowText(g_Kitchens.at(i));
+		m_Kitchens[i].EnableWindow(FALSE);
 	}
-	m_PrintKitchen.SetCurSel(0);
-	m_Kitchen = m_PrintKitchen.GetCurSel();
-	//disable the printer kitchen combo box since the default function is to print order
-	m_PrintKitchen.EnableWindow(FALSE);
+
+	//set the region to all as default
+	m_RegionAll.SetCheck(BST_CHECKED);
+	//set the regions
+	for(unsigned int i = 0; i < g_Regions.size(); i++){
+		m_Regions[i].SetWindowText(g_Regions.at(i));
+		m_Regions[i].EnableWindow(FALSE);
+	}
 
 	//set the printer style 
 	for(int i = 1; i < _nStyle; i++){
@@ -128,45 +177,12 @@ void CAddPrinterDlg::OnOK(){
 		int func = 0;
 		pPrinter->QueryIntAttribute(ConfTags::PRINT_FUNC, &func);
 		if(m_Printer == CString(name.c_str())){
-			//in the case the functions below
-			//1 - print order detail
-			//2 - print extra food
-			//3 - print canceled food
-			//Check to whether see both the function and kitchen is the same.
-			//Otherwise, just check to see whether the function is the same.
 			if(m_Func.Compare(_FuncDesc[func]) == 0){
-				if(func == Reserved::PRINT_ORDER_DETAIL ||
-					func == Reserved::PRINT_EXTRA_FOOD ||
-					func == Reserved::PRINT_CANCELLED_FOOD)
-				{
-					//get the kitchen to this printer instance
-					int kitchen = Kitchen::KITCHEN_ALL;;
-					pPrinter->QueryIntAttribute(ConfTags::KITCHEN, &kitchen);
-
-					//get the kitchen to add
-					int kitchen2Add = m_PrintKitchen.GetCurSel();
-					if(kitchen2Add == g_Kitchens.size() - 1){
-						kitchen2Add = Kitchen::KITCHEN_ALL;
-					}else if(kitchen2Add == g_Kitchens.size() - 2){
-						kitchen2Add = Kitchen::KITCHEN_TEMP;
-					}
-
-					//check to see whether the kitchen is the same
-					if(kitchen2Add == kitchen){
-						isDuplicate = true;
-						CString msg;
-						msg.Format(_T("已存在打印机\"%s\"执行打印\"%s-%s\"操作，\n请不要重复添加打印功能。"), CString(name.c_str()), _FuncDesc[func], g_Kitchens.at(m_PrintKitchen.GetCurSel()));
-						MessageBox(msg,  _T("信息"), MB_ICONINFORMATION);
-						break;
-					}
-
-				}else{
-					isDuplicate = true;
-					CString msg;
-					msg.Format(_T("已存在打印机\"%s\"执行打印\"%s\"操作，\n请不要重复添加打印功能。"), CString(name.c_str()), _FuncDesc[func]);
-					MessageBox(msg,  _T("信息"), MB_ICONINFORMATION);
-					break;
-				}
+				isDuplicate = true;
+				CString msg;
+				msg.Format(_T("已存在打印机\"%s\"执行打印\"%s\"操作，\n请不要重复添加打印功能。"), CString(name.c_str()), _FuncDesc[func]);
+				MessageBox(msg,  _T("信息"), MB_ICONINFORMATION);
+				break;
 			}
 		}
 		//get the printer style
@@ -199,22 +215,100 @@ void CAddPrinterDlg::OnOK(){
 			//set the function code attribute
 			pPrinter->SetAttribute(ConfTags::PRINT_FUNC, tmp);
 
-			//set the kitchen if the function is as below
-			//1 - print order detail
-			//2 - print extra food
-			//3 - print canceled food
-			if((selected + 1) == Reserved::PRINT_ORDER_DETAIL ||
-				(selected + 1) == Reserved::PRINT_EXTRA_FOOD ||
-				(selected + 1) == Reserved::PRINT_CANCELLED_FOOD){
-				int kitchen = m_PrintKitchen.GetCurSel();
-				if(kitchen == g_Kitchens.size() - 1){
-					kitchen = Kitchen::KITCHEN_ALL;
-				}else if(kitchen == g_Kitchens.size() - 2){
-					kitchen = Kitchen::KITCHEN_TEMP;
-				}
-				sprintf_s(tmp, sizeof(tmp), "%d", kitchen);
-				//set the kitchen for printing order detail
-				pPrinter->SetAttribute(ConfTags::KITCHEN, tmp);
+			//set the kitchen
+			if(m_KitchenAll.GetCheck() == BST_CHECKED){
+				pPrinter->SetAttribute(ConfTags::KITCHEN_ALL, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_TEMP, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_1, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_2, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_3, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_4, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_5, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_6, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_7, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_8, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_9, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_10, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_11, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_12, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_13, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_14, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_15, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_16, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_17, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_18, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_19, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_20, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_21, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_22, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_23, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_24, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_25, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_26, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_27, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_28, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_29, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_30, 1);
+
+			}else{
+				pPrinter->SetAttribute(ConfTags::KITCHEN_TEMP, m_KitchenTemp.GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_1, m_Kitchens[0].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_2, m_Kitchens[1].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_3, m_Kitchens[2].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_4, m_Kitchens[3].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_5, m_Kitchens[4].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_6, m_Kitchens[5].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_7, m_Kitchens[6].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_8, m_Kitchens[7].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_9, m_Kitchens[8].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_10, m_Kitchens[9].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_11, m_Kitchens[10].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_12, m_Kitchens[11].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_13, m_Kitchens[12].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_14, m_Kitchens[13].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_15, m_Kitchens[14].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_16, m_Kitchens[15].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_17, m_Kitchens[16].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_18, m_Kitchens[17].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_19, m_Kitchens[18].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_20, m_Kitchens[19].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_21, m_Kitchens[20].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_22, m_Kitchens[21].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_23, m_Kitchens[22].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_24, m_Kitchens[23].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_25, m_Kitchens[24].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_26, m_Kitchens[25].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_27, m_Kitchens[26].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_28, m_Kitchens[27].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_29, m_Kitchens[28].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_30, m_Kitchens[29].GetCheck() == BST_CHECKED ? 1 : 0);
+
+			}
+
+			//set the region
+			if(m_RegionAll.GetCheck() == BST_CHECKED){
+				pPrinter->SetAttribute(ConfTags::REGION_ALL, 1);
+				pPrinter->SetAttribute(ConfTags::REGION_1, 1);
+				pPrinter->SetAttribute(ConfTags::REGION_2, 1);
+				pPrinter->SetAttribute(ConfTags::REGION_3, 1);
+				pPrinter->SetAttribute(ConfTags::REGION_4, 1);
+				pPrinter->SetAttribute(ConfTags::REGION_5, 1);
+				pPrinter->SetAttribute(ConfTags::REGION_6, 1);
+				pPrinter->SetAttribute(ConfTags::REGION_7, 1);
+				pPrinter->SetAttribute(ConfTags::REGION_8, 1);
+				pPrinter->SetAttribute(ConfTags::REGION_9, 1);
+				pPrinter->SetAttribute(ConfTags::REGION_10, 1);
+			}else{
+				pPrinter->SetAttribute(ConfTags::REGION_1, m_Regions[0].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::REGION_2, m_Regions[1].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::REGION_3, m_Regions[2].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::REGION_4, m_Regions[3].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::REGION_5, m_Regions[4].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::REGION_6, m_Regions[5].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::REGION_7, m_Regions[6].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::REGION_8, m_Regions[7].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::REGION_9, m_Regions[8].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::REGION_10, m_Regions[9].GetCheck() == BST_CHECKED ? 1 : 0);
 			}
 
 			selected = m_PrinterStyle.GetCurSel();
@@ -251,6 +345,8 @@ BEGIN_MESSAGE_MAP(CAddPrinterDlg, CDialog)
 	ON_CBN_SELCHANGE(IDC_COMBO2, &CAddPrinterDlg::OnCbnFuncChg)
 	ON_CBN_SELCHANGE(IDC_COMBO3, &CAddPrinterDlg::OnCbnStyleChg)
 	ON_CBN_SELCHANGE(IDC_COMBO4, &CAddPrinterDlg::OnCbnKitchenChg)
+	ON_BN_CLICKED(IDC_CHECK_REGION_ALL, &CAddPrinterDlg::OnBnRegionAllClicked)
+	ON_BN_CLICKED(IDC_CHECK_KITCHEN_ALL, &CAddPrinterDlg::OnBnKitchenAllClicked)
 END_MESSAGE_MAP()
 
 
@@ -270,18 +366,6 @@ void CAddPrinterDlg::OnCbnFuncChg()
 {
 	//assign the selected function code value
 	int selected = m_Funcs.GetCurSel();
-	//show kitchen combobox if the function is as below.
-	//1 - print order detail
-	//2 - print extra food
-	//3 - print canceled food
-	if((selected + 1) == Reserved::PRINT_ORDER_DETAIL ||
-		(selected + 1) == Reserved::PRINT_EXTRA_FOOD ||
-		(selected + 1) == Reserved::PRINT_CANCELLED_FOOD){
-		m_PrintKitchen.EnableWindow(TRUE);
-	}else{
-		m_PrintKitchen.EnableWindow(FALSE);
-	}
-
 	if(selected != -1){
 		m_Funcs.GetLBText(selected, m_Func);
 	}
@@ -299,4 +383,34 @@ void CAddPrinterDlg::OnCbnStyleChg(){
 void CAddPrinterDlg::OnCbnKitchenChg(){
 	int m_Kitchen = m_PrinterStyle.GetCurSel();
 	UpdateData(TRUE);
+}
+
+void CAddPrinterDlg::OnBnRegionAllClicked(){
+	//have all the regions disabled if region all selected
+	//otherwise make them enabled
+	if(m_RegionAll.GetCheck() == BST_CHECKED){
+		for(unsigned int i = 0; i < g_Regions.size(); i++){
+			m_Regions[i].EnableWindow(FALSE);
+		}
+	}else{
+		for(unsigned int i = 0; i < g_Regions.size(); i++){
+			m_Regions[i].EnableWindow(TRUE);
+		}
+	}
+}
+
+void CAddPrinterDlg::OnBnKitchenAllClicked(){
+	//have all the kitchens disabled if kitchen all selected
+	//otherwise make them enabled
+	if(m_KitchenAll.GetCheck() == BST_CHECKED){
+		m_KitchenTemp.EnableWindow(FALSE);
+		for(unsigned int i = 0; i < g_Kitchens.size(); i++){
+			m_Kitchens[i].EnableWindow(FALSE);
+		}
+	}else{
+		m_KitchenTemp.EnableWindow(TRUE);
+		for(unsigned int i = 0; i < g_Kitchens.size(); i++){
+			m_Kitchens[i].EnableWindow(TRUE);
+		}
+	}
 }

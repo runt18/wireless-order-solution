@@ -32,6 +32,7 @@ CString g_NewProgPath;
 int g_DoQuitProg = 0;
 
 vector<CString> g_Kitchens;
+vector<CString> g_Regions;
 
 //the name of the restaurant
 static CString g_Restaurant = _T("e点通");
@@ -88,6 +89,13 @@ CMainFrame::CMainFrame() : m_pStatusView(NULL), m_pPrinterView(NULL), m_UpdateWa
 	}
 	g_Kitchens.push_back(_T("临时"));
 	g_Kitchens.push_back(_T("所有厨房"));
+
+	//initialize the regions, "区域1" to "区域10"
+	for(int i = 0; i < 10; i++){
+		CString region;
+		region.Format(_T("区域%d"), i + 1);
+		g_Regions.push_back(region);
+	}
 }
 
 CMainFrame::~CMainFrame()
@@ -290,18 +298,48 @@ static unsigned _stdcall StartPrinterProc(LPVOID pvParam){
 				}
 
 				/**
-				 * Since we add "repeat" attribute from 0.9.4,
-				 * we need to check to see whether each printer tag containing the "repeat" attribute.
-				 * If not containing "repeat" attribute, add one whose default value is 1.
-				 */
+				* As adding "region_1..10" attribute since 1.0.2,
+				* we need to check to see whether each printer tag containing the "region_1..10" attribute.
+				* Add the default values if not containing these attributes.
+				*/
 				TiXmlElement* pPrinter = TiXmlHandle(&confDoc).FirstChildElement(ConfTags::CONF_ROOT).FirstChildElement(ConfTags::PRINTER).Element();
 				for(pPrinter; pPrinter != NULL; pPrinter = pPrinter->NextSiblingElement(ConfTags::PRINTER)){
-					int repeat = 0;
-					int ret = pPrinter->QueryIntAttribute(ConfTags::PRINT_STYLE, &repeat);
-					if(ret == TIXML_NO_ATTRIBUTE){
-						pPrinter->SetAttribute(ConfTags::PRINT_REPEAT, 1);
+					int isOn = 0;
+					if(pPrinter->QueryIntAttribute(ConfTags::REGION_ALL, &isOn) == TIXML_NO_ATTRIBUTE){
+						pPrinter->SetAttribute(ConfTags::REGION_ALL, 1);
+					}
+					if(pPrinter->QueryIntAttribute(ConfTags::REGION_1, &isOn) == TIXML_NO_ATTRIBUTE){
+						pPrinter->SetAttribute(ConfTags::REGION_1, 1);
+					}
+					if(pPrinter->QueryIntAttribute(ConfTags::REGION_2, &isOn) == TIXML_NO_ATTRIBUTE){
+						pPrinter->SetAttribute(ConfTags::REGION_2, 1);
+					}
+					if(pPrinter->QueryIntAttribute(ConfTags::REGION_3, &isOn) == TIXML_NO_ATTRIBUTE){
+						pPrinter->SetAttribute(ConfTags::REGION_3, 1);
+					}
+					if(pPrinter->QueryIntAttribute(ConfTags::REGION_4, &isOn) == TIXML_NO_ATTRIBUTE){
+						pPrinter->SetAttribute(ConfTags::REGION_4, 1);
+					}
+					if(pPrinter->QueryIntAttribute(ConfTags::REGION_5, &isOn) == TIXML_NO_ATTRIBUTE){
+						pPrinter->SetAttribute(ConfTags::REGION_5, 1);
+					}
+					if(pPrinter->QueryIntAttribute(ConfTags::REGION_6, &isOn) == TIXML_NO_ATTRIBUTE){
+						pPrinter->SetAttribute(ConfTags::REGION_6, 1);
+					}
+					if(pPrinter->QueryIntAttribute(ConfTags::REGION_7, &isOn) == TIXML_NO_ATTRIBUTE){
+						pPrinter->SetAttribute(ConfTags::REGION_7, 1);
+					}
+					if(pPrinter->QueryIntAttribute(ConfTags::REGION_8, &isOn) == TIXML_NO_ATTRIBUTE){
+						pPrinter->SetAttribute(ConfTags::REGION_8, 1);
+					}
+					if(pPrinter->QueryIntAttribute(ConfTags::REGION_9, &isOn) == TIXML_NO_ATTRIBUTE){
+						pPrinter->SetAttribute(ConfTags::REGION_9, 1);
+					}
+					if(pPrinter->QueryIntAttribute(ConfTags::REGION_10, &isOn) == TIXML_NO_ATTRIBUTE){
+						pPrinter->SetAttribute(ConfTags::REGION_10, 1);
 					}
 				}
+
 			}else{
 				//create the <auto_update> tag and set it on
 				TiXmlElement * pAutoUpdate = new TiXmlElement(ConfTags::AUTO_UPDATE);
@@ -394,7 +432,7 @@ void CMainFrame::OnPrintReport(int type, const char* msg){
 void CMainFrame::OnRetrieveKitchen(const std::vector<Kitchen>& kitchens){
 	g_Kitchens.clear();
 	for(unsigned int i = 0; i < kitchens.size(); i++){
-		//convert the msg from ANSI to UNICODE
+		//convert the string from ANSI to UNICODE
 		DWORD dwNum = MultiByteToWideChar (CP_ACP, 0, kitchens[i].name.c_str(), -1, NULL, 0);
 		boost::shared_ptr<wchar_t> pMsg(new wchar_t[dwNum], boost::checked_array_deleter<wchar_t>());
 		MultiByteToWideChar (CP_ACP, 0, kitchens[i].name.c_str(), -1, pMsg.get(), dwNum);
@@ -402,6 +440,18 @@ void CMainFrame::OnRetrieveKitchen(const std::vector<Kitchen>& kitchens){
 	}
 	g_Kitchens.push_back(_T("临时菜"));
 	g_Kitchens.push_back(_T("所有厨房"));
+	m_pPrinterView->Update();
+}
+
+void CMainFrame::OnRetrieveRegion(const std::vector<Region>& regions){
+	g_Regions.clear();
+	for(unsigned int i = 0; i < regions.size(); i++){
+		//convert the string from ANSI to UNICODE
+		DWORD dwNum = MultiByteToWideChar (CP_ACP, 0, regions[i].name.c_str(), -1, NULL, 0);
+		boost::shared_ptr<wchar_t> pMsg(new wchar_t[dwNum], boost::checked_array_deleter<wchar_t>());
+		MultiByteToWideChar (CP_ACP, 0, regions[i].name.c_str(), -1, pMsg.get(), dwNum);
+		g_Regions.push_back(pMsg.get());
+	}
 	m_pPrinterView->Update();
 }
 

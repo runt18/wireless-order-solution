@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "../inc/Kitchen.h"
 
-Kitchen::Kitchen(){
-	alias_id = KITCHEN_NULL;
+Kitchen::Kitchen() : alias_id(KITCHEN_NULL), name(""){
+
 }
 
 Kitchen::Kitchen(const string& kName, int id){

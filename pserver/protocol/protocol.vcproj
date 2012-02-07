@@ -214,6 +214,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\Region.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\ReqPackage.cpp"
 				>
 			</File>
@@ -289,6 +293,10 @@
 			</File>
 			<File
 				RelativePath=".\inc\ProtocolPackage.h"
+				>
+			</File>
+			<File
+				RelativePath=".\inc\Region.h"
 				>
 			</File>
 			<File

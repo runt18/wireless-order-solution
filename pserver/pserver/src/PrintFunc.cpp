@@ -13,16 +13,21 @@ PrintFunc::PrintFunc(int iFunc){
 	repeat = 1;
 }
 
-PrintFunc::PrintFunc(int iFunc, int iKit, int iRepeat){
+PrintFunc::PrintFunc(int iFunc, const vector<int>& vectRegions, const vector<int>& vectKitchens, int iRepeat) : regions(vectRegions),
+																											    kitchens(vectKitchens){
 	code = iFunc;
-	kitchens.push_back(iKit);
 	repeat = iRepeat;
 }
 
 PrintFunc::PrintFunc(const PrintFunc &right){
 	code = right.code;
+	regions.clear();
+	vector<int>::const_iterator it = right.regions.begin();
+	for(it; it != right.regions.end(); it++){
+		regions.push_back(*it);
+	}
 	kitchens.clear();
-	vector<int>::const_iterator it = right.kitchens.begin();
+	it = right.kitchens.begin();
 	for(it; it != right.kitchens.end(); it++){
 		kitchens.push_back(*it);
 	}
@@ -31,8 +36,13 @@ PrintFunc::PrintFunc(const PrintFunc &right){
 
 PrintFunc& PrintFunc::operator=(const PrintFunc& right){
 	code = right.code;
+	regions.clear();
+	vector<int>::const_iterator it = right.regions.begin();
+	for(it; it != right.regions.end(); it++){
+		regions.push_back(*it);
+	}
 	kitchens.clear();
-	vector<int>::const_iterator it = right.kitchens.begin();
+	it = right.kitchens.begin();
 	for(it; it != right.kitchens.end(); it++){
 		kitchens.push_back(*it);
 	}
