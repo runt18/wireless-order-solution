@@ -7,22 +7,35 @@ import com.wireless.protocol.Terminal;
 
 public class QueryTerminal {
 
+	public final static int QUERY_ALL_TERM = 0;
+	public final static int QUERY_REAL_TERM = 1;
+	public final static int QUERY_VIRTUAL_TERM = 2;
+	
 	/**
 	 * Query the terminal to a specific restaurant.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param restaurantID
 	 * 			the restaurant id to query
+	 * @param type
+	 * 			one of three values below<br>
+	 * 			QUERY_ALL_TERM<br>
+	 * 			QUERY_REAL_TERM<br>
+	 * 			QUERY_VIRTUAL_TERM
+	 * @param extraCond
+	 * 			the extra condition to the SQL statement
+	 * @param orderClause 
+	 * 			the order clause to the SQL statement
 	 * @return
 	 * 			return all the terminals to this restaurant and match the extra condition and order clause
 	 * @throws SQLException
 	 * 			throws if fail to execute the SQL statement
 	 */
-	public static Terminal[] exec(int restaurantID, String extraCond, String orderClause) throws SQLException{
+	public static Terminal[] exec(int restaurantID, int type, String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return exec(dbCon, restaurantID, extraCond, orderClause);
+			return exec(dbCon, type, restaurantID, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -35,6 +48,11 @@ public class QueryTerminal {
 	 * 			the database connection
 	 * @param restaurantID
 	 * 			the restaurant id to query
+	 * @param type
+	 * 			one of three values below<br>
+	 * 			QUERY_ALL_TERM<br>
+	 * 			QUERY_REAL_TERM<br>
+	 * 			QUERY_VIRTUAL_TERM
 	 * @param extraCond
 	 * 			the extra condition to the SQL statement
 	 * @param orderClause 
@@ -44,9 +62,18 @@ public class QueryTerminal {
 	 * @throws SQLException
 	 * 			throws if fail to execute the SQL statement
 	 */
-	public static Terminal[] exec(DBCon dbCon, int restaurantID, String extraCond, String orderClause) throws SQLException{
+	public static Terminal[] exec(DBCon dbCon, int restaurantID, int type, String extraCond, String orderClause) throws SQLException{
+		String extraType = null;
+		if(type == QUERY_REAL_TERM){
+			extraType = " AND model_id < 127 ";
+		}else if(type == QUERY_VIRTUAL_TERM){
+			extraType = " AND model_id > 127 ";
+		}else{
+			extraType = "";
+		}
 		String sql = "SELECT * FROM " +  
-     				 Params.dbName + ".terminal WHERE restaurant_id=" + restaurantID + " " +
+     				 Params.dbName + ".terminal WHERE restaurant_id=" + restaurantID + 
+     				 extraType + " " +
 					 (extraCond != null ? extraCond : " ") +
 					 (orderClause != null ? orderClause : "");
 		
