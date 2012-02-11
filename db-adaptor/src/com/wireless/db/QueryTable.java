@@ -21,7 +21,7 @@ public class QueryTable {
 	 * @throws BusinessException throws if the terminal is NOT attached to any restaurant
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Table[] exec(int pin, short model) throws BusinessException, SQLException{		
+	public static Table[] exec(long pin, short model) throws BusinessException, SQLException{		
 
 		DBCon dbCon = new DBCon();
 
@@ -52,7 +52,7 @@ public class QueryTable {
 	 * @throws SQLException 
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static Table[] exec(int pin, short model, String extraCond, String orderClause) throws BusinessException, SQLException{
+	public static Table[] exec(long pin, short model, String extraCond, String orderClause) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -81,7 +81,7 @@ public class QueryTable {
 	 * @throws SQLException 
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static Table[] exec(DBCon dbCon, int pin, short model, String extraCond, String orderClause) throws BusinessException, SQLException{
+	public static Table[] exec(DBCon dbCon, long pin, short model, String extraCond, String orderClause) throws BusinessException, SQLException{
 		
 		Terminal term = VerifyPin.exec(dbCon, pin, model);
 		
@@ -181,7 +181,7 @@ public class QueryTable {
 	 * @throws BusinessException throws if the table to query does NOT exist
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Table exec(int pin, short model, int tableID, String extraCond, String orderClause) throws BusinessException, SQLException{
+	public static Table exec(long pin, short model, int tableID, String extraCond, String orderClause) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();		
 		
 		try{

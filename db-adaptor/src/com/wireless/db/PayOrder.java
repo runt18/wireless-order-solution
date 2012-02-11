@@ -66,7 +66,7 @@ public class PayOrder {
 	 * 							 - The order to query does NOT exist.
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Order execByID(int pin, short model, Order orderToPay) throws BusinessException, SQLException{
+	public static Order execByID(long pin, short model, Order orderToPay) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -316,7 +316,7 @@ public class PayOrder {
 	 * 							 - The order to query does NOT exist.
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Order queryOrderByID(int pin, short model, Order orderToPay) throws BusinessException, SQLException{
+	public static Order queryOrderByID(long pin, short model, Order orderToPay) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();

@@ -57,7 +57,7 @@ public class QueryMenu {
 	 * 							 - The terminal is expired.
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Food[] execFoods(int pin, short model) throws BusinessException, SQLException{
+	public static Food[] execFoods(long pin, short model) throws BusinessException, SQLException{
 		return execFoods(pin, model, null, null);
 	}
 	
@@ -73,7 +73,7 @@ public class QueryMenu {
 	 * 							 - The terminal is expired.
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Food[] execFoods(int pin, short model, String extraCondition, String orderClause) throws BusinessException, SQLException{
+	public static Food[] execFoods(long pin, short model, String extraCondition, String orderClause) throws BusinessException, SQLException{
 		
 		DBCon dbCon = new DBCon();
 		
@@ -99,7 +99,7 @@ public class QueryMenu {
 	 * 							 - The terminal is expired.
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Taste[] execTastes(int pin, short model) throws BusinessException, SQLException {
+	public static Taste[] execTastes(long pin, short model) throws BusinessException, SQLException {
 
 		DBCon dbCon = new DBCon();
 		
@@ -125,7 +125,7 @@ public class QueryMenu {
 	 * 							 - The terminal is expired.
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Taste[] execTastes(int pin, short model, String extraCond, String orderClause) throws BusinessException, SQLException {
+	public static Taste[] execTastes(long pin, short model, String extraCond, String orderClause) throws BusinessException, SQLException {
 
 		DBCon dbCon = new DBCon();
 		
@@ -154,7 +154,7 @@ public class QueryMenu {
 	 * @throws SQLException 
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static Kitchen[] execKitchens(int pin, short model) throws BusinessException, SQLException{
+	public static Kitchen[] execKitchens(long pin, short model) throws BusinessException, SQLException{
 
 		DBCon dbCon = new DBCon();
 		
@@ -187,7 +187,7 @@ public class QueryMenu {
 	 * @throws SQLException 
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static Kitchen[] execKitchens(int pin, short model, String extraCond, String orderClause) throws BusinessException, SQLException{
+	public static Kitchen[] execKitchens(long pin, short model, String extraCond, String orderClause) throws BusinessException, SQLException{
 
 		DBCon dbCon = new DBCon();
 		
@@ -216,7 +216,7 @@ public class QueryMenu {
 	 * @throws SQLException 
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static Department[] execDepartments(int pin, short model) throws BusinessException, SQLException{
+	public static Department[] execDepartments(long pin, short model) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		
 		try {
@@ -248,7 +248,7 @@ public class QueryMenu {
 	 * @throws SQLException 
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static Department[] execDepartments(int pin, short model, String extraCond, String orderClause) throws BusinessException, SQLException{
+	public static Department[] execDepartments(long pin, short model, String extraCond, String orderClause) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		
 		try {

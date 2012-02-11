@@ -27,7 +27,7 @@ public class QueryMember {
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
-	public static Member exec(int pin, short model, String memberID) throws BusinessException, SQLException{
+	public static Member exec(long pin, short model, String memberID) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 
 		try {   

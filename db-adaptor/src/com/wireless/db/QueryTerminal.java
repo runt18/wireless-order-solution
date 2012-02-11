@@ -110,7 +110,7 @@ public class QueryTerminal {
 	 * @throws SQLException
 	 * 			throws if fail to execute the SQL statement
 	 */
-	public static Terminal exec(int pin, short model) throws SQLException{
+	public static Terminal exec(long pin, short model) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();

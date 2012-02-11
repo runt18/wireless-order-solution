@@ -29,7 +29,7 @@ public class InsertTable {
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static int exec(int pin, short model, Table table, boolean autoGenID) throws BusinessException, SQLException{
+	public static int exec(long pin, short model, Table table, boolean autoGenID) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();

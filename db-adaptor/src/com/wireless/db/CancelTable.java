@@ -24,7 +24,7 @@ public class CancelTable {
 	 * @throws SQLException
 	 * 			Throws if fail to execute any SQL statement.
 	 */
-	public static void exec(int pin, short model, short tableID) throws BusinessException, SQLException{
+	public static void exec(long pin, short model, short tableID) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -53,7 +53,7 @@ public class CancelTable {
 	 * @throws SQLException
 	 * 			Throws if fail to execute any SQL statement.
 	 */
-	public static void exec(DBCon dbCon, int pin, short model, short tableID) throws BusinessException, SQLException{
+	public static void exec(DBCon dbCon, long pin, short model, short tableID) throws BusinessException, SQLException{
 		Terminal term = VerifyPin.exec(pin, model);
 		String sql = "SELECT id FROM " + Params.dbName + 
 		  			 ".table WHERE alias_id=" + tableID +

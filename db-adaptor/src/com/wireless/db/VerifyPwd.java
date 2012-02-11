@@ -31,7 +31,7 @@ public class VerifyPwd {
 	 * @throws SQLException
 	 * 		Throws if fail to execute any SQL statement.
 	 */
-	public static boolean exec(int pin, short model, int type, String pwd) throws BusinessException, SQLException{
+	public static boolean exec(long pin, short model, int type, String pwd) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -67,7 +67,7 @@ public class VerifyPwd {
 	 * @throws SQLException
 	 * 		Throws if fail to execute any SQL statement.
 	 */
-	public static boolean exec(DBCon dbCon, int pin, short model, int type, String pwd2Verify) throws BusinessException, SQLException{
+	public static boolean exec(DBCon dbCon, long pin, short model, int type, String pwd2Verify) throws BusinessException, SQLException{
 		Terminal term = VerifyPin.exec(dbCon, pin, model);
 		
 		String pwd = "", pwd2 = "", pwd3 = "";

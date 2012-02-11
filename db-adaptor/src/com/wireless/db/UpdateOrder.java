@@ -131,7 +131,7 @@ public class UpdateOrder {
 	 * 							 - Exceed the gift quota.
 	 * @throws SQLException throws if fail to execute any SQL statement.
 	 */
-	public static Result execByID(int pin, short model, Order orderToUpdate, boolean isGiftSkip) throws BusinessException, SQLException{
+	public static Result execByID(long pin, short model, Order orderToUpdate, boolean isGiftSkip) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();	
 		
 		try{
@@ -161,7 +161,7 @@ public class UpdateOrder {
 	 * 							 - Exceed the gift quota.
 	 * @throws SQLException throws if fail to execute any SQL statement.
 	 */
-	public static Result execByID(DBCon dbCon, int pin, short model, Order orderToUpdate, boolean isGiftSkip) throws BusinessException, SQLException{
+	public static Result execByID(DBCon dbCon, long pin, short model, Order orderToUpdate, boolean isGiftSkip) throws BusinessException, SQLException{
 		
 		Terminal term = VerifyPin.exec(dbCon, pin, model);
 		String sql = "SELECT table_id, table_name FROM " + Params.dbName + ".order WHERE id=" + orderToUpdate.id;

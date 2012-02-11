@@ -23,7 +23,7 @@ public class QuerySetting {
 	 * 			- The terminal is expired.<br>
 	 * 			- The restaurant this terminal attached to does NOT exist.
 	 */
-	public static Setting exec(int pin, short model) throws SQLException, BusinessException{
+	public static Setting exec(long pin, short model) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();

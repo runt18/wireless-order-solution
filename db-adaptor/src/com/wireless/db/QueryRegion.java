@@ -24,7 +24,7 @@ public class QueryRegion {
 	 * 			- The terminal is expired.<br>
 	 * 			- The restaurant this terminal attached to does NOT exist.
 	 */
-	public static Region[] exec(int pin, short model) throws SQLException, BusinessException{
+	public static Region[] exec(long pin, short model) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -54,7 +54,7 @@ public class QueryRegion {
 	 * 			- The terminal is expired.<br>
 	 * 			- The restaurant this terminal attached to does NOT exist.
 	 */
-	public static Region[] exec(int pin, short model, String extraCond, String orderClause) throws SQLException, BusinessException{
+	public static Region[] exec(long pin, short model, String extraCond, String orderClause) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
