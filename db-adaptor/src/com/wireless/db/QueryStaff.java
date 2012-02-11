@@ -56,15 +56,16 @@ public class QueryStaff {
 			
 		ArrayList<Staff> staffs = new ArrayList<Staff>();
 			
-		String sql = "SELECT a.name, a.pwd, b.pin FROM " + Params.dbName + ".staff a, terminal b WHERE a.restaurant_id=" +
+		String sql = "SELECT a.staff_id, a.name, a.pwd, b.pin FROM " + Params.dbName + ".staff a, terminal b WHERE a.restaurant_id=" +
 					 restaurantID + " AND a.restaurant_id=b.restaurant_id AND a.terminal_id=b.terminal_id " +
 					 (extraCond != null ? extraCond : " ") +
 					 (orderClause != null ? orderClause : "");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
-			staffs.add(new Staff(dbCon.rs.getString(1),
+			staffs.add(new Staff(dbCon.rs.getLong(1),
 								 dbCon.rs.getString(2),
-								 dbCon.rs.getInt(3)));
+								 dbCon.rs.getString(3),
+								 dbCon.rs.getInt(4)));
 		}
 		return staffs.toArray(new Staff[staffs.size()]);
 

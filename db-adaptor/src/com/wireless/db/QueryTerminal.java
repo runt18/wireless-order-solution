@@ -81,6 +81,7 @@ public class QueryTerminal {
 		dbCon.rs = dbCon.stmt.executeQuery(sql);	
 		while(dbCon.rs.next()){
 			Terminal terminal = new Terminal();
+			terminal.id = dbCon.rs.getLong("terminal_id");
 			terminal.restaurant_id = dbCon.rs.getInt("restaurant_id");
 			terminal.expireDate = dbCon.rs.getDate("expire_date");
 			terminal.owner = dbCon.rs.getString("owner_name");
@@ -135,12 +136,13 @@ public class QueryTerminal {
 	 * 			throws if fail to execute the SQL statement
 	 */
 	public static Terminal exec(DBCon dbCon, int pin, short model) throws SQLException{
-		String sql = "SELECT restaurant_id, expire_date, owner_name, model_name, gift_quota, gift_amount FROM " +  
+		String sql = "SELECT * FROM " +  
 	     			Params.dbName + ".terminal WHERE pin=" + "0x" + Integer.toHexString(pin) +
 	     			" AND model_id=" + model;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);		
 		if(dbCon.rs.next()){
 			Terminal terminal = new Terminal();
+			terminal.id = dbCon.rs.getLong("terminal_id");
 			terminal.restaurant_id = dbCon.rs.getInt("restaurant_id");
 			terminal.expireDate = dbCon.rs.getDate("expire_date");
 			terminal.owner = dbCon.rs.getString("owner_name");
