@@ -56,16 +56,26 @@ public class QueryStaff {
 			
 		ArrayList<Staff> staffs = new ArrayList<Staff>();
 			
-		String sql = "SELECT a.staff_id, a.name, a.pwd, b.pin FROM " + Params.dbName + ".staff a, terminal b WHERE a.restaurant_id=" +
+		String sql = "SELECT a.staff_id, a.staff_alias, a.name, a.pwd, a.terminal_id, b.pin, b.gift_quota, b.gift_amount FROM " + 
+					 Params.dbName + ".staff a, terminal b WHERE a.restaurant_id=" +
 					 restaurantID + " AND a.restaurant_id=b.restaurant_id AND a.terminal_id=b.terminal_id " +
 					 (extraCond != null ? extraCond : " ") +
 					 (orderClause != null ? orderClause : "");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
-			staffs.add(new Staff(dbCon.rs.getLong(1),
-								 dbCon.rs.getString(2),
-								 dbCon.rs.getString(3),
-								 dbCon.rs.getInt(4)));
+			Staff staff = new Staff();
+			staff.id = dbCon.rs.getLong("staff_id");
+			staff.aliasID = dbCon.rs.getInt("staff_alias");
+			staff.name = dbCon.rs.getString("name");
+			staff.pwd = dbCon.rs.getString("pwd");
+			staff.pin = dbCon.rs.getInt("pin");
+			staff.terminalID = dbCon.rs.getLong("terminal_id");
+			float quota = dbCon.rs.getFloat("gift_quota");
+			if(quota >= 0){
+				staff.setGiftQuota(quota);
+			}
+			staff.setGiftAmount(dbCon.rs.getFloat("gift_amount"));
+			staffs.add(staff);
 		}
 		return staffs.toArray(new Staff[staffs.size()]);
 
