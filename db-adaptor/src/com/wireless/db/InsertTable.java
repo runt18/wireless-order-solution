@@ -63,7 +63,7 @@ public class InsertTable {
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static int exec(DBCon dbCon, int pin, short model, Table table, boolean autoGenID) throws BusinessException, SQLException{
+	public static int exec(DBCon dbCon, long pin, short model, Table table, boolean autoGenID) throws BusinessException, SQLException{
 		Terminal term = VerifyPin.exec(pin, model);
 		String sql;
 		if(!autoGenID){

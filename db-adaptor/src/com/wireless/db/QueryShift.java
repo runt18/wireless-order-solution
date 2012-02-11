@@ -27,7 +27,7 @@ public class QueryShift {
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
-	public static Shift exec(int pin, short model) throws BusinessException, SQLException{
+	public static Shift exec(long pin, short model) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -56,7 +56,7 @@ public class QueryShift {
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
-	public static Shift exec(DBCon dbCon, int pin, short model) throws BusinessException, SQLException{
+	public static Shift exec(DBCon dbCon, long pin, short model) throws BusinessException, SQLException{
 		
 		Terminal term = VerifyPin.exec(dbCon, pin, model);
 		
@@ -104,7 +104,7 @@ public class QueryShift {
 	 * @throws SQLException
 	 * 				throws if fail to execute any SQL statement
 	 */
-	public static Shift exec2(int pin, short model) throws BusinessException, SQLException{
+	public static Shift exec2(long pin, short model) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -134,7 +134,7 @@ public class QueryShift {
 	 * @throws SQLException
 	 * 				throws if fail to execute any SQL statement
 	 */
-	public static Shift exec2(DBCon dbCon, int pin, short model) throws BusinessException, SQLException{
+	public static Shift exec2(DBCon dbCon, long pin, short model) throws BusinessException, SQLException{
 		
 		Terminal term = VerifyPin.exec(dbCon, pin, model);
 		

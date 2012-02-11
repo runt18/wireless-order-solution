@@ -22,7 +22,7 @@ public class QueryRestaurant {
 	 * 							 - The restaurant this terminal attached to does NOT exist.
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Restaurant exec(int pin, short model) throws BusinessException, SQLException{ 
+	public static Restaurant exec(long pin, short model) throws BusinessException, SQLException{ 
 
 		DBCon dbCon = new DBCon();
 		

@@ -137,7 +137,7 @@ public class QueryTable {
 	 * 							 - The table alias id to query does NOT exist.
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Table exec(int pin, short model, int tableID) throws BusinessException, SQLException{
+	public static Table exec(long pin, short model, int tableID) throws BusinessException, SQLException{
 		
 		DBCon dbCon = new DBCon();		
 		
@@ -164,7 +164,7 @@ public class QueryTable {
 	 * @throws BusinessException throws if the table to query does NOT exist
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Table exec(DBCon dbCon, int pin, short model, int tableID) throws BusinessException, SQLException{
+	public static Table exec(DBCon dbCon, long pin, short model, int tableID) throws BusinessException, SQLException{
 		return exec(dbCon, pin, model, tableID, null, null);
 	}
 	
@@ -208,7 +208,7 @@ public class QueryTable {
 	 * @throws BusinessException throws if the table to query does NOT exist
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Table exec(DBCon dbCon, int pin, short model, int tableID, String extraCond, String orderClause) throws BusinessException, SQLException{
+	public static Table exec(DBCon dbCon, long pin, short model, int tableID, String extraCond, String orderClause) throws BusinessException, SQLException{
 		
 		Terminal term = VerifyPin.exec(dbCon, pin, model);
 		

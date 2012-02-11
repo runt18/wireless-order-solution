@@ -21,7 +21,7 @@ public class VerifyPin {
 	 * 							 - The terminal is expired.
 	 * @throws SQLException throws if fail to execute the SQL statement
 	 */
-	public static Terminal exec(int pin, short model) throws BusinessException, SQLException{		
+	public static Terminal exec(long pin, short model) throws BusinessException, SQLException{		
 		//open the database
 		DBCon dbCon = new DBCon();;
 		try {   
@@ -49,7 +49,7 @@ public class VerifyPin {
 	 * 							 - The terminal is expired.
 	 * @throws SQLException throws if fail to execute the SQL statement
 	 */
-	public static Terminal exec(DBCon dbCon, int pin, short model) throws BusinessException, SQLException{
+	public static Terminal exec(DBCon dbCon, long pin, short model) throws BusinessException, SQLException{
 		Terminal terminal = QueryTerminal.exec(dbCon, pin, model);
 		
 		if(terminal != null){

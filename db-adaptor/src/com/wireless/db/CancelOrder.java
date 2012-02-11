@@ -20,7 +20,7 @@ public class CancelOrder {
 	 * 						     - The table associated with this order is idle.
 	 * @throws SQLException throws if fail to execute any SQL statement.
 	 */
-	public static void exec(int pin, short model, int tableID) throws BusinessException, SQLException{		
+	public static void exec(long pin, short model, int tableID) throws BusinessException, SQLException{		
 		
 		DBCon dbCon = new DBCon();
 		
@@ -52,7 +52,7 @@ public class CancelOrder {
 				
 				sql = "UPDATE " + Params.dbName + ".terminal SET" +
 				  	  " gift_amount = gift_amount - " + giftAmount +
-				  	  " WHERE pin=" + "0x" + Integer.toHexString(term.pin) +
+				  	  " WHERE pin=" + "0x" + Long.toHexString(term.pin) +
 				  	  " AND restaurant_id=" + term.restaurant_id;
 				dbCon.stmt.executeUpdate(sql);
 			}

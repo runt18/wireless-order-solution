@@ -28,7 +28,7 @@ public class QueryOrder {
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement.
 	 */
-	public static Order exec(int pin, short model, int tableID) throws BusinessException, SQLException {
+	public static Order exec(long pin, short model, int tableID) throws BusinessException, SQLException {
 		
 		DBCon dbCon = new DBCon();
 		
@@ -55,7 +55,7 @@ public class QueryOrder {
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
-	public static Order execByID(int pin, short model, int orderID) throws BusinessException, SQLException {
+	public static Order execByID(long pin, short model, int orderID) throws BusinessException, SQLException {
 		DBCon dbCon = new DBCon();
 		
 		try {
@@ -88,7 +88,7 @@ public class QueryOrder {
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement.
 	 */
-	public static Order exec(DBCon dbCon, int pin, short model, int tableID) throws BusinessException, SQLException {		
+	public static Order exec(DBCon dbCon, long pin, short model, int tableID) throws BusinessException, SQLException {		
 
 		Table table = QueryTable.exec(dbCon, pin, model, tableID);
 			
@@ -112,7 +112,7 @@ public class QueryOrder {
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
-	public static Order execByID(DBCon dbCon, int pin, short model, int orderID) throws BusinessException, SQLException{
+	public static Order execByID(DBCon dbCon, long pin, short model, int orderID) throws BusinessException, SQLException{
 
 		/**
 		 * Get the related info to this order.

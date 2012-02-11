@@ -92,7 +92,7 @@ public class QueryTerminal {
 			}
 			terminal.setGiftAmount(dbCon.rs.getFloat("gift_amount"));
 			terminal.modelID = dbCon.rs.getShort("model_id");
-			terminal.pin = dbCon.rs.getInt("pin");
+			terminal.pin = dbCon.rs.getLong("pin");
 			terms.add(terminal);
 		}
 		return terms.toArray(new Terminal[terms.size()]);
@@ -135,9 +135,9 @@ public class QueryTerminal {
 	 * @throws SQLException
 	 * 			throws if fail to execute the SQL statement
 	 */
-	public static Terminal exec(DBCon dbCon, int pin, short model) throws SQLException{
+	public static Terminal exec(DBCon dbCon, long pin, short model) throws SQLException{
 		String sql = "SELECT * FROM " +  
-	     			Params.dbName + ".terminal WHERE pin=" + "0x" + Integer.toHexString(pin) +
+	     			Params.dbName + ".terminal WHERE pin=" + "0x" + Long.toHexString(pin) +
 	     			" AND model_id=" + model;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);		
 		if(dbCon.rs.next()){

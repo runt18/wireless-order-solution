@@ -26,7 +26,7 @@ public class QueryMenu {
 	 * 							 - The terminal is expired.
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static FoodMenu exec(int pin, short model) throws BusinessException, SQLException{
+	public static FoodMenu exec(long pin, short model) throws BusinessException, SQLException{
 		
 		DBCon dbCon = new DBCon();
 		

@@ -28,7 +28,7 @@ public class InsertOrder {
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 * @return Order completed information to inserted order
 	 */
-	public static Order exec(int pin, short model, Order orderToInsert) throws BusinessException, SQLException{
+	public static Order exec(long pin, short model, Order orderToInsert) throws BusinessException, SQLException{
 		
 		DBCon dbCon = new DBCon();
 			
@@ -137,7 +137,7 @@ public class InsertOrder {
 					}else{
 						sql = "UPDATE " + Params.dbName + ".terminal SET" +
 							  " gift_amount = gift_amount + " + giftAmount +
-							  " WHERE pin=" + "0x" + Integer.toHexString(term.pin) +
+							  " WHERE pin=" + "0x" + Long.toHexString(term.pin) +
 							  " AND restaurant_id=" + term.restaurant_id;
 						dbCon.stmt.executeUpdate(sql);
 					}

@@ -31,7 +31,7 @@ public class PayOrder {
 	 * 							 - The order to query does NOT exist.
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Order exec(int pin, short model, Order orderToPay) throws BusinessException, SQLException{
+	public static Order exec(long pin, short model, Order orderToPay) throws BusinessException, SQLException{
 		
 		
 		DBCon dbCon = new DBCon();
@@ -93,7 +93,7 @@ public class PayOrder {
 	 * 							 - The order to query does NOT exist.
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Order execByID(DBCon dbCon, int pin, short model, Order orderToPay) throws BusinessException, SQLException{
+	public static Order execByID(DBCon dbCon, long pin, short model, Order orderToPay) throws BusinessException, SQLException{
 		
 		/**
 		 * Get the completed order information.
@@ -147,7 +147,7 @@ public class PayOrder {
 		 * - member name if pay type is for member
 		 */
 		sql = "UPDATE `" + Params.dbName + "`.`order` SET " +
-			  "waiter=(SELECT owner_name FROM " + Params.dbName + ".terminal WHERE pin=" + "0x" + Integer.toHexString(pin) + " AND model_id=" + model + ")" +
+			  "waiter=(SELECT owner_name FROM " + Params.dbName + ".terminal WHERE pin=" + "0x" + Long.toHexString(pin) + " AND model_id=" + model + ")" +
 			  ", terminal_pin=" + pin +
 			  ", gift_price=" + orderInfo.getGiftPrice() +
 			  ", total_price=" + totalPrice + 
@@ -241,7 +241,7 @@ public class PayOrder {
 					  " AND dept_id=0), " +	//price
 					  "NOW(), " +			//date
 					  "(SELECT owner_name FROM " + Params.dbName + 
-					  ".terminal WHERE pin=" + "0x" + Integer.toHexString(pin) + " AND model_id=" + model + "), " +	//staff
+					  ".terminal WHERE pin=" + "0x" + Long.toHexString(pin) + " AND model_id=" + model + "), " +	//staff
 					  "(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + 
 					  orderInfo.restaurantID + " AND alias_id=" + foodMaterial.food.kitchen + "), " +				//dept_id
 					  -amount + ", " + 				//amount
@@ -284,7 +284,7 @@ public class PayOrder {
 	 * 							 - The order to query does NOT exist.
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Order queryOrder(int pin, short model, Order orderToPay) throws BusinessException, SQLException{
+	public static Order queryOrder(long pin, short model, Order orderToPay) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -342,7 +342,7 @@ public class PayOrder {
 	 * 							 - The order to query does NOT exist.
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Order queryOrderByID(DBCon dbCon, int pin, short model, Order orderToPay) throws BusinessException, SQLException{
+	public static Order queryOrderByID(DBCon dbCon, long pin, short model, Order orderToPay) throws BusinessException, SQLException{
 		
 		Order orderInfo = QueryOrder.execByID(dbCon, pin, model, orderToPay.id);
 		

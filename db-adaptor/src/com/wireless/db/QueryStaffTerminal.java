@@ -3,9 +3,9 @@ package com.wireless.db;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import com.wireless.protocol.Staff;
+import com.wireless.protocol.StaffTerminal;
 
-public class QueryStaff {
+public class QueryStaffTerminal {
 	
 	/**
 	 * Query all the staff information to a specific restaurant.
@@ -13,7 +13,7 @@ public class QueryStaff {
 	 * @return an array holding all the staff to this restaurant
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Staff[] exec(int restaurantID) throws SQLException{
+	public static StaffTerminal[] exec(int restaurantID) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -31,7 +31,7 @@ public class QueryStaff {
 	 * @return an array holding all the staff to this restaurant
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Staff[] exec(int restaurantID, String extraCond, String orderClause) throws SQLException{
+	public static StaffTerminal[] exec(int restaurantID, String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -51,10 +51,10 @@ public class QueryStaff {
 	 * @return an array holding all the staff to this restaurant
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Staff[] exec(DBCon dbCon, int restaurantID, String extraCond, String orderClause) throws SQLException{
+	public static StaffTerminal[] exec(DBCon dbCon, int restaurantID, String extraCond, String orderClause) throws SQLException{
 		dbCon.connect();
 			
-		ArrayList<Staff> staffs = new ArrayList<Staff>();
+		ArrayList<StaffTerminal> staffs = new ArrayList<StaffTerminal>();
 			
 		String sql = "SELECT a.staff_id, a.staff_alias, a.name, a.pwd, a.terminal_id, b.pin, b.gift_quota, b.gift_amount FROM " + 
 					 Params.dbName + ".staff a, terminal b WHERE a.restaurant_id=" +
@@ -63,12 +63,12 @@ public class QueryStaff {
 					 (orderClause != null ? orderClause : "");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
-			Staff staff = new Staff();
+			StaffTerminal staff = new StaffTerminal();
 			staff.id = dbCon.rs.getLong("staff_id");
 			staff.aliasID = dbCon.rs.getInt("staff_alias");
 			staff.name = dbCon.rs.getString("name");
 			staff.pwd = dbCon.rs.getString("pwd");
-			staff.pin = dbCon.rs.getInt("pin");
+			staff.pin = dbCon.rs.getLong("pin");
 			staff.terminalID = dbCon.rs.getLong("terminal_id");
 			float quota = dbCon.rs.getFloat("gift_quota");
 			if(quota >= 0){
@@ -77,7 +77,7 @@ public class QueryStaff {
 			staff.setGiftAmount(dbCon.rs.getFloat("gift_amount"));
 			staffs.add(staff);
 		}
-		return staffs.toArray(new Staff[staffs.size()]);
+		return staffs.toArray(new StaffTerminal[staffs.size()]);
 
 	}
 	
