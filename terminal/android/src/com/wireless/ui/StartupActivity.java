@@ -81,7 +81,7 @@ public class StartupActivity extends Activity {
 
 		ReqPackage.setGen(new PinGen() {
 			@Override
-			public int getDeviceId() {
+			public long getDeviceId() {
 				return WirelessOrder.pin;
 			}
 
