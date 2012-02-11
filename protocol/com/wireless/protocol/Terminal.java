@@ -15,7 +15,7 @@ public class Terminal {
 	//the restaurant id this terminal is attached to
 	public int restaurant_id = 0;
 	//the pin to this terminal
-	public int pin = 0;
+	public long pin = 0;
 	//the model id to this terminal
 	public short modelID = MODEL_BB;
 	//the model name to this terminal

@@ -1,6 +1,6 @@
 package com.wireless.protocol;
 
-public class Staff {
+public class StaffTerminal {
 	//the id to this staff
 	public long id;
 	//the alias id to this staff
@@ -10,7 +10,7 @@ public class Staff {
 	//the password to this staff
 	public String pwd;
 	//the terminal pin this staff attached to
-	public int pin;
+	public long pin;
 	//the terminal id this staff attached to
 	public long terminalID;
 	//the gift quota represented as an integer
@@ -39,7 +39,7 @@ public class Staff {
 		return Util.int2Float(giftAmount);
 	}
 	
-	public Staff(){
+	public StaffTerminal(){
 		
 	}
 	
