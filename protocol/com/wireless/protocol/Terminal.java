@@ -1,5 +1,6 @@
 package com.wireless.protocol;
 
+
 public class Terminal { 
 	
 	/**
@@ -9,6 +10,8 @@ public class Terminal {
 	public final static short MODEL_ANDROID = 0x0001;
 	public final static short MODEL_STAFF = 0x00FF;
 	
+	//the id to this terminal
+	public long id = 0;
 	//the restaurant id this terminal is attached to
 	public int restaurant_id = 0;
 	//the pin to this terminal
