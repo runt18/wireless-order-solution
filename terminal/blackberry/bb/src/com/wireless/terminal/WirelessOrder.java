@@ -45,7 +45,7 @@ public class WirelessOrder extends UiApplication{
 		ServerConnector.instance().setConnType(Integer.parseInt(Params.getParam(Params.CONN_TYPE)));
 		//set device id generator
 		ReqPackage.setGen(new com.wireless.protocol.PinGen(){
-			public int getDeviceId(){
+			public long getDeviceId(){
 				return net.rim.device.api.system.DeviceInfo.getDeviceId();
 			}
 			public short getDeviceType(){
