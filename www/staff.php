@@ -55,7 +55,7 @@ if($editType == "addStaff" || $editType == "editStaff")
 						) VALUES ($pin, ".$_SESSION["restaurant_id"].", 255, 'Staff', '$name',$quota)";
 			}
 			$db->Execute($sql);
-			$sql = "SELECT id FROM terminal WHERE pin = $pin AND restaurant_id = ".$_SESSION["restaurant_id"];
+			$sql = "SELECT terminal_id FROM terminal WHERE pin = $pin AND restaurant_id = ".$_SESSION["restaurant_id"];
 			$rs = $db ->GetOne($sql);	
 			$sql = "INSERT INTO staff(restaurant_id,terminal_id,staff_alias,name,pwd) VALUES(".$_SESSION["restaurant_id"].",$rs,$alias_id,'$name','".md5($pwd)."')";
 		}
@@ -68,12 +68,17 @@ if($editType == "addStaff" || $editType == "editStaff")
 		$terminal_id = $db ->GetOne($sql);	
 		if($quota < 0)
 		{
-			$sql = "UPDATE terminal SET `owner_name`='$name',gift_quota=-1 WHERE id=$terminal_id";
+			$sql = "UPDATE terminal SET `owner_name`='$name',gift_quota=-1 WHERE terminal_id=$terminal_id";
+			echo $sql;
 			$db->Execute($sql);
 		}
 		else
 		{
-			$sql = "UPDATE terminal SET `owner_name`='$name',gift_quota=$quota WHERE id=$terminal_id";
+			if($quota == "-"){
+				$quota = -1;
+			}
+			$sql = "UPDATE terminal SET `owner_name`='$name',gift_quota=$quota WHERE terminal_id=$terminal_id";
+			echo $sql;
 			$db->Execute($sql);
 		}
 		
@@ -103,7 +108,7 @@ else if($editType == "deleteStaff")
 		$id = $_POST["id"];
 		$sql = "SELECT terminal_id FROM staff WHERE staff_id=$id";
 		$terminal_id = $db ->GetOne($sql);	
-		if($db->Execute("DELETE FROM staff WHERE staff_id=$id") && $db->Execute("DELETE FROM terminal WHERE id = $terminal_id"))
+		if($db->Execute("DELETE FROM staff WHERE staff_id=$id") && $db->Execute("DELETE FROM terminal WHERE terminal_id = $terminal_id"))
 		{			
 			echo "<script>alert('删除成功！');</script>";
 		}	
@@ -159,7 +164,7 @@ include("conn.php");
 include("common.php"); 				
 $xm=$_REQUEST["keyword_type"];
 $kw=$_REQUEST["keyword"]; 
-$sql = "SELECT a.staff_id,a.staff_alias,a.name,b.gift_quota,b.gift_amount FROM staff a INNER JOIN terminal b ON a.terminal_id = b.id WHERE a.restaurant_id=" . $_SESSION["restaurant_id"];			
+$sql = "SELECT a.staff_id,a.staff_alias,a.name,b.gift_quota,b.gift_amount FROM staff a INNER JOIN terminal b ON a.terminal_id = b.terminal_id WHERE a.restaurant_id=" . $_SESSION["restaurant_id"];			
 switch ($xm)
 {
 	case "alias_id":

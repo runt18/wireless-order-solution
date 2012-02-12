@@ -416,9 +416,9 @@ work_date = NOW() WHERE (((`t`.`restaurant_id` > 10) and (date(now()) <= `t`.`ex
 			echo "<td>$operation</td>";			
 			echo "</tr>";
 		}	
-		$sql = "SELECT COUNT(id) FROM terminal WHERE model_id <= 0x7F";		
+		$sql = "SELECT COUNT(terminal_id) FROM terminal WHERE model_id <= 0x7F";		
 		$terminal_num = $db ->GetOne($sql);
-		$sql = "SELECT COUNT(id) FROM terminal WHERE model_id > 0x7F";		
+		$sql = "SELECT COUNT(terminal_id) FROM terminal WHERE model_id > 0x7F";		
 		$terminal_virtual_num = $db ->GetOne($sql);
 		mysql_close($con);
 		?>			

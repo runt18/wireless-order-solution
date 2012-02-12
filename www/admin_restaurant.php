@@ -190,12 +190,12 @@ else if($editType == "addRestaurant" || $editType == "editAdminRestaurant")
 					$db->Execute($sql);
 
 					$admin_pin = "9". randomNumber(6);
-					$sql = "SELECT id FROM terminal WHERE pin='$admin_pin'";
+					$sql = "SELECT terminal_id FROM terminal WHERE pin='$admin_pin'";
 					$rs = $db ->GetOne($sql);		
 					while($rs)
 					{
 						$admin_pin = "9". randomNumber(6);
-						$sql = "SELECT id FROM terminal WHERE pin='$admin_pin'";
+						$sql = "SELECT terminal_id FROM terminal WHERE pin='$admin_pin'";
 						$rs = $db ->GetOne($sql);		
 					}
 					$sql = "INSERT INTO terminal(pin,restaurant_id,model_id,owner_name) VALUES($admin_pin,$id,0xFE,'管理员')";
