@@ -221,21 +221,22 @@
 			scope="request">
 		</action>
 		<action path="/InventoryCheckStatSum"
-			type="com.wireless.Actions.inventoryMgr.StatInventoryCheckSum"
-			scope="request">
+			type="com.wireless.Actions.inventoryMgr.StatInventoryCheckSum" scope="request">
 		</action>
 		<action path="/InventoryReturn"
 			type="com.wireless.Actions.inventoryMgr.InventoryReturnAction" scope="request">
 		</action>
 		<action path="/InventoryReturnStatDetail"
-			type="com.wireless.Actions.inventoryMgr.StatInventoryReturnDetail" scope="request">
+			type="com.wireless.Actions.inventoryMgr.StatInventoryReturnDetail"
+			scope="request">
 		</action>
 		<action path="/InventoryReturnStatByMaterial"
 			type="com.wireless.Actions.inventoryMgr.StatInventoryReturnByMaterial"
 			scope="request">
 		</action>
 		<action path="/InventoryReturnStatByDept"
-			type="com.wireless.Actions.inventoryMgr.StatInventoryReturnByDept" scope="request">
+			type="com.wireless.Actions.inventoryMgr.StatInventoryReturnByDept"
+			scope="request">
 		</action>
 		<action path="/InventoryReturnStatBySupplier"
 			type="com.wireless.Actions.inventoryMgr.StatInventoryReturnBySupplier"
@@ -250,39 +251,45 @@
 			scope="request">
 		</action>
 		<action path="/QueryRegion"
-			type="com.wireless.Actions.regionMgr.QueryRegionMgrAction"
-			scope="request">
+			type="com.wireless.Actions.regionMgr.QueryRegionMgrAction" scope="request">
 		</action>
 		<action path="/UpdateRegion"
-			type="com.wireless.Actions.regionMgr.UpdateRegionAction"
+			type="com.wireless.Actions.regionMgr.UpdateRegionAction" scope="request">
+		</action>
+		<action path="/DeleteTable" type="com.wireless.Actions.tableMgr.DeleteTableAction"
 			scope="request">
 		</action>
-		<action path="/DeleteTable"
-			type="com.wireless.Actions.tableMgr.DeleteTableAction"
+		<action path="/UpdateTable" type="com.wireless.Actions.tableMgr.UpdateTableAction"
 			scope="request">
 		</action>
-		<action path="/UpdateTable"
-			type="com.wireless.Actions.tableMgr.UpdateTableAction"
+		<action path="/InsertTable" type="com.wireless.Actions.tableMgr.InsertTableAction"
 			scope="request">
 		</action>
-		<action path="/InsertTable"
-			type="com.wireless.Actions.tableMgr.InsertTableAction"
+		<action path="/QueryTaste" type="com.wireless.Actions.tasteMgr.QueryTasteAction"
 			scope="request">
 		</action>
-		<action path="/QueryTaste"
-			type="com.wireless.Actions.tasteMgr.QueryTasteAction"
+		<action path="/InsertTaste" type="com.wireless.Actions.tasteMgr.InsertTasteAction"
 			scope="request">
 		</action>
-		<action path="/InsertTaste"
-			type="com.wireless.Actions.tasteMgr.InsertTasteAction"
+		<action path="/UpdateTaste" type="com.wireless.Actions.tasteMgr.UpdateTasteAction"
 			scope="request">
 		</action>
-		<action path="/UpdateTaste"
-			type="com.wireless.Actions.tasteMgr.UpdateTasteAction"
+		<action path="/DeleteTaste" type="com.wireless.Actions.tasteMgr.DeleteTasteAction"
 			scope="request">
 		</action>
-		<action path="/DeleteTaste"
-			type="com.wireless.Actions.tasteMgr.DeleteTasteAction"
+		<action path="/QueryTerminal"
+			type="com.wireless.Actions.terminalMgr.QueryTerminalAction" scope="request">
+		</action>
+		<action path="/SetTerminal"
+			type="com.wireless.Actions.terminalMgr.SetTerminalAction" scope="request">
+		</action>
+		<action path="/InsertStaff" type="com.wireless.Actions.staffMgr.InsertStaffAction"
+			scope="request">
+		</action>
+		<action path="/DeleteStaff" type="com.wireless.Actions.staffMgr.DeleteStaffAction"
+			scope="request">
+		</action>
+		<action path="/UpdateStaff" type="com.wireless.Actions.staffMgr.UpdateStaffAction"
 			scope="request">
 		</action>
 	</action-mappings>
