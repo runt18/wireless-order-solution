@@ -8,13 +8,14 @@
 #include "../pserver/inc/ConfTags.h"
 #include "../protocol/inc/Kitchen.h"
 #include "../protocol/inc/Reserved.h"
+#include <map>
 #include <winspool.h>
 #include <boost/shared_ptr.hpp>
 
 // CAddPrinterDlg dialog
 
-extern vector<CString> g_Kitchens;
-extern vector<CString> g_Regions;
+extern map<int, CString> g_Kitchens;
+extern map<int, CString> g_Regions;
 
 IMPLEMENT_DYNAMIC(CAddPrinterDlg, CDialog)
 
@@ -82,6 +83,26 @@ void CAddPrinterDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK_KITCHEN_28, m_Kitchens[27]);
 	DDX_Control(pDX, IDC_CHECK_KITCHEN_29, m_Kitchens[28]);
 	DDX_Control(pDX, IDC_CHECK_KITCHEN_30, m_Kitchens[29]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_31, m_Kitchens[30]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_32, m_Kitchens[31]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_33, m_Kitchens[32]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_34, m_Kitchens[33]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_35, m_Kitchens[34]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_36, m_Kitchens[35]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_37, m_Kitchens[36]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_38, m_Kitchens[37]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_39, m_Kitchens[38]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_40, m_Kitchens[39]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_41, m_Kitchens[40]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_42, m_Kitchens[41]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_43, m_Kitchens[42]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_44, m_Kitchens[43]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_45, m_Kitchens[44]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_46, m_Kitchens[45]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_47, m_Kitchens[46]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_48, m_Kitchens[47]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_49, m_Kitchens[48]);
+	DDX_Control(pDX, IDC_CHECK_KITCHEN_50, m_Kitchens[49]);
 
 }
 
@@ -121,18 +142,21 @@ BOOL CAddPrinterDlg::OnInitDialog(){
 
 	//set the kitchen to all as default
 	m_KitchenAll.SetCheck(BST_CHECKED);
+	m_KitchenAll.EnableWindow(FALSE);
 	m_KitchenTemp.EnableWindow(FALSE);
-	for(unsigned int i = 0; i < g_Kitchens.size(); i++){
-		m_Kitchens[i].SetWindowText(g_Kitchens.at(i));
-		m_Kitchens[i].EnableWindow(FALSE);
+	map<int, CString>::iterator it = g_Kitchens.begin();
+	for(it; it != g_Kitchens.end(); it++){
+		m_Kitchens[it->first].SetWindowText(it->second);
+		m_Kitchens[it->first].EnableWindow(FALSE);
 	}
 
 	//set the region to all as default
 	m_RegionAll.SetCheck(BST_CHECKED);
 	//set the regions
-	for(unsigned int i = 0; i < g_Regions.size(); i++){
-		m_Regions[i].SetWindowText(g_Regions.at(i));
-		m_Regions[i].EnableWindow(FALSE);
+	for(it = g_Regions.begin(); it != g_Regions.end(); it++){
+		m_Regions[it->first].SetWindowText(it->second);
+		m_Regions[it->first].EnableWindow(FALSE);
+
 	}
 
 	//set the printer style 
@@ -249,8 +273,29 @@ void CAddPrinterDlg::OnOK(){
 				pPrinter->SetAttribute(ConfTags::KITCHEN_28, 1);
 				pPrinter->SetAttribute(ConfTags::KITCHEN_29, 1);
 				pPrinter->SetAttribute(ConfTags::KITCHEN_30, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_31, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_32, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_33, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_34, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_35, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_36, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_37, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_38, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_39, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_40, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_41, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_42, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_43, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_44, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_45, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_46, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_47, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_48, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_49, 1);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_50, 1);
 
 			}else{
+				pPrinter->SetAttribute(ConfTags::KITCHEN_ALL, 0);
 				pPrinter->SetAttribute(ConfTags::KITCHEN_TEMP, m_KitchenTemp.GetCheck() == BST_CHECKED ? 1 : 0);
 				pPrinter->SetAttribute(ConfTags::KITCHEN_1, m_Kitchens[0].GetCheck() == BST_CHECKED ? 1 : 0);
 				pPrinter->SetAttribute(ConfTags::KITCHEN_2, m_Kitchens[1].GetCheck() == BST_CHECKED ? 1 : 0);
@@ -282,6 +327,26 @@ void CAddPrinterDlg::OnOK(){
 				pPrinter->SetAttribute(ConfTags::KITCHEN_28, m_Kitchens[27].GetCheck() == BST_CHECKED ? 1 : 0);
 				pPrinter->SetAttribute(ConfTags::KITCHEN_29, m_Kitchens[28].GetCheck() == BST_CHECKED ? 1 : 0);
 				pPrinter->SetAttribute(ConfTags::KITCHEN_30, m_Kitchens[29].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_31, m_Kitchens[30].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_32, m_Kitchens[31].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_33, m_Kitchens[32].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_34, m_Kitchens[33].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_35, m_Kitchens[34].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_36, m_Kitchens[35].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_37, m_Kitchens[36].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_38, m_Kitchens[37].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_39, m_Kitchens[38].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_40, m_Kitchens[39].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_41, m_Kitchens[40].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_42, m_Kitchens[41].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_43, m_Kitchens[42].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_44, m_Kitchens[43].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_45, m_Kitchens[44].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_46, m_Kitchens[45].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_47, m_Kitchens[46].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_48, m_Kitchens[47].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_49, m_Kitchens[48].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::KITCHEN_50, m_Kitchens[49].GetCheck() == BST_CHECKED ? 1 : 0);
 
 			}
 
@@ -299,6 +364,7 @@ void CAddPrinterDlg::OnOK(){
 				pPrinter->SetAttribute(ConfTags::REGION_9, 1);
 				pPrinter->SetAttribute(ConfTags::REGION_10, 1);
 			}else{
+				pPrinter->SetAttribute(ConfTags::REGION_ALL, 0);
 				pPrinter->SetAttribute(ConfTags::REGION_1, m_Regions[0].GetCheck() == BST_CHECKED ? 1 : 0);
 				pPrinter->SetAttribute(ConfTags::REGION_2, m_Regions[1].GetCheck() == BST_CHECKED ? 1 : 0);
 				pPrinter->SetAttribute(ConfTags::REGION_3, m_Regions[2].GetCheck() == BST_CHECKED ? 1 : 0);
@@ -366,6 +432,25 @@ void CAddPrinterDlg::OnCbnFuncChg()
 {
 	//assign the selected function code value
 	int selected = m_Funcs.GetCurSel();
+	//enable to show kitchen check boxes if the function is as below.
+	//1 - print order detail
+	//2 - print extra food
+	//3 - print canceled food
+	if((selected + 1) == Reserved::PRINT_ORDER_DETAIL ||
+		(selected + 1) == Reserved::PRINT_EXTRA_FOOD ||
+		(selected + 1) == Reserved::PRINT_CANCELLED_FOOD){
+			m_KitchenAll.EnableWindow(TRUE);
+			m_KitchenTemp.EnableWindow(TRUE);
+			for(int i = 0; i < KITCHEN_NUM; i++){
+				m_Kitchens[i].EnableWindow(TRUE);
+			}
+	}else{
+		m_KitchenAll.EnableWindow(FALSE);
+		m_KitchenTemp.EnableWindow(FALSE);
+		for(int i = 0; i < KITCHEN_NUM; i++){
+			m_Kitchens[i].EnableWindow(FALSE);
+		}
+	}
 	if(selected != -1){
 		m_Funcs.GetLBText(selected, m_Func);
 	}

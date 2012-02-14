@@ -282,6 +282,86 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 			if(isOn == 1){
 				kitchens.push_back(Kitchen::KITCHEN_30);
 			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_31, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_31);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_32, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_32);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_33, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_33);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_34, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_34);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_35, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_35);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_36, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_36);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_37, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_37);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_38, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_38);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_39, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_39);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_40, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_40);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_41, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_41);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_42, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_42);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_43, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_43);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_44, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_44);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_45, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_45);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_46, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_46);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_47, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_47);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_48, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_48);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_49, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_49);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::KITCHEN_50, &isOn);
+			if(isOn == 1){
+				kitchens.push_back(Kitchen::KITCHEN_50);
+			}
 
 		}
 		//get the repeat number

@@ -57,7 +57,9 @@ void CPrinterView::Dump(CDumpContext& dc) const
 static const ListCtrlHeader headers[] = {
 	{	COLUMN_ID,				_T("编号"),		LVCFMT_RIGHT,	75	},
 	{	COLUMN_PRINTER_NAME,	_T("打印机"),	LVCFMT_LEFT,	200	},
-	{	COLUMN_FUNC_CODE,		_T("功能"),		LVCFMT_LEFT,	150	},
+	{	COLUMN_FUNC_CODE,		_T("功能"),		LVCFMT_LEFT,	75	},
+	{	COLUMN_KITCHEN,			_T("厨房"),		LVCFMT_LEFT,	185	},
+	{	COLUMN_REGION,			_T("区域"),		LVCFMT_LEFT,	185	},
 	{	COLUMN_PRINTER_STYLE,	_T("类型"),		LVCFMT_LEFT,	100	},
 	{	COLUMN_PRINTER_REPEAT,  _T("打印数"),	LVCFMT_CENTER,	55	},
 	{	COLUMN_PRINTER_DESC,	_T("描述"),		LVCFMT_LEFT,	250	}

@@ -42,6 +42,26 @@ public:
 	static const int KITCHEN_28 = 27;
 	static const int KITCHEN_29 = 28;
 	static const int KITCHEN_30 = 29;
+	static const int KITCHEN_31 = 30;
+	static const int KITCHEN_32 = 31;
+	static const int KITCHEN_33 = 32;
+	static const int KITCHEN_34 = 33;
+	static const int KITCHEN_35 = 34;
+	static const int KITCHEN_36 = 35;
+	static const int KITCHEN_37 = 36;
+	static const int KITCHEN_38 = 37;
+	static const int KITCHEN_39 = 38;
+	static const int KITCHEN_40 = 39;
+	static const int KITCHEN_41 = 40;
+	static const int KITCHEN_42 = 41;
+	static const int KITCHEN_43 = 42;
+	static const int KITCHEN_44 = 43;
+	static const int KITCHEN_45 = 44;
+	static const int KITCHEN_46 = 45;
+	static const int KITCHEN_47 = 46;
+	static const int KITCHEN_48 = 47;
+	static const int KITCHEN_49 = 48;
+	static const int KITCHEN_50 = 49;
 
 	Kitchen();
 	Kitchen(const string& kName, int id);

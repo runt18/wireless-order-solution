@@ -10,6 +10,7 @@
 #include "ChkUpdate.h"
 #include "../pserver/inc/ConfTags.h"
 #include "../pserver/inc/PrintServer.h"
+#include <map>
 #include <fstream>
 #include <boost/shared_ptr.hpp>
 #include <process.h>
@@ -31,8 +32,8 @@ CString g_NewProgPath;
 //2 - Run new setup program silently 
 int g_DoQuitProg = 0;
 
-vector<CString> g_Kitchens;
-vector<CString> g_Regions;
+map<int, CString> g_Kitchens;
+map<int, CString> g_Regions;
 
 //the name of the restaurant
 static CString g_Restaurant = _T("e点通");
@@ -81,20 +82,18 @@ static UINT indicators[] =
 CMainFrame::CMainFrame() : m_pStatusView(NULL), m_pPrinterView(NULL), m_UpdateWaitTime(10), m_TimerID(0)
 {
 	// TODO: add member initialization code here
-	//initialize the kitchens, "厨房1" to "厨房10", "临时菜" and "所有厨房"
+	//initialize the kitchens, "厨房1" to "厨房10"
 	for(int i = 0; i < 10; i++){
-		CString kit;
-		kit.Format(_T("厨房%d"), i + 1);
-		g_Kitchens.push_back(kit);
+		CString kitchen;
+		kitchen.Format(_T("厨房%d"), i + 1);
+		g_Kitchens.insert(map<int, CString>::value_type(i, kitchen));
 	}
-	g_Kitchens.push_back(_T("临时"));
-	g_Kitchens.push_back(_T("所有厨房"));
 
 	//initialize the regions, "区域1" to "区域10"
 	for(int i = 0; i < 10; i++){
 		CString region;
 		region.Format(_T("区域%d"), i + 1);
-		g_Regions.push_back(region);
+		g_Regions.insert(map<int, CString>::value_type(i, region));
 	}
 }
 
@@ -436,10 +435,8 @@ void CMainFrame::OnRetrieveKitchen(const std::vector<Kitchen>& kitchens){
 		DWORD dwNum = MultiByteToWideChar (CP_ACP, 0, kitchens[i].name.c_str(), -1, NULL, 0);
 		boost::shared_ptr<wchar_t> pMsg(new wchar_t[dwNum], boost::checked_array_deleter<wchar_t>());
 		MultiByteToWideChar (CP_ACP, 0, kitchens[i].name.c_str(), -1, pMsg.get(), dwNum);
-		g_Kitchens.push_back(pMsg.get());
+		g_Kitchens.insert(map<int, CString>::value_type(kitchens[i].alias_id, pMsg.get()));
 	}
-	g_Kitchens.push_back(_T("临时菜"));
-	g_Kitchens.push_back(_T("所有厨房"));
 	m_pPrinterView->Update();
 }
 
@@ -450,7 +447,7 @@ void CMainFrame::OnRetrieveRegion(const std::vector<Region>& regions){
 		DWORD dwNum = MultiByteToWideChar (CP_ACP, 0, regions[i].name.c_str(), -1, NULL, 0);
 		boost::shared_ptr<wchar_t> pMsg(new wchar_t[dwNum], boost::checked_array_deleter<wchar_t>());
 		MultiByteToWideChar (CP_ACP, 0, regions[i].name.c_str(), -1, pMsg.get(), dwNum);
-		g_Regions.push_back(pMsg.get());
+		g_Regions.insert(map<int, CString>::value_type(regions[i].alias_id, pMsg.get()));
 	}
 	m_pPrinterView->Update();
 }

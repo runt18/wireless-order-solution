@@ -23,7 +23,9 @@ IMPLEMENT_DYNAMIC(CPrinterSettingDlg, CDialog)
 static const ListCtrlHeader headers[] = {
 	{	COLUMN_ID,				_T("编号"),		LVCFMT_RIGHT,	40	},
 	{	COLUMN_PRINTER_NAME,	_T("打印机"),	LVCFMT_LEFT,	170	},
-	{	COLUMN_FUNC_CODE,		_T("功能"),		LVCFMT_LEFT,	135	},
+	{	COLUMN_FUNC_CODE,		_T("功能"),		LVCFMT_LEFT,	80	},
+	{	COLUMN_KITCHEN,			_T("厨房"),		LVCFMT_LEFT,	150	},
+	{	COLUMN_REGION,			_T("区域"),		LVCFMT_LEFT,	150	},
 	{	COLUMN_PRINTER_STYLE,	_T("类型"),		LVCFMT_LEFT,	55	},
 	{	COLUMN_PRINTER_REPEAT,  _T("数量"),		LVCFMT_LEFT,	50	},
 	{	COLUMN_PRINTER_DESC,	_T("描述"),		LVCFMT_LEFT,	250	}
@@ -32,7 +34,7 @@ static const ListCtrlHeader headers[] = {
 static const int nHeaders = sizeof(headers) / sizeof(ListCtrlHeader);
 
 CPrinterSettingDlg::CPrinterSettingDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(CPrinterSettingDlg::IDD, pParent),
+	: CDialog(CPrinterSettingDlg::IDD, pParent),	
 	  m_ListCtrl(headers, nHeaders)
 {
 
@@ -157,12 +159,12 @@ BOOL CPrinterSettingDlg::OnInitDialog(){
 	m_TabCtrl.InsertItem(0, _T("打印机列表"));
 
 	m_ListCtrl.SetExtendedStyle(LVS_EX_LABELTIP | LVS_EX_SUBITEMIMAGES | LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
-	m_ListCtrl.InsertColumn(COLUMN_ID, _T("编号"), LVCFMT_RIGHT, 40);
-	m_ListCtrl.InsertColumn(COLUMN_PRINTER_NAME, _T("打印机"), LVCFMT_LEFT, 170);
-	m_ListCtrl.InsertColumn(COLUMN_FUNC_CODE, _T("功能"), LVCFMT_LEFT, 135);
-	m_ListCtrl.InsertColumn(COLUMN_PRINTER_STYLE, _T("类型"), LVCFMT_LEFT, 55);
-	m_ListCtrl.InsertColumn(COLUMN_PRINTER_REPEAT, _T("打印数"), LVCFMT_CENTER, 55);
-	m_ListCtrl.InsertColumn(COLUMN_PRINTER_DESC, _T("描述"), LVCFMT_LEFT, 250);
+	for(int i = 0; i < nHeaders; i++){
+		m_ListCtrl.InsertColumn(headers[i].columnID, 
+								 headers[i].headerText, 
+								 headers[i].format, 
+								 headers[i].width);
+	}
 
 	ifstream fin(g_ConfPath);
 	if(fin.good()){
