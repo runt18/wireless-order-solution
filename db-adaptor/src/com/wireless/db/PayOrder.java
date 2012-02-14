@@ -148,6 +148,7 @@ public class PayOrder {
 		 */
 		sql = "UPDATE `" + Params.dbName + "`.`order` SET " +
 			  "waiter=(SELECT owner_name FROM " + Params.dbName + ".terminal WHERE pin=" + "0x" + Long.toHexString(pin) + " AND model_id=" + model + ")" +
+			  ", terminal_model=" + model +
 			  ", terminal_pin=" + pin +
 			  ", gift_price=" + orderInfo.getGiftPrice() +
 			  ", total_price=" + totalPrice + 
