@@ -216,8 +216,8 @@ var tableListReflash = function(node) {
 					"tableName" : tableStatusListTS[i].tableName,// 餐台名称
 					"tableCategory" : tableStatusListTS[i].tableCategory, // 餐台类型
 					"tableMinCost" : tableStatusListTS[i].tableMinCost, // 最低消费
-					"tableRegion" : tableStatusListTS[i].tableRegion
-				// 區域代碼
+					"tableRegion" : tableStatusListTS[i].tableRegion, // 區域代碼
+					"tableServiceRate" : tableStatusListTS[i].tableServiceRate, // 服務費率
 				});
 			}
 		}
