@@ -2,6 +2,7 @@
 #include "../inc/ConfTags.h"
 
 const char* ConfTags::CONF_ROOT = "conf";
+const char* ConfTags::CONF_VER = "ver";
 const char* ConfTags::REMOTE = "remote";
 const char* ConfTags::REMOTE_IP = "ip";
 const char* ConfTags::REMOTE_PORT = "port";

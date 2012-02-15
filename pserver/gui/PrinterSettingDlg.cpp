@@ -22,10 +22,10 @@ IMPLEMENT_DYNAMIC(CPrinterSettingDlg, CDialog)
 
 static const ListCtrlHeader headers[] = {
 	{	COLUMN_ID,				_T("编号"),		LVCFMT_RIGHT,	40	},
-	{	COLUMN_PRINTER_NAME,	_T("打印机"),	LVCFMT_LEFT,	170	},
+	{	COLUMN_PRINTER_NAME,	_T("打印机"),	LVCFMT_LEFT,	135	},
 	{	COLUMN_FUNC_CODE,		_T("功能"),		LVCFMT_LEFT,	80	},
-	{	COLUMN_KITCHEN,			_T("厨房"),		LVCFMT_LEFT,	150	},
-	{	COLUMN_REGION,			_T("区域"),		LVCFMT_LEFT,	150	},
+	{	COLUMN_KITCHEN,			_T("厨房"),		LVCFMT_LEFT,	175	},
+	{	COLUMN_REGION,			_T("区域"),		LVCFMT_LEFT,	175	},
 	{	COLUMN_PRINTER_STYLE,	_T("类型"),		LVCFMT_LEFT,	55	},
 	{	COLUMN_PRINTER_REPEAT,  _T("数量"),		LVCFMT_LEFT,	50	},
 	{	COLUMN_PRINTER_DESC,	_T("描述"),		LVCFMT_LEFT,	250	}

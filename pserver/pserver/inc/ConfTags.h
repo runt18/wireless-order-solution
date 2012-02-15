@@ -5,6 +5,7 @@
 class PSERVER_DLL_API ConfTags{
 public:
 	static const char* CONF_ROOT;
+	static const char* CONF_VER;
 	static const char* REMOTE;
 	static const char* REMOTE_IP;
 	static const char* REMOTE_PORT;

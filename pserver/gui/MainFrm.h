@@ -99,4 +99,12 @@ public:
 	afx_msg void OnHelpOnline();
 };
 
-
+typedef struct {
+	string printerName;
+	int func;
+	int style;
+	int repeat;
+	string desc;
+	vector<int> kitchens;
+	vector<int> regions;
+}PInstanceXML;
