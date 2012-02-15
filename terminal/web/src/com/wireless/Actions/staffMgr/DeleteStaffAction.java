@@ -39,33 +39,43 @@ public class DeleteStaffAction extends Action {
 			 * example, filter the order date greater than or equal 2011-7-14
 			 * 14:30:00 pin=0x1 & type=3 & ope=2 & value=2011-7-14 14:30:00
 			 * 
-			 * pin : the pin the this terminal
-			 * dishNumber: 
+			 * pin : the pin the this terminal dishNumber:
 			 * 
 			 */
 			String pin = request.getParameter("pin");
-			
+
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
 					Terminal.MODEL_STAFF);
-			
 
 			// get the query condition
 			int staffID = Integer.parseInt(request.getParameter("staffID"));
-	
+
 			/**
 			 * 
 			 */
-			String sql = "DELETE FROM " + Params.dbName + ".staff " +
-					"WHERE restaurant_id=" + term.restaurant_id
+			String sql = " SELECT terminal_id FROM " + Params.dbName
+					+ ".staff WHERE restaurant_id=" + term.restaurant_id
 					+ " AND staff_id = " + staffID;
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			dbCon.rs.next();
+			int terminalID = dbCon.rs.getInt(1);
 
+			sql = "DELETE FROM " + Params.dbName + ".staff "
+					+ "WHERE restaurant_id=" + term.restaurant_id
+					+ " AND staff_id = " + staffID;
 
 			int sqlRowCount = dbCon.stmt.executeUpdate(sql);
 
+			sql = "DELETE FROM " + Params.dbName + ".terminal "
+					+ "WHERE restaurant_id=" + term.restaurant_id
+					+ " AND terminal_id = " + terminalID;
+
+			sqlRowCount = dbCon.stmt.executeUpdate(sql);
+
 			jsonResp = jsonResp.replace("$(result)", "true");
 			jsonResp = jsonResp.replace("$(value)", "员工刪除成功！");
-			
+
 			dbCon.rs.close();
 
 		} catch (BusinessException e) {
@@ -94,7 +104,7 @@ public class DeleteStaffAction extends Action {
 		} finally {
 			dbCon.disconnect();
 			// just for debug
-			//System.out.println(jsonResp);
+			// System.out.println(jsonResp);
 			out.write(jsonResp);
 		}
 

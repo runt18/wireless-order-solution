@@ -74,7 +74,7 @@ public class InsertStaffAction extends Action {
 					+ ".terminal"
 					+ "( pin, restaurant_id, model_id, model_name, owner_name ) "
 					+ " VALUES(" + newPin + ", " + term.restaurant_id
-					+ ", 255, 'staff', '" + staffName + "' ) ";
+					+ ", 255, 'Staff', '" + staffName + "' ) ";
 
 			int sqlRowCount = dbCon.stmt.executeUpdate(sql);
 

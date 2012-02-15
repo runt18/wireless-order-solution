@@ -5,7 +5,7 @@ staffAddWin = new Ext.Window(
 			layout : "fit",
 			title : "添加员工",
 			width : 260,
-			height : 193,
+			height : 241,
 			closeAction : "hide",
 			resizable : false,
 			items : [ {
@@ -27,14 +27,6 @@ staffAddWin = new Ext.Window(
 							fieldLabel : "姓名",
 							id : "staffAddName",
 							allowBlank : false,
-							width : 160
-						},
-						{
-							xtype : "textfield",
-							inputType : "password",
-							fieldLabel : "密码",
-							id : "staffAddPwd",
-							// allowBlank : false,
 							width : 160
 						},
 						{
@@ -66,6 +58,25 @@ staffAddWin = new Ext.Window(
 									}
 								}
 							}
+						},
+						{
+							xtype : "textfield",
+							inputType : "password",
+							fieldLabel : "密码",
+							id : "staffAddPwd",
+							// allowBlank : false,
+							width : 160
+						},
+						{
+							xtype : "textfield",
+							inputType : "password",
+							fieldLabel : "确认密码",
+							id : "staffAddPwdConfirm",
+							// allowBlank : false,
+							width : 160
+						},
+						{
+							html : '<div style="margin-top:4px"><font id="errorMsgAdd" style="color:red;"> </font></div>'
 						} ]
 			} ],
 			buttons : [
@@ -86,6 +97,8 @@ staffAddWin = new Ext.Window(
 										"staffAddName").getValue();
 								var staffAddPwd = staffAddWin.findById(
 										"staffAddPwd").getValue();
+								var staffAddPwdCon = staffAddWin.findById(
+										"staffAddPwdConfirm").getValue();
 								var staffAddQuota = staffAddWin.findById(
 										"staffAddQuota").getValue();
 								if (staffAddQuota == null) {
@@ -106,54 +119,63 @@ staffAddWin = new Ext.Window(
 								}
 
 								if (!isDuplicate) {
-									staffAddWin.hide();
-									isPrompt = false;
+									if (staffAddPwd == staffAddPwdCon) {
+										staffAddWin.hide();
+										isPrompt = false;
 
-									Ext.Ajax
-											.request({
-												url : "../../InsertStaff.do",
-												params : {
-													"pin" : pin,
-													"staffNumber" : staffAddNumber,
-													"staffName" : staffAddName,
-													"staffPwd" : staffAddPwd,
-													"staffQuota" : staffAddQuota
-												},
-												success : function(response,
-														options) {
-													var resultJSON = Ext.util.JSON
-															.decode(response.responseText);
-													if (resultJSON.success == true) {
-														loadAllStaff();
-														staffStore
-																.reload({
-																	params : {
-																		start : 0,
-																		limit : pageRecordCount
-																	}
-																});
+										Ext.Ajax
+												.request({
+													url : "../../InsertStaff.do",
+													params : {
+														"pin" : pin,
+														"staffNumber" : staffAddNumber,
+														"staffName" : staffAddName,
+														"staffPwd" : staffAddPwd,
+														"staffQuota" : staffAddQuota
+													},
+													success : function(
+															response, options) {
+														var resultJSON = Ext.util.JSON
+																.decode(response.responseText);
+														if (resultJSON.success == true) {
+															loadAllStaff();
+															staffStore
+																	.reload({
+																		params : {
+																			start : 0,
+																			limit : pageRecordCount
+																		}
+																	});
 
-														var dataInfo = resultJSON.data;
-														Ext.MessageBox
-																.show({
-																	msg : dataInfo,
-																	width : 300,
-																	buttons : Ext.MessageBox.OK
-																});
-													} else {
-														var dataInfo = resultJSON.data;
-														Ext.MessageBox
-																.show({
-																	msg : dataInfo,
-																	width : 300,
-																	buttons : Ext.MessageBox.OK
-																});
+															var dataInfo = resultJSON.data;
+															Ext.MessageBox
+																	.show({
+																		msg : dataInfo,
+																		width : 300,
+																		buttons : Ext.MessageBox.OK
+																	});
+														} else {
+															var dataInfo = resultJSON.data;
+															Ext.MessageBox
+																	.show({
+																		msg : dataInfo,
+																		width : 300,
+																		buttons : Ext.MessageBox.OK
+																	});
+														}
+													},
+													failure : function(
+															response, options) {
 													}
-												},
-												failure : function(response,
-														options) {
-												}
-											});
+												});
+									} else {
+										document.getElementById("errorMsgAdd").innerHTML = "确认密码不一致";
+										// staffAddWin.findById("staffAddPwd")
+										// .setValue("");
+										// staffAddWin.findById(
+										// "staffAddPwdConfirm").setValue(
+										// "");
+									}
 								} else {
 									Ext.MessageBox.show({
 										msg : "该员工编号已存在！",
@@ -184,10 +206,15 @@ staffAddWin = new Ext.Window(
 					staffAddWin.findById("staffAddPwd").setValue("");
 					staffAddWin.findById("staffAddPwd").clearInvalid();
 
+					staffAddWin.findById("staffAddPwdConfirm").setValue("");
+					staffAddWin.findById("staffAddPwdConfirm").clearInvalid();
+
 					staffAddWin.findById("staffAddQuota").setValue(0);
 					staffAddWin.findById("staffAddQuota").clearInvalid();
 
 					staffAddWin.findById("noQuotaLimitAdd").setValue(false);
+
+					document.getElementById("errorMsgAdd").innerHTML = " ";
 
 					var f = Ext.get("staffAddNumber");
 					f.focus.defer(100, f); // 为什么这样才可以！？！？

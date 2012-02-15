@@ -439,6 +439,9 @@ function checkOutOnLoad() {
 																							.getElementById("actualCount").value = sPay;
 																					document
 																							.getElementById("change").innerHTML = "0.00";
+																					
+																					moneyCount("");
+																					
 																				} else {
 																					var dataInfo = resultJSON.data;
 																					Ext.MessageBox
