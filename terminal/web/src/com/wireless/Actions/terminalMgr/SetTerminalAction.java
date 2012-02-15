@@ -50,25 +50,37 @@ public class SetTerminalAction extends Action {
 			 */
 
 			String pin = request.getParameter("pin");
-			
+
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
 					Terminal.MODEL_STAFF);
 
 			// get parameter
-			String terminalID = request.getParameter("terminalID");
-			String staff = request.getParameter("staff");
-			String giftQuota = request.getParameter("giftQuota");
+			String modTernimials = request.getParameter("modTernimials");
 
 			/**
-			 * 
+			 * modfiedArr .push(record .get("staffID") + " field_separator " +
+			 * record .get("terminalID") + " field_separator " + record
+			 * .get("staffName") + " field_separator " + record
+			 * .get("staffQuota"))
 			 */
-			String sql = "UPDATE " + Params.dbName + ".terminal "
-					+ " SET owner_name = '" + staff + "', " + " gift_quota = "
-					+ giftQuota + " WHERE restaurant_id=" + term.restaurant_id
-					+ " AND terminal_id = " + terminalID;
+			String[] terminals = modTernimials.split(" record_separator ");
+			int sqlRowCount;
+			String sql;
+			for (int i = 0; i < terminals.length; i++) {
 
-			dbCon.stmt.executeUpdate(sql);
+				String[] fieldValues = terminals[i].split(" field_separator ");
+
+				sql = "UPDATE " + Params.dbName + ".terminal "
+						+ " SET owner_name = '" + fieldValues[1]
+						+ "', gift_quota = " + fieldValues[2]
+						+ " WHERE restaurant_id=" + term.restaurant_id
+						+ " AND terminal_id = " + fieldValues[0];
+				
+				System.out.println(sql);
+
+				sqlRowCount = dbCon.stmt.executeUpdate(sql);
+			}
 
 			jsonResp = jsonResp.replace("$(result)", "true");
 			jsonResp = jsonResp.replace("$(value)", "终端修改成功！");

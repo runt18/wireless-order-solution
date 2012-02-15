@@ -1,156 +1,156 @@
 ﻿// ----------------- 設定 --------------------
-settingWin = new Ext.Window(
-		{
-			layout : "fit",
-			title : "设定",
-			width : 245,
-			height : 145,
-			closeAction : "hide",
-			resizable : false,
-			items : [ {
-				layout : "form",
-				labelWidth : 60,
-				border : false,
-				frame : true,
-				items : [ {
-					xtype : "textfield",
-					fieldLabel : "持有人",
-					id : "ownerSet",
-					allowBlank : false,
-					width : 150
-				}, {
-					xtype : "numberfield",
-					fieldLabel : "赠送额度",
-					id : "giftQuotaSet",
-					allowBlank : false,
-					width : 150,
-					// minValue : 0,
-					// maxValue : 99999.99
-					validator : function(v) {
-						if (v < 0.00 || v > 99999.99) {
-							return "赠送额度范围是0.00至99999.99！";
-						} else {
-							return true;
-						}
-					}
-				}, {
-					xtype : "checkbox",
-					id : "noQuotaLimitSet",
-					fieldLabel : "无限制",
-					listeners : {
-						"check" : function(thiz, checked) {
-							if (checked) {
-								settingWin.findById("giftQuotaSet").disable();
-							} else {
-								settingWin.findById("giftQuotaSet").enable();
-							}
-						}
-					}
-				} ]
-			} ],
-			buttons : [
-					{
-						text : "确定",
-						handler : function() {
-							if (settingWin.findById("giftQuotaSet").isValid()
-									&& settingWin.findById("ownerSet")
-											.isValid()) {
-								// 獲取分頁表格的當前頁碼！神技！！！
-								var toolbar = terminalGrid.getBottomToolbar();
-								currPageIndex = toolbar.readPage(toolbar
-										.getPageData());
-
-								isPrompt = false;
-								settingWin.hide();
-
-								var giftQuota = settingWin.findById(
-										"giftQuotaSet").getValue();
-								var quotaUnlimit = settingWin.findById(
-										"noQuotaLimitSet").getValue();
-								if (quotaUnlimit == true) {
-									giftQuota = -1;
-								}
-								var staff = settingWin.findById("ownerSet")
-										.getValue();
-								var terminalID = terminalStore.getAt(
-										currRowIndex).get("terminalID");
-
-								Ext.Ajax.request({
-									url : "../../SetTerminal.do",
-									params : {
-										"pin" : pin,
-										"terminalID" : terminalID,
-										"staff" : staff,
-										"giftQuota" : giftQuota
-									},
-									success : function(response, options) {
-										var resultJSON = Ext.util.JSON
-												.decode(response.responseText);
-										if (resultJSON.success == true) {
-											terminalStore.reload({
-												params : {
-													start : (currPageIndex - 1)
-															* pageRecordCount,
-													limit : pageRecordCount
-												}
-											});
-
-											var dataInfo = resultJSON.data;
-											Ext.MessageBox.show({
-												msg : dataInfo,
-												width : 300,
-												buttons : Ext.MessageBox.OK
-											});
-										} else {
-											var dataInfo = resultJSON.data;
-											Ext.MessageBox.show({
-												msg : dataInfo,
-												width : 300,
-												buttons : Ext.MessageBox.OK
-											});
-										}
-									},
-									failure : function(response, options) {
-									}
-								});
-							}
-						}
-					}, {
-						text : "取消",
-						handler : function() {
-							isPrompt = false;
-							settingWin.hide();
-						}
-					} ],
-			listeners : {
-				"show" : function(thiz) {
-					settingWin.findById("ownerSet").setValue(
-							terminalStore.getAt(currRowIndex).get("ownerName"));
-					settingWin.findById("ownerSet").clearInvalid();
-
-					var quota = terminalStore.getAt(currRowIndex).get(
-							"giftQuota");
-					if (quota < 0) {
-						settingWin.findById("giftQuotaSet").setValue(0);
-						settingWin.findById("giftQuotaSet").disable();
-						settingWin.findById("noQuotaLimitSet").setValue(true);
-					} else {
-						settingWin.findById("giftQuotaSet").setValue(
-								terminalStore.getAt(currRowIndex).get(
-										"giftQuota"));
-						settingWin.findById("giftQuotaSet").enable();
-						settingWin.findById("noQuotaLimitSet").setValue(false);
-					}
-					settingWin.findById("giftQuotaSet").clearInvalid();
-
-					var f = Ext.get("ownerSet");
-					f.focus.defer(100, f); // 为什么这样才可以！？！？
-				},
-				"hide" : function(thiz) {
-					isPrompt = false;
-				}
-			}
-		});
+//settingWin = new Ext.Window(
+//		{
+//			layout : "fit",
+//			title : "设定",
+//			width : 245,
+//			height : 145,
+//			closeAction : "hide",
+//			resizable : false,
+//			items : [ {
+//				layout : "form",
+//				labelWidth : 60,
+//				border : false,
+//				frame : true,
+//				items : [ {
+//					xtype : "textfield",
+//					fieldLabel : "持有人",
+//					id : "ownerSet",
+//					allowBlank : false,
+//					width : 150
+//				}, {
+//					xtype : "numberfield",
+//					fieldLabel : "赠送额度",
+//					id : "giftQuotaSet",
+//					allowBlank : false,
+//					width : 150,
+//					// minValue : 0,
+//					// maxValue : 99999.99
+//					validator : function(v) {
+//						if (v < 0.00 || v > 99999.99) {
+//							return "赠送额度范围是0.00至99999.99！";
+//						} else {
+//							return true;
+//						}
+//					}
+//				}, {
+//					xtype : "checkbox",
+//					id : "noQuotaLimitSet",
+//					fieldLabel : "无限制",
+//					listeners : {
+//						"check" : function(thiz, checked) {
+//							if (checked) {
+//								settingWin.findById("giftQuotaSet").disable();
+//							} else {
+//								settingWin.findById("giftQuotaSet").enable();
+//							}
+//						}
+//					}
+//				} ]
+//			} ],
+//			buttons : [
+//					{
+//						text : "确定",
+//						handler : function() {
+//							if (settingWin.findById("giftQuotaSet").isValid()
+//									&& settingWin.findById("ownerSet")
+//											.isValid()) {
+//								// 獲取分頁表格的當前頁碼！神技！！！
+//								var toolbar = terminalGrid.getBottomToolbar();
+//								currPageIndex = toolbar.readPage(toolbar
+//										.getPageData());
+//
+//								isPrompt = false;
+//								settingWin.hide();
+//
+//								var giftQuota = settingWin.findById(
+//										"giftQuotaSet").getValue();
+//								var quotaUnlimit = settingWin.findById(
+//										"noQuotaLimitSet").getValue();
+//								if (quotaUnlimit == true) {
+//									giftQuota = -1;
+//								}
+//								var staff = settingWin.findById("ownerSet")
+//										.getValue();
+//								var terminalID = terminalStore.getAt(
+//										currRowIndex).get("terminalID");
+//
+//								Ext.Ajax.request({
+//									url : "../../SetTerminal.do",
+//									params : {
+//										"pin" : pin,
+//										"terminalID" : terminalID,
+//										"staff" : staff,
+//										"giftQuota" : giftQuota
+//									},
+//									success : function(response, options) {
+//										var resultJSON = Ext.util.JSON
+//												.decode(response.responseText);
+//										if (resultJSON.success == true) {
+//											terminalStore.reload({
+//												params : {
+//													start : (currPageIndex - 1)
+//															* pageRecordCount,
+//													limit : pageRecordCount
+//												}
+//											});
+//
+//											var dataInfo = resultJSON.data;
+//											Ext.MessageBox.show({
+//												msg : dataInfo,
+//												width : 300,
+//												buttons : Ext.MessageBox.OK
+//											});
+//										} else {
+//											var dataInfo = resultJSON.data;
+//											Ext.MessageBox.show({
+//												msg : dataInfo,
+//												width : 300,
+//												buttons : Ext.MessageBox.OK
+//											});
+//										}
+//									},
+//									failure : function(response, options) {
+//									}
+//								});
+//							}
+//						}
+//					}, {
+//						text : "取消",
+//						handler : function() {
+//							isPrompt = false;
+//							settingWin.hide();
+//						}
+//					} ],
+//			listeners : {
+//				"show" : function(thiz) {
+//					settingWin.findById("ownerSet").setValue(
+//							terminalStore.getAt(currRowIndex).get("ownerName"));
+//					settingWin.findById("ownerSet").clearInvalid();
+//
+//					var quota = terminalStore.getAt(currRowIndex).get(
+//							"giftQuota");
+//					if (quota < 0) {
+//						settingWin.findById("giftQuotaSet").setValue(0);
+//						settingWin.findById("giftQuotaSet").disable();
+//						settingWin.findById("noQuotaLimitSet").setValue(true);
+//					} else {
+//						settingWin.findById("giftQuotaSet").setValue(
+//								terminalStore.getAt(currRowIndex).get(
+//										"giftQuota"));
+//						settingWin.findById("giftQuotaSet").enable();
+//						settingWin.findById("noQuotaLimitSet").setValue(false);
+//					}
+//					settingWin.findById("giftQuotaSet").clearInvalid();
+//
+//					var f = Ext.get("ownerSet");
+//					f.focus.defer(100, f); // 为什么这样才可以！？！？
+//				},
+//				"hide" : function(thiz) {
+//					isPrompt = false;
+//				}
+//			}
+//		});
 
 // --
 var pushBackBut = new Ext.ux.ImageButton({
@@ -180,10 +180,10 @@ var termSetHandler = function(rowIndex) {
 	}
 };
 
-function terminalOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
-	return "<center><a href=\"javascript:termSetHandler(" + rowIndex + ")\">"
-			+ "<img src='../../images/Modify.png'/>设定</a>" + "</center>";
-};
+// function terminalOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
+// return "<center><a href=\"javascript:termSetHandler(" + rowIndex + ")\">"
+// + "<img src='../../images/Modify.png'/>设定</a>" + "</center>";
+// };
 
 // 1，表格的数据store
 var terminalStore = new Ext.data.Store({
@@ -210,6 +210,10 @@ var terminalStore = new Ext.data.Store({
 	}, {
 		name : "giftQuota"
 	}, {
+		name : "quotaOrig"
+	}, {
+		name : "noLimit"
+	}, {
 		name : "operator"
 	}, {
 		name : "message"
@@ -217,6 +221,12 @@ var terminalStore = new Ext.data.Store({
 });
 
 // menuStore.reload();
+
+var noLimitCheckColumn = new Ext.grid.CheckColumn({
+	header : "无额度限制",
+	dataIndex : "noLimit",
+	width : 30
+});
 
 // 2，栏位模型
 var terminalColumnModel = new Ext.grid.ColumnModel([
@@ -229,7 +239,12 @@ var terminalColumnModel = new Ext.grid.ColumnModel([
 			header : "持有人",
 			sortable : true,
 			dataIndex : "ownerName",
-			width : 100
+			width : 100,
+			editor : new Ext.form.TextField({
+				allowBlank : false,
+				allowNegative : false,
+				selectOnFocus : true
+			})
 		}, {
 			header : "PIN",
 			sortable : true,
@@ -253,6 +268,17 @@ var terminalColumnModel = new Ext.grid.ColumnModel([
 			sortable : true,
 			dataIndex : "giftQuota",
 			width : 100,
+			editor : new Ext.form.NumberField({
+				allowBlank : false,
+				selectOnFocus : true,
+				validator : function(v) {
+					if (v < 0.00 || v > 99999.99) {
+						return "赠送额度范围是0.00至99999.99！";
+					} else {
+						return true;
+					}
+				}
+			}),
 			renderer : function(v, params, record) {
 				if (v < 0) {
 					return "无限制";
@@ -260,13 +286,15 @@ var terminalColumnModel = new Ext.grid.ColumnModel([
 					return v;
 				}
 			}
-		}, {
-			header : "<center>操作</center>",
-			sortable : true,
-			dataIndex : "operator",
-			width : 100,
-			renderer : terminalOpt
-		} ]);
+		}, noLimitCheckColumn
+// {
+// header : "<center>操作</center>",
+// sortable : true,
+// dataIndex : "operator",
+// width : 100,
+// renderer : terminalOpt
+// }
+]);
 
 // -------------- layout ---------------
 var terminalGrid;
@@ -277,45 +305,142 @@ Ext
 			Ext.QuickTips.init();
 
 			// ---------------------表格--------------------------
-			terminalGrid = new Ext.grid.GridPanel({
-				xtype : "grid",
-				anchor : "99%",
-				region : "center",
-				frame : true,
-				margins : '0 5 0 0',
-				ds : terminalStore,
-				cm : terminalColumnModel,
-				sm : new Ext.grid.RowSelectionModel({
-					singleSelect : true
-				}),
-				viewConfig : {
-					forceFit : true
-				},
-				bbar : new Ext.PagingToolbar({
-					pageSize : pageRecordCount,
-					store : terminalStore,
-					displayInfo : true,
-					displayMsg : '显示第 {0} 条到 {1} 条记录，共 {2} 条',
-					emptyMsg : "没有记录"
-				}),
-				autoScroll : true,
-				loadMask : {
-					msg : "数据加载中，请稍等..."
-				},
-				listeners : {
-					"render" : function(thiz) {
-						terminalStore.reload({
-							params : {
-								start : 0,
-								limit : pageRecordCount
+			terminalGrid = new Ext.grid.EditorGridPanel(
+					{
+						xtype : "grid",
+						anchor : "99%",
+						region : "center",
+						frame : true,
+						margins : '0 5 0 0',
+						ds : terminalStore,
+						cm : terminalColumnModel,
+						plugins : noLimitCheckColumn,
+						clicksToEdit : 2,
+						sm : new Ext.grid.RowSelectionModel({
+							singleSelect : true
+						}),
+						viewConfig : {
+							forceFit : true
+						},
+						bbar : new Ext.PagingToolbar({
+							pageSize : pageRecordCount,
+							store : terminalStore,
+							displayInfo : true,
+							displayMsg : '显示第 {0} 条到 {1} 条记录，共 {2} 条',
+							emptyMsg : "没有记录"
+						}),
+						autoScroll : true,
+						loadMask : {
+							msg : "数据加载中，请稍等..."
+						},
+						listeners : {
+							"render" : function(thiz) {
+								terminalStore.reload({
+									params : {
+										start : 0,
+										limit : pageRecordCount
+									}
+								});
+							},
+							"rowclick" : function(thiz, rowIndex, e) {
+								currRowIndex = rowIndex;
 							}
-						});
-					},
-					"rowclick" : function(thiz, rowIndex, e) {
-						currRowIndex = rowIndex;
-					}
-				}
-			});
+						},
+						tbar : [ {
+							text : '保存修改',
+							tooltip : '保存修改',
+							iconCls : 'save',
+							handler : function() {
+								// 修改記錄格式:id field_separator name
+								// field_separator phone field_separator contact
+								// field_separator address record_separator id
+								// field_separator name field_separator phone
+								// field_separator contact field_separator
+								// address
+								var modfiedArr = [];
+								terminalGrid
+										.getStore()
+										.each(
+												function(record) {
+													if (record
+															.isModified("ownerName") == true
+															|| record
+																	.isModified("giftQuota") == true) {
+														modfiedArr
+																.push(record
+																		.get("terminalID")
+																		+ " field_separator "
+																		+ record
+																				.get("ownerName")
+																		+ " field_separator "
+																		+ record
+																				.get("giftQuota"));
+													}
+												});
+
+								if (modfiedArr.length != 0) {
+									// 獲取分頁表格的當前頁碼！神技！！！
+									var toolbar = terminalGrid
+											.getBottomToolbar();
+									currPageIndex = toolbar.readPage(toolbar
+											.getPageData());
+
+									var modTernimials = "";
+									for ( var i = 0; i < modfiedArr.length; i++) {
+										modTernimials = modTernimials
+												+ modfiedArr[i]
+												+ " record_separator ";
+									}
+									modTernimials = modTernimials.substring(0,
+											modTernimials.length - 18);
+
+									Ext.Ajax
+											.request({
+												url : "../../SetTerminal.do",
+												params : {
+													"pin" : pin,
+													"modTernimials" : modTernimials
+												},
+												success : function(response,
+														options) {
+													var resultJSON = Ext.util.JSON
+															.decode(response.responseText);
+													if (resultJSON.success == true) {
+														// loadAllTaste();
+														terminalStore
+																.reload({
+																	params : {
+																		start : (currPageIndex - 1)
+																				* pageRecordCount,
+																		limit : pageRecordCount
+																	}
+																});
+
+														var dataInfo = resultJSON.data;
+														Ext.MessageBox
+																.show({
+																	msg : dataInfo,
+																	width : 300,
+																	buttons : Ext.MessageBox.OK
+																});
+													} else {
+														var dataInfo = resultJSON.data;
+														Ext.MessageBox
+																.show({
+																	msg : dataInfo,
+																	width : 300,
+																	buttons : Ext.MessageBox.OK
+																});
+													}
+												},
+												failure : function(response,
+														options) {
+												}
+											});
+								}
+							}
+						} ],
+					});
 
 			// 为store配置beforeload监听器
 			terminalGrid.getStore().on('beforeload', function() {
@@ -344,6 +469,29 @@ Ext
 					}
 				}
 			});
+
+			terminalGrid.on("beforeedit", function(e) {
+				if (e.record.get("noLimit") == true && e.field == "giftQuota") {
+					e.cancel = true;
+				}
+			});
+
+			terminalGrid.on("afteredit",
+					function(e) {
+						if (e.field == "noLimit") {
+							if (e.record.get("noLimit") == true) {
+								e.record.set("giftQuota", -1);
+							} else {
+								if (e.record.get("quotaOrig") > 0) {
+									e.record.set("giftQuota", e.record
+											.get("quotaOrig"));
+								} else {
+									e.record.set("giftQuota", 0);
+								}
+							}
+						}
+					});
+
 			// ---------------------end 表格--------------------------
 
 			var centerPanel = new Ext.Panel({

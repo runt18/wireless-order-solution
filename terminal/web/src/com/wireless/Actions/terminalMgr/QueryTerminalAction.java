@@ -95,6 +95,12 @@ public class QueryTerminalAction extends Action {
 				}
 				resultMap.put("giftAmount", terminals[i].getGiftAmount());
 				resultMap.put("giftQuota", terminals[i].getGiftQuota());
+				resultMap.put("quotaOrig", terminals[i].getGiftQuota());
+				if (terminals[i].getGiftQuota() < 0) {
+					resultMap.put("noLimit", true);
+				} else {
+					resultMap.put("noLimit", false);
+				}
 
 				resultMap.put("message", "normal");
 
