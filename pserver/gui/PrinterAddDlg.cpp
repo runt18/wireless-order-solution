@@ -441,13 +441,13 @@ void CAddPrinterDlg::OnCbnFuncChg()
 		(selected + 1) == Reserved::PRINT_CANCELLED_FOOD){
 			m_KitchenAll.EnableWindow(TRUE);
 			m_KitchenTemp.EnableWindow(TRUE);
-			for(int i = 0; i < KITCHEN_NUM; i++){
+			for(unsigned int i = 0; i < g_Kitchens.size(); i++){
 				m_Kitchens[i].EnableWindow(TRUE);
 			}
 	}else{
 		m_KitchenAll.EnableWindow(FALSE);
 		m_KitchenTemp.EnableWindow(FALSE);
-		for(int i = 0; i < KITCHEN_NUM; i++){
+		for(unsigned int i = 0; i < g_Kitchens.size(); i++){
 			m_Kitchens[i].EnableWindow(FALSE);
 		}
 	}
