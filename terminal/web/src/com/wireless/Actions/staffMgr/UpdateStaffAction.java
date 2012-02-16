@@ -50,7 +50,7 @@ public class UpdateStaffAction extends Action {
 			 */
 
 			String pin = request.getParameter("pin");
-			
+
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
 					Terminal.MODEL_STAFF);
@@ -80,7 +80,8 @@ public class UpdateStaffAction extends Action {
 
 				sql = "UPDATE " + Params.dbName + ".terminal "
 						+ " SET gift_quota = " + fieldValues[3]
-						+ " WHERE restaurant_id=" + term.restaurant_id
+						+ " , owner_name = '" + fieldValues[2]
+						+ "' WHERE restaurant_id=" + term.restaurant_id
 						+ " AND terminal_id = " + fieldValues[1];
 
 				sqlRowCount = dbCon.stmt.executeUpdate(sql);

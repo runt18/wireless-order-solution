@@ -34,6 +34,7 @@ staffAddWin = new Ext.Window(
 							fieldLabel : "赠送额度",
 							id : "staffAddQuota",
 							allowBlank : false,
+							disabled : true,
 							width : 160,
 							validator : function(v) {
 								if (v < 0.00 || v > 99999.99) {
@@ -47,6 +48,7 @@ staffAddWin = new Ext.Window(
 							xtype : "checkbox",
 							id : "noQuotaLimitAdd",
 							fieldLabel : "无限制",
+							value : true,
 							listeners : {
 								"check" : function(thiz, checked) {
 									if (checked) {
@@ -211,8 +213,9 @@ staffAddWin = new Ext.Window(
 
 					staffAddWin.findById("staffAddQuota").setValue(0);
 					staffAddWin.findById("staffAddQuota").clearInvalid();
+					staffAddWin.findById("staffAddQuota").disable();
 
-					staffAddWin.findById("noQuotaLimitAdd").setValue(false);
+					staffAddWin.findById("noQuotaLimitAdd").setValue(true);
 
 					document.getElementById("errorMsgAdd").innerHTML = " ";
 

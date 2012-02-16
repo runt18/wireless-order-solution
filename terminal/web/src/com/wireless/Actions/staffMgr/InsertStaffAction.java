@@ -48,7 +48,7 @@ public class InsertStaffAction extends Action {
 			 */
 
 			String pin = request.getParameter("pin");
-			
+
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
 					Terminal.MODEL_STAFF);
@@ -72,9 +72,10 @@ public class InsertStaffAction extends Action {
 			String sql = "INSERT INTO "
 					+ Params.dbName
 					+ ".terminal"
-					+ "( pin, restaurant_id, model_id, model_name, owner_name ) "
+					+ "( pin, restaurant_id, model_id, model_name, owner_name, gift_quota ) "
 					+ " VALUES(" + newPin + ", " + term.restaurant_id
-					+ ", 255, 'Staff', '" + staffName + "' ) ";
+					+ ", 255, 'Staff', '" + staffName + "', " + staffQuota
+					+ " ) ";
 
 			int sqlRowCount = dbCon.stmt.executeUpdate(sql);
 
