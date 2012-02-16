@@ -13,21 +13,27 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Display;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.WindowManager.LayoutParams;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
+import android.widget.BaseAdapter;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
@@ -44,8 +50,15 @@ import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Util;
+import com.wireless.ui.view.OrderFoodListView;
 import com.wireless.ui.view.PickFoodListView;
 import com.wireless.ui.view.TempListView;
+
+
+
+
+
+
 
 public class PickFoodActivity extends TabActivity 
 							  implements PickFoodListView.OnFoodPickedListener, OnGestureListener{
@@ -65,14 +78,16 @@ public class PickFoodActivity extends TabActivity
     boolean dialogTag = false;
     private List<Food> _filterFoods;
     private TempListView _tempLstView;
+    private PopupWindow _popupWindow;
+    private OrderFoodListView _orderLstView;
+    private boolean orderlistTag = false;
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		 _detector = new GestureDetector(this); 
 		
 		setContentView(R.layout.table);
-		
+		_detector = new GestureDetector(this); 
 		
 		
 		//取得新点菜中已有的菜品List，并保存到pickFood的List中
@@ -285,6 +300,27 @@ public class PickFoodActivity extends TabActivity
 		final EditText filterNumEdtTxt = ((EditText)findViewById(R.id.filterNumEdtTxt));
 		filterNumEdtTxt.setText("");
 		pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods, PickFoodListView.TAG_NUM);
+		//已点菜按钮
+		ImageView numberOrder = (ImageView)findViewById(R.id.numorder);
+		//已点菜按钮事件
+		numberOrder.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				if(orderlistTag == false){
+					 showOrderList();
+					_popupWindow.showAsDropDown(v);
+					orderlistTag = true;
+				}else{
+					_popupWindow.dismiss();
+			        orderlistTag = false;
+				
+				}
+				
+				
+			}
+		});
+		
 		pickLstView.setFoodPickedListener(this);
 		((ImageView)findViewById(R.id.numback)).setOnClickListener(new View.OnClickListener() {
 			
@@ -344,6 +380,7 @@ public class PickFoodActivity extends TabActivity
 	 * 设置分厨筛选的View
 	 */
 	private void setupKitchenView(){
+		
 		final PickFoodListView pickLstView = (PickFoodListView)findViewById(R.id.pickByKitchenLstView);
 		RelativeLayout filterKitchen = (RelativeLayout)findViewById(R.id.filterKitchenRelaLayout);
 		final EditText filterKitEdtTxt = (EditText)findViewById(R.id.filterKitchenEdtTxt);
@@ -353,6 +390,28 @@ public class PickFoodActivity extends TabActivity
 		ketchenName.setText("全部");
 		pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods, PickFoodListView.TAG_PINYIN);
 		pickLstView.setFoodPickedListener(this);
+		
+		//已点菜按钮
+		ImageView numberOrder = (ImageView)findViewById(R.id.kitchenorder);
+		//已点菜按钮事件
+		numberOrder.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				if(orderlistTag == false){
+					 showOrderList();
+					_popupWindow.showAsDropDown(v);
+					orderlistTag = true;
+				}else{
+					_popupWindow.dismiss();
+			        orderlistTag = false;
+				
+				}
+				
+				
+			}
+		});
+		
         ((ImageView)findViewById(R.id.ketback)).setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -434,6 +493,27 @@ public class PickFoodActivity extends TabActivity
 		filterPinyinEdtTxt.setText("");
 		pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods, PickFoodListView.TAG_PINYIN);
 		pickLstView.setFoodPickedListener(this);
+		
+		//已点菜按钮
+		ImageView numberOrder = (ImageView)findViewById(R.id.pinorder);
+		//已点菜按钮事件
+		numberOrder.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				if(orderlistTag == false){
+					 showOrderList();
+					_popupWindow.showAsDropDown(v);
+					orderlistTag = true;
+				}else{
+					_popupWindow.dismiss();
+			        orderlistTag = false;
+				
+				}
+				
+				
+			}
+		});
         ((ImageView)findViewById(R.id.pinback)).setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -755,6 +835,19 @@ public class PickFoodActivity extends TabActivity
 		
 	}
 
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event)
+    {
+        if (_detector.onTouchEvent(event))
+        {
+            return true;
+        } else
+        {
+            return false;
+        }
+    }
+	
 	@Override
 	public boolean onDown(MotionEvent e) {
 		return true;
@@ -813,4 +906,76 @@ public class PickFoodActivity extends TabActivity
 	   return false;
 	}
 	
+	
+	/**
+	 * 点击按钮显示已点菜列表
+	 */
+	public void showOrderList(){		
+		
+		Display display = ((WindowManager) getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
+		int width = display.getWidth();//获取屏幕宽度
+		int heigh = display.getHeight();//获取屏幕高度
+		View popupWindow_view = getLayoutInflater().inflate(    //获取自定义布局文件的视图    
+                R.layout.orderlistpupowindow, null,false);     
+        _popupWindow = new PopupWindow(popupWindow_view, LayoutParams.WRAP_CONTENT-20, heigh/2, false);//创建PopupWindow实例   
+        _popupWindow.setOutsideTouchable(true);
+        _popupWindow.setAnimationStyle(R.style.popuwindow);
+        ListView _orderLstView = (ListView)popupWindow_view.findViewById(R.id.orderpupowindowLstView);
+        _orderLstView.setAdapter(new popuwindowadapter(this,_pickFoods));
+        
+	}
+	
+	/**
+	 * 点击按钮显示已点菜列表adapter
+	 */
+	public class popuwindowadapter extends BaseAdapter{
+		
+       private ArrayList<OrderFood> tmpFoods;
+       private Context context;
+       
+		public popuwindowadapter(Context context,ArrayList<OrderFood>  mpickFoods){
+			this.context = context;
+			this.tmpFoods = mpickFoods;
+		}
+		@Override
+		public int getCount() {
+			// TODO Auto-generated method stub
+			return tmpFoods.size();
+		}
+
+		@Override
+		public Object getItem(int position) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public long getItemId(int position) {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			Holder holder;
+			if(convertView == null){
+				 convertView = LayoutInflater.from(context).inflate(R.layout.orderpopuwindowitem, null);
+				 holder = new Holder();
+				 holder.foodname = (TextView)convertView.findViewById(R.id.popuwindowfoodname);
+				 convertView.setTag(holder);
+			}else{
+				holder = (Holder)convertView.getTag();
+			}
+		    
+			OrderFood food = tmpFoods.get(position);
+		    holder.foodname.setText(food.name);
+			return convertView;
+		}
+		
+		private class Holder
+		{
+			TextView foodname;
+		
+		}
+	}
 }
