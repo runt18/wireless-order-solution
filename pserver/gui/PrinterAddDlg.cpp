@@ -177,6 +177,38 @@ BOOL CAddPrinterDlg::OnInitDialog(){
 }
 
 void CAddPrinterDlg::OnOK(){
+	bool isKitchenSelected = false;
+	if(m_KitchenAll.GetCheck() == BST_CHECKED || m_KitchenTemp.GetCheck() == BST_CHECKED){
+		isKitchenSelected = true;
+	}else{
+		for(unsigned i = 0; i < g_Kitchens.size(); i++){
+			if(m_Kitchens[i].GetCheck() == BST_CHECKED){
+				isKitchenSelected = true;
+				break;
+			}
+		}
+	}
+	if(!isKitchenSelected){
+		MessageBox(_T("请选择打印的厨房分类"),  _T("信息"));
+		return;
+	}
+
+	bool isRegionSelected = false;
+	if(m_RegionAll.GetCheck() == BST_CHECKED){
+		isRegionSelected = true;
+	}else{
+		for(unsigned int i = 0; i < g_Regions.size(); i++){
+			if(m_Regions[i].GetCheck() == BST_CHECKED){
+				isRegionSelected = true;
+				break;
+			}
+		}
+	}
+	if(!isRegionSelected){
+		MessageBox(_T("请选择打印的区域"),  _T("信息"));
+		return;
+	}
+
 	if(m_Printer.IsEmpty()){
 		MessageBox(_T("请选择打印机"),  _T("信息"));
 		m_PrinterNames.SetFocus();
@@ -428,11 +460,12 @@ void CAddPrinterDlg::OnCbnPrinterNamesChg()
 	UpdateData(TRUE);
 }
 
+//“功能”ComboBox的回调函数，用于选择“下单”、“结帐”等的打印功能
 void CAddPrinterDlg::OnCbnFuncChg()
 {
 	//assign the selected function code value
 	int selected = m_Funcs.GetCurSel();
-	//enable to show kitchen check boxes if the function is as below.
+	//enable kitchen check boxes & disable the region check boxes if the function is as below.
 	//1 - print order detail
 	//2 - print extra food
 	//3 - print canceled food
@@ -440,16 +473,35 @@ void CAddPrinterDlg::OnCbnFuncChg()
 		(selected + 1) == Reserved::PRINT_EXTRA_FOOD ||
 		(selected + 1) == Reserved::PRINT_CANCELLED_FOOD){
 			m_KitchenAll.EnableWindow(TRUE);
-			m_KitchenTemp.EnableWindow(TRUE);
+			m_KitchenAll.SetCheck(BST_CHECKED);
+			m_KitchenTemp.EnableWindow(FALSE);
+			m_KitchenTemp.SetCheck(BST_UNCHECKED);
 			for(unsigned int i = 0; i < g_Kitchens.size(); i++){
-				m_Kitchens[i].EnableWindow(TRUE);
+				m_Kitchens[i].EnableWindow(FALSE);
+				m_Kitchens[i].SetCheck(BST_UNCHECKED);
+			}
+			m_RegionAll.EnableWindow(FALSE);
+			m_RegionAll.SetCheck(BST_CHECKED);
+			for(unsigned int i = 0; i < g_Regions.size(); i++){
+				m_Regions[i].EnableWindow(FALSE);
+				m_Regions[i].SetCheck(BST_UNCHECKED);
 			}
 	}else{
 		m_KitchenAll.EnableWindow(FALSE);
+		m_KitchenAll.SetCheck(BST_CHECKED);
 		m_KitchenTemp.EnableWindow(FALSE);
+		m_KitchenTemp.SetCheck(BST_UNCHECKED);
 		for(unsigned int i = 0; i < g_Kitchens.size(); i++){
 			m_Kitchens[i].EnableWindow(FALSE);
+			m_Kitchens[i].SetCheck(BST_UNCHECKED);
 		}
+		m_RegionAll.EnableWindow(TRUE);
+		m_RegionAll.SetCheck(BST_CHECKED);
+		for(unsigned int i = 0; i < g_Regions.size(); i++){
+			m_Regions[i].EnableWindow(FALSE);
+			m_Regions[i].SetCheck(BST_UNCHECKED);
+		}
+
 	}
 	if(selected != -1){
 		m_Funcs.GetLBText(selected, m_Func);
@@ -457,6 +509,7 @@ void CAddPrinterDlg::OnCbnFuncChg()
 	UpdateData(TRUE);
 }
 
+//“类型”ComboBox的回调函数，用于选择58、80mm的打印类型
 void CAddPrinterDlg::OnCbnStyleChg(){
 	int selected = m_PrinterStyle.GetCurSel();
 	if(selected != -1){

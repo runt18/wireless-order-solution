@@ -56,9 +56,6 @@ void CPrinterSettingDlg::Update(){
 	//clear the printers vector
 	m_Printers.clear();
 
-
-#if 1
-
 	TiXmlElement* pPrinter = TiXmlHandle(&m_Conf).FirstChildElement(ConfTags::CONF_ROOT).FirstChildElement(ConfTags::PRINTER).Element();
 	for(pPrinter; pPrinter != NULL; pPrinter = pPrinter->NextSiblingElement(ConfTags::PRINTER)){
 		//add the printer node 
@@ -66,92 +63,6 @@ void CPrinterSettingDlg::Update(){
 	}
 	m_ListCtrl.Update(m_Conf);
 
-
-#else
-	//clear the printer list ctrl
-	m_ListCtrl.DeleteAllItems();
-	//extract each printer's name and supported functions from the configuration file
-	TiXmlElement* pPrinter = TiXmlHandle(&m_Conf).FirstChildElement(ConfTags::CONF_ROOT).FirstChildElement(ConfTags::PRINTER).Element();
-	int row = 0;
-	for(pPrinter; pPrinter != NULL; pPrinter = pPrinter->NextSiblingElement(ConfTags::PRINTER)){
-		//push the printer node 
-		m_Printers.push_back(pPrinter);
-
-		//set the "编号"
-		CString id;
-		id.Format(TEXT("%d"), row + 1);
-		m_ListCtrl.InsertItem(row, id);
-
-		//get the printer name
-		string name = pPrinter->Attribute(ConfTags::PRINT_NAME);
-		//set the "打印机"
-		m_ListCtrl.SetItemText(row, COLUMN_PRINTER_NAME, CString(name.c_str()));
-
-		//get the printer function code
-		int func = 0;
-		pPrinter->QueryIntAttribute(ConfTags::PRINT_FUNC, &func);
-		//set the "功能"
-		if(func < _nFuncs){
-			//set the kitchen if the function is as below
-			//1 - print order detail
-			//2 - print extra food
-			//3 - print canceled food
-			//4 - print hurried food
-			if(func == Reserved::PRINT_ORDER_DETAIL ||
-				func == Reserved::PRINT_EXTRA_FOOD ||
-				func == Reserved::PRINT_CANCELLED_FOOD ||
-				func == Reserved::PRINT_HURRY_FOOD){
-				int kitchen = Kitchen::KITCHEN_NULL;
-				int ret = pPrinter->QueryIntAttribute(ConfTags::KITCHEN, &kitchen);
-				if(ret == TIXML_NO_ATTRIBUTE){
-					m_ListCtrl.SetItemText(row, COLUMN_FUNC_CODE, _FuncDesc[func]);
-
-				}else if(kitchen > (int)g_Kitchens.size() - 1 && kitchen != Kitchen::KITCHEN_ALL && kitchen != Kitchen::KITCHEN_NULL){
-					m_ListCtrl.SetItemText(row, COLUMN_FUNC_CODE, _FuncDesc[func]);
-
-				}else{
-					if(kitchen == Kitchen::KITCHEN_ALL){
-						kitchen = g_Kitchens.size() - 1;
-					}
-					CString tmp;
-					tmp.Format(_T("%s - %s"), _FuncDesc[func], g_Kitchens[kitchen]);
-					m_ListCtrl.SetItemText(row, COLUMN_FUNC_CODE, tmp);
-				}
-			}else{
-				m_ListCtrl.SetItemText(row, COLUMN_FUNC_CODE, _FuncDesc[func]);
-			}
-		}else{
-			m_ListCtrl.SetItemText(row, COLUMN_FUNC_CODE, _T("未知"));
-		}
-
-		int style = 0;
-		pPrinter->QueryIntAttribute(ConfTags::PRINT_STYLE, &style);
-		if(style < _nStyle){
-			m_ListCtrl.SetItemText(row, COLUMN_PRINTER_STYLE, _PrinterStyle[style]);
-		}else{
-			m_ListCtrl.SetItemText(row, COLUMN_PRINTER_STYLE, _PrinterStyle[0]);
-		}
-
-		//get the repeat
-		int repeat = 1;
-		pPrinter->QueryIntAttribute(ConfTags::PRINT_REPEAT, &repeat);
-		CString tmp;
-		tmp.Format(_T("%d"), repeat);
-		//set the repeat to list control
-		m_ListCtrl.SetItemText(row, COLUMN_PRINTER_REPEAT, tmp);
-
-		//get the description 
-		string desc = pPrinter->Attribute(ConfTags::PRINT_DESC);
-		DWORD dwNum = MultiByteToWideChar (CP_UTF8, 0, desc.c_str(), -1, NULL, 0);
-		boost::shared_ptr<wchar_t> pDesc(new wchar_t[dwNum], boost::checked_array_deleter<wchar_t>());
-		MultiByteToWideChar (CP_UTF8, 0, desc.c_str(), -1, pDesc.get(), dwNum);
-
-		//set the "描述"
-		m_ListCtrl.SetItemText(row, COLUMN_PRINTER_DESC, pDesc.get());
-
-		row++;
-	}	
-#endif
 }
 
 BOOL CPrinterSettingDlg::OnInitDialog(){
@@ -176,9 +87,6 @@ BOOL CPrinterSettingDlg::OnInitDialog(){
 }
 
 void CPrinterSettingDlg::OnClose(){
-	if(m_ListCtrl){
-		delete m_ListCtrl;
-	}
 	CDialog::OnClose();
 }
 
@@ -230,8 +138,12 @@ void CPrinterSettingDlg::OnAddPrinter()
 	if(IDOK == addPrinterDlg.DoModal()){
 		Update();
 	}
-	m_ListCtrl.UpdateWindow();
-	m_TabCtrl.UpdateWindow();
+	if(m_ListCtrl){
+		m_ListCtrl.UpdateWindow();
+	}
+	if(m_TabCtrl){
+		m_TabCtrl.UpdateWindow();
+	}
 }
 
 void CPrinterSettingDlg::OnDelPrinter()
