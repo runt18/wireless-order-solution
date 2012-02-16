@@ -126,20 +126,12 @@ public class InsertOrder {
 				}
 				
 				/**
-				 * Update the gift amount if not reach the quota.
-				 * Otherwise throw a business exception.
+				 * Throw a business exception if gift amount reach the quota.
 				 */
 				float giftAmount = orderToInsert.calcGiftPrice().floatValue();
 				if(term.getGiftQuota() >= 0){
 					if((giftAmount + term.getGiftAmount()) > term.getGiftQuota()){
-						throw new BusinessException("The gift amount exceeds the quota.", ErrorCode.EXCEED_GIFT_QUOTA);
-						
-					}else{
-						sql = "UPDATE " + Params.dbName + ".terminal SET" +
-							  " gift_amount = gift_amount + " + giftAmount +
-							  " WHERE pin=" + "0x" + Long.toHexString(term.pin) +
-							  " AND restaurant_id=" + term.restaurant_id;
-						dbCon.stmt.executeUpdate(sql);
+						throw new BusinessException("The gift amount exceeds the quota.", ErrorCode.EXCEED_GIFT_QUOTA);						
 					}
 				}
 
@@ -179,6 +171,39 @@ public class InsertOrder {
 				}
 					
 				dbCon.stmt.clearBatch();
+				
+				/**
+				 * Update the 2nd table to busy if the category is for merger
+				 */
+				if(orderToInsert.category == Order.CATE_MERGER_TABLE){
+					sql = "UPDATE " + Params.dbName + ".table SET " +
+						  "status=" + Table.TABLE_BUSY + ", " +
+						  "category=" + orderToInsert.category + ", " +
+						  "custom_num=" + orderToInsert.custom_num +
+						  " WHERE restaurant_id=" + term.restaurant_id +
+						  " AND alias_id=" + orderToInsert.table2_id;
+					dbCon.stmt.addBatch(sql);
+				}
+				/**
+				 * Update the table status to busy.
+				 */
+				sql = "UPDATE " + Params.dbName + ".table SET " +
+					  "status=" + Table.TABLE_BUSY + ", " +
+					  "category=" + orderToInsert.category + ", " +
+					  "custom_num=" + orderToInsert.custom_num +
+					  " WHERE restaurant_id=" + term.restaurant_id + 
+					  " AND alias_id=" + orderToInsert.table_id;
+				dbCon.stmt.addBatch(sql);
+				
+				/**
+				 * Update the gift amount.
+				 */
+				sql = "UPDATE " + Params.dbName + ".terminal SET" +
+						  " gift_amount = gift_amount + " + giftAmount +
+						  " WHERE pin=" + "0x" + Long.toHexString(term.pin) +
+						  " AND restaurant_id=" + term.restaurant_id;
+				dbCon.stmt.addBatch(sql);
+				
 				/**
 				 * Insert the detail records to 'order_food' table
 				 */
@@ -209,30 +234,7 @@ public class InsertOrder {
 						
 					dbCon.stmt.addBatch(sql);
 				}		
-				
-				/**
-				 * Update the 2nd table to busy if the category is for merger
-				 */
-				if(orderToInsert.category == Order.CATE_MERGER_TABLE){
-					sql = "UPDATE " + Params.dbName + ".table SET " +
-						  "status=" + Table.TABLE_BUSY + ", " +
-						  "category=" + orderToInsert.category + ", " +
-						  "custom_num=" + orderToInsert.custom_num +
-						  " WHERE restaurant_id=" + term.restaurant_id +
-						  " AND alias_id=" + orderToInsert.table2_id;
-					dbCon.stmt.addBatch(sql);
-				}
-				/**
-				 * Update the table status to busy.
-				 */
-				sql = "UPDATE " + Params.dbName + ".table SET " +
-					  "status=" + Table.TABLE_BUSY + ", " +
-					  "category=" + orderToInsert.category + ", " +
-					  "custom_num=" + orderToInsert.custom_num +
-					  " WHERE restaurant_id=" + term.restaurant_id + 
-					  " AND alias_id=" + orderToInsert.table_id;
-				dbCon.stmt.addBatch(sql);
-				
+								
 				dbCon.stmt.executeBatch();
 				
 				return orderToInsert;
