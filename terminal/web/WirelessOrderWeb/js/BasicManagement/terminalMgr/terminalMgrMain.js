@@ -241,7 +241,7 @@ var terminalColumnModel = new Ext.grid.ColumnModel([
 			dataIndex : "ownerName",
 			width : 100,
 			editor : new Ext.form.TextField({
-				allowBlank : false,
+				// allowBlank : false,
 				allowNegative : false,
 				selectOnFocus : true
 			})
