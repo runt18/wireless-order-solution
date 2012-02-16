@@ -20,7 +20,13 @@
 			android:layout_centerHorizontal="true">
 		</TextView>
 
-
+	
+		<ImageView android:id="@+id/pinorder" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:src="@drawable/popuwindow_selector"
+			android:layout_alignParentRight="true"
+			android:layout_marginRight="20dip" android:layout_centerVertical="true">
+		</ImageView>
+		
 	</RelativeLayout>
 
 	<RelativeLayout android:id="@+id/second"
