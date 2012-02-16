@@ -8,7 +8,7 @@ import java.sql.Statement;
 
 public class DBCon {
 	//open the database
-	public Connection dbCon = null;
+	public Connection conn = null;
 	public Statement stmt = null;
 	public ResultSet rs = null;
 	
@@ -19,8 +19,8 @@ public class DBCon {
 			throw new SQLException(e);
 		}
 		
-		dbCon = DriverManager.getConnection(Params.dbUrl, Params.dbUser, Params.dbPwd);   
-		stmt = dbCon.createStatement();   
+		conn = DriverManager.getConnection(Params.dbUrl, Params.dbUser, Params.dbPwd);   
+		stmt = conn.createStatement();   
 		//set names to UTF-8
 		stmt.execute("SET NAMES utf8");
 	}
@@ -35,9 +35,9 @@ public class DBCon {
 				stmt.close();
 				stmt = null;
 			}
-			if(dbCon != null){
-				dbCon.close();
-				dbCon = null;
+			if(conn != null){
+				conn.close();
+				conn = null;
 			}
 		}catch(SQLException e){
 			System.err.println(e.toString());

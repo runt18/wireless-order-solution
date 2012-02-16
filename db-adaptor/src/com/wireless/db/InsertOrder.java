@@ -141,101 +141,119 @@ public class InsertOrder {
 				orderToInsert.region = QueryRegion.exec(dbCon, table.restaurantID, table.alias_id);
 
 				/**
-				 * Insert to 'order' table.
+				 * Put all the INSERT statements into a database transition so as to assure 
+				 * the status to both table and order is consistent. 
 				 */
-				sql = "INSERT INTO `" + Params.dbName + "`.`order` (" +
-						"`id`, `restaurant_id`, `category`, `region_id`, `region_name`, " +
-						"`table_id`, `table_name`, `table2_id`, `table2_name`, `terminal_model`, " +
-						"`terminal_pin`, `order_date`, `custom_num`, `waiter`) VALUES (" +
-						"NULL, " + 
-						table.restaurantID + ", " + 
-						orderToInsert.category + ", " +
-						orderToInsert.region.regionID + ", '" +
-						orderToInsert.region.name + "', " +
-						orderToInsert.table_id + ", '" + 
-						orderToInsert.table_name + "', " +
-						(orderToInsert.category == Order.CATE_MERGER_TABLE ? orderToInsert.table2_id : "NULL") + ", " +
-						(orderToInsert.category == Order.CATE_MERGER_TABLE ? "'" + orderToInsert.table2_name + "'" : "NULL") + ", " +
-						term.modelID + ", " + 
-						term.pin + 
-						", NOW(), " + 
-						orderToInsert.custom_num + ", '" + 
-						term.owner + "')";
-				dbCon.stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
-				//get the generated id to order 
-				dbCon.rs = dbCon.stmt.getGeneratedKeys();
-				if(dbCon.rs.next()){
-					orderToInsert.id = dbCon.rs.getInt(1);
-				}else{
-					throw new SQLException("The id of order is not generated successfully.");
-				}
+				try{
 					
-				dbCon.stmt.clearBatch();
-				
-				/**
-				 * Update the 2nd table to busy if the category is for merger
-				 */
-				if(orderToInsert.category == Order.CATE_MERGER_TABLE){
+					dbCon.conn.setAutoCommit(false);
+					
+					/**
+					 * Insert to 'order' table.
+					 */
+					sql = "INSERT INTO `" + Params.dbName + "`.`order` (" +
+							"`id`, `restaurant_id`, `category`, `region_id`, `region_name`, " +
+							"`table_id`, `table_name`, `table2_id`, `table2_name`, `terminal_model`, " +
+							"`terminal_pin`, `order_date`, `custom_num`, `waiter`) VALUES (" +
+							"NULL, " + 
+							table.restaurantID + ", " + 
+							orderToInsert.category + ", " +
+							orderToInsert.region.regionID + ", '" +
+							orderToInsert.region.name + "', " +
+							orderToInsert.table_id + ", '" + 
+							orderToInsert.table_name + "', " +
+							(orderToInsert.category == Order.CATE_MERGER_TABLE ? orderToInsert.table2_id : "NULL") + ", " +
+							(orderToInsert.category == Order.CATE_MERGER_TABLE ? "'" + orderToInsert.table2_name + "'" : "NULL") + ", " +
+							term.modelID + ", " + 
+							term.pin + 
+							", NOW(), " + 
+							orderToInsert.custom_num + ", '" + 
+							term.owner + "')";
+					dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+					//get the generated id to order 
+					dbCon.rs = dbCon.stmt.getGeneratedKeys();
+					if(dbCon.rs.next()){
+						orderToInsert.id = dbCon.rs.getInt(1);
+					}else{
+						throw new SQLException("The id of order is not generated successfully.");
+					}
+						
+					/**
+					 * Update the 2nd table to busy if the category is for merger
+					 */
+					if(orderToInsert.category == Order.CATE_MERGER_TABLE){
+						sql = "UPDATE " + Params.dbName + ".table SET " +
+							  "status=" + Table.TABLE_BUSY + ", " +
+							  "category=" + orderToInsert.category + ", " +
+							  "custom_num=" + orderToInsert.custom_num +
+							  " WHERE restaurant_id=" + term.restaurant_id +
+							  " AND alias_id=" + orderToInsert.table2_id;
+						dbCon.stmt.executeUpdate(sql);
+					}
+					/**
+					 * Update the table status to busy.
+					 */
 					sql = "UPDATE " + Params.dbName + ".table SET " +
 						  "status=" + Table.TABLE_BUSY + ", " +
 						  "category=" + orderToInsert.category + ", " +
 						  "custom_num=" + orderToInsert.custom_num +
-						  " WHERE restaurant_id=" + term.restaurant_id +
-						  " AND alias_id=" + orderToInsert.table2_id;
-					dbCon.stmt.addBatch(sql);
+						  " WHERE restaurant_id=" + term.restaurant_id + 
+						  " AND alias_id=" + orderToInsert.table_id;
+					dbCon.stmt.executeUpdate(sql);
+					
+					/**
+					 * Update the gift amount.
+					 */
+					sql = "UPDATE " + Params.dbName + ".terminal SET" +
+							  " gift_amount = gift_amount + " + giftAmount +
+							  " WHERE pin=" + "0x" + Long.toHexString(term.pin) +
+							  " AND restaurant_id=" + term.restaurant_id;
+					dbCon.stmt.executeUpdate(sql);
+					
+					/**
+					 * Insert the detail records to 'order_food' table
+					 */
+					for(int i = 0; i < orderToInsert.foods.length; i++){
+							
+						//insert the record to table "order_food"
+						sql = "INSERT INTO `" + Params.dbName + "`.`order_food` (" +
+								"`restaurant_id`, `order_id`, `food_id`, `order_count`, `unit_price`, `name`, " +
+								"`food_status`, `hang_status`, `discount`, `taste`, `taste_price`, " +
+								"`taste_id`, `taste_id2`, `taste_id3`, `kitchen`, `waiter`, `order_date`, `is_temporary`) VALUES (" +	
+								term.restaurant_id + ", " +
+								orderToInsert.id + ", " + 
+								orderToInsert.foods[i].alias_id + ", " + 
+								orderToInsert.foods[i].getCount() + ", " + 
+								orderToInsert.foods[i].getPrice() + ", '" + 
+								orderToInsert.foods[i].name + "', " +
+								orderToInsert.foods[i].status + ", " +
+								(orderToInsert.foods[i].hangStatus == OrderFood.FOOD_HANG_UP ? OrderFood.FOOD_HANG_UP : OrderFood.FOOD_NORMAL) + ", " +
+								orderToInsert.foods[i].getDiscount() + ", '" +
+								orderToInsert.foods[i].tastePref + "', " + 
+								orderToInsert.foods[i].getTastePrice() + ", " +
+								orderToInsert.foods[i].tastes[0].alias_id + ", " + 
+								orderToInsert.foods[i].tastes[1].alias_id + ", " + 
+								orderToInsert.foods[i].tastes[2].alias_id + ", " + 
+								orderToInsert.foods[i].kitchen + ", '" + 
+								term.owner + "', NOW(), " + 
+								(orderToInsert.foods[i].isTemporary ? "1" : "0") + ")";
+							
+						dbCon.stmt.executeUpdate(sql);
+					}
+					
+					dbCon.conn.commit();
+					
+				}catch(SQLException e){
+					dbCon.conn.rollback();
+					throw e;
+					
+				}catch(Exception e){
+					dbCon.conn.rollback();
+					throw new SQLException(e);
+					
+				}finally{
+					dbCon.conn.setAutoCommit(true);
 				}
-				/**
-				 * Update the table status to busy.
-				 */
-				sql = "UPDATE " + Params.dbName + ".table SET " +
-					  "status=" + Table.TABLE_BUSY + ", " +
-					  "category=" + orderToInsert.category + ", " +
-					  "custom_num=" + orderToInsert.custom_num +
-					  " WHERE restaurant_id=" + term.restaurant_id + 
-					  " AND alias_id=" + orderToInsert.table_id;
-				dbCon.stmt.addBatch(sql);
-				
-				/**
-				 * Update the gift amount.
-				 */
-				sql = "UPDATE " + Params.dbName + ".terminal SET" +
-						  " gift_amount = gift_amount + " + giftAmount +
-						  " WHERE pin=" + "0x" + Long.toHexString(term.pin) +
-						  " AND restaurant_id=" + term.restaurant_id;
-				dbCon.stmt.addBatch(sql);
-				
-				/**
-				 * Insert the detail records to 'order_food' table
-				 */
-				for(int i = 0; i < orderToInsert.foods.length; i++){
-						
-					//insert the record to table "order_food"
-					sql = "INSERT INTO `" + Params.dbName + "`.`order_food` (" +
-							"`restaurant_id`, `order_id`, `food_id`, `order_count`, `unit_price`, `name`, " +
-							"`food_status`, `hang_status`, `discount`, `taste`, `taste_price`, " +
-							"`taste_id`, `taste_id2`, `taste_id3`, `kitchen`, `waiter`, `order_date`, `is_temporary`) VALUES (" +	
-							term.restaurant_id + ", " +
-							orderToInsert.id + ", " + 
-							orderToInsert.foods[i].alias_id + ", " + 
-							orderToInsert.foods[i].getCount() + ", " + 
-							orderToInsert.foods[i].getPrice() + ", '" + 
-							orderToInsert.foods[i].name + "', " +
-							orderToInsert.foods[i].status + ", " +
-							(orderToInsert.foods[i].hangStatus == OrderFood.FOOD_HANG_UP ? OrderFood.FOOD_HANG_UP : OrderFood.FOOD_NORMAL) + ", " +
-							orderToInsert.foods[i].getDiscount() + ", '" +
-							orderToInsert.foods[i].tastePref + "', " + 
-							orderToInsert.foods[i].getTastePrice() + ", " +
-							orderToInsert.foods[i].tastes[0].alias_id + ", " + 
-							orderToInsert.foods[i].tastes[1].alias_id + ", " + 
-							orderToInsert.foods[i].tastes[2].alias_id + ", " + 
-							orderToInsert.foods[i].kitchen + ", '" + 
-							term.owner + "', NOW(), " + 
-							(orderToInsert.foods[i].isTemporary ? "1" : "0") + ")";
-						
-					dbCon.stmt.addBatch(sql);
-				}		
-								
-				dbCon.stmt.executeBatch();
 				
 				return orderToInsert;
 				

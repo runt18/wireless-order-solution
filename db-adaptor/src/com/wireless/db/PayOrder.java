@@ -115,103 +115,126 @@ public class PayOrder {
 			}
 		}
 			
-		dbCon.stmt.clearBatch();
-		String sql = null;
+		String sql;
 		/**
-		 * Calculate the member balance if both pay type and manner is for member .
-		 * The formula is as below.
-		 * balance = balance - actualPrice + actualPrice * exchange_rate
+		 * Put all the INSERT statements into a database transition so as to assure 
+		 * the status to both table and order is consistent. 
 		 */
-		if(orderInfo.pay_type == Order.PAY_MEMBER && orderInfo.pay_manner == Order.MANNER_MEMBER && orderInfo.memberID != null){
-			sql = "UPDATE " + Params.dbName + ".member SET balance=balance - " + totalPrice2 +
-				  " + " + totalPrice2 + " * exchange_rate" + 
-				  " WHERE restaurant_id=" + orderInfo.restaurantID +
-				  " AND alias_id=" + member.alias_id;
+		try{
 			
-			dbCon.stmt.addBatch(sql);
-		}
-					 
-		/**
-		 * Update the values below to "order" table
-		 * - total price
-		 * - actual price
-		 * - gift price
-		 * - waiter
-		 * - discount_type
-		 * - payment manner
-		 * - terminal pin
-		 * - service rate
-		 * - pay order date
-		 * - comment if exist
-		 * - member id if pay type is for member
-		 * - member name if pay type is for member
-		 */
-		sql = "UPDATE `" + Params.dbName + "`.`order` SET " +
-			  "waiter=(SELECT owner_name FROM " + Params.dbName + ".terminal WHERE pin=" + "0x" + Long.toHexString(pin) + " AND model_id=" + model + ")" +
-			  ", terminal_model=" + model +
-			  ", terminal_pin=" + pin +
-			  ", gift_price=" + orderInfo.getGiftPrice() +
-			  ", total_price=" + totalPrice + 
-			  ", total_price_2=" + totalPrice2 +
-			  ", type=" + orderInfo.pay_manner + 
-			  ", discount_type=" + orderInfo.discount_type +
-			  ", service_rate=" + ((float)orderInfo.service_rate / 100) +
-		   	  ", order_date=NOW()" + 
-			  (orderInfo.comment != null ? ", comment='" + orderInfo.comment + "'" : "") +
-			  (member != null ? ", member_id='" + member.alias_id + "', member='" + member.name + "'" : ", member_id=NULL, member=NULL") + 
-			  " WHERE id=" + orderInfo.id;
+			dbCon.conn.setAutoCommit(false);
 			
-		dbCon.stmt.addBatch(sql);
-			
-
-		/**
-		 * Update each food's discount to "order_food" table
-		 */
-		for(int i = 0; i < orderInfo.foods.length; i++){
-			sql = "UPDATE " + Params.dbName + ".order_food SET discount=" + orderInfo.foods[i].getDiscount() +
-				  " WHERE order_id=" + orderInfo.id + 
-				  " AND food_id=" + orderInfo.foods[i].alias_id;
-			dbCon.stmt.addBatch(sql);				
-		}
-			
-		/**
-		 * Delete the table in the case of "并台" or "外卖",
-		 * since the table to these order is temporary. 
-		 * Otherwise update the table status to idle.
-		 */
-		if(orderInfo.category == Order.CATE_JOIN_TABLE || orderInfo.category == Order.CATE_TAKE_OUT){
-			sql = "DELETE FROM " + Params.dbName + ".table WHERE alias_id=" +
-				  orderInfo.table_id + " AND restaurant_id=" + orderInfo.restaurantID;
-			dbCon.stmt.addBatch(sql);
-		}else{
-			if(orderInfo.category == Order.CATE_MERGER_TABLE){
-				sql = "UPDATE " + Params.dbName + ".table SET " +
-				  	  "status=" + Table.TABLE_IDLE + ", " +
-				  	  "custom_num=NULL, " +
-				  	  "category=NULL " +
-				  	  "WHERE alias_id=" + orderInfo.table2_id + " AND restaurant_id=" + orderInfo.restaurantID;
-				dbCon.stmt.addBatch(sql);
+			/**
+			 * Calculate the member balance if both pay type and manner is for member .
+			 * The formula is as below.
+			 * balance = balance - actualPrice + actualPrice * exchange_rate
+			 */
+			if(orderInfo.pay_type == Order.PAY_MEMBER && orderInfo.pay_manner == Order.MANNER_MEMBER && orderInfo.memberID != null){
+				sql = "UPDATE " + Params.dbName + ".member SET balance=balance - " + totalPrice2 +
+					  " + " + totalPrice2 + " * exchange_rate" + 
+					  " WHERE restaurant_id=" + orderInfo.restaurantID +
+					  " AND alias_id=" + member.alias_id;
+				
+				dbCon.stmt.executeUpdate(sql);
 			}
-			sql = "UPDATE " + Params.dbName + ".table SET " +
-				  "status=" + Table.TABLE_IDLE + ", " +
-				  "custom_num=NULL, " +
-				  "category=NULL " +
-				  "WHERE alias_id=" + orderInfo.table_id + " AND restaurant_id=" + orderInfo.restaurantID;
-			dbCon.stmt.addBatch(sql);
-		}
-		dbCon.stmt.executeBatch();
+						 
+			/**
+			 * Update the values below to "order" table
+			 * - total price
+			 * - actual price
+			 * - gift price
+			 * - waiter
+			 * - discount_type
+			 * - payment manner
+			 * - terminal pin
+			 * - service rate
+			 * - pay order date
+			 * - comment if exist
+			 * - member id if pay type is for member
+			 * - member name if pay type is for member
+			 */
+			sql = "UPDATE `" + Params.dbName + "`.`order` SET " +
+				  "waiter=(SELECT owner_name FROM " + Params.dbName + ".terminal WHERE pin=" + "0x" + Long.toHexString(pin) + " AND model_id=" + model + ")" +
+				  ", terminal_model=" + model +
+				  ", terminal_pin=" + pin +
+				  ", gift_price=" + orderInfo.getGiftPrice() +
+				  ", total_price=" + totalPrice + 
+				  ", total_price_2=" + totalPrice2 +
+				  ", type=" + orderInfo.pay_manner + 
+				  ", discount_type=" + orderInfo.discount_type +
+				  ", service_rate=" + ((float)orderInfo.service_rate / 100) +
+			   	  ", order_date=NOW()" + 
+				  (orderInfo.comment != null ? ", comment='" + orderInfo.comment + "'" : "") +
+				  (member != null ? ", member_id='" + member.alias_id + "', member='" + member.name + "'" : ", member_id=NULL, member=NULL") + 
+				  " WHERE id=" + orderInfo.id;
+				
+			dbCon.stmt.executeUpdate(sql);
+				
+			/**
+			 * Delete the table in the case of "并台" or "外卖",
+			 * since the table to these order is temporary. 
+			 * Otherwise update the table status to idle.
+			 */
+			if(orderInfo.category == Order.CATE_JOIN_TABLE || orderInfo.category == Order.CATE_TAKE_OUT){
+				sql = "DELETE FROM " + Params.dbName + ".table WHERE alias_id=" +
+					  orderInfo.table_id + " AND restaurant_id=" + orderInfo.restaurantID;
+				dbCon.stmt.executeUpdate(sql);
+				
+			}else{
+				if(orderInfo.category == Order.CATE_MERGER_TABLE){
+					sql = "UPDATE " + Params.dbName + ".table SET " +
+					  	  "status=" + Table.TABLE_IDLE + ", " +
+					  	  "custom_num=NULL, " +
+					  	  "category=NULL " +
+					  	  "WHERE alias_id=" + orderInfo.table2_id + " AND restaurant_id=" + orderInfo.restaurantID;
+					dbCon.stmt.executeUpdate(sql);
+				}
+				sql = "UPDATE " + Params.dbName + ".table SET " +
+					  "status=" + Table.TABLE_IDLE + ", " +
+					  "custom_num=NULL, " +
+					  "category=NULL " +
+					  "WHERE alias_id=" + orderInfo.table_id + " AND restaurant_id=" + orderInfo.restaurantID;
+				dbCon.stmt.executeUpdate(sql);
+			}
 			
+			/**
+			 * Update each food's discount to "order_food" table
+			 */
+			for(int i = 0; i < orderInfo.foods.length; i++){
+				sql = "UPDATE " + Params.dbName + ".order_food SET discount=" + orderInfo.foods[i].getDiscount() +
+					  " WHERE order_id=" + orderInfo.id + 
+					  " AND food_id=" + orderInfo.foods[i].alias_id;
+				dbCon.stmt.executeUpdate(sql);				
+			}			
+			
+			dbCon.conn.commit();		
+			
+		}catch(SQLException e){
+			dbCon.conn.rollback();
+			throw e;
+			
+		}catch(Exception e){
+			dbCon.conn.rollback();
+			throw new SQLException(e);
+			
+		}finally{
+			dbCon.conn.setAutoCommit(true);
+		}
+			
+		/**
+		 * Below is to calculate the food and material.
+		 */
 		//get the food details to this order
 		OrderFood[] foods = OrderFoodReflector.getDetailToday(dbCon, " AND C.order_id=" + orderInfo.id, "");
 		for(int i = 0; i < foods.length; i++){
 			//get each material consumption to every food
 			sql = "SELECT consumption, material_id FROM " +
-					Params.dbName + ".food_material WHERE " +
-					"food_id=" +
-					"(SELECT id FROM " + 
-					Params.dbName +
-					".food WHERE alias_id=" + foods[i].alias_id +
-					" AND restaurant_id="+ orderInfo.restaurantID + ")"; 
+				  Params.dbName + ".food_material WHERE " +
+				  "food_id=" +
+				  "(SELECT id FROM " + 
+				  Params.dbName +
+				  ".food WHERE alias_id=" + foods[i].alias_id +
+				  " AND restaurant_id="+ orderInfo.restaurantID + ")"; 
 			
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			
@@ -272,7 +295,7 @@ public class PayOrder {
 	 * Get the order detail information and get the discount to each food 
 	 * according to the table id, payment and discount type.
 	 * Note that the database should be connected before invoking this method.
-	 * @param dbCon the database connection
+	 * @param conn the database connection
 	 * @param pin the pin to this terminal
 	 * @param model the model to this terminal
 	 * @param orderToPay the pay order information along with table ID, payment and discount type,
@@ -305,7 +328,7 @@ public class PayOrder {
 	/**
 	 * Get the order detail information and get the discount to each food 
 	 * according to the order id, payment and discount type.
-	 * @param dbCon the database connection
+	 * @param conn the database connection
 	 * @param pin the pin to this terminal
 	 * @param model the model to this terminal
 	 * @param orderToPay the pay order information along with order ID, payment and discount type,
