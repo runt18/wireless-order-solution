@@ -251,7 +251,7 @@ var terminalColumnModel = new Ext.grid.ColumnModel([
 			dataIndex : "pin",
 			width : 100,
 			renderer : function(v, params, record) {
-				return ("0x" + v.toString(16)).toUpperCase();
+				return "0x" + (v.toString(16) + "").toUpperCase();
 			}
 		}, {
 			header : "有效期",
