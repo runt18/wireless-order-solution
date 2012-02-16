@@ -69,7 +69,6 @@ if($editType == "addStaff" || $editType == "editStaff")
 		if($quota < 0)
 		{
 			$sql = "UPDATE terminal SET `owner_name`='$name',gift_quota=-1 WHERE terminal_id=$terminal_id";
-			echo $sql;
 			$db->Execute($sql);
 		}
 		else
@@ -78,7 +77,6 @@ if($editType == "addStaff" || $editType == "editStaff")
 				$quota = -1;
 			}
 			$sql = "UPDATE terminal SET `owner_name`='$name',gift_quota=$quota WHERE terminal_id=$terminal_id";
-			echo $sql;
 			$db->Execute($sql);
 		}
 		
