@@ -38,8 +38,8 @@ public class CancelOrder {
 			/**
 			 * Calculate the gift amount and remove it from the total gift amount if the gift quota exist.
 			 */
+			float giftAmount = 0;
 			if(term.getGiftQuota() >= 0){
-				float giftAmount = 0;
 				sql = "SELECT unit_price, order_count, food_status FROM " + Params.dbName +
 					  ".order_food WHERE order_id=" + orderID;
 				dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -49,12 +49,6 @@ public class CancelOrder {
 					}
 				}
 				dbCon.rs.close();
-				
-				sql = "UPDATE " + Params.dbName + ".terminal SET" +
-				  	  " gift_amount = gift_amount - " + giftAmount +
-				  	  " WHERE pin=" + "0x" + Long.toHexString(term.pin) +
-				  	  " AND restaurant_id=" + term.restaurant_id;
-				dbCon.stmt.executeUpdate(sql);
 			}
 			
 			short category = Order.CATE_NORMAL;
@@ -69,41 +63,72 @@ public class CancelOrder {
 					isDelTable = true;
 				}
 			}
+			
 			/**
-			 * Delete the table if the order category is "并台" or "外卖",
-			 * since the table to these two category is temporary.
-			 * Otherwise update the table status to idle
+			 * Put all the UPDATE, INSERT, DELETE statements into a database transition so as to assure 
+			 * the status to both table and order is consistent. 
 			 */
-			dbCon.stmt.clearBatch();
-			if(isDelTable){
-				sql = "DELETE FROM " + Params.dbName + ".table WHERE alias_id=" +
-					  table.alias_id + 
-					  " AND restaurant_id=" + table.restaurantID;
-				dbCon.stmt.addBatch(sql);
-			}else{
-				if(category == Order.CATE_MERGER_TABLE){
-					sql = "UPDATE " + Params.dbName + ".table SET " +
-					  	  "status=" + Table.TABLE_IDLE + ", " +
-					  	  "custom_num=NULL, " +
-					  	  "category=NULL " +
-					  	  "WHERE alias_id=" + table2ID + " AND restaurant_id=" + table.restaurantID;
-					dbCon.stmt.addBatch(sql);
+			try{
+				dbCon.conn.setAutoCommit(false);
+				
+				/**
+				 * Update the gift amount if the gift quota is set.
+				 */
+				if(term.getGiftQuota() >= 0){
+					sql = "UPDATE " + Params.dbName + ".terminal SET" +
+						  	  " gift_amount = gift_amount - " + giftAmount +
+						  	  " WHERE pin=" + "0x" + Long.toHexString(term.pin) +
+						  	  " AND restaurant_id=" + term.restaurant_id;
+					dbCon.stmt.executeUpdate(sql);
 				}
-				sql = "UPDATE " + Params.dbName + ".table SET " +
-					  "status=" + Table.TABLE_IDLE + ", " +
-					  "custom_num=NULL, " +
-					  "category=NULL " +
-					  "WHERE restaurant_id=" + table.restaurantID + 
-					  " AND alias_id=" + table.alias_id;
-				dbCon.stmt.addBatch(sql);
+				
+				/**
+				 * Delete the table if the order category is "并台" or "外卖",
+				 * since the table to these two category is temporary.
+				 * Otherwise update the table status to idle
+				 */
+				if(isDelTable){
+					sql = "DELETE FROM " + Params.dbName + ".table WHERE alias_id=" +
+						  table.alias_id + 
+						  " AND restaurant_id=" + table.restaurantID;
+					dbCon.stmt.executeUpdate(sql);
+				}else{
+					if(category == Order.CATE_MERGER_TABLE){
+						sql = "UPDATE " + Params.dbName + ".table SET " +
+						  	  "status=" + Table.TABLE_IDLE + ", " +
+						  	  "custom_num=NULL, " +
+						  	  "category=NULL " +
+						  	  "WHERE alias_id=" + table2ID + " AND restaurant_id=" + table.restaurantID;
+						dbCon.stmt.executeUpdate(sql);
+					}
+					sql = "UPDATE " + Params.dbName + ".table SET " +
+						  "status=" + Table.TABLE_IDLE + ", " +
+						  "custom_num=NULL, " +
+						  "category=NULL " +
+						  "WHERE restaurant_id=" + table.restaurantID + 
+						  " AND alias_id=" + table.alias_id;
+					dbCon.stmt.executeUpdate(sql);
+				}
+				//delete the records related to the order id and food id in "order_food" table
+				sql = "DELETE FROM `" + Params.dbName + "`.`order_food` WHERE order_id=" + orderID;
+				dbCon.stmt.executeUpdate(sql);
+				//delete the corresponding order record in "order" table
+				sql = "DELETE FROM `" + Params.dbName + "`.`order` WHERE id=" + orderID;
+				dbCon.stmt.executeUpdate(sql);
+
+				dbCon.conn.commit();
+				
+			}catch(SQLException e){
+				dbCon.conn.rollback();
+				throw e;
+				
+			}catch(Exception e){
+				dbCon.conn.rollback();
+				throw new SQLException(e);
+				
+			}finally{
+				dbCon.conn.setAutoCommit(true);
 			}
-			//delete the records related to the order id and food id in "order_food" table
-			sql = "DELETE FROM `" + Params.dbName + "`.`order_food` WHERE order_id=" + orderID;
-			dbCon.stmt.addBatch(sql);
-			//delete the corresponding order record in "order" table
-			sql = "DELETE FROM `" + Params.dbName + "`.`order` WHERE id=" + orderID;
-			dbCon.stmt.addBatch(sql);
-			dbCon.stmt.executeBatch();
 			
 		}finally{
 			dbCon.disconnect();

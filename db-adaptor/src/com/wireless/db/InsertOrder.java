@@ -202,13 +202,15 @@ public class InsertOrder {
 					dbCon.stmt.executeUpdate(sql);
 					
 					/**
-					 * Update the gift amount.
+					 * Update the gift amount if the gift quota is set.
 					 */
-					sql = "UPDATE " + Params.dbName + ".terminal SET" +
-							  " gift_amount = gift_amount + " + giftAmount +
-							  " WHERE pin=" + "0x" + Long.toHexString(term.pin) +
-							  " AND restaurant_id=" + term.restaurant_id;
-					dbCon.stmt.executeUpdate(sql);
+					if(term.getGiftQuota() >= 0){
+						sql = "UPDATE " + Params.dbName + ".terminal SET" +
+								  " gift_amount = gift_amount + " + giftAmount +
+								  " WHERE pin=" + "0x" + Long.toHexString(term.pin) +
+								  " AND restaurant_id=" + term.restaurant_id;
+						dbCon.stmt.executeUpdate(sql);
+					}
 					
 					/**
 					 * Insert the detail records to 'order_food' table
