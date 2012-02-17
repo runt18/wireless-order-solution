@@ -226,6 +226,150 @@ staffAddWin = new Ext.Window(
 			}
 		});
 
+var changePwdWin = new Ext.Window(
+		{
+			layout : "fit",
+			title : "重置密码",
+			width : 260,
+			height : 170,
+			closeAction : "hide",
+			resizable : false,
+			items : [ {
+				layout : "form",
+				id : "changePwdWin",
+				labelWidth : 70,
+				border : false,
+				frame : true,
+				items : [
+
+						{
+							xtype : "textfield",
+							inputType : "password",
+							fieldLabel : "原密码",
+							id : "origPwdCP",
+							// allowBlank : false,
+							width : 160
+						},
+						{
+							xtype : "textfield",
+							inputType : "password",
+							fieldLabel : "新密码",
+							id : "newPwdCP",
+							// allowBlank : false,
+							width : 160
+						},
+						{
+							xtype : "textfield",
+							inputType : "password",
+							fieldLabel : "确认新密码",
+							id : "confirmNewPwdCP",
+							// allowBlank : false,
+							width : 160
+						},
+						{
+							html : '<div style="margin-top:4px"><font id="errorMsgChangePwd" style="color:red;"> </font></div>'
+						} ]
+			} ],
+			buttons : [
+					{
+						text : "确定",
+						handler : function() {
+							var origPwd = changePwdWin.findById("origPwdCP")
+									.getValue();
+							var newPwd = changePwdWin.findById("newPwdCP")
+									.getValue();
+							var confirmPwd = changePwdWin.findById(
+									"confirmNewPwdCP").getValue();
+
+							var staffID = staffStore.getAt(currRowIndex).get(
+									"staffID");
+							var password = staffStore.getAt(currRowIndex).get(
+									"staffPassword");
+
+							if (password == MD5(origPwd)) {
+								if (newPwd == confirmPwd) {
+									changePwdWin.hide();
+									isPrompt = false;
+
+									Ext.Ajax
+											.request({
+												url : "../../ResetStaffPassword.do",
+												params : {
+													"pin" : pin,
+													"staffID" : staffID,
+													"newPwd" : hex_md5(newPwd)
+												},
+												success : function(response,
+														options) {
+													var resultJSON = Ext.util.JSON
+															.decode(response.responseText);
+													if (resultJSON.success == true) {
+														loadAllStaff();
+														staffStore
+																.reload({
+																	params : {
+																		start : 0,
+																		limit : pageRecordCount
+																	}
+																});
+
+														var dataInfo = resultJSON.data;
+														Ext.MessageBox
+																.show({
+																	msg : dataInfo,
+																	width : 300,
+																	buttons : Ext.MessageBox.OK
+																});
+													} else {
+														var dataInfo = resultJSON.data;
+														Ext.MessageBox
+																.show({
+																	msg : dataInfo,
+																	width : 300,
+																	buttons : Ext.MessageBox.OK
+																});
+													}
+												},
+												failure : function(response,
+														options) {
+												}
+											});
+								} else {
+									document
+											.getElementById("errorMsgChangePwd").innerHTML = "确认密码不一致";
+									// staffAddWin.findById("staffAddPwd")
+									// .setValue("");
+									// staffAddWin.findById(
+									// "staffAddPwdConfirm").setValue(
+									// "");
+								}
+							} else {
+								document.getElementById("errorMsgChangePwd").innerHTML = "密码不正确";
+							}
+						}
+					}, {
+						text : "取消",
+						handler : function() {
+							changePwdWin.hide();
+							isPrompt = false;
+						}
+					} ],
+			listeners : {
+				"show" : function(thiz) {
+
+					changePwdWin.findById("origPwdCP").setValue("");
+					changePwdWin.findById("newPwdCP").setValue("");
+					changePwdWin.findById("confirmNewPwdCP").setValue("");
+
+					document.getElementById("errorMsgChangePwd").innerHTML = " ";
+
+					var f = Ext.get("origPwdCP");
+					f.focus.defer(100, f); // 为什么这样才可以！？！？
+
+				}
+			}
+		});
+
 // --------------------------------------------------------------------------
 var staffAddBut = new Ext.ux.ImageButton({
 	imgPath : "../../images/material_add.png",
@@ -491,9 +635,19 @@ function staffDeleteHandler(rowIndex) {
 	});
 };
 
+function changePwdHandler(rowIndex) {
+	if (!isPrompt) {
+		changePwdWin.show();
+		isPrompt = true;
+	}
+};
+
 function staffOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
 	return "<center><a href=\"javascript:staffDeleteHandler(" + rowIndex
-			+ ")\">" + "<img src='../../images/del.png'/>删除</a>" + "</center>";
+			+ ")\">" + "<img src='../../images/del.png'/>删除</a>"
+			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+			+ "<a href=\"javascript:changePwdHandler(" + rowIndex + ")\">"
+			+ "<img src='../../images/del.png'/>重置密码</a>" + "</center>";
 };
 
 // 1，表格的数据store
@@ -579,43 +733,11 @@ var staffColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(), {
 			return v;
 		}
 	}
-}, noLimitCheckColumn,
-// {
-// header : "计算方式",
-// sortable : true,
-// dataIndex : "tasteCalc",
-// width : 100,
-// editor : calModComb,
-// renderer : function(value, cellmeta, record) {
-// var calDesc = "";
-// for ( var i = 0; i < calAddData.length; i++) {
-// if (calAddData[i][0] == value) {
-// calDesc = calAddData[i][1];
-// }
-// }
-// return calDesc;
-// }
-// }, {
-// header : "类型",
-// sortable : true,
-// dataIndex : "tasteCategory",
-// width : 100,
-// editor : typeModComb,
-// renderer : function(value, cellmeta, record) {
-// var typeDesc = "";
-// for ( var i = 0; i < typeAddData.length; i++) {
-// if (typeAddData[i][0] == value) {
-// typeDesc = typeAddData[i][1];
-// }
-// }
-// return typeDesc;
-// }
-// },
-{
+}, noLimitCheckColumn, {
 	header : "<center>操作</center>",
 	sortable : true,
 	dataIndex : "operator",
-	width : 100,
+	width : 150,
 	renderer : staffOpt
 } ]);
 
@@ -647,8 +769,17 @@ Ext
 							forceFit : true
 						},
 						listeners : {
-							rowclick : function(thiz, rowIndex, e) {
+							"rowclick" : function(thiz, rowIndex, e) {
 								currRowIndex = rowIndex;
+							},
+							"render" : function(thiz) {
+								// alert("here");
+								staffStore.reload({
+									params : {
+										start : 0,
+										limit : pageRecordCount
+									}
+								});
 							}
 						},
 						tbar : [ {
@@ -756,17 +887,6 @@ Ext
 						autoScroll : true,
 						loadMask : {
 							msg : "数据加载中，请稍等..."
-						},
-						listeners : {
-							"render" : function(thiz) {
-								// alert("here");
-								staffStore.reload({
-									params : {
-										start : 0,
-										limit : pageRecordCount
-									}
-								});
-							}
 						}
 					});
 

@@ -292,6 +292,9 @@
 		<action path="/UpdateStaff" type="com.wireless.Actions.staffMgr.UpdateStaffAction"
 			scope="request">
 		</action>
+    <action path="/ResetStaffPassword"
+			type="com.wireless.Actions.staffMgr.ResetPwdStaffAction" scope="request">
+		</action>
 	</action-mappings>
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
 </struts-config>
