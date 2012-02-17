@@ -8,5 +8,11 @@ home_dir="/home/yzhang"
 
 cur_dir=$(pwd);
 cd /home/yzhang/socket
-echo java -Duser.timezone=Asia/Shanghai -jar $home_dir/socket/wireless_order_socket.jar $home_dir/socket/conf.xml | at now
+is_cronolog_on=$(which cronolog | grep -c "cronolog")
+if [ "$is_cronolog_on" -eq 1 ]; then
+	echo "java -Duser.timezone=Asia/Shanghai -jar wireless_order_socket.jar conf.xml 2>&1 | cronolog ${home_dir}/socket/log/errors_%Y-%m-%d.log" | at now
+else
+	echo "java -Duser.timezone=Asia/Shanghai -jar wireless_order_socket.jar conf.xml" | at now
+	echo 'WARNING!!! The socket server does NOT log any error since cronolog NOT be found.'
+fi
 cd "$cur_dir"
