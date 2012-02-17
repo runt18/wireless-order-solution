@@ -704,11 +704,11 @@ Ext
 													.getValue();
 
 											var pwdTrans;
-											if (passwordInput != "") {
-												pwdTrans = MD5(passwordInput);
-											} else {
-												pwdTrans = passwordInput;
-											}
+											// if (passwordInput != "") {
+											pwdTrans = MD5(passwordInput);
+											// } else {
+											// pwdTrans = passwordInput;
+											// }
 											if (password == pwdTrans) {
 
 												// location.href =
