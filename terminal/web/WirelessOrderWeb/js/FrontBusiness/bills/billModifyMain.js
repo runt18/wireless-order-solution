@@ -351,7 +351,9 @@ var orderedForm = new Ext.form.FormPanel(
 						// 以点菜式格式：[菜名，口味，数量，￥单价，操作，￥实价，菜名编号，厨房编号，口味编号1,特,荐,停,送,折扣率,￥口味价钱,口味编号2,口味编号3]
 						text : "提交",
 						handler : function() {
-							if (orderedData.length > 0) {
+							if (orderedData.length > 0
+									&& billGenModForm.findById("serviceRate")
+											.isValid()) {
 
 								var foodPara = "";
 								for ( var i = 0; i < orderedData.length; i++) {
@@ -1576,6 +1578,7 @@ var dishesDisplayTabPanel = new Ext.TabPanel({
 			if (panel.getId() == "dishesChooseByKitchenForm") {
 				dishesDisplayTabPanel.setHeight(135);
 				dishesOrderEastPanel.doLayout();
+				ketchenDeselect(ketchenSelectIndex);
 			} else {
 				dishesDisplayTabPanel.setHeight(65);
 				dishesOrderEastPanel.doLayout();
@@ -1754,7 +1757,14 @@ var billGenModForm = new Ext.form.FormPanel({
 				fieldLabel : "服务费",
 				id : "serviceRate",
 				allowBlank : false,
-				anchor : "%99"
+				anchor : "%99",
+				validator : function(v) {
+					if (v < 0 || v > 100) {
+						return "服务费率范围是0%至100%！";
+					} else {
+						return true;
+					}
+				}
 			} ]
 		}, {
 			// layout : "form",
