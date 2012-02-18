@@ -291,8 +291,7 @@ var changePwdWin = new Ext.Window(
 									changePwdWin.hide();
 									isPrompt = false;
 
-									Ext.Ajax
-											.request({
+									Ext.Ajax.request({
 												url : "../../ResetStaffPassword.do",
 												params : {
 													"pin" : pin,
