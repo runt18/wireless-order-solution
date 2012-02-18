@@ -42,10 +42,10 @@ public class OrderFood extends Food {
 	 * The value of discount ranges from 0.00 through 1.00
 	 * So the real price should be divided 100 at last. 
 	 */
-	byte discount = 100;	//the discount to this food 
+	int discount = 100;	//the discount to this food 
 	
 	public void setDiscount(Float _discount){
-		discount = (byte)Util.float2Int(_discount);
+		discount = Util.float2Int(_discount);
 	}
 	
 	public Float getDiscount(){

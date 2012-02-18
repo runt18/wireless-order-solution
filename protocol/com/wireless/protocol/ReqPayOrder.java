@@ -94,7 +94,7 @@ public class ReqPayOrder extends ReqPackage{
 		body[14] = (byte)(order.pay_manner & 0x000000FF);
 		
 		//assign the service rate
-		body[15] = order.service_rate;
+		body[15] = (byte)order.serviceRate;
 		
 		//assign the length of the member id
 		body[16] = (byte)(memberIDBytes.length & 0x000000FF);

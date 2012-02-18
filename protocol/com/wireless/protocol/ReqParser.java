@@ -322,7 +322,7 @@ public class ReqParser {
 		//get the payment manner
 		int payManner = req.body[14];
 		//get the service rate
-		byte serviceRate = req.body[15];
+		int serviceRate = req.body[15];
 		//get the the length to member id
 		int lenMember = req.body[16];
 		//get the value to member id
@@ -354,7 +354,7 @@ public class ReqParser {
 		orderToPay.pay_type = payType;
 		orderToPay.discount_type = discountType;
 		orderToPay.pay_manner = payManner;
-		orderToPay.service_rate = serviceRate;
+		orderToPay.serviceRate = serviceRate;
 		orderToPay.memberID = memberID;
 		orderToPay.comment = comment;
 		return orderToPay;
