@@ -97,7 +97,7 @@ public class UpdateOrderAction2 extends Action{
 			//get the pay manner to this order
 			orderToUpdate.pay_manner = Integer.parseInt(request.getParameter("payManner"));
 			//get the service rate to this order
-			orderToUpdate.service_rate = Byte.parseByte(request.getParameter("serviceRate"));
+			orderToUpdate.setServiceRate(com.wireless.protocol.Util.int2Float(Integer.parseInt(request.getParameter("serviceRate"))));
 			/**
 			 * Get the member id if the pay type is "会员"
 			 */

@@ -20,6 +20,7 @@ import com.wireless.protocol.ReqPayOrder;
 import com.wireless.protocol.Reserved;
 import com.wireless.protocol.Terminal;
 import com.wireless.protocol.Type;
+import com.wireless.protocol.Util;
 import com.wireless.sccon.ServerConnector;
 
 public class PayOrderAction extends Action implements PinGen{
@@ -112,9 +113,9 @@ public class PayOrderAction extends Action implements PinGen{
 			}
 			
 			if(request.getParameter("serviceRate") != null){
-				orderToPay.service_rate = Byte.parseByte(request.getParameter("serviceRate"));
+				orderToPay.setServiceRate(Util.int2Float(Integer.parseInt(request.getParameter("serviceRate"))));
 			}else{
-				orderToPay.service_rate = 0;
+				orderToPay.setServiceRate(new Float(0));
 			}
 			
 			if(request.getParameter("giftPrice") != null){
