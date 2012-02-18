@@ -73,7 +73,14 @@ public class Util {
 				// set the temporary flat
 				foods[i].isTemporary = true;
 				// extract the alias id to this temporary food
-				foods[i].alias_id = Integer.parseInt(values[1]);
+				int aliasID = Integer.parseInt(values[i]);
+				if(aliasID < 0){
+					//generate food id if the temporary food is new 
+					foods[i].alias_id = com.wireless.protocol.Util.genTempFoodID();
+				}else{			
+					//assign the alias id
+					foods[i].alias_id = aliasID;					
+				}
 				// extract the name to this temporary food
 				foods[i].name = values[2];
 				// extract the amount to this temporary food
