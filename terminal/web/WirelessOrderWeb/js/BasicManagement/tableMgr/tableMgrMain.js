@@ -64,8 +64,8 @@ tableAddWin = new Ext.Window({
 			// allowBlank : false,
 			width : 160,
 			validator : function(v) {
-				if (v < 0 || v > 9.99) {
-					return "服务费率范围是0至9.99！";
+				if (v < 0 || v > 1) {
+					return "服务费率范围是0%至100%！";
 				} else {
 					return true;
 				}
@@ -686,8 +686,8 @@ var tableColumnModel = new Ext.grid.ColumnModel([
 							"tableStatus") == 1) {
 						return "就餐状态餐台不能修改";
 					} else {
-						if (v < 0 || v > 9.99) {
-							return "服务费率范围是0至9.99！";
+						if (v < 0 || v > 1) {
+							return "服务费率范围是0%至100%！";
 						} else {
 							return true;
 						}
