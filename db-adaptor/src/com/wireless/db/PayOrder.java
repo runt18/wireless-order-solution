@@ -162,7 +162,7 @@ public class PayOrder {
 				  ", total_price_2=" + totalPrice2 +
 				  ", type=" + orderInfo.pay_manner + 
 				  ", discount_type=" + orderInfo.discount_type +
-				  ", service_rate=" + ((float)orderInfo.service_rate / 100) +
+				  ", service_rate=" + orderInfo.getServiceRate() +
 			   	  ", order_date=NOW()" + 
 				  (orderInfo.comment != null ? ", comment='" + orderInfo.comment + "'" : "") +
 				  (member != null ? ", member_id='" + member.alias_id + "', member='" + member.name + "'" : ", member_id=NULL, member=NULL") + 
@@ -462,7 +462,7 @@ public class PayOrder {
 		 * Multiplied by service rate
 		 * total = total * (1 + service_rate)
 		 */
-		totalPrice = totalPrice * (1 + ((float)orderToPay.service_rate / 100));		
+		totalPrice = totalPrice * (1 + orderToPay.getServiceRate());		
 		totalPrice = (float)Math.round(totalPrice * 100) / 100;
 		
 		/**
@@ -497,7 +497,7 @@ public class PayOrder {
 		orderInfo.setGiftPrice(orderToPay.getGiftPrice());
 		orderInfo.pay_manner = orderToPay.pay_manner;
 		orderInfo.comment = orderToPay.comment;
-		orderInfo.service_rate = orderToPay.service_rate;
+		orderInfo.setServiceRate(orderToPay.getServiceRate());
 			
 		return orderInfo;
 	}
