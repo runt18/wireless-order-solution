@@ -439,9 +439,9 @@ function checkOutOnLoad() {
 																							.getElementById("actualCount").value = sPay;
 																					document
 																							.getElementById("change").innerHTML = "0.00";
-																					
+
 																					moneyCount("");
-																					
+
 																				} else {
 																					var dataInfo = resultJSON.data;
 																					Ext.MessageBox
@@ -514,51 +514,60 @@ function moneyCount(opt) {
 	var shouldPay_out = "0.00";
 	var change_out = "0.00";
 
-	if (restaurantData[0] != undefined) {
-		// “应收”加上服务费
-		if (parseFloat(totalCount) < parseFloat(minCost)) {
-			shouldPay_out = parseFloat(minCost)
-					* (1 + parseFloat(serviceRate) / 100);
-		} else {
-			shouldPay_out = parseFloat(originalTotalCount)
-					* (1 + parseFloat(serviceRate) / 100);
-		}
+	if (serviceRate < 0 || serviceRate > 100) {
+		Ext.MessageBox.show({
+			msg : "服务费率范围是0%至100%！",
+			width : 300,
+			buttons : Ext.MessageBox.OK
+		});
+	} else {
 
-		// “应收”尾数处理
-		if (restaurantData[0][5] == 1) {
-			if ((shouldPay_out + "").indexOf(".") != -1) {
-				shouldPay_out = (shouldPay_out + "").substr(0,
-						(shouldPay_out + "").indexOf("."))
-						+ ".00";
+		if (restaurantData[0] != undefined) {
+			// “应收”加上服务费
+			if (parseFloat(totalCount) < parseFloat(minCost)) {
+				shouldPay_out = parseFloat(minCost)
+						* (1 + parseFloat(serviceRate) / 100);
 			} else {
-				shouldPay_out = shouldPay_out + ".00";
+				shouldPay_out = parseFloat(originalTotalCount)
+						* (1 + parseFloat(serviceRate) / 100);
 			}
-		} else if (restaurantData[0][5] == 2) {
-			shouldPay_out = parseFloat(shouldPay_out).toFixed(0) + ".00";
-		} else {
-			shouldPay_out = parseFloat(shouldPay_out).toFixed(2);
-		}
 
-		// “合计”加上服务费
-		totalCount_out = (parseFloat(originalTotalCount) * (1 + parseFloat(serviceRate) / 100))
-				.toFixed(2);
+			// “应收”尾数处理
+			if (restaurantData[0][5] == 1) {
+				if ((shouldPay_out + "").indexOf(".") != -1) {
+					shouldPay_out = (shouldPay_out + "").substr(0,
+							(shouldPay_out + "").indexOf("."))
+							+ ".00";
+				} else {
+					shouldPay_out = shouldPay_out + ".00";
+				}
+			} else if (restaurantData[0][5] == 2) {
+				shouldPay_out = parseFloat(shouldPay_out).toFixed(0) + ".00";
+			} else {
+				shouldPay_out = parseFloat(shouldPay_out).toFixed(2);
+			}
 
-		// “找零”计算
-		if (actualPay != "" && actualPay != "0.00") {
+			// “合计”加上服务费
+			totalCount_out = (parseFloat(originalTotalCount) * (1 + parseFloat(serviceRate) / 100))
+					.toFixed(2);
+
+			// “找零”计算
+			if (actualPay != "" && actualPay != "0.00") {
+				if (opt == "button") {
+					change_out = (parseFloat(actualPay) - parseFloat(shouldPay_out))
+							.toFixed(2);
+				} else {
+					change_out = "0.00";
+				}
+			}
+
+			document.getElementById("totalCount").innerHTML = totalCount_out;
+			document.getElementById("shouldPay").innerHTML = shouldPay_out;
+			document.getElementById("change").innerHTML = change_out;
 			if (opt == "button") {
-				change_out = (parseFloat(actualPay) - parseFloat(shouldPay_out))
-						.toFixed(2);
 			} else {
-				change_out = "0.00";
+				document.getElementById("actualCount").value = shouldPay_out;
 			}
-		}
-
-		document.getElementById("totalCount").innerHTML = totalCount_out;
-		document.getElementById("shouldPay").innerHTML = shouldPay_out;
-		document.getElementById("change").innerHTML = change_out;
-		if (opt == "button") {
-		} else {
-			document.getElementById("actualCount").value = shouldPay_out;
 		}
 	}
 };

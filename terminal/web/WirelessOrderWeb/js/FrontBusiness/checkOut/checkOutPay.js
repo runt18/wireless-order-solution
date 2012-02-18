@@ -27,6 +27,17 @@
 		payManner = submitType;
 	}
 
+	if (serviceRate < 0 || serviceRate > 100) {
+		checkOutForm.buttons[0].setDisabled(false);
+		checkOutForm.buttons[1].setDisabled(false);
+		checkOutForm.buttons[2].setDisabled(false);
+		checkOutForm.buttons[3].setDisabled(false);
+		checkOutForm.buttons[4].setDisabled(false);
+		checkOutForm.buttons[5].setDisabled(false);
+		Ext.Msg.alert("", "<b>服务费率范围是0%至100%！</b>");
+		canSubmit = false;
+	}
+
 	// 会员卡结帐，检查余额；现金校验
 	if (submitType == 3 && parseFloat(countPrice) > parseFloat(mBalance)
 			&& payType == 2) {
@@ -122,4 +133,5 @@
 			}
 		});
 	}
+
 };
