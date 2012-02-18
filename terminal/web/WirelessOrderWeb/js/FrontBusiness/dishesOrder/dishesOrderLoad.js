@@ -1,15 +1,22 @@
 ﻿//刪退菜處理函數
 function dishOptTasteHandler(rowIndex) {
 	if (dishOrderCurrRowIndex_ != -1) {
-		if (orderedData[rowIndex][18] == "false") {
-			dishOrderCurrRowIndex_ = rowIndex;
-			dishTasteWindow.show();
-		} else {
+
+		if (orderedData[rowIndex][16] == "1") {
+			Ext.MessageBox.show({
+				msg : "已点菜品不能修改口味",
+				width : 300,
+				buttons : Ext.MessageBox.OK
+			});
+		} else if (orderedData[rowIndex][18] == "true") {
 			Ext.MessageBox.show({
 				msg : "临时菜不支持口味选择",
 				width : 300,
 				buttons : Ext.MessageBox.OK
 			});
+		} else {
+			dishOrderCurrRowIndex_ = rowIndex;
+			dishTasteWindow.show();
 		}
 	}
 };
@@ -163,7 +170,8 @@ function tableStuLoad() {
 	if (Request["minCost"] == "0") {
 		document.getElementById("minCostDivTS").style["display"] = "none";
 		document.getElementById("minCostImgTS").style["display"] = "none";
-		//document.getElementById("minCostPlaceHolder").style["visibility"] = "hidden";
+		// document.getElementById("minCostPlaceHolder").style["visibility"] =
+		// "hidden";
 	}
 	document.getElementById("serviceRateDivTS").innerHTML = (Request["serviceRate"] * 100)
 			+ "%";

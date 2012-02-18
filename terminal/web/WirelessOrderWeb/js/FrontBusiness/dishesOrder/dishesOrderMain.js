@@ -563,6 +563,7 @@ var orderedForm = new Ext.form.FormPanel(
 								// + " category:" + category
 								// + " foods" + foodPara);
 								orderedForm.buttons[0].setDisabled(true);
+								//alert(foodPara);
 								Ext.Ajax
 										.request({
 											url : "../../InsertOrder.do",
@@ -1579,7 +1580,8 @@ softKeyBoardDO = new Ext.Window({
 	}
 });
 
-// ------------------------------------- 菜谱 -----------------------------------
+// ------------------------------------- 普通菜谱
+// -----------------------------------
 // 2，表格的数据store
 var dishesDisplayStore = new Ext.data.Store({
 	proxy : new Ext.data.MemoryProxy(dishesDisplayDataShow),
@@ -1622,9 +1624,10 @@ var dishesDisplayColumnModel = new Ext.grid.ColumnModel([
 var dishesDisplayGrid = new Ext.grid.GridPanel({
 	xtype : "grid",
 	// height : 400,
+	id : "dishesDisplayGrid",
 	anchor : "98%",
 	autoScroll : true,
-	region : "center",
+	// region : "center",
 	ds : dishesDisplayStore,
 	cm : dishesDisplayColumnModel,
 	viewConfig : {
@@ -1664,7 +1667,7 @@ var dishesDisplayGrid = new Ext.grid.GridPanel({
 							dishesDisplayDataShow[rowIndex][7],
 							dishesDisplayDataShow[rowIndex][8], "￥0", 0, 0,
 							"2", dishesDisplayDataShow[rowIndex][9], "false",
-							"" ]);
+							dishCurrName ]);
 				}
 				orderedStore.reload();
 				// 底色处理，已点菜式原色底色
@@ -1688,6 +1691,31 @@ var dishesDisplayGrid = new Ext.grid.GridPanel({
 
 dishesDisplayStore.reload();
 
+// // ------------------------------- 臨時菜點菜 -----------------------------
+// var tempDishGrid = new Ext.grid.PropertyGrid({
+// title : 'Property Grid',
+// source : {
+// "(name)" : "Properties Grid",
+// "grouping" : false,
+// "autoFitColumns" : true,
+// "productionQuality" : false,
+// "created" : new Date(Date.parse('10/15/2006')),
+// "tested" : false,
+// "version" : .01,
+// "borderWidth" : 1
+// }
+// });
+//
+// // ------------------------------- 菜譜card -----------------------------
+// var menuCard = new Ext.Panel({
+// id : 'menuCard',
+// layout : 'card',
+// region : "center",
+// activeItem : 0,
+// items : [ dishesDisplayGrid, tempDishGrid ]
+// });
+
+// -----------------------------------------------------------------------------------
 var dishesChooseBySpellForm = new Ext.form.FormPanel({
 	title : "菜名拼音选菜",
 	id : "dishesChooseBySpellForm",
@@ -1801,6 +1829,12 @@ var dishesChooseByKitchenForm = new Ext.form.FormPanel(
 			}
 		});
 
+var emptyPanel = new Ext.Panel({
+	title : "临时菜点菜",
+	id : "emptyPanel",
+	items : [ {} ]
+});
+
 var dishesDisplayTabPanel = new Ext.TabPanel({
 	activeTab : 0,
 	// height : 65,
@@ -1808,7 +1842,7 @@ var dishesDisplayTabPanel = new Ext.TabPanel({
 	region : "north",
 	border : false,
 	items : [ dishesChooseByNumForm, dishesChooseBySpellForm,
-			dishesChooseByKitchenForm ],
+			dishesChooseByKitchenForm, emptyPanel ],
 	listeners : {
 		// for FF only!!! FF when clicking the tab, the focus of the number
 		// field
@@ -1828,9 +1862,18 @@ var dishesDisplayTabPanel = new Ext.TabPanel({
 			if (panel.getId() == "dishesChooseByKitchenForm") {
 				dishesDisplayTabPanel.setHeight(135);
 				dishesOrderEastPanel.doLayout();
+				Ext.getCmp('menuCard').layout
+						.setActiveItem("dishesDisplayGrid");
+				ketchenDeselect(ketchenSelectIndex);
+			} else if (panel.getId() == "emptyPanel") {
+				Ext.getCmp('menuCard').layout.setActiveItem("tempDishPanel");
+				dishesDisplayTabPanel.setHeight(0);
+				dishesOrderEastPanel.doLayout();
 			} else {
 				dishesDisplayTabPanel.setHeight(65);
 				dishesOrderEastPanel.doLayout();
+				Ext.getCmp('menuCard').layout
+						.setActiveItem("dishesDisplayGrid");
 			}
 
 			// show all the dishes
@@ -1852,17 +1895,17 @@ var dishesDisplayTabPanel = new Ext.TabPanel({
 	}
 });
 
-var dishesOrderEastPanel = new Ext.Panel({
-	region : "east",
-	collapsible : true,
-	width : 432,
-	minSize : 432,
-	maxSize : 432,
-	split : true,
-	id : "dishesOrderEastPanel",
-	layout : "border",
-	items : [ dishesDisplayTabPanel, dishesDisplayGrid ]
-});
+// var dishesOrderEastPanel = new Ext.Panel({
+// region : "east",
+// collapsible : true,
+// width : 432,
+// minSize : 432,
+// maxSize : 432,
+// split : true,
+// id : "dishesOrderEastPanel",
+// layout : "border",
+// items : [ dishesDisplayTabPanel, menuCard ]
+// });
 
 // --------------dishes order north panel-----------------
 var dishesOrderNorthPanel = new Ext.Panel({
@@ -1921,6 +1964,10 @@ var dishesOrderNorthPanel = new Ext.Panel({
 	}
 });
 
+var menuCard;
+var dishesOrderEastPanel;
+var centerPanelDO;
+var tempDishGrid;
 Ext
 		.onReady(function() {
 			// 解决ext中文传入后台变问号问题
@@ -1928,7 +1975,129 @@ Ext
 			Ext.QuickTips.init();
 
 			// *************整体布局*************
-			var centerPanelDO = new Ext.Panel({
+			// ------------------------------- 臨時菜點菜
+			// -----------------------------
+			tempDishGrid = new Ext.grid.PropertyGrid({
+				// title : 'Property Grid',
+				id : "tempDishGrid",
+				region : "center",
+				nameText : 'new query',
+				hideHeaders : true,
+				source : {
+					"临时菜名称" : "",
+					"单价" : 0,
+					"数量" : 1
+				},
+				customEditors : {
+					"临时菜名称" : new Ext.grid.GridEditor(new Ext.form.TextField({
+						selectOnFocus : true,
+						//allowBlank : false
+					})),
+					"单价" : new Ext.grid.GridEditor(new Ext.form.NumberField({
+						selectOnFocus : true,
+						allowBlank : false,
+						allowNegative : false
+					})),
+					"数量" : new Ext.grid.GridEditor(new Ext.form.NumberField({
+						selectOnFocus : true,
+						allowBlank : false,
+						allowNegative : false
+					}))
+				}
+			});
+
+			var tempDishCtl = new Ext.form.FormPanel(
+					{
+						id : "tempDishCtl",
+						region : "south",
+						height : 1,
+						frame : true,
+						items : [ {} ],
+						buttons : [ {
+							text : "添加",
+							handler : function() {
+								var name = tempDishGrid.getSource().临时菜名称;
+								var price = tempDishGrid.getSource().单价;
+								var count = tempDishGrid.getSource().数量;
+
+								if (name == "") {
+									Ext.MessageBox.show({
+										msg : "临时菜名称不能为空！",
+										width : 300,
+										buttons : Ext.MessageBox.OK
+									});
+								} else {
+									orderedData
+											.push([
+													name
+															+ "<img src='../../images/tempDish.png'></img>", // 菜名
+													"无口味", // 口味
+													count,// 数量
+													"￥" + price,// 单价
+													"", // 操作
+													"￥" + price, // 实价
+													-1,// 菜名编号
+													0, // 厨房编号
+													0,// 口味编号1
+													"false",// 特
+													"false",// 荐
+													"false", // 停
+													"false", // 送
+													"￥0",// 口味价钱
+													0, // 口味编号2
+													0,// 口味编号3
+													"2",// 菜品状态
+													"false",// 時
+													"true", // 是否临时菜
+													name // 菜名ORIG
+											]);
+
+									orderedStore.reload();
+									// 底色处理，已点菜式原色底色
+									dishGridRefresh();
+									orderIsChanged = true;
+									dishOrderCurrRowIndex_ = -1;
+
+									tempDishGrid.setSource({
+										"临时菜名称" : "",
+										"单价" : 0,
+										"数量" : 1
+									});
+
+								}
+							}
+						} ]
+					});
+
+			var tempDishPanel = new Ext.Panel({
+				layout : "border",
+				id : "tempDishPanel",
+				items : [ tempDishGrid, tempDishCtl ]
+			});
+
+			// ------------------------------- 菜譜card
+			// -----------------------------
+			menuCard = new Ext.Panel({
+				id : 'menuCard',
+				layout : 'card',
+				region : "center",
+				activeItem : 0,
+				items : [ dishesDisplayGrid, tempDishPanel ]
+			});
+
+			dishesOrderEastPanel = new Ext.Panel({
+				region : "east",
+				collapsible : true,
+				width : 432,
+				minSize : 432,
+				maxSize : 432,
+				split : true,
+				id : "dishesOrderEastPanel",
+				layout : "border",
+				items : [ dishesDisplayTabPanel, menuCard ]
+			});
+
+			centerPanelDO = new Ext.Panel({
 				id : "centerPanelDO",
 				region : "center",
 				border : false,
