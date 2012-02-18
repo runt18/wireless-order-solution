@@ -63,8 +63,7 @@ public class Util {
 		OrderFood[] foods = new OrderFood[foodItems.length];
 		for (int i = 0; i < foodItems.length; i++) {
 			// remove the "[]"
-			String foodItem = foodItems[i].substring(1,
-					foodItems[i].length() - 1);
+			String foodItem = foodItems[i].substring(1,	foodItems[i].length() - 1);
 			foods[i] = new OrderFood();
 			// extract each food detail information string
 			String[] values = foodItem.split(",");
@@ -81,7 +80,7 @@ public class Util {
 					do{
 						tmpFoodID = com.wireless.protocol.Util.genTempFoodID();
 						isUnique = true;
-						for(int j = 0; j < foods.length; j++){
+						for(int j = 0; j < i; j++){
 							if(foods[j].isTemporary){
 								if(tmpFoodID == foods[j].alias_id){
 									isUnique = false;
