@@ -75,8 +75,24 @@ public class Util {
 				// extract the alias id to this temporary food
 				int aliasID = Integer.parseInt(values[1]);
 				if(aliasID < 0){
-					//generate food id if the temporary food is new 
-					foods[i].alias_id = com.wireless.protocol.Util.genTempFoodID();
+					//generate an unique food id to temporary food if it is new 
+					int tmpFoodID;
+					boolean isUnique;
+					do{
+						tmpFoodID = com.wireless.protocol.Util.genTempFoodID();
+						isUnique = true;
+						for(int j = 0; j < foods.length; j++){
+							if(foods[j].isTemporary){
+								if(tmpFoodID == foods[j].alias_id){
+									isUnique = false;
+									break;
+								}
+							}
+						}						
+					}while(!isUnique);
+					
+					foods[i].alias_id = tmpFoodID;
+					
 				}else{			
 					//assign the alias id
 					foods[i].alias_id = aliasID;					
