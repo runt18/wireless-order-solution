@@ -96,7 +96,7 @@ public class InsertOrder {
 							orderToInsert.foods[i].status = dbCon.rs.getShort("status");
 							orderToInsert.foods[i].setPrice(dbCon.rs.getFloat("unit_price"));
 						}else{
-							throw new BusinessException("The food(alias_id=" + orderToInsert.foods[i].alias_id + ") to query doesn't exit.", ErrorCode.MENU_EXPIRED);
+							throw new BusinessException("The food(alias_id=" + orderToInsert.foods[i].alias_id + ", restaurant_id=" + table.restaurantID+ ") to query doesn't exit.", ErrorCode.MENU_EXPIRED);
 						}
 						dbCon.rs.close();
 						

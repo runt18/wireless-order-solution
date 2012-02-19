@@ -3,8 +3,7 @@ package com.wireless.db;
 import java.sql.SQLException;
 
 import com.wireless.exception.BusinessException;
-import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.Terminal;
+import com.wireless.protocol.Table;
 
 public class CancelTable {
 	
@@ -53,19 +52,12 @@ public class CancelTable {
 	 * @throws SQLException
 	 * 			Throws if fail to execute any SQL statement.
 	 */
-	public static void exec(DBCon dbCon, long pin, short model, short tableID) throws BusinessException, SQLException{
-		Terminal term = VerifyPin.exec(pin, model);
-		String sql = "SELECT id FROM " + Params.dbName + 
-		  			 ".table WHERE alias_id=" + tableID +
-		  			 " AND restaurant_id=" + term.restaurant_id;
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(!dbCon.rs.next()){
-			throw new BusinessException("Table(alias_id=" + tableID + ") is NOT exist.", ErrorCode.TABLE_NOT_EXIST);
-		}	
-		dbCon.rs.close();
+	public static void exec(DBCon dbCon, long pin, short model, int tableID) throws BusinessException, SQLException{
 		
-		sql = "DELETE FROM " + Params.dbName + ".table WHERE restaurant_id=" + 
-			  term.restaurant_id + " AND alias_id=" + tableID;
+		Table table = QueryTable.exec(dbCon, pin, model, tableID);
+		
+		String sql = "DELETE FROM " + Params.dbName + ".table WHERE restaurant_id=" + 
+					 table.restaurantID + " AND alias_id=" + table.alias_id;
 		dbCon.stmt.execute(sql);
 	}
 }

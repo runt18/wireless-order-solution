@@ -64,13 +64,13 @@ public class VerifyPin {
 				* Note that NULL means the terminal never expire
 				*/
 				if(terminal.expireDate != null && System.currentTimeMillis() > terminal.expireDate.getTime()){
-					throw new BusinessException("The terminal is expired.",	ErrorCode.TERMINAL_EXPIRED);
+					throw new BusinessException("The terminal(pin=0x" + Long.toHexString(pin) + ", model=" + model + ") is expired.",	ErrorCode.TERMINAL_EXPIRED);
 				}
 			}
 			return terminal;
 			
 		}else{
-			throw new BusinessException("The terminal is NOT attached with any restaurant.",
+			throw new BusinessException("The terminal(pin=0x" + Long.toHexString(pin) + ", model=" + model + ") is NOT attached with any restaurant.",
 			    	ErrorCode.TERMINAL_NOT_ATTACHED);
 		}
 

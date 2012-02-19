@@ -72,7 +72,7 @@ public class InsertTable {
 				  " AND restaurant_id=" + term.restaurant_id;
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			if(dbCon.rs.next()){
-				throw new BusinessException("Table(alias_id=" + table.alias_id + ") is exist.", ErrorCode.TABLE_EXIST);
+				throw new BusinessException("Table(alias_id=" + table.alias_id + ", restaurant_id=" + term.restaurant_id + ") is exist.", ErrorCode.TABLE_EXIST);
 			}	
 			dbCon.rs.close();
 			

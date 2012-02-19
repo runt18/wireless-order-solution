@@ -204,7 +204,7 @@ public class QueryRegion {
 			return new Region(dbCon.rs.getShort("region_id"),
 							  dbCon.rs.getString("name"));
 		}else{
-			throw new BusinessException("The table(id=" + tableID + ") to restaurant(id=" + restaurantID + ") does NOT belong to any region.");
+			throw new BusinessException("The table(id=" + tableID + ", restaurant_id=" + restaurantID + ") does NOT belong to any region.");
 		}
 	}
 }

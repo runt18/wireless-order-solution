@@ -77,7 +77,7 @@ public class UpdateOrder {
 				
 				Table table = QueryTable.exec(dbCon, pin, model, orderToUpdate.table_id);
 				if(table.status == Table.TABLE_IDLE){
-					throw new BusinessException("The table(alias_id=" + orderToUpdate.table_id + ") to change order is IDLE."
+					throw new BusinessException("The table(alias_id=" + orderToUpdate.table_id + ", restaurant_id=" + term.restaurant_id + ") to change order is IDLE."
 												,ErrorCode.TABLE_IDLE);
 				}
 				orderToUpdate.table_name = table.name;
@@ -95,11 +95,11 @@ public class UpdateOrder {
 				newTbl = QueryTable.exec(dbCon, pin, model, orderToUpdate.table_id);
 				
 				if(newTbl.status == Table.TABLE_BUSY){
-					throw new BusinessException("The table(alias_id=" + orderToUpdate.table_id + ") to be transferred is BUSY.",
+					throw new BusinessException("The table(alias_id=" + orderToUpdate.table_id + ", restaurant_id=" + newTbl.restaurantID + ") to be transferred is BUSY.",
 												ErrorCode.TABLE_BUSY);
 					
 				}else if(oriTbl.status == Table.TABLE_IDLE){
-					throw new BusinessException("The original table(alias_id=" + orderToUpdate.originalTableID + ") to be transferred is IDLE.",
+					throw new BusinessException("The original table(alias_id=" + orderToUpdate.originalTableID + ", restaurant_id=" + oriTbl.restaurantID + ") to be transferred is IDLE.",
 												ErrorCode.TABLE_IDLE);
 				}
 				orderToUpdate.table_name = newTbl.name;
@@ -624,7 +624,7 @@ public class UpdateOrder {
 
 				food.kitchen = dbCon.rs.getShort("kitchen");
 			}else{
-				throw new BusinessException("The food(alias_id=" + foodBasic.alias_id + ") to query does NOT exist.", ErrorCode.MENU_EXPIRED);
+				throw new BusinessException("The food(alias_id=" + foodBasic.alias_id + ", restaurant_id=" + term.restaurant_id + ") to query does NOT exist.", ErrorCode.MENU_EXPIRED);
 			}
 			dbCon.rs.close();
 			
@@ -643,7 +643,7 @@ public class UpdateOrder {
 						food.tastes[j].setRate(dbCon.rs.getFloat("rate"));
 						food.tastes[j].setPrice(dbCon.rs.getFloat("price"));
 					}else{
-						throw new BusinessException("The taste(alias_id=" + foodBasic.tastes[j].alias_id + ") to query does NOT exist.", ErrorCode.MENU_EXPIRED);
+						throw new BusinessException("The taste(alias_id=" + foodBasic.tastes[j].alias_id + ", restaurant_id=" + term.restaurant_id +") to query does NOT exist.", ErrorCode.MENU_EXPIRED);
 					}
 					dbCon.rs.close();
 					

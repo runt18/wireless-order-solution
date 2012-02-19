@@ -232,7 +232,7 @@ public class QueryTable {
 			table.regionID = dbCon.rs.getShort("region_id");
 			table.setServiceRate(dbCon.rs.getFloat("service_rate"));
 		}else{
-			throw new BusinessException("The table(alias_id=" + tableID + ") to query does NOT exist.", ErrorCode.TABLE_NOT_EXIST);
+			throw new BusinessException("The table(alias_id=" + tableID + ", restaurant_id=" + term.restaurant_id + ") to query does NOT exist.", ErrorCode.TABLE_NOT_EXIST);
 		}
 		dbCon.rs.close();
 

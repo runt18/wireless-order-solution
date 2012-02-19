@@ -17,17 +17,21 @@ public class Util {
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
 	public static int getUnPaidOrderID(DBCon dbCon, Table table) throws BusinessException, SQLException{
-		//query the order id associated with the this table
-		String sql = "SELECT id FROM `" + Params.dbName + 
-					"`.`order` WHERE (table_id = " + table.alias_id +
-					" OR table2_id = " + table.alias_id + ")" +
-					" AND restaurant_id = " + table.restaurantID +
-					" AND total_price IS NULL";
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			return dbCon.rs.getInt("id");
+		if(table.status == Table.TABLE_IDLE){
+			throw new BusinessException("The table(alias_id=" + table.alias_id + ", restaurant_id=" + table.restaurantID + ") to query is idle.", ErrorCode.TABLE_IDLE);			
 		}else{
-			throw new BusinessException("The table(alias_id=" + table.alias_id + ") to query is idle.", ErrorCode.TABLE_IDLE);
+			//query the order id associated with the this table
+			String sql = "SELECT id FROM `" + Params.dbName + 
+						"`.`order` WHERE (table_id = " + table.alias_id +
+						" OR table2_id = " + table.alias_id + ")" +
+						" AND restaurant_id = " + table.restaurantID +
+						" AND total_price IS NULL";
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
+				return dbCon.rs.getInt("id");
+			}else{
+				throw new BusinessException("The un-paid order id to table(alias_id=" + table.alias_id + ", restaurant_id=" + table.restaurantID + ") does NOT exist.", ErrorCode.TABLE_IDLE);
+			}			
 		}
 	}
 }
