@@ -12,7 +12,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.VerifyPin;
+import com.wireless.db.QueryTable;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.PinGen;
@@ -78,12 +78,9 @@ public class PrintOrderAction extends Action implements PinGen{
 				
 			}else{				
 				if(request.getParameter("tableID") != null){
-					Table table = new Table();
 					tableID = Integer.parseInt(request.getParameter("tableID"));
-					table.alias_id = tableID;
 					dbCon.connect();
-					Terminal term = VerifyPin.exec(dbCon, _pin, Terminal.MODEL_STAFF);
-					table.restaurantID = term.restaurant_id;
+					Table table = QueryTable.exec(dbCon, _pin, Terminal.MODEL_STAFF, tableID);
 					orderID = com.wireless.db.Util.getUnPaidOrderID(dbCon, table);
 				}
 			}
