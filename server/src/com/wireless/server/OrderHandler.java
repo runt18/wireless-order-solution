@@ -108,8 +108,8 @@ class OrderHandler extends Handler implements Runnable{
 				try{
 					response = new RespQueryOrder(request.header, QueryOrder.exec(_term.pin, _term.modelID, tableToQuery));
 				}catch(BusinessException e){
-					if(e.errCode == ErrorCode.TABLE_IDLE){
-						response = new RespNAK(request.header, ErrorCode.TABLE_IDLE);
+					if(e.errCode == ErrorCode.TABLE_IDLE || e.errCode == ErrorCode.TABLE_NOT_EXIST){
+						response = new RespNAK(request.header, e.errCode);
 					}else{
 						throw e;
 					}
@@ -118,15 +118,23 @@ class OrderHandler extends Handler implements Runnable{
 				//handle query order 2 request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_ORDER_2){
 				int tableToQuery = ReqParser.parseQueryOrder(request);
-				Table table = QueryTable.exec(_term.pin, _term.modelID, tableToQuery);
-				if(table.status == Table.TABLE_BUSY){
-					response = new RespACK(request.header);
-					
-				}else if(table.status == Table.TABLE_IDLE){
-					response = new RespNAK(request.header, ErrorCode.TABLE_IDLE);
-					
-				}else{
-					response = new RespNAK(request.header, ErrorCode.UNKNOWN);
+				try{
+					Table table = QueryTable.exec(_term.pin, _term.modelID, tableToQuery);
+					if(table.status == Table.TABLE_BUSY){
+						response = new RespACK(request.header);
+						
+					}else if(table.status == Table.TABLE_IDLE){
+						response = new RespNAK(request.header, ErrorCode.TABLE_IDLE);
+						
+					}else{
+						response = new RespNAK(request.header, ErrorCode.UNKNOWN);
+					}
+				}catch(BusinessException e){
+					if(e.errCode == ErrorCode.TABLE_NOT_EXIST){
+						response = new RespNAK(request.header, e.errCode);
+					}else{
+						throw e;
+					}
 				}
 				
 				//handle insert order request
