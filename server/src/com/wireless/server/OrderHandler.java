@@ -77,14 +77,14 @@ class OrderHandler extends Handler implements Runnable{
 			}
 
 		    short model = Terminal.MODEL_BB;
-		    int pin = 0;			
+		    long pin = 0;			
 		    /**
 		     * Extract the pin and model from the header of request package
 		     */
-			pin = (request.header.pin[0] & 0x000000FF) |
-			   	   ((request.header.pin[1] & 0x000000FF) << 8) |
-			       ((request.header.pin[2] & 0x000000FF) << 16) |
-			       ((request.header.pin[3] & 0x000000FF) << 24); 
+			pin = (((long)request.header.pin[0] & 0x00000000000000FF) |
+			   	   (((long)request.header.pin[1] & 0x00000000000000FF) << 8) |
+			       (((long)request.header.pin[2] & 0x00000000000000FF) << 16) |
+			       (((long)request.header.pin[3] & 0x00000000000000FF) << 24));
 			
 			model = (short)((request.header.pin[4] & 0x000000FF) | 
 							((request.header.pin[5] & 0x000000FF) << 8)); 
