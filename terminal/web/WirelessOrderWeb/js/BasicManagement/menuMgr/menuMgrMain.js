@@ -474,7 +474,14 @@ menuAddWin = new Ext.Window(
 					fieldLabel : "价格",
 					id : "menuAddPrice",
 					allowBlank : false,
-					width : 180
+					width : 180,
+					validator : function(v) {
+						if (v >= 0 && v <= 99999.99) {
+							return true;
+						} else {
+							return "价格范围是0.00至99999.99！";
+						}
+					}
 				}, kitchenTypeCombMA, {
 					layout : "column",
 					border : false,

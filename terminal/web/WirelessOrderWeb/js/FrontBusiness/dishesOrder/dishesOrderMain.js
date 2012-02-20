@@ -563,7 +563,7 @@ var orderedForm = new Ext.form.FormPanel(
 								// + " category:" + category
 								// + " foods" + foodPara);
 								orderedForm.buttons[0].setDisabled(true);
-								//alert(foodPara);
+								// alert(foodPara);
 								Ext.Ajax
 										.request({
 											url : "../../InsertOrder.do",
@@ -1991,17 +1991,31 @@ Ext
 				customEditors : {
 					"临时菜名称" : new Ext.grid.GridEditor(new Ext.form.TextField({
 						selectOnFocus : true,
-						//allowBlank : false
+					// allowBlank : false
 					})),
 					"单价" : new Ext.grid.GridEditor(new Ext.form.NumberField({
 						selectOnFocus : true,
 						allowBlank : false,
-						allowNegative : false
+						allowNegative : false,
+						validator : function(v) {
+							if (v >= 0 && v <= 99999.99) {
+								return true;
+							} else {
+								return "价格范围是0.00至99999.99！";
+							}
+						}
 					})),
 					"数量" : new Ext.grid.GridEditor(new Ext.form.NumberField({
 						selectOnFocus : true,
 						allowBlank : false,
-						allowNegative : false
+						allowNegative : false,
+						validator : function(v) {
+							if (v >= 0.01 && v <= 99.99) {
+								return true;
+							} else {
+								return "数量范围是0.01至99.99！";
+							}
+						}
 					}))
 				}
 			});
