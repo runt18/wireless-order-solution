@@ -15,6 +15,8 @@ Release v1.1.3 <16/02/2012>
 3 - staff表字段“alias_id”改为“staff_alias”
 4 - terminal表字段“id”改为“terminal_id”
 5 - 删除staff表字段“terminal_id”和terminal表字段“terminal_id”的外键关联
+6 - order表字段“terminal_pin”的数据类型改为unsigned int
+7 - order_history表字段“terminal_pin”的数据类型改为unsigned int
 ******************************************************************************************************/
 
 /******************************************************************************************************
