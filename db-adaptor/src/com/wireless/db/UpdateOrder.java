@@ -75,13 +75,13 @@ public class UpdateOrder {
 			 */
 			if(orderToUpdate.table_id == orderToUpdate.originalTableID){
 				
-				Table table = QueryTable.exec(dbCon, pin, model, orderToUpdate.table_id);
-				if(table.status == Table.TABLE_IDLE){
+				oriTbl = QueryTable.exec(dbCon, pin, model, orderToUpdate.table_id);
+				if(oriTbl.status == Table.TABLE_IDLE){
 					throw new BusinessException("The table(alias_id=" + orderToUpdate.table_id + ", restaurant_id=" + term.restaurant_id + ") to change order is IDLE."
 												,ErrorCode.TABLE_IDLE);
 				}
-				orderToUpdate.table_name = table.name;
-				orderToUpdate.id = Util.getUnPaidOrderID(dbCon, table);
+				orderToUpdate.table_name = oriTbl.name;
+				orderToUpdate.id = Util.getUnPaidOrderID(dbCon, oriTbl);
 				
 			/**
 			 * In the case that the table is different from before,
@@ -301,166 +301,243 @@ public class UpdateOrder {
 			}
 		}
 		
-		dbCon.stmt.clearBatch();
-		
-		float giftAmount = 0;
-		
-		//insert the extra order food records
-		for(int i = 0; i < extraFoods.size(); i++){
-
-			//add the gift amount if extra foods
-			if(extraFoods.get(i).isGift()){
-				giftAmount += extraFoods.get(i).getPrice2() * extraFoods.get(i).getCount();
-			}
-			
-			sql = "INSERT INTO `" + Params.dbName + "`.`order_food` " +
-					"(`restaurant_id`, `order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, `hang_status`, " +
-					"`discount`, `taste_id`, `taste_id2`, `taste_id3`, `taste_price`, " +
-					"`taste`, `kitchen`, `waiter`, `order_date`, `is_temporary`) VALUES (" +
-					term.restaurant_id + ", " +
-					orderToUpdate.id + ", " + extraFoods.get(i).alias_id + ", " + 
-					extraFoods.get(i).getCount() + ", " + 
-					extraFoods.get(i).getPrice() + ", '" + 
-					extraFoods.get(i).name + "', " + 
-					extraFoods.get(i).status + ", " +
-					(extraFoods.get(i).hangStatus == OrderFood.FOOD_HANG_UP ? OrderFood.FOOD_HANG_UP : OrderFood.FOOD_NORMAL) + ", " +
-					extraFoods.get(i).getDiscount() + ", " +
-					extraFoods.get(i).tastes[0].alias_id + "," +
-					extraFoods.get(i).tastes[1].alias_id + "," +
-					extraFoods.get(i).tastes[2].alias_id + "," +
-					extraFoods.get(i).getTastePrice() + ", '" +
-					extraFoods.get(i).tastePref + "', " + 
-					extraFoods.get(i).kitchen + ", '" + 
-					term.owner + "', " +
-					"NOW(), " + 
-					(extraFoods.get(i).isTemporary ? 1 : 0) + 
-					")";
-			dbCon.stmt.addBatch(sql);			
-		}
-		
-		//insert the canceled order food records 
-		for(int i = 0; i < canceledFoods.size(); i++){
-
-			//minus the gift amount if canceled foods
-			if(canceledFoods.get(i).isGift()){
-				giftAmount -= canceledFoods.get(i).getPrice2() * canceledFoods.get(i).getCount();
-			}
-			
-			sql = "INSERT INTO `" + Params.dbName + "`.`order_food` " +
-					"(`restaurant_id`, `order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, `hang_status`, " +
-					"`discount`, `taste_id`, `taste_id2`, `taste_id3`, `taste_price`, `taste`, `kitchen`, " +
-					"`waiter`, `order_date`, `is_temporary`) VALUES (" +
-					term.restaurant_id + ", " +
-					orderToUpdate.id + ", " + canceledFoods.get(i).alias_id + ", " + 
-					"-" + canceledFoods.get(i).getCount() + ", " + 
-					canceledFoods.get(i).getPrice() + ", '" + 
-					canceledFoods.get(i).name + "', " + 
-					canceledFoods.get(i).status + ", " +
-					(canceledFoods.get(i).hangStatus == OrderFood.FOOD_HANG_UP ? OrderFood.FOOD_HANG_UP : OrderFood.FOOD_NORMAL) + ", " +
-					canceledFoods.get(i).getDiscount() + ", " +
-					canceledFoods.get(i).tastes[0].alias_id + "," +
-					canceledFoods.get(i).tastes[1].alias_id + "," +
-					canceledFoods.get(i).tastes[2].alias_id + "," +
-					canceledFoods.get(i).getTastePrice() + ", '" +
-					canceledFoods.get(i).tastePref + "', " + 
-					canceledFoods.get(i).kitchen + ", '" + 
-					term.owner + "', " +
-					"NOW(), " + 
-					(canceledFoods.get(i).isTemporary ? 1 : 0) + 
-					")";
-			dbCon.stmt.addBatch(sql);			
-		}
-		
-		/**
-		 * Update the gift amount if not reach the quota.
-		 * Otherwise throw a business exception.
-		 */
-		if(term.getGiftQuota() >= 0 && !isGiftSkip){
-			if((giftAmount + term.getGiftAmount()) > term.getGiftQuota()){
-				throw new BusinessException("The gift amount exceeds the quota.", ErrorCode.EXCEED_GIFT_QUOTA);
-				
-			}else{
-				sql = "UPDATE " + Params.dbName + ".terminal SET" +
-				  " gift_amount = gift_amount + " + giftAmount +
-				  " WHERE pin=" + "0x" + Long.toHexString(term.pin) +
-				  " AND restaurant_id=" + term.restaurant_id;
-				dbCon.stmt.executeUpdate(sql);
-			}
-		}
-
 		/**
 		 * Get the region to this table
 		 */
 		orderToUpdate.region = QueryRegion.exec(dbCon, term.restaurant_id, orderToUpdate.table_id);
 		
-		/**
-		 * Update the related info to this order
-		 */
-		sql = "UPDATE `" + Params.dbName + "`.`order` SET custom_num=" + orderToUpdate.custom_num +
-				", terminal_pin=" + term.pin + 
-				", waiter='" + term.owner + "'" +
-				", region_id=" + orderToUpdate.region.regionID +
-				", region_name='" + orderToUpdate.region.name + "'" + 
-				", table_id=" + orderToUpdate.table_id + 
-				", table_name='" + orderToUpdate.table_name + "'" +
-				" WHERE id=" + orderToUpdate.id;
-		dbCon.stmt.addBatch(sql);
+		try{
+			
+			float giftAmount = 0;
+			
+			dbCon.conn.setAutoCommit(false);
+			
+			//insert the extra order food records
+			for(int i = 0; i < extraFoods.size(); i++){
 
-		/**
-		 * Update the custom_num to the table
-		 */
-		if(orderToUpdate.category == Order.CATE_MERGER_TABLE){
-			sql = "UPDATE " + Params.dbName + ".table SET custom_num=" + orderToUpdate.custom_num +
-			  	  " WHERE restaurant_id=" + term.restaurant_id + 
-			  	  " AND alias_id=" + orderToUpdate.table2_id;
-			dbCon.stmt.addBatch(sql);
-		}
-		sql = "UPDATE " + Params.dbName + ".table SET custom_num=" + orderToUpdate.custom_num +
-			  " WHERE restaurant_id=" + term.restaurant_id + 
-			  " AND alias_id=" + orderToUpdate.table_id;
-		dbCon.stmt.addBatch(sql);
-		
-		dbCon.stmt.executeBatch();
-		
-		Result result = new Result();			
-		/**
-		 * Find the extra and canceled foods and put them to result.
-		 */
-		if(!extraFoods.isEmpty() || !canceledFoods.isEmpty()){			
+				//add the gift amount if extra foods
+				if(extraFoods.get(i).isGift()){
+					giftAmount += extraFoods.get(i).getPrice2() * extraFoods.get(i).getCount();
+				}
+				
+				sql = "INSERT INTO `" + Params.dbName + "`.`order_food` " +
+						"(`restaurant_id`, `order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, `hang_status`, " +
+						"`discount`, `taste_id`, `taste_id2`, `taste_id3`, `taste_price`, " +
+						"`taste`, `kitchen`, `waiter`, `order_date`, `is_temporary`) VALUES (" +
+						term.restaurant_id + ", " +
+						orderToUpdate.id + ", " + 
+						extraFoods.get(i).alias_id + ", " + 
+						extraFoods.get(i).getCount() + ", " + 
+						extraFoods.get(i).getPrice() + ", '" + 
+						extraFoods.get(i).name + "', " + 
+						extraFoods.get(i).status + ", " +
+						(extraFoods.get(i).hangStatus == OrderFood.FOOD_HANG_UP ? OrderFood.FOOD_HANG_UP : OrderFood.FOOD_NORMAL) + ", " +
+						extraFoods.get(i).getDiscount() + ", " +
+						extraFoods.get(i).tastes[0].alias_id + "," +
+						extraFoods.get(i).tastes[1].alias_id + "," +
+						extraFoods.get(i).tastes[2].alias_id + "," +
+						extraFoods.get(i).getTastePrice() + ", '" +
+						extraFoods.get(i).tastePref + "', " + 
+						extraFoods.get(i).kitchen + ", '" + 
+						term.owner + "', " +
+						"NOW(), " + 
+						(extraFoods.get(i).isTemporary ? 1 : 0) + 
+						")";
+				dbCon.stmt.executeUpdate(sql);			
+			}
 			
-			ArrayList<OrderFood> tmpFoods = new ArrayList<OrderFood>();
-			
-			Iterator<OrderFood> iterExtra;
-			Iterator<OrderFood> iterCancel;
+			//insert the canceled order food records 
+			for(int i = 0; i < canceledFoods.size(); i++){
+
+				//minus the gift amount if canceled foods
+				if(canceledFoods.get(i).isGift()){
+					giftAmount -= canceledFoods.get(i).getPrice2() * canceledFoods.get(i).getCount();
+				}
+				
+				sql = "INSERT INTO `" + Params.dbName + "`.`order_food` " +
+						"(`restaurant_id`, `order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, `hang_status`, " +
+						"`discount`, `taste_id`, `taste_id2`, `taste_id3`, `taste_price`, `taste`, `kitchen`, " +
+						"`waiter`, `order_date`, `is_temporary`) VALUES (" +
+						term.restaurant_id + ", " +
+						orderToUpdate.id + ", " + 
+						canceledFoods.get(i).alias_id + ", " + 
+						"-" + canceledFoods.get(i).getCount() + ", " + 
+						canceledFoods.get(i).getPrice() + ", '" + 
+						canceledFoods.get(i).name + "', " + 
+						canceledFoods.get(i).status + ", " +
+						(canceledFoods.get(i).hangStatus == OrderFood.FOOD_HANG_UP ? OrderFood.FOOD_HANG_UP : OrderFood.FOOD_NORMAL) + ", " +
+						canceledFoods.get(i).getDiscount() + ", " +
+						canceledFoods.get(i).tastes[0].alias_id + "," +
+						canceledFoods.get(i).tastes[1].alias_id + "," +
+						canceledFoods.get(i).tastes[2].alias_id + "," +
+						canceledFoods.get(i).getTastePrice() + ", '" +
+						canceledFoods.get(i).tastePref + "', " + 
+						canceledFoods.get(i).kitchen + ", '" + 
+						term.owner + "', " +
+						"NOW(), " + 
+						(canceledFoods.get(i).isTemporary ? 1 : 0) + 
+						")";
+				dbCon.stmt.executeUpdate(sql);			
+			}
 			
 			/**
-			 * Find the canceled foods to print
+			 * Update the gift amount if not reach the quota.
+			 * Otherwise throw a business exception.
 			 */
-			tmpFoods.clear();
-			iterCancel = canceledFoods.iterator();
-			while(iterCancel.hasNext()){
-				OrderFood canceledFood = iterCancel.next();
+			if(term.getGiftQuota() >= 0 && !isGiftSkip){
+				if((giftAmount + term.getGiftAmount()) > term.getGiftQuota()){
+					throw new BusinessException("The gift amount exceeds the quota.", ErrorCode.EXCEED_GIFT_QUOTA);
+					
+				}else{
+					sql = "UPDATE " + Params.dbName + ".terminal SET" +
+					  " gift_amount = gift_amount + " + giftAmount +
+					  " WHERE pin=" + "0x" + Long.toHexString(term.pin) +
+					  " AND restaurant_id=" + term.restaurant_id;
+					dbCon.stmt.executeUpdate(sql);
+				}
+			}
+			
+			/**
+			 * Update the related info to this order
+			 */
+			sql = "UPDATE `" + Params.dbName + "`.`order` SET custom_num=" + orderToUpdate.custom_num +
+					", terminal_pin=" + term.pin + 
+					", waiter='" + term.owner + "'" +
+					", region_id=" + orderToUpdate.region.regionID +
+					", region_name='" + orderToUpdate.region.name + "'" + 
+					", table_id=" + orderToUpdate.table_id + 
+					", table_name='" + orderToUpdate.table_name + "'" +
+					" WHERE id=" + orderToUpdate.id;
+			dbCon.stmt.executeUpdate(sql);
+
+			/**
+			 * Update the custom number to the merger table
+			 */
+			if(orderToUpdate.category == Order.CATE_MERGER_TABLE){
+				sql = "UPDATE " + Params.dbName + ".table SET " +
+					  "status=" + Table.TABLE_BUSY + ", " +
+					  "category=" + Order.CATE_MERGER_TABLE + ", " +
+					  "custom_num=" + orderToUpdate.custom_num +
+				  	  " WHERE restaurant_id=" + term.restaurant_id + 
+				  	  " AND alias_id=" + orderToUpdate.table2_id;
+				dbCon.stmt.executeUpdate(sql);
+			}
+			
+			/**
+			 * 
+			 */
+			if(orderToUpdate.table_id != orderToUpdate.originalTableID){
+				// update the original table status to idle
+				sql = "UPDATE " + Params.dbName + ".table SET status="
+						+ Table.TABLE_IDLE + "," + "custom_num=NULL,"
+						+ "category=NULL" + " WHERE restaurant_id="
+						+ oriTbl.restaurantID + " AND alias_id="
+						+ oriTbl.alias_id;
+				dbCon.stmt.executeUpdate(sql);
 				
-				boolean isCancelled = true;	
-				iterExtra = extraFoods.iterator();
-				while(iterExtra.hasNext()){
-					OrderFood extraFood = iterExtra.next();
-					/**
-					 * If the food to cancel is hang up before.
-					 * Check to see whether the same extra food is exist
-					 * and the amount is equal or greater than the canceled.
-					 * If so, means the extra food is immediate
-					 * and NOT need to print this canceled food.
-					 */
-					if(canceledFood.hangStatus == OrderFood.FOOD_HANG_UP){
-						if(extraFood.equals2(canceledFood) && 
-						   extraFood.getCount().floatValue() >= canceledFood.getCount().floatValue()){
+				// update the new table status to busy
+				sql = "UPDATE " + Params.dbName + ".table SET " +
+						  "status=" + Table.TABLE_BUSY + ", " +
+						  "category=" + oriTbl.category + ", " +
+						  "custom_num=" + orderToUpdate.custom_num + 
+						  " WHERE restaurant_id=" + newTbl.restaurantID + 
+						  " AND alias_id=" + newTbl.alias_id;
+				dbCon.stmt.executeUpdate(sql);
+				
+			}else{
+
+				sql = "UPDATE " + Params.dbName + ".table SET " +
+				      "status=" + Table.TABLE_BUSY + ", " +
+					  "category=" + oriTbl.category + ", " +
+					  "custom_num=" + orderToUpdate.custom_num +
+					  " WHERE restaurant_id=" + term.restaurant_id + 
+					  " AND alias_id=" + orderToUpdate.table_id;
+				dbCon.stmt.executeUpdate(sql);
+			}
+			
+			dbCon.conn.commit();
+			
+			Result result = new Result();			
+			/**
+			 * Find the extra and canceled foods and put them to result.
+			 */
+			if(!extraFoods.isEmpty() || !canceledFoods.isEmpty()){			
+				
+				ArrayList<OrderFood> tmpFoods = new ArrayList<OrderFood>();
+				
+				Iterator<OrderFood> iterExtra;
+				Iterator<OrderFood> iterCancel;
+				
+				/**
+				 * Find the canceled foods to print
+				 */
+				tmpFoods.clear();
+				iterCancel = canceledFoods.iterator();
+				while(iterCancel.hasNext()){
+					OrderFood canceledFood = iterCancel.next();
+					
+					boolean isCancelled = true;	
+					iterExtra = extraFoods.iterator();
+					while(iterExtra.hasNext()){
+						OrderFood extraFood = iterExtra.next();
+						/**
+						 * If the food to cancel is hang up before.
+						 * Check to see whether the same extra food is exist
+						 * and the amount is equal or greater than the canceled.
+						 * If so, means the extra food is immediate
+						 * and NOT need to print this canceled food.
+						 */
+						if(canceledFood.hangStatus == OrderFood.FOOD_HANG_UP){
+							if(extraFood.equals2(canceledFood) && 
+							   extraFood.getCount().floatValue() >= canceledFood.getCount().floatValue()){
+								
+								isCancelled = false;
+								extraFood.hangStatus = OrderFood.FOOD_IMMEDIATE;
+								break;
+							}
 							
+						/**
+						 * In the case below, 
+						 * 1 - food alias id is matched 
+						 * 2 - order count is matched 
+						 * 3 - the hang status is the same
+						 * Means just change the taste preference to this food. 
+						 * We don't print this record.
+						 */
+						}else if(canceledFood.alias_id == extraFood.alias_id &&
+								 canceledFood.getCount().equals(extraFood.getCount()) &&
+								 canceledFood.hangStatus == extraFood.hangStatus) {
+
 							isCancelled = false;
-							extraFood.hangStatus = OrderFood.FOOD_IMMEDIATE;
 							break;
 						}
-						
+					}
+					
+					if(isCancelled){
+						tmpFoods.add(canceledFood);
+					}				
+				}
+				
+				if(!tmpFoods.isEmpty()){
+					result.canceledOrder = new Order();
+					result.canceledOrder.id = orderToUpdate.id;
+					result.canceledOrder.table_id = orderToUpdate.table_id;
+					result.canceledOrder.table_name = orderToUpdate.table_name;
+					result.canceledOrder.custom_num = orderToUpdate.custom_num;
+					result.canceledOrder.region = orderToUpdate.region;
+					result.canceledOrder.foods = tmpFoods.toArray(new OrderFood[tmpFoods.size()]);
+				}
+				
+				/**
+				 * Find the extra foods to print
+				 */
+				tmpFoods.clear();
+				iterExtra = extraFoods.listIterator();
+				while(iterExtra.hasNext()){
+					
+					OrderFood extraFood = iterExtra.next();
+					
+					boolean isExtra = true;	
 					/**
 					 * In the case below, 
 					 * 1 - food alias id is matched 
@@ -469,108 +546,64 @@ public class UpdateOrder {
 					 * Means just change the taste preference to this food. 
 					 * We don't print this record.
 					 */
-					}else if(canceledFood.alias_id == extraFood.alias_id &&
-							 canceledFood.getCount().equals(extraFood.getCount()) &&
-							 canceledFood.hangStatus == extraFood.hangStatus) {
-
-						isCancelled = false;
-						break;
+					iterCancel = canceledFoods.iterator();
+					while(iterCancel.hasNext()){
+						OrderFood canceledFood = iterCancel.next();
+						if(extraFood.alias_id == canceledFood.alias_id &&
+						   extraFood.getCount().equals(canceledFood.getCount()) &&
+						   extraFood.hangStatus == canceledFood.hangStatus){
+								isExtra = false;
+								break;
+						}
+					}
+					
+					if(isExtra){
+						tmpFoods.add(extraFood);
 					}
 				}
 				
-				if(isCancelled){
-					tmpFoods.add(canceledFood);
-				}				
-			}
-			
-			if(!tmpFoods.isEmpty()){
-				result.canceledOrder = new Order();
-				result.canceledOrder.id = orderToUpdate.id;
-				result.canceledOrder.table_id = orderToUpdate.table_id;
-				result.canceledOrder.table_name = orderToUpdate.table_name;
-				result.canceledOrder.custom_num = orderToUpdate.custom_num;
-				result.canceledOrder.region = orderToUpdate.region;
-				result.canceledOrder.foods = tmpFoods.toArray(new OrderFood[tmpFoods.size()]);
+				if(!tmpFoods.isEmpty()){
+					result.extraOrder = new Order();
+					result.extraOrder.id = orderToUpdate.id;
+					result.extraOrder.table_id = orderToUpdate.table_id;
+					result.extraOrder.table_name = orderToUpdate.table_name;
+					result.extraOrder.custom_num = orderToUpdate.custom_num;
+					result.extraOrder.region = orderToUpdate.region;
+					result.extraOrder.foods = tmpFoods.toArray(new OrderFood[tmpFoods.size()]);
+				}
 			}
 			
 			/**
-			 * Find the extra foods to print
+			 * Find the hurried foods and put them to result.
 			 */
-			tmpFoods.clear();
-			iterExtra = extraFoods.listIterator();
-			while(iterExtra.hasNext()){
-				
-				OrderFood extraFood = iterExtra.next();
-				
-				boolean isExtra = true;	
-				/**
-				 * In the case below, 
-				 * 1 - food alias id is matched 
-				 * 2 - order count is matched 
-				 * 3 - the hang status is the same
-				 * Means just change the taste preference to this food. 
-				 * We don't print this record.
-				 */
-				iterCancel = canceledFoods.iterator();
-				while(iterCancel.hasNext()){
-					OrderFood canceledFood = iterCancel.next();
-					if(extraFood.alias_id == canceledFood.alias_id &&
-					   extraFood.getCount().equals(canceledFood.getCount()) &&
-					   extraFood.hangStatus == canceledFood.hangStatus){
-							isExtra = false;
-							break;
-					}
-				}
-				
-				if(isExtra){
-					tmpFoods.add(extraFood);
-				}
-			}
+			if(!hurriedFoods.isEmpty()){
+				result.hurriedOrder = new Order();
+				result.hurriedOrder.id = orderToUpdate.id;
+				result.hurriedOrder.table_id = orderToUpdate.table_id;
+				result.hurriedOrder.table_name = orderToUpdate.table_name;
+				result.hurriedOrder.custom_num = orderToUpdate.custom_num;
+				result.hurriedOrder.region = orderToUpdate.region;
+				result.hurriedOrder.foods = hurriedFoods.toArray(new OrderFood[hurriedFoods.size()]);
+			}		
 			
-			if(!tmpFoods.isEmpty()){
-				result.extraOrder = new Order();
-				result.extraOrder.id = orderToUpdate.id;
-				result.extraOrder.table_id = orderToUpdate.table_id;
-				result.extraOrder.table_name = orderToUpdate.table_name;
-				result.extraOrder.custom_num = orderToUpdate.custom_num;
-				result.extraOrder.region = orderToUpdate.region;
-				result.extraOrder.foods = tmpFoods.toArray(new OrderFood[tmpFoods.size()]);
-			}
-		}
-		
-		/**
-		 * Find the hurried foods and put them to result.
-		 */
-		if(!hurriedFoods.isEmpty()){
-			result.hurriedOrder = new Order();
-			result.hurriedOrder.id = orderToUpdate.id;
-			result.hurriedOrder.table_id = orderToUpdate.table_id;
-			result.hurriedOrder.table_name = orderToUpdate.table_name;
-			result.hurriedOrder.custom_num = orderToUpdate.custom_num;
-			result.hurriedOrder.region = orderToUpdate.region;
-			result.hurriedOrder.foods = hurriedFoods.toArray(new OrderFood[hurriedFoods.size()]);
-		}
-		
-		if(oriTbl != null && newTbl != null){
-			// update the original table status to idle
-			sql = "UPDATE " + Params.dbName + ".table SET status="
-					+ Table.TABLE_IDLE + "," + "custom_num=NULL,"
-					+ "category=NULL" + " WHERE restaurant_id="
-					+ oriTbl.restaurantID + " AND alias_id="
-					+ oriTbl.alias_id;
-			dbCon.stmt.execute(sql);
+			return result;
 			
-			// update the new table status to busy
-			sql = "UPDATE " + Params.dbName + ".table SET " +
-					  "status=" + Table.TABLE_BUSY + ", " +
-					  "category=" + oriTbl.category + ", " +
-					  "custom_num=" + oriTbl.custom_num + 
-					  " WHERE restaurant_id=" + newTbl.restaurantID + 
-					  " AND alias_id=" + newTbl.alias_id;
-			dbCon.stmt.execute(sql);
+		}catch(SQLException e){
+			dbCon.conn.rollback();
+			throw e;
+			
+		}catch(BusinessException e){
+			dbCon.conn.rollback();
+			throw e;
+			
+		}catch(Exception e){
+			dbCon.conn.rollback();
+			throw new BusinessException("Unknown error occourred while updating order.");
+			
+		}finally{
+			dbCon.conn.setAutoCommit(true);
 		}
-		
-		return result;
+
 	}	
 	
 	/**
