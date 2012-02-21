@@ -108,9 +108,9 @@ public class DailySettlementTask extends SchedulerTask{
 				  "SELECT " +
 				  Params.dbName + ".`order_food`.`order_id` AS `order_id`," +
 				  Params.dbName + ".`order_food`.`food_id` AS `food_id`," +
-				  Params.dbName + ".`order_food`.`taste_id2` AS `taste_id`," +
-				  Params.dbName + ".`order_food`.`taste_id3` AS `taste_id2`," +
-				  Params.dbName + ".`order_food`.`taste_id` AS `taste_id3`," +
+				  Params.dbName + ".`order_food`.`taste_id` AS `taste_id`," +
+				  Params.dbName + ".`order_food`.`taste_id2` AS `taste_id2`," +
+				  Params.dbName + ".`order_food`.`taste_id3` AS `taste_id3`," +
 				  Params.dbName + ".`order_food`.`is_temporary` AS `is_temporary`," +
 				  Params.dbName + ".`order_food`.`name` AS `name`," +
 				  Params.dbName + ".`order_food`.`taste` AS `taste`," + 				   
