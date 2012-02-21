@@ -81,6 +81,7 @@ public class UpdateOrder {
 												,ErrorCode.TABLE_IDLE);
 				}
 				orderToUpdate.table_name = oriTbl.name;
+				orderToUpdate.category = oriTbl.category;
 				orderToUpdate.id = Util.getUnPaidOrderID(dbCon, oriTbl);
 				
 			/**
@@ -164,12 +165,14 @@ public class UpdateOrder {
 	public static Result execByID(DBCon dbCon, long pin, short model, Order orderToUpdate, boolean isGiftSkip) throws BusinessException, SQLException{
 		
 		Terminal term = VerifyPin.exec(dbCon, pin, model);
-		String sql = "SELECT table_id, table_name FROM " + Params.dbName + ".order WHERE id=" + orderToUpdate.id;
+		String sql = "SELECT table_id, table_name, category FROM " + Params.dbName + ".order WHERE id=" + orderToUpdate.id;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			orderToUpdate.table_id = dbCon.rs.getInt("table_id");
+			orderToUpdate.originalTableID = orderToUpdate.table_id;
 			String tblName = dbCon.rs.getString("table_name");
 			orderToUpdate.table_name = (tblName != null ? tblName : "");
+			orderToUpdate.category = dbCon.rs.getShort("category");
 			dbCon.rs.close();
 			
 			return updateOrder(dbCon, term, orderToUpdate, null, null, isGiftSkip);
@@ -424,7 +427,9 @@ public class UpdateOrder {
 			}
 			
 			/**
-			 * 
+			 * Update the table status in tow cases.
+			 * 1 - Transfer table
+			 * 2 - Not transfer table
 			 */
 			if(orderToUpdate.table_id != orderToUpdate.originalTableID){
 				// update the original table status to idle
@@ -448,7 +453,7 @@ public class UpdateOrder {
 
 				sql = "UPDATE " + Params.dbName + ".table SET " +
 				      "status=" + Table.TABLE_BUSY + ", " +
-					  "category=" + oriTbl.category + ", " +
+					  "category=" + orderToUpdate.category + ", " +
 					  "custom_num=" + orderToUpdate.custom_num +
 					  " WHERE restaurant_id=" + term.restaurant_id + 
 					  " AND alias_id=" + orderToUpdate.table_id;
@@ -598,7 +603,7 @@ public class UpdateOrder {
 			
 		}catch(Exception e){
 			dbCon.conn.rollback();
-			throw new BusinessException("Unknown error occourred while updating order.");
+			throw new BusinessException(e.getMessage());
 			
 		}finally{
 			dbCon.conn.setAutoCommit(true);
