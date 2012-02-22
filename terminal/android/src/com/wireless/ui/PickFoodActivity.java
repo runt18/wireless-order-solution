@@ -53,16 +53,14 @@ import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Util;
-import com.wireless.ui.view.OrderFoodListView;
 import com.wireless.ui.view.PickFoodListView;
 import com.wireless.ui.view.TempListView;
 
 public class PickFoodActivity extends TabActivity implements
 		PickFoodListView.OnFoodPickedListener, OnGestureListener {
 
-	private List<Department> _deptParent;
-	private List<List<Kitchen>> _kitchenChild;
-	private ArrayList<Kitchen> validKitchens;
+	private ArrayList<Kitchen> _validKitchens;
+	private ArrayList<Department> _validDepts;
 
 	private LinearLayout rightlayout ;
 	
@@ -82,8 +80,7 @@ public class PickFoodActivity extends TabActivity implements
 	private List<Food> _filterFoods;
 	private TempListView _tempLstView;
 	private PopupWindow _popupWindow;
-	private OrderFoodListView _orderLstView;
-	private boolean orderlistTag = false;
+	private boolean _isOrderLstShow = false;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -97,9 +94,8 @@ public class PickFoodActivity extends TabActivity implements
 		LoadDate();
 
 		// 取得新点菜中已有的菜品List，并保存到pickFood的List中
-		OrderParcel orderParcel = getIntent().getParcelableExtra(
-				OrderParcel.KEY_VALUE);
-		for (int i = 0; i < orderParcel.foods.length; i++) {
+		OrderParcel orderParcel = getIntent().getParcelableExtra(OrderParcel.KEY_VALUE);
+		for(int i = 0; i < orderParcel.foods.length; i++){
 			_pickFoods.add(orderParcel.foods[i]);
 		}
 
@@ -280,13 +276,9 @@ public class PickFoodActivity extends TabActivity implements
 						"对不起，\"" + food.toString() + "\"最多只能点255份", 0).show();
 				// pickedFood.setCount(new Float(255));
 			} else {
-				Toast.makeText(
-						this,
-						"添加"
-								+ (food.hangStatus == OrderFood.FOOD_HANG_UP ? "并叫起\""
-										: "\"") + food.toString() + "\""
-								+ Util.float2String2(food.getCount()) + "份", 0)
-						.show();
+				Toast.makeText(this, 
+							  "添加"	+ (food.hangStatus == OrderFood.FOOD_HANG_UP ? "并叫起\"" : "\"") + food.toString() + "\"" + Util.float2String2(food.getCount()) + "份", 0)
+					 .show();
 				pickedFood.setCount(orderAmount);
 				_pickFoods.set(index, pickedFood);
 			}
@@ -295,11 +287,8 @@ public class PickFoodActivity extends TabActivity implements
 				Toast.makeText(this,
 						"对不起，\"" + food.toString() + "\"最多只能点255份", 0).show();
 			} else {
-				Toast.makeText(
-						this,
-						"新增"
-								+ (food.hangStatus == OrderFood.FOOD_HANG_UP ? "并叫起\""
-										: "\"") + food.toString() + "\""
+				Toast.makeText(this,
+							  "新增" + (food.hangStatus == OrderFood.FOOD_HANG_UP ? "并叫起\"" : "\"") + food.toString() + "\""
 								+ Util.float2String2(food.getCount()) + "份", 0)
 						.show();
 				_pickFoods.add(food);
@@ -345,13 +334,13 @@ public class PickFoodActivity extends TabActivity implements
 
 			@Override
 			public void onClick(View v) {
-				if (orderlistTag == false) {
+				if (_isOrderLstShow == false) {
 					showOrderList();
 					_popupWindow.showAsDropDown(v);
-					orderlistTag = true;
+					_isOrderLstShow = true;
 				} else {
 					_popupWindow.dismiss();
-					orderlistTag = false;
+					_isOrderLstShow = false;
 
 				}
 
@@ -382,7 +371,6 @@ public class PickFoodActivity extends TabActivity implements
 			@Override
 			public void onScroll(AbsListView view, int firstVisibleItem,
 					int visibleItemCount, int totalItemCount) {
-				// TODO Auto-generated method stub
 
 			}
 		});
@@ -436,23 +424,41 @@ public class PickFoodActivity extends TabActivity implements
 		rightlayout.removeAllViews();
 		rightlayout.setBackgroundColor(0xfbfdfe);
 		// 为侧栏添加筛选条件
-		for (Department d : _deptParent) {
+		for (Department d : _validDepts) {
 			TextView btn = new TextView(this);
 			btn.setText(d.name.subSequence(0, 2));
-			btn.setTag(d.name);
+			btn.setTag(new Integer(d.deptID));
 			btn.setTextSize(20);
 			btn.setBackgroundDrawable(null);
 			btn.setPadding(0, 5, 0, 5);
 			btn.setTextColor(Color.GRAY);
 			rightlayout.addView(btn);
+			/**
+			 * 侧栏部门Button的处理函数
+			 */
 			btn.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					// TODO Auto-generated method stub
-					TextView tv = ((TextView) v);
-					ArrayList<Department> list = Saixuan((String) tv.getTag());
-					List<List<Kitchen>> list2 = Saixuan2(list);
-					new KitchenSelectDialog(pickLstView, list, list2).show();
+					/**
+					 * 根据侧栏选中的部门，筛选出相应的部门和厨房
+					 */
+					List<Department> dept = new ArrayList<Department>();
+					int deptID = ((Integer)((TextView)v).getTag());
+					for(int i = 0; i < _validDepts.size(); i++){
+						if(_validDepts.get(i).deptID == deptID){
+							dept.add(_validDepts.get(i));
+							break;
+						}
+					}
+					List<Kitchen> kitchens = new ArrayList<Kitchen>();
+					for(int i = 0; i < _validKitchens.size(); i++){
+						if(_validKitchens.get(i).deptID == deptID){
+							kitchens.add(_validKitchens.get(i));
+						}
+					}
+					List<List<Kitchen>> kitchenChild = new ArrayList<List<Kitchen>>();
+					kitchenChild.add(kitchens);
+					new KitchenSelectDialog(pickLstView, dept, kitchenChild).show();
 				}
 			});
 		}
@@ -463,8 +469,7 @@ public class PickFoodActivity extends TabActivity implements
 		// 初始化的时候厨房默认显示的厨房信息
 		ketchenName = (TextView) findViewById(R.id.Spinner01);
 		ketchenName.setText("全部");
-		pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods,
-				PickFoodListView.TAG_PINYIN);
+		pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods,	PickFoodListView.TAG_PINYIN);
 		pickLstView.setFoodPickedListener(this);
 
 		// 已点菜按钮
@@ -474,16 +479,15 @@ public class PickFoodActivity extends TabActivity implements
 
 			@Override
 			public void onClick(View v) {
-				if (orderlistTag == false) {
+				if (_isOrderLstShow == false) {
 					showOrderList();
 					_popupWindow.showAsDropDown(v);
-					orderlistTag = true;
+					_isOrderLstShow = true;
+					
 				} else {
 					_popupWindow.dismiss();
-					orderlistTag = false;
-
+					_isOrderLstShow = false;
 				}
-
 			}
 		});
 
@@ -510,7 +514,6 @@ public class PickFoodActivity extends TabActivity implements
 			@Override
 			public void onScroll(AbsListView view, int firstVisibleItem,
 					int visibleItemCount, int totalItemCount) {
-				// TODO Auto-generated method stub
 
 			}
 		});
@@ -526,8 +529,7 @@ public class PickFoodActivity extends TabActivity implements
 					Food[] foods = pickLstView.getSourceData();
 					ArrayList<Food> filterFoods = new ArrayList<Food>();
 					for (int i = 0; i < foods.length; i++) {
-						if (String.valueOf(foods[i].pinyin).toLowerCase()
-								.contains(s.toString().toLowerCase())
+						if (String.valueOf(foods[i].pinyin).toLowerCase().contains(s.toString().toLowerCase())
 								|| foods[i].name.contains(s.toString())) {
 							filterFoods.add(foods[i]);
 						}
@@ -567,8 +569,20 @@ public class PickFoodActivity extends TabActivity implements
 		filterKitchen.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				new KitchenSelectDialog(pickLstView, _deptParent, _kitchenChild)
-						.show();
+				/**
+				 * 筛选出每个部门中有菜品的厨房
+				 */
+				List<List<Kitchen>> kitchenChild = new ArrayList<List<Kitchen>>();
+				for (int i = 0; i < _validDepts.size(); i++) {
+					List<Kitchen> kitchens = new ArrayList<Kitchen>();
+					for (int j = 0; j < _validKitchens.size(); j++) {
+						if (_validKitchens.get(j).deptID == _validDepts.get(i).deptID) {
+							kitchens.add(_validKitchens.get(j));
+						}
+					}
+					kitchenChild.add(kitchens);
+				}
+				new KitchenSelectDialog(pickLstView, _validDepts, kitchenChild).show();
 			}
 		});
 	}
@@ -591,13 +605,13 @@ public class PickFoodActivity extends TabActivity implements
 
 			@Override
 			public void onClick(View v) {
-				if (orderlistTag == false) {
+				if (_isOrderLstShow == false) {
 					showOrderList();
 					_popupWindow.showAsDropDown(v);
-					orderlistTag = true;
+					_isOrderLstShow = true;
 				} else {
 					_popupWindow.dismiss();
-					orderlistTag = false;
+					_isOrderLstShow = false;
 
 				}
 
@@ -626,7 +640,6 @@ public class PickFoodActivity extends TabActivity implements
 			@Override
 			public void onScroll(AbsListView view, int firstVisibleItem,
 					int visibleItemCount, int totalItemCount) {
-				// TODO Auto-generated method stub
 
 			}
 		});
@@ -720,7 +733,6 @@ public class PickFoodActivity extends TabActivity implements
 			@Override
 			public void onScroll(AbsListView view, int firstVisibleItem,
 					int visibleItemCount, int totalItemCount) {
-				// TODO Auto-generated method stub
 
 			}
 		});
@@ -734,11 +746,10 @@ public class PickFoodActivity extends TabActivity implements
 		private List<Department> deptParent;
 		private List<List<Kitchen>> kitchenChild;
 
-		KitchenSelectDialog(final PickFoodListView foodLstView,
-				List<Department> de, List<List<Kitchen>> ki) {
+		KitchenSelectDialog(final PickFoodListView foodLstView,	List<Department> depts, List<List<Kitchen>> kitchens) {
 			super(PickFoodActivity.this, R.style.FullHeightDialog);
-			deptParent = de;
-			kitchenChild = ki;
+			deptParent = depts;
+			kitchenChild = kitchens;
 
 			View dialogContent = View.inflate(PickFoodActivity.this,
 					R.layout.expander_list_view, null);
@@ -834,8 +845,9 @@ public class PickFoodActivity extends TabActivity implements
 			});
 
 			// 设置展开所有的二级菜单
-			for (int i = 0; i < deptParent.size(); i++)
+			for (int i = 0; i < deptParent.size(); i++){
 				kitchenLstView.expandGroup(i);
+			}
 
 			/**
 			 * 选择某个厨房后，筛选出相应的菜品，并更新ListView
@@ -952,53 +964,48 @@ public class PickFoodActivity extends TabActivity implements
 	/**
 	 * 点击按钮显示已点菜列表
 	 */
-	public void showOrderList() {
+	private void showOrderList() {
 
-		Display display = ((WindowManager) getSystemService(WINDOW_SERVICE))
-				.getDefaultDisplay();
-		int width = display.getWidth();// 获取屏幕宽度
-		int heigh = display.getHeight();// 获取屏幕高度
-		View popupWindow_view = getLayoutInflater().inflate( // 获取自定义布局文件的视图
-				R.layout.orderlistpupowindow, null, false);
-		_popupWindow = new PopupWindow(popupWindow_view,
-				LayoutParams.WRAP_CONTENT - 20, heigh / 2, false);// 创建PopupWindow实例
+		Display display = ((WindowManager) getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
+		// 获取屏幕宽度
+		//int width = display.getWidth();
+		// 获取屏幕高度
+		int heigh = display.getHeight();
+		// 获取自定义布局文件的视图
+		View popupWndView = getLayoutInflater().inflate(R.layout.orderlistpupowindow, null, false);
+		// 创建PopupWindow实例
+		_popupWindow = new PopupWindow(popupWndView, LayoutParams.WRAP_CONTENT - 20, heigh / 2, false);
 		_popupWindow.setOutsideTouchable(true);
 		_popupWindow.setAnimationStyle(R.style.popuwindow);
-		ListView _orderLstView = (ListView) popupWindow_view
-				.findViewById(R.id.orderpupowindowLstView);
-		_orderLstView.setAdapter(new popuwindowadapter(this, _pickFoods));
-
+		((ListView)popupWndView.findViewById(R.id.orderpupowindowLstView)).setAdapter(new PopupWndAdapter(this, _pickFoods));
 	}
 
 	/**
 	 * 点击按钮显示已点菜列表adapter
 	 */
-	public class popuwindowadapter extends BaseAdapter {
+	private class PopupWndAdapter extends BaseAdapter {
 
 		private ArrayList<OrderFood> tmpFoods;
-		private Context context;
+		private Context _context;
 
-		public popuwindowadapter(Context context,
-				ArrayList<OrderFood> mpickFoods) {
-			this.context = context;
-			this.tmpFoods = mpickFoods;
+		public PopupWndAdapter(Context context,
+				ArrayList<OrderFood> pickFoods) {
+			this._context = context;
+			this.tmpFoods = pickFoods;
 		}
 
 		@Override
 		public int getCount() {
-			// TODO Auto-generated method stub
 			return tmpFoods.size();
 		}
 
 		@Override
 		public Object getItem(int position) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public long getItemId(int position) {
-			// TODO Auto-generated method stub
 			return 0;
 		}
 
@@ -1006,7 +1013,7 @@ public class PickFoodActivity extends TabActivity implements
 		public View getView(int position, View convertView, ViewGroup parent) {
 			Holder holder;
 			if (convertView == null) {
-				convertView = LayoutInflater.from(context).inflate(
+				convertView = LayoutInflater.from(_context).inflate(
 						R.layout.orderpopuwindowitem, null);
 				holder = new Holder();
 				holder.foodname = (TextView) convertView
@@ -1023,7 +1030,6 @@ public class PickFoodActivity extends TabActivity implements
 
 		private class Holder {
 			TextView foodname;
-
 		}
 	}
 
@@ -1050,7 +1056,7 @@ public class PickFoodActivity extends TabActivity implements
 		/**
 		 * 使用二分查找算法筛选出有菜品的厨房
 		 */
-		validKitchens = new ArrayList<Kitchen>();
+		_validKitchens = new ArrayList<Kitchen>();
 		for (int i = 0; i < WirelessOrder.foodMenu.kitchens.length; i++) {
 			Food keyFood = new Food();
 			keyFood.kitchen = WirelessOrder.foodMenu.kitchens[i].kitchenID;
@@ -1069,66 +1075,21 @@ public class PickFoodActivity extends TabActivity implements
 					});
 
 			if (index >= 0) {
-				validKitchens.add(WirelessOrder.foodMenu.kitchens[i]);
+				_validKitchens.add(WirelessOrder.foodMenu.kitchens[i]);
 			}
 		}
 
 		/**
 		 * 筛选出有菜品的部门
 		 */
-		_deptParent = new ArrayList<Department>();
+		_validDepts = new ArrayList<Department>();
 		for (int i = 0; i < WirelessOrder.foodMenu.sKitchens.length; i++) {
-			for (int j = 0; j < validKitchens.size(); j++) {
-				if (WirelessOrder.foodMenu.sKitchens[i].deptID == validKitchens
-						.get(j).deptID) {
-					_deptParent.add(WirelessOrder.foodMenu.sKitchens[i]);
+			for (int j = 0; j < _validKitchens.size(); j++) {
+				if (WirelessOrder.foodMenu.sKitchens[i].deptID == _validKitchens.get(j).deptID) {
+					_validDepts.add(WirelessOrder.foodMenu.sKitchens[i]);
 					break;
 				}
 			}
 		}
-
-		/**
-		 * 筛选出部门中有菜品的厨房
-		 */
-		_kitchenChild = new ArrayList<List<Kitchen>>();
-		for (int i = 0; i < _deptParent.size(); i++) {
-			List<Kitchen> kitchens = new ArrayList<Kitchen>();
-			for (int j = 0; j < validKitchens.size(); j++) {
-				if (validKitchens.get(j).deptID == _deptParent.get(i).deptID) {
-					kitchens.add(validKitchens.get(j));
-				}
-			}
-			_kitchenChild.add(kitchens);
-		}
-
 	}
-
-	private ArrayList<Department> Saixuan(String str) {
-		ArrayList<Department> result = new ArrayList<Department>();
-
-		for (Department d : _deptParent) {
-			if (d.name.equals(str)) {
-				result.add(d);
-			}
-		}
-		return result;
-	}
-
-	private List<List<Kitchen>> Saixuan2(ArrayList<Department> dep) {
-
-		ArrayList<List<Kitchen>> result = new ArrayList<List<Kitchen>>();
-
-		for (int i = 0; i < dep.size(); i++) {
-			List<Kitchen> kitchens = new ArrayList<Kitchen>();
-			for (int j = 0; j < validKitchens.size(); j++) {
-				if (validKitchens.get(j).deptID == dep.get(i).deptID) {
-					kitchens.add(validKitchens.get(j));
-				}
-			}
-			result.add(kitchens);
-		}
-
-		return result;
-	}
-
 }
