@@ -91,7 +91,7 @@ public class PickFoodActivity extends TabActivity implements
 		rightlayout = (LinearLayout) findViewById(R.id.sideIndex);
 		_detector = new GestureDetector(this);
 
-		LoadDate();
+		init();
 
 		// 取得新点菜中已有的菜品List，并保存到pickFood的List中
 		OrderParcel orderParcel = getIntent().getParcelableExtra(OrderParcel.KEY_VALUE);
@@ -1033,7 +1033,7 @@ public class PickFoodActivity extends TabActivity implements
 		}
 	}
 
-	private void LoadDate() {
+	private void init() {
 		/**
 		 * 将所有菜品进行按厨房编号进行排序
 		 */
