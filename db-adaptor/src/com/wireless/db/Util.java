@@ -18,7 +18,7 @@ public class Util {
 	 */
 	public static int getUnPaidOrderID(DBCon dbCon, Table table) throws BusinessException, SQLException{
 		if(table.status == Table.TABLE_IDLE){
-			throw new BusinessException("The table(alias_id=" + table.alias_id + ", restaurant_id=" + table.restaurantID + ") to query is idle.", ErrorCode.TABLE_IDLE);			
+			throw new BusinessException("The table(alias_id=" + table.alias_id + ", restaurant_id=" + table.restaurantID + ") to query is IDLE.", ErrorCode.TABLE_IDLE);			
 		}else{
 			//query the order id associated with the this table
 			String sql = "SELECT id FROM `" + Params.dbName + 
