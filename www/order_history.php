@@ -299,7 +299,7 @@ switch ($xm)
 		break;
 }
 
-$sql .= " LIMIT 400";
+$sql .= " LIMIT 500";
 
 $bh=0;
 mysql_query("SET NAMES utf8"); 
