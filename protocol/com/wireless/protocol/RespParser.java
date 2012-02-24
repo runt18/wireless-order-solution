@@ -543,7 +543,7 @@ public class RespParser {
 	 * @return The restaurant info.
 	 */
 	public static Restaurant parseQueryRestaurant(ProtocolPackage response){
-		Restaurant restaurant = new Restaurant();;
+		Restaurant restaurant = new Restaurant();
 		/******************************************************
 		 * In the case query restaurant successfully, 
 		 * design the query restaurant response looks like below
@@ -632,5 +632,74 @@ public class RespParser {
 		return restaurant;
 	}
 	
-
+	/**
+	 * Parse the response associated with the query staff. 
+	 * @param response The response containing the staff info.
+	 * @return The staff info.
+	 */
+	public static StaffTerminal[] parseQueryStaff(ProtocolPackage response){
+		/******************************************************
+		 * In the case query staff successfully, 
+		 * design the query staff response looks like below
+		 * mode : type : seq : reserved : pin[6] : len[2] : <Body>
+		 * <Header>
+		 * mode - ORDER_BUSSINESS
+		 * type - ACK
+		 * seq - same as request
+		 * reserved : 0x00
+		 * pin[6] : same as request
+		 * len[2] -  length of the <Body>
+		 * <Body>
+		 * nStaff : <staff_1> : ... : <staff_n>
+		 * nStaff - the amount of staff
+		 * <staff_n>
+		 * len_1 : name : len_2 : pwd : pin[4]
+		 * len_1 - the length to the staff name
+		 * name - the value to staff name
+		 * len_2 - the length to the staff password
+		 * pwd - the value to the staff password
+		 * pin[4] - 4-byte indicating the pin
+		 *******************************************************/	
+		StaffTerminal[] staffs = new StaffTerminal[0];
+		try{
+			//get the amount staff
+			int nStaff = response.body[0];
+			
+			staffs = new StaffTerminal[nStaff];
+			
+			int offset = 1;
+			for(int i = 0; i < nStaff; i++){
+				
+				staffs[i] = new StaffTerminal();
+				
+				//get the length to this staff name
+				int nameLen = response.body[offset];
+				offset++;
+				//get the value to this staff name
+				if(nameLen > 0){
+					staffs[i].name = new String(response.body, offset, nameLen, "UTF-16BE");
+					offset += nameLen;
+				}
+				//get the length to staff password
+				int pwdLen = response.body[offset];
+				offset++;
+				//get the value to this staff name
+				if(pwdLen > 0){
+					staffs[i].pwd = new String(response.body, offset, pwdLen);
+					offset += pwdLen;
+				}
+				//get the pin to this staff
+				staffs[i].pin = ((long)response.body[offset] & 0x00000000000000FF) |
+					   	   		(((long)response.body[offset + 1] & 0x00000000000000FF) << 8) |
+					   	   		(((long)response.body[offset + 2] & 0x00000000000000FF) << 16) |
+					   	   		(((long)response.body[offset + 3] & 0x00000000000000FF) << 24);
+				offset += 4;
+			}		
+			
+		}catch(UnsupportedEncodingException e){
+			
+		}
+		
+		return staffs;
+	}
 }
