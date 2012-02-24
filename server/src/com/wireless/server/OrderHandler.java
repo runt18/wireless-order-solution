@@ -17,6 +17,7 @@ import com.wireless.db.PayOrder;
 import com.wireless.db.QueryMenu;
 import com.wireless.db.QueryOrder;
 import com.wireless.db.QueryRestaurant;
+import com.wireless.db.QueryStaffTerminal;
 import com.wireless.db.QueryTable;
 import com.wireless.db.UpdateOrder;
 import com.wireless.db.VerifyPin;
@@ -34,6 +35,7 @@ import com.wireless.protocol.RespPackage;
 import com.wireless.protocol.RespQueryMenu;
 import com.wireless.protocol.RespQueryOrder;
 import com.wireless.protocol.RespQueryRestaurant;
+import com.wireless.protocol.RespQueryStaff;
 import com.wireless.protocol.Restaurant;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
@@ -96,17 +98,21 @@ class OrderHandler extends Handler implements Runnable{
 			
 				//handle query menu request
 			if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_MENU){
-				response = new RespQueryMenu(request.header, QueryMenu.exec(_term.pin, _term.modelID));
+				response = new RespQueryMenu(request.header, QueryMenu.exec(_term));
 
 				//handle query restaurant request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_RESTAURANT){
-				response = new RespQueryRestaurant(request.header, QueryRestaurant.exec(_term.pin, _term.modelID));
-
+				response = new RespQueryRestaurant(request.header, QueryRestaurant.exec(_term));
+				
+				//handle query staff request
+			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_STAFF){
+				response = new RespQueryStaff(request.header, QueryStaffTerminal.exec(_term));
+				
 				//handle query order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_ORDER){
 				int tableToQuery = ReqParser.parseQueryOrder(request);
 				try{
-					response = new RespQueryOrder(request.header, QueryOrder.exec(_term.pin, _term.modelID, tableToQuery));
+					response = new RespQueryOrder(request.header, QueryOrder.exec(_term, tableToQuery));
 				}catch(BusinessException e){
 					if(e.errCode == ErrorCode.TABLE_IDLE || e.errCode == ErrorCode.TABLE_NOT_EXIST){
 						response = new RespNAK(request.header, e.errCode);
@@ -119,7 +125,7 @@ class OrderHandler extends Handler implements Runnable{
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_ORDER_2){
 				int tableToQuery = ReqParser.parseQueryOrder(request);
 				try{
-					Table table = QueryTable.exec(_term.pin, _term.modelID, tableToQuery);
+					Table table = QueryTable.exec(_term, tableToQuery);
 					if(table.status == Table.TABLE_BUSY){
 						response = new RespACK(request.header);
 						
@@ -203,7 +209,7 @@ class OrderHandler extends Handler implements Runnable{
 				//handle the cancel order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.CANCEL_ORDER){
 				int tableToCancel = ReqParser.parseCancelOrder(request);
-				CancelOrder.exec(_term.pin, _term.modelID, tableToCancel);
+				CancelOrder.exec(_term, tableToCancel);
 				response = new RespACK(request.header);
 
 				//handle the pay order request
@@ -216,9 +222,9 @@ class OrderHandler extends Handler implements Runnable{
 				 */
 				int printConf = orderToPay.print_type;
 				if((printConf & Reserved.PRINT_TEMP_RECEIPT_2) != 0){
-					printOrder(printConf, PayOrder.queryOrder(_term.pin, _term.modelID, orderToPay));
+					printOrder(printConf, PayOrder.queryOrder(_term, orderToPay));
 				}else{
-					printOrder(printConf, PayOrder.exec(_term.pin, _term.modelID, orderToPay));
+					printOrder(printConf, PayOrder.exec(_term, orderToPay));
 				}
 				response = new RespACK(request.header);
 
@@ -234,7 +240,7 @@ class OrderHandler extends Handler implements Runnable{
 				 * If print shift receipt, NOT need to query the order.
 				 */
 				if((printConf & (Reserved.PRINT_SHIFT_RECEIPT_2 | Reserved.PRINT_TEMP_SHIFT_RECEIPT_2)) == 0){
-					orderToPrint = QueryOrder.execByID(_term.pin, _term.modelID, reqToPrint.id);
+					orderToPrint = QueryOrder.execByID(reqToPrint.id);
 				}else{				
 					orderToPrint = new Order();
 				}
@@ -354,7 +360,7 @@ class OrderHandler extends Handler implements Runnable{
 			 */
 			Restaurant restaurant = null;
 			try{
-				restaurant = QueryRestaurant.exec(_term.restaurant_id);
+				restaurant = QueryRestaurant.exec(_term);
 			}catch(Exception e){
 				restaurant = new Restaurant();
 			}
