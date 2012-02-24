@@ -39,6 +39,7 @@ import com.wireless.protocol.ReqOTAUpdate;
 import com.wireless.protocol.ReqPackage;
 import com.wireless.protocol.ReqQueryMenu;
 import com.wireless.protocol.ReqQueryRestaurant;
+import com.wireless.protocol.ReqQueryStaff;
 import com.wireless.protocol.RespParser;
 import com.wireless.protocol.Terminal;
 import com.wireless.protocol.Type;
@@ -149,6 +150,77 @@ public class StartupActivity extends Activity {
 
 	}
 	
+	private class QueryStaffTask extends AsyncTask<Void, Void, String>{
+		
+		//private ProgressDialog _progDialog;
+		
+		/**
+		 * 执行员工信息请求前显示提示信息
+		 */
+		@Override
+		protected void onPreExecute(){
+			_msgTxtView.setText("正在更新员工信息...请稍后");
+			//_progDialog = ProgressDialog.show(EnterActivity.this, "", "正在更新员工信息...请稍后", true);
+		}
+		
+		/**
+		 * 在新的线程中执行请求员工信息的操作
+		 */
+		@Override
+		protected String doInBackground(Void... arg0){
+			String errMsg = null;
+			try{
+				WirelessOrder.staffs = null;
+				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryStaff());
+				if(resp.header.type == Type.ACK){
+					WirelessOrder.staffs = RespParser.parseQueryStaff(resp);
+				}else{
+					if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
+						errMsg = "终端没有登记到餐厅，请联系管理人员。";
+					}else if(resp.header.reserved == ErrorCode.TERMINAL_EXPIRED) {
+						errMsg = "终端已过期，请联系管理人员。";
+					}else{
+						errMsg = "更新员工信息失败，请检查网络信号或重新连接。";
+					}
+					throw new IOException(errMsg);
+				}
+			}catch(IOException e){
+				errMsg = e.getMessage();
+			}
+			return errMsg;
+		}
+		
+		/**
+		 * 根据返回的error message判断，如果发错异常则提示用户，
+		 * 如果员工信息请求成功，则继续进行请求菜谱信息的操作。
+		 */
+		@Override
+		protected void onPostExecute(String errMsg){
+			//make the progress dialog disappeared
+			//_progDialog.dismiss();					
+			//notify the main activity to redraw the food menu
+			//_handler.sendEmptyMessage(REDRAW_FOOD_MENU);
+			/**
+			 * Prompt user message if any error occurred,
+			 * otherwise continue to query restaurant info.
+			 */
+			if(errMsg != null){
+				new AlertDialog.Builder(StartupActivity.this)
+				.setTitle("提示")
+				.setMessage(errMsg)
+				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						Intent intent = new Intent(StartupActivity.this, MainActivity.class);
+						startActivity(intent);
+						finish();
+					}
+				}).show();
+				
+			}else{
+				new QueryMenuTask().execute();
+			}
+		}	
+	}
 	
 	/**
 	 * 请求菜谱信息
@@ -312,7 +384,7 @@ public class StartupActivity extends Activity {
 			String errMsg = null;
 			
 			try{
-				WirelessOrder.pin = Integer.parseInt(PinReader.read(), 16);
+				WirelessOrder.pin = Long.parseLong(PinReader.read(), 16);
 			}catch(FileNotFoundException e){
 				errMsg = "找不到PIN验证文件，请确认是否已插入验证用的SDCard";
 			}catch(IOException e){
@@ -336,9 +408,7 @@ public class StartupActivity extends Activity {
 				}).show();				
 				
 			}else{
-				// FIXME
 				new CheckVersionTask().execute();
-				//new QueryMenuTask().execute();
 			}
 		}
 	}
@@ -454,7 +524,7 @@ public class StartupActivity extends Activity {
 							})
 					.show();
 			}else{
-				new QueryMenuTask().execute();
+				new QueryStaffTask().execute();
 			}
 		}
 	}	
