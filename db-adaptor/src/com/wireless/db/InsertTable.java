@@ -3,6 +3,7 @@ package com.wireless.db;
 import java.sql.SQLException;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.Order;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 
@@ -72,6 +73,9 @@ public class InsertTable {
 		Table newTbl = new Table();
 		newTbl.alias_id = table.alias_id;
 		newTbl.name = table.name;
+		newTbl.restaurantID = term.restaurant_id;
+		newTbl.status = Table.TABLE_IDLE;
+		newTbl.category = Order.CATE_NORMAL;
 		
 		String sql;
 		if(autoGenID){

@@ -2,6 +2,7 @@ package com.wireless.db;
 
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
@@ -244,7 +245,12 @@ public class InsertOrder {
 				}else{
 					throw new SQLException("The id of order is not generated successfully.");
 				}
-					
+				
+				//FIXME 
+				System.out.println(orderToInsert.id + "@" + 
+							new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()) + 
+							":" + System.getProperty("line.separator") + sql);
+				
 				/**
 				 * Update the 2nd table to busy if the category is for merger
 				 */
@@ -267,6 +273,11 @@ public class InsertOrder {
 					  " WHERE restaurant_id=" + term.restaurant_id + 
 					  " AND alias_id=" + orderToInsert.table_id;
 				dbCon.stmt.executeUpdate(sql);
+				
+				//FIXME 
+				System.out.println(orderToInsert.id + "@" + 
+							new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()) +
+							":" + System.getProperty("line.separator") + sql);
 				
 				/**
 				 * Update the gift amount if the gift quota is set.
@@ -323,6 +334,26 @@ public class InsertOrder {
 			}finally{
 				dbCon.conn.setAutoCommit(true);
 			}
+			
+			//FIXME
+			sql = "SELECT status FROM " + Params.dbName + ".table WHERE " +
+				  "restaurant_id=" + term.restaurant_id + " AND " +
+				  "alias_id=" + orderToInsert.table_id + " AND " +
+				  "status=" + Table.TABLE_IDLE;
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
+				System.out.println(orderToInsert.id + 
+						"@" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()) +
+						":" + "table status is NOT correct after inserting order" + System.getProperty("line.separator") + sql);
+			}
+			sql = "SELECT total_price FROM " + Params.dbName + ".order WHERE id=" + orderToInsert.id + " AND total_price IS NOT NULL";
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
+				System.out.println(orderToInsert.id + 
+						"@" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()) +
+						":" + "total price is NOT correct after inserting order" + System.getProperty("line.separator") + sql);
+			}
+			//end of FIX-ME
 			
 			return orderToInsert;
 			

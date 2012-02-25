@@ -1,6 +1,7 @@
 package com.wireless.db;
 
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -217,6 +218,11 @@ public class PayOrder {
 				  " WHERE id=" + orderInfo.id;
 				
 			dbCon.stmt.executeUpdate(sql);
+			
+			//FIXME
+			System.out.println(orderInfo.id + "@" + 
+					new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()) +
+					":" + System.getProperty("line.separator") + sql);
 				
 			/**
 			 * Delete the table in the case of "并台" or "外卖",
@@ -243,6 +249,11 @@ public class PayOrder {
 					  "category=NULL " +
 					  "WHERE alias_id=" + orderInfo.table_id + " AND restaurant_id=" + orderInfo.restaurantID;
 				dbCon.stmt.executeUpdate(sql);
+				
+				//FIXME
+				System.out.println(orderInfo.id + "@" + 
+						new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()) +
+						":" + System.getProperty("line.separator") + sql);
 			}
 			
 			/**
@@ -269,6 +280,27 @@ public class PayOrder {
 			dbCon.conn.setAutoCommit(true);
 		}
 			
+		//FIXME
+		sql = "SELECT status FROM " + Params.dbName + ".table WHERE " +
+			  "restaurant_id=" + term.restaurant_id + " AND " +
+			  "alias_id=" + orderInfo.table_id + " AND " +
+			  "status=" + Table.TABLE_BUSY;
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			System.out.println(orderInfo.id + 
+					"@" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()) +
+					":" + "table status is NOT correct after paid order" + System.getProperty("line.separator") + sql);
+		}
+		sql = "SELECT total_price FROM " + Params.dbName + ".order WHERE id=" + orderInfo.id + 
+				" AND total_price IS NULL";
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			System.out.println(orderInfo.id + 
+					"@" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()) +
+					":" + "total price is NOT correct after paid order" + System.getProperty("line.separator") + sql);
+		}
+		//end of FIX-ME
+		
 		/**
 		 * Below is to calculate the food and material.
 		 */
