@@ -147,7 +147,7 @@ class OrderHandler extends Handler implements Runnable{
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.INSERT_ORDER){
 
 				Order orderToInsert = ReqParser.parseInsertOrder(request);				
-				printOrder(orderToInsert.print_type, InsertOrder.exec(_term.pin, _term.modelID, orderToInsert));
+				printOrder(orderToInsert.print_type, InsertOrder.exec(_term, orderToInsert));
 				response = new RespACK(request.header);
 
 				//handle update order request
