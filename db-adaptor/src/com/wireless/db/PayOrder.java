@@ -17,19 +17,67 @@ import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 
 public class PayOrder {
+	
 	/**
-	 * Perform to pay an order along with the table id, payment and discount type.
-	 * @param pin the pin to this terminal
-	 * @param model the model to this terminal
-	 * @param orderToPay the pay order information along with the table id, payment and discount type, 				     
-	 * 					 refer to the class "ReqPayOrder" for more details on what information it contains.
+	 * Perform to pay an order along with the table id, payment and discount
+	 * type.
+	 * 
+	 * @param terminal
+	 *            the terminal to pay order
+	 * @param model
+	 *            the model to this terminal
+	 * @param orderToPay
+	 *            the pay order information along with the table id, payment and
+	 *            discount type, refer to the class "ReqPayOrder" for more
+	 *            details on what information it contains.
 	 * @return Order completed pay order information to paid order
-	 * @throws BusinessException throws if one of the cases below.<br>
-	 * 							 - The terminal is NOT attached to any restaurant.<br>
-	 * 							 - The terminal is expired.<br>
-	 * 							 - The table associated with this order is idle.<br>
-	 * 							 - The order to query does NOT exist.
-	 * @throws SQLException throws if fail to execute any SQL statement
+	 * @throws BusinessException
+	 *             throws if one of the cases below.<br>
+	 *             - The terminal is NOT attached to any restaurant.<br>
+	 *             - The terminal is expired.<br>
+	 *             - The table associated with this order is IDLE.<br>
+	 *             - The order to query does NOT exist.
+	 * @throws SQLException
+	 *             throws if fail to execute any SQL statement
+	 */
+	public static Order exec(Terminal term, Order orderToPay) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			
+			/**
+			 * Get the unpaid order id associated with this table
+			 */	
+			orderToPay.id = Util.getUnPaidOrderID(dbCon, QueryTable.exec(dbCon, term, orderToPay.table_id, null, null));
+			orderToPay.restaurantID = term.restaurant_id;
+			
+			return execByID(dbCon, term, orderToPay);	
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Perform to pay an order along with the table id, payment and discount
+	 * type.
+	 * 
+	 * @param pin
+	 *            the pin to this terminal
+	 * @param model
+	 *            the model to this terminal
+	 * @param orderToPay
+	 *            the pay order information along with the table id, payment and
+	 *            discount type, refer to the class "ReqPayOrder" for more
+	 *            details on what information it contains.
+	 * @return Order completed pay order information to paid order
+	 * @throws BusinessException
+	 *             throws if one of the cases below.<br>
+	 *             - The terminal is NOT attached to any restaurant.<br>
+	 *             - The terminal is expired.<br>
+	 *             - The table associated with this order is idle.<br>
+	 *             - The order to query does NOT exist.
+	 * @throws SQLException
+	 *             throws if fail to execute any SQL statement
 	 */
 	public static Order exec(long pin, short model, Order orderToPay) throws BusinessException, SQLException{
 		
@@ -39,14 +87,14 @@ public class PayOrder {
 		try{
 			dbCon.connect();
 			
+			Terminal term = VerifyPin.exec(dbCon, pin, model);
 			/**
 			 * Get the unpaid order id associated with this table
-			 */		
-			Table table = QueryTable.exec(dbCon, pin, model, orderToPay.table_id);
-			orderToPay.id = Util.getUnPaidOrderID(dbCon, table);
-			orderToPay.restaurantID = table.restaurantID;
+			 */	
+			orderToPay.id = Util.getUnPaidOrderID(dbCon, QueryTable.exec(dbCon, term, orderToPay.table_id, null, null));
+			orderToPay.restaurantID = term.restaurant_id;
 			
-			return execByID(dbCon, pin, model, orderToPay);			
+			return execByID(dbCon, term, orderToPay);			
 			
 		}finally{
 			dbCon.disconnect();
@@ -72,7 +120,7 @@ public class PayOrder {
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, pin, model);
 			orderToPay.restaurantID = term.restaurant_id;
-			return execByID(dbCon, pin, model, orderToPay);
+			return execByID(dbCon, term, orderToPay);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -93,12 +141,12 @@ public class PayOrder {
 	 * 							 - The order to query does NOT exist.
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Order execByID(DBCon dbCon, long pin, short model, Order orderToPay) throws BusinessException, SQLException{
+	public static Order execByID(DBCon dbCon, Terminal term, Order orderToPay) throws BusinessException, SQLException{
 		
 		/**
 		 * Get the completed order information.
 		 */			
-		Order orderInfo = queryOrderByID(dbCon, pin, model, orderToPay); 
+		Order orderInfo = queryOrderByID(dbCon, orderToPay); 
 			
 		float totalPrice = orderInfo.getTotalPrice().floatValue();
 		float totalPrice2 = orderInfo.getActualPrice().floatValue();
@@ -154,9 +202,9 @@ public class PayOrder {
 			 * - member name if pay type is for member
 			 */
 			sql = "UPDATE `" + Params.dbName + "`.`order` SET " +
-				  "waiter=(SELECT owner_name FROM " + Params.dbName + ".terminal WHERE pin=" + "0x" + Long.toHexString(pin) + " AND model_id=" + model + ")" +
-				  ", terminal_model=" + model +
-				  ", terminal_pin=" + pin +
+				  "waiter=(SELECT owner_name FROM " + Params.dbName + ".terminal WHERE pin=" + "0x" + Long.toHexString(term.pin) + " AND model_id=" + term.modelID + ")" +
+				  ", terminal_model=" + term.modelID +
+				  ", terminal_pin=" + term.pin +
 				  ", gift_price=" + orderInfo.getGiftPrice() +
 				  ", total_price=" + totalPrice + 
 				  ", total_price_2=" + totalPrice2 +
@@ -265,7 +313,7 @@ public class PayOrder {
 					  " AND dept_id=0), " +	//price
 					  "NOW(), " +			//date
 					  "(SELECT owner_name FROM " + Params.dbName + 
-					  ".terminal WHERE pin=" + "0x" + Long.toHexString(pin) + " AND model_id=" + model + "), " +	//staff
+					  ".terminal WHERE pin=" + "0x" + Long.toHexString(term.pin) + " AND model_id=" + term.modelID + "), " +	//staff
 					  "(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + 
 					  orderInfo.restaurantID + " AND alias_id=" + foodMaterial.food.kitchen + "), " +				//dept_id
 					  -amount + ", " + 				//amount
@@ -292,34 +340,75 @@ public class PayOrder {
 	}
 	
 	/**
-	 * Get the order detail information and get the discount to each food 
-	 * according to the table id, payment and discount type.
-	 * Note that the database should be connected before invoking this method.
-	 * @param conn the database connection
-	 * @param pin the pin to this terminal
-	 * @param model the model to this terminal
-	 * @param orderToPay the pay order information along with table ID, payment and discount type,
-	 * 					 refer to the class "ReqPayOrder" for more details on what information it contains.
+	 * Get the order detail information and get the discount to each food
+	 * according to the table id, payment and discount type. 
+	 * @param term
+	 * 			  the terminal to pay order
+	 * @param orderToPay
+	 *            the pay order information along with table ID, payment and
+	 *            discount type, refer to the class "ReqPayOrder" for more
+	 *            details on what information it contains.
 	 * @return Order completed pay order information to paid order
-	 * @throws BusinessException throws if one of the cases below.<br>
-	 * 							 - The terminal is NOT attached to any restaurant.<br>
-	 * 							 - The terminal is expired.<br>
-	 *  						 - The table associated with this order is idle.<br>
-	 * 							 - The order to query does NOT exist.
-	 * @throws SQLException throws if fail to execute any SQL statement
+	 * @throws BusinessException
+	 *             throws if one of the cases below.<br>
+	 *             - The terminal is NOT attached to any restaurant.<br>
+	 *             - The terminal is expired.<br>
+	 *             - The table associated with this order is idle.<br>
+	 *             - The order to query does NOT exist.
+	 * @throws SQLException
+	 *             throws if fail to execute any SQL statement
 	 */
-	public static Order queryOrder(long pin, short model, Order orderToPay) throws BusinessException, SQLException{
+	public static Order queryOrder(Terminal term, Order orderToPay) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			/**
 			 * Get the unpaid order id associated with this table
 			 */
-			Table table = QueryTable.exec(dbCon, pin, model, orderToPay.table_id);
-			orderToPay.id = Util.getUnPaidOrderID(dbCon, table);
-			orderToPay.restaurantID = table.restaurantID;
+			orderToPay.id = Util.getUnPaidOrderID(dbCon, QueryTable.exec(dbCon, term, orderToPay.table_id, null, null));
+			orderToPay.restaurantID = term.restaurant_id;
 			
-			return queryOrderByID(dbCon, pin, model, orderToPay);
+			return queryOrderByID(dbCon, orderToPay);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the order detail information and get the discount to each food
+	 * according to the table id, payment and discount type. 
+	 * 
+	 * @param pin
+	 *            the pin to this terminal
+	 * @param model
+	 *            the model to this terminal
+	 * @param orderToPay
+	 *            the pay order information along with table ID, payment and
+	 *            discount type, refer to the class "ReqPayOrder" for more
+	 *            details on what information it contains.
+	 * @return Order completed pay order information to paid order
+	 * @throws BusinessException
+	 *             throws if one of the cases below.<br>
+	 *             - The terminal is NOT attached to any restaurant.<br>
+	 *             - The terminal is expired.<br>
+	 *             - The table associated with this order is idle.<br>
+	 *             - The order to query does NOT exist.
+	 * @throws SQLException
+	 *             throws if fail to execute any SQL statement
+	 */
+	public static Order queryOrder(long pin, short model, Order orderToPay) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			
+			Terminal term = VerifyPin.exec(dbCon, pin, model);
+			/**
+			 * Get the unpaid order id associated with this table
+			 */
+			orderToPay.id = Util.getUnPaidOrderID(dbCon, QueryTable.exec(dbCon, term, orderToPay.table_id, null, null));
+			orderToPay.restaurantID = term.restaurant_id;
+			
+			return queryOrderByID(dbCon, orderToPay);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -344,7 +433,7 @@ public class PayOrder {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return queryOrderByID(dbCon, pin, model, orderToPay);
+			return queryOrderByID(dbCon, orderToPay);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -355,8 +444,6 @@ public class PayOrder {
 	 * according to the order id, payment and discount type.
 	 * Note that the database should be connected before invoking this method.
 	 * @param dbCon the database connection
-	 * @param pin the pin to this terminal
-	 * @param model the model to this terminal
 	 * @param orderToPay the pay order information along with order ID, payment and discount type,
 	 * 					 refer to the class "ReqPayOrder" for more details on what information it contains.
 	 * @return Order completed pay order information to paid order
@@ -366,9 +453,9 @@ public class PayOrder {
 	 * 							 - The order to query does NOT exist.
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Order queryOrderByID(DBCon dbCon, long pin, short model, Order orderToPay) throws BusinessException, SQLException{
+	public static Order queryOrderByID(DBCon dbCon, Order orderToPay) throws BusinessException, SQLException{
 		
-		Order orderInfo = QueryOrder.execByID(dbCon, pin, model, orderToPay.id);
+		Order orderInfo = QueryOrder.execByID(dbCon, orderToPay.id);
 		
 		/**
 		 * If the pay order formation does NOT comprise the discount,

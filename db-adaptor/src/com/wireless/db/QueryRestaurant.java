@@ -43,8 +43,30 @@ public class QueryRestaurant {
 	
 	/**
 	 * Get the restaurant information according to specific restaurant id.
+	 * @param term 
+	 * 			the terminal to query
+	 * @return the restaurant information
+	 * @throws BusinessException 
+	 * 			throws if the restaurant does NOT exist
+	 * @throws SQLException 
+	 * 			throws if fail to execute any SQL statement
+	 */
+	public static Restaurant exec(Terminal term) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		
+		try{
+			dbCon.connect();
+			return exec(dbCon, term.restaurant_id);
+			
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the restaurant information according to specific restaurant id.
 	 * @param restaurantID 
-	 * 			the restaurant id to query
+	 * 			the restaurant id
 	 * @return the restaurant information
 	 * @throws BusinessException 
 	 * 			throws if the restaurant does NOT exist
@@ -69,7 +91,7 @@ public class QueryRestaurant {
 	 * @param dbCon 
 	 * 			the database connection 
 	 * @param restaurantID 
-	 * 			the restaurant id to query
+	 * 			the restaurant id
 	 * @return the restaurant information
 	 * @throws BusinessException 
 	 * 			throws if the restaurant does NOT exist

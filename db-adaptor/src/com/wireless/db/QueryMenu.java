@@ -14,6 +14,44 @@ import com.wireless.protocol.Terminal;
 public class QueryMenu {
 
 	/**
+	 * Get the food menu according to the specific restaurant.
+	 * @param restaurantID
+	 * 			The restaurant id.
+	 * @return the food menu
+	 * @throws SQLException
+	 * 			Throws if fail to execute any SQL statement.
+	 */
+	public static FoodMenu exec(Terminal term) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return exec(dbCon, term);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the food menu according to the specific restaurant.
+	 * Note that the database should be connected before invoking this method.
+	 * @param dbCon
+	 * 			The database connection.
+	 * @param term
+	 * 			The terminal to query.
+	 * @return the food menu
+	 * @throws SQLException
+	 * 			Throws if fail to execute any SQL statement.
+	 */
+	public static FoodMenu exec(DBCon dbCon, Terminal term) throws SQLException{
+		return new FoodMenu(queryFoods(dbCon, term.restaurant_id, null, null), 
+			    			queryTastes(dbCon, term.restaurant_id, Taste.CATE_TASTE, null, null),
+			    			queryTastes(dbCon, term.restaurant_id, Taste.CATE_STYLE, null, null),
+			    			queryTastes(dbCon, term.restaurant_id, Taste.CATE_SPEC, null, null),
+			    			queryKitchens(dbCon, term.restaurant_id, null, null),
+			    			queryDepartments(dbCon, term.restaurant_id, null, null));
+	}
+	
+	/**
 	 * Get the food menu including three information below.<br>
 	 * - Food<br>
 	 * - Taste<br>

@@ -10,10 +10,15 @@ public class Util {
 	/**
 	 * Get the unpaid order id according to the specific table if the table is busy,
 	 * otherwise throw a business exception with the TABLE_IDLE error code.
-	 * @param dbCon the db connection
-	 * @param table the table information containing the alias id and associated restaurant id
+	 * @param dbCon 
+	 * 			the database connection
+	 * @param table 
+	 * 			the table information containing the alias id and associated restaurant id
 	 * @return the unpaid order id to this table
-	 * @throws BusinessException throws if the table to query is idle
+	 * @throws BusinessException 
+	 * 			Throws if either of cases below.<br>
+	 * 			1 - The table to query is IDLE.<br>
+	 * 			2 - The order to the this table does NOT exist.<br>
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
 	public static int getUnPaidOrderID(DBCon dbCon, Table table) throws BusinessException, SQLException{

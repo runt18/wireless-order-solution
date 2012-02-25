@@ -212,6 +212,78 @@ public class QueryTable {
 		
 		Terminal term = VerifyPin.exec(dbCon, pin, model);
 		
+		return exec(dbCon, term, tableID, extraCond, orderClause);
+		
+	}
+	
+	/**
+	 * Get the table according to the specific restaurant and table id
+	 * @param terminal
+	 * 			the terminal to query
+	 * @param tableID
+	 * 			the table id
+	 * @return the table information
+	 * @throws BusinessException
+	 * 			throws if the table to query does NOT exist
+	 * @throws SQLException
+	 * 			throws if fail to execute any SQL statement
+	 */
+	public static Table exec(Terminal term, int tableID) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return exec(dbCon, term, tableID, null, null);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the table according to the specific restaurant and table id
+	 * @param terminal
+	 * 			the terminal to query
+	 * @param tableID
+	 * 			the table id
+	 * @param extraCond
+	 * 			the extra condition to SQL statement
+	 * @param orderClause
+	 * 			the order clause to SQL statement
+	 * @return the table information
+	 * @throws BusinessException
+	 * 			throws if the table to query does NOT exist
+	 * @throws SQLException
+	 * 			throws if fail to execute any SQL statement
+	 */
+	public static Table exec(Terminal term, int tableID, String extraCond, String orderClause) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return exec(dbCon, term, tableID, extraCond, orderClause);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the table according to the specific restaurant and table id.
+	 * Note that the database should be connected before invoking this method.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param terminal
+	 * 			the terminal to query
+	 * @param tableID
+	 * 			the table id
+	 * @param extraCond
+	 * 			the extra condition to SQL statement
+	 * @param orderClause
+	 * 			the order clause to SQL statement
+	 * @return the table information
+	 * @throws BusinessException
+	 * 			throws if the table to query does NOT exist
+	 * @throws SQLException
+	 * 			throws if fail to execute any SQL statement
+	 */
+	public static Table exec(DBCon dbCon, Terminal term, int tableID, String extraCond, String orderClause) throws BusinessException, SQLException{
 		//get the tables
 		String sql = "SELECT * FROM " + Params.dbName + 
 					 ".table WHERE restaurant_id=" +
@@ -235,9 +307,8 @@ public class QueryTable {
 			throw new BusinessException("The table(alias_id=" + tableID + ", restaurant_id=" + term.restaurant_id + ") to query does NOT exist.", ErrorCode.TABLE_NOT_EXIST);
 		}
 		dbCon.rs.close();
-
-		return table;
 		
+		return table;
 	}
 	
 }

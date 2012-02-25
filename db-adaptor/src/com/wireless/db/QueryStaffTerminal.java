@@ -4,32 +4,22 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import com.wireless.protocol.StaffTerminal;
+import com.wireless.protocol.Terminal;
 
 public class QueryStaffTerminal {
 	
 	/**
 	 * Query all the staff information to a specific restaurant.
-	 * @param restaurantID indicates which staff of restaurant to query
+	 * 
+	 * @param restaurantID
+	 *            The restaurant id
+	 * @param extraCond
+	 *            the extra condition to the SQL statement
+	 * @param orderClause
+	 *            the order clause to the SQL statement
 	 * @return an array holding all the staff to this restaurant
-	 * @throws SQLException throws if fail to execute any SQL statement
-	 */
-	public static StaffTerminal[] exec(int restaurantID) throws SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return exec(dbCon, restaurantID, null, null);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * Query all the staff information to a specific restaurant.
-	 * @param restaurantID indicates which staff of restaurant to query
-	 * @param extraCond the extra condition to the SQL statement
-	 * @param orderClause the order clause to the SQL statement
-	 * @return an array holding all the staff to this restaurant
-	 * @throws SQLException throws if fail to execute any SQL statement
+	 * @throws SQLException
+	 *             throws if fail to execute any SQL statement
 	 */
 	public static StaffTerminal[] exec(int restaurantID, String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
@@ -43,13 +33,61 @@ public class QueryStaffTerminal {
 	
 	/**
 	 * Query all the staff information to a specific restaurant.
-	 * Note that the database should be connected before invoking this method.
-	 * @param dbCon the database connection
-	 * @param restaurantID indicates which staff of restaurant to query
-	 * @param extraCond the extra condition to the SQL statement
-	 * @param orderClause the order clause to the SQL statement
+	 * 
+	 * @param Terminal
+	 *            The terminal to query
 	 * @return an array holding all the staff to this restaurant
-	 * @throws SQLException throws if fail to execute any SQL statement
+	 * @throws SQLException
+	 *             throws if fail to execute any SQL statement
+	 */
+	public static StaffTerminal[] exec(Terminal term) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return exec(dbCon, term.restaurant_id, null, null);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Query all the staff information to a specific restaurant.
+	 * 
+	 * @param Terminal
+	 *            the terminal to query
+	 * @param extraCond
+	 *            the extra condition to the SQL statement
+	 * @param orderClause
+	 *            the order clause to the SQL statement
+	 * @return an array holding all the staff to this restaurant
+	 * @throws SQLException
+	 *             throws if fail to execute any SQL statement
+	 */
+	public static StaffTerminal[] exec(Terminal term, String extraCond, String orderClause) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return exec(dbCon, term.restaurant_id, extraCond, orderClause);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Query all the staff information to a specific restaurant. Note that the
+	 * database should be connected before invoking this method.
+	 * 
+	 * @param dbCon
+	 *            the database connection
+	 * @param restaurantID
+	 *            indicates which staff of restaurant to query
+	 * @param extraCond
+	 *            the extra condition to the SQL statement
+	 * @param orderClause
+	 *            the order clause to the SQL statement
+	 * @return an array holding all the staff to this restaurant
+	 * @throws SQLException
+	 *             throws if fail to execute any SQL statement
 	 */
 	public static StaffTerminal[] exec(DBCon dbCon, int restaurantID, String extraCond, String orderClause) throws SQLException{
 		dbCon.connect();
