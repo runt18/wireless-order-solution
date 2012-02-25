@@ -203,7 +203,7 @@ public class QueryOrder {
 			
 			dbCon.connect();
 			
-			Table table = QueryTable.exec(dbCon, term, tableID, null, null);
+			Table table = QueryTable.exec(dbCon, term, tableID);
 			
 			return execByID(dbCon, Util.getUnPaidOrderID(dbCon, table));
 			
@@ -233,7 +233,7 @@ public class QueryOrder {
 	 */
 	public static Order exec(DBCon dbCon, Terminal term, int tableID) throws BusinessException, SQLException {		
 
-		Table table = QueryTable.exec(dbCon, term, tableID, null, null);
+		Table table = QueryTable.exec(dbCon, term, tableID);
 			
 		return execByID(dbCon, Util.getUnPaidOrderID(dbCon, table));
 

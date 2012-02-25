@@ -273,6 +273,25 @@ public class QueryTable {
 	 * 			the terminal to query
 	 * @param tableID
 	 * 			the table id
+	 * @return the table information
+	 * @throws BusinessException
+	 * 			throws if the table to query does NOT exist
+	 * @throws SQLException
+	 * 			throws if fail to execute any SQL statement
+	 */
+	public static Table exec(DBCon dbCon, Terminal term, int tableID) throws BusinessException, SQLException{
+		return exec(dbCon, term, tableID, null, null);
+	}
+	
+	/**
+	 * Get the table according to the specific restaurant and table id.
+	 * Note that the database should be connected before invoking this method.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param terminal
+	 * 			the terminal to query
+	 * @param tableID
+	 * 			the table id
 	 * @param extraCond
 	 * 			the extra condition to SQL statement
 	 * @param orderClause

@@ -52,68 +52,127 @@ public class UpdateOrder {
 		try{
 			dbCon.connect();
 			
-			Terminal term = VerifyPin.exec(dbCon, pin, model);
-			
-			Table oriTbl = null, newTbl = null;
-			
-			/**
-			 * There are two update order condition to deal with.
-			 * 1 - The table is the same
-			 * 2 - The table is different
-			 * 
-			 * In the 1st case, need to assure the table to update remains in busy.
-			 * 
-			 * In the 2nd case, need to assure two conditions
-			 * 1 - original table remains in busy
-			 * 2 - the table to be transferred is idle now
-			 */
-			
-	
-			/**
-			 * In the case the table is the same as before,
-			 * need to assure the table to update remains in busy.
-			 */
-			if(orderToUpdate.table_id == orderToUpdate.originalTableID){
-				
-				oriTbl = QueryTable.exec(dbCon, pin, model, orderToUpdate.table_id);
-				if(oriTbl.status == Table.TABLE_IDLE){
-					throw new BusinessException("The table(alias_id=" + orderToUpdate.table_id + ", restaurant_id=" + term.restaurant_id + ") to change order is IDLE."
-												,ErrorCode.TABLE_IDLE);
-				}
-				orderToUpdate.table_name = oriTbl.name;
-				orderToUpdate.category = oriTbl.category;
-				orderToUpdate.id = Util.getUnPaidOrderID(dbCon, oriTbl);
-				
-			/**
-			 * In the case that the table is different from before,
-			 * need to assure two conditions
-			 * 1 - original table remains in busy
-			 * 2 - the table to be transferred is idle now
-			 */
-			}else{			
-				
-				oriTbl = QueryTable.exec(dbCon, pin, model, orderToUpdate.originalTableID);
-				newTbl = QueryTable.exec(dbCon, pin, model, orderToUpdate.table_id);
-				
-				if(newTbl.status == Table.TABLE_BUSY){
-					throw new BusinessException("The table(alias_id=" + orderToUpdate.table_id + ", restaurant_id=" + newTbl.restaurantID + ") to be transferred is BUSY.",
-												ErrorCode.TABLE_BUSY);
-					
-				}else if(oriTbl.status == Table.TABLE_IDLE){
-					throw new BusinessException("The original table(alias_id=" + orderToUpdate.originalTableID + ", restaurant_id=" + oriTbl.restaurantID + ") to be transferred is IDLE.",
-												ErrorCode.TABLE_IDLE);
-				}
-				orderToUpdate.table_name = newTbl.name;
-				orderToUpdate.id = Util.getUnPaidOrderID(dbCon, oriTbl);
-			}
-			
-			
-			return updateOrder(dbCon, term, orderToUpdate, oriTbl, newTbl, false);
+			return exec(dbCon, VerifyPin.exec(dbCon, pin, model), orderToUpdate);
 			
 		}finally{
 			dbCon.disconnect();
 		}
 	}	
+	
+	/**
+	 * Update the order according to the specific table id.
+	 * @param term
+	 * 			the terminal to query
+	 * @param orderToUpdate 
+	 * 			the updated detail information
+	 * @return the update result containing two orders below.<br>
+	 * 		   - The extra order.<br>
+	 * 		   - The canceled order.
+	 * @throws BusinessException throws if one of the cases below.<br>
+	 * 							 - The terminal is NOT attached to any restaurant.<br>
+	 * 							 - The terminal is expired.<br>
+	 * 							 - The table associated with this order does NOT exist.<br>
+	 * 							 - The table of this order to update is IDLE<br>
+	 * 							 - Any table to be transferred of this order is BUSY.<br>
+	 * 							 - Any food to this order does NOT exist.<br>
+	 * 							 - Any taste to this order does NOT exist.<br>
+	 * 							 - Exceed the gift quota.
+	 * @throws SQLException throws if fail to execute any SQL statement.
+	 */
+	public static Result exec(Terminal term, Order orderToUpdate) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();	
+		
+		try{
+			dbCon.connect();
+			
+			return exec(dbCon, term, orderToUpdate);
+			
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Update the order according to the specific table id.
+	 * Note that the database should be connected before invoking this method.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param term
+	 * 			the terminal to query
+	 * @param orderToUpdate 
+	 * 			the updated detail information
+	 * @return the update result containing two orders below.<br>
+	 * 		   - The extra order.<br>
+	 * 		   - The canceled order.
+	 * @throws BusinessException throws if one of the cases below.<br>
+	 * 							 - The terminal is NOT attached to any restaurant.<br>
+	 * 							 - The terminal is expired.<br>
+	 * 							 - The table associated with this order does NOT exist.<br>
+	 * 							 - The table of this order to update is IDLE<br>
+	 * 							 - Any table to be transferred of this order is BUSY.<br>
+	 * 							 - Any food to this order does NOT exist.<br>
+	 * 							 - Any taste to this order does NOT exist.<br>
+	 * 							 - Exceed the gift quota.
+	 * @throws SQLException throws if fail to execute any SQL statement.
+	 */
+	public static Result exec(DBCon dbCon, Terminal term, Order orderToUpdate) throws BusinessException, SQLException{
+		
+		Table oriTbl = null, newTbl = null;
+		
+		/**
+		 * There are two update order condition to deal with.
+		 * 1 - The table is the same
+		 * 2 - The table is different
+		 * 
+		 * In the 1st case, need to assure the table to update remains in busy.
+		 * 
+		 * In the 2nd case, need to assure two conditions
+		 * 1 - original table remains in busy
+		 * 2 - the table to be transferred is idle now
+		 */
+		
+
+		/**
+		 * In the case the table is the same as before,
+		 * need to assure the table to update remains in busy.
+		 */
+		if(orderToUpdate.table_id == orderToUpdate.originalTableID){
+			
+			oriTbl = QueryTable.exec(dbCon, term, orderToUpdate.table_id);
+			if(oriTbl.status == Table.TABLE_IDLE){
+				throw new BusinessException("The table(alias_id=" + orderToUpdate.table_id + ", restaurant_id=" + term.restaurant_id + ") to change order is IDLE."
+											,ErrorCode.TABLE_IDLE);
+			}
+			orderToUpdate.table_name = oriTbl.name;
+			orderToUpdate.category = oriTbl.category;
+			orderToUpdate.id = Util.getUnPaidOrderID(dbCon, oriTbl);
+			
+		/**
+		 * In the case that the table is different from before,
+		 * need to assure two conditions
+		 * 1 - original table remains in busy
+		 * 2 - the table to be transferred is idle now
+		 */
+		}else{			
+			
+			oriTbl = QueryTable.exec(dbCon, term, orderToUpdate.originalTableID);
+			newTbl = QueryTable.exec(dbCon, term, orderToUpdate.table_id);
+			
+			if(newTbl.status == Table.TABLE_BUSY){
+				throw new BusinessException("The table(alias_id=" + orderToUpdate.table_id + ", restaurant_id=" + newTbl.restaurantID + ") to be transferred is BUSY.",
+											ErrorCode.TABLE_BUSY);
+				
+			}else if(oriTbl.status == Table.TABLE_IDLE){
+				throw new BusinessException("The original table(alias_id=" + orderToUpdate.originalTableID + ", restaurant_id=" + oriTbl.restaurantID + ") to be transferred is IDLE.",
+											ErrorCode.TABLE_IDLE);
+			}
+			orderToUpdate.table_name = newTbl.name;
+			orderToUpdate.id = Util.getUnPaidOrderID(dbCon, oriTbl);
+		}
+		
+		
+		return updateOrder(dbCon, term, orderToUpdate, oriTbl, newTbl, false);
+	}
 	
 	/**
 	 * Update the order according to the specific order id.

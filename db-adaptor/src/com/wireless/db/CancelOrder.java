@@ -77,7 +77,7 @@ public class CancelOrder {
 	 */
 	public static void exec(DBCon dbCon, Terminal term, int tableID) throws BusinessException, SQLException{ 
 		
-		Table table = QueryTable.exec(dbCon, term, tableID, null, null);
+		Table table = QueryTable.exec(dbCon, term, tableID);
 		
 		int orderID = Util.getUnPaidOrderID(dbCon, table);
 		

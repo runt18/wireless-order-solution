@@ -48,7 +48,7 @@ public class PayOrder {
 			/**
 			 * Get the unpaid order id associated with this table
 			 */	
-			orderToPay.id = Util.getUnPaidOrderID(dbCon, QueryTable.exec(dbCon, term, orderToPay.table_id, null, null));
+			orderToPay.id = Util.getUnPaidOrderID(dbCon, QueryTable.exec(dbCon, term, orderToPay.table_id));
 			orderToPay.restaurantID = term.restaurant_id;
 			
 			return execByID(dbCon, term, orderToPay);	
@@ -91,7 +91,7 @@ public class PayOrder {
 			/**
 			 * Get the unpaid order id associated with this table
 			 */	
-			orderToPay.id = Util.getUnPaidOrderID(dbCon, QueryTable.exec(dbCon, term, orderToPay.table_id, null, null));
+			orderToPay.id = Util.getUnPaidOrderID(dbCon, QueryTable.exec(dbCon, term, orderToPay.table_id));
 			orderToPay.restaurantID = term.restaurant_id;
 			
 			return execByID(dbCon, term, orderToPay);			
@@ -365,7 +365,7 @@ public class PayOrder {
 			/**
 			 * Get the unpaid order id associated with this table
 			 */
-			orderToPay.id = Util.getUnPaidOrderID(dbCon, QueryTable.exec(dbCon, term, orderToPay.table_id, null, null));
+			orderToPay.id = Util.getUnPaidOrderID(dbCon, QueryTable.exec(dbCon, term, orderToPay.table_id));
 			orderToPay.restaurantID = term.restaurant_id;
 			
 			return queryOrderByID(dbCon, orderToPay);
@@ -405,7 +405,7 @@ public class PayOrder {
 			/**
 			 * Get the unpaid order id associated with this table
 			 */
-			orderToPay.id = Util.getUnPaidOrderID(dbCon, QueryTable.exec(dbCon, term, orderToPay.table_id, null, null));
+			orderToPay.id = Util.getUnPaidOrderID(dbCon, QueryTable.exec(dbCon, term, orderToPay.table_id));
 			orderToPay.restaurantID = term.restaurant_id;
 			
 			return queryOrderByID(dbCon, orderToPay);

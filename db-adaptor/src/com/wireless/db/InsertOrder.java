@@ -118,7 +118,7 @@ public class InsertOrder {
 			orderToInsert.table_id = InsertTable.exec(dbCon, term, newTable, true).alias_id;				
 		}
 		
-		Table table = QueryTable.exec(dbCon, term, orderToInsert.table_id, null, null);
+		Table table = QueryTable.exec(dbCon, term, orderToInsert.table_id);
 			
 		if(table.status == Table.TABLE_IDLE){
 			
