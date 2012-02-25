@@ -49,7 +49,7 @@ public class InsertTableAction extends Action {
 			}
 			table.name = request.getParameter("tableName");
 			
-			int tableID = InsertTable.exec(Long.parseLong(pin), Terminal.MODEL_STAFF, table, autoGenID);
+			int tableID = InsertTable.exec(Long.parseLong(pin), Terminal.MODEL_STAFF, table, autoGenID).alias_id;
 			
 			jsonResp = jsonResp.replace("$(result)", "true");
 			jsonResp = jsonResp.replace("$(value)", Integer.toString(tableID));

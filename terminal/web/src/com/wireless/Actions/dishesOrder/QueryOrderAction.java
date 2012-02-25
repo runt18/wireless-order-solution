@@ -55,7 +55,7 @@ public class QueryOrderAction extends Action {
 				
 			}else if(request.getParameter("orderID") != null){
 				orderID = Integer.parseInt(request.getParameter("orderID"));
-				order = QueryOrder.execByID(Long.parseLong(pin), Terminal.MODEL_STAFF, orderID);
+				order = QueryOrder.execByID(orderID);
 			}			
 
 			jsonResp = jsonResp.replace("$(result)", "true");
