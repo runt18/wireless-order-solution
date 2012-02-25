@@ -153,7 +153,7 @@ class OrderHandler extends Handler implements Runnable{
 				//handle update order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.UPDATE_ORDER){
 				Order orderToUpdate = ReqParser.parseInsertOrder(request);
-				UpdateOrder.Result result = UpdateOrder.exec(_term.pin, _term.modelID, orderToUpdate);				
+				UpdateOrder.Result result = UpdateOrder.exec(_term, orderToUpdate);				
 				
 				short printConf = Reserved.DEFAULT_CONF;			
 				
