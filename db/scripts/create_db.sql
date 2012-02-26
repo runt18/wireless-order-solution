@@ -80,7 +80,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order` (
   `member_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the member\'s alias id' ,
   `member` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the member name' ,
   `terminal_model` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the terminal model to this order' ,
-  `terminal_pin` INT NOT NULL DEFAULT 0 COMMENT 'the terminal pin to this order' ,
+  `terminal_pin` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the terminal pin to this order' ,
   `region_id` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the region id to this order' ,
   `region_name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the region name to this order' ,
   `table_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the table alias id to this order' ,
@@ -305,7 +305,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_history` (
   `member_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the member\'s alias id' ,
   `member` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the member name' ,
   `terminal_model` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the terminal model to this order' ,
-  `terminal_pin` INT NOT NULL DEFAULT 0 COMMENT 'the terminal pin to this order' ,
+  `terminal_pin` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the terminal pin to this order' ,
   `region_id` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the region id to this order' ,
   `region_name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the region name to this order' ,
   `table_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the table alias id to this order' ,
@@ -708,8 +708,6 @@ COMMENT = 'describe the category of material' ;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
-
 
 
 
