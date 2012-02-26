@@ -129,7 +129,7 @@ public class InsertOrder {
 			 * Assure both tables to be merger remains in idle. 
 			 */
 			if(orderToInsert.category == Order.CATE_MERGER_TABLE){
-				Table mergerTable = QueryTable.exec(dbCon, term, orderToInsert.table2_id, null, null);
+				Table mergerTable = QueryTable.exec(dbCon, term, orderToInsert.table2_id);
 				if(mergerTable.status == Table.TABLE_BUSY){
 					throw new BusinessException("The tabe(alias_id=" + orderToInsert.table2_id + ") to be mergerd is BUSY.", ErrorCode.TABLE_BUSY);
 				}else{
@@ -334,26 +334,6 @@ public class InsertOrder {
 			}finally{
 				dbCon.conn.setAutoCommit(true);
 			}
-			
-			//FIXME
-			sql = "SELECT status FROM " + Params.dbName + ".table WHERE " +
-				  "restaurant_id=" + term.restaurant_id + " AND " +
-				  "alias_id=" + orderToInsert.table_id + " AND " +
-				  "status=" + Table.TABLE_IDLE;
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			if(dbCon.rs.next()){
-				System.out.println(orderToInsert.id + 
-						"@" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()) +
-						":" + "table status is NOT correct after inserting order" + System.getProperty("line.separator") + sql);
-			}
-			sql = "SELECT total_price FROM " + Params.dbName + ".order WHERE id=" + orderToInsert.id + " AND total_price IS NOT NULL";
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			if(dbCon.rs.next()){
-				System.out.println(orderToInsert.id + 
-						"@" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()) +
-						":" + "total price is NOT correct after inserting order" + System.getProperty("line.separator") + sql);
-			}
-			//end of FIX-ME
 			
 			return orderToInsert;
 			

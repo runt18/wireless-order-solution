@@ -1,6 +1,7 @@
 package com.wireless.db;
 
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -472,6 +473,11 @@ public class UpdateOrder {
 					" WHERE id=" + orderToUpdate.id;
 			dbCon.stmt.executeUpdate(sql);
 
+			//FIXME
+			System.out.println(orderToUpdate.id + "@" + 
+					new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()) +
+					":" + System.getProperty("line.separator") + sql);
+			
 			/**
 			 * Update the custom number to the merger table
 			 */
@@ -483,6 +489,11 @@ public class UpdateOrder {
 				  	  " WHERE restaurant_id=" + term.restaurant_id + 
 				  	  " AND alias_id=" + orderToUpdate.table2_id;
 				dbCon.stmt.executeUpdate(sql);
+				
+				//FIXME
+				System.out.println(orderToUpdate.id + "@" + 
+						new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()) +
+						":" + System.getProperty("line.separator") + sql);
 			}
 			
 			/**
@@ -499,6 +510,11 @@ public class UpdateOrder {
 						+ oriTbl.alias_id;
 				dbCon.stmt.executeUpdate(sql);
 				
+				//FIXME
+				System.out.println(orderToUpdate.id + "@" + 
+						new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()) +
+						":" + System.getProperty("line.separator") + sql);
+				
 				// update the new table status to busy
 				sql = "UPDATE " + Params.dbName + ".table SET " +
 						  "status=" + Table.TABLE_BUSY + ", " +
@@ -507,6 +523,11 @@ public class UpdateOrder {
 						  " WHERE restaurant_id=" + newTbl.restaurantID + 
 						  " AND alias_id=" + newTbl.alias_id;
 				dbCon.stmt.executeUpdate(sql);
+				
+				//FIXME
+				System.out.println(orderToUpdate.id + "@" + 
+						new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()) +
+						":" + System.getProperty("line.separator") + sql);
 				
 			}else{
 
@@ -517,6 +538,11 @@ public class UpdateOrder {
 					  " WHERE restaurant_id=" + term.restaurant_id + 
 					  " AND alias_id=" + orderToUpdate.table_id;
 				dbCon.stmt.executeUpdate(sql);
+				
+				//FIXME
+				System.out.println(orderToUpdate.id + "@" + 
+						new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()) +
+						":" + System.getProperty("line.separator") + sql);
 			}
 			
 			dbCon.conn.commit();

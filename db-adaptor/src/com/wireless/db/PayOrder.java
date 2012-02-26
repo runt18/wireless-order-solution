@@ -279,27 +279,6 @@ public class PayOrder {
 		}finally{
 			dbCon.conn.setAutoCommit(true);
 		}
-			
-		//FIXME
-		sql = "SELECT status FROM " + Params.dbName + ".table WHERE " +
-			  "restaurant_id=" + term.restaurant_id + " AND " +
-			  "alias_id=" + orderInfo.table_id + " AND " +
-			  "status=" + Table.TABLE_BUSY;
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			System.out.println(orderInfo.id + 
-					"@" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()) +
-					":" + "table status is NOT correct after paid order" + System.getProperty("line.separator") + sql);
-		}
-		sql = "SELECT total_price FROM " + Params.dbName + ".order WHERE id=" + orderInfo.id + 
-				" AND total_price IS NULL";
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			System.out.println(orderInfo.id + 
-					"@" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()) +
-					":" + "total price is NOT correct after paid order" + System.getProperty("line.separator") + sql);
-		}
-		//end of FIX-ME
 		
 		/**
 		 * Below is to calculate the food and material.
