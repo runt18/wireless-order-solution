@@ -56,7 +56,9 @@ public class QueryRestaurant {
 		
 		try{
 			dbCon.connect();
-			return exec(dbCon, term.restaurant_id);
+			Restaurant restaurant = exec(dbCon, term.restaurant_id);
+			restaurant.owner = term.owner;
+			return restaurant;
 			
 		}finally{
 			dbCon.disconnect();
