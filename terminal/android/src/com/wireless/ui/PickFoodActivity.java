@@ -14,14 +14,17 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.MarginLayoutParams;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.view.inputmethod.InputMethodManager;
@@ -62,8 +65,15 @@ public class PickFoodActivity extends TabActivity implements
 	private ArrayList<Kitchen> _validKitchens;
 	private ArrayList<Department> _validDepts;
 
-	private LinearLayout rightlayout ;
-	
+	private LinearLayout rightlayout; // 分厨Tab 侧栏
+
+	private LinearLayout _NumRightLayout; // 编号Tab 侧栏
+
+	private LinearLayout _PinyinRightLayout; // 拼音Tab 侧栏
+
+	private EditText filterNumEdtTxt;
+	private EditText filterPinyinEdtTxt;
+
 	private final static String TAG_NUMBER = "number";
 	private final static String TAG_KITCHEN = "kitchen";
 	private final static String TAG_PINYIN = "pinyin";
@@ -82,6 +92,8 @@ public class PickFoodActivity extends TabActivity implements
 	private PopupWindow _popupWindow;
 	private boolean _isOrderLstShow = false;
 
+	private PickFoodListView pickLstView;
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -94,8 +106,9 @@ public class PickFoodActivity extends TabActivity implements
 		init();
 
 		// 取得新点菜中已有的菜品List，并保存到pickFood的List中
-		OrderParcel orderParcel = getIntent().getParcelableExtra(OrderParcel.KEY_VALUE);
-		for(int i = 0; i < orderParcel.foods.length; i++){
+		OrderParcel orderParcel = getIntent().getParcelableExtra(
+				OrderParcel.KEY_VALUE);
+		for (int i = 0; i < orderParcel.foods.length; i++) {
 			_pickFoods.add(orderParcel.foods[i]);
 		}
 
@@ -276,9 +289,13 @@ public class PickFoodActivity extends TabActivity implements
 						"对不起，\"" + food.toString() + "\"最多只能点255份", 0).show();
 				// pickedFood.setCount(new Float(255));
 			} else {
-				Toast.makeText(this, 
-							  "添加"	+ (food.hangStatus == OrderFood.FOOD_HANG_UP ? "并叫起\"" : "\"") + food.toString() + "\"" + Util.float2String2(food.getCount()) + "份", 0)
-					 .show();
+				Toast.makeText(
+						this,
+						"添加"
+								+ (food.hangStatus == OrderFood.FOOD_HANG_UP ? "并叫起\""
+										: "\"") + food.toString() + "\""
+								+ Util.float2String2(food.getCount()) + "份", 0)
+						.show();
 				pickedFood.setCount(orderAmount);
 				_pickFoods.set(index, pickedFood);
 			}
@@ -287,8 +304,11 @@ public class PickFoodActivity extends TabActivity implements
 				Toast.makeText(this,
 						"对不起，\"" + food.toString() + "\"最多只能点255份", 0).show();
 			} else {
-				Toast.makeText(this,
-							  "新增" + (food.hangStatus == OrderFood.FOOD_HANG_UP ? "并叫起\"" : "\"") + food.toString() + "\""
+				Toast.makeText(
+						this,
+						"新增"
+								+ (food.hangStatus == OrderFood.FOOD_HANG_UP ? "并叫起\""
+										: "\"") + food.toString() + "\""
 								+ Util.float2String2(food.getCount()) + "份", 0)
 						.show();
 				_pickFoods.add(food);
@@ -322,8 +342,36 @@ public class PickFoodActivity extends TabActivity implements
 	 * 设置编号筛选的View
 	 */
 	private void setupNumberView() {
-		final PickFoodListView pickLstView = (PickFoodListView) findViewById(R.id.pickByNumLstView);
-		final EditText filterNumEdtTxt = ((EditText) findViewById(R.id.filterNumEdtTxt));
+
+		if (_NumRightLayout == null) {
+			_NumRightLayout = (LinearLayout) findViewById(R.id.NumsideIndex);
+
+			_NumRightLayout.setBackgroundColor(0xfbfdfe);
+			_NumRightLayout.setOrientation(LinearLayout.VERTICAL);
+		}
+		_NumRightLayout.removeAllViews();
+		for (int i = 0; i < 10; i++) {
+			final TextView tv = new TextView(PickFoodActivity.this);
+			tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 28);
+			MarginLayoutParams ml = new MarginLayoutParams(
+					MarginLayoutParams.FILL_PARENT,
+					MarginLayoutParams.WRAP_CONTENT);
+			tv.setLayoutParams(ml);
+			tv.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					filterNumEdtTxt.append(tv.getText().toString());
+					filterNumEdtTxt.setSelection(filterNumEdtTxt.getText()
+							.toString().length());
+				}
+			});
+
+			tv.setText(i + "");
+			_NumRightLayout.addView(tv);
+			tv.setGravity(Gravity.CENTER_HORIZONTAL);
+		}
+		pickLstView = (PickFoodListView) findViewById(R.id.pickByNumLstView);
+		filterNumEdtTxt = ((EditText) findViewById(R.id.filterNumEdtTxt));
 		filterNumEdtTxt.setText("");
 		pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods,
 				PickFoodListView.TAG_NUM);
@@ -420,7 +468,7 @@ public class PickFoodActivity extends TabActivity implements
 
 		rightlayout = (LinearLayout) findViewById(R.id.sideIndex);
 		final PickFoodListView pickLstView = (PickFoodListView) findViewById(R.id.pickByKitchenLstView);
-		//清除侧栏
+		// 清除侧栏
 		rightlayout.removeAllViews();
 		rightlayout.setBackgroundColor(0xfbfdfe);
 		// 为侧栏添加筛选条件
@@ -443,22 +491,23 @@ public class PickFoodActivity extends TabActivity implements
 					 * 根据侧栏选中的部门，筛选出相应的部门和厨房
 					 */
 					List<Department> dept = new ArrayList<Department>();
-					int deptID = ((Integer)((TextView)v).getTag());
-					for(int i = 0; i < _validDepts.size(); i++){
-						if(_validDepts.get(i).deptID == deptID){
+					int deptID = ((Integer) ((TextView) v).getTag());
+					for (int i = 0; i < _validDepts.size(); i++) {
+						if (_validDepts.get(i).deptID == deptID) {
 							dept.add(_validDepts.get(i));
 							break;
 						}
 					}
 					List<Kitchen> kitchens = new ArrayList<Kitchen>();
-					for(int i = 0; i < _validKitchens.size(); i++){
-						if(_validKitchens.get(i).deptID == deptID){
+					for (int i = 0; i < _validKitchens.size(); i++) {
+						if (_validKitchens.get(i).deptID == deptID) {
 							kitchens.add(_validKitchens.get(i));
 						}
 					}
 					List<List<Kitchen>> kitchenChild = new ArrayList<List<Kitchen>>();
 					kitchenChild.add(kitchens);
-					new KitchenSelectDialog(pickLstView, dept, kitchenChild).show();
+					new KitchenSelectDialog(pickLstView, dept, kitchenChild)
+							.show();
 				}
 			});
 		}
@@ -469,7 +518,8 @@ public class PickFoodActivity extends TabActivity implements
 		// 初始化的时候厨房默认显示的厨房信息
 		ketchenName = (TextView) findViewById(R.id.Spinner01);
 		ketchenName.setText("全部");
-		pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods,	PickFoodListView.TAG_PINYIN);
+		pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods,
+				PickFoodListView.TAG_PINYIN);
 		pickLstView.setFoodPickedListener(this);
 
 		// 已点菜按钮
@@ -483,7 +533,7 @@ public class PickFoodActivity extends TabActivity implements
 					showOrderList();
 					_popupWindow.showAsDropDown(v);
 					_isOrderLstShow = true;
-					
+
 				} else {
 					_popupWindow.dismiss();
 					_isOrderLstShow = false;
@@ -529,7 +579,8 @@ public class PickFoodActivity extends TabActivity implements
 					Food[] foods = pickLstView.getSourceData();
 					ArrayList<Food> filterFoods = new ArrayList<Food>();
 					for (int i = 0; i < foods.length; i++) {
-						if (String.valueOf(foods[i].pinyin).toLowerCase().contains(s.toString().toLowerCase())
+						if (String.valueOf(foods[i].pinyin).toLowerCase()
+								.contains(s.toString().toLowerCase())
 								|| foods[i].name.contains(s.toString())) {
 							filterFoods.add(foods[i]);
 						}
@@ -582,7 +633,8 @@ public class PickFoodActivity extends TabActivity implements
 					}
 					kitchenChild.add(kitchens);
 				}
-				new KitchenSelectDialog(pickLstView, _validDepts, kitchenChild).show();
+				new KitchenSelectDialog(pickLstView, _validDepts, kitchenChild)
+						.show();
 			}
 		});
 	}
@@ -591,8 +643,33 @@ public class PickFoodActivity extends TabActivity implements
 	 * 设置拼音筛选的View
 	 */
 	private void setupPinyinView() {
+		filterPinyinEdtTxt = (EditText) findViewById(R.id.filterPinyinEdtTxt);
+
+		if (_PinyinRightLayout == null) {
+			_PinyinRightLayout = (LinearLayout) findViewById(R.id.PinyinsideIndex);
+			_PinyinRightLayout.setBackgroundColor(0xfbfdfe);
+			_PinyinRightLayout.setOrientation(LinearLayout.VERTICAL);
+		}
+		_PinyinRightLayout.removeAllViews();
+
+		for (char c = 'a'; c <= 'z'; c++) {
+			final TextView tv = new TextView(PickFoodActivity.this);
+			tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
+			tv.setGravity(Gravity.CENTER_HORIZONTAL);
+			tv.setText(c + "");
+			tv.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					filterPinyinEdtTxt.append(tv.getText().toString());
+					filterPinyinEdtTxt.setSelection(filterPinyinEdtTxt
+							.getText().toString().length());
+				}
+			});
+			_PinyinRightLayout.addView(tv);
+		}
+
 		final PickFoodListView pickLstView = (PickFoodListView) findViewById(R.id.pickByPinyinLstView);
-		final EditText filterPinyinEdtTxt = (EditText) findViewById(R.id.filterPinyinEdtTxt);
+
 		filterPinyinEdtTxt.setText("");
 		pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods,
 				PickFoodListView.TAG_PINYIN);
@@ -746,7 +823,8 @@ public class PickFoodActivity extends TabActivity implements
 		private List<Department> deptParent;
 		private List<List<Kitchen>> kitchenChild;
 
-		KitchenSelectDialog(final PickFoodListView foodLstView,	List<Department> depts, List<List<Kitchen>> kitchens) {
+		KitchenSelectDialog(final PickFoodListView foodLstView,
+				List<Department> depts, List<List<Kitchen>> kitchens) {
 			super(PickFoodActivity.this, R.style.FullHeightDialog);
 			deptParent = depts;
 			kitchenChild = kitchens;
@@ -845,7 +923,7 @@ public class PickFoodActivity extends TabActivity implements
 			});
 
 			// 设置展开所有的二级菜单
-			for (int i = 0; i < deptParent.size(); i++){
+			for (int i = 0; i < deptParent.size(); i++) {
 				kitchenLstView.expandGroup(i);
 			}
 
@@ -966,18 +1044,22 @@ public class PickFoodActivity extends TabActivity implements
 	 */
 	private void showOrderList() {
 
-		Display display = ((WindowManager) getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
+		Display display = ((WindowManager) getSystemService(WINDOW_SERVICE))
+				.getDefaultDisplay();
 		// 获取屏幕宽度
-		//int width = display.getWidth();
+		// int width = display.getWidth();
 		// 获取屏幕高度
 		int heigh = display.getHeight();
 		// 获取自定义布局文件的视图
-		View popupWndView = getLayoutInflater().inflate(R.layout.orderlistpupowindow, null, false);
+		View popupWndView = getLayoutInflater().inflate(
+				R.layout.orderlistpupowindow, null, false);
 		// 创建PopupWindow实例
-		_popupWindow = new PopupWindow(popupWndView, LayoutParams.WRAP_CONTENT - 20, heigh / 2, false);
+		_popupWindow = new PopupWindow(popupWndView,
+				LayoutParams.WRAP_CONTENT - 20, heigh / 2, false);
 		_popupWindow.setOutsideTouchable(true);
 		_popupWindow.setAnimationStyle(R.style.popuwindow);
-		((ListView)popupWndView.findViewById(R.id.orderpupowindowLstView)).setAdapter(new PopupWndAdapter(this, _pickFoods));
+		((ListView) popupWndView.findViewById(R.id.orderpupowindowLstView))
+				.setAdapter(new PopupWndAdapter(this, _pickFoods));
 	}
 
 	/**
@@ -988,8 +1070,7 @@ public class PickFoodActivity extends TabActivity implements
 		private ArrayList<OrderFood> tmpFoods;
 		private Context _context;
 
-		public PopupWndAdapter(Context context,
-				ArrayList<OrderFood> pickFoods) {
+		public PopupWndAdapter(Context context, ArrayList<OrderFood> pickFoods) {
 			this._context = context;
 			this.tmpFoods = pickFoods;
 		}
@@ -1085,7 +1166,8 @@ public class PickFoodActivity extends TabActivity implements
 		_validDepts = new ArrayList<Department>();
 		for (int i = 0; i < WirelessOrder.foodMenu.sKitchens.length; i++) {
 			for (int j = 0; j < _validKitchens.size(); j++) {
-				if (WirelessOrder.foodMenu.sKitchens[i].deptID == _validKitchens.get(j).deptID) {
+				if (WirelessOrder.foodMenu.sKitchens[i].deptID == _validKitchens
+						.get(j).deptID) {
 					_validDepts.add(WirelessOrder.foodMenu.sKitchens[i]);
 					break;
 				}
