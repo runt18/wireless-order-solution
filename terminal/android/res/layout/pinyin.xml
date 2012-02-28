@@ -1,58 +1,116 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:orientation="vertical" android:layout_width="match_parent"
-	android:layout_height="match_parent"
-	android:background="@drawable/bgcolor"
-	>
-	<RelativeLayout android:id="@+id/top_pin"
-		android:layout_width="fill_parent" android:layout_height="wrap_content"
-		android:background="@drawable/bg01" android:layout_alignParentTop="true">
-		<ImageView android:id="@+id/pinback" android:layout_width="wrap_content"
-			android:layout_height="wrap_content" android:src="@drawable/back_selector"
-			android:layout_marginLeft="20dip" android:layout_centerVertical="true">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bgcolor"
+    android:orientation="vertical" >
 
-		</ImageView>
-		<TextView android:id="@+id/pintitle" android:layout_width="wrap_content"
-			android:layout_height="wrap_content" android:textColor="#FFFFFF"
-			android:textSize="22sp" android:textStyle="bold" android:typeface="monospace"
-			android:shadowDx="1" android:shadowDy="1" android:shadowRadius="3.0"
-			android:text="点菜-拼音" android:layout_centerVertical="true"
-			android:layout_centerHorizontal="true">
-		</TextView>
+    <RelativeLayout
+        android:id="@+id/top_pin"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/bg01" >
 
-	
-		<ImageView android:id="@+id/pinorder" android:layout_width="wrap_content"
-			android:layout_height="wrap_content" android:src="@drawable/popuwindow_selector"
-			android:layout_alignParentRight="true"
-			android:layout_marginRight="20dip" android:layout_centerVertical="true">
-		</ImageView>
-		
-	</RelativeLayout>
+        <ImageView
+            android:id="@+id/pinback"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20dip"
+            android:src="@drawable/back_selector" >
+        </ImageView>
 
-	<RelativeLayout android:id="@+id/second"
-		android:layout_width="fill_parent" android:layout_height="40dip"
-		android:layout_below="@id/top_pin" android:background="@drawable/bg02">
-		<TextView android:id="@+id/orderpin" android:layout_width="wrap_content"
-			android:layout_height="wrap_content" android:textColor="#000000"
-			android:layout_centerVertical="true" android:textSize="20sp"
-			android:text="拼音:" android:layout_marginLeft="5dip" />
-		<EditText android:id="@+id/filterPinyinEdtTxt" android:layout_width="250dip"
-		    android:inputType="text"
-			android:layout_height="wrap_content" android:layout_centerVertical="true"
-			android:layout_toRightOf="@id/orderpin" android:layout_marginLeft="10dip" />
-	</RelativeLayout>
-	<ImageView android:id="@+id/line" android:layout_width="fill_parent"
-		android:layout_height="wrap_content" android:src="@drawable/line"
-		android:layout_below="@id/second" />
+        <TextView
+            android:id="@+id/pintitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="3.0"
+            android:text="点菜-拼音"
+            android:textColor="#FFFFFF"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:typeface="monospace" >
+        </TextView>
 
-	<com.wireless.ui.view.PickFoodListView
-		android:id="@+id/pickByPinyinLstView" android:layout_width="fill_parent"
-		android:layout_height="wrap_content" android:layout_below="@id/line"
-		android:fadeScrollbars="false"
-		android:fadingEdge="none"
-		android:fastScrollEnabled="true" 
-		android:divider="@drawable/line" android:cacheColorHint="#00000000">
-	</com.wireless.ui.view.PickFoodListView>
+        <ImageView
+            android:id="@+id/pinorder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="20dip"
+            android:src="@drawable/popuwindow_selector" >
+        </ImageView>
+    </RelativeLayout>
 
+    <RelativeLayout
+        android:id="@+id/second"
+        android:layout_width="fill_parent"
+        android:layout_height="40dip"
+        android:layout_below="@id/top_pin"
+        android:background="@drawable/bg02" >
+
+        <TextView
+            android:id="@+id/orderpin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dip"
+            android:text="拼音:"
+            android:textColor="#000000"
+            android:textSize="20sp" />
+
+        <EditText
+            android:id="@+id/filterPinyinEdtTxt"
+            android:layout_width="250dip"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dip"
+            android:layout_toRightOf="@id/orderpin"
+            android:inputType="text" />
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/line"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/second"
+        android:src="@drawable/line" />
+
+    
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="horizontal" 
+        android:layout_below="@id/line"
+        >
+
+        <com.wireless.ui.view.PickFoodListView
+            android:id="@+id/pickByPinyinLstView"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_below="@id/line"
+            android:layout_weight="1"
+            android:cacheColorHint="#00000000"
+            android:divider="@drawable/line"
+            android:fadeScrollbars="false"
+            android:fadingEdge="none"
+            android:fastScrollEnabled="true" >
+        </com.wireless.ui.view.PickFoodListView>
+
+        <LinearLayout
+            android:id="@+id/PinyinsideIndex"
+            android:layout_width="45dip"
+            android:layout_height="fill_parent"
+            android:background="#FFF"
+            android:gravity="center_horizontal"
+            android:orientation="vertical" >
+        </LinearLayout>
+    </LinearLayout>
 
 </LinearLayout>
