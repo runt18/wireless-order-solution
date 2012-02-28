@@ -225,10 +225,10 @@ public class UpdateOrder {
 	public static Result execByID(DBCon dbCon, long pin, short model, Order orderToUpdate, boolean isGiftSkip) throws BusinessException, SQLException{
 		
 		Terminal term = VerifyPin.exec(dbCon, pin, model);
-		String sql = "SELECT table_id, table_name, category FROM " + Params.dbName + ".order WHERE id=" + orderToUpdate.id;
+		String sql = "SELECT table_alias, table_name, category FROM " + Params.dbName + ".order WHERE id=" + orderToUpdate.id;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
-			orderToUpdate.table_id = dbCon.rs.getInt("table_id");
+			orderToUpdate.table_id = dbCon.rs.getInt("table_alias");
 			orderToUpdate.originalTableID = orderToUpdate.table_id;
 			String tblName = dbCon.rs.getString("table_name");
 			orderToUpdate.table_name = (tblName != null ? tblName : "");
@@ -468,7 +468,7 @@ public class UpdateOrder {
 					", waiter='" + term.owner + "'" +
 					", region_id=" + orderToUpdate.region.regionID +
 					", region_name='" + orderToUpdate.region.name + "'" + 
-					", table_id=" + orderToUpdate.table_id + 
+					", table_alias=" + orderToUpdate.table_id + 
 					", table_name='" + orderToUpdate.table_name + "'" +
 					" WHERE id=" + orderToUpdate.id;
 			dbCon.stmt.executeUpdate(sql);
@@ -487,7 +487,7 @@ public class UpdateOrder {
 					  "category=" + Order.CATE_MERGER_TABLE + ", " +
 					  "custom_num=" + orderToUpdate.custom_num +
 				  	  " WHERE restaurant_id=" + term.restaurant_id + 
-				  	  " AND alias_id=" + orderToUpdate.table2_id;
+				  	  " AND table_alias=" + orderToUpdate.table2_id;
 				dbCon.stmt.executeUpdate(sql);
 				
 				//FIXME
@@ -506,7 +506,7 @@ public class UpdateOrder {
 				sql = "UPDATE " + Params.dbName + ".table SET status="
 						+ Table.TABLE_IDLE + "," + "custom_num=NULL,"
 						+ "category=NULL" + " WHERE restaurant_id="
-						+ oriTbl.restaurantID + " AND alias_id="
+						+ oriTbl.restaurantID + " AND table_alias="
 						+ oriTbl.alias_id;
 				dbCon.stmt.executeUpdate(sql);
 				
@@ -521,7 +521,7 @@ public class UpdateOrder {
 						  "category=" + oriTbl.category + ", " +
 						  "custom_num=" + orderToUpdate.custom_num + 
 						  " WHERE restaurant_id=" + newTbl.restaurantID + 
-						  " AND alias_id=" + newTbl.alias_id;
+						  " AND table_alias=" + newTbl.alias_id;
 				dbCon.stmt.executeUpdate(sql);
 				
 				//FIXME
@@ -536,7 +536,7 @@ public class UpdateOrder {
 					  "category=" + orderToUpdate.category + ", " +
 					  "custom_num=" + orderToUpdate.custom_num +
 					  " WHERE restaurant_id=" + term.restaurant_id + 
-					  " AND alias_id=" + orderToUpdate.table_id;
+					  " AND table_alias=" + orderToUpdate.table_id;
 				dbCon.stmt.executeUpdate(sql);
 				
 				//FIXME

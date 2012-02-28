@@ -27,8 +27,8 @@ public class Util {
 		}else{
 			//query the order id associated with the this table
 			String sql = "SELECT id FROM `" + Params.dbName + 
-						"`.`order` WHERE (table_id = " + table.alias_id +
-						" OR table2_id = " + table.alias_id + ")" +
+						"`.`order` WHERE (table_alias = " + table.alias_id +
+						" OR table2_alias = " + table.alias_id + ")" +
 						" AND restaurant_id = " + table.restaurantID +
 						" AND total_price IS NULL";
 			dbCon.rs = dbCon.stmt.executeQuery(sql);

@@ -97,7 +97,7 @@ public class QueryTable {
 		while(dbCon.rs.next()){
 			Table table = new Table();
 			table.restaurantID = term.restaurant_id;
-			table.alias_id = dbCon.rs.getInt("alias_id");
+			table.alias_id = dbCon.rs.getInt("table_alias");
 			table.name = dbCon.rs.getString("name");
 			table.setMinimumCost(dbCon.rs.getFloat("minimum_cost"));
 			table.custom_num = dbCon.rs.getShort("custom_num");
@@ -290,7 +290,7 @@ public class QueryTable {
 	 * 			the database connection
 	 * @param terminal
 	 * 			the terminal to query
-	 * @param tableID
+	 * @param tableAliasID
 	 * 			the table id
 	 * @param extraCond
 	 * 			the extra condition to SQL statement
@@ -302,19 +302,19 @@ public class QueryTable {
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static Table exec(DBCon dbCon, Terminal term, int tableID, String extraCond, String orderClause) throws BusinessException, SQLException{
+	public static Table exec(DBCon dbCon, Terminal term, int tableAliasID, String extraCond, String orderClause) throws BusinessException, SQLException{
 		//get the tables
 		String sql = "SELECT * FROM " + Params.dbName + 
 					 ".table WHERE restaurant_id=" +
-					 term.restaurant_id + " AND alias_id=" +
-					 tableID + " " +
+					 term.restaurant_id + " AND table_alias=" +
+					 tableAliasID + " " +
 					 (extraCond != null ? extraCond : " ") +
 					 (orderClause != null ? orderClause : "");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		Table table = new Table();
 		if(dbCon.rs.next()){
 			table.restaurantID = term.restaurant_id;
-			table.alias_id = tableID;
+			table.alias_id = tableAliasID;
 			table.name = dbCon.rs.getString("name");
 			table.setMinimumCost(dbCon.rs.getFloat("minimum_cost"));
 			table.custom_num = dbCon.rs.getShort("custom_num");
@@ -323,7 +323,7 @@ public class QueryTable {
 			table.regionID = dbCon.rs.getShort("region_id");
 			table.setServiceRate(dbCon.rs.getFloat("service_rate"));
 		}else{
-			throw new BusinessException("The table(alias_id=" + tableID + ", restaurant_id=" + term.restaurant_id + ") to query does NOT exist.", ErrorCode.TABLE_NOT_EXIST);
+			throw new BusinessException("The table(alias_id=" + tableAliasID + ", restaurant_id=" + term.restaurant_id + ") to query does NOT exist.", ErrorCode.TABLE_NOT_EXIST);
 		}
 		dbCon.rs.close();
 		

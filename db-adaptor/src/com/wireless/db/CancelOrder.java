@@ -100,13 +100,13 @@ public class CancelOrder {
 		}
 		
 		short category = Order.CATE_NORMAL;
-		int table2ID = 0;
+		int table2AliasID = 0;
 		boolean isDelTable = false;
-		sql = "SELECT category, table2_id FROM " + Params.dbName + ".order WHERE id=" + orderID;
+		sql = "SELECT category, table2_alias FROM " + Params.dbName + ".order WHERE id=" + orderID;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			category = dbCon.rs.getShort("category");
-			table2ID = dbCon.rs.getInt("table2_id");
+			table2AliasID = dbCon.rs.getInt("table2_alias");
 			if(category == Order.CATE_JOIN_TABLE || category == Order.CATE_TAKE_OUT){
 				isDelTable = true;
 			}
@@ -136,9 +136,9 @@ public class CancelOrder {
 			 * Otherwise update the table status to idle
 			 */
 			if(isDelTable){
-				sql = "DELETE FROM " + Params.dbName + ".table WHERE alias_id=" +
-					  table.alias_id + 
-					  " AND restaurant_id=" + table.restaurantID;
+				sql = "DELETE FROM " + Params.dbName + ".table WHERE " +
+					  "restaurant_id=" + table.restaurantID + " AND " +
+					  "table_alias=" + table.alias_id;
 				dbCon.stmt.executeUpdate(sql);
 			}else{
 				if(category == Order.CATE_MERGER_TABLE){
@@ -146,7 +146,9 @@ public class CancelOrder {
 					  	  "status=" + Table.TABLE_IDLE + ", " +
 					  	  "custom_num=NULL, " +
 					  	  "category=NULL " +
-					  	  "WHERE alias_id=" + table2ID + " AND restaurant_id=" + table.restaurantID;
+					  	  "WHERE " +
+					  	  "restaurant_id=" + table.restaurantID + " AND " +
+					  	  "table_alias=" + table2AliasID;
 					dbCon.stmt.executeUpdate(sql);
 				}
 				sql = "UPDATE " + Params.dbName + ".table SET " +
@@ -154,7 +156,7 @@ public class CancelOrder {
 					  "custom_num=NULL, " +
 					  "category=NULL " +
 					  "WHERE restaurant_id=" + table.restaurantID + 
-					  " AND alias_id=" + table.alias_id;
+					  " AND table_alias=" + table.alias_id;
 				dbCon.stmt.executeUpdate(sql);
 			}
 			//delete the records related to the order id and food id in "order_food" table

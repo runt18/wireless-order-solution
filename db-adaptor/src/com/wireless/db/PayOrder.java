@@ -230,8 +230,9 @@ public class PayOrder {
 			 * Otherwise update the table status to idle.
 			 */
 			if(orderInfo.category == Order.CATE_JOIN_TABLE || orderInfo.category == Order.CATE_TAKE_OUT){
-				sql = "DELETE FROM " + Params.dbName + ".table WHERE alias_id=" +
-					  orderInfo.table_id + " AND restaurant_id=" + orderInfo.restaurantID;
+				sql = "DELETE FROM " + Params.dbName + ".table WHERE " +
+					  "restaurant_id=" + orderInfo.restaurantID + " AND " +
+					  "table_alias=" + orderInfo.table_id;
 				dbCon.stmt.executeUpdate(sql);
 				
 			}else{
@@ -240,14 +241,18 @@ public class PayOrder {
 					  	  "status=" + Table.TABLE_IDLE + ", " +
 					  	  "custom_num=NULL, " +
 					  	  "category=NULL " +
-					  	  "WHERE alias_id=" + orderInfo.table2_id + " AND restaurant_id=" + orderInfo.restaurantID;
+					  	  "WHERE " +
+					  	  "restaurant_id=" + orderInfo.restaurantID + " AND " +
+					  	  "table_alias=" + orderInfo.table2_id;
 					dbCon.stmt.executeUpdate(sql);
 				}
 				sql = "UPDATE " + Params.dbName + ".table SET " +
 					  "status=" + Table.TABLE_IDLE + ", " +
 					  "custom_num=NULL, " +
 					  "category=NULL " +
-					  "WHERE alias_id=" + orderInfo.table_id + " AND restaurant_id=" + orderInfo.restaurantID;
+					  "WHERE " +
+  			  		  "restaurant_id=" + orderInfo.restaurantID + " AND " +
+					  "table_alias=" + orderInfo.table_id;
 				dbCon.stmt.executeUpdate(sql);
 				
 				//FIXME

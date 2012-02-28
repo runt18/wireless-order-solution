@@ -197,7 +197,7 @@ public class QueryRegion {
 					 ".region WHERE restaurant_id=" + restaurantID +
 					 " AND region_id=" +
 					 "(SELECT region_id FROM " + Params.dbName + ".table WHERE restaurant_id=" + restaurantID +
-					 " AND alias_id=" + tableID + ")";
+					 " AND table_alias=" + tableID + ")";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
 		if(dbCon.rs.next()){

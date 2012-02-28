@@ -221,7 +221,7 @@ public class InsertOrder {
 				 */
 				sql = "INSERT INTO `" + Params.dbName + "`.`order` (" +
 						"`id`, `restaurant_id`, `category`, `region_id`, `region_name`, " +
-						"`table_id`, `table_name`, `table2_id`, `table2_name`, `terminal_model`, " +
+						"`table_alias`, `table_name`, `table2_alias`, `table2_name`, `terminal_model`, " +
 						"`terminal_pin`, `order_date`, `custom_num`, `waiter`) VALUES (" +
 						"NULL, " + 
 						table.restaurantID + ", " + 
@@ -260,7 +260,7 @@ public class InsertOrder {
 						  "category=" + orderToInsert.category + ", " +
 						  "custom_num=" + orderToInsert.custom_num +
 						  " WHERE restaurant_id=" + term.restaurant_id +
-						  " AND alias_id=" + orderToInsert.table2_id;
+						  " AND table_alias=" + orderToInsert.table2_id;
 					dbCon.stmt.executeUpdate(sql);
 				}
 				/**
@@ -271,7 +271,7 @@ public class InsertOrder {
 					  "category=" + orderToInsert.category + ", " +
 					  "custom_num=" + orderToInsert.custom_num +
 					  " WHERE restaurant_id=" + term.restaurant_id + 
-					  " AND alias_id=" + orderToInsert.table_id;
+					  " AND table_alias=" + orderToInsert.table_id;
 				dbCon.stmt.executeUpdate(sql);
 				
 				//FIXME 

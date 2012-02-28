@@ -80,7 +80,7 @@ public class InsertTable {
 		String sql;
 		if(autoGenID){
 			
-			sql = "SELECT MAX(alias_id) + 1 FROM " + Params.dbName + ".table WHERE restaurant_id=" + term.restaurant_id;
+			sql = "SELECT MAX(table_alias) + 1 FROM " + Params.dbName + ".table WHERE restaurant_id=" + term.restaurant_id;
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			if(dbCon.rs.next()){
 				newTbl.alias_id = dbCon.rs.getInt(1);
@@ -91,8 +91,10 @@ public class InsertTable {
 			
 		}else{
 			sql = "SELECT id FROM " + Params.dbName + 
-				".table WHERE alias_id=" + newTbl.alias_id +
-					  " AND restaurant_id=" + term.restaurant_id;
+				  ".table WHERE " +
+				  "restaurant_id=" + term.restaurant_id + 
+				  " AND " +
+				  "table_alias=" + newTbl.alias_id;
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			if(dbCon.rs.next()){
 				throw new BusinessException("Table(alias_id=" + newTbl.alias_id + ", restaurant_id=" + term.restaurant_id + ") is exist.", ErrorCode.TABLE_EXIST);
@@ -105,7 +107,7 @@ public class InsertTable {
 		 * Otherwise, set the alias id using the parameter pass into the function. 
 		 */
 		sql = "INSERT INTO " + Params.dbName + 
-			  ".table (`id`, `alias_id`, `restaurant_id`, `name`, `category`, `custom_num`, `status`) VALUES( " +
+			  ".table (`table_id`, `table_alias`, `restaurant_id`, `name`, `category`, `custom_num`, `status`) VALUES( " +
 			  "NULL, " +
 			  newTbl.alias_id + ", " +
 			  term.restaurant_id + ", '" +

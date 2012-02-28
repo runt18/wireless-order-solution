@@ -56,8 +56,9 @@ public class CancelTable {
 		
 		Table table = QueryTable.exec(dbCon, pin, model, tableID);
 		
-		String sql = "DELETE FROM " + Params.dbName + ".table WHERE restaurant_id=" + 
-					 table.restaurantID + " AND alias_id=" + table.alias_id;
+		String sql = "DELETE FROM " + Params.dbName + ".table WHERE " +
+					 "restaurant_id=" + table.restaurantID + " AND " +
+					 "table_alias=" + table.alias_id;
 		dbCon.stmt.execute(sql);
 	}
 }
