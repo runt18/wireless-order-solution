@@ -17,6 +17,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -506,6 +507,7 @@ public class MainActivity extends Activity {
 			// ´´½¨PopupWindowÊµÀý
 			_popupWindow = new PopupWindow(popupWndView, 464, 300, true);
 			_popupWindow.setOutsideTouchable(true);
+			_popupWindow.setBackgroundDrawable(new BitmapDrawable());
 			ListView listView = (ListView)popupWndView.findViewById(R.id.loginpopuwindow);
 			
 			if(WirelessOrder.staffs.length != 0){
