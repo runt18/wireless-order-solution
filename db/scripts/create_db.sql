@@ -83,8 +83,10 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order` (
   `terminal_pin` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the terminal pin to this order' ,
   `region_id` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the region id to this order' ,
   `region_name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the region name to this order' ,
+  `table_id` INT NOT NULL DEFAULT 0 COMMENT 'the table id to this order' ,
   `table_alias` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the table alias id to this order' ,
   `table_name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the table to this order' ,
+  `table2_id` INT NULL DEFAULT NULL COMMENT 'the 2nd table id to this order' ,
   `table2_alias` SMALLINT UNSIGNED NULL DEFAULT NULL COMMENT 'the 2nd table alias id to this order(used for table merger)' ,
   `table2_name` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the 2nd table name to this order(used for table merger)' ,
   `service_rate` DECIMAL(3,2) NOT NULL DEFAULT 0 COMMENT 'the service rate to this order' ,
@@ -297,8 +299,10 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_history` (
   `terminal_pin` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the terminal pin to this order' ,
   `region_id` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the region id to this order' ,
   `region_name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the region name to this order' ,
+  `table_id` INT NOT NULL DEFAULT 0 COMMENT 'the table id to this order' ,
   `table_alias` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the table alias id to this order' ,
   `table_name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the table name to this order' ,
+  `table2_id` INT NOT NULL DEFAULT 0 COMMENT 'the 2nd table id to this order' ,
   `table2_alias` SMALLINT UNSIGNED NULL DEFAULT NULL COMMENT 'the 2nd table alias id to this order(used for table merger)' ,
   `table2_name` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the 2nd table name to this order(used for table merger)' ,
   `service_rate` DECIMAL(3,2) NOT NULL DEFAULT 0 COMMENT 'the service rate to this order' ,
@@ -692,7 +696,6 @@ COMMENT = 'describe the category of material' ;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
 
 
 

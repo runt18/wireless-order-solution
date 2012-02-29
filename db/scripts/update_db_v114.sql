@@ -49,6 +49,16 @@ ALTER TABLE `wireless_order_db`.`order_history` CHANGE COLUMN `table_id` `table_
 
 , DROP INDEX `fk_order_restaurant` ;
 
+-- -----------------------------------------------------
+-- Add the field 'table_id' and 'table2_id' to table 'order'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order` ADD COLUMN `table_id` INT NOT NULL DEFAULT 0 COMMENT 'the table id to this order'  AFTER `region_name` , ADD COLUMN `table2_id` INT NULL DEFAULT NULL COMMENT 'the 2nd table id to this order'  AFTER `table_name` ;
+
+-- -----------------------------------------------------
+-- Add the field 'table_id' and 'table2_id' to table 'order_history'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_history` ADD COLUMN `table_id` INT NOT NULL DEFAULT 0 COMMENT 'the table id to this order'  AFTER `region_name` , ADD COLUMN `table2_id` INT NULL DEFAULT NULL COMMENT 'the 2nd table id to this order'  AFTER `table_name` ;
+
 
 -- -----------------------------------------------------
 -- View `order_food_history_view`
