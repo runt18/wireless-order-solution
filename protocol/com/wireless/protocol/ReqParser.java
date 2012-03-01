@@ -82,10 +82,10 @@ public class ReqParser {
 		order.print_type = ((req.body[0] & 0x000000FF) | ((req.body[1] & 0x000000FF) << 8));
 		
 		//get the table id
-		order.table_id = ((req.body[2] & 0x000000FF) | ((req.body[3] & 0x000000FF) << 8));
+		order.table.aliasID = ((req.body[2] & 0x000000FF) | ((req.body[3] & 0x000000FF) << 8));
 		
 		//get the 2nd table id
-		order.table2_id = ((req.body[4] & 0x000000FF) | ((req.body[5] & 0x000000FF) << 8));
+		order.table2.aliasID = ((req.body[4] & 0x000000FF) | ((req.body[5] & 0x000000FF) << 8));
 		
 		//get the category
 		order.category = (short)(req.body[6] & 0x000000FF);
@@ -206,7 +206,7 @@ public class ReqParser {
 		order.foods = orderFoods;
 		
 		//assign the original table id
-		order.originalTableID = ((req.body[offset] & 0x000000FF) | 
+		order.oriTbl.aliasID = ((req.body[offset] & 0x000000FF) | 
 									((req.body[offset + 1] & 0x000000FF) << 8));
 		return order;
 	}
@@ -247,8 +247,8 @@ public class ReqParser {
 		
 		Order orderToPrint = new Order();
 		orderToPrint.id = orderID;
-		orderToPrint.originalTableID = oriTblID;
-		orderToPrint.table_id = newTblID;
+		orderToPrint.oriTbl.aliasID = oriTblID;
+		orderToPrint.table.aliasID = newTblID;
 		orderToPrint.print_type = printType;
 		
 		return orderToPrint;
@@ -348,7 +348,7 @@ public class ReqParser {
 		}
 		Order orderToPay = new Order();
 		orderToPay.print_type = printType;
-		orderToPay.table_id = tableToPay;
+		orderToPay.table.aliasID = tableToPay;
 		orderToPay.cashIncome = cashIncome;
 		orderToPay.giftPrice = giftPrice;
 		orderToPay.pay_type = payType;

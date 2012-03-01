@@ -73,10 +73,10 @@ public class RespParser {
 		 *******************************************************/
 		if(response.header.type == Type.ACK){
 			//get the table id
-			order.table_id = ((response.body[0] & 0x000000FF) | ((response.body[1] & 0x000000FF) << 8));
+			order.table.aliasID = ((response.body[0] & 0x000000FF) | ((response.body[1] & 0x000000FF) << 8));
 
 			//get the 2nd table id
-			order.table2_id = ((response.body[2] & 0x000000FF) | ((response.body[3] & 0x000000FF) << 8));
+			order.table2.aliasID = ((response.body[2] & 0x000000FF) | ((response.body[3] & 0x000000FF) << 8));
 			
 			//get the minimum cost
 			order.minCost = (response.body[4] & 0x000000FF) | 

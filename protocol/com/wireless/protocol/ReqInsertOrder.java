@@ -127,12 +127,12 @@ public class ReqInsertOrder extends ReqPackage {
 		body[1] = (byte)((reqConf & 0xFF00) >> 8);
 		
 		//assign the table id
-		body[2] = (byte)(reqOrder.table_id & 0x00FF);
-		body[3] = (byte)((reqOrder.table_id & 0xFF00) >> 8);
+		body[2] = (byte)(reqOrder.table.aliasID & 0x00FF);
+		body[3] = (byte)((reqOrder.table.aliasID & 0xFF00) >> 8);
 
 		//assign the 2nd table id
-		body[4] = (byte)(reqOrder.table2_id & 0x00FF);
-		body[5] = (byte)((reqOrder.table2_id & 0xFF00) >> 8);
+		body[4] = (byte)(reqOrder.table2.aliasID & 0x00FF);
+		body[5] = (byte)((reqOrder.table2.aliasID & 0xFF00) >> 8);
 		
 		//assign the category
 		body[6] = (byte)(reqOrder.category & 0x00FF); 
@@ -208,8 +208,8 @@ public class ReqInsertOrder extends ReqPackage {
 		}		
 		
 		//assign the original table id
-		body[offset] = (byte)(reqOrder.originalTableID & 0x000000FF);
-		body[offset + 1] = (byte)((reqOrder.originalTableID & 0x0000FF00) >> 8);
+		body[offset] = (byte)(reqOrder.oriTbl.aliasID & 0x000000FF);
+		body[offset + 1] = (byte)((reqOrder.oriTbl.aliasID & 0x0000FF00) >> 8);
 	}
 	
 	/******************************************************

@@ -94,12 +94,12 @@ public class RespQueryOrder extends RespPackage{
 		body = new byte[bodyLen];
 		
 		//assign the table id
-		body[0] = (byte)(order.table_id & 0x00FF);
-		body[1] = (byte)((order.table_id & 0xFF00) >> 8);
+		body[0] = (byte)(order.table.aliasID & 0x00FF);
+		body[1] = (byte)((order.table.aliasID & 0xFF00) >> 8);
 		
 		//assign the 2nd table id
-		body[2] = (byte)(order.table2_id & 0x00FF);
-		body[3] = (byte)((order.table2_id & 0xFF00) >> 8);
+		body[2] = (byte)(order.table2.aliasID & 0x00FF);
+		body[3] = (byte)((order.table2.aliasID & 0xFF00) >> 8);
 		
 		//assign the minimum cost
 		body[4] = (byte)(order.minCost & 0x000000FF);
