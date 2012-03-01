@@ -108,7 +108,7 @@
 	    android:layout_height="wrap_content"
 	    android:layout_gravity="center_horizontal"
 	    android:text="登录"
-	    android:layout_marginTop="15dip"
+	    android:layout_marginTop="2dip"
 	    android:textColor="#FFFFFF"
 	    android:textSize="18sp"
 	    android:background="@drawable/login_selector"
