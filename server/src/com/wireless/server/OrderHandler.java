@@ -248,8 +248,8 @@ class OrderHandler extends Handler implements Runnable{
 				 * If print table transfer, need to assign the original and new table id to order.
 				 */
 				if((printConf & Reserved.PRINT_TRANSFER_TABLE_2) != 0){
-					orderToPrint.table_id = reqToPrint.table_id;
-					orderToPrint.originalTableID = reqToPrint.originalTableID;
+					orderToPrint.table = reqToPrint.table;
+					orderToPrint.oriTbl = reqToPrint.oriTbl;
 				}
 				
 				printOrder(printConf, orderToPrint);
