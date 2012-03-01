@@ -71,7 +71,7 @@ public class InsertTable {
 	public static Table exec(DBCon dbCon, Terminal term, Table table, boolean autoGenID) throws BusinessException, SQLException{
 		
 		Table newTbl = new Table();
-		newTbl.alias_id = table.alias_id;
+		newTbl.aliasID = table.aliasID;
 		newTbl.name = table.name;
 		newTbl.restaurantID = term.restaurant_id;
 		newTbl.status = Table.TABLE_IDLE;
@@ -83,7 +83,7 @@ public class InsertTable {
 			sql = "SELECT MAX(table_alias) + 1 FROM " + Params.dbName + ".table WHERE restaurant_id=" + term.restaurant_id;
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			if(dbCon.rs.next()){
-				newTbl.alias_id = dbCon.rs.getInt(1);
+				newTbl.aliasID = dbCon.rs.getInt(1);
 			}else{
 				throw new BusinessException("Fail to generate the table alias id.");
 			}
@@ -94,10 +94,10 @@ public class InsertTable {
 				  ".table WHERE " +
 				  "restaurant_id=" + term.restaurant_id + 
 				  " AND " +
-				  "table_alias=" + newTbl.alias_id;
+				  "table_alias=" + newTbl.aliasID;
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			if(dbCon.rs.next()){
-				throw new BusinessException("Table(alias_id=" + newTbl.alias_id + ", restaurant_id=" + term.restaurant_id + ") is exist.", ErrorCode.TABLE_EXIST);
+				throw new BusinessException("Table(alias_id=" + newTbl.aliasID + ", restaurant_id=" + term.restaurant_id + ") is exist.", ErrorCode.TABLE_EXIST);
 			}	
 			dbCon.rs.close();
 		}
@@ -109,7 +109,7 @@ public class InsertTable {
 		sql = "INSERT INTO " + Params.dbName + 
 			  ".table (`table_id`, `table_alias`, `restaurant_id`, `name`, `category`, `custom_num`, `status`) VALUES( " +
 			  "NULL, " +
-			  newTbl.alias_id + ", " +
+			  newTbl.aliasID + ", " +
 			  term.restaurant_id + ", '" +
 			  (newTbl.name != null ? newTbl.name : "") + "', " + 
 			  "NULL, " +

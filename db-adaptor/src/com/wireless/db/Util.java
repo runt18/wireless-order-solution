@@ -23,19 +23,19 @@ public class Util {
 	 */
 	public static int getUnPaidOrderID(DBCon dbCon, Table table) throws BusinessException, SQLException{
 		if(table.status == Table.TABLE_IDLE){
-			throw new BusinessException("The table(alias_id=" + table.alias_id + ", restaurant_id=" + table.restaurantID + ") to query is IDLE.", ErrorCode.TABLE_IDLE);			
+			throw new BusinessException("The table(alias_id=" + table.aliasID + ", restaurant_id=" + table.restaurantID + ") to query is IDLE.", ErrorCode.TABLE_IDLE);			
 		}else{
 			//query the order id associated with the this table
 			String sql = "SELECT id FROM `" + Params.dbName + 
-						"`.`order` WHERE (table_alias = " + table.alias_id +
-						" OR table2_alias = " + table.alias_id + ")" +
+						"`.`order` WHERE (table_alias = " + table.aliasID +
+						" OR table2_alias = " + table.aliasID + ")" +
 						" AND restaurant_id = " + table.restaurantID +
 						" AND total_price IS NULL";
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			if(dbCon.rs.next()){
 				return dbCon.rs.getInt("id");
 			}else{
-				throw new BusinessException("The un-paid order id to table(alias_id=" + table.alias_id + ", restaurant_id=" + table.restaurantID + ") does NOT exist.", ErrorCode.TABLE_IDLE);
+				throw new BusinessException("The un-paid order id to table(alias_id=" + table.aliasID + ", restaurant_id=" + table.restaurantID + ") does NOT exist.", ErrorCode.TABLE_IDLE);
 			}			
 		}
 	}

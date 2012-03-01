@@ -138,7 +138,7 @@ public class CancelOrder {
 			if(isDelTable){
 				sql = "DELETE FROM " + Params.dbName + ".table WHERE " +
 					  "restaurant_id=" + table.restaurantID + " AND " +
-					  "table_alias=" + table.alias_id;
+					  "table_alias=" + table.aliasID;
 				dbCon.stmt.executeUpdate(sql);
 			}else{
 				if(category == Order.CATE_MERGER_TABLE){
@@ -156,7 +156,7 @@ public class CancelOrder {
 					  "custom_num=NULL, " +
 					  "category=NULL " +
 					  "WHERE restaurant_id=" + table.restaurantID + 
-					  " AND table_alias=" + table.alias_id;
+					  " AND table_alias=" + table.aliasID;
 				dbCon.stmt.executeUpdate(sql);
 			}
 			//delete the records related to the order id and food id in "order_food" table

@@ -110,7 +110,7 @@ public class QueryOrder {
 		/**
 		 * Get the related info to this order.
 		 */
-		String sql = "SELECT custom_num, table_alias, table_name, table2_alias, table2_name, " +
+		String sql = "SELECT custom_num, table_id, table_alias, table_name, table2_alias, table2_name, " +
 					 "region_id, region_name, restaurant_id, type, discount_type, category FROM `" + Params.dbName	+ 
 					 "`.`order` WHERE id=" + orderID;
 
@@ -120,10 +120,11 @@ public class QueryOrder {
 
 		if(dbCon.rs.next()) {
 			orderInfo.restaurantID = dbCon.rs.getInt("restaurant_id");
-			orderInfo.table_id = dbCon.rs.getInt("table_alias");
-			orderInfo.table_name = dbCon.rs.getString("table_name");
-			orderInfo.table2_id = dbCon.rs.getShort("table2_alias");
-			orderInfo.table2_name = dbCon.rs.getString("table2_name");
+			orderInfo.table.tableID = dbCon.rs.getInt("table_id");
+			orderInfo.table.aliasID = dbCon.rs.getInt("table_alias");
+			orderInfo.table.name = dbCon.rs.getString("table_name");
+			orderInfo.table2.aliasID = dbCon.rs.getShort("table2_alias");
+			orderInfo.table2.name = dbCon.rs.getString("table2_name");
 			orderInfo.region.regionID = dbCon.rs.getShort("region_id");
 			orderInfo.region.name = dbCon.rs.getString("region_name");
 			orderInfo.custom_num = dbCon.rs.getShort("custom_num");
@@ -164,7 +165,7 @@ public class QueryOrder {
 		 */
 		sql = "SELECT minimum_cost FROM " + Params.dbName +	
 			  ".table WHERE restaurant_id=" + orderInfo.restaurantID +
-			  " AND table_alias=" + orderInfo.table_id;
+			  " AND table_alias=" + orderInfo.table.aliasID;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			//orderInfo.minimum_cost = new Float(dbCon.rs.getFloat("minimum_cost") * 100).intValue();

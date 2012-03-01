@@ -97,7 +97,8 @@ public class QueryTable {
 		while(dbCon.rs.next()){
 			Table table = new Table();
 			table.restaurantID = term.restaurant_id;
-			table.alias_id = dbCon.rs.getInt("table_alias");
+			table.tableID = dbCon.rs.getInt("table_id");
+			table.aliasID = dbCon.rs.getInt("table_alias");
 			table.name = dbCon.rs.getString("name");
 			table.setMinimumCost(dbCon.rs.getFloat("minimum_cost"));
 			table.custom_num = dbCon.rs.getShort("custom_num");
@@ -113,9 +114,9 @@ public class QueryTable {
 		Collections.sort(tables, new Comparator<Table>(){
 
 			public int compare(Table table1, Table table2) {
-				if(table1.alias_id > table2.alias_id){
+				if(table1.aliasID > table2.aliasID){
 					return 1;
-				}else if(table1.alias_id < table2.alias_id){
+				}else if(table1.aliasID < table2.aliasID){
 					return -1;
 				}else{
 					return 0;
@@ -130,21 +131,21 @@ public class QueryTable {
 	 * Get the table information according to specific alias id.
 	 * @param pin the pin to this terminal
 	 * @param model the model to this terminal
-	 * @param tableID the table alias id to query
+	 * @param tableAlias the table alias id to query
 	 * @return the table information to specific alias id
 	 * @throws BusinessException throws if either of cases below.<br>
 	 * 							 - The terminal is NOT attached to any restaurant.<br>
 	 * 							 - The table alias id to query does NOT exist.
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Table exec(long pin, short model, int tableID) throws BusinessException, SQLException{
+	public static Table exec(long pin, short model, int tableAlias) throws BusinessException, SQLException{
 		
 		DBCon dbCon = new DBCon();		
 		
 		try{
 			dbCon.connect();
 
-			return exec(dbCon, pin, model, tableID);
+			return exec(dbCon, pin, model, tableAlias);
 			
 		}finally{
 			dbCon.disconnect();
@@ -159,13 +160,13 @@ public class QueryTable {
 	 * @param dbCon the database connection
 	 * @param pin the pin to this terminal
 	 * @param model the model to this terminal
-	 * @param tableID the table alias id to query
+	 * @param tableAlias the table alias id to query
 	 * @return the table information
 	 * @throws BusinessException throws if the table to query does NOT exist
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Table exec(DBCon dbCon, long pin, short model, int tableID) throws BusinessException, SQLException{
-		return exec(dbCon, pin, model, tableID, null, null);
+	public static Table exec(DBCon dbCon, long pin, short model, int tableAlias) throws BusinessException, SQLException{
+		return exec(dbCon, pin, model, tableAlias, null, null);
 	}
 	
 	/**
@@ -174,20 +175,20 @@ public class QueryTable {
 	 * @param dbCon the database connection
 	 * @param pin the pin to this terminal
 	 * @param model the model to this terminal
-	 * @param tableID the table alias id to query
+	 * @param tableAlias the table alias id to query
 	 * @param extraCond the extra condition to the SQL statement
 	 * @param orderClause the order clause to the SQL statement
 	 * @return the table information
 	 * @throws BusinessException throws if the table to query does NOT exist
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Table exec(long pin, short model, int tableID, String extraCond, String orderClause) throws BusinessException, SQLException{
+	public static Table exec(long pin, short model, int tableAlias, String extraCond, String orderClause) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();		
 		
 		try{
 			dbCon.connect();
 
-			return exec(dbCon, pin, model, tableID, extraCond, orderClause);
+			return exec(dbCon, pin, model, tableAlias, extraCond, orderClause);
 			
 		}finally{
 			dbCon.disconnect();
@@ -201,18 +202,18 @@ public class QueryTable {
 	 * @param dbCon the database connection
 	 * @param pin the pin to this terminal
 	 * @param model the model to this terminal
-	 * @param tableID the table alias id to query
+	 * @param tableAlias the table alias id to query
 	 * @param extraCond the extra condition to the SQL statement
 	 * @param orderClause the order clause to the SQL statement
 	 * @return the table information
 	 * @throws BusinessException throws if the table to query does NOT exist
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Table exec(DBCon dbCon, long pin, short model, int tableID, String extraCond, String orderClause) throws BusinessException, SQLException{
+	public static Table exec(DBCon dbCon, long pin, short model, int tableAlias, String extraCond, String orderClause) throws BusinessException, SQLException{
 		
 		Terminal term = VerifyPin.exec(dbCon, pin, model);
 		
-		return exec(dbCon, term, tableID, extraCond, orderClause);
+		return exec(dbCon, term, tableAlias, extraCond, orderClause);
 		
 	}
 	
@@ -220,7 +221,7 @@ public class QueryTable {
 	 * Get the table according to the specific restaurant and table id
 	 * @param terminal
 	 * 			the terminal to query
-	 * @param tableID
+	 * @param tableAlias
 	 * 			the table id
 	 * @return the table information
 	 * @throws BusinessException
@@ -228,11 +229,11 @@ public class QueryTable {
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static Table exec(Terminal term, int tableID) throws BusinessException, SQLException{
+	public static Table exec(Terminal term, int tableAlias) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return exec(dbCon, term, tableID, null, null);
+			return exec(dbCon, term, tableAlias, null, null);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -242,7 +243,7 @@ public class QueryTable {
 	 * Get the table according to the specific restaurant and table id
 	 * @param terminal
 	 * 			the terminal to query
-	 * @param tableID
+	 * @param tableAlias
 	 * 			the table id
 	 * @param extraCond
 	 * 			the extra condition to SQL statement
@@ -254,11 +255,11 @@ public class QueryTable {
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static Table exec(Terminal term, int tableID, String extraCond, String orderClause) throws BusinessException, SQLException{
+	public static Table exec(Terminal term, int tableAlias, String extraCond, String orderClause) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return exec(dbCon, term, tableID, extraCond, orderClause);
+			return exec(dbCon, term, tableAlias, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -271,7 +272,7 @@ public class QueryTable {
 	 * 			the database connection
 	 * @param terminal
 	 * 			the terminal to query
-	 * @param tableID
+	 * @param tableAlias
 	 * 			the table id
 	 * @return the table information
 	 * @throws BusinessException
@@ -279,8 +280,8 @@ public class QueryTable {
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static Table exec(DBCon dbCon, Terminal term, int tableID) throws BusinessException, SQLException{
-		return exec(dbCon, term, tableID, null, null);
+	public static Table exec(DBCon dbCon, Terminal term, int tableAlias) throws BusinessException, SQLException{
+		return exec(dbCon, term, tableAlias, null, null);
 	}
 	
 	/**
@@ -314,7 +315,8 @@ public class QueryTable {
 		Table table = new Table();
 		if(dbCon.rs.next()){
 			table.restaurantID = term.restaurant_id;
-			table.alias_id = tableAliasID;
+			table.tableID = dbCon.rs.getInt("table_id");
+			table.aliasID = tableAliasID;
 			table.name = dbCon.rs.getString("name");
 			table.setMinimumCost(dbCon.rs.getFloat("minimum_cost"));
 			table.custom_num = dbCon.rs.getShort("custom_num");

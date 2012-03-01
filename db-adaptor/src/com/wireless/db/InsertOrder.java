@@ -111,17 +111,18 @@ public class InsertOrder {
 		 */
 		if(orderToInsert.category == Order.CATE_JOIN_TABLE){
 			Table newTable = new Table();
-			newTable.name = "并" + Integer.toString(orderToInsert.table_id);
-			orderToInsert.table_id = InsertTable.exec(dbCon, term, newTable, true).alias_id;
+			newTable.name = "并" + Integer.toString(orderToInsert.table.aliasID);
+			orderToInsert.table = InsertTable.exec(dbCon, term, newTable, true);
 			
 		}else if(orderToInsert.category == Order.CATE_TAKE_OUT){
 			Table newTable = new Table();
-			orderToInsert.table_id = InsertTable.exec(dbCon, term, newTable, true).alias_id;				
-		}
-		
-		Table table = QueryTable.exec(dbCon, term, orderToInsert.table_id);
+			orderToInsert.table = InsertTable.exec(dbCon, term, newTable, true);		
 			
-		if(table.status == Table.TABLE_IDLE){
+		}else{
+			orderToInsert.table = QueryTable.exec(dbCon, term, orderToInsert.table.aliasID);
+		}		
+			
+		if(orderToInsert.table.status == Table.TABLE_IDLE){
 			
 			/**
 			 * In the case of table merger,
@@ -129,15 +130,13 @@ public class InsertOrder {
 			 * Assure both tables to be merger remains in idle. 
 			 */
 			if(orderToInsert.category == Order.CATE_MERGER_TABLE){
-				Table mergerTable = QueryTable.exec(dbCon, term, orderToInsert.table2_id);
-				if(mergerTable.status == Table.TABLE_BUSY){
-					throw new BusinessException("The tabe(alias_id=" + orderToInsert.table2_id + ") to be mergerd is BUSY.", ErrorCode.TABLE_BUSY);
-				}else{
-					orderToInsert.table2_name = mergerTable.name;
+				orderToInsert.table2 = QueryTable.exec(dbCon, term, orderToInsert.table2.aliasID);
+				if(orderToInsert.table2.status == Table.TABLE_BUSY){
+					throw new BusinessException("The tabe(alias_id=" + orderToInsert.table2.aliasID + ") to be mergerd is BUSY.", ErrorCode.TABLE_BUSY);
 				}
 			}
 			
-			orderToInsert.table_name = table.name;
+			//orderToInsert.table_name = table.name;
 			
 			String sql = null;
 			/**
@@ -156,7 +155,7 @@ public class InsertOrder {
 					//get the associated foods' unit price and name
 					sql = "SELECT unit_price, name, status FROM " +  Params.dbName + 
 					 	  ".food WHERE alias_id=" + orderToInsert.foods[i].alias_id + 
-					 	  " AND restaurant_id=" + table.restaurantID;
+					 	  " AND restaurant_id=" + orderToInsert.table.restaurantID;
 					dbCon.rs = dbCon.stmt.executeQuery(sql);
 					//check if the food exist in db 
 					if(dbCon.rs.next()){
@@ -164,7 +163,7 @@ public class InsertOrder {
 						orderToInsert.foods[i].status = dbCon.rs.getShort("status");
 						orderToInsert.foods[i].setPrice(dbCon.rs.getFloat("unit_price"));
 					}else{
-						throw new BusinessException("The food(alias_id=" + orderToInsert.foods[i].alias_id + ", restaurant_id=" + table.restaurantID+ ") to query doesn't exit.", ErrorCode.MENU_EXPIRED);
+						throw new BusinessException("The food(alias_id=" + orderToInsert.foods[i].alias_id + ", restaurant_id=" + orderToInsert.table.restaurantID+ ") to query doesn't exit.", ErrorCode.MENU_EXPIRED);
 					}
 					dbCon.rs.close();
 					
@@ -172,7 +171,7 @@ public class InsertOrder {
 					for(int j = 0; j < orderToInsert.foods[i].tastes.length; j++){
 						if(orderToInsert.foods[i].tastes[j].alias_id != Taste.NO_TASTE){
 							sql = "SELECT preference, price, category, rate, calc FROM " + Params.dbName + 
-								  ".taste WHERE restaurant_id=" + table.restaurantID + 
+								  ".taste WHERE restaurant_id=" + orderToInsert.table.restaurantID + 
 								  " AND alias_id=" + orderToInsert.foods[i].tastes[j].alias_id;
 							dbCon.rs = dbCon.stmt.executeQuery(sql);
 							if(dbCon.rs.next()){
@@ -206,7 +205,7 @@ public class InsertOrder {
 			/**
 			 * Get the region to this table
 			 */
-			orderToInsert.region = QueryRegion.exec(dbCon, table.restaurantID, table.alias_id);
+			orderToInsert.region = QueryRegion.exec(dbCon, orderToInsert.table.restaurantID, orderToInsert.table.aliasID);
 
 			/**
 			 * Put all the INSERT statements into a database transition so as to assure 
@@ -221,17 +220,19 @@ public class InsertOrder {
 				 */
 				sql = "INSERT INTO `" + Params.dbName + "`.`order` (" +
 						"`id`, `restaurant_id`, `category`, `region_id`, `region_name`, " +
-						"`table_alias`, `table_name`, `table2_alias`, `table2_name`, `terminal_model`, " +
-						"`terminal_pin`, `order_date`, `custom_num`, `waiter`) VALUES (" +
+						"`table_id`, `table_alias`, `table_name`, `table2_id`, `table2_alias`, `table2_name`, " +
+						"`terminal_model`, `terminal_pin`, `order_date`, `custom_num`, `waiter`) VALUES (" +
 						"NULL, " + 
-						table.restaurantID + ", " + 
+						orderToInsert.table.restaurantID + ", " + 
 						orderToInsert.category + ", " +
 						orderToInsert.region.regionID + ", '" +
 						orderToInsert.region.name + "', " +
-						orderToInsert.table_id + ", '" + 
-						orderToInsert.table_name + "', " +
-						(orderToInsert.category == Order.CATE_MERGER_TABLE ? orderToInsert.table2_id : "NULL") + ", " +
-						(orderToInsert.category == Order.CATE_MERGER_TABLE ? "'" + orderToInsert.table2_name + "'" : "NULL") + ", " +
+						orderToInsert.table.tableID + ", " +
+						orderToInsert.table.aliasID + ", '" + 
+						orderToInsert.table.name + "', " +
+						(orderToInsert.category == Order.CATE_MERGER_TABLE ? orderToInsert.table2.tableID : "NULL") + ", " +
+						(orderToInsert.category == Order.CATE_MERGER_TABLE ? orderToInsert.table2.aliasID : "NULL") + ", " +
+						(orderToInsert.category == Order.CATE_MERGER_TABLE ? "'" + orderToInsert.table2.name + "'" : "NULL") + ", " +
 						term.modelID + ", " + 
 						term.pin + 
 						", NOW(), " + 
@@ -260,7 +261,7 @@ public class InsertOrder {
 						  "category=" + orderToInsert.category + ", " +
 						  "custom_num=" + orderToInsert.custom_num +
 						  " WHERE restaurant_id=" + term.restaurant_id +
-						  " AND table_alias=" + orderToInsert.table2_id;
+						  " AND table_alias=" + orderToInsert.table2.aliasID;
 					dbCon.stmt.executeUpdate(sql);
 				}
 				/**
@@ -271,7 +272,7 @@ public class InsertOrder {
 					  "category=" + orderToInsert.category + ", " +
 					  "custom_num=" + orderToInsert.custom_num +
 					  " WHERE restaurant_id=" + term.restaurant_id + 
-					  " AND table_alias=" + orderToInsert.table_id;
+					  " AND table_alias=" + orderToInsert.table.aliasID;
 				dbCon.stmt.executeUpdate(sql);
 				
 				//FIXME 
@@ -337,8 +338,8 @@ public class InsertOrder {
 			
 			return orderToInsert;
 			
-		}else if(table.status == Table.TABLE_BUSY){
-			throw new BusinessException("The table(alias_id=" + orderToInsert.table_id + ", restaurant_id=" + term.restaurant_id + ") to insert order is BUSY.", ErrorCode.TABLE_BUSY);
+		}else if(orderToInsert.table.status == Table.TABLE_BUSY){
+			throw new BusinessException("The table(alias_id=" + orderToInsert.table.aliasID + ", restaurant_id=" + term.restaurant_id + ") to insert order is BUSY.", ErrorCode.TABLE_BUSY);
 			
 		}else{
 			throw new BusinessException("Unknown error occourred while inserting order.", ErrorCode.UNKNOWN);
