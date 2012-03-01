@@ -63,7 +63,7 @@ public class PayOrderScreen extends MainScreen
 		}else{
 			category = "";
 		}
-		vfm.add(new LabelField(_bill.table_id + "号餐台信息" + category, LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
+		vfm.add(new LabelField(_bill.table.aliasID + "号餐台信息" + category, LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
 			protected void paintBackground(Graphics g) {
 				g.clear();
 				g.setBackgroundColor(Color.BLUE);
