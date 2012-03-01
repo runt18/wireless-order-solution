@@ -59,6 +59,31 @@ ALTER TABLE `wireless_order_db`.`order` ADD COLUMN `table_id` INT NOT NULL DEFAU
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`order_history` ADD COLUMN `table_id` INT NOT NULL DEFAULT 0 COMMENT 'the table id to this order'  AFTER `region_name` , ADD COLUMN `table2_id` INT NULL DEFAULT NULL COMMENT 'the 2nd table id to this order'  AFTER `table_name` ;
 
+-- -----------------------------------------------------
+-- Update the field 'table_id' in table 'order'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order` CHANGE COLUMN `table_id` `table_id` INT(11) NULL DEFAULT '0' COMMENT 'the table id to this order'  ;
+UPDATE `wireless_order_db`.`order` AS a SET table_id = (SELECT table_id FROM `wireless_order_db`.`table` AS b WHERE a.table_alias = b.table_alias AND a.restaurant_id = b.restaurant_id);
+UPDATE `wireless_order_db`.`order` SET table_id=0 WHERE table_id IS NULL;
+ALTER TABLE `wireless_order_db`.`order` CHANGE COLUMN `table_id` `table_id` INT(11) NOT NULL DEFAULT '0' COMMENT 'the table id to this order'  ;
+
+-- -----------------------------------------------------
+-- Update the field 'table2_id' in table 'order'
+-- -----------------------------------------------------
+UPDATE `wireless_order_db`.`order` AS a SET table2_id = (SELECT table_id FROM `wireless_order_db`.`table` AS b WHERE a.table2_alias = b.table_alias AND a.restaurant_id = b.restaurant_id);
+
+-- -----------------------------------------------------
+-- Update the field 'table_id' in table 'order_history'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_history` CHANGE COLUMN `table_id` `table_id` INT(11) NULL DEFAULT '0' COMMENT 'the table id to this order'  ;
+UPDATE `wireless_order_db`.`order_history` AS a SET table_id = (SELECT table_id FROM `wireless_order_db`.`table` AS b WHERE a.table_alias = b.table_alias AND a.restaurant_id = b.restaurant_id);
+UPDATE `wireless_order_db`.`order_history` SET table_id=0 WHERE table_id IS NULL;
+ALTER TABLE `wireless_order_db`.`order_history` CHANGE COLUMN `table_id` `table_id` INT(11) NOT NULL DEFAULT '0' COMMENT 'the table id to this order'  ;
+
+-- -----------------------------------------------------
+-- Update the field 'table2_id' in table 'order_history'
+-- -----------------------------------------------------
+UPDATE `wireless_order_db`.`order_history` AS a SET table2_id = (SELECT table_id FROM `wireless_order_db`.`table` AS b WHERE a.table2_alias = b.table_alias AND a.restaurant_id = b.restaurant_id);
 
 -- -----------------------------------------------------
 -- View `order_food_history_view`
