@@ -162,14 +162,14 @@ public class QueryTodayAction extends Action {
 								   "\"$(service_rate)\",\"$(member_id)\",\"$(member)\",\"$(comment)\"," +
 								   "\"$(gift_price)\",\"$(pay_type)\",\"$(discount_type)\",\"$(waiter)\"]";
 				jsonOrder = jsonOrder.replace("$(order_id)", Long.toString(dbCon.rs.getLong("id")));
-				jsonOrder = jsonOrder.replace("$(table_id)", Integer.toString(dbCon.rs.getInt("table_id")));
+				jsonOrder = jsonOrder.replace("$(table_id)", Integer.toString(dbCon.rs.getInt("table_alias")));
 				jsonOrder = jsonOrder.replace("$(order_date)", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(dbCon.rs.getTimestamp("order_date")));
 				jsonOrder = jsonOrder.replace("$(order_cate)", Util.toOrderCate(dbCon.rs.getShort("category")));
 				jsonOrder = jsonOrder.replace("$(pay_manner)", Util.toPayManner(dbCon.rs.getShort("type")));
 				float totalPrice = (float)Math.round(dbCon.rs.getFloat("total_price") * (1 + dbCon.rs.getFloat("service_rate")) * 100) / 100;
 				jsonOrder = jsonOrder.replace("$(total_price)", Float.toString(totalPrice));
 				jsonOrder = jsonOrder.replace("$(actual_income)", Float.toString(dbCon.rs.getFloat("total_price_2")));
-				jsonOrder = jsonOrder.replace("$(table2_id)", Integer.toString(dbCon.rs.getInt("table2_id")));
+				jsonOrder = jsonOrder.replace("$(table2_id)", Integer.toString(dbCon.rs.getInt("table2_alias")));
 				jsonOrder = jsonOrder.replace("$(custom_num)", Integer.toString(dbCon.rs.getInt("custom_num")));
 				jsonOrder = jsonOrder.replace("$(min_cost)", "0");
 				jsonOrder = jsonOrder.replace("$(service_rate)", Byte.toString((byte)(dbCon.rs.getFloat("service_rate") * 100)));

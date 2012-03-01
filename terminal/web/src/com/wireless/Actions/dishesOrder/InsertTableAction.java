@@ -45,11 +45,11 @@ public class InsertTableAction extends Action {
 			boolean autoGenID = Boolean.parseBoolean(request.getParameter("autoGenID"));
 			table = new Table();
 			if(!autoGenID){
-				table.alias_id = Short.parseShort(request.getParameter("tableID"));
+				table.aliasID = Short.parseShort(request.getParameter("tableID"));
 			}
 			table.name = request.getParameter("tableName");
 			
-			int tableID = InsertTable.exec(Long.parseLong(pin), Terminal.MODEL_STAFF, table, autoGenID).alias_id;
+			int tableID = InsertTable.exec(Long.parseLong(pin), Terminal.MODEL_STAFF, table, autoGenID).aliasID;
 			
 			jsonResp = jsonResp.replace("$(result)", "true");
 			jsonResp = jsonResp.replace("$(value)", Integer.toString(tableID));
@@ -61,7 +61,7 @@ public class InsertTableAction extends Action {
 				jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");
 				
 			}else if(e.errCode == ErrorCode.TABLE_EXIST){
-				jsonResp = jsonResp.replace("$(value)", table.alias_id + "号餐台已经存在，请选择其他餐台号录入");
+				jsonResp = jsonResp.replace("$(value)", table.aliasID + "号餐台已经存在，请选择其他餐台号录入");
 				
 			}else{
 				jsonResp = jsonResp.replace("$(value)", "添加新餐台不成功，请重新尝试");

@@ -14,6 +14,7 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.QueryTable;
+import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.PinGen;
 import com.wireless.protocol.ReqPackage;
@@ -56,11 +57,12 @@ public class TransTableAction extends Action implements PinGen {
 			newTableID = request.getParameter("newTableID");
 
 			dbCon.connect();
-			oldTable = QueryTable.exec(dbCon, _pin, Terminal.MODEL_STAFF,
-					Integer.parseInt(oldTableID));
+			
+			Terminal term = VerifyPin.exec(dbCon, _pin, Terminal.MODEL_STAFF);
+			
+			oldTable = QueryTable.exec(dbCon, term, Integer.parseInt(oldTableID));
 
-			newTable = QueryTable.exec(dbCon, _pin, Terminal.MODEL_STAFF,
-					Integer.parseInt(newTableID));
+			newTable = QueryTable.exec(dbCon, term, Integer.parseInt(newTableID));
 
 			/**
 			 * Need to assure two conditions before table transfer 1 - the old
@@ -68,67 +70,72 @@ public class TransTableAction extends Action implements PinGen {
 			 */
 			if (oldTable.status == Table.TABLE_IDLE) {
 				jsonResp = jsonResp.replace("$(result)", "false");
-				jsonResp = jsonResp.replace("$(value)", oldTable.alias_id
+				jsonResp = jsonResp.replace("$(value)", oldTable.aliasID
 						+ "号台是空闲状态，可能已经结帐，请跟餐厅经理确认");
 
 			} else if (newTable.status == Table.TABLE_BUSY) {
 				jsonResp = jsonResp.replace("$(result)", "false");
-				jsonResp = jsonResp.replace("$(value)", newTable.alias_id
+				jsonResp = jsonResp.replace("$(value)", newTable.aliasID
 						+ "号台是就餐状态，请跟餐厅经理确认");
 
 			} else {
 
 				int orderID = com.wireless.db.Util.getUnPaidOrderID(dbCon, oldTable);
 
-				// update the order
-				String sql = "UPDATE "
-						+ Params.dbName
-						+ ".order SET "
-						+ "table_id="
-						+ newTable.alias_id
-						+ ((newTable.name == null) ? " " : ", "
-								+ "table_name='" + newTable.name + "'")
-						+ " WHERE id=" + orderID;
-				dbCon.stmt.execute(sql);
+				try{
+					
+					dbCon.conn.setAutoCommit(false);
+					
+					// update the order
+					String sql = "UPDATE "	+ Params.dbName	+ ".order SET "	+ 
+								 "table_id=" + newTable.tableID + ", " +
+								 "table_alias="	+ newTable.aliasID + " " + 
+								 ((newTable.name == null) ? "" : ", " + "table_name='" + newTable.name + "'") + 
+								 " WHERE id=" + orderID;
+					dbCon.stmt.executeUpdate(sql);
 
-				// update the new table status to busy
-				sql = "SELECT category, custom_num FROM " + Params.dbName + 
-				  	  ".table WHERE restaurant_id=" + oldTable.restaurantID +
-				  	  " AND alias_id=" + oldTable.alias_id;
-				dbCon.rs = dbCon.stmt.executeQuery(sql);
-				if(dbCon.rs.next()){
-					short category = dbCon.rs.getShort("category");
-					short customNum = dbCon.rs.getShort("custom_num");
 					sql = "UPDATE " + Params.dbName + ".table SET " +
 						  "status=" + Table.TABLE_BUSY + ", " +
-						  "category=" + category + ", " +
-						  "custom_num=" + customNum + 
+						  "category=" + oldTable.category + ", " +
+						  "custom_num=" + oldTable.custom_num + 
 						  " WHERE restaurant_id=" + newTable.restaurantID + 
-						  " AND alias_id=" + newTable.alias_id;
-					dbCon.stmt.execute(sql);
-				}
-				dbCon.rs.close();
-			
-
-				// update the original table status to idle
-				sql = "UPDATE " + Params.dbName + ".table SET status="
-						+ Table.TABLE_IDLE + "," + "custom_num=NULL,"
-						+ "category=NULL" + " WHERE restaurant_id="
-						+ oldTable.restaurantID + " AND alias_id="
-						+ oldTable.alias_id;
-				dbCon.stmt.execute(sql);
+						  " AND table_alias=" + newTable.aliasID;
+					dbCon.stmt.executeUpdate(sql);
 				
-				jsonResp = jsonResp.replace("$(result)", "true");
-				jsonResp = jsonResp.replace("$(value)", oldTable.alias_id
-						+ "号台转至" + newTable.alias_id + "号台成功");
 
-				// print the transfer table receipt
-				ReqPackage.setGen(this);
-				ServerConnector.instance().ask(
-						new ReqPrintOrder2(Reserved.PRINT_TRANSFER_TABLE_2,
-								orderID, oldTable.alias_id, newTable.alias_id));
+					// update the original table status to idle
+					sql = "UPDATE " + Params.dbName + ".table SET status="
+							+ Table.TABLE_IDLE + "," + "custom_num=NULL,"
+							+ "category=NULL" + " WHERE restaurant_id="
+							+ oldTable.restaurantID + " AND table_alias="
+							+ oldTable.aliasID;
+					dbCon.stmt.executeUpdate(sql);
+					
+					jsonResp = jsonResp.replace("$(result)", "true");
+					jsonResp = jsonResp.replace("$(value)", oldTable.aliasID
+							+ "号台转至" + newTable.aliasID + "号台成功");
 
+					// print the transfer table receipt
+					ReqPackage.setGen(this);
+					ServerConnector.instance().ask(
+							new ReqPrintOrder2(Reserved.PRINT_TRANSFER_TABLE_2,
+									orderID, oldTable.aliasID, newTable.aliasID));
+					
+					dbCon.conn.commit();
+
+				}catch(SQLException e){
+					dbCon.conn.rollback();
+					throw e;
+					
+				}catch(Exception e){
+					dbCon.conn.rollback();
+					throw new BusinessException(e.getMessage());
+					
+				}finally{
+					dbCon.conn.setAutoCommit(true);
+				}
 			}
+
 
 		} catch (BusinessException e) {
 			jsonResp = jsonResp.replace("$(result)", "false");
@@ -137,8 +144,8 @@ public class TransTableAction extends Action implements PinGen {
 			} else if (newTable == null) {
 				jsonResp = jsonResp.replace("$(value)", newTableID + "号台信息不存在");
 			} else {
-				jsonResp = jsonResp.replace("$(value)", oldTable.alias_id
-						+ "号台转至" + newTable.alias_id + "号台不成功");
+				jsonResp = jsonResp.replace("$(value)", oldTable.aliasID
+						+ "号台转至" + newTable.aliasID + "号台不成功");
 			}
 
 		} catch (SQLException e) {

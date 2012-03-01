@@ -125,8 +125,8 @@ public class QueryTableAction extends Action {
 				// ID，別名編號，名稱，區域，人數，狀態，種類，最低消費
 				HashMap resultMap = new HashMap();
 
-				resultMap.put("tableID", tables[i].alias_id);
-				resultMap.put("tableAlias", tables[i].alias_id);
+				resultMap.put("tableID", tables[i].aliasID);
+				resultMap.put("tableAlias", tables[i].aliasID);
 				resultMap.put("tableName", tables[i].name);
 				resultMap.put("tableRegion", tables[i].regionID);
 				resultMap.put("tableCustNbr", tables[i].custom_num);

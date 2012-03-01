@@ -80,11 +80,11 @@ public class InsertOrderAction extends Action implements PinGen {
 			_pin = Long.parseLong(pin);
 			
 			Order orderToInsert = new Order();
-			int tableID = request.getParameter("tableID") != null ? Integer.parseInt(request.getParameter("tableID")) : 0;
-			orderToInsert.table_id = tableID;
+			int tableAlias = request.getParameter("tableID") != null ? Integer.parseInt(request.getParameter("tableID")) : 0;
+			orderToInsert.table.aliasID = tableAlias;
 			String table2ID = request.getParameter("tableID_2");
 			if(table2ID != null){
-				orderToInsert.table2_id = Integer.parseInt(table2ID);
+				orderToInsert.table2.aliasID = Integer.parseInt(table2ID);
 			}			
 			orderToInsert.category = Short.parseShort(request.getParameter("category"));
 			orderToInsert.custom_num = Integer.parseInt(request.getParameter("customNum"));
@@ -93,15 +93,15 @@ public class InsertOrderAction extends Action implements PinGen {
 			short printType = Reserved.DEFAULT_CONF;
 			if(type == 1){
 				orderType = "下单";
-				orderToInsert.originalTableID = tableID;				
+				orderToInsert.oriTbl.aliasID = tableAlias;				
 				printType = Reserved.PRINT_ORDER_2 | Reserved.PRINT_ORDER_DETAIL_2;
 			}else{
 				orderType = "改单";
 				String oriTableID = request.getParameter("originalTableID");
 				if(oriTableID == null){
-					orderToInsert.originalTableID = orderToInsert.table_id;
+					orderToInsert.oriTbl.aliasID = orderToInsert.table.aliasID;
 				}else{
-					orderToInsert.originalTableID = Integer.parseInt(oriTableID);
+					orderToInsert.oriTbl.aliasID = Integer.parseInt(oriTableID);
 				}
 				printType |= Reserved.PRINT_EXTRA_FOOD_2 | 
 							 Reserved.PRINT_CANCELLED_FOOD_2 | 
@@ -120,20 +120,20 @@ public class InsertOrderAction extends Action implements PinGen {
 			if(resp.header.type == Type.ACK){
 				jsonResp = jsonResp.replace("$(result)", "true");
 				if(orderToInsert.category == Order.CATE_NORMAL){
-					if(orderToInsert.table_id == orderToInsert.originalTableID){
-						jsonResp = jsonResp.replace("$(value)", orderToInsert.table_id + "号餐台" + orderType + "成功");
+					if(orderToInsert.table.aliasID == orderToInsert.oriTbl.aliasID){
+						jsonResp = jsonResp.replace("$(value)", orderToInsert.table.aliasID + "号餐台" + orderType + "成功");
 					}else{
-						jsonResp = jsonResp.replace("$(value)", orderToInsert.originalTableID + "号台转至" + orderToInsert.table_id + "号台，改单成功。");
+						jsonResp = jsonResp.replace("$(value)", orderToInsert.oriTbl.aliasID + "号台转至" + orderToInsert.table.aliasID + "号台，改单成功。");
 					}					
 					
 				}else if(orderToInsert.category == Order.CATE_TAKE_OUT){
 					jsonResp = jsonResp.replace("$(value)", "外卖" + orderType + "成功");
 					
 				}else if(orderToInsert.category == Order.CATE_MERGER_TABLE){
-					jsonResp = jsonResp.replace("$(value)", orderToInsert.table_id + "号台拼" + orderToInsert.table2_id + "号台" + orderType + "成功");
+					jsonResp = jsonResp.replace("$(value)", orderToInsert.table.aliasID + "号台拼" + orderToInsert.table2.aliasID + "号台" + orderType + "成功");
 					
 				}else if(orderToInsert.category == Order.CATE_JOIN_TABLE){
-					jsonResp = jsonResp.replace("$(value)", "并" + orderToInsert.table_id + "号" + orderType + "成功");
+					jsonResp = jsonResp.replace("$(value)", "并" + orderToInsert.table.aliasID + "号" + orderType + "成功");
 				}
 				
 			}else if(resp.header.type == Type.NAK){
@@ -142,24 +142,24 @@ public class InsertOrderAction extends Action implements PinGen {
 					jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");
 					
 				}else if(resp.header.reserved == ErrorCode.TABLE_NOT_EXIST){					
-					jsonResp = jsonResp.replace("$(value)", orderToInsert.table_id + "号餐台信息不存在，请重新确认");
+					jsonResp = jsonResp.replace("$(value)", orderToInsert.table.aliasID + "号餐台信息不存在，请重新确认");
 					
 				}else if(resp.header.reserved == ErrorCode.TABLE_BUSY){
-					jsonResp = jsonResp.replace("$(value)", orderToInsert.table_id + "号餐台正在就餐，可能已下单，请重新确认");
+					jsonResp = jsonResp.replace("$(value)", orderToInsert.table.aliasID + "号餐台正在就餐，可能已下单，请重新确认");
 					
 				}else if(resp.header.reserved == ErrorCode.PRINT_FAIL){
-					jsonResp = jsonResp.replace("$(value)", orderToInsert.table_id + "号餐台" + orderType + "成功，但未能成功打印，请立刻补打下单并与相关人员确认");
+					jsonResp = jsonResp.replace("$(value)", orderToInsert.table.aliasID + "号餐台" + orderType + "成功，但未能成功打印，请立刻补打下单并与相关人员确认");
 					
 				}else if(resp.header.reserved == ErrorCode.EXCEED_GIFT_QUOTA){
 					jsonResp = jsonResp.replace("$(value)", "赠送菜品金额已超过赠送额度，请与餐厅负责人确认");
 					
 				}else{
-					jsonResp = jsonResp.replace("$(value)", orderToInsert.table_id + "号餐台" + orderType + "失败，请重新确认");
+					jsonResp = jsonResp.replace("$(value)", orderToInsert.table.aliasID + "号餐台" + orderType + "失败，请重新确认");
 				}
 				
 			}else{
 				jsonResp = jsonResp.replace("$(result)", "false");
-				jsonResp = jsonResp.replace("$(value)", orderToInsert.table_id + "号餐台" + orderType + "不成功，请重新确认");
+				jsonResp = jsonResp.replace("$(value)", orderToInsert.table.aliasID + "号餐台" + orderType + "不成功，请重新确认");
 			}
 			
 		}catch(IOException e){

@@ -37,7 +37,7 @@ public class QueryMergerAction extends Action {
 			
 			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF);
 			
-			String sql = "SELECT table_id, table2_id FROM " + 
+			String sql = "SELECT table_alias, table2_alias FROM " + 
 						 Params.dbName + 
 						 ".order WHERE category=" + Order.CATE_MERGER_TABLE +
 						 " AND restaurant_id=" + term.restaurant_id +
@@ -54,8 +54,8 @@ public class QueryMergerAction extends Action {
 					value.append("，");
 				}
 				String jsonMergerTable = "[$(major),$(minor)]";
-				jsonMergerTable = jsonMergerTable.replace("$(major)", Integer.toString(dbCon.rs.getInt("table_id")));
-				jsonMergerTable = jsonMergerTable.replace("$(minor)", Integer.toString(dbCon.rs.getInt("table2_id")));
+				jsonMergerTable = jsonMergerTable.replace("$(major)", Integer.toString(dbCon.rs.getInt("table_alias")));
+				jsonMergerTable = jsonMergerTable.replace("$(minor)", Integer.toString(dbCon.rs.getInt("table2_alias")));
 				// put each json merger table info to the value
 				value.append(jsonMergerTable);
 			}
