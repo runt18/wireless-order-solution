@@ -26,7 +26,6 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.MarginLayoutParams;
 import android.view.WindowManager;
-import android.view.WindowManager.LayoutParams;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
@@ -384,7 +383,7 @@ public class PickFoodActivity extends TabActivity implements
 			public void onClick(View v) {
 				if (_isOrderLstShow == false) {
 					showOrderList();
-					_popupWindow.showAsDropDown(v);
+					_popupWindow.showAsDropDown(v, -120, 5);
 					_isOrderLstShow = true;
 				} else {
 					_popupWindow.dismiss();
@@ -531,7 +530,7 @@ public class PickFoodActivity extends TabActivity implements
 			public void onClick(View v) {
 				if (_isOrderLstShow == false) {
 					showOrderList();
-					_popupWindow.showAsDropDown(v);
+					_popupWindow.showAsDropDown(v, -120, 5);
 					_isOrderLstShow = true;
 
 				} else {
@@ -684,7 +683,7 @@ public class PickFoodActivity extends TabActivity implements
 			public void onClick(View v) {
 				if (_isOrderLstShow == false) {
 					showOrderList();
-					_popupWindow.showAsDropDown(v);
+					_popupWindow.showAsDropDown(v, -120, 5);
 					_isOrderLstShow = true;
 				} else {
 					_popupWindow.dismiss();
@@ -1055,7 +1054,7 @@ public class PickFoodActivity extends TabActivity implements
 				R.layout.orderlistpupowindow, null, false);
 		// ´´½¨PopupWindowÊµÀý
 		_popupWindow = new PopupWindow(popupWndView,
-				LayoutParams.WRAP_CONTENT - 20, heigh / 2, false);
+				200, heigh / 2, false);
 		_popupWindow.setOutsideTouchable(true);
 		_popupWindow.setAnimationStyle(R.style.popuwindow);
 		((ListView) popupWndView.findViewById(R.id.orderpupowindowLstView))

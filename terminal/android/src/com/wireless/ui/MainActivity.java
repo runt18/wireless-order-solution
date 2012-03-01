@@ -496,7 +496,7 @@ public class MainActivity extends Activity {
 					if(_popupWindow.isShowing()){
 						_popupWindow.dismiss();
 					}else{
-						_popupWindow.showAsDropDown(v, -400, 15);
+						_popupWindow.showAsDropDown(v, -330, 15);
 					}
 					
 				}
@@ -505,7 +505,7 @@ public class MainActivity extends Activity {
 	        // 获取自定义布局文件的视图
 			View popupWndView = getLayoutInflater().inflate(R.layout.loginpopuwindow,null,false);
 			// 创建PopupWindow实例
-			_popupWindow = new PopupWindow(popupWndView, 464, 300, true);
+			_popupWindow = new PopupWindow(popupWndView, 380, 300, true);
 			_popupWindow.setOutsideTouchable(true);
 			_popupWindow.setBackgroundDrawable(new BitmapDrawable());
 			ListView listView = (ListView)popupWndView.findViewById(R.id.loginpopuwindow);
