@@ -22,11 +22,10 @@ public class OrderParcel extends Order implements Parcelable{
 		setServiceRate(order.getServiceRate());
 		id = order.id;
 		restaurantID = order.restaurantID;
-		table_id = order.table_id;
-		this.table_name = order.table_name;
-		table2_id = order.table2_id;
-		table2_name = order.table2_name;
-		originalTableID = order.originalTableID;
+		table = order.table;
+		table2 = order.table2;
+		oriTbl = order.oriTbl;
+
 		custom_num = order.custom_num;
 		this.memberID = order.memberID;
 		this.comment = order.comment;
@@ -48,13 +47,9 @@ public class OrderParcel extends Order implements Parcelable{
 		setServiceRate(Util.int2Float(in.readInt()));
 		id = in.readInt();
 		restaurantID = in.readInt();
-		table_id = in.readInt();
-		String tableName = in.readString();
-		this.table_name = tableName.equals("") ? null : tableName;
-		table2_id = in.readInt();
-		tableName = in.readString();
-		table2_name = tableName.equals("") ? null : tableName;
-		originalTableID = in.readInt();
+		table = new TableParcel(in);
+		table2 = new TableParcel(in);
+		oriTbl = new TableParcel(in);
 		custom_num = in.readInt();
 		String memberID = in.readString();
 		this.memberID = memberID.equals("") ? null : memberID;
@@ -97,11 +92,9 @@ public class OrderParcel extends Order implements Parcelable{
 		parcel.writeInt(Util.float2Int(getServiceRate()));
 		parcel.writeInt(id);
 		parcel.writeInt(restaurantID);
-		parcel.writeInt(table_id);
-		parcel.writeString(table_name == null ? "" : table_name);
-		parcel.writeInt(table2_id);
-		parcel.writeString(table2_name == null ? "" : table2_name);
-		parcel.writeInt(originalTableID);
+		new TableParcel(table).writeToParcel(parcel, flags);
+		new TableParcel(table2).writeToParcel(parcel, flags);
+		new TableParcel(oriTbl).writeToParcel(parcel, flags);
 		parcel.writeInt(custom_num);
 		parcel.writeString(memberID == null ? "" : memberID);
 		parcel.writeString(comment == null ? "" : comment);
