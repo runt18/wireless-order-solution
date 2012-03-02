@@ -73,6 +73,15 @@
             android:layout_marginLeft="10dip"
             android:layout_toRightOf="@id/ordernum"
             android:inputType="number" />
+        
+         <ImageView
+        android:id="@+id/numberdelete"
+        android:layout_width="40dip"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/filterNumEdtTxt"
+        android:layout_marginLeft="7dip"
+        android:layout_centerVertical="true"
+        android:src="@drawable/delete" />
     </RelativeLayout>
 
     <ImageView
@@ -106,7 +115,6 @@
             android:id="@+id/NumsideIndex"
             android:layout_width="45dip"
             android:layout_height="fill_parent"
-            android:background="#FFF"
 			android:gravity="right"
 			android:layout_gravity="right"
             android:orientation="vertical" >

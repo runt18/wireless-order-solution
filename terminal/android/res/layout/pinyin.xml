@@ -73,6 +73,15 @@
             android:layout_marginLeft="10dip"
             android:layout_toRightOf="@id/orderpin"
             android:inputType="text" />
+        
+            <ImageView
+        android:id="@+id/pinyindelete"
+        android:layout_width="40dip"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/filterPinyinEdtTxt"
+        android:layout_marginLeft="7dip"
+        android:layout_centerVertical="true"
+        android:src="@drawable/delete" />
     </RelativeLayout>
 
     <ImageView
@@ -107,7 +116,6 @@
             android:id="@+id/PinyinsideIndex"
             android:layout_width="45dip"
             android:layout_height="fill_parent"
-            android:background="#FFF"
             android:gravity="center_horizontal"
             android:orientation="vertical" >
         </LinearLayout>
