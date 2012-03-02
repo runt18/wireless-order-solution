@@ -374,6 +374,14 @@ public class PickFoodActivity extends TabActivity implements
 		filterNumEdtTxt.setText("");
 		pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods,
 				PickFoodListView.TAG_NUM);
+		//删除输入文字
+		((ImageView)findViewById(R.id.numberdelete)).setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				filterNumEdtTxt.setText("");
+			}
+		});
 		// 已点菜按钮
 		ImageView numberOrder = (ImageView) findViewById(R.id.numorder);
 		// 已点菜按钮事件
@@ -673,6 +681,15 @@ public class PickFoodActivity extends TabActivity implements
 		pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods,
 				PickFoodListView.TAG_PINYIN);
 		pickLstView.setFoodPickedListener(this);
+		
+		//删除输入文字
+		((ImageView)findViewById(R.id.pinyindelete)).setOnClickListener(new View.OnClickListener() {
+					
+			   @Override
+		       public void onClick(View v) {
+					filterPinyinEdtTxt.setText("");
+					}
+				});
 
 		// 已点菜按钮
 		ImageView numberOrder = (ImageView) findViewById(R.id.pinorder);

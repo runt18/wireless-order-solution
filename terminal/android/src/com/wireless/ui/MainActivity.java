@@ -509,12 +509,18 @@ public class MainActivity extends Activity {
 			_popupWindow.setOutsideTouchable(true);
 			_popupWindow.setBackgroundDrawable(new BitmapDrawable());
 			ListView listView = (ListView)popupWndView.findViewById(R.id.loginpopuwindow);
-			
-			if(WirelessOrder.staffs.length != 0){
-				listView.setAdapter(new LoginAdapter(MainActivity.this, WirelessOrder.staffs));
-			}else{
+			/**
+			 * 异常处理以防WirelessOrder.staffs为空
+			 **/
+			try {
+				if(WirelessOrder.staffs.length != 0){
+					listView.setAdapter(new LoginAdapter(MainActivity.this, WirelessOrder.staffs));
+				}else{
+					listView.setAdapter(new LoginAdapter(MainActivity.this, null));
+				}	
+			} catch (Exception e) {
 				listView.setAdapter(new LoginAdapter(MainActivity.this, null));
-			}	
+			}
 			
 			listView.setOnItemClickListener(new OnItemClickListener() {
 				@Override
