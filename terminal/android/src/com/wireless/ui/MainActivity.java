@@ -40,17 +40,22 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.OrderParcel;
+import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
+import com.wireless.protocol.PinGen;
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqCancelOrder;
+import com.wireless.protocol.ReqPackage;
 import com.wireless.protocol.ReqQueryMenu;
 import com.wireless.protocol.ReqQueryOrder;
 import com.wireless.protocol.ReqQueryOrder2;
 import com.wireless.protocol.ReqQueryRestaurant;
+import com.wireless.protocol.ReqQueryStaff;
 import com.wireless.protocol.RespParser;
 import com.wireless.protocol.StaffTerminal;
+import com.wireless.protocol.Terminal;
 import com.wireless.protocol.Type;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.ui.dialog.AskPwdDialog;
@@ -64,13 +69,16 @@ public class MainActivity extends Activity {
 	private static final int DIALOG_UPDATE_ORDER = 1;
 	private static final int DIALOG_CANCEL_ORDER = 2;
 	private static final int DIALOG_BILL_ORDER = 3;
+	private static final int DIALOG_STAFF_LOGIN = 4;
 	
 	private static final int REDRAW_FOOD_MENU = 1;
 	private static final int REDRAW_RESTAURANT = 2;
+	
+	private StaffTerminal _staff;
+	
 	private String _staffname;
-	private PopupWindow _popupWindow;
-	StaffTerminal _s = null;
-	MessageDigest digester;
+
+	
 	/**
 	 * 请求菜谱和餐厅信息后，更新到相关的界面控件
 	 */
@@ -97,15 +105,15 @@ public class MainActivity extends Activity {
 					}
 					
 					TextView userName = (TextView)findViewById(R.id.username);
-					if(WirelessOrder.restaurant.owner != null){
-						if(WirelessOrder.restaurant.owner.length() != 0){
-							userName.setText(WirelessOrder.restaurant.name + "(" + WirelessOrder.restaurant.owner + ")");							
+					if(_staff != null){
+						if(_staff.name != null){
+							userName.setText(WirelessOrder.restaurant.name + "(" + _staff.name + ")");							
 						}else{
-							userName.setText(WirelessOrder.restaurant.name);
+							userName.setText(WirelessOrder.restaurant.name);							
 						}
 					}else{
-						userName.setText("");
-					}					
+						userName.setText(WirelessOrder.restaurant.name);
+					}
 				}				
 			}
 		}
@@ -209,12 +217,8 @@ public class MainActivity extends Activity {
 					break;
 
 				case 7:
-					//保存信息到文件里面
-					Editor editor = getSharedPreferences("user", Context.MODE_PRIVATE).edit();//获取编辑器
-					editor.putString("staffname", "");
-					//提交修改
-					editor.commit();
-					loginDialog(); 
+					//注销
+					new QueryStaffTask().execute();
 					break;
 
 				case 8:
@@ -233,9 +237,42 @@ public class MainActivity extends Activity {
 		}catch(NameNotFoundException e) {
 			topTitle.setText("e点通");
 		}
-		_handler.sendEmptyMessage(REDRAW_RESTAURANT);
 		
-		loginDialog();
+		SharedPreferences sharedPreferences = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE);
+		long pin = sharedPreferences.getLong(Params.STAFF_PIN, Params.DEF_STAFF_PIN);
+		if(pin == Params.DEF_STAFF_PIN){
+			/**
+			 * Show the login dialog if logout before.  
+			 */
+			showDialog(DIALOG_STAFF_LOGIN);
+		}else{
+			/**
+			 * Directly login with the previous staff account if user does NOT logout before.
+			 * Otherwise show the login dialog. 
+			 */
+			_staff = null;
+			for(int i = 0; i < WirelessOrder.staffs.length; i++){
+				if(WirelessOrder.staffs[i].pin == pin){
+					_staff = WirelessOrder.staffs[i];
+				}
+			}
+			if(_staff != null){
+				ReqPackage.setGen(new PinGen(){
+					@Override
+					public long getDeviceId() {
+						return _staff.pin;
+					}
+					@Override
+					public short getDeviceType() {
+						return Terminal.MODEL_STAFF;
+					}					
+				});				
+			}else{
+				showDialog(DIALOG_STAFF_LOGIN);
+			}
+		}
+		
+		_handler.sendEmptyMessage(REDRAW_RESTAURANT);
 		  
 	}
 
@@ -257,7 +294,7 @@ public class MainActivity extends Activity {
 			_staffname= sharedPreferences.getString("staffname", "");
 			 
 			 if( _staffname == null||_staffname.equals("")){
-				 new LoginDialog(MainActivity.this).show();
+				 new AskLoginDialog().show();
 			 }
 	}
 	
@@ -279,7 +316,10 @@ public class MainActivity extends Activity {
 			//结账的餐台输入Dialog
 			return new AskTableDialog(DIALOG_BILL_ORDER);
 			
-		}else{
+		}else if(dialogID == DIALOG_STAFF_LOGIN){
+			return new AskLoginDialog();
+		}
+		else{
 			return null;
 		}
 	}
@@ -474,23 +514,124 @@ public class MainActivity extends Activity {
 		}	
 	}
 	
+	/**
+	 * 请求查询员工信息 
+	 */
+	private class QueryStaffTask extends AsyncTask<Void, Void, String>{
+		
+		private ProgressDialog _progDialog;
+		
+		/**
+		 * 执行员工信息请求前显示提示信息
+		 */
+		@Override
+		protected void onPreExecute(){
+
+			_progDialog = ProgressDialog.show(MainActivity.this, "", "正在更新员工信息...请稍后", true);
+		}
+		
+		/**
+		 * 在新的线程中执行请求员工信息的操作
+		 */
+		@Override
+		protected String doInBackground(Void... arg0){
+			String errMsg = null;
+			try{
+				WirelessOrder.staffs = null;
+				ReqPackage.setGen(new PinGen(){
+					@Override
+					public long getDeviceId() {
+						return WirelessOrder.pin;
+					}
+					@Override
+					public short getDeviceType() {
+						return Terminal.MODEL_ANDROID;
+					}				
+				});
+				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryStaff());
+				if(resp.header.type == Type.ACK){
+					WirelessOrder.staffs = RespParser.parseQueryStaff(resp);
+				}else{
+					if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
+						errMsg = "终端没有登记到餐厅，请联系管理人员。";
+					}else if(resp.header.reserved == ErrorCode.TERMINAL_EXPIRED) {
+						errMsg = "终端已过期，请联系管理人员。";
+					}else{
+						errMsg = "更新员工信息失败，请检查网络信号或重新连接。";
+					}
+					throw new IOException(errMsg);
+				}
+			}catch(IOException e){
+				errMsg = e.getMessage();
+			}
+			return errMsg;
+		}
+		
+		/**
+		 * 根据返回的error message判断，如果发错异常则提示用户，
+		 * 如果员工信息请求成功，则显示登录Dialog。
+		 */
+		@Override
+		protected void onPostExecute(String errMsg){
+			//make the progress dialog disappeared
+			_progDialog.dismiss();					
+			/**
+			 * Prompt user message if any error occurred,
+			 * otherwise show the login dialog
+			 */
+			if(errMsg != null){
+				new AlertDialog.Builder(MainActivity.this)
+						.setTitle("提示")
+						.setMessage(errMsg)
+						.setPositiveButton("确定",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,	int id) {
+									finish();
+								}
+							})				
+						.show();
+				
+			}else{
+				if(WirelessOrder.staffs.length == 0){
+					new AlertDialog.Builder(MainActivity.this)
+								   .setTitle("提示")
+					               .setMessage("没有查询到任何的员工信息，请在管理后台先添加员工信息")
+					               .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					            	   public void onClick(DialogInterface dialog, int id) {
+					            		   finish();
+					            	   }
+					               })
+					               .show();
+				}else{
+					Editor editor = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).edit();//获取编辑器
+					editor.putLong(Params.STAFF_PIN, Params.DEF_STAFF_PIN);
+					editor.commit();
+					showDialog(DIALOG_STAFF_LOGIN);					
+				}
+			}
+		}	
+	}
 	
 	//登录框Dialog
-	public class LoginDialog extends Dialog{
+	public class AskLoginDialog extends Dialog{
 
-		public LoginDialog(Context context) {
+		private PopupWindow _popupWindow;
+		private BaseAdapter _staffAdapter;
+		
+		AskLoginDialog() {
 			super(MainActivity.this, R.style.FullHeightDialog);
 			setContentView(R.layout.login_dialog);
 			getWindow().getAttributes().width = (int) (getWindow().getWindowManager().getDefaultDisplay().getWidth()* 0.85);
-			getWindow().getAttributes().height = (int) (getWindow().getWindowManager().getDefaultDisplay().getHeight()*0.5);
+			getWindow().getAttributes().height = (int) (getWindow().getWindowManager().getDefaultDisplay().getHeight() * 0.5);
 			getWindow().setBackgroundDrawableResource(android.R.color.transparent);//设置背景透明
-			final EditText pwd = (EditText)findViewById(R.id.pwd);
-			Button login = (Button)findViewById(R.id.login);	
-	        final TextView error = (TextView)findViewById(R.id.error);
-	        final EditText staffname = (EditText)findViewById(R.id.staffname);
-	        ImageView click = (ImageView)findViewById(R.id.click);
-	        click.setOnClickListener(new View.OnClickListener() {
-				
+			final EditText pwdEdtTxt = (EditText)findViewById(R.id.pwd);
+	        
+	        final EditText staffEditTxt = (EditText)findViewById(R.id.staffname);
+	        
+	        /**
+	         * 下拉箭头显示员工信息列表
+	         */
+	        ((ImageView)findViewById(R.id.click)).setOnClickListener(new View.OnClickListener() {				
 				@Override
 				public void onClick(View v) {
 					if(_popupWindow.isShowing()){
@@ -503,68 +644,106 @@ public class MainActivity extends Activity {
 			});
 	        
 	        // 获取自定义布局文件的视图
-			View popupWndView = getLayoutInflater().inflate(R.layout.loginpopuwindow,null,false);
+			View popupWndView = getLayoutInflater().inflate(R.layout.loginpopuwindow, null, false);
 			// 创建PopupWindow实例
 			_popupWindow = new PopupWindow(popupWndView, 380, 300, true);
 			_popupWindow.setOutsideTouchable(true);
 			_popupWindow.setBackgroundDrawable(new BitmapDrawable());
-			ListView listView = (ListView)popupWndView.findViewById(R.id.loginpopuwindow);
-			/**
-			 * 异常处理以防WirelessOrder.staffs为空
-			 **/
-			try {
-				if(WirelessOrder.staffs.length != 0){
-					listView.setAdapter(new LoginAdapter(MainActivity.this, WirelessOrder.staffs));
-				}else{
-					listView.setAdapter(new LoginAdapter(MainActivity.this, null));
-				}	
-			} catch (Exception e) {
-				listView.setAdapter(new LoginAdapter(MainActivity.this, null));
-			}
 			
-			listView.setOnItemClickListener(new OnItemClickListener() {
+			ListView staffLstView = (ListView)popupWndView.findViewById(R.id.loginpopuwindow);
+			_staffAdapter = new StaffsAdapter();
+			staffLstView.setAdapter(_staffAdapter);
+
+			/**
+			 * 从下拉列表框中选择员工信息的操作
+			 */
+			staffLstView.setOnItemClickListener(new OnItemClickListener() {
 				@Override
-				public void onItemClick(AdapterView<?> parent, View view,
-						int position, long id) {
-					_s = WirelessOrder.staffs[position];
-					staffname.setText(_s.name);
+				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+					_staff = WirelessOrder.staffs[position];
+					staffEditTxt.setText(_staff.name);
 				   _popupWindow.dismiss();
 				}
 			});
-			login.setOnClickListener(new View.OnClickListener() {
+			
+			/**
+			 * 登录Button的点击操作
+			 */
+			((Button)findViewById(R.id.login)).setOnClickListener(new View.OnClickListener() {
 				
 				@Override
 				public void onClick(View v) {
 				
-					//Convert the password into MD5
+					TextView errTxtView = (TextView)findViewById(R.id.error);
+					
 					try {
-						digester = MessageDigest.getInstance("MD5");
-						digester.update(pwd.getText().toString().getBytes(), 0, pwd.getText().toString().getBytes().length); 
-					} catch (NoSuchAlgorithmException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					if(staffname.getText().toString().equals("")){
-						error.setText("账号不能为空");
-					}else if(pwd.getText().toString().equals("")){
-						error.setText("密码不能为空");
-					}else if(_s.pwd.equals(toHexString(digester.digest()))){
-						//保存信息到文件里面
-						Editor editor = getSharedPreferences("user", Context.MODE_PRIVATE).edit();//获取编辑器
-						editor.putString("staffname", staffname.getText().toString());
-						//提交修改
-						editor.commit();	
-						dismiss();
-					}else{		
-						error.setText("密码错误");
+						//Convert the password into MD5
+						MessageDigest digester = MessageDigest.getInstance("MD5");
+						digester.update(pwdEdtTxt.getText().toString().getBytes(), 0, pwdEdtTxt.getText().toString().getBytes().length); 
+					
+						if(staffEditTxt.getText().toString().equals("")){
+							errTxtView.setText("账号不能为空");
+							
+						}else if(_staff.pwd.equals(toHexString(digester.digest()))){
+							//保存staff pin到文件里面
+							Editor editor = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).edit();//获取编辑器
+							editor.putLong(Params.STAFF_PIN, _staff.pin);
+							//提交修改
+							editor.commit();	
+							_handler.sendEmptyMessage(REDRAW_RESTAURANT);
+							//set the pin generator according to the staff login
+							ReqPackage.setGen(new PinGen(){
+								@Override
+								public long getDeviceId() {
+									return _staff.pin;
+								}
+								@Override
+								public short getDeviceType() {
+									return Terminal.MODEL_STAFF;
+								}
+								
+							});
+							dismiss();
+							
+						}else{		
+							errTxtView.setText("密码错误");
+						}
+						
+					}catch(NoSuchAlgorithmException e) {
+						errTxtView.setText(e.getMessage());;
 					}
 				}
 			});
 			
+		}		
+		
+		@Override
+		public void onAttachedToWindow(){
+			final EditText pwdEdtTxt = (EditText)findViewById(R.id.pwd);
+	        pwdEdtTxt.setText("");
+	        final EditText staffEdtTxt = (EditText)findViewById(R.id.staffname);
+	        staffEdtTxt.setText("");
+	        if(_staffAdapter != null){
+	        	_staffAdapter.notifyDataSetChanged();
+	        }
 		}
-
 		
-		
+		/**
+		 * Convert the md5 byte to hex string.
+		 * @param md5Msg the md5 byte value
+		 * @return the hex string to this md5 byte value
+		 */
+		private String toHexString(byte[] md5Msg){
+			StringBuffer hexString = new StringBuffer();
+			for (int i=0; i < md5Msg.length; i++) {
+				if(md5Msg[i] >= 0x00 && md5Msg[i] < 0x10){
+					hexString.append("0").append(Integer.toHexString(0xFF & md5Msg[i]));
+				}else{
+					hexString.append(Integer.toHexString(0xFF & md5Msg[i]));					
+				}
+			}
+			return hexString.toString();
+		}
 		
 		@Override
 		public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -574,76 +753,42 @@ public class MainActivity extends Activity {
 			return super.onKeyDown(keyCode, event);
 		}
 		
-		public class LoginAdapter extends BaseAdapter{
+		/**
+		 * 员工信息下拉框的Adapter 
+		 */
+		private class StaffsAdapter extends BaseAdapter{
 			
-            Context context;
-            LayoutInflater minflater;
-            StaffTerminal[] staffs;
-			public LoginAdapter(Context context,StaffTerminal[] staffs){
-				this.context = context;
-				minflater = LayoutInflater.from(context);
-				this.staffs = staffs;
+			public StaffsAdapter(){
+
 			}
-			@Override
-			public int getCount() {
 			
-				return staffs.length;
+			@Override
+			public int getCount() {			
+				return WirelessOrder.staffs.length;
 			}
 
 			@Override
 			public Object getItem(int position) {
-				// TODO Auto-generated method stub
 				return null;
 			}
 
 			@Override
 			public long getItemId(int position) {
-				// TODO Auto-generated method stub
 				return 0;
 			}
 
 			@Override
 			public View getView(int position, View convertView, ViewGroup parent) {
-				Holder holder;
-				if( convertView == null){
-					holder = new Holder();
-					convertView = minflater.inflate(R.layout.orderpopuwindowitem, null);
-					holder.staffname = (TextView)convertView.findViewById(R.id.popuwindowfoodname);
-					convertView.setTag(holder);
+				if(convertView == null){
+					convertView = LayoutInflater.from(MainActivity.this).inflate(R.layout.orderpopuwindowitem, null);
+					((TextView)convertView.findViewById(R.id.popuwindowfoodname)).setText(WirelessOrder.staffs[position].name);
 				}else{
-					holder = (Holder) convertView.getTag();
-				}
-				
-				StaffTerminal staffterminal = staffs[position];
-				holder.staffname.setText(staffterminal.name);
-				
+					((TextView)convertView.findViewById(R.id.popuwindowfoodname)).setText(WirelessOrder.staffs[position].name);
+				}				
 				return convertView;
-			}
-			
-			
-			class Holder{
-				TextView staffname;
-			}
+			}			
 			
 		}
-	}
-
-	
-	/**
-	 * Convert the md5 byte to hex string.
-	 * @param md5Msg the md5 byte value
-	 * @return the hex string to this md5 byte value
-	 */
-	private String toHexString(byte[] md5Msg){
-		StringBuffer hexString = new StringBuffer();
-		for (int i=0; i < md5Msg.length; i++) {
-			if(md5Msg[i] >= 0x00 && md5Msg[i] < 0x10){
-				hexString.append("0").append(Integer.toHexString(0xFF & md5Msg[i]));
-			}else{
-				hexString.append(Integer.toHexString(0xFF & md5Msg[i]));					
-			}
-		}
-		return hexString.toString();
 	}
 	
 	/**

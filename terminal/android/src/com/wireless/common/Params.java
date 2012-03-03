@@ -19,6 +19,8 @@ public final class Params {
 	public final static String USER_NAME = "UserName";
 	//The name to password
 	public final static String PWD = "Password";
+	//The pin to login staff
+	public final static String STAFF_PIN = "StaffPin";
 	
 	/* The setting value to print setting */
 	public final static int PRINT_SYNC = 0;			//Í¬²½
@@ -30,8 +32,11 @@ public final class Params {
 	public final static int TIME_OUT_20s = 2;		//20s
 	
 	/* The default IP address */
-	public final static String DEF_IP_ADDR = "125.88.20.194";
+	public final static String DEF_IP_ADDR = "122.115.57.66";
 	
 	/* The default IP port */
 	public final static int DEF_IP_PORT = 55555;
+	
+	/* The default staff pin */
+	public final static long DEF_STAFF_PIN = -1;
 }
