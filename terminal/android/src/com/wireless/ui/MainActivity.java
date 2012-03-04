@@ -719,10 +719,9 @@ public class MainActivity extends Activity {
 		
 		@Override
 		public void onAttachedToWindow(){
-			final EditText pwdEdtTxt = (EditText)findViewById(R.id.pwd);
-	        pwdEdtTxt.setText("");
-	        final EditText staffEdtTxt = (EditText)findViewById(R.id.staffname);
-	        staffEdtTxt.setText("");
+			((TextView)findViewById(R.id.error)).setText("");
+			((EditText)findViewById(R.id.pwd)).setText("");
+	        ((EditText)findViewById(R.id.staffname)).setText("");
 	        if(_staffAdapter != null){
 	        	_staffAdapter.notifyDataSetChanged();
 	        }
