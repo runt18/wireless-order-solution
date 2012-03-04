@@ -101,6 +101,7 @@ public class SweepDBTask extends SchedulerTask {
 			/**
 			 * Delete all the records matches the order which has been expired from "order_food_material_hisotry" table.
 			 */
+			/**
 			dbCon.stmt.clearBatch();
 			for(int i = 0; i < expiredOrders.size(); i++){
 				sql = "DELETE FROM " + Params.dbName + 
@@ -116,6 +117,7 @@ public class SweepDBTask extends SchedulerTask {
 					count += rowsAffected[i];
 			}
 			taskInfo += "info : " + count + " record(s) are deleted from \"order_food_material_history\" table" + sep;
+			*/
 			
 			/**
 			 * Delete all the food records matches the order which has been expired from "order_food_hisotry" table.
