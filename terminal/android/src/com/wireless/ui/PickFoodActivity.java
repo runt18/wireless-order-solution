@@ -656,7 +656,7 @@ public class PickFoodActivity extends TabActivity implements
 			final TextView tv = new TextView(PickFoodActivity.this);
 			tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
 			tv.setGravity(Gravity.CENTER_HORIZONTAL);
-			tv.setText(c);
+			tv.setText(Character.toString(c));
 			tv.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
