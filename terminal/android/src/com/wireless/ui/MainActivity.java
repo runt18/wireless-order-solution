@@ -646,7 +646,7 @@ public class MainActivity extends Activity {
 	        // 获取自定义布局文件的视图
 			View popupWndView = getLayoutInflater().inflate(R.layout.loginpopuwindow, null, false);
 			// 创建PopupWindow实例
-			_popupWindow = new PopupWindow(popupWndView, 380, 300, true);
+			_popupWindow = new PopupWindow(popupWndView, 380, 200, true);
 			_popupWindow.setOutsideTouchable(true);
 			_popupWindow.setBackgroundDrawable(new BitmapDrawable());
 			
