@@ -78,7 +78,7 @@ public class PickFoodActivity extends TabActivity implements
 	private List<Food> _filterFoods;
 	private TempListView _tempLstView;
 	private PopupWindow _popupWindow;
-	private boolean _isOrderLstShow = false;
+	private ListView _popupLstView;
 
 
 	/** Called when the activity is first created. */
@@ -271,29 +271,19 @@ public class PickFoodActivity extends TabActivity implements
 
 			float orderAmount = food.getCount() + pickedFood.getCount();
 			if (orderAmount > 255) {
-				Toast.makeText(this,
-						"对不起，\"" + food.toString() + "\"最多只能点255份", 0).show();
+				Toast.makeText(this, "对不起，\"" + food.toString() + "\"最多只能点255份", 0).show();
 				// pickedFood.setCount(new Float(255));
 			} else {
-				Toast.makeText(
-						this,
-						"添加"
-								+ (food.hangStatus == OrderFood.FOOD_HANG_UP ? "并叫起\""
-										: "\"") + food.toString() + "\""
-								+ Util.float2String2(food.getCount()) + "份", 0)
-						.show();
+				Toast.makeText(this, "添加"	+ (food.hangStatus == OrderFood.FOOD_HANG_UP ? "并叫起\"" : "\"") + food.toString() + "\""
+								+ Util.float2String2(food.getCount()) + "份", 0)	.show();
 				pickedFood.setCount(orderAmount);
 				_pickFoods.set(index, pickedFood);
 			}
 		} else {
 			if (food.getCount() > 255) {
-				Toast.makeText(this,
-						"对不起，\"" + food.toString() + "\"最多只能点255份", 0).show();
+				Toast.makeText(this, "对不起，\"" + food.toString() + "\"最多只能点255份", 0).show();
 			} else {
-				Toast.makeText(
-						this,
-						"新增"
-								+ (food.hangStatus == OrderFood.FOOD_HANG_UP ? "并叫起\""
+				Toast.makeText(this, "新增"	+ (food.hangStatus == OrderFood.FOOD_HANG_UP ? "并叫起\""
 										: "\"") + food.toString() + "\""
 								+ Util.float2String2(food.getCount()) + "份", 0)
 						.show();
@@ -308,6 +298,12 @@ public class PickFoodActivity extends TabActivity implements
 		} else if (_tabHost.getCurrentTabTag() == TAG_PINYIN) {
 			((EditText) findViewById(R.id.filterPinyinEdtTxt)).setText("");
 		}
+		
+		//update the short cut if it is showing
+		if(_popupWindow.isShowing()){
+			_popupLstView.setAdapter(new PopupWndAdapter(this, _pickFoods));
+		}
+		
 	}
 
 	@Override
@@ -317,8 +313,7 @@ public class PickFoodActivity extends TabActivity implements
 				/**
 				 * 添加口味后添加到pickList中
 				 */
-				FoodParcel foodParcel = data
-						.getParcelableExtra(FoodParcel.KEY_VALUE);
+				FoodParcel foodParcel = data.getParcelableExtra(FoodParcel.KEY_VALUE);
 				addFood(foodParcel);
 			}
 		}
@@ -377,14 +372,11 @@ public class PickFoodActivity extends TabActivity implements
 
 			@Override
 			public void onClick(View v) {
-				if (_isOrderLstShow == false) {
-					showOrderList();
-					_popupWindow.showAsDropDown(v, -120, 5);
-					_isOrderLstShow = true;
-				} else {
+				if(_popupWindow.isShowing()) {
 					_popupWindow.dismiss();
-					_isOrderLstShow = false;
-
+				}else{
+					_popupLstView.setAdapter(new PopupWndAdapter(PickFoodActivity.this, _pickFoods));
+					_popupWindow.showAsDropDown(v, -120, 5);
 				}
 			}
 		});
@@ -523,14 +515,11 @@ public class PickFoodActivity extends TabActivity implements
 
 			@Override
 			public void onClick(View v) {
-				if (_isOrderLstShow == false) {
-					showOrderList();
-					_popupWindow.showAsDropDown(v, -120, 5);
-					_isOrderLstShow = true;
-
-				} else {
+				if(_popupWindow.isShowing()) {
 					_popupWindow.dismiss();
-					_isOrderLstShow = false;
+				}else{
+					_popupLstView.setAdapter(new PopupWndAdapter(PickFoodActivity.this, _pickFoods));
+					_popupWindow.showAsDropDown(v, -120, 5);
 				}
 			}
 		});
@@ -685,15 +674,12 @@ public class PickFoodActivity extends TabActivity implements
 
 			@Override
 			public void onClick(View v) {
-				if (_isOrderLstShow == false) {
-					showOrderList();
-					_popupWindow.showAsDropDown(v, -120, 5);
-					_isOrderLstShow = true;
-				} else {
+				if(_popupWindow.isShowing()) {
 					_popupWindow.dismiss();
-					_isOrderLstShow = false;
+				}else{
+					_popupLstView.setAdapter(new PopupWndAdapter(PickFoodActivity.this, _pickFoods));
+					_popupWindow.showAsDropDown(v, -120, 5);
 				}
-
 			}
 		});
 		
@@ -777,6 +763,7 @@ public class PickFoodActivity extends TabActivity implements
 	 */
 	private void setTempView() {
 
+		_popupWindow.dismiss();
 		_tempLstView = (TempListView) findViewById(R.id.tempListView);
 		_tempLstView.notifyDataChanged();
 
@@ -799,6 +786,7 @@ public class PickFoodActivity extends TabActivity implements
 						_tempLstView.addTemp();
 					}
 				});
+		
 
 		/**
 		 * list滚动的时候屏蔽软键盘
@@ -1036,44 +1024,21 @@ public class PickFoodActivity extends TabActivity implements
 	}
 
 	/**
-	 * 点击按钮显示已点菜shortcut
-	 */
-	private void showOrderList() {
-
-		Display display = ((WindowManager) getSystemService(WINDOW_SERVICE))
-				.getDefaultDisplay();
-		// 获取屏幕宽度
-		// int width = display.getWidth();
-		// 获取屏幕高度
-		int heigh = display.getHeight();
-		// 获取自定义布局文件的视图
-		View popupWndView = getLayoutInflater().inflate(
-				R.layout.orderlistpupowindow, null, false);
-		// 创建PopupWindow实例
-		_popupWindow = new PopupWindow(popupWndView,
-				200, heigh / 2, false);
-		_popupWindow.setOutsideTouchable(true);
-		_popupWindow.setAnimationStyle(R.style.popuwindow);
-		((ListView) popupWndView.findViewById(R.id.orderpupowindowLstView))
-				.setAdapter(new PopupWndAdapter(this, _pickFoods));
-	}
-
-	/**
 	 * 点击按钮显示已点菜列表adapter
 	 */
 	private class PopupWndAdapter extends BaseAdapter {
 
-		private ArrayList<OrderFood> tmpFoods;
+		private ArrayList<OrderFood> _orderFoods;
 		private Context _context;
 
 		public PopupWndAdapter(Context context, ArrayList<OrderFood> pickFoods) {
 			this._context = context;
-			this.tmpFoods = pickFoods;
+			this._orderFoods = pickFoods;
 		}
 
 		@Override
 		public int getCount() {
-			return tmpFoods.size();
+			return _orderFoods.size();
 		}
 
 		@Override
@@ -1088,29 +1053,35 @@ public class PickFoodActivity extends TabActivity implements
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-			Holder holder;
-			if (convertView == null) {
-				convertView = LayoutInflater.from(_context).inflate(
-						R.layout.orderpopuwindowitem, null);
-				holder = new Holder();
-				holder.foodname = (TextView) convertView
-						.findViewById(R.id.popuwindowfoodname);
-				convertView.setTag(holder);
+			OrderFood food = _orderFoods.get(position);
+			if(convertView == null){
+				convertView = LayoutInflater.from(_context).inflate(R.layout.orderpopuwindowitem, null);
+				((TextView)convertView.findViewById(R.id.popuwindowfoodname)).setText(food.name + "(" + Util.float2String2(food.getCount()) + ")");
 			} else {
-				holder = (Holder) convertView.getTag();
+				((TextView)convertView.findViewById(R.id.popuwindowfoodname)).setText(food.name + "(" + Util.float2String2(food.getCount()) + ")");
 			}
-
-			OrderFood food = tmpFoods.get(position);
-			holder.foodname.setText(food.name);
 			return convertView;
-		}
-
-		private class Holder {
-			TextView foodname;
 		}
 	}
 
 	private void init() {
+		
+		/**
+		 * 创建已点菜shortcut的PopupWindow
+		 */
+		Display display = ((WindowManager)getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
+		// 获取屏幕宽度
+		// int width = display.getWidth();
+		// 获取屏幕高度
+		int heigh = display.getHeight();
+		// 获取自定义布局文件的视图
+		View popupWndView = getLayoutInflater().inflate(R.layout.orderlistpupowindow, null, false);
+		// 创建PopupWindow实例
+		_popupWindow = new PopupWindow(popupWndView, 200, heigh / 2, false);
+		_popupWindow.setOutsideTouchable(true);
+		_popupWindow.setAnimationStyle(R.style.popuwindow);
+		_popupLstView = (ListView)popupWndView.findViewById(R.id.orderpupowindowLstView);
+		
 		/**
 		 * 将所有菜品进行按厨房编号进行排序
 		 */

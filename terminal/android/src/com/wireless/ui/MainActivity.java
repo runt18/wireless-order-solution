@@ -626,7 +626,21 @@ public class MainActivity extends Activity {
 			getWindow().setBackgroundDrawableResource(android.R.color.transparent);//设置背景透明
 			final EditText pwdEdtTxt = (EditText)findViewById(R.id.pwd);
 	        
-	        final TextView staffEditTxt = (TextView)findViewById(R.id.staffname);
+	        final TextView staffTxtView = (TextView)findViewById(R.id.staffname);
+	        
+	        /**
+	         * 帐号输入框显示员工列表
+	         */
+	        staffTxtView.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					if(_popupWindow.isShowing()){
+						_popupWindow.dismiss();
+					}else{
+						_popupWindow.showAsDropDown(findViewById(R.id.click), -330, 15);
+					}					
+				}
+			});
 	        
 	        /**
 	         * 下拉箭头显示员工信息列表
@@ -638,8 +652,7 @@ public class MainActivity extends Activity {
 						_popupWindow.dismiss();
 					}else{
 						_popupWindow.showAsDropDown(v, -330, 15);
-					}
-					
+					}					
 				}
 			});
 	        
@@ -661,7 +674,7 @@ public class MainActivity extends Activity {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 					_staff = WirelessOrder.staffs[position];
-					staffEditTxt.setText(_staff.name);
+					staffTxtView.setText(_staff.name);
 				   _popupWindow.dismiss();
 				}
 			});
@@ -681,7 +694,7 @@ public class MainActivity extends Activity {
 						MessageDigest digester = MessageDigest.getInstance("MD5");
 						digester.update(pwdEdtTxt.getText().toString().getBytes(), 0, pwdEdtTxt.getText().toString().getBytes().length); 
 					
-						if(staffEditTxt.getText().toString().equals("")){
+						if(staffTxtView.getText().toString().equals("")){
 							errTxtView.setText("账号不能为空");
 							
 						}else if(_staff.pwd.equals(toHexString(digester.digest()))){
