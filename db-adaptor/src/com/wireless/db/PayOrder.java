@@ -1,7 +1,6 @@
 package com.wireless.db;
 
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -31,6 +30,8 @@ public class PayOrder {
 	 *            the pay order information along with the table id, payment and
 	 *            discount type, refer to the class "ReqPayOrder" for more
 	 *            details on what information it contains.
+ 	 * @param isPaidAgain
+	 * 			  indicating whether the order has been paid or not
 	 * @return Order completed pay order information to paid order
 	 * @throws BusinessException
 	 *             throws if one of the cases below.<br>
@@ -41,7 +42,7 @@ public class PayOrder {
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
-	public static Order exec(Terminal term, Order orderToPay) throws BusinessException, SQLException{
+	public static Order exec(Terminal term, Order orderToPay, boolean isPaidAgain) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -52,7 +53,7 @@ public class PayOrder {
 			orderToPay.id = Util.getUnPaidOrderID(dbCon, QueryTable.exec(dbCon, term, orderToPay.table.aliasID));
 			orderToPay.restaurantID = term.restaurant_id;
 			
-			return execByID(dbCon, term, orderToPay);	
+			return execByID(dbCon, term, orderToPay, isPaidAgain);	
 		}finally{
 			dbCon.disconnect();
 		}
@@ -70,6 +71,8 @@ public class PayOrder {
 	 *            the pay order information along with the table id, payment and
 	 *            discount type, refer to the class "ReqPayOrder" for more
 	 *            details on what information it contains.
+	 * @param isPaidAgain
+	 * 			  indicating whether the order has been paid or not
 	 * @return Order completed pay order information to paid order
 	 * @throws BusinessException
 	 *             throws if one of the cases below.<br>
@@ -80,7 +83,7 @@ public class PayOrder {
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
-	public static Order exec(long pin, short model, Order orderToPay) throws BusinessException, SQLException{
+	public static Order exec(long pin, short model, Order orderToPay, boolean isPaidAgain) throws BusinessException, SQLException{
 		
 		
 		DBCon dbCon = new DBCon();
@@ -95,7 +98,7 @@ public class PayOrder {
 			orderToPay.id = Util.getUnPaidOrderID(dbCon, QueryTable.exec(dbCon, term, orderToPay.table.aliasID));
 			orderToPay.restaurantID = term.restaurant_id;
 			
-			return execByID(dbCon, term, orderToPay);			
+			return execByID(dbCon, term, orderToPay, isPaidAgain);			
 			
 		}finally{
 			dbCon.disconnect();
@@ -108,6 +111,7 @@ public class PayOrder {
 	 * @param model the model to this terminal
 	 * @param orderToPay the pay order information along with the order ID, payment and discount type 				     
 	 * 					 refer to the class "ReqPayOrder" for more details on what information it contains.
+	 * @param isPaidAgain indicating whether the order has been paid or not
 	 * @return Order completed pay order information to paid order
 	 * @throws BusinessException throws if one of the cases below.<br>
 	 * 							 - The terminal is NOT attached to any restaurant.<br>
@@ -115,13 +119,13 @@ public class PayOrder {
 	 * 							 - The order to query does NOT exist.
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Order execByID(long pin, short model, Order orderToPay) throws BusinessException, SQLException{
+	public static Order execByID(long pin, short model, Order orderToPay, boolean isPaidAgain) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, pin, model);
 			orderToPay.restaurantID = term.restaurant_id;
-			return execByID(dbCon, term, orderToPay);
+			return execByID(dbCon, term, orderToPay, isPaidAgain);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -129,20 +133,29 @@ public class PayOrder {
 	
 	
 	/**
-	 * Perform to pay an order along with the order id.
-	 * Note that the database should be connected before invoking this method.
-	 * @param pin the pin to this terminal
-	 * @param model the model to this terminal
-	 * @param orderToPay the pay order information along with the order ID, payment and discount, 				     
-	 * 					 refer to the class "ReqPayOrder" for more details on what information it contains.
+	 * Perform to pay an order along with the order id. Note that the database
+	 * should be connected before invoking this method.
+	 * 
+	 * @param pin
+	 *            the pin to this terminal
+	 * @param model
+	 *            the model to this terminal
+	 * @param orderToPay
+	 *            the pay order information along with the order ID, payment and
+	 *            discount, refer to the class "ReqPayOrder" for more details on
+	 *            what information it contains.
+	 * @param isPaidAgain
+	 *            indicating whether the order is paid or not
 	 * @return Order completed pay order information to paid order
-	 * @throws BusinessException throws if one of the cases below.<br>
-	 * 							 - The terminal is NOT attached to any restaurant.<br>
-	 * 							 - The terminal is expired.<br>
-	 * 							 - The order to query does NOT exist.
-	 * @throws SQLException throws if fail to execute any SQL statement
+	 * @throws BusinessException
+	 *             throws if one of the cases below.<br>
+	 *             - The terminal is NOT attached to any restaurant.<br>
+	 *             - The terminal is expired.<br>
+	 *             - The order to query does NOT exist.
+	 * @throws SQLException
+	 *             throws if fail to execute any SQL statement
 	 */
-	public static Order execByID(DBCon dbCon, Terminal term, Order orderToPay) throws BusinessException, SQLException{
+	public static Order execByID(DBCon dbCon, Terminal term, Order orderToPay, boolean isPaidAgain) throws BusinessException, SQLException{
 		
 		/**
 		 * Get the completed order information.
@@ -197,7 +210,7 @@ public class PayOrder {
 			 * - payment manner
 			 * - terminal pin
 			 * - service rate
-			 * - pay order date
+			 * - pay order date(if NOT paid again)
 			 * - comment if exist
 			 * - member id if pay type is for member
 			 * - member name if pay type is for member
@@ -212,53 +225,49 @@ public class PayOrder {
 				  ", type=" + orderInfo.pay_manner + 
 				  ", discount_type=" + orderInfo.discount_type +
 				  ", service_rate=" + orderInfo.getServiceRate() +
-			   	  ", order_date=NOW()" + 
+			   	  (isPaidAgain ? "" : ", order_date=NOW()") + 
 				  (orderInfo.comment != null ? ", comment='" + orderInfo.comment + "'" : "") +
 				  (member != null ? ", member_id='" + member.alias_id + "', member='" + member.name + "'" : ", member_id=NULL, member=NULL") + 
 				  " WHERE id=" + orderInfo.id;
 				
-			dbCon.stmt.executeUpdate(sql);
-			
-			//FIXME
-			System.out.println(orderInfo.id + "@" + 
-					new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()) +
-					":" + System.getProperty("line.separator") + sql);
+			dbCon.stmt.executeUpdate(sql);			
 				
+
 			/**
-			 * Delete the table in the case of "并台" or "外卖",
-			 * since the table to these order is temporary. 
-			 * Otherwise update the table status to idle.
+			 * Update the table status if the order is NOT paid again.
 			 */
-			if(orderInfo.category == Order.CATE_JOIN_TABLE || orderInfo.category == Order.CATE_TAKE_OUT){
-				sql = "DELETE FROM " + Params.dbName + ".table WHERE " +
-					  "restaurant_id=" + orderInfo.restaurantID + " AND " +
-					  "table_alias=" + orderInfo.table.aliasID;
-				dbCon.stmt.executeUpdate(sql);
-				
-			}else{
-				if(orderInfo.category == Order.CATE_MERGER_TABLE){
-					sql = "UPDATE " + Params.dbName + ".table SET " +
-					  	  "status=" + Table.TABLE_IDLE + ", " +
-					  	  "custom_num=NULL, " +
-					  	  "category=NULL " +
-					  	  "WHERE " +
-					  	  "restaurant_id=" + orderInfo.restaurantID + " AND " +
-					  	  "table_alias=" + orderInfo.table2.aliasID;
+			if(!isPaidAgain){
+				/**
+				 * Delete the table in the case of "并台" or "外卖",
+				 * since the table to these order is temporary. 
+				 * Otherwise update the table status to idle.
+				 */
+				if(orderInfo.category == Order.CATE_JOIN_TABLE || orderInfo.category == Order.CATE_TAKE_OUT){
+					sql = "DELETE FROM " + Params.dbName + ".table WHERE " +
+						  "restaurant_id=" + orderInfo.restaurantID + " AND " +
+						  "table_alias=" + orderInfo.table.aliasID;
 					dbCon.stmt.executeUpdate(sql);
-				}
-				sql = "UPDATE " + Params.dbName + ".table SET " +
-					  "status=" + Table.TABLE_IDLE + ", " +
-					  "custom_num=NULL, " +
-					  "category=NULL " +
-					  "WHERE " +
-  			  		  "restaurant_id=" + orderInfo.restaurantID + " AND " +
-					  "table_alias=" + orderInfo.table.aliasID;
-				dbCon.stmt.executeUpdate(sql);
-				
-				//FIXME
-				System.out.println(orderInfo.id + "@" + 
-						new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()) +
-						":" + System.getProperty("line.separator") + sql);
+					
+				}else{
+					if(orderInfo.category == Order.CATE_MERGER_TABLE){
+						sql = "UPDATE " + Params.dbName + ".table SET " +
+						  	  "status=" + Table.TABLE_IDLE + ", " +
+						  	  "custom_num=NULL, " +
+						  	  "category=NULL " +
+						  	  "WHERE " +
+						  	  "restaurant_id=" + orderInfo.restaurantID + " AND " +
+						  	  "table_alias=" + orderInfo.table2.aliasID;
+						dbCon.stmt.executeUpdate(sql);
+					}
+					sql = "UPDATE " + Params.dbName + ".table SET " +
+						  "status=" + Table.TABLE_IDLE + ", " +
+						  "custom_num=NULL, " +
+						  "category=NULL " +
+						  "WHERE " +
+	  			  		  "restaurant_id=" + orderInfo.restaurantID + " AND " +
+						  "table_alias=" + orderInfo.table.aliasID;
+					dbCon.stmt.executeUpdate(sql);				
+				}				
 			}
 			
 			/**
@@ -286,69 +295,86 @@ public class PayOrder {
 		}
 		
 		/**
-		 * Below is to calculate the food and material.
-		 */
-		//get the food details to this order
-		OrderFood[] foods = OrderFoodReflector.getDetailToday(dbCon, " AND C.order_id=" + orderInfo.id, "");
-		for(int i = 0; i < foods.length; i++){
-			//get each material consumption to every food
-			sql = "SELECT consumption, material_id FROM " +
-				  Params.dbName + ".food_material WHERE " +
-				  "food_id=" +
-				  "(SELECT id FROM " + 
-				  Params.dbName +
-				  ".food WHERE alias_id=" + foods[i].alias_id +
-				  " AND restaurant_id="+ orderInfo.restaurantID + ")"; 
-			
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			
-			ArrayList<FoodMaterial> foodMaterials = new ArrayList<FoodMaterial>();
-			while(dbCon.rs.next()){				
-				foodMaterials.add(new FoodMaterial(foods[i],
-												   new Material(dbCon.rs.getLong("material_id")),
-												   dbCon.rs.getFloat("consumption")));
+		 * Below is to calculate the food and material if the order is NOT paid again.
+		 */		
+		if(!isPaidAgain){
+			//get the food details to this order
+			OrderFood[] foods = OrderFoodReflector.getDetailToday(dbCon, " AND C.order_id=" + orderInfo.id, "");
+			for(int i = 0; i < foods.length; i++){
+				//get each material consumption to every food
+				sql = "SELECT consumption, material_id FROM " +
+					  Params.dbName + ".food_material WHERE " +
+					  "food_id=" +
+					  "(SELECT id FROM " + 
+					  Params.dbName +
+					  ".food WHERE alias_id=" + foods[i].alias_id +
+					  " AND restaurant_id="+ orderInfo.restaurantID + ")"; 
+				
+				dbCon.rs = dbCon.stmt.executeQuery(sql);
+				
+				ArrayList<FoodMaterial> foodMaterials = new ArrayList<FoodMaterial>();
+				while(dbCon.rs.next()){				
+					foodMaterials.add(new FoodMaterial(foods[i],
+													   new Material(dbCon.rs.getLong("material_id")),
+													   dbCon.rs.getFloat("consumption")));
+				}			
+				dbCon.rs.close();
+				
+				try{
+					
+					dbCon.conn.setAutoCommit(false);
+					
+					//calculate the 库存对冲 and insert the record to material_detail
+					Iterator<FoodMaterial> iter = foodMaterials.iterator();
+					while(iter.hasNext()){
+						FoodMaterial foodMaterial = iter.next();
+						//calculate the 库存对冲
+						float amount = (float)Math.round(foodMaterial.food.getCount().floatValue() * foodMaterial.consumption * 100) /100;
+						
+						//insert the corresponding detail record to material_detail
+						sql = "INSERT INTO " + Params.dbName + ".material_detail (" + 
+							  "restaurant_id, material_id, price, date, staff, dept_id, amount, type) VALUES(" +
+							  orderInfo.restaurantID + ", " +						//restaurant_id
+							  foodMaterial.material.getMaterialID() + ", " +		//material_id
+							  "(SELECT price FROM " + Params.dbName + ".material_dept WHERE restaurant_id=" + 
+							  orderInfo.restaurantID + 
+							  " AND material_id=" + foodMaterial.material.getMaterialID() + 	
+							  " AND dept_id=0), " +	//price
+							  "NOW(), " +			//date
+							  "(SELECT owner_name FROM " + Params.dbName + 
+							  ".terminal WHERE pin=" + "0x" + Long.toHexString(term.pin) + " AND model_id=" + term.modelID + "), " +	//staff
+							  "(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + 
+							  orderInfo.restaurantID + " AND alias_id=" + foodMaterial.food.kitchen + "), " +				//dept_id
+							  -amount + ", " + 				//amount
+							  MaterialDetail.TYPE_CONSUME + //type
+							  ")";
+						dbCon.stmt.executeUpdate(sql);
+						
+						//update the stock of material_dept to this material
+						sql = "UPDATE " + Params.dbName + ".material_dept SET " +
+							  "stock = stock - " + amount +
+							  " WHERE restaurant_id=" + orderInfo.restaurantID + 
+							  " AND material_id=" + foodMaterial.material.getMaterialID() +
+							  " AND dept_id=" + "(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + 
+							  orderInfo.restaurantID + " AND alias_id=" + foodMaterial.food.kitchen + ")";
+						dbCon.stmt.executeUpdate(sql);
+					}
+					
+					dbCon.conn.commit();
+
+				}catch(SQLException e){
+					dbCon.conn.rollback();
+					throw e;
+					
+				}catch(Exception e){
+					dbCon.conn.rollback();
+					throw new BusinessException(e.getMessage());
+					
+				}finally{
+					dbCon.conn.setAutoCommit(true);
+				}
+				
 			}			
-			dbCon.rs.close();
-			
-			dbCon.stmt.clearBatch();
-			//calculate the 库存对冲 and insert the record to material_detail
-			Iterator<FoodMaterial> iter = foodMaterials.iterator();
-			while(iter.hasNext()){
-				FoodMaterial foodMaterial = iter.next();
-				//calculate the 库存对冲
-				float amount = (float)Math.round(foodMaterial.food.getCount().floatValue() * foodMaterial.consumption * 100) /100;
-				
-				//insert the corresponding detail record to material_detail
-				sql = "INSERT INTO " + Params.dbName + ".material_detail (" + 
-					  "restaurant_id, material_id, price, date, staff, dept_id, amount, type) VALUES(" +
-					  orderInfo.restaurantID + ", " +						//restaurant_id
-					  foodMaterial.material.getMaterialID() + ", " +		//material_id
-					  "(SELECT price FROM " + Params.dbName + ".material_dept WHERE restaurant_id=" + 
-					  orderInfo.restaurantID + 
-					  " AND material_id=" + foodMaterial.material.getMaterialID() + 	
-					  " AND dept_id=0), " +	//price
-					  "NOW(), " +			//date
-					  "(SELECT owner_name FROM " + Params.dbName + 
-					  ".terminal WHERE pin=" + "0x" + Long.toHexString(term.pin) + " AND model_id=" + term.modelID + "), " +	//staff
-					  "(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + 
-					  orderInfo.restaurantID + " AND alias_id=" + foodMaterial.food.kitchen + "), " +				//dept_id
-					  -amount + ", " + 				//amount
-					  MaterialDetail.TYPE_CONSUME + //type
-					  ")";
-				dbCon.stmt.addBatch(sql);
-				
-				//update the stock of material_dept to this material
-				sql = "UPDATE " + Params.dbName + ".material_dept SET " +
-					  "stock = stock - " + amount +
-					  " WHERE restaurant_id=" + orderInfo.restaurantID + 
-					  " AND material_id=" + foodMaterial.material.getMaterialID() +
-					  " AND dept_id=" + "(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + 
-					  orderInfo.restaurantID + " AND alias_id=" + foodMaterial.food.kitchen + ")";
-				dbCon.stmt.addBatch(sql);
-			}
-			
-			dbCon.stmt.executeBatch();
-			
 		}
 		
 		return orderInfo;

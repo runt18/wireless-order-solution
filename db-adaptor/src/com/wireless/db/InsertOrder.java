@@ -2,7 +2,6 @@ package com.wireless.db;
 
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.SimpleDateFormat;
 
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
@@ -245,12 +244,7 @@ public class InsertOrder {
 					orderToInsert.id = dbCon.rs.getInt(1);
 				}else{
 					throw new SQLException("The id of order is not generated successfully.");
-				}
-				
-				//FIXME 
-				System.out.println(orderToInsert.id + "@" + 
-							new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()) + 
-							":" + System.getProperty("line.separator") + sql);
+				}				
 				
 				/**
 				 * Update the 2nd table to busy if the category is for merger
@@ -274,11 +268,6 @@ public class InsertOrder {
 					  " WHERE restaurant_id=" + term.restaurant_id + 
 					  " AND table_alias=" + orderToInsert.table.aliasID;
 				dbCon.stmt.executeUpdate(sql);
-				
-				//FIXME 
-				System.out.println(orderToInsert.id + "@" + 
-							new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()) +
-							":" + System.getProperty("line.separator") + sql);
 				
 				/**
 				 * Update the gift amount if the gift quota is set.

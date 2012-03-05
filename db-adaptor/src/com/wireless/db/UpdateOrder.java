@@ -1,7 +1,6 @@
 package com.wireless.db;
 
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -177,27 +176,35 @@ public class UpdateOrder {
 	
 	/**
 	 * Update the order according to the specific order id.
-	 * @param pin the pin to terminal
-	 * @param model the model to terminal
-	 * @param orderToUpdate the order along with the order id and other detail information
+	 * 
+	 * @param pin
+	 *            the pin to terminal
+	 * @param model
+	 *            the model to terminal
+	 * @param orderToUpdate
+	 *            the order along with the order id and other detail information
+	 * @param isPaidAgain
+	 * 			  indicating whether the order has been paid before
 	 * @return the update result containing two orders below.<br>
-	 * 		   - The extra order.<br>
-	 * 		   - The canceled order.
-	 * @throws BusinessException throws if one of the cases below.<br>
-	 * 							 - The terminal is NOT attached to any restaurant.<br>
-	 * 							 - The terminal is expired.<br>
-	 * 							 - The order to this id does NOT exist.<br>
-	 * 							 - Any food to this order does NOT exist.<br>
-	 * 							 - Any taste to this order does NOT exist.<br>
-	 * 							 - Exceed the gift quota.
-	 * @throws SQLException throws if fail to execute any SQL statement.
+	 *         - The extra order.<br>
+	 *         - The canceled order.
+	 * @throws BusinessException
+	 *             throws if one of the cases below.<br>
+	 *             - The terminal is NOT attached to any restaurant.<br>
+	 *             - The terminal is expired.<br>
+	 *             - The order to this id does NOT exist.<br>
+	 *             - Any food to this order does NOT exist.<br>
+	 *             - Any taste to this order does NOT exist.<br>
+	 *             - Exceed the gift quota.
+	 * @throws SQLException
+	 *             throws if fail to execute any SQL statement.
 	 */
-	public static Result execByID(long pin, short model, Order orderToUpdate, boolean isGiftSkip) throws BusinessException, SQLException{
+	public static Result execByID(long pin, short model, Order orderToUpdate, boolean isPaidAgain) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();	
 		
 		try{
 			dbCon.connect();
-			return execByID(dbCon, pin, model, orderToUpdate, isGiftSkip);
+			return execByID(dbCon, pin, model, orderToUpdate, isPaidAgain);
 
 		}finally{
 			dbCon.disconnect();
@@ -205,24 +212,33 @@ public class UpdateOrder {
 	}
 	
 	/**
-	 * Update the order according to the specific order id.
-	 * Note that the method should be invoked before database connected.
-	 * @param pin the pin to terminal
-	 * @param model the model to terminal
-	 * @param orderToUpdate the order along with the order id and other detail information
+	 * Update the order according to the specific order id. Note that the method
+	 * should be invoked before database connected.
+	 * 
+	 * @param pin
+	 *            the pin to terminal
+	 * @param model
+	 *            the model to terminal
+	 * @param orderToUpdate
+	 *            the order along with the order id and other detail information
+	 * @param isPaidAgain
+	 *            indicating whether the order has been paid before
+	 * 
 	 * @return the update result containing two orders below.<br>
-	 * 		   - The extra order.<br>
-	 * 		   - The canceled order.
-	 * @throws BusinessException throws if one of the cases below.<br>
-	 * 							 - The terminal is NOT attached to any restaurant.<br>
-	 * 							 - The terminal is expired.<br>
-	 * 							 - The order to this id does NOT exist.<br>
-	 * 							 - Any food to this order does NOT exist.<br>
-	 * 							 - Any taste to this order does NOT exist.<br>
-	 * 							 - Exceed the gift quota.
-	 * @throws SQLException throws if fail to execute any SQL statement.
+	 *         - The extra order.<br>
+	 *         - The canceled order.
+	 * @throws BusinessException
+	 *             throws if one of the cases below.<br>
+	 *             - The terminal is NOT attached to any restaurant.<br>
+	 *             - The terminal is expired.<br>
+	 *             - The order to this id does NOT exist.<br>
+	 *             - Any food to this order does NOT exist.<br>
+	 *             - Any taste to this order does NOT exist.<br>
+	 *             - Exceed the gift quota.
+	 * @throws SQLException
+	 *             throws if fail to execute any SQL statement.
 	 */
-	public static Result execByID(DBCon dbCon, long pin, short model, Order orderToUpdate, boolean isGiftSkip) throws BusinessException, SQLException{
+	public static Result execByID(DBCon dbCon, long pin, short model, Order orderToUpdate, boolean isPaidAgain) throws BusinessException, SQLException{
 		
 		Terminal term = VerifyPin.exec(dbCon, pin, model);
 		String sql = "SELECT table_id, table_alias, table_name, category FROM " + Params.dbName + ".order WHERE id=" + orderToUpdate.id;
@@ -236,7 +252,7 @@ public class UpdateOrder {
 			orderToUpdate.category = dbCon.rs.getShort("category");
 			dbCon.rs.close();
 			
-			return updateOrder(dbCon, term, orderToUpdate, isGiftSkip);
+			return updateOrder(dbCon, term, orderToUpdate, isPaidAgain);
 			
 		}else{
 			throw new BusinessException("Order(id=" + orderToUpdate.id + ") to query does NOT exist.", ErrorCode.ORDER_NOT_EXIST);
@@ -244,7 +260,7 @@ public class UpdateOrder {
 	
 	}
 	
-	private static Result updateOrder(DBCon dbCon, Terminal term, Order orderToUpdate, boolean isGiftSkip) throws BusinessException, SQLException{		
+	private static Result updateOrder(DBCon dbCon, Terminal term, Order orderToUpdate, boolean isPaidAgain) throws BusinessException, SQLException{		
 		
 		//query all the food's id ,order count and taste preference of this order
 		ArrayList<OrderFood> originalRecords = new ArrayList<OrderFood>();
@@ -365,9 +381,11 @@ public class UpdateOrder {
 		}
 		
 		/**
-		 * Get the region to this table
+		 * Get the region to this table if the order has NOT been paid before
 		 */
-		orderToUpdate.region = QueryRegion.exec(dbCon, term.restaurant_id, orderToUpdate.table.aliasID);
+		if(!isPaidAgain){
+			orderToUpdate.region = QueryRegion.exec(dbCon, term.restaurant_id, orderToUpdate.table.aliasID);
+		}
 		
 		try{
 			
@@ -447,7 +465,7 @@ public class UpdateOrder {
 			 * Update the gift amount if not reach the quota.
 			 * Otherwise throw a business exception.
 			 */
-			if(term.getGiftQuota() >= 0 && !isGiftSkip){
+			if(term.getGiftQuota() >= 0 && !isPaidAgain){
 				if((giftAmount + term.getGiftAmount()) > term.getGiftQuota()){
 					throw new BusinessException("The gift amount exceeds the quota.", ErrorCode.EXCEED_GIFT_QUOTA);
 					
@@ -461,89 +479,68 @@ public class UpdateOrder {
 			}
 			
 			/**
-			 * Update the related info to this order
+			 * Update the related info to this order.
+			 * Don't update the region and table status if the order has been paid before.
 			 */
-			sql = "UPDATE `" + Params.dbName + "`.`order` SET custom_num=" + orderToUpdate.custom_num +
-					", terminal_pin=" + term.pin + 
-					", waiter='" + term.owner + "'" +
-					", region_id=" + orderToUpdate.region.regionID +
-					", region_name='" + orderToUpdate.region.name + "'" + 
-					", table_id=" + orderToUpdate.table.tableID + 
-					", table_alias=" + orderToUpdate.table.aliasID + 
-					", table_name='" + orderToUpdate.table.name + "'" +
-					" WHERE id=" + orderToUpdate.id;
+			sql = "UPDATE `" + Params.dbName + "`.`order` SET " +
+					"custom_num=" + orderToUpdate.custom_num +	", " +
+					"terminal_pin=" + term.pin + ", " +
+					(isPaidAgain ? "" : "region_id=" + orderToUpdate.region.regionID + ", ") +
+					(isPaidAgain ? "" : "region_name='" + orderToUpdate.region.name + "', ") +
+					(isPaidAgain ? "" : "table_id=" + orderToUpdate.table.tableID + ", ") +
+					(isPaidAgain ? "" : "table_alias=" + orderToUpdate.table.aliasID + ", ") +
+					(isPaidAgain ? "" : "table_name='" + orderToUpdate.table.name + "', ") +
+					"waiter='" + term.owner + "' " +
+					"WHERE id=" + orderToUpdate.id;
 			dbCon.stmt.executeUpdate(sql);
-
-			//FIXME
-			System.out.println(orderToUpdate.id + "@" + 
-					new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()) +
-					":" + System.getProperty("line.separator") + sql);
 			
 			/**
-			 * Update the custom number to the merger table
+			 * Update the custom number to the merger table if the order has NOT been paid before.
 			 */
-			if(orderToUpdate.category == Order.CATE_MERGER_TABLE){
-				sql = "UPDATE " + Params.dbName + ".table SET " +
-					  "status=" + Table.TABLE_BUSY + ", " +
-					  "category=" + Order.CATE_MERGER_TABLE + ", " +
-					  "custom_num=" + orderToUpdate.custom_num +
-				  	  " WHERE restaurant_id=" + term.restaurant_id + 
-				  	  " AND table_alias=" + orderToUpdate.table2.aliasID;
-				dbCon.stmt.executeUpdate(sql);
-				
-				//FIXME
-				System.out.println(orderToUpdate.id + "@" + 
-						new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()) +
-						":" + System.getProperty("line.separator") + sql);
-			}
-			
-			/**
-			 * Update the table status in tow cases.
-			 * 1 - Transfer table
-			 * 2 - Not transfer table
-			 */
-			if(orderToUpdate.table.aliasID != orderToUpdate.oriTbl.aliasID){
-				// update the original table status to idle
-				sql = "UPDATE " + Params.dbName + ".table SET status="
-						+ Table.TABLE_IDLE + "," + "custom_num=NULL,"
-						+ "category=NULL" + " WHERE restaurant_id="
-						+ orderToUpdate.oriTbl.restaurantID + " AND table_alias="
-						+ orderToUpdate.oriTbl.aliasID;
-				dbCon.stmt.executeUpdate(sql);
-				
-				//FIXME
-				System.out.println(orderToUpdate.id + "@" + 
-						new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()) +
-						":" + System.getProperty("line.separator") + sql);
-				
-				// update the new table status to busy
-				sql = "UPDATE " + Params.dbName + ".table SET " +
+			if(!isPaidAgain){
+				if(orderToUpdate.category == Order.CATE_MERGER_TABLE){
+					sql = "UPDATE " + Params.dbName + ".table SET " +
 						  "status=" + Table.TABLE_BUSY + ", " +
-						  "category=" + orderToUpdate.oriTbl.category + ", " +
-						  "custom_num=" + orderToUpdate.custom_num + 
-						  " WHERE restaurant_id=" + orderToUpdate.table.restaurantID + 
-						  " AND table_alias=" + orderToUpdate.table.aliasID;
-				dbCon.stmt.executeUpdate(sql);
+						  "category=" + Order.CATE_MERGER_TABLE + ", " +
+						  "custom_num=" + orderToUpdate.custom_num +
+					  	  " WHERE restaurant_id=" + term.restaurant_id + 
+					  	  " AND table_alias=" + orderToUpdate.table2.aliasID;
+					dbCon.stmt.executeUpdate(sql);				
+				}
 				
-				//FIXME
-				System.out.println(orderToUpdate.id + "@" + 
-						new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()) +
-						":" + System.getProperty("line.separator") + sql);
-				
-			}else{
+				/**
+				 * Update the table status in tow cases.
+				 * 1 - Transfer table
+				 * 2 - Not transfer table
+				 */
+				if(orderToUpdate.table.aliasID != orderToUpdate.oriTbl.aliasID){
+					// update the original table status to idle
+					sql = "UPDATE " + Params.dbName + ".table SET status="
+							+ Table.TABLE_IDLE + "," + "custom_num=NULL,"
+							+ "category=NULL" + " WHERE restaurant_id="
+							+ orderToUpdate.oriTbl.restaurantID + " AND table_alias="
+							+ orderToUpdate.oriTbl.aliasID;
+					dbCon.stmt.executeUpdate(sql);				
+					
+					// update the new table status to busy
+					sql = "UPDATE " + Params.dbName + ".table SET " +
+							  "status=" + Table.TABLE_BUSY + ", " +
+							  "category=" + orderToUpdate.oriTbl.category + ", " +
+							  "custom_num=" + orderToUpdate.custom_num + 
+							  " WHERE restaurant_id=" + orderToUpdate.table.restaurantID + 
+							  " AND table_alias=" + orderToUpdate.table.aliasID;
+					dbCon.stmt.executeUpdate(sql);				
+					
+				}else{
 
-				sql = "UPDATE " + Params.dbName + ".table SET " +
-				      "status=" + Table.TABLE_BUSY + ", " +
-					  "category=" + orderToUpdate.category + ", " +
-					  "custom_num=" + orderToUpdate.custom_num +
-					  " WHERE restaurant_id=" + term.restaurant_id + 
-					  " AND table_alias=" + orderToUpdate.table.aliasID;
-				dbCon.stmt.executeUpdate(sql);
-				
-				//FIXME
-				System.out.println(orderToUpdate.id + "@" + 
-						new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()) +
-						":" + System.getProperty("line.separator") + sql);
+					sql = "UPDATE " + Params.dbName + ".table SET " +
+					      "status=" + Table.TABLE_BUSY + ", " +
+						  "category=" + orderToUpdate.category + ", " +
+						  "custom_num=" + orderToUpdate.custom_num +
+						  " WHERE restaurant_id=" + term.restaurant_id + 
+						  " AND table_alias=" + orderToUpdate.table.aliasID;
+					dbCon.stmt.executeUpdate(sql);				
+				}				
 			}
 			
 			dbCon.conn.commit();
