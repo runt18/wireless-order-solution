@@ -344,7 +344,7 @@ public class PickFoodActivity extends TabActivity implements
 		 */
 		for(int i = 0; i < 10; i++) {
 			final TextView tv = new TextView(PickFoodActivity.this);
-			tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 28);
+			tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
 			MarginLayoutParams ml = new MarginLayoutParams(MarginLayoutParams.FILL_PARENT, MarginLayoutParams.WRAP_CONTENT);
 			tv.setLayoutParams(ml);
 			tv.setOnClickListener(new View.OnClickListener() {
@@ -654,7 +654,7 @@ public class PickFoodActivity extends TabActivity implements
 		 */
 		for(char c = 'a'; c <= 'z'; c++) {
 			final TextView tv = new TextView(PickFoodActivity.this);
-			tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
+			tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 9);
 			tv.setGravity(Gravity.CENTER_HORIZONTAL);
 			tv.setText(Character.toString(c));
 			tv.setOnClickListener(new View.OnClickListener() {

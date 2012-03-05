@@ -626,7 +626,7 @@ public class MainActivity extends Activity {
 			getWindow().setBackgroundDrawableResource(android.R.color.transparent);//设置背景透明
 			final EditText pwdEdtTxt = (EditText)findViewById(R.id.pwd);
 	        
-	        final EditText staffEditTxt = (EditText)findViewById(R.id.staffname);
+	        final TextView staffEditTxt = (TextView)findViewById(R.id.staffname);
 	        
 	        /**
 	         * 下拉箭头显示员工信息列表
@@ -721,7 +721,7 @@ public class MainActivity extends Activity {
 		public void onAttachedToWindow(){
 			((TextView)findViewById(R.id.error)).setText("");
 			((EditText)findViewById(R.id.pwd)).setText("");
-	        ((EditText)findViewById(R.id.staffname)).setText("");
+	        ((TextView)findViewById(R.id.staffname)).setText("");
 	        if(_staffAdapter != null){
 	        	_staffAdapter.notifyDataSetChanged();
 	        }
