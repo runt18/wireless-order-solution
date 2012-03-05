@@ -224,7 +224,7 @@ class OrderHandler extends Handler implements Runnable{
 				if((printConf & Reserved.PRINT_TEMP_RECEIPT_2) != 0){
 					printOrder(printConf, PayOrder.queryOrder(_term, orderToPay));
 				}else{
-					printOrder(printConf, PayOrder.exec(_term, orderToPay));
+					printOrder(printConf, PayOrder.exec(_term, orderToPay, false));
 				}
 				response = new RespACK(request.header);
 
