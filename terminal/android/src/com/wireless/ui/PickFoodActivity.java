@@ -189,6 +189,11 @@ public class PickFoodActivity extends TabActivity implements
 	 */
 	@Override
 	public void onBackPressed() {
+		//dismiss the order shortcut
+		if(_popupWindow.isShowing()){
+			_popupWindow.dismiss();
+		}
+		
 		// Add the temporary foods to the picked food list
 		// except the ones without food name
 		if (_tempLstView != null) {
