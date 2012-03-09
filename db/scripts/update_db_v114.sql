@@ -86,10 +86,53 @@ ALTER TABLE `wireless_order_db`.`order_history` CHANGE COLUMN `table_id` `table_
 UPDATE `wireless_order_db`.`order_history` AS a SET table2_id = (SELECT table_id FROM `wireless_order_db`.`table` AS b WHERE a.table2_alias = b.table_alias AND a.restaurant_id = b.restaurant_id);
 
 -- -----------------------------------------------------
+-- Drop the foreign key to restaurant.
+-- Rename the field 'id' to 'kitchen_id'.
+-- Rename the field 'alias_id' to 'kitchen_alias'
+-- Create the index associates with both restaurant_id and kitchen_alias
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`kitchen` DROP FOREIGN KEY `fk_kitchen_restaurant1` ;
+
+ALTER TABLE `wireless_order_db`.`kitchen` CHANGE COLUMN `id` `kitchen_id` INT(11) NOT NULL AUTO_INCREMENT COMMENT 'the id to this kitchen'  , CHANGE COLUMN `alias_id` `kitchen_alias` TINYINT UNSIGNED NOT NULL DEFAULT '0' COMMENT 'the alias id to this kitchen'  
+
+, DROP PRIMARY KEY 
+
+, ADD PRIMARY KEY (`kitchen_id`) 
+
+, ADD INDEX `ix_kitchen_alias_id` USING BTREE (`restaurant_id` ASC, `kitchen_alias` ASC) 
+
+, DROP INDEX `fk_kitchen_restaurant1` ;
+
+-- -----------------------------------------------------
+-- Add the field 'kitchen_id' to table 'order_food'.
+-- Rename the field 'kitchen' to 'kitchen_alias'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_food` 
+ADD COLUMN `kitchen_id` INT NULL DEFAULT NULL COMMENT 'the kitchen id which the order food of this record belong to. '  AFTER `discount` , CHANGE COLUMN `kitchen` `kitchen_alias` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'the kitchen alias id which the order food of this record belong to.'  ;
+
+-- -----------------------------------------------------
+-- Add the field 'kitchen_id' to table 'order_food'.
+-- Rename the field 'kitchen' to 'kitchen_alias'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_food_history` 
+ADD COLUMN `kitchen_id` INT NULL DEFAULT NULL COMMENT 'the kitchen id which the order food of this record belong to. '  AFTER `discount` , CHANGE COLUMN `kitchen` `kitchen_alias` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'the kitchen alias id which the order food of this record belong to.'  ;
+
+-- -----------------------------------------------------
+-- Update the field 'kitchen_id' to table 'order_food'
+-- -----------------------------------------------------
+UPDATE wireless_order_db.order_food AS a SET kitchen_id = (SELECT kitchen_id FROM wireless_order_db.kitchen b WHERE b.restaurant_id=a.restaurant_id AND b.kitchen_alias=a.kitchen_alias);
+
+-- -----------------------------------------------------
+-- Update the field 'kitchen_id' to table 'order_food_history'
+-- -----------------------------------------------------
+UPDATE wireless_order_db.order_food_history AS a SET kitchen_id = (SELECT kitchen_id FROM wireless_order_db.kitchen b WHERE b.restaurant_id=a.restaurant_id AND b.kitchen_alias=a.kitchen_alias);
+
+
+-- -----------------------------------------------------
 -- View `order_food_history_view`
 -- -----------------------------------------------------
 DROP VIEW IF EXISTS order_food_history_view;
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `order_food_history_view` AS select sum(`order_food_history`.`order_count`) AS `order_count`,max(`order_food_history`.`unit_price`) AS `unit_price`,max(`order_food_history`.`taste_price`) AS `taste_price`,max(`order_food_history`.`name`) AS `name`,max(`order_food_history`.`taste`) AS `taste`,max(`order_food_history`.`taste_id`) AS `taste_id`,max(`order_food_history`.`discount`) AS `discount`,max(`order_food_history`.`food_status`) AS `food_status`,max(`order_food_history`.`kitchen`) AS `kitchen`,max(`order_food_history`.`waiter`) AS `waiter`,`order_food_history`.`order_id` AS `order_id`,`order_food_history`.`food_id` AS `food_id` from `order_food_history` group by `order_food_history`.`order_id`,`order_food_history`.`food_id`,`order_food_history`.`taste_id`,`order_food_history`.`taste_id2`,`order_food_history`.`taste_id3`,`order_food_history`.`is_temporary` having (sum(`order_food_history`.`order_count`) > 0);
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `order_food_history_view` AS select sum(`order_food_history`.`order_count`) AS `order_count`,max(`order_food_history`.`unit_price`) AS `unit_price`,max(`order_food_history`.`taste_price`) AS `taste_price`,max(`order_food_history`.`name`) AS `name`,max(`order_food_history`.`taste`) AS `taste`,max(`order_food_history`.`taste_id`) AS `taste_id`,max(`order_food_history`.`discount`) AS `discount`,max(`order_food_history`.`food_status`) AS `food_status`,max(`order_food_history`.`kitchen_alias`) AS `kitchen`,max(`order_food_history`.`waiter`) AS `waiter`,`order_food_history`.`order_id` AS `order_id`,`order_food_history`.`food_id` AS `food_id` from `order_food_history` group by `order_food_history`.`order_id`,`order_food_history`.`food_id`,`order_food_history`.`taste_id`,`order_food_history`.`taste_id2`,`order_food_history`.`taste_id3`,`order_food_history`.`is_temporary` having (sum(`order_food_history`.`order_count`) > 0);
 
 -- -----------------------------------------------------
 -- View `order_food_view`
