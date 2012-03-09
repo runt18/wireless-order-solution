@@ -86,7 +86,7 @@ public class DailySettlementTask extends SchedulerTask{
 			
 			final String orderFoodItem = "`id`,`restaurant_id`, `order_id`, `food_id`, `order_date`, `order_count`," + 
 										"`unit_price`,`name`, `food_status`, `taste`,`taste_price`," +
-										"`taste_id`,`taste_id2`,`taste_id3`,`discount`,`kitchen`," +
+										"`taste_id`,`taste_id2`,`taste_id3`,`discount`,`kitchen_id`,`kitchen_alias`," +
 										"`comment`,`waiter`,`is_temporary`";
 			
 			dbCon.stmt.clearBatch();
