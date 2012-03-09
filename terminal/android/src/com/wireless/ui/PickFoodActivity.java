@@ -928,7 +928,7 @@ public class PickFoodActivity extends TabActivity implements
 					Kitchen selectedKitchen = _kitchenChild.get(groupPosition).get(childPosition);
 					_filterFoods = new ArrayList<Food>();
 					for (int i = 0; i < WirelessOrder.foodMenu.foods.length; i++) {
-						if (WirelessOrder.foodMenu.foods[i].kitchen == selectedKitchen.kitchenID) {
+						if (WirelessOrder.foodMenu.foods[i].kitchen == selectedKitchen.kitchenAlias) {
 							_filterFoods.add(WirelessOrder.foodMenu.foods[i]);
 						}
 					}
@@ -1112,7 +1112,7 @@ public class PickFoodActivity extends TabActivity implements
 		_validKitchens = new ArrayList<Kitchen>();
 		for (int i = 0; i < WirelessOrder.foodMenu.kitchens.length; i++) {
 			Food keyFood = new Food();
-			keyFood.kitchen = WirelessOrder.foodMenu.kitchens[i].kitchenID;
+			keyFood.kitchen = WirelessOrder.foodMenu.kitchens[i].kitchenAlias;
 			int index = Arrays.binarySearch(tmpFoods, keyFood,
 					new Comparator<Food>() {
 
