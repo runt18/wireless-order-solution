@@ -111,12 +111,13 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 								dbCon.rs.close();
 								
 								//get the related kitchen information 
-								sql = "SELECT alias_id, name, dept_id FROM " + WirelessSocketServer.database + ".kitchen WHERE restaurant_id=" + restaurantID;
+								sql = "SELECT kitchen_id, kitchen_alias, name, dept_id FROM " + WirelessSocketServer.database + ".kitchen WHERE restaurant_id=" + restaurantID;
 								dbCon.rs = dbCon.stmt.executeQuery(sql);
 								ArrayList<Kitchen> kitchens = new ArrayList<Kitchen>();
 								while(dbCon.rs.next()){
 									kitchens.add(new Kitchen(dbCon.rs.getString("name"),
-															 dbCon.rs.getShort("alias_id"),
+															 dbCon.rs.getInt("kitchen_id"),
+															 dbCon.rs.getShort("kitchen_alias"),
 															 dbCon.rs.getShort("dept_id")));															
 								}
 								dbCon.rs.close();
