@@ -26,11 +26,6 @@ public final class Kitchen {
 	public final static short KITCHEN_19 = 18;
 	public final static short KITCHEN_20 = 19;
 		
-	/**
-	 * The discount to this kitchen ranges from 0.00 through 1.00
-	 * Since the 8100 doesn't support float, we instead to use 0 through 100.
-	 * So the real price should be divided 100 at last. 
-	 */
 	public byte discount = 100;	
 	public byte discount_2 = 100;
 	public byte discount_3 = 100;
@@ -38,19 +33,25 @@ public final class Kitchen {
 	public byte member_discount_2 = 100;
 	public byte member_discount_3 = 100;
 	
+	//the name to this kitchen
 	public String name;
-	public short kitchenID = KITCHEN_NULL;
+	//the id to this kitchen
+	public long kitchenID = 0;
+	//the alias id to this kitchen
+	public short kitchenAlias = KITCHEN_NULL;
+	//the department id to this kitchen
 	public short deptID = Department.DEPT_1;
 	
 	
-	public Kitchen(String kName, short kID, short deptID){
+	public Kitchen(String kName, long kID, short kAlias, short deptID){
 		this.name = kName;
 		this.kitchenID = kID;
+		this.kitchenAlias = kAlias;
 		this.deptID = deptID;
 	}
 	
-	public Kitchen(String kName, short id, short deptID, byte dist1, byte dist2, byte dist3, byte memDist1, byte memDist2, byte memDist3){
-		this(kName, id, deptID);
+	public Kitchen(String kName, long kID, short kAlias, short deptID, byte dist1, byte dist2, byte dist3, byte memDist1, byte memDist2, byte memDist3){
+		this(kName, kID, kAlias, deptID);
 		discount = dist1;
 		discount_2 = dist2;
 		discount_3 = dist3;

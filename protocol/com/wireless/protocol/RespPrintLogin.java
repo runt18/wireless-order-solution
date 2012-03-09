@@ -97,7 +97,7 @@ public class RespPrintLogin extends RespPackage{
 		
 		for(int i = 0; i < kitchenBytes.length; i++){
 			//assign the alias id
-			body[offset] = (byte)kitchens[i].kitchenID;
+			body[offset] = (byte)kitchens[i].kitchenAlias;
 			//assign the length to kitchen name
 			body[offset + 1] = (byte)kitchenBytes[i].length;
 			//assign the name of kitchen

@@ -427,10 +427,10 @@ public class RespParser {
 			for(int i = 0; i < kitchens.length; i++){
 				
 				//get the kitchen alias id
-				short kitchen_id = (short)(response.body[index] & 0x00FF);
+				short kitchenAlias = (short)(response.body[index] & 0x00FF);
 				
-				//get the super kitchen alias id that the kitchen belong to
-				short sKitchen_id = (short)(response.body[index + 1] & 0x00FF);
+				//get the department alias id that the kitchen belong to
+				short deptAlias = (short)(response.body[index + 1] & 0x00FF);
 				
 				//get 3 normal discounts
 				byte dist_1 = response.body[index + 2];
@@ -445,15 +445,15 @@ public class RespParser {
 				//get the length of the kitchen name
 				int length = response.body[index + 8];
 				//get the value of super kitchen name
-				String kname = null;
+				String kitchenName = null;
 				try{
-					kname = new String(response.body, index + 9, length, "UTF-16BE");
+					kitchenName = new String(response.body, index + 9, length, "UTF-16BE");
 				}catch(UnsupportedEncodingException e){}
 				
 				index += 9 + length;
 				
 				//add the kitchen
-				kitchens[i] = new Kitchen(kname, kitchen_id, sKitchen_id,
+				kitchens[i] = new Kitchen(kitchenName, 0, kitchenAlias, deptAlias,
 										  dist_1, dist_2, dist_3,
 										  mdist_1, mdist_2, mdist_3);
 			}

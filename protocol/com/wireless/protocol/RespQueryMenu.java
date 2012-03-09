@@ -207,7 +207,7 @@ public class RespQueryMenu extends RespPackage{
 		//assign each kitchen to the body
 		for(int i = 0; i < foodMenu.kitchens.length; i++){
 			//assign the kitchen id
-			body[index] = (byte)(foodMenu.kitchens[i].kitchenID & 0x00FF);
+			body[index] = (byte)(foodMenu.kitchens[i].kitchenAlias & 0x00FF);
 			
 			//assign the super kitchen id that this kitchen belong to 
 			body[index + 1] = (byte)(foodMenu.kitchens[i].deptID & 0x00FF);
