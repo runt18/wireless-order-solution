@@ -47,7 +47,7 @@ public class TempListView extends ListView {
 	public void addTemp(){
 		OrderFood tmpFood = new OrderFood();
 		tmpFood.isTemporary = true;
-		tmpFood.alias_id = Util.genTempFoodID();
+		tmpFood.foodAlias = Util.genTempFoodID();
 		tmpFood.hangStatus = OrderFood.FOOD_NORMAL;
 		tmpFood.setCount(new Float(1));
 		_tmpFoods.add(tmpFood);

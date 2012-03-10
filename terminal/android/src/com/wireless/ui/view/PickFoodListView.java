@@ -134,7 +134,7 @@ public class PickFoodListView extends ListView {
 			((TextView)view.findViewById(R.id.foodname)).setText(_foods[position].name + status);
 			if(_tag == TAG_NUM){
 				((TextView)view.findViewById(R.id.foodpinyin)).setText("±‡∫≈£∫");
-				((TextView)view.findViewById(R.id.foodpinyins)).setText(String.valueOf(_foods[position].alias_id));
+				((TextView)view.findViewById(R.id.foodpinyins)).setText(String.valueOf(_foods[position].foodAlias));
 			}else{
 				((TextView)view.findViewById(R.id.foodpinyin)).setText("∆¥“Ù£∫");
 				((TextView)view.findViewById(R.id.foodpinyins)).setText(_foods[position].pinyin);

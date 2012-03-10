@@ -429,7 +429,7 @@ public class PickFoodActivity extends TabActivity implements
 					ArrayList<Food> filterFoods = new ArrayList<Food>();
 					for (int i = 0; i < WirelessOrder.foodMenu.foods.length; i++) {
 						if (String.valueOf(
-								WirelessOrder.foodMenu.foods[i].alias_id)
+								WirelessOrder.foodMenu.foods[i].foodAlias)
 								.startsWith(s.toString().trim())) {
 							filterFoods.add(WirelessOrder.foodMenu.foods[i]);
 						}
