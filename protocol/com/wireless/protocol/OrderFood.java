@@ -88,7 +88,7 @@ public class OrderFood extends Food {
 			}else if(isTemporary && food.isTemporary){
 				return name.equals(food.name) && (price == food.price) && (hangStatus == food.hangStatus);
 			}else{
-				return alias_id == food.alias_id &&
+				return foodAlias == food.foodAlias &&
 					   tastes[0].alias_id == food.tastes[0].alias_id &&
 					   tastes[1].alias_id == food.tastes[1].alias_id &&
 					   tastes[2].alias_id == food.tastes[2].alias_id &&
@@ -104,7 +104,7 @@ public class OrderFood extends Food {
 		if(isTemporary){
 			return name.hashCode() ^ price ^ hangStatus;
 		}else{
-			return new Integer(alias_id).hashCode() ^ 
+			return new Integer(foodAlias).hashCode() ^ 
 				   new Integer(tastes[0].alias_id).hashCode() ^ 
 				   new Integer(tastes[1].alias_id).hashCode() ^ 
 				   new Integer(tastes[2].alias_id).hashCode() ^ 
@@ -118,7 +118,7 @@ public class OrderFood extends Food {
 	 * @return
 	 */
 	public boolean equals2(OrderFood food){
-		return alias_id == food.alias_id &&
+		return foodAlias == food.foodAlias &&
 		   tastes[0].alias_id == food.tastes[0].alias_id &&
 		   tastes[1].alias_id == food.tastes[1].alias_id &&
 		   tastes[2].alias_id == food.tastes[2].alias_id ;
@@ -261,8 +261,8 @@ public class OrderFood extends Food {
 	}
 
 	public OrderFood(Food food){
-		super(food.food_id,
-			  food.alias_id,
+		super(food.foodID,
+			  food.foodAlias,
 			  food.name,
 			  food.getPrice(),
 			  food.kitchen,

@@ -132,7 +132,7 @@ public class RespParser {
 					
 					orderFoods[i] = new OrderFood();
 					orderFoods[i].isTemporary = true;
-					orderFoods[i].alias_id = foodID;
+					orderFoods[i].foodAlias = foodID;
 					orderFoods[i].hangStatus = hangStatus;
 					orderFoods[i].count = orderAmount;
 					orderFoods[i].setPrice(Util.int2Float(unitPrice));
@@ -170,7 +170,7 @@ public class RespParser {
 					
 					orderFoods[i] = new OrderFood();
 					orderFoods[i].isTemporary = false;
-					orderFoods[i].alias_id = foodID;
+					orderFoods[i].foodAlias = foodID;
 					orderFoods[i].count = orderAmount;
 					orderFoods[i].status = status;
 					
@@ -193,7 +193,7 @@ public class RespParser {
 			if(!order.foods[i].isTemporary){
 				//get the food name, unit price and attached kitchen
 				for(int j = 0; j < foodMenu.foods.length; j++){
-					if(order.foods[i].alias_id == foodMenu.foods[j].alias_id){
+					if(order.foods[i].foodAlias == foodMenu.foods[j].foodAlias){
 						order.foods[i].name = foodMenu.foods[j].name;
 						order.foods[i].setPrice(foodMenu.foods[j].getPrice());
 						order.foods[i].kitchen = foodMenu.foods[j].kitchen;
@@ -355,7 +355,7 @@ public class RespParser {
 			for(int i = 0; i < nFoods; i++){
 				Food food = new Food();
 				//get the food's id
-				food.alias_id = (response.body[index] & 0x000000FF) |
+				food.foodAlias = (response.body[index] & 0x000000FF) |
 							((response.body[index + 1] & 0x000000FF) << 8);
 				
 				//get the food's price

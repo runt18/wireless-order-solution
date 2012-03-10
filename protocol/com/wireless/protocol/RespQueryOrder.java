@@ -134,8 +134,8 @@ public class RespQueryOrder extends RespPackage{
 				//assign the temporary flag 
 				body[offset] = 1;
 				//assign the food id
-				body[offset + 1] = (byte)(order.foods[i].alias_id & 0x000000FF);
-				body[offset + 2] = (byte)((order.foods[i].alias_id & 0x0000FF00) >> 8);
+				body[offset + 1] = (byte)(order.foods[i].foodAlias & 0x000000FF);
+				body[offset + 2] = (byte)((order.foods[i].foodAlias & 0x0000FF00) >> 8);
 				//assign the order amount
 				body[offset + 3] = (byte)(order.foods[i].count & 0x000000FF);
 				body[offset + 4] = (byte)((order.foods[i].count & 0x0000FF00) >> 8);
@@ -159,8 +159,8 @@ public class RespQueryOrder extends RespPackage{
 				//assign the temporary flag
 				body[offset] = 0;
 				//assign the food alias id
-				body[offset + 1] = (byte)(order.foods[i].alias_id & 0x000000FF);
-				body[offset + 2] = (byte)((order.foods[i].alias_id & 0x0000FF00) >> 8);
+				body[offset + 1] = (byte)(order.foods[i].foodAlias & 0x000000FF);
+				body[offset + 2] = (byte)((order.foods[i].foodAlias & 0x0000FF00) >> 8);
 				//assign the order amount
 				body[offset + 3] = (byte)(order.foods[i].count & 0x000000FF);
 				body[offset + 4] = (byte)((order.foods[i].count & 0x0000FF00) >> 8);

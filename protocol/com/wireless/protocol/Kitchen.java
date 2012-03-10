@@ -26,13 +26,60 @@ public final class Kitchen {
 	public final static short KITCHEN_19 = 18;
 	public final static short KITCHEN_20 = 19;
 		
-	public byte discount = 100;	
-	public byte discount_2 = 100;
-	public byte discount_3 = 100;
-	public byte member_discount_1 = 100;
-	public byte member_discount_2 = 100;
-	public byte member_discount_3 = 100;
+	int discount_1 = 100;	
+	int discount_2 = 100;
+	int discount_3 = 100;
+	int memberDist_1 = 100;
+	int memberDist_2 = 100;
+	int memberDist_3 = 100;
 	
+	public Float getDist1(){
+		return Util.int2Float(discount_1);
+	}
+	
+	public void setDist1(Float distVal){
+		discount_1 = Util.float2Int(distVal);
+	}
+	
+	public Float getDist2(){
+		return Util.int2Float(discount_2);
+	}
+	
+	public void setDist2(Float distVal){
+		discount_2 = Util.float2Int(distVal);
+	}
+	
+	public Float getDist3(){
+		return Util.int2Float(discount_3);
+	}
+	
+	public void setDist3(Float distVal){
+		discount_3 = Util.float2Int(distVal);
+	}
+	
+	public Float getMemDist1(){
+		return Util.int2Float(memberDist_1);
+	}
+	
+	public void setMemDist1(Float distVal){
+		memberDist_1 = Util.float2Int(distVal);
+	}
+	
+	public Float getMemDist2(){
+		return Util.int2Float(memberDist_2);
+	}
+	
+	public void setMemDist2(Float distVal){
+		memberDist_2 = Util.float2Int(distVal);
+	}
+	
+	public Float getMemDist3(){
+		return Util.int2Float(memberDist_3);
+	}
+	
+	public void setMemDist3(Float distVal){
+		memberDist_3 = Util.float2Int(distVal);
+	}
 	//the name to this kitchen
 	public String name;
 	//the id to this kitchen
@@ -52,11 +99,11 @@ public final class Kitchen {
 	
 	public Kitchen(String kName, long kID, short kAlias, short deptID, byte dist1, byte dist2, byte dist3, byte memDist1, byte memDist2, byte memDist3){
 		this(kName, kID, kAlias, deptID);
-		discount = dist1;
+		discount_1 = dist1;
 		discount_2 = dist2;
 		discount_3 = dist3;
-		member_discount_1 = memDist1;
-		member_discount_2 = memDist2;
-		member_discount_3 = memDist3;
+		memberDist_1 = memDist1;
+		memberDist_2 = memDist2;
+		memberDist_3 = memDist3;
 	}
 }

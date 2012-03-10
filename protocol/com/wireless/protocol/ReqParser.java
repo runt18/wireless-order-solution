@@ -138,7 +138,7 @@ public class ReqParser {
 				orderFoods[i] = new OrderFood();
 				orderFoods[i].isTemporary = true;
 				orderFoods[i].kitchen = Kitchen.KITCHEN_TEMP;
-				orderFoods[i].alias_id = foodID;
+				orderFoods[i].foodAlias = foodID;
 				orderFoods[i].hangStatus = hangStatus;
 				orderFoods[i].isHurried = isHurried;
 				orderFoods[i].count = orderNum;
@@ -179,7 +179,7 @@ public class ReqParser {
 				offset += 14;
 				
 				orderFoods[i] = new OrderFood();
-				orderFoods[i].alias_id = foodID;
+				orderFoods[i].foodAlias = foodID;
 				orderFoods[i].count = orderNum;
 				
 				orderFoods[i].isTemporary = false;

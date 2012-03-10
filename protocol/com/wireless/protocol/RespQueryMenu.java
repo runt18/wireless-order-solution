@@ -153,8 +153,8 @@ public class RespQueryMenu extends RespPackage{
 		int index = 2;
 		for(int i = 0; i < foodMenu.foods.length; i++){
 			//assign the food's id
-			body[index] = (byte)(foodMenu.foods[i].alias_id & 0x000000FF);
-			body[index + 1] = (byte)((foodMenu.foods[i].alias_id & 0x0000FF00) >> 8);
+			body[index] = (byte)(foodMenu.foods[i].foodAlias & 0x000000FF);
+			body[index + 1] = (byte)((foodMenu.foods[i].foodAlias & 0x0000FF00) >> 8);
 			
 			//assign the unit price to this food
 			body[index + 2] = (byte)(foodMenu.foods[i].price & 0x000000FF);
@@ -213,14 +213,14 @@ public class RespQueryMenu extends RespPackage{
 			body[index + 1] = (byte)(foodMenu.kitchens[i].deptID & 0x00FF);
 			
 			//assign 3 normal discounts
-			body[index + 2] = foodMenu.kitchens[i].discount;
-			body[index + 3] = foodMenu.kitchens[i].discount_2;
-			body[index + 4] = foodMenu.kitchens[i].discount_3;
+			body[index + 2] = (byte)(foodMenu.kitchens[i].discount_1 & 0x000000FF);
+			body[index + 3] = (byte)(foodMenu.kitchens[i].discount_2 & 0x000000FF);
+			body[index + 4] = (byte)(foodMenu.kitchens[i].discount_3 & 0x000000FF);
 			
 			//assign 3 member discounts
-			body[index + 5] = foodMenu.kitchens[i].member_discount_1;
-			body[index + 6] = foodMenu.kitchens[i].member_discount_2;
-			body[index + 7] = foodMenu.kitchens[i].member_discount_3;
+			body[index + 5] = (byte)(foodMenu.kitchens[i].memberDist_1 & 0x000000FF);
+			body[index + 6] = (byte)(foodMenu.kitchens[i].memberDist_2 & 0x000000FF);
+			body[index + 7] = (byte)(foodMenu.kitchens[i].memberDist_3 & 0x000000FF);
 			
 			byte[] kname = foodMenu.kitchens[i].name.getBytes("UTF-16BE");
 			//assign the length of the kitchen name
