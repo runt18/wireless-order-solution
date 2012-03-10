@@ -6,55 +6,25 @@ CREATE SCHEMA IF NOT EXISTS `wireless_order_db` DEFAULT CHARACTER SET utf8 ;
 USE `wireless_order_db` ;
 
 -- -----------------------------------------------------
--- Table `wireless_order_db`.`restaurant`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `wireless_order_db`.`restaurant` ;
-
-CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`restaurant` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'the id to this restaurant, id 1 indicates the root user, id 2 indicates idle-repository, id 3 indicates discarded-repository' ,
-  `pwd` VARCHAR(45) NOT NULL COMMENT 'the password for the restaurant to log in' ,
-  `account` VARCHAR(45) NOT NULL COMMENT 'the account for the restaurant to log in' ,
-  `restaurant_name` VARCHAR(50) NOT NULL DEFAULT '' COMMENT 'the restaurant name ' ,
-  `restaurant_info` VARCHAR(300) NOT NULL DEFAULT '' COMMENT 'the restaurant info' ,
-  `pwd2` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the 2nd password to this restaurant, whose permission priority is lower than pwd' ,
-  `pwd3` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the 3rd password to this restaurant, whose permission priority is lower than pwd2' ,
-  `tele1` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'One of the telephones to this restaurant.' ,
-  `tele2` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'One of the telephones to this restaurant.' ,
-  `address` VARCHAR(70) NOT NULL DEFAULT '' COMMENT 'The address to this restaurant.' ,
-  `record_alive` BIGINT NOT NULL DEFAULT 0 COMMENT 'Indicates how long the order record of this restaurant can be persisted. It\'s represented in second. Value 0 means the records never expire.' ,
-  PRIMARY KEY (`id`, `account`) ,
-  UNIQUE INDEX `account_UNIQUE` (`account` ASC) )
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8, 
-COMMENT = 'describe the restaurnat\'s information' ;
-
-
--- -----------------------------------------------------
 -- Table `wireless_order_db`.`food`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `wireless_order_db`.`food` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'the id to this food' ,
-  `alias_id` SMALLINT UNSIGNED NOT NULL COMMENT 'the waiter use this alias id to select food in terminal' ,
+  `food_id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this food' ,
+  `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'indicates the food belong to which restaurant' ,
+  `food_alias` SMALLINT UNSIGNED NOT NULL COMMENT 'the waiter use this alias id to select food in terminal' ,
   `name` VARCHAR(45) NOT NULL COMMENT 'the name of the food' ,
   `pinyin` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the pinyin to this food' ,
   `unit_price` DECIMAL(7,2) UNSIGNED NOT NULL DEFAULT 0.0 COMMENT 'the unit price of the food' ,
-  `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'indicates the food belong to which restaurant' ,
   `kitchen` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the kitchen number which the food belong to. the maximum value (255) means the food does not belong to any kitchen.' ,
   `status` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates the status to this food, the value is the combination of values below.\n特价菜 ：0x01\n推荐菜 ：0x02\n停售　 ：0x04\n赠送     ：0x08\n时价     ：0x10' ,
   `img1` BINARY NULL DEFAULT NULL ,
   `img2` BINARY NULL DEFAULT NULL ,
   `img3` BINARY NULL DEFAULT NULL ,
   `enabled` TINYINT NOT NULL DEFAULT 1 COMMENT 'indicates whether the food information is enabled or not' ,
-  PRIMARY KEY (`id`) ,
-  INDEX `fk_food_restaurant` (`restaurant_id` ASC) ,
-  INDEX `ix_food_alias_id` (`alias_id` ASC) ,
-  CONSTRAINT `fk_food_restaurant`
-    FOREIGN KEY (`restaurant_id` )
-    REFERENCES `wireless_order_db`.`restaurant` (`id` )
-    ON DELETE RESTRICT
-    ON UPDATE RESTRICT)
+  PRIMARY KEY (`food_id`) ,
+  INDEX `ix_food_alias_id` (`restaurant_id` ASC, `food_alias` ASC) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'This table contains the all restaurant\'s food information.' ;
@@ -107,10 +77,11 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food` (
   `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this order detail record' ,
   `order_id` INT UNSIGNED NOT NULL COMMENT 'external key associated with the order table' ,
   `restaurant_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the restaurant id to this order detail' ,
-  `food_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the alias id to this food' ,
   `order_date` DATETIME NOT NULL DEFAULT 19000101 ,
   `order_count` DECIMAL(5,2) NOT NULL DEFAULT 0 COMMENT 'the count that the waiter ordered. the count can be positive or negative.' ,
   `unit_price` DECIMAL(7,2) UNSIGNED NOT NULL DEFAULT 0 ,
+  `food_id` INT NULL DEFAULT NULL COMMENT 'the id to this food' ,
+  `food_alias` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the alias id to this food' ,
   `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to the ordered food' ,
   `food_status` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates the status to this food, the value is the combination of values below.\n特价菜 ：0x01\n推荐菜 ：0x02\n停售　 ：0x04\n赠送     ：0x08' ,
   `hang_status` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates hang up status.\n0 - normal\n1 - hang_up\n2 - immediate' ,
@@ -120,7 +91,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food` (
   `taste` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the taste preference to the ordered food' ,
   `taste_price` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the price to taste preference' ,
   `discount` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the discount to this food' ,
-  `kitchen_id` INT NULL DEFAULT NULL COMMENT 'the kitchen id which the order food of this record belong to.' ,
+  `kitchen_id` INT NOT NULL DEFAULT 0 COMMENT 'the kitchen id which the order food of this record belong to.' ,
   `kitchen_alias` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the kitchen alias id which the order food of this record belong to.' ,
   `comment` VARCHAR(100) NULL DEFAULT NULL COMMENT 'the comment to this record, such as the reason to cancel food' ,
   `waiter` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name of waiter who deal with this record' ,
@@ -135,6 +106,30 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'descirbe the relationship between the order and food' ;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`restaurant`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`restaurant` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`restaurant` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'the id to this restaurant, id 1 indicates the root user, id 2 indicates idle-repository, id 3 indicates discarded-repository' ,
+  `pwd` VARCHAR(45) NOT NULL COMMENT 'the password for the restaurant to log in' ,
+  `account` VARCHAR(45) NOT NULL COMMENT 'the account for the restaurant to log in' ,
+  `restaurant_name` VARCHAR(50) NOT NULL DEFAULT '' COMMENT 'the restaurant name ' ,
+  `restaurant_info` VARCHAR(300) NOT NULL DEFAULT '' COMMENT 'the restaurant info' ,
+  `pwd2` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the 2nd password to this restaurant, whose permission priority is lower than pwd' ,
+  `pwd3` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the 3rd password to this restaurant, whose permission priority is lower than pwd2' ,
+  `tele1` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'One of the telephones to this restaurant.' ,
+  `tele2` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'One of the telephones to this restaurant.' ,
+  `address` VARCHAR(70) NOT NULL DEFAULT '' COMMENT 'The address to this restaurant.' ,
+  `record_alive` BIGINT NOT NULL DEFAULT 0 COMMENT 'Indicates how long the order record of this restaurant can be persisted. It\'s represented in second. Value 0 means the records never expire.' ,
+  PRIMARY KEY (`id`, `account`) ,
+  UNIQUE INDEX `account_UNIQUE` (`account` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the restaurnat\'s information' ;
 
 
 -- -----------------------------------------------------
@@ -388,10 +383,11 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food_history` (
   `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this order detail record' ,
   `order_id` INT UNSIGNED NOT NULL ,
   `restaurant_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the restaurant id to this order history detail' ,
-  `food_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the alias id to this food' ,
   `order_count` DECIMAL(5,2) NOT NULL DEFAULT 0 COMMENT 'the count that the waiter ordered. the count can be positive or negative.' ,
   `order_date` DATETIME NOT NULL DEFAULT 19000101 ,
   `unit_price` DECIMAL(7,2) UNSIGNED NOT NULL DEFAULT 0 ,
+  `food_id` INT NULL DEFAULT NULL COMMENT 'the id to this food' ,
+  `food_alias` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the alias id to this food' ,
   `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to the ordered food' ,
   `food_status` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates the status to this food, the value is the combination of values below.\n特价菜 ：0x01\n推荐菜 ：0x02\n停售　 ：0x04\n赠送     ：0x08' ,
   `taste` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the taste preference to the ordered food' ,
@@ -400,7 +396,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food_history` (
   `taste_id2` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the 2nd taste to this record' ,
   `taste_id3` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the 3rd taste to this record' ,
   `discount` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the discount to this food' ,
-  `kitchen_id` INT NULL DEFAULT NULL COMMENT 'the kitchen id which the order food of this record belong to.' ,
+  `kitchen_id` INT NOT NULL DEFAULT 0 COMMENT 'the kitchen id which the order food of this record belong to.' ,
   `kitchen_alias` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the kitchen number which the order food of this record belong to. the maximum value (255) means the food does not belong to any kitchen.' ,
   `comment` VARCHAR(100) NULL DEFAULT NULL COMMENT 'the comment to this record, such as the reason to cancel food' ,
   `waiter` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name of waiter who deal with this record' ,
@@ -693,6 +689,7 @@ COMMENT = 'describe the category of material' ;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
 
 
 
