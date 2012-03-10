@@ -14,6 +14,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.GestureDetector;
@@ -338,7 +339,19 @@ public class PickFoodActivity extends TabActivity implements
 		numberSidebar.setBackgroundColor(0xfbfdfe);
 		numberSidebar.setOrientation(LinearLayout.VERTICAL);
 		numberSidebar.removeAllViews();
-		
+		numberSidebar.setOnTouchListener(new View.OnTouchListener() {			
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				// TODO Auto-generated method stub
+				Log.i(v.toString(), event.getAction() + ", " + "x=" + event.getRawX() + ", y=" + event.getRawY());
+				if(event.getAction() == MotionEvent.ACTION_UP){
+					filterNumEdtTxt.append(((TextView)numberSidebar.getChildAt(new Float((event.getY() / 50) % 10).intValue())).getText().toString());
+					filterNumEdtTxt.setSelection(filterNumEdtTxt.getText().toString().length());
+				}
+				return true;
+			}
+		});
+
 		/**
 		 * ±àºÅ²àÀ¸Ìí¼Ó0-9µÄÊý×Ö
 		 */
@@ -347,17 +360,17 @@ public class PickFoodActivity extends TabActivity implements
 			tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
 			MarginLayoutParams ml = new MarginLayoutParams(MarginLayoutParams.FILL_PARENT, MarginLayoutParams.WRAP_CONTENT);
 			tv.setLayoutParams(ml);
-			tv.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					filterNumEdtTxt.append(tv.getText().toString());
-					filterNumEdtTxt.setSelection(filterNumEdtTxt.getText().toString().length());
-				}
-			});
-
+//			tv.setOnClickListener(new View.OnClickListener() {
+//				@Override
+//				public void onClick(View v) {
+//					filterNumEdtTxt.append(tv.getText().toString());
+//					filterNumEdtTxt.setSelection(filterNumEdtTxt.getText().toString().length());
+//				}
+//			});
 			tv.setText(Integer.toString(i));
 			numberSidebar.addView(tv);
 			tv.setGravity(Gravity.CENTER_HORIZONTAL);
+			Log.i(tv.toString(), "top=" + numberSidebar.getChildAt(i).getTop() + ", bottom=" + numberSidebar.getChildAt(i).getBottom());
 		}
 		
 		/**
