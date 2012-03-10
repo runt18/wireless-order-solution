@@ -276,7 +276,7 @@ public class PayOrder {
 			for(int i = 0; i < orderInfo.foods.length; i++){
 				sql = "UPDATE " + Params.dbName + ".order_food SET discount=" + orderInfo.foods[i].getDiscount() +
 					  " WHERE order_id=" + orderInfo.id + 
-					  " AND food_id=" + orderInfo.foods[i].alias_id;
+					  " AND food_alias=" + orderInfo.foods[i].foodAlias;
 				dbCon.stmt.executeUpdate(sql);				
 			}			
 			
@@ -305,9 +305,9 @@ public class PayOrder {
 				sql = "SELECT consumption, material_id FROM " +
 					  Params.dbName + ".food_material WHERE " +
 					  "food_id=" +
-					  "(SELECT id FROM " + 
+					  "(SELECT food_id FROM " + 
 					  Params.dbName +
-					  ".food WHERE alias_id=" + foods[i].alias_id +
+					  ".food WHERE food_alias=" + foods[i].foodAlias +
 					  " AND restaurant_id="+ orderInfo.restaurantID + ")"; 
 				
 				dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -344,7 +344,7 @@ public class PayOrder {
 							  "(SELECT owner_name FROM " + Params.dbName + 
 							  ".terminal WHERE pin=" + "0x" + Long.toHexString(term.pin) + " AND model_id=" + term.modelID + "), " +	//staff
 							  "(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + 
-							  orderInfo.restaurantID + " AND alias_id=" + foodMaterial.food.kitchen + "), " +				//dept_id
+							  orderInfo.restaurantID + " AND kitchen_alias=" + foodMaterial.food.kitchen + "), " +				//dept_id
 							  -amount + ", " + 				//amount
 							  MaterialDetail.TYPE_CONSUME + //type
 							  ")";
@@ -356,7 +356,7 @@ public class PayOrder {
 							  " WHERE restaurant_id=" + orderInfo.restaurantID + 
 							  " AND material_id=" + foodMaterial.material.getMaterialID() +
 							  " AND dept_id=" + "(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + 
-							  orderInfo.restaurantID + " AND alias_id=" + foodMaterial.food.kitchen + ")";
+							  orderInfo.restaurantID + " AND kitchen_alias=" + foodMaterial.food.kitchen + ")";
 						dbCon.stmt.executeUpdate(sql);
 					}
 					
@@ -554,7 +554,7 @@ public class PayOrder {
 					 */
 					String sql = "SELECT " + discount + " FROM " + Params.dbName + 
 								 ".kitchen WHERE restaurant_id=" + orderInfo.restaurantID + 
-								 " AND alias_id=" + orderInfo.foods[i].kitchen;
+								 " AND kitchen_alias=" + orderInfo.foods[i].kitchen;
 					
 					dbCon.rs = dbCon.stmt.executeQuery(sql);
 					if(dbCon.rs.next()){

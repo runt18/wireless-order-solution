@@ -153,7 +153,7 @@ public class InsertOrder {
 				if(!orderToInsert.foods[i].isTemporary){
 					//get the associated foods' unit price and name
 					sql = "SELECT unit_price, name, status FROM " +  Params.dbName + 
-					 	  ".food WHERE alias_id=" + orderToInsert.foods[i].alias_id + 
+					 	  ".food WHERE food_alias=" + orderToInsert.foods[i].foodAlias + 
 					 	  " AND restaurant_id=" + orderToInsert.table.restaurantID;
 					dbCon.rs = dbCon.stmt.executeQuery(sql);
 					//check if the food exist in db 
@@ -162,7 +162,7 @@ public class InsertOrder {
 						orderToInsert.foods[i].status = dbCon.rs.getShort("status");
 						orderToInsert.foods[i].setPrice(dbCon.rs.getFloat("unit_price"));
 					}else{
-						throw new BusinessException("The food(alias_id=" + orderToInsert.foods[i].alias_id + ", restaurant_id=" + orderToInsert.table.restaurantID+ ") to query doesn't exit.", ErrorCode.MENU_EXPIRED);
+						throw new BusinessException("The food(alias_id=" + orderToInsert.foods[i].foodAlias + ", restaurant_id=" + orderToInsert.table.restaurantID+ ") to query doesn't exit.", ErrorCode.MENU_EXPIRED);
 					}
 					dbCon.rs.close();
 					
@@ -287,12 +287,14 @@ public class InsertOrder {
 						
 					//insert the record to table "order_food"
 					sql = "INSERT INTO `" + Params.dbName + "`.`order_food` (" +
-							"`restaurant_id`, `order_id`, `food_id`, `order_count`, `unit_price`, `name`, " +
+							"`restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `name`, " +
 							"`food_status`, `hang_status`, `discount`, `taste`, `taste_price`, " +
-							"`taste_id`, `taste_id2`, `taste_id3`, `kitchen`, `waiter`, `order_date`, `is_temporary`) VALUES (" +	
+							"`taste_id`, `taste_id2`, `taste_id3`, `kitchen_id`, `kitchen_alias`, " +
+							"`waiter`, `order_date`, `is_temporary`) VALUES (" +	
 							term.restaurant_id + ", " +
 							orderToInsert.id + ", " + 
-							orderToInsert.foods[i].alias_id + ", " + 
+							"(SELECT food_id FROM " + Params.dbName + ".food WHERE restaurant_id=" + term.restaurant_id + " AND food_alias=" + orderToInsert.foods[i].foodAlias + "), " +
+							orderToInsert.foods[i].foodAlias + ", " + 
 							orderToInsert.foods[i].getCount() + ", " + 
 							orderToInsert.foods[i].getPrice() + ", '" + 
 							orderToInsert.foods[i].name + "', " +
@@ -304,6 +306,7 @@ public class InsertOrder {
 							orderToInsert.foods[i].tastes[0].alias_id + ", " + 
 							orderToInsert.foods[i].tastes[1].alias_id + ", " + 
 							orderToInsert.foods[i].tastes[2].alias_id + ", " + 
+							"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + orderToInsert.foods[i].kitchen + "), " + 
 							orderToInsert.foods[i].kitchen + ", '" + 
 							term.owner + "', NOW(), " + 
 							(orderToInsert.foods[i].isTemporary ? "1" : "0") + ")";

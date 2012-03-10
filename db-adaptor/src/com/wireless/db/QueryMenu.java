@@ -302,14 +302,14 @@ public class QueryMenu {
 	private static Food[] queryFoods(DBCon dbCon, int restaurantID, String extraCondition, String orderClause) throws SQLException{
 		ArrayList<Food> foods = new ArrayList<Food>();
         //get all the food information to this restaurant
-		String sql = "SELECT id, alias_id, name, unit_price, kitchen, status, pinyin FROM " + 
+		String sql = "SELECT food_id, food_alias, name, unit_price, kitchen, status, pinyin FROM " + 
 					 Params.dbName + ".food WHERE restaurant_id=" + restaurantID + " " +
 					 (extraCondition == null ? "" : extraCondition) + " " +
 					 (orderClause == null ? "" : orderClause); 
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
-			Food food = new Food(dbCon.rs.getLong("id"),
-								 dbCon.rs.getInt("alias_id"),
+			Food food = new Food(dbCon.rs.getLong("food_id"),
+								 dbCon.rs.getInt("food_alias"),
 								 dbCon.rs.getString("name"),
 								 new Float(dbCon.rs.getFloat("unit_price")),
 								 dbCon.rs.getShort("kitchen"),
@@ -326,7 +326,7 @@ public class QueryMenu {
 	private static Kitchen[] queryKitchens(DBCon dbCon, int restaurantID, String extraCond, String orderClause) throws SQLException{
 		//get all the kitchen information to this restaurant,
 		ArrayList<Kitchen> kitchens = new ArrayList<Kitchen>();
-		String sql = "SELECT alias_id, name, discount, discount_2, discount_3, " +
+		String sql = "SELECT kitchen_id, kitchen_alias, name, discount, discount_2, discount_3, " +
 					 "member_discount_1, member_discount_2, member_discount_3, " +
 					 "dept_id FROM " + 
 			  		 Params.dbName + ".kitchen WHERE restaurant_id=" + 
@@ -336,7 +336,8 @@ public class QueryMenu {
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
 			kitchens.add(new Kitchen(dbCon.rs.getString("name"),
-									 dbCon.rs.getShort("alias_id"),
+									 dbCon.rs.getLong("kitchen_id"),
+									 dbCon.rs.getShort("kitchen_alias"),
 									 dbCon.rs.getShort("dept_id"),
 									 (byte)(dbCon.rs.getFloat("discount") * 100),
 									 (byte)(dbCon.rs.getFloat("discount_2") * 100),
@@ -352,19 +353,19 @@ public class QueryMenu {
 	
 	private static Department[] queryDepartments(DBCon dbCon, int restaurantID, String extraCond, String orderClause) throws SQLException{
 		//get tall the super kitchen information to this restaurant
-		ArrayList<Department> sKitchens = new ArrayList<Department>();
+		ArrayList<Department> departments = new ArrayList<Department>();
 		String sql = "SELECT dept_id, name FROM " + Params.dbName + ".department WHERE " +
 					 " restaurant_id=" + restaurantID + " " +
 					 (extraCond != null ? extraCond : "") + " " +
 					 (orderClause != null ? orderClause : "");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
-			sKitchens.add(new Department(dbCon.rs.getString("name"),
+			departments.add(new Department(dbCon.rs.getString("name"),
 									   dbCon.rs.getShort("dept_id")));
 		}
 		dbCon.rs.close();
 		
-		return sKitchens.toArray(new Department[sKitchens.size()]);
+		return departments.toArray(new Department[departments.size()]);
 	}
 	
 	/**

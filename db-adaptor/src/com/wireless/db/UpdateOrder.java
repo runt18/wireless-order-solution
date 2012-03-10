@@ -264,20 +264,21 @@ public class UpdateOrder {
 		
 		//query all the food's id ,order count and taste preference of this order
 		ArrayList<OrderFood> originalRecords = new ArrayList<OrderFood>();
-		String sql = "SELECT food_id, unit_price, name, food_status, discount, SUM(order_count) AS order_sum, " +
-					"taste, taste_price, taste_id, taste_id2, taste_id3, hang_status, kitchen, is_temporary FROM `" + 
+		String sql = "SELECT food_id, food_alias, unit_price, name, food_status, discount, SUM(order_count) AS order_sum, " +
+					"taste, taste_price, taste_id, taste_id2, taste_id3, hang_status, kitchen_alias, is_temporary FROM `" + 
 					Params.dbName + "`.`order_food` WHERE order_id=" + orderToUpdate.id + 
-					" GROUP BY food_id, taste_id, taste_id2, taste_id3, hang_status, is_temporary HAVING order_sum > 0";
+					" GROUP BY food_alias, taste_id, taste_id2, taste_id3, hang_status, is_temporary HAVING order_sum > 0";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
 			OrderFood food = new OrderFood();
-			food.alias_id = dbCon.rs.getInt("food_id");
+			food.foodID = dbCon.rs.getInt("food_id");
+			food.foodAlias = dbCon.rs.getInt("food_alias");
 			food.setPrice(new Float(dbCon.rs.getFloat("unit_price")));
 			food.name = dbCon.rs.getString("name");
 			food.status = dbCon.rs.getShort("food_status");
 			food.setDiscount(dbCon.rs.getFloat("discount"));
 			food.setCount(new Float(dbCon.rs.getFloat("order_sum")));
-			food.kitchen = dbCon.rs.getShort("kitchen");
+			food.kitchen = dbCon.rs.getShort("kitchen_alias");
 			food.tastes[0].alias_id = dbCon.rs.getInt("taste_id");
 			food.tastes[1].alias_id = dbCon.rs.getInt("taste_id2");
 			food.tastes[2].alias_id = dbCon.rs.getInt("taste_id3");
@@ -402,12 +403,13 @@ public class UpdateOrder {
 				}
 				
 				sql = "INSERT INTO `" + Params.dbName + "`.`order_food` " +
-						"(`restaurant_id`, `order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, `hang_status`, " +
+						"(`restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `name`, `food_status`, `hang_status`, " +
 						"`discount`, `taste_id`, `taste_id2`, `taste_id3`, `taste_price`, " +
-						"`taste`, `kitchen`, `waiter`, `order_date`, `is_temporary`) VALUES (" +
+						"`taste`, `kitchen_id`, `kitchen_alias`, `waiter`, `order_date`, `is_temporary`) VALUES (" +
 						term.restaurant_id + ", " +
 						orderToUpdate.id + ", " + 
-						extraFoods.get(i).alias_id + ", " + 
+						"(SELECT food_id FROM " + Params.dbName + ".food WHERE restaurant_id=" + term.restaurant_id + " AND food_alias=" + extraFoods.get(i).foodAlias + "), " +
+						extraFoods.get(i).foodAlias + ", " + 
 						extraFoods.get(i).getCount() + ", " + 
 						extraFoods.get(i).getPrice() + ", '" + 
 						extraFoods.get(i).name + "', " + 
@@ -419,6 +421,7 @@ public class UpdateOrder {
 						extraFoods.get(i).tastes[2].alias_id + "," +
 						extraFoods.get(i).getTastePrice() + ", '" +
 						extraFoods.get(i).tastePref + "', " + 
+						"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + extraFoods.get(i).kitchen + "), " + 
 						extraFoods.get(i).kitchen + ", '" + 
 						term.owner + "', " +
 						"NOW(), " + 
@@ -436,12 +439,13 @@ public class UpdateOrder {
 				}
 				
 				sql = "INSERT INTO `" + Params.dbName + "`.`order_food` " +
-						"(`restaurant_id`, `order_id`, `food_id`, `order_count`, `unit_price`, `name`, `food_status`, `hang_status`, " +
-						"`discount`, `taste_id`, `taste_id2`, `taste_id3`, `taste_price`, `taste`, `kitchen`, " +
+						"(`restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `name`, `food_status`, `hang_status`, " +
+						"`discount`, `taste_id`, `taste_id2`, `taste_id3`, `taste_price`, `taste`, `kitchen_id`, `kitchen_alias`, " +
 						"`waiter`, `order_date`, `is_temporary`) VALUES (" +
 						term.restaurant_id + ", " +
 						orderToUpdate.id + ", " + 
-						canceledFoods.get(i).alias_id + ", " + 
+						"(SELECT food_id FROM " + Params.dbName + ".food WHERE restaurant_id=" + term.restaurant_id + " AND food_alias=" + canceledFoods.get(i).foodAlias + "), " +
+						canceledFoods.get(i).foodAlias + ", " + 
 						"-" + canceledFoods.get(i).getCount() + ", " + 
 						canceledFoods.get(i).getPrice() + ", '" + 
 						canceledFoods.get(i).name + "', " + 
@@ -453,6 +457,7 @@ public class UpdateOrder {
 						canceledFoods.get(i).tastes[2].alias_id + "," +
 						canceledFoods.get(i).getTastePrice() + ", '" +
 						canceledFoods.get(i).tastePref + "', " + 
+						"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + canceledFoods.get(i).kitchen + "), " + 
 						canceledFoods.get(i).kitchen + ", '" + 
 						term.owner + "', " +
 						"NOW(), " + 
@@ -592,7 +597,7 @@ public class UpdateOrder {
 						 * Means just change the taste preference to this food. 
 						 * We don't print this record.
 						 */
-						}else if(canceledFood.alias_id == extraFood.alias_id &&
+						}else if(canceledFood.foodAlias == extraFood.foodAlias &&
 								 canceledFood.getCount().equals(extraFood.getCount()) &&
 								 canceledFood.hangStatus == extraFood.hangStatus) {
 
@@ -636,7 +641,7 @@ public class UpdateOrder {
 					iterCancel = canceledFoods.iterator();
 					while(iterCancel.hasNext()){
 						OrderFood canceledFood = iterCancel.next();
-						if(extraFood.alias_id == canceledFood.alias_id &&
+						if(extraFood.foodAlias == canceledFood.foodAlias &&
 						   extraFood.getCount().equals(canceledFood.getCount()) &&
 						   extraFood.hangStatus == canceledFood.hangStatus){
 								isExtra = false;
@@ -729,20 +734,21 @@ public class UpdateOrder {
 			
 		}else{
 			//get the food name and its unit price
-			String sql = "SELECT name, status, unit_price, kitchen FROM " + Params.dbName + 
-					".food WHERE alias_id=" + foodBasic.alias_id + 
+			String sql = "SELECT food_id, name, status, unit_price, kitchen FROM " + Params.dbName + 
+					".food WHERE food_alias=" + foodBasic.foodAlias + 
 					" AND restaurant_id=" + term.restaurant_id;
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			//check if the food to be inserted exist in db or not
 
 			if(dbCon.rs.next()){
+				food.foodID = dbCon.rs.getInt("food_id");
 				food.status = dbCon.rs.getShort("status");
 				food.name = dbCon.rs.getString("name");
 				food.setPrice(new Float(dbCon.rs.getFloat("unit_price")));
 
 				food.kitchen = dbCon.rs.getShort("kitchen");
 			}else{
-				throw new BusinessException("The food(alias_id=" + foodBasic.alias_id + ", restaurant_id=" + term.restaurant_id + ") to query does NOT exist.", ErrorCode.MENU_EXPIRED);
+				throw new BusinessException("The food(alias_id=" + foodBasic.foodAlias + ", restaurant_id=" + term.restaurant_id + ") to query does NOT exist.", ErrorCode.MENU_EXPIRED);
 			}
 			dbCon.rs.close();
 			
@@ -770,7 +776,7 @@ public class UpdateOrder {
 		}
 		
 		//set the alias id
-		food.alias_id = foodBasic.alias_id;
+		food.foodAlias = foodBasic.foodAlias;
 		//set the discount
 		food.setDiscount(foodBasic.getDiscount());
 		//set the hang status
