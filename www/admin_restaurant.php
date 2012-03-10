@@ -105,25 +105,25 @@ else if($editType == "addRestaurant" || $editType == "editAdminRestaurant")
 					$rs = $db ->GetOne($sql);		
 					$id = $rs;
 					//insert the kitchen
-					$sql = "INSERT INTO kitchen(restaurant_id,alias_id,name) VALUES($id, 0, '厨房1')";
+					$sql = "INSERT INTO kitchen(restaurant_id,kitchen_alias,name) VALUES($id, 0, '厨房1')";
 					$db->Execute($sql);
-					$sql = "INSERT INTO kitchen(restaurant_id,alias_id,name) VALUES($id, 1, '厨房2')";
+					$sql = "INSERT INTO kitchen(restaurant_id,kitchen_alias,name) VALUES($id, 1, '厨房2')";
 					$db->Execute($sql);
-					$sql = "INSERT INTO kitchen(restaurant_id,alias_id,name) VALUES($id, 2, '厨房3')";
+					$sql = "INSERT INTO kitchen(restaurant_id,kitchen_alias,name) VALUES($id, 2, '厨房3')";
 					$db->Execute($sql);
-					$sql = "INSERT INTO kitchen(restaurant_id,alias_id,name) VALUES($id, 3, '厨房4')";
+					$sql = "INSERT INTO kitchen(restaurant_id,kitchen_alias,name) VALUES($id, 3, '厨房4')";
 					$db->Execute($sql);
-					$sql = "INSERT INTO kitchen(restaurant_id,alias_id,name) VALUES($id, 4, '厨房5')";
+					$sql = "INSERT INTO kitchen(restaurant_id,kitchen_alias,name) VALUES($id, 4, '厨房5')";
 					$db->Execute($sql);
-					$sql = "INSERT INTO kitchen(restaurant_id,alias_id,name) VALUES($id, 5, '厨房6')";
+					$sql = "INSERT INTO kitchen(restaurant_id,kitchen_alias,name) VALUES($id, 5, '厨房6')";
 					$db->Execute($sql);
-					$sql = "INSERT INTO kitchen(restaurant_id,alias_id,name) VALUES($id, 6, '厨房7')";
+					$sql = "INSERT INTO kitchen(restaurant_id,kitchen_alias,name) VALUES($id, 6, '厨房7')";
 					$db->Execute($sql);
-					$sql = "INSERT INTO kitchen(restaurant_id,alias_id,name) VALUES($id, 7, '厨房8')";
+					$sql = "INSERT INTO kitchen(restaurant_id,kitchen_alias,name) VALUES($id, 7, '厨房8')";
 					$db->Execute($sql);
-					$sql = "INSERT INTO kitchen(restaurant_id,alias_id,name) VALUES($id, 8, '厨房9')";
+					$sql = "INSERT INTO kitchen(restaurant_id,kitchen_alias,name) VALUES($id, 8, '厨房9')";
 					$db->Execute($sql);
-					$sql = "INSERT INTO kitchen(restaurant_id,alias_id,name) VALUES($id, 9, '厨房10')";
+					$sql = "INSERT INTO kitchen(restaurant_id,kitchen_alias,name) VALUES($id, 9, '厨房10')";
 					$db->Execute($sql);
 					//insert the material category
 					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 0, '种类1')";
