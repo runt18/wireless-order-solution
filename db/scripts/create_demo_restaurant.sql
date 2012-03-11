@@ -47,14 +47,14 @@ INSERT INTO `wireless_order_db`.`setting` (`restaurant_id`) VALUES (11);
 -- -----------------------------------------------------
 SET AUTOCOMMIT=0;
 -- DELETE FROM wireless_order_db.taste WHERE restaurant_id=11;
-INSERT INTO `wireless_order_db`.`taste` (`restaurant_id`, `alias_id`, `preference`, `price`) VALUES (11, 1, '加辣', 2.5);
-INSERT INTO `wireless_order_db`.`taste` (`restaurant_id`, `alias_id`, `preference`, `price`) VALUES (11, 2, '少盐', 0);
-INSERT INTO `wireless_order_db`.`taste` (`restaurant_id`, `alias_id`, `preference`, `price`) VALUES (11, 3, '少辣', 5.0);
-INSERT INTO `wireless_order_db`.`taste` (`restaurant_id`, `alias_id`, `preference`, `price`, `category`, `calc`) VALUES (11, 4, '打包', 5.0, 1, 0);
-INSERT INTO `wireless_order_db`.`taste` (`restaurant_id`, `alias_id`, `preference`, `price`, `category`, `calc`) VALUES (11, 5, '免葱', 5.0, 1, 0);
-INSERT INTO `wireless_order_db`.`taste` (`restaurant_id`, `alias_id`, `preference`, `rate`, `category`, `calc`) VALUES (11, 6, '例牌', 0, 2, 1); 
-INSERT INTO `wireless_order_db`.`taste` (`restaurant_id`, `alias_id`, `preference`, `rate`, `category`, `calc`) VALUES (11, 7, '中牌', 0.2, 2, 1);
-INSERT INTO `wireless_order_db`.`taste` (`restaurant_id`, `alias_id`, `preference`, `rate`, `category`, `calc`) VALUES (11, 8, '大牌', 0.5, 2, 1);
+INSERT INTO `wireless_order_db`.`taste` (`restaurant_id`, `taste_alias`, `preference`, `price`) VALUES (11, 1, '加辣', 2.5);
+INSERT INTO `wireless_order_db`.`taste` (`restaurant_id`, `taste_alias`, `preference`, `price`) VALUES (11, 2, '少盐', 0);
+INSERT INTO `wireless_order_db`.`taste` (`restaurant_id`, `taste_alias`, `preference`, `price`) VALUES (11, 3, '少辣', 5.0);
+INSERT INTO `wireless_order_db`.`taste` (`restaurant_id`, `taste_alias`, `preference`, `price`, `category`, `calc`) VALUES (11, 4, '打包', 5.0, 1, 0);
+INSERT INTO `wireless_order_db`.`taste` (`restaurant_id`, `taste_alias`, `preference`, `price`, `category`, `calc`) VALUES (11, 5, '免葱', 5.0, 1, 0);
+INSERT INTO `wireless_order_db`.`taste` (`restaurant_id`, `taste_alias`, `preference`, `rate`, `category`, `calc`) VALUES (11, 6, '例牌', 0, 2, 1); 
+INSERT INTO `wireless_order_db`.`taste` (`restaurant_id`, `taste_alias`, `preference`, `rate`, `category`, `calc`) VALUES (11, 7, '中牌', 0.2, 2, 1);
+INSERT INTO `wireless_order_db`.`taste` (`restaurant_id`, `taste_alias`, `preference`, `rate`, `category`, `calc`) VALUES (11, 8, '大牌', 0.5, 2, 1);
 COMMIT;
 -- SELECT * FROM terminal;
 
@@ -532,9 +532,9 @@ INSERT INTO `wireless_order_db`.temp_order_food_history(order_id,food_id,taste_i
 SELECT 
 `wireless_order_db`.`order_food_history`.`order_id` AS `order_id`,
 `wireless_order_db`.`order_food_history`.`food_id` AS `food_id`,
-`wireless_order_db`.`order_food_history`.`taste_id` AS `taste_id`,
-`wireless_order_db`.`order_food_history`.`taste_id2` AS `taste_id2`,
-`wireless_order_db`.`order_food_history`.`taste_id3` AS `taste_id3`,
+`wireless_order_db`.`order_food_history`.`taste_alias` AS `taste_id`,
+`wireless_order_db`.`order_food_history`.`taste2_alias` AS `taste_id2`,
+`wireless_order_db`.`order_food_history`.`taste3_alias` AS `taste_id3`,
 `wireless_order_db`.`order_food_history`.`is_temporary` AS `is_temporary`,
 `wireless_order_db`.`order_food_history`.`name` AS `name`,
 `wireless_order_db`.`order_food_history`.`taste` AS `taste`,
@@ -548,10 +548,10 @@ max(`wireless_order_db`.`order_food_history`.`waiter`) AS `waiter`
 FROM `wireless_order_db`.`order_food_history` 
 GROUP BY 
 `wireless_order_db`.`order_food_history`.`order_id`,
-`wireless_order_db`.`order_food_history`.`food_id`,
-`wireless_order_db`.`order_food_history`.`taste_id`,
-`wireless_order_db`.`order_food_history`.`taste_id2`,
-`wireless_order_db`.`order_food_history`.`taste_id3`,
+`wireless_order_db`.`order_food_history`.`food_alias`,
+`wireless_order_db`.`order_food_history`.`taste_alias`,
+`wireless_order_db`.`order_food_history`.`taste2_alias`,
+`wireless_order_db`.`order_food_history`.`taste3_alias`,
 `wireless_order_db`.`order_food_history`.`is_temporary`
 HAVING (SUM(`wireless_order_db`.`order_food_history`.`order_count`) > 0);
 

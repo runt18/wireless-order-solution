@@ -30,6 +30,12 @@ Release v1.1.4 <xx/03/2012>
 18 - food表删除与restaurant表的外键关联
 19 - order_food和order_food_history表增加"food_alias"字段
 20 - order_food和order_food_hisotry表增加"food_id"字段
+21 - taste表字段"id"改为"taste_id"
+22 - taste表字段"alias_id"改为"taste_alias"
+23 - taste表创建"restaurant_id + taste_alias"的复合索引
+24 - taste表删除与restaurant表的外键关联
+25 - order_food和order_food_history表增加"taste_alias"、"taste2_alias"、"taste3_alias"字段
+25 - order_food和order_food_history表增加"taste_id"、"taste2_id"、"taste3_id"字段
 ******************************************************************************************************/
 
 /******************************************************************************************************
