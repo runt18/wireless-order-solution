@@ -339,16 +339,43 @@ public class PickFoodActivity extends TabActivity implements
 		numberSidebar.setBackgroundColor(0xfbfdfe);
 		numberSidebar.setOrientation(LinearLayout.VERTICAL);
 		numberSidebar.removeAllViews();
+		/**
+		 * 侧栏手指滑动时，输入相应的数字
+		 */
 		numberSidebar.setOnTouchListener(new View.OnTouchListener() {			
+			
+			private int _prePos = -1;
+			
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
-				// TODO Auto-generated method stub
-				Log.i(v.toString(), event.getAction() + ", " + "x=" + event.getRawX() + ", y=" + event.getRawY());
-				if(event.getAction() == MotionEvent.ACTION_UP){
-					filterNumEdtTxt.append(((TextView)numberSidebar.getChildAt(new Float((event.getY() / 50) % 10).intValue())).getText().toString());
-					filterNumEdtTxt.setSelection(filterNumEdtTxt.getText().toString().length());
-				}
-				return true;
+				Log.i(v.toString(), event.getAction() + ", " + "x=" + event.getX() + ", y=" + event.getY());
+				int curPos = 0;
+				if(event.getY() < numberSidebar.getChildAt(numberSidebar.getChildCount() - 1).getBottom()){
+					
+					curPos = (new Float(event.getY() / numberSidebar.getChildAt(0).getHeight()).intValue()) % numberSidebar.getChildCount();
+					
+					if(event.getAction() == MotionEvent.ACTION_DOWN){
+						//TODO show the popup number in the center of screen 
+						Toast.makeText(PickFoodActivity.this, curPos + "", 0).show();
+						
+					}else if(event.getAction() == MotionEvent.ACTION_MOVE){
+						if(curPos != _prePos){
+							//TODO show the popup number in the center of screen 
+							Toast.makeText(PickFoodActivity.this, curPos + "", 0).show();
+						}
+						
+					}else if(event.getAction() == MotionEvent.ACTION_UP){
+						filterNumEdtTxt.append(((TextView)numberSidebar.getChildAt(curPos)).getText().toString());
+						filterNumEdtTxt.setSelection(filterNumEdtTxt.getText().toString().length());						
+					}
+					
+					_prePos = curPos;
+					
+					return true;
+	
+				}else{
+					return false;
+				}			
 			}
 		});
 
@@ -360,17 +387,9 @@ public class PickFoodActivity extends TabActivity implements
 			tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
 			MarginLayoutParams ml = new MarginLayoutParams(MarginLayoutParams.FILL_PARENT, MarginLayoutParams.WRAP_CONTENT);
 			tv.setLayoutParams(ml);
-//			tv.setOnClickListener(new View.OnClickListener() {
-//				@Override
-//				public void onClick(View v) {
-//					filterNumEdtTxt.append(tv.getText().toString());
-//					filterNumEdtTxt.setSelection(filterNumEdtTxt.getText().toString().length());
-//				}
-//			});
 			tv.setText(Integer.toString(i));
 			numberSidebar.addView(tv);
 			tv.setGravity(Gravity.CENTER_HORIZONTAL);
-			Log.i(tv.toString(), "top=" + numberSidebar.getChildAt(i).getTop() + ", bottom=" + numberSidebar.getChildAt(i).getBottom());
 		}
 		
 		/**
