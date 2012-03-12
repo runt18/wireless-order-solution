@@ -11,10 +11,10 @@ import android.app.TabActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.GestureDetector;
@@ -23,8 +23,8 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.view.ViewGroup.MarginLayoutParams;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -80,7 +80,7 @@ public class PickFoodActivity extends TabActivity implements
 	private TempListView _tempLstView;
 	private PopupWindow _popupWindow;
 	private ListView _popupLstView;
-
+	private TextView _centerTxtView;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -185,6 +185,12 @@ public class PickFoodActivity extends TabActivity implements
 		setupNumberView();
 	}
 
+	@Override
+	public void onDestroy(){
+		((WindowManager)getSystemService(Context.WINDOW_SERVICE)).removeView(_centerTxtView);
+		super.onDestroy();
+	}
+	
 	/**
 	 * 返回时将新点菜品的List返回到上一个Activity
 	 */
@@ -339,6 +345,7 @@ public class PickFoodActivity extends TabActivity implements
 		numberSidebar.setBackgroundColor(0xfbfdfe);
 		numberSidebar.setOrientation(LinearLayout.VERTICAL);
 		numberSidebar.removeAllViews();
+		
 		/**
 		 * 侧栏手指滑动时，输入相应的数字
 		 */
@@ -348,23 +355,26 @@ public class PickFoodActivity extends TabActivity implements
 			
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
-				Log.i(v.toString(), event.getAction() + ", " + "x=" + event.getX() + ", y=" + event.getY());
+				//Log.i(v.toString(), event.getAction() + ", " + "x=" + event.getX() + ", y=" + event.getY());
 				int curPos = 0;
 				if(event.getY() < numberSidebar.getChildAt(numberSidebar.getChildCount() - 1).getBottom()){
 					
 					curPos = (new Float(event.getY() / numberSidebar.getChildAt(0).getHeight()).intValue()) % numberSidebar.getChildCount();
 					
 					if(event.getAction() == MotionEvent.ACTION_DOWN){
-						//TODO show the popup number in the center of screen 
-						Toast.makeText(PickFoodActivity.this, curPos + "", 0).show();
+						//show the popup number in the center of screen 
+						_centerTxtView.setVisibility(View.VISIBLE);
+						_centerTxtView.setText(((TextView)numberSidebar.getChildAt(curPos)).getText());
 						
 					}else if(event.getAction() == MotionEvent.ACTION_MOVE){
 						if(curPos != _prePos){
-							//TODO show the popup number in the center of screen 
-							Toast.makeText(PickFoodActivity.this, curPos + "", 0).show();
+							//show the popup number in the center of screen 
+							_centerTxtView.setVisibility(View.VISIBLE);
+							_centerTxtView.setText(((TextView)numberSidebar.getChildAt(curPos)).getText());
 						}
 						
 					}else if(event.getAction() == MotionEvent.ACTION_UP){
+						_centerTxtView.setVisibility(View.INVISIBLE);
 						filterNumEdtTxt.append(((TextView)numberSidebar.getChildAt(curPos)).getText().toString());
 						filterNumEdtTxt.setSelection(filterNumEdtTxt.getText().toString().length());						
 					}
@@ -374,6 +384,7 @@ public class PickFoodActivity extends TabActivity implements
 					return true;
 	
 				}else{
+					_centerTxtView.setVisibility(View.INVISIBLE);
 					return false;
 				}			
 			}
@@ -498,6 +509,70 @@ public class PickFoodActivity extends TabActivity implements
 		// 清除侧栏
 		kitchenSidebar.removeAllViews();
 		kitchenSidebar.setBackgroundColor(0xfbfdfe);
+		
+		/**
+		 * 侧栏手指滑动时，显示相应的部门
+		 */
+		kitchenSidebar.setOnTouchListener(new View.OnTouchListener() {			
+			
+			private int _prePos = -1;
+			
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				//Log.i(v.toString(), event.getAction() + ", " + "x=" + event.getX() + ", y=" + event.getY());
+				int curPos = 0;
+				if(event.getY() < kitchenSidebar.getChildAt(kitchenSidebar.getChildCount() - 1).getBottom()){
+					
+					curPos = (new Float(event.getY() / kitchenSidebar.getChildAt(0).getHeight()).intValue()) % kitchenSidebar.getChildCount();
+					
+					if(event.getAction() == MotionEvent.ACTION_DOWN){
+						//show the department in the center of screen 
+						_centerTxtView.setVisibility(View.VISIBLE);
+						_centerTxtView.setText(((TextView)kitchenSidebar.getChildAt(curPos)).getText());
+						
+					}else if(event.getAction() == MotionEvent.ACTION_MOVE){
+						if(curPos != _prePos){
+							//show the department in the center of screen 
+							_centerTxtView.setVisibility(View.VISIBLE);
+							_centerTxtView.setText(((TextView)kitchenSidebar.getChildAt(curPos)).getText());
+						}
+						
+					}else if(event.getAction() == MotionEvent.ACTION_UP){
+						//disappear the center text view
+						_centerTxtView.setVisibility(View.INVISIBLE);
+						/**
+						 * 根据侧栏选中的部门，筛选出相应的部门和厨房
+						 */
+						List<Department> dept = new ArrayList<Department>();
+						int deptID = ((Integer)((TextView)kitchenSidebar.getChildAt(curPos)).getTag());
+						for (int i = 0; i < _validDepts.size(); i++) {
+							if (_validDepts.get(i).deptID == deptID) {
+								dept.add(_validDepts.get(i));
+								break;
+							}
+						}
+						List<Kitchen> kitchens = new ArrayList<Kitchen>();
+						for (int i = 0; i < _validKitchens.size(); i++) {
+							if (_validKitchens.get(i).deptID == deptID) {
+								kitchens.add(_validKitchens.get(i));
+							}
+						}
+						List<List<Kitchen>> kitchenChild = new ArrayList<List<Kitchen>>();
+						kitchenChild.add(kitchens);
+						new KitchenSelectDialog(pickLstView, dept, kitchenChild).show();											
+					}
+					
+					_prePos = curPos;
+					
+					return true;
+	
+				}else{
+					_centerTxtView.setVisibility(View.INVISIBLE);
+					return false;
+				}			
+			}
+		});
+		
 		// 为侧栏添加筛选条件
 		for (Department d : _validDepts) {
 			TextView tv = new TextView(this);
@@ -508,34 +583,6 @@ public class PickFoodActivity extends TabActivity implements
 			tv.setPadding(0, 5, 0, 5);
 			tv.setTextColor(Color.GRAY);
 			kitchenSidebar.addView(tv);
-			/**
-			 * 侧栏部门Button的处理函数
-			 */
-			tv.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					/**
-					 * 根据侧栏选中的部门，筛选出相应的部门和厨房
-					 */
-					List<Department> dept = new ArrayList<Department>();
-					int deptID = ((Integer) ((TextView) v).getTag());
-					for (int i = 0; i < _validDepts.size(); i++) {
-						if (_validDepts.get(i).deptID == deptID) {
-							dept.add(_validDepts.get(i));
-							break;
-						}
-					}
-					List<Kitchen> kitchens = new ArrayList<Kitchen>();
-					for (int i = 0; i < _validKitchens.size(); i++) {
-						if (_validKitchens.get(i).deptID == deptID) {
-							kitchens.add(_validKitchens.get(i));
-						}
-					}
-					List<List<Kitchen>> kitchenChild = new ArrayList<List<Kitchen>>();
-					kitchenChild.add(kitchens);
-					new KitchenSelectDialog(pickLstView, dept, kitchenChild).show();
-				}
-			});
 		}
 
 		RelativeLayout filterKitchen = (RelativeLayout) findViewById(R.id.filterKitchenRelaLayout);
@@ -675,22 +722,56 @@ public class PickFoodActivity extends TabActivity implements
 		pinyinSidebar.setOrientation(LinearLayout.VERTICAL);
 		pinyinSidebar.removeAllViews();
 
+		pinyinSidebar.setOnTouchListener(new View.OnTouchListener() {			
+			
+			private int _prePos = -1;
+			
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				//Log.i(v.toString(), event.getAction() + ", " + "x=" + event.getX() + ", y=" + event.getY());
+				int curPos = 0;
+				if(event.getY() < pinyinSidebar.getChildAt(pinyinSidebar.getChildCount() - 1).getBottom()){
+					
+					curPos = (new Float(event.getY() / pinyinSidebar.getChildAt(0).getHeight()).intValue()) % pinyinSidebar.getChildCount();
+					
+					if(event.getAction() == MotionEvent.ACTION_DOWN){
+						//show the department in the center of screen 
+						_centerTxtView.setVisibility(View.VISIBLE);
+						_centerTxtView.setText(((TextView)pinyinSidebar.getChildAt(curPos)).getText());
+						
+					}else if(event.getAction() == MotionEvent.ACTION_MOVE){
+						if(curPos != _prePos){
+							//show the department in the center of screen 
+							_centerTxtView.setVisibility(View.VISIBLE);
+							_centerTxtView.setText(((TextView)pinyinSidebar.getChildAt(curPos)).getText());
+						}
+						
+					}else if(event.getAction() == MotionEvent.ACTION_UP){
+						//disappear the center text view
+						_centerTxtView.setVisibility(View.INVISIBLE);
+						filterPinyinEdtTxt.append(((TextView)pinyinSidebar.getChildAt(curPos)).getText().toString());
+						filterPinyinEdtTxt.setSelection(filterPinyinEdtTxt.getText().toString().length());										
+					}
+					
+					_prePos = curPos;
+					
+					return true;
+	
+				}else{
+					_centerTxtView.setVisibility(View.INVISIBLE);
+					return false;
+				}			
+			}
+		});
+		
 		/**
 		 * 拼音侧栏显示a-z的字母
 		 */
-		for(char c = 'a'; c <= 'z'; c++) {
+		for(char c = 'A'; c <= 'Z'; c++) {
 			final TextView tv = new TextView(PickFoodActivity.this);
-			tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 9);
+			tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
 			tv.setGravity(Gravity.CENTER_HORIZONTAL);
 			tv.setText(Character.toString(c));
-			tv.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					filterPinyinEdtTxt.append(tv.getText().toString());
-					filterPinyinEdtTxt.setSelection(filterPinyinEdtTxt
-							.getText().toString().length());
-				}
-			});
 			pinyinSidebar.addView(tv);
 		}
 		
@@ -1102,6 +1183,19 @@ public class PickFoodActivity extends TabActivity implements
 	}
 
 	private void init() {
+		
+		/**
+		 * 创建中间显示的TextView
+		 */
+		WindowManager wndMgr = (WindowManager)getSystemService(Context.WINDOW_SERVICE);
+        LayoutInflater inflate = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);        
+        _centerTxtView = (TextView)inflate.inflate(R.layout.list_position, null);
+        wndMgr.addView(_centerTxtView, new WindowManager.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT,
+                													  WindowManager.LayoutParams.TYPE_APPLICATION,
+                													  WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+                													  | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                													  PixelFormat.TRANSLUCENT));
+        _centerTxtView.setVisibility(View.INVISIBLE);
 		
 		/**
 		 * 创建已点菜shortcut的PopupWindow
