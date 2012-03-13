@@ -769,7 +769,7 @@ public class PickFoodActivity extends TabActivity implements
 		 */
 		for(char c = 'A'; c <= 'Z'; c++) {
 			final TextView tv = new TextView(PickFoodActivity.this);
-			tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
+			tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 9);
 			tv.setGravity(Gravity.CENTER_HORIZONTAL);
 			tv.setText(Character.toString(c));
 			pinyinSidebar.addView(tv);
@@ -1204,11 +1204,11 @@ public class PickFoodActivity extends TabActivity implements
 		// 获取屏幕宽度
 		// int width = display.getWidth();
 		// 获取屏幕高度
-		int heigh = display.getHeight();
+		//int heigh = display.getHeight();
 		// 获取自定义布局文件的视图
 		View popupWndView = getLayoutInflater().inflate(R.layout.orderlistpupowindow, null, false);
 		// 创建PopupWindow实例
-		_popupWindow = new PopupWindow(popupWndView, 200, heigh / 2, false);
+		_popupWindow = new PopupWindow(popupWndView, 200, new Float(display.getHeight() / 2.5).intValue(), false);
 		_popupWindow.setOutsideTouchable(true);
 		_popupWindow.setAnimationStyle(R.style.popuwindow);
 		_popupLstView = (ListView)popupWndView.findViewById(R.id.orderpupowindowLstView);
