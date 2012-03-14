@@ -117,7 +117,10 @@
             android:layout_height="fill_parent"
 			android:gravity="right"
 			android:layout_gravity="right"
-            android:orientation="vertical" >
+            android:orientation="vertical"
+            android:background="@drawable/side_bar_bg">
+            
+
         </LinearLayout>
     </LinearLayout>
     

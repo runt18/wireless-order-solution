@@ -106,7 +106,7 @@
 
     <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="fill_parent"
         android:orientation="horizontal" >
 
         <com.wireless.ui.view.PickFoodListView
@@ -124,10 +124,12 @@
 
         <LinearLayout
             android:id="@+id/sideIndex"
-            android:layout_width="45dip"
+            android:layout_width="50dip"
             android:layout_height="fill_parent"
-            android:gravity="center_horizontal"
-            android:orientation="vertical" >
+            android:gravity="right"
+            android:layout_gravity="right"
+            android:orientation="vertical"
+            android:background="@drawable/side_bar_bg" >
         </LinearLayout>
     </LinearLayout>
 
