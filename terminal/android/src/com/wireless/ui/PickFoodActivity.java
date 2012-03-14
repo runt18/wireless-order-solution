@@ -342,10 +342,11 @@ public class PickFoodActivity extends TabActivity implements
 
 		// 编号侧栏
 		final LinearLayout numberSidebar = (LinearLayout) findViewById(R.id.NumsideIndex);
-		numberSidebar.setBackgroundColor(0xfbfdfe);
+		//numberSidebar.setBackgroundColor(0xfbfdfe);
 		numberSidebar.setOrientation(LinearLayout.VERTICAL);
 		numberSidebar.removeAllViews();
-		
+		numberSidebar.setBackgroundResource(0);
+
 		/**
 		 * 侧栏手指滑动时，输入相应的数字
 		 */
@@ -365,6 +366,8 @@ public class PickFoodActivity extends TabActivity implements
 						//show the popup number in the center of screen 
 						_centerTxtView.setVisibility(View.VISIBLE);
 						_centerTxtView.setText(((TextView)numberSidebar.getChildAt(curPos)).getText());
+						numberSidebar.setBackgroundResource(R.drawable.side_bar_bg);
+
 						
 					}else if(event.getAction() == MotionEvent.ACTION_MOVE){
 						if(curPos != _prePos){
@@ -376,7 +379,9 @@ public class PickFoodActivity extends TabActivity implements
 					}else if(event.getAction() == MotionEvent.ACTION_UP){
 						_centerTxtView.setVisibility(View.INVISIBLE);
 						filterNumEdtTxt.append(((TextView)numberSidebar.getChildAt(curPos)).getText().toString());
-						filterNumEdtTxt.setSelection(filterNumEdtTxt.getText().toString().length());						
+						filterNumEdtTxt.setSelection(filterNumEdtTxt.getText().toString().length());	
+						numberSidebar.setBackgroundResource(0);
+
 					}
 					
 					_prePos = curPos;
@@ -385,6 +390,7 @@ public class PickFoodActivity extends TabActivity implements
 	
 				}else{
 					_centerTxtView.setVisibility(View.INVISIBLE);
+					numberSidebar.setBackgroundResource(0);
 					return false;
 				}			
 			}
@@ -508,7 +514,9 @@ public class PickFoodActivity extends TabActivity implements
 		final PickFoodListView pickLstView = (PickFoodListView) findViewById(R.id.pickByKitchenLstView);
 		// 清除侧栏
 		kitchenSidebar.removeAllViews();
-		kitchenSidebar.setBackgroundColor(0xfbfdfe);
+		//kitchenSidebar.setBackgroundColor(0xfbfdfe);
+		kitchenSidebar.setBackgroundResource(0);
+
 		
 		/**
 		 * 侧栏手指滑动时，显示相应的部门
@@ -529,6 +537,8 @@ public class PickFoodActivity extends TabActivity implements
 						//show the department in the center of screen 
 						_centerTxtView.setVisibility(View.VISIBLE);
 						_centerTxtView.setText(((TextView)kitchenSidebar.getChildAt(curPos)).getText());
+						kitchenSidebar.setBackgroundResource(R.drawable.side_bar_bg);
+
 						
 					}else if(event.getAction() == MotionEvent.ACTION_MOVE){
 						if(curPos != _prePos){
@@ -538,6 +548,7 @@ public class PickFoodActivity extends TabActivity implements
 						}
 						
 					}else if(event.getAction() == MotionEvent.ACTION_UP){
+						kitchenSidebar.setBackgroundResource(0);
 						//disappear the center text view
 						_centerTxtView.setVisibility(View.INVISIBLE);
 						/**
@@ -568,6 +579,7 @@ public class PickFoodActivity extends TabActivity implements
 	
 				}else{
 					_centerTxtView.setVisibility(View.INVISIBLE);
+					kitchenSidebar.setBackgroundResource(0);
 					return false;
 				}			
 			}
@@ -578,7 +590,7 @@ public class PickFoodActivity extends TabActivity implements
 			TextView tv = new TextView(this);
 			tv.setText(d.name.subSequence(0, 2));
 			tv.setTag(new Integer(d.deptID));
-			tv.setTextSize(20);
+			tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
 			tv.setBackgroundDrawable(null);
 			tv.setPadding(0, 5, 0, 5);
 			tv.setTextColor(Color.GRAY);
@@ -721,7 +733,9 @@ public class PickFoodActivity extends TabActivity implements
 		pinyinSidebar.setBackgroundColor(0xfbfdfe);
 		pinyinSidebar.setOrientation(LinearLayout.VERTICAL);
 		pinyinSidebar.removeAllViews();
+		pinyinSidebar.setBackgroundResource(0);
 
+		
 		pinyinSidebar.setOnTouchListener(new View.OnTouchListener() {			
 			
 			private int _prePos = -1;
@@ -738,6 +752,8 @@ public class PickFoodActivity extends TabActivity implements
 						//show the department in the center of screen 
 						_centerTxtView.setVisibility(View.VISIBLE);
 						_centerTxtView.setText(((TextView)pinyinSidebar.getChildAt(curPos)).getText());
+						pinyinSidebar.setBackgroundResource(R.drawable.side_bar_bg);
+
 						
 					}else if(event.getAction() == MotionEvent.ACTION_MOVE){
 						if(curPos != _prePos){
@@ -750,7 +766,8 @@ public class PickFoodActivity extends TabActivity implements
 						//disappear the center text view
 						_centerTxtView.setVisibility(View.INVISIBLE);
 						filterPinyinEdtTxt.append(((TextView)pinyinSidebar.getChildAt(curPos)).getText().toString());
-						filterPinyinEdtTxt.setSelection(filterPinyinEdtTxt.getText().toString().length());										
+						filterPinyinEdtTxt.setSelection(filterPinyinEdtTxt.getText().toString().length());		
+						pinyinSidebar.setBackgroundResource(0);
 					}
 					
 					_prePos = curPos;
@@ -759,6 +776,7 @@ public class PickFoodActivity extends TabActivity implements
 	
 				}else{
 					_centerTxtView.setVisibility(View.INVISIBLE);
+					pinyinSidebar.setBackgroundResource(0);
 					return false;
 				}			
 			}
