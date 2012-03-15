@@ -414,8 +414,13 @@ public class PickFoodActivity extends TabActivity implements
 		 */
 		((ImageView)findViewById(R.id.numberdelete)).setOnClickListener(new View.OnClickListener() {			
 			@Override
-			public void onClick(View v) {
-				filterNumEdtTxt.setText("");
+		    public void onClick(View v) {
+				//Öð×ÖÉ¾³ý
+				String s = filterNumEdtTxt.getText().toString();
+				if(s.length() > 0){
+					filterNumEdtTxt.setText(s.substring(0, s.length() - 1));
+					filterNumEdtTxt.setSelection(filterNumEdtTxt.getText().length());					
+				}
 			}
 		});
 		
@@ -799,7 +804,12 @@ public class PickFoodActivity extends TabActivity implements
 		((ImageView)findViewById(R.id.pinyindelete)).setOnClickListener(new View.OnClickListener() {					
 			@Override
 		    public void onClick(View v) {
-				filterPinyinEdtTxt.setText("");
+				//Öð×ÖÉ¾³ý
+				String s = filterPinyinEdtTxt.getText().toString();
+				if(s.length() > 0){
+					filterPinyinEdtTxt.setText(s.substring(0, s.length() - 1));
+					filterPinyinEdtTxt.setSelection(filterPinyinEdtTxt.getText().length());					
+				}
 			}
 		});
 
