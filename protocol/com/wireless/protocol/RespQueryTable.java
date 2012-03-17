@@ -33,7 +33,7 @@ public final class RespQueryTable extends RespPackage {
 		/**
 		 * calculate the body length
 		 */		
-		int bodyLen = 1;	/* the amount of staff takes up 1-byte */
+		int bodyLen = 1;	/* the amount of tables takes up 1-byte */
 		
 		for(int i = 0; i < tables.length; i++){
 			byte[] name = tables[i].name.getBytes("UTF-16BE");

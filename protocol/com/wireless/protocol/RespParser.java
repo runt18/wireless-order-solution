@@ -782,4 +782,60 @@ public class RespParser {
 		}
 		return tables;
 	}
+	
+	/**
+	 * Parse the response associated with the query region. 
+	 * @param response The response containing the region info.
+	 * @return The region info.
+	 */
+	public static Region[] parseQueryRegion(ProtocolPackage response){
+		/******************************************************
+		 * In the case query region successfully, 
+		 * design the query region response looks like below
+		 * mode : type : seq : reserved : pin[6] : len[2] : <Body>
+		 * <Header>
+		 * mode - ORDER_BUSSINESS
+		 * type - ACK
+		 * seq - same as request
+		 * reserved : 0x00
+		 * pin[6] : same as request
+		 * len[2] -  length of the <Body>
+		 * <Body>
+		 * nRegion : <region_1> : ... : <region_n>
+		 * nRegion - the amount of regions
+		 * <region_n>
+		 * len_1 : region_name : region_alias[2] 
+		 * len_1 - the length to the region name
+		 * region_name - the value to region name
+		 * region_alias[2] - the alias id to this region
+		 *******************************************************/
+		Region[] regions = new Region[0];
+		try{
+			//get the amount to staff
+			int nRegion = response.body[0];
+			regions = new Region[nRegion];
+			
+			int offset = 1;
+			for(int i = 0; i < regions.length; i++){
+				//get the length to this region name
+				int nameLen = response.body[offset];
+				offset++;
+				
+				//get the value to this region name
+				if(nameLen > 0){
+					regions[i].name = new String(response.body, offset, nameLen, "UTF-16BE");
+					offset += nameLen;
+				}
+				
+				//get the region alias
+				regions[i].regionID = (short)(((int)(response.body[offset] & 0x0000000FF)) | 
+									((int)(response.body[offset + 1] & 0x0000000FF) << 8));
+				offset += 2;				
+			}
+			
+		}catch(UnsupportedEncodingException e){
+			
+		}
+		return regions;
+	}
 }
