@@ -36,6 +36,7 @@ import com.wireless.protocol.RespQueryMenu;
 import com.wireless.protocol.RespQueryOrder;
 import com.wireless.protocol.RespQueryRestaurant;
 import com.wireless.protocol.RespQueryStaff;
+import com.wireless.protocol.RespQueryTable;
 import com.wireless.protocol.Restaurant;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
@@ -108,6 +109,10 @@ class OrderHandler extends Handler implements Runnable{
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_STAFF){
 				response = new RespQueryStaff(request.header, QueryStaffTerminal.exec(_term));
 				
+				//handle query table request
+			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_TABLE){
+				response = new RespQueryTable(request.header, QueryTable.exec(_term));
+			
 				//handle query order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_ORDER){
 				int tableToQuery = ReqParser.parseQueryOrder(request);
