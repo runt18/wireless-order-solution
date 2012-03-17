@@ -29,7 +29,7 @@ public class QueryRegion {
 		try{
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, pin, model);
-			return exec(dbCon, term.restaurant_id, null, null);
+			return exec(dbCon, term, null, null);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -59,7 +59,7 @@ public class QueryRegion {
 		try{
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, pin, model);
-			return exec(dbCon, term.restaurant_id, extraCond, orderClause);
+			return exec(dbCon, term, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -67,17 +67,17 @@ public class QueryRegion {
 	
 	/**
 	 * Get the regions according to a specific restaurant id.
-	 * @param restaurantID 
-	 * 			the restaurant id
+	 * @param term 
+	 * 			the terminal to query region
 	 * @return the regions to this restaurant
 	 * @throws SQLException 
 	 * 			throws if any error occurred while execute the SQL statement
 	 */
-	public static Region[] exec(int restaurantID) throws SQLException{
+	public static Region[] exec(Terminal term) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return exec(dbCon, restaurantID, null, null);
+			return exec(dbCon, term, null, null);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -89,17 +89,17 @@ public class QueryRegion {
 	 * 			the extra condition to the SQL statement
 	 * @param orderClause
 	 * 			the order clause to the SQL statement
-	 * @param restaurantID 
-	 * 			the restaurant id
+	 * @param term 
+	 * 			the terminal to query region
 	 * @return the regions to this restaurant
 	 * @throws SQLException 
 	 * 			throws if any error occurred while execute the SQL statement
 	 */
-	public static Region[] exec(int restaurantID, String extraCond, String orderClause) throws SQLException{
+	public static Region[] exec(Terminal term, String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return exec(dbCon, restaurantID, extraCond, orderClause);
+			return exec(dbCon, term, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -108,23 +108,23 @@ public class QueryRegion {
 	/**
 	 * Get the regions according to a specific restaurant id.
 	 * Note that the database should be connected before invoking this method.
-	 * @param restaurantID 
-	 * 			the restaurant id
+	 * @param term 
+	 * 			the terminal to query region
 	 * @param dbCon
 	 * 			the database connection
 	 * @return the regions to this restaurant
 	 * @throws SQLException 
 	 * 			throws if any error occurred while execute the SQL statement
 	 */
-	public static Region[] exec(DBCon dbCon, int restaurantID) throws SQLException{		
-		return exec(dbCon, restaurantID, null, null);
+	public static Region[] exec(DBCon dbCon, Terminal term) throws SQLException{		
+		return exec(dbCon, term, null, null);
 	}
 	
 	/**
 	 * Get the regions according to a specific restaurant id.
 	 * Note that the database should be connected before invoking this method.
-	 * @param restaurantID 
-	 * 			the restaurant id
+	 * @param term 
+	 * 			the terminal to query region
 	 * @param dbCon
 	 * 			the database connection
 	 * @param extraCond
@@ -135,12 +135,12 @@ public class QueryRegion {
 	 * @throws SQLException 
 	 * 			throws if any error occurred while execute the SQL statement
 	 */
-	public static Region[] exec(DBCon dbCon, int restaurantID, String extraCond, String orderClause) throws SQLException{
+	public static Region[] exec(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
 		
 		ArrayList<Region> regions = new ArrayList<Region>();
 		
 		String sql = "SELECT * FROM " + Params.dbName +
-			 		 ".region WHERE restaurant_id=" + restaurantID +
+			 		 ".region WHERE restaurant_id=" + term.restaurant_id +
 			 		 (extraCond == null ? "" : extraCond) +
 			 		 (orderClause == null ? "" : orderClause);
 		
@@ -158,8 +158,8 @@ public class QueryRegion {
 	 * Get the region to a specific restaurant and table
 	 * @param dbCon
 	 * 			the database connection
-	 * @param restaurantID
-	 * 			the restaurant id
+	 * @param term
+	 * 			the terminal to query
 	 * @param tableID
 	 * 			the table id
 	 * @return the region information to a specific restaurant and table
@@ -168,11 +168,11 @@ public class QueryRegion {
 	 * @throws BusinessException
 	 * 			throws if the table does NOT belong to any region
 	 */
-	public static Region exec(int restaurantID, int tableID) throws SQLException, BusinessException{
+	public static Region exec(Terminal term, int tableID) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return exec(dbCon, restaurantID, tableID);
+			return exec(dbCon, term, tableID);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -182,8 +182,8 @@ public class QueryRegion {
 	 * Get the region to a specific restaurant and table
 	 * @param dbCon
 	 * 			the database connection
-	 * @param restaurantID
-	 * 			the restaurant id
+	 * @param term
+	 * 			the terminal to query region
 	 * @param tableID
 	 * 			the table id
 	 * @return the region information to a specific restaurant and table
@@ -192,11 +192,11 @@ public class QueryRegion {
 	 * @throws BusinessException
 	 * 			throws if the table does NOT belong to any region
 	 */
-	public static Region exec(DBCon dbCon, int restaurantID, int tableID) throws SQLException, BusinessException{
+	public static Region exec(DBCon dbCon, Terminal term, int tableID) throws SQLException, BusinessException{
 		String sql = "SELECT * FROM " + Params.dbName + 
-					 ".region WHERE restaurant_id=" + restaurantID +
+					 ".region WHERE restaurant_id=" + term.restaurant_id +
 					 " AND region_id=" +
-					 "(SELECT region_id FROM " + Params.dbName + ".table WHERE restaurant_id=" + restaurantID +
+					 "(SELECT region_id FROM " + Params.dbName + ".table WHERE restaurant_id=" + term.restaurant_id +
 					 " AND table_alias=" + tableID + ")";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
@@ -204,7 +204,7 @@ public class QueryRegion {
 			return new Region(dbCon.rs.getShort("region_id"),
 							  dbCon.rs.getString("name"));
 		}else{
-			throw new BusinessException("The table(id=" + tableID + ", restaurant_id=" + restaurantID + ") does NOT belong to any region.");
+			throw new BusinessException("The table(id=" + tableID + ", restaurant_id=" + term.restaurant_id + ") does NOT belong to any region.");
 		}
 	}
 }

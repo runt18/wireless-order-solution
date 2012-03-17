@@ -204,7 +204,7 @@ public class InsertOrder {
 			/**
 			 * Get the region to this table
 			 */
-			orderToInsert.region = QueryRegion.exec(dbCon, orderToInsert.table.restaurantID, orderToInsert.table.aliasID);
+			orderToInsert.region = QueryRegion.exec(dbCon, term, orderToInsert.table.aliasID);
 
 			/**
 			 * Put all the INSERT statements into a database transition so as to assure 

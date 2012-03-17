@@ -385,7 +385,7 @@ public class UpdateOrder {
 		 * Get the region to this table if the order has NOT been paid before
 		 */
 		if(!isPaidAgain){
-			orderToUpdate.region = QueryRegion.exec(dbCon, term.restaurant_id, orderToUpdate.table.aliasID);
+			orderToUpdate.region = QueryRegion.exec(dbCon, term, orderToUpdate.table.aliasID);
 		}
 		
 		try{
