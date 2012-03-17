@@ -28,10 +28,10 @@ public class RespQueryStaff extends RespPackage{
 	public RespQueryStaff(ProtocolHeader reqHeader, StaffTerminal[] staffs) throws UnsupportedEncodingException{
 		super(reqHeader);
 		header.type = Type.ACK;
+		
 		/**
 		 * calculate the body length
-		 */
-		
+		 */		
 		int bodyLen = 1;	/* the amount of staff takes up 1-byte */
 		
 		for(int i = 0; i < staffs.length; i++){
@@ -64,9 +64,11 @@ public class RespQueryStaff extends RespPackage{
 			//assign the length of password to body
 			body[offset] = (byte)pwd.length; 
 			offset++;
+			
 			//assign the staff password to body
 			System.arraycopy(pwd, 0, body, offset, pwd.length);
 			offset += pwd.length;
+			
 			//assign the pin to body
 			body[offset] = (byte)(staffs[i].pin & 0x00000000000000FF);
 			body[offset + 1] = (byte)((staffs[i].pin & 0x000000000000FF00) >> 8);

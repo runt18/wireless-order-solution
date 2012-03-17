@@ -17,6 +17,7 @@ public final class Type{
 	public final static byte QUERY_RESTAURANT = 9;
 	public final static byte PRINT_ORDER = 10;
 	public final static byte QUERY_STAFF = 11;
+	public final static byte QUERY_TABLE = 12;
 	
 	/* belong to OTA */
 	public final static byte CHECK_VER = 1;

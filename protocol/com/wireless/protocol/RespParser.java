@@ -662,7 +662,7 @@ public class RespParser {
 		 *******************************************************/	
 		StaffTerminal[] staffs = new StaffTerminal[0];
 		try{
-			//get the amount staff
+			//get the amount to staff
 			int nStaff = response.body[0];
 			
 			staffs = new StaffTerminal[nStaff];
@@ -675,19 +675,23 @@ public class RespParser {
 				//get the length to this staff name
 				int nameLen = response.body[offset];
 				offset++;
+				
 				//get the value to this staff name
 				if(nameLen > 0){
 					staffs[i].name = new String(response.body, offset, nameLen, "UTF-16BE");
 					offset += nameLen;
 				}
+				
 				//get the length to staff password
 				int pwdLen = response.body[offset];
 				offset++;
+				
 				//get the value to this staff name
 				if(pwdLen > 0){
 					staffs[i].pwd = new String(response.body, offset, pwdLen);
 					offset += pwdLen;
 				}
+				
 				//get the pin to this staff
 				staffs[i].pin = ((long)response.body[offset] & 0x00000000000000FF) |
 					   	   		(((long)response.body[offset + 1] & 0x00000000000000FF) << 8) |
@@ -701,5 +705,81 @@ public class RespParser {
 		}
 		
 		return staffs;
+	}
+	
+	/**
+	 * Parse the response associated with the query table. 
+	 * @param response The response containing the table info.
+	 * @return The table info.
+	 */
+	public static Table[] parseQueryTable(ProtocolPackage response){
+		/******************************************************
+		 * In the case query table successfully, 
+		 * design the query table response looks like below
+		 * mode : type : seq : reserved : pin[6] : len[2] : <Body>
+		 * <Header>
+		 * mode - ORDER_BUSSINESS
+		 * type - ACK
+		 * seq - same as request
+		 * reserved : 0x00
+		 * pin[6] : same as request
+		 * len[2] -  length of the <Body>
+		 * <Body>
+		 * nStaff : <table_1> : ... : <table_2>
+		 * nStaff - the amount of tables
+		 * <table_n>
+		 * len_1 : table_name : table_alias[2] : region : status : category : custom_num
+		 * len_1 - the length to the table name
+		 * table_name - the value to table name
+		 * table_alias[2] - the alias id to this table
+		 * region - the region alias id to this table
+		 * status - the status to this table
+		 * category - the category to this table
+		 * custom_num - the custom number to this table
+		 *******************************************************/
+		Table[] tables = new Table[0];
+		try{
+			//get the amount to staff
+			int nTable = response.body[0];
+			tables = new Table[nTable];
+			
+			int offset = 1;
+			for(int i = 0; i < tables.length; i++){
+				//get the length to this table name
+				int nameLen = response.body[offset];
+				offset++;
+				
+				//get the value to this table name
+				if(nameLen > 0){
+					tables[i].name = new String(response.body, offset, nameLen, "UTF-16BE");
+					offset += nameLen;
+				}
+				
+				//get the table alias
+				tables[i].aliasID = ((int)(response.body[offset] & 0x000000FF)) | 
+									((int)(response.body[offset + 1] & 0x000000FF) << 8);
+				offset += 2;
+				
+				//get the region alias
+				tables[i].regionID = response.body[offset];
+				offset++;
+				
+				//get the status
+				tables[i].status = response.body[offset];
+				offset++;
+				
+				//get the category
+				tables[i].category = response.body[offset];
+				offset++;
+				
+				//get the custom number;
+				tables[i].custom_num = response.body[offset];
+				offset++;
+			}
+			
+		}catch(UnsupportedEncodingException e){
+			
+		}
+		return tables;
 	}
 }
