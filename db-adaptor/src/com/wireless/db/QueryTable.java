@@ -83,7 +83,72 @@ public class QueryTable {
 	 */
 	public static Table[] exec(DBCon dbCon, long pin, short model, String extraCond, String orderClause) throws BusinessException, SQLException{
 		
-		Terminal term = VerifyPin.exec(dbCon, pin, model);
+		return exec(dbCon, VerifyPin.exec(dbCon, pin, model), extraCond, orderClause);
+		
+	}
+	
+	/**
+	 * Get all the table information to restaurant that the terminal is attached to. 
+	 * @param term 
+	 * 			the terminal that restaurant is attached to
+	 * @return An array holding all the table information
+	 * @throws BusinessException 
+	 * 			throws if the terminal is NOT attached to any restaurant
+	 * @throws SQLException 
+	 * 			throws if fail to execute any SQL statement
+	 */
+	public static Table[] exec(Terminal term) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return exec(dbCon, term, null, null);
+		}finally{
+			dbCon.disconnect();
+		}
+	}	
+	
+	/**
+	 * Get all the table information to restaurant that the terminal is attached to. 
+	 * @param term 
+	 * 			the terminal that restaurant is attached to
+	 * @param extraCond
+	 * 			the extra condition to the SQL statement
+	 * @param orderClause
+	 * 			the order clause to the SQL statement
+	 * @return An array holding all the table information
+	 * @throws BusinessException 
+	 * 			throws if the terminal is NOT attached to any restaurant
+	 * @throws SQLException 
+	 * 			throws if fail to execute any SQL statement
+	 */
+	public static Table[] exec(Terminal term, String extraCond, String orderClause) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return exec(dbCon, term, extraCond, orderClause);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get all the table information to restaurant that the terminal is attached to. 
+	 * Note that the database should be connected before invoking this method.
+	 * @param dbCon 
+	 * 			the database connection
+	 * @param term 
+	 * 			the terminal that restaurant is attached to
+	 * @param extraCond
+	 * 			the extra condition to the SQL statement
+	 * @param orderClause
+	 * 			the order clause to the SQL statement
+	 * @return An array holding all the table information
+	 * @throws BusinessException 
+	 * 			throws if the terminal is NOT attached to any restaurant
+	 * @throws SQLException 
+	 * 			throws if fail to execute any SQL statement
+	 */
+	public static Table[] exec(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws BusinessException, SQLException{
 		
 		ArrayList<Table> tables = new ArrayList<Table>();
 		
@@ -126,7 +191,6 @@ public class QueryTable {
 		});
 		return tables.toArray(new Table[tables.size()]);
 	}
-	
 	/**
 	 * Get the table information according to specific alias id.
 	 * @param pin the pin to this terminal
