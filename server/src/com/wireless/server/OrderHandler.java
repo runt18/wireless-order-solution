@@ -16,6 +16,7 @@ import com.wireless.db.InsertOrder;
 import com.wireless.db.PayOrder;
 import com.wireless.db.QueryMenu;
 import com.wireless.db.QueryOrder;
+import com.wireless.db.QueryRegion;
 import com.wireless.db.QueryRestaurant;
 import com.wireless.db.QueryStaffTerminal;
 import com.wireless.db.QueryTable;
@@ -34,6 +35,7 @@ import com.wireless.protocol.RespOTAUpdate;
 import com.wireless.protocol.RespPackage;
 import com.wireless.protocol.RespQueryMenu;
 import com.wireless.protocol.RespQueryOrder;
+import com.wireless.protocol.RespQueryRegion;
 import com.wireless.protocol.RespQueryRestaurant;
 import com.wireless.protocol.RespQueryStaff;
 import com.wireless.protocol.RespQueryTable;
@@ -108,6 +110,10 @@ class OrderHandler extends Handler implements Runnable{
 				//handle query staff request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_STAFF){
 				response = new RespQueryStaff(request.header, QueryStaffTerminal.exec(_term));
+				
+				//handle query region request
+			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_REGION){
+				response = new RespQueryRegion(request.header, QueryRegion.exec(_term));	
 				
 				//handle query table request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_TABLE){
