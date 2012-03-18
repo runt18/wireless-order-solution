@@ -1,0 +1,66 @@
+package com.wireless.common;
+
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import com.wireless.protocol.Table;
+import com.wireless.protocol.Util;
+
+public class TableParcel extends Table implements Parcelable {
+
+	public TableParcel(Table table){
+		this.restaurantID = table.restaurantID;
+		this.tableID = table.tableID;
+		this.aliasID = table.aliasID;
+		this.category = table.category;
+		this.status = table.status;
+		this.custom_num = table.custom_num;
+		this.name = table.name;
+		this.regionID = table.regionID;
+		this.setMinimumCost(table.getMinimumCost());
+		this.setServiceRate(table.getServiceRate());
+	}
+	
+	public TableParcel(Parcel in){
+		this.restaurantID = in.readInt();
+		this.tableID = in.readInt();
+		this.aliasID = in.readInt();
+		this.category = (short)in.readInt();
+		this.status = (short)in.readInt();
+		this.custom_num = (short)in.readInt();
+		this.name = in.readString();
+		this.regionID = (short)in.readInt();
+		this.setMinimumCost(Util.int2Float(in.readInt()));
+		this.setServiceRate(Util.int2Float(in.readInt()));
+	}
+	
+	public static final Parcelable.Creator<TableParcel> CREATOR = new Parcelable.Creator<TableParcel>() {
+		public TableParcel createFromParcel(Parcel in) {
+			return new TableParcel(in);
+		}
+
+		public TableParcel[] newArray(int size) {
+			return new TableParcel[size];
+		}
+	};
+	
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel parcel, int flags) {
+		parcel.writeInt(this.restaurantID);
+		parcel.writeInt(this.tableID);
+		parcel.writeInt(this.aliasID);
+		parcel.writeInt(this.category);
+		parcel.writeInt(this.status);
+		parcel.writeInt(this.custom_num);
+		parcel.writeString(this.name);
+		parcel.writeInt(this.regionID);
+		parcel.writeInt(Util.float2Int(this.getMinimumCost()));
+		parcel.writeInt(Util.float2Int(this.getServiceRate()));
+	}
+
+}
