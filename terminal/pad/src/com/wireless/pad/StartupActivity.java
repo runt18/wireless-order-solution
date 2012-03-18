@@ -103,8 +103,7 @@ public class StartupActivity extends Activity {
 	protected void onStart(){
 		super.onStart();
 		if(isNetworkAvail()){
-			new CheckVersionTask().execute();
-			//new ReadPinTask().execute();
+			new ReadPinTask().execute();
 		}else{
 			showNetSetting();
 		}		
@@ -426,7 +425,6 @@ private class QueryStaffTask extends AsyncTask<Void, Void, String>{
 				
 			}else{
 				new CheckVersionTask().execute();
-				//new QueryStaffTask().execute();
 			}
 		}
 	}
