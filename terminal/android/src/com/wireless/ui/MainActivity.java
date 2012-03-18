@@ -73,6 +73,7 @@ public class MainActivity extends Activity {
 	
 	private static final int REDRAW_FOOD_MENU = 1;
 	private static final int REDRAW_RESTAURANT = 2;
+	private static final int REDRAW_STAFF_LOGIN = 3;
 	
 	private StaffTerminal _staff;
 
@@ -84,11 +85,14 @@ public class MainActivity extends Activity {
 		@Override
 		public void handleMessage(Message message){
 			if(message.what == REDRAW_FOOD_MENU){
-				/**
-				 * 如果没有菜谱信息，点菜相关的按钮变为disable状态
-				 */
+
 				if(WirelessOrder.foodMenu == null){
-					//TODO make the order related button disabled  
+					((TextView)findViewById(R.id.username)).setText("");
+					((TextView)findViewById(R.id.notice)).setText("");
+				}
+				
+			}else if(message.what == REDRAW_STAFF_LOGIN){
+				if(WirelessOrder.staffs == null){
 					((TextView)findViewById(R.id.username)).setText("");
 					((TextView)findViewById(R.id.notice)).setText("");
 				}
@@ -161,6 +165,20 @@ public class MainActivity extends Activity {
 									int position, 		// The position of the view in the adapter
 									long arg3 			// The row id of the item that was clicked
 			) {
+				
+				/**
+				 * "功能设置", "网络设置", "注销", "关于" 在任何情况都是可以使用的
+				 */
+				if(position != 4 && position != 5 && position != 7 && position != 8){
+					if(WirelessOrder.staffs == null){
+						Toast.makeText(MainActivity.this, "没有查询到任何的员工信息，请在管理后台先添加员工信息", 0).show();
+						return;
+					}else if(WirelessOrder.foodMenu == null){
+						Toast.makeText(MainActivity.this, "没有查询到菜谱信息，请重新执行菜谱更新操作", 0).show();
+						return;
+					}
+				}
+				
 				switch (position) {
 				case 0:
 					//下单
@@ -270,10 +288,9 @@ public class MainActivity extends Activity {
 					showDialog(DIALOG_STAFF_LOGIN);
 				}
 			}
-		}
-		
-		_handler.sendEmptyMessage(REDRAW_RESTAURANT);
-		  
+			
+			_handler.sendEmptyMessage(REDRAW_RESTAURANT);
+		}		  
 	}
 
 	@Override
@@ -574,7 +591,8 @@ public class MainActivity extends Activity {
 		@Override
 		protected void onPostExecute(String errMsg){
 			//make the progress dialog disappeared
-			_progDialog.dismiss();					
+			_progDialog.dismiss();		
+			_handler.sendEmptyMessage(REDRAW_STAFF_LOGIN);
 			/**
 			 * Prompt user message if any error occurred,
 			 * otherwise show the login dialog
