@@ -75,8 +75,6 @@ public class MainActivity extends Activity {
 	private static final int REDRAW_RESTAURANT = 2;
 	
 	private StaffTerminal _staff;
-	
-	private String _staffname;
 
 	
 	/**
@@ -132,7 +130,7 @@ public class MainActivity extends Activity {
 							 R.drawable.btnup07, R.drawable.btnup08, R.drawable.btnup09 
 						   };
 
-		String[] iconDes = { 
+		String[] iconDesc = { 
 							 "下单", "改单", "删单", 
 							 "结账", "功能设置", "网络设置", 
 							 "菜谱更新", "注销", "关于" 
@@ -143,7 +141,7 @@ public class MainActivity extends Activity {
 		for (int i = 0; i < imageIcons.length; i++) {
 			HashMap<String, Object> map = new HashMap<String, Object>();
 			map.put("ItemImage", imageIcons[i]);// 添加图像资源的ID
-			map.put("ItemText", iconDes[i]);// 按序号做ItemText
+			map.put("ItemText", iconDesc[i]);// 按序号做ItemText
 			imgItems.add(map);
 		}
 
@@ -218,7 +216,7 @@ public class MainActivity extends Activity {
 
 				case 7:
 					//注销
-					new QueryStaffTask().execute();
+					new QueryStaffTask(false).execute();
 					break;
 
 				case 8:
@@ -238,37 +236,39 @@ public class MainActivity extends Activity {
 			topTitle.setText("e点通");
 		}
 		
-		SharedPreferences sharedPreferences = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE);
-		long pin = sharedPreferences.getLong(Params.STAFF_PIN, Params.DEF_STAFF_PIN);
-		if(pin == Params.DEF_STAFF_PIN){
-			/**
-			 * Show the login dialog if logout before.  
-			 */
-			showDialog(DIALOG_STAFF_LOGIN);
-		}else{
-			/**
-			 * Directly login with the previous staff account if user does NOT logout before.
-			 * Otherwise show the login dialog. 
-			 */
-			_staff = null;
-			for(int i = 0; i < WirelessOrder.staffs.length; i++){
-				if(WirelessOrder.staffs[i].pin == pin){
-					_staff = WirelessOrder.staffs[i];
-				}
-			}
-			if(_staff != null){
-				ReqPackage.setGen(new PinGen(){
-					@Override
-					public long getDeviceId() {
-						return _staff.pin;
-					}
-					@Override
-					public short getDeviceType() {
-						return Terminal.MODEL_STAFF;
-					}					
-				});				
-			}else{
+		if(WirelessOrder.staffs != null){
+			SharedPreferences sharedPreferences = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE);
+			long pin = sharedPreferences.getLong(Params.STAFF_PIN, Params.DEF_STAFF_PIN);
+			if(pin == Params.DEF_STAFF_PIN){
+				/**
+				 * Show the login dialog if logout before.  
+				 */
 				showDialog(DIALOG_STAFF_LOGIN);
+			}else{
+				/**
+				 * Directly login with the previous staff account if user does NOT logout before.
+				 * Otherwise show the login dialog. 
+				 */
+				_staff = null;
+				for(int i = 0; i < WirelessOrder.staffs.length; i++){
+					if(WirelessOrder.staffs[i].pin == pin){
+						_staff = WirelessOrder.staffs[i];
+					}
+				}
+				if(_staff != null){
+					ReqPackage.setGen(new PinGen(){
+						@Override
+						public long getDeviceId() {
+							return _staff.pin;
+						}
+						@Override
+						public short getDeviceType() {
+							return Terminal.MODEL_STAFF;
+						}					
+					});				
+				}else{
+					showDialog(DIALOG_STAFF_LOGIN);
+				}
 			}
 		}
 		
@@ -279,23 +279,6 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onStart(){
 		super.onStart();
-	}
-	
-	
-	/**
-	 * 登录提示的方法
-	 * 
-	 */
-	public void loginDialog(){
-		 /**
-	        * 获取文件保存账号的值
-	        */
-			SharedPreferences sharedPreferences = getSharedPreferences("user", Context.MODE_PRIVATE);
-			_staffname= sharedPreferences.getString("staffname", "");
-			 
-			 if( _staffname == null||_staffname.equals("")){
-				 new AskLoginDialog().show();
-			 }
 	}
 	
 	@Override
@@ -358,8 +341,19 @@ public class MainActivity extends Activity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if(requestCode == NETWORK_SET ){
 		     if(resultCode == RESULT_OK){
-		          	//菜谱更新
-				new QueryMenuTask().execute();
+		    	 //重新请求员工信息并更新菜谱
+		    	 ReqPackage.setGen(new PinGen(){
+					@Override
+					public long getDeviceId() {
+						return WirelessOrder.pin;
+					}
+
+					@Override
+					public short getDeviceType() {
+						return Terminal.MODEL_ANDROID;
+					}		    		 
+		    	 });
+		    	 new QueryStaffTask(true).execute();
 		     }
 		}
 		super.onActivityResult(requestCode, resultCode, data);
@@ -521,6 +515,12 @@ public class MainActivity extends Activity {
 		
 		private ProgressDialog _progDialog;
 		
+		private boolean _isMenuUpdate;
+		
+		QueryStaffTask(boolean isMenuUpdate){
+			_isMenuUpdate = isMenuUpdate;
+		}
+		
 		/**
 		 * 执行员工信息请求前显示提示信息
 		 */
@@ -583,30 +583,24 @@ public class MainActivity extends Activity {
 				new AlertDialog.Builder(MainActivity.this)
 						.setTitle("提示")
 						.setMessage(errMsg)
-						.setPositiveButton("确定",
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,	int id) {
-									finish();
-								}
-							})				
+						.setPositiveButton("确定", null)
 						.show();
 				
 			}else{
-				if(WirelessOrder.staffs.length == 0){
+				if(WirelessOrder.staffs == null){
 					new AlertDialog.Builder(MainActivity.this)
 								   .setTitle("提示")
 					               .setMessage("没有查询到任何的员工信息，请在管理后台先添加员工信息")
-					               .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-					            	   public void onClick(DialogInterface dialog, int id) {
-					            		   finish();
-					            	   }
-					               })
+					               .setPositiveButton("确定", null)
 					               .show();
 				}else{
 					Editor editor = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).edit();//获取编辑器
 					editor.putLong(Params.STAFF_PIN, Params.DEF_STAFF_PIN);
 					editor.commit();
-					showDialog(DIALOG_STAFF_LOGIN);					
+					showDialog(DIALOG_STAFF_LOGIN);
+					if(_isMenuUpdate){
+						new QueryMenuTask().execute();
+					}
 				}
 			}
 		}	
