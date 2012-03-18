@@ -210,8 +210,6 @@ public class StartupActivity extends Activity {
 				.setMessage(errMsg)
 				.setPositiveButton("È·¶¨", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
-						Intent intent = new Intent(StartupActivity.this, MainActivity.class);
-						startActivity(intent);
 						finish();
 					}
 				}).show();
