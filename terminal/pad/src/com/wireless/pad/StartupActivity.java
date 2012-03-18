@@ -425,8 +425,8 @@ private class QueryStaffTask extends AsyncTask<Void, Void, String>{
 				}).show();				
 				
 			}else{
-				//new CheckVersionTask().execute();
-				new QueryStaffTask().execute();
+				new CheckVersionTask().execute();
+				//new QueryStaffTask().execute();
 			}
 		}
 	}
