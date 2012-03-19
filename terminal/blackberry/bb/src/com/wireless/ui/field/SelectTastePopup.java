@@ -70,7 +70,7 @@ public class SelectTastePopup extends PopupScreen{
 				int matchNum = 0;
 				for(int i = 0; i < _tastes.length; i++){
 					Taste taste = (Taste)_tastes[i];
-					if(Integer.toString(taste.alias_id).startsWith(_tasteID.getText())){
+					if(Integer.toString(taste.aliasID).startsWith(_tasteID.getText())){
 						_tasteMatchedIdx[matchNum] = i;
 						matchNum++;
 					}

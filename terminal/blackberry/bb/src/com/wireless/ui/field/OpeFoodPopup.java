@@ -191,7 +191,7 @@ class OpeFoodPopup extends PopupScreen{
 			
 			//the button to remove taste, show up only if the food along with the taste
 			for(int i = 0; i < _selectedFood.tastes.length; i++){
-				if(_selectedFood.tastes[i].alias_id != Taste.NO_TASTE){
+				if(_selectedFood.tastes[i].aliasID != Taste.NO_TASTE){
 					delTasteBtn = new ButtonField("口味-", Field.FIELD_HCENTER | ButtonField.CONSUME_CLICK);
 					delTasteBtn.setChangeListener(new FieldChangeListener(){
 						public void fieldChanged(Field field, int context) {

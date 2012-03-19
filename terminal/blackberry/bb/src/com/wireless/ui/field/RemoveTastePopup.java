@@ -145,7 +145,7 @@ public class RemoveTastePopup extends PopupScreen {
 	private Taste[] getTastes(){
 		Vector vectTaste = new Vector();
 		for(int i = 0; i < _selectedFood.tastes.length; i++){
-			if(_selectedFood.tastes[i].alias_id != Taste.NO_TASTE){
+			if(_selectedFood.tastes[i].aliasID != Taste.NO_TASTE){
 				vectTaste.addElement(_selectedFood.tastes[i]);
 			}
 		}
