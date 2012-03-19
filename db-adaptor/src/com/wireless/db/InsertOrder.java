@@ -297,7 +297,8 @@ public class InsertOrder {
 							"`restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `name`, " +
 							"`food_status`, `hang_status`, `discount`, `taste`, `taste_price`, " +
 							"`taste_id`, `taste2_id`, `taste3_id` ," +
-							"`taste_alias`, `taste2_alias`, `taste3_alias`, `kitchen_id`, `kitchen_alias`, " +
+							"`taste_alias`, `taste2_alias`, `taste3_alias`, " +
+							"`dept_id`, `kitchen_id`, `kitchen_alias`, " +
 							"`waiter`, `order_date`, `is_temporary`) VALUES (" +	
 							term.restaurant_id + ", " +
 							orderToInsert.id + ", " +
@@ -316,7 +317,8 @@ public class InsertOrder {
 							(orderToInsert.foods[i].tastes[2].tasteID == 0 ? "NULL" : orderToInsert.foods[i].tastes[2].tasteID) + ", " +
 							orderToInsert.foods[i].tastes[0].aliasID + ", " + 
 							orderToInsert.foods[i].tastes[1].aliasID + ", " + 
-							orderToInsert.foods[i].tastes[2].aliasID + ", " + 
+							orderToInsert.foods[i].tastes[2].aliasID + ", " +
+							"(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + orderToInsert.foods[i].kitchen + "), " +
 							"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + orderToInsert.foods[i].kitchen + "), " + 
 							orderToInsert.foods[i].kitchen + ", '" + 
 							term.owner + "', NOW(), " + 

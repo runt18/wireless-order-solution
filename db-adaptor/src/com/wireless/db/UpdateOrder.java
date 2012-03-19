@@ -263,34 +263,6 @@ public class UpdateOrder {
 	
 	private static Result updateOrder(DBCon dbCon, Terminal term, Order orderToUpdate, boolean isPaidAgain) throws BusinessException, SQLException{		
 		
-		//query all the food's id ,order count and taste preference of this order
-//		ArrayList<OrderFood> originalRecords = new ArrayList<OrderFood>();
-//		String sql = "SELECT food_id, food_alias, unit_price, name, food_status, discount, SUM(order_count) AS order_sum, " +
-//					"taste, taste_price, taste_id, taste_id2, taste_id3, hang_status, kitchen_alias, is_temporary FROM `" + 
-//					Params.dbName + "`.`order_food` WHERE order_id=" + orderToUpdate.id + 
-//					" GROUP BY food_alias, taste_id, taste_id2, taste_id3, hang_status, is_temporary HAVING order_sum > 0";
-//		dbCon.rs = dbCon.stmt.executeQuery(sql);
-//		while(dbCon.rs.next()){
-//			OrderFood food = new OrderFood();
-//			food.foodID = dbCon.rs.getInt("food_id");
-//			food.foodAlias = dbCon.rs.getInt("food_alias");
-//			food.setPrice(new Float(dbCon.rs.getFloat("unit_price")));
-//			food.name = dbCon.rs.getString("name");
-//			food.status = dbCon.rs.getShort("food_status");
-//			food.setDiscount(dbCon.rs.getFloat("discount"));
-//			food.setCount(new Float(dbCon.rs.getFloat("order_sum")));
-//			food.kitchen = dbCon.rs.getShort("kitchen_alias");
-//			food.tastes[0].tasteAlias = dbCon.rs.getInt("taste_id");
-//			food.tastes[1].tasteAlias = dbCon.rs.getInt("taste_id2");
-//			food.tastes[2].tasteAlias = dbCon.rs.getInt("taste_id3");
-//			food.tastePref = dbCon.rs.getString("taste");
-//			food.setTastePrice(dbCon.rs.getFloat("taste_price"));
-//			food.hangStatus = dbCon.rs.getShort("hang_status");
-//			food.isTemporary = dbCon.rs.getBoolean("is_temporary");
-//			originalRecords.add(food);
-//		}
-//		dbCon.rs.close();
-		
 		String extraCond = " AND C.order_id=" + orderToUpdate.id;
 		OrderFood[] oriFoods = OrderFoodReflector.getDetailToday(dbCon, extraCond, null);
 		
@@ -410,7 +382,7 @@ public class UpdateOrder {
 						"(`restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `name`, `food_status`, `hang_status`, " +
 						"`taste_id`, `taste2_id`, `taste3_id`, " + 
 						"`discount`, `taste_alias`, `taste2_alias`, `taste3_alias`, `taste_price`, " +
-						"`taste`, `kitchen_id`, `kitchen_alias`, `waiter`, `order_date`, `is_temporary`) VALUES (" +
+						"`taste`, `dept_id`, `kitchen_id`, `kitchen_alias`, `waiter`, `order_date`, `is_temporary`) VALUES (" +
 						term.restaurant_id + ", " +
 						orderToUpdate.id + ", " +
 						(extraFoods.get(i).foodID == 0 ? "NULL" : extraFoods.get(i).foodID) + ", " +
@@ -429,6 +401,7 @@ public class UpdateOrder {
 						extraFoods.get(i).tastes[2].aliasID + "," +
 						extraFoods.get(i).getTastePrice() + ", '" +
 						extraFoods.get(i).tastePref + "', " + 
+						"(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + extraFoods.get(i).kitchen + "), " + 
 						"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + extraFoods.get(i).kitchen + "), " + 
 						extraFoods.get(i).kitchen + ", '" + 
 						term.owner + "', " +
@@ -449,7 +422,8 @@ public class UpdateOrder {
 				sql = "INSERT INTO `" + Params.dbName + "`.`order_food` " +
 						"(`restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `name`, `food_status`, `hang_status`, " +
 						"`taste_id`, `taste2_id`, `taste3_id`, " +
-						"`discount`, `taste_alias`, `taste2_alias`, `taste3_alias`, `taste_price`, `taste`, `kitchen_id`, `kitchen_alias`, " +
+						"`discount`, `taste_alias`, `taste2_alias`, `taste3_alias`, `taste_price`, `taste`, " +
+						"`dept_id`, `kitchen_id`, `kitchen_alias`, " +
 						"`waiter`, `order_date`, `is_temporary`) VALUES (" +
 						term.restaurant_id + ", " +
 						orderToUpdate.id + ", " +
@@ -469,6 +443,7 @@ public class UpdateOrder {
 						canceledFoods.get(i).tastes[2].aliasID + "," +
 						canceledFoods.get(i).getTastePrice() + ", '" +
 						canceledFoods.get(i).tastePref + "', " + 
+						"(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + canceledFoods.get(i).kitchen + "), " + 
 						"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + canceledFoods.get(i).kitchen + "), " + 
 						canceledFoods.get(i).kitchen + ", '" + 
 						term.owner + "', " +
