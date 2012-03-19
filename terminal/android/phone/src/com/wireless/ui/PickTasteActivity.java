@@ -179,7 +179,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 				ArrayList<Taste> tastes = new ArrayList<Taste>();
 				if(s.toString().length() != 0){
 				    for(int i = 0; i < WirelessOrder.foodMenu.tastes.length;i++){
-				    	 if(String.valueOf(WirelessOrder.foodMenu.tastes[i].tasteAlias).startsWith(s.toString().trim())){
+				    	 if(String.valueOf(WirelessOrder.foodMenu.tastes[i].aliasID).startsWith(s.toString().trim())){
 				    		 tastes.add(WirelessOrder.foodMenu.tastes[i]);
 				    	 }
 				    }
@@ -241,7 +241,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 				ArrayList<Taste> styles = new ArrayList<Taste>();
 				if(s.toString().length() != 0){
 					 for(int i = 0; i < WirelessOrder.foodMenu.styles.length;i++){
-				    	 if(String.valueOf(WirelessOrder.foodMenu.styles[i].tasteAlias).startsWith(s.toString().trim())){
+				    	 if(String.valueOf(WirelessOrder.foodMenu.styles[i].aliasID).startsWith(s.toString().trim())){
 				    		 styles.add(WirelessOrder.foodMenu.styles[i]);
 				    	 }
 				    }
@@ -304,7 +304,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 				ArrayList<Taste> specs = new ArrayList<Taste>();
 				if(s.toString().length() != 0){
 					 for(int i = 0; i < WirelessOrder.foodMenu.specs.length;i++){
-				    	 if(String.valueOf(WirelessOrder.foodMenu.specs[i].tasteAlias).startsWith(s.toString().trim())){
+				    	 if(String.valueOf(WirelessOrder.foodMenu.specs[i].aliasID).startsWith(s.toString().trim())){
 				    		 specs.add(WirelessOrder.foodMenu.specs[i]);
 				    	 }
 				    }
@@ -380,7 +380,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 			//set name to taste
 			((TextView)view.findViewById(R.id.foodname)).setText(_tastes[position].preference);
 			//set number to taste
-			((TextView)view.findViewById(R.id.nums)).setText(String.valueOf(_tastes[position].tasteAlias));
+			((TextView)view.findViewById(R.id.nums)).setText(String.valueOf(_tastes[position].aliasID));
 			//set the price to taste
 			if(_tastes[position].calc == Taste.CALC_RATE){
 				((TextView)view.findViewById(R.id.foodprice)).setText(Util.float2Int(_tastes[position].getRate()) + "%");
@@ -392,7 +392,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 			selectChkBox.setChecked(false);
 			selectChkBox.requestFocus();
 			for(int i = 0; i < _selectedFood.tastes.length; i++){
-				if(_tastes[position].tasteAlias == _selectedFood.tastes[i].tasteAlias){
+				if(_tastes[position].aliasID == _selectedFood.tastes[i].aliasID){
 					selectChkBox.setChecked(true);
 					break;
 				}
