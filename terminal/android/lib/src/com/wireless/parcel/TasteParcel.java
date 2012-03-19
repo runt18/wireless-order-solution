@@ -9,7 +9,7 @@ import com.wireless.protocol.Util;
 public class TasteParcel extends Taste implements Parcelable{
 
 	public TasteParcel(Taste taste){
-		tasteAlias = taste.tasteAlias;
+		aliasID = taste.aliasID;
 		preference = taste.preference;
 		category = taste.category;
 		calc = taste.calc;
@@ -18,7 +18,7 @@ public class TasteParcel extends Taste implements Parcelable{
 	}
 	
 	private TasteParcel(Parcel in){
-		tasteAlias = in.readInt();
+		aliasID = in.readInt();
 		preference = in.readString();
 		category = (short)in.readInt();
 		calc = (short)in.readInt();
@@ -44,7 +44,7 @@ public class TasteParcel extends Taste implements Parcelable{
 
 	@Override
 	public void writeToParcel(Parcel parcel, int flags) {
-		parcel.writeInt(tasteAlias);
+		parcel.writeInt(aliasID);
 		parcel.writeString(preference);
 		parcel.writeInt(category);
 		parcel.writeInt(calc);
