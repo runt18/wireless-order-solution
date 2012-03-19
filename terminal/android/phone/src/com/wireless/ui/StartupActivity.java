@@ -160,7 +160,6 @@ public class StartupActivity extends Activity {
 		@Override
 		protected void onPreExecute(){
 			_msgTxtView.setText("正在更新员工信息...请稍后");
-			//_progDialog = ProgressDialog.show(EnterActivity.this, "", "正在更新员工信息...请稍后", true);
 		}
 		
 		/**
