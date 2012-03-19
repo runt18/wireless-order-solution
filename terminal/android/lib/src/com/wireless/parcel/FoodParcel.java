@@ -14,7 +14,7 @@ public class FoodParcel extends OrderFood implements Parcelable{
 	public static final String KEY_VALUE = "com.wireless.common.FoodParcel";
 	
 	public FoodParcel(OrderFood food){
-		foodAlias = food.foodAlias;
+		aliasID = food.aliasID;
 		kitchen = food.kitchen;
 		name = food.name;
 		tastes = food.tastes;
@@ -28,7 +28,7 @@ public class FoodParcel extends OrderFood implements Parcelable{
 	}
 	
 	private FoodParcel(Parcel in){
-		foodAlias = in.readInt();
+		aliasID = in.readInt();
 		kitchen = (short)in.readInt();
 		name = in.readString();
 		hangStatus = (short)in.readInt();
@@ -61,7 +61,7 @@ public class FoodParcel extends OrderFood implements Parcelable{
 	
 	@Override
 	public void writeToParcel(Parcel parcel, int flags) {
-		parcel.writeInt(foodAlias);
+		parcel.writeInt(aliasID);
 		parcel.writeInt(kitchen);
 		parcel.writeString(name);
 		parcel.writeInt(hangStatus);
