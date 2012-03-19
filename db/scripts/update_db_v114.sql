@@ -241,6 +241,27 @@ UPDATE wireless_order_db.order_food_history AS a SET taste2_id = (SELECT taste_i
 UPDATE wireless_order_db.order_food_history AS a SET taste3_id = (SELECT taste_id FROM wireless_order_db.taste b WHERE b.restaurant_id=a.restaurant_id AND b.taste_alias=a.taste3_alias);
 
 -- -----------------------------------------------------
+-- Add the field 'dept_id' to table 'order_food'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_food` ADD COLUMN `dept_id` TINYINT UNSIGNED NULL DEFAULT NULL COMMENT 'the department alias id to this record'  AFTER `kitchen_id` ;
+
+-- -----------------------------------------------------
+-- Add the field 'dept_id' to table 'order_food_history'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_food_history` ADD COLUMN `dept_id` TINYINT UNSIGNED NULL DEFAULT NULL COMMENT 'the department alias id to this record'  AFTER `kitchen_id` ;
+
+-- -----------------------------------------------------
+-- Update the field 'dept_id' to table 'order_food'
+-- -----------------------------------------------------
+UPDATE wireless_order_db.order_food AS a SET dept_id = (SELECT dept_id FROM wireless_order_db.kitchen b WHERE b.restaurant_id=a.restaurant_id AND b.kitchen_alias=a.kitchen_alias);
+
+-- -----------------------------------------------------
+-- Update the field 'dept_id' to table 'order_food_history'
+-- -----------------------------------------------------
+UPDATE wireless_order_db.order_food_history AS a SET dept_id = (SELECT dept_id FROM wireless_order_db.kitchen b WHERE b.restaurant_id=a.restaurant_id AND b.kitchen_alias=a.kitchen_alias);
+
+
+-- -----------------------------------------------------
 -- View `order_food_history_view`
 -- -----------------------------------------------------
 DROP VIEW IF EXISTS order_food_history_view;
