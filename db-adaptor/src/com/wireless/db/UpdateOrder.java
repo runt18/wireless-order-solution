@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import com.wireless.dbReflect.OrderFoodReflector;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
@@ -263,34 +264,36 @@ public class UpdateOrder {
 	private static Result updateOrder(DBCon dbCon, Terminal term, Order orderToUpdate, boolean isPaidAgain) throws BusinessException, SQLException{		
 		
 		//query all the food's id ,order count and taste preference of this order
-		ArrayList<OrderFood> originalRecords = new ArrayList<OrderFood>();
-		String sql = "SELECT food_id, food_alias, unit_price, name, food_status, discount, SUM(order_count) AS order_sum, " +
-					"taste, taste_price, taste_id, taste_id2, taste_id3, hang_status, kitchen_alias, is_temporary FROM `" + 
-					Params.dbName + "`.`order_food` WHERE order_id=" + orderToUpdate.id + 
-					" GROUP BY food_alias, taste_id, taste_id2, taste_id3, hang_status, is_temporary HAVING order_sum > 0";
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		while(dbCon.rs.next()){
-			OrderFood food = new OrderFood();
-			food.foodID = dbCon.rs.getInt("food_id");
-			food.foodAlias = dbCon.rs.getInt("food_alias");
-			food.setPrice(new Float(dbCon.rs.getFloat("unit_price")));
-			food.name = dbCon.rs.getString("name");
-			food.status = dbCon.rs.getShort("food_status");
-			food.setDiscount(dbCon.rs.getFloat("discount"));
-			food.setCount(new Float(dbCon.rs.getFloat("order_sum")));
-			food.kitchen = dbCon.rs.getShort("kitchen_alias");
-			food.tastes[0].alias_id = dbCon.rs.getInt("taste_id");
-			food.tastes[1].alias_id = dbCon.rs.getInt("taste_id2");
-			food.tastes[2].alias_id = dbCon.rs.getInt("taste_id3");
-			food.tastePref = dbCon.rs.getString("taste");
-			food.setTastePrice(dbCon.rs.getFloat("taste_price"));
-			food.hangStatus = dbCon.rs.getShort("hang_status");
-			food.isTemporary = dbCon.rs.getBoolean("is_temporary");
-			originalRecords.add(food);
-		}
-		dbCon.rs.close();
+//		ArrayList<OrderFood> originalRecords = new ArrayList<OrderFood>();
+//		String sql = "SELECT food_id, food_alias, unit_price, name, food_status, discount, SUM(order_count) AS order_sum, " +
+//					"taste, taste_price, taste_id, taste_id2, taste_id3, hang_status, kitchen_alias, is_temporary FROM `" + 
+//					Params.dbName + "`.`order_food` WHERE order_id=" + orderToUpdate.id + 
+//					" GROUP BY food_alias, taste_id, taste_id2, taste_id3, hang_status, is_temporary HAVING order_sum > 0";
+//		dbCon.rs = dbCon.stmt.executeQuery(sql);
+//		while(dbCon.rs.next()){
+//			OrderFood food = new OrderFood();
+//			food.foodID = dbCon.rs.getInt("food_id");
+//			food.foodAlias = dbCon.rs.getInt("food_alias");
+//			food.setPrice(new Float(dbCon.rs.getFloat("unit_price")));
+//			food.name = dbCon.rs.getString("name");
+//			food.status = dbCon.rs.getShort("food_status");
+//			food.setDiscount(dbCon.rs.getFloat("discount"));
+//			food.setCount(new Float(dbCon.rs.getFloat("order_sum")));
+//			food.kitchen = dbCon.rs.getShort("kitchen_alias");
+//			food.tastes[0].tasteAlias = dbCon.rs.getInt("taste_id");
+//			food.tastes[1].tasteAlias = dbCon.rs.getInt("taste_id2");
+//			food.tastes[2].tasteAlias = dbCon.rs.getInt("taste_id3");
+//			food.tastePref = dbCon.rs.getString("taste");
+//			food.setTastePrice(dbCon.rs.getFloat("taste_price"));
+//			food.hangStatus = dbCon.rs.getShort("hang_status");
+//			food.isTemporary = dbCon.rs.getBoolean("is_temporary");
+//			originalRecords.add(food);
+//		}
+//		dbCon.rs.close();
 		
-
+		String extraCond = " AND C.order_id=" + orderToUpdate.id;
+		OrderFood[] oriFoods = OrderFoodReflector.getDetailToday(dbCon, extraCond, null);
+		
 		ArrayList<OrderFood> extraFoods = new ArrayList<OrderFood>();
 		ArrayList<OrderFood> canceledFoods = new ArrayList<OrderFood>();
 		ArrayList<OrderFood> hurriedFoods = new ArrayList<OrderFood>();
@@ -313,15 +316,15 @@ public class UpdateOrder {
 			STATUS status = STATUS.NOT_MATCHED;
 			float diff = orderToUpdate.foods[i].getCount().floatValue();
 			
-			for(int j = 0; j < originalRecords.size(); j++){
+			for(int j = 0; j < oriFoods.length; j++){
 				/**
 				 * In the case below,
 				 * 1 - both food alias id and taste id is matched
 				 * 2 - order count is matched
 				 * Skip this record since it is totally the same as original.
 				 */
-				if(orderToUpdate.foods[i].equals(originalRecords.get(j)) &&
-					orderToUpdate.foods[i].getCount().equals(originalRecords.get(j).getCount())){
+				if(orderToUpdate.foods[i].equals(oriFoods[j]) &&
+					orderToUpdate.foods[i].getCount().equals(oriFoods[j].getCount())){
 					diff = 0;
 					status = STATUS.FULL_MATCHED;
 					break;
@@ -332,11 +335,11 @@ public class UpdateOrder {
 				 * 2 - order count isn't matched
 				 * Calculate the difference between these two records and insert a new record to keep track of this incremental
 				 */
-				}else if(orderToUpdate.foods[i].equals(originalRecords.get(j)) &&
-						!orderToUpdate.foods[i].getCount().equals(originalRecords.get(j).getCount())){
+				}else if(orderToUpdate.foods[i].equals(oriFoods[j]) &&
+						!orderToUpdate.foods[i].getCount().equals(oriFoods[j].getCount())){
 
 					//calculate the difference between the submitted and original record
-					diff = orderToUpdate.foods[i].getCount().floatValue() - originalRecords.get(j).getCount().floatValue();					
+					diff = orderToUpdate.foods[i].getCount().floatValue() - oriFoods[j].getCount().floatValue();					
 					status = STATUS.FULL_MATCHED_BUT_COUNT;
 					break;					
 				}
@@ -357,16 +360,16 @@ public class UpdateOrder {
 		}	
 		
 		//insert the canceled order records
-		for(int i = 0; i < originalRecords.size(); i++){
+		for(int i = 0; i < oriFoods.length; i++){
 			/**
 			 * If the sum to original record's order count is zero,
 			 * means the record to this food has been canceled before.
 			 * So we should skip to check this record.
 			 */
-			if(originalRecords.get(i).getCount() > 0){
+			if(oriFoods[i].getCount() > 0){
 				boolean isCancelled = true;
 				for(int j = 0; j < orderToUpdate.foods.length; j++){
-					if(originalRecords.get(i).equals(orderToUpdate.foods[j])){
+					if(oriFoods[i].equals(orderToUpdate.foods[j])){
 						isCancelled = false;
 						break;
 					}
@@ -376,7 +379,7 @@ public class UpdateOrder {
 				 * So we insert an record whose order count is negative to original record
 				 */
 				if(isCancelled){
-					canceledFoods.add(originalRecords.get(i));
+					canceledFoods.add(oriFoods[i]);
 				}			
 			}
 		}
@@ -389,7 +392,8 @@ public class UpdateOrder {
 		}
 		
 		try{
-			
+		
+			String sql;
 			float giftAmount = 0;
 			
 			dbCon.conn.setAutoCommit(false);
@@ -404,21 +408,25 @@ public class UpdateOrder {
 				
 				sql = "INSERT INTO `" + Params.dbName + "`.`order_food` " +
 						"(`restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `name`, `food_status`, `hang_status`, " +
-						"`discount`, `taste_id`, `taste_id2`, `taste_id3`, `taste_price`, " +
+						"`taste_id`, `taste2_id`, `taste3_id`, " + 
+						"`discount`, `taste_alias`, `taste2_alias`, `taste3_alias`, `taste_price`, " +
 						"`taste`, `kitchen_id`, `kitchen_alias`, `waiter`, `order_date`, `is_temporary`) VALUES (" +
 						term.restaurant_id + ", " +
-						orderToUpdate.id + ", " + 
-						"(SELECT food_id FROM " + Params.dbName + ".food WHERE restaurant_id=" + term.restaurant_id + " AND food_alias=" + extraFoods.get(i).foodAlias + "), " +
-						extraFoods.get(i).foodAlias + ", " + 
+						orderToUpdate.id + ", " +
+						(extraFoods.get(i).foodID == 0 ? "NULL" : extraFoods.get(i).foodID) + ", " +
+						extraFoods.get(i).aliasID + ", " + 
 						extraFoods.get(i).getCount() + ", " + 
 						extraFoods.get(i).getPrice() + ", '" + 
 						extraFoods.get(i).name + "', " + 
 						extraFoods.get(i).status + ", " +
 						(extraFoods.get(i).hangStatus == OrderFood.FOOD_HANG_UP ? OrderFood.FOOD_HANG_UP : OrderFood.FOOD_NORMAL) + ", " +
+						(extraFoods.get(i).tastes[0].tasteID == 0 ? "NULL" : extraFoods.get(i).tastes[0].tasteID) + ", " +
+						(extraFoods.get(i).tastes[1].tasteID == 0 ? "NULL" : extraFoods.get(i).tastes[1].tasteID) + ", " +
+						(extraFoods.get(i).tastes[2].tasteID == 0 ? "NULL" : extraFoods.get(i).tastes[2].tasteID) + ", " +
 						extraFoods.get(i).getDiscount() + ", " +
-						extraFoods.get(i).tastes[0].alias_id + "," +
-						extraFoods.get(i).tastes[1].alias_id + "," +
-						extraFoods.get(i).tastes[2].alias_id + "," +
+						extraFoods.get(i).tastes[0].aliasID + "," +
+						extraFoods.get(i).tastes[1].aliasID + "," +
+						extraFoods.get(i).tastes[2].aliasID + "," +
 						extraFoods.get(i).getTastePrice() + ", '" +
 						extraFoods.get(i).tastePref + "', " + 
 						"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + extraFoods.get(i).kitchen + "), " + 
@@ -440,21 +448,25 @@ public class UpdateOrder {
 				
 				sql = "INSERT INTO `" + Params.dbName + "`.`order_food` " +
 						"(`restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `name`, `food_status`, `hang_status`, " +
-						"`discount`, `taste_id`, `taste_id2`, `taste_id3`, `taste_price`, `taste`, `kitchen_id`, `kitchen_alias`, " +
+						"`taste_id`, `taste2_id`, `taste3_id`, " +
+						"`discount`, `taste_alias`, `taste2_alias`, `taste3_alias`, `taste_price`, `taste`, `kitchen_id`, `kitchen_alias`, " +
 						"`waiter`, `order_date`, `is_temporary`) VALUES (" +
 						term.restaurant_id + ", " +
-						orderToUpdate.id + ", " + 
-						"(SELECT food_id FROM " + Params.dbName + ".food WHERE restaurant_id=" + term.restaurant_id + " AND food_alias=" + canceledFoods.get(i).foodAlias + "), " +
-						canceledFoods.get(i).foodAlias + ", " + 
+						orderToUpdate.id + ", " +
+						(canceledFoods.get(i).foodID == 0 ? "NULL" : canceledFoods.get(i).foodID) + ", " +
+						canceledFoods.get(i).aliasID + ", " + 
 						"-" + canceledFoods.get(i).getCount() + ", " + 
 						canceledFoods.get(i).getPrice() + ", '" + 
 						canceledFoods.get(i).name + "', " + 
 						canceledFoods.get(i).status + ", " +
 						(canceledFoods.get(i).hangStatus == OrderFood.FOOD_HANG_UP ? OrderFood.FOOD_HANG_UP : OrderFood.FOOD_NORMAL) + ", " +
+						(canceledFoods.get(i).tastes[0].tasteID == 0 ? "NULL" : canceledFoods.get(i).tastes[0].tasteID) + ", " +
+						(canceledFoods.get(i).tastes[1].tasteID == 0 ? "NULL" : canceledFoods.get(i).tastes[1].tasteID)+ ", " +
+						(canceledFoods.get(i).tastes[2].tasteID == 0 ? "NULL" : canceledFoods.get(i).tastes[2].tasteID)+ ", " +
 						canceledFoods.get(i).getDiscount() + ", " +
-						canceledFoods.get(i).tastes[0].alias_id + "," +
-						canceledFoods.get(i).tastes[1].alias_id + "," +
-						canceledFoods.get(i).tastes[2].alias_id + "," +
+						canceledFoods.get(i).tastes[0].aliasID + "," +
+						canceledFoods.get(i).tastes[1].aliasID + "," +
+						canceledFoods.get(i).tastes[2].aliasID + "," +
 						canceledFoods.get(i).getTastePrice() + ", '" +
 						canceledFoods.get(i).tastePref + "', " + 
 						"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + canceledFoods.get(i).kitchen + "), " + 
@@ -597,7 +609,7 @@ public class UpdateOrder {
 						 * Means just change the taste preference to this food. 
 						 * We don't print this record.
 						 */
-						}else if(canceledFood.foodAlias == extraFood.foodAlias &&
+						}else if(canceledFood.aliasID == extraFood.aliasID &&
 								 canceledFood.getCount().equals(extraFood.getCount()) &&
 								 canceledFood.hangStatus == extraFood.hangStatus) {
 
@@ -641,7 +653,7 @@ public class UpdateOrder {
 					iterCancel = canceledFoods.iterator();
 					while(iterCancel.hasNext()){
 						OrderFood canceledFood = iterCancel.next();
-						if(extraFood.foodAlias == canceledFood.foodAlias &&
+						if(extraFood.aliasID == canceledFood.aliasID &&
 						   extraFood.getCount().equals(canceledFood.getCount()) &&
 						   extraFood.hangStatus == canceledFood.hangStatus){
 								isExtra = false;
@@ -734,9 +746,11 @@ public class UpdateOrder {
 			
 		}else{
 			//get the food name and its unit price
-			String sql = "SELECT food_id, name, status, unit_price, kitchen FROM " + Params.dbName + 
-					".food WHERE food_alias=" + foodBasic.foodAlias + 
-					" AND restaurant_id=" + term.restaurant_id;
+			String sql = "SELECT food_id, name, status, unit_price, kitchen FROM " + Params.dbName + ".food " +
+						 "WHERE " +
+						 "restaurant_id=" + term.restaurant_id +
+						 " AND " +
+						 "food_alias=" + foodBasic.aliasID;
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			//check if the food to be inserted exist in db or not
 
@@ -748,26 +762,27 @@ public class UpdateOrder {
 
 				food.kitchen = dbCon.rs.getShort("kitchen");
 			}else{
-				throw new BusinessException("The food(alias_id=" + foodBasic.foodAlias + ", restaurant_id=" + term.restaurant_id + ") to query does NOT exist.", ErrorCode.MENU_EXPIRED);
+				throw new BusinessException("The food(alias_id=" + foodBasic.aliasID + ", restaurant_id=" + term.restaurant_id + ") to query does NOT exist.", ErrorCode.MENU_EXPIRED);
 			}
 			dbCon.rs.close();
 			
 			//get the each taste information to this food only if the food has taste preference
 			for(int j = 0; j < foodBasic.tastes.length; j++){
-				if(foodBasic.tastes[j].alias_id != Taste.NO_TASTE){
-					sql = "SELECT preference, price, category, rate, calc FROM " + Params.dbName + ".taste WHERE restaurant_id=" + term.restaurant_id +
-						" AND alias_id=" + foodBasic.tastes[j].alias_id;
+				if(foodBasic.tastes[j].aliasID != Taste.NO_TASTE){
+					sql = "SELECT taste_id, preference, price, category, rate, calc FROM " + Params.dbName + ".taste WHERE restaurant_id=" + term.restaurant_id +
+						" AND taste_alias=" + foodBasic.tastes[j].aliasID;
 					dbCon.rs = dbCon.stmt.executeQuery(sql);
 					//check if the taste preference exist in db
 					if(dbCon.rs.next()){
-						food.tastes[j].alias_id = foodBasic.tastes[j].alias_id;
+						food.tastes[j].tasteID = dbCon.rs.getInt("taste_id");
+						food.tastes[j].aliasID = foodBasic.tastes[j].aliasID;
 						food.tastes[j].preference = dbCon.rs.getString("preference");
 						food.tastes[j].category = dbCon.rs.getShort("category");
 						food.tastes[j].calc = dbCon.rs.getShort("calc");
 						food.tastes[j].setRate(dbCon.rs.getFloat("rate"));
 						food.tastes[j].setPrice(dbCon.rs.getFloat("price"));
 					}else{
-						throw new BusinessException("The taste(alias_id=" + foodBasic.tastes[j].alias_id + ", restaurant_id=" + term.restaurant_id +") to query does NOT exist.", ErrorCode.MENU_EXPIRED);
+						throw new BusinessException("The taste(alias_id=" + foodBasic.tastes[j].aliasID + ", restaurant_id=" + term.restaurant_id +") to query does NOT exist.", ErrorCode.MENU_EXPIRED);
 					}
 					dbCon.rs.close();
 					
@@ -776,7 +791,7 @@ public class UpdateOrder {
 		}
 		
 		//set the alias id
-		food.foodAlias = foodBasic.foodAlias;
+		food.aliasID = foodBasic.aliasID;
 		//set the discount
 		food.setDiscount(foodBasic.getDiscount());
 		//set the hang status

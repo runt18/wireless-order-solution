@@ -388,7 +388,7 @@ public class QueryMenu {
 		//Get the taste preferences to this restaurant sort by alias id in ascend order.
 		//The lower alias id, the more commonly this preference used.
 		//Put the most commonly used taste preference in first position 
-		String sql = "SELECT alias_id, preference, price, category, rate, calc FROM " + Params.dbName + ".taste WHERE restaurant_id=" + 
+		String sql = "SELECT * FROM " + Params.dbName + ".taste WHERE restaurant_id=" + 
 					 restaurantID + 
 					 (category < 0 ? "" : " AND category=" + category) + " " +
 					 (extraCond == null ? "" : extraCond) + " " +
@@ -397,7 +397,8 @@ public class QueryMenu {
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		ArrayList<Taste> tastes = new ArrayList<Taste>();
 		while(dbCon.rs.next()){
-			Taste taste = new Taste(dbCon.rs.getInt("alias_id"), 
+			Taste taste = new Taste(dbCon.rs.getInt("taste_id"),
+								    dbCon.rs.getInt("taste_alias"), 
 									dbCon.rs.getString("preference"),
 									dbCon.rs.getShort("category"),
 									dbCon.rs.getShort("calc"),

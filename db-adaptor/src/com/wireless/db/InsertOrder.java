@@ -152,34 +152,41 @@ public class InsertOrder {
 				 */
 				if(!orderToInsert.foods[i].isTemporary){
 					//get the associated foods' unit price and name
-					sql = "SELECT unit_price, name, status FROM " +  Params.dbName + 
-					 	  ".food WHERE food_alias=" + orderToInsert.foods[i].foodAlias + 
-					 	  " AND restaurant_id=" + orderToInsert.table.restaurantID;
+					sql = "SELECT food_id, unit_price, name, status FROM " +  Params.dbName + ".food " +
+						  "WHERE " +
+						  "food_alias=" + orderToInsert.foods[i].aliasID + 
+					 	  " AND " +
+					 	  "restaurant_id=" + orderToInsert.table.restaurantID;
 					dbCon.rs = dbCon.stmt.executeQuery(sql);
 					//check if the food exist in db 
 					if(dbCon.rs.next()){
+						orderToInsert.foods[i].foodID = dbCon.rs.getInt("food_id");
 						orderToInsert.foods[i].name = dbCon.rs.getString("name");
 						orderToInsert.foods[i].status = dbCon.rs.getShort("status");
 						orderToInsert.foods[i].setPrice(dbCon.rs.getFloat("unit_price"));
 					}else{
-						throw new BusinessException("The food(alias_id=" + orderToInsert.foods[i].foodAlias + ", restaurant_id=" + orderToInsert.table.restaurantID+ ") to query doesn't exit.", ErrorCode.MENU_EXPIRED);
+						throw new BusinessException("The food(alias_id=" + orderToInsert.foods[i].aliasID + ", restaurant_id=" + orderToInsert.table.restaurantID+ ") to query doesn't exit.", ErrorCode.MENU_EXPIRED);
 					}
 					dbCon.rs.close();
 					
 					//get three taste information for each food
 					for(int j = 0; j < orderToInsert.foods[i].tastes.length; j++){
-						if(orderToInsert.foods[i].tastes[j].alias_id != Taste.NO_TASTE){
-							sql = "SELECT preference, price, category, rate, calc FROM " + Params.dbName + 
-								  ".taste WHERE restaurant_id=" + orderToInsert.table.restaurantID + 
-								  " AND alias_id=" + orderToInsert.foods[i].tastes[j].alias_id;
+						if(orderToInsert.foods[i].tastes[j].aliasID != Taste.NO_TASTE){
+							sql = "SELECT taste_id, preference, price, category, rate, calc FROM " + Params.dbName + ".taste " +
+								  "WHERE " +
+								  "restaurant_id=" + orderToInsert.table.restaurantID + 
+								  " AND " +
+								  "taste_alias=" + orderToInsert.foods[i].tastes[j].aliasID;
 							dbCon.rs = dbCon.stmt.executeQuery(sql);
 							if(dbCon.rs.next()){
+								orderToInsert.foods[i].tastes[j].tasteID = dbCon.rs.getInt("taste_id");
 								orderToInsert.foods[i].tastes[j].preference = dbCon.rs.getString("preference");
 								orderToInsert.foods[i].tastes[j].setPrice(dbCon.rs.getFloat("price"));
 								orderToInsert.foods[i].tastes[j].category = dbCon.rs.getShort("category");
 								orderToInsert.foods[i].tastes[j].setRate(dbCon.rs.getFloat("rate"));
 								orderToInsert.foods[i].tastes[j].calc = dbCon.rs.getShort("calc");
-							}				
+							}		
+							dbCon.rs.close();
 						}
 					}
 					
@@ -289,12 +296,13 @@ public class InsertOrder {
 					sql = "INSERT INTO `" + Params.dbName + "`.`order_food` (" +
 							"`restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `name`, " +
 							"`food_status`, `hang_status`, `discount`, `taste`, `taste_price`, " +
-							"`taste_id`, `taste_id2`, `taste_id3`, `kitchen_id`, `kitchen_alias`, " +
+							"`taste_id`, `taste2_id`, `taste3_id` ," +
+							"`taste_alias`, `taste2_alias`, `taste3_alias`, `kitchen_id`, `kitchen_alias`, " +
 							"`waiter`, `order_date`, `is_temporary`) VALUES (" +	
 							term.restaurant_id + ", " +
-							orderToInsert.id + ", " + 
-							"(SELECT food_id FROM " + Params.dbName + ".food WHERE restaurant_id=" + term.restaurant_id + " AND food_alias=" + orderToInsert.foods[i].foodAlias + "), " +
-							orderToInsert.foods[i].foodAlias + ", " + 
+							orderToInsert.id + ", " +
+							(orderToInsert.foods[i].foodID == 0 ? "NULL" : orderToInsert.foods[i].foodID) + ", " +
+							orderToInsert.foods[i].aliasID + ", " + 
 							orderToInsert.foods[i].getCount() + ", " + 
 							orderToInsert.foods[i].getPrice() + ", '" + 
 							orderToInsert.foods[i].name + "', " +
@@ -303,9 +311,12 @@ public class InsertOrder {
 							orderToInsert.foods[i].getDiscount() + ", '" +
 							orderToInsert.foods[i].tastePref + "', " + 
 							orderToInsert.foods[i].getTastePrice() + ", " +
-							orderToInsert.foods[i].tastes[0].alias_id + ", " + 
-							orderToInsert.foods[i].tastes[1].alias_id + ", " + 
-							orderToInsert.foods[i].tastes[2].alias_id + ", " + 
+							(orderToInsert.foods[i].tastes[0].tasteID == 0 ? "NULL" : orderToInsert.foods[i].tastes[0].tasteID) + ", " +
+							(orderToInsert.foods[i].tastes[1].tasteID == 0 ? "NULL" : orderToInsert.foods[i].tastes[1].tasteID) + ", " +
+							(orderToInsert.foods[i].tastes[2].tasteID == 0 ? "NULL" : orderToInsert.foods[i].tastes[2].tasteID) + ", " +
+							orderToInsert.foods[i].tastes[0].aliasID + ", " + 
+							orderToInsert.foods[i].tastes[1].aliasID + ", " + 
+							orderToInsert.foods[i].tastes[2].aliasID + ", " + 
 							"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + orderToInsert.foods[i].kitchen + "), " + 
 							orderToInsert.foods[i].kitchen + ", '" + 
 							term.owner + "', NOW(), " + 

@@ -31,8 +31,7 @@ public class OrderFoodReflector {
 	 * @throws SQLException
 	 *             throws if fail to execute the SQL statement
 	 */
-	public static OrderFood[] getDetailToday(DBCon dbCon, String extraCond,
-			String orderClause) throws SQLException {
+	public static OrderFood[] getDetailToday(DBCon dbCon, String extraCond,	String orderClause) throws SQLException {
 		String sql;
 		// sql = "SELECT "
 		// +
@@ -53,9 +52,9 @@ public class OrderFoodReflector {
 		// + " HAVING order_sum > 0 " + orderClause;
 
 		sql = "SELECT C.food_id, C.name, D.food_alias, C.food_status, D.order_sum, C.unit_price, C.order_date, "
-				+ " C.discount, C.taste, C.taste_price, D.taste_id, D.taste_id2, D.taste_id3, "
+				+ " C.discount, C.taste, C.taste_price, C.taste_id, C.taste2_id, C.taste3_id, D.taste_alias, D.taste2_alias, D.taste3_alias, "
 				+ " D.hang_status, C.kitchen_alias, D.is_temporary, D.type, D.pay_datetime, D.pay_date "
-				+ " FROM (SELECT A.order_id, A.food_alias, A.taste_id, A.taste_id2, A.taste_id3, A.hang_status, A.is_temporary, "
+				+ " FROM (SELECT A.order_id, A.food_alias, A.taste_alias, A.taste2_alias, A.taste3_alias, A.hang_status, A.is_temporary, "
 				+ " B.type, B.order_date AS pay_datetime, date_format(B.order_date, '%Y-%m-%d') AS pay_date, "
 				+ " SUM(A.order_count) AS order_sum, MAX(A.id) AS id "
 				+ " FROM "
@@ -64,7 +63,7 @@ public class OrderFoodReflector {
 				+ Params.dbName
 				+ ".order B "
 				+ " WHERE A.order_id = B.id AND A.restaurant_id = B.restaurant_id "
-				+ " GROUP BY A.order_id, A.food_alias, A.taste_id, A.taste_id2, A.taste_id3, A.hang_status,  A.is_temporary, "
+				+ " GROUP BY A.order_id, A.food_alias, A.taste_alias, A.taste2_alias, A.taste3_alias, A.hang_status, A.is_temporary, "
 				+ " B.type, pay_datetime, pay_date "
 				+ " HAVING order_sum > 0 "
 				+ " ) AS D, "
@@ -72,7 +71,7 @@ public class OrderFoodReflector {
 				+ ".order_food C "
 				+ " WHERE D.id = C.id "
 				+ (extraCond == null ? "" : extraCond)
-				+ orderClause;
+				+ (orderClause == null ? "" : " " + orderClause);
 
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		ArrayList<OrderFood> orderFoods = new ArrayList<OrderFood>();
@@ -80,7 +79,7 @@ public class OrderFoodReflector {
 			OrderFood food = new OrderFood();
 			food.foodID = dbCon.rs.getInt("food_id");
 			food.name = dbCon.rs.getString("name");
-			food.foodAlias = dbCon.rs.getInt("food_alias");
+			food.aliasID = dbCon.rs.getInt("food_alias");
 			food.status = dbCon.rs.getShort("food_status");
 			food.setCount(dbCon.rs.getFloat("order_sum"));
 			food.setPrice(dbCon.rs.getFloat("unit_price"));
@@ -89,9 +88,12 @@ public class OrderFoodReflector {
 			food.setDiscount(dbCon.rs.getFloat("discount"));
 			food.tastePref = dbCon.rs.getString("taste");
 			food.setTastePrice(dbCon.rs.getFloat("taste_price"));
-			food.tastes[0].alias_id = dbCon.rs.getInt("taste_id");
-			food.tastes[1].alias_id = dbCon.rs.getInt("taste_id2");
-			food.tastes[2].alias_id = dbCon.rs.getInt("taste_id3");
+			food.tastes[0].tasteID = dbCon.rs.getInt("taste_id");
+			food.tastes[1].tasteID = dbCon.rs.getInt("taste2_id");
+			food.tastes[2].tasteID = dbCon.rs.getInt("taste3_id");
+			food.tastes[0].aliasID = dbCon.rs.getInt("taste_alias");
+			food.tastes[1].aliasID = dbCon.rs.getInt("taste2_alias");
+			food.tastes[2].aliasID = dbCon.rs.getInt("taste3_alias");
 			food.hangStatus = dbCon.rs.getShort("hang_status");
 			food.isTemporary = dbCon.rs.getBoolean("is_temporary");
 			food.payManner = dbCon.rs.getShort("type");
@@ -138,9 +140,9 @@ public class OrderFoodReflector {
 		// + " HAVING order_sum > 0 " + orderClause;
 
 		sql = "SELECT C.food_id, C.name, D.food_alias, C.food_status, D.order_sum, C.unit_price, C.order_date, "
-				+ " C.discount, C.taste, C.taste_price, D.taste_id, D.taste_id2, D.taste_id3, "
+				+ " C.discount, C.taste, C.taste_price, C.taste_id, C.taste2_id, C.taste3_id, D.taste_alias, D.taste2_alias, D.taste3_alias, "
 				+ " C.kitchen_alias, D.is_temporary, D.type, D.pay_datetime, D.pay_date "
-				+ " FROM (SELECT A.order_id, A.food_alias, A.taste_id, A.taste_id2, A.taste_id3, A.is_temporary, "
+				+ " FROM (SELECT A.order_id, A.food_alias, A.taste_alias, A.taste2_alias, A.taste3_alias, A.is_temporary, "
 				+ " B.type, B.order_date AS pay_datetime, date_format(B.order_date, '%Y-%m-%d') AS pay_date, "
 				+ "SUM(A.order_count) AS order_sum, MAX(A.id) AS id "
 				+ " FROM "
@@ -149,7 +151,7 @@ public class OrderFoodReflector {
 				+ Params.dbName
 				+ ".order_history B "
 				+ " WHERE A.order_id = B.id AND A.restaurant_id = B.restaurant_id "
-				+ " GROUP BY A.order_id, A.food_alias, A.taste_id, A.taste_id2, A.taste_id3, A.is_temporary, "
+				+ " GROUP BY A.order_id, A.food_alias, A.taste_alias, A.taste2_alias, A.taste3_alias, A.is_temporary, "
 				+ " B.type, pay_datetime, pay_date "
 				+ " HAVING order_sum > 0 "
 				+ " ) AS D, "
@@ -157,7 +159,7 @@ public class OrderFoodReflector {
 				+ ".order_food_history C "
 				+ " WHERE D.id = C.id "
 				+ (extraCond == null ? "" : extraCond)
-				+ orderClause;
+				+ (orderClause == null ? "" : " " + orderClause);
 
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		ArrayList<OrderFood> orderFoods = new ArrayList<OrderFood>();
@@ -165,7 +167,7 @@ public class OrderFoodReflector {
 			OrderFood food = new OrderFood();
 			food.foodID = dbCon.rs.getInt("food_id");
 			food.name = dbCon.rs.getString("name");
-			food.foodAlias = dbCon.rs.getInt("food_alias");
+			food.aliasID = dbCon.rs.getInt("food_alias");
 			food.status = dbCon.rs.getShort("food_status");
 			food.setCount(dbCon.rs.getFloat("order_sum"));
 			food.setPrice(dbCon.rs.getFloat("unit_price"));
@@ -174,9 +176,12 @@ public class OrderFoodReflector {
 			food.setDiscount(dbCon.rs.getFloat("discount"));
 			food.tastePref = dbCon.rs.getString("taste");
 			food.setTastePrice(dbCon.rs.getFloat("taste_price"));
-			food.tastes[0].alias_id = dbCon.rs.getInt("taste_id");
-			food.tastes[1].alias_id = dbCon.rs.getInt("taste_id2");
-			food.tastes[2].alias_id = dbCon.rs.getInt("taste_id3");
+			food.tastes[0].tasteID = dbCon.rs.getInt("taste_id");
+			food.tastes[1].tasteID = dbCon.rs.getInt("taste2_id");
+			food.tastes[2].tasteID = dbCon.rs.getInt("taste3_id");
+			food.tastes[0].aliasID = dbCon.rs.getInt("taste_alias");
+			food.tastes[1].aliasID = dbCon.rs.getInt("taste2_alias");
+			food.tastes[2].aliasID = dbCon.rs.getInt("taste3_alias");
 			// food.hangStatus = dbCon.rs.getShort("hang_status");
 			food.isTemporary = dbCon.rs.getBoolean("is_temporary");
 			food.payManner = dbCon.rs.getShort("type");

@@ -276,7 +276,7 @@ public class PayOrder {
 			for(int i = 0; i < orderInfo.foods.length; i++){
 				sql = "UPDATE " + Params.dbName + ".order_food SET discount=" + orderInfo.foods[i].getDiscount() +
 					  " WHERE order_id=" + orderInfo.id + 
-					  " AND food_alias=" + orderInfo.foods[i].foodAlias;
+					  " AND food_alias=" + orderInfo.foods[i].aliasID;
 				dbCon.stmt.executeUpdate(sql);				
 			}			
 			
@@ -307,7 +307,7 @@ public class PayOrder {
 					  "food_id=" +
 					  "(SELECT food_id FROM " + 
 					  Params.dbName +
-					  ".food WHERE food_alias=" + foods[i].foodAlias +
+					  ".food WHERE food_alias=" + foods[i].aliasID +
 					  " AND restaurant_id="+ orderInfo.restaurantID + ")"; 
 				
 				dbCon.rs = dbCon.stmt.executeQuery(sql);
