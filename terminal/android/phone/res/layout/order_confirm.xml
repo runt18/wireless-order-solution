@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="wrap_content" android:layout_height="wrap_content"
+	android:background="@drawable/kuang">
+	<RelativeLayout android:id="@+id/orderConfirmRL"
+		android:layout_width="fill_parent" android:layout_height="50dip">
+		<TextView android:id="@+id/orderTitleTxt" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:textColor="#FFFFFF"
+			android:textSize="20sp" android:typeface="serif" android:textStyle="bold"
+			android:layout_marginTop="5dip" />
+
+
+	</RelativeLayout>
+
+	<TextView android:id="@+id/orderTxtView1" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:textColor="#000000"
+		android:textSize="18sp" android:layout_marginTop="20dip" android:text="数量："
+		android:layout_below="@id/orderConfirmRL" android:layout_marginLeft="10dip" />
+	<EditText android:id="@+id/amountEdtTxt" android:layout_width="130dip"
+		android:layout_height="50dip" android:textColor="#000000"
+		android:textSize="18sp" android:typeface="sans" android:textStyle="bold"
+		android:layout_below="@id/orderConfirmRL" android:layout_marginLeft="10dip"
+		android:layout_toRightOf="@id/orderTxtView1" android:inputType="numberSigned|text"
+		android:digits="0123456789." android:background="@drawable/input"
+		android:focusableInTouchMode="true" android:singleLine="true"
+		android:layout_marginTop="10dip" />
+
+	<CheckBox android:id="@+id/orderHurriedChk" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" 
+			android:textColor="#000000" android:textSize="18sp"
+		   android:layout_toRightOf="@id/amountEdtTxt"	android:focusable="false"
+		   android:layout_alignTop="@id/amountEdtTxt" 
+			android:layout_marginLeft="2dip" />
+
+	<RelativeLayout android:layout_width="fill_parent"
+		android:layout_height="70dip" android:layout_below="@id/amountEdtTxt"
+		android:layout_marginTop="15dip" android:layout_centerHorizontal="true">
+
+		<Button android:id="@+id/orderConfirmBtn" android:layout_width="80dip"
+			android:layout_height="wrap_content" android:layout_centerVertical="true"
+			android:src="@drawable/yes_selector" android:layout_marginLeft="17dip"
+			android:textColor="#000000" />
+
+		
+		<Button android:id="@+id/orderCancelBtn" android:layout_width="80dip"
+			android:layout_height="wrap_content" android:layout_marginLeft="10dip"
+			android:layout_toRightOf="@id/orderConfirmBtn"
+			android:layout_centerVertical="true" android:src="@drawable/cancle_selector"
+			android:textColor="#000000" />
+			
+			<Button android:id="@+id/orderTasteBtn" android:layout_width="80dip"
+			android:layout_height="wrap_content" android:layout_marginLeft="10dip"
+			android:layout_toRightOf="@id/orderCancelBtn" android:layout_centerVertical="true"
+			android:src="@drawable/cancle_selector" android:textColor="#000000" />		
+			
+
+	</RelativeLayout>
+
+
+</RelativeLayout>
