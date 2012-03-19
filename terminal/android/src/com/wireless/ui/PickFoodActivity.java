@@ -313,7 +313,14 @@ public class PickFoodActivity extends TabActivity implements
 		
 		//update the short cut if it is showing
 		if(_popupWindow.isShowing()){
-			_popupLstView.setAdapter(new PopupWndAdapter(this, _pickFoods));
+			if(_tempLstView != null){
+				 //Combine both temporary and picked foods
+				List<OrderFood> pickedFoods = new ArrayList<OrderFood>(_pickFoods);
+				pickedFoods.addAll(_tempLstView.getSourceData());
+				_popupLstView.setAdapter(new PopupWndAdapter(PickFoodActivity.this, pickedFoods));
+			}else{
+				_popupLstView.setAdapter(new PopupWndAdapter(PickFoodActivity.this, _pickFoods));
+			}
 		}
 		
 	}
@@ -433,8 +440,16 @@ public class PickFoodActivity extends TabActivity implements
 			public void onClick(View v) {
 				if(_popupWindow.isShowing()) {
 					_popupWindow.dismiss();
-				}else{
-					_popupLstView.setAdapter(new PopupWndAdapter(PickFoodActivity.this, _pickFoods));
+					
+				}else{					
+					if(_tempLstView != null){
+						 //Combine both temporary and picked foods
+						List<OrderFood> pickedFoods = new ArrayList<OrderFood>(_pickFoods);
+						pickedFoods.addAll(_tempLstView.getSourceData());
+						_popupLstView.setAdapter(new PopupWndAdapter(PickFoodActivity.this, pickedFoods));
+					}else{
+						_popupLstView.setAdapter(new PopupWndAdapter(PickFoodActivity.this, _pickFoods));
+					}
 					_popupWindow.showAsDropDown(v, -120, 5);
 				}
 			}
@@ -619,7 +634,14 @@ public class PickFoodActivity extends TabActivity implements
 				if(_popupWindow.isShowing()) {
 					_popupWindow.dismiss();
 				}else{
-					_popupLstView.setAdapter(new PopupWndAdapter(PickFoodActivity.this, _pickFoods));
+					if(_tempLstView != null){
+						 //Combine both temporary and picked foods
+						List<OrderFood> pickedFoods = new ArrayList<OrderFood>(_pickFoods);
+						pickedFoods.addAll(_tempLstView.getSourceData());
+						_popupLstView.setAdapter(new PopupWndAdapter(PickFoodActivity.this, pickedFoods));
+					}else{
+						_popupLstView.setAdapter(new PopupWndAdapter(PickFoodActivity.this, _pickFoods));
+					}
 					_popupWindow.showAsDropDown(v, -120, 5);
 				}
 			}
@@ -788,7 +810,7 @@ public class PickFoodActivity extends TabActivity implements
 		});
 		
 		/**
-		 * 拼音侧栏显示a-z的字母
+		 * 拼音侧栏显示A-Z的字母
 		 */
 		for(char c = 'A'; c <= 'Z'; c++) {
 			final TextView tv = new TextView(PickFoodActivity.this);
@@ -823,7 +845,14 @@ public class PickFoodActivity extends TabActivity implements
 				if(_popupWindow.isShowing()) {
 					_popupWindow.dismiss();
 				}else{
-					_popupLstView.setAdapter(new PopupWndAdapter(PickFoodActivity.this, _pickFoods));
+					if(_tempLstView != null){
+						 //Combine both temporary and picked foods
+						List<OrderFood> pickedFoods = new ArrayList<OrderFood>(_pickFoods);
+						pickedFoods.addAll(_tempLstView.getSourceData());
+						_popupLstView.setAdapter(new PopupWndAdapter(PickFoodActivity.this, pickedFoods));
+					}else{
+						_popupLstView.setAdapter(new PopupWndAdapter(PickFoodActivity.this, _pickFoods));
+					}
 					_popupWindow.showAsDropDown(v, -120, 5);
 				}
 			}
@@ -1174,10 +1203,10 @@ public class PickFoodActivity extends TabActivity implements
 	 */
 	private class PopupWndAdapter extends BaseAdapter {
 
-		private ArrayList<OrderFood> _orderFoods;
+		private List<OrderFood> _orderFoods;
 		private Context _context;
 
-		public PopupWndAdapter(Context context, ArrayList<OrderFood> pickFoods) {
+		public PopupWndAdapter(Context context, List<OrderFood> pickFoods) {
 			this._context = context;
 			this._orderFoods = pickFoods;
 		}
@@ -1202,11 +1231,20 @@ public class PickFoodActivity extends TabActivity implements
 			OrderFood food = _orderFoods.get(position);
 			if(convertView == null){
 				convertView = LayoutInflater.from(_context).inflate(R.layout.orderpopuwindowitem, null);
-				((TextView)convertView.findViewById(R.id.popuwindowfoodname)).setText(food.name + "(" + Util.float2String2(food.getCount()) + ")");
+				((TextView)convertView.findViewById(R.id.popuwindowfoodname)).setText(toFoodString(food));
 			} else {
-				((TextView)convertView.findViewById(R.id.popuwindowfoodname)).setText(food.name + "(" + Util.float2String2(food.getCount()) + ")");
+				((TextView)convertView.findViewById(R.id.popuwindowfoodname)).setText(toFoodString(food));
 			}
 			return convertView;
+		}
+		
+		private String toFoodString(OrderFood food){
+			String s = "";
+			if(food.isTemporary){
+				s = "(临)";
+			}
+			s += food.name + "(" + Util.float2String2(food.getCount()) + ")";
+			return s;
 		}
 	}
 
@@ -1229,10 +1267,6 @@ public class PickFoodActivity extends TabActivity implements
 		 * 创建已点菜shortcut的PopupWindow
 		 */
 		Display display = ((WindowManager)getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
-		// 获取屏幕宽度
-		// int width = display.getWidth();
-		// 获取屏幕高度
-		//int heigh = display.getHeight();
 		// 获取自定义布局文件的视图
 		View popupWndView = getLayoutInflater().inflate(R.layout.orderlistpupowindow, null, false);
 		// 创建PopupWindow实例
