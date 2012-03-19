@@ -134,8 +134,8 @@ public class RespQueryOrder extends RespPackage{
 				//assign the temporary flag 
 				body[offset] = 1;
 				//assign the food id
-				body[offset + 1] = (byte)(order.foods[i].foodAlias & 0x000000FF);
-				body[offset + 2] = (byte)((order.foods[i].foodAlias & 0x0000FF00) >> 8);
+				body[offset + 1] = (byte)(order.foods[i].aliasID & 0x000000FF);
+				body[offset + 2] = (byte)((order.foods[i].aliasID & 0x0000FF00) >> 8);
 				//assign the order amount
 				body[offset + 3] = (byte)(order.foods[i].count & 0x000000FF);
 				body[offset + 4] = (byte)((order.foods[i].count & 0x0000FF00) >> 8);
@@ -159,22 +159,22 @@ public class RespQueryOrder extends RespPackage{
 				//assign the temporary flag
 				body[offset] = 0;
 				//assign the food alias id
-				body[offset + 1] = (byte)(order.foods[i].foodAlias & 0x000000FF);
-				body[offset + 2] = (byte)((order.foods[i].foodAlias & 0x0000FF00) >> 8);
+				body[offset + 1] = (byte)(order.foods[i].aliasID & 0x000000FF);
+				body[offset + 2] = (byte)((order.foods[i].aliasID & 0x0000FF00) >> 8);
 				//assign the order amount
 				body[offset + 3] = (byte)(order.foods[i].count & 0x000000FF);
 				body[offset + 4] = (byte)((order.foods[i].count & 0x0000FF00) >> 8);
 				//assign the food status
 				body[offset + 5] = (byte)(order.foods[i].status);
 				//assign the 1st taste id
-				body[offset + 6] = (byte)(order.foods[i].tastes[0].alias_id & 0x00FF);
-				body[offset + 7] = (byte)((order.foods[i].tastes[0].alias_id & 0xFF00) >> 8);
+				body[offset + 6] = (byte)(order.foods[i].tastes[0].aliasID & 0x00FF);
+				body[offset + 7] = (byte)((order.foods[i].tastes[0].aliasID & 0xFF00) >> 8);
 				//assign the 2nd taste id
-				body[offset + 8] = (byte)(order.foods[i].tastes[1].alias_id & 0x00FF);
-				body[offset + 9] = (byte)((order.foods[i].tastes[1].alias_id & 0xFF00) >> 8);
+				body[offset + 8] = (byte)(order.foods[i].tastes[1].aliasID & 0x00FF);
+				body[offset + 9] = (byte)((order.foods[i].tastes[1].aliasID & 0xFF00) >> 8);
 				//assign the 3rd taste id
-				body[offset + 10] = (byte)(order.foods[i].tastes[2].alias_id & 0x00FF);
-				body[offset + 11] = (byte)((order.foods[i].tastes[2].alias_id & 0xFF00) >> 8);
+				body[offset + 10] = (byte)(order.foods[i].tastes[2].aliasID & 0x00FF);
+				body[offset + 11] = (byte)((order.foods[i].tastes[2].aliasID & 0xFF00) >> 8);
 				//assign the hang status
 				body[offset + 12] = (byte)(order.foods[i].hangStatus);
 				offset += 13;

@@ -139,7 +139,7 @@ public class Util {
 		String tastePref = "";
 		boolean isTasted = false;
 		for(int i = 0; i < tastes.length; i++){
-			if(tastes[i].alias_id != Taste.NO_TASTE){
+			if(tastes[i].aliasID != Taste.NO_TASTE){
 				isTasted = true;
 				if(tastePref.length() != 0){
 					tastePref += ",";

@@ -153,8 +153,8 @@ public class RespQueryMenu extends RespPackage{
 		int index = 2;
 		for(int i = 0; i < foodMenu.foods.length; i++){
 			//assign the food's id
-			body[index] = (byte)(foodMenu.foods[i].foodAlias & 0x000000FF);
-			body[index + 1] = (byte)((foodMenu.foods[i].foodAlias & 0x0000FF00) >> 8);
+			body[index] = (byte)(foodMenu.foods[i].aliasID & 0x000000FF);
+			body[index + 1] = (byte)((foodMenu.foods[i].aliasID & 0x0000FF00) >> 8);
 			
 			//assign the unit price to this food
 			body[index + 2] = (byte)(foodMenu.foods[i].price & 0x000000FF);
@@ -207,7 +207,7 @@ public class RespQueryMenu extends RespPackage{
 		//assign each kitchen to the body
 		for(int i = 0; i < foodMenu.kitchens.length; i++){
 			//assign the kitchen id
-			body[index] = (byte)(foodMenu.kitchens[i].kitchenAlias & 0x00FF);
+			body[index] = (byte)(foodMenu.kitchens[i].aliasID & 0x00FF);
 			
 			//assign the super kitchen id that this kitchen belong to 
 			body[index + 1] = (byte)(foodMenu.kitchens[i].deptID & 0x00FF);
@@ -289,8 +289,8 @@ public class RespQueryMenu extends RespPackage{
 		//assign each taste preference to the body
 		for(int i = 0; i < tastes.length; i++){
 			//assign the taste preference alias id
-			body[offset] = (byte)(tastes[i].alias_id & 0x00FF);
-			body[offset + 1] = (byte)((tastes[i].alias_id & 0xFF00) >> 8);
+			body[offset] = (byte)(tastes[i].aliasID & 0x00FF);
+			body[offset + 1] = (byte)((tastes[i].aliasID & 0xFF00) >> 8);
 			     
 			//assign the category of taste preference
 			body[offset + 2] = (byte)(tastes[i].category & 0x00FF);

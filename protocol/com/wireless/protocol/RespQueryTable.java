@@ -18,11 +18,13 @@ public final class RespQueryTable extends RespPackage {
 	 * nStaff : <table_1> : ... : <table_2>
 	 * nStaff - the amount of tables
 	 * <table_n>
-	 * len_1 : table_name : table_alias[2] : region : status : category : custom_num
+	 * len_1 : table_name : table_alias[2] : region : service_rate[2] : minimum_cost[4] : status : category : custom_num
 	 * len_1 - the length to the table name
 	 * table_name - the value to table name
 	 * table_alias[2] - the alias id to this table
 	 * region - the region alias id to this table
+	 * service_rate[2] - the service rate to this table
+	 * minimum_cost[4] - the minimum cost to this table
 	 * status - the status to this table
 	 * category - the category to this table
 	 * custom_num - the custom number to this table
@@ -41,6 +43,8 @@ public final class RespQueryTable extends RespPackage {
 					   name.length + 		/* the name to this table */
 					   2 + 					/* the table alias takes up 2-byte */
 					   1 + 					/* the region alias takes up 1-byte */
+					   2 +					/* the service rate takes up 2-byte */
+					   4 +					/* the minimum cost takes up 4-byte */
 					   1 +					/* the status takes up 1-byte */
 					   1 +					/* the category takes up 1-byte */
 					   1 ;					/* the custom number takes up 1-byte */					   
@@ -71,6 +75,18 @@ public final class RespQueryTable extends RespPackage {
 			//assign the region alias
 			body[offset] = (byte)(tables[i].regionID);
 			offset++;
+			
+			//assign the service rate
+			body[offset] = (byte)(tables[i].serviceRate & 0x000000FF);
+			body[offset + 1] = (byte)((tables[i].serviceRate & 0x0000FF00) >> 8);
+			offset += 2;
+			
+			//assign the minimum cost
+			body[offset] = (byte)(tables[i].minimumCost & 0x000000FF);
+			body[offset + 1] = (byte)((tables[i].minimumCost & 0x0000FF00) >> 8);
+			body[offset + 2] = (byte)((tables[i].minimumCost & 0x00FF0000) >> 16);
+			body[offset + 3] = (byte)((tables[i].minimumCost & 0xFF000000) >> 24);
+			offset += 4;
 			
 			//assign the status
 			body[offset] = (byte)(tables[i].status);

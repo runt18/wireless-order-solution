@@ -138,7 +138,7 @@ public class ReqParser {
 				orderFoods[i] = new OrderFood();
 				orderFoods[i].isTemporary = true;
 				orderFoods[i].kitchen = Kitchen.KITCHEN_TEMP;
-				orderFoods[i].foodAlias = foodID;
+				orderFoods[i].aliasID = foodID;
 				orderFoods[i].hangStatus = hangStatus;
 				orderFoods[i].isHurried = isHurried;
 				orderFoods[i].count = orderNum;
@@ -179,14 +179,14 @@ public class ReqParser {
 				offset += 14;
 				
 				orderFoods[i] = new OrderFood();
-				orderFoods[i].foodAlias = foodID;
+				orderFoods[i].aliasID = foodID;
 				orderFoods[i].count = orderNum;
 				
 				orderFoods[i].isTemporary = false;
 				
-				orderFoods[i].tastes[0].alias_id = tasteID[0];
-				orderFoods[i].tastes[1].alias_id = tasteID[1];
-				orderFoods[i].tastes[2].alias_id = tasteID[2];
+				orderFoods[i].tastes[0].aliasID = tasteID[0];
+				orderFoods[i].tastes[1].aliasID = tasteID[1];
+				orderFoods[i].tastes[2].aliasID = tasteID[2];
 				
 				Arrays.sort(orderFoods[i].tastes, new Comparator<Taste>(){
 

@@ -88,10 +88,10 @@ public class OrderFood extends Food {
 			}else if(isTemporary && food.isTemporary){
 				return name.equals(food.name) && (price == food.price) && (hangStatus == food.hangStatus);
 			}else{
-				return foodAlias == food.foodAlias &&
-					   tastes[0].alias_id == food.tastes[0].alias_id &&
-					   tastes[1].alias_id == food.tastes[1].alias_id &&
-					   tastes[2].alias_id == food.tastes[2].alias_id &&
+				return aliasID == food.aliasID &&
+					   tastes[0].aliasID == food.tastes[0].aliasID &&
+					   tastes[1].aliasID == food.tastes[1].aliasID &&
+					   tastes[2].aliasID == food.tastes[2].aliasID &&
 					   hangStatus == food.hangStatus;
 			}
 		}
@@ -104,10 +104,10 @@ public class OrderFood extends Food {
 		if(isTemporary){
 			return name.hashCode() ^ price ^ hangStatus;
 		}else{
-			return new Integer(foodAlias).hashCode() ^ 
-				   new Integer(tastes[0].alias_id).hashCode() ^ 
-				   new Integer(tastes[1].alias_id).hashCode() ^ 
-				   new Integer(tastes[2].alias_id).hashCode() ^ 
+			return new Integer(aliasID).hashCode() ^ 
+				   new Integer(tastes[0].aliasID).hashCode() ^ 
+				   new Integer(tastes[1].aliasID).hashCode() ^ 
+				   new Integer(tastes[2].aliasID).hashCode() ^ 
 				   new Short(hangStatus).hashCode();
 		}
 	}
@@ -118,10 +118,10 @@ public class OrderFood extends Food {
 	 * @return
 	 */
 	public boolean equals2(OrderFood food){
-		return foodAlias == food.foodAlias &&
-		   tastes[0].alias_id == food.tastes[0].alias_id &&
-		   tastes[1].alias_id == food.tastes[1].alias_id &&
-		   tastes[2].alias_id == food.tastes[2].alias_id ;
+		return aliasID == food.aliasID &&
+		   tastes[0].aliasID == food.tastes[0].aliasID &&
+		   tastes[1].aliasID == food.tastes[1].aliasID &&
+		   tastes[2].aliasID == food.tastes[2].aliasID ;
 	}
 	
 	/**
@@ -137,7 +137,7 @@ public class OrderFood extends Food {
 		 */
 		int tastePos = 0;
 		for(; tastePos < tastes.length; tastePos++){
-			if(tastes[tastePos].alias_id == Taste.NO_TASTE){
+			if(tastes[tastePos].aliasID == Taste.NO_TASTE){
 				break;
 			}
 		}
@@ -148,7 +148,7 @@ public class OrderFood extends Food {
 			 */
 			try{
 				//assign the taste id 
-				tastes[tastePos].alias_id = taste.alias_id;
+				tastes[tastePos].aliasID = taste.aliasID;
 				//assign the taste preference 
 				tastes[tastePos].preference = taste.preference;
 				//assign the taste category
@@ -197,7 +197,7 @@ public class OrderFood extends Food {
 		 */
 		int tastePos = 0;
 		for(; tastePos < tastes.length; tastePos++){
-			if(taste.alias_id == tastes[tastePos].alias_id){
+			if(taste.aliasID == tastes[tastePos].aliasID){
 				break;
 			}
 		}
@@ -262,7 +262,7 @@ public class OrderFood extends Food {
 
 	public OrderFood(Food food){
 		super(food.foodID,
-			  food.foodAlias,
+			  food.aliasID,
 			  food.name,
 			  food.getPrice(),
 			  food.kitchen,
@@ -281,7 +281,7 @@ public class OrderFood extends Food {
 	public String toString(){
 		String taste = null;
 		for(int i = 0; i < tastes.length; i++){
-			if(tastes[i].alias_id != Taste.NO_TASTE){
+			if(tastes[i].aliasID != Taste.NO_TASTE){
 				if(taste != null){
 					taste += "," + tastes[i].preference;
 				}else{

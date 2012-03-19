@@ -132,7 +132,7 @@ public class RespParser {
 					
 					orderFoods[i] = new OrderFood();
 					orderFoods[i].isTemporary = true;
-					orderFoods[i].foodAlias = foodID;
+					orderFoods[i].aliasID = foodID;
 					orderFoods[i].hangStatus = hangStatus;
 					orderFoods[i].count = orderAmount;
 					orderFoods[i].setPrice(Util.int2Float(unitPrice));
@@ -170,14 +170,14 @@ public class RespParser {
 					
 					orderFoods[i] = new OrderFood();
 					orderFoods[i].isTemporary = false;
-					orderFoods[i].foodAlias = foodID;
+					orderFoods[i].aliasID = foodID;
 					orderFoods[i].count = orderAmount;
 					orderFoods[i].status = status;
 					
 					//Arrays.sort(tasteID, 0, tasteID.length);
-					orderFoods[i].tastes[0].alias_id = tasteID[0];
-					orderFoods[i].tastes[1].alias_id = tasteID[1];
-					orderFoods[i].tastes[2].alias_id = tasteID[2];
+					orderFoods[i].tastes[0].aliasID = tasteID[0];
+					orderFoods[i].tastes[1].aliasID = tasteID[1];
+					orderFoods[i].tastes[2].aliasID = tasteID[2];
 					
 					orderFoods[i].hangStatus = hangStatus;
 				}
@@ -193,7 +193,7 @@ public class RespParser {
 			if(!order.foods[i].isTemporary){
 				//get the food name, unit price and attached kitchen
 				for(int j = 0; j < foodMenu.foods.length; j++){
-					if(order.foods[i].foodAlias == foodMenu.foods[j].foodAlias){
+					if(order.foods[i].aliasID == foodMenu.foods[j].aliasID){
 						order.foods[i].name = foodMenu.foods[j].name;
 						order.foods[i].setPrice(foodMenu.foods[j].getPrice());
 						order.foods[i].kitchen = foodMenu.foods[j].kitchen;
@@ -204,21 +204,21 @@ public class RespParser {
 				for(int j = 0; j < order.foods[i].tastes.length; j++){
 
 					//search and get the taste match the alias id
-					Taste taste = srchTaste(order.foods[i].tastes[j].alias_id, foodMenu.tastes);
+					Taste taste = srchTaste(order.foods[i].tastes[j].aliasID, foodMenu.tastes);
 					if(taste != null){
 						order.foods[i].tastes[j] = taste;
 						continue;
 					}
 					
 					//search and get the style match the alias id
-					Taste style = srchTaste(order.foods[i].tastes[j].alias_id, foodMenu.styles);
+					Taste style = srchTaste(order.foods[i].tastes[j].aliasID, foodMenu.styles);
 					if(style != null){
 						order.foods[i].tastes[j] = style;
 						continue;
 					}
 					
 					//search and get the specification match the alias id
-					Taste spec = srchTaste(order.foods[i].tastes[j].alias_id, foodMenu.specs);
+					Taste spec = srchTaste(order.foods[i].tastes[j].aliasID, foodMenu.specs);
 					if(spec != null){
 						order.foods[i].tastes[j] = spec;
 						continue;
@@ -247,11 +247,11 @@ public class RespParser {
 			Taste taste = null;
 			
 			for(int i = 0; i < tasteSrc.length; i++){
-				if(aliasID == tasteSrc[i].alias_id){
+				if(aliasID == tasteSrc[i].aliasID){
 					
 					taste = new Taste();
 					
-					taste.alias_id = tasteSrc[i].alias_id;
+					taste.aliasID = tasteSrc[i].aliasID;
 					taste.preference = tasteSrc[i].preference;
 					taste.setPrice(tasteSrc[i].getPrice());
 					taste.calc = tasteSrc[i].calc;
@@ -355,7 +355,7 @@ public class RespParser {
 			for(int i = 0; i < nFoods; i++){
 				Food food = new Food();
 				//get the food's id
-				food.foodAlias = (response.body[index] & 0x000000FF) |
+				food.aliasID = (response.body[index] & 0x000000FF) |
 							((response.body[index + 1] & 0x000000FF) << 8);
 				
 				//get the food's price
@@ -529,7 +529,11 @@ public class RespParser {
 			offset += 2 + 1 + 1 + 3 + 2 + 1 + length;
 			
 			//add the taste
-			tastes[i] = new Taste(alias_id, preference, category, calcType, 
+			tastes[i] = new Taste(0,
+								  alias_id, 
+								  preference, 
+								  category, 
+								  calcType, 
 							      Util.int2Float(rate),
 							      Util.int2Float(price));
 		}
@@ -635,7 +639,7 @@ public class RespParser {
 	/**
 	 * Parse the response associated with the query staff. 
 	 * @param response The response containing the staff info.
-	 * @return The staff info.
+	 * @return Return the array of staff info, null if no staff info.
 	 */
 	public static StaffTerminal[] parseQueryStaff(ProtocolPackage response){
 		/******************************************************
@@ -660,45 +664,48 @@ public class RespParser {
 		 * pwd - the value to the staff password
 		 * pin[4] - 4-byte indicating the pin
 		 *******************************************************/	
-		StaffTerminal[] staffs = new StaffTerminal[0];
+		StaffTerminal[] staffs = null;
 		try{
 			//get the amount to staff
 			int nStaff = response.body[0];
 			
-			staffs = new StaffTerminal[nStaff];
-			
-			int offset = 1;
-			for(int i = 0; i < nStaff; i++){
+			if(nStaff > 0){
+				staffs = new StaffTerminal[nStaff];
 				
-				staffs[i] = new StaffTerminal();
-				
-				//get the length to this staff name
-				int nameLen = response.body[offset];
-				offset++;
-				
-				//get the value to this staff name
-				if(nameLen > 0){
-					staffs[i].name = new String(response.body, offset, nameLen, "UTF-16BE");
-					offset += nameLen;
-				}
-				
-				//get the length to staff password
-				int pwdLen = response.body[offset];
-				offset++;
-				
-				//get the value to this staff name
-				if(pwdLen > 0){
-					staffs[i].pwd = new String(response.body, offset, pwdLen);
-					offset += pwdLen;
-				}
-				
-				//get the pin to this staff
-				staffs[i].pin = ((long)response.body[offset] & 0x00000000000000FF) |
-					   	   		(((long)response.body[offset + 1] & 0x00000000000000FF) << 8) |
-					   	   		(((long)response.body[offset + 2] & 0x00000000000000FF) << 16) |
-					   	   		(((long)response.body[offset + 3] & 0x00000000000000FF) << 24);
-				offset += 4;
-			}		
+				int offset = 1;
+				for(int i = 0; i < nStaff; i++){
+					
+					staffs[i] = new StaffTerminal();
+					
+					//get the length to this staff name
+					int nameLen = response.body[offset];
+					offset++;
+					
+					//get the value to this staff name
+					if(nameLen > 0){
+						staffs[i].name = new String(response.body, offset, nameLen, "UTF-16BE");
+						offset += nameLen;
+					}
+					
+					//get the length to staff password
+					int pwdLen = response.body[offset];
+					offset++;
+					
+					//get the value to this staff name
+					if(pwdLen > 0){
+						staffs[i].pwd = new String(response.body, offset, pwdLen);
+						offset += pwdLen;
+					}
+					
+					//get the pin to this staff
+					staffs[i].pin = ((long)response.body[offset] & 0x00000000000000FF) |
+						   	   		(((long)response.body[offset + 1] & 0x00000000000000FF) << 8) |
+						   	   		(((long)response.body[offset + 2] & 0x00000000000000FF) << 16) |
+						   	   		(((long)response.body[offset + 3] & 0x00000000000000FF) << 24);
+					offset += 4;
+				}		
+
+			}			
 			
 		}catch(UnsupportedEncodingException e){
 			
@@ -710,7 +717,7 @@ public class RespParser {
 	/**
 	 * Parse the response associated with the query table. 
 	 * @param response The response containing the table info.
-	 * @return The table info.
+	 * @return Return the array of table info, null if no table info.
 	 */
 	public static Table[] parseQueryTable(ProtocolPackage response){
 		/******************************************************
@@ -728,53 +735,73 @@ public class RespParser {
 		 * nStaff : <table_1> : ... : <table_2>
 		 * nStaff - the amount of tables
 		 * <table_n>
-		 * len_1 : table_name : table_alias[2] : region : status : category : custom_num
+		 * len_1 : table_name : table_alias[2] : region : service_rate[2] : minimum_cost[4] : status : category : custom_num
 		 * len_1 - the length to the table name
 		 * table_name - the value to table name
 		 * table_alias[2] - the alias id to this table
 		 * region - the region alias id to this table
+		 * service_rate[2] - the service rate to this table
+		 * minimum_cost[4] - the minimum cost to this table
 		 * status - the status to this table
 		 * category - the category to this table
 		 * custom_num - the custom number to this table
 		 *******************************************************/
-		Table[] tables = new Table[0];
+		Table[] tables = null;
 		try{
 			//get the amount to staff
 			int nTable = response.body[0];
-			tables = new Table[nTable];
 			
-			int offset = 1;
-			for(int i = 0; i < tables.length; i++){
-				//get the length to this table name
-				int nameLen = response.body[offset];
-				offset++;
+			if(nTable > 0){
+				tables = new Table[nTable];
 				
-				//get the value to this table name
-				if(nameLen > 0){
-					tables[i].name = new String(response.body, offset, nameLen, "UTF-16BE");
-					offset += nameLen;
+				int offset = 1;
+				for(int i = 0; i < tables.length; i++){
+					
+					tables[i] = new Table();
+					
+					//get the length to this table name
+					int nameLen = response.body[offset];
+					offset++;
+					
+					//get the value to this table name
+					if(nameLen > 0){
+						tables[i].name = new String(response.body, offset, nameLen, "UTF-16BE");
+						offset += nameLen;
+					}
+					
+					//get the table alias
+					tables[i].aliasID = ((int)(response.body[offset] & 0x000000FF)) | 
+										((int)(response.body[offset + 1] & 0x000000FF) << 8);
+					offset += 2;
+					
+					//get the region alias
+					tables[i].regionID = response.body[offset];
+					offset++;
+					
+					//get the service rate
+					tables[i].serviceRate = (response.body[offset] & 0x000000FF) |
+										    ((response.body[offset + 1] & 0x000000FF) << 8);
+					offset += 2;
+					
+					//get the minimum cost
+					tables[i].minimumCost = (response.body[offset] & 0x000000FF) | 
+											((response.body[offset + 1] & 0x000000FF) << 8) |
+											((response.body[offset + 2] & 0x000000FF) << 16) |
+											((response.body[offset + 3] & 0x000000FF) << 24);
+					offset += 4;
+					
+					//get the status
+					tables[i].status = response.body[offset];
+					offset++;
+					
+					//get the category
+					tables[i].category = response.body[offset];
+					offset++;
+					
+					//get the custom number;
+					tables[i].custom_num = response.body[offset];
+					offset++;
 				}
-				
-				//get the table alias
-				tables[i].aliasID = ((int)(response.body[offset] & 0x000000FF)) | 
-									((int)(response.body[offset + 1] & 0x000000FF) << 8);
-				offset += 2;
-				
-				//get the region alias
-				tables[i].regionID = response.body[offset];
-				offset++;
-				
-				//get the status
-				tables[i].status = response.body[offset];
-				offset++;
-				
-				//get the category
-				tables[i].category = response.body[offset];
-				offset++;
-				
-				//get the custom number;
-				tables[i].custom_num = response.body[offset];
-				offset++;
 			}
 			
 		}catch(UnsupportedEncodingException e){
@@ -786,7 +813,7 @@ public class RespParser {
 	/**
 	 * Parse the response associated with the query region. 
 	 * @param response The response containing the region info.
-	 * @return The region info.
+	 * @return Return the array of region info, null if no region info.
 	 */
 	public static Region[] parseQueryRegion(ProtocolPackage response){
 		/******************************************************
@@ -809,30 +836,35 @@ public class RespParser {
 		 * region_name - the value to region name
 		 * region_alias[2] - the alias id to this region
 		 *******************************************************/
-		Region[] regions = new Region[0];
+		Region[] regions = null;
 		try{
 			//get the amount to staff
 			int nRegion = response.body[0];
-			regions = new Region[nRegion];
 			
-			int offset = 1;
-			for(int i = 0; i < regions.length; i++){
-				//get the length to this region name
-				int nameLen = response.body[offset];
-				offset++;
+			if(nRegion > 0){
+				regions = new Region[nRegion];
 				
-				//get the value to this region name
-				if(nameLen > 0){
-					regions[i].name = new String(response.body, offset, nameLen, "UTF-16BE");
-					offset += nameLen;
+				int offset = 1;
+				for(int i = 0; i < regions.length; i++){
+					
+					regions[i] = new Region();
+					
+					//get the length to this region name
+					int nameLen = response.body[offset];
+					offset++;
+					
+					//get the value to this region name
+					if(nameLen > 0){
+						regions[i].name = new String(response.body, offset, nameLen, "UTF-16BE");
+						offset += nameLen;
+					}
+					
+					//get the region alias
+					regions[i].regionID = (short)(((int)(response.body[offset] & 0x0000000FF)) | 
+										((int)(response.body[offset + 1] & 0x0000000FF) << 8));
+					offset += 2;				
 				}
-				
-				//get the region alias
-				regions[i].regionID = (short)(((int)(response.body[offset] & 0x0000000FF)) | 
-									((int)(response.body[offset + 1] & 0x0000000FF) << 8));
-				offset += 2;				
-			}
-			
+			}			
 		}catch(UnsupportedEncodingException e){
 			
 		}

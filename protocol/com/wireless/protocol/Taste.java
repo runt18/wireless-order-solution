@@ -12,7 +12,8 @@ public class Taste {
 	public final static short CALC_PRICE = 0;	/* 按价格计算  */
 	public final static short CALC_RATE = 1;	/* 按比例计算  */
 	
-	public int alias_id = Taste.NO_TASTE;
+	public int tasteID = 0;
+	public int aliasID = Taste.NO_TASTE;
 	public String preference = Taste.NO_PREFERENCE;
 	public short category = Taste.CATE_TASTE;
 	public short calc = Taste.CALC_PRICE;
@@ -34,14 +35,10 @@ public class Taste {
 
 	}
 	
-	public Taste(int id, String pref){
-		alias_id = id;
+	public Taste(int id, int alias, String pref, short cate, short calcType, Float _rate, Float _price){
+		tasteID = id;
+		aliasID = alias;
 		preference = pref.trim();
-	}
-	
-	public Taste(int id, String pref, short cate, short calcType, Float _rate, Float _price){
-		alias_id = id;
-		preference = pref;
 		category = cate;
 		calc = calcType;
 		setRate(_rate);
@@ -56,15 +53,15 @@ public class Taste {
 	 * @return
 	 */
 	public int compare(Taste taste2){
-		if(this.alias_id == taste2.alias_id){
+		if(this.aliasID == taste2.aliasID){
 			return 0;
-		}else if(this.alias_id == Taste.NO_TASTE){
+		}else if(this.aliasID == Taste.NO_TASTE){
 			return 1;
-		}else if(taste2.alias_id == Taste.NO_TASTE){
+		}else if(taste2.aliasID == Taste.NO_TASTE){
 			return -1;
-		}else if(this.alias_id > taste2.alias_id){
+		}else if(this.aliasID > taste2.aliasID){
 			return 1;
-		}else if(this.alias_id < taste2.alias_id){
+		}else if(this.aliasID < taste2.aliasID){
 			return -1;
 		}else{
 			return 0;
