@@ -2,7 +2,7 @@ package com.wireless.common;
 
 public final class Params {
 	//The name to share preferences
-	public final static String PREFS_NAME = "TermPref";
+	public final static String PREFS_NAME = "TermPadPref";
 	//The name to Pin
 	public final static String PIN = "Pin";
 	//The name to "ºó³ø´òÓ¡"
@@ -32,7 +32,7 @@ public final class Params {
 	public final static int TIME_OUT_20s = 2;		//20s
 	
 	/* The default IP address */
-	public final static String DEF_IP_ADDR = "122.115.57.66";
+	public final static String DEF_IP_ADDR = "125.88.20.194";
 	
 	/* The default IP port */
 	public final static int DEF_IP_PORT = 55555;
