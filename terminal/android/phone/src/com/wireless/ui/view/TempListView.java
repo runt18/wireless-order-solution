@@ -1,6 +1,7 @@
 package com.wireless.ui.view;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import android.content.Context;
@@ -38,7 +39,15 @@ public class TempListView extends ListView {
 	 * @return
 	 */
 	public List<OrderFood> getSourceData(){		
-		return new ArrayList<OrderFood>(_tmpFoods);
+		ArrayList<OrderFood> foods = new ArrayList<OrderFood>(_tmpFoods);
+		//filter the temporary foods without food name
+		Iterator<OrderFood> iter = foods.iterator();
+		while (iter.hasNext()) {
+			if (iter.next().name.equals("")) {
+				iter.remove();
+			}
+		}
+		return foods;
 	}	
 	
 	/**

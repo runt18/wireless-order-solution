@@ -3,7 +3,6 @@ package com.wireless.ui;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 
 import android.app.Dialog;
@@ -204,14 +203,7 @@ public class PickFoodActivity extends TabActivity implements
 		// Add the temporary foods to the picked food list
 		// except the ones without food name
 		if (_tempLstView != null) {
-			List<OrderFood> tmpFoods = _tempLstView.getSourceData();
-			Iterator<OrderFood> iter = tmpFoods.iterator();
-			while (iter.hasNext()) {
-				if (iter.next().name.equals("")) {
-					iter.remove();
-				}
-			}
-			_pickFoods.addAll(tmpFoods);
+			_pickFoods.addAll(_tempLstView.getSourceData());
 		}
 
 		Intent intent = new Intent();

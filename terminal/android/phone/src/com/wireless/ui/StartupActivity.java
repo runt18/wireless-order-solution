@@ -324,7 +324,7 @@ public class StartupActivity extends Activity {
 		 */
 		@Override
 		protected void onPreExecute(){			
-			_msgTxtView.setText("更新菜谱信息...请稍候");
+			_msgTxtView.setText("更新餐厅信息...请稍候");
 		}
 		
 		/**
