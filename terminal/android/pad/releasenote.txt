@@ -1,0 +1,16 @@
+/******************** (C) COPYRIGHT Digi-e Co.,Ltd*****************************
+* Author                : Ying.Zhang
+* Create Date        	: 20/03/2012
+* Description         	: The release note of Android pad terminal for wireless order project
+*******************************************************************************/
+
+/******************************************************************************************************
+Release v1.0.0 <xx/xx/2011> 
+<General Info>
+1 - Release on xx/xx/2011
+2 - Source code is tagged as "1.1.4" in Google Code's SVN
+3 - Build under Eclipse
+<Issues>
+1 - First release to Android Pad
+******************************************************************************************************/
+
