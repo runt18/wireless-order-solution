@@ -131,17 +131,33 @@ IF NOT EXIST terminal\blackberry\deliverables\Web\4.5.0\WirelessOrderTerminal.co
 
 Rem copy the AndroidManifest.xml and apk file
 :android_apk
-IF EXIST terminal\android\bin\WirelessOrderTerminal_Android.apk GOTO apk_exist
-IF NOT EXIST terminal\android\bin\WirelessOrderTerminal_Android.apk GOTO apk_not_exist
+IF EXIST terminal\android\phone\bin\WirelessOrderTerminal_Android.apk GOTO apk_exist
+IF NOT EXIST terminal\android\phone\bin\WirelessOrderTerminal_Android.apk GOTO apk_not_exist
 :apk_exist
 	@echo copying the android apk files...
 	IF NOT EXIST dist\www\ota\android\phone mkdir dist\www\ota\android\phone
-	@copy terminal\android\version.php dist\www\ota\android\phone > nul
-	@copy terminal\android\AndroidManifest.xml dist\www\ota\android\phone > nul
-	@copy terminal\android\bin\WirelessOrderTerminal_Android.apk dist\www\ota\android\phone > nul
-	GOTO pserver_files
+	@copy terminal\android\phone\version.php dist\www\ota\android\phone > nul
+	@copy terminal\android\phone\AndroidManifest.xml dist\www\ota\android\phone > nul
+	@copy terminal\android\phone\bin\WirelessOrderTerminal_Android.apk dist\www\ota\android\phone > nul
+	GOTO android_pad_apk
 :apk_not_exist
-	@echo the apk file for android phone terminal missing
+	@echo the android phone apk file for android phone terminal missing
+	@pause
+	GOTO end
+	
+Rem copy the AndroidManifest.xml and apk file
+:android_pad_apk
+IF EXIST terminal\android\pad\bin\WirelessOrderTerminal_Pad.apk GOTO pad_apk_exist
+IF NOT EXIST terminal\android\pad\bin\WirelessOrderTerminal_Pad.apk GOTO pad_apk_not_exist
+:pad_apk_exist
+	@echo copying the android pad apk files...
+	IF NOT EXIST dist\www\ota\android\pad mkdir dist\www\ota\android\pad
+	@copy terminal\android\pad\version.php dist\www\ota\android\pad > nul
+	@copy terminal\android\pad\AndroidManifest.xml dist\www\ota\android\pad > nul
+	@copy terminal\android\pad\bin\WirelessOrderTerminal_Pad.apk dist\www\ota\android\pad > nul
+	GOTO pserver_files
+:pad_apk_not_exist
+	@echo the android pad apk file for android phone terminal missing
 	@pause
 	GOTO end
 	
