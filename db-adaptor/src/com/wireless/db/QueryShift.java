@@ -7,10 +7,29 @@ import java.util.TimeZone;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
-import com.wireless.protocol.Shift;
 import com.wireless.protocol.Terminal;
 
 public class QueryShift {
+	
+	public static class Result{
+		public String onDuty;			//开始时间
+		public String offDuty;			//结束时间
+		public int orderAmount;			//账单数
+		public Float totalCash;			//现金金额
+		public Float totalCash2;		//现金实收
+		public Float totalCreditCard;	//刷卡金额
+		public Float totalCreditCard2;	//刷卡实收
+		public Float totalMemberCard;	//会员卡金额
+		public Float totalMemberCard2;	//会员卡实收
+		public Float totalSign;			//签单金额
+		public Float totalSign2;		//签单实收
+		public Float totalHang;			//挂账金额
+		public Float totalHang2;		//挂账实收
+		public Float totalActual;		//合计实收金额
+		public Float totalDiscount;		//合计折扣金额
+		public Float totalGift;			//合计赠送金额
+	}
+	
 	/**
 	 * Perform to query the shift information through now to last shift.
 	 * 
@@ -27,7 +46,7 @@ public class QueryShift {
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
-	public static Shift exec(long pin, short model) throws BusinessException, SQLException{
+	public static Result exec(long pin, short model) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -56,7 +75,7 @@ public class QueryShift {
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
-	public static Shift exec(DBCon dbCon, long pin, short model) throws BusinessException, SQLException{
+	public static Result exec(DBCon dbCon, long pin, short model) throws BusinessException, SQLException{
 		
 		Terminal term = VerifyPin.exec(dbCon, pin, model);
 		
@@ -104,7 +123,7 @@ public class QueryShift {
 	 * @throws SQLException
 	 * 				throws if fail to execute any SQL statement
 	 */
-	public static Shift exec2(long pin, short model) throws BusinessException, SQLException{
+	public static Result exec2(long pin, short model) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -134,7 +153,7 @@ public class QueryShift {
 	 * @throws SQLException
 	 * 				throws if fail to execute any SQL statement
 	 */
-	public static Shift exec2(DBCon dbCon, long pin, short model) throws BusinessException, SQLException{
+	public static Result exec2(DBCon dbCon, long pin, short model) throws BusinessException, SQLException{
 		
 		Terminal term = VerifyPin.exec(dbCon, pin, model);
 		
@@ -172,7 +191,7 @@ public class QueryShift {
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
 	 */
-	private static Shift genShiftDetail(DBCon dbCon, Terminal term, String onDuty, String offDuty) throws SQLException{
+	private static Result genShiftDetail(DBCon dbCon, Terminal term, String onDuty, String offDuty) throws SQLException{
 		/**
 		 * Get the amount the order within this shift
 		 */
@@ -290,24 +309,24 @@ public class QueryShift {
 		totalGift = (float)Math.round(totalGift * 100) / 100;
 		totalDiscount = (float)Math.round(totalDiscount * 100) / 100;
 		
-		Shift shift = new Shift();
-		shift.onDuty = onDuty;
-		shift.offDuty = offDuty;
-		shift.orderAmount = orderAmount;
-		shift.totalActual = (float)Math.round(totalActual * 100) / 100;
-		shift.totalCash = (float)Math.round(totalCash * 100) / 100;
-		shift.totalCash2 = (float)Math.round(totalCash_2 * 100) / 100;
-		shift.totalCreditCard = (float)Math.round(totalCreditCard * 100) / 100;
-		shift.totalCreditCard2 = (float)Math.round(totalCreditCard_2 * 100) / 100;
-		shift.totalDiscount = (float)Math.round(totalDiscount * 100) / 100;
-		shift.totalGift = (float)Math.round(totalGift * 100) / 100;
-		shift.totalHang = (float)Math.round(totalHang * 100) / 100;
-		shift.totalHang2 = (float)Math.round(totalHang_2 * 100) / 100;
-		shift.totalMemberCard = (float)Math.round(totalMemberCard * 100) / 100;
-		shift.totalMemberCard2 = (float)Math.round(totalMemberCard_2 * 100) / 100;
-		shift.totalSign = (float)Math.round(totalSign * 100) / 100;
-		shift.totalSign2 = (float)Math.round(totalSign_2 * 100) / 100;
-		return shift;
+		Result result = new Result();
+		result.onDuty = onDuty;
+		result.offDuty = offDuty;
+		result.orderAmount = orderAmount;
+		result.totalActual = (float)Math.round(totalActual * 100) / 100;
+		result.totalCash = (float)Math.round(totalCash * 100) / 100;
+		result.totalCash2 = (float)Math.round(totalCash_2 * 100) / 100;
+		result.totalCreditCard = (float)Math.round(totalCreditCard * 100) / 100;
+		result.totalCreditCard2 = (float)Math.round(totalCreditCard_2 * 100) / 100;
+		result.totalDiscount = (float)Math.round(totalDiscount * 100) / 100;
+		result.totalGift = (float)Math.round(totalGift * 100) / 100;
+		result.totalHang = (float)Math.round(totalHang * 100) / 100;
+		result.totalHang2 = (float)Math.round(totalHang_2 * 100) / 100;
+		result.totalMemberCard = (float)Math.round(totalMemberCard * 100) / 100;
+		result.totalMemberCard2 = (float)Math.round(totalMemberCard_2 * 100) / 100;
+		result.totalSign = (float)Math.round(totalSign * 100) / 100;
+		result.totalSign2 = (float)Math.round(totalSign_2 * 100) / 100;
+		return result;
 	}
 	
 }
