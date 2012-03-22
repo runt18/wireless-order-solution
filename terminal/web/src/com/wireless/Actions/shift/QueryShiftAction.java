@@ -16,7 +16,6 @@ import com.wireless.db.DBCon;
 import com.wireless.db.QueryShift;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.Shift;
 import com.wireless.protocol.Terminal;
 
 public class QueryShiftAction extends Action {
@@ -38,7 +37,7 @@ public class QueryShiftAction extends Action {
 			 */
 			String pin = request.getParameter("pin");
 					
-			Shift shift = QueryShift.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
+			QueryShift.Result result = QueryShift.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
 			
 			/**
 			 * The json to shift record like below
@@ -50,22 +49,22 @@ public class QueryShiftAction extends Action {
 			String jsonOrder = "[\"$(on_duty)\",\"$(off_duty)\",\"$(orderAmount)\",\"$(cash)\",\"$(cash_2)\",\"$(credit_card)\",\"$(credit_card_2)\"," +
 								"\"$(member)\",\"$(member_2)\",\"$(sign)\",\"$(sign_2)\",\"$(hang)\",\"$(hang_2)\"," +
 								"\"$(totalActual)\",\"$(totalDiscount)\",\"$(totalGifted)\"]";
-			jsonOrder = jsonOrder.replace("$(on_duty)", shift.onDuty);
-			jsonOrder = jsonOrder.replace("$(off_duty)", shift.offDuty);
-			jsonOrder = jsonOrder.replace("$(orderAmount)", Integer.toString(shift.orderAmount));
-			jsonOrder = jsonOrder.replace("$(cash)", shift.totalCash.toString());
-			jsonOrder = jsonOrder.replace("$(cash_2)", shift.totalCash2.toString());
-			jsonOrder = jsonOrder.replace("$(credit_card)", shift.totalCreditCard.toString());
-			jsonOrder = jsonOrder.replace("$(credit_card_2)", shift.totalCreditCard2.toString());
-			jsonOrder = jsonOrder.replace("$(member)", shift.totalMemberCard.toString());
-			jsonOrder = jsonOrder.replace("$(member_2)", shift.totalMemberCard2.toString());
-			jsonOrder = jsonOrder.replace("$(sign)", shift.totalSign.toString());
-			jsonOrder = jsonOrder.replace("$(sign_2)", shift.totalSign2.toString());
-			jsonOrder = jsonOrder.replace("$(hang)", shift.totalHang.toString());
-			jsonOrder = jsonOrder.replace("$(hang_2)", shift.totalHang2.toString());
-			jsonOrder = jsonOrder.replace("$(totalActual)", shift.totalActual.toString());
-			jsonOrder = jsonOrder.replace("$(totalDiscount)", shift.totalDiscount.toString());
-			jsonOrder = jsonOrder.replace("$(totalGifted)", shift.totalGift.toString());
+			jsonOrder = jsonOrder.replace("$(on_duty)", result.onDuty);
+			jsonOrder = jsonOrder.replace("$(off_duty)", result.offDuty);
+			jsonOrder = jsonOrder.replace("$(orderAmount)", Integer.toString(result.orderAmount));
+			jsonOrder = jsonOrder.replace("$(cash)", result.totalCash.toString());
+			jsonOrder = jsonOrder.replace("$(cash_2)", result.totalCash2.toString());
+			jsonOrder = jsonOrder.replace("$(credit_card)", result.totalCreditCard.toString());
+			jsonOrder = jsonOrder.replace("$(credit_card_2)", result.totalCreditCard2.toString());
+			jsonOrder = jsonOrder.replace("$(member)", result.totalMemberCard.toString());
+			jsonOrder = jsonOrder.replace("$(member_2)", result.totalMemberCard2.toString());
+			jsonOrder = jsonOrder.replace("$(sign)", result.totalSign.toString());
+			jsonOrder = jsonOrder.replace("$(sign_2)", result.totalSign2.toString());
+			jsonOrder = jsonOrder.replace("$(hang)", result.totalHang.toString());
+			jsonOrder = jsonOrder.replace("$(hang_2)", result.totalHang2.toString());
+			jsonOrder = jsonOrder.replace("$(totalActual)", result.totalActual.toString());
+			jsonOrder = jsonOrder.replace("$(totalDiscount)", result.totalDiscount.toString());
+			jsonOrder = jsonOrder.replace("$(totalGifted)", result.totalGift.toString());
 			
 			jsonResp = jsonResp.replace("$(result)", "true");
 			jsonResp = jsonResp.replace("$(value)", jsonOrder);

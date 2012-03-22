@@ -152,9 +152,9 @@ public class QueryMenuMgrAction extends Action {
 				// dbCon.rs.close();
 
 				HashMap resultMap = new HashMap();
-				resultMap.put("foodID", new Long(foods[i].food_id).toString());
+				resultMap.put("foodID", new Long(foods[i].foodID).toString());
 				resultMap.put("dishNumber",
-						new Integer(foods[i].alias_id).toString());
+						new Integer(foods[i].aliasID).toString());
 				resultMap.put("dishName", foods[i].name);
 				resultMap.put("dishSpill", foods[i].pinyin);
 				resultMap.put("dishPrice",

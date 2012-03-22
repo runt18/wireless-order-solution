@@ -132,8 +132,8 @@ public class QueryTasteAction extends Action {
 				// ID，別名編號，名稱，價錢，比例，種類，計算方法
 				HashMap resultMap = new HashMap();
 
-				resultMap.put("tasteID", tastes[i].alias_id);
-				resultMap.put("tasteAlias", tastes[i].alias_id);
+				resultMap.put("tasteID", tastes[i].aliasID);
+				resultMap.put("tasteAlias", tastes[i].aliasID);
 				resultMap.put("tasteName", tastes[i].preference);
 				resultMap.put("tastePrice", tastes[i].getPrice());
 				resultMap.put("tasteRate", tastes[i].getRate());

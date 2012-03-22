@@ -75,11 +75,11 @@ public class QueryOrderAction extends Action {
 										   "$(count),\"$(unit_price)\",$(special),$(recommend),$(soldout)," +
 										   "$(gift),$(discount),$(taste_id2),$(taste_id3),\"$(taste_price)\",$(currPrice),$(temporary)]";
 					jsonOrderFood = jsonOrderFood.replace("$(food)", order.foods[i].name);
-					jsonOrderFood = jsonOrderFood.replace("$(food_id)", new Integer(order.foods[i].alias_id).toString());
+					jsonOrderFood = jsonOrderFood.replace("$(food_id)", new Integer(order.foods[i].aliasID).toString());
 					jsonOrderFood = jsonOrderFood.replace("$(kitchen)", new Short(order.foods[i].kitchen).toString());
 					jsonOrderFood = jsonOrderFood.replace("$(taste)", order.foods[i].tastePref.replaceAll(",", "；"));
 					//FIX ME!!!
-					jsonOrderFood = jsonOrderFood.replace("$(taste_id)", Integer.toString(order.foods[i].tastes[0].alias_id));
+					jsonOrderFood = jsonOrderFood.replace("$(taste_id)", Integer.toString(order.foods[i].tastes[0].aliasID));
 					jsonOrderFood = jsonOrderFood.replace("$(count)", Util.float2String2(order.foods[i].getCount()));
 					//float unitPrice = order.foods[i].getPrice() + order.foods[i].getTastePrice();
 					jsonOrderFood = jsonOrderFood.replace("$(unit_price)", Util.CURRENCY_SIGN + order.foods[i].getPrice());
@@ -89,8 +89,8 @@ public class QueryOrderAction extends Action {
 					jsonOrderFood = jsonOrderFood.replace("$(soldout)", order.foods[i].isSellOut() ? "true" : "false");
 					jsonOrderFood = jsonOrderFood.replace("$(gift)", order.foods[i].isGift() ? "true" : "false");
 					jsonOrderFood = jsonOrderFood.replace("$(discount)", order.foods[i].getDiscount().toString());
-					jsonOrderFood = jsonOrderFood.replace("$(taste_id2)", Integer.toString(order.foods[i].tastes[1].alias_id));
-					jsonOrderFood = jsonOrderFood.replace("$(taste_id3)", Integer.toString(order.foods[i].tastes[2].alias_id));
+					jsonOrderFood = jsonOrderFood.replace("$(taste_id2)", Integer.toString(order.foods[i].tastes[1].aliasID));
+					jsonOrderFood = jsonOrderFood.replace("$(taste_id3)", Integer.toString(order.foods[i].tastes[2].aliasID));
 					jsonOrderFood = jsonOrderFood.replace("$(currPrice)", order.foods[i].isCurPrice() ? "true" : "false");
 					jsonOrderFood = jsonOrderFood.replace("$(temporary)", order.foods[i].isTemporary ? "true" : "false");
 

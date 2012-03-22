@@ -155,7 +155,7 @@ public class MenuStatisticsAction extends Action {
 			float SumPrice = 0;
 			for (int i = 0; i < orderFoods.length; i++) {
 				OrderFood orderFood = orderFoods[i];
-				int thisFoodId = orderFood.alias_id;
+				int thisFoodId = orderFood.aliasID;
 
 				if (thisFoodId != lastFoodId) {
 					if (rowCount != 0) {

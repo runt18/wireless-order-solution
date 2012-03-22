@@ -115,7 +115,7 @@ public class UpdateOrderAction2 extends Action{
 			orderToUpdate.foods = Util.toFoodArray(request.getParameter("foods"));
 			
 			UpdateOrder.execByID(Long.parseLong(pin), Terminal.MODEL_STAFF, orderToUpdate, true);
-			PayOrder.execByID(Long.parseLong(pin), Terminal.MODEL_STAFF, orderToUpdate);
+			PayOrder.execByID(Long.parseLong(pin), Terminal.MODEL_STAFF, orderToUpdate, true);
 			
 			jsonResp = jsonResp.replace("$(result)", "true");	
 			jsonResp = jsonResp.replace("$(value)", orderID + "号账单修改成功");

@@ -82,7 +82,7 @@ public class Util {
 						isUnique = true;
 						for(int j = 0; j < i; j++){
 							if(foods[j].isTemporary){
-								if(tmpFoodID == foods[j].alias_id){
+								if(tmpFoodID == foods[j].aliasID){
 									isUnique = false;
 									break;
 								}
@@ -90,11 +90,11 @@ public class Util {
 						}						
 					}while(!isUnique);
 					
-					foods[i].alias_id = tmpFoodID;
+					foods[i].aliasID = tmpFoodID;
 					
 				}else{			
 					//assign the alias id
-					foods[i].alias_id = aliasID;					
+					foods[i].aliasID = aliasID;					
 				}
 				// extract the name to this temporary food
 				foods[i].name = values[2];
@@ -104,11 +104,11 @@ public class Util {
 				foods[i].setPrice(Float.parseFloat(values[4]));
 			} else {
 				// extract the food alias id
-				foods[i].alias_id = Integer.parseInt(values[1]);
+				foods[i].aliasID = Integer.parseInt(values[1]);
 				// extract the amount to order food
 				foods[i].setCount(Float.parseFloat(values[2]));
 				// extract the taste alias id
-				foods[i].tastes[0].alias_id = Short.parseShort(values[3]);
+				foods[i].tastes[0].aliasID = Short.parseShort(values[3]);
 				// extract the kitchen number
 				foods[i].kitchen = Short.parseShort(values[4]);
 				// extract the discount
@@ -119,9 +119,9 @@ public class Util {
 				}
 				if (values.length > 6) {
 					// extract the 2nd taste alias id
-					foods[i].tastes[1].alias_id = Short.parseShort(values[6]);
+					foods[i].tastes[1].aliasID = Short.parseShort(values[6]);
 					// extract the 3rd taste alias id
-					foods[i].tastes[2].alias_id = Short.parseShort(values[7]);
+					foods[i].tastes[2].aliasID = Short.parseShort(values[7]);
 				}
 			}
 
