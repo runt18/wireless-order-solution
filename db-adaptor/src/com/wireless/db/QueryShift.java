@@ -1,7 +1,9 @@
 package com.wireless.db;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.TimeZone;
 
 import com.wireless.exception.BusinessException;
@@ -10,6 +12,12 @@ import com.wireless.protocol.Order;
 import com.wireless.protocol.Terminal;
 
 public class QueryShift {
+	
+	static class DeptIncome{
+		public float gift;				//某个部门的赠送额
+		public float discount;			//某个部门的折扣额
+		public float turnover;			//某个部门的营业额
+	}
 	
 	public static class Result{
 		public String onDuty;			//开始时间
@@ -28,6 +36,8 @@ public class QueryShift {
 		public Float totalActual;		//合计实收金额
 		public Float totalDiscount;		//合计折扣金额
 		public Float totalGift;			//合计赠送金额
+		
+		List<DeptIncome> deptIncome;	//部门营业额
 	}
 	
 	/**
@@ -306,9 +316,6 @@ public class QueryShift {
 		}
 		dbCon.rs.close();
 		
-		totalGift = (float)Math.round(totalGift * 100) / 100;
-		totalDiscount = (float)Math.round(totalDiscount * 100) / 100;
-		
 		Result result = new Result();
 		result.onDuty = onDuty;
 		result.offDuty = offDuty;
@@ -327,6 +334,23 @@ public class QueryShift {
 		result.totalSign = (float)Math.round(totalSign * 100) / 100;
 		result.totalSign2 = (float)Math.round(totalSign_2 * 100) / 100;
 		return result;
+	}
+		
+	private ResultSet calc(DBCon dbCon, String calcItem, String extraCond, String orderClause, 
+							Terminal term, String onDuty, String offDuty, boolean isHistory) throws SQLException{
+		
+		String orderTbl = isHistory ? "order_history" : "order";
+		String orderFoodTbl = isHistory ? "order_food_history" : "order_food";
+		
+		String sql = "SELECT " + calcItem + " FROM " + Params.dbName + "." + orderFoodTbl + " WHERE order_id IN (" +
+					 "SELECT id FROM " + Params.dbName + "." + orderTbl + " WHERE restaurant_id=" + term.restaurant_id +  
+					 " AND " + "total_price IS NOT NULL" + " AND " +
+					 ((onDuty == null || offDuty == null) ? "" : "order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "'") + ") " +
+					 ((extraCond == null) ? "" : extraCond) +
+					 ((orderClause == null) ? "" : orderClause)
+					 ;
+		return dbCon.stmt.executeQuery(sql);
+		
 	}
 	
 }
