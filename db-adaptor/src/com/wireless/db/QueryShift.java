@@ -3,7 +3,7 @@ package com.wireless.db;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.List;
+import java.util.ArrayList;
 import java.util.TimeZone;
 
 import com.wireless.exception.BusinessException;
@@ -37,7 +37,7 @@ public class QueryShift {
 		public Float totalDiscount;		//合计折扣金额
 		public Float totalGift;			//合计赠送金额
 		
-		List<DeptIncome> deptIncome;	//部门营业额
+		DeptIncome[] deptIncome;		//部门营业额
 	}
 	
 	/**
@@ -215,17 +215,18 @@ public class QueryShift {
 		}
 		dbCon.rs.close();
 		
-		String prefix = "SELECT SUM(total_price * (1 + service_rate)), SUM(total_price_2) FROM " + Params.dbName + 
-						".order WHERE restaurant_id=" + term.restaurant_id +
-						" AND order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "'" +
-						" AND type=";
+		String calcItem = "SUM(total_price), SUM(total_price_2)";
 		/**
 		 * Get the total cash income within this shirt
-		 */
+		 */		
+		dbCon.rs = calcOrder(dbCon, term,
+							 calcItem, 
+							 "AND type=" + Order.MANNER_CASH,
+							 null,
+							 onDuty, offDuty, false); 
+		
 		float totalCash = 0;
 		float totalCash_2 = 0;
-		sql = prefix + Order.MANNER_CASH;
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			totalCash = dbCon.rs.getFloat(1);
 			totalCash_2 = dbCon.rs.getFloat(2);
@@ -235,10 +236,13 @@ public class QueryShift {
 		/**
 		 * Get the total credit card income within this shift
 		 */
+		dbCon.rs = calcOrder(dbCon, term,
+							 calcItem,
+							 "AND type=" + Order.MANNER_CREDIT_CARD,
+							 null,
+							 onDuty, offDuty, false);
 		float totalCreditCard = 0;
 		float totalCreditCard_2 = 0;
-		sql = prefix + Order.MANNER_CREDIT_CARD;
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			totalCreditCard = dbCon.rs.getFloat(1);
 			totalCreditCard_2 = dbCon.rs.getFloat(2);
@@ -248,10 +252,13 @@ public class QueryShift {
 		/**
 		 * Get the total member card income within this shift
 		 */
+		dbCon.rs = calcOrder(dbCon, term,
+						 	 calcItem,
+						 	 "AND type=" + Order.MANNER_MEMBER,
+						 	 null,
+						 	 onDuty, offDuty, false);	
 		float totalMemberCard = 0;
 		float totalMemberCard_2 = 0;
-		sql = prefix + Order.MANNER_MEMBER;
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			totalMemberCard = dbCon.rs.getFloat(1);
 			totalMemberCard_2 = dbCon.rs.getFloat(2);
@@ -261,10 +268,13 @@ public class QueryShift {
 		/**
 		 * Get the total sign income within this shift
 		 */
+		dbCon.rs = calcOrder(dbCon, term,
+							 calcItem,
+							 "AND type=" + Order.MANNER_SIGN,
+							 null,
+							 onDuty, offDuty, false);
 		float totalSign = 0;
 		float totalSign_2 = 0;
-		sql = prefix + Order.MANNER_SIGN;
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			totalSign = dbCon.rs.getFloat(1);
 			totalSign_2 = dbCon.rs.getFloat(2);
@@ -274,10 +284,13 @@ public class QueryShift {
 		/**
 		 * Get the total hang income within this shift
 		 */
+		dbCon.rs = calcOrder(dbCon, term,
+							 calcItem,
+							 "AND type=" + Order.MANNER_HANG,
+							 null,
+							 onDuty, offDuty, false);
 		float totalHang = 0;
 		float totalHang_2 = 0;
-		sql = prefix + Order.MANNER_HANG;
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			totalHang = dbCon.rs.getFloat(1);
 			totalHang_2 = dbCon.rs.getFloat(2);
@@ -290,12 +303,17 @@ public class QueryShift {
 		 * Calculate the price to all gifted food within this shift
 		 */
 		float totalGift = 0;
-		sql = "SELECT SUM(unit_price * order_count * discount + taste_price) FROM " + Params.dbName + ".order_food WHERE order_id IN(" +
-			  "SELECT id FROM " +Params.dbName + ".order WHERE restaurant_id=" + term.restaurant_id + 
-			  " AND total_price IS NOT NULL" +
-			  " AND order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "')" +
-			  " AND (food_status & " + Food.GIFT + ") <> 0"; 
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		dbCon.rs = calcOrderFood(dbCon, term, 
+								 "SUM(unit_price * order_count * discount + taste_price)",
+								 "AND (food_status & " + Food.GIFT + ") <> 0",
+								 null,
+								 onDuty, offDuty, false);
+//		sql = "SELECT SUM(unit_price * order_count * discount + taste_price) FROM " + Params.dbName + ".order_food WHERE order_id IN(" +
+//			  "SELECT id FROM " +Params.dbName + ".order WHERE restaurant_id=" + term.restaurant_id + 
+//			  " AND total_price IS NOT NULL" +
+//			  " AND order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "')" +
+//			  " AND (food_status & " + Food.GIFT + ") <> 0"; 
+//		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			totalGift = dbCon.rs.getFloat(1);
 		}
@@ -305,16 +323,61 @@ public class QueryShift {
 		 * Calculate the price to all discount food within this shift
 		 */
 		float totalDiscount = 0;
-		sql = "SELECT SUM(unit_price * order_count * (1-discount)) FROM " + Params.dbName + ".order_food WHERE order_id iN(" +
-			  "SELECT id FROM " +Params.dbName + ".order WHERE restaurant_id=" + term.restaurant_id + 
-			  " AND total_price IS NOT NULL" +
-			  " AND order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "')" +
-			  " AND discount < 1.00";
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		dbCon.rs = calcOrderFood(dbCon, term, 
+				 				 "SUM(unit_price * order_count * (1 - discount))",
+				 				 "AND discount < 1.00",
+				 				 null,
+				 				 onDuty, offDuty, false);
+//		sql = "SELECT SUM(unit_price * order_count * (1-discount)) FROM " + Params.dbName + ".order_food WHERE order_id iN(" +
+//			  "SELECT id FROM " +Params.dbName + ".order WHERE restaurant_id=" + term.restaurant_id + 
+//			  " AND total_price IS NOT NULL" +
+//			  " AND order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "')" +
+//			  " AND discount < 1.00";
+//		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			totalDiscount = dbCon.rs.getFloat(1);
 		}
 		dbCon.rs.close();
+		
+		ArrayList<DeptIncome> depts = new ArrayList<DeptIncome>();
+		
+		for(int i = 0; i < 10; i++){
+			DeptIncome deptIncome = new DeptIncome();
+			
+			dbCon.rs = calcOrderFood(dbCon, term, 
+									 "SUM(unit_price * order_count * discount + taste_price)",
+									 "AND (food_status & " + Food.GIFT + ") <> 0 AND dept_id=" + i,
+									 null,
+									 onDuty, offDuty, false);
+			if(dbCon.rs.next()){
+				deptIncome.gift = Math.round(dbCon.rs.getFloat(1) * 100) / 100;
+			}
+			dbCon.rs.close();
+			
+			dbCon.rs = calcOrderFood(dbCon, term, 
+					 				 "SUM(unit_price * order_count * (1 - discount))",
+					 				 "AND discount < 1.00 AND dept_id=" + i,
+					 				 null,
+					 				 onDuty, offDuty, false);
+			if(dbCon.rs.next()){
+				deptIncome.discount = Math.round(dbCon.rs.getFloat(1) * 100) / 100;
+			}
+			dbCon.rs.close();
+			
+			dbCon.rs = calcOrderFood(dbCon, term,
+									 "SUM(unit_price * order_count * discount + taste_price)",
+									 "AND dept_id=" + i,
+									 null,
+									 onDuty, offDuty, false);
+			if(dbCon.rs.next()){
+				deptIncome.turnover = Math.round(dbCon.rs.getFloat(1) * 100) / 100;
+			}
+			
+			dbCon.rs.close();
+			
+			depts.add(deptIncome);
+			
+		}
 		
 		Result result = new Result();
 		result.onDuty = onDuty;
@@ -333,24 +396,41 @@ public class QueryShift {
 		result.totalMemberCard2 = (float)Math.round(totalMemberCard_2 * 100) / 100;
 		result.totalSign = (float)Math.round(totalSign * 100) / 100;
 		result.totalSign2 = (float)Math.round(totalSign_2 * 100) / 100;
+		result.deptIncome = depts.toArray(new DeptIncome[depts.size()]);
 		return result;
 	}
 		
-	private ResultSet calc(DBCon dbCon, String calcItem, String extraCond, String orderClause, 
-							Terminal term, String onDuty, String offDuty, boolean isHistory) throws SQLException{
+	private static ResultSet calcOrder(DBCon dbCon, Terminal term,
+								  String calcItem, String extraCond, String orderClause,
+								  String onDuty, String offDuty, boolean isHistory) throws SQLException{
+		
+		String orderTbl = isHistory ? "order_history" : "order";
+		
+		String sql = "SELECT " + calcItem + " FROM " + Params.dbName + "." + orderTbl + " WHERE " +
+					 "restaurant_id=" + term.restaurant_id + " AND " +
+					 "total_price IS NOT NULL" + " " +
+					 ((onDuty == null || offDuty == null) ? "" : "AND order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "'") +
+					 ((extraCond == null) ? "" : extraCond) + " " +
+					 ((orderClause == null) ? "" : orderClause);
+		
+		return dbCon.stmt.executeQuery(sql);
+	}
+	
+	private static ResultSet calcOrderFood(DBCon dbCon, Terminal term, 
+								  String calcItem, String extraCond, String orderClause, 
+								  String onDuty, String offDuty, boolean isHistory) throws SQLException{
 		
 		String orderTbl = isHistory ? "order_history" : "order";
 		String orderFoodTbl = isHistory ? "order_food_history" : "order_food";
 		
 		String sql = "SELECT " + calcItem + " FROM " + Params.dbName + "." + orderFoodTbl + " WHERE order_id IN (" +
 					 "SELECT id FROM " + Params.dbName + "." + orderTbl + " WHERE restaurant_id=" + term.restaurant_id +  
-					 " AND " + "total_price IS NOT NULL" + " AND " +
-					 ((onDuty == null || offDuty == null) ? "" : "order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "'") + ") " +
-					 ((extraCond == null) ? "" : extraCond) +
-					 ((orderClause == null) ? "" : orderClause)
-					 ;
-		return dbCon.stmt.executeQuery(sql);
+					 " AND " + "total_price IS NOT NULL" + " " +
+					 ((onDuty == null || offDuty == null) ? "" : "AND order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "'") + ") " +
+					 ((extraCond == null) ? "" : extraCond) + " " +
+					 ((orderClause == null) ? "" : orderClause);
 		
+		return dbCon.stmt.executeQuery(sql);		
 	}
 	
 }
