@@ -16,28 +16,32 @@ public class QueryShift {
 	static class DeptIncome{
 		public float gift;				//某个部门的赠送额
 		public float discount;			//某个部门的折扣额
-		public float turnover;			//某个部门的营业额
+		public float income;			//某个部门的营业额
 	}
 	
 	public static class Result{
 		public String onDuty;			//开始时间
 		public String offDuty;			//结束时间
 		public int orderAmount;			//账单数
-		public Float totalCash;			//现金金额
-		public Float totalCash2;		//现金实收
-		public Float totalCreditCard;	//刷卡金额
-		public Float totalCreditCard2;	//刷卡实收
-		public Float totalMemberCard;	//会员卡金额
-		public Float totalMemberCard2;	//会员卡实收
-		public Float totalSign;			//签单金额
-		public Float totalSign2;		//签单实收
-		public Float totalHang;			//挂账金额
-		public Float totalHang2;		//挂账实收
-		public Float totalActual;		//合计实收金额
-		public Float totalDiscount;		//合计折扣金额
-		public Float totalGift;			//合计赠送金额
+		public float totalCash;			//现金金额
+		public float totalCash2;		//现金实收
+		public float totalCreditCard;	//刷卡金额
+		public float totalCreditCard2;	//刷卡实收
+		public float totalMemberCard;	//会员卡金额
+		public float totalMemberCard2;	//会员卡实收
+		public float totalSign;			//签单金额
+		public float totalSign2;		//签单实收
+		public float totalHang;			//挂账金额
+		public float totalHang2;		//挂账实收
+		public float totalActual;		//合计实收金额
+		public int discountAmount;		//折扣账单数
+		public float totalDiscount;		//合计折扣金额
+		public int giftAmount;			//赠送账单数
+		public float totalGift;			//合计赠送金额
+		public int cancelAmount;		//退菜账单数
+		public float totalCancel;		//合计退菜金额
 		
-		DeptIncome[] deptIncome;		//部门营业额
+		public DeptIncome[] deptIncome;	//所有部门营业额
 	}
 	
 	/**
@@ -202,16 +206,20 @@ public class QueryShift {
 	 * 			throws if fail to execute any SQL statement
 	 */
 	private static Result genShiftDetail(DBCon dbCon, Terminal term, String onDuty, String offDuty) throws SQLException{
+		
+		Result result = new Result();
+		result.onDuty = onDuty;
+		result.offDuty = offDuty;
+		
 		/**
 		 * Get the amount the order within this shift
 		 */
-		int orderAmount = 0;
-		String sql = "SELECT COUNT(*) FROM " + Params.dbName + ".order WHERE restaurant_id=" + term.restaurant_id +
-			  " AND total_price IS NOT NULL" +
-			  " AND order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "'";
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		dbCon.rs = calcOrder(dbCon, term,
+							"COUNT(*)",
+							null, null,
+							onDuty, offDuty, false);
 		if(dbCon.rs.next()){
-			orderAmount = dbCon.rs.getInt(1);
+			result.orderAmount = dbCon.rs.getInt(1);
 		}
 		dbCon.rs.close();
 		
@@ -225,11 +233,9 @@ public class QueryShift {
 							 null,
 							 onDuty, offDuty, false); 
 		
-		float totalCash = 0;
-		float totalCash_2 = 0;
 		if(dbCon.rs.next()){
-			totalCash = dbCon.rs.getFloat(1);
-			totalCash_2 = dbCon.rs.getFloat(2);
+			result.totalCash = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
+			result.totalCash2 = (float)Math.round(dbCon.rs.getFloat(2) * 100) / 100;
 		}
 		dbCon.rs.close();
 		
@@ -241,11 +247,9 @@ public class QueryShift {
 							 "AND type=" + Order.MANNER_CREDIT_CARD,
 							 null,
 							 onDuty, offDuty, false);
-		float totalCreditCard = 0;
-		float totalCreditCard_2 = 0;
 		if(dbCon.rs.next()){
-			totalCreditCard = dbCon.rs.getFloat(1);
-			totalCreditCard_2 = dbCon.rs.getFloat(2);
+			result.totalCreditCard = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
+			result.totalCreditCard2 = (float)Math.round(dbCon.rs.getFloat(2) * 100) / 100;
 		}
 		dbCon.rs.close();
 		
@@ -257,11 +261,9 @@ public class QueryShift {
 						 	 "AND type=" + Order.MANNER_MEMBER,
 						 	 null,
 						 	 onDuty, offDuty, false);	
-		float totalMemberCard = 0;
-		float totalMemberCard_2 = 0;
 		if(dbCon.rs.next()){
-			totalMemberCard = dbCon.rs.getFloat(1);
-			totalMemberCard_2 = dbCon.rs.getFloat(2);
+			result.totalMemberCard = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
+			result.totalMemberCard2 = (float)Math.round(dbCon.rs.getFloat(2) * 100) / 100;
 		}
 		dbCon.rs.close();
 		
@@ -273,11 +275,9 @@ public class QueryShift {
 							 "AND type=" + Order.MANNER_SIGN,
 							 null,
 							 onDuty, offDuty, false);
-		float totalSign = 0;
-		float totalSign_2 = 0;
 		if(dbCon.rs.next()){
-			totalSign = dbCon.rs.getFloat(1);
-			totalSign_2 = dbCon.rs.getFloat(2);
+			result.totalSign = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
+			result.totalSign2 = (float)Math.round(dbCon.rs.getFloat(2) * 100) / 100;
 		}
 		dbCon.rs.close();
 		
@@ -289,53 +289,54 @@ public class QueryShift {
 							 "AND type=" + Order.MANNER_HANG,
 							 null,
 							 onDuty, offDuty, false);
-		float totalHang = 0;
-		float totalHang_2 = 0;
 		if(dbCon.rs.next()){
-			totalHang = dbCon.rs.getFloat(1);
-			totalHang_2 = dbCon.rs.getFloat(2);
+			result.totalHang = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
+			result.totalHang2 = (float)Math.round(dbCon.rs.getFloat(2) * 100) / 100;
 		}
 		dbCon.rs.close();
 		
-		float totalActual = totalCash_2 + totalCreditCard_2 + totalMemberCard_2 + totalSign_2 + totalHang_2;			
+		float totalActual = result.totalCash2 + result.totalCreditCard2 + result.totalMemberCard2 + result.totalSign2 + result.totalHang2;			
+		result.totalActual = (float)Math.round(totalActual * 100) / 100;
+
+		/**
+		 * Calculate the price to all cancelled food within this shift
+		 */
+		dbCon.rs = calcOrderFood(dbCon, term, 
+								 "SUM(unit_price * order_count * discount + taste_price), COUNT(distinct order_id)",
+								 "AND order_count < 0",
+								 null,
+								 onDuty, offDuty, false);
+		if(dbCon.rs.next()){
+			result.totalCancel = (float)Math.round(Math.abs(dbCon.rs.getFloat(1)) * 100) / 100;
+			result.cancelAmount = dbCon.rs.getInt(2);
+		}
+		dbCon.rs.close();
 		
 		/**
 		 * Calculate the price to all gifted food within this shift
 		 */
-		float totalGift = 0;
 		dbCon.rs = calcOrderFood(dbCon, term, 
-								 "SUM(unit_price * order_count * discount + taste_price)",
+								 "SUM(unit_price * order_count * discount + taste_price), COUNT(distinct order_id)",
 								 "AND (food_status & " + Food.GIFT + ") <> 0",
 								 null,
 								 onDuty, offDuty, false);
-//		sql = "SELECT SUM(unit_price * order_count * discount + taste_price) FROM " + Params.dbName + ".order_food WHERE order_id IN(" +
-//			  "SELECT id FROM " +Params.dbName + ".order WHERE restaurant_id=" + term.restaurant_id + 
-//			  " AND total_price IS NOT NULL" +
-//			  " AND order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "')" +
-//			  " AND (food_status & " + Food.GIFT + ") <> 0"; 
-//		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
-			totalGift = dbCon.rs.getFloat(1);
+			result.totalGift = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
+			result.giftAmount = dbCon.rs.getInt(2);
 		}
 		dbCon.rs.close();
 		
 		/**
 		 * Calculate the price to all discount food within this shift
 		 */
-		float totalDiscount = 0;
 		dbCon.rs = calcOrderFood(dbCon, term, 
-				 				 "SUM(unit_price * order_count * (1 - discount))",
+				 				 "SUM(unit_price * order_count * (1 - discount)), COUNT(distinct order_id)",
 				 				 "AND discount < 1.00",
 				 				 null,
 				 				 onDuty, offDuty, false);
-//		sql = "SELECT SUM(unit_price * order_count * (1-discount)) FROM " + Params.dbName + ".order_food WHERE order_id iN(" +
-//			  "SELECT id FROM " +Params.dbName + ".order WHERE restaurant_id=" + term.restaurant_id + 
-//			  " AND total_price IS NOT NULL" +
-//			  " AND order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "')" +
-//			  " AND discount < 1.00";
-//		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
-			totalDiscount = dbCon.rs.getFloat(1);
+			result.totalDiscount = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
+			result.discountAmount = dbCon.rs.getInt(2);
 		}
 		dbCon.rs.close();
 		
@@ -350,7 +351,7 @@ public class QueryShift {
 									 null,
 									 onDuty, offDuty, false);
 			if(dbCon.rs.next()){
-				deptIncome.gift = Math.round(dbCon.rs.getFloat(1) * 100) / 100;
+				deptIncome.gift = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
 			}
 			dbCon.rs.close();
 			
@@ -360,17 +361,17 @@ public class QueryShift {
 					 				 null,
 					 				 onDuty, offDuty, false);
 			if(dbCon.rs.next()){
-				deptIncome.discount = Math.round(dbCon.rs.getFloat(1) * 100) / 100;
+				deptIncome.discount = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
 			}
 			dbCon.rs.close();
 			
 			dbCon.rs = calcOrderFood(dbCon, term,
 									 "SUM(unit_price * order_count * discount + taste_price)",
-									 "AND dept_id=" + i,
+									 "AND (food_status & " + Food.GIFT + ") = 0 AND dept_id=" + i,
 									 null,
 									 onDuty, offDuty, false);
 			if(dbCon.rs.next()){
-				deptIncome.turnover = Math.round(dbCon.rs.getFloat(1) * 100) / 100;
+				deptIncome.income = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
 			}
 			
 			dbCon.rs.close();
@@ -378,25 +379,8 @@ public class QueryShift {
 			depts.add(deptIncome);
 			
 		}
-		
-		Result result = new Result();
-		result.onDuty = onDuty;
-		result.offDuty = offDuty;
-		result.orderAmount = orderAmount;
-		result.totalActual = (float)Math.round(totalActual * 100) / 100;
-		result.totalCash = (float)Math.round(totalCash * 100) / 100;
-		result.totalCash2 = (float)Math.round(totalCash_2 * 100) / 100;
-		result.totalCreditCard = (float)Math.round(totalCreditCard * 100) / 100;
-		result.totalCreditCard2 = (float)Math.round(totalCreditCard_2 * 100) / 100;
-		result.totalDiscount = (float)Math.round(totalDiscount * 100) / 100;
-		result.totalGift = (float)Math.round(totalGift * 100) / 100;
-		result.totalHang = (float)Math.round(totalHang * 100) / 100;
-		result.totalHang2 = (float)Math.round(totalHang_2 * 100) / 100;
-		result.totalMemberCard = (float)Math.round(totalMemberCard * 100) / 100;
-		result.totalMemberCard2 = (float)Math.round(totalMemberCard_2 * 100) / 100;
-		result.totalSign = (float)Math.round(totalSign * 100) / 100;
-		result.totalSign2 = (float)Math.round(totalSign_2 * 100) / 100;
 		result.deptIncome = depts.toArray(new DeptIncome[depts.size()]);
+		
 		return result;
 	}
 		
