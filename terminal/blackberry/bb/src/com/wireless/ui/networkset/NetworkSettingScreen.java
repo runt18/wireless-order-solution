@@ -11,7 +11,7 @@ import net.rim.device.api.ui.container.*;
 
 public class NetworkSettingScreen extends MainScreen{
 	
-	private EditField _netAddr = new EditField("服务器IP：", "", 15 , (TextField.NO_NEWLINE | EditField.FILTER_REAL_NUMERIC)){
+	private EditField _netAddr = new EditField("服务器：", "", 30 , (TextField.NO_NEWLINE)){
 		protected boolean navigationClick(int status, int time){
 			return true;
 		}

@@ -41,7 +41,7 @@ public final class Params{
 				for(int i = 0; i < _params.capacity(); i++){
 					_params.addElement(null);
 				}
-				setParam(NET_ADDR, "122.115.57.66");
+				setParam(NET_ADDR, "www.e-tones.net");
 				setParam(NET_PORT, "55555");
 				setParam(NET_APN, "cmnet");
 				setParam(NET_USER, "");

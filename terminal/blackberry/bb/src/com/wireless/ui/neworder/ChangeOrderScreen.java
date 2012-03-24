@@ -213,8 +213,17 @@ public class ChangeOrderScreen extends MainScreen implements PostSubmitOrder{
 		//Set the submit button's listener
 		submit.setChangeListener(new FieldChangeListener(){
 			public void fieldChanged(Field field, int context) {
-				if(_oriListField.getSize() == 0 && _newListField.getSize() == 0){
+				if(_tableEdt.getText().length() == 0){
+					Dialog.alert("请输入餐台号");
+					_tableEdt.setFocus();
+					
+				}else if(_customNumEdt.getText().length() == 0){
+					Dialog.alert("请就餐人数");
+					_customNumEdt.setFocus();
+					
+				}else if(_oriListField.getSize() == 0 && _newListField.getSize() == 0){
 					Dialog.alert("点菜单为空，暂时不能改单。");
+					
 				}else{
 					
 					Vector vectFoods = new Vector();					
