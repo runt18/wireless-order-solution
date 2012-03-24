@@ -1090,7 +1090,7 @@ public class PickFoodActivity extends TabActivity implements
 					Kitchen selectedKitchen = _kitchenChild.get(groupPosition).get(childPosition);
 					_filterFoods = new ArrayList<Food>();
 					for (int i = 0; i < WirelessOrder.foodMenu.foods.length; i++) {
-						if (WirelessOrder.foodMenu.foods[i].kitchen == selectedKitchen.aliasID) {
+						if (WirelessOrder.foodMenu.foods[i].kitchen.aliasID == selectedKitchen.aliasID) {
 							_filterFoods.add(WirelessOrder.foodMenu.foods[i]);
 						}
 					}
@@ -1276,9 +1276,9 @@ public class PickFoodActivity extends TabActivity implements
 		Arrays.sort(tmpFoods, new Comparator<Food>() {
 			@Override
 			public int compare(Food food1, Food food2) {
-				if (food1.kitchen > food2.kitchen) {
+				if (food1.kitchen.aliasID > food2.kitchen.aliasID) {
 					return 1;
-				} else if (food1.kitchen < food2.kitchen) {
+				} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
 					return -1;
 				} else {
 					return 0;
@@ -1292,14 +1292,14 @@ public class PickFoodActivity extends TabActivity implements
 		_validKitchens = new ArrayList<Kitchen>();
 		for (int i = 0; i < WirelessOrder.foodMenu.kitchens.length; i++) {
 			Food keyFood = new Food();
-			keyFood.kitchen = WirelessOrder.foodMenu.kitchens[i].aliasID;
+			keyFood.kitchen.aliasID = WirelessOrder.foodMenu.kitchens[i].aliasID;
 			int index = Arrays.binarySearch(tmpFoods, keyFood,
 					new Comparator<Food>() {
 
 						public int compare(Food food1, Food food2) {
-							if (food1.kitchen > food2.kitchen) {
+							if (food1.kitchen.aliasID > food2.kitchen.aliasID) {
 								return 1;
-							} else if (food1.kitchen < food2.kitchen) {
+							} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
 								return -1;
 							} else {
 								return 0;
