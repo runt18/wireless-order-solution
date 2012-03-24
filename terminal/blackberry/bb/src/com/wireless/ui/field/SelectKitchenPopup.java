@@ -42,9 +42,9 @@ public class SelectKitchenPopup extends PopupScreen{
 			public int compare(Object o1, Object o2) {
 				Food food1 = (Food)o1;
 				Food food2 = (Food)o2;
-				if(food1.kitchen > food2.kitchen){
+				if(food1.kitchen.aliasID > food2.kitchen.aliasID){
 					return 1;
-				}else if(food1.kitchen < food2.kitchen){
+				}else if(food1.kitchen.aliasID < food2.kitchen.aliasID){
 					return -1;
 				}else{
 					return 0;
@@ -56,15 +56,15 @@ public class SelectKitchenPopup extends PopupScreen{
 		_kitchens = new Vector();
 		for(int i = 0; i < WirelessOrder.foodMenu.kitchens.length; i++){
 			Food food = new Food();
-			food.kitchen = WirelessOrder.foodMenu.kitchens[i].aliasID;
+			food.kitchen.aliasID = WirelessOrder.foodMenu.kitchens[i].aliasID;
 			int index = Arrays.binarySearch(tmpFoods, food, new Comparator(){
 
 				public int compare(Object o1, Object o2) {
 					Food food1 = (Food)o1;
 					Food food2 = (Food)o2;
-					if(food1.kitchen > food2.kitchen){
+					if(food1.kitchen.aliasID > food2.kitchen.aliasID){
 						return 1;
-					}else if(food1.kitchen < food2.kitchen){
+					}else if(food1.kitchen.aliasID < food2.kitchen.aliasID){
 						return -1;
 					}else{
 						return 0;
@@ -120,7 +120,7 @@ public class SelectKitchenPopup extends PopupScreen{
 				int nCount = 0;
 				Vector vectFoods = new Vector();
 				for(int i = 0; i < WirelessOrder.foodMenu.foods.length; i++){
-					if(WirelessOrder.foodMenu.foods[i].kitchen == ((Kitchen)_kitchens.elementAt(getSelectedIndex())).aliasID){
+					if(WirelessOrder.foodMenu.foods[i].kitchen.aliasID == ((Kitchen)_kitchens.elementAt(getSelectedIndex())).aliasID){
 						nCount++;
 						vectFoods.addElement(WirelessOrder.foodMenu.foods[i]);
 					}
