@@ -29,7 +29,7 @@ public class FoodParcel extends OrderFood implements Parcelable{
 	
 	private FoodParcel(Parcel in){
 		aliasID = in.readInt();
-		kitchen = (short)in.readInt();
+		kitchen.aliasID = (short)in.readInt();
 		name = in.readString();
 		hangStatus = (short)in.readInt();
 		isTemporary = in.readInt() == 1 ? true : false;
@@ -62,7 +62,7 @@ public class FoodParcel extends OrderFood implements Parcelable{
 	@Override
 	public void writeToParcel(Parcel parcel, int flags) {
 		parcel.writeInt(aliasID);
-		parcel.writeInt(kitchen);
+		parcel.writeInt(kitchen.aliasID);
 		parcel.writeString(name);
 		parcel.writeInt(hangStatus);
 		parcel.writeInt(isTemporary ? 1 : 0);
