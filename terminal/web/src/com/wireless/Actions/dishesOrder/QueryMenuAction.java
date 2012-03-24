@@ -122,7 +122,7 @@ public class QueryMenuAction extends Action {
 				 * [厨房编号,"菜品名称",菜品编号,"菜品拼音","￥菜品单价",是否特价,是否推荐,是否停售,是否赠送,是否時價]
 				 */
 				String jsonFood = "[$(kitchen_id),\"$(name)\",$(alias_id),\"$(pinyin)\",\"$(unit)\",$(special),$(recommend),$(soldout),$(gift),$(currPrice)]";
-				jsonFood = jsonFood.replace("$(kitchen_id)", new Short(foods[i].kitchen).toString());
+				jsonFood = jsonFood.replace("$(kitchen_id)", new Short(foods[i].kitchen.aliasID).toString());
 				jsonFood = jsonFood.replace("$(name)", foods[i].name);
 				jsonFood = jsonFood.replace("$(alias_id)", new Integer(foods[i].aliasID).toString());
 				jsonFood = jsonFood.replace("$(pinyin)", foods[i].pinyin);

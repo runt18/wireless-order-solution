@@ -110,7 +110,7 @@ public class Util {
 				// extract the taste alias id
 				foods[i].tastes[0].aliasID = Short.parseShort(values[3]);
 				// extract the kitchen number
-				foods[i].kitchen = Short.parseShort(values[4]);
+				foods[i].kitchen.aliasID = Short.parseShort(values[4]);
 				// extract the discount
 				if (values.length > 5) {
 					// foods[i].discount = (byte)(Float.parseFloat(values[4]) *
