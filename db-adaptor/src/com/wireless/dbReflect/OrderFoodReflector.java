@@ -84,7 +84,7 @@ public class OrderFoodReflector {
 			food.setCount(dbCon.rs.getFloat("order_sum"));
 			food.setPrice(dbCon.rs.getFloat("unit_price"));
 			food.orderDate = dbCon.rs.getTimestamp("pay_datetime").getTime();
-			food.kitchen = dbCon.rs.getShort("kitchen_alias");
+			food.kitchen.aliasID = dbCon.rs.getShort("kitchen_alias");
 			food.setDiscount(dbCon.rs.getFloat("discount"));
 			food.tastePref = dbCon.rs.getString("taste");
 			food.setTastePrice(dbCon.rs.getFloat("taste_price"));
@@ -172,7 +172,7 @@ public class OrderFoodReflector {
 			food.setCount(dbCon.rs.getFloat("order_sum"));
 			food.setPrice(dbCon.rs.getFloat("unit_price"));
 			food.orderDate = dbCon.rs.getTimestamp("pay_datetime").getTime();
-			food.kitchen = dbCon.rs.getShort("kitchen_alias");
+			food.kitchen.aliasID = dbCon.rs.getShort("kitchen_alias");
 			food.setDiscount(dbCon.rs.getFloat("discount"));
 			food.tastePref = dbCon.rs.getString("taste");
 			food.setTastePrice(dbCon.rs.getFloat("taste_price"));

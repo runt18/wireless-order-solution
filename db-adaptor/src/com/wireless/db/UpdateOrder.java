@@ -401,9 +401,9 @@ public class UpdateOrder {
 						extraFoods.get(i).tastes[2].aliasID + "," +
 						extraFoods.get(i).getTastePrice() + ", '" +
 						extraFoods.get(i).tastePref + "', " + 
-						"(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + extraFoods.get(i).kitchen + "), " + 
-						"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + extraFoods.get(i).kitchen + "), " + 
-						extraFoods.get(i).kitchen + ", '" + 
+						"(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + extraFoods.get(i).kitchen.aliasID + "), " + 
+						"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + extraFoods.get(i).kitchen.aliasID + "), " + 
+						extraFoods.get(i).kitchen.aliasID + ", '" + 
 						term.owner + "', " +
 						"NOW(), " + 
 						(extraFoods.get(i).isTemporary ? 1 : 0) + 
@@ -443,9 +443,9 @@ public class UpdateOrder {
 						canceledFoods.get(i).tastes[2].aliasID + "," +
 						canceledFoods.get(i).getTastePrice() + ", '" +
 						canceledFoods.get(i).tastePref + "', " + 
-						"(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + canceledFoods.get(i).kitchen + "), " + 
-						"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + canceledFoods.get(i).kitchen + "), " + 
-						canceledFoods.get(i).kitchen + ", '" + 
+						"(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + canceledFoods.get(i).kitchen.aliasID + "), " + 
+						"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + canceledFoods.get(i).kitchen.aliasID + "), " + 
+						canceledFoods.get(i).kitchen.aliasID + ", '" + 
 						term.owner + "', " +
 						"NOW(), " + 
 						(canceledFoods.get(i).isTemporary ? 1 : 0) + 
@@ -721,7 +721,7 @@ public class UpdateOrder {
 			
 		}else{
 			//get the food name and its unit price
-			String sql = "SELECT food_id, name, status, unit_price, kitchen FROM " + Params.dbName + ".food " +
+			String sql = "SELECT food_id, name, status, unit_price, kitchen_id, kitchen_alias FROM " + Params.dbName + ".food " +
 						 "WHERE " +
 						 "restaurant_id=" + term.restaurant_id +
 						 " AND " +
@@ -734,8 +734,8 @@ public class UpdateOrder {
 				food.status = dbCon.rs.getShort("status");
 				food.name = dbCon.rs.getString("name");
 				food.setPrice(new Float(dbCon.rs.getFloat("unit_price")));
-
-				food.kitchen = dbCon.rs.getShort("kitchen");
+				food.kitchen.kitchenID = dbCon.rs.getLong("kitchen_id");
+				food.kitchen.aliasID = dbCon.rs.getShort("kitchen_alias");
 			}else{
 				throw new BusinessException("The food(alias_id=" + foodBasic.aliasID + ", restaurant_id=" + term.restaurant_id + ") to query does NOT exist.", ErrorCode.MENU_EXPIRED);
 			}

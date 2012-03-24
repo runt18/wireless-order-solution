@@ -318,9 +318,9 @@ public class InsertOrder {
 							orderToInsert.foods[i].tastes[0].aliasID + ", " + 
 							orderToInsert.foods[i].tastes[1].aliasID + ", " + 
 							orderToInsert.foods[i].tastes[2].aliasID + ", " +
-							"(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + orderToInsert.foods[i].kitchen + "), " +
-							"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + orderToInsert.foods[i].kitchen + "), " + 
-							orderToInsert.foods[i].kitchen + ", '" + 
+							"(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + orderToInsert.foods[i].kitchen.aliasID + "), " +
+							"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + orderToInsert.foods[i].kitchen.aliasID + "), " + 
+							orderToInsert.foods[i].kitchen.aliasID + ", '" + 
 							term.owner + "', NOW(), " + 
 							(orderToInsert.foods[i].isTemporary ? "1" : "0") + ")";
 						

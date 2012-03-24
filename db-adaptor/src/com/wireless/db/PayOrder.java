@@ -554,7 +554,7 @@ public class PayOrder {
 					 */
 					String sql = "SELECT " + discount + " FROM " + Params.dbName + 
 								 ".kitchen WHERE restaurant_id=" + orderInfo.restaurantID + 
-								 " AND kitchen_alias=" + orderInfo.foods[i].kitchen;
+								 " AND kitchen_alias=" + orderInfo.foods[i].kitchen.aliasID;
 					
 					dbCon.rs = dbCon.stmt.executeQuery(sql);
 					if(dbCon.rs.next()){

@@ -302,7 +302,7 @@ public class QueryMenu {
 	private static Food[] queryFoods(DBCon dbCon, int restaurantID, String extraCondition, String orderClause) throws SQLException{
 		ArrayList<Food> foods = new ArrayList<Food>();
         //get all the food information to this restaurant
-		String sql = "SELECT food_id, food_alias, name, unit_price, kitchen, status, pinyin FROM " + 
+		String sql = "SELECT food_id, food_alias, name, unit_price, kitchen_alias, status, pinyin FROM " + 
 					 Params.dbName + ".food WHERE restaurant_id=" + restaurantID + " " +
 					 (extraCondition == null ? "" : extraCondition) + " " +
 					 (orderClause == null ? "" : orderClause); 
@@ -312,7 +312,7 @@ public class QueryMenu {
 								 dbCon.rs.getInt("food_alias"),
 								 dbCon.rs.getString("name"),
 								 new Float(dbCon.rs.getFloat("unit_price")),
-								 dbCon.rs.getShort("kitchen"),
+								 dbCon.rs.getShort("kitchen_alias"),
 								 dbCon.rs.getShort("status"),
 								 dbCon.rs.getString("pinyin"));
 			foods.add(food);

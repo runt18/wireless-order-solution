@@ -35,11 +35,13 @@ public class QueryShift {
 		public float totalHang2;		//挂账实收
 		public float totalActual;		//合计实收金额
 		public int discountAmount;		//折扣账单数
-		public float totalDiscount;		//合计折扣金额
+		public float discountIncome;	//合计折扣金额
 		public int giftAmount;			//赠送账单数
-		public float totalGift;			//合计赠送金额
+		public float giftIncome;		//合计赠送金额
 		public int cancelAmount;		//退菜账单数
-		public float totalCancel;		//合计退菜金额
+		public float cancelIncome;		//合计退菜金额
+		public int serviceAmount;		//服务费账单数
+		public float serviceIncome;		//服务费金额
 		
 		public DeptIncome[] deptIncome;	//所有部门营业额
 	}
@@ -212,7 +214,7 @@ public class QueryShift {
 		result.offDuty = offDuty;
 		
 		/**
-		 * Get the amount the order within this shift
+		 * Get the order amount within this shift
 		 */
 		dbCon.rs = calcOrder(dbCon, term,
 							"COUNT(*)",
@@ -223,7 +225,7 @@ public class QueryShift {
 		}
 		dbCon.rs.close();
 		
-		String calcItem = "SUM(total_price), SUM(total_price_2)";
+		String calcItem = "SUM(total_price * (1 + service_rate)), SUM(total_price_2)";
 		/**
 		 * Get the total cash income within this shirt
 		 */		
@@ -307,7 +309,7 @@ public class QueryShift {
 								 null,
 								 onDuty, offDuty, false);
 		if(dbCon.rs.next()){
-			result.totalCancel = (float)Math.round(Math.abs(dbCon.rs.getFloat(1)) * 100) / 100;
+			result.cancelIncome = (float)Math.round(Math.abs(dbCon.rs.getFloat(1)) * 100) / 100;
 			result.cancelAmount = dbCon.rs.getInt(2);
 		}
 		dbCon.rs.close();
@@ -321,7 +323,7 @@ public class QueryShift {
 								 null,
 								 onDuty, offDuty, false);
 		if(dbCon.rs.next()){
-			result.totalGift = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
+			result.giftIncome = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
 			result.giftAmount = dbCon.rs.getInt(2);
 		}
 		dbCon.rs.close();
@@ -335,11 +337,28 @@ public class QueryShift {
 				 				 null,
 				 				 onDuty, offDuty, false);
 		if(dbCon.rs.next()){
-			result.totalDiscount = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
+			result.discountIncome = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
 			result.discountAmount = dbCon.rs.getInt(2);
 		}
 		dbCon.rs.close();
 		
+		/**
+		 * Calculate the price to all service income within this shift
+		 */
+		dbCon.rs = calcOrder(dbCon, term,
+							 "SUM(total_price_2 / (1 + service_rate) * service_rate), COUNT(*)",
+							 "AND service_rate > 0",
+							 null,
+							 onDuty, offDuty, false);
+		if(dbCon.rs.next()){
+			result.serviceIncome = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
+			result.serviceAmount = dbCon.rs.getInt(2);
+		}
+		dbCon.rs.close();
+		
+		/**
+		 * Calculate the income to every department.
+		 */
 		ArrayList<DeptIncome> depts = new ArrayList<DeptIncome>();
 		
 		for(int i = 0; i < 10; i++){
