@@ -364,7 +364,7 @@ public class RespParser {
 							 ((response.body[index + 4] & 0x000000FF) << 16)) &	0x00FFFFFF;
 				
 				//get the kitchen no to this food
-				food.kitchen = response.body[index + 5];
+				food.kitchen.aliasID = response.body[index + 5];
 				
 				//get the status to this food
 				food.status = response.body[index + 6];

@@ -197,8 +197,8 @@ public class ReqInsertOrder extends ReqPackage {
 				//assign the 3rd taste id
 				body[offset + 9] = (byte)(reqOrder.foods[i].tastes[2].aliasID & 0x00FF);
 				body[offset + 10] = (byte)((reqOrder.foods[i].tastes[2].aliasID & 0xFF00) >> 8);
-				//assign the kitchen
-				body[offset + 11] = (byte)(reqOrder.foods[i].kitchen);
+				//assign the kitchen alias
+				body[offset + 11] = (byte)(reqOrder.foods[i].kitchen.aliasID);
 				//assign the hang status
 				body[offset + 12] = (byte)reqOrder.foods[i].hangStatus;
 				//assign the hurried flag

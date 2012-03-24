@@ -137,7 +137,7 @@ public class ReqParser {
 				
 				orderFoods[i] = new OrderFood();
 				orderFoods[i].isTemporary = true;
-				orderFoods[i].kitchen = Kitchen.KITCHEN_TEMP;
+				orderFoods[i].kitchen.aliasID = Kitchen.KITCHEN_TEMP;
 				orderFoods[i].aliasID = foodID;
 				orderFoods[i].hangStatus = hangStatus;
 				orderFoods[i].isHurried = isHurried;
@@ -196,7 +196,7 @@ public class ReqParser {
 					
 				});
 				
-				orderFoods[i].kitchen = (short)(kitchen & 0xFF);
+				orderFoods[i].kitchen.aliasID = (short)(kitchen & 0xFF);
 				
 				orderFoods[i].hangStatus = hangStatus;
 				

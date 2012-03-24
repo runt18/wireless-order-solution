@@ -161,7 +161,7 @@ public class RespQueryMenu extends RespPackage{
 			body[index + 3] = (byte)((foodMenu.foods[i].price & 0x0000FF00) >> 8);
 			body[index + 4] = (byte)((foodMenu.foods[i].price & 0x00FF0000) >> 16);
 			//assign the kitchen to this food
-			body[index + 5] = (byte)foodMenu.foods[i].kitchen;
+			body[index + 5] = (byte)foodMenu.foods[i].kitchen.aliasID;
 			//assign the status to this food
 			body[index + 6] = (byte)foodMenu.foods[i].status;
 			//assign the length of food's name

@@ -89,6 +89,9 @@ public final class Kitchen {
 	//the department id to this kitchen
 	public short deptID = Department.DEPT_1;
 	
+	public Kitchen(){
+		
+	}
 	
 	public Kitchen(String kName, long kID, short kAlias, short deptID){
 		this.name = kName;
