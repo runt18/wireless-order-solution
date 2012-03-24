@@ -260,6 +260,16 @@ UPDATE wireless_order_db.order_food AS a SET dept_id = (SELECT dept_id FROM wire
 -- -----------------------------------------------------
 UPDATE wireless_order_db.order_food_history AS a SET dept_id = (SELECT dept_id FROM wireless_order_db.kitchen b WHERE b.restaurant_id=a.restaurant_id AND b.kitchen_alias=a.kitchen_alias);
 
+-- -----------------------------------------------------
+-- Rename the field 'kitchen' to 'kitchen_alias' to table 'food'
+-- Add the field 'kitchen_id' to table 'food'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`food` ADD COLUMN `kitchen_id` INT NULL DEFAULT NULL COMMENT 'the kitchen id the food belong to'  AFTER `unit_price` , CHANGE COLUMN `kitchen` `kitchen_alias` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'the kitchen number which the food belong to. the maximum value (255) means the food does not belong to any kitchen.'  ;
+
+-- -----------------------------------------------------
+-- Update the field 'dept_id' to table 'order_food_history'
+-- -----------------------------------------------------
+UPDATE wireless_order_db.food AS a SET kitchen_id = (SELECT kitchen_id FROM wireless_order_db.kitchen b WHERE b.restaurant_id=a.restaurant_id AND b.kitchen_alias=a.kitchen_alias);
 
 -- -----------------------------------------------------
 -- View `order_food_history_view`
