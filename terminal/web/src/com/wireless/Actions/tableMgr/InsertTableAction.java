@@ -66,7 +66,7 @@ public class InsertTableAction extends Action {
 			String sql = "INSERT INTO "
 					+ Params.dbName
 					+ ".table"
-					+ "( alias_id, restaurant_id, region_id, name, minimum_cost, enabled, status, service_rate ) "
+					+ "( table_alias, restaurant_id, region_id, name, minimum_cost, enabled, status, service_rate ) "
 					+ " VALUES(" + tableNumber + ", " + term.restaurant_id
 					+ ", " + region + ", '" + tableName + "', " + tableMincost
 					+ ", " + "1, 0, " + tableSerRate + " ) ";

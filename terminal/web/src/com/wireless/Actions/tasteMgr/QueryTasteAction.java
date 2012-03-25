@@ -100,7 +100,7 @@ public class QueryTasteAction extends Action {
 			// "4", "類型" ]
 			if (type == 1) {
 				// 按编号
-				filterCondition = " AND alias_id " + ope + filterVal;
+				filterCondition = " AND taste_alias " + ope + filterVal;
 			} else if (type == 2) {
 				// 按名称
 				filterCondition = " AND preference like '%" + filterVal + "%'";
@@ -115,7 +115,7 @@ public class QueryTasteAction extends Action {
 				filterCondition = "";
 			}
 
-			String orderClause = " ORDER BY alias_id ";
+			String orderClause = " ORDER BY taste_alias ";
 
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
@@ -132,7 +132,7 @@ public class QueryTasteAction extends Action {
 				// ID，別名編號，名稱，價錢，比例，種類，計算方法
 				HashMap resultMap = new HashMap();
 
-				resultMap.put("tasteID", tastes[i].aliasID);
+				resultMap.put("tasteID", tastes[i].tasteID);
 				resultMap.put("tasteAlias", tastes[i].aliasID);
 				resultMap.put("tasteName", tastes[i].preference);
 				resultMap.put("tastePrice", tastes[i].getPrice());

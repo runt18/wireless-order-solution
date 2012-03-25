@@ -58,7 +58,7 @@ public class DeleteTasteAction extends Action {
 			 */
 			String sql = "DELETE FROM " + Params.dbName + ".taste " +
 					"WHERE restaurant_id=" + term.restaurant_id
-					+ " AND alias_id = " + tasteID;
+					+ " AND taste_id = " + tasteID;
 
 
 			int sqlRowCount = dbCon.stmt.executeUpdate(sql);

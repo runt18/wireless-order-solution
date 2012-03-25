@@ -78,11 +78,11 @@ public class QueryKitchenMgrAction extends Action {
 			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
 					Terminal.MODEL_STAFF);
 
-			String sql = " SELECT alias_id, name, discount, discount_2, discount_3, "
+			String sql = " SELECT kitchen_id, kitchen_alias, name, discount, discount_2, discount_3, "
 				    + " member_discount_1, member_discount_2, member_discount_3, dept_id "
 					+ " FROM " + Params.dbName + ".kitchen "
 					+ " WHERE restaurant_id = " + term.restaurant_id 
-					+ " AND alias_id IN (0,1,2,3,4,5,6,7,8,9) ";
+					+ " AND kitchen_alias IN (0,1,2,3,4,5,6,7,8,9) ";
 
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 
@@ -91,7 +91,8 @@ public class QueryKitchenMgrAction extends Action {
 				/**
 				 * The json to each order looks like below 分廚編號，名稱，一般折扣１，一般折扣２，一般折扣３，會員折扣１，會員折扣２，會員折扣３，部門
 				 */
-				resultMap.put("kitchenID", dbCon.rs.getInt("alias_id"));
+				resultMap.put("kitchenID", dbCon.rs.getInt("kitchen_id"));
+				resultMap.put("kitchenAlias", dbCon.rs.getInt("kitchen_alias"));
 				resultMap.put("kitchenName", dbCon.rs.getString("name"));
 				resultMap.put("normalDiscount1", dbCon.rs.getFloat("discount"));
 				resultMap.put("normalDiscount2", dbCon.rs.getFloat("discount_2"));

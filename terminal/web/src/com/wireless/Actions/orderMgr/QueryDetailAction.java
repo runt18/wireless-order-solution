@@ -24,6 +24,7 @@ import com.wireless.db.Params;
 import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Terminal;
 
 import net.sf.json.JSONObject;
@@ -74,19 +75,15 @@ public class QueryDetailAction extends Action {
 			int nCount = 0;
 			StringBuffer value = new StringBuffer();
 
-			// String sql = "SELECT a.*, b.name AS kitchen_name FROM "
-			// + Params.dbName + ".order_food a, " + Params.dbName
-			// + ".kitchen b " + "WHERE order_id=" + orderID
-			// + " AND a.kitchen=b.alias_id AND b.restaurant_id="
-			// + term.restaurant_id;
-			
-			String sql = "SELECT a.*, (CASE WHEN b.name IS NOT NULL THEN b.name ELSE '临时' END) AS kitchen_name FROM "
-					+ Params.dbName + ".order_food a LEFT OUTER JOIN " + Params.dbName
-					+ ".kitchen b ON (a.kitchen=b.alias_id AND a.restaurant_id = b.restaurant_id)" + 
-					"WHERE a.order_id=" + orderID
-					+ "  AND a.restaurant_id="
+			String sql = "SELECT a.*, (CASE WHEN b.kitchen_alias = "
+					+ Kitchen.KITCHEN_TEMP + " THEN '临时' "
+					+ "WHEN b.kitchen_alias IS NULL THEN '已刪除廚房' "
+					+ " ELSE b.name END) AS kitchen_name FROM " + Params.dbName
+					+ ".order_food a LEFT OUTER JOIN " + Params.dbName
+					+ ".kitchen b ON (a.kitchen_id=b.kitchen_id)"
+					+ "WHERE a.order_id=" + orderID + "  AND a.restaurant_id="
 					+ term.restaurant_id;
-			
+
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while (dbCon.rs.next()) {
 				// the string is separated by comma
@@ -98,37 +95,6 @@ public class QueryDetailAction extends Action {
 				 * The json to each order detail looks like below
 				 * [日期,名称,单价,数量,折扣,口味,口味价钱,厨房,服务员,备注]
 				 */
-				// String jsonOrderDetail =
-				// "[$(order_date),$(food_name),$(unit_price),$(amount),$(discount),"
-				// +
-				// "$(taste_pref),$(taste_price),$(kitchen),$(waiter),$(comment)]";
-				// jsonOrderDetail = jsonOrderDetail.replace("$(order_date)",
-				// new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-				// .format(dbCon.rs.getTimestamp("order_date")));
-				// jsonOrderDetail = jsonOrderDetail.replace("$(food_name)",
-				// dbCon.rs.getString("name"));
-				// jsonOrderDetail = jsonOrderDetail.replace("$(unit_price)",
-				// Float.toString(dbCon.rs.getFloat("unit_price")));
-				// jsonOrderDetail = jsonOrderDetail.replace("$(amount)",
-				// Float.toString(dbCon.rs.getFloat("order_count")));
-				// jsonOrderDetail = jsonOrderDetail.replace("$(discount)",
-				// Float.toString(dbCon.rs.getFloat("discount")));
-				// jsonOrderDetail = jsonOrderDetail.replace("$(taste_pref)",
-				// dbCon.rs.getString("taste").replaceAll(",", "；"));
-				// jsonOrderDetail = jsonOrderDetail.replace("$(taste_price)",
-				// Float.toString(dbCon.rs.getFloat("taste_price")));
-				// jsonOrderDetail = jsonOrderDetail.replace("$(kitchen)",
-				// dbCon.rs.getString("kitchen_name"));
-				// jsonOrderDetail = jsonOrderDetail.replace("$(waiter)",
-				// dbCon.rs.getString("waiter"));
-				// String comment = dbCon.rs.getString("comment");
-				// jsonOrderDetail = jsonOrderDetail.replace("$(comment)",
-				// comment != null ? comment : "");
-				// // put each json order info to the value
-				// value.append(jsonOrderDetail);
-				//
-				// nCount++;
-
 				// mod by ZTF @10/02;
 				HashMap resultMay = new HashMap();
 				resultMay.put("order_date", new SimpleDateFormat(
@@ -258,7 +224,7 @@ public class QueryDetailAction extends Action {
 			String outputJson = "{\"totalProperty\":" + resultList.size() + ","
 					+ obj.toString().substring(1);
 
-			//System.out.println(outputJson);
+			// System.out.println(outputJson);
 
 			// out.write(jsonResp);
 			out.write(outputJson);

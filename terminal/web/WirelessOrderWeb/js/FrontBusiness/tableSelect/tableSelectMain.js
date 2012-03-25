@@ -55,8 +55,8 @@ Ext
 															url : "../../TransTable.do",
 															params : {
 																"pin" : pin,
-																"oldTableID" : selectedTable,
-																"newTableID" : inputTableNbr
+																"oldTableAlias" : selectedTable,
+																"newTableAlias" : inputTableNbr
 															},
 															success : function(
 																	response,
@@ -540,7 +540,7 @@ Ext
 																		url : "../../CancelOrder.do",
 																		params : {
 																			"pin" : pin,
-																			"tableID" : selectedTable
+																			"tableAlias" : selectedTable
 																		},
 																		success : function(
 																				response,

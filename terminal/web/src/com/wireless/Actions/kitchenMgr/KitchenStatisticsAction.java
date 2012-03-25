@@ -76,10 +76,10 @@ public class KitchenStatisticsAction extends Action {
 			// get the query condition
 			String dateBegin = request.getParameter("dateBegin");
 			String dateEnd = request.getParameter("dateEnd");
-			String kitchenIDs = request.getParameter("kitchenIDs");
+			String kitchenAlias = request.getParameter("kitchenAlias");
 
 
-			String condition = " AND C.kitchen IN (" + kitchenIDs + ") ";
+			String condition = " AND C.kitchen_alias IN (" + kitchenAlias + ") ";
 			if (!dateBegin.equals("")) {
 				condition = condition + " AND D.pay_datetime >= '" + dateBegin
 						+ " 00:00:00" + "' ";
@@ -92,7 +92,7 @@ public class KitchenStatisticsAction extends Action {
 					+ term.restaurant_id;
 
 			OrderFoodReflector foodRef = new OrderFoodReflector();
-			String orderClause = " ORDER BY D.pay_date DESC, C.kitchen ";
+			String orderClause = " ORDER BY D.pay_date DESC, C.kitchen_alias ";
 			OrderFood orderFoods[] = foodRef.getDetailHistory(dbCon, condition,
 					orderClause);
 
@@ -115,7 +115,7 @@ public class KitchenStatisticsAction extends Action {
 					OrderFood orderFood = orderFoods[i];
 					String orderDate = new SimpleDateFormat("yyyy-MM-dd")
 							.format(new Date(orderFood.orderDate));
-					int kitchen = orderFood.kitchen;
+					int kitchen = orderFood.kitchen.aliasID;
 
 					if (!orderDate.equals(lastDate) || kitchen != lastKitchen) {
 						if (rowCount != 0) {

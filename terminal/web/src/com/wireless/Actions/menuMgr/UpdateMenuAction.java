@@ -68,7 +68,7 @@ public class UpdateMenuAction extends Action {
 			
 
 			// get the query condition
-			int dishNumber = Integer.parseInt(request.getParameter("dishNumber"));
+			int foodID = Integer.parseInt(request.getParameter("foodID"));
 			String dishName = request.getParameter("dishName");
 			String dishSpill = request.getParameter("dishSpill");
 			float dishPrice = Float.parseFloat(request.getParameter("dishPrice"));
@@ -109,7 +109,7 @@ public class UpdateMenuAction extends Action {
 					" kitchen = " + kitchen + ", " + 
 					" status =  " + status + 
 					" WHERE restaurant_id=" + term.restaurant_id
-					+ " AND alias_id = " + dishNumber;
+					+ " AND food_id = " + foodID;
 
 			int sqlRowCount = dbCon.stmt.executeUpdate(sql);
 

@@ -73,7 +73,7 @@ public class UpdateTasteAction extends Action {
 						+ fieldValues[3] + ", " + " calc = " + fieldValues[4]
 						+ ", " + " category = " + fieldValues[5] + " "
 						+ " WHERE restaurant_id=" + term.restaurant_id
-						+ " AND alias_id = " + fieldValues[0];
+						+ " AND taste_id = " + fieldValues[0];
 
 				sqlRowCount = dbCon.stmt.executeUpdate(sql);
 			}

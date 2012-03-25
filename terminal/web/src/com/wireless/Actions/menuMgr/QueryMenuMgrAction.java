@@ -113,7 +113,7 @@ public class QueryMenuMgrAction extends Action {
 
 			if (type == 1) {
 				// 按编号
-				filterCondition = " AND alias_id " + ope + filterVal;
+				filterCondition = " AND food_alias " + ope + filterVal;
 			} else if (type == 2) {
 				// 按名称
 				filterCondition = " AND name like '%" + filterVal + "%'";
@@ -161,7 +161,8 @@ public class QueryMenuMgrAction extends Action {
 						Util.float2String(foods[i].getPrice()));
 				resultMap.put("dishSpill", foods[i].pinyin);
 				resultMap
-						.put("kitchen", new Short(foods[i].kitchen).toString());
+						.put("kitchenAlias", new Short(foods[i].kitchen.aliasID).toString());
+				resultMap.put("kitchenID", new Long(foods[i].kitchen.kitchenID).toString());
 				resultMap.put("special", foods[i].isSpecial());
 				resultMap.put("recommend", foods[i].isRecommend());
 				resultMap.put("stop", foods[i].isSellOut());

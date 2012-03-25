@@ -102,7 +102,7 @@ public class InsertMenuAction extends Action {
 			};
 			
 			String sql = "INSERT INTO " + Params.dbName + ".food" +
-					"( alias_id, name, pinyin, unit_price, restaurant_id, kitchen, status, enabled ) " + 
+					"( food_alias, name, pinyin, unit_price, restaurant_id, kitchen, status, enabled ) " + 
 					" VALUES(" +
 					dishNumber + ", '" +
 					dishName + "', '" +

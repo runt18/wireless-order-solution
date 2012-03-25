@@ -45,13 +45,15 @@ function loadAddKitchens() {
 		},
 		success : function(response, options) {
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
-			// 格式：[分廚編號，名稱]
+			// 格式：[分廚編號，名稱，分廚別名]
 			// 后台格式：[分廚編號，名稱，一般折扣１，一般折扣２，一般折扣３，會員折扣１，會員折扣２，會員折扣３，部門]
 			var rootData = resultJSON.root;
 			if (rootData[0].message == "normal") {
 				for ( var i = 0; i < rootData.length; i++) {
-					kitchenMultSelectData.push([ rootData[i].kitchenID,
-							rootData[i].kitchenName ]);
+					kitchenMultSelectData
+							.push([ rootData[i].kitchenAlias,
+									rootData[i].kitchenName,
+									rootData[i].kitchenID ]);
 				}
 				kitchenStore.reload();
 			} else {

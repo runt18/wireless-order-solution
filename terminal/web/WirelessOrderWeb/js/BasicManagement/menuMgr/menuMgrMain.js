@@ -335,7 +335,7 @@ menuStatResultGrid.getStore().on('beforeload', function() {
 	// 输入查询条件参数
 	this.baseParams = {
 		"pin" : pin,
-		"foodIDs" : orderStaticDishesString,
+		"foodAlias" : orderStaticDishesString,
 		"dateBegin" : orderStaticBeginDate,
 		"dateEnd" : orderStaticEndDate
 	};
@@ -1313,13 +1313,13 @@ function dishDeleteHandler(rowIndex) {
 		buttons : Ext.MessageBox.YESNO,
 		fn : function(btn) {
 			if (btn == "yes") {
-				var dishNumber = menuStore.getAt(rowIndex).get("dishNumber");
+				var foodID = menuStore.getAt(rowIndex).get("foodID");
 
 				Ext.Ajax.request({
 					url : "../../DeleteMenu.do",
 					params : {
 						"pin" : pin,
-						"dishNumber" : dishNumber
+						"foodID" : foodID
 					},
 					success : function(response, options) {
 						var resultJSON = Ext.util.JSON

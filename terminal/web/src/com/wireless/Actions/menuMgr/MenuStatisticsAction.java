@@ -76,38 +76,14 @@ public class MenuStatisticsAction extends Action {
 			// get the query condition
 			String dateBegin = request.getParameter("dateBegin");
 			String dateEnd = request.getParameter("dateEnd");
-			String dishString = request.getParameter("foodIDs");
+			String foodAlias = request.getParameter("foodAlias");
 
 			/**
 			 * Select all the today orders matched the conditions below. 1 -
 			 * belong to this restaurant 2 - has been paid 3 - match extra
 			 * filter condition
 			 */
-			// String sql =
-			// "SELECT food_id, name, unit_price, is_temporary, kitchen, "
-			// +
-			// " sum(order_count) as dishCount, sum(order_count)*unit_price as totalPrice "
-			// + " FROM "
-			// + Params.dbName
-			// + ".order_food_history "
-			// + " WHERE 1=1 AND restaurant_id = "
-			// + term.restaurant_id
-			// + " ";
-			// if (!dateBegin.equals("")) {
-			// sql = sql + " AND order_date >= '" + dateBegin + "' ";
-			// }
-			// if (!dateEnd.equals("")) {
-			// sql = sql + " AND order_date <= '" + dateEnd + "' ";
-			// }
-			// sql = sql
-			// + " AND food_id in ("
-			// + dishString
-			// + ") "
-			// + " GROUP BY food_id, name, unit_price, is_temporary, kitchen ";
-			//
-			// dbCon.rs = dbCon.stmt.executeQuery(sql);
-
-			String condition = " AND C.food_id IN (" + dishString + ") ";
+			String condition = " AND C.food_alias IN (" + foodAlias + ") ";
 			if (!dateBegin.equals("")) {
 				condition = condition + " AND D.pay_datetime >= '" + dateBegin
 						+ " 00:00:00" + "' ";
@@ -120,54 +96,33 @@ public class MenuStatisticsAction extends Action {
 					+ term.restaurant_id;
 
 			//String orderClause = " ORDER BY D.food_id DESC, D.pay_date ";
-			String orderClause = " ORDER BY D.food_id ASC, D.pay_date ";
+			String orderClause = " ORDER BY D.food_alias ASC, D.pay_date ";
 
 			OrderFoodReflector foodRef = new OrderFoodReflector();
 			OrderFood orderFoods[] = foodRef.getDetailHistory(dbCon, condition,
 					orderClause);
 
-			// while (dbCon.rs.next()) {
-			// HashMap resultMap = new HashMap();
-			// /**
-			// * The json to each order looks like below
-			// * 菜品ｉｄ，菜品名稱，菜品單價，是否臨時，厨房，總數量，總價格
-			// */
-			// resultMap.put("dishNumber", dbCon.rs.getInt("food_id"));
-			// resultMap.put("dishName", dbCon.rs.getString("name"));
-			// resultMap.put("dishPrice", dbCon.rs.getFloat("unit_price"));
-			// resultMap.put("isTemp", dbCon.rs.getBoolean("is_temporary"));
-			// resultMap.put("kitchen", dbCon.rs.getInt("kitchen"));
-			// resultMap.put("dishCount", dbCon.rs.getFloat("dishCount"));
-			// resultMap
-			// .put("dishTotalPrice", dbCon.rs.getFloat("totalPrice"));
-			// resultMap.put("message", "normal");
-			//
-			// resultList.add(resultMap);
-			//
-			// totalPrice = totalPrice + dbCon.rs.getFloat("totalPrice");
-			// }
-
-			int lastFoodId = -100;
-			int lastKitchen = -1;
+			int lastFoodAlias = -100;
+			int lastKitchenAlias = -100;
 			String lastFoodName = "";
 			int rowCount = 0;
 			float sumAmout = 0;
 			float SumPrice = 0;
 			for (int i = 0; i < orderFoods.length; i++) {
 				OrderFood orderFood = orderFoods[i];
-				int thisFoodId = orderFood.aliasID;
+				int thisFoodAlias = orderFood.aliasID;
 
-				if (thisFoodId != lastFoodId) {
+				if (thisFoodAlias != lastFoodAlias) {
 					if (rowCount != 0) {
 						HashMap resultMap = new HashMap();
 
-						resultMap.put("dishNumber", lastFoodId);
+						resultMap.put("dishNumber", lastFoodAlias);
 						resultMap.put("dishName", lastFoodName);
 						// resultMap.put("dishPrice",
 						// dbCon.rs.getFloat("unit_price"));
 						// resultMap.put("isTemp",
 						// orderFoods[i].isTemporary);
-						resultMap.put("kitchen", lastKitchen);
+						resultMap.put("kitchen", lastKitchenAlias);
 						resultMap.put("dishCount", sumAmout);
 						resultMap.put("dishTotalPrice", SumPrice);
 						resultMap.put("message", "normal");
@@ -181,8 +136,8 @@ public class MenuStatisticsAction extends Action {
 				}
 
 				rowCount = rowCount + 1;
-				lastFoodId = thisFoodId;
-				lastKitchen = orderFoods[i].kitchen;
+				lastFoodAlias = thisFoodAlias;
+				lastKitchenAlias = orderFoods[i].kitchen.aliasID;
 				lastFoodName = orderFoods[i].name;
 
 				float allPrice = (float) Math.round((orderFood.getPrice2()
@@ -199,12 +154,12 @@ public class MenuStatisticsAction extends Action {
 			if (totalPrice != 0) {
 				HashMap resultMap = new HashMap();
 
-				resultMap.put("dishNumber", lastFoodId);
+				resultMap.put("dishNumber", lastFoodAlias);
 				resultMap.put("dishName", lastFoodName);
 				// resultMap.put("dishPrice",
 				// dbCon.rs.getFloat("unit_price"));
 				// resultMap.put("isTemp", orderFoods[i].isTemporary);
-				resultMap.put("kitchen", lastKitchen);
+				resultMap.put("kitchen", lastFoodAlias);
 				resultMap.put("dishCount", sumAmout);
 				resultMap.put("dishTotalPrice", SumPrice);
 				resultMap.put("message", "normal");

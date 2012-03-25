@@ -51,14 +51,14 @@ public class DeleteTableAction extends Action {
 			
 
 			// get the query condition
-			int tableNumber = Integer.parseInt(request.getParameter("tableID"));
+			int tableID = Integer.parseInt(request.getParameter("tableID"));
 	
 			/**
 			 * 
 			 */
 			String sql = "DELETE FROM " + Params.dbName + ".table " +
 					"WHERE restaurant_id=" + term.restaurant_id
-					+ " AND alias_id = " + tableNumber;
+					+ " AND table_id = " + tableID;
 
 
 			int sqlRowCount = dbCon.stmt.executeUpdate(sql);

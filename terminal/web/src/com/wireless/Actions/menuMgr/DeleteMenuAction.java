@@ -54,14 +54,14 @@ public class DeleteMenuAction extends Action {
 			
 
 			// get the query condition
-			int dishNumber = Integer.parseInt(request.getParameter("dishNumber"));
+			int foodID = Integer.parseInt(request.getParameter("foodID"));
 	
 			/**
 			 * 
 			 */
 			String sql = "DELETE FROM " + Params.dbName + ".food " +
 					"WHERE restaurant_id=" + term.restaurant_id
-					+ " AND alias_id = " + dishNumber;
+					+ " AND food_id = " + foodID;
 
 
 			int sqlRowCount = dbCon.stmt.executeUpdate(sql);

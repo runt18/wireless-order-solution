@@ -70,7 +70,7 @@ public class InsertTasteAction extends Action {
 			String sql = "INSERT INTO "
 					+ Params.dbName
 					+ ".taste"
-					+ "( restaurant_id, alias_id, preference, price, category, rate, calc ) "
+					+ "( restaurant_id, taste_alias, preference, price, category, rate, calc ) "
 					+ " VALUES(" + term.restaurant_id + ", " + tasteNumber
 					+ ", '" + tasteName + "', " + tastePrice + ", " + type
 					+ "," + tasteRate + "," + cal + " ) ";

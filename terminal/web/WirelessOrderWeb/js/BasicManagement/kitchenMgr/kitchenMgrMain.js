@@ -268,7 +268,7 @@ kitchenStatResultGrid.getStore().on('beforeload', function() {
 	// 输入查询条件参数
 	this.baseParams = {
 		"pin" : pin,
-		"kitchenIDs" : kitchenStaticString,
+		"kitchenAlias" : kitchenStaticString,
 		"dateBegin" : kitchenStaticBeginDate,
 		"dateEnd" : kitchenStaticEndDate
 	};
@@ -447,6 +447,8 @@ var kitchenStore = new Ext.data.Store({
 		root : "root"
 	}, [ {
 		name : "kitchenID"
+	}, {
+		name : "kitchenAlias"
 	}, {
 		name : "kitchenName"
 	}, {
