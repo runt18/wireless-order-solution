@@ -272,6 +272,17 @@ ALTER TABLE `wireless_order_db`.`food` ADD COLUMN `kitchen_id` INT NULL DEFAULT 
 UPDATE wireless_order_db.food AS a SET kitchen_id = (SELECT kitchen_id FROM wireless_order_db.kitchen b WHERE b.restaurant_id=a.restaurant_id AND b.kitchen_alias=a.kitchen_alias);
 
 -- -----------------------------------------------------
+-- Add the field 'is_paid' to table 'order_food'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_food` ADD COLUMN `is_paid` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates whether this record is paid before'  AFTER `is_temporary` ;
+
+-- -----------------------------------------------------
+-- Add the field 'is_paid' to table 'order_food_history'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_food_history` ADD COLUMN `is_paid` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates whether this record is paid before'  AFTER `is_temporary` ;
+
+
+-- -----------------------------------------------------
 -- View `order_food_history_view`
 -- -----------------------------------------------------
 DROP VIEW IF EXISTS order_food_history_view;

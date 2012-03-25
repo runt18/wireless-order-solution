@@ -101,6 +101,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food` (
   `comment` VARCHAR(100) NULL DEFAULT NULL COMMENT 'the comment to this record, such as the reason to cancel food' ,
   `waiter` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name of waiter who deal with this record' ,
   `is_temporary` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates whether the food to this record is temporary' ,
+  `is_paid` TINYINT NULL DEFAULT 0 COMMENT 'indicates whether this record is paid before' ,
   INDEX `fk_order_food_order` (`order_id` ASC) ,
   PRIMARY KEY (`id`) ,
   CONSTRAINT `fk_order_food_order`
@@ -405,6 +406,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food_history` (
   `comment` VARCHAR(100) NULL DEFAULT NULL COMMENT 'the comment to this record, such as the reason to cancel food' ,
   `waiter` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name of waiter who deal with this record' ,
   `is_temporary` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates whether the food to this record is temporary' ,
+  `is_paid` TINYINT NULL DEFAULT 0 COMMENT 'indicates whether this record is paid before' ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_order_food_history_order_history1` (`order_id` ASC) ,
   CONSTRAINT `fk_order_food_history_order_history1`
