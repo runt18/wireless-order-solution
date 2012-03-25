@@ -155,7 +155,7 @@ public class DailySettle {
 					"`unit_price`,`name`, `food_status`, `taste`,`taste_price`," +
 					"`taste_alias`, `taste2_alias`, `taste3_alias`, `taste_id`,`taste2_id`,`taste3_id`, " +
 					"`discount`, `dept_id`, `kitchen_id`, `kitchen_alias`," +
-					"`comment`,`waiter`,`is_temporary`";
+					"`comment`,`waiter`,`is_temporary`,`is_paid`";
 		
 		try{
 			dbCon.conn.setAutoCommit(false);

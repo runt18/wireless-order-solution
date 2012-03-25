@@ -382,7 +382,7 @@ public class UpdateOrder {
 						"(`restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `name`, `food_status`, `hang_status`, " +
 						"`taste_id`, `taste2_id`, `taste3_id`, " + 
 						"`discount`, `taste_alias`, `taste2_alias`, `taste3_alias`, `taste_price`, " +
-						"`taste`, `dept_id`, `kitchen_id`, `kitchen_alias`, `waiter`, `order_date`, `is_temporary`) VALUES (" +
+						"`taste`, `dept_id`, `kitchen_id`, `kitchen_alias`, `waiter`, `order_date`, `is_temporary`, `is_paid`) VALUES (" +
 						term.restaurant_id + ", " +
 						orderToUpdate.id + ", " +
 						(extraFoods.get(i).foodID == 0 ? "NULL" : extraFoods.get(i).foodID) + ", " +
@@ -406,7 +406,8 @@ public class UpdateOrder {
 						extraFoods.get(i).kitchen.aliasID + ", '" + 
 						term.owner + "', " +
 						"NOW(), " + 
-						(extraFoods.get(i).isTemporary ? 1 : 0) + 
+						(extraFoods.get(i).isTemporary ? 1 : 0) + ", " +
+						(isPaidAgain ? 1 : 0) +
 						")";
 				dbCon.stmt.executeUpdate(sql);			
 			}
@@ -424,7 +425,7 @@ public class UpdateOrder {
 						"`taste_id`, `taste2_id`, `taste3_id`, " +
 						"`discount`, `taste_alias`, `taste2_alias`, `taste3_alias`, `taste_price`, `taste`, " +
 						"`dept_id`, `kitchen_id`, `kitchen_alias`, " +
-						"`waiter`, `order_date`, `is_temporary`) VALUES (" +
+						"`waiter`, `order_date`, `is_temporary`, `is_paid`) VALUES (" +
 						term.restaurant_id + ", " +
 						orderToUpdate.id + ", " +
 						(canceledFoods.get(i).foodID == 0 ? "NULL" : canceledFoods.get(i).foodID) + ", " +
@@ -448,7 +449,8 @@ public class UpdateOrder {
 						canceledFoods.get(i).kitchen.aliasID + ", '" + 
 						term.owner + "', " +
 						"NOW(), " + 
-						(canceledFoods.get(i).isTemporary ? 1 : 0) + 
+						(canceledFoods.get(i).isTemporary ? 1 : 0) + ", " +
+						(isPaidAgain ? 1 : 0) +
 						")";
 				dbCon.stmt.executeUpdate(sql);			
 			}
