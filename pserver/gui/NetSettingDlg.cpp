@@ -56,7 +56,7 @@ BOOL CNetSettingDlg::OnInitDialog()
 			//get the IP address
 			string ip_addr = pRemote->Attribute(ConfTags::REMOTE_IP);
 			DWORD dwIP = ntohl(inet_addr(ip_addr.c_str()));
-			m_IPAddr.SetAddress(dwIP);
+			m_IPAddr.SetWindowText(CString(ip_addr.c_str()));
 			//get the port
 			string port = pRemote->Attribute(ConfTags::REMOTE_PORT);
 			m_Port.SetWindowText(CString(port.c_str()));

@@ -29,7 +29,7 @@ private:
 	CEdit m_Account;
 	CEdit m_Pwd;
 	CEdit m_Port;
-	CIPAddressCtrl m_IPAddr;
+	CEdit m_IPAddr;
 	TiXmlDocument m_Conf;
 	string m_InitPwd;
 

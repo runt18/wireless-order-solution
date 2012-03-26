@@ -23,7 +23,7 @@ using namespace std;
 #endif
 
 //the string indicating the version of the program
-const TCHAR* _PROG_VER_ = _T("1.0.3");
+const TCHAR* _PROG_VER_ = _T("1.0.4");
 //the path to the conf.xml
 CString g_ConfPath;
 //the path to new setup program
@@ -258,6 +258,9 @@ static unsigned __stdcall StopPrinterProc(LPVOID pvParam){
 
 static unsigned _stdcall StartPrinterProc(LPVOID pvParam){
 
+	const char* CONF_VER = "1.1";
+	const char* SERV_ADDR = "www.e-tones.net";
+
 	CMainFrame* pMainFrame = reinterpret_cast<CMainFrame*>(pvParam);
 
 	//wait until the printer service finish stopping
@@ -299,245 +302,17 @@ static unsigned _stdcall StartPrinterProc(LPVOID pvParam){
 				}
 
 				/**
-				* As adding "region_1..10" & "kitchen1..50" attributes since 1.0.2,
-				* we need to check to see whether each printer tag containing these attributes.
-				* Firstly, combine the elements with the same printer name and func code,
-				* Secondly, add the region and kitchen attributes to each new elements.
-				*/
-				const char* pConfVer = pRoot->Attribute(ConfTags::CONF_VER);
-				if(pConfVer == NULL){
-					vector<PInstanceXML> pInstances;
-					TiXmlElement* pPrinter = TiXmlHandle(pRoot).FirstChildElement(ConfTags::PRINTER).Element();
-					for(pPrinter; pPrinter != NULL; pPrinter = pPrinter->NextSiblingElement(ConfTags::PRINTER)){
-						//get the printer name
-						string name = pPrinter->Attribute(ConfTags::PRINT_NAME);						
-						//get the printer function code
-						int func = Reserved::PRINT_UNKNOWN;
-						pPrinter->QueryIntAttribute(ConfTags::PRINT_FUNC, &func);
-						//get the printer style
-						int style = PRINT_STYLE_UNKNOWN;
-						pPrinter->QueryIntAttribute(ConfTags::PRINT_STYLE, &style);
-						//get the repeat number
-						int repeat = 1;
-						pPrinter->QueryIntAttribute(ConfTags::PRINT_REPEAT, &repeat);
-						//get the description
-						string desc = pPrinter->Attribute(ConfTags::PRINT_DESC);
-						//get the kitchen
-						int kitchen = Kitchen::KITCHEN_ALL;
-						if(pPrinter->QueryIntAttribute(ConfTags::KITCHEN, &kitchen) == TIXML_NO_ATTRIBUTE){
-							kitchen = Kitchen::KITCHEN_ALL;
-						}
-
-						//check to see whether the elements with the same printer name and func code is exist
-						vector<PInstanceXML>::iterator iter = pInstances.begin();
-						for(iter; iter != pInstances.end(); iter++){
-							if(iter->printerName == name && iter->func == func){
-								break;
-							}
-						}
-
-						if(iter == pInstances.end()){
-							//add the new printer instance
-							PInstanceXML instanceXML;
-							instanceXML.printerName = name;
-							instanceXML.func = func;
-							instanceXML.style = style;
-							instanceXML.repeat = repeat;
-							instanceXML.desc = desc;
-							instanceXML.kitchens.push_back(kitchen);
-							instanceXML.regions.push_back(Region::REGION_ALL);
-							instanceXML.regions.push_back(Region::REGION_1);
-							instanceXML.regions.push_back(Region::REGION_2);
-							instanceXML.regions.push_back(Region::REGION_3);
-							instanceXML.regions.push_back(Region::REGION_4);
-							instanceXML.regions.push_back(Region::REGION_5);
-							instanceXML.regions.push_back(Region::REGION_6);
-							instanceXML.regions.push_back(Region::REGION_7);
-							instanceXML.regions.push_back(Region::REGION_8);
-							instanceXML.regions.push_back(Region::REGION_9);
-							instanceXML.regions.push_back(Region::REGION_10);
-							pInstances.push_back(instanceXML);
-						}else{
-							//append the kitchen to elements with the same printer and and func code
-							iter->kitchens.push_back(kitchen);
-						}
+				 * Change the remote ip to "www.e-tones.net"
+				 */
+				string confVer = pRoot->Attribute(ConfTags::CONF_VER);
+				if(confVer != CONF_VER){
+					//change the version to 1.1
+					pRoot->SetAttribute(ConfTags::CONF_VER, CONF_VER);
+					//change the remote ip to "www.e-tones.net"
+					TiXmlElement* pRemote = TiXmlHandle(pRoot).FirstChildElement(ConfTags::REMOTE).Element();
+					if(pRemote != NULL){
+						pRemote->SetAttribute(ConfTags::REMOTE_IP, SERV_ADDR);
 					}
-
-					//clear all original printer elements
-					while((pPrinter = TiXmlHandle(pRoot).FirstChildElement(ConfTags::PRINTER).Element()) != NULL){
-						TiXmlHandle(pRoot).Element()->RemoveChild(pPrinter);
-					}
-
-					//add attribute "ver" to <conf>
-					pRoot->SetAttribute(ConfTags::CONF_VER, "1.0");
-
-					//enumerate to re-create the new XML
-					for(vector<PInstanceXML>::iterator iter = pInstances.begin(); iter != pInstances.end(); iter++){
-						TiXmlElement* pPrinter = new TiXmlElement(ConfTags::PRINTER);
-						//set the printer name attribute
-						pPrinter->SetAttribute(ConfTags::PRINT_NAME, iter->printerName.c_str());
-						//set the func code
-						pPrinter->SetAttribute(ConfTags::PRINT_FUNC, iter->func);
-						//set the style
-						pPrinter->SetAttribute(ConfTags::PRINT_STYLE, iter->style);
-						//set the repeat
-						pPrinter->SetAttribute(ConfTags::PRINT_REPEAT, iter->repeat);
-						//set the desc
-						pPrinter->SetAttribute(ConfTags::PRINT_DESC, iter->desc.c_str());
-						//set the regions
-						pPrinter->SetAttribute(ConfTags::REGION_ALL, 1);
-						pPrinter->SetAttribute(ConfTags::REGION_1, 1);
-						pPrinter->SetAttribute(ConfTags::REGION_2, 1);
-						pPrinter->SetAttribute(ConfTags::REGION_3, 1);
-						pPrinter->SetAttribute(ConfTags::REGION_4, 1);
-						pPrinter->SetAttribute(ConfTags::REGION_5, 1);
-						pPrinter->SetAttribute(ConfTags::REGION_6, 1);
-						pPrinter->SetAttribute(ConfTags::REGION_7, 1);
-						pPrinter->SetAttribute(ConfTags::REGION_8, 1);
-						pPrinter->SetAttribute(ConfTags::REGION_9, 1);
-						pPrinter->SetAttribute(ConfTags::REGION_10, 1);
-						//set attribute "kitchen_1..50" to "1" 
-						pPrinter->SetAttribute(ConfTags::KITCHEN_ALL, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_TEMP, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_1, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_2, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_3, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_4, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_5, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_6, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_7, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_8, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_9, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_10, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_11, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_12, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_13, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_14, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_15, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_16, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_17, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_18, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_19, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_20, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_21, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_22, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_23, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_24, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_25, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_26, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_27, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_28, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_29, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_30, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_31, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_32, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_33, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_34, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_35, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_36, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_37, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_38, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_39, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_40, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_41, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_42, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_43, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_44, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_45, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_46, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_47, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_48, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_49, 1);
-						pPrinter->SetAttribute(ConfTags::KITCHEN_50, 1);
-
-						//check if KITCHEN_ALL exist
-						vector<int>::iterator iter_kitchen = find(iter->kitchens.begin(), iter->kitchens.end(), Kitchen::KITCHEN_ALL);
-						if(iter_kitchen != iter->kitchens.end()){
-							pPrinter->SetAttribute(ConfTags::KITCHEN_ALL, 1);
-						}else{
-							pPrinter->SetAttribute(ConfTags::KITCHEN_ALL, 0);
-							//check if KITCHEN_TEMP exist
-							iter_kitchen = find(iter->kitchens.begin(), iter->kitchens.end(), Kitchen::KITCHEN_TEMP);
-							if(iter_kitchen != iter->kitchens.end()){
-								pPrinter->SetAttribute(ConfTags::KITCHEN_TEMP, 1);
-							}else{
-								pPrinter->SetAttribute(ConfTags::KITCHEN_TEMP, 0);
-							}
-							//check if KITCHEN_1 exist
-							iter_kitchen = find(iter->kitchens.begin(), iter->kitchens.end(), Kitchen::KITCHEN_1);
-							if(iter_kitchen != iter->kitchens.end()){
-								pPrinter->SetAttribute(ConfTags::KITCHEN_1, 1);
-							}else{
-								pPrinter->SetAttribute(ConfTags::KITCHEN_1, 0);
-							}
-							//check if KITCHEN_2 exist
-							iter_kitchen = find(iter->kitchens.begin(), iter->kitchens.end(), Kitchen::KITCHEN_2);
-							if(iter_kitchen != iter->kitchens.end()){
-								pPrinter->SetAttribute(ConfTags::KITCHEN_2, 1);
-							}else{
-								pPrinter->SetAttribute(ConfTags::KITCHEN_2, 0);
-							}
-							//check if KITCHEN_3 exist
-							iter_kitchen = find(iter->kitchens.begin(), iter->kitchens.end(), Kitchen::KITCHEN_3);
-							if(iter_kitchen != iter->kitchens.end()){
-								pPrinter->SetAttribute(ConfTags::KITCHEN_3, 1);
-							}else{
-								pPrinter->SetAttribute(ConfTags::KITCHEN_3, 0);
-							}
-							//check if KITCHEN_4 exist
-							iter_kitchen = find(iter->kitchens.begin(), iter->kitchens.end(), Kitchen::KITCHEN_4);
-							if(iter_kitchen != iter->kitchens.end()){
-								pPrinter->SetAttribute(ConfTags::KITCHEN_4, 1);
-							}else{
-								pPrinter->SetAttribute(ConfTags::KITCHEN_4, 0);
-							}
-							//check if KITCHEN_5 exist
-							iter_kitchen = find(iter->kitchens.begin(), iter->kitchens.end(), Kitchen::KITCHEN_5);
-							if(iter_kitchen != iter->kitchens.end()){
-								pPrinter->SetAttribute(ConfTags::KITCHEN_5, 1);
-							}else{
-								pPrinter->SetAttribute(ConfTags::KITCHEN_5, 0);
-							}
-							//check if KITCHEN_6 exist
-							iter_kitchen = find(iter->kitchens.begin(), iter->kitchens.end(), Kitchen::KITCHEN_6);
-							if(iter_kitchen != iter->kitchens.end()){
-								pPrinter->SetAttribute(ConfTags::KITCHEN_6, 1);
-							}else{
-								pPrinter->SetAttribute(ConfTags::KITCHEN_6, 0);
-							}
-							//check if KITCHEN_7 exist
-							iter_kitchen = find(iter->kitchens.begin(), iter->kitchens.end(), Kitchen::KITCHEN_7);
-							if(iter_kitchen != iter->kitchens.end()){
-								pPrinter->SetAttribute(ConfTags::KITCHEN_7, 1);
-							}else{
-								pPrinter->SetAttribute(ConfTags::KITCHEN_7, 0);
-							}
-							//check if KITCHEN_8 exist
-							iter_kitchen = find(iter->kitchens.begin(), iter->kitchens.end(), Kitchen::KITCHEN_8);
-							if(iter_kitchen != iter->kitchens.end()){
-								pPrinter->SetAttribute(ConfTags::KITCHEN_8, 1);
-							}else{
-								pPrinter->SetAttribute(ConfTags::KITCHEN_8, 0);
-							}
-							//check if KITCHEN_9 exist
-							iter_kitchen = find(iter->kitchens.begin(), iter->kitchens.end(), Kitchen::KITCHEN_9);
-							if(iter_kitchen != iter->kitchens.end()){
-								pPrinter->SetAttribute(ConfTags::KITCHEN_9, 1);
-							}else{
-								pPrinter->SetAttribute(ConfTags::KITCHEN_9, 0);
-							}
-							//check if KITCHEN_10 exist
-							iter_kitchen = find(iter->kitchens.begin(), iter->kitchens.end(), Kitchen::KITCHEN_10);
-							if(iter_kitchen != iter->kitchens.end()){
-								pPrinter->SetAttribute(ConfTags::KITCHEN_10, 1);
-							}else{
-								pPrinter->SetAttribute(ConfTags::KITCHEN_10, 0);
-							}
-						}
-
-						pRoot->LinkEndChild(pPrinter);
-					}
-					
 					ofstream fout(g_ConfPath);
 					if(fout.good()){
 						fout.seekp(ios::beg);
@@ -569,8 +344,9 @@ static unsigned _stdcall StartPrinterProc(LPVOID pvParam){
 		TiXmlDocument confDoc;
 		TiXmlDeclaration* pDecl = new TiXmlDeclaration( "1.0", "", "" );
 		TiXmlElement* pRoot = new TiXmlElement(ConfTags::CONF_ROOT);
+		pRoot->SetAttribute(ConfTags::CONF_VER, CONF_VER);
 		TiXmlElement* pRemote = new TiXmlElement(ConfTags::REMOTE);
-		pRemote->SetAttribute(ConfTags::REMOTE_IP, "122.115.57.66");
+		pRemote->SetAttribute(ConfTags::REMOTE_IP, SERV_ADDR);
 		pRemote->SetAttribute(ConfTags::REMOTE_PORT, "44444");
 		pRemote->SetAttribute(ConfTags::ACCOUNT, "");
 		pRemote->SetAttribute(ConfTags::PWD, "");
@@ -1016,7 +792,7 @@ void CMainFrame::OnHelpOnline(){
 					string ip_addr = pRemote->Attribute(ConfTags::REMOTE_IP);
 					if(!ip_addr.empty()){
 						CString url;
-						url.Format(_T("http://%s:10080/pserver/help.html"), CString(ip_addr.c_str()));
+						url.Format(_T("http://%s/pserver/help.html"), CString(ip_addr.c_str()));
 						ShellExecute(NULL, _T("open"), cmdBrowser, url, NULL, SW_MAX);
 					}else{
 						MessageBox(_T("无法打开在线帮助文档"));

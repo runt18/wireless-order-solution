@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "ChkUpdate.h"
 #include <string>
+#include <ws2tcpip.h>
 #include <process.h>
 #include <winhttp.h>
 #include "../tinyxml/tinyxml.h"
@@ -356,9 +357,31 @@ static bool checkOTAHost(IUpdateFunc* pUpdateFunc){
 	TiXmlElement* pRemote = TiXmlHandle(&g_Conf).FirstChildElement(ConfTags::CONF_ROOT).FirstChildElement(ConfTags::REMOTE).Element();
 	if(pRemote){
 		//get the IP address
-		string ip_addr = pRemote->Attribute(ConfTags::REMOTE_IP);
-		if(!ip_addr.empty()){
-			clientService.sin_addr.s_addr = inet_addr(ip_addr.c_str());
+		string serv_name = pRemote->Attribute(ConfTags::REMOTE_IP);
+		if(!serv_name.empty()){
+
+			struct addrinfo hints, *res = NULL;
+			memset(&hints, 0, sizeof(hints));
+			hints.ai_socktype = SOCK_STREAM;
+			hints.ai_family = AF_INET;
+			hints.ai_protocol = IPPROTO_TCP;
+
+			//convert the host name to ip address
+			if (getaddrinfo(serv_name.c_str(), NULL, &hints, &res) != 0) {
+				if(pUpdateFunc){
+					CString s;
+					s.Format(_T("无法解释域名\"%s\""), CString(serv_name.c_str()));
+					pUpdateFunc->OnUpdateExcept(s.GetBuffer());
+					return false;
+				}
+			}else{
+				clientService.sin_addr.s_addr = ((struct sockaddr_in*)res->ai_addr)->sin_addr.s_addr;
+			}
+
+			if(res){
+				freeaddrinfo(res);
+			}
+
 		}else{
 			if(pUpdateFunc){
 				pUpdateFunc->OnUpdateExcept(_T("请设置连接服务器的IP地址"));

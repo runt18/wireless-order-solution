@@ -22,6 +22,7 @@
 #define IDC_ACCOUNT                     1001
 #define IDC_PWD                         1002
 #define IDC_BUTTON_NET_TEST             1003
+#define IDC_ACCOUNT3                    1003
 #define IDC_BUTTON_NET_SAVE             1004
 #define IDC_BUTTON_NET_CANCEL           1005
 #define IDC_ACCOUNT2                    1007
