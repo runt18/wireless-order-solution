@@ -131,7 +131,7 @@ public class QueryMenuMgrAction extends Action {
 				filterCondition = "";
 			}
 			
-			String orderClause = " ORDER BY alias_id ";
+			String orderClause = " ORDER BY food_alias ";
 			
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
