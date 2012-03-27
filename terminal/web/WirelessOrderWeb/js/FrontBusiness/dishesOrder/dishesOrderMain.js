@@ -628,26 +628,157 @@ var orderedForm = new Ext.form.FormPanel(
 								});
 							}
 						}
-					}
-					// , {
-					// text : "清空",
-					// handler : function() {
-					// Ext.Msg.show({
-					// title : "提示",
-					// msg : "确定要删除所有已点菜式？",
-					// buttons : Ext.Msg.YESNO,
-					// fn : function(btn) {
-					// if (btn == "yes") {
-					// orderedData.length = 0;
-					// orderedStore.reload();
-					// }
-					// ;
-					// },
-					// icon : Ext.MessageBox.QUESTION
-					// });
-					// }
-					// }
-					,
+					},
+					{
+						// tableID="100"&customNum="3"&foods="{[1100,2,1,0]}"
+						// 各字段表示的意义：
+						// tableID：餐台号
+						// customNum：就餐人数
+						// foods：菜品列表，格式为{[菜品1编号,菜品1数量,口味1编号,厨房1编号,菜品1折扣,2nd口味1编号,3rd口味1编号]}
+						// 以点菜式格式：[菜名，口味，数量，￥单价，操作，￥实价，菜名编号，厨房编号，口味编号1,特,荐,停,送,￥口味价钱,口味编号2,口味编号3]
+						text : "提交&结帐",
+						handler : function() {
+							if (orderedData.length > 0
+									&& dishesOrderNorthPanel.findById(
+											"tablePersonCount").isValid()) {
+
+								var Request = new URLParaQuery();
+
+								var foodPara = "";
+								for ( var i = 0; i < orderedData.length; i++) {
+									if (orderedData[i][18] == "false") {
+										// [是否临时菜(false),菜品1编号,菜品1数量,口味1编号,厨房1编号,菜品1折扣,2nd口味1编号,3rd口味1编号]，
+										foodPara = foodPara + "[false,"// 是否临时菜(false)
+												+ orderedData[i][6] + "," // 菜品1编号
+												+ orderedData[i][2] + "," // 菜品1数量
+												+ orderedData[i][8] + "," // 口味1编号
+												+ orderedData[i][7] + ","// 厨房1编号
+												+ "0,"// 菜品1折扣
+												+ orderedData[i][14] + ","// 2nd口味1编号
+												+ orderedData[i][15] // 3rd口味1编号
+												+ "]，";
+									} else {
+										// [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价]，
+										var price = orderedData[i][3].substr(1,
+												orderedData[i][3].length - 1);
+										foodPara = foodPara + "[true,"// 是否临时菜(true)
+												+ orderedData[i][6] + "," // 临时菜1编号
+												+ orderedData[i][19] + "," // 临时菜1名称
+												+ orderedData[i][2] + "," // 临时菜1数量
+												+ price + "" // 临时菜1单价(原料單價)
+												+ "]，";
+									}
+
+								}
+								foodPara = "{"
+										+ foodPara.substr(0,
+												foodPara.length - 1) + "}";
+
+								var type = 9;
+								if (Request["tableStat"] == "free") {
+									type = 1;
+								} else {
+									type = 2;
+								}
+
+								var inputPersCount = dishesOrderNorthPanel
+										.findById("tablePersonCount")
+										.getValue();
+
+								// alert("pin:" + Request["pin"] + " tableID:"
+								// + Request["tableNbr"]
+								// + " tableID_2:"
+								// + Request["tableNbr2"]
+								// + " customNum:"
+								// + Request["personCount"] + " type:"
+								// + type + " originalTableID:"
+								// + Request["tableNbr"]
+								// + " category:" + category
+								// + " foods" + foodPara);
+								orderedForm.buttons[0].setDisabled(true);
+								// alert(foodPara);
+								Ext.Ajax
+										.request({
+											url : "../../InsertOrder.do",
+											params : {
+												"pin" : Request["pin"],
+												"tableID" : Request["tableNbr"],
+												"tableID_2" : Request["tableNbr2"],
+												"customNum" : inputPersCount,// get
+												// input
+												// count
+												"type" : type,
+												"originalTableID" : Request["tableNbr"],// no
+												// use
+												"foods" : foodPara,
+												"category" : category
+											},
+											success : function(response,
+													options) {
+												var resultJSON = Ext.util.JSON
+														.decode(response.responseText);
+												if (resultJSON.success == true) {
+													Ext.MessageBox
+															.show({
+																msg : resultJSON.data,
+																width : 300,
+																buttons : Ext.MessageBox.OK,
+																fn : function() {
+																	var Request = new URLParaQuery();
+																	// location.href
+																	// =
+																	// "TableSelect.html?pin="
+																	// +
+																	// Request["pin"]
+																	// +
+																	// "&restaurantID="
+																	// +
+																	// restaurantID;
+																	location.href = "CheckOut.html?tableNbr="
+																			+ Request["tableNbr"]
+																			+ "&personCount="
+																			+ inputPersCount
+																			+ "&pin="
+																			+ Request["pin"]
+																			+ "&restaurantID="
+																			+ restaurantID
+																			+ "&minCost="
+																			+ Request["minCost"]
+																			+ "&serviceRate="
+																			+ Request["serviceRate"];
+																}
+															});
+												} else {
+													orderedForm.buttons[0]
+															.setDisabled(false);
+													Ext.MessageBox
+															.show({
+																msg : resultJSON.data,
+																width : 300,
+																buttons : Ext.MessageBox.OK
+															});
+												}
+											},
+											failure : function(response,
+													options) {
+												orderedForm.buttons[0]
+														.setDisabled(false);
+												Ext.MessageBox.show({
+													msg : "Unknow page error",
+													width : 300,
+													buttons : Ext.MessageBox.OK
+												});
+											}
+										});
+							} else if (orderedData.length == 0) {
+								Ext.MessageBox.show({
+									msg : "还没有选择任何菜品，暂时不能提交",
+									width : 300,
+									buttons : Ext.MessageBox.OK
+								});
+							}
+						}
+					},
 					{
 						text : "返回",
 						handler : function() {
@@ -1674,7 +1805,7 @@ var dishesDisplayGrid = new Ext.grid.GridPanel({
 				dishGridRefresh();
 				orderIsChanged = true;
 				dishOrderCurrRowIndex_ = -1;
-				
+
 				// show all the dishes
 				dishesDisplayDataShow.length = 0;
 				for ( var i = 0; i < dishesDisplayData.length; i++) {
