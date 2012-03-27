@@ -1674,6 +1674,22 @@ var dishesDisplayGrid = new Ext.grid.GridPanel({
 				dishGridRefresh();
 				orderIsChanged = true;
 				dishOrderCurrRowIndex_ = -1;
+				
+				// show all the dishes
+				dishesDisplayDataShow.length = 0;
+				for ( var i = 0; i < dishesDisplayData.length; i++) {
+					dishesDisplayDataShow.push([ dishesDisplayData[i][0],
+							dishesDisplayData[i][1], dishesDisplayData[i][2],
+							dishesDisplayData[i][3], dishesDisplayData[i][4],
+							dishesDisplayData[i][5], dishesDisplayData[i][6],
+							dishesDisplayData[i][7], dishesDisplayData[i][8],
+							dishesDisplayData[i][9] ]);
+				}
+				dishesDisplayStore.reload();
+
+				// clear the number or spell input
+				dishesOrderEastPanel.findById("orderSpell").setValue("");
+				dishesOrderEastPanel.findById("orderNbr").setValue("");
 			} else {
 				Ext.MessageBox.show({
 					msg : "该菜品已售完！",
