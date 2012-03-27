@@ -459,6 +459,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`setting` (
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'the restaurant id to this setting' ,
   `price_tail` TINYINT UNSIGNED NOT NULL DEFAULT 2 COMMENT 'indicates how to deal with the tail of price:\n不处理 : 0\n小数抹零 : 1\n小数四舍五入 : 2' ,
   `auto_reprint` TINYINT NOT NULL DEFAULT 1 COMMENT 'indicates whether to auto re-print' ,
+  `receipt_style` INT UNSIGNED NOT NULL DEFAULT 4294967295 COMMENT 'the receipt style is as below.\n0x01 : 结帐单是否显示折扣\n0x02 : 结帐单是否显示数量\n0x04 : 结帐单是否显示状态\n0x08 : 结帐单是否显示折扣额' ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_setting_restaurant` (`restaurant_id` ASC) ,
   CONSTRAINT `fk_setting_restaurant`
@@ -695,6 +696,8 @@ COMMENT = 'describe the category of material' ;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+
 
 
 -- -----------------------------------------------------
