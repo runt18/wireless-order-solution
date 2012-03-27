@@ -563,6 +563,8 @@ var orderedForm = new Ext.form.FormPanel(
 								// + " category:" + category
 								// + " foods" + foodPara);
 								orderedForm.buttons[0].setDisabled(true);
+								orderedForm.buttons[1].setDisabled(true);
+								orderedForm.buttons[2].setDisabled(true);
 								// alert(foodPara);
 								Ext.Ajax
 										.request({
@@ -696,6 +698,8 @@ var orderedForm = new Ext.form.FormPanel(
 								// + " category:" + category
 								// + " foods" + foodPara);
 								orderedForm.buttons[0].setDisabled(true);
+								orderedForm.buttons[1].setDisabled(true);
+								orderedForm.buttons[2].setDisabled(true);
 								// alert(foodPara);
 								Ext.Ajax
 										.request({
