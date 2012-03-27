@@ -459,30 +459,30 @@ public class RespParser {
 			}
 			
 			//get the amount of super kitchens
-			int nSKitchen = response.body[index] & 0x000000FF;
+			int nDept = response.body[index] & 0x000000FF;
 			index++;
 			//allocate the memory for super kitchens
-			Department[] sKitchens = new Department[nSKitchen];
+			Department[] depts = new Department[nDept];
 			//get each super kitchen's information
-			for(int i = 0; i < sKitchens.length; i++){
-				//get the alias id to super kitchen
-				short sKitchenID = (short)(response.body[index] & 0x00FF);
+			for(int i = 0; i < depts.length; i++){
+				//get the alias id to department
+				short deptID = (short)(response.body[index] & 0x00FF);
 				
-				//get the length of the super kitchen name
+				//get the length of the department name
 				int length = response.body[index + 1];
 				
-				//get the value of super kitchen name
-				String sKname = null;
+				//get the value of super department name
+				String deptName = null;
 				try{
-					sKname = new String(response.body, index + 2, length, "UTF-16BE");
+					deptName = new String(response.body, index + 2, length, "UTF-16BE");
 				}catch(UnsupportedEncodingException e){}
 				
 				index += 2 + length;
 				
-				sKitchens[i] = new Department(sKname, sKitchenID);
+				depts[i] = new Department(deptName, deptID, 0);
 			}
 			
-			return new FoodMenu(foods, tastes, styles, specs, kitchens, sKitchens);
+			return new FoodMenu(foods, tastes, styles, specs, kitchens, depts);
 			
 		}else{
 			return new FoodMenu(new Food[0], new Taste[0], new Taste[0], new Taste[0], new Kitchen[0], new Department[0]);

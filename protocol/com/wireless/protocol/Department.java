@@ -14,10 +14,12 @@ public class Department {
 	public final static short DEPT_10 = 9;
 	
 	public short deptID = DEPT_1;
+	public int restaurantID;
 	public String name;
 	
-	public Department(String name, short deptID){
+	public Department(String name, short deptID, int restaurantID){
 		this.name = name;
 		this.deptID = deptID;
+		this.restaurantID = restaurantID;
 	}
 }
