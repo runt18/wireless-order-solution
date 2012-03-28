@@ -7,13 +7,15 @@ import java.util.ArrayList;
 import java.util.TimeZone;
 
 import com.wireless.exception.BusinessException;
+import com.wireless.protocol.Department;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.Terminal;
 
 public class QueryShift {
 	
-	static class DeptIncome{
+	public static class DeptIncome{
+		public Department dept;			//某个部门的信息
 		public float gift;				//某个部门的赠送额
 		public float discount;			//某个部门的折扣额
 		public float income;			//某个部门的营业额
@@ -22,26 +24,45 @@ public class QueryShift {
 	public static class Result{
 		public String onDuty;			//开始时间
 		public String offDuty;			//结束时间
-		public int orderAmount;			//账单数
-		public float totalCash;			//现金金额
-		public float totalCash2;		//现金实收
-		public float totalCreditCard;	//刷卡金额
-		public float totalCreditCard2;	//刷卡实收
-		public float totalMemberCard;	//会员卡金额
-		public float totalMemberCard2;	//会员卡实收
-		public float totalSign;			//签单金额
-		public float totalSign2;		//签单实收
-		public float totalHang;			//挂账金额
-		public float totalHang2;		//挂账实收
+		
+		public int orderAmount;			//总账单数
+		
+		public int cashAmount;			//现金账单数
+		public float cashIncome;		//现金金额
+		public float cashIncome2;		//现金实收
+		
+		public int creditCardAmount;	//刷卡账单数
+		public float creditCardIncome;	//刷卡金额
+		public float creditCardIncome2;	//刷卡实收
+		
+		public int memeberCardAmount;	//会员卡账单数
+		public float memberCardIncome;	//会员卡金额
+		public float memberCardIncome2;	//会员卡实收
+		
+		public int signAmount;			//签单账单数
+		public float signIncome;		//签单金额
+		public float signIncome2;		//签单实收
+		
+		public int hangAmount;			//挂账账单数
+		public float hangIncome;		//挂账金额
+		public float hangIncome2;		//挂账实收
+		
 		public float totalActual;		//合计实收金额
+		
 		public int discountAmount;		//折扣账单数
 		public float discountIncome;	//合计折扣金额
+		
 		public int giftAmount;			//赠送账单数
 		public float giftIncome;		//合计赠送金额
+		
 		public int cancelAmount;		//退菜账单数
 		public float cancelIncome;		//合计退菜金额
+		
 		public int serviceAmount;		//服务费账单数
 		public float serviceIncome;		//服务费金额
+		
+		public int paidAmount;			//反结帐账单数
+		public float paidIncome;		//反结帐金额
 		
 		public DeptIncome[] deptIncome;	//所有部门营业额
 	}
@@ -116,7 +137,7 @@ public class QueryShift {
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT+8"));
 		String offDuty = sdf.format(System.currentTimeMillis());
 		
-		return genShiftDetail(dbCon, term, onDuty, offDuty);
+		return genShiftDetail(dbCon, term, onDuty, offDuty, false);
 
 	}
 	
@@ -189,7 +210,7 @@ public class QueryShift {
 		}
 		dbCon.rs.close();
 		
-		return genShiftDetail(dbCon, term, onDuty, offDuty);
+		return genShiftDetail(dbCon, term, onDuty, offDuty, false);
 		
 	}
 	
@@ -203,11 +224,13 @@ public class QueryShift {
 	 * 			the date to be on duty
 	 * @param offDuty
 	 * 			the date to be off duty
+	 * @param isHistory
+	 * 			indicate whether to check history record
 	 * @return the shift detail information
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
 	 */
-	private static Result genShiftDetail(DBCon dbCon, Terminal term, String onDuty, String offDuty) throws SQLException{
+	private static Result genShiftDetail(DBCon dbCon, Terminal term, String onDuty, String offDuty, boolean isHistory) throws SQLException{
 		
 		Result result = new Result();
 		result.onDuty = onDuty;
@@ -219,13 +242,13 @@ public class QueryShift {
 		dbCon.rs = calcOrder(dbCon, term,
 							"COUNT(*)",
 							null, null,
-							onDuty, offDuty, false);
+							onDuty, offDuty, isHistory);
 		if(dbCon.rs.next()){
 			result.orderAmount = dbCon.rs.getInt(1);
 		}
 		dbCon.rs.close();
 		
-		String calcItem = "SUM(total_price * (1 + service_rate)), SUM(total_price_2)";
+		String calcItem = "SUM(total_price * (1 + service_rate)), SUM(total_price_2), COUNT(*)";
 		/**
 		 * Get the total cash income within this shirt
 		 */		
@@ -233,11 +256,12 @@ public class QueryShift {
 							 calcItem, 
 							 "AND type=" + Order.MANNER_CASH,
 							 null,
-							 onDuty, offDuty, false); 
+							 onDuty, offDuty, isHistory); 
 		
 		if(dbCon.rs.next()){
-			result.totalCash = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
-			result.totalCash2 = (float)Math.round(dbCon.rs.getFloat(2) * 100) / 100;
+			result.cashIncome = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
+			result.cashIncome2 = (float)Math.round(dbCon.rs.getFloat(2) * 100) / 100;
+			result.cashAmount = dbCon.rs.getInt(3);
 		}
 		dbCon.rs.close();
 		
@@ -248,10 +272,11 @@ public class QueryShift {
 							 calcItem,
 							 "AND type=" + Order.MANNER_CREDIT_CARD,
 							 null,
-							 onDuty, offDuty, false);
+							 onDuty, offDuty, isHistory);
 		if(dbCon.rs.next()){
-			result.totalCreditCard = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
-			result.totalCreditCard2 = (float)Math.round(dbCon.rs.getFloat(2) * 100) / 100;
+			result.creditCardIncome = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
+			result.creditCardIncome2 = (float)Math.round(dbCon.rs.getFloat(2) * 100) / 100;
+			result.creditCardAmount = dbCon.rs.getInt(3);
 		}
 		dbCon.rs.close();
 		
@@ -262,10 +287,11 @@ public class QueryShift {
 						 	 calcItem,
 						 	 "AND type=" + Order.MANNER_MEMBER,
 						 	 null,
-						 	 onDuty, offDuty, false);	
+						 	 onDuty, offDuty, isHistory);	
 		if(dbCon.rs.next()){
-			result.totalMemberCard = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
-			result.totalMemberCard2 = (float)Math.round(dbCon.rs.getFloat(2) * 100) / 100;
+			result.memberCardIncome = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
+			result.memberCardIncome2 = (float)Math.round(dbCon.rs.getFloat(2) * 100) / 100;
+			result.memeberCardAmount = dbCon.rs.getInt(3);
 		}
 		dbCon.rs.close();
 		
@@ -276,10 +302,11 @@ public class QueryShift {
 							 calcItem,
 							 "AND type=" + Order.MANNER_SIGN,
 							 null,
-							 onDuty, offDuty, false);
+							 onDuty, offDuty, isHistory);
 		if(dbCon.rs.next()){
-			result.totalSign = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
-			result.totalSign2 = (float)Math.round(dbCon.rs.getFloat(2) * 100) / 100;
+			result.signIncome = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
+			result.signIncome2 = (float)Math.round(dbCon.rs.getFloat(2) * 100) / 100;
+			result.signAmount = dbCon.rs.getInt(3);
 		}
 		dbCon.rs.close();
 		
@@ -290,14 +317,15 @@ public class QueryShift {
 							 calcItem,
 							 "AND type=" + Order.MANNER_HANG,
 							 null,
-							 onDuty, offDuty, false);
+							 onDuty, offDuty, isHistory);
 		if(dbCon.rs.next()){
-			result.totalHang = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
-			result.totalHang2 = (float)Math.round(dbCon.rs.getFloat(2) * 100) / 100;
+			result.hangIncome = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
+			result.hangIncome2 = (float)Math.round(dbCon.rs.getFloat(2) * 100) / 100;
+			result.hangAmount = dbCon.rs.getInt(3);
 		}
 		dbCon.rs.close();
 		
-		float totalActual = result.totalCash2 + result.totalCreditCard2 + result.totalMemberCard2 + result.totalSign2 + result.totalHang2;			
+		float totalActual = result.cashIncome2 + result.creditCardIncome2 + result.memberCardIncome2 + result.signIncome2 + result.hangIncome2;			
 		result.totalActual = (float)Math.round(totalActual * 100) / 100;
 
 		/**
@@ -307,7 +335,7 @@ public class QueryShift {
 								 "SUM(unit_price * order_count * discount + taste_price), COUNT(distinct order_id)",
 								 "AND order_count < 0",
 								 null,
-								 onDuty, offDuty, false);
+								 onDuty, offDuty, isHistory);
 		if(dbCon.rs.next()){
 			result.cancelIncome = (float)Math.round(Math.abs(dbCon.rs.getFloat(1)) * 100) / 100;
 			result.cancelAmount = dbCon.rs.getInt(2);
@@ -321,9 +349,9 @@ public class QueryShift {
 								 "SUM(unit_price * order_count * discount + taste_price), COUNT(distinct order_id)",
 								 "AND (food_status & " + Food.GIFT + ") <> 0",
 								 null,
-								 onDuty, offDuty, false);
+								 onDuty, offDuty, isHistory);
 		if(dbCon.rs.next()){
-			result.giftIncome = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
+			result.giftIncome = (float)Math.round(Math.abs(dbCon.rs.getFloat(1)) * 100) / 100;
 			result.giftAmount = dbCon.rs.getInt(2);
 		}
 		dbCon.rs.close();
@@ -335,10 +363,24 @@ public class QueryShift {
 				 				 "SUM(unit_price * order_count * (1 - discount)), COUNT(distinct order_id)",
 				 				 "AND discount < 1.00",
 				 				 null,
-				 				 onDuty, offDuty, false);
+				 				 onDuty, offDuty, isHistory);
 		if(dbCon.rs.next()){
-			result.discountIncome = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
+			result.discountIncome = (float)Math.round(Math.abs(dbCon.rs.getFloat(1)) * 100) / 100;
 			result.discountAmount = dbCon.rs.getInt(2);
+		}
+		dbCon.rs.close();
+		
+		/**
+		 * Calculate the price to all paid income within this shift
+		 */
+		dbCon.rs = calcOrderFood(dbCon, term, 
+				 				 "SUM(unit_price * order_count * discount + taste_price), COUNT(distinct order_id)",
+				 				 "AND is_paid = 1",
+				 				 null,
+				 				 onDuty, offDuty, isHistory);
+		if(dbCon.rs.next()){
+			result.paidIncome = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
+			result.paidAmount = dbCon.rs.getInt(2);
 		}
 		dbCon.rs.close();
 		
@@ -349,56 +391,70 @@ public class QueryShift {
 							 "SUM(total_price_2 / (1 + service_rate) * service_rate), COUNT(*)",
 							 "AND service_rate > 0",
 							 null,
-							 onDuty, offDuty, false);
+							 onDuty, offDuty, isHistory);
 		if(dbCon.rs.next()){
-			result.serviceIncome = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
+			result.serviceIncome = (float)Math.round(Math.abs(dbCon.rs.getFloat(1)) * 100) / 100;
 			result.serviceAmount = dbCon.rs.getInt(2);
 		}
 		dbCon.rs.close();
 		
+		//Department[] depts = QueryMenu.queryDepartments(dbCon, term.restaurant_id, null, null);
+		ArrayList<DeptIncome> deptIncomes = new ArrayList<DeptIncome>();
 		/**
 		 * Calculate the income to every department.
 		 */
-		ArrayList<DeptIncome> depts = new ArrayList<DeptIncome>();
-		
-		for(int i = 0; i < 10; i++){
+		for(Department dept : QueryMenu.queryDepartments(dbCon, term.restaurant_id, null, null)){
+
 			DeptIncome deptIncome = new DeptIncome();
 			
+			deptIncome.dept = dept;
+			
+			/**
+			 * Calculate the gift income to this department.
+			 */
 			dbCon.rs = calcOrderFood(dbCon, term, 
 									 "SUM(unit_price * order_count * discount + taste_price)",
-									 "AND (food_status & " + Food.GIFT + ") <> 0 AND dept_id=" + i,
+									 "AND (food_status & " + Food.GIFT + ") <> 0 AND dept_id=" + dept.deptID,
 									 null,
-									 onDuty, offDuty, false);
+									 onDuty, offDuty, isHistory);
 			if(dbCon.rs.next()){
-				deptIncome.gift = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
+				deptIncome.gift = (float)Math.round(Math.abs(dbCon.rs.getFloat(1)) * 100) / 100;
 			}
 			dbCon.rs.close();
 			
+			/**
+			 * Calculate the discount income to this department.
+			 */
 			dbCon.rs = calcOrderFood(dbCon, term, 
 					 				 "SUM(unit_price * order_count * (1 - discount))",
-					 				 "AND discount < 1.00 AND dept_id=" + i,
+					 				 "AND discount < 1.00 AND dept_id=" + dept.deptID,
 					 				 null,
-					 				 onDuty, offDuty, false);
+					 				 onDuty, offDuty, isHistory);
 			if(dbCon.rs.next()){
-				deptIncome.discount = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
+				deptIncome.discount = (float)Math.round(Math.abs(dbCon.rs.getFloat(1)) * 100) / 100;
 			}
 			dbCon.rs.close();
 			
+			/**
+			 * Calculate the income to this department.
+			 */
 			dbCon.rs = calcOrderFood(dbCon, term,
 									 "SUM(unit_price * order_count * discount + taste_price)",
-									 "AND (food_status & " + Food.GIFT + ") = 0 AND dept_id=" + i,
+									 "AND (food_status & " + Food.GIFT + ") = 0 AND dept_id=" + dept.deptID,
 									 null,
-									 onDuty, offDuty, false);
+									 onDuty, offDuty, isHistory);
 			if(dbCon.rs.next()){
-				deptIncome.income = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
+				deptIncome.income = (float)Math.round(Math.abs(dbCon.rs.getFloat(1)) * 100) / 100;
 			}
 			
 			dbCon.rs.close();
 			
-			depts.add(deptIncome);
-			
+			if(deptIncome.discount != 0 || deptIncome.gift != 0 || deptIncome.income != 0){
+				deptIncomes.add(deptIncome);			
+			}
 		}
-		result.deptIncome = depts.toArray(new DeptIncome[depts.size()]);
+		
+		result.deptIncome = deptIncomes.toArray(new DeptIncome[deptIncomes.size()]);
 		
 		return result;
 	}
