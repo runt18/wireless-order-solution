@@ -21,6 +21,8 @@ public final class Params {
 	public final static String PWD = "Password";
 	//The pin to login staff
 	public final static String STAFF_PIN = "StaffPin";
+	//The last pick food category
+	public final static String LAST_PICK_CATE = "LastPickCate";
 	
 	/* The setting value to print setting */
 	public final static int PRINT_SYNC = 0;			//同步
@@ -31,6 +33,11 @@ public final class Params {
 	public final static int TIME_OUT_15s = 1;		//15s
 	public final static int TIME_OUT_20s = 2;		//20s
 	
+	/* The last pick food category */
+	public final static int PICK_BY_NUMBER = 0;		//编号点菜
+	public final static int PICK_BY_KITCHEN = 1;	//分厨点菜
+	public final static int PICK_BY_PINYIN = 2;		//拼音点菜
+	
 	/* The default IP address */
 	public final static String DEF_IP_ADDR = "www.e-tones.net";
 	
@@ -39,4 +46,5 @@ public final class Params {
 	
 	/* The default staff pin */
 	public final static long DEF_STAFF_PIN = -1;
+	
 }
