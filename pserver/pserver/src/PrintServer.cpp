@@ -520,37 +520,19 @@ static unsigned __stdcall LoginProc(LPVOID pvParam){
 
 	string account;
 	string pwd;
+	string serv_name;
 
 	//get the remote IP address, port, account and password from the config XML configuration file
 	TiXmlElement* pRemote = TiXmlHandle(&g_Conf).FirstChildElement(ConfTags::CONF_ROOT).FirstChildElement(ConfTags::REMOTE).Element();
 	if(pRemote){
 		//get the IP address
-		string serv_name = pRemote->Attribute(ConfTags::REMOTE_IP);
+		serv_name = pRemote->Attribute(ConfTags::REMOTE_IP);
 		if(!serv_name.empty()){
-			
-			struct addrinfo hints, *res = NULL;
-			memset(&hints, 0, sizeof(hints));
-			hints.ai_socktype = SOCK_STREAM;
-			hints.ai_family = AF_INET;
-			hints.ai_protocol = IPPROTO_TCP;
-			//convert the host name to ip address
-			if (getaddrinfo(serv_name.c_str(), NULL, &hints, &res) != 0) {
-				if(pReport){
-					string s = "无法解释域名\"" + serv_name + "\"";
-					pReport->OnPrintExcep(0, s.c_str());
-					return 1;
-				}
-			}else{
-				clientService.sin_addr.s_addr = ((struct sockaddr_in*)res->ai_addr)->sin_addr.s_addr;
-			}
 
-			if(res){
-				freeaddrinfo(res);
-			}
 
 		}else{
 			if(pReport){
-				pReport->OnPrintExcep(0, "请设置连接服务器的IP地址");
+				pReport->OnPrintExcep(0, "请设置连接服务器的地址");
 			}
 			return 1;
 		}
@@ -639,68 +621,95 @@ static unsigned __stdcall LoginProc(LPVOID pvParam){
 				pReport->OnPrintExcep(0, os.str().c_str());
 			}
 
-			// Connect to server.
-			int iResult = connect(g_ConnectSocket, (SOCKADDR*) &clientService, sizeof(clientService));
-
-			//in the case not connected, notify the recover thread to login again
-			//otherwise login to the server and notify the print manager thread to run
-			if(iResult == SOCKET_ERROR){
+			struct addrinfo hints, *res = NULL;
+			memset(&hints, 0, sizeof(hints));
+			hints.ai_socktype = SOCK_STREAM;
+			hints.ai_family = AF_INET;
+			hints.ai_protocol = IPPROTO_TCP;
+			//convert the host name to ip address
+			if(getaddrinfo(serv_name.c_str(), NULL, &hints, &res) != 0) {
 				if(pReport){
-					ostringstream os;
-					os << "无法连接服务器: " << WSAGetLastError();
-					pReport->OnPrintExcep(0, os.str().c_str());
+					string s = "无法解释域名\"" + serv_name + "\"";
+					pReport->OnPrintExcep(0, s.c_str());
+					//notify the recover thread to run if fail to convert the host name
+					SetEvent(g_hRecoverEvent);
 				}
-				//notify the recover thread to run
-				SetEvent(g_hRecoverEvent);
-			}else{
 
-				//send the user name and pwd to try logging in the remote server
-				ReqPrinterLogin reqLogin(account.c_str(), pwd.c_str());
-				int iResult = Protocol::send(g_ConnectSocket, reqLogin);
-				if(iResult > 0){
-					//check to see if login successfully
-					//if login successfully, responds with an ACK,
-					//otherwise responds with a NAK along with an error code
-					ProtocolPackage loginResp;
-					iResult = Protocol::recv(g_ConnectSocket, 256, loginResp);
+			}else{
+				clientService.sin_addr.s_addr = ((struct sockaddr_in*)res->ai_addr)->sin_addr.s_addr;
+				// Connect to server.
+				int iResult = connect(g_ConnectSocket, (SOCKADDR*) &clientService, sizeof(clientService));
+
+				//in the case not connected, notify the recover thread to login again
+				//otherwise login to the server and notify the print manager thread to run
+				if(iResult == SOCKET_ERROR){
+					if(pReport){
+						ostringstream os;
+						os << "无法连接服务器: " << WSAGetLastError();
+						pReport->OnPrintExcep(0, os.str().c_str());
+					}
+					//notify the recover thread to run
+					SetEvent(g_hRecoverEvent);
+				}else{
+
+					//send the user name and pwd to try logging in the remote server
+					ReqPrinterLogin reqLogin(account.c_str(), pwd.c_str());
+					int iResult = Protocol::send(g_ConnectSocket, reqLogin);
 					if(iResult > 0){
-						//check whether the sequence no is matched or not
-						if(loginResp.header.seq == reqLogin.header.seq){
-							//check the type to see it's an ACK or NAK
-							if(loginResp.header.type == Type::ACK){
-								vector<Kitchen> kitchens;
-								vector<Region> regions;
-								string rest;
-								RespParse::parsePrintLogin(loginResp, kitchens, regions, rest);
-								if(pReport){
-									ostringstream os;
-									os << "\"" << rest << "\"" << "登录成功";
-									pReport->OnPrintReport(0, os.str().c_str());
-									pReport->OnRetrieveRestaurant(rest);
-									pReport->OnRetrieveKitchen(kitchens);
-									pReport->OnRetrieveRegion(regions);
-								}
-								//notify the print manager thread to run
-								SetEvent(g_hPrintMgrEvent);
-							}else{
-								//show user the message according to the error code
-								if(pReport){
-									if(loginResp.header.reserved == ErrorCode::ACCOUNT_NOT_EXIST){
-										pReport->OnPrintExcep(0, "登录失败，用户名不存在");
-									}else if(loginResp.header.reserved == ErrorCode::PWD_NOT_MATCH){
-										pReport->OnPrintExcep(0, "登录失败，密码不正确");
-									}else{
-										pReport->OnPrintExcep(0, "登录失败");
+						//check to see if login successfully
+						//if login successfully, responds with an ACK,
+						//otherwise responds with a NAK along with an error code
+						ProtocolPackage loginResp;
+						iResult = Protocol::recv(g_ConnectSocket, 256, loginResp);
+						if(iResult > 0){
+							//check whether the sequence no is matched or not
+							if(loginResp.header.seq == reqLogin.header.seq){
+								//check the type to see it's an ACK or NAK
+								if(loginResp.header.type == Type::ACK){
+									vector<Kitchen> kitchens;
+									vector<Region> regions;
+									string rest;
+									RespParse::parsePrintLogin(loginResp, kitchens, regions, rest);
+									if(pReport){
+										ostringstream os;
+										os << "\"" << rest << "\"" << "登录成功";
+										pReport->OnPrintReport(0, os.str().c_str());
+										pReport->OnRetrieveRestaurant(rest);
+										pReport->OnRetrieveKitchen(kitchens);
+										pReport->OnRetrieveRegion(regions);
 									}
-									closesocket(g_ConnectSocket);
-									g_ConnectSocket = INVALID_SOCKET;
-									//notify the recover thread to run
-									SetEvent(g_hRecoverEvent);
+									//notify the print manager thread to run
+									SetEvent(g_hPrintMgrEvent);
+								}else{
+									//show user the message according to the error code
+									if(pReport){
+										if(loginResp.header.reserved == ErrorCode::ACCOUNT_NOT_EXIST){
+											pReport->OnPrintExcep(0, "登录失败，用户名不存在");
+										}else if(loginResp.header.reserved == ErrorCode::PWD_NOT_MATCH){
+											pReport->OnPrintExcep(0, "登录失败，密码不正确");
+										}else{
+											pReport->OnPrintExcep(0, "登录失败");
+										}
+										closesocket(g_ConnectSocket);
+										g_ConnectSocket = INVALID_SOCKET;
+										//notify the recover thread to run
+										SetEvent(g_hRecoverEvent);
+									}
 								}
+							}else{
+								if(pReport){
+									pReport->OnPrintExcep(0, "登录失败，数据包的序列号不正确");
+								}
+								closesocket(g_ConnectSocket);
+								g_ConnectSocket = INVALID_SOCKET;
+								//notify the recover thread to run
+								SetEvent(g_hRecoverEvent);
 							}
 						}else{
 							if(pReport){
-								pReport->OnPrintExcep(0, "登录失败，数据包的序列号不正确");
+								ostringstream os;
+								os << "接收登录回复确认失败: " << WSAGetLastError();
+								pReport->OnPrintExcep(0, os.str().c_str());
 							}
 							closesocket(g_ConnectSocket);
 							g_ConnectSocket = INVALID_SOCKET;
@@ -710,7 +719,7 @@ static unsigned __stdcall LoginProc(LPVOID pvParam){
 					}else{
 						if(pReport){
 							ostringstream os;
-							os << "接收登录回复确认失败: " << WSAGetLastError();
+							os << "发送登录请求失败: " << WSAGetLastError();
 							pReport->OnPrintExcep(0, os.str().c_str());
 						}
 						closesocket(g_ConnectSocket);
@@ -718,17 +727,11 @@ static unsigned __stdcall LoginProc(LPVOID pvParam){
 						//notify the recover thread to run
 						SetEvent(g_hRecoverEvent);
 					}
-				}else{
-					if(pReport){
-						ostringstream os;
-						os << "发送登录请求失败: " << WSAGetLastError();
-						pReport->OnPrintExcep(0, os.str().c_str());
-					}
-					closesocket(g_ConnectSocket);
-					g_ConnectSocket = INVALID_SOCKET;
-					//notify the recover thread to run
-					SetEvent(g_hRecoverEvent);
 				}
+			}
+
+			if(res){
+				freeaddrinfo(res);
 			}
 
 			ResetEvent(g_hLoginEvent);
