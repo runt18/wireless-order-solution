@@ -92,6 +92,7 @@ var dishKeyboardSelect = function(relateItemId) {
 
 // on page load function
 function dishNbrOnLoad() {
+	
 	// keyboard input dish number
 	$("#orderNbr").bind("keyup", function() {
 		dishKeyboardSelect("orderNbr");
@@ -146,6 +147,14 @@ function dishSpellOnLoad() {
 }
 
 function tableStuLoad() {
+	
+	var Request = new URLParaQuery();
+	if(Request["category"] == CATE_TAKE_OUT){
+		orderedForm.buttons[1].setDisabled(true);
+	}
+	
+	
+	
 	// update table status
 	var Request = new URLParaQuery();
 
