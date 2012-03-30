@@ -397,7 +397,7 @@ public class PickFoodActivity extends TabActivity implements
 					}else if(event.getAction() == MotionEvent.ACTION_UP){
 						_centerTxtView.setVisibility(View.INVISIBLE);
 						filterNumEdtTxt.append(((TextView)numberSidebar.getChildAt(curPos)).getText().toString());
-						filterNumEdtTxt.setSelection(filterNumEdtTxt.getText().toString().length());	
+						filterNumEdtTxt.setSelection(filterNumEdtTxt.getText().length());	
 						numberSidebar.setBackgroundResource(0);
 
 					}
@@ -796,7 +796,7 @@ public class PickFoodActivity extends TabActivity implements
 						//disappear the center text view
 						_centerTxtView.setVisibility(View.INVISIBLE);
 						filterPinyinEdtTxt.append(((TextView)pinyinSidebar.getChildAt(curPos)).getText().toString());
-						filterPinyinEdtTxt.setSelection(filterPinyinEdtTxt.getText().toString().length());		
+						filterPinyinEdtTxt.setSelection(filterPinyinEdtTxt.getText().length());		
 						pinyinSidebar.setBackgroundResource(0);
 					}
 					

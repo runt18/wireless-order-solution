@@ -188,11 +188,15 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 	 */
 	@Override
 	public void onPickTaste(OrderFood selectedFood) {
-		Intent intent = new Intent(ChgOrderActivity.this, PickTasteActivity.class);
-		Bundle bundle = new Bundle();
-		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(selectedFood));
-		intent.putExtras(bundle);
-		startActivityForResult(intent, OrderFoodListView.PICK_TASTE);
+		if(selectedFood.isTemporary){
+			Toast.makeText(this, "临时菜不能添加口味", 0).show();
+		}else{
+			Intent intent = new Intent(ChgOrderActivity.this, PickTasteActivity.class);
+			Bundle bundle = new Bundle();
+			bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(selectedFood));
+			intent.putExtras(bundle);
+			startActivityForResult(intent, OrderFoodListView.PICK_TASTE);			
+		}
 	}
 
 	/**

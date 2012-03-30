@@ -26,6 +26,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
@@ -1119,6 +1120,8 @@ public class MainActivity extends Activity {
 			setContentView(R.layout.alert);
 			//getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
 			
+			((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).showSoftInput((EditText)findViewById(R.id.mycount), InputMethodManager.SHOW_FORCED);
+			
 			_type = type;
 			TextView title = (TextView)findViewById(R.id.ordername);
 			if(_type == DIALOG_INSERT_ORDER){
@@ -1138,9 +1141,9 @@ public class MainActivity extends Activity {
 			ok.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					EditText table= (EditText)findViewById(R.id.mycount);
+					EditText tblNoEdtTxt = (EditText)findViewById(R.id.mycount);
 					try{
-						int tableID = Integer.parseInt(table.getText().toString().trim());
+						int tableID = Integer.parseInt(tblNoEdtTxt.getText().toString().trim());
 						if(_type == DIALOG_UPDATE_ORDER){
 							new QueryOrderTask(tableID, Type.UPDATE_ORDER).execute();
 							dismiss();
@@ -1148,15 +1151,15 @@ public class MainActivity extends Activity {
 						}else if(_type == DIALOG_BILL_ORDER){
 							new QueryOrderTask(tableID, Type.PAY_ORDER).execute();
 							dismiss();
-							table.setText("");
+							tblNoEdtTxt.setText("");
 							
 						}else{
 							new QueryOrder2Task(tableID).execute();
 							dismiss();
-							table.setText("");
+							tblNoEdtTxt.setText("");
 						}
 					}catch(NumberFormatException e){
-						Toast.makeText(MainActivity.this, "您输入的台号" + table.getText().toString().trim() + "格式不正确，请重新输入" , 0).show();
+						Toast.makeText(MainActivity.this, "您输入的台号" + tblNoEdtTxt.getText().toString().trim() + "格式不正确，请重新输入" , 0).show();
 					}
 
 				}
