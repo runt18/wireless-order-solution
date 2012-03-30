@@ -137,7 +137,7 @@ public class QueryShift {
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT+8"));
 		String offDuty = sdf.format(System.currentTimeMillis());
 		
-		return genShiftDetail(dbCon, term, onDuty, offDuty, false);
+		return exec(dbCon, term, onDuty, offDuty, false);
 
 	}
 	
@@ -210,7 +210,7 @@ public class QueryShift {
 		}
 		dbCon.rs.close();
 		
-		return genShiftDetail(dbCon, term, onDuty, offDuty, false);
+		return exec(dbCon, term, onDuty, offDuty, false);
 		
 	}
 	
@@ -230,7 +230,81 @@ public class QueryShift {
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
 	 */
-	private static Result genShiftDetail(DBCon dbCon, Terminal term, String onDuty, String offDuty, boolean isHistory) throws SQLException{
+	public static Result exec(long pin, short model, String onDuty, String offDuty, boolean isHistory) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return exec(dbCon, pin, model, onDuty, offDuty, isHistory);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Generate the details to shift within the on & off duty date.
+	 * Note that database should be connected before invoking this method.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param term
+	 * 			the terminal to request
+	 * @param onDuty
+	 * 			the date to be on duty
+	 * @param offDuty
+	 * 			the date to be off duty
+	 * @param isHistory
+	 * 			indicate whether to check history record
+	 * @return the shift detail information
+	 * @throws SQLException
+	 * 			throws if fail to execute any SQL statement
+	 */
+	public static Result exec(DBCon dbCon, long pin, short model, String onDuty, String offDuty, boolean isHistory) throws SQLException, BusinessException{
+		return exec(dbCon, VerifyPin.exec(dbCon, pin, model), onDuty, offDuty, isHistory);
+	}
+	
+	/**
+	 * Generate the details to shift within the on & off duty date.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param term
+	 * 			the terminal to request
+	 * @param onDuty
+	 * 			the date to be on duty
+	 * @param offDuty
+	 * 			the date to be off duty
+	 * @param isHistory
+	 * 			indicate whether to check history record
+	 * @return the shift detail information
+	 * @throws SQLException
+	 * 			throws if fail to execute any SQL statement
+	 */
+	public static Result exec(Terminal term, String onDuty, String offDuty, boolean isHistory) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return exec(dbCon, term, onDuty, offDuty, isHistory);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Generate the details to shift within the on & off duty date.
+	 * Note that database should be connected before invoking this method.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param term
+	 * 			the terminal to request
+	 * @param onDuty
+	 * 			the date to be on duty
+	 * @param offDuty
+	 * 			the date to be off duty
+	 * @param isHistory
+	 * 			indicate whether to check history record
+	 * @return the shift detail information
+	 * @throws SQLException
+	 * 			throws if fail to execute any SQL statement
+	 */
+	public static Result exec(DBCon dbCon, Terminal term, String onDuty, String offDuty, boolean isHistory) throws SQLException{
 		
 		Result result = new Result();
 		result.onDuty = onDuty;
