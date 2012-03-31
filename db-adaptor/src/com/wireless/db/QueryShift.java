@@ -2,6 +2,7 @@ package com.wireless.db;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.TimeZone;
@@ -117,14 +118,23 @@ public class QueryShift {
 		Terminal term = VerifyPin.exec(dbCon, pin, model);
 		
 		/**
-		 * Get the latest off duty date and make it as the on duty date to this duty shift
+		 * Get the latest off duty date from both shift and shift_history,
+		 * and make it as the on duty date to this duty shift
 		 */
 		String onDuty;
-		String sql = "SELECT off_duty FROM " + Params.dbName + ".shift WHERE restaurant_id=" + term.restaurant_id +
-					 " ORDER BY off_duty desc LIMIT 1";
+//		String sql = "SELECT off_duty FROM " + Params.dbName + ".shift WHERE restaurant_id=" + term.restaurant_id +
+//					 " ORDER BY off_duty desc LIMIT 1";
+		String sql = "SELECT MAX(off_duty) FROM (" +
+					 "SELECT off_duty FROM " + Params.dbName + ".shift WHERE restaurant_id=" + term.restaurant_id + " UNION " +
+					 "SELECT off_duty FROM " + Params.dbName + ".shift_history WHERE restaurant_id=" + term.restaurant_id + ") AS all_off_duty";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
-			onDuty = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(dbCon.rs.getTimestamp("off_duty"));
+			Timestamp offDuty = dbCon.rs.getTimestamp(1);
+			if(offDuty == null){
+				onDuty = "2011-07-30 00:00:00";
+			}else{
+				onDuty = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(offDuty);
+			}
 		}else{
 			onDuty = "2011-07-30 00:00:00";
 		}

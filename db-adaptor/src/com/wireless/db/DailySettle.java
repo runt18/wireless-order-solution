@@ -13,10 +13,12 @@ public class DailySettle {
 	 * 3 - the maximum order id 
 	 */
 	public static class Result{
-		public int totalOrder;
-		public int totalOrderDetail;
-		public int maxOrderID;
-		public int maxOrderFoodID;
+		public int totalOrder;				//当日已结帐的账单数
+		public int totalOrderDetail;		//当日已结帐的账单明细数
+		public int totalShift;				//当日交班的记录数
+		public int maxOrderID;				//order和order_history表的最大id
+		public int maxOrderFoodID;			//order_food和order_food_history表的最大id
+		public int maxShiftID;				//shift和shift_history表的最大id
 	}
 
 	/**
@@ -102,7 +104,17 @@ public class DailySettle {
 		}
 		dbCon.rs.close();
 		
-		//get the max order id from both order and order_history
+		//get the amount to shift record
+		sql = "SELECT count(*) FROM " + Params.dbName + ".shift " +
+			  "WHERE 1=1 " +
+			  (restaurantID < 0 ? "" : "AND restaurant_id=" + restaurantID);
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			result.totalShift = dbCon.rs.getInt(1);
+		}
+		dbCon.rs.close();
+		
+		//calculate the max order id from both order and order_history
 		sql = "SELECT MAX(`id`) + 1 FROM (" + "SELECT id FROM " + Params.dbName + 
 			  ".order UNION SELECT id FROM " + Params.dbName + 
 			  ".order_history) AS all_order";
@@ -112,7 +124,7 @@ public class DailySettle {
 		}
 		dbCon.rs.close();
 		
-		//get the max order_food id from both order_food and order_food_history
+		//calculate the max order_food id from both order_food and order_food_history
 		sql = "SELECT MAX(`id`) + 1 FROM (SELECT id FROM " + Params.dbName +
 			  ".order_food UNION SELECT id FROM " + Params.dbName +
 			  ".order_food_history) AS all_order";
@@ -122,30 +134,15 @@ public class DailySettle {
 		}
 		dbCon.rs.close();
 		
-		//delete the order_food record to root
-		sql = "DELETE FROM " + Params.dbName + ".order_food WHERE order_id IN (SELECT id FROM " + 
-			  Params.dbName + ".order WHERE restaurant_id=" + Restaurant.ADMIN + ")";
-		dbCon.stmt.executeUpdate(sql);
-		
-		//delete the order record to root
-		sql = "DELETE FROM " + Params.dbName + ".order WHERE restaurant_id=" + Restaurant.ADMIN;
-		dbCon.stmt.executeUpdate(sql);
-		
-		//insert a order record with the max order id to root
-		sql = "INSERT INTO " + Params.dbName + ".order (`id`, `restaurant_id`, `order_date`) VALUES (" + 
-			  result.maxOrderID + ", " +
-			  Restaurant.ADMIN + ", " +
-			  0 +
-			  ")";
-		dbCon.stmt.executeUpdate(sql);
-		
-		//insert a order_food record with the max order_food id to root
-		sql = "INSERT INTO " + Params.dbName + ".order_food (`id`, `order_id`, `order_date`) VALUES (" +
-			  result.maxOrderFoodID + ", " +
-			  result.maxOrderID + ", " +
-			  0 +
-			  ")";
-		dbCon.stmt.executeUpdate(sql);
+		//calculate the max shift id from both shift and shift_history
+		sql = "SELECT MAX(`id`) + 1 FROM (SELECT id FROM " + Params.dbName +
+			  ".shift UNION SELECT id FROM " + Params.dbName +
+			  ".shift_history) AS all_shift";
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			result.maxShiftID = dbCon.rs.getInt(1);
+		}
+		dbCon.rs.close();
 		
 		final String orderItem = "`id`, `restaurant_id`,`order_date`, `total_price`, `total_price_2`, `custom_num`," + 
 				"`waiter`, `type`, `discount_type`,`category`, `member_id`, `member`,`terminal_pin`, `terminal_model`, " +
@@ -156,6 +153,8 @@ public class DailySettle {
 					"`taste_alias`, `taste2_alias`, `taste3_alias`, `taste_id`,`taste2_id`,`taste3_id`, " +
 					"`discount`, `dept_id`, `kitchen_id`, `kitchen_alias`," +
 					"`comment`,`waiter`,`is_temporary`,`is_paid`";
+		
+		final String shiftItem = "`id`, `restaurant_id`, `name`, `on_duty`, `off_duty`";
 		
 		try{
 			dbCon.conn.setAutoCommit(false);
@@ -174,6 +173,13 @@ public class DailySettle {
 				  ")";
 			dbCon.stmt.executeUpdate(sql);
 			
+			//move the shift record from "shift" to "shift_history"
+			sql = "INSERT INTO " + Params.dbName + ".shift_history (" + shiftItem + ") " +
+				  "SELECT " + shiftItem + " FROM " + Params.dbName + ".shift " +
+				  "WHERE 1=1 " +
+				  (restaurantID < 0 ? "" : "AND restaurant_id=" + restaurantID);
+			dbCon.stmt.executeUpdate(sql);
+			
 			//delete the order details from "order_food"
 			sql = "DELETE FROM " + Params.dbName + ".order_food WHERE order_id IN (" +
 				  "SELECT id FROM " + Params.dbName + ".order WHERE total_price IS NOT NULL " +
@@ -184,6 +190,48 @@ public class DailySettle {
 			//delete the order from "order"
 			sql = "DELETE FROM " + Params.dbName + ".order WHERE total_price IS NOT NULL " +
 				  (restaurantID < 0 ? "" : "AND restaurant_id=" + restaurantID);
+			dbCon.stmt.executeUpdate(sql);
+			
+			//delete the shift record from "shift"
+			sql = "DELETE FROM " + Params.dbName + ".shift " +
+				  "WHERE 1=1 " +
+				  (restaurantID < 0 ? "" : "AND restaurant_id=" + restaurantID);
+			dbCon.stmt.executeUpdate(sql);
+			
+			//delete the order_food record to root
+			sql = "DELETE FROM " + Params.dbName + ".order_food WHERE order_id IN (SELECT id FROM " + 
+				  Params.dbName + ".order WHERE restaurant_id=" + Restaurant.ADMIN + ")";
+			dbCon.stmt.executeUpdate(sql);
+			
+			//delete the order record to root
+			sql = "DELETE FROM " + Params.dbName + ".order WHERE restaurant_id=" + Restaurant.ADMIN;
+			dbCon.stmt.executeUpdate(sql);
+			
+			//delete the shift record to root
+			sql = "DELETE FROM " + Params.dbName + ".shift WHERE restaurant_id=" + Restaurant.ADMIN;
+			dbCon.stmt.executeUpdate(sql);
+			
+			//insert a order record with the max order id to root
+			sql = "INSERT INTO " + Params.dbName + ".order (`id`, `restaurant_id`, `order_date`) VALUES (" + 
+				  result.maxOrderID + ", " +
+				  Restaurant.ADMIN + ", " +
+				  0 +
+				  ")";
+			dbCon.stmt.executeUpdate(sql);
+			
+			//insert a order_food record with the max order_food id to root
+			sql = "INSERT INTO " + Params.dbName + ".order_food (`id`, `order_id`, `order_date`) VALUES (" +
+				  result.maxOrderFoodID + ", " +
+				  result.maxOrderID + ", " +
+				  0 +
+				  ")";
+			dbCon.stmt.executeUpdate(sql);
+			
+			//insert a shift record with the max shift id to root
+			sql = "INSERT INTO " + Params.dbName + ".shift (`id`, `restaurant_id`) VALUES (" +
+				  result.maxShiftID + ", " +
+				  Restaurant.ADMIN +
+				  ")";
 			dbCon.stmt.executeUpdate(sql);
 			
 			dbCon.conn.commit();
