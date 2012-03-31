@@ -281,6 +281,16 @@ ALTER TABLE `wireless_order_db`.`order_food` ADD COLUMN `is_paid` TINYINT NOT NU
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`order_food_history` ADD COLUMN `is_paid` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates whether this record is paid before'  AFTER `is_temporary` ;
 
+-- -----------------------------------------------------
+-- Add the field 'is_paid' to table 'order'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order` ADD COLUMN `is_paid` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates whether the order has been paid before'  AFTER `service_rate` ;
+
+-- -----------------------------------------------------
+-- Add the field 'is_paid' to table 'order_history'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_history` ADD COLUMN `is_paid` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates whether the order has been paid before'  AFTER `service_rate` ;
+
 
 -- -----------------------------------------------------
 -- View `order_food_history_view`

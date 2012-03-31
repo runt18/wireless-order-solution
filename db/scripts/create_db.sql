@@ -62,6 +62,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order` (
   `table2_name` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the 2nd table name to this order(used for table merger)' ,
   `service_rate` DECIMAL(3,2) NOT NULL DEFAULT 0 COMMENT 'the service rate to this order' ,
   `comment` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the comment to this order' ,
+  `is_paid` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates whether the order has been paid before' ,
   PRIMARY KEY (`id`) ,
   INDEX `ix_order_restaurant` (`restaurant_id` ASC) )
 ENGINE = InnoDB
@@ -299,6 +300,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_history` (
   `table2_name` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the 2nd table name to this order(used for table merger)' ,
   `service_rate` DECIMAL(3,2) NOT NULL DEFAULT 0 COMMENT 'the service rate to this order' ,
   `comment` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the comment to this order' ,
+  `is_paid` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates whether the order has been paid before' ,
   PRIMARY KEY (`id`) ,
   INDEX `ix_order_history_restaurant` (`restaurant_id` ASC) )
 ENGINE = InnoDB
@@ -696,6 +698,7 @@ COMMENT = 'describe the category of material' ;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
 
 
 
