@@ -43,20 +43,20 @@ function loginOnLoad() {
 						]);
 					}
 
-					emplComboData.length = 0;
-					for ( var i = 0; i < staffData.length; i++) {
-						emplComboData.push([ staffData[i].pin,// pin
-						staffData[i].staffName // 姓名
-						]);
-					}
-
-					emplStore.reload();
-					if (isNewAccess) {
-						personLoginWin.show();
-					} else {
-						currPin = Request["pin"];
-						isVerified = true;
-					}
+//					emplComboData = [];
+//					for ( var i = 0; i < staffData.length; i++) {
+//						emplComboData.push([ staffData[i].pin,// pin
+//						staffData[i].staffName // 姓名
+//						]);
+//					}
+//
+//					emplStore.reload();
+//					if (isNewAccess) {
+//						personLoginWin.show();
+//					} else {
+//						currPin = Request["pin"];
+//						isVerified = true;
+//					}
 				} else {
 					Ext.MessageBox.show({
 						msg : rootData[0].message,

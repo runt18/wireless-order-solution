@@ -77,7 +77,7 @@ public class SetTerminalAction extends Action {
 						+ " WHERE restaurant_id=" + term.restaurant_id
 						+ " AND terminal_id = " + fieldValues[0];
 				
-				System.out.println(sql);
+				// System.out.println(sql);
 
 				sqlRowCount = dbCon.stmt.executeUpdate(sql);
 			}
