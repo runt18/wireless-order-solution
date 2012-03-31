@@ -291,6 +291,22 @@ ALTER TABLE `wireless_order_db`.`order` ADD COLUMN `is_paid` TINYINT NOT NULL DE
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`order_history` ADD COLUMN `is_paid` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates whether the order has been paid before'  AFTER `service_rate` ;
 
+-- -----------------------------------------------------
+-- Create table `wireless_order_db`.`shift_history`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`shift_history` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`shift_history` (
+  `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to each shift record' ,
+  `restaurant_id` INT UNSIGNED NOT NULL ,
+  `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name of the operator to shift' ,
+  `on_duty` DATETIME NULL DEFAULT NULL COMMENT 'the datetime to be on duty' ,
+  `off_duty` DATETIME NULL DEFAULT NULL COMMENT 'the datetime to be off duty' ,
+  PRIMARY KEY (`id`) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'the shift history to each restaurant' ;
 
 -- -----------------------------------------------------
 -- View `order_food_history_view`
