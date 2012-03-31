@@ -35,7 +35,11 @@ public class DailySettlementTask extends SchedulerTask{
 					
 			taskInfo += "info : " + result.totalOrder + " record(s) are moved from \"order\" to \"order_history\"" + sep;
 			taskInfo += "info : " + result.totalOrderDetail + " record(s) are moved from \"order_food\" to \"order_food_history\"" + sep;
-			taskInfo += "info : " + "maxium order id : " + result.maxOrderID + ", maxium order food id : " + result.maxOrderFoodID + sep;
+			taskInfo += "info : " + result.totalShift + " record(s) are moved from \"shift\" to \"shift_history\"" + sep;
+			taskInfo += "info : " + 
+						"maxium order id : " + result.maxOrderID + ", " +
+						"maxium order food id : " + result.maxOrderFoodID + ", " +
+						"maxium shift id : " + result.maxShiftID + sep;
 			
 			
 		}catch(SQLException e){
