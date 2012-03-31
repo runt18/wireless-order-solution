@@ -111,7 +111,7 @@ public class QueryOrder {
 		 * Get the related info to this order.
 		 */
 		String sql = "SELECT custom_num, table_id, table_alias, table_name, table2_alias, table2_name, " +
-					 "region_id, region_name, restaurant_id, type, discount_type, category FROM `" + Params.dbName	+ 
+					 "region_id, region_name, restaurant_id, type, discount_type, category, is_paid FROM `" + Params.dbName	+ 
 					 "`.`order` WHERE id=" + orderID;
 
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -131,6 +131,7 @@ public class QueryOrder {
 			orderInfo.category = dbCon.rs.getShort("category");
 			orderInfo.pay_manner = dbCon.rs.getShort("type");
 			orderInfo.discount_type = dbCon.rs.getShort("discount_type");
+			orderInfo.isPaid = dbCon.rs.getBoolean("is_paid");
 		}else{
 			throw new BusinessException("The order(id=" + orderID + ") does NOT exist.", ErrorCode.ORDER_NOT_EXIST);
 		}

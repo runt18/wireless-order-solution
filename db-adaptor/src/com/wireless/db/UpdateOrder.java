@@ -479,6 +479,7 @@ public class UpdateOrder {
 			sql = "UPDATE `" + Params.dbName + "`.`order` SET " +
 					"custom_num=" + orderToUpdate.custom_num +	", " +
 					"terminal_pin=" + term.pin + ", " +
+					"is_paid=" + (isPaidAgain ? 1 : 0) + ", " +
 					(isPaidAgain ? "" : "region_id=" + orderToUpdate.region.regionID + ", ") +
 					(isPaidAgain ? "" : "region_name='" + orderToUpdate.region.name + "', ") +
 					(isPaidAgain ? "" : "table_id=" + orderToUpdate.table.tableID + ", ") +
