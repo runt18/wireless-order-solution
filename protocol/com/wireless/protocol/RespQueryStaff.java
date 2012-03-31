@@ -15,8 +15,8 @@ public class RespQueryStaff extends RespPackage{
 	 * pin[6] : same as request
 	 * len[2] -  length of the <Body>
 	 * <Body>
-	 * nStaff : <staff_1> : ... : <staff_n>
-	 * nStaff - the amount of staff
+	 * nStaff[2] : <staff_1> : ... : <staff_n>
+	 * nStaff[2] - the amount of staff
 	 * <staff_n>
 	 * len_1 : name : len_2 : pwd : pin[4]
 	 * len_1 - the length to the staff name
@@ -37,7 +37,7 @@ public class RespQueryStaff extends RespPackage{
 		for(int i = 0; i < staffs.length; i++){
 			byte[] name = staffs[i].name.getBytes("UTF-16BE");
 			byte[] pwd = staffs[i].pwd.getBytes("UTF-16BE");
-			bodyLen += 1 +				/* the length to staff name takes up 1-byte */
+			bodyLen += 2 +				/* the length to staff name takes up 1-byte */
 					   name.length + 	/* the name to staff */
 					   1 + 				/* the length to staff password takes up 1-byte */
 					   pwd.length + 	/* the password to staff */
@@ -49,8 +49,9 @@ public class RespQueryStaff extends RespPackage{
 		
 		//assign the amount of staff
 		body[0] = (byte)(staffs.length & 0x000000FF);
+		body[1] = (byte)((staffs.length & 0x0000FF00) >> 8);
 		
-		int offset = 1;
+		int offset = 2;
 		for(int i = 0; i < staffs.length; i++){
 			byte[] name = staffs[i].name.getBytes("UTF-16BE");
 			//assign the length of staff name to body

@@ -654,8 +654,8 @@ public class RespParser {
 		 * pin[6] : same as request
 		 * len[2] -  length of the <Body>
 		 * <Body>
-		 * nStaff : <staff_1> : ... : <staff_n>
-		 * nStaff - the amount of staff
+		 * nStaff[2] : <staff_1> : ... : <staff_n>
+		 * nStaff[2] - the amount of staff
 		 * <staff_n>
 		 * len_1 : name : len_2 : pwd : pin[4]
 		 * len_1 - the length to the staff name
@@ -667,12 +667,13 @@ public class RespParser {
 		StaffTerminal[] staffs = null;
 		try{
 			//get the amount to staff
-			int nStaff = response.body[0];
+			int nStaff = (response.body[0] & 0x000000FF) |
+						 ((response.body[1] & 0x000000FF) << 8);
 			
 			if(nStaff > 0){
 				staffs = new StaffTerminal[nStaff];
 				
-				int offset = 1;
+				int offset = 2;
 				for(int i = 0; i < nStaff; i++){
 					
 					staffs[i] = new StaffTerminal();
@@ -732,8 +733,8 @@ public class RespParser {
 		 * pin[6] : same as request
 		 * len[2] -  length of the <Body>
 		 * <Body>
-		 * nStaff : <table_1> : ... : <table_2>
-		 * nStaff - the amount of tables
+		 * nTable[2] : <table_1> : ... : <table_2>
+		 * nTable[2] - the amount of tables
 		 * <table_n>
 		 * len_1 : table_name : table_alias[2] : region : service_rate[2] : minimum_cost[4] : status : category : custom_num
 		 * len_1 - the length to the table name
@@ -749,12 +750,13 @@ public class RespParser {
 		Table[] tables = null;
 		try{
 			//get the amount to staff
-			int nTable = response.body[0];
+			int nTable = (response.body[0] & 0x000000FF) |
+						 ((response.body[1] & 0x000000FF) << 8);
 			
 			if(nTable > 0){
 				tables = new Table[nTable];
 				
-				int offset = 1;
+				int offset = 2;
 				for(int i = 0; i < tables.length; i++){
 					
 					tables[i] = new Table();
