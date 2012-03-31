@@ -151,10 +151,11 @@ function menuMgrOnLoad() {
 					var keichenInfo = keichenList[i].substr(1,
 							keichenList[i].length - 2).split(",");
 					kitchenTypeData.push([ keichenInfo[0],// 厨房编号
-					keichenInfo[1].substr(1, keichenInfo[1].length - 2) // 厨房名称
+					keichenInfo[2], // 厨房名称
+					keichenInfo[1] // 厨房id
 					]);
 				}
-				kitchenTypeData.push([ 255, "空" ]);
+				kitchenTypeData.push([ 255, "空","" ]);
 				menuStore.reload();
 			} else {
 				var dataInfo = resultJSON.data;

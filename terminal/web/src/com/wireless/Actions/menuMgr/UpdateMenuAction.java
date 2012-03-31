@@ -72,7 +72,8 @@ public class UpdateMenuAction extends Action {
 			String dishName = request.getParameter("dishName");
 			String dishSpill = request.getParameter("dishSpill");
 			float dishPrice = Float.parseFloat(request.getParameter("dishPrice"));
-			int kitchen = Integer.parseInt(request.getParameter("kitchen"));
+			int kitchenId = Integer.parseInt(request.getParameter("kitchenId"));
+			int kitchenAlias = Integer.parseInt(request.getParameter("kitchenAlias"));
 			
 			String isSpecial = request.getParameter("isSpecial");
 			String isRecommend = request.getParameter("isRecommend");
@@ -106,7 +107,8 @@ public class UpdateMenuAction extends Action {
 					" SET name = '" + dishName + "', " + 
 					" pinyin = '"+ dishSpill + "', " + 
 					" unit_price =  " + dishPrice + ", " + 
-					" kitchen = " + kitchen + ", " + 
+					" kitchen_id =  " + kitchenId + ", " + 
+					" kitchen_alias = " + kitchenAlias + ", " + 
 					" status =  " + status + 
 					" WHERE restaurant_id=" + term.restaurant_id
 					+ " AND food_id = " + foodID;

@@ -125,7 +125,7 @@ public class QueryMenuMgrAction extends Action {
 				filterCondition = " AND unit_price " + ope + filterVal;
 			} else if (type == 5) {
 				// 按厨房
-				filterCondition = " AND kitchen " + ope + filterVal;
+				filterCondition = " AND kitchen_alias " + ope + filterVal;
 			} else {
 				// 全部
 				filterCondition = "";

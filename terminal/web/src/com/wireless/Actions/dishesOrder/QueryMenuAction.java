@@ -191,10 +191,11 @@ public class QueryMenuAction extends Action {
 			for(int i = 0; i < kitchens.length; i++){
 				/**
 				 * The json format to each kitchen looks like below.
-				 * [厨房编号,"厨房名称",一般折扣1,一般折扣2,一般折扣3,会员折扣1,会员折扣2,会员折扣3]
+				 * [厨房编号,厨房id,"厨房名称",一般折扣1,一般折扣2,一般折扣3,会员折扣1,会员折扣2,会员折扣3]
 				 */
-				String jsonKitchen = "[$(kitchen_id),\"$(name)\",$(dist1),$(dist2),$(dist3),$(memDist1),$(memDist2),$(memDist3)]";
-				jsonKitchen = jsonKitchen.replace("$(kitchen_id)", new Short(kitchens[i].aliasID).toString());
+				String jsonKitchen = "[$(kitchenAlias),$(kitchenId),$(name),$(dist1),$(dist2),$(dist3),$(memDist1),$(memDist2),$(memDist3)]";
+				jsonKitchen = jsonKitchen.replace("$(kitchenAlias)", new Short(kitchens[i].aliasID).toString());
+				jsonKitchen = jsonKitchen.replace("$(kitchenId)", new Long(kitchens[i].kitchenID).toString());
 				jsonKitchen = jsonKitchen.replace("$(name)", kitchens[i].name);
 				jsonKitchen = jsonKitchen.replace("$(dist1)", kitchens[i].getDist1().toString());
 				jsonKitchen = jsonKitchen.replace("$(dist2)", kitchens[i].getDist2().toString());
@@ -202,6 +203,7 @@ public class QueryMenuAction extends Action {
 				jsonKitchen = jsonKitchen.replace("$(memDist1)", kitchens[i].getMemDist1().toString());
 				jsonKitchen = jsonKitchen.replace("$(memDist2)", kitchens[i].getMemDist2().toString());
 				jsonKitchen = jsonKitchen.replace("$(memDist3)", kitchens[i].getMemDist3().toString());
+				
 				
 				// put each json kitchen info to the value
 				value.append(jsonKitchen);
@@ -228,7 +230,7 @@ public class QueryMenuAction extends Action {
 			for(int i = 0; i < kitchens.length; i++){
 				
 				outString = outString + "{value:"+ new Short(kitchens[i].aliasID).toString()+ ",";
-				outString = outString + "text:'" + kitchens[i].name + "'},";
+				outString = outString + "text:'" + kitchens[i].name + "',id:'" + kitchens[i].kitchenID + "'},";
 
 			}
 			//outString = outString.substring(0, outString.length()-1);

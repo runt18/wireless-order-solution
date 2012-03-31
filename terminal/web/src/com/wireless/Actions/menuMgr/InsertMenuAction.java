@@ -42,83 +42,79 @@ public class InsertMenuAction extends Action {
 			 * example, filter the order date greater than or equal 2011-7-14
 			 * 14:30:00 pin=0x1 & type=3 & ope=2 & value=2011-7-14 14:30:00
 			 * 
-			 * pin : the pin the this terminal
-			 * dishNumber: 
-			 * dishName:
-			 * dishSpill:
-			 * dishPrice:
-			 * kitchen:
-			 * isSpecial :  
-			 * isRecommend : 
-			 * isFree :   
-			 * isStop : 
+			 * pin : the pin the this terminal dishNumber: dishName: dishSpill:
+			 * dishPrice: kitchen: isSpecial : isRecommend : isFree : isStop :
 			 * 
 			 */
-			byte SPECIAL = 0x01;	/* 特价 */
-			byte RECOMMEND = 0x02;	/* 推荐 */ 
-			byte SELL_OUT = 0x04;	/* 售完 */
-			byte GIFT = 0x08;		/* 赠送 */
-			byte CUR_PRICE = 0x10;	/* 时价 */
-			
+			byte SPECIAL = 0x01; /* 特价 */
+			byte RECOMMEND = 0x02; /* 推荐 */
+			byte SELL_OUT = 0x04; /* 售完 */
+			byte GIFT = 0x08; /* 赠送 */
+			byte CUR_PRICE = 0x10; /* 时价 */
+
 			String pin = request.getParameter("pin");
-			
+
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
 					Terminal.MODEL_STAFF);
-			
 
 			// get the query condition
-			int dishNumber = Integer.parseInt(request.getParameter("dishNumber"));
+			int dishNumber = Integer.parseInt(request
+					.getParameter("dishNumber"));
 			String dishName = request.getParameter("dishName");
 			String dishSpill = request.getParameter("dishSpill");
-			float dishPrice = Float.parseFloat(request.getParameter("dishPrice"));
-			int kitchen = Integer.parseInt(request.getParameter("kitchen"));
-			
+			float dishPrice = Float.parseFloat(request
+					.getParameter("dishPrice"));
+			int kitchenAlias = Integer.parseInt(request
+					.getParameter("kitchenAlias"));
+			int kitchenId = Integer.parseInt(request.getParameter("kitchenId"));
+
 			String isSpecial = request.getParameter("isSpecial");
 			String isRecommend = request.getParameter("isRecommend");
 			String isFree = request.getParameter("isFree");
 			String isStop = request.getParameter("isStop");
 			String isCurrPrice = request.getParameter("isCurrPrice");
 
-			
 			/**
 			 * 
 			 */
 			int status = 0x00;
-			if(isSpecial.equals("true")){
+			if (isSpecial.equals("true")) {
 				status |= SPECIAL;
-			};
-			if(isRecommend.equals("true")){
+			}
+			;
+			if (isRecommend.equals("true")) {
 				status |= RECOMMEND;
-			};
-			if(isStop.equals("true")){
+			}
+			;
+			if (isStop.equals("true")) {
 				status |= SELL_OUT;
-			};
-			if(isFree.equals("true")){
+			}
+			;
+			if (isFree.equals("true")) {
 				status |= GIFT;
-			};
-			if(isCurrPrice.equals("true")){ 
+			}
+			;
+			if (isCurrPrice.equals("true")) {
 				status |= CUR_PRICE;
-			};
-			
-			String sql = "INSERT INTO " + Params.dbName + ".food" +
-					"( food_alias, name, pinyin, unit_price, restaurant_id, kitchen, status, enabled ) " + 
-					" VALUES(" +
-					dishNumber + ", '" +
-					dishName + "', '" +
-					dishSpill + "', " +
-					dishPrice + ", " +
-					term.restaurant_id + ", " +
-					kitchen + ", " +
-					status + ", 1 " +
-					") ";
-			//System.out.println(sql);
+			}
+			;
+
+			String sql = "INSERT INTO "
+					+ Params.dbName
+					+ ".food"
+					+ "( food_alias, name, pinyin, unit_price, restaurant_id, kitchen_id, kitchen_alias, status, enabled ) "
+					+ " VALUES(" + dishNumber + ", '" + dishName + "', '"
+					+ dishSpill + "', " + dishPrice + ", " + term.restaurant_id
+					+ ", " + kitchenId + "," + kitchenAlias + ", " + status
+					+ ", 1 " + ") ";
+			// System.out.println(sql);
 
 			int sqlRowCount = dbCon.stmt.executeUpdate(sql);
 
 			jsonResp = jsonResp.replace("$(result)", "true");
 			jsonResp = jsonResp.replace("$(value)", "添加新菜成功！");
-			
+
 			dbCon.rs.close();
 
 		} catch (BusinessException e) {
@@ -147,7 +143,7 @@ public class InsertMenuAction extends Action {
 		} finally {
 			dbCon.disconnect();
 			// just for debug
-			//System.out.println(jsonResp);
+			// System.out.println(jsonResp);
 			out.write(jsonResp);
 		}
 

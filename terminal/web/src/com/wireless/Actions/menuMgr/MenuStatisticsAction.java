@@ -122,7 +122,7 @@ public class MenuStatisticsAction extends Action {
 						// dbCon.rs.getFloat("unit_price"));
 						// resultMap.put("isTemp",
 						// orderFoods[i].isTemporary);
-						resultMap.put("kitchen", lastKitchenAlias);
+						resultMap.put("kitchenAlias", lastKitchenAlias);
 						resultMap.put("dishCount", sumAmout);
 						resultMap.put("dishTotalPrice", SumPrice);
 						resultMap.put("message", "normal");

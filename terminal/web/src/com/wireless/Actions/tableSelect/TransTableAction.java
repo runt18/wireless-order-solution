@@ -36,7 +36,7 @@ public class TransTableAction extends Action implements PinGen {
 
 		String jsonResp = "{success:$(result), data:'$(value)'}";
 		DBCon dbCon = new DBCon();
-		String oldTableID = "", newTableID = "";
+		String oldTableAlias = "", newTableAlias = "";
 		Table oldTable = null;
 		Table newTable = null;
 		try {
@@ -53,16 +53,16 @@ public class TransTableAction extends Action implements PinGen {
 			
 			_pin = Long.parseLong(pin);
 
-			oldTableID = request.getParameter("oldTableID");
-			newTableID = request.getParameter("newTableID");
+			oldTableAlias = request.getParameter("oldTableAlias");
+			newTableAlias = request.getParameter("newTableAlias");
 
 			dbCon.connect();
 			
 			Terminal term = VerifyPin.exec(dbCon, _pin, Terminal.MODEL_STAFF);
 			
-			oldTable = QueryTable.exec(dbCon, term, Integer.parseInt(oldTableID));
+			oldTable = QueryTable.exec(dbCon, term, Integer.parseInt(oldTableAlias));
 
-			newTable = QueryTable.exec(dbCon, term, Integer.parseInt(newTableID));
+			newTable = QueryTable.exec(dbCon, term, Integer.parseInt(newTableAlias));
 
 			/**
 			 * Need to assure two conditions before table transfer 1 - the old
@@ -140,9 +140,9 @@ public class TransTableAction extends Action implements PinGen {
 		} catch (BusinessException e) {
 			jsonResp = jsonResp.replace("$(result)", "false");
 			if (oldTable == null) {
-				jsonResp = jsonResp.replace("$(value)", oldTableID + "号台信息不存在");
+				jsonResp = jsonResp.replace("$(value)", oldTableAlias + "号台信息不存在");
 			} else if (newTable == null) {
-				jsonResp = jsonResp.replace("$(value)", newTableID + "号台信息不存在");
+				jsonResp = jsonResp.replace("$(value)", newTableAlias + "号台信息不存在");
 			} else {
 				jsonResp = jsonResp.replace("$(value)", oldTable.aliasID
 						+ "号台转至" + newTable.aliasID + "号台不成功");

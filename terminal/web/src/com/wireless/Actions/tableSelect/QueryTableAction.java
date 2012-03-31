@@ -99,7 +99,7 @@ public class QueryTableAction extends Action {
 			// "4", "状态 " ]
 			if (type == 1) {
 				// 按编号
-				filterCondition = " AND alias_id " + ope + filterVal;
+				filterCondition = " AND table_alias " + ope + filterVal;
 			} else if (type == 2) {
 				// 按名称
 				filterCondition = " AND name like '%" + filterVal + "%'";
@@ -125,7 +125,7 @@ public class QueryTableAction extends Action {
 				// ID，別名編號，名稱，區域，人數，狀態，種類，最低消費
 				HashMap resultMap = new HashMap();
 
-				resultMap.put("tableID", tables[i].aliasID);
+				resultMap.put("tableID", tables[i].tableID);
 				resultMap.put("tableAlias", tables[i].aliasID);
 				resultMap.put("tableName", tables[i].name);
 				resultMap.put("tableRegion", tables[i].regionID);

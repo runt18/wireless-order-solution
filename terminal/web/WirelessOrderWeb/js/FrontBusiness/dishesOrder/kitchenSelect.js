@@ -34,7 +34,8 @@ function kitchenSelectLoad() {
 							var keichenInfo = keichenList[i].substr(1,
 									keichenList[i].length - 2).split(",");
 							kitchenData.push([ keichenInfo[0],// 厨房编号
-							keichenInfo[1].substr(1, keichenInfo[1].length - 2) // 厨房名称
+							keichenInfo[2], // 厨房名称
+							keichenInfo[1],// 厨房id
 							]);
 						}
 

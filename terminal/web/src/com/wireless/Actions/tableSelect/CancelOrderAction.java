@@ -23,7 +23,7 @@ public class CancelOrderAction extends Action {
 			throws Exception {
 		
 		PrintWriter out = null;
-		int tableID = 0;
+		int tableAlias = 0;
 		String jsonResp = "{success:$(result), data:'$(value)'}";
 		try {
 			// 解决后台中文传到前台乱码
@@ -32,11 +32,11 @@ public class CancelOrderAction extends Action {
 			
 			String pin = request.getParameter("pin");
 			
-			tableID = Integer.parseInt(request.getParameter("tableID"));
+			tableAlias = Integer.parseInt(request.getParameter("tableAlias"));
 			
-			CancelOrder.exec(Long.parseLong(pin), Terminal.MODEL_STAFF, tableID);
+			CancelOrder.exec(Long.parseLong(pin), Terminal.MODEL_STAFF, tableAlias);
 			jsonResp = jsonResp.replace("$(result)", "true");
-			jsonResp = jsonResp.replace("$(value)", tableID + "号餐台删单成功");
+			jsonResp = jsonResp.replace("$(value)", tableAlias + "号餐台删单成功");
 			
 		}catch(BusinessException e){
 			e.printStackTrace();
@@ -45,13 +45,13 @@ public class CancelOrderAction extends Action {
 				jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");
 				
 			}else if(e.errCode == ErrorCode.TABLE_NOT_EXIST){
-				jsonResp = jsonResp.replace("$(value)", tableID + "号餐台信息不存在，请重新确认");
+				jsonResp = jsonResp.replace("$(value)", tableAlias + "号餐台信息不存在，请重新确认");
 				
 			}else if(e.errCode == ErrorCode.TABLE_IDLE){
-				jsonResp = jsonResp.replace("$(value)", tableID + "号餐台是空闲状态，可能已结帐，请与餐厅管理人员确认");
+				jsonResp = jsonResp.replace("$(value)", tableAlias + "号餐台是空闲状态，可能已结帐，请与餐厅管理人员确认");
 				
 			}else{
-				jsonResp = jsonResp.replace("$(value)", "删除" + tableID + "号餐台信息不成功，请确认网络连接是否正常");
+				jsonResp = jsonResp.replace("$(value)", "删除" + tableAlias + "号餐台信息不成功，请确认网络连接是否正常");
 			}
 		}catch(SQLException e){
 			e.printStackTrace();

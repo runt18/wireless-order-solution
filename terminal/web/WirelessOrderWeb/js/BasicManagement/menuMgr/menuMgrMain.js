@@ -265,7 +265,7 @@ var menuStatResultStore = new Ext.data.Store({
 	}, {
 		name : "isTemp"
 	}, {
-		name : "kitchen"
+		name : "kitchenAlias"
 	}, {
 		name : "kitchenDisplay"
 	}, {
@@ -357,7 +357,7 @@ menuStatResultGrid.getStore().on('load', function() {
 			menuStatResultGrid.getStore().each(function(record) {
 				// 廚房顯示
 				for ( var i = 0; i < kitchenTypeData.length; i++) {
-					if (record.get("kitchen") == kitchenTypeData[i][0]) {
+					if (record.get("kitchenAlias") == kitchenTypeData[i][0]) {
 						record.set("kitchenDisplay", kitchenTypeData[i][1]);
 					}
 				}
@@ -566,14 +566,15 @@ menuAddWin = new Ext.Window(
 											"menuAddSpill").getValue();
 									var dishPrice = menuAddWin.findById(
 											"menuAddPrice").getValue();
-									var kitchen = kitchenTypeCombMA.getValue();
-									// // 前台：kitchenTypeData：[厨房编号,厨房名称]
-									// for ( var i = 0; i <
-									// kitchenTypeData.length; i++) {
-									// if (kitchen == kitchenTypeData[i][1]) {
-									// kitchen = kitchenTypeData[i][0];
-									// }
-									// }
+									var kitchenAlias = kitchenTypeCombMA
+											.getValue();
+									var kitchenId = 0;
+									// 前台：kitchenTypeData：[厨房编号,厨房名称,厨房id]
+									for ( var i = 0; i < kitchenTypeData.length; i++) {
+										if (kitchenAlias == kitchenTypeData[i][0]) {
+											kitchenId = kitchenTypeData[i][2];
+										}
+									}
 									var isSpecial = menuAddWin.findById(
 											"specialCheckboxMA").getValue();
 									var isRecommend = menuAddWin.findById(
@@ -605,7 +606,8 @@ menuAddWin = new Ext.Window(
 														"dishName" : dishName,
 														"dishSpill" : dishSpill,
 														"dishPrice" : dishPrice,
-														"kitchen" : kitchen,
+														"kitchenAlias" : kitchenAlias,
+														"kitchenId" : kitchenId,
 														"isSpecial" : isSpecial,
 														"isRecommend" : isRecommend,
 														"isFree" : isFree,
@@ -728,7 +730,7 @@ var kitchenTypeStoreMM = new Ext.data.Store({
 		load : function() {
 			// 解決combo初始值問題
 			Ext.getCmp('kitchenTypeCombMM').setValue(
-					menuStore.getAt(currRowIndex).get("kitchen"));
+					menuStore.getAt(currRowIndex).get("kitchenAlias"));
 		}
 	}
 });
@@ -863,6 +865,8 @@ menuModifyWin = new Ext.Window(
 								isPrompt = false;
 								menuModifyWin.hide();
 
+								var foodID = menuStore.getAt(currRowIndex).get(
+										"foodID");
 								var dishNumber = menuModifyWin.findById(
 										"menuModNumber").getValue();
 								var dishName = menuModifyWin.findById(
@@ -871,14 +875,14 @@ menuModifyWin = new Ext.Window(
 										"menuModSpill").getValue();
 								var dishPrice = menuModifyWin.findById(
 										"menuModPrice").getValue();
-								var kitchen = kitchenTypeCombMM.getValue();
-								// // 前台：kitchenTypeData：[厨房编号,厨房名称]
-								// for ( var i = 0; i < kitchenTypeData.length;
-								// i++) {
-								// if (kitchen == kitchenTypeData[i][1]) {
-								// kitchen = kitchenTypeData[i][0];
-								// }
-								// }
+								var kitchenAlias = kitchenTypeCombMM.getValue();
+								// 前台：kitchenTypeData：[厨房编号,厨房名称,厨房id]
+								var kitchenId = 0;
+								for ( var i = 0; i < kitchenTypeData.length; i++) {
+									if (kitchenAlias == kitchenTypeData[i][0]) {
+										kitchenId = kitchenTypeData[i][2];
+									}
+								}
 
 								var isSpecial = menuModifyWin.findById(
 										"specialCheckboxMM").getValue();
@@ -896,11 +900,13 @@ menuModifyWin = new Ext.Window(
 											url : "../../UpdateMenu.do",
 											params : {
 												"pin" : Request["pin"],
+												"foodID" : foodID,
 												"dishNumber" : dishNumber,
 												"dishName" : dishName,
 												"dishSpill" : dishSpill,
 												"dishPrice" : dishPrice,
-												"kitchen" : kitchen,
+												"kitchenId" : kitchenId,
+												"kitchenAlias" : kitchenAlias,
 												"isSpecial" : isSpecial,
 												"isRecommend" : isRecommend,
 												"isFree" : isFree,
@@ -1393,9 +1399,11 @@ var menuStore = new Ext.data.Store({
 	}, {
 		name : "dishPrice"
 	}, {
-		name : "kitchen"
+		name : "kitchenAlias"
 	}, {
 		name : "kitchenDisplay"
+	}, {
+		name : "kitchenID"
 	}, {
 		name : "operator"
 	}, {
@@ -1943,7 +1951,7 @@ Ext
 															// 廚房顯示
 															for ( var i = 0; i < kitchenTypeData.length; i++) {
 																if (record
-																		.get("kitchen") == kitchenTypeData[i][0]) {
+																		.get("kitchenAlias") == kitchenTypeData[i][0]) {
 																	record
 																			.set(
 																					"kitchenDisplay",

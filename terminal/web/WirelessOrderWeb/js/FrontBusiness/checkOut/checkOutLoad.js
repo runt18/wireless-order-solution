@@ -101,12 +101,13 @@ function checkOutOnLoad() {
 														.split(",");
 												discountData.push([
 														discountInfo[0], // 厨房编号
-														discountInfo[2],// 一般折扣1
-														discountInfo[3],// 一般折扣2
-														discountInfo[4],// 一般折扣3
-														discountInfo[5],// 会员折扣1
-														discountInfo[6],// 会员折扣2
-														discountInfo[7] // 会员折扣3
+														discountInfo[3],// 一般折扣1
+														discountInfo[4],// 一般折扣2
+														discountInfo[5],// 一般折扣3
+														discountInfo[6],// 会员折扣1
+														discountInfo[7],// 会员折扣2
+														discountInfo[8], // 会员折扣3
+														discountInfo[1] // 厨房id
 												]);
 											}
 
