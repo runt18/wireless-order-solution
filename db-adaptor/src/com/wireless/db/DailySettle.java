@@ -1,6 +1,7 @@
 package com.wireless.db;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.Restaurant;
@@ -19,6 +20,7 @@ public class DailySettle {
 		public int maxOrderID;				//order和order_history表的最大id
 		public int maxOrderFoodID;			//order_food和order_food_history表的最大id
 		public int maxShiftID;				//shift和shift_history表的最大id
+		public int[] restOrderID;			//日结操作前还没有进行交班操作的账单号
 	}
 
 	/**
@@ -85,9 +87,33 @@ public class DailySettle {
 	 */
 	public static Result exec(DBCon dbCon, int restaurantID) throws SQLException, BusinessException{
 		Result result = new Result();
+		
+		String sql;
+		
+		if(restaurantID > 0){
+			//get the paid orders which has NOT been shifted between the latest off duty and now
+			sql = "SELECT id FROM " + Params.dbName + ".order WHERE " +
+				  "restaurant_id=" + restaurantID + " AND " +
+				  "total_price IS NOT NULL" + " AND " +
+				  "order_date BETWEEN " +
+				  "(SELECT off_duty FROM " + Params.dbName + ".shift WHERE " +
+				  "restaurant_id=" + restaurantID + " " +
+				  "ORDER BY off_duty DESC LIMIT 1)" + " AND " + "NOW()";
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			ArrayList<Integer> orderIDs = new ArrayList<Integer>();
+			while(dbCon.rs.next()){
+				orderIDs.add(dbCon.rs.getInt("id"));
+			}
+			dbCon.rs.close();
+			result.restOrderID = new int[orderIDs.size()];
+			for(int i = 0; i < result.restOrderID.length; i++){
+				result.restOrderID[i] = orderIDs.get(i).intValue();
+			}
+		}
+		
 		//get the amount to order
-		String sql = "SELECT count(*) FROM " + Params.dbName + ".order WHERE total_price IS NOT NULL " +
-					 (restaurantID < 0 ? "" : "AND restaurant_id=" + restaurantID);
+		sql = "SELECT count(*) FROM " + Params.dbName + ".order WHERE total_price IS NOT NULL " +
+			 (restaurantID < 0 ? "" : "AND restaurant_id=" + restaurantID);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			result.totalOrder = dbCon.rs.getInt(1);
