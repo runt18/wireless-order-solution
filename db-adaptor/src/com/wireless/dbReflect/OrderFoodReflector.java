@@ -55,7 +55,7 @@ public class OrderFoodReflector {
 				+ " C.discount, C.taste, C.taste_price, C.taste_id, C.taste2_id, C.taste3_id, D.taste_alias, D.taste2_alias, D.taste3_alias, "
 				+ " D.hang_status, C.kitchen_alias, D.is_temporary, D.type, D.pay_datetime, D.pay_date "
 				+ " FROM (SELECT A.order_id, A.food_alias, A.taste_alias, A.taste2_alias, A.taste3_alias, A.hang_status, A.is_temporary, "
-				+ " B.type, B.order_date AS pay_datetime, date_format(B.order_date, '%Y-%m-%d') AS pay_date, "
+				+ " B.type, B.order_date AS pay_datetime, date_format(B.order_date, '%Y-%m-%d') AS pay_date, C.dept_id "
 				+ " SUM(A.order_count) AS order_sum, MAX(A.id) AS id "
 				+ " FROM "
 				+ Params.dbName
@@ -85,6 +85,7 @@ public class OrderFoodReflector {
 			food.setPrice(dbCon.rs.getFloat("unit_price"));
 			food.orderDate = dbCon.rs.getTimestamp("pay_datetime").getTime();
 			food.kitchen.aliasID = dbCon.rs.getShort("kitchen_alias");
+			food.kitchen.deptID = dbCon.rs.getShort("dept_id");
 			food.setDiscount(dbCon.rs.getFloat("discount"));
 			food.tastePref = dbCon.rs.getString("taste");
 			food.setTastePrice(dbCon.rs.getFloat("taste_price"));
