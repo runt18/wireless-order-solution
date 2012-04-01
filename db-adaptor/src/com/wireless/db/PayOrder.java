@@ -344,7 +344,7 @@ public class PayOrder {
 							  "(SELECT owner_name FROM " + Params.dbName + 
 							  ".terminal WHERE pin=" + "0x" + Long.toHexString(term.pin) + " AND model_id=" + term.modelID + "), " +	//staff
 							  "(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + 
-							  orderInfo.restaurantID + " AND kitchen_alias=" + foodMaterial.food.kitchen + "), " +				//dept_id
+							  orderInfo.restaurantID + " AND kitchen_alias=" + foodMaterial.food.kitchen.aliasID + "), " +				//dept_id
 							  -amount + ", " + 				//amount
 							  MaterialDetail.TYPE_CONSUME + //type
 							  ")";
@@ -356,7 +356,7 @@ public class PayOrder {
 							  " WHERE restaurant_id=" + orderInfo.restaurantID + 
 							  " AND material_id=" + foodMaterial.material.getMaterialID() +
 							  " AND dept_id=" + "(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + 
-							  orderInfo.restaurantID + " AND kitchen_alias=" + foodMaterial.food.kitchen + ")";
+							  orderInfo.restaurantID + " AND kitchen_alias=" + foodMaterial.food.kitchen.aliasID + ")";
 						dbCon.stmt.executeUpdate(sql);
 					}
 					
