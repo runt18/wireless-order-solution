@@ -72,8 +72,8 @@ public class StartupActivity extends Activity {
 			editor.putInt(Params.CONN_TIME_OUT, Params.TIME_OUT_10s);
 			editor.commit();//Ìá½»ÐÞ¸Ä
 			
-		}else{
-			ServerConnector.instance().setNetAddr(sharedPrefs.getString(Params.IP_ADDR, Params.DEF_IP_ADDR));
+		}else{		
+			ServerConnector.instance().setNetAddr("www.e-tones.net");
 			ServerConnector.instance().setNetPort(sharedPrefs.getInt(Params.IP_PORT, Params.DEF_IP_PORT));
 //			ServerConnector.instance().setNetAPN(_netapn);
 //			ServerConnector.instance().setNetUser(_username);
