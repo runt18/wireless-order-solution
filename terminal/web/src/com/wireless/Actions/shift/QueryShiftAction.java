@@ -37,7 +37,7 @@ public class QueryShiftAction extends Action {
 			 */
 			String pin = request.getParameter("pin");
 					
-			QueryShift.Result result = QueryShift.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
+			QueryShift.Result result = QueryShift.execByNow(Long.parseLong(pin), Terminal.MODEL_STAFF);
 			
 			/**
 			 * The json to shift record like below
@@ -52,16 +52,16 @@ public class QueryShiftAction extends Action {
 			jsonOrder = jsonOrder.replace("$(on_duty)", result.onDuty);
 			jsonOrder = jsonOrder.replace("$(off_duty)", result.offDuty);
 			jsonOrder = jsonOrder.replace("$(orderAmount)", Integer.toString(result.orderAmount));
-			jsonOrder = jsonOrder.replace("$(cash)", new Float(result.totalCash).toString());
-			jsonOrder = jsonOrder.replace("$(cash_2)", new Float(result.totalCash2).toString());
-			jsonOrder = jsonOrder.replace("$(credit_card)", new Float(result.totalCreditCard).toString());
-			jsonOrder = jsonOrder.replace("$(credit_card_2)", new Float(result.totalCreditCard2).toString());
-			jsonOrder = jsonOrder.replace("$(member)", new Float(result.totalMemberCard).toString());
-			jsonOrder = jsonOrder.replace("$(member_2)", new Float(result.totalMemberCard2).toString());
-			jsonOrder = jsonOrder.replace("$(sign)", new Float(result.totalSign).toString());
-			jsonOrder = jsonOrder.replace("$(sign_2)", new Float(result.totalSign2).toString());
-			jsonOrder = jsonOrder.replace("$(hang)", new Float(result.totalHang).toString());
-			jsonOrder = jsonOrder.replace("$(hang_2)", new Float(result.totalHang2).toString());
+			jsonOrder = jsonOrder.replace("$(cash)", new Float(result.cashIncome).toString());
+			jsonOrder = jsonOrder.replace("$(cash_2)", new Float(result.cashIncome2).toString());
+			jsonOrder = jsonOrder.replace("$(credit_card)", new Float(result.creditCardIncome).toString());
+			jsonOrder = jsonOrder.replace("$(credit_card_2)", new Float(result.creditCardIncome2).toString());
+			jsonOrder = jsonOrder.replace("$(member)", new Float(result.memberCardIncome).toString());
+			jsonOrder = jsonOrder.replace("$(member_2)", new Float(result.memberCardIncome2).toString());
+			jsonOrder = jsonOrder.replace("$(sign)", new Float(result.signIncome).toString());
+			jsonOrder = jsonOrder.replace("$(sign_2)", new Float(result.signIncome2).toString());
+			jsonOrder = jsonOrder.replace("$(hang)", new Float(result.hangIncome).toString());
+			jsonOrder = jsonOrder.replace("$(hang_2)", new Float(result.hangIncome2).toString());
 			jsonOrder = jsonOrder.replace("$(totalActual)", new Float(result.totalActual).toString());
 			jsonOrder = jsonOrder.replace("$(totalDiscount)", new Float(result.discountIncome).toString());
 			jsonOrder = jsonOrder.replace("$(totalGifted)", new Float(result.giftIncome).toString());
