@@ -137,7 +137,11 @@ public class TransTableAction extends Action implements PinGen {
 			}
 
 
-		} catch (BusinessException e) {
+		}catch(NumberFormatException e){
+			jsonResp = jsonResp.replace("$(result)", "false");
+			jsonResp = jsonResp.replace("$(value)", "餐台号输入不正确，请重新输入");
+			
+		}catch (BusinessException e) {
 			jsonResp = jsonResp.replace("$(result)", "false");
 			if (oldTable == null) {
 				jsonResp = jsonResp.replace("$(value)", oldTableAlias + "号台信息不存在");

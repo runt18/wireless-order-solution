@@ -38,6 +38,10 @@ public class CancelOrderAction extends Action {
 			jsonResp = jsonResp.replace("$(result)", "true");
 			jsonResp = jsonResp.replace("$(value)", tableAlias + "号餐台删单成功");
 			
+		}catch(NumberFormatException e){
+			jsonResp = jsonResp.replace("$(result)", "false");
+			jsonResp = jsonResp.replace("$(value)", "餐台号输入不正确，请重新输入");
+			
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jsonResp = jsonResp.replace("$(result)", "false");
