@@ -11,6 +11,8 @@ public class OrderFood extends Food {
 	
 	public Taste[] tastes = new Taste[3];			//three tastes the food can consist of
 	
+	public Table table = new Table();				//the table this order food belongs to
+	
 	public boolean isTemporary = false;				//indicates whether the food is temporary
 
 	int tastePrice = 0; //the taste price to this food
