@@ -697,12 +697,11 @@ public class PickFoodActivity extends TabActivity implements
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				if (s.toString().length() != 0) {
-					Food[] foods = pickLstView.getSourceData();
 					ArrayList<Food> filterFoods = new ArrayList<Food>();
-					for (int i = 0; i < foods.length; i++) {
-						if(String.valueOf(foods[i].pinyin).toLowerCase().contains(s.toString().toLowerCase())
-								|| foods[i].name.contains(s.toString())) {
-							filterFoods.add(foods[i]);
+					for(Food food : _filterKitchenFoods){
+						if(String.valueOf(food.pinyin).toLowerCase().contains(s.toString().toLowerCase())
+								|| food.name.contains(s.toString())) {
+							filterFoods.add(food);
 						}
 					}
 
