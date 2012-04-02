@@ -175,7 +175,7 @@ public class QueryOrder {
 		dbCon.rs.close();
 		
 		// query the food's id and order count associate with the order id for "order_food" table		
-		String extraCond = " AND A.order_id=" + orderID;		
+		String extraCond = " AND C.order_id=" + orderID;		
 
 		orderInfo.foods = OrderFoodReflector.getDetailToday(dbCon, extraCond, "");
 		orderInfo.id = orderID;

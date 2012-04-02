@@ -263,7 +263,7 @@ public class UpdateOrder {
 	
 	private static Result updateOrder(DBCon dbCon, Terminal term, Order orderToUpdate, boolean isPaidAgain) throws BusinessException, SQLException{		
 		
-		String extraCond = " AND A.order_id=" + orderToUpdate.id;
+		String extraCond = " AND C.order_id=" + orderToUpdate.id;
 		OrderFood[] oriFoods = OrderFoodReflector.getDetailToday(dbCon, extraCond, null);
 		
 		ArrayList<OrderFood> extraFoods = new ArrayList<OrderFood>();
