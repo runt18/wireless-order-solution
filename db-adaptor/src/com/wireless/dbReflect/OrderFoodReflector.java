@@ -53,12 +53,9 @@ public class OrderFoodReflector {
 
 		sql = "SELECT C.food_id, C.name, D.food_alias, C.food_status, D.order_sum, C.unit_price, C.order_date, "
 				+ " C.discount, C.taste, C.taste_price, C.taste_id, C.taste2_id, C.taste3_id, D.taste_alias, D.taste2_alias, D.taste3_alias, "
-				+ " D.hang_status, C.kitchen_alias, D.is_temporary, " 
-				+ " D.table_id, D.table_alias, D.table_name, D.region_id, D.region_name, "
-				+ " D.type, D.pay_datetime, D.pay_date, D.dept_id"
+				+ " D.hang_status, C.kitchen_alias, D.is_temporary, D.type, D.pay_datetime, D.pay_date, C.dept_id "
 				+ " FROM (SELECT A.order_id, A.food_alias, A.taste_alias, A.taste2_alias, A.taste3_alias, A.hang_status, A.is_temporary, "
-				+ " B.type, B.table_id, B.table_alias, B.table_name, B.region_id, B.region_name, " 
-				+ " B.order_date AS pay_datetime, date_format(B.order_date, '%Y-%m-%d') AS pay_date, A.dept_id, "
+				+ " B.type, B.order_date AS pay_datetime, date_format(B.order_date, '%Y-%m-%d') AS pay_date, "
 				+ " SUM(A.order_count) AS order_sum, MAX(A.id) AS id "
 				+ " FROM "
 				+ Params.dbName
@@ -101,10 +98,6 @@ public class OrderFoodReflector {
 			food.hangStatus = dbCon.rs.getShort("hang_status");
 			food.isTemporary = dbCon.rs.getBoolean("is_temporary");
 			food.payManner = dbCon.rs.getShort("type");
-			food.table.tableID = dbCon.rs.getInt("table_id");
-			food.table.aliasID = dbCon.rs.getInt("table_alias");
-			food.table.name = dbCon.rs.getString("table_name");
-			food.table.regionID = dbCon.rs.getShort("region_id");
 			orderFoods.add(food);
 		}
 		dbCon.rs.close();
@@ -149,12 +142,10 @@ public class OrderFoodReflector {
 
 		sql = "SELECT C.food_id, C.name, D.food_alias, C.food_status, D.order_sum, C.unit_price, C.order_date, "
 				+ " C.discount, C.taste, C.taste_price, C.taste_id, C.taste2_id, C.taste3_id, D.taste_alias, D.taste2_alias, D.taste3_alias, "
-				+ " D.table_id, D.table_alias, D.table_name, D.region_id, D.region_name, "
-				+ " C.kitchen_alias, D.is_temporary, D.type, D.pay_datetime, D.pay_date, D.dept_id "
+				+ " C.kitchen_alias, D.is_temporary, D.type, D.pay_datetime, D.pay_date "
 				+ " FROM (SELECT A.order_id, A.food_alias, A.taste_alias, A.taste2_alias, A.taste3_alias, A.is_temporary, "
-				+ " B.type, B.table_id, B.table_alias, B.table_name, B.region_id, B.region_name, "
-				+ " B.order_date AS pay_datetime, date_format(B.order_date, '%Y-%m-%d') AS pay_date, A.dept_id, "
-				+ " SUM(A.order_count) AS order_sum, MAX(A.id) AS id "
+				+ " B.type, B.order_date AS pay_datetime, date_format(B.order_date, '%Y-%m-%d') AS pay_date, "
+				+ "SUM(A.order_count) AS order_sum, MAX(A.id) AS id "
 				+ " FROM "
 				+ Params.dbName
 				+ ".order_food_history A, "
@@ -183,7 +174,6 @@ public class OrderFoodReflector {
 			food.setPrice(dbCon.rs.getFloat("unit_price"));
 			food.orderDate = dbCon.rs.getTimestamp("pay_datetime").getTime();
 			food.kitchen.aliasID = dbCon.rs.getShort("kitchen_alias");
-			food.kitchen.deptID = dbCon.rs.getShort("dept_id");
 			food.setDiscount(dbCon.rs.getFloat("discount"));
 			food.tastePref = dbCon.rs.getString("taste");
 			food.setTastePrice(dbCon.rs.getFloat("taste_price"));
@@ -196,10 +186,6 @@ public class OrderFoodReflector {
 			// food.hangStatus = dbCon.rs.getShort("hang_status");
 			food.isTemporary = dbCon.rs.getBoolean("is_temporary");
 			food.payManner = dbCon.rs.getShort("type");
-			food.table.tableID = dbCon.rs.getInt("table_id");
-			food.table.aliasID = dbCon.rs.getInt("table_alias");
-			food.table.name = dbCon.rs.getString("table_name");
-			food.table.regionID = dbCon.rs.getShort("region_id");
 			orderFoods.add(food);
 		}
 		dbCon.rs.close();
