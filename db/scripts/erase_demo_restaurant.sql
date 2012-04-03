@@ -28,6 +28,10 @@ DELETE FROM wireless_order_db.setting WHERE restaurant_id=11;
 
 DELETE FROM wireless_order_db.shift WHERE restaurant_id=11;
 
+DELETE FROM wireless_order_db.shift_history WHERE restaurant_id=11;
+
+DELETE FROM wireless_order_db.daily_settle_history WHERE restaurant_id=11;
+
 DELETE FROM wireless_order_db.restaurant WHERE id=11;
 
 

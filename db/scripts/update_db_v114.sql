@@ -309,6 +309,23 @@ DEFAULT CHARACTER SET = utf8,
 COMMENT = 'the shift history to each restaurant' ;
 
 -- -----------------------------------------------------
+-- Create table `wireless_order_db`.`daily_settle_history`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`daily_settle_history` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`daily_settle_history` (
+  `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to each shift record' ,
+  `restaurant_id` INT UNSIGNED NOT NULL ,
+  `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name of the operator to perform daily settle' ,
+  `on_duty` DATETIME NULL DEFAULT NULL COMMENT 'the datetime to be on duty' ,
+  `off_duty` DATETIME NULL DEFAULT NULL COMMENT 'the datetime to be off duty' ,
+  PRIMARY KEY (`id`) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'the daily settle history to each restaurant' ;
+
+-- -----------------------------------------------------
 -- View `order_food_history_view`
 -- -----------------------------------------------------
 DROP VIEW IF EXISTS order_food_history_view;
