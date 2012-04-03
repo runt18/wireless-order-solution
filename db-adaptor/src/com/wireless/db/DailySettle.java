@@ -1,10 +1,13 @@
 package com.wireless.db;
 
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.Restaurant;
+import com.wireless.protocol.Terminal;
 
 public class DailySettle {
 	/**
@@ -39,27 +42,7 @@ public class DailySettle {
 		}finally{
 			dbCon.disconnect();
 		}
-	}
-	
-	/**
-	 * Perform the daily settlement to a specific restaurant.
-	 * 
-	 * @param restaurantID
-	 *            the restaurant id to daily settle
-	 * @return the result to daily settlement
-	 * @throws SQLException
-	 * @throws BusinessException
-	 */
-	public static Result exec(int restaurantID) throws SQLException, BusinessException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return exec(dbCon, restaurantID);
-			
-		}finally{
-			dbCon.disconnect();
-		}
-	}
+	}	
 	
 	/**
 	 * Perform the daily settlement to all the restaurant.
@@ -69,35 +52,113 @@ public class DailySettle {
 	 * @throws BusinessException
 	 */
 	public static Result exec(DBCon dbCon) throws SQLException, BusinessException{
-		return exec(dbCon, -1);
+		Terminal term = new Terminal();
+		term.restaurant_id = -1;
+		return exec(dbCon, term);
 	}
 	
 	/**
-	 * Perform to daily settle according to the restaurant id.
+	 * Perform the daily settlement according to both pin and model.	
+	 * 
+	 * @param pin
+	 *            the pin to this terminal
+	 * @param model
+	 *            the model to this terminal
+	 * @return the result to daily settlement
+	 * @throws BusinessException
+	 *             throws if one the cases below.<br>
+	 *             - The terminal is NOT attached to any restaurant.<br>
+	 *             - The terminal is expired.<br>
+	 *             - The member to query does NOT exist.
+	 * @throws SQLException
+	 *             throws if fail to execute any SQL statement
+	 */
+	public static Result exec(long pin, short model) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return exec(dbCon, VerifyPin.exec(dbCon, pin, model));
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Perform the daily settlement according to both pin and model.	
 	 * Note that the database should be connected before invoking this method.
+	 * 
 	 * @param dbCon
 	 *            the database connection
-	 * @param restaurantID
-	 *            the restaurant id to perform daily settle, -1 means all
-	 *            restaurants
+	 * @param pin
+	 *            the pin to this terminal
+	 * @param model
+	 *            the model to this terminal
+	 * @return the result to daily settlement
+	 * @throws BusinessException
+	 *             throws if one the cases below.<br>
+	 *             - The terminal is NOT attached to any restaurant.<br>
+	 *             - The terminal is expired.<br>
+	 *             - The member to query does NOT exist.
+	 * @throws SQLException
+	 *             throws if fail to execute any SQL statement
+	 */
+	public static Result exec(DBCon dbCon, long pin, short model) throws BusinessException, SQLException{
+		return exec(dbCon, VerifyPin.exec(dbCon, pin, model));
+	}
+	
+	/**
+	 * Perform to daily settle according to a terminal.
+	 * @param term
+	 * 			  the terminal with both user name and restaurant id, 
+	 * 			  restaurant_id(-1) means all restaurants
 	 * @return the result to daily settle
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 * @throws BusinessException
 	 */
-	public static Result exec(DBCon dbCon, int restaurantID) throws SQLException, BusinessException{
+	public static Result exec(Terminal term) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return exec(dbCon, term);
+			
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Perform to daily settle according to a terminal.
+	 * Note that the database should be connected before invoking this method.
+	 * @param dbCon
+	 *            the database connection
+	 * @param term
+	 * 			  the terminal with both user name and restaurant id, 
+	 * 			  restaurant_id(-1) means all restaurants
+	 * @return the result to daily settle
+	 * @throws SQLException
+	 *             throws if fail to execute any SQL statement
+	 * @throws BusinessException
+	 */
+	public static Result exec(DBCon dbCon, Terminal term) throws SQLException, BusinessException{
 		Result result = new Result();
 		
 		String sql;
+		String onDuty = null;
 		
-		if(restaurantID > 0){
+		/**
+		 * In the case perform the daily settle to a specific restaurant,
+		 * get the paid orders which has NOT been shifted between the latest off duty and now,
+		 * get the date to last daily settlement
+		 */
+		if(term.restaurant_id > 0){
 			//get the paid orders which has NOT been shifted between the latest off duty and now
 			sql = "SELECT id FROM " + Params.dbName + ".order WHERE " +
-				  "restaurant_id=" + restaurantID + " AND " +
+				  "restaurant_id=" + term.restaurant_id + " AND " +
 				  "total_price IS NOT NULL" + " AND " +
 				  "order_date BETWEEN " +
 				  "(SELECT off_duty FROM " + Params.dbName + ".shift WHERE " +
-				  "restaurant_id=" + restaurantID + " " +
+				  "restaurant_id=" + term.restaurant_id + " " +
 				  "ORDER BY off_duty DESC LIMIT 1)" + " AND " + "NOW()";
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			ArrayList<Integer> orderIDs = new ArrayList<Integer>();
@@ -109,11 +170,23 @@ public class DailySettle {
 			for(int i = 0; i < result.restOrderID.length; i++){
 				result.restOrderID[i] = orderIDs.get(i).intValue();
 			}
-		}
+			
+			//get the date to last daily settlement
+			sql = " SELECT MAX(off_duty) FROM " + Params.dbName + ".daily_settle_history " +
+				  " WHERE " +
+				  " restaurant_id = " + term.restaurant_id;
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
+				Timestamp offDuty = dbCon.rs.getTimestamp(1);
+				if(offDuty != null){
+					onDuty = "'" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(offDuty) + "'";
+				}
+			}
+		}			  
 		
 		//get the amount to order
 		sql = "SELECT count(*) FROM " + Params.dbName + ".order WHERE total_price IS NOT NULL " +
-			 (restaurantID < 0 ? "" : "AND restaurant_id=" + restaurantID);
+			 (term.restaurant_id < 0 ? "" : "AND restaurant_id=" + term.restaurant_id);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			result.totalOrder = dbCon.rs.getInt(1);
@@ -123,7 +196,7 @@ public class DailySettle {
 		//get the amount to order detail 
 		sql = "SELECT count(*) FROM " + Params.dbName + ".order_food WHERE order_id IN (" +
 		  	  "SELECT id FROM " + Params.dbName + ".order WHERE total_price IS NOT NULL " +
-		  	  (restaurantID < 0 ? "" : "AND restaurant_id=" + restaurantID) + ")";
+		  	  (term.restaurant_id < 0 ? "" : "AND restaurant_id=" + term.restaurant_id) + ")";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			result.totalOrderDetail = dbCon.rs.getInt(1);				
@@ -133,7 +206,7 @@ public class DailySettle {
 		//get the amount to shift record
 		sql = "SELECT count(*) FROM " + Params.dbName + ".shift " +
 			  "WHERE 1=1 " +
-			  (restaurantID < 0 ? "" : "AND restaurant_id=" + restaurantID);
+			  (term.restaurant_id < 0 ? "" : "AND restaurant_id=" + term.restaurant_id);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			result.totalShift = dbCon.rs.getInt(1);
@@ -188,14 +261,14 @@ public class DailySettle {
 			//move the paid order from "order" to "order_history"
 			sql = "INSERT INTO " + Params.dbName + ".order_history (" + orderItem + ") " + 
 				  "SELECT " + orderItem + " FROM " + Params.dbName + ".order WHERE total_price IS NOT NULL " + 
-				  (restaurantID < 0 ? "" : "AND restaurant_id=" + restaurantID);
+				  (term.restaurant_id < 0 ? "" : "AND restaurant_id=" + term.restaurant_id);
 			dbCon.stmt.executeUpdate(sql);
 			
 			//move the paid order details from "order_food" to "order_food_history" 
 			sql = "INSERT INTO " + Params.dbName + ".order_food_history (" + orderFoodItem + ") " +
 				  "SELECT " + orderFoodItem + " FROM " + Params.dbName + ".order_food WHERE order_id IN (" +
 				  "SELECT id FROM " + Params.dbName + ".order WHERE total_price IS NOT NULL " +
-				  (restaurantID < 0 ? "" : "AND restaurant_id=" + restaurantID) +
+				  (term.restaurant_id < 0 ? "" : "AND restaurant_id=" + term.restaurant_id) +
 				  ")";
 			dbCon.stmt.executeUpdate(sql);
 			
@@ -203,25 +276,37 @@ public class DailySettle {
 			sql = "INSERT INTO " + Params.dbName + ".shift_history (" + shiftItem + ") " +
 				  "SELECT " + shiftItem + " FROM " + Params.dbName + ".shift " +
 				  "WHERE 1=1 " +
-				  (restaurantID < 0 ? "" : "AND restaurant_id=" + restaurantID);
+				  (term.restaurant_id < 0 ? "" : "AND restaurant_id=" + term.restaurant_id);
 			dbCon.stmt.executeUpdate(sql);
+			
+			//insert the daily settle record to "daily_settle_history"
+			//if perform daily settle to a specific restaurant
+			if(term.restaurant_id > 0){
+				sql = "INSERT INTO " + Params.dbName + ".daily_settle_history (`restaurant_id`, `name`, `on_duty`, `off_duty`) VALUES (" +
+					  term.restaurant_id + ", " +
+					  "'" + (term.owner == null ? "" : term.owner) + "', " +
+					  (onDuty == null ? "date_format(NOW(), '%Y-%m-%d')" : "'" + onDuty + "'") + ", " +
+					  "NOW()" +
+					  ")";
+				dbCon.stmt.executeUpdate(sql);
+			}
 			
 			//delete the order details from "order_food"
 			sql = "DELETE FROM " + Params.dbName + ".order_food WHERE order_id IN (" +
 				  "SELECT id FROM " + Params.dbName + ".order WHERE total_price IS NOT NULL " +
-				  (restaurantID < 0 ? "" : "AND restaurant_id=" + restaurantID) +
+				  (term.restaurant_id < 0 ? "" : "AND restaurant_id=" + term.restaurant_id) +
 				  ")";
 			dbCon.stmt.executeUpdate(sql);
 			
 			//delete the order from "order"
 			sql = "DELETE FROM " + Params.dbName + ".order WHERE total_price IS NOT NULL " +
-				  (restaurantID < 0 ? "" : "AND restaurant_id=" + restaurantID);
+				  (term.restaurant_id < 0 ? "" : "AND restaurant_id=" + term.restaurant_id);
 			dbCon.stmt.executeUpdate(sql);
 			
 			//delete the shift record from "shift"
 			sql = "DELETE FROM " + Params.dbName + ".shift " +
 				  "WHERE 1=1 " +
-				  (restaurantID < 0 ? "" : "AND restaurant_id=" + restaurantID);
+				  (term.restaurant_id < 0 ? "" : "AND restaurant_id=" + term.restaurant_id);
 			dbCon.stmt.executeUpdate(sql);
 			
 			//delete the order_food record to root
