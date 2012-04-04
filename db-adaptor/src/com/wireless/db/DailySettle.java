@@ -206,7 +206,7 @@ public class DailySettle {
 		//get the amount to shift record
 		sql = "SELECT count(*) FROM " + Params.dbName + ".shift " +
 			  "WHERE 1=1 " +
-			  (term.restaurant_id < 0 ? "" : "AND restaurant_id=" + term.restaurant_id);
+			  (term.restaurant_id < 0 ? "AND restaurant_id <> " + Restaurant.ADMIN : "AND restaurant_id=" + term.restaurant_id);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			result.totalShift = dbCon.rs.getInt(1);
