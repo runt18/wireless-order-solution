@@ -329,7 +329,7 @@ public class PayOrder {
 					while(iter.hasNext()){
 						FoodMaterial foodMaterial = iter.next();
 						//calculate the 库存对冲
-						float amount = (float)Math.round(foodMaterial.food.getCount().floatValue() * foodMaterial.consumption * 100) /100;
+						float amount = (float)Math.round(foodMaterial.food.getCount().floatValue() * foodMaterial.consumption * 100) / 100;
 						
 						//insert the corresponding detail record to material_detail
 						sql = "INSERT INTO " + Params.dbName + ".material_detail (" + 
