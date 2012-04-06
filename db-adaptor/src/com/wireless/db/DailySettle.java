@@ -23,7 +23,7 @@ public class DailySettle {
 		public int maxOrderID;				//order和order_history表的最大id
 		public int maxOrderFoodID;			//order_food和order_food_history表的最大id
 		public int maxShiftID;				//shift和shift_history表的最大id
-		public int[] restOrderID;			//日结操作前还没有进行交班操作的账单号
+		//public int[] restOrderID;			//日结操作前还没有进行交班操作的账单号
 	}
 
 	/**
@@ -52,9 +52,34 @@ public class DailySettle {
 	 * @throws BusinessException
 	 */
 	public static Result exec(DBCon dbCon) throws SQLException, BusinessException{
-		Terminal term = new Terminal();
-		term.restaurant_id = -1;
-		return exec(dbCon, term);
+		
+		String sql;
+		
+		ArrayList<Terminal> terms = new ArrayList<Terminal>();
+		
+		sql = "SELECT id AS restaurant_id FROM " + Params.dbName + ".restaurant WHERE id > " + Restaurant.RESERVED_7;
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		while(dbCon.rs.next()){
+			Terminal term = new Terminal();
+			term.restaurant_id = dbCon.rs.getInt("restaurant_id");
+			term.owner = "system";
+			terms.add(term);
+		}
+		dbCon.rs.close();		
+		
+		Result result = new Result();
+		for(Terminal term : terms){			
+			Result eachResult = exec(dbCon, term, false);
+			
+			result.totalOrder += eachResult.totalOrder;
+			result.totalOrderDetail += eachResult.totalOrderDetail;
+			result.totalShift += eachResult.totalShift;
+			result.maxOrderFoodID = eachResult.maxOrderFoodID;
+			result.maxOrderID = eachResult.maxOrderID;
+			result.maxShiftID = eachResult.maxShiftID;
+		}
+		
+		return result;
 	}
 	
 	/**
@@ -77,7 +102,7 @@ public class DailySettle {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return exec(dbCon, VerifyPin.exec(dbCon, pin, model));
+			return exec(dbCon, VerifyPin.exec(dbCon, pin, model), true);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -103,14 +128,13 @@ public class DailySettle {
 	 *             throws if fail to execute any SQL statement
 	 */
 	public static Result exec(DBCon dbCon, long pin, short model) throws BusinessException, SQLException{
-		return exec(dbCon, VerifyPin.exec(dbCon, pin, model));
+		return exec(dbCon, VerifyPin.exec(dbCon, pin, model), true);
 	}
 	
 	/**
 	 * Perform to daily settle according to a terminal.
 	 * @param term
-	 * 			  the terminal with both user name and restaurant id, 
-	 * 			  restaurant_id(-1) means all restaurants
+	 * 			  the terminal with both user name and restaurant id
 	 * @return the result to daily settle
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
@@ -120,7 +144,7 @@ public class DailySettle {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return exec(dbCon, term);
+			return exec(dbCon, term, true);
 			
 		}finally{
 			dbCon.disconnect();
@@ -133,56 +157,31 @@ public class DailySettle {
 	 * @param dbCon
 	 *            the database connection
 	 * @param term
-	 * 			  the terminal with both user name and restaurant id, 
-	 * 			  restaurant_id(-1) means all restaurants
+	 * 			  the terminal with both user name and restaurant id
+	 * @param isManual
+	 * 			  indicates whether the daily settle is manual or automation
 	 * @return the result to daily settle
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 * @throws BusinessException
 	 */
-	public static Result exec(DBCon dbCon, Terminal term) throws SQLException, BusinessException{
+	public static Result exec(DBCon dbCon, Terminal term, boolean isManual) throws SQLException, BusinessException{
 		Result result = new Result();
 		
 		String sql;
 		String onDuty = null;
 		
-		/**
-		 * In the case perform the daily settle to a specific restaurant,
-		 * get the paid orders which has NOT been shifted between the latest off duty and now,
-		 * get the date to last daily settlement
-		 */
-		if(term.restaurant_id > 0){
-			//get the paid orders which has NOT been shifted between the latest off duty and now
-			sql = "SELECT id FROM " + Params.dbName + ".order WHERE " +
-				  "restaurant_id=" + term.restaurant_id + " AND " +
-				  "total_price IS NOT NULL" + " AND " +
-				  "order_date BETWEEN " +
-				  "(SELECT off_duty FROM " + Params.dbName + ".shift WHERE " +
-				  "restaurant_id=" + term.restaurant_id + " " +
-				  "ORDER BY off_duty DESC LIMIT 1)" + " AND " + "NOW()";
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			ArrayList<Integer> orderIDs = new ArrayList<Integer>();
-			while(dbCon.rs.next()){
-				orderIDs.add(dbCon.rs.getInt("id"));
+		//get the date to last daily settlement
+		sql = " SELECT MAX(off_duty) FROM " + Params.dbName + ".daily_settle_history " +
+			  " WHERE " +
+			  " restaurant_id = " + term.restaurant_id;
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			Timestamp offDuty = dbCon.rs.getTimestamp(1);
+			if(offDuty != null){
+				onDuty = "'" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(offDuty) + "'";
 			}
-			dbCon.rs.close();
-			result.restOrderID = new int[orderIDs.size()];
-			for(int i = 0; i < result.restOrderID.length; i++){
-				result.restOrderID[i] = orderIDs.get(i).intValue();
-			}
-			
-			//get the date to last daily settlement
-			sql = " SELECT MAX(off_duty) FROM " + Params.dbName + ".daily_settle_history " +
-				  " WHERE " +
-				  " restaurant_id = " + term.restaurant_id;
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			if(dbCon.rs.next()){
-				Timestamp offDuty = dbCon.rs.getTimestamp(1);
-				if(offDuty != null){
-					onDuty = "'" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(offDuty) + "'";
-				}
-			}
-		}			  
+		}
 		
 		//get the amount to order
 		sql = "SELECT count(*) FROM " + Params.dbName + ".order WHERE total_price IS NOT NULL " +
@@ -214,9 +213,10 @@ public class DailySettle {
 		dbCon.rs.close();
 		
 		//calculate the max order id from both order and order_history
-		sql = "SELECT MAX(`id`) + 1 FROM (" + "SELECT id FROM " + Params.dbName + 
-			  ".order UNION SELECT id FROM " + Params.dbName + 
-			  ".order_history) AS all_order";
+		sql = " SELECT MAX(id) + 1 FROM (" + 
+			  " SELECT MAX(id) AS id FROM " + Params.dbName + ".order " +
+			  " UNION " +
+			  " SELECT MAX(id) AS id FROM " + Params.dbName + ".order_history) AS all_order";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			result.maxOrderID = dbCon.rs.getInt(1);
@@ -224,9 +224,10 @@ public class DailySettle {
 		dbCon.rs.close();
 		
 		//calculate the max order_food id from both order_food and order_food_history
-		sql = "SELECT MAX(`id`) + 1 FROM (SELECT id FROM " + Params.dbName +
-			  ".order_food UNION SELECT id FROM " + Params.dbName +
-			  ".order_food_history) AS all_order";
+		sql = " SELECT MAX(id) + 1 FROM (" +
+			  " SELECT MAX(id) AS id FROM " + Params.dbName + ".order_food " +
+			  " UNION " +
+			  " SELECT MAX(id) AS id FROM " + Params.dbName + ".order_food_history) AS all_order_food";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			result.maxOrderFoodID = dbCon.rs.getInt(1);
@@ -234,9 +235,10 @@ public class DailySettle {
 		dbCon.rs.close();
 		
 		//calculate the max shift id from both shift and shift_history
-		sql = "SELECT MAX(`id`) + 1 FROM (SELECT id FROM " + Params.dbName +
-			  ".shift UNION SELECT id FROM " + Params.dbName +
-			  ".shift_history) AS all_shift";
+		sql = " SELECT MAX(id) + 1 FROM (" +
+			  " SELECT MAX(id) AS id FROM " + Params.dbName + ".shift " +
+			  " UNION " +
+			  " SELECT MAX(id) AS id FROM " + Params.dbName + ".shift_history) AS all_shift";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			result.maxShiftID = dbCon.rs.getInt(1);
@@ -279,16 +281,24 @@ public class DailySettle {
 				  (term.restaurant_id < 0 ? "" : "AND restaurant_id=" + term.restaurant_id);
 			dbCon.stmt.executeUpdate(sql);
 			
-			//insert the daily settle record to "daily_settle_history"
-			//if perform daily settle to a specific restaurant
-			if(term.restaurant_id > 0){
-				sql = "INSERT INTO " + Params.dbName + ".daily_settle_history (`restaurant_id`, `name`, `on_duty`, `off_duty`) VALUES (" +
-					  term.restaurant_id + ", " +
-					  "'" + (term.owner == null ? "" : term.owner) + "', " +
-					  (onDuty == null ? "date_format(NOW(), '%Y-%m-%d')" : "'" + onDuty + "'") + ", " +
-					  "NOW()" +
-					  ")";
-				dbCon.stmt.executeUpdate(sql);
+			sql = "INSERT INTO " + Params.dbName + ".daily_settle_history (`restaurant_id`, `name`, `on_duty`, `off_duty`) VALUES (" +
+				  term.restaurant_id + ", " +
+				  "'" + (term.owner == null ? "" : term.owner) + "', " +
+				  (onDuty == null ? "date_format(NOW(), '%Y-%m-%d')" : "'" + onDuty + "'") + ", " +
+				  "NOW()" +
+				  ")";
+			/**
+			 * Insert the daily settle record in case of manual.
+			 */
+			if(isManual){
+				dbCon.stmt.executeUpdate(sql);				
+			}else{
+				/**
+				 * Insert the record if the amount of rest order is greater than zero in case of automation.
+				 */
+				if(result.totalOrder > 0){
+					dbCon.stmt.executeUpdate(sql);
+				}
 			}
 			
 			//delete the order details from "order_food"
@@ -361,4 +371,45 @@ public class DailySettle {
 		
 		return result;
 	}
+	
+	/**
+	 * Check to see whether the paid order is exist before daily settlement to a specific restaurant.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param term
+	 * 			the terminal attached with the restaurant id
+	 * @return
+	 * 			an integer array holding the paid order id, 
+	 * 			return int[0] if no paid order exist. 
+	 * @throws SQLException
+	 */
+	public static int[] check(DBCon dbCon, Terminal term) throws SQLException{
+		String sql;
+		int[] restOrderID = new int[0];
+		/**
+		 * In the case perform the daily settle to a specific restaurant,
+		 * get the paid orders which has NOT been shifted between the latest off duty and now,
+		 */
+		//get the paid orders which has NOT been shifted between the latest off duty and now
+		sql = "SELECT id FROM " + Params.dbName + ".order WHERE " +
+			  "restaurant_id=" + term.restaurant_id + " AND " +
+			  "total_price IS NOT NULL" + " AND " +
+			  "order_date BETWEEN " +
+			  "(SELECT off_duty FROM " + Params.dbName + ".shift WHERE " +
+			  "restaurant_id=" + term.restaurant_id + " " +
+			  "ORDER BY off_duty DESC LIMIT 1)" + " AND " + "NOW()";
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		ArrayList<Integer> orderIDs = new ArrayList<Integer>();
+		while(dbCon.rs.next()){
+			orderIDs.add(dbCon.rs.getInt("id"));
+		}
+		dbCon.rs.close();
+		restOrderID = new int[orderIDs.size()];
+		for(int i = 0; i < restOrderID.length; i++){
+			restOrderID[i] = orderIDs.get(i).intValue();
+		}
+		
+		return restOrderID;
+	}
+	
 }
