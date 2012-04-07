@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.LayoutInflater;
@@ -46,6 +47,18 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 		@Override
 		public void handleMessage(Message message){
 			_tasteTxtView.setText(_selectedFood.name + "-" + _selectedFood.tastePref);
+			
+			/**
+			 * 发送广播去更新已点菜界面
+			 * */
+			Intent intent = new Intent(); 
+			//设置action
+		    intent.setAction(MyBroadcastReceiver.TASTEACTION);	
+			Bundle bundle = new Bundle();
+			bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(_selectedFood));
+			intent.putExtras(bundle);
+			//发送广播
+		    sendBroadcast(intent);
 		}
 	};
 	
@@ -53,7 +66,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 	private final static String TAG_STYLE = "style";
 	private final static String TAG_SPEC = "spec";
 	
-	private OrderFood _selectedFood;
+	private static OrderFood _selectedFood;
 	private TextView _tasteTxtView;
 	private TabHost _tabHost;
 	
@@ -64,14 +77,14 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 		super.onCreate(savedInstanceState);
 		
 		 _detector = new GestureDetector(this); 
-		//get the food parcel from the intent
-		FoodParcel foodParcel = getIntent().getParcelableExtra(FoodParcel.KEY_VALUE);
-		_selectedFood = foodParcel;
 		
 		// construct the tab host
 		setContentView(R.layout.tastetable);		
 		_tabHost = getTabHost();
 		
+		  FoodParcel foodParcel = getIntent().getParcelableExtra(FoodParcel.KEY_VALUE);
+		  _selectedFood = foodParcel;
+		  
 		//口味Tab
 		TabSpec spec = _tabHost.newTabSpec(TAG_TASTE)
 							   .setIndicator(createTabIndicator("口味", R.drawable.ic_tab_albums))
@@ -134,6 +147,15 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 		
 	}
 
+	
+	
+	//接收传递过来的菜品对象
+	public static void onResume( FoodParcel foodParcel) {
+		//get the food parcel from the intent
+		_selectedFood = foodParcel;
+		Log.e("", _selectedFood.name);		
+	}
+	
    //设置口味View
 	public void setTasteView(){
 		_tasteTxtView = (TextView)findViewById(R.id.foodTasteTxtView);
@@ -493,12 +515,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 
 	}
 	
-		
-		//	/*
-		//	 * 手势切换添加动画效果
-		//	 */
-		//	Animation anim = AnimationUtils.loadAnimation(PickTasteActivity.this, android.R.anim.slide_in_left);
-		//	_tabHost.startAnimation(anim);
+	
 
 	
 	

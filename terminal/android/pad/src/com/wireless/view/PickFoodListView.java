@@ -2,6 +2,8 @@ package com.wireless.view;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,8 +19,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.wireless.pad.MyBroadcastReceiver;
+import com.wireless.pad.OrderActivity;
+import com.wireless.pad.PickFoodActivity;
 import com.wireless.pad.R;
+import com.wireless.parcel.OrderParcel;
 import com.wireless.protocol.Food;
+import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Util;
 
@@ -48,6 +55,12 @@ public class PickFoodListView extends ListView {
 		setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position,	long rowID) {
+				//点菜之前发生广播，把新的orderlist赋值到已点菜列表
+				Intent intent = new Intent();
+				//设置action
+			    intent.setAction(MyBroadcastReceiver.GETORDERLIST);	
+				//发送广播
+			    _context.sendBroadcast(intent);
 				new AskOrderAmountDialog(_foods[position]).show();
 			   
 			}

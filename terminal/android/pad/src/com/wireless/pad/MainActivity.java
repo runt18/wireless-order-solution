@@ -654,7 +654,7 @@ public class MainActivity extends Activity implements OnClickListener,
 		case LOADDIALOG:
 			ProgressDialog pd;
 			pd = new ProgressDialog(this);
-			pd.setMessage("正在加载...请稍后.");
+			pd.setMessage("正在加载...请稍候.");
 			return pd;
 		case BUSYTABLE:
 			AlertDialog.Builder b = new AlertDialog.Builder(this);

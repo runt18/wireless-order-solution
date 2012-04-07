@@ -29,7 +29,6 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
-import android.widget.BaseAdapter;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -37,15 +36,12 @@ import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.wireless.common.WirelessOrder;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.OrderParcel;
@@ -69,17 +65,16 @@ public class PickFoodActivity extends TabActivity implements
 	private final static String TAG_PINYIN = "pinyin";
 	private final static String TAG_OCCASIONAL = "occasional";
 
-	private final static int PICK_WITH_TASTE = 0;
 
-	private ArrayList<OrderFood> _pickFoods = new ArrayList<OrderFood>();
+	private static ArrayList<OrderFood> _pickFoods = new ArrayList<OrderFood>();
 	private TabHost _tabHost;
 	private GestureDetector _detector;
 	boolean dialogTag = false;
 	private List<Food> _filterFoods;
 	private TempListView _tempLstView;
-	private PopupWindow _popupWindow;
-	private ListView _popupLstView;
 	private TextView _centerTxtView;
+	
+  
 
 	/** Called when the activity is first created. */
 	@Override
@@ -91,21 +86,16 @@ public class PickFoodActivity extends TabActivity implements
 
 		init();
 
-		// È¡µÃÐÂµã²ËÖÐÒÑÓÐµÄ²ËÆ·List£¬²¢±£´æµ½pickFoodµÄListÖÐ
-//		OrderParcel orderParcel = getIntent().getParcelableExtra(
-//				OrderParcel.KEY_VALUE);
-//		for (int i = 0; i < orderParcel.foods.length; i++) {
-//			_pickFoods.add(orderParcel.foods[i]);
-//		}
+
 
 		// construct the tab host
 		_tabHost = getTabHost();
 
-		// ±àºÅTab
+		// ï¿½ï¿½ï¿½Tab
 		TabSpec spec = _tabHost
 				.newTabSpec(TAG_NUMBER)
 				.setIndicator(
-						createTabIndicator("±àºÅ", R.drawable.number_selector))
+						createTabIndicator("ï¿½ï¿½ï¿½", R.drawable.number_selector))
 				.setContent(new TabHost.TabContentFactory() {
 					@Override
 					public View createTabContent(String arg0) {
@@ -115,11 +105,11 @@ public class PickFoodActivity extends TabActivity implements
 				});
 		_tabHost.addTab(spec);
 
-		// ·Ö³øTab
+		// ï¿½Ö³ï¿½Tab
 		spec = _tabHost
 				.newTabSpec(TAG_KITCHEN)
 				.setIndicator(
-						createTabIndicator("·Ö³ø", R.drawable.kitchen_selector))
+						createTabIndicator("ï¿½Ö³ï¿½", R.drawable.kitchen_selector))
 				.setContent(new TabHost.TabContentFactory() {
 					@Override
 					public View createTabContent(String arg0) {
@@ -129,11 +119,11 @@ public class PickFoodActivity extends TabActivity implements
 				});
 		_tabHost.addTab(spec);
 
-		// Æ´ÒôTab
+		// Æ´ï¿½ï¿½Tab
 		spec = _tabHost
 				.newTabSpec(TAG_PINYIN)
 				.setIndicator(
-						createTabIndicator("Æ´Òô", R.drawable.pinyin_selector))
+						createTabIndicator("Æ´ï¿½ï¿½", R.drawable.pinyin_selector))
 				.setContent(new TabHost.TabContentFactory() {
 					@Override
 					public View createTabContent(String arg0) {
@@ -144,11 +134,11 @@ public class PickFoodActivity extends TabActivity implements
 
 		_tabHost.addTab(spec);
 
-		// ÁÙÊ±²ËTab
+		// ï¿½ï¿½Ê±ï¿½ï¿½Tab
 		spec = _tabHost
 				.newTabSpec(TAG_OCCASIONAL)
 				.setIndicator(
-						createTabIndicator("ÁÙÊ±²Ë",
+						createTabIndicator("ï¿½ï¿½Ê±ï¿½ï¿½",
 								R.drawable.occasional_selector))
 				.setContent(new TabHost.TabContentFactory() {
 					@Override
@@ -160,7 +150,7 @@ public class PickFoodActivity extends TabActivity implements
 		_tabHost.addTab(spec);
 
 		/**
-		 * TabÇÐ»»Ê±¸ü»»ÏàÓ¦µÄAdapter£¬ÏÔÊ¾²»Í¬µÄµã²Ë·½Ê½
+		 * Tabï¿½Ð»ï¿½Ê±ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½Adapterï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½Í¬ï¿½Äµï¿½Ë·ï¿½Ê½
 		 */
 		_tabHost.setOnTabChangedListener(new OnTabChangeListener() {
 			@Override
@@ -183,6 +173,18 @@ public class PickFoodActivity extends TabActivity implements
 		_tabHost.setCurrentTabByTag(TAG_NUMBER);
 		setupNumberView();
 	}
+	
+	/**
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½Ãµï¿½ï¿½Ð±ï¿½Öµ
+	 * */
+     public static void onResume(List<OrderFood> pickFoods) {
+		_pickFoods.clear();	
+		_pickFoods = (ArrayList<OrderFood>) pickFoods;
+		}
+		
+	
+	
+	
 
 	@Override
 	public void onDestroy(){
@@ -191,17 +193,10 @@ public class PickFoodActivity extends TabActivity implements
 	}
 	
 	/**
-	 * ·µ»ØÊ±½«ÐÂµã²ËÆ·µÄList·µ»Øµ½ÉÏÒ»¸öActivity
+	 * ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½Âµï¿½ï¿½Æ·ï¿½ï¿½Listï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½Ò»ï¿½ï¿½Activity
 	 */
 	@Override
 	public void onBackPressed() {
-		//dismiss the order shortcut
-		if(_popupWindow.isShowing()){
-			_popupWindow.dismiss();
-		}
-		
-		// Add the temporary foods to the picked food list
-		// except the ones without food name
 		if (_tempLstView != null) {
 			_pickFoods.addAll(_tempLstView.getSourceData());
 		}
@@ -232,31 +227,49 @@ public class PickFoodActivity extends TabActivity implements
 	}
 
 	/**
-	 * Í¨¹ý"±àºÅ"¡¢"·Ö³ø"¡¢"Æ´Òô"·½Ê½Ñ¡ÖÐ²ËÆ·ºó£¬ ½«²ËÆ·±£´æµ½ListÖÐ£¬ÍË³öÊ±½«´ËList×÷Îª½á¹û·µ»Øµ½ÉÏÒ»¸öActivity
+	 * Í¨ï¿½ï¿½"ï¿½ï¿½ï¿½"ï¿½ï¿½"ï¿½Ö³ï¿½"ï¿½ï¿½"Æ´ï¿½ï¿½"ï¿½ï¿½Ê½Ñ¡ï¿½Ð²ï¿½Æ·ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ·ï¿½ï¿½ï¿½æµ½Listï¿½Ð£ï¿½ï¿½Ë³ï¿½Ê±ï¿½ï¿½ï¿½ï¿½Listï¿½ï¿½Îªï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½Ò»ï¿½ï¿½Activity
 	 * 
 	 * @param food
-	 *            Ñ¡ÖÐ²ËÆ·µÄÐÅÏ¢
+	 *            Ñ¡ï¿½Ð²ï¿½Æ·ï¿½ï¿½ï¿½ï¿½Ï¢
 	 */
 	@Override
 	public void onPicked(OrderFood food) {
 		addFood(food);
+		
+		Intent intent = new Intent();
+		//ï¿½ï¿½ï¿½ï¿½action
+	    intent.setAction(MyBroadcastReceiver.ACTION);	
+		Bundle bundle = new Bundle();
+		Order tmpOrder = new Order();
+		tmpOrder.foods = _pickFoods.toArray(new OrderFood[_pickFoods.size()]);
+		bundle.putParcelable(OrderParcel.KEY_VALUE, new OrderParcel(tmpOrder));
+		intent.putExtras(bundle);
+		//ï¿½ï¿½ï¿½Í¹ã²¥
+	    sendBroadcast(intent);
+
+		
 	}
 
 	/**
-	 * Í¨¹ý"±àºÅ"¡¢"·Ö³ø"¡¢"Æ´Òô"·½Ê½Ñ¡ÖÐ²ËÆ·ºó£¬ ½«²ËÆ·±£´æµ½ListÖÐ£¬²¢Ìø×ªµ½¿ÚÎ¶ActivityÑ¡Ôñ¿ÚÎ¶
+	 * Í¨ï¿½ï¿½"ï¿½ï¿½ï¿½"ï¿½ï¿½"ï¿½Ö³ï¿½"ï¿½ï¿½"Æ´ï¿½ï¿½"ï¿½ï¿½Ê½Ñ¡ï¿½Ð²ï¿½Æ·ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ·ï¿½ï¿½ï¿½æµ½Listï¿½Ð£ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½Î¶ActivityÑ¡ï¿½ï¿½ï¿½Î¶
 	 * 
 	 * @param food
-	 *            Ñ¡ÖÐ²ËÆ·µÄÐÅÏ¢
+	 *            Ñ¡ï¿½Ð²ï¿½Æ·ï¿½ï¿½ï¿½ï¿½Ï¢
 	 */
 	@Override
 	public void onPickedWithTaste(OrderFood food) {
-		
-		Intent intent = new Intent(this, PickTasteActivity.class);
+		//ï¿½ï¿½ï¿½ï¿½Î¶ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½Ö´ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½È»ï¿½ï¿½ï¿½Ù°Ñµï¿½Ç°ï¿½ï¿½ï¿½ï¿½Æ·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î¶ï¿½ï¿½ï¿½æ£¬ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½ï¿½Î¶
+		onPicked(food);
+		//ï¿½ï¿½ï¿½ï¿½Ò³ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ÝµÄ²ï¿½Æ·ï¿½ï¿½ï¿½ó´«µï¿½ï¿½ï¿½Î¶ï¿½ï¿½ï¿½ï¿½
+		Intent intent = new Intent();
+		//intent.setAction(MyBroadcastReceiver.SENTTOTASTE);
 		Bundle bundle = new Bundle();
 		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(food));
 		intent.putExtras(bundle);
-		//startActivityForResult(intent, PICK_WITH_TASTE);
+		//ï¿½ï¿½ï¿½Í¹ã²¥
+	   // sendBroadcast(intent);
 		goTo(intent,PickTasteActivity.class);
+		
 	}
 
 	
@@ -273,11 +286,24 @@ public class PickFoodActivity extends TabActivity implements
 		
 	}
 	
+	
+
 	/**
-	 * Ìí¼Ó²ËÆ·µ½ÒÑµã²ËµÄListÖÐ
+	 * go to Activity method
+	 */
+	public  void goTo(Class<? extends Activity> cls) {
+		OrderActivity.dynamic.removeAllViews();
+		OrderActivity.dynamic.removeAllViewsInLayout();
+		View nowView = PickFoodActivity.this.getLocalActivityManager().startActivity(cls.getName(), new Intent(PickFoodActivity.this,cls))
+				.getDecorView();
+		OrderActivity.dynamic.addView(nowView);
+		
+	}
+	/**
+	 * ï¿½ï¿½Ó²ï¿½Æ·ï¿½ï¿½ï¿½Ñµï¿½Ëµï¿½Listï¿½ï¿½
 	 * 
 	 * @param food
-	 *            Ñ¡ÖÐµÄ²ËÆ·ÐÅÏ¢
+	 *            Ñ¡ï¿½ÐµÄ²ï¿½Æ·ï¿½ï¿½Ï¢
 	 */
 	private void addFood(OrderFood food) {
 
@@ -285,27 +311,27 @@ public class PickFoodActivity extends TabActivity implements
 
 		if (index != -1) {
 			/**
-			 * Èç¹ûÔ­À´µÄ²ËÆ·ÁÐ±íÖÐÒÑ°üº¬ÓÐÏàÍ¬µÄ²ËÆ·£¬ Ôò½«ÐÂµã²ËµÄÊýÁ¿ÀÛ¼Óµ½Ô­À´µÄ²ËÆ·ÖÐ
+			 * ï¿½ï¿½ï¿½Ô­4ï¿½Ä²ï¿½Æ·ï¿½Ð±ï¿½ï¿½ï¿½ï¿½Ñ°ï¿½ï¿½ï¿½ï¿½ï¿½Í¬ï¿½Ä²ï¿½Æ·ï¿½ï¿½ ï¿½ï¿½ï¿½Âµï¿½Ëµï¿½ï¿½ï¿½ï¿½Û¼Óµï¿½Ô­4ï¿½Ä²ï¿½Æ·ï¿½ï¿½
 			 */
 			OrderFood pickedFood = _pickFoods.get(index);
 
 			float orderAmount = food.getCount() + pickedFood.getCount();
 			if (orderAmount > 255) {
-				Toast.makeText(this, "¶Ô²»Æð£¬\"" + food.toString() + "\"×î¶àÖ»ÄÜµã255·Ý", 0).show();
+				Toast.makeText(this, "ï¿½Ô²ï¿½ï¿½ï¿½\"" + food.toString() + "\"ï¿½ï¿½ï¿½Ö»ï¿½Üµï¿½255ï¿½ï¿½", 0).show();
 				// pickedFood.setCount(new Float(255));
 			} else {
-				Toast.makeText(this, "Ìí¼Ó"	+ (food.hangStatus == OrderFood.FOOD_HANG_UP ? "²¢½ÐÆð\"" : "\"") + food.toString() + "\""
-								+ Util.float2String2(food.getCount()) + "·Ý", 0)	.show();
+				Toast.makeText(this, "ï¿½ï¿½ï¿½"	+ (food.hangStatus == OrderFood.FOOD_HANG_UP ? "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½\"" : "\"") + food.toString() + "\""
+								+ Util.float2String2(food.getCount()) + "ï¿½ï¿½", 0)	.show();
 				pickedFood.setCount(orderAmount);
 				_pickFoods.set(index, pickedFood);
 			}
 		} else {
 			if (food.getCount() > 255) {
-				Toast.makeText(this, "¶Ô²»Æð£¬\"" + food.toString() + "\"×î¶àÖ»ÄÜµã255·Ý", 0).show();
+				Toast.makeText(this, "ï¿½Ô²ï¿½ï¿½ï¿½\"" + food.toString() + "\"ï¿½ï¿½ï¿½Ö»ï¿½Üµï¿½255ï¿½ï¿½", 0).show();
 			} else {
-				Toast.makeText(this, "ÐÂÔö"	+ (food.hangStatus == OrderFood.FOOD_HANG_UP ? "²¢½ÐÆð\""
+				Toast.makeText(this, "ï¿½ï¿½ï¿½ï¿½"	+ (food.hangStatus == OrderFood.FOOD_HANG_UP ? "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½\""
 										: "\"") + food.toString() + "\""
-								+ Util.float2String2(food.getCount()) + "·Ý", 0)
+								+ Util.float2String2(food.getCount()) + "ï¿½ï¿½", 0)
 						.show();
 				_pickFoods.add(food);
 			}
@@ -319,43 +345,21 @@ public class PickFoodActivity extends TabActivity implements
 			((EditText) findViewById(R.id.filterPinyinEdtTxt)).setText("");
 		}
 		
-		//update the short cut if it is showing
-		if(_popupWindow.isShowing()){
-			if(_tempLstView != null){
-				 //Combine both temporary and picked foods
-				List<OrderFood> pickedFoods = new ArrayList<OrderFood>(_pickFoods);
-				pickedFoods.addAll(_tempLstView.getSourceData());
-				_popupLstView.setAdapter(new PopupWndAdapter(PickFoodActivity.this, pickedFoods));
-			}else{
-				_popupLstView.setAdapter(new PopupWndAdapter(PickFoodActivity.this, _pickFoods));
-			}
-		}
 		
 	}
 
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (resultCode == RESULT_OK) {
-			if (requestCode == PICK_WITH_TASTE) {
-				/**
-				 * Ìí¼Ó¿ÚÎ¶ºóÌí¼Óµ½pickListÖÐ
-				 */
-				FoodParcel foodParcel = data.getParcelableExtra(FoodParcel.KEY_VALUE);
-				addFood(foodParcel);
-			}
-		}
-	}
+	
 
 	/**
-	 * ÉèÖÃ±àºÅÉ¸Ñ¡µÄView
+	 * ï¿½ï¿½ï¿½Ã±ï¿½ï¿½É¸Ñ¡ï¿½ï¿½View
 	 */
 	private void setupNumberView() {
 
-		//±àºÅÊäÈë¿ò
+		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		final EditText filterNumEdtTxt = (EditText)findViewById(R.id.filterNumEdtTxt);
 		filterNumEdtTxt.setText("");
 
-		// ±àºÅ²àÀ¸
+		// ï¿½ï¿½Å²ï¿½8
 		final LinearLayout numberSidebar = (LinearLayout) findViewById(R.id.NumsideIndex);
 		//numberSidebar.setBackgroundColor(0xfbfdfe);
 		numberSidebar.setOrientation(LinearLayout.VERTICAL);
@@ -363,7 +367,7 @@ public class PickFoodActivity extends TabActivity implements
 		numberSidebar.setBackgroundResource(0);
 
 		/**
-		 * ²àÀ¸ÊÖÖ¸»¬¶¯Ê±£¬ÊäÈëÏàÓ¦µÄÊý×Ö
+		 * ï¿½ï¿½8ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		 */
 		numberSidebar.setOnTouchListener(new View.OnTouchListener() {			
 			
@@ -412,7 +416,7 @@ public class PickFoodActivity extends TabActivity implements
 		});
 
 		/**
-		 * ±àºÅ²àÀ¸Ìí¼Ó0-9µÄÊý×Ö
+		 * ï¿½ï¿½Å²ï¿½8ï¿½ï¿½ï¿½0-9ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		 */
 		for(int i = 0; i < 10; i++) {
 			final TextView tv = new TextView(PickFoodActivity.this);
@@ -425,12 +429,12 @@ public class PickFoodActivity extends TabActivity implements
 		}
 		
 		/**
-		 * ±àºÅÊäÈë¿òµÄÉ¾³ýButton
+		 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¾ï¿½ï¿½Button
 		 */
 		((ImageView)findViewById(R.id.numberdelete)).setOnClickListener(new View.OnClickListener() {			
 			@Override
 		    public void onClick(View v) {
-				//Öð×ÖÉ¾³ý
+				//ï¿½ï¿½ï¿½ï¿½É¾ï¿½ï¿½
 				String s = filterNumEdtTxt.getText().toString();
 				if(s.length() > 0){
 					filterNumEdtTxt.setText(s.substring(0, s.length() - 1));
@@ -446,7 +450,7 @@ public class PickFoodActivity extends TabActivity implements
 	
 
 		/**
-		 * ²ËÆ·List¹ö¶¯Ê±Òþ²ØÈí¼üÅÌ
+		 * ï¿½ï¿½Æ·Listï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		 */
 		pickLstView.setOnScrollListener(new OnScrollListener() {
 
@@ -465,7 +469,7 @@ public class PickFoodActivity extends TabActivity implements
 		});
 
 		/**
-		 * °´±àºÅ½øÐÐ²ËÆ·µÄÉ¸Ñ¡
+		 * ï¿½ï¿½ï¿½ï¿½Å½ï¿½ï¿½Ð²ï¿½Æ·ï¿½ï¿½É¸Ñ¡
 		 */
 		filterNumEdtTxt.addTextChangedListener(new TextWatcher() {
 
@@ -503,21 +507,21 @@ public class PickFoodActivity extends TabActivity implements
 	}
 
 	/**
-	 * ÉèÖÃ·Ö³øÉ¸Ñ¡µÄView
+	 * ï¿½ï¿½ï¿½Ã·Ö³ï¿½É¸Ñ¡ï¿½ï¿½View
 	 */
 	private void setupKitchenView() {
 
-		// ·Ö³ø²àÀ¸
+		// ï¿½Ö³ï¿½ï¿½8
 		final LinearLayout kitchenSidebar =(LinearLayout) findViewById(R.id.sideIndex);
 		final PickFoodListView pickLstView = (PickFoodListView) findViewById(R.id.pickByKitchenLstView);
-		// Çå³ý²àÀ¸
+		// ï¿½ï¿½ï¿½ï¿½8
 		kitchenSidebar.removeAllViews();
 		//kitchenSidebar.setBackgroundColor(0xfbfdfe);
 		kitchenSidebar.setBackgroundResource(0);
 
 		
 		/**
-		 * ²àÀ¸ÊÖÖ¸»¬¶¯Ê±£¬ÏÔÊ¾ÏàÓ¦µÄ²¿ÃÅ
+		 * ï¿½ï¿½8ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½Ó¦ï¿½Ä²ï¿½ï¿½ï¿½
 		 */
 		kitchenSidebar.setOnTouchListener(new View.OnTouchListener() {			
 			
@@ -550,7 +554,7 @@ public class PickFoodActivity extends TabActivity implements
 						//disappear the center text view
 						_centerTxtView.setVisibility(View.INVISIBLE);
 						/**
-						 * ¸ù¾Ý²àÀ¸Ñ¡ÖÐµÄ²¿ÃÅ£¬É¸Ñ¡³öÏàÓ¦µÄ²¿ÃÅºÍ³ø·¿
+						 * ï¿½ï¿½Ý²ï¿½8Ñ¡ï¿½ÐµÄ²ï¿½ï¿½Å£ï¿½É¸Ñ¡ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½Ä²ï¿½ï¿½ÅºÍ³ï¿½
 						 */
 						List<Department> dept = new ArrayList<Department>();
 						int deptID = ((Integer)((TextView)kitchenSidebar.getChildAt(curPos)).getTag());
@@ -583,7 +587,7 @@ public class PickFoodActivity extends TabActivity implements
 			}
 		});
 		
-		// Îª²àÀ¸Ìí¼ÓÉ¸Ñ¡Ìõ¼þ
+		// Îªï¿½ï¿½8ï¿½ï¿½ï¿½É¸Ñ¡ï¿½ï¿½ï¿½
 		for (Department d : _validDepts) {
 			TextView tv = new TextView(this);
 			tv.setText(d.name.subSequence(0, 2));
@@ -598,16 +602,16 @@ public class PickFoodActivity extends TabActivity implements
 		RelativeLayout filterKitchen = (RelativeLayout) findViewById(R.id.filterKitchenRelaLayout);
 		final EditText filterKitEdtTxt = (EditText) findViewById(R.id.filterKitchenEdtTxt);
 		filterKitEdtTxt.setText("");
-		// ³õÊ¼»¯µÄÊ±ºò³ø·¿Ä¬ÈÏÏÔÊ¾µÄ³ø·¿ÐÅÏ¢
+		// ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½Ä¬ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½Ä³ï¿½ï¿½ï¿½Ï¢
 		TextView ketchenName = (TextView)findViewById(R.id.Spinner01);
-		ketchenName.setText("È«²¿");
+		ketchenName.setText("È«ï¿½ï¿½");
 		pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods,	PickFoodListView.TAG_PINYIN);
 		pickLstView.setFoodPickedListener(this);
 
 
 
 		/**
-		 * ²ËÆ·List¹ö¶¯Ê±Òþ²ØÈí¼üÅÌ
+		 * ï¿½ï¿½Æ·Listï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		 */
 		pickLstView.setOnScrollListener(new OnScrollListener() {
 
@@ -626,7 +630,7 @@ public class PickFoodActivity extends TabActivity implements
 		});
 		
 		/**
-		 * ÔÚ·Ö³øÑ¡ÔñÒ³ÃæÖÐ°´Æ´Òô½øÐÐ²ËÆ·µÄÉ¸Ñ¡
+		 * ï¿½Ú·Ö³ï¿½Ñ¡ï¿½ï¿½Ò³ï¿½ï¿½ï¿½Ð°ï¿½Æ´ï¿½ï¿½ï¿½ï¿½Ð²ï¿½Æ·ï¿½ï¿½É¸Ñ¡
 		 */
 		filterKitEdtTxt.addTextChangedListener(new TextWatcher() {
 
@@ -671,13 +675,13 @@ public class PickFoodActivity extends TabActivity implements
 		});
 
 		/**
-		 * µ¯³ö³ø·¿Ñ¡ÔñÒ³Ãæ²¢É¸Ñ¡³öÏàÓ¦µÄ²ËÆ·
+		 * ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½Ò³ï¿½æ²¢É¸Ñ¡ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½Ä²ï¿½Æ·
 		 */
 		filterKitchen.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
 				/**
-				 * É¸Ñ¡³öÃ¿¸ö²¿ÃÅÖÐÓÐ²ËÆ·µÄ³ø·¿
+				 * É¸Ñ¡ï¿½ï¿½Ã¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð²ï¿½Æ·ï¿½Ä³ï¿½
 				 */
 				List<List<Kitchen>> kitchenChild = new ArrayList<List<Kitchen>>();
 				for (int i = 0; i < _validDepts.size(); i++) {
@@ -696,14 +700,14 @@ public class PickFoodActivity extends TabActivity implements
 	}
 
 	/**
-	 * ÉèÖÃÆ´ÒôÉ¸Ñ¡µÄView
+	 * ï¿½ï¿½ï¿½ï¿½Æ´ï¿½ï¿½É¸Ñ¡ï¿½ï¿½View
 	 */
 	private void setupPinyinView() {
-		// Æ´ÒôÊäÈë¿ò
+		// Æ´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		final EditText filterPinyinEdtTxt = (EditText)findViewById(R.id.filterPinyinEdtTxt);
 		filterPinyinEdtTxt.setText("");
 
-		// Æ´Òô²àÀ¸
+		// Æ´ï¿½ï¿½ï¿½8
 		final LinearLayout pinyinSidebar = (LinearLayout) findViewById(R.id.PinyinsideIndex); 
 		pinyinSidebar.setBackgroundColor(0xfbfdfe);
 		pinyinSidebar.setOrientation(LinearLayout.VERTICAL);
@@ -758,7 +762,7 @@ public class PickFoodActivity extends TabActivity implements
 		});
 		
 		/**
-		 * Æ´Òô²àÀ¸ÏÔÊ¾A-ZµÄ×ÖÄ¸
+		 * Æ´ï¿½ï¿½ï¿½8ï¿½ï¿½Ê¾A-Zï¿½ï¿½ï¿½ï¿½Ä¸
 		 */
 		for(char c = 'A'; c <= 'Z'; c++) {
 			final TextView tv = new TextView(PickFoodActivity.this);
@@ -769,12 +773,12 @@ public class PickFoodActivity extends TabActivity implements
 		}
 		
 		/**
-		 * Æ´ÒôÊäÈë¿òµÄÉ¾³ýButtonÏìÓ¦ÊÂ¼þ
+		 * Æ´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¾ï¿½ï¿½Buttonï¿½ï¿½Ó¦ï¿½Â¼ï¿½
 		 */
 		((ImageView)findViewById(R.id.pinyindelete)).setOnClickListener(new View.OnClickListener() {					
 			@Override
 		    public void onClick(View v) {
-				//Öð×ÖÉ¾³ý
+				//ï¿½ï¿½ï¿½ï¿½É¾ï¿½ï¿½
 				String s = filterPinyinEdtTxt.getText().toString();
 				if(s.length() > 0){
 					filterPinyinEdtTxt.setText(s.substring(0, s.length() - 1));
@@ -789,7 +793,7 @@ public class PickFoodActivity extends TabActivity implements
 		pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods,	PickFoodListView.TAG_PINYIN);
 		pickLstView.setFoodPickedListener(this);
 		/**
-		 * Æ´ÒôList¹ö¶¯Ê±Òþ²ØÈí¼üÅÌ
+		 * Æ´ï¿½ï¿½Listï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		 */
 		pickLstView.setOnScrollListener(new OnScrollListener() {
 
@@ -808,7 +812,7 @@ public class PickFoodActivity extends TabActivity implements
 		});
 
 		/**
-		 * °´Æ´Òô½øÐÐ²ËÆ·µÄÉ¸Ñ¡
+		 * ï¿½ï¿½Æ´ï¿½ï¿½ï¿½ï¿½Ð²ï¿½Æ·ï¿½ï¿½É¸Ñ¡
 		 */
 		filterPinyinEdtTxt.addTextChangedListener(new TextWatcher() {
 
@@ -853,14 +857,14 @@ public class PickFoodActivity extends TabActivity implements
 	}
 
 	/**
-	 * ÉèÖÃÁÙÊ±²ËµÄView
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½Ëµï¿½View
 	 */
 	private void setTempView() {
 
 		_tempLstView = (TempListView) findViewById(R.id.tempListView);
 		_tempLstView.notifyDataChanged();
 
-		// ÁÙÊ±²ËÌí¼Ó
+		// ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½
 		((ImageView) findViewById(R.id.add))
 				.setOnClickListener(new View.OnClickListener() {
 					@Override
@@ -871,7 +875,7 @@ public class PickFoodActivity extends TabActivity implements
 		
 
 		/**
-		 * list¹ö¶¯µÄÊ±ºòÆÁ±ÎÈí¼üÅÌ
+		 * listï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½qï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		 */
 		_tempLstView.setOnScrollListener(new OnScrollListener() {
 
@@ -892,7 +896,7 @@ public class PickFoodActivity extends TabActivity implements
 	}
 
 	/**
-	 * ·Ö³øÒ³ÃæÖÐ³ø·¿Ñ¡ÔñµÄDialog
+	 * ï¿½Ö³ï¿½Ò³ï¿½ï¿½ï¿½Ð³ï¿½Ñ¡ï¿½ï¿½ï¿½Dialog
 	 */
 	private class KitchenSelectDialog extends Dialog {
 
@@ -905,11 +909,11 @@ public class PickFoodActivity extends TabActivity implements
 			_kitchenChild = kitchens;
 
 			View dialogContent = View.inflate(PickFoodActivity.this, R.layout.expander_list_view, null);
-			setTitle("ÇëÑ¡Ôñ³ø·¿");
+			setTitle("ï¿½ï¿½Ñ¡ï¿½ï¿½ï¿½");
 			ExpandableListView kitchenLstView = (ExpandableListView) dialogContent.findViewById(R.id.kitchenSelectLstView);
 			// kitchenLstView.setGroupIndicator(getResources().getDrawable(R.layout.expander_folder));
 
-			// ÉèÖÃListViewµÄAdaptor
+			// ï¿½ï¿½ï¿½ï¿½ListViewï¿½ï¿½Adaptor
 			kitchenLstView.setAdapter(new BaseExpandableListAdapter() {
 
 				@Override
@@ -990,13 +994,13 @@ public class PickFoodActivity extends TabActivity implements
 				}
 			});
 
-			// ÉèÖÃÕ¹¿ªËùÓÐµÄ¶þ¼¶²Ëµ¥
+			// ï¿½ï¿½ï¿½ï¿½Õ¹ï¿½ï¿½ï¿½ï¿½ï¿½ÐµÄ¶ï¿½ï¿½ï¿½ï¿½Ëµï¿½
 			for (int i = 0; i < _deptParent.size(); i++) {
 				kitchenLstView.expandGroup(i);
 			}
 
 			/**
-			 * Ñ¡ÔñÄ³¸ö³ø·¿ºó£¬É¸Ñ¡³öÏàÓ¦µÄ²ËÆ·£¬²¢¸üÐÂListView
+			 * Ñ¡ï¿½ï¿½Ä³ï¿½ï¿½ï¿½ï¿½É¸Ñ¡ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½Ä²ï¿½Æ·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ListView
 			 */
 			kitchenLstView.setOnChildClickListener(new OnChildClickListener() {
 
@@ -1005,11 +1009,11 @@ public class PickFoodActivity extends TabActivity implements
 					Kitchen selectedKitchen = _kitchenChild.get(groupPosition).get(childPosition);
 					_filterFoods = new ArrayList<Food>();
 					for (int i = 0; i < WirelessOrder.foodMenu.foods.length; i++) {
-						if (WirelessOrder.foodMenu.foods[i].kitchen == selectedKitchen.aliasID) {
+						if (WirelessOrder.foodMenu.foods[i].kitchen.aliasID == selectedKitchen.aliasID) {
 							_filterFoods.add(WirelessOrder.foodMenu.foods[i]);
 						}
 					}
-					// Ñ¡ÖÐ³ø·¿ºó´ÓÐÂ¸³Öµ
+					// Ñ¡ï¿½Ð³ï¿½ï¿½ï¿½ï¿½Â¸ï¿½Öµ
 					((TextView)PickFoodActivity.this.findViewById(R.id.Spinner01)).setText(_kitchenChild.get(groupPosition).get(childPosition).name);
 					dialogTag = true;
 
@@ -1021,7 +1025,7 @@ public class PickFoodActivity extends TabActivity implements
 			});
 
 			/**
-			 * ³ø·¿Ñ¡ÔñDialogµÄ·µ»ØButtonÏìÓ¦ÊÂ¼þ
+			 * ï¿½ï¿½Ñ¡ï¿½ï¿½Dialogï¿½Ä·ï¿½ï¿½ï¿½Buttonï¿½ï¿½Ó¦ï¿½Â¼ï¿½
 			 */
 			((Button)dialogContent.findViewById(R.id.dialog_back_btn)).setOnClickListener(new View.OnClickListener() {
 				@Override
@@ -1077,7 +1081,7 @@ public class PickFoodActivity extends TabActivity implements
 	}
 
 	/*
-	 * ÊÖÊÆ»¬¶¯Ö´ÐÐ·½·¨
+	 * ï¿½ï¿½ï¿½Æ»ï¿½ï¿½ï¿½Ö´ï¿½Ð·ï¿½ï¿½ï¿½
 	 */
 	@Override
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
@@ -1087,13 +1091,13 @@ public class PickFoodActivity extends TabActivity implements
 				&& Math.abs(scrollX) / Math.abs(e1.getY() - e2.getY()) > 1) {
 
 			if (scrollX > 0) {
-				// ´Ë´¦Ìí¼Ó´úÂëÓÃÀ´ÏÔÊ¾ÏÂÒ»¸öÒ³Ãæ
+				// ï¿½Ë´ï¿½ï¿½ï¿½Ó´ï¿½ï¿½ï¿½ï¿½ï¿½4ï¿½ï¿½Ê¾ï¿½ï¿½Ò»ï¿½ï¿½Ò³ï¿½ï¿½
 				if (_tabHost.getCurrentTab() == 4)
 					return false;
 				_tabHost.setCurrentTab(_tabHost.getCurrentTab() + 1);
 
 			} else {
-				// ´Ë´¦Ìí¼Ó´úÂëÓÃÀ´ÏÔÊ¾ÉÏÒ»¸öÒ³Ãæ
+				// ï¿½Ë´ï¿½ï¿½ï¿½Ó´ï¿½ï¿½ï¿½ï¿½ï¿½4ï¿½ï¿½Ê¾ï¿½ï¿½Ò»ï¿½ï¿½Ò³ï¿½ï¿½
 				if (_tabHost.getCurrentTab() == 0)
 					return false;
 				_tabHost.setCurrentTab(_tabHost.getCurrentTab() - 1);
@@ -1105,60 +1109,12 @@ public class PickFoodActivity extends TabActivity implements
 		return false;
 	}
 
-	/**
-	 * µã»÷°´Å¥ÏÔÊ¾ÒÑµã²ËÁÐ±íadapter
-	 */
-	private class PopupWndAdapter extends BaseAdapter {
-
-		private List<OrderFood> _orderFoods;
-		private Context _context;
-
-		public PopupWndAdapter(Context context, List<OrderFood> pickFoods) {
-			this._context = context;
-			this._orderFoods = pickFoods;
-		}
-
-		@Override
-		public int getCount() {
-			return _orderFoods.size();
-		}
-
-		@Override
-		public Object getItem(int position) {
-			return null;
-		}
-
-		@Override
-		public long getItemId(int position) {
-			return 0;
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			OrderFood food = _orderFoods.get(position);
-			if(convertView == null){
-				convertView = LayoutInflater.from(_context).inflate(R.layout.orderpopuwindowitem, null);
-				((TextView)convertView.findViewById(R.id.popuwindowfoodname)).setText(toFoodString(food));
-			} else {
-				((TextView)convertView.findViewById(R.id.popuwindowfoodname)).setText(toFoodString(food));
-			}
-			return convertView;
-		}
-		
-		private String toFoodString(OrderFood food){
-			String s = "";
-			if(food.isTemporary){
-				s = "(ÁÙ)";
-			}
-			s += food.name + "(" + Util.float2String2(food.getCount()) + ")";
-			return s;
-		}
-	}
+	
 
 	private void init() {
 		
 		/**
-		 * ´´½¨ÖÐ¼äÏÔÊ¾µÄTextView
+		 * ï¿½ï¿½ï¿½ï¿½ï¿½Ð¼ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½TextView
 		 */
 		WindowManager wndMgr = (WindowManager)getSystemService(Context.WINDOW_SERVICE);
         LayoutInflater inflate = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);        
@@ -1172,7 +1128,7 @@ public class PickFoodActivity extends TabActivity implements
 
 		
 		/**
-		 * ½«ËùÓÐ²ËÆ·½øÐÐ°´³ø·¿±àºÅ½øÐÐÅÅÐò
+		 * ï¿½ï¿½ï¿½ï¿½ï¿½Ð²ï¿½Æ·ï¿½ï¿½ï¿½Ð°ï¿½ï¿½ï¿½ï¿½Å½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		 */
 		Food[] tmpFoods = new Food[WirelessOrder.foodMenu.foods.length];
 		System.arraycopy(WirelessOrder.foodMenu.foods, 0, tmpFoods, 0,
@@ -1180,9 +1136,10 @@ public class PickFoodActivity extends TabActivity implements
 		Arrays.sort(tmpFoods, new Comparator<Food>() {
 			@Override
 			public int compare(Food food1, Food food2) {
-				if (food1.kitchen > food2.kitchen) {
+				if (food1.kitchen.aliasID
+						> food2.kitchen.aliasID) {
 					return 1;
-				} else if (food1.kitchen < food2.kitchen) {
+				} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
 					return -1;
 				} else {
 					return 0;
@@ -1191,19 +1148,19 @@ public class PickFoodActivity extends TabActivity implements
 		});
 
 		/**
-		 * Ê¹ÓÃ¶þ·Ö²éÕÒËã·¨É¸Ñ¡³öÓÐ²ËÆ·µÄ³ø·¿
+		 * Ê¹ï¿½Ã¶ï¿½ï¿½Ö²ï¿½ï¿½ï¿½ï¿½ã·¨É¸Ñ¡ï¿½ï¿½ï¿½Ð²ï¿½Æ·ï¿½Ä³ï¿½
 		 */
 		_validKitchens = new ArrayList<Kitchen>();
 		for (int i = 0; i < WirelessOrder.foodMenu.kitchens.length; i++) {
 			Food keyFood = new Food();
-			keyFood.kitchen = WirelessOrder.foodMenu.kitchens[i].aliasID;
+			keyFood.kitchen.aliasID = WirelessOrder.foodMenu.kitchens[i].aliasID;
 			int index = Arrays.binarySearch(tmpFoods, keyFood,
 					new Comparator<Food>() {
 
 						public int compare(Food food1, Food food2) {
-							if (food1.kitchen > food2.kitchen) {
+							if (food1.kitchen .aliasID> food2.kitchen.aliasID) {
 								return 1;
-							} else if (food1.kitchen < food2.kitchen) {
+							} else if (food1.kitchen .aliasID < food2.kitchen.aliasID) {
 								return -1;
 							} else {
 								return 0;
@@ -1217,7 +1174,7 @@ public class PickFoodActivity extends TabActivity implements
 		}
 
 		/**
-		 * É¸Ñ¡³öÓÐ²ËÆ·µÄ²¿ÃÅ
+		 * É¸Ñ¡ï¿½ï¿½ï¿½Ð²ï¿½Æ·ï¿½Ä²ï¿½ï¿½ï¿½
 		 */
 		_validDepts = new ArrayList<Department>();
 		for (int i = 0; i < WirelessOrder.foodMenu.sKitchens.length; i++) {
