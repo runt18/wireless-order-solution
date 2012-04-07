@@ -6,15 +6,15 @@ import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Taste;
 
 public class SingleOrderFood {
-	public String waiter;				//服务员姓名
-	public long orderID;				//账单号
-	public Timestamp orderDate;			//操作时间
-	public String name;					//菜品名称
-	public float unitPrice;				//菜品单价
-	public float orderCount;			//点菜数量
-	public float discount = 1;			//折扣
-	public Taste taste;					//菜品口味
-	public Kitchen kitchen;				//菜品所属厨房
+	public String waiter;						//服务员姓名
+	public long orderID;						//账单号
+	public Timestamp orderDate;					//操作时间
+	public String name;							//菜品名称
+	public float unitPrice;						//菜品单价
+	public float orderCount;					//点菜数量
+	public float discount = 1;					//折扣
+	public Taste taste = new Taste();			//菜品口味
+	public Kitchen kitchen = new Kitchen();		//菜品所属厨房
 	
 	/**
 	 * Calculate the total price to this food as below.
