@@ -3,8 +3,61 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="#FFFFFF"
+    android:orientation="vertical" >
+    
+        <!-- 头部 区域 1 -->
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/av_r1_c1" >
+
+        <Button
+            android:id="@+id/back_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dip"
+            android:background="@drawable/av_back_selector" />
+
+        <Button
+            android:id="@+id/refurbish_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="15dip"
+            android:background="@drawable/av_refurbish_selector" />
+
+       
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/username_txt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:shadowColor="#000000"
+                android:shadowDy="-2"
+                android:shadowRadius="1"
+                android:text="点菜"
+                android:textColor="#ffffff"
+                android:textSize="23sp" />
+        </LinearLayout>
+    </RelativeLayout>
+    
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#FFFFFF"
     android:weightSum="1"
     android:orientation="horizontal" >
+    
     
 	<LinearLayout 
 	android:id="@+id/orderlist"    
@@ -110,11 +163,12 @@
 	android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:layout_weight="0.5"
-    android:orientation="vertical"
 	    >
 	    
 	    
 	    
+	</LinearLayout>
+	
 	</LinearLayout>
 	
 </LinearLayout>
