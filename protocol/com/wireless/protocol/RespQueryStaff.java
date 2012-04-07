@@ -37,7 +37,7 @@ public class RespQueryStaff extends RespPackage{
 		for(int i = 0; i < staffs.length; i++){
 			byte[] name = staffs[i].name.getBytes("UTF-16BE");
 			byte[] pwd = staffs[i].pwd.getBytes("UTF-16BE");
-			bodyLen += 2 +				/* the length to staff name takes up 1-byte */
+			bodyLen += 2 +				/* the length to staff name takes up 2-byte */
 					   name.length + 	/* the name to staff */
 					   1 + 				/* the length to staff password takes up 1-byte */
 					   pwd.length + 	/* the password to staff */
