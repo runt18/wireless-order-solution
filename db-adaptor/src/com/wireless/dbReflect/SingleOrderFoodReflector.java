@@ -68,7 +68,7 @@ public class SingleOrderFoodReflector {
 		String sql;
 		sql = " SELECT A.*, B.name AS kitchen_name " +
 			  " FROM " + 
-			  Params.dbName + "." + tblName + "A, " +
+			  Params.dbName + "." + tblName + " A, " +
 			  Params.dbName + ".kitchen B " +
 			  " WHERE " +
 			  " A.kitchen_id = B.kitchen_id " + 
