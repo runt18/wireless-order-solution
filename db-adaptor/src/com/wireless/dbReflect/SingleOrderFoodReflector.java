@@ -90,7 +90,7 @@ public class SingleOrderFoodReflector {
 			singleOrderFood.taste.setPrice(dbCon.rs.getFloat("taste_price"));
 			singleOrderFood.kitchen.kitchenID = dbCon.rs.getInt("kitchen_id");
 			singleOrderFood.kitchen.aliasID = dbCon.rs.getShort("kitchen_alias");
-			singleOrderFood.kitchen.deptID = dbCon.rs.getShort("detp_id");
+			singleOrderFood.kitchen.deptID = dbCon.rs.getShort("dept_id");
 			singleOrderFood.kitchen.name = dbCon.rs.getString("kitchen_name");
 			singleOrderFoods.add(singleOrderFood);
 		}
