@@ -296,5 +296,20 @@
 			type="com.wireless.Actions.staffMgr.ResetPwdStaffAction" scope="request">
 		</action>
 	</action-mappings>
+<action path="/deptStatistics"
+			type="com.wireless.Actions.billStatistics.DeptStatisticsAction" scope="request">
+		</action>
+		<action path="/regionStatistics"
+			type="com.wireless.Actions.billStatistics.RegionStatisticsAction" scope="request">
+		</action>
+		<action path="/DiscountStatDetail"
+			type="com.wireless.Actions.billStatistics.DiscountStatisticsDetailAction" scope="request">
+		</action>
+		<action path="/shiftStat"
+			type="com.wireless.Actions.billStatistics.ShiftStatisticsAction" scope="request">
+		</action>
+		<action path="/shiftStatDetail"
+			type="com.wireless.Actions.billStatistics.ShiftStatDetailAction" scope="request">
+		</action>
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
 </struts-config>

@@ -18,6 +18,11 @@
 	font-size: 12pt;
 }
 
+#shiftContentCheck {
+	height: 20px;
+	font-size: 11pt;
+}
+
 
 .shiftInfo {
 	font-weight: bold;

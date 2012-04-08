@@ -1,4 +1,4 @@
-package com.wireless.Actions.kitchenMgr;
+package com.wireless.Actions.billStatistics;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -31,7 +31,7 @@ import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Terminal;
 
-public class KitchenStatisticsAction extends Action {
+public class RegionStatisticsAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -83,11 +83,10 @@ public class KitchenStatisticsAction extends Action {
 			// get the query condition
 			String dateBegin = request.getParameter("dateBegin");
 			String dateEnd = request.getParameter("dateEnd");
-			String kitchenAlias = request.getParameter("kitchenAlias");
+			String regionIDs = request.getParameter("regionIDs");
 			String StatisticsType = request.getParameter("StatisticsType");
 
-			String condition = " AND C.kitchen_alias IN (" + kitchenAlias
-					+ ") ";
+			String condition = " AND D.region_id IN (" + regionIDs + ") ";
 			if (!dateBegin.equals("")) {
 				condition = condition + " AND D.pay_datetime >= '" + dateBegin
 						+ " 00:00:00" + "' ";
@@ -100,7 +99,7 @@ public class KitchenStatisticsAction extends Action {
 					+ term.restaurant_id;
 
 			OrderFoodReflector foodRef = new OrderFoodReflector();
-			String orderClause = " ORDER BY D.pay_date DESC, C.kitchen_alias ";
+			String orderClause = " ORDER BY D.pay_date DESC, D.region_id";
 
 			OrderFood orderFoods[] = null;
 			if (StatisticsType.equals("Today")) {
@@ -117,7 +116,7 @@ public class KitchenStatisticsAction extends Action {
 			 * filter condition
 			 */
 			String lastDate = "1900-01-01";
-			int lastKitchen = -1;
+			int lastRegion = -1;
 			float cashCount = 0;
 			float bankCardCount = 0;
 			float memberCardCount = 0;
@@ -132,14 +131,14 @@ public class KitchenStatisticsAction extends Action {
 					OrderFood orderFood = orderFoods[i];
 					String orderDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 							.format(new Date(orderFood.orderDate));
-					int kitchen = orderFood.kitchen.aliasID;
+					int region = orderFood.table.regionID;
 
-					if (!orderDate.equals(lastDate) || kitchen != lastKitchen) {
+					if (!orderDate.equals(lastDate) || region != lastRegion) {
 						if (rowCount != 0) {
 							HashMap resultMap = new HashMap();
 
 							resultMap.put("statDate", lastDate);
-							resultMap.put("kitchenName", lastKitchen);
+							resultMap.put("regionID", lastRegion);
 							resultMap.put("cash", cashCount);
 							resultMap.put("bankCard", bankCardCount);
 							resultMap.put("memberCard", memberCardCount);
@@ -166,7 +165,7 @@ public class KitchenStatisticsAction extends Action {
 
 					rowCount = rowCount + 1;
 					lastDate = orderDate;
-					lastKitchen = kitchen;
+					lastRegion = region;
 
 					float allPrice = (float) Math.round((orderFood.getPrice2()
 							.floatValue() * orderFood.getCount()) * 100) / 100;
@@ -238,7 +237,7 @@ public class KitchenStatisticsAction extends Action {
 				HashMap resultMap = new HashMap();
 
 				resultMap.put("statDate", lastDate);
-				resultMap.put("kitchenName", lastKitchen);
+				resultMap.put("regionID", lastRegion);
 				resultMap.put("cash", cashCount);
 				resultMap.put("bankCard", bankCardCount);
 				resultMap.put("memberCard", memberCardCount);
@@ -301,7 +300,7 @@ public class KitchenStatisticsAction extends Action {
 				DecimalFormat fnum = new DecimalFormat("##0.00");
 				String totalPriceDiaplay = fnum.format(allTotalCount);
 				HashMap resultMap = new HashMap();
-				resultMap.put("kitchenName", "汇总");
+				resultMap.put("regionID", "汇总");
 				resultMap.put("cash", allCashCount);
 				resultMap.put("bankCard", allBankCardCount);
 				resultMap.put("memberCard", allMemberCardCount);

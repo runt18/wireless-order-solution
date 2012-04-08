@@ -1,4 +1,4 @@
-package com.wireless.Actions.menuMgr;
+package com.wireless.Actions.billStatistics;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -21,17 +21,18 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import com.wireless.JsonProcessor.DateJsonValueProcessor;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.VerifyPin;
 import com.wireless.dbReflect.OrderFoodReflector;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Terminal;
-import com.wireless.util.Util;
 
-public class MenuStatisticsAction extends Action {
+public class ShiftStatisticsAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -50,7 +51,14 @@ public class MenuStatisticsAction extends Action {
 		HashMap rootMap = new HashMap();
 
 		boolean isError = false;
-		float totalPrice = 0;
+		float allTotalCount = 0;
+		float allCashCount = 0;
+		float allBankCardCount = 0;
+		float allMemberCardCount = 0;
+		float allHandCount = 0;
+		float allSignCount = 0;
+		float allDiscountCount = 0;
+		float allGiftCount = 0;
 
 		try {
 			// 解决后台中文传到前台乱码
@@ -76,107 +84,50 @@ public class MenuStatisticsAction extends Action {
 			// get the query condition
 			String dateBegin = request.getParameter("dateBegin");
 			String dateEnd = request.getParameter("dateEnd");
-			String foodAlias = request.getParameter("foodAlias");
 			String StatisticsType = request.getParameter("StatisticsType");
 
-			/**
-			 * Select all the today orders matched the conditions below. 1 -
-			 * belong to this restaurant 2 - has been paid 3 - match extra
-			 * filter condition
-			 */
-			String condition = " AND C.food_alias IN (" + foodAlias + ") ";
+			String condition = " ";
 			if (!dateBegin.equals("")) {
-				condition = condition + " AND D.pay_datetime >= '" + dateBegin
+				condition = condition + " AND off_duty >= '" + dateBegin
 						+ " 00:00:00" + "' ";
 			}
 			if (!dateEnd.equals("")) {
-				condition = condition + " AND D.pay_datetime <= '" + dateEnd
+				condition = condition + " AND off_duty <= '" + dateEnd
 						+ " 23:59:59" + "' ";
 			}
-			condition = condition + " AND C.restaurant_id =  "
+			condition = condition + " AND restaurant_id =  "
 					+ term.restaurant_id;
 
-			// String orderClause = " ORDER BY D.food_id DESC, D.pay_date ";
-			String orderClause = " ORDER BY D.food_alias ASC, D.pay_date ";
+			String orderClause = " ORDER BY off_duty ";
 
-			OrderFoodReflector foodRef = new OrderFoodReflector();
-			// OrderFood orderFoods[] = foodRef.getDetailHistory(dbCon,
-			// condition,
-			// orderClause);
-			OrderFood orderFoods[] = null;
-			if (StatisticsType.equals("Today")) {
-				orderFoods = foodRef.getDetailToday(dbCon, condition,
-						orderClause);
-			} else if (StatisticsType.equals("History")) {
-				orderFoods = foodRef.getDetailHistory(dbCon, condition,
-						orderClause);
-			}
+			String sql = " SELECT id, restaurant_id, name, on_duty, off_duty FROM "
+					+ Params.dbName
+					+ ".shift "
+					+ " WHERE restaurant_id = "
+					+ term.restaurant_id + " " + condition + orderClause;
 
-			int lastFoodAlias = -100;
-			int lastKitchenAlias = -100;
-			String lastFoodName = "";
-			int rowCount = 0;
-			float sumAmout = 0;
-			float SumPrice = 0;
-			for (int i = 0; i < orderFoods.length; i++) {
-				OrderFood orderFood = orderFoods[i];
-				int thisFoodAlias = orderFood.aliasID;
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
 
-				if (thisFoodAlias != lastFoodAlias) {
-					if (rowCount != 0) {
-						HashMap resultMap = new HashMap();
-
-						resultMap.put("dishNumber", lastFoodAlias);
-						resultMap.put("dishName", lastFoodName);
-						// resultMap.put("dishPrice",
-						// dbCon.rs.getFloat("unit_price"));
-						// resultMap.put("isTemp",
-						// orderFoods[i].isTemporary);
-						resultMap.put("kitchenAlias", lastKitchenAlias);
-						resultMap.put("dishCount", sumAmout);
-						resultMap.put("dishTotalPrice", SumPrice);
-						resultMap.put("message", "normal");
-
-						resultList.add(resultMap);
-
-					}
-
-					sumAmout = 0;
-					SumPrice = 0;
-				}
-
-				rowCount = rowCount + 1;
-				lastFoodAlias = thisFoodAlias;
-				lastKitchenAlias = orderFoods[i].kitchen.aliasID;
-				lastFoodName = orderFoods[i].name;
-
-				float allPrice = (float) Math.round((orderFood.getPrice2()
-						.floatValue() * orderFood.getCount()) * 100) / 100;
-
-				totalPrice = (float) Math.round((totalPrice + allPrice) * 100) / 100;
-
-				SumPrice = (float) Math.round((SumPrice + allPrice) * 100) / 100;
-				sumAmout = (float) Math
-						.round((sumAmout + orderFood.getCount()) * 100) / 100;
-
-			}
-
-			if (totalPrice != 0) {
+			while (dbCon.rs.next()) {
 				HashMap resultMap = new HashMap();
+				/**
+				 * 
+				 */
+				resultMap.put("staff", dbCon.rs.getString("name"));
+				resultMap.put("beginTime", new SimpleDateFormat(
+						"yyyy-MM-dd HH:mm:ss").format(dbCon.rs
+						.getTimestamp("on_duty")));
+				resultMap.put("endTime", new SimpleDateFormat(
+						"yyyy-MM-dd HH:mm:ss").format(dbCon.rs
+						.getTimestamp("off_duty")));
+				// resultMap.put("beginTime", dbCon.rs.getDate("on_duty"));
+				// resultMap.put("endTime", dbCon.rs.getDate("off_duty"));
 
-				resultMap.put("dishNumber", lastFoodAlias);
-				resultMap.put("dishName", lastFoodName);
-				// resultMap.put("dishPrice",
-				// dbCon.rs.getFloat("unit_price"));
-				// resultMap.put("isTemp", orderFoods[i].isTemporary);
-				resultMap.put("kitchen", lastFoodAlias);
-				resultMap.put("dishCount", sumAmout);
-				resultMap.put("dishTotalPrice", SumPrice);
 				resultMap.put("message", "normal");
 
 				resultList.add(resultMap);
-			}
 
+			}
 			dbCon.rs.close();
 
 		} catch (BusinessException e) {
@@ -189,7 +140,7 @@ public class MenuStatisticsAction extends Action {
 				resultMap.put("message", "终端已过期，请重新确认");
 
 			} else {
-				resultMap.put("message", "没有获取到当日账单信息，请重新确认");
+				resultMap.put("message", "没有获取到信息，请重新确认");
 			}
 			resultList.add(resultMap);
 			isError = true;
@@ -221,20 +172,16 @@ public class MenuStatisticsAction extends Action {
 						// 最后一页可能不足一页，会报错，忽略
 					}
 				}
-				DecimalFormat fnum = new DecimalFormat("##0.00");
-				String totalPriceDiaplay = fnum.format(totalPrice);
-				HashMap resultMap = new HashMap();
-				resultMap.put("kitchenAlias", "SUM");
-				resultMap.put("dishCount", "汇总");
-				resultMap.put("dishTotalPrice", totalPriceDiaplay);
-				resultMap.put("message", "normal");
-				outputList.add(resultMap);
 
 				rootMap.put("root", outputList);
 			}
 
 			JsonConfig jsonConfig = new JsonConfig();
-
+			// // 解决日期类型显示问题
+			// jsonConfig.registerJsonValueProcessor(java.util.Date.class,
+			// new DateJsonValueProcessor("yyyy-MM-dd HH:mm:ss"));
+			// jsonConfig.registerJsonValueProcessor(java.sql.Timestamp.class,
+			// new DateJsonValueProcessor("yyyy-MM-dd HH:mm:ss"));
 			JSONObject obj = JSONObject.fromObject(rootMap, jsonConfig);
 
 			String outputJson = "{\"totalProperty\":" + resultList.size() + ","
@@ -247,5 +194,4 @@ public class MenuStatisticsAction extends Action {
 
 		return null;
 	}
-
 }

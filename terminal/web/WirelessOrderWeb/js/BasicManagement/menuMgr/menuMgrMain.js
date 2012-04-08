@@ -337,7 +337,8 @@ menuStatResultGrid.getStore().on('beforeload', function() {
 		"pin" : pin,
 		"foodAlias" : orderStaticDishesString,
 		"dateBegin" : orderStaticBeginDate,
-		"dateEnd" : orderStaticEndDate
+		"dateEnd" : orderStaticEndDate,
+		"StatisticsType" : "History"
 	};
 
 });
@@ -2028,10 +2029,12 @@ Ext
 				} ],
 				tbar : new Ext.Toolbar({
 					height : 55,
-					items : [ orderStatiBut, {
-						text : "&nbsp;&nbsp;&nbsp;",
-						disabled : true
-					}, dishAddBut, {
+					items : [
+					// orderStatiBut, {
+					// text : "&nbsp;&nbsp;&nbsp;",
+					// disabled : true
+					// },
+					dishAddBut, {
 						text : "&nbsp;&nbsp;&nbsp;",
 						disabled : true
 					}, "->", pushBackBut, {

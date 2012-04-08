@@ -270,7 +270,8 @@ kitchenStatResultGrid.getStore().on('beforeload', function() {
 		"pin" : pin,
 		"kitchenAlias" : kitchenStaticString,
 		"dateBegin" : kitchenStaticBeginDate,
-		"dateEnd" : kitchenStaticEndDate
+		"dateEnd" : kitchenStaticEndDate,
+		"StatisticsType" : "History"
 	};
 
 });
@@ -826,10 +827,12 @@ Ext
 				} ],
 				tbar : new Ext.Toolbar({
 					height : 55,
-					items : [ kitchenStaticBut, {
-						text : "&nbsp;&nbsp;&nbsp;",
-						disabled : true
-					}, "->", pushBackBut, {
+					items : [
+					// kitchenStaticBut, {
+					// text : "&nbsp;&nbsp;&nbsp;",
+					// disabled : true
+					// },
+					"->", pushBackBut, {
 						text : "&nbsp;&nbsp;&nbsp;",
 						disabled : true
 					}, logOutBut ]
