@@ -18,7 +18,6 @@ public class OrderParcel extends Order implements Parcelable{
 		discount_type = order.discount_type;
 		pay_manner = order.pay_manner;
 		category = order.category;
-		price_tail = order.price_tail;
 		setServiceRate(order.getServiceRate());
 		id = order.id;
 		restaurantID = order.restaurantID;
@@ -43,7 +42,6 @@ public class OrderParcel extends Order implements Parcelable{
 		discount_type = in.readInt();
 		pay_manner = in.readInt();
 		category = (short)in.readInt();
-		price_tail = (short)in.readInt();
 		setServiceRate(Util.int2Float(in.readInt()));
 		id = in.readInt();
 		restaurantID = in.readInt();
@@ -88,7 +86,6 @@ public class OrderParcel extends Order implements Parcelable{
 		parcel.writeInt(discount_type);
 		parcel.writeInt(pay_manner);
 		parcel.writeInt(category);
-		parcel.writeInt(price_tail);
 		parcel.writeInt(Util.float2Int(getServiceRate()));
 		parcel.writeInt(id);
 		parcel.writeInt(restaurantID);
