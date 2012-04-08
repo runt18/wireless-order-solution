@@ -1,21 +1,27 @@
 package com.wireless.db;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.TimeZone;
 
+import com.wireless.dbObject.Setting;
+import com.wireless.dbObject.SingleOrderFood;
+import com.wireless.dbReflect.SingleOrderFoodReflector;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.Department;
-import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.Terminal;
 
 public class QueryShift {
 	
 	public static class DeptIncome{
+		public DeptIncome(Department dept){
+			this.dept = dept;
+		}
 		public Department dept;			//某个部门的信息
 		public float gift;				//某个部门的赠送额
 		public float discount;			//某个部门的折扣额
@@ -320,260 +326,226 @@ public class QueryShift {
 		result.onDuty = onDuty;
 		result.offDuty = offDuty;
 		
-		/**
-		 * Get the order amount within this shift
-		 */
-		dbCon.rs = calcOrder(dbCon, term,
-							"COUNT(*)",
-							null, null,
-							onDuty, offDuty, isHistory);
-		if(dbCon.rs.next()){
-			result.orderAmount = dbCon.rs.getInt(1);
+		SingleOrderFood[] orderFoods;
+		if(isHistory){
+			orderFoods = SingleOrderFoodReflector.getDetailHistory(dbCon, "AND B.restaurant_id=" + term.restaurant_id + " AND B.order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "'", null);			
+		}else{
+			orderFoods = SingleOrderFoodReflector.getDetailToday(dbCon, "AND B.restaurant_id=" + term.restaurant_id + " AND B.order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "'", null);
 		}
-		dbCon.rs.close();
 		
-		String calcItem = "SUM(total_price * (1 + service_rate)), SUM(total_price_2), COUNT(*)";
-		/**
-		 * Get the total cash income within this shirt
-		 */		
-		dbCon.rs = calcOrder(dbCon, term,
-							 calcItem, 
-							 "AND type=" + Order.MANNER_CASH,
-							 null,
-							 onDuty, offDuty, isHistory); 
+	
+		HashSet<Long> orderID = new HashSet<Long>();
+		HashSet<Long> cashOrderID = new HashSet<Long>();
+		HashSet<Long> creditOrderID = new HashSet<Long>();
+		HashSet<Long> memberOrderID = new HashSet<Long>();
+		HashSet<Long> hangOrderID = new HashSet<Long>();
+		HashSet<Long> signOrderID = new HashSet<Long>();
+		HashSet<Long> cancelOrderID = new HashSet<Long>();
+		HashSet<Long> giftOrderID = new HashSet<Long>();
+		HashSet<Long> discountOrderID = new HashSet<Long>();
+		HashSet<Long> paidOrderID = new HashSet<Long>();
+		HashSet<Long> serviceOrderID = new HashSet<Long>();
 		
-		if(dbCon.rs.next()){
-			result.cashIncome = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
-			result.cashIncome2 = (float)Math.round(dbCon.rs.getFloat(2) * 100) / 100;
-			result.cashAmount = dbCon.rs.getInt(3);
-		}
-		dbCon.rs.close();
-		
-		/**
-		 * Get the total credit card income within this shift
-		 */
-		dbCon.rs = calcOrder(dbCon, term,
-							 calcItem,
-							 "AND type=" + Order.MANNER_CREDIT_CARD,
-							 null,
-							 onDuty, offDuty, isHistory);
-		if(dbCon.rs.next()){
-			result.creditCardIncome = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
-			result.creditCardIncome2 = (float)Math.round(dbCon.rs.getFloat(2) * 100) / 100;
-			result.creditCardAmount = dbCon.rs.getInt(3);
-		}
-		dbCon.rs.close();
-		
-		/**
-		 * Get the total member card income within this shift
-		 */
-		dbCon.rs = calcOrder(dbCon, term,
-						 	 calcItem,
-						 	 "AND type=" + Order.MANNER_MEMBER,
-						 	 null,
-						 	 onDuty, offDuty, isHistory);	
-		if(dbCon.rs.next()){
-			result.memberCardIncome = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
-			result.memberCardIncome2 = (float)Math.round(dbCon.rs.getFloat(2) * 100) / 100;
-			result.memeberCardAmount = dbCon.rs.getInt(3);
-		}
-		dbCon.rs.close();
-		
-		/**
-		 * Get the total sign income within this shift
-		 */
-		dbCon.rs = calcOrder(dbCon, term,
-							 calcItem,
-							 "AND type=" + Order.MANNER_SIGN,
-							 null,
-							 onDuty, offDuty, isHistory);
-		if(dbCon.rs.next()){
-			result.signIncome = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
-			result.signIncome2 = (float)Math.round(dbCon.rs.getFloat(2) * 100) / 100;
-			result.signAmount = dbCon.rs.getInt(3);
-		}
-		dbCon.rs.close();
-		
-		/**
-		 * Get the total hang income within this shift
-		 */
-		dbCon.rs = calcOrder(dbCon, term,
-							 calcItem,
-							 "AND type=" + Order.MANNER_HANG,
-							 null,
-							 onDuty, offDuty, isHistory);
-		if(dbCon.rs.next()){
-			result.hangIncome = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
-			result.hangIncome2 = (float)Math.round(dbCon.rs.getFloat(2) * 100) / 100;
-			result.hangAmount = dbCon.rs.getInt(3);
-		}
-		dbCon.rs.close();
-		
-		float totalActual = result.cashIncome2 + result.creditCardIncome2 + result.memberCardIncome2 + result.signIncome2 + result.hangIncome2;			
-		result.totalActual = (float)Math.round(totalActual * 100) / 100;
-
-		/**
-		 * Calculate the price to all cancelled food within this shift
-		 */
-		dbCon.rs = calcOrderFood(dbCon, term, 
-								 "SUM(unit_price * order_count * discount + taste_price), COUNT(distinct order_id)",
-								 "AND order_count < 0",
-								 null,
-								 onDuty, offDuty, isHistory);
-		if(dbCon.rs.next()){
-			result.cancelIncome = (float)Math.round(Math.abs(dbCon.rs.getFloat(1)) * 100) / 100;
-			result.cancelAmount = dbCon.rs.getInt(2);
-		}
-		dbCon.rs.close();
-		
-		/**
-		 * Calculate the price to all gifted food within this shift
-		 */
-		dbCon.rs = calcOrderFood(dbCon, term, 
-								 "SUM(unit_price * order_count * discount + taste_price), COUNT(distinct order_id)",
-								 "AND (food_status & " + Food.GIFT + ") <> 0",
-								 null,
-								 onDuty, offDuty, isHistory);
-		if(dbCon.rs.next()){
-			result.giftIncome = (float)Math.round(Math.abs(dbCon.rs.getFloat(1)) * 100) / 100;
-			result.giftAmount = dbCon.rs.getInt(2);
-		}
-		dbCon.rs.close();
-		
-		/**
-		 * Calculate the price to all discount food within this shift
-		 */
-		dbCon.rs = calcOrderFood(dbCon, term, 
-				 				 "SUM(unit_price * order_count * (1 - discount)), COUNT(distinct order_id)",
-				 				 "AND discount < 1.00",
-				 				 null,
-				 				 onDuty, offDuty, isHistory);
-		if(dbCon.rs.next()){
-			result.discountIncome = (float)Math.round(Math.abs(dbCon.rs.getFloat(1)) * 100) / 100;
-			result.discountAmount = dbCon.rs.getInt(2);
-		}
-		dbCon.rs.close();
-		
-		/**
-		 * Calculate the price to all paid income within this shift
-		 */
-		dbCon.rs = calcOrderFood(dbCon, term, 
-				 				 "SUM(unit_price * order_count * discount + taste_price), COUNT(distinct order_id)",
-				 				 "AND is_paid = 1",
-				 				 null,
-				 				 onDuty, offDuty, isHistory);
-		if(dbCon.rs.next()){
-			result.paidIncome = (float)Math.round(dbCon.rs.getFloat(1) * 100) / 100;
-			result.paidAmount = dbCon.rs.getInt(2);
-		}
-		dbCon.rs.close();
-		
-		/**
-		 * Calculate the price to all service income within this shift
-		 */
-		dbCon.rs = calcOrder(dbCon, term,
-							 "SUM(total_price_2 / (1 + service_rate) * service_rate), COUNT(*)",
-							 "AND service_rate > 0",
-							 null,
-							 onDuty, offDuty, isHistory);
-		if(dbCon.rs.next()){
-			result.serviceIncome = (float)Math.round(Math.abs(dbCon.rs.getFloat(1)) * 100) / 100;
-			result.serviceAmount = dbCon.rs.getInt(2);
-		}
-		dbCon.rs.close();
-		
-		//Department[] depts = QueryMenu.queryDepartments(dbCon, term.restaurant_id, null, null);
-		ArrayList<DeptIncome> deptIncomes = new ArrayList<DeptIncome>();
-		/**
-		 * Calculate the income to every department.
-		 */
+		HashMap<Short, DeptIncome> deptIncome = new HashMap<Short, DeptIncome>();
 		for(Department dept : QueryMenu.queryDepartments(dbCon, term.restaurant_id, null, null)){
-
-			DeptIncome deptIncome = new DeptIncome();
+			deptIncome.put(dept.deptID, new DeptIncome(dept));
+		}
+		for(SingleOrderFood orderFood : orderFoods){
 			
-			deptIncome.dept = dept;
-			
-			/**
-			 * Calculate the gift income to this department.
-			 */
-			dbCon.rs = calcOrderFood(dbCon, term, 
-									 "SUM(unit_price * order_count * discount + taste_price)",
-									 "AND (food_status & " + Food.GIFT + ") <> 0 AND dept_id=" + dept.deptID,
-									 null,
-									 onDuty, offDuty, isHistory);
-			if(dbCon.rs.next()){
-				deptIncome.gift = (float)Math.round(Math.abs(dbCon.rs.getFloat(1)) * 100) / 100;
-			}
-			dbCon.rs.close();
+			orderID.add(orderFood.orderID);
 			
 			/**
-			 * Calculate the discount income to this department.
-			 */
-			dbCon.rs = calcOrderFood(dbCon, term, 
-					 				 "SUM(unit_price * order_count * (1 - discount))",
-					 				 "AND discount < 1.00 AND dept_id=" + dept.deptID,
-					 				 null,
-					 				 onDuty, offDuty, isHistory);
-			if(dbCon.rs.next()){
-				deptIncome.discount = (float)Math.round(Math.abs(dbCon.rs.getFloat(1)) * 100) / 100;
+			 * Calculate the total cash income during this period
+			 */	
+			if(!orderFood.food.isGift() && orderFood.payManner == Order.MANNER_CASH){
+				result.cashIncome += orderFood.calcPriceWithService();
+				cashOrderID.add(orderFood.orderID);
 			}
-			dbCon.rs.close();
 			
 			/**
-			 * Calculate the income to this department.
-			 */
-			dbCon.rs = calcOrderFood(dbCon, term,
-									 "SUM(unit_price * order_count * discount + taste_price)",
-									 "AND (food_status & " + Food.GIFT + ") = 0 AND dept_id=" + dept.deptID,
-									 null,
-									 onDuty, offDuty, isHistory);
-			if(dbCon.rs.next()){
-				deptIncome.income = (float)Math.round(Math.abs(dbCon.rs.getFloat(1)) * 100) / 100;
+			 * Calculate the total credit card income during this period
+			 */	
+			if(!orderFood.food.isGift() && orderFood.payManner == Order.MANNER_CREDIT_CARD){
+				result.creditCardIncome += orderFood.calcPriceWithService();
+				creditOrderID.add(orderFood.orderID);
 			}
 			
-			dbCon.rs.close();
+			/**
+			 * Calculate the total member card income during this period
+			 */	
+			if(!orderFood.food.isGift() && orderFood.payManner == Order.MANNER_MEMBER){
+				result.memberCardIncome += orderFood.calcPriceWithService();
+				memberOrderID.add(orderFood.orderID);
+			}
 			
-			if(deptIncome.discount != 0 || deptIncome.gift != 0 || deptIncome.income != 0){
-				deptIncomes.add(deptIncome);			
+			/**
+			 * Calculate the total hang income during this period
+			 */	
+			if(!orderFood.food.isGift() && orderFood.payManner == Order.MANNER_HANG){
+				result.hangIncome += orderFood.calcPriceWithService();
+				hangOrderID.add(orderFood.orderID);
+			}
+			
+			/**
+			 * Calculate the total sign income during this period
+			 */	
+			if(!orderFood.food.isGift() && orderFood.payManner == Order.MANNER_SIGN){
+				result.signIncome += orderFood.calcPriceWithService();
+				signOrderID.add(orderFood.orderID);
+			}
+			
+			/**
+			 * Calculate the gift, discount, income to each department during this period
+			 */
+			DeptIncome income = deptIncome.get(orderFood.kitchen.deptID);
+			if(income != null){
+				if(orderFood.food.isGift()){
+					income.gift += orderFood.calcPriceWithTaste();
+				}else{
+					income.income += orderFood.calcPriceWithTaste();
+				}
+				
+				if(orderFood.discount < 1){
+					income.discount += orderFood.calcPriceWithTaste();
+				}
+				
+				deptIncome.put(orderFood.kitchen.deptID, income);
+			}
+			
+			/**
+			 * Calculate the price to all cancelled food during this period
+			 */
+			if(orderFood.orderCount < 0){
+				result.cancelIncome += Math.abs(orderFood.calcPriceWithTaste());
+				cancelOrderID.add(orderFood.orderID);
+			}
+			
+			/**
+			 * Calculate the price to all gifted food during this period
+			 */
+			if(orderFood.food.isGift()){
+				result.giftIncome += orderFood.calcPriceWithTaste();
+				giftOrderID.add(orderFood.orderID);
+			}
+			
+			/**
+			 * Calculate the price to all discount food during this period
+			 */
+			if(orderFood.discount < 1){
+				result.discountIncome += orderFood.calcPriceWithTaste();
+				discountOrderID.add(orderFood.orderID);
+			}
+			
+			/**
+			 * Calculate the price to all paid income during this period
+			 */
+			if(orderFood.isPaid){
+				result.paidIncome += orderFood.calcPriceWithTaste();
+				paidOrderID.add(orderFood.orderID);
+			}
+			
+			/**
+			 * Calculate the price to service income during this period
+			 */
+			if(orderFood.serviceRate > 0){
+				result.serviceIncome += orderFood.calcPriceWithTaste() * orderFood.serviceRate;
+				serviceOrderID.add(orderFood.orderID);
 			}
 		}
 		
-		result.deptIncome = deptIncomes.toArray(new DeptIncome[deptIncomes.size()]);
+		/**
+		 * Assign the amount to all order
+		 */
+		result.orderAmount = orderID.size();
+		
+		//get the setting to this restaurant
+		Setting setting = QuerySetting.exec(dbCon, term.restaurant_id);
+		
+		/**
+		 * Assign the total cash income and amount
+		 */
+		result.cashIncome = (float)Math.round(result.cashIncome * 100) / 100;
+		result.cashIncome2 = Util.calcByTail(setting.priceTail, result.cashIncome);
+		result.cashAmount = cashOrderID.size();
+		
+		/**
+		 * Assign the total credit card income and amount
+		 */
+		result.creditCardIncome = (float)Math.round(result.creditCardIncome * 100) / 100;
+		result.creditCardIncome2 = Util.calcByTail(setting.priceTail, result.creditCardIncome);
+		result.creditCardAmount = creditOrderID.size();
+		
+		/**
+		 * Assign the total member card income and amount
+		 */
+		result.memberCardIncome = (float)Math.round(result.memberCardIncome * 100) / 100;
+		result.memberCardIncome2 = Util.calcByTail(setting.priceTail, result.memberCardIncome);
+		result.memeberCardAmount = memberOrderID.size();
+		
+		/**
+		 * Assign the total hang income and amount
+		 */
+		result.hangIncome = (float)Math.round(result.hangIncome * 100) / 100;
+		result.hangIncome2 = Util.calcByTail(setting.priceTail, result.hangIncome);
+		result.hangAmount = hangOrderID.size();		
+		
+		/**
+		 * Assign the total sign income and amount
+		 */
+		result.signIncome = (float)Math.round(result.signIncome * 100) / 100;
+		result.signIncome2 = Util.calcByTail(setting.priceTail, result.signIncome);
+		result.signAmount = signOrderID.size();
+		
+		/**
+		 * Assign the total actual income
+		 */
+		result.totalActual = result.cashIncome2 + result.creditCardIncome2 + result.memberCardIncome2 + result.signIncome2 + result.hangIncome2;
+		
+		/**
+		 * Assign the cancel food income and amount
+		 */
+		result.cancelIncome = (float)Math.round(result.cancelIncome * 100) / 100;
+		result.cancelAmount = cancelOrderID.size();
+		
+		/**
+		 * Assign the gift income and amount
+		 */
+		result.giftIncome = (float)Math.round(result.giftIncome * 100) / 100;
+		result.giftAmount = giftOrderID.size();
+		
+		/**
+		 * Assign the discount income and amount
+		 */
+		result.discountIncome = (float)Math.round(result.discountIncome * 100) / 100;
+		result.discountAmount = discountOrderID.size();
+		
+		/**
+		 * Assign the paid income and amount
+		 */
+		result.paidIncome = (float)Math.round(result.paidIncome * 100) / 100;
+		result.paidAmount = paidOrderID.size();
+		
+		/**
+		 * Assign the service income and amount
+		 */
+		result.serviceIncome = (float)Math.round(result.serviceIncome * 100) / 100;
+		result.serviceAmount = serviceOrderID.size();
+		
+		/**
+		 * Assign all the department income
+		 */
+		ArrayList<DeptIncome> validDeptIncomes = new ArrayList<DeptIncome>();
+		for(DeptIncome income : deptIncome.values()){
+			if(income.discount != 0 || income.gift != 0 || income.income != 0){
+				income.discount = (float)Math.round(income.discount * 100) / 100;
+				income.gift = (float)Math.round(income.gift * 100) / 100;
+				income.income = (float)Math.round(income.income * 100) / 100;
+				validDeptIncomes.add(income);
+			}
+		}
+		result.deptIncome = validDeptIncomes.toArray(new DeptIncome[validDeptIncomes.size()]);
 		
 		return result;
-	}
-		
-	private static ResultSet calcOrder(DBCon dbCon, Terminal term,
-								  String calcItem, String extraCond, String orderClause,
-								  String onDuty, String offDuty, boolean isHistory) throws SQLException{
-		
-		String orderTbl = isHistory ? "order_history" : "order";
-		
-		String sql = "SELECT " + calcItem + " FROM " + Params.dbName + "." + orderTbl + " WHERE " +
-					 "restaurant_id=" + term.restaurant_id + " AND " +
-					 "total_price IS NOT NULL" + " " +
-					 ((onDuty == null || offDuty == null) ? "" : "AND order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "'") +
-					 ((extraCond == null) ? "" : extraCond) + " " +
-					 ((orderClause == null) ? "" : orderClause);
-		
-		return dbCon.stmt.executeQuery(sql);
-	}
-	
-	private static ResultSet calcOrderFood(DBCon dbCon, Terminal term, 
-								  String calcItem, String extraCond, String orderClause, 
-								  String onDuty, String offDuty, boolean isHistory) throws SQLException{
-		
-		String orderTbl = isHistory ? "order_history" : "order";
-		String orderFoodTbl = isHistory ? "order_food_history" : "order_food";
-		
-		String sql = "SELECT " + calcItem + " FROM " + Params.dbName + "." + orderFoodTbl + " WHERE order_id IN (" +
-					 "SELECT id FROM " + Params.dbName + "." + orderTbl + " WHERE restaurant_id=" + term.restaurant_id +  
-					 " AND " + "total_price IS NOT NULL" + " " +
-					 ((onDuty == null || offDuty == null) ? "" : "AND order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "'") + ") " +
-					 ((extraCond == null) ? "" : extraCond) + " " +
-					 ((orderClause == null) ? "" : orderClause);
-		
-		return dbCon.stmt.executeQuery(sql);		
-	}
-	
+	}		
+
 }

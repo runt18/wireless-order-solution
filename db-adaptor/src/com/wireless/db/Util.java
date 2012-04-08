@@ -2,6 +2,7 @@ package com.wireless.db;
 
 import java.sql.SQLException;
 
+import com.wireless.dbObject.Setting;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Table;
@@ -37,6 +38,24 @@ public class Util {
 			}else{
 				throw new BusinessException("The un-paid order id to table(alias_id=" + table.aliasID + ", restaurant_id=" + table.restaurantID + ") does NOT exist.", ErrorCode.TABLE_IDLE);
 			}			
+		}
+	}
+	
+	/**
+	 * Calculate the total price according to the type of price tail
+	 * @param priceTail
+	 * @param totalPrice
+	 * @return
+	 */
+	public static float calcByTail(int priceTail, float totalPrice){
+		if(priceTail == Setting.TAIL_DECIMAL_CUT){
+			//小数抹零
+			return new Float(totalPrice).intValue();
+		}else if(priceTail == Setting.TAIL_DECIMAL_ROUND){
+			//小数四舍五入
+			return Math.round(totalPrice);
+		}else{
+			return totalPrice;
 		}
 	}
 }

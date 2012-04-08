@@ -7,6 +7,7 @@ import java.util.Iterator;
 import com.wireless.dbObject.FoodMaterial;
 import com.wireless.dbObject.Material;
 import com.wireless.dbObject.MaterialDetail;
+import com.wireless.dbObject.Setting;
 import com.wireless.dbReflect.OrderFoodReflector;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
@@ -606,14 +607,9 @@ public class PayOrder {
 		if(totalPrice < orderInfo.getMinimumCost()){
 			//直接使用最低消费
 			totalPrice2 = orderInfo.getMinimumCost();			
-		}else if(orderInfo.price_tail == Order.TAIL_DECIMAL_CUT){
-			//小数抹零
-			totalPrice2 = new Float(totalPrice).intValue();
-		}else if(orderInfo.price_tail == Order.TAIL_DECIMAL_ROUND){
-			//小数四舍五入
-			totalPrice2 = Math.round(totalPrice);
 		}else{
-			totalPrice2 = totalPrice;
+			Setting setting = QuerySetting.exec(dbCon, orderToPay.restaurantID);
+			totalPrice2 = Util.calcByTail(setting.priceTail, totalPrice);
 		}
 		
 		orderInfo.setActualPrice(totalPrice2);

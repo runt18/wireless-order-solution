@@ -1,9 +1,15 @@
 package com.wireless.dbObject;
 
-import com.wireless.protocol.Order;
 
 public class Setting{
-	public int priceTail = Order.TAIL_NO_ACTION;
+	
+	/* 尾数处理的方式 */
+	public final static short TAIL_NO_ACTION = 0;			//小数部分不处理
+	public final static short TAIL_DECIMAL_CUT = 1;			//小数抹零
+	public final static short TAIL_DECIMAL_ROUND = 2;		//小数四舍五入	
+	public int priceTail = TAIL_NO_ACTION;
+
+	
 	public boolean autoReprint = true;
 	
 	/* 结帐单显示的选项设置  */
