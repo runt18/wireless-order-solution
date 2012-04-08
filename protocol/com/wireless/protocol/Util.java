@@ -126,7 +126,11 @@ public class Util {
 		
 		int decimal = Byte.parseByte(floatPoint);
 		int integer = floatValue.intValue();
-		return integer * 100 + decimal;
+		if(integer < 0){
+			return -(Math.abs(integer) * 100 + decimal);
+		}else{
+			return integer * 100 + decimal;
+		}
 	}
 	
 	/**
