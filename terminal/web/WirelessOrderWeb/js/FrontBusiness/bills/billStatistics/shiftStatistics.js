@@ -332,6 +332,7 @@ function shiftStatDetalHandler(rowIndex) {
 						// document.getElementById("serviceBillCount").innerHTML
 						// = rootData[0].serviceBillCount;
 
+						shiftCheckDetpData.length = 0;
 						var deptInfos = rootData[0].deptInfos;
 						for ( var i = 0; i < deptInfos.length; i++) {
 							shiftCheckDetpData.push([ deptInfos[i].deptName,
