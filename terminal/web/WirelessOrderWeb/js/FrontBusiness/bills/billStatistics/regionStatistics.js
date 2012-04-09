@@ -122,11 +122,7 @@ regionStatWin = new Ext.Window(
 									regionStaticBeginDate = dateFormated
 											.format('Y-m-d')
 											+ " " + regionStaticBeginDate;
-								} else {
-									regionStaticBeginDate = dateFormated
-											.format('Y-m-d')
-											+ " 00:00:00";
-								}
+								} 
 
 								regionStaticEndDate = regionStatWin.findById(
 										"endDateMStatRegion").getValue();
@@ -134,11 +130,7 @@ regionStatWin = new Ext.Window(
 									regionStaticEndDate = dateFormated
 											.format('Y-m-d')
 											+ " " + regionStaticEndDate;
-								} else {
-									regionStaticEndDate = dateFormated
-											.format('Y-m-d')
-											+ " 23:59:59";
-								}
+								} 
 
 								regionStaticString = selectRegions;
 

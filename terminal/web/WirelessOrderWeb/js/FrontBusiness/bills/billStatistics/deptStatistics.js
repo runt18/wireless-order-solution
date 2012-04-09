@@ -120,11 +120,7 @@ deptStatWin = new Ext.Window(
 									deptStaticBeginDate = dateFormated
 											.format('Y-m-d')
 											+ " " + deptStaticBeginDate;
-								} else {
-									deptStaticBeginDate = dateFormated
-											.format('Y-m-d')
-											+ " 00:00:00";
-								}
+								} 
 
 								deptStaticEndDate = deptStatWin.findById(
 										"endDateMStatDept").getValue();
@@ -132,11 +128,7 @@ deptStatWin = new Ext.Window(
 									deptStaticEndDate = dateFormated
 											.format('Y-m-d')
 											+ " " + deptStaticEndDate;
-								} else {
-									deptStaticEndDate = dateFormated
-											.format('Y-m-d')
-											+ " 23:59:59";
-								}
+								} 
 
 								deptStaticString = selectDepts;
 

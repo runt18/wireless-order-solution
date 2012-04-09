@@ -120,11 +120,7 @@ menuStatWin = new Ext.Window(
 									orderStaticBeginDate = dateFormated
 											.format('Y-m-d')
 											+ " " + orderStaticBeginDate;
-								} else {
-									orderStaticBeginDate = dateFormated
-											.format('Y-m-d')
-											+ " 00:00:00";
-								}
+								} 
 
 								orderStaticEndDate = menuStatWin.findById(
 										"endDateMStatOrder").getValue();
@@ -132,12 +128,8 @@ menuStatWin = new Ext.Window(
 									orderStaticEndDate = dateFormated
 											.format('Y-m-d')
 											+ " " + orderStaticEndDate;
-								} else {
-									orderStaticEndDate = dateFormated
-											.format('Y-m-d')
-											+ " 23:59:59";
-								}
-
+								} 
+								
 								orderStaticDishesString = selectDishes;
 
 								isPrompt = true;

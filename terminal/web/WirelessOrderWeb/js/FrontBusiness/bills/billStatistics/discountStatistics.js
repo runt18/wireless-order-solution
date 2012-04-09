@@ -180,10 +180,6 @@ discountStatWin = new Ext.Window(
 									begDateInStatDiscount = dateFormated
 											.format('Y-m-d')
 											+ " " + begDateInStatDiscount;
-								} else {
-									begDateInStatDiscount = dateFormated
-											.format('Y-m-d')
-											+ " 00:00:00";
 								}
 
 								var endDateInStatDiscount = discountStatWin
@@ -193,10 +189,6 @@ discountStatWin = new Ext.Window(
 									endDateInStatDiscount = dateFormated
 											.format('Y-m-d')
 											+ " " + endDateInStatDiscount;
-								} else {
-									endDateInStatDiscount = dateFormated
-											.format('Y-m-d')
-											+ " 23:59:59";
 								}
 
 								// -- 獲取統計類型 --

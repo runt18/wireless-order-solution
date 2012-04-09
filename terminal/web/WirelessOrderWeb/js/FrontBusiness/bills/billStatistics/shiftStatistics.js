@@ -182,20 +182,14 @@ shiftStatWin = new Ext.Window({
 					if (begDateMStatShift != "") {
 						begDateMStatShift = dateFormated.format('Y-m-d') + " "
 								+ begDateMStatShift;
-					} else {
-						begDateMStatShift = dateFormated.format('Y-m-d')
-								+ " 00:00:00";
-					}
+					} 
 
 					endDateMStatShift = shiftStatWin.findById(
 							"endDateMStatShift").getValue();
 					if (endDateMStatShift != "") {
 						endDateMStatShift = dateFormated.format('Y-m-d') + " "
 								+ endDateMStatShift;
-					} else {
-						endDateMStatShift = dateFormated.format('Y-m-d')
-								+ " 23:59:59";
-					}
+					} 
 
 					isPrompt = true;
 					shiftStatResultWin.show();
