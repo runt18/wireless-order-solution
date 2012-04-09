@@ -33,27 +33,24 @@ public class OrderFoodReflector {
 	 */
 	public static OrderFood[] getDetailToday(DBCon dbCon, String extraCond,	String orderClause) throws SQLException {
 		String sql;
-//		sql = "SELECT C.order_id, C.food_alias, C.taste_alias, C.taste2_alias, C.taste3_alias, C.hang_status, C.is_temporary, "
-//				+ " MAX(C.kitchen_alias) AS kitchen_alias, MAX(C.kitchen_id) AS kitchen_id, " 
-//				+ " MAX(C.food_id) AS food_id, MAX(C.name) AS name, MAX(C.food_status) AS food_status, " 
-//				+ " MAX(C.unit_price) AS unit_price, MAX(C.order_date) AS order_date,  MAX(C.discount) AS discount, "
-//				+ " MAX(C.taste) AS taste, MAX(C.taste_price) AS taste_price, "
-//				+ " MAX(C.taste_id) AS taste_id, MAX(C.taste2_id) AS taste2_id, MAX(C.taste3_id) AS taste3_id, " 
-//				+ " MAX(C.dept_id) AS dept_id, MAX(C.id) AS id, SUM(C.order_count) AS order_sum, "
-//				+ " MAX(B.type) AS type, MAX(B.table_id) AS table_id, MAX(B.table_alias) AS table_alias, "
-//				+ " MAX(B.region_id) AS region_id, MAX(B.table_name) AS table_name, MAX(B.region_name) AS region_name, "
-//				+ " MAX(B.order_date) AS pay_datetime "
-//				+ " FROM " 
-//				+ Params.dbName
-//				+ ".order_food C, "
-//				+ Params.dbName
-//				+ ".order B "
-//				+ " WHERE C.order_id = B.id "
-//				+ (extraCond == null ? "" : extraCond)
-//				+ " GROUP BY C.order_id, C.food_alias, C.taste_alias, C.taste2_alias, C.taste3_alias, C.hang_status, C.is_temporary "
-//				+ " HAVING order_sum > 0 " 
-//				+ (orderClause == null ? "" : " " + orderClause);
-		
+		// sql = "SELECT "
+		// +
+		// "A.name, A.food_id, A.food_status, SUM(A.order_count) AS order_sum, A.unit_price, A.order_date, "
+		// +
+		// "A.discount, A.taste, A.taste_price, A.taste_id, A.taste_id2, A.taste_id3, "
+		// + "A.hang_status, A.kitchen, A.is_temporary, B.type FROM `"
+		// + Params.dbName
+		// + "`.`order_food` A, "
+		// + Params.dbName
+		// + ".order B "
+		// + " WHERE A.order_id = B.id AND A.restaurant_id = B.restaurant_id "
+		// + (extraCond == null ? "" : extraCond)
+		// +
+		// " GROUP BY A.name, A.food_id, A.food_status, A.unit_price, A.order_date, "
+		// +
+		// " A.discount, A.taste, A.taste_price, A.taste_id, A.taste_id2, A.taste_id3, A.hang_status, A.kitchen, A.is_temporary, B.type "
+		// + " HAVING order_sum > 0 " + orderClause;
+
 		sql = "SELECT C.food_id, C.name, D.food_alias, C.food_status, D.order_sum, C.unit_price, C.order_date, "
 				+ " C.discount, C.taste, C.taste_price, C.taste_id, C.taste2_id, C.taste3_id, D.taste_alias, D.taste2_alias, D.taste3_alias, "
 				+ " D.hang_status, C.kitchen_id, C.kitchen_alias, D.is_temporary, D.type, D.pay_datetime, D.pay_date, C.dept_id, "
@@ -82,7 +79,6 @@ public class OrderFoodReflector {
 		ArrayList<OrderFood> orderFoods = new ArrayList<OrderFood>();
 		while (dbCon.rs.next()) {
 			OrderFood food = new OrderFood();
-			food.orderID = dbCon.rs.getLong("order_id");
 			food.foodID = dbCon.rs.getInt("food_id");
 			food.name = dbCon.rs.getString("name");
 			food.aliasID = dbCon.rs.getInt("food_alias");
@@ -130,59 +126,55 @@ public class OrderFoodReflector {
 	 * @throws SQLException
 	 *             throws if fail to execute the SQL statement
 	 */
-	public static OrderFood[] getDetailHistory(DBCon dbCon, String extraCond, String orderClause) throws SQLException {
+	public static OrderFood[] getDetailHistory(DBCon dbCon, String extraCond,
+			String orderClause) throws SQLException {
 		String sql;
+		// sql = "SELECT "
+		// +
+		// "A.name, A.food_id, A.food_status, SUM(A.order_count) AS order_sum, A.unit_price, A.order_date, "
+		// +
+		// "A.discount, A.taste, A.taste_price, A.taste_id, A.taste_id2, A.taste_id3, "
+		// + "A.kitchen, A.is_temporary, B.type FROM `"
+		// + Params.dbName
+		// + "`.`order_food_history` A, "
+		// + Params.dbName
+		// + ".order_history B "
+		// + " WHERE A.order_id = B.id AND A.restaurant_id = B.restaurant_id "
+		// + (extraCond == null ? "" : extraCond)
+		// +
+		// " GROUP BY A.name, A.food_id, A.food_status, A.unit_price, A.order_date, "
+		// +
+		// " A.discount, A.taste, A.taste_price, A.taste_id, A.taste_id2, A.taste_id3, A.kitchen, A.is_temporary, B.type "
+		// + " HAVING order_sum > 0 " + orderClause;
 
-//		sql = "SELECT C.food_id, C.name, D.food_alias, C.food_status, D.order_sum, C.unit_price, C.order_date, "
-//				+ " C.discount, C.taste, C.taste_price, C.taste_id, C.taste2_id, C.taste3_id, D.taste_alias, D.taste2_alias, D.taste3_alias, "
-//				+ " D.table_id, D.table_alias, D.table_name, D.region_id, D.region_name, "
-//				+ " C.kitchen_alias, D.is_temporary, D.type, D.pay_datetime, D.pay_date, D.dept_id "
-//				+ " FROM (SELECT A.order_id, A.food_alias, A.taste_alias, A.taste2_alias, A.taste3_alias, A.is_temporary, "
-//				+ " B.type, B.table_id, B.table_alias, B.table_name, B.region_id, B.region_name, "
-//				+ " B.order_date AS pay_datetime, date_format(B.order_date, '%Y-%m-%d') AS pay_date, MAX(A.dept_id) AS dept_id, "
-//				+ " SUM(A.order_count) AS order_sum, MAX(A.id) AS id "
-//				+ " FROM "
-//				+ Params.dbName
-//				+ ".order_food_history A, "
-//				+ Params.dbName
-//				+ ".order_history B "
-//				+ " WHERE A.order_id = B.id AND A.restaurant_id = B.restaurant_id "
-//				+ " GROUP BY A.order_id, A.food_alias, A.taste_alias, A.taste2_alias, A.taste3_alias, A.is_temporary, "
-//				+ " B.type, pay_datetime, pay_date "
-//				+ " HAVING order_sum > 0 "
-//				+ " ) AS D, "
-//				+ Params.dbName
-//				+ ".order_food_history C "
-//				+ " WHERE D.id = C.id "
-//				+ (extraCond == null ? "" : extraCond)
-//				+ (orderClause == null ? "" : " " + orderClause);
-
-		sql = "SELECT C.order_id, C.food_alias, C.taste_alias, C.taste2_alias, C.taste3_alias, C.is_temporary, "
-				+ " MAX(C.kitchen_alias) AS kitchen_alias, MAX(C.kitchen_id) AS kitchen_id, " 
-				+ " MAX(C.food_id) AS food_id, MAX(C.name) AS name, MAX(C.food_status) AS food_status, " 
-				+ " MAX(C.unit_price) AS unit_price, MAX(C.order_date) AS order_date,  MAX(C.discount) AS discount, "
-				+ " MAX(C.taste) AS taste, MAX(C.taste_price) AS taste_price, "
-				+ " MAX(C.taste_id) AS taste_id, MAX(C.taste2_id) AS taste2_id, MAX(C.taste3_id) AS taste3_id, " 
-				+ " MAX(C.dept_id) AS dept_id, MAX(C.id) AS id, SUM(C.order_count) AS order_sum, "
-				+ " MAX(B.type) AS type, MAX(B.table_id) AS table_id, MAX(B.table_alias) AS table_alias, "
-				+ " MAX(B.region_id) AS region_id, MAX(B.table_name) AS table_name, MAX(B.region_name) AS region_name, "
-				+ " MAX(B.order_date) AS pay_datetime "
-				+ " FROM " 
+		sql = "SELECT C.food_id, C.name, D.food_alias, C.food_status, D.order_sum, C.unit_price, C.order_date, "
+				+ " C.discount, C.taste, C.taste_price, C.taste_id, C.taste2_id, C.taste3_id, D.taste_alias, D.taste2_alias, D.taste3_alias, "
+				+ " C.kitchen_id, C.kitchen_alias, D.is_temporary, D.type, D.pay_datetime, D.pay_date, C.dept_id, "
+ 				+ " D.table_id, D.table_alias, D.table_name, D.region_id "
+				+ " FROM (SELECT A.order_id, A.food_alias, A.taste_alias, A.taste2_alias, A.taste3_alias, A.is_temporary, "
+				+ " B.type, B.order_date AS pay_datetime, date_format(B.order_date, '%Y-%m-%d') AS pay_date, "
+ 				+ " MAX(B.table_id) AS table_id, MAX(B.table_alias) AS table_alias, MAX(B.table_name) AS table_name, MAX(B.region_id) AS region_id, "
+				+ " SUM(A.order_count) AS order_sum, MAX(A.id) AS id "
+				+ " FROM "
 				+ Params.dbName
-				+ ".order_food_history C, "
+				+ ".order_food_history A, "
 				+ Params.dbName
 				+ ".order_history B "
-				+ " WHERE C.order_id = B.id "
+				+ " WHERE A.order_id = B.id AND A.restaurant_id = B.restaurant_id "
+				+ " GROUP BY A.order_id, A.food_alias, A.taste_alias, A.taste2_alias, A.taste3_alias, A.is_temporary, "
+				+ " B.type, pay_datetime, pay_date "
+				+ " HAVING order_sum > 0 "
+				+ " ) AS D, "
+				+ Params.dbName
+				+ ".order_food_history C "
+				+ " WHERE D.id = C.id "
 				+ (extraCond == null ? "" : extraCond)
-				+ " GROUP BY C.order_id, C.food_alias, C.taste_alias, C.taste2_alias, C.taste3_alias, C.is_temporary "
-				+ " HAVING order_sum > 0 " 
 				+ (orderClause == null ? "" : " " + orderClause);
-		
+
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		ArrayList<OrderFood> orderFoods = new ArrayList<OrderFood>();
 		while (dbCon.rs.next()) {
 			OrderFood food = new OrderFood();
-			food.orderID = dbCon.rs.getLong("order_id");
 			food.foodID = dbCon.rs.getInt("food_id");
 			food.name = dbCon.rs.getString("name");
 			food.aliasID = dbCon.rs.getInt("food_alias");
@@ -214,5 +206,5 @@ public class OrderFoodReflector {
 		dbCon.rs.close();
 		return orderFoods.toArray(new OrderFood[orderFoods.size()]);
 	}
-	
+
 }
