@@ -102,7 +102,9 @@ var shiftWin = new Ext.Window(
 								url : "../../PrintOrder.do",
 								params : {
 									"pin" : currPin,
-									"printTmpShift" : 1
+									"printTmpShift" : 1,
+									"onDuty" : shiftStartTiem,
+									"offDuty" : shiftEndTiem
 								},
 								success : function(response, options) {
 									var resultJSON = Ext.util.JSON
