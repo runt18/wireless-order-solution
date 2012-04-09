@@ -2,6 +2,8 @@ package com.wireless.Actions.payment;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -53,7 +55,7 @@ public class PrintOrderAction extends Action implements PinGen{
 			 * pin=11 & tableID=101 & printSync=1 & printOrder=1 & printDetail=0 & printReceipt=0 & printShift=0
 			 * 
 			 * 3rd example, print the shift record
-			 * pin=1 & printShift=1 & onDuty=253654123 & offDuty=253169844
+			 * pin=1 & printShift=1 & onDuty=2012-4-9 8:00:00 & offDuty=2012-4-9 14:00:00
 			 * 
 			 * pin : the pin the this terminal
 			 * 
@@ -71,9 +73,9 @@ public class PrintOrderAction extends Action implements PinGen{
 			 * 
 			 * printShift : 1 means to print the shift, 0 or null means NOT
 			 * 
-			 * onDuty : the date time to be on duty which represented by milliseconds 
+			 * onDuty : the date time to be on duty
 			 * 
-			 * offDuty : the date time to be off duty which represented by milliseconds 
+			 * offDuty : the date time to be off duty
 			 * 
 			 */
 			String pin = request.getParameter("pin");
@@ -163,12 +165,12 @@ public class PrintOrderAction extends Action implements PinGen{
 			
 			long onDuty = 0;
 			if(request.getParameter("onDuty") != null){
-				onDuty = Long.parseLong(request.getParameter("onDuty"));				
+				onDuty = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(request.getParameter("onDuty")).getTime();
 			}
 			
 			long offDuty = 0;
 			if(request.getParameter("offDuty") != null){
-				offDuty = Long.parseLong(request.getParameter("offDuty"));				
+				offDuty = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(request.getParameter("offDuty")).getTime();
 			}
 						
 			ReqPackage.setGen(this);
@@ -205,6 +207,11 @@ public class PrintOrderAction extends Action implements PinGen{
 				jsonResp = jsonResp.replace("$(result)", "false");
 				jsonResp = jsonResp.replace("$(value)", orderID + "号账单打印不成功，请重新检查网络是否连通");
 			}
+			
+		}catch(ParseException e){
+			e.printStackTrace();
+			jsonResp = jsonResp.replace("$(result)", "false");
+			jsonResp = jsonResp.replace("$(value)", e.getMessage());
 			
 		}catch(BusinessException e){
 			e.printStackTrace();
