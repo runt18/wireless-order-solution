@@ -27,7 +27,6 @@ var shiftWin = new Ext.Window(
 							isPrompt = false;
 
 							// do shift
-							// alert(shiftStartTiem + " , " + shiftEndTiem);
 							Ext.Ajax
 									.request({
 										url : "../../DoShift.do",
@@ -56,7 +55,9 @@ var shiftWin = new Ext.Window(
 																				url : "../../PrintOrder.do",
 																				params : {
 																					"pin" : currPin,
-																					"printShift" : 1
+																					"printShift" : 1,
+																					"onDuty" : shiftStartTiem,
+																					"offDuty" : shiftEndTiem
 																				},
 																				success : function(
 																						response,
