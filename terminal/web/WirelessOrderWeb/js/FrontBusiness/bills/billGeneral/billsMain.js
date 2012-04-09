@@ -1243,6 +1243,9 @@ function billOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
 };
 
 // 1，表格的数据store
+// ["账单号","台号","日期","类型","结帐方式","金额","实收","台号2",
+// "就餐人数","最低消","服务费率","会员编号","会员姓名","账单备注",
+// "赠券金额","结帐类型","折扣类型","服务员",是否反結帳]
 var billsStore = new Ext.data.Store({
 	proxy : new Ext.data.MemoryProxy(billsData),
 	reader : new Ext.data.ArrayReader({}, [ {
@@ -1260,8 +1263,6 @@ var billsStore = new Ext.data.Store({
 	}, {
 		name : "acturalPrice"
 	}, {
-		name : "billOpt"
-	}, {
 		name : "tableNbr2"
 	}, {
 		name : "personCount"
@@ -1277,6 +1278,16 @@ var billsStore = new Ext.data.Store({
 		name : "comment"
 	}, {
 		name : "give"
+	}, {
+		name : "payManner"
+	}, {
+		name : "discountType"
+	}, {
+		name : "staff"
+	}, {
+		name : "isPaid"
+	}, {
+		name : "billOpt"
 	} ])
 });
 
@@ -1319,6 +1330,11 @@ var billsColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(), {
 	dataIndex : "acturalPrice",
 	width : 120
 }, {
+	header : "反结帐",
+	sortable : true,
+	dataIndex : "isPaid",
+	width : 80
+}, {
 	header : "<center>操作</center>",
 	sortable : true,
 	dataIndex : "billOpt",
@@ -1353,6 +1369,27 @@ Ext
 					}
 				}
 			});
+
+			// 为store配置load监听器(即load完后动作)
+			billsGrid.getStore().on(
+					'load',
+					function() {
+						if (billsGrid.getStore().getTotalCount() != 0) {
+							billsGrid.getStore().each(
+									function(record) {
+										// 反結帳顯示
+										record.set("isPaid",
+												norCounPayCode2Descr(record
+														.get("isPaid")));
+
+										// 提交，去掉修改標記
+										record.commit();
+									});
+
+						}
+					});
+
+			// --------------------------------------------------------------------------
 
 			var billSum = new Ext.Panel({
 				region : "south",

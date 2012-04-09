@@ -69,3 +69,17 @@ function tableCateCode2Descr(code) {
 	}
 	return descr;
 }
+
+// 是否反結帳（is_paid）code到描述轉換
+var NORMAL_PAY = 0;
+var COUNTER_PAY = 1;
+
+function norCounPayCode2Descr(code) {
+	var descr = "";
+	if (code == NORMAL_PAY) {
+		descr = "否";
+	} else if (code == COUNTER_PAY) {
+		descr = "是";
+	}
+	return descr;
+}
