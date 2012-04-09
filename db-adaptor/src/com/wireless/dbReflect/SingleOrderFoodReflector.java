@@ -81,8 +81,7 @@ public class SingleOrderFoodReflector {
 			  Params.dbName + ".kitchen C " +
 			  " WHERE " +
 			  " A.order_id = B.id " + " AND " +
-			  " A.kitchen_id = C.kitchen_id " + " AND " +
-			  " B.total_price IS NOT NULL " + 
+			  " A.kitchen_id = C.kitchen_id " + 
 			  (extraCond == null ? "" : extraCond) + " " +
 			  (orderClause == null ? "" : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);

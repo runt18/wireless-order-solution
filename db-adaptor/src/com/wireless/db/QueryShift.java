@@ -328,9 +328,16 @@ public class QueryShift {
 		
 		SingleOrderFood[] orderFoods;
 		if(isHistory){
-			orderFoods = SingleOrderFoodReflector.getDetailHistory(dbCon, "AND B.restaurant_id=" + term.restaurant_id + " AND B.order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "'", null);			
+			orderFoods = SingleOrderFoodReflector.getDetailHistory(dbCon, 
+							"AND B.restaurant_id=" + term.restaurant_id + " " + 
+							"AND B.order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "'", 
+							null);			
 		}else{
-			orderFoods = SingleOrderFoodReflector.getDetailToday(dbCon, "AND B.restaurant_id=" + term.restaurant_id + " AND B.order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "'", null);
+			orderFoods = SingleOrderFoodReflector.getDetailToday(dbCon, 
+							"AND B.total_price IS NOT NULL " + 
+							"AND B.restaurant_id=" + term.restaurant_id + " " + 
+							"AND B.order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "'", 
+							null);
 		}
 		
 	
