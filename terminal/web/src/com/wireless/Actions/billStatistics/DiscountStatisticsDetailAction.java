@@ -118,8 +118,9 @@ public class DiscountStatisticsDetailAction extends Action {
 						SingleOrderFoods[i].kitchen.kitchenID);
 				// resultMap.put("kitchenName",
 				// dbCon.rs.getString("kitchenName"));
-				resultMap.put("waiter", SingleOrderFoods[i].waiter);
-				resultMap.put("amount", SingleOrderFoods[i].calcPrice2());
+				resultMap.put("staffName", SingleOrderFoods[i].staff.name);
+				resultMap.put("amount",
+						SingleOrderFoods[i].calcPriceWithTaste());
 
 				resultMap.put("message", "normal");
 
@@ -127,7 +128,7 @@ public class DiscountStatisticsDetailAction extends Action {
 
 				allTotalAmount = (float) Math
 						.round((allTotalAmount + SingleOrderFoods[i]
-								.calcPrice2()) * 100) / 100;
+								.calcPriceWithTaste()) * 100) / 100;
 
 			}
 
