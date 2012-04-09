@@ -28,6 +28,7 @@ import com.wireless.protocol.Mode;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqParser;
+import com.wireless.protocol.ReqPrintOrder2;
 import com.wireless.protocol.Reserved;
 import com.wireless.protocol.RespACK;
 import com.wireless.protocol.RespNAK;
@@ -157,8 +158,10 @@ class OrderHandler extends Handler implements Runnable{
 				//handle insert order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.INSERT_ORDER){
 
-				Order orderToInsert = ReqParser.parseInsertOrder(request);				
-				printOrder(orderToInsert.print_type, InsertOrder.exec(_term, orderToInsert));
+				Order orderToInsert = ReqParser.parseInsertOrder(request);	
+				PrintHandler.PrintParam printParam = new PrintHandler.PrintParam();
+				printParam.orderInfo = InsertOrder.exec(_term, orderToInsert);
+				printOrder(orderToInsert.print_type, printParam);
 				response = new RespACK(request.header);
 
 				//handle update order request
@@ -166,6 +169,7 @@ class OrderHandler extends Handler implements Runnable{
 				Order orderToUpdate = ReqParser.parseInsertOrder(request);
 				UpdateOrder.Result result = UpdateOrder.exec(_term, orderToUpdate);				
 				
+				PrintHandler.PrintParam printParam = new PrintHandler.PrintParam();
 				short printConf = Reserved.DEFAULT_CONF;			
 				
 				int conf = orderToUpdate.print_type;
@@ -177,7 +181,8 @@ class OrderHandler extends Handler implements Runnable{
 				if((conf & Reserved.PRINT_ALL_HURRIED_FOOD_2) != 0){
 					printConf |= Reserved.PRINT_ALL_HURRIED_FOOD_2;
 				}
-				printOrder(printConf, result.hurriedOrder);
+				printParam.orderInfo = result.hurriedOrder;
+				printOrder(printConf, printParam);
 				
 				//print the extra food 
 				printConf = Reserved.DEFAULT_CONF;
@@ -190,7 +195,8 @@ class OrderHandler extends Handler implements Runnable{
 				if((conf & Reserved.PRINT_ALL_EXTRA_FOOD_2) != 0){
 					printConf |= Reserved.PRINT_ALL_EXTRA_FOOD_2;
 				}
-				printOrder(printConf, result.extraOrder);
+				printParam.orderInfo = result.extraOrder;
+				printOrder(printConf, printParam);
 				
 				//print canceled food
 				printConf = Reserved.DEFAULT_CONF;
@@ -203,7 +209,8 @@ class OrderHandler extends Handler implements Runnable{
 				if((conf & Reserved.PRINT_ALL_CANCELLED_FOOD_2) != 0){
 					printConf |= Reserved.PRINT_ALL_CANCELLED_FOOD_2;
 				}
-				printOrder(printConf, result.canceledOrder);
+				printParam.orderInfo = result.canceledOrder;
+				printOrder(printConf, printParam);
 				
 				//print the table transfer
 				printConf = Reserved.DEFAULT_CONF;
@@ -213,7 +220,8 @@ class OrderHandler extends Handler implements Runnable{
 				if((conf & Reserved.PRINT_TRANSFER_TABLE_2) != 0){
 					printConf |= Reserved.PRINT_TRANSFER_TABLE_2;
 				}
-				printOrder(printConf, orderToUpdate);
+				printParam.orderInfo = orderToUpdate;
+				printOrder(printConf, printParam);
 				
 				response = new RespACK(request.header);
 
@@ -226,44 +234,47 @@ class OrderHandler extends Handler implements Runnable{
 				//handle the pay order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.PAY_ORDER){
 				Order orderToPay = ReqParser.parsePayOrder(request);
-				//orderToPay.restaurant_id = _term.restaurant_id;
 				/**
 				 * If pay order temporary, just only print the temporary receipt.
 				 * Otherwise perform the pay action and print receipt 
 				 */
+				PrintHandler.PrintParam printParam = new PrintHandler.PrintParam();
 				int printConf = orderToPay.print_type;
 				if((printConf & Reserved.PRINT_TEMP_RECEIPT_2) != 0){
-					printOrder(printConf, PayOrder.queryOrder(_term, orderToPay));
+					printParam.orderInfo = PayOrder.queryOrder(_term, orderToPay);
+					printOrder(printConf, printParam);
 				}else{
-					printOrder(printConf, PayOrder.exec(_term, orderToPay, false));
+					printParam.orderInfo = PayOrder.exec(_term, orderToPay, false);
+					printOrder(printConf, printParam);
 				}
 				response = new RespACK(request.header);
 
 				//handle the print request
 			}else if(request.header.mode == Mode.PRINT && request.header.type == Type.PRINT_BILL_2){
 				
-				Order reqToPrint = ReqParser.parsePrintReq(request);
+				ReqPrintOrder2.ReqParam reqParam = ReqParser.parsePrintReq(request);
 				
-				int printConf = reqToPrint.print_type;
+				int printConf = reqParam.printConf;
 
-				Order orderToPrint;
+				PrintHandler.PrintParam printParam = new PrintHandler.PrintParam();
 				/**
 				 * If print shift receipt, NOT need to query the order.
 				 */
 				if((printConf & (Reserved.PRINT_SHIFT_RECEIPT_2 | Reserved.PRINT_TEMP_SHIFT_RECEIPT_2)) == 0){
-					orderToPrint = QueryOrder.execByID(reqToPrint.id);
+					printParam.orderInfo = QueryOrder.execByID(reqParam.orderID);
 				}else{				
-					orderToPrint = new Order();
+					printParam.onDuty = reqParam.onDuty;
+					printParam.offDuty = reqParam.offDuty;
 				}
 				/**
 				 * If print table transfer, need to assign the original and new table id to order.
 				 */
 				if((printConf & Reserved.PRINT_TRANSFER_TABLE_2) != 0){
-					orderToPrint.table = reqToPrint.table;
-					orderToPrint.oriTbl = reqToPrint.oriTbl;
+					printParam.orderInfo.table.aliasID = reqParam.newTblID;
+					printParam.orderInfo.oriTbl.aliasID = reqParam.oriTblID;
 				}
 				
-				printOrder(printConf, orderToPrint);
+				printOrder(printConf, printParam);
 				response = new RespACK(request.header);
 				
 				//handle the ping test request
@@ -356,8 +367,8 @@ class OrderHandler extends Handler implements Runnable{
 	 *             throws if any logic exception occurred while performing print
 	 *             action
 	 */
-	private void printOrder(int printConf, Order orderToPrint) throws PrintLogicException{
-		if(orderToPrint != null){
+	private void printOrder(int printConf, PrintHandler.PrintParam param) throws PrintLogicException{
+		if(param != null){
 			//find the printer connection socket to the restaurant for this terminal
 			ArrayList<Socket> printerConn = WirelessSocketServer.printerConnections.get(new Integer(_term.restaurant_id));
 			Socket[] connections = null;
@@ -366,15 +377,17 @@ class OrderHandler extends Handler implements Runnable{
 			}else{
 				connections = new Socket[0];
 			}
+			
 			/**
 			 * Get the corresponding restaurant information
 			 */
-			Restaurant restaurant = null;
 			try{
-				restaurant = QueryRestaurant.exec(_term);
+				param.restaurant = QueryRestaurant.exec(_term);
 			}catch(Exception e){
-				restaurant = new Restaurant();
+				param.restaurant = new Restaurant();
 			}
+			
+			param.term = _term;
 			
 			//check whether the print request is synchronized or asynchronous
 			if((printConf & Reserved.PRINT_SYNC) != 0){
@@ -383,7 +396,7 @@ class OrderHandler extends Handler implements Runnable{
 				 * the print request is done, and send the ACK or NAK to let the terminal know whether 
 				 * the print actions is successfully or not
 				 */	
-				new PrintHandler(orderToPrint, connections, printConf, restaurant, _term).run();						
+				new PrintHandler(connections, printConf, param).run();						
 				
 			}else{
 				/**
@@ -391,7 +404,7 @@ class OrderHandler extends Handler implements Runnable{
 				 * regardless of the print request. In the mean time, the print request would be put to a 
 				 * new thread to run.
 				 */	
-				WirelessSocketServer.threadPool.execute(new PrintHandler(orderToPrint, connections, printConf, restaurant, _term));
+				WirelessSocketServer.threadPool.execute(new PrintHandler(connections, printConf, param));
 			}
 		}
 	}
