@@ -1,6 +1,8 @@
 package com.wireless.pad;
 
 import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,7 +13,11 @@ import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -20,8 +26,14 @@ import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Gravity;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup.LayoutParams;
@@ -34,17 +46,26 @@ import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 import com.wireless.adapter.TableAdapter;
+import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
+import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.PinGen;
 import com.wireless.protocol.ProtocolPackage;
+import com.wireless.protocol.ReqPackage;
+import com.wireless.protocol.ReqQueryMenu;
+import com.wireless.protocol.ReqQueryRestaurant;
 import com.wireless.protocol.ReqQueryTable;
 import com.wireless.protocol.RespParser;
+import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Table;
+import com.wireless.protocol.Terminal;
 import com.wireless.protocol.Type;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.view.MarqueeText;
@@ -75,6 +96,37 @@ public class MainActivity extends Activity implements OnClickListener,
 				_serchTable.setBackgroundResource(R.drawable.av_r19_c17);
 				UpdatePagePoint();
 				break;
+			case REDRAW_FOOD_MENU:
+				if (WirelessOrder.foodMenu == null) {
+					((TextView) findViewById(R.id.username_txt)).setText("");
+					((TextView) findViewById(R.id.notice)).setText("");
+				}
+				break;
+
+			case REDRAW_RESTAURANT:
+				if (WirelessOrder.restaurant != null) {
+					TextView billBoard = (TextView) findViewById(R.id.notice);
+					if (WirelessOrder.restaurant.info != null) {
+						billBoard.setText(WirelessOrder.restaurant.info
+								.replaceAll("\n", ""));
+					} else {
+						billBoard.setText("");
+					}
+
+					TextView userName = (TextView) findViewById(R.id.username_value);
+					if (_staff != null) {
+						if (_staff.name != null) {
+							userName.setText(WirelessOrder.restaurant.name
+									+ "(" + _staff.name + ")");
+						} else {
+							userName.setText(WirelessOrder.restaurant.name);
+						}
+					} else {
+						userName.setText(WirelessOrder.restaurant.name);
+					}
+				}
+				break;
+
 			}
 		}
 	}
@@ -83,6 +135,12 @@ public class MainActivity extends Activity implements OnClickListener,
 	private final static short LOADDIALOG = 0x000b;
 	private final static short BUSYTABLE = 0x000c;
 	private final static short IDLETABLE = 0x000d;
+	private static final int REDRAW_FOOD_MENU = 0x000f;
+
+	private StaffTerminal _staff;
+
+	private static final int DIALOG_STAFF_LOGIN = 4;
+	private static final int REDRAW_RESTAURANT = 2;
 
 	private EditText _inputTableId; // 输入餐台号框
 
@@ -91,6 +149,8 @@ public class MainActivity extends Activity implements OnClickListener,
 	private Button _refurbishBtn; // 刷新按钮
 	private Button _bottomFirstBtn; // 底部第一个按钮( 全部，取消)
 	private Button _clearTablenum; // 清楚搜索餐台号内容按钮
+	
+	private Button _allRefresh ;	//全局刷新
 
 	private TextView _usernameTv; // 当前用户名
 	private TextView _tablecountSum; // 餐台数（总数）
@@ -125,7 +185,6 @@ public class MainActivity extends Activity implements OnClickListener,
 
 	// 筛选 记录变量
 	private short _regionConfine = -1; // 区域限制
-	private String _tableNumConfine = ""; // 餐台号限制
 	private byte _tableStatusConfine = -1; // 餐台状态限制
 
 	// 底部状态标记 true区域 false数字
@@ -135,11 +194,10 @@ public class MainActivity extends Activity implements OnClickListener,
 	private MyHandler myhandler = new MyHandler();
 
 	private void init() {
-		// 打印信息
-		// for(Table t : WirelessOrder.tables){
-		// System.out.println(t.name + "fdfsds");
-		// System.out.println(t.aliasID + "fdfsds");
-		// }
+		_allRefresh = (Button)findViewById(R.id.reAll_btn);
+		_allRefresh.setOnClickListener(this);
+		_logoutBtn = (Button)findViewById(R.id.logon_btn);
+		_logoutBtn.setOnClickListener(this);
 		_notice = (MarqueeText) findViewById(R.id.notice);
 		_refurbishBtn = (Button) findViewById(R.id.refurbish_btn);
 		_refurbishBtn.setOnClickListener(this);
@@ -160,21 +218,17 @@ public class MainActivity extends Activity implements OnClickListener,
 				if (_serchTable != null)
 					_serchTable
 							.setBackgroundResource(R.drawable.griditem_bg_selector);
-				short id = 0;
+				int id = 0;
 				try {
-					id = Short.parseShort(s.toString().trim());
+					id = Integer.parseInt(s.toString().trim());
 				} catch (Exception e) {
 					return;
 				}
-				Table[] serachTable;
-				if (_regionConfine != -1 || _tableStatusConfine != -1) {
-					serachTable = _tempResultTables;
-				} else {
-					serachTable = WirelessOrder.tables;
-				}
+				if (_tempResultTables == null)
+					_tempResultTables = WirelessOrder.tables;
 				int index = -1;
-				for (int i = 0; i < serachTable.length; i++) {
-					if (serachTable[i].aliasID == id) {
+				for (int i = 0; i < _tempResultTables.length; i++) {
+					if (_tempResultTables[i].aliasID == id) {
 						index = i;
 						break;
 					}
@@ -252,6 +306,80 @@ public class MainActivity extends Activity implements OnClickListener,
 		loadRegions();
 		// 加载餐台状态统计信息
 		loadTableStatus();
+
+		// 弹出登陆对话框(登陆操作)
+		// if (false) {
+		if (WirelessOrder.staffs != null) {
+			SharedPreferences sharedPreferences = getSharedPreferences(
+					Params.PREFS_NAME, Context.MODE_PRIVATE);
+			long pin = sharedPreferences.getLong(Params.STAFF_PIN,
+					Params.DEF_STAFF_PIN);
+			if (pin == Params.DEF_STAFF_PIN) {
+				/**
+				 * Show the login dialog if logout before.
+				 */
+				showDialog(DIALOG_STAFF_LOGIN);
+			} else {
+				/**
+				 * Directly login with the previous staff account if user does
+				 * NOT logout before. Otherwise show the login dialog.
+				 */
+				_staff = null;
+				for (int i = 0; i < WirelessOrder.staffs.length; i++) {
+					if (WirelessOrder.staffs[i].pin == pin) {
+						_staff = WirelessOrder.staffs[i];
+					}
+				}
+				if (_staff != null) {
+					ReqPackage.setGen(new PinGen() {
+						@Override
+						public long getDeviceId() {
+							return _staff.pin;
+						}
+
+						@Override
+						public short getDeviceType() {
+							return Terminal.MODEL_STAFF;
+						}
+					});
+				} else {
+					showDialog(DIALOG_STAFF_LOGIN);
+				}
+			}
+
+			myhandler.sendEmptyMessage(REDRAW_RESTAURANT);
+		}
+
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// TODO Auto-generated method stub
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.layout.main_menu, menu);// 指定使用的XML
+		return true;
+
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// TODO Auto-generated method stub
+		int item_id = item.getItemId();
+		switch (item_id) {
+		// 点击跳转设置页面
+		case R.id.menu_set:
+			Intent intent = new Intent(this, WebSettingActivity.class);
+			startActivity(intent);
+			// finish();
+			break;
+		// 点击菜谱更新项
+		case R.id.menu_update:
+			new QueryMenuTask().execute();
+			break;
+
+		}
+		return true;
+
 	}
 
 	/*
@@ -346,6 +474,16 @@ public class MainActivity extends Activity implements OnClickListener,
 	public void onClick(View v) {
 		int viewID = v.getId();
 		switch (viewID) {
+		
+		case R.id.reAll_btn:
+			_regionConfine = -1;
+			_tableStatusConfine = -1;
+			_inputTableId.setText("");
+			_regionsInfo.setText("全部区域");
+			_tableStatus.setText("(全部)");
+			_tempResultTables = WirelessOrder.tables;
+			myhandler.sendEmptyMessage(0);
+			break;
 		case R.id.showPopWindow:
 			if (_popWindow == null) {
 				if (_popView == null) {
@@ -359,6 +497,9 @@ public class MainActivity extends Activity implements OnClickListener,
 					((Button) _popView.findViewById(R.id.statusBusy))
 							.setOnClickListener(this);
 				}
+				// _popWindow = new PopupWindow(_popView,
+				// LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT,
+				// true);
 				_popWindow = new PopupWindow(_popView,
 						LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT,
 						true);
@@ -379,10 +520,9 @@ public class MainActivity extends Activity implements OnClickListener,
 					_regionConfine = -1;
 					_regionsInfo.setText("全部区域");
 					_tempResultTables = WirelessOrder.tables;
-					selectorRegion();
+					selectorTable();
 				}
 			} else {
-				// _inputTableId.clearFocus();
 				_inputTableId.setFocusable(false);
 				myhandler.sendEmptyMessage(9);
 			}
@@ -393,7 +533,7 @@ public class MainActivity extends Activity implements OnClickListener,
 				_tableStatusConfine = -1;
 				_tableStatus.setText("(全部)");
 				_popWindow.dismiss();
-				selectorStatus();
+				selectorTable();
 			}
 
 			break;
@@ -402,7 +542,7 @@ public class MainActivity extends Activity implements OnClickListener,
 				_tableStatusConfine = Table.TABLE_BUSY;
 				_tableStatus.setText("(就餐)");
 				_popWindow.dismiss();
-				selectorStatus();
+				selectorTable();
 			}
 			break;
 		case R.id.statusNobody:
@@ -410,7 +550,7 @@ public class MainActivity extends Activity implements OnClickListener,
 				_tableStatusConfine = Table.TABLE_IDLE;
 				_tableStatus.setText("(空闲)");
 				_popWindow.dismiss();
-				selectorStatus();
+				selectorTable();
 			}
 			break;
 		case R.id.inputtableNumarea:
@@ -427,6 +567,9 @@ public class MainActivity extends Activity implements OnClickListener,
 		case R.id.refurbish_btn:
 			showDialog(LOADDIALOG);
 			new QueryTableTask().execute();
+			break;
+		case R.id.logon_btn:
+			showDialog(DIALOG_STAFF_LOGIN);
 			break;
 		}
 	}
@@ -498,7 +641,6 @@ public class MainActivity extends Activity implements OnClickListener,
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 			long id) {
 		if (_touchFlag) {
-			Toast.makeText(this, "点击啦", 100).show();
 			Table[] t;
 			if (_regionConfine != -1 || _tableStatusConfine != -1) {
 				t = _tempResultTables;
@@ -534,7 +676,7 @@ public class MainActivity extends Activity implements OnClickListener,
 				if (clickRegion != _regionConfine) {
 					_regionsInfo.setText(((Button) v).getText().toString());
 					_regionConfine = clickRegion;
-					selectorRegion();
+					selectorTable();
 				}
 			} else {
 				// 底部显示数字按钮
@@ -548,63 +690,87 @@ public class MainActivity extends Activity implements OnClickListener,
 	/**
 	 * 筛选符合条件的餐台显示
 	 */
-	private void selectorRegion() {
-		_tempResultTables = null;
-		List<Table> tmpTables = new ArrayList<Table>();
-		for (int i = 0; i < WirelessOrder.tables.length; i++) {
-			if (WirelessOrder.tables[i].regionID == _regionConfine) {
-				tmpTables.add(WirelessOrder.tables[i]);
-			}
-		}
-		_tempResultTables = new Table[tmpTables.size()];
-		tmpTables.toArray(_tempResultTables);
-		selectorStatus();
-	}
+	// private void selectorRegion() {
+	// _tempResultTables = null;
+	// List<Table> tmpTables = new ArrayList<Table>();
+	// for (int i = 0; i < WirelessOrder.tables.length; i++) {
+	// if (WirelessOrder.tables[i].regionID == _regionConfine) {
+	// tmpTables.add(WirelessOrder.tables[i]);
+	// }
+	// }
+	// _tempResultTables = new Table[tmpTables.size()];
+	// tmpTables.toArray(_tempResultTables);
+	// selectorStatus();
+	// }
 
 	/**
 	 * 筛选餐台的状态
 	 */
-	private void selectorStatus() {
-		Table[] st;
-		if (_regionConfine != -1) {
-			// 已进行区域筛选
-			st = _tempResultTables;
-		} else {
-			// 未进行区域筛选
-			st = WirelessOrder.tables;
-		}
-		if (_tableStatusConfine == -1) {
-			Message msg = new Message();
-			msg.what = 3;
-			msg.obj = st;
-			myhandler.sendMessage(msg);
-		} else if (_tableStatusConfine == Table.TABLE_BUSY) {
-			List<Table> lt = new ArrayList<Table>();
-			for (int i = 0; i < st.length; i++) {
-				if (st[i].status == Table.TABLE_BUSY) {
-					lt.add(st[i]);
-				}
+	// private void selectorStatus() {
+	// Table[] st;
+	// if (_regionConfine != -1) {
+	// // 已进行区域筛选
+	// st = _tempResultTables;
+	// } else {
+	// // 未进行区域筛选
+	// st = WirelessOrder.tables;
+	// }
+	// if (_tableStatusConfine == -1) {
+	// Message msg = new Message();
+	// msg.what = 3;
+	// msg.obj = st;
+	// myhandler.sendMessage(msg);
+	// } else if (_tableStatusConfine == Table.TABLE_BUSY) {
+	// List<Table> lt = new ArrayList<Table>();
+	// for (int i = 0; i < st.length; i++) {
+	// if (st[i].status == Table.TABLE_BUSY) {
+	// lt.add(st[i]);
+	// }
+	// }
+	// st = new Table[lt.size()];
+	// lt.toArray(st);
+	// Message msg = new Message();
+	// msg.what = 3;
+	// msg.obj = st;
+	// myhandler.sendMessage(msg);
+	// } else if (_tableStatusConfine == Table.TABLE_IDLE) {
+	// List<Table> lt = new ArrayList<Table>();
+	// for (int i = 0; i < st.length; i++) {
+	// if (st[i].status == Table.TABLE_IDLE) {
+	// lt.add(st[i]);
+	// }
+	// }
+	// st = new Table[lt.size()];
+	// lt.toArray(st);
+	// Message msg = new Message();
+	// msg.what = 3;
+	// msg.obj = st;
+	// myhandler.sendMessage(msg);
+	// }
+	// }
+
+	/**
+	 * 统一筛选的方法（筛选状态，区域）
+	 */
+	private void selectorTable() {
+		_tempResultTables = null;
+		List<Table> tmpTables = new ArrayList<Table>();
+		for (int i = 0; i < WirelessOrder.tables.length; i++) {
+			// 核对 区域条件
+			if (!(WirelessOrder.tables[i].regionID == _regionConfine || _regionConfine == -1)) {
+				continue;
 			}
-			st = new Table[lt.size()];
-			lt.toArray(st);
-			Message msg = new Message();
-			msg.what = 3;
-			msg.obj = st;
-			myhandler.sendMessage(msg);
-		} else if (_tableStatusConfine == Table.TABLE_IDLE) {
-			List<Table> lt = new ArrayList<Table>();
-			for (int i = 0; i < st.length; i++) {
-				if (st[i].status == Table.TABLE_IDLE) {
-					lt.add(st[i]);
-				}
+			// 核对状态条件
+			if (!(WirelessOrder.tables[i].status == _tableStatusConfine || _tableStatusConfine == -1)) {
+				continue;
 			}
-			st = new Table[lt.size()];
-			lt.toArray(st);
-			Message msg = new Message();
-			msg.what = 3;
-			msg.obj = st;
-			myhandler.sendMessage(msg);
+			tmpTables.add(WirelessOrder.tables[i]);
 		}
+		_tempResultTables = new Table[tmpTables.size()];
+		tmpTables.toArray(_tempResultTables);
+		Message msg = new Message();
+		msg.what = 0;
+		myhandler.sendMessage(msg);
 	}
 
 	/**
@@ -654,7 +820,7 @@ public class MainActivity extends Activity implements OnClickListener,
 		case LOADDIALOG:
 			ProgressDialog pd;
 			pd = new ProgressDialog(this);
-			pd.setMessage("正在加载...请稍候.");
+			pd.setMessage("正在加载...请稍后.");
 			return pd;
 		case BUSYTABLE:
 			AlertDialog.Builder b = new AlertDialog.Builder(this);
@@ -670,6 +836,9 @@ public class MainActivity extends Activity implements OnClickListener,
 			b2.setNegativeButton("返回", null);
 			b2.show();
 			break;
+
+		case DIALOG_STAFF_LOGIN:
+			return new AskLoginDialog();
 		}
 		return super.onCreateDialog(id);
 	}
@@ -684,6 +853,7 @@ public class MainActivity extends Activity implements OnClickListener,
 			super.onPreExecute();
 			showDialog(LOADDIALOG);
 		}
+
 		@Override
 		protected String doInBackground(String... params) {
 			String errMsg = null;
@@ -713,6 +883,8 @@ public class MainActivity extends Activity implements OnClickListener,
 	 * 显示上一页
 	 */
 	private void showPreviousPage() {
+		_viewFlipper.setOutAnimation(this, R.anim.ad_previous_out);
+		_viewFlipper.setInAnimation(this, R.anim.ad_previous_in);
 		_viewFlipper.showPrevious();
 	}
 
@@ -720,7 +892,347 @@ public class MainActivity extends Activity implements OnClickListener,
 	 * 显示下一页
 	 */
 	private void showNextPage() {
+		_viewFlipper.setOutAnimation(this, R.anim.ad_next_out);
+		_viewFlipper.setInAnimation(this, R.anim.ad_next_in);
 		_viewFlipper.showNext();
 	}
 
+	// 登录框Dialog
+	public class AskLoginDialog extends Dialog {
+
+		private PopupWindow _popupWindow;
+		private BaseAdapter _staffAdapter;
+
+		AskLoginDialog() {
+			super(MainActivity.this, 0);
+			setContentView(R.layout.login_dialog);
+			getWindow().getAttributes().width = (int) (getWindow()
+					.getWindowManager().getDefaultDisplay().getWidth() * 0.55);
+			getWindow().getAttributes().height = (int) (getWindow()
+					.getWindowManager().getDefaultDisplay().getHeight() * 0.35);
+			setTitle("请输入账号与密码");
+			final EditText pwdEdtTxt = (EditText) findViewById(R.id.pwd);
+			final EditText staffTxtView = (EditText) findViewById(R.id.staffname);
+
+			/**
+			 * 帐号输入框显示员工列表
+			 */
+			staffTxtView.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					if (_popupWindow.isShowing()) {
+						_popupWindow.dismiss();
+					} else {
+						_popupWindow.showAsDropDown(
+								findViewById(R.id.staffname), 0, 15);
+					}
+				}
+			});
+
+			// 获取自定义布局文件的视图
+			View popupWndView = getLayoutInflater().inflate(
+					R.layout.loginpopuwindow, null, false);
+			// 创建PopupWindow实例
+			_popupWindow = new PopupWindow(popupWndView, 380, 200, true);
+			_popupWindow.setOutsideTouchable(true);
+			_popupWindow.setBackgroundDrawable(new BitmapDrawable());
+
+			ListView staffLstView = (ListView) popupWndView
+					.findViewById(R.id.loginpopuwindow);
+			_staffAdapter = new StaffsAdapter();
+			staffLstView.setAdapter(_staffAdapter);
+
+			/**
+			 * 从下拉列表框中选择员工信息的操作
+			 */
+			staffLstView.setOnItemClickListener(new OnItemClickListener() {
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view,
+						int position, long id) {
+					_staff = WirelessOrder.staffs[position];
+					staffTxtView.setText(_staff.name);
+					_popupWindow.dismiss();
+				}
+			});
+
+			/**
+			 * 登录Button的点击操作
+			 */
+			((Button) findViewById(R.id.login))
+					.setOnClickListener(new View.OnClickListener() {
+
+						@Override
+						public void onClick(View v) {
+
+							TextView errTxtView = (TextView) findViewById(R.id.error);
+
+							try {
+								// Convert the password into MD5
+								MessageDigest digester = MessageDigest
+										.getInstance("MD5");
+								digester.update(pwdEdtTxt.getText().toString()
+										.getBytes(), 0, pwdEdtTxt.getText()
+										.toString().getBytes().length);
+
+								if (staffTxtView.getText().toString()
+										.equals("")) {
+									errTxtView.setText("账号不能为空");
+
+								} else if (_staff.pwd
+										.equals(toHexString(digester.digest()))) {
+									// 保存staff pin到文件里面
+									Editor editor = getSharedPreferences(
+											Params.PREFS_NAME,
+											Context.MODE_PRIVATE).edit();// 获取编辑器
+									editor.putLong(Params.STAFF_PIN, _staff.pin);
+									// 提交修改
+									editor.commit();
+									myhandler
+											.sendEmptyMessage(REDRAW_RESTAURANT);
+									// set the pin generator according to the
+									// staff login
+									ReqPackage.setGen(new PinGen() {
+										@Override
+										public long getDeviceId() {
+											return _staff.pin;
+										}
+
+										@Override
+										public short getDeviceType() {
+											return Terminal.MODEL_STAFF;
+										}
+
+									});
+									dismiss();
+
+								} else {
+									errTxtView.setText("密码错误");
+								}
+
+							} catch (NoSuchAlgorithmException e) {
+								errTxtView.setText(e.getMessage());
+								;
+							}
+						}
+					});
+
+		}
+
+		@Override
+		public void onAttachedToWindow() {
+			((TextView) findViewById(R.id.error)).setText("");
+			((EditText) findViewById(R.id.pwd)).setText("");
+			((TextView) findViewById(R.id.staffname)).setText("");
+			if (_staffAdapter != null) {
+				_staffAdapter.notifyDataSetChanged();
+			}
+		}
+
+		/**
+		 * Convert the md5 byte to hex string.
+		 * 
+		 * @param md5Msg
+		 *            the md5 byte value
+		 * @return the hex string to this md5 byte value
+		 */
+		private String toHexString(byte[] md5Msg) {
+			StringBuffer hexString = new StringBuffer();
+			for (int i = 0; i < md5Msg.length; i++) {
+				if (md5Msg[i] >= 0x00 && md5Msg[i] < 0x10) {
+					hexString.append("0").append(
+							Integer.toHexString(0xFF & md5Msg[i]));
+				} else {
+					hexString.append(Integer.toHexString(0xFF & md5Msg[i]));
+				}
+			}
+			return hexString.toString();
+		}
+
+		@Override
+		public boolean onKeyDown(int keyCode, KeyEvent event) {
+			if (keyCode == KeyEvent.KEYCODE_BACK) {
+				finish();
+			}
+			return super.onKeyDown(keyCode, event);
+		}
+
+		/**
+		 * 员工信息下拉框的Adapter
+		 */
+		private class StaffsAdapter extends BaseAdapter {
+
+			public StaffsAdapter() {
+
+			}
+
+			@Override
+			public int getCount() {
+				return WirelessOrder.staffs.length;
+			}
+
+			@Override
+			public Object getItem(int position) {
+				return null;
+			}
+
+			@Override
+			public long getItemId(int position) {
+				return 0;
+			}
+
+			@Override
+			public View getView(int position, View convertView, ViewGroup parent) {
+				if (convertView == null) {
+					convertView = LayoutInflater.from(MainActivity.this)
+							.inflate(R.layout.orderpopuwindowitem, null);
+					((TextView) convertView
+							.findViewById(R.id.popuwindowfoodname))
+							.setText(WirelessOrder.staffs[position].name);
+				} else {
+					((TextView) convertView
+							.findViewById(R.id.popuwindowfoodname))
+							.setText(WirelessOrder.staffs[position].name);
+				}
+				return convertView;
+			}
+
+		}
+	}
+
+	/**
+	 * 请求菜谱信息
+	 */
+	private class QueryMenuTask extends AsyncTask<Void, Void, String> {
+
+		private ProgressDialog _progDialog;
+
+		/**
+		 * 执行菜谱请求操作前显示提示信息
+		 */
+		@Override
+		protected void onPreExecute() {
+			_progDialog = ProgressDialog.show(MainActivity.this, "",
+					"正在下载菜谱...请稍候", true);
+		}
+
+		/**
+		 * 在新的线程中执行请求菜谱信息的操作
+		 */
+		@Override
+		protected String doInBackground(Void... arg0) {
+			String errMsg = null;
+			try {
+				WirelessOrder.foodMenu = null;
+				ProtocolPackage resp = ServerConnector.instance().ask(
+						new ReqQueryMenu());
+				if (resp.header.type == Type.ACK) {
+					WirelessOrder.foodMenu = RespParser.parseQueryMenu(resp);
+				} else {
+					if (resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
+						errMsg = "终端没有登记到餐厅，请联系管理人员。";
+					} else if (resp.header.reserved == ErrorCode.TERMINAL_EXPIRED) {
+						errMsg = "终端已过期，请联系管理人员。";
+					} else {
+						errMsg = "菜谱下载失败，请检查网络信号或重新连接。";
+					}
+				}
+			} catch (IOException e) {
+				errMsg = e.getMessage();
+			}
+			return errMsg;
+		}
+
+		/**
+		 * 根据返回的error message判断，如果发错异常则提示用户， 如果菜谱请求成功，则继续进行请求餐厅信息的操作。
+		 */
+		@Override
+		protected void onPostExecute(String errMsg) {
+			// make the progress dialog disappeared
+			_progDialog.dismiss();
+			// notify the main activity to redraw the food menu
+			myhandler.sendEmptyMessage(REDRAW_FOOD_MENU);
+			/**
+			 * Prompt user message if any error occurred, otherwise continue to
+			 * query restaurant info.
+			 */
+			if (errMsg != null) {
+				new AlertDialog.Builder(MainActivity.this)
+						.setTitle("提示")
+						.setMessage(errMsg)
+						.setPositiveButton("确定",
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog,
+											int id) {
+										dialog.dismiss();
+									}
+								}).show();
+			} else {
+				new QueryRestaurantTask().execute();
+			}
+		}
+	}
+
+	/**
+	 * 请求查询餐厅信息
+	 */
+	private class QueryRestaurantTask extends AsyncTask<Void, Void, String> {
+
+		private ProgressDialog _progDialog;
+
+		/**
+		 * 在执行请求餐厅请求信息前显示提示信息
+		 */
+		@Override
+		protected void onPreExecute() {
+			_progDialog = ProgressDialog.show(MainActivity.this, "",
+					"更新菜谱信息...请稍候", true);
+		}
+
+		/**
+		 * 在新的线程中执行请求餐厅信息的操作
+		 */
+		@Override
+		protected String doInBackground(Void... arg0) {
+			String errMsg = null;
+			try {
+				ProtocolPackage resp = ServerConnector.instance().ask(
+						new ReqQueryRestaurant());
+				if (resp.header.type == Type.ACK) {
+					WirelessOrder.restaurant = RespParser
+							.parseQueryRestaurant(resp);
+				}
+			} catch (IOException e) {
+				errMsg = e.getMessage();
+			}
+			return errMsg;
+		}
+
+		/**
+		 * 根据返回的error message判断，如果发错异常则提示用户， 如果成功，则通知Handler更新界面的相关控件。
+		 */
+		@Override
+		protected void onPostExecute(String errMsg) {
+			// make the progress dialog disappeared
+			_progDialog.dismiss();
+			// notify the main activity to update the food menu
+			myhandler.sendEmptyMessage(REDRAW_RESTAURANT);
+			/**
+			 * Prompt user message if any error occurred.
+			 */
+			if (errMsg != null) {
+				new AlertDialog.Builder(MainActivity.this)
+						.setTitle("提示")
+						.setMessage(errMsg)
+						.setPositiveButton("确定",
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog,
+											int id) {
+										dialog.dismiss();
+									}
+								}).show();
+			} else {
+				Toast.makeText(MainActivity.this, "菜谱更新成功", 1).show();
+			}
+		}
+	}
 }

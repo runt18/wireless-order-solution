@@ -492,7 +492,7 @@ public class StartupActivity extends Activity {
 				}).show();
 				
 			}else{				
-				Intent intent = new Intent(StartupActivity.this,OrderActivity.class);
+				Intent intent = new Intent(StartupActivity.this,MainActivity.class);
 				startActivity(intent);
 				overridePendingTransition(android.R.anim.fade_in,android.R.anim.fade_out);    
 				finish();

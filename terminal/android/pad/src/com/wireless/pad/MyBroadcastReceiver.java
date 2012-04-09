@@ -62,8 +62,7 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
     	  FoodParcel foodParcel = intent.getParcelableExtra(FoodParcel.KEY_VALUE);
     	  PickTasteActivity.onResume(foodParcel);
       }
-      
-      
+         
       
     
 	}

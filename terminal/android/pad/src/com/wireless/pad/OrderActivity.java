@@ -18,6 +18,7 @@ import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqQueryMenu;
 import com.wireless.protocol.RespParser;
+import com.wireless.protocol.Table;
 import com.wireless.protocol.Type;
 import com.wireless.protocol.Util;
 import com.wireless.sccon.ServerConnector;
@@ -63,7 +64,15 @@ public class OrderActivity extends ActivityGroup implements OrderFoodListView.On
 	private Button back_btn;//返回按钮
 	private Button reflash_btn;//刷新菜品信息
 	
+	private Button confirm;//确认
+	private Button cancle;//取消
 	
+	private Table table;
+	
+	private EditText tblNoEdtTxt;//餐台号
+	private EditText customerNumEdtTxt;//人数
+	
+	public static final String TABLE = "table";
 	
 	/**
 	 * 请求菜谱和餐厅信息后，更新到相关的界面控件
@@ -82,6 +91,9 @@ public class OrderActivity extends ActivityGroup implements OrderFoodListView.On
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.order);
+		
+		table = getIntent().getParcelableExtra(TABLE);
+		
 		init();
 		
 	}
@@ -117,6 +129,46 @@ public class OrderActivity extends ActivityGroup implements OrderFoodListView.On
 			}
 		});
 		
+		confirm = (Button)findViewById(R.id.confirm);
+		//确认按钮的点击事件
+		confirm.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
+		cancle = (Button)findViewById(R.id.cancle);
+		//取消按钮的点击事件
+		cancle.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
+		
+		tblNoEdtTxt = (EditText)findViewById(R.id.tblNoEdtTxt);
+		customerNumEdtTxt = (EditText)findViewById(R.id.customerNumEdtTxt);
+		
+		//台号进行赋值
+		//tblNoEdtTxt.setText(table.aliasID);
+		//人数进行赋值
+		//customerNumEdtTxt.setText(table.custom_num);
+		
+//		/**
+//		 * 判断餐台状态，并且进行对列表赋类型，是改单还是下单
+//		 * */
+//		if(table.status == 0){
+//			_newFoodLstView.setType(Type.INSERT_ORDER);
+//		}else{
+//			_newFoodLstView.setType(Type.UPDATE_ORDER);
+//			//执行异步请求该餐台的信息
+//		}
 		_newFoodLstView.setType(Type.INSERT_ORDER);
 		_newFoodLstView.setOperListener(OrderActivity.this);
 		//滚动的时候隐藏输入法

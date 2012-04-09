@@ -59,6 +59,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 			intent.putExtras(bundle);
 			//发送广播
 		    sendBroadcast(intent);
+		
 		}
 	};
 	
@@ -148,12 +149,10 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 	}
 
 	
-	
 	//接收传递过来的菜品对象
 	public static void onResume( FoodParcel foodParcel) {
 		//get the food parcel from the intent
 		_selectedFood = foodParcel;
-		Log.e("", _selectedFood.name);		
 	}
 	
    //设置口味View
