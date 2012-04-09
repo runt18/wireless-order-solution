@@ -11,48 +11,45 @@ package com.wireless.protocol;
  * pin[6] - auto calculated and filled in
  * len[2] - length of the <Body>
  * <Body>
- * print_type[2] : order_id[4] : ori_tbl[2] : new_tbl[2] 
+ * print_type[2] : order_id[4] : ori_tbl[2] : new_tbl[2] : on_duty[8] : off_duty[8]
  * print_type[2] - 2-byte indicates the print type
  * order_id[4] - 4-byte indicating the order id to print
  * ori_tbl[2] - 2-byte indicating the original table id
  * new_tbl[2] - 2-byte indicating the new table id
+ * on_duty[8] - 8-byte indicating the on duty
+ * off_duty[8] - 8-byte indicating the off duty
  *******************************************************/
 public class ReqPrintOrder2 extends ReqPackage{
 	
 	/**
-	 * Construct the print protocol.
-	 * @param printConf
-	 * 				the configuration parameter to the print, the meaning to each bit is as below.<br>
-	 * 				[0] - Not Used<br>
-	 *              [1] - PRINT_SYNC<br>
-	 *              [2] - PRINT_ORDER_2<br>
-	 *              [3] - PRINT_ORDER_DETAIL_2<br>
-	 *              [4] - PRINT_RECEIPT_2<br>
-	 *              [5] - PRINT_EXTRA_FOOD_2<br>
-	 *              [6] - PRINT_CANCELLED_FOOD_2<br>
-	 *              [7] - PRINT_TRANSFER_TABLE_2<br>
-	 *              [8] - PRINT_ALL_EXTRA_FOOD_2<br>
-	 *              [9] - PRINT_ALL_CANCELLED_FOOD_2<br>
-	 *              [10] - PRINT_SHIFT_RECEIPT_2<br>
-	 *              [11] - PRINT_TEMP_RECEIPT_2<br>	
-	 * @param printConf
-	 * 				the print configuration parameter             		
-	 * @param orderID
-	 * 			    the order id to print
-	 * @param oriTbl
-	 * 				the id to original table 
-	 * @param newTbl
-	 * 				the id to new table 
+	 * 
+	 * @author Ying.Zhang
+	 *
 	 */
-	public ReqPrintOrder2(short printConf, int orderID, int oriTbl, int newTbl){
+	public static class ReqParam{
+		public int printConf = Reserved.DEFAULT_CONF;		//the print configuration parameter  
+		public int orderID;									//the order id to print
+		public int oriTblID;								//the id to original table 
+		public int newTblID;								//the id to new table 
+		public long onDuty;									//the on duty 
+		public long offDuty;								//the off duty
+	}
+	
+	/**
+	 * Construct the print protocol.
+	 * @param param
+	 */
+	public ReqPrintOrder2(ReqParam param){
 		header.mode = Mode.PRINT;
 		header.type = Type.PRINT_BILL_2;
 		
 		int bodyLen = 2 + /* print_type takes up 2 bytes */
-					  4 + /* order id takes up 4 bytes */
-					  2 + /* original table id takes up 2 bytes */
-					  2 ; /* new table id takes up 2 bytes */
-		
+				  	  4 + /* order id takes up 4 bytes */
+				  	  2 + /* original table id takes up 2 bytes */
+				  	  2 + /* new table id takes up 2 bytes */
+				  	  8 + /* on duty takes up 8 bytes */
+				  	  8 ; /* off duty takes up 8 bytes */
+	
 		//assign the length of the body
 		header.length[0] = (byte)(bodyLen & 0x000000FF);
 		header.length[1] = (byte)((bodyLen >> 8) & 0x000000FF);
@@ -60,21 +57,41 @@ public class ReqPrintOrder2 extends ReqPackage{
 		body = new byte[bodyLen];
 		
 		//assign the print type
-		body[0] = (byte)(printConf & 0x00FF);
-		body[1] = (byte)((printConf & 0xFF00) >> 8);
+		body[0] = (byte)(param.printConf & 0x00FF);
+		body[1] = (byte)((param.printConf & 0xFF00) >> 8);
 		
 		//assign the order id
-		body[2] = (byte)(orderID & 0x000000FF);
-		body[3] = (byte)((orderID & 0x0000FF00) >> 8);
-		body[4] = (byte)((orderID & 0x00FF0000) >> 16);
-		body[5] = (byte)((orderID & 0xFF000000) >> 24);
+		body[2] = (byte)(param.orderID & 0x000000FF);
+		body[3] = (byte)((param.orderID & 0x0000FF00) >> 8);
+		body[4] = (byte)((param.orderID & 0x00FF0000) >> 16);
+		body[5] = (byte)((param.orderID & 0xFF000000) >> 24);
 		
 		//assign the original table id
-		body[6] = (byte)(oriTbl & 0x000000FF);
-		body[7] = (byte)((oriTbl & 0x0000FF00) >> 8);
+		body[6] = (byte)(param.oriTblID & 0x000000FF);
+		body[7] = (byte)((param.oriTblID & 0x0000FF00) >> 8);
 		
 		//assign the new table id
-		body[8] = (byte)(newTbl & 0x000000FF);
-		body[9] = (byte)((newTbl & 0x0000FF00) >> 8);
+		body[8] = (byte)(param.newTblID & 0x000000FF);
+		body[9] = (byte)((param.newTblID & 0x0000FF00) >> 8);
+		
+		//assign the on duty
+		body[10] = (byte)(param.onDuty & 0x00000000000000FFL);
+		body[11] = (byte)((param.onDuty & 0x000000000000FF00L) >> 8);
+		body[12] = (byte)((param.onDuty & 0x0000000000FF0000L) >> 16);
+		body[13] = (byte)((param.onDuty & 0x00000000FF000000L) >> 24);
+		body[14] = (byte)((param.onDuty & 0x000000FF00000000L) >> 32);
+		body[15] = (byte)((param.onDuty & 0x0000FF0000000000L) >> 40);
+		body[16] = (byte)((param.onDuty & 0x00FF000000000000L) >> 48);
+		body[17] = (byte)((param.onDuty & 0xFF00000000000000L) >> 56);
+
+		//assign the off duty
+		body[18] = (byte)(param.offDuty & 0x00000000000000FFL);
+		body[19] = (byte)((param.offDuty & 0x000000000000FF00L) >> 8);
+		body[20] = (byte)((param.offDuty & 0x0000000000FF0000L) >> 16);
+		body[21] = (byte)((param.offDuty & 0x00000000FF000000L) >> 24);
+		body[22] = (byte)((param.offDuty & 0x000000FF00000000L) >> 32);
+		body[23] = (byte)((param.offDuty & 0x0000FF0000000000L) >> 40);
+		body[24] = (byte)((param.offDuty & 0x00FF000000000000L) >> 48);
+		body[25] = (byte)((param.offDuty & 0xFF00000000000000L) >> 56);
 	}
 }

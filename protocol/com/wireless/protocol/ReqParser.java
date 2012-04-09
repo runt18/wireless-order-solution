@@ -210,6 +210,7 @@ public class ReqParser {
 									((req.body[offset + 1] & 0x000000FF) << 8));
 		return order;
 	}
+	
 	/******************************************************
 	 * Design the print order 2 request looks like below
 	 * <Header>
@@ -217,19 +218,21 @@ public class ReqParser {
 	 * mode - PRINT
 	 * type - PRINT_BILL_2
 	 * seq - auto calculated and filled in
-	 * reserved - 0x00
+	 * reserved - 0x00	
 	 * pin[6] - auto calculated and filled in
 	 * len[2] - length of the <Body>
 	 * <Body>
-	 * print_type[2] : order_id[4] : ori_tbl[2] : new_tbl[2]
-	 * print_type[2] - 2-byte indicating the print type 
+	 * print_type[2] : order_id[4] : ori_tbl[2] : new_tbl[2] : on_duty[8] : off_duty[8]
+	 * print_type[2] - 2-byte indicates the print type
 	 * order_id[4] - 4-byte indicating the order id to print
 	 * ori_tbl[2] - 2-byte indicating the original table id
 	 * new_tbl[2] - 2-byte indicating the new table id
+	 * on_duty[8] - 8-byte indicating the on duty
+	 * off_duty[8] - 8-byte indicating the off duty
 	 *******************************************************/
-	public static Order parsePrintReq(ProtocolPackage req){
+	public static ReqPrintOrder2.ReqParam parsePrintReq(ProtocolPackage req){
 		//get the print type
-		int printType = (req.body[0] & 0x000000FF) | ((req.body[1] & 0x000000FF) << 8);
+		int printConf = (req.body[0] & 0x000000FF) | ((req.body[1] & 0x000000FF) << 8);
 		
 		//get the order id
 		int orderID = (req.body[2] & 0x000000FF) |
@@ -245,13 +248,36 @@ public class ReqParser {
 		int newTblID = (req.body[8] & 0x000000FF) |
 		   			   ((req.body[9] & 0x000000FF) << 8);
 		
-		Order orderToPrint = new Order();
-		orderToPrint.id = orderID;
-		orderToPrint.oriTbl.aliasID = oriTblID;
-		orderToPrint.table.aliasID = newTblID;
-		orderToPrint.print_type = printType;
+		//get the on duty
+		long onDuty = (req.body[10] & 0x00000000000000FFL) |
+					  ((req.body[11] & 0x00000000000000FFL) << 8) |
+					  ((req.body[12] & 0x00000000000000FFL) << 16) |
+					  ((req.body[13] & 0x00000000000000FFL) << 24) |
+					  ((req.body[14] & 0x00000000000000FFL) << 32) |
+					  ((req.body[15] & 0x00000000000000FFL) << 40) |
+					  ((req.body[16] & 0x00000000000000FFL) << 48) |
+					  ((req.body[17] & 0x00000000000000FFL) << 56);
+
+		//get the off duty
+		long offDuty = (req.body[18] & 0x00000000000000FFL) |
+					  ((req.body[19] & 0x00000000000000FFL) << 8) |
+					  ((req.body[20] & 0x00000000000000FFL) << 16) |
+					  ((req.body[21] & 0x00000000000000FFL) << 24) |
+					  ((req.body[22] & 0x00000000000000FFL) << 32) |
+					  ((req.body[23] & 0x00000000000000FFL) << 40) |
+					  ((req.body[24] & 0x00000000000000FFL) << 48) |
+					  ((req.body[25] & 0x00000000000000FFL) << 56);
+
+
+		ReqPrintOrder2.ReqParam reqParam = new ReqPrintOrder2.ReqParam();
+		reqParam.printConf = printConf;
+		reqParam.orderID = orderID;
+		reqParam.oriTblID = oriTblID;
+		reqParam.newTblID = newTblID;
+		reqParam.onDuty = onDuty;
+		reqParam.offDuty = offDuty;
 		
-		return orderToPrint;
+		return reqParam;
 	}
 	
 	/******************************************************
