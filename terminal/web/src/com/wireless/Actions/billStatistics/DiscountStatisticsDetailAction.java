@@ -77,7 +77,7 @@ public class DiscountStatisticsDetailAction extends Action {
 						+ "' ";
 			}
 			if (!endDate.equals("")) {
-				condition = condition + " AND A.order_date <= '" + endDate
+				condition = condition + " AND B.total_price IS NOT NULL AND A.order_date <= '" + endDate
 						+ "' ";
 			}
 

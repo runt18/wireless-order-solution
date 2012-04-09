@@ -93,7 +93,7 @@ public class MenuStatisticsAction extends Action {
 				condition = condition + " AND D.pay_datetime <= '" + dateEnd
 						+ " 23:59:59" + "' ";
 			}
-			condition = condition + " AND C.restaurant_id =  "
+			condition = condition + " AND D.total_price IS NOT NULL AND C.restaurant_id =  "
 					+ term.restaurant_id;
 
 			// String orderClause = " ORDER BY D.food_id DESC, D.pay_date ";
