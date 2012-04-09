@@ -278,7 +278,7 @@ discountStatWin = new Ext.Window(
 																			kitchenName,
 																			// rootData[i].staffID,
 																			// staffName,
-																			rootData[i].waiter, // !!!!!
+																			rootData[i].staffName, 
 																			rootData[i].amount,
 																			rootData[i].message ]);
 														}
@@ -546,7 +546,7 @@ var discountStatDetailResultStore = new Ext.data.Store({
 	// name : "staffName"
 	// },
 	{
-		name : "waiter"
+		name : "staffName"
 	}, {
 		name : "amount"
 	}, {
@@ -604,7 +604,7 @@ var discountStatDetailResultColumnModel = new Ext.grid.ColumnModel([
 		}, {
 			header : "服务员",
 			sortable : true,
-			dataIndex : "waiter",
+			dataIndex : "staffName",
 			width : 80
 		}, {
 			header : "金额（￥）",

@@ -80,18 +80,45 @@ var shiftCheckTableWin = new Ext.Window({
 	resizable : false,
 	closable : false,
 	items : [ shiftCheckTablePanel, shiftCheckDetpPanel ],
-	buttons : [ {
-		text : "打印",
-		handler : function() {
-		}
-	}, {
-		text : "关闭",
-		// disabled : true,
-		handler : function() {
-			shiftCheckTableWin.hide();
-			isPrompt = false;
-		}
-	} ]
+	buttons : [
+			{
+				text : "打印",
+				handler : function() {
+					var onDuty = shiftStatResultStore.getAt(shiftDtlRowIndex)
+							.get("beginTime");
+					var offDuty = shiftStatResultStore.getAt(shiftDtlRowIndex)
+							.get("endTime");
+
+					Ext.Ajax.request({
+						url : "../../PrintOrder.do",
+						params : {
+							"pin" : pin,
+							"printTmpShift" : 1,
+							"onDuty" : onDuty,
+							"offDuty" : offDuty
+						},
+						success : function(response, options) {
+							var resultJSON = Ext.util.JSON
+									.decode(response.responseText);
+							Ext.MessageBox.show({
+								msg : resultJSON.data,
+								width : 300,
+								buttons : Ext.MessageBox.OK
+							});
+
+						},
+						failure : function(response, options) {
+						}
+					});
+				}
+			}, {
+				text : "关闭",
+				// disabled : true,
+				handler : function() {
+					shiftCheckTableWin.hide();
+					isPrompt = false;
+				}
+			} ]
 });
 
 // -----------------------------------------------------------------------------
@@ -214,6 +241,7 @@ var shiftStatResultStore = new Ext.data.Store({
 });
 
 // 2，栏位模型
+// operation handler
 function shiftStatDetalHandler(rowIndex) {
 
 	var onDuty = shiftStatResultStore.getAt(rowIndex).get("beginTime");
@@ -335,6 +363,33 @@ function shiftStatDetalHandler(rowIndex) {
 
 };
 
+function shiftStatPrintHandler(rowIndex) {
+
+	var onDuty = shiftStatResultStore.getAt(rowIndex).get("beginTime");
+	var offDuty = shiftStatResultStore.getAt(rowIndex).get("endTime");
+
+	Ext.Ajax.request({
+		url : "../../PrintOrder.do",
+		params : {
+			"pin" : pin,
+			"printTmpShift" : 1,
+			"onDuty" : onDuty,
+			"offDuty" : offDuty
+		},
+		success : function(response, options) {
+			var resultJSON = Ext.util.JSON.decode(response.responseText);
+			Ext.MessageBox.show({
+				msg : resultJSON.data,
+				width : 300,
+				buttons : Ext.MessageBox.OK
+			});
+
+		},
+		failure : function(response, options) {
+		}
+	});
+};
+
 function shiftStatOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
 	return "<center><a href=\"javascript:shiftStatDetalHandler(" + rowIndex
 			+ ")\">" + "<img src='../../images/Modify.png'/>详细</a>"
@@ -378,6 +433,11 @@ var shiftStatResultGrid = new Ext.grid.GridPanel({
 	}),
 	viewConfig : {
 		forceFit : true
+	},
+	listeners : {
+		rowclick : function(thiz, rowIndex, e) {
+			shiftDtlRowIndex = rowIndex;
+		}
 	},
 	bbar : new Ext.PagingToolbar({
 		pageSize : shiftStaticRecordCount,
