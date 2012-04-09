@@ -117,9 +117,12 @@ public class TransTableAction extends Action implements PinGen {
 
 					// print the transfer table receipt
 					ReqPackage.setGen(this);
-					ServerConnector.instance().ask(
-							new ReqPrintOrder2(Reserved.PRINT_TRANSFER_TABLE_2,
-									orderID, oldTable.aliasID, newTable.aliasID));
+					ReqPrintOrder2.ReqParam printParam = new ReqPrintOrder2.ReqParam();
+					printParam.printConf = Reserved.PRINT_TRANSFER_TABLE_2;
+					printParam.orderID = orderID;
+					printParam.oriTblID = oldTable.aliasID;
+					printParam.newTblID = newTable.aliasID;
+					ServerConnector.instance().ask(new ReqPrintOrder2(printParam));
 					
 					dbCon.conn.commit();
 

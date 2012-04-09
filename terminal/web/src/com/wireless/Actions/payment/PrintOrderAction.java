@@ -47,10 +47,13 @@ public class PrintOrderAction extends Action implements PinGen{
 			 * The parameters looks like below.
 			 * 
 			 * 1st example, print an order according to order id
-			 * pin=0x1 & orderID=654 & printSync=1 & printOrder=1 & printDetail=0 & printReceipt=0 & printShift=0
+			 * pin=1 & orderID=654 & printSync=1 & printOrder=1 & printDetail=0 & printReceipt=0 & printShift=0
 			 * 
 			 * 2nd example, print an order according to table id
-			 * pin=0x1 & tableID=101 & printSync=1 & printOrder=1 & printDetail=0 & printReceipt=0 & printShift=0
+			 * pin=11 & tableID=101 & printSync=1 & printOrder=1 & printDetail=0 & printReceipt=0 & printShift=0
+			 * 
+			 * 3rd example, print the shift record
+			 * pin=1 & printShift=1 & onDuty=253654123 & offDuty=253169844
 			 * 
 			 * pin : the pin the this terminal
 			 * 
@@ -67,6 +70,10 @@ public class PrintOrderAction extends Action implements PinGen{
 			 * printReceipt : 1 means to print the receipt, 0 or null means NOT
 			 * 
 			 * printShift : 1 means to print the shift, 0 or null means NOT
+			 * 
+			 * onDuty : the date time to be on duty which represented by milliseconds 
+			 * 
+			 * offDuty : the date time to be off duty which represented by milliseconds 
 			 * 
 			 */
 			String pin = request.getParameter("pin");
@@ -154,8 +161,23 @@ public class PrintOrderAction extends Action implements PinGen{
 				conf &= ~Reserved.PRINT_TEMP_SHIFT_RECEIPT_2;
 			}
 			
+			long onDuty = 0;
+			if(request.getParameter("onDuty") != null){
+				onDuty = Long.parseLong(request.getParameter("onDuty"));				
+			}
+			
+			long offDuty = 0;
+			if(request.getParameter("offDuty") != null){
+				offDuty = Long.parseLong(request.getParameter("offDuty"));				
+			}
+						
 			ReqPackage.setGen(this);
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqPrintOrder2(conf, orderID, 0, 0));
+			ReqPrintOrder2.ReqParam reqParam = new ReqPrintOrder2.ReqParam();
+			reqParam.printConf = conf;
+			reqParam.orderID = orderID;
+			reqParam.onDuty = onDuty;
+			reqParam.offDuty = offDuty;
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqPrintOrder2(reqParam));
 			if(resp.header.type == Type.ACK){
 				jsonResp = jsonResp.replace("$(result)", "true");
 				if(request.getParameter("orderID") != null){
