@@ -1,9 +1,8 @@
 package com.wireless.protocol;
 
 public class OrderFood extends Food {
-	public long orderID;
 	public long orderDate;
-	public int payManner = Order.MANNER_CASH;		/* 结帐方式 */
+	public int payManner = Order.MANNER_CASH;
 	
 	public static final int FOOD_NORMAL = 0;		/* 正常 */
 	public static final int FOOD_HANG_UP = 1;		/* 叫起 */
@@ -14,11 +13,7 @@ public class OrderFood extends Food {
 	
 	public Table table = new Table();				//the table this order food belongs to
 	
-	public StaffTerminal staff = new StaffTerminal();	//the staff this order food is operated by 
-	
 	public boolean isTemporary = false;				//indicates whether the food is temporary
-	
-	public boolean isPaid = false;					//indicates whether the food has been paid before
 
 	int tastePrice = 0; //the taste price to this food
 	
