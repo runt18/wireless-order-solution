@@ -33,7 +33,7 @@
 
         <RelativeLayout
             android:id="@+id/filterKitchenRelaLayout"
-            android:layout_width="fill_parent"
+            android:layout_width="wrap_content"
             android:layout_height="40dip"
             android:layout_marginLeft="5dip"
             android:layout_marginTop="3dip"
