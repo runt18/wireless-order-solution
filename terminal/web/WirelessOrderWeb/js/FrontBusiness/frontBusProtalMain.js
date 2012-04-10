@@ -462,11 +462,24 @@ var doDailySettle = function() {
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
 			var rootData = resultJSON.root;
 			if (rootData[0].message == "normal") {
-				Ext.MessageBox.show({
-					msg : "日结成功",
-					width : 300,
-					buttons : Ext.MessageBox.OK
+				
+				Ext.Ajax.request({
+					url : "../../PrintOrder.do",
+					params : {
+						"pin" : currPin,
+						"printDailySettle" : 1
+					},
+					success : function(response, options) {
+						Ext.MessageBox.show({
+							msg : "日结成功",
+							width : 300,
+							buttons : Ext.MessageBox.OK
+						});
+					},
+					failure : function(response, options) {
+					}
 				});
+				
 			} else {
 				Ext.MessageBox.show({
 					msg : rootData[0].message,
