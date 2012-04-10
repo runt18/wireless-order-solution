@@ -452,6 +452,39 @@ var shiftVerifyWin = new Ext.Window(
 		});
 
 // ------------------------------ daily settle ---------------------------------
+var doDailySettle = function() {
+	Ext.Ajax.request({
+		url : "../../DailySettleExec.do",
+		params : {
+			"pin" : currPin
+		},
+		success : function(response, options) {
+			var resultJSON = Ext.util.JSON.decode(response.responseText);
+			var rootData = resultJSON.root;
+			if (rootData[0].message == "normal") {
+				Ext.MessageBox.show({
+					msg : "日结成功",
+					width : 300,
+					buttons : Ext.MessageBox.OK
+				});
+			} else {
+				Ext.MessageBox.show({
+					msg : rootData[0].message,
+					width : 300,
+					buttons : Ext.MessageBox.OK
+				});
+			}
+		},
+		failure : function(response, options) {
+			Ext.MessageBox.show({
+				msg : " Unknown page error ",
+				width : 300,
+				buttons : Ext.MessageBox.OK
+			});
+		}
+	});
+};
+
 var unShiftBillWarnWin = new Ext.Window({
 	layout : "fit",
 	width : 300,
@@ -467,7 +500,10 @@ var unShiftBillWarnWin = new Ext.Window({
 	buttons : [ {
 		text : "确定",
 		handler : function() {
-
+			unShiftBillWarnWin.hide();
+			isPrompt = false;
+			
+			doDailySettle();
 		}
 	}, {
 		text : "取消",
@@ -552,6 +588,8 @@ var dailySettleVerifyWin = new Ext.Window(
 																		dailySettleVerifyWin
 																				.hide();
 																		isPrompt = false;
+
+																		doDailySettle();
 																	} else {
 																		// 有剩帳單
 																		dailySettleVerifyWin
