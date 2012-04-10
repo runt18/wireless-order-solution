@@ -310,6 +310,9 @@
 		<action path="/shiftStatDetail"
 			type="com.wireless.Actions.billStatistics.ShiftStatDetailAction" scope="request">
 		</action>
+<action path="/DailySettleCheck"
+			type="com.wireless.Actions.dailySettle.DailySettleCheckAction" scope="request">
+		</action>
 	</action-mappings>
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
 </struts-config>

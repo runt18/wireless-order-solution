@@ -56,10 +56,10 @@
 	}
 
 	var isPrompt = false;
-	
+
 	var shiftStartTiem = "";
 	var shiftEndTiem = "";
-	
+
 	var emplData = [];
 	var emplComboData = [];
 </script>
@@ -101,13 +101,15 @@
 				<td id="shift"
 					style="width: 160px; height: 220px; background: url(../../images/shift.png) no-repeat 50%;"></td>
 				<td style="width: 100px;">&nbsp;</td>
+				<td id="dailySettle"
+					style="width: 160px; height: 220px; background: url(../../images/dailySettle.png) no-repeat 50%;"></td>
 			</tr>
 			<tr>
 				<td style="height: 80px;"></td>
 			</tr>
 		</table>
 	</div>
-	
+
 	<!------------------- shift ------------------------>
 	<div id="shiftDiv">
 		<table border="1" id="shiftContent">
@@ -127,8 +129,7 @@
 										<td class="shiftInfo">帐单数：</td>
 										<td id="shiftBillCount">45</td>
 									</tr>
-								</table>
-							</td>
+								</table></td>
 
 						</tr>
 						<tr>
@@ -143,10 +144,10 @@
 										<td class="shiftInfo">结束时间：</td>
 										<td id="shiftEndTime">2011-07-11 12:14:33</td>
 									</tr>
-								</table></td>
+								</table>
+							</td>
 						</tr>
-					</table>
-				</td>
+					</table></td>
 			</tr>
 			<tr>
 				<td><table>
@@ -186,7 +187,8 @@
 							<td id="amount5">1243.43</td>
 							<td id="actual5">1243</td>
 						</tr>
-					</table></td>
+					</table>
+				</td>
 			</tr>
 			<tr>
 				<td><table>
@@ -199,9 +201,15 @@
 							<td style="width: 60px" class="shiftInfo">折扣：</td>
 							<td style="width: 70px" id="discountAmt">210</td>
 						</tr>
-					</table></td>
+					</table>
+				</td>
 			</tr>
 		</table>
+	</div>
+
+	<!------------------- daily settle ------------------------>
+	<div id="unShiftBillWarnDiv">
+		<div style="font-size: 21px;" id="unShiftBillWarnMsg"></div>
 	</div>
 
 </body>
