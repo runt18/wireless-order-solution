@@ -14,7 +14,9 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.Params;
 import com.wireless.db.QueryTable;
+import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.PinGen;
@@ -168,17 +170,6 @@ public class PrintOrderAction extends Action implements PinGen{
 				conf &= ~Reserved.PRINT_TEMP_SHIFT_RECEIPT_2;
 			}
 			
-			param = request.getParameter("printDailySettle");
-			if(param != null){
-				if(Byte.parseByte(param) == 0){
-					conf &= ~Reserved.PRINT_DAILY_SETTLE_RECEIPT_2;
-				}else{
-					conf |= Reserved.PRINT_DAILY_SETTLE_RECEIPT_2;
-				}
-			}else{
-				conf &= ~Reserved.PRINT_DAILY_SETTLE_RECEIPT_2;
-			}
-			
 			long onDuty = 0;
 			if(request.getParameter("onDuty") != null){
 				onDuty = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(request.getParameter("onDuty")).getTime();
@@ -188,6 +179,35 @@ public class PrintOrderAction extends Action implements PinGen{
 			if(request.getParameter("offDuty") != null){
 				offDuty = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(request.getParameter("offDuty")).getTime();
 			}
+			
+			param = request.getParameter("printDailySettle");
+			if(param != null){
+				if(Byte.parseByte(param) == 0){
+					conf &= ~Reserved.PRINT_DAILY_SETTLE_RECEIPT_2;
+					
+				}else{					
+					/**
+					 * Get the last daily settlement record to assign the on & off duty
+					 */
+					dbCon.connect();
+					String sql = " SELECT on_duty, off_duty FROM " + Params.dbName + ".daily_settle_history " +
+								 " WHERE id=(" +
+								 " SELECT MAX(id) FROM " + Params.dbName + ".daily_settle_history WHERE " +
+								 " restaurant_id=" + VerifyPin.exec(dbCon, _pin, Terminal.MODEL_STAFF).restaurant_id + 
+								 ")";
+					dbCon.rs = dbCon.stmt.executeQuery(sql);
+					if(dbCon.rs.next()){
+						onDuty = dbCon.rs.getTimestamp("on_duty").getTime();
+						offDuty = dbCon.rs.getTimestamp("off_duty").getTime();
+					}
+					dbCon.rs.close();
+					
+					conf |= Reserved.PRINT_DAILY_SETTLE_RECEIPT_2;
+				}
+			}else{
+				conf &= ~Reserved.PRINT_DAILY_SETTLE_RECEIPT_2;
+			}
+			
 						
 			ReqPackage.setGen(this);
 			ReqPrintOrder2.ReqParam reqParam = new ReqPrintOrder2.ReqParam();
