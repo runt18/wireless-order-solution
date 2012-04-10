@@ -258,9 +258,11 @@ class OrderHandler extends Handler implements Runnable{
 
 				PrintHandler.PrintParam printParam = new PrintHandler.PrintParam();
 				/**
-				 * If print shift receipt, NOT need to query the order.
+				 * In the case print shift, temporary shift or daily settle,
+				 * just assign the on & off duty.
+				 * Otherwise query to associated detail to this order.
 				 */
-				if((printConf & (Reserved.PRINT_SHIFT_RECEIPT_2 | Reserved.PRINT_TEMP_SHIFT_RECEIPT_2)) == 0){
+				if((printConf & (Reserved.PRINT_SHIFT_RECEIPT_2 | Reserved.PRINT_TEMP_SHIFT_RECEIPT_2 | Reserved.PRINT_DAILY_SETTLE_RECEIPT_2)) == 0){
 					printParam.orderInfo = QueryOrder.execByID(reqParam.orderID);
 				}else{				
 					printParam.onDuty = reqParam.onDuty;
