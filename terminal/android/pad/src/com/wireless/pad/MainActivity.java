@@ -519,6 +519,7 @@ public class MainActivity extends Activity implements OnClickListener,
 				if (_regionConfine != -1) {
 					_regionConfine = -1;
 					_regionsInfo.setText("全部区域");
+					_inputTableId.setText("");
 					_tempResultTables = WirelessOrder.tables;
 					selectorTable();
 				}
@@ -924,7 +925,7 @@ public class MainActivity extends Activity implements OnClickListener,
 						_popupWindow.dismiss();
 					} else {
 						_popupWindow.showAsDropDown(
-								findViewById(R.id.staffname), 0, 15);
+								findViewById(R.id.staffname), 0, -7);
 					}
 				}
 			});
@@ -933,10 +934,10 @@ public class MainActivity extends Activity implements OnClickListener,
 			View popupWndView = getLayoutInflater().inflate(
 					R.layout.loginpopuwindow, null, false);
 			// 创建PopupWindow实例
-			_popupWindow = new PopupWindow(popupWndView, 380, 200, true);
+			_popupWindow = new PopupWindow(popupWndView, 320, 200, true);
 			_popupWindow.setOutsideTouchable(true);
 			_popupWindow.setBackgroundDrawable(new BitmapDrawable());
-
+			_popupWindow.update();
 			ListView staffLstView = (ListView) popupWndView
 					.findViewById(R.id.loginpopuwindow);
 			_staffAdapter = new StaffsAdapter();
