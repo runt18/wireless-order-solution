@@ -416,7 +416,7 @@ public class DailySettle {
 			  "restaurant_id=" + term.restaurant_id + " AND " +
 			  "total_price IS NOT NULL" + " AND " +
 			  "order_date BETWEEN " +
-			  lastOffDuty + " AND " + "NOW()";
+			  "'" + lastOffDuty + "'" + " AND " + "NOW()";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		ArrayList<Integer> orderIDs = new ArrayList<Integer>();
 		while(dbCon.rs.next()){
