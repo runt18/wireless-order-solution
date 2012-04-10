@@ -57,6 +57,9 @@ public class PrintOrderAction extends Action implements PinGen{
 			 * 3rd example, print the shift record
 			 * pin=1 & printShift=1 & onDuty=2012-4-9 8:00:00 & offDuty=2012-4-9 14:00:00
 			 * 
+			 * 4th example, print the daily settle
+			 * pin=1 & printDailySettle=1 & onDuty=2012-4-9 8:00:00 & offDuty=2012-4-9 14:00:00
+			 * 
 			 * pin : the pin the this terminal
 			 * 
 			 * orderID : the order id to print
@@ -71,7 +74,9 @@ public class PrintOrderAction extends Action implements PinGen{
 			 * 
 			 * printReceipt : 1 means to print the receipt, 0 or null means NOT
 			 * 
-			 * printShift : 1 means to print the shift, 0 or null means NOT
+			 * printShift : 1 means to print the shift receipt, 0 or null means NOT
+			 * 
+			 * printDailySettle : 1 means to print the daily settle receipt, 0 or null means NOT
 			 * 
 			 * onDuty : the date time to be on duty
 			 * 
@@ -161,6 +166,17 @@ public class PrintOrderAction extends Action implements PinGen{
 				}
 			}else{
 				conf &= ~Reserved.PRINT_TEMP_SHIFT_RECEIPT_2;
+			}
+			
+			param = request.getParameter("printDailySettle");
+			if(param != null){
+				if(Byte.parseByte(param) == 0){
+					conf &= ~Reserved.PRINT_DAILY_SETTLE_RECEIPT_2;
+				}else{
+					conf |= Reserved.PRINT_DAILY_SETTLE_RECEIPT_2;
+				}
+			}else{
+				conf &= ~Reserved.PRINT_DAILY_SETTLE_RECEIPT_2;
 			}
 			
 			long onDuty = 0;
