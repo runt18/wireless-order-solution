@@ -128,8 +128,6 @@ public class QueryShift {
 		 * and make it as the on duty date to this duty shift
 		 */
 		String onDuty;
-//		String sql = "SELECT off_duty FROM " + Params.dbName + ".shift WHERE restaurant_id=" + term.restaurant_id +
-//					 " ORDER BY off_duty desc LIMIT 1";
 		String sql = "SELECT MAX(off_duty) FROM (" +
 					 "SELECT off_duty FROM " + Params.dbName + ".shift WHERE restaurant_id=" + term.restaurant_id + " UNION " +
 					 "SELECT off_duty FROM " + Params.dbName + ".shift_history WHERE restaurant_id=" + term.restaurant_id + ") AS all_off_duty";
@@ -176,16 +174,16 @@ public class QueryShift {
 	 * @throws SQLException
 	 * 				throws if fail to execute any SQL statement
 	 */
-	public static Result execLatest(long pin, short model) throws BusinessException, SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return execLatest(dbCon, pin, model);
-		}finally{
-			dbCon.disconnect();
-		}
-		
-	}
+//	public static Result execLatest(long pin, short model) throws BusinessException, SQLException{
+//		DBCon dbCon = new DBCon();
+//		try{
+//			dbCon.connect();
+//			return execLatest(dbCon, pin, model);
+//		}finally{
+//			dbCon.disconnect();
+//		}
+//		
+//	}
 	
 	/**
 	 * Perform to get the latest shift information. 
@@ -206,29 +204,29 @@ public class QueryShift {
 	 * @throws SQLException
 	 * 				throws if fail to execute any SQL statement
 	 */
-	public static Result execLatest(DBCon dbCon, long pin, short model) throws BusinessException, SQLException{
-		
-		Terminal term = VerifyPin.exec(dbCon, pin, model);
-		
-		/**
-		 * Get the latest on & off duty date
-		 */
-		String onDuty;
-		String offDuty;
-		String sql = "SELECT on_duty, off_duty FROM " + Params.dbName + ".shift WHERE restaurant_id=" + term.restaurant_id +
-					 " ORDER BY off_duty desc LIMIT 1";
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			onDuty = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(dbCon.rs.getTimestamp("on_duty"));
-			offDuty = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(dbCon.rs.getTimestamp("off_duty"));
-		}else{
-			throw new BusinessException("No shift record to restaurant(id=" + term.restaurant_id + ") exist.");
-		}
-		dbCon.rs.close();
-		
-		return exec(dbCon, term, onDuty, offDuty, false);
-		
-	}
+//	public static Result execLatest(DBCon dbCon, long pin, short model) throws BusinessException, SQLException{
+//		
+//		Terminal term = VerifyPin.exec(dbCon, pin, model);
+//		
+//		/**
+//		 * Get the latest on & off duty date
+//		 */
+//		String onDuty;
+//		String offDuty;
+//		String sql = "SELECT on_duty, off_duty FROM " + Params.dbName + ".shift WHERE restaurant_id=" + term.restaurant_id +
+//					 " ORDER BY off_duty desc LIMIT 1";
+//		dbCon.rs = dbCon.stmt.executeQuery(sql);
+//		if(dbCon.rs.next()){
+//			onDuty = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(dbCon.rs.getTimestamp("on_duty"));
+//			offDuty = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(dbCon.rs.getTimestamp("off_duty"));
+//		}else{
+//			throw new BusinessException("No shift record to restaurant(id=" + term.restaurant_id + ") exist.");
+//		}
+//		dbCon.rs.close();
+//		
+//		return exec(dbCon, term, onDuty, offDuty, false);
+//		
+//	}
 	
 	/**
 	 * Generate the details to shift within the on & off duty date.

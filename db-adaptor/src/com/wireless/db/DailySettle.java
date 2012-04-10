@@ -386,24 +386,44 @@ public class DailySettle {
 	public static int[] check(DBCon dbCon, Terminal term) throws SQLException{
 		String sql;
 		int[] restOrderID = new int[0];
+		
+		/**
+		 * Get the last off duty date from both shift and shift_history,
+		 */
+		String lastOffDuty;
+		sql = "SELECT MAX(off_duty) FROM (" +
+		 	  "SELECT off_duty FROM " + Params.dbName + ".shift WHERE restaurant_id=" + term.restaurant_id + " UNION " +
+			  "SELECT off_duty FROM " + Params.dbName + ".shift_history WHERE restaurant_id=" + term.restaurant_id + ") AS all_off_duty";
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			Timestamp offDuty = dbCon.rs.getTimestamp(1);
+			if(offDuty == null){
+				lastOffDuty = "2011-07-30 00:00:00";
+			}else{
+				lastOffDuty = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(offDuty);
+			}
+		}else{
+			lastOffDuty = "2011-07-30 00:00:00";
+		}
+		dbCon.rs.close();
+
+		
 		/**
 		 * In the case perform the daily settle to a specific restaurant,
-		 * get the paid orders which has NOT been shifted between the latest off duty and now,
+		 * get the paid orders which has NOT been shifted between the last off duty and now,
 		 */
-		//get the paid orders which has NOT been shifted between the latest off duty and now
 		sql = "SELECT id FROM " + Params.dbName + ".order WHERE " +
 			  "restaurant_id=" + term.restaurant_id + " AND " +
 			  "total_price IS NOT NULL" + " AND " +
 			  "order_date BETWEEN " +
-			  "(SELECT off_duty FROM " + Params.dbName + ".shift WHERE " +
-			  "restaurant_id=" + term.restaurant_id + " " +
-			  "ORDER BY off_duty DESC LIMIT 1)" + " AND " + "NOW()";
+			  lastOffDuty + " AND " + "NOW()";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		ArrayList<Integer> orderIDs = new ArrayList<Integer>();
 		while(dbCon.rs.next()){
 			orderIDs.add(dbCon.rs.getInt("id"));
 		}
 		dbCon.rs.close();
+		
 		restOrderID = new int[orderIDs.size()];
 		for(int i = 0; i < restOrderID.length; i++){
 			restOrderID[i] = orderIDs.get(i).intValue();
