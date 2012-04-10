@@ -145,6 +145,8 @@ static unsigned __stdcall PrintProc(LPVOID pvParam){
 						stDocInfo.pDocName = L"转台";
 					}else if(job.req_code == Reserved::PRINT_SHIFT_RECEIPT || job.req_code == Reserved::PRINT_TEMP_SHIFT_RECEIPT){
 						stDocInfo.pDocName = L"交班对账";
+					}else if(job.req_code == Reserved::PRINT_DAILY_SETTLE_RECEIPT){
+						stDocInfo.pDocName = L"日结表";
 					}else{
 						stDocInfo.pDocName = L"未知信息";
 					}
