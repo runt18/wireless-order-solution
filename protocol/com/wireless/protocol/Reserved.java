@@ -39,6 +39,8 @@ public class Reserved {
 	public static final short PRINT_SHIFT_RECEIPT_2 = 0x4000;
 	//indicates to print temporary receipt
 	public static final short PRINT_TEMP_RECEIPT_2 = (short)0x8000;
+	//indicates to print daily settle receipt
+	public static final short PRINT_DAILY_SETTLE_RECEIPT_2 = (short)0x10000;
 
 	/**
 	 * The values below are used for the print request
@@ -55,6 +57,7 @@ public class Reserved {
 	public static final byte PRINT_ALL_CANCELLED_FOOD = 8;
 	public static final byte PRINT_ALL_HURRIED_FOOD = 9;
 	public static final byte PRINT_HURRIED_FOOD = 10;
+	public static final byte PRINT_DAILY_SETTLE_RECEIPT = 124;
 	public static final byte PRINT_TEMP_SHIFT_RECEIPT = 125;
 	public static final byte PRINT_SHIFT_RECEIPT = 126;
 	public static final byte PRINT_TEMP_RECEIPT = 127;
