@@ -3,12 +3,11 @@
     android:id="@+id/gridItemBg"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical" 
-    android:gravity="center"
     android:layout_gravity="center"
-	android:padding="18dip"
-	android:background="@drawable/griditem_bg_selector"
-    >
+    android:background="@drawable/griditem_bg_selector"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="18dip" >
 
     <FrameLayout
         android:id="@+id/item1"
@@ -16,22 +15,20 @@
         android:layout_height="74dip"
         android:background="@drawable/av_r39_c15" >
 
-        <ImageView
-            android:id="@+id/item2"
-            android:layout_width="58dip"
-            android:layout_height="41dip"
-            android:layout_gravity="bottom|right"
-            android:src="@drawable/av_r41_c11" />
-        <TextView 
+        <TextView
             android:id="@+id/item3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="99"
             android:layout_gravity="bottom|right"
-            android:textColor="#000000"
-            android:textSize="20sp"
             android:layout_marginRight="17dip"
-            />
+            android:background="@drawable/av_r41_c11"
+            android:text="99"
+            android:paddingBottom="0dp"
+            android:paddingTop="4dp"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:textColor="#000000"
+            android:textSize="20sp" />
     </FrameLayout>
 
     <FrameLayout

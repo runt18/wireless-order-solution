@@ -24,12 +24,12 @@
 
         <Button
             android:id="@+id/refurbish_btn"
-            android:layout_toLeftOf="@+id/reAll_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="15dip"
             android:layout_marginRight="15dip"
+            android:layout_toLeftOf="@+id/reAll_btn"
             android:background="@drawable/av_refurbish_selector" />
 
         <Button
@@ -39,16 +39,15 @@
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@id/refurbish_btn"
             android:background="@drawable/av_logout_selector" />
-        
+
         <Button
             android:id="@+id/reAll_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
-            android:background="@drawable/av_allre_selector"
-            />
-        
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dip"
+            android:background="@drawable/av_allre_selector" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -154,10 +153,16 @@
                 android:textColor="#f5b90e"
                 android:textSize="18sp" />
 
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="60dip"
+                android:src="@drawable/idle_image" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="60dip"
                 android:layout_marginRight="10dip"
                 android:text="空闲"
                 android:textColor="#ffffff"
@@ -171,6 +176,12 @@
                 android:text="(25)"
                 android:textColor="#f5b90e"
                 android:textSize="18sp" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/busy_image" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -230,7 +241,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/av_r25_c31" />
+                android:src="@drawable/av_r25_c31" />
             -->
         </LinearLayout>
     </FrameLayout>
@@ -295,13 +306,13 @@
                 android:id="@+id/inputTableId"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:background="@null"
                 android:editable="false"
                 android:focusable="false"
-                android:singleLine="true"
                 android:hint="点击此处输入餐台号"
-                android:layout_gravity="center"
-                android:maxLength="6" />
+                android:maxLength="6"
+                android:singleLine="true" />
 
             <Button
                 android:id="@+id/clearTableNum"
