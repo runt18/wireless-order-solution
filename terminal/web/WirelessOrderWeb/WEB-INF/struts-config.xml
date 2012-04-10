@@ -80,7 +80,7 @@
 			scope="request">
 		</action>
 		<action path="/MenuStatistics"
-			type="com.wireless.Actions.menuMgr.MenuStatisticsAction" scope="request">
+			type="com.wireless.Actions.billStatistics.MenuStatisticsAction" scope="request">
 		</action>
 		<action path="/QuerySupplierMgr"
 			type="com.wireless.Actions.supplierMgr.QuerySupplierMgrAction" scope="request">
@@ -104,7 +104,7 @@
 			type="com.wireless.Actions.kitchenMgr.UpdateKitchenAction" scope="request">
 		</action>
 		<action path="/kitchenStatistics"
-			type="com.wireless.Actions.kitchenMgr.KitchenStatisticsAction" scope="request">
+			type="com.wireless.Actions.billStatistics.KitchenStatisticsAction" scope="request">
 		</action>
 		<action path="/UpdateDepartment"
 			type="com.wireless.Actions.deptMgr.UpdateDepartmentAction" scope="request">
@@ -310,8 +310,11 @@
 		<action path="/shiftStatDetail"
 			type="com.wireless.Actions.billStatistics.ShiftStatDetailAction" scope="request">
 		</action>
-<action path="/DailySettleCheck"
+		<action path="/DailySettleCheck"
 			type="com.wireless.Actions.dailySettle.DailySettleCheckAction" scope="request">
+		</action>
+		<action path="/DailySettleExec"
+			type="com.wireless.Actions.dailySettle.DailySettleExecAction" scope="request">
 		</action>
 	</action-mappings>
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
