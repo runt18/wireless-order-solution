@@ -171,7 +171,10 @@ public class DailySettle {
 		String sql;
 		String onDuty = null;
 		
-		//get the date to last daily settlement
+		/**
+		 * Get the date to last daily settlement.
+		 * Make the 00:00 of today as on duty if no daily settle record exist before. 
+		 */
 		sql = " SELECT MAX(off_duty) FROM " + Params.dbName + ".daily_settle_history " +
 			  " WHERE " +
 			  " restaurant_id = " + term.restaurant_id;
@@ -180,7 +183,11 @@ public class DailySettle {
 			Timestamp offDuty = dbCon.rs.getTimestamp(1);
 			if(offDuty != null){
 				onDuty = "'" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(offDuty) + "'";
+			}else{
+				onDuty = "date_format(NOW(), '%Y-%m-%d')";
 			}
+		}else{
+			onDuty = "date_format(NOW(), '%Y-%m-%d')";
 		}
 		
 		//get the amount to order
@@ -284,7 +291,7 @@ public class DailySettle {
 			sql = "INSERT INTO " + Params.dbName + ".daily_settle_history (`restaurant_id`, `name`, `on_duty`, `off_duty`) VALUES (" +
 				  term.restaurant_id + ", " +
 				  "'" + (term.owner == null ? "" : term.owner) + "', " +
-				  (onDuty == null ? "date_format(NOW(), '%Y-%m-%d')" : "'" + onDuty + "'") + ", " +
+				  onDuty + ", " +
 				  "NOW()" +
 				  ")";
 			/**
