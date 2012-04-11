@@ -33,9 +33,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
+import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -55,6 +55,8 @@ import android.widget.ViewFlipper;
 import com.wireless.adapter.TableAdapter;
 import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
+import com.wireless.parcel.OrderParcel;
+import com.wireless.parcel.TableParcel;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.PinGen;
 import com.wireless.protocol.ProtocolPackage;
@@ -71,7 +73,7 @@ import com.wireless.sccon.ServerConnector;
 import com.wireless.view.MarqueeText;
 
 public class MainActivity extends Activity implements OnClickListener,
-		OnTouchListener, OnItemClickListener {
+		OnTouchListener {
 
 	class MyHandler extends Handler {
 		@Override
@@ -435,13 +437,28 @@ public class MainActivity extends Activity implements OnClickListener,
 					LinearLayout.LayoutParams.FILL_PARENT,
 					LinearLayout.LayoutParams.FILL_PARENT);
 			grid.setOnTouchListener(this);
-			grid.setOnItemClickListener(this);
+			//grid.setOnItemClickListener(this);
 			lp.gravity = Gravity.CENTER;
 			grid.setNumColumns(6);
 			grid.setLayoutParams(lp);
 			grid.setSelector(android.R.color.transparent);
-			TableAdapter tableAdapter = new TableAdapter(this, getTables(
-					i * 24, tablesArray));
+			TableAdapter tableAdapter = new TableAdapter(getTables(i * 24, tablesArray), 
+				new TableAdapter.OnTableClickListener() {				
+					@Override
+					public void onClick(Table table) {
+						if(table.status == Table.TABLE_IDLE){
+							//jump to the order activity with the table parcel
+							Intent intent = new Intent(MainActivity.this, OrderActivity.class);
+							Bundle bundle = new Bundle();
+							bundle.putParcelable(TableParcel.KEY_VALUE, new TableParcel(table));
+							intent.putExtras(bundle);
+							startActivity(intent);
+							
+						}else{
+							//TODO jump to change order activity with the order parcel
+						}
+					}
+				});
 			grid.setAdapter(tableAdapter);
 			adapterList.add(tableAdapter);
 			_viewFlipper.addView(grid);
@@ -638,28 +655,28 @@ public class MainActivity extends Activity implements OnClickListener,
 		return false;
 	}
 
-	@Override
-	public void onItemClick(AdapterView<?> parent, View view, int position,
-			long id) {
-		if (_touchFlag) {
-			Table[] t;
-			if (_regionConfine != -1 || _tableStatusConfine != -1) {
-				t = _tempResultTables;
-			} else {
-				t = WirelessOrder.tables;
-			}
-			int currentPage = _viewFlipper.getDisplayedChild();
-
-			Table table = t[(currentPage * 24) + position];
-			_onClickTable = table;
-			if (table.status == Table.TABLE_BUSY) {
-				showDialog(BUSYTABLE);
-			} else if (table.status == Table.TABLE_IDLE) {
-				showDialog(IDLETABLE);
-			}
-		}
-
-	}
+//	@Override
+//	public void onItemClick(AdapterView<?> parent, View view, int position,
+//			long id) {
+//		if (_touchFlag) {
+//			Table[] t;
+//			if (_regionConfine != -1 || _tableStatusConfine != -1) {
+//				t = _tempResultTables;
+//			} else {
+//				t = WirelessOrder.tables;
+//			}
+//			int currentPage = _viewFlipper.getDisplayedChild();
+//
+//			Table table = t[(currentPage * 24) + position];
+//			_onClickTable = table;
+//			if (table.status == Table.TABLE_BUSY) {
+//				showDialog(BUSYTABLE);
+//			} else if (table.status == Table.TABLE_IDLE) {
+//				showDialog(IDLETABLE);
+//			}
+//		}
+//
+//	}
 
 	/**
 	 * 专门监听区域按钮的类

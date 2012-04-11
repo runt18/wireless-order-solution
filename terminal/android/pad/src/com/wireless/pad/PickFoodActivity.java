@@ -15,7 +15,6 @@ import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
@@ -43,6 +42,7 @@ import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.wireless.common.WirelessOrder;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.OrderParcel;
@@ -52,12 +52,16 @@ import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Util;
-import com.wireless.view.TempListView;
 import com.wireless.view.PickFoodListView;
+import com.wireless.view.TempListView;
 
 public class PickFoodActivity extends TabActivity implements
    PickFoodListView.OnFoodPickedListener, OnGestureListener {
 
+	public static final String PICK_FOOD_ACTION = "com.wireless.pad.PickFoodActivity.PickFood";
+	public static final String PICK_TASTE_ACTION = "com.wireless.pad.PickFoodActivity.PickTaste";
+
+	
 	private ArrayList<Kitchen> _validKitchens;
 	private ArrayList<Department> _validDepts;
 
@@ -87,6 +91,11 @@ public class PickFoodActivity extends TabActivity implements
 
 		init();
 
+		// 取得新点菜中已有的菜品List，并保存到pickFood的List中
+		OrderParcel orderParcel = getIntent().getParcelableExtra(OrderParcel.KEY_VALUE);
+		for(OrderFood food : orderParcel.foods) {
+			_pickFoods.add(food);
+		}
 
 		// construct the tab host
 		_tabHost = getTabHost();
@@ -180,7 +189,7 @@ public class PickFoodActivity extends TabActivity implements
      public static void onResume(List<OrderFood> pickFoods) {
 		_pickFoods.clear();	
 		_pickFoods = (ArrayList<OrderFood>) pickFoods;
-		}
+	}
 		
 	
 	
@@ -237,19 +246,17 @@ public class PickFoodActivity extends TabActivity implements
 	 */
 	@Override
 	public void onPicked(OrderFood food) {
-		addFood(food);
-		
-		Intent intent = new Intent();
-	    intent.setAction(MyBroadcastReceiver.ACTION);	
-		Bundle bundle = new Bundle();
+		addFood(food);		
+		/**
+		 * 将添加菜品用broadcast的形式发送
+		 */
 		Order tmpOrder = new Order();
 		tmpOrder.foods = _pickFoods.toArray(new OrderFood[_pickFoods.size()]);
+		Bundle bundle = new Bundle();
 		bundle.putParcelable(OrderParcel.KEY_VALUE, new OrderParcel(tmpOrder));
+		Intent intent = new Intent().setAction(PICK_FOOD_ACTION);
 		intent.putExtras(bundle);
-		//发送广播
-	    sendBroadcast(intent);
-
-		
+	    sendBroadcast(intent);		
 	}
 
 	/**
@@ -260,12 +267,13 @@ public class PickFoodActivity extends TabActivity implements
 	 */
 	@Override
 	public void onPickedWithTaste(OrderFood food) {
-		Intent intent = new Intent();
 		Bundle bundle = new Bundle();
 		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(food));
+		Intent intent = new Intent();
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		intent.setAction(PICK_TASTE_ACTION);
 		intent.putExtras(bundle);
-		goTo(intent,PickTasteActivity.class);
-		
+		sendBroadcast(intent);				
 	}
 
 	
@@ -273,12 +281,12 @@ public class PickFoodActivity extends TabActivity implements
 	 * go to Activity method
 	 */
 	public  void goTo(Intent intent, Class<? extends Activity> cls) {
-		OrderActivity.dynamic.removeAllViews();
-		OrderActivity.dynamic.removeAllViewsInLayout();
-		intent.setClass(PickFoodActivity.this, cls);
-		View nowView = PickFoodActivity.this.getLocalActivityManager()
-				.startActivity(cls.getName(), intent).getDecorView();
-		OrderActivity.dynamic.addView(nowView);
+//		OrderActivity._rightDynamic.removeAllViews();
+//		OrderActivity._rightDynamic.removeAllViewsInLayout();
+//		intent.setClass(PickFoodActivity.this, cls);
+//		View nowView = PickFoodActivity.this.getLocalActivityManager()
+//				.startActivity(cls.getName(), intent).getDecorView();
+//		OrderActivity._rightDynamic.addView(nowView);
 		
 	}
 	
@@ -288,11 +296,11 @@ public class PickFoodActivity extends TabActivity implements
 	 * go to Activity method
 	 */
 	public  void goTo(Class<? extends Activity> cls) {
-		OrderActivity.dynamic.removeAllViews();
-		OrderActivity.dynamic.removeAllViewsInLayout();
-		View nowView = PickFoodActivity.this.getLocalActivityManager().startActivity(cls.getName(), new Intent(PickFoodActivity.this,cls))
-				.getDecorView();
-		OrderActivity.dynamic.addView(nowView);
+//		OrderActivity._rightDynamic.removeAllViews();
+//		OrderActivity._rightDynamic.removeAllViewsInLayout();
+//		View nowView = PickFoodActivity.this.getLocalActivityManager().startActivity(cls.getName(), new Intent(PickFoodActivity.this,cls))
+//				.getDecorView();
+//		OrderActivity._rightDynamic.addView(nowView);
 		
 	}
 	/**

@@ -6,12 +6,36 @@ package com.wireless.pad;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
+import android.app.Activity;
+import android.app.ActivityGroup;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnKeyListener;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.OrderParcel;
+import com.wireless.parcel.TableParcel;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
@@ -22,57 +46,17 @@ import com.wireless.protocol.Table;
 import com.wireless.protocol.Type;
 import com.wireless.protocol.Util;
 import com.wireless.sccon.ServerConnector;
-
-
 import com.wireless.view.OrderFoodListView;
-
-import android.app.Activity;
-import android.app.ActivityGroup;
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.DialogInterface.OnKeyListener;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.view.KeyEvent;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.AbsListView;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.AbsListView.OnScrollListener;
-import android.widget.Toast;
 
 
 public class OrderActivity extends ActivityGroup implements OrderFoodListView.OnOperListener{
 	
-	//the Dynamic of the View
-	public static LinearLayout dynamic;
 	
 	private static OrderFoodListView _newFoodLstView;
 	
-	//the BroadcastReceiver action
-	public static final String ACTION = "notifydatachange";
 	private static final int REDRAW_FOOD_MENU = 1;
 	
-	private Button back_btn;//返回按钮
-	private Button reflash_btn;//刷新菜品信息
-	
-	private Button confirm;//确认
-	private Button cancle;//取消
-	
-	private Table table;
-	
-	private EditText tblNoEdtTxt;//餐台号
-	private EditText customerNumEdtTxt;//人数
-	
-	public static final String TABLE = "table";
+	private Table _table;
 	
 	/**
 	 * 请求菜谱和餐厅信息后，更新到相关的界面控件
@@ -82,37 +66,102 @@ public class OrderActivity extends ActivityGroup implements OrderFoodListView.On
 		public void handleMessage(Message message){
 			if(message.what == REDRAW_FOOD_MENU){
 				//更新菜品列表
-				goTo(new Intent(),PickFoodActivity.class);
+				rightSwitchTo(new Intent(),PickFoodActivity.class);
 			}
 		}
 	};
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.order);
 		
-		table = getIntent().getParcelableExtra(TABLE);
+		TableParcel tableParcel = getIntent().getParcelableExtra(TableParcel.KEY_VALUE);
+		_table = tableParcel;
 		
 		init();
+	}
+	
+	BroadcastReceiver _pickFoodRecv = new BroadcastReceiver() {
 		
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if(intent.getAction().equals(PickFoodActivity.PICK_FOOD_ACTION)){
+				/**
+				 * 如果是点菜View选择了某个菜品后，从点菜View取得OrderParcel，并更新点菜的List
+				 */
+				OrderParcel orderParcel = intent.getParcelableExtra(OrderParcel.KEY_VALUE);
+				_newFoodLstView.notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(orderParcel.foods)));
+				_newFoodLstView.expandGroup(0);
+				
+			}else if(intent.getAction().equals(PickFoodActivity.PICK_TASTE_ACTION)){
+				/**
+				 * 如果是点菜View选择口味，从点菜View取得FoodParcel，并切换到口味View
+				 */
+				Bundle bundle = new Bundle();
+				bundle.putParcelable(FoodParcel.KEY_VALUE, intent.getParcelableExtra(FoodParcel.KEY_VALUE));
+				Intent intentToTaste = new Intent(OrderActivity.this, PickTasteActivity.class);
+				intentToTaste.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				intentToTaste.putExtras(bundle);
+				rightSwitchTo(intentToTaste, PickTasteActivity.class);
+				
+			}else if(intent.getAction().equals(PickTasteActivity.PICK_TASTE_ACTION)){
+				/**
+				 * 如果是口味View选择了某个菜品的口味，从口味View取得FoodParcel，更新点菜的List，并切换到点菜View
+				 */
+				FoodParcel foodParcel = intent.getParcelableExtra(FoodParcel.KEY_VALUE);
+				_newFoodLstView.notifyDataChanged(foodParcel);
+				_newFoodLstView.expandGroup(0);
+				
+				intent = new Intent(OrderActivity.this, PickFoodActivity.class);
+				Bundle bundle = new Bundle();
+				Order tmpOrder = new Order();
+				tmpOrder.foods = _newFoodLstView.getSourceData().toArray(new OrderFood[_newFoodLstView.getSourceData().size()]);
+				bundle.putParcelable(OrderParcel.KEY_VALUE, new OrderParcel(tmpOrder));
+				intent.putExtras(bundle);
+				rightSwitchTo(intent, PickFoodActivity.class);   
+				
+			}else if(intent.getAction().equals(PickTasteActivity.NOT_PICK_TASTE_ACTION)){
+				/**
+				 * 如果在口味View选择取消，则直接切换到点菜View
+				 */
+				intent = new Intent(OrderActivity.this, PickFoodActivity.class);
+				Bundle bundle = new Bundle();
+				Order tmpOrder = new Order();
+				tmpOrder.foods = _newFoodLstView.getSourceData().toArray(new OrderFood[_newFoodLstView.getSourceData().size()]);
+				bundle.putParcelable(OrderParcel.KEY_VALUE, new OrderParcel(tmpOrder));
+				intent.putExtras(bundle);
+				rightSwitchTo(intent, PickFoodActivity.class); 
+			}
+		}
+	}; 
+	
+	@Override
+	protected void onResume(){
+		super.onResume();
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(PickFoodActivity.PICK_FOOD_ACTION);
+		filter.addAction(PickFoodActivity.PICK_TASTE_ACTION);
+		filter.addAction(PickTasteActivity.PICK_TASTE_ACTION);
+		filter.addAction(PickTasteActivity.NOT_PICK_TASTE_ACTION);
+		registerReceiver(_pickFoodRecv,	filter);
+	}
+	
+	@Override
+	protected void onPause(){
+		super.onPause();
+		this.unregisterReceiver(_pickFoodRecv);
 	}
 	
 	
 	/**
 	 * the init method
 	 * */
-	public void init(){
-		
+	public void init(){		
 		
 		_newFoodLstView = (OrderFoodListView)findViewById(R.id.orderLstView);
-		dynamic = (LinearLayout)findViewById(R.id.dynamic);
 
-		back_btn = (Button)findViewById(R.id.back_btn);
-		reflash_btn = (Button)findViewById(R.id.refurbish_btn);
-		
 		//返回按钮的点击事件
-		back_btn.setOnClickListener(new View.OnClickListener() {
+		((Button)findViewById(R.id.back_btn)).setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
@@ -121,7 +170,7 @@ public class OrderActivity extends ActivityGroup implements OrderFoodListView.On
 		});
 		
 		//刷新菜品的按钮点击事件
-		reflash_btn.setOnClickListener(new View.OnClickListener() {
+		((Button)findViewById(R.id.refurbish_btn)).setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
@@ -129,9 +178,8 @@ public class OrderActivity extends ActivityGroup implements OrderFoodListView.On
 			}
 		});
 		
-		confirm = (Button)findViewById(R.id.confirm);
-		//确认按钮的点击事件
-		confirm.setOnClickListener(new View.OnClickListener() {
+		//提交按钮的点击事件
+		((Button)findViewById(R.id.confirm)).setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
@@ -140,37 +188,23 @@ public class OrderActivity extends ActivityGroup implements OrderFoodListView.On
 			}
 		});
 		
-		cancle = (Button)findViewById(R.id.cancle);
 		//取消按钮的点击事件
-		cancle.setOnClickListener(new View.OnClickListener() {
+		((Button)findViewById(R.id.cancle)).setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				
+				// TODO Auto-generated method stub				
 			}
 		});
-		
-		
-		tblNoEdtTxt = (EditText)findViewById(R.id.tblNoEdtTxt);
-		customerNumEdtTxt = (EditText)findViewById(R.id.customerNumEdtTxt);
 		
 		//台号进行赋值
-		//tblNoEdtTxt.setText(table.aliasID);
+		((EditText)findViewById(R.id.tblNoEdtTxt)).setText(Integer.toString(_table.aliasID));
 		//人数进行赋值
-		//customerNumEdtTxt.setText(table.custom_num);
+		((EditText)findViewById(R.id.customerNumEdtTxt)).setText("1");
 		
-//		/**
-//		 * 判断餐台状态，并且进行对列表赋类型，是改单还是下单
-//		 * */
-//		if(table.status == 0){
-//			_newFoodLstView.setType(Type.INSERT_ORDER);
-//		}else{
-//			_newFoodLstView.setType(Type.UPDATE_ORDER);
-//			//执行异步请求该餐台的信息
-//		}
 		_newFoodLstView.setType(Type.INSERT_ORDER);
-		_newFoodLstView.setOperListener(OrderActivity.this);
+		_newFoodLstView.setOperListener(this);
+		
 		//滚动的时候隐藏输入法
 		_newFoodLstView.setOnScrollListener(new OnScrollListener() {				
 			@Override
@@ -189,47 +223,63 @@ public class OrderActivity extends ActivityGroup implements OrderFoodListView.On
 				((TextView)findViewById(R.id.totalTxtView)).setText(Util.CURRENCY_SIGN + Util.float2String(tmpOrder.calcPrice2()));	
 			}
 		});
-		_newFoodLstView.notifyDataChanged(new ArrayList<OrderFood>());
+		_newFoodLstView.notifyDataChanged(new ArrayList<OrderFood>());		
 		
-		onPickFood();
-		
-		
+		/**
+		 * 右侧显示点菜View
+		 */
+		Order tmpOrder = new Order();
+		tmpOrder.foods = new OrderFood[0];
+		Intent intent = new Intent(OrderActivity.this, PickFoodActivity.class);
+		Bundle bundle = new Bundle();
+		bundle.putParcelable(OrderParcel.KEY_VALUE, new OrderParcel(tmpOrder));
+		intent.putExtras(bundle);
+		rightSwitchTo(intent, PickFoodActivity.class);
 	}
 	
 	
 	/**
 	 * go to Activity method
 	 */
-	public  void goTo(Intent intent, Class<? extends Activity> cls) {
-		OrderActivity.dynamic.removeAllViews();
-		OrderActivity.dynamic.removeAllViewsInLayout();
-		intent.setClass(OrderActivity.this, cls);
-		View nowView = OrderActivity.this.getLocalActivityManager()
-				.startActivity(cls.getName(), intent).getDecorView();
-		OrderActivity.dynamic.addView(nowView);
-		
+	public void rightSwitchTo(Intent intent, Class<? extends Activity> cls) {
+		LinearLayout rightDynamicView = (LinearLayout)findViewById(R.id.dynamic);
+		rightDynamicView.removeAllViews();
+		rightDynamicView.removeAllViewsInLayout();
+		intent.setClass(this, cls);
+		rightDynamicView.addView(getLocalActivityManager().startActivity(cls.getName(), intent).getDecorView());		
 	}
 	
 
 
 	@Override
 	public void onPickTaste(OrderFood selectedFood) {
-		// TODO Auto-generated method stub
-		
+		if(selectedFood.isTemporary){
+			Toast.makeText(this, "临时菜不能添加口味", 0).show();
+		}else{
+			/**
+			 * 点击"口味"后，右侧切换到口味View
+			 */
+			Intent intent = new Intent(OrderActivity.this, PickTasteActivity.class);
+			Bundle bundle = new Bundle();
+			bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(selectedFood));
+			intent.putExtras(bundle);
+			rightSwitchTo(intent, PickTasteActivity.class);			
+		}
 	}
 
 
 	@Override
 	public void onPickFood() {
-		 // 调转到选菜Activity，并将新点菜的已有菜品传递过去
+		/**
+		 * 点击"点菜"后，右侧切换到点菜View
+		 */
 		Intent intent = new Intent(OrderActivity.this, PickFoodActivity.class);
 		Bundle bundle = new Bundle();
 		Order tmpOrder = new Order();
 		tmpOrder.foods = _newFoodLstView.getSourceData().toArray(new OrderFood[_newFoodLstView.getSourceData().size()]);
 		bundle.putParcelable(OrderParcel.KEY_VALUE, new OrderParcel(tmpOrder));
 		intent.putExtras(bundle);
-		goTo(intent,PickFoodActivity.class);
-       
+		rightSwitchTo(intent, PickFoodActivity.class);       
 	}
   
 	
@@ -241,62 +291,43 @@ public class OrderActivity extends ActivityGroup implements OrderFoodListView.On
 		 
 	 }    
 	
-	
-
-
-	 //更新口味ListView方法
-	 public static void notifyTasteData(FoodParcel foodParcel){
-		 _newFoodLstView.notifyDataChanged(foodParcel);
-		 _newFoodLstView.expandGroup(0);
-		 
-	 }    
-	 
-	 //获取已点菜的数据
-	 public static List<OrderFood> getSourceData(){ 
-		 return _newFoodLstView.getSourceData();
-	 }
-	 
-	 
-	 
-	 
-	 
-	 /**
-		 * 点解返回键进行监听弹出的Dialog
-		 */
-		public void showExitDialog(){
-			if(_newFoodLstView.getSourceData().size() != 0){			
-				new AlertDialog.Builder(this)
-				.setTitle("提示")
-				.setMessage("账单还未提交，是否确认退出?")
-				.setNeutralButton("确定",
-						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog,	int which){
-								finish();
-							}
-						})
-				.setNegativeButton("取消", null)
-				.setOnKeyListener(new OnKeyListener() {
-					@Override
-					public boolean onKey(DialogInterface arg0, int arg1, KeyEvent arg2) {
-						return true;
-					}
-				}).show();
-			}else{
-				finish();
-			}
+	/**
+	 * 点解返回键进行监听弹出的Dialog
+	 */
+	public void showExitDialog() {
+		if (_newFoodLstView.getSourceData().size() != 0) {
+			new AlertDialog.Builder(this)
+					.setTitle("提示")
+					.setMessage("账单还未提交，是否确认退出?")
+					.setNeutralButton("确定",
+							new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog,	int which) {
+									finish();
+								}
+							})
+					.setNegativeButton("取消", null)
+					.setOnKeyListener(new OnKeyListener() {
+						@Override
+						public boolean onKey(DialogInterface arg0, int arg1, KeyEvent arg2) {
+							return true;
+						}
+					}).show();
+		} else {
+			finish();
 		}
+	}
 
-		/**
-		 * 监听返回键
-		 */
-		@Override
-		public boolean onKeyDown(int keyCode, KeyEvent event) {
-			if(keyCode == KeyEvent.KEYCODE_BACK){
-				showExitDialog();
-			}
-			return super.onKeyDown(keyCode, event);
+	/**
+	 * 监听返回键
+	 */
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			showExitDialog();
 		}
+		return super.onKeyDown(keyCode, event);
+	}
 	 
 	 /**
 		 * 请求菜谱信息

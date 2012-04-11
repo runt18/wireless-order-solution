@@ -2,7 +2,7 @@ package com.wireless.adapter;
 
 import java.util.ArrayList;
 
-import android.content.Context;
+import android.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,100 +15,99 @@ import com.wireless.protocol.Table;
 
 public class TableAdapter extends BaseAdapter {
 
-	private Context context;
-	private ArrayList<Table> tables;
-
+	private ArrayList<Table> _tables;
+	private OnTableClickListener _tableClick;
+	
 	public TableAdapter() {
 	}
 
-	public TableAdapter(Context context,  ArrayList<Table> tables) {
-		this.context = context;
-		this.tables = tables;
+	public TableAdapter(ArrayList<Table> tables, OnTableClickListener tableClick) {
+		this._tableClick = tableClick;
+		this._tables = tables;
 	}
 
 	@Override
 	public int getCount() {
-		return tables.size();
+		return _tables.size();
 	}
 
 	@Override
 	public Object getItem(int position) {
-		return tables.get(position);
+		return _tables.get(position);
 	}
 
 	@Override
 	public long getItemId(int position) {
-		return tables.get(position).tableID;
+		return _tables.get(position).tableID;
 	}
 
-	/* (non-Javadoc)
-	 * @see android.widget.Adapter#getView(int, android.view.View, android.view.ViewGroup)
-	 */
+
 	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
+	public View getView(int position, View convertView, final ViewGroup parent) {
 		
-		View rowView = convertView;
-		ViewCache viewCache;
-
-		if (rowView == null) {
-			// 初始化每项的View
-			LayoutInflater inflater = LayoutInflater.from(context);
-			rowView = inflater.inflate(R.layout.gridviewitem, null);
-			viewCache = new ViewCache(rowView);
-			rowView.setTag(viewCache);
+		View view;
+		
+		if(convertView == null) {
+			view = LayoutInflater.from(parent.getContext()).inflate(R.layout.gridviewitem, null);
 		} else {
-			viewCache = (ViewCache) rowView.getTag();
+			view = convertView;
 		}
 		
-		if(tables.get(position).status == Table.TABLE_BUSY ){
-			viewCache.getItem1().setBackgroundResource(R.drawable.av_r39_c15);
-			viewCache.getItem4().setBackgroundResource(R.drawable.av_r42_c15);
+		final Table table = _tables.get(position);
+		
+		//根据餐台的不同状态设置背景
+		if(table.status == Table.TABLE_BUSY ){
+			((FrameLayout)view.findViewById(R.id.item1)).setBackgroundResource(R.drawable.av_r39_c15);
+			((FrameLayout)view.findViewById(R.id.item4)).setBackgroundResource(R.drawable.av_r42_c15);
 		}else{
-			viewCache.getItem1().setBackgroundResource(R.drawable.av_r40_c8);
-			viewCache.getItem4().setBackgroundResource(R.drawable.av_r43_c8);
+			((FrameLayout)view.findViewById(R.id.item1)).setBackgroundResource(R.drawable.av_r40_c8);
+			((FrameLayout)view.findViewById(R.id.item4)).setBackgroundResource(R.drawable.av_r43_c8);
 		}
-		viewCache.getItem3().setText("" + tables.get(position).aliasID);
-		viewCache.getItem5().setText(tables.get(position).name);
-//		viewCache.getItem5().setText("餐台");
-		return rowView;
+		//设置餐台台号
+		((TextView)view.findViewById(R.id.item3)).setText(Integer.toString(table.aliasID));
+		//设置餐台名称
+		((TextView)view.findViewById(R.id.item5)).setText(table.name);
+		
+		view.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				//TODO jump to order activity
+				if(_tableClick != null){
+					_tableClick.onClick(table);
+				}
+			}
+		});
+		
+		view.setOnLongClickListener(new View.OnLongClickListener() {
+			
+			@Override
+			public boolean onLongClick(View v) {
+				if (table.status == Table.TABLE_BUSY) {
+					new AlertDialog.Builder(parent.getContext())
+						.setTitle("请选择" + table.aliasID + "号餐台的操作")
+						.setItems(new String[] { "改单", "转台" }, null)
+						.setNegativeButton("返回", null)
+						.show();
+					
+				} else if (table.status == Table.TABLE_IDLE) {
+					new AlertDialog.Builder(parent.getContext())
+						.setTitle("请选择" + table.aliasID + "号餐台的操作")
+						.setItems(new String[] { "下单" }, null)
+						.setNegativeButton("返回", null)
+						.show();
+				}
+				return true;
+			}
+		});
+		
+		return view;
 	}
 
+	public static interface OnTableClickListener{
+		public void onClick(Table table);
+	}
+	
 }
 
-class ViewCache {
-	View baseView;
-	FrameLayout item1;
-	TextView item3;
-	FrameLayout item4;
-	TextView item5;
 
-	public ViewCache(View baseView) {
-		this.baseView = baseView;
-	}
-
-	public FrameLayout getItem1() {
-		if (item1 == null)
-			item1 = (FrameLayout) baseView.findViewById(R.id.item1);
-		return item1;
-	}
-
-
-	public TextView getItem3() {
-		if (item3 == null)
-			item3 = (TextView) baseView.findViewById(R.id.item3);
-		return item3;
-	}
-
-	public FrameLayout getItem4() {
-		if (item4 == null)
-			item4 = (FrameLayout) baseView.findViewById(R.id.item4);
-		return item4;
-	}
-
-	public TextView getItem5() {
-		if (item5 == null)
-			item5 = (TextView) baseView.findViewById(R.id.item5);
-		return item5;
-	}
-
-}

@@ -10,7 +10,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.LayoutInflater;
@@ -22,6 +21,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -39,27 +39,16 @@ import com.wireless.protocol.Taste;
 import com.wireless.protocol.Util;
 
 public class PickTasteActivity extends TabActivity implements OnGestureListener{
-	int _currentView = 0; 
+	
 	private GestureDetector _detector; 
 
+	public static final String PICK_TASTE_ACTION = "com.wireless_pad.PickTasteActivty.PickTaste";
+	public static final String NOT_PICK_TASTE_ACTION = "com.wireless_pad.PickTasteActivty.PickNoTaste";
 
 	private Handler _handler = new Handler(){
 		@Override
 		public void handleMessage(Message message){
 			_tasteTxtView.setText(_selectedFood.name + "-" + _selectedFood.tastePref);
-			
-			/**
-			 * 发送广播去更新已点菜界面
-			 * */
-			Intent intent = new Intent(); 
-			//设置action
-		    intent.setAction(MyBroadcastReceiver.TASTEACTION);	
-			Bundle bundle = new Bundle();
-			bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(_selectedFood));
-			intent.putExtras(bundle);
-			//发送广播
-		    sendBroadcast(intent);
-		
 		}
 	};
 	
@@ -81,11 +70,12 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 		
 		// construct the tab host
 		setContentView(R.layout.tastetable);		
+		
+		FoodParcel foodParcel = getIntent().getParcelableExtra(FoodParcel.KEY_VALUE);
+		_selectedFood = foodParcel;
+		
 		_tabHost = getTabHost();
 		
-		  FoodParcel foodParcel = getIntent().getParcelableExtra(FoodParcel.KEY_VALUE);
-		  _selectedFood = foodParcel;
-		  
 		//口味Tab
 		TabSpec spec = _tabHost.newTabSpec(TAG_TASTE)
 							   .setIndicator(createTabIndicator("口味", R.drawable.ic_tab_albums))
@@ -146,17 +136,44 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 		setTasteView();
 		_handler.sendEmptyMessage(0);	
 		
-	}
+	}	
 
-	
-	//接收传递过来的菜品对象
-	public static void onResume( FoodParcel foodParcel) {
-		//get the food parcel from the intent
-		_selectedFood = foodParcel;
-	}
-	
-   //设置口味View
+	    //设置口味View
 	public void setTasteView(){
+		
+		//确定Button
+		((Button)findViewById(R.id.pickTasteBtn)).setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				/**
+				 * 选择口味后，将OrderFood的信息放到Parcel，并发出广播Intent通知OrderActivity
+				 */
+				Bundle bundle = new Bundle();
+				bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(_selectedFood));
+				Intent intent = new Intent();
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				intent.setAction(PICK_TASTE_ACTION);
+				intent.putExtras(bundle);
+				sendBroadcast(intent);
+			}
+		});
+		
+		//取消Button
+		((Button)findViewById(R.id.cancelTasteBtn)).setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				/**
+				 * 不选择口味，广播Intent通知OrderActivity
+				 */
+				Intent intent = new Intent();
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				intent.setAction(NOT_PICK_TASTE_ACTION);
+				sendBroadcast(intent);
+			}
+		});
+		
 		_tasteTxtView = (TextView)findViewById(R.id.foodTasteTxtView);
 	    final ListView tasteLstView = (ListView)findViewById(R.id.tasteLstView);
 	   ((EditText)findViewById(R.id.tastesearch)).setText("");
@@ -317,15 +334,15 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 		});
 	}
 	
-	@Override
-	public void onBackPressed(){
-		Intent intent = new Intent(); 
-		Bundle bundle = new Bundle();
-		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(_selectedFood));
-		intent.putExtras(bundle);
-		setResult(RESULT_OK, intent);
-		super.onBackPressed();
-	}
+//	@Override
+//	public void onBackPressed(){
+//		Intent intent = new Intent(); 
+//		Bundle bundle = new Bundle();
+//		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(_selectedFood));
+//		intent.putExtras(bundle);
+//		setResult(RESULT_OK, intent);
+//		super.onBackPressed();
+//	}
 	
 	/**
 	 * Create the tab indicator
