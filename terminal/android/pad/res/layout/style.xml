@@ -14,7 +14,21 @@
 			android:layout_height="wrap_content" android:textSize="20sp"
 			android:textColor="#000000" android:layout_centerVertical="true"
 			android:layout_marginLeft="5dip"></TextView>
+		<Button
+		    android:id="@+id/cancelStyleBtn"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_alignParentRight="true"
+		    android:layout_alignParentTop="true"
+		    android:text="取消" />
 
+		<Button
+		    android:id="@+id/pickStyleBtn"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_alignParentTop="true"
+		    android:layout_toLeftOf="@+id/cancelStyleBtn"
+		    android:text="确定" />
 	</RelativeLayout>
 
 	<RelativeLayout android:id="@+id/second"

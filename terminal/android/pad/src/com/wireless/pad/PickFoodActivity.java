@@ -10,6 +10,7 @@ import android.app.Dialog;
 import android.app.TabActivity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences.Editor;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
@@ -43,6 +44,7 @@ import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.OrderParcel;
@@ -71,15 +73,12 @@ public class PickFoodActivity extends TabActivity implements
 	private final static String TAG_OCCASIONAL = "occasional";
 
 
-	private static ArrayList<OrderFood> _pickFoods = new ArrayList<OrderFood>();
+	private ArrayList<OrderFood> _pickFoods = new ArrayList<OrderFood>();
 	private TabHost _tabHost;
 	private GestureDetector _detector;
-	boolean dialogTag = false;
-	private List<Food> _filterFoods;
+	private List<Food> _filterKitchenFoods;
 	private TempListView _tempLstView;
-	private TextView _centerTxtView;
-	
-  
+	private TextView _centerTxtView;  
 
 	/** Called when the activity is first created. */
 	@Override
@@ -164,37 +163,44 @@ public class PickFoodActivity extends TabActivity implements
 		_tabHost.setOnTabChangedListener(new OnTabChangeListener() {
 			@Override
 			public void onTabChanged(String tag) {
+				Editor editor = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).edit();
 				if (tag == TAG_NUMBER) {
+					editor.putInt(Params.LAST_PICK_CATE, Params.PICK_BY_NUMBER);
 					setupNumberView();
 
 				} else if (tag == TAG_KITCHEN) {
+					editor.putInt(Params.LAST_PICK_CATE, Params.PICK_BY_KITCHEN);
 					setupKitchenView();
 
 				} else if (tag == TAG_PINYIN) {
+					editor.putInt(Params.LAST_PICK_CATE, Params.PICK_BY_PINYIN);
 					setupPinyinView();
 
 				} else if (tag == TAG_OCCASIONAL) {
 					setTempView();
 				}
+				editor.commit();
 			}
 		});
 
-		_tabHost.setCurrentTabByTag(TAG_NUMBER);
-		setupNumberView();
-	}
-	
-	/**
-	 * 获取传递过来的List
-	 * */
-     public static void onResume(List<OrderFood> pickFoods) {
-		_pickFoods.clear();	
-		_pickFoods = (ArrayList<OrderFood>) pickFoods;
-	}
-		
-	
-	
-	
+		/**
+		 * 根据上次保存的记录，切换到相应的点菜方式
+		 */
+		int lastPickCate = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).getInt(Params.LAST_PICK_CATE, Params.PICK_BY_KITCHEN);
+		if(lastPickCate == Params.PICK_BY_NUMBER){
+			_tabHost.setCurrentTabByTag(TAG_NUMBER);
+			setupNumberView();
+			
+		}else if(lastPickCate == Params.PICK_BY_KITCHEN){
+			_tabHost.setCurrentTabByTag(TAG_KITCHEN);
+			
+		}else if(lastPickCate == Params.PICK_BY_PINYIN){
+			_tabHost.setCurrentTabByTag(TAG_PINYIN);
 
+		}else{
+			_tabHost.setCurrentTabByTag(TAG_NUMBER);
+		}
+	}
 	
 
 	@Override
@@ -609,9 +615,9 @@ public class PickFoodActivity extends TabActivity implements
 		// 初始化的时候厨房默认显示的厨房信息
 		TextView ketchenName = (TextView)findViewById(R.id.Spinner01);
 		ketchenName.setText("全部");
-		pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods,	PickFoodListView.TAG_PINYIN);
+		_filterKitchenFoods = new ArrayList<Food>(Arrays.asList(WirelessOrder.foodMenu.foods));
+		pickLstView.notifyDataChanged(_filterKitchenFoods.toArray(new Food[_filterKitchenFoods.size()]), PickFoodListView.TAG_PINYIN);
 		pickLstView.setFoodPickedListener(this);
-
 
 
 		/**
@@ -642,12 +648,11 @@ public class PickFoodActivity extends TabActivity implements
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				if (s.toString().length() != 0) {
-					Food[] foods = pickLstView.getSourceData();
 					ArrayList<Food> filterFoods = new ArrayList<Food>();
-					for (int i = 0; i < foods.length; i++) {
-						if(String.valueOf(foods[i].pinyin).toLowerCase().contains(s.toString().toLowerCase())
-								|| foods[i].name.contains(s.toString())) {
-							filterFoods.add(foods[i]);
+					for(Food food : _filterKitchenFoods){
+						if(String.valueOf(food.pinyin).toLowerCase().contains(s.toString().toLowerCase())
+								|| food.name.contains(s.toString())) {
+							filterFoods.add(food);
 						}
 					}
 
@@ -656,16 +661,7 @@ public class PickFoodActivity extends TabActivity implements
 							PickFoodListView.TAG_PINYIN);
 
 				} else {
-					if (dialogTag) {
-						pickLstView.notifyDataChanged(_filterFoods
-								.toArray(new Food[_filterFoods.size()]),
-								PickFoodListView.TAG_PINYIN);
-					} else {
-						pickLstView.notifyDataChanged(
-								WirelessOrder.foodMenu.foods,
-								PickFoodListView.TAG_PINYIN);
-					}
-
+					pickLstView.notifyDataChanged(_filterKitchenFoods.toArray(new Food[_filterKitchenFoods.size()]), PickFoodListView.TAG_PINYIN);
 				}
 			}
 
@@ -1022,17 +1018,17 @@ public class PickFoodActivity extends TabActivity implements
 				public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
 					
 					Kitchen selectedKitchen = _kitchenChild.get(groupPosition).get(childPosition);
-					_filterFoods = new ArrayList<Food>();
+					
+					_filterKitchenFoods.clear();
 					for (int i = 0; i < WirelessOrder.foodMenu.foods.length; i++) {
 						if (WirelessOrder.foodMenu.foods[i].kitchen.aliasID == selectedKitchen.aliasID) {
-							_filterFoods.add(WirelessOrder.foodMenu.foods[i]);
+							_filterKitchenFoods.add(WirelessOrder.foodMenu.foods[i]);
 						}
 					}
 					// 选中厨房后从新赋值
 					((TextView)PickFoodActivity.this.findViewById(R.id.Spinner01)).setText(_kitchenChild.get(groupPosition).get(childPosition).name);
-					dialogTag = true;
 
-					foodLstView.notifyDataChanged(_filterFoods.toArray(new Food[_filterFoods.size()]),
+					foodLstView.notifyDataChanged(_filterKitchenFoods.toArray(new Food[_filterKitchenFoods.size()]),
 												  PickFoodListView.TAG_PINYIN);
 					dismiss();
 					return true;

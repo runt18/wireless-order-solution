@@ -56,7 +56,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 	private final static String TAG_STYLE = "style";
 	private final static String TAG_SPEC = "spec";
 	
-	private static OrderFood _selectedFood;
+	private OrderFood _selectedFood;
 	private TextView _tasteTxtView;
 	private TabHost _tabHost;
 	
@@ -71,7 +71,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 		// construct the tab host
 		setContentView(R.layout.tastetable);		
 		
-		FoodParcel foodParcel = getIntent().getParcelableExtra(FoodParcel.KEY_VALUE);
+		FoodParcel foodParcel = (FoodParcel)getIntent().getParcelableExtra(FoodParcel.KEY_VALUE);
 		_selectedFood = foodParcel;
 		
 		_tabHost = getTabHost();
@@ -138,6 +138,28 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 		
 	}	
 
+	private void confirmPickTaste(){
+		/**
+		 * 选择口味后，将OrderFood的信息放到Parcel，并发出广播Intent通知OrderActivity
+		 */
+		Bundle bundle = new Bundle();
+		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(_selectedFood));
+		Intent intent = new Intent();
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		intent.setAction(PICK_TASTE_ACTION);
+		intent.putExtras(bundle);
+		sendBroadcast(intent);		
+	}
+	
+	private void cancelPickTaste(){
+		/**
+		 * 不选择口味，广播Intent通知OrderActivity
+		 */
+		Intent intent = new Intent();
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		intent.setAction(NOT_PICK_TASTE_ACTION);
+		sendBroadcast(intent);
+	}
 	    //设置口味View
 	public void setTasteView(){
 		
@@ -146,16 +168,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 			
 			@Override
 			public void onClick(View v) {
-				/**
-				 * 选择口味后，将OrderFood的信息放到Parcel，并发出广播Intent通知OrderActivity
-				 */
-				Bundle bundle = new Bundle();
-				bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(_selectedFood));
-				Intent intent = new Intent();
-				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				intent.setAction(PICK_TASTE_ACTION);
-				intent.putExtras(bundle);
-				sendBroadcast(intent);
+				confirmPickTaste();
 			}
 		});
 		
@@ -164,21 +177,14 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 			
 			@Override
 			public void onClick(View v) {
-				/**
-				 * 不选择口味，广播Intent通知OrderActivity
-				 */
-				Intent intent = new Intent();
-				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				intent.setAction(NOT_PICK_TASTE_ACTION);
-				sendBroadcast(intent);
+				cancelPickTaste();
 			}
 		});
 		
 		_tasteTxtView = (TextView)findViewById(R.id.foodTasteTxtView);
 	    final ListView tasteLstView = (ListView)findViewById(R.id.tasteLstView);
 	   ((EditText)findViewById(R.id.tastesearch)).setText("");
-		tasteLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.tastes));
-		
+		tasteLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.tastes));		
 		
 		
 		
@@ -236,7 +242,23 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
     	((EditText)findViewById(R.id.stylesearch)).setText("");
 		styleLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.styles));
 		
+		//确定Button
+		((Button)findViewById(R.id.pickStyleBtn)).setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				confirmPickTaste();
+			}
+		});
 		
+		//取消Button
+		((Button)findViewById(R.id.cancelStyleBtn)).setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				cancelPickTaste();
+			}
+		});
 	    
 	    //滚动的时候隐藏输入法
 	    styleLstView.setOnScrollListener(new OnScrollListener() {
@@ -289,7 +311,23 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 		((EditText)findViewById(R.id.specsearch)).setText("");
 		specLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.specs));
 	    
-	    
+		//确定Button
+		((Button)findViewById(R.id.pickSpecBtn)).setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				confirmPickTaste();
+			}
+		});
+		
+		//取消Button
+		((Button)findViewById(R.id.cancelSpecBtn)).setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				cancelPickTaste();
+			}
+		});
 	    
 	    //滚动的时候隐藏输入法
 	    specLstView.setOnScrollListener(new OnScrollListener() {
@@ -333,16 +371,6 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 			public void afterTextChanged(Editable s) {}
 		});
 	}
-	
-//	@Override
-//	public void onBackPressed(){
-//		Intent intent = new Intent(); 
-//		Bundle bundle = new Bundle();
-//		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(_selectedFood));
-//		intent.putExtras(bundle);
-//		setResult(RESULT_OK, intent);
-//		super.onBackPressed();
-//	}
 	
 	/**
 	 * Create the tab indicator

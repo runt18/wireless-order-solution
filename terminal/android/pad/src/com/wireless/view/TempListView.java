@@ -5,10 +5,13 @@ import java.util.Iterator;
 import java.util.List;
 
 import android.content.Context;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -21,16 +24,13 @@ import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Util;
 
 
-
 public class TempListView extends ListView {
 	
-	private Context _context;
 	private List<OrderFood> _tmpFoods = new ArrayList<OrderFood>();
 	private BaseAdapter _adapter = new Adapter();
 	
 	public TempListView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		this._context = context;
 		setAdapter(_adapter);		
 	}
 
@@ -44,7 +44,8 @@ public class TempListView extends ListView {
 		//filter the temporary foods without food name
 		Iterator<OrderFood> iter = foods.iterator();
 		while (iter.hasNext()) {
-			if (iter.next().name.equals("")) {
+			OrderFood food = iter.next();
+			if (food.name.equals("") || food.getPrice() > 9999) {
 				iter.remove();
 			}
 		}
@@ -59,9 +60,19 @@ public class TempListView extends ListView {
 		tmpFood.isTemporary = true;
 		tmpFood.aliasID = Util.genTempFoodID();
 		tmpFood.hangStatus = OrderFood.FOOD_NORMAL;
+		tmpFood.setPrice(new Float(10000));
 		tmpFood.setCount(new Float(1));
 		_tmpFoods.add(tmpFood);
 		_adapter.notifyDataSetChanged();
+		//隐藏软键盘
+		((InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(getWindowToken(), 0);
+		//滚动到最后一项
+		post( new Runnable() {     
+			@Override
+			public void run() { 
+				smoothScrollToPosition(getCount());
+			}
+		});
 	}
 	
 	/**
@@ -90,98 +101,150 @@ public class TempListView extends ListView {
 			return position;
 		}
 
+	
 		@Override
 		public View getView(final int position, View convertView, ViewGroup parent) {
-			View view;
+			
+			final OrderFood food = _tmpFoods.get(position);
+			
+			View view;			
+			
 			if(convertView == null){
-				view = LayoutInflater.from(_context).inflate(R.layout.temp_item, null);
+				view = LayoutInflater.from(getContext()).inflate(R.layout.temp_item, null);				
 			}else{
 				view = convertView;
 			}
-			((TextView)view.findViewById(R.id.occasin)).setText("临时菜" + (position + 1));
 			
-			final OrderFood food = _tmpFoods.get(position);
+			((TextView)view.findViewById(R.id.occasin)).setText("临时菜" + (position + 1));			
 			
 			/**
 			 * 菜名赋值
 			 */
-			final EditText foodNameEdtTxt = (EditText)view.findViewById(R.id.occasiname);
+			EditText foodNameEdtTxt = (EditText)view.findViewById(R.id.occasiname);
+			//设置临时菜名称前删除文本框监听器
+			if(foodNameEdtTxt.getTag() != null){
+				foodNameEdtTxt.removeTextChangedListener((TextWatcher)foodNameEdtTxt.getTag());
+			}
 			foodNameEdtTxt.setText(food.name);
-			foodNameEdtTxt.setOnFocusChangeListener(new OnFocusChangeListener() {				
+			TextWatcher textWatcher = new TextWatcher() {
+				
 				@Override
-				public void onFocusChange(View v, boolean hasFocus) {
-					if(!hasFocus){
-						if(_tmpFoods.indexOf(food) == position){
-							String name = foodNameEdtTxt.getEditableText().toString().trim();
-							if(name.equals("")){
-								Toast.makeText(_context, "请输入临时菜" + (position + 1) + "的名称", 0).show();
-							}else{
-								food.name = foodNameEdtTxt.getEditableText().toString().replace(",", ";").replace("，", "；").trim();
-								_tmpFoods.set(position, food);
-							}
-						}
-					}
+				public void onTextChanged(CharSequence s, int start, int before, int count) {
+					
 				}
-			});
+				
+				@Override
+				public void beforeTextChanged(CharSequence s, int start, int count,	int after) {
+					
+				}
+				
+				@Override
+				public void afterTextChanged(Editable s) {
+					food.name = s.toString().replace(",", ";").replace("，", "；").trim();
+					_tmpFoods.set(position, food);
+				}
+			};
+			
+			foodNameEdtTxt.setTag(textWatcher);
+			foodNameEdtTxt.addTextChangedListener(textWatcher);		
+
 			
 			/**
 			 * 价钱赋值
 			 */
 			final EditText foodPriceEdtTxt = (EditText)view.findViewById(R.id.occasiprice);
-			foodPriceEdtTxt.setText(Util.float2String2(food.getPrice()));
-			foodPriceEdtTxt.setOnFocusChangeListener(new OnFocusChangeListener() {
-				
-				@Override
-				public void onFocusChange(View v, boolean hasFocus) {
-					if(!hasFocus){
-						if(_tmpFoods.indexOf(food) == position){
-							try{
-								Float price = Float.parseFloat(foodPriceEdtTxt.getEditableText().toString());
-								if(price >= 0 && price < 9999){
-									food.setPrice(price);
-									_tmpFoods.set(position, food);
-								}else{
-									foodPriceEdtTxt.setText(Util.float2String(food.getPrice()));
-									Toast.makeText(_context, "临时菜" + (position + 1) + "的价格范围是0～9999", 0).show();
-								}
-							}catch(NumberFormatException e){
-								Toast.makeText(_context, "您输入临时菜" + (position + 1) + "的价钱格式不正确，请重新输入", 0).show();
-							}
-						}
-					}					
-				}
-			});
+			//设置临时菜价钱前删除文本框监听器
+			if(foodPriceEdtTxt.getTag() != null){
+				foodPriceEdtTxt.removeTextChangedListener((TextWatcher)foodPriceEdtTxt.getTag());
+			}
+			foodPriceEdtTxt.setText(food.getPrice() > 9999 ? "" : Util.float2String2(food.getPrice()));
 			
+			textWatcher = new TextWatcher() {				
+				@Override
+				public void onTextChanged(CharSequence s, int start, int before, int count) {
+					
+				}				
+				@Override
+				public void beforeTextChanged(CharSequence s, int start, int count,	int after) {
+					
+				}				
+				@Override
+				public void afterTextChanged(Editable s) {
+					if(s.toString().length() != 0){
+						try{
+							Float price = Float.parseFloat(s.toString());
+							if(price >= 0 && price < 9999){
+								food.setPrice(price);
+								_tmpFoods.set(position, food);
+							}else{
+								foodPriceEdtTxt.setText(food.getPrice() > 9999 ? "" : Util.float2String2(food.getPrice()));
+								foodPriceEdtTxt.setSelection(foodPriceEdtTxt.getText().length());
+								Toast.makeText(getContext(), "临时菜" + 
+											   (food.name.length() == 0 ? (position + 1) : "(" + food.name + ")") + 
+											   "的价格范围是0～9999", 0).show();
+							}
+							
+						}catch(NumberFormatException e){
+							foodPriceEdtTxt.setText(food.getPrice() > 9999 ? "" : Util.float2String2(food.getPrice()));
+							foodPriceEdtTxt.setSelection(foodPriceEdtTxt.getText().length());
+							Toast.makeText(getContext(), "您输入临时菜" + 
+										  (food.name.length() == 0 ? (position + 1) : "(" + food.name + ")") + 
+										  "的价钱格式不正确，请重新输入", 0).show();
+						}						
+					}
+				}
+			};
+			
+			foodPriceEdtTxt.setTag(textWatcher);
+			foodPriceEdtTxt.addTextChangedListener(textWatcher);			
 			
 			/**
 			 * 数量赋值
 			 */
 			final EditText foodAmountEdtTxt = (EditText)view.findViewById(R.id.occasicount);
+			//设置临时菜数量前删除文本框监听器
+			if(foodAmountEdtTxt.getTag() != null){
+				foodAmountEdtTxt.removeTextChangedListener((TextWatcher)foodAmountEdtTxt.getTag());
+			}
 			foodAmountEdtTxt.setText(Util.float2String2(food.getCount()));
-			foodAmountEdtTxt.setOnFocusChangeListener(new OnFocusChangeListener() {				
+			
+			textWatcher = new TextWatcher() {				
 				@Override
-				public void onFocusChange(View v, boolean hasFocus) {
-					if(!hasFocus){
-						if(_tmpFoods.indexOf(food) == position){
-							try{
-								Float amount = Float.parseFloat(foodAmountEdtTxt.getEditableText().toString());
-								if(amount > 0 && amount <= 255){
-									food.setCount(amount);
-									_tmpFoods.set(position, food);
-								}else{
-									foodAmountEdtTxt.setText(Util.float2String2(food.getCount()));
-									Toast.makeText(_context, "临时菜" + (position + 1) + "的数量范围是1～255", 0).show();
-								}
-							}catch(NumberFormatException e){
-								Toast.makeText(_context, "您输入临时菜" + (position + 1) + "的数量格式不正确，请重新输入", 0).show();
+				public void onTextChanged(CharSequence s, int start, int before, int count) {
+					
+				}				
+				@Override
+				public void beforeTextChanged(CharSequence s, int start, int count,	int after) {
+					
+				}				
+				@Override
+				public void afterTextChanged(Editable s) {
+					if(s.toString().length() != 0){
+						try{
+							Float amount = Float.parseFloat(s.toString());
+							if(amount > 0 && amount <= 255){
+								food.setCount(amount);
+								_tmpFoods.set(position, food);
+							}else{
+								foodAmountEdtTxt.setText(Util.float2String2(food.getCount()));
+								foodAmountEdtTxt.setSelection(foodAmountEdtTxt.getText().length());
+								Toast.makeText(getContext(), "临时菜" + 
+										   (food.name.length() == 0 ? (position + 1) : "(" + food.name + ")") + 
+											  "的数量范围是1～255", 0).show();
 							}
-							
-						}
+						}catch(NumberFormatException e){
+							foodAmountEdtTxt.setText(Util.float2String2(food.getCount()));
+							foodAmountEdtTxt.setSelection(foodAmountEdtTxt.getText().length());
+							Toast.makeText(getContext(), "您输入临时菜" + 
+										  (food.name.length() == 0 ? (position + 1) : "(" + food.name + ")") + 
+										  "的数量格式不正确，请重新输入", 0).show();
+						}						
 					}
 				}
-			});
+			};
 	       
-			
+			foodAmountEdtTxt.setTag(textWatcher);
+			foodAmountEdtTxt.addTextChangedListener(textWatcher);	
 	        
 			
 			/**
@@ -194,6 +257,8 @@ public class TempListView extends ListView {
 				public void onClick(View v) {		
 					_tmpFoods.remove(position);
 					_adapter.notifyDataSetChanged();
+					//隐藏软键盘
+					((InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(getWindowToken(), 0);
 				}
 			});
 			return view;

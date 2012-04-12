@@ -70,6 +70,7 @@ public class StartupActivity extends Activity {
 			editor.putString(Params.PWD, "");
 			editor.putInt(Params.PRINT_SETTING, Params.PRINT_ASYNC);
 			editor.putInt(Params.CONN_TIME_OUT, Params.TIME_OUT_10s);
+			editor.putInt(Params.LAST_PICK_CATE, Params.PICK_BY_KITCHEN);
 			editor.commit();//Ìá½»ÐÞ¸Ä
 			
 		}else{		
