@@ -8,6 +8,8 @@ import com.wireless.protocol.Util;
 
 public class TableParcel extends Table implements Parcelable {
 
+	public static final String KEY_VALUE = "com.wireless.common.TableParcel";
+	
 	public TableParcel(Table table){
 		this.restaurantID = table.restaurantID;
 		this.tableID = table.tableID;
@@ -15,10 +17,10 @@ public class TableParcel extends Table implements Parcelable {
 		this.category = table.category;
 		this.status = table.status;
 		this.custom_num = table.custom_num;
-		this.name = table.name;
+		this.name = new String(table.name);
 		this.regionID = table.regionID;
-		this.setMinimumCost(table.getMinimumCost());
-		this.setServiceRate(table.getServiceRate());
+		this.setMinimumCost(new Float(table.getMinimumCost()));
+		this.setServiceRate(new Float(table.getServiceRate()));
 	}
 	
 	public TableParcel(Parcel in){

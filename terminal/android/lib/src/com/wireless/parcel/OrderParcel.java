@@ -18,23 +18,26 @@ public class OrderParcel extends Order implements Parcelable{
 		discount_type = order.discount_type;
 		pay_manner = order.pay_manner;
 		category = order.category;
-		setServiceRate(order.getServiceRate());
+		setServiceRate(new Float(order.getServiceRate()));
 		id = order.id;
 		restaurantID = order.restaurantID;
-		table = order.table;
-		table2 = order.table2;
-		oriTbl = order.oriTbl;
+		table = new TableParcel(order.table);
+		table2 = new TableParcel(order.table2);
+		oriTbl = new TableParcel(order.oriTbl);
 
 		custom_num = order.custom_num;
-		this.memberID = order.memberID;
-		this.comment = order.comment;
+		memberID = order.memberID == null ? null : new String(order.memberID);
+		comment = order.comment == null ? null : new String(order.comment);
 		print_type = order.print_type;
-		setMinimumCost(order.getMinimumCost());
-		setGiftPrice(order.getGiftPrice());
-		setCashIncome(order.getCashIncome());
-		setTotalPrice(order.getTotalPrice());
-		setActualPrice(order.getActualPrice());
-		foods = order.foods;
+		setMinimumCost(new Float(order.getMinimumCost()));
+		setGiftPrice(new Float(order.getGiftPrice()));
+		setCashIncome(new Float(order.getCashIncome()));
+		setTotalPrice(new Float(order.getTotalPrice()));
+		setActualPrice(new Float(order.getActualPrice()));
+		foods = new FoodParcel[order.foods.length];
+		for(int i = 0; i < foods.length; i++){
+			foods[i] = new FoodParcel(order.foods[i]);
+		}
 	}
 	
 	private OrderParcel(Parcel in){

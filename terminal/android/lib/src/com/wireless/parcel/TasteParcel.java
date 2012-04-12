@@ -10,11 +10,11 @@ public class TasteParcel extends Taste implements Parcelable{
 
 	public TasteParcel(Taste taste){
 		aliasID = taste.aliasID;
-		preference = taste.preference;
+		preference = new String(taste.preference);
 		category = taste.category;
 		calc = taste.calc;
-		setRate(taste.getRate());
-		setPrice(taste.getPrice());
+		setRate(new Float(taste.getRate()));
+		setPrice(new Float(taste.getPrice()));
 	}
 	
 	private TasteParcel(Parcel in){

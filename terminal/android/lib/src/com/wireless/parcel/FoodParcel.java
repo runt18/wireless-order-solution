@@ -16,15 +16,18 @@ public class FoodParcel extends OrderFood implements Parcelable{
 	public FoodParcel(OrderFood food){
 		aliasID = food.aliasID;
 		kitchen = food.kitchen;
-		name = food.name;
-		tastes = food.tastes;
+		name = new String(food.name);
+		tastes = new TasteParcel[food.tastes.length];
+		for(int i = 0; i < tastes.length; i++){
+			tastes[i] = new TasteParcel(food.tastes[i]);
+		}
 		hangStatus = food.hangStatus;
 		isTemporary = food.isTemporary;
 		status = food.status;
-		tastePref = food.tastePref;
-		setTastePrice(food.getTastePrice());
-		setCount(food.getCount());
-		setPrice(food.getPrice());
+		tastePref = new String(food.tastePref);
+		setTastePrice(new Float(food.getTastePrice()));
+		setCount(new Float(food.getCount()));
+		setPrice(new Float(food.getPrice()));
 	}
 	
 	private FoodParcel(Parcel in){
