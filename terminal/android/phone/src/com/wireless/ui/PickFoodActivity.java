@@ -191,6 +191,7 @@ public class PickFoodActivity extends TabActivity implements
 		 */
 		int lastPickCate = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).getInt(Params.LAST_PICK_CATE, Params.PICK_BY_KITCHEN);
 		if(lastPickCate == Params.PICK_BY_NUMBER){
+			setupNumberView();
 			_tabHost.setCurrentTabByTag(TAG_NUMBER);
 			
 		}else if(lastPickCate == Params.PICK_BY_KITCHEN){
@@ -199,8 +200,10 @@ public class PickFoodActivity extends TabActivity implements
 		}else if(lastPickCate == Params.PICK_BY_PINYIN){
 			_tabHost.setCurrentTabByTag(TAG_PINYIN);
 
+		}else{
+			_tabHost.setCurrentTabByTag(TAG_KITCHEN);
 		}
-		setupNumberView();
+		//setupNumberView();
 	}
 
 	@Override
@@ -635,7 +638,7 @@ public class PickFoodActivity extends TabActivity implements
 		TextView ketchenName = (TextView)findViewById(R.id.Spinner01);
 		ketchenName.setText("全部");
 		_filterKitchenFoods = new ArrayList<Food>(Arrays.asList(WirelessOrder.foodMenu.foods));
-		pickLstView.notifyDataChanged(_filterKitchenFoods.toArray(new Food[_filterKitchenFoods.size()]),	PickFoodListView.TAG_PINYIN);
+		pickLstView.notifyDataChanged(_filterKitchenFoods.toArray(new Food[_filterKitchenFoods.size()]), PickFoodListView.TAG_PINYIN);
 		pickLstView.setFoodPickedListener(this);
 
 		// 已点菜shortcut事件

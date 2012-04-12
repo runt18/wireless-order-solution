@@ -47,8 +47,11 @@ public class PickFoodListView extends ListView {
 		setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position,	long rowID) {
-				new AskOrderAmountDialog(_foods[position]).show();
-			   
+				if(_foods[position].isSellOut()){
+					Toast.makeText(_context, "对不起，" + _foods[position].name + "已经售完", 0).show();
+				}else{
+					new AskOrderAmountDialog(_foods[position]).show();
+				}
 			}
 		});
 	}
@@ -109,26 +112,33 @@ public class PickFoodListView extends ListView {
 				view = convertView;
 			}
 			
-			String status = "";
+			StringBuffer status = new StringBuffer();
 			if(_foods[position].isSpecial()){
-				status = "特";
+				status.append("特");
 			}
 			if(_foods[position].isRecommend()){
 				if(status.length() == 0){
-					status = "荐";
+					status.append("荐");
 				}else{
-					status = status + ",荐";
+					status.append(",荐");
 				}
 			}
 			if(_foods[position].isGift()){
 				if(status.length() == 0){
-					status = "赠";
+					status.append("赠");
 				}else{
-					status = status + ",赠";
+					status.append(",赠");
 				}
 			}
+			if(_foods[position].isSellOut()){
+				if(status.length() == 0){
+					status.append("停");
+				}else{
+					status.append(",停");
+				}				
+			}
 			if(status.length() != 0){
-				status = "(" + status + ")";
+				status.insert(0, "(").insert(status.length(), ")");
 			}
 			
 			((TextView)view.findViewById(R.id.foodname)).setText(_foods[position].name + status);
@@ -154,7 +164,7 @@ public class PickFoodListView extends ListView {
 
 		private OrderFood _selectedFood;
 		
-		public AskOrderAmountDialog(Food food) {
+		AskOrderAmountDialog(Food food) {
 			super(_context, R.style.FullHeightDialog);
 			
 			_selectedFood = new OrderFood(food);
