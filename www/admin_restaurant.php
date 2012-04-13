@@ -239,6 +239,8 @@ else if($editType == "addRestaurant" || $editType == "editAdminRestaurant")
 						&& $db->Execute("DELETE FROM wireless_order_db.setting WHERE restaurant_id=$id")
 						&& $db->Execute("DELETE FROM wireless_order_db.member WHERE restaurant_id=$id")
 						&& $db->Execute("DELETE FROM wireless_order_db.shift WHERE restaurant_id=$id")
+						&& $db->Execute("DELETE FROM wireless_order_db.shift_history WHERE restaurant_id=$id")
+						&& $db->Execute("DELETE FROM wireless_order_db.daily_settle_history WHERE restaurant_id=$id")
 						&& $db->Execute("DELETE FROM wireless_order_db.restaurant WHERE id=$id")){			
 					echo "<script>alert('删除成功！');</script>";
 				}	
