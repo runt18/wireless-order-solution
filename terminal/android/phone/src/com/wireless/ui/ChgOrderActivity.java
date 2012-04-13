@@ -63,8 +63,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 		/**
 		 * "∑µªÿ"Button
 		 */
-		ImageView backBtn = (ImageView)findViewById(R.id.orderback);
-		backBtn.setOnClickListener(new View.OnClickListener(){
+		((ImageView)findViewById(R.id.orderback)).setOnClickListener(new View.OnClickListener(){
 			@Override
 			public void onClick(View v) {
 				showExitDialog();
@@ -74,8 +73,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 		/**
 		 * "Ã·Ωª"Button
 		 */
-		ImageView commitBtn = (ImageView)findViewById(R.id.ordercommit);
-		commitBtn.setOnClickListener(new View.OnClickListener() {
+		((ImageView)findViewById(R.id.ordercommit)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				/**
