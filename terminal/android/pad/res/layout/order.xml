@@ -157,44 +157,35 @@
 		        android:text="确认"
 		        />
 		    
-		     <Button 
-		        android:id="@+id/cancle"
-		        android:layout_width="80dip"
-		        android:layout_height="50dip"
-		        android:text="取消"
-		        android:layout_toRightOf="@id/confirm"
-		        android:layout_marginLeft="30dip"
-		        />
+
 		</RelativeLayout>
 		
 	</RelativeLayout>
-	    
-	    
-	    <com.wireless.view.OrderFoodListView
-		android:id="@+id/orderLstView" android:layout_width="fill_parent"
+	
+	    	    
+ 	<com.wireless.view.OrderFoodListView
+		android:id="@+id/oriFoodLstView" android:layout_width="fill_parent"
 		android:layout_height="wrap_content" android:layout_below="@id/restitle"
 		android:divider="@drawable/line" android:cacheColorHint="#00000000"
-		android:groupIndicator="@null"
-		android:layout_above="@id/bottom">
+		android:groupIndicator="@null">
 	</com.wireless.view.OrderFoodListView>
-	
-	
+	    
+	<com.wireless.view.OrderFoodListView  android:id="@+id/newFoodLstView"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:layout_below="@id/oriFoodLstView" android:layout_above="@id/bottom"
+		android:groupIndicator="@null"
+		android:cacheColorHint="#00000000">
+	</com.wireless.view.OrderFoodListView >
+	    
+
 	</RelativeLayout>
 	
-	</LinearLayout>
-    
-	
-	
-	<LinearLayout 
-	android:id="@+id/dynamic"    
-	android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:layout_weight="0.5"
-	    >
-	    
-	    
-	    
-	</LinearLayout>
+	</LinearLayout><LinearLayout
+            android:id="@+id/dynamic"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="0.5" >
+        </LinearLayout>
 	
 	</LinearLayout>
 	
