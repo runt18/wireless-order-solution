@@ -67,13 +67,13 @@ public class OrderActivity extends ActivityGroup implements OrderFoodListView.On
 				
 			}else if(intent.getAction().equals(PickTasteActivity.PICK_TASTE_ACTION)){
 				/**
-				 * 如果是口味View选择了某个菜品的口味，从口味View取得FoodParcel，更新点菜的List，并切换到点菜View
+				 * 如果是口味View选择了某个菜品的口味，从口味View取得FoodParcel，更新点菜的List
 				 */
 				FoodParcel foodParcel = intent.getParcelableExtra(FoodParcel.KEY_VALUE);
 				_newFoodLstView.notifyDataChanged(foodParcel);
 				_newFoodLstView.expandGroup(0);
 
-				switchToOrderView();
+				//switchToOrderView();
 				
 			}else if(intent.getAction().equals(PickTasteActivity.NOT_PICK_TASTE_ACTION)){
 				/**
@@ -99,7 +99,9 @@ public class OrderActivity extends ActivityGroup implements OrderFoodListView.On
 		new QueryMenuTask().execute();
 	}	
 
-	
+	/**
+	 * 注册监听广播的Receiver，接收来自PickFoodActivity和PickTasteActivity的事件通知	 * 
+	 */
 	@Override
 	protected void onResume(){
 		super.onResume();
@@ -111,10 +113,13 @@ public class OrderActivity extends ActivityGroup implements OrderFoodListView.On
 		registerReceiver(_pickFoodRecv,	filter);
 	}
 	
+	/**
+	 * 删除监听的广播的Receiver
+	 */
 	@Override
 	protected void onPause(){
 		super.onPause();
-		this.unregisterReceiver(_pickFoodRecv);
+		unregisterReceiver(_pickFoodRecv);
 	}
 	
 	
@@ -124,7 +129,9 @@ public class OrderActivity extends ActivityGroup implements OrderFoodListView.On
 	 **/
 	public void init(TableParcel table){		
 		
-		_newFoodLstView = (OrderFoodListView)findViewById(R.id.orderLstView);
+		findViewById(R.id.oriFoodLstView).setVisibility(View.GONE);
+		
+		_newFoodLstView = (OrderFoodListView)findViewById(R.id.newFoodLstView);
 
 		//返回按钮的点击事件
 		((Button)findViewById(R.id.back_btn)).setOnClickListener(new View.OnClickListener() {
@@ -162,15 +169,6 @@ public class OrderActivity extends ActivityGroup implements OrderFoodListView.On
 			}
 		});
 		
-		//取消按钮的点击事件
-		((Button)findViewById(R.id.cancle)).setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub				
-			}
-		});
-		
 		//台号进行赋值
 		((EditText)findViewById(R.id.tblNoEdtTxt)).setText(Integer.toString(table.aliasID));
 		//人数进行赋值
@@ -203,7 +201,7 @@ public class OrderActivity extends ActivityGroup implements OrderFoodListView.On
 		//初始化新点菜列表的数据
 		_newFoodLstView.notifyDataChanged(new ArrayList<OrderFood>());		
 		
-		//切换到点菜View
+		//右侧切换到点菜View
 		switchToOrderView();
 
 	}
@@ -240,24 +238,23 @@ public class OrderActivity extends ActivityGroup implements OrderFoodListView.On
 		rightSwitchTo(intentToTaste, PickTasteActivity.class);
 	}
 	
+	/**
+	 * 点击"口味"后，右侧切换到口味View
+	 */
 	@Override
 	public void onPickTaste(OrderFood selectedFood) {
 		if(selectedFood.isTemporary){
 			Toast.makeText(this, "临时菜不能添加口味", 0).show();
 		}else{
-			/**
-			 * 点击"口味"后，右侧切换到口味View
-			 */
 			switchToTasteView(new FoodParcel(selectedFood));
 		}
 	}
 
-
+	/**
+	 * 点击"点菜"后，右侧切换到点菜View
+	 */
 	@Override
 	public void onPickFood() {
-		/**
-		 * 点击"点菜"后，右侧切换到点菜View
-		 */
 		switchToOrderView();
 	}   
 	

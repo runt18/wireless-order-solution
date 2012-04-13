@@ -49,7 +49,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 import com.wireless.adapter.TableAdapter;
@@ -58,11 +57,11 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.parcel.OrderParcel;
 import com.wireless.parcel.TableParcel;
 import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.Order;
 import com.wireless.protocol.PinGen;
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqPackage;
-import com.wireless.protocol.ReqQueryMenu;
-import com.wireless.protocol.ReqQueryRestaurant;
+import com.wireless.protocol.ReqQueryOrder;
 import com.wireless.protocol.ReqQueryTable;
 import com.wireless.protocol.RespParser;
 import com.wireless.protocol.StaffTerminal;
@@ -376,7 +375,7 @@ public class MainActivity extends Activity implements OnClickListener,
 			break;
 		// 点击菜谱更新项
 		case R.id.menu_update:
-			new QueryMenuTask().execute();
+			//new QueryMenuTask().execute();
 			break;
 
 		}
@@ -454,8 +453,9 @@ public class MainActivity extends Activity implements OnClickListener,
 							intent.putExtras(bundle);
 							startActivity(intent);
 							
-						}else{
+						}else if(table.status == Table.TABLE_BUSY){
 							//TODO jump to change order activity with the order parcel
+							new QueryOrderTask(table.aliasID, Type.UPDATE_ORDER).execute();
 						}
 					}
 				});
@@ -809,7 +809,6 @@ public class MainActivity extends Activity implements OnClickListener,
 
 	@Override
 	protected Dialog onCreateDialog(int id) {
-		// TODO Auto-generated method stub
 		switch (id) {
 		case EXIT_APP:
 			AlertDialog alertDialog = new AlertDialog.Builder(this)
@@ -867,7 +866,6 @@ public class MainActivity extends Activity implements OnClickListener,
 	class QueryTableTask extends AsyncTask<String, String, String> {
 		@Override
 		protected void onPreExecute() {
-			// TODO Auto-generated method stub
 			super.onPreExecute();
 			showDialog(LOADDIALOG);
 		}
@@ -1118,139 +1116,101 @@ public class MainActivity extends Activity implements OnClickListener,
 	}
 
 	/**
-	 * 请求菜谱信息
+	 * 执行请求对应餐台的账单信息 
 	 */
-	private class QueryMenuTask extends AsyncTask<Void, Void, String> {
+	private class QueryOrderTask extends AsyncTask<Void, Void, String>{
 
 		private ProgressDialog _progDialog;
-
+		private int _tableID;
+		private Order _order;
+		private int _type = Type.UPDATE_ORDER;;
+		
+		QueryOrderTask(int tableID, int type){
+			_tableID = tableID;
+			_type = type;
+		}
+		
 		/**
-		 * 执行菜谱请求操作前显示提示信息
+		 * 在执行请求删单操作前显示提示信息
 		 */
 		@Override
-		protected void onPreExecute() {
-			_progDialog = ProgressDialog.show(MainActivity.this, "",
-					"正在下载菜谱...请稍候", true);
+		protected void onPreExecute(){
+			_progDialog = ProgressDialog.show(MainActivity.this, "", "查询" + _tableID + "号餐台的信息...请稍候", true);
 		}
-
-		/**
-		 * 在新的线程中执行请求菜谱信息的操作
-		 */
+		
 		@Override
 		protected String doInBackground(Void... arg0) {
 			String errMsg = null;
-			try {
-				WirelessOrder.foodMenu = null;
-				ProtocolPackage resp = ServerConnector.instance().ask(
-						new ReqQueryMenu());
-				if (resp.header.type == Type.ACK) {
-					WirelessOrder.foodMenu = RespParser.parseQueryMenu(resp);
-				} else {
-					if (resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
-						errMsg = "终端没有登记到餐厅，请联系管理人员。";
-					} else if (resp.header.reserved == ErrorCode.TERMINAL_EXPIRED) {
-						errMsg = "终端已过期，请联系管理人员。";
-					} else {
-						errMsg = "菜谱下载失败，请检查网络信号或重新连接。";
-					}
+			try{
+				//根据tableID请求数据
+				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryOrder(_tableID));
+				if(resp.header.type == Type.ACK){
+					_order = RespParser.parseQueryOrder(resp, WirelessOrder.foodMenu);
+					
+				}else{
+    				if(resp.header.reserved == ErrorCode.TABLE_IDLE) {
+    					errMsg = _tableID + "号台还未下单";
+    					
+    				}else if(resp.header.reserved == ErrorCode.TABLE_NOT_EXIST) {
+    					errMsg = _tableID + "号台信息不存在";
+
+    				}else if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
+    					errMsg = "终端没有登记到餐厅，请联系管理人员。";
+
+    				}else if(resp.header.reserved == ErrorCode.TERMINAL_EXPIRED) {
+    					errMsg = "终端已过期，请联系管理人员。";
+
+    				}else{
+    					errMsg = "未确定的异常错误(" + resp.header.reserved + ")";
+    				}
 				}
-			} catch (IOException e) {
+			}catch(IOException e){
 				errMsg = e.getMessage();
 			}
+			
 			return errMsg;
 		}
-
+		
 		/**
-		 * 根据返回的error message判断，如果发错异常则提示用户， 如果菜谱请求成功，则继续进行请求餐厅信息的操作。
+		 * 根据返回的error message判断，如果发错异常则提示用户，
+		 * 如果成功，则迁移到改单页面
 		 */
 		@Override
-		protected void onPostExecute(String errMsg) {
-			// make the progress dialog disappeared
+		protected void onPostExecute(String errMsg){
+			//make the progress dialog disappeared
 			_progDialog.dismiss();
-			// notify the main activity to redraw the food menu
-			myhandler.sendEmptyMessage(REDRAW_FOOD_MENU);
-			/**
-			 * Prompt user message if any error occurred, otherwise continue to
-			 * query restaurant info.
-			 */
-			if (errMsg != null) {
-				new AlertDialog.Builder(MainActivity.this)
-						.setTitle("提示")
-						.setMessage(errMsg)
-						.setPositiveButton("确定",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int id) {
-										dialog.dismiss();
-									}
-								}).show();
-			} else {
-				new QueryRestaurantTask().execute();
-			}
-		}
-	}
-
-	/**
-	 * 请求查询餐厅信息
-	 */
-	private class QueryRestaurantTask extends AsyncTask<Void, Void, String> {
-
-		private ProgressDialog _progDialog;
-
-		/**
-		 * 在执行请求餐厅请求信息前显示提示信息
-		 */
-		@Override
-		protected void onPreExecute() {
-			_progDialog = ProgressDialog.show(MainActivity.this, "",
-					"更新菜谱信息...请稍候", true);
-		}
-
-		/**
-		 * 在新的线程中执行请求餐厅信息的操作
-		 */
-		@Override
-		protected String doInBackground(Void... arg0) {
-			String errMsg = null;
-			try {
-				ProtocolPackage resp = ServerConnector.instance().ask(
-						new ReqQueryRestaurant());
-				if (resp.header.type == Type.ACK) {
-					WirelessOrder.restaurant = RespParser
-							.parseQueryRestaurant(resp);
-				}
-			} catch (IOException e) {
-				errMsg = e.getMessage();
-			}
-			return errMsg;
-		}
-
-		/**
-		 * 根据返回的error message判断，如果发错异常则提示用户， 如果成功，则通知Handler更新界面的相关控件。
-		 */
-		@Override
-		protected void onPostExecute(String errMsg) {
-			// make the progress dialog disappeared
-			_progDialog.dismiss();
-			// notify the main activity to update the food menu
-			myhandler.sendEmptyMessage(REDRAW_RESTAURANT);
 			/**
 			 * Prompt user message if any error occurred.
 			 */
-			if (errMsg != null) {
+			if(errMsg != null){
 				new AlertDialog.Builder(MainActivity.this)
-						.setTitle("提示")
-						.setMessage(errMsg)
-						.setPositiveButton("确定",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int id) {
-										dialog.dismiss();
-									}
-								}).show();
-			} else {
-				Toast.makeText(MainActivity.this, "菜谱更新成功", 1).show();
+				.setTitle("提示")
+				.setMessage(errMsg)
+				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.dismiss();
+					}
+				}).show();
+			}else{
+				if(_type == Type.UPDATE_ORDER){
+					//jump to the update order activity
+					Intent intent = new Intent(MainActivity.this, ChgOrderActivity.class);
+					Bundle bundle = new Bundle();
+					bundle.putParcelable(OrderParcel.KEY_VALUE, new OrderParcel(_order));
+					intent.putExtras(bundle);
+					startActivity(intent);
+					
+				}else if(_type == Type.PAY_ORDER){
+					//jump to the pay order activity
+//					Intent intent = new Intent(MainActivity.this, BillActivity.class);
+//					Bundle bundle = new Bundle();
+//					bundle.putParcelable(OrderParcel.KEY_VALUE, new OrderParcel(_order));
+//					intent.putExtras(bundle);
+//					startActivity(intent);
+				}
 			}
 		}
+		
 	}
+
 }
