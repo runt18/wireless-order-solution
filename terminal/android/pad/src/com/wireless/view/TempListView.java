@@ -36,21 +36,24 @@ public class TempListView extends ListView {
 
 	
 	/**
-	 *listView的数据源
+	 * 从临时菜列表中删除并返回有效的临时菜品(包含菜品名和价钱)
 	 * @return
+	 * 		包含有效的临时菜品信息
 	 */
-	public List<OrderFood> getSourceData(){		
-		ArrayList<OrderFood> foods = new ArrayList<OrderFood>(_tmpFoods);
-		//filter the temporary foods without food name
-		Iterator<OrderFood> iter = foods.iterator();
+	public List<OrderFood> removeValidFoods(){
+		ArrayList<OrderFood> validFoods = new ArrayList<OrderFood>();
+		//filter the temporary foods with food name and price
+		Iterator<OrderFood> iter = _tmpFoods.iterator();
 		while (iter.hasNext()) {
 			OrderFood food = iter.next();
-			if (food.name.equals("") || food.getPrice() > 9999) {
+			if(!(food.name.equals("") || food.getPrice() > 9999)) {
+				validFoods.add(food);
 				iter.remove();
 			}
 		}
-		return foods;
-	}	
+		_adapter.notifyDataSetChanged();
+		return validFoods;
+	}
 	
 	/**
 	 * 增加一个临时菜

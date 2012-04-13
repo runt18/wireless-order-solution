@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.app.TabActivity;
 import android.content.Context;
@@ -213,21 +212,21 @@ public class PickFoodActivity extends TabActivity implements
 	/**
 	 * 返回时将新点菜品的List返回到上一个Activity
 	 */
-	@Override
-	public void onBackPressed() {
-		if (_tempLstView != null) {
-			_pickFoods.addAll(_tempLstView.getSourceData());
-		}
-
-		Intent intent = new Intent();
-		Bundle bundle = new Bundle();
-		Order tmpOrder = new Order();
-		tmpOrder.foods = _pickFoods.toArray(new OrderFood[_pickFoods.size()]);
-		bundle.putParcelable(OrderParcel.KEY_VALUE, new OrderParcel(tmpOrder));
-		intent.putExtras(bundle);
-		setResult(RESULT_OK, intent);
-		super.onBackPressed();
-	}
+//	@Override
+//	public void onBackPressed() {
+//		if (_tempLstView != null) {
+//			_pickFoods.addAll(_tempLstView.getSourceData());
+//		}
+//
+//		Intent intent = new Intent();
+//		Bundle bundle = new Bundle();
+//		Order tmpOrder = new Order();
+//		tmpOrder.foods = _pickFoods.toArray(new OrderFood[_pickFoods.size()]);
+//		bundle.putParcelable(OrderParcel.KEY_VALUE, new OrderParcel(tmpOrder));
+//		intent.putExtras(bundle);
+//		setResult(RESULT_OK, intent);
+//		super.onBackPressed();
+//	}
 
 	/**
 	 * Create the tab indicator
@@ -282,33 +281,6 @@ public class PickFoodActivity extends TabActivity implements
 		sendBroadcast(intent);				
 	}
 
-	
-	/**
-	 * go to Activity method
-	 */
-	public  void goTo(Intent intent, Class<? extends Activity> cls) {
-//		OrderActivity._rightDynamic.removeAllViews();
-//		OrderActivity._rightDynamic.removeAllViewsInLayout();
-//		intent.setClass(PickFoodActivity.this, cls);
-//		View nowView = PickFoodActivity.this.getLocalActivityManager()
-//				.startActivity(cls.getName(), intent).getDecorView();
-//		OrderActivity._rightDynamic.addView(nowView);
-		
-	}
-	
-	
-
-	/**
-	 * go to Activity method
-	 */
-	public  void goTo(Class<? extends Activity> cls) {
-//		OrderActivity._rightDynamic.removeAllViews();
-//		OrderActivity._rightDynamic.removeAllViewsInLayout();
-//		View nowView = PickFoodActivity.this.getLocalActivityManager().startActivity(cls.getName(), new Intent(PickFoodActivity.this,cls))
-//				.getDecorView();
-//		OrderActivity._rightDynamic.addView(nowView);
-		
-	}
 	/**
 	 * 添加菜品到已点菜的List中
 	 * 
@@ -867,15 +839,36 @@ public class PickFoodActivity extends TabActivity implements
 		_tempLstView = (TempListView) findViewById(R.id.tempListView);
 		_tempLstView.notifyDataChanged();
 
-		// 临时菜返回键
-		((ImageView) findViewById(R.id.add))
-				.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						_tempLstView.addTemp();
+		//确认添加临时菜Button
+		((Button)findViewById(R.id.addTmpFoodBtn)).setOnClickListener(new View.OnClickListener() {			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				
+				if(_tempLstView != null){
+					List<OrderFood> tmpFoods = _tempLstView.removeValidFoods();
+					
+					if(tmpFoods.size() != 0){
+						//添加临时菜品到菜品List中，并清空临时菜品列表
+						_pickFoods.addAll(tmpFoods);
+						
+						//通知新点菜View更新信息
+						Order tmpOrder = new Order();
+						tmpOrder.foods = _pickFoods.toArray(new OrderFood[_pickFoods.size()]);
+						Bundle bundle = new Bundle();
+						bundle.putParcelable(OrderParcel.KEY_VALUE, new OrderParcel(tmpOrder));
+						Intent intent = new Intent().setAction(PICK_FOOD_ACTION);
+						intent.putExtras(bundle);
+					    sendBroadcast(intent);	
+					    for(OrderFood tmpFood : tmpFoods){
+					    	Toast.makeText(PickFoodActivity.this, "新增\"" + tmpFood.name + "\"" + Util.float2String2(tmpFood.getCount()) + "份", 0).show();
+					    }
+					}else{					
+						Toast.makeText(PickFoodActivity.this, "对不起, 您填入的临时菜信息不正确", 0).show();
 					}
-				});
-		
+				}
+			}
+		});
 
 		// 临时菜添加
 		((ImageView) findViewById(R.id.add))
@@ -884,7 +877,8 @@ public class PickFoodActivity extends TabActivity implements
 					public void onClick(View v) {
 						_tempLstView.addTemp();
 					}
-				});
+		});
+		
 		/**
 		 * list滚动的时候屏蔽软键盘
 		 */
