@@ -12,7 +12,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
@@ -25,11 +24,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
+import com.wireless.dialog.AskPwdDialog;
 import com.wireless.pad.R;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Type;
 import com.wireless.protocol.Util;
-import com.wireless.dialog.*;
 
 
 public class OrderFoodListView extends ExpandableListView{
@@ -128,6 +127,61 @@ public class OrderFoodListView extends ExpandableListView{
 		}
 	}
 
+	/**
+	 * 添加多个菜品到已经菜的List中
+	 * @param foods
+	 * 				新点菜品
+	 */
+	public void addFoods(OrderFood[] foods){
+		for(OrderFood food : foods){
+			addFood(food);
+		}
+	}
+	
+	/**
+	 * 添加菜品到已点菜的List中
+	 * 
+	 * @param food
+	 *            选中的菜品信息
+	 */
+	private void addFood(OrderFood food) {
+
+		int index = _foods.indexOf(food);
+
+		if (index != -1) {
+			/**
+			 * 如果原来的菜品列表中已包含有相同的菜品， 则将新点菜的数量累加到原来的菜品中，
+			 * 否则就作为新点菜品添加到菜品列表中
+			 */
+			OrderFood pickedFood = _foods.get(index);
+
+			float orderAmount = food.getCount() + pickedFood.getCount();
+			if (orderAmount > 255) {
+				Toast.makeText(_context, "对不起，\"" + food.toString() + "\"最多只能点255份", 0).show();
+				// pickedFood.setCount(new Float(255));
+			} else {
+				Toast.makeText(_context, "添加"	+ (food.hangStatus == OrderFood.FOOD_HANG_UP ? "并叫起\"" : "\"") + food.toString() + "\""
+										  + Util.float2String2(food.getCount()) + "份", 0)	.show();
+				pickedFood.setCount(orderAmount);
+				_foods.set(index, pickedFood);
+				//刷新菜品列表
+				notifyDataChanged();
+			}
+		} else {
+			if (food.getCount() > 255) {
+				Toast.makeText(_context, "对不起，\"" + food.toString() + "\"最多只能点255份", 0).show();
+				
+			} else {
+				Toast.makeText(_context, "新增"	+ (food.hangStatus == OrderFood.FOOD_HANG_UP ? "并叫起\"" : "\"") + food.toString() + "\""
+										 + Util.float2String2(food.getCount()) + "份", 0).show();
+				_foods.add(food);
+				//刷新菜品列表
+				notifyDataChanged();
+
+			}
+		}
+	}
+	
 	/**
 	 * 函数用于更新ListView的source data，第一次调用此函数的时候，会中同时创建相应的Adapter。
 	 * @param foods

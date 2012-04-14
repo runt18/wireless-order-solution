@@ -63,8 +63,9 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 				 * 如果是点菜View选择了某个菜品后，从点菜View取得OrderParcel，并更新点菜的List
 				 */
 				OrderParcel orderParcel = intent.getParcelableExtra(OrderParcel.KEY_VALUE);
-				_newFoodLstView.notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(orderParcel.foods)));
+				_newFoodLstView.addFoods(orderParcel.foods);
 				_newFoodLstView.expandGroup(0);
+				_oriFoodLstView.collapseGroup(0);
 				
 			}else if(intent.getAction().equals(PickFoodActivity.PICK_TASTE_ACTION)){
 				/**
@@ -276,13 +277,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 	}
 	
 	private void switchToOrderView(){
-		Intent intent = new Intent(ChgOrderActivity.this, PickFoodActivity.class);
-		Bundle bundle = new Bundle();
-		Order tmpOrder = new Order();
-		tmpOrder.foods = _newFoodLstView.getSourceData().toArray(new OrderFood[_newFoodLstView.getSourceData().size()]);
-		bundle.putParcelable(OrderParcel.KEY_VALUE, new OrderParcel(tmpOrder));
-		intent.putExtras(bundle);
-		rightSwitchTo(intent, PickFoodActivity.class); 
+		rightSwitchTo(new Intent(ChgOrderActivity.this, PickFoodActivity.class), PickFoodActivity.class); 
 	}
 
 	private void switchToTasteView(FoodParcel foodParcel){

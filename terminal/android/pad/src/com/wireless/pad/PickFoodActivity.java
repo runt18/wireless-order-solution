@@ -52,7 +52,6 @@ import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.Util;
 import com.wireless.view.PickFoodListView;
 import com.wireless.view.TempListView;
 
@@ -90,10 +89,10 @@ public class PickFoodActivity extends TabActivity implements
 		init();
 
 		// 取得新点菜中已有的菜品List，并保存到pickFood的List中
-		OrderParcel orderParcel = getIntent().getParcelableExtra(OrderParcel.KEY_VALUE);
-		for(OrderFood food : orderParcel.foods) {
-			_pickFoods.add(food);
-		}
+//		OrderParcel orderParcel = getIntent().getParcelableExtra(OrderParcel.KEY_VALUE);
+//		for(OrderFood food : orderParcel.foods) {
+//			_pickFoods.add(food);
+//		}
 
 		// construct the tab host
 		_tabHost = getTabHost();
@@ -251,7 +250,8 @@ public class PickFoodActivity extends TabActivity implements
 	 */
 	@Override
 	public void onPicked(OrderFood food) {
-		addFood(food);		
+		_pickFoods.add(food);
+
 		/**
 		 * 将添加菜品用broadcast的形式发送
 		 */
@@ -262,6 +262,16 @@ public class PickFoodActivity extends TabActivity implements
 		Intent intent = new Intent().setAction(PICK_FOOD_ACTION);
 		intent.putExtras(bundle);
 	    sendBroadcast(intent);		
+	    
+		if (_tabHost.getCurrentTabTag() == TAG_NUMBER) {
+			(((EditText) findViewById(R.id.filterNumEdtTxt))).setText("");
+		} else if (_tabHost.getCurrentTabTag() == TAG_KITCHEN) {
+			((EditText) findViewById(R.id.filterKitchenEdtTxt)).setText("");
+		} else if (_tabHost.getCurrentTabTag() == TAG_PINYIN) {
+			((EditText) findViewById(R.id.filterPinyinEdtTxt)).setText("");
+		}	
+	    _pickFoods.clear();
+	    
 	}
 
 	/**
@@ -280,57 +290,6 @@ public class PickFoodActivity extends TabActivity implements
 		intent.putExtras(bundle);
 		sendBroadcast(intent);				
 	}
-
-	/**
-	 * 添加菜品到已点菜的List中
-	 * 
-	 * @param food
-	 *            选中的菜品信息
-	 */
-	private void addFood(OrderFood food) {
-
-		int index = _pickFoods.indexOf(food);
-
-		if (index != -1) {
-			/**
-			 * 如果原来的菜品列表中已包含有相同的菜品， 则将新点菜的数量累加到原来的菜品中
-			 */
-			OrderFood pickedFood = _pickFoods.get(index);
-
-			float orderAmount = food.getCount() + pickedFood.getCount();
-			if (orderAmount > 255) {
-				Toast.makeText(this, "对不起，\"" + food.toString() + "\"最多只能点255份", 0).show();
-				// pickedFood.setCount(new Float(255));
-			} else {
-				Toast.makeText(this, "添加"	+ (food.hangStatus == OrderFood.FOOD_HANG_UP ? "并叫起\"" : "\"") + food.toString() + "\""
-						+ Util.float2String2(food.getCount()) + "份", 0)	.show();
-				pickedFood.setCount(orderAmount);
-				_pickFoods.set(index, pickedFood);
-			}
-		} else {
-			if (food.getCount() > 255) {
-				Toast.makeText(this, "对不起，\"" + food.toString() + "\"最多只能点255份", 0).show();
-			} else {
-				Toast.makeText(this, "新增"	+ (food.hangStatus == OrderFood.FOOD_HANG_UP ? "并叫起\""
-						: "\"") + food.toString() + "\""
-				+ Util.float2String2(food.getCount()) + "份", 0)
-		        .show();
-				_pickFoods.add(food);
-			}
-		}
-
-		if (_tabHost.getCurrentTabTag() == TAG_NUMBER) {
-			(((EditText) findViewById(R.id.filterNumEdtTxt))).setText("");
-		} else if (_tabHost.getCurrentTabTag() == TAG_KITCHEN) {
-			((EditText) findViewById(R.id.filterKitchenEdtTxt)).setText("");
-		} else if (_tabHost.getCurrentTabTag() == TAG_PINYIN) {
-			((EditText) findViewById(R.id.filterPinyinEdtTxt)).setText("");
-		}
-		
-		
-	}
-
-	
 
 	/**
 	 * 设置编号筛选的View
@@ -843,8 +802,7 @@ public class PickFoodActivity extends TabActivity implements
 		((Button)findViewById(R.id.addTmpFoodBtn)).setOnClickListener(new View.OnClickListener() {			
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				
+			
 				if(_tempLstView != null){
 					List<OrderFood> tmpFoods = _tempLstView.removeValidFoods();
 					
@@ -860,9 +818,8 @@ public class PickFoodActivity extends TabActivity implements
 						Intent intent = new Intent().setAction(PICK_FOOD_ACTION);
 						intent.putExtras(bundle);
 					    sendBroadcast(intent);	
-					    for(OrderFood tmpFood : tmpFoods){
-					    	Toast.makeText(PickFoodActivity.this, "新增\"" + tmpFood.name + "\"" + Util.float2String2(tmpFood.getCount()) + "份", 0).show();
-					    }
+					    _pickFoods.clear();
+					    
 					}else{					
 						Toast.makeText(PickFoodActivity.this, "对不起, 您填入的临时菜信息不正确", 0).show();
 					}

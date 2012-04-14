@@ -1,7 +1,6 @@
 package com.wireless.pad;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import android.app.Activity;
 import android.app.ActivityGroup;
@@ -55,7 +54,7 @@ public class OrderActivity extends ActivityGroup implements OrderFoodListView.On
 				 * 如果是点菜View选择了某个菜品后，从点菜View取得OrderParcel，并更新点菜的List
 				 */
 				OrderParcel orderParcel = intent.getParcelableExtra(OrderParcel.KEY_VALUE);
-				_newFoodLstView.notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(orderParcel.foods)));
+				_newFoodLstView.addFoods(orderParcel.foods);
 				_newFoodLstView.expandGroup(0);
 				
 			}else if(intent.getAction().equals(PickFoodActivity.PICK_TASTE_ACTION)){
@@ -220,13 +219,7 @@ public class OrderActivity extends ActivityGroup implements OrderFoodListView.On
 	}
 	
 	private void switchToOrderView(){
-		Intent intent = new Intent(OrderActivity.this, PickFoodActivity.class);
-		Bundle bundle = new Bundle();
-		Order tmpOrder = new Order();
-		tmpOrder.foods = _newFoodLstView.getSourceData().toArray(new OrderFood[_newFoodLstView.getSourceData().size()]);
-		bundle.putParcelable(OrderParcel.KEY_VALUE, new OrderParcel(tmpOrder));
-		intent.putExtras(bundle);
-		rightSwitchTo(intent, PickFoodActivity.class); 
+		rightSwitchTo(new Intent(OrderActivity.this, PickFoodActivity.class), PickFoodActivity.class); 
 	}
 
 	private void switchToTasteView(FoodParcel foodParcel){
