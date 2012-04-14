@@ -150,8 +150,8 @@ public class MainActivity extends Activity implements OnClickListener,
 	private Button _refurbishBtn; // 刷新按钮
 	private Button _bottomFirstBtn; // 底部第一个按钮( 全部，取消)
 	private Button _clearTablenum; // 清楚搜索餐台号内容按钮
-	
-	private Button _allRefresh ;	//全局刷新
+
+	private Button _allRefresh; // 全局刷新
 
 	private TextView _usernameTv; // 当前用户名
 	private TextView _tablecountSum; // 餐台数（总数）
@@ -195,9 +195,9 @@ public class MainActivity extends Activity implements OnClickListener,
 	private MyHandler myhandler = new MyHandler();
 
 	private void init() {
-		_allRefresh = (Button)findViewById(R.id.reAll_btn);
+		_allRefresh = (Button) findViewById(R.id.reAll_btn);
 		_allRefresh.setOnClickListener(this);
-		_logoutBtn = (Button)findViewById(R.id.logon_btn);
+		_logoutBtn = (Button) findViewById(R.id.logon_btn);
 		_logoutBtn.setOnClickListener(this);
 		_notice = (MarqueeText) findViewById(R.id.notice);
 		_refurbishBtn = (Button) findViewById(R.id.refurbish_btn);
@@ -375,7 +375,7 @@ public class MainActivity extends Activity implements OnClickListener,
 			break;
 		// 点击菜谱更新项
 		case R.id.menu_update:
-			//new QueryMenuTask().execute();
+			// new QueryMenuTask().execute();
 			break;
 
 		}
@@ -436,29 +436,33 @@ public class MainActivity extends Activity implements OnClickListener,
 					LinearLayout.LayoutParams.FILL_PARENT,
 					LinearLayout.LayoutParams.FILL_PARENT);
 			grid.setOnTouchListener(this);
-			//grid.setOnItemClickListener(this);
+			// grid.setOnItemClickListener(this);
 			lp.gravity = Gravity.CENTER;
 			grid.setNumColumns(6);
 			grid.setLayoutParams(lp);
 			grid.setSelector(android.R.color.transparent);
-			TableAdapter tableAdapter = new TableAdapter(getTables(i * 24, tablesArray), 
-				new TableAdapter.OnTableClickListener() {				
-					@Override
-					public void onClick(Table table) {
-						if(table.status == Table.TABLE_IDLE){
-							//jump to the order activity with the table parcel
-							Intent intent = new Intent(MainActivity.this, OrderActivity.class);
-							Bundle bundle = new Bundle();
-							bundle.putParcelable(TableParcel.KEY_VALUE, new TableParcel(table));
-							intent.putExtras(bundle);
-							startActivity(intent);
-							
-						}else if(table.status == Table.TABLE_BUSY){
-							//TODO jump to change order activity with the order parcel
-							new QueryOrderTask(table.aliasID, Type.UPDATE_ORDER).execute();
-						}
+			TableAdapter tableAdapter = new TableAdapter(getTables(i * 24,
+					tablesArray), new TableAdapter.OnTableClickListener() {
+				@Override
+				public void onClick(Table table) {
+					if (table.status == Table.TABLE_IDLE) {
+						// jump to the order activity with the table parcel
+						Intent intent = new Intent(MainActivity.this,
+								OrderActivity.class);
+						Bundle bundle = new Bundle();
+						bundle.putParcelable(TableParcel.KEY_VALUE,
+								new TableParcel(table));
+						intent.putExtras(bundle);
+						startActivity(intent);
+
+					} else if (table.status == Table.TABLE_BUSY) {
+						// TODO jump to change order activity with the order
+						// parcel
+						new QueryOrderTask(table.aliasID, Type.UPDATE_ORDER)
+								.execute();
 					}
-				});
+				}
+			});
 			grid.setAdapter(tableAdapter);
 			adapterList.add(tableAdapter);
 			_viewFlipper.addView(grid);
@@ -491,7 +495,7 @@ public class MainActivity extends Activity implements OnClickListener,
 	public void onClick(View v) {
 		int viewID = v.getId();
 		switch (viewID) {
-		
+
 		case R.id.reAll_btn:
 			_regionConfine = -1;
 			_tableStatusConfine = -1;
@@ -587,6 +591,13 @@ public class MainActivity extends Activity implements OnClickListener,
 			new QueryTableTask().execute();
 			break;
 		case R.id.logon_btn:
+			Editor editor = getSharedPreferences(Params.PREFS_NAME,
+					Context.MODE_PRIVATE).edit();// 获取编辑器
+			// editor.putLong(Params.STAFF_PIN, _staff.pin);
+			editor.remove(Params.STAFF_PIN);
+			// 提交修改
+			editor.commit();
+			_staff = null;
 			showDialog(DIALOG_STAFF_LOGIN);
 			break;
 		}
@@ -655,28 +666,28 @@ public class MainActivity extends Activity implements OnClickListener,
 		return false;
 	}
 
-//	@Override
-//	public void onItemClick(AdapterView<?> parent, View view, int position,
-//			long id) {
-//		if (_touchFlag) {
-//			Table[] t;
-//			if (_regionConfine != -1 || _tableStatusConfine != -1) {
-//				t = _tempResultTables;
-//			} else {
-//				t = WirelessOrder.tables;
-//			}
-//			int currentPage = _viewFlipper.getDisplayedChild();
-//
-//			Table table = t[(currentPage * 24) + position];
-//			_onClickTable = table;
-//			if (table.status == Table.TABLE_BUSY) {
-//				showDialog(BUSYTABLE);
-//			} else if (table.status == Table.TABLE_IDLE) {
-//				showDialog(IDLETABLE);
-//			}
-//		}
-//
-//	}
+	// @Override
+	// public void onItemClick(AdapterView<?> parent, View view, int position,
+	// long id) {
+	// if (_touchFlag) {
+	// Table[] t;
+	// if (_regionConfine != -1 || _tableStatusConfine != -1) {
+	// t = _tempResultTables;
+	// } else {
+	// t = WirelessOrder.tables;
+	// }
+	// int currentPage = _viewFlipper.getDisplayedChild();
+	//
+	// Table table = t[(currentPage * 24) + position];
+	// _onClickTable = table;
+	// if (table.status == Table.TABLE_BUSY) {
+	// showDialog(BUSYTABLE);
+	// } else if (table.status == Table.TABLE_IDLE) {
+	// showDialog(IDLETABLE);
+	// }
+	// }
+	//
+	// }
 
 	/**
 	 * 专门监听区域按钮的类
@@ -951,6 +962,7 @@ public class MainActivity extends Activity implements OnClickListener,
 			// 创建PopupWindow实例
 			_popupWindow = new PopupWindow(popupWndView, 320, 200, true);
 			_popupWindow.setOutsideTouchable(true);
+			_popupWindow.setFocusable(true);
 			_popupWindow.setBackgroundDrawable(new BitmapDrawable());
 			_popupWindow.update();
 			ListView staffLstView = (ListView) popupWndView
@@ -1116,101 +1128,109 @@ public class MainActivity extends Activity implements OnClickListener,
 	}
 
 	/**
-	 * 执行请求对应餐台的账单信息 
+	 * 执行请求对应餐台的账单信息
 	 */
-	private class QueryOrderTask extends AsyncTask<Void, Void, String>{
+	private class QueryOrderTask extends AsyncTask<Void, Void, String> {
 
 		private ProgressDialog _progDialog;
 		private int _tableID;
 		private Order _order;
 		private int _type = Type.UPDATE_ORDER;;
-		
-		QueryOrderTask(int tableID, int type){
+
+		QueryOrderTask(int tableID, int type) {
 			_tableID = tableID;
 			_type = type;
 		}
-		
+
 		/**
 		 * 在执行请求删单操作前显示提示信息
 		 */
 		@Override
-		protected void onPreExecute(){
-			_progDialog = ProgressDialog.show(MainActivity.this, "", "查询" + _tableID + "号餐台的信息...请稍候", true);
+		protected void onPreExecute() {
+			_progDialog = ProgressDialog.show(MainActivity.this, "", "查询"
+					+ _tableID + "号餐台的信息...请稍候", true);
 		}
-		
+
 		@Override
 		protected String doInBackground(Void... arg0) {
 			String errMsg = null;
-			try{
-				//根据tableID请求数据
-				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryOrder(_tableID));
-				if(resp.header.type == Type.ACK){
-					_order = RespParser.parseQueryOrder(resp, WirelessOrder.foodMenu);
-					
-				}else{
-    				if(resp.header.reserved == ErrorCode.TABLE_IDLE) {
-    					errMsg = _tableID + "号台还未下单";
-    					
-    				}else if(resp.header.reserved == ErrorCode.TABLE_NOT_EXIST) {
-    					errMsg = _tableID + "号台信息不存在";
+			try {
+				// 根据tableID请求数据
+				ProtocolPackage resp = ServerConnector.instance().ask(
+						new ReqQueryOrder(_tableID));
+				if (resp.header.type == Type.ACK) {
+					_order = RespParser.parseQueryOrder(resp,
+							WirelessOrder.foodMenu);
 
-    				}else if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
-    					errMsg = "终端没有登记到餐厅，请联系管理人员。";
+				} else {
+					if (resp.header.reserved == ErrorCode.TABLE_IDLE) {
+						errMsg = _tableID + "号台还未下单";
 
-    				}else if(resp.header.reserved == ErrorCode.TERMINAL_EXPIRED) {
-    					errMsg = "终端已过期，请联系管理人员。";
+					} else if (resp.header.reserved == ErrorCode.TABLE_NOT_EXIST) {
+						errMsg = _tableID + "号台信息不存在";
 
-    				}else{
-    					errMsg = "未确定的异常错误(" + resp.header.reserved + ")";
-    				}
+					} else if (resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
+						errMsg = "终端没有登记到餐厅，请联系管理人员。";
+
+					} else if (resp.header.reserved == ErrorCode.TERMINAL_EXPIRED) {
+						errMsg = "终端已过期，请联系管理人员。";
+
+					} else {
+						errMsg = "未确定的异常错误(" + resp.header.reserved + ")";
+					}
 				}
-			}catch(IOException e){
+			} catch (IOException e) {
 				errMsg = e.getMessage();
 			}
-			
+
 			return errMsg;
 		}
-		
+
 		/**
-		 * 根据返回的error message判断，如果发错异常则提示用户，
-		 * 如果成功，则迁移到改单页面
+		 * 根据返回的error message判断，如果发错异常则提示用户， 如果成功，则迁移到改单页面
 		 */
 		@Override
-		protected void onPostExecute(String errMsg){
-			//make the progress dialog disappeared
+		protected void onPostExecute(String errMsg) {
+			// make the progress dialog disappeared
 			_progDialog.dismiss();
 			/**
 			 * Prompt user message if any error occurred.
 			 */
-			if(errMsg != null){
+			if (errMsg != null) {
 				new AlertDialog.Builder(MainActivity.this)
-				.setTitle("提示")
-				.setMessage(errMsg)
-				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						dialog.dismiss();
-					}
-				}).show();
-			}else{
-				if(_type == Type.UPDATE_ORDER){
-					//jump to the update order activity
-					Intent intent = new Intent(MainActivity.this, ChgOrderActivity.class);
+						.setTitle("提示")
+						.setMessage(errMsg)
+						.setPositiveButton("确定",
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog,
+											int id) {
+										dialog.dismiss();
+									}
+								}).show();
+			} else {
+				if (_type == Type.UPDATE_ORDER) {
+					// jump to the update order activity
+					Intent intent = new Intent(MainActivity.this,
+							ChgOrderActivity.class);
 					Bundle bundle = new Bundle();
-					bundle.putParcelable(OrderParcel.KEY_VALUE, new OrderParcel(_order));
+					bundle.putParcelable(OrderParcel.KEY_VALUE,
+							new OrderParcel(_order));
 					intent.putExtras(bundle);
 					startActivity(intent);
-					
-				}else if(_type == Type.PAY_ORDER){
-					//jump to the pay order activity
-//					Intent intent = new Intent(MainActivity.this, BillActivity.class);
-//					Bundle bundle = new Bundle();
-//					bundle.putParcelable(OrderParcel.KEY_VALUE, new OrderParcel(_order));
-//					intent.putExtras(bundle);
-//					startActivity(intent);
+
+				} else if (_type == Type.PAY_ORDER) {
+					// jump to the pay order activity
+					// Intent intent = new Intent(MainActivity.this,
+					// BillActivity.class);
+					// Bundle bundle = new Bundle();
+					// bundle.putParcelable(OrderParcel.KEY_VALUE, new
+					// OrderParcel(_order));
+					// intent.putExtras(bundle);
+					// startActivity(intent);
 				}
 			}
 		}
-		
+
 	}
 
 }

@@ -557,18 +557,18 @@ public class OrderFoodListView extends ExpandableListView{
 		AskCancelAmountDialog(final OrderFood selectedFood) {
 			super(_context, R.style.FullHeightDialog);
 			
-			View view = LayoutInflater.from(_context).inflate(R.layout.alert, null);
-			setContentView(view);
+			//View view = LayoutInflater.from(_context).inflate(R.layout.alert, null);
+			setContentView(R.layout.alert);
 			//getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
-			((TextView)view.findViewById(R.id.ordername)).setText("请输入" + selectedFood.name + "的删除数量");
+			((TextView)findViewById(R.id.ordername)).setText("请输入" + selectedFood.name + "的删除数量");
 			
 			((TextView)findViewById(R.id.table)).setText("数量：");
 			//删除数量默认为此菜品的点菜数量
-			final EditText cancelEdtTxt = (EditText)view.findViewById(R.id.mycount);			
+			final EditText cancelEdtTxt = (EditText)findViewById(R.id.mycount);			
 			cancelEdtTxt.setText(Util.float2String2(selectedFood.getCount()));
 			
 			//"确定"Button
-			Button okBtn = (Button)view.findViewById(R.id.confirm);
+			Button okBtn = (Button)findViewById(R.id.confirm);
 			okBtn.setText("确定");
 			okBtn.setOnClickListener(new View.OnClickListener() {
 				@Override
@@ -605,7 +605,7 @@ public class OrderFoodListView extends ExpandableListView{
 			});
 			
 			//"取消"Button
-			Button cancelBtn = (Button)view.findViewById(R.id.alert_cancel);
+			Button cancelBtn = (Button)findViewById(R.id.alert_cancel);
 			cancelBtn.setText("取消");
 			cancelBtn.setOnClickListener(new View.OnClickListener() {
 				@Override
@@ -625,7 +625,7 @@ public class OrderFoodListView extends ExpandableListView{
 		ExtOperDialg(final OrderFood selectedFood) {
 			super(_context, R.style.FullHeightDialog);
 			setContentView(R.layout.item_alert);
-			getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
+			//getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
 			((TextView)findViewById(R.id.ordername)).setText("请选择" + selectedFood.name + "的操作");
 			if(_type == Type.INSERT_ORDER){
 				/**
