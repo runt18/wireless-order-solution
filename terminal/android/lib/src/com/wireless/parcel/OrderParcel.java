@@ -34,7 +34,7 @@ public class OrderParcel extends Order implements Parcelable{
 		setCashIncome(new Float(order.getCashIncome()));
 		setTotalPrice(new Float(order.getTotalPrice()));
 		setActualPrice(new Float(order.getActualPrice()));
-		foods = new FoodParcel[order.foods.length];
+		foods = new OrderFood[order.foods.length];
 		for(int i = 0; i < foods.length; i++){
 			foods[i] = new FoodParcel(order.foods[i]);
 		}

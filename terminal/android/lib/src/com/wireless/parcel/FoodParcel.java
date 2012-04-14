@@ -17,7 +17,7 @@ public class FoodParcel extends OrderFood implements Parcelable{
 		aliasID = food.aliasID;
 		kitchen = food.kitchen;
 		name = new String(food.name);
-		tastes = new TasteParcel[food.tastes.length];
+		tastes = new Taste[food.tastes.length];
 		for(int i = 0; i < tastes.length; i++){
 			tastes[i] = new TasteParcel(food.tastes[i]);
 		}
