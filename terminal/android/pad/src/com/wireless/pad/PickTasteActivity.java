@@ -59,7 +59,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 	private OrderFood _selectedFood;
 	private TextView _tasteTxtView;
 	private TabHost _tabHost;
-	
+	private BaseAdapter _tasteAdapter;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -73,6 +73,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 		
 		FoodParcel foodParcel = (FoodParcel)getIntent().getParcelableExtra(FoodParcel.KEY_VALUE);
 		_selectedFood = foodParcel;
+		//_selectedFood.tastes[0] = new Taste();
 		
 		_tabHost = getTabHost();
 		
@@ -138,54 +139,53 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 		
 	}	
 
-	private void confirmPickTaste(){
-		/**
-		 * 选择口味后，将OrderFood的信息放到Parcel，并发出广播Intent通知OrderActivity
-		 */
+	/**
+	 * 选择口味后，将OrderFood的信息放到Parcel，并发出广播Intent通知OrderActivity或者ChgOrderActivity
+	 */
+	private void sendPickTasteBoradcast(){
 		Bundle bundle = new Bundle();
 		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(_selectedFood));
 		Intent intent = new Intent();
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		intent.setAction(PICK_TASTE_ACTION);
 		intent.putExtras(bundle);
-		sendBroadcast(intent);		
+		sendBroadcast(intent);	
 	}
 	
-	private void cancelPickTaste(){
-		/**
-		 * 不选择口味，广播Intent通知OrderActivity
-		 */
-		Intent intent = new Intent();
-		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		intent.setAction(NOT_PICK_TASTE_ACTION);
-		sendBroadcast(intent);
+	/**
+	 * 删除所选菜品的所有口味
+	 */
+	private void removeAllTaste(){
+		if(_selectedFood.tastes.length > 0){
+			for(Taste taste : _selectedFood.tastes.clone()){
+				_selectedFood.removeTaste(taste);
+			}
+			//refresh the taste preference
+			_handler.sendEmptyMessage(0);
+			//refresh the taste list view
+			_tasteAdapter.notifyDataSetChanged();
+			//send the broadcast event to notify OrderActivity or ChgOrderActivity
+			sendPickTasteBoradcast();
+		}
 	}
 	    //设置口味View
 	public void setTasteView(){
 		
-		//确定Button
-		((Button)findViewById(R.id.pickTasteBtn)).setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				confirmPickTaste();
-			}
-		});
-		
-		//取消Button
+		//删除所有口味Button
 		((Button)findViewById(R.id.cancelTasteBtn)).setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
-				cancelPickTaste();
+				removeAllTaste();
 			}
 		});
 		
 		_tasteTxtView = (TextView)findViewById(R.id.foodTasteTxtView);
 	    final ListView tasteLstView = (ListView)findViewById(R.id.tasteLstView);
 	   ((EditText)findViewById(R.id.tastesearch)).setText("");
-		tasteLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.tastes));		
-		
+	   
+	   _tasteAdapter = new TasteAdapter(WirelessOrder.foodMenu.tastes);
+	   tasteLstView.setAdapter(_tasteAdapter);
 		
 		
 		//滚动的时候隐藏输入法
@@ -218,9 +218,11 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 				    		 tastes.add(WirelessOrder.foodMenu.tastes[i]);
 				    	 }
 				    }
-				    tasteLstView.setAdapter(new TasteAdapter(tastes.toArray(new Taste[tastes.size()])));
+				    _tasteAdapter = new TasteAdapter(tastes.toArray(new Taste[tastes.size()]));
+				    tasteLstView.setAdapter(_tasteAdapter);
 				}else{
-					tasteLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.tastes));
+					_tasteAdapter = new TasteAdapter(WirelessOrder.foodMenu.tastes);
+					tasteLstView.setAdapter(_tasteAdapter);
 				}
 			}
 			
@@ -240,23 +242,16 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 		_tasteTxtView = (TextView)findViewById(R.id.foodStyleTxtView);
     	final ListView styleLstView = (ListView)findViewById(R.id.styleLstView);
     	((EditText)findViewById(R.id.stylesearch)).setText("");
-		styleLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.styles));
+    	
+    	_tasteAdapter = new TasteAdapter(WirelessOrder.foodMenu.styles);
+		styleLstView.setAdapter(_tasteAdapter);
 		
-		//确定Button
-		((Button)findViewById(R.id.pickStyleBtn)).setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				confirmPickTaste();
-			}
-		});
-		
-		//取消Button
+		//删除所有口味Button
 		((Button)findViewById(R.id.cancelStyleBtn)).setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
-				cancelPickTaste();
+				removeAllTaste();
 			}
 		});
 	    
@@ -289,10 +284,12 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 				    		 styles.add(WirelessOrder.foodMenu.styles[i]);
 				    	 }
 				    }
-					styleLstView.setAdapter(new TasteAdapter(styles.toArray(new Taste[styles.size()])));
+					 _tasteAdapter = new TasteAdapter(styles.toArray(new Taste[styles.size()]));
+					styleLstView.setAdapter(_tasteAdapter);
 					
 				}else{
-					styleLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.styles));
+					_tasteAdapter = new TasteAdapter(WirelessOrder.foodMenu.styles);
+					styleLstView.setAdapter(_tasteAdapter);
 				}
 			}
 			
@@ -309,23 +306,16 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 		_tasteTxtView = (TextView)findViewById(R.id.foodSpecTxtView);
 		final ListView specLstView = (ListView)findViewById(R.id.specLstView);
 		((EditText)findViewById(R.id.specsearch)).setText("");
-		specLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.specs));
-	    
-		//确定Button
-		((Button)findViewById(R.id.pickSpecBtn)).setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				confirmPickTaste();
-			}
-		});
 		
-		//取消Button
+		_tasteAdapter = new TasteAdapter(WirelessOrder.foodMenu.specs);
+		specLstView.setAdapter(_tasteAdapter);
+		
+		//删除所有口味Button
 		((Button)findViewById(R.id.cancelSpecBtn)).setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
-				cancelPickTaste();
+				removeAllTaste();
 			}
 		});
 	    
@@ -357,10 +347,12 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 				    		 specs.add(WirelessOrder.foodMenu.specs[i]);
 				    	 }
 				    }
-					 specLstView.setAdapter(new TasteAdapter(specs.toArray(new Taste[specs.size()])));
+					 _tasteAdapter = new TasteAdapter(specs.toArray(new Taste[specs.size()]));
+					specLstView.setAdapter(_tasteAdapter);
 					
 				}else{
-					specLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.specs));
+					_tasteAdapter = new TasteAdapter(WirelessOrder.foodMenu.specs);
+					specLstView.setAdapter(_tasteAdapter);
 				}
 			}
 			
@@ -444,6 +436,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 					if(selectChkBox.isChecked()){
 						int pos = _selectedFood.addTaste(_tastes[position]);
 						if(pos >= 0){
+							sendPickTasteBoradcast();
 							Toast.makeText(PickTasteActivity.this, "添加" + _tastes[position].preference, 0).show();
 						}else{
 							Toast.makeText(PickTasteActivity.this, "最多只能添加" + _selectedFood.tastes.length + "种口味", 0).show();
@@ -453,6 +446,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 					}else{
 						int pos = _selectedFood.removeTaste(_tastes[position]);
 						if(pos >= 0){
+							sendPickTasteBoradcast();
 							Toast.makeText(PickTasteActivity.this, "删除" + _tastes[position].preference, 0).show();
 						}
 					}
@@ -471,6 +465,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 					if(selectChkBox.isChecked()){
 						int pos = _selectedFood.removeTaste(_tastes[position]);
 						if(pos >= 0){
+							sendPickTasteBoradcast();
 							selectChkBox.setChecked(false);
 							Toast.makeText(PickTasteActivity.this, "删除" + _tastes[position].preference, 0).show();
 						}
@@ -478,6 +473,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 					}else{
 						int pos = _selectedFood.addTaste(_tastes[position]);
 						if(pos >= 0){
+							sendPickTasteBoradcast();
 							selectChkBox.setChecked(true);
 							Toast.makeText(PickTasteActivity.this, "添加" + _tastes[position].preference, 0).show();
 						}else{
