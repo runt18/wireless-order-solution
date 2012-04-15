@@ -263,7 +263,7 @@ class OrderHandler extends Handler implements Runnable{
 				 * Otherwise query to associated detail to this order.
 				 */
 				if((printConf & (Reserved.PRINT_SHIFT_RECEIPT_2 | Reserved.PRINT_TEMP_SHIFT_RECEIPT_2 | Reserved.PRINT_DAILY_SETTLE_RECEIPT_2)) == 0){
-					printParam.orderInfo = QueryOrder.execByID(reqParam.orderID);
+					printParam.orderInfo = QueryOrder.execByID(reqParam.orderID, false);
 				}else{				
 					printParam.onDuty = reqParam.onDuty;
 					printParam.offDuty = reqParam.offDuty;
