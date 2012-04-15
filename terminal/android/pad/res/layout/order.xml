@@ -3,7 +3,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="#FFFFFF"
-    android:orientation="vertical" >
+    android:orientation="vertical">
     
         <!-- 头部 区域 1 -->
 
@@ -180,10 +180,12 @@
 
 	</RelativeLayout>
 	
-	</LinearLayout><LinearLayout
+	</LinearLayout>
+	<LinearLayout
             android:id="@+id/dynamic"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
+            android:orientation="vertical"
             android:layout_weight="0.5" >
         </LinearLayout>
 	
