@@ -33,14 +33,14 @@ public class Reserved {
 	public static final short PRINT_HURRIED_FOOD_2 = 0x200;
 	//indicates to print all hurried food
 	public static final short PRINT_ALL_HURRIED_FOOD_2 = 0x400;
+	//indicates to print daily settle receipt
+	public static final short PRINT_DAILY_SETTLE_RECEIPT_2 = (short)0x1000;
 	//indicates to print temporary shift receipt
 	public static final short PRINT_TEMP_SHIFT_RECEIPT_2 = 0x2000;
 	//indicates to print shift receipt
 	public static final short PRINT_SHIFT_RECEIPT_2 = 0x4000;
 	//indicates to print temporary receipt
 	public static final short PRINT_TEMP_RECEIPT_2 = (short)0x8000;
-	//indicates to print daily settle receipt
-	public static final short PRINT_DAILY_SETTLE_RECEIPT_2 = (short)0x10000;
 
 	/**
 	 * The values below are used for the print request
