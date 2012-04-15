@@ -47,18 +47,19 @@ public class QueryOrder {
 	 * Get the order detail information according to the specific order id. Note
 	 * @param orderID
 	 *            the order id to query
-	 *
+	 * @param isHistory
+	 * 			  indicates whether to check the history record
 	 * @return the order detail information
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
-	public static Order execByID(int orderID) throws BusinessException, SQLException {
+	public static Order execByID(int orderID, boolean isHistory) throws BusinessException, SQLException {
 		DBCon dbCon = new DBCon();
 		
 		try {
 			dbCon.connect();
 
-			return execByID(dbCon, orderID);
+			return execByID(dbCon, orderID, isHistory);
 
 		} finally {
 			dbCon.disconnect();
@@ -89,7 +90,7 @@ public class QueryOrder {
 
 		Table table = QueryTable.exec(dbCon, pin, model, tableID);
 			
-		return execByID(dbCon, Util.getUnPaidOrderID(dbCon, table));
+		return execByID(dbCon, Util.getUnPaidOrderID(dbCon, table), false);
 
 	}
 
@@ -101,18 +102,23 @@ public class QueryOrder {
 	 *            the database connection
 	 * @param orderID
 	 *            the order id to query
+	 * @param isHistory
+	 * 			  indicates whether to query to history record
 	 * @return the order detail information
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
-	public static Order execByID(DBCon dbCon, int orderID) throws BusinessException, SQLException{
+	public static Order execByID(DBCon dbCon, int orderID, boolean isHistory) throws BusinessException, SQLException{
 
+		String orderTbl = isHistory ? "order_history" : "order";
+		
 		/**
 		 * Get the related info to this order.
 		 */
 		String sql = "SELECT custom_num, table_id, table_alias, table_name, table2_alias, table2_name, " +
-					 "region_id, region_name, restaurant_id, type, discount_type, category, is_paid FROM `" + Params.dbName	+ 
-					 "`.`order` WHERE id=" + orderID;
+					 "region_id, region_name, restaurant_id, type, discount_type, category, is_paid FROM " + Params.dbName	+ 
+					 "." + orderTbl + " " +
+					 "WHERE id=" + orderID;
 
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
@@ -140,8 +146,9 @@ public class QueryOrder {
 		/**
 		 * Get the total and actual price if the order has been paid
 		 */
-		sql = "SELECT total_price, total_price_2 FROM `" + Params.dbName +
-			   "`.`order` WHERE id=" + orderID +
+		sql = "SELECT total_price, total_price_2 FROM " + Params.dbName +
+			   "." + orderTbl + 
+			   " WHERE id=" + orderID +
 			   " AND total_price IS NOT NULL";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
@@ -177,7 +184,11 @@ public class QueryOrder {
 		// query the food's id and order count associate with the order id for "order_food" table		
 		String extraCond = " AND C.order_id=" + orderID;		
 
-		orderInfo.foods = OrderFoodReflector.getDetailToday(dbCon, extraCond, "");
+		if(isHistory){
+			orderInfo.foods = OrderFoodReflector.getDetailHistory(dbCon, extraCond, "");
+		}else{
+			orderInfo.foods = OrderFoodReflector.getDetailToday(dbCon, extraCond, "");
+		}
 		orderInfo.id = orderID;
 		
 		return orderInfo;
@@ -207,7 +218,7 @@ public class QueryOrder {
 			
 			Table table = QueryTable.exec(dbCon, term, tableID);
 			
-			return execByID(dbCon, Util.getUnPaidOrderID(dbCon, table));
+			return execByID(dbCon, Util.getUnPaidOrderID(dbCon, table), false);
 			
 		}finally{
 			dbCon.disconnect();
@@ -237,7 +248,7 @@ public class QueryOrder {
 
 		Table table = QueryTable.exec(dbCon, term, tableID);
 			
-		return execByID(dbCon, Util.getUnPaidOrderID(dbCon, table));
+		return execByID(dbCon, Util.getUnPaidOrderID(dbCon, table), false);
 
 	}
 	
