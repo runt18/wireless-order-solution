@@ -8,11 +8,14 @@ import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import net.sf.json.JSONObject;
+import net.sf.json.JsonConfig;
 
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -20,15 +23,12 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.Params;
 import com.wireless.db.VerifyPin;
+import com.wireless.dbObject.SingleOrderFood;
+import com.wireless.dbReflect.SingleOrderFoodReflector;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Terminal;
-
-import net.sf.json.JSONObject;
-import net.sf.json.JsonConfig;
 
 public class QueryDetailAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -48,9 +48,9 @@ public class QueryDetailAction extends Action {
 		int index = Integer.parseInt(start);
 		int pageSize = Integer.parseInt(limit);
 
-		List resultList = new ArrayList();
-		List outputList = new ArrayList();
-		HashMap rootMap = new HashMap();
+		List<HashMap<String, Object>> resultList = new ArrayList<HashMap<String, Object>>();
+		List<HashMap<String, Object>> outputList = new ArrayList<HashMap<String, Object>>();
+		HashMap<String, List<HashMap<String, Object>>> rootMap = new HashMap<String, List<HashMap<String, Object>>>();
 
 		boolean isError = false;
 		// end mod;
@@ -69,63 +69,88 @@ public class QueryDetailAction extends Action {
 
 			dbCon.connect();
 
-			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
-					Terminal.MODEL_STAFF);
+			VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF);
 
-			int nCount = 0;
-			StringBuffer value = new StringBuffer();
+			//int nCount = 0;
+			//StringBuffer value = new StringBuffer();
 
-			String sql = "SELECT a.*, (CASE WHEN b.kitchen_alias = "
-					+ Kitchen.KITCHEN_TEMP + " THEN '临时' "
-					+ "WHEN b.kitchen_alias IS NULL THEN '已刪除廚房' "
-					+ " ELSE b.name END) AS kitchen_name FROM " + Params.dbName
-					+ ".order_food a LEFT OUTER JOIN " + Params.dbName
-					+ ".kitchen b ON (a.kitchen_id=b.kitchen_id)"
-					+ "WHERE a.order_id=" + orderID + "  AND a.restaurant_id="
-					+ term.restaurant_id;
 
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			while (dbCon.rs.next()) {
-				// the string is separated by comma
-				if (nCount != 0) {
-					value.append("，");
-				}
 
+			SingleOrderFood[] singleOrderFoods = SingleOrderFoodReflector.getDetailToday(dbCon, "AND A.order_id=" + orderID, "");
+			
+			for(SingleOrderFood singleOrderFood : singleOrderFoods){
 				/**
 				 * The json to each order detail looks like below
 				 * [日期,名称,单价,数量,折扣,口味,口味价钱,厨房,服务员,备注]
 				 */
 				// mod by ZTF @10/02;
-				HashMap resultMay = new HashMap();
-				resultMay.put("order_date", new SimpleDateFormat(
-						"yyyy-MM-dd HH:mm:ss").format(dbCon.rs
-						.getTimestamp("order_date")));
-				resultMay.put("food_name", dbCon.rs.getString("name"));
-				resultMay.put("unit_price",
-						Float.toString(dbCon.rs.getFloat("unit_price")));
-				resultMay.put("amount",
-						Float.toString(dbCon.rs.getFloat("order_count")));
-				resultMay.put("discount",
-						Float.toString(dbCon.rs.getFloat("discount")));
-				resultMay.put("taste_pref", dbCon.rs.getString("taste")
-						.replaceAll(",", "；"));
-				resultMay.put("taste_price",
-						Float.toString(dbCon.rs.getFloat("taste_price")));
-				resultMay.put("kitchen", dbCon.rs.getString("kitchen_name"));
-				resultMay.put("waiter", dbCon.rs.getString("waiter"));
-				resultMay.put("comment", dbCon.rs.getString("comment"));
+				HashMap<String, Object> resultMay = new HashMap<String, Object>();
+				resultMay.put("order_date", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(singleOrderFood.orderDate));
+				resultMay.put("food_name", singleOrderFood.food.name);
+				resultMay.put("unit_price",	singleOrderFood.unitPrice);
+				resultMay.put("amount", singleOrderFood.orderCount);
+				resultMay.put("discount", singleOrderFood.discount);
+				resultMay.put("taste_pref", singleOrderFood.taste.preference.replaceAll(",", "；"));
+				resultMay.put("taste_price", singleOrderFood.taste.getPrice());
+				resultMay.put("kitchen", singleOrderFood.kitchen.name);
+				resultMay.put("waiter", singleOrderFood.staff.name);
+				resultMay.put("comment", singleOrderFood.comment);
 				resultMay.put("message", "normal");
 
 				resultList.add(resultMay);
-				// end mod;
 			}
-
-			// if (nCount == 0) {
-			// jsonResp = jsonResp.replace("$(value)", "");
-			// } else {
-			// jsonResp = jsonResp.replace("$(value)", value);
-			// }
-			dbCon.rs.close();
+			
+//			String sql = "SELECT a.*, (CASE WHEN b.kitchen_alias = "
+//					+ Kitchen.KITCHEN_TEMP + " THEN '临时' "
+//					+ "WHEN b.kitchen_alias IS NULL THEN '已刪除廚房' "
+//					+ " ELSE b.name END) AS kitchen_name FROM " + Params.dbName
+//					+ ".order_food a LEFT OUTER JOIN " + Params.dbName
+//					+ ".kitchen b ON (a.kitchen_id=b.kitchen_id)"
+//					+ "WHERE a.order_id=" + orderID + "  AND a.restaurant_id="
+//					+ term.restaurant_id;	
+			
+//			dbCon.rs = dbCon.stmt.executeQuery(sql);
+//			while (dbCon.rs.next()) {
+//				// the string is separated by comma
+////				if (nCount != 0) {
+////					value.append("，");
+////				}
+//
+//				/**
+//				 * The json to each order detail looks like below
+//				 * [日期,名称,单价,数量,折扣,口味,口味价钱,厨房,服务员,备注]
+//				 */
+//				// mod by ZTF @10/02;
+//				HashMap resultMay = new HashMap();
+//				resultMay.put("order_date", new SimpleDateFormat(
+//						"yyyy-MM-dd HH:mm:ss").format(dbCon.rs
+//						.getTimestamp("order_date")));
+//				resultMay.put("food_name", dbCon.rs.getString("name"));
+//				resultMay.put("unit_price",
+//						Float.toString(dbCon.rs.getFloat("unit_price")));
+//				resultMay.put("amount",
+//						Float.toString(dbCon.rs.getFloat("order_count")));
+//				resultMay.put("discount",
+//						Float.toString(dbCon.rs.getFloat("discount")));
+//				resultMay.put("taste_pref", dbCon.rs.getString("taste")
+//						.replaceAll(",", "；"));
+//				resultMay.put("taste_price",
+//						Float.toString(dbCon.rs.getFloat("taste_price")));
+//				resultMay.put("kitchen", dbCon.rs.getString("kitchen_name"));
+//				resultMay.put("waiter", dbCon.rs.getString("waiter"));
+//				resultMay.put("comment", dbCon.rs.getString("comment"));
+//				resultMay.put("message", "normal");
+//
+//				resultList.add(resultMay);
+//				// end mod;
+//			}
+//
+//			// if (nCount == 0) {
+//			// jsonResp = jsonResp.replace("$(value)", "");
+//			// } else {
+//			// jsonResp = jsonResp.replace("$(value)", value);
+//			// }
+//			dbCon.rs.close();
 
 			// jsonResp = jsonResp.replace("$(result)", "true");
 
@@ -135,7 +160,7 @@ public class QueryDetailAction extends Action {
 			if (e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
 				// jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");
 				// mod by ZTF @10/02;
-				HashMap resultMay = new HashMap();
+				HashMap<String, Object> resultMay = new HashMap<String, Object>();
 				resultMay.put("message", "没有获取到餐厅信息，请重新确认");
 				resultList.add(resultMay);
 				isError = true;
@@ -144,7 +169,7 @@ public class QueryDetailAction extends Action {
 			} else if (e.errCode == ErrorCode.TERMINAL_EXPIRED) {
 				// jsonResp = jsonResp.replace("$(value)", "终端已过期，请重新确认");
 				// mod by ZTF @10/02;
-				HashMap resultMay = new HashMap();
+				HashMap<String, Object> resultMay = new HashMap<String, Object>();
 				resultMay.put("message", "终端已过期，请重新确认");
 				resultList.add(resultMay);
 				isError = true;
@@ -154,7 +179,7 @@ public class QueryDetailAction extends Action {
 				// jsonResp = jsonResp.replace("$(value)", "没有获取到账单(id=" +
 				// orderID + ")的详细信息，请重新确认");
 				// mod by ZTF @10/02;
-				HashMap resultMay = new HashMap();
+				HashMap<String, Object> resultMay = new HashMap<String, Object>();
 				resultMay.put("message", "没有获取到账单(id=" + orderID
 						+ ")的详细信息，请重新确认");
 				resultList.add(resultMay);
@@ -167,7 +192,7 @@ public class QueryDetailAction extends Action {
 			// jsonResp = jsonResp.replace("$(result)", "false");
 			// jsonResp = jsonResp.replace("$(value)", "数据库请求发生错误，请确认网络是否连接正常");
 			// mod by ZTF @10/02;
-			HashMap resultMay = new HashMap();
+			HashMap<String, Object> resultMay = new HashMap<String, Object>();
 			resultMay.put("message", "数据库请求发生错误，请确认网络是否连接正常");
 			resultList.add(resultMay);
 			isError = true;
@@ -178,7 +203,7 @@ public class QueryDetailAction extends Action {
 			// jsonResp = jsonResp.replace("$(result)", "false");
 			// jsonResp = jsonResp.replace("$(value)", "数据库请求发生错误，请确认网络是否连接正常");
 			// mod by ZTF @10/02;
-			HashMap resultMay = new HashMap();
+			HashMap<String, Object> resultMay = new HashMap<String, Object>();
 			resultMay.put("message", "数据库请求发生错误，请确认网络是否连接正常");
 			resultList.add(resultMay);
 			isError = true;
