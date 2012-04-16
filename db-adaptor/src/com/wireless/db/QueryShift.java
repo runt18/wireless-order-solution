@@ -18,6 +18,9 @@ import com.wireless.protocol.Terminal;
 
 public class QueryShift {
 	
+	public final static int QUERY_TODAY = 0;
+	public final static int QUERY_HISTORY = 1;
+	
 	public static class DeptIncome{
 		public DeptIncome(Department dept){
 			this.dept = dept;
@@ -151,7 +154,7 @@ public class QueryShift {
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT+8"));
 		String offDuty = sdf.format(System.currentTimeMillis());
 		
-		return exec(dbCon, term, onDuty, offDuty, false);
+		return exec(dbCon, term, onDuty, offDuty, QUERY_TODAY);
 
 	}
 	
@@ -238,17 +241,20 @@ public class QueryShift {
 	 * 			the date to be on duty
 	 * @param offDuty
 	 * 			the date to be off duty
-	 * @param isHistory
-	 * 			indicate whether to check history record
+	 * @param queryType
+	 * 			indicate which query type should use
+	 * 			it is one of values below.
+	 * 			- QUERY_TODAY
+	 * 		    - QUERY_HISTORY
 	 * @return the shift detail information
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static Result exec(long pin, short model, String onDuty, String offDuty, boolean isHistory) throws SQLException, BusinessException{
+	public static Result exec(long pin, short model, String onDuty, String offDuty, int queryType) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return exec(dbCon, pin, model, onDuty, offDuty, isHistory);
+			return exec(dbCon, pin, model, onDuty, offDuty, queryType);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -265,14 +271,17 @@ public class QueryShift {
 	 * 			the date to be on duty
 	 * @param offDuty
 	 * 			the date to be off duty
-	 * @param isHistory
-	 * 			indicate whether to check history record
+	 * @param queryType
+	 * 			indicate which query type should use
+	 * 			it is one of values below.
+	 * 			- QUERY_TODAY
+	 * 		    - QUERY_HISTORY
 	 * @return the shift detail information
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static Result exec(DBCon dbCon, long pin, short model, String onDuty, String offDuty, boolean isHistory) throws SQLException, BusinessException{
-		return exec(dbCon, VerifyPin.exec(dbCon, pin, model), onDuty, offDuty, isHistory);
+	public static Result exec(DBCon dbCon, long pin, short model, String onDuty, String offDuty, int queryType) throws SQLException, BusinessException{
+		return exec(dbCon, VerifyPin.exec(dbCon, pin, model), onDuty, offDuty, queryType);
 	}
 	
 	/**
@@ -285,17 +294,20 @@ public class QueryShift {
 	 * 			the date to be on duty
 	 * @param offDuty
 	 * 			the date to be off duty
-	 * @param isHistory
-	 * 			indicate whether to check history record
+	 * @param queryType
+	 * 			indicate which query type should use
+	 * 			it is one of values below.
+	 * 			- QUERY_TODAY
+	 * 		    - QUERY_HISTORY
 	 * @return the shift detail information
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static Result exec(Terminal term, String onDuty, String offDuty, boolean isHistory) throws SQLException{
+	public static Result exec(Terminal term, String onDuty, String offDuty, int queryType) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return exec(dbCon, term, onDuty, offDuty, isHistory);
+			return exec(dbCon, term, onDuty, offDuty, queryType);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -312,25 +324,29 @@ public class QueryShift {
 	 * 			the date to be on duty
 	 * @param offDuty
 	 * 			the date to be off duty
-	 * @param isHistory
-	 * 			indicate whether to check history record
+	 * @param queryType
+	 * 			indicate which query type should use
+	 * 			it is one of values below.
+	 * 			- QUERY_TODAY
+	 * 		    - QUERY_HISTORY
 	 * @return the shift detail information
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static Result exec(DBCon dbCon, Terminal term, String onDuty, String offDuty, boolean isHistory) throws SQLException{
+	public static Result exec(DBCon dbCon, Terminal term, String onDuty, String offDuty, int queryType) throws SQLException{
 		
 		Result result = new Result();
 		result.onDuty = onDuty;
 		result.offDuty = offDuty;
 		
-		SingleOrderFood[] orderFoods;
-		if(isHistory){
+		SingleOrderFood[] orderFoods = new SingleOrderFood[0];
+		if(queryType == QUERY_HISTORY){
 			orderFoods = SingleOrderFoodReflector.getDetailHistory(dbCon, 
 							"AND B.restaurant_id=" + term.restaurant_id + " " + 
 							"AND B.order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "'", 
-							null);			
-		}else{
+							null);		
+			
+		}else if(queryType == QUERY_TODAY){
 			orderFoods = SingleOrderFoodReflector.getDetailToday(dbCon, 
 							"AND B.total_price IS NOT NULL " + 
 							"AND B.restaurant_id=" + term.restaurant_id + " " + 

@@ -11,6 +11,9 @@ import com.wireless.protocol.Terminal;
 
 public class QueryOrder {
 
+	public final static int QUERY_TODAY = 0;
+	public final static int QUERY_HISTORY = 1;
+	
 	/**
 	 * Get the order detail information to the specific table alias id.
 	 * 
@@ -47,19 +50,22 @@ public class QueryOrder {
 	 * Get the order detail information according to the specific order id. Note
 	 * @param orderID
 	 *            the order id to query
-	 * @param isHistory
-	 * 			  indicates whether to check the history record
+	 * @param queryType
+	 * 			  indicates which query type should use.
+	 * 		  	  it is one of values below.
+	 * 			  - QUERY_TODAY
+	 *            - QUERY_HISTORY
 	 * @return the order detail information
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
-	public static Order execByID(int orderID, boolean isHistory) throws BusinessException, SQLException {
+	public static Order execByID(int orderID, int queryType) throws BusinessException, SQLException {
 		DBCon dbCon = new DBCon();
 		
 		try {
 			dbCon.connect();
 
-			return execByID(dbCon, orderID, isHistory);
+			return execByID(dbCon, orderID, queryType);
 
 		} finally {
 			dbCon.disconnect();
@@ -90,7 +96,7 @@ public class QueryOrder {
 
 		Table table = QueryTable.exec(dbCon, pin, model, tableID);
 			
-		return execByID(dbCon, Util.getUnPaidOrderID(dbCon, table), false);
+		return execByID(dbCon, Util.getUnPaidOrderID(dbCon, table), QUERY_TODAY);
 
 	}
 
@@ -102,15 +108,25 @@ public class QueryOrder {
 	 *            the database connection
 	 * @param orderID
 	 *            the order id to query
-	 * @param isHistory
-	 * 			  indicates whether to query to history record
+	 * @param queryType
+	 * 			  indicates which query type should use.
+	 * 		  	  it is one of values below.
+	 * 			  - QUERY_TODAY
+	 *            - QUERY_HISTORY
 	 * @return the order detail information
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
-	public static Order execByID(DBCon dbCon, int orderID, boolean isHistory) throws BusinessException, SQLException{
+	public static Order execByID(DBCon dbCon, int orderID, int queryType) throws BusinessException, SQLException{
 
-		String orderTbl = isHistory ? "order_history" : "order";
+		String orderTbl;
+		if(queryType == QUERY_TODAY){
+			orderTbl = "order";
+		}else if(queryType == QUERY_HISTORY){
+			orderTbl = "order_history";
+		}else{
+			orderTbl = "order";			
+		}
 		
 		/**
 		 * Get the related info to this order.
@@ -184,8 +200,10 @@ public class QueryOrder {
 		// query the food's id and order count associate with the order id for "order_food" table		
 		String extraCond = " AND C.order_id=" + orderID;		
 
-		if(isHistory){
+		if(queryType == QUERY_HISTORY){
 			orderInfo.foods = OrderFoodReflector.getDetailHistory(dbCon, extraCond, "");
+		}else if(queryType == QUERY_TODAY){
+			orderInfo.foods = OrderFoodReflector.getDetailToday(dbCon, extraCond, "");
 		}else{
 			orderInfo.foods = OrderFoodReflector.getDetailToday(dbCon, extraCond, "");
 		}
@@ -218,7 +236,7 @@ public class QueryOrder {
 			
 			Table table = QueryTable.exec(dbCon, term, tableID);
 			
-			return execByID(dbCon, Util.getUnPaidOrderID(dbCon, table), false);
+			return execByID(dbCon, Util.getUnPaidOrderID(dbCon, table), QUERY_TODAY);
 			
 		}finally{
 			dbCon.disconnect();
@@ -248,7 +266,7 @@ public class QueryOrder {
 
 		Table table = QueryTable.exec(dbCon, term, tableID);
 			
-		return execByID(dbCon, Util.getUnPaidOrderID(dbCon, table), false);
+		return execByID(dbCon, Util.getUnPaidOrderID(dbCon, table), QUERY_TODAY);
 
 	}
 	

@@ -498,7 +498,7 @@ public class PayOrder {
 	 */
 	public static Order queryOrderByID(DBCon dbCon, Order orderToPay) throws BusinessException, SQLException{
 		
-		Order orderInfo = QueryOrder.execByID(dbCon, orderToPay.id, false);
+		Order orderInfo = QueryOrder.execByID(dbCon, orderToPay.id, QueryOrder.QUERY_TODAY);
 		
 		/**
 		 * If the pay order formation does NOT comprise the discount,
