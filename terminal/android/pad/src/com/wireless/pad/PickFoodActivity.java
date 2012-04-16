@@ -88,12 +88,6 @@ public class PickFoodActivity extends TabActivity implements
 
 		init();
 
-		// 取得新点菜中已有的菜品List，并保存到pickFood的List中
-//		OrderParcel orderParcel = getIntent().getParcelableExtra(OrderParcel.KEY_VALUE);
-//		for(OrderFood food : orderParcel.foods) {
-//			_pickFoods.add(food);
-//		}
-
 		// construct the tab host
 		_tabHost = getTabHost();
 
