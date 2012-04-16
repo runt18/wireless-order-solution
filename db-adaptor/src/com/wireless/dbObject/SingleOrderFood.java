@@ -10,7 +10,6 @@ public class SingleOrderFood {
 	public StaffTerminal staff = new StaffTerminal();		//服务员姓名
 	public long orderID;									//账单号
 	public long orderDate;									//操作时间
-	public String name;										//菜品名称
 	public float unitPrice;									//菜品单价
 	public float orderCount;								//点菜数量
 	public float discount = 1;								//折扣
@@ -21,6 +20,7 @@ public class SingleOrderFood {
 	public boolean isPaid = false;							//是否曾经反结帐
 	public int payManner = Order.MANNER_CASH;				//结帐方式(现金、刷卡、挂账...)
 	public float serviceRate = 0;							//服务费率
+	public String comment = null;							//备注
 	
 	/**
 	 * Calculate the total price to this food as below.
