@@ -464,7 +464,19 @@ public class MainActivity extends Activity implements OnTouchListener {
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-				try{
+				try{					
+					/**
+					 * 餐台号变化时，先去除原先餐台的高亮状态
+					 */
+					if(_highLightedTbl != null){
+						final LinearLayout highLightedTbl = _highLightedTbl;
+						_tableAreaFlipper.post(new Runnable(){								
+							public void run(){
+								highLightedTbl.setBackgroundResource(R.drawable.griditem_bg_selector);
+							}
+						});					
+					}
+					
 					int	tblId = Integer.parseInt(s.toString().trim());
 				
 					_highLightedTblPos = -1;
@@ -490,28 +502,9 @@ public class MainActivity extends Activity implements OnTouchListener {
 							}					
 						});
 						
-					}else{
-						/**
-						 * 如果无找到输入框中匹配的餐台号，则去除原先餐台的高亮状态
-						 */
-						if(_highLightedTbl != null){
-							final LinearLayout highLightedTbl = _highLightedTbl;
-							_tableAreaFlipper.post(new Runnable(){								
-								public void run(){
-									highLightedTbl.setBackgroundResource(R.drawable.griditem_bg_selector);
-								}
-							});					
-						}
 					}
 				}catch(NumberFormatException e){
-					if(_highLightedTbl != null){
-						final LinearLayout highLightedTbl = _highLightedTbl;
-						_tableAreaFlipper.post(new Runnable(){								
-							public void run(){
-								highLightedTbl.setBackgroundResource(R.drawable.griditem_bg_selector);
-							}
-						});					
-					}
+
 				}
 
 			}
@@ -663,6 +656,8 @@ public class MainActivity extends Activity implements OnTouchListener {
 	@Override
 	protected void onStart(){
 		super.onStart();
+		((EditText)findViewById(R.id.inputTableId)).setText("");
+		reflashRegion();
 		new QueryTableTask().execute();
 	}
 	
