@@ -174,43 +174,49 @@ class OrderHandler extends Handler implements Runnable{
 				
 				int conf = orderToUpdate.print_type;
 				
-				//print the hurried food 
-				if((conf & Reserved.PRINT_SYNC) != 0){
-					printConf |= Reserved.PRINT_SYNC;
+				//perform to print if hurried foods exist
+				if(result.hurriedOrder != null){
+					if((conf & Reserved.PRINT_SYNC) != 0){
+						printConf |= Reserved.PRINT_SYNC;
+					}
+					if((conf & Reserved.PRINT_ALL_HURRIED_FOOD_2) != 0){
+						printConf |= Reserved.PRINT_ALL_HURRIED_FOOD_2;
+					}
+					printParam.orderInfo = result.hurriedOrder;
+					printOrder(printConf, printParam);					
 				}
-				if((conf & Reserved.PRINT_ALL_HURRIED_FOOD_2) != 0){
-					printConf |= Reserved.PRINT_ALL_HURRIED_FOOD_2;
-				}
-				printParam.orderInfo = result.hurriedOrder;
-				printOrder(printConf, printParam);
 				
-				//print the extra food 
-				printConf = Reserved.DEFAULT_CONF;
-				if((conf & Reserved.PRINT_SYNC) != 0){
-					printConf |= Reserved.PRINT_SYNC;
+				//perform to print if extra foods exist
+				if(result.extraOrder != null){
+					printConf = Reserved.DEFAULT_CONF;
+					if((conf & Reserved.PRINT_SYNC) != 0){
+						printConf |= Reserved.PRINT_SYNC;
+					}
+					if((conf & Reserved.PRINT_EXTRA_FOOD_2) != 0){
+						printConf |= Reserved.PRINT_EXTRA_FOOD_2;
+					}
+					if((conf & Reserved.PRINT_ALL_EXTRA_FOOD_2) != 0){
+						printConf |= Reserved.PRINT_ALL_EXTRA_FOOD_2;
+					}
+					printParam.orderInfo = result.extraOrder;
+					printOrder(printConf, printParam);
 				}
-				if((conf & Reserved.PRINT_EXTRA_FOOD_2) != 0){
-					printConf |= Reserved.PRINT_EXTRA_FOOD_2;
+					
+				//perform to print if canceled foods exist
+				if(result.canceledOrder != null){
+					printConf = Reserved.DEFAULT_CONF;
+					if((conf & Reserved.PRINT_SYNC) != 0){
+						printConf |= Reserved.PRINT_SYNC;
+					}
+					if((conf & Reserved.PRINT_CANCELLED_FOOD_2) != 0){
+						printConf |= Reserved.PRINT_CANCELLED_FOOD_2;
+					}
+					if((conf & Reserved.PRINT_ALL_CANCELLED_FOOD_2) != 0){
+						printConf |= Reserved.PRINT_ALL_CANCELLED_FOOD_2;
+					}
+					printParam.orderInfo = result.canceledOrder;
+					printOrder(printConf, printParam);
 				}
-				if((conf & Reserved.PRINT_ALL_EXTRA_FOOD_2) != 0){
-					printConf |= Reserved.PRINT_ALL_EXTRA_FOOD_2;
-				}
-				printParam.orderInfo = result.extraOrder;
-				printOrder(printConf, printParam);
-				
-				//print canceled food
-				printConf = Reserved.DEFAULT_CONF;
-				if((conf & Reserved.PRINT_SYNC) != 0){
-					printConf |= Reserved.PRINT_SYNC;
-				}
-				if((conf & Reserved.PRINT_CANCELLED_FOOD_2) != 0){
-					printConf |= Reserved.PRINT_CANCELLED_FOOD_2;
-				}
-				if((conf & Reserved.PRINT_ALL_CANCELLED_FOOD_2) != 0){
-					printConf |= Reserved.PRINT_ALL_CANCELLED_FOOD_2;
-				}
-				printParam.orderInfo = result.canceledOrder;
-				printOrder(printConf, printParam);
 				
 				//print the table transfer
 				printConf = Reserved.DEFAULT_CONF;
