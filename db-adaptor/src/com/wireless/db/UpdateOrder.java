@@ -66,9 +66,10 @@ public class UpdateOrder {
 	 * 			the terminal to query
 	 * @param orderToUpdate 
 	 * 			the updated detail information
-	 * @return the update result containing two orders below.<br>
-	 * 		   - The extra order.<br>
-	 * 		   - The canceled order.
+	 * @return the update result containing order results below.<br>
+	 * 		   - The extra order, return null if no extra order.<br>
+	 * 		   - The canceled order, return null if no cancel order.<br>
+	 * 		   - The hurried order, return null if no hurried order.
 	 * @throws BusinessException throws if one of the cases below.<br>
 	 * 							 - The terminal is NOT attached to any restaurant.<br>
 	 * 							 - The terminal is expired.<br>
