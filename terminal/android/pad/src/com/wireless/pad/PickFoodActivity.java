@@ -82,8 +82,9 @@ public class PickFoodActivity extends TabActivity implements
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		
 		setContentView(R.layout.table);
+		
 		_detector = new GestureDetector(this);
 
 		init();

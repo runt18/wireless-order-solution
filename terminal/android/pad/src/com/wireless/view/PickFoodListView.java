@@ -41,7 +41,6 @@ public class PickFoodListView extends ListView {
 		super(context, attrs);
 		_context = context;
 
-
 		/**
 		 * 点击每个菜品后弹出点菜数量Dialog
 		 */
@@ -172,10 +171,11 @@ public class PickFoodListView extends ListView {
 			
 			setContentView(R.layout.order_confirm);
 			
-			//getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
-			
 			((TextView)findViewById(R.id.orderTitleTxt)).setText("请输入" + _selectedFood.name + "的点菜数量");
-			((EditText)findViewById(R.id.amountEdtTxt)).setText("1");
+			EditText amountEdtTxt = ((EditText)findViewById(R.id.amountEdtTxt));
+			amountEdtTxt.setText("1");
+			amountEdtTxt.setSelection(amountEdtTxt.getText().length());
+
 			
 			//"确定"Button
 			Button okBtn = (Button)findViewById(R.id.orderConfirmBtn);
