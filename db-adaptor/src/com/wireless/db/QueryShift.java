@@ -427,7 +427,7 @@ public class QueryShift {
 				}
 				
 				if(orderFood.discount < 1){
-					income.discount += orderFood.calcPriceWithTaste();
+					income.discount += orderFood.calcDiscountPrice();
 				}
 				
 				deptIncome.put(orderFood.kitchen.deptID, income);
@@ -453,7 +453,7 @@ public class QueryShift {
 			 * Calculate the price to all discount food during this period
 			 */
 			if(orderFood.discount < 1){
-				result.discountIncome += orderFood.calcPriceWithTaste();
+				result.discountIncome += orderFood.calcDiscountPrice();
 				discountOrderID.add(orderFood.orderID);
 			}
 			

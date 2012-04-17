@@ -23,6 +23,15 @@ public class SingleOrderFood {
 	public String comment = null;							//±¸×¢
 	
 	/**
+	 * Calculate the discount price to this food as below.<br>
+	 * price = unit_price * (1 - discount)
+	 * @return the discount price to this food
+	 */
+	public float calcDiscountPrice(){
+		return (float)Math.round(unitPrice * (1 - discount) * 100) / 100;
+	}
+	
+	/**
 	 * Calculate the total price to this food as below.
 	 * <br>price = (unit_price * discount + taste_price) * count * (1 + service_rate)
 	 * @return the total price to this food
