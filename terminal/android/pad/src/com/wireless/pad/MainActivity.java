@@ -14,7 +14,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
@@ -58,6 +57,7 @@ import com.wireless.protocol.ReqPackage;
 import com.wireless.protocol.ReqQueryOrder;
 import com.wireless.protocol.ReqQueryRegion;
 import com.wireless.protocol.ReqQueryRestaurant;
+import com.wireless.protocol.ReqQueryStaff;
 import com.wireless.protocol.ReqQueryTable;
 import com.wireless.protocol.RespParser;
 import com.wireless.protocol.StaffTerminal;
@@ -101,6 +101,7 @@ public class MainActivity extends Activity {
 			}
 		}
 	};
+	
 	private final static short ALL_STATUS = Short.MIN_VALUE;
 	private short _curTblStatus = ALL_STATUS;				//当前要筛选的餐台状态，小于0表示全部状态
 	private final static short ALL_REGION = Short.MIN_VALUE;
@@ -108,7 +109,8 @@ public class MainActivity extends Activity {
 
 	private final static int TABLE_AMOUNT_PER_PAGE = 24; // 每页要显示餐台数量
 
-
+	private final static int NETWORK_SET = 0;
+	
 	private StaffTerminal _staff;
 
 	private ScrollLayout _tblScrolledArea; // 餐台显示区域
@@ -302,14 +304,7 @@ public class MainActivity extends Activity {
 				.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						Editor editor = getSharedPreferences(Params.PREFS_NAME,
-								Context.MODE_PRIVATE).edit();// 获取编辑器
-						// editor.putLong(Params.STAFF_PIN, _staff.pin);
-						editor.remove(Params.STAFF_PIN);
-						// 提交修改
-						editor.commit();
-						_staff = null;
-						showDialog(DIALOG_STAFF_LOGIN);
+						new QueryStaffTask(false).execute();
 					}
 				});
 
@@ -335,12 +330,8 @@ public class MainActivity extends Activity {
 		reflashTableStat();
 
 		// 弹出登陆对话框(登陆操作)
-		// if (false) {
 		if (WirelessOrder.staffs != null) {
-			SharedPreferences sharedPreferences = getSharedPreferences(
-					Params.PREFS_NAME, Context.MODE_PRIVATE);
-			long pin = sharedPreferences.getLong(Params.STAFF_PIN,
-					Params.DEF_STAFF_PIN);
+			long pin = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).getLong(Params.STAFF_PIN, Params.DEF_STAFF_PIN);
 			if (pin == Params.DEF_STAFF_PIN) {
 				/**
 				 * Show the login dialog if logout before.
@@ -391,12 +382,11 @@ public class MainActivity extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// TODO Auto-generated method stub
-		int item_id = item.getItemId();
-		switch (item_id) {
+		switch(item.getItemId()){
 		// 点击跳转设置页面
 		case R.id.menu_set:
 			Intent intent = new Intent(this, WebSettingActivity.class);
-			startActivity(intent);
+			startActivityForResult(intent, NETWORK_SET);
 			// finish();
 			break;
 		// 点击菜谱更新项
@@ -811,6 +801,32 @@ public class MainActivity extends Activity {
 	}
 
 	/**
+	 * 判断是哪一个Activity返回的
+	 */
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		//如果从设定Activity返回，则重新请求员工信息
+		if(requestCode == NETWORK_SET ){
+		     if(resultCode == RESULT_OK){
+		    	 //重新请求员工信息并更新菜谱
+		    	 ReqPackage.setGen(new PinGen(){
+					@Override
+					public long getDeviceId() {
+						return WirelessOrder.pin;
+					}
+
+					@Override
+					public short getDeviceType() {
+						return Terminal.MODEL_ANDROID;
+					}		    		 
+		    	 });
+		    	 new QueryStaffTask(true).execute();
+		     }
+		}
+		super.onActivityResult(requestCode, resultCode, data);
+	}
+	
+	/**
 	 * 刷新页码指示器
 	 */
 	private void reflashPageIndictor() {
@@ -962,23 +978,20 @@ public class MainActivity extends Activity {
 					if (_popupWindow.isShowing()) {
 						_popupWindow.dismiss();
 					} else {
-						_popupWindow.showAsDropDown(
-								findViewById(R.id.staffname), 0, -7);
+						_popupWindow.showAsDropDown(findViewById(R.id.staffname), 0, -7);
 					}
 				}
 			});
 
 			// 获取自定义布局文件的视图
-			View popupWndView = getLayoutInflater().inflate(
-					R.layout.loginpopuwindow, null, false);
+			View popupWndView = getLayoutInflater().inflate(R.layout.loginpopuwindow, null, false);
 			// 创建PopupWindow实例
 			_popupWindow = new PopupWindow(popupWndView, 320, 200, true);
 			_popupWindow.setOutsideTouchable(true);
 			_popupWindow.setFocusable(true);
 			_popupWindow.setBackgroundDrawable(new BitmapDrawable());
 			_popupWindow.update();
-			ListView staffLstView = (ListView) popupWndView
-					.findViewById(R.id.loginpopuwindow);
+			ListView staffLstView = (ListView) popupWndView.findViewById(R.id.loginpopuwindow);
 			_staffAdapter = new StaffsAdapter();
 			staffLstView.setAdapter(_staffAdapter);
 
@@ -1050,7 +1063,6 @@ public class MainActivity extends Activity {
 
 							} catch (NoSuchAlgorithmException e) {
 								errTxtView.setText(e.getMessage());
-								;
 							}
 						}
 					});
@@ -1380,6 +1392,106 @@ public class MainActivity extends Activity {
 	}
 
 	/**
+	 * 请求查询员工信息 
+	 */
+	private class QueryStaffTask extends AsyncTask<Void, Void, String>{
+		
+		private ProgressDialog _progDialog;
+		
+		private boolean _isTableUpdate;
+		
+		QueryStaffTask(boolean isMenuUpdate){
+			_isTableUpdate = isMenuUpdate;
+		}
+		
+		/**
+		 * 执行员工信息请求前显示提示信息
+		 */
+		@Override
+		protected void onPreExecute(){
+
+			_progDialog = ProgressDialog.show(MainActivity.this, "", "正在更新员工信息...请稍后", true);
+		}
+		
+		/**
+		 * 在新的线程中执行请求员工信息的操作
+		 */
+		@Override
+		protected String doInBackground(Void... arg0){
+			String errMsg = null;
+			try{
+				WirelessOrder.staffs = null;
+				ReqPackage.setGen(new PinGen(){
+					@Override
+					public long getDeviceId() {
+						return WirelessOrder.pin;
+					}
+					@Override
+					public short getDeviceType() {
+						return Terminal.MODEL_ANDROID;
+					}				
+				});
+				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryStaff());
+				if(resp.header.type == Type.ACK){
+					WirelessOrder.staffs = RespParser.parseQueryStaff(resp);
+				}else{
+					if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
+						errMsg = "终端没有登记到餐厅，请联系管理人员。";
+					}else if(resp.header.reserved == ErrorCode.TERMINAL_EXPIRED) {
+						errMsg = "终端已过期，请联系管理人员。";
+					}else{
+						errMsg = "更新员工信息失败，请检查网络信号或重新连接。";
+					}
+					throw new IOException(errMsg);
+				}
+			}catch(IOException e){
+				errMsg = e.getMessage();
+			}
+			return errMsg;
+		}
+		
+		/**
+		 * 根据返回的error message判断，如果发错异常则提示用户，
+		 * 如果员工信息请求成功，则显示登录Dialog。
+		 */
+		@Override
+		protected void onPostExecute(String errMsg){
+			//make the progress dialog disappeared
+			_progDialog.dismiss();		
+			((TextView)findViewById(R.id.username_value)).setText("");
+			((TextView)findViewById(R.id.notice)).setText("");
+			/**
+			 * Prompt user message if any error occurred,
+			 * otherwise show the login dialog
+			 */
+			if(errMsg != null){
+				new AlertDialog.Builder(MainActivity.this)
+						.setTitle("提示")
+						.setMessage(errMsg)
+						.setPositiveButton("确定", null)
+						.show();
+				
+			}else{
+				if(WirelessOrder.staffs == null){
+					new AlertDialog.Builder(MainActivity.this)
+								   .setTitle("提示")
+					               .setMessage("没有查询到任何的员工信息，请在管理后台先添加员工信息")
+					               .setPositiveButton("确定", null)
+					               .show();
+				}else{
+					Editor editor = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).edit();//获取编辑器
+					editor.putLong(Params.STAFF_PIN, Params.DEF_STAFF_PIN);
+					editor.commit();
+					showDialog(DIALOG_STAFF_LOGIN);
+					if(_isTableUpdate){
+						new QueryTableTask().execute();
+					}
+				}
+			}
+		}	
+	}
+	
+	/**
 	 * 餐台信息的Adapter
 	 * 
 	 * @author Ying.Zhang
@@ -1446,21 +1558,16 @@ public class MainActivity extends Activity {
 				@Override
 				public void onClick(View v) {
 					if (table.status == Table.TABLE_IDLE) {
-						// jump to the order activity with the table parcel in
-						// case of idle
-						Intent intent = new Intent(MainActivity.this,
-								OrderActivity.class);
+						// jump to the order activity with the table parcel in case of idle
+						Intent intent = new Intent(MainActivity.this, OrderActivity.class);
 						Bundle bundle = new Bundle();
-						bundle.putParcelable(TableParcel.KEY_VALUE,
-								new TableParcel(table));
+						bundle.putParcelable(TableParcel.KEY_VALUE,	new TableParcel(table));
 						intent.putExtras(bundle);
 						startActivity(intent);
 
 					} else if (table.status == Table.TABLE_BUSY) {
-						// jump to change order activity with the order in case
-						// of busy
-						new QueryOrderTask(table.aliasID, Type.UPDATE_ORDER)
-								.execute();
+						// jump to change order activity with the order in case of busy
+						new QueryOrderTask(table.aliasID, Type.UPDATE_ORDER).execute();
 					}
 				}
 			});
@@ -1472,13 +1579,36 @@ public class MainActivity extends Activity {
 					if (table.status == Table.TABLE_BUSY) {
 						new AlertDialog.Builder(parent.getContext())
 								.setTitle("请选择" + table.aliasID + "号餐台的操作")
-								.setItems(new String[] { "改单", "转台" }, null)
+								.setItems(new String[] { "改单", "转台" }, new DialogInterface.OnClickListener() {									
+									@Override
+									public void onClick(DialogInterface dialog, int which) {
+										if(which == 0){
+											// jump to change order activity with the order in case of busy
+											new QueryOrderTask(table.aliasID, Type.UPDATE_ORDER).execute();
+										}else if(which == 1){
+											
+										}										
+									}
+								})
 								.setNegativeButton("返回", null).show();
 
 					} else if (table.status == Table.TABLE_IDLE) {
 						new AlertDialog.Builder(parent.getContext())
 								.setTitle("请选择" + table.aliasID + "号餐台的操作")
-								.setItems(new String[] { "下单" }, null)
+								.setItems(new String[] { "下单" }, new DialogInterface.OnClickListener() {
+									
+									@Override
+									public void onClick(DialogInterface dialog, int which) {
+										if(which == 0){
+											// jump to the order activity with the table parcel in case of idle
+											Intent intent = new Intent(MainActivity.this, OrderActivity.class);
+											Bundle bundle = new Bundle();
+											bundle.putParcelable(TableParcel.KEY_VALUE,	new TableParcel(table));
+											intent.putExtras(bundle);
+											startActivity(intent);
+										}
+									}
+								})
 								.setNegativeButton("返回", null).show();
 					}
 					return true;

@@ -63,7 +63,6 @@ public class WebSettingActivity extends Activity implements OnClickListener {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.websetting);
 		init();
@@ -212,7 +211,6 @@ public class WebSettingActivity extends Activity implements OnClickListener {
 
 	@Override
 	public void onClick(View v) {
-		// TODO Auto-generated method stub
 		switch (v.getId()) {
 		case R.id.back_btn:
 			finish();
@@ -250,8 +248,7 @@ public class WebSettingActivity extends Activity implements OnClickListener {
 
 			Toast.makeText(WebSettingActivity.this, "Õ¯¬Á…Ë÷√≥…π¶", 0).show();
 			if (!_address.equals(_ipEdtTxt.getText().toString())
-					|| !String.valueOf(_port).equals(
-							_portEdtTxt.getText().toString())
+					|| !String.valueOf(_port).equals(_portEdtTxt.getText().toString())
 					|| !_apn.equals(_apnEdtTxt.getText().toString())
 					|| !_username.equals(_userEdtTxt.getText().toString())
 					|| !_password.equals(_pwdEdtTxt.getText().toString())) {
