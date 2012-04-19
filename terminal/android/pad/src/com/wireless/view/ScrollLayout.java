@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Scroller;
 
 /**
- * 仿Launcher中的WorkSapce，可以左右滑动切换屏幕的�? * 
+ * 仿Launcher中的WorkSapce，可以左右滑动切换屏幕的�? * 
  * @author Yao.GUET blog: http://blog.csdn.net/Yao_GUET date: 2011-05-04
  */
 public class ScrollLayout extends ViewGroup {
@@ -73,7 +73,7 @@ public class ScrollLayout extends ViewGroup {
 		}
 
 		/**
-		 * wrap_content 传进去的是AT_MOST 固定数�?或fill_parent 传入的模式是EXACTLY
+		 * wrap_content 传进去的是AT_MOST 固定数�?或fill_parent 传入的模式是EXACTLY
 		 */
 		final int heightMode = MeasureSpec.getMode(heightMeasureSpec);
 		if (heightMode != MeasureSpec.EXACTLY) {
@@ -124,7 +124,7 @@ public class ScrollLayout extends ViewGroup {
 	}
 
 	/**
-	 * 当滑动后的当前页�?	 */ 
+	 * 当滑动后的当前页�?	 */ 
 	public int getPage() {
 		return page;
 	}
@@ -194,6 +194,7 @@ public class ScrollLayout extends ViewGroup {
 		return true;
 	}
 
+	
 	@Override
 	public boolean onInterceptTouchEvent(MotionEvent ev) {
 
