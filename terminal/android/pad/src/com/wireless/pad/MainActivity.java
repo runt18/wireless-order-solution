@@ -79,14 +79,14 @@ public class MainActivity extends Activity {
 				Iterator<Table> iter = tmpTbls.iterator();
 				while (iter.hasNext()) {
 					Table table = iter.next();
-					if (_curTblStatus >= 0) {
-						if (table.status != _curTblStatus) {
+					if(_curTblStatus != ALL_STATUS){
+						if(table.status != _curTblStatus){
 							iter.remove();
 							continue;
 						}
 					}
-					if (_curRegion >= 0) {
-						if (table.regionID != _curRegion) {
+					if(_curRegion != ALL_REGION){
+						if(table.regionID != _curRegion){
 							iter.remove();
 							continue;
 						}
@@ -101,17 +101,17 @@ public class MainActivity extends Activity {
 			}
 		}
 	};
+	private final static short ALL_STATUS = Short.MIN_VALUE;
+	private short _curTblStatus = ALL_STATUS;				//当前要筛选的餐台状态，小于0表示全部状态
+	private final static short ALL_REGION = Short.MIN_VALUE;
+	private short _curRegion = ALL_REGION;					//当前要筛选的餐台区域，小于0表示全部区域		
 
 	private final static int TABLE_AMOUNT_PER_PAGE = 24; // 每页要显示餐台数量
 
-	private short _curTblStatus = Short.MIN_VALUE; // 当前要筛选的餐台状态，小于0表示全部状态
-	private short _curRegion = Short.MIN_VALUE; // 当前要筛选的餐台区域，小于0表示全部区域
 
 	private StaffTerminal _staff;
 
-	private ScrollLayout _tableAreaFlipper; // 餐台显示区域
-
-	private LinearLayout _pageIndicator; // 页码指示器
+	private ScrollLayout _tblScrolledArea; // 餐台显示区域
 
 	private Table[] _tableSource; // 主界面中用于餐台显示的数据源
 
@@ -121,15 +121,26 @@ public class MainActivity extends Activity {
 	private final static int FILTER_TABLE_BY_COND = 0; //
 	private final static int REDRAW_RESTAURANT = 2; //
 
-	private float mStartX, mEndX; // 滑动切换页码时记录的X坐标值
+	//private float mStartX, mEndX; // 滑动切换页码时记录的X坐标值
 
 	private void init() {
-
-		_tableAreaFlipper = (ScrollLayout) findViewById(R.id.tableFlipper);
-		_tableAreaFlipper.getLayoutParams().height = this.getWindowManager()
-				.getDefaultDisplay().getHeight() * 2 / 3;
-		_tableAreaFlipper.setPageListener(new PageListener() {
-
+		
+		//全部刷新Button
+		((Button)findViewById(R.id.reAll_btn)).setOnClickListener(new View.OnClickListener() {			
+			@Override
+			public void onClick(View v) {
+				_curRegion = ALL_REGION;
+				_curTblStatus = ALL_STATUS;
+				((TextView)findViewById(R.id.regionsInfo_txt)).setText("全部区域");
+				((TextView)findViewById(R.id.tablestatus_txt)).setText("(全部)");
+				_handler.sendEmptyMessage(FILTER_TABLE_BY_COND);
+			}
+		});
+		
+		//显示餐台的scroll view group
+		_tblScrolledArea = (ScrollLayout) findViewById(R.id.tableFlipper);
+		_tblScrolledArea.getLayoutParams().height = this.getWindowManager().getDefaultDisplay().getHeight() * 2 / 3;
+		_tblScrolledArea.setPageListener(new PageListener() {
 			@Override
 			public void page(int page) {
 				// TODO Auto-generated method stub
@@ -155,6 +166,51 @@ public class MainActivity extends Activity {
 		popWnd.setOutsideTouchable(true);
 		popWnd.setBackgroundDrawable(new BitmapDrawable());
 		popWnd.update();
+		
+		//餐台状态弹出View中的“全部”Button
+		((Button)tblStatusPopupView.findViewById(R.id.statusAll)).setOnClickListener(new View.OnClickListener() {			
+			@Override
+			public void onClick(View v) {
+				_curTblStatus = ALL_STATUS;
+				((TextView)findViewById(R.id.tablestatus_txt)).setText("(全部)");
+				popWnd.dismiss();
+				_handler.sendEmptyMessage(FILTER_TABLE_BY_COND);
+			}
+		});
+		
+		//餐台状态弹出View中的“空闲”Button
+		((Button)tblStatusPopupView.findViewById(R.id.statusNobody)).setOnClickListener(new View.OnClickListener() {			
+			@Override
+			public void onClick(View v) {
+				_curTblStatus = Table.TABLE_IDLE;
+				((TextView)findViewById(R.id.tablestatus_txt)).setText("(空闲)");
+				popWnd.dismiss();
+				_handler.sendEmptyMessage(FILTER_TABLE_BY_COND);
+			}
+		});
+		
+		//餐台状态弹出View中的“就餐”Button
+		((Button)tblStatusPopupView.findViewById(R.id.statusBusy)).setOnClickListener(new View.OnClickListener() {			
+			@Override
+			public void onClick(View v) {
+				_curTblStatus = Table.TABLE_BUSY;
+				((TextView)findViewById(R.id.tablestatus_txt)).setText("(就餐)");
+				popWnd.dismiss();
+				_handler.sendEmptyMessage(FILTER_TABLE_BY_COND);
+			}
+		});
+		
+		//响应餐台筛选状态的Click事件
+		((FrameLayout)findViewById(R.id.showPopWindow)).setOnClickListener(new View.OnClickListener() {			
+			@Override
+			public void onClick(View v) {
+				if(popWnd.isShowing()){
+					popWnd.dismiss();
+				}else{
+					popWnd.showAsDropDown(v);
+				}
+			}
+		});
 
 		// 餐台状态弹出View中的“全部”Button
 		((Button) tblStatusPopupView.findViewById(R.id.statusAll))
@@ -365,7 +421,7 @@ public class MainActivity extends Activity {
 			} else {
 				billBoard.setText("");
 			}
-
+			
 			TextView userName = (TextView) findViewById(R.id.username_value);
 			if (_staff != null) {
 				if (_staff.name != null) {
@@ -536,7 +592,7 @@ public class MainActivity extends Activity {
 							 */
 							if (_highLightedTbl != null) {
 								final LinearLayout highLightedTbl = _highLightedTbl;
-								_tableAreaFlipper.post(new Runnable() {
+								_tblScrolledArea.post(new Runnable() {
 									public void run() {
 										highLightedTbl
 												.setBackgroundResource(R.drawable.griditem_bg_selector);
@@ -557,14 +613,14 @@ public class MainActivity extends Activity {
 							if (_highLightedTblPos != -1) {
 								final int pos = _highLightedTblPos;
 								// 自动跳转到高亮餐台所在那一屏
-								_tableAreaFlipper
+								_tblScrolledArea
 										.snapToScreen(_highLightedTblPos
 												/ TABLE_AMOUNT_PER_PAGE);
 								// 高亮显示与餐台号一致的餐台
-								_tableAreaFlipper.post(new Runnable() {
+								_tblScrolledArea.post(new Runnable() {
 									@Override
 									public void run() {
-										View v = ((GridView) _tableAreaFlipper
+										View v = ((GridView) _tblScrolledArea
 												.getChildAt(_highLightedTblPos
 														/ TABLE_AMOUNT_PER_PAGE))
 												.getChildAt(pos
@@ -681,10 +737,10 @@ public class MainActivity extends Activity {
 				+ (_tableSource.length % TABLE_AMOUNT_PER_PAGE == 0 ? 0 : 1);
 
 		// 清空所有Grid View
-		_tableAreaFlipper.removeAllViews();
-		_tableAreaFlipper.page = 0;
-		_tableAreaFlipper.mCurScreen = 0;
-		_tableAreaFlipper.mDefaultScreen = 0;
+		_tblScrolledArea.removeAllViews();
+		_tblScrolledArea.page = 0;
+		_tblScrolledArea.mCurScreen = 0;
+		_tblScrolledArea.mDefaultScreen = 0;
 
 		for (int pageNo = 0; pageNo < pageSize; pageNo++) {
 			// 每页餐台的Grid View
@@ -717,11 +773,11 @@ public class MainActivity extends Activity {
 			grid.setAdapter(new TableAdapter(tables4Page));
 
 			// 添加Grid
-			_tableAreaFlipper.addView(grid);
+			_tblScrolledArea.addView(grid);
 		}
 
-		_pageIndicator = (LinearLayout) findViewById(R.id.page_point);
-		_pageIndicator.removeAllViews();
+		LinearLayout pageIndicator = (LinearLayout) findViewById(R.id.page_point);
+		pageIndicator.removeAllViews();
 		// 初始化页码指示器的每一项
 		for (int i = 0; i < pageSize; i++) {
 			ImageView point = new ImageView(this);
@@ -731,7 +787,7 @@ public class MainActivity extends Activity {
 					LinearLayout.LayoutParams.WRAP_CONTENT);
 			lp.setMargins(0, 0, 25, 0);
 			point.setLayoutParams(lp);
-			_pageIndicator.addView(point);
+			pageIndicator.addView(point);
 		}
 		// 刷新页码指示器
 		reflashPageIndictor();
@@ -758,18 +814,19 @@ public class MainActivity extends Activity {
 	 * 刷新页码指示器
 	 */
 	private void reflashPageIndictor() {
-		if (_tableAreaFlipper.getChildCount() > 0) {
-			_pageIndicator.setVisibility(View.VISIBLE);
-			for (int i = 0; i < _pageIndicator.getChildCount(); i++) {
-				((ImageView) _pageIndicator.getChildAt(i))
+		LinearLayout pageIndicator = (LinearLayout) findViewById(R.id.page_point);
+		if (_tblScrolledArea.getChildCount() > 0) {
+			pageIndicator.setVisibility(View.VISIBLE);
+			for (int i = 0; i < pageIndicator.getChildCount(); i++) {
+				((ImageView) pageIndicator.getChildAt(i))
 						.setImageResource(R.drawable.av_r25_c31);
 			}
 			// highlight the active page point
-			((ImageView) _pageIndicator.getChildAt(_tableAreaFlipper
+			((ImageView) pageIndicator.getChildAt(_tblScrolledArea
 					.getCurScreen())).setImageResource(R.drawable.av_r24_c28);
 
 		} else {
-			_pageIndicator.setVisibility(View.GONE);
+			pageIndicator.setVisibility(View.GONE);
 		}
 	}
 
@@ -895,7 +952,7 @@ public class MainActivity extends Activity {
 			setTitle("请输入账号与密码");
 			final EditText pwdEdtTxt = (EditText) findViewById(R.id.pwd);
 			final EditText staffTxtView = (EditText) findViewById(R.id.staffname);
-
+			
 			/**
 			 * 帐号输入框显示员工列表
 			 */
