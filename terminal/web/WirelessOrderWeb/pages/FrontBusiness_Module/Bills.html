@@ -1,0 +1,388 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>无线点餐网页终端</title>
+
+<link rel="stylesheet" type="text/css"
+	href="../../extjs/resources/css/ext-all.css" />
+<script type="text/javascript" src="../../extjs/ext-base.js"></script>
+<script type="text/javascript" src="../../extjs/ext-all.js"></script>
+<!-- 解决Grid不能选择复制问题 -->
+<script type="text/javascript" src="../../js/GridViewRewrite.js"></script>
+<script type="text/javascript" src="../../extjs/ext-lang-zh_CN.js"></script>
+
+<!-- 实现多选JS -->
+<script type="text/javascript" src="../../extjs/multiselect/DDView.js"></script>
+<script type="text/javascript"
+	src="../../extjs/multiselect/MultiSelect.js"></script>
+<script type="text/javascript"
+	src="../../extjs/multiselect/ItemSelector.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="../../extjs/multiselect/multiselect.css" />
+
+<!-- css -->
+<link rel="stylesheet" type="text/css"
+	href="../../css/systemSetting.css" />
+<link rel="stylesheet" type="text/css" href="../../css/header.css" />
+<link rel="stylesheet" type="text/css" href="../../css/tableList.css" />
+<link rel="stylesheet" type="text/css" href="../../css/tableStatus.css" />
+<link rel="stylesheet" type="text/css"
+	href="../../css/systemSetting.css" />
+
+<!-- jquery lib -->
+<script type="text/javascript" src="../../jquery/jquery-1.5.1.min.js"></script>
+
+<!-- components -->
+<script type="text/javascript"
+	src="../../js/components/Ext.ux.ImageButton.js"></script>
+<script type="text/javascript" src="../../js/components/md5.js"></script>
+<script type="text/javascript" src="../../js/components/functionLib.js"></script>
+<script type="text/javascript" src="../../js/components/translateValue.js"></script>
+
+<script type="text/javascript">
+	// 解决combobox图标异常问题
+	Ext.onReady(function() {
+		Ext.BLANK_IMAGE_URL = "../../extjs/resources/images/default/s.gif";
+	});
+</script>
+
+<script type="text/javascript">
+	var Request = new URLParaQuery();
+
+	// global variable
+	var restaurantID = Request["restaurantID"];
+	var operatorName = "";
+	var pin = Request["pin"];
+
+	var currRowIndex = -1;
+	var shiftDtlRowIndex = -1;
+
+	var billsData = [];
+	var conditionType = "text";
+
+	var isPrompt = false;
+	//統計
+	// dish
+	var orderStaticBeginDate;
+	var orderStaticEndDate;
+	var orderStaticDishesString = "";
+	var dishMultSelectData = [];//[菜品编号，菜品名称]
+	var kitchenTypeData = [];
+	var dishesStaticRecordCount = 10;
+	// kitchen
+	var kitchenStaticBeginDate;
+	var kitchenStaticEndDate;
+	var kitchenStaticString = "";
+	var kitchenMultSelectData = [];
+	var kitchenStaticRecordCount = 10;
+	// dept
+	var deptStaticBeginDate;
+	var deptStaticEndDate;
+	var deptStaticString = "";
+	var deptMultSelectData = [];
+	var deptStaticRecordCount = 10;
+	// region
+	var regionStaticBeginDate;
+	var regionStaticEndDate;
+	var regionStaticString = "";
+	var regionMultSelectData = [];
+	var regionStaticRecordCount = 10;
+	// discount
+	var discountStatDetailResultData = [];
+	var staffData = [];
+	// shift
+	var shiftStaticRecordCount = 10;
+	var begDateMStatShift;
+	var endDateMStatShift;
+
+	//明細表格分頁記錄數
+	var billDetailpageRecordCount = 10;
+</script>
+
+<script type="text/javascript"
+	src="../../js/FrontBusiness/bills/billsFuncLib.js"></script>
+<script type="text/javascript"
+	src="../../js/FrontBusiness/bills/billGeneral/billsLoad.js"></script>
+<script type="text/javascript"
+	src="../../js/FrontBusiness/bills/billStatistics/dishOrderStatistics.js"></script>
+<script type="text/javascript"
+	src="../../js/FrontBusiness/bills/billStatistics/kitchenStatistics.js"></script>
+<script type="text/javascript"
+	src="../../js/FrontBusiness/bills/billStatistics/deptStatistics.js"></script>
+<script type="text/javascript"
+	src="../../js/FrontBusiness/bills/billStatistics/regionStatistics.js"></script>
+<script type="text/javascript"
+	src="../../js/FrontBusiness/bills/billStatistics/discountStatistics.js"></script>
+<script type="text/javascript"
+	src="../../js/FrontBusiness/bills/billStatistics/shiftStatistics.js"></script>
+<script type="text/javascript"
+	src="../../js/FrontBusiness/bills/billGeneral/billsMain.js"></script>
+
+</head>
+<body onload="billsOnLoad()">
+	<script type="text/javascript" src="../../extjs/examples.js"></script>
+
+	<!------------------- layout ------------------------>
+	<div id="west"></div>
+	<div id="north">
+		<p>icons here.</p>
+	</div>
+	<div id="south"></div>
+	<div id="west"></div>
+	<div id="center"></div>
+	<div id="temp"></div>
+
+	<!-- bill sum -->
+	<div id="billSum" style="font-weight: bold; font-size: 15px;">
+		<table>
+			<tr>
+				<td style="width: 560px">&nbsp;</td>
+				<td style="width: 60px">合计：</td>
+				<td style="width: 120px"><div id="shouldPaySum">0</div></td>
+				<td style="width: 120px"><div id="actualPaySum">0</div></td>
+			</tr>
+		</table>
+	</div>
+
+	<!-- bill view -->
+	<div id="billView" style="font-size: 14px;">
+		<table>
+			<tr>
+				<td><table>
+						<tr>
+							<td style="width: 10px">&nbsp;</td>
+							<td style="width: 80px">账单号：</td>
+							<td style="width: 80px" id="billIDBV">000</td>
+							<td style="width: 30px">&nbsp;</td>
+							<td style="width: 80px">类型：</td>
+							<td style="width: 80px" id="billTypeBV">000</td>
+						</tr>
+						<tr>
+							<td style="width: 10px">&nbsp;</td>
+							<td style="width: 80px">台号：</td>
+							<td style="width: 80px" id="tableNbrBV">000</td>
+							<td style="width: 30px">&nbsp;</td>
+							<td style="width: 80px">人数：</td>
+							<td style="width: 80px" id="personNbrBV">1</td>
+						</tr>
+					</table></td>
+			</tr>
+			<tr>
+				<td>
+					<table>
+						<tr>
+							<td style="width: 10px">&nbsp;</td>
+							<td style="width: 80px">日期：</td>
+							<td style="width: 160px" id="billDateBV">2011-01-02 00:00:00</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<table>
+						<tr>
+							<td style="width: 10px">&nbsp;</td>
+							<td style="width: 80px">结账方式：</td>
+							<td style="width: 80px" id="payTypeBV">一般</td>
+							<td style="width: 30px">&nbsp;</td>
+							<td style="width: 80px">付款方式：</td>
+							<td style="width: 80px" id="payMannerBV">现金</td>
+						</tr>
+						<tr>
+							<td style="width: 10px">&nbsp;</td>
+							<td style="width: 80px">服务费：</td>
+							<td style="width: 80px" id="serviceRateBV">0%</td>
+						</tr>
+						<tr>
+							<td style="width: 10px">&nbsp;</td>
+							<td style="width: 80px">服务员：</td>
+							<td style="width: 80px" id="waiterBV">張穎</td>
+						</tr>
+					</table></td>
+			</tr>
+		</table>
+
+	</div>
+
+
+	<!-- bill view add info -->
+	<div id="billViewAddInfo" style="font-size: 15px;">
+		<table>
+			<tr>
+				<td style="width: 160px">&nbsp;</td>
+				<td style="width: 60px">赠送：</td>
+				<td style="width: 100px" id="forFreeBV">￥0</td>
+				<td style="width: 60px">应收：</td>
+				<td style="width: 100px" id="shouldPayBV">￥1234.12</td>
+			</tr>
+			<tr>
+				<td style="width: 160px">&nbsp;</td>
+				<td style="width: 60px">&nbsp;</td>
+				<td style="width: 100px">&nbsp;</td>
+				<td style="width: 60px">实收：</td>
+				<td style="width: 100px" id="actrualPayBV">￥1234.12</td>
+			</tr>
+		</table>
+	</div>
+
+	<!------------------- shift check table ------------------------>
+	<div id="shiftCheckTableDiv">
+		<table border="1" id="shiftContentCheck">
+			<tr>
+				<td id="shiftTitle">交班对帐表</td>
+			</tr>
+			<tr>
+				<td>
+					<table>
+						<tr>
+							<td><table>
+									<tr>
+										<td style="width: 15px" />
+										<td class="shiftInfo">交班人：</td>
+										<td id="shiftOperator">fuck</td>
+										<td style="width: 120px" />
+										<td class="shiftInfo">帐单总数：</td>
+										<td id="shiftBillCount">45</td>
+									</tr>
+								</table></td>
+
+						</tr>
+						<tr>
+							<td><table>
+									<tr>
+										<td style="width: 15px; height: 20px" />
+										<td class="shiftInfo">开始时间：</td>
+										<td id="shiftStartTime">2011-07-11 8:04:04</td>
+									</tr>
+									<tr>
+										<td style="height: 20px" />
+										<td class="shiftInfo">结束时间：</td>
+										<td id="shiftEndTime">2011-07-11 12:14:33</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+					</table></td>
+			</tr>
+			<tr>
+				<td><table>
+						<tr>
+							<td style="width: 30px; height: 20px" />
+							<td style="width: 140px" class="shiftInfo">收款方式</td>
+							<td style="width: 140px" class="shiftInfo">账单数</td>
+							<td style="width: 140px" class="shiftInfo">金额</td>
+							<td style="width: 140px" class="shiftInfo">实收</td>
+						</tr>
+						<tr>
+							<td style="height: 20px" />
+							<td class="shiftInfo">现金</td>
+							<td id="billCount1">1000</td>
+							<td id="amount1">1243.43</td>
+							<td id="actual1">1243</td>
+						</tr>
+						<tr>
+							<td style="height: 20px" />
+							<td class="shiftInfo">刷卡</td>
+							<td id="billCount2">1000</td>
+							<td id="amount2">1243.43</td>
+							<td id="actual2">1243</td>
+						</tr>
+						<tr>
+							<td style="height: 20px" />
+							<td class="shiftInfo">会员卡</td>
+							<td id="billCount3">1000</td>
+							<td id="amount3">1243.43</td>
+							<td id="actual3">1243</td>
+						</tr>
+						<tr>
+							<td style="height: 20px" />
+							<td class="shiftInfo">签单</td>
+							<td id="billCount4">1000</td>
+							<td id="amount4">1243.43</td>
+							<td id="actual4">1243</td>
+						</tr>
+						<tr>
+							<td style="height: 20px" />
+							<td class="shiftInfo">挂账</td>
+							<td id="billCount5">1000</td>
+							<td id="amount5">1243.43</td>
+							<td id="actual5">1243</td>
+						</tr>
+						<tr>
+							<td/>
+							<td style="height: 20px" />
+							<td class="shiftInfo">合计：</td>
+							<td id="amountSum">1243.43</td>
+							<td id="actualSum">1243</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td><table>
+						<tr>
+							<td style="width: 20px; height: 20px" />
+							<td style="width: 120px;" class="shiftInfo">折扣金额：</td>
+							<td style="width: 90px;" id="discountAmount">365.00</td>
+							<td style="width: 120px;" class="shiftInfo">折扣账单数：</td>
+							<td style="width: 70px;" id="discountBillCount">210</td>
+						</tr>
+						<tr>
+							<td style="height: 20px" />
+							<td class="shiftInfo">赠送金额：</td>
+							<td id="giftAmount">365.00</td>
+							<td class="shiftInfo">赠送账单数：</td>
+							<td id="giftBillCount">210</td>
+						</tr>
+						<tr>
+							<td style="height: 20px" />
+							<td class="shiftInfo">退菜金额：</td>
+							<td id="returnAmount">365.00</td>
+							<td class="shiftInfo">退菜账单数：</td>
+							<td id="returnBillCount">210</td>
+						</tr>
+						<tr>
+							<td style="height: 20px" />
+							<td class="shiftInfo">反结帐金额：</td>
+							<td id="repayAmount">365.00</td>
+							<td class="shiftInfo">反结帐账单数：</td>
+							<td id="repayBillCount">210</td>
+						</tr>
+						<tr>
+							<td style="height: 20px" />
+							<td class="shiftInfo">服务费收入：</td>
+							<td id="serviceAmount">365.00</td>
+							<!-- 
+							<td class="shiftInfo">服务费账单数：</td>
+							<td id="serviceBillCount">210</td>
+							 -->
+						</tr>
+					</table>
+				</td>
+			</tr>
+			<!-- <tr>
+				<td><table>
+						<tr>
+							<td style="width: 27px; height: 30px" />
+							<td style="width: 140px" class="shiftInfo">部门</td>
+							<td style="width: 140px" class="shiftInfo">折扣</td>
+							<td style="width: 140px" class="shiftInfo">赠送</td>
+							<td style="width: 140px" class="shiftInfo">金额</td>
+						</tr>
+						<tr>
+							<td style="width: 27px; height: 30px" />
+							<td class="shiftInfo">中厨</td>
+							<td>1000</td>
+							<td>1243.43</td>
+							<td>1243</td>
+						</tr>
+					</table></td>
+			</tr>
+			 -->
+		</table>
+	</div>
+
+</body>
+</html>
