@@ -316,6 +316,18 @@
 		<action path="/DailySettleExec"
 			type="com.wireless.Actions.dailySettle.DailySettleExecAction" scope="request">
 		</action>
+		<action path="/QueryHistory" type="com.wireless.Actions.billHistory.QueryHistoryAction"
+			scope="request">
+		</action>
+		<action path="/QueryHistoryAdv" type="com.wireless.Actions.billHistory.QueryHistoryAdvAction"
+			scope="request">
+		</action>
+		<action path="/dailySettleStat"
+			type="com.wireless.Actions.billHistory.DailySettleStatisticsAction" scope="request">
+		</action>
+		<action path="/dailySettleStatDetail"
+			type="com.wireless.Actions.billHistory.DailySettleStatDetailAction" scope="request">
+		</action>
 	</action-mappings>
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
 </struts-config>
