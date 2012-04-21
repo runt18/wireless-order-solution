@@ -28,7 +28,7 @@ public class SingleOrderFood {
 	 * @return the discount price to this food
 	 */
 	public float calcDiscountPrice(){
-		return (float)Math.round(unitPrice * (1 - discount) * 100) / 100;
+		return (float)Math.round(unitPrice * orderCount * (1 - discount) * 100) / 100;
 	}
 	
 	/**
