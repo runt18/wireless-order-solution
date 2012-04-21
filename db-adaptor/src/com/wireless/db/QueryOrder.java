@@ -198,14 +198,13 @@ public class QueryOrder {
 		dbCon.rs.close();
 		
 		// query the food's id and order count associate with the order id for "order_food" table		
-		String extraCond = " AND C.order_id=" + orderID;		
 
 		if(queryType == QUERY_HISTORY){
-			orderInfo.foods = OrderFoodReflector.getDetailHistory(dbCon, extraCond, "");
+			orderInfo.foods = OrderFoodReflector.getDetailHistory(dbCon, " AND A.order_id=" + orderID, "");
 		}else if(queryType == QUERY_TODAY){
-			orderInfo.foods = OrderFoodReflector.getDetailToday(dbCon, extraCond, "");
+			orderInfo.foods = OrderFoodReflector.getDetailToday(dbCon, " AND C.order_id=" + orderID, "");
 		}else{
-			orderInfo.foods = OrderFoodReflector.getDetailToday(dbCon, extraCond, "");
+			orderInfo.foods = OrderFoodReflector.getDetailToday(dbCon, " AND C.order_id=" + orderID, "");
 		}
 		orderInfo.id = orderID;
 		
