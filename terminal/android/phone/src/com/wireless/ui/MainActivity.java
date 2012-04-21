@@ -223,7 +223,7 @@ public class MainActivity extends Activity {
 
 				case 5:
 					//Õ¯¬Á…Ë÷√
-					Intent netIntent = new Intent(MainActivity.this,NetworkSettingActivity.class);
+					Intent netIntent = new Intent(MainActivity.this, NetworkSettingActivity.class);
 					startActivityForResult(netIntent, NETWORK_SET);
 					break;
 
