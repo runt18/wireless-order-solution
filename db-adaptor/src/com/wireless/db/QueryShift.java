@@ -127,13 +127,18 @@ public class QueryShift {
 		Terminal term = VerifyPin.exec(dbCon, pin, model);
 		
 		/**
-		 * Get the latest off duty date from both shift and shift_history,
+		 * Get the latest off duty date from the tables below.
+		 * 1 - shift 
+		 * 2 - shift_history
+		 * 3 - daily_settle_history
 		 * and make it as the on duty date to this duty shift
 		 */
 		String onDuty;
 		String sql = "SELECT MAX(off_duty) FROM (" +
 					 "SELECT off_duty FROM " + Params.dbName + ".shift WHERE restaurant_id=" + term.restaurant_id + " UNION " +
-					 "SELECT off_duty FROM " + Params.dbName + ".shift_history WHERE restaurant_id=" + term.restaurant_id + ") AS all_off_duty";
+					 "SELECT off_duty FROM " + Params.dbName + ".shift_history WHERE restaurant_id=" + term.restaurant_id + " UNION " +
+					 "SELECT off_duty FROM " + Params.dbName + ".daily_settle_history WHERE restaurant_id=" + term.restaurant_id +
+					 ") AS all_off_duty";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			Timestamp offDuty = dbCon.rs.getTimestamp(1);
