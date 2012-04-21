@@ -2,7 +2,7 @@ package com.wireless.ui;
 
 import java.util.ArrayList;
 
-import android.app.TabActivity;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,10 +10,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.GestureDetector;
-import android.view.GestureDetector.OnGestureListener;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -26,8 +23,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TabHost;
-import android.widget.TabHost.OnTabChangeListener;
-import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,25 +31,26 @@ import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Util;
+import com.wireless.ui.view.ScrollLayout;
+import com.wireless.ui.view.ScrollLayout.OnViewChangedListner;
 
-public class PickTasteActivity extends TabActivity implements OnGestureListener{
+public class PickTasteActivity extends Activity{
 	int _currentView = 0; 
-	private GestureDetector _detector; 
+	//private GestureDetector _detector; 
 
 
 	private Handler _handler = new Handler(){
 		@Override
 		public void handleMessage(Message message){
-			_tasteTxtView.setText(_selectedFood.name + "-" + _selectedFood.tastePref);
+			((TextView)findViewById(R.id.foodTasteTxtView)).setText(_selectedFood.name + "-" + _selectedFood.tastePref);
 		}
 	};
 	
-	private final static String TAG_TASTE = "taste";
-	private final static String TAG_STYLE = "style";
-	private final static String TAG_SPEC = "spec";
+	private final static String TAG_TASTE = "口味";
+	private final static String TAG_STYLE = "做法";
+	private final static String TAG_SPEC = "规格";
 	
 	private OrderFood _selectedFood;
-	private TextView _tasteTxtView;
 	private TabHost _tabHost;
 	
 
@@ -63,85 +59,75 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		 _detector = new GestureDetector(this); 
+		 //_detector = new GestureDetector(this); 
 		//get the food parcel from the intent
 		FoodParcel foodParcel = getIntent().getParcelableExtra(FoodParcel.KEY_VALUE);
 		_selectedFood = foodParcel;
 		
 		// construct the tab host
 		setContentView(R.layout.tastetable);		
-		_tabHost = getTabHost();
+		//_tabHost = getTabHost();
 		
 		//口味Tab
-		TabSpec spec = _tabHost.newTabSpec(TAG_TASTE)
-							   .setIndicator(createTabIndicator("口味", R.drawable.ic_tab_albums))
-							   .setContent(new TabHost.TabContentFactory(){
-								   @Override
-								   public View createTabContent(String arg0) {
-									   return LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.taste, null);
-								   }								   
-							   });
-		_tabHost.addTab(spec);
+//		TabSpec spec = _tabHost.newTabSpec(TAG_TASTE)
+//							   .setIndicator(createTabIndicator("口味", R.drawable.ic_tab_albums))
+//							   .setContent(new TabHost.TabContentFactory(){
+//								   @Override
+//								   public View createTabContent(String arg0) {
+//									   return LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.taste, null);
+//								   }								   
+//							   });
+//		_tabHost.addTab(spec);
+//		
+//		
+//		
+//		//做法Tab
+//		spec = _tabHost.newTabSpec(TAG_STYLE)
+//					   .setIndicator(createTabIndicator("做法", R.drawable.ic_tab_artists))
+//					   .setContent(new TabHost.TabContentFactory(){
+//						   @Override
+//						   public View createTabContent(String arg0) {
+//							   return LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.style, null);
+//						   }								   
+//					   });
+//		_tabHost.addTab(spec);
+//		
+//		
+//		
+//		//规格Tab
+//		spec = _tabHost.newTabSpec(TAG_SPEC)
+//					   .setIndicator(createTabIndicator("规格", R.drawable.ic_tab_songs))
+//					   .setContent(new TabHost.TabContentFactory(){
+//						   @Override
+//						   public View createTabContent(String arg0) {
+//							   return LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.specs, null);
+//						   }								   
+//					   });
+//		_tabHost.addTab(spec);
+//		
+//		
+//		
+//		/**
+//		 * Tab切换时更换相应的Adapter，显示不同种类的口味
+//		 */
+//		_tabHost.setOnTabChangedListener(new OnTabChangeListener() {			
+//			@Override
+//			public void onTabChanged(String tag) {
+//				if(tag == TAG_TASTE){
+//					setTasteView();		
+//				}else if(tag == TAG_STYLE){
+//					setStyleView();
+//				}else if(tag == TAG_SPEC){
+//					setSpecView();
+//				}
+//				_handler.sendEmptyMessage(0);
+//			}
+//		});
 		
+//		_tabHost.setCurrentTabByTag(TAG_TASTE);
+//		setTasteView();
 		
-		
-		//做法Tab
-		spec = _tabHost.newTabSpec(TAG_STYLE)
-					   .setIndicator(createTabIndicator("做法", R.drawable.ic_tab_artists))
-					   .setContent(new TabHost.TabContentFactory(){
-						   @Override
-						   public View createTabContent(String arg0) {
-							   return LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.style, null);
-						   }								   
-					   });
-		_tabHost.addTab(spec);
-		
-		
-		
-		//规格Tab
-		spec = _tabHost.newTabSpec(TAG_SPEC)
-					   .setIndicator(createTabIndicator("规格", R.drawable.ic_tab_songs))
-					   .setContent(new TabHost.TabContentFactory(){
-						   @Override
-						   public View createTabContent(String arg0) {
-							   return LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.specs, null);
-						   }								   
-					   });
-		_tabHost.addTab(spec);
-		
-		
-		
-		/**
-		 * Tab切换时更换相应的Adapter，显示不同种类的口味
-		 */
-		_tabHost.setOnTabChangedListener(new OnTabChangeListener() {			
-			@Override
-			public void onTabChanged(String tag) {
-				if(tag == TAG_TASTE){
-					setTasteView();		
-				}else if(tag == TAG_STYLE){
-					setStyleView();
-				}else if(tag == TAG_SPEC){
-					setSpecView();
-				}
-				_handler.sendEmptyMessage(0);
-			}
-		});
-		
-		_tabHost.setCurrentTabByTag(TAG_TASTE);
-		setTasteView();
-		_handler.sendEmptyMessage(0);	
-		
-	}
-
-   //设置口味View
-	public void setTasteView(){
-		_tasteTxtView = (TextView)findViewById(R.id.foodTasteTxtView);
-	    final ListView tasteLstView = (ListView)findViewById(R.id.tasteLstView);
-	   ((EditText)findViewById(R.id.tastesearch)).setText("");
-		tasteLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.tastes));
-		
-		//口味返回按钮
+		//返回按钮
 		((ImageView)findViewById(R.id.tasteback)).setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -151,6 +137,31 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 			}
 		});
 		
+		ScrollLayout tasteScrollLayout = (ScrollLayout)findViewById(R.id.tasteScrollLayout);
+		//口味View
+		tasteScrollLayout.addView(setTasteView());
+		//做法View
+		tasteScrollLayout.addView(setStyleView());
+		//规格View
+		tasteScrollLayout.addView(setSpecView());
+		
+		tasteScrollLayout.setOnViewChangedListener(new OnViewChangedListner() {			
+			@Override
+			public void onViewChanged(int curScreen, View parent, View curView) {
+				((TextView)findViewById(R.id.tasteTitleTxtView)).setText(curView.getTag().toString());
+			}
+		});
+		
+		_handler.sendEmptyMessage(0);	
+		
+	}
+
+   //设置口味View
+	public View setTasteView(){
+		View tasteView = LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.taste, null);
+	    final ListView tasteLstView = (ListView)tasteView.findViewById(R.id.tasteLstView);
+	   ((EditText)tasteView.findViewById(R.id.tastesearch)).setText("");
+		tasteLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.tastes));	
 		
 		
 		//滚动的时候隐藏输入法
@@ -172,7 +183,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 		/**
 		 * 在口味选择页面中按编号进行口味的筛选
 		 */
-		((EditText)findViewById(R.id.tastesearch)).addTextChangedListener(new TextWatcher() {
+		((EditText)tasteView.findViewById(R.id.tastesearch)).addTextChangedListener(new TextWatcher() {
 			
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -196,25 +207,20 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 			public void afterTextChanged(Editable s) {}
 		});
 		
+		tasteView.setTag(TAG_TASTE);
+		
+		return tasteView;
 		
 	}
 	
 	
 	//设置做法View
-	public void setStyleView(){
-		_tasteTxtView = (TextView)findViewById(R.id.foodStyleTxtView);
-    	final ListView styleLstView = (ListView)findViewById(R.id.styleLstView);
-    	((EditText)findViewById(R.id.stylesearch)).setText("");
+	public View setStyleView(){
+		View styleView = LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.style, null);
+    	final ListView styleLstView = (ListView)styleView.findViewById(R.id.styleLstView);
+    	((EditText)styleView.findViewById(R.id.stylesearch)).setText("");
 		styleLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.styles));
 		
-		//做法返回按钮
-	    ((ImageView)findViewById(R.id.styleback)).setOnClickListener(new View.OnClickListener() {				
-			@Override
-			public void onClick(View v) {
-				onBackPressed();	
-				finish();	
-			}
-		});
 	    
 	    //滚动的时候隐藏输入法
 	    styleLstView.setOnScrollListener(new OnScrollListener() {
@@ -234,7 +240,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 	    /**
 		 * 在做法选择页面中按编号进行做法的筛选
 		 */
-		((EditText)findViewById(R.id.stylesearch)).addTextChangedListener(new TextWatcher() {
+		((EditText)styleView.findViewById(R.id.stylesearch)).addTextChangedListener(new TextWatcher() {
 			
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -258,25 +264,21 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 			@Override
 			public void afterTextChanged(Editable s) {}
 		});
+		
+		styleView.setTag(TAG_STYLE);
+		
+		return styleView;
 	}
 	
 	//设置规格View
-	public void setSpecView(){
-		_tasteTxtView = (TextView)findViewById(R.id.foodSpecTxtView);
-		final ListView specLstView = (ListView)findViewById(R.id.specLstView);
-		((EditText)findViewById(R.id.specsearch)).setText("");
-		specLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.specs));
+	public View setSpecView(){
 		
-		//做法返回按钮
-	    ((ImageView)findViewById(R.id.specback)).setOnClickListener(new View.OnClickListener() {
+		View specView = LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.specs, null);
 				
-				@Override
-				public void onClick(View v) {
-				onBackPressed();	
-				finish();
-					
-				}
-			});
+		final ListView specLstView = (ListView)specView.findViewById(R.id.specLstView);
+		((EditText)specView.findViewById(R.id.specsearch)).setText("");
+		specLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.specs));
+
 	    
 	    
 	    
@@ -297,7 +299,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 	    /**
 		 * 在规格选择页面中按编号进行规格的筛选
 		 */
-		((EditText)findViewById(R.id.specsearch)).addTextChangedListener(new TextWatcher() {
+		((EditText)specView.findViewById(R.id.specsearch)).addTextChangedListener(new TextWatcher() {
 			
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -321,6 +323,10 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 			@Override
 			public void afterTextChanged(Editable s) {}
 		});
+		
+		specView.setTag(TAG_SPEC);
+		
+		return specView;
 	}
 	
 	@Override
@@ -453,72 +459,72 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 		}
 		
 	}
-    @Override  
-    public boolean onTouchEvent(MotionEvent event) {  
-      
-        return this._detector.onTouchEvent(event);  
-    }  
-    
-    @Override
-	public boolean dispatchTouchEvent(MotionEvent ev) {
-    	_detector.onTouchEvent(ev);
-		return super.dispatchTouchEvent(ev);
-	}
-
-
-	@Override
-	public boolean onDown(MotionEvent e) {
-		return true;
-	}
-
-	@Override
-	public void onShowPress(MotionEvent e) {
-		
-	}
-
-	@Override
-	public boolean onSingleTapUp(MotionEvent e) {
-		return false;
-	}
-
-	@Override
-	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-			float distanceY) {
-		return false;
-	}
-
-	@Override
-	public void onLongPress(MotionEvent e) {
-		
-	}
-
-	/*
-	 * 手势滑动执行方法
-	 */
-	@Override
-	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,	float velocityY) {
-		float scrollX = e1.getX()-e2.getX();
-	    if(Math.abs(velocityX) > 200 && velocityY != 0 && Math.abs(scrollX)/Math.abs(e1.getY()-e2.getY()) > 1){
-	    	if(scrollX>0){
-	    		//此处添加代码用来显示下一个页面
-	    		if(_tabHost.getCurrentTab() == 3)
- 					return false; 
- 				_tabHost.setCurrentTab(_tabHost.getCurrentTab()+1);
-
-	    	}
-	    	else{
-	    		//此处添加代码用来显示上一个页面
-	    		  if(_tabHost.getCurrentTab() == 0)
-	 					return false; 
-	 				_tabHost.setCurrentTab(_tabHost.getCurrentTab()-1);		
-	    	}
-	    	
-	    	return true;
-	    }
-		
-	   return false;
-
-	}
+//    @Override  
+//    public boolean onTouchEvent(MotionEvent event) {  
+//      
+//        return this._detector.onTouchEvent(event);  
+//    }  
+//    
+//    @Override
+//	public boolean dispatchTouchEvent(MotionEvent ev) {
+//    	_detector.onTouchEvent(ev);
+//		return super.dispatchTouchEvent(ev);
+//	}
+//
+//
+//	@Override
+//	public boolean onDown(MotionEvent e) {
+//		return true;
+//	}
+//
+//	@Override
+//	public void onShowPress(MotionEvent e) {
+//		
+//	}
+//
+//	@Override
+//	public boolean onSingleTapUp(MotionEvent e) {
+//		return false;
+//	}
+//
+//	@Override
+//	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
+//			float distanceY) {
+//		return false;
+//	}
+//
+//	@Override
+//	public void onLongPress(MotionEvent e) {
+//		
+//	}
+//
+//	/*
+//	 * 手势滑动执行方法
+//	 */
+//	@Override
+//	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,	float velocityY) {
+//		float scrollX = e1.getX()-e2.getX();
+//	    if(Math.abs(velocityX) > 200 && velocityY != 0 && Math.abs(scrollX)/Math.abs(e1.getY()-e2.getY()) > 1){
+//	    	if(scrollX>0){
+//	    		//此处添加代码用来显示下一个页面
+//	    		if(_tabHost.getCurrentTab() == 3)
+// 					return false; 
+// 				_tabHost.setCurrentTab(_tabHost.getCurrentTab()+1);
+//
+//	    	}
+//	    	else{
+//	    		//此处添加代码用来显示上一个页面
+//	    		  if(_tabHost.getCurrentTab() == 0)
+//	 					return false; 
+//	 				_tabHost.setCurrentTab(_tabHost.getCurrentTab()-1);		
+//	    	}
+//	    	
+//	    	return true;
+//	    }
+//		
+//	   return false;
+//
+//	}
 	
 		
 		//	/*
