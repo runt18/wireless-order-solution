@@ -179,7 +179,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 				ArrayList<Taste> tastes = new ArrayList<Taste>();
 				if(s.toString().length() != 0){
 				    for(int i = 0; i < WirelessOrder.foodMenu.tastes.length;i++){
-				    	 if(String.valueOf(WirelessOrder.foodMenu.tastes[i].aliasID).startsWith(s.toString().trim())){
+				    	 if(WirelessOrder.foodMenu.tastes[i].preference.contains(s.toString().trim())){
 				    		 tastes.add(WirelessOrder.foodMenu.tastes[i]);
 				    	 }
 				    }
@@ -241,7 +241,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 				ArrayList<Taste> styles = new ArrayList<Taste>();
 				if(s.toString().length() != 0){
 					 for(int i = 0; i < WirelessOrder.foodMenu.styles.length;i++){
-				    	 if(String.valueOf(WirelessOrder.foodMenu.styles[i].aliasID).startsWith(s.toString().trim())){
+				    	 if(WirelessOrder.foodMenu.styles[i].preference.contains(s.toString().trim())){
 				    		 styles.add(WirelessOrder.foodMenu.styles[i]);
 				    	 }
 				    }
@@ -304,7 +304,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 				ArrayList<Taste> specs = new ArrayList<Taste>();
 				if(s.toString().length() != 0){
 					 for(int i = 0; i < WirelessOrder.foodMenu.specs.length;i++){
-				    	 if(String.valueOf(WirelessOrder.foodMenu.specs[i].aliasID).startsWith(s.toString().trim())){
+				    	 if(WirelessOrder.foodMenu.specs[i].preference.contains(s.toString().trim())){
 				    		 specs.add(WirelessOrder.foodMenu.specs[i]);
 				    	 }
 				    }
