@@ -85,13 +85,19 @@ public class PickTasteActivity extends Activity{
 			public void onViewChanged(int curScreen, View parent, View curView) {
 				String tag = curView.getTag().toString();
 				((TextView)findViewById(R.id.tasteTitleTxtView)).setText(tag);
-				//TODO 设置Button的选中状态
+				
+				((LinearLayout)findViewById(R.id.tasteLayout)).setBackgroundResource(R.drawable.tab_bg_unselected);
+				((LinearLayout)findViewById(R.id.styleLayout)).setBackgroundResource(R.drawable.tab_bg_unselected);
+				((LinearLayout)findViewById(R.id.specLayout)).setBackgroundResource(R.drawable.tab_bg_unselected);
 				if(tag.equals(TAG_TASTE)){
+					((LinearLayout)findViewById(R.id.tasteLayout)).setBackgroundResource(R.drawable.tab_bg_selected);
 					
 				}else if(tag.equals(TAG_STYLE)){
+					((LinearLayout)findViewById(R.id.styleLayout)).setBackgroundResource(R.drawable.tab_bg_selected);
 					
 				}else if(tag.equals(TAG_SPEC)){
-					
+					((LinearLayout)findViewById(R.id.specLayout)).setBackgroundResource(R.drawable.tab_bg_selected);
+
 				}
 			}
 		});
@@ -119,6 +125,8 @@ public class PickTasteActivity extends Activity{
 				tasteScrollLayout.setToScreen(2);
 			}
 		});
+		
+		tasteScrollLayout.setToScreen(0);
 		
 		_handler.sendEmptyMessage(0);	
 		

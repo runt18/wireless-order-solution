@@ -140,17 +140,25 @@ public class PickFoodActivity extends Activity implements PickFoodListView.OnFoo
 				
 				//切换点菜方式时，保存当前的点菜模式
 				Editor editor = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).edit();
-				//TODO 设置Button的选中状态
+				
+				((LinearLayout)findViewById(R.id.numberLayout)).setBackgroundResource(R.drawable.tab_bg_unselected);
+				((LinearLayout)findViewById(R.id.kitchenLayout)).setBackgroundResource(R.drawable.tab_bg_unselected);
+				((LinearLayout)findViewById(R.id.pinyinLayout)).setBackgroundResource(R.drawable.tab_bg_unselected);
+				((LinearLayout)findViewById(R.id.tempLayout)).setBackgroundResource(R.drawable.tab_bg_unselected);
 				if(tag.equals(TAG_NUMBER)){
 					editor.putInt(Params.LAST_PICK_CATE, Params.PICK_BY_NUMBER);
+					((LinearLayout)findViewById(R.id.numberLayout)).setBackgroundResource(R.drawable.tab_bg_selected);
 					
 				}else if(tag.equals(TAG_KITCHEN)){
 					editor.putInt(Params.LAST_PICK_CATE, Params.PICK_BY_KITCHEN);
+					((LinearLayout)findViewById(R.id.kitchenLayout)).setBackgroundResource(R.drawable.tab_bg_selected);
 					
 				}else if(tag.equals(TAG_PINYIN)){
 					editor.putInt(Params.LAST_PICK_CATE, Params.PICK_BY_PINYIN);
+					((LinearLayout)findViewById(R.id.pinyinLayout)).setBackgroundResource(R.drawable.tab_bg_selected);
 					
 				}else if(tag.equals(TAG_OCCASIONAL)){
+					((LinearLayout)findViewById(R.id.tempLayout)).setBackgroundResource(R.drawable.tab_bg_selected);
 					
 				}
 				editor.commit();
