@@ -6,53 +6,9 @@
     android:orientation="vertical" >
 
     <RelativeLayout
-        android:id="@+id/top_pin"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:background="@drawable/bg01" >
-
-        <ImageView
-            android:id="@+id/pinback"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="20dip"
-            android:src="@drawable/back_selector" >
-        </ImageView>
-
-        <TextView
-            android:id="@+id/pintitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:shadowDx="1"
-            android:shadowDy="1"
-            android:shadowRadius="3.0"
-            android:text="点菜-拼音"
-            android:textColor="#FFFFFF"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:typeface="monospace" >
-        </TextView>
-
-        <ImageView
-            android:id="@+id/pinorder"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="20dip"
-            android:src="@drawable/popuwindow_selector" >
-        </ImageView>
-    </RelativeLayout>
-
-    <RelativeLayout
         android:id="@+id/second"
         android:layout_width="fill_parent"
         android:layout_height="40dip"
-        android:layout_below="@id/top_pin"
         android:background="@drawable/bg02" >
 
         <TextView
@@ -73,15 +29,15 @@
             android:layout_marginLeft="10dip"
             android:layout_toRightOf="@id/orderpin"
             android:inputType="text" />
-        
-            <ImageView
-        android:id="@+id/pinyindelete"
-        android:layout_width="50dip"
-        android:layout_height="25dip"
-        android:layout_toRightOf="@id/filterPinyinEdtTxt"
-        android:layout_marginLeft="7dip"
-        android:layout_centerVertical="true"
-        android:src="@drawable/deletes_selector" />
+
+        <ImageView
+            android:id="@+id/pinyindelete"
+            android:layout_width="50dip"
+            android:layout_height="25dip"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="7dip"
+            android:layout_toRightOf="@id/filterPinyinEdtTxt"
+            android:src="@drawable/deletes_selector" />
     </RelativeLayout>
 
     <ImageView
@@ -91,13 +47,11 @@
         android:layout_below="@id/second"
         android:src="@drawable/line" />
 
-    
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:orientation="horizontal" 
         android:layout_below="@id/line"
-        >
+        android:orientation="horizontal" >
 
         <com.wireless.ui.view.PickFoodListView
             android:id="@+id/pickByPinyinLstView"
@@ -116,9 +70,9 @@
             android:id="@+id/PinyinsideIndex"
             android:layout_width="45dip"
             android:layout_height="fill_parent"
+            android:background="@drawable/side_bar_bg"
             android:gravity="center_horizontal"
-            android:orientation="vertical"
-            android:background="@drawable/side_bar_bg" >
+            android:orientation="vertical" >
         </LinearLayout>
     </LinearLayout>
 

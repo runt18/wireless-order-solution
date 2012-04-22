@@ -21,8 +21,8 @@ import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,10 +35,7 @@ import com.wireless.ui.view.ScrollLayout;
 import com.wireless.ui.view.ScrollLayout.OnViewChangedListner;
 
 public class PickTasteActivity extends Activity{
-	int _currentView = 0; 
-	//private GestureDetector _detector; 
-
-
+	
 	private Handler _handler = new Handler(){
 		@Override
 		public void handleMessage(Message message){
@@ -51,7 +48,7 @@ public class PickTasteActivity extends Activity{
 	private final static String TAG_SPEC = "规格";
 	
 	private OrderFood _selectedFood;
-	private TabHost _tabHost;
+	//private TabHost _tabHost;
 	
 
 	/** Called when the activity is first created. */
@@ -59,73 +56,11 @@ public class PickTasteActivity extends Activity{
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		 //_detector = new GestureDetector(this); 
 		//get the food parcel from the intent
 		FoodParcel foodParcel = getIntent().getParcelableExtra(FoodParcel.KEY_VALUE);
 		_selectedFood = foodParcel;
 		
-		// construct the tab host
 		setContentView(R.layout.tastetable);		
-		//_tabHost = getTabHost();
-		
-		//口味Tab
-//		TabSpec spec = _tabHost.newTabSpec(TAG_TASTE)
-//							   .setIndicator(createTabIndicator("口味", R.drawable.ic_tab_albums))
-//							   .setContent(new TabHost.TabContentFactory(){
-//								   @Override
-//								   public View createTabContent(String arg0) {
-//									   return LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.taste, null);
-//								   }								   
-//							   });
-//		_tabHost.addTab(spec);
-//		
-//		
-//		
-//		//做法Tab
-//		spec = _tabHost.newTabSpec(TAG_STYLE)
-//					   .setIndicator(createTabIndicator("做法", R.drawable.ic_tab_artists))
-//					   .setContent(new TabHost.TabContentFactory(){
-//						   @Override
-//						   public View createTabContent(String arg0) {
-//							   return LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.style, null);
-//						   }								   
-//					   });
-//		_tabHost.addTab(spec);
-//		
-//		
-//		
-//		//规格Tab
-//		spec = _tabHost.newTabSpec(TAG_SPEC)
-//					   .setIndicator(createTabIndicator("规格", R.drawable.ic_tab_songs))
-//					   .setContent(new TabHost.TabContentFactory(){
-//						   @Override
-//						   public View createTabContent(String arg0) {
-//							   return LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.specs, null);
-//						   }								   
-//					   });
-//		_tabHost.addTab(spec);
-//		
-//		
-//		
-//		/**
-//		 * Tab切换时更换相应的Adapter，显示不同种类的口味
-//		 */
-//		_tabHost.setOnTabChangedListener(new OnTabChangeListener() {			
-//			@Override
-//			public void onTabChanged(String tag) {
-//				if(tag == TAG_TASTE){
-//					setTasteView();		
-//				}else if(tag == TAG_STYLE){
-//					setStyleView();
-//				}else if(tag == TAG_SPEC){
-//					setSpecView();
-//				}
-//				_handler.sendEmptyMessage(0);
-//			}
-//		});
-		
-//		_tabHost.setCurrentTabByTag(TAG_TASTE);
-//		setTasteView();
 		
 		//返回按钮
 		((ImageView)findViewById(R.id.tasteback)).setOnClickListener(new View.OnClickListener() {
@@ -137,18 +72,51 @@ public class PickTasteActivity extends Activity{
 			}
 		});
 		
-		ScrollLayout tasteScrollLayout = (ScrollLayout)findViewById(R.id.tasteScrollLayout);
+		final ScrollLayout tasteScrollLayout = (ScrollLayout)findViewById(R.id.tasteScrollLayout);
 		//口味View
-		tasteScrollLayout.addView(setTasteView());
+		tasteScrollLayout.addView(setupTasteView());
 		//做法View
-		tasteScrollLayout.addView(setStyleView());
+		tasteScrollLayout.addView(setupStyleView());
 		//规格View
-		tasteScrollLayout.addView(setSpecView());
+		tasteScrollLayout.addView(setupSpecView());
 		
 		tasteScrollLayout.setOnViewChangedListener(new OnViewChangedListner() {			
 			@Override
 			public void onViewChanged(int curScreen, View parent, View curView) {
-				((TextView)findViewById(R.id.tasteTitleTxtView)).setText(curView.getTag().toString());
+				String tag = curView.getTag().toString();
+				((TextView)findViewById(R.id.tasteTitleTxtView)).setText(tag);
+				//TODO 设置Button的选中状态
+				if(tag.equals(TAG_TASTE)){
+					
+				}else if(tag.equals(TAG_STYLE)){
+					
+				}else if(tag.equals(TAG_SPEC)){
+					
+				}
+			}
+		});
+		
+		//口味Button
+		((LinearLayout)findViewById(R.id.tasteLayout)).setOnClickListener(new View.OnClickListener() {			
+			@Override
+			public void onClick(View v) {
+				tasteScrollLayout.setToScreen(0);
+			}
+		});
+		
+		//做法Button
+		((LinearLayout)findViewById(R.id.styleLayout)).setOnClickListener(new View.OnClickListener() {			
+			@Override
+			public void onClick(View v) {
+				tasteScrollLayout.setToScreen(1);
+			}
+		});
+		
+		//规格Button
+		((LinearLayout)findViewById(R.id.specLayout)).setOnClickListener(new View.OnClickListener() {			
+			@Override
+			public void onClick(View v) {
+				tasteScrollLayout.setToScreen(2);
 			}
 		});
 		
@@ -157,7 +125,7 @@ public class PickTasteActivity extends Activity{
 	}
 
    //设置口味View
-	public View setTasteView(){
+	public View setupTasteView(){
 		View tasteView = LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.taste, null);
 	    final ListView tasteLstView = (ListView)tasteView.findViewById(R.id.tasteLstView);
 	   ((EditText)tasteView.findViewById(R.id.tastesearch)).setText("");
@@ -215,7 +183,7 @@ public class PickTasteActivity extends Activity{
 	
 	
 	//设置做法View
-	public View setStyleView(){
+	public View setupStyleView(){
 		View styleView = LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.style, null);
     	final ListView styleLstView = (ListView)styleView.findViewById(R.id.styleLstView);
     	((EditText)styleView.findViewById(R.id.stylesearch)).setText("");
@@ -271,7 +239,7 @@ public class PickTasteActivity extends Activity{
 	}
 	
 	//设置规格View
-	public View setSpecView(){
+	public View setupSpecView(){
 		
 		View specView = LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.specs, null);
 				
@@ -345,12 +313,12 @@ public class PickTasteActivity extends Activity{
 	 * @param drawable
 	 * @return
 	 */
-	private View createTabIndicator(String text, int drawable) {
-		View view = LayoutInflater.from(_tabHost.getContext()).inflate(R.layout.tb_bg, null);
-		((TextView)view.findViewById(R.id.tabsText)).setText(text);
-		((ImageView) view.findViewById(R.id.icon)).setImageResource(drawable);
-		return view;
-	}
+//	private View createTabIndicator(String text, int drawable) {
+//		View view = LayoutInflater.from(_tabHost.getContext()).inflate(R.layout.tb_bg, null);
+//		((TextView)view.findViewById(R.id.tabsText)).setText(text);
+//		((ImageView) view.findViewById(R.id.icon)).setImageResource(drawable);
+//		return view;
+//	}
 	
 	private class TasteAdapter extends BaseAdapter{
 
@@ -458,81 +426,6 @@ public class PickTasteActivity extends Activity{
 			return view;
 		}
 		
-	}
-//    @Override  
-//    public boolean onTouchEvent(MotionEvent event) {  
-//      
-//        return this._detector.onTouchEvent(event);  
-//    }  
-//    
-//    @Override
-//	public boolean dispatchTouchEvent(MotionEvent ev) {
-//    	_detector.onTouchEvent(ev);
-//		return super.dispatchTouchEvent(ev);
-//	}
-//
-//
-//	@Override
-//	public boolean onDown(MotionEvent e) {
-//		return true;
-//	}
-//
-//	@Override
-//	public void onShowPress(MotionEvent e) {
-//		
-//	}
-//
-//	@Override
-//	public boolean onSingleTapUp(MotionEvent e) {
-//		return false;
-//	}
-//
-//	@Override
-//	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-//			float distanceY) {
-//		return false;
-//	}
-//
-//	@Override
-//	public void onLongPress(MotionEvent e) {
-//		
-//	}
-//
-//	/*
-//	 * 手势滑动执行方法
-//	 */
-//	@Override
-//	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,	float velocityY) {
-//		float scrollX = e1.getX()-e2.getX();
-//	    if(Math.abs(velocityX) > 200 && velocityY != 0 && Math.abs(scrollX)/Math.abs(e1.getY()-e2.getY()) > 1){
-//	    	if(scrollX>0){
-//	    		//此处添加代码用来显示下一个页面
-//	    		if(_tabHost.getCurrentTab() == 3)
-// 					return false; 
-// 				_tabHost.setCurrentTab(_tabHost.getCurrentTab()+1);
-//
-//	    	}
-//	    	else{
-//	    		//此处添加代码用来显示上一个页面
-//	    		  if(_tabHost.getCurrentTab() == 0)
-//	 					return false; 
-//	 				_tabHost.setCurrentTab(_tabHost.getCurrentTab()-1);		
-//	    	}
-//	    	
-//	    	return true;
-//	    }
-//		
-//	   return false;
-//
-//	}
-	
-		
-		//	/*
-		//	 * 手势切换添加动画效果
-		//	 */
-		//	Animation anim = AnimationUtils.loadAnimation(PickTasteActivity.this, android.R.anim.slide_in_left);
-		//	_tabHost.startAnimation(anim);
-
-	
+	}	
 	
 }

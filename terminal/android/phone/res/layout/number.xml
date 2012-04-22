@@ -6,53 +6,9 @@
     android:orientation="vertical" >
 
     <RelativeLayout
-        android:id="@+id/top_num"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:background="@drawable/bg01" >
-
-        <ImageView
-            android:id="@+id/numback"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="20dip"
-            android:src="@drawable/back_selector" >
-        </ImageView>
-
-        <TextView
-            android:id="@+id/numtitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:shadowDx="1"
-            android:shadowDy="1"
-            android:shadowRadius="3.0"
-            android:text="点菜-编号"
-            android:textColor="#FFFFFF"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:typeface="monospace" >
-        </TextView>
-
-        <ImageView
-            android:id="@+id/numorder"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="20dip"
-            android:src="@drawable/popuwindow_selector" >
-        </ImageView>
-    </RelativeLayout>
-
-    <RelativeLayout
         android:id="@+id/second"
         android:layout_width="fill_parent"
         android:layout_height="40dip"
-        android:layout_below="@id/top_num"
         android:background="@drawable/bg02" >
 
         <TextView
@@ -73,15 +29,15 @@
             android:layout_marginLeft="10dip"
             android:layout_toRightOf="@id/ordernum"
             android:inputType="number" />
-        
-         <ImageView
-        android:id="@+id/numberdelete"
-        android:layout_width="50dip"
-        android:layout_height="25dip"
-        android:layout_toRightOf="@id/filterNumEdtTxt"
-        android:layout_marginLeft="7dip"
-        android:layout_centerVertical="true"
-        android:src="@drawable/deletes_selector" />
+
+        <ImageView
+            android:id="@+id/numberdelete"
+            android:layout_width="50dip"
+            android:layout_height="25dip"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="7dip"
+            android:layout_toRightOf="@id/filterNumEdtTxt"
+            android:src="@drawable/deletes_selector" />
     </RelativeLayout>
 
     <ImageView
@@ -94,9 +50,8 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:orientation="horizontal" 
         android:layout_below="@id/line"
-        >
+        android:orientation="horizontal" >
 
         <com.wireless.ui.view.PickFoodListView
             android:id="@+id/pickByNumLstView"
@@ -115,15 +70,11 @@
             android:id="@+id/NumsideIndex"
             android:layout_width="45dip"
             android:layout_height="fill_parent"
-			android:gravity="right"
-			android:layout_gravity="right"
-            android:orientation="vertical"
-            android:background="@drawable/side_bar_bg">
-            
-
+            android:layout_gravity="right"
+            android:background="@drawable/side_bar_bg"
+            android:gravity="right"
+            android:orientation="vertical" >
         </LinearLayout>
     </LinearLayout>
-    
-     
 
 </RelativeLayout>

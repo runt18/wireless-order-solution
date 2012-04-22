@@ -6,53 +6,9 @@
     android:orientation="vertical" >
 
     <RelativeLayout
-        android:id="@+id/top_ket"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:background="@drawable/bg01" >
-
-        <ImageView
-            android:id="@+id/ketback"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="20dip"
-            android:src="@drawable/back_selector" >
-        </ImageView>
-
-        <TextView
-            android:id="@+id/kettitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:shadowDx="1"
-            android:shadowDy="1"
-            android:shadowRadius="3.0"
-            android:text="点菜-分厨"
-            android:textColor="#FFFFFF"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:typeface="monospace" >
-        </TextView>
-
-        <ImageView
-            android:id="@+id/kitchenorder"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="20dip"
-            android:src="@drawable/popuwindow_selector" >
-        </ImageView>
-    </RelativeLayout>
-
-    <RelativeLayout
         android:id="@+id/second"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/top_ket"
+        android:layout_height="40dip"
         android:background="@drawable/bg02" >
 
         <TextView
@@ -77,9 +33,9 @@
         <RelativeLayout
             android:id="@+id/filterKitchenRelaLayout"
             android:layout_width="fill_parent"
-            android:layout_height="40dip"
+            android:layout_height="35dip"
             android:layout_marginLeft="5dip"
-            android:layout_marginTop="3dip"
+            android:layout_marginTop="2dip"
             android:layout_toRightOf="@id/filterKitchenEdtTxt"
             android:background="@drawable/bg06" >
 
@@ -126,10 +82,10 @@
             android:id="@+id/sideIndex"
             android:layout_width="50dip"
             android:layout_height="fill_parent"
-            android:gravity="right"
             android:layout_gravity="right"
-            android:orientation="vertical"
-            android:background="@drawable/side_bar_bg" >
+            android:background="@drawable/side_bar_bg"
+            android:gravity="right"
+            android:orientation="vertical" >
         </LinearLayout>
     </LinearLayout>
 

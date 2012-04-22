@@ -31,7 +31,7 @@ public class ScrollLayout extends ViewGroup {
 	private int mTouchState = TOUCH_STATE_REST;
 	private int mTouchSlop;
 	private float mLastMotionX;
-	private float mLastMotionY;
+	//private float mLastMotionY;
 
 
 	public ScrollLayout(Context context, AttributeSet attrs) {
@@ -151,7 +151,7 @@ public class ScrollLayout extends ViewGroup {
 
 		final int action = event.getAction();
 		final float x = event.getX();
-		final float y = event.getY();
+		//final float y = event.getY();
 
 		switch (action) {
 		case MotionEvent.ACTION_DOWN:
@@ -205,7 +205,7 @@ public class ScrollLayout extends ViewGroup {
 		}
 
 		final float x = ev.getX();
-		final float y = ev.getY();
+		//final float y = ev.getY();
 
 		switch (action) {
 		case MotionEvent.ACTION_MOVE:
@@ -216,7 +216,7 @@ public class ScrollLayout extends ViewGroup {
 			break;
 		case MotionEvent.ACTION_DOWN:
 			mLastMotionX = x;
-			mLastMotionY = y;
+			//mLastMotionY = y;
 			mTouchState = mScroller.isFinished() ? TOUCH_STATE_REST : TOUCH_STATE_SCROLLING;
 			break;
 

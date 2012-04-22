@@ -5,8 +5,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+import android.app.Activity;
 import android.app.Dialog;
-import android.app.TabActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences.Editor;
@@ -17,8 +17,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.TypedValue;
 import android.view.Display;
-import android.view.GestureDetector;
-import android.view.GestureDetector.OnGestureListener;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -41,9 +39,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
-import android.widget.TabHost;
-import android.widget.TabHost.OnTabChangeListener;
-import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,24 +53,27 @@ import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Util;
 import com.wireless.ui.view.PickFoodListView;
+import com.wireless.ui.view.ScrollLayout;
+import com.wireless.ui.view.ScrollLayout.OnViewChangedListner;
 import com.wireless.ui.view.TempListView;
 
-public class PickFoodActivity extends TabActivity implements
-		PickFoodListView.OnFoodPickedListener, OnGestureListener {
+public class PickFoodActivity extends Activity implements PickFoodListView.OnFoodPickedListener {
 
 	private ArrayList<Kitchen> _validKitchens;
 	private ArrayList<Department> _validDepts;
 
-	private final static String TAG_NUMBER = "number";
-	private final static String TAG_KITCHEN = "kitchen";
-	private final static String TAG_PINYIN = "pinyin";
-	private final static String TAG_OCCASIONAL = "occasional";
+	private final static String TAG_NUMBER = "编号";
+	private final static String TAG_KITCHEN = "分厨";
+	private final static String TAG_PINYIN = "拼音";
+	private final static String TAG_OCCASIONAL = "临时菜";
 
 	private final static int PICK_WITH_TASTE = 0;
 
+	private ScrollLayout _foodScrollLayout;
+	private View _currentView;
+	
 	private ArrayList<OrderFood> _pickFoods = new ArrayList<OrderFood>();
-	private TabHost _tabHost;
-	private GestureDetector _detector;
+
 	private List<Food> _filterKitchenFoods;
 	private TempListView _tempLstView;
 	private PopupWindow _popupWindow;
@@ -87,8 +85,7 @@ public class PickFoodActivity extends TabActivity implements
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		setContentView(R.layout.table);
-		_detector = new GestureDetector(this);
+		setContentView(R.layout.pick_food);
 
 		init();
 
@@ -98,112 +95,125 @@ public class PickFoodActivity extends TabActivity implements
 		for (int i = 0; i < orderParcel.foods.length; i++) {
 			_pickFoods.add(orderParcel.foods[i]);
 		}
-
-		// construct the tab host
-		_tabHost = getTabHost();
-
-		// 编号Tab
-		TabSpec spec = _tabHost
-				.newTabSpec(TAG_NUMBER)
-				.setIndicator(
-						createTabIndicator("编号", R.drawable.number_selector))
-				.setContent(new TabHost.TabContentFactory() {
-					@Override
-					public View createTabContent(String arg0) {
-						return LayoutInflater.from(PickFoodActivity.this)
-								.inflate(R.layout.number, null);
-					}
-				});
-		_tabHost.addTab(spec);
-
-		// 分厨Tab
-		spec = _tabHost
-				.newTabSpec(TAG_KITCHEN)
-				.setIndicator(
-						createTabIndicator("分厨", R.drawable.kitchen_selector))
-				.setContent(new TabHost.TabContentFactory() {
-					@Override
-					public View createTabContent(String arg0) {
-						return LayoutInflater.from(PickFoodActivity.this)
-								.inflate(R.layout.kitchen, null);
-					}
-				});
-		_tabHost.addTab(spec);
-
-		// 拼音Tab
-		spec = _tabHost
-				.newTabSpec(TAG_PINYIN)
-				.setIndicator(
-						createTabIndicator("拼音", R.drawable.pinyin_selector))
-				.setContent(new TabHost.TabContentFactory() {
-					@Override
-					public View createTabContent(String arg0) {
-						return LayoutInflater.from(PickFoodActivity.this)
-								.inflate(R.layout.pinyin, null);
-					}
-				});
-
-		_tabHost.addTab(spec);
-
-		// 临时菜Tab
-		spec = _tabHost
-				.newTabSpec(TAG_OCCASIONAL)
-				.setIndicator(
-						createTabIndicator("临时菜",
-								R.drawable.occasional_selector))
-				.setContent(new TabHost.TabContentFactory() {
-					@Override
-					public View createTabContent(String arg0) {
-						return LayoutInflater.from(PickFoodActivity.this)
-								.inflate(R.layout.temp, null);
-					}
-				});
-		_tabHost.addTab(spec);
-
-		/**
-		 * Tab切换时更换相应的Adapter，显示不同的点菜方式
-		 */
-		_tabHost.setOnTabChangedListener(new OnTabChangeListener() {
+		
+		//返回Button
+		((ImageView)findViewById(R.id.pickFoodBackBtn)).setOnClickListener(new View.OnClickListener() {			
 			@Override
-			public void onTabChanged(String tag) {
+			public void onClick(View v) {
+				onBackPressed();
+				finish();
+			}
+		});
+		
+		//已点菜shortcut的响应事件
+		((ImageView)findViewById(R.id.foodHolderImgView)).setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				if(_popupWindow.isShowing()) {
+					_popupWindow.dismiss();
+					
+				}else{					
+					if(_tempLstView != null){
+						 //Combine both temporary and picked foods
+						List<OrderFood> pickedFoods = new ArrayList<OrderFood>(_pickFoods);
+						pickedFoods.addAll(_tempLstView.getSourceData());
+						_popupLstView.setAdapter(new PopupWndAdapter(PickFoodActivity.this, pickedFoods));
+					}else{
+						_popupLstView.setAdapter(new PopupWndAdapter(PickFoodActivity.this, _pickFoods));
+					}
+					_popupWindow.showAsDropDown(v, -120, 5);
+				}
+			}
+		});
+		
+		_foodScrollLayout = (ScrollLayout)findViewById(R.id.pickFoodScrollLayout);
+		_foodScrollLayout.setOnViewChangedListener(new OnViewChangedListner() {
+			
+			@Override
+			public void onViewChanged(int curScreen, View parent, View curView) {
+				_currentView = curView;
+				String tag = curView.getTag().toString();
+				((TextView)findViewById(R.id.pickFoodTxtView)).setText("点菜-" + tag.substring(0, 2));
+				
+				_centerTxtView.setVisibility(View.INVISIBLE);
+				
+				//切换点菜方式时，保存当前的点菜模式
 				Editor editor = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).edit();
-				if (tag == TAG_NUMBER) {
+				//TODO 设置Button的选中状态
+				if(tag.equals(TAG_NUMBER)){
 					editor.putInt(Params.LAST_PICK_CATE, Params.PICK_BY_NUMBER);
-					setupNumberView();
-
-				} else if (tag == TAG_KITCHEN) {
+					
+				}else if(tag.equals(TAG_KITCHEN)){
 					editor.putInt(Params.LAST_PICK_CATE, Params.PICK_BY_KITCHEN);
-					setupKitchenView();
-
-				} else if (tag == TAG_PINYIN) {
+					
+				}else if(tag.equals(TAG_PINYIN)){
 					editor.putInt(Params.LAST_PICK_CATE, Params.PICK_BY_PINYIN);
-					setupPinyinView();
-
-				} else if (tag == TAG_OCCASIONAL) {
-					setTempView();
+					
+				}else if(tag.equals(TAG_OCCASIONAL)){
+					
 				}
 				editor.commit();
 			}
 		});
-
+		//编号点菜View
+		_foodScrollLayout.addView(setupNumberView());
+		//分厨点菜View
+		_foodScrollLayout.addView(setupKitchenView());
+		//拼音点菜View
+		_foodScrollLayout.addView(setupPinyinView());
+		//临时菜点菜View
+		_foodScrollLayout.addView(setupTempView());
+		
+		//编号点菜Button
+		((LinearLayout)findViewById(R.id.numberLayout)).setOnClickListener(new View.OnClickListener() {			
+			@Override
+			public void onClick(View v) {
+				_foodScrollLayout.setToScreen(0);
+			}
+		});
+		
+		//分厨点菜Button
+		((LinearLayout)findViewById(R.id.kitchenLayout)).setOnClickListener(new View.OnClickListener() {			
+			@Override
+			public void onClick(View v) {
+				_foodScrollLayout.setToScreen(1);
+			}
+		});
+		
+		//拼音点菜Button
+		((LinearLayout)findViewById(R.id.pinyinLayout)).setOnClickListener(new View.OnClickListener() {			
+			@Override
+			public void onClick(View v) {
+				_foodScrollLayout.setToScreen(2);
+			}
+		});
+		
+		
+		//临时菜点菜Button
+		((LinearLayout)findViewById(R.id.tempLayout)).setOnClickListener(new View.OnClickListener() {			
+			@Override
+			public void onClick(View v) {
+				_foodScrollLayout.setToScreen(3);
+			}
+		});
+		
 		/**
 		 * 根据上次保存的记录，切换到相应的点菜方式
 		 */
 		int lastPickCate = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).getInt(Params.LAST_PICK_CATE, Params.PICK_BY_KITCHEN);
 		if(lastPickCate == Params.PICK_BY_NUMBER){
-			setupNumberView();
-			_tabHost.setCurrentTabByTag(TAG_NUMBER);
+			_foodScrollLayout.setToScreen(0);
 			
 		}else if(lastPickCate == Params.PICK_BY_KITCHEN){
-			_tabHost.setCurrentTabByTag(TAG_KITCHEN);
+			_foodScrollLayout.setToScreen(1);
 			
 		}else if(lastPickCate == Params.PICK_BY_PINYIN){
-			_tabHost.setCurrentTabByTag(TAG_PINYIN);
+			_foodScrollLayout.setToScreen(2);
 
 		}else{
-			_tabHost.setCurrentTabByTag(TAG_KITCHEN);
+			_foodScrollLayout.setToScreen(0);
 		}
-		//setupNumberView();
 	}
 
 	@Override
@@ -238,20 +248,6 @@ public class PickFoodActivity extends TabActivity implements
 		super.onBackPressed();
 	}
 
-	/**
-	 * Create the tab indicator
-	 * 
-	 * @param text
-	 * @param drawable
-	 * @return
-	 */
-	private View createTabIndicator(String text, int drawable) {
-		View view = LayoutInflater.from(_tabHost.getContext()).inflate(
-				R.layout.tb_bg, null);
-		((TextView) view.findViewById(R.id.tabsText)).setText(text);
-		((ImageView) view.findViewById(R.id.icon)).setImageResource(drawable);
-		return view;
-	}
 
 	/**
 	 * 通过"编号"、"分厨"、"拼音"方式选中菜品后， 将菜品保存到List中，退出时将此List作为结果返回到上一个Activity
@@ -317,11 +313,13 @@ public class PickFoodActivity extends TabActivity implements
 			}
 		}
 
-		if (_tabHost.getCurrentTabTag() == TAG_NUMBER) {
+		if (_currentView.getTag().equals(TAG_NUMBER)) {
 			(((EditText) findViewById(R.id.filterNumEdtTxt))).setText("");
-		} else if (_tabHost.getCurrentTabTag() == TAG_KITCHEN) {
+			
+		} else if (_currentView.getTag().equals(TAG_KITCHEN)) {
 			((EditText) findViewById(R.id.filterKitchenEdtTxt)).setText("");
-		} else if (_tabHost.getCurrentTabTag() == TAG_PINYIN) {
+			
+		} else if (_currentView.getTag().equals(TAG_PINYIN)) {
 			((EditText) findViewById(R.id.filterPinyinEdtTxt)).setText("");
 		}
 		
@@ -355,14 +353,18 @@ public class PickFoodActivity extends TabActivity implements
 	/**
 	 * 设置编号筛选的View
 	 */
-	private void setupNumberView() {
+	private View setupNumberView() {
 
+		View numberView = LayoutInflater.from(PickFoodActivity.this).inflate(R.layout.number, null);
+		
+		numberView.setTag(TAG_NUMBER);
+		
 		//编号输入框
-		final EditText filterNumEdtTxt = (EditText)findViewById(R.id.filterNumEdtTxt);
+		final EditText filterNumEdtTxt = (EditText)numberView.findViewById(R.id.filterNumEdtTxt);
 		filterNumEdtTxt.setText("");
 
 		// 编号侧栏
-		final LinearLayout numberSidebar = (LinearLayout) findViewById(R.id.NumsideIndex);
+		final LinearLayout numberSidebar = (LinearLayout) numberView.findViewById(R.id.NumsideIndex);
 		//numberSidebar.setBackgroundColor(0xfbfdfe);
 		numberSidebar.setOrientation(LinearLayout.VERTICAL);
 		numberSidebar.removeAllViews();
@@ -433,7 +435,7 @@ public class PickFoodActivity extends TabActivity implements
 		/**
 		 * 编号输入框的删除Button
 		 */
-		((ImageView)findViewById(R.id.numberdelete)).setOnClickListener(new View.OnClickListener() {			
+		((ImageView)numberView.findViewById(R.id.numberdelete)).setOnClickListener(new View.OnClickListener() {			
 			@Override
 		    public void onClick(View v) {
 				//逐字删除
@@ -445,42 +447,12 @@ public class PickFoodActivity extends TabActivity implements
 			}
 		});
 		
-		/**
-		 * 已点菜shortcut的响应事件
-		 */
-		((ImageView) findViewById(R.id.numorder)).setOnClickListener(new View.OnClickListener() {
 
-			@Override
-			public void onClick(View v) {
-				if(_popupWindow.isShowing()) {
-					_popupWindow.dismiss();
-					
-				}else{					
-					if(_tempLstView != null){
-						 //Combine both temporary and picked foods
-						List<OrderFood> pickedFoods = new ArrayList<OrderFood>(_pickFoods);
-						pickedFoods.addAll(_tempLstView.getSourceData());
-						_popupLstView.setAdapter(new PopupWndAdapter(PickFoodActivity.this, pickedFoods));
-					}else{
-						_popupLstView.setAdapter(new PopupWndAdapter(PickFoodActivity.this, _pickFoods));
-					}
-					_popupWindow.showAsDropDown(v, -120, 5);
-				}
-			}
-		});
 
-		final PickFoodListView pickLstView = (PickFoodListView)findViewById(R.id.pickByNumLstView);
+		final PickFoodListView pickLstView = (PickFoodListView)numberView.findViewById(R.id.pickByNumLstView);
 		pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods,	PickFoodListView.TAG_NUM);
 		pickLstView.setFoodPickedListener(this);
 		
-		((ImageView) findViewById(R.id.numback)).setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				onBackPressed();
-				finish();
-			}
-		});
-
 		/**
 		 * 菜品List滚动时隐藏软键盘
 		 */
@@ -536,16 +508,22 @@ public class PickFoodActivity extends TabActivity implements
 			public void afterTextChanged(Editable s) {
 			}
 		});
+		
+		return numberView;
 	}
 
 	/**
 	 * 设置分厨筛选的View
 	 */
-	private void setupKitchenView() {
+	private View setupKitchenView() {
 
+		View kitchenView = LayoutInflater.from(PickFoodActivity.this).inflate(R.layout.kitchen, null);
+		
+		kitchenView.setTag(TAG_KITCHEN);
+		
 		// 分厨侧栏
-		final LinearLayout kitchenSidebar =(LinearLayout) findViewById(R.id.sideIndex);
-		final PickFoodListView pickLstView = (PickFoodListView) findViewById(R.id.pickByKitchenLstView);
+		final LinearLayout kitchenSidebar =(LinearLayout) kitchenView.findViewById(R.id.sideIndex);
+		final PickFoodListView pickLstView = (PickFoodListView) kitchenView.findViewById(R.id.pickByKitchenLstView);
 		// 清除侧栏
 		kitchenSidebar.removeAllViews();
 		//kitchenSidebar.setBackgroundColor(0xfbfdfe);
@@ -631,47 +609,15 @@ public class PickFoodActivity extends TabActivity implements
 			kitchenSidebar.addView(tv);
 		}
 
-		RelativeLayout filterKitchen = (RelativeLayout) findViewById(R.id.filterKitchenRelaLayout);
-		final EditText filterKitEdtTxt = (EditText) findViewById(R.id.filterKitchenEdtTxt);
+		RelativeLayout filterKitchen = (RelativeLayout) kitchenView.findViewById(R.id.filterKitchenRelaLayout);
+		final EditText filterKitEdtTxt = (EditText) kitchenView.findViewById(R.id.filterKitchenEdtTxt);
 		filterKitEdtTxt.setText("");
 		// 初始化的时候厨房默认显示的厨房信息
-		TextView ketchenName = (TextView)findViewById(R.id.Spinner01);
+		TextView ketchenName = (TextView)kitchenView.findViewById(R.id.Spinner01);
 		ketchenName.setText("全部");
 		_filterKitchenFoods = new ArrayList<Food>(Arrays.asList(WirelessOrder.foodMenu.foods));
 		pickLstView.notifyDataChanged(_filterKitchenFoods.toArray(new Food[_filterKitchenFoods.size()]), PickFoodListView.TAG_PINYIN);
 		pickLstView.setFoodPickedListener(this);
-
-		// 已点菜shortcut事件
-		((ImageView)findViewById(R.id.kitchenorder)).setOnClickListener(new View.OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				if(_popupWindow.isShowing()) {
-					_popupWindow.dismiss();
-				}else{
-					if(_tempLstView != null){
-						 //Combine both temporary and picked foods
-						List<OrderFood> pickedFoods = new ArrayList<OrderFood>(_pickFoods);
-						pickedFoods.addAll(_tempLstView.getSourceData());
-						_popupLstView.setAdapter(new PopupWndAdapter(PickFoodActivity.this, pickedFoods));
-					}else{
-						_popupLstView.setAdapter(new PopupWndAdapter(PickFoodActivity.this, _pickFoods));
-					}
-					_popupWindow.showAsDropDown(v, -120, 5);
-				}
-			}
-		});
-
-		/**
-		 * 厨房方式下的返回Button
-		 */
-		((ImageView) findViewById(R.id.ketback)).setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				onBackPressed();
-				finish();
-			}
-		});
 
 		/**
 		 * 菜品List滚动时隐藏软键盘
@@ -750,18 +696,25 @@ public class PickFoodActivity extends TabActivity implements
 						.show();
 			}
 		});
+		
+		return kitchenView;
 	}
 
 	/**
 	 * 设置拼音筛选的View
 	 */
-	private void setupPinyinView() {
+	private View setupPinyinView() {
+		
+		View pinyinView = LayoutInflater.from(PickFoodActivity.this).inflate(R.layout.pinyin, null);
+		
+		pinyinView.setTag(TAG_PINYIN);
+		
 		// 拼音输入框
-		final EditText filterPinyinEdtTxt = (EditText)findViewById(R.id.filterPinyinEdtTxt);
+		final EditText filterPinyinEdtTxt = (EditText)pinyinView.findViewById(R.id.filterPinyinEdtTxt);
 		filterPinyinEdtTxt.setText("");
 
 		// 拼音侧栏
-		final LinearLayout pinyinSidebar = (LinearLayout) findViewById(R.id.PinyinsideIndex); 
+		final LinearLayout pinyinSidebar = (LinearLayout) pinyinView.findViewById(R.id.PinyinsideIndex); 
 		pinyinSidebar.setBackgroundColor(0xfbfdfe);
 		pinyinSidebar.setOrientation(LinearLayout.VERTICAL);
 		pinyinSidebar.removeAllViews();
@@ -828,7 +781,7 @@ public class PickFoodActivity extends TabActivity implements
 		/**
 		 * 拼音输入框的删除Button响应事件
 		 */
-		((ImageView)findViewById(R.id.pinyindelete)).setOnClickListener(new View.OnClickListener() {					
+		((ImageView)pinyinView.findViewById(R.id.pinyindelete)).setOnClickListener(new View.OnClickListener() {					
 			@Override
 		    public void onClick(View v) {
 				//逐字删除
@@ -839,39 +792,8 @@ public class PickFoodActivity extends TabActivity implements
 				}
 			}
 		});
-
-		/**
-		 * 已点菜shortcut的响应事件
-		 */
-		((ImageView) findViewById(R.id.pinorder)).setOnClickListener(new View.OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				if(_popupWindow.isShowing()) {
-					_popupWindow.dismiss();
-				}else{
-					if(_tempLstView != null){
-						 //Combine both temporary and picked foods
-						List<OrderFood> pickedFoods = new ArrayList<OrderFood>(_pickFoods);
-						pickedFoods.addAll(_tempLstView.getSourceData());
-						_popupLstView.setAdapter(new PopupWndAdapter(PickFoodActivity.this, pickedFoods));
-					}else{
-						_popupLstView.setAdapter(new PopupWndAdapter(PickFoodActivity.this, _pickFoods));
-					}
-					_popupWindow.showAsDropDown(v, -120, 5);
-				}
-			}
-		});
 		
-		((ImageView) findViewById(R.id.pinback)).setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				onBackPressed();
-				finish();
-			}
-		});
-		
-		final PickFoodListView pickLstView = (PickFoodListView) findViewById(R.id.pickByPinyinLstView);
+		final PickFoodListView pickLstView = (PickFoodListView) pinyinView.findViewById(R.id.pickByPinyinLstView);
 		pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods,	PickFoodListView.TAG_PINYIN);
 		pickLstView.setFoodPickedListener(this);
 		/**
@@ -928,30 +850,26 @@ public class PickFoodActivity extends TabActivity implements
 			public void afterTextChanged(Editable s) {
 			}
 		});
+		
+		return pinyinView;
 	}
 
 	/**
 	 * 设置临时菜的View
 	 */
-	private void setTempView() {
+	private View setupTempView() {
+		
+		View tempView = LayoutInflater.from(PickFoodActivity.this).inflate(R.layout.temp, null);
 
+		tempView.setTag(TAG_OCCASIONAL);
+		
 		_popupWindow.dismiss();
-		_tempLstView = (TempListView) findViewById(R.id.tempListView);
+		_tempLstView = (TempListView) tempView.findViewById(R.id.tempListView);
 		_tempLstView.notifyDataChanged();
 
-		// 临时菜返回键
-		((ImageView) findViewById(R.id.tempback))
-				.setOnClickListener(new View.OnClickListener() {
-
-					@Override
-					public void onClick(View v) {
-						onBackPressed();
-						finish();
-					}
-				});
 
 		// 临时菜添加
-		((ImageView) findViewById(R.id.add))
+		((ImageView) tempView.findViewById(R.id.add))
 				.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
@@ -961,7 +879,7 @@ public class PickFoodActivity extends TabActivity implements
 		
 
 		/**
-		 * list滚动的时候屏蔽软键盘
+		 * List滚动的时候屏蔽软键盘
 		 */
 		_tempLstView.setOnScrollListener(new OnScrollListener() {
 
@@ -979,6 +897,8 @@ public class PickFoodActivity extends TabActivity implements
 
 			}
 		});
+		
+		return tempView;
 	}
 
 	/**
@@ -1122,76 +1042,6 @@ public class PickFoodActivity extends TabActivity implements
 			setContentView(dialogContent);
 		}
 
-	}
-
-	@Override
-	public boolean onTouchEvent(MotionEvent event) {
-		if (_detector.onTouchEvent(event)) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	@Override
-	public boolean onDown(MotionEvent e) {
-		return true;
-	}
-
-	@Override
-	public boolean dispatchTouchEvent(MotionEvent ev) {
-		_detector.onTouchEvent(ev);
-		return super.dispatchTouchEvent(ev);
-	}
-
-	@Override
-	public void onShowPress(MotionEvent e) {
-
-	}
-
-	@Override
-	public boolean onSingleTapUp(MotionEvent e) {
-		return false;
-	}
-
-	@Override
-	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-			float distanceY) {
-		return false;
-	}
-
-	@Override
-	public void onLongPress(MotionEvent e) {
-
-	}
-
-	/*
-	 * 手势滑动执行方法
-	 */
-	@Override
-	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-			float velocityY) {
-		float scrollX = e1.getX() - e2.getX();
-		if (Math.abs(velocityX) > 200 && velocityY != 0
-				&& Math.abs(scrollX) / Math.abs(e1.getY() - e2.getY()) > 1) {
-
-			if (scrollX > 0) {
-				// 此处添加代码用来显示下一个页面
-				if (_tabHost.getCurrentTab() == 4)
-					return false;
-				_tabHost.setCurrentTab(_tabHost.getCurrentTab() + 1);
-
-			} else {
-				// 此处添加代码用来显示上一个页面
-				if (_tabHost.getCurrentTab() == 0)
-					return false;
-				_tabHost.setCurrentTab(_tabHost.getCurrentTab() - 1);
-			}
-
-			return true;
-		}
-
-		return false;
 	}
 
 	/**
