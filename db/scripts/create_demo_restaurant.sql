@@ -4,7 +4,6 @@ SET NAMES utf8;
 -- Delete all the info before creating the demo	
 -- -----------------------------------------------------
 DELETE FROM wireless_order_db.order_food_history WHERE order_id IN (SELECT id FROM wireless_order_db.order_history WHERE restaurant_id=11);
-DELETE FROM wireless_order_db.temp_order_food_history WHERE order_id IN (SELECT id FROM wireless_order_db.order_history WHERE restaurant_id=11);
 DELETE FROM wireless_order_db.order_history WHERE restaurant_id=11;
 
 DELETE FROM wireless_order_db.order_food WHERE restaurant_id=11;
@@ -528,36 +527,6 @@ INSERT INTO `wireless_order_db`.`order_food_history` (`restaurant_id`, `order_id
 INSERT INTO `wireless_order_db`.`order_food_history` (`restaurant_id`, `order_id`, `food_alias`, `food_id`, `order_count`, `name`,`unit_price`, `order_date`, `waiter`, `comment`, `dept_id`, `kitchen_alias`, `kitchen_id`) VALUES (11, 21, 0x4C3, (SELECT food_id FROM wireless_order_db.food WHERE restaurant_id=11 AND food_alias=0x4C3),  1, '冷鸡冻', 23, NOW(), (SELECT owner_name FROM wireless_order_db.terminal WHERE pin=0x2100000A), NULL, 0, 0, (SELECT kitchen_id FROM wireless_order_db.kitchen WHERE restaurant_id=11 AND kitchen_alias=0));
 COMMIT;
 SET AUTOCOMMIT=1;
-
--- -----------------------------------------------------
--- Insert the info from order_food_history to temp_order_food_history
--- -----------------------------------------------------
-INSERT INTO `wireless_order_db`.temp_order_food_history(order_id,food_id,taste_id,taste_id2,taste_id3,is_temporary,`name`,taste,order_count,unit_price,taste_price,discount,food_status,kitchen,waiter) 
-SELECT 
-`wireless_order_db`.`order_food_history`.`order_id` AS `order_id`,
-`wireless_order_db`.`order_food_history`.`food_id` AS `food_id`,
-`wireless_order_db`.`order_food_history`.`taste_alias` AS `taste_id`,
-`wireless_order_db`.`order_food_history`.`taste2_alias` AS `taste_id2`,
-`wireless_order_db`.`order_food_history`.`taste3_alias` AS `taste_id3`,
-`wireless_order_db`.`order_food_history`.`is_temporary` AS `is_temporary`,
-`wireless_order_db`.`order_food_history`.`name` AS `name`,
-`wireless_order_db`.`order_food_history`.`taste` AS `taste`,
-sum(`wireless_order_db`.`order_food_history`.`order_count`) AS `order_count`,
-max(`wireless_order_db`.`order_food_history`.`unit_price`) AS `unit_price`,
-max(`wireless_order_db`.`order_food_history`.`taste_price`) AS `taste_price`,
-max(`wireless_order_db`.`order_food_history`.`discount`) AS `discount`,
-max(`wireless_order_db`.`order_food_history`.`food_status`) AS `food_status`,
-max(`wireless_order_db`.`order_food_history`.`kitchen_alias`) AS `kitchen`,
-max(`wireless_order_db`.`order_food_history`.`waiter`) AS `waiter`
-FROM `wireless_order_db`.`order_food_history` 
-GROUP BY 
-`wireless_order_db`.`order_food_history`.`order_id`,
-`wireless_order_db`.`order_food_history`.`food_alias`,
-`wireless_order_db`.`order_food_history`.`taste_alias`,
-`wireless_order_db`.`order_food_history`.`taste2_alias`,
-`wireless_order_db`.`order_food_history`.`taste3_alias`,
-`wireless_order_db`.`order_food_history`.`is_temporary`
-HAVING (SUM(`wireless_order_db`.`order_food_history`.`order_count`) > 0);
 
 -- -----------------------------------------------------
 -- Insert order and the associated order_food records

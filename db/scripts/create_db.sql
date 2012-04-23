@@ -411,6 +411,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food_history` (
   `is_paid` TINYINT NULL DEFAULT 0 COMMENT 'indicates whether this record is paid before' ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_order_food_history_order_history1` (`order_id` ASC) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) ,
   CONSTRAINT `fk_order_food_history_order_history1`
     FOREIGN KEY (`order_id` )
     REFERENCES `wireless_order_db`.`order_history` (`id` )
@@ -540,47 +541,19 @@ COMMENT = 'describe the department information' ;
 DROP TABLE IF EXISTS `wireless_order_db`.`temp_order_food_history` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`temp_order_food_history` (
-  `order_id` INT UNSIGNED NOT NULL COMMENT 'the order id to this order detail record' ,
-  `food_id` SMALLINT UNSIGNED NOT NULL COMMENT 'the food id to this order detail record' ,
-  `taste_id` SMALLINT UNSIGNED NOT NULL COMMENT 'the taste id to this order detail record' ,
-  `taste_id2` SMALLINT UNSIGNED NOT NULL COMMENT 'the 2nd taste id to this order detail record' ,
-  `taste_id3` SMALLINT UNSIGNED NOT NULL COMMENT 'the 3rd taste id to this order detail record' ,
-  `is_temporary` TINYINT NOT NULL DEFAULT 0 COMMENT 'the flag indicates whether the food to this record is temporary' ,
+  `order_id` INT(10) UNSIGNED NOT NULL COMMENT 'the order id to this order detail record' ,
+  `food_id` SMALLINT(5) UNSIGNED NOT NULL COMMENT 'the food id to this order detail record' ,
+  `taste_id` SMALLINT(5) UNSIGNED NOT NULL COMMENT 'the taste id to this order detail record' ,
+  `taste_id2` SMALLINT(5) UNSIGNED NOT NULL COMMENT 'the 2nd taste id to this order detail record' ,
+  `taste_id3` SMALLINT(5) UNSIGNED NOT NULL COMMENT 'the 3rd taste id to this order detail record' ,
   `name` VARCHAR(45) NOT NULL COMMENT 'the food name to this order detail record' ,
   `taste` VARCHAR(45) NOT NULL COMMENT 'the taste preference to this order detail record' ,
   `order_count` DECIMAL(5,2) NOT NULL COMMENT 'the sum of order count to this order detail record' ,
   `unit_price` DECIMAL(7,2) UNSIGNED NOT NULL COMMENT 'the unit price to this order detail record' ,
   `taste_price` DECIMAL(7,2) UNSIGNED NOT NULL COMMENT 'the taste price to this order detail record' ,
-  `discount` DECIMAL(3,2) NOT NULL COMMENT 'the discount to this order detail record' ,
-  `food_status` TINYINT NOT NULL COMMENT 'the food status to this order detail record' ,
-  `kitchen` TINYINT UNSIGNED NOT NULL COMMENT 'the kitchen to this order detail record' ,
-  `waiter` VARCHAR(45) NOT NULL COMMENT 'the waiter name to this order detail record' ,
-  PRIMARY KEY (`order_id`, `food_id`, `taste_id`, `taste_id2`, `taste_id3`) )
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8, 
-COMMENT = 'temporary order food history table for performance problem' ;
-
-
--- -----------------------------------------------------
--- Table `wireless_order_db`.`temp_order_food_history`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `wireless_order_db`.`temp_order_food_history` ;
-
-CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`temp_order_food_history` (
-  `order_id` INT UNSIGNED NOT NULL COMMENT 'the order id to this order detail record' ,
-  `food_id` SMALLINT UNSIGNED NOT NULL COMMENT 'the food id to this order detail record' ,
-  `taste_id` SMALLINT UNSIGNED NOT NULL COMMENT 'the taste id to this order detail record' ,
-  `taste_id2` SMALLINT UNSIGNED NOT NULL COMMENT 'the 2nd taste id to this order detail record' ,
-  `taste_id3` SMALLINT UNSIGNED NOT NULL COMMENT 'the 3rd taste id to this order detail record' ,
-  `is_temporary` TINYINT NOT NULL DEFAULT 0 COMMENT 'the flag indicates whether the food to this record is temporary' ,
-  `name` VARCHAR(45) NOT NULL COMMENT 'the food name to this order detail record' ,
-  `taste` VARCHAR(45) NOT NULL COMMENT 'the taste preference to this order detail record' ,
-  `order_count` DECIMAL(5,2) NOT NULL COMMENT 'the sum of order count to this order detail record' ,
-  `unit_price` DECIMAL(7,2) UNSIGNED NOT NULL COMMENT 'the unit price to this order detail record' ,
-  `taste_price` DECIMAL(7,2) UNSIGNED NOT NULL COMMENT 'the taste price to this order detail record' ,
-  `discount` DECIMAL(3,2) NOT NULL COMMENT 'the discount to this order detail record' ,
-  `food_status` TINYINT NOT NULL COMMENT 'the food status to this order detail record' ,
-  `kitchen` TINYINT UNSIGNED NOT NULL COMMENT 'the kitchen to this order detail record' ,
+  `discount` DECIMAL(5,2) NOT NULL COMMENT 'the discount to this order detail record' ,
+  `food_status` TINYINT(4) NOT NULL COMMENT 'the food status to this order detail record' ,
+  `kitchen` TINYINT(3) UNSIGNED NOT NULL COMMENT 'the kitchen to this order detail record' ,
   `waiter` VARCHAR(45) NOT NULL COMMENT 'the waiter name to this order detail record' ,
   PRIMARY KEY (`order_id`, `food_id`, `taste_id`, `taste_id2`, `taste_id3`) )
 ENGINE = InnoDB

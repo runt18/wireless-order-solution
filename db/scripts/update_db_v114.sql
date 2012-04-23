@@ -1,4 +1,4 @@
-﻿SET NAMES utf8;
+SET NAMES utf8;
 USE wireless_order_db;
 
 -- -----------------------------------------------------
@@ -290,6 +290,17 @@ ALTER TABLE `wireless_order_db`.`order` ADD COLUMN `is_paid` TINYINT NOT NULL DE
 -- Add the field 'is_paid' to table 'order_history'
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`order_history` ADD COLUMN `is_paid` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates whether the order has been paid before'  AFTER `service_rate` ;
+
+-- -----------------------------------------------------
+-- Add the index 'ix_restaurant_id' to table 'order_food_history'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_food_history`
+ADD INDEX `ix_restaurant_id` (`restaurant_id` ASC) ;
+
+-- -----------------------------------------------------
+-- Drop the table 'temp_order_food_history'
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`temp_order_food_history`;
 
 -- -----------------------------------------------------
 -- Create table `wireless_order_db`.`shift_history`
