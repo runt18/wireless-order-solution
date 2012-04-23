@@ -15,7 +15,8 @@ import android.widget.Scroller;
  */
 public class ScrollLayout extends ViewGroup {
 
-	private static final String TAG = "ScrollLayout";
+	private OnViewChangedListner mViewChangedListner;
+	
 	private Scroller mScroller;
 	private VelocityTracker mVelocityTracker;
 
@@ -31,9 +32,7 @@ public class ScrollLayout extends ViewGroup {
 	private int mTouchState = TOUCH_STATE_REST;
 	private int mTouchSlop;
 	private float mLastMotionX;
-	private float mLastMotionY;
-
-	private PageListener pageListener;
+	//private float mLastMotionY;
 
 	public ScrollLayout(Context context, AttributeSet attrs) {
 		this(context, attrs, 0);
@@ -106,6 +105,9 @@ public class ScrollLayout extends ViewGroup {
 			final int delta = whichScreen * getWidth() - getScrollX();
 			mScroller.startScroll(getScrollX(), 0, delta, 0, Math.abs(delta) * 2);
 			mCurScreen = whichScreen;
+			if(mViewChangedListner != null){
+				mViewChangedListner.onViewChanged(mCurScreen, this, getChildAt(mCurScreen));
+			}
 			invalidate(); // Redraw the layout
 		}
 	}
@@ -113,6 +115,9 @@ public class ScrollLayout extends ViewGroup {
 	public void setToScreen(int whichScreen) {
 		whichScreen = Math.max(0, Math.min(whichScreen, getChildCount() - 1));
 		mCurScreen = whichScreen;
+		if(mViewChangedListner != null){
+			mViewChangedListner.onViewChanged(mCurScreen, this, getChildAt(mCurScreen));
+		}
 		scrollTo(whichScreen * getWidth(), 0);
 	}
 
@@ -147,7 +152,7 @@ public class ScrollLayout extends ViewGroup {
 
 		final int action = event.getAction();
 		final float x = event.getX();
-		final float y = event.getY();
+		//final float y = event.getY();
 
 		switch (action) {
 		case MotionEvent.ACTION_DOWN:
@@ -171,12 +176,10 @@ public class ScrollLayout extends ViewGroup {
 				// Fling enough to move left
 				snapToScreen(mCurScreen - 1);
 				--page;
-//				pageListener.page(page);
 			} else if (velocityX < -SNAP_VELOCITY && mCurScreen < getChildCount() - 1) {
 				// Fling enough to move right
 				snapToScreen(mCurScreen + 1);
 				++page;
-//				pageListener.page(page);
 			} else {
 				snapToDestination();
 			}
@@ -185,7 +188,6 @@ public class ScrollLayout extends ViewGroup {
 				mVelocityTracker = null;
 			}
 			mTouchState = TOUCH_STATE_REST;
-			pageListener.page(page);
 			break;
 		case MotionEvent.ACTION_CANCEL:
 			mTouchState = TOUCH_STATE_REST;
@@ -204,7 +206,7 @@ public class ScrollLayout extends ViewGroup {
 		}
 
 		final float x = ev.getX();
-		final float y = ev.getY();
+		//final float y = ev.getY();
 
 		switch (action) {
 		case MotionEvent.ACTION_MOVE:
@@ -215,7 +217,7 @@ public class ScrollLayout extends ViewGroup {
 			break;
 		case MotionEvent.ACTION_DOWN:
 			mLastMotionX = x;
-			mLastMotionY = y;
+			//mLastMotionY = y;
 			mTouchState = mScroller.isFinished() ? TOUCH_STATE_REST : TOUCH_STATE_SCROLLING;
 			break;
 
@@ -227,12 +229,11 @@ public class ScrollLayout extends ViewGroup {
 		return mTouchState != TOUCH_STATE_REST;
 	}
 
-	public void setPageListener(PageListener pageListener) {
-		this.pageListener = pageListener;
+	public void setOnViewChangedListener(OnViewChangedListner viewChangedListner){
+		mViewChangedListner = viewChangedListner;
 	}
-
-	public interface PageListener {
-
-		void page(int page);
+	
+	public static interface OnViewChangedListner{
+		public void onViewChanged(int curScreen, View parent, View curView);
 	}
 }

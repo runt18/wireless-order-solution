@@ -66,7 +66,7 @@ import com.wireless.protocol.Terminal;
 import com.wireless.protocol.Type;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.view.ScrollLayout;
-import com.wireless.view.ScrollLayout.PageListener;
+import com.wireless.view.ScrollLayout.OnViewChangedListner;
 
 public class MainActivity extends Activity {
 
@@ -142,10 +142,8 @@ public class MainActivity extends Activity {
 		//ÏÔÊ¾²ÍÌ¨µÄscroll view group
 		_tblScrolledArea = (ScrollLayout) findViewById(R.id.tableFlipper);
 		_tblScrolledArea.getLayoutParams().height = this.getWindowManager().getDefaultDisplay().getHeight() * 2 / 3;
-		_tblScrolledArea.setPageListener(new PageListener() {
-			@Override
-			public void page(int page) {
-				// TODO Auto-generated method stub
+		_tblScrolledArea.setOnViewChangedListener(new OnViewChangedListner() {			@Override
+			public void onViewChanged(int curScreen, View parent, View curView) {
 				reflashPageIndictor();
 			}
 		});
