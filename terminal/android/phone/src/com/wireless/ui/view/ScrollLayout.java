@@ -174,11 +174,9 @@ public class ScrollLayout extends ViewGroup {
 			if (velocityX > SNAP_VELOCITY && mCurScreen > 0) {
 				// Fling enough to move left
 				snapToScreen(mCurScreen - 1);
-//				pageListener.page(page);
 			} else if (velocityX < -SNAP_VELOCITY && mCurScreen < getChildCount() - 1) {
 				// Fling enough to move right
 				snapToScreen(mCurScreen + 1);
-//				pageListener.page(page);
 			} else {
 				snapToDestination();
 			}
