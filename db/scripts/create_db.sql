@@ -411,7 +411,6 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food_history` (
   `is_paid` TINYINT NULL DEFAULT 0 COMMENT 'indicates whether this record is paid before' ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_order_food_history_order_history1` (`order_id` ASC) ,
-  INDEX `ix_restaurant_id` (`restaurant_id` ASC) ,
   CONSTRAINT `fk_order_food_history_order_history1`
     FOREIGN KEY (`order_id` )
     REFERENCES `wireless_order_db`.`order_history` (`id` )
@@ -702,8 +701,6 @@ COMMENT = 'the daily settle history to each restaurant' ;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
-
 
 -- -----------------------------------------------------
 -- Data for table `wireless_order_db`.`restaurant`
