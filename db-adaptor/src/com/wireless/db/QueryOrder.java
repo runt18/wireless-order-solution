@@ -131,7 +131,7 @@ public class QueryOrder {
 		/**
 		 * Get the related info to this order.
 		 */
-		String sql = "SELECT custom_num, table_id, table_alias, table_name, table2_alias, table2_name, " +
+		String sql = "SELECT seq_id, custom_num, table_id, table_alias, table_name, table2_alias, table2_name, " +
 					 "region_id, region_name, restaurant_id, type, discount_type, category, is_paid FROM " + Params.dbName	+ 
 					 "." + orderTbl + " " +
 					 "WHERE id=" + orderID;
@@ -141,6 +141,7 @@ public class QueryOrder {
 		Order orderInfo = new Order();
 
 		if(dbCon.rs.next()) {
+			orderInfo.seqID = dbCon.rs.getInt("seq_id");
 			orderInfo.restaurantID = dbCon.rs.getInt("restaurant_id");
 			orderInfo.table.tableID = dbCon.rs.getInt("table_id");
 			orderInfo.table.aliasID = dbCon.rs.getInt("table_alias");
@@ -172,17 +173,6 @@ public class QueryOrder {
 			orderInfo.setActualPrice(dbCon.rs.getFloat("total_price_2"));
 		}
 		dbCon.rs.close();
-		
-		/**
-		 * Get the type to handle the tail of price
-		 */
-//		sql = "SELECT price_tail FROM " + Params.dbName +
-//			  ".setting WHERE restaurant_id=" + orderInfo.restaurantID;
-//		dbCon.rs = dbCon.stmt.executeQuery(sql);
-//		if(dbCon.rs.next()){
-//			orderInfo.price_tail = dbCon.rs.getShort("price_tail");
-//		}
-//		dbCon.rs.close();
 		
 		/**
 		 * Get the minimum cost

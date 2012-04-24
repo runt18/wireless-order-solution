@@ -178,7 +178,19 @@ public class PayOrder {
 			}
 		}
 			
+		
 		String sql;
+		
+		/**
+		 * Calculate the sequence id to this order.
+		 */
+		sql = "SELECT CASE WHEN MAX(seq_id) IS NULL THEN 1 ELSE MAX(seq_id) + 1 END FROM " + 
+			  Params.dbName + ".order WHERE restaurant_id=" + orderInfo.restaurantID;
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			orderInfo.seqID = dbCon.rs.getInt(1);
+		}
+		
 		/**
 		 * Put all the INSERT statements into a database transition so as to assure 
 		 * the status to both table and order is consistent. 
@@ -211,6 +223,7 @@ public class PayOrder {
 			 * - payment manner
 			 * - terminal pin
 			 * - service rate
+			 * - sequence id
 			 * - pay order date(if NOT paid again)
 			 * - comment if exist
 			 * - member id if pay type is for member
@@ -226,6 +239,7 @@ public class PayOrder {
 				  ", type=" + orderInfo.pay_manner + 
 				  ", discount_type=" + orderInfo.discount_type +
 				  ", service_rate=" + orderInfo.getServiceRate() +
+				  ", seq_id=" + orderInfo.seqID +
 			   	  (isPaidAgain ? "" : ", order_date=NOW()") + 
 				  (orderInfo.comment != null ? ", comment='" + orderInfo.comment + "'" : "") +
 				  (member != null ? ", member_id='" + member.alias_id + "', member='" + member.name + "'" : ", member_id=NULL, member=NULL") + 
