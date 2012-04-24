@@ -190,6 +190,7 @@ public class PayOrder {
 		if(dbCon.rs.next()){
 			orderInfo.seqID = dbCon.rs.getInt(1);
 		}
+		dbCon.rs.close();
 		
 		/**
 		 * Put all the INSERT statements into a database transition so as to assure 
