@@ -292,6 +292,16 @@ ALTER TABLE `wireless_order_db`.`order` ADD COLUMN `is_paid` TINYINT NOT NULL DE
 ALTER TABLE `wireless_order_db`.`order_history` ADD COLUMN `is_paid` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates whether the order has been paid before'  AFTER `service_rate` ;
 
 -- -----------------------------------------------------
+-- Add the field 'seq_id' to table 'order'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order` ADD COLUMN `seq_id` INT UNSIGNED NULL DEFAULT NULL COMMENT 'the sequence id to this order'  AFTER `id` ;
+
+-- -----------------------------------------------------
+-- Add the field 'seq_id' to table 'order_history'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_history` ADD COLUMN `seq_id` INT UNSIGNED NULL DEFAULT NULL COMMENT 'the sequence id to this order'  AFTER `id` ;
+
+-- -----------------------------------------------------
 -- Drop the table 'temp_order_food_history'
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `wireless_order_db`.`temp_order_food_history`;
