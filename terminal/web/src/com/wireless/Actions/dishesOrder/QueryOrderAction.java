@@ -22,7 +22,7 @@ import com.wireless.protocol.Util;
 
 public class QueryOrderAction extends Action {
 
-	private static final long serialVersionUID = 1L;
+//	private static final long serialVersionUID = 1L;
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
@@ -71,13 +71,14 @@ public class QueryOrderAction extends Action {
 				StringBuffer value = new StringBuffer();
 				for (int i = 0; i < order.foods.length; i++) {
 					/**
-					 * The json to order food looks like below.
-					 * ["菜名",菜名编号,厨房编号,"口味",口味编号,数量,单价,
-					 * 是否特价,是否推荐,是否停售,是否赠送,折扣率,口味编号2, 口味编号3,口味价钱,是否时价,是否临时菜]
+					 * The json to order food looks like below. 
+					 * ["菜名", 菜名编号, 厨房编号, "口味", 口味编号, 数量, 单价, 是否特价, 是否推荐, 是否停售, 是否赠送, 折扣率,
+					 * 口味编号2, 口味编号3, 口味价钱, 是否时价, 是否临时菜, 流水号, 折扣额]
 					 */
 					String jsonOrderFood = "[\"$(food)\",$(food_id),$(kitchen),\"$(taste)\",$(taste_id),"
 							+ "$(count),\"$(unit_price)\",$(special),$(recommend),$(soldout),"
-							+ "$(gift),$(discount),$(taste_id2),$(taste_id3),\"$(taste_price)\",$(currPrice),$(temporary)]";
+							+ "$(gift),$(discount),$(taste_id2),$(taste_id3),\"$(taste_price)\","
+							+ "$(currPrice),$(temporary),$(seq_id),$(total_discount)]";
 					jsonOrderFood = jsonOrderFood.replace("$(food)",
 							order.foods[i].name);
 					jsonOrderFood = jsonOrderFood.replace("$(food_id)",
@@ -117,7 +118,11 @@ public class QueryOrderAction extends Action {
 							order.foods[i].isCurPrice() ? "true" : "false");
 					jsonOrderFood = jsonOrderFood.replace("$(temporary)",
 							order.foods[i].isTemporary ? "true" : "false");
-
+					jsonOrderFood = jsonOrderFood.replace("$(seq_id)",
+							Integer.toString(order.seqID));
+					jsonOrderFood = jsonOrderFood.replace("$(total_discount)",
+							order.foods[i].calcDiscountPrice().toString());
+					
 					// put each json order food info to the value
 					value.append(jsonOrderFood);
 					// the string is separated by comma
