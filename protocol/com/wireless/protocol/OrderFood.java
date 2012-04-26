@@ -256,6 +256,15 @@ public class OrderFood extends Food {
 		return Util.int2Float((price * discount * count) / 10000);
 	}
 	
+	/**
+	 * Calculate the discount price to this food as below.<br>
+	 * price = unit_price * (1 - discount)
+	 * @return the discount price to this food
+	 */
+	public Float calcDiscountPrice(){
+		return Util.int2Float((price * count * (100 - discount)) / 10000);
+	}
+	
 	public OrderFood(){
 		for(int i = 0; i < tastes.length; i++){
 			tastes[i] = new Taste();
