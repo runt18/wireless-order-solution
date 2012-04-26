@@ -19,6 +19,7 @@ import com.wireless.db.Params;
 import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.Food;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.Util;
 
@@ -115,9 +116,26 @@ public class QueryTodayAdvAction extends Action {
 			 * belong to this restaurant 2 - has been paid 3 - match extra
 			 * filter condition
 			 */
-			String sql = "SELECT * FROM " + Params.dbName + ".order WHERE"
-					+ " restaurant_id=" + term.restaurant_id
-					+ " AND total_price IS NOT NULL" + filterCondition;
+			String sql = " SELECT " +
+					 " A.id, MAX(A.seq_id) AS seq_id, " +
+					 " MAX(A.table_alias) AS table_alias, MAX(A.order_date) AS order_date, MAX(A.category) AS category, " +
+					 " MAX(A.type) AS type, MAX(A.total_price) AS total_price, MAX(A.total_price_2) AS total_price_2, " +
+					 " MAX(A.table2_alias) AS table2_alias, MAX(A.custom_num) AS custom_num, MAX(A.service_rate) AS service_rate, " +
+					 " MAX(A.gift_price) AS gift_price, MAX(A.member_id) AS member_id, MAX(A.member) AS member, " +
+					 " MAX(A.comment) AS comment, MAX(A.discount_type) AS discount_type, MAX(A.waiter) AS waiter, " +
+					 "(CASE WHEN MIN(B.discount) < 1 THEN 1 ELSE 0 END) AS is_discount, " +
+					 "(CASE WHEN SUM(B.food_status & " + Food.GIFT + ") <= 0 THEN 0 ELSE 1 END) AS is_gift, " +
+					 "(CASE WHEN SUM(IF(B.is_paid, 1, 0)) <= 0 THEN 0 ELSE 1 END) AS is_paid, " +
+					 "(CASE WHEN MIN(order_count) < 0 THEN 1 ELSE 0 END) AS is_cancel" +
+					 " FROM " + 
+					 Params.dbName + ".order A, " +
+					 Params.dbName + ".order_food B " +
+					 " WHERE " +
+					 " A.id = B.order_id " +
+					 " AND A.restaurant_id=" + term.restaurant_id + " " +
+					 " AND A.total_price IS NOT NULL" +
+					 filterCondition +
+					 " GROUP BY A.id " ;
 
 
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -133,9 +151,9 @@ public class QueryTodayAdvAction extends Action {
 				}
 				/**
 				 * The json to each order looks like below
-				 * ["账单号","台号","日期","类型","结帐方式","金额","实收","台号2",
-				 * "就餐人数","最低消","服务费率","会员编号","会员姓名","账单备注",
-				 * "赠券金额","结帐类型","折扣类型","服务员"]
+				 * ["账单号", "台号", "日期", "类型", "结帐方式", "金额", "实收", "台号2",
+				 * "就餐人数", "最低消", "服务费率", "会员编号", "会员姓名", "账单备注",
+				 * "赠券金额", "结帐类型", "折扣类型", "服务员", 是否反結帳, 是否折扣, 是否赠送, 是否退菜]
 				 */
 				String jsonOrder = "[\"$(order_id)\",\"$(table_id)\",\"$(order_date)\",\"$(order_cate)\","
 						+ "\"$(pay_manner)\",\"$(total_price)\",\"$(actual_income)\","
@@ -186,6 +204,9 @@ public class QueryTodayAdvAction extends Action {
 						Short.toString(dbCon.rs.getShort("discount_type")));
 				jsonOrder = jsonOrder.replace("$(waiter)",
 						dbCon.rs.getString("waiter"));
+				jsonOrder = jsonOrder.replace("$(isDiscount)", String.valueOf(dbCon.rs.getInt("is_discount")));
+				jsonOrder = jsonOrder.replace("$(isGift)", String.valueOf(dbCon.rs.getInt("is_gift")));
+				jsonOrder = jsonOrder.replace("$(isCancel)", String.valueOf(dbCon.rs.getInt("is_cancel")));
 				// put each json order info to the value
 				value.append(jsonOrder);
 				nCount++;
