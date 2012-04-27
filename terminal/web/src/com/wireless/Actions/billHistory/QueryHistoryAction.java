@@ -67,10 +67,10 @@ public class QueryHistoryAction extends Action {
 			 * value : the value to search, the content is depending on the type
 			 * havingCond : the having condition is one of the values below.
 			 * 		  0 - 无
-			 * 		  1 - 有反结帐
-			 * 		  2 - 有折扣
-			 * 		  3 - 有赠送
-			 * 		  4 - 有退菜	
+			 * 		  1 - 是否有反结帐
+			 * 		  2 - 是否有折扣
+			 * 		  3 - 是否有赠送
+			 * 		  4 - 是否有退菜	
 			 */
 			String pin = request.getParameter("pin");
 			
@@ -154,16 +154,16 @@ public class QueryHistoryAction extends Action {
 			int cond = Integer.parseInt(request.getParameter("havingCond"));
 			String havingCond = null;
 			if(cond == 1){
-				//有反结帐
+				//是否有反结帐
 				havingCond = "HAVING SUM(IF(B.is_paid, 1, 0)) > 0";
 			}else if(cond == 2){
-				//有折扣
+				//是否有折扣
 				havingCond = "HAVING MIN(B.discount) < 1";
 			}else if(cond == 3){
-				//有赠送
+				//是否有赠送
 				havingCond = "HAVING SUM(B.food_status & " + Food.GIFT + ") > 0";
 			}else if(cond == 4){
-				//有退菜
+				//是否有退菜
 				havingCond = "HAVING MIN(order_count) < 0";
 			}else{
 				havingCond = "";
