@@ -68,33 +68,33 @@ public class QueryHistoryAdvAction extends Action {
 			// combine the operator and filter value
 			String filterCondition = "";
 			if (!timeBegin.equals("")) {
-				filterCondition = " AND order_date>='"
+				filterCondition = " AND A.order_date>='"
 						+ new SimpleDateFormat("yyyy-MM-dd").format(new Date())
 						+ " " + timeBegin + "'";
 			}
 			;
 
 			if (!timeEnd.equals("")) {
-				filterCondition = filterCondition + " AND order_date<='"
+				filterCondition = filterCondition + " AND A.order_date<='"
 						+ new SimpleDateFormat("yyyy-MM-dd").format(new Date())
 						+ " " + timeEnd + "'";
 			}
 			;
 
 			if (!amountBegin.equals("")) {
-				filterCondition = filterCondition + " AND total_price>="
+				filterCondition = filterCondition + " AND A.total_price>="
 						+ amountBegin;
 			}
 			;
 
 			if (!amountEnd.equals("")) {
-				filterCondition = filterCondition + " AND total_price<="
+				filterCondition = filterCondition + " AND A.total_price<="
 						+ amountEnd;
 			}
 			;
 
 			if (!tableNumber.equals("")) {
-				filterCondition = filterCondition + " AND table_id="
+				filterCondition = filterCondition + " AND A.table_alias="
 						+ tableNumber;
 			}
 			;
@@ -102,12 +102,12 @@ public class QueryHistoryAdvAction extends Action {
 			// db:[ [ "1", "现金" ], [ "2", "刷卡" ], [ "3", "会员卡" ],[ "4", "签单" ],
 			// [ "5", "挂账" ] ]
 			if (!payManner.equals("6")) {
-				filterCondition = filterCondition + " AND type=" + payManner;
+				filterCondition = filterCondition + " AND A.type=" + payManner;
 			}
 
 			// db:[ [ "1", "一般" ], [ "2", "外卖" ], [ "3", "并台" ], [ "4", "拼台" ] ]
 			if (!tableType.equals("6")) {
-				filterCondition = filterCondition + " AND category="
+				filterCondition = filterCondition + " AND A.category="
 						+ tableType;
 			}
 
@@ -155,7 +155,7 @@ public class QueryHistoryAdvAction extends Action {
 				 * "就餐人数", "最低消", "服务费率", "会员编号", "会员姓名", "账单备注",
 				 * "赠券金额", "结帐类型", "折扣类型", "服务员", 是否反結帳, 是否折扣, 是否赠送, 是否退菜]
 				 */
-				String jsonOrder = "[\"$(order_id)\",\"$(table_id)\",\"$(order_date)\",\"$(order_cate)\","
+				String jsonOrder = "[\"$(order_id)\",\"$(table_alias)\",\"$(order_date)\",\"$(order_cate)\","
 						+ "\"$(pay_manner)\",\"$(total_price)\",\"$(actual_income)\","
 						+ "\"$(table2_id)\",\"$(custom_num)\",\"$(min_cost)\","
 						+ "\"$(service_rate)\",\"$(member_id)\",\"$(member)\",\"$(comment)\","
@@ -163,8 +163,8 @@ public class QueryHistoryAdvAction extends Action {
 						+ "$(isPaid),$(isDiscount),$(isGift),$(isCancel)]";
 				jsonOrder = jsonOrder.replace("$(order_id)",
 						Long.toString(dbCon.rs.getLong("id")));
-				jsonOrder = jsonOrder.replace("$(table_id)",
-						Integer.toString(dbCon.rs.getInt("table_id")));
+				jsonOrder = jsonOrder.replace("$(table_alias)",
+						Integer.toString(dbCon.rs.getInt("table_alias")));
 				jsonOrder = jsonOrder.replace("$(order_date)",
 						new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 								.format(dbCon.rs.getTimestamp("order_date")));

@@ -41,8 +41,12 @@ public class QueryTodayAction extends Action {
 			 * The parameters looks like below.
 			 * 1st example, filter the order whose id equals 321 
 			 * pin=0x1 & type=1 & ope=1 & value=321
+			 * 
 			 * 2nd example, filter the order date greater than or equal 2011-7-14 14:30:00
 			 * pin=0x1 & type=3 & ope=2 & value=2011-7-14 14:30:00
+			 * 
+			 * 3rd example, filter the orders have been paid before
+			 * pin=0x1 & havingCond=1
 			 * 
 			 * pin : the pin the this terminal
 			 * type : the type is one of the values below.
@@ -60,6 +64,12 @@ public class QueryTodayAction extends Action {
 			 * 		  2 - 大于等于
 			 * 		  3 - 小于等于
 			 * value : the value to search, the content is depending on the type
+			 * havingCond : the having condition is one of the values below.
+			 * 		  0 - 无
+			 * 		  1 - 有反结帐
+			 * 		  2 - 有折扣
+			 * 		  3 - 有赠送
+			 * 		  4 - 有退菜	
 			 */
 			String pin = request.getParameter("pin");
 			
@@ -96,30 +106,49 @@ public class QueryTodayAction extends Action {
 			
 			if(type == 1){
 				//按账单号
-				filterCondition = " AND id" + ope + filterVal;
+				filterCondition = " AND A.id" + ope + filterVal;
 			}else if(type == 2){
 				//按台号
-				filterCondition = " AND table_id" + ope + filterVal;
+				filterCondition = " AND A.table_alias" + ope + filterVal;
 			}else if(type == 3){
 				//按日期时间
-				filterCondition = " AND order_date" + ope + "'" + filterVal + "'"; 
+				filterCondition = " AND A.order_date" + ope + "'" + filterVal + "'"; 
 			}else if(type == 4){
 				//按类型
-				filterCondition = " AND category" + ope + filterVal;
+				filterCondition = " AND A.category" + ope + filterVal;
 			}else if(type == 5){
 				//按结帐方式
-				filterCondition = " AND type" + ope + filterVal;
+				filterCondition = " AND A.type" + ope + filterVal;
 			}else if(type == 6){
 				//按金额
-				filterCondition = " AND total_price" + ope + filterVal;
+				filterCondition = " AND A.total_price" + ope + filterVal;
 			}else if(type == 7){
 				//按实收
-				filterCondition = " AND total_price_2" + ope + filterVal;
+				filterCondition = " AND A.total_price_2" + ope + filterVal;
 			}else if(type == 8){
 				//按时间
-				filterCondition = " AND order_date" + ope + "'" + new SimpleDateFormat("yyyy-MM-dd").format(new Date()) + " " + filterVal + "'"; 
+				filterCondition = " AND A.order_date" + ope + "'" + new SimpleDateFormat("yyyy-MM-dd").format(new Date()) + " " + filterVal + "'"; 
 			}else{
 				filterCondition = "";
+			}
+			
+			//get the having condition to filter
+			int cond = Integer.parseInt(request.getParameter("havingCond"));
+			String havingCond = null;
+			if(cond == 1){
+				//有反结帐
+				havingCond = "HAVING SUM(IF(B.is_paid, 1, 0)) > 0";
+			}else if(cond == 2){
+				//有折扣
+				havingCond = "HAVING MIN(B.discount) < 1";
+			}else if(cond == 3){
+				//有赠送
+				havingCond = "HAVING SUM(B.food_status & " + Food.GIFT + ") > 0";
+			}else if(cond == 4){
+				//有退菜
+				havingCond = "HAVING MIN(order_count) < 0";
+			}else{
+				havingCond = "";
 			}
 			
 			/**
@@ -147,7 +176,8 @@ public class QueryTodayAction extends Action {
 					 " AND A.restaurant_id=" + term.restaurant_id + " " +
 					 " AND A.total_price IS NOT NULL" +
 					 filterCondition +
-					 " GROUP BY A.id " ;
+					 " GROUP BY A.id " +
+					 havingCond;
 
 			
 //			String sql = "SELECT a.minimum_cost, b.* FROM " + Params.dbName + ".table a, " + Params.dbName + ".order b" +
@@ -174,13 +204,13 @@ public class QueryTodayAction extends Action {
 				 * "就餐人数", "最低消", "服务费率", "会员编号", "会员姓名", "账单备注",
 				 * "赠券金额", "结帐类型", "折扣类型", "服务员", 是否反結帳, 是否折扣, 是否赠送, 是否退菜]
 				 */
-				String jsonOrder = "[\"$(order_id)\",\"$(table_id)\",\"$(order_date)\",\"$(order_cate)\"," +
+				String jsonOrder = "[\"$(order_id)\",\"$(table_alias)\",\"$(order_date)\",\"$(order_cate)\"," +
 								   "\"$(pay_manner)\",\"$(total_price)\",\"$(actual_income)\"," +
 								   "\"$(table2_id)\",\"$(custom_num)\",\"$(min_cost)\"," +
 								   "\"$(service_rate)\",\"$(member_id)\",\"$(member)\",\"$(comment)\"," +
 								   "\"$(gift_price)\",\"$(pay_type)\",\"$(discount_type)\",\"$(waiter)\",$(isPaid)]";
 				jsonOrder = jsonOrder.replace("$(order_id)", Long.toString(dbCon.rs.getLong("id")));
-				jsonOrder = jsonOrder.replace("$(table_id)", Integer.toString(dbCon.rs.getInt("table_alias")));
+				jsonOrder = jsonOrder.replace("$(table_alias)", Integer.toString(dbCon.rs.getInt("table_alias")));
 				jsonOrder = jsonOrder.replace("$(order_date)", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(dbCon.rs.getTimestamp("order_date")));
 				jsonOrder = jsonOrder.replace("$(order_cate)", Util.toOrderCate(dbCon.rs.getShort("category")));
 				jsonOrder = jsonOrder.replace("$(pay_manner)", Util.toPayManner(dbCon.rs.getShort("type")));
