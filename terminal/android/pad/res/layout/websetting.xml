@@ -8,7 +8,7 @@
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.8"
+        android:layout_weight="0.5"
         android:background="@drawable/av_r1_c1" >
 
         <Button
@@ -37,7 +37,7 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="0dp"
-        android:layout_weight="8.5"
+        android:layout_weight="8.8"
         android:background="@drawable/setting_bg"
         android:orientation="vertical"
         android:weightSum="10.7" >
@@ -45,7 +45,7 @@
         <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="0dp"
-            android:layout_weight="1.2"
+            android:layout_weight="1.3"
             android:background="@drawable/head_title_bg"
             android:gravity="center_vertical" >
 
@@ -236,7 +236,7 @@
         <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="0dp"
-            android:layout_weight="1.2"
+            android:layout_weight="1.3"
             android:background="@drawable/head_title_bg"
             android:gravity="center_vertical" >
 

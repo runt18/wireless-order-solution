@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:background="#FFFFFF"
+    android:weightSum="10" >
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.5"
+        android:background="@drawable/av_r1_c1" >
+
+        <Button
+            android:id="@+id/back_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dip"
+            android:background="@drawable/av_back_selector" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:shadowColor="#000000"
+            android:shadowDy="-2"
+            android:shadowRadius="1"
+            android:text="关于"
+            android:textColor="#ffffff"
+            android:textSize="23sp" />
+    </RelativeLayout>
+    
+    <TextView
+        android:id="@+id/software"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dip"
+        android:layout_weight="0.5"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="0.5"
+        android:textColor="#000000"
+        android:textSize="18sp"
+        android:typeface="sans" />
+
+    <RelativeLayout
+        android:id="@+id/content"
+        android:layout_width="wrap_content"
+        android:layout_height="0dip"
+        android:paddingBottom="20dip"
+        android:paddingLeft="10dip"
+        android:paddingRight="10dip"
+        android:layout_weight="8"
+        android:paddingTop="20dip" >
+
+        <TextView
+            android:id="@+id/contents"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="0.5"
+            android:textColor="#000000"
+            android:textSize="15sp"
+            android:typeface="sans" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/company"
+        android:layout_width="wrap_content"
+        android:layout_height="0dip"
+        android:layout_weight="1"
+        android:layout_gravity="center"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="0.5"
+        android:text="版权所有(c) 广州智易科技有限公司"
+        android:textColor="#000000"
+        android:textSize="18sp"
+        android:typeface="sans" />
+
+</LinearLayout>

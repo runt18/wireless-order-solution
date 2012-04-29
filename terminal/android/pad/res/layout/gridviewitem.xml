@@ -12,7 +12,7 @@
     <FrameLayout
         android:id="@+id/item1"
         android:layout_width="98dip"
-        android:layout_height="74dip"
+        android:layout_height="70dip"
         android:background="@drawable/av_r39_c15" >
 
         <TextView
@@ -34,7 +34,7 @@
     <FrameLayout
         android:id="@+id/item4"
         android:layout_width="98dip"
-        android:layout_height="22dip"
+        android:layout_height="20dip"
         android:background="@drawable/av_r42_c15" >
 
         <TextView
@@ -42,7 +42,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="餐台名称"
+            android:textSize="18sp"
             android:textColor="#000000" />
     </FrameLayout>
 

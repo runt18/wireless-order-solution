@@ -137,6 +137,12 @@
             android:layout_centerInParent="true"
             android:orientation="horizontal" >
 
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/tableicon" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -207,55 +213,71 @@
         android:id="@+id/center_area"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
-        android:layout_weight="7.8"
-        android:background="@drawable/av_r19_c1" >
+        android:layout_weight="7.9" >
 
-        <LinearLayout
-            android:id="@+id/affiche"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top"
-            android:layout_margin="10dip"
-            android:background="#00000000"
-            android:orientation="horizontal" >
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dip"
-                android:layout_marginRight="10dip"
-                android:background="@drawable/av_r23_c33" />
-
-            <com.wireless.view.MarqueeText
-                android:id="@+id/notice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ellipsize="marquee"
-                android:focusable="true"
-                android:layout_gravity="center_horizontal"
-                android:focusableInTouchMode="true"
-                android:lines="1"
-                android:marqueeRepeatLimit="marquee_forever"
-                android:scrollHorizontally="true"
-                android:textColor="#ffffff"
-                android:textSize="16sp" />
-        </LinearLayout>
-
-        <com.wireless.view.ScrollLayout
-            android:id="@+id/tableFlipper"
+        <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_gravity="center" />
+            android:background="@drawable/av_r19_c1" >
 
-        <LinearLayout
-            android:id="@+id/page_point"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center_horizontal"
-            android:layout_marginBottom="10dip"
-            android:gravity="center"
-            android:orientation="horizontal" >
-        </LinearLayout>
+            <LinearLayout
+                android:id="@+id/page_point"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="bottom|center_horizontal"
+                android:layout_marginBottom="10dip"
+                android:gravity="center"
+                android:orientation="horizontal" >
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/affiche"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_gravity="top"
+                android:layout_margin="10dip"
+                android:background="#00000000"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dip"
+                    android:layout_marginRight="10dip"
+                    android:background="@drawable/av_r23_c33" />
+
+                <com.wireless.view.MarqueeText
+                    android:id="@+id/notice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:ellipsize="marquee"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:lines="1"
+                    android:marqueeRepeatLimit="marquee_forever"
+                    android:scrollHorizontally="true"
+                    android:textColor="#ffffff"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <com.wireless.view.ScrollLayout
+                android:id="@+id/tableFlipper"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center" />
+
+            <TextSwitcher
+                android:id="@+id/switcher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" 
+                android:layout_centerInParent="true"
+                />
+        </RelativeLayout>
     </FrameLayout>
 
     <!-- 区域4 公告信息部分 -->
@@ -266,14 +288,14 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="0dip"
-        android:layout_weight="1"
+        android:layout_weight="0.9"
         android:background="@drawable/av_r47_c1"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingTop="5dip"
         android:paddingBottom="5dip"
         android:paddingLeft="12dip"
         android:paddingRight="8dip"
+        android:paddingTop="5dip"
         android:weightSum="10" >
 
         <FrameLayout
@@ -319,7 +341,7 @@
 
             <Button
                 android:id="@+id/bottomFirstBtn"
-                android:layout_width="wrap_content"
+                android:layout_width="0dip"
                 android:layout_height="fill_parent"
                 android:layout_marginRight="15dip"
                 android:layout_weight="1"
@@ -333,7 +355,7 @@
 
             <Button
                 android:id="@+id/region_1"
-                android:layout_width="wrap_content"
+                android:layout_width="0dip"
                 android:layout_height="fill_parent"
                 android:layout_marginRight="15dip"
                 android:layout_weight="1"
@@ -347,7 +369,7 @@
 
             <Button
                 android:id="@+id/region_2"
-                android:layout_width="wrap_content"
+                android:layout_width="0dip"
                 android:layout_height="fill_parent"
                 android:layout_marginRight="15dip"
                 android:layout_weight="1"
@@ -361,7 +383,7 @@
 
             <Button
                 android:id="@+id/region_3"
-                android:layout_width="wrap_content"
+                android:layout_width="0dip"
                 android:layout_height="fill_parent"
                 android:layout_marginRight="15dip"
                 android:layout_weight="1"
@@ -375,7 +397,7 @@
 
             <Button
                 android:id="@+id/region_4"
-                android:layout_width="wrap_content"
+                android:layout_width="0dip"
                 android:layout_height="fill_parent"
                 android:layout_marginRight="15dip"
                 android:layout_weight="1"
@@ -389,7 +411,7 @@
 
             <Button
                 android:id="@+id/region_5"
-                android:layout_width="wrap_content"
+                android:layout_width="0dip"
                 android:layout_height="fill_parent"
                 android:layout_marginRight="15dip"
                 android:layout_weight="1"
@@ -403,7 +425,7 @@
 
             <Button
                 android:id="@+id/region_6"
-                android:layout_width="wrap_content"
+                android:layout_width="0dip"
                 android:layout_height="fill_parent"
                 android:layout_marginRight="15dip"
                 android:layout_weight="1"
@@ -417,7 +439,7 @@
 
             <Button
                 android:id="@+id/region_7"
-                android:layout_width="wrap_content"
+                android:layout_width="0dip"
                 android:layout_height="fill_parent"
                 android:layout_marginRight="15dip"
                 android:layout_weight="1"
@@ -431,7 +453,7 @@
 
             <Button
                 android:id="@+id/region_8"
-                android:layout_width="wrap_content"
+                android:layout_width="0dip"
                 android:layout_height="fill_parent"
                 android:layout_marginRight="15dip"
                 android:layout_weight="1"
@@ -445,7 +467,7 @@
 
             <Button
                 android:id="@+id/region_9"
-                android:layout_width="wrap_content"
+                android:layout_width="0dip"
                 android:layout_height="fill_parent"
                 android:layout_marginRight="15dip"
                 android:layout_weight="1"
@@ -459,7 +481,7 @@
 
             <Button
                 android:id="@+id/region_10"
-                android:layout_width="wrap_content"
+                android:layout_width="0dip"
                 android:layout_height="fill_parent"
                 android:layout_marginRight="15dip"
                 android:layout_weight="1"
