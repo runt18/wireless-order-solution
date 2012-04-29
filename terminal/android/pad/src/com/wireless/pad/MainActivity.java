@@ -31,6 +31,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
@@ -42,8 +45,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.TextSwitcher;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ViewSwitcher;
 
 import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
@@ -68,7 +73,7 @@ import com.wireless.sccon.ServerConnector;
 import com.wireless.view.ScrollLayout;
 import com.wireless.view.ScrollLayout.OnViewChangedListner;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements ViewSwitcher.ViewFactory {
 
 	private Handler _handler = new Handler() {
 		@Override
@@ -79,14 +84,14 @@ public class MainActivity extends Activity {
 				Iterator<Table> iter = tmpTbls.iterator();
 				while (iter.hasNext()) {
 					Table table = iter.next();
-					if(_curTblStatus != ALL_STATUS){
-						if(table.status != _curTblStatus){
+					if (_curTblStatus != ALL_STATUS) {
+						if (table.status != _curTblStatus) {
 							iter.remove();
 							continue;
 						}
 					}
-					if(_curRegion != ALL_REGION){
-						if(table.regionID != _curRegion){
+					if (_curRegion != ALL_REGION) {
+						if (table.regionID != _curRegion) {
 							iter.remove();
 							continue;
 						}
@@ -101,16 +106,19 @@ public class MainActivity extends Activity {
 			}
 		}
 	};
-	
+
 	private final static short ALL_STATUS = Short.MIN_VALUE;
-	private short _curTblStatus = ALL_STATUS;				//当前要筛选的餐台状态，小于0表示全部状态
+	private short _curTblStatus = ALL_STATUS; // 当前要筛选的餐台状态，小于0表示全部状态
 	private final static short ALL_REGION = Short.MIN_VALUE;
-	private short _curRegion = ALL_REGION;					//当前要筛选的餐台区域，小于0表示全部区域		
+	private short _curRegion = ALL_REGION; // 当前要筛选的餐台区域，小于0表示全部区域
 
 	private final static int TABLE_AMOUNT_PER_PAGE = 24; // 每页要显示餐台数量
 
+	private Button highLightBtn; // 保存上一次高亮的按钮
+	private TextSwitcher mSwitcher;
+
 	private final static int NETWORK_SET = 0;
-	
+
 	private StaffTerminal _staff;
 
 	private ScrollLayout _tblScrolledArea; // 餐台显示区域
@@ -123,26 +131,61 @@ public class MainActivity extends Activity {
 	private final static int FILTER_TABLE_BY_COND = 0; //
 	private final static int REDRAW_RESTAURANT = 2; //
 
-	//private float mStartX, mEndX; // 滑动切换页码时记录的X坐标值
+	// private float mStartX, mEndX; // 滑动切换页码时记录的X坐标值
 
 	private void init() {
-		
-		//全部刷新Button
-		((Button)findViewById(R.id.reAll_btn)).setOnClickListener(new View.OnClickListener() {			
+
+		// 全部刷新Button
+		((Button) findViewById(R.id.reAll_btn))
+				.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						_curRegion = ALL_REGION;
+						_curTblStatus = ALL_STATUS;
+						((TextView) findViewById(R.id.regionsInfo_txt))
+								.setText("全部区域");
+						((TextView) findViewById(R.id.tablestatus_txt))
+								.setText("(全部)");
+						_handler.sendEmptyMessage(FILTER_TABLE_BY_COND);
+					}
+				});
+
+		mSwitcher = (TextSwitcher) findViewById(R.id.switcher);
+		mSwitcher.setFactory(this);
+
+		Animation in = AnimationUtils.loadAnimation(this,
+				R.anim.sw);
+		in.setAnimationListener(new AnimationListener() {
+			
 			@Override
-			public void onClick(View v) {
-				_curRegion = ALL_REGION;
-				_curTblStatus = ALL_STATUS;
-				((TextView)findViewById(R.id.regionsInfo_txt)).setText("全部区域");
-				((TextView)findViewById(R.id.tablestatus_txt)).setText("(全部)");
-				_handler.sendEmptyMessage(FILTER_TABLE_BY_COND);
+			public void onAnimationStart(Animation animation) {
+				// TODO Auto-generated method stub
+				mSwitcher.setVisibility(View.VISIBLE);
+			}
+			
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				// TODO Auto-generated method stub
+				mSwitcher.setVisibility(View.INVISIBLE);
 			}
 		});
-		
-		//显示餐台的scroll view group
+//		Animation out = AnimationUtils.loadAnimation(this,
+//				R.anim.swout);
+		mSwitcher.setInAnimation(in);
+//		mSwitcher.setOutAnimation(out);
+
+		// 显示餐台的scroll view group
 		_tblScrolledArea = (ScrollLayout) findViewById(R.id.tableFlipper);
-		_tblScrolledArea.getLayoutParams().height = this.getWindowManager().getDefaultDisplay().getHeight() * 2 / 3;
-		_tblScrolledArea.setOnViewChangedListener(new OnViewChangedListner() {			@Override
+		_tblScrolledArea.getLayoutParams().height = this.getWindowManager()
+				.getDefaultDisplay().getHeight() * 2 / 3;
+		_tblScrolledArea.setOnViewChangedListener(new OnViewChangedListner() {
+			@Override
 			public void onViewChanged(int curScreen, View parent, View curView) {
 				reflashPageIndictor();
 			}
@@ -166,51 +209,58 @@ public class MainActivity extends Activity {
 		popWnd.setOutsideTouchable(true);
 		popWnd.setBackgroundDrawable(new BitmapDrawable());
 		popWnd.update();
-		
-		//餐台状态弹出View中的“全部”Button
-		((Button)tblStatusPopupView.findViewById(R.id.statusAll)).setOnClickListener(new View.OnClickListener() {			
-			@Override
-			public void onClick(View v) {
-				_curTblStatus = ALL_STATUS;
-				((TextView)findViewById(R.id.tablestatus_txt)).setText("(全部)");
-				popWnd.dismiss();
-				_handler.sendEmptyMessage(FILTER_TABLE_BY_COND);
-			}
-		});
-		
-		//餐台状态弹出View中的“空闲”Button
-		((Button)tblStatusPopupView.findViewById(R.id.statusNobody)).setOnClickListener(new View.OnClickListener() {			
-			@Override
-			public void onClick(View v) {
-				_curTblStatus = Table.TABLE_IDLE;
-				((TextView)findViewById(R.id.tablestatus_txt)).setText("(空闲)");
-				popWnd.dismiss();
-				_handler.sendEmptyMessage(FILTER_TABLE_BY_COND);
-			}
-		});
-		
-		//餐台状态弹出View中的“就餐”Button
-		((Button)tblStatusPopupView.findViewById(R.id.statusBusy)).setOnClickListener(new View.OnClickListener() {			
-			@Override
-			public void onClick(View v) {
-				_curTblStatus = Table.TABLE_BUSY;
-				((TextView)findViewById(R.id.tablestatus_txt)).setText("(就餐)");
-				popWnd.dismiss();
-				_handler.sendEmptyMessage(FILTER_TABLE_BY_COND);
-			}
-		});
-		
-		//响应餐台筛选状态的Click事件
-		((FrameLayout)findViewById(R.id.showPopWindow)).setOnClickListener(new View.OnClickListener() {			
-			@Override
-			public void onClick(View v) {
-				if(popWnd.isShowing()){
-					popWnd.dismiss();
-				}else{
-					popWnd.showAsDropDown(v);
-				}
-			}
-		});
+
+		// 餐台状态弹出View中的“全部”Button
+		((Button) tblStatusPopupView.findViewById(R.id.statusAll))
+				.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						_curTblStatus = ALL_STATUS;
+						((TextView) findViewById(R.id.tablestatus_txt))
+								.setText("(全部)");
+						popWnd.dismiss();
+						_handler.sendEmptyMessage(FILTER_TABLE_BY_COND);
+					}
+				});
+
+		// 餐台状态弹出View中的“空闲”Button
+		((Button) tblStatusPopupView.findViewById(R.id.statusNobody))
+				.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						_curTblStatus = Table.TABLE_IDLE;
+						((TextView) findViewById(R.id.tablestatus_txt))
+								.setText("(空闲)");
+						popWnd.dismiss();
+						_handler.sendEmptyMessage(FILTER_TABLE_BY_COND);
+					}
+				});
+
+		// 餐台状态弹出View中的“就餐”Button
+		((Button) tblStatusPopupView.findViewById(R.id.statusBusy))
+				.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						_curTblStatus = Table.TABLE_BUSY;
+						((TextView) findViewById(R.id.tablestatus_txt))
+								.setText("(就餐)");
+						popWnd.dismiss();
+						_handler.sendEmptyMessage(FILTER_TABLE_BY_COND);
+					}
+				});
+
+		// 响应餐台筛选状态的Click事件
+		((FrameLayout) findViewById(R.id.showPopWindow))
+				.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						if (popWnd.isShowing()) {
+							popWnd.dismiss();
+						} else {
+							popWnd.showAsDropDown(v);
+						}
+					}
+				});
 
 		// 餐台状态弹出View中的“全部”Button
 		((Button) tblStatusPopupView.findViewById(R.id.statusAll))
@@ -329,7 +379,9 @@ public class MainActivity extends Activity {
 
 		// 弹出登陆对话框(登陆操作)
 		if (WirelessOrder.staffs != null) {
-			long pin = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).getLong(Params.STAFF_PIN, Params.DEF_STAFF_PIN);
+			long pin = getSharedPreferences(Params.PREFS_NAME,
+					Context.MODE_PRIVATE).getLong(Params.STAFF_PIN,
+					Params.DEF_STAFF_PIN);
 			if (pin == Params.DEF_STAFF_PIN) {
 				/**
 				 * Show the login dialog if logout before.
@@ -380,10 +432,10 @@ public class MainActivity extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// TODO Auto-generated method stub
-		switch(item.getItemId()){
+		switch (item.getItemId()) {
 		// 点击跳转设置页面
 		case R.id.menu_set:
-			Intent intent = new Intent(this, WebSettingActivity.class);
+			Intent intent = new Intent(MainActivity.this, WebSettingActivity.class);
 			startActivityForResult(intent, NETWORK_SET);
 			// finish();
 			break;
@@ -391,6 +443,13 @@ public class MainActivity extends Activity {
 		case R.id.menu_update:
 			// new QueryMenuTask().execute();
 			break;
+			
+		//关于界面
+		case R.id.menu_abount:
+			Intent aboutintent = new Intent(MainActivity.this,AboutActivity.class);
+			startActivity(aboutintent);
+			break;
+			
 
 		}
 		return true;
@@ -409,7 +468,7 @@ public class MainActivity extends Activity {
 			} else {
 				billBoard.setText("");
 			}
-			
+
 			TextView userName = (TextView) findViewById(R.id.username_value);
 			if (_staff != null) {
 				if (_staff.name != null) {
@@ -459,6 +518,7 @@ public class MainActivity extends Activity {
 				.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
+						hightLightBtn((Button) v);
 						_curRegion = Short.MIN_VALUE;
 						_curTblStatus = Short.MIN_VALUE;
 						((TextView) findViewById(R.id.regionsInfo_txt))
@@ -472,6 +532,7 @@ public class MainActivity extends Activity {
 		View.OnClickListener regionClickListener = new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				hightLightBtn((Button) v);
 				_curRegion = (Short) v.getTag();
 				((TextView) findViewById(R.id.regionsInfo_txt))
 						.setText(((Button) v).getText());
@@ -655,12 +716,19 @@ public class MainActivity extends Activity {
 		View.OnClickListener regionClickListener = new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				((EditText) findViewById(R.id.inputTableId))
-						.append(((Button) v).getText().toString());
+				String numtext = ((Button) v).getText().toString();
+				// 此处在屏幕中间显示数字
+				mSwitcher.setVisibility(View.VISIBLE);
+				mSwitcher.setText(numtext);
+				((EditText) findViewById(R.id.inputTableId)).append(numtext);
 			}
 		};
 
 		if (WirelessOrder.regions != null) {
+			if(highLightBtn != null){
+				highLightBtn.setBackgroundResource(R.drawable.av_bottombtn_selector);
+				highLightBtn.setPadding(0, 0, 0, 0);
+			}
 			// 设置0-9的数字按钮和响应事件
 			((Button) findViewById(R.id.region_1)).setText("0");
 			((Button) findViewById(R.id.region_1)).setTag(0);
@@ -803,11 +871,11 @@ public class MainActivity extends Activity {
 	 */
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		//如果从设定Activity返回，则重新请求员工信息
-		if(requestCode == NETWORK_SET ){
-		     if(resultCode == RESULT_OK){
-		    	 //重新请求员工信息并更新菜谱
-		    	 ReqPackage.setGen(new PinGen(){
+		// 如果从设定Activity返回，则重新请求员工信息
+		if (requestCode == NETWORK_SET) {
+			if (resultCode == RESULT_OK) {
+				// 重新请求员工信息并更新菜谱
+				ReqPackage.setGen(new PinGen() {
 					@Override
 					public long getDeviceId() {
 						return WirelessOrder.pin;
@@ -816,14 +884,14 @@ public class MainActivity extends Activity {
 					@Override
 					public short getDeviceType() {
 						return Terminal.MODEL_ANDROID;
-					}		    		 
-		    	 });
-		    	 new QueryStaffTask(true).execute();
-		     }
+					}
+				});
+				new QueryStaffTask(true).execute();
+			}
 		}
 		super.onActivityResult(requestCode, resultCode, data);
 	}
-	
+
 	/**
 	 * 刷新页码指示器
 	 */
@@ -966,7 +1034,7 @@ public class MainActivity extends Activity {
 			setTitle("请输入账号与密码");
 			final EditText pwdEdtTxt = (EditText) findViewById(R.id.pwd);
 			final EditText staffTxtView = (EditText) findViewById(R.id.staffname);
-			
+
 			/**
 			 * 帐号输入框显示员工列表
 			 */
@@ -976,20 +1044,23 @@ public class MainActivity extends Activity {
 					if (_popupWindow.isShowing()) {
 						_popupWindow.dismiss();
 					} else {
-						_popupWindow.showAsDropDown(findViewById(R.id.staffname), 0, -7);
+						_popupWindow.showAsDropDown(
+								findViewById(R.id.staffname), 0, -7);
 					}
 				}
 			});
 
 			// 获取自定义布局文件的视图
-			View popupWndView = getLayoutInflater().inflate(R.layout.loginpopuwindow, null, false);
+			View popupWndView = getLayoutInflater().inflate(
+					R.layout.loginpopuwindow, null, false);
 			// 创建PopupWindow实例
 			_popupWindow = new PopupWindow(popupWndView, 320, 200, true);
 			_popupWindow.setOutsideTouchable(true);
 			_popupWindow.setFocusable(true);
 			_popupWindow.setBackgroundDrawable(new BitmapDrawable());
 			_popupWindow.update();
-			ListView staffLstView = (ListView) popupWndView.findViewById(R.id.loginpopuwindow);
+			ListView staffLstView = (ListView) popupWndView
+					.findViewById(R.id.loginpopuwindow);
 			_staffAdapter = new StaffsAdapter();
 			staffLstView.setAdapter(_staffAdapter);
 
@@ -1390,105 +1461,104 @@ public class MainActivity extends Activity {
 	}
 
 	/**
-	 * 请求查询员工信息 
+	 * 请求查询员工信息
 	 */
-	private class QueryStaffTask extends AsyncTask<Void, Void, String>{
-		
+	private class QueryStaffTask extends AsyncTask<Void, Void, String> {
+
 		private ProgressDialog _progDialog;
-		
+
 		private boolean _isTableUpdate;
-		
-		QueryStaffTask(boolean isMenuUpdate){
+
+		QueryStaffTask(boolean isMenuUpdate) {
 			_isTableUpdate = isMenuUpdate;
 		}
-		
+
 		/**
 		 * 执行员工信息请求前显示提示信息
 		 */
 		@Override
-		protected void onPreExecute(){
+		protected void onPreExecute() {
 
-			_progDialog = ProgressDialog.show(MainActivity.this, "", "正在更新员工信息...请稍后", true);
+			_progDialog = ProgressDialog.show(MainActivity.this, "",
+					"正在更新员工信息...请稍后", true);
 		}
-		
+
 		/**
 		 * 在新的线程中执行请求员工信息的操作
 		 */
 		@Override
-		protected String doInBackground(Void... arg0){
+		protected String doInBackground(Void... arg0) {
 			String errMsg = null;
-			try{
+			try {
 				WirelessOrder.staffs = null;
-				ReqPackage.setGen(new PinGen(){
+				ReqPackage.setGen(new PinGen() {
 					@Override
 					public long getDeviceId() {
 						return WirelessOrder.pin;
 					}
+
 					@Override
 					public short getDeviceType() {
 						return Terminal.MODEL_ANDROID;
-					}				
+					}
 				});
-				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryStaff());
-				if(resp.header.type == Type.ACK){
+				ProtocolPackage resp = ServerConnector.instance().ask(
+						new ReqQueryStaff());
+				if (resp.header.type == Type.ACK) {
 					WirelessOrder.staffs = RespParser.parseQueryStaff(resp);
-				}else{
-					if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
+				} else {
+					if (resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
 						errMsg = "终端没有登记到餐厅，请联系管理人员。";
-					}else if(resp.header.reserved == ErrorCode.TERMINAL_EXPIRED) {
+					} else if (resp.header.reserved == ErrorCode.TERMINAL_EXPIRED) {
 						errMsg = "终端已过期，请联系管理人员。";
-					}else{
+					} else {
 						errMsg = "更新员工信息失败，请检查网络信号或重新连接。";
 					}
 					throw new IOException(errMsg);
 				}
-			}catch(IOException e){
+			} catch (IOException e) {
 				errMsg = e.getMessage();
 			}
 			return errMsg;
 		}
-		
+
 		/**
-		 * 根据返回的error message判断，如果发错异常则提示用户，
-		 * 如果员工信息请求成功，则显示登录Dialog。
+		 * 根据返回的error message判断，如果发错异常则提示用户， 如果员工信息请求成功，则显示登录Dialog。
 		 */
 		@Override
-		protected void onPostExecute(String errMsg){
-			//make the progress dialog disappeared
-			_progDialog.dismiss();		
-			((TextView)findViewById(R.id.username_value)).setText("");
-			((TextView)findViewById(R.id.notice)).setText("");
+		protected void onPostExecute(String errMsg) {
+			// make the progress dialog disappeared
+			_progDialog.dismiss();
+			((TextView) findViewById(R.id.username_value)).setText("");
+			((TextView) findViewById(R.id.notice)).setText("");
 			/**
-			 * Prompt user message if any error occurred,
-			 * otherwise show the login dialog
+			 * Prompt user message if any error occurred, otherwise show the
+			 * login dialog
 			 */
-			if(errMsg != null){
-				new AlertDialog.Builder(MainActivity.this)
-						.setTitle("提示")
-						.setMessage(errMsg)
-						.setPositiveButton("确定", null)
+			if (errMsg != null) {
+				new AlertDialog.Builder(MainActivity.this).setTitle("提示")
+						.setMessage(errMsg).setPositiveButton("确定", null)
 						.show();
-				
-			}else{
-				if(WirelessOrder.staffs == null){
-					new AlertDialog.Builder(MainActivity.this)
-								   .setTitle("提示")
-					               .setMessage("没有查询到任何的员工信息，请在管理后台先添加员工信息")
-					               .setPositiveButton("确定", null)
-					               .show();
-				}else{
-					Editor editor = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).edit();//获取编辑器
+
+			} else {
+				if (WirelessOrder.staffs == null) {
+					new AlertDialog.Builder(MainActivity.this).setTitle("提示")
+							.setMessage("没有查询到任何的员工信息，请在管理后台先添加员工信息")
+							.setPositiveButton("确定", null).show();
+				} else {
+					Editor editor = getSharedPreferences(Params.PREFS_NAME,
+							Context.MODE_PRIVATE).edit();// 获取编辑器
 					editor.putLong(Params.STAFF_PIN, Params.DEF_STAFF_PIN);
 					editor.commit();
 					showDialog(DIALOG_STAFF_LOGIN);
-					if(_isTableUpdate){
+					if (_isTableUpdate) {
 						new QueryTableTask().execute();
 					}
 				}
 			}
-		}	
+		}
 	}
-	
+
 	/**
 	 * 餐台信息的Adapter
 	 * 
@@ -1556,16 +1626,21 @@ public class MainActivity extends Activity {
 				@Override
 				public void onClick(View v) {
 					if (table.status == Table.TABLE_IDLE) {
-						// jump to the order activity with the table parcel in case of idle
-						Intent intent = new Intent(MainActivity.this, OrderActivity.class);
+						// jump to the order activity with the table parcel in
+						// case of idle
+						Intent intent = new Intent(MainActivity.this,
+								OrderActivity.class);
 						Bundle bundle = new Bundle();
-						bundle.putParcelable(TableParcel.KEY_VALUE,	new TableParcel(table));
+						bundle.putParcelable(TableParcel.KEY_VALUE,
+								new TableParcel(table));
 						intent.putExtras(bundle);
 						startActivity(intent);
 
 					} else if (table.status == Table.TABLE_BUSY) {
-						// jump to change order activity with the order in case of busy
-						new QueryOrderTask(table.aliasID, Type.UPDATE_ORDER).execute();
+						// jump to change order activity with the order in case
+						// of busy
+						new QueryOrderTask(table.aliasID, Type.UPDATE_ORDER)
+								.execute();
 					}
 				}
 			});
@@ -1577,37 +1652,53 @@ public class MainActivity extends Activity {
 					if (table.status == Table.TABLE_BUSY) {
 						new AlertDialog.Builder(parent.getContext())
 								.setTitle("请选择" + table.aliasID + "号餐台的操作")
-								.setItems(new String[] { "改单", "转台" }, new DialogInterface.OnClickListener() {									
-									@Override
-									public void onClick(DialogInterface dialog, int which) {
-										if(which == 0){
-											// jump to change order activity with the order in case of busy
-											new QueryOrderTask(table.aliasID, Type.UPDATE_ORDER).execute();
-										}else if(which == 1){
-											
-										}										
-									}
-								})
-								.setNegativeButton("返回", null).show();
+								.setItems(new String[] { "改单", "转台" },
+										new DialogInterface.OnClickListener() {
+											@Override
+											public void onClick(
+													DialogInterface dialog,
+													int which) {
+												if (which == 0) {
+													// jump to change order
+													// activity with the order
+													// in case of busy
+													new QueryOrderTask(
+															table.aliasID,
+															Type.UPDATE_ORDER)
+															.execute();
+												} else if (which == 1) {
+
+												}
+											}
+										}).setNegativeButton("返回", null).show();
 
 					} else if (table.status == Table.TABLE_IDLE) {
 						new AlertDialog.Builder(parent.getContext())
 								.setTitle("请选择" + table.aliasID + "号餐台的操作")
-								.setItems(new String[] { "下单" }, new DialogInterface.OnClickListener() {
-									
-									@Override
-									public void onClick(DialogInterface dialog, int which) {
-										if(which == 0){
-											// jump to the order activity with the table parcel in case of idle
-											Intent intent = new Intent(MainActivity.this, OrderActivity.class);
-											Bundle bundle = new Bundle();
-											bundle.putParcelable(TableParcel.KEY_VALUE,	new TableParcel(table));
-											intent.putExtras(bundle);
-											startActivity(intent);
-										}
-									}
-								})
-								.setNegativeButton("返回", null).show();
+								.setItems(new String[] { "下单" },
+										new DialogInterface.OnClickListener() {
+
+											@Override
+											public void onClick(
+													DialogInterface dialog,
+													int which) {
+												if (which == 0) {
+													// jump to the order
+													// activity with the table
+													// parcel in case of idle
+													Intent intent = new Intent(
+															MainActivity.this,
+															OrderActivity.class);
+													Bundle bundle = new Bundle();
+													bundle.putParcelable(
+															TableParcel.KEY_VALUE,
+															new TableParcel(
+																	table));
+													intent.putExtras(bundle);
+													startActivity(intent);
+												}
+											}
+										}).setNegativeButton("返回", null).show();
 					}
 					return true;
 				}
@@ -1615,5 +1706,34 @@ public class MainActivity extends Activity {
 
 			return view;
 		}
+	}
+
+	/**
+	 * 选择区域时，区域按钮高亮
+	 */
+	private void hightLightBtn(Button btn) {
+		// btn.setBackgroundResource(R.drawable.av_r12_c28_2);
+		if (btn == highLightBtn) {
+			return;
+		}
+		if (highLightBtn == null) {
+			highLightBtn = btn;
+			highLightBtn.setBackgroundResource(R.drawable.av_r12_c28_2);
+			return;
+		}
+		highLightBtn.setBackgroundResource(R.drawable.av_bottombtn_selector);
+		highLightBtn.setPadding(0, 0, 0, 0);
+		highLightBtn = btn;
+		highLightBtn.setBackgroundResource(R.drawable.av_r12_c28_2);
+		highLightBtn.setPadding(0, 0, 0, 0);
+
+	}
+
+	@Override
+	public View makeView() {
+		TextView t = new TextView(this);
+		t.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL);
+		t.setTextSize(70);
+		return t;
 	}
 }
