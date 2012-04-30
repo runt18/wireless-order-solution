@@ -74,7 +74,7 @@ public class StartupActivity extends Activity {
 			editor.commit();//Ìá½»ÐÞ¸Ä
 			
 		}else{		
-			ServerConnector.instance().setNetAddr("122.49.20.170");
+			ServerConnector.instance().setNetAddr(sharedPrefs.getString(Params.IP_ADDR, Params.DEF_IP_ADDR));
 			ServerConnector.instance().setNetPort(sharedPrefs.getInt(Params.IP_PORT, Params.DEF_IP_PORT));
 //			ServerConnector.instance().setNetAPN(_netapn);
 //			ServerConnector.instance().setNetUser(_username);

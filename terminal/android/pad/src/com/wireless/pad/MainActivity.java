@@ -6,6 +6,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -15,6 +17,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences.Editor;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -58,6 +61,7 @@ import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.PinGen;
 import com.wireless.protocol.ProtocolPackage;
+import com.wireless.protocol.Region;
 import com.wireless.protocol.ReqPackage;
 import com.wireless.protocol.ReqQueryOrder;
 import com.wireless.protocol.ReqQueryRegion;
@@ -73,14 +77,13 @@ import com.wireless.sccon.ServerConnector;
 import com.wireless.view.ScrollLayout;
 import com.wireless.view.ScrollLayout.OnViewChangedListner;
 
-public class MainActivity extends Activity implements ViewSwitcher.ViewFactory {
+public class MainActivity extends Activity {
 
 	private Handler _handler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
 			if (msg.what == FILTER_TABLE_BY_COND) {
-				ArrayList<Table> tmpTbls = new ArrayList<Table>(
-						Arrays.asList(WirelessOrder.tables));
+				ArrayList<Table> tmpTbls = new ArrayList<Table>(Arrays.asList(WirelessOrder.tables));
 				Iterator<Table> iter = tmpTbls.iterator();
 				while (iter.hasNext()) {
 					Table table = iter.next();
@@ -107,23 +110,29 @@ public class MainActivity extends Activity implements ViewSwitcher.ViewFactory {
 		}
 	};
 
+	//餐台状态更新Timer
+	private Timer _tblReflashTimer;		
+	
 	private final static short ALL_STATUS = Short.MIN_VALUE;
-	private short _curTblStatus = ALL_STATUS; // 当前要筛选的餐台状态，小于0表示全部状态
+	// 当前要筛选的餐台状态，小于0表示全部状态
+	private short _curTblStatus = ALL_STATUS; 
+	
 	private final static short ALL_REGION = Short.MIN_VALUE;
-	private short _curRegion = ALL_REGION; // 当前要筛选的餐台区域，小于0表示全部区域
+	// 当前要筛选的餐台区域，小于0表示全部区域
+	private short _curRegion = ALL_REGION; 
 
-	private final static int TABLE_AMOUNT_PER_PAGE = 24; // 每页要显示餐台数量
-
-	private Button highLightBtn; // 保存上一次高亮的按钮
-	private TextSwitcher mSwitcher;
+	// 每页要显示餐台数量
+	private final static int TABLE_AMOUNT_PER_PAGE = 24; 
 
 	private final static int NETWORK_SET = 0;
 
 	private StaffTerminal _staff;
 
-	private ScrollLayout _tblScrolledArea; // 餐台显示区域
+	// 餐台显示区域
+	private ScrollLayout _tblScrolledArea; 
 
-	private Table[] _tableSource; // 主界面中用于餐台显示的数据源
+	// 主界面中用于餐台显示的数据源
+	private Table[] _tableSource; 
 
 	private final static int DIALOG_EXIT_APP = 0;
 	private final static int DIALOG_STAFF_LOGIN = 1;
@@ -150,36 +159,6 @@ public class MainActivity extends Activity implements ViewSwitcher.ViewFactory {
 					}
 				});
 
-		mSwitcher = (TextSwitcher) findViewById(R.id.switcher);
-		mSwitcher.setFactory(this);
-
-		Animation in = AnimationUtils.loadAnimation(this,
-				R.anim.sw);
-		in.setAnimationListener(new AnimationListener() {
-			
-			@Override
-			public void onAnimationStart(Animation animation) {
-				// TODO Auto-generated method stub
-				mSwitcher.setVisibility(View.VISIBLE);
-			}
-			
-			@Override
-			public void onAnimationRepeat(Animation animation) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void onAnimationEnd(Animation animation) {
-				// TODO Auto-generated method stub
-				mSwitcher.setVisibility(View.INVISIBLE);
-			}
-		});
-//		Animation out = AnimationUtils.loadAnimation(this,
-//				R.anim.swout);
-		mSwitcher.setInAnimation(in);
-//		mSwitcher.setOutAnimation(out);
-
 		// 显示餐台的scroll view group
 		_tblScrolledArea = (ScrollLayout) findViewById(R.id.tableFlipper);
 		_tblScrolledArea.getLayoutParams().height = this.getWindowManager()
@@ -200,6 +179,44 @@ public class MainActivity extends Activity implements ViewSwitcher.ViewFactory {
 					}
 				});
 
+		//
+		final TextSwitcher numberSwitcher = (TextSwitcher) findViewById(R.id.switcher);
+		numberSwitcher.setFactory(new ViewSwitcher.ViewFactory() {
+			@Override
+			public View makeView() {
+				TextView t = new TextView(MainActivity.this);
+				t.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL);
+				t.setTextSize(100);
+				t.setTextColor(Color.rgb(178, 34, 34));
+				return t;
+			}
+		});
+
+		Animation in = AnimationUtils.loadAnimation(this, R.anim.sw);
+		in.setAnimationListener(new AnimationListener() {
+			
+			@Override
+			public void onAnimationStart(Animation animation) {
+				// TODO Auto-generated method stub
+				numberSwitcher.setVisibility(View.VISIBLE);
+			}
+			
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				// TODO Auto-generated method stub
+				numberSwitcher.setVisibility(View.INVISIBLE);
+			}
+		});
+		numberSwitcher.setInAnimation(in);
+//		numberSwitcher.setInAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
+//		numberSwitcher.setOutAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_out));
+		
 		// 创建点击餐台状态后弹出区域的View
 		final View tblStatusPopupView = getLayoutInflater().inflate(
 				R.layout.main_pop_window, null);
@@ -514,105 +531,88 @@ public class MainActivity extends Activity implements ViewSwitcher.ViewFactory {
 
 		// 设置全部区域
 		((Button) findViewById(R.id.bottomFirstBtn)).setText("全部");
+		((Button) findViewById(R.id.bottomFirstBtn)).setPadding(0, 0, 0, 0);
+
+		// 设置全部区域Button的响应事件
 		((Button) findViewById(R.id.bottomFirstBtn))
 				.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						hightLightBtn((Button) v);
 						_curRegion = Short.MIN_VALUE;
 						_curTblStatus = Short.MIN_VALUE;
-						((TextView) findViewById(R.id.regionsInfo_txt))
-								.setText("全部区域");
-						((TextView) findViewById(R.id.tablestatus_txt))
-								.setText("(全部)");
+						((TextView) findViewById(R.id.regionsInfo_txt)).setText("全部区域");
+						((TextView) findViewById(R.id.tablestatus_txt)).setText("(全部)");
+						highLightRegionBtn();
 						_handler.sendEmptyMessage(FILTER_TABLE_BY_COND);
 					}
 				});
 
+		// 设置每个区域Button的响应事件
 		View.OnClickListener regionClickListener = new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				hightLightBtn((Button) v);
 				_curRegion = (Short) v.getTag();
-				((TextView) findViewById(R.id.regionsInfo_txt))
-						.setText(((Button) v).getText());
+				((TextView) findViewById(R.id.regionsInfo_txt)).setText(((Button) v).getText());
+				highLightRegionBtn();
 				_handler.sendEmptyMessage(FILTER_TABLE_BY_COND);
 			}
 		};
 
 		if (WirelessOrder.regions != null) {
 			// 设置区域按钮文本和响应事件
-			((Button) findViewById(R.id.region_1))
-					.setText(WirelessOrder.regions[0].name);
-			((Button) findViewById(R.id.region_1)).setTag(new Short(
-					WirelessOrder.regions[0].regionID));
-			((Button) findViewById(R.id.region_1))
-					.setOnClickListener(regionClickListener);
+			((Button) findViewById(R.id.region_1)).setText(WirelessOrder.regions[0].name);
+			((Button) findViewById(R.id.region_1)).setTag(new Short(WirelessOrder.regions[0].regionID));
+			((Button) findViewById(R.id.region_1)).setPadding(0, 0, 0, 0);
+			((Button) findViewById(R.id.region_1)).setOnClickListener(regionClickListener);
 
-			((Button) findViewById(R.id.region_2))
-					.setText(WirelessOrder.regions[1].name);
-			((Button) findViewById(R.id.region_2)).setTag(new Short(
-					WirelessOrder.regions[1].regionID));
-			((Button) findViewById(R.id.region_2))
-					.setOnClickListener(regionClickListener);
+			((Button) findViewById(R.id.region_2)).setText(WirelessOrder.regions[1].name);
+			((Button) findViewById(R.id.region_2)).setTag(new Short(WirelessOrder.regions[1].regionID));
+			((Button) findViewById(R.id.region_2)).setPadding(0, 0, 0, 0);
+			((Button) findViewById(R.id.region_2)).setOnClickListener(regionClickListener);
 
-			((Button) findViewById(R.id.region_3))
-					.setText(WirelessOrder.regions[2].name);
-			((Button) findViewById(R.id.region_3)).setTag(new Short(
-					WirelessOrder.regions[2].regionID));
-			((Button) findViewById(R.id.region_3))
-					.setOnClickListener(regionClickListener);
+			((Button) findViewById(R.id.region_3)).setText(WirelessOrder.regions[2].name);
+			((Button) findViewById(R.id.region_3)).setTag(new Short(WirelessOrder.regions[2].regionID));
+			((Button) findViewById(R.id.region_3)).setPadding(0, 0, 0, 0);
+			((Button) findViewById(R.id.region_3)).setOnClickListener(regionClickListener);
 
-			((Button) findViewById(R.id.region_4))
-					.setText(WirelessOrder.regions[3].name);
-			((Button) findViewById(R.id.region_4)).setTag(new Short(
-					WirelessOrder.regions[3].regionID));
-			((Button) findViewById(R.id.region_4))
-					.setOnClickListener(regionClickListener);
+			((Button) findViewById(R.id.region_4)).setText(WirelessOrder.regions[3].name);
+			((Button) findViewById(R.id.region_4)).setTag(new Short(WirelessOrder.regions[3].regionID));
+			((Button) findViewById(R.id.region_4)).setPadding(0, 0, 0, 0);
+			((Button) findViewById(R.id.region_4)).setOnClickListener(regionClickListener);
 
-			((Button) findViewById(R.id.region_5))
-					.setText(WirelessOrder.regions[4].name);
-			((Button) findViewById(R.id.region_5)).setTag(new Short(
-					WirelessOrder.regions[4].regionID));
-			((Button) findViewById(R.id.region_5))
-					.setOnClickListener(regionClickListener);
+			((Button) findViewById(R.id.region_5)).setText(WirelessOrder.regions[4].name);
+			((Button) findViewById(R.id.region_5)).setTag(new Short(WirelessOrder.regions[4].regionID));
+			((Button) findViewById(R.id.region_5)).setPadding(0, 0, 0, 0);
+			((Button) findViewById(R.id.region_5)).setOnClickListener(regionClickListener);
 
-			((Button) findViewById(R.id.region_6))
-					.setText(WirelessOrder.regions[5].name);
-			((Button) findViewById(R.id.region_6)).setTag(new Short(
-					WirelessOrder.regions[5].regionID));
-			((Button) findViewById(R.id.region_6))
-					.setOnClickListener(regionClickListener);
+			((Button) findViewById(R.id.region_6)).setText(WirelessOrder.regions[5].name);
+			((Button) findViewById(R.id.region_6)).setTag(new Short(WirelessOrder.regions[5].regionID));
+			((Button) findViewById(R.id.region_6)).setPadding(0, 0, 0, 0);
+			((Button) findViewById(R.id.region_6)).setOnClickListener(regionClickListener);
 
-			((Button) findViewById(R.id.region_7))
-					.setText(WirelessOrder.regions[6].name);
-			((Button) findViewById(R.id.region_7)).setTag(new Short(
-					WirelessOrder.regions[6].regionID));
-			((Button) findViewById(R.id.region_7))
-					.setOnClickListener(regionClickListener);
+			((Button) findViewById(R.id.region_7)).setText(WirelessOrder.regions[6].name);
+			((Button) findViewById(R.id.region_7)).setTag(new Short(WirelessOrder.regions[6].regionID));
+			((Button) findViewById(R.id.region_7)).setPadding(0, 0, 0, 0);
+			((Button) findViewById(R.id.region_7)).setOnClickListener(regionClickListener);
 
-			((Button) findViewById(R.id.region_8))
-					.setText(WirelessOrder.regions[7].name);
-			((Button) findViewById(R.id.region_8)).setTag(new Short(
-					WirelessOrder.regions[7].regionID));
-			((Button) findViewById(R.id.region_8))
-					.setOnClickListener(regionClickListener);
+			((Button) findViewById(R.id.region_8)).setText(WirelessOrder.regions[7].name);
+			((Button) findViewById(R.id.region_8)).setTag(new Short(WirelessOrder.regions[7].regionID));
+			((Button) findViewById(R.id.region_8)).setPadding(0, 0, 0, 0);
+			((Button) findViewById(R.id.region_8)).setOnClickListener(regionClickListener);
 
-			((Button) findViewById(R.id.region_9))
-					.setText(WirelessOrder.regions[8].name);
-			((Button) findViewById(R.id.region_9)).setTag(new Short(
-					WirelessOrder.regions[8].regionID));
-			((Button) findViewById(R.id.region_9))
-					.setOnClickListener(regionClickListener);
+			((Button) findViewById(R.id.region_9)).setText(WirelessOrder.regions[8].name);
+			((Button) findViewById(R.id.region_9)).setTag(new Short(WirelessOrder.regions[8].regionID));
+			((Button) findViewById(R.id.region_9)).setPadding(0, 0, 0, 0);
+			((Button) findViewById(R.id.region_9)).setOnClickListener(regionClickListener);
 
-			((Button) findViewById(R.id.region_10))
-					.setText(WirelessOrder.regions[9].name);
-			((Button) findViewById(R.id.region_10)).setTag(new Short(
-					WirelessOrder.regions[9].regionID));
-			((Button) findViewById(R.id.region_10))
-					.setOnClickListener(regionClickListener);
+			((Button) findViewById(R.id.region_10)).setText(WirelessOrder.regions[9].name);
+			((Button) findViewById(R.id.region_10)).setTag(new Short(WirelessOrder.regions[9].regionID));
+			((Button) findViewById(R.id.region_10)).setPadding(0, 0, 0, 0);
+			((Button) findViewById(R.id.region_10)).setOnClickListener(regionClickListener);
 
 		}
+		
+		highLightRegionBtn();
 	}
 
 	/**
@@ -703,6 +703,8 @@ public class MainActivity extends Activity implements ViewSwitcher.ViewFactory {
 
 		// 设置取消
 		((Button) findViewById(R.id.bottomFirstBtn)).setText("取消");
+		((Button)findViewById(R.id.bottomFirstBtn)).setBackgroundResource(R.drawable.av_bottombtn_selector);
+		((Button)findViewById(R.id.bottomFirstBtn)).setPadding(0, 0, 0, 0);
 		((Button) findViewById(R.id.bottomFirstBtn))
 				.setOnClickListener(new View.OnClickListener() {
 					@Override
@@ -713,72 +715,72 @@ public class MainActivity extends Activity implements ViewSwitcher.ViewFactory {
 					}
 				});
 
+		
+		//点击数字键Button的响应事件
 		View.OnClickListener regionClickListener = new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				String numtext = ((Button) v).getText().toString();
+				String num = ((Button) v).getText().toString();
 				// 此处在屏幕中间显示数字
-				mSwitcher.setVisibility(View.VISIBLE);
-				mSwitcher.setText(numtext);
-				((EditText) findViewById(R.id.inputTableId)).append(numtext);
+				TextSwitcher numberSwitcher = (TextSwitcher)findViewById(R.id.switcher);
+				numberSwitcher.setVisibility(View.VISIBLE);
+				numberSwitcher.setText(num);
+				((EditText) findViewById(R.id.inputTableId)).append(num);
 			}
 		};
 
 		if (WirelessOrder.regions != null) {
-			if(highLightBtn != null){
-				highLightBtn.setBackgroundResource(R.drawable.av_bottombtn_selector);
-				highLightBtn.setPadding(0, 0, 0, 0);
-			}
+
 			// 设置0-9的数字按钮和响应事件
 			((Button) findViewById(R.id.region_1)).setText("0");
 			((Button) findViewById(R.id.region_1)).setTag(0);
-			((Button) findViewById(R.id.region_1))
-					.setOnClickListener(regionClickListener);
+			((Button) findViewById(R.id.region_1)).setBackgroundResource(R.drawable.av_bottombtn_selector);
+			((Button) findViewById(R.id.region_1)).setOnClickListener(regionClickListener);
 
 			((Button) findViewById(R.id.region_2)).setText("1");
 			((Button) findViewById(R.id.region_2)).setTag(1);
-			((Button) findViewById(R.id.region_2))
-					.setOnClickListener(regionClickListener);
+			((Button) findViewById(R.id.region_3)).setBackgroundResource(R.drawable.av_bottombtn_selector);
+			((Button) findViewById(R.id.region_2)).setOnClickListener(regionClickListener);
 
 			((Button) findViewById(R.id.region_3)).setText("2");
 			((Button) findViewById(R.id.region_3)).setTag(2);
-			((Button) findViewById(R.id.region_3))
-					.setOnClickListener(regionClickListener);
+			((Button) findViewById(R.id.region_3)).setBackgroundResource(R.drawable.av_bottombtn_selector);
+			((Button) findViewById(R.id.region_3)).setOnClickListener(regionClickListener);
 
 			((Button) findViewById(R.id.region_4)).setText("3");
 			((Button) findViewById(R.id.region_4)).setTag(3);
-			((Button) findViewById(R.id.region_4))
-					.setOnClickListener(regionClickListener);
+			((Button) findViewById(R.id.region_4)).setBackgroundResource(R.drawable.av_bottombtn_selector);
+			((Button) findViewById(R.id.region_4)).setOnClickListener(regionClickListener);
 
 			((Button) findViewById(R.id.region_5)).setText("4");
 			((Button) findViewById(R.id.region_5)).setTag(4);
-			((Button) findViewById(R.id.region_5))
-					.setOnClickListener(regionClickListener);
+			((Button) findViewById(R.id.region_5)).setBackgroundResource(R.drawable.av_bottombtn_selector);
+			((Button) findViewById(R.id.region_5)).setOnClickListener(regionClickListener);
 
 			((Button) findViewById(R.id.region_6)).setText("5");
 			((Button) findViewById(R.id.region_6)).setTag(5);
-			((Button) findViewById(R.id.region_6))
-					.setOnClickListener(regionClickListener);
+			((Button) findViewById(R.id.region_6)).setBackgroundResource(R.drawable.av_bottombtn_selector);
+			((Button) findViewById(R.id.region_6)).setOnClickListener(regionClickListener);
 
 			((Button) findViewById(R.id.region_7)).setText("6");
 			((Button) findViewById(R.id.region_7)).setTag(6);
-			((Button) findViewById(R.id.region_7))
-					.setOnClickListener(regionClickListener);
+			((Button) findViewById(R.id.region_7)).setBackgroundResource(R.drawable.av_bottombtn_selector);
+			((Button) findViewById(R.id.region_7)).setOnClickListener(regionClickListener);
 
 			((Button) findViewById(R.id.region_8)).setText("7");
 			((Button) findViewById(R.id.region_8)).setTag(7);
-			((Button) findViewById(R.id.region_8))
-					.setOnClickListener(regionClickListener);
+			((Button) findViewById(R.id.region_8)).setBackgroundResource(R.drawable.av_bottombtn_selector);
+			((Button) findViewById(R.id.region_8)).setOnClickListener(regionClickListener);
 
 			((Button) findViewById(R.id.region_9)).setText("8");
 			((Button) findViewById(R.id.region_9)).setTag(8);
-			((Button) findViewById(R.id.region_9))
-					.setOnClickListener(regionClickListener);
+			((Button) findViewById(R.id.region_9)).setBackgroundResource(R.drawable.av_bottombtn_selector);
+			((Button) findViewById(R.id.region_9)).setOnClickListener(regionClickListener);
 
 			((Button) findViewById(R.id.region_10)).setText("9");
 			((Button) findViewById(R.id.region_10)).setTag(9);
-			((Button) findViewById(R.id.region_10))
-					.setOnClickListener(regionClickListener);
+			((Button) findViewById(R.id.region_10)).setBackgroundResource(R.drawable.av_bottombtn_selector);
+			((Button) findViewById(R.id.region_10)).setOnClickListener(regionClickListener);
 		}
 
 	}
@@ -853,8 +855,7 @@ public class MainActivity extends Activity implements ViewSwitcher.ViewFactory {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		_tableSource = WirelessOrder.tables == null ? new Table[0]
-				: WirelessOrder.tables;
+		_tableSource = WirelessOrder.tables == null ? new Table[0] : WirelessOrder.tables;
 		init();
 	}
 
@@ -866,6 +867,36 @@ public class MainActivity extends Activity implements ViewSwitcher.ViewFactory {
 		new QueryTableTask().execute();
 	}
 
+	@Override
+	protected void onResume(){
+		super.onResume();
+		_tblReflashTimer = new Timer();
+		/**
+		 * 在MIN_PERIOD和MAX_PERIOD之间产生一个随机时间，按照这个时间段来定期更新餐台信息
+		 */
+		final long MIN_PERIOD =  5 * 60 * 1000;
+		final long MAX_PERIOD = 10 * 60 * 1000;
+		_tblReflashTimer.schedule(new TimerTask() {			
+			@Override
+			public void run() {
+				_tblScrolledArea.post(new Runnable(){
+					@Override
+					public void run(){
+						new QueryTableTask().execute();						
+					}					
+				});
+			}
+		}, 
+		Math.round(Math.random() * (MAX_PERIOD - MIN_PERIOD) + MIN_PERIOD), 
+		Math.round(Math.random() * (MAX_PERIOD - MIN_PERIOD) + MIN_PERIOD));
+	}
+	
+	@Override
+	protected void onPause(){
+		super.onPause();
+		_tblReflashTimer.cancel();
+	}
+	
 	/**
 	 * 判断是哪一个Activity返回的
 	 */
@@ -1054,7 +1085,7 @@ public class MainActivity extends Activity implements ViewSwitcher.ViewFactory {
 			View popupWndView = getLayoutInflater().inflate(
 					R.layout.loginpopuwindow, null, false);
 			// 创建PopupWindow实例
-			_popupWindow = new PopupWindow(popupWndView, 320, 200, true);
+			_popupWindow = new PopupWindow(popupWndView, 325, 200, true);
 			_popupWindow.setOutsideTouchable(true);
 			_popupWindow.setFocusable(true);
 			_popupWindow.setBackgroundDrawable(new BitmapDrawable());
@@ -1711,29 +1742,81 @@ public class MainActivity extends Activity implements ViewSwitcher.ViewFactory {
 	/**
 	 * 选择区域时，区域按钮高亮
 	 */
-	private void hightLightBtn(Button btn) {
-		// btn.setBackgroundResource(R.drawable.av_r12_c28_2);
-		if (btn == highLightBtn) {
-			return;
-		}
-		if (highLightBtn == null) {
-			highLightBtn = btn;
-			highLightBtn.setBackgroundResource(R.drawable.av_r12_c28_2);
-			return;
-		}
-		highLightBtn.setBackgroundResource(R.drawable.av_bottombtn_selector);
-		highLightBtn.setPadding(0, 0, 0, 0);
-		highLightBtn = btn;
-		highLightBtn.setBackgroundResource(R.drawable.av_r12_c28_2);
-		highLightBtn.setPadding(0, 0, 0, 0);
+//	private void hightLightBtn(Button btn) {
+//		// btn.setBackgroundResource(R.drawable.av_r12_c28_2);
+//		if (btn == highLightBtn) {
+//			return;
+//		}
+//		if (highLightBtn == null) {
+//			highLightBtn = btn;
+//			highLightBtn.setBackgroundResource(R.drawable.av_r12_c28_2);
+//			return;
+//		}
+//		highLightBtn.setBackgroundResource(R.drawable.av_bottombtn_selector);
+//		highLightBtn.setPadding(0, 0, 0, 0);
+//		highLightBtn = btn;
+//		highLightBtn.setBackgroundResource(R.drawable.av_r12_c28_2);
+//		highLightBtn.setPadding(0, 0, 0, 0);
+//
+//	}
+	
+	private void highLightRegionBtn(){
+		((Button)findViewById(R.id.bottomFirstBtn)).setBackgroundResource(R.drawable.av_bottombtn_selector);
+		((Button)findViewById(R.id.bottomFirstBtn)).setPadding(0, 0, 0, 0);
+		((Button)findViewById(R.id.region_1)).setBackgroundResource(R.drawable.av_bottombtn_selector);
+		((Button)findViewById(R.id.region_1)).setPadding(0, 0, 0, 0);
+		((Button)findViewById(R.id.region_2)).setBackgroundResource(R.drawable.av_bottombtn_selector);
+		((Button)findViewById(R.id.region_2)).setPadding(0, 0, 0, 0);
+		((Button)findViewById(R.id.region_3)).setBackgroundResource(R.drawable.av_bottombtn_selector);
+		((Button)findViewById(R.id.region_3)).setPadding(0, 0, 0, 0);
+		((Button)findViewById(R.id.region_4)).setBackgroundResource(R.drawable.av_bottombtn_selector);
+		((Button)findViewById(R.id.region_4)).setPadding(0, 0, 0, 0);
+		((Button)findViewById(R.id.region_5)).setBackgroundResource(R.drawable.av_bottombtn_selector);
+		((Button)findViewById(R.id.region_5)).setPadding(0, 0, 0, 0);
+		((Button)findViewById(R.id.region_6)).setBackgroundResource(R.drawable.av_bottombtn_selector);
+		((Button)findViewById(R.id.region_6)).setPadding(0, 0, 0, 0);
+		((Button)findViewById(R.id.region_7)).setBackgroundResource(R.drawable.av_bottombtn_selector);
+		((Button)findViewById(R.id.region_7)).setPadding(0, 0, 0, 0);
+		((Button)findViewById(R.id.region_8)).setBackgroundResource(R.drawable.av_bottombtn_selector);
+		((Button)findViewById(R.id.region_8)).setPadding(0, 0, 0, 0);
+		((Button)findViewById(R.id.region_9)).setBackgroundResource(R.drawable.av_bottombtn_selector);
+		((Button)findViewById(R.id.region_9)).setPadding(0, 0, 0, 0);
+		((Button)findViewById(R.id.region_10)).setBackgroundResource(R.drawable.av_bottombtn_selector);
+		((Button)findViewById(R.id.region_10)).setPadding(0, 0, 0, 0);
 
-	}
-
-	@Override
-	public View makeView() {
-		TextView t = new TextView(this);
-		t.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL);
-		t.setTextSize(70);
-		return t;
+		if(_curRegion < 0){
+			((Button)findViewById(R.id.bottomFirstBtn)).setBackgroundResource(R.drawable.av_r12_c28_2);
+			
+		}else if(_curRegion == Region.REGION_1){			
+			((Button)findViewById(R.id.region_1)).setBackgroundResource(R.drawable.av_r12_c28_2);
+			
+		}else if(_curRegion == Region.REGION_2){
+			((Button)findViewById(R.id.region_2)).setBackgroundResource(R.drawable.av_r12_c28_2);
+			
+		}else if(_curRegion == Region.REGION_3){
+			((Button)findViewById(R.id.region_3)).setBackgroundResource(R.drawable.av_r12_c28_2);
+			
+		}else if(_curRegion == Region.REGION_4){
+			((Button)findViewById(R.id.region_4)).setBackgroundResource(R.drawable.av_r12_c28_2);
+			
+		}else if(_curRegion == Region.REGION_5){
+			((Button)findViewById(R.id.region_5)).setBackgroundResource(R.drawable.av_r12_c28_2);
+			
+		}else if(_curRegion == Region.REGION_6){
+			((Button)findViewById(R.id.region_6)).setBackgroundResource(R.drawable.av_r12_c28_2);
+			
+		}else if(_curRegion == Region.REGION_7){
+			((Button)findViewById(R.id.region_7)).setBackgroundResource(R.drawable.av_r12_c28_2);
+			
+		}else if(_curRegion == Region.REGION_8){
+			((Button)findViewById(R.id.region_8)).setBackgroundResource(R.drawable.av_r12_c28_2);
+			
+		}else if(_curRegion == Region.REGION_9){
+			((Button)findViewById(R.id.region_9)).setBackgroundResource(R.drawable.av_r12_c28_2);
+			
+		}else if(_curRegion == Region.REGION_10){
+			((Button)findViewById(R.id.region_10)).setBackgroundResource(R.drawable.av_r12_c28_2);
+			
+		}
 	}
 }

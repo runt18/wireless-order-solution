@@ -34,7 +34,7 @@
     <FrameLayout
         android:id="@+id/item4"
         android:layout_width="98dip"
-        android:layout_height="20dip"
+        android:layout_height="26dip"
         android:background="@drawable/av_r42_c15" >
 
         <TextView
@@ -43,7 +43,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:textSize="18sp"
-            android:textColor="#000000" />
+            android:textColor="#000000"
+            android:text="古浪" />
     </FrameLayout>
 
 </LinearLayout>
