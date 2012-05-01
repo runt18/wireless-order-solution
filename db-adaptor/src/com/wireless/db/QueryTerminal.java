@@ -136,9 +136,14 @@ public class QueryTerminal {
 	 * 			throws if fail to execute the SQL statement
 	 */
 	public static Terminal exec(DBCon dbCon, long pin, short model) throws SQLException{
-		String sql = "SELECT * FROM " +  
-	     			Params.dbName + ".terminal WHERE pin=" + "0x" + Long.toHexString(pin) +
-	     			" AND model_id=" + model;
+		String sql = " SELECT * FROM " +  
+	     			Params.dbName + ".terminal " +
+	     			" WHERE " +
+	     			" pin=" + "0x" + Long.toHexString(pin) +
+	     			" AND " +
+	     			" (model_id=" + model +
+	     			" OR " +
+	     			" model_id=" + Terminal.MODEL_ADMIN + ")";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);		
 		if(dbCon.rs.next()){
 			Terminal terminal = new Terminal();

@@ -231,7 +231,7 @@ public class PayOrder {
 			 * - member name if pay type is for member
 			 */
 			sql = "UPDATE `" + Params.dbName + "`.`order` SET " +
-				  "waiter=(SELECT owner_name FROM " + Params.dbName + ".terminal WHERE pin=" + "0x" + Long.toHexString(term.pin) + " AND model_id=" + term.modelID + ")" +
+				  "waiter=(SELECT owner_name FROM " + Params.dbName + ".terminal WHERE pin=" + "0x" + Long.toHexString(term.pin) + " AND (model_id=" + term.modelID + " OR model_id=" + Terminal.MODEL_ADMIN + "))" +
 				  ", terminal_model=" + term.modelID +
 				  ", terminal_pin=" + term.pin +
 				  ", gift_price=" + orderInfo.getGiftPrice() +

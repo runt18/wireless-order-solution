@@ -94,6 +94,9 @@ public class QueryStaffTerminal {
 			
 		ArrayList<StaffTerminal> staffs = new ArrayList<StaffTerminal>();
 			
+		/**
+		 * Get the normal account
+		 */
 		String sql = "SELECT a.staff_id, a.staff_alias, a.name, a.pwd, a.terminal_id, b.pin, b.gift_quota, b.gift_amount FROM " + 
 					 Params.dbName + ".staff a, terminal b WHERE a.restaurant_id=" +
 					 restaurantID + " AND a.restaurant_id=b.restaurant_id AND a.terminal_id=b.terminal_id " +
@@ -115,6 +118,35 @@ public class QueryStaffTerminal {
 			staff.setGiftAmount(dbCon.rs.getFloat("gift_amount"));
 			staffs.add(staff);
 		}
+		dbCon.rs.close();
+		
+		/**
+		 * Get the admin account
+		 */
+		sql = " SELECT A.terminal_id, A.pin, A.gift_quota, A.gift_amount, B.account AS name, B.pwd AS pwd FROM " + 
+			  Params.dbName + ".terminal A, " +
+			  Params.dbName + ".restaurant B " +
+			  " WHERE " +
+			  " A.restaurant_id = B.id " + 
+			  " AND " +
+			  " A.model_id = " + Terminal.MODEL_ADMIN +
+			  " AND " + 
+			  " B.id = " + restaurantID;
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		while(dbCon.rs.next()){
+			StaffTerminal staff = new StaffTerminal();
+			staff.name = dbCon.rs.getString("name");
+			staff.pwd = dbCon.rs.getString("pwd");
+			staff.pin = dbCon.rs.getLong("pin");
+			staff.terminalID = dbCon.rs.getLong("terminal_id");
+			float quota = dbCon.rs.getFloat("gift_quota");
+			if(quota >= 0){
+				staff.setGiftQuota(quota);
+			}
+			staff.setGiftAmount(dbCon.rs.getFloat("gift_amount"));
+			staffs.add(0, staff);
+		}
+		
 		return staffs.toArray(new StaffTerminal[staffs.size()]);
 
 	}
