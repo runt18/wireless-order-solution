@@ -9,6 +9,7 @@ public class Terminal {
 	public final static short MODEL_BB = 0x0000; 
 	public final static short MODEL_ANDROID = 0x0001;
 	public final static short MODEL_STAFF = 0x00FF;
+	public final static short MODEL_ADMIN = 0xFE;
 	
 	//the id to this terminal
 	public long id = 0;
