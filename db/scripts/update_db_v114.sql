@@ -302,6 +302,22 @@ ALTER TABLE `wireless_order_db`.`order` ADD COLUMN `seq_id` INT UNSIGNED NULL DE
 ALTER TABLE `wireless_order_db`.`order_history` ADD COLUMN `seq_id` INT UNSIGNED NULL DEFAULT NULL COMMENT 'the sequence id to this order'  AFTER `id` ;
 
 -- -----------------------------------------------------
+-- Add the admin record to terminal
+-- -----------------------------------------------------
+INSERT INTO 
+wireless_order_db.terminal (`pin`, `restaurant_id`, `model_id`, `owner_name`)
+
+SELECT MAX(pin) + ROUND(0.5 - RAND() * 100), restaurant_id, 254, '管理员'
+FROM 
+    `wireless_order_db`.`terminal` 
+    
+WHERE   restaurant_id NOT IN (SELECT restaurant_id FROM `wireless_order_db`.`terminal` WHERE model_id = 254)
+    AND restaurant_id > 10 
+    
+GROUP BY restaurant_id 
+
+;
+-- -----------------------------------------------------
 -- Drop the table 'temp_order_food_history'
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `wireless_order_db`.`temp_order_food_history`;
