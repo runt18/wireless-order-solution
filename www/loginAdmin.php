@@ -1,4 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -88,9 +88,15 @@ if (window.parent != window)
         <td><input type="text" name="username" style="width:188px" /></td>
 		
       </tr>
+	        <tr>
+        <td>会员密码：</td>
+        <td><input type="password" name="password" style="width:188px" /></td>
+		
+      </tr>
             <tr>
         <td>验证码：</td>
-        <td><input type="text" name="code" class="code" style="width:188px" /></td>
+        <td>
+		<input type="text" name="code" class="code" style="width:188px" /></td>
 		
       </tr>
       <tr>
@@ -100,7 +106,8 @@ if (window.parent != window)
 
       <tr>
         <td>&nbsp;</td>
-		<td><input  id="button" type="submit" onclick="javascript:document.getElementById('loginType').value = 'WebTerminal';" value="进入web点菜系统" class="button"  style="width:105px;" /></td>
+		<td>
+		<input  id="button" type="submit" onclick="javascript:document.getElementById('loginType').value = 'Web';" value="进入会员中心" class="button"  style="width:85px;" /></td>
 	  </tr>
       
       </table>
@@ -108,7 +115,7 @@ if (window.parent != window)
   </tr>
   </table>
   <input type="hidden" name="act" value="signin" />
-  <input type="hidden" id="loginType" name="loginType" value="WebTerminal" />
+  <input type="hidden" id="loginType" name="loginType" value="Web" />
 </form>
 <script language="JavaScript"> 
   document.forms['theForm'].elements['username'].focus();
