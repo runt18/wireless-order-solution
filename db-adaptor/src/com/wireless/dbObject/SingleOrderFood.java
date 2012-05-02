@@ -23,6 +23,30 @@ public class SingleOrderFood {
 	public String comment = null;							//±¸×¢
 	
 	/**
+	 * Return whether the order food is gifted.
+	 * @return
+	 */
+	public boolean isGift(){
+		return food.isGift();
+	}
+	
+	/**
+	 * Return whether the order food is discount.
+	 * @return
+	 */
+	public boolean isDiscount(){
+		return discount < 1;
+	}
+	
+	/**
+	 * Return whether the order food is cancelled.
+	 * @return
+	 */
+	public boolean isCancelled(){
+		return orderCount < 0;
+	}
+	
+	/**
 	 * Calculate the discount price to this food as below.<br>
 	 * price = unit_price * (1 - discount)
 	 * @return the discount price to this food
