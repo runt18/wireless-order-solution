@@ -245,7 +245,8 @@ function billModifyOnLoad() {
 					"pin" : pin,
 					"type" : 0,
 					"ope" : 1,
-					"value" : ""
+					"value" : "",
+					"havingCond" : 0
 				},
 				success : function(response, options) {
 					var resultJSON = Ext.util.JSON

@@ -213,6 +213,8 @@ var viewBillWin = new Ext.Window(
 											.decode(response.responseText);
 									if (resultJSON.success == true) {
 										if (resultJSON.data != "NULL") {
+
+											var totalDiscount = 0.0;
 											var josnData = resultJSON.data;
 											var orderList = josnData.split("，");
 											for ( var i = 0; i < orderList.length; i++) {
@@ -253,20 +255,15 @@ var viewBillWin = new Ext.Window(
 																				orderInfo[3].length - 2),// 口味
 																acturalPrice // 实价
 														]);
+
+												// 算總折扣
+												totalDiscount = totalDiscount
+														+ parseFloat(orderInfo[18]);
 											}
 
-											// // 算應收
-											// var shouldPayOth = 0.0;
-											// for ( var i = 0; i <
-											// viewBillData.length; i++) {
-											// shouldPayOth = shouldPayOth
-											// + parseFloat(viewBillData[i][4]
-											// .substring(1));
-											// }
-											// document
-											// .getElementById("shouldPayBV").innerHTML
-											// = "￥"
-											// + shouldPayOth;
+											document
+													.getElementById("discountBV").innerHTML = "￥"
+													+ totalDiscount.toFixed(1);
 
 											viewBillStore.reload();
 										}
@@ -331,6 +328,12 @@ var billDetailStore = new Ext.data.Store({
 		name : "comment"
 	}, {
 		name : "isPaid"
+	}, {
+		name : "isDiscount"
+	}, {
+		name : "isGift"
+	}, {
+		name : "isReturn"
 	}, {
 		name : "message"
 	} ])
@@ -434,42 +437,79 @@ billDetailGrid.getStore().on('beforeload', function() {
 });
 
 // 为store配置load监听器(即load完后动作)
-billDetailGrid.getStore().on(
-		'load',
-		function() {
-			var msg = this.getAt(0).get("message");
-			if (msg != "normal") {
-				Ext.MessageBox.show({
-					msg : msg,
-					width : 110,
-					buttons : Ext.MessageBox.OK
-				});
-				this.removeAll();
-			} else {
-				if (billDetailGrid.getStore().getTotalCount() != 0) {
-					
-					billDetailGrid.getStore().each(
-							function(record) {
-								// 反結帳顯示
-								record.set("isPaid",
-										norCounPayCode2Descr(record
-												.get("isPaid")));
+billDetailGrid
+		.getStore()
+		.on(
+				'load',
+				function() {
+					var msg = this.getAt(0).get("message");
+					if (msg != "normal") {
+						Ext.MessageBox.show({
+							msg : msg,
+							width : 110,
+							buttons : Ext.MessageBox.OK
+						});
+						this.removeAll();
+					} else {
+						if (billDetailGrid.getStore().getTotalCount() != 0) {
 
-								// 提交，去掉修改標記
-								record.commit();
-							});
-					
-					// 底色处理
-					for ( var i = 0; i < billDetailGrid.getStore()
-							.getCount(); i++) {
-						var record = billDetailGrid.getStore().getAt(i);
-						if (record.get("isPaid") == norCounPayCode2Descr(COUNTER_PAY)) {
-							billDetailGrid.getView().getRow(i).style.backgroundColor = "#FFFF93";
+							billDetailGrid.getStore().each(
+									function(record) {
+										// 反結帳顯示
+										record.set("isPaid",
+												norCounPayCode2Descr(record
+														.get("isPaid")));
+
+										// 提交，去掉修改標記
+										record.commit();
+									});
+
+							// 底色处理
+							var conditionRadio = billsQueryCondPanel.getForm()
+									.findField("conditionRadio")
+									.getGroupValue();
+							if (conditionRadio == "isPaid") {
+								for ( var i = 0; i < billDetailGrid.getStore()
+										.getCount(); i++) {
+									var record = billDetailGrid.getStore()
+											.getAt(i);
+									if (record.get("isPaid") == norCounPayCode2Descr(COUNTER_PAY)) {
+										billDetailGrid.getView().getRow(i).style.backgroundColor = "#FFFF93";
+									}
+								}
+							} else if (conditionRadio == "discount") {
+								for ( var i = 0; i < billDetailGrid.getStore()
+										.getCount(); i++) {
+									var record = billDetailGrid.getStore()
+											.getAt(i);
+									if (record.get("isDiscount") == "true") {
+										billDetailGrid.getView().getRow(i).style.backgroundColor = "#FFFF93";
+									}
+								}
+
+							} else if (conditionRadio == "gift") {
+								for ( var i = 0; i < billDetailGrid.getStore()
+										.getCount(); i++) {
+									var record = billDetailGrid.getStore()
+											.getAt(i);
+									if (record.get("isGift") == "true") {
+										billDetailGrid.getView().getRow(i).style.backgroundColor = "#FFFF93";
+									}
+								}
+
+							} else if (conditionRadio == "return") {
+								for ( var i = 0; i < billDetailGrid.getStore()
+										.getCount(); i++) {
+									var record = billDetailGrid.getStore()
+											.getAt(i);
+									if (record.get("isReturn") == "true") {
+										billDetailGrid.getView().getRow(i).style.backgroundColor = "#FFFF93";
+									}
+								}
+							}
 						}
 					}
-				}
-			}
-		});
+				});
 
 // 彈出框
 billDetailWin = new Ext.Window({
@@ -1187,6 +1227,66 @@ var billsQueryCondPanel = new Ext.form.FormPanel({
 			border : false,
 			width : 110,
 			items : operatorComb
+		}, {
+			layout : "form",
+			border : false,
+			width : 60,
+			items : [ {
+				xtype : 'radio',
+				hideLabel : true,
+				boxLabel : "全部",
+				checked : true,
+				name : 'conditionRadio',
+				inputValue : 'all'
+			} ]
+		}, {
+			layout : "form",
+			border : false,
+			labelSeparator : '',
+			width : 70,
+			items : [ {
+				xtype : 'radio',
+				hideLabel : true,
+				boxLabel : "反结帐",
+				name : 'conditionRadio',
+				inputValue : 'isPaid'
+			} ]
+		}, {
+			layout : "form",
+			border : false,
+			labelSeparator : '',
+			width : 60,
+			items : [ {
+				xtype : 'radio',
+				hideLabel : true,
+				boxLabel : "折扣",
+				name : 'conditionRadio',
+				inputValue : 'discount'
+			} ]
+		}, {
+			layout : "form",
+			border : false,
+			labelSeparator : '',
+			width : 60,
+			items : [ {
+				xtype : 'radio',
+				hideLabel : true,
+				boxLabel : "赠送",
+				name : 'conditionRadio',
+				inputValue : 'gift'
+			} ]
+		}, {
+			layout : "form",
+			border : false,
+			labelSeparator : '',
+			width : 60,
+			items : [ {
+				xtype : 'radio',
+				hideLabel : true,
+				boxLabel : "退菜",
+				name : 'conditionRadio',
+				inputValue : 'return'
+			} ]
 		}, searchForm, {
 			layout : 'form',
 			border : false,
@@ -1386,15 +1486,18 @@ Ext
 										// 提交，去掉修改標記
 										record.commit();
 									});
-							
-							// 底色处理
-							for ( var i = 0; i < billsGrid.getStore()
-									.getCount(); i++) {
-								var record = billsGrid.getStore().getAt(i);
-								if (record.get("isPaid") == norCounPayCode2Descr(COUNTER_PAY)) {
-									billsGrid.getView().getRow(i).style.backgroundColor = "#FFFF93";
-								}
-							}
+
+							// // 底色处理
+							// for ( var i = 0; i < billsGrid.getStore()
+							// .getCount(); i++) {
+							// var record = billsGrid.getStore()
+							// .getAt(i);
+							// if (record.get("isPaid") ==
+							// norCounPayCode2Descr(COUNTER_PAY)) {
+							// billsGrid.getView().getRow(i).style.backgroundColor
+							// = "#FFFF93";
+							// }
+							// }
 
 						}
 					});

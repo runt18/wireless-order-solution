@@ -105,6 +105,9 @@ public class QueryDetailAction extends Action {
 				resultMay.put("waiter", singleOrderFood.staff.name);
 				resultMay.put("comment", singleOrderFood.comment);
 				resultMay.put("isPaid", singleOrderFood.isPaid);
+				resultMay.put("isDiscount", singleOrderFood.isDiscount());
+				resultMay.put("isGift", singleOrderFood.isGift());
+				resultMay.put("isReturn", singleOrderFood.isCancelled());
 				resultMay.put("message", "normal");
 
 				resultList.add(resultMay);

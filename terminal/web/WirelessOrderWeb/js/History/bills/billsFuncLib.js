@@ -1,4 +1,4 @@
-﻿function billQuery(in_queryTpye, in_operator, in_condition) {
+﻿function billQuery(in_queryTpye, in_operator, in_condition, in_additionalFilter) {
 
 	Ext.Ajax
 			.request({
@@ -7,7 +7,8 @@
 					"pin" : pin,
 					"type" : in_queryTpye,
 					"ope" : in_operator,
-					"value" : in_condition
+					"value" : in_condition,
+					"havingCond" : in_additionalFilter
 				},
 				success : function(response, options) {
 					var resultJSON = Ext.util.JSON
@@ -121,6 +122,22 @@ function billQueryHandler() {
 		}
 	}
 	// alert(queryTpye + " , " + queryOperator + " , " + queryValue);
+	
+	// -- 獲取額外過濾條件--
+	var additionFilter = 0;
+	var conditionRadio = billsQueryCondPanel.getForm().findField(
+			"conditionRadio").getGroupValue();
+	if (conditionRadio == "all") {
+		additionFilter = 0;
+	} else if (conditionRadio == "isPaid") {
+		additionFilter = 1;
+	} else if (conditionRadio == "discount") {
+		additionFilter = 2;
+	} else if (conditionRadio == "gift") {
+		additionFilter = 3;
+	} else if (conditionRadio == "return") {
+		additionFilter = 4;
+	}
 
 	var isInputValid = true;
 	if (conditionType == "text" && queryTpye != 0) {
@@ -137,7 +154,7 @@ function billQueryHandler() {
 
 	if (isInputValid) {
 
-		billQuery(queryTpye, queryOperator, queryValue);
+		billQuery(queryTpye, queryOperator, queryValue, additionFilter);
 	}
 
 	currRowIndex = -1;
