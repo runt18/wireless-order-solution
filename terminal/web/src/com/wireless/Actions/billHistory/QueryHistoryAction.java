@@ -217,17 +217,18 @@ public class QueryHistoryAction extends Action {
 				}
 				/**
 				 * The json to each order looks like below
-				 * ["账单号", "台号", "日期", "类型", "结帐方式", "金额", "实收", "台号2",
+				 * ["账单号", "台号", "流水号", "日期", "类型", "结帐方式", "金额", "实收", "台号2",
 				 * "就餐人数", "最低消", "服务费率", "会员编号", "会员姓名", "账单备注",
 				 * "赠券金额", "结帐类型", "折扣类型", "服务员", 是否反結帳, 是否折扣, 是否赠送, 是否退菜]
 				 */
-				String jsonOrder = "[\"$(order_id)\",\"$(table_alias)\",\"$(order_date)\",\"$(order_cate)\"," +
+				String jsonOrder = "[\"$(order_id)\",\"$(seq_id)\",\"$(table_alias)\",\"$(order_date)\",\"$(order_cate)\"," +
 								   "\"$(pay_manner)\",\"$(total_price)\",\"$(actual_income)\"," +
 								   "\"$(table2_id)\",\"$(custom_num)\",\"$(min_cost)\"," +
 								   "\"$(service_rate)\",\"$(member_id)\",\"$(member)\",\"$(comment)\"," +
 								   "\"$(gift_price)\",\"$(pay_type)\",\"$(discount_type)\",\"$(waiter)\"," +
 								   "$(isPaid),$(isDiscount),$(isGift),$(isCancel)]";
 				jsonOrder = jsonOrder.replace("$(order_id)", Long.toString(dbCon.rs.getLong("id")));
+				jsonOrder = jsonOrder.replace("$(seq_id)", Long.toString(dbCon.rs.getLong("seq_id")));
 				jsonOrder = jsonOrder.replace("$(table_alias)", Integer.toString(dbCon.rs.getInt("table_alias")));
 				jsonOrder = jsonOrder.replace("$(order_date)", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(dbCon.rs.getTimestamp("order_date")));
 				jsonOrder = jsonOrder.replace("$(order_cate)", Util.toOrderCate(dbCon.rs.getShort("category")));
