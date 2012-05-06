@@ -26,9 +26,9 @@ public class VerifyPwd extends PopupScreen implements FieldChangeListener{
 	/**
 	 * The type to password
 	 */
-	public static final int PWD_1 = 1;
-	public static final int PWD_3 = 2;
-	public static final int PWD_5 = 3;
+	public static final int PWD_1 = 1;		//管理员密码
+	public static final int PWD_3 = 2;		//店长权限密码
+	public static final int PWD_5 = 3;		//退菜密码
 	
 	private static int _resp = VERIFY_CANCEL;
 	private PasswordEditField _pwd;
