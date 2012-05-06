@@ -618,7 +618,7 @@ public class RespParser {
 			offset++;
 			//get the 2nd password
 			if(length != 0){
-				restaurant.pwd2 = new String(response.body, offset, length);
+				restaurant.pwd3 = new String(response.body, offset, length);
 			}
 			
 			//calculate the position of the length to 3rd password
@@ -627,7 +627,7 @@ public class RespParser {
 			offset++;
 			//get the 3rd password
 			if(length != 0){
-				restaurant.pwd3 = new String(response.body, offset, length);
+				restaurant.pwd5 = new String(response.body, offset, length);
 			}
 			
 		}catch(UnsupportedEncodingException e){

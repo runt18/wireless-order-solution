@@ -36,8 +36,8 @@ public class RespQueryRestaurant extends RespPackage{
 		byte[] info = restaurant.info.getBytes("UTF-16BE");
 		byte[] owner = restaurant.owner.getBytes("UTF-16BE");
 		byte[] pwd = restaurant.pwd != null ? restaurant.pwd.getBytes() : new byte[0];
-		byte[] pwd2 = restaurant.pwd2 != null ? restaurant.pwd2.getBytes() : new byte[0];
-		byte[] pwd3 = restaurant.pwd3 != null ? restaurant.pwd3.getBytes() : new byte[0];
+		byte[] pwd2 = restaurant.pwd2 != null ? restaurant.pwd3.getBytes() : new byte[0];
+		byte[] pwd3 = restaurant.pwd3 != null ? restaurant.pwd5.getBytes() : new byte[0];
 		//calculate the length of the body
 		int bodyLen = 1 +	/* length of the name takes up 1 byte */
 				      name.length + /* the name's length */

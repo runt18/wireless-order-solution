@@ -9,9 +9,11 @@ public class Restaurant {
 	public String addr;
 	public String info;
 	public String owner;
-	public String pwd;
-	public String pwd2;
-	public String pwd3;
+	public String pwd;		//管理员密码
+	public String pwd2;		//财务权限密码
+	public String pwd3;		//店长权限密码
+	public String pwd4;		//收银员权限密码
+	public String pwd5;		//退菜权限密码
 	//public Setting setting = new Setting();
 	
 	public Restaurant(){
