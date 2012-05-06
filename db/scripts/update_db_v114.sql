@@ -299,7 +299,7 @@ ALTER TABLE `wireless_order_db`.`order` ADD COLUMN `seq_id` INT UNSIGNED NULL DE
 -- -----------------------------------------------------
 -- Add the field 'seq_id' to table 'order_history'
 -- -----------------------------------------------------
-ALTER TABLE `wireless_order_db`.`order_history` ADD COLUMN `seq_id` INT UNSIGNED NULL DEFAULT NULL COMMENT 'the sequence id to this order'  AFTER `id` ;
+ALTER TABLE `wireless_order_db`.`order_history` ADD COLUMN `seq_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the sequence id to this order'  AFTER `id` ;
 
 -- -----------------------------------------------------
 -- Add the admin record to terminal
@@ -317,6 +317,24 @@ WHERE   restaurant_id NOT IN (SELECT restaurant_id FROM `wireless_order_db`.`ter
 GROUP BY restaurant_id 
 
 ;
+
+-- -----------------------------------------------------
+-- Add the field 'pwd4' to table 'restaurant'
+-- Add the field 'pwd5' to table 'restaurant'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`restaurant` 
+ADD COLUMN `pwd4` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the 4th password to this restaurant, whose permission priority is lower than pwd3'  AFTER `pwd3` , 
+ADD COLUMN `pwd5` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the 5th password to this restaurant, whose permission priority is lower than pwd4'  AFTER `pwd4` , 
+CHANGE COLUMN `pwd` `pwd` VARCHAR(45) NOT NULL COMMENT 'the password for the restaurant to log in'  AFTER `address` ;
+
+-- -----------------------------------------------------
+-- Cut the field 'pwd3' to field 'pwd5' (将原先的权限密码2移到退菜密码)
+-- Cut the field 'pwd2' to field 'pwd3' (将原先的权限密码1移到店长权限密码)
+-- -----------------------------------------------------
+UPDATE wireless_order_db.restaurant SET 
+pwd5 = pwd3, pwd3='', 
+pwd3 = pwd2, pwd2='';
+
 -- -----------------------------------------------------
 -- Drop the table 'temp_order_food_history'
 -- -----------------------------------------------------
