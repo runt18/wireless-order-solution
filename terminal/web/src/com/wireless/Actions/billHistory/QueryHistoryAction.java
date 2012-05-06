@@ -52,13 +52,13 @@ public class QueryHistoryAction extends Action {
 			 * type : the type is one of the values below.
 			 * 		  0 - 全部显示
 			 *  	  1 - 按账单号
-			 *  	  2 - 按台号
-			 *  	  3 - 按日期时间
-			 *  	  4 - 按类型
-			 *  	  5 - 按结帐方式
-			 *  	  6 - 按金额
-			 *   	  7 - 按实收
-			 *   	  8 - 按时间
+			 *  	  2 - 按流水号
+			 *  	  3 - 按台号
+			 *  	  4 - 按日期
+			 *  	  5 - 按类型
+			 *  	  6 - 按结帐方式
+			 *  	  7 - 按金额
+			 *   	  8 - 按实收
 			 *   	  9 - 最近日结
 			 * ope : the operator is one of the values below.
 			 * 		  1 - 等于
@@ -102,6 +102,25 @@ public class QueryHistoryAction extends Action {
 			//get the value to filter
 			String filterVal = request.getParameter("value");
 			
+			//get the having condition to filter
+			int cond = Integer.parseInt(request.getParameter("havingCond"));
+			String havingCond = null;
+			if(cond == 1){
+				//是否有反结帐
+				havingCond = " HAVING SUM(IF(B.is_paid, 1, 0)) > 0 ";
+			}else if(cond == 2){
+				//是否有折扣
+				havingCond = " HAVING MIN(B.discount) < 1 ";
+			}else if(cond == 3){
+				//是否有赠送
+				havingCond = " HAVING SUM(B.food_status & " + Food.GIFT + ") > 0 ";
+			}else if(cond == 4){
+				//是否有退菜
+				havingCond = " HAVING MIN(order_count) < 0 ";
+			}else{
+				havingCond = "";
+			}
+			
 			//combine the operator and filter value
 			String filterCondition = null;
 			
@@ -109,26 +128,31 @@ public class QueryHistoryAction extends Action {
 				//按账单号
 				filterCondition = " AND A.id" + ope + filterVal;
 			}else if(type == 2){
+				//按流水号
+				if(havingCond.equals("")){
+					havingCond = " HAVING MAX(A.seq_id) " + ope + filterVal;
+				} else {
+					havingCond = havingCond + " AND MAX(A.seq_id) " + ope + filterVal;
+				}
+				filterCondition = "";
+			}else if(type == 3){
 				//按台号
 				filterCondition = " AND A.table_alias" + ope + filterVal;
-			}else if(type == 3){
-				//按日期时间
-				filterCondition = " AND A.order_date" + ope + "'" + filterVal + "'"; 
 			}else if(type == 4){
+				//按日期
+				filterCondition = " AND A.order_date" + ope + "'" + filterVal + "'"; 
+			}else if(type == 5){
 				//按类型
 				filterCondition = " AND A.category" + ope + filterVal;
-			}else if(type == 5){
+			}else if(type == 6){
 				//按结帐方式
 				filterCondition = " AND A.type" + ope + filterVal;
-			}else if(type == 6){
+			}else if(type == 7){
 				//按金额
 				filterCondition = " AND A.total_price" + ope + filterVal;
-			}else if(type == 7){
+			}else if(type == 8){
 				//按实收
 				filterCondition = " AND A.total_price_2" + ope + filterVal;
-			}else if(type == 8){
-				//按时间
-				filterCondition = " AND A.order_date" + ope + "'" + new SimpleDateFormat("yyyy-MM-dd").format(new Date()) + " " + filterVal + "'"; 
 			}else if(type == 9){
 				//最近日结(显示最近一次日结记录的时间区间内的账单信息)
 				String sql = " SELECT on_duty, off_duty FROM " + Params.dbName + ".daily_settle_history " +
@@ -148,25 +172,6 @@ public class QueryHistoryAction extends Action {
 				dbCon.rs.close();
 			}else{
 				filterCondition = "";				
-			}
-			
-			//get the having condition to filter
-			int cond = Integer.parseInt(request.getParameter("havingCond"));
-			String havingCond = null;
-			if(cond == 1){
-				//是否有反结帐
-				havingCond = "HAVING SUM(IF(B.is_paid, 1, 0)) > 0";
-			}else if(cond == 2){
-				//是否有折扣
-				havingCond = "HAVING MIN(B.discount) < 1";
-			}else if(cond == 3){
-				//是否有赠送
-				havingCond = "HAVING SUM(B.food_status & " + Food.GIFT + ") > 0";
-			}else if(cond == 4){
-				//是否有退菜
-				havingCond = "HAVING MIN(order_count) < 0";
-			}else{
-				havingCond = "";
 			}
 			
 			/**
@@ -203,6 +208,8 @@ public class QueryHistoryAction extends Action {
 //			 " AND a.alias_id=b.table_id" +
 //			 " AND a.restaurant_id=" + term.restaurant_id +
 //			 filterCondition;
+			
+			// System.out.println(sql);
 			
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			

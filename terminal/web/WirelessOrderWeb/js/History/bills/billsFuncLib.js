@@ -21,8 +21,10 @@
 							for ( var i = 0; i < billList.length; i++) {
 								var billInfo = billList[i].substr(1,
 										billList[i].length - 2).split(",");
-								// 格式：["账单号","台号","日期","类型","结帐方式","金额","实收","台号2","就餐人数","最低消","服务费率","会员编号","会员姓名","账单备注","赠券金额","结帐类型","折扣类型","服务员",是否反結帳]
-								// 后台格式：["账单号","台号","日期","类型","结帐方式","金额","实收","台号2","就餐人数","最低消","服务费率","会员编号","会员姓名","账单备注","赠券金额","结帐类型","折扣类型","服务员",是否反結帳]
+								// 格式：["账单号","台号","日期","类型","结帐方式","金额","实收","台号2","就餐人数","最低消","服务费率","会员编号","会员姓名","账单备注","赠券金额","结帐类型","折扣类型","服务员",是否反結帳,"服务员",
+								// 是否反結帳, 是否折扣, 是否赠送, 是否退菜, "流水号"]
+								// 后台格式：["账单号","台号","日期","类型","结帐方式","金额","实收","台号2","就餐人数","最低消","服务费率","会员编号","会员姓名","账单备注","赠券金额","结帐类型","折扣类型","服务员",是否反結帳,"服务员",
+								// 是否反結帳, 是否折扣, 是否赠送, 是否退菜, "流水号"]
 								billsData.push([
 										billInfo[0].substr(1,
 												billInfo[0].length - 2),// 账单号
@@ -60,7 +62,12 @@
 												billInfo[16].length - 2), // 折扣类型
 										billInfo[17].substr(1,
 												billInfo[17].length - 2), // 服务员
-										billInfo[18] // 是否反結帳
+										billInfo[18], // 是否反結帳
+										billInfo[19], // 是否折扣
+										billInfo[20], // 是否赠送
+										billInfo[21], // 是否退菜
+										billInfo[22].substr(1,
+												billInfo[22].length - 2) // 流水号
 								]);
 
 							}
@@ -102,7 +109,7 @@ function billQueryHandler() {
 	}
 
 	var queryValue = "";
-	if (conditionType == "text" && queryTpye != 0) {
+	if (conditionType == "text" && queryTpye != 0 && queryTpye != 9) {
 		queryValue = searchForm.findById("conditionText").getValue();
 	} else if (conditionType == "number") {
 		queryValue = searchForm.findById("conditionNumber").getValue();
@@ -122,7 +129,7 @@ function billQueryHandler() {
 		}
 	}
 	// alert(queryTpye + " , " + queryOperator + " , " + queryValue);
-	
+
 	// -- 獲取額外過濾條件--
 	var additionFilter = 0;
 	var conditionRadio = billsQueryCondPanel.getForm().findField(
@@ -140,7 +147,7 @@ function billQueryHandler() {
 	}
 
 	var isInputValid = true;
-	if (conditionType == "text" && queryTpye != 0) {
+	if (conditionType == "text" && queryTpye != 0 && queryTpye != 9) {
 		isInputValid = searchForm.findById("conditionText").isValid();
 	} else if (conditionType == "number") {
 		isInputValid = searchForm.findById("conditionNumber").isValid();

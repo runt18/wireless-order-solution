@@ -482,7 +482,7 @@ billDetailGrid
 										.getCount(); i++) {
 									var record = billDetailGrid.getStore()
 											.getAt(i);
-									if (record.get("isDiscount") == "true") {
+									if (record.get("isDiscount") == true) {
 										billDetailGrid.getView().getRow(i).style.backgroundColor = "#FFFF93";
 									}
 								}
@@ -492,7 +492,7 @@ billDetailGrid
 										.getCount(); i++) {
 									var record = billDetailGrid.getStore()
 											.getAt(i);
-									if (record.get("isGift") == "true") {
+									if (record.get("isGift") == true) {
 										billDetailGrid.getView().getRow(i).style.backgroundColor = "#FFFF93";
 									}
 								}
@@ -502,7 +502,7 @@ billDetailGrid
 										.getCount(); i++) {
 									var record = billDetailGrid.getStore()
 											.getAt(i);
-									if (record.get("isReturn") == "true") {
+									if (record.get("isReturn") == true) {
 										billDetailGrid.getView().getRow(i).style.backgroundColor = "#FFFF93";
 									}
 								}
@@ -680,9 +680,9 @@ var logOutBut = new Ext.ux.ImageButton({
 
 // ------------------ north ------------------------
 // combom
-var filterTypeData = [ [ "0", "全部" ], [ "1", "帐单号" ], [ "2", "台号" ],
-		[ "8", "日期时间" ], [ "4", "类型" ], [ "5", "结帐方式" ], [ "6", "金额" ],
-		[ "7", "实收" ] ];
+var filterTypeData = [ [ "0", "全部" ], [ "1", "帐单号" ], [ "2", "流水号" ],
+		[ "3", "台号" ], [ "4", "日期" ], [ "5", "类型" ], [ "6", "结帐方式" ],
+		[ "7", "金额" ], [ "8", "实收" ], [ "9", "最近日结" ] ];
 var filterTypeComb = new Ext.form.ComboBox({
 	fieldLabel : "过滤",
 	forceSelection : true,
@@ -785,45 +785,52 @@ var filterTypeComb = new Ext.form.ComboBox({
 			operatorComb.setDisabled(false);
 			if (index == 0) {
 				// 全部
-				// searchForm.add(conditionText);
 				operatorComb.setValue("等于");
 				operatorComb.setDisabled(true);
 				conditionType = "text";
 			} else if (index == 1) {
 				// 帐单号
 				searchForm.add(conditionNumber);
-				// searchForm.items.add(conditionNumber);
 				conditionType = "number";
 			} else if (index == 2) {
-				// 台号
+				// 流水号
 				searchForm.add(conditionNumber);
 				conditionType = "number";
 			} else if (index == 3) {
+				// 台号
+				searchForm.add(conditionNumber);
+				conditionType = "number";
+			} else if (index == 4) {
 				// 日期时间
 				searchForm.add(conditionDate);
 				conditionType = "date";
-			} else if (index == 4) {
+			} else if (index == 5) {
 				// 类型
 				searchForm.add(tableTypeComb);
 				operatorComb.setValue("等于");
 				operatorComb.setDisabled(true);
 				tableTypeComb.setValue("一般");
 				conditionType = "tableTypeComb";
-			} else if (index == 5) {
+			} else if (index == 6) {
 				// 结帐方式
 				searchForm.add(payTypeComb);
 				operatorComb.setValue("等于");
 				operatorComb.setDisabled(true);
 				payTypeComb.setValue("现金");
 				conditionType = "payTypeComb";
-			} else if (index == 6) {
+			} else if (index == 7) {
 				// 金额
 				searchForm.add(conditionNumber);
 				conditionType = "number";
-			} else if (index == 7) {
+			} else if (index == 8) {
 				// 实收
 				searchForm.add(conditionNumber);
 				conditionType = "number";
+			} else if (index == 9) {
+				// 最近日结
+				operatorComb.setValue("等于");
+				operatorComb.setDisabled(true);
+				conditionType = "text";
 			}
 
 			billsQueryCondPanel.doLayout();
@@ -1160,6 +1167,14 @@ advSrchWin = new Ext.Window(
 																				.substr(
 																						1,
 																						billInfo[17].length - 2), // 服务员
+																		billInfo[18], // 是否反結帳
+																		billInfo[19], // 是否折扣
+																		billInfo[20], // 是否赠送
+																		billInfo[21], // 是否退菜
+																		billInfo[22]
+																				.substr(
+																						1,
+																						billInfo[22].length - 2) // 流水号
 																]);
 
 													}
@@ -1227,7 +1242,7 @@ var billsQueryCondPanel = new Ext.form.FormPanel({
 			border : false,
 			width : 110,
 			items : operatorComb
-		}, {
+		}, searchForm, {
 			layout : "form",
 			border : false,
 			width : 60,
@@ -1287,7 +1302,7 @@ var billsQueryCondPanel = new Ext.form.FormPanel({
 				name : 'conditionRadio',
 				inputValue : 'return'
 			} ]
-		}, searchForm, {
+		}, {
 			layout : 'form',
 			border : false,
 			width : 70,
@@ -1343,7 +1358,7 @@ function billOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
 // 1，表格的数据store
 // ["账单号","台号","日期","类型","结帐方式","金额","实收","台号2",
 // "就餐人数","最低消","服务费率","会员编号","会员姓名","账单备注",
-// "赠券金额","结帐类型","折扣类型","服务员",是否反結帳]
+// "赠券金额","结帐类型","折扣类型","服务员",是否反結帳, 是否折扣, 是否赠送, 是否退菜, "流水号"]
 var billsStore = new Ext.data.Store({
 	// proxy : new Ext.data.HttpProxy({
 	// url : "../../QueryTable.do"
@@ -1388,6 +1403,14 @@ var billsStore = new Ext.data.Store({
 	}, {
 		name : "isPaid"
 	}, {
+		name : "isDiscount"
+	}, {
+		name : "isGift"
+	}, {
+		name : "isReturn"
+	}, {
+		name : "seqNum"
+	}, {
 		name : "billOpt"
 	} ])
 });
@@ -1399,6 +1422,11 @@ var billsColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(), {
 	header : "帐单号",
 	sortable : true,
 	dataIndex : "billNumber",
+	width : 120
+}, {
+	header : "流水号",
+	sortable : true,
+	dataIndex : "seqNum",
 	width : 120
 }, {
 	header : "台号",

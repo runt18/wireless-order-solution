@@ -52,13 +52,13 @@ public class QueryTodayAction extends Action {
 			 * type : the type is one of the values below.
 			 * 		  0 - 全部显示
 			 *  	  1 - 按账单号
-			 *  	  2 - 按台号
-			 *  	  3 - 按日期时间
-			 *  	  4 - 按类型
-			 *  	  5 - 按结帐方式
-			 *  	  6 - 按金额
-			 *   	  7 - 按实收
-			 *   	  8 - 按时间
+			 *  	  2 - 按流水号
+			 *  	  3 - 按台号
+			 *  	  4 - 按时间
+			 *  	  5 - 按类型
+			 *  	  6 - 按结帐方式
+			 *  	  7 - 按金额
+			 *   	  8 - 按实收
 			 * ope : the operator is one of the values below.
 			 * 		  1 - 等于
 			 * 		  2 - 大于等于
@@ -101,6 +101,27 @@ public class QueryTodayAction extends Action {
 			//get the value to filter
 			String filterVal = request.getParameter("value");
 			
+			
+			//get the having condition to filter
+			int cond = Integer.parseInt(request.getParameter("havingCond"));
+			String havingCond = null;
+			if(cond == 1){
+				//是否有反结帐
+				havingCond = " HAVING SUM(IF(B.is_paid, 1, 0)) > 0 ";
+			}else if(cond == 2){
+				//是否有折扣
+				havingCond = " HAVING MIN(B.discount) < 1 ";
+			}else if(cond == 3){
+				//是否有赠送
+				havingCond = " HAVING SUM(B.food_status & " + Food.GIFT + ") > 0 ";
+			}else if(cond == 4){
+				//是否有退菜
+				havingCond = " HAVING MIN(order_count) < 0 ";
+			}else{
+				havingCond = "";
+			}
+			
+			
 			//combine the operator and filter value
 			String filterCondition = null;
 			
@@ -108,48 +129,35 @@ public class QueryTodayAction extends Action {
 				//按账单号
 				filterCondition = " AND A.id" + ope + filterVal;
 			}else if(type == 2){
+				//按流水号
+				if(havingCond.equals("")){
+					havingCond = " HAVING MAX(A.seq_id) " + ope + filterVal;
+				} else {
+					havingCond = havingCond + " AND MAX(A.seq_id) " + ope + filterVal;
+				}
+				filterCondition = "";
+			}else if(type == 3){
 				//按台号
 				filterCondition = " AND A.table_alias" + ope + filterVal;
-			}else if(type == 3){
-				//按日期时间
-				filterCondition = " AND A.order_date" + ope + "'" + filterVal + "'"; 
 			}else if(type == 4){
+				//按时间
+				filterCondition = " AND A.order_date" + ope + "'" + new SimpleDateFormat("yyyy-MM-dd").format(new Date()) + " " + filterVal + "'";
+			}else if(type == 5){
 				//按类型
 				filterCondition = " AND A.category" + ope + filterVal;
-			}else if(type == 5){
+			}else if(type == 6){
 				//按结帐方式
 				filterCondition = " AND A.type" + ope + filterVal;
-			}else if(type == 6){
+			}else if(type == 7){
 				//按金额
 				filterCondition = " AND A.total_price" + ope + filterVal;
-			}else if(type == 7){
+			}else if(type == 8){
 				//按实收
 				filterCondition = " AND A.total_price_2" + ope + filterVal;
-			}else if(type == 8){
-				//按时间
-				filterCondition = " AND A.order_date" + ope + "'" + new SimpleDateFormat("yyyy-MM-dd").format(new Date()) + " " + filterVal + "'"; 
 			}else{
 				filterCondition = "";
 			}
 			
-			//get the having condition to filter
-			int cond = Integer.parseInt(request.getParameter("havingCond"));
-			String havingCond = null;
-			if(cond == 1){
-				//是否有反结帐
-				havingCond = "HAVING SUM(IF(B.is_paid, 1, 0)) > 0";
-			}else if(cond == 2){
-				//是否有折扣
-				havingCond = "HAVING MIN(B.discount) < 1";
-			}else if(cond == 3){
-				//是否有赠送
-				havingCond = "HAVING SUM(B.food_status & " + Food.GIFT + ") > 0";
-			}else if(cond == 4){
-				//是否有退菜
-				havingCond = "HAVING MIN(order_count) < 0";
-			}else{
-				havingCond = "";
-			}
 			
 			/**
 			 * Select all the today orders matched the conditions below.
@@ -204,7 +212,7 @@ public class QueryTodayAction extends Action {
 				 * "就餐人数", "最低消", "服务费率", "会员编号", "会员姓名", "账单备注",
 				 * "赠券金额", "结帐类型", "折扣类型", "服务员", 是否反結帳, 是否折扣, 是否赠送, 是否退菜, "流水号"]
 				 */
-				String jsonOrder = "[\"$(order_id)\",\"$(seq_id)\",\"$(table_alias)\",\"$(order_date)\",\"$(order_cate)\"," +
+				String jsonOrder = "[\"$(order_id)\",\"$(table_alias)\",\"$(order_date)\",\"$(order_cate)\"," +
 								   "\"$(pay_manner)\",\"$(total_price)\",\"$(actual_income)\"," +
 								   "\"$(table2_id)\",\"$(custom_num)\",\"$(min_cost)\"," +
 								   "\"$(service_rate)\",\"$(member_id)\",\"$(member)\",\"$(comment)\"," +

@@ -153,13 +153,14 @@ public class QueryTodayAdvAction extends Action {
 				 * The json to each order looks like below
 				 * ["账单号", "台号", "日期", "类型", "结帐方式", "金额", "实收", "台号2",
 				 * "就餐人数", "最低消", "服务费率", "会员编号", "会员姓名", "账单备注",
-				 * "赠券金额", "结帐类型", "折扣类型", "服务员", 是否反結帳, 是否折扣, 是否赠送, 是否退菜]
+				 * "赠券金额", "结帐类型", "折扣类型", "服务员", 是否反結帳, 是否折扣, 是否赠送, 是否退菜, "流水号"]
 				 */
 				String jsonOrder = "[\"$(order_id)\",\"$(table_alias)\",\"$(order_date)\",\"$(order_cate)\","
 						+ "\"$(pay_manner)\",\"$(total_price)\",\"$(actual_income)\","
 						+ "\"$(table2_id)\",\"$(custom_num)\",\"$(min_cost)\","
 						+ "\"$(service_rate)\",\"$(member_id)\",\"$(member)\",\"$(comment)\","
-						+ "\"$(gift_price)\",\"$(pay_type)\",\"$(discount_type)\",\"$(waiter)\"]";
+						+ "\"$(gift_price)\",\"$(pay_type)\",\"$(discount_type)\",\"$(waiter)\"," +
+								   "$(isPaid),$(isDiscount),$(isGift),$(isCancel),\"$(seq_id)\"]";
 				jsonOrder = jsonOrder.replace("$(order_id)",
 						Long.toString(dbCon.rs.getLong("id")));
 				jsonOrder = jsonOrder.replace("$(table_alias)",
@@ -179,7 +180,7 @@ public class QueryTodayAdvAction extends Action {
 				jsonOrder = jsonOrder.replace("$(actual_income)",
 						Float.toString(dbCon.rs.getFloat("total_price_2")));
 				jsonOrder = jsonOrder.replace("$(table2_id)",
-						Integer.toString(dbCon.rs.getInt("table2_id")));
+						Integer.toString(dbCon.rs.getInt("table2_alias")));
 				jsonOrder = jsonOrder.replace("$(custom_num)",
 						Integer.toString(dbCon.rs.getInt("custom_num")));
 				jsonOrder = jsonOrder.replace("$(min_cost)", "0");
@@ -204,9 +205,11 @@ public class QueryTodayAdvAction extends Action {
 						Short.toString(dbCon.rs.getShort("discount_type")));
 				jsonOrder = jsonOrder.replace("$(waiter)",
 						dbCon.rs.getString("waiter"));
+				jsonOrder = jsonOrder.replace("$(isPaid)", String.valueOf(dbCon.rs.getInt("is_paid")));
 				jsonOrder = jsonOrder.replace("$(isDiscount)", String.valueOf(dbCon.rs.getInt("is_discount")));
 				jsonOrder = jsonOrder.replace("$(isGift)", String.valueOf(dbCon.rs.getInt("is_gift")));
 				jsonOrder = jsonOrder.replace("$(isCancel)", String.valueOf(dbCon.rs.getInt("is_cancel")));
+				jsonOrder = jsonOrder.replace("$(seq_id)", Long.toString(dbCon.rs.getLong("seq_id")));
 				// put each json order info to the value
 				value.append(jsonOrder);
 				nCount++;
