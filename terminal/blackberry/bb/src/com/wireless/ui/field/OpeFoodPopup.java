@@ -105,15 +105,7 @@ class OpeFoodPopup extends PopupScreen{
 				 * In the case of "改单"，ask operator for permission before cancel a food
 				 */
 	    		if(_type == Type.UPDATE_ORDER){
-	    			if(WirelessOrder.restaurant.pwd2 != null){
-	    				if(WirelessOrder.restaurant.pwd2.length() != 0){
-	    					resp = VerifyPwd.ask(VerifyPwd.PWD_3);
-	    				}else{
-	    					resp = VerifyPwd.VERIFY_PASS;
-	    				}
-	    			}else{
-	    				resp = VerifyPwd.VERIFY_PASS;
-	    			}	    			
+	    			resp = VerifyPwd.ask(VerifyPwd.PWD_5);
 	    			
 	    		}else if(_type == Type.INSERT_ORDER){
 	    			resp = VerifyPwd.VERIFY_PASS;
