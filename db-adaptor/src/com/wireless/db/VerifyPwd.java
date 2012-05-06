@@ -74,7 +74,7 @@ public class VerifyPwd {
 		
 		String pwd = "", pwd2 = "", pwd3 = "", pwd4 = "", pwd5 = "";
 		
-		String sql = "SELECT pwd, pwd2, pwd3£¬ pwd4, pwd5 FROM " + Params.dbName + ".restaurant WHERE id=" + term.restaurant_id;
+		String sql = "SELECT pwd, pwd2, pwd3, pwd4, pwd5 FROM " + Params.dbName + ".restaurant WHERE id=" + term.restaurant_id;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			pwd = dbCon.rs.getString("pwd");
