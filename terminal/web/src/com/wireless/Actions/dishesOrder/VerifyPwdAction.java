@@ -34,9 +34,11 @@ public class VerifyPwdAction extends Action {
 			 * 
 			 * pin : the pin the this terminal
 			 * 
-			 * type : "1" means password_1
-			 * 		  "2" means password_2
-			 * 		  "3" means password_3
+			 * type : "1" means password_1 (管理员密码)
+			 * 		  "2" means password_2 (财务权限密码)
+			 * 		  "3" means password_3 (店长权限密码)
+			 * 		  "4" means password_4 (收银员权限密码)
+			 * 		  "5" means password_5 (退菜权限密码)
 			 * 
 			 * pwd : the password to verify, which is in the form of MD5
 			 */
