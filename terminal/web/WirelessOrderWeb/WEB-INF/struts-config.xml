@@ -328,6 +328,9 @@
 		<action path="/dailySettleStatDetail"
 			type="com.wireless.Actions.billHistory.DailySettleStatDetailAction" scope="request">
 		</action>
+		<action path="/SetPassword"
+			type="com.wireless.Actions.passwordConfig.SetPasswordAction" scope="request">
+		</action>
 	</action-mappings>
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
 </struts-config>
