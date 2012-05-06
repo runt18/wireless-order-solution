@@ -18,9 +18,9 @@ import com.wireless.ui.R;
 
 public class AskPwdDialog extends Dialog{
 
-	public static final int PWD_1 = 1;
-	public static final int PWD_2 = 2;
-	public static final int PWD_3 = 3;
+	public static final int PWD_1 = 1;		//管理员密码
+	public static final int PWD_3 = 2;		//店长权限密码
+	public static final int PWD_5 = 3;		//退菜密码
 	private int _pwdType = PWD_1;
 	private EditText _pwdEdtTxt;
 	private Context _context;
@@ -35,13 +35,13 @@ public class AskPwdDialog extends Dialog{
 
 		String title;
 		if(_pwdType == PWD_1){
-			title = "请输入密码";
-		}else if(_pwdType == PWD_2){
-			title = "请输入权限密码1";
+			title = "请输入管理员密码";
 		}else if(_pwdType == PWD_3){
-			title = "请输入权限密码2";
+			title = "请输入店长权限密码";
+		}else if(_pwdType == PWD_5){
+			title = "请输入退菜密码";
 		}else{
-			title = "请输入权限密码";
+			title = "请输入管理员密码";
 		}			
 		((TextView)view.findViewById(R.id.ordername)).setText(title);
 		
@@ -114,39 +114,23 @@ public class AskPwdDialog extends Dialog{
 	 * @return true if pass, otherwise return false
 	 */
 	private boolean isPass(byte[] pwd){
+		String password = toHexString(pwd);
 		if(_pwdType == PWD_1){
-			if(WirelessOrder.restaurant.pwd.equals(toHexString(pwd))){
-				return true;
-			}else{
-				return false;
-			}		
-			
-		}else if(_pwdType == PWD_2){
-			if(WirelessOrder.restaurant.pwd.equals(toHexString(pwd))){
-				return true;
-			}else{
-				if(WirelessOrder.restaurant.pwd2.equals(toHexString(pwd))){
-					return true;
-				}else{
-					return false;
-				}
-			}
+			return WirelessOrder.restaurant.pwd.equals(password);	
 			
 		}else if(_pwdType == PWD_3){
-			if(WirelessOrder.restaurant.pwd.equals(toHexString(pwd))){
+			if(WirelessOrder.restaurant.pwd.equals(password)){
 				return true;
 			}else{
-				if(WirelessOrder.restaurant.pwd2.equals(toHexString(pwd))){
-					return true;
-				}else{
-					if(WirelessOrder.restaurant.pwd3.equals(toHexString(pwd))){
-						return true;
-					}else{
-						return false;
-					}
-				}
+				return WirelessOrder.restaurant.pwd3.equals(password);
 			}
 			
+		}else if(_pwdType == PWD_5){
+			if(WirelessOrder.restaurant.pwd.equals(password) || WirelessOrder.restaurant.pwd3.equals(password)){
+				return true;
+			}else{
+				return WirelessOrder.restaurant.pwd5.equals(password);
+			}			
 		}else{			
 			return false;
 		}		

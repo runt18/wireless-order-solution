@@ -427,7 +427,7 @@ public class OrderFoodListView extends ExpandableListView{
 							/**
 							 * 提示输入权限密码2，验证通过的情况下显示删菜数量Dialog
 							 */
-							new AskPwdDialog(_context, AskPwdDialog.PWD_3){
+							new AskPwdDialog(_context, AskPwdDialog.PWD_5){
 								@Override
 								protected void onPwdPass(Context context){
 									dismiss();
@@ -739,7 +739,7 @@ public class OrderFoodListView extends ExpandableListView{
 					public void onClick(View arg0) {
 						dismiss();
 						if(WirelessOrder.restaurant.pwd3 != null){
-							new AskPwdDialog(_context, AskPwdDialog.PWD_3){							
+							new AskPwdDialog(_context, AskPwdDialog.PWD_5){							
 								@Override
 								protected void onPwdPass(Context context){
 									dismiss();
