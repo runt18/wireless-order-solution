@@ -7,9 +7,11 @@ import com.wireless.protocol.Terminal;
 
 public class VerifyPwd {
 	
-	public static int PASSWORD_1 = 1;
-	public static int PASSWORD_2 = 2;
-	public static int PASSWORD_3 = 3;
+	public static int PASSWORD_1 = 1;	//管理员密码
+	public static int PASSWORD_2 = 2;	//财务权限密码
+	public static int PASSWORD_3 = 3;	//店长权限密码
+	public static int PASSWORD_4 = 4;	//收银员权限密码
+	public static int PASSWORD_5 = 5;	//退菜权限密码
 	
 	/**
 	 * Verify the password according to specific type.
@@ -44,7 +46,7 @@ public class VerifyPwd {
 	/**
 	 * Verify the password to check whether permit to do this action.
 	 * The priority to password is below.
-	 * pwd1 > pwd2 > pwd3
+	 * pwd1 > pwd2 > pwd3 > pwd4 > pwd5
 	 * e.g. While asking to verify 3rd password, then would pass if type 1st or 2nd password correctly. 
 	 * Note that this method should be invoked before database connected.
 	 * @param dbCon
@@ -70,14 +72,16 @@ public class VerifyPwd {
 	public static boolean exec(DBCon dbCon, long pin, short model, int type, String pwd2Verify) throws BusinessException, SQLException{
 		Terminal term = VerifyPin.exec(dbCon, pin, model);
 		
-		String pwd = "", pwd2 = "", pwd3 = "";
+		String pwd = "", pwd2 = "", pwd3 = "", pwd4 = "", pwd5 = "";
 		
-		String sql = "SELECT pwd, pwd2, pwd3 FROM " + Params.dbName + ".restaurant WHERE id=" + term.restaurant_id;
+		String sql = "SELECT pwd, pwd2, pwd3， pwd4, pwd5 FROM " + Params.dbName + ".restaurant WHERE id=" + term.restaurant_id;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			pwd = dbCon.rs.getString("pwd");
 			pwd2 = dbCon.rs.getString("pwd2");
 			pwd3 = dbCon.rs.getString("pwd3");
+			pwd4 = dbCon.rs.getString("pwd4");
+			pwd5 = dbCon.rs.getString("pwd5");
 		}
 		
 		if(type == PASSWORD_1){
@@ -87,26 +91,28 @@ public class VerifyPwd {
 			if(pwd2Verify.equals(pwd)){
 				return true;
 			}else{
-				if(pwd2Verify.equals(pwd2)){
-					return true;
-				}else{
-					return false;
-				}
+				return pwd2Verify.equals(pwd2);
 			}
 
 		}else if(type == PASSWORD_3){
-			if(pwd2Verify.equals(pwd)){
+			if(pwd2Verify.equals(pwd) || pwd2Verify.equals(pwd2)){
 				return true;
 			}else{
-				if(pwd2Verify.equals(pwd2)){
-					return true;
-				}else{
-					if(pwd2Verify.equals(pwd3)){
-						return true;
-					}else{
-						return false;
-					}
-				}
+				return pwd2Verify.equals(pwd3);
+			}
+			
+		}else if(type == PASSWORD_4){
+			if(pwd2Verify.equals(pwd) || pwd2Verify.equals(pwd2) || pwd2Verify.equals(pwd3)){
+				return true;
+			}else{
+				return pwd2Verify.equals(pwd4);
+			}
+			
+		}else if(type == PASSWORD_5){
+			if(pwd2Verify.equals(pwd) || pwd2Verify.equals(pwd2) || pwd2Verify.equals(pwd3) || pwd2Verify.equals(pwd4)){
+				return true;
+			}else{
+				return pwd2Verify.equals(pwd5);
 			}
 			
 		}else{
