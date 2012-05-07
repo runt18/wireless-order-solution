@@ -180,17 +180,19 @@ public class PayOrder {
 			
 		
 		String sql;
-		
 		/**
-		 * Calculate the sequence id to this order.
+		 * Calculate the sequence id to this order in case of not been paid again.
 		 */
-		sql = "SELECT CASE WHEN MAX(seq_id) IS NULL THEN 1 ELSE MAX(seq_id) + 1 END FROM " + 
-			  Params.dbName + ".order WHERE restaurant_id=" + orderInfo.restaurantID;
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			orderInfo.seqID = dbCon.rs.getInt(1);
+		if(!isPaidAgain){
+			sql = "SELECT CASE WHEN MAX(seq_id) IS NULL THEN 1 ELSE MAX(seq_id) + 1 END FROM " + 
+				  Params.dbName + ".order WHERE restaurant_id=" + orderInfo.restaurantID;
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
+				orderInfo.seqID = dbCon.rs.getInt(1);
+			}
+			dbCon.rs.close();
 		}
-		dbCon.rs.close();
+
 		
 		/**
 		 * Put all the INSERT statements into a database transition so as to assure 
@@ -240,7 +242,7 @@ public class PayOrder {
 				  ", type=" + orderInfo.pay_manner + 
 				  ", discount_type=" + orderInfo.discount_type +
 				  ", service_rate=" + orderInfo.getServiceRate() +
-				  ", seq_id=" + orderInfo.seqID +
+				  (isPaidAgain ? "" : ", seq_id=" + orderInfo.seqID) +
 			   	  (isPaidAgain ? "" : ", order_date=NOW()") + 
 				  (orderInfo.comment != null ? ", comment='" + orderInfo.comment + "'" : "") +
 				  (member != null ? ", member_id='" + member.alias_id + "', member='" + member.name + "'" : ", member_id=NULL, member=NULL") + 
