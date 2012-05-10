@@ -43,6 +43,16 @@
 	});
 </script>
 
+<style type="text/css">
+.lock {
+	background-image: url(../../images/lock.png) !important;
+}
+
+.unlock {
+	background-image: url(../../images/unlock.png) !important;
+}
+</style>
+
 <script type="text/javascript">
 	// global variable
 	var Request = new URLParaQuery();
@@ -55,12 +65,17 @@
 	//var shiftEndTiem = "";
 
 	var emplData = [];
+
+	var adminLock = "YES";
+	var financeLock = "YES";
+	var managerLock = "YES";
+	var cashierLock = "YES";
+	var orderCancelLock = "YES";
 </script>
 
 <script type="text/javascript"
 	src="../../js/System/systemProtalAction.js"></script>
-<script type="text/javascript"
-	src="../../js/System/systemProtalMain.js"></script>
+<script type="text/javascript" src="../../js/System/systemProtalMain.js"></script>
 <script type="text/javascript"
 	src="../../js/System/systemProtalLoad.js "></script>
 
