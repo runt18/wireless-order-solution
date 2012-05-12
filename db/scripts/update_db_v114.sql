@@ -335,6 +335,131 @@ UPDATE wireless_order_db.restaurant SET
 pwd5 = pwd3, pwd3='', 
 pwd3 = pwd2, pwd2='';
 
+
+-- -----------------------------------------------------
+-- Append the kitchen 11 - 50 
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 10, '厨房11' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 11, '厨房12' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 12, '厨房13' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 13, '厨房14' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 14, '厨房15' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 15, '厨房16' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 16, '厨房17' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 17, '厨房18' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 18, '厨房19' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 19, '厨房20' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 20, '厨房21' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 21, '厨房22' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 22, '厨房23' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 23, '厨房24' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 24, '厨房25' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 25, '厨房26' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 26, '厨房27' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 27, '厨房28' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 28, '厨房29' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 29, '厨房30' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 30, '厨房31' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 31, '厨房32' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 32, '厨房33' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 33, '厨房34' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 34, '厨房35' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 35, '厨房36' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 36, '厨房37' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 37, '厨房38' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 38, '厨房39' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 39, '厨房40' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 40, '厨房41' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 41, '厨房42' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 42, '厨房43' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 43, '厨房44' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 44, '厨房45' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 45, '厨房46' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 46, '厨房47' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 47, '厨房48' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 48, '厨房49' FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.kitchen (`restaurant_id`, `kitchen_alias`, `name`)
+SELECT id, 49, '厨房50' FROM wireless_order_db.restaurant WHERE id > 10;
+
+
 -- -----------------------------------------------------
 -- Drop the table 'temp_order_food_history'
 -- -----------------------------------------------------
