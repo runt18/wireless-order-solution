@@ -297,6 +297,11 @@ ALTER TABLE `wireless_order_db`.`order_history` ADD COLUMN `is_paid` TINYINT NOT
 ALTER TABLE `wireless_order_db`.`order` ADD COLUMN `seq_id` INT UNSIGNED NULL DEFAULT NULL COMMENT 'the sequence id to this order'  AFTER `id` ;
 
 -- -----------------------------------------------------
+-- Update the seq_id to 0 in case the total price is not null(means order has been paid)
+-- -----------------------------------------------------
+UPDATE wireless_order_db.order SET seq_id = 0 WHERE total_price IS NOT NULL;
+
+-- -----------------------------------------------------
 -- Add the field 'seq_id' to table 'order_history'
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`order_history` ADD COLUMN `seq_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the sequence id to this order'  AFTER `id` ;
