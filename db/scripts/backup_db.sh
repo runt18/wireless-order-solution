@@ -11,4 +11,6 @@ file_name="wireless_order_db.sql"
 file_path="$dir_path""/""$file_name"
 test -e $dir_path || mkdir $dir_path
 test -e $file_path || touch $file_path
+
+echo dumping the wireless_order_db...
 mysqldump -u root -pHelloZ315 wireless_order_db > $file_path
