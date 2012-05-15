@@ -180,7 +180,7 @@ class OrderHandler extends Handler implements Runnable{
 						printConf |= Reserved.PRINT_SYNC;
 					}
 					if((conf & Reserved.PRINT_ALL_HURRIED_FOOD_2) != 0){
-						printConf |= Reserved.PRINT_ALL_HURRIED_FOOD_2;
+						printConf |= Reserved.PRINT_ALL_HURRIED_FOOD_2 | Reserved.PRINT_HURRIED_FOOD_2;
 					}
 					printParam.orderInfo = result.hurriedOrder;
 					printOrder(printConf, printParam);					
