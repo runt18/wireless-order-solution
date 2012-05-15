@@ -427,7 +427,7 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 						for(iter; iter != g_PrintInstances.end(); iter++){
 							vector<PrintFunc>::iterator it = (*iter)->funcs.begin();
 							for(it; it != (*iter)->funcs.end(); it++){
-								if(it->code == Reserved::PRINT_ORDER && (printReq.header.reserved == Reserved::PRINT_ORDER)){
+								if(it->code == Reserved::PRINT_ORDER && (printReq.header.reserved == Reserved::PRINT_ORDER || printReq.header.reserved == Reserved::PRINT_HURRIED_FOOD)){
 									(*iter)->addJob(printReq.body, len, *it, printReq.header.reserved);
 
 								}else if(it->code == Reserved::PRINT_ORDER_DETAIL && (printReq.header.reserved == Reserved::PRINT_ORDER_DETAIL)){
