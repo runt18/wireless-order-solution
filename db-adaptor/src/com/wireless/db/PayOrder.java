@@ -236,7 +236,7 @@ public class PayOrder {
 				  "waiter=(SELECT owner_name FROM " + Params.dbName + ".terminal WHERE pin=" + "0x" + Long.toHexString(term.pin) + " AND (model_id=" + term.modelID + " OR model_id=" + Terminal.MODEL_ADMIN + "))" +
 				  ", terminal_model=" + term.modelID +
 				  ", terminal_pin=" + term.pin +
-				  ", gift_price=" + orderInfo.getGiftPrice() +
+				  ", gift_price=" + orderInfo.calcGiftPrice() +
 				  ", total_price=" + totalPrice + 
 				  ", total_price_2=" + totalPrice2 +
 				  ", type=" + orderInfo.pay_manner + 
@@ -521,36 +521,23 @@ public class PayOrder {
 		 * If the pay order formation does NOT comprise the discount,
 		 * get the discount according the pay type and manner.
 		 */
-		//if(!incDiscount){
-			String discount = "discount";
-			if(orderToPay.pay_type == Order.PAY_NORMAL && orderToPay.discount_type == Order.DISCOUNT_1){
-				discount = "discount";
+		String discount = "discount";
+		if(orderToPay.pay_type == Order.PAY_NORMAL && orderToPay.discount_type == Order.DISCOUNT_1){
+			discount = "discount";
 				
-			}else if(orderToPay.pay_type == Order.PAY_NORMAL && orderToPay.discount_type == Order.DISCOUNT_2){
-				discount = "discount_2";
+		}else if(orderToPay.pay_type == Order.PAY_NORMAL && orderToPay.discount_type == Order.DISCOUNT_2){
+			discount = "discount_2";
 				
-			}else if(orderToPay.pay_type == Order.PAY_NORMAL && orderToPay.discount_type == Order.DISCOUNT_3){
-				discount = "discount_3";
+		}else if(orderToPay.pay_type == Order.PAY_NORMAL && orderToPay.discount_type == Order.DISCOUNT_3){
+			discount = "discount_3";
 				
-			}else if(orderToPay.pay_type == Order.PAY_MEMBER && orderToPay.memberID != null){
-				//validate the member id
-				String sql = "SELECT id FROM " + Params.dbName + 
-							 ".member WHERE restaurant_id=" + orderToPay.restaurantID + 
-							 " AND alias_id='" + orderToPay.memberID + "'";
-				dbCon.rs = dbCon.stmt.executeQuery(sql);
-				if(dbCon.rs.next()){
-					if(orderToPay.discount_type == Order.DISCOUNT_1){
-						discount = "member_discount_1";
-					}else if(orderToPay.discount_type == Order.DISCOUNT_2){
-						discount = "member_discount_2";
-					}else if(orderToPay.discount_type == Order.DISCOUNT_3){
-						discount = "member_discount_3";
-					}
-				}else{
-					throw new BusinessException("The member id(" + orderToPay.memberID + ") is invalid.", ErrorCode.MEMBER_NOT_EXIST);
-				}
-				
-			}else if(orderToPay.pay_type == Order.PAY_MEMBER && orderToPay.memberID == null){
+		}else if(orderToPay.pay_type == Order.PAY_MEMBER && orderToPay.memberID != null){
+			//validate the member id
+			String sql = "SELECT id FROM " + Params.dbName + 
+						 ".member WHERE restaurant_id=" + orderToPay.restaurantID + 
+						 " AND alias_id='" + orderToPay.memberID + "'";
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
 				if(orderToPay.discount_type == Order.DISCOUNT_1){
 					discount = "member_discount_1";
 				}else if(orderToPay.discount_type == Order.DISCOUNT_2){
@@ -558,59 +545,50 @@ public class PayOrder {
 				}else if(orderToPay.discount_type == Order.DISCOUNT_3){
 					discount = "member_discount_3";
 				}
+			}else{
+				throw new BusinessException("The member id(" + orderToPay.memberID + ") is invalid.", ErrorCode.MEMBER_NOT_EXIST);
 			}
 				
-			for(int i = 0; i < orderInfo.foods.length; i++){
-				/**
-				 * Both the special food and gifted food does NOT discount
-				 */
-				if(orderInfo.foods[i].isSpecial() || orderInfo.foods[i].isGift()){
-					orderInfo.foods[i].setDiscount(new Float(1.0));
-				}else{
-					/**
-					 * Get the discount to each food according to the kitchen of this restaurant.
-					 */
-					String sql = "SELECT " + discount + " FROM " + Params.dbName + 
-								 ".kitchen WHERE restaurant_id=" + orderInfo.restaurantID + 
-								 " AND kitchen_alias=" + orderInfo.foods[i].kitchen.aliasID;
-					
-					dbCon.rs = dbCon.stmt.executeQuery(sql);
-					if(dbCon.rs.next()){
-						orderInfo.foods[i].setDiscount(dbCon.rs.getFloat(discount));
-					}
-					dbCon.rs.close();				
-				}
+		}else if(orderToPay.pay_type == Order.PAY_MEMBER && orderToPay.memberID == null){
+			if(orderToPay.discount_type == Order.DISCOUNT_1){
+				discount = "member_discount_1";
+			}else if(orderToPay.discount_type == Order.DISCOUNT_2){
+				discount = "member_discount_2";
+			}else if(orderToPay.discount_type == Order.DISCOUNT_3){
+				discount = "member_discount_3";
 			}
-		//}
-		
-		/**
-		 * Calculate the total price of this order(exclude the gifted foods) as below.
-		 * total = food_price_1 + food_price_2 + ...
-		 * food_price_n = (unit * discount + taste) * count
-		 */
-		float totalPrice = 0;
+		}
+				
 		for(int i = 0; i < orderInfo.foods.length; i++){
-			if(!orderInfo.foods[i].isGift()){
-				float dist = orderInfo.foods[i].getDiscount();					
-				float foodPrice = orderInfo.foods[i].getPrice().floatValue();
-				float tastePrice = orderInfo.foods[i].getTastePrice();
-				totalPrice += (foodPrice * dist + tastePrice) * orderInfo.foods[i].getCount().floatValue();
+			/**
+			 * Both the special food and gifted food does NOT discount
+			 */
+			if(orderInfo.foods[i].isSpecial() || orderInfo.foods[i].isGift()){
+				orderInfo.foods[i].setDiscount(new Float(1.0));
+			}else{
+				/**
+				 * Get the discount to each food according to the kitchen of this restaurant.
+				 */
+				String sql = "SELECT " + discount + " FROM " + Params.dbName + 
+							 ".kitchen WHERE restaurant_id=" + orderInfo.restaurantID + 
+							 " AND kitchen_alias=" + orderInfo.foods[i].kitchen.aliasID;
+				
+				dbCon.rs = dbCon.stmt.executeQuery(sql);
+				if(dbCon.rs.next()){
+					orderInfo.foods[i].setDiscount(dbCon.rs.getFloat(discount));
+				}
+				dbCon.rs.close();				
 			}
 		}
 		
-		/**
-		 * Minus the gift price as 
-		 * total = total - gift
-		 */
-		totalPrice = (float)Math.round((totalPrice - orderToPay.getGiftPrice()) * 100) / 100;
-		orderInfo.setTotalPrice(totalPrice);
+		orderInfo.setTotalPrice(orderInfo.calcPriceWithTaste());
 
 		/**
 		 * Multiplied by service rate
 		 * total = total * (1 + service_rate)
 		 */
-		totalPrice = totalPrice * (1 + orderToPay.getServiceRate());		
-		totalPrice = (float)Math.round(totalPrice * 100) / 100;
+		float totalPriceWithServRate = orderInfo.getTotalPrice() * (1 + orderToPay.getServiceRate());		
+		totalPriceWithServRate = (float)Math.round(totalPriceWithServRate * 100) / 100;
 		
 		/**
 		 * Calculate the total price 2 as below.
@@ -621,12 +599,12 @@ public class PayOrder {
 		 * Comparing the minimum cost against total price.
 		 * Set the actual price to minimum cost if total price is less than minimum cost.
 		 */
-		if(totalPrice < orderInfo.getMinimumCost()){
+		if(totalPriceWithServRate < orderInfo.getMinimumCost()){
 			//直接使用最低消费
 			totalPrice2 = orderInfo.getMinimumCost();			
 		}else{
 			Setting setting = QuerySetting.exec(dbCon, orderToPay.restaurantID);
-			totalPrice2 = Util.calcByTail(setting.priceTail, totalPrice);
+			totalPrice2 = Util.calcByTail(setting.priceTail, totalPriceWithServRate);
 		}
 		
 		orderInfo.setActualPrice(totalPrice2);
@@ -636,7 +614,6 @@ public class PayOrder {
 		orderInfo.discount_type = orderToPay.discount_type;
 		orderInfo.memberID = orderToPay.memberID; 
 		orderInfo.setCashIncome(orderToPay.getCashIncome());
-		orderInfo.setGiftPrice(orderToPay.getGiftPrice());
 		orderInfo.pay_manner = orderToPay.pay_manner;
 		orderInfo.comment = orderToPay.comment;
 		orderInfo.setServiceRate(orderToPay.getServiceRate());
