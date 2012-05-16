@@ -40,7 +40,7 @@ public class AskPwdDialog extends Dialog{
 		}else if(_pwdType == PWD_3){
 			title = "请输入店长权限密码";
 		}else if(_pwdType == PWD_5){
-			title = "请输入退菜密码";
+			title = "请输入退菜权限密码";
 		}else{
 			title = "请输入管理员密码";
 		}			

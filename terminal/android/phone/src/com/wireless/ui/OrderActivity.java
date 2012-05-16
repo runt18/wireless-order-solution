@@ -105,7 +105,7 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 			public void onSourceChanged(){
 				//update the total price
 				Order tmpOrder = new Order(_newFoodLstView.getSourceData().toArray(new OrderFood[_newFoodLstView.getSourceData().size()]));
-				((TextView)findViewById(R.id.totalTxtView)).setText(Util.CURRENCY_SIGN + Util.float2String(tmpOrder.calcPrice2()));	
+				((TextView)findViewById(R.id.totalTxtView)).setText(Util.CURRENCY_SIGN + Util.float2String(tmpOrder.calcPriceWithTaste()));	
 			}
 		});
 		_newFoodLstView.notifyDataChanged(new ArrayList<OrderFood>());

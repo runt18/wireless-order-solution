@@ -30,7 +30,7 @@ public class OrderParcel extends Order implements Parcelable{
 		comment = order.comment == null ? null : new String(order.comment);
 		print_type = order.print_type;
 		setMinimumCost(new Float(order.getMinimumCost()));
-		setGiftPrice(new Float(order.getGiftPrice()));
+		//setGiftPrice(new Float(order.getGiftPrice()));
 		setCashIncome(new Float(order.getCashIncome()));
 		setTotalPrice(new Float(order.getTotalPrice()));
 		setActualPrice(new Float(order.getActualPrice()));
@@ -58,7 +58,7 @@ public class OrderParcel extends Order implements Parcelable{
 		this.comment = comment.equals("") ? null : comment;
 		print_type = in.readInt();
 		setMinimumCost(Util.int2Float(in.readInt()));
-		setGiftPrice(Util.int2Float(in.readInt()));
+		//setGiftPrice(Util.int2Float(in.readInt()));
 		setCashIncome(Util.int2Float(in.readInt()));
 		setTotalPrice(Util.int2Float(in.readInt()));
 		setActualPrice(Util.int2Float(in.readInt()));
@@ -100,7 +100,7 @@ public class OrderParcel extends Order implements Parcelable{
 		parcel.writeString(comment == null ? "" : comment);
 		parcel.writeInt(print_type);
 		parcel.writeInt(Util.float2Int(getMinimumCost()));
-		parcel.writeInt(Util.float2Int(getGiftPrice()));
+		//parcel.writeInt(Util.float2Int(getGiftPrice()));
 		parcel.writeInt(Util.float2Int(getCashIncome()));
 		parcel.writeInt(Util.float2Int(getTotalPrice()));
 		parcel.writeInt(Util.float2Int(getActualPrice()));

@@ -47,7 +47,7 @@ public class BillActivity extends Activity {
 		((TextView)findViewById(R.id.valueplatform)).setText(String.valueOf(_orderToPay.table.aliasID));
 		((TextView)findViewById(R.id.valuepeople)).setText(String.valueOf(_orderToPay.custom_num));
 		((TextView)findViewById(R.id.valuehandsel)).setText(Util.CURRENCY_SIGN+Float.toString(_orderToPay.calcGiftPrice()));
-		((TextView)findViewById(R.id.valueconfirmed)).setText(Util.CURRENCY_SIGN+Float.toString(_orderToPay.calcPrice2()));
+		((TextView)findViewById(R.id.valueconfirmed)).setText(Util.CURRENCY_SIGN+Float.toString(_orderToPay.calcPriceWithTaste()));
 		
 		/**
 		 * "·µ»Ø"Button
