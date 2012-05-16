@@ -576,7 +576,7 @@ function tableOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
 //	 * "赠券金额","结帐类型","折扣类型","服务员",是否反結帳]
 var tableStore = new Ext.data.Store({
 	proxy : new Ext.data.HttpProxy({
-		url : "../../QueryHistory.do"
+		url : "../../QueryTable.do"
 	}),
 	reader : new Ext.data.JsonReader({
 		totalProperty : "totalProperty",

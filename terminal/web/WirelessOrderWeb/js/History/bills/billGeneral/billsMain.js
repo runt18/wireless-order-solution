@@ -1,28 +1,28 @@
-﻿//修改link
-function billOptModifyHandler(rowindex) {
-	// "51","100","2011-07-26
-	// 23:23:41","一般","现金","100.44","150.0","0","3","0","0.0","","","","0.0","1","1"
-	var tableNbr = billsData[rowindex][1];
-	var tableNbr2 = billsData[rowindex][7];
-	var category = billsData[rowindex][3];
-	var orderID = billsData[rowindex][0];
-	var personCount = billsData[rowindex][8];
-	var discountType = billsData[rowindex][16];
-	var payType = billsData[rowindex][15];
-	var give = billsData[rowindex][14];
-	var payManner = billsData[rowindex][4];
-	var serviceRate = billsData[rowindex][10];
-	var memberID = billsData[rowindex][11];
-	var comment = billsData[rowindex][13];
-	var minCost = billsData[rowindex][9];
-	location.href = "BillModify.html?pin=" + pin + "&restaurantID="
-			+ restaurantID + "&category=" + category + "&tableNbr=" + tableNbr
-			+ "&tableNbr2=" + tableNbr2 + "&personCount=" + personCount
-			+ "&minCost=" + minCost + "&orderID=" + orderID + "&give=" + give
-			+ "&payType=" + payType + "&discountType=" + discountType
-			+ "&payManner=" + payManner + "&serviceRate=" + serviceRate
-			+ "&memberID=" + memberID;
-};
+﻿////修改link
+//function billOptModifyHandler(rowindex) {
+//	// "51","100","2011-07-26
+//	// 23:23:41","一般","现金","100.44","150.0","0","3","0","0.0","","","","0.0","1","1"
+//	var tableNbr = billsData[rowindex][1];
+//	var tableNbr2 = billsData[rowindex][7];
+//	var category = billsData[rowindex][3];
+//	var orderID = billsData[rowindex][0];
+//	var personCount = billsData[rowindex][8];
+//	var discountType = billsData[rowindex][16];
+//	var payType = billsData[rowindex][15];
+//	var give = billsData[rowindex][14];
+//	var payManner = billsData[rowindex][4];
+//	var serviceRate = billsData[rowindex][10];
+//	var memberID = billsData[rowindex][11];
+//	var comment = billsData[rowindex][13];
+//	var minCost = billsData[rowindex][9];
+//	location.href = "BillModify.html?pin=" + pin + "&restaurantID="
+//			+ restaurantID + "&category=" + category + "&tableNbr=" + tableNbr
+//			+ "&tableNbr2=" + tableNbr2 + "&personCount=" + personCount
+//			+ "&minCost=" + minCost + "&orderID=" + orderID + "&give=" + give
+//			+ "&payType=" + payType + "&discountType=" + discountType
+//			+ "&payManner=" + payManner + "&serviceRate=" + serviceRate
+//			+ "&memberID=" + memberID;
+//};
 
 // 查看link
 var viewBillGenPanel = new Ext.Panel({
@@ -163,31 +163,43 @@ var viewBillWin = new Ext.Window(
 			} ],
 			listeners : {
 				"show" : function(thiz) {
-					var billID = billsData[currRowIndex][0];
-					var tableType = billsData[currRowIndex][3];
-					var tableNbr = billsData[currRowIndex][1];
-					var personNbr = billsData[currRowIndex][8];
-					var billDate = billsData[currRowIndex][2];
-					var billPayType = billsData[currRowIndex][4];
-					var billPayManna = billsData[currRowIndex][15];
-					var PayMannaDescr;
-					if (billPayManna == "1") {
-						PayMannaDescr = "一般";
+					var billID = billsGrid.getStore().getAt(currRowIndex).get(
+							"orderID");
+					var tableType = billsGrid.getStore().getAt(currRowIndex)
+							.get("orderCategory");
+					var tableNbr = billsGrid.getStore().getAt(currRowIndex)
+							.get("tableAlias");
+					var personNbr = billsGrid.getStore().getAt(currRowIndex)
+							.get("customerNum");
+					var billDate = billsGrid.getStore().getAt(currRowIndex)
+							.get("orderDate");
+					var billPayType = billsGrid.getStore().getAt(currRowIndex)
+							.get("payManner");
+					var payType = billsGrid.getStore().getAt(currRowIndex).get(
+							"payType");
+					var payTypeDescr;
+					if (payType == "1") {
+						payTypeDescr = "一般";
 					} else {
-						PayMannaDescr = "会员";
+						payTypeDescr = "会员";
 					}
-					var billServiceRate = billsData[currRowIndex][10];
-					var billWaiter = billsData[currRowIndex][17];
-					var billForFree = billsData[currRowIndex][14];
-					var billShouldPay = billsData[currRowIndex][5];
-					var billAvtrualPay = billsData[currRowIndex][6];
+					var billServiceRate = billsGrid.getStore().getAt(
+							currRowIndex).get("serviceRate");
+					var billWaiter = billsGrid.getStore().getAt(currRowIndex)
+							.get("staff");
+					var billForFree = billsGrid.getStore().getAt(currRowIndex)
+							.get("giftPrice");
+					var billShouldPay = billsGrid.getStore()
+							.getAt(currRowIndex).get("totalPrice");
+					var billAvtrualPay = billsGrid.getStore().getAt(
+							currRowIndex).get("actualIncome");
 
 					document.getElementById("billIDBV").innerHTML = billID;
 					document.getElementById("billTypeBV").innerHTML = tableType;
 					document.getElementById("tableNbrBV").innerHTML = tableNbr;
 					document.getElementById("personNbrBV").innerHTML = personNbr;
 					document.getElementById("billDateBV").innerHTML = billDate;
-					document.getElementById("payTypeBV").innerHTML = PayMannaDescr;
+					document.getElementById("payTypeBV").innerHTML = payTypeDescr;
 					document.getElementById("payMannerBV").innerHTML = billPayType;
 					document.getElementById("serviceRateBV").innerHTML = billServiceRate
 							+ "％";
@@ -426,11 +438,12 @@ var billDetailGrid = new Ext.grid.GridPanel({
 
 // 为store配置beforeload监听器
 billDetailGrid.getStore().on('beforeload', function() {
-	var billId = billsData[currRowIndex][0];
+	var orderID = billsGrid.getStore().getAt(currRowIndex).get("orderID");
+
 	// 输入查询条件参数
 	this.baseParams = {
 		"pin" : pin,
-		"orderID" : billId,
+		"orderID" : orderID,
 		"queryType" : "History"
 	};
 
@@ -549,7 +562,7 @@ function printBillFunc(rowInd) {
 		url : "../../PrintOrder.do",
 		params : {
 			"pin" : pin,
-			"orderID" : billsData[rowInd][0],
+			"orderID" : billsGrid.getStore().getAt(rowInd).get("orderID"),
 			"printReceipt" : 1
 		},
 		success : function(response, options) {
@@ -1326,7 +1339,7 @@ var billsQueryCondPanel = new Ext.form.FormPanel({
 				id : "advSrchBtn",
 				text : "高级搜索",
 				width : 100,
-				// disabled : true,
+				 disabled : true,
 				listeners : {
 					"click" : function() {
 						advSrchWin.show();
@@ -1360,28 +1373,30 @@ function billOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
 // "就餐人数","最低消","服务费率","会员编号","会员姓名","账单备注",
 // "赠券金额","结帐类型","折扣类型","服务员",是否反結帳, 是否折扣, 是否赠送, 是否退菜, "流水号"]
 var billsStore = new Ext.data.Store({
-	// proxy : new Ext.data.HttpProxy({
-	// url : "../../QueryTable.do"
-	// }),
-	proxy : new Ext.data.MemoryProxy(billsData),
-	reader : new Ext.data.ArrayReader({}, [ {
-		name : "billNumber"
+	proxy : new Ext.data.HttpProxy({
+		url : "../../QueryHistory.do"
+	}),
+	reader : new Ext.data.JsonReader({
+		totalProperty : "totalProperty",
+		root : "root"
+	}, [ {
+		name : "orderID"
 	}, {
-		name : "tableNumber"
+		name : "tableAlias"
 	}, {
-		name : "payDate"
+		name : "orderDate"
 	}, {
-		name : "billType"
+		name : "orderCategory"
 	}, {
-		name : "payType"
+		name : "payManner"
 	}, {
 		name : "totalPrice"
 	}, {
-		name : "acturalPrice"
+		name : "actualIncome"
 	}, {
-		name : "tableNbr2"
+		name : "table2Alias"
 	}, {
-		name : "personCount"
+		name : "customerNum"
 	}, {
 		name : "minCost"
 	}, {
@@ -1389,13 +1404,13 @@ var billsStore = new Ext.data.Store({
 	}, {
 		name : "giftPrice"
 	}, {
-		name : "memberID"
-	}, {
-		name : "memberName"
+		name : "member"
 	}, {
 		name : "comment"
 	}, {
-		name : "payManner"
+		name : "giftPrice"
+	}, {
+		name : "payType"
 	}, {
 		name : "discountType"
 	}, {
@@ -1407,46 +1422,44 @@ var billsStore = new Ext.data.Store({
 	}, {
 		name : "isGift"
 	}, {
-		name : "isReturn"
+		name : "isCancel"
 	}, {
-		name : "seqNum"
+		name : "seqID"
 	}, {
 		name : "billOpt"
 	} ])
 });
 
-billsStore.reload();
-
 // 2，栏位模型
 var billsColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(), {
 	header : "帐单号",
 	sortable : true,
-	dataIndex : "billNumber",
+	dataIndex : "orderID",
 	width : 120
 }, {
 	header : "流水号",
 	sortable : true,
-	dataIndex : "seqNum",
+	dataIndex : "seqID",
 	width : 120
 }, {
 	header : "台号",
 	sortable : true,
-	dataIndex : "tableNumber",
+	dataIndex : "tableAlias",
 	width : 120
 }, {
 	header : "日期",
 	sortable : true,
-	dataIndex : "payDate",
+	dataIndex : "orderDate",
 	width : 120
 }, {
 	header : "类型",
 	sortable : true,
-	dataIndex : "billType",
+	dataIndex : "orderCategory",
 	width : 120
 }, {
 	header : "结帐方式",
 	sortable : true,
-	dataIndex : "payType",
+	dataIndex : "payManner",
 	width : 120
 }, {
 	header : "金额（￥）",
@@ -1456,7 +1469,7 @@ var billsColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(), {
 }, {
 	header : "实收（￥）",
 	sortable : true,
-	dataIndex : "acturalPrice",
+	dataIndex : "actualIncome",
 	width : 120
 }, {
 	header : "反结帐",
@@ -1467,10 +1480,11 @@ var billsColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(), {
 	header : "<center>操作</center>",
 	sortable : true,
 	dataIndex : "billOpt",
-	width : 270,
+	width : 170,
 	renderer : billOpt
 } ]);
 
+var billsGrid;
 Ext
 		.onReady(function() {
 			// 解决ext中文传入后台变问号问题
@@ -1478,7 +1492,7 @@ Ext
 			Ext.QuickTips.init();
 
 			// 3,表格
-			var billsGrid = new Ext.grid.GridPanel({
+			billsGrid = new Ext.grid.GridPanel({
 				title : "帐单",
 				xtype : "grid",
 				anchor : "99%",
@@ -1486,15 +1500,35 @@ Ext
 				border : false,
 				ds : billsStore,
 				cm : billsColumnModel,
-				viewConfig : {
-					forceFit : true
-				},
+				// viewConfig : {
+				// forceFit : true
+				// },
 				sm : new Ext.grid.RowSelectionModel({
 					singleSelect : true
 				}),
+				bbar : new Ext.PagingToolbar({
+					pageSize : billRecordCount,
+					store : billsStore,
+					displayInfo : true,
+					displayMsg : '显示第 {0} 条到 {1} 条记录，共 {2} 条',
+					emptyMsg : "没有记录"
+				}),
+				autoScroll : true,
+				loadMask : {
+					msg : "数据加载中，请稍等..."
+				},
 				listeners : {
-					rowclick : function(thiz, rowIndex, e) {
+					"rowclick" : function(thiz, rowIndex, e) {
 						currRowIndex = rowIndex;
+					},
+
+					"render" : function(thiz) {
+						billsStore.reload({
+							params : {
+								start : 0,
+								limit : billRecordCount
+							}
+						});
 					}
 				}
 			});
@@ -1503,6 +1537,8 @@ Ext
 			billsGrid.getStore().on(
 					'load',
 					function() {
+						currRowIndex = -1;
+
 						if (billsGrid.getStore().getTotalCount() != 0) {
 							billsGrid.getStore().each(
 									function(record) {
@@ -1514,31 +1550,94 @@ Ext
 										// 提交，去掉修改標記
 										record.commit();
 									});
-
-							// // 底色处理
-							// for ( var i = 0; i < billsGrid.getStore()
-							// .getCount(); i++) {
-							// var record = billsGrid.getStore()
-							// .getAt(i);
-							// if (record.get("isPaid") ==
-							// norCounPayCode2Descr(COUNTER_PAY)) {
-							// billsGrid.getView().getRow(i).style.backgroundColor
-							// = "#FFFF93";
-							// }
-							// }
-
 						}
+						
+						// sum the prices
+						var sumShouldPay = 0;
+						var sumActualPay = 0;
+						for ( var i = 0; i < billsGrid.getStore().getCount(); i++) {
+							sumShouldPay = sumShouldPay
+									+ parseFloat(billsGrid.getStore().getAt(i).get("totalPrice"));
+							sumActualPay = sumActualPay
+									+ parseFloat(billsGrid.getStore().getAt(i).get("actualIncome"));
+						}
+						document.getElementById("shouldPaySum").innerHTML = sumShouldPay
+								.toFixed(2);
+						document.getElementById("actualPaySum").innerHTML = sumActualPay
+								.toFixed(2);
+						
 					});
 
-			// tableGrid.getStore().on('beforeload', function() {
-			// // 输入查询条件参数
-			// this.baseParams = {
-			// "pin" : pin,
-			// "type" : queryTpyeBill,
-			// "ope" : queryOperatorBill,
-			// "value" : queryValueBill
-			// };
-			// });
+			billsGrid.getStore().on(
+					'beforeload',
+					function() {
+						var queryTpye = filterTypeComb.getValue();
+						if (queryTpye == "全部") {
+							queryTpye = 0;
+						}
+
+						var queryOperator = operatorComb.getValue();
+						if (queryOperator == "等于") {
+							queryOperator = 1;
+						}
+
+						var queryValue = "";
+						if (conditionType == "text" && queryTpye != 0
+								&& queryTpye != 9) {
+							queryValue = searchForm.findById("conditionText")
+									.getValue();
+						} else if (conditionType == "number") {
+							queryValue = searchForm.findById("conditionNumber")
+									.getValue();
+						} else if (conditionType == "date") {
+							queryValue = new Date();
+							queryValue = searchForm.findById("conditionDate")
+									.getValue();
+							// queryValue = queryValue.format("H:i:s");
+						} else if (conditionType == "tableTypeComb") {
+							queryValue = searchForm.findById("tableTypeComb")
+									.getValue();
+							if (queryValue == "一般") {
+								queryValue = 1;
+							}
+						} else if (conditionType == "payTypeComb") {
+							queryValue = searchForm.findById("payTypeComb")
+									.getValue();
+							if (queryValue == "现金") {
+								queryValue = 1;
+							}
+						}
+
+						// -- 獲取額外過濾條件--
+						var additionFilter = 0;
+						if (billsQueryCondPanel.getForm().findField(
+								"conditionRadio") != null) {
+							var conditionRadio = billsQueryCondPanel.getForm()
+									.findField("conditionRadio")
+									.getGroupValue();
+							if (conditionRadio == "all") {
+								additionFilter = 0;
+							} else if (conditionRadio == "isPaid") {
+								additionFilter = 1;
+							} else if (conditionRadio == "discount") {
+								additionFilter = 2;
+							} else if (conditionRadio == "gift") {
+								additionFilter = 3;
+							} else if (conditionRadio == "return") {
+								additionFilter = 4;
+							}
+						}
+
+						// 输入查询条件参数
+						this.baseParams = {
+							"pin" : pin,
+							"type" : queryTpye,
+							"ope" : queryOperator,
+							"value" : queryValue,
+							"havingCond" : additionFilter,
+							"isPaging" : true
+						};
+					});
 
 			// --------------------------------------------------------------------------
 

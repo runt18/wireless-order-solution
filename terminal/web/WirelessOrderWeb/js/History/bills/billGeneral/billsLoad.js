@@ -202,4 +202,11 @@ function billHistoryOnLoad() {
 	loadDepartment();
 	loadAllRegion();
 	loadAllStaff();
+
+//	billsStore.reload({
+//		params : {
+//			start : 0,
+//			limit : billRecordCount
+//		}
+//	});
 };

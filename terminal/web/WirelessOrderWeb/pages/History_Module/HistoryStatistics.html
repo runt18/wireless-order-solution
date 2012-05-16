@@ -61,6 +61,7 @@
 	var dailySettleDtlRowIndex = -1;
 
 	var billsData = [];
+	var billJSON = {};
 	var conditionType = "text";
 
 	var isPrompt = false;
@@ -109,6 +110,8 @@
 
 	//明細表格分頁記錄數
 	var billDetailpageRecordCount = 10;
+	
+	var billRecordCount = 15;
 </script>
 
 <script type="text/javascript"
@@ -150,7 +153,7 @@
 	<div id="billSum" style="font-weight: bold; font-size: 15px;">
 		<table>
 			<tr>
-				<td style="width: 560px">&nbsp;</td>
+				<td style="width: 660px">&nbsp;</td>
 				<td style="width: 60px">合计：</td>
 				<td style="width: 120px"><div id="shouldPaySum">0</div>
 				</td>
