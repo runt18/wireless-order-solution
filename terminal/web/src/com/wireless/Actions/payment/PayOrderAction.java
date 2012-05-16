@@ -66,7 +66,6 @@ public class PayOrderAction extends Action implements PinGen{
 			 * cashIncome : the cash that client pay for this order,
 			 * 				this parameter is optional, only takes effect while the pay manner is "现金"
 			 * 
-			 * giftPrice : the gift price to this order
 			 * 
 			 * serviceRate : the service percent rate to this order,
 			 * 				 this parameter is optional.
@@ -116,10 +115,6 @@ public class PayOrderAction extends Action implements PinGen{
 				orderToPay.setServiceRate(Util.int2Float(Integer.parseInt(request.getParameter("serviceRate"))));
 			}else{
 				orderToPay.setServiceRate(new Float(0));
-			}
-			
-			if(request.getParameter("giftPrice") != null){
-				orderToPay.setGiftPrice(Float.parseFloat(request.getParameter("giftPrice")));
 			}
 			
 			/**
