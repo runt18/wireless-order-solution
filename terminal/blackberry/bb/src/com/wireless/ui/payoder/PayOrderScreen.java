@@ -103,7 +103,7 @@ public class PayOrderScreen extends MainScreen
 		if(Util.float2Int(giftMoney) != 0){
 			add(new LabelField("赠送：" + Util.CURRENCY_SIGN + Util.float2String(giftMoney), LabelField.USE_ALL_WIDTH | DrawStyle.RIGHT));
 		}		
-		add(new LabelField("应收：" + Util.CURRENCY_SIGN + Util.float2String(_bill.calcPrice2()), LabelField.USE_ALL_WIDTH | DrawStyle.RIGHT));
+		add(new LabelField("应收：" + Util.CURRENCY_SIGN + Util.float2String(_bill.calcPriceWithTaste()), LabelField.USE_ALL_WIDTH | DrawStyle.RIGHT));
 		
 //		HorizontalFieldManager hfm2 = new HorizontalFieldManager(Field.FIELD_RIGHT);
 //		_cashIncome = new EditField("实收：￥", 
@@ -163,7 +163,7 @@ public class PayOrderScreen extends MainScreen
 	
 	private void payOrder(int payType, int distType){
 		try{
-			int totalPrice = Util.float2Int(_bill.calcPrice2());
+			int totalPrice = Util.float2Int(_bill.calcPriceWithTaste());
 			int minimumCost = Util.float2Int(_bill.getMinimumCost());
 			//check to see whether the total price reach the minimum cost
 			if(totalPrice < minimumCost){
