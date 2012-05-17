@@ -1980,7 +1980,10 @@ var dishesChooseByKitchenForm = new Ext.form.FormPanel(
 			frame : true,
 			items : [ {
 				contentEl : "kitchenSelectDO"
+					//,
+				//autoScroll : true
 			} ],
+			autoScroll : true,
 			listeners : {
 				render : function(thiz) {
 					document.getElementById("kitchenSelectDO").style["visibility"] = "visible";
