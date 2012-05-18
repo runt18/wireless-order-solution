@@ -670,6 +670,19 @@ var dailySettleStatBut = new Ext.ux.ImageButton({
 	}
 });
 
+var businessStatBut = new Ext.ux.ImageButton({
+	imgPath : "../../images/businessStatis.png",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "营业统计",
+	handler : function(btn) {
+		if (!isPrompt) {
+			isPrompt = true;
+			businessStatWin.show();
+		}
+	}
+});
+
 // --
 var pushBackBut = new Ext.ux.ImageButton({
 	imgPath : "../../images/UserLogout.png",
@@ -1339,7 +1352,7 @@ var billsQueryCondPanel = new Ext.form.FormPanel({
 				id : "advSrchBtn",
 				text : "高级搜索",
 				width : 100,
-				 disabled : true,
+				disabled : true,
 				listeners : {
 					"click" : function() {
 						advSrchWin.show();
@@ -1534,39 +1547,49 @@ Ext
 			});
 
 			// 为store配置load监听器(即load完后动作)
-			billsGrid.getStore().on(
-					'load',
-					function() {
-						currRowIndex = -1;
+			billsGrid
+					.getStore()
+					.on(
+							'load',
+							function() {
+								currRowIndex = -1;
 
-						if (billsGrid.getStore().getTotalCount() != 0) {
-							billsGrid.getStore().each(
-									function(record) {
-										// 反結帳顯示
-										record.set("isPaid",
-												norCounPayCode2Descr(record
-														.get("isPaid")));
+								if (billsGrid.getStore().getTotalCount() != 0) {
+									billsGrid
+											.getStore()
+											.each(
+													function(record) {
+														// 反結帳顯示
+														record
+																.set(
+																		"isPaid",
+																		norCounPayCode2Descr(record
+																				.get("isPaid")));
 
-										// 提交，去掉修改標記
-										record.commit();
-									});
-						}
-						
-						// sum the prices
-						var sumShouldPay = 0;
-						var sumActualPay = 0;
-						for ( var i = 0; i < billsGrid.getStore().getCount(); i++) {
-							sumShouldPay = sumShouldPay
-									+ parseFloat(billsGrid.getStore().getAt(i).get("totalPrice"));
-							sumActualPay = sumActualPay
-									+ parseFloat(billsGrid.getStore().getAt(i).get("actualIncome"));
-						}
-						document.getElementById("shouldPaySum").innerHTML = sumShouldPay
-								.toFixed(2);
-						document.getElementById("actualPaySum").innerHTML = sumActualPay
-								.toFixed(2);
-						
-					});
+														// 提交，去掉修改標記
+														record.commit();
+													});
+								}
+
+								// sum the prices
+								var sumShouldPay = 0;
+								var sumActualPay = 0;
+								for ( var i = 0; i < billsGrid.getStore()
+										.getCount(); i++) {
+									sumShouldPay = sumShouldPay
+											+ parseFloat(billsGrid.getStore()
+													.getAt(i).get("totalPrice"));
+									sumActualPay = sumActualPay
+											+ parseFloat(billsGrid.getStore()
+													.getAt(i).get(
+															"actualIncome"));
+								}
+								document.getElementById("shouldPaySum").innerHTML = sumShouldPay
+										.toFixed(2);
+								document.getElementById("actualPaySum").innerHTML = sumActualPay
+										.toFixed(2);
+
+							});
 
 			billsGrid.getStore().on(
 					'beforeload',
@@ -1679,6 +1702,9 @@ Ext
 						text : "&nbsp;&nbsp;&nbsp;",
 						disabled : true
 					}, shiftStatBut, {
+						text : "&nbsp;&nbsp;&nbsp;",
+						disabled : true
+					}, businessStatBut, {
 						text : "&nbsp;&nbsp;&nbsp;",
 						disabled : true
 					}, "->", pushBackBut, {
