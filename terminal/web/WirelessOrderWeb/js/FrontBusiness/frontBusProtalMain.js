@@ -173,7 +173,7 @@ var billVerifyWin = new Ext.Window({
 						url : "../../VerifyPwd.do",
 						params : {
 							"pin" : currPin,
-							"type" : "2",
+							"type" : "4",
 							"pwd" : pwdTrans
 						},
 						success : function(response, options) {
@@ -260,7 +260,7 @@ var shiftVerifyWin = new Ext.Window(
 										url : "../../VerifyPwd.do",
 										params : {
 											"pin" : currPin,
-											"type" : "3",
+											"type" : "4",
 											"pwd" : pwdTrans
 										},
 										success : function(response, options) {
@@ -575,7 +575,7 @@ var dailySettleVerifyWin = new Ext.Window(
 										url : "../../VerifyPwd.do",
 										params : {
 											"pin" : currPin,
-											"type" : "3",
+											"type" : "4",
 											"pwd" : pwdTrans
 										},
 										success : function(response, options) {

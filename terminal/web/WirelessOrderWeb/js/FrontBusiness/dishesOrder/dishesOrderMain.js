@@ -135,7 +135,7 @@ var dishPushBackWin = new Ext.Window(
 											url : "../../VerifyPwd.do",
 											params : {
 												"pin" : Request["pin"],
-												"type" : "3",
+												"type" : "5",
 												"pwd" : pwdTrans
 											},
 											success : function(response,

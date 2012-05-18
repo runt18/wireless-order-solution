@@ -584,7 +584,7 @@ var historyVerifyWin = new Ext.Window(
 										url : "../VerifyPwd.do",
 										params : {
 											"pin" : currPin,
-											"type" : "1",
+											"type" : "2",
 											"pwd" : pwdTrans
 										},
 										success : function(response, options) {
@@ -674,7 +674,7 @@ var inventoryVerifyWin = new Ext.Window(
 										url : "../VerifyPwd.do",
 										params : {
 											"pin" : currPin,
-											"type" : "2",
+											"type" : "3",
 											"pwd" : pwdTrans
 										},
 										success : function(response, options) {
@@ -711,6 +711,96 @@ var inventoryVerifyWin = new Ext.Window(
 				show : function(thiz) {
 					// thiz.findById("personCountInput").focus();
 					var f = Ext.get("inventoryVerifyPwd");
+					f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
+				}
+			}
+		});
+
+
+//systemVerifyWin
+var systemVerifyWin = new Ext.Window(
+		{
+			layout : "fit",
+			width : 200,
+			height : 100,
+			closeAction : "hide",
+			resizable : false,
+			closable : false,
+			items : [ {
+				layout : "form",
+				labelWidth : 30,
+				border : false,
+				frame : true,
+				items : [ {
+					xtype : "textfield",
+					inputType : "password",
+					fieldLabel : "密码",
+					id : "systemVerifyPwd",
+					width : 110
+				} ]
+			} ],
+			buttons : [
+					{
+						text : "确定",
+						handler : function() {
+							var systemVerifyPwd = systemVerifyWin
+									.findById("systemVerifyPwd").getValue();
+							systemVerifyWin.findById("systemVerifyPwd")
+									.setValue("");
+
+							var pwdTrans;
+							if (systemVerifyPwd != "") {
+								pwdTrans = MD5(systemVerifyPwd);
+							} else {
+								pwdTrans = systemVerifyPwd;
+							}
+
+							systemVerifyWin.hide();
+							isPrompt = false;
+							systemVerifyWin.findById("systemVerifyPwd")
+									.setValue("");
+
+							Ext.Ajax
+									.request({
+										url : "../VerifyPwd.do",
+										params : {
+											"pin" : currPin,
+											"type" : "1",
+											"pwd" : pwdTrans
+										},
+										success : function(response, options) {
+											var resultJSON = Ext.util.JSON
+													.decode(response.responseText);
+											if (resultJSON.success == true) {
+												location.href = "System_Module/SystemProtal.html?pin="
+													+ currPin + "&restaurantID="
+													+ restaurantID;
+											} else {
+												Ext.MessageBox.show({
+													msg : resultJSON.data,
+													width : 300,
+													buttons : Ext.MessageBox.OK
+												});
+											}
+										},
+										failure : function(response, options) {
+										}
+									});
+						}
+					},
+					{
+						text : "取消",
+						handler : function() {
+							systemVerifyWin.hide();
+							isPrompt = false;
+							systemVerifyWin.findById("systemVerifyPwd")
+									.setValue("");
+						}
+					} ],
+			listeners : {
+				show : function(thiz) {
+					// thiz.findById("personCountInput").focus();
+					var f = Ext.get("systemVerifyPwd");
 					f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
 				}
 			}
