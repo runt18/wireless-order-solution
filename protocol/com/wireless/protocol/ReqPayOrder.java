@@ -14,8 +14,8 @@ public class ReqPayOrder extends ReqPackage{
 	* pin[6] - auto calculated and filled in
 	* len[2] - 0x06, 0x00
 	* <Body>
-	* print_type[2] : table[2] : cash_income[4] : gift_price[4] : pay_type : discount_type : pay_manner : service_rate : len_member : member_id[len] : len_comment : comment[len]
-	* print_type[2] - 2-byte indicates the print type
+	* print_type[4] : table[2] : cash_income[4] : gift_price[4] : pay_type : discount_type : pay_manner : service_rate : len_member : member_id[len] : len_comment : comment[len]
+	* print_type[4] - 4-byte indicates the print type
 	* table[2] - 2-byte indicates the table id
 	* cash_income[4] - 4-byte indicates the total price
 	* gift_price[4] - 4-byte indicates the gift price
@@ -28,7 +28,7 @@ public class ReqPayOrder extends ReqPackage{
 	* len_comment - length of the comment 
 	* comment[len] - the comment this order
 	*******************************************************/
-	public ReqPayOrder(Order order, short printType){
+	public ReqPayOrder(Order order, int printType){
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.PAY_ORDER;
 		
@@ -46,7 +46,7 @@ public class ReqPayOrder extends ReqPackage{
 			}catch(UnsupportedEncodingException e){}
 		}
 		
-		int bodyLen = 2 + /* print type takes up 2 bytes */
+		int bodyLen = 4 + /* print type takes up 4 bytes */
 					  2 + /* table id takes up 2 bytes */
 					  4 + /* actual total price takes up 4 bytes */
 					  4 + /* gift price takes up 4 bytes */
@@ -65,48 +65,50 @@ public class ReqPayOrder extends ReqPackage{
 		
 		body = new byte[bodyLen];
 		//assign the print type
-		body[0] = (byte)(printType & 0x00FF);
-		body[1] = (byte)((printType & 0xFF00) >> 8);
+		body[0] = (byte)(printType & 0x000000FF);
+		body[1] = (byte)((printType & 0x0000FF00) >> 8);
+		body[2] = (byte)((printType & 0x00FF0000) >> 16);
+		body[3] = (byte)((printType & 0xFF000000) >> 24);		
 		
 		//assign the table id
-		body[2] = (byte)(order.table.aliasID & 0x00FF);
-		body[3] = (byte)((order.table.aliasID >> 8) & 0x00FF);
+		body[4] = (byte)(order.table.aliasID & 0x00FF);
+		body[5] = (byte)((order.table.aliasID >> 8) & 0x00FF);
 		
 		//assign the total price
-		body[4] = (byte)(order.cashIncome & 0x000000FF);
-		body[5] = (byte)((order.cashIncome >> 8) & 0x000000FF);
-		body[6] = (byte)((order.cashIncome >> 16) & 0x000000FF);
-		body[7] = (byte)((order.cashIncome >> 24) & 0x000000FF);
+		body[6] = (byte)(order.cashIncome & 0x000000FF);
+		body[7] = (byte)((order.cashIncome >> 8) & 0x000000FF);
+		body[8] = (byte)((order.cashIncome >> 16) & 0x000000FF);
+		body[9] = (byte)((order.cashIncome >> 24) & 0x000000FF);
 		
 		//assign the gift price
-		body[8] = (byte)(order.giftPrice & 0x000000FF);
-		body[9] = (byte)((order.giftPrice >> 8) & 0x000000FF);
-		body[10] = (byte)((order.giftPrice >> 16) & 0x000000FF);
-		body[11] = (byte)((order.giftPrice >> 24) & 0x000000FF);
+		body[10] = (byte)(order.giftPrice & 0x000000FF);
+		body[11] = (byte)((order.giftPrice >> 8) & 0x000000FF);
+		body[12] = (byte)((order.giftPrice >> 16) & 0x000000FF);
+		body[13] = (byte)((order.giftPrice >> 24) & 0x000000FF);
 		
 		//assign the payment type
-		body[12] = (byte)(order.pay_type & 0x000000FF);
+		body[14] = (byte)(order.pay_type & 0x000000FF);
 		
 		//assign the discount type
-		body[13] = (byte)(order.discount_type & 0x000000FF);
+		body[15] = (byte)(order.discount_type & 0x000000FF);
 		
 		//assign the payment manner
-		body[14] = (byte)(order.pay_manner & 0x000000FF);
+		body[16] = (byte)(order.pay_manner & 0x000000FF);
 		
 		//assign the service rate
-		body[15] = (byte)order.serviceRate;
+		body[17] = (byte)order.serviceRate;
 		
 		//assign the length of the member id
-		body[16] = (byte)(memberIDBytes.length & 0x000000FF);
+		body[18] = (byte)(memberIDBytes.length & 0x000000FF);
 		
 		//assign the value of the member id
-		System.arraycopy(memberIDBytes, 0, body, 17, memberIDBytes.length);
+		System.arraycopy(memberIDBytes, 0, body, 19, memberIDBytes.length);
 		
 		//assign the length of comment
-		body[17 + memberIDBytes.length] = (byte)(commentBytes.length & 0x000000FF);
+		body[19 + memberIDBytes.length] = (byte)(commentBytes.length & 0x000000FF);
 		
 		//assign the value of comment
-		System.arraycopy(commentBytes, 0, body, 18 + memberIDBytes.length, commentBytes.length);
+		System.arraycopy(commentBytes, 0, body, 20 + memberIDBytes.length, commentBytes.length);
 	} 
 
 	/******************************************************

@@ -11,8 +11,8 @@ package com.wireless.protocol;
  * pin[6] - auto calculated and filled in
  * len[2] - length of the <Body>
  * <Body>
- * print_type[2] : order_id[4] : ori_tbl[2] : new_tbl[2] : on_duty[8] : off_duty[8]
- * print_type[2] - 2-byte indicates the print type
+ * print_type[4] : order_id[4] : ori_tbl[2] : new_tbl[2] : on_duty[8] : off_duty[8]
+ * print_type[4] - 4-byte indicates the print type
  * order_id[4] - 4-byte indicating the order id to print
  * ori_tbl[2] - 2-byte indicating the original table id
  * new_tbl[2] - 2-byte indicating the new table id
@@ -43,7 +43,7 @@ public class ReqPrintOrder2 extends ReqPackage{
 		header.mode = Mode.PRINT;
 		header.type = Type.PRINT_BILL_2;
 		
-		int bodyLen = 2 + /* print_type takes up 2 bytes */
+		int bodyLen = 4 + /* print_type takes up 4 bytes */
 				  	  4 + /* order id takes up 4 bytes */
 				  	  2 + /* original table id takes up 2 bytes */
 				  	  2 + /* new table id takes up 2 bytes */
@@ -57,41 +57,43 @@ public class ReqPrintOrder2 extends ReqPackage{
 		body = new byte[bodyLen];
 		
 		//assign the print type
-		body[0] = (byte)(param.printConf & 0x00FF);
-		body[1] = (byte)((param.printConf & 0xFF00) >> 8);
+		body[0] = (byte)(param.printConf & 0x000000FF);
+		body[1] = (byte)((param.printConf & 0x0000FF00) >> 8);
+		body[2] = (byte)((param.printConf & 0x00FF0000) >> 16);
+		body[3] = (byte)((param.printConf & 0xFF000000) >> 24);
 		
 		//assign the order id
-		body[2] = (byte)(param.orderID & 0x000000FF);
-		body[3] = (byte)((param.orderID & 0x0000FF00) >> 8);
-		body[4] = (byte)((param.orderID & 0x00FF0000) >> 16);
-		body[5] = (byte)((param.orderID & 0xFF000000) >> 24);
+		body[4] = (byte)(param.orderID & 0x000000FF);
+		body[5] = (byte)((param.orderID & 0x0000FF00) >> 8);
+		body[6] = (byte)((param.orderID & 0x00FF0000) >> 16);
+		body[7] = (byte)((param.orderID & 0xFF000000) >> 24);
 		
 		//assign the original table id
-		body[6] = (byte)(param.oriTblID & 0x000000FF);
-		body[7] = (byte)((param.oriTblID & 0x0000FF00) >> 8);
+		body[8] = (byte)(param.oriTblID & 0x000000FF);
+		body[9] = (byte)((param.oriTblID & 0x0000FF00) >> 8);
 		
 		//assign the new table id
-		body[8] = (byte)(param.newTblID & 0x000000FF);
-		body[9] = (byte)((param.newTblID & 0x0000FF00) >> 8);
+		body[10] = (byte)(param.newTblID & 0x000000FF);
+		body[11] = (byte)((param.newTblID & 0x0000FF00) >> 8);
 		
 		//assign the on duty
-		body[10] = (byte)(param.onDuty & 0x00000000000000FFL);
-		body[11] = (byte)((param.onDuty & 0x000000000000FF00L) >> 8);
-		body[12] = (byte)((param.onDuty & 0x0000000000FF0000L) >> 16);
-		body[13] = (byte)((param.onDuty & 0x00000000FF000000L) >> 24);
-		body[14] = (byte)((param.onDuty & 0x000000FF00000000L) >> 32);
-		body[15] = (byte)((param.onDuty & 0x0000FF0000000000L) >> 40);
-		body[16] = (byte)((param.onDuty & 0x00FF000000000000L) >> 48);
-		body[17] = (byte)((param.onDuty & 0xFF00000000000000L) >> 56);
+		body[12] = (byte)(param.onDuty & 0x00000000000000FFL);
+		body[13] = (byte)((param.onDuty & 0x000000000000FF00L) >> 8);
+		body[14] = (byte)((param.onDuty & 0x0000000000FF0000L) >> 16);
+		body[15] = (byte)((param.onDuty & 0x00000000FF000000L) >> 24);
+		body[16] = (byte)((param.onDuty & 0x000000FF00000000L) >> 32);
+		body[17] = (byte)((param.onDuty & 0x0000FF0000000000L) >> 40);
+		body[18] = (byte)((param.onDuty & 0x00FF000000000000L) >> 48);
+		body[19] = (byte)((param.onDuty & 0xFF00000000000000L) >> 56);
 
 		//assign the off duty
-		body[18] = (byte)(param.offDuty & 0x00000000000000FFL);
-		body[19] = (byte)((param.offDuty & 0x000000000000FF00L) >> 8);
-		body[20] = (byte)((param.offDuty & 0x0000000000FF0000L) >> 16);
-		body[21] = (byte)((param.offDuty & 0x00000000FF000000L) >> 24);
-		body[22] = (byte)((param.offDuty & 0x000000FF00000000L) >> 32);
-		body[23] = (byte)((param.offDuty & 0x0000FF0000000000L) >> 40);
-		body[24] = (byte)((param.offDuty & 0x00FF000000000000L) >> 48);
-		body[25] = (byte)((param.offDuty & 0xFF00000000000000L) >> 56);
+		body[20] = (byte)(param.offDuty & 0x00000000000000FFL);
+		body[21] = (byte)((param.offDuty & 0x000000000000FF00L) >> 8);
+		body[22] = (byte)((param.offDuty & 0x0000000000FF0000L) >> 16);
+		body[23] = (byte)((param.offDuty & 0x00000000FF000000L) >> 24);
+		body[24] = (byte)((param.offDuty & 0x000000FF00000000L) >> 32);
+		body[25] = (byte)((param.offDuty & 0x0000FF0000000000L) >> 40);
+		body[26] = (byte)((param.offDuty & 0x00FF000000000000L) >> 48);
+		body[27] = (byte)((param.offDuty & 0xFF00000000000000L) >> 56);
 	}
 }

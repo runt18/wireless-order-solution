@@ -89,7 +89,7 @@ public class ReqInsertOrder extends ReqPackage {
 	 * @param type indicates insert or update request
 	 * @param reqConf indicates the request configuration, like sync or asyn print 
 	 */
-	private void makePackage(Order reqOrder, byte type, short reqConf) throws UnsupportedEncodingException{
+	private void makePackage(Order reqOrder, byte type, int reqConf) throws UnsupportedEncodingException{
 		if(type != Type.INSERT_ORDER && type != Type.UPDATE_ORDER)
 			throw new IllegalArgumentException();
 		

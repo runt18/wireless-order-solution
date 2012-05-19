@@ -222,8 +222,8 @@ public class ReqParser {
 	 * pin[6] - auto calculated and filled in
 	 * len[2] - length of the <Body>
 	 * <Body>
-	 * print_type[2] : order_id[4] : ori_tbl[2] : new_tbl[2] : on_duty[8] : off_duty[8]
-	 * print_type[2] - 2-byte indicates the print type
+	 * print_type[4] : order_id[4] : ori_tbl[2] : new_tbl[2] : on_duty[8] : off_duty[8]
+	 * print_type[4] - 4-byte indicates the print type
 	 * order_id[4] - 4-byte indicating the order id to print
 	 * ori_tbl[2] - 2-byte indicating the original table id
 	 * new_tbl[2] - 2-byte indicating the new table id
@@ -232,41 +232,44 @@ public class ReqParser {
 	 *******************************************************/
 	public static ReqPrintOrder2.ReqParam parsePrintReq(ProtocolPackage req){
 		//get the print type
-		int printConf = (req.body[0] & 0x000000FF) | ((req.body[1] & 0x000000FF) << 8);
+		int printConf = (req.body[0] & 0x000000FF) | 
+						((req.body[1] & 0x000000FF) << 8) |
+						((req.body[2] & 0x000000FF) << 16) |
+						((req.body[3] & 0x000000FF) << 24);
 		
 		//get the order id
-		int orderID = (req.body[2] & 0x000000FF) |
-	   	   			  ((req.body[3] & 0x000000FF) << 8) |
-	   	   			  ((req.body[4] & 0x000000FF) << 16) |
-	   	   			  ((req.body[5] & 0x000000FF) << 24); 
+		int orderID = (req.body[4] & 0x000000FF) |
+	   	   			  ((req.body[5] & 0x000000FF) << 8) |
+	   	   			  ((req.body[6] & 0x000000FF) << 16) |
+	   	   			  ((req.body[7] & 0x000000FF) << 24); 
 		
 		//get the original table id
-		int oriTblID = (req.body[6] & 0x000000FF) |
-					   ((req.body[7] & 0x000000FF) << 8);
+		int oriTblID = (req.body[8] & 0x000000FF) |
+					   ((req.body[9] & 0x000000FF) << 8);
 		
 		//get the new table id
-		int newTblID = (req.body[8] & 0x000000FF) |
-		   			   ((req.body[9] & 0x000000FF) << 8);
+		int newTblID = (req.body[10] & 0x000000FF) |
+		   			   ((req.body[11] & 0x000000FF) << 8);
 		
 		//get the on duty
-		long onDuty = (req.body[10] & 0x00000000000000FFL) |
-					  ((req.body[11] & 0x00000000000000FFL) << 8) |
-					  ((req.body[12] & 0x00000000000000FFL) << 16) |
-					  ((req.body[13] & 0x00000000000000FFL) << 24) |
-					  ((req.body[14] & 0x00000000000000FFL) << 32) |
-					  ((req.body[15] & 0x00000000000000FFL) << 40) |
-					  ((req.body[16] & 0x00000000000000FFL) << 48) |
-					  ((req.body[17] & 0x00000000000000FFL) << 56);
+		long onDuty = (req.body[12] & 0x00000000000000FFL) |
+					  ((req.body[13] & 0x00000000000000FFL) << 8) |
+					  ((req.body[14] & 0x00000000000000FFL) << 16) |
+					  ((req.body[15] & 0x00000000000000FFL) << 24) |
+					  ((req.body[16] & 0x00000000000000FFL) << 32) |
+					  ((req.body[17] & 0x00000000000000FFL) << 40) |
+					  ((req.body[18] & 0x00000000000000FFL) << 48) |
+					  ((req.body[19] & 0x00000000000000FFL) << 56);
 
 		//get the off duty
-		long offDuty = (req.body[18] & 0x00000000000000FFL) |
-					  ((req.body[19] & 0x00000000000000FFL) << 8) |
-					  ((req.body[20] & 0x00000000000000FFL) << 16) |
-					  ((req.body[21] & 0x00000000000000FFL) << 24) |
-					  ((req.body[22] & 0x00000000000000FFL) << 32) |
-					  ((req.body[23] & 0x00000000000000FFL) << 40) |
-					  ((req.body[24] & 0x00000000000000FFL) << 48) |
-					  ((req.body[25] & 0x00000000000000FFL) << 56);
+		long offDuty = (req.body[20] & 0x00000000000000FFL) |
+					  ((req.body[21] & 0x00000000000000FFL) << 8) |
+					  ((req.body[22] & 0x00000000000000FFL) << 16) |
+					  ((req.body[23] & 0x00000000000000FFL) << 24) |
+					  ((req.body[24] & 0x00000000000000FFL) << 32) |
+					  ((req.body[25] & 0x00000000000000FFL) << 40) |
+					  ((req.body[26] & 0x00000000000000FFL) << 48) |
+					  ((req.body[27] & 0x00000000000000FFL) << 56);
 
 
 		ReqPrintOrder2.ReqParam reqParam = new ReqPrintOrder2.ReqParam();
@@ -310,8 +313,8 @@ public class ReqParser {
 	* pin[6] - auto calculated and filled in
 	* len[2] - 0x06, 0x00
 	* <Body>
-	* print_type[2] : table[2] : cash_income[4] : gift_price[4] : pay_type : discount_type : pay_manner : service_rate : len_member : member_id[len] : len_comment : comment[len]
-	* print_type[2] - 2-byte indicates the print type
+	* print_type[4] : table[2] : cash_income[4] : gift_price[4] : pay_type : discount_type : pay_manner : service_rate : len_member : member_id[len] : len_comment : comment[len]
+	* print_type[4] - 4-byte indicates the print type
 	* table[2] - 2-byte indicates the table id
 	* cash_income[4] - 4-byte indicates the total price
 	* gift_price[4] - 4-byte indicates the gift price
@@ -327,47 +330,50 @@ public class ReqParser {
 	public static Order parsePayOrder(ProtocolPackage req){
 		
 		//get the print type
-		int printType = ((req.body[0] & 0x000000FF) | ((req.body[1] & 0x000000FF) << 8));
+		int printType = ((req.body[0] & 0x000000FF) | 
+						((req.body[1] & 0x000000FF) << 8)) |
+						((req.body[2] & 0x000000FF) << 16) |
+						((req.body[3] & 0x000000FF) << 24);
 		
 		//get the table id
-		int tableToPay = ((req.body[2] & 0x000000FF) | ((req.body[3] & 0x000000FF) << 8));
+		int tableToPay = ((req.body[4] & 0x000000FF) | ((req.body[5] & 0x000000FF) << 8));
 		//get the actual total price
-		int cashIncome = (req.body[4] & 0x000000FF) | 
-						 ((req.body[5] & 0x000000FF) << 8) | 
-						 ((req.body[6] & 0x000000FF) << 16) |
-						 ((req.body[7] & 0x000000FF) << 24);
+		int cashIncome = (req.body[6] & 0x000000FF) | 
+						 ((req.body[7] & 0x000000FF) << 8) | 
+						 ((req.body[8] & 0x000000FF) << 16) |
+						 ((req.body[9] & 0x000000FF) << 24);
 		//get the gift price
-		int giftPrice = (req.body[8] & 0x000000FF) | 
-		 				((req.body[9] & 0x000000FF) << 8) | 
-		 				((req.body[10] & 0x000000FF) << 16) |
-		 				((req.body[11] & 0x000000FF) << 24);
+		int giftPrice = (req.body[10] & 0x000000FF) | 
+		 				((req.body[11] & 0x000000FF) << 8) | 
+		 				((req.body[12] & 0x000000FF) << 16) |
+		 				((req.body[13] & 0x000000FF) << 24);
 		//get the payment type
-		int payType = req.body[12];
+		int payType = req.body[14];
 		//get the discount type
-		int discountType = req.body[13];
+		int discountType = req.body[15];
 		//get the payment manner
-		int payManner = req.body[14];
+		int payManner = req.body[16];
 		//get the service rate
-		int serviceRate = req.body[15];
+		int serviceRate = req.body[17];
 		//get the the length to member id
-		int lenMember = req.body[16];
+		int lenMember = req.body[18];
 		//get the value to member id
 		String memberID = null;
 		//get the member id if exist
 		if(lenMember > 0){
 			byte[] memberIDBytes = new byte[lenMember];
-			System.arraycopy(req.body, 17, memberIDBytes, 0, lenMember);
+			System.arraycopy(req.body, 19, memberIDBytes, 0, lenMember);
 			try{
 				memberID = new String(memberIDBytes, "UTF-8");
 			}catch(UnsupportedEncodingException e){}
 		}
 		//get the length of comment
-		int lenComment = req.body[17 + lenMember];
+		int lenComment = req.body[19 + lenMember];
 		String comment = null;
 		//get the comment if exist
 		if(lenComment > 0){
 			byte[] commentBytes = new byte[lenComment];
-			System.arraycopy(req.body, 18 + lenMember, commentBytes, 0, lenComment);
+			System.arraycopy(req.body, 20 + lenMember, commentBytes, 0, lenComment);
 			try{
 				comment = new String(commentBytes, "UTF-8");
 			}catch(UnsupportedEncodingException e){}
