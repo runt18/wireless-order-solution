@@ -333,13 +333,16 @@ ADD COLUMN `pwd5` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the 5th password to t
 CHANGE COLUMN `pwd` `pwd` VARCHAR(45) NOT NULL COMMENT 'the password for the restaurant to log in'  AFTER `address` ;
 
 -- -----------------------------------------------------
--- Cut the field 'pwd3' to field 'pwd5' (将原先的权限密码2移到退菜密码)
--- Cut the field 'pwd2' to field 'pwd3' (将原先的权限密码1移到店长权限密码)
+-- Copy the field 'pwd3' to field 'pwd5' (将原先的权限密码2移到退菜权限密码)
+-- Copy the field 'pwd2' to fiedl 'pwd4' (将原先的权限密码1移到收银权限密码)
+-- Copy the field 'pwd2' to field 'pwd3' (将原先的权限密码1移到店长权限密码)
+-- Copy the field 'pwd' to field 'pwd2'  (将财务权限密码设置为会员中心密码)
 -- -----------------------------------------------------
 UPDATE wireless_order_db.restaurant SET 
-pwd5 = pwd3, pwd3='', 
-pwd3 = pwd2, pwd2='';
-
+pwd5 = pwd3, 
+pwd4 = pwd2,
+pwd3 = pwd2,
+pwd2 = pwd;
 
 -- -----------------------------------------------------
 -- Append the kitchen 11 - 50 
