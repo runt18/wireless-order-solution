@@ -145,9 +145,9 @@ static unsigned __stdcall PrintProc(LPVOID pvParam){
 						stDocInfo.pDocName = L"催菜";
 					}else if(job.req_code == Reserved::PRINT_TRANSFER_TABLE){
 						stDocInfo.pDocName = L"转台";
-					}else if(job.req_code == Reserved::PRINT_SHIFT_RECEIPT || job.req_code == Reserved::PRINT_TEMP_SHIFT_RECEIPT){
+					}else if(job.req_code == Reserved::PRINT_SHIFT_RECEIPT || job.req_code == Reserved::PRINT_TEMP_SHIFT_RECEIPT || job.req_code == Reserved::PRINT_HISTORY_SHIFT_RECEIPT){
 						stDocInfo.pDocName = L"交班对账";
-					}else if(job.req_code == Reserved::PRINT_DAILY_SETTLE_RECEIPT){
+					}else if(job.req_code == Reserved::PRINT_DAILY_SETTLE_RECEIPT || job.req_code == Reserved::PRINT_HISTORY_DAILY_SETTLE_RECEIPT){
 						stDocInfo.pDocName = L"日结表";
 					}else{
 						stDocInfo.pDocName = L"未知信息";
