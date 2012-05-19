@@ -129,7 +129,7 @@ public class PayOrderAction extends Action implements PinGen{
 			 * If pay order temporary, just print the receipt.
 			 * Otherwise perform to pay order and print the receipt.
 			 */
-			short printType;
+			int printType;
 			tempPay = request.getParameter("tempPay");
 			if(tempPay != null){
 				if(Boolean.parseBoolean(tempPay)){

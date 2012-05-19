@@ -59,8 +59,14 @@ public class PrintOrderAction extends Action implements PinGen{
 			 * 3rd example, print the shift record
 			 * pin=1 & printShift=1 & onDuty=2012-4-9 8:00:00 & offDuty=2012-4-9 14:00:00
 			 * 
-			 * 4th example, print the daily settle
-			 * pin=1 & printDailySettle=1 & onDuty=2012-4-9 8:00:00 & offDuty=2012-4-9 14:00:00
+			 * 4th example, print daily settle to today
+			 * pin=1 & printDailySettle=1 
+			 * 
+			 * 5th example, print the history shift record
+			 * pin=1 & printHistoryShift=1 & onDuty=2012-4-9 8:00:00 & offDuty=2012-4-9 14:00:00
+			 * 
+			 * 6th example, print the history daily settle record
+			 * pin=1 & printHistoryDailySettle=1 & onDuty=2012-4-9 8:00:00 & offDuty=2012-4-9 14:00:00
 			 * 
 			 * pin : the pin the this terminal
 			 * 
@@ -70,15 +76,19 @@ public class PrintOrderAction extends Action implements PinGen{
 			 * 
 			 * printSync : 1 means print in sync, 0 means print in async
 			 * 
-			 * printOrder : 1 means to print the order, 0 or null means NOT
+			 * printOrder : 1 means to print the order, 0 or NULL means NOT
 			 * 
-			 * printDetail : 1 means to print the order detail, 0 or null means NOT
+			 * printDetail : 1 means to print the order detail, 0 or NULL means NOT
 			 * 
-			 * printReceipt : 1 means to print the receipt, 0 or null means NOT
+			 * printReceipt : 1 means to print the receipt, 0 or NULL means NOT
 			 * 
-			 * printShift : 1 means to print the shift receipt, 0 or null means NOT
+			 * printShift : 1 means to print the shift receipt, 0 or NULL means NOT
 			 * 
-			 * printDailySettle : 1 means to print the daily settle receipt, 0 or null means NOT
+			 * printDailySettle : 1 means to print the daily settle receipt, 0 or NULL means NOT
+			 * 
+			 * printHistoryShift : 1 means to print the history shift receipt, 0 or NULL means NOT
+			 * 
+			 * printHistoryDailySettle : 1 means to print the history daily settle receipt, 0 or NULL means NOT
 			 * 
 			 * onDuty : the date time to be on duty
 			 * 
@@ -102,70 +112,46 @@ public class PrintOrderAction extends Action implements PinGen{
 			}
 			
 			
-			short conf = 0;
+			int conf = 0;
 			
 			String param = request.getParameter("printSync");
-			if(param != null){
-				if(Byte.parseByte(param) == 0){
-					conf &= ~Reserved.PRINT_SYNC;
-				}else{
-					conf |= Reserved.PRINT_SYNC;
-				}
+			if(param != null && Byte.parseByte(param) == 1){
+				conf |= Reserved.PRINT_SYNC;
 			}else{
 				conf &= ~Reserved.PRINT_SYNC;
 			}
 			
 			param = request.getParameter("printOrder");
-			if(param != null){
-				if(Byte.parseByte(param) == 0){
-					conf &= ~Reserved.PRINT_ORDER_2;
-				}else{
-					conf |= Reserved.PRINT_ORDER_2;
-				}
+			if(param != null && Byte.parseByte(param) == 1){
+				conf |= Reserved.PRINT_ORDER_2;
 			}else{
 				conf &= ~Reserved.PRINT_ORDER_2;
 			}
 			
 			param = request.getParameter("printDetail");
-			if(param != null){
-				if(Byte.parseByte(param) == 0){
-					conf &= ~Reserved.PRINT_ORDER_DETAIL_2;
-				}else{
-					conf |= Reserved.PRINT_ORDER_DETAIL_2;
-				}
+			if(param != null && Byte.parseByte(param) == 1){
+				conf |= Reserved.PRINT_ORDER_DETAIL_2;
 			}else{
 				conf &= ~Reserved.PRINT_ORDER_DETAIL_2;
 			}
 			
 			param = request.getParameter("printReceipt");
-			if(param != null){
-				if(Byte.parseByte(param) == 0){
-					conf &= ~Reserved.PRINT_RECEIPT_2;
-				}else{
-					conf |= Reserved.PRINT_RECEIPT_2;
-				}
+			if(param != null && Byte.parseByte(param) == 1){
+				conf |= Reserved.PRINT_RECEIPT_2;
 			}else{
 				conf &= ~Reserved.PRINT_RECEIPT_2;
 			}
 			
 			param = request.getParameter("printShift");
-			if(param != null){
-				if(Byte.parseByte(param) == 0){
-					conf &= ~Reserved.PRINT_SHIFT_RECEIPT_2;
-				}else{
-					conf |= Reserved.PRINT_SHIFT_RECEIPT_2;
-				}
+			if(param != null && Byte.parseByte(param) == 1){
+				conf |= Reserved.PRINT_SHIFT_RECEIPT_2;
 			}else{
 				conf &= ~Reserved.PRINT_SHIFT_RECEIPT_2;
 			}
 			
 			param = request.getParameter("printTmpShift");
-			if(param != null){
-				if(Byte.parseByte(param) == 0){
-					conf &= ~Reserved.PRINT_TEMP_SHIFT_RECEIPT_2;
-				}else{
-					conf |= Reserved.PRINT_TEMP_SHIFT_RECEIPT_2;
-				}
+			if(param != null && Byte.parseByte(param) == 1){
+				conf |= Reserved.PRINT_TEMP_SHIFT_RECEIPT_2;
 			}else{
 				conf &= ~Reserved.PRINT_TEMP_SHIFT_RECEIPT_2;
 			}
@@ -181,34 +167,42 @@ public class PrintOrderAction extends Action implements PinGen{
 			}
 			
 			param = request.getParameter("printDailySettle");
-			if(param != null){
-				if(Byte.parseByte(param) == 0){
-					conf &= ~Reserved.PRINT_DAILY_SETTLE_RECEIPT_2;
-					
-				}else{					
-					/**
-					 * Get the last daily settlement record to assign the on & off duty
-					 */
-					dbCon.connect();
-					String sql = " SELECT on_duty, off_duty FROM " + Params.dbName + ".daily_settle_history " +
-								 " WHERE id=(" +
-								 " SELECT MAX(id) FROM " + Params.dbName + ".daily_settle_history WHERE " +
-								 " restaurant_id=" + VerifyPin.exec(dbCon, _pin, Terminal.MODEL_STAFF).restaurant_id + 
-								 ")";
-					dbCon.rs = dbCon.stmt.executeQuery(sql);
-					if(dbCon.rs.next()){
-						onDuty = dbCon.rs.getTimestamp("on_duty").getTime();
-						offDuty = dbCon.rs.getTimestamp("off_duty").getTime();
-					}
-					dbCon.rs.close();
-					
-					conf |= Reserved.PRINT_DAILY_SETTLE_RECEIPT_2;
+			if(param != null && Byte.parseByte(param) == 1){
+				/**
+				 * Get the last daily settlement record to assign the on & off duty
+				 */
+				dbCon.connect();
+				String sql = " SELECT on_duty, off_duty FROM " + Params.dbName + ".daily_settle_history " +
+							 " WHERE id=(" +
+							 " SELECT MAX(id) FROM " + Params.dbName + ".daily_settle_history WHERE " +
+							 " restaurant_id=" + VerifyPin.exec(dbCon, _pin, Terminal.MODEL_STAFF).restaurant_id + 
+							 ")";
+				dbCon.rs = dbCon.stmt.executeQuery(sql);
+				if(dbCon.rs.next()){
+					onDuty = dbCon.rs.getTimestamp("on_duty").getTime();
+					offDuty = dbCon.rs.getTimestamp("off_duty").getTime();
 				}
+				dbCon.rs.close();
+					
+				conf |= Reserved.PRINT_DAILY_SETTLE_RECEIPT_2;
 			}else{
 				conf &= ~Reserved.PRINT_DAILY_SETTLE_RECEIPT_2;
 			}
 			
+			param = request.getParameter("printHistoryShift");
+			if(param != null && Byte.parseByte(param) == 1){
+				conf |= Reserved.PRINT_HISTORY_SHIFT_RECEIPT_2;
+			}else{
+				conf &= ~Reserved.PRINT_HISTORY_SHIFT_RECEIPT_2;
+			}
 						
+			param = request.getParameter("printHistoryDailySettle");
+			if(param != null && Byte.parseByte(param) == 1){
+				conf |= Reserved.PRINT_HISTORY_DAILY_SETTLE_RECEIPT_2;
+			}else{
+				conf &= ~Reserved.PRINT_HISTORY_DAILY_SETTLE_RECEIPT_2;
+			}
+			
 			ReqPackage.setGen(this);
 			ReqPrintOrder2.ReqParam reqParam = new ReqPrintOrder2.ReqParam();
 			reqParam.printConf = conf;
@@ -224,8 +218,13 @@ public class PrintOrderAction extends Action implements PinGen{
 				}else if(request.getParameter("tableID") != null){
 					jsonResp = jsonResp.replace("$(value)", tableID + "号餐台的账单打印成功");
 					
-				}else if(request.getParameter("printShift") != null || request.getParameter("printTmpShift") != null){
+				}else if(request.getParameter("printShift") != null || 
+						 request.getParameter("printTmpShift") != null || 
+						 request.getParameter("printHistoryShift") != null){
 					jsonResp = jsonResp.replace("$(value)", "交班对账单打印成功");
+					
+				}else if(request.getParameter("printDailySettle") != null || request.getParameter("printHistoryDailySettle") != null){
+					jsonResp = jsonResp.replace("$(value)", "日结表打印成功");
 					
 				}else{
 					jsonResp = jsonResp.replace("$(value)", orderID + "号账单打印成功");					
@@ -275,13 +274,11 @@ public class PrintOrderAction extends Action implements PinGen{
 	
 	@Override
 	public long getDeviceId() {
-		// TODO Auto-generated method stub
 		return _pin;
 	}
 
 	@Override
 	public short getDeviceType() {
-		// TODO Auto-generated method stub
 		return Terminal.MODEL_STAFF;
 	}
 

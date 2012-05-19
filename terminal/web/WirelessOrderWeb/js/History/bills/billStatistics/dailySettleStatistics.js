@@ -93,7 +93,7 @@ var dailySettleCheckTableWin = new Ext.Window({
 						url : "../../PrintOrder.do",
 						params : {
 							"pin" : pin,
-							"printTmpShift" : 1,
+							"printHistoryDailySettle" : 1,
 							"onDuty" : onDuty,
 							"offDuty" : offDuty
 						},
@@ -369,7 +369,7 @@ function dailySettleStatPrintHandler(rowIndex) {
 		url : "../../PrintOrder.do",
 		params : {
 			"pin" : pin,
-			"printTmpShift" : 1,
+			"printHistoryDailySettle" : 1,
 			"onDuty" : onDuty,
 			"offDuty" : offDuty
 		},
