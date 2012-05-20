@@ -93,7 +93,7 @@ var shiftCheckTableWin = new Ext.Window({
 						url : "../../PrintOrder.do",
 						params : {
 							"pin" : pin,
-							"printHistoryShift" : 1,
+							"printTmpShift" : 1,
 							"onDuty" : onDuty,
 							"offDuty" : offDuty
 						},
