@@ -370,7 +370,7 @@ function shiftStatPrintHandler(rowIndex) {
 		url : "../../PrintOrder.do",
 		params : {
 			"pin" : pin,
-			"printTmpShift" : 1,
+			"printHistoryShift" : 1,
 			"onDuty" : onDuty,
 			"offDuty" : offDuty
 		},
