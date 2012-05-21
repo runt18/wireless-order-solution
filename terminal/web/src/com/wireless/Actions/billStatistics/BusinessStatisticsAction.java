@@ -68,8 +68,43 @@ public class BusinessStatisticsAction extends Action {
 			String pin = request.getParameter("pin");
 			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF);
 		
-			Date dateBegin = new SimpleDateFormat("yyyy-MM-dd").parse(request.getParameter("dateBegin"));
-			Date dateEnd = new SimpleDateFormat("yyyy-MM-dd").parse(request.getParameter("dateEnd"));
+			Date dateBegin = null;
+			/**
+			 * In the case not input the begin date,
+			 * set the minimum on duty of daily settle history as dateBegin
+			 */
+			if(request.getParameter("dateBegin") == null){
+				sql = " SELECT MIN(on_duty) AS on_duty FROM " +
+					  Params.dbName + ".daily_settle_history " +
+					  " WHERE " +
+					  " restaurant_id = " + term.restaurant_id;
+				dbCon.rs = dbCon.stmt.executeQuery(sql);
+				if(dbCon.rs.next()){
+					dateBegin = new Date(dbCon.rs.getTimestamp("on_duty").getTime());
+				}
+				dbCon.rs.close();
+			}else{
+				dateBegin = new SimpleDateFormat("yyyy-MM-dd").parse(request.getParameter("dateBegin"));				
+			}
+			
+			/**
+			 * In the case not input the begin date,
+			 * set maximum off duty of daily settle history as dateEnd
+			 */
+			Date dateEnd = null;
+			if(request.getParameter("dateEnd") == null){
+				sql = " SELECT MAX(off_duty) AS off_duty FROM " +
+					  Params.dbName + ".daily_settle_history" + 
+					  " WHERE " +
+					  "restaurant_id = " + term.restaurant_id;
+				dbCon.rs = dbCon.stmt.executeQuery(sql);
+				if(dbCon.rs.next()){
+					dateBegin = new Date(dbCon.rs.getTimestamp("off_duty").getTime());
+				}
+				dbCon.rs.close();				
+			}else{
+				dateEnd = new SimpleDateFormat("yyyy-MM-dd").parse(request.getParameter("dateEnd"));				
+			}
 			
 			Calendar c = Calendar.getInstance();
 			c.setTime(dateBegin);
