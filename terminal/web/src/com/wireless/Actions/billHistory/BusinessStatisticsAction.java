@@ -51,7 +51,7 @@ public class BusinessStatisticsAction extends Action {
 			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF);
 			
 			Date dateBegin = new SimpleDateFormat("yyyy-MM-dd").parse(request.getParameter("dateBegin"));
-			Date dateEnd = new SimpleDateFormat("yyyy-MM-dd").parse(request.getParameter("businessStaticEndDate"));
+			Date dateEnd = new SimpleDateFormat("yyyy-MM-dd").parse(request.getParameter("dateEnd"));
 			
 			Calendar c = Calendar.getInstance();
 			c.setTime(dateBegin);
