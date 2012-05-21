@@ -114,18 +114,18 @@ public class KitchenStatisticsAction extends Action {
 
 				condition = " AND kitchen_alias IN (" + kitchenAlias + ") ";
 				if (!dateBegin.equals("")) {
-					condition = condition + " AND MAX(B.order_date) >= '"
+					orderClause = orderClause + " AND MAX(B.order_date) >= '"
 							+ dateBegin + " 00:00:00" + "' ";
 				}
 				if (!dateEnd.equals("")) {
-					condition = condition + " AND MAX(B.order_date) <= '" + dateEnd
+					orderClause = orderClause + " AND MAX(B.order_date) <= '" + dateEnd
 							+ " 23:59:59" + "' ";
 				}
 				condition = condition
 						+ " AND total_price IS NOT NULL AND A.restaurant_id =  "
 						+ term.restaurant_id;
 
-				orderClause = " ORDER BY kitchen_alias ";
+				orderClause = orderClause + " ORDER BY kitchen_alias ";
 
 				orderFoods = foodRef.getDetailHistory(dbCon, condition,
 						orderClause);

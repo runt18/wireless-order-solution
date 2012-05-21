@@ -26,11 +26,11 @@ deptStatWin = new Ext.Window(
 						width : 200,
 						labelWidth : 30,
 						items : [ {
-							xtype : "timefield",
-							format : "H:i:s",
+							xtype : "datefield",
+							format : "Y-m-d",
 							id : "begDateMStatDept",
 							width : 150,
-							fieldLabel : "时间"
+							fieldLabel : "日期"
 						} ]
 					}, {
 						layout : "form",
@@ -39,8 +39,8 @@ deptStatWin = new Ext.Window(
 						width : 200,
 						labelWidth : 30,
 						items : [ {
-							xtype : "timefield",
-							format : "H:i:s",
+							xtype : "datefield",
+							format : "Y-m-d",
 							id : "endDateMStatDept",
 							width : 150,
 							fieldLabel : "至"
@@ -117,17 +117,21 @@ deptStatWin = new Ext.Window(
 								deptStaticBeginDate = deptStatWin.findById(
 										"begDateMStatDept").getValue();
 								if (deptStaticBeginDate != "") {
+									dateFormated = deptStaticBeginDate;
 									deptStaticBeginDate = dateFormated
-											.format('Y-m-d')
-											+ " " + deptStaticBeginDate;
+											.format('Y-m-d');
+									deptStaticBeginDate = deptStaticBeginDate
+											+ " 00:00:00";
 								}
 
 								deptStaticEndDate = deptStatWin.findById(
-										"endDateMStatDept").getValue();
+										"begDateMStatDept").getValue();
 								if (deptStaticEndDate != "") {
+									dateFormated = deptStaticEndDate;
 									deptStaticEndDate = dateFormated
-											.format('Y-m-d')
-											+ " " + deptStaticEndDate;
+											.format('Y-m-d');
+									deptStaticEndDate = deptStaticEndDate
+											+ " 00:00:00";
 								}
 
 								deptStaticString = selectDepts;
@@ -279,7 +283,7 @@ deptStatResultGrid.getStore().on('beforeload', function() {
 		"deptIDs" : deptStaticString,
 		"dateBegin" : deptStaticBeginDate,
 		"dateEnd" : deptStaticEndDate,
-		"StatisticsType" : "Today"
+		"StatisticsType" : "History"
 	};
 
 });
