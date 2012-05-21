@@ -26,11 +26,11 @@ kitchenStatWin = new Ext.Window(
 						width : 200,
 						labelWidth : 30,
 						items : [ {
-							xtype : "timefield",
-							format : "H:i:s",
+							xtype : "datefield",
+							format : "Y-m-d",
 							id : "begDateMStatKitchen",
 							width : 150,
-							fieldLabel : "时间"
+							fieldLabel : "日期"
 						} ]
 					}, {
 						layout : "form",
@@ -39,8 +39,8 @@ kitchenStatWin = new Ext.Window(
 						width : 200,
 						labelWidth : 30,
 						items : [ {
-							xtype : "timefield",
-							format : "H:i:s",
+							xtype : "datefield",
+							format : "Y-m-d",
 							id : "endDateMStatKitchen",
 							width : 150,
 							fieldLabel : "至"
@@ -120,17 +120,21 @@ kitchenStatWin = new Ext.Window(
 										.findById("begDateMStatKitchen")
 										.getValue();
 								if (kitchenStaticBeginDate != "") {
+									dateFormated = kitchenStaticBeginDate;
 									kitchenStaticBeginDate = dateFormated
-											.format('Y-m-d')
-											+ " " + kitchenStaticBeginDate;
+											.format('Y-m-d');
+//									kitchenStaticBeginDate = kitchenStaticBeginDate
+//											+ " 00:00:00";
 								}
 
 								kitchenStaticEndDate = kitchenStatWin.findById(
 										"endDateMStatKitchen").getValue();
 								if (kitchenStaticEndDate != "") {
+									dateFormated = kitchenStaticEndDate;
 									kitchenStaticEndDate = dateFormated
-											.format('Y-m-d')
-											+ " " + orderStaticEndDate;
+											.format('Y-m-d');
+//									kitchenStaticEndDate = kitchenStaticEndDate
+//											+ " 00:00:00";
 								}
 
 								kitchenStaticString = selectKitchens;
@@ -281,7 +285,7 @@ kitchenStatResultGrid.getStore().on('beforeload', function() {
 		"kitchenAlias" : kitchenStaticString,
 		"dateBegin" : kitchenStaticBeginDate,
 		"dateEnd" : kitchenStaticEndDate,
-		"StatisticsType" : "Today"
+		"StatisticsType" : "History"
 	};
 
 });

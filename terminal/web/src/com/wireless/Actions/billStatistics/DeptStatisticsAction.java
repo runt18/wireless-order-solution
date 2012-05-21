@@ -86,27 +86,48 @@ public class DeptStatisticsAction extends Action {
 			String deptIDs = request.getParameter("deptIDs");
 			String StatisticsType = request.getParameter("StatisticsType");
 
-			String condition = " AND C.dept_id IN (" + deptIDs + ") ";
-			if (!dateBegin.equals("")) {
-				condition = condition + " AND D.pay_datetime >= '" + dateBegin
-						+ " 00:00:00" + "' ";
-			}
-			if (!dateEnd.equals("")) {
-				condition = condition + " AND D.pay_datetime <= '" + dateEnd
-						+ " 23:59:59" + "' ";
-			}
-			condition = condition
-					+ " AND D.total_price IS NOT NULL AND C.restaurant_id =  "
-					+ term.restaurant_id;
-
 			OrderFoodReflector foodRef = new OrderFoodReflector();
-			String orderClause = " ORDER BY C.dept_id";
-
 			OrderFood orderFoods[] = null;
+
+			String condition = " ";
+			String orderClause = " ";
+
 			if (StatisticsType.equals("Today")) {
+
+				condition = " AND C.dept_id IN (" + deptIDs + ") ";
+				if (!dateBegin.equals("")) {
+					condition = condition + " AND D.pay_datetime >= '"
+							+ dateBegin + " 00:00:00" + "' ";
+				}
+				if (!dateEnd.equals("")) {
+					condition = condition + " AND D.pay_datetime <= '"
+							+ dateEnd + " 23:59:59" + "' ";
+				}
+				condition = condition
+						+ " AND D.total_price IS NOT NULL AND C.restaurant_id =  "
+						+ term.restaurant_id;
+
+				orderClause = " ORDER BY C.dept_id";
+
 				orderFoods = foodRef.getDetailToday(dbCon, condition,
 						orderClause);
 			} else if (StatisticsType.equals("History")) {
+
+				condition = " AND dept_id IN (" + deptIDs + ") ";
+				if (!dateBegin.equals("")) {
+					orderClause = orderClause + " AND MAX(B.order_date) >= '"
+							+ dateBegin + " 00:00:00" + "' ";
+				}
+				if (!dateEnd.equals("")) {
+					orderClause = orderClause + " AND MAX(B.order_date) <= '"
+							+ dateEnd + " 23:59:59" + "' ";
+				}
+				condition = condition
+						+ " AND total_price IS NOT NULL AND A.restaurant_id =  "
+						+ term.restaurant_id;
+
+				orderClause = orderClause + " ORDER BY dept_id";
+
 				orderFoods = foodRef.getDetailHistory(dbCon, condition,
 						orderClause);
 			}

@@ -331,6 +331,9 @@
 		<action path="/SetPassword"
 			type="com.wireless.Actions.passwordConfig.SetPasswordAction" scope="request">
 		</action>
+		<action path="/businessStatistics"
+			type="com.wireless.Actions.billStatistics.BusinessStatisticsAction" scope="request">
+		</action>
 	</action-mappings>
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
 </struts-config>

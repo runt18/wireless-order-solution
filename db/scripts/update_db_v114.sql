@@ -171,12 +171,12 @@ ALTER TABLE `wireless_order_db`.`order_food_history` ADD COLUMN `food_id` INT NU
 -- -----------------------------------------------------
 -- Update the field 'food_id' to table 'order_food'
 -- -----------------------------------------------------
-UPDATE wireless_order_db.order_food AS a SET food_id = (SELECT food_id FROM wireless_order_db.food b WHERE b.restaurant_id=a.restaurant_id AND b.food_alias=a.food_alias);
+UPDATE wireless_order_db.order_food AS a SET food_id = (SELECT MAX(food_id) FROM wireless_order_db.food b WHERE b.restaurant_id=a.restaurant_id AND b.food_alias=a.food_alias);
 
 -- -----------------------------------------------------
 -- Update the field 'food_id' to table 'order_food_history'
 -- -----------------------------------------------------
-UPDATE wireless_order_db.order_food_history AS a SET food_id = (SELECT food_id FROM wireless_order_db.food b WHERE b.restaurant_id=a.restaurant_id AND b.food_alias=a.food_alias);
+UPDATE wireless_order_db.order_food_history AS a SET food_id = (SELECT MAX(food_id) FROM wireless_order_db.food b WHERE b.restaurant_id=a.restaurant_id AND b.food_alias=a.food_alias);
 
 
 -- -----------------------------------------------------

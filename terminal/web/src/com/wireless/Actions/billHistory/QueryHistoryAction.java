@@ -94,8 +94,9 @@ public class QueryHistoryAction extends Action {
 
 			// get the operator to filter
 			String ope = request.getParameter("ope");
+			int opeType = 1;
 			if (ope != null) {
-				int opeType = Integer.parseInt(ope);
+				opeType = Integer.parseInt(ope);
 
 				if (opeType == 1) {
 					ope = "=";
@@ -153,8 +154,18 @@ public class QueryHistoryAction extends Action {
 				filterCondition = " AND A.table_alias" + ope + filterVal;
 			} else if (type == 4) {
 				// 按日期
-				filterCondition = " AND A.order_date" + ope + "'" + filterVal
-						+ "'";
+				if (opeType == 1) {
+					filterCondition = " AND A.order_date >= '" + filterVal
+							+ " 00:00:00' AND A.order_date <= '" + filterVal
+							+ " 23:59:59'";
+
+				} else if (opeType == 3) {
+					filterCondition = " AND A.order_date" + ope + "'"
+							+ filterVal + " 23:59:59'";
+				} else {
+					filterCondition = " AND A.order_date" + ope + "'"
+							+ filterVal + " 00:00:00'";
+				}
 			} else if (type == 5) {
 				// 按类型
 				filterCondition = " AND A.category" + ope + filterVal;

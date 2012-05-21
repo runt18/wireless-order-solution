@@ -713,7 +713,7 @@ var filterTypeComb = new Ext.form.ComboBox({
 	fieldLabel : "过滤",
 	forceSelection : true,
 	width : 100,
-	value : "全部",
+	value : 9,
 	id : "filter",
 	store : new Ext.data.SimpleStore({
 		fields : [ "value", "text" ],
@@ -744,11 +744,11 @@ var filterTypeComb = new Ext.form.ComboBox({
 				width : 120
 			});
 
-			var conditionDate = new Ext.form.TimeField({
+			var conditionDate = new Ext.form.DateField({
 				hideLabel : true,
 				id : "conditionDate",
 				allowBlank : false,
-				format : "H:i:s",
+				format : "Y-m-d",
 				width : 120
 			});
 
@@ -1205,21 +1205,28 @@ advSrchWin = new Ext.Window(
 
 													}
 
-													// sum the prices
-													var sumShouldPay = 0;
-													var sumActualPay = 0;
-													for ( var i = 0; i < billsData.length; i++) {
-														sumShouldPay = sumShouldPay
-																+ parseFloat(billsData[i][5]);
-														sumActualPay = sumActualPay
-																+ parseFloat(billsData[i][6]);
-													}
-													document
-															.getElementById("shouldPaySum").innerHTML = sumShouldPay
-															.toFixed(2);
-													document
-															.getElementById("actualPaySum").innerHTML = sumActualPay
-															.toFixed(2);
+													// // sum the prices
+													// var sumShouldPay = 0;
+													// var sumActualPay = 0;
+													// for ( var i = 0; i <
+													// billsData.length; i++) {
+													// sumShouldPay =
+													// sumShouldPay
+													// +
+													// parseFloat(billsData[i][5]);
+													// sumActualPay =
+													// sumActualPay
+													// +
+													// parseFloat(billsData[i][6]);
+													// }
+													// document
+													// .getElementById("shouldPaySum").innerHTML
+													// = sumShouldPay
+													// .toFixed(2);
+													// document
+													// .getElementById("actualPaySum").innerHTML
+													// = sumActualPay
+													// .toFixed(2);
 
 												} else {
 													billsData.length = 0;
@@ -1547,49 +1554,45 @@ Ext
 			});
 
 			// 为store配置load监听器(即load完后动作)
-			billsGrid
-					.getStore()
-					.on(
-							'load',
-							function() {
-								currRowIndex = -1;
+			billsGrid.getStore().on(
+					'load',
+					function() {
+						currRowIndex = -1;
 
-								if (billsGrid.getStore().getTotalCount() != 0) {
-									billsGrid
-											.getStore()
-											.each(
-													function(record) {
-														// 反結帳顯示
-														record
-																.set(
-																		"isPaid",
-																		norCounPayCode2Descr(record
-																				.get("isPaid")));
+						if (billsGrid.getStore().getTotalCount() != 0) {
+							billsGrid.getStore().each(
+									function(record) {
+										// 反結帳顯示
+										record.set("isPaid",
+												norCounPayCode2Descr(record
+														.get("isPaid")));
 
-														// 提交，去掉修改標記
-														record.commit();
-													});
-								}
+										// 提交，去掉修改標記
+										record.commit();
+									});
+						}
 
-								// sum the prices
-								var sumShouldPay = 0;
-								var sumActualPay = 0;
-								for ( var i = 0; i < billsGrid.getStore()
-										.getCount(); i++) {
-									sumShouldPay = sumShouldPay
-											+ parseFloat(billsGrid.getStore()
-													.getAt(i).get("totalPrice"));
-									sumActualPay = sumActualPay
-											+ parseFloat(billsGrid.getStore()
-													.getAt(i).get(
-															"actualIncome"));
-								}
-								document.getElementById("shouldPaySum").innerHTML = sumShouldPay
-										.toFixed(2);
-								document.getElementById("actualPaySum").innerHTML = sumActualPay
-										.toFixed(2);
+						// // sum the prices
+						// var sumShouldPay = 0;
+						// var sumActualPay = 0;
+						// for ( var i = 0; i < billsGrid.getStore()
+						// .getCount(); i++) {
+						// sumShouldPay = sumShouldPay
+						// + parseFloat(billsGrid.getStore()
+						// .getAt(i).get("totalPrice"));
+						// sumActualPay = sumActualPay
+						// + parseFloat(billsGrid.getStore()
+						// .getAt(i).get(
+						// "actualIncome"));
+						// }
+						// document.getElementById("shouldPaySum").innerHTML =
+						// sumShouldPay
+						// .toFixed(2);
+						// document.getElementById("actualPaySum").innerHTML =
+						// sumActualPay
+						// .toFixed(2);
 
-							});
+					});
 
 			billsGrid.getStore().on(
 					'beforeload',
@@ -1613,10 +1616,12 @@ Ext
 							queryValue = searchForm.findById("conditionNumber")
 									.getValue();
 						} else if (conditionType == "date") {
-							queryValue = new Date();
+							var dateFormated = new Date();
 							queryValue = searchForm.findById("conditionDate")
 									.getValue();
-							// queryValue = queryValue.format("H:i:s");
+							dateFormated = queryValue;
+							queryValue = dateFormated.format('Y-m-d');
+							// queryValue = queryValue + " 00:00:00";
 						} else if (conditionType == "tableTypeComb") {
 							queryValue = searchForm.findById("tableTypeComb")
 									.getValue();
@@ -1679,7 +1684,9 @@ Ext
 				items : [ {
 					layout : "border",
 					title : "<div style='font-size:20px;'>帐单信息<div>",
-					items : [ billsQueryCondPanel, billsGrid, billSum ]
+					items : [ billsQueryCondPanel, billsGrid
+					// , billSum
+					]
 				} ],
 				tbar : new Ext.Toolbar({
 					height : 55,
@@ -1687,21 +1694,23 @@ Ext
 					// orderStatBut, {
 					// text : "&nbsp;&nbsp;&nbsp;",
 					// disabled : true
-					// }, kitchenStatBut, {
-					// text : "&nbsp;&nbsp;&nbsp;",
-					// disabled : true
-					// }, deptStatBut, {
-					// text : "&nbsp;&nbsp;&nbsp;",
-					// disabled : true
-					// }, regionStatBut, {
+					// },
+					kitchenStatBut, {
+						text : "&nbsp;&nbsp;&nbsp;",
+						disabled : true
+					}, deptStatBut, {
+						text : "&nbsp;&nbsp;&nbsp;",
+						disabled : true
+					},
+					// regionStatBut, {
 					// text : "&nbsp;&nbsp;&nbsp;",
 					// disabled : true
 					// },
 					//	
-					dailySettleStatBut, {
+					shiftStatBut, {
 						text : "&nbsp;&nbsp;&nbsp;",
 						disabled : true
-					}, shiftStatBut, {
+					}, dailySettleStatBut, {
 						text : "&nbsp;&nbsp;&nbsp;",
 						disabled : true
 					}, businessStatBut, {

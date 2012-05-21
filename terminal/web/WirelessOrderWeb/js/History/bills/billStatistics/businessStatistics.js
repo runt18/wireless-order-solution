@@ -1,129 +1,218 @@
-﻿var shiftCheckDetpData = [];
-
-var shiftCheckDetpStore = new Ext.data.Store({
-	proxy : new Ext.data.MemoryProxy(shiftCheckDetpData),
-	reader : new Ext.data.ArrayReader({}, [ {
-		name : "deptName"
+﻿// 结果框
+// 前台：[编号	日期	账单数	现金(￥)	刷卡(￥)	会员卡(￥)	签单(￥)	挂账(￥)	折扣额(￥)	赠送额(￥)	退菜额(￥)	反结帐额(￥)	服务费(￥)	金额(￥)	实收(￥)]
+var businessStatResultStore = new Ext.data.Store({
+	proxy : new Ext.data.HttpProxy({
+		url : "../../businessStatistics.do"
+	}),
+	reader : new Ext.data.JsonReader({
+		totalProperty : "totalProperty",
+		root : "root"
+	}, [ {
+		name : "date"
+	}, {
+		name : "orderCount"
+	}, {
+		name : "cash"
+	}, {
+		name : "bankCard"
+	}, {
+		name : "memberCard"
+	}, {
+		name : "credit"
+	}, {
+		name : "sign"
 	}, {
 		name : "discount"
 	}, {
 		name : "gift"
 	}, {
-		name : "amount"
+		name : "return"
+	}, {
+		name : "paid"
+	}, {
+		name : "service"
+	}, {
+		name : "totalPrice"
+	}, {
+		name : "actualPrice"
+	}, {
+		name : "message"
 	} ])
 });
 
-// shiftCheckDetpStore.reload();
-
 // 2，栏位模型
-var shiftCheckDetpColumnModel = new Ext.grid.ColumnModel([
+var businessStatResultColumnModel = new Ext.grid.ColumnModel([
 		new Ext.grid.RowNumberer(), {
-			header : "部门",
+			header : "日期",
 			sortable : true,
-			dataIndex : "deptName",
+			dataIndex : "date",
 			width : 100
 		}, {
-			header : "折扣",
+			header : "账单数",
+			sortable : true,
+			dataIndex : "orderCount",
+			width : 80
+		}, {
+			header : "现金(￥)",
+			sortable : true,
+			dataIndex : "cash",
+			width : 80
+		}, {
+			header : "	刷卡(￥)",
+			sortable : true,
+			dataIndex : "bankCard",
+			width : 80
+		}, {
+			header : "会员卡（￥）",
+			sortable : true,
+			dataIndex : "memberCard",
+			width : 80
+		}, {
+			header : "挂账（￥）",
+			sortable : true,
+			dataIndex : "credit",
+			width : 80
+		}, {
+			header : "签单（￥）",
+			sortable : true,
+			dataIndex : "sign",
+			width : 80
+		}, {
+			header : "折扣额（￥）",
 			sortable : true,
 			dataIndex : "discount",
-			width : 100
+			width : 80
 		}, {
-			header : "赠送",
+			header : "赠送额（￥）",
 			sortable : true,
 			dataIndex : "gift",
+			width : 80
+		}, {
+			header : "退菜额(￥)",
+			sortable : true,
+			dataIndex : "return",
+			width : 80
+		}, {
+			header : "反结帐额(￥)",
+			sortable : true,
+			dataIndex : "paid",
+			width : 80
+		}, {
+			header : "金额(￥)",
+			sortable : true,
+			dataIndex : "totalPrice",
 			width : 100
 		}, {
-			header : "金额",
+			header : "实收(￥)",
 			sortable : true,
-			dataIndex : "amount",
+			dataIndex : "actualPrice",
 			width : 100
 		} ]);
 
-// 3,表格
-var shiftCheckDetpGrid = new Ext.grid.GridPanel({
-	// title : "已点菜",
+var businessStatResultGrid = new Ext.grid.GridPanel({
+	xtype : "grid",
+	anchor : "99%",
 	border : false,
-	layout : "fit",
-	ds : shiftCheckDetpStore,
-	cm : shiftCheckDetpColumnModel,
+	ds : businessStatResultStore,
+	cm : businessStatResultColumnModel,
+	sm : new Ext.grid.RowSelectionModel({
+		singleSelect : true
+	}),
 	viewConfig : {
 		forceFit : true
 	},
-	listeners : {
-
+	bbar : new Ext.PagingToolbar({
+		pageSize : businessStaticRecordCount,
+		store : businessStatResultStore,
+		displayInfo : true,
+		displayMsg : '显示第 {0} 条到 {1} 条记录，共 {2} 条',
+		emptyMsg : "没有记录"
+	}),
+	autoScroll : true,
+	loadMask : {
+		msg : "数据加载中，请稍等..."
 	}
 });
 
-var shiftCheckDetpPanel = new Ext.Panel({
-	region : "center",
-	layout : "fit",
-	// height : 200,
-	frame : true,
-	items : shiftCheckDetpGrid
+// 为store配置beforeload监听器
+businessStatResultGrid.getStore().on('beforeload', function() {
+
+	// 输入查询条件参数
+	this.baseParams = {
+		"pin" : pin,
+		"dateBegin" : businessStaticBeginDate,
+		"dateEnd" : businessStaticEndDate,
+		"StatisticsType" : "History"
+	};
+
 });
 
-var shiftCheckTablePanel = new Ext.Panel({
-	frame : true,
-	region : "north",
-	height : 415,
-	items : [ {
-		border : false,
-		contentEl : "shiftCheckTableDiv"
-	} ]
+// 为store配置load监听器(即load完后动作)
+businessStatResultGrid.getStore().on('load', function() {
+	if (businessStatResultGrid.getStore().getTotalCount() != 0) {
+		var msg = this.getAt(0).get("message");
+		if (msg != "normal") {
+			Ext.MessageBox.show({
+				msg : msg,
+				width : 300,
+				buttons : Ext.MessageBox.OK
+			});
+			this.removeAll();
+		} else {
+			businessStatResultGrid.getStore().each(function(record) {
+				// // 區域顯示
+				// for ( var i = 0; i < regionMultSelectData.length; i++) {
+				// if (record.get("regionID") == regionMultSelectData[i][0]) {
+				// record
+				// .set(
+				// "regionDisplay",
+				// regionMultSelectData[i][1]);
+				// }
+				// if (record.get("regionID") == "SUM") {
+				// record
+				// .set(
+				// "regionDisplay",
+				// "");
+				// }
+				// }
+
+				// 提交，去掉修改標記
+				record.commit();
+			});
+		}
+	}
 });
 
-var shiftCheckTableWin = new Ext.Window({
-	layout : "border",
-	width : 450,
-	height : 600,
+businessStatResultWin = new Ext.Window({
+	title : "统计结果",
+	width : 1200,
+	height : 370,
 	closeAction : "hide",
 	resizable : false,
-	closable : false,
-	items : [ shiftCheckTablePanel, shiftCheckDetpPanel ],
-	buttons : [
-			{
-				text : "打印",
-				handler : function() {
-					var onDuty = shiftStatResultStore.getAt(shiftDtlRowIndex)
-							.get("beginTime");
-					var offDuty = shiftStatResultStore.getAt(shiftDtlRowIndex)
-							.get("endTime");
-
-					Ext.Ajax.request({
-						url : "../../PrintOrder.do",
-						params : {
-							"pin" : pin,
-							"printTmpShift" : 1,
-							"onDuty" : onDuty,
-							"offDuty" : offDuty
-						},
-						success : function(response, options) {
-							var resultJSON = Ext.util.JSON
-									.decode(response.responseText);
-							Ext.MessageBox.show({
-								msg : resultJSON.data,
-								width : 300,
-								buttons : Ext.MessageBox.OK
-							});
-
-						},
-						failure : function(response, options) {
-						}
-					});
+	layout : "fit",
+	items : businessStatResultGrid,
+	buttons : [ {
+		text : "退出",
+		handler : function() {
+			isPrompt = false;
+			businessStatResultWin.hide();
+		}
+	} ],
+	listeners : {
+		"show" : function(thiz) {
+			businessStatResultGrid.getStore().reload({
+				params : {
+					start : 0,
+					limit : businessStaticRecordCount
 				}
-			}, {
-				text : "关闭",
-				// disabled : true,
-				handler : function() {
-					shiftCheckTableWin.hide();
-					isPrompt = false;
-				}
-			} ]
+			});
+		}
+	}
 });
 
 // -----------------------------------------------------------------------------
-shiftStatWin = new Ext.Window({
-	title : "交班记录",
+businessStatWin = new Ext.Window({
+	title : "营业统计",
 	width : 450,
 	height : 101,
 	closeAction : "hide",
@@ -146,7 +235,7 @@ shiftStatWin = new Ext.Window({
 				items : [ {
 					xtype : "datefield",
 					// format : "y-m-d",
-					id : "begDateMStatShift",
+					id : "businessStaticBeginDate",
 					width : 150,
 					fieldLabel : "日期"
 				} ]
@@ -159,7 +248,7 @@ shiftStatWin = new Ext.Window({
 				items : [ {
 					xtype : "datefield",
 					// format : "y-m-d",
-					id : "endDateMStatShift",
+					id : "businessStaticEndDate",
 					width : 150,
 					fieldLabel : "至"
 				} ]
@@ -173,334 +262,45 @@ shiftStatWin = new Ext.Window({
 				handler : function() {
 
 					isPrompt = false;
-					shiftStatWin.hide();
+					businessStatWin.hide();
 
 					// 保存条件
 					var dateFormated = new Date();
-					begDateMStatShift = shiftStatWin.findById(
-							"begDateMStatShift").getValue();
-					if (begDateMStatShift != "") {
-						dateFormated = begDateMStatShift;
-						begDateMStatShift = dateFormated.format('Y-m-d');
-						begDateMStatShift = begDateMStatShift + " 00:00:00";
+					businessStaticBeginDate = businessStatWin.findById(
+							"businessStaticBeginDate").getValue();
+					if (businessStaticBeginDate != "") {
+						dateFormated = businessStaticBeginDate;
+						businessStaticBeginDate = dateFormated.format('Y-m-d');
+						businessStaticBeginDate = businessStaticBeginDate
+								+ " 00:00:00";
 					}
 
-					endDateMStatShift = shiftStatWin.findById(
-							"endDateMStatShift").getValue();
-					if (endDateMStatShift != "") {
-						dateFormated = endDateMStatShift;
-						endDateMStatShift = dateFormated.format('Y-m-d');
-						endDateMStatShift = endDateMStatShift + " 23:59:59";
+					businessStaticEndDate = businessStatWin.findById(
+							"businessStaticEndDate").getValue();
+					if (businessStaticEndDate != "") {
+						dateFormated = businessStaticEndDate;
+						businessStaticEndDate = dateFormated.format('Y-m-d');
+						businessStaticEndDate = businessStaticEndDate
+								+ " 23:59:59";
 					}
 
 					isPrompt = true;
-					shiftStatResultWin.show();
+					businessStatResultWin.show();
 
 				}
 			}, {
 				text : "取消",
 				handler : function() {
 					isPrompt = false;
-					shiftStatWin.hide();
+					businessStatWin.hide();
 				}
 			} ],
 	listeners : {
 		"show" : function(thiz) {
 
-			shiftStatWin.findById("begDateMStatShift").setValue("");
-			shiftStatWin.findById("endDateMStatShift").setValue("");
+			businessStatWin.findById("businessStaticBeginDate").setValue("");
+			businessStatWin.findById("businessStaticEndDate").setValue("");
 
-		}
-	}
-});
-
-// 结果框
-// 前台：[交班人 ,开始时间, 结束时间, 操作]
-var shiftStatResultStore = new Ext.data.Store({
-	proxy : new Ext.data.HttpProxy({
-		url : "../../shiftStat.do"
-	}),
-	reader : new Ext.data.JsonReader({
-		totalProperty : "totalProperty",
-		root : "root"
-	}, [ {
-		name : "staff"
-	}, {
-		name : "beginTime"
-	}, {
-		name : "endTime"
-	}, {
-		name : "operator"
-	}, {
-		name : "message"
-	} ])
-});
-
-// 2，栏位模型
-// operation handler
-function shiftStatDetalHandler(rowIndex) {
-
-	var onDuty = shiftStatResultStore.getAt(rowIndex).get("beginTime");
-	var offDuty = shiftStatResultStore.getAt(rowIndex).get("endTime");
-
-	Ext.Ajax
-			.request({
-				url : "../../shiftStatDetail.do",
-				params : {
-					"pin" : pin,
-					"onDuty" : onDuty,
-					"offDuty" : offDuty,
-					"StatisticsType" : "History"
-				},
-				success : function(response, options) {
-					var resultJSON = Ext.util.JSON
-							.decode(response.responseText);
-					// 
-					var rootData = resultJSON.root;
-					if (rootData[0].message == "normal") {
-
-						document.getElementById("shiftTitle").innerHTML = "交班对账表";
-						document.getElementById("shiftOperator").innerHTML = shiftStatResultStore
-								.getAt(rowIndex).get("staff");
-						document.getElementById("shiftBillCount").innerHTML = rootData[0].allBillCount;
-						document.getElementById("shiftStartTime").innerHTML = onDuty;
-						document.getElementById("shiftEndTime").innerHTML = offDuty;
-
-						// 現金
-						document.getElementById("billCount1").innerHTML = rootData[0].cashBillCount;
-						document.getElementById("amount1").innerHTML = rootData[0].cashAmount;
-						document.getElementById("actual1").innerHTML = rootData[0].cashActual;
-
-						// 刷卡
-						document.getElementById("billCount2").innerHTML = rootData[0].creditBillCount;
-						document.getElementById("amount2").innerHTML = rootData[0].creditAmount;
-						document.getElementById("actual2").innerHTML = rootData[0].creditActual;
-
-						// 會員卡
-						document.getElementById("billCount3").innerHTML = rootData[0].memberBillCount;
-						document.getElementById("amount3").innerHTML = rootData[0].memberAmount;
-						document.getElementById("actual3").innerHTML = rootData[0].memberActual;
-
-						// 簽單
-						document.getElementById("billCount4").innerHTML = rootData[0].signBillCount;
-						document.getElementById("amount4").innerHTML = rootData[0].signAmount;
-						document.getElementById("actual4").innerHTML = rootData[0].signActual;
-
-						// 掛賬
-						document.getElementById("billCount5").innerHTML = rootData[0].hangBillCount;
-						document.getElementById("amount5").innerHTML = rootData[0].hangAmount;
-						document.getElementById("actual5").innerHTML = rootData[0].hangActual;
-
-						// 合計
-						var sumAmout = rootData[0].cashAmount
-								+ rootData[0].creditAmount
-								+ rootData[0].memberAmount
-								+ rootData[0].signAmount
-								+ rootData[0].hangAmount;
-						var sumActual = rootData[0].cashActual
-								+ rootData[0].creditActual
-								+ rootData[0].memberActual
-								+ rootData[0].signActual
-								+ rootData[0].hangActual;
-						document.getElementById("amountSum").innerHTML = sumAmout
-								.toFixed(2);
-						document.getElementById("actualSum").innerHTML = sumActual
-								.toFixed(2);
-
-						// --------------
-						// 折扣
-						document.getElementById("discountAmount").innerHTML = rootData[0].discountAmount;
-						document.getElementById("discountBillCount").innerHTML = rootData[0].discountBillCount;
-
-						// 赠送
-						document.getElementById("giftAmount").innerHTML = rootData[0].giftAmount;
-						document.getElementById("giftBillCount").innerHTML = rootData[0].giftBillCount;
-
-						// 退菜
-						document.getElementById("returnAmount").innerHTML = rootData[0].returnAmount;
-						document.getElementById("returnBillCount").innerHTML = rootData[0].returnBillCount;
-
-						// 反结帐
-						document.getElementById("repayAmount").innerHTML = rootData[0].repayAmount;
-						document.getElementById("repayBillCount").innerHTML = rootData[0].repayBillCount;
-
-						// 服务费
-						document.getElementById("serviceAmount").innerHTML = rootData[0].serviceAmount;
-						// document.getElementById("serviceBillCount").innerHTML
-						// = rootData[0].serviceBillCount;
-
-						shiftCheckDetpData.length = 0;
-						var deptInfos = rootData[0].deptInfos;
-						for ( var i = 0; i < deptInfos.length; i++) {
-							shiftCheckDetpData.push([ deptInfos[i].deptName,
-									deptInfos[i].deptDiscount,
-									deptInfos[i].deptGift,
-									deptInfos[i].deptAmount ]);
-						}
-
-						shiftCheckDetpStore.reload();
-
-					} else {
-						Ext.MessageBox.show({
-							msg : rootData[0].message,
-							width : 300,
-							buttons : Ext.MessageBox.OK
-						});
-					}
-				},
-				failure : function(response, options) {
-					Ext.MessageBox.show({
-						msg : " Unknown page error ",
-						width : 300,
-						buttons : Ext.MessageBox.OK
-					});
-				}
-			});
-
-	shiftCheckTableWin.show();
-
-};
-
-function shiftStatPrintHandler(rowIndex) {
-
-	var onDuty = shiftStatResultStore.getAt(rowIndex).get("beginTime");
-	var offDuty = shiftStatResultStore.getAt(rowIndex).get("endTime");
-
-	Ext.Ajax.request({
-		url : "../../PrintOrder.do",
-		params : {
-			"pin" : pin,
-			"printTmpShift" : 1,
-			"onDuty" : onDuty,
-			"offDuty" : offDuty
-		},
-		success : function(response, options) {
-			var resultJSON = Ext.util.JSON.decode(response.responseText);
-			Ext.MessageBox.show({
-				msg : resultJSON.data,
-				width : 300,
-				buttons : Ext.MessageBox.OK
-			});
-
-		},
-		failure : function(response, options) {
-		}
-	});
-};
-
-function shiftStatOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
-	return "<center><a href=\"javascript:shiftStatDetalHandler(" + rowIndex
-			+ ")\">" + "<img src='../../images/Modify.png'/>详细</a>"
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-			+ "<a href=\"javascript:shiftStatPrintHandler(" + rowIndex + ")\">"
-			+ "<img src='../../images/del.png'/>补打</a>" + "</center>";
-};
-
-var shiftStatResultColumnModel = new Ext.grid.ColumnModel([
-		new Ext.grid.RowNumberer(), {
-			header : "交班人",
-			sortable : true,
-			dataIndex : "staff",
-			width : 80
-		}, {
-			header : "开始时间",
-			sortable : true,
-			dataIndex : "beginTime",
-			width : 120
-		}, {
-			header : "结束时间",
-			sortable : true,
-			dataIndex : "endTime",
-			width : 120
-		}, {
-			header : "<center>操作</center>",
-			sortable : true,
-			dataIndex : "operator",
-			width : 230,
-			renderer : shiftStatOpt
-		} ]);
-
-var shiftStatResultGrid = new Ext.grid.GridPanel({
-	xtype : "grid",
-	anchor : "99%",
-	border : false,
-	ds : shiftStatResultStore,
-	cm : shiftStatResultColumnModel,
-	sm : new Ext.grid.RowSelectionModel({
-		singleSelect : true
-	}),
-	viewConfig : {
-		forceFit : true
-	},
-	listeners : {
-		rowclick : function(thiz, rowIndex, e) {
-			shiftDtlRowIndex = rowIndex;
-		}
-	},
-	bbar : new Ext.PagingToolbar({
-		pageSize : shiftStaticRecordCount,
-		store : shiftStatResultStore,
-		displayInfo : true,
-		displayMsg : '显示第 {0} 条到 {1} 条记录，共 {2} 条',
-		emptyMsg : "没有记录"
-	}),
-	autoScroll : true,
-	loadMask : {
-		msg : "数据加载中，请稍等..."
-	}
-});
-
-// 为store配置beforeload监听器
-shiftStatResultGrid.getStore().on('beforeload', function() {
-
-	// 输入查询条件参数
-	this.baseParams = {
-		"pin" : pin,
-		"dateBegin" : begDateMStatShift,
-		"dateEnd" : endDateMStatShift,
-		"StatisticsType" : "History"
-	};
-
-});
-
-// 为store配置load监听器(即load完后动作)
-shiftStatResultGrid.getStore().on('load', function() {
-	if (shiftStatResultGrid.getStore().getTotalCount() != 0) {
-		var msg = this.getAt(0).get("message");
-		if (msg != "normal") {
-			Ext.MessageBox.show({
-				msg : msg,
-				width : 300,
-				buttons : Ext.MessageBox.OK
-			});
-			this.removeAll();
-		}
-	}
-});
-
-shiftStatResultWin = new Ext.Window({
-	title : "统计结果",
-	width : 800,
-	height : 370,
-	closeAction : "hide",
-	resizable : false,
-	layout : "fit",
-	items : shiftStatResultGrid,
-	buttons : [ {
-		text : "退出",
-		handler : function() {
-			isPrompt = false;
-			shiftStatResultWin.hide();
-		}
-	} ],
-	listeners : {
-		"show" : function(thiz) {
-			shiftStatResultGrid.getStore().reload({
-				params : {
-					start : 0,
-					limit : shiftStaticRecordCount
-				}
-			});
 		}
 	}
 });
