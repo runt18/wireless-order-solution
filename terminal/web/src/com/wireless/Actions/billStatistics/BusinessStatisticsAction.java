@@ -48,6 +48,20 @@ public class BusinessStatisticsAction extends Action {
 		List outputList = new ArrayList();
 		HashMap rootMap = new HashMap();
 
+		float orderCountAll = 0;
+		float cashAll = 0;
+		float bankCardAll = 0;
+		float memberCardAll = 0;
+		float creditAll = 0;
+		float signAll = 0;
+		float discountAll = 0;
+		float giftAll = 0;
+		float returnAll = 0;
+		float paidAll = 0;
+		float serviceAll = 0;
+		float totalPriceAll = 0;
+		float actualPriceAll = 0;
+
 		try {
 			// 解决后台中文传到前台乱码
 			response.setContentType("text/json; charset=utf-8");
@@ -73,8 +87,8 @@ public class BusinessStatisticsAction extends Action {
 			 * daily settle history as dateBegin
 			 */
 			if (request.getParameter("dateBegin").equals("")) {
-				sql = " SELECT MIN(order_date) AS date_begin FROM " + Params.dbName
-						+ ".order_history " + " WHERE "
+				sql = " SELECT MIN(order_date) AS date_begin FROM "
+						+ Params.dbName + ".order_history " + " WHERE "
 						+ " restaurant_id = " + term.restaurant_id;
 				dbCon.rs = dbCon.stmt.executeQuery(sql);
 				if (dbCon.rs.next()) {
@@ -93,8 +107,8 @@ public class BusinessStatisticsAction extends Action {
 			 */
 			Date dateEnd = null;
 			if (request.getParameter("dateEnd").equals("")) {
-				sql = " SELECT MAX(order_date) AS date_end FROM " + Params.dbName
-						+ ".order_history" + " WHERE "
+				sql = " SELECT MAX(order_date) AS date_end FROM "
+						+ Params.dbName + ".order_history" + " WHERE "
 						+ "restaurant_id = " + term.restaurant_id;
 				dbCon.rs = dbCon.stmt.executeQuery(sql);
 				if (dbCon.rs.next()) {
@@ -110,9 +124,9 @@ public class BusinessStatisticsAction extends Action {
 			Calendar c = Calendar.getInstance();
 			c.setTime(dateBegin);
 
-			while (dateBegin.compareTo(dateEnd) <= 0) {
-				Date datePrev = c.getTime();
+			while (dateBegin.compareTo(dateEnd) < 0) {
 				c.add(Calendar.DATE, 1);
+				Date dateItemEnd = c.getTime();
 				sql = " SELECT MIN(on_duty) AS on_duty, MAX(off_duty) AS off_duty FROM "
 						+ Params.dbName
 						+ ".daily_settle_history "
@@ -124,8 +138,9 @@ public class BusinessStatisticsAction extends Action {
 						+ new SimpleDateFormat("yyyy-MM-dd").format(dateBegin)
 						+ " AND "
 						+ new SimpleDateFormat("yyyy-MM-dd")
-								.format(c.getTime());
+								.format(dateItemEnd);
 				dbCon.rs = dbCon.stmt.executeQuery(sql);
+
 				if (dbCon.rs.next()) {
 					String onDuty;
 					java.sql.Timestamp onDutyTS = dbCon.rs
@@ -144,7 +159,7 @@ public class BusinessStatisticsAction extends Action {
 							.getTimestamp("on_duty");
 					if (offDutyTS == null) {
 						offDuty = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-								.format(c.getTime());
+								.format(dateItemEnd);
 					} else {
 						offDuty = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 								.format(new Date(dbCon.rs.getTimestamp(
@@ -157,7 +172,7 @@ public class BusinessStatisticsAction extends Action {
 
 					// resultMap.put("statDate", lastDate);
 					resultMap.put("date", new SimpleDateFormat("yyyy-MM-dd")
-							.format(datePrev));
+							.format(dateItemEnd));
 					resultMap.put("orderCount", result.orderAmount);
 					resultMap.put("cash", result.cashIncome);
 					resultMap.put("bankCard", result.creditCardIncome);
@@ -182,6 +197,33 @@ public class BusinessStatisticsAction extends Action {
 					resultMap.put("message", "normal");
 
 					resultList.add(resultMap);
+
+					orderCountAll = (float) Math
+							.round((orderCountAll + result.orderAmount) * 100) / 100;
+					cashAll = (float) Math
+							.round((cashAll + result.cashIncome) * 100) / 100;
+					bankCardAll = (float) Math
+							.round((bankCardAll + result.creditCardIncome) * 100) / 100;
+					memberCardAll = (float) Math
+							.round((memberCardAll + result.memberCardIncome) * 100) / 100;
+					creditAll = (float) Math
+							.round((creditAll + result.hangIncome) * 100) / 100;
+					signAll = (float) Math
+							.round((signAll + result.signIncome) * 100) / 100;
+					discountAll = (float) Math
+							.round((discountAll + result.discountIncome) * 100) / 100;
+					giftAll = (float) Math
+							.round((giftAll + result.giftIncome) * 100) / 100;
+					returnAll = (float) Math
+							.round((returnAll + result.cancelIncome) * 100) / 100;
+					paidAll = (float) Math
+							.round((paidAll + result.paidIncome) * 100) / 100;
+					serviceAll = (float) Math
+							.round((serviceAll + result.serviceIncome) * 100) / 100;
+					totalPriceAll = (float) Math
+							.round((totalPriceAll + totalIncome) * 100) / 100;
+					actualPriceAll = (float) Math
+							.round((actualPriceAll + totalActual) * 100) / 100;
 
 				}
 
@@ -218,6 +260,25 @@ public class BusinessStatisticsAction extends Action {
 						// 最后一页可能不足一页，会报错，忽略
 					}
 				}
+
+				HashMap resultMap = new HashMap();
+				resultMap.put("date", "汇总");
+				resultMap.put("orderCount", orderCountAll);
+				resultMap.put("cash", cashAll);
+				resultMap.put("bankCard", bankCardAll);
+				resultMap.put("memberCard", memberCardAll);
+				resultMap.put("credit", creditAll);
+				resultMap.put("sign", signAll);
+				resultMap.put("discount", discountAll);
+				resultMap.put("gift", giftAll);
+				resultMap.put("return", returnAll);
+				resultMap.put("paid", paidAll);
+				resultMap.put("service", serviceAll);
+				resultMap.put("totalPrice", totalPriceAll);
+				resultMap.put("actualPrice", actualPriceAll);
+				resultMap.put("message", "normal");
+				outputList.add(resultMap);
+
 				rootMap.put("root", outputList);
 
 			}
