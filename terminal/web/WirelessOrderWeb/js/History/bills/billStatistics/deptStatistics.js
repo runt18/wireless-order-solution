@@ -125,7 +125,7 @@ deptStatWin = new Ext.Window(
 								}
 
 								deptStaticEndDate = deptStatWin.findById(
-										"begDateMStatDept").getValue();
+										"endDateMStatDept").getValue();
 								if (deptStaticEndDate != "") {
 									dateFormated = deptStaticEndDate;
 									deptStaticEndDate = dateFormated
