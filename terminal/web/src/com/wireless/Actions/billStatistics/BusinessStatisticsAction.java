@@ -124,9 +124,9 @@ public class BusinessStatisticsAction extends Action {
 			Calendar c = Calendar.getInstance();
 			c.setTime(dateBegin);
 
-			while (dateBegin.compareTo(dateEnd) < 0) {
+			while (dateBegin.compareTo(dateEnd) <= 0) {
+				Date datePrev = c.getTime();
 				c.add(Calendar.DATE, 1);
-				Date dateItemEnd = c.getTime();
 				sql = " SELECT MIN(on_duty) AS on_duty, MAX(off_duty) AS off_duty FROM "
 						+ Params.dbName
 						+ ".daily_settle_history "
@@ -138,7 +138,7 @@ public class BusinessStatisticsAction extends Action {
 						+ new SimpleDateFormat("yyyy-MM-dd").format(dateBegin)
 						+ " AND "
 						+ new SimpleDateFormat("yyyy-MM-dd")
-								.format(dateItemEnd);
+								.format(c.getTime());
 				dbCon.rs = dbCon.stmt.executeQuery(sql);
 
 				if (dbCon.rs.next()) {
@@ -159,7 +159,7 @@ public class BusinessStatisticsAction extends Action {
 							.getTimestamp("on_duty");
 					if (offDutyTS == null) {
 						offDuty = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-								.format(dateItemEnd);
+								.format(c.getTime());
 					} else {
 						offDuty = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 								.format(new Date(dbCon.rs.getTimestamp(
@@ -172,7 +172,7 @@ public class BusinessStatisticsAction extends Action {
 
 					// resultMap.put("statDate", lastDate);
 					resultMap.put("date", new SimpleDateFormat("yyyy-MM-dd")
-							.format(dateItemEnd));
+							.format(datePrev));
 					resultMap.put("orderCount", result.orderAmount);
 					resultMap.put("cash", result.cashIncome);
 					resultMap.put("bankCard", result.creditCardIncome);
