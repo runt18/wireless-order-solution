@@ -1621,7 +1621,7 @@ Ext
 									.getValue();
 							dateFormated = queryValue;
 							queryValue = dateFormated.format('Y-m-d');
-							//queryValue = queryValue + " 00:00:00";
+							// queryValue = queryValue + " 00:00:00";
 						} else if (conditionType == "tableTypeComb") {
 							queryValue = searchForm.findById("tableTypeComb")
 									.getValue();
@@ -1707,10 +1707,10 @@ Ext
 					// disabled : true
 					// },
 					//	
-					dailySettleStatBut, {
+					shiftStatBut, {
 						text : "&nbsp;&nbsp;&nbsp;",
 						disabled : true
-					}, shiftStatBut, {
+					}, dailySettleStatBut, {
 						text : "&nbsp;&nbsp;&nbsp;",
 						disabled : true
 					}, businessStatBut, {
