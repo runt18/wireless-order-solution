@@ -123,8 +123,8 @@ kitchenStatWin = new Ext.Window(
 									dateFormated = kitchenStaticBeginDate;
 									kitchenStaticBeginDate = dateFormated
 											.format('Y-m-d');
-									kitchenStaticBeginDate = kitchenStaticBeginDate
-											+ " 00:00:00";
+//									kitchenStaticBeginDate = kitchenStaticBeginDate
+//											+ " 00:00:00";
 								}
 
 								kitchenStaticEndDate = kitchenStatWin.findById(
@@ -133,8 +133,8 @@ kitchenStatWin = new Ext.Window(
 									dateFormated = kitchenStaticEndDate;
 									kitchenStaticEndDate = dateFormated
 											.format('Y-m-d');
-									kitchenStaticEndDate = kitchenStaticEndDate
-											+ " 00:00:00";
+//									kitchenStaticEndDate = kitchenStaticEndDate
+//											+ " 00:00:00";
 								}
 
 								kitchenStaticString = selectKitchens;
