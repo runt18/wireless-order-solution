@@ -73,12 +73,12 @@ public class BusinessStatisticsAction extends Action {
 			 * daily settle history as dateBegin
 			 */
 			if (request.getParameter("dateBegin").equals("")) {
-				sql = " SELECT MIN(on_duty) AS on_duty FROM " + Params.dbName
-						+ ".daily_settle_history " + " WHERE "
+				sql = " SELECT MIN(order_date) AS date_begin FROM " + Params.dbName
+						+ ".order_history " + " WHERE "
 						+ " restaurant_id = " + term.restaurant_id;
 				dbCon.rs = dbCon.stmt.executeQuery(sql);
 				if (dbCon.rs.next()) {
-					dateBegin = new Date(dbCon.rs.getTimestamp("on_duty")
+					dateBegin = new Date(dbCon.rs.getTimestamp("date_begin")
 							.getTime());
 				}
 				dbCon.rs.close();
@@ -93,12 +93,12 @@ public class BusinessStatisticsAction extends Action {
 			 */
 			Date dateEnd = null;
 			if (request.getParameter("dateEnd").equals("")) {
-				sql = " SELECT MAX(off_duty) AS off_duty FROM " + Params.dbName
-						+ ".daily_settle_history" + " WHERE "
+				sql = " SELECT MAX(order_date) AS date_end FROM " + Params.dbName
+						+ ".order_history" + " WHERE "
 						+ "restaurant_id = " + term.restaurant_id;
 				dbCon.rs = dbCon.stmt.executeQuery(sql);
 				if (dbCon.rs.next()) {
-					dateBegin = new Date(dbCon.rs.getTimestamp("off_duty")
+					dateEnd = new Date(dbCon.rs.getTimestamp("date_end")
 							.getTime());
 				}
 				dbCon.rs.close();
