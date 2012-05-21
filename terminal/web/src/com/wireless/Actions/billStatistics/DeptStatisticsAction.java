@@ -126,7 +126,7 @@ public class DeptStatisticsAction extends Action {
 						+ " AND total_price IS NOT NULL AND A.restaurant_id =  "
 						+ term.restaurant_id;
 
-				orderClause = " ORDER BY dept_id";
+				orderClause = orderClause + " ORDER BY dept_id";
 
 				orderFoods = foodRef.getDetailHistory(dbCon, condition,
 						orderClause);
