@@ -185,7 +185,7 @@ businessStatResultGrid.getStore().on('load', function() {
 
 businessStatResultWin = new Ext.Window({
 	title : "统计结果",
-	width : 800,
+	width : 1200,
 	height : 370,
 	closeAction : "hide",
 	resizable : false,
@@ -298,8 +298,8 @@ businessStatWin = new Ext.Window({
 	listeners : {
 		"show" : function(thiz) {
 
-			businessStatWin.findById("begDateMStatBusiness").setValue("");
-			businessStatWin.findById("endDateMStatBusiness").setValue("");
+			businessStatWin.findById("businessStaticBeginDate").setValue("");
+			businessStatWin.findById("businessStaticEndDate").setValue("");
 
 		}
 	}

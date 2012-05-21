@@ -86,28 +86,47 @@ public class KitchenStatisticsAction extends Action {
 			String kitchenAlias = request.getParameter("kitchenAlias");
 			String StatisticsType = request.getParameter("StatisticsType");
 
-			String condition = " AND C.kitchen_alias IN (" + kitchenAlias
-					+ ") ";
-			if (!dateBegin.equals("")) {
-				condition = condition + " AND D.pay_datetime >= '" + dateBegin
-						+ " 00:00:00" + "' ";
-			}
-			if (!dateEnd.equals("")) {
-				condition = condition + " AND D.pay_datetime <= '" + dateEnd
-						+ " 23:59:59" + "' ";
-			}
-			condition = condition
-					+ " AND D.total_price IS NOT NULL AND C.restaurant_id =  "
-					+ term.restaurant_id;
+			String condition = " ";
+			String orderClause = " ";
 
 			OrderFoodReflector foodRef = new OrderFoodReflector();
-			String orderClause = " ORDER BY C.kitchen_alias ";
-
 			OrderFood orderFoods[] = null;
 			if (StatisticsType.equals("Today")) {
+
+				condition = " AND C.kitchen_alias IN (" + kitchenAlias + ") ";
+				if (!dateBegin.equals("")) {
+					condition = condition + " AND D.pay_datetime >= '"
+							+ dateBegin + " 00:00:00" + "' ";
+				}
+				if (!dateEnd.equals("")) {
+					condition = condition + " AND D.pay_datetime <= '"
+							+ dateEnd + " 23:59:59" + "' ";
+				}
+				condition = condition
+						+ " AND D.total_price IS NOT NULL AND C.restaurant_id =  "
+						+ term.restaurant_id;
+
+				orderClause = " ORDER BY C.kitchen_alias ";
+
 				orderFoods = foodRef.getDetailToday(dbCon, condition,
 						orderClause);
 			} else if (StatisticsType.equals("History")) {
+
+				condition = " AND kitchen_alias IN (" + kitchenAlias + ") ";
+				if (!dateBegin.equals("")) {
+					condition = condition + " AND MAX(B.order_date) >= '"
+							+ dateBegin + " 00:00:00" + "' ";
+				}
+				if (!dateEnd.equals("")) {
+					condition = condition + " AND MAX(B.order_date) <= '" + dateEnd
+							+ " 23:59:59" + "' ";
+				}
+				condition = condition
+						+ " AND total_price IS NOT NULL AND A.restaurant_id =  "
+						+ term.restaurant_id;
+
+				orderClause = " ORDER BY kitchen_alias ";
+
 				orderFoods = foodRef.getDetailHistory(dbCon, condition,
 						orderClause);
 			}
