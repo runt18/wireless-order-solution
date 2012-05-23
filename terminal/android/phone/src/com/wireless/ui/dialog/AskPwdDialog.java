@@ -116,17 +116,19 @@ public class AskPwdDialog extends Dialog{
 	private boolean isPass(byte[] pwd){
 		String password = toHexString(pwd);
 		if(_pwdType == PWD_1){
-			return WirelessOrder.restaurant.pwd.equals(password);	
+			return WirelessOrder.restaurant.pwd == null ? true : WirelessOrder.restaurant.pwd.equals(password);	
 			
 		}else if(_pwdType == PWD_3){
-			if(WirelessOrder.restaurant.pwd.equals(password)){
+			if(WirelessOrder.restaurant.pwd == null ||
+			   WirelessOrder.restaurant.pwd.equals(password)){
 				return true;
 			}else{
 				return WirelessOrder.restaurant.pwd3.equals(password);
 			}
 			
 		}else if(_pwdType == PWD_5){
-			if(WirelessOrder.restaurant.pwd.equals(password) || WirelessOrder.restaurant.pwd3.equals(password)){
+			if(WirelessOrder.restaurant.pwd == null || WirelessOrder.restaurant.pwd3 == null ||
+				WirelessOrder.restaurant.pwd.equals(password) || WirelessOrder.restaurant.pwd3.equals(password)){
 				return true;
 			}else{
 				return WirelessOrder.restaurant.pwd5.equals(password);

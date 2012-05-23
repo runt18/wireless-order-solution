@@ -368,9 +368,9 @@ public class OrderFoodListView extends ExpandableListView{
 				cancelFoodImgView.setOnClickListener(new View.OnClickListener() {				
 					@Override
 					public void onClick(View v) {
-						if(WirelessOrder.restaurant.pwd3 != null){
+						if(WirelessOrder.restaurant.pwd5 != null){
 							/**
-							 * 提示输入权限密码2，验证通过的情况下显示删菜数量Dialog
+							 * 提示退菜权限密码，验证通过的情况下显示删菜数量Dialog
 							 */
 							new AskPwdDialog(_context, AskPwdDialog.PWD_5){
 								@Override
@@ -683,7 +683,7 @@ public class OrderFoodListView extends ExpandableListView{
 					@Override
 					public void onClick(View arg0) {
 						dismiss();
-						if(WirelessOrder.restaurant.pwd3 != null){
+						if(WirelessOrder.restaurant.pwd5 != null){
 							new AskPwdDialog(_context, AskPwdDialog.PWD_5){							
 								@Override
 								protected void onPwdPass(Context context){
