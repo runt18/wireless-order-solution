@@ -527,8 +527,8 @@ var unShiftBillWarnWin = new Ext.Window({
 	} ]
 });
 
-// dailySettleVerifyWin
-var dailySettleVerifyWin = new Ext.Window(
+// dailyConfirmWin
+var dailyConfirmWin = new Ext.Window(
 		{
 			layout : "fit",
 			width : 200,
@@ -553,10 +553,10 @@ var dailySettleVerifyWin = new Ext.Window(
 					{
 						text : "确定",
 						handler : function() {
-							var dailySettleVerifyPwd = dailySettleVerifyWin
+							var dailySettleVerifyPwd = dailyConfirmWin
 									.findById("dailySettleVerifyPwd")
 									.getValue();
-							dailySettleVerifyWin.findById(
+							dailyConfirmWin.findById(
 									"dailySettleVerifyPwd").setValue("");
 
 							var pwdTrans;
@@ -566,7 +566,7 @@ var dailySettleVerifyWin = new Ext.Window(
 								pwdTrans = dailySettleVerifyPwd;
 							}
 
-							dailySettleVerifyWin.hide();
+							dailyConfirmWin.hide();
 							isPrompt = false;
 
 							// 密碼校驗
@@ -598,14 +598,14 @@ var dailySettleVerifyWin = new Ext.Window(
 																if (rootData[0].message == "normal") {
 																	if (rootData[0].text == "NoUnShift") {
 																		// 沒剩帳單
-																		dailySettleVerifyWin
+																		dailyConfirmWin
 																				.hide();
 																		isPrompt = false;
 
 																		doDailySettle();
 																	} else {
 																		// 有剩帳單
-																		dailySettleVerifyWin
+																		dailyConfirmWin
 																				.hide();
 																		isPrompt = false;
 
@@ -654,9 +654,9 @@ var dailySettleVerifyWin = new Ext.Window(
 					{
 						text : "取消",
 						handler : function() {
-							dailySettleVerifyWin.hide();
+							dailyConfirmWin.hide();
 							isPrompt = false;
-							dailySettleVerifyWin.findById(
+							dailyConfirmWin.findById(
 									"dailySettleVerifyPwd").setValue("");
 						}
 					} ],
