@@ -361,16 +361,17 @@ public class QueryShift {
 		
 	
 		HashSet<Long> orderID = new HashSet<Long>();
-		HashSet<Long> cashOrderID = new HashSet<Long>();
-		HashSet<Long> creditOrderID = new HashSet<Long>();
-		HashSet<Long> memberOrderID = new HashSet<Long>();
-		HashSet<Long> hangOrderID = new HashSet<Long>();
-		HashSet<Long> signOrderID = new HashSet<Long>();
 		HashSet<Long> cancelOrderID = new HashSet<Long>();
 		HashSet<Long> giftOrderID = new HashSet<Long>();
 		HashSet<Long> discountOrderID = new HashSet<Long>();
 		HashSet<Long> paidOrderID = new HashSet<Long>();
 		HashSet<Long> serviceOrderID = new HashSet<Long>();
+		
+		HashMap<Long, Float> cashIncomeByOrder = new HashMap<Long, Float>();
+		HashMap<Long, Float> creditIncomeByOrder = new HashMap<Long, Float>();
+		HashMap<Long, Float> memberCardIncomeByOrder = new HashMap<Long, Float>();
+		HashMap<Long, Float> hangIncomeByOrder = new HashMap<Long, Float>();
+		HashMap<Long, Float> signIncomeByOrder = new HashMap<Long, Float>();
 		
 		HashMap<Short, DeptIncome> deptIncome = new HashMap<Short, DeptIncome>();
 		for(Department dept : QueryMenu.queryDepartments(dbCon, term.restaurant_id, null, null)){
@@ -385,7 +386,11 @@ public class QueryShift {
 			 */	
 			if(!orderFood.food.isGift() && orderFood.payManner == Order.MANNER_CASH){
 				result.cashIncome += orderFood.calcPriceWithService();
-				cashOrderID.add(orderFood.orderID);
+				if(cashIncomeByOrder.containsKey(orderFood.orderID)){
+					cashIncomeByOrder.put(orderFood.orderID, cashIncomeByOrder.get(orderFood.orderID) + orderFood.calcPriceWithService());
+				}else{
+					cashIncomeByOrder.put(orderFood.orderID, orderFood.calcPriceWithService());
+				}
 			}
 			
 			/**
@@ -393,7 +398,11 @@ public class QueryShift {
 			 */	
 			if(!orderFood.food.isGift() && orderFood.payManner == Order.MANNER_CREDIT_CARD){
 				result.creditCardIncome += orderFood.calcPriceWithService();
-				creditOrderID.add(orderFood.orderID);
+				if(creditIncomeByOrder.containsKey(orderFood.orderID)){
+					creditIncomeByOrder.put(orderFood.orderID, creditIncomeByOrder.get(orderFood.orderID) + orderFood.calcPriceWithService());
+				}else{
+					creditIncomeByOrder.put(orderFood.orderID, orderFood.calcPriceWithService());
+				}
 			}
 			
 			/**
@@ -401,7 +410,11 @@ public class QueryShift {
 			 */	
 			if(!orderFood.food.isGift() && orderFood.payManner == Order.MANNER_MEMBER){
 				result.memberCardIncome += orderFood.calcPriceWithService();
-				memberOrderID.add(orderFood.orderID);
+				if(memberCardIncomeByOrder.containsKey(orderFood.orderID)){
+					memberCardIncomeByOrder.put(orderFood.orderID, memberCardIncomeByOrder.get(orderFood.orderID) + orderFood.calcPriceWithService());
+				}else{
+					memberCardIncomeByOrder.put(orderFood.orderID, orderFood.calcPriceWithService());
+				}
 			}
 			
 			/**
@@ -409,7 +422,11 @@ public class QueryShift {
 			 */	
 			if(!orderFood.food.isGift() && orderFood.payManner == Order.MANNER_HANG){
 				result.hangIncome += orderFood.calcPriceWithService();
-				hangOrderID.add(orderFood.orderID);
+				if(hangIncomeByOrder.containsKey(orderFood.orderID)){
+					hangIncomeByOrder.put(orderFood.orderID, hangIncomeByOrder.get(orderFood.orderID) + orderFood.calcPriceWithService());
+				}else{
+					hangIncomeByOrder.put(orderFood.orderID, orderFood.calcPriceWithService());
+				}
 			}
 			
 			/**
@@ -417,7 +434,11 @@ public class QueryShift {
 			 */	
 			if(!orderFood.food.isGift() && orderFood.payManner == Order.MANNER_SIGN){
 				result.signIncome += orderFood.calcPriceWithService();
-				signOrderID.add(orderFood.orderID);
+				if(signIncomeByOrder.containsKey(orderFood.orderID)){
+					signIncomeByOrder.put(orderFood.orderID, signIncomeByOrder.get(orderFood.orderID) + orderFood.calcPriceWithService());
+				}else{
+					signIncomeByOrder.put(orderFood.orderID, orderFood.calcPriceWithService());
+				}
 			}
 			
 			/**
@@ -491,36 +512,46 @@ public class QueryShift {
 		 * Assign the total cash income and amount
 		 */
 		result.cashIncome = (float)Math.round(result.cashIncome * 100) / 100;
-		result.cashIncome2 = Util.calcByTail(setting.priceTail, result.cashIncome);
-		result.cashAmount = cashOrderID.size();
+		for(float cashByEachOrder : cashIncomeByOrder.values()){
+			result.cashIncome2 += Util.calcByTail(setting.priceTail, cashByEachOrder);
+		}
+		result.cashAmount = cashIncomeByOrder.size();
 		
 		/**
 		 * Assign the total credit card income and amount
 		 */
 		result.creditCardIncome = (float)Math.round(result.creditCardIncome * 100) / 100;
-		result.creditCardIncome2 = Util.calcByTail(setting.priceTail, result.creditCardIncome);
-		result.creditCardAmount = creditOrderID.size();
+		for(float creditByEachOrder : creditIncomeByOrder.values()){
+			result.creditCardIncome2 += Util.calcByTail(setting.priceTail, creditByEachOrder);
+		}
+		result.creditCardAmount = creditIncomeByOrder.size();
 		
 		/**
 		 * Assign the total member card income and amount
 		 */
 		result.memberCardIncome = (float)Math.round(result.memberCardIncome * 100) / 100;
-		result.memberCardIncome2 = Util.calcByTail(setting.priceTail, result.memberCardIncome);
-		result.memeberCardAmount = memberOrderID.size();
+		for(float memberCardByEachOrder : memberCardIncomeByOrder.values()){
+			result.memberCardIncome2 += Util.calcByTail(setting.priceTail, memberCardByEachOrder);			
+		}
+		result.memeberCardAmount = memberCardIncomeByOrder.size();
 		
 		/**
 		 * Assign the total hang income and amount
 		 */
 		result.hangIncome = (float)Math.round(result.hangIncome * 100) / 100;
-		result.hangIncome2 = Util.calcByTail(setting.priceTail, result.hangIncome);
-		result.hangAmount = hangOrderID.size();		
+		for(float hangByEachOrder : hangIncomeByOrder.values()){
+			result.hangIncome2 += Util.calcByTail(setting.priceTail, hangByEachOrder);
+		}
+		result.hangAmount = hangIncomeByOrder.size();		
 		
 		/**
 		 * Assign the total sign income and amount
 		 */
 		result.signIncome = (float)Math.round(result.signIncome * 100) / 100;
-		result.signIncome2 = Util.calcByTail(setting.priceTail, result.signIncome);
-		result.signAmount = signOrderID.size();
+		for(float signByEachOrder : signIncomeByOrder.values()){
+			result.signIncome2 += Util.calcByTail(setting.priceTail, signByEachOrder);
+		}
+		result.signAmount = signIncomeByOrder.size();
 		
 		/**
 		 * Assign the total actual income
