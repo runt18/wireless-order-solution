@@ -9,7 +9,8 @@
 					"ope" : in_operator,
 					"value" : in_condition,
 					"havingCond" : in_additionalFilter,
-					"isPaging" : false
+					"isPaging" : false,
+					"queryType" : "normal"
 				},
 				success : function(response, options) {
 					var resultJSON = Ext.util.JSON
