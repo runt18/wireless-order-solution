@@ -183,10 +183,12 @@ function billQueryHandler() {
 		queryValue = searchForm.findById("conditionNumber")
 				.getValue();
 	} else if (conditionType == "date") {
-		queryValue = new Date();
+		var dateFormated = new Date();
 		queryValue = searchForm.findById("conditionDate")
 				.getValue();
-		// queryValue = queryValue.format("H:i:s");
+		dateFormated = queryValue;
+		queryValue = dateFormated.format('Y-m-d');
+		// queryValue = queryValue + " 00:00:00";
 	} else if (conditionType == "tableTypeComb") {
 		queryValue = searchForm.findById("tableTypeComb")
 				.getValue();
@@ -198,6 +200,26 @@ function billQueryHandler() {
 				.getValue();
 		if (queryValue == "现金") {
 			queryValue = 1;
+		}
+	}
+
+	// -- 獲取額外過濾條件--
+	var additionFilter = 0;
+	if (billsQueryCondPanel.getForm().findField(
+			"conditionRadio") != null) {
+		var conditionRadio = billsQueryCondPanel.getForm()
+				.findField("conditionRadio")
+				.getGroupValue();
+		if (conditionRadio == "all") {
+			additionFilter = 0;
+		} else if (conditionRadio == "isPaid") {
+			additionFilter = 1;
+		} else if (conditionRadio == "discount") {
+			additionFilter = 2;
+		} else if (conditionRadio == "gift") {
+			additionFilter = 3;
+		} else if (conditionRadio == "return") {
+			additionFilter = 4;
 		}
 	}
 
@@ -218,8 +240,15 @@ function billQueryHandler() {
 
 		billsStore.reload({
 			params : {
-				start : 0,
-				limit : billRecordCount
+				"start" : 0,
+				"limit" : billRecordCount,
+				"pin" : pin,
+				"type" : queryTpye,
+				"ope" : queryOperator,
+				"value" : queryValue,
+				"havingCond" : additionFilter,
+				"isPaging" : true,
+				"queryType" : "normal"
 			}
 		});
 	}
