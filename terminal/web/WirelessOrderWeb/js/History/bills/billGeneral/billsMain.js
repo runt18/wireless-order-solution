@@ -1109,68 +1109,76 @@ advSrchWin = new Ext.Window({
 				handler : function() {
 					advSrchWin.hide();
 
-					// bill adv srch
-					// 1, get parameters
-					var dateFormated = new Date();
-					var dateBegin = advSrchForm.findById("advSrchStartDate")
-							.getValue();
-					var dateEnd = advSrchForm.findById("advSrchEndDate")
-							.getValue();
-					if (dateBegin != "") {
-						dateFormated = dateBegin;
-						dateBegin = dateFormated.format('Y-m-d');
-					}
-					if (dateEnd != "") {
-						dateFormated = dateEnd;
-						dateEnd = dateFormated.format('Y-m-d');
-					}
-
-					var amountBegin = advSrchForm.findById("advSrchStartAmt")
-							.getValue();
-					var amountEnd = advSrchForm.findById("advSrchEndAmt")
-							.getValue();
-					var seqNumBegin = advSrchForm
-							.findById("advSrchStartSeqNum").getValue();
-					var seqNumEnd = advSrchForm.findById("advSrchEndSeqNum")
-							.getValue();
-					var tableNumber = advSrchForm.findById("advSrchTableNbr")
-							.getValue();
-
-					var payManner = payTypeCombAdvSrch.getValue();
-					var in_payManner;
-					if (payManner == "全部") {
-						in_payManner = 6;
-					} else {
-						in_payManner = payManner;
-					}
-					;
-
-					var tableType = tableTypeCombAdvSrch.getValue();
-					var in_tableType;
-					if (tableType == "全部") {
-						in_tableType = 6;
-					} else {
-						in_tableType = tableType;
-					}
-
+					queryType = "advance";
 					billsStore.reload({
 						params : {
 							"start" : 0,
-							"limit" : billRecordCount,
-							"pin" : pin,
-							"dateBegin" : dateBegin,
-							"dateEnd" : dateEnd,
-							"amountBegin" : amountBegin,
-							"amountEnd" : amountEnd,
-							"seqNumBegin" : seqNumBegin,
-							"seqNumEnd" : seqNumEnd,
-							"tableNumber" : tableNumber,
-							"payManner" : in_payManner,
-							"tableType" : in_tableType,
-							"isPaging" : true,
-							"queryType" : "Advance"
+							"limit" : billRecordCount
 						}
 					});
+					
+//					// bill adv srch
+//					// 1, get parameters
+//					var dateFormated = new Date();
+//					var dateBegin = advSrchForm.findById("advSrchStartDate")
+//							.getValue();
+//					var dateEnd = advSrchForm.findById("advSrchEndDate")
+//							.getValue();
+//					if (dateBegin != "") {
+//						dateFormated = dateBegin;
+//						dateBegin = dateFormated.format('Y-m-d');
+//					}
+//					if (dateEnd != "") {
+//						dateFormated = dateEnd;
+//						dateEnd = dateFormated.format('Y-m-d');
+//					}
+//
+//					var amountBegin = advSrchForm.findById("advSrchStartAmt")
+//							.getValue();
+//					var amountEnd = advSrchForm.findById("advSrchEndAmt")
+//							.getValue();
+//					var seqNumBegin = advSrchForm
+//							.findById("advSrchStartSeqNum").getValue();
+//					var seqNumEnd = advSrchForm.findById("advSrchEndSeqNum")
+//							.getValue();
+//					var tableNumber = advSrchForm.findById("advSrchTableNbr")
+//							.getValue();
+//
+//					var payManner = payTypeCombAdvSrch.getValue();
+//					var in_payManner;
+//					if (payManner == "全部") {
+//						in_payManner = 6;
+//					} else {
+//						in_payManner = payManner;
+//					}
+//					;
+//
+//					var tableType = tableTypeCombAdvSrch.getValue();
+//					var in_tableType;
+//					if (tableType == "全部") {
+//						in_tableType = 6;
+//					} else {
+//						in_tableType = tableType;
+//					}
+//
+//					billsStore.reload({
+//						params : {
+//							"start" : 0,
+//							"limit" : billRecordCount,
+//							"pin" : pin,
+//							"dateBegin" : dateBegin,
+//							"dateEnd" : dateEnd,
+//							"amountBegin" : amountBegin,
+//							"amountEnd" : amountEnd,
+//							"seqNumBegin" : seqNumBegin,
+//							"seqNumEnd" : seqNumEnd,
+//							"tableNumber" : tableNumber,
+//							"payManner" : in_payManner,
+//							"tableType" : in_tableType,
+//							"isPaging" : true,
+//							"queryType" : "Advance"
+//						}
+//					});
 
 				}
 			}, {
@@ -1538,79 +1546,142 @@ Ext
 
 					});
 
-			// billsGrid.getStore().on(
-			// 'beforeload',
-			// function() {
-			// var queryTpye = filterTypeComb.getValue();
-			// if (queryTpye == "全部") {
-			// queryTpye = 0;
-			// }
-			//
-			// var queryOperator = operatorComb.getValue();
-			// if (queryOperator == "等于") {
-			// queryOperator = 1;
-			// }
-			//
-			// var queryValue = "";
-			// if (conditionType == "text" && queryTpye != 0
-			// && queryTpye != 9) {
-			// queryValue = searchForm.findById("conditionText")
-			// .getValue();
-			// } else if (conditionType == "number") {
-			// queryValue = searchForm.findById("conditionNumber")
-			// .getValue();
-			// } else if (conditionType == "date") {
-			// var dateFormated = new Date();
-			// queryValue = searchForm.findById("conditionDate")
-			// .getValue();
-			// dateFormated = queryValue;
-			// queryValue = dateFormated.format('Y-m-d');
-			// // queryValue = queryValue + " 00:00:00";
-			// } else if (conditionType == "tableTypeComb") {
-			// queryValue = searchForm.findById("tableTypeComb")
-			// .getValue();
-			// if (queryValue == "一般") {
-			// queryValue = 1;
-			// }
-			// } else if (conditionType == "payTypeComb") {
-			// queryValue = searchForm.findById("payTypeComb")
-			// .getValue();
-			// if (queryValue == "现金") {
-			// queryValue = 1;
-			// }
-			// }
-			//
-			// // -- 獲取額外過濾條件--
-			// var additionFilter = 0;
-			// if (billsQueryCondPanel.getForm().findField(
-			// "conditionRadio") != null) {
-			// var conditionRadio = billsQueryCondPanel.getForm()
-			// .findField("conditionRadio")
-			// .getGroupValue();
-			// if (conditionRadio == "all") {
-			// additionFilter = 0;
-			// } else if (conditionRadio == "isPaid") {
-			// additionFilter = 1;
-			// } else if (conditionRadio == "discount") {
-			// additionFilter = 2;
-			// } else if (conditionRadio == "gift") {
-			// additionFilter = 3;
-			// } else if (conditionRadio == "return") {
-			// additionFilter = 4;
-			// }
-			// }
-			//
-			// // 输入查询条件参数
-			// this.baseParams = {
-			// "pin" : pin,
-			// "type" : queryTpye,
-			// "ope" : queryOperator,
-			// "value" : queryValue,
-			// "havingCond" : additionFilter,
-			// "isPaging" : true,
-			// "queryType" : "normal"
-			// };
-			// });
+			billsGrid.getStore().on(
+					'beforeload',
+					function() {
+
+						if (queryType == "normal") {
+							var queryTpye = filterTypeComb.getValue();
+							if (queryTpye == "全部") {
+								queryTpye = 0;
+							}
+
+							var queryOperator = operatorComb.getValue();
+							if (queryOperator == "等于") {
+								queryOperator = 1;
+							}
+
+							var queryValue = "";
+							if (conditionType == "text" && queryTpye != 0
+									&& queryTpye != 9) {
+								queryValue = searchForm.findById(
+										"conditionText").getValue();
+							} else if (conditionType == "number") {
+								queryValue = searchForm.findById(
+										"conditionNumber").getValue();
+							} else if (conditionType == "date") {
+								var dateFormated = new Date();
+								queryValue = searchForm.findById(
+										"conditionDate").getValue();
+								dateFormated = queryValue;
+								queryValue = dateFormated.format('Y-m-d');
+								// queryValue = queryValue + " 00:00:00";
+							} else if (conditionType == "tableTypeComb") {
+								queryValue = searchForm.findById(
+										"tableTypeComb").getValue();
+								if (queryValue == "一般") {
+									queryValue = 1;
+								}
+							} else if (conditionType == "payTypeComb") {
+								queryValue = searchForm.findById("payTypeComb")
+										.getValue();
+								if (queryValue == "现金") {
+									queryValue = 1;
+								}
+							}
+
+							// -- 獲取額外過濾條件--
+							var additionFilter = 0;
+							if (billsQueryCondPanel.getForm().findField(
+									"conditionRadio") != null) {
+								var conditionRadio = billsQueryCondPanel
+										.getForm().findField("conditionRadio")
+										.getGroupValue();
+								if (conditionRadio == "all") {
+									additionFilter = 0;
+								} else if (conditionRadio == "isPaid") {
+									additionFilter = 1;
+								} else if (conditionRadio == "discount") {
+									additionFilter = 2;
+								} else if (conditionRadio == "gift") {
+									additionFilter = 3;
+								} else if (conditionRadio == "return") {
+									additionFilter = 4;
+								}
+							}
+
+							// 输入查询条件参数
+							this.baseParams = {
+								"pin" : pin,
+								"type" : queryTpye,
+								"ope" : queryOperator,
+								"value" : queryValue,
+								"havingCond" : additionFilter,
+								"isPaging" : true,
+								"queryType" : "normal"
+							};
+							
+						} else if (queryType == "advance") {
+							// bill adv srch
+							// 1, get parameters
+							var dateFormated = new Date();
+							var dateBegin = advSrchForm.findById(
+									"advSrchStartDate").getValue();
+							var dateEnd = advSrchForm
+									.findById("advSrchEndDate").getValue();
+							if (dateBegin != "") {
+								dateFormated = dateBegin;
+								dateBegin = dateFormated.format('Y-m-d');
+							}
+							if (dateEnd != "") {
+								dateFormated = dateEnd;
+								dateEnd = dateFormated.format('Y-m-d');
+							}
+
+							var amountBegin = advSrchForm.findById(
+									"advSrchStartAmt").getValue();
+							var amountEnd = advSrchForm.findById(
+									"advSrchEndAmt").getValue();
+							var seqNumBegin = advSrchForm.findById(
+									"advSrchStartSeqNum").getValue();
+							var seqNumEnd = advSrchForm.findById(
+									"advSrchEndSeqNum").getValue();
+							var tableNumber = advSrchForm.findById(
+									"advSrchTableNbr").getValue();
+
+							var payManner = payTypeCombAdvSrch.getValue();
+							var in_payManner;
+							if (payManner == "全部") {
+								in_payManner = 6;
+							} else {
+								in_payManner = payManner;
+							}
+							;
+
+							var tableType = tableTypeCombAdvSrch.getValue();
+							var in_tableType;
+							if (tableType == "全部") {
+								in_tableType = 6;
+							} else {
+								in_tableType = tableType;
+							}
+
+							this.baseParams = {
+								"pin" : pin,
+								"dateBegin" : dateBegin,
+								"dateEnd" : dateEnd,
+								"amountBegin" : amountBegin,
+								"amountEnd" : amountEnd,
+								"seqNumBegin" : seqNumBegin,
+								"seqNumEnd" : seqNumEnd,
+								"tableNumber" : tableNumber,
+								"payManner" : in_payManner,
+								"tableType" : in_tableType,
+								"isPaging" : true,
+								"queryType" : "Advance"
+							};
+						}
+					});
 
 			// --------------------------------------------------------------------------
 

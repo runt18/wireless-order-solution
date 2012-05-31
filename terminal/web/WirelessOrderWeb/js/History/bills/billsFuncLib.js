@@ -239,17 +239,25 @@ function billQueryHandler() {
 
 	if (isInputValid) {
 
+//		billsStore.reload({
+//			params : {
+//				"start" : 0,
+//				"limit" : billRecordCount,
+//				"pin" : pin,
+//				"type" : queryTpye,
+//				"ope" : queryOperator,
+//				"value" : queryValue,
+//				"havingCond" : additionFilter,
+//				"isPaging" : true,
+//				"queryType" : "normal"
+//			}
+//		});
+		
+		queryType = "normal";
 		billsStore.reload({
 			params : {
 				"start" : 0,
-				"limit" : billRecordCount,
-				"pin" : pin,
-				"type" : queryTpye,
-				"ope" : queryOperator,
-				"value" : queryValue,
-				"havingCond" : additionFilter,
-				"isPaging" : true,
-				"queryType" : "normal"
+				"limit" : billRecordCount
 			}
 		});
 	}
