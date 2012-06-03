@@ -43,6 +43,8 @@ public class QueryHistoryAction extends Action {
 			pageSize = Integer.parseInt(limit);
 		}
 
+		String queryType = request.getParameter("queryType");
+
 		List resultList = new ArrayList();
 		List outputList = new ArrayList();
 		// List chooseList = new ArrayList();
@@ -89,145 +91,248 @@ public class QueryHistoryAction extends Action {
 			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
 					Terminal.MODEL_STAFF);
 
-			// get the type to filter
-			int type = Integer.parseInt(request.getParameter("type"));
+			String sql = "";
+			String havingCond = "";
+			if (queryType.equals("normal")) {
 
-			// get the operator to filter
-			String ope = request.getParameter("ope");
-			int opeType = 1;
-			if (ope != null) {
-				opeType = Integer.parseInt(ope);
+				// get the type to filter
+				int type = Integer.parseInt(request.getParameter("type"));
 
-				if (opeType == 1) {
-					ope = "=";
-				} else if (opeType == 2) {
-					ope = ">=";
-				} else if (opeType == 3) {
-					ope = "<=";
+				// get the operator to filter
+				String ope = request.getParameter("ope");
+				int opeType = 1;
+				if (ope != null) {
+					opeType = Integer.parseInt(ope);
+
+					if (opeType == 1) {
+						ope = "=";
+					} else if (opeType == 2) {
+						ope = ">=";
+					} else if (opeType == 3) {
+						ope = "<=";
+					} else {
+						ope = "=";
+					}
 				} else {
-					ope = "=";
+					ope = "";
 				}
-			} else {
-				ope = "";
-			}
 
-			// get the value to filter
-			String filterVal = request.getParameter("value");
+				// get the value to filter
+				String filterVal = request.getParameter("value");
 
-			// get the having condition to filter
-			int cond = Integer.parseInt(request.getParameter("havingCond"));
-			String havingCond = null;
-			if (cond == 1) {
-				// 是否有反结帐
-				havingCond = " HAVING SUM(IF(B.is_paid, 1, 0)) > 0 ";
-			} else if (cond == 2) {
-				// 是否有折扣
-				havingCond = " HAVING MIN(B.discount) < 1 ";
-			} else if (cond == 3) {
-				// 是否有赠送
-				havingCond = " HAVING SUM(B.food_status & " + Food.GIFT
-						+ ") > 0 ";
-			} else if (cond == 4) {
-				// 是否有退菜
-				havingCond = " HAVING MIN(order_count) < 0 ";
-			} else {
-				havingCond = "";
-			}
-
-			// combine the operator and filter value
-			String filterCondition = null;
-
-			if (type == 1) {
-				// 按账单号
-				filterCondition = " AND A.id" + ope + filterVal;
-			} else if (type == 2) {
-				// 按流水号
-				if (havingCond.equals("")) {
-					havingCond = " HAVING MAX(A.seq_id) " + ope + filterVal;
+				// get the having condition to filter
+				int cond = Integer.parseInt(request.getParameter("havingCond"));
+				havingCond = null;
+				if (cond == 1) {
+					// 是否有反结帐
+					havingCond = " HAVING SUM(IF(B.is_paid, 1, 0)) > 0 ";
+				} else if (cond == 2) {
+					// 是否有折扣
+					havingCond = " HAVING MIN(B.discount) < 1 ";
+				} else if (cond == 3) {
+					// 是否有赠送
+					havingCond = " HAVING SUM(B.food_status & " + Food.GIFT
+							+ ") > 0 ";
+				} else if (cond == 4) {
+					// 是否有退菜
+					havingCond = " HAVING MIN(order_count) < 0 ";
 				} else {
-					havingCond = havingCond + " AND MAX(A.seq_id) " + ope
-							+ filterVal;
+					havingCond = "";
 				}
-				filterCondition = "";
-			} else if (type == 3) {
-				// 按台号
-				filterCondition = " AND A.table_alias" + ope + filterVal;
-			} else if (type == 4) {
-				// 按日期
-				if (opeType == 1) {
-					filterCondition = " AND A.order_date >= '" + filterVal
-							+ " 00:00:00' AND A.order_date <= '" + filterVal
-							+ " 23:59:59'";
 
-				} else if (opeType == 3) {
-					filterCondition = " AND A.order_date" + ope + "'"
-							+ filterVal + " 23:59:59'";
-				} else {
-					filterCondition = " AND A.order_date" + ope + "'"
-							+ filterVal + " 00:00:00'";
-				}
-			} else if (type == 5) {
-				// 按类型
-				filterCondition = " AND A.category" + ope + filterVal;
-			} else if (type == 6) {
-				// 按结帐方式
-				filterCondition = " AND A.type" + ope + filterVal;
-			} else if (type == 7) {
-				// 按金额
-				filterCondition = " AND A.total_price" + ope + filterVal;
-			} else if (type == 8) {
-				// 按实收
-				filterCondition = " AND A.total_price_2" + ope + filterVal;
-			} else if (type == 9) {
-				// 最近日结(显示最近一次日结记录的时间区间内的账单信息)
-				String sql = " SELECT on_duty, off_duty FROM " + Params.dbName
-						+ ".daily_settle_history " + " WHERE restaurant_id="
-						+ term.restaurant_id + " ORDER BY id DESC "
-						+ " LIMIT 1 ";
-				dbCon.rs = dbCon.stmt.executeQuery(sql);
-				if (dbCon.rs.next()) {
-					filterCondition = " AND A.order_date BETWEEN "
-							+ "'"
-							+ new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-									.format(dbCon.rs.getTimestamp("on_duty"))
-							+ "'"
-							+ " AND "
-							+ "'"
-							+ new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-									.format(dbCon.rs.getTimestamp("off_duty"))
-							+ "'";
+				// combine the operator and filter value
+				String filterCondition = null;
 
+				if (type == 1) {
+					// 按账单号
+					filterCondition = " AND A.id" + ope + filterVal;
+				} else if (type == 2) {
+					// 按流水号
+					if (havingCond.equals("")) {
+						havingCond = " HAVING MAX(A.seq_id) " + ope + filterVal;
+					} else {
+						havingCond = havingCond + " AND MAX(A.seq_id) " + ope
+								+ filterVal;
+					}
+					filterCondition = "";
+				} else if (type == 3) {
+					// 按台号
+					filterCondition = " AND A.table_alias" + ope + filterVal;
+				} else if (type == 4) {
+					// 按日期
+					if (opeType == 1) {
+						filterCondition = " AND A.order_date >= '" + filterVal
+								+ " 00:00:00' AND A.order_date <= '"
+								+ filterVal + " 23:59:59'";
+
+					} else if (opeType == 3) {
+						filterCondition = " AND A.order_date" + ope + "'"
+								+ filterVal + " 23:59:59'";
+					} else {
+						filterCondition = " AND A.order_date" + ope + "'"
+								+ filterVal + " 00:00:00'";
+					}
+				} else if (type == 5) {
+					// 按类型
+					filterCondition = " AND A.category" + ope + filterVal;
+				} else if (type == 6) {
+					// 按结帐方式
+					filterCondition = " AND A.type" + ope + filterVal;
+				} else if (type == 7) {
+					// 按金额
+					filterCondition = " AND A.total_price" + ope + filterVal;
+				} else if (type == 8) {
+					// 按实收
+					filterCondition = " AND A.total_price_2" + ope + filterVal;
+				} else if (type == 9) {
+					// 最近日结(显示最近一次日结记录的时间区间内的账单信息)
+					sql = " SELECT on_duty, off_duty FROM " + Params.dbName
+							+ ".daily_settle_history "
+							+ " WHERE restaurant_id=" + term.restaurant_id
+							+ " ORDER BY id DESC " + " LIMIT 1 ";
+					dbCon.rs = dbCon.stmt.executeQuery(sql);
+					if (dbCon.rs.next()) {
+						filterCondition = " AND A.order_date BETWEEN "
+								+ "'"
+								+ new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+										.format(dbCon.rs
+												.getTimestamp("on_duty"))
+								+ "'"
+								+ " AND "
+								+ "'"
+								+ new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+										.format(dbCon.rs
+												.getTimestamp("off_duty"))
+								+ "'";
+
+					} else {
+						filterCondition = "";
+					}
+					dbCon.rs.close();
 				} else {
 					filterCondition = "";
 				}
-				dbCon.rs.close();
-			} else {
-				filterCondition = "";
-			}
 
-			/**
-			 * Select all the today orders matched the conditions below. 1 -
-			 * belong to this restaurant 2 - has been paid 3 - match extra
-			 * filter condition
-			 */
-			String sql = " SELECT "
-					+ " A.id, MAX(A.seq_id) AS seq_id, "
-					+ " MAX(A.table_alias) AS table_alias, MAX(A.order_date) AS order_date, MAX(A.category) AS category, "
-					+ " MAX(A.type) AS type, MAX(A.total_price) AS total_price, MAX(A.total_price_2) AS total_price_2, "
-					+ " MAX(A.table2_alias) AS table2_alias, MAX(A.custom_num) AS custom_num, MAX(A.service_rate) AS service_rate, "
-					+ " MAX(A.gift_price) AS gift_price, MAX(A.member_id) AS member_id, MAX(A.member) AS member, "
-					+ " MAX(A.comment) AS comment, MAX(A.discount_type) AS discount_type, MAX(A.waiter) AS waiter, "
-					+ "(CASE WHEN MIN(B.discount) < 1 THEN 1 ELSE 0 END) AS is_discount, "
-					+ "(CASE WHEN SUM(B.food_status & "
-					+ Food.GIFT
-					+ ") <= 0 THEN 0 ELSE 1 END) AS is_gift, "
-					+ "(CASE WHEN SUM(IF(B.is_paid, 1, 0)) <= 0 THEN 0 ELSE 1 END) AS is_paid, "
-					+ "(CASE WHEN MIN(order_count) < 0 THEN 1 ELSE 0 END) AS is_cancel"
-					+ " FROM " + Params.dbName + ".order_history A, "
-					+ Params.dbName + ".order_food_history B " + " WHERE "
-					+ " A.id = B.order_id " + " AND A.restaurant_id="
-					+ term.restaurant_id + " " + filterCondition
-					+ " GROUP BY A.id " + havingCond;
+				/**
+				 * Select all the today orders matched the conditions below. 1 -
+				 * belong to this restaurant 2 - has been paid 3 - match extra
+				 * filter condition
+				 */
+				sql = " SELECT "
+						+ " A.id, MAX(A.seq_id) AS seq_id, "
+						+ " MAX(A.table_alias) AS table_alias, MAX(A.order_date) AS order_date, MAX(A.category) AS category, "
+						+ " MAX(A.type) AS type, MAX(A.total_price) AS total_price, MAX(A.total_price_2) AS total_price_2, "
+						+ " MAX(A.table2_alias) AS table2_alias, MAX(A.custom_num) AS custom_num, MAX(A.service_rate) AS service_rate, "
+						+ " MAX(A.gift_price) AS gift_price, MAX(A.member_id) AS member_id, MAX(A.member) AS member, "
+						+ " MAX(A.comment) AS comment, MAX(A.discount_type) AS discount_type, MAX(A.waiter) AS waiter, "
+						+ "(CASE WHEN MIN(B.discount) < 1 THEN 1 ELSE 0 END) AS is_discount, "
+						+ "(CASE WHEN SUM(B.food_status & "
+						+ Food.GIFT
+						+ ") <= 0 THEN 0 ELSE 1 END) AS is_gift, "
+						+ "(CASE WHEN SUM(IF(B.is_paid, 1, 0)) <= 0 THEN 0 ELSE 1 END) AS is_paid, "
+						+ "(CASE WHEN MIN(order_count) < 0 THEN 1 ELSE 0 END) AS is_cancel"
+						+ " FROM " + Params.dbName + ".order_history A, "
+						+ Params.dbName + ".order_food_history B " + " WHERE "
+						+ " A.id = B.order_id " + " AND A.restaurant_id="
+						+ term.restaurant_id + " " + filterCondition
+						+ " GROUP BY A.id " + havingCond;
+
+			} else {
+				// get the query condition
+				String dateBegin = request.getParameter("dateBegin");
+				String dateEnd = request.getParameter("dateEnd");
+				String amountBegin = request.getParameter("amountBegin");
+				String amountEnd = request.getParameter("amountEnd");
+				String seqNumBegin = request.getParameter("seqNumBegin");
+				String seqNumEnd = request.getParameter("seqNumEnd");
+				String tableNumber = request.getParameter("tableNumber");
+				String payManner = request.getParameter("payManner");
+				String tableType = request.getParameter("tableType");
+
+				// combine the operator and filter value
+				String filterCondition = "";
+				if (!dateBegin.equals("")) {
+					filterCondition = " AND A.order_date>='" + dateBegin
+							+ " 00:00:00" + "' ";
+				}
+
+				if (!dateEnd.equals("")) {
+					filterCondition = filterCondition + " AND A.order_date<='"
+							+ dateEnd + " 23:59:59" + "' ";
+				}
+
+				if (!amountBegin.equals("")) {
+					filterCondition = filterCondition + " AND A.total_price>="
+							+ amountBegin;
+				}
+
+				if (!amountEnd.equals("")) {
+					filterCondition = filterCondition + " AND A.total_price<="
+							+ amountEnd;
+				}
+
+				if (!seqNumBegin.equals("")) {
+					if (havingCond.equals("")) {
+						havingCond = " HAVING MAX(A.seq_id) >= " + seqNumBegin;
+					} else {
+						havingCond = havingCond + " AND MAX(A.seq_id) >= "
+								+ seqNumBegin;
+					}
+				}
+
+				if (!seqNumEnd.equals("")) {
+					if (havingCond.equals("")) {
+						havingCond = " HAVING MAX(A.seq_id) <= " + seqNumEnd;
+					} else {
+						havingCond = havingCond + " AND MAX(A.seq_id) <= "
+								+ seqNumEnd;
+					}
+				}
+
+				if (!tableNumber.equals("")) {
+					filterCondition = filterCondition + " AND A.table_alias="
+							+ tableNumber;
+				}
+
+				// db:[ [ "1", "现金" ], [ "2", "刷卡" ], [ "3", "会员卡" ],[ "4", "签单"
+				// ],
+				// [ "5", "挂账" ] ]
+				if (!payManner.equals("6")) {
+					filterCondition = filterCondition + " AND A.type="
+							+ payManner;
+				}
+
+				// db:[ [ "1", "一般" ], [ "2", "外卖" ], [ "3", "并台" ], [ "4", "拼台"
+				// ] ]
+				if (!tableType.equals("6")) {
+					filterCondition = filterCondition + " AND A.category="
+							+ tableType;
+				}
+
+				/**
+				 * Select all the today orders matched the conditions below. 1 -
+				 * belong to this restaurant 2 - has been paid 3 - match extra
+				 * filter condition
+				 */
+				sql = " SELECT "
+						+ " A.id, MAX(A.seq_id) AS seq_id, "
+						+ " MAX(A.table_alias) AS table_alias, MAX(A.order_date) AS order_date, MAX(A.category) AS category, "
+						+ " MAX(A.type) AS type, MAX(A.total_price) AS total_price, MAX(A.total_price_2) AS total_price_2, "
+						+ " MAX(A.table2_alias) AS table2_alias, MAX(A.custom_num) AS custom_num, MAX(A.service_rate) AS service_rate, "
+						+ " MAX(A.gift_price) AS gift_price, MAX(A.member_id) AS member_id, MAX(A.member) AS member, "
+						+ " MAX(A.comment) AS comment, MAX(A.discount_type) AS discount_type, MAX(A.waiter) AS waiter, "
+						+ "(CASE WHEN MIN(B.discount) < 1 THEN 1 ELSE 0 END) AS is_discount, "
+						+ "(CASE WHEN SUM(B.food_status & "
+						+ Food.GIFT
+						+ ") <= 0 THEN 0 ELSE 1 END) AS is_gift, "
+						+ "(CASE WHEN SUM(IF(B.is_paid, 1, 0)) <= 0 THEN 0 ELSE 1 END) AS is_paid, "
+						+ "(CASE WHEN MIN(order_count) < 0 THEN 1 ELSE 0 END) AS is_cancel"
+						+ " FROM " + Params.dbName + ".order_history A, "
+						+ Params.dbName + ".order_food_history B " + " WHERE "
+						+ " A.id = B.order_id " + " AND A.restaurant_id="
+						+ term.restaurant_id + " " + filterCondition
+						+ " GROUP BY A.id " + havingCond;
+			}
 
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 
