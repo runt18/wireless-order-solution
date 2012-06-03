@@ -135,10 +135,9 @@ public class BusinessStatisticsAction extends Action {
 						+ term.restaurant_id
 						+ " AND "
 						+ " off_duty BETWEEN "
-						+ new SimpleDateFormat("yyyy-MM-dd").format(dateBegin)
+						+ "'" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(dateBegin) + "'"
 						+ " AND "
-						+ new SimpleDateFormat("yyyy-MM-dd")
-								.format(c.getTime());
+						+ "'" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(c.getTime()) + "'";
 				dbCon.rs = dbCon.stmt.executeQuery(sql);
 
 				if (dbCon.rs.next()) {
@@ -238,14 +237,16 @@ public class BusinessStatisticsAction extends Action {
 			resultMap.put("message", "日期格式不正确");
 			resultList.add(resultMap);
 			isError = true;
-
+			e.printStackTrace();
+			
 		} catch (SQLException e) {
 
 			HashMap resultMap = new HashMap();
 			resultMap.put("message", "数据查询语句不正确");
 			resultList.add(resultMap);
 			isError = true;
-
+			e.printStackTrace();
+			
 		} finally {
 			dbCon.disconnect();
 
