@@ -181,7 +181,6 @@ public class OrderFoodListView extends ExpandableListView{
 	public void notifyDataChanged(OrderFood food){
 		if(food != null && _adapter != null){
 			_foods.set(_selectedPos, food);
-			//trim(food);
 			_adapter.notifyDataSetChanged();
 		
 		}else{

@@ -331,17 +331,6 @@ public class PickFoodActivity extends Activity implements PickFoodListView.OnFoo
 			((EditText) findViewById(R.id.filterPinyinEdtTxt)).setText("");
 		}
 		
-		//update the short cut if it is showing
-		if(_popupWindow.isShowing()){
-			if(_tempLstView != null){
-				 //Combine both temporary and picked foods
-				List<OrderFood> pickedFoods = new ArrayList<OrderFood>(_pickFoods);
-				pickedFoods.addAll(_tempLstView.getSourceData());
-				_popupLstView.setAdapter(new PopupWndAdapter(PickFoodActivity.this, pickedFoods));
-			}else{
-				_popupLstView.setAdapter(new PopupWndAdapter(PickFoodActivity.this, _pickFoods));
-			}
-		}
 		
 	}
 

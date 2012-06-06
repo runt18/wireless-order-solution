@@ -22,6 +22,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -271,6 +272,7 @@ public class MainActivity extends Activity {
 				for(int i = 0; i < WirelessOrder.staffs.length; i++){
 					if(WirelessOrder.staffs[i].pin == pin){
 						_staff = WirelessOrder.staffs[i];
+						Log.e("", _staff.name);
 					}
 				}
 				if(_staff != null){

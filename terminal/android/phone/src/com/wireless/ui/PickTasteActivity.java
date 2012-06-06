@@ -132,6 +132,7 @@ public class PickTasteActivity extends Activity{
 		
 	}
 
+	
    //ÉèÖÃ¿ÚÎ¶View
 	public View setupTasteView(){
 		View tasteView = LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.taste, null);
