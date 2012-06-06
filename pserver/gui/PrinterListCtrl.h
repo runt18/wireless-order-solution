@@ -2,7 +2,13 @@
 
 #include "../tinyxml/tinyxml.h"
 
-extern TCHAR* _FuncDesc[];
+typedef struct{
+	int code;
+	TCHAR* desc;
+}PrintFuncMap;
+
+//extern TCHAR* _FuncDesc[];
+extern PrintFuncMap _FuncMap[];
 extern int _nFuncs;
 extern TCHAR* _PrinterStyle[];
 extern int _nStyle;

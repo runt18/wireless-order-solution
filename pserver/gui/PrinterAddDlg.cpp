@@ -23,7 +23,7 @@ CAddPrinterDlg::CAddPrinterDlg(TiXmlDocument& conf, CWnd* pParent /*=NULL*/)
 	: m_Conf(conf), CDialog(CAddPrinterDlg::IDD, pParent)
 {
 	m_Printer = _T("");
-	m_Func = _T("");
+	m_FuncCode = 0;
 }
 
 CAddPrinterDlg::~CAddPrinterDlg()
@@ -133,12 +133,12 @@ BOOL CAddPrinterDlg::OnInitDialog(){
 	}
 
 	//set the function codes
-	for(int i = 1; i < _nFuncs; i++){
-		m_Funcs.InsertString(i - 1, _FuncDesc[i]);
+	for(int i = 0; i < _nFuncs; i++){
+		m_Funcs.InsertString(i, _FuncMap[i].desc);
 	}
 	m_Funcs.SetCurSel(0);
 	//assign the current value of function code
-	m_Funcs.GetLBText(0, m_Func);	
+	m_FuncCode = _FuncMap[m_Funcs.GetCurSel()].code;
 
 	//set the kitchen to all as default
 	m_KitchenAll.SetCheck(BST_CHECKED);
@@ -214,7 +214,7 @@ void CAddPrinterDlg::OnOK(){
 		m_PrinterNames.SetFocus();
 		return;
 	}
-	if(m_Func.IsEmpty()){
+	if(m_FuncCode == Reserved::PRINT_UNKNOWN){
 		MessageBox(_T("请选择功能"),  _T("信息"));
 		m_Funcs.SetFocus();
 		return;
@@ -230,13 +230,20 @@ void CAddPrinterDlg::OnOK(){
 		//get the printer name
 		string name = pPrinter->Attribute(ConfTags::PRINT_NAME);
 		//get the printer function code
-		int func = 0;
-		pPrinter->QueryIntAttribute(ConfTags::PRINT_FUNC, &func);
+		int funcCode = 0;
+		pPrinter->QueryIntAttribute(ConfTags::PRINT_FUNC, &funcCode);
 		if(m_Printer == CString(name.c_str())){
-			if(m_Func.Compare(_FuncDesc[func]) == 0){
+			if(m_FuncCode == funcCode){
 				isDuplicate = true;
 				CString msg;
-				msg.Format(_T("已存在打印机\"%s\"执行打印\"%s\"操作，\n请不要重复添加打印功能。"), CString(name.c_str()), _FuncDesc[func]);
+				TCHAR* pFuncDesc = _T("");
+				for(int i = 0; i < _nFuncs; i++){
+					if(_FuncMap[i].code == m_FuncCode){
+						pFuncDesc = _FuncMap[i].desc;
+						break;
+					}
+				}
+				msg.Format(_T("已存在打印机\"%s\"执行打印\"%s\"操作，\n请不要重复添加打印功能。"), CString(name.c_str()), pFuncDesc);
 				MessageBox(msg,  _T("信息"), MB_ICONINFORMATION);
 				break;
 			}
@@ -265,11 +272,8 @@ void CAddPrinterDlg::OnOK(){
 			//set the name attribute
 			pPrinter->SetAttribute(ConfTags::PRINT_NAME, pName.get());
 
-			int selected = m_Funcs.GetCurSel();
-			char tmp[32];
-			sprintf_s(tmp, sizeof(tmp), "%d", selected + 1);
 			//set the function code attribute
-			pPrinter->SetAttribute(ConfTags::PRINT_FUNC, tmp);
+			pPrinter->SetAttribute(ConfTags::PRINT_FUNC, _FuncMap[m_Funcs.GetCurSel()].code);
 
 			//set the kitchen
 			if(m_KitchenAll.GetCheck() == BST_CHECKED){
@@ -409,7 +413,8 @@ void CAddPrinterDlg::OnOK(){
 				pPrinter->SetAttribute(ConfTags::REGION_10, m_Regions[9].GetCheck() == BST_CHECKED ? 1 : 0);
 			}
 
-			selected = m_PrinterStyle.GetCurSel();
+			int selected = m_PrinterStyle.GetCurSel();
+			char tmp[32];
 			sprintf_s(tmp, sizeof(tmp), "%d", selected + 1);
 			//set the printer style
 			pPrinter->SetAttribute(ConfTags::PRINT_STYLE, tmp);
@@ -464,14 +469,14 @@ void CAddPrinterDlg::OnCbnPrinterNamesChg()
 void CAddPrinterDlg::OnCbnFuncChg()
 {
 	//assign the selected function code value
-	int selected = m_Funcs.GetCurSel();
+	m_FuncCode = _FuncMap[m_Funcs.GetCurSel()].code;
 	//enable kitchen check boxes & disable the region check boxes if the function is as below.
 	//1 - print order detail
 	//2 - print extra food
 	//3 - print canceled food
-	if((selected + 1) == Reserved::PRINT_ORDER_DETAIL ||
-		(selected + 1) == Reserved::PRINT_EXTRA_FOOD ||
-		(selected + 1) == Reserved::PRINT_CANCELLED_FOOD){
+	if(m_FuncCode == Reserved::PRINT_ORDER_DETAIL ||
+		m_FuncCode == Reserved::PRINT_EXTRA_FOOD ||
+		m_FuncCode == Reserved::PRINT_CANCELLED_FOOD){
 			m_KitchenAll.EnableWindow(TRUE);
 			m_KitchenAll.SetCheck(BST_CHECKED);
 			m_KitchenTemp.EnableWindow(FALSE);
@@ -503,9 +508,7 @@ void CAddPrinterDlg::OnCbnFuncChg()
 		}
 
 	}
-	if(selected != -1){
-		m_Funcs.GetLBText(selected, m_Func);
-	}
+
 	UpdateData(TRUE);
 }
 

@@ -39,7 +39,7 @@ private:
 	CRichEditCtrl m_DescCtrl;
 	TiXmlDocument& m_Conf;
 	CString m_Printer;
-	CString m_Func;
+	int m_FuncCode;
 	CString m_Style;
 public:
 	afx_msg void OnCbnPrinterNamesChg();

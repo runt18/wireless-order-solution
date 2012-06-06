@@ -16,20 +16,55 @@ extern map<int, CString> g_Kitchens;
 extern map<int, CString> g_Regions;
 extern CString g_ConfPath;
 
-TCHAR* _FuncDesc[] = {
-	/* 0 */ _T("未知"), 
-	/* 1 */ _T("下单"), 
-	/* 2 */ _T("下单(详细)"), 
-	/* 3 */ _T("结帐"), 
-	/* 4 */ _T("加菜(详细)"), 
-	/* 5 */ _T("退菜(详细)"), 
-	/* 6 */ _T("转台"),
-	/* 7 */ _T("加菜"),
-	/* 8 */ _T("退菜"),
-	/* 9 */ _T("催菜")
+PrintFuncMap _FuncMap[] = {
+	{
+		Reserved::PRINT_ORDER, _T("下单")
+	},
+	{
+		Reserved::PRINT_ORDER_DETAIL, _T("下单(详细)")
+	},
+	{
+		Reserved::PRINT_ALL_EXTRA_FOOD, _T("加菜")
+	},
+	{
+		Reserved::PRINT_EXTRA_FOOD, _T("加菜(详细)")
+	},
+	{
+		Reserved::PRINT_ALL_CANCELLED_FOOD, _T("退菜")
+	},
+	{
+		Reserved::PRINT_CANCELLED_FOOD, _T("退菜(详细)")
+	},
+	{
+		Reserved::PRINT_TEMP_RECEIPT, _T("暂结")
+	},
+	{
+		Reserved::PRINT_RECEIPT, _T("结帐")
+	},
+	{
+		Reserved::PRINT_TRANSFER_TABLE, _T("转台")
+	},
+	{
+		Reserved::PRINT_ALL_HURRIED_FOOD, _T("催菜")
+	}
 };
 
-int _nFuncs = sizeof(_FuncDesc) / sizeof(TCHAR*);
+int _nFuncs = sizeof(_FuncMap) / sizeof(PrintFuncMap);
+
+//TCHAR* _FuncDesc[] = {
+//	/* 0 */ _T("未知"), 
+//	/* 1 */ _T("下单"), 
+//	/* 2 */ _T("下单(详细)"), 
+//	/* 3 */ _T("结帐"), 
+//	/* 4 */ _T("加菜(详细)"), 
+//	/* 5 */ _T("退菜(详细)"), 
+//	/* 6 */ _T("转台"),
+//	/* 7 */ _T("加菜"),
+//	/* 8 */ _T("退菜"),
+//	/* 9 */ _T("催菜")
+//};
+
+
 
 TCHAR* _PrinterStyle[] = {
 	/* 0 */ _T("未知"), 
@@ -103,10 +138,17 @@ void CPrinterListCtrl::Update(TiXmlDocument& conf){
 		SetItemText(row, COLUMN_PRINTER_NAME, CString(name.c_str()));
 
 		//get the printer function code
-		int func = 0;
-		pPrinter->QueryIntAttribute(ConfTags::PRINT_FUNC, &func);
+		int funcCode = 0;
+		pPrinter->QueryIntAttribute(ConfTags::PRINT_FUNC, &funcCode);
 		//set the "功能"
-		SetItemText(row, COLUMN_FUNC_CODE, _FuncDesc[func]);
+		TCHAR* pFuncDesc = _T("");
+		for(int i = 0; i < _nFuncs; i++){
+			if(_FuncMap[i].code == funcCode){
+				pFuncDesc = _FuncMap[i].desc;
+				break;
+			}
+		}
+		SetItemText(row, COLUMN_FUNC_CODE, pFuncDesc);
 
 		int isKitchenAll = 0;
 		pPrinter->QueryIntAttribute(ConfTags::KITCHEN_ALL, &isKitchenAll);

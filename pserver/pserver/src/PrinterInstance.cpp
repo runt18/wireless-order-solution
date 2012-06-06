@@ -126,7 +126,7 @@ static unsigned __stdcall PrintProc(LPVOID pvParam){
 					}else if(job.req_code == Reserved::PRINT_ORDER_DETAIL){
 						stDocInfo.pDocName = L"下单详细";
 					}else if(job.req_code == Reserved::PRINT_HURRIED_FOOD){
-						stDocInfo.pDocName = L"催菜明细";
+						stDocInfo.pDocName = L"催菜详细";
 					}else if(job.req_code == Reserved::PRINT_RECEIPT){
 						stDocInfo.pDocName = L"结帐";
 					}else if(job.req_code == Reserved::PRINT_TEMP_RECEIPT){
