@@ -2,6 +2,7 @@ package com.wireless.protocol;
 
 public class OrderFood extends Food {
 	public long orderDate;
+	public String waiter;
 	public int payManner = Order.MANNER_CASH;
 	
 	public static final int FOOD_NORMAL = 0;		/* Õý³£ */
