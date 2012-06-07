@@ -34,6 +34,9 @@ import com.wireless.ui.view.BillFoodListView;
 public class BillActivity extends Activity {
 	
 	private Order _orderToPay;
+	
+	private final static int PAY_ORDER = 1;
+	private final static int PAY_TEMPORARY_ORDER = 2;
   
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -46,8 +49,8 @@ public class BillActivity extends Activity {
 		
 		((TextView)findViewById(R.id.valueplatform)).setText(String.valueOf(_orderToPay.table.aliasID));
 		((TextView)findViewById(R.id.valuepeople)).setText(String.valueOf(_orderToPay.custom_num));
-		((TextView)findViewById(R.id.valuehandsel)).setText(Util.CURRENCY_SIGN+Float.toString(_orderToPay.calcGiftPrice()));
-		((TextView)findViewById(R.id.valueconfirmed)).setText(Util.CURRENCY_SIGN+Float.toString(_orderToPay.calcPriceWithTaste()));
+		((TextView)findViewById(R.id.valuehandsel)).setText(Util.CURRENCY_SIGN + Float.toString(_orderToPay.calcGiftPrice()));
+		((TextView)findViewById(R.id.valueconfirmed)).setText(Util.CURRENCY_SIGN + Float.toString(_orderToPay.calcPriceWithTaste()));
 		
 		/**
 		 * "·µ»Ø"Button
@@ -91,9 +94,11 @@ public class BillActivity extends Activity {
 		
 		private ProgressDialog _progDialog;
 		private Order _orderToPay;
+		private int _payType;
 		
-		PayOrderTask(Order order){
+		PayOrderTask(Order order, int payType){
 			_orderToPay = order;
+			_payType = payType;
 		}
 		
 		/**
@@ -113,7 +118,14 @@ public class BillActivity extends Activity {
 			
 			String errMsg = null;
 			
-			byte printType = Reserved.DEFAULT_CONF | Reserved.PRINT_RECEIPT_2;
+			byte printType = Reserved.DEFAULT_CONF;
+			if(_payType == PAY_ORDER){
+				printType |= Reserved.PRINT_RECEIPT_2;
+				
+			}else if(_payType == PAY_TEMPORARY_ORDER){
+				printType |= Reserved.PRINT_TEMP_RECEIPT;
+				
+			}
 			ProtocolPackage resp;
 			try {
 				resp = ServerConnector.instance().ask(new ReqPayOrder(_orderToPay, printType));
@@ -205,7 +217,7 @@ public class BillActivity extends Activity {
 					_orderToPay.pay_manner = Order.MANNER_CASH;					
 					_orderToPay.discount_type = discount;
 					
-					new PayOrderTask(_orderToPay).execute();
+					new PayOrderTask(_orderToPay, PAY_ORDER).execute();
 					dismiss();
 				}
 			});
@@ -223,7 +235,7 @@ public class BillActivity extends Activity {
 					_orderToPay.pay_manner = Order.MANNER_CREDIT_CARD;
 					_orderToPay.discount_type = discount;
 					
-					new PayOrderTask(_orderToPay).execute();
+					new PayOrderTask(_orderToPay, PAY_ORDER).execute();
 					dismiss();
 				}
 			});
