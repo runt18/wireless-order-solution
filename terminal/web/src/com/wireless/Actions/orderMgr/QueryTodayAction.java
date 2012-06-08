@@ -185,7 +185,8 @@ public class QueryTodayAction extends Action {
 					 " AND A.total_price IS NOT NULL" +
 					 filterCondition +
 					 " GROUP BY A.id " +
-					 havingCond;
+					 havingCond +
+					 " ORDER BY order_date ASC ";
 
 			
 //			String sql = "SELECT a.minimum_cost, b.* FROM " + Params.dbName + ".table a, " + Params.dbName + ".order b" +

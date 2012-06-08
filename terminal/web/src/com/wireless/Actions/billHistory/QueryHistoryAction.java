@@ -235,7 +235,8 @@ public class QueryHistoryAction extends Action {
 						+ Params.dbName + ".order_food_history B " + " WHERE "
 						+ " A.id = B.order_id " + " AND A.restaurant_id="
 						+ term.restaurant_id + " " + filterCondition
-						+ " GROUP BY A.id " + havingCond;
+						+ " GROUP BY A.id " + havingCond 
+						+ " ORDER BY order_date ASC ";
 
 			} else {
 				// get the query condition
@@ -331,7 +332,8 @@ public class QueryHistoryAction extends Action {
 						+ Params.dbName + ".order_food_history B " + " WHERE "
 						+ " A.id = B.order_id " + " AND A.restaurant_id="
 						+ term.restaurant_id + " " + filterCondition
-						+ " GROUP BY A.id " + havingCond;
+						+ " GROUP BY A.id " + havingCond
+						+ " ORDER BY order_date ASC ";
 			}
 
 			dbCon.rs = dbCon.stmt.executeQuery(sql);

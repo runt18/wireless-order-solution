@@ -135,7 +135,8 @@ public class QueryTodayAdvAction extends Action {
 					 " AND A.restaurant_id=" + term.restaurant_id + " " +
 					 " AND A.total_price IS NOT NULL" +
 					 filterCondition +
-					 " GROUP BY A.id " ;
+					 " GROUP BY A.id " +
+					 " ORDER BY order_date ASC ";
 
 
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
