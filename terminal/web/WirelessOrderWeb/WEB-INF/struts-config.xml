@@ -110,35 +110,35 @@
 			type="com.wireless.Actions.deptMgr.UpdateDepartmentAction" scope="request">
 		</action>
 		<action path="/QueryMaterialMgr"
-			type="com.wireless.Actions.inventoryMgr.QueryMaterialMgrAction"
+			type="com.wireless.Actions.inventoryMgr.materialManagement.QueryMaterialMgrAction"
 			scope="request">
 		</action>
 		<action path="/UpdateMaterial"
-			type="com.wireless.Actions.inventoryMgr.UpdateMaterialAction" scope="request">
+			type="com.wireless.Actions.inventoryMgr.materialManagement.UpdateMaterialAction" scope="request">
 		</action>
 		<action path="/DeleteMaterial"
-			type="com.wireless.Actions.inventoryMgr.DeleteMaterialAciton" scope="request">
+			type="com.wireless.Actions.inventoryMgr.materialManagement.DeleteMaterialAciton" scope="request">
 		</action>
 		<action path="/InsertMaterial"
-			type="com.wireless.Actions.inventoryMgr.InsertMaterialAction" scope="request">
+			type="com.wireless.Actions.inventoryMgr.materialManagement.InsertMaterialAction" scope="request">
 		</action>
 		<action path="/InventoryIn"
-			type="com.wireless.Actions.inventoryMgr.InventoryInAction" scope="request">
+			type="com.wireless.Actions.inventoryMgr.inventoryOperation.InventoryInAction" scope="request">
 		</action>
 		<action path="/InventoryOut"
-			type="com.wireless.Actions.inventoryMgr.InventoryOutAction" scope="request">
+			type="com.wireless.Actions.inventoryMgr.inventoryOperation.InventoryOutAction" scope="request">
 		</action>
 		<action path="/InventoryChange"
-			type="com.wireless.Actions.inventoryMgr.InventoryChangeAction" scope="request">
+			type="com.wireless.Actions.inventoryMgr.inventoryOperation.InventoryChangeAction" scope="request">
 		</action>
 		<action path="/InventoryInStatDetail"
-			type="com.wireless.Actions.inventoryMgr.StatInventoryInDetail" scope="request">
+			type="com.wireless.Actions.inventoryMgr.statistics.StatInventoryInDetail" scope="request">
 		</action>
 		<action path="/QueryCurrStock" type="com.wireless.Actions.inventoryMgr.QueryCurrStock"
 			scope="request">
 		</action>
 		<action path="/InventoryCheck"
-			type="com.wireless.Actions.inventoryMgr.InventoryCheckAction" scope="request">
+			type="com.wireless.Actions.inventoryMgr.inventoryOperation.InventoryCheckAction" scope="request">
 		</action>
 		<action path="/QueryFoodMaterial" type="com.wireless.Actions.menuMgr.QueryFoodMaterial"
 			scope="request">
@@ -150,96 +150,96 @@
 			type="com.wireless.Actions.menuMgr.DeleteFoodMaterialAction" scope="request">
 		</action>
 		<action path="/InventoryInStatByMaterial"
-			type="com.wireless.Actions.inventoryMgr.StatInventoryInByMaterial"
+			type="com.wireless.Actions.inventoryMgr.statistics.StatInventoryInByMaterial"
 			scope="request">
 		</action>
 		<action path="/InventoryInStatByDept"
-			type="com.wireless.Actions.inventoryMgr.StatInventoryInByDept" scope="request">
+			type="com.wireless.Actions.inventoryMgr.statistics.StatInventoryInByDept" scope="request">
 		</action>
 		<action path="/InventoryInStatBySupplier"
-			type="com.wireless.Actions.inventoryMgr.StatInventoryInBySupplier"
+			type="com.wireless.Actions.inventoryMgr.statistics.StatInventoryInBySupplier"
 			scope="request">
 		</action>
 		<action path="/InventoryOutStatDetail"
-			type="com.wireless.Actions.inventoryMgr.StatInventoryOutDetail"
+			type="com.wireless.Actions.inventoryMgr.statistics.StatInventoryOutDetail"
 			scope="request">
 		</action>
 		<action path="/InventoryOutStatByMaterial"
-			type="com.wireless.Actions.inventoryMgr.StatInventoryOutByMaterial"
+			type="com.wireless.Actions.inventoryMgr.statistics.StatInventoryOutByMaterial"
 			scope="request">
 		</action>
 		<action path="/InventoryOutStatByDept"
-			type="com.wireless.Actions.inventoryMgr.StatInventoryOutByDept"
+			type="com.wireless.Actions.inventoryMgr.statistics.StatInventoryOutByDept"
 			scope="request">
 		</action>
 		<action path="/InventoryOutStatByReason"
-			type="com.wireless.Actions.inventoryMgr.StatInventoryOutByReason"
+			type="com.wireless.Actions.inventoryMgr.statistics.StatInventoryOutByReason"
 			scope="request">
 		</action>
 		<action path="/InventoryChangeStatDetail"
-			type="com.wireless.Actions.inventoryMgr.StatInventoryChangeDetail"
+			type="com.wireless.Actions.inventoryMgr.statistics.StatInventoryChangeDetail"
 			scope="request">
 		</action>
 		<action path="/InventoryChangeStatByMaterial"
-			type="com.wireless.Actions.inventoryMgr.StatInventoryChangeByMaterial"
+			type="com.wireless.Actions.inventoryMgr.statistics.StatInventoryChangeByMaterial"
 			scope="request">
 		</action>
 		<action path="/InventoryChangeStatByOutDept"
-			type="com.wireless.Actions.inventoryMgr.StatInventoryChangeByOutDept"
+			type="com.wireless.Actions.inventoryMgr.statistics.StatInventoryChangeByOutDept"
 			scope="request">
 		</action>
 		<action path="/InventoryChangeStatByInDept"
-			type="com.wireless.Actions.inventoryMgr.StatInventoryChangeByInDept"
+			type="com.wireless.Actions.inventoryMgr.statistics.StatInventoryChangeByInDept"
 			scope="request">
 		</action>
 		<action path="/InventoryCostStatDetail"
-			type="com.wireless.Actions.inventoryMgr.StatInventoryCostDetail"
+			type="com.wireless.Actions.inventoryMgr.statistics.StatInventoryCostDetail"
 			scope="request">
 		</action>
 		<action path="/InventoryCostStatByMaterial"
-			type="com.wireless.Actions.inventoryMgr.StatInventoryCostByMaterial"
+			type="com.wireless.Actions.inventoryMgr.statistics.StatInventoryCostByMaterial"
 			scope="request">
 		</action>
 		<action path="/InventoryCostStatByDept"
-			type="com.wireless.Actions.inventoryMgr.StatInventoryCostByDept"
+			type="com.wireless.Actions.inventoryMgr.statistics.StatInventoryCostByDept"
 			scope="request">
 		</action>
 		<action path="/InventoryAllStatDetail"
-			type="com.wireless.Actions.inventoryMgr.StatInventoryAllDetail"
+			type="com.wireless.Actions.inventoryMgr.statistics.StatInventoryAllDetail"
 			scope="request">
 		</action>
 		<action path="/InventoryAllStatByMaterial"
-			type="com.wireless.Actions.inventoryMgr.StatInventoryAllByMaterial"
+			type="com.wireless.Actions.inventoryMgr.statistics.StatInventoryAllByMaterial"
 			scope="request">
 		</action>
 		<action path="/InventoryAllStatByDept"
-			type="com.wireless.Actions.inventoryMgr.StatInventoryAllByDept"
+			type="com.wireless.Actions.inventoryMgr.statistics.StatInventoryAllByDept"
 			scope="request">
 		</action>
 		<action path="/InventoryCheckStatDetail"
-			type="com.wireless.Actions.inventoryMgr.StatInventoryCheckDetail"
+			type="com.wireless.Actions.inventoryMgr.statistics.StatInventoryCheckDetail"
 			scope="request">
 		</action>
 		<action path="/InventoryCheckStatSum"
-			type="com.wireless.Actions.inventoryMgr.StatInventoryCheckSum" scope="request">
+			type="com.wireless.Actions.inventoryMgr.statistics.StatInventoryCheckSum" scope="request">
 		</action>
 		<action path="/InventoryReturn"
-			type="com.wireless.Actions.inventoryMgr.InventoryReturnAction" scope="request">
+			type="com.wireless.Actions.inventoryMgr.inventoryOperation.InventoryReturnAction" scope="request">
 		</action>
 		<action path="/InventoryReturnStatDetail"
-			type="com.wireless.Actions.inventoryMgr.StatInventoryReturnDetail"
+			type="com.wireless.Actions.inventoryMgr.statistics.StatInventoryReturnDetail"
 			scope="request">
 		</action>
 		<action path="/InventoryReturnStatByMaterial"
-			type="com.wireless.Actions.inventoryMgr.StatInventoryReturnByMaterial"
+			type="com.wireless.Actions.inventoryMgr.statistics.StatInventoryReturnByMaterial"
 			scope="request">
 		</action>
 		<action path="/InventoryReturnStatByDept"
-			type="com.wireless.Actions.inventoryMgr.StatInventoryReturnByDept"
+			type="com.wireless.Actions.inventoryMgr.statistics.StatInventoryReturnByDept"
 			scope="request">
 		</action>
 		<action path="/InventoryReturnStatBySupplier"
-			type="com.wireless.Actions.inventoryMgr.StatInventoryReturnBySupplier"
+			type="com.wireless.Actions.inventoryMgr.statistics.StatInventoryReturnBySupplier"
 			scope="request">
 		</action>
 		<action path="/QueryMaterialCate"
@@ -333,6 +333,9 @@
 		</action>
 		<action path="/businessStatistics"
 			type="com.wireless.Actions.billStatistics.BusinessStatisticsAction" scope="request">
+		</action>
+		<action path="/supplierStatistics"
+			type="com.wireless.Actions.inventoryMgr.statistics.supplierStatisticsAction" scope="request">
 		</action>
 	</action-mappings>
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
