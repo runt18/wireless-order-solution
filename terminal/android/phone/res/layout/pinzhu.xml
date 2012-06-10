@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/bgcolor"
+    android:orientation="vertical" >
+    
+    <ImageView 
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/line"
+        />
+    
+    <LinearLayout 
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="2"
+        android:orientation="horizontal"
+        android:layout_marginLeft="10dip"
+        android:layout_marginRight="10dip"
+        android:layout_marginTop="60dip"
+        >
+        
+        <TextView 
+            android:id="@+id/pinname"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="品注:"
+            android:layout_weight="0.3"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            />
+        <EditText 
+            android:id="@+id/pinText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.7"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            />
+        
+    </LinearLayout>
+
+    
+       <LinearLayout 
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="2"
+        android:orientation="horizontal"
+        android:layout_marginLeft="10dip"
+        android:layout_marginRight="10dip"
+        android:layout_marginTop="30dip"
+        >
+        
+        <TextView 
+            android:id="@+id/pinprice"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="价钱:"
+            android:layout_weight="0.3"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            />
+        <EditText 
+            android:id="@+id/priceText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.7"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            />
+        
+    </LinearLayout>
+</LinearLayout>

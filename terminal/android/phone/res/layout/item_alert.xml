@@ -56,20 +56,37 @@
 			android:typeface="sans" android:layout_centerVertical="true" />
 	</RelativeLayout>
 
-
+	
 	<ImageView android:id="@+id/line4" android:layout_width="fill_parent"
 		android:layout_height="wrap_content" android:src="@drawable/line"
 		android:layout_below="@id/r3" />
 	<RelativeLayout android:id="@+id/r4"
-		android:layout_width="fill_parent" android:layout_height="60dip"
+		android:layout_width="fill_parent" android:layout_height="40dip"
 		android:background="@drawable/tasteitem_selector"
 		android:layout_below="@id/line4">
+		<TextView android:id="@+id/item4Txt" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:textColor="#000000"
+			android:layout_marginLeft="5dip" android:textSize="20sp"
+			android:text="数量"
+			android:typeface="sans" android:layout_centerVertical="true" />
+	</RelativeLayout>
+	
+
+	<ImageView android:id="@+id/line5" android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:src="@drawable/line"
+		android:layout_below="@id/r4" />
+	<RelativeLayout android:id="@+id/r5"
+		android:layout_width="fill_parent" android:layout_height="60dip"
+		android:background="@drawable/tasteitem_selector"
+		android:layout_below="@id/line5">
 		<Button android:id="@+id/back" android:layout_width="80dip"
 			android:layout_height="wrap_content" android:layout_marginLeft="55dip"
 			android:layout_centerVertical="true" android:background="@drawable/cancle_selector"
 			android:layout_centerHorizontal="true" />
 
 	</RelativeLayout>
+    
+
 
 
 </RelativeLayout>

@@ -65,7 +65,7 @@
         android:gravity="center"
         android:orientation="horizontal"
         android:padding="2dip"
-        android:weightSum="3" >
+        android:weightSum="4" >
 
         <LinearLayout
             android:id="@+id/tasteLayout"
@@ -141,6 +141,34 @@
                 android:textColor="@drawable/tab_text_selector"
                 android:textSize="20sp" />
         </LinearLayout>
+        
+        
+        
+        <LinearLayout
+            android:id="@+id/pinzhuLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/tab_bg_selector"
+            android:gravity="center"
+            android:orientation="vertical" >
+
+            <ImageView
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_margin="0dip"
+                android:src="@drawable/ic_tab_albums" />
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:gravity="center"
+                android:paddingTop="1dip"
+                android:text="品注"
+                android:textColor="@drawable/tab_text_selector"
+                android:textSize="20sp" />
+        </LinearLayout>
+        
     </LinearLayout>
 
     <com.wireless.ui.view.ScrollLayout
