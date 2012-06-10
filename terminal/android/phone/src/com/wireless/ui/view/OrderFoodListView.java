@@ -614,6 +614,85 @@ public class OrderFoodListView extends ExpandableListView{
 		}		
 	}
 	
+	
+	
+	
+	/**
+	 * 提示输入增加数量的Dialog
+	 */
+	private class AskAddAmountDialog extends Dialog{
+	
+		AskAddAmountDialog(final OrderFood selectedFood) {
+			super(_context, R.style.FullHeightDialog);
+			
+			View view = LayoutInflater.from(_context).inflate(R.layout.alert, null);
+			setContentView(view);
+			//getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
+			((TextView)view.findViewById(R.id.ordername)).setText("请输入" + selectedFood.name + "的数量");
+			
+			((TextView)findViewById(R.id.table)).setText("数量：");
+			//增加数量默认为此菜品的点菜数量
+			final EditText addEdtTxt = (EditText)view.findViewById(R.id.mycount);			
+			addEdtTxt.setText(Util.float2String2(selectedFood.getCount()));
+			
+			//"确定"Button
+			Button okBtn = (Button)view.findViewById(R.id.confirm);
+			okBtn.setText("确定");
+			okBtn.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					float foodAmount = selectedFood.getCount();
+					if( addEdtTxt.getText().toString() != null && !addEdtTxt.getText().toString().equals("") ){
+						float addAmount = Float.parseFloat(addEdtTxt.getText().toString());
+						if(foodAmount == addAmount){
+							/**
+							 * 如果数量相等，没有添加数量
+							 */
+							_adapter.notifyDataSetChanged();
+							dismiss();
+							Toast.makeText(_context, "没有添加\"" + selectedFood.toString() + "\"" + "数量", 1).show();
+							
+						}else if(addAmount > foodAmount || addAmount < foodAmount){
+							/**
+							 * 如果输入数量为当前这个菜数量
+							 */
+							selectedFood.setCount(addAmount);
+							_adapter.notifyDataSetChanged();
+							dismiss();
+							if(addAmount > foodAmount){
+								float newAmount = addAmount - foodAmount;
+								Toast.makeText(_context, "添加\"" + selectedFood.toString() + "\"" + newAmount + "份成功", 1).show();
+							}else{
+								float newAmount = foodAmount - addAmount ;
+								Toast.makeText(_context, "减少\"" + selectedFood.toString() + "\"" + newAmount + "份成功", 1).show();
+							}
+							
+							
+						}
+					}else{
+						new AlertDialog.Builder(_context)
+						.setTitle("提示")
+						.setMessage("你输入的数量不能为空, 请重新输入")
+						.setNeutralButton("确定", null)
+						.show();
+					}
+					
+					
+				}
+			});
+			
+			//"取消"Button
+			Button cancelBtn = (Button)view.findViewById(R.id.alert_cancel);
+			cancelBtn.setText("取消");
+			cancelBtn.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					dismiss();
+				}
+			});
+		}		
+	}
+	
 	/**
 	 * 点击菜品列表后的扩展功能 Dialog
 	 */
@@ -627,7 +706,7 @@ public class OrderFoodListView extends ExpandableListView{
 			((TextView)findViewById(R.id.ordername)).setText("请选择" + selectedFood.name + "的操作");
 			if(_type == Type.INSERT_ORDER){
 				/**
-				 * 新点菜是扩展功能为"删菜"、"口味"、"叫起/取消叫起"
+				 * 新点菜是扩展功能为"删菜"、"口味"、"叫起/取消叫起"、“数量”
 				 */
 				//删菜功能
 				((TextView)findViewById(R.id.item1Txt)).setText("删菜");
@@ -671,6 +750,16 @@ public class OrderFoodListView extends ExpandableListView{
 						}
 					}
 				});
+				
+				//数量
+				((RelativeLayout)findViewById(R.id.r4)).setOnClickListener(new View.OnClickListener() {						
+					@Override
+					public void onClick(View arg0) {
+						dismiss();
+						new AskAddAmountDialog(selectedFood).show();							
+					}
+				});
+				
 				
 			}else{
 				/**
@@ -765,7 +854,11 @@ public class OrderFoodListView extends ExpandableListView{
 						}
 					});
 					
+					((ImageView)findViewById(R.id.line3)).setVisibility(View.GONE);
+					((ImageView)findViewById(R.id.line4)).setVisibility(View.GONE);
 					((RelativeLayout)findViewById(R.id.r3)).setVisibility(View.GONE);
+					//数量
+					((RelativeLayout)findViewById(R.id.r4)).setVisibility(View.GONE);
 				}					
 			}
 			

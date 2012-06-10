@@ -3,17 +3,29 @@ package com.wireless.ui;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.ExpandableListView;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -67,7 +79,8 @@ public class BillActivity extends Activity {
 		((ImageView)findViewById(R.id.normal)).setOnClickListener(new View.OnClickListener() {			
 			@Override
 			public void onClick(View arg0) {
-				showDialog(Order.DISCOUNT_1);				
+				//showDialog(Order.DISCOUNT_1);	
+				showBillDialog();
 			}
 		});
 		/**
@@ -76,7 +89,8 @@ public class BillActivity extends Activity {
 		((ImageView)findViewById(R.id.allowance)).setOnClickListener(new View.OnClickListener() {			
 			@Override
 			public void onClick(View arg0) {
-				showDialog(Order.DISCOUNT_2);					
+				//showDialog(Order.DISCOUNT_2);	
+				showBillDialog();
 			}
 		});		
 		/**
@@ -253,4 +267,83 @@ public class BillActivity extends Activity {
 		}
 		
 	}
+	
+	
+	/**
+	 * 付款弹出框
+	 * */
+	
+	public synchronized void showBillDialog(){
+		
+		//取得自定义的view
+		LayoutInflater layoutinflater = LayoutInflater.from(this);
+		View view = layoutinflater.inflate(R.layout.billextand, null);
+		
+		//默认账单赋值，比如付款方式，折扣方式
+		_orderToPay.pay_type = Order.PAY_NORMAL;
+		_orderToPay.pay_manner = Order.MANNER_CASH;	
+		_orderToPay.discount_type = Order.DISCOUNT_1;
+		
+		
+		
+		RadioGroup radioGroupm = (RadioGroup)view.findViewById(R.id.radioGroup1);
+		  //付款方式添加事件监听器  
+		radioGroupm.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {  
+              
+            @Override 
+            public void onCheckedChanged(RadioGroup group, int checkedId) {  
+            	
+               if(checkedId == R.id.cash){
+					_orderToPay.pay_manner = Order.MANNER_CASH;					
+               }else{
+            		_orderToPay.pay_manner = Order.MANNER_CREDIT_CARD;	
+               }
+               
+               
+            }  
+        });  
+		
+		RadioGroup radioGroupd = (RadioGroup)view.findViewById(R.id.radioGroup2);
+		  //折扣方式方式添加事件监听器  
+		radioGroupd.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {  
+		              
+		            @Override 
+		            public void onCheckedChanged(RadioGroup group, int checkedId) {  
+		               if(checkedId == R.id.discount1){
+		            	   _orderToPay.discount_type = Order.DISCOUNT_1;
+		               }else if(checkedId == R.id.discount2){
+		            	   _orderToPay.discount_type = Order.DISCOUNT_2;
+		               }else{
+		            	   _orderToPay.discount_type = Order.DISCOUNT_3;
+		               }
+		               
+		            }  
+		            
+		            
+		        });  
+		
+		        Dialog alertDialog = new AlertDialog.Builder(this).setTitle("请选择付款方式与折扣类型").setView(view).setPositiveButton
+				
+				("确定", new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+	                    //执行结账异步线程 
+						new PayOrderTask(_orderToPay, PAY_ORDER).execute();
+					
+					}
+				}).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub
+						
+					}
+				}).create();
+		
+		alertDialog.show();
+	}
+	
+	
+	
 }

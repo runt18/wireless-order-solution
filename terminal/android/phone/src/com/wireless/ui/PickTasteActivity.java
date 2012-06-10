@@ -46,6 +46,7 @@ public class PickTasteActivity extends Activity{
 	private final static String TAG_TASTE = "口味";
 	private final static String TAG_STYLE = "做法";
 	private final static String TAG_SPEC = "规格";
+	private final static String TAG_PINZHU= "品注";
 	
 	private OrderFood _selectedFood;
 	//private TabHost _tabHost;
@@ -79,6 +80,8 @@ public class PickTasteActivity extends Activity{
 		tasteScrollLayout.addView(setupStyleView());
 		//规格View
 		tasteScrollLayout.addView(setupSpecView());
+		//品注
+		tasteScrollLayout.addView(setPinzhuView());
 		
 		tasteScrollLayout.setOnViewChangedListener(new OnViewChangedListner() {			
 			@Override
@@ -89,6 +92,7 @@ public class PickTasteActivity extends Activity{
 				((LinearLayout)findViewById(R.id.tasteLayout)).setBackgroundResource(R.drawable.tab_bg_unselected);
 				((LinearLayout)findViewById(R.id.styleLayout)).setBackgroundResource(R.drawable.tab_bg_unselected);
 				((LinearLayout)findViewById(R.id.specLayout)).setBackgroundResource(R.drawable.tab_bg_unselected);
+				((LinearLayout)findViewById(R.id.pinzhuLayout)).setBackgroundResource(R.drawable.tab_bg_unselected);
 				if(tag.equals(TAG_TASTE)){
 					((LinearLayout)findViewById(R.id.tasteLayout)).setBackgroundResource(R.drawable.tab_bg_selected);
 					
@@ -97,6 +101,9 @@ public class PickTasteActivity extends Activity{
 					
 				}else if(tag.equals(TAG_SPEC)){
 					((LinearLayout)findViewById(R.id.specLayout)).setBackgroundResource(R.drawable.tab_bg_selected);
+
+				}else if(tag.equals(TAG_PINZHU)){
+					((LinearLayout)findViewById(R.id.pinzhuLayout)).setBackgroundResource(R.drawable.tab_bg_selected);
 
 				}
 			}
@@ -126,6 +133,13 @@ public class PickTasteActivity extends Activity{
 			}
 		});
 		
+		//品注Button
+				((LinearLayout)findViewById(R.id.pinzhuLayout)).setOnClickListener(new View.OnClickListener() {			
+					@Override
+					public void onClick(View v) {
+						tasteScrollLayout.setToScreen(3);
+					}
+				});
 		tasteScrollLayout.setToScreen(0);
 		
 		_handler.sendEmptyMessage(0);	
@@ -304,6 +318,13 @@ public class PickTasteActivity extends Activity{
 		specView.setTag(TAG_SPEC);
 		
 		return specView;
+	}
+	
+	//设置品注View
+	public View setPinzhuView(){
+		View pinzhuView = LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.pinzhu, null);
+		pinzhuView.setTag(TAG_PINZHU);  
+		return pinzhuView;
 	}
 	
 	@Override
