@@ -11,6 +11,10 @@ public class DBCon {
 	public Connection conn = null;
 	public Statement stmt = null;
 	public ResultSet rs = null;
+	public ResultSet rs2 = null;
+	public ResultSet rs3 = null;
+	public ResultSet rs4 = null;
+	public ResultSet rs5 = null;
 	
 	public void connect() throws SQLException{
 		try{
@@ -30,6 +34,22 @@ public class DBCon {
 			if(rs != null){
 				rs.close();
 				rs = null;
+			}
+			if(rs2 != null){
+				rs2.close();
+				rs2 = null;
+			}
+			if(rs3 != null){
+				rs3.close();
+				rs3 = null;
+			}
+			if(rs4 != null){
+				rs4.close();
+				rs4 = null;
+			}
+			if(rs5 != null){
+				rs5.close();
+				rs5 = null;
 			}
 			if(stmt != null){
 				stmt.close();
