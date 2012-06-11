@@ -10,6 +10,11 @@ public class DBCon {
 	//open the database
 	public Connection conn = null;
 	public Statement stmt = null;
+	public Statement stmt2 = null;
+	public Statement stmt3 = null;
+	public Statement stmt4 = null;
+	public Statement stmt5 = null;
+	
 	public ResultSet rs = null;
 	public ResultSet rs2 = null;
 	public ResultSet rs3 = null;
@@ -54,6 +59,22 @@ public class DBCon {
 			if(stmt != null){
 				stmt.close();
 				stmt = null;
+			}
+			if(stmt2 != null){
+				stmt2.close();
+				stmt2 = null;
+			}
+			if(stmt3 != null){
+				stmt3.close();
+				stmt3 = null;
+			}
+			if(stmt4 != null){
+				stmt4.close();
+				stmt4 = null;
+			}
+			if(stmt5 != null){
+				stmt5.close();
+				stmt5 = null;
 			}
 			if(conn != null){
 				conn.close();
