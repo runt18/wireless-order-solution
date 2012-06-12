@@ -23,7 +23,7 @@ public class TableParcel extends Table implements Parcelable {
 		this.setServiceRate(new Float(table.getServiceRate()));
 	}
 	
-	public TableParcel(Parcel in){
+	TableParcel(Parcel in){
 		this.restaurantID = in.readInt();
 		this.tableID = in.readInt();
 		this.aliasID = in.readInt();

@@ -17,7 +17,7 @@ public class TasteParcel extends Taste implements Parcelable{
 		setPrice(new Float(taste.getPrice()));
 	}
 	
-	private TasteParcel(Parcel in){
+	TasteParcel(Parcel in){
 		aliasID = in.readInt();
 		preference = in.readString();
 		category = (short)in.readInt();

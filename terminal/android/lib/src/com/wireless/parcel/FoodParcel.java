@@ -28,6 +28,12 @@ public class FoodParcel extends OrderFood implements Parcelable{
 		setTastePrice(new Float(food.getTastePrice()));
 		setCount(new Float(food.getCount()));
 		setPrice(new Float(food.getPrice()));
+		if(food.tmpTaste != null){
+			tmpTaste = food.tmpTaste;
+		}else{
+			tmpTaste = new Taste();
+			tmpTaste.tasteID = Integer.MIN_VALUE;
+		}
 	}
 	
 	private FoodParcel(Parcel in){
@@ -45,6 +51,10 @@ public class FoodParcel extends OrderFood implements Parcelable{
 		ArrayList<TasteParcel> tasteParcels = new ArrayList<TasteParcel>();
 		in.readTypedList(tasteParcels, TasteParcel.CREATOR);
 		tastes = tasteParcels.toArray(new Taste[tasteParcels.size()]);
+		tmpTaste = new TasteParcel(in);
+		if(tmpTaste.tasteID == Integer.MIN_VALUE){
+			tmpTaste = null;
+		}
 	}
 	
 	public static final Parcelable.Creator<FoodParcel> CREATOR = new Parcelable.Creator<FoodParcel>() {
@@ -80,5 +90,6 @@ public class FoodParcel extends OrderFood implements Parcelable{
 			tasteParcels.add(new TasteParcel(tastes[i]));
 		}
 		parcel.writeTypedList(tasteParcels);
+		new TasteParcel(tmpTaste).writeToParcel(parcel, flags);
 	}
 }
