@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.Taste;
 
 /**
  * The DB reflector is designed to the bridge between the OrderFood instance of
@@ -37,7 +38,8 @@ public class OrderFoodReflector {
 		sql = "SELECT C.food_id, C.name, D.food_alias, C.food_status, D.order_sum, C.unit_price, C.order_date, "
 				+ " C.discount, C.taste, C.taste_price, C.taste_id, C.taste2_id, C.taste3_id, D.taste_alias, D.taste2_alias, D.taste3_alias, "
 				+ " D.hang_status, C.kitchen_id, C.kitchen_alias, D.is_temporary, D.type, D.pay_datetime, D.pay_date, C.dept_id, "
-				+ " D.table_id, D.table_alias, D.table_name, D.region_id, D.total_price, C.waiter "
+				+ " D.table_id, D.table_alias, D.table_name, D.region_id, D.total_price, " 
+				+ " C.waiter, C.taste_tmp_alias, C.taste_tmp, C.taste_tmp_price "
 				+ " FROM " 
 				+ "(SELECT " 
 				+ " A.order_id, A.food_alias, A.taste_alias, A.taste2_alias, A.taste3_alias, A.hang_status, A.is_temporary, "
@@ -51,7 +53,7 @@ public class OrderFoodReflector {
 				+ Params.dbName
 				+ ".order B "
 				+ " WHERE A.order_id = B.id AND A.restaurant_id = B.restaurant_id "
-				+ " GROUP BY A.order_id, A.food_alias, A.taste_alias, A.taste2_alias, A.taste3_alias, A.hang_status, A.is_temporary, "
+				+ " GROUP BY A.order_id, A.food_alias, A.taste_alias, A.taste2_alias, A.taste3_alias, A.taste_tmp_alias, A.hang_status, A.is_temporary, "
 				+ " B.type, pay_datetime, pay_date "
 				+ " HAVING order_sum > 0 "
 				+ " ) AS D, "
@@ -113,6 +115,13 @@ public class OrderFoodReflector {
 			food.table.aliasID = dbCon.rs.getInt("table_alias");
 			food.table.name = dbCon.rs.getString("table_name");
 			food.table.regionID = dbCon.rs.getShort("region_id");
+			String tmpTastePref = dbCon.rs.getString("taste_tmp");
+			if(tmpTastePref != null){
+				food.tmpTaste = new Taste();
+				food.tmpTaste.preference = tmpTastePref;
+				food.tmpTaste.aliasID = dbCon.rs.getInt("taste_tmp_alias");
+				food.tmpTaste.setPrice(dbCon.rs.getFloat("taste_tmp_price"));
+			}
 			orderFoods.add(food);
 		}
 		dbCon.rs.close();
@@ -168,6 +177,7 @@ public class OrderFoodReflector {
 				+ " MAX(A.taste) AS taste, MAX(A.taste_price) AS taste_price, "
 				+ " MAX(A.taste_id) AS taste_id, MAX(A.taste2_id) AS taste2_id, MAX(A.taste3_id) AS taste3_id, " 
 				+ " MAX(A.dept_id) AS dept_id, MAX(A.id) AS id, SUM(A.order_count) AS order_sum, "
+				+ " MAX(A.taste_tmp_alias) AS taste_tmp_alias, MAX(A.taste_tmp) AS taste_tmp, MAX(A.taste_tmp_price) AS taste_tmp_price, "
 				+ " MAX(B.type) AS type, MAX(B.table_id) AS table_id, MAX(B.table_alias) AS table_alias, "
 				+ " MAX(B.region_id) AS region_id, MAX(B.table_name) AS table_name, MAX(B.region_name) AS region_name, "
 				+ " MAX(B.order_date) AS pay_datetime, date_format(MAX(B.order_date), '%Y-%m-%d') AS pay_date "
@@ -178,7 +188,7 @@ public class OrderFoodReflector {
 				+ ".order_history B "
 				+ " WHERE A.order_id = B.id "
 				+ (extraCond == null ? "" : extraCond)
-				+ " GROUP BY A.order_id, A.food_alias, A.taste_alias, A.taste2_alias, A.taste3_alias, A.is_temporary "
+				+ " GROUP BY A.order_id, A.food_alias, A.taste_alias, A.taste2_alias, A.taste3_alias, A.taste_tmp_alias, A.is_temporary "
 				+ " HAVING order_sum > 0 " 
 				+ (orderClause == null ? "" : " " + orderClause);
 		
@@ -212,6 +222,13 @@ public class OrderFoodReflector {
 			food.table.aliasID = dbCon.rs.getInt("table_alias");
 			food.table.name = dbCon.rs.getString("table_name");
 			food.table.regionID = dbCon.rs.getShort("region_id");
+			String tmpTastePref = dbCon.rs.getString("taste_tmp");
+			if(tmpTastePref != null){
+				food.tmpTaste = new Taste();
+				food.tmpTaste.preference = tmpTastePref;
+				food.tmpTaste.aliasID = dbCon.rs.getInt("taste_tmp_alias");
+				food.tmpTaste.setPrice(dbCon.rs.getFloat("taste_tmp_price"));
+			}
 			orderFoods.add(food);
 		}
 		dbCon.rs.close();

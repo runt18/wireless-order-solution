@@ -191,7 +191,7 @@ public class InsertOrder {
 					}
 					
 					//set the taste preference
-					orderToInsert.foods[i].tastePref = com.wireless.protocol.Util.genTastePref(orderToInsert.foods[i].tastes);
+					orderToInsert.foods[i].tastePref = com.wireless.protocol.Util.genTastePref(orderToInsert.foods[i].tastes, orderToInsert.foods[i].tmpTaste);
 					//set the total taste price
 					orderToInsert.foods[i].setTastePrice(com.wireless.protocol.Util.genTastePrice(orderToInsert.foods[i].tastes, 
 																							 orderToInsert.foods[i].getPrice()));

@@ -777,9 +777,11 @@ public class UpdateOrder {
 		food.hangStatus = foodBasic.hangStatus;
 		//set the temporary flag
 		food.isTemporary = foodBasic.isTemporary;
+		//set the temporary taste
+		food.tmpTaste = foodBasic.tmpTaste;
 		
 		//set the taste preference to this food
-		food.tastePref = com.wireless.protocol.Util.genTastePref(food.tastes);
+		food.tastePref = com.wireless.protocol.Util.genTastePref(food.tastes, food.tmpTaste);
 		//set the total taste price to this food
 		food.setTastePrice(com.wireless.protocol.Util.genTastePrice(food.tastes, food.getPrice()));
 		
