@@ -137,9 +137,10 @@ public class Util {
 	 * Combine the tastes into a signal string,
 	 * each of which is separated by "," .
 	 * @param tastes the tastes to this food
+	 * @param tmpTaste the temporary taste to this food
 	 * @return the combined taste string
 	 */
-	public static String genTastePref(Taste[] tastes){
+	public static String genTastePref(Taste[] tastes, Taste tmpTaste){
 		String tastePref = "";
 		boolean isTasted = false;
 		for(int i = 0; i < tastes.length; i++){
@@ -150,6 +151,10 @@ public class Util {
 				}
 				tastePref += tastes[i].preference;
 			}
+		}
+		if(tmpTaste != null){
+			tastePref += (tastePref.length() == 0 ? "" : ",") + tmpTaste.preference;
+			isTasted = true;
 		}
 		if(isTasted){
 			return tastePref;

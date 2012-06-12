@@ -12,11 +12,13 @@ public class OrderFood extends Food {
 	
 	public Taste[] tastes = new Taste[3];			//three tastes the food can consist of
 	
+	public Taste tmpTaste;							//the temporary taste to this food
+	
 	public Table table = new Table();				//the table this order food belongs to
 	
 	public boolean isTemporary = false;				//indicates whether the food is temporary
 
-	int tastePrice = 0; //the taste price to this food
+	int tastePrice = 0; 							//the taste price to this food
 	
 	public void setTastePrice(Float price){
 		tastePrice = Util.float2Int(price);
@@ -38,7 +40,7 @@ public class OrderFood extends Food {
 	 * @return the total price to this food
 	 */
 	public Float calcPrice2(){
-		return Util.int2Float(price2() * count / 100);
+		return Util.int2Float(priceWithTaste() * count / 100);
 	}
 	
 	/**
@@ -95,6 +97,7 @@ public class OrderFood extends Food {
 					   tastes[0].aliasID == food.tastes[0].aliasID &&
 					   tastes[1].aliasID == food.tastes[1].aliasID &&
 					   tastes[2].aliasID == food.tastes[2].aliasID &&
+					   ((tmpTaste == null || food.tmpTaste == null) ? true : tmpTaste.aliasID == food.tmpTaste.aliasID) &&
 					   hangStatus == food.hangStatus;
 			}
 		}
@@ -110,7 +113,8 @@ public class OrderFood extends Food {
 			return new Integer(aliasID).hashCode() ^ 
 				   new Integer(tastes[0].aliasID).hashCode() ^ 
 				   new Integer(tastes[1].aliasID).hashCode() ^ 
-				   new Integer(tastes[2].aliasID).hashCode() ^ 
+				   new Integer(tastes[2].aliasID).hashCode() ^
+				   (tmpTaste == null ? new Integer(0).hashCode() : new Integer(tmpTaste.aliasID).hashCode()) ^
 				   new Short(hangStatus).hashCode();
 		}
 	}
@@ -178,7 +182,7 @@ public class OrderFood extends Food {
 			/**
 			 * Calculate the taste price and preference
 			 */
-			tastePref = Util.genTastePref(tastes);
+			tastePref = Util.genTastePref(tastes, tmpTaste);
 			setTastePrice(Util.genTastePrice(tastes, getPrice()));
 			
 			return tastePos;
@@ -220,7 +224,7 @@ public class OrderFood extends Food {
 			/**
 			 * Calculate the taste price and preference
 			 */
-			tastePref = Util.genTastePref(tastes);
+			tastePref = Util.genTastePref(tastes, tmpTaste);
 			setTastePrice(Util.genTastePrice(tastes, getPrice()));
 			return tastePos;
 		}else{
@@ -234,18 +238,18 @@ public class OrderFood extends Food {
 	 * @return the unit price represented as Float 
 	 */
 	public Float getPrice2(){
-		return Util.int2Float(price2());
+		return Util.int2Float(priceWithTaste());
 	}
 	
 	/**
-	 * The 2nd unit price to food is as below.
-	 * unit_price = food_price * discount + taste_price
+	 * The unit price with taste to a specific food is as below.
+	 * unit_price = food_price * discount + taste_price + tmp_taste_price
 	 * If taste price is calculated by rate, then
 	 * taste_price = food_price * taste_rate
 	 * @return the unit price represented as an integer
 	 */
-	int price2(){
-		return price * discount / 100 + tastePrice;
+	int priceWithTaste(){
+		return price * discount / 100 + tastePrice + (tmpTaste == null ? 0 : tmpTaste.price);
 	}
 	
 	/**
