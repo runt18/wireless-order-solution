@@ -337,6 +337,15 @@
 		<action path="/supplierStatistics"
 			type="com.wireless.Actions.inventoryMgr.statistics.supplierStatisticsAction" scope="request">
 		</action>
+		<action path="/InventoryAnalysisCurrent"
+			type="com.wireless.Actions.inventoryMgr.statistics.InventoryAnalysisCurrent" scope="request">
+		</action>
+		<action path="/InventoryAnalysisInOutSum"
+			type="com.wireless.Actions.inventoryMgr.statistics.InventoryAnalysisInOutSum" scope="request">
+		</action>
+		<action path="/InventoryAnalysis"
+			type="com.wireless.Actions.inventoryMgr.statistics.InventoryAnalysis" scope="request">
+		</action>
 	</action-mappings>
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
 </struts-config>
