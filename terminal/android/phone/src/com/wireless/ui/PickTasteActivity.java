@@ -46,7 +46,7 @@ public class PickTasteActivity extends Activity{
 	private final static String TAG_TASTE = "口味";
 	private final static String TAG_STYLE = "做法";
 	private final static String TAG_SPEC = "规格";
-	private final static String TAG_PINZHU= "品注";
+	private final static String TAG_PINZHU = "品注";
 	
 	private OrderFood _selectedFood;
 	//private TabHost _tabHost;
