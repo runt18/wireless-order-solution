@@ -38,6 +38,7 @@ DROP TABLE IF EXISTS `wireless_order_db`.`order` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `seq_no` INT NULL DEFAULT NULL COMMENT 'the sequence no to this order' ,
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'external key associated with the  restaurant table' ,
   `order_date` DATETIME NOT NULL COMMENT 'the order\'s date and time' ,
   `gift_price` DECIMAL(10,2) NOT NULL DEFAULT 0 COMMENT 'the gift price to this order' ,
@@ -93,6 +94,9 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food` (
   `taste_alias` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the taste alias id' ,
   `taste2_alias` SMALLINT UNSIGNED NOT NULL DEFAULT 0 ,
   `taste3_alias` SMALLINT UNSIGNED NOT NULL DEFAULT 0 ,
+  `taste_tmp_alias` SMALLINT UNSIGNED NULL DEFAULT NULL COMMENT 'the alias id to this temporary taste' ,
+  `taste_tmp` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the value to this temporary taste' ,
+  `taste_tmp_price` DECIMAL(7,2) NULL DEFAULT NULL COMMENT 'the price to this temporary taste' ,
   `taste` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the taste preference to the ordered food' ,
   `taste_price` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the price to taste preference' ,
   `discount` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the discount to this food' ,
@@ -276,6 +280,7 @@ DROP TABLE IF EXISTS `wireless_order_db`.`order_history` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_history` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `seq_no` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the sequence no to this order' ,
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'external key associated with the  restaurant table' ,
   `order_date` DATETIME NOT NULL COMMENT 'the order\'s date and time' ,
   `gift_price` DECIMAL(10,2) NOT NULL DEFAULT 0 COMMENT 'the gift price to this order' ,
@@ -401,6 +406,9 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food_history` (
   `taste_alias` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the taste alias id' ,
   `taste2_alias` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the 2nd taste alias id to this record' ,
   `taste3_alias` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the 3rd taste alias id to this record' ,
+  `taste_tmp_alias` SMALLINT UNSIGNED NULL DEFAULT NULL COMMENT 'the alias to this temporary taste' ,
+  `taste_tmp` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the value to this temporay taste' ,
+  `taste_tmp_price` DECIMAL(7,2) NULL DEFAULT NULL COMMENT 'the price to this temporary taste' ,
   `discount` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the discount to this food' ,
   `dept_id` TINYINT UNSIGNED NULL DEFAULT NULL COMMENT 'the department alias id to this record' ,
   `kitchen_id` INT NULL DEFAULT NULL COMMENT 'the kitchen id which the order food of this record belong to.' ,
@@ -701,6 +709,7 @@ COMMENT = 'the daily settle history to each restaurant' ;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
 
 -- -----------------------------------------------------
 -- Data for table `wireless_order_db`.`restaurant`
