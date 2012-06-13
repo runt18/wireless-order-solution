@@ -259,6 +259,7 @@ public class DailySettle {
 		final String orderFoodItem = "`id`,`restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_date`, `order_count`," + 
 					"`unit_price`,`name`, `food_status`, `taste`,`taste_price`," +
 					"`taste_alias`, `taste2_alias`, `taste3_alias`, `taste_id`,`taste2_id`,`taste3_id`, " +
+					"`taste_tmp_alias`, `taste_tmp`, `taste_tmp_price`, " +
 					"`discount`, `dept_id`, `kitchen_id`, `kitchen_alias`," +
 					"`comment`,`waiter`,`is_temporary`,`is_paid`";
 		

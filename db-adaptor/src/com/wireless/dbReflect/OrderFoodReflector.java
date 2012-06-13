@@ -43,7 +43,7 @@ public class OrderFoodReflector {
 				+ " FROM " 
 				+ "(SELECT " 
 				+ " A.order_id, A.food_alias, A.taste_alias, A.taste2_alias, A.taste3_alias, A.hang_status, A.is_temporary, "
-				+ " B.type, B.order_date AS pay_datetime, date_format(B.order_date, '%Y-%m-%d') AS pay_date, "
+				+ " B.type, A.order_date AS pay_datetime, date_format(A.order_date, '%Y-%m-%d') AS pay_date, "
 				+ " MAX(B.table_id) AS table_id, MAX(B.table_alias) AS table_alias, MAX(B.table_name) AS table_name, " 
 				+ " MAX(B.region_id) AS region_id, MAX(B.total_price) AS total_price, "
 				+ " SUM(A.order_count) AS order_sum, MAX(A.id) AS id "
@@ -63,7 +63,7 @@ public class OrderFoodReflector {
 				+ (extraCond == null ? "" : extraCond)
 				+ (orderClause == null ? "" : " " + orderClause);
 
-//		sql = "SELECT A.order_id, A.food_alias, A.taste_alias, A.taste2_alias, A.taste3_alias, A.hang_status, A.is_temporary, "
+//		sql = "SELECT A.order_id, A.food_alias, A.taste_alias, A.taste2_alias, A.taste3_alias, A.taste_tmp_alias, A.hang_status, A.is_temporary, "
 //				+ " MAX(A.kitchen_alias) AS kitchen_alias, MAX(A.kitchen_id) AS kitchen_id, " 
 //				+ " MAX(A.food_id) AS food_id, MAX(A.name) AS name, MAX(A.food_status) AS food_status, " 
 //				+ " MAX(A.unit_price) AS unit_price, MAX(A.waiter) AS waiter, MAX(A.order_date) AS order_date,  MAX(A.discount) AS discount, "
@@ -72,7 +72,7 @@ public class OrderFoodReflector {
 //				+ " MAX(A.dept_id) AS dept_id, MAX(A.id) AS id, SUM(A.order_count) AS order_sum, "
 //				+ " MAX(B.type) AS type, MAX(B.table_id) AS table_id, MAX(B.table_alias) AS table_alias, "
 //				+ " MAX(B.region_id) AS region_id, MAX(B.table_name) AS table_name, MAX(B.region_name) AS region_name, "
-//				+ " MAX(B.order_date) AS pay_datetime, date_format(MAX(B.order_date), '%Y-%m-%d') AS pay_date "
+//				+ " MAX(A.order_date) AS pay_datetime, date_format(MAX(A.order_date), '%Y-%m-%d') AS pay_date "
 //				+ " FROM " 
 //				+ Params.dbName
 //				+ ".order_food A, "
@@ -80,7 +80,7 @@ public class OrderFoodReflector {
 //				+ ".order B "
 //				+ " WHERE A.order_id = B.id "
 //				+ (extraCond == null ? "" : extraCond)
-//				+ " GROUP BY A.order_id, A.food_alias, A.taste_alias, A.taste2_alias, A.taste3_alias, A.hang_status, A.is_temporary "
+//				+ " GROUP BY A.order_id, A.food_alias, A.taste_alias, A.taste2_alias, A.taste3_alias, A.taste_tmp_alias, A.hang_status, A.is_temporary "
 //				+ " HAVING order_sum > 0 " 
 //				+ (orderClause == null ? "" : " " + orderClause);
 		
@@ -170,14 +170,14 @@ public class OrderFoodReflector {
 //				+ (extraCond == null ? "" : extraCond)
 //				+ (orderClause == null ? "" : " " + orderClause);
 
-		sql = "SELECT A.order_id, A.food_alias, A.taste_alias, A.taste2_alias, A.taste3_alias, A.is_temporary, "
+		sql = "SELECT A.order_id, A.food_alias, A.taste_alias, A.taste2_alias, A.taste3_alias, A.taste_tmp_alias, A.is_temporary, "
 				+ " MAX(A.kitchen_alias) AS kitchen_alias, MAX(A.kitchen_id) AS kitchen_id, " 
 				+ " MAX(A.food_id) AS food_id, MAX(A.name) AS name, MAX(A.food_status) AS food_status, " 
 				+ " MAX(A.unit_price) AS unit_price, MAX(A.order_date) AS order_date,  MAX(A.discount) AS discount, "
 				+ " MAX(A.taste) AS taste, MAX(A.taste_price) AS taste_price, "
 				+ " MAX(A.taste_id) AS taste_id, MAX(A.taste2_id) AS taste2_id, MAX(A.taste3_id) AS taste3_id, " 
 				+ " MAX(A.dept_id) AS dept_id, MAX(A.id) AS id, SUM(A.order_count) AS order_sum, "
-				+ " MAX(A.taste_tmp_alias) AS taste_tmp_alias, MAX(A.taste_tmp) AS taste_tmp, MAX(A.taste_tmp_price) AS taste_tmp_price, "
+				+ " MAX(A.taste_tmp) AS taste_tmp, MAX(A.taste_tmp_price) AS taste_tmp_price, "
 				+ " MAX(B.type) AS type, MAX(B.table_id) AS table_id, MAX(B.table_alias) AS table_alias, "
 				+ " MAX(B.region_id) AS region_id, MAX(B.table_name) AS table_name, MAX(B.region_name) AS region_name, "
 				+ " MAX(B.order_date) AS pay_datetime, date_format(MAX(B.order_date), '%Y-%m-%d') AS pay_date "
