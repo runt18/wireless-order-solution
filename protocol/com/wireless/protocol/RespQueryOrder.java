@@ -37,7 +37,8 @@ import java.io.UnsupportedEncodingException;
  * 
  * <Food>
  * is_temp(0) : food_id[2] : order_amount[2] : status : taste_id[2] : taste_id2[2] : taste_id3[2] : 
- * len_tmp_taste : tmp_taste[n] : tmp_taste_alias[2] : tmp_taste_price[4] : hang_status
+ * len_tmp_taste : tmp_taste[n] : tmp_taste_alias[2] : tmp_taste_price[4] : hang_status : 
+ * order_date[8] : nWaiter : waiter 
  * is_temp : "0" means this food is NOT temporary
  * food_id[2] - 2-byte indicating the food's id
  * order_amount[2] - 2-byte indicating how many this foods are ordered
@@ -52,6 +53,9 @@ import java.io.UnsupportedEncodingException;
  * tmp_taste_alias[2] - 2-byte indicates the alias to this temporary taste
  * tmp_taste_price[4] - 4-byte indicates the price to this temporary taste
  * hang_status - indicates the hang status to the food
+ * order_date[8] - 8-byte indicates the order date
+ * nWaiter - the length of waiter
+ * waiter[nWaiter] - the waiter value
  * 
  * <TmpFood>
  * is_temp(1) : food_id[2] : order_amount[2] : unit_price[3] : hang_status : len : food_name[len] 
@@ -94,7 +98,10 @@ public class RespQueryOrder extends RespPackage{
 						   (order.foods[i].tmpTaste == null ? 0 : order.foods[i].tmpTaste.preference.getBytes("UTF-8").length) + /* tmp_taset */
 						   2 + /* tmp_taste_alias[2] */
 						   4 + /* tmp_taste_price[4] */
-						   1; /* hang_status */ 
+						   1 + /* hang_status */
+						   8 + /* order_date[4] */
+						   1 + /* nWaiter */
+						   (order.foods[i].waiter == null ? 0 : order.foods[i].waiter.getBytes("UTF-8").length); /* the value of waiter */
 			}
 		}
 		
@@ -180,6 +187,7 @@ public class RespQueryOrder extends RespPackage{
 				/** 
 				 * is_temp(0) : food_id[2] : order_amount[2] : status : taste_id[2] : taste_id2[2] : taste_id3[2] : 
 				 * len_tmp_taste : tmp_taste[n] : tmp_taste_alias[2] : tmp_taste_price[4] : hang_status 
+				 * order_date[8] : nWaiter : waiter 
 				 */
 				//assign the temporary flag
 				body[offset] = 0;
@@ -201,41 +209,74 @@ public class RespQueryOrder extends RespPackage{
 				body[offset + 10] = (byte)(order.foods[i].tastes[2].aliasID & 0x00FF);
 				body[offset + 11] = (byte)((order.foods[i].tastes[2].aliasID & 0xFF00) >> 8);
 				
+				offset += 12;
+				
 				if(order.foods[i].tmpTaste != null){
 					byte[] tmpTasteBytes = order.foods[i].tmpTaste.preference.getBytes("UTF-8");
 					//assign the length of temporary taste value
-					body[offset + 12] = (byte)(tmpTasteBytes.length);
+					body[offset] = (byte)(tmpTasteBytes.length);
+					offset++;
+					
 					//assign the value of temporary taste value
 					for(int cnt = 0; cnt < tmpTasteBytes.length; cnt++){
-						body[offset + 13 + cnt] = tmpTasteBytes[cnt];
+						body[offset + cnt] = tmpTasteBytes[cnt];
 					}
+					offset += tmpTasteBytes.length;
 					
 					//assign the alias id to temporary taste
-					body[offset + 13 + tmpTasteBytes.length] = (byte)(order.foods[i].tmpTaste.aliasID & 0x00FF);
-					body[offset + 14 + tmpTasteBytes.length] = (byte)((order.foods[i].tmpTaste.aliasID & 0xFF00) >> 8);
+					body[offset] = (byte)(order.foods[i].tmpTaste.aliasID & 0x00FF);
+					body[offset + 1] = (byte)((order.foods[i].tmpTaste.aliasID & 0xFF00) >> 8);
+					offset += 2;
 					
 					//assign the price to temporary taste
-					body[offset + 15 + tmpTasteBytes.length] = (byte)(order.foods[i].tmpTaste.price & 0x000000FF);
-					body[offset + 16 + tmpTasteBytes.length] = (byte)((order.foods[i].tmpTaste.price & 0x0000FF00) >> 8);
-					body[offset + 17 + tmpTasteBytes.length] = (byte)((order.foods[i].tmpTaste.price & 0x00FF0000) >> 16);
-					body[offset + 18 + tmpTasteBytes.length] = (byte)((order.foods[i].tmpTaste.price & 0xFF000000) >> 24);
+					body[offset] = (byte)(order.foods[i].tmpTaste.price & 0x000000FF);
+					body[offset + 1] = (byte)((order.foods[i].tmpTaste.price & 0x0000FF00) >> 8);
+					body[offset + 2] = (byte)((order.foods[i].tmpTaste.price & 0x00FF0000) >> 16);
+					body[offset + 3] = (byte)((order.foods[i].tmpTaste.price & 0xFF000000) >> 24);
 					
-					offset += 18 + tmpTasteBytes.length;
+					offset += 4;
 					
 				}else{
 					//assign the length of temporary taste value
-					body[offset + 12] = 0x00;
+					body[offset] = 0x00;
 					//assign the length of temporary taste value
-					body[offset + 13] = 0x00;
-					body[offset + 14] = 0x00;
-					body[offset + 15] = 0x00;
-					body[offset + 16] = 0x00;
+					body[offset + 1] = 0x00;
+					body[offset + 2] = 0x00;
+					body[offset + 3] = 0x00;
+					body[offset + 4] = 0x00;
 					
-					offset += 16;					
+					offset += 5;					
 				}
 				//assign the hang status
-				body[offset + 1] = (byte)(order.foods[i].hangStatus);
+				body[offset] = (byte)(order.foods[i].hangStatus);
 				offset++;
+				
+				//assign the order date
+				body[offset] = (byte)(order.foods[i].orderDate & 0x00000000000000FF);
+				body[offset + 1] = (byte)((order.foods[i].orderDate & 0x000000000000FF00L) >> 8);
+				body[offset + 2] = (byte)((order.foods[i].orderDate & 0x0000000000FF0000L) >> 16);
+				body[offset + 3] = (byte)((order.foods[i].orderDate & 0x00000000FF000000L) >> 24);
+				body[offset + 4] = (byte)((order.foods[i].orderDate & 0x000000FF00000000L) >> 32);
+				body[offset + 5] = (byte)((order.foods[i].orderDate & 0x0000FF0000000000L) >> 40);
+				body[offset + 6] = (byte)((order.foods[i].orderDate & 0x00FF000000000000L) >> 48);
+				body[offset + 7] = (byte)((order.foods[i].orderDate & 0xFF00000000000000L) >> 56);
+				offset += 8;
+				
+				if(order.foods[i].waiter != null){
+					byte[] waiterBytes = order.foods[i].waiter.getBytes("UTF-8");
+					//assign the length of waiter
+					body[offset] = (byte)(waiterBytes.length);
+					offset++;
+					//assign the value of waiter
+					for(int cnt = 0; cnt < waiterBytes.length; cnt++){
+						body[offset + cnt] = waiterBytes[cnt];
+					}
+					offset += waiterBytes.length;
+				}else{
+					//assign the length of waiter to zero
+					body[offset] = 0x00;
+					offset++;
+				}
 			}
 		}
 	}

@@ -50,7 +50,8 @@ public class RespParser {
 		 * 
 		 * <Food>
 		 * is_temp(0) : food_id[2] : order_amount[2] : status : taste_id[2] : taste_id2[2] : taste_id3[2] : 
-		 * len_tmp_taste : tmp_taste[n] : tmp_taste_alias[2] : tmp_taste_price[4] : hang_status
+		 * len_tmp_taste : tmp_taste[n] : tmp_taste_alias[2] : tmp_taste_price[4] : hang_status : 
+		 * order_date[8] : nWaiter : waiter 
 		 * is_temp : "0" means this food is NOT temporary
 		 * food_id[2] - 2-byte indicating the food's id
 		 * order_amount[2] - 2-byte indicating how many this foods are ordered
@@ -64,6 +65,9 @@ public class RespParser {
 		 * tmp_taste[n] - indicates the value of temporary taste
 		 * tmp_taste_alias[2] - 2-byte indicates the alias to this temporary taste
 		 * hang_status - indicates the hang status to the food
+		 * order_date[8] - 8-byte indicates the order date
+		 * nWaiter - the length of waiter
+		 * waiter[nWaiter] - the waiter value
 		 * 
 		 * <TmpFood>
 		 * is_temp(1) : food_id[2] : order_amount[2] : unit_price[3] : hang_status : len : food_name[len] 
@@ -148,6 +152,7 @@ public class RespParser {
 					/** 
 					 * is_temp(0) : food_id[2] : order_amount[2] : status : taste_id[2] : taste_id2[2] : taste_id3[2] : 
 					 * len_tmp_taste : tmp_taste[n] : tmp_taste_alias[2] : tmp_taste_price[4] : hang_status 
+					 * order_date[8] : nWaiter : waiter 
 					 */
 					//get the food alias id
 					int foodID = (response.body[offset + 1] & 0x000000FF) |
@@ -171,44 +176,71 @@ public class RespParser {
 					//get the length of temporary taste
 					int nTmpTaste = response.body[offset + 12];
 					
+					offset += 13;
+					
 					Taste tmpTaste = null;
 					if(nTmpTaste != 0){
 						tmpTaste = new Taste();
 						//get the temporary taste value
 						try{
-							tmpTaste.preference = new String(response.body, offset + 13, nTmpTaste, "UTF-8");
+							tmpTaste.preference = new String(response.body, offset, nTmpTaste, "UTF-8");
 						}catch(UnsupportedEncodingException e){}
+						offset += nTmpTaste;
 						
 						//get the alias id of temporary taste
-						tmpTaste.aliasID = (response.body[offset + nTmpTaste + 13] & 0x000000FF) |
-														((response.body[offset + nTmpTaste + 14] & 0x000000FF) << 8);
+						tmpTaste.aliasID = (response.body[offset] & 0x000000FF) |
+														((response.body[offset + 1] & 0x000000FF) << 8);
+						offset += 2;
 						
 						//get the price of temporary taste
-						int tmpTastePrice = (response.body[offset + nTmpTaste + 15] & 0x000000FF) |
-											((response.body[offset + nTmpTaste + 16] & 0x000000FF) << 8) |
-											((response.body[offset + nTmpTaste + 17] & 0x000000FF) << 16) |
-											((response.body[offset + nTmpTaste + 18] & 0x000000FF) << 24);
+						int tmpTastePrice = (response.body[offset] & 0x000000FF) |
+											((response.body[offset + 1] & 0x000000FF) << 8) |
+											((response.body[offset + 2] & 0x000000FF) << 16) |
+											((response.body[offset + 3] & 0x000000FF) << 24);
 						tmpTaste.setPrice(Util.int2Float(tmpTastePrice));
-						
-						offset += 12 +			/* previous content takes up 12 bytes  */
-								  nTmpTaste +	/* temporary taste takes up n bytes */
-								  2 +			/* the alias id of temporary taste takes up 2 bytes */
-								  4;			/* price of temporary taste takes up 4 bytes */
+						offset += 4;
 						
 					}else{
-						offset += 12 + /* previous content takes up 12 bytes  */
-								  4;   /* price of temporary taste takes up 4 bytes */
+						offset += 4;   /* price of temporary taste takes up 4 bytes */
 					}
-					//get the hang status
-					short hangStatus = response.body[offset + 1];
 					
+					//get the hang status
+					short hangStatus = response.body[offset];					
 					offset++;
+					
+					//get the order date
+					long orderDate = (response.body[offset] & 0x00000000000000FFL) |
+									 ((response.body[offset + 1] & 0x00000000000000FFL) << 8) |
+									 ((response.body[offset + 2] & 0x00000000000000FFL) << 16) |
+									 ((response.body[offset + 3] & 0x00000000000000FFL) << 24) |
+									 ((response.body[offset + 4] & 0x00000000000000FFL) << 32) |
+									 ((response.body[offset + 5] & 0x00000000000000FFL) << 40) |
+									 ((response.body[offset + 6] & 0x00000000000000FFL) << 48) |
+									 ((response.body[offset + 7] & 0x00000000000000FFL) << 56);
+					offset += 8;
+					
+					//get the length of waiter value
+					int nWaiter = response.body[offset];
+					offset++;
+					
+					String waiter = null;
+					if(nWaiter != 0){
+						//get the value of waiter
+						try{
+							waiter = new String(response.body, offset, nWaiter, "UTF-8");
+						}catch(UnsupportedEncodingException e){}
+						offset += nWaiter;
+					}else{
+						waiter = "";
+					}
 					
 					orderFoods[i] = new OrderFood();
 					orderFoods[i].isTemporary = false;
 					orderFoods[i].aliasID = foodID;
 					orderFoods[i].count = orderAmount;
 					orderFoods[i].status = status;
+					orderFoods[i].orderDate = orderDate;
+					orderFoods[i].waiter = waiter;
 					
 					//Arrays.sort(tasteID, 0, tasteID.length);
 					orderFoods[i].tastes[0].aliasID = tasteID[0];
