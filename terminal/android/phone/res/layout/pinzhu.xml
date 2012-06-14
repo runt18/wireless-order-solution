@@ -22,7 +22,6 @@
         >
         
         <TextView 
-            android:id="@+id/pinname"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="品注:"
@@ -31,7 +30,7 @@
             android:textSize="18sp"
             />
         <EditText 
-            android:id="@+id/pinText"
+            android:id="@+id/pinZhuEdtTxt"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1.7"
@@ -53,7 +52,6 @@
         >
         
         <TextView 
-            android:id="@+id/pinprice"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="价钱:"
@@ -62,7 +60,9 @@
             android:textSize="18sp"
             />
         <EditText 
-            android:id="@+id/priceText"
+            android:id="@+id/priceEdtTxt"
+            android:digits="0123456789."
+            android:inputType="number"           
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1.7"

@@ -39,7 +39,7 @@ public class PickTasteActivity extends Activity{
 	private Handler _handler = new Handler(){
 		@Override
 		public void handleMessage(Message message){
-			((TextView)findViewById(R.id.foodTasteTxtView)).setText(_selectedFood.name + "-" + _selectedFood.tastePref);
+			((TextView)findViewById(R.id.foodTasteTxtView)).setText(_selectedFood.toString());
 		}
 	};
 	
@@ -81,7 +81,7 @@ public class PickTasteActivity extends Activity{
 		//规格View
 		tasteScrollLayout.addView(setupSpecView());
 		//品注
-		tasteScrollLayout.addView(setPinzhuView());
+		tasteScrollLayout.addView(setupPinZhuView());
 		
 		tasteScrollLayout.setOnViewChangedListener(new OnViewChangedListner() {			
 			@Override
@@ -134,12 +134,12 @@ public class PickTasteActivity extends Activity{
 		});
 		
 		//品注Button
-				((LinearLayout)findViewById(R.id.pinzhuLayout)).setOnClickListener(new View.OnClickListener() {			
-					@Override
-					public void onClick(View v) {
-						tasteScrollLayout.setToScreen(3);
-					}
-				});
+		((LinearLayout)findViewById(R.id.pinzhuLayout)).setOnClickListener(new View.OnClickListener() {			
+			@Override
+			public void onClick(View v) {
+				tasteScrollLayout.setToScreen(3);
+			}
+		});
 		tasteScrollLayout.setToScreen(0);
 		
 		_handler.sendEmptyMessage(0);	
@@ -270,9 +270,6 @@ public class PickTasteActivity extends Activity{
 		((EditText)specView.findViewById(R.id.specsearch)).setText("");
 		specLstView.setAdapter(new TasteAdapter(WirelessOrder.foodMenu.specs));
 
-	    
-	    
-	    
 	    //滚动的时候隐藏输入法
 	    specLstView.setOnScrollListener(new OnScrollListener() {
 				
@@ -321,10 +318,77 @@ public class PickTasteActivity extends Activity{
 	}
 	
 	//设置品注View
-	public View setPinzhuView(){
+	public View setupPinZhuView(){
 		View pinzhuView = LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.pinzhu, null);
 		pinzhuView.setTag(TAG_PINZHU);  
+		//品注的EditText的处理函数
+		((EditText)pinzhuView.findViewById(R.id.pinZhuEdtTxt)).addTextChangedListener(new TextWatcher(){
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				String tmpTasteValue = s.toString().trim();
+				if(tmpTasteValue.length() != 0){
+					_selectedFood.tmpTaste = new Taste();
+					_selectedFood.tmpTaste.aliasID = Util.genTempFoodID();
+					_selectedFood.tmpTaste.preference = tmpTasteValue;
+				}else{
+					_selectedFood.tmpTaste = null;
+				}
+				_handler.sendEmptyMessage(0);
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+				
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				
+			}
+			
+		});
+		
+		//价格EditText的处理函数
+		final EditText priceEdtTxt = ((EditText)pinzhuView.findViewById(R.id.priceEdtTxt));
+		priceEdtTxt.addTextChangedListener(new TextWatcher(){
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				if(_selectedFood.tmpTaste != null){
+					try{
+						Float price = Float.parseFloat(s.toString());
+						if(price >= 0 && price < 9999){
+							_selectedFood.tmpTaste.setPrice(price);
+						}else{
+							priceEdtTxt.setText(_selectedFood.tmpTaste.getPrice() > 9999 ? "" : Util.float2String2(_selectedFood.tmpTaste.getPrice()));
+							priceEdtTxt.setSelection(priceEdtTxt.getText().length());
+							Toast.makeText(PickTasteActivity.this, "临时口味的价格范围是0～9999", 0).show();
+						}
+					}catch(NumberFormatException e){
+						priceEdtTxt.setText(_selectedFood.tmpTaste.getPrice() > 9999 ? "" : Util.float2String2(_selectedFood.tmpTaste.getPrice()));
+						priceEdtTxt.setSelection(priceEdtTxt.getText().length());
+						Toast.makeText(PickTasteActivity.this, "临时口味的价钱格式不正确，请重新输入", 0).show();
+					}
+				}else{
+					Toast.makeText(PickTasteActivity.this, "请先输入临时口味", 0).show();
+				}
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+				
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				
+			}
+			
+		});
+		
 		return pinzhuView;
+
 	}
 	
 	@Override
