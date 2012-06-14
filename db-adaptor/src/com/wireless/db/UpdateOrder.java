@@ -383,6 +383,7 @@ public class UpdateOrder {
 						"(`restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `name`, `food_status`, `hang_status`, " +
 						"`taste_id`, `taste2_id`, `taste3_id`, " + 
 						"`discount`, `taste_alias`, `taste2_alias`, `taste3_alias`, `taste_price`, " +
+						"`taste_tmp_alias`, `taste_tmp`, `taste_tmp_price`, " +
 						"`taste`, `dept_id`, `kitchen_id`, `kitchen_alias`, `waiter`, `order_date`, `is_temporary`, `is_paid`) VALUES (" +
 						term.restaurant_id + ", " +
 						orderToUpdate.id + ", " +
@@ -402,6 +403,9 @@ public class UpdateOrder {
 						extraFoods.get(i).tastes[2].aliasID + "," +
 						extraFoods.get(i).getTastePrice() + ", '" +
 						extraFoods.get(i).tastePref + "', " + 
+						extraFoods.get(i).tmpTaste == null ? "NULL" : extraFoods.get(i).tmpTaste.aliasID + ", " +
+						extraFoods.get(i).tmpTaste == null ? "NULL" : extraFoods.get(i).tmpTaste.preference + ", " +
+						extraFoods.get(i).tmpTaste == null ? "NULL" : extraFoods.get(i).tmpTaste.getPrice() + ", " +
 						"(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + extraFoods.get(i).kitchen.aliasID + "), " + 
 						"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + extraFoods.get(i).kitchen.aliasID + "), " + 
 						extraFoods.get(i).kitchen.aliasID + ", '" + 
@@ -425,6 +429,7 @@ public class UpdateOrder {
 						"(`restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `name`, `food_status`, `hang_status`, " +
 						"`taste_id`, `taste2_id`, `taste3_id`, " +
 						"`discount`, `taste_alias`, `taste2_alias`, `taste3_alias`, `taste_price`, `taste`, " +
+						"`taste_tmp_alias`, `taste_tmp`, `taste_tmp_price`, " +
 						"`dept_id`, `kitchen_id`, `kitchen_alias`, " +
 						"`waiter`, `order_date`, `is_temporary`, `is_paid`) VALUES (" +
 						term.restaurant_id + ", " +
@@ -445,6 +450,9 @@ public class UpdateOrder {
 						canceledFoods.get(i).tastes[2].aliasID + "," +
 						canceledFoods.get(i).getTastePrice() + ", '" +
 						canceledFoods.get(i).tastePref + "', " + 
+						canceledFoods.get(i).tmpTaste == null ? "NULL" : canceledFoods.get(i).tmpTaste.aliasID + ", " +
+						canceledFoods.get(i).tmpTaste == null ? "NULL" : canceledFoods.get(i).tmpTaste.preference + ", " +
+						canceledFoods.get(i).tmpTaste == null ? "NULL" : canceledFoods.get(i).tmpTaste.getPrice() + ", " +
 						"(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + canceledFoods.get(i).kitchen.aliasID + "), " + 
 						"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + canceledFoods.get(i).kitchen.aliasID + "), " + 
 						canceledFoods.get(i).kitchen.aliasID + ", '" + 
