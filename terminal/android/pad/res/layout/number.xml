@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/bgcolor"
+    android:orientation="vertical"
+    android:paddingTop="3dip" >
+
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/second"
+        android:layout_width="fill_parent"
+        android:layout_height="40dip"
+        android:background="@drawable/bg02" >
+
+        <TextView
+            android:id="@+id/ordernum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dip"
+            android:text="编号:"
+            android:textColor="#000000"
+            android:textSize="20sp" />
+
+        <FrameLayout
+            android:id="@+id/sousou"
+            android:layout_toRightOf="@+id/ordernum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" 
+            android:padding="2dip"
+            >
+            <EditText
+                android:id="@+id/filterNumEdtTxt"
+                android:layout_width="350dip"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dip"
+                android:background="@drawable/kuangbg"
+                android:layout_toRightOf="@id/ordernum"
+                android:inputType="number" />
+
+            <ImageView
+                android:id="@+id/numberdelete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_gravity="right"
+                android:layout_margin="2dip"
+                android:layout_toRightOf="@id/filterNumEdtTxt"
+                android:src="@drawable/av_tablecancel_selector" />
+        </FrameLayout>
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/line"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/second"
+        android:src="@drawable/line" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@id/line"
+        android:orientation="horizontal" >
+
+        <com.wireless.view.PickFoodListView
+            android:id="@+id/pickByNumLstView"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_below="@id/line"
+            android:layout_weight="1"
+            android:fastScrollEnabled="true" />
+
+        <LinearLayout
+            android:id="@+id/NumsideIndex"
+            android:layout_width="45dip"
+            android:layout_height="fill_parent"
+            android:layout_gravity="right"
+            android:background="@drawable/side_bar_bg"
+            android:gravity="right"
+            android:orientation="vertical" >
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>

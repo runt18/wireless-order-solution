@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="500dip"
+    android:layout_height="fill_parent"
+    android:background="#FFFFFF" >
+
+    <RelativeLayout
+        android:id="@+id/orderConfirmRL"
+        android:layout_width="fill_parent"
+        android:layout_height="50dip"
+        android:background="#000000" >
+
+        <TextView
+            android:id="@+id/orderTitleTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:typeface="serif" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/r"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/orderConfirmRL"
+        android:layout_marginTop="15dip"
+        android:gravity="center_vertical" >
+
+        <TextView
+            android:id="@+id/orderTxtView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dip"
+            android:text="数量："
+            android:textColor="#000000"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/amountEdtTxt"
+            android:layout_width="130dip"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dip"
+            android:layout_marginTop="10dip"
+            android:layout_toRightOf="@id/orderTxtView1"
+            android:background="@drawable/input"
+            android:digits="0123456789."
+            android:focusableInTouchMode="true"
+            android:inputType="numberSigned|text"
+            android:singleLine="true"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:typeface="sans"
+            android:visibility="gone" />
+
+        <CheckBox
+            android:id="@+id/orderHurriedChk"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="2dip"
+            android:layout_toRightOf="@id/amountEdtTxt"
+            android:focusable="false"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            android:visibility="gone" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="70dip"
+        android:layout_below="@id/r"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dip" >
+
+        <Button
+            android:id="@+id/orderConfirmBtn"
+            android:layout_width="80dip"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="17dip"
+            android:src="@drawable/yes_selector"
+            android:textColor="#000000" />
+
+        <Button
+            android:id="@+id/orderCancelBtn"
+            android:layout_width="80dip"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dip"
+            android:layout_toRightOf="@id/orderConfirmBtn"
+            android:src="@drawable/cancle_selector"
+            android:textColor="#000000" />
+
+        <Button
+            android:id="@+id/orderTasteBtn"
+            android:layout_width="80dip"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dip"
+            android:layout_toRightOf="@id/orderCancelBtn"
+            android:src="@drawable/cancle_selector"
+            android:textColor="#000000"
+            android:visibility="gone" />
+    </RelativeLayout>
+
+</RelativeLayout>
