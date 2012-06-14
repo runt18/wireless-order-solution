@@ -191,9 +191,9 @@ public class InsertOrder {
 					}
 					
 					//set the taste preference
-					orderToInsert.foods[i].tastePref = com.wireless.protocol.Util.genTastePref(orderToInsert.foods[i].tastes, orderToInsert.foods[i].tmpTaste);
+					//orderToInsert.foods[i].tastePref = com.wireless.protocol.Util.genTastePref(orderToInsert.foods[i].tastes);
 					//set the total taste price
-					orderToInsert.foods[i].setTastePrice(com.wireless.protocol.Util.genTastePrice(orderToInsert.foods[i].tastes, 
+					orderToInsert.foods[i].setTasteNormalPrice(com.wireless.protocol.Util.genTastePrice(orderToInsert.foods[i].tastes, 
 																							 orderToInsert.foods[i].getPrice()));
 				}					
 			}
@@ -311,8 +311,8 @@ public class InsertOrder {
 							orderToInsert.foods[i].status + ", " +
 							(orderToInsert.foods[i].hangStatus == OrderFood.FOOD_HANG_UP ? OrderFood.FOOD_HANG_UP : OrderFood.FOOD_NORMAL) + ", " +
 							orderToInsert.foods[i].getDiscount() + ", '" +
-							orderToInsert.foods[i].tastePref + "', " + 
-							orderToInsert.foods[i].getTastePrice() + ", " +
+							com.wireless.protocol.Util.genTastePref(orderToInsert.foods[i].tastes) + "', " + 
+							orderToInsert.foods[i].getTasteNormalPrice() + ", " +
 							(orderToInsert.foods[i].tastes[0].tasteID == 0 ? "NULL" : orderToInsert.foods[i].tastes[0].tasteID) + ", " +
 							(orderToInsert.foods[i].tastes[1].tasteID == 0 ? "NULL" : orderToInsert.foods[i].tastes[1].tasteID) + ", " +
 							(orderToInsert.foods[i].tastes[2].tasteID == 0 ? "NULL" : orderToInsert.foods[i].tastes[2].tasteID) + ", " +

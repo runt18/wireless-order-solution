@@ -376,7 +376,7 @@ public class UpdateOrder {
 
 				//add the gift amount if extra foods
 				if(extraFoods.get(i).isGift()){
-					giftAmount += extraFoods.get(i).getPrice2() * extraFoods.get(i).getCount();
+					giftAmount += extraFoods.get(i).getPriceWithTaste() * extraFoods.get(i).getCount();
 				}
 				
 				sql = "INSERT INTO `" + Params.dbName + "`.`order_food` " +
@@ -401,11 +401,11 @@ public class UpdateOrder {
 						extraFoods.get(i).tastes[0].aliasID + "," +
 						extraFoods.get(i).tastes[1].aliasID + "," +
 						extraFoods.get(i).tastes[2].aliasID + "," +
-						extraFoods.get(i).getTastePrice() + ", '" +
-						extraFoods.get(i).tastePref + "', " + 
-						extraFoods.get(i).tmpTaste == null ? "NULL" : extraFoods.get(i).tmpTaste.aliasID + ", " +
-						extraFoods.get(i).tmpTaste == null ? "NULL" : extraFoods.get(i).tmpTaste.preference + ", " +
-						extraFoods.get(i).tmpTaste == null ? "NULL" : extraFoods.get(i).tmpTaste.getPrice() + ", " +
+						extraFoods.get(i).getTasteNormalPrice() + ", '" +
+						com.wireless.protocol.Util.genTastePref(extraFoods.get(i).tastes) + "', " + 
+						(extraFoods.get(i).tmpTaste == null ? "NULL" : extraFoods.get(i).tmpTaste.aliasID) + ", " +
+						(extraFoods.get(i).tmpTaste == null ? "NULL" : extraFoods.get(i).tmpTaste.preference) + ", " +
+						(extraFoods.get(i).tmpTaste == null ? "NULL" : extraFoods.get(i).tmpTaste.getPrice()) + ", " +
 						"(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + extraFoods.get(i).kitchen.aliasID + "), " + 
 						"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + extraFoods.get(i).kitchen.aliasID + "), " + 
 						extraFoods.get(i).kitchen.aliasID + ", '" + 
@@ -422,7 +422,7 @@ public class UpdateOrder {
 
 				//minus the gift amount if canceled foods
 				if(canceledFoods.get(i).isGift()){
-					giftAmount -= canceledFoods.get(i).getPrice2() * canceledFoods.get(i).getCount();
+					giftAmount -= canceledFoods.get(i).getPriceWithTaste() * canceledFoods.get(i).getCount();
 				}
 				
 				sql = "INSERT INTO `" + Params.dbName + "`.`order_food` " +
@@ -448,11 +448,11 @@ public class UpdateOrder {
 						canceledFoods.get(i).tastes[0].aliasID + "," +
 						canceledFoods.get(i).tastes[1].aliasID + "," +
 						canceledFoods.get(i).tastes[2].aliasID + "," +
-						canceledFoods.get(i).getTastePrice() + ", '" +
-						canceledFoods.get(i).tastePref + "', " + 
-						canceledFoods.get(i).tmpTaste == null ? "NULL" : canceledFoods.get(i).tmpTaste.aliasID + ", " +
-						canceledFoods.get(i).tmpTaste == null ? "NULL" : canceledFoods.get(i).tmpTaste.preference + ", " +
-						canceledFoods.get(i).tmpTaste == null ? "NULL" : canceledFoods.get(i).tmpTaste.getPrice() + ", " +
+						canceledFoods.get(i).getTasteNormalPrice() + ", '" +
+						com.wireless.protocol.Util.genTastePref(canceledFoods.get(i).tastes) + "', " + 
+						(canceledFoods.get(i).tmpTaste == null ? "NULL" : canceledFoods.get(i).tmpTaste.aliasID) + ", " +
+						(canceledFoods.get(i).tmpTaste == null ? "NULL" : canceledFoods.get(i).tmpTaste.preference) + ", " +
+						(canceledFoods.get(i).tmpTaste == null ? "NULL" : canceledFoods.get(i).tmpTaste.getPrice()) + ", " +
 						"(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + canceledFoods.get(i).kitchen.aliasID + "), " + 
 						"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + canceledFoods.get(i).kitchen.aliasID + "), " + 
 						canceledFoods.get(i).kitchen.aliasID + ", '" + 
@@ -789,9 +789,9 @@ public class UpdateOrder {
 		food.tmpTaste = foodBasic.tmpTaste;
 		
 		//set the taste preference to this food
-		food.tastePref = com.wireless.protocol.Util.genTastePref(food.tastes, food.tmpTaste);
+		//food.tastePref = com.wireless.protocol.Util.genTastePref(food.tastes);
 		//set the total taste price to this food
-		food.setTastePrice(com.wireless.protocol.Util.genTastePrice(food.tastes, food.getPrice()));
+		food.setTasteNormalPrice(com.wireless.protocol.Util.genTastePrice(food.tastes, food.getPrice()));
 		
 		return food;
 	}
