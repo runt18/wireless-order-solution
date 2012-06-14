@@ -18,30 +18,21 @@ public class OrderFood extends Food {
 	
 	public boolean isTemporary = false;				//indicates whether the food is temporary
 
-	int tastePrice = 0; 							//the taste price to this food
+	int tasteNormalPrice = 0; 							//the normal taste price to this food
 	
-	public void setTastePrice(Float price){
-		tastePrice = Util.float2Int(price);
+	public void setTasteNormalPrice(Float price){
+		tasteNormalPrice = Util.float2Int(price);
 	}
 	
-	public Float getTastePrice(){
-		return Util.int2Float(tastePrice);
+	public Float getTasteNormalPrice(){
+		return Util.int2Float(tasteNormalPrice);
 	}
 	
 	/**
-	 * Since a food can consist of three tastes at most,
-	 * combine the taste into a signal string.
+	 * Since a food can consist of three normal tastes at most,
+	 * combine these three normal tastes into a signal string.
 	 */
-	public String tastePref = Taste.NO_PREFERENCE;
-	
-	/**
-	 * Calculate the total price to this food as below.
-	 * <br>price = (food_price * discount + taste_price) * count 
-	 * @return the total price to this food
-	 */
-	public Float calcPrice2(){
-		return Util.int2Float(priceWithTaste() * count / 100);
-	}
+	public String tasteNormalPref = Taste.NO_PREFERENCE;
 	
 	/**
 	 * The value of discount ranges from 0.00 through 1.00
@@ -182,8 +173,8 @@ public class OrderFood extends Food {
 			/**
 			 * Calculate the taste price and preference
 			 */
-			tastePref = Util.genTastePref(tastes, tmpTaste);
-			setTastePrice(Util.genTastePrice(tastes, getPrice()));
+			tasteNormalPref = Util.genTastePref(tastes);
+			setTasteNormalPrice(Util.genTastePrice(tastes, getPrice()));
 			
 			return tastePos;
 			
@@ -224,22 +215,15 @@ public class OrderFood extends Food {
 			/**
 			 * Calculate the taste price and preference
 			 */
-			tastePref = Util.genTastePref(tastes, tmpTaste);
-			setTastePrice(Util.genTastePrice(tastes, getPrice()));
+			tasteNormalPref = Util.genTastePref(tastes);
+			setTasteNormalPrice(Util.genTastePrice(tastes, getPrice()));
 			return tastePos;
 		}else{
 			return -1;
 		}
 	}
 
-	/**
-	 * The 2nd unit price to food is as below.
-	 * unit_price = food_price * discount + taste_price
-	 * @return the unit price represented as Float 
-	 */
-	public Float getPrice2(){
-		return Util.int2Float(priceWithTaste());
-	}
+
 	
 	/**
 	 * The unit price with taste to a specific food is as below.
@@ -249,18 +233,35 @@ public class OrderFood extends Food {
 	 * @return the unit price represented as an integer
 	 */
 	int priceWithTaste(){
-		return price * discount / 100 + tastePrice + (tmpTaste == null ? 0 : tmpTaste.price);
+		return price * discount / 100 + tasteNormalPrice + (tmpTaste == null ? 0 : tmpTaste.price);
+	}	
+	
+	/**
+	 * The 2nd unit price to food is as below.
+	 * unit_price = food_price * discount + taste_price
+	 * @return the unit price represented as Float 
+	 */
+	public Float getPriceWithTaste(){
+		return Util.int2Float(priceWithTaste());
 	}
 	
 	/**
-	 * Calculate the total price to this food as below.
+	 * Calculate the total price to this food without taste as below.
 	 * <br>price = food_price * discount * count 
 	 * @return the total price to this food
 	 */
 	public Float calcPrice(){
 		return Util.int2Float((price * discount * count) / 10000);
-	}
+	}	
 	
+	/**
+	 * Calculate the total price to this food along with taste as below.
+	 * <br>price = (food_price * discount + taste_price) * count 
+	 * @return the total price to this food
+	 */
+	public Float calcPriceWithTaste(){
+		return Util.int2Float(priceWithTaste() * count / 100);
+	}
 	/**
 	 * Calculate the discount price to this food as below.<br>
 	 * price = unit_price * (1 - discount)
@@ -290,13 +291,25 @@ public class OrderFood extends Food {
 	}
 	
 	/**
+	 * Get the taste combined with both normal and temporary preference.
+	 * @return the combined taste preference
+	 */
+	public String getTastePref(){
+		if(tmpTaste != null){
+			return (tasteNormalPref.equals(Taste.NO_PREFERENCE) ? "" : (tasteNormalPref + ",")) + tmpTaste.preference;
+		}else{
+			return tasteNormalPref;
+		}
+	}
+	
+	/**
 	 * Return the order food string.
 	 * The string format is as below.
 	 * name-taste1,taste2,taste3
 	 */
 	public String toString(){
 
-		String tastePref = Util.genTastePref(tastes, tmpTaste);
+		String tastePref = getTastePref();
 		
 		return name + (tastePref.equals(Taste.NO_PREFERENCE) ? "" : ("-" + tastePref));
 	}
