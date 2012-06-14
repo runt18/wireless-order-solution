@@ -28,13 +28,19 @@ import com.wireless.protocol.Reserved;
  * food_num - 1-byte indicating the number of foods
  * 
  * <Food>
- * is_temp(0) : food_id[2] : order_amount[2] : taste_id[2] : taste_id2[2] : taste_id3[2] : kitchen : hang_status : is_hurried
+ * is_temp(0) : food_id[2] : order_amount[2] : taste_id[2] : taste_id2[2] : taste_id3[2] : 
+ * len_tmp_taste : tmp_taste[n] : tmp_taste_alias[2] : tmp_taste_price[4] : 
+ * kitchen : hang_status : is_hurried
  * is_temp(0) - "0" means this food is NOT temporary
  * food_id[2] - 2-byte indicating the food's id
  * order_amount[2] - 2-byte indicating how many this foods are ordered
  * taste_id[2] - 2-byte indicates the 1st taste preference id
  * taste_id2[2] - 2-byte indicates the 2nd taste preference id
  * taste_id3[2] - 2-byte indicates the 3rd taste preference id
+ * len_tmp_taste - 1-byte indicates the length of temporary taste
+ * tmp_taste[n] - the temporary taste value
+ * tmp_taste_alias[2] - 2-byte indicates the alias id to this temporary taste
+ * tmp_taste_price[4] - 4-byte indicates the price to this temporary taste
  * kitchen - the kitchen to this food
  * hang_status - the hang status to the food
  * is_hurried - indicates whether the food is hurried
@@ -103,8 +109,24 @@ public class ReqInsertOrder extends ReqPackage {
 				/* is_temp(1) : food_id[2] : order_amount[2] : unit_price[3] : hang_status : is_hurried : len : food_name[len] */
 				foodLen += 1 + 2 + 2 + 3 + 1 + 1 + 1 + reqOrder.foods[i].name.getBytes("UTF-8").length;
 			}else{
-				/* is_temp(0) : food_id[2] : order_amount[2] : taste_id[2] : taste_id2[2] : taste_id3[2] : kitchen : hang_status : is_hurried */
-				foodLen += 14; 
+				/**
+				 * is_temp(0) : food_id[2] : order_amount[2] : taste_id[2] : taste_id2[2] : taste_id3[2] : 
+				 * len_tmp_taste : tmp_taste[n] : tmp_taste_alias[2] : tmp_taste_price[4] : 
+				 * kitchen : hang_status : is_hurried 
+				 **/
+				foodLen += 1 + /* is_temp(0) */
+						   2 + /* food_id[2] */ 
+						   2 + /* order_amount[2] */
+						   2 + /* taste_id[2] */
+						   2 + /* taste_id2[2] */
+						   2 + /* taste_id3[2] */
+						   1 + /* len_tmp_taste */
+						   (reqOrder.foods[i].tmpTaste == null ? 0 : reqOrder.foods[i].tmpTaste.preference.getBytes("UTF-8").length) + /* tmp_taset */
+						   2 + /* tmp_taste_alias[2] */
+						   4 + /* tmp_taste_price[4] */
+						   1 + /* kitchen */
+						   1 + /* hang_status */
+						   1;  /* is_hurried */ 
 			}
 		}
 		
@@ -178,7 +200,9 @@ public class ReqInsertOrder extends ReqPackage {
 				
 			}else{
 				/**
-				 * is_temp(0) : food_id[2] : order_amount[2] : taste_id[2] : taste_id2[2] : taste_id3[2] : kitchen : hang_status : is_hurried
+				 * is_temp(0) : food_id[2] : order_amount[2] : taste_id[2] : taste_id2[2] : taste_id3[2] :
+				 * len_tmp_taste : tmp_taste[n] : tmp_taste_alias[2] : tmp_taste_price[4] 
+				 * kitchen : hang_status : is_hurried
 				 */
 				//assign the temporary flag
 				body[offset] = 0;

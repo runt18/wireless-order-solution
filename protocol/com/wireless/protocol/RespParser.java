@@ -64,6 +64,7 @@ public class RespParser {
 		 * len_tmp_taste - indicates the length of temporary taste
 		 * tmp_taste[n] - indicates the value of temporary taste
 		 * tmp_taste_alias[2] - 2-byte indicates the alias to this temporary taste
+		 * tmp_taste_price[4] - 4-byte indicates the price to this temporary taste
 		 * hang_status - indicates the hang status to the food
 		 * order_date[8] - 8-byte indicates the order date
 		 * nWaiter - the length of waiter
@@ -201,7 +202,8 @@ public class RespParser {
 						offset += 4;
 						
 					}else{
-						offset += 4;   /* price of temporary taste takes up 4 bytes */
+						offset += 2 + /* alias of temporary taste takes up 2 bytes */ 
+								  4;  /* price of temporary taste takes up 4 bytes */
 					}
 					
 					//get the hang status

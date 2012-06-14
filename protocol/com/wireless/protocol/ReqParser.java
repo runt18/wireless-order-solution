@@ -48,7 +48,9 @@ public class ReqParser {
 	 * food_num - 1-byte indicating the number of foods
 	 * 
 	 * <Food>
-	 * is_temp(0) : food_id[2] : order_num[2] : taste_id[2] : taste_id2[2] : taste_id3[2] : kitchen : hang_status : is_hurried
+	 * is_temp(0) : food_id[2] : order_num[2] : taste_id[2] : taste_id2[2] : taste_id3[2] : 
+	 * len_tmp_taste : tmp_taste[n] : tmp_taste_alias[2] : tmp_taste_price[4] : 
+	 * kitchen : hang_status : is_hurried
 	 * is_temp(0) - "0" means this food is NOT temporary
 	 * food_id[2] - 2-byte indicating the food's id
 	 * order_num[2] - 2-byte indicating how many this foods are ordered
@@ -57,6 +59,10 @@ public class ReqParser {
 	 * taste_id[2] - 2-byte indicates the 1st taste preference id
 	 * taste_id2[2] - 2-byte indicates the 2nd taste preference id
 	 * taste_id3[2] - 2-byte indicates the 3rd taste preference id
+	 * len_tmp_taste - 1-byte indicates the length of temporary taste
+	 * tmp_taste[n] - the temporary taste value
+	 * tmp_taste_alias[2] - 2-byte indicates the alias id to this temporary taste
+	 * tmp_taste_price[4] - 4-byte indicates the price to this temporary taste
 	 * kitchen - the kitchen to this food
 	 * hang_status - the hang status to the food
 	 * is_hurried - indicates whether the food is hurried
@@ -149,7 +155,9 @@ public class ReqParser {
 				
 			}else{
 				/**
-				 * is_temp(0) : food_id[2] : order_num[2] : taste_id[2] : taste_id2[2] : taste_id3[2] : kitchen : hang_status : is_hurried
+				 * is_temp(0) : food_id[2] : order_num[2] : taste_id[2] : taste_id2[2] : taste_id3[2] : 
+				 * len_tmp_taste : tmp_taste[n] : tmp_taste_alias[2] : tmp_taste_price[4] : 
+				 * kitchen : hang_status : is_hurried
 				 */
 				
 				//get the food id
@@ -165,7 +173,38 @@ public class ReqParser {
 				tasteID[1] = (req.body[offset + 7] & 0x000000FF) | 
 								((req.body[offset + 8] & 0x000000FF) << 8);
 				tasteID[2] = (req.body[offset + 9] & 0x000000FF) | 
-								((req.body[offset + 10] & 0x000000FF) << 8);
+								((req.body[offset + 10] & 0x000000FF) << 8);				
+			
+				//get the length of temporary taste value
+				int nTmpTaste = req.body[offset + 11];
+				offset += 12;
+
+				Taste tmpTaste = null;
+				if(nTmpTaste != 0){
+					//get the temporary taste value
+					tmpTaste = new Taste();
+					try{
+						tmpTaste.preference = new String(req.body, offset, nTmpTaste, "UTF-8");
+					}catch(UnsupportedEncodingException e){}
+					offset += nTmpTaste;
+					
+					//get the alias id to temporary taste
+					tmpTaste.aliasID = (req.body[offset] & 0x000000FF) |
+										((req.body[offset + 1] & 0x000000FF) << 8);
+					offset += 2;
+					
+					//get the price of temporary taste
+					int tmpTastePrice = (req.body[offset] & 0x000000FF) |
+										((req.body[offset + 1] & 0x000000FF) << 8) |
+										((req.body[offset + 2] & 0x000000FF) << 16) |
+										((req.body[offset + 3] & 0x000000FF) << 24);
+					tmpTaste.setPrice(Util.int2Float(tmpTastePrice));
+					offset += 4;
+					
+				}else{
+					offset += 2 + /* alias to this temporary taste takes up 2 bytes */
+							  4;  /* price to this temporary taste takes up 4 bytes */
+				}
 				
 				//get the kitchen 
 				short kitchen = req.body[offset + 11];
@@ -187,6 +226,8 @@ public class ReqParser {
 				orderFoods[i].tastes[0].aliasID = tasteID[0];
 				orderFoods[i].tastes[1].aliasID = tasteID[1];
 				orderFoods[i].tastes[2].aliasID = tasteID[2];
+				
+				orderFoods[i].tmpTaste = tmpTaste;
 				
 				Arrays.sort(orderFoods[i].tastes, new Comparator<Taste>(){
 

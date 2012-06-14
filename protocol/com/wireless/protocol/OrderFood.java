@@ -295,17 +295,9 @@ public class OrderFood extends Food {
 	 * name-taste1,taste2,taste3
 	 */
 	public String toString(){
-		String taste = null;
-		for(int i = 0; i < tastes.length; i++){
-			if(tastes[i].aliasID != Taste.NO_TASTE){
-				if(taste != null){
-					taste += "," + tastes[i].preference;
-				}else{
-					taste = tastes[i].preference;
-				}
-			}
-		}
+
+		String tastePref = Util.genTastePref(tastes, tmpTaste);
 		
-		return name + (taste != null ? "-" + taste : "");
+		return name + (tastePref.equals(Taste.NO_PREFERENCE) ? "" : ("-" + tastePref));
 	}
 }

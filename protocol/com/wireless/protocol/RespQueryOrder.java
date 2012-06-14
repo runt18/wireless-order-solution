@@ -239,13 +239,16 @@ public class RespQueryOrder extends RespPackage{
 				}else{
 					//assign the length of temporary taste value
 					body[offset] = 0x00;
-					//assign the length of temporary taste value
+					//assign the temporary taste alias
 					body[offset + 1] = 0x00;
 					body[offset + 2] = 0x00;
+					//assign the temporary taste price
 					body[offset + 3] = 0x00;
 					body[offset + 4] = 0x00;
+					body[offset + 5] = 0x00;
+					body[offset + 6] = 0x00;
 					
-					offset += 5;					
+					offset += 7;					
 				}
 				//assign the hang status
 				body[offset] = (byte)(order.foods[i].hangStatus);
