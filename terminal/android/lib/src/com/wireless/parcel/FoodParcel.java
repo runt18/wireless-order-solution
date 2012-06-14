@@ -24,6 +24,8 @@ public class FoodParcel extends OrderFood implements Parcelable{
 		hangStatus = food.hangStatus;
 		isTemporary = food.isTemporary;
 		status = food.status;
+		orderDate  = food.orderDate;
+		waiter = food.waiter == null ? "" : food.waiter;
 		tastePref = new String(food.tastePref);
 		setTastePrice(new Float(food.getTastePrice()));
 		setCount(new Float(food.getCount()));
@@ -43,6 +45,8 @@ public class FoodParcel extends OrderFood implements Parcelable{
 		hangStatus = (short)in.readInt();
 		isTemporary = in.readInt() == 1 ? true : false;
 		status = (short)in.readInt();
+		orderDate = in.readLong();
+		waiter = in.readString();
 		tastePref = in.readString();
 		setTastePrice(Util.int2Float(in.readInt()));
 		setCount(Util.int2Float(in.readInt()));
@@ -80,6 +84,8 @@ public class FoodParcel extends OrderFood implements Parcelable{
 		parcel.writeInt(hangStatus);
 		parcel.writeInt(isTemporary ? 1 : 0);
 		parcel.writeInt(status);
+		parcel.writeLong(orderDate);
+		parcel.writeString(waiter);
 		parcel.writeString(tastePref);
 		parcel.writeInt(Util.float2Int(getTastePrice()));
 		parcel.writeInt(Util.float2Int(getCount()));
