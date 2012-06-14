@@ -322,9 +322,9 @@ public class OrderFoodListView extends ExpandableListView{
 			//show the order amount to each food
 			((TextView) view.findViewById(R.id.accountvalue)).setText(Util.float2String2(food.getCount()));
 			//show the price to each food
-			((TextView) view.findViewById(R.id.pricevalue)).setText(Util.CURRENCY_SIGN + Util.float2String2(food.calcPrice2()));
+			((TextView) view.findViewById(R.id.pricevalue)).setText(Util.CURRENCY_SIGN + Util.float2String2(food.calcPriceWithTaste()));
 			//show the taste to each food
-			((TextView)view.findViewById(R.id.taste)).setText(food.tastePref);
+			((TextView)view.findViewById(R.id.taste)).setText(food.getTastePref());
 			/**
 			 * "新点菜"的ListView显示"删菜"和"口味"
 			 * "已点菜"的ListView显示"退菜"和"催菜"
