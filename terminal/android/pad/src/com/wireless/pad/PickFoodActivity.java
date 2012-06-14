@@ -232,8 +232,21 @@ public class PickFoodActivity extends TabActivity implements
 	private View createTabIndicator(String text, int drawable) {
 		View view = LayoutInflater.from(_tabHost.getContext()).inflate(
 				R.layout.tb_bg, null);
-		((TextView) view.findViewById(R.id.tabsText)).setText(text);
-		((ImageView) view.findViewById(R.id.icon)).setImageResource(drawable);
+//		((TextView) view.findViewById(R.id.tabsText)).setText(text);
+//		((ImageView) view.findViewById(R.id.icon)).setImageResource(drawable);
+		
+		android.widget.LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT);
+		if(text.equals("±àºÅ")){
+			lp.setMargins(15, 10, 2, 10);
+			((Button)view.findViewById(R.id.tabicon)).setLayoutParams(lp);
+		}
+		if(text.equals("ÁÙÊ±²Ë")){
+			lp.setMargins(2, 10, 15, 10);
+			((Button)view.findViewById(R.id.tabicon)).setLayoutParams(lp);
+		}
+		((Button)view.findViewById(R.id.tabicon)).setText(text);
+		((Button)view.findViewById(R.id.tabicon)).setBackgroundResource(drawable);
+		((Button)view.findViewById(R.id.tabicon)).setClickable(false);
 		return view;
 	}
 
@@ -334,7 +347,7 @@ public class PickFoodActivity extends TabActivity implements
 					}else if(event.getAction() == MotionEvent.ACTION_UP){
 						_centerTxtView.setVisibility(View.INVISIBLE);
 						filterNumEdtTxt.append(((TextView)numberSidebar.getChildAt(curPos)).getText().toString());
-						filterNumEdtTxt.setSelection(filterNumEdtTxt.getText().toString().length());	
+//						filterNumEdtTxt.setSelection(filterNumEdtTxt.getText().toString().length());	
 						numberSidebar.setBackgroundResource(0);
 
 					}
@@ -381,6 +394,7 @@ public class PickFoodActivity extends TabActivity implements
 		
 
 		final PickFoodListView pickLstView = (PickFoodListView)findViewById(R.id.pickByNumLstView);
+		pickLstView.setNumColumns(4);
 		pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods,	PickFoodListView.TAG_NUM);
 		pickLstView.setFoodPickedListener(this);
 	
@@ -450,6 +464,7 @@ public class PickFoodActivity extends TabActivity implements
 		// ·Ö³ø²àÀ¸
 		final LinearLayout kitchenSidebar =(LinearLayout) findViewById(R.id.sideIndex);
 		final PickFoodListView pickLstView = (PickFoodListView) findViewById(R.id.pickByKitchenLstView);
+		pickLstView.setNumColumns(4);
 		// Çå³ý²àÀ¸
 		kitchenSidebar.removeAllViews();
 		//kitchenSidebar.setBackgroundColor(0xfbfdfe);
@@ -718,6 +733,7 @@ public class PickFoodActivity extends TabActivity implements
 
 		
 		final PickFoodListView pickLstView = (PickFoodListView) findViewById(R.id.pickByPinyinLstView);
+		pickLstView.setNumColumns(4);
 		pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods,	PickFoodListView.TAG_PINYIN);
 		pickLstView.setFoodPickedListener(this);
 		/**

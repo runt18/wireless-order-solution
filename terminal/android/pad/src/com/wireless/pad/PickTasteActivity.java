@@ -24,8 +24,8 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.ListView;
+import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabHost.TabSpec;
@@ -48,7 +48,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 	private Handler _handler = new Handler(){
 		@Override
 		public void handleMessage(Message message){
-			_tasteTxtView.setText(_selectedFood.name + "-" + _selectedFood.tastePref);
+			_tasteTxtView.setText(_selectedFood.name + "-" + _selectedFood.getTastePref());
 		}
 	};
 	
@@ -181,7 +181,8 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 		});
 		
 		_tasteTxtView = (TextView)findViewById(R.id.foodTasteTxtView);
-	    final ListView tasteLstView = (ListView)findViewById(R.id.tasteLstView);
+	    final GridView tasteLstView = (GridView)findViewById(R.id.tasteLstView);
+	    tasteLstView.setNumColumns(4);
 	   ((EditText)findViewById(R.id.tastesearch)).setText("");
 	   
 	   _tasteAdapter = new TasteAdapter(WirelessOrder.foodMenu.tastes);
@@ -240,7 +241,8 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 	//设置做法View
 	public void setStyleView(){
 		_tasteTxtView = (TextView)findViewById(R.id.foodStyleTxtView);
-    	final ListView styleLstView = (ListView)findViewById(R.id.styleLstView);
+    	final GridView styleLstView = (GridView)findViewById(R.id.styleLstView);
+    	styleLstView.setNumColumns(4);
     	((EditText)findViewById(R.id.stylesearch)).setText("");
     	
     	_tasteAdapter = new TasteAdapter(WirelessOrder.foodMenu.styles);
@@ -304,7 +306,8 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 	//设置规格View
 	public void setSpecView(){
 		_tasteTxtView = (TextView)findViewById(R.id.foodSpecTxtView);
-		final ListView specLstView = (ListView)findViewById(R.id.specLstView);
+		final GridView specLstView = (GridView)findViewById(R.id.specLstView);
+		specLstView.setNumColumns(4);
 		((EditText)findViewById(R.id.specsearch)).setText("");
 		
 		_tasteAdapter = new TasteAdapter(WirelessOrder.foodMenu.specs);
@@ -372,8 +375,22 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 	 */
 	private View createTabIndicator(String text, int drawable) {
 		View view = LayoutInflater.from(_tabHost.getContext()).inflate(R.layout.tb_bg, null);
-		((TextView)view.findViewById(R.id.tabsText)).setText(text);
-		((ImageView) view.findViewById(R.id.icon)).setImageResource(drawable);
+//		((TextView)view.findViewById(R.id.tabsText)).setText(text);
+//		((ImageView) view.findViewById(R.id.icon)).setImageResource(drawable);
+		
+		android.widget.LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT);
+		if(text.equals("口味")){
+			lp.setMargins(15, 10, 2, 10);
+			((Button)view.findViewById(R.id.tabicon)).setLayoutParams(lp);
+		}
+		if(text.equals("规格")){
+			lp.setMargins(2, 10, 15, 10);
+			((Button)view.findViewById(R.id.tabicon)).setLayoutParams(lp);
+		}
+		
+		((Button)view.findViewById(R.id.tabicon)).setText(text);
+		((Button)view.findViewById(R.id.tabicon)).setBackgroundResource(drawable);
+		((Button)view.findViewById(R.id.tabicon)).setClickable(false);
 		return view;
 	}
 	
@@ -469,8 +486,9 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 							selectChkBox.setChecked(false);
 							Toast.makeText(PickTasteActivity.this, "删除" + _tastes[position].preference, 0).show();
 						}
-						
+						((LinearLayout)arg0.findViewById(R.id.item_body)).setBackgroundResource(R.drawable.item_bg_selector);
 					}else{
+						((LinearLayout)arg0.findViewById(R.id.item_body)).setBackgroundResource(R.drawable.item_bg2);
 						int pos = _selectedFood.addTaste(_tastes[position]);
 						if(pos >= 0){
 							sendPickTasteBoradcast();

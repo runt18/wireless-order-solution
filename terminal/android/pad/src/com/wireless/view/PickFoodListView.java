@@ -13,6 +13,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,7 +24,7 @@ import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Util;
 
 
-public class PickFoodListView extends ListView {
+public class PickFoodListView extends GridView {
 
 	public final static int TAG_NUM = 0;
 	public final static int TAG_PINYIN = 1;
@@ -171,7 +172,9 @@ public class PickFoodListView extends ListView {
 			
 			setContentView(R.layout.order_confirm);
 			
-			((TextView)findViewById(R.id.orderTitleTxt)).setText("请输入" + _selectedFood.name + "的点菜数量");
+//			((TextView)findViewById(R.id.orderTitleTxt)).setText("请输入" + _selectedFood.name + "的点菜数量");
+			((TextView)findViewById(R.id.orderTitleTxt)).setText("提示信息");
+			((TextView)findViewById(R.id.orderTxtView1)).setText("确定点" + _selectedFood.name + "1份?");
 			EditText amountEdtTxt = ((EditText)findViewById(R.id.amountEdtTxt));
 			amountEdtTxt.setText("1");
 			amountEdtTxt.setSelection(amountEdtTxt.getText().length());
