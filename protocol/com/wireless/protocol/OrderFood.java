@@ -224,6 +224,21 @@ public class OrderFood extends Food {
 	}
 
 
+	/**
+	 * The taste price along with both normal and temporary taste.
+	 * @return the taste price represented as an integer
+	 */
+	int tastePrice(){
+		return tasteNormalPrice + (tmpTaste == null ? 0 : tmpTaste.price);
+	}
+	
+	/**
+	 * The taste price along with both normal and temporary taste.
+	 * @return the taste price represented as a Float
+	 */
+	public Float getTastePrice(){
+		return Util.int2Float(tastePrice());
+	}
 	
 	/**
 	 * The unit price with taste to a specific food is as below.
@@ -233,13 +248,15 @@ public class OrderFood extends Food {
 	 * @return the unit price represented as an integer
 	 */
 	int priceWithTaste(){
-		return price * discount / 100 + tasteNormalPrice + (tmpTaste == null ? 0 : tmpTaste.price);
+		return price * discount / 100 + tastePrice();
 	}	
 	
 	/**
-	 * The 2nd unit price to food is as below.
-	 * unit_price = food_price * discount + taste_price
-	 * @return the unit price represented as Float 
+	 * The unit price with taste to a specific food is as below.
+	 * unit_price = food_price * discount + taste_price + tmp_taste_price
+	 * If taste price is calculated by rate, then
+	 * taste_price = food_price * taste_rate
+	 * @return the unit price represented as a Float
 	 */
 	public Float getPriceWithTaste(){
 		return Util.int2Float(priceWithTaste());

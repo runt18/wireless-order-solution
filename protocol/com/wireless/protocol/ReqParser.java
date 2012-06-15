@@ -207,15 +207,16 @@ public class ReqParser {
 				}
 				
 				//get the kitchen 
-				short kitchen = req.body[offset + 11];
+				short kitchen = req.body[offset];
+				offset += 1;
 				
 				//get the hang up status
-				short hangStatus = req.body[offset + 12];
+				short hangStatus = req.body[offset];
+				offset += 1;
 				
 				//get the hurried flag
-				boolean isHurried = req.body[offset + 13] == 1 ? true : false;
-				
-				offset += 14;
+				boolean isHurried = req.body[offset] == 1 ? true : false;
+				offset += 1;				
 				
 				orderFoods[i] = new OrderFood();
 				orderFoods[i].aliasID = foodID;
