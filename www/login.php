@@ -129,7 +129,7 @@ if (window.parent != window)
 </script>
 
 <div style="height:100%;"></div>
-<div id="postBar"><span style="color: #FFFFFF; font-size: small">版权所有(c) 2011 智易科技</span></div>
+<div id="postBar"><span style="color: #FFFFFF; font-size: small">版权所有(c) 2011 广州鼎鼎信息科技有限公司 · 智易科技</span></div>
 
 
 
