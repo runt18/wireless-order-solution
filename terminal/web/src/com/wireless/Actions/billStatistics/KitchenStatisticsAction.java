@@ -189,8 +189,7 @@ public class KitchenStatisticsAction extends Action {
 					// lastDate = orderDate;
 					lastKitchen = kitchen;
 
-					float allPrice = (float) Math.round((orderFood.getPrice2()
-							.floatValue() * orderFood.getCount()) * 100) / 100;
+					float allPrice = (float) Math.round(orderFood.calcPriceWithTaste() * 100) / 100;
 
 					// pay
 					int payManner = orderFood.payManner;

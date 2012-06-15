@@ -150,8 +150,7 @@ public class MenuStatisticsAction extends Action {
 				lastKitchenAlias = orderFoods[i].kitchen.aliasID;
 				lastFoodName = orderFoods[i].name;
 
-				float allPrice = (float) Math.round((orderFood.getPrice2()
-						.floatValue() * orderFood.getCount()) * 100) / 100;
+				float allPrice = (float) Math.round(orderFood.calcPriceWithTaste() * 100) / 100;
 
 				totalPrice = (float) Math.round((totalPrice + allPrice) * 100) / 100;
 
