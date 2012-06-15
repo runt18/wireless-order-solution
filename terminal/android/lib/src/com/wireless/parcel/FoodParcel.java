@@ -34,7 +34,7 @@ public class FoodParcel extends OrderFood implements Parcelable{
 			tmpTaste = food.tmpTaste;
 		}else{
 			tmpTaste = new Taste();
-			tmpTaste.tasteID = Integer.MIN_VALUE;
+			tmpTaste.aliasID = Integer.MIN_VALUE;
 		}
 	}
 	
@@ -56,7 +56,7 @@ public class FoodParcel extends OrderFood implements Parcelable{
 		in.readTypedList(tasteParcels, TasteParcel.CREATOR);
 		tastes = tasteParcels.toArray(new Taste[tasteParcels.size()]);
 		tmpTaste = new TasteParcel(in);
-		if(tmpTaste.tasteID == Integer.MIN_VALUE){
+		if(tmpTaste.aliasID == Integer.MIN_VALUE){
 			tmpTaste = null;
 		}
 	}
