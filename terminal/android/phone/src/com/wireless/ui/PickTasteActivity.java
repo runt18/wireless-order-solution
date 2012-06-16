@@ -320,6 +320,12 @@ public class PickTasteActivity extends Activity{
 	//设置品注View
 	public View setupPinZhuView(){
 		View pinzhuView = LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.pinzhu, null);
+		
+		if(_selectedFood.tmpTaste != null){
+			((EditText)pinzhuView.findViewById(R.id.pinZhuEdtTxt)).setText(_selectedFood.tmpTaste.preference);
+			((EditText)pinzhuView.findViewById(R.id.priceEdtTxt)).setText(_selectedFood.tmpTaste.getPrice().toString());
+		}
+		
 		pinzhuView.setTag(TAG_PINZHU);  
 		//品注的EditText的处理函数
 		((EditText)pinzhuView.findViewById(R.id.pinZhuEdtTxt)).addTextChangedListener(new TextWatcher(){
