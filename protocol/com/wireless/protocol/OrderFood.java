@@ -88,7 +88,8 @@ public class OrderFood extends Food {
 					   tastes[0].aliasID == food.tastes[0].aliasID &&
 					   tastes[1].aliasID == food.tastes[1].aliasID &&
 					   tastes[2].aliasID == food.tastes[2].aliasID &&
-					   ((tmpTaste == null || food.tmpTaste == null) ? true : tmpTaste.aliasID == food.tmpTaste.aliasID) &&
+					   ((tmpTaste == null && food.tmpTaste == null) ? true : 
+						   ((tmpTaste != null && food.tmpTaste != null) ? tmpTaste.aliasID == food.tmpTaste.aliasID : false)) &&
 					   hangStatus == food.hangStatus;
 			}
 		}

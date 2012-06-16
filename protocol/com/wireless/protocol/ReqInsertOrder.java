@@ -246,8 +246,8 @@ public class ReqInsertOrder extends ReqPackage {
 					offset += tmpTasteBytes.length;
 					
 					//assign the alias to temporary taste
-					body[offset] = (byte)(reqOrder.foods[i].aliasID & 0x00FF);
-					body[offset + 1] = (byte)((reqOrder.foods[i].aliasID & 0xFF00) >> 8);
+					body[offset] = (byte)(reqOrder.foods[i].tmpTaste.aliasID & 0x00FF);
+					body[offset + 1] = (byte)((reqOrder.foods[i].tmpTaste.aliasID & 0xFF00) >> 8);
 					offset += 2;
 					
 					//assign the price to temporary taste
