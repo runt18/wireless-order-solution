@@ -618,11 +618,11 @@ public class OrderFoodListView extends ExpandableListView{
 	
 	
 	/**
-	 * 提示输入增加数量的Dialog
+	 * 提示输入数量的Dialog
 	 */
-	private class AskAddAmountDialog extends Dialog{
+	private class AskOrderAmountDialog extends Dialog{
 	
-		AskAddAmountDialog(final OrderFood selectedFood) {
+		AskOrderAmountDialog(final OrderFood selectedFood) {
 			super(_context, R.style.FullHeightDialog);
 			
 			View view = LayoutInflater.from(_context).inflate(R.layout.alert, null);
@@ -632,8 +632,8 @@ public class OrderFoodListView extends ExpandableListView{
 			
 			((TextView)findViewById(R.id.table)).setText("数量：");
 			//增加数量默认为此菜品的点菜数量
-			final EditText addEdtTxt = (EditText)view.findViewById(R.id.mycount);			
-			addEdtTxt.setText(Util.float2String2(selectedFood.getCount()));
+			final EditText amountEdtTxt = (EditText)view.findViewById(R.id.mycount);			
+			amountEdtTxt.setText("");
 			
 			//"确定"Button
 			Button okBtn = (Button)view.findViewById(R.id.confirm);
@@ -641,43 +641,20 @@ public class OrderFoodListView extends ExpandableListView{
 			okBtn.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					float foodAmount = selectedFood.getCount();
-					if( addEdtTxt.getText().toString() != null && !addEdtTxt.getText().toString().equals("") ){
-						float addAmount = Float.parseFloat(addEdtTxt.getText().toString());
-						if(foodAmount == addAmount){
-							/**
-							 * 如果数量相等，没有添加数量
-							 */
+					try{
+						float amount = Float.parseFloat(amountEdtTxt.getText().toString());
+						if(amount > 255){
+							Toast.makeText(_context, "对不起，\"" + selectedFood.toString() + "\"最多只能点255份", 0).show();
+						}else{
+							selectedFood.setCount(amount);
 							_adapter.notifyDataSetChanged();
+							Toast.makeText(_context, "设置\"" + selectedFood.toString() + "\"" + "数量为" + amount + "份", 1).show();
 							dismiss();
-							Toast.makeText(_context, "没有添加\"" + selectedFood.toString() + "\"" + "数量", 1).show();
-							
-						}else if(addAmount > foodAmount || addAmount < foodAmount){
-							/**
-							 * 如果输入数量为当前这个菜数量
-							 */
-							selectedFood.setCount(addAmount);
-							_adapter.notifyDataSetChanged();
-							dismiss();
-							if(addAmount > foodAmount){
-								float newAmount = addAmount - foodAmount;
-								Toast.makeText(_context, "添加\"" + selectedFood.toString() + "\"" + newAmount + "份成功", 1).show();
-							}else{
-								float newAmount = foodAmount - addAmount ;
-								Toast.makeText(_context, "减少\"" + selectedFood.toString() + "\"" + newAmount + "份成功", 1).show();
-							}
-							
-							
-						}
-					}else{
-						new AlertDialog.Builder(_context)
-						.setTitle("提示")
-						.setMessage("你输入的数量不能为空, 请重新输入")
-						.setNeutralButton("确定", null)
-						.show();
-					}
-					
-					
+						}							
+						
+					}catch(NumberFormatException e){
+						Toast.makeText(_context, "您输入的数量格式不正确，请重新输入", 0).show();
+					}					
 				}
 			});
 			
@@ -756,7 +733,7 @@ public class OrderFoodListView extends ExpandableListView{
 					@Override
 					public void onClick(View arg0) {
 						dismiss();
-						new AskAddAmountDialog(selectedFood).show();							
+						new AskOrderAmountDialog(selectedFood).show();							
 					}
 				});
 				

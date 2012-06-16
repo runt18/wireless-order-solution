@@ -363,13 +363,17 @@ public class PickTasteActivity extends Activity{
 			public void afterTextChanged(Editable s) {
 				if(_selectedFood.tmpTaste != null){
 					try{
-						Float price = Float.parseFloat(s.toString());
-						if(price >= 0 && price < 9999){
-							_selectedFood.tmpTaste.setPrice(price);
+						if(s.length() == 0){
+							_selectedFood.tmpTaste.setPrice(new Float(0));
 						}else{
-							priceEdtTxt.setText(_selectedFood.tmpTaste.getPrice() > 9999 ? "" : Util.float2String2(_selectedFood.tmpTaste.getPrice()));
-							priceEdtTxt.setSelection(priceEdtTxt.getText().length());
-							Toast.makeText(PickTasteActivity.this, "临时口味的价格范围是0～9999", 0).show();
+							Float price = Float.parseFloat(s.toString());
+							if(price >= 0 && price < 9999){
+								_selectedFood.tmpTaste.setPrice(price);
+							}else{
+								priceEdtTxt.setText(_selectedFood.tmpTaste.getPrice() > 9999 ? "" : Util.float2String2(_selectedFood.tmpTaste.getPrice()));
+								priceEdtTxt.setSelection(priceEdtTxt.getText().length());
+								Toast.makeText(PickTasteActivity.this, "临时口味的价格范围是0～9999", 0).show();
+							}
 						}
 					}catch(NumberFormatException e){
 						priceEdtTxt.setText(_selectedFood.tmpTaste.getPrice() > 9999 ? "" : Util.float2String2(_selectedFood.tmpTaste.getPrice()));

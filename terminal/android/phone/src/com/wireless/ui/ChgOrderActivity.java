@@ -51,7 +51,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 		public void handleMessage(Message message){
 			float totalPrice = new Order(_oriFoodLstView.getSourceData().toArray(new OrderFood[_oriFoodLstView.getSourceData().size()])).calcPriceWithTaste() +
 							   new Order(_newFoodLstView.getSourceData().toArray(new OrderFood[_newFoodLstView.getSourceData().size()])).calcPriceWithTaste();
-			((TextView)findViewById(R.id.amountvalue)).setText(Util.float2String(totalPrice));
+			((TextView)findViewById(R.id.amountvalue)).setText(Util.float2String((float)Math.round(totalPrice * 100) / 100));
 		}
 	};
 	
