@@ -9,6 +9,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.Taste;
 
 public class Util {
 	public static String toOrderCate(int type) {
@@ -47,11 +48,10 @@ public class Util {
 	 * 
 	 * @param submitFoods
 	 *            the submitted string looks like below.<br>
-	 *            {[是否临时菜(false),菜品1编号,菜品1数量,口味1编号,厨房1编号,菜品1折扣,2nd口味1编号,3rd口味1编号
-	 *            ]，
-	 *            [是否临时菜(false),菜品2编号,菜品2数量,口味2编号,厨房2编号,菜品2折扣,2nd口味1编号,3rd口味1编号
-	 *            ]，... [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价]，
-	 *            [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价]...}
+	 *            {[是否临时菜(false),菜品1编号,菜品1数量,口味1编号,厨房1编号,菜品1折扣,2nd口味1编号,3rd口味1编号,是否临时口味,临时口味,临时口味价钱]，
+	 *             [是否临时菜(false),菜品2编号,菜品2数量,口味2编号,厨房2编号,菜品2折扣,2nd口味1编号,3rd口味1编号,是否临时口味,临时口味,临时口味价钱]，... 
+	 *             [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价]，
+	 *             [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价]...}
 	 * @return the class food array
 	 */
 	public static OrderFood[] toFoodArray(String submitFoods)
@@ -69,7 +69,7 @@ public class Util {
 			String[] values = foodItem.split(",");
 			// extract the temporary flag
 			if (Boolean.parseBoolean(values[0])) {
-				// set the temporary flat
+				// set the temporary flag
 				foods[i].isTemporary = true;
 				// extract the alias id to this temporary food
 				int aliasID = Integer.parseInt(values[1]);
@@ -112,16 +112,23 @@ public class Util {
 				// extract the kitchen number
 				foods[i].kitchen.aliasID = Short.parseShort(values[4]);
 				// extract the discount
-				if (values.length > 5) {
-					// foods[i].discount = (byte)(Float.parseFloat(values[4]) *
-					// 100);
-					foods[i].setDiscount(Float.parseFloat(values[5]));
-				}
-				if (values.length > 6) {
-					// extract the 2nd taste alias id
-					foods[i].tastes[1].aliasID = Short.parseShort(values[6]);
-					// extract the 3rd taste alias id
-					foods[i].tastes[2].aliasID = Short.parseShort(values[7]);
+				foods[i].setDiscount(Float.parseFloat(values[5]));
+				// extract the 2nd taste alias id
+				foods[i].tastes[1].aliasID = Short.parseShort(values[6]);
+				// extract the 3rd taste alias id
+				foods[i].tastes[2].aliasID = Short.parseShort(values[7]);
+				// FIXME 
+				if(values.length > 8){
+					//check to see whether containing temporary taste
+					if(Boolean.parseBoolean(values[8])){
+						foods[i].tmpTaste = new Taste();
+						//extract the value to temporary taste
+						foods[i].tmpTaste.preference = values[9];
+						//extract the price to temporary taste
+						foods[i].tmpTaste.setPrice(Float.parseFloat(values[10]));
+					}else{
+						foods[i].tmpTaste = null;
+					}
 				}
 			}
 
