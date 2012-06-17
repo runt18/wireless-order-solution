@@ -503,8 +503,8 @@ public class StartupActivity extends Activity {
 				   updateString.append(inputLine);
 			   }
 			   reader.close();
-			
-			   _updateInfo = updateString.toString().split("</br>");
+			   
+			   _updateInfo = updateString.toString().trim().split("</br>");
 			   
 			   return compareVer(getPackageManager().getPackageInfo(StartupActivity.this.getPackageName(), 0).versionName.trim(), _updateInfo[0]);			   
 					
