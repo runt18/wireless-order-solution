@@ -174,7 +174,9 @@ static unsigned __stdcall PrintProc(LPVOID pvParam){
 								ostringstream os;
 								//os << pPI->name << " 打印" << job.order_id << "号账单" << doc_name.get() << "信息成功";
 								os << pPI->name << " 打印" << doc_name.get() << "信息成功 (" << job.order_id << "@" << job.order_date << ")";
+#ifdef _DEBUG
 								pPI->pPrintReport->OnPrintReport(job.func.code, os.str().c_str());
+#endif
 							}else{
 								ostringstream os;
 								os << pPI->name << " 打印" << job.order_id << "号账单" << doc_name.get() << "信息失败";
