@@ -119,15 +119,18 @@ public class QueryMaterialMgrAction extends Action {
 				// 按名称
 				filterCondition = " AND A.name like '" + filterVal + "%'";
 			} else if (type == 3) {
+				// 按種類
+				filterCondition = " AND A.cate_id = " + filterVal;
+			} else if (type == 4) {
 				// 按库存量
 				filterCondition = " AND stock " + ope + filterVal;
-			} else if (type == 4) {
+			} else if (type == 5) {
 				// 按价格
 				filterCondition = " AND B.price " + ope + filterVal;
-			} else if (type == 5) {
+			} else if (type == 6) {
 				// 按预警阀值
 				filterCondition = " AND A.warning_threshold " + ope + filterVal;
-			} else if (type == 6) {
+			} else if (type == 7) {
 				// 按危险阀值
 				filterCondition = " AND A.danger_threshold " + ope + filterVal;
 			} else {

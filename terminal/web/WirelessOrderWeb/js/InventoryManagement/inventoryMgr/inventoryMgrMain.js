@@ -264,7 +264,7 @@ var departmentCombOut = new Ext.form.ComboBox({
 	allowBlank : false
 });
 
-var outReasonData = [ [ TYPE_WEAR, "报损" ], [ TYPE_SELL, "销售" ],
+var outReasonData = [ [ TYPE_WEAR, "报损" ], /*[ TYPE_SELL, "销售" ],*/
 		[ TYPE_OUT_WARE, "出仓" ] ];
 
 var outReason = new Ext.form.ComboBox({
@@ -1706,7 +1706,8 @@ var logOutBut = new Ext.ux.ImageButton({
 // ----------------- dymatic searchForm -----------------
 // combom
 var filterTypeData = [ [ "0", "全部" ], [ "1", "编号" ], [ "2", "名称" ],
-		[ "3", "库存量" ], [ "4", "价格" ], [ "5", "预警阀值" ], [ "6", "危险阀值" ] ];
+		[ "3", "种类" ], [ "4", "库存量" ], [ "5", "价格" ], [ "6", "预警阀值" ],
+		[ "7", "危险阀值" ] ];
 var filterTypeComb = new Ext.form.ComboBox({
 	fieldLabel : "过滤",
 	forceSelection : true,
@@ -1742,17 +1743,38 @@ var filterTypeComb = new Ext.form.ComboBox({
 				width : 120
 			});
 
+			var materialCateComb = new Ext.form.ComboBox({
+				fieldLabel : "种类",
+				forceSelection : true,
+				width : 120,
+				value : materialCateComboData[0][0],
+				id : "materialCateComb",
+				store : new Ext.data.SimpleStore({
+					fields : [ "value", "text" ],
+					data : materialCateComboData
+				}),
+				valueField : "value",
+				displayField : "text",
+				typeAhead : true,
+				mode : "local",
+				triggerAction : "all",
+				selectOnFocus : true,
+				allowBlank : false
+			});
+
 			// ------------------remove field-------------------
 			if (conditionType == "text") {
 				searchForm.remove("conditionText");
 			} else if (conditionType == "number") {
 				searchForm.remove("conditionNumber");
+			} else if (conditionType == "materialCateComb") {
+				searchForm.remove("materialCateComb");
 			}
 
 			// ------------------ add field -------------------
 			operatorComb.setDisabled(false);
-			// [ "0", "全部" ], [ "1", "编号" ], [ "2", "名称" ],
-			// [ "3", "库存量" ], [ "4", "价格" ], [ "5", "预警阀值" ], [ "6", "危险阀值" ]
+			// [ "0", "全部" ], [ "1", "编号" ], [ "2", "名称" ], [ "3", "种类" ],
+			// [ "4", "库存量" ], [ "5", "价格" ], [ "6", "预警阀值" ], [ "7", "危险阀值" ]
 			if (index == 0) {
 				// 全部
 				// searchForm.add(conditionText);
@@ -1770,18 +1792,24 @@ var filterTypeComb = new Ext.form.ComboBox({
 				operatorComb.setDisabled(true);
 				conditionType = "text";
 			} else if (index == 3) {
+				// 种类
+				searchForm.add(materialCateComb);
+				operatorComb.setValue("等于");
+				operatorComb.setDisabled(true);
+				conditionType = "materialCateComb";
+			} else if (index == 4) {
 				// 库存量
 				searchForm.add(conditionNumber);
 				conditionType = "number";
-			} else if (index == 4) {
+			} else if (index == 5) {
 				// 价格
 				searchForm.add(conditionNumber);
 				conditionType = "number";
-			} else if (index == 5) {
+			} else if (index == 6) {
 				// 预警阀值
 				searchForm.add(conditionNumber);
 				conditionType = "number";
-			} else if (index == 6) {
+			} else if (index == 7) {
 				// 危险阀值
 				searchForm.add(conditionNumber);
 				conditionType = "number";
@@ -2289,7 +2317,8 @@ Ext
 					});
 
 			// 为store配置beforeload监听器
-			materialGrid.getStore()
+			materialGrid
+					.getStore()
 					.on(
 							'beforeload',
 							function() {
@@ -2319,6 +2348,9 @@ Ext
 											.isValid()) {
 										return false;
 									}
+								} else if (conditionType == "materialCateComb") {
+									queryValue = searchForm.findById(
+											"materialCateComb").getValue();
 								}
 
 								var isWarning = materialQueryCondPanel
@@ -2458,7 +2490,7 @@ Ext
 					}, inventoryAnalysisBut, {
 						text : "&nbsp;&nbsp;&nbsp;",
 						disabled : true
-					},  materialAddBut, {
+					}, materialAddBut, {
 						text : "&nbsp;&nbsp;&nbsp;",
 						disabled : true
 					}, "->", pushBackBut, {
