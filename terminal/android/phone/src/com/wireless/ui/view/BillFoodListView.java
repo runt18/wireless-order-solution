@@ -1,5 +1,6 @@
 package com.wireless.ui.view;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import android.content.Context;
@@ -12,6 +13,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.Util;
 import com.wireless.ui.R;
 
 public class BillFoodListView extends ListView {
@@ -59,15 +61,16 @@ public class BillFoodListView extends ListView {
 		public View getView(int position, View convertView, ViewGroup parent) {
 			View view;
 			if(convertView == null){
-				view =LayoutInflater.from(getContext()).inflate(R.layout.billitem,null);
+				view =LayoutInflater.from(getContext()).inflate(R.layout.billitem, null);
 			}else{
 				view = convertView;
 			}
 			
-			((TextView)view.findViewById(R.id.foodname)).setText(_foods.get(position).name);
-			((TextView)view.findViewById(R.id.accountvalue)).setText(Float.toString(_foods.get(position).getCount()));
-			((TextView)view.findViewById(R.id.pricevalue)).setText(Float.toString(_foods.get(position).calcPriceWithTaste()));
-			((TextView)view.findViewById(R.id.taste)).setText(_foods.get(position).getTastePref());
+			((TextView)view.findViewById(R.id.foodName)).setText(_foods.get(position).toString());
+			((TextView)view.findViewById(R.id.accountValue)).setText(Float.toString(_foods.get(position).getCount()));
+			((TextView)view.findViewById(R.id.priceValue)).setText(Util.CURRENCY_SIGN + Float.toString(_foods.get(position).calcPriceWithTaste()));
+			((TextView)view.findViewById(R.id.operatorValue)).setText(_foods.get(position).waiter);
+			((TextView)view.findViewById(R.id.orderDate)).setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(_foods.get(position).orderDate));
 			
 			return view;
 		}

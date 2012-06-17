@@ -1,251 +1,227 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  android:background="@drawable/bgcolor"
-  android:layout_width="fill_parent"
-  android:layout_height="fill_parent">
-  <RelativeLayout 
-android:id="@+id/top"
-android:layout_width="fill_parent"
-android:layout_height="wrap_content"
-android:background="@drawable/bg01"
->
-<ImageView
-android:id="@+id/billback"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:src="@drawable/back_selector"
-android:layout_marginLeft="20dip"
-android:layout_centerVertical="true"
- >
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/bgcolor" >
 
-</ImageView>
-<TextView 
-android:id="@+id/billtitle"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:textColor="#FFFFFF"
-android:textSize="22sp"
-android:textStyle="bold"
-android:typeface="monospace"
-android:shadowDx="1"
-android:shadowDy="1"
-android:shadowRadius="3.0"
-android:text="结账"
-android:layout_centerVertical="true"
-android:layout_centerHorizontal="true"
->
-</TextView>
+    <RelativeLayout
+        android:id="@+id/top"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg01" >
 
-</RelativeLayout>
-  <RelativeLayout 
-  android:id="@+id/restitle"
-  android:layout_width="fill_parent"
-  android:layout_height="wrap_content"
-  android:layout_below="@id/top"
-  android:background="@drawable/bg02"
-  >
-  <TextView
-  android:id="@+id/platform"
-  android:layout_width="wrap_content"
-  android:layout_height="wrap_content"
-  android:textSize="20sp"
-  android:textColor="#000000"
-  android:layout_centerVertical="true"
-  android:layout_marginLeft="10dip"
-  android:text="台号:"
-  ></TextView>
-  
-  <TextView
-  android:focusable="true"
-  android:focusableInTouchMode="true"
-  android:id="@+id/valueplatform"
-  android:layout_width="90dip"
-  android:layout_height="wrap_content"
-  android:textSize="20sp"
-  android:textColor="#000000"
-  android:layout_centerVertical="true"
-  android:layout_toRightOf="@id/platform"
-  android:layout_marginLeft="5dip"
-  android:background = "#00000000"
-  android:inputType="numberSigned|text"  
-  ></TextView>
-  
-  
-  
-     <TextView 
-  android:id="@+id/people"
-  android:layout_width="wrap_content"
-  android:layout_height="wrap_content"
-  android:textSize="20sp"
-  android:textColor="#000000"
-  android:layout_centerVertical="true"
-  android:layout_toRightOf="@id/platform"
-  android:layout_marginLeft="110dip"
-  android:text="人数:"
-  ></TextView>
-  
-  <TextView
-  android:focusable="true"
-  android:focusableInTouchMode="true"
-  android:id="@+id/valuepeople"
-  android:layout_width="100dip"
-  android:layout_height="wrap_content"
-  android:textSize="20sp"
-  android:textColor="#000000"
-  android:layout_centerVertical="true"
-  android:layout_toRightOf="@id/people"
-  android:layout_marginLeft="3dip"
-  android:background = "#00000000"
-  android:inputType="numberSigned|text"  
-  ></TextView>
-  
- 
-  </RelativeLayout>
-    
-   <RelativeLayout 
-  android:id="@+id/t_line"
-  android:layout_width="fill_parent"
-  android:layout_height="wrap_content"
-  android:background="@drawable/bg04"
-  android:layout_below="@id/restitle"
-   >
- <ImageView 
- android:id="@+id/up"
- android:layout_width="wrap_content"
- android:layout_height="wrap_content"
- android:layout_centerVertical="true"
- android:layout_marginLeft="10dip"
- android:src="@drawable/point"
- />
-<TextView 
- android:id="@+id/ordermenu"
-  android:layout_width="wrap_content"
-  android:layout_height="wrap_content"
-  android:textSize="20sp"
-  android:textColor="#000000"
-  android:layout_centerVertical="true"
-  android:layout_toRightOf="@id/up"
-  android:layout_marginLeft="15dip"
-  android:text="已点菜"
-/>
-  </RelativeLayout> 
-  
-  
-  <RelativeLayout 
-android:id="@+id/bottom"
-android:layout_width="fill_parent"
-android:layout_height="wrap_content"
-android:layout_alignParentBottom="true"
-android:background="@drawable/bg03"
->
-<ImageView 
-android:id="@+id/normal"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:src="@drawable/normal_selector"
-android:layout_alignParentLeft="true"
-android:layout_marginLeft="50dip"
-android:layout_centerVertical="true"
-/>
+        <ImageView
+            android:id="@+id/billback"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20dip"
+            android:src="@drawable/back_selector" >
+        </ImageView>
 
-<ImageView 
-android:id="@+id/allowance"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:src="@drawable/rebate_selector"
-android:layout_alignParentRight="true"
-android:layout_marginRight="50dip"
-android:layout_centerVertical="true"
-/>
-</RelativeLayout>   
-  
-  
-  
-  <RelativeLayout 
-  android:id="@+id/mybill"
-  android:layout_width="fill_parent"
-  android:layout_height="wrap_content"
-  android:layout_above="@id/bottom"
-  android:background="@drawable/bg02"
-  >
-  <TextView
-  android:id="@+id/handsel"
-  android:layout_width="wrap_content"
-  android:layout_height="wrap_content"
-  android:textSize="20sp"
-  android:textColor="#000000"
-  android:layout_centerVertical="true"
-  android:layout_marginLeft="10dip"
-  android:text="赠送:"
-  ></TextView>
-  
-  <TextView
-  android:id="@+id/valuehandsel"
-  android:layout_width="90dip"
-  android:layout_height="wrap_content"
-  android:textSize="20sp"
-  android:textColor="#000000"
-  android:layout_centerVertical="true"
-  android:layout_toRightOf="@id/handsel"
-  android:layout_marginLeft="5dip"
-  android:background = "#00000000"
-  android:inputType="numberSigned|text"  
-  ></TextView>
-  
-  
-  
-     <TextView 
-  android:id="@+id/confirmed"
-  android:layout_width="wrap_content"
-  android:layout_height="wrap_content"
-  android:textSize="20sp"
-  android:textColor="#000000"
-  android:layout_centerVertical="true"
-  android:layout_toRightOf="@id/handsel"
-  android:layout_marginLeft="110dip"
-  android:text="应收:"
-  ></TextView>
-  
-  <TextView
-  android:id="@+id/valueconfirmed"
-  android:layout_width="100dip"
-  android:layout_height="wrap_content"
-  android:textSize="20sp"
-  android:textColor="#000000"
-  android:layout_centerVertical="true"
-  android:layout_toRightOf="@id/confirmed"
-  android:layout_marginLeft="3dip"
-  android:background = "#00000000"
-  android:inputType="numberSigned|text"  
-  ></TextView>
-  
- 
-  </RelativeLayout>
-  
-  
-  
-  
- <ImageView 
-  android:id="@+id/myline"
-  android:layout_width="fill_parent"
-  android:layout_height="wrap_content"
-  android:src="@drawable/line" 
-  android:layout_above="@id/mybill"
- /> 
-  
+        <TextView
+            android:id="@+id/billtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="3.0"
+            android:text="结账"
+            android:textColor="#FFFFFF"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:typeface="monospace" >
+        </TextView>
+    </RelativeLayout>
 
+    <RelativeLayout
+        android:id="@+id/restitle"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/top"
+        android:background="@drawable/bg02" >
 
- <com.wireless.ui.view.BillFoodListView
-   android:id="@+id/billListView"  
-   android:layout_width="fill_parent" 
-   android:layout_height="wrap_content"
-   android:layout_below="@id/t_line"
-   android:layout_above="@id/myline"
-   android:divider="@drawable/line"
-   android:cacheColorHint="#00000000">
-   </com.wireless.ui.view.BillFoodListView> 
+        <TextView
+            android:id="@+id/platform"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dip"
+            android:text="台号:"
+            android:textColor="#000000"
+            android:textSize="20sp" >
+        </TextView>
+
+        <TextView
+            android:id="@+id/valueplatform"
+            android:layout_width="90dip"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dip"
+            android:layout_toRightOf="@id/platform"
+            android:background="#00000000"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:inputType="numberSigned|text"
+            android:textColor="#000000"
+            android:textSize="20sp" >
+        </TextView>
+
+        <TextView
+            android:id="@+id/people"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="110dip"
+            android:layout_toRightOf="@id/platform"
+            android:text="人数:"
+            android:textColor="#000000"
+            android:textSize="20sp" >
+        </TextView>
+
+        <TextView
+            android:id="@+id/valuepeople"
+            android:layout_width="100dip"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="3dip"
+            android:layout_toRightOf="@id/people"
+            android:background="#00000000"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:inputType="numberSigned|text"
+            android:textColor="#000000"
+            android:textSize="20sp" >
+        </TextView>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/t_line"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/restitle"
+        android:background="@drawable/bg04" >
+
+        <ImageView
+            android:id="@+id/up"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dip"
+            android:src="@drawable/point" />
+
+        <TextView
+            android:id="@+id/ordermenu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="15dip"
+            android:layout_toRightOf="@id/up"
+            android:text="已点菜"
+            android:textColor="#000000"
+            android:textSize="20sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/bottom"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/bg03" >
+
+        <ImageView
+            android:id="@+id/normal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="50dip"
+            android:src="@drawable/normal_selector" />
+
+        <ImageView
+            android:id="@+id/allowance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="50dip"
+            android:src="@drawable/rebate_selector" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/mybill"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/bottom"
+        android:background="@drawable/bg02" >
+
+        <TextView
+            android:id="@+id/handsel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dip"
+            android:text="赠送:"
+            android:textColor="#000000"
+            android:textSize="20sp" >
+        </TextView>
+
+        <TextView
+            android:id="@+id/valuehandsel"
+            android:layout_width="90dip"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dip"
+            android:layout_toRightOf="@id/handsel"
+            android:background="#00000000"
+            android:inputType="numberSigned|text"
+            android:textColor="#000000"
+            android:textSize="20sp" >
+        </TextView>
+
+        <TextView
+            android:id="@+id/confirmed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="110dip"
+            android:layout_toRightOf="@id/handsel"
+            android:text="应收:"
+            android:textColor="#000000"
+            android:textSize="20sp" >
+        </TextView>
+
+        <TextView
+            android:id="@+id/valueconfirmed"
+            android:layout_width="100dip"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="3dip"
+            android:layout_toRightOf="@id/confirmed"
+            android:background="#00000000"
+            android:inputType="numberSigned|text"
+            android:textColor="#000000"
+            android:textSize="20sp" >
+        </TextView>
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/myline"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/mybill"
+        android:src="@drawable/line" />
+
+    <com.wireless.ui.view.BillFoodListView
+        android:id="@+id/billListView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/myline"
+        android:layout_below="@id/t_line"
+        android:cacheColorHint="#00000000"
+        android:divider="@drawable/line" >
+    </com.wireless.ui.view.BillFoodListView>
 
 </RelativeLayout>
-
-

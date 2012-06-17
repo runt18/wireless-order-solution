@@ -4,148 +4,126 @@
     android:layout_height="fill_parent"
     android:background="#FFFFFF"
     android:orientation="vertical" >
-    
 
-  <RelativeLayout 
-      android:id="@+id/r1"
-      android:layout_width="fill_parent"
-      android:layout_height="wrap_content"
-      android:minHeight="40dip"
-      >
-      <ImageView 
-          android:id="@+id/imagemanner"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:src="@android:drawable/ic_menu_agenda"
-          android:layout_marginLeft="5dip"
-          android:layout_centerVertical="true"
-          />
-      <TextView 
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:text="付款方式"
-          android:textColor="#000000"
-          android:textSize="18sp"
-          android:layout_centerVertical="true"
-          android:layout_toRightOf="@id/imagemanner"
-          android:layout_marginLeft="10dip"
-          />
-      
-      </RelativeLayout>
-      
-      <ImageView 
-          android:layout_width="fill_parent"
-          android:layout_height="wrap_content"
-          android:src="@drawable/line"
-          />
-      
-      
-      <RadioGroup 
-            android:id="@+id/radioGroup1" 
-            android:layout_width="wrap_content" 
-            android:layout_height="wrap_content" 
-            android:orientation="vertical" 
-            > 
-            <RadioButton 
-                android:id="@+id/cash" 
-                android:layout_width="wrap_content" 
-                android:layout_height="wrap_content" 
-                android:text="现金" 
-                android:textColor="#000000"
-                android:checked="true"
-                android:textSize="18sp"
-               /> 
-            <RadioButton 
-                android:id="@+id/card" 
-                android:layout_width="wrap_content" 
-                android:layout_height="wrap_content" 
-                android:text="刷卡" 
-                android:textColor="#000000"
-                android:textSize="18sp"
-               /> 
-   
-      
-      
-        </RadioGroup> 
-  
-  
-        
-              <ImageView 
-          android:layout_width="fill_parent"
-          android:layout_height="wrap_content"
-          android:src="@drawable/line"
-          />
-              
-              
-              
-  <RelativeLayout 
-      android:id="@+id/r2"
-      android:layout_width="fill_parent"
-      android:layout_height="wrap_content"
-      android:minHeight="40dip"
-      >
-      <ImageView 
-          android:id="@+id/imagediscount"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:src="@android:drawable/ic_menu_crop"
-          android:layout_marginLeft="5dip"
-          android:layout_centerVertical="true"
-          />
-      <TextView 
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:text="折扣方式"
-          android:textColor="#000000"
-          android:textSize="18sp"
-          android:layout_centerVertical="true"
-          android:layout_toRightOf="@id/imagediscount"
-          android:layout_marginLeft="10dip"
-          />
-      
-      
-      </RelativeLayout>
-      
-     <ImageView 
-          android:layout_width="fill_parent"
-          android:layout_height="wrap_content"
-          android:src="@drawable/line"
-          />
-  
-   <RadioGroup 
-            android:id="@+id/radioGroup2" 
-            android:layout_width="wrap_content" 
-            android:layout_height="wrap_content" 
-            android:orientation="vertical" 
-            > 
-            <RadioButton 
-                android:id="@+id/discount1" 
-                android:layout_width="wrap_content" 
-                android:layout_height="wrap_content" 
-                android:text="折扣1" 
-                android:textColor="#000000"
-                android:checked="true"
-                android:textSize="18sp"
-               /> 
-            <RadioButton 
-                android:id="@+id/discount2" 
-                android:layout_width="wrap_content" 
-                android:layout_height="wrap_content" 
-                android:text="折扣2" 
-                android:textColor="#000000"
-                android:textSize="18sp"
-               /> 
-   
-       <RadioButton 
-                android:id="@+id/discount3" 
-                android:layout_width="wrap_content" 
-                android:layout_height="wrap_content" 
-                android:text="折扣3" 
-                android:textColor="#000000"
-                android:textSize="18sp"
-               /> 
-      
-        </RadioGroup> 
-  
-    
+    <RelativeLayout
+        android:id="@+id/r1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="40dip" >
+
+        <ImageView
+            android:id="@+id/imagemanner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dip"
+            android:src="@android:drawable/ic_menu_agenda" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dip"
+            android:layout_toRightOf="@id/imagemanner"
+            android:text="付款方式"
+            android:textColor="#000000"
+            android:textSize="18sp" />
+    </RelativeLayout>
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/line" />
+
+    <RadioGroup
+        android:id="@+id/radioGroup1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <RadioButton
+            android:id="@+id/cash"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="现金"
+            android:textColor="#000000"
+            android:textSize="18sp" />
+
+        <RadioButton
+            android:id="@+id/card"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="刷卡"
+            android:textColor="#000000"
+            android:textSize="18sp" />
+    </RadioGroup>
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/line" />
+
+    <RelativeLayout
+        android:id="@+id/r2"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="40dip" >
+
+        <ImageView
+            android:id="@+id/imagediscount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dip"
+            android:src="@android:drawable/ic_menu_crop" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dip"
+            android:layout_toRightOf="@id/imagediscount"
+            android:text="折扣方式"
+            android:textColor="#000000"
+            android:textSize="18sp" />
+    </RelativeLayout>
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/line" />
+
+    <RadioGroup
+        android:id="@+id/radioGroup2"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <RadioButton
+            android:id="@+id/discount1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="折扣1"
+            android:textColor="#000000"
+            android:textSize="18sp" />
+
+        <RadioButton
+            android:id="@+id/discount2"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="折扣2"
+            android:textColor="#000000"
+            android:textSize="18sp" />
+
+        <RadioButton
+            android:id="@+id/discount3"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="折扣3"
+            android:textColor="#000000"
+            android:textSize="18sp" />
+    </RadioGroup>
+
 </LinearLayout>

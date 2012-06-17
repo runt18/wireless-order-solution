@@ -343,20 +343,14 @@ public class OrderFoodListView extends ExpandableListView{
 					}
 				});
 
-				//"口味"操作
+				//"数量"操作
 				ImageView addTasteImgView = (ImageView)view.findViewById(R.id.addtaste);
-				addTasteImgView.setBackgroundResource(R.drawable.taste_selector);
+				addTasteImgView.setBackgroundResource(R.drawable.amount_selector);
 				addTasteImgView.setOnClickListener(new View.OnClickListener() {				
 					@Override
 					public void onClick(View v) {
 						_selectedPos = childPosition;
-						if(_operListener != null){
-							if(_foods.get(childPosition).isTemporary){
-								Toast.makeText(_context, "临时菜不能添加口味", 0).show();
-							}else{
-								_operListener.onPickTaste(_foods.get(childPosition));								
-							}
-						}
+						new AskOrderAmountDialog(_foods.get(childPosition)).show();
 					}
 				});
 				

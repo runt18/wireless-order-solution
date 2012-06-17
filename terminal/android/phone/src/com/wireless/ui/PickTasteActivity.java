@@ -319,16 +319,19 @@ public class PickTasteActivity extends Activity{
 	
 	//设置品注View
 	public View setupPinZhuView(){
-		View pinzhuView = LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.pinzhu, null);
+		View pinZhuView = LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.pinzhu, null);
+		
+		final EditText pinZhuEdtTxt = ((EditText)pinZhuView.findViewById(R.id.pinZhuEdtTxt));
+		final EditText priceEdtTxt = ((EditText)pinZhuView.findViewById(R.id.priceEdtTxt));
+		pinZhuEdtTxt.requestFocus();
 		
 		if(_selectedFood.tmpTaste != null){
-			((EditText)pinzhuView.findViewById(R.id.pinZhuEdtTxt)).setText(_selectedFood.tmpTaste.preference);
-			((EditText)pinzhuView.findViewById(R.id.priceEdtTxt)).setText(_selectedFood.tmpTaste.getPrice().toString());
+			pinZhuEdtTxt.setText(_selectedFood.tmpTaste.preference);
+			priceEdtTxt.setText(_selectedFood.tmpTaste.getPrice().toString());
 		}
 		
-		pinzhuView.setTag(TAG_PINZHU);  
 		//品注的EditText的处理函数
-		((EditText)pinzhuView.findViewById(R.id.pinZhuEdtTxt)).addTextChangedListener(new TextWatcher(){
+		pinZhuEdtTxt.addTextChangedListener(new TextWatcher(){
 
 			@Override
 			public void afterTextChanged(Editable s) {
@@ -356,7 +359,6 @@ public class PickTasteActivity extends Activity{
 		});
 		
 		//价格EditText的处理函数
-		final EditText priceEdtTxt = ((EditText)pinzhuView.findViewById(R.id.priceEdtTxt));
 		priceEdtTxt.addTextChangedListener(new TextWatcher(){
 
 			@Override
@@ -397,7 +399,9 @@ public class PickTasteActivity extends Activity{
 			
 		});
 		
-		return pinzhuView;
+		pinZhuView.setTag(TAG_PINZHU);  
+		
+		return pinZhuView;
 
 	}
 	
