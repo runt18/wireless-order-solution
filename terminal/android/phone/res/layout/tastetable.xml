@@ -157,7 +157,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_margin="0dip"
-                android:src="@drawable/ic_tab_albums" />
+                android:src="@drawable/pinzhu_selector" />
 
             <TextView
                 android:layout_width="fill_parent"
