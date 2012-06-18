@@ -662,9 +662,7 @@ public class MainActivity extends Activity {
 							if (_highLightedTblPos != -1) {
 								final int pos = _highLightedTblPos;
 								// 自动跳转到高亮餐台所在那一屏
-								_tblScrolledArea
-										.snapToScreen(_highLightedTblPos
-												/ TABLE_AMOUNT_PER_PAGE);
+								_tblScrolledArea.setToScreen(_highLightedTblPos / TABLE_AMOUNT_PER_PAGE);
 								// 高亮显示与餐台号一致的餐台
 								_tblScrolledArea.post(new Runnable() {
 									@Override

@@ -205,7 +205,7 @@ public class OrderActivity extends ActivityGroup implements
 		((EditText) findViewById(R.id.tblNoEdtTxt)).setText(Integer
 				.toString(table.aliasID));
 		// 人数进行赋值
-		((EditText) findViewById(R.id.customerNumEdtTxt)).setText("1人");
+		((EditText) findViewById(R.id.customerNumEdtTxt)).setText("1");
 
 		_newFoodLstView.setType(Type.INSERT_ORDER);
 		_newFoodLstView.setOperListener(this);
@@ -272,8 +272,7 @@ public class OrderActivity extends ActivityGroup implements
 	private void switchToTasteView(FoodParcel foodParcel) {
 		Bundle bundle = new Bundle();
 		bundle.putParcelable(FoodParcel.KEY_VALUE, foodParcel);
-		Intent intentToTaste = new Intent(OrderActivity.this,
-				PickTasteActivity.class);
+		Intent intentToTaste = new Intent(OrderActivity.this, PickTasteActivity.class);
 		intentToTaste.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		intentToTaste.putExtras(bundle);
 		rightSwitchTo(intentToTaste, PickTasteActivity.class);

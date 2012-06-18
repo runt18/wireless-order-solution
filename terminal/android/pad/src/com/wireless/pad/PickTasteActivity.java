@@ -48,7 +48,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 	private Handler _handler = new Handler(){
 		@Override
 		public void handleMessage(Message message){
-			_tasteTxtView.setText(_selectedFood.name + "-" + _selectedFood.getTastePref());
+			_tasteTxtView.setText(_selectedFood.toString());
 		}
 	};
 	
@@ -71,7 +71,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 		// construct the tab host
 		setContentView(R.layout.tastetable);		
 		
-		FoodParcel foodParcel = (FoodParcel)getIntent().getParcelableExtra(FoodParcel.KEY_VALUE);
+		FoodParcel foodParcel = getIntent().getParcelableExtra(FoodParcel.KEY_VALUE);
 		_selectedFood = foodParcel;
 		//_selectedFood.tastes[0] = new Taste();
 		

@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
@@ -410,90 +411,87 @@ public class OrderFoodListView extends ExpandableListView {
 			 * "新点菜"的ListView显示"删菜"和"口味" "已点菜"的ListView显示"退菜"和"催菜"
 			 */
 			if (_type == Type.INSERT_ORDER) {
-				// "删菜"操作
 
-				// 新点菜中叫的操作
-				((ImageView) view.findViewById(R.id.jiao))
-						.setOnClickListener(new View.OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								OrderFood food = _foods.get(childPosition);
-								if (food.hangStatus == OrderFood.FOOD_NORMAL) {
-									food.hangStatus = OrderFood.FOOD_HANG_UP;
-								}
-								_adapter.notifyDataSetChanged();
-							}
-						});
-
-				// 新点菜
+				// 新点菜中"+"操作
 				((ImageView) view.findViewById(R.id.add2))
 						.setOnClickListener(new View.OnClickListener() {
 
 							@Override
 							public void onClick(View v) {
-								OrderFood selectedFood = _foods
-										.get(childPosition);
-								selectedFood.setCount(selectedFood.getCount() + 1.0f);
-								final TextView counttxt = (TextView) findViewById(R.id.accountvalue);
-								counttxt.setText((Util
-										.float2String2(selectedFood.getCount())));
+								OrderFood selectedFood = _foods.get(childPosition);
+								float amount = selectedFood.getCount() + 1;
+								if(amount <= 255){
+									selectedFood.setCount(selectedFood.getCount() + 1);
+								}else{
+									Toast.makeText(getContext(), selectedFood.name + "只能最多只能点255份", 0).show();
+								}
+								_adapter.notifyDataSetChanged();
 							}
 						});
-				ImageView delFoodImgView = (ImageView) view
-						.findViewById(R.id.deletefood);
-				delFoodImgView
-						.setBackgroundResource(R.drawable.delete_selector);
+				
+				//新点菜中"-"操作
+				((ImageView) view.findViewById(R.id.jian2)).setOnClickListener(new View.OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						OrderFood selectedFood = _foods.get(childPosition);
+						if (selectedFood.getCount() > 1) {
+							selectedFood.setCount(selectedFood.getCount() - 1);
+							_adapter.notifyDataSetChanged();
+						}else{
+							Toast.makeText(getContext(), selectedFood.name + "点菜数量不能小于1", 0).show();
+						}
+					}
+				});
+				
+				// 新点菜中"叫"的操作
+				((ImageView) view.findViewById(R.id.jiao)).setOnClickListener(new View.OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						OrderFood food = _foods.get(childPosition);
+						if (food.hangStatus == OrderFood.FOOD_NORMAL) {
+							food.hangStatus = OrderFood.FOOD_HANG_UP;
+							Toast.makeText(getContext(), "叫起" + food.name, 0).show();
+									
+						}else if(food.hangStatus == OrderFood.FOOD_HANG_UP){
+							food.hangStatus = OrderFood.FOOD_NORMAL;
+							Toast.makeText(getContext(), "取消叫起" + food.name, 0).show();
+						}
+						_adapter.notifyDataSetChanged();
+					}
+				});
+				
+				//新点菜中的"删除"操作
+				ImageView delFoodImgView = (ImageView) view.findViewById(R.id.deletefood);
+				delFoodImgView.setBackgroundResource(R.drawable.delete_selector);
 				delFoodImgView.setOnClickListener(new View.OnClickListener() {
-					/**
-					 * "新点菜"时直接显示删菜数量Dialog
-					 */
 					@Override
 					public void onClick(View v) {
 
-						OrderFood selectedFood = _foods.get(childPosition);
+						final OrderFood selectedFood = _foods.get(childPosition);
 
-						/**
-						 * 如果数量相等，则从列表中删除此菜
-						 */
-						_foods.remove(selectedFood);
-						_adapter.notifyDataSetChanged();
+						new AlertDialog.Builder(getContext())
+							.setTitle("提示")
+							.setMessage("是否确定取消" + selectedFood.name + "?")
+							.setNeutralButton("确定",
+								new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog,	int which){
+										_foods.remove(selectedFood);
+										Toast.makeText(getContext(), "取消" + food.name, 0).show();
+										_adapter.notifyDataSetChanged();
+									}
+								})
+							.setNegativeButton("取消", null)
+							.show();
 
 					}
 				});
-				((ImageView) view.findViewById(R.id.jian2))
-						.setOnClickListener(new View.OnClickListener() {
 
-							@Override
-							public void onClick(View v) {
-								OrderFood selectedFood = _foods
-										.get(childPosition);
-								if (selectedFood.getCount() == 1.0f) {
-
-									OrderFood selectedFood2 = _foods
-											.get(childPosition);
-									/**
-									 * 如果数量相等，则从列表中删除此菜
-									 */
-									_foods.remove(selectedFood2);
-									_adapter.notifyDataSetChanged();
-									return;
-								}
-								selectedFood.setCount(selectedFood.getCount() - 1.0f);
-
-								final TextView counttxt = (TextView) findViewById(R.id.accountvalue);
-								counttxt.setText((Util
-										.float2String2(selectedFood.getCount())));
-							}
-						});
-
-				// view.findViewById(R.id.jiao).setVisibility(View.GONE);
-
-				// "口味"操作
-				ImageView addTasteImgView = (ImageView) view
-						.findViewById(R.id.addtaste);
-				addTasteImgView
-						.setBackgroundResource(R.drawable.taste_selector);
+				// 新点菜中的"口味"操作
+				ImageView addTasteImgView = (ImageView) view.findViewById(R.id.addtaste);
+				addTasteImgView.setBackgroundResource(R.drawable.taste_selector);
 				addTasteImgView.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
@@ -502,8 +500,7 @@ public class OrderFoodListView extends ExpandableListView {
 							if (_foods.get(childPosition).isTemporary) {
 								Toast.makeText(_context, "临时菜不能添加口味", 0).show();
 							} else {
-								_operListener.onPickTaste(_foods
-										.get(childPosition));
+								_operListener.onPickTaste(_foods.get(childPosition));
 							}
 						}
 					}
@@ -522,10 +519,10 @@ public class OrderFoodListView extends ExpandableListView {
 						.setOnClickListener(new View.OnClickListener() {
 							@Override
 							public void onClick(View v) {
-									OrderFood food = _foods.get(childPosition);
-									if (food.hangStatus == OrderFood.FOOD_HANG_UP) {
-										food.hangStatus = OrderFood.FOOD_IMMEDIATE;
-									}
+								OrderFood food = _foods.get(childPosition);
+								if (food.hangStatus == OrderFood.FOOD_HANG_UP) {
+									food.hangStatus = OrderFood.FOOD_IMMEDIATE;
+								}
 								_adapter.notifyDataSetChanged();
 							}
 						});
@@ -568,13 +565,12 @@ public class OrderFoodListView extends ExpandableListView {
 						if (food.isHurried) {
 							food.isHurried = false;
 							Toast.makeText(_context, "取消催菜成功", 0).show();
-							_adapter.notifyDataSetChanged();
 
 						} else {
 							food.isHurried = true;
 							Toast.makeText(_context, "催菜成功", 0).show();
-							_adapter.notifyDataSetChanged();
 						}
+						_adapter.notifyDataSetChanged();
 					}
 				});
 			}
