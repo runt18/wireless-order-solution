@@ -73,7 +73,10 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 		
 		FoodParcel foodParcel = getIntent().getParcelableExtra(FoodParcel.KEY_VALUE);
 		_selectedFood = foodParcel;
-		//_selectedFood.tastes[0] = new Taste();
+		// FIXME 
+		if(_selectedFood.tmpTaste != null && _selectedFood.tmpTaste.aliasID == Integer.MIN_VALUE){
+			_selectedFood.tmpTaste = null;
+		}
 		
 		_tabHost = getTabHost();
 		
@@ -123,18 +126,18 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 			@Override
 			public void onTabChanged(String tag) {
 				if(tag == TAG_TASTE){
-					setTasteView();		
+					setupTasteView();		
 				}else if(tag == TAG_STYLE){
-					setStyleView();
+					setupStyleView();
 				}else if(tag == TAG_SPEC){
-					setSpecView();
+					setupSpecView();
 				}
 				_handler.sendEmptyMessage(0);
 			}
 		});
 		
 		_tabHost.setCurrentTabByTag(TAG_TASTE);
-		setTasteView();
+		setupTasteView();
 		_handler.sendEmptyMessage(0);	
 		
 	}	
@@ -169,7 +172,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 		}
 	}
 	    //设置口味View
-	public void setTasteView(){
+	public void setupTasteView(){
 		
 		//删除所有口味Button
 		((Button)findViewById(R.id.cancelTasteBtn)).setOnClickListener(new View.OnClickListener() {
@@ -215,7 +218,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 				ArrayList<Taste> tastes = new ArrayList<Taste>();
 				if(s.toString().length() != 0){
 				    for(int i = 0; i < WirelessOrder.foodMenu.tastes.length;i++){
-				    	 if(String.valueOf(WirelessOrder.foodMenu.tastes[i].aliasID).startsWith(s.toString().trim())){
+				    	 if(WirelessOrder.foodMenu.tastes[i].preference.contains(s.toString().trim())){
 				    		 tastes.add(WirelessOrder.foodMenu.tastes[i]);
 				    	 }
 				    }
@@ -239,7 +242,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 	
 	
 	//设置做法View
-	public void setStyleView(){
+	public void setupStyleView(){
 		_tasteTxtView = (TextView)findViewById(R.id.foodStyleTxtView);
     	final GridView styleLstView = (GridView)findViewById(R.id.styleLstView);
     	styleLstView.setNumColumns(4);
@@ -282,7 +285,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 				ArrayList<Taste> styles = new ArrayList<Taste>();
 				if(s.toString().length() != 0){
 					 for(int i = 0; i < WirelessOrder.foodMenu.styles.length;i++){
-				    	 if(String.valueOf(WirelessOrder.foodMenu.styles[i].aliasID).startsWith(s.toString().trim())){
+				    	 if(WirelessOrder.foodMenu.styles[i].preference.contains(s.toString().trim())){
 				    		 styles.add(WirelessOrder.foodMenu.styles[i]);
 				    	 }
 				    }
@@ -304,7 +307,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 	}
 	
 	//设置规格View
-	public void setSpecView(){
+	public void setupSpecView(){
 		_tasteTxtView = (TextView)findViewById(R.id.foodSpecTxtView);
 		final GridView specLstView = (GridView)findViewById(R.id.specLstView);
 		specLstView.setNumColumns(4);
@@ -346,7 +349,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 				ArrayList<Taste> specs = new ArrayList<Taste>();
 				if(s.toString().length() != 0){
 					 for(int i = 0; i < WirelessOrder.foodMenu.specs.length;i++){
-				    	 if(String.valueOf(WirelessOrder.foodMenu.specs[i].aliasID).startsWith(s.toString().trim())){
+				    	 if(WirelessOrder.foodMenu.specs[i].preference.contains(s.toString().trim())){
 				    		 specs.add(WirelessOrder.foodMenu.specs[i]);
 				    	 }
 				    }

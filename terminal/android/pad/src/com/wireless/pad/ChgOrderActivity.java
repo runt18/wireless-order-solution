@@ -172,11 +172,15 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 				/**
 				 * 已点菜和新点菜合并后，生成新的Order，执行改单请求
 				 */
-				Order reqOrder = new Order(foods.toArray(new OrderFood[foods.size()]),
-										   Short.parseShort(((EditText)findViewById(R.id.tblNoEdtTxt)).getText().toString()),
-										   Integer.parseInt(((EditText)findViewById(R.id.customerNumEdtTxt)).getText().toString()));
-				reqOrder.oriTbl.aliasID = _oriOrder.table.aliasID;
-				new UpdateOrderTask(reqOrder).execute();
+				if(foods.size() != 0){
+					Order reqOrder = new Order(foods.toArray(new OrderFood[foods.size()]),
+											   Short.parseShort(((EditText)findViewById(R.id.tblNoEdtTxt)).getText().toString()),
+											   Integer.parseInt(((EditText)findViewById(R.id.customerNumEdtTxt)).getText().toString()));
+					reqOrder.oriTbl.aliasID = _oriOrder.table.aliasID;
+					new UpdateOrderTask(reqOrder).execute();
+				}else{
+					Toast.makeText(ChgOrderActivity.this, "您还未点菜，暂时不能下单。", 0).show();
+				}
 			}
 		});
 

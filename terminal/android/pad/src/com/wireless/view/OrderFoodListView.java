@@ -285,46 +285,6 @@ public class OrderFoodListView extends ExpandableListView {
 		}
 	}
 
-	// private void trim(OrderFood food){
-	// /**
-	// * Keep track of the first food and position in the list that matched the
-	// food modified.
-	// * Combine the food if there is the same food exist in the following
-	// position.
-	// */
-	// int pos = -1;
-	// OrderFood firstFood = null;
-	// int firstPos = -1;
-	// int srchPos = 0;
-	// int nCount = 0;
-	// List<OrderFood> tmpFoods = _foods.subList(0, _foods.size());
-	// while((pos = tmpFoods.indexOf(food)) != -1){
-	// nCount++;
-	// if(nCount == 1){
-	// firstFood = tmpFoods.get(pos);
-	// firstPos = pos;
-	// }else{
-	// int count = Util.float2Int(firstFood.getCount()) +
-	// Util.float2Int(tmpFoods.get(pos).getCount());
-	// if((count / 100) > 255){
-	// Toast.makeText(_context, "对不起，\"" + firstFood.toString() + "\"最多只能点255份",
-	// 0).show();
-	// firstFood.setCount(new Float(255));
-	// }else{
-	// firstFood.setCount(Util.int2Float(count));
-	// }
-	// _foods.set(firstPos, firstFood);
-	// _foods.remove(srchPos + pos);
-	// }
-	// srchPos += pos + 1;
-	// if(srchPos >= _foods.size()){
-	// break;
-	// }else{
-	// tmpFoods = _foods.subList(srchPos, _foods.size());
-	// }
-	// }
-	// }
-
 	public class Adapter extends BaseExpandableListAdapter {
 
 		private String _groupTitle;
@@ -462,7 +422,7 @@ public class OrderFoodListView extends ExpandableListView {
 					}
 				});
 				
-				//新点菜中的"删除"操作
+				//新点菜中的"删"操作
 				ImageView delFoodImgView = (ImageView) view.findViewById(R.id.deletefood);
 				delFoodImgView.setBackgroundResource(R.drawable.delete_selector);
 				delFoodImgView.setOnClickListener(new View.OnClickListener() {
@@ -507,26 +467,41 @@ public class OrderFoodListView extends ExpandableListView {
 				});
 
 			} else {
-				// "退菜"操作
-				// 已点菜
+				// 已点菜的"退"操作
 				view.findViewById(R.id.add2).setVisibility(View.GONE);
 				view.findViewById(R.id.jian2).setVisibility(View.GONE);
 
-				((ImageView) view.findViewById(R.id.jiao)).setBackgroundResource(R.drawable.ji_selector);
-				
-				// 已点菜中叫的操作
-				((ImageView) view.findViewById(R.id.jiao))
-						.setOnClickListener(new View.OnClickListener() {
-							@Override
-							public void onClick(View v) {
-								OrderFood food = _foods.get(childPosition);
-								if (food.hangStatus == OrderFood.FOOD_HANG_UP) {
-									food.hangStatus = OrderFood.FOOD_IMMEDIATE;
-								}
-								_adapter.notifyDataSetChanged();
-							}
-						});
+				ImageView immdiateImgView = ((ImageView) view.findViewById(R.id.jiao));
+				if(_foods.get(childPosition).hangStatus == OrderFood.FOOD_HANG_UP){
+					immdiateImgView.setBackgroundResource(R.drawable.ji_selector);
+					// 已点菜中"即"的操作
+					immdiateImgView.setOnClickListener(new View.OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							OrderFood food = _foods.get(childPosition);
+							food.hangStatus = OrderFood.FOOD_IMMEDIATE;
+							Toast.makeText(getContext(), food.name + "即起", 0).show();
+							_adapter.notifyDataSetChanged();
+						}
+					});
+				}else if(_foods.get(childPosition).hangStatus == OrderFood.FOOD_IMMEDIATE){
+					//已点菜中"叫"的操作
+					immdiateImgView.setOnClickListener(new View.OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							OrderFood food = _foods.get(childPosition);
+							food.hangStatus = OrderFood.FOOD_HANG_UP;
+							Toast.makeText(getContext(), food.name + "重新叫起", 0).show();
+							_adapter.notifyDataSetChanged();
+						}
+					});
+					
+				}else{
+					immdiateImgView.setVisibility(View.GONE);
+				}
 
+
+				// 已点菜中"退"的操作
 				ImageView cancelFoodImgView = (ImageView) view
 						.findViewById(R.id.deletefood);
 				cancelFoodImgView
@@ -535,26 +510,24 @@ public class OrderFoodListView extends ExpandableListView {
 						.setOnClickListener(new View.OnClickListener() {
 							@Override
 							public void onClick(View v) {
-								if (WirelessOrder.restaurant.pwd3 != null) {
+								if (WirelessOrder.restaurant.pwd5 != null) {
 									/**
 									 * 提示输入权限密码2，验证通过的情况下显示删菜数量Dialog
 									 */
-									new AskPwdDialog(_context,
-											AskPwdDialog.PWD_5) {
+									new AskPwdDialog(_context, AskPwdDialog.PWD_5) {
 										@Override
 										protected void onPwdPass(Context context) {
 											dismiss();
-											new AskCancelAmountDialog(_foods
-													.get(childPosition)).show();
+											new AskCancelAmountDialog(_foods.get(childPosition)).show();
 										}
 									}.show();
 								} else {
-									new AskCancelAmountDialog(_foods
-											.get(childPosition)).show();
+									new AskCancelAmountDialog(_foods.get(childPosition)).show();
 								}
 							}
 						});
-				// "催菜"操作
+				
+				// 已点菜中"催"的操作
 				ImageView addTasteImgView = (ImageView) view
 						.findViewById(R.id.addtaste);
 				addTasteImgView
@@ -564,11 +537,11 @@ public class OrderFoodListView extends ExpandableListView {
 					public void onClick(View v) {
 						if (food.isHurried) {
 							food.isHurried = false;
-							Toast.makeText(_context, "取消催菜成功", 0).show();
+							Toast.makeText(_context, food.name + "取消催菜", 0).show();
 
 						} else {
 							food.isHurried = true;
-							Toast.makeText(_context, "催菜成功", 0).show();
+							Toast.makeText(_context, food.name + "催菜", 0).show();
 						}
 						_adapter.notifyDataSetChanged();
 					}
@@ -636,20 +609,19 @@ public class OrderFoodListView extends ExpandableListView {
 						if (_foods.size() > 0) {
 							new AlertDialog.Builder(_context)
 									.setTitle("提示")
-									.setMessage("确定全单叫起吗?")
+									.setMessage(_foods.get(0).hangStatus == OrderFood.FOOD_NORMAL ? "确定全单叫起吗?" : "确定全单取消叫起吗?")
 									.setNeutralButton(
 											"确定",
 											new DialogInterface.OnClickListener() {
 												@Override
-												public void onClick(
-														DialogInterface dialog,
-														int which) {
-													for (int i = 0; i < _foods
-															.size(); i++) {
-														OrderFood food = _foods
-																.get(i);
-														if (food.hangStatus == OrderFood.FOOD_NORMAL) {
+												public void onClick(DialogInterface dialog,	int which) {
+													for (int i = 0; i < _foods.size(); i++) {
+														OrderFood food = _foods.get(i);
+														if(food.hangStatus == OrderFood.FOOD_NORMAL) {
 															food.hangStatus = OrderFood.FOOD_HANG_UP;
+															
+														}else if(food.hangStatus == OrderFood.FOOD_HANG_UP){
+															food.hangStatus = OrderFood.FOOD_NORMAL;
 														}
 													}
 													_adapter.notifyDataSetChanged();
@@ -690,13 +662,9 @@ public class OrderFoodListView extends ExpandableListView {
 														"确定",
 														new DialogInterface.OnClickListener() {
 															@Override
-															public void onClick(
-																	DialogInterface dialog,
-																	int which) {
-																for (int i = 0; i < _foods
-																		.size(); i++) {
-																	OrderFood food = _foods
-																			.get(i);
+															public void onClick(DialogInterface dialog,	int which) {
+																for (int i = 0; i < _foods.size(); i++) {
+																	OrderFood food = _foods.get(i);
 																	if (food.hangStatus == OrderFood.FOOD_HANG_UP) {
 																		food.hangStatus = OrderFood.FOOD_IMMEDIATE;
 																	}
@@ -713,8 +681,7 @@ public class OrderFoodListView extends ExpandableListView {
 					/**
 					 * 如果没有叫起的菜品则不显示叫起Button
 					 */
-					((ImageView) view.findViewById(R.id.orderimage))
-							.setVisibility(View.INVISIBLE);
+					((ImageView) view.findViewById(R.id.orderimage)).setVisibility(View.INVISIBLE);
 				}
 			}
 
@@ -759,6 +726,8 @@ public class OrderFoodListView extends ExpandableListView {
 			// 删除数量默认为此菜品的点菜数量
 			final EditText cancelEdtTxt = (EditText) findViewById(R.id.mycount);
 			cancelEdtTxt.setText(Util.float2String2(selectedFood.getCount()));
+			// 光标置到数量最后面，方面修改
+			cancelEdtTxt.setSelection(cancelEdtTxt.getText().length());
 
 			// "确定"Button
 			Button okBtn = (Button) findViewById(R.id.confirm);
