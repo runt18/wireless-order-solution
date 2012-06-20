@@ -86,28 +86,27 @@ public class RegionStatisticsAction extends Action {
 			String regionIDs = request.getParameter("regionIDs");
 			String StatisticsType = request.getParameter("StatisticsType");
 
-			String condition = " AND D.region_id IN (" + regionIDs + ") ";
+			String condition = " AND B.region_id IN (" + regionIDs + ") ";
 			if (!dateBegin.equals("")) {
-				condition = condition + " AND D.pay_datetime >= '" + dateBegin
+				condition = condition + " AND MAX(B.order_date) >= '" + dateBegin
 						+ " 00:00:00" + "' ";
 			}
 			if (!dateEnd.equals("")) {
-				condition = condition + " AND D.pay_datetime <= '" + dateEnd
+				condition = condition + " AND MAX(B.order_date) <= '" + dateEnd
 						+ " 23:59:59" + "' ";
 			}
 			condition = condition
-					+ " AND D.total_price IS NOT NULL AND C.restaurant_id =  "
+					+ " AND B.total_price IS NOT NULL AND A.restaurant_id =  "
 					+ term.restaurant_id;
 
-			OrderFoodReflector foodRef = new OrderFoodReflector();
-			String orderClause = " ORDER BY D.region_id";
+			String orderClause = " ORDER BY region_id";
 
 			OrderFood orderFoods[] = null;
 			if (StatisticsType.equals("Today")) {
-				orderFoods = foodRef.getDetailToday(dbCon, condition,
+				orderFoods = OrderFoodReflector.getDetailToday(dbCon, condition,
 						orderClause);
 			} else if (StatisticsType.equals("History")) {
-				orderFoods = foodRef.getDetailHistory(dbCon, condition,
+				orderFoods = OrderFoodReflector.getDetailHistory(dbCon, condition,
 						orderClause);
 			}
 

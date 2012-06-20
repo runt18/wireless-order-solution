@@ -89,30 +89,29 @@ public class KitchenStatisticsAction extends Action {
 			String condition = " ";
 			String orderClause = " ";
 
-			OrderFoodReflector foodRef = new OrderFoodReflector();
 			OrderFood orderFoods[] = null;
 			if (StatisticsType.equals("Today")) {
 
-				condition = " AND C.kitchen_alias IN (" + kitchenAlias + ") ";
+				condition = " AND A.kitchen_alias IN (" + kitchenAlias + ") ";
 				if (!dateBegin.equals("")) {
-					condition = condition + " AND D.pay_datetime >= '"
+					condition = condition + " AND MAX(B.order_date) >= '"
 							+ dateBegin + " 00:00:00" + "' ";
 				}
 				if (!dateEnd.equals("")) {
-					condition = condition + " AND D.pay_datetime <= '"
+					condition = condition + " AND MAX(B.order_date) <= '"
 							+ dateEnd + " 23:59:59" + "' ";
 				}
 				condition = condition
-						+ " AND D.total_price IS NOT NULL AND C.restaurant_id =  "
+						+ " AND B.total_price IS NOT NULL AND A.restaurant_id =  "
 						+ term.restaurant_id;
 
-				orderClause = " ORDER BY C.kitchen_alias ";
+				orderClause = " ORDER BY kitchen_alias ";
 
-				orderFoods = foodRef.getDetailToday(dbCon, condition,
+				orderFoods = OrderFoodReflector.getDetailToday(dbCon, condition,
 						orderClause);
 			} else if (StatisticsType.equals("History")) {
 
-				condition = " AND kitchen_alias IN (" + kitchenAlias + ") ";
+				condition = " AND A.kitchen_alias IN (" + kitchenAlias + ") ";
 				if (!dateBegin.equals("")) {
 					orderClause = orderClause + " AND MAX(B.order_date) >= '"
 							+ dateBegin + " 00:00:00" + "' ";
@@ -122,12 +121,12 @@ public class KitchenStatisticsAction extends Action {
 							+ " 23:59:59" + "' ";
 				}
 				condition = condition
-						+ " AND total_price IS NOT NULL AND A.restaurant_id =  "
+						+ " AND A.restaurant_id =  "
 						+ term.restaurant_id;
 
 				orderClause = orderClause + " ORDER BY kitchen_alias ";
 
-				orderFoods = foodRef.getDetailHistory(dbCon, condition,
+				orderFoods = OrderFoodReflector.getDetailHistory(dbCon, condition,
 						orderClause);
 			}
 

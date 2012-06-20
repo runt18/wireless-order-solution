@@ -78,10 +78,10 @@ public class QueryDetailAction extends Action {
 			SingleOrderFood[] singleOrderFoods = null;
 			if (queryType.equals("Today")) {
 				singleOrderFoods = SingleOrderFoodReflector.getDetailToday(
-						dbCon, "AND A.order_id=" + orderID, "");
+						dbCon, "AND B.id=" + orderID, "");
 			} else {
 				singleOrderFoods = SingleOrderFoodReflector.getDetailHistory(
-						dbCon, "AND A.order_id=" + orderID, "");
+						dbCon, "AND B.id=" + orderID, "");
 			}
 
 			for (SingleOrderFood singleOrderFood : singleOrderFoods) {

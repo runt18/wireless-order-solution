@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -22,12 +20,10 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.Params;
 import com.wireless.db.VerifyPin;
 import com.wireless.dbReflect.OrderFoodReflector;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Terminal;
 
@@ -86,7 +82,6 @@ public class DeptStatisticsAction extends Action {
 			String deptIDs = request.getParameter("deptIDs");
 			String StatisticsType = request.getParameter("StatisticsType");
 
-			OrderFoodReflector foodRef = new OrderFoodReflector();
 			OrderFood orderFoods[] = null;
 
 			String condition = " ";
@@ -94,26 +89,26 @@ public class DeptStatisticsAction extends Action {
 
 			if (StatisticsType.equals("Today")) {
 
-				condition = " AND C.dept_id IN (" + deptIDs + ") ";
+				condition = " AND A.dept_id IN (" + deptIDs + ") ";
 				if (!dateBegin.equals("")) {
-					condition = condition + " AND D.pay_datetime >= '"
+					condition = condition + " AND MAX(B.order_date) >= '"
 							+ dateBegin + " 00:00:00" + "' ";
 				}
 				if (!dateEnd.equals("")) {
-					condition = condition + " AND D.pay_datetime <= '"
+					condition = condition + " AND MAX(B.order_date) <= '"
 							+ dateEnd + " 23:59:59" + "' ";
 				}
 				condition = condition
-						+ " AND D.total_price IS NOT NULL AND C.restaurant_id =  "
+						+ " AND B.total_price IS NOT NULL AND A.restaurant_id =  "
 						+ term.restaurant_id;
 
-				orderClause = " ORDER BY C.dept_id";
+				orderClause = " ORDER BY dept_id";
 
-				orderFoods = foodRef.getDetailToday(dbCon, condition,
+				orderFoods = OrderFoodReflector.getDetailToday(dbCon, condition,
 						orderClause);
 			} else if (StatisticsType.equals("History")) {
 
-				condition = " AND dept_id IN (" + deptIDs + ") ";
+				condition = " AND A.dept_id IN (" + deptIDs + ") ";
 				if (!dateBegin.equals("")) {
 					orderClause = orderClause + " AND MAX(B.order_date) >= '"
 							+ dateBegin + " 00:00:00" + "' ";
@@ -123,12 +118,12 @@ public class DeptStatisticsAction extends Action {
 							+ dateEnd + " 23:59:59" + "' ";
 				}
 				condition = condition
-						+ " AND total_price IS NOT NULL AND A.restaurant_id =  "
+						+ " AND A.restaurant_id =  "
 						+ term.restaurant_id;
 
 				orderClause = orderClause + " ORDER BY dept_id";
 
-				orderFoods = foodRef.getDetailHistory(dbCon, condition,
+				orderFoods = OrderFoodReflector.getDetailHistory(dbCon, condition,
 						orderClause);
 			}
 

@@ -84,31 +84,30 @@ public class MenuStatisticsAction extends Action {
 			 * belong to this restaurant 2 - has been paid 3 - match extra
 			 * filter condition
 			 */
-			String condition = " AND C.food_alias IN (" + foodAlias + ") ";
+			String condition = " AND A.food_alias IN (" + foodAlias + ") ";
 			if (!dateBegin.equals("")) {
-				condition = condition + " AND D.pay_datetime >= '" + dateBegin
+				condition = condition + " AND MAX(B.order_date) >= '" + dateBegin
 						+ " 00:00:00" + "' ";
 			}
 			if (!dateEnd.equals("")) {
-				condition = condition + " AND D.pay_datetime <= '" + dateEnd
+				condition = condition + " AND MAX(B.order_date) <= '" + dateEnd
 						+ " 23:59:59" + "' ";
 			}
-			condition = condition + " AND D.total_price IS NOT NULL AND C.restaurant_id =  "
+			condition = condition + " AND B.total_price IS NOT NULL AND B.restaurant_id =  "
 					+ term.restaurant_id;
 
 			// String orderClause = " ORDER BY D.food_id DESC, D.pay_date ";
-			String orderClause = " ORDER BY D.food_alias ASC, D.pay_date ";
+			String orderClause = " ORDER BY food_alias ASC, pay_date ";
 
-			OrderFoodReflector foodRef = new OrderFoodReflector();
 			// OrderFood orderFoods[] = foodRef.getDetailHistory(dbCon,
 			// condition,
 			// orderClause);
 			OrderFood orderFoods[] = null;
 			if (StatisticsType.equals("Today")) {
-				orderFoods = foodRef.getDetailToday(dbCon, condition,
+				orderFoods = OrderFoodReflector.getDetailToday(dbCon, condition,
 						orderClause);
 			} else if (StatisticsType.equals("History")) {
-				orderFoods = foodRef.getDetailHistory(dbCon, condition,
+				orderFoods = OrderFoodReflector.getDetailHistory(dbCon, condition,
 						orderClause);
 			}
 
