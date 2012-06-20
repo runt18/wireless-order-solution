@@ -3,6 +3,7 @@ package com.wireless.Actions.dishesOrder;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -73,12 +74,12 @@ public class QueryOrderAction extends Action {
 					/**
 					 * The json to order food looks like below. 
 					 * ["菜名", 菜名编号, 厨房编号, "口味", 口味编号, 数量, 单价, 是否特价, 是否推荐, 是否停售, 是否赠送, 折扣率,
-					 * 口味编号2, 口味编号3, 口味价钱, 是否时价, 是否临时菜, 流水号, 折扣额]
+					 * 口味编号2, 口味编号3, 口味价钱, 是否时价, 是否临时菜, 流水号, 折扣额, 日期时间, 服务员]
 					 */
 					String jsonOrderFood = "[\"$(food)\",$(food_id),$(kitchen),\"$(taste)\",$(taste_id),"
 							+ "$(count),\"$(unit_price)\",$(special),$(recommend),$(soldout),"
 							+ "$(gift),$(discount),$(taste_id2),$(taste_id3),\"$(taste_price)\","
-							+ "$(currPrice),$(temporary),$(seq_id),$(total_discount)]";
+							+ "$(currPrice),$(temporary),$(seq_id),$(total_discount),$(order_date),$(waiter)]";
 					jsonOrderFood = jsonOrderFood.replace("$(food)",
 							order.foods[i].name);
 					jsonOrderFood = jsonOrderFood.replace("$(food_id)",
@@ -122,6 +123,10 @@ public class QueryOrderAction extends Action {
 							Integer.toString(order.seqID));
 					jsonOrderFood = jsonOrderFood.replace("$(total_discount)",
 							order.foods[i].calcDiscountPrice().toString());
+					jsonOrderFood = jsonOrderFood.replace("$(order_date)",
+							new SimpleDateFormat("").format(order.foods[i].orderDate));
+					jsonOrderFood = jsonOrderFood.replace("$(waiter)",
+							order.foods[i].waiter);
 					
 					// put each json order food info to the value
 					value.append(jsonOrderFood);
