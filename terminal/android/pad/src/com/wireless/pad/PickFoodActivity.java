@@ -237,11 +237,11 @@ public class PickFoodActivity extends TabActivity implements
 		
 		android.widget.LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT);
 		if(text.equals("±‡∫≈")){
-			lp.setMargins(15, 10, 2, 10);
+			lp.setMargins(15, 10, 0, 10);
 			((Button)view.findViewById(R.id.tabicon)).setLayoutParams(lp);
 		}
 		if(text.equals("¡Ÿ ±≤À")){
-			lp.setMargins(2, 10, 15, 10);
+			lp.setMargins(0, 10, 15, 10);
 			((Button)view.findViewById(R.id.tabicon)).setLayoutParams(lp);
 		}
 		((Button)view.findViewById(R.id.tabicon)).setText(text);

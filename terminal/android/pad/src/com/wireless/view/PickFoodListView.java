@@ -142,14 +142,15 @@ public class PickFoodListView extends GridView {
 				status.insert(0, "(").insert(status.length(), ")");
 			}
 			
-			((TextView)view.findViewById(R.id.foodname)).setText(_foods[position].name + status);
-			if(_tag == TAG_NUM){
-				((TextView)view.findViewById(R.id.foodpinyin)).setText("编号：");
-				((TextView)view.findViewById(R.id.foodpinyins)).setText(String.valueOf(_foods[position].aliasID));
-			}else{
-				((TextView)view.findViewById(R.id.foodpinyin)).setText("拼音：");
-				((TextView)view.findViewById(R.id.foodpinyins)).setText(_foods[position].pinyin);
-			}
+			((TextView)view.findViewById(R.id.foodname)).setText(_foods[position].name);
+			((TextView)view.findViewById(R.id.foodpinyins)).setText(status);
+//			if(_tag == TAG_NUM){
+//				((TextView)view.findViewById(R.id.foodpinyin)).setText("编号：");
+//				((TextView)view.findViewById(R.id.foodpinyins)).setText(String.valueOf(_foods[position].aliasID));
+//			}else{
+//				((TextView)view.findViewById(R.id.foodpinyin)).setText("拼音：");
+//				((TextView)view.findViewById(R.id.foodpinyins)).setText(_foods[position].pinyin);
+//			}
 			((TextView)view.findViewById(R.id.foodprices)).setText(Util.CURRENCY_SIGN + Float.toString(_foods[position].getPrice()));
 			
 			return view;
@@ -172,9 +173,9 @@ public class PickFoodListView extends GridView {
 			
 			setContentView(R.layout.order_confirm);
 			
-//			((TextView)findViewById(R.id.orderTitleTxt)).setText("请输入" + _selectedFood.name + "的点菜数量");
+			((TextView)findViewById(R.id.orderTitleTxt)).setText("请输入" + _selectedFood.name + "的点菜数量");
 			((TextView)findViewById(R.id.orderTitleTxt)).setText("提示信息");
-			((TextView)findViewById(R.id.orderTxtView1)).setText("确定点" + _selectedFood.name + "1份?");
+//			((TextView)findViewById(R.id.orderTxtView1)).setText("确定点" + _selectedFood.name + "1份?");
 			EditText amountEdtTxt = ((EditText)findViewById(R.id.amountEdtTxt));
 			amountEdtTxt.setText("1");
 			amountEdtTxt.setSelection(amountEdtTxt.getText().length());

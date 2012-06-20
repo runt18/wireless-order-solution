@@ -55,6 +55,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 	private final static String TAG_TASTE = "taste";
 	private final static String TAG_STYLE = "style";
 	private final static String TAG_SPEC = "spec";
+	private final static String TAG_PIN = "pinzhu";
 	
 	private OrderFood _selectedFood;
 	private TextView _tasteTxtView;
@@ -82,7 +83,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 		
 		//口味Tab
 		TabSpec spec = _tabHost.newTabSpec(TAG_TASTE)
-							   .setIndicator(createTabIndicator("口味", R.drawable.ic_tab_albums))
+							   .setIndicator(createTabIndicator("口味", R.drawable.number_selector))
 							   .setContent(new TabHost.TabContentFactory(){
 								   @Override
 								   public View createTabContent(String arg0) {
@@ -95,7 +96,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 		
 		//做法Tab
 		spec = _tabHost.newTabSpec(TAG_STYLE)
-					   .setIndicator(createTabIndicator("做法", R.drawable.ic_tab_artists))
+					   .setIndicator(createTabIndicator("做法", R.drawable.kitchen_selector))
 					   .setContent(new TabHost.TabContentFactory(){
 						   @Override
 						   public View createTabContent(String arg0) {
@@ -108,7 +109,7 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 		
 		//规格Tab
 		spec = _tabHost.newTabSpec(TAG_SPEC)
-					   .setIndicator(createTabIndicator("规格", R.drawable.ic_tab_songs))
+					   .setIndicator(createTabIndicator("规格",  R.drawable.pinyin_selector))
 					   .setContent(new TabHost.TabContentFactory(){
 						   @Override
 						   public View createTabContent(String arg0) {
@@ -118,6 +119,17 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 		_tabHost.addTab(spec);
 		
 		
+
+		//品注Tab
+		spec = _tabHost.newTabSpec(TAG_PIN)
+					   .setIndicator(createTabIndicator("品注",R.drawable.occasional_selector))
+					   .setContent(new TabHost.TabContentFactory(){
+						   @Override
+						   public View createTabContent(String arg0) {
+							   return LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.pinzhu, null);
+						   }								   
+					   });
+		_tabHost.addTab(spec);
 		
 		/**
 		 * Tab切换时更换相应的Adapter，显示不同种类的口味
@@ -131,6 +143,8 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 					setupStyleView();
 				}else if(tag == TAG_SPEC){
 					setupSpecView();
+				}else{
+					setPinzhuView();
 				}
 				_handler.sendEmptyMessage(0);
 			}
@@ -370,6 +384,12 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 		});
 	}
 	
+	//设置品注View
+	public void setPinzhuView(){
+		
+	}
+	
+	
 	/**
 	 * Create the tab indicator
 	 * @param text
@@ -383,11 +403,11 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 		
 		android.widget.LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT);
 		if(text.equals("口味")){
-			lp.setMargins(15, 10, 2, 10);
+			lp.setMargins(15, 10, 0, 10);
 			((Button)view.findViewById(R.id.tabicon)).setLayoutParams(lp);
 		}
-		if(text.equals("规格")){
-			lp.setMargins(2, 10, 15, 10);
+		if(text.equals("品注")){
+			lp.setMargins(0, 10, 15, 10);
 			((Button)view.findViewById(R.id.tabicon)).setLayoutParams(lp);
 		}
 		
@@ -445,7 +465,11 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 			for(int i = 0; i < _selectedFood.tastes.length; i++){
 				if(_tastes[position].aliasID == _selectedFood.tastes[i].aliasID){
 					selectChkBox.setChecked(true);
+					((LinearLayout)view.findViewById(R.id.item_body)).setBackgroundResource(R.drawable.item_bg2);
 					break;
+				}else{
+					selectChkBox.setChecked(false);
+					((LinearLayout)view.findViewById(R.id.item_body)).setBackgroundResource(R.drawable.item_bg_selector);
 				}
 			}
 			
@@ -491,15 +515,17 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 						}
 						((LinearLayout)arg0.findViewById(R.id.item_body)).setBackgroundResource(R.drawable.item_bg_selector);
 					}else{
-						((LinearLayout)arg0.findViewById(R.id.item_body)).setBackgroundResource(R.drawable.item_bg2);
 						int pos = _selectedFood.addTaste(_tastes[position]);
 						if(pos >= 0){
 							sendPickTasteBoradcast();
 							selectChkBox.setChecked(true);
+							((LinearLayout)arg0.findViewById(R.id.item_body)).setBackgroundResource(R.drawable.item_bg2);
 							Toast.makeText(PickTasteActivity.this, "添加" + _tastes[position].preference, 0).show();
 						}else{
 							Toast.makeText(PickTasteActivity.this, "最多只能添加" + _selectedFood.tastes.length + "种口味", 0).show();
+							((LinearLayout)arg0.findViewById(R.id.item_body)).setBackgroundResource(R.drawable.item_bg_selector);
 						}
+
 					}
 					_handler.sendEmptyMessage(0);
 				}

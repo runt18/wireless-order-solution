@@ -465,12 +465,26 @@ public class OrderFoodListView extends ExpandableListView {
 						}
 					}
 				});
+				
+				
+				//新点菜中"="操作
+				ImageView equlesImgView = (ImageView) view.findViewById(R.id.equlefood);
+				equlesImgView.setBackgroundResource(R.drawable.eques_selector);
+				equlesImgView.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+					
+						
+					}
+				});
+				
 
 			} else {
-				// 已点菜的"退"操作
+				// 已点菜的不需要的按钮进行隐藏
 				view.findViewById(R.id.add2).setVisibility(View.GONE);
 				view.findViewById(R.id.jian2).setVisibility(View.GONE);
-
+				view.findViewById(R.id.equlefood).setVisibility(View.GONE);
+				
 				ImageView immdiateImgView = ((ImageView) view.findViewById(R.id.jiao));
 				if(_foods.get(childPosition).hangStatus == OrderFood.FOOD_HANG_UP){
 					immdiateImgView.setBackgroundResource(R.drawable.ji_selector);
