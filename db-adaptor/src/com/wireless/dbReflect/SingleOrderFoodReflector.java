@@ -7,6 +7,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.dbObject.SingleOrderFood;
 import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.Taste;
 
 public class SingleOrderFoodReflector {
 	
@@ -78,6 +79,7 @@ public class SingleOrderFoodReflector {
 			  " WHEN A.kitchen_id IS NULL OR C.kitchen_id IS NULL THEN 'ÒÑÉ¾³ý³ø·¿' " +
 			  " ELSE C.name END) AS kitchen_name, " +
 			  " A.taste, A.taste_price, A.taste_id, A.taste2_id, A.taste3_id, A.taste_alias, A.taste2_alias, A.taste3_alias, " +
+			  " A.taste_tmp_alias, A.taste_tmp, A.taste_tmp_price, " + 
 			  " A.order_date, A.is_temporary, A.is_paid, A.waiter, A.comment, " +
 			  " B.type, B.service_rate " +
 			  " FROM " + 
@@ -92,38 +94,47 @@ public class SingleOrderFoodReflector {
 		
 		ArrayList<SingleOrderFood> singleOrderFoods = new ArrayList<SingleOrderFood>();
 		while(dbCon.rs.next()){
-			SingleOrderFood orderFood = new SingleOrderFood();
+			SingleOrderFood singleOrderFood = new SingleOrderFood();
 
-			orderFood.orderID = dbCon.rs.getLong("order_id");
+			singleOrderFood.orderID = dbCon.rs.getLong("order_id");
 			
-			orderFood.food.foodID = dbCon.rs.getInt("food_id");
-			orderFood.food.name = dbCon.rs.getString("name");
-			orderFood.food.aliasID = dbCon.rs.getInt("food_alias");
-			orderFood.food.status = dbCon.rs.getShort("food_status");
+			singleOrderFood.food.foodID = dbCon.rs.getInt("food_id");
+			singleOrderFood.food.name = dbCon.rs.getString("name");
+			singleOrderFood.food.aliasID = dbCon.rs.getInt("food_alias");
+			singleOrderFood.food.status = dbCon.rs.getShort("food_status");
 			
-			orderFood.orderCount = dbCon.rs.getFloat("order_count");
-			orderFood.unitPrice = dbCon.rs.getFloat("unit_price");
-			orderFood.discount = dbCon.rs.getFloat("discount");
+			singleOrderFood.orderCount = dbCon.rs.getFloat("order_count");
+			singleOrderFood.unitPrice = dbCon.rs.getFloat("unit_price");
+			singleOrderFood.discount = dbCon.rs.getFloat("discount");
 
-			orderFood.kitchen.kitchenID = dbCon.rs.getInt("kitchen_id");			
-			orderFood.kitchen.aliasID = dbCon.rs.getShort("kitchen_alias");
-			orderFood.kitchen.name = dbCon.rs.getString("kitchen_name");
-			orderFood.kitchen.deptID = dbCon.rs.getShort("dept_id");
+			singleOrderFood.kitchen.kitchenID = dbCon.rs.getInt("kitchen_id");			
+			singleOrderFood.kitchen.aliasID = dbCon.rs.getShort("kitchen_alias");
+			singleOrderFood.kitchen.name = dbCon.rs.getString("kitchen_name");
+			singleOrderFood.kitchen.deptID = dbCon.rs.getShort("dept_id");
 			
-			orderFood.taste.preference = dbCon.rs.getString("taste");			
-			orderFood.taste.setPrice(dbCon.rs.getFloat("taste_price"));
+			String normalTastePref = dbCon.rs.getString("taste");
+			String tmpTastePref = dbCon.rs.getString("taste_tmp");
+			if(tmpTastePref != null){
+				singleOrderFood.taste.preference = (normalTastePref.equals(Taste.NO_PREFERENCE) ? "" : (normalTastePref + ",")) + tmpTastePref;				
+			}else{
+				singleOrderFood.taste.preference = normalTastePref;
+			}
 			
-			orderFood.orderDate = dbCon.rs.getTimestamp("order_date").getTime();
-			orderFood.isTemporary = dbCon.rs.getBoolean("is_temporary");
-			orderFood.isPaid = dbCon.rs.getBoolean("is_paid");
-			orderFood.staff.name = dbCon.rs.getString("waiter");
+			float normalTastePrice = dbCon.rs.getFloat("taste_price");
+			float tmpTastePrice = dbCon.rs.getFloat("taste_tmp_price");
+			singleOrderFood.taste.setPrice(normalTastePrice + tmpTastePrice);
 			
-			orderFood.payManner = dbCon.rs.getInt("type");
-			orderFood.serviceRate = dbCon.rs.getFloat("service_rate");
+			singleOrderFood.orderDate = dbCon.rs.getTimestamp("order_date").getTime();
+			singleOrderFood.isTemporary = dbCon.rs.getBoolean("is_temporary");
+			singleOrderFood.isPaid = dbCon.rs.getBoolean("is_paid");
+			singleOrderFood.staff.name = dbCon.rs.getString("waiter");
 			
-			orderFood.comment = dbCon.rs.getString("comment");
+			singleOrderFood.payManner = dbCon.rs.getInt("type");
+			singleOrderFood.serviceRate = dbCon.rs.getFloat("service_rate");
 			
-			singleOrderFoods.add(orderFood);
+			singleOrderFood.comment = dbCon.rs.getString("comment");
+			
+			singleOrderFoods.add(singleOrderFood);
 		}
 		dbCon.rs.close();
 		

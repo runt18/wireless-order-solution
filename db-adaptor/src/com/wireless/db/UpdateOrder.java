@@ -264,7 +264,7 @@ public class UpdateOrder {
 	
 	private static Result updateOrder(DBCon dbCon, Terminal term, Order orderToUpdate, boolean isPaidAgain) throws BusinessException, SQLException{		
 		
-		String extraCond = " AND C.order_id=" + orderToUpdate.id;
+		String extraCond = " AND B.id=" + orderToUpdate.id;
 		OrderFood[] oriFoods = OrderFoodReflector.getDetailToday(dbCon, extraCond, null);
 		
 		ArrayList<OrderFood> extraFoods = new ArrayList<OrderFood>();
@@ -352,7 +352,9 @@ public class UpdateOrder {
 				 * So we insert an record whose order count is negative to original record
 				 */
 				if(isCancelled){
-					canceledFoods.add(oriFoods[i]);
+					OrderFood food = genFoodDetail(dbCon, term, oriFoods[i]);
+					food.setCount(oriFoods[i].getCount());
+					canceledFoods.add(food);
 				}			
 			}
 		}

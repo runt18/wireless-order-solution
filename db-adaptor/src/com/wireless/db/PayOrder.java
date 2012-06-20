@@ -317,7 +317,7 @@ public class PayOrder {
 		 */		
 		if(!isPaidAgain){
 			//get the food details to this order
-			OrderFood[] foods = OrderFoodReflector.getDetailToday(dbCon, " AND C.order_id=" + orderInfo.id, "");
+			OrderFood[] foods = OrderFoodReflector.getDetailToday(dbCon, " AND B.id=" + orderInfo.id, "");
 			for(int i = 0; i < foods.length; i++){
 				//get each material consumption to every food
 				sql = "SELECT consumption, material_id FROM " +

@@ -192,9 +192,9 @@ public class QueryOrder {
 		if(queryType == QUERY_HISTORY){
 			orderInfo.foods = OrderFoodReflector.getDetailHistory(dbCon, " AND A.order_id=" + orderID, "");
 		}else if(queryType == QUERY_TODAY){
-			orderInfo.foods = OrderFoodReflector.getDetailToday(dbCon, " AND C.order_id=" + orderID, "");
+			orderInfo.foods = OrderFoodReflector.getDetailToday(dbCon, " AND B.id=" + orderID, "");
 		}else{
-			orderInfo.foods = OrderFoodReflector.getDetailToday(dbCon, " AND C.order_id=" + orderID, "");
+			orderInfo.foods = OrderFoodReflector.getDetailToday(dbCon, " AND B.id=" + orderID, "");
 		}
 		orderInfo.id = orderID;
 		
