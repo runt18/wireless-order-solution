@@ -4,7 +4,6 @@
     android:layout_height="fill_parent"
     android:layout_gravity="center"
     android:layout_margin="5dip"
-    android:background="#00000000"
     android:gravity="center"
     android:orientation="vertical"
     android:padding="5dip" >
@@ -54,8 +53,10 @@
             android:layout_gravity="center"
             android:gravity="center"
             android:text="小鸡炖蘑菇"
+            android:maxLength="8"
+            android:lines="2"
             android:textColor="#000000"
-            android:textSize="20sp" />
+            android:textSize="16sp" />
 
         <LinearLayout
             android:layout_width="wrap_content"

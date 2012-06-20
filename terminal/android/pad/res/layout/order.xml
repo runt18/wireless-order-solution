@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="#FFFFFF"
+    android:background="#6495ED"
     android:orientation="vertical" >
 
     <!-- 头部 区域 1 -->
@@ -53,7 +53,6 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:background="#6495ED"
         android:orientation="horizontal"
         android:weightSum="1" >
 
@@ -61,7 +60,6 @@
             android:id="@+id/orderlist"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:background="#FFFFFF"
             android:layout_marginRight="2dip"
             android:layout_weight="0.45"
             android:orientation="vertical" >
@@ -89,12 +87,12 @@
 
                     <EditText
                         android:id="@+id/tblNoEdtTxt"
-                        android:layout_width="180dip"
+                        android:layout_width="100dip"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_marginLeft="5dip"
                         android:layout_toRightOf="@id/platform"
-                        android:background="@null"
+                        android:background="@drawable/kuangbg"
                         android:digits="0123456789."
                         android:focusable="true"
                         android:focusableInTouchMode="true"
@@ -111,7 +109,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:layout_marginLeft="20dip"
+                        android:layout_marginLeft="80dip"
                         android:layout_toRightOf="@id/tblNoEdtTxt"
                         android:text="人数:"
                         android:textColor="#000000"
@@ -173,30 +171,27 @@
                 <RelativeLayout
                     android:id="@+id/bottom"
                     android:layout_width="fill_parent"
-                    android:layout_height="62dip"
-                    android:paddingLeft="45dip"
-                    android:paddingRight="45dip"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/listbottom1024" 
                     android:layout_alignParentBottom="true"
-                    android:background="@drawable/av_r1_c1" >
+                    >
 
                     <LinearLayout
                         android:id="@+id/button"
                         android:layout_width="fill_parent"
-                        android:layout_height="fill_parent"
+                        android:layout_height="wrap_content"
                         android:layout_below="@id/totalTxtView"
                         android:layout_centerVertical="true"
                         android:gravity="center_horizontal"
-                        android:paddingTop="11dip"
-                        android:paddingBottom="11dip"
                         android:orientation="horizontal"
                         android:weightSum="1" >
 
                         <Button
                             android:id="@+id/confirm"
                             android:layout_width="0dip"
-                            android:layout_height="fill_parent"
+                            android:layout_height="wrap_content"
                             android:layout_margin="0dip"
-                            android:layout_weight="0.5"
+                            android:layout_weight="0.3"
                             android:background="@drawable/order_confirm_selector"
                             android:text="提  交"
                             android:textSize="18sp" />
@@ -204,10 +199,10 @@
                         <Button
                             android:id="@+id/confirm2"
                             android:layout_width="0dip"
-                            android:layout_height="fill_parent"
+                            android:layout_height="wrap_content"
                             android:layout_margin="0dip"
                             android:layout_toRightOf="@+id/confirm"
-                            android:layout_weight="0.5"
+                            android:layout_weight="0.3"
                             android:background="@drawable/order_confirm2_selector"
                             android:text="取  消"
                             android:textSize="18sp" />
@@ -219,8 +214,9 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/restitle"
+                    android:background="@drawable/conternbg"
                     android:cacheColorHint="#00000000"
-                    android:divider="@drawable/line"
+                    android:childDivider="@drawable/line2"
                     android:groupIndicator="@null" >
                 </com.wireless.view.OrderFoodListView>
 
@@ -242,7 +238,6 @@
             android:id="@+id/dynamic"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:background="#FFFFFF"
             android:layout_weight="0.55"
             android:orientation="vertical" >
         </LinearLayout>

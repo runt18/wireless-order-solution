@@ -47,7 +47,7 @@
             android:layout_marginLeft="10dip"
             android:layout_marginTop="10dip"
             android:layout_toRightOf="@id/orderTxtView1"
-            android:background="@drawable/input"
+            android:background="@drawable/kuangbg"
             android:digits="0123456789."
             android:focusableInTouchMode="true"
             android:inputType="numberSigned|text"
@@ -56,7 +56,7 @@
             android:textSize="18sp"
             android:textStyle="bold"
             android:typeface="sans"
-            android:visibility="gone" />
+           />
 
         <CheckBox
             android:id="@+id/orderHurriedChk"

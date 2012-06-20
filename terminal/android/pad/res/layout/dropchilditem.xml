@@ -2,7 +2,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="#FFFFFF"
     android:minHeight="70dip" >
 
     <TextView
@@ -77,36 +76,48 @@
 
         <ImageView
             android:id="@+id/add2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="5dip"
+            android:layout_width="40dip"
+            android:layout_height="35dip"
+            android:layout_marginRight="8dip"
             android:background="@drawable/add2_selector" />
 
         <ImageView
             android:id="@+id/jian2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="5dip"
+            android:layout_width="40dip"
+            android:layout_height="35dip"
+            android:layout_marginRight="8dip"
             android:background="@drawable/reduc2_selector" />
 
         <ImageView
             android:id="@+id/jiao"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="5dip"
+            android:layout_width="40dip"
+            android:layout_height="35dip"
+            android:layout_marginRight="8dip"
             android:background="@drawable/jiao_selector" />
+        
+         <ImageView
+            android:id="@+id/equlefood"
+            android:layout_width="40dip"
+            android:layout_height="35dip"
+            android:layout_marginRight="8dip"
+            android:background="@drawable/eques_selector"
+             />
+        
 
         <ImageView
             android:id="@+id/addtaste"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="5dip" />
+            android:layout_width="40dip"
+            android:layout_height="35dip"
+            android:layout_marginRight="8dip" />
 
         <ImageView
             android:id="@+id/deletefood"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="5dip" />
+            android:layout_width="40dip"
+            android:layout_height="35dip"
+            android:layout_marginRight="8dip" />
+        
+        
+       
     </LinearLayout>
 
 </RelativeLayout>
