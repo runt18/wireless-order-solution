@@ -12,11 +12,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
@@ -27,6 +27,7 @@ import android.widget.Toast;
 import com.wireless.common.WirelessOrder;
 import com.wireless.dialog.AskPwdDialog;
 import com.wireless.pad.R;
+import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Type;
 import com.wireless.protocol.Util;
@@ -472,9 +473,9 @@ public class OrderFoodListView extends ExpandableListView {
 				equlesImgView.setBackgroundResource(R.drawable.eques_selector);
 				equlesImgView.setOnClickListener(new View.OnClickListener() {
 					@Override
-					public void onClick(View v) {
-					
-						
+					public void onClick(View v) {	
+						_selectedPos = childPosition;
+						new AskOrderAmountDialog(_foods.get(childPosition)).show();
 					}
 				});
 				
@@ -797,6 +798,63 @@ public class OrderFoodListView extends ExpandableListView {
 		}
 	}
 
+	/**
+	 * 提示输入点菜数量的Dialog
+	 * @author Ying.Zhang
+	 *
+	 */
+	private class AskOrderAmountDialog extends Dialog{
+
+		
+		public AskOrderAmountDialog(final OrderFood selectedFood) {
+			super(_context, R.style.FullHeightDialog);			
+			
+			setContentView(R.layout.order_confirm);
+			
+			findViewById(R.id.orderHurriedChk).setVisibility(View.GONE);
+			
+			((TextView)findViewById(R.id.orderTitleTxt)).setText("请输入" + selectedFood.name + "的点菜数量");
+
+			EditText amountEdtTxt = ((EditText)findViewById(R.id.amountEdtTxt));
+			amountEdtTxt.setText("");
+
+			
+			//"确定"Button
+			Button okBtn = (Button)findViewById(R.id.orderConfirmBtn);
+			okBtn.setText("确定");
+			okBtn.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {	
+					try{
+						float orderAmount = Float.parseFloat(((EditText)findViewById(R.id.amountEdtTxt)).getText().toString());
+						
+		       			if(orderAmount > 255){
+		       				Toast.makeText(_context, "对不起，\"" + selectedFood.toString() + "\"最多只能点255份", 0).show();
+		       			}else{
+		       				selectedFood.setCount(orderAmount);
+		       				_adapter.notifyDataSetChanged();
+							dismiss();
+		       			}
+					
+					}catch(NumberFormatException e){
+						Toast.makeText(_context, "您输入的数量格式不正确，请重新输入", 0).show();
+					}
+				}
+			});
+			
+			//"取消"Button
+			Button cancelBtn = (Button)findViewById(R.id.orderCancelBtn);
+			cancelBtn.setText("取消");
+			cancelBtn.setOnClickListener(new View.OnClickListener(){
+				@Override
+				public void onClick(View v) {
+					dismiss();
+				}
+			});
+
+		}		
+	}
+	
 	/**
 	 * 点击菜品列表后的扩展功能 Dialog
 	 */

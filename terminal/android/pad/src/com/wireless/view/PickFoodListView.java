@@ -14,7 +14,6 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.GridView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,7 +33,7 @@ public class PickFoodListView extends GridView {
 	private Food[] _foods = null;
 	private BaseAdapter _adapter = null;
 	private OnFoodPickedListener _foodPickedListener;
-	private int _tag;
+	//private int _tag;
 
 	
 
@@ -71,7 +70,7 @@ public class PickFoodListView extends GridView {
 	 */
 	public void notifyDataChanged(Food[] foods, int tag){
 		_foods = foods;
-		_tag = tag;
+		//_tag = tag;
 		if(_adapter != null){
 			_adapter.notifyDataSetChanged();
 		}else{
@@ -174,8 +173,6 @@ public class PickFoodListView extends GridView {
 			setContentView(R.layout.order_confirm);
 			
 			((TextView)findViewById(R.id.orderTitleTxt)).setText("请输入" + _selectedFood.name + "的点菜数量");
-			((TextView)findViewById(R.id.orderTitleTxt)).setText("提示信息");
-//			((TextView)findViewById(R.id.orderTxtView1)).setText("确定点" + _selectedFood.name + "1份?");
 			EditText amountEdtTxt = ((EditText)findViewById(R.id.amountEdtTxt));
 			amountEdtTxt.setText("1");
 			amountEdtTxt.setSelection(amountEdtTxt.getText().length());
@@ -189,17 +186,8 @@ public class PickFoodListView extends GridView {
 				public void onClick(View v) {			
 					onPick(false);
 				}
-			});
-			
-			//"口味"Button
-			Button tasteBtn = (Button)findViewById(R.id.orderTasteBtn);
-			tasteBtn.setText("口味");
-			tasteBtn.setOnClickListener(new View.OnClickListener() {				
-				@Override
-				public void onClick(View arg0) {
-					onPick(true);
-				}
-			});
+			});			
+
 			
 			//"取消"Button
 			Button cancelBtn = (Button)findViewById(R.id.orderCancelBtn);

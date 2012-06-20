@@ -97,8 +97,8 @@
                         android:focusable="true"
                         android:focusableInTouchMode="true"
                         android:gravity="left"
-                        android:paddingLeft="15dip"
                         android:inputType="numberSigned|text"
+                        android:paddingLeft="15dip"
                         android:singleLine="true"
                         android:textColor="#FF6600"
                         android:textSize="20sp" >
@@ -119,9 +119,9 @@
                     <EditText
                         android:id="@+id/customerNumEdtTxt"
                         android:layout_width="100dip"
-                        android:layout_margin="3dip"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
+                        android:layout_margin="3dip"
                         android:layout_toRightOf="@id/people"
                         android:background="@drawable/kuangbg"
                         android:digits="0123456789."
@@ -139,8 +139,8 @@
                     android:id="@+id/aountarea"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:background="#FFFFFF"
-                    android:layout_above="@+id/bottom" >
+                    android:layout_above="@+id/bottom"
+                    android:background="#FFFFFF" >
 
                     <TextView
                         android:id="@+id/totalTxtView"
@@ -172,9 +172,8 @@
                     android:id="@+id/bottom"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/listbottom1024" 
                     android:layout_alignParentBottom="true"
-                    >
+                    android:background="@drawable/listbottom1024" >
 
                     <LinearLayout
                         android:id="@+id/button"

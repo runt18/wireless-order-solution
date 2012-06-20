@@ -184,6 +184,15 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 			}
 		});
 
+		
+		//取消Button的响应事件
+		((Button)findViewById(R.id.confirm2)).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				showExitDialog();
+			}
+		});
+		
 		//get the order parcel from the intent sent by main activity
 		OrderParcel orderParcel = getIntent().getParcelableExtra(OrderParcel.KEY_VALUE);
 		_oriOrder = orderParcel;

@@ -191,15 +191,13 @@ public class OrderActivity extends ActivityGroup implements
 					}
 				});
 
-		((Button) findViewById(R.id.confirm2))
-				.setOnClickListener(new View.OnClickListener() {
-
-					@Override
-					public void onClick(View v) {
-
-						showExitDialog();
-					}
-				});
+		//取消Button的响应事件
+		((Button)findViewById(R.id.confirm2)).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				showExitDialog();
+			}
+		});
 
 		// 台号进行赋值
 		((EditText) findViewById(R.id.tblNoEdtTxt)).setText(Integer

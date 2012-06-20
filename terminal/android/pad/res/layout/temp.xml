@@ -1,59 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  android:orientation="vertical"
-  android:layout_width="fill_parent"
-  android:layout_height="fill_parent"
-  android:background="@drawable/conternbg"
-  >
-	
-	<RelativeLayout android:id="@+id/r2"
-		android:layout_width="fill_parent" android:layout_height="wrap_content"
-		 android:background="@drawable/bg02">
-		<TextView android:id="@+id/orderpin" android:layout_width="wrap_content"
-			android:layout_height="wrap_content" android:textColor="#000000"
-			android:layout_centerVertical="true" android:textSize="20sp"
-			android:text="添加临时菜" android:layout_marginLeft="20dip" />
-		<ImageView 
-		android:id="@+id/add"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_centerVertical="true"
-		android:layout_alignParentRight="true"
-		android:layout_marginRight="20dip"
-		android:src="@drawable/add_selector"
-		/>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/conternbg"
+    android:orientation="vertical" >
 
-		<Button 
-		    android:id="@+id/confime"
-		    android:layout_width="wrap_content"
-		    android:layout_height="wrap_content"
-		    android:text="确定"
-		    android:layout_toLeftOf="@+id/addTmpFoodBtn"
-		    android:layout_marginRight="50dip"
-		    />
-		
-		<Button
-		    android:id="@+id/addTmpFoodBtn"
-		    android:layout_width="wrap_content"
-		    android:layout_height="wrap_content"
-		    android:visibility="gone"
-		    android:layout_alignParentTop="true"
-		    android:layout_toLeftOf="@+id/add"
-		    android:text="添加" />
+    <RelativeLayout
+        android:id="@+id/r2"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg02" >
 
-	</RelativeLayout>
-	
-  <com.wireless.view.TempListView
-  android:id="@+id/tempListView"
-  android:layout_width="fill_parent"
-  android:layout_height="wrap_content"
-  android:divider="@drawable/line2"
-  android:cacheColorHint="#00000000"
-  android:fadeScrollbars="false"
-  android:fadingEdge="none"
-  android:fastScrollEnabled="true" 
-  >
-  </com.wireless.view.TempListView>	
-  
+        <TextView
+            android:id="@+id/orderpin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20dip"
+            android:text="添加临时菜"
+            android:textColor="#000000"
+            android:textSize="20sp" />
+
+        <ImageView
+            android:id="@+id/add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="20dip"
+            android:src="@drawable/add_selector" />
+
+        <Button
+            android:id="@+id/addTmpFoodBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/add"
+            android:text="添加" />
+    </RelativeLayout>
+
+    <com.wireless.view.TempListView
+        android:id="@+id/tempListView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:cacheColorHint="#00000000"
+        android:divider="@drawable/line2"
+        android:fadeScrollbars="false"
+        android:fadingEdge="none"
+        android:fastScrollEnabled="true" >
+    </com.wireless.view.TempListView>
+
 </LinearLayout>

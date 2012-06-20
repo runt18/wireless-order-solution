@@ -10,10 +10,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.GestureDetector;
-import android.view.GestureDetector.OnGestureListener;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -38,10 +35,8 @@ import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Util;
 
-public class PickTasteActivity extends TabActivity implements OnGestureListener{
+public class PickTasteActivity extends TabActivity{
 	
-	private GestureDetector _detector; 
-
 	public static final String PICK_TASTE_ACTION = "com.wireless_pad.PickTasteActivty.PickTaste";
 	public static final String NOT_PICK_TASTE_ACTION = "com.wireless_pad.PickTasteActivty.PickNoTaste";
 
@@ -66,8 +61,6 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		 _detector = new GestureDetector(this); 
 		
 		// construct the tab host
 		setContentView(R.layout.tastetable);		
@@ -143,8 +136,8 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 					setupStyleView();
 				}else if(tag == TAG_SPEC){
 					setupSpecView();
-				}else{
-					setPinzhuView();
+				}else if(tag == TAG_PIN){
+					setupPinZhuView();
 				}
 				_handler.sendEmptyMessage(0);
 			}
@@ -177,6 +170,8 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 			for(Taste taste : _selectedFood.tastes.clone()){
 				_selectedFood.removeTaste(taste);
 			}
+			_selectedFood.tmpTaste = null;
+			
 			//refresh the taste preference
 			_handler.sendEmptyMessage(0);
 			//refresh the taste list view
@@ -385,8 +380,100 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 	}
 	
 	//设置品注View
-	public void setPinzhuView(){
+	public void setupPinZhuView(){
+	
+		final EditText pinZhuEdtTxt = ((EditText)findViewById(R.id.pinZhuEdtTxt));
+		final EditText priceEdtTxt = ((EditText)findViewById(R.id.priceEdtTxt));
+		pinZhuEdtTxt.requestFocus();
 		
+		if(_selectedFood.tmpTaste != null){
+			pinZhuEdtTxt.setText(_selectedFood.tmpTaste.preference);
+			priceEdtTxt.setText(_selectedFood.tmpTaste.getPrice().toString());
+		}
+		
+		//删除所有口味Button
+		((Button)findViewById(R.id.cancelPinZhuBtn)).setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				pinZhuEdtTxt.setText("");
+				priceEdtTxt.setText("");
+				removeAllTaste();
+			}
+		});
+		
+		//品注的EditText的处理函数
+		pinZhuEdtTxt.addTextChangedListener(new TextWatcher(){
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				String tmpTasteValue = s.toString().trim();
+				if(tmpTasteValue.length() != 0){
+					_selectedFood.tmpTaste = new Taste();
+					_selectedFood.tmpTaste.aliasID = Util.genTempFoodID();
+					_selectedFood.tmpTaste.preference = tmpTasteValue;
+				}else{
+					_selectedFood.tmpTaste = null;
+				}
+				sendPickTasteBoradcast();
+				_handler.sendEmptyMessage(0);
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+				
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				
+			}
+			
+		});
+		
+		//价格EditText的处理函数
+		priceEdtTxt.addTextChangedListener(new TextWatcher(){
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				if(_selectedFood.tmpTaste != null){
+					try{
+						if(s.length() == 0){
+							_selectedFood.tmpTaste.setPrice(new Float(0));
+							sendPickTasteBoradcast();
+						}else{
+							Float price = Float.parseFloat(s.toString());
+							if(price >= 0 && price < 9999){
+								_selectedFood.tmpTaste.setPrice(price);
+								sendPickTasteBoradcast();
+							}else{
+								priceEdtTxt.setText(_selectedFood.tmpTaste.getPrice() > 9999 ? "" : Util.float2String2(_selectedFood.tmpTaste.getPrice()));
+								priceEdtTxt.setSelection(priceEdtTxt.getText().length());
+								Toast.makeText(PickTasteActivity.this, "临时口味的价格范围是0～9999", 0).show();
+							}
+						}
+					}catch(NumberFormatException e){
+						priceEdtTxt.setText(_selectedFood.tmpTaste.getPrice() > 9999 ? "" : Util.float2String2(_selectedFood.tmpTaste.getPrice()));
+						priceEdtTxt.setSelection(priceEdtTxt.getText().length());
+						Toast.makeText(PickTasteActivity.this, "临时口味的价钱格式不正确，请重新输入", 0).show();
+					}
+				}else{
+					Toast.makeText(PickTasteActivity.this, "请先输入临时口味", 0).show();
+				}
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+				
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				
+			}
+			
+		});
+
 	}
 	
 	
@@ -534,76 +621,6 @@ public class PickTasteActivity extends TabActivity implements OnGestureListener{
 			return view;
 		}
 		
-	}
-    @Override  
-    public boolean onTouchEvent(MotionEvent event) {  
-      
-        return this._detector.onTouchEvent(event);  
-    }  
-    
-    @Override
-	public boolean dispatchTouchEvent(MotionEvent ev) {
-    	_detector.onTouchEvent(ev);
-		return super.dispatchTouchEvent(ev);
-	}
-
-
-	@Override
-	public boolean onDown(MotionEvent e) {
-		return true;
-	}
-
-	@Override
-	public void onShowPress(MotionEvent e) {
-		
-	}
-
-	@Override
-	public boolean onSingleTapUp(MotionEvent e) {
-		return false;
-	}
-
-	@Override
-	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-			float distanceY) {
-		return false;
-	}
-
-	@Override
-	public void onLongPress(MotionEvent e) {
-		
-	}
-
-	/*
-	 * 手势滑动执行方法
-	 */
-	@Override
-	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,	float velocityY) {
-		float scrollX = e1.getX()-e2.getX();
-	    if(Math.abs(velocityX) > 200 && velocityY != 0 && Math.abs(scrollX)/Math.abs(e1.getY()-e2.getY()) > 1){
-	    	if(scrollX>0){
-	    		//此处添加代码用来显示下一个页面
-	    		if(_tabHost.getCurrentTab() == 3)
- 					return false; 
- 				_tabHost.setCurrentTab(_tabHost.getCurrentTab()+1);
-
-	    	}
-	    	else{
-	    		//此处添加代码用来显示上一个页面
-	    		  if(_tabHost.getCurrentTab() == 0)
-	 					return false; 
-	 				_tabHost.setCurrentTab(_tabHost.getCurrentTab()-1);		
-	    	}
-	    	
-	    	return true;
-	    }
-		
-	   return false;
-
-	}
-	
-	
-
-	
+	}	
 	
 }

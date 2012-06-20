@@ -16,8 +16,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.TypedValue;
-import android.view.GestureDetector;
-import android.view.GestureDetector.OnGestureListener;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -56,7 +54,7 @@ import com.wireless.view.PickFoodListView;
 import com.wireless.view.TempListView;
 
 public class PickFoodActivity extends TabActivity implements
-   PickFoodListView.OnFoodPickedListener, OnGestureListener {
+   PickFoodListView.OnFoodPickedListener {
 
 	public static final String PICK_FOOD_ACTION = "com.wireless.pad.PickFoodActivity.PickFood";
 	public static final String PICK_TASTE_ACTION = "com.wireless.pad.PickFoodActivity.PickTaste";
@@ -73,7 +71,6 @@ public class PickFoodActivity extends TabActivity implements
 
 	private ArrayList<OrderFood> _pickFoods = new ArrayList<OrderFood>();
 	private TabHost _tabHost;
-	private GestureDetector _detector;
 	private List<Food> _filterKitchenFoods;
 	private TempListView _tempLstView;
 	private TextView _centerTxtView;  
@@ -85,8 +82,6 @@ public class PickFoodActivity extends TabActivity implements
 		
 		setContentView(R.layout.table);
 		
-		_detector = new GestureDetector(this);
-
 		init();
 
 		// construct the tab host
@@ -170,7 +165,7 @@ public class PickFoodActivity extends TabActivity implements
 					setupPinyinView();
 
 				} else if (tag == TAG_OCCASIONAL) {
-					setTempView();
+					setupTempView();
 				}
 				editor.commit();
 			}
@@ -804,7 +799,7 @@ public class PickFoodActivity extends TabActivity implements
 	/**
 	 * 设置临时菜的View
 	 */
-	private void setTempView() {
+	private void setupTempView() {
 
 		_tempLstView = (TempListView) findViewById(R.id.tempListView);
 		_tempLstView.notifyDataChanged();
@@ -1011,79 +1006,6 @@ public class PickFoodActivity extends TabActivity implements
 		}
 
 	}
-
-	@Override
-	public boolean onTouchEvent(MotionEvent event) {
-		if (_detector.onTouchEvent(event)) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	@Override
-	public boolean onDown(MotionEvent e) {
-		return true;
-	}
-
-	@Override
-	public boolean dispatchTouchEvent(MotionEvent ev) {
-		_detector.onTouchEvent(ev);
-		return super.dispatchTouchEvent(ev);
-	}
-
-	@Override
-	public void onShowPress(MotionEvent e) {
-
-	}
-
-	@Override
-	public boolean onSingleTapUp(MotionEvent e) {
-		return false;
-	}
-
-	@Override
-	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-			float distanceY) {
-		return false;
-	}
-
-	@Override
-	public void onLongPress(MotionEvent e) {
-
-	}
-
-
-	/*
-	 * 手势滑动执行方法
-	 */
-	@Override
-	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-			float velocityY) {
-		float scrollX = e1.getX() - e2.getX();
-		if (Math.abs(velocityX) > 200 && velocityY != 0
-				&& Math.abs(scrollX) / Math.abs(e1.getY() - e2.getY()) > 1) {
-
-			if (scrollX > 0) {
-				// 此处添加代码用来显示下一个页面
-				if (_tabHost.getCurrentTab() == 4)
-					return false;
-				_tabHost.setCurrentTab(_tabHost.getCurrentTab() + 1);
-
-			} else {
-				// 此处添加代码用来显示上一个页面
-				if (_tabHost.getCurrentTab() == 0)
-					return false;
-				_tabHost.setCurrentTab(_tabHost.getCurrentTab() - 1);
-			}
-
-			return true;
-		}
-
-		return false;
-	}
-
-	
 
 	private void init() {
 		
