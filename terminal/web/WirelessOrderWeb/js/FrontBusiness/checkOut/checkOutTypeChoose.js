@@ -102,52 +102,49 @@ var checkOurListRefresh = function() {
 			}
 		}
 
-		var tastePrice = checkOutData[i][9];
-		// var tastePrice = 0;
-		// for ( var j = 0; j < dishTasteData.length; j++) {
-		// if (dishTasteData[j][0] == checkOutData[i][2]) {
-		// tastePrice = parseFloat(dishTasteData[j][1].substr(1,
-		// dishTasteData[j][1].length - 1));
-		// }
-		// }
+		var tastePrice = checkOutData[i][11];
 
 		// 总价 = （原料价 * 折扣率 + 口味价）* 数量
 		var price;
-		if (checkOutData[i][5] == "true" || checkOutData[i][8] == "true"
-				|| checkOutData[i][12] == "true") {
+		if (checkOutData[i][7] == "true" || checkOutData[i][10] == "true"
+				|| checkOutData[i][14] == "true") {
 			// 特价，送，臨時菜　　 不打折
 			price = parseFloat(checkOutData[i][4].substring(1))
 					* checkOutData[i][3];
 		} else {
 			// 非   特价，送，臨時菜
-			price = (parseFloat(checkOutData[i][10]) * discountRate + parseFloat(tastePrice))
+			price = (parseFloat(checkOutData[i][12]) * discountRate + parseFloat(tastePrice))
 					* checkOutData[i][3];
 		}
 		var priceDisplay = "￥" + price.toFixed(2);
 
 		// 特送臨 -- 折扣率 --1
-		if (checkOutData[i][8] == "true" || checkOutData[i][5] == "true"
-				|| checkOutData[i][12] == "true") {
+		if (checkOutData[i][10] == "true" || checkOutData[i][7] == "true"
+				|| checkOutData[i][14] == "true") {
 			checkOutDataDisplay.push([ checkOutData[i][1], checkOutData[i][2],
 					checkOutData[i][3], checkOutData[i][4],
 					parseFloat("1").toFixed(2), priceDisplay, // 实价
-					checkOutData[i][5],// 特
-					checkOutData[i][6],// 荐
-					checkOutData[i][7], // 停
+					checkOutData[i][5],
+					checkOutData[i][6],
+					checkOutData[i][7],// 特
+					checkOutData[i][8],// 荐
+					checkOutData[i][9], // 停
 					checkOutData[i][8], // 送
-					checkOutData[i][11], // 時
-					checkOutData[i][12] // 臨
+					checkOutData[i][13], // 時
+					checkOutData[i][14] // 臨
 			]);
 		} else {
 			checkOutDataDisplay.push([ checkOutData[i][1], checkOutData[i][2],
 					checkOutData[i][3], checkOutData[i][4],
 					parseFloat(discountRate).toFixed(2), priceDisplay, // 实价
-					checkOutData[i][5],// 特
-					checkOutData[i][6],// 荐
-					checkOutData[i][7], // 停
+					checkOutData[i][5],
+					checkOutData[i][6],
+					checkOutData[i][7],// 特
+					checkOutData[i][8],// 荐
+					checkOutData[i][9], // 停
 					checkOutData[i][8], // 送
-					checkOutData[i][11], // 時
-					checkOutData[i][12] // 臨
+					checkOutData[i][13], // 時
+					checkOutData[i][14] // 臨
 			]);
 		}
 	}

@@ -85,6 +85,10 @@ var orderedStore = new Ext.data.Store({
 		name : "discountRate"
 	}, {
 		name : "currPrice"
+	} , {
+		name : "dishOrderDate"
+	} , {
+		name : "dishWaiter"
 	} ])
 });
 
@@ -156,7 +160,7 @@ var orderedColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(),
 			header : "菜名",
 			sortable : true,
 			dataIndex : "dishName",
-			width : 210
+			width : 200
 		}, {
 			header : "口味",
 			sortable : true,
@@ -166,28 +170,32 @@ var orderedColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(),
 			header : "数量",
 			sortable : true,
 			dataIndex : "dishCount",
-			width : 120
+			width : 60
 		}, {
 			header : "单价",
 			sortable : true,
 			dataIndex : "dishTotalPrice",
-			width : 120
+			width : 60
 		}, {
 			header : "折扣率",
 			sortable : true,
 			dataIndex : "discountRate",
-			width : 120
-		// ,
-		// editor : new Ext.form.NumberField({
-		// allowBlank : false,
-		// allowNegative : false,
-		// maxValue : 100000
-		// })
+			width : 60
 		}, {
+			header : "时间",
+			sortable : true,
+			dataIndex : "dishOrderDate",
+			width : 160
+		}, {
+			header : "服务员",
+			sortable : true,
+			dataIndex : "dishWaiter",
+			width : 80
+		} , {
 			header : "<center>操作</center>",
 			sortable : true,
 			dataIndex : "dishOpt",
-			width : 220,
+			width : 150,
 			renderer : dishOptDispley
 		} ]);
 
@@ -351,13 +359,11 @@ var orderedForm = new Ext.form.FormPanel(
 						// 以点菜式格式：[菜名，口味，数量，￥单价，操作，￥实价，菜名编号，厨房编号，口味编号1,特,荐,停,送,折扣率,￥口味价钱,口味编号2,口味编号3]
 						text : "提交",
 						handler : function() {
-							if (orderedData.length > 0
-									&& billGenModForm.findById("serviceRate")
-											.isValid()) {
-
+							if (orderedData.length > 0 && billGenModForm.findById("serviceRate").isValid()) {
+								billListRefresh();
 								var foodPara = "";
-								for ( var i = 0; i < orderedData.length; i++) {
-									if (orderedData[i][18] == "false") {
+								for ( var i = 0; i < orderedData.length; i++) {									
+									if (orderedData[i][20] == "false") {
 										// [是否临时菜(false),菜品1编号,菜品1数量,口味1编号,厨房1编号,菜品1折扣,2nd口味1编号,3rd口味1编号]
 										foodPara = foodPara + "[false,"// 是否临时菜(false)
 												+ orderedData[i][6] + "," // 菜品1编号
@@ -365,8 +371,8 @@ var orderedForm = new Ext.form.FormPanel(
 												+ orderedData[i][8] + "," // 口味1编号
 												+ orderedData[i][7] + ","// 厨房1编号
 												+ orderedData[i][13] + "," // 折扣率
-												+ orderedData[i][15] + ","// 2nd口味1编号
-												+ orderedData[i][16] // 3rd口味1编号
+												+ orderedData[i][17] + ","// 2nd口味1编号
+												+ orderedData[i][18] // 3rd口味1编号
 												+ "]，";
 									} else {
 										// 是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价
@@ -374,16 +380,14 @@ var orderedForm = new Ext.form.FormPanel(
 												orderedData[i][3].length - 1);
 										foodPara = foodPara + "[true,"// 是否临时菜(true)
 												+ orderedData[i][6] + "," // 临时菜1编号
-												+ orderedData[i][19] + "," // 临时菜1名称
+												+ orderedData[i][21] + "," // 临时菜1名称
 												+ orderedData[i][2] + "," // 临时菜1数量
 												+ price + "" // 临时菜1单价(原材料單價)
 												+ "]，";
 									}
 
 								}
-								foodPara = "{"
-										+ foodPara.substr(0,
-												foodPara.length - 1) + "}";
+								foodPara = "{"+ foodPara.substr(0,foodPara.length - 1) + "}";
 
 								// alert(foodPara);
 
@@ -420,10 +424,9 @@ var orderedForm = new Ext.form.FormPanel(
 										"remark").getValue();
 
 								var memberIDOut = Request["memberID"] + "";
-
+								
 								orderedForm.buttons[0].setDisabled(true);
-								Ext.Ajax
-										.request({
+								Ext.Ajax.request({
 											url : "../../UpdateOrder2.do",
 											params : {
 												"pin" : pin,
@@ -1409,6 +1412,8 @@ var dishesDisplayGrid = new Ext.grid.GridPanel({
 					dishesDisplayDataShow[rowIndex][8],// 送
 					"1",// 折扣率
 					"￥0",// ￥口味价钱
+					new Date().format('Y-m-d h:m:s'),
+					Ext.getDom('optName').innerHTML,					
 					0,// 口味编号2
 					0, // 口味编号3
 					dishesDisplayDataShow[rowIndex][9], // 時
@@ -1905,8 +1910,7 @@ var billGenModForm = new Ext.form.FormPanel({
 	} ]
 });
 
-Ext
-		.onReady(function() {
+Ext.onReady(function() {
 			// 解决ext中文传入后台变问号问题
 			Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
 			Ext.QuickTips.init();
@@ -1965,7 +1969,7 @@ Ext
 									html : "<div style='font-size:11pt; text-align:center;'><b>版权所有(c) 2011 智易科技</b></div>"
 								} ]
 					});
-
+			
 			// -------------------- 浏览器大小改变 -------------------------------
 			// 1,调整colDisplayFormUQ中表格的高度
 			// Ext.EventManager.onWindowResize(function() {

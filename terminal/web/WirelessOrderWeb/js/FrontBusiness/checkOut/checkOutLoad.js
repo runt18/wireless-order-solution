@@ -36,8 +36,7 @@ function checkOutOnLoad() {
 	// 口味编号3,口味价钱,是否时价,是否临时菜]
 	// discountData [厨房编号,一般折扣1,一般折扣2,一般折扣3,会员折扣1,会员折扣2,会员折扣3]
 	// 后台折扣率 [厨房编号,"厨房名称",一般折扣1,一般折扣2,一般折扣3,会员折扣1,会员折扣2,会员折扣3]
-	Ext.Ajax
-			.request({
+	Ext.Ajax.request({
 				url : "../../QueryOrder.do",
 				params : {
 					"pin" : Request["pin"],
@@ -51,7 +50,7 @@ function checkOutOnLoad() {
 						var josnData = resultJSON.data;
 						var orderList = josnData.split("，");
 						for ( var i = 0; i < orderList.length; i++) {
-
+//							alert('orderList[i]:   '+orderList[i])
 							var orderInfo = orderList[i].substr(1,
 									orderList[i].length - 2).split(",");
 							// 实价 = 单价 + 口味价钱
@@ -67,8 +66,10 @@ function checkOutOnLoad() {
 							orderInfo[3].substr(1, orderInfo[3].length - 2),// 口味
 							orderInfo[5],// 数量
 							acturalPrice, // 实价
+							orderInfo[19],// 时间
+							orderInfo[20],// 服务员 
 							orderInfo[7],// 特
-							orderInfo[8],// 荐
+							orderInfo[8],// 荐							
 							orderInfo[9], // 停
 							orderInfo[10], // 送
 							orderInfo[14].substr(2, orderInfo[14].length - 3),// 口味价钱
@@ -76,11 +77,11 @@ function checkOutOnLoad() {
 							orderInfo[15], // 時
 							orderInfo[16] // 臨
 							]);
+//							alert('checkOutData:  '+checkOutData)
 						}
 
 						// 2,获取折扣率
-						Ext.Ajax
-								.request({
+						Ext.Ajax.request({
 									url : "../../QueryMenu.do",
 									params : {
 										"pin" : Request["pin"],
@@ -91,14 +92,9 @@ function checkOutOnLoad() {
 												.decode(response.responseText);
 										if (resultJSON.success == true) {
 											var discountJSONData = resultJSON.data;
-											var discountList = discountJSONData
-													.split("，");
+											var discountList = discountJSONData.split("，");
 											for ( var i = 0; i < discountList.length; i++) {
-												var discountInfo = discountList[i]
-														.substr(
-																1,
-																discountList[i].length - 2)
-														.split(",");
+												var discountInfo = discountList[i].substr(1,discountList[i].length - 2).split(",");
 												discountData.push([
 														discountInfo[0], // 厨房编号
 														discountInfo[3],// 一般折扣1
@@ -112,43 +108,26 @@ function checkOutOnLoad() {
 											}
 
 											// 3,请求口味
-											Ext.Ajax
-													.request({
+											Ext.Ajax.request({
 														url : "../../QueryMenu.do",
 														params : {
 															"pin" : Request["pin"],
 															"type" : "2"
 														},
-														success : function(
-																response,
-																options) {
-															var resultTasteJSON = Ext.util.JSON
-																	.decode(response.responseText);
+														success : function(response,options) {
+															var resultTasteJSON = Ext.util.JSON.decode(response.responseText);
 															if (resultTasteJSON.success == true) {
 																if (resultTasteJSON.data != "") {
 																	var josnTasteData = resultTasteJSON.data;
-																	var tasteList = josnTasteData
-																			.split("，");
+																	var tasteList = josnTasteData.split("，");
 
 																	for ( var i = 0; i < tasteList.length; i++) {
-																		var tasteInfo = tasteList[i]
-																				.substr(
-																						1,
-																						tasteList[i].length - 2)
-																				.split(
-																						",");
+																		var tasteInfo = tasteList[i].substr(1,tasteList[i].length - 2).split(",");
 																		// 后台格式：[1,"加辣","￥2.50"]，[2,"少盐","￥0.00"]，[3,"少辣","￥5.00"]
 																		// 前后台格式有差异，口味编号前台存储放在最后一位
-																		dishTasteData
-																				.push([
-																						tasteInfo[1]
-																								.substr(
-																										1,
-																										tasteInfo[1].length - 2), // 口味
-																						tasteInfo[2]
-																								.substr(
-																										1,
-																										tasteInfo[2].length - 2), // 价钱
+																		dishTasteData.push([
+																						tasteInfo[1].substr(1,tasteInfo[1].length - 2), // 口味
+																						tasteInfo[2].substr(1,tasteInfo[2].length - 2), // 价钱
 																						tasteInfo[0] // 口味编号
 																				]);
 																	}
@@ -165,60 +144,18 @@ function checkOutOnLoad() {
 																		}
 																	}
 
-																	var tastePrice = checkOutData[i][9];
-																	// var
-																	// tastePrice
-																	// = 0;
-																	// for ( var
-																	// j = 0; j
-																	// <
-																	// dishTasteData.length;
-																	// j++) {
-																	// if
-																	// (dishTasteData[j][0]
-																	// ==
-																	// checkOutData[i][2])
-																	// {
-																	// tastePrice
-																	// =
-																	// parseFloat(dishTasteData[j][1]
-																	// .substr(
-																	// 1,
-																	// dishTasteData[j][1].length
-																	// - 1));
-																	// }
-																	// }
+																	var tastePrice = checkOutData[i][11];
 
 																	// 总价 = （原料价
 																	// * 折扣率 +
 																	// 口味价）* 数量
 																	var price;
-																	if (checkOutData[i][5] == "true"
-																			|| checkOutData[i][8] == "true") {
+																	if (checkOutData[i][7] == "true" || checkOutData[i][10] == "true") {
 																		// 特价，送
 																		// 不打折
-																		price = parseFloat(checkOutData[i][4]
-																				.substring(1))
-																				* checkOutData[i][3];
-
+																		price = parseFloat(checkOutData[i][4] .substring(1)) * checkOutData[i][3];
 																	} else {
-																		// 非特价
-																		// var
-																		// price
-																		// =
-																		// ((parseFloat(checkOutData[i][4]
-																		// .substring(1))
-																		// -
-																		// tastePrice)
-																		// *
-																		// discountRate
-																		// +
-																		// tastePrice)
-																		// *
-																		// checkOutData[i][3];
-
-																		price = (parseFloat(checkOutData[i][10])
-																				* discountRate + parseFloat(tastePrice))
+																		price = (parseFloat(checkOutData[i][12]) * discountRate + parseFloat(tastePrice))
 																				* checkOutData[i][3];
 
 																	}
@@ -229,25 +166,23 @@ function checkOutOnLoad() {
 																	// 特价，送 --
 																	// 折扣率
 																	// --1
-																	if (checkOutData[i][8] == "true"
-																			|| checkOutData[i][5] == "true") {
-																		checkOutDataDisplay
-																				.push([
+																	if (checkOutData[i][10] == "true"
+																			|| checkOutData[i][7] == "true") {
+																		checkOutDataDisplay.push([
 																						checkOutData[i][1],// 菜名
 																						checkOutData[i][2],// 口味
 																						checkOutData[i][3],// 数量
 																						checkOutData[i][4],// 单价
-																						parseFloat(
-																								"1")
-																								.toFixed(
-																										2),// 折扣率
+																						parseFloat("1").toFixed(2),// 折扣率
 																						priceDisplay, // 实价
-																						checkOutData[i][5],// 特
-																						checkOutData[i][6],// 荐
-																						checkOutData[i][7], // 停
+																						checkOutData[i][5],
+																						checkOutData[i][6],
+																						checkOutData[i][7],// 特
+																						checkOutData[i][8],// 荐
+																						checkOutData[i][9], // 停
 																						checkOutData[i][8], // 送
-																						checkOutData[i][11], // 時
-																						checkOutData[i][12] // 臨
+																						checkOutData[i][13], // 時
+																						checkOutData[i][14] // 臨
 																				]);
 																	} else {
 																		checkOutDataDisplay
@@ -261,12 +196,14 @@ function checkOutOnLoad() {
 																								.toFixed(
 																										2),// 折扣率
 																						priceDisplay, // 实价
-																						checkOutData[i][5],// 特
-																						checkOutData[i][6],// 荐
-																						checkOutData[i][7], // 停
+																						checkOutData[i][5],
+																						checkOutData[i][6],
+																						checkOutData[i][7],// 特
+																						checkOutData[i][8],// 荐
+																						checkOutData[i][9], // 停
 																						checkOutData[i][8], // 送
-																						checkOutData[i][11], // 時
-																						checkOutData[i][12] // 臨
+																						checkOutData[i][13], // 時
+																						checkOutData[i][14] // 臨
 																				]);
 																	}
 																}
@@ -313,19 +250,7 @@ function checkOutOnLoad() {
 																for ( var i = 0; i < checkOutDataDisplay.length; i++) {
 																	var singleCount = parseFloat(checkOutDataDisplay[i][5]
 																			.substr(1));
-																	if (checkOutDataDisplay[i][9] == "true") {
-																		// forFreeCount
-																		// =
-																		// forFreeCount
-																		// +
-																		// singleCount;
-
-																		// for
-																		// free
-																		// count
-																		// dont
-																		// need
-																		// discount
+																	if (checkOutDataDisplay[i][9] == "true") {																		
 																		forFreeCount = forFreeCount
 																				+ parseFloat(checkOutData[i][4]
 																						.substring(1))

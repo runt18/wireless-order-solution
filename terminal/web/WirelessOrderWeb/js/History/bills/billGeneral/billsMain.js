@@ -600,7 +600,7 @@ var kitchenStatBut = new Ext.ux.ImageButton({
 	handler : function(btn) {
 		if (!isPrompt) {
 			isPrompt = true;
-			kitchenStatWin.show();
+			kitchenStatWin.show(true);
 		}
 	}
 });
@@ -680,6 +680,26 @@ var businessStatBut = new Ext.ux.ImageButton({
 			isPrompt = true;
 			businessStatWin.show();
 		}
+	}
+});
+
+var btnBusinessSum = new Ext.ux.ImageButton({
+	imgPath : '',
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "营业汇总",
+	handler : function(btn) {
+		businessSum();
+	}
+});
+
+var btnSalesSub = new Ext.ux.ImageButton({
+	imgPath : '',
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "销售统计",
+	handler : function(btn) {
+		salesSub();
 	}
 });
 
@@ -1732,7 +1752,11 @@ Ext
 					}, businessStatBut, {
 						text : "&nbsp;&nbsp;&nbsp;",
 						disabled : true
-					}, "->", pushBackBut, {
+					}, 
+					btnBusinessSum,
+					{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
+					btnSalesSub,
+					"->", pushBackBut, {
 						text : "&nbsp;&nbsp;&nbsp;",
 						disabled : true
 					}, logOutBut ]
@@ -1749,7 +1773,7 @@ Ext
 									bodyStyle : "background-color:#A9D0F5",
 									html : "<h4 style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4><div id='optName' class='optName'></div>",
 									height : 50,
-									margins : '0 0 5 0'
+									margins : '0 0 0 0'
 								},
 								centerPanel,
 								{

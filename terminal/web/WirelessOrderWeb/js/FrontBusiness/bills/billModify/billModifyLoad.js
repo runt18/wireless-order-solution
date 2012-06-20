@@ -142,42 +142,36 @@ function billModifyOnLoad() {
 							var josnData = resultJSON.data;
 							var orderList = josnData.split("，");
 							for ( var i = 0; i < orderList.length; i++) {
-
-								var orderInfo = orderList[i].substr(1,
-										orderList[i].length - 2).split(",");
+								var orderInfo = orderList[i].substr(1, orderList[i].length - 2).split(",");
 								// 实价 = 单价 + 口味价钱
-								var singlePrice = parseFloat(orderInfo[6]
-										.substr(2, orderInfo[6].length - 3));
-								var tastePrice = parseFloat(orderInfo[14]
-										.substr(2, orderInfo[14].length - 3));
+								var singlePrice = parseFloat(orderInfo[6].substr(2, orderInfo[6].length - 3));
+								var tastePrice = parseFloat(orderInfo[14].substr(2, orderInfo[14].length - 3));
 								var acturalPrice = 0.0;
 								acturalPrice = singlePrice + tastePrice;
 								acturalPrice = "￥" + acturalPrice.toFixed(1);
 								orderedData.push([
-										orderInfo[0].substr(1,
-												orderInfo[0].length - 2), // 菜名
-										orderInfo[3].substr(1,
-												orderInfo[3].length - 2),// 口味
+										orderInfo[0].substr(1, orderInfo[0].length - 2), // 菜名
+										orderInfo[3].substr(1, orderInfo[3].length - 2),// 口味
 										orderInfo[5],// 数量
-										orderInfo[6].substr(1,
-												orderInfo[6].length - 2),// 单价
+										orderInfo[6].substr(1, orderInfo[6].length - 2),// 单价
 										"",// 操作
-										acturalPrice,// 实价
-										orderInfo[1],// 菜名编号
+										acturalPrice,// 实价										
+										orderInfo[1],// 菜名编号										
 										orderInfo[2],// 厨房编号
-										orderInfo[4], // 口味编号
+										orderInfo[4], // 口味编号										
 										orderInfo[7],// 特
 										orderInfo[8],// 荐
 										orderInfo[9], // 停
 										orderInfo[10], // 送
 										orderInfo[11], // 折扣率
 										tastePrice,// 口味价钱
+										orderInfo[19],// 时间
+										orderInfo[20],// 服务员 
 										orderInfo[12],// 口味编号2
 										orderInfo[13], // 口味编号3
 										orderInfo[15], // 時
 										orderInfo[16], // 是否临时菜
-										orderInfo[0].substr(1,
-												orderInfo[0].length - 2) // 菜名ORIG
+										orderInfo[0].substr(1,orderInfo[0].length - 2) // 菜名ORIG
 								]);
 							}
 
@@ -238,8 +232,7 @@ function billModifyOnLoad() {
 			});
 
 	// 当前帐单信息查询
-	Ext.Ajax
-			.request({
+	Ext.Ajax.request({
 				url : "../../QueryToday.do",
 				params : {
 					"pin" : pin,

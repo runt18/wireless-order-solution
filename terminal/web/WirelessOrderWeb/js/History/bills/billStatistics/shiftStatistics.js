@@ -115,7 +115,7 @@ var shiftCheckTableWin = new Ext.Window({
 				text : "关闭",
 				// disabled : true,
 				handler : function() {
-					shiftCheckTableWin.hide();
+					shiftCheckTableWin.hide();					
 					isPrompt = false;
 				}
 			} ]
@@ -126,8 +126,12 @@ shiftStatWin = new Ext.Window({
 	title : "交班记录",
 	width : 450,
 	height : 101,
-	closeAction : "hide",
+//	closeAction : "hide",
 	resizable : false,
+	modal:true,
+	closable:false,
+	constrainHeader:true,
+	draggable:false,
 	layout : "anchor",
 	items : [ {
 		border : false,
@@ -257,8 +261,8 @@ function shiftStatDetalHandler(rowIndex) {
 							.decode(response.responseText);
 					// 
 					var rootData = resultJSON.root;
-					if (rootData[0].message == "normal") {
-
+					if (rootData[0].message == "normal") {				
+						
 						document.getElementById("shiftTitle").innerHTML = "交班对账表";
 						document.getElementById("shiftOperator").innerHTML = shiftStatResultStore
 								.getAt(rowIndex).get("staff");
@@ -341,6 +345,7 @@ function shiftStatDetalHandler(rowIndex) {
 						shiftCheckDetpStore.reload();
 
 					} else {
+						shiftStatShowDiv(false);
 						Ext.MessageBox.show({
 							msg : rootData[0].message,
 							width : 300,
@@ -349,6 +354,7 @@ function shiftStatDetalHandler(rowIndex) {
 					}
 				},
 				failure : function(response, options) {
+					shiftStatShowDiv(false);
 					Ext.MessageBox.show({
 						msg : " Unknown page error ",
 						width : 300,
@@ -482,8 +488,12 @@ shiftStatResultWin = new Ext.Window({
 	title : "统计结果",
 	width : 800,
 	height : 370,
-	closeAction : "hide",
+//	closeAction : "hide",
 	resizable : false,
+	modal:true,
+	closable:false,
+	constrainHeader:true,
+	draggable:false,
 	layout : "fit",
 	items : shiftStatResultGrid,
 	buttons : [ {
@@ -504,3 +514,12 @@ shiftStatResultWin = new Ext.Window({
 		}
 	}
 });
+
+shiftStatShowDiv = function(_st){
+	var id = ['billSum','billView','billViewAddInfo','shiftCheckTableDiv','billSum'];
+	var styleDisplay = 'none';
+	styleDisplay = _st ? 'block' : styleDisplay;
+	for(var i = 0; i < id.length; i++){
+		Ext.get('billSum').setStyle({ display : styleDisplay });
+	}
+};

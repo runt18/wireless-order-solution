@@ -99,7 +99,11 @@ var checkOutStore = new Ext.data.Store({
 		name : "dishDiscount"
 	}, {
 		name : "dishTotalPrice"
-	} ])
+	},  {
+		name : "dishOrderDate"
+	},  {
+		name : "dishWaiter"
+	}  ])
 });
 
 checkOutStore.reload();
@@ -121,22 +125,32 @@ var checkOutColumnModel = new Ext.grid.ColumnModel([
 			header : "数量",
 			sortable : true,
 			dataIndex : "dishCount",
-			width : 160
+			width : 80
 		}, {
 			header : "单价",
 			sortable : true,
 			dataIndex : "dishPrice",
-			width : 160
+			width : 80
 		}, {
 			header : "打折率",
 			sortable : true,
 			dataIndex : "dishDiscount",
-			width : 160
+			width : 80
 		}, {
 			header : "总价",
 			sortable : true,
 			dataIndex : "dishTotalPrice",
+			width : 80
+		}, {
+			header : "时间",
+			sortable : true,
+			dataIndex : "dishOrderDate",
 			width : 160
+		}, {
+			header : "服务员",
+			sortable : true,
+			dataIndex : "dishWaiter",
+			width : 80
 		} ]);
 
 // 4，表格
@@ -504,8 +518,7 @@ var checkOutNorthPanel = new Ext.Panel({
 	contentEl : "tableStatusCO"
 });
 
-Ext
-		.onReady(function() {
+Ext.onReady(function() {
 			// 解决ext中文传入后台变问号问题
 			Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
 			Ext.QuickTips.init();
@@ -530,7 +543,7 @@ Ext
 									region : "north",
 									html : "<div style='padding:10px; background-color:#A9D0F5'><h4 style='font-size:150%'>无线点餐网页终端<h4></div>",
 									height : 50,
-									margins : "0 0 5 0"
+									margins : "0 0 0 0"
 								},
 								centerPanelCO,
 								{
