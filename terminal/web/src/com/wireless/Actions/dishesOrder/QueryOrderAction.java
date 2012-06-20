@@ -124,7 +124,7 @@ public class QueryOrderAction extends Action {
 					jsonOrderFood = jsonOrderFood.replace("$(total_discount)",
 							order.foods[i].calcDiscountPrice().toString());
 					jsonOrderFood = jsonOrderFood.replace("$(order_date)",
-							new SimpleDateFormat("").format(order.foods[i].orderDate));
+							new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(order.foods[i].orderDate));
 					jsonOrderFood = jsonOrderFood.replace("$(waiter)",
 							order.foods[i].waiter);
 					
