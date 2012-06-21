@@ -38,6 +38,8 @@
 		    android:layout_height="wrap_content"
 		    android:layout_alignParentRight="true"
 		    android:layout_alignParentTop="true"
+		    android:background="@drawable/number_selector"
+		    android:textSize="18sp"
 		    android:text="删除口味" />
 
 	</RelativeLayout>

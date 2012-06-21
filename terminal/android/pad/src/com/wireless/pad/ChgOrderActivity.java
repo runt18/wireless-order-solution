@@ -66,6 +66,13 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 				OrderParcel orderParcel = intent.getParcelableExtra(OrderParcel.KEY_VALUE);
 				_newFoodLstView.addFoods(orderParcel.foods);
 				_newFoodLstView.expandGroup(0);
+				//滚动到最后一项
+				_newFoodLstView.post( new Runnable() {     
+					@Override
+					public void run() { 
+						_newFoodLstView.smoothScrollToPosition(_newFoodLstView.getCount());
+					}
+				});
 				_oriFoodLstView.collapseGroup(0);
 				
 			}else if(intent.getAction().equals(PickFoodActivity.PICK_TASTE_ACTION)){

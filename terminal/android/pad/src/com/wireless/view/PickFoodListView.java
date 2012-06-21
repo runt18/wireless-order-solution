@@ -173,7 +173,9 @@ public class PickFoodListView extends GridView {
 			setContentView(R.layout.order_confirm);
 			
 			((TextView)findViewById(R.id.orderTitleTxt)).setText("请输入" + _selectedFood.name + "的点菜数量");
-			EditText amountEdtTxt = ((EditText)findViewById(R.id.amountEdtTxt));
+			final EditText amountEdtTxt = ((EditText)findViewById(R.id.amountEdtTxt));
+			//FIXME
+			amountEdtTxt.setFocusable(false);
 			amountEdtTxt.setText("1");
 			amountEdtTxt.setSelection(amountEdtTxt.getText().length());
 

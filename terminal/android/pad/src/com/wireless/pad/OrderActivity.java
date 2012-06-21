@@ -59,6 +59,13 @@ public class OrderActivity extends ActivityGroup implements
 						.getParcelableExtra(OrderParcel.KEY_VALUE);
 				_newFoodLstView.addFoods(orderParcel.foods);
 				_newFoodLstView.expandGroup(0);
+				//滚动到最后一项
+				_newFoodLstView.post( new Runnable() {     
+					@Override
+					public void run() { 
+						_newFoodLstView.smoothScrollToPosition(_newFoodLstView.getCount());
+					}
+				});
 
 			} else if (intent.getAction().equals(
 					PickFoodActivity.PICK_TASTE_ACTION)) {

@@ -193,7 +193,7 @@
                             android:layout_weight="0.3"
                             android:background="@drawable/order_confirm_selector"
                             android:text="提  交"
-                            android:textSize="18sp" />
+                            android:textSize="20sp" />
 
                         <Button
                             android:id="@+id/confirm2"
@@ -204,7 +204,7 @@
                             android:layout_weight="0.3"
                             android:background="@drawable/order_confirm2_selector"
                             android:text="取  消"
-                            android:textSize="18sp" />
+                            android:textSize="20sp" />
                     </LinearLayout>
                 </RelativeLayout>
 
