@@ -112,7 +112,6 @@ public class UpdateOrderAction2 extends Action{
 				orderToUpdate.comment = comment.substring(0, comment.length() < 20 ? comment.length() : 20);
 			}
 			//get the food string to this order
-			System.out.println("discountType:    "+request.getParameter("discountType"));
 			orderToUpdate.foods = Util.toFoodArray(request.getParameter("foods"));
 			
 			UpdateOrder.execByID(Long.parseLong(pin), Terminal.MODEL_STAFF, orderToUpdate, true);
