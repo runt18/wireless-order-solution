@@ -1412,7 +1412,7 @@ var dishesDisplayGrid = new Ext.grid.GridPanel({
 					dishesDisplayDataShow[rowIndex][8],// 送
 					"1",// 折扣率
 					"￥0",// ￥口味价钱
-					new Date().format('Y-m-d h:m:s'),
+					new Date().format('Y-m-d H:m:s'),
 					Ext.getDom('optName').innerHTML,					
 					0,// 口味编号2
 					0, // 口味编号3

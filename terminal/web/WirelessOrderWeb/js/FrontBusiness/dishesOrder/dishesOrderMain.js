@@ -1804,7 +1804,7 @@ var dishesDisplayGrid = new Ext.grid.GridPanel(
 						if (isAlreadyOrderd == false) {
 							orderedData.push([ dishCurrName, "无口味", 1,
 									dishCurrPrice, "", dishCurrPrice,
-									new Date().format('Y-m-d h:m:s'), Ext.getDom('optName').innerHTML,
+									new Date().format('Y-m-d H:m:s'), Ext.getDom('optName').innerHTML,
 									dishNbr, kitchenNbr, 0,
 									dishesDisplayDataShow[rowIndex][5],
 									dishesDisplayDataShow[rowIndex][6],

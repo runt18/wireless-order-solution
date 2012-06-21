@@ -980,7 +980,7 @@ Ext.onReady(function() {
 //						}
 //						return;
 						
-						var pageSize = 10;
+						var pageSize = 200;
 						var cmData = [[true,false],['日期','order_date',150],['名称','food_name',150],['单价','unit_price',80],
 						              ['数量','amount',80],['折扣','discount',80],['口味','taste_pref'],
 						              ['口味价钱','taste_price',80],['厨房','kitchen'],['服务员','waiter',80],
@@ -993,8 +993,7 @@ Ext.onReady(function() {
 						var height = 320;
 						var width = '';
 						var groupName = '';
-						if(!selTabContentGrid){
-							
+						if(!selTabContentGrid){					
 							selTabContentGrid = createGridPanel(id,title,height,width,url,cmData,readerData,baseParams,pageSize,groupName,null);
 						}
 						
@@ -1024,13 +1023,14 @@ Ext.onReady(function() {
 						selTabContentWin.show(true);
 						var tpStore = selTabContentGrid.getStore();
 						tpStore.baseParams.tableAlias = selTabContent.tableAlias;
+						tpStore.baseParams.pin = pin;
+						tpStore.baseParams.queryType = 'TodayByTbl';
+						tpStore.baseParams.restaurantID = restaurantID;
+						tpStore.baseParams.tableAlias = selTabContent.tableAlias;
 						tpStore.load({
 							params : {
 								limit : pageSize,
-								start : 0,
-								pin : pin,
-								queryType : 'TodayByTbl',
-								restaurantID : restaurantID
+								start : 0
 							}
 						});
 						

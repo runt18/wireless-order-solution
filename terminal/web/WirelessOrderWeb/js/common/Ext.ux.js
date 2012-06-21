@@ -154,23 +154,23 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 
 	/** 构造下工具条 * */
 	var g_bbar = "";
-	if(bbar==false){
-		g_bbar = new Ext.PagingToolbar({
-				pageSize : pageSize,
-				store : g_store
-			});
-	}else{
+//	if(bbar==false){
+//		g_bbar = new Ext.PagingToolbar({
+//				pageSize : pageSize,
+//				store : g_store
+//			});
+//	}else{
 			g_bbar = new Ext.PagingToolbar({
 				pageSize : pageSize,
 				store : g_store,
 //				plugins : new Ext.ux.PageSizePlugin(),
 				displayInfo : true,
 				displayMsg : '显示第{0}~{1}条记录，共{2}条',
-				emptyMsg : "没有记录",
+				emptyMsg : "没有记录"
 //				items : [groupName == '' ? '' : b_groupBtn, b_printBtn]
-				items : b_groupBtn
+//				,items : b_groupBtn
 			});
-	}
+//	}
 	/** 构造数据列表 * */
 	var g_gridPanel = new Ext.grid.GridPanel({
 		id : id, // 编号
@@ -205,8 +205,8 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 			right : 0,
 			left : 0
 		},
-		view : groupName == '' ? new Ext.grid.GridView : g_groupView, // 数据分组显示
-		bbar : g_bbar, // 加载下工具条
+//		view : groupName == '' ? new Ext.grid.GridView : g_groupView, // 数据分组显示
+//		bbar : g_bbar, // 加载下工具条
 		tbar : typeof tbar != 'undefined' ? (Ext.isArray(tbar)==true?tbar[0]:tbar) :null // 加载上工具条
 		});
 	
