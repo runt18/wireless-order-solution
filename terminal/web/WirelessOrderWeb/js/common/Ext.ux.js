@@ -141,7 +141,9 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 
 		g_store.baseParams[param[0]] = param[1];
 	}
-
+	
+	g_store.baseParams['start'] = 0;
+	g_store.baseParams['limit'] = pageSize;
 	/** 加载数据 * */
 //	g_store.load({
 //				params : {

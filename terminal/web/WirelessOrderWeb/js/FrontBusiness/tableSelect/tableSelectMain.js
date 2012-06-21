@@ -1,7 +1,11 @@
 ﻿var regionTree;
 
-Ext
-		.onReady(function() {
+
+
+Ext.onReady(function() {
+	getIsPaidDisplay = function(_val){
+		return eval(_val) == true ? '是' : '否';
+	};
 			// 解决ext中文传入后台变问号问题
 			Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
 			Ext.QuickTips.init();
@@ -50,8 +54,7 @@ Ext
 																"<b>您输入的台号为就餐状态，不能转台！</b>");
 											} else {
 												tableChangeWin.hide();
-												Ext.Ajax
-														.request({
+												Ext.Ajax.request({
 															url : "../../TransTable.do",
 															params : {
 																"pin" : pin,
@@ -217,75 +220,7 @@ Ext
 								f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
 							}
 						}
-					});
-
-			// table separate pop window
-			// tableSeparateWin = new Ext.Window(
-			// {
-			// layout : "fit",
-			// width : 200,
-			// height : 100,
-			// closeAction : "hide",
-			// resizable : false,
-			// items : [ {
-			// layout : "form",
-			// labelWidth : 30,
-			// border : false,
-			// frame : true,
-			// items : [ {
-			// xtype : "numberfield",
-			// fieldLabel : "人数",
-			// id : "personCountInputSep",
-			// width : 110
-			// } ]
-			// } ],
-			// buttons : [
-			// {
-			// text : "确定",
-			// handler : function() {
-			// var inputCount = tableSeparateWin
-			// .findById("personCountInputSep")
-			// .getValue();
-			// if (inputCount != 0 && inputCount != "") {
-			// tableSeparateWin.hide();
-			// // for forward the page
-			// var tableIndex = -1;
-			// for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
-			// if (tableStatusListTSDisplay[i].tableAlias == selectedTable) {
-			// tableIndex = i;
-			// }
-			// }
-			// location.href = "OrderMain.html?tableNbr="
-			// + selectedTable
-			// + "&personCount="
-			// + inputCount
-			// + "&tableStat=free"
-			// + "&category="
-			// + CATE_JOIN_TABLE
-			// + "&tableNbr2=0"
-			// + "&pin="
-			// + pin
-			// + "&restaurantID="
-			// + restaurantID
-			// + "&minCost="
-			// + tableStatusListTSDisplay[tableIndex].tableMinCost;
-			//
-			// }
-			// }
-			// }, {
-			// text : "取消",
-			// handler : function() {
-			// tableSeparateWin.hide();
-			// }
-			// } ],
-			// listeners : {
-			// show : function(thiz) {
-			// // thiz.findById("personCountInput").focus();
-			// var f = Ext.get("personCountInputSep");
-			// f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
-			// }
-			// }
-			// });
+					});			
 
 			// ***************tableSelectNorthPanel******************
 			// soft key board
@@ -1020,7 +955,89 @@ Ext
 							+ "&minCost=0.0&serviceRate=0";
 				}
 			});
-
+			
+			var selTabContentGrid = null;
+			var selTabContentWin = null;
+			var btnOrderDetail = new Ext.ux.ImageButton({
+				imgPath : '../../images/TableOrderDetail.png',
+				imgWidth : 50,
+				imgHeight : 50,
+				tooltip : '查看明细',
+				handler : function(e) {
+					if (selectedTable != '') {
+						var selTabContent = null;
+						for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
+							if (tableStatusListTSDisplay[i].tableAlias == selectedTable) {
+								selTabContent = tableStatusListTSDisplay[i];
+							}
+						}
+						if(parseInt(selTabContent.tableStatus) != 1){
+							return;
+						}
+						
+//						for(k in selTabContent){
+//							alert(k+'      '+selTabContent[k]);
+//						}
+//						return;
+						
+						var pageSize = 10;
+						var cmData = [[true,false],['日期','order_date',150],['名称','food_name',150],['单价','unit_price',80],
+						              ['数量','amount',80],['折扣','discount',80],['口味','taste_pref'],
+						              ['口味价钱','taste_price',80],['厨房','kitchen'],['服务员','waiter',80],
+						              ['反结帐','isPaid',80,'getIsPaidDisplay'],['备注','comment']];
+						var url = '../../QueryDetail.do?tiem=' + new Date();
+						var readerData = ['order_date','food_name','unit_price','amount','discount','taste_pref','taste_price','kitchen','waiter','comment','isPaid','isDiscount','isGift','isReturn','message'];
+						var baseParams = [['pin', pin], ['queryType', 'TodayByTbl'], ['tableAlias', selTabContent.tableAlias], ['restaurantID', restaurantID]];							
+						var id = 'selTabConten_grid';
+						var title = '';
+						var height = 320;
+						var width = '';
+						var groupName = '';
+						if(!selTabContentGrid){
+							
+							selTabContentGrid = createGridPanel(id,title,height,width,url,cmData,readerData,baseParams,pageSize,groupName,null);
+						}
+						
+						if(!selTabContentWin){
+							selTabContentWin = new Ext.Window({
+								title : '',
+								resizable : false,
+								closable : false,
+								constrainHeader : true,
+//								modal : true,
+//								draggable : false,
+								width : 1150,
+								items : [selTabContentGrid],
+								buttons : [
+								{
+									text : '关闭',
+									handler : function(){
+										selTabContentWin.hide();
+									}
+								}
+								]
+							});
+						}
+						
+						selTabContentWin.setTitle(String.format('餐台号:&nbsp;<font color="red">{0}</font>&nbsp;&nbsp;&nbsp;餐台名:&nbsp;<font color="red">{1}</font>&nbsp;&nbsp;&nbsp;用餐人数:&nbsp;<font color="red">{2}</font>'
+								,selectedTable, selTabContent.tableName, selTabContent.tableCustNbr));
+						selTabContentWin.show(true);
+						var tpStore = selTabContentGrid.getStore();
+						tpStore.baseParams.tableAlias = selTabContent.tableAlias;
+						tpStore.load({
+							params : {
+								limit : pageSize,
+								start : 0,
+								pin : pin,
+								queryType : 'TodayByTbl',
+								restaurantID : restaurantID
+							}
+						});
+						
+					}
+				}
+			});
+			
 			var pushBackBut = new Ext.ux.ImageButton({
 				imgPath : "../../images/UserLogout.png",
 				imgWidth : 50,
@@ -1048,28 +1065,31 @@ Ext
 					height : 55,
 					items : [ {
 						text : " ",
-						disabled : true
+						xtype : 'tbtext'
 					}, dishesOrderImgBut, {
 						text : "&nbsp;&nbsp;&nbsp;",
-						disabled : true
+						xtype : 'tbtext'
 					}, checkOutImgBut, {
 						text : "&nbsp;&nbsp;&nbsp;",
-						disabled : true
+						xtype : 'tbtext'
 					}, orderDeleteImgBut, {
 						text : "&nbsp;&nbsp;&nbsp;",
-						disabled : true
+						xtype : 'tbtext'
 					}, tableChangeImgBut, {
 						text : "&nbsp;&nbsp;&nbsp;",
-						disabled : true
+						xtype : 'tbtext'
 					}, tableMergeImgBut, {
 						text : "&nbsp;&nbsp;&nbsp;",
-						disabled : true
+						xtype : 'tbtext'
 					}, tableSepImgBut, {
 						text : "&nbsp;&nbsp;&nbsp;",
-						disabled : true
-					}, packageImgBut, "->", pushBackBut, {
+						xtype : 'tbtext'
+					}, packageImgBut,
+					{ xtype : 'tbtext', text : '&nbsp;&nbsp;&nbsp;'},
+					btnOrderDetail,
+					"->", pushBackBut, {
 						text : "&nbsp;&nbsp;&nbsp;",
-						disabled : true
+						xtype : 'tbtext'
 					}, logOutBut ]
 				}),
 				layout : "border",

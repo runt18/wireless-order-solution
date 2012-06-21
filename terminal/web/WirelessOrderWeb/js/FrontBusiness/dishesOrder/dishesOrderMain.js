@@ -530,8 +530,7 @@ var orderedForm = new Ext.form.FormPanel(
 								var Request = new URLParaQuery();
 
 								var foodPara = "";
-								for ( var i = 0; i < orderedData.length; i++) {
-									
+								for ( var i = 0; i < orderedData.length; i++) {									
 									if (orderedData[i][20] == "false") {
 										
 										// [是否临时菜(false),菜品1编号,菜品1数量,口味1编号,厨房1编号,菜品1折扣,2nd口味1编号,3rd口味1编号]，
@@ -542,7 +541,10 @@ var orderedForm = new Ext.form.FormPanel(
 												+ orderedData[i][9] + ","// 厨房1编号
 												+ "0,"// 菜品1折扣
 												+ orderedData[i][16] + ","// 2nd口味1编号
-												+ orderedData[i][17] // 3rd口味1编号
+												+ orderedData[i][17] + "," // 3rd口味1编号
+												+ orderedData[i][22] + "," // 是否临时口味
+												+ orderedData[i][23] + "," // 临时口味
+												+ orderedData[i][24] // 临时口味价钱
 												+ "]，";
 									} else {										
 										// [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价]，
@@ -552,13 +554,14 @@ var orderedForm = new Ext.form.FormPanel(
 												+ orderedData[i][8] + "," // 临时菜1编号
 												+ orderedData[i][21] + "," // 临时菜1名称
 												+ orderedData[i][2] + "," // 临时菜1数量
-												+ price + "" // 临时菜1单价(原料單價)
+												+ price + "", // 临时菜1单价(原料單價)
+												+ orderedData[i][22] + "," // 是否临时口味
+												+ orderedData[i][23] + "," // 临时口味
+												+ orderedData[i][24] // 临时口味价钱
 												+ "]，";
-									}
+									}									
 								}
-								foodPara = "{"
-										+ foodPara.substr(0,
-												foodPara.length - 1) + "}";
+								foodPara = "{" + foodPara.substr(0, foodPara.length - 1) + "}";
 
 								var type = 9;
 								if (Request["tableStat"] == "free") {
@@ -571,16 +574,7 @@ var orderedForm = new Ext.form.FormPanel(
 										.findById("tablePersonCount")
 										.getValue();
 
-								// alert("pin:" + Request["pin"] + " tableID:"
-								// + Request["tableNbr"]
-								// + " tableID_2:"
-								// + Request["tableNbr2"]
-								// + " customNum:"
-								// + Request["personCount"] + " type:"
-								// + type + " originalTableID:"
-								// + Request["tableNbr"]
-								// + " category:" + category
-								// + " foods" + foodPara);
+								
 								orderedForm.buttons[0].setDisabled(true);
 								orderedForm.buttons[1].setDisabled(true);
 								orderedForm.buttons[2].setDisabled(true);
@@ -666,19 +660,23 @@ var orderedForm = new Ext.form.FormPanel(
 								var Request = new URLParaQuery();
 
 								var foodPara = "";
-								for ( var i = 0; i < orderedData.length; i++) {
-									if (orderedData[i][18] == "false") {
+								for ( var i = 0; i < orderedData.length; i++) {									
+									if (orderedData[i][20] == "false") {
+										
 										// [是否临时菜(false),菜品1编号,菜品1数量,口味1编号,厨房1编号,菜品1折扣,2nd口味1编号,3rd口味1编号]，
 										foodPara = foodPara + "[false,"// 是否临时菜(false)
 												+ orderedData[i][8] + "," // 菜品1编号
 												+ orderedData[i][2] + "," // 菜品1数量
-												+ orderedData[i][9] + "," // 口味1编号
-												+ orderedData[i][10] + ","// 厨房1编号
+												+ orderedData[i][10] + "," // 口味1编号
+												+ orderedData[i][9] + ","// 厨房1编号
 												+ "0,"// 菜品1折扣
 												+ orderedData[i][16] + ","// 2nd口味1编号
-												+ orderedData[i][17] // 3rd口味1编号
+												+ orderedData[i][17] + "," // 3rd口味1编号
+												+ orderedData[i][22] + "," // 是否临时口味
+												+ orderedData[i][23] + "," // 临时口味
+												+ orderedData[i][24] // 临时口味价钱
 												+ "]，";
-									} else {
+									} else {										
 										// [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价]，
 										var price = orderedData[i][3].substr(1,
 												orderedData[i][3].length - 1);
@@ -686,14 +684,14 @@ var orderedForm = new Ext.form.FormPanel(
 												+ orderedData[i][8] + "," // 临时菜1编号
 												+ orderedData[i][21] + "," // 临时菜1名称
 												+ orderedData[i][2] + "," // 临时菜1数量
-												+ price + "" // 临时菜1单价(原料單價)
+												+ price + "", // 临时菜1单价(原料單價)
+												+ orderedData[i][22] + "," // 是否临时口味
+												+ orderedData[i][23] + "," // 临时口味
+												+ orderedData[i][24] // 临时口味价钱
 												+ "]，";
-									}
-
+									}									
 								}
-								foodPara = "{"
-										+ foodPara.substr(0,
-												foodPara.length - 1) + "}";
+								foodPara = "{" + foodPara.substr(0, foodPara.length - 1) + "}";
 
 								var type = 9;
 								if (Request["tableStat"] == "free") {

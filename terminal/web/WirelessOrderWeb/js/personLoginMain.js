@@ -454,9 +454,12 @@ var menuVerifyWin = new Ext.Window(
 			layout : "fit",
 			width : 200,
 			height : 100,
-			closeAction : "hide",
+//			closeAction : "hide",
 			resizable : false,
 			closable : false,
+			draggable : false,
+			modal : true,
+			constrainHeade : true,			
 			items : [ {
 				layout : "form",
 				labelWidth : 30,
@@ -473,6 +476,7 @@ var menuVerifyWin = new Ext.Window(
 			buttons : [
 					{
 						text : "确定",
+						id : 'btnMenuVerifyWinSubmit',
 						handler : function() {
 							var menuVerifyPwd = menuVerifyWin.findById(
 									"menuVerifyPwd").getValue();
@@ -491,8 +495,7 @@ var menuVerifyWin = new Ext.Window(
 							menuVerifyWin.findById("menuVerifyPwd")
 									.setValue("");
 
-							Ext.Ajax
-									.request({
+							Ext.Ajax.request({
 										url : "../VerifyPwd.do",
 										params : {
 											"pin" : currPin,
@@ -535,7 +538,14 @@ var menuVerifyWin = new Ext.Window(
 					var f = Ext.get("menuVerifyPwd");
 					f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
 				}
-			}
+			},
+			keys : [
+				    {
+						key : Ext.EventObject.ENTER,
+						fn : function(){Ext.getCmp('btnMenuVerifyWinSubmit').handler(); },
+						scope : this 
+					}
+				]
 		});
 
 // historyVerifyWin
@@ -544,9 +554,12 @@ var historyVerifyWin = new Ext.Window(
 			layout : "fit",
 			width : 200,
 			height : 100,
-			closeAction : "hide",
+//			closeAction : "hide",
 			resizable : false,
 			closable : false,
+			draggable : false,
+			modal : true,
+			constrainHeade : true,	
 			items : [ {
 				layout : "form",
 				labelWidth : 30,
@@ -563,6 +576,7 @@ var historyVerifyWin = new Ext.Window(
 			buttons : [
 					{
 						text : "确定",
+						id : 'btnHistoryVerifyWinSubmit',
 						handler : function() {
 							var historyVerifyPwd = historyVerifyWin.findById(
 									"historyVerifyPwd").getValue();
@@ -579,8 +593,7 @@ var historyVerifyWin = new Ext.Window(
 							historyVerifyWin.hide();
 							isPrompt = false;
 
-							Ext.Ajax
-									.request({
+							Ext.Ajax.request({
 										url : "../VerifyPwd.do",
 										params : {
 											"pin" : currPin,
@@ -623,7 +636,14 @@ var historyVerifyWin = new Ext.Window(
 					var f = Ext.get("historyVerifyPwd");
 					f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
 				}
-			}
+			},
+			keys : [
+				    {
+						key : Ext.EventObject.ENTER,
+						fn : function(){Ext.getCmp('btnHistoryVerifyWinSubmit').handler(); },
+						scope : this 
+					}
+				]
 		});
 
 // inventoryVerifyWin
@@ -632,9 +652,12 @@ var inventoryVerifyWin = new Ext.Window(
 			layout : "fit",
 			width : 200,
 			height : 100,
-			closeAction : "hide",
+//			closeAction : "hide",
 			resizable : false,
 			closable : false,
+			draggable : false,
+			modal : true,
+			constrainHeade : true,	
 			items : [ {
 				layout : "form",
 				labelWidth : 30,
@@ -651,6 +674,7 @@ var inventoryVerifyWin = new Ext.Window(
 			buttons : [
 					{
 						text : "确定",
+						id : 'btnInventoryVerifyWinSubmit',
 						handler : function() {
 							var inventoryVerifyPwd = inventoryVerifyWin
 									.findById("inventoryVerifyPwd").getValue();
@@ -669,8 +693,7 @@ var inventoryVerifyWin = new Ext.Window(
 							inventoryVerifyWin.findById("inventoryVerifyPwd")
 									.setValue("");
 
-							Ext.Ajax
-									.request({
+							Ext.Ajax.request({
 										url : "../VerifyPwd.do",
 										params : {
 											"pin" : currPin,
@@ -713,7 +736,14 @@ var inventoryVerifyWin = new Ext.Window(
 					var f = Ext.get("inventoryVerifyPwd");
 					f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
 				}
-			}
+			},
+			keys : [
+				    {
+						key : Ext.EventObject.ENTER,
+						fn : function(){Ext.getCmp('btnInventoryVerifyWinSubmit').handler(); },
+						scope : this 
+					}
+				]
 		});
 
 
@@ -723,9 +753,12 @@ var systemVerifyWin = new Ext.Window(
 			layout : "fit",
 			width : 200,
 			height : 100,
-			closeAction : "hide",
+//			closeAction : "hide",
 			resizable : false,
 			closable : false,
+			draggable : false,
+			modal : true,
+			constrainHeade : true,	
 			items : [ {
 				layout : "form",
 				labelWidth : 30,
@@ -742,6 +775,7 @@ var systemVerifyWin = new Ext.Window(
 			buttons : [
 					{
 						text : "确定",
+						id : 'btnSystemVerifyWinSubmit',
 						handler : function() {
 							var systemVerifyPwd = systemVerifyWin
 									.findById("systemVerifyPwd").getValue();
@@ -760,8 +794,7 @@ var systemVerifyWin = new Ext.Window(
 							systemVerifyWin.findById("systemVerifyPwd")
 									.setValue("");
 
-							Ext.Ajax
-									.request({
+							Ext.Ajax.request({
 										url : "../VerifyPwd.do",
 										params : {
 											"pin" : currPin,
@@ -803,11 +836,18 @@ var systemVerifyWin = new Ext.Window(
 					var f = Ext.get("systemVerifyPwd");
 					f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
 				}
-			}
+			},
+			keys : [
+			    {
+					key : Ext.EventObject.ENTER,
+					fn : function(){Ext.getCmp('btnSystemVerifyWinSubmit').handler(); },
+					scope : this 
+				}
+			]
+		
 		});
 
-Ext
-		.onReady(function() {
+Ext.onReady(function() {
 			// 解决ext中文传入后台变问号问题
 			Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
 			Ext.QuickTips.init();
@@ -866,6 +906,7 @@ Ext
 						buttons : [
 								{
 									text : '提交',
+									id : 'btnStaffFormSubmit',
 									handler : function() {
 										if (staffForm.getForm().isValid()) {
 											// check the password
@@ -924,10 +965,24 @@ Ext
 				layout : "fit",
 				width : 300,
 				height : 160,
-				closeAction : "hide",
+//				closeAction : "hide",
 				resizable : false,
 				closable : false,
-				items : staffForm
+				modal : true,
+				constrainHeade : true,
+				draggable : false,
+				items : staffForm,
+				keys : [
+				 {
+					 key : Ext.EventObject.ENTER,
+					 fn : function(){Ext.getCmp('btnStaffFormSubmit').handler(); },
+					 scope : this 
+				 },{
+					 key : Ext.EventObject.ESC,
+					 fn : function(){ staffForm.getForm().reset(); },
+					 scope : this 
+				 }
+				 ]
 			});
 
 			// ******************************************************************************************************

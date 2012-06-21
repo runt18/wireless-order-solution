@@ -65,8 +65,8 @@ public class QueryDetailAction extends Action {
 
 			
 			int orderID = request.getParameter("orderID") != null ? Integer.parseInt(request.getParameter("orderID")) : 0;
-			int restaurantID = request.getParameter("restaurantID") != null ? Integer.parseInt(request.getParameter("orderID")) : 0;
-			int tableAlias = request.getParameter("tableAlias") != null ? Integer.parseInt(request.getParameter("orderID")) : 0;
+			int restaurantID = request.getParameter("restaurantID") != null ? Integer.parseInt(request.getParameter("restaurantID")) : 0;
+			int tableAlias = request.getParameter("tableAlias") != null ? Integer.parseInt(request.getParameter("tableAlias")) : 0;
 			String queryType = request.getParameter("queryType");
 
 			dbCon.connect();
@@ -81,9 +81,9 @@ public class QueryDetailAction extends Action {
 				singleOrderFoods = SingleOrderFoodReflector.getDetailToday(dbCon, "AND B.id=" + orderID, "");
 				
 			}if (queryType.equals("TodayByTbl")) {
-				singleOrderFoods = SingleOrderFoodReflector.getDetailToday(dbCon, "AND B.total_price IS NULL " +
-																				  "AND table_alias=" + tableAlias +
-																				  "AND restaurantID=" + restaurantID, "");
+				singleOrderFoods = SingleOrderFoodReflector.getDetailToday(dbCon, " AND B.total_price IS NULL " +
+																				  " AND B.table_alias=" + tableAlias +
+																				  " AND A.restaurant_id=" + restaurantID, "");
 			}else {
 				singleOrderFoods = SingleOrderFoodReflector.getDetailHistory(dbCon, "AND B.id=" + orderID, "");
 			}
@@ -209,7 +209,7 @@ public class QueryDetailAction extends Action {
 			String outputJson = "{\"totalProperty\":" + resultList.size() + ","
 					+ obj.toString().substring(1);
 
-			// System.out.println(outputJson);
+//			 System.out.println(outputJson);
 
 			// out.write(jsonResp);
 			out.write(outputJson);

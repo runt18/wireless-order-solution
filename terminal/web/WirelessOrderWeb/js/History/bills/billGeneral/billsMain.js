@@ -683,18 +683,8 @@ var businessStatBut = new Ext.ux.ImageButton({
 	}
 });
 
-var btnBusinessSum = new Ext.ux.ImageButton({
-	imgPath : '',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : "营业汇总",
-	handler : function(btn) {
-		businessSum();
-	}
-});
-
 var btnSalesSub = new Ext.ux.ImageButton({
-	imgPath : '',
+	imgPath : '../../images/HistorySalesSub.png',
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : "销售统计",
@@ -1727,39 +1717,21 @@ Ext
 				tbar : new Ext.Toolbar({
 					height : 55,
 					items : [
-					// orderStatBut, {
-					// text : "&nbsp;&nbsp;&nbsp;",
-					// disabled : true
-					// },
-					kitchenStatBut, {
-						text : "&nbsp;&nbsp;&nbsp;",
-						disabled : true
-					}, deptStatBut, {
-						text : "&nbsp;&nbsp;&nbsp;",
-						disabled : true
-					},
-					// regionStatBut, {
-					// text : "&nbsp;&nbsp;&nbsp;",
-					// disabled : true
-					// },
-					//	
-					shiftStatBut, {
-						text : "&nbsp;&nbsp;&nbsp;",
-						disabled : true
-					}, dailySettleStatBut, {
-						text : "&nbsp;&nbsp;&nbsp;",
-						disabled : true
-					}, businessStatBut, {
-						text : "&nbsp;&nbsp;&nbsp;",
-						disabled : true
-					}, 
-					btnBusinessSum,
+					kitchenStatBut, 
 					{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
-					btnSalesSub,
-					"->", pushBackBut, {
-						text : "&nbsp;&nbsp;&nbsp;",
-						disabled : true
-					}, logOutBut ]
+					deptStatBut,
+					{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
+					shiftStatBut, 
+					{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
+					dailySettleStatBut,
+					{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
+					businessStatBut, 
+					{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
+//					btnSalesSub,
+					"->", pushBackBut,
+					{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
+					logOutBut 
+					]
 				})
 			});
 

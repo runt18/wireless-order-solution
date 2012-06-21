@@ -109,6 +109,7 @@ public class InsertOrderAction extends Action implements PinGen {
 						     Reserved.PRINT_ALL_CANCELLED_FOOD_2 | 
 						     Reserved.PRINT_ALL_EXTRA_FOOD_2;
 			}
+//			System.out.println(request.getParameter("foods")+"");
 			orderToInsert.foods = Util.toFoodArray(request.getParameter("foods"));
 			
 			ReqPackage.setGen(this);

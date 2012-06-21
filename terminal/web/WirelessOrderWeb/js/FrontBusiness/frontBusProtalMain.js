@@ -134,9 +134,12 @@ var billVerifyWin = new Ext.Window({
 	layout : "fit",
 	width : 200,
 	height : 100,
-	closeAction : "hide",
+//	closeAction : "hide",
 	resizable : false,
 	closable : false,
+	draggable : false,
+	modal : true,
+	constrainHeade : true,	
 	items : [ {
 		layout : "form",
 		labelWidth : 30,
