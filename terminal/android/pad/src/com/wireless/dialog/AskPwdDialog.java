@@ -4,20 +4,16 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.text.InputType;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.Button;
+
 import android.widget.EditText;
-import android.widget.TextView;
-
 import com.wireless.common.WirelessOrder;
-import com.wireless.pad.R;
 
 
-public class AskPwdDialog extends Dialog{
+
+public class AskPwdDialog{
 
 	public static final int PWD_1 = 1;		//管理员密码
 	public static final int PWD_3 = 2;		//店长权限密码
@@ -27,13 +23,9 @@ public class AskPwdDialog extends Dialog{
 	private Context _context;
 	
 	public AskPwdDialog(Context context, int pwdType) {
-		super(context, R.style.FullHeightDialog);
+	
 		_pwdType = pwdType;
 		_context = context;
-		View view = LayoutInflater.from(context).inflate(R.layout.alert, null);
-		setContentView(view);
-	   // getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
-
 		String title;
 		if(_pwdType == PWD_1){
 			title = "请输入管理员密码";
@@ -43,47 +35,45 @@ public class AskPwdDialog extends Dialog{
 			title = "请输入退菜权限密码";
 		}else{
 			title = "请输入管理员密码";
-		}			
-		((TextView)view.findViewById(R.id.ordername)).setText(title);
-		
-		_pwdEdtTxt = (EditText)view.findViewById(R.id.mycount);
-		_pwdEdtTxt.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-
-		((TextView)findViewById(R.id.table)).setText("密码：");
-		Button okBtn = (Button)view.findViewById(R.id.confirm);
-		okBtn.setText("确定");
-		okBtn.setOnClickListener(new View.OnClickListener() {				
-			@Override
-			public void onClick(View arg0) {
-				MessageDigest digester;
-				try {
-					//Convert the password into MD5
-					digester = MessageDigest.getInstance("MD5");
-				    digester.update(_pwdEdtTxt.getText().toString().getBytes(), 0, _pwdEdtTxt.getText().toString().getBytes().length); 
-				    /**
-				     * 如果权限密码通过，则显示退菜数量Dialog，
-				     * 否则提示密码输入错误
-				     */
-				    if(isPass(digester.digest())){
-				    	onPwdPass(_context);				    	
-				    }else{
-				    	onPwdFail(_context);
-				    }
-				}catch(NoSuchAlgorithmException e) {
-					
-				} 
-			}
-		});
-		
-		Button cancle = (Button)view.findViewById(R.id.alert_cancel);
-		cancle.setText("取消");
-		cancle.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				dismiss();
-			}
-		});
+		}	
+		/**
+		 * 新建一个弹出框，然后初始化一个EditText
+		 * */
+    	final EditText editText = new EditText(context);
+		editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+		new AlertDialog.Builder(context)
+			.setTitle(title)
+			.setView(editText)
+			.setNeutralButton("确定",
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog,	int which){
+						MessageDigest digester;
+						try {
+							//Convert the password into MD5
+							digester = MessageDigest.getInstance("MD5");
+						    digester.update(_pwdEdtTxt.getText().toString().getBytes(), 0, _pwdEdtTxt.getText().toString().getBytes().length); 
+						    /**
+						     * 如果权限密码通过，则显示退菜数量Dialog，
+						     * 否则提示密码输入错误
+						     */
+						    if(isPass(digester.digest())){
+						    	onPwdPass(_context);				    	
+						    }else{
+						    	onPwdFail(_context);
+						    }
+						}catch(NoSuchAlgorithmException e) {
+							
+						} 
+						
+						
+					}
+				})
+			.setNegativeButton("取消", null)
+			.show();
 	}
+	
+	
 	
 	/**
 	 * The derived class should override this method to implement its own logic 
