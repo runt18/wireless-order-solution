@@ -190,11 +190,11 @@ public class QueryOrder {
 		// query the food's id and order count associate with the order id for "order_food" table		
 
 		if(queryType == QUERY_HISTORY){
-			orderInfo.foods = OrderFoodReflector.getDetailHistory(dbCon, " AND A.order_id=" + orderID, "");
+			orderInfo.foods = OrderFoodReflector.getDetailHistory(dbCon, " AND A.order_id=" + orderID, "ORDER BY pay_datetime");
 		}else if(queryType == QUERY_TODAY){
-			orderInfo.foods = OrderFoodReflector.getDetailToday(dbCon, " AND B.id=" + orderID, "");
+			orderInfo.foods = OrderFoodReflector.getDetailToday(dbCon, " AND B.id=" + orderID, "ORDER BY pay_datetime");
 		}else{
-			orderInfo.foods = OrderFoodReflector.getDetailToday(dbCon, " AND B.id=" + orderID, "");
+			orderInfo.foods = OrderFoodReflector.getDetailToday(dbCon, " AND B.id=" + orderID, "ORDER BY pay_datetime");
 		}
 		orderInfo.id = orderID;
 		
