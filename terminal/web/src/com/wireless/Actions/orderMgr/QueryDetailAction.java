@@ -37,8 +37,6 @@ public class QueryDetailAction extends Action {
 
 		DBCon dbCon = new DBCon();
 
-		int orderID = 0;
-
 		// String jsonResp = "{success:$(result), data:'$(value)'}";
 		PrintWriter out = null;
 
@@ -65,7 +63,10 @@ public class QueryDetailAction extends Action {
 			 */
 			String pin = request.getParameter("pin");
 
-			orderID = Integer.parseInt(request.getParameter("orderID"));
+			
+			int orderID = request.getParameter("orderID") != null ? Integer.parseInt(request.getParameter("orderID")) : 0;
+			int restaurantID = request.getParameter("restaurantID") != null ? Integer.parseInt(request.getParameter("orderID")) : 0;
+			int tableAlias = request.getParameter("tableAlias") != null ? Integer.parseInt(request.getParameter("orderID")) : 0;
 			String queryType = request.getParameter("queryType");
 
 			dbCon.connect();
@@ -77,11 +78,14 @@ public class QueryDetailAction extends Action {
 
 			SingleOrderFood[] singleOrderFoods = null;
 			if (queryType.equals("Today")) {
-				singleOrderFoods = SingleOrderFoodReflector.getDetailToday(
-						dbCon, "AND B.id=" + orderID, "");
-			} else {
-				singleOrderFoods = SingleOrderFoodReflector.getDetailHistory(
-						dbCon, "AND B.id=" + orderID, "");
+				singleOrderFoods = SingleOrderFoodReflector.getDetailToday(dbCon, "AND B.id=" + orderID, "");
+				
+			}if (queryType.equals("TodayByTbl")) {
+				singleOrderFoods = SingleOrderFoodReflector.getDetailToday(dbCon, "AND B.total_price IS NULL " +
+																				  "AND table_alias=" + tableAlias +
+																				  "AND restaurantID=" + restaurantID, "");
+			}else {
+				singleOrderFoods = SingleOrderFoodReflector.getDetailHistory(dbCon, "AND B.id=" + orderID, "");
 			}
 
 			for (SingleOrderFood singleOrderFood : singleOrderFoods) {
@@ -91,15 +95,12 @@ public class QueryDetailAction extends Action {
 				 */
 				// mod by ZTF @10/02;
 				HashMap<String, Object> resultMay = new HashMap<String, Object>();
-				resultMay.put("order_date", new SimpleDateFormat(
-						"yyyy-MM-dd HH:mm:ss")
-						.format(singleOrderFood.orderDate));
+				resultMay.put("order_date", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(singleOrderFood.orderDate));
 				resultMay.put("food_name", singleOrderFood.food.name);
 				resultMay.put("unit_price", singleOrderFood.unitPrice);
 				resultMay.put("amount", singleOrderFood.orderCount);
 				resultMay.put("discount", singleOrderFood.discount);
-				resultMay.put("taste_pref",
-						singleOrderFood.taste.preference.replaceAll(",", "；"));
+				resultMay.put("taste_pref",	singleOrderFood.taste.preference.replaceAll(",", "；"));
 				resultMay.put("taste_price", singleOrderFood.taste.getPrice());
 				resultMay.put("kitchen", singleOrderFood.kitchen.name);
 				resultMay.put("waiter", singleOrderFood.staff.name);
@@ -113,59 +114,6 @@ public class QueryDetailAction extends Action {
 				resultList.add(resultMay);
 			}
 
-			// String sql = "SELECT a.*, (CASE WHEN b.kitchen_alias = "
-			// + Kitchen.KITCHEN_TEMP + " THEN '临时' "
-			// + "WHEN b.kitchen_alias IS NULL THEN '已刪除廚房' "
-			// + " ELSE b.name END) AS kitchen_name FROM " + Params.dbName
-			// + ".order_food a LEFT OUTER JOIN " + Params.dbName
-			// + ".kitchen b ON (a.kitchen_id=b.kitchen_id)"
-			// + "WHERE a.order_id=" + orderID + "  AND a.restaurant_id="
-			// + term.restaurant_id;
-
-			// dbCon.rs = dbCon.stmt.executeQuery(sql);
-			// while (dbCon.rs.next()) {
-			// // the string is separated by comma
-			// // if (nCount != 0) {
-			// // value.append("，");
-			// // }
-			//
-			// /**
-			// * The json to each order detail looks like below
-			// * [日期,名称,单价,数量,折扣,口味,口味价钱,厨房,服务员,备注]
-			// */
-			// // mod by ZTF @10/02;
-			// HashMap resultMay = new HashMap();
-			// resultMay.put("order_date", new SimpleDateFormat(
-			// "yyyy-MM-dd HH:mm:ss").format(dbCon.rs
-			// .getTimestamp("order_date")));
-			// resultMay.put("food_name", dbCon.rs.getString("name"));
-			// resultMay.put("unit_price",
-			// Float.toString(dbCon.rs.getFloat("unit_price")));
-			// resultMay.put("amount",
-			// Float.toString(dbCon.rs.getFloat("order_count")));
-			// resultMay.put("discount",
-			// Float.toString(dbCon.rs.getFloat("discount")));
-			// resultMay.put("taste_pref", dbCon.rs.getString("taste")
-			// .replaceAll(",", "；"));
-			// resultMay.put("taste_price",
-			// Float.toString(dbCon.rs.getFloat("taste_price")));
-			// resultMay.put("kitchen", dbCon.rs.getString("kitchen_name"));
-			// resultMay.put("waiter", dbCon.rs.getString("waiter"));
-			// resultMay.put("comment", dbCon.rs.getString("comment"));
-			// resultMay.put("message", "normal");
-			//
-			// resultList.add(resultMay);
-			// // end mod;
-			// }
-			//
-			// // if (nCount == 0) {
-			// // jsonResp = jsonResp.replace("$(value)", "");
-			// // } else {
-			// // jsonResp = jsonResp.replace("$(value)", value);
-			// // }
-			// dbCon.rs.close();
-
-			// jsonResp = jsonResp.replace("$(result)", "true");
 
 		} catch (BusinessException e) {
 			e.printStackTrace();
@@ -193,8 +141,7 @@ public class QueryDetailAction extends Action {
 				// orderID + ")的详细信息，请重新确认");
 				// mod by ZTF @10/02;
 				HashMap<String, Object> resultMay = new HashMap<String, Object>();
-				resultMay.put("message", "没有获取到账单(id=" + orderID
-						+ ")的详细信息，请重新确认");
+				resultMay.put("message", "没有获取到账单的详细信息，请重新确认");
 				resultList.add(resultMay);
 				isError = true;
 				// end mod;
