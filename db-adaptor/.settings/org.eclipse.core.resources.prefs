@@ -5,3 +5,4 @@ encoding//src/com/wireless/db/CancelOrder.java=UTF-8
 encoding//src/com/wireless/db/InsertOrder.java=UTF-8
 encoding//src/com/wireless/db/PayOrder.java=UTF-8
 encoding//src/com/wireless/db/VerifyPin.java=UTF-8
+encoding//src/com/wireless/dbReflect/SingleOrderFoodReflector.java=GBK
