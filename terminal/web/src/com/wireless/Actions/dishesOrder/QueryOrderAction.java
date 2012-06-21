@@ -74,12 +74,13 @@ public class QueryOrderAction extends Action {
 					/**
 					 * The json to order food looks like below. 
 					 * ["菜名", 菜名编号, 厨房编号, "口味", 口味编号, 数量, 单价, 是否特价, 是否推荐, 是否停售, 是否赠送, 折扣率,
-					 * 口味编号2, 口味编号3, 口味价钱, 是否时价, 是否临时菜, 流水号, 折扣额, 日期时间, 服务员]
+					 * 口味编号2, 口味编号3, 口味价钱, 是否时价, 是否临时菜, 流水号, 折扣额, 日期时间, 服务员, 是否临时口味, 临时口味, 临时口味价钱]
 					 */
 					String jsonOrderFood = "[\"$(food)\",$(food_id),$(kitchen),\"$(taste)\",$(taste_id),"
 							+ "$(count),\"$(unit_price)\",$(special),$(recommend),$(soldout),"
 							+ "$(gift),$(discount),$(taste_id2),$(taste_id3),\"$(taste_price)\","
-							+ "$(currPrice),$(temporary),$(seq_id),$(total_discount),$(order_date),$(waiter)]";
+							+ "$(currPrice),$(temporary),$(seq_id),$(total_discount),$(order_date),$(waiter),"
+							+ "$(is_tmp_taste),$(tmp_taste),$(tmp_taste_price)]";
 					jsonOrderFood = jsonOrderFood.replace("$(food)",
 							order.foods[i].name);
 					jsonOrderFood = jsonOrderFood.replace("$(food_id)",
@@ -96,37 +97,30 @@ public class QueryOrderAction extends Action {
 							Util.float2String2(order.foods[i].getCount()));
 					// float unitPrice = order.foods[i].getPrice() +
 					// order.foods[i].getTastePrice();
-					jsonOrderFood = jsonOrderFood.replace("$(unit_price)",
-							Util.CURRENCY_SIGN + order.foods[i].getPrice());
-					jsonOrderFood = jsonOrderFood
-							.replace("$(taste_price)", Util.CURRENCY_SIGN
-									+ order.foods[i].getTastePrice());
-					jsonOrderFood = jsonOrderFood.replace("$(special)",
-							order.foods[i].isSpecial() ? "true" : "false");
-					jsonOrderFood = jsonOrderFood.replace("$(recommend)",
-							order.foods[i].isRecommend() ? "true" : "false");
-					jsonOrderFood = jsonOrderFood.replace("$(soldout)",
-							order.foods[i].isSellOut() ? "true" : "false");
-					jsonOrderFood = jsonOrderFood.replace("$(gift)",
-							order.foods[i].isGift() ? "true" : "false");
-					jsonOrderFood = jsonOrderFood.replace("$(discount)",
-							order.foods[i].getDiscount().toString());
-					jsonOrderFood = jsonOrderFood.replace("$(taste_id2)",
-							Integer.toString(order.foods[i].tastes[1].aliasID));
-					jsonOrderFood = jsonOrderFood.replace("$(taste_id3)",
-							Integer.toString(order.foods[i].tastes[2].aliasID));
-					jsonOrderFood = jsonOrderFood.replace("$(currPrice)",
-							order.foods[i].isCurPrice() ? "true" : "false");
-					jsonOrderFood = jsonOrderFood.replace("$(temporary)",
-							order.foods[i].isTemporary ? "true" : "false");
-					jsonOrderFood = jsonOrderFood.replace("$(seq_id)",
-							Integer.toString(order.seqID));
-					jsonOrderFood = jsonOrderFood.replace("$(total_discount)",
-							order.foods[i].calcDiscountPrice().toString());
-					jsonOrderFood = jsonOrderFood.replace("$(order_date)",
-							new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(order.foods[i].orderDate));
-					jsonOrderFood = jsonOrderFood.replace("$(waiter)",
-							order.foods[i].waiter);
+					jsonOrderFood = jsonOrderFood.replace("$(unit_price)", Util.CURRENCY_SIGN + order.foods[i].getPrice());
+					jsonOrderFood = jsonOrderFood.replace("$(taste_price)", Util.CURRENCY_SIGN + order.foods[i].getTastePrice());
+					jsonOrderFood = jsonOrderFood.replace("$(special)",	order.foods[i].isSpecial() ? "true" : "false");
+					jsonOrderFood = jsonOrderFood.replace("$(recommend)", order.foods[i].isRecommend() ? "true" : "false");
+					jsonOrderFood = jsonOrderFood.replace("$(soldout)", order.foods[i].isSellOut() ? "true" : "false");
+					jsonOrderFood = jsonOrderFood.replace("$(gift)", order.foods[i].isGift() ? "true" : "false");
+					jsonOrderFood = jsonOrderFood.replace("$(discount)", order.foods[i].getDiscount().toString());
+					jsonOrderFood = jsonOrderFood.replace("$(taste_id2)", Integer.toString(order.foods[i].tastes[1].aliasID));
+					jsonOrderFood = jsonOrderFood.replace("$(taste_id3)", Integer.toString(order.foods[i].tastes[2].aliasID));
+					jsonOrderFood = jsonOrderFood.replace("$(currPrice)", order.foods[i].isCurPrice() ? "true" : "false");
+					jsonOrderFood = jsonOrderFood.replace("$(temporary)", order.foods[i].isTemporary ? "true" : "false");
+					jsonOrderFood = jsonOrderFood.replace("$(seq_id)", Integer.toString(order.seqID));
+					jsonOrderFood = jsonOrderFood.replace("$(total_discount)", order.foods[i].calcDiscountPrice().toString());
+					jsonOrderFood = jsonOrderFood.replace("$(order_date)", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(order.foods[i].orderDate));
+					jsonOrderFood = jsonOrderFood.replace("$(waiter)", order.foods[i].waiter);
+					if(order.foods[i].tmpTaste != null){
+						jsonOrderFood = jsonOrderFood.replace("$(is_tmp_taste)", "true");
+						jsonOrderFood = jsonOrderFood.replace("$(tmp_taste)", order.foods[i].tmpTaste.preference);
+						jsonOrderFood = jsonOrderFood.replace("$(tmp_taste_price)", order.foods[i].tmpTaste.getPrice().toString());						
+					}else{
+						jsonOrderFood = jsonOrderFood.replace("$(is_tmp_taste)", "false");
+						jsonOrderFood = jsonOrderFood.replace("$(tmp_taste)", "");
+						jsonOrderFood = jsonOrderFood.replace("$(tmp_taste_price)", "0.0");
+					}
 					
 					// put each json order food info to the value
 					value.append(jsonOrderFood);
