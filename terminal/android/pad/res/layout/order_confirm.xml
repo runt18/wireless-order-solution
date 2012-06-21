@@ -41,13 +41,12 @@
 
         <EditText
             android:id="@+id/amountEdtTxt"
-            android:layout_width="130dip"
+            android:layout_width="200dip"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="10dip"
             android:layout_marginTop="10dip"
             android:layout_toRightOf="@id/orderTxtView1"
-            android:background="@drawable/kuangbg"
             android:digits="0123456789."
             android:focusableInTouchMode="true"
             android:inputType="numberSigned|text"
