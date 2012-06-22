@@ -80,7 +80,7 @@ public class QueryDetailAction extends Action {
 			if (queryType.equals("Today")) {
 				singleOrderFoods = SingleOrderFoodReflector.getDetailToday(dbCon, "AND B.id=" + orderID, "");
 				
-			}if (queryType.equals("TodayByTbl")) {
+			}else if (queryType.equals("TodayByTbl")) {
 				singleOrderFoods = SingleOrderFoodReflector.getDetailToday(dbCon, " AND B.total_price IS NULL " +
 																				  " AND B.table_alias=" + tableAlias +
 																				  " AND A.restaurant_id=" + restaurantID, "");
