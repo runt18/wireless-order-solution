@@ -48,8 +48,8 @@ public class Util {
 	 * 
 	 * @param submitFoods
 	 *            the submitted string looks like below.<br>
-	 *            {[是否临时菜(false),菜品1编号,菜品1数量,口味1编号,厨房1编号,菜品1折扣,2nd口味1编号,3rd口味1编号,是否临时口味,临时口味,临时口味价钱]，
-	 *             [是否临时菜(false),菜品2编号,菜品2数量,口味2编号,厨房2编号,菜品2折扣,2nd口味1编号,3rd口味1编号,是否临时口味,临时口味,临时口味价钱]，... 
+	 *            {[是否临时菜(false),菜品1编号,菜品1数量,口味1编号,厨房1编号,菜品1折扣,2nd口味1编号,3rd口味1编号,是否临时口味,临时口味,临时口味价钱,临时口味编号]，
+	 *             [是否临时菜(false),菜品2编号,菜品2数量,口味2编号,厨房2编号,菜品2折扣,2nd口味1编号,3rd口味1编号,是否临时口味,临时口味,临时口味价钱,临时口味编号]，... 
 	 *             [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价]，
 	 *             [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价]...}
 	 * @return the class food array
@@ -117,40 +117,19 @@ public class Util {
 				foods[i].tastes[1].aliasID = Short.parseShort(values[6]);
 				// extract the 3rd taste alias id
 				foods[i].tastes[2].aliasID = Short.parseShort(values[7]);
-				// FIXME 
-				if(values.length > 8){
-					//check to see whether containing temporary taste
-					if(Boolean.parseBoolean(values[8])){
-						foods[i].tmpTaste = new Taste();
-						//extract the value to temporary taste
-						foods[i].tmpTaste.preference = values[9];
-						//extract the price to temporary taste
-						foods[i].tmpTaste.setPrice(Float.parseFloat(values[10]));
-					}else{
-						foods[i].tmpTaste = null;
-					}
+				//check to see whether containing temporary taste
+				if(Boolean.parseBoolean(values[8])){
+					foods[i].tmpTaste = new Taste();
+					//extract the value to temporary taste
+					foods[i].tmpTaste.preference = values[9];
+					//extract the price to temporary taste
+					foods[i].tmpTaste.setPrice(Float.parseFloat(values[10]));
+					//extract the alias to temporary taste
+					foods[i].tmpTaste.aliasID = Integer.parseInt(values[11]);
+				}else{
+					foods[i].tmpTaste = null;
 				}
 			}
-
-			// //extract the food alias id
-			// foods[i].alias_id = Integer.parseInt(values[0]);
-			// //extract the amount to order food
-			// foods[i].setCount(Float.parseFloat(values[1]));
-			// //extract the taste alias id
-			// foods[i].tastes[0].alias_id = Short.parseShort(values[2]);
-			// //extract the kitchen number
-			// foods[i].kitchen = Short.parseShort(values[3]);
-			// //extract the discount
-			// if(values.length > 4){
-			// //foods[i].discount = (byte)(Float.parseFloat(values[4]) * 100);
-			// foods[i].setDiscount(Float.parseFloat(values[4]));
-			// }
-			// if(values.length > 5){
-			// //extract the 2nd taste alias id
-			// foods[i].tastes[1].alias_id = Short.parseShort(values[5]);
-			// //extract the 3rd taste alias id
-			// foods[i].tastes[2].alias_id = Short.parseShort(values[6]);
-			// }
 		}
 
 		/**

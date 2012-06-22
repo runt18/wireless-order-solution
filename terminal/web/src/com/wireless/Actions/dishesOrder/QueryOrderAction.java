@@ -74,13 +74,14 @@ public class QueryOrderAction extends Action {
 					/**
 					 * The json to order food looks like below. 
 					 * ["菜名", 菜名编号, 厨房编号, "口味", 口味编号, 数量, 单价, 是否特价, 是否推荐, 是否停售, 是否赠送, 折扣率,
-					 * 口味编号2, 口味编号3, 口味价钱, 是否时价, 是否临时菜, 流水号, 折扣额, 日期时间, 服务员, 是否临时口味, 临时口味, 临时口味价钱]
+					 * 口味编号2, 口味编号3, 口味价钱, 是否时价, 是否临时菜, 流水号, 折扣额, 日期时间, 服务员, 
+					 * 是否临时口味, 临时口味, 临时口味价钱, 临时口味编号]
 					 */
 					String jsonOrderFood = "[\"$(food)\",$(food_id),$(kitchen),\"$(taste)\",$(taste_id),"
 							+ "$(count),\"$(unit_price)\",$(special),$(recommend),$(soldout),"
 							+ "$(gift),$(discount),$(taste_id2),$(taste_id3),\"$(taste_price)\","
 							+ "$(currPrice),$(temporary),$(seq_id),$(total_discount),$(order_date),$(waiter),"
-							+ "$(is_tmp_taste),$(tmp_taste),$(tmp_taste_price)]";
+							+ "$(is_tmp_taste),$(tmp_taste),$(tmp_taste_price),$(tmp_taste_alias)]";
 					jsonOrderFood = jsonOrderFood.replace("$(food)",
 							order.foods[i].name);
 					jsonOrderFood = jsonOrderFood.replace("$(food_id)",
@@ -116,10 +117,12 @@ public class QueryOrderAction extends Action {
 						jsonOrderFood = jsonOrderFood.replace("$(is_tmp_taste)", "true");
 						jsonOrderFood = jsonOrderFood.replace("$(tmp_taste)", order.foods[i].tmpTaste.preference);
 						jsonOrderFood = jsonOrderFood.replace("$(tmp_taste_price)", order.foods[i].tmpTaste.getPrice().toString());						
+						jsonOrderFood = jsonOrderFood.replace("$(tmp_taste_alias)", Integer.toString(order.foods[i].tmpTaste.aliasID));
 					}else{
 						jsonOrderFood = jsonOrderFood.replace("$(is_tmp_taste)", "false");
 						jsonOrderFood = jsonOrderFood.replace("$(tmp_taste)", "");
 						jsonOrderFood = jsonOrderFood.replace("$(tmp_taste_price)", "0.0");
+						jsonOrderFood = jsonOrderFood.replace("$(tmp_taste_alias)", "0");
 					}
 					
 					// put each json order food info to the value
