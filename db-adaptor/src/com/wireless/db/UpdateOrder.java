@@ -404,7 +404,7 @@ public class UpdateOrder {
 						extraFoods.get(i).tastes[1].aliasID + "," +
 						extraFoods.get(i).tastes[2].aliasID + "," +
 						extraFoods.get(i).getTasteNormalPrice() + ", '" +
-						com.wireless.protocol.Util.genTastePref(extraFoods.get(i).tastes) + "', " + 
+						extraFoods.get(i).tasteNormalPref + "', " + 
 						(extraFoods.get(i).tmpTaste == null ? "NULL" : extraFoods.get(i).tmpTaste.aliasID) + ", " +
 						(extraFoods.get(i).tmpTaste == null ? "NULL" : ("'" + extraFoods.get(i).tmpTaste.preference + "'")) + ", " +
 						(extraFoods.get(i).tmpTaste == null ? "NULL" : extraFoods.get(i).tmpTaste.getPrice()) + ", " +
@@ -451,7 +451,7 @@ public class UpdateOrder {
 						canceledFoods.get(i).tastes[1].aliasID + "," +
 						canceledFoods.get(i).tastes[2].aliasID + "," +
 						canceledFoods.get(i).getTasteNormalPrice() + ", '" +
-						com.wireless.protocol.Util.genTastePref(canceledFoods.get(i).tastes) + "', " + 
+						canceledFoods.get(i).tasteNormalPref + "', " + 
 						(canceledFoods.get(i).tmpTaste == null ? "NULL" : canceledFoods.get(i).tmpTaste.aliasID) + ", " +
 						(canceledFoods.get(i).tmpTaste == null ? "NULL" : ("'" + canceledFoods.get(i).tmpTaste.preference + "'")) + ", " +
 						(canceledFoods.get(i).tmpTaste == null ? "NULL" : canceledFoods.get(i).tmpTaste.getPrice()) + ", " +
@@ -791,7 +791,7 @@ public class UpdateOrder {
 		food.tmpTaste = foodBasic.tmpTaste;
 		
 		//set the taste preference to this food
-		//food.tastePref = com.wireless.protocol.Util.genTastePref(food.tastes);
+		food.tasteNormalPref = com.wireless.protocol.Util.genTastePref(food.tastes);
 		//set the total taste price to this food
 		food.setTasteNormalPrice(com.wireless.protocol.Util.genTastePrice(food.tastes, food.getPrice()));
 		
