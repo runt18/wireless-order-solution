@@ -555,11 +555,7 @@ var orderedForm = new Ext.form.FormPanel(
 												+ orderedData[i][8] + "," // 临时菜1编号
 												+ orderedData[i][21] + "," // 临时菜1名称
 												+ orderedData[i][2] + "," // 临时菜1数量
-												+ price + "", // 临时菜1单价(原料單價)
-												+ orderedData[i][22] + "," // 是否临时口味
-												+ orderedData[i][23] + "," // 临时口味
-												+ orderedData[i][24] + ","  // 临时口味价钱
-												+ orderedData[i][25]  // 临时口味编号
+												+ price + "" // 临时菜1单价(原料單價)
 												+ "]，";
 									}									
 								}
@@ -600,8 +596,7 @@ var orderedForm = new Ext.form.FormPanel(
 												var resultJSON = Ext.util.JSON
 														.decode(response.responseText);
 												if (resultJSON.success == true) {
-													Ext.MessageBox
-															.show({
+													Ext.MessageBox.show({
 																msg : resultJSON.data,
 																width : 300,
 																buttons : Ext.MessageBox.OK,
@@ -683,11 +678,7 @@ var orderedForm = new Ext.form.FormPanel(
 												+ orderedData[i][8] + "," // 临时菜1编号
 												+ orderedData[i][21] + "," // 临时菜1名称
 												+ orderedData[i][2] + "," // 临时菜1数量
-												+ price + "", // 临时菜1单价(原料單價)
-												+ orderedData[i][22] + "," // 是否临时口味
-												+ orderedData[i][23] + "," // 临时口味
-												+ orderedData[i][24] + ","  // 临时口味价钱
-												+ orderedData[i][25]  // 临时口味编号
+												+ price + "" // 临时菜1单价(原料單價)
 												+ "]，";
 									}									
 								}
@@ -706,8 +697,7 @@ var orderedForm = new Ext.form.FormPanel(
 								orderedForm.buttons[1].setDisabled(true);
 								orderedForm.buttons[2].setDisabled(true);
 								
-								Ext.Ajax
-										.request({
+								Ext.Ajax.request({
 											url : "../../InsertOrder.do",
 											params : {
 												"pin" : Request["pin"],
