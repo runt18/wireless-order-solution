@@ -31,7 +31,7 @@
 		<link>
 			<name>protocol</name>
 			<type>2</type>
-			<location>E:/job/wireless-order-solution/protocol</location>
+			<location>E:/wireless-order-solution/trunk/protocol</location>
 		</link>
 	</linkedResources>
 	<filteredResources>
