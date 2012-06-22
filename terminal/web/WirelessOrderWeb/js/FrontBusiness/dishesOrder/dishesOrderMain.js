@@ -221,7 +221,7 @@ function dishOptDeleteHandler(rowIndex) {
 
 	if (dishOrderCurrRowIndex_ != -1) {
 		// if (Request["tableStat"] == "used")
-		if (orderedData[dishOrderCurrRowIndex_][16] == "1") {
+		if (orderedData[dishOrderCurrRowIndex_][18] == "1") {
 			dishPushBackWin.show();
 		} else {
 			Ext.MessageBox.show({
@@ -572,9 +572,7 @@ var orderedForm = new Ext.form.FormPanel(
 									type = 2;
 								}
 
-								var inputPersCount = dishesOrderNorthPanel
-										.findById("tablePersonCount")
-										.getValue();
+								var inputPersCount = dishesOrderNorthPanel.findById("tablePersonCount").getValue();
 
 								
 								orderedForm.buttons[0].setDisabled(true);
@@ -655,9 +653,7 @@ var orderedForm = new Ext.form.FormPanel(
 						// 以点菜式格式：[菜名，口味，数量，￥单价，操作，￥实价，菜名编号，厨房编号，口味编号1,特,荐,停,送,￥口味价钱,口味编号2,口味编号3]
 						text : "提交&结帐",
 						handler : function() {
-							if (orderedData.length > 0
-									&& dishesOrderNorthPanel.findById(
-											"tablePersonCount").isValid()) {
+							if (orderedData.length > 0 && dishesOrderNorthPanel.findById( "tablePersonCount").isValid()) {
 
 								var Request = new URLParaQuery();
 
@@ -704,24 +700,12 @@ var orderedForm = new Ext.form.FormPanel(
 									type = 2;
 								}
 
-								var inputPersCount = dishesOrderNorthPanel
-										.findById("tablePersonCount")
-										.getValue();
-
-								// alert("pin:" + Request["pin"] + " tableID:"
-								// + Request["tableNbr"]
-								// + " tableID_2:"
-								// + Request["tableNbr2"]
-								// + " customNum:"
-								// + Request["personCount"] + " type:"
-								// + type + " originalTableID:"
-								// + Request["tableNbr"]
-								// + " category:" + category
-								// + " foods" + foodPara);
+								var inputPersCount = dishesOrderNorthPanel.findById("tablePersonCount").getValue();
+								
 								orderedForm.buttons[0].setDisabled(true);
 								orderedForm.buttons[1].setDisabled(true);
 								orderedForm.buttons[2].setDisabled(true);
-								// alert(foodPara);
+								
 								Ext.Ajax
 										.request({
 											url : "../../InsertOrder.do",
@@ -1210,27 +1194,22 @@ var dishTasteWindow = new Ext.Window(
 							// dishTasteWindow.hide();
 							// 格式：[{編號,描述,價錢或比例,計算方式}]
 							choosenTaset.length = 0;
-							orderedData[dishOrderCurrRowIndex_][8] = "0";
-							orderedData[dishOrderCurrRowIndex_][14] = "0";
-							orderedData[dishOrderCurrRowIndex_][15] = "0";
+							orderedData[dishOrderCurrRowIndex_][10] = "0";
+							orderedData[dishOrderCurrRowIndex_][16] = "0";
+							orderedData[dishOrderCurrRowIndex_][17] = "0";
 
-							dishTasteGridTas
-									.getStore()
-									.each(
+							dishTasteGridTas.getStore().each(
 											function(record) {
 												if (record.get("tasteChoose")) {
-													if (record
-															.get("tasteCountType") == "0") {
-														choosenTaset
-																.push([
+													if (record.get("tasteCountType") == "0") {
+														choosenTaset.push([
 																		record.get("tasteNumber"),// 編號
 																		record.get("dishTaste"),// 描述
 																		record.get("tastePrice"),// 價錢或比例
 																		record.get("tasteCountType") // 計算方式
 																]);
 													} else {
-														choosenTaset
-																.push([
+														choosenTaset.push([
 																		record.get("tasteNumber"),// 編號
 																		record.get("dishTaste"),// 描述
 																		record.get("tasteRate"),// 價錢或比例
@@ -1239,68 +1218,42 @@ var dishTasteWindow = new Ext.Window(
 													}
 												}
 											});
-							dishTasteGridPar
-									.getStore()
-									.each(
+							dishTasteGridPar.getStore().each(
 											function(record) {
 												if (record.get("tasteChoose")) {
-													if (record
-															.get("tasteCountType") == "0") {
-														choosenTaset
-																.push([
-																		record
-																				.get("tasteNumber"),// 編號
-																		record
-																				.get("dishTaste"),// 描述
-																		record
-																				.get("tastePrice"),// 價錢或比例
-																		record
-																				.get("tasteCountType") // 計算方式
+													if (record.get("tasteCountType") == "0") {
+														choosenTaset.push([
+																		record.get("tasteNumber"),// 編號
+																		record.get("dishTaste"),// 描述
+																		record.get("tastePrice"),// 價錢或比例
+																		record.get("tasteCountType") // 計算方式
 																]);
 													} else {
-														choosenTaset
-																.push([
-																		record
-																				.get("tasteNumber"),// 編號
-																		record
-																				.get("dishTaste"),// 描述
-																		record
-																				.get("tasteRate"),// 價錢或比例
-																		record
-																				.get("tasteCountType") // 計算方式
+														choosenTaset.push([
+																		record.get("tasteNumber"),// 編號
+																		record.get("dishTaste"),// 描述
+																		record.get("tasteRate"),// 價錢或比例
+																		record.get("tasteCountType") // 計算方式
 																]);
 													}
 												}
 											});
-							dishTasteGridSiz
-									.getStore()
-									.each(
+							dishTasteGridSiz.getStore().each(
 											function(record) {
 												if (record.get("tasteChoose")) {
-													if (record
-															.get("tasteCountType") == "0") {
-														choosenTaset
-																.push([
-																		record
-																				.get("tasteNumber"),// 編號
-																		record
-																				.get("dishTaste"),// 描述
-																		record
-																				.get("tastePrice"),// 價錢或比例
-																		record
-																				.get("tasteCountType") // 計算方式
+													if (record.get("tasteCountType") == "0") {
+														choosenTaset.push([
+																		record.get("tasteNumber"),// 編號
+																		record.get("dishTaste"),// 描述
+																		record.get("tastePrice"),// 價錢或比例
+																		record.get("tasteCountType") // 計算方式
 																]);
 													} else {
-														choosenTaset
-																.push([
-																		record
-																				.get("tasteNumber"),// 編號
-																		record
-																				.get("dishTaste"),// 描述
-																		record
-																				.get("tasteRate"),// 價錢或比例
-																		record
-																				.get("tasteCountType") // 計算方式
+														choosenTaset.push([
+																		record.get("tasteNumber"),// 編號
+																		record.get("dishTaste"),// 描述
+																		record.get("tasteRate"),// 價錢或比例
+																		record.get("tasteCountType") // 計算方式
 																]);
 													}
 												}
@@ -1324,13 +1277,11 @@ var dishTasteWindow = new Ext.Window(
 								// 校驗通過
 								// 格式：[菜名，口味，数量，￥单价，操作，￥实价，菜名编号，厨房编号，口味编号1,特,荐,停,送,￥口味价钱,口味编号2,口味编号3,菜品状态]
 								// 更新單價,// 格式：[{編號,描述,價錢或比例,計算方式}]
-								var origPrice = orderedData[dishOrderCurrRowIndex_][3]
-										.substring(1);
+								var origPrice = orderedData[dishOrderCurrRowIndex_][3].substring(1);
 								var currPrice = parseFloat(origPrice);
 								for ( var i = 0; i < choosenTaset.length; i++) {
 									if (choosenTaset[i][3] == 1)
-										currPrice = currPrice
-												* (1 + parseFloat(choosenTaset[i][2]));
+										currPrice = currPrice * (1 + parseFloat(choosenTaset[i][2]));
 								}
 								for ( var i = 0; i < choosenTaset.length; i++) {
 									if (choosenTaset[i][3] == 0)
@@ -1344,14 +1295,14 @@ var dishTasteWindow = new Ext.Window(
 								// mark the choosen taset
 								// 第一口味
 								if (choosenTaset[0] != undefined) {
-									orderedData[dishOrderCurrRowIndex_][8] = choosenTaset[0][0];
+									orderedData[dishOrderCurrRowIndex_][10] = choosenTaset[0][0];
 									orderedData[dishOrderCurrRowIndex_][1] = choosenTaset[0][1];
 									orderedData[dishOrderCurrRowIndex_][1] = orderedData[dishOrderCurrRowIndex_][1]
 											+ "；";
 								}
 								// 第二口味
 								if (choosenTaset[1] != undefined) {
-									orderedData[dishOrderCurrRowIndex_][14] = choosenTaset[1][0];
+									orderedData[dishOrderCurrRowIndex_][16] = choosenTaset[1][0];
 									orderedData[dishOrderCurrRowIndex_][1] = orderedData[dishOrderCurrRowIndex_][1]
 											+ choosenTaset[1][1];
 									orderedData[dishOrderCurrRowIndex_][1] = orderedData[dishOrderCurrRowIndex_][1]
@@ -1359,7 +1310,7 @@ var dishTasteWindow = new Ext.Window(
 								}
 								// 第三口味
 								if (choosenTaset[2] != undefined) {
-									orderedData[dishOrderCurrRowIndex_][15] = choosenTaset[2][0];
+									orderedData[dishOrderCurrRowIndex_][17] = choosenTaset[2][0];
 									orderedData[dishOrderCurrRowIndex_][1] = orderedData[dishOrderCurrRowIndex_][1]
 											+ choosenTaset[2][1];
 									orderedData[dishOrderCurrRowIndex_][1] = orderedData[dishOrderCurrRowIndex_][1]
@@ -1391,9 +1342,9 @@ var dishTasteWindow = new Ext.Window(
 				"show" : function(thiz) {
 
 					// show的時候從一點菜式數組中取出當前菜品的口味情況
-					var tasteNbr1 = orderedData[dishOrderCurrRowIndex_][8];
-					var tasteNbr2 = orderedData[dishOrderCurrRowIndex_][14];
-					var tasteNbr3 = orderedData[dishOrderCurrRowIndex_][15];
+					var tasteNbr1 = orderedData[dishOrderCurrRowIndex_][10];
+					var tasteNbr2 = orderedData[dishOrderCurrRowIndex_][16];
+					var tasteNbr3 = orderedData[dishOrderCurrRowIndex_][17];
 
 					// alert("tasteNbr1:"+tasteNbr1+" tasteNbr2:"+tasteNbr2+"
 					// tasteNbr3:"+tasteNbr3);
@@ -1417,34 +1368,23 @@ var dishTasteWindow = new Ext.Window(
 						choosenTasteRefresh();
 
 					} else {
-						dishTasteGridTas
-								.getStore()
-								.each(
+						dishTasteGridTas.getStore().each(
 										function(record) {
 											if (record.get("tasteNumber") == tasteNbr1
-													|| record
-															.get("tasteNumber") == tasteNbr2
-													|| record
-															.get("tasteNumber") == tasteNbr3) {
+													|| record.get("tasteNumber") == tasteNbr2
+													|| record.get("tasteNumber") == tasteNbr3) {
 												record.set("tasteChoose", true);
-												choosenTasteDisplay
-														.push([
-																record
-																		.get("tasteNumber"),
-																record
-																		.get("dishTaste") ]);
+												choosenTasteDisplay.push([
+																record.get("tasteNumber"),
+																record.get("dishTaste") ]);
 												tasteChoosenCount = tasteChoosenCount + 1;
 											}
 										});
-						dishTasteGridPar
-								.getStore()
-								.each(
+						dishTasteGridPar.getStore().each(
 										function(record) {
 											if (record.get("tasteNumber") == tasteNbr1
-													|| record
-															.get("tasteNumber") == tasteNbr2
-													|| record
-															.get("tasteNumber") == tasteNbr3) {
+													|| record.get("tasteNumber") == tasteNbr2
+													|| record.get("tasteNumber") == tasteNbr3) {
 												record.set("tasteChoose", true);
 												choosenTasteDisplay.push([
 																record.get("tasteNumber"),
@@ -1462,12 +1402,9 @@ var dishTasteWindow = new Ext.Window(
 													|| record
 															.get("tasteNumber") == tasteNbr3) {
 												record.set("tasteChoose", true);
-												choosenTasteDisplay
-														.push([
-																record
-																		.get("tasteNumber"),
-																record
-																		.get("dishTaste") ])
+												choosenTasteDisplay.push([
+																record.get("tasteNumber"),
+																record.get("dishTaste") ])
 												tasteChoosenCount = tasteChoosenCount + 1;
 											}
 										});
@@ -1775,7 +1712,6 @@ var dishesDisplayGrid = new Ext.grid.GridPanel(
 			}),
 			listeners : {
 				rowdblclick : function(thiz, rowIndex, e) {
-					
 					if (dishesDisplayDataShow[rowIndex][7] == "false") {
 						
 						// mune格式：[菜名，菜名编号，菜名拼音，单价，厨房编号,特,荐,停,送,菜品状态]
@@ -2215,10 +2151,8 @@ Ext.onReady(function() {
 										buttons : Ext.MessageBox.OK
 									});
 								} else {
-									orderedData
-											.push([
-													name
-															+ "<img src='../../images/tempDish.png'></img>", // 菜名
+									orderedData.push([
+													name + "<img src='../../images/tempDish.png'></img>", // 菜名
 													"无口味", // 口味
 													count,// 数量
 													"￥" + price,// 单价
