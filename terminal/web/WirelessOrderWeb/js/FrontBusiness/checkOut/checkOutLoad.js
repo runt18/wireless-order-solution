@@ -50,14 +50,11 @@ function checkOutOnLoad() {
 						var josnData = resultJSON.data;
 						var orderList = josnData.split("，");
 						for ( var i = 0; i < orderList.length; i++) {
-//							alert('orderList[i]:   '+orderList[i])
-							var orderInfo = orderList[i].substr(1,
-									orderList[i].length - 2).split(",");
+//							alert('orderList[i]:   '+orderList[i]);
+							var orderInfo = orderList[i].substr(1, orderList[i].length - 2).split(",");
 							// 实价 = 单价 + 口味价钱
-							var singlePrice = parseFloat(orderInfo[6].substr(2,
-									orderInfo[6].length - 3));
-							var tastePrice = parseFloat(orderInfo[14].substr(2,
-									orderInfo[14].length - 3));
+							var singlePrice = parseFloat(orderInfo[6].substr(2, orderInfo[6].length - 3));
+							var tastePrice = parseFloat(orderInfo[14].substr(2, orderInfo[14].length - 3));
 							var acturalPrice = 0.0;
 							acturalPrice = singlePrice + tastePrice;
 							acturalPrice = "￥" + acturalPrice.toFixed(2);
@@ -71,7 +68,7 @@ function checkOutOnLoad() {
 							orderInfo[7],// 特
 							orderInfo[8],// 荐							
 							orderInfo[9], // 停
-							orderInfo[10], // 送
+							orderInfo[10], // 赠
 							orderInfo[14].substr(2, orderInfo[14].length - 3),// 口味价钱
 							orderInfo[6].substr(2, orderInfo[6].length - 3), // 单价
 							orderInfo[15], // 時
@@ -88,8 +85,7 @@ function checkOutOnLoad() {
 										"type" : "3"
 									},
 									success : function(response, options) {
-										var resultJSON = Ext.util.JSON
-												.decode(response.responseText);
+										var resultJSON = Ext.util.JSON.decode(response.responseText);
 										if (resultJSON.success == true) {
 											var discountJSONData = resultJSON.data;
 											var discountList = discountJSONData.split("，");
@@ -150,6 +146,7 @@ function checkOutOnLoad() {
 																	// * 折扣率 +
 																	// 口味价）* 数量
 																	var price;
+																	
 																	if (checkOutData[i][7] == "true" || checkOutData[i][10] == "true") {
 																		// 特价，送
 																		// 不打折
@@ -159,15 +156,12 @@ function checkOutOnLoad() {
 																				* checkOutData[i][3];
 
 																	}
-																	var priceDisplay = "￥"
-																			+ price
-																					.toFixed(2);
+																	var priceDisplay = "￥" + price.toFixed(2);
 
 																	// 特价，送 --
 																	// 折扣率
 																	// --1
-																	if (checkOutData[i][10] == "true"
-																			|| checkOutData[i][7] == "true") {
+																	if (checkOutData[i][10] == "true" || checkOutData[i][7] == "true") {
 																		checkOutDataDisplay.push([
 																						checkOutData[i][1],// 菜名
 																						checkOutData[i][2],// 口味
@@ -180,28 +174,24 @@ function checkOutOnLoad() {
 																						checkOutData[i][7],// 特
 																						checkOutData[i][8],// 荐
 																						checkOutData[i][9], // 停
-																						checkOutData[i][8], // 送
+																						checkOutData[i][10], // 赠
 																						checkOutData[i][13], // 時
 																						checkOutData[i][14] // 臨
 																				]);
 																	} else {
-																		checkOutDataDisplay
-																				.push([
+																		checkOutDataDisplay.push([
 																						checkOutData[i][1],// 菜名
 																						checkOutData[i][2],// 口味
 																						checkOutData[i][3],// 数量
 																						checkOutData[i][4],// 单价
-																						parseFloat(
-																								discountRate)
-																								.toFixed(
-																										2),// 折扣率
+																						parseFloat(discountRate).toFixed(2),// 折扣率
 																						priceDisplay, // 实价
 																						checkOutData[i][5],
 																						checkOutData[i][6],
 																						checkOutData[i][7],// 特
 																						checkOutData[i][8],// 荐
 																						checkOutData[i][9], // 停
-																						checkOutData[i][8], // 送
+																						checkOutData[i][10], // 赠
 																						checkOutData[i][13], // 時
 																						checkOutData[i][14] // 臨
 																				]);
@@ -209,78 +199,67 @@ function checkOutOnLoad() {
 																}
 																// 根据“特荐停”重新写菜名
 																for ( var i = 0; i < checkOutDataDisplay.length; i++) {
-																	if (checkOutDataDisplay[i][6] == "true") {
+																	
+																	if (checkOutDataDisplay[i][8] == "true") {
 																		// 特
 																		checkOutDataDisplay[i][0] = checkOutDataDisplay[i][0]
 																				+ "<img src='../../images/icon_tip_te.gif'></img>";
 																	}
-																	if (checkOutDataDisplay[i][7] == "true") {
+																	if (checkOutDataDisplay[i][9] == "true") {
 																		// 荐
 																		checkOutDataDisplay[i][0] = checkOutDataDisplay[i][0]
 																				+ "<img src='../../images/icon_tip_jian.gif'></img>";
 																	}
-																	if (checkOutDataDisplay[i][8] == "true") {
+																	if (checkOutDataDisplay[i][10] == "true") {
 																		// 停
 																		checkOutDataDisplay[i][0] = checkOutDataDisplay[i][0]
 																				+ "<img src='../../images/icon_tip_ting.gif'></img>";
 																	}
-																	if (checkOutDataDisplay[i][9] == "true") {
-																		// 送
+																	if (checkOutDataDisplay[i][11] == "true") {
+																		// 赠
 																		checkOutDataDisplay[i][0] = checkOutDataDisplay[i][0]
 																				+ "<img src='../../images/forFree.png'></img>";
 																	}
-																	if (checkOutDataDisplay[i][10] == "true") {
+																	if (checkOutDataDisplay[i][12] == "true") {
 																		// 時
 																		checkOutDataDisplay[i][0] = checkOutDataDisplay[i][0]
 																				+ "<img src='../../images/currPrice.png'></img>";
 																	}
-																	if (checkOutDataDisplay[i][11] == "true") {
+																	if (checkOutDataDisplay[i][13] == "true") {
 																		// 臨
 																		checkOutDataDisplay[i][0] = checkOutDataDisplay[i][0]
 																				+ "<img src='../../images/tempDish.png'></img>";
 																	}
 																}
 
-																checkOutStore
-																		.reload();
+																checkOutStore.reload();
 
 																// 4,算总价
 																var totalCount = 0;
 																var forFreeCount = 0;
 																for ( var i = 0; i < checkOutDataDisplay.length; i++) {
-																	var singleCount = parseFloat(checkOutDataDisplay[i][5]
-																			.substr(1));
-																	if (checkOutDataDisplay[i][9] == "true") {																		
-																		forFreeCount = forFreeCount
-																				+ parseFloat(checkOutData[i][4]
-																						.substring(1))
-																				* checkOutData[i][3];
+																	var singleCount = parseFloat(checkOutDataDisplay[i][5].substr(1));
+																	if (checkOutDataDisplay[i][11] == "true") {																		
+																		forFreeCount = forFreeCount + parseFloat(checkOutData[i][4].substring(1)) * checkOutData[i][3];
 																	} else {
-																		totalCount = totalCount
-																				+ singleCount;
+																		totalCount = totalCount + singleCount;
 																	}
 																}
-																totalCount = totalCount
-																		.toFixed(2);
-																forFreeCount = forFreeCount
-																		.toFixed(2);
+																totalCount = totalCount.toFixed(2);
+																forFreeCount = forFreeCount.toFixed(2);
 																originalTotalCount = totalCount;
-																document
-																		.getElementById("totalCount").innerHTML = totalCount;
-																document
-																		.getElementById("forFree").innerHTML = forFreeCount;
+																document.getElementById("totalCount").innerHTML = totalCount;
+																document.getElementById("forFree").innerHTML = forFreeCount;
 																// document
 																// .getElementById("actualCount").value
 																// = "0.00";
-																document
-																		.getElementById("shouldPay").innerHTML = totalCount;
+																document.getElementById("shouldPay").innerHTML = totalCount;
 
 																// 4,（尾数处理）
 																// 后台：["餐厅名称","餐厅信息","电话1","电话2","地址",$(尾数处理),$(自动补打)]
 																// 前台：restaurantData
 																// ，格式一样
-																Ext.Ajax
-																		.request({
+																Ext.Ajax.request({
 																			url : "../../QueryRestaurant.do",
 																			params : {
 																				"restaurantID" : restaurantID
@@ -288,40 +267,21 @@ function checkOutOnLoad() {
 																			success : function(
 																					response,
 																					options) {
-																				var resultJSON = Ext.util.JSON
-																						.decode(response.responseText);
+																				var resultJSON = Ext.util.JSON.decode(response.responseText);
 																				if (resultJSON.success == true) {
 																					var dataInfo = resultJSON.data;
-																					var restaurantInfo = dataInfo
-																							.split(",");
-																					restaurantData
-																							.push([
-																									restaurantInfo[0]
-																											.substr(
-																													1,
-																													restaurantInfo[0].length - 2),// 餐厅名称
-																									restaurantInfo[1]
-																											.substr(
-																													1,
-																													restaurantInfo[1].length - 2),// 餐厅信息
-																									restaurantInfo[2]
-																											.substr(
-																													1,
-																													restaurantInfo[2].length - 2),// 电话1
-																									restaurantInfo[3]
-																											.substr(
-																													1,
-																													restaurantInfo[3].length - 2),// 电话2
-																									restaurantInfo[4]
-																											.substr(
-																													1,
-																													restaurantInfo[4].length - 2),// 地址
+																					var restaurantInfo = dataInfo.split(",");
+																					restaurantData.push([
+																									restaurantInfo[0].substr(1, restaurantInfo[0].length - 2),// 餐厅名称
+																									restaurantInfo[1].substr(1, restaurantInfo[1].length - 2),// 餐厅信息
+																									restaurantInfo[2].substr(1, restaurantInfo[2].length - 2),// 电话1
+																									restaurantInfo[3].substr(1, restaurantInfo[3].length - 2),// 电话2
+																									restaurantInfo[4].substr(1, restaurantInfo[4].length - 2),// 地址
 																									restaurantInfo[5],// 尾数处理
 																									restaurantInfo[6] // 自动补打
 																							]);
 
-																					var sPay = document
-																							.getElementById("shouldPay").innerHTML;
+																					var sPay = document.getElementById("shouldPay").innerHTML;
 
 																					// 5,最低消费处理
 																					var minCost = Request["minCost"];
@@ -353,34 +313,24 @@ function checkOutOnLoad() {
 																												.indexOf("."))
 																								+ ".00";
 																					} else if (restaurantData[0][5] == 2) {
-																						sPay = parseFloat(
-																								sPay)
-																								.toFixed(
-																										0)
-																								+ ".00";
+																						sPay = parseFloat(sPay).toFixed(0) + ".00";
 																					}
-																					document
-																							.getElementById("shouldPay").innerHTML = sPay;
-																					document
-																							.getElementById("actualCount").value = sPay;
-																					document
-																							.getElementById("change").innerHTML = "0.00";
+																					document.getElementById("shouldPay").innerHTML = sPay;
+																					document.getElementById("actualCount").value = sPay;
+																					document.getElementById("change").innerHTML = "0.00";
 
 																					moneyCount("");
 
 																				} else {
 																					var dataInfo = resultJSON.data;
-																					Ext.MessageBox
-																							.show({
+																					Ext.MessageBox.show({
 																								msg : dataInfo,
 																								width : 300,
 																								buttons : Ext.MessageBox.OK
 																							});
 																				}
 																			},
-																			failure : function(
-																					response,
-																					options) {
+																			failure : function(response,options) {
 																			}
 																		});
 
@@ -394,9 +344,7 @@ function checkOutOnLoad() {
 																		});
 															}
 														},
-														failure : function(
-																response,
-																options) {
+														failure : function(response,options) {
 														}
 													});
 
@@ -451,19 +399,15 @@ function moneyCount(opt) {
 		if (restaurantData[0] != undefined) {
 			// “应收”加上服务费
 			if (parseFloat(totalCount) < parseFloat(minCost)) {
-				shouldPay_out = parseFloat(minCost)
-						* (1 + parseFloat(serviceRate) / 100);
+				shouldPay_out = parseFloat(minCost) * (1 + parseFloat(serviceRate) / 100);
 			} else {
-				shouldPay_out = parseFloat(originalTotalCount)
-						* (1 + parseFloat(serviceRate) / 100);
+				shouldPay_out = parseFloat(originalTotalCount) * (1 + parseFloat(serviceRate) / 100);
 			}
 
 			// “应收”尾数处理
 			if (restaurantData[0][5] == 1) {
 				if ((shouldPay_out + "").indexOf(".") != -1) {
-					shouldPay_out = (shouldPay_out + "").substr(0,
-							(shouldPay_out + "").indexOf("."))
-							+ ".00";
+					shouldPay_out = (shouldPay_out + "").substr(0, (shouldPay_out + "").indexOf(".")) + ".00";
 				} else {
 					shouldPay_out = shouldPay_out + ".00";
 				}
@@ -474,19 +418,17 @@ function moneyCount(opt) {
 			}
 
 			// “合计”加上服务费
-			totalCount_out = (parseFloat(originalTotalCount) * (1 + parseFloat(serviceRate) / 100))
-					.toFixed(2);
+			totalCount_out = (parseFloat(originalTotalCount) * (1 + parseFloat(serviceRate) / 100)).toFixed(2);
 
 			// “找零”计算
 			if (actualPay != "" && actualPay != "0.00") {
 				if (opt == "button") {
-					change_out = (parseFloat(actualPay) - parseFloat(shouldPay_out))
-							.toFixed(2);
+					change_out = (parseFloat(actualPay) - parseFloat(shouldPay_out)).toFixed(2);
 				} else {
 					change_out = "0.00";
 				}
 			}
-
+//			alert('totalCount_out: '+totalCount_out+'   shouldPay_out: '+shouldPay_out+'change_out: '+change_out);
 			document.getElementById("totalCount").innerHTML = totalCount_out;
 			document.getElementById("shouldPay").innerHTML = shouldPay_out;
 			document.getElementById("change").innerHTML = change_out;

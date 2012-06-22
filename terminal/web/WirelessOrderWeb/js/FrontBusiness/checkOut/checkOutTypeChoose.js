@@ -1,8 +1,7 @@
 ﻿var getMemberInfo = function(memberNbr) {
 
 	var Request = new URLParaQuery();
-	Ext.Ajax
-			.request({
+	Ext.Ajax.request({
 				url : "../../QueryMember.do",
 				params : {
 					"pin" : Request["pin"],
@@ -101,20 +100,17 @@ var checkOurListRefresh = function() {
 				discountRate = discountData[j][discountIndex];
 			}
 		}
-
+		
 		var tastePrice = checkOutData[i][11];
-
+		
 		// 总价 = （原料价 * 折扣率 + 口味价）* 数量
 		var price;
-		if (checkOutData[i][7] == "true" || checkOutData[i][10] == "true"
-				|| checkOutData[i][14] == "true") {
+		if (checkOutData[i][7] == "true" || checkOutData[i][10] == "true" || checkOutData[i][14] == "true") {
 			// 特价，送，臨時菜　　 不打折
-			price = parseFloat(checkOutData[i][4].substring(1))
-					* checkOutData[i][3];
+			price = parseFloat(checkOutData[i][4].substring(1)) * checkOutData[i][3];			
 		} else {
 			// 非   特价，送，臨時菜
-			price = (parseFloat(checkOutData[i][12]) * discountRate + parseFloat(tastePrice))
-					* checkOutData[i][3];
+			price = (parseFloat(checkOutData[i][12]) * discountRate + parseFloat(tastePrice)) * checkOutData[i][3];			
 		}
 		var priceDisplay = "￥" + price.toFixed(2);
 
@@ -129,7 +125,7 @@ var checkOurListRefresh = function() {
 					checkOutData[i][7],// 特
 					checkOutData[i][8],// 荐
 					checkOutData[i][9], // 停
-					checkOutData[i][8], // 送
+					checkOutData[i][10], // 送
 					checkOutData[i][13], // 時
 					checkOutData[i][14] // 臨
 			]);
@@ -142,7 +138,7 @@ var checkOurListRefresh = function() {
 					checkOutData[i][7],// 特
 					checkOutData[i][8],// 荐
 					checkOutData[i][9], // 停
-					checkOutData[i][8], // 送
+					checkOutData[i][10], // 送
 					checkOutData[i][13], // 時
 					checkOutData[i][14] // 臨
 			]);
@@ -151,51 +147,47 @@ var checkOurListRefresh = function() {
 
 	// 根据“特荐停”重新写菜名
 	for ( var i = 0; i < checkOutDataDisplay.length; i++) {
-		if (checkOutDataDisplay[i][6] == "true") {
+		if (checkOutDataDisplay[i][8] == "true") {
 			// 特
 			checkOutDataDisplay[i][0] = checkOutDataDisplay[i][0]
 					+ "<img src='../../images/icon_tip_te.gif'></img>";
 		}
-		if (checkOutDataDisplay[i][7] == "true") {
+		if (checkOutDataDisplay[i][9] == "true") {
 			// 荐
 			checkOutDataDisplay[i][0] = checkOutDataDisplay[i][0]
 					+ "<img src='../../images/icon_tip_jian.gif'></img>";
 		}
-		if (checkOutDataDisplay[i][8] == "true") {
+		if (checkOutDataDisplay[i][10] == "true") {
 			// 停
 			checkOutDataDisplay[i][0] = checkOutDataDisplay[i][0]
 					+ "<img src='../../images/icon_tip_ting.gif'></img>";
 		}
-		if (checkOutDataDisplay[i][9] == "true") {
+		if (checkOutDataDisplay[i][11] == "true") {
 			// 送
 			checkOutDataDisplay[i][0] = checkOutDataDisplay[i][0]
 					+ "<img src='../../images/forFree.png'></img>";
 		}
-		if (checkOutDataDisplay[i][10] == "true") {
+		if (checkOutDataDisplay[i][12] == "true") {
 			// 時
 			checkOutDataDisplay[i][0] = checkOutDataDisplay[i][0]
 					+ "<img src='../../images/currPrice.png'></img>";
 		}
-		if (checkOutDataDisplay[i][11] == "true") {
+		if (checkOutDataDisplay[i][13] == "true") {
 			// 臨
 			checkOutDataDisplay[i][0] = checkOutDataDisplay[i][0]
 					+ "<img src='../../images/tempDish.png'></img>";
 		}
 	}
-
+	
 	checkOutStore.reload();
-
+	
 	// 算总价
 	var totalCount = 0;
 	var forFreeCount = 0;
 	for ( var i = 0; i < checkOutDataDisplay.length; i++) {
 		var singleCount = parseFloat(checkOutDataDisplay[i][5].substr(1));
-		if (checkOutDataDisplay[i][9] == "true") {
-			// forFreeCount = forFreeCount + singleCount;
-			// for free count dont need discount
-			forFreeCount = forFreeCount
-					+ parseFloat(checkOutData[i][4].substring(1))
-					* checkOutData[i][3];
+		if (checkOutDataDisplay[i][11] == "true") {
+			forFreeCount = forFreeCount + parseFloat(checkOutData[i][4].substring(1)) * checkOutData[i][3];
 		} else {
 			totalCount = totalCount + singleCount;
 		}
@@ -203,22 +195,10 @@ var checkOurListRefresh = function() {
 	totalCount = totalCount.toFixed(2);
 	forFreeCount = forFreeCount.toFixed(2);
 	originalTotalCount = totalCount;
-
+	
 	document.getElementById("totalCount").innerHTML = totalCount;
 	document.getElementById("forFree").innerHTML = forFreeCount;
-	// //document.getElementById("actualCount").value = totalCount;
-	// document.getElementById("shouldPay").innerHTML = totalCount;
-	// var sPay = document.getElementById("shouldPay").innerHTML;
-	// if (restaurantData[0][5] == 2) {
-	// sPay = sPay.substr(0, sPay.indexOf(".")) + ".00";
-	// } else if (restaurantData[0][5] == 3) {
-	// sPay = parseFloat(sPay).toFixed(0) + ".00";
-	// }
-	// document.getElementById("shouldPay").innerHTML = sPay;
-	// document.getElementById("change").innerHTML =
-	// (parseFloat(totalCount)-parseFloat(sPay)).toFixed(2);
-	// // checkOutForm.findById("actualCount").setValue(totalCount);
-
+	
 	moneyCount("radio");
 
 };
