@@ -1423,8 +1423,7 @@ var softKBKeyHandler = function(relateItemId, number) {
 	dishesOrderEastPanel.findById(relateItemId).setValue(
 			currValue + ("" + number));
 
-	dishesOrderEastPanel.findById(relateItemId).fireEvent("blur",
-			dishesOrderEastPanel.findById(relateItemId));
+	dishesOrderEastPanel.findById(relateItemId).fireEvent("blur", dishesOrderEastPanel.findById(relateItemId));
 };
 
 softKeyBoardDO = new Ext.Window({
@@ -1583,19 +1582,11 @@ softKeyBoardDO = new Ext.Window({
 							text : "&nbsp;删 除&nbsp;",
 							xtype : "button",
 							handler : function() {
-								var origValue = dishesOrderEastPanel.findById(
-										softKBRelateItemId).getValue()
-										+ "";
-								var newValue = origValue.substring(0,
-										origValue.length - 1);
-								dishesOrderEastPanel.findById(
-										softKBRelateItemId).setValue(newValue);
+								var origValue = dishesOrderEastPanel.findById(softKBRelateItemId).getValue() + "";
+								var newValue = origValue.substring(0, origValue.length - 1);
+								dishesOrderEastPanel.findById(softKBRelateItemId).setValue(newValue);
 								dishKeyboardSelect(softKBRelateItemId);
-								dishesOrderEastPanel.findById(
-										softKBRelateItemId).fireEvent(
-										"blur",
-										dishesOrderEastPanel
-												.findById(softKBRelateItemId));
+								dishesOrderEastPanel.findById(softKBRelateItemId).fireEvent("blur",dishesOrderEastPanel.findById(softKBRelateItemId));
 							}
 
 						} ]
@@ -1627,8 +1618,7 @@ softKeyBoardDO = new Ext.Window({
 								dishesOrderEastPanel.findById(
 										softKBRelateItemId).fireEvent(
 										"blur",
-										dishesOrderEastPanel
-												.findById(softKBRelateItemId));
+										dishesOrderEastPanel.findById(softKBRelateItemId));
 							}
 
 						} ]
@@ -2155,9 +2145,11 @@ Ext.onReady(function() {
 													name + "<img src='../../images/tempDish.png'></img>", // 菜名
 													"无口味", // 口味
 													count,// 数量
-													"￥" + price,// 单价
+													"￥" + price,// 单价													
 													"", // 操作
 													"￥" + price, // 实价
+													new Date().format('Y-m-d H:m:s'),
+													Ext.getDom('optName').innerHTML,
 													-1,// 菜名编号
 													0, // 厨房编号
 													0,// 口味编号1
