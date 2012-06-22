@@ -344,7 +344,7 @@ var countAddImgBut = new Ext.ux.ImageButton(
 			tooltip : "数量加1",
 			handler : function(btn) {
 				if (dishOrderCurrRowIndex_ != -1) {
-					if (orderedData[dishOrderCurrRowIndex_][16] == "2") {
+					if (orderedData[dishOrderCurrRowIndex_][18] == "2") {
 						orderedData[dishOrderCurrRowIndex_][2] = parseFloat(orderedData[dishOrderCurrRowIndex_][2]) + 1;
 						orderedStore.reload();
 						// 底色处理，已点菜式原色底色
@@ -364,7 +364,7 @@ var countMinusImgBut = new Ext.ux.ImageButton(
 			tooltip : "数量减1",
 			handler : function(btn) {
 				if (dishOrderCurrRowIndex_ != -1) {
-					if (orderedData[dishOrderCurrRowIndex_][16] == "2") {
+					if (orderedData[dishOrderCurrRowIndex_][18] == "2") {
 						if (orderedData[dishOrderCurrRowIndex_][2] != "1") {
 							orderedData[dishOrderCurrRowIndex_][2] = parseFloat(orderedData[dishOrderCurrRowIndex_][2]) - 1;
 							orderedStore.reload();
@@ -386,7 +386,7 @@ var countEqualImgBut = new Ext.ux.ImageButton({
 	tooltip : "数量等于",
 	handler : function(btn) {
 		if (dishOrderCurrRowIndex_ != -1) {
-			if (orderedData[dishOrderCurrRowIndex_][16] == "2") {
+			if (orderedData[dishOrderCurrRowIndex_][18] == "2") {
 				dishCountInputWin.show();
 			}
 		}
@@ -544,7 +544,8 @@ var orderedForm = new Ext.form.FormPanel(
 												+ orderedData[i][17] + "," // 3rd口味1编号
 												+ orderedData[i][22] + "," // 是否临时口味
 												+ orderedData[i][23] + "," // 临时口味
-												+ orderedData[i][24] // 临时口味价钱
+												+ orderedData[i][24] + ","  // 临时口味价钱
+												+ orderedData[i][25]  // 临时口味编号
 												+ "]，";
 									} else {										
 										// [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价]，
@@ -557,7 +558,8 @@ var orderedForm = new Ext.form.FormPanel(
 												+ price + "", // 临时菜1单价(原料單價)
 												+ orderedData[i][22] + "," // 是否临时口味
 												+ orderedData[i][23] + "," // 临时口味
-												+ orderedData[i][24] // 临时口味价钱
+												+ orderedData[i][24] + ","  // 临时口味价钱
+												+ orderedData[i][25]  // 临时口味编号
 												+ "]，";
 									}									
 								}
@@ -674,7 +676,8 @@ var orderedForm = new Ext.form.FormPanel(
 												+ orderedData[i][17] + "," // 3rd口味1编号
 												+ orderedData[i][22] + "," // 是否临时口味
 												+ orderedData[i][23] + "," // 临时口味
-												+ orderedData[i][24] // 临时口味价钱
+												+ orderedData[i][24] + ","  // 临时口味价钱
+												+ orderedData[i][25]  // 临时口味编号
 												+ "]，";
 									} else {										
 										// [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价]，
@@ -687,7 +690,8 @@ var orderedForm = new Ext.form.FormPanel(
 												+ price + "", // 临时菜1单价(原料單價)
 												+ orderedData[i][22] + "," // 是否临时口味
 												+ orderedData[i][23] + "," // 临时口味
-												+ orderedData[i][24] // 临时口味价钱
+												+ orderedData[i][24] + ","  // 临时口味价钱
+												+ orderedData[i][25]  // 临时口味编号
 												+ "]，";
 									}									
 								}
@@ -1219,26 +1223,18 @@ var dishTasteWindow = new Ext.Window(
 															.get("tasteCountType") == "0") {
 														choosenTaset
 																.push([
-																		record
-																				.get("tasteNumber"),// 編號
-																		record
-																				.get("dishTaste"),// 描述
-																		record
-																				.get("tastePrice"),// 價錢或比例
-																		record
-																				.get("tasteCountType") // 計算方式
+																		record.get("tasteNumber"),// 編號
+																		record.get("dishTaste"),// 描述
+																		record.get("tastePrice"),// 價錢或比例
+																		record.get("tasteCountType") // 計算方式
 																]);
 													} else {
 														choosenTaset
 																.push([
-																		record
-																				.get("tasteNumber"),// 編號
-																		record
-																				.get("dishTaste"),// 描述
-																		record
-																				.get("tasteRate"),// 價錢或比例
-																		record
-																				.get("tasteCountType") // 計算方式
+																		record.get("tasteNumber"),// 編號
+																		record.get("dishTaste"),// 描述
+																		record.get("tasteRate"),// 價錢或比例
+																		record.get("tasteCountType") // 計算方式
 																]);
 													}
 												}

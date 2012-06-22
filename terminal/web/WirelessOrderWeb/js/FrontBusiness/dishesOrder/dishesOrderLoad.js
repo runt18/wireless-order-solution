@@ -271,7 +271,8 @@ function orderedDishesOnLoad() {
 											orderInfo[0].substr(1,orderInfo[0].length - 2), // 菜名ORIG
 											orderInfo[21],// 是否临时口味
 											orderInfo[22],// 临时口味
-											orderInfo[23]// 临时口味价钱
+											orderInfo[23],// 临时口味价钱
+											orderInfo[24] // 临时口味编号
 									]);
 								}
 
