@@ -372,7 +372,11 @@ var orderedForm = new Ext.form.FormPanel(
 												+ orderedData[i][7] + ","// 厨房1编号
 												+ orderedData[i][13] + "," // 折扣率
 												+ orderedData[i][17] + ","// 2nd口味1编号
-												+ orderedData[i][18] // 3rd口味1编号
+												+ orderedData[i][18] + ','// 3rd口味1编号
+												+ orderedData[i][22] + ',' // 是否临时口味
+												+ orderedData[i][23] + ',' // 临时口味
+												+ orderedData[i][24] + ','  // 临时口味价钱
+												+ orderedData[i][25]  // 临时口味编号
 												+ "]，";
 									} else {
 										// 是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价
