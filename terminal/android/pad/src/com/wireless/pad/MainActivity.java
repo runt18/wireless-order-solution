@@ -32,6 +32,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.animation.Animation;
@@ -815,6 +816,8 @@ public class MainActivity extends Activity {
 
 			// 添加Grid
 			_tblScrolledArea.addView(grid);
+			
+			
 		}
 
 		LinearLayout pageIndicator = (LinearLayout) findViewById(R.id.page_point);
@@ -1638,7 +1641,7 @@ public class MainActivity extends Activity {
 					if (table.status == Table.TABLE_BUSY) {
 						new AlertDialog.Builder(parent.getContext())
 								.setTitle("请选择" + table.aliasID + "号餐台的操作")
-								.setItems(new String[] { "改单", "转台" },
+								.setItems(new String[] { "改单", "转台","结账" },
 										new DialogInterface.OnClickListener() {
 											@Override
 											public void onClick(DialogInterface dialog,	int which) {
@@ -1646,7 +1649,10 @@ public class MainActivity extends Activity {
 													// jump to change order activity with the order in case of busy
 													new QueryOrderTask(table).execute();
 												} else if (which == 1) {
-
+													
+												} else if( which == 2){
+													// jump to Bill activity with the order in case of busy
+													new QueryOrderBillTask(table.aliasID,Type.PAY_ORDER).execute();
 												}
 											}
 										}).setNegativeButton("返回", null).show();
@@ -1757,5 +1763,96 @@ public class MainActivity extends Activity {
 			((Button)findViewById(R.id.region_10)).setBackgroundResource(R.drawable.av_r12_c28_2);
 			
 		}
+	}
+	
+	
+	/**
+	 * 执行请求对应餐台的账单信息 
+	 */
+	private class QueryOrderBillTask extends AsyncTask<Void, Void, String>{
+
+		private ProgressDialog _progDialog;
+		private int _tableID;
+		private Order _order;
+		private int _type = Type.UPDATE_ORDER;;
+		
+		QueryOrderBillTask(int tableID, int type){
+			_tableID = tableID;
+			_type = type;
+		}
+		
+		/**
+		 * 在执行请求删单操作前显示提示信息
+		 */
+		@Override
+		protected void onPreExecute(){
+			_progDialog = ProgressDialog.show(MainActivity.this, "", "查询" + _tableID + "号餐台的信息...请稍候", true);
+		}
+		
+		@Override
+		protected String doInBackground(Void... arg0) {
+			String errMsg = null;
+			try{
+				//根据tableID请求数据
+				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryOrder(_tableID));
+				if(resp.header.type == Type.ACK){
+					_order = RespParser.parseQueryOrder(resp, WirelessOrder.foodMenu);
+					
+				}else{
+    				if(resp.header.reserved == ErrorCode.TABLE_IDLE) {
+    					errMsg = _tableID + "号台还未下单";
+    					
+    				}else if(resp.header.reserved == ErrorCode.TABLE_NOT_EXIST) {
+    					errMsg = _tableID + "号台信息不存在";
+
+    				}else if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
+    					errMsg = "终端没有登记到餐厅，请联系管理人员。";
+
+    				}else if(resp.header.reserved == ErrorCode.TERMINAL_EXPIRED) {
+    					errMsg = "终端已过期，请联系管理人员。";
+
+    				}else{
+    					errMsg = "未确定的异常错误(" + resp.header.reserved + ")";
+    				}
+				}
+			}catch(IOException e){
+				errMsg = e.getMessage();
+			}
+			
+			return errMsg;
+		}
+		
+		/**
+		 * 根据返回的error message判断，如果发错异常则提示用户，
+		 * 如果成功，则迁移到改单页面
+		 */
+		@Override
+		protected void onPostExecute(String errMsg){
+			//make the progress dialog disappeared
+			_progDialog.dismiss();
+			/**
+			 * Prompt user message if any error occurred.
+			 */
+			if(errMsg != null){
+				new AlertDialog.Builder(MainActivity.this)
+				.setTitle("提示")
+				.setMessage(errMsg)
+				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.dismiss();
+					}
+				}).show();
+			}else{
+				 if(_type == Type.PAY_ORDER){
+					//jump to the pay order activity
+					Intent intent = new Intent(MainActivity.this, BillActivity.class);
+					Bundle bundle = new Bundle();
+					bundle.putParcelable(OrderParcel.KEY_VALUE, new OrderParcel(_order));
+					intent.putExtras(bundle);
+					startActivity(intent);
+				}
+			}
+		}
+		
 	}
 }
