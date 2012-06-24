@@ -512,7 +512,7 @@ public class PickFoodActivity extends TabActivity implements
 						}
 						List<Kitchen> kitchens = new ArrayList<Kitchen>();
 						for (int i = 0; i < _validKitchens.size(); i++) {
-							if (_validKitchens.get(i).deptID == deptID) {
+							if (_validKitchens.get(i).dept.deptID == deptID) {
 								kitchens.add(_validKitchens.get(i));
 							}
 						}
@@ -624,7 +624,7 @@ public class PickFoodActivity extends TabActivity implements
 				for (int i = 0; i < _validDepts.size(); i++) {
 					List<Kitchen> kitchens = new ArrayList<Kitchen>();
 					for (int j = 0; j < _validKitchens.size(); j++) {
-						if (_validKitchens.get(j).deptID == _validDepts.get(i).deptID) {
+						if (_validKitchens.get(j).dept.deptID == _validDepts.get(i).deptID) {
 							kitchens.add(_validKitchens.get(j));
 						}
 					}
@@ -1074,8 +1074,7 @@ public class PickFoodActivity extends TabActivity implements
 		_validDepts = new ArrayList<Department>();
 		for (int i = 0; i < WirelessOrder.foodMenu.sKitchens.length; i++) {
 			for (int j = 0; j < _validKitchens.size(); j++) {
-				if (WirelessOrder.foodMenu.sKitchens[i].deptID == _validKitchens
-						.get(j).deptID) {
+				if (WirelessOrder.foodMenu.sKitchens[i].deptID == _validKitchens.get(j).dept.deptID) {
 					_validDepts.add(WirelessOrder.foodMenu.sKitchens[i]);
 					break;
 				}
