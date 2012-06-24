@@ -87,7 +87,7 @@ public final class Kitchen {
 	//the alias id to this kitchen
 	public short aliasID = KITCHEN_NULL;
 	//the department id to this kitchen
-	public short deptID = Department.DEPT_1;
+	public Department dept = new Department();
 	
 	public Kitchen(){
 		
@@ -97,7 +97,7 @@ public final class Kitchen {
 		this.name = kName;
 		this.kitchenID = kID;
 		this.aliasID = kAlias;
-		this.deptID = deptID;
+		this.dept.deptID = deptID;
 	}
 	
 	public Kitchen(String kName, long kID, short kAlias, short deptID, byte dist1, byte dist2, byte dist3, byte memDist1, byte memDist2, byte memDist3){
