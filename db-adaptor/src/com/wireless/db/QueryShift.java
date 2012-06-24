@@ -530,6 +530,9 @@ public class QueryShift {
 			}
 		}
 		
+		/**
+		 * Sort the income in ascending order by department id. 
+		 */
 		Collections.sort(validDeptIncomes, new Comparator<DeptIncome>(){
 
 			@Override
