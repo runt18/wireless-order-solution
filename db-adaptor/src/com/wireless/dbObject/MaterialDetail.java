@@ -1,17 +1,24 @@
 package com.wireless.dbObject;
 
+import com.wireless.protocol.Department;
+import com.wireless.protocol.Food;
+
 public class MaterialDetail{
-	private int restaurantID;
+	public int restaurantID;
 	
-	private float price;
+	public Food food = new Food();
 	
-	private long date;
+	public Department dept = new Department();
 	
-	private String staff;
+	public float price;
 	
-	private float amount;
+	public long date;
 	
-	private int type = TYPE_CONSUME;
+	public String staff;
+	
+	public float amount;
+	
+	public int type = TYPE_CONSUME;
 	
 	public final static int TYPE_CONSUME = 0;	//消耗
 	public final static int TYPE_WEAR = 1;		//报损
@@ -23,53 +30,12 @@ public class MaterialDetail{
 	public final static int TYPE_IN = 7;		//调入
 	public final static int TYPE_CHECK = 8;		//盘点
 	
-	public int getRestaurantID() {
-		return restaurantID;
+	/**
+	 * Calculate the price to this material detail.
+	 * @return
+	 */
+	public float calcPrice(){
+		return (float)Math.round(price * amount * 100) / 100;
 	}
-
-	public void setRestaurantID(int restaurantID) {
-		this.restaurantID = restaurantID;
-	}
-
-	public float getPrice() {
-		return price;
-	}
-
-	public void setPrice(float price) {
-		this.price = price;
-	}
-
-	public long getDate() {
-		return date;
-	}
-
-	public void setDate(long date) {
-		this.date = date;
-	}
-
-	public String getStaff() {
-		return staff;
-	}
-
-	public void setStaff(String staff) {
-		this.staff = staff;
-	}
-
-	public float getAmount() {
-		return amount;
-	}
-
-	public void setAmount(float amount) {
-		this.amount = amount;
-	}
-
-	public int getType() {
-		return type;
-	}
-
-	public void setType(int type) {
-		this.type = type;
-	}
-
 	
 }

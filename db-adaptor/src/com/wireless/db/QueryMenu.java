@@ -299,7 +299,7 @@ public class QueryMenu {
 		}
 	}
 	
-	static Food[] queryFoods(DBCon dbCon, int restaurantID, String extraCondition, String orderClause) throws SQLException{
+	public static Food[] queryFoods(DBCon dbCon, int restaurantID, String extraCondition, String orderClause) throws SQLException{
 		ArrayList<Food> foods = new ArrayList<Food>();
         //get all the food information to this restaurant
 		String sql = "SELECT food_id, food_alias, name, unit_price, kitchen_alias, status, pinyin FROM " + 
@@ -323,7 +323,7 @@ public class QueryMenu {
 		return foods.toArray(new Food[foods.size()]);
 	}
 	
-	static Kitchen[] queryKitchens(DBCon dbCon, int restaurantID, String extraCond, String orderClause) throws SQLException{
+	public static Kitchen[] queryKitchens(DBCon dbCon, int restaurantID, String extraCond, String orderClause) throws SQLException{
 		//get all the kitchen information to this restaurant,
 		ArrayList<Kitchen> kitchens = new ArrayList<Kitchen>();
 		String sql = "SELECT kitchen_id, kitchen_alias, name, discount, discount_2, discount_3, " +
@@ -351,7 +351,7 @@ public class QueryMenu {
 		return kitchens.toArray(new Kitchen[kitchens.size()]);
 	}
 	
-	static Department[] queryDepartments(DBCon dbCon, int restaurantID, String extraCond, String orderClause) throws SQLException{
+	public static Department[] queryDepartments(DBCon dbCon, int restaurantID, String extraCond, String orderClause) throws SQLException{
 		//get tall the super kitchen information to this restaurant
 		ArrayList<Department> departments = new ArrayList<Department>();
 		String sql = "SELECT dept_id, name, restaurant_id FROM " + Params.dbName + ".department WHERE " +
@@ -385,7 +385,7 @@ public class QueryMenu {
 	 * @throws SQLException 
 	 * 			throws if fail to execute any SQL statement
 	 */
-	static Taste[] queryTastes(DBCon dbCon, int restaurantID, short category, String extraCond, String orderClause) throws SQLException{
+	public static Taste[] queryTastes(DBCon dbCon, int restaurantID, short category, String extraCond, String orderClause) throws SQLException{
 		//Get the taste preferences to this restaurant sort by alias id in ascend order.
 		//The lower alias id, the more commonly this preference used.
 		//Put the most commonly used taste preference in first position 
