@@ -1516,9 +1516,7 @@ Ext
 			});
 
 			// 为store配置load监听器(即load完后动作)
-			billsGrid.getStore().on(
-					'load',
-					function() {
+			billsGrid.getStore().on('load', function() {
 						currRowIndex = -1;
 
 						if (billsGrid.getStore().getTotalCount() != 0) {
@@ -1533,27 +1531,6 @@ Ext
 										record.commit();
 									});
 						}
-
-						// // sum the prices
-						// var sumShouldPay = 0;
-						// var sumActualPay = 0;
-						// for ( var i = 0; i < billsGrid.getStore()
-						// .getCount(); i++) {
-						// sumShouldPay = sumShouldPay
-						// + parseFloat(billsGrid.getStore()
-						// .getAt(i).get("totalPrice"));
-						// sumActualPay = sumActualPay
-						// + parseFloat(billsGrid.getStore()
-						// .getAt(i).get(
-						// "actualIncome"));
-						// }
-						// document.getElementById("shouldPaySum").innerHTML =
-						// sumShouldPay
-						// .toFixed(2);
-						// document.getElementById("actualPaySum").innerHTML =
-						// sumActualPay
-						// .toFixed(2);
-
 					});
 
 			billsGrid.getStore().on(
@@ -1648,16 +1625,11 @@ Ext
 								dateEnd = dateFormated.format('Y-m-d');
 							}
 
-							var amountBegin = advSrchForm.findById(
-									"advSrchStartAmt").getValue();
-							var amountEnd = advSrchForm.findById(
-									"advSrchEndAmt").getValue();
-							var seqNumBegin = advSrchForm.findById(
-									"advSrchStartSeqNum").getValue();
-							var seqNumEnd = advSrchForm.findById(
-									"advSrchEndSeqNum").getValue();
-							var tableNumber = advSrchForm.findById(
-									"advSrchTableNbr").getValue();
+							var amountBegin = advSrchForm.findById("advSrchStartAmt").getValue();
+							var amountEnd = advSrchForm.findById("advSrchEndAmt").getValue();
+							var seqNumBegin = advSrchForm.findById("advSrchStartSeqNum").getValue();
+							var seqNumEnd = advSrchForm.findById("advSrchEndSeqNum").getValue();
+							var tableNumber = advSrchForm.findById("advSrchTableNbr").getValue();
 
 							var payManner = payTypeCombAdvSrch.getValue();
 							var in_payManner;
@@ -1727,7 +1699,7 @@ Ext
 					{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
 					businessStatBut, 
 					{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
-//					btnSalesSub,
+					btnSalesSub,
 					"->", pushBackBut,
 					{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
 					logOutBut 

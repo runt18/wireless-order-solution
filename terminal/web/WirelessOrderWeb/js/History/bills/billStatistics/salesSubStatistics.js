@@ -6,8 +6,10 @@ var salesSubWin = null;
 
 salesSubPanelnit = function(){
 	
-	var cmData = [[true,true],['name','name'],['card','card']];
-	var url = '/HR/ScoreAction.action?tiem='+new Date();
+	var cmData = [[true, false], ['部门',''], ['营业额',''], ['折扣额',''], ['赠送额',''],
+			['成本',''], ['成本率',''], ['毛利',''], ['毛利率',''],
+			['销量',''], ['均价',''], ['单位成本','']];
+	var url = '../../SalesSubStatistics.do?tiem='+new Date();
 	var readerData = ['name','card'];
 	var baseParams = [];
 	var pageSize = 10;
@@ -19,9 +21,10 @@ salesSubPanelnit = function(){
 	if(!salesSubGrid){	
 		var salesSubGrid_tbar = new Ext.Toolbar({
 			buttonAlign : 'left',
-			height : 29,
+			height : 26,
 			items : [
-			{xtype:'panel',height:22,border:false},
+			{xtype:'tbtext',text:'类别:1231231'},
+			{xtype:'tbtext',text:'&nbsp;&nbsp;'},	
 			{xtype:'tbtext',text:'日期:'},
 			new Ext.form.DateField({
 //				xtype : "datefield",			
@@ -60,7 +63,7 @@ salesSubPanelnit = function(){
 				text : '搜索',
 				width : 150,
 				handler : function(){
-					alert(111111);
+					salesSubGrid.getStore().reload();
 				}
 			}
 			]
@@ -97,7 +100,6 @@ salesSubPanelnit = function(){
 		
 		var salesSubMuneTree = new Ext.tree.TreePanel({
 			border : false,
-//			layout : 'fit',
 			rootVisible : true,
 			root: new Ext.tree.AsyncTreeNode({					
 //	            expanded: true,
@@ -110,7 +112,7 @@ salesSubPanelnit = function(){
 		
 		salesSubMune = new Ext.Panel({
 			region : 'west',
-			width : 250,
+			width : 200,
 			layout : 'fit',
 			border : false,
 			items : [salesSubMuneTree]
@@ -134,12 +136,13 @@ salesSub = function(){
 			closable:false,
 			constrainHeader:true,
 			draggable:false,
-			width : 900,
+			width : 1000,
 			height : 500,
 			items : [salesSubMune,salesSubGrid],
 			buttons : [
 			{
 				text : '打印',
+				disabled : true,
 				handler : function(){
 					
 				}
@@ -150,7 +153,12 @@ salesSub = function(){
 					salesSubWin.hide();
 				}
 			}
-			]
+			],
+			listeners : {
+				show : function(){
+//					salesSubGrid.getStroe().reload();
+				}
+			}
 		});
 	}
 	salesSubWin.show();
