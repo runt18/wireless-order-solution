@@ -346,6 +346,7 @@
 		<action path="/InventoryAnalysis"
 			type="com.wireless.Actions.inventoryMgr.statistics.InventoryAnalysis" scope="request">
 		</action>
+		<action path="/SalesSubStatistics" type="com.wireless.Actions.billStatistics.SalesSubStatisticsAction" scope="request"></action>
 	</action-mappings>
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
 </struts-config>
