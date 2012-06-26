@@ -1,6 +1,5 @@
 ﻿// ******************************************************************************************************
-Ext
-		.onReady(function() {
+Ext.onReady(function() {
 			// 解决ext中文传入后台变问号问题
 			Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
 			Ext.QuickTips.init();
