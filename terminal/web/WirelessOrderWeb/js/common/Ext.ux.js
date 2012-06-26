@@ -1,4 +1,37 @@
-/*******************************************************************************
+/*************************************
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ */
+
+
+/*************************************
+ * 部分通用显示格式
+ */
+Ext.ux.txtFormat = {
+	barMsg : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{0}:&nbsp;<span id="{1}" style="color:red; font-size:15px; font-weight:bold;">{2}</span>',
+	barSum : '<span style="font-weight:bold; font-size:13px;">总计</span>'
+};
+
+
+
+/*************************************
+ * 解决DateField在Firefox宽度过长问题
+ */
+Ext.override(Ext.menu.DateMenu,{   
+    render : function(){   
+        Ext.menu.DateMenu.superclass.render.call(this);   
+        if(Ext.isGecko){   
+            this.picker.el.dom.childNodes[0].style.width = '178px';   
+            this.picker.el.dom.style.width = '178px';   
+        }   
+    }   
+}); 
+
+/*************************************
  * 字符串高效拼接(类似StringBuffer)
  */
 function StringBuilder() {
@@ -11,7 +44,7 @@ StringBuilder.prototype.toString = function() {
 	return this.__string__.join("");
 };
 
-/*******************************************************************************
+/*************************************
  * 
  * 创建GridPanel
  * 
