@@ -13,7 +13,6 @@ import java.util.ArrayList;
 
 import com.wireless.db.CancelOrder;
 import com.wireless.db.InsertOrder;
-import com.wireless.db.PayOrder;
 import com.wireless.db.QueryMenu;
 import com.wireless.db.QueryOrder;
 import com.wireless.db.QueryRegion;
@@ -22,6 +21,8 @@ import com.wireless.db.QueryStaffTerminal;
 import com.wireless.db.QueryTable;
 import com.wireless.db.UpdateOrder;
 import com.wireless.db.VerifyPin;
+import com.wireless.db.payment.ConsumeMaterial;
+import com.wireless.db.payment.PayOrder;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Mode;
@@ -244,13 +245,31 @@ class OrderHandler extends Handler implements Runnable{
 				 * If pay order temporary, just only print the temporary receipt.
 				 * Otherwise perform the pay action and print receipt 
 				 */
-				PrintHandler.PrintParam printParam = new PrintHandler.PrintParam();
+				final PrintHandler.PrintParam printParam = new PrintHandler.PrintParam();
 				int printConf = orderToPay.print_type;
 				if((printConf & Reserved.PRINT_TEMP_RECEIPT_2) != 0){
 					printParam.orderInfo = PayOrder.queryOrder(_term, orderToPay);
 					printOrder(printConf, printParam);
+					
 				}else{
+					
 					printParam.orderInfo = PayOrder.exec(_term, orderToPay, false);
+					/**
+					 * Perform to consume the corresponding material in another thread,
+					 * so as to prevent the action to pay order from taking too long.
+					 * Since the action to consume material would become slower as the amount of 
+					 * material detail records grow up. 
+					 */
+					WirelessSocketServer.threadPool.execute(new Runnable(){
+						@Override
+						public void run() {
+							try{
+								ConsumeMaterial.execByOrderID(_term, printParam.orderInfo.id);
+							}catch(Exception e){
+								e.printStackTrace();
+							}
+						}						
+					});
 					printOrder(printConf, printParam);
 				}
 				response = new RespACK(request.header);
