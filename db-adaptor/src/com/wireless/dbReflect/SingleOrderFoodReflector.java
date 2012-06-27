@@ -99,6 +99,9 @@ public class SingleOrderFoodReflector {
 
 			singleOrderFood.orderID = dbCon.rs.getLong("order_id");
 			
+			int restaurantID = dbCon.rs.getInt("restaurant_id");
+			
+			singleOrderFood.food.restaurantID = restaurantID;
 			singleOrderFood.food.foodID = dbCon.rs.getInt("food_id");
 			singleOrderFood.food.name = dbCon.rs.getString("name");
 			singleOrderFood.food.aliasID = dbCon.rs.getInt("food_alias");
@@ -111,7 +114,7 @@ public class SingleOrderFoodReflector {
 			singleOrderFood.kitchen.kitchenID = dbCon.rs.getInt("kitchen_id");			
 			singleOrderFood.kitchen.aliasID = dbCon.rs.getShort("kitchen_alias");
 			singleOrderFood.kitchen.name = dbCon.rs.getString("kitchen_name");
-			singleOrderFood.kitchen.dept.restaurantID = dbCon.rs.getInt("restaurant_id");
+			singleOrderFood.kitchen.dept.restaurantID = restaurantID;
 			singleOrderFood.kitchen.dept.deptID = dbCon.rs.getShort("dept_id");
 			
 			String normalTastePref = dbCon.rs.getString("taste");

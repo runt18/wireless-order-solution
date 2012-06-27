@@ -13,48 +13,34 @@ import com.wireless.dbObject.MaterialDetail;
 import com.wireless.dbObject.SingleOrderFood;
 import com.wireless.dbReflect.MaterialDetailReflector;
 import com.wireless.dbReflect.SingleOrderFoodReflector;
+import com.wireless.pojo.billStatistics.SalesDetail;
 import com.wireless.protocol.Department;
 import com.wireless.protocol.Terminal;
 
 public class QuerySaleDetails {
 	
-	public final static int QUERY_BY_DEPT = 0;	//∞¥≤ø√≈≤È—Ø
-	public final static int QUERY_BY_FOOD = 1;	//∞¥≤À∆∑≤È—Ø
+	public final static int QUERY_BY_DEPT = 0;	//ÊåâÈÉ®Èó®ÊòæÁ§∫
+	public final static int QUERY_BY_FOOD = 1;	//ÊåâËèúÂìÅÊòæÁ§∫
 	
-	public final static int ORDER_BY_PROFIT = 0;	//∞¥√´¿˚≈≈–Ú
-	public final static int ORDER_BY_SALES = 1;		//∞¥œ˙ €¡ø≈≈–Ú
-	
-	public static class Result{
-		
-		Result(String item){
-			this.item = item;
-		}
-		
-		public String item;			//≤ø√≈ªÚ≤À∆∑√˚≥∆
-		public float income;		//”™“µ∂Ó
-		public float discount;		//’€ø€∂Ó
-		public float gifted;		//‘˘ÀÕ∂Ó
-		public float cost;			//≥…±æ
-		public float costRate;		//≥…±æ¬ 
-		public float profit;		//√´¿˚
-		public float profitRate;	//√´¿˚¬ 
-		public float salesAmount;	//œ˙¡ø
-		public float avgPrice;		//æ˘º€
-		public float avgCost;		//µ•Œª≥…±æ
-	}
+	public final static int ORDER_BY_PROFIT = 0;	//ÊåâÊØõÂà©ÊéíÂ∫è
+	public final static int ORDER_BY_SALES = 1;		//ÊåâÈîÄÈáèÊéíÂ∫è
 	
 	/**
-	 * 
+	 * Get the sales details to each department.
 	 * @param dbCon
+	 * 			the database connection
 	 * @param term
+	 * 			the terminal to query
 	 * @param onDuty
+	 * 			the on duty to query
 	 * @param offDuty
-	 * @param queryType
-	 * @param orderType
+	 * 			the off duty to query
 	 * @return
+	 * 			an array containing department sales details which is sorted by profit in descending order
 	 * @throws SQLException
+	 * 			throws if any error occurred while execute any SQL statements.
 	 */
-	public static Result[] exec(DBCon dbCon, Terminal term, String onDuty, String offDuty, int queryType, int orderType) throws SQLException{
+	public static SalesDetail[] execByDept(DBCon dbCon, Terminal term, String onDuty, String offDuty) throws SQLException{
 	
 		SingleOrderFood[] orderFoods = new SingleOrderFood[0];
 		/**
@@ -75,100 +61,141 @@ public class QuerySaleDetails {
 							" AND MATE_DETAIL.date BETWEEN '" + onDuty + "' AND '" + offDuty + "'", 
 							"");
 		
-		if(queryType == QUERY_BY_DEPT){
-			HashMap<Department, Result> deptSalesDetail = new HashMap<Department, Result>();
-			for(Department dept : QueryMenu.queryDepartments(dbCon, term.restaurant_id, null, null)){
-				deptSalesDetail.put(dept, new Result(dept.name));
-			}
-			
-			/**
-			 * Calculate the gift, discount, income to each department during this period
-			 */
-			for(SingleOrderFood singleOrderFood : orderFoods){
-				Result salesDetail = deptSalesDetail.get(singleOrderFood.kitchen.dept);
-	
-				if(salesDetail != null){
-					if(singleOrderFood.food.isGift()){
-						salesDetail.gifted += singleOrderFood.calcPriceWithTaste();
-					}else{
-						salesDetail.income += singleOrderFood.calcPriceWithTaste();
-					}
-					
-					if(singleOrderFood.discount < 1){
-						salesDetail.discount += singleOrderFood.calcDiscountPrice();
-					}
-					
-					deptSalesDetail.put(singleOrderFood.kitchen.dept, salesDetail);
-				}
-			}
-			
-			/**
-			 * Calculate the cost to each department during this period
-			 */
-			for(MaterialDetail materialDetail : materialDetails){
-				Result salesDetail = deptSalesDetail.get(materialDetail.dept);
-				if(salesDetail != null){
-					salesDetail.cost += materialDetail.calcPrice();
-				}
-			}
-
-			/**
-			 * Remove the invalid department sales detail record
-			 */
-			Iterator<Map.Entry<Department, Result>> iter = deptSalesDetail.entrySet().iterator();
-			while(iter.hasNext()){
-				Map.Entry<Department, Result> entry = iter.next();
-				Result saleDetail = entry.getValue();
-				if(saleDetail.gifted == 0 && saleDetail.income == 0 &&
-				   saleDetail.discount == 0 && saleDetail.cost == 0){
-					iter.remove();
-				}
-			}
-			
-			/**
-			 * Calculate the profit, cost rate, profit rate to each department
-			 */
-			for(Department dept : deptSalesDetail.keySet()){
-				Result salesDetail = deptSalesDetail.get(dept);
-				
-				salesDetail.gifted = (float)Math.round(salesDetail.gifted * 100) / 100;
-				salesDetail.discount = (float)Math.round(salesDetail.discount * 100) / 100;
-				salesDetail.income = (float)Math.round(salesDetail.income * 100) / 100;
-				salesDetail.cost = (float)Math.round(salesDetail.cost * 100) / 100;
-				
-				salesDetail.profit = salesDetail.income - salesDetail.cost;
-				salesDetail.profitRate = salesDetail.profit / salesDetail.income;
-				salesDetail.costRate = salesDetail.cost / salesDetail.income;
-				
-				deptSalesDetail.put(dept, salesDetail);
-			}
-			
-			Result[] result = deptSalesDetail.values().toArray(new Result[deptSalesDetail.values().size()]);
-			/**
-			 * Sort the department sales detail in descending order by profit
-			 */
-			Arrays.sort(result, new Comparator<Result>(){
-
-				@Override
-				public int compare(Result result1, Result result2) {
-					if(result1.profit == result2.profit){
-						return 0;
-					}else if(result1.profit > result2.profit){
-						return 1;
-					}else{
-						return -1;
-					}
-				}
-				
-			});
-			
-			return result;
-			
-		}else if(queryType == QUERY_BY_FOOD){
-			
-			return null;
-		}else{
-			return new Result[0];
+		HashMap<Department, SalesDetail> deptSalesDetail = new HashMap<Department, SalesDetail>();
+		for(Department dept : QueryMenu.queryDepartments(dbCon, term.restaurant_id, null, null)){
+			deptSalesDetail.put(dept, new SalesDetail(dept.name));
 		}
+			
+		/**
+		 * Calculate the gift, discount, income to each department during this period
+		 */
+		for(SingleOrderFood singleOrderFood : orderFoods){
+			SalesDetail salesDetail = deptSalesDetail.get(singleOrderFood.kitchen.dept);
+	
+			if(salesDetail != null){
+				if(singleOrderFood.food.isGift()){
+					salesDetail.setGifted(salesDetail.getGifted() + singleOrderFood.calcPriceWithTaste());
+				}else{
+					salesDetail.setIncome(salesDetail.getIncome() + singleOrderFood.calcPriceWithTaste());
+				}
+					
+				if(singleOrderFood.discount < 1){
+					salesDetail.setDiscount(salesDetail.getDiscount() + singleOrderFood.calcDiscountPrice());
+				}
+					
+				deptSalesDetail.put(singleOrderFood.kitchen.dept, salesDetail);
+			}
+		}
+			
+		/**
+		 * Calculate the cost to each department during this period
+		 */
+		for(MaterialDetail materialDetail : materialDetails){
+			SalesDetail salesDetail = deptSalesDetail.get(materialDetail.dept);
+			if(salesDetail != null){
+				salesDetail.setCost(salesDetail.getCost() + materialDetail.calcPrice());
+			}
+		}
+
+		/**
+		 * Remove the invalid department sales detail record
+		 */
+		Iterator<Map.Entry<Department, SalesDetail>> iter = deptSalesDetail.entrySet().iterator();
+		while(iter.hasNext()){
+			Map.Entry<Department, SalesDetail> entry = iter.next();
+			SalesDetail saleDetail = entry.getValue();
+			if(saleDetail.getGifted() == 0 && saleDetail.getIncome() == 0 &&
+			   saleDetail.getDiscount() == 0 && saleDetail.getCost() == 0){
+				iter.remove();
+			}
+		}
+			
+		/**
+		 * Calculate the profit, cost rate, profit rate to each department
+		 */
+		for(Department dept : deptSalesDetail.keySet()){
+			SalesDetail salesDetail = deptSalesDetail.get(dept);
+				
+			salesDetail.setGifted((float)Math.round(salesDetail.getGifted() * 100) / 100);
+			salesDetail.setDiscount((float)Math.round(salesDetail.getDiscount() * 100) / 100);
+			salesDetail.setIncome((float)Math.round(salesDetail.getIncome() * 100) / 100);
+			salesDetail.setCost((float)Math.round(salesDetail.getCost() * 100) / 100);
+				
+			salesDetail.setProfit(salesDetail.getIncome() - salesDetail.getCost());
+			salesDetail.setProfitRate(salesDetail.getProfit() / salesDetail.getIncome());
+			salesDetail.setCostRate(salesDetail.getCost() / salesDetail.getIncome());
+				
+			deptSalesDetail.put(dept, salesDetail);
+		}
+			
+		SalesDetail[] result = deptSalesDetail.values().toArray(new SalesDetail[deptSalesDetail.values().size()]);
+		/**
+		 * Sort the department sales detail in descending order by profit
+		 */
+		Arrays.sort(result, new Comparator<SalesDetail>(){
+
+			@Override
+			public int compare(SalesDetail result1, SalesDetail result2) {
+				if(result1.getProfit() == result2.getProfit()){
+					return 0;
+				}else if(result1.getProfit() > result2.getProfit()){
+					return -1;
+				}else{
+					return 1;
+				}
+			}
+				
+		});
+			
+		return result;
 	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param term
+	 * @param onDuty
+	 * @param offDuty
+	 * @param deptID
+	 * @param orderType
+	 * @return
+	 * @throws SQLException
+	 */
+	public static SalesDetail[] execByFood(DBCon dbCon, Terminal term, String onDuty, String offDuty, int[] deptID, int orderType) throws SQLException{
+		
+		String deptCond = "";
+		if(deptID.length != 0){
+			for(int i = 0; i < deptID.length; i++){
+				if(i == 0){
+					deptCond = Integer.toString(deptID[0]);
+				}else{
+					deptCond += "," + deptID[i];
+				}
+			}
+		}
+		
+		SingleOrderFood[] orderFoods = new SingleOrderFood[0];
+		/**
+		 * Get the single order food information
+		 */
+		orderFoods = SingleOrderFoodReflector.getDetailHistory(dbCon, 
+							" AND B.restaurant_id=" + term.restaurant_id + " " + 
+							" AND B.order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "'" + 
+							(deptID.length != 0 ? " AND B.dept_id IN(" + deptCond + ")" : ""),  
+							null);				
+		
+		/**
+		 * Get the material detail information
+		 */
+		MaterialDetail[] materialDetails = new MaterialDetail[0];
+		materialDetails = MaterialDetailReflector.getMaterialDetail(dbCon, 
+							" AND MATE_DETAIL.restaurant_id=" + term.restaurant_id + " " +
+							" AND MATE_DETAIL.type=" + MaterialDetail.TYPE_CONSUME +
+							" AND MATE_DETAIL.date BETWEEN '" + onDuty + "' AND '" + offDuty + "'" +
+							(deptID.length != 0 ? " AND MATE_DETAIL.deptID IN(" + deptCond + ")" : ""),
+							"");
+		
+		return new SalesDetail[0];
+	}
+	
 }
