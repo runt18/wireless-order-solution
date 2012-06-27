@@ -149,24 +149,24 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 	var g_store = null;
 	var b_groupBtn = null;
 
-	if (groupName == '') {
+//	if (groupName == '') {
 		/** 普通数据源 * */
 		g_store = new Ext.data.Store({
 					proxy : g_proxy,
 					reader : g_reader
 				});
-	} else {
-		/** 分组数据源 * */
-		g_store = new Ext.data.GroupingStore({
-					proxy : g_proxy,
-					reader : g_reader,
-					sortInfo : {
-						field : groupName,
-						direction : "ASC"
-					},
-					groupField : groupName
-				});
-	}
+//	} else {
+//		/** 分组数据源 * */
+//		g_store = new Ext.data.GroupingStore({
+//					proxy : g_proxy,
+//					reader : g_reader,
+//					sortInfo : {
+//						field : groupName,
+//						direction : "ASC"
+//					},
+//					groupField : groupName
+//				});
+//	}
 
 	/** 条件查询参数 * */
 	for (var n = 0; n < baseParams.length; n++) {
@@ -239,7 +239,7 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 			left : 0
 		},
 //		view : groupName == '' ? new Ext.grid.GridView : g_groupView, // 数据分组显示
-//		bbar : g_bbar, // 加载下工具条
+		bbar : g_bbar, // 加载下工具条
 		tbar : typeof tbar != 'undefined' ? (Ext.isArray(tbar)==true?tbar[0]:tbar) :null // 加载上工具条
 		});
 	
