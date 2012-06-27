@@ -1,7 +1,10 @@
-package com.wireless.db;
+package com.wireless.db.payment;
 
 import java.sql.SQLException;
 
+import com.wireless.db.DBCon;
+import com.wireless.db.Params;
+import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Member;
@@ -51,7 +54,7 @@ public class QueryMember {
 	 * @throws BusinessException throws if the member does NOT exist
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	static Member exec(DBCon dbCon, int restaurantID, String memberID) throws BusinessException, SQLException{
+	public static Member exec(DBCon dbCon, int restaurantID, String memberID) throws BusinessException, SQLException{
 		try{
 			String sql = "SELECT name, tele, balance FROM " + Params.dbName + ".member WHERE restaurant_id=" +
 			 			 restaurantID + " AND alias_id=" +

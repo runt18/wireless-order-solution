@@ -1,19 +1,19 @@
-package com.wireless.db;
+package com.wireless.db.payment;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Iterator;
 
-import com.wireless.dbObject.FoodMaterial;
-import com.wireless.dbObject.Material;
-import com.wireless.dbObject.MaterialDetail;
+import com.wireless.db.DBCon;
+import com.wireless.db.Params;
+import com.wireless.db.QueryOrder;
+import com.wireless.db.QuerySetting;
+import com.wireless.db.QueryTable;
+import com.wireless.db.Util;
+import com.wireless.db.VerifyPin;
 import com.wireless.dbObject.Setting;
-import com.wireless.dbReflect.OrderFoodReflector;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Member;
 import com.wireless.protocol.Order;
-import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 
@@ -310,89 +310,6 @@ public class PayOrder {
 			
 		}finally{
 			dbCon.conn.setAutoCommit(true);
-		}
-		
-		/**
-		 * Below is to calculate the food and material if the order is NOT paid again.
-		 */		
-		if(!isPaidAgain){
-			//get the food details to this order
-			OrderFood[] foods = OrderFoodReflector.getDetailToday(dbCon, " AND B.id=" + orderInfo.id, "");
-			for(int i = 0; i < foods.length; i++){
-				//get each material consumption to every food
-				sql = "SELECT consumption, material_id FROM " +
-					  Params.dbName + ".food_material WHERE " +
-					  "food_id=" +
-					  "(SELECT food_id FROM " + 
-					  Params.dbName +
-					  ".food WHERE food_alias=" + foods[i].aliasID +
-					  " AND restaurant_id="+ orderInfo.restaurantID + ")"; 
-				
-				dbCon.rs = dbCon.stmt.executeQuery(sql);
-				
-				ArrayList<FoodMaterial> foodMaterials = new ArrayList<FoodMaterial>();
-				while(dbCon.rs.next()){				
-					foodMaterials.add(new FoodMaterial(foods[i],
-													   new Material(dbCon.rs.getLong("material_id")),
-													   dbCon.rs.getFloat("consumption")));
-				}			
-				dbCon.rs.close();
-				
-				try{
-					
-					dbCon.conn.setAutoCommit(false);
-					
-					//calculate the 库存对冲 and insert the record to material_detail
-					Iterator<FoodMaterial> iter = foodMaterials.iterator();
-					while(iter.hasNext()){
-						FoodMaterial foodMaterial = iter.next();
-						//calculate the 库存对冲
-						float amount = (float)Math.round(foodMaterial.food.getCount().floatValue() * foodMaterial.consumption * 100) / 100;
-						
-						//insert the corresponding detail record to material_detail
-						sql = "INSERT INTO " + Params.dbName + ".material_detail (" + 
-							  "restaurant_id, material_id, price, date, staff, dept_id, amount, type) VALUES(" +
-							  orderInfo.restaurantID + ", " +						//restaurant_id
-							  foodMaterial.material.getMaterialID() + ", " +		//material_id
-							  "(SELECT price FROM " + Params.dbName + ".material_dept WHERE restaurant_id=" + 
-							  orderInfo.restaurantID + 
-							  " AND material_id=" + foodMaterial.material.getMaterialID() + 	
-							  " AND dept_id=0), " +	//price
-							  "NOW(), " +			//date
-							  "(SELECT owner_name FROM " + Params.dbName + 
-							  ".terminal WHERE pin=" + "0x" + Long.toHexString(term.pin) + " AND model_id=" + term.modelID + "), " +	//staff
-							  "(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + 
-							  orderInfo.restaurantID + " AND kitchen_alias=" + foodMaterial.food.kitchen.aliasID + "), " +				//dept_id
-							  -amount + ", " + 				//amount
-							  MaterialDetail.TYPE_CONSUME + //type
-							  ")";
-						dbCon.stmt.executeUpdate(sql);
-						
-						//update the stock of material_dept to this material
-						sql = "UPDATE " + Params.dbName + ".material_dept SET " +
-							  "stock = stock - " + amount +
-							  " WHERE restaurant_id=" + orderInfo.restaurantID + 
-							  " AND material_id=" + foodMaterial.material.getMaterialID() +
-							  " AND dept_id=" + "(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + 
-							  orderInfo.restaurantID + " AND kitchen_alias=" + foodMaterial.food.kitchen.aliasID + ")";
-						dbCon.stmt.executeUpdate(sql);
-					}
-					
-					dbCon.conn.commit();
-
-				}catch(SQLException e){
-					dbCon.conn.rollback();
-					throw e;
-					
-				}catch(Exception e){
-					dbCon.conn.rollback();
-					throw new BusinessException(e.getMessage());
-					
-				}finally{
-					dbCon.conn.setAutoCommit(true);
-				}
-				
-			}			
 		}
 		
 		return orderInfo;
