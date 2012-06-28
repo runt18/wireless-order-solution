@@ -308,7 +308,8 @@ public class QueryMenu {
 					 (orderClause == null ? "" : orderClause); 
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
-			Food food = new Food(dbCon.rs.getLong("food_id"),
+			Food food = new Food(restaurantID,
+								 dbCon.rs.getLong("food_id"),
 								 dbCon.rs.getInt("food_alias"),
 								 dbCon.rs.getString("name"),
 								 new Float(dbCon.rs.getFloat("unit_price")),
