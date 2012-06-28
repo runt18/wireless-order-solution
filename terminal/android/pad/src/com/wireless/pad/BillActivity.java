@@ -44,45 +44,45 @@ public class BillActivity extends Activity {
 		
 		setContentView(R.layout.bill);
 		//get the order detail passed by main activity
-				OrderParcel orderParcel = getIntent().getParcelableExtra(OrderParcel.KEY_VALUE);
-				_orderToPay = orderParcel;
+		OrderParcel orderParcel = getIntent().getParcelableExtra(OrderParcel.KEY_VALUE);
+		_orderToPay = orderParcel;
+			
+		((TextView)findViewById(R.id.valueplatform)).setText(String.valueOf(_orderToPay.table.aliasID));
+		((TextView)findViewById(R.id.valuepeople)).setText(String.valueOf(_orderToPay.custom_num));
+		((TextView)findViewById(R.id.valuehandsel)).setText(Util.CURRENCY_SIGN + Float.toString(_orderToPay.calcGiftPrice()));
+		((TextView)findViewById(R.id.valueconfirmed)).setText(Util.CURRENCY_SIGN + Float.toString(_orderToPay.calcPriceWithTaste()));
 				
-				((TextView)findViewById(R.id.valueplatform)).setText(String.valueOf(_orderToPay.table.aliasID));
-				((TextView)findViewById(R.id.valuepeople)).setText(String.valueOf(_orderToPay.custom_num));
-				((TextView)findViewById(R.id.valuehandsel)).setText(Util.CURRENCY_SIGN + Float.toString(_orderToPay.calcGiftPrice()));
-				((TextView)findViewById(R.id.valueconfirmed)).setText(Util.CURRENCY_SIGN + Float.toString(_orderToPay.calcPriceWithTaste()));
-				
-				/**
-				 * "返回"Button
-				 */
-				((ImageView)findViewById(R.id.billback)).setOnClickListener(new View.OnClickListener() {			
-					@Override
-					public void onClick(View arg0) {
-						finish();				
-					}
-				});
-				/**
-				 * "结帐"Button
-				 */
-				((ImageView)findViewById(R.id.normal)).setOnClickListener(new View.OnClickListener() {			
-					@Override
-					public void onClick(View arg0) {
-						showBillDialog(PAY_ORDER);
-					}
-				});
-				/**
-				 * "暂结"Button
-				 */
-				((ImageView)findViewById(R.id.allowance)).setOnClickListener(new View.OnClickListener() {			
-					@Override
-					public void onClick(View arg0) {
-						showBillDialog(PAY_TEMPORARY_ORDER);
-					}
-				});		
-				/**
-				 * "已点菜"的ListView
-				 */
-				((BillFoodListView)findViewById(R.id.billListView)).notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(_orderToPay.foods)));
+		/**
+		 * "返回"Button
+		 */
+		((ImageView)findViewById(R.id.billback)).setOnClickListener(new View.OnClickListener() {			
+			@Override
+			public void onClick(View arg0) {
+				finish();				
+			}
+		});
+		/**
+		 * "结帐"Button
+		 */
+		((ImageView)findViewById(R.id.normal)).setOnClickListener(new View.OnClickListener() {			
+			@Override
+			public void onClick(View arg0) {
+				showBillDialog(PAY_ORDER);
+			}
+		});
+		/**
+		 * "暂结"Button
+		 */
+		((ImageView)findViewById(R.id.allowance)).setOnClickListener(new View.OnClickListener() {			
+			@Override
+			public void onClick(View arg0) {
+				showBillDialog(PAY_TEMPORARY_ORDER);
+			}
+		});		
+		/**
+		 * "已点菜"的ListView
+		 */
+		((BillFoodListView)findViewById(R.id.billListView)).notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(_orderToPay.foods)));
 	}
 
 	/**
@@ -132,13 +132,13 @@ public class BillActivity extends Activity {
 					byte errCode = resp.header.reserved;
 								
 					if(errCode == ErrorCode.TABLE_NOT_EXIST){
-						errMsg=_orderToPay.table.aliasID + "号台已被删除，请与餐厅负责人确认。";
+						errMsg =_orderToPay.table.aliasID + "号台已被删除，请与餐厅负责人确认。";
 					}else if(errCode == ErrorCode.TABLE_IDLE){
-						errMsg=_orderToPay.table.aliasID + "号台的账单已结帐或删除，请与餐厅负责人确认。";
+						errMsg =_orderToPay.table.aliasID + "号台的账单已结帐或删除，请与餐厅负责人确认。";
 					}else if(errCode == ErrorCode.PRINT_FAIL){
 						errMsg = _orderToPay.table.aliasID + "号结帐打印未成功，请与餐厅负责人确认。";
 					}else{
-						errMsg=_orderToPay.table.aliasID + "号台结帐未成功，请重新结帐";
+						errMsg =_orderToPay.table.aliasID + "号台结帐未成功，请重新结帐";
 					}
 				}
 				
