@@ -237,7 +237,7 @@ public class QueryTodayAction extends Action {
 				String member = dbCon.rs.getString("member");
 				jsonOrder = jsonOrder.replace("$(member)", member != null ? member : "");
 				String comment = dbCon.rs.getString("comment");
-				jsonOrder = jsonOrder.replace("$(comment)", comment != null ? comment : "");
+				jsonOrder = jsonOrder.replace("$(comment)", comment != null ? comment.replace("，", " ") : "");
 				jsonOrder = jsonOrder.replace("$(pay_type)", dbCon.rs.getString("member") == null ? "1" : "2");
 				jsonOrder = jsonOrder.replace("$(discount_type)", Short.toString(dbCon.rs.getShort("discount_type")));
 				jsonOrder = jsonOrder.replace("$(waiter)", dbCon.rs.getString("waiter"));
