@@ -164,7 +164,7 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="10dip"
             android:text="折扣:"
-            android:textColor="#000000"
+            android:textColor="#0000ff"
             android:textSize="20sp" >
         </TextView>
 
@@ -177,7 +177,7 @@
             android:layout_toRightOf="@id/handsel"
             android:background="#00000000"
             android:inputType="numberSigned|text"
-            android:textColor="#000000"
+            android:textColor="#0000ff"
             android:textSize="20sp" >
         </TextView>
 
@@ -189,7 +189,7 @@
             android:layout_marginLeft="110dip"
             android:layout_toRightOf="@id/handsel"
             android:text="实收:"
-            android:textColor="#000000"
+            android:textColor="#0000ff"
             android:textSize="20sp" >
         </TextView>
 
@@ -202,7 +202,7 @@
             android:layout_toRightOf="@id/confirmed"
             android:background="#00000000"
             android:inputType="numberSigned|text"
-            android:textColor="#000000"
+            android:textColor="#0000ff"
             android:textSize="20sp" >
         </TextView>
     </RelativeLayout>
