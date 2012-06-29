@@ -163,7 +163,7 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="10dip"
-            android:text="赠送:"
+            android:text="折扣:"
             android:textColor="#000000"
             android:textSize="20sp" >
         </TextView>
@@ -188,7 +188,7 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="110dip"
             android:layout_toRightOf="@id/handsel"
-            android:text="应收:"
+            android:text="实收:"
             android:textColor="#000000"
             android:textSize="20sp" >
         </TextView>

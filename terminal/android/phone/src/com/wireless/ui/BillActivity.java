@@ -10,15 +10,20 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.wireless.common.WirelessOrder;
 import com.wireless.parcel.OrderParcel;
 import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.ProtocolPackage;
@@ -37,6 +42,17 @@ public class BillActivity extends Activity {
 	private final static int PAY_ORDER = 1;
 	private final static int PAY_TEMPORARY_ORDER = 2;
   
+	/**
+	 * 选择折扣方式后，更新显示的合计金额
+	 */
+	private Handler _handler = new Handler(){
+		@Override
+		public void handleMessage(Message message){
+			((TextView)findViewById(R.id.valuehandsel)).setText(Util.CURRENCY_SIGN + Float.toString(_orderToPay.calcDiscountPrice()));
+			((TextView)findViewById(R.id.valueconfirmed)).setText(Util.CURRENCY_SIGN + Float.toString(Math.round(_orderToPay.calcPriceWithTaste())));
+		}
+	};
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -48,8 +64,7 @@ public class BillActivity extends Activity {
 		
 		((TextView)findViewById(R.id.valueplatform)).setText(String.valueOf(_orderToPay.table.aliasID));
 		((TextView)findViewById(R.id.valuepeople)).setText(String.valueOf(_orderToPay.custom_num));
-		((TextView)findViewById(R.id.valuehandsel)).setText(Util.CURRENCY_SIGN + Float.toString(_orderToPay.calcGiftPrice()));
-		((TextView)findViewById(R.id.valueconfirmed)).setText(Util.CURRENCY_SIGN + Float.toString(_orderToPay.calcPriceWithTaste()));
+		_handler.sendEmptyMessage(0);
 		
 		/**
 		 * "返回"Button
@@ -178,82 +193,6 @@ public class BillActivity extends Activity {
 		}
 	}	
 	
-//	@Override
-//	protected Dialog onCreateDialog(int dialogID){
-//		if(dialogID == Order.DISCOUNT_1){
-//			//选择"一般"结帐
-//			return new AskMannerDialog(Order.DISCOUNT_1);
-//			
-//		}else if(dialogID == Order.DISCOUNT_2){
-//			//选择"折扣"结帐
-//			return new AskMannerDialog(Order.DISCOUNT_2);
-//			
-//		}else{
-//			return null;
-//		}
-//	}
-//	
-//	/**
-//	 * 选择"付款方式"的Dialog	
-//	 */
-//	private class AskMannerDialog extends Dialog{
-//
-//		public AskMannerDialog(final int discount) {
-//			super(BillActivity.this,R.style.FullHeightDialog);
-//			setContentView(R.layout.billalert);
-//			getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
-//		    
-//			/**
-//			 * 选择"现金"付款方式
-//			 */
-//			RelativeLayout l1=(RelativeLayout)findViewById(R.id.l1);
-//			l1.setOnClickListener(new View.OnClickListener() {
-//				
-//				@Override
-//				public void onClick(View v) {
-//					//
-//					_orderToPay.pay_type = Order.PAY_NORMAL;
-//					_orderToPay.pay_manner = Order.MANNER_CASH;					
-//					_orderToPay.discount_type = discount;
-//					
-//					new PayOrderTask(_orderToPay, PAY_ORDER).execute();
-//					dismiss();
-//				}
-//			});
-//		
-//			/**
-//			 * 选择"刷卡"付款方式
-//			 */
-//			RelativeLayout r1=(RelativeLayout)findViewById(R.id.r1);
-//			
-//			r1.setOnClickListener(new View.OnClickListener() {
-//
-//				@Override
-//				public void onClick(View v) {
-//					_orderToPay.pay_type = Order.PAY_NORMAL;
-//					_orderToPay.pay_manner = Order.MANNER_CREDIT_CARD;
-//					_orderToPay.discount_type = discount;
-//					
-//					new PayOrderTask(_orderToPay, PAY_ORDER).execute();
-//					dismiss();
-//				}
-//			});
-//             
-//			/**
-//			 * “返回”Button
-//			 */
-//            ((Button)findViewById(R.id.back)).setOnClickListener(new View.OnClickListener() {				
-//				@Override
-//				public void onClick(View v) {
-//					dismiss();
-//				}
-//			});
-//		
-//		}
-//		
-//	}
-	
-	
 	/**
 	 * 付款弹出框
 	 * @param payCate
@@ -261,18 +200,21 @@ public class BillActivity extends Activity {
 	public void showBillDialog(final int payCate){
 		
 		//取得自定义的view
-		LayoutInflater layoutinflater = LayoutInflater.from(this);
-		View view = layoutinflater.inflate(R.layout.billextand, null);
+		View view = LayoutInflater.from(this).inflate(R.layout.billextand, null);
 		
 		//默认账单赋值，比如付款方式，折扣方式
 		_orderToPay.pay_type = Order.PAY_NORMAL;
-		_orderToPay.pay_manner = Order.MANNER_CASH;	
-		_orderToPay.discount_type = Order.DISCOUNT_1;
 		
-		
+		if(_orderToPay.pay_manner == Order.MANNER_CASH){
+			((RadioButton)view.findViewById(R.id.cash)).setChecked(true);
+			
+		}else if(_orderToPay.pay_manner == Order.MANNER_CREDIT_CARD){
+			((RadioButton)view.findViewById(R.id.card)).setChecked(true);
+			
+		}
 		
 		RadioGroup radioGroupm = (RadioGroup)view.findViewById(R.id.radioGroup1);
-		  //付款方式添加事件监听器  
+		//付款方式添加事件监听器  
 		radioGroupm.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {  
               
             @Override 
@@ -286,6 +228,16 @@ public class BillActivity extends Activity {
                
             }  
         });  
+		
+		if(_orderToPay.discount_type == Order.DISCOUNT_1){
+			((RadioButton)view.findViewById(R.id.discount1)).setChecked(true);
+			
+		}else if(_orderToPay.discount_type == Order.DISCOUNT_2){
+			((RadioButton)view.findViewById(R.id.discount2)).setChecked(true);
+			
+		}else if(_orderToPay.discount_type == Order.DISCOUNT_3){
+			((RadioButton)view.findViewById(R.id.discount3)).setChecked(true);
+		}
 		
 		RadioGroup radioGroupd = (RadioGroup)view.findViewById(R.id.radioGroup2);
 		//折扣方式方式添加事件监听器  
@@ -305,20 +257,41 @@ public class BillActivity extends Activity {
 		 });  
 		
 		 new AlertDialog.Builder(this)
-		 						.setTitle(payCate == PAY_ORDER ? "结帐" : "暂结")
-		 						.setView(view).setPositiveButton("确定", new DialogInterface.OnClickListener() {					
-										@Override
-										public void onClick(DialogInterface dialog, int which) {
-						                    //执行结账异步线程 
-											new PayOrderTask(_orderToPay, payCate).execute();										
-										}
-		 							})
-		 						.setNegativeButton("取消", null)
-		 						.show();
-		
-		//alertDialog.show();
-	}
-	
-	
+		 	.setTitle(payCate == PAY_ORDER ? "结帐" : "暂结")
+		 	.setView(view).setPositiveButton("确定", new DialogInterface.OnClickListener() {					
+				@Override
+				public void onClick(DialogInterface dialog, int which) {		
+					//执行结账异步线程 
+					new PayOrderTask(_orderToPay, payCate).execute();										
+				}
+		 	})
+		 	.setNegativeButton("计算", new DialogInterface.OnClickListener() {					
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					//选择折扣方式后，设定每个菜品的折扣率
+					for(int i = 0; i < _orderToPay.foods.length; i++){
+						if(!(_orderToPay.foods[i].isGift() || _orderToPay.foods[i].isTemporary || _orderToPay.foods[i].isSpecial())){
+							for(Kitchen kitchen : WirelessOrder.foodMenu.kitchens){
+								if(_orderToPay.foods[i].kitchen.aliasID == kitchen.aliasID){
+									if(_orderToPay.discount_type == Order.DISCOUNT_1){
+										_orderToPay.foods[i].setDiscount(kitchen.getDist1());
+										
+									}else if(_orderToPay.discount_type == Order.DISCOUNT_2){
+										_orderToPay.foods[i].setDiscount(kitchen.getDist2());
+										
+									}else if(_orderToPay.discount_type == Order.DISCOUNT_3){
+										_orderToPay.foods[i].setDiscount(kitchen.getDist3());
+									}
+								}
+							}
+						}
+					}
+					((BillFoodListView)findViewById(R.id.billListView)).notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(_orderToPay.foods)));
+					_handler.sendEmptyMessage(0);
+				}
+		 	})
+		 	.show();		
+
+	}	
 	
 }

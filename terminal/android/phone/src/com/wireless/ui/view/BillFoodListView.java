@@ -65,8 +65,38 @@ public class BillFoodListView extends ListView {
 			}else{
 				view = convertView;
 			}
+			OrderFood food = _foods.get(position);
 			
-			((TextView)view.findViewById(R.id.foodName)).setText(_foods.get(position).toString());
+			String status = "";
+			if(food.isSpecial()){
+				status = "杻";
+			}
+			if(food.isRecommend()){
+				if(status.length() == 0){
+					status = "熱";
+				}else{
+					status = status + ",熱";
+				}
+			}
+			if(food.isGift()){
+				if(status.length() == 0){
+					status = "崌";
+				}else{
+					status = status + ",崌";
+				}
+			}
+			if(food.isTemporary){
+				if(status.length() == 0){
+					status = "還";
+				}else{
+					status = status + ",還";
+				}
+			}
+			if(status.length() != 0){
+				status = "(" + status + ")";
+			}
+			((TextView)view.findViewById(R.id.foodName)).setText(food.toString() + status);
+			((TextView)view.findViewById(R.id.discountValue)).setText(food.getDiscount() == 1 ? "" : "(" + food.getDiscount() * 10 + "殏)");
 			((TextView)view.findViewById(R.id.accountValue)).setText(Float.toString(_foods.get(position).getCount()));
 			((TextView)view.findViewById(R.id.priceValue)).setText(Util.CURRENCY_SIGN + Float.toString(_foods.get(position).calcPriceWithTaste()));
 			((TextView)view.findViewById(R.id.operatorValue)).setText(_foods.get(position).waiter);
