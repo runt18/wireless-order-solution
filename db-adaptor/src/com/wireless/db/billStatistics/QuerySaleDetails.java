@@ -15,6 +15,7 @@ import com.wireless.dbReflect.MaterialDetailReflector;
 import com.wireless.dbReflect.SingleOrderFoodReflector;
 import com.wireless.pojo.billStatistics.SalesDetail;
 import com.wireless.protocol.Department;
+import com.wireless.protocol.Food;
 import com.wireless.protocol.Terminal;
 
 public class QuerySaleDetails {
@@ -122,9 +123,10 @@ public class QuerySaleDetails {
 			salesDetail.setCost((float)Math.round(salesDetail.getCost() * 100) / 100);
 				
 			salesDetail.setProfit(salesDetail.getIncome() - salesDetail.getCost());
-			salesDetail.setProfitRate(salesDetail.getProfit() / salesDetail.getIncome());
-			salesDetail.setCostRate(salesDetail.getCost() / salesDetail.getIncome());
-				
+			if(salesDetail.getIncome() != 0.00){
+				salesDetail.setProfitRate(salesDetail.getProfit() / salesDetail.getIncome());
+				salesDetail.setCostRate(salesDetail.getCost() / salesDetail.getIncome());
+			}
 			deptSalesDetail.put(dept, salesDetail);
 		}
 			
@@ -195,7 +197,81 @@ public class QuerySaleDetails {
 							(deptID.length != 0 ? " AND MATE_DETAIL.deptID IN(" + deptCond + ")" : ""),
 							"");
 		
-		return new SalesDetail[0];
+		Food[] foodList = QueryMenu.queryFoods(dbCon, term.restaurant_id, null, null);
+		HashMap<Food, SalesDetail> foodSalesDetail = new HashMap<Food, SalesDetail>();
+		for(Food item : foodList){
+			foodSalesDetail.put(item, new SalesDetail(item.name));
+		}
+		
+		/**
+		 * Calculate the gift, discount, income to each department during this period
+		 */
+		for(SingleOrderFood singleOrderFood : orderFoods){
+			SalesDetail salesDetail = foodSalesDetail.get(singleOrderFood.food);
+			
+			if(salesDetail != null){
+				if(singleOrderFood.food.isGift()){
+					salesDetail.setGifted(salesDetail.getGifted() + singleOrderFood.calcPriceWithTaste());
+				}else{
+					salesDetail.setIncome(salesDetail.getIncome() + singleOrderFood.calcPriceWithTaste());
+				}
+					
+				if(singleOrderFood.discount < 1){
+					salesDetail.setDiscount(salesDetail.getDiscount() + singleOrderFood.calcDiscountPrice());
+				}
+				
+				salesDetail.setSalesAmount(salesDetail.getSalesAmount() + singleOrderFood.orderCount);
+				
+				salesDetail.setGifted((float)Math.round(salesDetail.getGifted() * 100) / 100);
+				salesDetail.setDiscount((float)Math.round(salesDetail.getDiscount() * 100) / 100);
+				salesDetail.setIncome((float)Math.round(salesDetail.getIncome() * 100) / 100);
+				salesDetail.setCost((float)Math.round(salesDetail.getCost() * 100) / 100);
+					
+				salesDetail.setProfit(salesDetail.getIncome() - salesDetail.getCost());
+				if(salesDetail.getIncome() != 0.00){
+					salesDetail.setProfitRate((float)Math.round(salesDetail.getProfit() / salesDetail.getIncome() * 100) / 100);			
+					salesDetail.setCostRate((float)Math.round(salesDetail.getCost() / salesDetail.getIncome() * 100) / 100);
+				}
+				
+				if(salesDetail.getSalesAmount() != 0.00){
+					salesDetail.setAvgPrice((float)Math.round(salesDetail.getIncome() / salesDetail.getSalesAmount() * 100) / 100);
+					salesDetail.setAvgCost((float)Math.round(salesDetail.getCost() / salesDetail.getSalesAmount() * 100) /100);
+				}
+				foodSalesDetail.put(singleOrderFood.food, salesDetail);			
+			}
+		}
+		
+		SalesDetail[] result = foodSalesDetail.values().toArray(new SalesDetail[foodSalesDetail.values().size()]);
+		
+		if(orderType == QuerySaleDetails.ORDER_BY_PROFIT){
+			Arrays.sort(result, new Comparator<SalesDetail>(){
+				@Override
+				public int compare(SalesDetail o1, SalesDetail o2) {
+					if(o1.getProfit() == o2.getProfit()){
+						return 0;
+					}else if(o1.getProfit() > o2.getProfit()){
+						return -1;
+					}else{
+						return 1;
+					}
+				}				
+			});
+		}else if(orderType == QuerySaleDetails.ORDER_BY_SALES){
+			Arrays.sort(result, new Comparator<SalesDetail>(){
+				@Override
+				public int compare(SalesDetail o1, SalesDetail o2) {
+					if(o1.getSalesAmount() == o2.getSalesAmount()){
+						return 0;
+					}else if(o1.getSalesAmount() > o2.getSalesAmount()){
+						return -1;
+					}else{
+						return 1;
+					}
+				}				
+			});
+		}
+			
+		return result;
 	}
 	
 }

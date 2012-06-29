@@ -34,7 +34,7 @@ public class MaterialDetailReflector {
 		sql = " SELECT " +
 			  " MATE_DETAIL.restaurant_id AS restaurant_id, MATE_DETAIL.supplier_id AS supplier_id, MATE_DETAIL.food_id AS food_id, " +
 			  " MATE_DETAIL.price AS price, MATE_DETAIL.date AS date, MATE_DETAIL.staff AS staff, MATE_DETAIL.dept_id AS dept_id, " +
-			  " MATE_DETAIL.amount AS amount, MATE_DETAIL.type AS type " +
+			  " MATE_DETAIL.amount AS amount, MATE_DETAIL.type AS type, " +
 			  " FOOD.name AS food_name, FOOD.food_alias AS food_alias" +
 			  " FROM " + Params.dbName + ".material_detail MATE_DETAIL" +
 			  " LEFT OUTER JOIN " + Params.dbName + ".food FOOD " +
