@@ -49,10 +49,10 @@ public class Util {
 	 */
 	public static float calcByTail(int priceTail, float totalPrice){
 		if(priceTail == Setting.TAIL_DECIMAL_CUT){
-			//小数抹零
+			//灏忔暟鎶归浂
 			return new Float(totalPrice).intValue();
 		}else if(priceTail == Setting.TAIL_DECIMAL_ROUND){
-			//小数四舍五入
+			//鍥涜垗浜斿叆
 			return Math.round(totalPrice);
 		}else{
 			return totalPrice;
