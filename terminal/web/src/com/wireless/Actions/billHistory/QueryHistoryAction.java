@@ -462,11 +462,10 @@ public class QueryHistoryAction extends Action {
 			JsonConfig jsonConfig = new JsonConfig();
 
 			JSONObject obj = JSONObject.fromObject(rootMap, jsonConfig);
+						
+			String outputJson = "{\"totalProperty\":" + resultList.size() + "," + obj.toString().substring(1);
 
-			String outputJson = "{\"totalProperty\":" + resultList.size() + ","
-					+ obj.toString().substring(1);
-
-			// System.out.println(outputJson);
+//			System.out.println(outputJson);
 			out.write(outputJson);
 
 		}

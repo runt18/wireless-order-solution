@@ -1,9 +1,15 @@
 package com.wireless.Actions.billHistory;
 
+import java.awt.event.ItemListener;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import net.sf.json.JSONArray;
 
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -13,16 +19,26 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.DBCon;
 import com.wireless.db.VerifyPin;
 import com.wireless.db.billStatistics.QuerySaleDetails;
+import com.wireless.pojo.billStatistics.SalesDetail;
 import com.wireless.protocol.Terminal;
 
+@SuppressWarnings({ "unused", "rawtypes" , "unchecked"})
 public class SalesSubStatisticsAction extends Action {
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		
-		DBCon dbCon = new DBCon();
+		request.setCharacterEncoding("UTF-8");
+		response.setContentType("text/json; charset=utf-8");
 		
+		DBCon dbCon = new DBCon();
+		SalesDetail[] saleDetails = {};
+		List itemsList = new ArrayList();
+		String limit = request.getParameter("limit");
+		String start = request.getParameter("start");
+		Integer index = Integer.parseInt(start);
+		Integer pageSize = Integer.parseInt(limit);
 		try{
 			dbCon.connect();
 			
@@ -50,24 +66,81 @@ public class SalesSubStatisticsAction extends Action {
 			 * 			   "1" means "按销量排序"
 			 * 
 			 */
-			//String pin = request.getParameter("pin");
-			String pin = "244";
-//			QuerySaleDetails.Result[] saleDetails = QuerySaleDetails.exec(dbCon, 
-//								  										  VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF), 
-//								  										  "2012-6-1", 
-//								  										  "2012-6-30", 
-//								  										  QuerySaleDetails.QUERY_BY_DEPT, 
-//								  										  QuerySaleDetails.ORDER_BY_PROFIT);
-			System.out.print(""); 
+			String pin = request.getParameter("pin");
+			String restaurantId = request.getParameter("restaurantID");			
+			String dateBeg = request.getParameter("dateBeg");
+			String dataEnd = request.getParameter("dataEnd");
+			String queryType = request.getParameter("queryType");
+			String orderType = request.getParameter("orderType");
+			String deptID = request.getParameter("deptID");
+			
+			pin = pin != null && pin.length() > 0 ? pin.trim() : "";
+			restaurantId = restaurantId != null && restaurantId.length() > 0 ? restaurantId.trim() : "";
+			dateBeg = dateBeg != null && dateBeg.length() > 0 ? dateBeg.trim() : "";
+			dataEnd = dataEnd != null && dataEnd.length() > 0 ? dataEnd.trim() : "";
+			queryType = queryType != null && queryType.length() > 0 ? queryType.trim() : "0";
+			orderType = orderType != null && orderType.length() > 0 ? orderType.trim() : "0";
+			deptID = deptID != null && deptID.length() > 0 ? deptID.trim() : "0";
+			
+			Integer qt = Integer.valueOf(queryType), ot = Integer.valueOf(orderType);
+			String[] splitDeptID = deptID.split(",");
+			int[] did = new int[splitDeptID.length];
+			for(int i = 0; i < splitDeptID.length; i++){
+				did[0] = Integer.parseInt(splitDeptID[i]);
+			}
+			if(did.length ==1 && did[0] == -1){
+				did = new int[0];
+			}
+			
+//			pin = "244";
+			if(qt == 0){
+				saleDetails = QuerySaleDetails.execByDept(dbCon, 
+	  					VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF), 
+	  					dateBeg, 
+	  					dataEnd);	
+			}else if(qt == 1){
+				saleDetails = QuerySaleDetails.execByFood(dbCon, 
+	  					VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF), 
+	  					dateBeg, 
+	  					dataEnd,
+	  					did,
+	  					ot);
+			}
+					
 			
 		} catch(SQLException e){
 			e.printStackTrace();
 			
 		} finally{
 			dbCon.disconnect();
-			//JSONArray json = JSONArray.fromObject(l);
+			JSONArray json = null;
+			if(index != null && pageSize != null){
+				pageSize = (pageSize + index) > saleDetails.length ? (pageSize - ((pageSize + index) - saleDetails.length)) : pageSize;
+				for(int i = 0; i < pageSize; i++){
+					itemsList.add(saleDetails[index + i]);
+				}
+				
+			}else{
+//				json = JSONArray.fromObject(saleDetails);
+				itemsList = Arrays.asList(saleDetails);
+			}
+			
+			if(saleDetails.length > 0){
+				SalesDetail sum = new SalesDetail("汇总");
+				for(SalesDetail tp : saleDetails){
+					sum.setIncome(sum.getIncome() + tp.getIncome());
+					sum.setDiscount(sum.getDiscount() + tp.getDiscount());
+					sum.setGifted(sum.getGifted() + tp.getGifted());
+					sum.setCost(sum.getCost() + tp.getCost());
+					sum.setProfit(sum.getProfit() + tp.getProfit());
+					sum.setSalesAmount(sum.getSalesAmount() + tp.getSalesAmount());				
+				}
+				itemsList.add(sum);
+			}
+			json = JSONArray.fromObject(itemsList);
+//			System.out.println("{totalProperty:" + saleDetails.length + ", root:" + json.toString() + "}");
 			//response.getWriter().print(json.toString());
-			response.getWriter().print("{totalProperty:12, root:[{name:'nameTest'}]}");
+			response.getWriter().print("{totalProperty:" + saleDetails.length + ", root:" + json.toString() + "}");
 		}
 		
 		return null;
