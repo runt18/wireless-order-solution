@@ -12,7 +12,8 @@ public class QueryDutyRange {
 	
 	/**
 	 * Get the records to daily settle history whose off duty is between on and off duty(two input parameters),
-	 *  
+	 * The on duty to duty range is the earliest date of those daily settle history record,
+	 * and the off duty to duty range is the latest date.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param term

@@ -159,15 +159,21 @@ public class QuerySaleDetails {
 	}
 	
 	/**
-	 * 
+	 * Get the sales details to each food.
 	 * @param dbCon
+	 * 			the database connection
 	 * @param term
+	 * 			the terminal to query
 	 * @param onDuty
+	 * 			the on duty to query
 	 * @param offDuty
+	 * 			the off duty to query
 	 * @param deptID
 	 * @param orderType
 	 * @return
+	 * 			an array containing department sales details which is sorted by profit in descending order
 	 * @throws SQLException
+	 * 			throws if any error occurred while execute any SQL statements.
 	 */
 	public static SalesDetail[] execByFood(DBCon dbCon, Terminal term, String onDuty, String offDuty, int[] deptID, int orderType) throws SQLException{
 		
