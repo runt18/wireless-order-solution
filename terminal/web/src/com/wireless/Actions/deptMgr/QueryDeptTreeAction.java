@@ -40,9 +40,10 @@ public class QueryDeptTreeAction extends Action{
 			while (dbCon.rs != null && dbCon.rs.next()) {
 				jsonSB.append(index > 0 ? "," : "");
 				jsonSB.append("{");
-				jsonSB.append("id:'" + dbCon.rs.getInt("dept_id") + "'");
+				jsonSB.append("id:'dept_id_" + dbCon.rs.getInt("dept_id") + "'");
 				jsonSB.append(",");
 				jsonSB.append("text:'" + dbCon.rs.getString("name") + "'");
+				jsonSB.append(",deptID:'" + dbCon.rs.getInt("dept_id") + "'");
 				jsonSB.append(",leaf:true");
 				jsonSB.append("}");
 				index++;

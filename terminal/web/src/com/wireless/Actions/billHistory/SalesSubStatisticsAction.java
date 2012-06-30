@@ -80,25 +80,24 @@ public class SalesSubStatisticsAction extends Action {
 			dataEnd = dataEnd != null && dataEnd.length() > 0 ? dataEnd.trim() : "";
 			queryType = queryType != null && queryType.length() > 0 ? queryType.trim() : "0";
 			orderType = orderType != null && orderType.length() > 0 ? orderType.trim() : "0";
-			deptID = deptID != null && deptID.length() > 0 ? deptID.trim() : "0";
+			deptID = deptID != null && deptID.length() > 0 ? deptID.trim() : "-1";
 			
 			Integer qt = Integer.valueOf(queryType), ot = Integer.valueOf(orderType);
-			String[] splitDeptID = deptID.split(",");
-			int[] did = new int[splitDeptID.length];
-			for(int i = 0; i < splitDeptID.length; i++){
-				did[0] = Integer.parseInt(splitDeptID[i]);
-			}
-			if(did.length == 1 && did[0] == -1){
-				did = new int[0];
-			}
 			
 			if(qt == QuerySaleDetails.QUERY_BY_DEPT){
 				saleDetails = QuerySaleDetails.execByDept(dbCon, 
 	  					VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF), 
 	  					dateBeg, 
 	  					dataEnd);	
-				
 			}else if(qt == QuerySaleDetails.QUERY_BY_FOOD){
+				String[] splitDeptID = deptID.split(",");
+				int[] did = new int[splitDeptID.length];
+				for(int i = 0; i < splitDeptID.length; i++){
+					did[i] = Integer.parseInt(splitDeptID[i]);
+				}
+				if(did.length == 1 && did[0] == -1){
+					did = new int[0];
+				}
 				saleDetails = QuerySaleDetails.execByFood(dbCon, 
 	  					VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF), 
 	  					dateBeg, 
@@ -114,6 +113,7 @@ public class SalesSubStatisticsAction extends Action {
 		} finally{
 			dbCon.disconnect();
 			JSONArray json = null;
+			int totalProperty = saleDetails.length;
 			if(index != null && pageSize != null){
 				pageSize = (pageSize + index) > saleDetails.length ? (pageSize - ((pageSize + index) - saleDetails.length)) : pageSize;
 				for(int i = 0; i < pageSize; i++){
@@ -121,11 +121,11 @@ public class SalesSubStatisticsAction extends Action {
 				}
 				
 			}else{
-//				json = JSONArray.fromObject(saleDetails);
 				itemsList = Arrays.asList(saleDetails);
 			}
 			
-			if(saleDetails.length > 0){
+			if(totalProperty > 0){
+				totalProperty++;
 				SalesDetail sum = new SalesDetail("汇总");
 				for(SalesDetail tp : saleDetails){
 					sum.setIncome(sum.getIncome() + tp.getIncome());
@@ -138,9 +138,8 @@ public class SalesSubStatisticsAction extends Action {
 				itemsList.add(sum);
 			}
 			json = JSONArray.fromObject(itemsList);
-//			System.out.println("{totalProperty:" + saleDetails.length + ", root:" + json.toString() + "}");
-			//response.getWriter().print(json.toString());
-			response.getWriter().print("{totalProperty:" + saleDetails.length + ", root:" + json.toString() + "}");
+//			System.out.println("{totalProperty:" + saleDetails.length + ", root:" + json.toString() + "}");			
+			response.getWriter().print("{totalProperty:" + totalProperty + ", root:" + json.toString() + "}");
 		}
 		
 		return null;
