@@ -156,33 +156,49 @@ Ext.ux.getSelData = function(_id){
  * 
  */
 Ext.ux.checkDateForBeginAndEnd = function(_s, _bid, _eid){
-		var beginDate = Ext.getCmp(_bid);
-		var endDate = Ext.getCmp(_eid);
-		var bdv = null, edv = null;
+	var beginDate = Ext.getCmp(_bid);
+	var endDate = Ext.getCmp(_eid);
+	var bdv = null, edv = null;
+	
+	if(typeof(beginDate) == 'undefined' || typeof(endDate) == 'undefined'){
+		return false;
+	}
 		
-		if(typeof(beginDate) == 'undefined' || typeof(endDate) == 'undefined'){
-			return false;
-		}
+	bdv = beginDate.getRawValue();
+	edv = endDate.getRawValue();
 		
-		bdv = beginDate.getRawValue();
-		edv = endDate.getRawValue();
+	if(bdv == '' && edv == ''){
+		return false;
+	}else{
+		bdv = bdv.replace(/-/g, '');
+		edv = edv.replace(/-/g, '');
 		
-		if(bdv == '' && edv == ''){
-			return;
-		}else{
-			bdv = bdv.replace(/-/g, '');
-			edv = edv.replace(/-/g, '');
-			
-			if(_s){
-				if(edv == '' || (bdv + 1) > edv){
-					endDate.setRawValue(beginDate.getValue().add(Date.DAY, 1).format('Y-m-d'));
-				}
-			}else if(!_s){
-				if(bdv == '' || (edv - 1) < bdv){
-					beginDate.setRawValue(endDate.getValue().add(Date.DAY,-1).format('Y-m-d'));
-				}
+		if(_s){
+			if(edv == '' || (bdv + 1) > edv){
+				endDate.setRawValue(beginDate.getValue().add(Date.DAY, 1).format('Y-m-d'));
+			}
+		}else if(!_s){
+			if(bdv == '' || (edv - 1) < bdv){
+				beginDate.setRawValue(endDate.getValue().add(Date.DAY,-1).format('Y-m-d'));
 			}
 		}
+	}
 };
 
 Ext.ux.checkBAE = Ext.ux.checkDateForBeginAndEnd;
+
+/**
+ * 求两个时间的天数差 日期格式为 YYYY-MM-dd   
+ */
+Ext.ux.daysBetween = function(DateOne,DateTwo){
+	var OneMonth = DateOne.substring(5, DateOne.lastIndexOf('-'));  
+    var OneDay = DateOne.substring(DateOne.length, DateOne.lastIndexOf('-')+1);  
+    var OneYear = DateOne.substring(0, DateOne.indexOf('-'));  
+  
+    var TwoMonth = DateTwo.substring(5, DateTwo.lastIndexOf('-'));  
+    var TwoDay = DateTwo.substring(DateTwo.length, DateTwo.lastIndexOf('-')+1);  
+    var TwoYear = DateTwo.substring(0, DateTwo.indexOf('-'));  
+  
+    var cha=((Date.parse(OneMonth + '/' + OneDay + '/' + OneYear) - Date.parse(TwoMonth + '/' + TwoDay + '/' + TwoYear)) / 86400000);   
+    return Math.abs(cha);
+};

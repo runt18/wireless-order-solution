@@ -9,13 +9,15 @@ var salesSubDeptId = -1;
 
 salesSubPanelnit = function(){
 	
-	salesSubQueryType = 0;
-	salesSubOrderType = 0;
-	salesSubDeptId = -1;
+//	salesSubQueryType = 0;
+//	salesSubOrderType = 0;
+//	salesSubDeptId = -1;
 	
-	var cmData = [[true, false, false, true], ['部门','item'], ['营业额','income','','right','Ext.ux.txtFormat.gridDou'], ['折扣额','discount','','right','Ext.ux.txtFormat.gridDou'], ['赠送额','gifted','','right','Ext.ux.txtFormat.gridDou'],
-			['成本','cost','','right','Ext.ux.txtFormat.gridDou'], ['成本率','costRate','','right','Ext.ux.txtFormat.gridDou'], ['毛利','profit','','right','Ext.ux.txtFormat.gridDou'], ['毛利率','profitRate','','right','Ext.ux.txtFormat.gridDou'],
-			['销量','salesAmount','','right','Ext.ux.txtFormat.gridDou'], ['均价','avgPrice','','right','Ext.ux.txtFormat.gridDou'], ['单位成本','avgCost','','right','Ext.ux.txtFormat.gridDou']];
+	var cmData = [[true, false, false, true], 
+	              ['部门','item'], ['销量','salesAmount','','right','Ext.ux.txtFormat.gridDou'], ['均价','avgPrice','','right','Ext.ux.txtFormat.gridDou'], ['单位成本','avgCost','','right','Ext.ux.txtFormat.gridDou'],
+	              ['营业额','income','','right','Ext.ux.txtFormat.gridDou'], ['折扣额','discount','','right','Ext.ux.txtFormat.gridDou'], ['赠送额','gifted','','right','Ext.ux.txtFormat.gridDou'],
+	              ['成本','cost','','right','Ext.ux.txtFormat.gridDou'], ['成本率','costRate','','right','Ext.ux.txtFormat.gridDou'], ['毛利','profit','','right','Ext.ux.txtFormat.gridDou'], 
+	              ['毛利率','profitRate','','right','Ext.ux.txtFormat.gridDou']];
 	var url = '../../SalesSubStatistics.do?tiem='+new Date();
 	var readerData = ['item','income','discount','gifted','cost','costRate','profit','profitRate','salesAmount','avgPrice','avgCost'];
 	var baseParams = [['pin', pin], ['restaurantID', restaurantID]];
@@ -43,7 +45,8 @@ salesSubPanelnit = function(){
 				readOnly : true,
 				listeners : {
 					blur : function(){									
-						Ext.ux.checkDateForBeginAndEnd(true, 'salesSubBegDate', 'salesSubEndDate', 40);
+//						Ext.ux.checkDateForBeginAndEnd(true, 'salesSubBegDate', 'salesSubEndDate');
+						salesSubSearchCheckDate(true, 'salesSubBegDate', 'salesSubEndDate');
 					}
 				}
 			},
@@ -57,7 +60,8 @@ salesSubPanelnit = function(){
 				readOnly : true,
 				listeners : {
 					blur : function(){									
-						Ext.ux.checkDateForBeginAndEnd(false, 'salesSubBegDate', 'salesSubEndDate', 40);
+//						Ext.ux.checkDateForBeginAndEnd(false, 'salesSubBegDate', 'salesSubEndDate');
+						salesSubSearchCheckDate(false, 'salesSubBegDate', 'salesSubEndDate');
 					}
 				}
 			},
@@ -102,9 +106,12 @@ salesSubPanelnit = function(){
 				width : 150,
 				handler : function(){
 					
-					Ext.ux.checkDateForBeginAndEnd(true, 'salesSubBegDate', 'salesSubEndDate', 40);
-					Ext.ux.checkDateForBeginAndEnd(false, 'salesSubBegDate', 'salesSubEndDate',40);
+//					Ext.ux.checkDateForBeginAndEnd(true, 'salesSubBegDate', 'salesSubEndDate');
+//					Ext.ux.checkDateForBeginAndEnd(false, 'salesSubBegDate', 'salesSubEndDate');					
 					
+					salesSubSearchCheckDate(true, 'salesSubBegDate', 'salesSubEndDate');
+					salesSubSearchCheckDate(false, 'salesSubBegDate', 'salesSubEndDate');
+							
 					var gs = salesSubGrid.getStore();
 					gs.baseParams['dateBeg'] = Ext.getCmp('salesSubBegDate').getRawValue();
 					gs.baseParams['dataEnd'] = Ext.getCmp('salesSubEndDate').getRawValue();
@@ -112,13 +119,40 @@ salesSubPanelnit = function(){
 					gs.baseParams['orderType'] = salesSubOrderType;
 					gs.baseParams['deptID'] = salesSubDeptId;
 					gs.load({params:{start:0,limit:15}});
+					
+					var colHide = true, colWidth = 0;					
+					if(salesSubQueryType == 0){
+						colHide = true;
+						colWidth = 0;
+					}else{
+						colHide = false;
+						colWidth = 80;
+					}					
+					salesSubGrid.getColumnModel().setHidden(2, colHide);
+					salesSubGrid.getColumnModel().setHidden(3, colHide);
+					salesSubGrid.getColumnModel().setHidden(4, colHide);
+					salesSubGrid.getColumnModel().setColumnWidth(2, colWidth);
+					salesSubGrid.getColumnModel().setColumnWidth(3, colWidth);
+					salesSubGrid.getColumnModel().setColumnWidth(4, colWidth);
+					
 				}
 			}
 			]
 		});
 		
 		salesSubGrid = createGridPanel(id,title,height,width,url,cmData,readerData,baseParams,pageSize,groupName,salesSubGrid_tbar);
-		salesSubGrid.region = 'center';		
+		salesSubGrid.region = 'center';
+		salesSubGrid.getStore().on('load', function(store, records, options ){
+			var sumRow = salesSubGrid.getView().getRow(store.getCount()-1);	
+			sumRow.style.backgroundColor = '#EEEEEE';			
+			sumRow.style.color = 'green';
+			for(var i = 0; i < salesSubGrid.getColumnModel().getColumnCount(); i++){
+				var sumRow = salesSubGrid.getView().getCell(store.getCount()-1, i);
+				sumRow.style.fontSize = '15px';
+				sumRow.style.fontWeight = 'bold';
+				
+			}
+		});
 	}
 	
 	if(!salesSubMune){
@@ -130,8 +164,9 @@ salesSubPanelnit = function(){
 			{
 				xtype : 'radio',
 				hideLabel : true,
-				width : 90,
+				width : 80,
 				boxLabel : '部门分类',
+				id : 'salesSubMuneTreeTypeRadioDept',
 				name : 'salesSubMuneTreeTypeRadio',
 				inputValue : '0',
 				checked : true,
@@ -140,16 +175,10 @@ salesSubPanelnit = function(){
 						if(e.getValue() == true){
 							Ext.getCmp('salesSubGridOrderByRadioProsit').setValue(true);						
 							Ext.getCmp('salesSubGridOrderByRadioSales').disable();
-							salesSubMuneTree.enable();
+							salesSubMuneTree.disable();
 							salesSubQueryType = e.getRawValue();
 							Ext.getDom('salesSubShowType').innerHTML = e.boxLabel;
-							
-							salesSubGrid.getColumnModel().setHidden(9,true);
-							salesSubGrid.getColumnModel().setHidden(10,true);
-							salesSubGrid.getColumnModel().setHidden(11,true);
-							
-							salesSubGrid.getColumnModel().setColumnHeader(1, '部门');
-							
+							salesSubGrid.getColumnModel().setColumnHeader(1, '部门');							
 						}
 					}
 				}
@@ -157,7 +186,7 @@ salesSubPanelnit = function(){
 			{
 				xtype : 'radio',
 				hideLabel : true,
-				width : 90,
+				width : 80,
 				boxLabel : '全部菜品',
 				name : 'salesSubMuneTreeTypeRadio',
 				inputValue : '1',
@@ -166,16 +195,10 @@ salesSubPanelnit = function(){
 						if(e.getValue() == true){
 							Ext.getCmp('salesSubGridOrderByRadioProsit').setValue(true);						
 							Ext.getCmp('salesSubGridOrderByRadioSales').enable();
-							salesSubMuneTree.disable();
+							salesSubMuneTree.enable();
 							salesSubQueryType = e.getRawValue();
 							Ext.getDom('salesSubShowType').innerHTML = e.boxLabel;
-							
-							salesSubGrid.getColumnModel().setHidden(9, false);
-							salesSubGrid.getColumnModel().setHidden(10, false);
-							salesSubGrid.getColumnModel().setHidden(11, false);
-							
-							salesSubGrid.getColumnModel().setColumnHeader(1, '菜品');
-							
+							salesSubGrid.getColumnModel().setColumnHeader(1, '菜品');							
 						}
 					}
 				}
@@ -197,19 +220,30 @@ salesSubPanelnit = function(){
 			root: new Ext.tree.AsyncTreeNode({
 				expanded : true,
 	            text : '全部',
-	            leaf : false
+	            leaf : false,
+	            deptID : '-1'
 			}),
 	        listeners : {
 	        	click : function(e){
-	        		salesSubDeptId = e.id;
+	        		if(e.attributes.deptID == '' || e.attributes.deptID == '-1'){
+	        			salesSubDeptId = '';
+	        			if(e.hasChildNodes()){
+	        				for(var i = 0; i < e.childNodes.length; i++){
+	        					salesSubDeptId += (i > 0 ? ',' : '');
+	        					salesSubDeptId += e.childNodes[i].attributes.deptID;
+	        				}
+	        			}
+	        		}else{
+	        			salesSubDeptId = e.attributes.deptID;
+	        		}	        		
 	        	}
 	        }
 		});
 		salesSubMune = new Ext.Panel({
 			region : 'west',
-			width : 200,			
+			width : 160,			
 			border : false,
-			items : [{xtype:'panel',tbar:salesSubMuneTree_tbar, border:false}, salesSubMuneTree]
+			items : [{xtype:'panel', tbar:salesSubMuneTree_tbar, border:false}, salesSubMuneTree]
 		});
 	}	
 };
@@ -224,10 +258,10 @@ salesSub = function(){
 			layout : 'border',
 			closeAction : 'hide',
 			resizable : false,
-			modal:true,
-			closable:false,
-			constrainHeader:true,
-			draggable:false,
+			modal : true,
+			closable : false,
+			constrainHeader : true,
+			draggable : false,
 			width : 1200,
 			height : 500,
 			items : [salesSubMune,salesSubGrid],
@@ -242,12 +276,13 @@ salesSub = function(){
 			{
 				text : '退出',
 				handler : function(){
-					salesSubWin.close();
+					salesSubWin.hide();
 				}
 			}
 			],
 			listeners : {
 				show : function(){
+//					Ext.getCmp('salesSubMuneTreeTypeRadioDept').setValue(true);
 					Ext.getCmp('salesSubBtnSearch').handler();
 				}
 			}
@@ -255,7 +290,36 @@ salesSub = function(){
 	}
 	
 	
-	salesSubWin.show();
-	
+	salesSubWin.show();	
 	Ext.getCmp('salesSubMuneTree').root.reload();
 };
+
+salesSubSearchCheckDate = function(_s, _bid, _eid, _num){
+	var beginDate = Ext.getCmp(_bid);
+	var endDate = Ext.getCmp(_eid);
+	var bdv = null, edv = null;
+	var day = typeof(_num) != 'undefined' ? _num : 40;
+	
+	if(typeof(beginDate) == 'undefined' || typeof(endDate) == 'undefined'){
+		return false;
+	}
+	
+	bdv = beginDate.getValue();
+	edv = endDate.getValue();
+//	alert('222333444  '+Ext.ux.daysBetween(edv.format('Y-m-d'), bdv.format('Y-m-d')));
+	if(bdv == '' && edv == ''){
+		return false;
+	}else{
+		
+		if(_s){
+			if(edv == '' || bdv >= edv || (bdv.add(Date.DAY, day) < edv ) ){
+				endDate.setRawValue(beginDate.getValue().add(Date.DAY, day).format('Y-m-d'));
+			}
+		}else if(!_s){
+			if(bdv == '' || edv <= bdv || (edv.add(Date.DAY, (day * -1)) > bdv ) ){
+				beginDate.setRawValue(endDate.getValue().add(Date.DAY, (day * -1)).format('Y-m-d'));
+			}
+		}
+	}
+};
+
