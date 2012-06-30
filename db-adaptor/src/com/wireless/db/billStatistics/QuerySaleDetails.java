@@ -199,8 +199,7 @@ public class QuerySaleDetails {
 		 */
 		orderFoods = SingleOrderFoodReflector.getDetailHistory(dbCon, 
 							" AND B.restaurant_id=" + term.restaurant_id + " " + 
-							" AND B.order_date BETWEEN '" + dutyRange.getOnDuty() + "' AND '" + dutyRange.getOffDuty() + "'" + 
-							(deptID.length != 0 ? " AND B.dept_id IN(" + deptCond + ")" : ""),  
+							" AND B.order_date BETWEEN '" + dutyRange.getOnDuty() + "' AND '" + dutyRange.getOffDuty() + "'",  
 							null);				
 		
 		/**
@@ -211,7 +210,7 @@ public class QuerySaleDetails {
 							" AND MATE_DETAIL.restaurant_id=" + term.restaurant_id + " " +
 							" AND MATE_DETAIL.type=" + MaterialDetail.TYPE_CONSUME +
 							" AND MATE_DETAIL.date BETWEEN '" + dutyRange.getOnDuty() + "' AND '" + dutyRange.getOffDuty() + "'" +
-							(deptID.length != 0 ? " AND MATE_DETAIL.deptID IN(" + deptCond + ")" : ""),
+							(deptID.length != 0 ? " AND MATE_DETAIL.dept_id IN(" + deptCond + ")" : ""),
 							"");
 		
 		Food[] foodList = QueryMenu.queryFoods(dbCon, term.restaurant_id, null, null);
