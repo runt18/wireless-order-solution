@@ -13,6 +13,7 @@ import com.wireless.dbObject.MaterialDetail;
 import com.wireless.dbObject.SingleOrderFood;
 import com.wireless.dbReflect.MaterialDetailReflector;
 import com.wireless.dbReflect.SingleOrderFoodReflector;
+import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.SalesDetail;
 import com.wireless.protocol.Department;
 import com.wireless.protocol.Food;
@@ -20,8 +21,8 @@ import com.wireless.protocol.Terminal;
 
 public class QuerySaleDetails {
 	
-	public final static int QUERY_BY_DEPT = 0;	//按部门显示
-	public final static int QUERY_BY_FOOD = 1;	//按菜品显示
+	public final static int QUERY_BY_DEPT = 0;		//按部门显示
+	public final static int QUERY_BY_FOOD = 1;		//按菜品显示
 	
 	public final static int ORDER_BY_PROFIT = 0;	//按毛利排序
 	public final static int ORDER_BY_SALES = 1;		//按销量排序
@@ -43,13 +44,18 @@ public class QuerySaleDetails {
 	 */
 	public static SalesDetail[] execByDept(DBCon dbCon, Terminal term, String onDuty, String offDuty) throws SQLException{
 	
+		/**
+		 * Get the duty range between on and off duty date
+		 */
+		DutyRange dutyRange = QueryDutyRange.exec(dbCon, term, onDuty, offDuty);
+		
 		SingleOrderFood[] orderFoods = new SingleOrderFood[0];
 		/**
 		 * Get the single order food information
 		 */
 		orderFoods = SingleOrderFoodReflector.getDetailHistory(dbCon, 
 							"AND B.restaurant_id=" + term.restaurant_id + " " + 
-							"AND B.order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "'", 
+							"AND B.order_date BETWEEN '" + dutyRange.getOnDuty() + "' AND '" + dutyRange.getOffDuty() + "'", 
 							null);				
 		
 		/**
@@ -59,7 +65,7 @@ public class QuerySaleDetails {
 		materialDetails = MaterialDetailReflector.getMaterialDetail(dbCon, 
 							" AND MATE_DETAIL.restaurant_id=" + term.restaurant_id + " " +
 							" AND MATE_DETAIL.type=" + MaterialDetail.TYPE_CONSUME +
-							" AND MATE_DETAIL.date BETWEEN '" + onDuty + "' AND '" + offDuty + "'", 
+							" AND MATE_DETAIL.date BETWEEN '" + dutyRange.getOnDuty() + "' AND '" + dutyRange.getOffDuty() + "'", 
 							"");
 		
 		HashMap<Department, SalesDetail> deptSalesDetail = new HashMap<Department, SalesDetail>();
@@ -165,6 +171,11 @@ public class QuerySaleDetails {
 	 */
 	public static SalesDetail[] execByFood(DBCon dbCon, Terminal term, String onDuty, String offDuty, int[] deptID, int orderType) throws SQLException{
 		
+		/**
+		 * Get the duty range between on and off duty date
+		 */
+		DutyRange dutyRange = QueryDutyRange.exec(dbCon, term, onDuty, offDuty);
+		
 		String deptCond = "";
 		if(deptID.length != 0){
 			for(int i = 0; i < deptID.length; i++){
@@ -182,7 +193,7 @@ public class QuerySaleDetails {
 		 */
 		orderFoods = SingleOrderFoodReflector.getDetailHistory(dbCon, 
 							" AND B.restaurant_id=" + term.restaurant_id + " " + 
-							" AND B.order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "'" + 
+							" AND B.order_date BETWEEN '" + dutyRange.getOnDuty() + "' AND '" + dutyRange.getOffDuty() + "'" + 
 							(deptID.length != 0 ? " AND B.dept_id IN(" + deptCond + ")" : ""),  
 							null);				
 		
@@ -193,7 +204,7 @@ public class QuerySaleDetails {
 		materialDetails = MaterialDetailReflector.getMaterialDetail(dbCon, 
 							" AND MATE_DETAIL.restaurant_id=" + term.restaurant_id + " " +
 							" AND MATE_DETAIL.type=" + MaterialDetail.TYPE_CONSUME +
-							" AND MATE_DETAIL.date BETWEEN '" + onDuty + "' AND '" + offDuty + "'" +
+							" AND MATE_DETAIL.date BETWEEN '" + dutyRange.getOnDuty() + "' AND '" + dutyRange.getOffDuty() + "'" +
 							(deptID.length != 0 ? " AND MATE_DETAIL.deptID IN(" + deptCond + ")" : ""),
 							"");
 		
@@ -204,7 +215,7 @@ public class QuerySaleDetails {
 		}
 		
 		/**
-		 * Calculate the gift, discount, income to each department during this period
+		 * Calculate the gift, discount, income to each food during this period
 		 */
 		for(SingleOrderFood singleOrderFood : orderFoods){
 			SalesDetail salesDetail = foodSalesDetail.get(singleOrderFood.food);
@@ -222,23 +233,43 @@ public class QuerySaleDetails {
 				
 				salesDetail.setSalesAmount(salesDetail.getSalesAmount() + singleOrderFood.orderCount);
 				
-				salesDetail.setGifted((float)Math.round(salesDetail.getGifted() * 100) / 100);
-				salesDetail.setDiscount((float)Math.round(salesDetail.getDiscount() * 100) / 100);
-				salesDetail.setIncome((float)Math.round(salesDetail.getIncome() * 100) / 100);
-				salesDetail.setCost((float)Math.round(salesDetail.getCost() * 100) / 100);
-					
-				salesDetail.setProfit(salesDetail.getIncome() - salesDetail.getCost());
-				if(salesDetail.getIncome() != 0.00){
-					salesDetail.setProfitRate((float)Math.round(salesDetail.getProfit() / salesDetail.getIncome() * 100) / 100);			
-					salesDetail.setCostRate((float)Math.round(salesDetail.getCost() / salesDetail.getIncome() * 100) / 100);
-				}
-				
-				if(salesDetail.getSalesAmount() != 0.00){
-					salesDetail.setAvgPrice((float)Math.round(salesDetail.getIncome() / salesDetail.getSalesAmount() * 100) / 100);
-					salesDetail.setAvgCost((float)Math.round(salesDetail.getCost() / salesDetail.getSalesAmount() * 100) /100);
-				}
 				foodSalesDetail.put(singleOrderFood.food, salesDetail);			
 			}
+		}
+		
+		/**
+		 * Calculate the cost to each food during this period
+		 */
+		for(MaterialDetail materialDetail : materialDetails){
+			SalesDetail salesDetail = foodSalesDetail.get(materialDetail.food);
+			if(salesDetail != null){
+				salesDetail.setCost(salesDetail.getCost() + materialDetail.calcPrice());
+			}
+		}
+		
+		/**
+		 * Calculate the profit, cost rate, profit rate, average price, average cost to each food
+		 */
+		for(Food food : foodSalesDetail.keySet()){
+			SalesDetail salesDetail = foodSalesDetail.get(food);
+				
+			salesDetail.setGifted((float)Math.round(salesDetail.getGifted() * 100) / 100);
+			salesDetail.setDiscount((float)Math.round(salesDetail.getDiscount() * 100) / 100);
+			salesDetail.setIncome((float)Math.round(salesDetail.getIncome() * 100) / 100);
+			salesDetail.setCost((float)Math.round(salesDetail.getCost() * 100) / 100);
+				
+			salesDetail.setProfit(salesDetail.getIncome() - salesDetail.getCost());
+			if(salesDetail.getIncome() != 0.00){
+				salesDetail.setProfitRate(salesDetail.getProfit() / salesDetail.getIncome());
+				salesDetail.setCostRate(salesDetail.getCost() / salesDetail.getIncome());
+			}
+			
+			if(salesDetail.getSalesAmount() != 0.00){
+				salesDetail.setAvgPrice((float)Math.round(salesDetail.getIncome() / salesDetail.getSalesAmount() * 100) / 100);
+				salesDetail.setAvgCost((float)Math.round(salesDetail.getCost() / salesDetail.getSalesAmount() * 100) /100);
+			}
+			
+			foodSalesDetail.put(food, salesDetail);
 		}
 		
 		SalesDetail[] result = foodSalesDetail.values().toArray(new SalesDetail[foodSalesDetail.values().size()]);
