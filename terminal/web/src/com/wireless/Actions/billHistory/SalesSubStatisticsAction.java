@@ -88,17 +88,17 @@ public class SalesSubStatisticsAction extends Action {
 			for(int i = 0; i < splitDeptID.length; i++){
 				did[0] = Integer.parseInt(splitDeptID[i]);
 			}
-			if(did.length ==1 && did[0] == -1){
+			if(did.length == 1 && did[0] == -1){
 				did = new int[0];
 			}
 			
-//			pin = "244";
-			if(qt == 0){
+			if(qt == QuerySaleDetails.QUERY_BY_DEPT){
 				saleDetails = QuerySaleDetails.execByDept(dbCon, 
 	  					VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF), 
 	  					dateBeg, 
 	  					dataEnd);	
-			}else if(qt == 1){
+				
+			}else if(qt == QuerySaleDetails.QUERY_BY_FOOD){
 				saleDetails = QuerySaleDetails.execByFood(dbCon, 
 	  					VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF), 
 	  					dateBeg, 
