@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.Params;
 import com.wireless.db.QueryMenu;
 import com.wireless.dbObject.MaterialDetail;
 import com.wireless.dbObject.SingleOrderFood;
@@ -222,7 +223,15 @@ public class QuerySaleDetails {
 							(deptID.length != 0 ? " AND MATE_DETAIL.dept_id IN(" + deptCond + ")" : ""),
 							"");
 		
-		Food[] foodList = QueryMenu.queryFoods(dbCon, term.restaurant_id, null, null);
+		String queryFoodExtraCond;
+		queryFoodExtraCond = " AND kitchen_alias IN " +
+							 " (SELECT kitchen_alias FROM " + 
+							 Params.dbName + ".kitchen" +
+							 " WHERE " +
+							 " dept_id IN(" + deptCond + ")" + 
+							 " AND " +
+							 " restaurant_id=" + term.restaurant_id + ")";
+		Food[] foodList = QueryMenu.queryFoods(dbCon, term.restaurant_id, queryFoodExtraCond, null);
 		HashMap<Food, SalesDetail> foodSalesDetail = new HashMap<Food, SalesDetail>();
 		for(Food item : foodList){
 			foodSalesDetail.put(item, new SalesDetail(item.name));
