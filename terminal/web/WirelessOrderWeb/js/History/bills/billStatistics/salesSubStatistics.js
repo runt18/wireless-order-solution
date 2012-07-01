@@ -128,21 +128,7 @@ salesSubPanelnit = function(){
 					gs.baseParams['deptID'] = salesSubDeptId;
 					gs.load({params:{start:0,limit:15}});
 					
-					var colHide = true, colWidth = 0;					
-					if(salesSubQueryType == 0){
-						colHide = true;
-						colWidth = 0;
-					}else{
-						colHide = false;
-						colWidth = 80;
-					}					
-					salesSubGrid.getColumnModel().setHidden(2, colHide);
-					salesSubGrid.getColumnModel().setHidden(3, colHide);
-					salesSubGrid.getColumnModel().setHidden(4, colHide);
-					salesSubGrid.getColumnModel().setColumnWidth(2, colWidth);
-					salesSubGrid.getColumnModel().setColumnWidth(3, colWidth);
-					salesSubGrid.getColumnModel().setColumnWidth(4, colWidth);
-					
+					salesSubSetColumn();
 				}
 			}
 			]
@@ -188,7 +174,10 @@ salesSubPanelnit = function(){
 							salesSubMuneTree.enable();
 							salesSubQueryType = e.getRawValue();
 							Ext.getDom('salesSubShowType').innerHTML = e.boxLabel;
-							salesSubGrid.getColumnModel().setColumnHeader(1, '部门');							
+							salesSubGrid.getColumnModel().setColumnHeader(1, '部门');
+							Ext.getCmp('salesSubMuneTree').root.select();
+							salesSubQueryType = 0;
+							salesSubDeptId = '';
 						}
 					}
 				}
@@ -209,6 +198,15 @@ salesSubPanelnit = function(){
 							salesSubQueryType = e.getRawValue();
 							Ext.getDom('salesSubShowType').innerHTML = e.boxLabel;
 							salesSubGrid.getColumnModel().setColumnHeader(1, '菜品');							
+							var root = Ext.getCmp('salesSubMuneTree').getRootNode();
+							salesSubDeptId = '';
+							salesSubQueryType = 1;
+							if(root.hasChildNodes()){
+								for(var i = 0; i <  root.childNodes.length; i++){
+									salesSubDeptId += (i > 0 ? ',' : '');
+		        					salesSubDeptId += root.childNodes[i].attributes.deptID;
+								}
+							}
 						}
 					}
 				}
@@ -303,7 +301,7 @@ salesSub = function(){
 		
 	salesSubWin.show();	
 	Ext.getCmp('salesSubMuneTree').root.reload();
-	
+	salesSubSetColumn();
 };
 
 salesSubSearchCheckDate = function(_s, _bid, _eid, _num){
@@ -335,3 +333,20 @@ salesSubSearchCheckDate = function(_s, _bid, _eid, _num){
 	}
 };
 
+salesSubSetColumn = function(){
+	var colHide = true, colWidth = 0;					
+	if(salesSubQueryType == 0){
+		colHide = true;
+		colWidth = 0;
+	}else{
+		colHide = false;
+		colWidth = 80;
+	}					
+	salesSubGrid.getColumnModel().setHidden(2, colHide);
+	salesSubGrid.getColumnModel().setHidden(3, colHide);
+	salesSubGrid.getColumnModel().setHidden(4, colHide);
+	salesSubGrid.getColumnModel().setColumnWidth(2, colWidth);
+	salesSubGrid.getColumnModel().setColumnWidth(3, colWidth);
+	salesSubGrid.getColumnModel().setColumnWidth(4, colWidth);
+	
+};
