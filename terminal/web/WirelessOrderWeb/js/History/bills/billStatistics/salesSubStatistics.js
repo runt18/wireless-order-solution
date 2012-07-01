@@ -170,7 +170,7 @@ salesSubPanelnit = function(){
 					check : function(e){
 						if(e.getValue() == true){
 							Ext.getCmp('salesSubGridOrderByRadioProsit').setValue(true);						
-							Ext.getCmp('salesSubGridOrderByRadioSales').disable();
+							Ext.getCmp('salesSubGridOrderByRadioSales').setDisabled(true);
 							salesSubMuneTree.enable();
 							salesSubQueryType = e.getRawValue();
 							Ext.getDom('salesSubShowType').innerHTML = e.boxLabel;
@@ -193,7 +193,7 @@ salesSubPanelnit = function(){
 					check : function(e){
 						if(e.getValue() == true){
 							Ext.getCmp('salesSubGridOrderByRadioProsit').setValue(true);						
-							Ext.getCmp('salesSubGridOrderByRadioSales').enable();
+							Ext.getCmp('salesSubGridOrderByRadioSales').setDisabled(false);
 							salesSubMuneTree.disable();
 							salesSubQueryType = e.getRawValue();
 							Ext.getDom('salesSubShowType').innerHTML = e.boxLabel;
@@ -292,7 +292,6 @@ salesSub = function(){
 			],
 			listeners : {
 				show : function(){
-//					Ext.getCmp('salesSubMuneTreeTypeRadioDept').setValue(true);
 //					Ext.getCmp('salesSubBtnSearch').handler();
 				}
 			}
@@ -300,7 +299,11 @@ salesSub = function(){
 	}
 		
 	salesSubWin.show();	
+	Ext.getCmp('salesSubBegDate').setValue('');
+	Ext.getCmp('salesSubEndDate').setValue('');
+	Ext.getCmp('salesSubMuneTreeTypeRadioDept').setValue(true);
 	Ext.getCmp('salesSubMuneTree').root.reload();
+	Ext.getCmp('salesSub_grid').getStore().removeAll();
 	salesSubSetColumn();
 };
 
