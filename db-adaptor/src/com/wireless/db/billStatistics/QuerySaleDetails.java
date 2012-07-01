@@ -207,7 +207,8 @@ public class QuerySaleDetails {
 		 */
 		orderFoods = SingleOrderFoodReflector.getDetailHistory(dbCon, 
 							" AND B.restaurant_id=" + term.restaurant_id + " " + 
-							" AND B.order_date BETWEEN '" + dutyRange.getOnDuty() + "' AND '" + dutyRange.getOffDuty() + "'",  
+							" AND B.order_date BETWEEN '" + dutyRange.getOnDuty() + "' AND '" + dutyRange.getOffDuty() + "'" +  
+							(deptID.length != 0 ? " AND B.dept_id IN(" + deptCond + ")" : ""),
 							null);				
 		
 		/**
