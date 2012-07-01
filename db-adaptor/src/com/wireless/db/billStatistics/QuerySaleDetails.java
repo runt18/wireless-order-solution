@@ -49,6 +49,10 @@ public class QuerySaleDetails {
 		 */
 		DutyRange dutyRange = QueryDutyRange.exec(dbCon, term, onDuty, offDuty);
 		
+		if(dutyRange == null){
+			return new SalesDetail[0];
+		}
+		
 		SingleOrderFood[] orderFoods = new SingleOrderFood[0];
 		/**
 		 * Get the single order food information
@@ -159,7 +163,7 @@ public class QuerySaleDetails {
 	}
 	
 	/**
-	 * Get the sales details to each food.
+	 * Get the sales details to each food of one or more departments.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param term
@@ -181,6 +185,10 @@ public class QuerySaleDetails {
 		 * Get the duty range between on and off duty date
 		 */
 		DutyRange dutyRange = QueryDutyRange.exec(dbCon, term, onDuty, offDuty);
+		
+		if(dutyRange == null){
+			return new SalesDetail[0];
+		}
 		
 		String deptCond = "";
 		if(deptID.length != 0){

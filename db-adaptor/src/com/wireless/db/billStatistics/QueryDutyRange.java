@@ -23,7 +23,10 @@ public class QueryDutyRange {
 	 * @param offDuty
 	 * 			the off duty 
 	 * @return	
+	 * 			the result to duty range,
+	 * 			return null if no corresponding daily settle record exist within this period
 	 * @throws SQLException
+	 * 			throws if any error occurred while execute any SQL statements.
 	 */
 	public static DutyRange exec(DBCon dbCon, Terminal term, String onDuty, String offDuty) throws SQLException{
 		try{

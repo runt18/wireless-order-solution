@@ -75,9 +75,9 @@ public class SingleOrderFoodReflector {
 			  " A.food_id, A.name, A.food_alias, A.food_status, " +
 			  " A.order_count, A.unit_price, A.discount, " + 
 			  " A.kitchen_id, A.kitchen_alias, A.dept_id, " +
-			  "(CASE WHEN A.kitchen_alias = " + Kitchen.KITCHEN_TEMP + " THEN 'ÁÙÊ±' " +
-			  " WHEN A.kitchen_alias = " + Kitchen.KITCHEN_NULL + " THEN '¿Õ' " +
-			  " WHEN A.kitchen_id IS NULL OR C.kitchen_id IS NULL THEN 'ÒÑÉ¾³ý³ø·¿' " +
+			  "(CASE WHEN A.kitchen_alias = " + Kitchen.KITCHEN_TEMP + " THEN 'ä¸´æ—¶' " +
+			  " WHEN A.kitchen_alias = " + Kitchen.KITCHEN_NULL + " THEN 'ç©º' " +
+			  " WHEN A.kitchen_id IS NULL OR C.kitchen_id IS NULL THEN 'å·²åˆ é™¤åŽ¨æˆ¿' " +
 			  " ELSE C.name END) AS kitchen_name, " +
 			  " A.taste, A.taste_price, A.taste_id, A.taste2_id, A.taste3_id, A.taste_alias, A.taste2_alias, A.taste3_alias, " +
 			  " A.taste_tmp_alias, A.taste_tmp, A.taste_tmp_price, " + 
