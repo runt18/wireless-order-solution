@@ -40,7 +40,7 @@ salesSubPanelnit = function(){
 				xtype : 'datefield',		
 				format : 'Y-m-d',
 				id : 'salesSubBegDate',
-				value : new Date().getFirstDateOfMonth(),
+//				value : new Date().getFirstDateOfMonth(),
 				width : 100,
 				readOnly : true,
 				listeners : {
@@ -56,7 +56,7 @@ salesSubPanelnit = function(){
 				format : 'Y-m-d',
 				id : 'salesSubEndDate',
 				width : 100,
-				value : new Date(),
+//				value : new Date(),
 				readOnly : true,
 				listeners : {
 					blur : function(){									
@@ -109,9 +109,17 @@ salesSubPanelnit = function(){
 //					Ext.ux.checkDateForBeginAndEnd(true, 'salesSubBegDate', 'salesSubEndDate');
 //					Ext.ux.checkDateForBeginAndEnd(false, 'salesSubBegDate', 'salesSubEndDate');					
 					
-					salesSubSearchCheckDate(true, 'salesSubBegDate', 'salesSubEndDate');
-					salesSubSearchCheckDate(false, 'salesSubBegDate', 'salesSubEndDate');
-							
+					var bd = Ext.getCmp('salesSubBegDate').getValue();
+					var ed = Ext.getCmp('salesSubEndDate').getValue();
+					if(bd == '' && ed == ''){
+						Ext.getCmp('salesSubEndDate').setValue(new Date());
+						salesSubSearchCheckDate(false, 'salesSubBegDate', 'salesSubEndDate');
+					}else if(bd != '' && ed == ''){
+						salesSubSearchCheckDate(true, 'salesSubBegDate', 'salesSubEndDate');
+					}else if(bd == '' && ed != ''){
+						salesSubSearchCheckDate(false, 'salesSubBegDate', 'salesSubEndDate');
+					}
+										
 					var gs = salesSubGrid.getStore();
 					gs.baseParams['dateBeg'] = Ext.getCmp('salesSubBegDate').getRawValue();
 					gs.baseParams['dataEnd'] = Ext.getCmp('salesSubEndDate').getRawValue();
@@ -143,14 +151,16 @@ salesSubPanelnit = function(){
 		salesSubGrid = createGridPanel(id,title,height,width,url,cmData,readerData,baseParams,pageSize,groupName,salesSubGrid_tbar);
 		salesSubGrid.region = 'center';
 		salesSubGrid.getStore().on('load', function(store, records, options ){
-			var sumRow = salesSubGrid.getView().getRow(store.getCount()-1);	
-			sumRow.style.backgroundColor = '#EEEEEE';			
-			sumRow.style.color = 'green';
-			for(var i = 0; i < salesSubGrid.getColumnModel().getColumnCount(); i++){
-				var sumRow = salesSubGrid.getView().getCell(store.getCount()-1, i);
-				sumRow.style.fontSize = '15px';
-				sumRow.style.fontWeight = 'bold';
-				
+			if(store.getCount() > 0){
+				var sumRow = salesSubGrid.getView().getRow(store.getCount()-1);	
+				sumRow.style.backgroundColor = '#EEEEEE';			
+				sumRow.style.color = 'green';
+				for(var i = 0; i < salesSubGrid.getColumnModel().getColumnCount(); i++){
+					var sumRow = salesSubGrid.getView().getCell(store.getCount()-1, i);
+					sumRow.style.fontSize = '15px';
+					sumRow.style.fontWeight = 'bold';
+					
+				}
 			}
 		});
 	}
@@ -175,7 +185,7 @@ salesSubPanelnit = function(){
 						if(e.getValue() == true){
 							Ext.getCmp('salesSubGridOrderByRadioProsit').setValue(true);						
 							Ext.getCmp('salesSubGridOrderByRadioSales').disable();
-							salesSubMuneTree.disable();
+							salesSubMuneTree.enable();
 							salesSubQueryType = e.getRawValue();
 							Ext.getDom('salesSubShowType').innerHTML = e.boxLabel;
 							salesSubGrid.getColumnModel().setColumnHeader(1, '部门');							
@@ -195,7 +205,7 @@ salesSubPanelnit = function(){
 						if(e.getValue() == true){
 							Ext.getCmp('salesSubGridOrderByRadioProsit').setValue(true);						
 							Ext.getCmp('salesSubGridOrderByRadioSales').enable();
-							salesSubMuneTree.enable();
+							salesSubMuneTree.disable();
 							salesSubQueryType = e.getRawValue();
 							Ext.getDom('salesSubShowType').innerHTML = e.boxLabel;
 							salesSubGrid.getColumnModel().setColumnHeader(1, '菜品');							
@@ -233,7 +243,9 @@ salesSubPanelnit = function(){
 	        					salesSubDeptId += e.childNodes[i].attributes.deptID;
 	        				}
 	        			}
+	        			salesSubQueryType = 0;
 	        		}else{
+	        			salesSubQueryType = 1;
 	        			salesSubDeptId = e.attributes.deptID;
 	        		}	        		
 	        	}
@@ -283,15 +295,15 @@ salesSub = function(){
 			listeners : {
 				show : function(){
 //					Ext.getCmp('salesSubMuneTreeTypeRadioDept').setValue(true);
-					Ext.getCmp('salesSubBtnSearch').handler();
+//					Ext.getCmp('salesSubBtnSearch').handler();
 				}
 			}
 		});
 	}
-	
-	
+		
 	salesSubWin.show();	
 	Ext.getCmp('salesSubMuneTree').root.reload();
+	
 };
 
 salesSubSearchCheckDate = function(_s, _bid, _eid, _num){
