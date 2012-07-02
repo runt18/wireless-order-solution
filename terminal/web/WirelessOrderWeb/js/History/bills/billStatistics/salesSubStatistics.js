@@ -159,6 +159,8 @@ salesSub = function(){
 				sumRow.style.fontSize = '15px';
 				sumRow.style.fontWeight = 'bold';					
 			}
+			salesSubGrid.getView().getCell(store.getCount()-1, 3).innerHTML = '--';
+			salesSubGrid.getView().getCell(store.getCount()-1, 4).innerHTML = '--';
 		}
 	});
 	
@@ -171,7 +173,7 @@ salesSub = function(){
 			xtype : 'radio',
 			hideLabel : true,
 			width : 80,
-			boxLabel : '全部部门',
+			boxLabel : '部门汇总',
 			id : 'salesSubMuneTreeTypeRadioDept',
 			name : 'salesSubMuneTreeTypeRadio',
 			inputValue : '0',
@@ -179,7 +181,7 @@ salesSub = function(){
 			listeners : {
 				check : function(e){						
 					if(e.getValue() == true){						
-						salesSubSetDisplay(false, e.boxLabel,  e.getRawValue(), true, '部门' );
+						salesSubSetDisplay(true, e.boxLabel,  e.getRawValue(), true, '部门' );
 						Ext.getCmp('salesSubGridOrderByRadioProsit').setValue(true);							
 						Ext.getCmp('salesSubMuneTree').root.select();							
 						salesSubDeptId = '';
@@ -191,13 +193,13 @@ salesSub = function(){
 			xtype : 'radio',
 			hideLabel : true,
 			width : 80,
-			boxLabel : '全部菜品',
+			boxLabel : '菜品明细',
 			name : 'salesSubMuneTreeTypeRadio',
 			inputValue : '1',
 			listeners : {
 				check : function(e){						
 					if(e.getValue() == true){							
-						salesSubSetDisplay(true, e.boxLabel, e.getRawValue(), false,'菜品' );
+						salesSubSetDisplay(false, '全部菜品', e.getRawValue(), false,'菜品' );
 						Ext.getCmp('salesSubGridOrderByRadioProsit').setValue(true);	
 						salesSubDeptId = '';
 						var root = Ext.getCmp('salesSubMuneTree').getRootNode();							
@@ -228,14 +230,14 @@ salesSub = function(){
 	       }),
 		root: new Ext.tree.AsyncTreeNode({
 			expanded : true,
-            text : '全部部门',
+            text : '全部菜品',
             leaf : false,
             deptID : '-1'
 		}),
         listeners : {
         	click : function(e){
         		if(e.attributes.deptID == '' || e.attributes.deptID == '-1'){
-        			salesSubSetDisplay(false, e.text, 0, true, '部门');
+        			salesSubSetDisplay(false, e.text, 1, false, '菜品');
         			Ext.getCmp('salesSubGridOrderByRadioProsit').setValue(true);
         			salesSubDeptId = '';
         			if(e.hasChildNodes()){
