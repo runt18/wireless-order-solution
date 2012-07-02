@@ -178,7 +178,7 @@ Ext.ux.checkDateForBeginAndEnd = function(_s, _bid, _eid){
 				endDate.setRawValue(beginDate.getValue().format('Y-m-d'));
 			}
 		}else if(!_s){
-			if(bdv == '' || edv < bdv){
+			if(bdv == '' || edv < bdv){				
 				beginDate.setRawValue(endDate.getValue().format('Y-m-d'));
 			}
 		}
