@@ -1,11 +1,11 @@
 ﻿var regionTree;
 
-
+getIsPaidDisplay = function(_val){
+	return eval(_val) == true ? '是' : '否';
+};
 
 Ext.onReady(function() {
-	getIsPaidDisplay = function(_val){
-		return eval(_val) == true ? '是' : '否';
-	};
+	
 			// 解决ext中文传入后台变问号问题
 			Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
 			Ext.QuickTips.init();
@@ -984,7 +984,7 @@ Ext.onReady(function() {
 						var cmData = [[true,false,false],['日期','order_date',150],['名称','food_name',150],['单价','unit_price',80],
 						              ['数量','amount',80],['折扣','discount',80],['口味','taste_pref'],
 						              ['口味价钱','taste_price',80],['厨房','kitchen'],['服务员','waiter',80],
-						              ['反结帐','isPaid',80,'getIsPaidDisplay'],['备注','comment']];
+						              ['反结帐','isPaid',80,'','getIsPaidDisplay'],['备注','comment']];
 						var url = '../../QueryDetail.do?tiem=' + new Date();
 						var readerData = ['order_date','food_name','unit_price','amount','discount','taste_pref','taste_price','kitchen','waiter','comment','isPaid','isDiscount','isGift','isReturn','message'];
 						var baseParams = [['pin', pin], ['queryType', 'TodayByTbl'], ['tableAlias', selTabContent.tableAlias], ['restaurantID', restaurantID]];							
