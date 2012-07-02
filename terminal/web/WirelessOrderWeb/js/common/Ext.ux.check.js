@@ -174,12 +174,12 @@ Ext.ux.checkDateForBeginAndEnd = function(_s, _bid, _eid){
 		edv = edv.replace(/-/g, '');
 		
 		if(_s){
-			if(edv == '' || (bdv + 1) > edv){
-				endDate.setRawValue(beginDate.getValue().add(Date.DAY, 1).format('Y-m-d'));
+			if(edv == '' || bdv > edv){
+				endDate.setRawValue(beginDate.getValue().format('Y-m-d'));
 			}
 		}else if(!_s){
-			if(bdv == '' || (edv - 1) < bdv){
-				beginDate.setRawValue(endDate.getValue().add(Date.DAY,-1).format('Y-m-d'));
+			if(bdv == '' || edv < bdv){
+				beginDate.setRawValue(endDate.getValue().format('Y-m-d'));
 			}
 		}
 	}
