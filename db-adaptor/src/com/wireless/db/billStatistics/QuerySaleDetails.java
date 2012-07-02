@@ -105,7 +105,7 @@ public class QuerySaleDetails {
 		for(MaterialDetail materialDetail : materialDetails){
 			SalesDetail salesDetail = deptSalesDetail.get(materialDetail.dept);
 			if(salesDetail != null){
-				salesDetail.setCost(salesDetail.getCost() + materialDetail.calcPrice());
+				salesDetail.setCost(salesDetail.getCost() + Math.abs(materialDetail.calcPrice()));
 			}
 		}
 
@@ -266,7 +266,7 @@ public class QuerySaleDetails {
 		for(MaterialDetail materialDetail : materialDetails){
 			SalesDetail salesDetail = foodSalesDetail.get(materialDetail.food);
 			if(salesDetail != null){
-				salesDetail.setCost(salesDetail.getCost() + materialDetail.calcPrice());
+				salesDetail.setCost(salesDetail.getCost() + Math.abs(materialDetail.calcPrice()));
 			}
 		}
 		
