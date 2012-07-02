@@ -41,7 +41,7 @@ salesSub = function(){
 		buttonAlign : 'left',
 		height : 26,
 		items : [
-		{xtype:'tbtext',text:'类别:<span id="salesSubShowType"></span'},
+		{xtype:'tbtext',text:'类别:&nbsp;<span id="salesSubShowType" style="color:green; font-weight:bold; font-size:13px;"></span'},
 		{xtype:'tbtext',text:'&nbsp;&nbsp;'},	
 		{xtype:'tbtext',text:'日期:'},
 		{
@@ -171,7 +171,7 @@ salesSub = function(){
 			xtype : 'radio',
 			hideLabel : true,
 			width : 80,
-			boxLabel : '部门分类',
+			boxLabel : '全部部门',
 			id : 'salesSubMuneTreeTypeRadioDept',
 			name : 'salesSubMuneTreeTypeRadio',
 			inputValue : '0',
@@ -228,14 +228,14 @@ salesSub = function(){
 	       }),
 		root: new Ext.tree.AsyncTreeNode({
 			expanded : true,
-            text : '全部',
+            text : '全部部门',
             leaf : false,
             deptID : '-1'
 		}),
         listeners : {
         	click : function(e){
         		if(e.attributes.deptID == '' || e.attributes.deptID == '-1'){
-        			salesSubSetDisplay(false, '部门分类', 0, true, '部门');
+        			salesSubSetDisplay(false, e.text, 0, true, '部门');
         			Ext.getCmp('salesSubGridOrderByRadioProsit').setValue(true);
         			salesSubDeptId = '';
         			if(e.hasChildNodes()){
