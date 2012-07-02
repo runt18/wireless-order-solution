@@ -82,6 +82,9 @@ public class SalesSubStatisticsAction extends Action {
 			orderType = orderType != null && orderType.length() > 0 ? orderType.trim() : "0";
 			deptID = deptID != null && deptID.length() > 0 ? deptID.trim() : "-1";
 			
+			dateBeg += " 00:00:00";
+			dataEnd += " 23:59:59";
+			
 			Integer qt = Integer.valueOf(queryType), ot = Integer.valueOf(orderType);
 			
 			if(qt == QuerySaleDetails.QUERY_BY_DEPT){
