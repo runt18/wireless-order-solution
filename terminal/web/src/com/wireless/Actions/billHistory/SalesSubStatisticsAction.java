@@ -76,14 +76,11 @@ public class SalesSubStatisticsAction extends Action {
 			
 			pin = pin != null && pin.length() > 0 ? pin.trim() : "";
 			restaurantId = restaurantId != null && restaurantId.length() > 0 ? restaurantId.trim() : "";
-			dateBeg = dateBeg != null && dateBeg.length() > 0 ? dateBeg.trim() : "";
-			dataEnd = dataEnd != null && dataEnd.length() > 0 ? dataEnd.trim() : "";
+			dateBeg = dateBeg != null && dateBeg.length() > 0 ? dateBeg.trim() + " 00:00:00" : "";
+			dataEnd = dataEnd != null && dataEnd.length() > 0 ? dataEnd.trim() + " 23:59:59" : "";
 			queryType = queryType != null && queryType.length() > 0 ? queryType.trim() : "0";
 			orderType = orderType != null && orderType.length() > 0 ? orderType.trim() : "0";
 			deptID = deptID != null && deptID.length() > 0 ? deptID.trim() : "-1";
-			
-			dateBeg += " 00:00:00";
-			dataEnd += " 23:59:59";
 			
 			Integer qt = Integer.valueOf(queryType), ot = Integer.valueOf(orderType);
 			
