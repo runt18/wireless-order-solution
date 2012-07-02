@@ -658,8 +658,13 @@ var pushBackBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "返回",
 	handler : function(btn) {
-		location.href = "HistoryProtal.html?restaurantID=" + restaurantID
-				+ "&pin=" + pin;
+//		location.href = "HistoryProtal.html?restaurantID=" + restaurantID
+//				+ "&pin=" + pin;
+		location.href = '../PersonLogin.html?restaurantID=' 
+						+ restaurantID 
+						+ '&isNewAccess=false'
+						+ '&pin='
+						+ pin;
 	}
 });
 

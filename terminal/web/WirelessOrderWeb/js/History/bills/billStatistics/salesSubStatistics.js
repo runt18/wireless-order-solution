@@ -218,7 +218,8 @@ salesSub = function(){
 		id : 'salesSubMuneTree',
 		border : false,
 		rootVisible : true,
-		height : 410,		
+		height : 410,	
+		animate : true,
 		loader:new Ext.tree.TreeLoader({    
 	          dataUrl:'../../QueryDeptTree.do?time='+new Date(),
 	          baseParams : {
