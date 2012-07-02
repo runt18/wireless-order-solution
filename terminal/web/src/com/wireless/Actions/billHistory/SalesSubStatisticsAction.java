@@ -138,6 +138,10 @@ public class SalesSubStatisticsAction extends Action {
 					sum.setProfit(sum.getProfit() + tp.getProfit());
 					sum.setSalesAmount(sum.getSalesAmount() + tp.getSalesAmount());				
 				}
+				if(sum.getIncome() != 0.00){
+					sum.setProfitRate(sum.getProfit() / sum.getIncome());
+					sum.setCostRate(sum.getCost() / sum.getIncome());
+				}
 				itemsList.add(sum);
 			}
 			json = JSONArray.fromObject(itemsList);
