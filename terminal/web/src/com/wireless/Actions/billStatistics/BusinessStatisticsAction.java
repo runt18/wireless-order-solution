@@ -131,71 +131,62 @@ public class BusinessStatisticsAction extends Action {
 														  new SimpleDateFormat("yyyy-MM-dd").format(dateBegin), 
 														  new SimpleDateFormat("yyyy-MM-dd").format(c.getTime()));
 				
+				QueryShift.Result result;
+				
 				if (dutyRange != null) {
 					
-					QueryShift.Result result = QueryShift.exec(dbCon, 
-															   term,
-															   dutyRange.getOnDuty(), 
-															   dutyRange.getOffDuty(), 
-															   QueryShift.QUERY_HISTORY);
+					result = QueryShift.exec(dbCon, 
+											term,
+											dutyRange.getOnDuty(), 
+											dutyRange.getOffDuty(), 
+											QueryShift.QUERY_HISTORY);
 					
-					HashMap<String, Object> resultMap = new HashMap<String, Object>();
+				}else{
+					result = new QueryShift.Result();
+				}
+				
+				HashMap<String, Object> resultMap = new HashMap<String, Object>();
 
-					// resultMap.put("statDate", lastDate);
-					resultMap.put("date", new SimpleDateFormat("yyyy-MM-dd").format(datePrev));
-					resultMap.put("orderCount", result.orderAmount);
-					resultMap.put("cash", result.cashIncome);
-					resultMap.put("bankCard", result.creditCardIncome);
-					resultMap.put("memberCard", result.memberCardIncome);
-					resultMap.put("credit", result.hangIncome);
-					resultMap.put("sign", result.signIncome);
-					resultMap.put("discount", result.discountIncome);
-					resultMap.put("gift", result.giftIncome);
-					resultMap.put("return", result.cancelIncome);
-					resultMap.put("paid", result.paidIncome);
-					resultMap.put("service", result.serviceIncome);
-					float totalIncome = result.cashIncome
-							+ result.creditCardIncome + result.memberCardIncome
-							+ result.signIncome + result.hangIncome;
-					resultMap.put("totalPrice", totalIncome);
-					float totalActual = result.cashIncome2
+				// resultMap.put("statDate", lastDate);
+				resultMap.put("date", new SimpleDateFormat("yyyy-MM-dd").format(datePrev));
+				resultMap.put("orderCount", result.orderAmount);
+				resultMap.put("cash", result.cashIncome);
+				resultMap.put("bankCard", result.creditCardIncome);
+				resultMap.put("memberCard", result.memberCardIncome);
+				resultMap.put("credit", result.hangIncome);
+				resultMap.put("sign", result.signIncome);
+				resultMap.put("discount", result.discountIncome);
+				resultMap.put("gift", result.giftIncome);
+				resultMap.put("return", result.cancelIncome);
+				resultMap.put("paid", result.paidIncome);
+				resultMap.put("service", result.serviceIncome);
+				float totalIncome = result.cashIncome + 
+									result.creditCardIncome + result.memberCardIncome + 
+									result.signIncome + result.hangIncome;
+				resultMap.put("totalPrice", totalIncome);
+				float totalActual = result.cashIncome2
 							+ result.creditCardIncome2
 							+ result.memberCardIncome2 + result.signIncome2
 							+ result.hangIncome2;
-					resultMap.put("actualPrice", totalActual);
+				resultMap.put("actualPrice", totalActual);
 
-					resultMap.put("message", "normal");
+				resultMap.put("message", "normal");
 
-					resultList.add(resultMap);
+				resultList.add(resultMap);
 
-					orderCountAll = (float) Math
-							.round((orderCountAll + result.orderAmount) * 100) / 100;
-					cashAll = (float) Math
-							.round((cashAll + result.cashIncome) * 100) / 100;
-					bankCardAll = (float) Math
-							.round((bankCardAll + result.creditCardIncome) * 100) / 100;
-					memberCardAll = (float) Math
-							.round((memberCardAll + result.memberCardIncome) * 100) / 100;
-					creditAll = (float) Math
-							.round((creditAll + result.hangIncome) * 100) / 100;
-					signAll = (float) Math
-							.round((signAll + result.signIncome) * 100) / 100;
-					discountAll = (float) Math
-							.round((discountAll + result.discountIncome) * 100) / 100;
-					giftAll = (float) Math
-							.round((giftAll + result.giftIncome) * 100) / 100;
-					returnAll = (float) Math
-							.round((returnAll + result.cancelIncome) * 100) / 100;
-					paidAll = (float) Math
-							.round((paidAll + result.paidIncome) * 100) / 100;
-					serviceAll = (float) Math
-							.round((serviceAll + result.serviceIncome) * 100) / 100;
-					totalPriceAll = (float) Math
-							.round((totalPriceAll + totalIncome) * 100) / 100;
-					actualPriceAll = (float) Math
-							.round((actualPriceAll + totalActual) * 100) / 100;
-
-				}
+				orderCountAll = (float)Math.round((orderCountAll + result.orderAmount) * 100) / 100;
+				cashAll = (float) Math.round((cashAll + result.cashIncome) * 100) / 100;
+				bankCardAll = (float) Math.round((bankCardAll + result.creditCardIncome) * 100) / 100;
+				memberCardAll = (float) Math.round((memberCardAll + result.memberCardIncome) * 100) / 100;
+				creditAll = (float) Math.round((creditAll + result.hangIncome) * 100) / 100;
+				signAll = (float) Math.round((signAll + result.signIncome) * 100) / 100;
+				discountAll = (float) Math.round((discountAll + result.discountIncome) * 100) / 100;
+				giftAll = (float) Math.round((giftAll + result.giftIncome) * 100) / 100;
+				returnAll = (float) Math.round((returnAll + result.cancelIncome) * 100) / 100;
+				paidAll = (float) Math.round((paidAll + result.paidIncome) * 100) / 100;
+				serviceAll = (float) Math.round((serviceAll + result.serviceIncome) * 100) / 100;
+				totalPriceAll = (float) Math.round((totalPriceAll + totalIncome) * 100) / 100;
+				actualPriceAll = (float) Math.round((actualPriceAll + totalActual) * 100) / 100;		
 
 				dateBegin = c.getTime();
 			}
