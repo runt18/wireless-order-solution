@@ -27,56 +27,56 @@ public class QueryShift {
 		public DeptIncome(Department dept){
 			this.dept = dept;
 		}
-		public Department dept;			//Ä³¸ö²¿ÃÅµÄĞÅÏ¢
-		public float gift;				//Ä³¸ö²¿ÃÅµÄÔùËÍ¶î
-		public float discount;			//Ä³¸ö²¿ÃÅµÄÕÛ¿Û¶î
-		public float income;			//Ä³¸ö²¿ÃÅµÄÓªÒµ¶î
+		public Department dept;			//æŸä¸ªéƒ¨é—¨çš„ä¿¡æ¯
+		public float gift;				//æŸä¸ªéƒ¨é—¨çš„èµ é€é¢
+		public float discount;			//æŸä¸ªéƒ¨é—¨çš„æŠ˜æ‰£é¢
+		public float income;			//æŸä¸ªéƒ¨é—¨çš„è¥ä¸šé¢
 	}
 	
 	public static class Result{
-		public String onDuty;			//¿ªÊ¼Ê±¼ä
-		public String offDuty;			//½áÊøÊ±¼ä
+		public String onDuty;			//å¼€å§‹æ—¶é—´
+		public String offDuty;			//ç»“æŸæ—¶é—´
 		
-		public int orderAmount;			//×ÜÕËµ¥Êı
+		public int orderAmount;			//æ€»è´¦å•æ•°
 		
-		public int cashAmount;			//ÏÖ½ğÕËµ¥Êı
-		public float cashIncome;		//ÏÖ½ğ½ğ¶î
-		public float cashIncome2;		//ÏÖ½ğÊµÊÕ
+		public int cashAmount;			//ç°é‡‘è´¦å•æ•°
+		public float cashIncome;		//ç°é‡‘é‡‘é¢
+		public float cashIncome2;		//ç°é‡‘å®æ”¶
 		
-		public int creditCardAmount;	//Ë¢¿¨ÕËµ¥Êı
-		public float creditCardIncome;	//Ë¢¿¨½ğ¶î
-		public float creditCardIncome2;	//Ë¢¿¨ÊµÊÕ
+		public int creditCardAmount;	//åˆ·å¡è´¦å•æ•°
+		public float creditCardIncome;	//åˆ·å¡é‡‘é¢
+		public float creditCardIncome2;	//åˆ·å¡å®æ”¶
 		
-		public int memeberCardAmount;	//»áÔ±¿¨ÕËµ¥Êı
-		public float memberCardIncome;	//»áÔ±¿¨½ğ¶î
-		public float memberCardIncome2;	//»áÔ±¿¨ÊµÊÕ
+		public int memeberCardAmount;	//ä¼šå‘˜å¡è´¦å•æ•°
+		public float memberCardIncome;	//ä¼šå‘˜å¡é‡‘é¢
+		public float memberCardIncome2;	//ä¼šå‘˜å¡å®æ”¶
 		
-		public int signAmount;			//Ç©µ¥ÕËµ¥Êı
-		public float signIncome;		//Ç©µ¥½ğ¶î
-		public float signIncome2;		//Ç©µ¥ÊµÊÕ
+		public int signAmount;			//ç­¾å•è´¦å•æ•°
+		public float signIncome;		//ç­¾å•é‡‘é¢
+		public float signIncome2;		//ç­¾å•å®æ”¶
 		
-		public int hangAmount;			//¹ÒÕËÕËµ¥Êı
-		public float hangIncome;		//¹ÒÕË½ğ¶î
-		public float hangIncome2;		//¹ÒÕËÊµÊÕ
+		public int hangAmount;			//æŒ‚è´¦è´¦å•æ•°
+		public float hangIncome;		//æŒ‚è´¦é‡‘é¢
+		public float hangIncome2;		//æŒ‚è´¦å®æ”¶
 		
-		public float totalActual;		//ºÏ¼ÆÊµÊÕ½ğ¶î
+		public float totalActual;		//åˆè®¡å®æ”¶é‡‘é¢
 		
-		public int discountAmount;		//ÕÛ¿ÛÕËµ¥Êı
-		public float discountIncome;	//ºÏ¼ÆÕÛ¿Û½ğ¶î
+		public int discountAmount;		//æŠ˜æ‰£è´¦å•æ•°
+		public float discountIncome;	//åˆè®¡æŠ˜æ‰£é‡‘é¢
 		
-		public int giftAmount;			//ÔùËÍÕËµ¥Êı
-		public float giftIncome;		//ºÏ¼ÆÔùËÍ½ğ¶î
+		public int giftAmount;			//èµ é€è´¦å•æ•°
+		public float giftIncome;		//åˆè®¡èµ é€é‡‘é¢
 		
-		public int cancelAmount;		//ÍË²ËÕËµ¥Êı
-		public float cancelIncome;		//ºÏ¼ÆÍË²Ë½ğ¶î
+		public int cancelAmount;		//é€€èœè´¦å•æ•°
+		public float cancelIncome;		//åˆè®¡é€€èœé‡‘é¢
 		
-		public int serviceAmount;		//·şÎñ·ÑÕËµ¥Êı
-		public float serviceIncome;		//·şÎñ·Ñ½ğ¶î
+		public int serviceAmount;		//æœåŠ¡è´¹è´¦å•æ•°
+		public float serviceIncome;		//æœåŠ¡è´¹é‡‘é¢
 		
-		public int paidAmount;			//·´½áÕÊÕËµ¥Êı
-		public float paidIncome;		//·´½áÕÊ½ğ¶î
+		public int paidAmount;			//åç»“å¸è´¦å•æ•°
+		public float paidIncome;		//åç»“å¸é‡‘é¢
 		
-		public DeptIncome[] deptIncome;	//ËùÓĞ²¿ÃÅÓªÒµ¶î
+		public DeptIncome[] deptIncome;	//æ‰€æœ‰éƒ¨é—¨è¥ä¸šé¢
 	}
 	
 	/**
