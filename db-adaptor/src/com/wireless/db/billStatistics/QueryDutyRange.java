@@ -48,7 +48,7 @@ public class QueryDutyRange {
 				java.sql.Timestamp onDutyTimeStamp = dbCon.rs.getTimestamp("on_duty");
 				String onDutyString;
 				if(onDutyTimeStamp == null){
-					onDutyString = onDuty;
+					return null;
 				}else{
 					onDutyString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(onDutyTimeStamp.getTime());
 				}
@@ -56,7 +56,7 @@ public class QueryDutyRange {
 				java.sql.Timestamp offDutyTimeStamp = dbCon.rs.getTimestamp("off_duty");
 				String offDutyString;
 				if(offDutyTimeStamp == null){
-					offDutyString = offDuty;
+					return null;
 				}else{
 					offDutyString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(offDutyTimeStamp.getTime());
 				}			
