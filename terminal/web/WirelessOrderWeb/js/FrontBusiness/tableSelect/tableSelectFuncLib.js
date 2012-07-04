@@ -188,11 +188,12 @@ var tableKeyboardSelect = function() {
 };
 
 var tableListReflash = function(node) {
-
+		
 	var currNodeId;
 	if (node != null && node != undefined) {
 		// 響應點擊樹節點，先觸發，后改變選擇
 		currNodeId = node.id;
+//		alert('node.attributes:  '+node.attributes.tableStatus);
 	} else {
 		if (regionTree.getSelectionModel().getSelectedNode() != undefined) {
 			currNodeId = regionTree.getSelectionModel().getSelectedNode().id;
@@ -221,8 +222,8 @@ var tableListReflash = function(node) {
 				});
 			}
 		}
-	}
-
+	}	
+	
 	// 改變區域名稱
 	var regionNameSpan = document.getElementById("listRegionName");
 	if (currNodeId == "regionTreeRoot") {
@@ -231,10 +232,24 @@ var tableListReflash = function(node) {
 		if (node != null) {
 			regionNameSpan.innerHTML = node.text;
 		} else {
-			regionNameSpan.innerHTML = regionTree.getSelectionModel()
-					.getSelectedNode().text;
+			regionNameSpan.innerHTML = regionTree.getSelectionModel().getSelectedNode().text;
 		}
 	}
+	
+	if(selectedStatus != null && parseInt(selectedStatus) >= 0){
+		var tpList = new Array();		
+		for(var i = 0; i < tableStatusListTSDisplay.length; i++){
+			if(parseInt(tableStatusListTSDisplay[i].tableStatus) == parseInt(selectedStatus)){
+				tpList.push(tableStatusListTSDisplay[i]);
+				
+			}			
+		}
+//		alert('list:   '+tpList.length);
+		tableStatusListTSDisplay = tpList.slice(0);
+		var ns = parseInt(selectedStatus) == TABLE_IDLE ? '空闲' : parseInt(selectedStatus) == TABLE_BUSY ? '就餐' : '';		
+		regionNameSpan.innerHTML = regionNameSpan.innerHTML + '__<font color="">' + ns + '</font>';
+	}
+	
 	// 2 ********** create table list **********
 	// 2.1,get the page total count
 	var pageTotalCount = parseInt(tableStatusListTSDisplay.length / 32);
@@ -309,8 +324,7 @@ var tableListReflash = function(node) {
 	var pageIndexSpan = document.getElementById("pageIndexTL");
 	pageIndexSpan.innerHTML = pageIndex + "";
 	var pageTotalCountSpan = document.getElementById("totalCountTL");
-	pageTotalCountSpan.innerHTML = "&nbsp;&nbsp;/&nbsp;&nbsp;" + pageTotalCount
-			+ "";
+	pageTotalCountSpan.innerHTML = "&nbsp;&nbsp;/&nbsp;&nbsp;" + pageTotalCount + "";
 
 	// 4 ********** get the general table count
 	// **********
@@ -324,12 +338,14 @@ var tableListReflash = function(node) {
 			freeCount = freeCount + 1;
 		}
 	}
-	document.getElementById("allTblDivTS").innerHTML = totalCount
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-	document.getElementById("usedTbltDivTS").innerHTML = usedCount
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-	document.getElementById("freeTblDivTS").innerHTML = freeCount;
-
+	
+	if(selectedStatus == null){
+		document.getElementById("allTblDivTS").innerHTML = totalCount
+				+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+		document.getElementById("usedTbltDivTS").innerHTML = usedCount
+				+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+		document.getElementById("freeTblDivTS").innerHTML = freeCount;
+	}
 	// 5 ********** register the event handler for the
 	// table
 	// icon **********
@@ -342,19 +358,14 @@ var tableListReflash = function(node) {
 		}, function() {
 			$(this).stop().animate({
 				marginTop : "20px"
-
 			}, 200);
 		});
 	});
 
 	// double click -- forward the page
-	$(".table_list li")
-			.each(
+	$(".table_list li").each(
 					function() {
-						$(this)
-								.bind(
-										"dblclick",
-										function() {
+						$(this).bind("dblclick", function() {
 											var tableIndex = -1;
 											for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
 												if (tableStatusListTSDisplay[i].tableAlias == selectedTable) {
@@ -387,7 +398,6 @@ var tableListReflash = function(node) {
 														+ "&serviceRate="
 														+ tableStatusListTSDisplay[tableIndex].tableServiceRate;
 											} else {
-
 												var minCost;
 												var serviceRate;
 												if (tableStatusListTSDisplay[tableIndex].tableCategory != CATE_MERGER_TABLE) {
@@ -416,13 +426,9 @@ var tableListReflash = function(node) {
 
 	// click - 1,change the status info; 2,heightlight
 	// the icon
-	$(".table_list li")
-			.each(
+	$(".table_list li").each(
 					function() {
-						$(this)
-								.bind(
-										"click",
-										function() {
+						$(this).bind("click", function() {
 											var tableId = this.id;
 											var tableIndex = -1;
 											for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
@@ -434,19 +440,15 @@ var tableListReflash = function(node) {
 
 											// update
 											// status
-											document
-													.getElementById("tblNbrDivTS").innerHTML = tableStatusListTSDisplay[tableIndex].tableAlias
+											document.getElementById("tblNbrDivTS").innerHTML = tableStatusListTSDisplay[tableIndex].tableAlias
 													+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-											document
-													.getElementById("perCountDivTS").innerHTML = tableStatusListTSDisplay[tableIndex].tableCustNbr
+											document.getElementById("perCountDivTS").innerHTML = tableStatusListTSDisplay[tableIndex].tableCustNbr
 													+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-											document
-													.getElementById("tblStatusDivTS").innerHTML = tableStatusListTSDisplay[tableIndex].tableStatus;
+											document.getElementById("tblStatusDivTS").innerHTML = tableStatusListTSDisplay[tableIndex].tableStatus;
 
 											// table
 											// select
-											var currTableNbr = $(this).attr(
-													"id").substring(5);
+											var currTableNbr = $(this).attr("id").substring(5);
 											if (currTableNbr != selectedTable) {
 												deselectTable();
 												selectTable(currTableNbr);
@@ -454,4 +456,14 @@ var tableListReflash = function(node) {
 										});
 					});
 
+};
+
+switchTableStatus = function(_s){	
+	selectedStatus = _s;
+	var regionTree = Ext.getCmp('regionTree');
+	var node = regionTree.getSelectionModel().getSelectedNode();
+	if(node != null && typeof(node) != 'undefined'){
+		node.attributes.tableStatus = _s;
+	}
+	tableListReflash(node);
 };

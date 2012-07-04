@@ -188,8 +188,7 @@ var memberNbrInputWin = new Ext.Window({
 			{
 				text : "确定",
 				handler : function() {
-					var memberNbr = memberNbrInputWin
-							.findById("memberNbrInput").getValue();
+					var memberNbr = memberNbrInputWin.findById("memberNbrInput").getValue();
 					memberNbrInputWin.findById("memberNbrInput").setValue("");
 					if (memberNbr != "") {
 

@@ -14,7 +14,10 @@
 Ext.ux.txtFormat = {
 	barMsg : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{0}:&nbsp;<span id="{1}" style="color:green; font-size:15px; font-weight:bold;">{2}</span>',
 	barSum : '<span style="font-weight:bold; font-size:13px;">总计</span>',
-	gridDou : function(_v){ return parseFloat(_v).toFixed(2);}
+	linkClassOne : '<a id="{0}" href="{1}" onClick="{2}" style="color:green; font-size:15px; font-weight:bold;">{3}</a>',
+	gridDou : function(_v){
+		return _v != '' ? parseFloat(_v).toFixed(2) : _v;
+	}
 };
 
 
@@ -61,7 +64,7 @@ StringBuilder.prototype.toString = function() {
  *            url 服务器地址
  * @param {}
  *            cmData 设定显示的列 ---------
- *            数据格式[[是否自动生成行号,是否可以多选,是否加载数据,是否分页]['列名','数据的字段名','列宽','指定自定义的方法去改变值的显示方式']]
+ *            数据格式[[是否自动生成行号,是否可以多选,是否加载数据,是否分页]['列名','数据的字段名','列宽','对齐方式','自定义显示']]
  * @param {}
  *            readerData 要显示列的对应该数据的字段名 ---------
  *            数据格式['activityName','activityAddress','contact','startDate','endDate']

@@ -649,6 +649,7 @@ Ext.onReady(function() {
 			});
 
 			regionTree = new Ext.tree.TreePanel({
+				id : 'regionTree',
 				autoScroll : true, // 如果超出范围带自动滚动条
 				animate : true, // 是否动画效果
 				root : regionTreeRoot,
@@ -660,6 +661,8 @@ Ext.onReady(function() {
 				containerScroll : true,
 				listeners : {
 					"click" : function(node, event) {
+						selectedStatus = null;
+						node.attributes.tableStatus = null;
 						tableListReflash(node);
 					}
 				}
