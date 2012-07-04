@@ -8,8 +8,10 @@
 	href="../../extjs/resources/css/ext-all.css" />
 <script type="text/javascript" src="../../extjs/ext-base.js"></script>
 <script type="text/javascript" src="../../extjs/ext-all.js"></script>
+<script type="text/javascript" src="../../js/common/Ext.ux.js"></script>
+<script type="text/javascript" src="../../js/common/Ext.ux.check.js"></script>
+
 <!-- 解决Grid不能选择复制问题 -->
-<script type="text/javascript" src="../../js/GridViewRewrite.js"></script>
 <script type="text/javascript" src="../../extjs/ext-lang-zh_CN.js"></script>
 
 <!-- 实现多选JS -->
@@ -44,6 +46,8 @@
 	var dishTasteData = []; // taste date
 	var checkOutDataDisplay = []
 	// check out dishes display
+	
+	var backFoodDetailData = {};
 
 	var discountType = 1; // discount type, default normal
 	var payType = 1; // pay type, default type 1
@@ -123,35 +127,35 @@
 		<table>
 			<tr>
 				<td>服务费：</td>
-				<td><input id="serviceCharge" type="text" value="0"
-					style="width: 50px;"></input>
+				<td>
+					<input id="serviceCharge" type="text" value="0" style="width: 50px;"></input>
 				</td>
 				<td>%</td>
 				<td style="width: 60px;">&nbsp;</td>
 				<td>赠送：￥</td>
-				<td><div id="forFree"></div>
-				</td>
+				<td><div id="forFree"></div></td>
 				<td style="width: 60px;">&nbsp;</td>
 				<td>合计：￥</td>
-				<td><div id="totalCount"></div>
-				</td>
+				<td><div id="totalCount"></div></td>
+				<td style="width: 60px;">&nbsp;</td>
+				
 			</tr>
 			<tr>
 				<td>现金实收：￥</td>
-				<td><input id="actualCount" type="text" style="width: 50px;"></input>
-				</td>
+				<td><input id="actualCount" type="text" style="width: 50px;"></input></td>
 				<td>&nbsp;&nbsp;&nbsp;</td>
 				<td style="width: 60px;">&nbsp;</td>
 				<td>应收：￥</td>
-				<td><div id="shouldPay"></div>
-				</td>
+				<td><div id="shouldPay"></div></td>
 				<td style="width: 60px;">&nbsp;</td>
 				<td>找零：￥</td>
-				<td><div id="change"></div>
-				</td>
-				<td style="width: 40px;">&nbsp;</td>
-				<td><input type="button" value="计算" style="width: 80px;"
-					onclick="moneyCount('button')"></input>
+				<td><div id="change"></div></td>
+				<td style="width: 60px;">&nbsp;</td>
+				<td>退菜金额：￥</td>
+				<td><div id="backFoodAmount_div">0.00</div></td>
+				<td style="width: 60px;">&nbsp;</td>
+				<td>
+					<input type="button" value="计算" style="width: 80px;" onclick="moneyCount('button')"></input>
 				</td>
 			</tr>
 		</table>
