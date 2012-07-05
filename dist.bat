@@ -141,7 +141,7 @@ IF NOT EXIST terminal\android\phone\bin\WirelessOrderTerminal_Android.apk GOTO a
 	@copy terminal\android\phone\bin\WirelessOrderTerminal_Android.apk dist\www\ota\android\phone > nul
 	GOTO android_pad_apk
 :apk_not_exist
-	@echo the android phone apk file for android phone terminal missing
+	@echo the android phone apk file missing
 	@pause
 	GOTO end
 	
@@ -157,7 +157,7 @@ IF NOT EXIST terminal\android\pad\bin\WirelessOrderTerminal_Pad.apk GOTO pad_apk
 	@copy terminal\android\pad\bin\WirelessOrderTerminal_Pad.apk dist\www\ota\android\pad > nul
 	GOTO pserver_files
 :pad_apk_not_exist
-	@echo the android pad apk file for android phone terminal missing
+	@echo the android pad apk file is missing
 	@pause
 	GOTO end
 	
