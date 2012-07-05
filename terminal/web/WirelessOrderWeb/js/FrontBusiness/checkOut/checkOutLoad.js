@@ -468,7 +468,8 @@ createBackFoodDetail = function(_data){
 	for(var i = 0; i < _data.root.length ; i++){		
 		item = _data.root[i];
 		if(typeof(item.amount) != 'undefined' && parseFloat(item.amount) < 0){
-			item.backFoodPrice = Math.abs(parseFloat(item['unit_price'] * item.amount));
+			item.amount = Math.abs(item.amount);
+			item.backFoodPrice = Math.abs(parseFloat(item['unit_price'] * item.amount));			
 			backFoodDetailData.root.push(item);
 			backFoodPrice += parseFloat(item.backFoodPrice);
 			sumAmount += parseFloat(item.amount);
