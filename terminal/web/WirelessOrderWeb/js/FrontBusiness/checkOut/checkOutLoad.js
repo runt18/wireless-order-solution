@@ -511,7 +511,7 @@ showBackFoodDetail = function(){
 			    {header:'名称', dataIndex:'food_name', width:180},
 			    {header:'日期', dataIndex:'order_date', width:130},			    
 			    {header:'单价', dataIndex:'unit_price', width:80, align:'right', renderer:Ext.ux.txtFormat.gridDou},
-			    {header:'数量', dataIndex:'amount', width:80, align:'right', renderer:Ext.ux.txtFormat.gridDou},
+			    {header:'退菜数量', dataIndex:'amount', width:80, align:'right', renderer:Ext.ux.txtFormat.gridDou},
 			    {header:'退菜金额', dataIndex:'backFoodPrice', width:80, align:'right', renderer:Ext.ux.txtFormat.gridDou},
 			    {header:'厨房', dataIndex:'kitchen', width:100},
 			    {header:'服务员', dataIndex:'waiter', width:70},
