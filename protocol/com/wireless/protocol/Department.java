@@ -12,6 +12,7 @@ public class Department {
 	public final static short DEPT_8 = 7;
 	public final static short DEPT_9 = 8;
 	public final static short DEPT_10 = 9;
+	public final static short DEPT_TEMP = 253;
 	
 	public short deptID;
 	public int restaurantID;
