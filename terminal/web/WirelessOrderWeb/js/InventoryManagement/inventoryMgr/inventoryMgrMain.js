@@ -82,60 +82,46 @@ inventoryInWin = new Ext.Window(
 						text : "确定",
 						handler : function() {
 
-							if (inventoryInWin.findById("inventoryInCount")
-									.isValid()
-									&& inventoryInWin.findById(
-											"inventoryInPrice").isValid()
-									&& inventoryInWin.findById(
-											"inventoryInDate").isValid()
-									&& inventoryInWin.findById(
-											"departmentCombIn").isValid()
-									&& inventoryInWin
-											.findById("supplierCombIn")
-											.isValid()) {
+							if (inventoryInWin.findById("inventoryInCount").isValid()
+									&& inventoryInWin.findById("inventoryInPrice").isValid()
+									&& inventoryInWin.findById("inventoryInDate").isValid()
+									&& inventoryInWin.findById("departmentCombIn").isValid()
+									&& inventoryInWin.findById("supplierCombIn").isValid()) {
 
-								var inventoryInCount = inventoryInWin.findById(
-										"inventoryInCount").getValue();
-								var inventoryInPrice = inventoryInWin.findById(
-										"inventoryInPrice").getValue();
+								var inventoryInCount = inventoryInWin.findById("inventoryInCount").getValue();
+								var inventoryInPrice = inventoryInWin.findById("inventoryInPrice").getValue();
 
-								var inventoryInDate = inventoryInWin.findById(
-										"inventoryInDate").getValue();
+								var inventoryInDate = inventoryInWin.findById("inventoryInDate").getValue();
 								var dateFormated = new Date();
 								dateFormated = inventoryInDate;
 								inventoryInDate = dateFormated.format('Y-m-d');
 
-								var department = inventoryInWin.findById(
-										"departmentCombIn").getValue();
+								var department = inventoryInWin.findById("departmentCombIn").getValue();
 								for ( var i = 0; i < departmentData.length; i++) {
 									if (department == departmentData[i][1]) {
 										department = departmentData[i][0];
 									}
 								}
 
-								var supplier = inventoryInWin.findById(
-										"supplierCombIn").getValue();
+								var supplier = inventoryInWin.findById("supplierCombIn").getValue();
 								for ( var i = 0; i < supplierData.length; i++) {
 									if (supplier == supplierData[i][2]) {
 										supplier = supplierData[i][0];
 									}
 								}
 
-								var material = materialGrid.getStore().getAt(
-										currRowIndex).get("materialID");
+								var material = materialGrid.getStore().getAt(currRowIndex).get("materialID");
 
 								var staff = document.getElementById("optName").innerHTML;
 
-								var remark = inventoryInWin.findById(
-										"inventoryInRemark").getValue();
+								var remark = inventoryInWin.findById("inventoryInRemark").getValue();
 
 								isPrompt = false;
 								inventoryInWin.hide();
 
 								// type: 0 : 消耗 1 : 报损 2 : 销售 3 : 退货 4 : 入库 5 :
 								// 调出 6 : 调入 7 : 盘点
-								Ext.Ajax
-										.request({
+								Ext.Ajax.request({
 											url : "../../InventoryIn.do",
 											params : {
 												"pin" : pin,
@@ -1345,9 +1331,10 @@ materialAddWin = new Ext.Window(
 			layout : "fit",
 			title : "添加食材",
 			width : 260,
-			height : 200,
-			closeAction : "hide",
+			height : 205,
+			closeAction : 'hide',
 			resizable : false,
+			colsable : false,
 			items : [ {
 				layout : "form",
 				id : "materialAddForm",
@@ -1386,31 +1373,17 @@ materialAddWin = new Ext.Window(
 						listeners : {
 							"click" : function() {
 
-								if (materialAddWin
-										.findById("materialAddNumber")
-										.isValid()
-										&& materialAddWin.findById(
-												"materialAddName").isValid()
-										&& materialAddWin.findById(
-												"materialAddWarning").isValid()
-										&& materialAddWin.findById(
-												"materialAddDanger").isValid()) {
+								if (materialAddWin.findById("materialAddNumber").isValid()
+										&& materialAddWin.findById("materialAddName").isValid()
+										&& materialAddWin.findById("materialAddWarning").isValid()
+										&& materialAddWin.findById("materialAddDanger").isValid()) {
 
-									var materialAddNumber = materialAddWin
-											.findById("materialAddNumber")
-											.getValue();
-									var materialAddName = materialAddWin
-											.findById("materialAddName")
-											.getValue();
-									var materialAddWarning = materialAddWin
-											.findById("materialAddWarning")
-											.getValue();
-									var materialAddDanger = materialAddWin
-											.findById("materialAddDanger")
-											.getValue();
+									var materialAddNumber = materialAddWin.findById("materialAddNumber").getValue();
+									var materialAddName = materialAddWin.findById("materialAddName").getValue();
+									var materialAddWarning = materialAddWin.findById("materialAddWarning").getValue();
+									var materialAddDanger = materialAddWin.findById("materialAddDanger").getValue();
 
-									var materialCate = materialCateCombAdd
-											.getValue();
+									var materialCate = materialCateCombAdd.getValue();
 									for ( var i = 0; i < materialCateComboData.length; i++) {
 										if (materialCate == materialCateComboData[i][1]) {
 											materialCate = materialCateComboData[i][0];
@@ -1427,8 +1400,7 @@ materialAddWin = new Ext.Window(
 									if (!isDuplicate) {
 										materialAddWin.hide();
 
-										Ext.Ajax
-												.request({
+										Ext.Ajax.request({
 													url : "../../InsertMaterial.do",
 													params : {
 														"pin" : pin,
@@ -2159,8 +2131,7 @@ var materialColumnModel = new Ext.grid.ColumnModel([
 
 // -------------- layout ---------------
 var materialGrid;
-Ext
-		.onReady(function() {
+Ext.onReady(function() {
 			// 解决ext中文传入后台变问号问题
 			Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
 			Ext.QuickTips.init();
@@ -2199,54 +2170,36 @@ Ext
 								// field_separator contact field_separator
 								// address
 								var modfiedArr = [];
-								materialGrid
-										.getStore()
-										.each(
+								materialGrid.getStore().each(
 												function(record) {
-													if (record
-															.isModified("materialName") == true
-															|| record
-																	.isModified("dangerNbr") == true
-															|| record
-																	.isModified("warningNbr") == true
-															|| record
-																	.isModified("cateID") == true) {
-														modfiedArr
-																.push(record
-																		.get("materialID")
+													if (record.isModified("materialName") == true
+															|| record.isModified("dangerNbr") == true
+															|| record.isModified("warningNbr") == true
+															|| record.isModified("cateID") == true) {
+														modfiedArr.push(record.get("materialID")
 																		+ " field_separator "
-																		+ record
-																				.get("materialName")
+																		+ record.get("materialName")
 																		+ " field_separator "
-																		+ record
-																				.get("warningNbr")
+																		+ record.get("warningNbr")
 																		+ " field_separator "
-																		+ record
-																				.get("dangerNbr")
+																		+ record.get("dangerNbr")
 																		+ " field_separator "
-																		+ record
-																				.get("cateID"));
+																		+ record.get("cateID"));
 													}
 												});
 
 								if (modfiedArr.length != 0) {
 									// 獲取分頁表格的當前頁碼！神技！！！
-									var toolbar = materialGrid
-											.getBottomToolbar();
-									currPageIndex = toolbar.readPage(toolbar
-											.getPageData());
+									var toolbar = materialGrid.getBottomToolbar();
+									currPageIndex = toolbar.readPage(toolbar.getPageData());
 
 									var modMaterials = "";
 									for ( var i = 0; i < modfiedArr.length; i++) {
-										modMaterials = modMaterials
-												+ modfiedArr[i]
-												+ " record_separator ";
+										modMaterials = modMaterials + modfiedArr[i] + " record_separator ";
 									}
-									modMaterials = modMaterials.substring(0,
-											modMaterials.length - 18);
+									modMaterials = modMaterials.substring(0, modMaterials.length - 18);
 
-									Ext.Ajax
-											.request({
+									Ext.Ajax.request({
 												url : "../../UpdateMaterial.do",
 												params : {
 													"pin" : pin,

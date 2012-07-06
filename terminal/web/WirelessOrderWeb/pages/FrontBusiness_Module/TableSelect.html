@@ -11,7 +11,6 @@
 <script type="text/javascript" src="../../extjs/ext-base.js"></script>
 <script type="text/javascript" src="../../extjs/ext-all.js"></script>
 <!-- 解决Grid不能选择复制问题 -->
-<script type="text/javascript" src="../../js/GridViewRewrite.js"></script>
 <script type="text/javascript" src="../../extjs/ext-lang-zh_CN.js"></script>
 
 <!-- 实现多选JS -->
@@ -74,6 +73,7 @@
 	var selectedTable = ""; // the current selected table number("" if null)
 	var softKeyBoardTS = null; // table select soft key board
 	var personCountInputWin = null
+	var selectedStatus = null;
 	// person count input pop window
 
 	var pin = ""; // the restaurant pin 
@@ -141,14 +141,14 @@
 
 	<!--    table summary infomation   -->
 	<div id="tableSumInfo">
-		<img title="总台数" src='../../images/table-idle.png'
-			style='float: left;' />
+		<img title="总台数,点击查看" src='../../images/table-idle.png'
+			style="float: left; cursor: pointer;" onClick="switchTableStatus(-1)"  />
 		<div id="allTblDivTS" class="tableStatusChar">000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-		<img title="就餐台数" src='../../images/table-total.png'
-			style='float: left;' />
+		<img title="就餐台数,点击查看" src='../../images/table-total.png'
+			style="float: left; cursor: pointer;" onClick="switchTableStatus(1)" />
 		<div id="usedTbltDivTS" class="tableStatusChar">000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-		<img title="空闲台数" src='../../images/table-used.png'
-			style='float: left;' />
+		<img title="空闲台数,点击查看" src='../../images/table-used.png'
+			style="float: left; cursor: pointer;" onClick="switchTableStatus(0)" />
 		<div id="freeTblDivTS" class="tableStatusChar">000</div>
 	</div>
 

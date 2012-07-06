@@ -163,36 +163,24 @@ var viewBillWin = new Ext.Window(
 			} ],
 			listeners : {
 				"show" : function(thiz) {
-					var billID = billsGrid.getStore().getAt(currRowIndex).get(
-							"orderID");
-					var tableType = billsGrid.getStore().getAt(currRowIndex)
-							.get("orderCategory");
-					var tableNbr = billsGrid.getStore().getAt(currRowIndex)
-							.get("tableAlias");
-					var personNbr = billsGrid.getStore().getAt(currRowIndex)
-							.get("customerNum");
-					var billDate = billsGrid.getStore().getAt(currRowIndex)
-							.get("orderDate");
-					var billPayType = billsGrid.getStore().getAt(currRowIndex)
-							.get("payManner");
-					var payType = billsGrid.getStore().getAt(currRowIndex).get(
-							"payType");
+					var billID = billsGrid.getStore().getAt(currRowIndex).get("orderID");
+					var tableType = billsGrid.getStore().getAt(currRowIndex).get("orderCategory");
+					var tableNbr = billsGrid.getStore().getAt(currRowIndex).get("tableAlias");
+					var personNbr = billsGrid.getStore().getAt(currRowIndex).get("customerNum");
+					var billDate = billsGrid.getStore().getAt(currRowIndex).get("orderDate");
+					var billPayType = billsGrid.getStore().getAt(currRowIndex).get("payManner");
+					var payType = billsGrid.getStore().getAt(currRowIndex).get("payType");
 					var payTypeDescr;
 					if (payType == "1") {
 						payTypeDescr = "一般";
 					} else {
 						payTypeDescr = "会员";
 					}
-					var billServiceRate = billsGrid.getStore().getAt(
-							currRowIndex).get("serviceRate");
-					var billWaiter = billsGrid.getStore().getAt(currRowIndex)
-							.get("staff");
-					var billForFree = billsGrid.getStore().getAt(currRowIndex)
-							.get("giftPrice");
-					var billShouldPay = billsGrid.getStore()
-							.getAt(currRowIndex).get("totalPrice");
-					var billAvtrualPay = billsGrid.getStore().getAt(
-							currRowIndex).get("actualIncome");
+					var billServiceRate = billsGrid.getStore().getAt(currRowIndex).get("serviceRate");
+					var billWaiter = billsGrid.getStore().getAt(currRowIndex).get("staff");
+					var billForFree = billsGrid.getStore().getAt(currRowIndex).get("giftPrice");
+					var billShouldPay = billsGrid.getStore().getAt(currRowIndex).get("totalPrice");
+					var billAvtrualPay = billsGrid.getStore().getAt(currRowIndex).get("actualIncome");
 
 					document.getElementById("billIDBV").innerHTML = billID;
 					document.getElementById("billTypeBV").innerHTML = tableType;
@@ -201,15 +189,11 @@ var viewBillWin = new Ext.Window(
 					document.getElementById("billDateBV").innerHTML = billDate;
 					document.getElementById("payTypeBV").innerHTML = payTypeDescr;
 					document.getElementById("payMannerBV").innerHTML = billPayType;
-					document.getElementById("serviceRateBV").innerHTML = billServiceRate
-							+ "％";
+					document.getElementById("serviceRateBV").innerHTML = billServiceRate + "％";
 					document.getElementById("waiterBV").innerHTML = billWaiter;
-					document.getElementById("forFreeBV").innerHTML = "￥"
-							+ billForFree;
-					document.getElementById("shouldPayBV").innerHTML = "￥"
-							+ billShouldPay;
-					document.getElementById("actrualPayBV").innerHTML = "￥"
-							+ billAvtrualPay;
+					document.getElementById("forFreeBV").innerHTML = "￥" + billForFree;
+					document.getElementById("shouldPayBV").innerHTML = "￥" + billShouldPay;
+					document.getElementById("actrualPayBV").innerHTML = "￥" + billAvtrualPay;
 
 					// 后台：["菜名",菜名编号,厨房编号,"口味",口味编号,数量,￥单价,是否特价,是否推荐,是否停售,是否赠送,折扣率,口味编号2,口味编号3,￥口味价钱,是否時價]
 					Ext.Ajax
@@ -221,8 +205,7 @@ var viewBillWin = new Ext.Window(
 									"queryType" : "History"
 								},
 								success : function(response, options) {
-									var resultJSON = Ext.util.JSON
-											.decode(response.responseText);
+									var resultJSON = Ext.util.JSON.decode(response.responseText);
 									if (resultJSON.success == true) {
 										if (resultJSON.data != "NULL") {
 
@@ -231,51 +214,26 @@ var viewBillWin = new Ext.Window(
 											var orderList = josnData.split("，");
 											for ( var i = 0; i < orderList.length; i++) {
 
-												var orderInfo = orderList[i]
-														.substr(
-																1,
-																orderList[i].length - 2)
-														.split(",");
+												var orderInfo = orderList[i].substr(1, orderList[i].length - 2).split(",");
 												// 实价 = 单价 * 數量 * 折扣 + 口味价钱
-												var singlePrice = parseFloat(orderInfo[6]
-														.substr(
-																2,
-																orderInfo[6].length - 3));
-												var tastePrice = parseFloat(orderInfo[14]
-														.substr(
-																2,
-																orderInfo[14].length - 3));
+												var singlePrice = parseFloat(orderInfo[6].substr(2, orderInfo[6].length - 3));
+												var tastePrice = parseFloat(orderInfo[14].substr(2, orderInfo[14].length - 3));
 												var acturalPrice = 0.0;
-												acturalPrice = singlePrice
-														* parseFloat(orderInfo[5])
-														* parseFloat(orderInfo[11])
-														+ tastePrice;
-												acturalPrice = "￥"
-														+ acturalPrice
-																.toFixed(1);
-												viewBillData
-														.push([
-																orderInfo[0]
-																		.substr(
-																				1,
-																				orderInfo[0].length - 2), // 菜名
+												acturalPrice = singlePrice * parseFloat(orderInfo[5]) * parseFloat(orderInfo[11]) + tastePrice;
+												acturalPrice = "￥" + acturalPrice.toFixed(1);
+												viewBillData.push([
+																orderInfo[0].substr(1, orderInfo[0].length - 2), // 菜名
 																orderInfo[5],// 数量
 																orderInfo[11], // 折扣率
-																orderInfo[3]
-																		.substr(
-																				1,
-																				orderInfo[3].length - 2),// 口味
+																orderInfo[3].substr(1, orderInfo[3].length - 2),// 口味
 																acturalPrice // 实价
 														]);
 
 												// 算總折扣
-												totalDiscount = totalDiscount
-														+ parseFloat(orderInfo[18]);
+												totalDiscount = totalDiscount + parseFloat(orderInfo[18]);
 											}
 
-											document
-													.getElementById("discountBV").innerHTML = "￥"
-													+ totalDiscount.toFixed(1);
+											document.getElementById("discountBV").innerHTML = "￥" + totalDiscount.toFixed(1);
 
 											viewBillStore.reload();
 										}
@@ -700,8 +658,13 @@ var pushBackBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "返回",
 	handler : function(btn) {
-		location.href = "HistoryProtal.html?restaurantID=" + restaurantID
-				+ "&pin=" + pin;
+//		location.href = "HistoryProtal.html?restaurantID=" + restaurantID
+//				+ "&pin=" + pin;
+		location.href = '../PersonLogin.html?restaurantID=' 
+						+ restaurantID 
+						+ '&isNewAccess=false'
+						+ '&pin='
+						+ pin;
 	}
 });
 
@@ -1466,8 +1429,7 @@ var billsColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(), {
 } ]);
 
 var billsGrid;
-Ext
-		.onReady(function() {
+Ext.onReady(function() {
 			// 解决ext中文传入后台变问号问题
 			Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
 			Ext.QuickTips.init();
@@ -1516,9 +1478,7 @@ Ext
 			});
 
 			// 为store配置load监听器(即load完后动作)
-			billsGrid.getStore().on(
-					'load',
-					function() {
+			billsGrid.getStore().on('load', function() {
 						currRowIndex = -1;
 
 						if (billsGrid.getStore().getTotalCount() != 0) {
@@ -1533,27 +1493,6 @@ Ext
 										record.commit();
 									});
 						}
-
-						// // sum the prices
-						// var sumShouldPay = 0;
-						// var sumActualPay = 0;
-						// for ( var i = 0; i < billsGrid.getStore()
-						// .getCount(); i++) {
-						// sumShouldPay = sumShouldPay
-						// + parseFloat(billsGrid.getStore()
-						// .getAt(i).get("totalPrice"));
-						// sumActualPay = sumActualPay
-						// + parseFloat(billsGrid.getStore()
-						// .getAt(i).get(
-						// "actualIncome"));
-						// }
-						// document.getElementById("shouldPaySum").innerHTML =
-						// sumShouldPay
-						// .toFixed(2);
-						// document.getElementById("actualPaySum").innerHTML =
-						// sumActualPay
-						// .toFixed(2);
-
 					});
 
 			billsGrid.getStore().on(
@@ -1648,16 +1587,11 @@ Ext
 								dateEnd = dateFormated.format('Y-m-d');
 							}
 
-							var amountBegin = advSrchForm.findById(
-									"advSrchStartAmt").getValue();
-							var amountEnd = advSrchForm.findById(
-									"advSrchEndAmt").getValue();
-							var seqNumBegin = advSrchForm.findById(
-									"advSrchStartSeqNum").getValue();
-							var seqNumEnd = advSrchForm.findById(
-									"advSrchEndSeqNum").getValue();
-							var tableNumber = advSrchForm.findById(
-									"advSrchTableNbr").getValue();
+							var amountBegin = advSrchForm.findById("advSrchStartAmt").getValue();
+							var amountEnd = advSrchForm.findById("advSrchEndAmt").getValue();
+							var seqNumBegin = advSrchForm.findById("advSrchStartSeqNum").getValue();
+							var seqNumEnd = advSrchForm.findById("advSrchEndSeqNum").getValue();
+							var tableNumber = advSrchForm.findById("advSrchTableNbr").getValue();
 
 							var payManner = payTypeCombAdvSrch.getValue();
 							var in_payManner;
@@ -1727,7 +1661,7 @@ Ext
 					{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
 					businessStatBut, 
 					{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
-//					btnSalesSub,
+					btnSalesSub,
 					"->", pushBackBut,
 					{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
 					logOutBut 

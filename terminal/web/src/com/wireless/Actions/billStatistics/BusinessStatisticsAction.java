@@ -25,6 +25,8 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.QueryShift;
 import com.wireless.db.VerifyPin;
+import com.wireless.db.billStatistics.QueryDutyRange;
+import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.protocol.Terminal;
 
 public class BusinessStatisticsAction extends Action {
@@ -43,9 +45,9 @@ public class BusinessStatisticsAction extends Action {
 		int index = Integer.parseInt(start);
 		int pageSize = Integer.parseInt(limit);
 
-		List resultList = new ArrayList();
-		List outputList = new ArrayList();
-		HashMap rootMap = new HashMap();
+		List<HashMap<String, Object>> resultList = new ArrayList<HashMap<String, Object>>();
+		List<HashMap<String, Object>> outputList = new ArrayList<HashMap<String, Object>>();
+		HashMap<String, Object> rootMap = new HashMap<String, Object>();
 
 		float orderCountAll = 0;
 		float cashAll = 0;
@@ -77,8 +79,7 @@ public class BusinessStatisticsAction extends Action {
 			String sql;
 
 			String pin = request.getParameter("pin");
-			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
-					Terminal.MODEL_STAFF);
+			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF);
 
 			Date dateBegin = null;
 			/**
@@ -86,18 +87,17 @@ public class BusinessStatisticsAction extends Action {
 			 * daily settle history as dateBegin
 			 */
 			if (request.getParameter("dateBegin").equals("")) {
-				sql = " SELECT MIN(order_date) AS date_begin FROM "
-						+ Params.dbName + ".order_history " + " WHERE "
-						+ " restaurant_id = " + term.restaurant_id;
+				sql = " SELECT MIN(on_duty) AS date_begin FROM "	+ 
+					  Params.dbName + ".daily_settle_history " + 
+					  " WHERE "	+ 
+					  " restaurant_id = " + term.restaurant_id;
 				dbCon.rs = dbCon.stmt.executeQuery(sql);
 				if (dbCon.rs.next()) {
-					dateBegin = new Date(dbCon.rs.getTimestamp("date_begin")
-							.getTime());
+					dateBegin = new Date(dbCon.rs.getTimestamp("date_begin").getTime());
 				}
 				dbCon.rs.close();
 			} else {
-				dateBegin = new SimpleDateFormat("yyyy-MM-dd").parse(request
-						.getParameter("dateBegin"));
+				dateBegin = new SimpleDateFormat("yyyy-MM-dd").parse(request.getParameter("dateBegin"));
 			}
 
 			/**
@@ -106,18 +106,17 @@ public class BusinessStatisticsAction extends Action {
 			 */
 			Date dateEnd = null;
 			if (request.getParameter("dateEnd").equals("")) {
-				sql = " SELECT MAX(order_date) AS date_end FROM "
-						+ Params.dbName + ".order_history" + " WHERE "
-						+ "restaurant_id = " + term.restaurant_id;
+				sql = " SELECT MAX(off_duty) AS date_end FROM " + 
+					  Params.dbName + ".daily_settle_history" + 
+					  " WHERE "	+ 
+					  "restaurant_id = " + term.restaurant_id;
 				dbCon.rs = dbCon.stmt.executeQuery(sql);
 				if (dbCon.rs.next()) {
-					dateEnd = new Date(dbCon.rs.getTimestamp("date_end")
-							.getTime());
+					dateEnd = new Date(dbCon.rs.getTimestamp("date_end").getTime());
 				}
 				dbCon.rs.close();
 			} else {
-				dateEnd = new SimpleDateFormat("yyyy-MM-dd").parse(request
-						.getParameter("dateEnd"));
+				dateEnd = new SimpleDateFormat("yyyy-MM-dd").parse(request.getParameter("dateEnd"));
 			}
 
 			Calendar c = Calendar.getInstance();
@@ -126,104 +125,68 @@ public class BusinessStatisticsAction extends Action {
 			while (dateBegin.compareTo(dateEnd) <= 0) {
 				Date datePrev = c.getTime();
 				c.add(Calendar.DATE, 1);
-				sql = " SELECT MIN(on_duty) AS on_duty, MAX(off_duty) AS off_duty FROM "
-						+ Params.dbName
-						+ ".daily_settle_history "
-						+ " WHERE "
-						+ " restaurant_id = "
-						+ term.restaurant_id
-						+ " AND "
-						+ " off_duty BETWEEN "
-						+ "'" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(dateBegin) + "'"
-						+ " AND "
-						+ "'" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(c.getTime()) + "'";
-				dbCon.rs = dbCon.stmt.executeQuery(sql);
 
-				if (dbCon.rs.next()) {
-					String onDuty;
-					java.sql.Timestamp onDutyTS = dbCon.rs
-							.getTimestamp("on_duty");
-					if (onDutyTS == null) {
-						onDuty = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-								.format(dateBegin);
-					} else {
-						onDuty = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-								.format(new Date(dbCon.rs.getTimestamp(
-										"on_duty").getTime()));
-					}
+				DutyRange dutyRange = QueryDutyRange.exec(dbCon, 
+														  term, 
+														  new SimpleDateFormat("yyyy-MM-dd").format(dateBegin), 
+														  new SimpleDateFormat("yyyy-MM-dd").format(c.getTime()));
+				
+				QueryShift.Result result;
+				
+				if (dutyRange != null) {
+					
+					result = QueryShift.exec(dbCon, 
+											term,
+											dutyRange.getOnDuty(), 
+											dutyRange.getOffDuty(), 
+											QueryShift.QUERY_HISTORY);
+					
+				}else{
+					result = new QueryShift.Result();
+				}
+				
+				HashMap<String, Object> resultMap = new HashMap<String, Object>();
 
-					String offDuty;
-					java.sql.Timestamp offDutyTS = dbCon.rs
-							.getTimestamp("on_duty");
-					if (offDutyTS == null) {
-						offDuty = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-								.format(c.getTime());
-					} else {
-						offDuty = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-								.format(new Date(dbCon.rs.getTimestamp(
-										"off_duty").getTime()));
-					}
-					QueryShift.Result result = QueryShift.exec(dbCon, term,
-							onDuty, offDuty, QueryShift.QUERY_HISTORY);
-
-					HashMap resultMap = new HashMap();
-
-					// resultMap.put("statDate", lastDate);
-					resultMap.put("date", new SimpleDateFormat("yyyy-MM-dd")
-							.format(datePrev));
-					resultMap.put("orderCount", result.orderAmount);
-					resultMap.put("cash", result.cashIncome);
-					resultMap.put("bankCard", result.creditCardIncome);
-					resultMap.put("memberCard", result.memberCardIncome);
-					resultMap.put("credit", result.hangIncome);
-					resultMap.put("sign", result.signIncome);
-					resultMap.put("discount", result.discountIncome);
-					resultMap.put("gift", result.giftIncome);
-					resultMap.put("return", result.cancelIncome);
-					resultMap.put("paid", result.paidIncome);
-					resultMap.put("service", result.serviceIncome);
-					float totalIncome = result.cashIncome
-							+ result.creditCardIncome + result.memberCardIncome
-							+ result.signIncome + result.hangIncome;
-					resultMap.put("totalPrice", totalIncome);
-					float totalActual = result.cashIncome2
+				// resultMap.put("statDate", lastDate);
+				resultMap.put("date", new SimpleDateFormat("yyyy-MM-dd").format(datePrev));
+				resultMap.put("orderCount", result.orderAmount);
+				resultMap.put("cash", result.cashIncome);
+				resultMap.put("bankCard", result.creditCardIncome);
+				resultMap.put("memberCard", result.memberCardIncome);
+				resultMap.put("credit", result.hangIncome);
+				resultMap.put("sign", result.signIncome);
+				resultMap.put("discount", result.discountIncome);
+				resultMap.put("gift", result.giftIncome);
+				resultMap.put("return", result.cancelIncome);
+				resultMap.put("paid", result.paidIncome);
+				resultMap.put("service", result.serviceIncome);
+				float totalIncome = result.cashIncome + 
+									result.creditCardIncome + result.memberCardIncome + 
+									result.signIncome + result.hangIncome;
+				resultMap.put("totalPrice", totalIncome);
+				float totalActual = result.cashIncome2
 							+ result.creditCardIncome2
 							+ result.memberCardIncome2 + result.signIncome2
 							+ result.hangIncome2;
-					resultMap.put("actualPrice", totalActual);
+				resultMap.put("actualPrice", totalActual);
 
-					resultMap.put("message", "normal");
+				resultMap.put("message", "normal");
 
-					resultList.add(resultMap);
+				resultList.add(resultMap);
 
-					orderCountAll = (float) Math
-							.round((orderCountAll + result.orderAmount) * 100) / 100;
-					cashAll = (float) Math
-							.round((cashAll + result.cashIncome) * 100) / 100;
-					bankCardAll = (float) Math
-							.round((bankCardAll + result.creditCardIncome) * 100) / 100;
-					memberCardAll = (float) Math
-							.round((memberCardAll + result.memberCardIncome) * 100) / 100;
-					creditAll = (float) Math
-							.round((creditAll + result.hangIncome) * 100) / 100;
-					signAll = (float) Math
-							.round((signAll + result.signIncome) * 100) / 100;
-					discountAll = (float) Math
-							.round((discountAll + result.discountIncome) * 100) / 100;
-					giftAll = (float) Math
-							.round((giftAll + result.giftIncome) * 100) / 100;
-					returnAll = (float) Math
-							.round((returnAll + result.cancelIncome) * 100) / 100;
-					paidAll = (float) Math
-							.round((paidAll + result.paidIncome) * 100) / 100;
-					serviceAll = (float) Math
-							.round((serviceAll + result.serviceIncome) * 100) / 100;
-					totalPriceAll = (float) Math
-							.round((totalPriceAll + totalIncome) * 100) / 100;
-					actualPriceAll = (float) Math
-							.round((actualPriceAll + totalActual) * 100) / 100;
-
-				}
+				orderCountAll = (float)Math.round((orderCountAll + result.orderAmount) * 100) / 100;
+				cashAll = (float) Math.round((cashAll + result.cashIncome) * 100) / 100;
+				bankCardAll = (float) Math.round((bankCardAll + result.creditCardIncome) * 100) / 100;
+				memberCardAll = (float) Math.round((memberCardAll + result.memberCardIncome) * 100) / 100;
+				creditAll = (float) Math.round((creditAll + result.hangIncome) * 100) / 100;
+				signAll = (float) Math.round((signAll + result.signIncome) * 100) / 100;
+				discountAll = (float) Math.round((discountAll + result.discountIncome) * 100) / 100;
+				giftAll = (float) Math.round((giftAll + result.giftIncome) * 100) / 100;
+				returnAll = (float) Math.round((returnAll + result.cancelIncome) * 100) / 100;
+				paidAll = (float) Math.round((paidAll + result.paidIncome) * 100) / 100;
+				serviceAll = (float) Math.round((serviceAll + result.serviceIncome) * 100) / 100;
+				totalPriceAll = (float) Math.round((totalPriceAll + totalIncome) * 100) / 100;
+				actualPriceAll = (float) Math.round((actualPriceAll + totalActual) * 100) / 100;		
 
 				dateBegin = c.getTime();
 			}
@@ -232,7 +195,7 @@ public class BusinessStatisticsAction extends Action {
 
 		} catch (ParseException e) {
 
-			HashMap resultMap = new HashMap();
+			HashMap<String, Object> resultMap = new HashMap<String ,Object>();
 			resultMap.put("message", "日期格式不正确");
 			resultList.add(resultMap);
 			isError = true;
@@ -240,7 +203,7 @@ public class BusinessStatisticsAction extends Action {
 			
 		} catch (SQLException e) {
 
-			HashMap resultMap = new HashMap();
+			HashMap<String, Object> resultMap = new HashMap<String, Object>();
 			resultMap.put("message", "数据查询语句不正确");
 			resultList.add(resultMap);
 			isError = true;
@@ -261,7 +224,7 @@ public class BusinessStatisticsAction extends Action {
 					}
 				}
 
-				HashMap resultMap = new HashMap();
+				HashMap<String, Object> resultMap = new HashMap<String, Object>();
 				resultMap.put("date", "汇总");
 				resultMap.put("orderCount", orderCountAll);
 				resultMap.put("cash", cashAll);

@@ -578,10 +578,9 @@ var historyVerifyWin = new Ext.Window(
 						text : "确定",
 						id : 'btnHistoryVerifyWinSubmit',
 						handler : function() {
-							var historyVerifyPwd = historyVerifyWin.findById(
-									"historyVerifyPwd").getValue();
-							historyVerifyWin.findById("historyVerifyPwd")
-									.setValue("");
+							
+							var historyVerifyPwd = historyVerifyWin.findById("historyVerifyPwd").getValue();
+							historyVerifyWin.findById("historyVerifyPwd").setValue("");
 
 							var pwdTrans;
 							if (historyVerifyPwd != "") {
@@ -604,10 +603,14 @@ var historyVerifyWin = new Ext.Window(
 											var resultJSON = Ext.util.JSON
 													.decode(response.responseText);
 											if (resultJSON.success == true) {
-												location.href = "History_Module/HistoryProtal.html?pin="
-														+ currPin
-														+ "&restaurantID="
-														+ restaurantID;
+//												location.href = "History_Module/HistoryProtal.html?pin="
+//														+ currPin
+//														+ "&restaurantID="
+//														+ restaurantID;
+												location.href = 'History_Module/HistoryStatistics.html?pin='
+													+ currPin 
+													+ '&restaurantID='
+													+ restaurantID;
 											} else {
 												Ext.MessageBox.show({
 													msg : resultJSON.data,

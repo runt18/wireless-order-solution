@@ -51,10 +51,8 @@ public class InventoryInAction extends Action {
 
 			// get the query condition
 
-			int supplierID = Integer.parseInt(request
-					.getParameter("supplierID"));
-			int materialID = Integer.parseInt(request
-					.getParameter("materialID"));
+			int supplierID = Integer.parseInt(request.getParameter("supplierID"));
+			int materialID = Integer.parseInt(request.getParameter("materialID"));
 			float price = Float.parseFloat(request.getParameter("price"));
 			String date = request.getParameter("date");
 			int deptID = Integer.parseInt(request.getParameter("deptID"));
@@ -86,8 +84,7 @@ public class InventoryInAction extends Action {
 			float thisPrice = dbCon.rs.getFloat("price");
 			dbCon.rs.close();
 
-			float allPrice = (float) Math
-					.round((totalStock * thisPrice + amount * price) * 100) / 100;
+			float allPrice = (float) Math.round((totalStock * thisPrice + amount * price) * 100) / 100;
 			float allStock = (float) Math.round((totalStock + amount) * 100) / 100;
 			float newPrice = (float) Math.round((allPrice / allStock) * 100) / 100;
 

@@ -123,8 +123,7 @@ public class DeptStatisticsAction extends Action {
 
 				orderClause = orderClause + " ORDER BY dept_id";
 
-				orderFoods = OrderFoodReflector.getDetailHistory(dbCon, condition,
-						orderClause);
+				orderFoods = OrderFoodReflector.getDetailHistory(dbCon, condition, orderClause);
 			}
 
 			/**
@@ -149,7 +148,7 @@ public class DeptStatisticsAction extends Action {
 					// String orderDate = new
 					// SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 					// .format(new Date(orderFood.orderDate));
-					int dept = orderFood.kitchen.deptID;
+					int dept = orderFood.kitchen.dept.deptID;
 
 					if (/* !orderDate.equals(lastDate) || */dept != lastDept) {
 						if (rowCount != 0) {

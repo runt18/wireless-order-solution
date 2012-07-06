@@ -599,9 +599,10 @@ DROP TABLE IF EXISTS `wireless_order_db`.`material_detail` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`material_detail` (
   `id` INT NOT NULL AUTO_INCREMENT ,
-  `restaurant_id` INT UNSIGNED NOT NULL ,
-  `supplier_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the supplier alias id that this material detail record belong to' ,
-  `material_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the material alias id that this material detail record belong to' ,
+  `restaurant_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the restaurant id that this material detial belongs to' ,
+  `supplier_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the supplier id that this material detail record belong to' ,
+  `material_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the material id that this material detail record belong to' ,
+  `food_id` INT NOT NULL DEFAULT 0 COMMENT 'the food id that this material detail record belong to' ,
   `price` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the price to this material record' ,
   `price_prev` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the previous price to this material detail record' ,
   `date` DATETIME NULL DEFAULT NULL COMMENT 'the date to this material detail record' ,
@@ -613,14 +614,10 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`material_detail` (
   `type` TINYINT NOT NULL DEFAULT 0 COMMENT 'the type is as below.\n0 : 消耗\n1 : 报损 \n2 : 销售\n3 : 退货\n4 : 出仓\n5 : 入库\n6 : 调出\n7 : 调入\n8 : 盘点' ,
   `comment` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the comment to this material detail' ,
   PRIMARY KEY (`id`) ,
-  INDEX `fk_material_detail_restaurant` (`restaurant_id` ASC) ,
-  CONSTRAINT `fk_material_detail_restaurant`
-    FOREIGN KEY (`restaurant_id` )
-    REFERENCES `wireless_order_db`.`restaurant` (`id` )
-    ON DELETE RESTRICT
-    ON UPDATE RESTRICT)
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8;
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the material detail to history' ;
 
 
 -- -----------------------------------------------------
@@ -709,6 +706,7 @@ COMMENT = 'the daily settle history to each restaurant' ;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
 
 
 -- -----------------------------------------------------

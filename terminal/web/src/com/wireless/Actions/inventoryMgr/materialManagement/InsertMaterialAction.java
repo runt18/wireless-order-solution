@@ -50,8 +50,7 @@ public class InsertMaterialAction extends Action {
 					Terminal.MODEL_STAFF);
 
 			// get the query condition
-			int materialAlias = Integer.parseInt(request
-					.getParameter("materialAlias"));
+			int materialAlias = Integer.parseInt(request.getParameter("materialAlias"));
 			String materialName = request.getParameter("materialName");
 			String materialWarning = request.getParameter("materialWarning");
 			String materialDanger = request.getParameter("materialDanger");

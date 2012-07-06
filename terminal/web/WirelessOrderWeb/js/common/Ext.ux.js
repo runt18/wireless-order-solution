@@ -1,4 +1,41 @@
-/*******************************************************************************
+/*************************************
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ */
+
+
+/*************************************
+ * 部分通用显示格式
+ */
+Ext.ux.txtFormat = {
+	barMsg : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{0}:&nbsp;<span id="{1}" style="color:green; font-size:15px; font-weight:bold;">{2}</span>',
+	barSum : '<span style="font-weight:bold; font-size:13px;">总计</span>',
+	linkClassOne : '<a id="{0}" href="{1}" onClick="{2}" style="color:green; font-size:15px; font-weight:bold;">{3}</a>',
+	gridDou : function(_v){
+		return _v != '' ? parseFloat(_v).toFixed(2) : _v;
+	}
+};
+
+
+
+/*************************************
+ * 解决DateField在Firefox宽度过长问题
+ */
+Ext.override(Ext.menu.DateMenu,{   
+    render : function(){   
+        Ext.menu.DateMenu.superclass.render.call(this);   
+        if(Ext.isGecko){   
+            this.picker.el.dom.childNodes[0].style.width = '178px';   
+            this.picker.el.dom.style.width = '178px';   
+        }   
+    }   
+}); 
+
+/*************************************
  * 字符串高效拼接(类似StringBuffer)
  */
 function StringBuilder() {
@@ -11,7 +48,7 @@ StringBuilder.prototype.toString = function() {
 	return this.__string__.join("");
 };
 
-/*******************************************************************************
+/*************************************
  * 
  * 创建GridPanel
  * 
@@ -27,7 +64,7 @@ StringBuilder.prototype.toString = function() {
  *            url 服务器地址
  * @param {}
  *            cmData 设定显示的列 ---------
- *            数据格式[[true,true]['列名','数据的字段名','列宽','指定自定义的方法去改变值的显示方式']]
+ *            数据格式[[是否自动生成行号,是否可以多选,是否加载数据,是否分页]['列名','数据的字段名','列宽','对齐方式','自定义显示']]
  * @param {}
  *            readerData 要显示列的对应该数据的字段名 ---------
  *            数据格式['activityName','activityAddress','contact','startDate','endDate']
@@ -45,12 +82,12 @@ StringBuilder.prototype.toString = function() {
  * @return {}
  */
 createGridPanel = function(id, title, height, width, url, cmData, readerData,
-		baseParams, pageSize, groupName,tbar,bbar) {
+		baseParams, pageSize, groupName, tbar, bbar) {
 
-	this.g_ckbox = new Ext.grid.CheckboxSelectionModel({
-				handleMouseDown : Ext.emptyFn	//只能通过点击复选框才能选中
-			}); // 复选框
-	this.g_rowNum = new Ext.grid.RowNumberer(); // 自动行号
+	var g_ckbox = new Ext.grid.CheckboxSelectionModel({
+				handleMouseDown : Ext.emptyFn	//只能通过点击复选框才能选中复选框
+			}); 
+	var g_rowNum = new Ext.grid.RowNumberer(); // 自动行号
 
 	/** 列模型的格式 * */
 	var g_cmData = new Array();
@@ -72,8 +109,13 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 			sb.append(data[2]);
 		}
 		if (data.length > 3 && data[3] != '' && data[3].length > 0) {
-			sb.append(",renderer:");
+			sb.append(",align:'");
 			sb.append(data[3]);
+			sb.append("'");
+		}
+		if (data.length > 4 && data[4] != '' && data[4].length > 0) {
+			sb.append(",renderer:");
+			sb.append(data[4]);
 		}
 
 		sb.append("}");
@@ -84,13 +126,13 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 	}
 
 	/** 构造列模型 * */
-	this.g_cm = new Ext.grid.ColumnModel(g_cmData);
+	var g_cm = new Ext.grid.ColumnModel(g_cmData);
 
 	/** 支持排序 * */
 	g_cm.defaultSortable = true;
 
 	/** 服务器地址 * */
-	this.g_proxy = new Ext.data.HttpProxy({
+	var g_proxy = new Ext.data.HttpProxy({
 				url : url
 			});
 
@@ -106,7 +148,7 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 			eval("g_readerData.push(" + sb_rd.toString()+")");
 		}
 	}
-
+	
 	/** 读取返回数据 * */
 	var g_reader = new Ext.data.JsonReader({
 				totalProperty : 'totalProperty',
@@ -142,8 +184,6 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 		g_store.baseParams[param[0]] = param[1];
 	}
 	
-	g_store.baseParams['start'] = 0;
-	g_store.baseParams['limit'] = pageSize;
 	/** 加载数据 * */
 //	g_store.load({
 //				params : {
@@ -153,7 +193,7 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 //			});
 
 	/** 构造下工具条 * */
-	var g_bbar = "";
+	var g_bbar = '';
 //	if(bbar==false){
 //		g_bbar = new Ext.PagingToolbar({
 //				pageSize : pageSize,
@@ -161,14 +201,13 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 //			});
 //	}else{
 			g_bbar = new Ext.PagingToolbar({
+				beforePageText: '第',
+				afterPageText: '页 , 共 {0} 页',	
 				pageSize : pageSize,
 				store : g_store,
-//				plugins : new Ext.ux.PageSizePlugin(),
 				displayInfo : true,
-				displayMsg : '显示第{0}~{1}条记录，共{2}条',
-				emptyMsg : "没有记录"
-//				items : [groupName == '' ? '' : b_groupBtn, b_printBtn]
-//				,items : b_groupBtn
+				displayMsg : '第 {0} ~ {1} 条记录, 共 {2} 条',
+				emptyMsg : '没有记录'
 			});
 //	}
 	/** 构造数据列表 * */
@@ -187,7 +226,6 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 		autoScroll : true,
 		height : height, // 高度
 		width : width, // 宽度
-		// autoExpandColumn:2, // 让第二列的宽度自动伸展
 		trackMouseOver : true,// 鼠标悬浮
 		autoSizeColumns: true,// 自动分配列宽
 		viewConfig : {
@@ -205,8 +243,7 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 			right : 0,
 			left : 0
 		},
-//		view : groupName == '' ? new Ext.grid.GridView : g_groupView, // 数据分组显示
-//		bbar : g_bbar, // 加载下工具条
+		bbar : cmData[0][3] ? g_bbar : null, // 加载下工具条
 		tbar : typeof tbar != 'undefined' ? (Ext.isArray(tbar)==true?tbar[0]:tbar) :null // 加载上工具条
 		});
 	
@@ -223,6 +260,11 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 			}
 		}
 	});
+	
+	// 是否加载数据
+	if (cmData[0][2]){
+		g_store.load({params : { start:0, limit:pageSize} });
+	}
 	
 	return g_gridPanel;
 };

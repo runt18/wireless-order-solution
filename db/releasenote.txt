@@ -13,6 +13,8 @@ Release v1.1.5 <21/06/2012>
 1 - order_food和order_food_history表增加"taste_tmp_alias"字段
 2 - order_food和order_food_hisotry表增加"taste_tmp"字段
 3 - order_food和order_food_hisotry表增加"taste_tmp_price"字段
+4 - material_detial表增加"food_id"字段
+5 - 删除material_detail表与restaurant表的外键关联
 ******************************************************************************************************/
 
 /******************************************************************************************************

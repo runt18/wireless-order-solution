@@ -4,6 +4,8 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TimeZone;
@@ -25,56 +27,56 @@ public class QueryShift {
 		public DeptIncome(Department dept){
 			this.dept = dept;
 		}
-		public Department dept;			//Ä³¸ö²¿ÃÅµÄĞÅÏ¢
-		public float gift;				//Ä³¸ö²¿ÃÅµÄÔùËÍ¶î
-		public float discount;			//Ä³¸ö²¿ÃÅµÄÕÛ¿Û¶î
-		public float income;			//Ä³¸ö²¿ÃÅµÄÓªÒµ¶î
+		public Department dept;			//æŸä¸ªéƒ¨é—¨çš„ä¿¡æ¯
+		public float gift;				//æŸä¸ªéƒ¨é—¨çš„èµ é€é¢
+		public float discount;			//æŸä¸ªéƒ¨é—¨çš„æŠ˜æ‰£é¢
+		public float income;			//æŸä¸ªéƒ¨é—¨çš„è¥ä¸šé¢
 	}
 	
 	public static class Result{
-		public String onDuty;			//¿ªÊ¼Ê±¼ä
-		public String offDuty;			//½áÊøÊ±¼ä
+		public String onDuty;			//å¼€å§‹æ—¶é—´
+		public String offDuty;			//ç»“æŸæ—¶é—´
 		
-		public int orderAmount;			//×ÜÕËµ¥Êı
+		public int orderAmount;			//æ€»è´¦å•æ•°
 		
-		public int cashAmount;			//ÏÖ½ğÕËµ¥Êı
-		public float cashIncome;		//ÏÖ½ğ½ğ¶î
-		public float cashIncome2;		//ÏÖ½ğÊµÊÕ
+		public int cashAmount;			//ç°é‡‘è´¦å•æ•°
+		public float cashIncome;		//ç°é‡‘é‡‘é¢
+		public float cashIncome2;		//ç°é‡‘å®æ”¶
 		
-		public int creditCardAmount;	//Ë¢¿¨ÕËµ¥Êı
-		public float creditCardIncome;	//Ë¢¿¨½ğ¶î
-		public float creditCardIncome2;	//Ë¢¿¨ÊµÊÕ
+		public int creditCardAmount;	//åˆ·å¡è´¦å•æ•°
+		public float creditCardIncome;	//åˆ·å¡é‡‘é¢
+		public float creditCardIncome2;	//åˆ·å¡å®æ”¶
 		
-		public int memeberCardAmount;	//»áÔ±¿¨ÕËµ¥Êı
-		public float memberCardIncome;	//»áÔ±¿¨½ğ¶î
-		public float memberCardIncome2;	//»áÔ±¿¨ÊµÊÕ
+		public int memeberCardAmount;	//ä¼šå‘˜å¡è´¦å•æ•°
+		public float memberCardIncome;	//ä¼šå‘˜å¡é‡‘é¢
+		public float memberCardIncome2;	//ä¼šå‘˜å¡å®æ”¶
 		
-		public int signAmount;			//Ç©µ¥ÕËµ¥Êı
-		public float signIncome;		//Ç©µ¥½ğ¶î
-		public float signIncome2;		//Ç©µ¥ÊµÊÕ
+		public int signAmount;			//ç­¾å•è´¦å•æ•°
+		public float signIncome;		//ç­¾å•é‡‘é¢
+		public float signIncome2;		//ç­¾å•å®æ”¶
 		
-		public int hangAmount;			//¹ÒÕËÕËµ¥Êı
-		public float hangIncome;		//¹ÒÕË½ğ¶î
-		public float hangIncome2;		//¹ÒÕËÊµÊÕ
+		public int hangAmount;			//æŒ‚è´¦è´¦å•æ•°
+		public float hangIncome;		//æŒ‚è´¦é‡‘é¢
+		public float hangIncome2;		//æŒ‚è´¦å®æ”¶
 		
-		public float totalActual;		//ºÏ¼ÆÊµÊÕ½ğ¶î
+		public float totalActual;		//åˆè®¡å®æ”¶é‡‘é¢
 		
-		public int discountAmount;		//ÕÛ¿ÛÕËµ¥Êı
-		public float discountIncome;	//ºÏ¼ÆÕÛ¿Û½ğ¶î
+		public int discountAmount;		//æŠ˜æ‰£è´¦å•æ•°
+		public float discountIncome;	//åˆè®¡æŠ˜æ‰£é‡‘é¢
 		
-		public int giftAmount;			//ÔùËÍÕËµ¥Êı
-		public float giftIncome;		//ºÏ¼ÆÔùËÍ½ğ¶î
+		public int giftAmount;			//èµ é€è´¦å•æ•°
+		public float giftIncome;		//åˆè®¡èµ é€é‡‘é¢
 		
-		public int cancelAmount;		//ÍË²ËÕËµ¥Êı
-		public float cancelIncome;		//ºÏ¼ÆÍË²Ë½ğ¶î
+		public int cancelAmount;		//é€€èœè´¦å•æ•°
+		public float cancelIncome;		//åˆè®¡é€€èœé‡‘é¢
 		
-		public int serviceAmount;		//·şÎñ·ÑÕËµ¥Êı
-		public float serviceIncome;		//·şÎñ·Ñ½ğ¶î
+		public int serviceAmount;		//æœåŠ¡è´¹è´¦å•æ•°
+		public float serviceIncome;		//æœåŠ¡è´¹é‡‘é¢
 		
-		public int paidAmount;			//·´½áÕÊÕËµ¥Êı
-		public float paidIncome;		//·´½áÕÊ½ğ¶î
+		public int paidAmount;			//åç»“å¸è´¦å•æ•°
+		public float paidIncome;		//åç»“å¸é‡‘é¢
 		
-		public DeptIncome[] deptIncome;	//ËùÓĞ²¿ÃÅÓªÒµ¶î
+		public DeptIncome[] deptIncome;	//æ‰€æœ‰éƒ¨é—¨è¥ä¸šé¢
 	}
 	
 	/**
@@ -162,79 +164,6 @@ public class QueryShift {
 		return exec(dbCon, term, onDuty, offDuty, QUERY_TODAY);
 
 	}
-	
-	/**
-	 * Perform to get the latest shift information. 
-	 * @param dbCon
-	 *            the database connection
-	 * @param pin
-	 *            the pin to this terminal
-	 * @param model
-	 *            the model to this terminal
-	 * @return the shift detail information
-	 * @return the shift detail information
-	 * @throws BusinessException
-	 * 			  throws if one the cases below.<br>
-	 *             - The terminal is NOT attached to any restaurant.<br>
-	 *             - The terminal is expired.<br>
-	 *             - The member to query does NOT exist.
-	 *             - No shift record exist.
-	 * @throws SQLException
-	 * 				throws if fail to execute any SQL statement
-	 */
-//	public static Result execLatest(long pin, short model) throws BusinessException, SQLException{
-//		DBCon dbCon = new DBCon();
-//		try{
-//			dbCon.connect();
-//			return execLatest(dbCon, pin, model);
-//		}finally{
-//			dbCon.disconnect();
-//		}
-//		
-//	}
-	
-	/**
-	 * Perform to get the latest shift information. 
-	 * @param dbCon
-	 *            the database connection
-	 * @param pin
-	 *            the pin to this terminal
-	 * @param model
-	 *            the model to this terminal
-	 * @return the shift detail information
-	 * @return the shift detail information
-	 * @throws BusinessException
-	 * 			  throws if one the cases below.<br>
-	 *             - The terminal is NOT attached to any restaurant.<br>
-	 *             - The terminal is expired.<br>
-	 *             - The member to query does NOT exist.
-	 *             - No shift record exist.
-	 * @throws SQLException
-	 * 				throws if fail to execute any SQL statement
-	 */
-//	public static Result execLatest(DBCon dbCon, long pin, short model) throws BusinessException, SQLException{
-//		
-//		Terminal term = VerifyPin.exec(dbCon, pin, model);
-//		
-//		/**
-//		 * Get the latest on & off duty date
-//		 */
-//		String onDuty;
-//		String offDuty;
-//		String sql = "SELECT on_duty, off_duty FROM " + Params.dbName + ".shift WHERE restaurant_id=" + term.restaurant_id +
-//					 " ORDER BY off_duty desc LIMIT 1";
-//		dbCon.rs = dbCon.stmt.executeQuery(sql);
-//		if(dbCon.rs.next()){
-//			onDuty = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(dbCon.rs.getTimestamp("on_duty"));
-//			offDuty = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(dbCon.rs.getTimestamp("off_duty"));
-//		}else{
-//			throw new BusinessException("No shift record to restaurant(id=" + term.restaurant_id + ") exist.");
-//		}
-//		dbCon.rs.close();
-//		
-//		return exec(dbCon, term, onDuty, offDuty, false);
-//		
-//	}
 	
 	/**
 	 * Generate the details to shift within the on & off duty date.
@@ -373,130 +302,130 @@ public class QueryShift {
 		HashMap<Long, Float> hangIncomeByOrder = new HashMap<Long, Float>();
 		HashMap<Long, Float> signIncomeByOrder = new HashMap<Long, Float>();
 		
-		HashMap<Short, DeptIncome> deptIncome = new HashMap<Short, DeptIncome>();
+		HashMap<Department, DeptIncome> deptIncome = new HashMap<Department, DeptIncome>();
 		for(Department dept : QueryMenu.queryDepartments(dbCon, term.restaurant_id, null, null)){
-			deptIncome.put(dept.deptID, new DeptIncome(dept));
+			deptIncome.put(dept, new DeptIncome(dept));
 		}
-		for(SingleOrderFood orderFood : orderFoods){
+		for(SingleOrderFood singleOrderFood : orderFoods){
 			
-			orderID.add(orderFood.orderID);
+			orderID.add(singleOrderFood.orderID);
 			
 			/**
 			 * Calculate the total cash income during this period
 			 */	
-			if(!orderFood.food.isGift() && orderFood.payManner == Order.MANNER_CASH){
-				result.cashIncome += orderFood.calcPriceWithService();
-				if(cashIncomeByOrder.containsKey(orderFood.orderID)){
-					cashIncomeByOrder.put(orderFood.orderID, cashIncomeByOrder.get(orderFood.orderID) + orderFood.calcPriceWithService());
+			if(!singleOrderFood.food.isGift() && singleOrderFood.payManner == Order.MANNER_CASH){
+				result.cashIncome += singleOrderFood.calcPriceWithService();
+				if(cashIncomeByOrder.containsKey(singleOrderFood.orderID)){
+					cashIncomeByOrder.put(singleOrderFood.orderID, cashIncomeByOrder.get(singleOrderFood.orderID) + singleOrderFood.calcPriceWithService());
 				}else{
-					cashIncomeByOrder.put(orderFood.orderID, orderFood.calcPriceWithService());
+					cashIncomeByOrder.put(singleOrderFood.orderID, singleOrderFood.calcPriceWithService());
 				}
 			}
 			
 			/**
 			 * Calculate the total credit card income during this period
 			 */	
-			if(!orderFood.food.isGift() && orderFood.payManner == Order.MANNER_CREDIT_CARD){
-				result.creditCardIncome += orderFood.calcPriceWithService();
-				if(creditIncomeByOrder.containsKey(orderFood.orderID)){
-					creditIncomeByOrder.put(orderFood.orderID, creditIncomeByOrder.get(orderFood.orderID) + orderFood.calcPriceWithService());
+			if(!singleOrderFood.food.isGift() && singleOrderFood.payManner == Order.MANNER_CREDIT_CARD){
+				result.creditCardIncome += singleOrderFood.calcPriceWithService();
+				if(creditIncomeByOrder.containsKey(singleOrderFood.orderID)){
+					creditIncomeByOrder.put(singleOrderFood.orderID, creditIncomeByOrder.get(singleOrderFood.orderID) + singleOrderFood.calcPriceWithService());
 				}else{
-					creditIncomeByOrder.put(orderFood.orderID, orderFood.calcPriceWithService());
+					creditIncomeByOrder.put(singleOrderFood.orderID, singleOrderFood.calcPriceWithService());
 				}
 			}
 			
 			/**
 			 * Calculate the total member card income during this period
 			 */	
-			if(!orderFood.food.isGift() && orderFood.payManner == Order.MANNER_MEMBER){
-				result.memberCardIncome += orderFood.calcPriceWithService();
-				if(memberCardIncomeByOrder.containsKey(orderFood.orderID)){
-					memberCardIncomeByOrder.put(orderFood.orderID, memberCardIncomeByOrder.get(orderFood.orderID) + orderFood.calcPriceWithService());
+			if(!singleOrderFood.food.isGift() && singleOrderFood.payManner == Order.MANNER_MEMBER){
+				result.memberCardIncome += singleOrderFood.calcPriceWithService();
+				if(memberCardIncomeByOrder.containsKey(singleOrderFood.orderID)){
+					memberCardIncomeByOrder.put(singleOrderFood.orderID, memberCardIncomeByOrder.get(singleOrderFood.orderID) + singleOrderFood.calcPriceWithService());
 				}else{
-					memberCardIncomeByOrder.put(orderFood.orderID, orderFood.calcPriceWithService());
+					memberCardIncomeByOrder.put(singleOrderFood.orderID, singleOrderFood.calcPriceWithService());
 				}
 			}
 			
 			/**
 			 * Calculate the total hang income during this period
 			 */	
-			if(!orderFood.food.isGift() && orderFood.payManner == Order.MANNER_HANG){
-				result.hangIncome += orderFood.calcPriceWithService();
-				if(hangIncomeByOrder.containsKey(orderFood.orderID)){
-					hangIncomeByOrder.put(orderFood.orderID, hangIncomeByOrder.get(orderFood.orderID) + orderFood.calcPriceWithService());
+			if(!singleOrderFood.food.isGift() && singleOrderFood.payManner == Order.MANNER_HANG){
+				result.hangIncome += singleOrderFood.calcPriceWithService();
+				if(hangIncomeByOrder.containsKey(singleOrderFood.orderID)){
+					hangIncomeByOrder.put(singleOrderFood.orderID, hangIncomeByOrder.get(singleOrderFood.orderID) + singleOrderFood.calcPriceWithService());
 				}else{
-					hangIncomeByOrder.put(orderFood.orderID, orderFood.calcPriceWithService());
+					hangIncomeByOrder.put(singleOrderFood.orderID, singleOrderFood.calcPriceWithService());
 				}
 			}
 			
 			/**
 			 * Calculate the total sign income during this period
 			 */	
-			if(!orderFood.food.isGift() && orderFood.payManner == Order.MANNER_SIGN){
-				result.signIncome += orderFood.calcPriceWithService();
-				if(signIncomeByOrder.containsKey(orderFood.orderID)){
-					signIncomeByOrder.put(orderFood.orderID, signIncomeByOrder.get(orderFood.orderID) + orderFood.calcPriceWithService());
+			if(!singleOrderFood.food.isGift() && singleOrderFood.payManner == Order.MANNER_SIGN){
+				result.signIncome += singleOrderFood.calcPriceWithService();
+				if(signIncomeByOrder.containsKey(singleOrderFood.orderID)){
+					signIncomeByOrder.put(singleOrderFood.orderID, signIncomeByOrder.get(singleOrderFood.orderID) + singleOrderFood.calcPriceWithService());
 				}else{
-					signIncomeByOrder.put(orderFood.orderID, orderFood.calcPriceWithService());
+					signIncomeByOrder.put(singleOrderFood.orderID, singleOrderFood.calcPriceWithService());
 				}
 			}
 			
 			/**
 			 * Calculate the gift, discount, income to each department during this period
 			 */
-			DeptIncome income = deptIncome.get(orderFood.kitchen.deptID);
+			DeptIncome income = deptIncome.get(singleOrderFood.kitchen.dept);
 			if(income != null){
-				if(orderFood.food.isGift()){
-					income.gift += orderFood.calcPriceWithTaste();
+				if(singleOrderFood.food.isGift()){
+					income.gift += singleOrderFood.calcPriceWithTaste();
 				}else{
-					income.income += orderFood.calcPriceWithTaste();
+					income.income += singleOrderFood.calcPriceWithTaste();
 				}
 				
-				if(orderFood.discount < 1){
-					income.discount += orderFood.calcDiscountPrice();
+				if(singleOrderFood.discount < 1){
+					income.discount += singleOrderFood.calcDiscountPrice();
 				}
 				
-				deptIncome.put(orderFood.kitchen.deptID, income);
+				deptIncome.put(singleOrderFood.kitchen.dept, income);
 			}
 			
 			/**
 			 * Calculate the price to all cancelled food during this period
 			 */
-			if(orderFood.orderCount < 0){
-				result.cancelIncome += Math.abs(orderFood.calcPriceWithTaste());
-				cancelOrderID.add(orderFood.orderID);
+			if(singleOrderFood.orderCount < 0){
+				result.cancelIncome += Math.abs(singleOrderFood.calcPriceWithTaste());
+				cancelOrderID.add(singleOrderFood.orderID);
 			}
 			
 			/**
 			 * Calculate the price to all gifted food during this period
 			 */
-			if(orderFood.food.isGift()){
-				result.giftIncome += orderFood.calcPriceWithTaste();
-				giftOrderID.add(orderFood.orderID);
+			if(singleOrderFood.food.isGift()){
+				result.giftIncome += singleOrderFood.calcPriceWithTaste();
+				giftOrderID.add(singleOrderFood.orderID);
 			}
 			
 			/**
 			 * Calculate the price to all discount food during this period
 			 */
-			if(orderFood.discount < 1){
-				result.discountIncome += orderFood.calcDiscountPrice();
-				discountOrderID.add(orderFood.orderID);
+			if(singleOrderFood.discount < 1){
+				result.discountIncome += singleOrderFood.calcDiscountPrice();
+				discountOrderID.add(singleOrderFood.orderID);
 			}
 			
 			/**
 			 * Calculate the price to all paid income during this period
 			 */
-			if(orderFood.isPaid){
-				result.paidIncome += orderFood.calcPriceWithTaste();
-				paidOrderID.add(orderFood.orderID);
+			if(singleOrderFood.isPaid){
+				result.paidIncome += singleOrderFood.calcPriceWithTaste();
+				paidOrderID.add(singleOrderFood.orderID);
 			}
 			
 			/**
 			 * Calculate the price to service income during this period
 			 */
-			if(orderFood.serviceRate > 0){
-				result.serviceIncome += orderFood.calcPriceWithTaste() * orderFood.serviceRate;
-				serviceOrderID.add(orderFood.orderID);
+			if(singleOrderFood.serviceRate > 0){
+				result.serviceIncome += singleOrderFood.calcPriceWithTaste() * singleOrderFood.serviceRate;
+				serviceOrderID.add(singleOrderFood.orderID);
 			}
 		}
 		
@@ -600,6 +529,25 @@ public class QueryShift {
 				validDeptIncomes.add(income);
 			}
 		}
+		
+		/**
+		 * Sort the income in ascending order by department id. 
+		 */
+		Collections.sort(validDeptIncomes, new Comparator<DeptIncome>(){
+
+			@Override
+			public int compare(DeptIncome income1, DeptIncome income2) {
+				if(income1.dept.deptID == income2.dept.deptID){
+					return 0;
+				}else if(income1.dept.deptID < income2.dept.deptID){
+					return -1;
+				}else{
+					return 1;
+				}
+			}
+			
+		});
+		
 		result.deptIncome = validDeptIncomes.toArray(new DeptIncome[validDeptIncomes.size()]);
 		
 		return result;

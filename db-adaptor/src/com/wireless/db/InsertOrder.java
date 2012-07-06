@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import com.wireless.exception.BusinessException;
+import com.wireless.protocol.Department;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
@@ -322,7 +323,7 @@ public class InsertOrder {
 							(orderToInsert.foods[i].tmpTaste == null ? "NULL" : orderToInsert.foods[i].tmpTaste.aliasID) + ", " +
 							(orderToInsert.foods[i].tmpTaste == null ? "NULL" : ("'" + orderToInsert.foods[i].tmpTaste.preference + "'")) + ", " +
 							(orderToInsert.foods[i].tmpTaste == null ? "NULL" : orderToInsert.foods[i].tmpTaste.getPrice()) + ", " +
-							"(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + orderToInsert.foods[i].kitchen.aliasID + "), " +
+							(orderToInsert.foods[i].isTemporary ? Department.DEPT_TEMP : "(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + orderToInsert.foods[i].kitchen.aliasID + ")") + ", " +
 							"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + orderToInsert.foods[i].kitchen.aliasID + "), " + 
 							orderToInsert.foods[i].kitchen.aliasID + ", '" + 
 							term.owner + "', NOW(), " + 

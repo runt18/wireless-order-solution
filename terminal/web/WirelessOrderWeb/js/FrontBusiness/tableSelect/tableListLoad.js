@@ -84,8 +84,10 @@ function tableSelectOnLoad() {
 	getData();
 
 	// 展開區域樹節點
-	regionTree.expandAll();
-
+	if(typeof(regionTree) != 'undefined'){
+		regionTree.expandAll();
+	}
+	
 	// update the operator name
 	getOperatorName(pin, "../../");
 

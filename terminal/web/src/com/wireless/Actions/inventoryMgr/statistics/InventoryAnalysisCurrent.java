@@ -1,6 +1,7 @@
 package com.wireless.Actions.inventoryMgr.statistics;
 
 import java.io.IOException;
+
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
@@ -28,7 +29,9 @@ import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Terminal;
 
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class InventoryAnalysisCurrent extends Action {
+
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -97,7 +100,7 @@ public class InventoryAnalysisCurrent extends Action {
 			 */
 			
 			String sql = " SELECT b.cate_id, a.material_id, b.name as materialCate_name, c.name as material_name, "
-					+ " sum(a.stock) as stock, sum(a.price) as price "
+					+ " sum(a.stock) as stock, a.price as price "
 					+ " FROM "
 					+ Params.dbName
 					+ ".material_dept a, "
@@ -114,7 +117,7 @@ public class InventoryAnalysisCurrent extends Action {
 					+ " GROUP BY b.cate_id, materialCate_name, a.material_id, material_name "
 					+ " ORDER BY b.cate_id, materialCate_name, a.material_id, material_name ";
 
-
+			
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 
 			/**
@@ -126,16 +129,14 @@ public class InventoryAnalysisCurrent extends Action {
 
 				HashMap resultMap = new HashMap();
 				resultMap.put("materialCateID", dbCon.rs.getInt("cate_id"));
-				resultMap.put("materialCateName",
-						dbCon.rs.getString("materialCate_name"));
+				resultMap.put("materialCateName", dbCon.rs.getString("materialCate_name"));
 				resultMap.put("groupID", groupID);
 				resultMap.put("groupDescr", "");
 				resultMap.put("materialID", dbCon.rs.getInt("material_id"));
 				resultMap.put("materialName", dbCon.rs.getString("material_name"));
 				resultMap.put("singlePrice", dbCon.rs.getFloat("price"));
 				resultMap.put("amount", dbCon.rs.getFloat("stock"));
-				sumPrice = (float) Math
-						.round(dbCon.rs.getFloat("price") * dbCon.rs.getFloat("stock") * 100) / 100;
+				sumPrice = (float) Math.round(dbCon.rs.getFloat("price") * dbCon.rs.getFloat("stock") * 100) / 100;
 				resultMap.put("sumPrice", sumPrice);
 
 				resultMap.put("message", "normal");
@@ -202,7 +203,7 @@ public class InventoryAnalysisCurrent extends Action {
 
 			String outputJson = obj.toString();
 
-			//System.out.println(outputJson);
+//			System.out.println(outputJson);
 
 			out.write(outputJson);
 		}

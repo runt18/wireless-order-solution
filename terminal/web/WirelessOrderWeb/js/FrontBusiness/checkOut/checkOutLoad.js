@@ -8,12 +8,9 @@ function checkOutOnLoad() {
 
 	var tableNum = Request["tableNbr"];
 	var persCount = Request["personCount"];
-	document.getElementById("tblNbrDivTS").innerHTML = tableNum
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-	document.getElementById("perCountDivTS").innerHTML = persCount
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-	document.getElementById("minCostDivTS").innerHTML = Request["minCost"]
-			+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+	document.getElementById("tblNbrDivTS").innerHTML = tableNum + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+	document.getElementById("perCountDivTS").innerHTML = persCount + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+	document.getElementById("minCostDivTS").innerHTML = Request["minCost"] + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 	if (Request["minCost"] == "0") {
 		document.getElementById("minCostDivTS").style["display"] = "none";
 		document.getElementById("minCostImgTS").style["display"] = "none";
@@ -287,8 +284,7 @@ function checkOutOnLoad() {
 																					var minCost = Request["minCost"];
 																					if (parseFloat(minCost) > parseFloat(sPay)) {
 																						sPay = minCost;
-																						Ext.MessageBox
-																								.show({
+																						Ext.MessageBox.show({
 																									msg : "消费额小于最低消费额，是否继续结帐？",
 																									width : 300,
 																									buttons : Ext.MessageBox.YESNO,
@@ -375,6 +371,25 @@ function checkOutOnLoad() {
 				}
 			});
 
+	Ext.Ajax.request({
+		url : '../../QueryDetail.do',
+		params : {
+			'time' : new Date(),
+			'limit' : 200,
+			'start' : 0,
+			'pin' : Request['pin'],
+			'queryType' : 'TodayByTbl',
+			'tableAlias' : Request['tableNbr'],
+			'restaurantID' : Request['restaurantID']
+		},
+		success : function(response, options){
+//			alert(response.responseText)
+			createBackFoodDetail(Ext.util.JSON.decode(response.responseText));
+		},
+		failure : function(response, options){
+			createBackFoodDetail(null);
+		}
+	});
 };
 
 function moneyCount(opt) {
@@ -439,3 +454,127 @@ function moneyCount(opt) {
 		}
 	}
 };
+
+createBackFoodDetail = function(_data){
+	
+	if(_data == null || typeof _data == 'undefined' || typeof _data.root == 'undefined' || _data.root.length == 0){
+		return;
+	}
+	
+	backFoodDetailData = {totalProperty:0, root:[]};
+	var backFoodPrice = 0.00, sumAmount = 0.00;
+	
+	var item = null;
+	for(var i = 0; i < _data.root.length ; i++){		
+		item = _data.root[i];
+		if(typeof(item.amount) != 'undefined' && parseFloat(item.amount) < 0){
+			item.amount = Math.abs(item.amount);
+			item.backFoodPrice = Math.abs(parseFloat(item['unit_price'] * item.amount));			
+			backFoodDetailData.root.push(item);
+			backFoodPrice += parseFloat(item.backFoodPrice);
+			sumAmount += parseFloat(item.amount);
+		}
+	}
+	
+	if(backFoodDetailData.root.length <= 0){
+		return;
+	}
+	backFoodPrice = backFoodPrice.toFixed(2);
+	sumAmount = sumAmount.toFixed(2);
+	backFoodDetailData.root.push({
+		food_name : '汇总',		
+		amount : sumAmount,
+		backFoodPrice : backFoodPrice
+	});
+	backFoodDetailData.totalProperty = backFoodDetailData.root.length;
+	
+	Ext.getDom('backFoodAmount_div').innerHTML = backFoodPrice + '&nbsp;<a href="#" onClick="showBackFoodDetail()">查看</a>';
+	
+};
+
+var showBackFoodDetailWin = null;
+showBackFoodDetail = function(){
+		 
+	if(!showBackFoodDetailWin){
+		
+		var grid = new Ext.grid.GridPanel({
+			id : 'showBackFoodDetailWinGrid',
+			border : false,
+			width : 900,
+			height : 300,
+			stripeRows : true,
+			animate : false,
+			animCollapse : true,
+			loadMask : { msg: '数据请求中，请稍后...' },
+			cm : new Ext.grid.ColumnModel([
+			    new Ext.grid.RowNumberer(),
+			    {header:'名称', dataIndex:'food_name', width:180},
+			    {header:'日期', dataIndex:'order_date', width:130},			    
+			    {header:'单价', dataIndex:'unit_price', width:80, align:'right', renderer:Ext.ux.txtFormat.gridDou},
+			    {header:'退菜数量', dataIndex:'amount', width:80, align:'right', renderer:Ext.ux.txtFormat.gridDou},
+			    {header:'退菜金额', dataIndex:'backFoodPrice', width:80, align:'right', renderer:Ext.ux.txtFormat.gridDou},
+			    {header:'厨房', dataIndex:'kitchen', width:100},
+			    {header:'服务员', dataIndex:'waiter', width:70},
+			    {header:'备注', dataIndex:'comment', width:150}
+			]),
+			ds : new Ext.data.Store({
+				proxy : new Ext.data.MemoryProxy(backFoodDetailData),
+				reader : new Ext.data.JsonReader({
+					totalProperty : 'totalProperty',
+					root : 'root'
+				},
+				[
+				 	{name:'food_name'},
+				 	{name:'order_date'},
+				 	{name:'unit_price'},
+				 	{name:'amount'},
+				 	{name:'backFoodPrice'},
+				 	{name:'kitchen'},
+				 	{name:'waiter'},
+				 	{name:'comment'}
+				 ]
+				)
+			})
+		});		
+		
+		showBackFoodDetailWin  = new Ext.Window({
+			title : '退菜明细',
+			resizable : false,
+			modal : true,
+			closable : false,
+			constrainHeader : true,
+			draggable : false,
+			items : [grid],
+			buttons : [
+				{
+					text : '退出',
+					handler : function(){
+						showBackFoodDetailWin.hide();
+					}
+				}
+			]			
+		});
+		
+		grid.getStore().on('load', function(store){
+			var count = store.getCount();
+			if(count > 0){
+				var sumRow = grid.getView().getRow(count - 1);
+				sumRow.style.backgroundColor = '#EEEEEE';
+				sumRow.style.color = 'green';
+				for(var i = 0; i < grid.getColumnModel().getColumnCount(); i++){
+					if(i == 0 || 3 || 4){
+						var item = grid.getView().getCell(count-1, i);
+						item.style.fontSize = '15px';
+						item.style.fontWeight = 'bold';
+						item = null;
+					}
+				}
+			}
+		});
+	}
+	
+	showBackFoodDetailWin.show();
+	Ext.getCmp('showBackFoodDetailWinGrid').getStore().reload();
+};
+
+
