@@ -6,6 +6,7 @@ import java.util.Iterator;
 
 import com.wireless.dbReflect.OrderFoodReflector;
 import com.wireless.exception.BusinessException;
+import com.wireless.protocol.Department;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
@@ -408,7 +409,7 @@ public class UpdateOrder {
 						(extraFoods.get(i).tmpTaste == null ? "NULL" : extraFoods.get(i).tmpTaste.aliasID) + ", " +
 						(extraFoods.get(i).tmpTaste == null ? "NULL" : ("'" + extraFoods.get(i).tmpTaste.preference + "'")) + ", " +
 						(extraFoods.get(i).tmpTaste == null ? "NULL" : extraFoods.get(i).tmpTaste.getPrice()) + ", " +
-						"(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + extraFoods.get(i).kitchen.aliasID + "), " + 
+						(extraFoods.get(i).isTemporary ? Department.DEPT_TEMP : "(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + extraFoods.get(i).kitchen.aliasID + ")") + ", " + 
 						"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + extraFoods.get(i).kitchen.aliasID + "), " + 
 						extraFoods.get(i).kitchen.aliasID + ", '" + 
 						term.owner + "', " +
@@ -455,7 +456,7 @@ public class UpdateOrder {
 						(canceledFoods.get(i).tmpTaste == null ? "NULL" : canceledFoods.get(i).tmpTaste.aliasID) + ", " +
 						(canceledFoods.get(i).tmpTaste == null ? "NULL" : ("'" + canceledFoods.get(i).tmpTaste.preference + "'")) + ", " +
 						(canceledFoods.get(i).tmpTaste == null ? "NULL" : canceledFoods.get(i).tmpTaste.getPrice()) + ", " +
-						"(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + canceledFoods.get(i).kitchen.aliasID + "), " + 
+						(canceledFoods.get(i).isTemporary ? Department.DEPT_TEMP : "(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + canceledFoods.get(i).kitchen.aliasID + ")") + ", " + 
 						"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + canceledFoods.get(i).kitchen.aliasID + "), " + 
 						canceledFoods.get(i).kitchen.aliasID + ", '" + 
 						term.owner + "', " +

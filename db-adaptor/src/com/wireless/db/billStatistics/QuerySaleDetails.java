@@ -73,10 +73,17 @@ public class QuerySaleDetails {
 							" AND MATE_DETAIL.date BETWEEN '" + dutyRange.getOnDuty() + "' AND '" + dutyRange.getOffDuty() + "'", 
 							"");
 		
+		/**
+		 * Get all the basic info to department 
+		 */
 		HashMap<Department, SalesDetail> deptSalesDetail = new HashMap<Department, SalesDetail>();
 		for(Department dept : QueryMenu.queryDepartments(dbCon, term.restaurant_id, null, null)){
 			deptSalesDetail.put(dept, new SalesDetail(dept.name));
 		}
+		/**
+		 * Put the temporary department
+		 */
+		deptSalesDetail.put(new Department("临时菜", Department.DEPT_TEMP, term.restaurant_id), new SalesDetail("临时菜"));
 			
 		/**
 		 * Calculate the gift, discount, income to each department during this period
