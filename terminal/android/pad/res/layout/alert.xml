@@ -1,97 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  android:layout_width="fill_parent"
-  android:layout_height="fill_parent"
-  android:orientation="vertical"
-  android:background="#FFFFFF"
-  >
-    <RelativeLayout 
-  android:id="@+id/l1"
-  android:layout_width="fill_parent"
-  android:layout_height="50dip"
-  android:background="#000000"
-  android:gravity="center_vertical"
-  >
-  <TextView 
-  android:id="@+id/ordername"
-  android:layout_width="wrap_content"
-  android:layout_height="wrap_content"
-  android:textColor="#FFFFFF"
-  android:textSize="20sp"
-  android:typeface="serif"
-  android:textStyle="bold"
-  android:layout_marginTop="5dip"
-  />
-  
-  
-</RelativeLayout>
-  
-   <RelativeLayout 
-      android:id="@+id/l2"
-      android:layout_width="fill_parent"
-      android:layout_height="wrap_content"
-      android:layout_below="@id/l1"
-       >
-  <TextView 
-  android:id="@+id/table"
-  android:layout_width="wrap_content"
-  android:layout_height="wrap_content"
-  android:textColor="#000000"
-  android:textSize="18sp"
-  android:layout_marginTop="20dip"
-  android:layout_marginLeft="10dip"
-  />
-  <EditText 
-  android:id="@+id/mycount"
-  android:layout_width="300dip"
-  android:layout_height="wrap_content"
-  android:textColor="#000000"
-  android:textSize="18sp"
-  android:typeface="sans"
-  android:textStyle="bold"
-  android:background="@drawable/input"
-  android:layout_marginLeft="5dip"
-  android:layout_toRightOf="@id/table"
-  android:inputType="numberSigned|text"  
-  android:digits="0123456789." 
-  android:focusableInTouchMode="true"
-  android:singleLine="true" 
-  android:layout_marginTop="10dip"
-  />  
-  
-  </RelativeLayout> 
-  
-  
-  <RelativeLayout 
-  android:layout_width="fill_parent"
-  android:layout_height="wrap_content"
-  android:gravity="center_vertical"
-  android:layout_below="@id/l2"
-  android:paddingTop="10dip"
-  android:paddingBottom="10dip"
-  >
-  
-   
-    <Button 
-  android:id="@+id/confirm"
-  android:layout_width="60dip"
-  android:layout_height="wrap_content"
-  android:layout_centerVertical="true"
-  android:src="@drawable/yes_selector"
-  android:layout_marginLeft="60dip"
-  />
-  
-    <Button 
-  android:id="@+id/alert_cancel"
-  android:layout_width="60dip"
-  android:layout_height="wrap_content"
-  android:layout_marginLeft="10dip"
-  android:layout_toRightOf="@id/confirm"
-  android:layout_centerVertical="true"
-  android:src="@drawable/cancle_selector"
-  />
-  </RelativeLayout>
-  
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#FFFFFF"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/l1"
+        android:layout_width="fill_parent"
+        android:layout_height="50dip"
+        android:background="#000000"
+        android:gravity="center_vertical" >
+
+        <TextView
+            android:id="@+id/ordername"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dip"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:typeface="serif" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/l2"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/l1" >
+
+        <TextView
+            android:id="@+id/table"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dip"
+            android:layout_marginTop="20dip"
+            android:textColor="#000000"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/mycount"
+            android:layout_width="300dip"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dip"
+            android:layout_marginTop="10dip"
+            android:layout_toRightOf="@id/table"
+            android:background="@drawable/input"
+            android:digits="0123456789."
+            android:focusableInTouchMode="true"
+            android:inputType="numberSigned|text"
+            android:singleLine="true"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:typeface="sans" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/l2"
+        android:gravity="center_vertical"
+        android:paddingBottom="10dip"
+        android:paddingTop="10dip" >
+
+        <Button
+            android:id="@+id/confirm"
+            android:layout_width="60dip"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="60dip"
+            android:src="@drawable/yes_selector" />
+
+        <Button
+            android:id="@+id/alert_cancel"
+            android:layout_width="60dip"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dip"
+            android:layout_toRightOf="@id/confirm"
+            android:src="@drawable/cancle_selector" />
+    </RelativeLayout>
 
 </RelativeLayout>

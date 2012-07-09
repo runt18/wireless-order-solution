@@ -449,7 +449,7 @@ public class OrderFoodListView extends ExpandableListView {
 					public void onClick(View v) {	
 						_selectedPos = childPosition;
 						//new AskOrderAmountDialog(_foods.get(childPosition)).show();
-						OrderAmountDialog(_foods.get(childPosition));
+						showOrderAmountDialog(_foods.get(childPosition));
 					}
 				});
 				
@@ -507,13 +507,13 @@ public class OrderFoodListView extends ExpandableListView {
 										@Override
 										protected void onPwdPass(Context context) {
 										
-											AskCancleFood(_foods.get(childPosition));
+											showCancelAmountDialog(_foods.get(childPosition));
 											//new AskCancelAmountDialog(_foods.get(childPosition)).show();
 										}
 									};
 								} else {
 									//new AskCancelAmountDialog(_foods.get(childPosition)).show();
-									AskCancleFood(_foods.get(childPosition));
+									showCancelAmountDialog(_foods.get(childPosition));
 								}
 							}
 						});
@@ -776,27 +776,38 @@ public class OrderFoodListView extends ExpandableListView {
 
 	/**
 	 * 提示输入删除数量的Dialog
-	 * @author FaRong.Zhang
-	 *
-	 */
-	
-	private void AskCancleFood(final OrderFood selectedFood){
-		final EditText editText = new EditText(getContext());
+	 */	
+	private void showCancelAmountDialog(final OrderFood selectedFood){
+		final EditText amountEdtTxt = new EditText(getContext());
+		amountEdtTxt.setInputType(InputType.TYPE_CLASS_NUMBER);
 		// 删除数量默认为此菜品的点菜数量
-		editText.setText(Util.float2String2(selectedFood.getCount()));
-		// 光标置到数量最后面，方面修改
-		editText.setSelection(editText.getText().length());
-		editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-		new AlertDialog.Builder(getContext())
+		amountEdtTxt.setText(Util.float2String2(selectedFood.getCount()));
+		// 光标置到数量最后面
+		amountEdtTxt.setSelection(amountEdtTxt.getText().length());
+		
+		final AlertDialog cancelAmtDialog = new AlertDialog.Builder(getContext())
 			.setTitle("请输入"+ selectedFood.name + "的删除数量")
-			.setView(editText)
+			.setView(amountEdtTxt)
 			.setNeutralButton("确定",
 				new DialogInterface.OnClickListener() {
 					@Override
-					public void onClick(DialogInterface dialog,	int which){
+					public void onClick(DialogInterface dialog,	int which){					
+						
+					}
+				})
+			.setNegativeButton("取消", null)
+			.create();
+		
+		cancelAmtDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+			
+			@Override
+			public void onShow(DialogInterface dialog) {
+				cancelAmtDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(new View.OnClickListener() {
+
+					@Override
+					public void onClick(View view) {
 						float foodAmount = selectedFood.getCount();
-						float cancelAmount = Float.parseFloat(editText
-								.getText().toString());
+						float cancelAmount = Float.parseFloat(amountEdtTxt.getText().toString());
 
 						if (foodAmount == cancelAmount) {
 							/**
@@ -804,33 +815,31 @@ public class OrderFoodListView extends ExpandableListView {
 							 */
 							_foods.remove(selectedFood);
 							_adapter.notifyDataSetChanged();
-							Toast.makeText(
-									getContext(),
-									"删除\"" + selectedFood.toString() + "\""
-											+ cancelAmount + "份成功", 1).show();
-
+							Toast.makeText(getContext(), "删除\"" + selectedFood.toString() + "\""	+ cancelAmount + "份成功", 1).show();
+							cancelAmtDialog.dismiss();
+							
 						} else if (foodAmount > cancelAmount) {
 							/**
 							 * 如果删除数量少于已点数量，则相应减去删除数量
 							 */
 							selectedFood.setCount(foodAmount - cancelAmount);
 							_adapter.notifyDataSetChanged();
-							Toast.makeText(
-									getContext(),
-									"删除\"" + selectedFood.toString() + "\""
-											+ cancelAmount + "份成功", 1).show();
+							Toast.makeText(getContext(), "删除\"" + selectedFood.toString() + "\"" + cancelAmount + "份成功", 1).show();
+							cancelAmtDialog.dismiss();
 
 						} else {
 							new AlertDialog.Builder(getContext()).setTitle("提示")
-									.setMessage("你输入的删除数量大于已点数量, 请重新输入")
-									.setNeutralButton("确定", null).show();
+								.setMessage("你输入的删除数量大于已点数量, 请重新输入")
+								.setNeutralButton("确定", null)
+								.show();
 						}
-						
-						
-					}
-				})
-			.setNegativeButton("取消", null)
-			.show();
+					}				
+				});
+			}
+		});
+		
+		cancelAmtDialog.show();
+		
 	}
 	
 	/**
@@ -896,233 +905,56 @@ public class OrderFoodListView extends ExpandableListView {
 	 * @author FaRong.Zhang
 	 *
 	 */
-	public void OrderAmountDialog(final OrderFood selectedFood){
+	public void showOrderAmountDialog(final OrderFood selectedFood){
 		
-		final EditText editText = new EditText(getContext());
+		final EditText orderAmtEdtTxt = new EditText(getContext());
 
-		new AlertDialog.Builder(getContext())
+		orderAmtEdtTxt.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+		
+		final AlertDialog orderAmtDialog = new AlertDialog.Builder(getContext())
 			.setTitle("请输入" + selectedFood.name + "的点菜数量")
-			.setView(editText)
+			.setView(orderAmtEdtTxt)
 			.setNeutralButton("确定",
 				new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog,	int which){
+
+					}
+				})
+			.setNegativeButton("取消", null)
+			.create();
+		
+		orderAmtDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+			
+			@Override
+			public void onShow(DialogInterface dialog) {
+				orderAmtDialog.getButton(DialogInterface.BUTTON_NEUTRAL).setOnClickListener(new View.OnClickListener() {
+					
+					@Override
+					public void onClick(View v) {
 						try{
-							float orderAmount = Float.parseFloat(editText.getText().toString());
+							float orderAmount = Float.parseFloat(orderAmtEdtTxt.getText().toString());
 							
 			       			if(orderAmount > 255){
 			       				Toast.makeText(getContext(), "对不起，\"" + selectedFood.toString() + "\"最多只能点255份", 0).show();
 			       			}else{
 			       				selectedFood.setCount(orderAmount);
 			       				_adapter.notifyDataSetChanged();
-								
+								orderAmtDialog.dismiss();
 			       			}
 						
 						}catch(NumberFormatException e){
 							Toast.makeText(getContext(), "您输入的数量格式不正确，请重新输入", 0).show();
 						}
 					}
-				})
-			.setNegativeButton("取消", null)
-			.show();
+				});
+			}
+		});
+		
+		orderAmtDialog.show();
 	}
 	
 	
-	/**
-	 * 点击菜品列表后的扩展功能 Dialog
-	 */
-//	private class ExtOperDialg extends Dialog {
-//
-//		ExtOperDialg(final OrderFood selectedFood) {
-//			super(OrderFoodListView.this.getContext(), R.style.FullHeightDialog);
-//			setContentView(R.layout.item_alert);
-//			// getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
-//			((TextView) findViewById(R.id.ordername)).setText("请选择"
-//					+ selectedFood.name + "的操作");
-//			if (_type == Type.INSERT_ORDER) {
-//				/**
-//				 * 新点菜是扩展功能为"删菜"、"口味"、"叫起/取消叫起"
-//				 */
-//				// 删菜功能
-//				((TextView) findViewById(R.id.item1Txt)).setText("删菜");
-//				((RelativeLayout) findViewById(R.id.r1))
-//						.setOnClickListener(new View.OnClickListener() {
-//							@Override
-//							public void onClick(View arg0) {
-//								dismiss();
-//								new AskCancelAmountDialog(selectedFood).show();
-//							}
-//						});
-//
-//				// 口味功能
-//				((TextView) findViewById(R.id.item2Txt)).setText("口味");
-//				((RelativeLayout) findViewById(R.id.r2))
-//						.setOnClickListener(new View.OnClickListener() {
-//							@Override
-//							public void onClick(View arg0) {
-//								if (_operListener != null) {
-//									dismiss();
-//									_operListener.onPickTaste(selectedFood);
-//								}
-//							}
-//						});
-//
-//				// 叫起/取消叫起
-//				if (selectedFood.hangStatus == OrderFood.FOOD_NORMAL) {
-//					((TextView) findViewById(R.id.item3Txt)).setText("叫起");
-//				} else {
-//					((TextView) findViewById(R.id.item3Txt)).setText("取消叫起");
-//				}
-//				((RelativeLayout) findViewById(R.id.r3))
-//						.setOnClickListener(new View.OnClickListener() {
-//							@Override
-//							public void onClick(View arg0) {
-//								if (selectedFood.hangStatus == OrderFood.FOOD_NORMAL) {
-//									selectedFood.hangStatus = OrderFood.FOOD_HANG_UP;
-//									((TextView) findViewById(R.id.item3Txt))
-//											.setText("取消叫起");
-//									dismiss();
-//								} else {
-//									selectedFood.hangStatus = OrderFood.FOOD_NORMAL;
-//									((TextView) findViewById(R.id.item3Txt))
-//											.setText("叫起");
-//									dismiss();
-//								}
-//							}
-//						});
-//
-//			} else {
-//				/**
-//				 * 已点菜的扩展功能为"退菜"、"即起"、"催菜/取消催菜"
-//				 */
-//				// 退菜功能
-//				((TextView) findViewById(R.id.item1Txt)).setText("退菜");
-//				((RelativeLayout) findViewById(R.id.r1))
-//						.setOnClickListener(new View.OnClickListener() {
-//							@Override
-//							public void onClick(View arg0) {
-//								dismiss();
-//								if (WirelessOrder.restaurant.pwd3 != null) {
-//									new AskPwdDialog(getContext(),
-//											AskPwdDialog.PWD_5) {
-//										@Override
-//										protected void onPwdPass(Context context) {
-//											dismiss();
-//											new AskCancelAmountDialog(
-//													selectedFood).show();
-//										}
-//									}.show();
-//								} else {
-//									new AskCancelAmountDialog(selectedFood)
-//											.show();
-//								}
-//							}
-//						});
-//
-//				// 如果菜品是叫起状态，显示"即起"功能
-//				if (selectedFood.hangStatus == OrderFood.FOOD_HANG_UP
-//						|| selectedFood.hangStatus == OrderFood.FOOD_IMMEDIATE) {
-//					if (selectedFood.hangStatus == OrderFood.FOOD_HANG_UP) {
-//						((TextView) findViewById(R.id.item2Txt)).setText("即起");
-//					} else {
-//						((TextView) findViewById(R.id.item2Txt))
-//								.setText("重新叫起");
-//					}
-//					((RelativeLayout) findViewById(R.id.r2))
-//							.setOnClickListener(new View.OnClickListener() {
-//								@Override
-//								public void onClick(View arg0) {
-//									if (selectedFood.hangStatus == OrderFood.FOOD_HANG_UP) {
-//										selectedFood.hangStatus = OrderFood.FOOD_IMMEDIATE;
-//										((TextView) findViewById(R.id.item2Txt))
-//												.setText("即起");
-//										dismiss();
-//
-//									} else if (selectedFood.hangStatus == OrderFood.FOOD_IMMEDIATE) {
-//										selectedFood.hangStatus = OrderFood.FOOD_HANG_UP;
-//										((TextView) findViewById(R.id.item2Txt))
-//												.setText("重新叫起");
-//										dismiss();
-//									}
-//								}
-//							});
-//
-//					// 催菜/取消催菜功能
-//					if (selectedFood.isHurried) {
-//						((TextView) findViewById(R.id.item3Txt))
-//								.setText("取消催菜");
-//					} else {
-//						((TextView) findViewById(R.id.item3Txt)).setText("催菜");
-//					}
-//					((RelativeLayout) findViewById(R.id.r3))
-//							.setOnClickListener(new View.OnClickListener() {
-//								@Override
-//								public void onClick(View arg0) {
-//									if (selectedFood.isHurried) {
-//										selectedFood.isHurried = false;
-//										((TextView) findViewById(R.id.item3Txt))
-//												.setText("催菜");
-//										dismiss();
-//
-//									} else {
-//										selectedFood.isHurried = true;
-//										((TextView) findViewById(R.id.item3Txt))
-//												.setText("取消催菜");
-//										dismiss();
-//									}
-//								}
-//							});
-//
-//				} else {
-//
-//					// 催菜/取消催菜功能
-//					if (selectedFood.isHurried) {
-//						((TextView) findViewById(R.id.item2Txt))
-//								.setText("取消催菜");
-//					} else {
-//						((TextView) findViewById(R.id.item2Txt)).setText("催菜");
-//					}
-//					((RelativeLayout) findViewById(R.id.r2))
-//							.setOnClickListener(new View.OnClickListener() {
-//								@Override
-//								public void onClick(View arg0) {
-//									if (selectedFood.isHurried) {
-//										selectedFood.isHurried = false;
-//										((TextView) findViewById(R.id.item2Txt))
-//												.setText("催菜");
-//										dismiss();
-//
-//									} else {
-//										selectedFood.isHurried = true;
-//										((TextView) findViewById(R.id.item2Txt))
-//												.setText("取消催菜");
-//										dismiss();
-//									}
-//								}
-//							});
-//
-//					((RelativeLayout) findViewById(R.id.r3))
-//							.setVisibility(View.GONE);
-//				}
-//			}
-//
-//			// 返回Button
-//			Button cancelBtn = (Button) findViewById(R.id.back);
-//			cancelBtn.setOnClickListener(new View.OnClickListener() {
-//				@Override
-//				public void onClick(View v) {
-//					dismiss();
-//				}
-//			});
-//		}
-//
-//		@Override
-//		protected void onStop() {
-//			// trim(_selectedFood);
-//			_adapter.notifyDataSetChanged();
-//		}
-//	}
-
 	public static interface OnChangedListener {
 		public void onSourceChanged();
 	}

@@ -8,7 +8,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.text.InputType;
 
+import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
+
 import com.wireless.common.WirelessOrder;
 
 
@@ -19,8 +22,8 @@ public class AskPwdDialog{
 	public static final int PWD_3 = 2;		//店长权限密码
 	public static final int PWD_5 = 3;		//退菜密码
 	private int _pwdType = PWD_1;
-	private EditText _pwdEdtTxt;
 	private Context _context;
+	private EditText _pwdEdtTxt;
 	
 	public AskPwdDialog(Context context, int pwdType) {
 	
@@ -38,16 +41,30 @@ public class AskPwdDialog{
 		}	
 		/**
 		 * 新建一个弹出框，然后初始化一个EditText
-		 * */
-    	final EditText editText = new EditText(context);
-		editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-		new AlertDialog.Builder(context)
+		 **/
+    	_pwdEdtTxt = new EditText(context);
+    	_pwdEdtTxt.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+		final AlertDialog askPwdDialog = new AlertDialog.Builder(context)
 			.setTitle(title)
-			.setView(editText)
+			.setView(_pwdEdtTxt)
 			.setNeutralButton("确定",
 				new DialogInterface.OnClickListener() {
 					@Override
-					public void onClick(DialogInterface dialog,	int which){
+					public void onClick(DialogInterface dialog,	int which){					
+						
+					}
+				})
+			.setNegativeButton("取消", null)
+			.create();
+		
+		askPwdDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+			
+			@Override
+			public void onShow(DialogInterface dialog) {
+				askPwdDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(new View.OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
 						MessageDigest digester;
 						try {
 							//Convert the password into MD5
@@ -58,6 +75,7 @@ public class AskPwdDialog{
 						     * 否则提示密码输入错误
 						     */
 						    if(isPass(digester.digest())){
+						    	askPwdDialog.dismiss();
 						    	onPwdPass(_context);				    	
 						    }else{
 						    	onPwdFail(_context);
@@ -65,12 +83,12 @@ public class AskPwdDialog{
 						}catch(NoSuchAlgorithmException e) {
 							
 						} 
-						
-						
-					}
-				})
-			.setNegativeButton("取消", null)
-			.show();
+					}						
+				});			
+			}
+		});
+		
+		askPwdDialog.show();
 	}
 	
 	
@@ -91,11 +109,7 @@ public class AskPwdDialog{
 	 * @param context
 	 */
 	protected void onPwdFail(Context context){
-    	new AlertDialog.Builder(context)
-				.setTitle("提示")
-				.setMessage("密码不正确，请重新输入")
-				.setNeutralButton("确定", null)
-				.show();
+    	Toast.makeText(_context, "密码不正确，请重新输入", 0).show();
     	_pwdEdtTxt.selectAll();
 	}
 	
