@@ -155,7 +155,7 @@ function menuMgrOnLoad() {
 					keichenInfo[1] // 厨房id
 					]);
 				}
-				kitchenTypeData.push([ 255, "空","" ]);
+				kitchenTypeData.push([ 255, "空", -1 ]);
 				menuStore.reload();
 			} else {
 				var dataInfo = resultJSON.data;

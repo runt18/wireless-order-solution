@@ -328,8 +328,7 @@ var kitchenTypeStoreMM = new Ext.data.Store({
 	listeners : {
 		load : function() {
 			// 解決combo初始值問題
-			Ext.getCmp('kitchenTypeCombMM').setValue(
-					menuStore.getAt(currRowIndex).get("kitchenAlias"));
+			Ext.getCmp('kitchenTypeCombMM').setValue(menuStore.getAt(currRowIndex).get("kitchenAlias"));
 		}
 	}
 });
@@ -350,20 +349,21 @@ var kitchenTypeCombMM = new Ext.form.ComboBox({
 	allowBlank : false
 });
 
-menuModifyWin = new Ext.Window(
-		{
-			layout : "fit",
-			title : "修改菜谱",
-			width : 245,
-			height : 255,
-			closeAction : "hide",
-			resizable : false,
-			items : [ {
-				layout : "form",
-				labelWidth : 30,
-				border : false,
-				frame : true,
-				items : [ {
+menuModifyWin = new Ext.Window({
+	layout : "fit",
+	title : "修改菜谱",
+	width : 245,
+	height : 255,
+	closeAction : "hide",
+	resizable : false,
+	items : [
+	     {
+			layout : "form",
+			labelWidth : 30,
+			border : false,
+			frame : true,
+			items : [ 
+			    {
 					xtype : "numberfield",
 					fieldLabel : "编号",
 					id : "menuModNumber",
@@ -449,113 +449,90 @@ menuModifyWin = new Ext.Window(
 					} ]
 				} ]
 			} ],
-			buttons : [
-					{
-						text : "确定",
-						handler : function() {
-							if (menuModifyWin.findById("menuModNumber")
-									.isValid()
-									&& menuModifyWin.findById("menuModName")
-											.isValid()
-									&& menuModifyWin.findById("menuModSpill")
-											.isValid()
-									&& menuModifyWin.findById("menuModPrice")
-											.isValid()) {
-								isPrompt = false;
-								menuModifyWin.hide();
+			buttons : [{
+			    text : "确定",
+				handler : function() {
+			    if (menuModifyWin.findById("menuModNumber").isValid()
+									&& menuModifyWin.findById("menuModName").isValid()
+									&& menuModifyWin.findById("menuModSpill").isValid()
+									&& menuModifyWin.findById("menuModPrice").isValid()) {
+					isPrompt = false;
+					menuModifyWin.hide();
 
-								var foodID = menuStore.getAt(currRowIndex).get(
-										"foodID");
-								var dishNumber = menuModifyWin.findById(
-										"menuModNumber").getValue();
-								var dishName = menuModifyWin.findById(
-										"menuModName").getValue();
-								var dishSpill = menuModifyWin.findById(
-										"menuModSpill").getValue();
-								var dishPrice = menuModifyWin.findById(
-										"menuModPrice").getValue();
-								var kitchenAlias = kitchenTypeCombMM.getValue();
-								// 前台：kitchenTypeData：[厨房编号,厨房名称,厨房id]
-								var kitchenId = 0;
-								for ( var i = 0; i < kitchenTypeData.length; i++) {
-									if (kitchenAlias == kitchenTypeData[i][0]) {
-										kitchenId = kitchenTypeData[i][2];
+					var foodID = menuStore.getAt(currRowIndex).get("foodID");
+					var dishNumber = menuModifyWin.findById("menuModNumber").getValue();
+					var dishName = menuModifyWin.findById("menuModName").getValue();
+					var dishSpill = menuModifyWin.findById("menuModSpill").getValue();
+					var dishPrice = menuModifyWin.findById("menuModPrice").getValue();
+					var kitchenAlias = kitchenTypeCombMM.getValue();
+					// 前台：kitchenTypeData：[厨房编号,厨房名称,厨房id]
+					var kitchenId = 0;
+					for ( var i = 0; i < kitchenTypeData.length; i++) {
+						if (kitchenAlias == kitchenTypeData[i][0]) {
+							kitchenId = kitchenTypeData[i][2];
+						}
+					}
+
+					var isSpecial = menuModifyWin.findById("specialCheckboxMM").getValue();
+					var isRecommend = menuModifyWin.findById("recommendCheckboxMM").getValue();
+					var isFree = menuModifyWin.findById("freeCheckboxMM").getValue();
+					var isStop = menuModifyWin.findById("stopCheckboxMM").getValue();
+					var isCurrPrice = menuModifyWin.findById("currPriceCheckboxMM").getValue();
+
+					Ext.Ajax.request({
+						url : "../../UpdateMenu.do",
+						params : {
+							"pin" : Request["pin"],
+							"foodID" : foodID,
+							"dishNumber" : dishNumber,
+							"dishName" : dishName,
+							"dishSpill" : dishSpill,
+							"dishPrice" : dishPrice,
+							"kitchenId" : kitchenId,
+							"kitchenAlias" : kitchenAlias,
+							"isSpecial" : isSpecial,
+							"isRecommend" : isRecommend,
+							"isFree" : isFree,
+							"isStop" : isStop,
+							"isCurrPrice" : isCurrPrice
+						},
+						success : function(response, options) {
+							var resultJSON = Ext.util.JSON.decode(response.responseText);
+							if (resultJSON.success == true) {
+								menuStore.reload({
+									params : {
+										start : (currPageIndex - 1) * dishesPageRecordCount,
+										limit : dishesPageRecordCount
 									}
-								}
+								});
 
-								var isSpecial = menuModifyWin.findById(
-										"specialCheckboxMM").getValue();
-								var isRecommend = menuModifyWin.findById(
-										"recommendCheckboxMM").getValue();
-								var isFree = menuModifyWin.findById(
-										"freeCheckboxMM").getValue();
-								var isStop = menuModifyWin.findById(
-										"stopCheckboxMM").getValue();
-								var isCurrPrice = menuModifyWin.findById(
-										"currPriceCheckboxMM").getValue();
-
-								Ext.Ajax
-										.request({
-											url : "../../UpdateMenu.do",
-											params : {
-												"pin" : Request["pin"],
-												"foodID" : foodID,
-												"dishNumber" : dishNumber,
-												"dishName" : dishName,
-												"dishSpill" : dishSpill,
-												"dishPrice" : dishPrice,
-												"kitchenId" : kitchenId,
-												"kitchenAlias" : kitchenAlias,
-												"isSpecial" : isSpecial,
-												"isRecommend" : isRecommend,
-												"isFree" : isFree,
-												"isStop" : isStop,
-												"isCurrPrice" : isCurrPrice
-											},
-											success : function(response,
-													options) {
-												var resultJSON = Ext.util.JSON
-														.decode(response.responseText);
-												if (resultJSON.success == true) {
-													menuStore
-															.reload({
-																params : {
-																	start : (currPageIndex - 1)
-																			* dishesPageRecordCount,
-																	limit : dishesPageRecordCount
-																}
-															});
-
-													var dataInfo = resultJSON.data;
-													Ext.MessageBox
-															.show({
-																msg : dataInfo,
-																width : 300,
-																buttons : Ext.MessageBox.OK
-															});
-												} else {
-													var dataInfo = resultJSON.data;
-													Ext.MessageBox
-															.show({
-																msg : dataInfo,
-																width : 300,
-																buttons : Ext.MessageBox.OK
-															});
-												}
-											},
-											failure : function(response,
-													options) {
-											}
-										});
+								var dataInfo = resultJSON.data;
+								Ext.MessageBox.show({
+									msg : dataInfo,
+									width : 300,
+									buttons : Ext.MessageBox.OK
+								});
+							} else {
+								var dataInfo = resultJSON.data;
+								Ext.MessageBox.show({
+									msg : dataInfo,
+									width : 300,
+									buttons : Ext.MessageBox.OK
+								});
 							}
+						},
+						failure : function(response, options) {
 						}
-					}, {
-						text : "取消",
-						handler : function() {
-							isPrompt = false;
-							menuModifyWin.hide();
-						}
-					} ],
+						});
+					}
+				}
+			}, {
+				text : "取消",
+				handler : function() {
+					isPrompt = false;
+						menuModifyWin.hide();
+					}
+				} ],
 			listeners : {
 				"show" : function(thiz) {
 					kitchenTypeStoreMM.reload();
