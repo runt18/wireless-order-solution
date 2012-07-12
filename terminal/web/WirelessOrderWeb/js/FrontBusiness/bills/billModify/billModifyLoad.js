@@ -126,114 +126,62 @@ function billModifyOnLoad() {
 	// 已点菜式查询
 	// 格式：[菜名，口味，数量，￥单价，操作，￥实价，菜名编号，厨房编号，口味编号1,特,荐,停,送,折扣率,￥口味价钱,口味编号2,口味编号3,時,是否临时菜,菜名ORIG]
 	// 后台：["菜名",菜名编号,厨房编号,"口味",口味编号,数量,￥单价,是否特价,是否推荐,是否停售,是否赠送,折扣率,口味编号2,口味编号3,￥口味价钱,時,是否临时菜]
-	Ext.Ajax
-			.request({
-				url : "../../QueryOrder.do",
-				params : {
-					"pin" : pin,
-					"orderID" : Request["orderID"],
-					"queryType": "Today"
-				},
-				success : function(response, options) {
-					var resultJSON = Ext.util.JSON
-							.decode(response.responseText);
-					if (resultJSON.success == true) {
-						if (resultJSON.data != "NULL") {
-							var josnData = resultJSON.data;
-							var orderList = josnData.split("，");
-							for ( var i = 0; i < orderList.length; i++) {
-								var orderInfo = orderList[i].substr(1, orderList[i].length - 2).split(",");
-								// 实价 = 单价 + 口味价钱
-								var singlePrice = parseFloat(orderInfo[6].substr(2, orderInfo[6].length - 3));
-								var tastePrice = parseFloat(orderInfo[14].substr(2, orderInfo[14].length - 3));
-								var acturalPrice = 0.0;
-								acturalPrice = singlePrice + tastePrice;
-								acturalPrice = "￥" + acturalPrice.toFixed(1);
-								orderedData.push([
-										orderInfo[0].substr(1, orderInfo[0].length - 2), // 菜名
-										orderInfo[3].substr(1, orderInfo[3].length - 2),// 口味
-										orderInfo[5],// 数量
-										orderInfo[6].substr(1, orderInfo[6].length - 2),// 单价
-										"",// 操作
-										acturalPrice,// 实价										
-										orderInfo[1],// 菜名编号										
-										orderInfo[2],// 厨房编号
-										orderInfo[4], // 口味编号										
-										orderInfo[7],// 特
-										orderInfo[8],// 荐
-										orderInfo[9], // 停
-										orderInfo[10], // 送
-										orderInfo[11], // 折扣率
-										tastePrice,// 口味价钱
-										orderInfo[19],// 时间
-										orderInfo[20],// 服务员 
-										orderInfo[12],// 口味编号2
-										orderInfo[13], // 口味编号3
-										orderInfo[15], // 時
-										orderInfo[16], // 是否临时菜
-										orderInfo[0].substr(1,orderInfo[0].length - 2), // 菜名ORIG
-										orderInfo[21],// 是否临时口味
-										orderInfo[22],// 临时口味
-										orderInfo[23],// 临时口味价钱
-										orderInfo[24] // 临时口味编号
-								]);
-							}
-
-							// 根据“特荐停”重新写菜名
-							for ( var i = 0; i < orderedData.length; i++) {
-								if (orderedData[i][9] == "true") {
-									// 特
-									orderedData[i][0] = orderedData[i][0]
-											+ "<img src='../../images/icon_tip_te.gif'></img>";
-								}
-								if (orderedData[i][10] == "true") {
-									// 荐
-									orderedData[i][0] = orderedData[i][0]
-											+ "<img src='../../images/icon_tip_jian.gif'></img>";
-								}
-								if (orderedData[i][11] == "true") {
-									// 停
-									orderedData[i][0] = orderedData[i][0]
-											+ "<img src='../../images/icon_tip_ting.gif'></img>";
-								}
-								if (orderedData[i][12] == "true") {
-									// 送
-									orderedData[i][0] = orderedData[i][0]
-											+ "<img src='../../images/forFree.png'></img>";
-								}
-								if (orderedData[i][17] == "true") {
-									// 時
-									orderedData[i][0] = orderedData[i][0]
-											+ "<img src='../../images/currPrice.png'></img>";
-								}
-								if (orderedData[i][18] == "true") {
-									// 臨
-									orderedData[i][0] = orderedData[i][0]
-											+ "<img src='../../images/tempDish.png'></img>";
-								}
-							}
-
-							// // “并台”特殊处理，如果并台+新下单，清空已点菜式
-							// if (Request["category"] == "3"
-							// && Request["tableStat"] == "free") {
-							// orderedData.length = 0;
-							// }
-
-							orderedStore.reload();
-						}
-					} else {
-						var dataInfo = resultJSON.data;
-						// Ext.Msg.alert(tableData);
-						Ext.MessageBox.show({
-							msg : dataInfo,
-							width : 300,
-							buttons : Ext.MessageBox.OK
-						});
+	Ext.Ajax.request({
+		url : "../../QueryOrder.do",
+		params : {
+			"pin" : pin,
+			"orderID" : Request["orderID"],
+			"queryType": "Today"
+		},
+		success : function(response, options) {
+			var resultJSON = Ext.util.JSON.decode(response.responseText);
+			
+			if (resultJSON.success == true) {					
+				orderedData = resultJSON;
+				
+				// 根据“特荐停”重新写菜名
+				for ( var i = 0; i < orderedData.root.length; i++) {
+					var tpItem = orderedData.root[i];
+					if (tpItem.special == true) {
+						// 特
+						tpItem.foodName = tpItem.foodName + "<img src='../../images/icon_tip_te.gif'></img>";
 					}
-				},
-				failure : function(response, options) {
+					if (tpItem.recommed == true) {
+						// 荐
+						tpItem.foodName = tpItem.foodName + "<img src='../../images/icon_tip_jian.gif'></img>";
+					}
+					if (tpItem.soldout == true) {
+						// 停
+						tpItem.foodName = tpItem.foodName + "<img src='../../images/icon_tip_ting.gif'></img>";
+					}
+					if (tpItem.gift == true) {
+						// 赠
+						tpItem.foodName = tpItem.foodName + "<img src='../../images/forFree.png'></img>";
+					}
+					if (tpItem.currPrice == true) {
+						// 時
+						tpItem.foodName = tpItem.foodName + "<img src='../../images/currPrice.png'></img>";
+					}
+					if (tpItem.temporary == true) {
+						// 臨
+						tpItem.foodName = tpItem.foodName + "<img src='../../images/tempDish.png'></img>";
+					}
 				}
-			});
+				orderedStore.loadData(orderedData);
+			
+			} else {
+				var dataInfo = resultJSON.data;			
+				Ext.MessageBox.show({
+					msg : dataInfo,
+					width : 300,
+					buttons : Ext.MessageBox.OK
+				});
+			}
+		},
+		failure : function(response, options) {
+			
+		}
+	});
 
 	// 当前帐单信息查询
 	Ext.Ajax.request({

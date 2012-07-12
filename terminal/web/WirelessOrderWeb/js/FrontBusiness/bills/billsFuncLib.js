@@ -173,8 +173,7 @@ function billQueryHandler() {
 };
 
 var billListRefresh = function() {
-	var discountValue = billGenModForm.getForm().findField("discountRadio")
-			.getGroupValue();
+	var discountValue = billGenModForm.getForm().findField("discountRadio").getGroupValue();
 	discountType = 0;
 	// 获取discountType
 	if (discountValue == "discount1") {
@@ -210,23 +209,24 @@ var billListRefresh = function() {
 	}
 
 	// 显示
-	for ( var i = 0; i < orderedData.length; i++) {
-		var KitchenNum = orderedData[i][7];
+	for ( var i = 0; i < orderedData.root.length; i++) {
+		var tpItem = orderedData.root[i];
+		var KitchenNum = tpItem.kitchenId;
 		var discountRate = 1;
 		for ( var j = 0; j < discountData.length; j++) {
 			if (KitchenNum == discountData[j][0]) {
 				discountRate = discountData[j][discountIndex];
 			}
 		}
+		
 		// alert(orderedData[i][12]);
-		if (orderedData[i][9] == "true" || orderedData[i][12] == "true"
-				|| orderedData[i][18] == "true") {
+		if (tpItem.special == true || tpItem.gift == true || tpItem.temporary == true) {
 			// 特价，送，臨時菜 不打折
-			orderedData[i][13] = "1.0";
+			tpItem.discount = 1.00;
 		} else {
 			// 非 特价，送，臨時菜
-			orderedData[i][13] = discountRate;
+			tpItem.discount = discountRate;
 		}
 	}
-	orderedStore.reload();
+	orderedStore.loadData(orderedData);
 };
