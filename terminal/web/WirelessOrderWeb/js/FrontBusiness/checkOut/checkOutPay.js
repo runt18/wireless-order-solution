@@ -28,35 +28,18 @@
 	}
 
 	if (serviceRate < 0 || serviceRate > 100) {
-		checkOutForm.buttons[0].setDisabled(false);
-		checkOutForm.buttons[1].setDisabled(false);
-		checkOutForm.buttons[2].setDisabled(false);
-		checkOutForm.buttons[3].setDisabled(false);
-		checkOutForm.buttons[4].setDisabled(false);
-		checkOutForm.buttons[5].setDisabled(false);
+		setFormButtonStatus(false);
 		Ext.Msg.alert("", "<b>服务费率范围是0%至100%！</b>");
 		canSubmit = false;
 	}
 
 	// 会员卡结帐，检查余额；现金校验
-	if (submitType == 3 && parseFloat(countPrice) > parseFloat(mBalance)
-			&& payType == 2) {
-		checkOutForm.buttons[0].setDisabled(false);
-		checkOutForm.buttons[1].setDisabled(false);
-		checkOutForm.buttons[2].setDisabled(false);
-		checkOutForm.buttons[3].setDisabled(false);
-		checkOutForm.buttons[4].setDisabled(false);
-		checkOutForm.buttons[5].setDisabled(false);
+	if (submitType == 3 && parseFloat(countPrice) > parseFloat(mBalance) && payType == 2) {
+		setFormButtonStatus(false);
 		Ext.Msg.alert("", "<b>会员卡余额小于合计金额，不能结帐！</b>");
 		canSubmit = false;
-	} else if (submitType == 1
-			&& parseFloat(actualPrice) < parseFloat(shouldPay)) {
-		checkOutForm.buttons[0].setDisabled(false);
-		checkOutForm.buttons[1].setDisabled(false);
-		checkOutForm.buttons[2].setDisabled(false);
-		checkOutForm.buttons[3].setDisabled(false);
-		checkOutForm.buttons[4].setDisabled(false);
-		checkOutForm.buttons[5].setDisabled(false);
+	} else if (submitType == 1 && parseFloat(actualPrice) < parseFloat(shouldPay)) {
+		setFormButtonStatus(false);
 		Ext.Msg.alert("", "<b>实缴金额小于应收金额，不能结帐！</b>");
 		canSubmit = false;
 	}
@@ -94,20 +77,9 @@
 							}
 						}
 					});
-					checkOutForm.buttons[0].setDisabled(false);
-					checkOutForm.buttons[1].setDisabled(false);
-					checkOutForm.buttons[2].setDisabled(false);
-					checkOutForm.buttons[3].setDisabled(false);
-					checkOutForm.buttons[4].setDisabled(false);
-					checkOutForm.buttons[5].setDisabled(false);
+					setFormButtonStatus(false);
 				} else {
-
-					checkOutForm.buttons[0].setDisabled(false);
-					checkOutForm.buttons[1].setDisabled(false);
-					checkOutForm.buttons[2].setDisabled(false);
-					checkOutForm.buttons[3].setDisabled(false);
-					checkOutForm.buttons[4].setDisabled(false);
-					checkOutForm.buttons[5].setDisabled(false);
+					setFormButtonStatus(false);
 
 					var dataInfo = resultJSON.data;
 					Ext.MessageBox.show({
@@ -118,12 +90,7 @@
 				}
 			},
 			failure : function(response, options) {
-				checkOutForm.buttons[0].setDisabled(false);
-				checkOutForm.buttons[1].setDisabled(false);
-				checkOutForm.buttons[2].setDisabled(false);
-				checkOutForm.buttons[3].setDisabled(false);
-				checkOutForm.buttons[4].setDisabled(false);
-				checkOutForm.buttons[5].setDisabled(false);
+				setFormButtonStatus(false);
 
 				Ext.MessageBox.show({
 					msg : "Unknow page error",

@@ -2,62 +2,52 @@
 
 	var Request = new URLParaQuery();
 	Ext.Ajax.request({
-				url : "../../QueryMember.do",
-				params : {
-					"pin" : Request["pin"],
-					"memberID" : memberNbr
-				},
-				success : function(response, options) {
-					var resultJSON = Ext.util.JSON
-							.decode(response.responseText);
-					if (resultJSON.success == true) {
-						// 1,update the menber info
-						var josnData = resultJSON.data;
-						var memberList = josnData.split(",");
-						var menberName = memberList[0].substr(1,
-								memberList[0].length - 2);
-						var menberPhone = memberList[1].substr(1,
-								memberList[1].length - 2);
-						var menberBalance = memberList[2];
-						mBalance = menberBalance;
-						document.getElementById("memberNbr").innerHTML = memberNbr
-								+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-						document.getElementById("memberName").innerHTML = menberName
-								+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-						document.getElementById("memberPhone").innerHTML = menberPhone
-								+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-						document.getElementById("memberBalance").innerHTML = menberBalance
-								+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+		url : "../../QueryMember.do",
+		params : {
+			"pin" : Request["pin"],
+			"memberID" : memberNbr
+		},
+		success : function(response, options) {
+			var resultJSON = Ext.util.JSON.decode(response.responseText);
+			if (resultJSON.success == true) {
+				// 1,update the menber info
+				var josnData = resultJSON.data;
+				var memberList = josnData.split(",");
+				var menberName = memberList[0].substr(1, memberList[0].length - 2);
+				var menberPhone = memberList[1].substr(1, memberList[1].length - 2);
+				var menberBalance = memberList[2];
+				mBalance = menberBalance;
+				Ext.getDom("memberNbr").innerHTML = memberNbr + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+				Ext.getDom("memberName").innerHTML = menberName + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+				Ext.getDom("memberPhone").innerHTML = menberPhone + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+				Ext.getDom("memberBalance").innerHTML = menberBalance + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 
-						// 2,display the menber info panel
-						checkOutForm.findById("memberInfoPanel").show();
+				// 2,display the menber info panel
+				checkOutForm.findById("memberInfoPanel").show();
 
-						// 3,hide the menber number input window
-						memberNbrInputWin.hide();
+				// 3,hide the menber number input window
+				memberNbrInputWin.hide();
 
-						// 4,mark the menber id
-						actualMemberID = memberNbr;
+				// 4,mark the menber id
+				actualMemberID = memberNbr;
 
-						// 5,refresh the general bill info
-						checkOurListRefresh();
-					} else {
-						var dataInfo = resultJSON.data;
-						Ext.MessageBox.show({
-							msg : dataInfo,
-							width : 300,
-							buttons : Ext.MessageBox.OK
-						});
-					}
-				},
-				failure : function(response, options) {
-				}
-			});
-
+				// 5,refresh the general bill info
+				checkOurListRefresh();
+			} else {
+				var dataInfo = resultJSON.data;
+				Ext.MessageBox.show({
+					msg : dataInfo,
+					width : 300,
+					buttons : Ext.MessageBox.OK
+				});
+			}
+		},
+		failure : function(response, options) { }
+	});
 };
 
 var checkOurListRefresh = function() {
-	var discountValue = checkOutForm.getForm().findField("discountRadio")
-			.getGroupValue();
+	var discountValue = checkOutForm.getForm().findField("discountRadio").getGroupValue();
 	discountType = 0;
 	if (discountValue == "discount1") {
 		discountType = 1;
@@ -92,8 +82,13 @@ var checkOurListRefresh = function() {
 
 	// 显示
 	checkOutDataDisplay.length = 0;
-	for ( var i = 0; i < checkOutData.length; i++) {
-		var KitchenNum = checkOutData[i][0];
+	checkOutDataDisplay.root = [];
+	if(typeof(checkOutData.root) == 'undefined'){
+		return;
+	}
+	for ( var i = 0; i < checkOutData.root.length; i++) {
+		var tpItem = checkOutData.root[i];
+		var KitchenNum = tpItem.kitchenId;
 		var discountRate = 1;
 		for ( var j = 0; j < discountData.length; j++) {
 			if (KitchenNum == discountData[j][0]) {
@@ -101,81 +96,57 @@ var checkOurListRefresh = function() {
 			}
 		}
 		
-		var tastePrice = checkOutData[i][11];
+//		var tastePrice = checkOutData[i][11];
 		
 		// 总价 = （原料价 * 折扣率 + 口味价）* 数量
 		var price;
-		if (checkOutData[i][7] == "true" || checkOutData[i][10] == "true" || checkOutData[i][14] == "true") {
+		if (tpItem.special == true || tpItem.gift == true || tpItem.temporary == true) {
 			// 特价，送，臨時菜　　 不打折
-			price = parseFloat(checkOutData[i][4].substring(1)) * checkOutData[i][3];			
+			price = parseFloat(tpItem.acturalPrice) * tpItem.count;			
 		} else {
 			// 非   特价，送，臨時菜
-			price = (parseFloat(checkOutData[i][12]) * discountRate + parseFloat(tastePrice)) * checkOutData[i][3];			
+//			price = (parseFloat(checkOutData[i][12]) * discountRate + parseFloat(tastePrice)) * checkOutData[i][3];		
+			price = (parseFloat(tpItem.acturalPrice) * discountRate + parseFloat(tpItem.tastePrice)) * tpItem.count;
 		}
-		var priceDisplay = "￥" + price.toFixed(2);
+//		var priceDisplay = "￥" + price.toFixed(2);
 
 		// 特送臨 -- 折扣率 --1
-		if (checkOutData[i][10] == "true" || checkOutData[i][7] == "true"
-				|| checkOutData[i][14] == "true") {
-			checkOutDataDisplay.push([ checkOutData[i][1], checkOutData[i][2],
-					checkOutData[i][3], checkOutData[i][4],
-					parseFloat("1").toFixed(2), priceDisplay, // 实价
-					checkOutData[i][5],
-					checkOutData[i][6],
-					checkOutData[i][7],// 特
-					checkOutData[i][8],// 荐
-					checkOutData[i][9], // 停
-					checkOutData[i][10], // 送
-					checkOutData[i][13], // 時
-					checkOutData[i][14] // 臨
-			]);
+		if (tpItem.special == true || tpItem.gift == true || tpItem.temporary == true) {
+			tpItem.discount = parseFloat("1").toFixed(2);
 		} else {
-			checkOutDataDisplay.push([ checkOutData[i][1], checkOutData[i][2],
-					checkOutData[i][3], checkOutData[i][4],
-					parseFloat(discountRate).toFixed(2), priceDisplay, // 实价
-					checkOutData[i][5],
-					checkOutData[i][6],
-					checkOutData[i][7],// 特
-					checkOutData[i][8],// 荐
-					checkOutData[i][9], // 停
-					checkOutData[i][10], // 送
-					checkOutData[i][13], // 時
-					checkOutData[i][14] // 臨
-			]);
+			tpItem.discount = parseFloat(discountRate).toFixed(2);
 		}
+		tpItem.totalPrice = price;
+		checkOutDataDisplay.root.push(tpItem);
 	}
 
 	// 根据“特荐停”重新写菜名
-	for ( var i = 0; i < checkOutDataDisplay.length; i++) {
-		if (checkOutDataDisplay[i][8] == "true") {
+	for ( var i = 0; i < checkOutDataDisplay.root.length; i++) {
+		var tpItem = checkOutDataDisplay.root[i];		
+		tpItem.foodName = (tpItem.foodName.indeOf('<') ? tpItem.foodName.substring(0, tpItem.foodName.indexOf('<')) : tpItem.foodName);
+		if (tpItem.special == true) {
 			// 特
-			checkOutDataDisplay[i][0] = checkOutDataDisplay[i][0]
-					+ "<img src='../../images/icon_tip_te.gif'></img>";
+			tpItem.foodName = tpItem.foodName + "<img src='../../images/icon_tip_te.gif'></img>";
 		}
-		if (checkOutDataDisplay[i][9] == "true") {
+		if (tpItem.recommed == true) {
 			// 荐
-			checkOutDataDisplay[i][0] = checkOutDataDisplay[i][0]
-					+ "<img src='../../images/icon_tip_jian.gif'></img>";
+			tpItem.foodName = tpItem.foodName + "<img src='../../images/icon_tip_jian.gif'></img>";
 		}
-		if (checkOutDataDisplay[i][10] == "true") {
+		if (tpItem.soldout == true) {
 			// 停
-			checkOutDataDisplay[i][0] = checkOutDataDisplay[i][0]
-					+ "<img src='../../images/icon_tip_ting.gif'></img>";
+			tpItem.foodName = tpItem.foodName + "<img src='../../images/icon_tip_ting.gif'></img>";
 		}
-		if (checkOutDataDisplay[i][11] == "true") {
-			// 送
-			checkOutDataDisplay[i][0] = checkOutDataDisplay[i][0]
-					+ "<img src='../../images/forFree.png'></img>";
+		if (tpItem.gift == true) {
+			// 赠
+			tpItem.foodName = tpItem.foodName + "<img src='../../images/forFree.png'></img>";
 		}
-		if (checkOutDataDisplay[i][12] == "true") {
+		if (tpItem.currPrice == true) {
 			// 時
-			checkOutDataDisplay[i][0] = checkOutDataDisplay[i][0]
-					+ "<img src='../../images/currPrice.png'></img>";
+			tpItem.foodName = tpItem.foodName + "<img src='../../images/currPrice.png'></img>";
 		}
-		if (checkOutDataDisplay[i][13] == "true") {
+		if (tpItem.temporary == true) {
 			// 臨
-			checkOutDataDisplay[i][0] = checkOutDataDisplay[i][0]
-					+ "<img src='../../images/tempDish.png'></img>";
+			tpItem.foodName = tpItem.foodName + "<img src='../../images/tempDish.png'></img>";
 		}
 	}
 	
@@ -184,10 +155,13 @@ var checkOurListRefresh = function() {
 	// 算总价
 	var totalCount = 0;
 	var forFreeCount = 0;
-	for ( var i = 0; i < checkOutDataDisplay.length; i++) {
-		var singleCount = parseFloat(checkOutDataDisplay[i][5].substr(1));
-		if (checkOutDataDisplay[i][11] == "true") {
-			forFreeCount = forFreeCount + parseFloat(checkOutData[i][4].substring(1)) * checkOutData[i][3];
+	for ( var i = 0; i < checkOutDataDisplay.root.length; i++) {
+//		var singleCount = parseFloat(checkOutDataDisplay[i][5].substr(1));
+		var tpItem = checkOutDataDisplay.root[i];
+		var singleCount = parseFloat(tpItem.totalPrice);
+		if (tpItem.gift == true) {
+//			forFreeCount = forFreeCount + parseFloat(checkOutData[i][4].substring(1)) * checkOutData[i][3];
+			forFreeCount = forFreeCount + parseFloat(tpItem.discount) * tpItem.totalPrice;
 		} else {
 			totalCount = totalCount + singleCount;
 		}

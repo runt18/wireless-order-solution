@@ -87,22 +87,22 @@
 // 2，表格的数据store
 var checkOutStore = new Ext.data.Store({
 	proxy : new Ext.data.MemoryProxy(checkOutDataDisplay),
-	reader : new Ext.data.ArrayReader({}, [ {
-		name : "dishName"
+	reader : new Ext.data.JsonReader(Ext.ux.readConfig, [ {
+		name : "foodName"
 	}, {
-		name : "dishTaste"
+		name : "tastePref"
 	}, {
-		name : "dishCount"
+		name : "count"
 	}, {
-		name : "dishPrice"
+		name : "unitPrice"
 	}, {
-		name : "dishDiscount"
+		name : "discount"
 	}, {
-		name : "dishTotalPrice"
+		name : "totalPrice"
 	},  {
-		name : "dishOrderDate"
+		name : "orderDateFormat"
 	},  {
-		name : "dishWaiter"
+		name : "waiter"
 	}  ])
 });
 
@@ -113,43 +113,53 @@ var checkOutColumnModel = new Ext.grid.ColumnModel([
 		new Ext.grid.RowNumberer(), {
 			header : "菜名",
 			sortable : true,
-			dataIndex : "dishName",
+			dataIndex : "foodName",
 			id : "dishNameCOCM",
 			width : 290
 		}, {
 			header : "口味",
 			sortable : true,
-			dataIndex : "dishTaste",
+			dataIndex : "tastePref",
 			width : 160
 		}, {
 			header : "数量",
 			sortable : true,
-			dataIndex : "dishCount",
-			width : 80
+			dataIndex : "count",
+			width : 80,
+			align : 'right'
 		}, {
 			header : "单价",
 			sortable : true,
-			dataIndex : "dishPrice",
-			width : 80
+			dataIndex : "unitPrice",
+			width : 80,
+			align : 'right',
+			renderer : function(_v){
+				return parseFloat(_v).toFixed(2);
+			}
 		}, {
 			header : "打折率",
 			sortable : true,
-			dataIndex : "dishDiscount",
-			width : 80
+			dataIndex : "discount",
+			width : 80,
+			align : 'right'
 		}, {
 			header : "总价",
 			sortable : true,
-			dataIndex : "dishTotalPrice",
-			width : 80
+			dataIndex : "totalPrice",
+			width : 80,
+			align : 'right',
+			renderer : function(_v){
+				return parseFloat(_v).toFixed(2)+'&nbsp;&nbsp;';
+			}
 		}, {
 			header : "时间",
 			sortable : true,
-			dataIndex : "dishOrderDate",
+			dataIndex : "orderDateFormat",
 			width : 160
 		}, {
 			header : "服务员",
 			sortable : true,
-			dataIndex : "dishWaiter",
+			dataIndex : "waiter",
 			width : 80
 		} ]);
 
@@ -223,6 +233,7 @@ var discountKindData = [ [ "0", "一般" ], [ "1", "会员" ] ];
 var discountKindComb = new Ext.form.ComboBox({
 	fieldLabel : "结账方式",
 	labelStyle : "font-size:14px;font-weight:bold;",
+	readOnly : true,
 	forceSelection : true,
 	value : "一般",
 	id : "payTpye",
@@ -249,7 +260,6 @@ var discountKindComb = new Ext.form.ComboBox({
 			} else {
 				memberNbrInputWin.show();
 			}
-
 		}
 	}
 });
@@ -402,24 +412,14 @@ var checkOutForm = new Ext.form.FormPanel({
 			{
 				text : "现金结账",
 				handler : function() {
-					checkOutForm.buttons[0].setDisabled(true);
-					checkOutForm.buttons[1].setDisabled(true);
-					checkOutForm.buttons[2].setDisabled(true);
-					checkOutForm.buttons[3].setDisabled(true);
-					checkOutForm.buttons[4].setDisabled(true);
-					checkOutForm.buttons[5].setDisabled(true);
+					setFormButtonStatus(true);
 					paySubmit(1);
 				}
 			},
 			{
 				text : "刷卡结账",
 				handler : function() {
-					checkOutForm.buttons[0].setDisabled(true);
-					checkOutForm.buttons[1].setDisabled(true);
-					checkOutForm.buttons[2].setDisabled(true);
-					checkOutForm.buttons[3].setDisabled(true);
-					checkOutForm.buttons[4].setDisabled(true);
-					checkOutForm.buttons[5].setDisabled(true);
+					setFormButtonStatus(true);
 					paySubmit(2);
 				}
 			},
@@ -427,12 +427,7 @@ var checkOutForm = new Ext.form.FormPanel({
 				text : "会员卡结账",
 				hidden : true,
 				handler : function() {
-					checkOutForm.buttons[0].setDisabled(true);
-					checkOutForm.buttons[1].setDisabled(true);
-					checkOutForm.buttons[2].setDisabled(true);
-					checkOutForm.buttons[3].setDisabled(true);
-					checkOutForm.buttons[4].setDisabled(true);
-					checkOutForm.buttons[5].setDisabled(true);
+					setFormButtonStatus(true);
 					paySubmit(3);
 				}
 			},
@@ -440,12 +435,7 @@ var checkOutForm = new Ext.form.FormPanel({
 				text : "签单",
 				// hidden : true,
 				handler : function() {
-					checkOutForm.buttons[0].setDisabled(true);
-					checkOutForm.buttons[1].setDisabled(true);
-					checkOutForm.buttons[2].setDisabled(true);
-					checkOutForm.buttons[3].setDisabled(true);
-					checkOutForm.buttons[4].setDisabled(true);
-					checkOutForm.buttons[5].setDisabled(true);
+					setFormButtonStatus(true);
 					paySubmit(4);
 				}
 			},
@@ -453,12 +443,7 @@ var checkOutForm = new Ext.form.FormPanel({
 				text : "挂账",
 				// hidden : true,
 				handler : function() {
-					checkOutForm.buttons[0].setDisabled(true);
-					checkOutForm.buttons[1].setDisabled(true);
-					checkOutForm.buttons[2].setDisabled(true);
-					checkOutForm.buttons[3].setDisabled(true);
-					checkOutForm.buttons[4].setDisabled(true);
-					checkOutForm.buttons[5].setDisabled(true);
+					setFormButtonStatus(true);
 					paySubmit(5);
 				}
 			},
@@ -466,12 +451,7 @@ var checkOutForm = new Ext.form.FormPanel({
 				text : "暂结",
 				// hidden : true,
 				handler : function() {
-					checkOutForm.buttons[0].setDisabled(true);
-					checkOutForm.buttons[1].setDisabled(true);
-					checkOutForm.buttons[2].setDisabled(true);
-					checkOutForm.buttons[3].setDisabled(true);
-					checkOutForm.buttons[4].setDisabled(true);
-					checkOutForm.buttons[5].setDisabled(true);
+					setFormButtonStatus(true);
 					paySubmit(6);
 				}
 			},
@@ -479,21 +459,16 @@ var checkOutForm = new Ext.form.FormPanel({
 				text : "返回",
 				handler : function() {
 					var Request = new URLParaQuery();
-					location.href = "TableSelect.html?pin=" + Request["pin"]
-							+ "&restaurantID=" + restaurantID;
+					location.href = "TableSelect.html?pin=" + Request["pin"] + "&restaurantID=" + restaurantID;
 				}
 			} ],
 	listeners : {
 		afterlayout : function(thiz) {
 			checkOutGrid.setHeight(thiz.getInnerHeight() - gridHeightOffset);
-			thiz.findById("placeHolderCOF1").setWidth(
-					(thiz.getInnerWidth() - 1000) / 2);
-			thiz.findById("placeHolderCOF2").setWidth(
-					(thiz.getInnerWidth() - 1000) / 2);
-			thiz.findById("placeHolderCOF3").setWidth(
-					(thiz.getInnerWidth() - 1000) / 2);
-			thiz.findById("placeHolderCOF4").setWidth(
-					(thiz.getInnerWidth() - 1000) / 2);
+			thiz.findById("placeHolderCOF1").setWidth((thiz.getInnerWidth() - 1000) / 2);
+			thiz.findById("placeHolderCOF2").setWidth((thiz.getInnerWidth() - 1000) / 2);
+			thiz.findById("placeHolderCOF3").setWidth((thiz.getInnerWidth() - 1000) / 2);
+			thiz.findById("placeHolderCOF4").setWidth((thiz.getInnerWidth() - 1000) / 2);
 		}
 	}
 });
@@ -557,17 +532,21 @@ Ext.onReady(function() {
 
 			// -------------------- 浏览器大小改变 -------------------------------
 			// 1,调整colDisplayFormUQ中表格的高度
-			Ext.EventManager
-					.onWindowResize(function() {
-						checkOutGrid.setHeight(checkOutCenterPanel
-								.getInnerHeight()
-								- gridHeightOffset);
-
+			Ext.EventManager.onWindowResize(function() {
+						checkOutGrid.setHeight(checkOutCenterPanel.getInnerHeight() - gridHeightOffset);
 						if (checkOutCenterPanel.getInnerWidth() < 1000) {
-							checkOutGrid.setWidth(checkOutCenterPanel
-									.getInnerWidth() - 20);
+							checkOutGrid.setWidth(checkOutCenterPanel.getInnerWidth() - 20);
 						} else {
 							checkOutGrid.setWidth(1000);
 						}
 					});
 		});
+
+setFormButtonStatus = function(_s){
+	checkOutForm.buttons[0].setDisabled(_s);
+	checkOutForm.buttons[1].setDisabled(_s);
+	checkOutForm.buttons[2].setDisabled(_s);
+	checkOutForm.buttons[3].setDisabled(_s);
+	checkOutForm.buttons[4].setDisabled(_s);
+	checkOutForm.buttons[5].setDisabled(_s);
+};
