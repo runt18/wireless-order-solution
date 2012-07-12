@@ -16,16 +16,14 @@ function kitchenSelectLoad() {
 	var Request = new URLParaQuery();
 	// 后台：[厨房编号,"厨房名称",一般折扣1,一般折扣2,一般折扣3,会员折扣1,会员折扣2,会员折扣3]
 	// 前台：kitchenData：[厨房编号,厨房名称]
-	Ext.Ajax
-			.request({
+	Ext.Ajax.request({
 				url : "../../QueryMenu.do",
 				params : {
 					"pin" : Request["pin"],
 					"type" : "3"
 				},
 				success : function(response, options) {
-					var resultJSON = Ext.util.JSON
-							.decode(response.responseText);
+					var resultJSON = Ext.util.JSON.decode(response.responseText);
 					if (resultJSON.success == true) {
 						// get the kitchen data
 						var josnData = resultJSON.data;
@@ -38,18 +36,13 @@ function kitchenSelectLoad() {
 							keichenInfo[1],// 厨房id
 							]);
 						}
-
 						// update the button
 						for ( var i = 0; i < kitchenData.length; i++) {
-							document.getElementById("kitchen"
-									+ kitchenData[i][0]).innerHTML = kitchenData[i][1];
-							document.getElementById("kitchen"
-									+ kitchenData[i][0]).title = kitchenData[i][1];
+							document.getElementById("kitchen" + i).innerHTML = kitchenData[i][1];
+							document.getElementById("kitchen" + i).title = kitchenData[i][1];
 						}
-
 						// bind the click function to the button
-						$(".ketchenSelect")
-								.each(
+						$(".ketchenSelect").each(
 										function() {
 											if ($(this).attr("title") != "") {
 												$(this)
