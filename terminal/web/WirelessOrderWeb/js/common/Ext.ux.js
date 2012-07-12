@@ -16,11 +16,17 @@ Ext.ux.txtFormat = {
 	barSum : '<span style="font-weight:bold; font-size:13px;">总计</span>',
 	linkClassOne : '<a id="{0}" href="{1}" onClick="{2}" style="color:green; font-size:15px; font-weight:bold;">{3}</a>',
 	gridDou : function(_v){
-		return _v != '' ? parseFloat(_v).toFixed(2) : _v;
+		return _v != '' ? (parseFloat(_v).toFixed(2) + '&nbsp;&nbsp;') : _v;
 	}
 };
 
-
+/**
+ * JSONReader Config
+ */
+Ext.ux.readConfig = {
+	totalProperty : 'totalProperty',
+	root : 'root'
+};
 
 /*************************************
  * 解决DateField在Firefox宽度过长问题
@@ -244,7 +250,7 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 			left : 0
 		},
 		bbar : cmData[0][3] ? g_bbar : null, // 加载下工具条
-		tbar : typeof tbar != 'undefined' ? (Ext.isArray(tbar)==true?tbar[0]:tbar) :null // 加载上工具条
+		tbar : typeof tbar != 'undefined' ? (Ext.isArray(tbar)==true?tbar[0]:tbar) : null // 加载上工具条
 		});
 	
 	//添加多条工具条
