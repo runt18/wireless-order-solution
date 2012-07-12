@@ -1,34 +1,11 @@
-﻿////修改link
-//function billOptModifyHandler(rowindex) {
-//	// "51","100","2011-07-26
-//	// 23:23:41","一般","现金","100.44","150.0","0","3","0","0.0","","","","0.0","1","1"
-//	var tableNbr = billsData[rowindex][1];
-//	var tableNbr2 = billsData[rowindex][7];
-//	var category = billsData[rowindex][3];
-//	var orderID = billsData[rowindex][0];
-//	var personCount = billsData[rowindex][8];
-//	var discountType = billsData[rowindex][16];
-//	var payType = billsData[rowindex][15];
-//	var give = billsData[rowindex][14];
-//	var payManner = billsData[rowindex][4];
-//	var serviceRate = billsData[rowindex][10];
-//	var memberID = billsData[rowindex][11];
-//	var comment = billsData[rowindex][13];
-//	var minCost = billsData[rowindex][9];
-//	location.href = "BillModify.html?pin=" + pin + "&restaurantID="
-//			+ restaurantID + "&category=" + category + "&tableNbr=" + tableNbr
-//			+ "&tableNbr2=" + tableNbr2 + "&personCount=" + personCount
-//			+ "&minCost=" + minCost + "&orderID=" + orderID + "&give=" + give
-//			+ "&payType=" + payType + "&discountType=" + discountType
-//			+ "&payManner=" + payManner + "&serviceRate=" + serviceRate
-//			+ "&memberID=" + memberID;
-//};
+﻿
 
 // 查看link
 var viewBillGenPanel = new Ext.Panel({
 	region : "north",
 	height : 140,
 	frame : true,
+	border : false,
 	items : [ {
 		border : false,
 		contentEl : "billView"
@@ -39,6 +16,7 @@ var viewBillAddPanel = new Ext.Panel({
 	region : "south",
 	height : 60,
 	frame : true,
+	border : false,
 	items : [ {
 		border : false,
 		contentEl : "billViewAddInfo"
@@ -46,53 +24,56 @@ var viewBillAddPanel = new Ext.Panel({
 });
 
 // 1，表格的数据store
-var viewBillData = [];
+var viewBillData = {totalProperty:0, root:[]};
 
 var viewBillStore = new Ext.data.Store({
 	proxy : new Ext.data.MemoryProxy(viewBillData),
-	reader : new Ext.data.ArrayReader({}, [ {
-		name : "dishName"
-	}, {
-		name : "dishCount"
-	}, {
-		name : "discount"
-	}, {
-		name : "dishTaste"
-	}, {
-		name : "totalPrice"
-	} ])
+	reader : new Ext.data.JsonReader(Ext.ux.readConfig, 
+	    [ 
+	      { name : "foodName" }, 
+	      { name : "tastePref"},
+	      { name : "count" }, 
+	      { name : "discount" }, 	       
+	      { name : "acturalPrice"} 
+	    ]
+	)
 });
-
-viewBillStore.reload();
 
 // 2，栏位模型
 var viewBillColumnModel = new Ext.grid.ColumnModel([
-		new Ext.grid.RowNumberer(), {
-			header : "菜名",
-			sortable : true,
-			dataIndex : "dishName",
-			width : 100
-		}, {
-			header : "数量",
-			sortable : true,
-			dataIndex : "dishCount",
-			width : 50
-		}, {
-			header : "折扣",
-			sortable : true,
-			dataIndex : "discount",
-			width : 50
-		}, {
-			header : "口味",
-			sortable : true,
-			dataIndex : "dishTaste",
-			width : 100
-		}, {
-			header : "金额（￥）",
-			sortable : true,
-			dataIndex : "totalPrice",
-			width : 100
-		} ]);
+	new Ext.grid.RowNumberer(), {
+		header : "菜名",
+		sortable : true,
+		dataIndex : "foodName",
+		width : 130
+	}, {
+		header : "口味",
+		sortable : true,
+		dataIndex : "tastePref",
+		width : 100
+	}, {
+		header : "数量",
+		sortable : true,
+		dataIndex : "count",
+		width : 50,
+		align : 'right',
+		renderer : Ext.ux.txtFormat.gridDou
+	}, {
+		header : "折扣",
+		sortable : true,
+		dataIndex : "discount",
+		width : 50,
+		align : 'right',
+		renderer : Ext.ux.txtFormat.gridDou
+	}, {
+		header : "金额（￥）",
+		sortable : true,
+		dataIndex : "acturalPrice",
+		width : 100,
+		align : 'right',
+		renderer : Ext.ux.txtFormat.gridDou
+	} 
+]);
 
 // 3,表格
 var viewBillGrid = new Ext.grid.GridPanel({
@@ -100,11 +81,12 @@ var viewBillGrid = new Ext.grid.GridPanel({
 	border : false,
 	ds : viewBillStore,
 	cm : viewBillColumnModel,
-	// sm : new Ext.grid.RowSelectionModel({
-	// singleSelect : true
-	// }),
+	loadMask : { msg: '数据请求中，请稍后...' },
+	animate : false,
+	margins : { top : 0, bottom : 0, right : 0, left : 0 },
+	cmargins : { top : 0, bottom : 0, right : 0, left : 0 },
 	listeners : {
-
+		
 	}
 });
 
@@ -113,150 +95,147 @@ var viewBillDtlPanel = new Ext.Panel({
 	layout : "fit",
 	// height : 260,
 	frame : true,
+	border : false,
 	items : viewBillGrid
 });
 
-var viewBillWin = new Ext.Window(
-		{
-			layout : "fit",
-			title : "查看账单",
-			width : 450,
-			height : 500,
-			closeAction : "hide",
-			resizable : false,
-			// closable : false,
-			items : [ {
-				layout : "border",
-				border : false,
-				items : [ viewBillGenPanel, viewBillDtlPanel, viewBillAddPanel ]
-			} ],
-			buttons : [ {
-				text : "确定",
-				handler : function() {
-					viewBillWin.hide();
-				}
-			}, {
-				text : "打印",
-				disabled : true,
-				handler : function() {
-
-					// Ext.Ajax.request({
-					// url : "../PrintOrder.do",
-					// params : {
-					// "pin" : currPin,
-					// "printShift" : 1
-					// },
-					// success : function(response, options) {
-					// var resultJSON = Ext.util.JSON
-					// .decode(response.responseText);
-					// Ext.MessageBox.show({
-					// msg : resultJSON.data,
-					// width : 300,
-					// buttons : Ext.MessageBox.OK
-					// });
-					//
-					// },
-					// failure : function(response, options) {
-					// }
-					// });
-				}
-			} ],
-			listeners : {
-				"show" : function(thiz) {
-					var billID = billsGrid.getStore().getAt(currRowIndex).get("orderID");
-					var tableType = billsGrid.getStore().getAt(currRowIndex).get("orderCategory");
-					var tableNbr = billsGrid.getStore().getAt(currRowIndex).get("tableAlias");
-					var personNbr = billsGrid.getStore().getAt(currRowIndex).get("customerNum");
-					var billDate = billsGrid.getStore().getAt(currRowIndex).get("orderDate");
-					var billPayType = billsGrid.getStore().getAt(currRowIndex).get("payManner");
-					var payType = billsGrid.getStore().getAt(currRowIndex).get("payType");
-					var payTypeDescr;
-					if (payType == "1") {
-						payTypeDescr = "一般";
-					} else {
-						payTypeDescr = "会员";
-					}
-					var billServiceRate = billsGrid.getStore().getAt(currRowIndex).get("serviceRate");
-					var billWaiter = billsGrid.getStore().getAt(currRowIndex).get("staff");
-					var billForFree = billsGrid.getStore().getAt(currRowIndex).get("giftPrice");
-					var billShouldPay = billsGrid.getStore().getAt(currRowIndex).get("totalPrice");
-					var billAvtrualPay = billsGrid.getStore().getAt(currRowIndex).get("actualIncome");
-
-					document.getElementById("billIDBV").innerHTML = billID;
-					document.getElementById("billTypeBV").innerHTML = tableType;
-					document.getElementById("tableNbrBV").innerHTML = tableNbr;
-					document.getElementById("personNbrBV").innerHTML = personNbr;
-					document.getElementById("billDateBV").innerHTML = billDate;
-					document.getElementById("payTypeBV").innerHTML = payTypeDescr;
-					document.getElementById("payMannerBV").innerHTML = billPayType;
-					document.getElementById("serviceRateBV").innerHTML = billServiceRate + "％";
-					document.getElementById("waiterBV").innerHTML = billWaiter;
-					document.getElementById("forFreeBV").innerHTML = "￥" + billForFree;
-					document.getElementById("shouldPayBV").innerHTML = "￥" + billShouldPay;
-					document.getElementById("actrualPayBV").innerHTML = "￥" + billAvtrualPay;
-
-					// 后台：["菜名",菜名编号,厨房编号,"口味",口味编号,数量,￥单价,是否特价,是否推荐,是否停售,是否赠送,折扣率,口味编号2,口味编号3,￥口味价钱,是否時價]
-					Ext.Ajax
-							.request({
-								url : "../../QueryOrder.do",
-								params : {
-									"pin" : pin,
-									"orderID" : billID,
-									"queryType" : "History"
-								},
-								success : function(response, options) {
-									var resultJSON = Ext.util.JSON.decode(response.responseText);
-									if (resultJSON.success == true) {
-										if (resultJSON.data != "NULL") {
-
-											var totalDiscount = 0.0;
-											var josnData = resultJSON.data;
-											var orderList = josnData.split("，");
-											for ( var i = 0; i < orderList.length; i++) {
-
-												var orderInfo = orderList[i].substr(1, orderList[i].length - 2).split(",");
-												// 实价 = 单价 * 數量 * 折扣 + 口味价钱
-												var singlePrice = parseFloat(orderInfo[6].substr(2, orderInfo[6].length - 3));
-												var tastePrice = parseFloat(orderInfo[14].substr(2, orderInfo[14].length - 3));
-												var acturalPrice = 0.0;
-												acturalPrice = singlePrice * parseFloat(orderInfo[5]) * parseFloat(orderInfo[11]) + tastePrice;
-												acturalPrice = "￥" + acturalPrice.toFixed(1);
-												viewBillData.push([
-																orderInfo[0].substr(1, orderInfo[0].length - 2), // 菜名
-																orderInfo[5],// 数量
-																orderInfo[11], // 折扣率
-																orderInfo[3].substr(1, orderInfo[3].length - 2),// 口味
-																acturalPrice // 实价
-														]);
-
-												// 算總折扣
-												totalDiscount = totalDiscount + parseFloat(orderInfo[18]);
-											}
-
-											document.getElementById("discountBV").innerHTML = "￥" + totalDiscount.toFixed(1);
-
-											viewBillStore.reload();
-										}
-									} else {
-										var dataInfo = resultJSON.data;
-										// Ext.Msg.alert(tableData);
-										Ext.MessageBox.show({
-											msg : dataInfo,
-											width : 300,
-											buttons : Ext.MessageBox.OK
-										});
-									}
-								},
-								failure : function(response, options) {
-								}
-							});
-
-				},
-				"hide" : function(thiz) {
-					viewBillData.length = 0;
-				}
+var viewBillWin = new Ext.Window({
+	layout : "fit",
+	title : "查看账单",
+	width : 500,
+	height : 500,
+	closeAction : "hide",
+	resizable : false,
+	// closable : false,
+	items : [ {
+		layout : "border",
+		border : false,
+		items : [ viewBillGenPanel, viewBillDtlPanel, viewBillAddPanel ]
+	} ],
+	buttons : [
+	    {
+			text : "确定",
+			handler : function() {
+				viewBillWin.hide();
 			}
-		});
+		}, {
+			text : "打印",
+			disabled : true,
+			handler : function() {
+				
+			}
+		} ],
+	listeners : {
+		"show" : function(thiz) {
+			var selData = billsGrid.getStore().getAt(currRowIndex);
+			var billID = selData.get("orderID");
+			var tableType = selData.get("orderCategory");
+			var tableNbr = selData.get("tableAlias");
+			var personNbr = selData.get("customerNum");
+			var billDate = selData.get("orderDate");
+			var billPayType = selData.get("payManner");
+			var payType = selData.get("payType");
+			var payTypeDescr;
+			if (payType == "1") {
+				payTypeDescr = "一般";
+			} else {
+				payTypeDescr = "会员";
+			}
+			var billServiceRate = selData.get("serviceRate");
+			var billWaiter = selData.get("staff");
+			var billForFree = selData.get("giftPrice");
+			var billShouldPay = selData.get("totalPrice");
+			var billAvtrualPay = selData.get("actualIncome");
+
+			document.getElementById("billIDBV").innerHTML = billID;
+			document.getElementById("billTypeBV").innerHTML = tableType;
+			document.getElementById("tableNbrBV").innerHTML = tableNbr;
+			document.getElementById("personNbrBV").innerHTML = personNbr;
+			document.getElementById("billDateBV").innerHTML = billDate;
+			document.getElementById("payTypeBV").innerHTML = payTypeDescr;
+			document.getElementById("payMannerBV").innerHTML = billPayType;
+			document.getElementById("serviceRateBV").innerHTML = billServiceRate + "％";
+			document.getElementById("waiterBV").innerHTML = billWaiter;
+			document.getElementById("forFreeBV").innerHTML = "￥" + billForFree;
+			document.getElementById("shouldPayBV").innerHTML = "￥" + billShouldPay;
+			document.getElementById("actrualPayBV").innerHTML = "￥" + billAvtrualPay;
+
+			// 后台：["菜名",菜名编号,厨房编号,"口味",口味编号,数量,￥单价,是否特价,是否推荐,是否停售,是否赠送,折扣率,口味编号2,口味编号3,￥口味价钱,是否時價]
+			Ext.Ajax.request({
+				url : "../../QueryOrder.do",
+				params : {
+					"pin" : pin,
+					"orderID" : billID,
+					"queryType" : "History"
+				},
+				success : function(response, options) {
+					var resultJSON = Ext.util.JSON.decode(response.responseText);					
+//					alert(response.responseText);
+					if (resultJSON.success == true) {
+//						if (resultJSON.data != "NULL") {
+//							var totalDiscount = 0.0;
+//							var josnData = resultJSON.data;
+//							var orderList = josnData.split("，");
+//							for ( var i = 0; i < orderList.length; i++) {
+//								var orderInfo = orderList[i].substr(1, orderList[i].length - 2).split(",");
+//								// 实价 = 单价 * 數量 * 折扣 + 口味价钱
+//								var singlePrice = parseFloat(orderInfo[6].substr(2, orderInfo[6].length - 3));
+//								var tastePrice = parseFloat(orderInfo[14].substr(2, orderInfo[14].length - 3));
+//								var acturalPrice = 0.0;
+//								acturalPrice = singlePrice * parseFloat(orderInfo[5]) * parseFloat(orderInfo[11]) + tastePrice;
+//								acturalPrice = "￥" + acturalPrice.toFixed(1);
+//								viewBillData.push([
+//								    orderInfo[0].substr(1, orderInfo[0].length - 2), // 菜名
+//									orderInfo[5],// 数量
+//									orderInfo[11], // 折扣率
+//									orderInfo[3].substr(1, orderInfo[3].length - 2),// 口味
+//									acturalPrice // 实价
+//								]);
+//
+//									// 算總折扣
+//								totalDiscount = totalDiscount + parseFloat(orderInfo[18]);
+//							}
+//
+//							document.getElementById("discountBV").innerHTML = "￥" + totalDiscount.toFixed(1);
+//
+//							viewBillStore.reload();
+//						}
+						viewBillData = resultJSON;
+						var tpItem = null;
+						var acturalPrice = null;
+						var totalDiscount = 0.0;
+						for(var i = 0; i < viewBillData.root.length; i++){
+							tpItem = viewBillData.root[i];
+							acturalPrice = parseFloat( tpItem.unitPrice * tpItem.count *  tpItem.discount + tpItem.tastePrice );
+							viewBillData.root[i].acturalPrice = acturalPrice;
+							totalDiscount += parseFloat(tpItem.totalDiscount);
+							tpItem = null;
+							acturalPrice = null;							
+						}
+						Ext.getDom('discountBV').innerHTML = "￥" + totalDiscount.toFixed(2);
+						viewBillStore.loadData(viewBillData);
+						
+					} else {
+						var dataInfo = resultJSON.data;
+						// Ext.Msg.alert(tableData);
+						Ext.MessageBox.show({
+							msg : dataInfo,
+							width : 300,
+							buttons : Ext.MessageBox.OK
+						});
+					}
+				},
+				failure : function(response, options) {
+						
+				}
+			});
+		},
+		"hide" : function(thiz) {
+			viewBillData = null;
+			viewBillStore.removeAll();
+		}
+	}
+});
 
 function billViewHandler() {
 	if (currRowIndex != -1) {
