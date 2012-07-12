@@ -3,10 +3,13 @@ package com.wireless.Actions.dishesOrder;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import net.sf.json.JSONObject;
 
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -16,10 +19,11 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.QueryOrder;
 import com.wireless.db.QueryShift;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.Terminal;
-import com.wireless.protocol.Util;
+import com.wireless.util.JObject;
 
 public class QueryOrderAction extends Action {
 
@@ -33,6 +37,7 @@ public class QueryOrderAction extends Action {
 		int orderID = 0;
 		String jsonResp = "{success:$(result), data:'$(value)'}";
 		PrintWriter out = null;
+		JObject jobject = new JObject();
 		try {
 			// 解决后台中文传到前台乱码
 			response.setContentType("text/json; charset=utf-8");
@@ -50,139 +55,172 @@ public class QueryOrderAction extends Action {
 			Order order = null;
 			if (request.getParameter("tableID") != null) {
 				tableID = Integer.parseInt(request.getParameter("tableID"));
-				order = QueryOrder.exec(Long.parseLong(pin),
-						Terminal.MODEL_STAFF, tableID);
+				order = QueryOrder.exec(Long.parseLong(pin), Terminal.MODEL_STAFF, tableID);
 
 			} else if (request.getParameter("orderID") != null) {
 				orderID = Integer.parseInt(request.getParameter("orderID"));
 				if (queryType.equals("History")) {
-					order = QueryOrder.execByID(orderID,
-							QueryShift.QUERY_HISTORY);
+					order = QueryOrder.execByID(orderID, QueryShift.QUERY_HISTORY);
 				} else {
-					order = QueryOrder
-							.execByID(orderID, QueryShift.QUERY_TODAY);
+					order = QueryOrder.execByID(orderID, QueryShift.QUERY_TODAY);
 				}
 			}
 
-			jsonResp = jsonResp.replace("$(result)", "true");
-
-			if (order.foods.length == 0) {
-				jsonResp = jsonResp.replace("$(value)", "");
-			} else {
-				StringBuffer value = new StringBuffer();
-				for (int i = 0; i < order.foods.length; i++) {
+//			jsonResp = jsonResp.replace("$(result)", "true");
+//			if (order.foods.length == 0) {
+//				jsonResp = jsonResp.replace("$(value)", "");
+//			} else {
+//				StringBuffer value = new StringBuffer();
+//				for (int i = 0; i < order.foods.length; i++) {
 					/**
 					 * The json to order food looks like below. 
 					 * ["菜名", 菜名编号, 厨房编号, "口味", 口味编号, 数量, 单价, 是否特价, 是否推荐, 是否停售, 是否赠送, 折扣率,
 					 * 口味编号2, 口味编号3, 口味价钱, 是否时价, 是否临时菜, 流水号, 折扣额, 日期时间, 服务员, 
 					 * 是否临时口味, 临时口味, 临时口味价钱, 临时口味编号]
 					 */
-					String jsonOrderFood = "[\"$(food)\",$(food_id),$(kitchen),\"$(taste)\",$(taste_id),"
-							+ "$(count),\"$(unit_price)\",$(special),$(recommend),$(soldout),"
-							+ "$(gift),$(discount),$(taste_id2),$(taste_id3),\"$(taste_price)\","
-							+ "$(currPrice),$(temporary),$(seq_id),$(total_discount),$(order_date),$(waiter),"
-							+ "$(is_tmp_taste),$(tmp_taste),$(tmp_taste_price),$(tmp_taste_alias)]";
-					jsonOrderFood = jsonOrderFood.replace("$(food)",
-							order.foods[i].name);
-					jsonOrderFood = jsonOrderFood.replace("$(food_id)",
-							new Integer(order.foods[i].aliasID).toString());
-					jsonOrderFood = jsonOrderFood.replace("$(kitchen)",
-							new Short(order.foods[i].kitchen.aliasID)
-									.toString());
-					jsonOrderFood = jsonOrderFood.replace("$(taste)",
-							order.foods[i].getTastePref().replaceAll(",", "；"));
-					// FIX ME!!!
-					jsonOrderFood = jsonOrderFood.replace("$(taste_id)",
-							Integer.toString(order.foods[i].tastes[0].aliasID));
-					jsonOrderFood = jsonOrderFood.replace("$(count)",
-							Util.float2String2(order.foods[i].getCount()));
-					// float unitPrice = order.foods[i].getPrice() +
-					// order.foods[i].getTastePrice();
-					jsonOrderFood = jsonOrderFood.replace("$(unit_price)", Util.CURRENCY_SIGN + order.foods[i].getPrice());
-					jsonOrderFood = jsonOrderFood.replace("$(taste_price)", Util.CURRENCY_SIGN + order.foods[i].getTastePrice());
-					jsonOrderFood = jsonOrderFood.replace("$(special)",	order.foods[i].isSpecial() ? "true" : "false");
-					jsonOrderFood = jsonOrderFood.replace("$(recommend)", order.foods[i].isRecommend() ? "true" : "false");
-					jsonOrderFood = jsonOrderFood.replace("$(soldout)", order.foods[i].isSellOut() ? "true" : "false");
-					jsonOrderFood = jsonOrderFood.replace("$(gift)", order.foods[i].isGift() ? "true" : "false");
-					jsonOrderFood = jsonOrderFood.replace("$(discount)", order.foods[i].getDiscount().toString());
-					jsonOrderFood = jsonOrderFood.replace("$(taste_id2)", Integer.toString(order.foods[i].tastes[1].aliasID));
-					jsonOrderFood = jsonOrderFood.replace("$(taste_id3)", Integer.toString(order.foods[i].tastes[2].aliasID));
-					jsonOrderFood = jsonOrderFood.replace("$(currPrice)", order.foods[i].isCurPrice() ? "true" : "false");
-					jsonOrderFood = jsonOrderFood.replace("$(temporary)", order.foods[i].isTemporary ? "true" : "false");
-					jsonOrderFood = jsonOrderFood.replace("$(seq_id)", Integer.toString(order.seqID));
-					jsonOrderFood = jsonOrderFood.replace("$(total_discount)", order.foods[i].calcDiscountPrice().toString());
-					jsonOrderFood = jsonOrderFood.replace("$(order_date)", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(order.foods[i].orderDate));
-					jsonOrderFood = jsonOrderFood.replace("$(waiter)", order.foods[i].waiter);
-					if(order.foods[i].tmpTaste != null){
-						jsonOrderFood = jsonOrderFood.replace("$(is_tmp_taste)", "true");
-						jsonOrderFood = jsonOrderFood.replace("$(tmp_taste)", order.foods[i].tmpTaste.preference);
-						jsonOrderFood = jsonOrderFood.replace("$(tmp_taste_price)", order.foods[i].tmpTaste.getPrice().toString());						
-						jsonOrderFood = jsonOrderFood.replace("$(tmp_taste_alias)", Integer.toString(order.foods[i].tmpTaste.aliasID));
-					}else{
-						jsonOrderFood = jsonOrderFood.replace("$(is_tmp_taste)", "false");
-						jsonOrderFood = jsonOrderFood.replace("$(tmp_taste)", "");
-						jsonOrderFood = jsonOrderFood.replace("$(tmp_taste_price)", "0.0");
-						jsonOrderFood = jsonOrderFood.replace("$(tmp_taste_alias)", "0");
-					}
+//					String jsonOrderFood = "[\"$(food)\",$(food_id),$(kitchen),\"$(taste)\",$(taste_id),"
+//							+ "$(count),\"$(unit_price)\",$(special),$(recommend),$(soldout),"
+//							+ "$(gift),$(discount),$(taste_id2),$(taste_id3),\"$(taste_price)\","
+//							+ "$(currPrice),$(temporary),$(seq_id),$(total_discount),$(order_date),$(waiter),"
+//							+ "$(is_tmp_taste),$(tmp_taste),$(tmp_taste_price),$(tmp_taste_alias)]";
+//					jsonOrderFood = jsonOrderFood.replace("$(food)", order.foods[i].name);
+//					jsonOrderFood = jsonOrderFood.replace("$(food_id)", new Integer(order.foods[i].aliasID).toString());
+//					jsonOrderFood = jsonOrderFood.replace("$(kitchen)", new Short(order.foods[i].kitchen.aliasID).toString());
+//					jsonOrderFood = jsonOrderFood.replace("$(taste)", order.foods[i].getTastePref().replaceAll(",", "；"));			
+//					jsonOrderFood = jsonOrderFood.replace("$(taste_id)", Integer.toString(order.foods[i].tastes[0].aliasID));
+//					jsonOrderFood = jsonOrderFood.replace("$(count)", Util.float2String2(order.foods[i].getCount()));					
+//					jsonOrderFood = jsonOrderFood.replace("$(unit_price)", Util.CURRENCY_SIGN + order.foods[i].getPrice());
+//					jsonOrderFood = jsonOrderFood.replace("$(taste_price)", Util.CURRENCY_SIGN + order.foods[i].getTastePrice());
+//					jsonOrderFood = jsonOrderFood.replace("$(special)",	order.foods[i].isSpecial() ? "true" : "false");
+//					jsonOrderFood = jsonOrderFood.replace("$(recommend)", order.foods[i].isRecommend() ? "true" : "false");
+//					jsonOrderFood = jsonOrderFood.replace("$(soldout)", order.foods[i].isSellOut() ? "true" : "false");
+//					jsonOrderFood = jsonOrderFood.replace("$(gift)", order.foods[i].isGift() ? "true" : "false");
+//					jsonOrderFood = jsonOrderFood.replace("$(discount)", order.foods[i].getDiscount().toString());
+//					jsonOrderFood = jsonOrderFood.replace("$(taste_id2)", Integer.toString(order.foods[i].tastes[1].aliasID));
+//					jsonOrderFood = jsonOrderFood.replace("$(taste_id3)", Integer.toString(order.foods[i].tastes[2].aliasID));
+//					jsonOrderFood = jsonOrderFood.replace("$(currPrice)", order.foods[i].isCurPrice() ? "true" : "false");
+//					jsonOrderFood = jsonOrderFood.replace("$(temporary)", order.foods[i].isTemporary ? "true" : "false");
+//					jsonOrderFood = jsonOrderFood.replace("$(seq_id)", Integer.toString(order.seqID));
+//					jsonOrderFood = jsonOrderFood.replace("$(total_discount)", order.foods[i].calcDiscountPrice().toString());
+//					jsonOrderFood = jsonOrderFood.replace("$(order_date)", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(order.foods[i].orderDate));
+//					jsonOrderFood = jsonOrderFood.replace("$(waiter)", order.foods[i].waiter);
+//					if(order.foods[i].tmpTaste != null){
+//						jsonOrderFood = jsonOrderFood.replace("$(is_tmp_taste)", "true");
+//						jsonOrderFood = jsonOrderFood.replace("$(tmp_taste)", order.foods[i].tmpTaste.preference);
+//						jsonOrderFood = jsonOrderFood.replace("$(tmp_taste_price)", order.foods[i].tmpTaste.getPrice().toString());						
+//						jsonOrderFood = jsonOrderFood.replace("$(tmp_taste_alias)", Integer.toString(order.foods[i].tmpTaste.aliasID));
+//					}else{
+//						jsonOrderFood = jsonOrderFood.replace("$(is_tmp_taste)", "false");
+//						jsonOrderFood = jsonOrderFood.replace("$(tmp_taste)", "");
+//						jsonOrderFood = jsonOrderFood.replace("$(tmp_taste_price)", "0.0");
+//						jsonOrderFood = jsonOrderFood.replace("$(tmp_taste_alias)", "0");
+//					}
+//					
+//					// put each json order food info to the value
+//					value.append(jsonOrderFood);
+//					// the string is separated by comma
+//					if (i != order.foods.length - 1) {
+//						value.append("，");
+//					}
+//				}
+//				jsonResp = jsonResp.replace("$(value)", value);
+//			}
+			
+			List<OrderFood> root = new ArrayList<OrderFood>();
+			if(order.foods != null){
+				OrderFood item = null;
+				for(int i = 0; i < order.foods.length; i++){
 					
-					// put each json order food info to the value
-					value.append(jsonOrderFood);
-					// the string is separated by comma
-					if (i != order.foods.length - 1) {
-						value.append("，");
-					}
+					item = new OrderFood();
+					item.setFoodName(order.foods[i].name);
+					item.setFoodID(order.foods[i].foodID);
+					item.setAliasID(order.foods[i].aliasID);
+					item.setKitchen(order.foods[i].kitchen);
+					item.setTaste(order.foods[i].tastes);
+					item.setCount(order.foods[i].getCount());
+					item.setUnitPrice(order.foods[i].getPrice());
+					item.setTastePrice(order.foods[i].getTastePrice());
+					item.setStatus(order.foods[i].status);
+					item.setDiscount(order.foods[i].getDiscount()); 
+					item.setTemporary(order.foods[i].isTemporary);
+					item.setSeqID(order.seqID);
+					item.setOrderDate(order.foods[i].orderDate); 
+					item.setWaiter(order.foods[i].waiter);
+					item.setTmpTaste(order.foods[i].tmpTaste);
+					root.add(item);
+					item = null;
 				}
-				jsonResp = jsonResp.replace("$(value)", value);
 			}
+			jobject.setSuccess(true);
+			jobject.setTotalProperty(root.size());
+			jobject.setRoot(root);
 
 		} catch (BusinessException e) {
 
 			if (e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
+				jobject.setSuccess(false);
+				jobject.setErrCode(ErrorCode.TERMINAL_NOT_ATTACHED);
+				jobject.setErrMsg("没有获取到餐厅信息,请重新确认!");
 				e.printStackTrace();
 				jsonResp = jsonResp.replace("$(result)", "false");
 				jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");
 
 			} else if (e.errCode == ErrorCode.TABLE_NOT_EXIST) {
+				jobject.setSuccess(false);
+				jobject.setErrCode(ErrorCode.TABLE_NOT_EXIST);
+				jobject.setErrMsg(tableID + "号餐台信息不存在,请重新确认!");
 				e.printStackTrace();
 				jsonResp = jsonResp.replace("$(result)", "false");
-				jsonResp = jsonResp.replace("$(value)", tableID
-						+ "号餐台信息不存在，请重新确认");
+				jsonResp = jsonResp.replace("$(value)", tableID + "号餐台信息不存在，请重新确认");
 
 			} else if (e.errCode == ErrorCode.TABLE_IDLE) {
+				jobject.setSuccess(true);
+				jobject.setErrCode(ErrorCode.TABLE_IDLE);
+				jobject.setErrMsg(null);
 				jsonResp = jsonResp.replace("$(result)", "true");
 				jsonResp = jsonResp.replace("$(value)", "NULL");
 
 			} else if (e.errCode == ErrorCode.MENU_EXPIRED) {
+				jobject.setSuccess(false);
+				jobject.setErrCode(ErrorCode.MENU_EXPIRED);
+				jobject.setErrMsg("菜谱信息与服务器不匹配,请与餐厅负责人确认或重新更新菜谱!");
 				jsonResp = jsonResp.replace("$(result)", "false");
-				jsonResp = jsonResp.replace("$(value)",
-						"菜谱信息与服务器不匹配，请与餐厅负责人确认或重新更新菜谱");
+				jsonResp = jsonResp.replace("$(value)", "菜谱信息与服务器不匹配，请与餐厅负责人确认或重新更新菜谱");
 
 			} else if (e.errCode == ErrorCode.ORDER_NOT_EXIST) {
+				jobject.setSuccess(false);
+				jobject.setErrCode(ErrorCode.ORDER_NOT_EXIST);
+				jobject.setErrMsg(orderID + "号账单信息不存在,请重新确认!");
 				jsonResp = jsonResp.replace("$(result)", "false");
-				jsonResp = jsonResp.replace("$(value)", orderID
-						+ "号账单信息不存在，请重新确认");
+				jsonResp = jsonResp.replace("$(value)", orderID + "号账单信息不存在，请重新确认");
 
 			} else {
+				jobject.setSuccess(false);
+				jobject.setErrMsg("没有获取到" + tableID + "号餐台的账单信息,请重新确认!");
 				e.printStackTrace();
 				jsonResp = jsonResp.replace("$(result)", "false");
-				jsonResp = jsonResp.replace("$(value)", "没有获取到" + tableID
-						+ "号餐台的账单信息，请重新确认");
+				jsonResp = jsonResp.replace("$(value)", "没有获取到" + tableID + "号餐台的账单信息，请重新确认");
 			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
+			jobject.setSuccess(false);
+			jobject.setErrMsg("数据库请求发生错误,请确认网络是否连接正常!");
 			jsonResp = jsonResp.replace("$(result)", "false");
 			jsonResp = jsonResp.replace("$(value)", "数据库请求发生错误，请确认网络是否连接正常");
 
 		} catch (IOException e) {
 			e.printStackTrace();
-
 		} finally {
 			// just for debug
 			// System.out.println(jsonResp);
-			out.write(jsonResp);
+			JSONObject json = JSONObject.fromObject(jobject);
+			String jsonStr = json.toString();
+//			System.out.println("jsonStr:   "+jsonStr);
+//			out.write(jsonResp);
+			out.write(jsonStr);
 		}
-
+		
 		return null;
 	}
 
