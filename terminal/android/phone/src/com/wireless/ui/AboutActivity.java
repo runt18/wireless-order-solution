@@ -15,7 +15,7 @@ public class AboutActivity extends Activity {
 		
 		TextView topTitle = (TextView)findViewById(R.id.software);
 		try {
-			topTitle.setText("e点通(v" + new Float(getPackageManager().getPackageInfo(getPackageName(), 0).versionName) + ")");
+			topTitle.setText("e点通(v" + getPackageManager().getPackageInfo(getPackageName(), 0).versionName + ")");
 		} catch (Exception e) {
 			topTitle.setText("e点通");
 		}	

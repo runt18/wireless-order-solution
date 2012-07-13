@@ -48,6 +48,25 @@ public class BillActivity extends Activity {
 	private Handler _handler = new Handler(){
 		@Override
 		public void handleMessage(Message message){
+			//选择折扣方式后，设定每个菜品的折扣率
+			for(int i = 0; i < _orderToPay.foods.length; i++){
+				if(!(_orderToPay.foods[i].isGift() || _orderToPay.foods[i].isTemporary || _orderToPay.foods[i].isSpecial())){
+					for(Kitchen kitchen : WirelessOrder.foodMenu.kitchens){
+						if(_orderToPay.foods[i].kitchen.aliasID == kitchen.aliasID){
+							if(_orderToPay.discount_type == Order.DISCOUNT_1){
+								_orderToPay.foods[i].setDiscount(kitchen.getDist1());
+								
+							}else if(_orderToPay.discount_type == Order.DISCOUNT_2){
+								_orderToPay.foods[i].setDiscount(kitchen.getDist2());
+								
+							}else if(_orderToPay.discount_type == Order.DISCOUNT_3){
+								_orderToPay.foods[i].setDiscount(kitchen.getDist3());
+							}
+						}
+					}
+				}
+			}
+			((BillFoodListView)findViewById(R.id.billListView)).notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(_orderToPay.foods)));
 			((TextView)findViewById(R.id.valuehandsel)).setText(Util.CURRENCY_SIGN + Float.toString(_orderToPay.calcDiscountPrice()));
 			((TextView)findViewById(R.id.valueconfirmed)).setText(Util.CURRENCY_SIGN + Float.toString(Math.round(_orderToPay.calcPriceWithTaste())));
 		}
@@ -184,8 +203,15 @@ public class BillActivity extends Activity {
 				}).show();
 				
 			}else{
-				//return to main activity and show the successful message
-				BillActivity.this.finish();
+				/**
+				 * Back to main activity if perform to pay order.
+				 * Refresh the bill list if perform to pay temporary order.
+				 */
+				if(_payCate == PAY_ORDER){
+					BillActivity.this.finish();
+				}else{				
+					_handler.sendEmptyMessage(0);
+				}
 				
 				Toast.makeText(BillActivity.this, _orderToPay.table.aliasID + "号台" + (_payCate == PAY_ORDER ? "结帐" : "暂结") + "成功", 0).show();
 				
@@ -202,9 +228,10 @@ public class BillActivity extends Activity {
 		//取得自定义的view
 		View view = LayoutInflater.from(this).inflate(R.layout.billextand, null);
 		
-		//默认账单赋值，比如付款方式，折扣方式
+		//设置为一般的结帐方式
 		_orderToPay.pay_type = Order.PAY_NORMAL;
 		
+		//根据付款方式显示"现金"或"刷卡"
 		if(_orderToPay.pay_manner == Order.MANNER_CASH){
 			((RadioButton)view.findViewById(R.id.cash)).setChecked(true);
 			
@@ -213,9 +240,8 @@ public class BillActivity extends Activity {
 			
 		}
 		
-		RadioGroup radioGroupm = (RadioGroup)view.findViewById(R.id.radioGroup1);
 		//付款方式添加事件监听器  
-		radioGroupm.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {  
+		((RadioGroup)view.findViewById(R.id.radioGroup1)).setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {  
               
             @Override 
             public void onCheckedChanged(RadioGroup group, int checkedId) {  
@@ -224,11 +250,12 @@ public class BillActivity extends Activity {
 					_orderToPay.pay_manner = Order.MANNER_CASH;					
                }else{
             		_orderToPay.pay_manner = Order.MANNER_CREDIT_CARD;	
-               }             
+               }           
                
             }  
         });  
 		
+		//根据折扣方式显示"折扣1","折扣2","折扣3"
 		if(_orderToPay.discount_type == Order.DISCOUNT_1){
 			((RadioButton)view.findViewById(R.id.discount1)).setChecked(true);
 			
@@ -239,9 +266,8 @@ public class BillActivity extends Activity {
 			((RadioButton)view.findViewById(R.id.discount3)).setChecked(true);
 		}
 		
-		RadioGroup radioGroupd = (RadioGroup)view.findViewById(R.id.radioGroup2);
 		//折扣方式方式添加事件监听器  
-		radioGroupd.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {  
+		((RadioGroup)view.findViewById(R.id.radioGroup2)).setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {  
 		              
 			@Override 
 		    public void onCheckedChanged(RadioGroup group, int checkedId) {  
@@ -268,25 +294,6 @@ public class BillActivity extends Activity {
 		 	.setNegativeButton("计算", new DialogInterface.OnClickListener() {					
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					//选择折扣方式后，设定每个菜品的折扣率
-					for(int i = 0; i < _orderToPay.foods.length; i++){
-						if(!(_orderToPay.foods[i].isGift() || _orderToPay.foods[i].isTemporary || _orderToPay.foods[i].isSpecial())){
-							for(Kitchen kitchen : WirelessOrder.foodMenu.kitchens){
-								if(_orderToPay.foods[i].kitchen.aliasID == kitchen.aliasID){
-									if(_orderToPay.discount_type == Order.DISCOUNT_1){
-										_orderToPay.foods[i].setDiscount(kitchen.getDist1());
-										
-									}else if(_orderToPay.discount_type == Order.DISCOUNT_2){
-										_orderToPay.foods[i].setDiscount(kitchen.getDist2());
-										
-									}else if(_orderToPay.discount_type == Order.DISCOUNT_3){
-										_orderToPay.foods[i].setDiscount(kitchen.getDist3());
-									}
-								}
-							}
-						}
-					}
-					((BillFoodListView)findViewById(R.id.billListView)).notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(_orderToPay.foods)));
 					_handler.sendEmptyMessage(0);
 				}
 		 	})

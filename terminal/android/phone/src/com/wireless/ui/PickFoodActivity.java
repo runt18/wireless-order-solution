@@ -1167,10 +1167,10 @@ public class PickFoodActivity extends Activity implements PickFoodListView.OnFoo
 		 * 筛选出有菜品的部门
 		 */
 		_validDepts = new ArrayList<Department>();
-		for (int i = 0; i < WirelessOrder.foodMenu.sKitchens.length; i++) {
+		for (int i = 0; i < WirelessOrder.foodMenu.depts.length; i++) {
 			for (int j = 0; j < _validKitchens.size(); j++) {
-				if (WirelessOrder.foodMenu.sKitchens[i].deptID == _validKitchens.get(j).dept.deptID) {
-					_validDepts.add(WirelessOrder.foodMenu.sKitchens[i]);
+				if (WirelessOrder.foodMenu.depts[i].deptID == _validKitchens.get(j).dept.deptID) {
+					_validDepts.add(WirelessOrder.foodMenu.depts[i]);
 					break;
 				}
 			}
