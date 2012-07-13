@@ -117,7 +117,7 @@ public class QueryMaterialMgrAction extends Action {
 				filterCondition = " AND A.material_alias " + ope + filterVal;
 			} else if (type == 2) {
 				// 按名称
-				filterCondition = " AND A.name like '" + filterVal + "%'";
+				filterCondition = " AND A.name like '%" + filterVal + "%'";
 			} else if (type == 3) {
 				// 按種類
 				filterCondition = " AND A.cate_id = " + filterVal;
