@@ -30,7 +30,9 @@ import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.BusinessUtil;
 
+@SuppressWarnings({"rawtypes","unchecked"})
 public class InventoryAnalysis extends Action {
+	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -80,8 +82,7 @@ public class InventoryAnalysis extends Action {
 			} else {
 				beginDt = beginDate + " 00:00:00";
 			}
-			ArrayList beginCountList = restaurantInventory.getInventoryPoint(
-					pin, beginDt, departments, materialCates);
+			ArrayList beginCountList = restaurantInventory.getInventoryPoint(pin, beginDt, departments, materialCates);
 
 			// 期末
 			if (!endDate.equals("")) {
@@ -89,8 +90,7 @@ public class InventoryAnalysis extends Action {
 			} else {
 				endDt = "";
 			}
-			ArrayList endCountList = restaurantInventory.getInventoryPoint(pin,
-					endDt, departments, materialCates);
+			ArrayList endCountList = restaurantInventory.getInventoryPoint(pin, endDt, departments, materialCates);
 
 			if (!beginDate.equals("")) {
 				beginDate = beginDate + " 00:00:00";
@@ -100,44 +100,28 @@ public class InventoryAnalysis extends Action {
 			}
 
 			// 进货数量
-			ArrayList inCountList = restaurantInventory
-					.getInventoryPeriodDetail(pin, beginDate, endDate,
-							departments, materialCates, 5);
+			ArrayList inCountList = restaurantInventory.getInventoryPeriodDetail(pin, beginDate, endDate, departments, materialCates, 5);
 
 			// 退货数量
-			ArrayList returnCountList = restaurantInventory
-					.getInventoryPeriodDetail(pin, beginDate, endDate,
-							departments, materialCates, 3);
+			ArrayList returnCountList = restaurantInventory.getInventoryPeriodDetail(pin, beginDate, endDate, departments, materialCates, 3);
 
 			// 出仓数量
-			ArrayList outCountList = restaurantInventory
-					.getInventoryPeriodDetail(pin, beginDate, endDate,
-							departments, materialCates, 4);
+			ArrayList outCountList = restaurantInventory.getInventoryPeriodDetail(pin, beginDate, endDate, departments, materialCates, 4);
 
 			// 报损数量
-			ArrayList lostCountList = restaurantInventory
-					.getInventoryPeriodDetail(pin, beginDate, endDate,
-							departments, materialCates, 1);
+			ArrayList lostCountList = restaurantInventory.getInventoryPeriodDetail(pin, beginDate, endDate, departments, materialCates, 1);
 
 			// 消耗数量
-			ArrayList costCountList = restaurantInventory
-					.getInventoryPeriodDetail(pin, beginDate, endDate,
-							departments, materialCates, 0);
+			ArrayList costCountList = restaurantInventory.getInventoryPeriodDetail(pin, beginDate, endDate, departments, materialCates, 0);
 
 			// 调入数量
-			ArrayList changeInCountList = restaurantInventory
-					.getInventoryPeriodDetail(pin, beginDate, endDate,
-							departments, materialCates, 7);
+			ArrayList changeInCountList = restaurantInventory.getInventoryPeriodDetail(pin, beginDate, endDate, departments, materialCates, 7);
 
 			// 调出数量
-			ArrayList changeOutCountList = restaurantInventory
-					.getInventoryPeriodDetail(pin, beginDate, endDate,
-							departments, materialCates, 6);
+			ArrayList changeOutCountList = restaurantInventory.getInventoryPeriodDetail(pin, beginDate, endDate, departments, materialCates, 6);
 
 			// 盘点损益
-			ArrayList checkCountList = restaurantInventory
-					.getInventoryPeriodDetail(pin, beginDate, endDate,
-							departments, materialCates, 8);
+			ArrayList checkCountList = restaurantInventory.getInventoryPeriodDetail(pin, beginDate, endDate, departments, materialCates, 8);
 
 			String cateString = "";
 			BusinessUtil businessUtil = new BusinessUtil();
@@ -192,214 +176,146 @@ public class InventoryAnalysis extends Action {
 
 				materialIndex = -1;
 				for (int j = 0; j < beginCountList.size(); j++) {
-					int thisMaterialId = Integer
-							.parseInt(((ArrayList) beginCountList.get(j))
-									.get(1).toString());
-					int thisCateId = Integer
-							.parseInt(((ArrayList) beginCountList.get(j))
-									.get(3).toString());
-					if (thisMaterialId == Integer.parseInt(countList.get(0)
-							.toString())
-							&& thisCateId == Integer.parseInt(countList.get(2)
-									.toString())) {
+					int thisMaterialId = Integer.parseInt(((ArrayList) beginCountList.get(j)).get(1).toString());
+					int thisCateId = Integer.parseInt(((ArrayList) beginCountList.get(j)).get(3).toString());
+					if (thisMaterialId == Integer.parseInt(countList.get(0).toString())
+							&& thisCateId == Integer.parseInt(countList.get(2).toString())) {
 						materialIndex = j;
 					}
 				}
 				if (materialIndex == -1) {
 					resultMap.put("countBegin", 0);
 				} else {
-					resultMap.put("countBegin", ((ArrayList) beginCountList
-							.get(materialIndex)).get(0));
+					resultMap.put("countBegin", ((ArrayList) beginCountList.get(materialIndex)).get(0));
 				}
 
 				materialIndex = -1;
 				for (int j = 0; j < inCountList.size(); j++) {
-					int thisMaterialId = Integer
-							.parseInt(((ArrayList) inCountList.get(j)).get(1)
-									.toString());
-					int thisCateId = Integer.parseInt(((ArrayList) inCountList
-							.get(j)).get(3).toString());
-					if (thisMaterialId == Integer.parseInt(countList.get(0)
-							.toString())
-							&& thisCateId == Integer.parseInt(countList.get(2)
-									.toString())) {
+					int thisMaterialId = Integer.parseInt(((ArrayList) inCountList.get(j)).get(1).toString());
+					int thisCateId = Integer.parseInt(((ArrayList) inCountList.get(j)).get(3).toString());
+					if (thisMaterialId == Integer.parseInt(countList.get(0).toString())
+							&& thisCateId == Integer.parseInt(countList.get(2).toString())) {
 						materialIndex = j;
 					}
 				}
 				if (materialIndex == -1) {
 					resultMap.put("inCount", 0);
 				} else {
-					resultMap
-							.put("inCount", ((ArrayList) inCountList
-									.get(materialIndex)).get(0));
+					resultMap.put("inCount", ((ArrayList) inCountList.get(materialIndex)).get(0));
 				}
 
 				materialIndex = -1;
 				for (int j = 0; j < returnCountList.size(); j++) {
-					int thisMaterialId = Integer
-							.parseInt(((ArrayList) returnCountList.get(j)).get(
-									1).toString());
-					int thisCateId = Integer
-							.parseInt(((ArrayList) returnCountList.get(j)).get(
-									3).toString());
-					if (thisMaterialId == Integer.parseInt(countList.get(0)
-							.toString())
-							&& thisCateId == Integer.parseInt(countList.get(2)
-									.toString())) {
+					int thisMaterialId = Integer.parseInt(((ArrayList) returnCountList.get(j)).get(1).toString());
+					int thisCateId = Integer.parseInt(((ArrayList) returnCountList.get(j)).get(3).toString());
+					if (thisMaterialId == Integer.parseInt(countList.get(0).toString())
+							&& thisCateId == Integer.parseInt(countList.get(2).toString())) {
 						materialIndex = j;
 					}
 				}
 				if (materialIndex == -1) {
 					resultMap.put("returnCount", 0);
 				} else {
-					resultMap.put("returnCount", ((ArrayList) returnCountList
-							.get(materialIndex)).get(0));
+					resultMap.put("returnCount", ((ArrayList) returnCountList.get(materialIndex)).get(0));
 				}
 
 				materialIndex = -1;
 				for (int j = 0; j < outCountList.size(); j++) {
-					int thisMaterialId = Integer
-							.parseInt(((ArrayList) outCountList.get(j)).get(1)
-									.toString());
-					int thisCateId = Integer.parseInt(((ArrayList) outCountList
-							.get(j)).get(3).toString());
-					if (thisMaterialId == Integer.parseInt(countList.get(0)
-							.toString())
-							&& thisCateId == Integer.parseInt(countList.get(2)
-									.toString())) {
+					int thisMaterialId = Integer.parseInt(((ArrayList) outCountList.get(j)).get(1).toString());
+					int thisCateId = Integer.parseInt(((ArrayList) outCountList.get(j)).get(3).toString());
+					if (thisMaterialId == Integer.parseInt(countList.get(0).toString())
+							&& thisCateId == Integer.parseInt(countList.get(2).toString())) {
 						materialIndex = j;
 					}
 				}
 				if (materialIndex == -1) {
 					resultMap.put("outCount", 0);
 				} else {
-					resultMap.put("outCount", ((ArrayList) outCountList
-							.get(materialIndex)).get(0));
+					resultMap.put("outCount", ((ArrayList) outCountList.get(materialIndex)).get(0));
 				}
 
 				materialIndex = -1;
 				for (int j = 0; j < lostCountList.size(); j++) {
-					int thisMaterialId = Integer
-							.parseInt(((ArrayList) lostCountList.get(j)).get(1)
-									.toString());
-					int thisCateId = Integer
-							.parseInt(((ArrayList) lostCountList.get(j)).get(3)
-									.toString());
-					if (thisMaterialId == Integer.parseInt(countList.get(0)
-							.toString())
-							&& thisCateId == Integer.parseInt(countList.get(2)
-									.toString())) {
+					int thisMaterialId = Integer.parseInt(((ArrayList) lostCountList.get(j)).get(1).toString());
+					int thisCateId = Integer.parseInt(((ArrayList) lostCountList.get(j)).get(3).toString());
+					if (thisMaterialId == Integer.parseInt(countList.get(0).toString())
+							&& thisCateId == Integer.parseInt(countList.get(2).toString())) {
 						materialIndex = j;
 					}
 				}
 				if (materialIndex == -1) {
 					resultMap.put("lostCount", 0);
 				} else {
-					resultMap.put("lostCount", ((ArrayList) lostCountList
-							.get(materialIndex)).get(0));
+					resultMap.put("lostCount", ((ArrayList) lostCountList.get(materialIndex)).get(0));
 				}
 
 				materialIndex = -1;
 				for (int j = 0; j < costCountList.size(); j++) {
-					int thisMaterialId = Integer
-							.parseInt(((ArrayList) costCountList.get(j)).get(1)
-									.toString());
-					int thisCateId = Integer
-							.parseInt(((ArrayList) costCountList.get(j)).get(3)
-									.toString());
-					if (thisMaterialId == Integer.parseInt(countList.get(0)
-							.toString())
-							&& thisCateId == Integer.parseInt(countList.get(2)
-									.toString())) {
+					int thisMaterialId = Integer.parseInt(((ArrayList) costCountList.get(j)).get(1).toString());
+					int thisCateId = Integer.parseInt(((ArrayList) costCountList.get(j)).get(3).toString());
+					if (thisMaterialId == Integer.parseInt(countList.get(0).toString())
+							&& thisCateId == Integer.parseInt(countList.get(2).toString())) {
 						materialIndex = j;
 					}
 				}
 				if (materialIndex == -1) {
 					resultMap.put("costCount", 0);
 				} else {
-					resultMap.put("costCount", ((ArrayList) costCountList
-							.get(materialIndex)).get(0));
+					resultMap.put("costCount", ((ArrayList) costCountList.get(materialIndex)).get(0));
 				}
 
 				materialIndex = -1;
 				for (int j = 0; j < changeInCountList.size(); j++) {
-					int thisMaterialId = Integer
-							.parseInt(((ArrayList) changeInCountList.get(j))
-									.get(1).toString());
-					int thisCateId = Integer
-							.parseInt(((ArrayList) changeInCountList.get(j))
-									.get(3).toString());
-					if (thisMaterialId == Integer.parseInt(countList.get(0)
-							.toString())
-							&& thisCateId == Integer.parseInt(countList.get(2)
-									.toString())) {
+					int thisMaterialId = Integer.parseInt(((ArrayList) changeInCountList.get(j)).get(1).toString());
+					int thisCateId = Integer.parseInt(((ArrayList) changeInCountList.get(j)).get(3).toString());
+					if (thisMaterialId == Integer.parseInt(countList.get(0).toString())
+							&& thisCateId == Integer.parseInt(countList.get(2).toString())) {
 						materialIndex = j;
 					}
 				}
 				if (materialIndex == -1) {
 					resultMap.put("changeInCount", 0);
 				} else {
-					resultMap.put("changeInCount",
-							((ArrayList) changeInCountList.get(materialIndex))
-									.get(0));
+					resultMap.put("changeInCount", ((ArrayList) changeInCountList.get(materialIndex)).get(0));
 				}
 
 				materialIndex = -1;
 				for (int j = 0; j < changeOutCountList.size(); j++) {
-					int thisMaterialId = Integer
-							.parseInt(((ArrayList) changeOutCountList.get(j))
-									.get(1).toString());
-					int thisCateId = Integer
-							.parseInt(((ArrayList) changeOutCountList.get(j))
-									.get(3).toString());
-					if (thisMaterialId == Integer.parseInt(countList.get(0)
-							.toString())
-							&& thisCateId == Integer.parseInt(countList.get(2)
-									.toString())) {
+					int thisMaterialId = Integer.parseInt(((ArrayList) changeOutCountList.get(j)).get(1).toString());
+					int thisCateId = Integer.parseInt(((ArrayList) changeOutCountList.get(j)).get(3).toString());
+					if (thisMaterialId == Integer.parseInt(countList.get(0).toString())
+							&& thisCateId == Integer.parseInt(countList.get(2).toString())) {
 						materialIndex = j;
 					}
 				}
 				if (materialIndex == -1) {
 					resultMap.put("changeOutCount", 0);
 				} else {
-					resultMap.put("changeOutCount",
-							((ArrayList) changeOutCountList.get(materialIndex))
-									.get(0));
+					resultMap.put("changeOutCount", ((ArrayList) changeOutCountList.get(materialIndex)).get(0));
 				}
 
 				materialIndex = -1;
 				for (int j = 0; j < checkCountList.size(); j++) {
-					int thisMaterialId = Integer
-							.parseInt(((ArrayList) checkCountList.get(j))
-									.get(1).toString());
-					int thisCateId = Integer
-							.parseInt(((ArrayList) checkCountList.get(j))
-									.get(3).toString());
-					if (thisMaterialId == Integer.parseInt(countList.get(0)
-							.toString())
-							&& thisCateId == Integer.parseInt(countList.get(2)
-									.toString())) {
+					int thisMaterialId = Integer.parseInt(((ArrayList) checkCountList.get(j)).get(1).toString());
+					int thisCateId = Integer.parseInt(((ArrayList) checkCountList.get(j)).get(3).toString());
+					if (thisMaterialId == Integer.parseInt(countList.get(0).toString())
+							&& thisCateId == Integer.parseInt(countList.get(2).toString())) {
 						materialIndex = j;
 					}
 				}
 				if (materialIndex == -1) {
 					resultMap.put("checkCount", 0);
 				} else {
-					resultMap.put("checkCount", ((ArrayList) checkCountList
-							.get(materialIndex)).get(0));
+					resultMap.put("checkCount", ((ArrayList) checkCountList.get(materialIndex)).get(0));
 				}
 
 				materialIndex = -1;
 				for (int j = 0; j < endCountList.size(); j++) {
-					int thisMaterialId = Integer
-							.parseInt(((ArrayList) endCountList.get(j)).get(1)
-									.toString());
+					int thisMaterialId = Integer.parseInt(((ArrayList) endCountList.get(j)).get(1).toString());
 					int thisCateId = Integer.parseInt(((ArrayList) endCountList
 							.get(j)).get(3).toString());
-					if (thisMaterialId == Integer.parseInt(countList.get(0)
-							.toString())
-							&& thisCateId == Integer.parseInt(countList.get(2)
-									.toString())) {
+					if (thisMaterialId == Integer.parseInt(countList.get(0).toString())
+							&& thisCateId == Integer.parseInt(countList.get(2).toString())) {
 						materialIndex = j;
 					}
 				}
@@ -407,8 +323,7 @@ public class InventoryAnalysis extends Action {
 					endCount = 0;
 					resultMap.put("countEnd", 0);
 				} else {
-					endCount = Float.parseFloat(((ArrayList) endCountList
-							.get(materialIndex)).get(0).toString());
+					endCount = Float.parseFloat(((ArrayList) endCountList.get(materialIndex)).get(0).toString());
 					resultMap.put("countEnd", endCount);
 				}
 
