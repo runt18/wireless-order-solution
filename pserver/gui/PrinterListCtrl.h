@@ -1,17 +1,22 @@
 #pragma once
 
 #include "../tinyxml/tinyxml.h"
+#include "../pserver/inc/PrintDef.h"
 
 typedef struct{
 	int code;
 	TCHAR* desc;
 }PrintFuncMap;
 
-//extern TCHAR* _FuncDesc[];
+typedef struct{
+	PRINT_STYLE style;
+	TCHAR* desc;
+}PrintStyleMap;
+
 extern PrintFuncMap _FuncMap[];
 extern int _nFuncs;
-extern TCHAR* _PrinterStyle[];
-extern int _nStyle;
+extern PrintStyleMap _StyleMap[];
+extern int _nStyles;
 
 enum{
 	COLUMN_ID = 0,

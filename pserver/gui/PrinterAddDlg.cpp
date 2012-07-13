@@ -16,6 +16,7 @@
 
 extern map<int, CString> g_Kitchens;
 extern map<int, CString> g_Regions;
+extern map<int, CString> g_Departments;
 
 IMPLEMENT_DYNAMIC(CAddPrinterDlg, CDialog)
 
@@ -103,6 +104,17 @@ void CAddPrinterDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK_KITCHEN_48, m_Kitchens[47]);
 	DDX_Control(pDX, IDC_CHECK_KITCHEN_49, m_Kitchens[48]);
 	DDX_Control(pDX, IDC_CHECK_KITCHEN_50, m_Kitchens[49]);
+	DDX_Control(pDX, IDC_RADIO_DEPT_1, m_Depts[0]);
+	DDX_Control(pDX, IDC_RADIO_DEPT_2, m_Depts[1]);
+	DDX_Control(pDX, IDC_RADIO_DEPT_3, m_Depts[2]);
+	DDX_Control(pDX, IDC_RADIO_DEPT_4, m_Depts[3]);
+	DDX_Control(pDX, IDC_RADIO_DEPT_5, m_Depts[4]);
+	DDX_Control(pDX, IDC_RADIO_DEPT_6, m_Depts[5]);
+	DDX_Control(pDX, IDC_RADIO_DEPT_7, m_Depts[6]);
+	DDX_Control(pDX, IDC_RADIO_DEPT_8, m_Depts[7]);
+	DDX_Control(pDX, IDC_RADIO_DEPT_9, m_Depts[8]);
+	DDX_Control(pDX, IDC_RADIO_DEPT_10, m_Depts[9]);
+	DDX_Control(pDX, IDC_RADIO_DEPT_ALL, m_DeptAll);
 
 }
 
@@ -140,14 +152,23 @@ BOOL CAddPrinterDlg::OnInitDialog(){
 	//assign the current value of function code
 	m_FuncCode = _FuncMap[m_Funcs.GetCurSel()].code;
 
+	//set the department to all as default
+	m_DeptAll.ShowWindow(SW_SHOW);
+	m_DeptAll.SetCheck(BST_CHECKED);
+	map<int, CString>::iterator it = g_Departments.begin();
+	for(it; it != g_Departments.end(); it++){
+		m_Depts[it->first].ShowWindow(SW_SHOW);
+		m_Depts[it->first].SetWindowText(it->second);
+		m_Depts[it->first].SetCheck(BST_UNCHECKED);
+	}
+
 	//set the kitchen to all as default
-	m_KitchenAll.SetCheck(BST_CHECKED);
-	m_KitchenAll.EnableWindow(FALSE);
-	m_KitchenTemp.EnableWindow(FALSE);
-	map<int, CString>::iterator it = g_Kitchens.begin();
+	m_KitchenAll.ShowWindow(SW_HIDE);
+	m_KitchenTemp.ShowWindow(SW_HIDE);
+	it = g_Kitchens.begin();
 	for(it; it != g_Kitchens.end(); it++){
 		m_Kitchens[it->first].SetWindowText(it->second);
-		m_Kitchens[it->first].EnableWindow(FALSE);
+		m_Kitchens[it->first].ShowWindow(SW_HIDE);
 	}
 
 	//set the region to all as default
@@ -156,12 +177,11 @@ BOOL CAddPrinterDlg::OnInitDialog(){
 	for(it = g_Regions.begin(); it != g_Regions.end(); it++){
 		m_Regions[it->first].SetWindowText(it->second);
 		m_Regions[it->first].EnableWindow(FALSE);
-
 	}
 
 	//set the printer style 
-	for(int i = 1; i < _nStyle; i++){
-		m_PrinterStyle.InsertString(i - 1, _PrinterStyle[i]);
+	for(int i = 1; i < _nStyles; i++){
+		m_PrinterStyle.InsertString(i - 1, _StyleMap[i].desc);
 	}
 
 	//set the repeat range from 1 to 10
@@ -177,20 +197,23 @@ BOOL CAddPrinterDlg::OnInitDialog(){
 }
 
 void CAddPrinterDlg::OnOK(){
-	bool isKitchenSelected = false;
-	if(m_KitchenAll.GetCheck() == BST_CHECKED || m_KitchenTemp.GetCheck() == BST_CHECKED){
-		isKitchenSelected = true;
-	}else{
-		for(unsigned i = 0; i < g_Kitchens.size(); i++){
-			if(m_Kitchens[i].GetCheck() == BST_CHECKED){
-				isKitchenSelected = true;
-				break;
+	if(m_KitchenAll.IsWindowVisible()){
+		bool isKitchenSelected = false;
+		if(m_KitchenAll.GetCheck() == BST_CHECKED || m_KitchenTemp.GetCheck() == BST_CHECKED){
+			isKitchenSelected = true;
+		}else{
+			for(unsigned i = 0; i < g_Kitchens.size(); i++){
+				if(m_Kitchens[i].GetCheck() == BST_CHECKED){
+					isKitchenSelected = true;
+					break;
+				}
 			}
 		}
-	}
-	if(!isKitchenSelected){
-		MessageBox(_T("请选择打印的厨房分类"),  _T("信息"));
-		return;
+		if(!isKitchenSelected){
+			MessageBox(_T("请选择打印的厨房分类"),  _T("信息"));
+			return;
+		}
+
 	}
 
 	bool isRegionSelected = false;
@@ -251,9 +274,16 @@ void CAddPrinterDlg::OnOK(){
 		//get the printer style
 		int style = 0;
 		pPrinter->QueryIntAttribute(ConfTags::PRINT_STYLE, &style);
-		if(m_Printer == CString(name.c_str()) && m_Style.Compare(_PrinterStyle[style]) != 0){
+		TCHAR* pStyle = _T("");
+		for(int i = 0; i < _nStyles; i++){
+			if(_StyleMap[i].style == style){
+				pStyle = _StyleMap[i].desc;
+				break;
+			}
+		}
+		if(m_Printer == CString(name.c_str()) && m_Style.Compare(pStyle) != 0){
 			CString msg;
-			msg.Format(_T("已存在打印机\"%s\"的\"%s\"打印类型，\n请确认相同型号的打印机要使用相同的打印类型。"), CString(name.c_str()), _PrinterStyle[style]);
+			msg.Format(_T("已存在打印机\"%s\"的\"%s\"打印类型，\n请确认相同型号的打印机要使用相同的打印类型。"), CString(name.c_str()), pStyle);
 			MessageBox(msg,  _T("信息"), MB_ICONINFORMATION);
 			isDuplicate = true;
 			break;
@@ -274,6 +304,19 @@ void CAddPrinterDlg::OnOK(){
 
 			//set the function code attribute
 			pPrinter->SetAttribute(ConfTags::PRINT_FUNC, _FuncMap[m_Funcs.GetCurSel()].code);
+
+			//set the department
+			pPrinter->SetAttribute(ConfTags::DEPT_ALL, m_DeptAll.GetCheck() == BST_CHECKED ? 1 : 0);
+			pPrinter->SetAttribute(ConfTags::DEPT_1, m_Depts[0].GetCheck() == BST_CHECKED ? 1 : 0);
+			pPrinter->SetAttribute(ConfTags::DEPT_2, m_Depts[1].GetCheck() == BST_CHECKED ? 1 : 0);
+			pPrinter->SetAttribute(ConfTags::DEPT_3, m_Depts[2].GetCheck() == BST_CHECKED ? 1 : 0);
+			pPrinter->SetAttribute(ConfTags::DEPT_4, m_Depts[3].GetCheck() == BST_CHECKED ? 1 : 0);
+			pPrinter->SetAttribute(ConfTags::DEPT_5, m_Depts[4].GetCheck() == BST_CHECKED ? 1 : 0);
+			pPrinter->SetAttribute(ConfTags::DEPT_6, m_Depts[5].GetCheck() == BST_CHECKED ? 1 : 0);
+			pPrinter->SetAttribute(ConfTags::DEPT_7, m_Depts[6].GetCheck() == BST_CHECKED ? 1 : 0);
+			pPrinter->SetAttribute(ConfTags::DEPT_8, m_Depts[7].GetCheck() == BST_CHECKED ? 1 : 0);
+			pPrinter->SetAttribute(ConfTags::DEPT_9, m_Depts[8].GetCheck() == BST_CHECKED ? 1 : 0);
+			pPrinter->SetAttribute(ConfTags::DEPT_10, m_Depts[9].GetCheck() == BST_CHECKED ? 1 : 0);
 
 			//set the kitchen
 			if(m_KitchenAll.GetCheck() == BST_CHECKED){
@@ -470,33 +513,76 @@ void CAddPrinterDlg::OnCbnFuncChg()
 {
 	//assign the selected function code value
 	m_FuncCode = _FuncMap[m_Funcs.GetCurSel()].code;
-	//enable kitchen check boxes & disable the region check boxes if the function is as below.
-	//1 - print order detail
-	//2 - print extra food
-	//3 - print canceled food
-	if(m_FuncCode == Reserved::PRINT_ORDER_DETAIL ||
+
+	if(m_FuncCode == Reserved::PRINT_ORDER ||
+		m_FuncCode == Reserved::PRINT_ALL_EXTRA_FOOD ||
+		m_FuncCode == Reserved::PRINT_ALL_CANCELLED_FOOD){
+
+		//Make the department visible, kitchen check boxes invisible if the function is as below.
+		//1 - print order 
+		//2 - print all extra food
+		//3 - print all canceled food
+
+		m_KitchenAll.ShowWindow(SW_HIDE);
+		m_KitchenTemp.ShowWindow(SW_HIDE);
+		for(unsigned int i = 0; i < g_Kitchens.size(); i++){
+			m_Kitchens[i].ShowWindow(SW_HIDE);
+		}
+
+		m_DeptAll.ShowWindow(SW_SHOW);
+		m_DeptAll.SetCheck(BST_CHECKED);
+		for(unsigned int i = 0; i < g_Departments.size(); i++){
+			m_Depts[i].ShowWindow(SW_SHOW);
+			m_Depts[i].SetCheck(BST_UNCHECKED);
+		}
+
+	}else if(m_FuncCode == Reserved::PRINT_ORDER_DETAIL ||
 		m_FuncCode == Reserved::PRINT_EXTRA_FOOD ||
 		m_FuncCode == Reserved::PRINT_CANCELLED_FOOD){
-			m_KitchenAll.EnableWindow(TRUE);
-			m_KitchenAll.SetCheck(BST_CHECKED);
-			m_KitchenTemp.EnableWindow(FALSE);
-			m_KitchenTemp.SetCheck(BST_UNCHECKED);
-			for(unsigned int i = 0; i < g_Kitchens.size(); i++){
-				m_Kitchens[i].EnableWindow(FALSE);
-				m_Kitchens[i].SetCheck(BST_UNCHECKED);
-			}
-			m_RegionAll.EnableWindow(FALSE);
-			m_RegionAll.SetCheck(BST_CHECKED);
-			for(unsigned int i = 0; i < g_Regions.size(); i++){
-				m_Regions[i].EnableWindow(FALSE);
-				m_Regions[i].SetCheck(BST_UNCHECKED);
-			}
-	}else{
-		m_KitchenAll.EnableWindow(FALSE);
+
+		//Make the department invisible, enable kitchen check boxes & disable the region check boxes if the function is as below.
+		//1 - print order detail
+		//2 - print extra food
+		//3 - print canceled food
+
+		m_DeptAll.ShowWindow(SW_HIDE);
+		for(unsigned int i = 0; i < g_Departments.size(); i++){
+			m_Depts[i].ShowWindow(SW_HIDE);
+		}
+
+		m_KitchenAll.ShowWindow(TRUE);
+		m_KitchenAll.EnableWindow(TRUE);
 		m_KitchenAll.SetCheck(BST_CHECKED);
 		m_KitchenTemp.EnableWindow(FALSE);
+		m_KitchenTemp.ShowWindow(TRUE);
 		m_KitchenTemp.SetCheck(BST_UNCHECKED);
 		for(unsigned int i = 0; i < g_Kitchens.size(); i++){
+			m_Kitchens[i].ShowWindow(TRUE);
+			m_Kitchens[i].EnableWindow(FALSE);
+			m_Kitchens[i].SetCheck(BST_UNCHECKED);
+		}
+		m_RegionAll.EnableWindow(FALSE);
+		m_RegionAll.SetCheck(BST_CHECKED);
+		for(unsigned int i = 0; i < g_Regions.size(); i++){
+			m_Regions[i].EnableWindow(FALSE);
+			m_Regions[i].SetCheck(BST_UNCHECKED);
+		}
+
+	}else{
+
+		m_DeptAll.ShowWindow(SW_HIDE);
+		for(unsigned int i = 0; i < g_Departments.size(); i++){
+			m_Depts[i].ShowWindow(SW_HIDE);
+		}
+
+		m_KitchenAll.EnableWindow(FALSE);
+		m_KitchenAll.SetCheck(BST_CHECKED);
+		m_KitchenAll.ShowWindow(SW_SHOW);
+		m_KitchenTemp.EnableWindow(FALSE);
+		m_KitchenTemp.SetCheck(BST_UNCHECKED);
+		m_KitchenTemp.ShowWindow(TRUE);
+		for(unsigned int i = 0; i < g_Kitchens.size(); i++){
+			m_Kitchens[i].ShowWindow(SW_SHOW);
 			m_Kitchens[i].EnableWindow(FALSE);
 			m_Kitchens[i].SetCheck(BST_UNCHECKED);
 		}

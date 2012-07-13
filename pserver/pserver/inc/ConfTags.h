@@ -15,6 +15,17 @@ public:
 	static const char* PRINT_NAME;
 	static const char* PRINT_FUNC;
 	static const char* PRINT_STYLE;
+	static const char* DEPT_ALL;
+	static const char* DEPT_1;
+	static const char* DEPT_2;
+	static const char* DEPT_3;
+	static const char* DEPT_4;
+	static const char* DEPT_5;
+	static const char* DEPT_6;
+	static const char* DEPT_7;
+	static const char* DEPT_8;
+	static const char* DEPT_9;
+	static const char* DEPT_10;
 	static const char* REGION_ALL;
 	static const char* REGION_1;
 	static const char* REGION_2;

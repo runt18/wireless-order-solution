@@ -27,5 +27,6 @@ public:
 	Region(string rName, int id);
 	Region(const Region& right);
 	Region& operator=(const Region& right);
+	bool operator == (const Region& right) const;
 
 };

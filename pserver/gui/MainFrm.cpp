@@ -23,7 +23,7 @@ using namespace std;
 #endif
 
 //the string indicating the version of the program
-const TCHAR* _PROG_VER_ = _T("1.0.5");
+const TCHAR* _PROG_VER_ = _T("1.0.6");
 //the path to the conf.xml
 CString g_ConfPath;
 //the path to new setup program
@@ -34,6 +34,7 @@ CString g_NewProgPath;
 //2 - Run new setup program silently 
 int g_DoQuitProg = 0;
 
+map<int, CString> g_Departments;
 map<int, CString> g_Kitchens;
 map<int, CString> g_Regions;
 
@@ -258,7 +259,7 @@ static unsigned __stdcall StopPrinterProc(LPVOID pvParam){
 
 static unsigned _stdcall StartPrinterProc(LPVOID pvParam){
 
-	const char* CONF_VER = "1.1";
+	const char* CONF_VER = "1.2";
 	const char* SERV_ADDR = "www.e-tones.net";
 
 	CMainFrame* pMainFrame = reinterpret_cast<CMainFrame*>(pvParam);
@@ -302,17 +303,51 @@ static unsigned _stdcall StartPrinterProc(LPVOID pvParam){
 				}
 
 				/**
-				 * Change the remote ip to "www.e-tones.net"
+				 * Check to see if the version of XML configure file is updated or not.
 				 */
 				string confVer = pRoot->Attribute(ConfTags::CONF_VER);
 				if(confVer != CONF_VER){
-					//change the version to 1.1
+					//change to the latest version
 					pRoot->SetAttribute(ConfTags::CONF_VER, CONF_VER);
-					//change the remote ip to "www.e-tones.net"
-					TiXmlElement* pRemote = TiXmlHandle(pRoot).FirstChildElement(ConfTags::REMOTE).Element();
-					if(pRemote != NULL){
-						pRemote->SetAttribute(ConfTags::REMOTE_IP, SERV_ADDR);
+
+					/**
+					 * Add the "dept" attribute to each printer element
+					 */
+					TiXmlElement* pPrinter = TiXmlHandle(pRoot).FirstChildElement(ConfTags::PRINTER).Element();
+					for(pPrinter; pPrinter != NULL; pPrinter = pPrinter->NextSiblingElement(ConfTags::PRINTER)){
+						pPrinter->SetAttribute(ConfTags::DEPT_ALL, 1);
+						pPrinter->SetAttribute(ConfTags::DEPT_1, 0);
+						pPrinter->SetAttribute(ConfTags::DEPT_2, 0);
+						pPrinter->SetAttribute(ConfTags::DEPT_3, 0);
+						pPrinter->SetAttribute(ConfTags::DEPT_4, 0);
+						pPrinter->SetAttribute(ConfTags::DEPT_5, 0);
+						pPrinter->SetAttribute(ConfTags::DEPT_6, 0);
+						pPrinter->SetAttribute(ConfTags::DEPT_7, 0);
+						pPrinter->SetAttribute(ConfTags::DEPT_8, 0);
+						pPrinter->SetAttribute(ConfTags::DEPT_9, 0);
+						pPrinter->SetAttribute(ConfTags::DEPT_10, 0);
 					}
+
+
+					/**
+					 * Remove the elements whose func code equals either Reserved::PRINT_ALL_EXTRA_FOOD or Reserved::PRINT_EXTRA_FOOD
+					 */
+					pPrinter = TiXmlHandle(pRoot).FirstChildElement(ConfTags::PRINTER).Element();
+					while(pPrinter != NULL){
+						int func = Reserved::PRINT_UNKNOWN;
+						pPrinter->QueryIntAttribute(ConfTags::PRINT_FUNC, &func);
+						if(func == Reserved::PRINT_ALL_EXTRA_FOOD || func == Reserved::PRINT_EXTRA_FOOD){
+							TiXmlElement* pPrinter2Del = pPrinter;
+							pPrinter = pPrinter->NextSiblingElement(ConfTags::PRINTER);
+							pRoot->RemoveChild(pPrinter2Del);
+							if(pPrinter == NULL){
+								break;
+							}
+						}else{
+							pPrinter = pPrinter->NextSiblingElement(ConfTags::PRINTER);
+						}
+					}
+
 					ofstream fout(g_ConfPath);
 					if(fout.good()){
 						fout.seekp(ios::beg);
@@ -412,14 +447,26 @@ void CMainFrame::OnPrintReport(int type, const char* msg){
 	}
 }
 
+void CMainFrame::OnRetrieveDept(const std::vector<Department>& depts){
+	g_Departments.clear();
+	for(unsigned int i = 0; i < depts.size(); i++){
+		//convert the string from ANSI to UNICODE
+		DWORD dwNum = MultiByteToWideChar (CP_ACP, 0, depts[i].name.c_str(), -1, NULL, 0);
+		boost::shared_ptr<wchar_t> pDeptName(new wchar_t[dwNum], boost::checked_array_deleter<wchar_t>());
+		MultiByteToWideChar (CP_ACP, 0, depts[i].name.c_str(), -1, pDeptName.get(), dwNum);
+		g_Departments.insert(map<int, CString>::value_type(depts[i].dept_id, pDeptName.get()));
+	}
+	m_pPrinterView->Update();
+}
+
 void CMainFrame::OnRetrieveKitchen(const std::vector<Kitchen>& kitchens){
 	g_Kitchens.clear();
 	for(unsigned int i = 0; i < kitchens.size(); i++){
 		//convert the string from ANSI to UNICODE
 		DWORD dwNum = MultiByteToWideChar (CP_ACP, 0, kitchens[i].name.c_str(), -1, NULL, 0);
-		boost::shared_ptr<wchar_t> pMsg(new wchar_t[dwNum], boost::checked_array_deleter<wchar_t>());
-		MultiByteToWideChar (CP_ACP, 0, kitchens[i].name.c_str(), -1, pMsg.get(), dwNum);
-		g_Kitchens.insert(map<int, CString>::value_type(kitchens[i].alias_id, pMsg.get()));
+		boost::shared_ptr<wchar_t> pKitchenName(new wchar_t[dwNum], boost::checked_array_deleter<wchar_t>());
+		MultiByteToWideChar (CP_ACP, 0, kitchens[i].name.c_str(), -1, pKitchenName.get(), dwNum);
+		g_Kitchens.insert(map<int, CString>::value_type(kitchens[i].alias_id, pKitchenName.get()));
 	}
 	m_pPrinterView->Update();
 }
@@ -429,9 +476,9 @@ void CMainFrame::OnRetrieveRegion(const std::vector<Region>& regions){
 	for(unsigned int i = 0; i < regions.size(); i++){
 		//convert the string from ANSI to UNICODE
 		DWORD dwNum = MultiByteToWideChar (CP_ACP, 0, regions[i].name.c_str(), -1, NULL, 0);
-		boost::shared_ptr<wchar_t> pMsg(new wchar_t[dwNum], boost::checked_array_deleter<wchar_t>());
-		MultiByteToWideChar (CP_ACP, 0, regions[i].name.c_str(), -1, pMsg.get(), dwNum);
-		g_Regions.insert(map<int, CString>::value_type(regions[i].alias_id, pMsg.get()));
+		boost::shared_ptr<wchar_t> pRegionName(new wchar_t[dwNum], boost::checked_array_deleter<wchar_t>());
+		MultiByteToWideChar (CP_ACP, 0, regions[i].name.c_str(), -1, pRegionName.get(), dwNum);
+		g_Regions.insert(map<int, CString>::value_type(regions[i].alias_id, pRegionName.get()));
 	}
 	m_pPrinterView->Update();
 }

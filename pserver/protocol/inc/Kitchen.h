@@ -1,13 +1,14 @@
 #pragma once
 
 #include <string>
+#include "Department.h"
 using namespace std;
 
 class Kitchen{
 public:
 	/**
 	 * The values below are used for the print order detail request
-	 * to indicate which kitchen the food belong to. 
+	 * to indicate which kitchen the food belongs to. 
 	 */
 	static const int KITCHEN_NULL = 255;
 	static const int KITCHEN_ALL = 254;
@@ -64,12 +65,16 @@ public:
 	static const int KITCHEN_50 = 49;
 
 	Kitchen();
-	Kitchen(const string& kName, int id);
+	Kitchen(const string& kitchenName, int id);
+	Kitchen(const string kitchenName, int kitchenAlias, const Department& department);
 	Kitchen(const Kitchen& right);
 	Kitchen& operator=(const Kitchen& right);
+	bool operator==(const Kitchen& right) const;
 	//the name to this kitchen
 	string name;
 	//the alias id to this kitchen
 	int alias_id;
+	//the department this kitchen belongs to
+	Department dept;
 	
 };

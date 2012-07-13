@@ -254,11 +254,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\inc\PrintDef.h"
+				>
+			</File>
+			<File
 				RelativePath=".\inc\PrinterInstance.h"
 				>
 			</File>
 			<File
 				RelativePath=".\inc\PrintFunc.h"
+				>
+			</File>
+			<File
+				RelativePath=".\inc\PrintJob.h"
 				>
 			</File>
 			<File

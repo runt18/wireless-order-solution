@@ -7,6 +7,7 @@
 #include "../../protocol/inc/Reserved.h"
 #include "../../protocol/inc/Region.h"
 #include "../../protocol/inc/Kitchen.h"
+#include "../../protocol/inc/Department.h"
 #include "../../protocol/inc/RespACK.h"
 #include "../../protocol/inc/RespNAK.h"
 #include "../../protocol/inc/RespParser.h"
@@ -365,6 +366,56 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 			}
 
 		}
+
+		//get the departments
+		vector<int> depts;
+		isOn = 0;
+		pPrinter->QueryIntAttribute(ConfTags::DEPT_ALL, &isOn);
+		if(isOn == 1){
+			depts.push_back(Department::DEPT_ALL);
+		}else{
+			pPrinter->QueryIntAttribute(ConfTags::DEPT_1, &isOn);
+			if(isOn == 1){
+				depts.push_back(Department::DEPT_1);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::DEPT_2, &isOn);
+			if(isOn == 1){
+				depts.push_back(Department::DEPT_2);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::DEPT_3, &isOn);
+			if(isOn == 1){
+				depts.push_back(Department::DEPT_3);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::DEPT_4, &isOn);
+			if(isOn == 1){
+				depts.push_back(Department::DEPT_4);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::DEPT_5, &isOn);
+			if(isOn == 1){
+				depts.push_back(Department::DEPT_5);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::DEPT_6, &isOn);
+			if(isOn == 1){
+				depts.push_back(Department::DEPT_6);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::DEPT_7, &isOn);
+			if(isOn == 1){
+				depts.push_back(Department::DEPT_7);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::DEPT_8, &isOn);
+			if(isOn == 1){
+				depts.push_back(Department::DEPT_8);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::DEPT_9, &isOn);
+			if(isOn == 1){
+				depts.push_back(Department::DEPT_9);
+			}
+			pPrinter->QueryIntAttribute(ConfTags::DEPT_10, &isOn);
+			if(isOn == 1){
+				depts.push_back(Department::DEPT_10);
+			}
+		}
+
 		//get the repeat number
 		int repeat = 1;
 		pPrinter->QueryIntAttribute(ConfTags::PRINT_REPEAT, &repeat);
@@ -379,12 +430,12 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 		if(it == g_PrintInstances.end()){
 			//create the printer instance and put it to the vector if not be found in the exist printer instances
 			boost::shared_ptr<PrinterInstance> pPI(new PrinterInstance(name.c_str(), style, pReport));
-			pPI->addFunc(func, regions, kitchens, repeat);
+			pPI->addFunc(func, regions, kitchens, depts, repeat);
 			g_PrintInstances.push_back(pPI);
 
 		}else{
 			//just add the function to the exist printer instance
-			(*it)->addFunc(func, regions, kitchens, repeat);
+			(*it)->addFunc(func, regions, kitchens, depts, repeat);
 		}
 	}
 
@@ -419,18 +470,19 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 				if(iResult > 0){
 					if(printReq.header.mode == Mode::PRINT && printReq.header.type == Type::PRINT_BILL){
 						//extract the 2-byte length of the print content
-						unsigned int len = (unsigned char)printReq.header.length[0] |
-								  (unsigned char)printReq.header.length[1] << 8;
+						unsigned int len = (unsigned char)printReq.header.length[0] | (unsigned char)printReq.header.length[1] << 8;
 						//notify the corresponding print thread according to the print function code
 						vector< boost::shared_ptr<PrinterInstance> >::iterator iter = g_PrintInstances.begin();
 						//enumerate each printer instances' supported function codes to check if the job is supported
 						for(iter; iter != g_PrintInstances.end(); iter++){
 							vector<PrintFunc>::iterator it = (*iter)->funcs.begin();
 							for(it; it != (*iter)->funcs.end(); it++){
-								if(it->code == Reserved::PRINT_ORDER && (printReq.header.reserved == Reserved::PRINT_ORDER || printReq.header.reserved == Reserved::PRINT_HURRIED_FOOD)){
+								if(it->code == Reserved::PRINT_ORDER && (printReq.header.reserved == Reserved::PRINT_ORDER || 
+									printReq.header.reserved == Reserved::PRINT_HURRIED_FOOD || printReq.header.reserved == Reserved::PRINT_ALL_EXTRA_FOOD)){
 									(*iter)->addJob(printReq.body, len, *it, printReq.header.reserved);
 
-								}else if(it->code == Reserved::PRINT_ORDER_DETAIL && (printReq.header.reserved == Reserved::PRINT_ORDER_DETAIL)){
+								}else if(it->code == Reserved::PRINT_ORDER_DETAIL && (printReq.header.reserved == Reserved::PRINT_ORDER_DETAIL ||
+									printReq.header.reserved == Reserved::PRINT_EXTRA_FOOD)){
 									(*iter)->addJob(printReq.body, len, *it, printReq.header.reserved);
 
 								}else if(it->code == Reserved::PRINT_RECEIPT && (printReq.header.reserved == Reserved::PRINT_RECEIPT || 
@@ -442,16 +494,10 @@ static unsigned __stdcall PrintMgrProc(LPVOID pvParam){
 								}else if(it->code == Reserved::PRINT_TEMP_RECEIPT && printReq.header.reserved == Reserved::PRINT_TEMP_RECEIPT){
 									(*iter)->addJob(printReq.body, len, *it, printReq.header.reserved);
 
-								}else if(it->code == Reserved::PRINT_EXTRA_FOOD && (printReq.header.reserved == Reserved::PRINT_EXTRA_FOOD)){
-									(*iter)->addJob(printReq.body, len, *it, printReq.header.reserved);
-
 								}else if(it->code == Reserved::PRINT_CANCELLED_FOOD && (printReq.header.reserved == Reserved::PRINT_CANCELLED_FOOD)){
 									(*iter)->addJob(printReq.body, len, *it, printReq.header.reserved);
 
 								}else if(it->code == Reserved::PRINT_TRANSFER_TABLE && (printReq.header.reserved == Reserved::PRINT_TRANSFER_TABLE)){
-									(*iter)->addJob(printReq.body, len, *it, printReq.header.reserved);
-
-								}else if(it->code == Reserved::PRINT_ALL_EXTRA_FOOD && (printReq.header.reserved == Reserved::PRINT_ALL_EXTRA_FOOD)){
 									(*iter)->addJob(printReq.body, len, *it, printReq.header.reserved);
 
 								}else if(it->code == Reserved::PRINT_ALL_CANCELLED_FOOD && (printReq.header.reserved == Reserved::PRINT_ALL_CANCELLED_FOOD)){
@@ -670,15 +716,17 @@ static unsigned __stdcall LoginProc(LPVOID pvParam){
 							if(loginResp.header.seq == reqLogin.header.seq){
 								//check the type to see it's an ACK or NAK
 								if(loginResp.header.type == Type::ACK){
+									vector<Department> depts;
 									vector<Kitchen> kitchens;
 									vector<Region> regions;
 									string rest;
-									RespParse::parsePrintLogin(loginResp, kitchens, regions, rest);
+									RespParse::parsePrintLogin(loginResp, depts, kitchens, regions, rest);
 									if(pReport){
 										ostringstream os;
 										os << "\"" << rest << "\"" << "µÇÂ¼³É¹¦";
 										pReport->OnPrintReport(0, os.str().c_str());
 										pReport->OnRetrieveRestaurant(rest);
+										pReport->OnRetrieveDept(depts);
 										pReport->OnRetrieveKitchen(kitchens);
 										pReport->OnRetrieveRegion(regions);
 									}

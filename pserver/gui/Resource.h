@@ -22,7 +22,6 @@
 #define IDC_ACCOUNT                     1001
 #define IDC_PWD                         1002
 #define IDC_BUTTON_NET_TEST             1003
-#define IDC_ACCOUNT3                    1003
 #define IDC_BUTTON_NET_SAVE             1004
 #define IDC_BUTTON_NET_CANCEL           1005
 #define IDC_ACCOUNT2                    1007
@@ -65,6 +64,10 @@
 #define IDC_CHECK_KITCHEN_8             1050
 #define IDC_CHECK_KITCHEN_9             1051
 #define IDC_CHECK_KITCHEN_10            1052
+#define IDC_RADIO_DEPT_1                1053
+#define IDC_RADIO_DEPT_2                1055
+#define IDC_RADIO_DEPT_3                1056
+#define IDC_RADIO_DEPT_4                1057
 #define IDC_CHECK_KITCHEN_11            1058
 #define IDC_CHECK_KITCHEN_12            1059
 #define IDC_CHECK_KITCHEN_13            1060
@@ -107,6 +110,14 @@
 #define IDC_CHECK_KITCHEN_48            1097
 #define IDC_CHECK_KITCHEN_49            1098
 #define IDC_CHECK_KITCHEN_50            1099
+#define IDC_RADIO_DEPT_5                1100
+#define IDC_RADIO_DEPT_6                1101
+#define IDC_RADIO_DEPT_7                1102
+#define IDC_RADIO_DEPT_8                1103
+#define IDC_RADIO_DEPT_9                1104
+#define IDC_RADIO_DEPT_10               1105
+#define IDC_RADIO_DEPT_11               1106
+#define IDC_RADIO_DEPT_ALL              1106
 #define ID_START_PRINTER                32771
 #define ID_STOP_PRINTER                 32772
 #define ID_NET_SETTING                  32774
@@ -140,7 +151,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        142
 #define _APS_NEXT_COMMAND_VALUE         32798
-#define _APS_NEXT_CONTROL_VALUE         1033
+#define _APS_NEXT_CONTROL_VALUE         1054
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

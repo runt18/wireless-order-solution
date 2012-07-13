@@ -2,6 +2,7 @@
 #include "../inc/PrinterInstance.h"
 #include "../../protocol/inc/Reserved.h"
 #include "../../protocol/inc/Kitchen.h"
+#include "../../protocol/inc/Department.h"
 #include "../../protocol/inc/Region.h"
 #include <algorithm>
 #include <sstream>
@@ -309,23 +310,24 @@ void PrinterInstance::addJob(const char* buf, int len, const PrintFunc& func, in
 
 	vector<PrintFunc>::iterator iter_func = find(funcs.begin(), funcs.end(), func);
 
-	if(func.code == Reserved::PRINT_ORDER_DETAIL ||
-		func.code == Reserved::PRINT_EXTRA_FOOD ||
-		func.code == Reserved::PRINT_CANCELLED_FOOD){		
-		if(iter_func != funcs.end()){
-			split2Details(print_content, iter_func->kitchens, details);
+	if(iter_func != funcs.end()){
+		if(func.code == Reserved::PRINT_ORDER || func.code == Reserved::PRINT_ALL_EXTRA_FOOD ||
+			func.code == Reserved::PRINT_ALL_CANCELLED_FOOD || func.code == Reserved::PRINT_ALL_HURRIED_FOOD){
+			splitOrdersByDept(print_content, iter_func->depts, details);
+
+		}else if(func.code == Reserved::PRINT_ORDER_DETAIL || func.code == Reserved::PRINT_EXTRA_FOOD ||
+				 func.code == Reserved::PRINT_CANCELLED_FOOD){		
+			splitDetailsByKitchen(print_content, iter_func->kitchens, details);
+
+		}else{
+			if(!print_content.empty()){
+				details.push_back(print_content);
+			}
 		}
 
-	}else{
-		if(!print_content.empty()){
-			details.push_back(print_content);
-		}
-	}
+		EnterCriticalSection(&m_csJobQueue);
 
-	EnterCriticalSection(&m_csJobQueue);
-
-	if(details.size() != 0){
-		if(iter_func != funcs.end()){
+		if(!details.empty()){
 			//add all order detail jobs to the queue
 			vector<string>::iterator iter = details.begin();
 			for(iter; iter != details.end(); iter++){
@@ -334,22 +336,23 @@ void PrinterInstance::addJob(const char* buf, int len, const PrintFunc& func, in
 			//notify the print thread to run
 			SetEvent(hPrintEvent);
 		}
+
+		LeaveCriticalSection(&m_csJobQueue);
 	}
 
-	LeaveCriticalSection(&m_csJobQueue);
 }
 
 /*******************************************************************************
-* Function Name  : split2Details
-* Description    : Split the print content into several details.
+* Function Name  : splitDetailsByKitchen
+* Description    : Split the order details content by the kitchen.
 * Input          : print_content - the content to be split
 			       kitchens - the kitchens that this printer contains
 * Output         : detail_content - the vector holding the results
 * Return         : None
 *******************************************************************************/
-void PrinterInstance::split2Details(const string& print_content, const vector<int>& kitchens, vector<string>& detail_content){
+void PrinterInstance::splitDetailsByKitchen(const string& print_content, const vector<int>& kitchens, vector<string>& detail_content){
 	/************************************************************************
-	* The print content looks like below in the case the content to print is as below
+	* The print content looks like below in case of the printer functions below
 	* 1 - order detail
 	* 2 - extra order
 	* 3 - canceled order
@@ -369,9 +372,9 @@ void PrinterInstance::split2Details(const string& print_content, const vector<in
 		while(offset < size){
 
 			int length = (print_content[offset + 1] & 0x000000FF) | ((print_content[offset + 2] & 0x000000FF) << 8);
-			int kit2Print = (unsigned char)print_content[offset];
+			int kitchen2Print = (unsigned char)print_content[offset];
 
-			if(kit2Print != Kitchen::KITCHEN_NULL){
+			if(kitchen2Print != Kitchen::KITCHEN_NULL){
 				//enumerate to see which kitchens match the print content,
 				//and then print it
 				vector<int>::const_iterator it = kitchens.begin();
@@ -381,14 +384,59 @@ void PrinterInstance::split2Details(const string& print_content, const vector<in
 					* 1 - the kitchen equals to Kitchen.KITCHEN_ALL
 					* 2 - the kitchen equals to print request
 					************************************************************************/
-					if(*it == Kitchen::KITCHEN_ALL || *it == kit2Print){
+					if(*it == Kitchen::KITCHEN_ALL || *it == kitchen2Print){
 						detail_content.push_back(string(print_content.begin() + offset + 3, print_content.begin() + offset + 3 + length));
 						break;
 					}
 				}
 			}
 			offset += 3 + length;
+		}
+	}
+}
 
+/*******************************************************************************
+* Function Name  : splitOrdersByDept
+* Description    : Split the orders content by the department.
+* Input          : print_content - the content to be split
+				   depts - the departments that this printer contains
+* Output         : detail_content - the vector holding the results
+* Return         : None
+*******************************************************************************/
+void PrinterInstance::splitOrdersByDept(const string& print_content, const vector<int>& depts, vector<string>& detail_content){
+	/************************************************************************
+	* The print content looks like below in case of print functions below
+	* 1 - order
+	* <order_1> : <order_2> : ... : <order_x>
+	* Each order looks like below.
+	* department : len[2] : content
+	* department - 1-byte indicating the department no
+	* len[2] - 2-byte indicating the length of order content
+	* content - the order content                                                          
+	************************************************************************/
+	detail_content.clear();
+	if(!print_content.empty()){
+		int offset = 0;
+		vector<string> details; 
+		int size = print_content.size();
+		while(offset < size){
+
+			int length = (print_content[offset + 1] & 0x000000FF) | ((print_content[offset + 2] & 0x000000FF) << 8);
+			int dept2Print = (unsigned char)print_content[offset];
+
+			//enumerate to see which kitchens match the print content,
+			//and then print it
+			vector<int>::const_iterator it = depts.begin();
+			for(it; it != depts.end(); it++){		
+				/************************************************************************
+				* perform to print the order content if the department is matched     
+				************************************************************************/
+				if(*it == dept2Print){
+					detail_content.push_back(string(print_content.begin() + offset + 3, print_content.begin() + offset + 3 + length));
+					return;
+				}
+			}
+			offset += 3 + length;
 		}
 	}
 }
@@ -399,24 +447,16 @@ void PrinterInstance::split2Details(const string& print_content, const vector<in
 * Input          : iFunc - the code to this function
 				   regions - the regions to this function
 				   kitchens - the kitchens to this function
+				   depts - the departments to this function
 				   iRepeat - the repeat times to this function
 * Output         : None
 * Return         : None
 *******************************************************************************/
-void PrinterInstance::addFunc(int iFunc, const vector<int>& regions, const vector<int>& kitchens, int iRepeat){
+void PrinterInstance::addFunc(int iFunc, const vector<int>& regions, const vector<int>& kitchens, const vector<int>& depts, int iRepeat){
 	vector<PrintFunc>::iterator iter_func = find(funcs.begin(), funcs.end(), PrintFunc(iFunc));
 	if(iter_func == funcs.end()){
 		//if the function doesn't exist, means the new function
 		//put it to the function list 
-		funcs.push_back(PrintFunc(iFunc, regions, kitchens, iRepeat));
-
+		funcs.push_back(PrintFunc(iFunc, regions, kitchens, depts, iRepeat));
 	}
-	//else{
-	//	//if the function has been exist, check to see whether this function contains this kitchen or not.
-	//	//add the kitchen to this function if not exist
-	//	vector<int>::iterator it = find(iter_func->kitchens.begin(), iter_func->kitchens.end(), iKitchen);
-	//	if(it == iter_func->kitchens.end()){
-	//		iter_func->kitchens.push_back(iKitchen);
-	//	}
-	//}
 }

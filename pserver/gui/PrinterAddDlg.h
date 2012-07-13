@@ -24,6 +24,7 @@ protected:
 
 private:
 	static const int REGION_NUM = 10;
+	static const int DEPT_NUM = 10;
 	static const int KITCHEN_NUM = 50;
 	CTabCtrl m_TabCtrl;
 	CComboBox m_PrinterNames;
@@ -34,6 +35,8 @@ private:
 	CButton m_KitchenAll;
 	CButton m_KitchenTemp;
 	CButton m_Kitchens[KITCHEN_NUM];
+	CButton m_DeptAll;
+	CButton m_Depts[DEPT_NUM];
 	CSpinButtonCtrl m_SpinRepeat;
 	CEdit m_PrintRepeat;
 	CRichEditCtrl m_DescCtrl;
