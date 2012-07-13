@@ -2,7 +2,7 @@
 
 var analysisCurrFrom = new Ext.form.FormPanel({
 	border : false,
-	anchor : "right 13%",
+	anchor : '100%',
 	id : "analysisCurrFrom",
 	items : [ {
 		layout : "column",
@@ -50,176 +50,78 @@ var analysisCurrFrom = new Ext.form.FormPanel({
 	} ]
 });
 
-inventoryAnalysisWin = new Ext.Window(
-		{
-			title : "库存分析",
-			width : 450,
-			height : 310,
-			closeAction : 'hide',
-			resizable : false,
-			closable : false,
-			layout : "anchor",
-			items : [ {
-				border : false,
-				anchor : "right 15%",
-				items : [ {
-					layout : "column",
-					border : false,
-					frame : true,
-					anchor : "98%",
-					items : [ {
-						layout : "form",
-						border : false,
-						labelSeparator : ' ',
-						width : 200,
-						labelWidth : 50,
-						items : [ {
-							xtype : "datefield",
-							id : "begDateInvenAnalysis",
-							width : 120,
-							fieldLabel : "日期",
-							format : 'Y-m-d',
-							readOnly : true,
-							listeners : {
-								blur : function(){									
-									Ext.ux.checkDateForBeginAndEnd(true, 'begDateInvenAnalysis', 'endDateInvenAnalysis');
+inventoryAnalysisWin = new Ext.Window({
+	title : "库存分析",
+	width : 450,
+//	height : 350,
+	closeAction : 'hide',
+	resizable : false,
+	closable : false,
+	layout : 'anchor',
+	items : [
+	    {
+	    	border : false,
+			items : [
+			     {
+			    	 layout : "column",
+					 border : false,
+					 frame : true,
+					 anchor : "98%",
+					 items : [
+					     {
+					    	 layout : "form",
+					    	 border : false,
+					    	 labelSeparator : ' ',
+					    	 width : 200,
+					    	 labelWidth : 50,
+					    	 items : [
+					    	     {
+					    	    	 xtype : "datefield",
+					    	    	 id : "begDateInvenAnalysis",
+					    	    	 width : 120,
+					    	    	 fieldLabel : "日期",
+					    	    	 format : 'Y-m-d',
+									readOnly : true,
+									listeners : {
+										blur : function(){									
+											Ext.ux.checkDateForBeginAndEnd(true, 'begDateInvenAnalysis', 'endDateInvenAnalysis');
+										}
+									}
+					    	     } ]
+						}, {
+							layout : "form",
+							border : false,
+							labelSeparator : ' ',
+							width : 200,
+							labelWidth : 50,
+							items : [ {
+								xtype : "datefield",
+								id : "endDateInvenAnalysis",
+								width : 120,
+								fieldLabel : "至",
+								format : 'Y-m-d',
+								readOnly : true,
+								listeners : {
+									blur : function(){									
+										Ext.ux.checkDateForBeginAndEnd(false, 'begDateInvenAnalysis', 'endDateInvenAnalysis');
+									}
 								}
-							}
+							} ]
 						} ]
-					}, {
-						layout : "form",
-						border : false,
-						labelSeparator : ' ',
-						width : 200,
-						labelWidth : 50,
-						items : [ {
-							xtype : "datefield",
-							id : "endDateInvenAnalysis",
-							width : 120,
-							fieldLabel : "至",
-							format : 'Y-m-d',
-							readOnly : true,
-							listeners : {
-								blur : function(){									
-									Ext.ux.checkDateForBeginAndEnd(false, 'begDateInvenAnalysis', 'endDateInvenAnalysis');
-								}
-							}
-						} ]
-					} ]
-				} ]
-			}, {
-				layout : "column",
-				title : "食材种类",
-				border : false,
-				anchor : "100% 37%",
-				autoScroll : true,
-				frame : true,
-				items : [ {
-					layout : "form",
-					border : false,
-					labelSeparator : '',
-					width : 80,
-					labelWidth : 45,
-					items : [ {
-						xtype : "checkbox",
-						id : "cate1InvenAna"
-					} ]
-				}, {
-					layout : "form",
-					border : false,
-					labelSeparator : '',
-					width : 80,
-					labelWidth : 45,
-					items : [ {
-						xtype : "checkbox",
-						id : "cate2InvenAna"
-					} ]
-				}, {
-					layout : "form",
-					border : false,
-					labelSeparator : '',
-					width : 80,
-					labelWidth : 45,
-					items : [ {
-						xtype : "checkbox",
-						id : "cate3InvenAna"
-					} ]
-				}, {
-					layout : "form",
-					border : false,
-					labelSeparator : '',
-					width : 80,
-					labelWidth : 45,
-					items : [ {
-						xtype : "checkbox",
-						id : "cate4InvenAna"
-					} ]
-				}, {
-					layout : "form",
-					border : false,
-					labelSeparator : '',
-					width : 80,
-					labelWidth : 45,
-					items : [ {
-						xtype : "checkbox",
-						id : "cate5InvenAna"
-					} ]
-				}, {
-					layout : "form",
-					border : false,
-					labelSeparator : '',
-					width : 80,
-					labelWidth : 45,
-					items : [ {
-						xtype : "checkbox",
-						id : "cate6InvenAna"
-					} ]
-				}, {
-					layout : "form",
-					border : false,
-					labelSeparator : '',
-					width : 80,
-					labelWidth : 45,
-					items : [ {
-						xtype : "checkbox",
-						id : "cate7InvenAna"
-					} ]
-				}, {
-					layout : "form",
-					border : false,
-					labelSeparator : '',
-					width : 80,
-					labelWidth : 45,
-					items : [ {
-						xtype : "checkbox",
-						id : "cate8InvenAna"
-					} ]
-				}, {
-					layout : "form",
-					border : false,
-					labelSeparator : '',
-					width : 80,
-					labelWidth : 45,
-					items : [ {
-						xtype : "checkbox",
-						id : "cate9InvenAna"
-					} ]
-				}, {
-					layout : "form",
-					border : false,
-					labelSeparator : '',
-					width : 80,
-					labelWidth : 45,
-					items : [ {
-						xtype : "checkbox",
-						id : "cate10InvenAna"
-					} ]
-				} ]
-			}, {
+			     } ]
+	    }, {
+			layout : "column",
+			title : "食材种类",
+			id : 'cateInvenAnaForm',
+			border : false,
+			height : 170,
+			autoScroll : true,
+			frame : true,
+			items : [{}] 
+		}, {
 				layout : "column",
 				title : "部门",
 				border : false,
-				anchor : "100% 37%",
 				autoScroll : true,
 				frame : true,
 				items : [ {
@@ -353,42 +255,15 @@ inventoryAnalysisWin = new Ext.Window(
 							}
 
 							// -- 獲取食材種類--
-							var materialCates = "";
-							if (inventoryAnalysisWin.findById("cate1InvenAna").getValue() == true) {
-								materialCates = materialCates + materialCateComboData[0][0] + ",";
+							var materialCates = "";						
+							
+							for(var i = 0; i < materialCateComboData.length; i++){
+								if(Ext.getCmp('cateInvenAna' + materialCateComboData[i][0]).getValue() == true){									
+									materialCates += (materialCateComboData[i][0] + ',');
+								}
 							}
-							if (inventoryAnalysisWin.findById("cate2InvenAna").getValue() == true) {
-								materialCates = materialCates + materialCateComboData[1][0] + ",";
-							}
-							if (inventoryAnalysisWin.findById("cate3InvenAna").getValue() == true) {
-								materialCates = materialCates + materialCateComboData[2][0] + ",";
-							}
-							if (inventoryAnalysisWin.findById("cate4InvenAna").getValue() == true) {
-								materialCates = materialCates + materialCateComboData[3][0] + ",";
-							}
-							if (inventoryAnalysisWin.findById("cate5InvenAna").getValue() == true) {
-								materialCates = materialCates + materialCateComboData[4][0] + ",";
-							}
-							if (inventoryAnalysisWin.findById("cate6InvenAna").getValue() == true) {
-								materialCates = materialCates + materialCateComboData[5][0] + ",";
-							}
-							if (inventoryAnalysisWin.findById("cate7InvenAna").getValue() == true) {
-								materialCates = materialCates + materialCateComboData[6][0] + ",";
-							}
-							if (inventoryAnalysisWin.findById("cate8InvenAna").getValue() == true) {
-								materialCates = materialCates + materialCateComboData[7][0] + ",";
-							}
-							if (inventoryAnalysisWin.findById("cate9InvenAna").getValue() == true) {
-								materialCates = materialCates + materialCateComboData[8][0] + ",";
-							}
-							if (inventoryAnalysisWin.findById("cate10InvenAna").getValue() == true) {
-								materialCates = materialCates + materialCateComboData[9][0] + ",";
-							}
-
-							if (materialCates != "") {
-								materialCates = materialCates.substring(0, materialCates.length - 1);
-							}
-
+							materialCates = materialCates.length > 0 ? materialCates.substring(0, materialCates.length - 1) : materialCates;
+							
 							// -- 獲取部門 --
 							var departments = "";
 							var departmentsName = '';
@@ -476,12 +351,14 @@ inventoryAnalysisWin = new Ext.Window(
 													currInventoryResultData = rootData.slice(0);
 													currInvenAnaGrid.getStore().loadData(currInventoryResultData);
 													
-													for(var i = 0; i < currInvenAnaGrid.getStore().data.length; i++){
+													for(var i = 0; i < currInventoryResultData.length; i++){
 														tpSumPrice += (parseFloat(currInventoryResultData[i].sumPrice));
 														tpAmount += parseInt(currInventoryResultData[i].amount);
 													}													
 													if (rootData[0].materialCateID == "NO_DATA") {
 														currInvenAnaGrid.getStore().removeAll();
+														tpSumPrice = 0.00;
+														tpAmount = 0;
 													}													
 												} else {
 													Ext.MessageBox.show({
@@ -491,10 +368,11 @@ inventoryAnalysisWin = new Ext.Window(
 															});
 													
 												}
+												
 												Ext.getDom('txtCurrInvenAnaDisplayAmount').innerHTML = tpAmount;
 												Ext.getDom('txtCurrInvenAnaDisplaySumPrice').innerHTML = tpSumPrice.toFixed(2);
 											},
-											failure : function(response,options) {
+											failure : function(response,options) {											
 												Ext.getDom('txtCurrInvenAnaDisplayAmount').innerHTML = tpAmount;
 												Ext.getDom('txtCurrInvenAnaDisplaySumPrice').innerHTML = tpSumPrice.toFixed(2);
 												Ext.MessageBox.show({
@@ -680,29 +558,51 @@ inventoryAnalysisWin = new Ext.Window(
 
 					inventoryAnalysisWin.findById("begDateInvenAnalysis").setValue("");
 					inventoryAnalysisWin.findById("endDateInvenAnalysis").setValue("");
-
+					
+					var cateInvenAnaForm = Ext.getCmp('cateInvenAnaForm');
+					cateInvenAnaForm.items.each(function(item,index,length){
+//						alert('item:  '+item);
+						cateInvenAnaForm.remove(item);
+					});
+					
+					for(var i = 0; i < materialCateComboData.length; i++){
+						cateInvenAnaForm.add({
+							layout : 'form',
+							border : false,
+							labelSeparator : (materialCateComboData[i][1] + ':'),
+							width : 80,
+							labelWidth : 45,
+							items : [ {
+								xtype : 'checkbox',
+								id : ('cateInvenAna' + materialCateComboData[i][0])
+							} ]
+						} );
+					}
+//					cateInvenAnaForm.setWidth(450);
+					cateInvenAnaForm.doLayout(true);
+					
 					// 神技！動態改變form中component的label！！！
-					inventoryAnalysisWin.findById("cate1InvenAna").el.parent().parent().parent().first().dom.innerHTML = materialCateComboData[0][1] + ":";
-					inventoryAnalysisWin.findById("cate2InvenAna").el.parent().parent().parent().first().dom.innerHTML = materialCateComboData[1][1] + ":";
-					inventoryAnalysisWin.findById("cate3InvenAna").el.parent().parent().parent().first().dom.innerHTML = materialCateComboData[2][1] + ":";
-					inventoryAnalysisWin.findById("cate4InvenAna").el.parent().parent().parent().first().dom.innerHTML = materialCateComboData[3][1] + ":";
-					inventoryAnalysisWin.findById("cate5InvenAna").el.parent().parent().parent().first().dom.innerHTML = materialCateComboData[4][1] + ":";
-					inventoryAnalysisWin.findById("cate6InvenAna").el.parent().parent().parent().first().dom.innerHTML = materialCateComboData[5][1] + ":";
-					inventoryAnalysisWin.findById("cate7InvenAna").el.parent().parent().parent().first().dom.innerHTML = materialCateComboData[6][1] + ":";
-					inventoryAnalysisWin.findById("cate8InvenAna").el.parent().parent().parent().first().dom.innerHTML = materialCateComboData[7][1]+ ":";
-					inventoryAnalysisWin.findById("cate9InvenAna").el.parent().parent().parent().first().dom.innerHTML = materialCateComboData[8][1] + ":";
-					inventoryAnalysisWin.findById("cate10InvenAna").el.parent().parent().parent().first().dom.innerHTML = materialCateComboData[9][1] + ":";
-
-					inventoryAnalysisWin.findById("cate1InvenAna").setValue(false);
-					inventoryAnalysisWin.findById("cate2InvenAna").setValue(false);
-					inventoryAnalysisWin.findById("cate3InvenAna").setValue(false);
-					inventoryAnalysisWin.findById("cate4InvenAna").setValue(false);
-					inventoryAnalysisWin.findById("cate5InvenAna").setValue(false);
-					inventoryAnalysisWin.findById("cate6InvenAna").setValue(false);
-					inventoryAnalysisWin.findById("cate7InvenAna").setValue(false);
-					inventoryAnalysisWin.findById("cate8InvenAna").setValue(false);
-					inventoryAnalysisWin.findById("cate9InvenAna").setValue(false);
-					inventoryAnalysisWin.findById("cate10InvenAna").setValue(false);
+//					inventoryAnalysisWin.findById("cate1InvenAna").el.parent().parent().parent().first().dom.innerHTML = materialCateComboData[0][1] + ":";
+//					inventoryAnalysisWin.findById("cate2InvenAna").el.parent().parent().parent().first().dom.innerHTML = materialCateComboData[1][1] + ":";
+//					inventoryAnalysisWin.findById("cate3InvenAna").el.parent().parent().parent().first().dom.innerHTML = materialCateComboData[2][1] + ":";
+//					inventoryAnalysisWin.findById("cate4InvenAna").el.parent().parent().parent().first().dom.innerHTML = materialCateComboData[3][1] + ":";
+//					inventoryAnalysisWin.findById("cate5InvenAna").el.parent().parent().parent().first().dom.innerHTML = materialCateComboData[4][1] + ":";
+//					inventoryAnalysisWin.findById("cate6InvenAna").el.parent().parent().parent().first().dom.innerHTML = materialCateComboData[5][1] + ":";
+//					inventoryAnalysisWin.findById("cate7InvenAna").el.parent().parent().parent().first().dom.innerHTML = materialCateComboData[6][1] + ":";
+//					inventoryAnalysisWin.findById("cate8InvenAna").el.parent().parent().parent().first().dom.innerHTML = materialCateComboData[7][1]+ ":";
+//					inventoryAnalysisWin.findById("cate9InvenAna").el.parent().parent().parent().first().dom.innerHTML = materialCateComboData[8][1] + ":";
+//					inventoryAnalysisWin.findById("cate10InvenAna").el.parent().parent().parent().first().dom.innerHTML = materialCateComboData[9][1] + ":";
+//
+//					inventoryAnalysisWin.findById("cate1InvenAna").setValue(false);
+//					inventoryAnalysisWin.findById("cate2InvenAna").setValue(false);
+//					inventoryAnalysisWin.findById("cate3InvenAna").setValue(false);
+//					inventoryAnalysisWin.findById("cate4InvenAna").setValue(false);
+//					inventoryAnalysisWin.findById("cate5InvenAna").setValue(false);
+//					inventoryAnalysisWin.findById("cate6InvenAna").setValue(false);
+//					inventoryAnalysisWin.findById("cate7InvenAna").setValue(false);
+//					inventoryAnalysisWin.findById("cate8InvenAna").setValue(false);
+//					inventoryAnalysisWin.findById("cate9InvenAna").setValue(false);
+//					inventoryAnalysisWin.findById("cate10InvenAna").setValue(false);
 
 					inventoryAnalysisWin.findById("dept1InvenAna").el.parent().parent().parent().first().dom.innerHTML = departmentData[0][1] + ":";
 					inventoryAnalysisWin.findById("dept2InvenAna").el.parent().parent().parent().first().dom.innerHTML = departmentData[1][1] + ":";
