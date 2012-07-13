@@ -1,7 +1,6 @@
 ﻿function billQuery(in_queryTpye, in_operator, in_condition, in_additionalFilter) {
 
-	Ext.Ajax
-			.request({
+	Ext.Ajax.request({
 				url : "../../QueryToday.do",
 				params : {
 					"pin" : pin,
