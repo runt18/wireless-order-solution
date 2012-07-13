@@ -11,16 +11,17 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.QueryMenu;
+import com.wireless.db.QueryRegion;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Mode;
 import com.wireless.protocol.ProtocolPackage;
-import com.wireless.protocol.Region;
 import com.wireless.protocol.ReqPing;
 import com.wireless.protocol.RespNAK;
 import com.wireless.protocol.RespOTAUpdate;
 import com.wireless.protocol.RespPrintLogin;
+import com.wireless.protocol.Terminal;
 import com.wireless.protocol.Type;
 
 /**
@@ -110,31 +111,14 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 								String restaurantName = dbCon.rs.getString("restaurant_name");
 								dbCon.rs.close();
 								
-								//get the related kitchen information 
-								sql = "SELECT kitchen_id, kitchen_alias, name, dept_id FROM " + WirelessSocketServer.database + ".kitchen WHERE restaurant_id=" + restaurantID;
-								dbCon.rs = dbCon.stmt.executeQuery(sql);
-								ArrayList<Kitchen> kitchens = new ArrayList<Kitchen>();
-								while(dbCon.rs.next()){
-									kitchens.add(new Kitchen(dbCon.rs.getString("name"),
-															 dbCon.rs.getInt("kitchen_id"),
-															 dbCon.rs.getShort("kitchen_alias"),
-															 dbCon.rs.getShort("dept_id")));															
-								}
-								dbCon.rs.close();
-								
-								//get the related region information
-								sql = "SELECT region_id, name FROM " + WirelessSocketServer.database + ".region WHERE restaurant_id=" + restaurantID;
-								dbCon.rs = dbCon.stmt.executeQuery(sql);
-								ArrayList<Region> regions = new ArrayList<Region>();
-								while(dbCon.rs.next()){
-									regions.add(new Region(dbCon.rs.getShort("region_id"),
-														   dbCon.rs.getString("name")));
-								}
+								Terminal term = new Terminal();
+								term.restaurant_id = restaurantID;
 								
 								//respond with the related kitchen information
 								send(_out, new RespPrintLogin(loginReq.header, 
-															  kitchens.toArray(new Kitchen[kitchens.size()]), 
-															  regions.toArray(new Region[regions.size()]),
+															  QueryMenu.queryDepartments(dbCon, restaurantID, null, null),
+															  QueryMenu.queryKitchens(dbCon, restaurantID, null, null),
+															  QueryRegion.exec(dbCon, term),
 															  restaurantName));
 								
 								//put the restaurant id and the associated socket to the tree map's socket list
