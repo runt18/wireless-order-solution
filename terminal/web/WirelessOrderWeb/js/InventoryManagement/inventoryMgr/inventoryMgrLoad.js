@@ -153,8 +153,7 @@ function loadMaterialCate() {
 			if (rootData.length != 0) {
 				if (rootData[0].message == "normal") {
 					for ( var i = 0; i < rootData.length; i++) {
-						materialCateComboData.push([ rootData[i].cateID,
-								rootData[i].cateName ]);
+						materialCateComboData.push([ rootData[i].cateID, rootData[i].cateName ]);
 					}
 					materialCateCombAdd.store.loadData(materialCateComboData);
 					materialCateComb.store.loadData(materialCateComboData);
