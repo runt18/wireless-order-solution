@@ -36,7 +36,7 @@ public class OrderFoodReflector {
 		String sql;
 
 		sql = "SELECT A.order_id, A.food_alias, A.taste_alias, A.taste2_alias, A.taste3_alias, A.taste_tmp_alias, A.hang_status, A.is_temporary, "
-				+ " MAX(A.kitchen_alias) AS kitchen_alias, MAX(A.kitchen_id) AS kitchen_id, " 
+				+ " MAX(A.restaurant_id) AS restaurant_id, MAX(A.kitchen_alias) AS kitchen_alias, MAX(A.kitchen_id) AS kitchen_id, " 
 				+ " MAX(A.food_id) AS food_id, MAX(A.name) AS name, MAX(A.food_status) AS food_status, " 
 				+ " MAX(A.unit_price) AS unit_price, MAX(A.waiter) AS waiter, MAX(A.order_date) AS order_date,  MAX(A.discount) AS discount, "
 				+ " MAX(A.taste) AS taste, MAX(A.taste_price) AS taste_price, "
@@ -71,6 +71,7 @@ public class OrderFoodReflector {
 			food.waiter = dbCon.rs.getString("waiter");
 			food.kitchen.kitchenID = dbCon.rs.getLong("kitchen_id");
 			food.kitchen.aliasID = dbCon.rs.getShort("kitchen_alias");
+			food.kitchen.dept.restaurantID = dbCon.rs.getInt("restaurant_id");
 			food.kitchen.dept.deptID = dbCon.rs.getShort("dept_id");
 			food.setDiscount(dbCon.rs.getFloat("discount"));
 			food.tasteNormalPref = dbCon.rs.getString("taste");
@@ -120,7 +121,7 @@ public class OrderFoodReflector {
 		String sql;
 
 		sql = "SELECT A.order_id, A.food_alias, A.taste_alias, A.taste2_alias, A.taste3_alias, A.taste_tmp_alias, A.is_temporary, "
-				+ " MAX(A.kitchen_alias) AS kitchen_alias, MAX(A.kitchen_id) AS kitchen_id, " 
+				+ " MAX(A.restaurant_id) AS restaurant_id, MAX(A.kitchen_alias) AS kitchen_alias, MAX(A.kitchen_id) AS kitchen_id, " 
 				+ " MAX(A.food_id) AS food_id, MAX(A.name) AS name, MAX(A.food_status) AS food_status, " 
 				+ " MAX(A.unit_price) AS unit_price, MAX(A.waiter) AS waiter, MAX(A.order_date) AS order_date,  MAX(A.discount) AS discount, "
 				+ " MAX(A.taste) AS taste, MAX(A.taste_price) AS taste_price, "
@@ -155,6 +156,7 @@ public class OrderFoodReflector {
 			food.orderDate = dbCon.rs.getTimestamp("pay_datetime").getTime();
 			food.kitchen.kitchenID = dbCon.rs.getLong("kitchen_id");
 			food.kitchen.aliasID = dbCon.rs.getShort("kitchen_alias");
+			food.kitchen.dept.restaurantID = dbCon.rs.getInt("restaurant_id");
 			food.kitchen.dept.deptID = dbCon.rs.getShort("dept_id");
 			food.setDiscount(dbCon.rs.getFloat("discount"));
 			food.tasteNormalPref = dbCon.rs.getString("taste");

@@ -6,7 +6,6 @@ import java.util.Iterator;
 
 import com.wireless.dbReflect.OrderFoodReflector;
 import com.wireless.exception.BusinessException;
-import com.wireless.protocol.Department;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
@@ -409,7 +408,7 @@ public class UpdateOrder {
 						(extraFoods.get(i).tmpTaste == null ? "NULL" : extraFoods.get(i).tmpTaste.aliasID) + ", " +
 						(extraFoods.get(i).tmpTaste == null ? "NULL" : ("'" + extraFoods.get(i).tmpTaste.preference + "'")) + ", " +
 						(extraFoods.get(i).tmpTaste == null ? "NULL" : extraFoods.get(i).tmpTaste.getPrice()) + ", " +
-						(extraFoods.get(i).isTemporary ? Department.DEPT_TEMP : "(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + extraFoods.get(i).kitchen.aliasID + ")") + ", " + 
+						extraFoods.get(i).kitchen.dept.deptID + ", " + 
 						"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + extraFoods.get(i).kitchen.aliasID + "), " + 
 						extraFoods.get(i).kitchen.aliasID + ", '" + 
 						term.owner + "', " +
@@ -456,7 +455,7 @@ public class UpdateOrder {
 						(canceledFoods.get(i).tmpTaste == null ? "NULL" : canceledFoods.get(i).tmpTaste.aliasID) + ", " +
 						(canceledFoods.get(i).tmpTaste == null ? "NULL" : ("'" + canceledFoods.get(i).tmpTaste.preference + "'")) + ", " +
 						(canceledFoods.get(i).tmpTaste == null ? "NULL" : canceledFoods.get(i).tmpTaste.getPrice()) + ", " +
-						(canceledFoods.get(i).isTemporary ? Department.DEPT_TEMP : "(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + canceledFoods.get(i).kitchen.aliasID + ")") + ", " + 
+						canceledFoods.get(i).kitchen.dept.deptID + ", " + 
 						"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + canceledFoods.get(i).kitchen.aliasID + "), " + 
 						canceledFoods.get(i).kitchen.aliasID + ", '" + 
 						term.owner + "', " +
@@ -736,11 +735,19 @@ public class UpdateOrder {
 			
 		}else{
 			//get the food name and its unit price
-			String sql = "SELECT food_id, name, status, unit_price, kitchen_id, kitchen_alias FROM " + Params.dbName + ".food " +
-						 "WHERE " +
-						 "restaurant_id=" + term.restaurant_id +
+			String sql = " SELECT " +
+						 " FOOD.food_id AS food_id, FOOD.name AS name, FOOD.status AS status, " +
+						 " FOOD.unit_price AS unit_price, FOOD.kitchen_id AS kitchen_id, FOOD.kitchen_alias AS kitchen_alias, " +
+						 " DEPT.dept_id AS dept_id" +
+						 " FROM " + Params.dbName + ".food FOOD " +
+						 " LEFT JOIN " + Params.dbName + ".department DEPT ON " +
+						 " DEPT.restaurant_id = FOOD.restaurant_id " +
 						 " AND " +
-						 "food_alias=" + foodBasic.aliasID;
+						 " DEPT.dept_id = " + "(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE kitchen_id = FOOD.kitchen_id)" +
+						 " WHERE " +
+						 " FOOD.restaurant_id = " + term.restaurant_id +
+						 " AND " +
+						 " FOOD.food_alias = " + foodBasic.aliasID;
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			//check if the food to be inserted exist in db or not
 
@@ -751,6 +758,8 @@ public class UpdateOrder {
 				food.setPrice(new Float(dbCon.rs.getFloat("unit_price")));
 				food.kitchen.kitchenID = dbCon.rs.getLong("kitchen_id");
 				food.kitchen.aliasID = dbCon.rs.getShort("kitchen_alias");
+				food.kitchen.dept.restaurantID = term.restaurant_id;
+				food.kitchen.dept.deptID = dbCon.rs.getShort("dept_id");
 			}else{
 				throw new BusinessException("The food(alias_id=" + foodBasic.aliasID + ", restaurant_id=" + term.restaurant_id + ") to query does NOT exist.", ErrorCode.MENU_EXPIRED);
 			}

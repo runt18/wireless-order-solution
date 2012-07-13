@@ -4,7 +4,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import com.wireless.exception.BusinessException;
-import com.wireless.protocol.Department;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
@@ -153,11 +152,18 @@ public class InsertOrder {
 				 */
 				if(!orderToInsert.foods[i].isTemporary){
 					//get the associated foods' unit price and name
-					sql = "SELECT food_id, unit_price, name, status FROM " +  Params.dbName + ".food " +
-						  "WHERE " +
-						  "food_alias=" + orderToInsert.foods[i].aliasID + 
+					sql = " SELECT " +
+						  " FOOD.food_id AS food_id, FOOD.unit_price AS unit_price, FOOD.name AS name, FOOD.status AS status, " +
+						  " DEPT.dept_id AS dept_id" +
+						  " FROM " +  Params.dbName + ".food FOOD " +
+						  " LEFT JOIN " + Params.dbName + ".department DEPT ON " +
+						  " DEPT.restaurant_id = FOOD.restaurant_id " + 
+						  " AND " +
+						  " DEPT.dept_id = " + "(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE kitchen_id = FOOD.kitchen_id)" +
+						  " WHERE " +
+						  " FOOD.food_alias=" + orderToInsert.foods[i].aliasID + 
 					 	  " AND " +
-					 	  "restaurant_id=" + orderToInsert.table.restaurantID;
+					 	  " FOOD.restaurant_id=" + term.restaurant_id;
 					dbCon.rs = dbCon.stmt.executeQuery(sql);
 					//check if the food exist in db 
 					if(dbCon.rs.next()){
@@ -165,6 +171,8 @@ public class InsertOrder {
 						orderToInsert.foods[i].name = dbCon.rs.getString("name");
 						orderToInsert.foods[i].status = dbCon.rs.getShort("status");
 						orderToInsert.foods[i].setPrice(dbCon.rs.getFloat("unit_price"));
+						orderToInsert.foods[i].kitchen.dept.restaurantID = term.restaurant_id;
+						orderToInsert.foods[i].kitchen.dept.deptID = dbCon.rs.getShort("dept_id");
 					}else{
 						throw new BusinessException("The food(alias_id=" + orderToInsert.foods[i].aliasID + ", restaurant_id=" + orderToInsert.table.restaurantID+ ") to query doesn't exit.", ErrorCode.MENU_EXPIRED);
 					}
@@ -173,11 +181,12 @@ public class InsertOrder {
 					//get three taste information for each food
 					for(int j = 0; j < orderToInsert.foods[i].tastes.length; j++){
 						if(orderToInsert.foods[i].tastes[j].aliasID != Taste.NO_TASTE){
-							sql = "SELECT taste_id, preference, price, category, rate, calc FROM " + Params.dbName + ".taste " +
-								  "WHERE " +
-								  "restaurant_id=" + orderToInsert.table.restaurantID + 
+							sql = " SELECT taste_id, preference, price, category, rate, calc " +
+								  " FROM " + Params.dbName + ".taste " +
+								  " WHERE " +
+								  " restaurant_id=" + orderToInsert.table.restaurantID + 
 								  " AND " +
-								  "taste_alias=" + orderToInsert.foods[i].tastes[j].aliasID;
+								  " taste_alias=" + orderToInsert.foods[i].tastes[j].aliasID;
 							dbCon.rs = dbCon.stmt.executeQuery(sql);
 							if(dbCon.rs.next()){
 								orderToInsert.foods[i].tastes[j].tasteID = dbCon.rs.getInt("taste_id");
@@ -323,7 +332,7 @@ public class InsertOrder {
 							(orderToInsert.foods[i].tmpTaste == null ? "NULL" : orderToInsert.foods[i].tmpTaste.aliasID) + ", " +
 							(orderToInsert.foods[i].tmpTaste == null ? "NULL" : ("'" + orderToInsert.foods[i].tmpTaste.preference + "'")) + ", " +
 							(orderToInsert.foods[i].tmpTaste == null ? "NULL" : orderToInsert.foods[i].tmpTaste.getPrice()) + ", " +
-							(orderToInsert.foods[i].isTemporary ? Department.DEPT_TEMP : "(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + orderToInsert.foods[i].kitchen.aliasID + ")") + ", " +
+							orderToInsert.foods[i].kitchen.dept.deptID + ", " +
 							"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + orderToInsert.foods[i].kitchen.aliasID + "), " + 
 							orderToInsert.foods[i].kitchen.aliasID + ", '" + 
 							term.owner + "', NOW(), " + 
