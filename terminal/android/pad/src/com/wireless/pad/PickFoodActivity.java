@@ -586,8 +586,8 @@ public class PickFoodActivity extends TabActivity implements
 				if (s.toString().length() != 0) {
 					ArrayList<Food> filterFoods = new ArrayList<Food>();
 					for(Food food : _filterKitchenFoods){
-						if(String.valueOf(food.pinyin).toLowerCase().contains(s.toString().toLowerCase())
-								|| food.name.contains(s.toString())) {
+						if(String.valueOf(food.pinyin).toLowerCase().contains(s.toString().trim().toLowerCase())
+								|| food.name.contains(s.toString().trim())) {
 							filterFoods.add(food);
 						}
 					}
@@ -762,11 +762,8 @@ public class PickFoodActivity extends TabActivity implements
 					ArrayList<Food> filterFoods = new ArrayList<Food>();
 					for (int i = 0; i < WirelessOrder.foodMenu.foods.length; i++) {
 						if (WirelessOrder.foodMenu.foods[i].pinyin != null) {
-							if (WirelessOrder.foodMenu.foods[i].pinyin
-									.toLowerCase().contains(
-											s.toString().toLowerCase())
-									|| WirelessOrder.foodMenu.foods[i].name
-											.contains(s.toString())) {
+							if (WirelessOrder.foodMenu.foods[i].pinyin.toLowerCase().contains(s.toString().trim().toLowerCase())
+									|| WirelessOrder.foodMenu.foods[i].name.contains(s.toString().trim())) {
 								filterFoods
 										.add(WirelessOrder.foodMenu.foods[i]);
 							}
@@ -1072,10 +1069,10 @@ public class PickFoodActivity extends TabActivity implements
 		 * 筛选出有菜品的部门
 		 */
 		_validDepts = new ArrayList<Department>();
-		for (int i = 0; i < WirelessOrder.foodMenu.sKitchens.length; i++) {
+		for (int i = 0; i < WirelessOrder.foodMenu.depts.length; i++) {
 			for (int j = 0; j < _validKitchens.size(); j++) {
-				if (WirelessOrder.foodMenu.sKitchens[i].deptID == _validKitchens.get(j).dept.deptID) {
-					_validDepts.add(WirelessOrder.foodMenu.sKitchens[i]);
+				if (WirelessOrder.foodMenu.depts[i].deptID == _validKitchens.get(j).dept.deptID) {
+					_validDepts.add(WirelessOrder.foodMenu.depts[i]);
 					break;
 				}
 			}
