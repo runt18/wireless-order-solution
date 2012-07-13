@@ -493,10 +493,24 @@ inventoryAnalysisWin = new Ext.Window({
 												var rootData = resultJSON.root;
 												if (rootData[0].message == "normal") {
 													var tpStore = inventoryAnalysisGrid.getStore();
-													invenAnaResultData = rootData.slice(0);
+													var invenAnaResultData = rootData.slice(0);
+													for(var i = 0; i < invenAnaResultData.length; i++){														
+														invenAnaResultData[i].countBeginPrice = parseFloat(invenAnaResultData[i].price * invenAnaResultData[i].countBegin);
+														invenAnaResultData[i].inCountPrice = parseFloat(invenAnaResultData[i].price * invenAnaResultData[i].inCount);
+														invenAnaResultData[i].returnCountPrice = parseFloat(invenAnaResultData[i].price * invenAnaResultData[i].returnCount);
+														invenAnaResultData[i].outCountPrice = parseFloat(invenAnaResultData[i].price * invenAnaResultData[i].outCount);
+														invenAnaResultData[i].lostCountPrice = parseFloat(invenAnaResultData[i].price * invenAnaResultData[i].lostCount);
+														invenAnaResultData[i].costCountPrice = parseFloat(invenAnaResultData[i].price * invenAnaResultData[i].costCount);
+														invenAnaResultData[i].changeInCountPrice = parseFloat(invenAnaResultData[i].price * invenAnaResultData[i].changeInCount);
+														invenAnaResultData[i].changeOutCountPrice = parseFloat(invenAnaResultData[i].price * invenAnaResultData[i].changeOutCount);
+														invenAnaResultData[i].checkCountPrice = parseFloat(invenAnaResultData[i].price * invenAnaResultData[i].checkCount);
+														invenAnaResultData[i].countEndPrice = parseFloat(invenAnaResultData[i].price * invenAnaResultData[i].countEnd);
+													}
+													
 													tpStore.loadData(invenAnaResultData);
 													if (rootData[0].materialCateID == "NO_DATA") {
 														tpStore.removeAll();
+														tpTotalPrice = 0.00;
 													}
 													for(var i = 0; i < tpStore.data.getCount(); i++){
 //														tpCountBegin += parseInt(invenAnaResultData[i].countBegin);
@@ -579,30 +593,7 @@ inventoryAnalysisWin = new Ext.Window({
 						} );
 					}
 //					cateInvenAnaForm.setWidth(450);
-					cateInvenAnaForm.doLayout(true);
-					
-					// 神技！動態改變form中component的label！！！
-//					inventoryAnalysisWin.findById("cate1InvenAna").el.parent().parent().parent().first().dom.innerHTML = materialCateComboData[0][1] + ":";
-//					inventoryAnalysisWin.findById("cate2InvenAna").el.parent().parent().parent().first().dom.innerHTML = materialCateComboData[1][1] + ":";
-//					inventoryAnalysisWin.findById("cate3InvenAna").el.parent().parent().parent().first().dom.innerHTML = materialCateComboData[2][1] + ":";
-//					inventoryAnalysisWin.findById("cate4InvenAna").el.parent().parent().parent().first().dom.innerHTML = materialCateComboData[3][1] + ":";
-//					inventoryAnalysisWin.findById("cate5InvenAna").el.parent().parent().parent().first().dom.innerHTML = materialCateComboData[4][1] + ":";
-//					inventoryAnalysisWin.findById("cate6InvenAna").el.parent().parent().parent().first().dom.innerHTML = materialCateComboData[5][1] + ":";
-//					inventoryAnalysisWin.findById("cate7InvenAna").el.parent().parent().parent().first().dom.innerHTML = materialCateComboData[6][1] + ":";
-//					inventoryAnalysisWin.findById("cate8InvenAna").el.parent().parent().parent().first().dom.innerHTML = materialCateComboData[7][1]+ ":";
-//					inventoryAnalysisWin.findById("cate9InvenAna").el.parent().parent().parent().first().dom.innerHTML = materialCateComboData[8][1] + ":";
-//					inventoryAnalysisWin.findById("cate10InvenAna").el.parent().parent().parent().first().dom.innerHTML = materialCateComboData[9][1] + ":";
-//
-//					inventoryAnalysisWin.findById("cate1InvenAna").setValue(false);
-//					inventoryAnalysisWin.findById("cate2InvenAna").setValue(false);
-//					inventoryAnalysisWin.findById("cate3InvenAna").setValue(false);
-//					inventoryAnalysisWin.findById("cate4InvenAna").setValue(false);
-//					inventoryAnalysisWin.findById("cate5InvenAna").setValue(false);
-//					inventoryAnalysisWin.findById("cate6InvenAna").setValue(false);
-//					inventoryAnalysisWin.findById("cate7InvenAna").setValue(false);
-//					inventoryAnalysisWin.findById("cate8InvenAna").setValue(false);
-//					inventoryAnalysisWin.findById("cate9InvenAna").setValue(false);
-//					inventoryAnalysisWin.findById("cate10InvenAna").setValue(false);
+					cateInvenAnaForm.doLayout(true);				
 
 					inventoryAnalysisWin.findById("dept1InvenAna").el.parent().parent().parent().first().dom.innerHTML = departmentData[0][1] + ":";
 					inventoryAnalysisWin.findById("dept2InvenAna").el.parent().parent().parent().first().dom.innerHTML = departmentData[1][1] + ":";
@@ -765,8 +756,6 @@ var currInvenAnaGrid = new Ext.grid.EditorGridPanel({
 			{xtype:'tbtext', text:String.format(Ext.ux.txtFormat.barMsg, '金额', 'txtCurrInvenAnaDisplaySumPrice', 0.00)}
 		]
 	})
-	    
-	
 });
 
 // --------------------------------------------------------------------------------------------------------
@@ -1051,52 +1040,61 @@ var inventoryAnalysisReader = new Ext.data.JsonReader({
 		name : 'materialCateName',
 		type : 'string'
 	}, {
-		name : 'groupID',
-		type : 'int'
-	}, {
-		name : 'groupDescr',
-		type : 'string'
-	}, {
-		name : 'countBegin',
-		type : 'float'
-	}, {
-		name : 'inCount',
-		type : 'float'
-	}, {
-		name : 'returnCount',
-		type : 'float'
-	}, {
-		name : 'outCount',
-		type : 'float'
-	}, {
-		name : 'lostCount',
-		type : 'float'
-	}, {
-		name : 'costCount',
-		type : 'float'
-	}, {
-		name : 'changeInCount',
-		type : 'float'
-	}, {
-		name : 'changeOutCount',
-		type : 'float'
-	}, {
-		name : 'checkCount',
-		type : 'float'
-	}, {
-		name : 'countEnd',
-		type : 'float'
-	}, {
 		name : 'price',
 		type : 'float'
 	}, {
 		name : 'totalPrice',
 		type : 'float'
 	}, {
+		name : 'groupID',
+		type : 'int'
+	}, {
+		name : 'groupDescr',
+		type : 'string'
+	}, {
+		name : 'countBegin'
+	}, {
+		name : 'countBeginPrice'
+	}, {
+		name : 'inCount'
+	}, {
+		name : 'inCountPrice'
+	}, {
+		name : 'returnCount'
+	}, {
+		name : 'returnCountPrice'
+	}, {
+		name : 'outCount'
+	}, {
+		name : 'outCountPrice'
+	}, {
+		name : 'lostCount'
+	}, {
+		name : 'lostCountPrice'
+	}, {
+		name : 'costCount'
+	}, {
+		name : 'costCountPrice'
+	}, {
+		name : 'changeInCount'
+	}, {
+		name : 'changeInCountPrice'
+	}, {
+		name : 'changeOutCount'
+	}, {
+		name : 'changeOutCountPrice'
+	}, {
+		name : 'checkCount'
+	}, {
+		name : 'checkCountPrice'
+	}, {
+		name : 'countEnd'
+	}, {
+		name : 'countEndPrice'
+	}, {
 		name : 'materialID'
 	}, {
-		name : 'materialName',
-		type : 'string'
+		name : 'materialName'
 	} ]
 
 });
@@ -1114,116 +1112,191 @@ var inventoryAnalysisGrid = new Ext.grid.EditorGridPanel({
 		},
 		groupField : 'materialCateName'
 	}),
-
 	columns : [ {
 		id : 'groupDescr',
-		header : "食材种类",
-		width : 20,
+		header : '食材种类',
+		width : 80,
 		sortable : true,
 		dataIndex : 'groupDescr',
 		hideable : false,
 		summaryRenderer : function(v, params, data) {
-			return "合计";
+			return '合计';
 		}
 	}, {
-		header : "NOT SHOW",
-		width : 20,
+		header : 'NOT SHOW',
+		width : 80,
 		sortable : false,
 		dataIndex : 'materialCateName'
 	}, {
-		header : "食材",
-		width : 25,
+		header : '食材',
+		width : 100,
 		sortable : true,
 		dataIndex : 'materialName'
 	}, {
-		header : "期初数量",
-		width : 20,
+		header : '期初数量',
+		width : 80,
+		align : 'right',		
 		sortable : true,
 		dataIndex : 'countBegin',
 		summaryType : 'sum'
+	},{
+		header : '期初金额',	
+		width : 80,
+		align : 'right',
+		sortable : true,
+		dataIndex : 'countBeginPrice',
+		summaryType : 'sum'
 	}, {
-		header : "进货数量",
-		width : 20,
+		header : '进货数量',
+		width : 80,
+		align : 'right',
 		sortable : true,
 		groupable : false,
 		dataIndex : 'inCount',
 		summaryType : 'sum'
 	}, {
-		header : "退货数量",
-		width : 20,
+		header : '进货金额',
+		width : 80,
+		align : 'right',
+		sortable : true,
+		groupable : false,
+		dataIndex : 'inCountPrice',
+		summaryType : 'sum'
+	}, {
+		header : '退货数量',
+		width : 80,
+		align : 'right',
 		sortable : false,
 		dataIndex : 'returnCount',
-		summaryType : "sum"
+		summaryType : 'sum'
 	}, {
-		header : "出仓数量",
-		width : 20,
+		header : '退货金额',	
+		width : 80,
+		align : 'right',
+		sortable : false,
+		dataIndex : 'returnCountPrice',
+		summaryType : 'sum'
+	}, {
+		header : '出仓数量',
+		width : 80,
+		align : 'right',
 		sortable : true,
 		dataIndex : 'outCount',
 		summaryType : 'sum'
 	}, {
-		header : "报损数量",
-		width : 20,
+		header : '出仓金额',
+		width : 80,
+		align : 'right',
+		sortable : true,
+		dataIndex : 'outCountPrice',
+		summaryType : 'sum'
+	}, {
+		header : '报损数量',
+		width : 80,
+		align : 'right',
 		sortable : true,
 		groupable : false,
 		dataIndex : 'lostCount',
 		summaryType : 'sum'
 	}, {
-		header : "消耗数量",
-		width : 20,
+		header : '报损金额',
+		width : 80,
+		align : 'right',
+		sortable : true,
+		groupable : false,
+		dataIndex : 'lostCountPrice',
+		summaryType : 'sum'
+	}, {
+		header : '消耗数量',
+		width : 80,
+		align : 'right',
 		sortable : false,
 		dataIndex : 'costCount',
-		summaryType : "sum"
+		summaryType : 'sum'
 	}, {
-		header : "调入数量",
-		width : 20,
+		header : '消耗金额',
+		width : 80,
+		align : 'right',
+		sortable : false,
+		dataIndex : 'costCountPrice',
+		summaryType : 'sum'
+	}, {
+		header : '调入数量',
+		width : 80,
+		align : 'right',
 		sortable : true,
 		dataIndex : 'changeInCount',
 		summaryType : 'sum'
 	}, {
-		header : "调出数量",
-		width : 20,
+		header : '调入金额',
+		width : 80,
+		align : 'right',
+		sortable : true,
+		dataIndex : 'changeInCountPrice',
+		summaryType : 'sum'
+	}, {
+		header : '调出数量',
+		width : 80,
+		align : 'right',
 		sortable : true,
 		groupable : false,
 		dataIndex : 'changeOutCount',
 		summaryType : 'sum'
 	}, {
-		header : "盘点损益",
-		width : 20,
+		header : '调出金额',
+		width : 80,
+		align : 'right',
+		sortable : true,
+		groupable : false,
+		dataIndex : 'changeOutCountPrice',
+		summaryType : 'sum'
+	}, {
+		header : '盘点损益',
+		width : 80,
+		align : 'right',
 		sortable : false,
 		dataIndex : 'checkCount',
-		summaryType : "sum"
+		summaryType : 'sum'
 	}, {
-		header : "期末数量",
-		width : 20,
+		header : '损益金额',
+		width : 80,
+		align : 'right',
+		sortable : false,
+		dataIndex : 'checkCountPrice',
+		summaryType : 'sum'
+	}, {
+		header : '期末数量',
+		width : 80,
+		align : 'right',
 		sortable : true,
 		dataIndex : 'countEnd',
 		summaryType : 'sum'
 	}, {
-		header : "价格",
-		width : 20,
+		header : '价格',
+		width : 60,
+		align : 'right',
 		sortable : true,
 		groupable : false,
 		dataIndex : 'price'
-//		,summaryType : 'sum'
 	}, {
-		header : "金额",
-		width : 20,
-		sortable : false,
-		dataIndex : 'totalPrice',
-		summaryType : "sum"
-	} ],
+		header : '期末金额',
+		width : 80,
+		align : 'right',
+		sortable : true,
+		dataIndex : 'countEndPrice',
+		summaryType : 'sum'
+	}],
 
 	view : new Ext.grid.GroupingView({
-		forceFit : true,
+//		forceFit : true,
 		showGroupName : false,
 		enableNoGroups : false, // REQUIRED!
 		hideGroupedColumn : true
 	}),
-
 	plugins : inventoryAnalysisSummary,
-
 	frame : true,
-	width : 800,
+//	width : 800,
+	autoScroll : true,
 	height : 450,
 	clicksToEdit : 1,
 	collapsible : true,
