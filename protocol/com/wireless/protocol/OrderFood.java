@@ -5,9 +5,9 @@ public class OrderFood extends Food {
 	public String waiter;
 	public int payManner = Order.MANNER_CASH;
 	
-	public static final int FOOD_NORMAL = 0;		/* 正常 */
-	public static final int FOOD_HANG_UP = 1;		/* 叫起 */
-	public static final int FOOD_IMMEDIATE = 2;		/* 即起 */
+	public static final int FOOD_NORMAL = 0;		/* 姝ｅ父 */
+	public static final int FOOD_HANG_UP = 1;		/* 鍙捣 */
+	public static final int FOOD_IMMEDIATE = 2;		/* 鍗宠捣 */
 	public short hangStatus = FOOD_NORMAL;			//the hang status to the food
 	
 	public Taste[] tastes = new Taste[3];			//three tastes the food can consist of

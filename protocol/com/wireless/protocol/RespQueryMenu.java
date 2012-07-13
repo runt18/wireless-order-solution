@@ -129,8 +129,8 @@ public class RespQueryMenu extends RespPackage{
 		/* the amount of super kitchen takes up 1-byte */
 		bodyLen += 1;
 		
-		for(int i = 0; i < foodMenu.sKitchens.length; i++){
-			byte[] sKname = foodMenu.sKitchens[i].name.getBytes("UTF-16BE");
+		for(int i = 0; i < foodMenu.depts.length; i++){
+			byte[] sKname = foodMenu.depts[i].name.getBytes("UTF-16BE");
 			/**
 			 * each super kitchen consist of the stuff below.
 			 * skitchen_id(1-byte) + length of the super kitchen name(1-byte) + super kitchen name(len-byte)
@@ -238,16 +238,16 @@ public class RespQueryMenu extends RespPackage{
 		}
 		
 		//assign the amount of super kitchen
-		body[index] = (byte)(foodMenu.sKitchens.length);
+		body[index] = (byte)(foodMenu.depts.length);
 		index++;
 		
 		//assign each super kitchen to the body
-		for(int i = 0; i < foodMenu.sKitchens.length; i++){
+		for(int i = 0; i < foodMenu.depts.length; i++){
 			//assign the super kitchen id
-			body[index] = (byte)(foodMenu.sKitchens[i].deptID & 0x00FF);
+			body[index] = (byte)(foodMenu.depts[i].deptID & 0x00FF);
 			
 			//assign the length of the super kitchen name
-			byte[] sKname = foodMenu.sKitchens[i].name.getBytes("UTF-16BE");
+			byte[] sKname = foodMenu.depts[i].name.getBytes("UTF-16BE");
 			body[index + 1] = (byte)(sKname.length & 0x000000FF);
 			
 			//assign the super kitchen name

@@ -9,11 +9,11 @@ public class Restaurant {
 	public String addr;
 	public String info;
 	public String owner;
-	public String pwd;		//¹ÜÀíÔ±ÃÜÂë
-	public String pwd2;		//²ÆÎñÈ¨ÏŞÃÜÂë
-	public String pwd3;		//µê³¤È¨ÏŞÃÜÂë
-	public String pwd4;		//ÊÕÒøÔ±È¨ÏŞÃÜÂë
-	public String pwd5;		//ÍË²ËÈ¨ÏŞÃÜÂë
+	public String pwd;		//ç®¡ç†å‘˜æƒé™å¯†ç 
+	public String pwd2;		//è´¢åŠ¡æƒé™å¯†ç 
+	public String pwd3;		//åº—é•¿æƒé™å¯†ç 
+	public String pwd4;		//æ”¶é“¶æƒé™å¯†ç 
+	public String pwd5;		//é€€èœæƒé™å¯†ç 
 	//public Setting setting = new Setting();
 	
 	public Restaurant(){

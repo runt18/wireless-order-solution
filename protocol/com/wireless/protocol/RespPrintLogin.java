@@ -15,48 +15,78 @@ import java.io.UnsupportedEncodingException;
  * pin[6] - same as request
  * len[2] -  length of the <Body>
  * <Body>
- * nKitchen : <kitchen_1> : ... : <kitchen_n> : nRegion : <region_1> : ... : <region_n> : restaurant_len : restaurant_name
+ * nDept : <dept_1> : ... : <dept_n> : 
+ * nKitchen : <kitchen_1> : ... : <kitchen_n> :   
+ * nRegion : <region_1> : ... : <region_n> : 
+ * restaurant_len : restaurant_name
+ * 
+ * nDept - the number of departments
+ * <dept_n>
+ * dept_id : len_name : name
+ * dept_id - the id to this department
+ * len_name - the length of the department name
+ * name - the name to this department
+ * 
  * nKitchen - the number of kitchens
  * <kitchen_n>
- * alias_id : len_name : name
+ * dept_id : alias_id : len_name : name
+ * dept_id : the department id this kitchen belongs to
  * alias_id - the alias id to this kitchen  
  * len_name - the length of the kitchen name
  * name - the name to kitchen
+ * 
  * nRegion - the number of regions
  * <region_n>
  * alias_id : len_name : name
  * alias_id - the alias id to this region
  * len_name - the length of the region name
  * name - the name to region
+ * 
  * restaurant_len - the length of the user name
  * restaurant_name - the name to user
  *******************************************************/
 public class RespPrintLogin extends RespPackage{
-	public RespPrintLogin(ProtocolHeader reqHeader, Kitchen[] kitchens, Region[] regions, String restaurant){
+	public RespPrintLogin(ProtocolHeader reqHeader, Department[] depts, Kitchen[] kitchens, Region[] regions, String restaurant){
 		super(reqHeader);
 		header.mode = Mode.PRINT;
 		header.type = Type.ACK;
 
 		//calculate the length of body
 		int len = 0;
-		//the number of kitchens takes up 1-byte
-		len += 1;
 		
+		//the number of departments takes up 1-byte
+		len += 1;
+		//the byte array to hold the name of departments
+		byte[][] deptBytes = new byte[depts.length][];
+		for(int i = 0; i < deptBytes.length; i++){
+
+			try{
+				deptBytes[i] = depts[i].name.getBytes("GBK");
+			}catch(UnsupportedEncodingException e){}
+			
+			len += 1 +					/* the alias id to department takes up 1-byte */
+				   1 +					/* the length of the department name takes up 1-byte */
+				   deptBytes[i].length;	/*  the name of department takes up the byte arrays's length */
+			
+		}
+		
+		//the number of kitchens takes up 1-byte
+		len += 1;		
 		//the byte array to hold the name of kitchens
 		byte[][] kitchenBytes = new byte[kitchens.length][];
 		
 		for(int i = 0; i < kitchenBytes.length; i++){
-			//the alias id takes up 1-byte
-			len += 1;
-			//the length of the name takes up 1-byte
 			len += 1;
 			try{
 				kitchenBytes[i] = kitchens[i].name.getBytes("GBK");
 			}catch(UnsupportedEncodingException e){
 				
 			}
-			//the name of kitchen takes up the byte arrays' length
-			len += kitchenBytes[i].length;
+			
+			len += 1 + 						/* the department id takes up 1-byte */
+				   1 +						/* the alias id takes up 1-byte */
+				   1 +						/* the length of the name takes up 1-byte */
+				   kitchenBytes[i].length;	/* the name of kitchen takes up the byte arrays' length */
 		}
 		
 		//the number of regions takes up 1-byte
@@ -64,17 +94,16 @@ public class RespPrintLogin extends RespPackage{
 		//the byte array to hold the name of regions
 		byte[][] regionBytes = new byte[regions.length][];
 		for(int i = 0; i < regionBytes.length; i++){
-			//the alias_id takes up 1-byte
-			len += 1;
-			//the length of name takes up 1-byte
-			len += 1;
+
 			try{
 				regionBytes[i] = regions[i].name.getBytes("GBK");
 			}catch(UnsupportedEncodingException e){
 				
 			}
 			//the name of region takes up the byte arrays' length
-			len += regionBytes[i].length;
+			len += 1 +						/* the alias_id takes up 1-byte */
+				   1 +						/* the length of name takes up 1-byte */
+				   regionBytes[i].length;	/* the name of region takes up the byte arrays' length */
 		}
 		
 		byte[] restaurantBytes = new byte[0];
@@ -91,20 +120,41 @@ public class RespPrintLogin extends RespPackage{
 		body = new byte[len];
 		
 		int offset = 0;
+		
+		//assign the number of departments
+		body[offset] = (byte)depts.length;
+		offset++;
+		
+		for(int i = 0; i < deptBytes.length; i++){
+			//assign the department id
+			body[offset] = (byte)depts[i].deptID;
+			//assign the length to department name
+			body[offset + 1] = (byte)deptBytes[i].length;
+			//assign the name of department
+			System.arraycopy(deptBytes[i], 0, body, offset + 2, deptBytes[i].length);
+			
+			offset += 1 +					/* the alias id takes up 1-byte */ 
+					  1 +					/* the length of name takes up 1-byte */
+					  deptBytes[i].length;	/* the name of department takes up the byte arrays' length */
+		}
+		
 		//assign the number of kitchens
 		body[offset] = (byte)kitchens.length;
 		offset++;
 		
 		for(int i = 0; i < kitchenBytes.length; i++){
+			//assign the department id to this kitchen
+			body[offset] = (byte)kitchens[i].dept.deptID;
 			//assign the alias id
-			body[offset] = (byte)kitchens[i].aliasID;
+			body[offset + 1] = (byte)kitchens[i].aliasID;
 			//assign the length to kitchen name
-			body[offset + 1] = (byte)kitchenBytes[i].length;
+			body[offset + 2] = (byte)kitchenBytes[i].length;
 			//assign the name of kitchen
-			System.arraycopy(kitchenBytes[i], 0, body, offset + 2, kitchenBytes[i].length);
-			offset += 1 + /* the alias id takes up 1-byte */ 
-					  1 + /* the length of name takes up 1-byte */
-					  kitchenBytes[i].length; /* the name of kitchen takes up the byte arrays' length */
+			System.arraycopy(kitchenBytes[i], 0, body, offset + 3, kitchenBytes[i].length);
+			offset += 1 + 						/* the department id to this kitchen takes up 1-byte */
+					  1 + 						/* the alias id takes up 1-byte */ 
+					  1 + 						/* the length of name takes up 1-byte */
+					  kitchenBytes[i].length; 	/* the name of kitchen takes up the byte arrays' length */
 		}
 		
 		//assign the number of regions

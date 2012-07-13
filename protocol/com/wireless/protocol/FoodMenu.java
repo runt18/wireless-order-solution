@@ -1,21 +1,21 @@
 package com.wireless.protocol;
 
 public class FoodMenu {
-	public Food[] foods = null;			//菜品信息
-	public Taste[] tastes = null;		//口味信息
-	public Taste[] styles = null;		//做法信息
-	public Taste[] specs = null;		//规格信息
-	public Kitchen[] kitchens = null;	//厨房信息
-	public Department[] sKitchens = null;//大厨房信息
+	public Food[] foods = null;			 	//鑿滃搧
+	public Taste[] tastes = null;		 	//鍙ｅ懗
+	public Taste[] styles = null;			//鍋氭硶
+	public Taste[] specs = null;			//瑙勬牸
+	public Kitchen[] kitchens = null;		//鍘ㄦ埧
+	public Department[] depts = null;		//閮ㄩ棬
 	
 	public FoodMenu(){}
 	
-	public FoodMenu(Food[] foods, Taste[] tastes, Taste[] styles, Taste[] specs, Kitchen[] kitchens, Department[] sKitchens){
+	public FoodMenu(Food[] foods, Taste[] tastes, Taste[] styles, Taste[] specs, Kitchen[] kitchens, Department[] depts){
 		this.foods = foods;
 		this.tastes = tastes;
 		this.styles = styles;
 		this.specs = specs;
 		this.kitchens = kitchens;
-		this.sKitchens = sKitchens;
+		this.depts = depts;
 	}
 }
