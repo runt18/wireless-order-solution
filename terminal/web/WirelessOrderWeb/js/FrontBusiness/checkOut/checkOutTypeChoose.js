@@ -96,6 +96,13 @@ var checkOurListRefresh = function() {
 			}
 		}
 		
+		if(tpItem.special == true || tpItem.gift == true){
+			// 特价和赠送菜品不打折
+			tpItem.totalPrice = parseFloat(tpItem.unitPrice * discountRate);
+		}else{
+			tpItem.totalPrice = parseFloat((tpItem.unitPrice * tpItem.discount + tpItem.tastePrice) * tpItem.count);
+		}
+		
 		// 特送臨 -- 折扣率 --1
 		if (tpItem.special == true || tpItem.gift == true || tpItem.temporary == true) {
 			tpItem.discount = parseFloat("1").toFixed(2);
