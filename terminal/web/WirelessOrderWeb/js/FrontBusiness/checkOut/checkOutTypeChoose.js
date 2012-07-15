@@ -96,34 +96,19 @@ var checkOurListRefresh = function() {
 			}
 		}
 		
-//		var tastePrice = checkOutData[i][11];
-		
-		// 总价 = （原料价 * 折扣率 + 口味价）* 数量
-		var price;
-		if (tpItem.special == true || tpItem.gift == true || tpItem.temporary == true) {
-			// 特价，送，臨時菜　　 不打折
-			price = parseFloat(tpItem.acturalPrice) * tpItem.count;			
-		} else {
-			// 非   特价，送，臨時菜
-//			price = (parseFloat(checkOutData[i][12]) * discountRate + parseFloat(tastePrice)) * checkOutData[i][3];		
-			price = (parseFloat(tpItem.acturalPrice) * discountRate + parseFloat(tpItem.tastePrice)) * tpItem.count;
-		}
-//		var priceDisplay = "￥" + price.toFixed(2);
-
 		// 特送臨 -- 折扣率 --1
 		if (tpItem.special == true || tpItem.gift == true || tpItem.temporary == true) {
 			tpItem.discount = parseFloat("1").toFixed(2);
 		} else {
 			tpItem.discount = parseFloat(discountRate).toFixed(2);
 		}
-		tpItem.totalPrice = price;
 		checkOutDataDisplay.root.push(tpItem);
 	}
 
 	// 根据“特荐停”重新写菜名
 	for ( var i = 0; i < checkOutDataDisplay.root.length; i++) {
 		var tpItem = checkOutDataDisplay.root[i];		
-		tpItem.foodName = (tpItem.foodName.indeOf('<') ? tpItem.foodName.substring(0, tpItem.foodName.indexOf('<')) : tpItem.foodName);
+		tpItem.foodName = (tpItem.foodName.indexOf('<') > 0 ? tpItem.foodName.substring(0, tpItem.foodName.indexOf('<')) : tpItem.foodName);
 		if (tpItem.special == true) {
 			// 特
 			tpItem.foodName = tpItem.foodName + "<img src='../../images/icon_tip_te.gif'></img>";

@@ -139,61 +139,15 @@ function checkOutOnLoad() {
 													discountRate = discountData[j][1];													
 												}
 											}
-																						
-											// 总价 = （原料价  * 折扣率 + 口味价）* 数量
-											var price;
-																	
-											if (tpItem.special == true || tpItem.gift == true) {
-												// 特价，送
-												// 不打折
-												price = parseFloat(tpItem.acturalPrice) * tpItem.count;
-											} else {
-												price = (parseFloat(tpItem.acturalPrice) * discountRate + parseFloat(tpItem.tastePrice)) * tpItem.count;
-											}
-//											var priceDisplay = "￥" + price.toFixed(2);
 
 											// 特价，送 --
 											// 折扣率
 											// --1
 											if (tpItem.special == true || tpItem.gift == true) {
-//												checkOutDataDisplay.push([
-//													checkOutData[i][1],// 菜名
-//													checkOutData[i][2],// 口味
-//													checkOutData[i][3],// 数量
-//													checkOutData[i][4],// 单价
-//													parseFloat("1").toFixed(2),// 折扣率
-//													priceDisplay, // 实价
-//													checkOutData[i][5],
-//													checkOutData[i][6],
-//													checkOutData[i][7],// 特
-//													checkOutData[i][8],// 荐
-//													checkOutData[i][9], // 停
-//													checkOutData[i][10], // 赠
-//													checkOutData[i][13], // 時
-//													checkOutData[i][14] // 臨
-//												]);												
 												tpItem.discount = parseFloat("1").toFixed(2);
 											} else {
-//												checkOutDataDisplay.push([
-//													checkOutData[i][1],// 菜名
-//													checkOutData[i][2],// 口味
-//													checkOutData[i][3],// 数量
-//													checkOutData[i][4],// 单价
-//													parseFloat(discountRate).toFixed(2),// 折扣率
-//													priceDisplay, // 实价
-//													checkOutData[i][5],
-//													checkOutData[i][6],
-//													checkOutData[i][7],// 特
-//													checkOutData[i][8],// 荐
-//													checkOutData[i][9], // 停
-//													checkOutData[i][10], // 赠
-//													checkOutData[i][13], // 時
-//													checkOutData[i][14] // 臨
-//												]);
 												tpItem.discount = parseFloat(discountRate).toFixed(2);
 											}
-//											alert('price:   '+price);
-											tpItem.totalPrice = price;
 											checkOutDataDisplay.root.push(tpItem);
 										}
 										
