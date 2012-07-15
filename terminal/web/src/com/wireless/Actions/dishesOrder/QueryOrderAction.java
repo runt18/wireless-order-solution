@@ -137,6 +137,7 @@ public class QueryOrderAction extends Action {
 					item.setAliasID(order.foods[i].aliasID);
 					item.setKitchen(order.foods[i].kitchen);
 					item.setTaste(order.foods[i].tastes);
+					item.setTasteNormalPref(order.foods[i].tasteNormalPref);
 					item.setCount(order.foods[i].getCount());
 					item.setUnitPrice(order.foods[i].getPrice());
 					item.setTastePrice(order.foods[i].getTastePrice());
