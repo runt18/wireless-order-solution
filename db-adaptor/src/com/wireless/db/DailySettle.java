@@ -17,13 +17,13 @@ public class DailySettle {
 	 * 3 - the maximum order id 
 	 */
 	public static class Result{
-		public int totalOrder;				//µ±ÈÕÒÑ½áÕÊµÄÕËµ¥Êý
-		public int totalOrderDetail;		//µ±ÈÕÒÑ½áÕÊµÄÕËµ¥Ã÷Ï¸Êý
-		public int totalShift;				//µ±ÈÕ½»°àµÄ¼ÇÂ¼Êý
-		public int maxOrderID;				//orderºÍorder_history±íµÄ×î´óid
-		public int maxOrderFoodID;			//order_foodºÍorder_food_history±íµÄ×î´óid
-		public int maxShiftID;				//shiftºÍshift_history±íµÄ×î´óid
-		//public int[] restOrderID;			//ÈÕ½á²Ù×÷Ç°»¹Ã»ÓÐ½øÐÐ½»°à²Ù×÷µÄÕËµ¥ºÅ
+		public int totalOrder;				//ï¿½ï¿½ï¿½ï¿½ï¿½Ñ½ï¿½ï¿½Êµï¿½ï¿½Ëµï¿½ï¿½ï¿½
+		public int totalOrderDetail;		//ï¿½ï¿½ï¿½ï¿½ï¿½Ñ½ï¿½ï¿½Êµï¿½ï¿½Ëµï¿½ï¿½ï¿½Ï¸ï¿½ï¿½
+		public int totalShift;				//ï¿½ï¿½ï¿½Õ½ï¿½ï¿½ï¿½Ä¼ï¿½Â¼ï¿½ï¿½
+		public int maxOrderID;				//orderï¿½ï¿½order_historyï¿½ï¿½ï¿½ï¿½ï¿½ï¿½id
+		public int maxOrderFoodID;			//order_foodï¿½ï¿½order_food_historyï¿½ï¿½ï¿½ï¿½ï¿½ï¿½id
+		public int maxShiftID;				//shiftï¿½ï¿½shift_historyï¿½ï¿½ï¿½ï¿½ï¿½ï¿½id
+		//public int[] restOrderID;			//ï¿½Õ½ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½Ã»ï¿½Ð½ï¿½ï¿½Ð½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ëµï¿½ï¿½ï¿½
 	}
 
 	/**
@@ -61,7 +61,7 @@ public class DailySettle {
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
 			Terminal term = new Terminal();
-			term.restaurant_id = dbCon.rs.getInt("restaurant_id");
+			term.restaurantID = dbCon.rs.getInt("restaurant_id");
 			term.owner = "system";
 			terms.add(term);
 		}
@@ -177,7 +177,7 @@ public class DailySettle {
 		 */
 		sql = " SELECT MAX(off_duty) FROM " + Params.dbName + ".daily_settle_history " +
 			  " WHERE " +
-			  " restaurant_id = " + term.restaurant_id;
+			  " restaurant_id = " + term.restaurantID;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			Timestamp offDuty = dbCon.rs.getTimestamp(1);
@@ -192,7 +192,7 @@ public class DailySettle {
 		
 		//get the amount to order
 		sql = "SELECT count(*) FROM " + Params.dbName + ".order WHERE total_price IS NOT NULL " +
-			 (term.restaurant_id < 0 ? "" : "AND restaurant_id=" + term.restaurant_id);
+			 (term.restaurantID < 0 ? "" : "AND restaurant_id=" + term.restaurantID);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			result.totalOrder = dbCon.rs.getInt(1);
@@ -202,7 +202,7 @@ public class DailySettle {
 		//get the amount to order detail 
 		sql = "SELECT count(*) FROM " + Params.dbName + ".order_food WHERE order_id IN (" +
 		  	  "SELECT id FROM " + Params.dbName + ".order WHERE total_price IS NOT NULL " +
-		  	  (term.restaurant_id < 0 ? "" : "AND restaurant_id=" + term.restaurant_id) + ")";
+		  	  (term.restaurantID < 0 ? "" : "AND restaurant_id=" + term.restaurantID) + ")";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			result.totalOrderDetail = dbCon.rs.getInt(1);				
@@ -212,7 +212,7 @@ public class DailySettle {
 		//get the amount to shift record
 		sql = "SELECT count(*) FROM " + Params.dbName + ".shift " +
 			  "WHERE 1=1 " +
-			  (term.restaurant_id < 0 ? "AND restaurant_id <> " + Restaurant.ADMIN : "AND restaurant_id=" + term.restaurant_id);
+			  (term.restaurantID < 0 ? "AND restaurant_id <> " + Restaurant.ADMIN : "AND restaurant_id=" + term.restaurantID);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			result.totalShift = dbCon.rs.getInt(1);
@@ -271,14 +271,14 @@ public class DailySettle {
 			//move the paid order from "order" to "order_history"
 			sql = "INSERT INTO " + Params.dbName + ".order_history (" + orderItem + ") " + 
 				  "SELECT " + orderItem + " FROM " + Params.dbName + ".order WHERE total_price IS NOT NULL " + 
-				  (term.restaurant_id < 0 ? "" : "AND restaurant_id=" + term.restaurant_id);
+				  (term.restaurantID < 0 ? "" : "AND restaurant_id=" + term.restaurantID);
 			dbCon.stmt.executeUpdate(sql);
 			
 			//move the paid order details from "order_food" to "order_food_history" 
 			sql = "INSERT INTO " + Params.dbName + ".order_food_history (" + orderFoodItem + ") " +
 				  "SELECT " + orderFoodItem + " FROM " + Params.dbName + ".order_food WHERE order_id IN (" +
 				  "SELECT id FROM " + Params.dbName + ".order WHERE total_price IS NOT NULL " +
-				  (term.restaurant_id < 0 ? "" : "AND restaurant_id=" + term.restaurant_id) +
+				  (term.restaurantID < 0 ? "" : "AND restaurant_id=" + term.restaurantID) +
 				  ")";
 			dbCon.stmt.executeUpdate(sql);
 			
@@ -286,11 +286,11 @@ public class DailySettle {
 			sql = "INSERT INTO " + Params.dbName + ".shift_history (" + shiftItem + ") " +
 				  "SELECT " + shiftItem + " FROM " + Params.dbName + ".shift " +
 				  "WHERE 1=1 " +
-				  (term.restaurant_id < 0 ? "" : "AND restaurant_id=" + term.restaurant_id);
+				  (term.restaurantID < 0 ? "" : "AND restaurant_id=" + term.restaurantID);
 			dbCon.stmt.executeUpdate(sql);
 			
 			sql = "INSERT INTO " + Params.dbName + ".daily_settle_history (`restaurant_id`, `name`, `on_duty`, `off_duty`) VALUES (" +
-				  term.restaurant_id + ", " +
+				  term.restaurantID + ", " +
 				  "'" + (term.owner == null ? "" : term.owner) + "', " +
 				  onDuty + ", " +
 				  "NOW()" +
@@ -312,19 +312,19 @@ public class DailySettle {
 			//delete the order details from "order_food"
 			sql = "DELETE FROM " + Params.dbName + ".order_food WHERE order_id IN (" +
 				  "SELECT id FROM " + Params.dbName + ".order WHERE total_price IS NOT NULL " +
-				  (term.restaurant_id < 0 ? "" : "AND restaurant_id=" + term.restaurant_id) +
+				  (term.restaurantID < 0 ? "" : "AND restaurant_id=" + term.restaurantID) +
 				  ")";
 			dbCon.stmt.executeUpdate(sql);
 			
 			//delete the order from "order"
 			sql = "DELETE FROM " + Params.dbName + ".order WHERE total_price IS NOT NULL " +
-				  (term.restaurant_id < 0 ? "" : "AND restaurant_id=" + term.restaurant_id);
+				  (term.restaurantID < 0 ? "" : "AND restaurant_id=" + term.restaurantID);
 			dbCon.stmt.executeUpdate(sql);
 			
 			//delete the shift record from "shift"
 			sql = "DELETE FROM " + Params.dbName + ".shift " +
 				  "WHERE 1=1 " +
-				  (term.restaurant_id < 0 ? "" : "AND restaurant_id=" + term.restaurant_id);
+				  (term.restaurantID < 0 ? "" : "AND restaurant_id=" + term.restaurantID);
 			dbCon.stmt.executeUpdate(sql);
 			
 			//delete the order_food record to root
@@ -400,8 +400,8 @@ public class DailySettle {
 		 */
 		String lastOffDuty;
 		sql = "SELECT MAX(off_duty) FROM (" +
-		 	  "SELECT off_duty FROM " + Params.dbName + ".shift WHERE restaurant_id=" + term.restaurant_id + " UNION " +
-			  "SELECT off_duty FROM " + Params.dbName + ".shift_history WHERE restaurant_id=" + term.restaurant_id + ") AS all_off_duty";
+		 	  "SELECT off_duty FROM " + Params.dbName + ".shift WHERE restaurant_id=" + term.restaurantID + " UNION " +
+			  "SELECT off_duty FROM " + Params.dbName + ".shift_history WHERE restaurant_id=" + term.restaurantID + ") AS all_off_duty";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			Timestamp offDuty = dbCon.rs.getTimestamp(1);
@@ -421,7 +421,7 @@ public class DailySettle {
 		 * get the paid orders which has NOT been shifted between the last off duty and now,
 		 */
 		sql = "SELECT id FROM " + Params.dbName + ".order WHERE " +
-			  "restaurant_id=" + term.restaurant_id + " AND " +
+			  "restaurant_id=" + term.restaurantID + " AND " +
 			  "total_price IS NOT NULL" + " AND " +
 			  "order_date BETWEEN " +
 			  "'" + lastOffDuty + "'" + " AND " + "NOW()";

@@ -140,7 +140,7 @@ public class QueryRegion {
 		ArrayList<Region> regions = new ArrayList<Region>();
 		
 		String sql = "SELECT * FROM " + Params.dbName +
-			 		 ".region WHERE restaurant_id=" + term.restaurant_id +
+			 		 ".region WHERE restaurant_id=" + term.restaurantID +
 			 		 (extraCond == null ? "" : extraCond) +
 			 		 (orderClause == null ? "" : orderClause);
 		
@@ -194,9 +194,9 @@ public class QueryRegion {
 	 */
 	public static Region exec(DBCon dbCon, Terminal term, int tableID) throws SQLException, BusinessException{
 		String sql = "SELECT * FROM " + Params.dbName + 
-					 ".region WHERE restaurant_id=" + term.restaurant_id +
+					 ".region WHERE restaurant_id=" + term.restaurantID +
 					 " AND region_id=" +
-					 "(SELECT region_id FROM " + Params.dbName + ".table WHERE restaurant_id=" + term.restaurant_id +
+					 "(SELECT region_id FROM " + Params.dbName + ".table WHERE restaurant_id=" + term.restaurantID +
 					 " AND table_alias=" + tableID + ")";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
@@ -204,7 +204,7 @@ public class QueryRegion {
 			return new Region(dbCon.rs.getShort("region_id"),
 							  dbCon.rs.getString("name"));
 		}else{
-			throw new BusinessException("The table(id=" + tableID + ", restaurant_id=" + term.restaurant_id + ") does NOT belong to any region.");
+			throw new BusinessException("The table(id=" + tableID + ", restaurant_id=" + term.restaurantID + ") does NOT belong to any region.");
 		}
 	}
 }

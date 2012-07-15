@@ -36,7 +36,7 @@ public class QueryDutyRange {
 					+ ".daily_settle_history "
 					+ " WHERE "
 					+ " restaurant_id = "
-					+ term.restaurant_id
+					+ term.restaurantID
 					+ " AND "
 					+ " off_duty BETWEEN "
 					+ "'" + onDuty + "'"

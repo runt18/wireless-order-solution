@@ -52,7 +52,7 @@ public class PayOrder {
 			 * Get the unpaid order id associated with this table
 			 */	
 			orderToPay.id = Util.getUnPaidOrderID(dbCon, QueryTable.exec(dbCon, term, orderToPay.table.aliasID));
-			orderToPay.restaurantID = term.restaurant_id;
+			orderToPay.restaurantID = term.restaurantID;
 			
 			return execByID(dbCon, term, orderToPay, isPaidAgain);	
 		}finally{
@@ -97,7 +97,7 @@ public class PayOrder {
 			 * Get the unpaid order id associated with this table
 			 */	
 			orderToPay.id = Util.getUnPaidOrderID(dbCon, QueryTable.exec(dbCon, term, orderToPay.table.aliasID));
-			orderToPay.restaurantID = term.restaurant_id;
+			orderToPay.restaurantID = term.restaurantID;
 			
 			return execByID(dbCon, term, orderToPay, isPaidAgain);			
 			
@@ -125,7 +125,7 @@ public class PayOrder {
 		try{
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, pin, model);
-			orderToPay.restaurantID = term.restaurant_id;
+			orderToPay.restaurantID = term.restaurantID;
 			return execByID(dbCon, term, orderToPay, isPaidAgain);
 		}finally{
 			dbCon.disconnect();
@@ -343,7 +343,7 @@ public class PayOrder {
 			 * Get the unpaid order id associated with this table
 			 */
 			orderToPay.id = Util.getUnPaidOrderID(dbCon, QueryTable.exec(dbCon, term, orderToPay.table.aliasID));
-			orderToPay.restaurantID = term.restaurant_id;
+			orderToPay.restaurantID = term.restaurantID;
 			
 			return queryOrderByID(dbCon, orderToPay);
 		}finally{
@@ -383,7 +383,7 @@ public class PayOrder {
 			 * Get the unpaid order id associated with this table
 			 */
 			orderToPay.id = Util.getUnPaidOrderID(dbCon, QueryTable.exec(dbCon, term, orderToPay.table.aliasID));
-			orderToPay.restaurantID = term.restaurant_id;
+			orderToPay.restaurantID = term.restaurantID;
 			
 			return queryOrderByID(dbCon, orderToPay);
 		}finally{

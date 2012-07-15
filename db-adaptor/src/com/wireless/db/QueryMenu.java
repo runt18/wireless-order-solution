@@ -43,12 +43,12 @@ public class QueryMenu {
 	 * 			Throws if fail to execute any SQL statement.
 	 */
 	public static FoodMenu exec(DBCon dbCon, Terminal term) throws SQLException{
-		return new FoodMenu(queryFoods(dbCon, term.restaurant_id, null, null), 
-			    			queryTastes(dbCon, term.restaurant_id, Taste.CATE_TASTE, null, null),
-			    			queryTastes(dbCon, term.restaurant_id, Taste.CATE_STYLE, null, null),
-			    			queryTastes(dbCon, term.restaurant_id, Taste.CATE_SPEC, null, null),
-			    			queryKitchens(dbCon, term.restaurant_id, null, null),
-			    			queryDepartments(dbCon, term.restaurant_id, null, null));
+		return new FoodMenu(queryFoods(dbCon, term.restaurantID, null, null), 
+			    			queryTastes(dbCon, term.restaurantID, Taste.CATE_TASTE, null, null),
+			    			queryTastes(dbCon, term.restaurantID, Taste.CATE_STYLE, null, null),
+			    			queryTastes(dbCon, term.restaurantID, Taste.CATE_SPEC, null, null),
+			    			queryKitchens(dbCon, term.restaurantID, null, null),
+			    			queryDepartments(dbCon, term.restaurantID, null, null));
 	}
 	
 	/**
@@ -73,12 +73,12 @@ public class QueryMenu {
 			
 			Terminal term = VerifyPin.exec(dbCon, pin, model);
 			
-			return new FoodMenu(queryFoods(dbCon, term.restaurant_id, null, null), 
-							    queryTastes(dbCon, term.restaurant_id, Taste.CATE_TASTE, null, null),
-							    queryTastes(dbCon, term.restaurant_id, Taste.CATE_STYLE, null, null),
-							    queryTastes(dbCon, term.restaurant_id, Taste.CATE_SPEC, null, null),
-							    queryKitchens(dbCon, term.restaurant_id, null, null),
-							    queryDepartments(dbCon, term.restaurant_id, null, null));
+			return new FoodMenu(queryFoods(dbCon, term.restaurantID, null, null), 
+							    queryTastes(dbCon, term.restaurantID, Taste.CATE_TASTE, null, null),
+							    queryTastes(dbCon, term.restaurantID, Taste.CATE_STYLE, null, null),
+							    queryTastes(dbCon, term.restaurantID, Taste.CATE_SPEC, null, null),
+							    queryKitchens(dbCon, term.restaurantID, null, null),
+							    queryDepartments(dbCon, term.restaurantID, null, null));
 			
 		}finally{
 			dbCon.disconnect();
@@ -120,7 +120,7 @@ public class QueryMenu {
 			
 			Terminal term = VerifyPin.exec(dbCon, pin, model);		
 			
-			return queryFoods(dbCon, term.restaurant_id, extraCondition, orderClause);
+			return queryFoods(dbCon, term.restaurantID, extraCondition, orderClause);
 			
 		}finally{
 			dbCon.disconnect();
@@ -144,7 +144,7 @@ public class QueryMenu {
 		try {
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, pin, model);
-			return queryTastes(dbCon, term.restaurant_id, Short.MIN_VALUE, null, null);
+			return queryTastes(dbCon, term.restaurantID, Short.MIN_VALUE, null, null);
 
 		} finally {
 			dbCon.disconnect();
@@ -170,7 +170,7 @@ public class QueryMenu {
 		try {
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, pin, model);
-			return queryTastes(dbCon, term.restaurant_id, Short.MIN_VALUE, extraCond, orderClause);
+			return queryTastes(dbCon, term.restaurantID, Short.MIN_VALUE, extraCond, orderClause);
 
 		} finally {
 			dbCon.disconnect();
@@ -199,7 +199,7 @@ public class QueryMenu {
 		try {
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, pin, model);
-			return queryKitchens(dbCon, term.restaurant_id, null, null);
+			return queryKitchens(dbCon, term.restaurantID, null, null);
 
 		} finally {
 			dbCon.disconnect();
@@ -232,7 +232,7 @@ public class QueryMenu {
 		try {
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, pin, model);
-			return queryKitchens(dbCon, term.restaurant_id, extraCond, orderClause);
+			return queryKitchens(dbCon, term.restaurantID, extraCond, orderClause);
 
 		} finally {
 			dbCon.disconnect();
@@ -260,7 +260,7 @@ public class QueryMenu {
 		try {
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, pin, model);
-			return queryDepartments(dbCon, term.restaurant_id, null, null);
+			return queryDepartments(dbCon, term.restaurantID, null, null);
 
 		} finally {
 			dbCon.disconnect();
@@ -292,7 +292,7 @@ public class QueryMenu {
 		try {
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, pin, model);
-			return queryDepartments(dbCon, term.restaurant_id, extraCond, orderClause);
+			return queryDepartments(dbCon, term.restaurantID, extraCond, orderClause);
 
 		} finally {
 			dbCon.disconnect();

@@ -163,7 +163,7 @@ public class InsertOrder {
 						  " WHERE " +
 						  " FOOD.food_alias=" + orderToInsert.foods[i].aliasID + 
 					 	  " AND " +
-					 	  " FOOD.restaurant_id=" + term.restaurant_id;
+					 	  " FOOD.restaurant_id=" + term.restaurantID;
 					dbCon.rs = dbCon.stmt.executeQuery(sql);
 					//check if the food exist in db 
 					if(dbCon.rs.next()){
@@ -171,7 +171,7 @@ public class InsertOrder {
 						orderToInsert.foods[i].name = dbCon.rs.getString("name");
 						orderToInsert.foods[i].status = dbCon.rs.getShort("status");
 						orderToInsert.foods[i].setPrice(dbCon.rs.getFloat("unit_price"));
-						orderToInsert.foods[i].kitchen.dept.restaurantID = term.restaurant_id;
+						orderToInsert.foods[i].kitchen.dept.restaurantID = term.restaurantID;
 						orderToInsert.foods[i].kitchen.dept.deptID = dbCon.rs.getShort("dept_id");
 					}else{
 						throw new BusinessException("The food(alias_id=" + orderToInsert.foods[i].aliasID + ", restaurant_id=" + orderToInsert.table.restaurantID+ ") to query doesn't exit.", ErrorCode.MENU_EXPIRED);
@@ -271,7 +271,7 @@ public class InsertOrder {
 						  "status=" + Table.TABLE_BUSY + ", " +
 						  "category=" + orderToInsert.category + ", " +
 						  "custom_num=" + orderToInsert.custom_num +
-						  " WHERE restaurant_id=" + term.restaurant_id +
+						  " WHERE restaurant_id=" + term.restaurantID +
 						  " AND table_alias=" + orderToInsert.table2.aliasID;
 					dbCon.stmt.executeUpdate(sql);
 				}
@@ -282,7 +282,7 @@ public class InsertOrder {
 					  "status=" + Table.TABLE_BUSY + ", " +
 					  "category=" + orderToInsert.category + ", " +
 					  "custom_num=" + orderToInsert.custom_num +
-					  " WHERE restaurant_id=" + term.restaurant_id + 
+					  " WHERE restaurant_id=" + term.restaurantID + 
 					  " AND table_alias=" + orderToInsert.table.aliasID;
 				dbCon.stmt.executeUpdate(sql);
 				
@@ -293,7 +293,7 @@ public class InsertOrder {
 					sql = "UPDATE " + Params.dbName + ".terminal SET" +
 							  " gift_amount = gift_amount + " + giftAmount +
 							  " WHERE pin=" + "0x" + Long.toHexString(term.pin) +
-							  " AND restaurant_id=" + term.restaurant_id;
+							  " AND restaurant_id=" + term.restaurantID;
 					dbCon.stmt.executeUpdate(sql);
 				}
 				
@@ -311,7 +311,7 @@ public class InsertOrder {
 							"`taste_tmp_alias`, `taste_tmp`, `taste_tmp_price`, " +
 							"`dept_id`, `kitchen_id`, `kitchen_alias`, " +
 							"`waiter`, `order_date`, `is_temporary`) VALUES (" +	
-							term.restaurant_id + ", " +
+							term.restaurantID + ", " +
 							orderToInsert.id + ", " +
 							(orderToInsert.foods[i].foodID == 0 ? "NULL" : orderToInsert.foods[i].foodID) + ", " +
 							orderToInsert.foods[i].aliasID + ", " + 
@@ -333,7 +333,7 @@ public class InsertOrder {
 							(orderToInsert.foods[i].tmpTaste == null ? "NULL" : ("'" + orderToInsert.foods[i].tmpTaste.preference + "'")) + ", " +
 							(orderToInsert.foods[i].tmpTaste == null ? "NULL" : orderToInsert.foods[i].tmpTaste.getPrice()) + ", " +
 							orderToInsert.foods[i].kitchen.dept.deptID + ", " +
-							"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + orderToInsert.foods[i].kitchen.aliasID + "), " + 
+							"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurantID + " AND kitchen_alias=" + orderToInsert.foods[i].kitchen.aliasID + "), " + 
 							orderToInsert.foods[i].kitchen.aliasID + ", '" + 
 							term.owner + "', NOW(), " + 
 							(orderToInsert.foods[i].isTemporary ? "1" : "0") + ")";
@@ -358,7 +358,7 @@ public class InsertOrder {
 			return orderToInsert;
 			
 		}else if(orderToInsert.table.status == Table.TABLE_BUSY){
-			throw new BusinessException("The table(alias_id=" + orderToInsert.table.aliasID + ", restaurant_id=" + term.restaurant_id + ") to insert order is BUSY.", ErrorCode.TABLE_BUSY);
+			throw new BusinessException("The table(alias_id=" + orderToInsert.table.aliasID + ", restaurant_id=" + term.restaurantID + ") to insert order is BUSY.", ErrorCode.TABLE_BUSY);
 			
 		}else{
 			throw new BusinessException("Unknown error occourred while inserting order.", ErrorCode.UNKNOWN);

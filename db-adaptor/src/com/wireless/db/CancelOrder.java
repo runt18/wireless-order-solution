@@ -126,7 +126,7 @@ public class CancelOrder {
 				sql = "UPDATE " + Params.dbName + ".terminal SET" +
 					  	  " gift_amount = gift_amount - " + giftAmount +
 					  	  " WHERE pin=" + "0x" + Long.toHexString(term.pin) +
-					  	  " AND restaurant_id=" + term.restaurant_id;
+					  	  " AND restaurant_id=" + term.restaurantID;
 				dbCon.stmt.executeUpdate(sql);
 			}
 			

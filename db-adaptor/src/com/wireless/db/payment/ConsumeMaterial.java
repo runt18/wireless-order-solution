@@ -63,7 +63,7 @@ public class ConsumeMaterial {
 			//get each material consumption to every food
 			FoodMaterial[] foodMaterials = FoodMaterialReflector.getFoodMaterial(dbCon, 
 																				 " AND FOOD_MATE.food_id=" + foods[i].foodID +
-																				 " AND FOOD_MATE.restaurant_id=" + term.restaurant_id, 
+																				 " AND FOOD_MATE.restaurant_id=" + term.restaurantID, 
 																				 "");
 			
 			try{
@@ -78,18 +78,18 @@ public class ConsumeMaterial {
 					//insert the corresponding detail record to material_detail
 					sql = "INSERT INTO " + Params.dbName + ".material_detail (" + 
 						  "restaurant_id, food_id, material_id, price, date, staff, dept_id, amount, type) VALUES(" +
-						  term.restaurant_id + ", " +							//restaurant_id
+						  term.restaurantID + ", " +							//restaurant_id
 						  foods[i].foodID + ", " +						//food_id
 						  foodMaterial.material.materialID + ", " +		//material_id
 						  "(SELECT price FROM " + Params.dbName + ".material_dept WHERE restaurant_id=" + 
-						  term.restaurant_id +
+						  term.restaurantID +
 						  " AND material_id=" + foodMaterial.material.materialID + 	
 						  " AND dept_id=0), " +	//price
 						  "NOW(), " +			//date
 						  "(SELECT owner_name FROM " + Params.dbName + 
 						  ".terminal WHERE pin=" + "0x" + Long.toHexString(term.pin) + " AND model_id=" + term.modelID + "), " +	//staff
 						  "(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + 
-						  term.restaurant_id + " AND kitchen_alias=" + foods[i].kitchen.aliasID + "), " +				//dept_id
+						  term.restaurantID + " AND kitchen_alias=" + foods[i].kitchen.aliasID + "), " +				//dept_id
 						  -amount + ", " + 				//amount
 						  MaterialDetail.TYPE_CONSUME + //type
 						  ")";
@@ -98,10 +98,10 @@ public class ConsumeMaterial {
 					//update the stock of material_dept to this material
 					sql = "UPDATE " + Params.dbName + ".material_dept SET " +
 						  "stock = stock - " + amount +
-						  " WHERE restaurant_id=" + term.restaurant_id + 
+						  " WHERE restaurant_id=" + term.restaurantID + 
 						  " AND material_id=" + foodMaterial.material.materialID +
 						  " AND dept_id=" + "(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + 
-						  term.restaurant_id + " AND kitchen_alias=" + foods[i].kitchen.aliasID + ")";
+						  term.restaurantID + " AND kitchen_alias=" + foods[i].kitchen.aliasID + ")";
 					dbCon.stmt.executeUpdate(sql);
 				}
 				

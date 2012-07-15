@@ -28,7 +28,7 @@ public class QuerySetting {
 		try{
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, pin, model);
-			return exec(dbCon, term.restaurant_id);
+			return exec(dbCon, term.restaurantID);
 		}finally{
 			dbCon.disconnect();
 		}

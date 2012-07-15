@@ -58,7 +58,7 @@ public class VerifyPin {
 			* throw a BusinessException with "TERMINAL_NOT_ATTACHED" 
 			* if the restaurant id is less than 10
 			*/
-			if(terminal.restaurant_id > Restaurant.RESERVED_7){
+			if(terminal.restaurantID > Restaurant.RESERVED_7){
 				/**
 				* Check if the terminal is expired or not.
 				* Note that NULL means the terminal never expire

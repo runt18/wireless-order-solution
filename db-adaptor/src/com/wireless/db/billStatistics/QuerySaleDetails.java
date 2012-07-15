@@ -59,7 +59,7 @@ public class QuerySaleDetails {
 		 * Get the single order food information
 		 */
 		orderFoods = SingleOrderFoodReflector.getDetailHistory(dbCon, 
-							"AND B.restaurant_id=" + term.restaurant_id + " " + 
+							"AND B.restaurant_id=" + term.restaurantID + " " + 
 							"AND B.order_date BETWEEN '" + dutyRange.getOnDuty() + "' AND '" + dutyRange.getOffDuty() + "'", 
 							null);				
 		
@@ -68,7 +68,7 @@ public class QuerySaleDetails {
 		 */
 		MaterialDetail[] materialDetails = new MaterialDetail[0];
 		materialDetails = MaterialDetailReflector.getMaterialDetail(dbCon, 
-							" AND MATE_DETAIL.restaurant_id=" + term.restaurant_id + " " +
+							" AND MATE_DETAIL.restaurant_id=" + term.restaurantID + " " +
 							" AND MATE_DETAIL.type=" + MaterialDetail.TYPE_CONSUME +
 							" AND MATE_DETAIL.date BETWEEN '" + dutyRange.getOnDuty() + "' AND '" + dutyRange.getOffDuty() + "'", 
 							"");
@@ -77,13 +77,13 @@ public class QuerySaleDetails {
 		 * Get all the basic info to department 
 		 */
 		HashMap<Department, SalesDetail> deptSalesDetail = new HashMap<Department, SalesDetail>();
-		for(Department dept : QueryMenu.queryDepartments(dbCon, term.restaurant_id, null, null)){
+		for(Department dept : QueryMenu.queryDepartments(dbCon, term.restaurantID, null, null)){
 			deptSalesDetail.put(dept, new SalesDetail(dept.name));
 		}
 		/**
 		 * Put the temporary department
 		 */
-		deptSalesDetail.put(new Department("临时菜", Department.DEPT_TEMP, term.restaurant_id), new SalesDetail("临时菜"));
+		deptSalesDetail.put(new Department("临时菜", Department.DEPT_TEMP, term.restaurantID), new SalesDetail("临时菜"));
 			
 		/**
 		 * Calculate the gift, discount, income to each department during this period
@@ -214,7 +214,7 @@ public class QuerySaleDetails {
 		 * Get the single order food information
 		 */
 		orderFoods = SingleOrderFoodReflector.getDetailHistory(dbCon, 
-							" AND B.restaurant_id=" + term.restaurant_id + " " + 
+							" AND B.restaurant_id=" + term.restaurantID + " " + 
 							" AND B.order_date BETWEEN '" + dutyRange.getOnDuty() + "' AND '" + dutyRange.getOffDuty() + "'" +  
 							(deptID.length != 0 ? " AND A.dept_id IN(" + deptCond + ")" : ""),
 							null);				
@@ -224,7 +224,7 @@ public class QuerySaleDetails {
 		 */
 		MaterialDetail[] materialDetails = new MaterialDetail[0];
 		materialDetails = MaterialDetailReflector.getMaterialDetail(dbCon, 
-							" AND MATE_DETAIL.restaurant_id=" + term.restaurant_id + " " +
+							" AND MATE_DETAIL.restaurant_id=" + term.restaurantID + " " +
 							" AND MATE_DETAIL.type=" + MaterialDetail.TYPE_CONSUME +
 							" AND MATE_DETAIL.date BETWEEN '" + dutyRange.getOnDuty() + "' AND '" + dutyRange.getOffDuty() + "'" +
 							(deptID.length != 0 ? " AND MATE_DETAIL.dept_id IN(" + deptCond + ")" : ""),
@@ -237,8 +237,8 @@ public class QuerySaleDetails {
 							 " WHERE " +
 							 " dept_id IN(" + deptCond + ")" + 
 							 " AND " +
-							 " restaurant_id=" + term.restaurant_id + ")";
-		Food[] foodList = QueryMenu.queryFoods(dbCon, term.restaurant_id, queryFoodExtraCond, null);
+							 " restaurant_id=" + term.restaurantID + ")";
+		Food[] foodList = QueryMenu.queryFoods(dbCon, term.restaurantID, queryFoodExtraCond, null);
 		HashMap<Food, SalesDetail> foodSalesDetail = new HashMap<Food, SalesDetail>();
 		for(Food item : foodList){
 			foodSalesDetail.put(item, new SalesDetail(item.name));

@@ -137,9 +137,9 @@ public class QueryShift {
 		 */
 		String onDuty;
 		String sql = "SELECT MAX(off_duty) FROM (" +
-					 "SELECT off_duty FROM " + Params.dbName + ".shift WHERE restaurant_id=" + term.restaurant_id + " UNION " +
-					 "SELECT off_duty FROM " + Params.dbName + ".shift_history WHERE restaurant_id=" + term.restaurant_id + " UNION " +
-					 "SELECT off_duty FROM " + Params.dbName + ".daily_settle_history WHERE restaurant_id=" + term.restaurant_id +
+					 "SELECT off_duty FROM " + Params.dbName + ".shift WHERE restaurant_id=" + term.restaurantID + " UNION " +
+					 "SELECT off_duty FROM " + Params.dbName + ".shift_history WHERE restaurant_id=" + term.restaurantID + " UNION " +
+					 "SELECT off_duty FROM " + Params.dbName + ".daily_settle_history WHERE restaurant_id=" + term.restaurantID +
 					 ") AS all_off_duty";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
@@ -276,14 +276,14 @@ public class QueryShift {
 		SingleOrderFood[] orderFoods = new SingleOrderFood[0];
 		if(queryType == QUERY_HISTORY){
 			orderFoods = SingleOrderFoodReflector.getDetailHistory(dbCon, 
-							"AND B.restaurant_id=" + term.restaurant_id + " " + 
+							"AND B.restaurant_id=" + term.restaurantID + " " + 
 							"AND B.order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "'", 
 							null);		
 			
 		}else if(queryType == QUERY_TODAY){
 			orderFoods = SingleOrderFoodReflector.getDetailToday(dbCon, 
 							"AND B.total_price IS NOT NULL " + 
-							"AND B.restaurant_id=" + term.restaurant_id + " " + 
+							"AND B.restaurant_id=" + term.restaurantID + " " + 
 							"AND B.order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "'", 
 							null);
 		}
@@ -303,7 +303,7 @@ public class QueryShift {
 		HashMap<Long, Float> signIncomeByOrder = new HashMap<Long, Float>();
 		
 		HashMap<Department, DeptIncome> deptIncome = new HashMap<Department, DeptIncome>();
-		for(Department dept : QueryMenu.queryDepartments(dbCon, term.restaurant_id, null, null)){
+		for(Department dept : QueryMenu.queryDepartments(dbCon, term.restaurantID, null, null)){
 			deptIncome.put(dept, new DeptIncome(dept));
 		}
 		for(SingleOrderFood singleOrderFood : orderFoods){
@@ -435,7 +435,7 @@ public class QueryShift {
 		result.orderAmount = orderID.size();
 		
 		//get the setting to this restaurant
-		Setting setting = QuerySetting.exec(dbCon, term.restaurant_id);
+		Setting setting = QuerySetting.exec(dbCon, term.restaurantID);
 		
 		/**
 		 * Assign the total cash income and amount

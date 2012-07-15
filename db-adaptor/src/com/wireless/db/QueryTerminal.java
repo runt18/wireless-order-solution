@@ -82,7 +82,7 @@ public class QueryTerminal {
 		while(dbCon.rs.next()){
 			Terminal terminal = new Terminal();
 			terminal.id = dbCon.rs.getLong("terminal_id");
-			terminal.restaurant_id = dbCon.rs.getInt("restaurant_id");
+			terminal.restaurantID = dbCon.rs.getInt("restaurant_id");
 			terminal.expireDate = dbCon.rs.getDate("expire_date");
 			terminal.owner = dbCon.rs.getString("owner_name");
 			terminal.modelName = dbCon.rs.getString("model_name");
@@ -148,7 +148,7 @@ public class QueryTerminal {
 		if(dbCon.rs.next()){
 			Terminal terminal = new Terminal();
 			terminal.id = dbCon.rs.getLong("terminal_id");
-			terminal.restaurant_id = dbCon.rs.getInt("restaurant_id");
+			terminal.restaurantID = dbCon.rs.getInt("restaurant_id");
 			terminal.expireDate = dbCon.rs.getDate("expire_date");
 			terminal.owner = dbCon.rs.getString("owner_name");
 			terminal.modelName = dbCon.rs.getString("model_name");

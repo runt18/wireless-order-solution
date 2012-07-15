@@ -73,14 +73,14 @@ public class InsertTable {
 		Table newTbl = new Table();
 		newTbl.aliasID = table.aliasID;
 		newTbl.name = table.name;
-		newTbl.restaurantID = term.restaurant_id;
+		newTbl.restaurantID = term.restaurantID;
 		newTbl.status = Table.TABLE_IDLE;
 		newTbl.category = Order.CATE_NORMAL;
 		
 		String sql;
 		if(autoGenID){
 			
-			sql = "SELECT MAX(table_alias) + 1 FROM " + Params.dbName + ".table WHERE restaurant_id=" + term.restaurant_id;
+			sql = "SELECT MAX(table_alias) + 1 FROM " + Params.dbName + ".table WHERE restaurant_id=" + term.restaurantID;
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			if(dbCon.rs.next()){
 				newTbl.aliasID = dbCon.rs.getInt(1);
@@ -92,12 +92,12 @@ public class InsertTable {
 		}else{
 			sql = "SELECT id FROM " + Params.dbName + 
 				  ".table WHERE " +
-				  "restaurant_id=" + term.restaurant_id + 
+				  "restaurant_id=" + term.restaurantID + 
 				  " AND " +
 				  "table_alias=" + newTbl.aliasID;
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			if(dbCon.rs.next()){
-				throw new BusinessException("Table(alias_id=" + newTbl.aliasID + ", restaurant_id=" + term.restaurant_id + ") is exist.", ErrorCode.TABLE_EXIST);
+				throw new BusinessException("Table(alias_id=" + newTbl.aliasID + ", restaurant_id=" + term.restaurantID + ") is exist.", ErrorCode.TABLE_EXIST);
 			}	
 			dbCon.rs.close();
 		}
@@ -110,7 +110,7 @@ public class InsertTable {
 			  ".table (`table_id`, `table_alias`, `restaurant_id`, `name`, `category`, `custom_num`, `status`) VALUES( " +
 			  "NULL, " +
 			  newTbl.aliasID + ", " +
-			  term.restaurant_id + ", '" +
+			  term.restaurantID + ", '" +
 			  (newTbl.name != null ? newTbl.name : "") + "', " + 
 			  "NULL, " +
 			  "NULL, " +

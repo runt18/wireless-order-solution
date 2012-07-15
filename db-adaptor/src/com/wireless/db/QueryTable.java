@@ -155,13 +155,13 @@ public class QueryTable {
 		//get the tables
 		String sql = "SELECT * FROM " + Params.dbName + 
 					 ".table WHERE restaurant_id=" +
-					 term.restaurant_id + " " +
+					 term.restaurantID + " " +
 					 (extraCond != null ? extraCond : "") +
 					 (orderClause != null ? orderClause : "");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
 			Table table = new Table();
-			table.restaurantID = term.restaurant_id;
+			table.restaurantID = term.restaurantID;
 			table.tableID = dbCon.rs.getInt("table_id");
 			table.aliasID = dbCon.rs.getInt("table_alias");
 			table.name = dbCon.rs.getString("name");
@@ -371,14 +371,14 @@ public class QueryTable {
 		//get the tables
 		String sql = "SELECT * FROM " + Params.dbName + 
 					 ".table WHERE restaurant_id=" +
-					 term.restaurant_id + " AND table_alias=" +
+					 term.restaurantID + " AND table_alias=" +
 					 tableAliasID + " " +
 					 (extraCond != null ? extraCond : " ") +
 					 (orderClause != null ? orderClause : "");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		Table table = new Table();
 		if(dbCon.rs.next()){
-			table.restaurantID = term.restaurant_id;
+			table.restaurantID = term.restaurantID;
 			table.tableID = dbCon.rs.getInt("table_id");
 			table.aliasID = tableAliasID;
 			table.name = dbCon.rs.getString("name");
@@ -389,7 +389,7 @@ public class QueryTable {
 			table.regionID = dbCon.rs.getShort("region_id");
 			table.setServiceRate(dbCon.rs.getFloat("service_rate"));
 		}else{
-			throw new BusinessException("The table(alias_id=" + tableAliasID + ", restaurant_id=" + term.restaurant_id + ") to query does NOT exist.", ErrorCode.TABLE_NOT_EXIST);
+			throw new BusinessException("The table(alias_id=" + tableAliasID + ", restaurant_id=" + term.restaurantID + ") to query does NOT exist.", ErrorCode.TABLE_NOT_EXIST);
 		}
 		dbCon.rs.close();
 		

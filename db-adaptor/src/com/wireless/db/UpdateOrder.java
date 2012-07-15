@@ -142,7 +142,7 @@ public class UpdateOrder {
 			
 			orderToUpdate.table = QueryTable.exec(dbCon, term, orderToUpdate.table.aliasID);
 			if(orderToUpdate.table.status == Table.TABLE_IDLE){
-				throw new BusinessException("The table(alias_id=" + orderToUpdate.table.aliasID + ", restaurant_id=" + term.restaurant_id + ") to change order is IDLE."
+				throw new BusinessException("The table(alias_id=" + orderToUpdate.table.aliasID + ", restaurant_id=" + term.restaurantID + ") to change order is IDLE."
 											,ErrorCode.TABLE_IDLE);
 			}
 			//orderToUpdate.table_name = oriTbl.name;
@@ -387,7 +387,7 @@ public class UpdateOrder {
 						"`discount`, `taste_alias`, `taste2_alias`, `taste3_alias`, `taste_price`, `taste`, " +
 						"`taste_tmp_alias`, `taste_tmp`, `taste_tmp_price`, " +
 						"`dept_id`, `kitchen_id`, `kitchen_alias`, `waiter`, `order_date`, `is_temporary`, `is_paid`) VALUES (" +
-						term.restaurant_id + ", " +
+						term.restaurantID + ", " +
 						orderToUpdate.id + ", " +
 						(extraFoods.get(i).foodID == 0 ? "NULL" : extraFoods.get(i).foodID) + ", " +
 						extraFoods.get(i).aliasID + ", " + 
@@ -409,7 +409,7 @@ public class UpdateOrder {
 						(extraFoods.get(i).tmpTaste == null ? "NULL" : ("'" + extraFoods.get(i).tmpTaste.preference + "'")) + ", " +
 						(extraFoods.get(i).tmpTaste == null ? "NULL" : extraFoods.get(i).tmpTaste.getPrice()) + ", " +
 						extraFoods.get(i).kitchen.dept.deptID + ", " + 
-						"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + extraFoods.get(i).kitchen.aliasID + "), " + 
+						"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurantID + " AND kitchen_alias=" + extraFoods.get(i).kitchen.aliasID + "), " + 
 						extraFoods.get(i).kitchen.aliasID + ", '" + 
 						term.owner + "', " +
 						"NOW(), " + 
@@ -434,7 +434,7 @@ public class UpdateOrder {
 						"`taste_tmp_alias`, `taste_tmp`, `taste_tmp_price`, " +
 						"`dept_id`, `kitchen_id`, `kitchen_alias`, " +
 						"`waiter`, `order_date`, `is_temporary`, `is_paid`) VALUES (" +
-						term.restaurant_id + ", " +
+						term.restaurantID + ", " +
 						orderToUpdate.id + ", " +
 						(canceledFoods.get(i).foodID == 0 ? "NULL" : canceledFoods.get(i).foodID) + ", " +
 						canceledFoods.get(i).aliasID + ", " + 
@@ -456,7 +456,7 @@ public class UpdateOrder {
 						(canceledFoods.get(i).tmpTaste == null ? "NULL" : ("'" + canceledFoods.get(i).tmpTaste.preference + "'")) + ", " +
 						(canceledFoods.get(i).tmpTaste == null ? "NULL" : canceledFoods.get(i).tmpTaste.getPrice()) + ", " +
 						canceledFoods.get(i).kitchen.dept.deptID + ", " + 
-						"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurant_id + " AND kitchen_alias=" + canceledFoods.get(i).kitchen.aliasID + "), " + 
+						"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurantID + " AND kitchen_alias=" + canceledFoods.get(i).kitchen.aliasID + "), " + 
 						canceledFoods.get(i).kitchen.aliasID + ", '" + 
 						term.owner + "', " +
 						"NOW(), " + 
@@ -478,7 +478,7 @@ public class UpdateOrder {
 					sql = "UPDATE " + Params.dbName + ".terminal SET" +
 					  " gift_amount = gift_amount + " + giftAmount +
 					  " WHERE pin=" + "0x" + Long.toHexString(term.pin) +
-					  " AND restaurant_id=" + term.restaurant_id;
+					  " AND restaurant_id=" + term.restaurantID;
 					dbCon.stmt.executeUpdate(sql);
 				}
 			}
@@ -509,7 +509,7 @@ public class UpdateOrder {
 						  "status=" + Table.TABLE_BUSY + ", " +
 						  "category=" + Order.CATE_MERGER_TABLE + ", " +
 						  "custom_num=" + orderToUpdate.custom_num +
-					  	  " WHERE restaurant_id=" + term.restaurant_id + 
+					  	  " WHERE restaurant_id=" + term.restaurantID + 
 					  	  " AND table_alias=" + orderToUpdate.table2.aliasID;
 					dbCon.stmt.executeUpdate(sql);				
 				}
@@ -543,7 +543,7 @@ public class UpdateOrder {
 					      "status=" + Table.TABLE_BUSY + ", " +
 						  "category=" + orderToUpdate.category + ", " +
 						  "custom_num=" + orderToUpdate.custom_num +
-						  " WHERE restaurant_id=" + term.restaurant_id + 
+						  " WHERE restaurant_id=" + term.restaurantID + 
 						  " AND table_alias=" + orderToUpdate.table.aliasID;
 					dbCon.stmt.executeUpdate(sql);				
 				}				
@@ -745,7 +745,7 @@ public class UpdateOrder {
 						 " AND " +
 						 " DEPT.dept_id = " + "(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE kitchen_id = FOOD.kitchen_id)" +
 						 " WHERE " +
-						 " FOOD.restaurant_id = " + term.restaurant_id +
+						 " FOOD.restaurant_id = " + term.restaurantID +
 						 " AND " +
 						 " FOOD.food_alias = " + foodBasic.aliasID;
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -758,17 +758,17 @@ public class UpdateOrder {
 				food.setPrice(new Float(dbCon.rs.getFloat("unit_price")));
 				food.kitchen.kitchenID = dbCon.rs.getLong("kitchen_id");
 				food.kitchen.aliasID = dbCon.rs.getShort("kitchen_alias");
-				food.kitchen.dept.restaurantID = term.restaurant_id;
+				food.kitchen.dept.restaurantID = term.restaurantID;
 				food.kitchen.dept.deptID = dbCon.rs.getShort("dept_id");
 			}else{
-				throw new BusinessException("The food(alias_id=" + foodBasic.aliasID + ", restaurant_id=" + term.restaurant_id + ") to query does NOT exist.", ErrorCode.MENU_EXPIRED);
+				throw new BusinessException("The food(alias_id=" + foodBasic.aliasID + ", restaurant_id=" + term.restaurantID + ") to query does NOT exist.", ErrorCode.MENU_EXPIRED);
 			}
 			dbCon.rs.close();
 			
 			//get the each taste information to this food only if the food has taste preference
 			for(int j = 0; j < foodBasic.tastes.length; j++){
 				if(foodBasic.tastes[j].aliasID != Taste.NO_TASTE){
-					sql = "SELECT taste_id, preference, price, category, rate, calc FROM " + Params.dbName + ".taste WHERE restaurant_id=" + term.restaurant_id +
+					sql = "SELECT taste_id, preference, price, category, rate, calc FROM " + Params.dbName + ".taste WHERE restaurant_id=" + term.restaurantID +
 						" AND taste_alias=" + foodBasic.tastes[j].aliasID;
 					dbCon.rs = dbCon.stmt.executeQuery(sql);
 					//check if the taste preference exist in db
@@ -781,7 +781,7 @@ public class UpdateOrder {
 						food.tastes[j].setRate(dbCon.rs.getFloat("rate"));
 						food.tastes[j].setPrice(dbCon.rs.getFloat("price"));
 					}else{
-						throw new BusinessException("The taste(alias_id=" + foodBasic.tastes[j].aliasID + ", restaurant_id=" + term.restaurant_id +") to query does NOT exist.", ErrorCode.MENU_EXPIRED);
+						throw new BusinessException("The taste(alias_id=" + foodBasic.tastes[j].aliasID + ", restaurant_id=" + term.restaurantID +") to query does NOT exist.", ErrorCode.MENU_EXPIRED);
 					}
 					dbCon.rs.close();
 					

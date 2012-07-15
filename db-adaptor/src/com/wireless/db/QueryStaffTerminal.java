@@ -44,7 +44,7 @@ public class QueryStaffTerminal {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return exec(dbCon, term.restaurant_id, null, null);
+			return exec(dbCon, term.restaurantID, null, null);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -67,7 +67,7 @@ public class QueryStaffTerminal {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return exec(dbCon, term.restaurant_id, extraCond, orderClause);
+			return exec(dbCon, term.restaurantID, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}

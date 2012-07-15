@@ -7,11 +7,11 @@ import com.wireless.protocol.Terminal;
 
 public class VerifyPwd {
 	
-	public static int PASSWORD_1 = 1;	//¹ÜÀíÔ±ÃÜÂë
-	public static int PASSWORD_2 = 2;	//²ÆÎñÈ¨ÏÞÃÜÂë
-	public static int PASSWORD_3 = 3;	//µê³¤È¨ÏÞÃÜÂë
-	public static int PASSWORD_4 = 4;	//ÊÕÒøÔ±È¨ÏÞÃÜÂë
-	public static int PASSWORD_5 = 5;	//ÍË²ËÈ¨ÏÞÃÜÂë
+	public static int PASSWORD_1 = 1;	//ï¿½ï¿½ï¿½ï¿½Ô±ï¿½ï¿½ï¿½ï¿½
+	public static int PASSWORD_2 = 2;	//ï¿½ï¿½ï¿½ï¿½È¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	public static int PASSWORD_3 = 3;	//ï¿½ê³¤È¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	public static int PASSWORD_4 = 4;	//ï¿½ï¿½ï¿½ï¿½Ô±È¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	public static int PASSWORD_5 = 5;	//ï¿½Ë²ï¿½È¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	
 	/**
 	 * Verify the password according to specific type.
@@ -74,7 +74,7 @@ public class VerifyPwd {
 		
 		String pwd = "", pwd2 = "", pwd3 = "", pwd4 = "", pwd5 = "";
 		
-		String sql = "SELECT pwd, pwd2, pwd3, pwd4, pwd5 FROM " + Params.dbName + ".restaurant WHERE id=" + term.restaurant_id;
+		String sql = "SELECT pwd, pwd2, pwd3, pwd4, pwd5 FROM " + Params.dbName + ".restaurant WHERE id=" + term.restaurantID;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			pwd = dbCon.rs.getString("pwd");

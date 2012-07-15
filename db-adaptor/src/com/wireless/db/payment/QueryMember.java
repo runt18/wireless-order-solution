@@ -37,7 +37,7 @@ public class QueryMember {
 			
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, pin, model);
-			return exec(dbCon, term.restaurant_id, memberID);
+			return exec(dbCon, term.restaurantID, memberID);
 			
 		}finally{
 			dbCon.disconnect();

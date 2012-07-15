@@ -31,7 +31,7 @@ public class QueryRestaurant {
 			
 			Terminal term = VerifyPin.exec(dbCon, pin, model);
 			
-			Restaurant restaurant = exec(dbCon, term.restaurant_id);
+			Restaurant restaurant = exec(dbCon, term.restaurantID);
 			restaurant.owner = term.owner;
 			
 			return restaurant;
@@ -56,7 +56,7 @@ public class QueryRestaurant {
 		
 		try{
 			dbCon.connect();
-			Restaurant restaurant = exec(dbCon, term.restaurant_id);
+			Restaurant restaurant = exec(dbCon, term.restaurantID);
 			restaurant.owner = term.owner;
 			return restaurant;
 			
