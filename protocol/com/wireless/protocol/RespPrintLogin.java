@@ -5,7 +5,9 @@ import java.io.UnsupportedEncodingException;
 /******************************************************
  * In the case printer login successfully, 
  * design the response looks like below
- * mode : type : seq : reserved : pin[6] : len[2] : nKitchen : <kitchen_1> : ... : <kitchen_n> : 
+ * mode : type : seq : reserved : pin[6] : len[2] : 
+ * nDept : <dept_1> : ... : <dept_n> : 
+ * nKitchen : <kitchen_1> : ... : <kitchen_n> : 
  * restaurant_len : restaurant_name
  * <Header>
  * mode - PRINT
