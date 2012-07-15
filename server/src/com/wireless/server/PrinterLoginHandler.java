@@ -112,7 +112,7 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 								dbCon.rs.close();
 								
 								Terminal term = new Terminal();
-								term.restaurant_id = restaurantID;
+								term.restaurantID = restaurantID;
 								
 								//respond with the related kitchen information
 								send(_out, new RespPrintLogin(loginReq.header, 

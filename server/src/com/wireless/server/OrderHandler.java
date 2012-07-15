@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import com.wireless.db.CancelOrder;
+import com.wireless.db.DBCon;
 import com.wireless.db.InsertOrder;
 import com.wireless.db.QueryMenu;
 import com.wireless.db.QueryOrder;
@@ -24,6 +25,7 @@ import com.wireless.db.VerifyPin;
 import com.wireless.db.payment.ConsumeMaterial;
 import com.wireless.db.payment.PayOrder;
 import com.wireless.exception.BusinessException;
+import com.wireless.protocol.Department;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Mode;
 import com.wireless.protocol.Order;
@@ -404,7 +406,7 @@ class OrderHandler extends Handler implements Runnable{
 	private void printOrder(int printConf, PrintHandler.PrintParam param) throws PrintLogicException{
 		if(param != null){
 			//find the printer connection socket to the restaurant for this terminal
-			ArrayList<Socket> printerConn = WirelessSocketServer.printerConnections.get(new Integer(_term.restaurant_id));
+			ArrayList<Socket> printerConn = WirelessSocketServer.printerConnections.get(new Integer(_term.restaurantID));
 			Socket[] connections = null;
 			if(printerConn != null){
 				connections = printerConn.toArray(new Socket[printerConn.size()]);			
@@ -415,10 +417,16 @@ class OrderHandler extends Handler implements Runnable{
 			/**
 			 * Get the corresponding restaurant information
 			 */
+			DBCon dbCon = new DBCon();
 			try{
-				param.restaurant = QueryRestaurant.exec(_term);
+				dbCon.connect();
+				param.restaurant = QueryRestaurant.exec(dbCon, _term.restaurantID);
+				param.depts = QueryMenu.queryDepartments(dbCon, _term.restaurantID, null, null);
 			}catch(Exception e){
 				param.restaurant = new Restaurant();
+				param.depts = new Department[0];
+			}finally{
+				dbCon.disconnect();
 			}
 			
 			param.term = _term;
