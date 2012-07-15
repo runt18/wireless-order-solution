@@ -109,7 +109,7 @@ public class InventoryAnalysisCurrent extends Action {
 					+ Params.dbName
 					+ ".material c "
 					+ " WHERE a.restaurant_id = "
-					+ term.restaurant_id
+					+ term.restaurantID
 					+ " AND a.restaurant_id = c.restaurant_id AND a.material_id = c.material_id "
 					+ " AND b.restaurant_id = c.restaurant_id AND b.cate_id = c.cate_id "
 					+ " "

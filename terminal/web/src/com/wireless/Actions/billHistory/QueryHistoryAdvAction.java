@@ -132,7 +132,7 @@ public class QueryHistoryAdvAction extends Action {
 					 Params.dbName + ".order_food_history B " +
 					 " WHERE " +
 					 " A.id = B.order_id " +
-					 " AND A.restaurant_id=" + term.restaurant_id + " " +
+					 " AND A.restaurant_id=" + term.restaurantID + " " +
 					 filterCondition +
 					 " GROUP BY A.id " +
 					 " LIMIT 300 ";

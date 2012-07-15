@@ -57,7 +57,7 @@ public class DeleteFoodMaterialAction extends Action {
 			 * 
 			 */
 			String sql = "DELETE FROM " + Params.dbName + ".food_material "
-					+ "WHERE restaurant_id=" + term.restaurant_id
+					+ "WHERE restaurant_id=" + term.restaurantID
 					+ " AND food_id = " + foodID + " AND material_id = "
 					+ materialID;
 			;

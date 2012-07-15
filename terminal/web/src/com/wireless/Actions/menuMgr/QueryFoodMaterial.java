@@ -78,7 +78,7 @@ public class QueryFoodMaterial extends Action {
 					+ Params.dbName
 					+ ".material B "
 					+ " WHERE A.restaurant_id = "
-					+ term.restaurant_id
+					+ term.restaurantID
 					+ " AND A.restaurant_id = B.restaurant_id"
 					+ " AND A.material_id = B.material_id "
 					+ " AND A.food_id = " + foodID;

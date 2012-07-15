@@ -55,20 +55,20 @@ public class DeleteStaffAction extends Action {
 			 * 
 			 */
 			String sql = " SELECT terminal_id FROM " + Params.dbName
-					+ ".staff WHERE restaurant_id=" + term.restaurant_id
+					+ ".staff WHERE restaurant_id=" + term.restaurantID
 					+ " AND staff_id = " + staffID;
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			dbCon.rs.next();
 			int terminalID = dbCon.rs.getInt(1);
 
 			sql = "DELETE FROM " + Params.dbName + ".staff "
-					+ "WHERE restaurant_id=" + term.restaurant_id
+					+ "WHERE restaurant_id=" + term.restaurantID
 					+ " AND staff_id = " + staffID;
 
 			int sqlRowCount = dbCon.stmt.executeUpdate(sql);
 
 			sql = "DELETE FROM " + Params.dbName + ".terminal "
-					+ "WHERE restaurant_id=" + term.restaurant_id
+					+ "WHERE restaurant_id=" + term.restaurantID
 					+ " AND terminal_id = " + terminalID;
 
 			sqlRowCount = dbCon.stmt.executeUpdate(sql);

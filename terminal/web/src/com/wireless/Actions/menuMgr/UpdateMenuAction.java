@@ -96,7 +96,7 @@ public class UpdateMenuAction extends Action {
 					" kitchen_id =  " + (kitchenID < 0 ? " NULL " : kitchenID) + ", " + 
 					" kitchen_alias = " + kitchenAlias + ", " + 
 					" status =  " + status + 
-					" WHERE restaurant_id=" + term.restaurant_id
+					" WHERE restaurant_id=" + term.restaurantID
 					+ " AND food_id = " + foodID;
 
 			dbCon.stmt.executeUpdate(sql);

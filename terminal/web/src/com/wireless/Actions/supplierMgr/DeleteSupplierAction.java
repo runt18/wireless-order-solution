@@ -59,7 +59,7 @@ public class DeleteSupplierAction extends Action {
 			 * 
 			 */
 			String sql = "DELETE FROM " + Params.dbName + ".supplier "
-					+ "WHERE restaurant_id=" + term.restaurant_id
+					+ "WHERE restaurant_id=" + term.restaurantID
 					+ " AND supplier_id = " + supplierID;
 
 			int sqlRowCount = dbCon.stmt.executeUpdate(sql);

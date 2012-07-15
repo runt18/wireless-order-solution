@@ -57,7 +57,7 @@ public class DeleteTableAction extends Action {
 			 * 
 			 */
 			String sql = "DELETE FROM " + Params.dbName + ".table " +
-					"WHERE restaurant_id=" + term.restaurant_id
+					"WHERE restaurant_id=" + term.restaurantID
 					+ " AND table_id = " + tableID;
 
 

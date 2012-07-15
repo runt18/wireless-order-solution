@@ -71,7 +71,7 @@ public class InsertTasteAction extends Action {
 					+ Params.dbName
 					+ ".taste"
 					+ "( restaurant_id, taste_alias, preference, price, category, rate, calc ) "
-					+ " VALUES(" + term.restaurant_id + ", " + tasteNumber
+					+ " VALUES(" + term.restaurantID + ", " + tasteNumber
 					+ ", '" + tasteName + "', " + tastePrice + ", " + type
 					+ "," + tasteRate + "," + cal + " ) ";
 

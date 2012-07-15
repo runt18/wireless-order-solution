@@ -67,7 +67,7 @@ public class InsertTableAction extends Action {
 					+ Params.dbName
 					+ ".table"
 					+ "( table_alias, restaurant_id, region_id, name, minimum_cost, enabled, status, service_rate ) "
-					+ " VALUES(" + tableNumber + ", " + term.restaurant_id
+					+ " VALUES(" + tableNumber + ", " + term.restaurantID
 					+ ", " + region + ", '" + tableName + "', " + tableMincost
 					+ ", " + "1, 0, " + tableSerRate + " ) ";
 

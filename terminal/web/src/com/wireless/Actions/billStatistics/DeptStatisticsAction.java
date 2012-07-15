@@ -100,7 +100,7 @@ public class DeptStatisticsAction extends Action {
 				}
 				condition = condition
 						+ " AND B.total_price IS NOT NULL AND A.restaurant_id =  "
-						+ term.restaurant_id;
+						+ term.restaurantID;
 
 				orderClause = " ORDER BY dept_id";
 
@@ -119,7 +119,7 @@ public class DeptStatisticsAction extends Action {
 				}
 				condition = condition
 						+ " AND A.restaurant_id =  "
-						+ term.restaurant_id;
+						+ term.restaurantID;
 
 				orderClause = orderClause + " ORDER BY dept_id";
 

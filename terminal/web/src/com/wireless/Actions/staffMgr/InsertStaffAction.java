@@ -73,7 +73,7 @@ public class InsertStaffAction extends Action {
 					+ Params.dbName
 					+ ".terminal"
 					+ "( pin, restaurant_id, model_id, model_name, owner_name, gift_quota ) "
-					+ " VALUES(" + newPin + ", " + term.restaurant_id
+					+ " VALUES(" + newPin + ", " + term.restaurantID
 					+ ", 255, 'Staff', '" + staffName + "', " + staffQuota
 					+ " ) ";
 
@@ -90,7 +90,7 @@ public class InsertStaffAction extends Action {
 					+ Params.dbName
 					+ ".staff"
 					+ "(  restaurant_id, terminal_id, staff_alias, name, pwd ) "
-					+ " VALUES(" + term.restaurant_id + ", " + newTerminalID
+					+ " VALUES(" + term.restaurantID + ", " + newTerminalID
 					+ ", " + staffNumber + ", '" + staffName + "', '" + pwdMd5
 					+ "' ) ";
 

@@ -104,7 +104,7 @@ public class StatInventoryAllDetail extends Action {
 					+ Params.dbName
 					+ ".material_detail a "
 					+ " WHERE a.restaurant_id = "
-					+ term.restaurant_id
+					+ term.restaurantID
 					+ " "
 					+ condition;
 

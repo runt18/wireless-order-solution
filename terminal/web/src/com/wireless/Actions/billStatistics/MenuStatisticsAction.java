@@ -94,7 +94,7 @@ public class MenuStatisticsAction extends Action {
 						+ " 23:59:59" + "' ";
 			}
 			condition = condition + " AND B.total_price IS NOT NULL AND B.restaurant_id =  "
-					+ term.restaurant_id;
+					+ term.restaurantID;
 
 			// String orderClause = " ORDER BY D.food_id DESC, D.pay_date ";
 			String orderClause = " ORDER BY food_alias ASC, pay_date ";

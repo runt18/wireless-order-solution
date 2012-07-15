@@ -103,7 +103,7 @@ public class KitchenStatisticsAction extends Action {
 				}
 				condition = condition
 						+ " AND B.total_price IS NOT NULL AND A.restaurant_id =  "
-						+ term.restaurant_id;
+						+ term.restaurantID;
 
 				orderClause = " ORDER BY kitchen_alias ";
 
@@ -122,7 +122,7 @@ public class KitchenStatisticsAction extends Action {
 				}
 				condition = condition
 						+ " AND A.restaurant_id =  "
-						+ term.restaurant_id;
+						+ term.restaurantID;
 
 				orderClause = orderClause + " ORDER BY kitchen_alias ";
 

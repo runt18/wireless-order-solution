@@ -53,7 +53,7 @@ public class QueryDetailAction2 extends Action {
 			StringBuffer value = new StringBuffer();
 			
 			String sql = "SELECT a.*, b.name AS kitchen_name FROM " + Params.dbName + ".order_food a, " + Params.dbName + ".kitchen b " +
-						 "WHERE order_id=" + orderID + " AND a.kitchen=b.alias_id AND b.restaurant_id=" + term.restaurant_id;
+						 "WHERE order_id=" + orderID + " AND a.kitchen=b.alias_id AND b.restaurant_id=" + term.restaurantID;
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while(dbCon.rs.next()){
 				// the string is separated by comma

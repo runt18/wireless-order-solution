@@ -60,7 +60,7 @@ public class DeleteMenuAction extends Action {
 			 * 
 			 */
 			String sql = "DELETE FROM " + Params.dbName + ".food " +
-					"WHERE restaurant_id=" + term.restaurant_id
+					"WHERE restaurant_id=" + term.restaurantID
 					+ " AND food_id = " + foodID;
 
 

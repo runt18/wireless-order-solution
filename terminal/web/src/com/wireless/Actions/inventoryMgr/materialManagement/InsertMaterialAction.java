@@ -61,7 +61,7 @@ public class InsertMaterialAction extends Action {
 					+ Params.dbName
 					+ ".material"
 					+ "( restaurant_id, material_alias, name, warning_threshold, danger_threshold, cate_id ) "
-					+ " VALUES(" + term.restaurant_id + ", " + materialAlias
+					+ " VALUES(" + term.restaurantID + ", " + materialAlias
 					+ ", '" + materialName + "', " + materialWarning + ", "
 					+ materialDanger + ", " + materialCate + " ) ";
 
@@ -71,7 +71,7 @@ public class InsertMaterialAction extends Action {
 			for (int i = 0; i < 10; i++) {
 				sql = " SELECT name FROM " + Params.dbName
 						+ ".department WHERE dept_id = " + i
-						+ " AND restaurant_id =  " + term.restaurant_id;
+						+ " AND restaurant_id =  " + term.restaurantID;
 				dbCon.rs = dbCon.stmt.executeQuery(sql);
 				dbCon.rs.next();
 				String deptName = dbCon.rs.getString("name");
@@ -85,7 +85,7 @@ public class InsertMaterialAction extends Action {
 						+ deptName + "', '" + materialName + "', 0, 0 "
 						+ " FROM " + Params.dbName
 						+ ".material WHERE material_alias = " + materialAlias
-						+ " AND restaurant_id = " + term.restaurant_id;
+						+ " AND restaurant_id = " + term.restaurantID;
 
 				sqlRowCount = dbCon.stmt.executeUpdate(sql);
 			}

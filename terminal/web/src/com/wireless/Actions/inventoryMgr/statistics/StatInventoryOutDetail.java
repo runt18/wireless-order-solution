@@ -110,7 +110,7 @@ public class StatInventoryOutDetail extends Action {
 			String sql = " SELECT material_id, date, type, staff, dept_id, "
 					+ " price, amount, price*amount as total, comment " + " FROM "
 					+ Params.dbName + ".material_detail "
-					+ " WHERE restaurant_id = " + term.restaurant_id
+					+ " WHERE restaurant_id = " + term.restaurantID
 					+ condition;
 
 			dbCon.rs = dbCon.stmt.executeQuery(sql);

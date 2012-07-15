@@ -109,7 +109,7 @@ public class QuerySupplierMgrAction extends Action {
 
 			String sql = " SELECT supplier_id, supplier_alias, name, tele, contact, addr "
 					+ " FROM " + Params.dbName + ".supplier "
-					+ " WHERE restaurant_id = " + term.restaurant_id
+					+ " WHERE restaurant_id = " + term.restaurantID
 					+ filterCondition;
 
 			dbCon.rs = dbCon.stmt.executeQuery(sql);

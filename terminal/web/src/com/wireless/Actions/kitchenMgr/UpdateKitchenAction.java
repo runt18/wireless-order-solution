@@ -76,7 +76,7 @@ public class UpdateKitchenAction extends Action {
 						+ " member_discount_1 = " + fieldValues[5] + ", "
 						+ " member_discount_2 = " + fieldValues[6] + ", "
 						+ " member_discount_3 = " + fieldValues[7] + " "
-						+ " WHERE restaurant_id=" + term.restaurant_id
+						+ " WHERE restaurant_id=" + term.restaurantID
 						+ " AND kitchen_id = " + fieldValues[0];
 
 				sqlRowCount = dbCon.stmt.executeUpdate(sql);

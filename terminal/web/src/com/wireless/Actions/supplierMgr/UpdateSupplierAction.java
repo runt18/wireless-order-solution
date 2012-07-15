@@ -73,7 +73,7 @@ public class UpdateSupplierAction extends Action {
 						+ fieldValues[5] + "', " + " contact = '"
 						+ fieldValues[4] + "', " + " supplier_alias =  "
 						+ fieldValues[1] + " " + " WHERE restaurant_id="
-						+ term.restaurant_id + " AND supplier_id = "
+						+ term.restaurantID + " AND supplier_id = "
 						+ fieldValues[0];
 
 				sqlRowCount = dbCon.stmt.executeUpdate(sql);

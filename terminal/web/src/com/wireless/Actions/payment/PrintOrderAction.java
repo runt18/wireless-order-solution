@@ -175,7 +175,7 @@ public class PrintOrderAction extends Action implements PinGen{
 				String sql = " SELECT on_duty, off_duty FROM " + Params.dbName + ".daily_settle_history " +
 							 " WHERE id=(" +
 							 " SELECT MAX(id) FROM " + Params.dbName + ".daily_settle_history WHERE " +
-							 " restaurant_id=" + VerifyPin.exec(dbCon, _pin, Terminal.MODEL_STAFF).restaurant_id + 
+							 " restaurant_id=" + VerifyPin.exec(dbCon, _pin, Terminal.MODEL_STAFF).restaurantID + 
 							 ")";
 				dbCon.rs = dbCon.stmt.executeQuery(sql);
 				if(dbCon.rs.next()){

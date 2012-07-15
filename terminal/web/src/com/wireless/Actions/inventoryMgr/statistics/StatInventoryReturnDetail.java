@@ -107,7 +107,7 @@ public class StatInventoryReturnDetail extends Action {
 					+ Params.dbName
 					+ ".material_detail "
 					+ " WHERE restaurant_id = "
-					+ term.restaurant_id
+					+ term.restaurantID
 					+ " AND type = "
 					+ MaterialDetail.TYPE_RETURN
 					+ " "

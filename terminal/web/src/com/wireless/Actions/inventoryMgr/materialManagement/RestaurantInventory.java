@@ -63,7 +63,7 @@ public class RestaurantInventory {
 					+ ".material c where c.restaurant_id = b.restaurant_id and c.cate_id = b.cate_id "
 					+ " and a.restaurant_id = c.restaurant_id and a.material_id = c.material_id "
 					+ " and a.restaurant_id = "
-					+ term.restaurant_id
+					+ term.restaurantID
 					+ timeCondition
 					+ " and a.dept_id in ("
 					+ deptString
@@ -148,7 +148,7 @@ public class RestaurantInventory {
 					+ ".material c where c.restaurant_id = b.restaurant_id and c.cate_id = b.cate_id "
 					+ " and a.restaurant_id = c.restaurant_id and a.material_id = c.material_id "
 					+ " and a.restaurant_id = "
-					+ term.restaurant_id
+					+ term.restaurantID
 					+ timeCondition
 					+ " and a.dept_id in ("
 					+ deptString

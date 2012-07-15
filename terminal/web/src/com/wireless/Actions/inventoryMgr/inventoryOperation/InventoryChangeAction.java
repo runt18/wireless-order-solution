@@ -65,7 +65,7 @@ public class InventoryChangeAction extends Action {
 					+ Params.dbName
 					+ ".material_detail"
 					+ "( restaurant_id, material_id, date, dept_id, dept2_id, amount, type, staff, comment ) "
-					+ " VALUES(" + term.restaurant_id + ", " + materialID
+					+ " VALUES(" + term.restaurantID + ", " + materialID
 					+ ", '" + date + "', " + deptIDIn + ", " + deptIDOut + ", "
 					+ amount + ", " + MaterialDetail.TYPE_IN + ", '" + staff
 					+ "', '" + remark + "' ) ";
@@ -73,7 +73,7 @@ public class InventoryChangeAction extends Action {
 
 			sql = " SELECT stock FROM " + Params.dbName
 					+ ".material_dept WHERE restaurant_id = "
-					+ term.restaurant_id + " AND material_id = " + materialID
+					+ term.restaurantID + " AND material_id = " + materialID
 					+ " AND dept_id =  " + deptIDIn;
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			dbCon.rs.next();
@@ -83,7 +83,7 @@ public class InventoryChangeAction extends Action {
 			sql = "UPDATE " + Params.dbName + ".material_dept"
 					+ " SET stock = "
 					+ (float) Math.round((thisStock + amount) * 100) / 100
-					+ " WHERE restaurant_id = " + term.restaurant_id
+					+ " WHERE restaurant_id = " + term.restaurantID
 					+ " AND material_id =  " + materialID + " AND dept_id =  "
 					+ deptIDIn;
 			sqlRowCount = dbCon.stmt.executeUpdate(sql);
@@ -93,7 +93,7 @@ public class InventoryChangeAction extends Action {
 					+ Params.dbName
 					+ ".material_detail"
 					+ "( restaurant_id, material_id, date, dept_id, dept2_id, amount, type, staff, comment ) "
-					+ " VALUES(" + term.restaurant_id + ", " + materialID
+					+ " VALUES(" + term.restaurantID + ", " + materialID
 					+ ", '" + date + "', " + deptIDOut + ", " + deptIDIn + ", "
 					+ amount * (-1) + ", " + MaterialDetail.TYPE_OUT + ", '"
 					+ staff + "', '" + remark + "' ) ";
@@ -101,7 +101,7 @@ public class InventoryChangeAction extends Action {
 
 			sql = " SELECT stock FROM " + Params.dbName
 					+ ".material_dept WHERE restaurant_id = "
-					+ term.restaurant_id + " AND material_id = " + materialID
+					+ term.restaurantID + " AND material_id = " + materialID
 					+ " AND dept_id =  " + deptIDOut;
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			dbCon.rs.next();
@@ -111,7 +111,7 @@ public class InventoryChangeAction extends Action {
 			sql = "UPDATE " + Params.dbName + ".material_dept"
 					+ " SET stock = "
 					+ (float) Math.round((thisStock - amount) * 100) / 100
-					+ " WHERE restaurant_id = " + term.restaurant_id
+					+ " WHERE restaurant_id = " + term.restaurantID
 					+ " AND material_id =  " + materialID + " AND dept_id =  "
 					+ deptIDOut;
 			sqlRowCount = dbCon.stmt.executeUpdate(sql);

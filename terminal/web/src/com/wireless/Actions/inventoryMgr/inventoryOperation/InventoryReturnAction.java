@@ -68,7 +68,7 @@ public class InventoryReturnAction extends Action {
 					+ Params.dbName
 					+ ".material_detail"
 					+ "( restaurant_id, supplier_id, material_id, price, date, dept_id, amount, type, staff, comment ) "
-					+ " VALUES(" + term.restaurant_id + ", " + supplierID
+					+ " VALUES(" + term.restaurantID + ", " + supplierID
 					+ ", " + materialID + ", " + price + ", '" + date + "', "
 					+ deptID + ", " + (-1) * amount + ", " + type + ", '"
 					+ staff + "', '" + remark + "' ) ";
@@ -79,7 +79,7 @@ public class InventoryReturnAction extends Action {
 			// 更新價錢
 			sql = " SELECT sum(stock) AS stock, max(price) AS price FROM "
 					+ Params.dbName + ".material_dept WHERE restaurant_id = "
-					+ term.restaurant_id + " AND material_id = " + materialID;
+					+ term.restaurantID + " AND material_id = " + materialID;
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			dbCon.rs.next();
 			float totalStock = dbCon.rs.getFloat("stock");
@@ -93,13 +93,13 @@ public class InventoryReturnAction extends Action {
 
 			sql = "UPDATE " + Params.dbName + ".material_dept"
 					+ " SET price = " + newPrice + " WHERE restaurant_id = "
-					+ term.restaurant_id + " AND material_id =  " + materialID;
+					+ term.restaurantID + " AND material_id =  " + materialID;
 			sqlRowCount = dbCon.stmt.executeUpdate(sql);
 
 			// 更新庫存量
 			sql = " SELECT stock FROM " + Params.dbName
 					+ ".material_dept WHERE restaurant_id = "
-					+ term.restaurant_id + " AND material_id = " + materialID
+					+ term.restaurantID + " AND material_id = " + materialID
 					+ " AND dept_id =  " + deptID;
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			dbCon.rs.next();
@@ -109,7 +109,7 @@ public class InventoryReturnAction extends Action {
 			sql = "UPDATE " + Params.dbName + ".material_dept"
 					+ " SET stock = "
 					+ (float) Math.round((thisStock - amount) * 100) / 100
-					+ " WHERE restaurant_id = " + term.restaurant_id
+					+ " WHERE restaurant_id = " + term.restaurantID
 					+ " AND material_id =  " + materialID + " AND dept_id =  "
 					+ deptID;
 			sqlRowCount = dbCon.stmt.executeUpdate(sql);

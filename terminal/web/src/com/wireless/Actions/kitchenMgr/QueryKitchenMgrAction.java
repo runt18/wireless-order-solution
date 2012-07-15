@@ -81,7 +81,7 @@ public class QueryKitchenMgrAction extends Action {
 			String sql = " SELECT kitchen_id, kitchen_alias, name, discount, discount_2, discount_3, "
 				    + " member_discount_1, member_discount_2, member_discount_3, dept_id "
 					+ " FROM " + Params.dbName + ".kitchen "
-					+ " WHERE restaurant_id = " + term.restaurant_id 
+					+ " WHERE restaurant_id = " + term.restaurantID 
 					+ " AND kitchen_alias BETWEEN 0 AND 49 ";
 
 			dbCon.rs = dbCon.stmt.executeQuery(sql);

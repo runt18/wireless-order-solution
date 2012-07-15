@@ -60,7 +60,7 @@ public class ResetPwdStaffAction extends Action {
 			String newPwd = request.getParameter("newPwd");
 
 			String sql = "UPDATE " + Params.dbName + ".staff " + " SET pwd = '"
-					+ newPwd + "' WHERE restaurant_id=" + term.restaurant_id
+					+ newPwd + "' WHERE restaurant_id=" + term.restaurantID
 					+ " AND staff_id = " + staffID;
 
 			int sqlRowCount = dbCon.stmt.executeUpdate(sql);

@@ -110,7 +110,7 @@ public class StatInventoryOutByDept extends Action {
 					+ Params.dbName
 					+ ".department c "
 					+ " WHERE a.restaurant_id = "
-					+ term.restaurant_id
+					+ term.restaurantID
 					+ " AND a.restaurant_id = b.restaurant_id AND a.material_id = b.material_id "
 					+ " AND a.restaurant_id = c.restaurant_id AND a.dept_id = c.dept_id "
 					+ condition

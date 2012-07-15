@@ -188,7 +188,7 @@ public class QueryHistoryAction extends Action {
 					// 最近日结(显示最近一次日结记录的时间区间内的账单信息)
 					sql = " SELECT on_duty, off_duty FROM " + Params.dbName
 							+ ".daily_settle_history "
-							+ " WHERE restaurant_id=" + term.restaurant_id
+							+ " WHERE restaurant_id=" + term.restaurantID
 							+ " ORDER BY id DESC " + " LIMIT 1 ";
 					dbCon.rs = dbCon.stmt.executeQuery(sql);
 					if (dbCon.rs.next()) {
@@ -234,7 +234,7 @@ public class QueryHistoryAction extends Action {
 						+ " FROM " + Params.dbName + ".order_history A, "
 						+ Params.dbName + ".order_food_history B " + " WHERE "
 						+ " A.id = B.order_id " + " AND A.restaurant_id="
-						+ term.restaurant_id + " " + filterCondition
+						+ term.restaurantID + " " + filterCondition
 						+ " GROUP BY A.id " + havingCond 
 						+ " ORDER BY order_date ASC ";
 
@@ -331,7 +331,7 @@ public class QueryHistoryAction extends Action {
 						+ " FROM " + Params.dbName + ".order_history A, "
 						+ Params.dbName + ".order_food_history B " + " WHERE "
 						+ " A.id = B.order_id " + " AND A.restaurant_id="
-						+ term.restaurant_id + " " + filterCondition
+						+ term.restaurantID + " " + filterCondition
 						+ " GROUP BY A.id " + havingCond
 						+ " ORDER BY order_date ASC ";
 			}

@@ -74,7 +74,7 @@ public class QueryTerminalAction extends Action {
 					Terminal.MODEL_STAFF);
 
 			Terminal[] terminals = QueryTerminal.exec(dbCon,
-					term.restaurant_id, QueryTerminal.QUERY_REAL_TERM, "", "");
+					term.restaurantID, QueryTerminal.QUERY_REAL_TERM, "", "");
 
 			for (int i = 0; i < terminals.length; i++) {
 				HashMap resultMap = new HashMap();

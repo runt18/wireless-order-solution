@@ -74,7 +74,7 @@ public class SetTerminalAction extends Action {
 				sql = "UPDATE " + Params.dbName + ".terminal "
 						+ " SET owner_name = '" + fieldValues[1]
 						+ "', gift_quota = " + fieldValues[2]
-						+ " WHERE restaurant_id=" + term.restaurant_id
+						+ " WHERE restaurant_id=" + term.restaurantID
 						+ " AND terminal_id = " + fieldValues[0];
 				
 				// System.out.println(sql);

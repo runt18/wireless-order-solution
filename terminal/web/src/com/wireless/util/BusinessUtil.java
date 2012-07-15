@@ -23,7 +23,7 @@ public class BusinessUtil {
 					Terminal.MODEL_STAFF);
 
 			sql = " select dept_id from  " + Params.dbName
-					+ ".department where restaurant_id = " + term.restaurant_id;
+					+ ".department where restaurant_id = " + term.restaurantID;
 
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while (dbCon.rs.next()) {
@@ -51,7 +51,7 @@ public class BusinessUtil {
 
 			sql = " select cate_id from  " + Params.dbName
 					+ ".material_cate where restaurant_id = "
-					+ term.restaurant_id;
+					+ term.restaurantID;
 
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while (dbCon.rs.next()) {

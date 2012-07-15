@@ -72,7 +72,7 @@ public class UpdateTableAction extends Action {
 						+ " region_id = " + fieldValues[2] + ", "
 						+ " minimum_cost = " + fieldValues[3] + ", "
 						+ " service_rate = " + fieldValues[4] + " "
-						+ " WHERE restaurant_id=" + term.restaurant_id
+						+ " WHERE restaurant_id=" + term.restaurantID
 						+ " AND table_id = " + fieldValues[0];
 
 				sqlRowCount = dbCon.stmt.executeUpdate(sql);

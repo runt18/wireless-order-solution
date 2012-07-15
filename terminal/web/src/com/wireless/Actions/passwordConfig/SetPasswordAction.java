@@ -61,11 +61,11 @@ public class SetPasswordAction extends Action {
 			if (!adminPwd.equals("<special_message:not_change>")) {
 				if (adminPwd.equals("")) {
 					sql = "UPDATE " + Params.dbName + ".restaurant "
-							+ " SET pwd = '' WHERE id=" + term.restaurant_id;
+							+ " SET pwd = '' WHERE id=" + term.restaurantID;
 				} else {
 					sql = "UPDATE " + Params.dbName + ".restaurant "
 							+ " SET pwd = md5('" + adminPwd + "') WHERE id="
-							+ term.restaurant_id;
+							+ term.restaurantID;
 				}
 				sqlRowCount = dbCon.stmt.executeUpdate(sql);
 			}
@@ -74,11 +74,11 @@ public class SetPasswordAction extends Action {
 			if (!financePwd.equals("<special_message:not_change>")) {
 				if (financePwd.equals("")) {
 					sql = "UPDATE " + Params.dbName + ".restaurant "
-							+ " SET pwd2 = '' WHERE id=" + term.restaurant_id;
+							+ " SET pwd2 = '' WHERE id=" + term.restaurantID;
 				} else {
 					sql = "UPDATE " + Params.dbName + ".restaurant "
 							+ " SET pwd2 = md5('" + financePwd + "') WHERE id="
-							+ term.restaurant_id;
+							+ term.restaurantID;
 				}
 				sqlRowCount = dbCon.stmt.executeUpdate(sql);
 			}
@@ -87,11 +87,11 @@ public class SetPasswordAction extends Action {
 			if (!managerPwd.equals("<special_message:not_change>")) {
 				if (managerPwd.equals("")) {
 					sql = "UPDATE " + Params.dbName + ".restaurant "
-							+ " SET pwd3 = '' WHERE id=" + term.restaurant_id;
+							+ " SET pwd3 = '' WHERE id=" + term.restaurantID;
 				} else {
 					sql = "UPDATE " + Params.dbName + ".restaurant "
 							+ " SET pwd3 = md5('" + managerPwd + "') WHERE id="
-							+ term.restaurant_id;
+							+ term.restaurantID;
 				}
 				sqlRowCount = dbCon.stmt.executeUpdate(sql);
 			}
@@ -100,11 +100,11 @@ public class SetPasswordAction extends Action {
 			if (!cashierPwd.equals("<special_message:not_change>")) {
 				if (cashierPwd.equals("")) {
 					sql = "UPDATE " + Params.dbName + ".restaurant "
-							+ " SET pwd4 = '' WHERE id=" + term.restaurant_id;
+							+ " SET pwd4 = '' WHERE id=" + term.restaurantID;
 				} else {
 					sql = "UPDATE " + Params.dbName + ".restaurant "
 							+ " SET pwd4 = md5('" + cashierPwd + "') WHERE id="
-							+ term.restaurant_id;
+							+ term.restaurantID;
 				}
 				sqlRowCount = dbCon.stmt.executeUpdate(sql);
 			}
@@ -113,11 +113,11 @@ public class SetPasswordAction extends Action {
 			if (!orderCancelPwd.equals("<special_message:not_change>")) {
 				if (orderCancelPwd.equals("")) {
 					sql = "UPDATE " + Params.dbName + ".restaurant "
-							+ " SET pwd5 = '' WHERE id=" + term.restaurant_id;
+							+ " SET pwd5 = '' WHERE id=" + term.restaurantID;
 				} else {
 					sql = "UPDATE " + Params.dbName + ".restaurant "
 							+ " SET pwd5 = md5('" + orderCancelPwd + "') WHERE id="
-							+ term.restaurant_id;
+							+ term.restaurantID;
 				}
 				sqlRowCount = dbCon.stmt.executeUpdate(sql);
 			}

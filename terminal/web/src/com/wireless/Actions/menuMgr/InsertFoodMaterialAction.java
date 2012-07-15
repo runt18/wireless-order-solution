@@ -60,7 +60,7 @@ public class InsertFoodMaterialAction extends Action {
 
 			String sql = "INSERT INTO " + Params.dbName + ".food_material "
 					+ "( restaurant_id, material_id, food_id, consumption ) "
-					+ " VALUES( " + term.restaurant_id + ", " + materialID
+					+ " VALUES( " + term.restaurantID + ", " + materialID
 					+ ", " + foodID + ", " + cost + " ) ";
 			//System.out.println(sql);
 

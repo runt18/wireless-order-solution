@@ -69,7 +69,7 @@ public class UpdateRegionAction extends Action {
 
 				String sql = " UPDATE " + Params.dbName + ".region "
 						+ " SET name = '" + fieldValues[1] + "'"
-						+ " WHERE restaurant_id=" + term.restaurant_id
+						+ " WHERE restaurant_id=" + term.restaurantID
 						+ " AND region_id = " + fieldValues[0];
 
 				sqlRowCount = dbCon.stmt.executeUpdate(sql);

@@ -82,7 +82,7 @@ public class DiscountStatisticsDetailAction extends Action {
 			}
 
 			condition = condition + " AND A.restaurant_id =  "
-					+ term.restaurant_id;
+					+ term.restaurantID;
 
 			SingleOrderFoodReflector foodRef = new SingleOrderFoodReflector();
 			String orderClause = " ORDER BY A.order_id, A.order_date ";

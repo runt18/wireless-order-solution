@@ -101,7 +101,7 @@ public class supplierStatisticsAction extends Action {
 
 			sqlSuppliers = " SELECT DISTINCT supplier_id FROM " + Params.dbName
 					+ ".material_detail " + " WHERE restaurant_id = "
-					+ term.restaurant_id + " AND supplier_id IN ("
+					+ term.restaurantID + " AND supplier_id IN ("
 					+ supplierIDs + ") " + condition;
 
 			dbCon.rs = dbCon.stmt.executeQuery(sqlSuppliers);
@@ -111,7 +111,7 @@ public class supplierStatisticsAction extends Action {
 
 				sqlDtl = " SELECT SUM(amount) as amount, type from "
 						+ Params.dbName + ".material_detail "
-						+ " WHERE restaurant_id = " + term.restaurant_id
+						+ " WHERE restaurant_id = " + term.restaurantID
 						+ " AND supplier_id =  " + supplierID
 						+ " AND type IN ('3', '5') " + condition
 						+ " GROUP BY type ORDER BY type ";

@@ -101,7 +101,7 @@ public class ShiftStatisticsAction extends Action {
 				condition = condition + " AND off_duty <= '" + dateEnd + "' ";
 			}
 			condition = condition + " AND restaurant_id =  "
-					+ term.restaurant_id;
+					+ term.restaurantID;
 
 			String orderClause = " ORDER BY off_duty ";
 
@@ -110,7 +110,7 @@ public class ShiftStatisticsAction extends Action {
 					+ "."
 					+ tableName
 					+ " WHERE restaurant_id = "
-					+ term.restaurant_id
+					+ term.restaurantID
 					+ " "
 					+ condition + orderClause;
 

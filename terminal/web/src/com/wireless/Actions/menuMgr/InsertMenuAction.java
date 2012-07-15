@@ -105,7 +105,7 @@ public class InsertMenuAction extends Action {
 					+ ".food"
 					+ "( food_alias, name, pinyin, unit_price, restaurant_id, kitchen_id, kitchen_alias, status, enabled ) "
 					+ " VALUES(" + dishNumber + ", '" + dishName + "', '"
-					+ dishSpill + "', " + dishPrice + ", " + term.restaurant_id
+					+ dishSpill + "', " + dishPrice + ", " + term.restaurantID
 					+ ", " + kitchenId + "," + kitchenAlias + ", " + status
 					+ ", 1 " + ") ";
 			// System.out.println(sql);

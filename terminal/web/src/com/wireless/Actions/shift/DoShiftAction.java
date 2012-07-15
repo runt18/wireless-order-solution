@@ -52,7 +52,7 @@ public class DoShiftAction extends Action {
 			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF);
 			
 			String sql = "INSERT INTO " + Params.dbName + ".shift (restaurant_id, name, on_duty, off_duty) VALUES(" +
-						 term.restaurant_id + "," +
+						 term.restaurantID + "," +
 						 "'" + term.owner + "'," +
 						 "DATE_FORMAT('" + onDuty + "', '%Y%m%d%H%i%s')" + "," +
 						 "DATE_FORMAT('" + offDuty + "', '%Y%m%d%H%i%s')" + 

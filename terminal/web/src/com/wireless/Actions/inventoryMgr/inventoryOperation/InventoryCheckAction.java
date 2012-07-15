@@ -84,7 +84,7 @@ public class InventoryCheckAction extends Action {
 						+ ".material_detail"
 						+ "( restaurant_id, material_id, price, price_prev, date, amount, amount_prev, type, staff, dept_id ) "
 						+ " VALUES("
-						+ term.restaurant_id
+						+ term.restaurantID
 						+ ", "
 						+ materialID
 						+ ", "
@@ -107,7 +107,7 @@ public class InventoryCheckAction extends Action {
 			// 更新價錢
 			sql = "UPDATE " + Params.dbName + ".material_dept"
 					+ " SET price = " + checkPrice + " WHERE restaurant_id = "
-					+ term.restaurant_id + " AND material_id =  " + materialID;
+					+ term.restaurantID + " AND material_id =  " + materialID;
 			sqlRowCount = dbCon.stmt.executeUpdate(sql);
 
 			// 更新庫存量
@@ -116,7 +116,7 @@ public class InventoryCheckAction extends Action {
 
 				sql = "UPDATE " + Params.dbName + ".material_dept"
 						+ " SET stock = " + thisDeptAmount[1]
-						+ " WHERE restaurant_id = " + term.restaurant_id
+						+ " WHERE restaurant_id = " + term.restaurantID
 						+ " AND material_id =  " + materialID
 						+ " AND dept_id = " + i + " ";
 				sqlRowCount = dbCon.stmt.executeUpdate(sql);

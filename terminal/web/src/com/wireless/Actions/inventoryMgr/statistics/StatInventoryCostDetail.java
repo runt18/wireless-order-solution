@@ -100,7 +100,7 @@ public class StatInventoryCostDetail extends Action {
 			String sql = " SELECT a.material_id, a.date, a.dept_id, "
 					+ " a.price, a.amount, a.price*a.amount as total "
 					+ " FROM " + Params.dbName + ".material_detail a "
-					+ " WHERE a.restaurant_id = " + term.restaurant_id
+					+ " WHERE a.restaurant_id = " + term.restaurantID
 					+ " AND a.type = " + MaterialDetail.TYPE_CONSUME + " "
 					+ condition;
 

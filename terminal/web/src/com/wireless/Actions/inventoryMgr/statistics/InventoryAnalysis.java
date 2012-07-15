@@ -147,7 +147,7 @@ public class InventoryAnalysis extends Action {
 					+ ".material a, "
 					+ Params.dbName
 					+ ".material_cate b where a.restaurant_id = "
-					+ term.restaurant_id
+					+ term.restaurantID
 					+ " and a.cate_id in ("
 					+ cateString
 					+ ") and a.restaurant_id = b.restaurant_id and a.cate_id = b.cate_id ";
@@ -329,7 +329,7 @@ public class InventoryAnalysis extends Action {
 
 				sqlPrice = " select price from " + Params.dbName
 						+ ".material_dept where restaurant_id = "
-						+ term.restaurant_id + " and material_id = "
+						+ term.restaurantID + " and material_id = "
 						+ countList.get(0);
 				dbCon.rs2 = dbCon.conn.createStatement().executeQuery(sqlPrice);
 				float thisPrice = 0;

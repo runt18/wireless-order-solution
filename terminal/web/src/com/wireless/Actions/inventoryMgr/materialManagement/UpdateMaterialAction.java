@@ -72,7 +72,7 @@ public class UpdateMaterialAction extends Action {
 						+ " warning_threshold = " + fieldValues[2] + ", "
 						+ " danger_threshold =  " + fieldValues[3] + ", "
 						+ " cate_id =  " + fieldValues[4] + " "
-						+ " WHERE restaurant_id=" + term.restaurant_id
+						+ " WHERE restaurant_id=" + term.restaurantID
 						+ " AND material_id = " + fieldValues[0];
 
 				sqlRowCount = dbCon.stmt.executeUpdate(sql);

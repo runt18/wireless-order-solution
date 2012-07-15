@@ -100,7 +100,7 @@ public class StatInventoryCostByMaterial extends Action {
 					+ Params.dbName
 					+ ".department d "
 					+ " WHERE a.restaurant_id = "
-					+ term.restaurant_id
+					+ term.restaurantID
 					+ " AND a.restaurant_id = c.restaurant_id AND a.material_id = c.material_id "
 					+ " AND a.restaurant_id = d.restaurant_id AND a.dept_id = d.dept_id "
 					+ " AND a.type = "

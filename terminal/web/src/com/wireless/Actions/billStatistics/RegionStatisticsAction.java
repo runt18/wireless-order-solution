@@ -97,7 +97,7 @@ public class RegionStatisticsAction extends Action {
 			}
 			condition = condition
 					+ " AND B.total_price IS NOT NULL AND A.restaurant_id =  "
-					+ term.restaurant_id;
+					+ term.restaurantID;
 
 			String orderClause = " ORDER BY region_id";
 

@@ -69,7 +69,7 @@ public class UpdateMaterialCateAction extends Action {
 
 				String sql = " UPDATE " + Params.dbName + ".material_cate "
 						+ " SET name = '" + fieldValues[1] + "'"
-						+ " WHERE restaurant_id=" + term.restaurant_id
+						+ " WHERE restaurant_id=" + term.restaurantID
 						+ " AND cate_id = " + fieldValues[0];
 
 				sqlRowCount = dbCon.stmt.executeUpdate(sql);

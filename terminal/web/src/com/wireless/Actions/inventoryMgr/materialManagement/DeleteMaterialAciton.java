@@ -58,14 +58,14 @@ public class DeleteMaterialAciton extends Action {
 			 */
 			// 食材基礎表
 			String sql = "DELETE FROM " + Params.dbName + ".material "
-					+ "WHERE restaurant_id=" + term.restaurant_id
+					+ "WHERE restaurant_id=" + term.restaurantID
 					+ " AND material_id = " + materialID;
 
 			int sqlRowCount = dbCon.stmt.executeUpdate(sql);
 
 			// 食材部門表
 			sql = "DELETE FROM " + Params.dbName + ".material_dept "
-					+ "WHERE restaurant_id=" + term.restaurant_id
+					+ "WHERE restaurant_id=" + term.restaurantID
 					+ " AND material_id = " + materialID;
 
 			sqlRowCount = dbCon.stmt.executeUpdate(sql);

@@ -73,7 +73,7 @@ public class QueryCurrStock extends Action {
 
 			String sql = " SELECT dept_id, dept_name, price, stock " + " FROM "
 					+ Params.dbName + ".material_dept "
-					+ " WHERE restaurant_id = " + term.restaurant_id
+					+ " WHERE restaurant_id = " + term.restaurantID
 					+ " AND material_id = " + materialID;
 
 			dbCon.rs = dbCon.stmt.executeQuery(sql);

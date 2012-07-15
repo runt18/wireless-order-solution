@@ -164,7 +164,7 @@ public class QueryMaterialMgrAction extends Action {
 					+ Params.dbName
 					+ ".material_dept B ON ( A.restaurant_id = B.restaurant_id AND A.material_id = B.material_id ) "
 					+ " WHERE A.restaurant_id = "
-					+ term.restaurant_id
+					+ term.restaurantID
 					+ " "
 					+ filterCondition
 					+ " GROUP BY A.material_id, A.material_alias, A.name, B.price, A.warning_threshold, A.danger_threshold  "

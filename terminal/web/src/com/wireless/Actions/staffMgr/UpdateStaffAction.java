@@ -73,7 +73,7 @@ public class UpdateStaffAction extends Action {
 
 				sql = "UPDATE " + Params.dbName + ".staff " + " SET name = '"
 						+ fieldValues[2] + "' WHERE restaurant_id="
-						+ term.restaurant_id + " AND staff_id = "
+						+ term.restaurantID + " AND staff_id = "
 						+ fieldValues[0];
 
 				sqlRowCount = dbCon.stmt.executeUpdate(sql);
@@ -81,7 +81,7 @@ public class UpdateStaffAction extends Action {
 				sql = "UPDATE " + Params.dbName + ".terminal "
 						+ " SET gift_quota = " + fieldValues[3]
 						+ " , owner_name = '" + fieldValues[2]
-						+ "' WHERE restaurant_id=" + term.restaurant_id
+						+ "' WHERE restaurant_id=" + term.restaurantID
 						+ " AND terminal_id = " + fieldValues[1];
 
 				sqlRowCount = dbCon.stmt.executeUpdate(sql);

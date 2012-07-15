@@ -61,7 +61,7 @@ public class InsertSupplierAction extends Action {
 					+ Params.dbName
 					+ ".supplier"
 					+ "( restaurant_id, supplier_alias, name, tele, addr, contact ) "
-					+ " VALUES(" + term.restaurant_id + ", " + supplierAlias
+					+ " VALUES(" + term.restaurantID + ", " + supplierAlias
 					+ ", '" + supplierName + "', '" + supplierPhone + "', '"
 					+ supplierAddress + "', '" + supplierContact + "') ";
 			//System.out.println(sql);

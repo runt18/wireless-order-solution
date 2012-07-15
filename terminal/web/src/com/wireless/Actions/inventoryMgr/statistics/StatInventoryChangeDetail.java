@@ -108,7 +108,7 @@ public class StatInventoryChangeDetail extends Action {
 					+ Params.dbName
 					+ ".material_dept b "
 					+ " WHERE a.restaurant_id = "
-					+ term.restaurant_id
+					+ term.restaurantID
 					+ " AND a.restaurant_id = b.restaurant_id AND a.material_id = b.material_id AND a.dept_id = b.dept_id "
 					+ " AND a.type = "
 					+ MaterialDetail.TYPE_OUT

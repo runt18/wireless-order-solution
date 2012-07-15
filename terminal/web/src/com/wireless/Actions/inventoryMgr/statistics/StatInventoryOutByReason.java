@@ -108,7 +108,7 @@ public class StatInventoryOutByReason extends Action {
 					+ Params.dbName
 					+ ".material b "
 					+ " WHERE a.restaurant_id = "
-					+ term.restaurant_id
+					+ term.restaurantID
 					+ " AND a.restaurant_id = b.restaurant_id AND a.material_id = b.material_id "
 					+ condition
 					+ " GROUP BY a.type, a.material_id, material_name "

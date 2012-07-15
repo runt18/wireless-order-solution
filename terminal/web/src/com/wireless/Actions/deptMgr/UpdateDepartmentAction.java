@@ -69,14 +69,14 @@ public class UpdateDepartmentAction extends Action {
 
 				String sql = "UPDATE " + Params.dbName + ".department "
 						+ " SET name = '" + fieldValues[1] + "'"
-						+ " WHERE restaurant_id=" + term.restaurant_id
+						+ " WHERE restaurant_id=" + term.restaurantID
 						+ " AND dept_id = " + fieldValues[0];
 
 				sqlRowCount = dbCon.stmt.executeUpdate(sql);
 
 				sql = "UPDATE " + Params.dbName + ".material_dept "
 						+ " SET dept_name = '" + fieldValues[1] + "'"
-						+ " WHERE restaurant_id=" + term.restaurant_id
+						+ " WHERE restaurant_id=" + term.restaurantID
 						+ " AND dept_id = " + fieldValues[0];
 
 				sqlRowCount = dbCon.stmt.executeUpdate(sql);

@@ -111,7 +111,7 @@ public class StatInventoryChangeByMaterial extends Action {
 					+ Params.dbName
 					+ ".department e "
 					+ " WHERE a.restaurant_id = "
-					+ term.restaurant_id
+					+ term.restaurantID
 					+ " AND a.restaurant_id = b.restaurant_id AND a.material_id = b.material_id AND a.dept_id = b.dept_id "
 					+ " AND a.restaurant_id = c.restaurant_id AND a.material_id = c.material_id "
 					+ " AND a.restaurant_id = d.restaurant_id AND a.dept_id = d.dept_id "

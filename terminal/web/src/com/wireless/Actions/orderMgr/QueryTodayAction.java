@@ -181,7 +181,7 @@ public class QueryTodayAction extends Action {
 					 Params.dbName + ".order_food B " +
 					 " WHERE " +
 					 " A.id = B.order_id " +
-					 " AND A.restaurant_id=" + term.restaurant_id + " " +
+					 " AND A.restaurant_id=" + term.restaurantID + " " +
 					 " AND A.total_price IS NOT NULL" +
 					 filterCondition +
 					 " GROUP BY A.id " +

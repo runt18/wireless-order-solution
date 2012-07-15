@@ -90,7 +90,7 @@ public class BusinessStatisticsAction extends Action {
 				sql = " SELECT MIN(on_duty) AS date_begin FROM "	+ 
 					  Params.dbName + ".daily_settle_history " + 
 					  " WHERE "	+ 
-					  " restaurant_id = " + term.restaurant_id;
+					  " restaurant_id = " + term.restaurantID;
 				dbCon.rs = dbCon.stmt.executeQuery(sql);
 				if (dbCon.rs.next()) {
 					dateBegin = new Date(dbCon.rs.getTimestamp("date_begin").getTime());
@@ -109,7 +109,7 @@ public class BusinessStatisticsAction extends Action {
 				sql = " SELECT MAX(off_duty) AS date_end FROM " + 
 					  Params.dbName + ".daily_settle_history" + 
 					  " WHERE "	+ 
-					  "restaurant_id = " + term.restaurant_id;
+					  "restaurant_id = " + term.restaurantID;
 				dbCon.rs = dbCon.stmt.executeQuery(sql);
 				if (dbCon.rs.next()) {
 					dateEnd = new Date(dbCon.rs.getTimestamp("date_end").getTime());

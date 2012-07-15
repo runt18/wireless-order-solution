@@ -82,7 +82,7 @@ public class QueryMaterialCateMgrAction extends Action {
 
 			String sql = " SELECT cate_id, name " + " FROM " + Params.dbName
 					+ ".material_cate " + " WHERE restaurant_id = "
-					+ term.restaurant_id + " ORDER BY cate_id ";
+					+ term.restaurantID + " ORDER BY cate_id ";
 
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 
