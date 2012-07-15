@@ -475,24 +475,18 @@ public class PickFoodActivity extends Activity implements PickFoodListView.OnFoo
 		filterNumEdtTxt.addTextChangedListener(new TextWatcher() {
 
 			@Override
-			public void onTextChanged(CharSequence s, int start, int before,
-					int count) {
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				if (s.toString().length() != 0) {
 					ArrayList<Food> filterFoods = new ArrayList<Food>();
 					for (int i = 0; i < WirelessOrder.foodMenu.foods.length; i++) {
-						if (String.valueOf(
-								WirelessOrder.foodMenu.foods[i].aliasID)
-								.startsWith(s.toString().trim())) {
+						if (String.valueOf(WirelessOrder.foodMenu.foods[i].aliasID).startsWith(s.toString().trim())) {
 							filterFoods.add(WirelessOrder.foodMenu.foods[i]);
 						}
 					}
-					pickLstView.notifyDataChanged(
-							filterFoods.toArray(new Food[filterFoods.size()]),
-							PickFoodListView.TAG_NUM);
+					pickLstView.notifyDataChanged(filterFoods.toArray(new Food[filterFoods.size()]), PickFoodListView.TAG_NUM);
 
 				} else {
-					pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods,
-							PickFoodListView.TAG_NUM);
+					pickLstView.notifyDataChanged(WirelessOrder.foodMenu.foods,	PickFoodListView.TAG_NUM);
 				}
 			}
 
@@ -645,15 +639,12 @@ public class PickFoodActivity extends Activity implements PickFoodListView.OnFoo
 				if (s.toString().length() != 0) {
 					ArrayList<Food> filterFoods = new ArrayList<Food>();
 					for(Food food : _filterKitchenFoods){
-						if(String.valueOf(food.pinyin).toLowerCase().contains(s.toString().toLowerCase())
-								|| food.name.contains(s.toString())) {
+						if(String.valueOf(food.pinyin).toLowerCase().contains(s.toString().trim().toLowerCase()) || food.name.contains(s.toString().trim())) {
 							filterFoods.add(food);
 						}
 					}
 
-					pickLstView.notifyDataChanged(
-							filterFoods.toArray(new Food[filterFoods.size()]),
-							PickFoodListView.TAG_PINYIN);
+					pickLstView.notifyDataChanged(filterFoods.toArray(new Food[filterFoods.size()]), PickFoodListView.TAG_PINYIN);
 
 				} else {
 					pickLstView.notifyDataChanged(_filterKitchenFoods.toArray(new Food[_filterKitchenFoods.size()]), PickFoodListView.TAG_PINYIN);
@@ -661,8 +652,7 @@ public class PickFoodActivity extends Activity implements PickFoodListView.OnFoo
 			}
 
 			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 			}
 
 			@Override
@@ -822,8 +812,8 @@ public class PickFoodActivity extends Activity implements PickFoodListView.OnFoo
 				if (s.toString().length() != 0) {
 					ArrayList<Food> filterFoods = new ArrayList<Food>();
 					for(Food food : WirelessOrder.foodMenu.foods){
-						if(String.valueOf(food.pinyin).toLowerCase().contains(s.toString().toLowerCase()) ||
-						   food.name.contains(s.toString())){
+						if(String.valueOf(food.pinyin).toLowerCase().contains(s.toString().trim().toLowerCase()) ||
+						   food.name.contains(s.toString().trim())){
 							filterFoods.add(food);
 						}
 					}
