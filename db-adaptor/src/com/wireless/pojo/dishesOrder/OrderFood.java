@@ -38,10 +38,10 @@ public class OrderFood {
 	private int seqID;						// 流水号	
 	private long orderDate;					// 日期时间
 	private String waiter;					// 服务员
-	private float acturalPrice;				// 实价 = 菜品单价 + 口味价钱
+	private float acturalPrice;				// 实价 = 菜品单价 * 折扣率 + 口味价钱
 	private float totalPrice;				// 总价 = （菜品单价 * 折扣率 + 口味价格）* 数量
 	
-	public String tasteNormalPref = Params.NO_PREFERENCE;
+	private String tasteNormalPref = Params.NO_PREFERENCE;
 	
 	public String getFoodName() {
 		return foodName;
@@ -129,6 +129,9 @@ public class OrderFood {
 		this.unitPrice = unitPrice;
 	}
 	public float getDiscount() {
+		if(isSpecial == true || isGift == true){
+			discount = 1.00f;  // 特价和赠送菜品不打折
+		}
 		return discount;
 	}
 	public void setDiscount(float discount) {
@@ -220,15 +223,25 @@ public class OrderFood {
 	}
 	
 	public float getActuralPrice() {
-		acturalPrice = unitPrice + tastePrice;
+		acturalPrice = unitPrice * discount + tastePrice;
 		return acturalPrice;
 	}
 	
 	public float getTotalPrice() {
+		if(isSpecial == true || isGift == true){
+			// 特价和赠送菜品不打折
+			totalPrice = unitPrice * count; 
+		}else{
+			totalPrice = (unitPrice * discount + tastePrice ) * count;
+		}
 		return totalPrice;
 	}
-	public void setTotalPrice(float totalPrice) {
-		this.totalPrice = totalPrice;
+	
+	public String getTasteNormalPref() {
+		return tasteNormalPref;
+	}
+	public void setTasteNormalPref(String tasteNormalPref) {
+		this.tasteNormalPref = tasteNormalPref;
 	}
 	
 	
