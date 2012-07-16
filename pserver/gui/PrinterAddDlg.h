@@ -50,5 +50,6 @@ public:
 	afx_msg void OnCbnStyleChg();
 	afx_msg void OnCbnKitchenChg();
 	afx_msg void OnBnRegionAllClicked();
+	afx_msg void OnBnDeptAllClicked();
 	afx_msg void OnBnKitchenAllClicked();
 };

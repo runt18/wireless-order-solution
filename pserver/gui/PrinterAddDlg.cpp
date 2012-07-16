@@ -104,17 +104,17 @@ void CAddPrinterDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK_KITCHEN_48, m_Kitchens[47]);
 	DDX_Control(pDX, IDC_CHECK_KITCHEN_49, m_Kitchens[48]);
 	DDX_Control(pDX, IDC_CHECK_KITCHEN_50, m_Kitchens[49]);
-	DDX_Control(pDX, IDC_RADIO_DEPT_1, m_Depts[0]);
-	DDX_Control(pDX, IDC_RADIO_DEPT_2, m_Depts[1]);
-	DDX_Control(pDX, IDC_RADIO_DEPT_3, m_Depts[2]);
-	DDX_Control(pDX, IDC_RADIO_DEPT_4, m_Depts[3]);
-	DDX_Control(pDX, IDC_RADIO_DEPT_5, m_Depts[4]);
-	DDX_Control(pDX, IDC_RADIO_DEPT_6, m_Depts[5]);
-	DDX_Control(pDX, IDC_RADIO_DEPT_7, m_Depts[6]);
-	DDX_Control(pDX, IDC_RADIO_DEPT_8, m_Depts[7]);
-	DDX_Control(pDX, IDC_RADIO_DEPT_9, m_Depts[8]);
-	DDX_Control(pDX, IDC_RADIO_DEPT_10, m_Depts[9]);
-	DDX_Control(pDX, IDC_RADIO_DEPT_ALL, m_DeptAll);
+	DDX_Control(pDX, IDC_CHECK_DEPT_1, m_Depts[0]);
+	DDX_Control(pDX, IDC_CHECK_DEPT_2, m_Depts[1]);
+	DDX_Control(pDX, IDC_CHECK_DEPT_3, m_Depts[2]);
+	DDX_Control(pDX, IDC_CHECK_DEPT_4, m_Depts[3]);
+	DDX_Control(pDX, IDC_CHECK_DEPT_5, m_Depts[4]);
+	DDX_Control(pDX, IDC_CHECK_DEPT_6, m_Depts[5]);
+	DDX_Control(pDX, IDC_CHECK_DEPT_7, m_Depts[6]);
+	DDX_Control(pDX, IDC_CHECK_DEPT_8, m_Depts[7]);
+	DDX_Control(pDX, IDC_CHECK_DEPT_9, m_Depts[8]);
+	DDX_Control(pDX, IDC_CHECK_DEPT_10, m_Depts[9]);
+	DDX_Control(pDX, IDC_CHECK_DEPT_ALL, m_DeptAll);
 
 }
 
@@ -155,9 +155,11 @@ BOOL CAddPrinterDlg::OnInitDialog(){
 	//set the department to all as default
 	m_DeptAll.ShowWindow(SW_SHOW);
 	m_DeptAll.SetCheck(BST_CHECKED);
+	m_DeptAll.EnableWindow(TRUE);
 	map<int, CString>::iterator it = g_Departments.begin();
 	for(it; it != g_Departments.end(); it++){
 		m_Depts[it->first].ShowWindow(SW_SHOW);
+		m_Depts[it->first].EnableWindow(FALSE);
 		m_Depts[it->first].SetWindowText(it->second);
 		m_Depts[it->first].SetCheck(BST_UNCHECKED);
 	}
@@ -306,17 +308,32 @@ void CAddPrinterDlg::OnOK(){
 			pPrinter->SetAttribute(ConfTags::PRINT_FUNC, _FuncMap[m_Funcs.GetCurSel()].code);
 
 			//set the department
-			pPrinter->SetAttribute(ConfTags::DEPT_ALL, m_DeptAll.GetCheck() == BST_CHECKED ? 1 : 0);
-			pPrinter->SetAttribute(ConfTags::DEPT_1, m_Depts[0].GetCheck() == BST_CHECKED ? 1 : 0);
-			pPrinter->SetAttribute(ConfTags::DEPT_2, m_Depts[1].GetCheck() == BST_CHECKED ? 1 : 0);
-			pPrinter->SetAttribute(ConfTags::DEPT_3, m_Depts[2].GetCheck() == BST_CHECKED ? 1 : 0);
-			pPrinter->SetAttribute(ConfTags::DEPT_4, m_Depts[3].GetCheck() == BST_CHECKED ? 1 : 0);
-			pPrinter->SetAttribute(ConfTags::DEPT_5, m_Depts[4].GetCheck() == BST_CHECKED ? 1 : 0);
-			pPrinter->SetAttribute(ConfTags::DEPT_6, m_Depts[5].GetCheck() == BST_CHECKED ? 1 : 0);
-			pPrinter->SetAttribute(ConfTags::DEPT_7, m_Depts[6].GetCheck() == BST_CHECKED ? 1 : 0);
-			pPrinter->SetAttribute(ConfTags::DEPT_8, m_Depts[7].GetCheck() == BST_CHECKED ? 1 : 0);
-			pPrinter->SetAttribute(ConfTags::DEPT_9, m_Depts[8].GetCheck() == BST_CHECKED ? 1 : 0);
-			pPrinter->SetAttribute(ConfTags::DEPT_10, m_Depts[9].GetCheck() == BST_CHECKED ? 1 : 0);
+			if(m_DeptAll.GetCheck() == BST_CHECKED){
+				pPrinter->SetAttribute(ConfTags::DEPT_ALL, 1);
+				pPrinter->SetAttribute(ConfTags::DEPT_1, 0);
+				pPrinter->SetAttribute(ConfTags::DEPT_2, 0);
+				pPrinter->SetAttribute(ConfTags::DEPT_3, 0);
+				pPrinter->SetAttribute(ConfTags::DEPT_4, 0);
+				pPrinter->SetAttribute(ConfTags::DEPT_5, 0);
+				pPrinter->SetAttribute(ConfTags::DEPT_6, 0);
+				pPrinter->SetAttribute(ConfTags::DEPT_7, 0);
+				pPrinter->SetAttribute(ConfTags::DEPT_8, 0);
+				pPrinter->SetAttribute(ConfTags::DEPT_9, 0);
+				pPrinter->SetAttribute(ConfTags::DEPT_10, 0);
+			}else{
+				pPrinter->SetAttribute(ConfTags::DEPT_ALL, 0);
+				pPrinter->SetAttribute(ConfTags::DEPT_1, m_Depts[0].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::DEPT_2, m_Depts[1].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::DEPT_3, m_Depts[2].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::DEPT_4, m_Depts[3].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::DEPT_5, m_Depts[4].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::DEPT_6, m_Depts[5].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::DEPT_7, m_Depts[6].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::DEPT_8, m_Depts[7].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::DEPT_9, m_Depts[8].GetCheck() == BST_CHECKED ? 1 : 0);
+				pPrinter->SetAttribute(ConfTags::DEPT_10, m_Depts[9].GetCheck() == BST_CHECKED ? 1 : 0);
+			}
+
 
 			//set the kitchen
 			if(m_KitchenAll.GetCheck() == BST_CHECKED){
@@ -492,6 +509,7 @@ BEGIN_MESSAGE_MAP(CAddPrinterDlg, CDialog)
 	ON_CBN_SELCHANGE(IDC_COMBO3, &CAddPrinterDlg::OnCbnStyleChg)
 	ON_CBN_SELCHANGE(IDC_COMBO4, &CAddPrinterDlg::OnCbnKitchenChg)
 	ON_BN_CLICKED(IDC_CHECK_REGION_ALL, &CAddPrinterDlg::OnBnRegionAllClicked)
+	ON_BN_CLICKED(IDC_CHECK_DEPT_ALL, &CAddPrinterDlg::OnBnDeptAllClicked)
 	ON_BN_CLICKED(IDC_CHECK_KITCHEN_ALL, &CAddPrinterDlg::OnBnKitchenAllClicked)
 END_MESSAGE_MAP()
 
@@ -638,6 +656,20 @@ void CAddPrinterDlg::OnBnKitchenAllClicked(){
 		m_KitchenTemp.EnableWindow(TRUE);
 		for(unsigned int i = 0; i < g_Kitchens.size(); i++){
 			m_Kitchens[i].EnableWindow(TRUE);
+		}
+	}
+}
+
+void CAddPrinterDlg::OnBnDeptAllClicked(){
+	//have all the department disabled if department all selected
+	//otherwise make them enabled
+	if(m_DeptAll.GetCheck() == BST_CHECKED){
+		for(unsigned int i = 0; i < DEPT_NUM; i++){
+			m_Depts[i].EnableWindow(FALSE);
+		}
+	}else{
+		for(unsigned int i = 0; i < DEPT_NUM; i++){
+			m_Depts[i].EnableWindow(TRUE);
 		}
 	}
 }

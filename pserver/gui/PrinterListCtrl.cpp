@@ -163,56 +163,84 @@ void CPrinterListCtrl::Update(TiXmlDocument& conf){
 				pPrinter->QueryIntAttribute(ConfTags::DEPT_1, &isOn);
 				if(isOn){
 					it = g_Departments.find(Department::DEPT_1);
+					if(it != g_Departments.end()){
+						dept += dept.IsEmpty() ? it->second : _T(",") + it->second;
+					}
 				}
 
 				pPrinter->QueryIntAttribute(ConfTags::DEPT_2, &isOn);
 				if(isOn){
 					it = g_Departments.find(Department::DEPT_2);
+					if(it != g_Departments.end()){
+						dept += dept.IsEmpty() ? it->second : _T(",") + it->second;
+					}
 				}
 
 				pPrinter->QueryIntAttribute(ConfTags::DEPT_3, &isOn);
 				if(isOn){
 					it = g_Departments.find(Department::DEPT_3);
+					if(it != g_Departments.end()){
+						dept += dept.IsEmpty() ? it->second : _T(",") + it->second;
+					}
 				}
 
 				pPrinter->QueryIntAttribute(ConfTags::DEPT_4, &isOn);
 				if(isOn){
 					it = g_Departments.find(Department::DEPT_4);
+					if(it != g_Departments.end()){
+						dept += dept.IsEmpty() ? it->second : _T(",") + it->second;
+					}
 				}
 
 				pPrinter->QueryIntAttribute(ConfTags::DEPT_5, &isOn);
 				if(isOn){
 					it = g_Departments.find(Department::DEPT_5);
+					if(it != g_Departments.end()){
+						dept += dept.IsEmpty() ? it->second : _T(",") + it->second;
+					}
 				}
 
 				pPrinter->QueryIntAttribute(ConfTags::DEPT_6, &isOn);
 				if(isOn){
 					it = g_Departments.find(Department::DEPT_6);
+					if(it != g_Departments.end()){
+						dept += dept.IsEmpty() ? it->second : _T(",") + it->second;
+					}
 				}
 
 				pPrinter->QueryIntAttribute(ConfTags::DEPT_7, &isOn);
 				if(isOn){
 					it = g_Departments.find(Department::DEPT_7);
+					if(it != g_Departments.end()){
+						dept += dept.IsEmpty() ? it->second : _T(",") + it->second;
+					}
 				}
 
 				pPrinter->QueryIntAttribute(ConfTags::DEPT_8, &isOn);
 				if(isOn){
 					it = g_Departments.find(Department::DEPT_8);
+					if(it != g_Departments.end()){
+						dept += dept.IsEmpty() ? it->second : _T(",") + it->second;
+					}
 				}
 
 				pPrinter->QueryIntAttribute(ConfTags::DEPT_9, &isOn);
 				if(isOn){
 					it = g_Departments.find(Department::DEPT_9);
+					if(it != g_Departments.end()){
+						dept += dept.IsEmpty() ? it->second : _T(",") + it->second;
+					}
 				}
 
 				pPrinter->QueryIntAttribute(ConfTags::DEPT_10, &isOn);
 				if(isOn){
 					it = g_Departments.find(Department::DEPT_10);
+					if(it != g_Departments.end()){
+						dept += dept.IsEmpty() ? it->second : _T(",") + it->second;
+					}
 				}
 
-				if(it != g_Departments.end()){
-					SetItemText(row, COLUMN_KITCHEN, it->second);
-				}
+				SetItemText(row, COLUMN_KITCHEN, dept);
 
 			}
 

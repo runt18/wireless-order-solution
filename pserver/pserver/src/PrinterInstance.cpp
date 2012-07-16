@@ -429,11 +429,16 @@ void PrinterInstance::splitOrdersByDept(const string& print_content, const vecto
 			vector<int>::const_iterator it = depts.begin();
 			for(it; it != depts.end(); it++){		
 				/************************************************************************
-				* perform to print the order content if the department is matched     
+				* If the department all is matched, only print the order to all department.   
+				* If one or more department is matched, print each matched order respectively.
 				************************************************************************/
-				if(*it == dept2Print){
+				if(dept2Print == Department::DEPT_ALL && *it == Department::DEPT_ALL){
+					detail_content.clear();
 					detail_content.push_back(string(print_content.begin() + offset + 3, print_content.begin() + offset + 3 + length));
 					return;
+				}else if(*it == dept2Print){
+					detail_content.push_back(string(print_content.begin() + offset + 3, print_content.begin() + offset + 3 + length));
+					break;
 				}
 			}
 			offset += 3 + length;
