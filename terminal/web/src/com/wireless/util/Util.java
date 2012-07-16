@@ -48,10 +48,10 @@ public class Util {
 	 * 
 	 * @param submitFoods
 	 *            the submitted string looks like below.<br>
-	 *            {[是否临时菜(false),菜品1编号,菜品1数量,口味1编号,厨房1编号,菜品1折扣,2nd口味1编号,3rd口味1编号,是否临时口味,临时口味,临时口味价钱,临时口味编号]，
-	 *             [是否临时菜(false),菜品2编号,菜品2数量,口味2编号,厨房2编号,菜品2折扣,2nd口味1编号,3rd口味1编号,是否临时口味,临时口味,临时口味价钱,临时口味编号]，... 
-	 *             [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价]，
-	 *             [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价]...}
+	 *            {[是否临时菜(false),菜品1编号,菜品1数量,口味1编号,厨房1编号,菜品1折扣,2nd口味1编号,3rd口味1编号,是否临时口味,临时口味,临时口味价钱,临时口味编号,叫起状态]，
+	 *             [是否临时菜(false),菜品2编号,菜品2数量,口味2编号,厨房2编号,菜品2折扣,2nd口味1编号,3rd口味1编号,是否临时口味,临时口味,临时口味价钱,临时口味编号,叫起状态]，... 
+	 *             [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价,叫起状态]，
+	 *             [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价,叫起状态]...}
 	 * @return the class food array
 	 */
 	public static OrderFood[] toFoodArray(String submitFoods)
@@ -102,6 +102,8 @@ public class Util {
 				foods[i].setCount(Float.parseFloat(values[3]));
 				// extract the unit price to this temporary food
 				foods[i].setPrice(Float.parseFloat(values[4]));
+				// extract the hang status to this temporary food
+				foods[i].hangStatus = Short.parseShort(values[5]);
 			} else {
 				// extract the food alias id
 				foods[i].aliasID = Integer.parseInt(values[1]);
@@ -117,7 +119,7 @@ public class Util {
 				foods[i].tastes[1].aliasID = Short.parseShort(values[6]);
 				// extract the 3rd taste alias id
 				foods[i].tastes[2].aliasID = Short.parseShort(values[7]);
-				//check to see whether containing temporary taste
+				// check to see whether containing temporary taste
 				if(Boolean.parseBoolean(values[8])){
 					foods[i].tmpTaste = new Taste();
 					//extract the value to temporary taste
@@ -129,6 +131,8 @@ public class Util {
 				}else{
 					foods[i].tmpTaste = null;
 				}
+				// extract the hang status 
+				foods[i].hangStatus = Short.parseShort(values[12]);
 			}
 		}
 
