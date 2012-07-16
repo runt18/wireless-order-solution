@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat;
 
 import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Taste;
-import com.wireless.util.Params;
+import com.wireless.util.WebParams;
 
 public class OrderFood {
 
@@ -41,7 +41,7 @@ public class OrderFood {
 	private float acturalPrice;				// 实价 = 菜品单价 * 折扣率 + 口味价钱
 	private float totalPrice;				// 总价 = （菜品单价 * 折扣率 + 口味价格）* 数量
 	
-	private String tasteNormalPref = Params.NO_PREFERENCE;
+	private String tasteNormalPref = WebParams.NO_PREFERENCE;
 	
 	public String getFoodName() {
 		return foodName;
@@ -85,7 +85,7 @@ public class OrderFood {
 	}
 	public String getTastePref() {
 		if(tmpTaste != null){
-			tastePref = (tasteNormalPref.equals(Params.NO_PREFERENCE) ? "" : (tasteNormalPref + ",")) + tmpTaste.preference;
+			tastePref = (tasteNormalPref.equals(WebParams.NO_PREFERENCE) ? "" : (tasteNormalPref + ",")) + tmpTaste.preference;
 		}else{
 			tastePref = tasteNormalPref;
 		}
@@ -144,26 +144,26 @@ public class OrderFood {
 	}
 	
 	public boolean isSpecial() {
-		isSpecial = ((status & Params.SPECIAL) != 0);
+		isSpecial = ((status & WebParams.SPECIAL) != 0);
 		return isSpecial;
 	}
 	
 	public boolean isRecommed() {
-		isRecommed = ((status & Params.RECOMMEND) != 0);
+		isRecommed = ((status & WebParams.RECOMMEND) != 0);
 		return isRecommed;
 	}
 	
 	public boolean isSoldout() {
-		isSoldout = ((status & Params.SELL_OUT) != 0);
+		isSoldout = ((status & WebParams.SELL_OUT) != 0);
 		return isSoldout;
 	}
 	public boolean isGift() {
-		isGift = ((status & Params.GIFT) != 0);
+		isGift = ((status & WebParams.GIFT) != 0);
 		return isGift;
 	}
 	
 	public boolean isCurrPrice() {
-		isCurrPrice = ((status & Params.CUR_PRICE) != 0);
+		isCurrPrice = ((status & WebParams.CUR_PRICE) != 0);
 		return isCurrPrice;
 	}
 	
