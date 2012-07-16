@@ -8,9 +8,9 @@ public class WebParams {
 	/**
 	 * 
 	 */
-	public static final int FOOD_NORMAL = 0;		/* 正常 */
-	public static final int FOOD_HANG_UP = 1;		/* 叫起 */
-	public static final int FOOD_IMMEDIATE = 2;		/* 即起 */
+	public static final int FOOD_NORMAL = OrderFood.FOOD_NORMAL;		/* 正常 */
+	public static final int FOOD_HANG_UP = OrderFood.FOOD_HANG_UP;		/* 叫起 */
+	public static final int FOOD_IMMEDIATE = OrderFood.FOOD_IMMEDIATE;	/* 即起 */
 	
 	/**
 	 * The payment type is as below

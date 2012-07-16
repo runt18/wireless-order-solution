@@ -41,6 +41,7 @@ public class OrderFood {
 	private float acturalPrice;				// 实价 = 菜品单价 * 折扣率 + 口味价钱
 	private float totalPrice;				// 总价 = （菜品单价 * 折扣率 + 口味价格）* 数量
 	
+	private short hangStatus = WebParams.FOOD_NORMAL;			// 菜品状态  0:正常,1:叫起,2:即起
 	private String tasteNormalPref = WebParams.NO_PREFERENCE;
 	
 	public String getFoodName() {
@@ -236,7 +237,13 @@ public class OrderFood {
 		}
 		return totalPrice;
 	}
-	
+		
+	public short getHangStatus() {
+		return hangStatus;
+	}
+	public void setHangStatus(short hangStatus) {
+		this.hangStatus = hangStatus;
+	}
 	public String getTasteNormalPref() {
 		return tasteNormalPref;
 	}
