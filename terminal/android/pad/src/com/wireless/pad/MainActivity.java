@@ -215,27 +215,23 @@ public class MainActivity extends Activity {
 //		numberSwitcher.setOutAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_out));
 		
 		// 创建点击餐台状态后弹出区域的View
-		final View tblStatusPopupView = getLayoutInflater().inflate(
-				R.layout.main_pop_window, null);
+		final View tblStatusPopupView = getLayoutInflater().inflate(R.layout.main_pop_window, null);
 		// 创建与这个View关联的pop-up window
-		final PopupWindow popWnd = new PopupWindow(tblStatusPopupView,
-				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, true);
+		final PopupWindow popWnd = new PopupWindow(tblStatusPopupView, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, true);
 		popWnd.setOutsideTouchable(true);
 		popWnd.setBackgroundDrawable(new BitmapDrawable());
 		popWnd.update();
 
 		// 餐台状态弹出View中的“全部”Button
-		((Button) tblStatusPopupView.findViewById(R.id.statusAll))
-				.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						_curTblStatus = ALL_STATUS;
-						((TextView) findViewById(R.id.tablestatus_txt))
-								.setText("(全部)");
-						popWnd.dismiss();
-						_handler.sendEmptyMessage(FILTER_TABLE_BY_COND);
-					}
-				});
+		((Button) tblStatusPopupView.findViewById(R.id.statusAll)).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				_curTblStatus = ALL_STATUS;
+				((TextView) findViewById(R.id.tablestatus_txt)).setText("(全部)");
+				popWnd.dismiss();
+				_handler.sendEmptyMessage(FILTER_TABLE_BY_COND);
+			}
+		});
 
 		// 餐台状态弹出View中的“空闲”Button
 		((Button) tblStatusPopupView.findViewById(R.id.statusNobody))
@@ -351,33 +347,29 @@ public class MainActivity extends Activity {
 				});
 
 		// 餐台号输入框的删除Button，长按时全字删除
-		((Button) findViewById(R.id.clearTableNum))
-				.setOnLongClickListener(new View.OnLongClickListener() {
-					@Override
-					public boolean onLongClick(View v) {
-						((EditText) findViewById(R.id.inputTableId))
-								.setText("");
-						return true;
-					}
-				});
+		((Button) findViewById(R.id.clearTableNum)).setOnLongClickListener(new View.OnLongClickListener() {
+			@Override
+			public boolean onLongClick(View v) {
+				((EditText) findViewById(R.id.inputTableId)).setText("");
+				return true;
+			}
+		});
 
 		// 注销Button
-		((Button) findViewById(R.id.logon_btn))
-				.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						new QueryStaffTask(false).execute();
-					}
-				});
+		((Button) findViewById(R.id.logon_btn)).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				new QueryStaffTask(false).execute();
+			}
+		});
 
 		// 返回Button
-		((Button) findViewById(R.id.back_btn))
-				.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						showDialog(DIALOG_EXIT_APP);
-					}
-				});
+		((Button) findViewById(R.id.back_btn)).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				showDialog(DIALOG_EXIT_APP);
+			}
+		});
 
 		// 加载餐台信息
 		reflashTableArea();
@@ -1042,10 +1034,8 @@ public class MainActivity extends Activity {
 		AskLoginDialog() {
 			super(MainActivity.this, 0);
 			setContentView(R.layout.login_dialog);
-			getWindow().getAttributes().width = (int) (getWindow()
-					.getWindowManager().getDefaultDisplay().getWidth() * 0.55);
-			getWindow().getAttributes().height = (int) (getWindow()
-					.getWindowManager().getDefaultDisplay().getHeight() * 0.35);
+			getWindow().getAttributes().width = (int)(getWindow().getWindowManager().getDefaultDisplay().getWidth() * 0.55);
+			getWindow().getAttributes().height = (int)(getWindow().getWindowManager().getDefaultDisplay().getHeight() * 0.45);
 			setTitle("请输入账号与密码");
 			final EditText pwdEdtTxt = (EditText) findViewById(R.id.pwd);
 			final EditText staffTxtView = (EditText) findViewById(R.id.staffname);
@@ -1059,23 +1049,20 @@ public class MainActivity extends Activity {
 					if (_popupWindow.isShowing()) {
 						_popupWindow.dismiss();
 					} else {
-						_popupWindow.showAsDropDown(
-								findViewById(R.id.staffname), 0, -7);
+						_popupWindow.showAsDropDown(findViewById(R.id.staffname), 0, -7);
 					}
 				}
 			});
 
 			// 获取自定义布局文件的视图
-			View popupWndView = getLayoutInflater().inflate(
-					R.layout.loginpopuwindow, null, false);
+			View popupWndView = getLayoutInflater().inflate(R.layout.loginpopuwindow, null, false);
 			// 创建PopupWindow实例
 			_popupWindow = new PopupWindow(popupWndView, 325, 200, true);
 			_popupWindow.setOutsideTouchable(true);
 			_popupWindow.setFocusable(true);
 			_popupWindow.setBackgroundDrawable(new BitmapDrawable());
 			_popupWindow.update();
-			ListView staffLstView = (ListView) popupWndView
-					.findViewById(R.id.loginpopuwindow);
+			ListView staffLstView = (ListView) popupWndView.findViewById(R.id.loginpopuwindow);
 			_staffAdapter = new StaffsAdapter();
 			staffLstView.setAdapter(_staffAdapter);
 
@@ -1084,8 +1071,7 @@ public class MainActivity extends Activity {
 			 */
 			staffLstView.setOnItemClickListener(new OnItemClickListener() {
 				@Override
-				public void onItemClick(AdapterView<?> parent, View view,
-						int position, long id) {
+				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 					_staff = WirelessOrder.staffs[position];
 					staffTxtView.setText(_staff.name);
 					_popupWindow.dismiss();
@@ -1095,62 +1081,50 @@ public class MainActivity extends Activity {
 			/**
 			 * 登录Button的点击操作
 			 */
-			((Button) findViewById(R.id.login))
-					.setOnClickListener(new View.OnClickListener() {
+			((Button) findViewById(R.id.login)).setOnClickListener(new View.OnClickListener() {
 
-						@Override
-						public void onClick(View v) {
+				@Override
+				public void onClick(View v) {
+					
+					TextView errTxtView = (TextView) findViewById(R.id.error);
 
-							TextView errTxtView = (TextView) findViewById(R.id.error);
+					try {
+						// Convert the password into MD5
+						MessageDigest digester = MessageDigest.getInstance("MD5");
+						digester.update(pwdEdtTxt.getText().toString().getBytes(), 0, pwdEdtTxt.getText().toString().getBytes().length);
 
-							try {
-								// Convert the password into MD5
-								MessageDigest digester = MessageDigest
-										.getInstance("MD5");
-								digester.update(pwdEdtTxt.getText().toString()
-										.getBytes(), 0, pwdEdtTxt.getText()
-										.toString().getBytes().length);
+						if (staffTxtView.getText().toString().equals("")) {
+							errTxtView.setText("账号不能为空");
 
-								if (staffTxtView.getText().toString()
-										.equals("")) {
-									errTxtView.setText("账号不能为空");
-
-								} else if (_staff.pwd
-										.equals(toHexString(digester.digest()))) {
-									// 保存staff pin到文件里面
-									Editor editor = getSharedPreferences(
-											Params.PREFS_NAME,
-											Context.MODE_PRIVATE).edit();// 获取编辑器
-									editor.putLong(Params.STAFF_PIN, _staff.pin);
-									// 提交修改
-									editor.commit();
-									_handler.sendEmptyMessage(REDRAW_RESTAURANT);
-									// set the pin generator according to the
-									// staff login
-									ReqPackage.setGen(new PinGen() {
-										@Override
-										public long getDeviceId() {
-											return _staff.pin;
-										}
-
-										@Override
-										public short getDeviceType() {
-											return Terminal.MODEL_STAFF;
-										}
-
-									});
-									dismiss();
-
-								} else {
-									errTxtView.setText("密码错误");
+						} else if (_staff.pwd.equals(toHexString(digester.digest()))) {
+							// 保存staff pin到文件里面
+							Editor editor = getSharedPreferences(Params.PREFS_NAME,	Context.MODE_PRIVATE).edit();// 获取编辑器
+							editor.putLong(Params.STAFF_PIN, _staff.pin);
+							// 提交修改
+							editor.commit();
+							_handler.sendEmptyMessage(REDRAW_RESTAURANT);
+							// set the pin generator according to the staff login
+							ReqPackage.setGen(new PinGen() {
+								@Override
+								public long getDeviceId() {
+									return _staff.pin;
 								}
+								@Override
+								public short getDeviceType() {
+									return Terminal.MODEL_STAFF;
+								}
+							});
+							dismiss();
 
-							} catch (NoSuchAlgorithmException e) {
-								errTxtView.setText(e.getMessage());
-							}
+						} else {
+							errTxtView.setText("密码错误");
 						}
-					});
-
+						
+					} catch (NoSuchAlgorithmException e) {
+						errTxtView.setText(e.getMessage());
+					}
+				}
+			});
 		}
 
 		@Override
@@ -1218,15 +1192,11 @@ public class MainActivity extends Activity {
 			@Override
 			public View getView(int position, View convertView, ViewGroup parent) {
 				if (convertView == null) {
-					convertView = LayoutInflater.from(MainActivity.this)
-							.inflate(R.layout.orderpopuwindowitem, null);
-					((TextView) convertView
-							.findViewById(R.id.popuwindowfoodname))
-							.setText(WirelessOrder.staffs[position].name);
+					convertView = LayoutInflater.from(MainActivity.this).inflate(R.layout.orderpopuwindowitem, null);
+					((TextView) convertView.findViewById(R.id.popuwindowfoodname)).setText(WirelessOrder.staffs[position].name);
+					
 				} else {
-					((TextView) convertView
-							.findViewById(R.id.popuwindowfoodname))
-							.setText(WirelessOrder.staffs[position].name);
+					((TextView) convertView.findViewById(R.id.popuwindowfoodname)).setText(WirelessOrder.staffs[position].name);
 				}
 				return convertView;
 			}
@@ -1512,8 +1482,7 @@ public class MainActivity extends Activity {
 						return Terminal.MODEL_ANDROID;
 					}
 				});
-				ProtocolPackage resp = ServerConnector.instance().ask(
-						new ReqQueryStaff());
+				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryStaff());
 				if (resp.header.type == Type.ACK) {
 					WirelessOrder.staffs = RespParser.parseQueryStaff(resp);
 				} else {
@@ -1546,18 +1515,20 @@ public class MainActivity extends Activity {
 			 * login dialog
 			 */
 			if (errMsg != null) {
-				new AlertDialog.Builder(MainActivity.this).setTitle("提示")
+				new AlertDialog.Builder(MainActivity.this)
+						.setTitle("提示")
 						.setMessage(errMsg).setPositiveButton("确定", null)
 						.show();
 
 			} else {
 				if (WirelessOrder.staffs == null) {
-					new AlertDialog.Builder(MainActivity.this).setTitle("提示")
-							.setMessage("没有查询到任何的员工信息，请在管理后台先添加员工信息")
-							.setPositiveButton("确定", null).show();
+					new AlertDialog.Builder(MainActivity.this)
+						.setTitle("提示")
+						.setMessage("没有查询到任何的员工信息，请在管理后台先添加员工信息")
+						.setPositiveButton("确定", null).show();
+					
 				} else {
-					Editor editor = getSharedPreferences(Params.PREFS_NAME,
-							Context.MODE_PRIVATE).edit();// 获取编辑器
+					Editor editor = getSharedPreferences(Params.PREFS_NAME,	Context.MODE_PRIVATE).edit();// 获取编辑器
 					editor.putLong(Params.STAFF_PIN, Params.DEF_STAFF_PIN);
 					editor.commit();
 					showDialog(DIALOG_STAFF_LOGIN);

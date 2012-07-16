@@ -2,9 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical" 
     android:layout_gravity="center"
-    >
+    android:orientation="vertical" >
 
     <LinearLayout
         android:layout_width="fill_parent"
@@ -30,6 +29,10 @@
             android:hint="点击选择登陆帐号" />
     </LinearLayout>
 
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content" />
+
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -49,8 +52,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.6"
-            android:inputType="textPassword"
-            android:gravity="center" />
+            android:gravity="center"
+            android:inputType="textPassword" />
     </LinearLayout>
 
     <TextView
