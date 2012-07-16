@@ -552,7 +552,8 @@ var orderedForm = new Ext.form.FormPanel({
 												+ orderedData.root[i].tmpTaste + ',' // 是否临时口味
 												+ orderedData.root[i].tmpTastePref + ',' // 临时口味
 												+ orderedData.root[i].tmpTastePrice + ','  // 临时口味价钱
-												+ orderedData.root[i].tmpTasteAlias  // 临时口味编号
+												+ orderedData.root[i].tmpTasteAlias + ',' // 临时口味编号
+												+ orderedData.root[i].hangStatus  // 菜品状态
 												+ ']';
 						} else {
 							var foodname = orderedData.root[i].foodName;
@@ -562,7 +563,8 @@ var orderedForm = new Ext.form.FormPanel({
 												+ orderedData.root[i].foodID + ',' // 临时菜1编号
 												+ foodname + ',' // 临时菜1名称
 												+ orderedData.root[i].count + ',' // 临时菜1数量
-												+ orderedData.root[i].unitPrice + '' // 临时菜1单价(原料單價)
+												+ orderedData.root[i].unitPrice + ',' // 临时菜1单价(原料單價)
+												+ orderedData.root[i].hangStatus  // 菜品状态
 												+ ']';
 						}									
 					}
@@ -659,7 +661,8 @@ var orderedForm = new Ext.form.FormPanel({
 												+ orderedData.root[i].tmpTaste + ',' // 是否临时口味
 												+ orderedData.root[i].tmpTastePref + ',' // 临时口味
 												+ orderedData.root[i].tmpTastePrice + ','  // 临时口味价钱
-												+ orderedData.root[i].tmpTasteAlias  // 临时口味编号
+												+ orderedData.root[i].tmpTasteAlias +',' // 临时口味编号
+												+ orderedData.root[i].hangStatus  // 菜品状态
 												+ ']';
 						} else {
 							var foodname = orderedData.root[i].foodName;
@@ -669,7 +672,8 @@ var orderedForm = new Ext.form.FormPanel({
 												+ orderedData.root[i].foodID + ',' // 临时菜1编号
 												+ foodname + ',' // 临时菜1名称
 												+ orderedData.root[i].count + ',' // 临时菜1数量
-												+ orderedData.root[i].unitPrice + '' // 临时菜1单价(原料單價)
+												+ orderedData.root[i].unitPrice + ',' // 临时菜1单价(原料單價)
+												+ orderedData.root[i].hangStatus  // 菜品状态
 												+ ']';
 						}									
 					}
@@ -1724,6 +1728,8 @@ var dishesDisplayGrid = new Ext.grid.GridPanel({
 						tmpTaste : false,						
 						tmpTastePref : '',
 						tmpTastePrice : 0,
+						tmpTasteAlias : 0,
+						hangStatus : 0
 					});
 				}
 				
@@ -2137,7 +2143,9 @@ Ext.onReady(function() {
 							status : 2,
 							currPrice : false,
 							temporary : true,
-							tmpFoodName : name
+							tmpFoodName : name,
+							tmpTasteAlias : 0,
+							hangStatus : 0
 						});					
 						
 						orderedStore.loadData(orderedData);
