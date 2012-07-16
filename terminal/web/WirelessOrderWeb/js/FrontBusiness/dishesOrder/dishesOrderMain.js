@@ -552,7 +552,8 @@ var orderedForm = new Ext.form.FormPanel({
 												+ orderedData.root[i].tmpTaste + ',' // 是否临时口味
 												+ orderedData.root[i].tmpTastePref + ',' // 临时口味
 												+ orderedData.root[i].tmpTastePrice + ','  // 临时口味价钱
-												+ orderedData.root[i].tmpTasteAlias  // 临时口味编号
+												+ orderedData.root[i].tmpTasteAlias + ',' // 临时口味编号
+												+ orderedData.root[i].hangStatus  // 菜品状态
 												+ ']';
 						} else {
 							var foodname = orderedData.root[i].foodName;
@@ -562,7 +563,8 @@ var orderedForm = new Ext.form.FormPanel({
 												+ orderedData.root[i].foodID + ',' // 临时菜1编号
 												+ foodname + ',' // 临时菜1名称
 												+ orderedData.root[i].count + ',' // 临时菜1数量
-												+ orderedData.root[i].unitPrice + '' // 临时菜1单价(原料單價)
+												+ orderedData.root[i].unitPrice + ',' // 临时菜1单价(原料單價)
+												+ orderedData.root[i].hangStatus  // 菜品状态
 												+ ']';
 						}									
 					}
@@ -659,7 +661,8 @@ var orderedForm = new Ext.form.FormPanel({
 												+ orderedData.root[i].tmpTaste + ',' // 是否临时口味
 												+ orderedData.root[i].tmpTastePref + ',' // 临时口味
 												+ orderedData.root[i].tmpTastePrice + ','  // 临时口味价钱
-												+ orderedData.root[i].tmpTasteAlias  // 临时口味编号
+												+ orderedData.root[i].tmpTasteAlias +',' // 临时口味编号
+												+ orderedData.root[i].hangStatus  // 菜品状态
 												+ ']';
 						} else {
 							var foodname = orderedData.root[i].foodName;
@@ -669,7 +672,8 @@ var orderedForm = new Ext.form.FormPanel({
 												+ orderedData.root[i].foodID + ',' // 临时菜1编号
 												+ foodname + ',' // 临时菜1名称
 												+ orderedData.root[i].count + ',' // 临时菜1数量
-												+ orderedData.root[i].unitPrice + '' // 临时菜1单价(原料單價)
+												+ orderedData.root[i].unitPrice + ',' // 临时菜1单价(原料單價)
+												+ orderedData.root[i].hangStatus  // 菜品状态
 												+ ']';
 						}									
 					}
@@ -1698,7 +1702,7 @@ var dishesDisplayGrid = new Ext.grid.GridPanel({
 						break;
 					}
 				}
-				if (isAlreadyOrderd == false) {					
+				if (isAlreadyOrderd == false) {
 					orderedData.root.push({
 						aliasID : dishNbr,
 						foodName : dishCurrName,
@@ -1706,7 +1710,7 @@ var dishesDisplayGrid = new Ext.grid.GridPanel({
 						count : 1,
 						unitPrice : dishCurrPrice.substring(1),
 						acturalPrice : dishCurrPrice.substring(1),
-						orderDateFormat : (new Date().format('Y-m-d H:m:s')),
+						orderDateFormat : new Date().format('Y-m-d  H:i:s'),
 						waiter : Ext.getDom('optName').innerHTML,
 						foodID : dishNbr,
 						kitchenId : kitchenNbr,
@@ -1724,6 +1728,8 @@ var dishesDisplayGrid = new Ext.grid.GridPanel({
 						tmpTaste : false,						
 						tmpTastePref : '',
 						tmpTastePrice : 0,
+						tmpTasteAlias : 0,
+						hangStatus : 0
 					});
 				}
 				
@@ -1804,7 +1810,9 @@ var dishesChooseBySpellForm = new Ext.form.FormPanel({
 				anchor : "90%",
 				listeners : {
 					focus : function(thiz) {
-						softKeyBoardDO.hide();
+						if(softKeyBoardDO.renderer && softKeyBoardDO.show){
+							softKeyBoardDO.hide();
+						}						
 					},
 					render : function(thiz) {
 						dishSpellOnLoad();
@@ -2135,7 +2143,9 @@ Ext.onReady(function() {
 							status : 2,
 							currPrice : false,
 							temporary : true,
-							tmpFoodName : name
+							tmpFoodName : name,
+							tmpTasteAlias : 0,
+							hangStatus : 0
 						});					
 						
 						orderedStore.loadData(orderedData);
