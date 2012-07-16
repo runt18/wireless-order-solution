@@ -1698,7 +1698,7 @@ var dishesDisplayGrid = new Ext.grid.GridPanel({
 						break;
 					}
 				}
-				if (isAlreadyOrderd == false) {					
+				if (isAlreadyOrderd == false) {
 					orderedData.root.push({
 						aliasID : dishNbr,
 						foodName : dishCurrName,
@@ -1706,7 +1706,7 @@ var dishesDisplayGrid = new Ext.grid.GridPanel({
 						count : 1,
 						unitPrice : dishCurrPrice.substring(1),
 						acturalPrice : dishCurrPrice.substring(1),
-						orderDateFormat : (new Date().format('Y-m-d H:m:s')),
+						orderDateFormat : new Date().format('Y-m-d  H:i:s'),
 						waiter : Ext.getDom('optName').innerHTML,
 						foodID : dishNbr,
 						kitchenId : kitchenNbr,
@@ -1804,7 +1804,9 @@ var dishesChooseBySpellForm = new Ext.form.FormPanel({
 				anchor : "90%",
 				listeners : {
 					focus : function(thiz) {
-						softKeyBoardDO.hide();
+						if(softKeyBoardDO.renderer && softKeyBoardDO.show){
+							softKeyBoardDO.hide();
+						}						
 					},
 					render : function(thiz) {
 						dishSpellOnLoad();

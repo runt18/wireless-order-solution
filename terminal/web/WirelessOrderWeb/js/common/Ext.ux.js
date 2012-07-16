@@ -14,9 +14,16 @@
 Ext.ux.txtFormat = {
 	barMsg : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{0}:&nbsp;<span id="{1}" style="color:green; font-size:15px; font-weight:bold;">{2}</span>',
 	barSum : '<span style="font-weight:bold; font-size:13px;">总计</span>',
+	typeName : '类别:&nbsp;<span id="{0}" style="color:green; font-weight:bold; font-size:13px;">{1}</span>',
 	linkClassOne : '<a id="{0}" href="{1}" onClick="{2}" style="color:green; font-size:15px; font-weight:bold;">{3}</a>',
 	gridDou : function(_v){
 		return _v != '' ? (parseFloat(_v).toFixed(2) + '&nbsp;&nbsp;') : _v;
+	},
+	getDate : function(){
+		var nd = new Date(), r = '';
+		r = String.format('{0}-{1}-{2} {3}:{4}:{5}', nd.getFullYear(), nd.getMonth(), nd.getDaysInMonth(),
+				nd.getHours(), nd.getMinutes(), nd.getSeconds());
+		return r;
 	}
 };
 
