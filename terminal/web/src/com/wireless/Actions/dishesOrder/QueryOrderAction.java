@@ -148,6 +148,7 @@ public class QueryOrderAction extends Action {
 					item.setOrderDate(order.foods[i].orderDate); 
 					item.setWaiter(order.foods[i].waiter);
 					item.setTmpTaste(order.foods[i].tmpTaste);
+					item.setHangStatus(order.foods[i].hangStatus);
 					root.add(item);
 					item = null;
 				}
