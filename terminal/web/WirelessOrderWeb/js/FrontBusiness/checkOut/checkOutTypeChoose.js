@@ -86,6 +86,7 @@ var checkOurListRefresh = function() {
 	if(typeof(checkOutData.root) == 'undefined'){
 		return;
 	}
+	
 	for ( var i = 0; i < checkOutData.root.length; i++) {
 		var tpItem = checkOutData.root[i];
 		var KitchenNum = tpItem.kitchenId;
@@ -96,19 +97,20 @@ var checkOurListRefresh = function() {
 			}
 		}
 		
-		if(tpItem.special == true || tpItem.gift == true){
-			// 特价和赠送菜品不打折
-			tpItem.totalPrice = parseFloat(tpItem.unitPrice * discountRate);
-		}else{
-			tpItem.totalPrice = parseFloat((tpItem.unitPrice * tpItem.discount + tpItem.tastePrice) * tpItem.count);
-		}
-		
 		// 特送臨 -- 折扣率 --1
 		if (tpItem.special == true || tpItem.gift == true || tpItem.temporary == true) {
 			tpItem.discount = parseFloat("1").toFixed(2);
 		} else {
 			tpItem.discount = parseFloat(discountRate).toFixed(2);
 		}
+		
+		if(tpItem.special == true || tpItem.gift == true){
+			// 特价和赠送菜品不打折
+			tpItem.totalPrice = parseFloat(tpItem.unitPrice * tpItem.discount);
+		}else{
+			tpItem.totalPrice = parseFloat((tpItem.unitPrice * tpItem.discount + tpItem.tastePrice) * tpItem.count);
+		}
+				
 		checkOutDataDisplay.root.push(tpItem);
 	}
 
