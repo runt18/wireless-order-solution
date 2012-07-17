@@ -126,31 +126,29 @@ var checkOutColumnModel = new Ext.grid.ColumnModel([
 			sortable : true,
 			dataIndex : "count",
 			width : 80,
-			align : 'right'
+			align : 'right',
+			renderer : Ext.ux.txtFormat.gridDou
 		}, {
 			header : "单价",
 			sortable : true,
 			dataIndex : "unitPrice",
 			width : 80,
 			align : 'right',
-			renderer : function(_v){
-				return parseFloat(_v).toFixed(2);
-			}
+			renderer : Ext.ux.txtFormat.gridDou
 		}, {
 			header : "打折率",
 			sortable : true,
 			dataIndex : "discount",
 			width : 80,
-			align : 'right'
+			align : 'right',
+			renderer : Ext.ux.txtFormat.gridDou
 		}, {
 			header : "总价",
 			sortable : true,
 			dataIndex : "totalPrice",
 			width : 80,
 			align : 'right',
-			renderer : function(_v){
-				return parseFloat(_v).toFixed(2)+'&nbsp;&nbsp;';
-			}
+			renderer : Ext.ux.txtFormat.gridDou
 		}, {
 			header : "时间",
 			sortable : true,

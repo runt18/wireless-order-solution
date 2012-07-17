@@ -202,3 +202,38 @@ Ext.ux.daysBetween = function(DateOne,DateTwo){
     var cha=((Date.parse(OneMonth + '/' + OneDay + '/' + OneYear) - Date.parse(TwoMonth + '/' + TwoDay + '/' + TwoYear)) / 86400000);   
     return Math.abs(cha);
 };
+
+/**
+ * 
+ */
+Ext.ux.checkDuft = function(_s, _bid, _eid, _num){
+	var beginDate = Ext.getCmp(_bid);
+	var endDate = Ext.getCmp(_eid);
+	var bdv = null, edv = null;
+	var day = typeof(_num) != 'undefined' ? _num : 40;
+	
+	if(typeof(beginDate) == 'undefined' || typeof(endDate) == 'undefined'){
+		return false;
+	}
+	
+	bdv = beginDate.getValue();
+	edv = endDate.getValue();
+	
+	if(bdv == '' && edv == ''){
+		return false;
+	}else{		
+		if(_s){
+			if(edv == '' || bdv > edv ){
+				endDate.setRawValue(beginDate.getRawValue());
+			}else if((bdv.add(Date.DAY, day) < edv )){
+				endDate.setRawValue(beginDate.getValue().add(Date.DAY, day).format('Y-m-d'));
+			}
+		}else if(!_s){
+			if(bdv == '' || edv < bdv){
+				beginDate.setRawValue(endDate.getRawValue());
+			}else if((edv.add(Date.DAY, (day * -1)) > bdv )){
+				beginDate.setRawValue(endDate.getValue().add(Date.DAY, (day * -1)).format('Y-m-d'));
+			}
+		}
+	}
+};
