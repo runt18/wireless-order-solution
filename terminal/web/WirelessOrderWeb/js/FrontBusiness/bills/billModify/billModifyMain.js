@@ -367,7 +367,8 @@ var orderedForm = new Ext.form.FormPanel({
 												+ orderedData.root[i].tmpTaste + ',' // 是否临时口味
 												+ orderedData.root[i].tmpTastePref + ',' // 临时口味
 												+ orderedData.root[i].tmpTastePrice + ','  // 临时口味价钱
-												+ orderedData.root[i].tmpTasteAlias  // 临时口味编号
+												+ orderedData.root[i].tmpTasteAlias + ','  // 临时口味编号
+												+ orderedData.root[i].hangStatus + '' // 菜品叫起状态
 												+ ']';
 						} else {
 							var foodname = orderedData.root[i].foodName;
@@ -377,7 +378,8 @@ var orderedForm = new Ext.form.FormPanel({
 												+ orderedData.root[i].foodID + ',' // 临时菜1编号
 												+ foodname + ',' // 临时菜1名称
 												+ orderedData.root[i].count + ',' // 临时菜1数量
-												+ orderedData.root[i].unitPrice + '' // 临时菜1单价(原材料單價)
+												+ orderedData.root[i].unitPrice + ',' // 临时菜1单价(原材料單價)
+												+ orderedData.root[i].hangStatus + '' // 菜品叫起状态
 												+ ']';
 						}
 					}
@@ -1335,7 +1337,8 @@ var dishesDisplayGrid = new Ext.grid.GridPanel({
 						tmpTastePrice : 0,
 						tmpTasteAlias : 255,
 						discount : 1,
-						aliasID : dishNbr
+						aliasID : dishNbr,
+						hangStatus : 0
 					});
 //					orderedData.push([ dishCurrName,// 菜名
 //					"无口味",// 口味
