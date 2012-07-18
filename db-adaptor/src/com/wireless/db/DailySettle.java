@@ -17,13 +17,13 @@ public class DailySettle {
 	 * 3 - the maximum order id 
 	 */
 	public static class Result{
-		public int totalOrder;				//�����ѽ��ʵ��˵���
-		public int totalOrderDetail;		//�����ѽ��ʵ��˵���ϸ��
-		public int totalShift;				//���ս���ļ�¼��
-		public int maxOrderID;				//order��order_history������id
-		public int maxOrderFoodID;			//order_food��order_food_history������id
-		public int maxShiftID;				//shift��shift_history������id
-		//public int[] restOrderID;			//�ս����ǰ��û�н��н���������˵���
+		public int totalOrder;				//当日已结帐的账单数
+		public int totalOrderDetail;		//当日已结帐的账单明细数
+		public int totalShift;				//当日交班的记录数
+		public int maxOrderID;				//order和order_history表的最大id
+		public int maxOrderFoodID;			//order_food和order_food_history表的最大id
+		public int maxShiftID;				//shift和shift_history表的最大id
+		//public int[] restOrderID;			//日结操作前还没有进行交班操作的账单号
 	}
 
 	/**
