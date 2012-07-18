@@ -1,5 +1,4 @@
-﻿
-dishCountInputWin = new Ext.Window({
+﻿dishCountInputWin = new Ext.Window({
 	layout : "fit",
 	width : 200,
 	height : 100,

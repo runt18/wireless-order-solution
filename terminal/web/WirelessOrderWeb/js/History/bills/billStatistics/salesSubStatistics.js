@@ -113,6 +113,7 @@ salesSub = function(){
 		'->',
 		{
 			text : '搜索',
+			iconCls : 'btn_search',
 			id : 'salesSubBtnSearch',
 			width : 150,
 			handler : function(){
@@ -149,7 +150,7 @@ salesSub = function(){
 	
 	var salesSubGrid = createGridPanel(id,title,height,width,url,cmData,readerData,baseParams,pageSize,groupName,salesSubGrid_tbar);
 	salesSubGrid.region = 'center';
-	salesSubGrid.getStore().on('load', function(store, records, options ){
+	salesSubGrid.getStore().on('load', function(store, records, options){
 		if(store.getCount() > 0){
 			var sumRow = salesSubGrid.getView().getRow(store.getCount()-1);	
 			sumRow.style.backgroundColor = '#EEEEEE';			
@@ -319,7 +320,7 @@ salesSubSearchCheckDate = function(_s, _bid, _eid, _num){
 	
 	bdv = beginDate.getValue();
 	edv = endDate.getValue();
-//	alert('222333444  '+Ext.ux.daysBetween(edv.format('Y-m-d'), bdv.format('Y-m-d')));
+	
 	if(bdv == '' && edv == ''){
 		return false;
 	}else{		

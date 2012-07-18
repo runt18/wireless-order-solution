@@ -387,79 +387,59 @@ billDetailGrid.getStore().on('beforeload', function() {
 });
 
 // 为store配置load监听器(即load完后动作)
-billDetailGrid
-		.getStore()
-		.on(
-				'load',
-				function() {
-					var msg = this.getAt(0).get("message");
-					if (msg != "normal") {
-						Ext.MessageBox.show({
-							msg : msg,
-							width : 110,
-							buttons : Ext.MessageBox.OK
-						});
-						this.removeAll();
-					} else {
-						if (billDetailGrid.getStore().getTotalCount() != 0) {
+billDetailGrid.getStore().on('load', function() {
+	var msg = this.getAt(0).get("message");
+	if (msg != "normal") {
+		Ext.MessageBox.show({
+			msg : msg,
+			width : 110,
+			buttons : Ext.MessageBox.OK
+		});
+		this.removeAll();
+	} else {
+		if (billDetailGrid.getStore().getTotalCount() != 0) {
+			billDetailGrid.getStore().each(function(record) {
+				// 反結帳顯示
+				record.set("isPaid", norCounPayCode2Descr(record.get("isPaid")));
+				
+				// 提交，去掉修改標記
+				record.commit();
+			});
 
-							billDetailGrid.getStore().each(
-									function(record) {
-										// 反結帳顯示
-										record.set("isPaid",
-												norCounPayCode2Descr(record
-														.get("isPaid")));
-
-										// 提交，去掉修改標記
-										record.commit();
-									});
-
-							// 底色处理
-							var conditionRadio = billsQueryCondPanel.getForm()
-									.findField("conditionRadio")
-									.getGroupValue();
-							if (conditionRadio == "isPaid") {
-								for ( var i = 0; i < billDetailGrid.getStore()
-										.getCount(); i++) {
-									var record = billDetailGrid.getStore()
-											.getAt(i);
-									if (record.get("isPaid") == norCounPayCode2Descr(COUNTER_PAY)) {
-										billDetailGrid.getView().getRow(i).style.backgroundColor = "#FFFF93";
-									}
-								}
-							} else if (conditionRadio == "discount") {
-								for ( var i = 0; i < billDetailGrid.getStore()
-										.getCount(); i++) {
-									var record = billDetailGrid.getStore()
-											.getAt(i);
-									if (record.get("isDiscount") == true) {
-										billDetailGrid.getView().getRow(i).style.backgroundColor = "#FFFF93";
-									}
-								}
-
-							} else if (conditionRadio == "gift") {
-								for ( var i = 0; i < billDetailGrid.getStore()
-										.getCount(); i++) {
-									var record = billDetailGrid.getStore()
-											.getAt(i);
-									if (record.get("isGift") == true) {
-										billDetailGrid.getView().getRow(i).style.backgroundColor = "#FFFF93";
-									}
-								}
-
-							} else if (conditionRadio == "return") {
-								for ( var i = 0; i < billDetailGrid.getStore()
-										.getCount(); i++) {
-									var record = billDetailGrid.getStore()
-											.getAt(i);
-									if (record.get("isReturn") == true) {
-										billDetailGrid.getView().getRow(i).style.backgroundColor = "#FFFF93";
-									}
-								}
-							}
-						}
+			// 底色处理
+			var conditionRadio = billsQueryCondPanel.getForm().findField("conditionRadio").getGroupValue();
+			if (conditionRadio == "isPaid") {
+				for ( var i = 0; i < billDetailGrid.getStore().getCount(); i++) {
+					var record = billDetailGrid.getStore().getAt(i);
+					if (record.get("isPaid") == norCounPayCode2Descr(COUNTER_PAY)) {
+						billDetailGrid.getView().getRow(i).style.backgroundColor = "#FFFF93";
 					}
-				});
+				}
+			} else if (conditionRadio == "discount") {
+				for ( var i = 0; i < billDetailGrid.getStore().getCount(); i++) {
+					var record = billDetailGrid.getStore().getAt(i);
+					if (record.get("isDiscount") == true) {
+						billDetailGrid.getView().getRow(i).style.backgroundColor = "#FFFF93";
+					}
+				}
+			} else if (conditionRadio == "gift") {
+				for ( var i = 0; i < billDetailGrid.getStore().getCount(); i++) {
+					var record = billDetailGrid.getStore().getAt(i);
+					if (record.get("isGift") == true) {
+						billDetailGrid.getView().getRow(i).style.backgroundColor = "#FFFF93";
+					}
+				}
+			} else if (conditionRadio == "return") {
+				for ( var i = 0; i < billDetailGrid.getStore().getCount(); i++) {
+					var record = billDetailGrid.getStore().getAt(i);
+					if (record.get("isReturn") == true) {
+						billDetailGrid.getView().getRow(i).style.backgroundColor = "#FFFF93";
+					}
+				}
+			}
+		}
+	}
+});
 
 // 彈出框
 billDetailWin = new Ext.Window({
@@ -624,9 +604,19 @@ var btnSalesSub = new Ext.ux.ImageButton({
 	imgPath : '../../images/HistorySalesSub.png',
 	imgWidth : 50,
 	imgHeight : 50,
-	tooltip : "销售统计",
+	tooltip : '销售统计',
 	handler : function(btn) {
 		salesSub();
+	}
+});
+
+var btnBackFood = new Ext.ux.ImageButton({
+	imgPath : '../../images/backFoodStatis.png',
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : '退菜汇总',
+	handler : function(btn) {
+		backFood();
 	}
 });
 
@@ -1068,69 +1058,6 @@ advSrchWin = new Ext.Window({
 							"limit" : billRecordCount
 						}
 					});
-					
-//					// bill adv srch
-//					// 1, get parameters
-//					var dateFormated = new Date();
-//					var dateBegin = advSrchForm.findById("advSrchStartDate")
-//							.getValue();
-//					var dateEnd = advSrchForm.findById("advSrchEndDate")
-//							.getValue();
-//					if (dateBegin != "") {
-//						dateFormated = dateBegin;
-//						dateBegin = dateFormated.format('Y-m-d');
-//					}
-//					if (dateEnd != "") {
-//						dateFormated = dateEnd;
-//						dateEnd = dateFormated.format('Y-m-d');
-//					}
-//
-//					var amountBegin = advSrchForm.findById("advSrchStartAmt")
-//							.getValue();
-//					var amountEnd = advSrchForm.findById("advSrchEndAmt")
-//							.getValue();
-//					var seqNumBegin = advSrchForm
-//							.findById("advSrchStartSeqNum").getValue();
-//					var seqNumEnd = advSrchForm.findById("advSrchEndSeqNum")
-//							.getValue();
-//					var tableNumber = advSrchForm.findById("advSrchTableNbr")
-//							.getValue();
-//
-//					var payManner = payTypeCombAdvSrch.getValue();
-//					var in_payManner;
-//					if (payManner == "全部") {
-//						in_payManner = 6;
-//					} else {
-//						in_payManner = payManner;
-//					}
-//					;
-//
-//					var tableType = tableTypeCombAdvSrch.getValue();
-//					var in_tableType;
-//					if (tableType == "全部") {
-//						in_tableType = 6;
-//					} else {
-//						in_tableType = tableType;
-//					}
-//
-//					billsStore.reload({
-//						params : {
-//							"start" : 0,
-//							"limit" : billRecordCount,
-//							"pin" : pin,
-//							"dateBegin" : dateBegin,
-//							"dateEnd" : dateEnd,
-//							"amountBegin" : amountBegin,
-//							"amountEnd" : amountEnd,
-//							"seqNumBegin" : seqNumBegin,
-//							"seqNumEnd" : seqNumEnd,
-//							"tableNumber" : tableNumber,
-//							"payManner" : in_payManner,
-//							"tableType" : in_tableType,
-//							"isPaging" : true,
-//							"queryType" : "Advance"
-//						}
-//					});
 
 				}
 			}, {
@@ -1641,6 +1568,8 @@ Ext.onReady(function() {
 					businessStatBut, 
 					{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
 					btnSalesSub,
+					{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
+					btnBackFood,
 					"->", pushBackBut,
 					{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
 					logOutBut 
