@@ -106,7 +106,7 @@ var checkOurListRefresh = function() {
 		
 		if(tpItem.special == true || tpItem.gift == true){
 			// 特价和赠送菜品不打折
-			tpItem.totalPrice = parseFloat(tpItem.unitPrice * tpItem.discount);
+			tpItem.totalPrice = parseFloat(tpItem.unitPrice * tpItem.count);
 		}else{
 			tpItem.totalPrice = parseFloat((tpItem.unitPrice * tpItem.discount + tpItem.tastePrice) * tpItem.count);
 		}

@@ -140,13 +140,6 @@ function checkOutOnLoad() {
 												}
 											}
 											
-											if(tpItem.special == true || tpItem.gift == true){
-												// 特价和赠送菜品不打折
-												tpItem.totalPrice = parseFloat(tpItem.unitPrice * discountRate);
-											}else{
-												tpItem.totalPrice = parseFloat((tpItem.unitPrice * tpItem.discount + tpItem.tastePrice) * tpItem.count);
-											}
-											
 											// 特价，送 --
 											// 折扣率
 											// --1
@@ -155,6 +148,14 @@ function checkOutOnLoad() {
 											} else {
 												tpItem.discount = parseFloat(discountRate).toFixed(2);
 											}
+											
+											if(tpItem.special == true || tpItem.gift == true){
+												// 特价和赠送菜品不打折
+												tpItem.totalPrice = parseFloat(tpItem.unitPrice * tpItem.count);
+											}else{
+												tpItem.totalPrice = parseFloat((tpItem.unitPrice * tpItem.discount + tpItem.tastePrice) * tpItem.count);
+											}											
+											
 											checkOutDataDisplay.root.push(tpItem);
 										}
 										
