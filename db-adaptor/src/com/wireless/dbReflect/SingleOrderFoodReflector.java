@@ -82,13 +82,14 @@ public class SingleOrderFoodReflector {
 			  " A.taste, A.taste_price, A.taste_id, A.taste2_id, A.taste3_id, A.taste_alias, A.taste2_alias, A.taste3_alias, " +
 			  " A.taste_tmp_alias, A.taste_tmp, A.taste_tmp_price, " + 
 			  " A.order_date, A.is_temporary, A.is_paid, A.waiter, A.comment, " +
-			  " B.type, B.service_rate " +
+			  " B.type, B.service_rate, D.name as dept_name" +
 			  " FROM " + 
 			  Params.dbName + "." + orderFoodTbl + " A LEFT OUTER JOIN " +
 			  Params.dbName + ".kitchen C " + " ON A.kitchen_id = C.kitchen_id, " +
-			  Params.dbName + "." + orderTbl + " B " +
+			  Params.dbName + "." + orderTbl + " B, " +
+			  Params.dbName + ".department D " +
 			  " WHERE " +
-			  " A.order_id = B.id " +
+			  " A.order_id = B.id AND A.dept_id = D.dept_id AND B.restaurant_id = D.restaurant_id " +
 			  (extraCond == null ? "" : extraCond) + " " +
 			  (orderClause == null ? "" : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -116,6 +117,7 @@ public class SingleOrderFoodReflector {
 			singleOrderFood.kitchen.name = dbCon.rs.getString("kitchen_name");
 			singleOrderFood.kitchen.dept.restaurantID = restaurantID;
 			singleOrderFood.kitchen.dept.deptID = dbCon.rs.getShort("dept_id");
+			singleOrderFood.kitchen.dept.name = dbCon.rs.getString("dept_name");
 			
 			String normalTastePref = dbCon.rs.getString("taste");
 			String tmpTastePref = dbCon.rs.getString("taste_tmp");

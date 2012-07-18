@@ -20,6 +20,13 @@ public class JObject {
 	private byte errCode = 0;
 	private String errMsg = "";
 	
+	public JObject(){}
+	
+	public JObject(int totalProperty, List root){
+		this.totalProperty = totalProperty;
+		this.root = root;
+	}
+	
 	public boolean isSuccess() {
 		return success;
 	}
