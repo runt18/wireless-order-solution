@@ -9,7 +9,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -21,6 +21,7 @@ import com.wireless.db.VerifyPin;
 import com.wireless.db.billStatistics.QuerySaleDetails;
 import com.wireless.pojo.billStatistics.SalesDetail;
 import com.wireless.protocol.Terminal;
+import com.wireless.util.JObject;
 
 @SuppressWarnings({ "unused", "rawtypes" , "unchecked"})
 public class SalesSubStatisticsAction extends Action {
@@ -112,14 +113,13 @@ public class SalesSubStatisticsAction extends Action {
 			
 		} finally{
 			dbCon.disconnect();
-			JSONArray json = null;
+			JSONObject json = null;
 			int totalProperty = saleDetails.length;
 			if(index != null && pageSize != null){
 				pageSize = (pageSize + index) > saleDetails.length ? (pageSize - ((pageSize + index) - saleDetails.length)) : pageSize;
 				for(int i = 0; i < pageSize; i++){
 					itemsList.add(saleDetails[index + i]);
 				}
-				
 			}else{
 				itemsList = Arrays.asList(saleDetails);
 			}
@@ -141,9 +141,14 @@ public class SalesSubStatisticsAction extends Action {
 				}
 				itemsList.add(sum);
 			}
-			json = JSONArray.fromObject(itemsList);
+			JObject jobj = new JObject();
+			jobj.setTotalProperty(totalProperty);
+			jobj.setRoot(itemsList);
+			json = JSONObject.fromObject(jobj);
+//			json = JSONArray.fromObject(itemsList);
 //			System.out.println("{totalProperty:" + saleDetails.length + ", root:" + json.toString() + "}");			
-			response.getWriter().print("{totalProperty:" + totalProperty + ", root:" + json.toString() + "}");
+//			response.getWriter().print("{totalProperty:" + totalProperty + ", root:" + json.toString() + "}");
+			response.getWriter().print(json.toString());
 		}
 		
 		return null;
