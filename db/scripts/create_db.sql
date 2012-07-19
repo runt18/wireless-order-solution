@@ -465,18 +465,12 @@ COMMENT = 'the staff information ' ;
 DROP TABLE IF EXISTS `wireless_order_db`.`setting` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`setting` (
-  `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to setting' ,
-  `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'the restaurant id to this setting' ,
+  `setting_id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to setting' ,
+  `restaurant_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the restaurant id to this setting' ,
   `price_tail` TINYINT UNSIGNED NOT NULL DEFAULT 2 COMMENT 'indicates how to deal with the tail of price:\n不处理 : 0\n小数抹零 : 1\n小数四舍五入 : 2' ,
   `auto_reprint` TINYINT NOT NULL DEFAULT 1 COMMENT 'indicates whether to auto re-print' ,
   `receipt_style` INT UNSIGNED NOT NULL DEFAULT 4294967295 COMMENT 'the receipt style is as below.\n0x01 : 结帐单是否显示折扣\n0x02 : 结帐单是否显示数量\n0x04 : 结帐单是否显示状态\n0x08 : 结帐单是否显示折扣额' ,
-  PRIMARY KEY (`id`) ,
-  INDEX `fk_setting_restaurant` (`restaurant_id` ASC) ,
-  CONSTRAINT `fk_setting_restaurant`
-    FOREIGN KEY (`restaurant_id` )
-    REFERENCES `wireless_order_db`.`restaurant` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+  PRIMARY KEY (`setting_id`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'the setting to restaurant' ;
@@ -506,16 +500,10 @@ COMMENT = 'the shift history to each restaurant' ;
 DROP TABLE IF EXISTS `wireless_order_db`.`region` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`region` (
-  `restaurant_id` INT UNSIGNED NOT NULL ,
+  `restaurant_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the restaurant id to this region' ,
   `region_id` TINYINT UNSIGNED NOT NULL COMMENT 'the alias id to this table region' ,
   `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to this table region' ,
-  PRIMARY KEY (`restaurant_id`, `region_id`) ,
-  INDEX `fk_region_restaurant1` (`restaurant_id` ASC) ,
-  CONSTRAINT `fk_region_restaurant1`
-    FOREIGN KEY (`restaurant_id` )
-    REFERENCES `wireless_order_db`.`restaurant` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+  PRIMARY KEY (`restaurant_id`, `region_id`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the region information to the tables' ;
@@ -696,12 +684,27 @@ DEFAULT CHARACTER SET = utf8,
 COMMENT = 'the daily settle history to each restaurant' ;
 
 
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`food_taste`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`food_taste` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food_taste` (
+  `food_id` INT NULL DEFAULT NULL COMMENT 'the food id' ,
+  `taste_id` INT NULL DEFAULT NULL COMMENT 'the taste id' ,
+  `restaurant_id` INT NULL DEFAULT NULL COMMENT 'the restaurant id' ,
+  `rank` TINYINT UNSIGNED NULL DEFAULT 0 COMMENT 'the rank of taste to this food' ,
+  INDEX `ix_food_id` (`food_id` ASC) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the rank of taste to each food' ;
+
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
-
 
 
 -- -----------------------------------------------------
