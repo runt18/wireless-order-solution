@@ -82,13 +82,7 @@ backFoodInit = function(){
 						
 					}else if(backFoodQType == 2){
 						if(e.attributes.deptID == '' || parseInt(e.attributes.deptID) == -1){
-							if(e.hasChildNodes()){
-								backFoodDeptID = '';
-								for(var i = 0; i < e.childNodes.length; i++){
-									backFoodDeptID += (i > 0 ? ',' : '');
-									backFoodDeptID += e.childNodes[i].attributes.deptID;
-								}
-							}
+							backFoodDeptID = '';
 						}else{
 							backFoodDeptID = e.attributes.deptID;
 						}
