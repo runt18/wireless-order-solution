@@ -11,6 +11,8 @@ Release v1.1.7 <xx/08/2012>
 2 - Source code is tagged as "1.1.7" in Google Code's SVN
 <Issues>
 1 - 创建food_taste表
+2 - 创建kitchen_taste表
+3 - 创建dept_taste表
 2 - 删除region表与restaurant表的外键关联
 3 - 删除setting表与restaurant表的外键关联
 ******************************************************************************************************/
