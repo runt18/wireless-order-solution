@@ -43,12 +43,12 @@ public class QueryMenu {
 	 * 			Throws if fail to execute any SQL statement.
 	 */
 	public static FoodMenu exec(DBCon dbCon, Terminal term) throws SQLException{
-		return new FoodMenu(queryFoods(dbCon, term.restaurantID, null, null), 
-			    			queryTastes(dbCon, term.restaurantID, Taste.CATE_TASTE, null, null),
-			    			queryTastes(dbCon, term.restaurantID, Taste.CATE_STYLE, null, null),
-			    			queryTastes(dbCon, term.restaurantID, Taste.CATE_SPEC, null, null),
-			    			queryKitchens(dbCon, term.restaurantID, null, null),
-			    			queryDepartments(dbCon, term.restaurantID, null, null));
+		return new FoodMenu(queryFoods(dbCon, "AND FOOD.restaurant_id=" + term.restaurantID, null), 
+			    			queryTastes(dbCon, Taste.CATE_TASTE, "AND restaurant_id=" + term.restaurantID, null),
+			    			queryTastes(dbCon, Taste.CATE_STYLE, "AND restaurant_id=" + term.restaurantID, null),
+			    			queryTastes(dbCon, Taste.CATE_SPEC, "AND restaurant_id=" + term.restaurantID, null),
+			    			queryKitchens(dbCon, "AND KITCHEN.restaurant_id=" + term.restaurantID, null),
+			    			queryDepartments(dbCon, "AND DEPT.restaurant_id=" + term.restaurantID, null));
 	}
 	
 	/**
@@ -71,248 +71,45 @@ public class QueryMenu {
 		try{
 			dbCon.connect();
 			
-			Terminal term = VerifyPin.exec(dbCon, pin, model);
-			
-			return new FoodMenu(queryFoods(dbCon, term.restaurantID, null, null), 
-							    queryTastes(dbCon, term.restaurantID, Taste.CATE_TASTE, null, null),
-							    queryTastes(dbCon, term.restaurantID, Taste.CATE_STYLE, null, null),
-							    queryTastes(dbCon, term.restaurantID, Taste.CATE_SPEC, null, null),
-							    queryKitchens(dbCon, term.restaurantID, null, null),
-							    queryDepartments(dbCon, term.restaurantID, null, null));
+			return exec(dbCon, VerifyPin.exec(dbCon, pin, model));
 			
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
-	/**
-	 * Get the food information.
-	 * @param pin the pin to this terminal
-	 * @param model the model to this terminal
-	 * @return the food menu holding all the information
-	 * @throws BusinessException throws if either of cases below.<br>
-	 * 							 - The terminal is NOT attache to any restaurant.<br>
-	 * 							 - The terminal is expired.
-	 * @throws SQLException throws if fail to execute any SQL statement
-	 */
-	public static Food[] execFoods(long pin, short model) throws BusinessException, SQLException{
-		return execFoods(pin, model, null, null);
-	}
-	
-	/**
-	 * Get the food information.
-	 * @param pin the pin to this terminal
-	 * @param model the model to this terminal
-	 * @param extraCondition the extra condition to SQL statement
-	 * @param orderClause the order clause to the SQL statement
-	 * @return the food menu holding all the information
-	 * @throws BusinessException throws if either of cases below.<br>
-	 * 							 - The terminal is NOT attache to any restaurant.<br>
-	 * 							 - The terminal is expired.
-	 * @throws SQLException throws if fail to execute any SQL statement
-	 */
-	public static Food[] execFoods(long pin, short model, String extraCondition, String orderClause) throws BusinessException, SQLException{
-		
+	public static Food[] queryFoods(String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
-		
 		try{
 			dbCon.connect();
-			
-			Terminal term = VerifyPin.exec(dbCon, pin, model);		
-			
-			return queryFoods(dbCon, term.restaurantID, extraCondition, orderClause);
-			
+			return queryFoods(dbCon, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
-	/**
-	 * Get the Taste information.
-	 * @param pin the pin to this terminal
-	 * @param model the model to this terminal
-	 * @return the food menu holding all the information
-	 * @throws BusinessException throws if either of cases below.<br>
-	 * 							 - The terminal is NOT attache to any restaurant.<br>
-	 * 							 - The terminal is expired.
-	 * @throws SQLException throws if fail to execute any SQL statement
-	 */
-	public static Taste[] execTastes(long pin, short model) throws BusinessException, SQLException {
-
-		DBCon dbCon = new DBCon();
-		
-		try {
-			dbCon.connect();
-			Terminal term = VerifyPin.exec(dbCon, pin, model);
-			return queryTastes(dbCon, term.restaurantID, Short.MIN_VALUE, null, null);
-
-		} finally {
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * Get the Taste information.
-	 * @param pin the pin to this terminal
-	 * @param model the model to this terminal
-	 * @param extraCond the extra condition to SQL statement
-	 * @param orderClause the order clause to SQL statement
-	 * @return the food menu holding all the information
-	 * @throws BusinessException throws if either of cases below.<br>
-	 * 							 - The terminal is NOT attache to any restaurant.<br>
-	 * 							 - The terminal is expired.
-	 * @throws SQLException throws if fail to execute any SQL statement
-	 */
-	public static Taste[] execTastes(long pin, short model, String extraCond, String orderClause) throws BusinessException, SQLException {
-
-		DBCon dbCon = new DBCon();
-		
-		try {
-			dbCon.connect();
-			Terminal term = VerifyPin.exec(dbCon, pin, model);
-			return queryTastes(dbCon, term.restaurantID, Short.MIN_VALUE, extraCond, orderClause);
-
-		} finally {
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * Get the kitchen information.
-	 * @param pin 
-	 * 			the pin to this terminal
-	 * @param model 
-	 * 			the model to this terminal
-	 * @return 
-	 * 			the food menu holding all the information
-	 * @throws BusinessException 
-	 * 			throws if either of cases below.<br>
-	 * 			- The terminal is NOT attache to any restaurant.<br>
-	 * 			- The terminal is expired.
-	 * @throws SQLException 
-	 * 			throws if fail to execute any SQL statement
-	 */
-	public static Kitchen[] execKitchens(long pin, short model) throws BusinessException, SQLException{
-
-		DBCon dbCon = new DBCon();
-		
-		try {
-			dbCon.connect();
-			Terminal term = VerifyPin.exec(dbCon, pin, model);
-			return queryKitchens(dbCon, term.restaurantID, null, null);
-
-		} finally {
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * Get the kitchen information.
-	 * @param pin 
-	 * 			the pin to this terminal
-	 * @param model 
-	 * 			the model to this terminal
-	 * @param extraCond
-	 * 			the extra condition to SQL statement
-	 * @param orderClause
-	 * 			the order clause to SQL statement
-	 * @return 
-	 * 			the food menu holding all the information
-	 * @throws BusinessException 
-	 * 			throws if either of cases below.<br>
-	 * 			- The terminal is NOT attache to any restaurant.<br>
-	 * 			- The terminal is expired.
-	 * @throws SQLException 
-	 * 			throws if fail to execute any SQL statement
-	 */
-	public static Kitchen[] execKitchens(long pin, short model, String extraCond, String orderClause) throws BusinessException, SQLException{
-
-		DBCon dbCon = new DBCon();
-		
-		try {
-			dbCon.connect();
-			Terminal term = VerifyPin.exec(dbCon, pin, model);
-			return queryKitchens(dbCon, term.restaurantID, extraCond, orderClause);
-
-		} finally {
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * Get the super kitchen information.
-	 * @param pin 
-	 * 			the pin to this terminal
-	 * @param model 
-	 * 			the model to this terminal
-	 * @return 
-	 * 			the food menu holding all the information
-	 * @throws BusinessException 
-	 * 			throws if either of cases below.<br>
-	 * 			- The terminal is NOT attache to any restaurant.<br>
-	 * 			- The terminal is expired.
-	 * @throws SQLException 
-	 * 			throws if fail to execute any SQL statement
-	 */
-	public static Department[] execDepartments(long pin, short model) throws BusinessException, SQLException{
-		DBCon dbCon = new DBCon();
-		
-		try {
-			dbCon.connect();
-			Terminal term = VerifyPin.exec(dbCon, pin, model);
-			return queryDepartments(dbCon, term.restaurantID, null, null);
-
-		} finally {
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * Get the super kitchen information.
-	 * @param pin 
-	 * 			the pin to this terminal
-	 * @param model 
-	 * 			the model to this terminal
-	 * @param extraCond
-	 * 			the extra condition to SQL statement
-	 * @param orderClause
-	 * 			the order clause to SQL statement
-	 * @return 
-	 * 			the food menu holding all the information
-	 * @throws BusinessException 
-	 * 			throws if either of cases below.<br>
-	 * 			- The terminal is NOT attache to any restaurant.<br>
-	 * 			- The terminal is expired.
-	 * @throws SQLException 
-	 * 			throws if fail to execute any SQL statement
-	 */
-	public static Department[] execDepartments(long pin, short model, String extraCond, String orderClause) throws BusinessException, SQLException{
-		DBCon dbCon = new DBCon();
-		
-		try {
-			dbCon.connect();
-			Terminal term = VerifyPin.exec(dbCon, pin, model);
-			return queryDepartments(dbCon, term.restaurantID, extraCond, orderClause);
-
-		} finally {
-			dbCon.disconnect();
-		}
-	}
-	
-	public static Food[] queryFoods(DBCon dbCon, int restaurantID, String extraCondition, String orderClause) throws SQLException{
+	public static Food[] queryFoods(DBCon dbCon, String extraCondition, String orderClause) throws SQLException{
 		ArrayList<Food> foods = new ArrayList<Food>();
         //get all the food information to this restaurant
-		String sql = "SELECT food_id, food_alias, name, unit_price, kitchen_alias, status, pinyin FROM " + 
-					 Params.dbName + ".food WHERE restaurant_id=" + restaurantID + " " +
+		String sql = " SELECT " +
+					 " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, " +
+					 " FOOD.name, FOOD.unit_price, FOOD.kitchen_alias, FOOD.status, FOOD.pinyin, " +
+					 " KITCHEN.dept_id " +
+					 " FROM " + 
+					 Params.dbName + ".food FOOD " +
+					 " LEFT OUTER JOIN " +
+					 Params.dbName + ".kitchen KITCHEN " +
+					 " ON FOOD.kitchen_id = KITCHEN.kitchen_id " +
 					 (extraCondition == null ? "" : extraCondition) + " " +
 					 (orderClause == null ? "" : orderClause); 
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
-			Food food = new Food(restaurantID,
+			Food food = new Food(dbCon.rs.getInt("restaurant_id"),
 								 dbCon.rs.getLong("food_id"),
 								 dbCon.rs.getInt("food_alias"),
 								 dbCon.rs.getString("name"),
 								 new Float(dbCon.rs.getFloat("unit_price")),
+								 dbCon.rs.getShort("dept_id"),
 								 dbCon.rs.getShort("kitchen_alias"),
 								 dbCon.rs.getShort("status"),
 								 dbCon.rs.getString("pinyin"));
@@ -324,19 +121,30 @@ public class QueryMenu {
 		return foods.toArray(new Food[foods.size()]);
 	}
 	
-	public static Kitchen[] queryKitchens(DBCon dbCon, int restaurantID, String extraCond, String orderClause) throws SQLException{
+	public static Kitchen[] queryKitchens(String extraCond, String orderClause) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return queryKitchens(dbCon, extraCond, orderClause);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	public static Kitchen[] queryKitchens(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
 		//get all the kitchen information to this restaurant,
 		ArrayList<Kitchen> kitchens = new ArrayList<Kitchen>();
-		String sql = "SELECT kitchen_id, kitchen_alias, name, discount, discount_2, discount_3, " +
-					 "member_discount_1, member_discount_2, member_discount_3, " +
-					 "dept_id FROM " + 
-			  		 Params.dbName + ".kitchen WHERE restaurant_id=" + 
-			  		 restaurantID + " " +
+		String sql = " SELECT restaurant_id, kitchen_id, kitchen_alias, name, discount, discount_2, discount_3, " +
+					 " member_discount_1, member_discount_2, member_discount_3, " +
+					 " dept_id FROM " + 
+			  		 Params.dbName + ".kitchen KITCHEN " +
+			  		 " WHERE 1=1 " + 
 			  		 (extraCond == null ? "" : extraCond) + " " +
 			  		 (orderClause == null ? "" : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
-			kitchens.add(new Kitchen(dbCon.rs.getString("name"),
+			kitchens.add(new Kitchen(dbCon.rs.getInt("restaurant_id"),
+									 dbCon.rs.getString("name"),
 									 dbCon.rs.getLong("kitchen_id"),
 									 dbCon.rs.getShort("kitchen_alias"),
 									 dbCon.rs.getShort("dept_id"),
@@ -352,11 +160,11 @@ public class QueryMenu {
 		return kitchens.toArray(new Kitchen[kitchens.size()]);
 	}
 	
-	public static Department[] queryDepartments(DBCon dbCon, int restaurantID, String extraCond, String orderClause) throws SQLException{
+	public static Department[] queryDepartments(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
 		//get tall the super kitchen information to this restaurant
 		ArrayList<Department> departments = new ArrayList<Department>();
-		String sql = "SELECT dept_id, name, restaurant_id FROM " + Params.dbName + ".department WHERE " +
-					 " restaurant_id=" + restaurantID + " " +
+		String sql = " SELECT dept_id, name, restaurant_id FROM " + Params.dbName + ".department DEPT " +
+					 " WHERE 1=1 " +
 					 (extraCond != null ? extraCond : "") + " " +
 					 (orderClause != null ? orderClause : "");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -368,6 +176,16 @@ public class QueryMenu {
 		dbCon.rs.close();
 		
 		return departments.toArray(new Department[departments.size()]);
+	}
+	
+	public static Taste[] queryTastes(short category, String extraCond, String orderClause) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return queryTastes(dbCon, category, extraCond, orderClause);
+		}finally{
+			dbCon.disconnect();
+		}
 	}
 	
 	/**
@@ -386,12 +204,10 @@ public class QueryMenu {
 	 * @throws SQLException 
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static Taste[] queryTastes(DBCon dbCon, int restaurantID, short category, String extraCond, String orderClause) throws SQLException{
-		//Get the taste preferences to this restaurant sort by alias id in ascend order.
-		//The lower alias id, the more commonly this preference used.
-		//Put the most commonly used taste preference in first position 
-		String sql = "SELECT * FROM " + Params.dbName + ".taste WHERE restaurant_id=" + 
-					 restaurantID + 
+	public static Taste[] queryTastes(DBCon dbCon, short category, String extraCond, String orderClause) throws SQLException{
+
+		String sql = " SELECT * FROM " + Params.dbName + ".taste " +
+				     " WHERE 1=1 " +
 					 (category < 0 ? "" : " AND category=" + category) + " " +
 					 (extraCond == null ? "" : extraCond) + " " +
 					 (orderClause == null ? "" : orderClause);

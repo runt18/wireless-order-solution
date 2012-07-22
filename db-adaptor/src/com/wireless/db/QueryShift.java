@@ -303,7 +303,7 @@ public class QueryShift {
 		HashMap<Long, Float> signIncomeByOrder = new HashMap<Long, Float>();
 		
 		HashMap<Department, DeptIncome> deptIncome = new HashMap<Department, DeptIncome>();
-		for(Department dept : QueryMenu.queryDepartments(dbCon, term.restaurantID, null, null)){
+		for(Department dept : QueryMenu.queryDepartments(dbCon, "AND restaurant_id=" + term.restaurantID, null)){
 			deptIncome.put(dept, new DeptIncome(dept));
 		}
 		for(SingleOrderFood singleOrderFood : orderFoods){

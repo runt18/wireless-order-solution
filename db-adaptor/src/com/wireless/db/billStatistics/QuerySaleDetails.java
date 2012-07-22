@@ -77,7 +77,7 @@ public class QuerySaleDetails {
 		 * Get all the basic info to department 
 		 */
 		HashMap<Department, SalesDetail> deptSalesDetail = new HashMap<Department, SalesDetail>();
-		for(Department dept : QueryMenu.queryDepartments(dbCon, term.restaurantID, null, null)){
+		for(Department dept : QueryMenu.queryDepartments(dbCon, "AND restaurant_id=" + term.restaurantID, null)){
 			deptSalesDetail.put(dept, new SalesDetail(dept.name));
 		}
 		/**
@@ -231,14 +231,16 @@ public class QuerySaleDetails {
 							"");
 		
 		String queryFoodExtraCond;
-		queryFoodExtraCond = " AND kitchen_alias IN " +
+		queryFoodExtraCond = " AND FOOD.restaurant_id=" + term.restaurantID +
+							 " AND kitchen_alias IN " +
 							 " (SELECT kitchen_alias FROM " + 
 							 Params.dbName + ".kitchen" +
 							 " WHERE " +
 							 " dept_id IN(" + deptCond + ")" + 
 							 " AND " +
 							 " restaurant_id=" + term.restaurantID + ")";
-		Food[] foodList = QueryMenu.queryFoods(dbCon, term.restaurantID, queryFoodExtraCond, null);
+		
+		Food[] foodList = QueryMenu.queryFoods(dbCon, queryFoodExtraCond, null);
 		HashMap<Food, SalesDetail> foodSalesDetail = new HashMap<Food, SalesDetail>();
 		for(Food item : foodList){
 			foodSalesDetail.put(item, new SalesDetail(item.name));
