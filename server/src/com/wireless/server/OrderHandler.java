@@ -421,7 +421,7 @@ class OrderHandler extends Handler implements Runnable{
 			try{
 				dbCon.connect();
 				param.restaurant = QueryRestaurant.exec(dbCon, _term.restaurantID);
-				param.depts = QueryMenu.queryDepartments(dbCon, _term.restaurantID, null, null);
+				param.depts = QueryMenu.queryDepartments(dbCon, "AND DEPT.restaurant_id=" + _term.restaurantID, null);
 			}catch(Exception e){
 				param.restaurant = new Restaurant();
 				param.depts = new Department[0];

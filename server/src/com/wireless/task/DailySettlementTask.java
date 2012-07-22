@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import org.tiling.scheduling.SchedulerTask;
 
 import com.wireless.db.DailySettle;
+import com.wireless.db.tasteRef.TasteRef;
 import com.wireless.exception.BusinessException;
 import com.wireless.server.WirelessSocketServer;
 
@@ -31,7 +32,7 @@ public class DailySettlementTask extends SchedulerTask{
 				WirelessSocketServer.printLosses.clear();
 			}
 			
-			DailySettle.Result result = DailySettle.exec();					
+			DailySettle.Result result = DailySettle.exec();		
 					
 			taskInfo += "info : " + result.totalOrder + " record(s) are moved from \"order\" to \"order_history\"" + sep;
 			taskInfo += "info : " + result.totalOrderDetail + " record(s) are moved from \"order_food\" to \"order_food_history\"" + sep;
@@ -41,7 +42,12 @@ public class DailySettlementTask extends SchedulerTask{
 						"maxium order food id : " + result.maxOrderFoodID + ", " +
 						"maxium shift id : " + result.maxShiftID + sep;
 			
+			long beginTime = System.currentTimeMillis();
+			TasteRef.exec();
+			long elapsedTime = System.currentTimeMillis() - beginTime;
 			
+			taskInfo += "info : The calcation to smart taste reference takes up " + elapsedTime / 1000 + "sec." + sep; 
+				
 		}catch(SQLException e){
 			taskInfo += "error : " + e.getMessage() + sep;
 			e.printStackTrace();

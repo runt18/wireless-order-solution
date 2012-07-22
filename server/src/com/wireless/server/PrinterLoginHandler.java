@@ -116,8 +116,8 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 								
 								//respond with the related kitchen information
 								send(_out, new RespPrintLogin(loginReq.header, 
-															  QueryMenu.queryDepartments(dbCon, restaurantID, null, null),
-															  QueryMenu.queryKitchens(dbCon, restaurantID, null, null),
+															  QueryMenu.queryDepartments(dbCon, "AND DEPT.restaurant_id=" + restaurantID, null),
+															  QueryMenu.queryKitchens(dbCon, "AND KITCHEN.restaurant_id=" + restaurantID, null),
 															  QueryRegion.exec(dbCon, term),
 															  restaurantName));
 								
