@@ -52,6 +52,12 @@ DEFAULT CHARACTER SET = utf8,
 COMMENT = 'describe the taste reference information to each department' ;
 
 -- -----------------------------------------------------
+-- Create the index 'ix_food_id' to table 'order_food_history'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_food_history` 
+ADD INDEX `ix_food_id` (`food_id` ASC) ;
+
+-- -----------------------------------------------------
 -- Drop the foreign key of 'region' to 'restaurant'
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`region` DROP FOREIGN KEY `fk_region_restaurant1` ;
@@ -67,5 +73,7 @@ ALTER TABLE `wireless_order_db`.`setting` ADD COLUMN `setting_id` INT NOT NULL A
 , ADD INDEX `ix_restaurant_id` (`restaurant_id` ASC) 
 , DROP INDEX `fk_setting_restaurant` ;
 
-
-
+-- -----------------------------------------------------
+-- Add the field 'taste_ref_type' to table 'food'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`food` CHANGE COLUMN `enabled` `taste_ref_type` TINYINT(4) NOT NULL DEFAULT '1' COMMENT 'the taste reference type to this food is below.\n1 - smart reference\n2 - manual reference'  ;
