@@ -301,6 +301,7 @@ public class OrderFood extends Food {
 			  food.aliasID,
 			  food.name,
 			  food.getPrice(),
+			  food.kitchen.dept.deptID,
 			  food.kitchen.aliasID,
 			  food.status,
 			  food.pinyin);

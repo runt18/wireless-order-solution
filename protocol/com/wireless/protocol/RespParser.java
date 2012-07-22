@@ -523,7 +523,7 @@ public class RespParser {
 				index += 9 + length;
 				
 				//add the kitchen
-				kitchens[i] = new Kitchen(kitchenName, 0, kitchenAlias, deptAlias,
+				kitchens[i] = new Kitchen(0, kitchenName, 0, kitchenAlias, deptAlias,
 										  dist_1, dist_2, dist_3,
 										  mdist_1, mdist_2, mdist_3);
 			}

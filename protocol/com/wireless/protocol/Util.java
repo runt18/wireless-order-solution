@@ -113,11 +113,13 @@ public class Util {
 			//append the "0" to the end 
 			floatPoint = floatPoint + "0";
 			
-		}else if(floatPoint.length() == 2){
+		}else if(floatPoint.length() >= 2){
 			//in the case the tenth digit is "0"
 			//cut this tenth digit
 			if(floatPoint.charAt(0) == '0'){
-				floatPoint = floatPoint.substring(1);
+				floatPoint = floatPoint.substring(1, 2);
+			}else{
+				floatPoint = floatPoint.substring(0, 2);
 			}
 			
 		}else{

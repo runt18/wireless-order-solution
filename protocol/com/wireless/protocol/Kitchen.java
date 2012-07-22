@@ -82,6 +82,8 @@ public final class Kitchen {
 	}
 	//the name to this kitchen
 	public String name;
+	//the restaurant id to this kitchen
+	public int restaurantID = 0;
 	//the id to this kitchen
 	public long kitchenID = 0;
 	//the alias id to this kitchen
@@ -93,20 +95,34 @@ public final class Kitchen {
 		
 	}
 	
-	public Kitchen(String kName, long kID, short kAlias, short deptID){
-		this.name = kName;
-		this.kitchenID = kID;
-		this.aliasID = kAlias;
+	public Kitchen(int restaurantID, String kitchenName, long kitchenID, short kitchenAlias, short deptID){
+		this.restaurantID = restaurantID;
+		this.name = kitchenName;
+		this.kitchenID = kitchenID;
+		this.aliasID = kitchenAlias;
 		this.dept.deptID = deptID;
 	}
 	
-	public Kitchen(String kName, long kID, short kAlias, short deptID, byte dist1, byte dist2, byte dist3, byte memDist1, byte memDist2, byte memDist3){
-		this(kName, kID, kAlias, deptID);
+	public Kitchen(int restaurantID, String kitchenName, long kitchenID, short kitchenAlias, short deptID, byte dist1, byte dist2, byte dist3, byte memDist1, byte memDist2, byte memDist3){
+		this(restaurantID, kitchenName, kitchenID, kitchenAlias, deptID);
 		discount_1 = dist1;
 		discount_2 = dist2;
 		discount_3 = dist3;
 		memberDist_1 = memDist1;
 		memberDist_2 = memDist2;
 		memberDist_3 = memDist3;
+	}
+	
+	public boolean equals(Object obj){
+		if(obj == null || !(obj instanceof Kitchen)){
+			return false;
+		}else{
+			return restaurantID == ((Kitchen)obj).restaurantID && aliasID == ((Kitchen)obj).aliasID;
+		}
+	}
+	
+	public int hashCode(){
+		return new Integer(restaurantID).hashCode() ^
+			   new Integer(aliasID).hashCode();
 	}
 }
