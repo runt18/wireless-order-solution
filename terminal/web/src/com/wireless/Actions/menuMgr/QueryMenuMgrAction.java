@@ -3,9 +3,7 @@ package com.wireless.Actions.menuMgr;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -21,15 +19,13 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.Params;
+import com.wireless.db.QueryMenu;
 import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Terminal;
 import com.wireless.protocol.Util;
-
-import com.wireless.db.QueryMenu;
 
 public class QueryMenuMgrAction extends Action {
 
@@ -136,8 +132,7 @@ public class QueryMenuMgrAction extends Action {
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
 					Terminal.MODEL_STAFF);
-			Food[] foods = QueryMenu.execFoods(Long.parseLong(pin),
-					Terminal.MODEL_STAFF, filterCondition, orderClause);
+			Food[] foods = QueryMenu.queryFoods(filterCondition + " AND FOOD.restaurant_id=" + term.restaurantID, orderClause);
 
 			// 格式：[编号，名称，拼音，价格，厨房，特价，推荐，停售，赠送，時價]
 			for (int i = 0; i < foods.length; i++) {
@@ -151,7 +146,7 @@ public class QueryMenuMgrAction extends Action {
 				// float thisPrice = dbCon.rs.getFloat("price");
 				// dbCon.rs.close();
 
-				HashMap resultMap = new HashMap();
+				HashMap<String, Object> resultMap = new HashMap<String, Object>();
 				resultMap.put("foodID", new Long(foods[i].foodID).toString());
 				resultMap.put("dishNumber",
 						new Integer(foods[i].aliasID).toString());

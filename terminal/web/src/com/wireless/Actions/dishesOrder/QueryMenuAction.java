@@ -13,6 +13,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.QueryMenu;
+import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Food;
@@ -54,20 +55,22 @@ public class QueryMenuAction extends Action {
 			 */
 			short type = Short.parseShort(request.getParameter("type"));
 			
+			Terminal term = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
+			
 			if(type == 1){
-				Food[] foods = QueryMenu.execFoods(Long.parseLong(pin), Terminal.MODEL_STAFF);
+				Food[] foods = QueryMenu.queryFoods("AND FOOD.restaurant_id=" + term.restaurantID, null);
 				jsonResp = jsonResp.replace("$(value)", toJson(foods));
 				
 			}else if(type == 2){
-				Taste[] tastes = QueryMenu.execTastes(Long.parseLong(pin), Terminal.MODEL_STAFF);
+				Taste[] tastes = QueryMenu.queryTastes(Short.MIN_VALUE, "AND restaurant_id=" + term.restaurantID, null);
 				jsonResp = jsonResp.replace("$(value)", toJson(tastes));
 				
 			}else if(type == 3){
-				Kitchen[] kitchens = QueryMenu.execKitchens(Long.parseLong(pin), Terminal.MODEL_STAFF);
+				Kitchen[] kitchens = QueryMenu.queryKitchens("AND restaurant_id=" + term.restaurantID, null);
 				jsonResp = jsonResp.replace("$(value)", toJson(kitchens));
 				
 			}else if(type == 4){
-				Kitchen[] kitchens = QueryMenu.execKitchens(Long.parseLong(pin), Terminal.MODEL_STAFF);
+				Kitchen[] kitchens = QueryMenu.queryKitchens("AND restaurant_id=" + term.restaurantID, null);
 				jsonResp = toJsonCombo(kitchens);
 			}else{
 				throw new BusinessException(ErrorCode.UNKNOWN);

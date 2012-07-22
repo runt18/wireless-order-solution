@@ -30,8 +30,6 @@ import com.wireless.protocol.Terminal;
 
 public class QueryTasteAction extends Action {
 
-	private static final long serialVersionUID = 1L;
-
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -121,8 +119,7 @@ public class QueryTasteAction extends Action {
 			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
 					Terminal.MODEL_STAFF);
 
-			Taste[] tastes = QueryMenu.execTastes(Long.parseLong(pin),
-					Terminal.MODEL_STAFF, filterCondition, orderClause);
+			Taste[] tastes = QueryMenu.queryTastes(Short.MIN_VALUE, filterCondition + " AND restaurant_id=" + term.restaurantID, orderClause);
 
 			/*
 			 * “口味分类”的值如下： 0 - 口味 ， 1 - 做法， 2 - 规格 “计算方式”的值如下：0 - 按价格，1 - 按比例
