@@ -168,21 +168,17 @@ function tableStuLoad() {
 	}
 
 	var personCount = Request["personCount"];
-
+	personCount = personCount == '' || parseInt(personCount) == 0 ? 1 : personCount;
 	document.getElementById("tblNbrDivTS").innerHTML = tableNbr;
-	// + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+	
 	dishesOrderNorthPanel.findById("tablePersonCount").setValue(personCount);
 	document.getElementById("minCostDivTS").innerHTML = Request["minCost"];
-	// +"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+	
 	if (Request["minCost"] == "0") {
 		document.getElementById("minCostDivTS").style["display"] = "none";
 		document.getElementById("minCostImgTS").style["display"] = "none";
-		// document.getElementById("minCostPlaceHolder").style["visibility"] =
-		// "hidden";
 	}
-	document.getElementById("serviceRateDivTS").innerHTML = (Request["serviceRate"] * 100)
-			+ "%";
-	// + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+	document.getElementById("serviceRateDivTS").innerHTML = (Request["serviceRate"] * 100) + "%";
 	if (Request["serviceRate"] == "0") {
 		document.getElementById("serviceRateDivTS").style["display"] = "none";
 		document.getElementById("serviceRateImgTS").style["display"] = "none";
@@ -316,10 +312,8 @@ function orderedDishesOnLoad() {
 					dishGridRefresh();
 //				}
 				} else {
-					var dataInfo = resultJSON.data;
-					// Ext.Msg.alert(tableData);
 					Ext.MessageBox.show({
-						msg : dataInfo,
+						msg : resultJSON.msg,
 						width : 300,
 						buttons : Ext.MessageBox.OK
 					});

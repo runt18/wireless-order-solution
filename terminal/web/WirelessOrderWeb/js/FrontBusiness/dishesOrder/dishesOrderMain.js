@@ -1,4 +1,4 @@
-﻿// dish count input pop window
+﻿
 dishCountInputWin = new Ext.Window({
 	layout : "fit",
 	width : 200,
@@ -534,7 +534,9 @@ var orderedForm = new Ext.form.FormPanel({
 			// 以点菜式格式：[菜名，口味，数量，￥单价，操作，￥实价，菜名编号，厨房编号，口味编号1,特,荐,停,送,￥口味价钱,口味编号2,口味编号3]
 			text : "提交",
 			handler : function() {
-				if (orderedData.root.length > 0 && dishesOrderNorthPanel.findById( "tablePersonCount").isValid()) {
+				if (orderedData.root.length > 0) {
+					var inputPersCount = dishesOrderNorthPanel.findById("tablePersonCount").getValue();
+					inputPersCount = inputPersCount == '' || inputPersCount == 0 ? 1 : inputPersCount;
 					var Request = new URLParaQuery();
 					var foodPara = '';
 					for ( var i = 0; i < orderedData.root.length; i++) {
@@ -575,7 +577,7 @@ var orderedForm = new Ext.form.FormPanel({
 					} else {
 						type = 2;
 					}
-					var inputPersCount = dishesOrderNorthPanel.findById("tablePersonCount").getValue();
+					
 					orderedForm.buttons[0].setDisabled(true);
 					orderedForm.buttons[1].setDisabled(true);
 					orderedForm.buttons[2].setDisabled(true);
@@ -643,7 +645,9 @@ var orderedForm = new Ext.form.FormPanel({
 			// 以点菜式格式：[菜名，口味，数量，￥单价，操作，￥实价，菜名编号，厨房编号，口味编号1,特,荐,停,送,￥口味价钱,口味编号2,口味编号3]
 			text : '提交&结帐',
 			handler : function() {
-				if (orderedData.root.length > 0 && dishesOrderNorthPanel.findById( 'tablePersonCount').isValid()) {
+				if (orderedData.root.length > 0) {
+					var inputPersCount = dishesOrderNorthPanel.findById("tablePersonCount").getValue();
+					inputPersCount = inputPersCount == '' || inputPersCount == 0 ? 1 : inputPersCount;
 					var Request = new URLParaQuery();
 					var foodPara = '';
 					for ( var i = 0; i < orderedData.root.length; i++) {
@@ -685,7 +689,6 @@ var orderedForm = new Ext.form.FormPanel({
 					} else {
 						type = 2;
 					}
-					var inputPersCount = dishesOrderNorthPanel.findById("tablePersonCount").getValue();
 					orderedForm.buttons[0].setDisabled(true);
 					orderedForm.buttons[1].setDisabled(true);
 					orderedForm.buttons[2].setDisabled(true);
@@ -1165,19 +1168,7 @@ var dishTasteWindow = new Ext.Window({
 				// dishTasteWindow.hide();
 				// 格式：[{編號,描述,價錢或比例,計算方式}]
 				choosenTaset.length = 0;
-//				orderedData[dishOrderCurrRowIndex_][10] = "0";
-//				orderedData[dishOrderCurrRowIndex_][16] = "0";
-//				orderedData[dishOrderCurrRowIndex_][17] = "0";
 				var ds = orderedStore.getAt(dishOrderCurrRowIndex_).data;
-				
-//				for(var i = 0; i < orderedData.root.length; i++){						
-//					if(orderedData.root[i].foodID == ds.foodID){
-//						orderedData.root[i].tasteID = 0;
-//						orderedData.root[i].tasteIDTwo = 0;
-//						orderedData.root[i].tasteIDThree = 0;
-//						break;
-//					}
-//				}
 				
 				dishTasteGridTas.getStore().each(function(record) {
 					if (record.get("tasteChoose")) {
@@ -1694,12 +1685,14 @@ var dishesDisplayGrid = new Ext.grid.GridPanel({
 				var kitchenNbr = dishesDisplayDataShow[rowIndex][4];
 
 				var isAlreadyOrderd = false;
-						
-				for ( var i = 0; i < orderedData.root.length; i++) {
-					if (orderedData.root[i].foodID == dishNbr && orderedData.root[i].status == 2) {
-						orderedData.root[i].count += 1;
-						isAlreadyOrderd = true;
-						break;
+				
+				if(typeof(orderedData) != 'undefined' && typeof(orderedData.root) != 'undefined' ){
+					for ( var i = 0; i < orderedData.root.length; i++) {
+						if (orderedData.root[i].foodID == dishNbr && orderedData.root[i].status == 2) {
+							orderedData.root[i].count += 1;
+							isAlreadyOrderd = true;
+							break;
+						}
 					}
 				}
 				if (isAlreadyOrderd == false) {
