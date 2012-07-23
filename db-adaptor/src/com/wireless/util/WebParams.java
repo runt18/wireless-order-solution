@@ -58,4 +58,11 @@ public class WebParams {
 	public final static byte GIFT = OrderFood.GIFT;				/* 赠送 */
 	public final static byte CUR_PRICE = OrderFood.CUR_PRICE;	/* 时价 */
 	
+	/**
+	 * 
+	 */
+	public final static byte ERROR_CODE = 0000;
+	public final static String ERROR_MSG = "";
+	public final static String ERROR_TITLE = "";
+	public final static long ERROR_LV = 0;
 }

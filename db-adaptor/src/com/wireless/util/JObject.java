@@ -14,11 +14,13 @@ import java.util.List;
 @SuppressWarnings({"rawtypes"})
 public class JObject {
 	
-	private boolean success = true;
-	private int totalProperty = 0;
-	private List root = new ArrayList();
-	private byte errCode = 0;
-	private String errMsg = "";
+	private boolean success = true;         		// 操作状态
+	private int totalProperty = 0;		    		// 数据数量
+	private List root = new ArrayList();			// 数据主体
+	private byte code = WebParams.ERROR_CODE;		// 错误码
+	private String msg = WebParams.ERROR_MSG;		// 错误提示信息
+	private String title = WebParams.ERROR_TITLE; 	// 错误信息标题
+	private long lv = WebParams.ERROR_LV;			// 错误等级
 	
 	public JObject(){}
 	
@@ -26,36 +28,62 @@ public class JObject {
 		this.totalProperty = totalProperty;
 		this.root = root;
 	}
-	
+
 	public boolean isSuccess() {
 		return success;
 	}
+
 	public void setSuccess(boolean success) {
 		this.success = success;
 	}
+
 	public int getTotalProperty() {
 		return totalProperty;
 	}
+
 	public void setTotalProperty(int totalProperty) {
 		this.totalProperty = totalProperty;
 	}
+
 	public List getRoot() {
 		return root;
 	}
+
 	public void setRoot(List root) {
 		this.root = root;
 	}
-	public byte getErrCode() {
-		return errCode;
+
+	public byte getCode() {
+		return code;
 	}
-	public void setErrCode(byte errCode) {
-		this.errCode = errCode;
+
+	public void setCode(byte code) {
+		this.code = code;
 	}
-	public String getErrMsg() {
-		return errMsg;
+
+	public String getMsg() {
+		return msg;
 	}
-	public void setErrMsg(String errMsg) {
-		this.errMsg = errMsg;
+
+	public void setMsg(String msg) {
+		this.msg = msg;
 	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public long getLv() {
+		return lv;
+	}
+
+	public void setLv(long lv) {
+		this.lv = lv;
+	}
+	
 		
 }
