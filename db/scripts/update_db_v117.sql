@@ -2,6 +2,22 @@
 USE wireless_order_db;
 
 -- -----------------------------------------------------
+-- Table `wireless_order_db`.`food_taste_rank`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`food_taste_rank` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food_taste_rank` (
+  `food_id` INT NULL DEFAULT NULL COMMENT 'the food id' ,
+  `taste_id` INT NULL DEFAULT NULL COMMENT 'the taste id' ,
+  `restaurant_id` INT NULL DEFAULT NULL COMMENT 'the restaurant id' ,
+  `rank` SMALLINT UNSIGNED NULL DEFAULT 0 COMMENT 'the rank of taste reference to this food. ' ,
+  INDEX `ix_food_id` (`food_id` ASC) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the rank of taste reference to each food' ;
+
+-- -----------------------------------------------------
 -- Table `wireless_order_db`.`food_taste`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `wireless_order_db`.`food_taste` ;
