@@ -34,6 +34,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -97,7 +98,18 @@ public class PickFoodActivity extends Activity implements PickFoodListView.OnFoo
 		}
 		
 		//返回Button
-		((ImageView)findViewById(R.id.pickFoodBackBtn)).setOnClickListener(new View.OnClickListener() {			
+		
+		TextView title = (TextView) findViewById(R.id.toptitle);
+		title.setVisibility(View.VISIBLE);
+		title.setText("点菜-编号");
+
+		TextView left = (TextView) findViewById(R.id.textView_left);
+		left.setText("返回");
+		left.setVisibility(View.VISIBLE);
+		
+		ImageButton back = (ImageButton) findViewById(R.id.btn_left);
+		back.setVisibility(View.VISIBLE);
+		back.setOnClickListener(new View.OnClickListener() {			
 			@Override
 			public void onClick(View v) {
 				onBackPressed();
@@ -106,7 +118,11 @@ public class PickFoodActivity extends Activity implements PickFoodListView.OnFoo
 		});
 		
 		//已点菜shortcut的响应事件
-		((ImageView)findViewById(R.id.foodHolderImgView)).setOnClickListener(new View.OnClickListener() {
+		
+		ImageButton next=(ImageButton)findViewById(R.id.btn_right);
+		next.setImageResource(R.drawable.popuwindow_selector);
+		next.setVisibility(View.VISIBLE);
+		next.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
@@ -134,7 +150,7 @@ public class PickFoodActivity extends Activity implements PickFoodListView.OnFoo
 			public void onViewChanged(int curScreen, View parent, View curView) {
 				_currentView = curView;
 				String tag = curView.getTag().toString();
-				((TextView)findViewById(R.id.pickFoodTxtView)).setText("点菜-" + tag.substring(0, 2));
+				((TextView)findViewById(R.id.toptitle)).setText("点菜-" + tag.substring(0, 2));
 				
 				_centerTxtView.setVisibility(View.INVISIBLE);
 				

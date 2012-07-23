@@ -1,6 +1,5 @@
 package com.wireless.ui;
 
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -12,6 +11,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -21,119 +21,147 @@ import com.wireless.common.Params;
 import com.wireless.lib.PinReader;
 
 public class FuncSettingActivity extends Activity {
-	
+
 	private ArrayAdapter<String> _adapter;
 	private ArrayAdapter<String> _timeAdapter;
-    private String _values[] = { "异步", "同步" };
-    private String _connectTimeouts[] = { "10秒", "15秒", "20秒" };
-        
-    Spinner _printSettingSpinner;
-    Spinner _connTimeoutSpinner;
-    private int _printSetting = Params.PRINT_ASYNC;
-    private int _connTimeout = Params.TIME_OUT_10s;
-    
+	private String _values[] = { "异步", "同步" };
+	private String _connectTimeouts[] = { "10秒", "15秒",
+			"20秒" };
+
+	Spinner _printSettingSpinner;
+	Spinner _connTimeoutSpinner;
+	private int _printSetting = Params.PRINT_ASYNC;
+	private int _connTimeout = Params.TIME_OUT_10s;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.function);
-		
-		_printSettingSpinner = (Spinner)findViewById(R.id.afterketchenmethod);
+
+		_printSettingSpinner = (Spinner) findViewById(R.id.afterketchenmethod);
 		// 将可选内容与ArrayAdapter连接起来
-		_adapter = new ArrayAdapter<String>(this, R.layout.spinner, _values);
+		_adapter = new ArrayAdapter<String>(this,
+				R.layout.spinner, _values);
 		// 设置下拉列表的风格
 		_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		// 将adapter 添加到spinner中
-		_printSettingSpinner.setAdapter(_adapter);		
-		//后厨打印设置中分为“同步”和“异步”
-		_printSettingSpinner.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
+		_printSettingSpinner.setAdapter(_adapter);
+		// 后厨打印设置中分为“同步”和“异步”
+		_printSettingSpinner
+				.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
 
-			@Override
-			public void onItemSelected(AdapterView<?> arg0, View view, int position, long rowID) {
-				if(rowID  == 0){
-					_printSetting = Params.PRINT_ASYNC;
-				}else if(rowID  == 1){
-					_printSetting = Params.PRINT_SYNC;
-				}else{
-					_printSetting = Params.PRINT_ASYNC;
-				}
-			}
-            
-			@Override
-			public void onNothingSelected(AdapterView<?> arg0) {
-				
-			}			
-		});	
-		
-		_connTimeoutSpinner = (Spinner)findViewById(R.id.connectiontime);
+					@Override
+					public void onItemSelected(
+							AdapterView<?> arg0, View view,
+							int position, long rowID) {
+						if (rowID == 0) {
+							_printSetting = Params.PRINT_ASYNC;
+						} else if (rowID == 1) {
+							_printSetting = Params.PRINT_SYNC;
+						} else {
+							_printSetting = Params.PRINT_ASYNC;
+						}
+					}
+
+					@Override
+					public void onNothingSelected(
+							AdapterView<?> arg0) {
+
+					}
+				});
+
+		_connTimeoutSpinner = (Spinner) findViewById(R.id.connectiontime);
 		// 将可选内容与ArrayAdapter连接起来
-		_timeAdapter = new ArrayAdapter<String>(this, R.layout.spinner, _connectTimeouts);
+		_timeAdapter = new ArrayAdapter<String>(this,
+				R.layout.spinner, _connectTimeouts);
 		// 设置下拉列表的风格
-		_timeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		_timeAdapter
+				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		// 将adapter 添加到spinner中
 		_connTimeoutSpinner.setAdapter(_timeAdapter);
 		// 超时链接分为10s, 15s, 20s
-		_connTimeoutSpinner.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
+		_connTimeoutSpinner
+				.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
 
-			@Override
-			public void onItemSelected(AdapterView<?> arg0, View view , int position, long rowID) {
-				if(rowID == 0){
-					_connTimeout = Params.TIME_OUT_10s;
-				}else if(rowID == 1){
-					_connTimeout = Params.TIME_OUT_15s;
-				}else if(rowID == 2){
-					_connTimeout = Params.TIME_OUT_20s;
-				}else{
-					_connTimeout = Params.TIME_OUT_10s;
-				}
-			}
-            
-			@Override
-			public void onNothingSelected(AdapterView<?> arg0) {
-				
-			}
-			
-		});			
-		
-		SharedPreferences sharedPreferences = getSharedPreferences(Params.PREFS_NAME, Context.MODE_WORLD_READABLE);
-		int printSetting = sharedPreferences.getInt(Params.PRINT_SETTING, Params.PRINT_ASYNC);
-		int timeout = sharedPreferences.getInt(Params.CONN_TIME_OUT, Params.TIME_OUT_10s);		
-				
+					@Override
+					public void onItemSelected(
+							AdapterView<?> arg0, View view,
+							int position, long rowID) {
+						if (rowID == 0) {
+							_connTimeout = Params.TIME_OUT_10s;
+						} else if (rowID == 1) {
+							_connTimeout = Params.TIME_OUT_15s;
+						} else if (rowID == 2) {
+							_connTimeout = Params.TIME_OUT_20s;
+						} else {
+							_connTimeout = Params.TIME_OUT_10s;
+						}
+					}
 
-		//显示后厨打印的设置
-		if(printSetting == Params.PRINT_ASYNC) {
+					@Override
+					public void onNothingSelected(
+							AdapterView<?> arg0) {
+
+					}
+
+				});
+
+		SharedPreferences sharedPreferences = getSharedPreferences(
+				Params.PREFS_NAME,
+				Context.MODE_WORLD_READABLE);
+		int printSetting = sharedPreferences.getInt(
+				Params.PRINT_SETTING, Params.PRINT_ASYNC);
+		int timeout = sharedPreferences.getInt(
+				Params.CONN_TIME_OUT, Params.TIME_OUT_10s);
+
+		// 显示后厨打印的设置
+		if (printSetting == Params.PRINT_ASYNC) {
 			_printSettingSpinner.setSelection(0);
-		}else{
+		} else {
 			_printSettingSpinner.setSelection(1);
 		}
 
-		//显示超时设定的设置
-		if(timeout == Params.TIME_OUT_10s) {
+		// 显示超时设定的设置
+		if (timeout == Params.TIME_OUT_10s) {
 			_connTimeoutSpinner.setSelection(0);
-		}else if(timeout == Params.TIME_OUT_15s) {
+		} else if (timeout == Params.TIME_OUT_15s) {
 			_connTimeoutSpinner.setSelection(1);
-		}else if(timeout == Params.TIME_OUT_20s){
+		} else if (timeout == Params.TIME_OUT_20s) {
 			_connTimeoutSpinner.setSelection(2);
-		}else{
+		} else {
 			_connTimeoutSpinner.setSelection(0);
 		}
-		
-		//显示PIN值
-		try{
+
+		// 显示PIN值
+		try {
 			String pin = PinReader.read();
-			((TextView)findViewById(R.id.pinnum)).setText("0x" + pin);
-			
-		}catch(FileNotFoundException e){
-			((TextView)findViewById(R.id.pinnum)).setText("PIN验证文件缺失");
-			
-		}catch(IOException e){
-			((TextView)findViewById(R.id.pinnum)).setText("读取PIN文件出错");
-		}	
+			((TextView) findViewById(R.id.pinnum))
+					.setText("0x" + pin);
+
+		} catch (FileNotFoundException e) {
+			((TextView) findViewById(R.id.pinnum))
+					.setText("PIN验证文件缺失");
+
+		} catch (IOException e) {
+			((TextView) findViewById(R.id.pinnum))
+					.setText("读取PIN文件出错");
+		}
 
 		/**
 		 * 返回Button
 		 */
-		((ImageView)findViewById(R.id.functionback)).setOnClickListener(new View.OnClickListener() {
-			
+		TextView title = (TextView) findViewById(R.id.toptitle);
+		title.setVisibility(View.VISIBLE);
+		title.setText("功能设置");
+
+		TextView left = (TextView) findViewById(R.id.textView_left);
+		left.setText("返回");
+		left.setVisibility(View.VISIBLE);
+
+		ImageButton back = (ImageButton) findViewById(R.id.btn_left);
+		back.setVisibility(View.VISIBLE);
+		back.setOnClickListener(new View.OnClickListener() {
+
 			@Override
 			public void onClick(View v) {
 				finish();
@@ -143,40 +171,56 @@ public class FuncSettingActivity extends Activity {
 		/**
 		 * 恢复默认Button
 		 */
-       ((ImageView)findViewById(R.id.convalescence)).setOnClickListener(new View.OnClickListener() {
-			
+		TextView right = (TextView) findViewById(R.id.textView_right);
+		right.setText("重置");
+		right.setVisibility(View.VISIBLE);
+
+		ImageButton next = (ImageButton) findViewById(R.id.btn_right);
+		next.setVisibility(View.VISIBLE);
+		next.setOnClickListener(new View.OnClickListener() {
+
 			@Override
 			public void onClick(View v) {
-				//((TextView)findViewById(R.id.pinnum)).setText("0x" + readfile());
+				// ((TextView)findViewById(R.id.pinnum)).setText("0x" +
+				// readfile());
 				_printSettingSpinner.setSelection(0);
-				_connTimeoutSpinner.setSelection(0);				
-			}
-		});  
-       
-       /**
-        * 确认Button
-        */
-       ((ImageView)findViewById(R.id.definite)).setOnClickListener(new View.OnClickListener() {			
-			@Override
-			public void onClick(View v) {
-				 Editor editor = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).edit();//获取编辑器
-				 editor.putInt(Params.PRINT_SETTING, _printSetting);
-				 editor.putInt(Params.CONN_TIME_OUT, _connTimeout);
-				 editor.commit();				
-				 Toast.makeText(FuncSettingActivity.this, "功能设置成功", 0).show();
-				 finish();
+				_connTimeoutSpinner.setSelection(0);
 			}
 		});
-      
-       /**
-        * 取消Button
-        */
-       ((ImageView)findViewById(R.id.cancle)).setOnClickListener(new View.OnClickListener() {			
-			@Override
-			public void onClick(View v) {
-				finish();
-			}
-		});	
-	}	
+
+		/**
+		 * 确认Button
+		 */
+		((ImageView) findViewById(R.id.definite))
+				.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						Editor editor = getSharedPreferences(
+								Params.PREFS_NAME,
+								Context.MODE_PRIVATE)
+								.edit();// 获取编辑器
+						editor.putInt(Params.PRINT_SETTING,
+								_printSetting);
+						editor.putInt(Params.CONN_TIME_OUT,
+								_connTimeout);
+						editor.commit();
+						Toast.makeText(
+								FuncSettingActivity.this,
+								"功能设置成功", 0).show();
+						finish();
+					}
+				});
+
+		/**
+		 * 取消Button
+		 */
+		((ImageView) findViewById(R.id.cancle))
+				.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						finish();
+					}
+				});
+	}
 
 }

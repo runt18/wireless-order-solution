@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  android:layout_width="fill_parent"
-  android:layout_height="fill_parent"
-  android:background="@drawable/bgcolor"
-  >
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/bgcolor" >
+    <!--
     <RelativeLayout 
 android:id="@+id/top"
 android:layout_width="fill_parent"
@@ -42,63 +41,64 @@ android:layout_centerHorizontal="true"
 
 
 </RelativeLayout>
+    -->
 
-<TextView 
-android:id="@+id/software"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:layout_centerHorizontal="true"
-android:layout_below="@id/top"
-android:layout_marginTop="10dip"
-android:textColor="#000000"
-android:textSize="18sp"
-android:typeface="sans"
-android:shadowDx="1"
-android:shadowDy="1"
-android:shadowRadius="0.5"
-/>
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
 
+        <include layout="@layout/topbar" />
 
+        <TextView
+            android:id="@+id/software"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dip"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="0.5"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            android:typeface="sans" />
 
+        <RelativeLayout
+            android:id="@+id/content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/software"
+            android:paddingBottom="20dip"
+            android:paddingLeft="10dip"
+            android:paddingRight="10dip"
+            android:paddingTop="20dip" >
 
-<RelativeLayout 
-android:id="@+id/content"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:paddingLeft="10dip"
-android:paddingTop="20dip"
-android:paddingRight="10dip"
-android:paddingBottom="20dip"
-android:layout_below="@id/software"
->
-<TextView 
-android:id="@+id/contents"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:layout_centerHorizontal="true"
-android:textColor="#000000"
-android:textSize="15sp"
-android:typeface="sans"
-android:shadowDx="1"
-android:shadowDy="1"
-android:shadowRadius="0.5"
-/>
-</RelativeLayout>
+            <TextView
+                android:id="@+id/contents"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="0.5"
+                android:textColor="#000000"
+                android:textSize="15sp"
+                android:typeface="sans" />
+        </RelativeLayout>
 
-
-<TextView 
-android:id="@+id/company"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:layout_centerHorizontal="true"
-android:layout_below="@id/content"
-android:textColor="#000000"
-android:textSize="18sp"
-android:typeface="sans"
-android:shadowDx="1"
-android:shadowDy="1"
-android:text="版权所有(c) 广州智易科技有限公司"
-android:shadowRadius="0.5"
-/>
+        <TextView
+            android:id="@+id/company"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/content"
+            android:layout_centerHorizontal="true"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="0.5"
+            android:text="版权所有(c) 广州智易科技有限公司"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            android:typeface="sans" />
+    </LinearLayout>
 
 </RelativeLayout>

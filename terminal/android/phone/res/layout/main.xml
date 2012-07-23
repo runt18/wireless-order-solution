@@ -2,8 +2,78 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@drawable/bgcolor"
-    >
+    android:background="@drawable/bgcolor" >
+
+    <include
+        android:id="@+id/top"
+        layout="@layout/topbar" />
+
+    <RelativeLayout
+        android:id="@+id/title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/top"
+        android:background="@drawable/bg02" >
+
+        <TextView
+            android:id="@+id/username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dip"
+            android:textColor="#000000"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+    <GridView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/gridview"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dip"
+        android:columnWidth="90dp"
+        android:gravity="center"
+        android:horizontalSpacing="10dp"
+        android:numColumns="3"
+            android:layout_below="@id/title"
+        
+        android:stretchMode="columnWidth"
+        android:verticalSpacing="10dp" >
+    </GridView>
+
+    <RelativeLayout
+        android:id="@+id/buttom"
+        android:layout_width="fill_parent"
+        android:layout_height="28dp"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/bg03" >
+
+        <ImageView
+            android:id="@+id/voice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="3dip"
+            android:src="@drawable/bulletin" />
+
+        <com.wireless.ui.view.MarqueeText
+            android:id="@+id/notice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/voice"
+            android:ellipsize="marquee"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:lines="1"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:scrollHorizontally="true"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp" />
+    </RelativeLayout>
+
+    <!--
 <RelativeLayout 
 android:id="@+id/top"
 android:layout_width="fill_parent"
@@ -11,6 +81,7 @@ android:layout_height="wrap_content"
 android:background="@drawable/bg01"
 android:layout_alignParentTop="true"
 >
+
 <TextView 
 android:id="@+id/toptitle"
 android:layout_width="wrap_content"
@@ -27,71 +98,6 @@ android:layout_centerHorizontal="true"
 >
 </TextView>
 </RelativeLayout>
+    -->
 
-<RelativeLayout 
-android:id="@+id/title"
-android:layout_width="fill_parent"
-android:layout_height="wrap_content"
-android:background="@drawable/bg02"
-android:layout_below="@id/top"
->
-<TextView
-android:id="@+id/username"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:textColor="#000000"
-android:textSize="20sp"
-android:textStyle="bold"
-android:layout_centerVertical="true"
-android:layout_marginLeft="10dip"
-></TextView>
-</RelativeLayout>
-
-<GridView xmlns:android="http://schemas.android.com/apk/res/android"   
-    android:id="@+id/gridview"  
-    android:layout_width="fill_parent"   
-    android:layout_height="wrap_content"  
-    android:numColumns="3"  
-    android:verticalSpacing="10dp"  
-    android:horizontalSpacing="10dp"  
-    android:columnWidth="90dp"  
-    android:stretchMode="columnWidth"  
-    android:gravity="center"  
-    android:layout_below="@id/title"
-    android:layout_marginTop="20dip"
-/>  
-
-<RelativeLayout 
-android:id="@+id/buttom"
-android:layout_width="fill_parent"
-android:layout_height="wrap_content"
-android:background="@drawable/bg03"
-android:layout_alignParentBottom="true"
->
-
-
-<ImageView 
-android:id="@+id/voice"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:layout_centerVertical="true"
-android:layout_marginLeft="3dip"
-android:src="@drawable/bulletin"
-/>
-<com.wireless.ui.view.MarqueeText
-    android:id="@+id/notice"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"        
-    android:textSize="15sp"        
-    android:textColor="#FFFFFF"
-    android:lines="1"
-    android:focusable="true"
-    android:focusableInTouchMode="true"
-    android:scrollHorizontally="true"  
-    android:marqueeRepeatLimit="marquee_forever"  
-    android:ellipsize="marquee"
-    android:layout_centerVertical="true"
-    android:layout_toRightOf="@id/voice"
-    />
-</RelativeLayout>
 </RelativeLayout>

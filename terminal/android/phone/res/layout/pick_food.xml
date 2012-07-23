@@ -4,8 +4,10 @@
     android:layout_height="fill_parent"
     android:background="@drawable/bgcolor"
     android:orientation="vertical" >
-
-    <RelativeLayout
+	   <include
+        android:id="@+id/top"
+        layout="@layout/topbar" />
+    <!-- <RelativeLayout
         android:id="@+id/pickFoodHeader"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -46,7 +48,7 @@
             android:layout_marginRight="20dip"
             android:src="@drawable/popuwindow_selector" >
         </ImageView>
-    </RelativeLayout>
+    </RelativeLayout> -->
 
     <LinearLayout
         android:id="@+id/pickFoodTabsLayout"
@@ -166,7 +168,7 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_above="@id/pickFoodTabsLayout"
-        android:layout_below="@id/pickFoodHeader"
+        android:layout_below="@id/top"
         android:layout_gravity="center" />
 
 </RelativeLayout>

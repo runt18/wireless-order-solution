@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/atopbar"
+    android:layout_width="fill_parent"
+    android:layout_height="42dp"
+    android:layout_alignParentTop="true"
+    android:background="@drawable/bg01"
+    android:gravity="top" >
+
+    <TextView
+        android:id="@+id/toptitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_gravity="center_vertical"
+        android:gravity="center"
+        android:includeFontPadding="true"
+        android:singleLine="true"
+        android:textColor="#FFFFFF"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:visibility="visible" />
+
+    <ImageButton
+        android:id="@+id/btn_left"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="8dip"
+        android:background="#00ffffff"
+        android:src="@drawable/back_selector"
+        android:textSize="11.0sp"
+        android:visibility="gone" />
+
+    <ImageButton
+        android:id="@+id/btn_right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/commit_selector"
+        android:layout_marginRight="8dip"
+        android:background="#00ffffff"
+        android:visibility="gone" />
+
+   <TextView
+       android:id="@+id/textView_left"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_alignLeft="@+id/btn_left"
+       android:layout_centerVertical="true"
+       android:layout_marginLeft="18dp"
+       android:text="TextView"
+       android:textColor="#FFFFFF"
+       android:textSize="18sp"
+       android:visibility="gone" />
+
+   <TextView
+       android:id="@+id/textView_right"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_alignRight="@+id/btn_right"
+       android:layout_centerVertical="true"
+       android:layout_marginRight="14dp"
+       android:text="text"
+       android:textColor="#FFFFFF"
+       android:textSize="18sp"
+       android:visibility="gone" />
+
+</RelativeLayout>

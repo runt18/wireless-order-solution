@@ -20,6 +20,7 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -61,10 +62,19 @@ public class PickTasteActivity extends Activity{
 		FoodParcel foodParcel = getIntent().getParcelableExtra(FoodParcel.KEY_VALUE);
 		_selectedFood = foodParcel;
 		
-		setContentView(R.layout.tastetable);		
+		setContentView(R.layout.tastetable);
 		
+		TextView title = (TextView) findViewById(R.id.toptitle);
+		title.setVisibility(View.VISIBLE);
+		title.setText("口味");
 		//返回按钮
-		((ImageView)findViewById(R.id.tasteback)).setOnClickListener(new View.OnClickListener() {
+		TextView left = (TextView) findViewById(R.id.textView_left);
+		left.setText("返回");
+		left.setVisibility(View.VISIBLE);
+		
+		ImageButton back = (ImageButton) findViewById(R.id.btn_left);
+		back.setVisibility(View.VISIBLE);
+		back.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
@@ -87,7 +97,7 @@ public class PickTasteActivity extends Activity{
 			@Override
 			public void onViewChanged(int curScreen, View parent, View curView) {
 				String tag = curView.getTag().toString();
-				((TextView)findViewById(R.id.tasteTitleTxtView)).setText(tag);
+				((TextView)findViewById(R.id.toptitle)).setText(tag);
 				
 				((LinearLayout)findViewById(R.id.tasteLayout)).setBackgroundResource(R.drawable.tab_bg_unselected);
 				((LinearLayout)findViewById(R.id.styleLayout)).setBackgroundResource(R.drawable.tab_bg_unselected);

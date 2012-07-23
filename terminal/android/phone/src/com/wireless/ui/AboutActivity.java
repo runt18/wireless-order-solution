@@ -3,7 +3,7 @@ package com.wireless.ui;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageView;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 public class AboutActivity extends Activity {
@@ -22,10 +22,18 @@ public class AboutActivity extends Activity {
 		
 		((TextView)findViewById(R.id.contents)).setText(R.string.content);
 		
+		TextView title=(TextView)findViewById(R.id.toptitle);
+		title.setVisibility(View.VISIBLE);
+		title.setText("关于");
 		/**
 		 * "返回"Button
 		 */
-		ImageView aboutback = ((ImageView)findViewById(R.id.aboutback));
+		TextView left=(TextView)findViewById(R.id.textView_left);
+		left.setText("返回");
+		left.setVisibility(View.VISIBLE);
+		
+		ImageButton aboutback = (ImageButton)findViewById(R.id.btn_left);
+		aboutback.setVisibility(View.VISIBLE);
 		aboutback.setOnClickListener(new View.OnClickListener(){
 
 			@Override

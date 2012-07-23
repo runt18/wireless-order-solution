@@ -23,7 +23,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.EditText;
-import android.widget.ImageView;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -63,7 +63,17 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 		/**
 		 * "返回"Button
 		 */
-		((ImageView)findViewById(R.id.orderback)).setOnClickListener(new View.OnClickListener(){
+		TextView title=(TextView)findViewById(R.id.toptitle);
+		title.setVisibility(View.VISIBLE);
+		title.setText("改单");
+		
+		TextView left=(TextView)findViewById(R.id.textView_left);
+		left.setText("返回");
+		left.setVisibility(View.VISIBLE);
+		
+		ImageButton back = (ImageButton)findViewById(R.id.btn_left);
+		back.setVisibility(View.VISIBLE);
+		back.setOnClickListener(new View.OnClickListener(){
 			@Override
 			public void onClick(View v) {
 				showExitDialog();
@@ -73,7 +83,13 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 		/**
 		 * "提交"Button
 		 */
-		((ImageView)findViewById(R.id.ordercommit)).setOnClickListener(new View.OnClickListener() {
+		TextView right=(TextView)findViewById(R.id.textView_right);
+		right.setText("提交");
+		right.setVisibility(View.VISIBLE);
+		
+		ImageButton next=(ImageButton)findViewById(R.id.btn_right);
+		next.setVisibility(View.VISIBLE);
+		next.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				/**

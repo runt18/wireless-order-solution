@@ -3,7 +3,10 @@
 	android:background="@drawable/bgcolor" android:layout_width="fill_parent"
 	android:layout_height="fill_parent"
 	>
-	<RelativeLayout android:id="@+id/top"
+	   <include
+        android:id="@+id/top"
+        layout="@layout/topbar" />
+	<!-- <RelativeLayout android:id="@+id/top"
 		android:layout_width="fill_parent" android:layout_height="wrap_content"
 		android:background="@drawable/bg01" android:layout_alignParentTop="true">
 		<ImageView android:id="@+id/orderback" android:layout_width="wrap_content"
@@ -25,7 +28,7 @@
 			android:layout_alignParentRight="true" android:layout_marginRight="20dip">
 
 		</ImageView>
-	</RelativeLayout>
+	</RelativeLayout> -->
 	<RelativeLayout android:id="@+id/restitle"
 		android:layout_width="fill_parent" android:layout_height="wrap_content"
 		android:layout_below="@id/top"

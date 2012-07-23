@@ -4,8 +4,10 @@
     android:layout_height="fill_parent"
     android:background="@drawable/bgcolor"
     android:orientation="vertical" >
-
-    <RelativeLayout
+	   <include
+        android:id="@+id/top"
+        layout="@layout/topbar" />
+    <!-- <RelativeLayout
         android:id="@+id/tasteHeader"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -36,13 +38,13 @@
             android:textStyle="bold"
             android:typeface="monospace" >
         </TextView>
-    </RelativeLayout>
+    </RelativeLayout> -->
 
     <RelativeLayout
         android:id="@+id/foodTaste"
         android:layout_width="fill_parent"
         android:layout_height="40dip"
-        android:layout_below="@id/tasteHeader" >
+        android:layout_below="@id/top" >
 
         <TextView
             android:id="@+id/foodTasteTxtView"

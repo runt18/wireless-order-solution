@@ -4,6 +4,11 @@
     android:layout_height="fill_parent"
     android:background="@drawable/bgcolor" >
 
+    <include
+        android:id="@+id/top"
+        layout="@layout/topbar" />
+
+    <!--
     <RelativeLayout
         android:id="@+id/top"
         android:layout_width="fill_parent"
@@ -35,6 +40,7 @@
             android:typeface="monospace" >
         </TextView>
     </RelativeLayout>
+    -->
 
     <RelativeLayout
         android:id="@+id/restitle"
