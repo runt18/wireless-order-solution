@@ -8,8 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
-import sun.jdbc.odbc.OdbcDef;
-
 import com.wireless.db.DBCon;
 import com.wireless.db.QueryMenu;
 import com.wireless.db.VerifyPin;
@@ -64,7 +62,7 @@ public class QueryBackFood {
 			 * Get all the basic info to department 
 			 */
 			HashMap<Department, BackFood> deptBackFoodDetail = new HashMap<Department, BackFood>();
-			Department[] departmentDetail = QueryMenu.queryDepartments(dbCon, term.restaurantID, null, null);
+			Department[] departmentDetail = QueryMenu.queryDepartments(dbCon, "DEPT.restaurant_id=" + term.restaurantID, null);
 			for(Department dept : departmentDetail){
 				deptBackFoodDetail.put(dept, new BackFood(dept.name, ""));
 			}
