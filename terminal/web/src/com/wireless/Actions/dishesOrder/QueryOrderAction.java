@@ -161,44 +161,44 @@ public class QueryOrderAction extends Action {
 
 			if (e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
 				jobject.setSuccess(false);
-				jobject.setErrCode(ErrorCode.TERMINAL_NOT_ATTACHED);
-				jobject.setErrMsg("没有获取到餐厅信息,请重新确认!");
+				jobject.setCode(ErrorCode.TERMINAL_NOT_ATTACHED);
+				jobject.setMsg("没有获取到餐厅信息,请重新确认!");
 				e.printStackTrace();
 				jsonResp = jsonResp.replace("$(result)", "false");
 				jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");
 
 			} else if (e.errCode == ErrorCode.TABLE_NOT_EXIST) {
 				jobject.setSuccess(false);
-				jobject.setErrCode(ErrorCode.TABLE_NOT_EXIST);
-				jobject.setErrMsg(tableID + "号餐台信息不存在,请重新确认!");
+				jobject.setCode(ErrorCode.TABLE_NOT_EXIST);
+				jobject.setMsg(tableID + "号餐台信息不存在,请重新确认!");
 				e.printStackTrace();
 				jsonResp = jsonResp.replace("$(result)", "false");
 				jsonResp = jsonResp.replace("$(value)", tableID + "号餐台信息不存在，请重新确认");
 
 			} else if (e.errCode == ErrorCode.TABLE_IDLE) {
 				jobject.setSuccess(true);
-				jobject.setErrCode(ErrorCode.TABLE_IDLE);
-				jobject.setErrMsg(null);
+				jobject.setCode(ErrorCode.TABLE_IDLE);
+				jobject.setMsg(null);
 				jsonResp = jsonResp.replace("$(result)", "true");
 				jsonResp = jsonResp.replace("$(value)", "NULL");
 
 			} else if (e.errCode == ErrorCode.MENU_EXPIRED) {
 				jobject.setSuccess(false);
-				jobject.setErrCode(ErrorCode.MENU_EXPIRED);
-				jobject.setErrMsg("菜谱信息与服务器不匹配,请与餐厅负责人确认或重新更新菜谱!");
+				jobject.setCode(ErrorCode.MENU_EXPIRED);
+				jobject.setMsg("菜谱信息与服务器不匹配,请与餐厅负责人确认或重新更新菜谱!");
 				jsonResp = jsonResp.replace("$(result)", "false");
 				jsonResp = jsonResp.replace("$(value)", "菜谱信息与服务器不匹配，请与餐厅负责人确认或重新更新菜谱");
 
 			} else if (e.errCode == ErrorCode.ORDER_NOT_EXIST) {
 				jobject.setSuccess(false);
-				jobject.setErrCode(ErrorCode.ORDER_NOT_EXIST);
-				jobject.setErrMsg(orderID + "号账单信息不存在,请重新确认!");
+				jobject.setCode(ErrorCode.ORDER_NOT_EXIST);
+				jobject.setMsg(orderID + "号账单信息不存在,请重新确认!");
 				jsonResp = jsonResp.replace("$(result)", "false");
 				jsonResp = jsonResp.replace("$(value)", orderID + "号账单信息不存在，请重新确认");
 
 			} else {
 				jobject.setSuccess(false);
-				jobject.setErrMsg("没有获取到" + tableID + "号餐台的账单信息,请重新确认!");
+				jobject.setMsg("没有获取到" + tableID + "号餐台的账单信息,请重新确认!");
 				e.printStackTrace();
 				jsonResp = jsonResp.replace("$(result)", "false");
 				jsonResp = jsonResp.replace("$(value)", "没有获取到" + tableID + "号餐台的账单信息，请重新确认");
@@ -207,7 +207,7 @@ public class QueryOrderAction extends Action {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			jobject.setSuccess(false);
-			jobject.setErrMsg("数据库请求发生错误,请确认网络是否连接正常!");
+			jobject.setMsg("数据库请求发生错误,请确认网络是否连接正常!");
 			jsonResp = jsonResp.replace("$(result)", "false");
 			jsonResp = jsonResp.replace("$(value)", "数据库请求发生错误，请确认网络是否连接正常");
 

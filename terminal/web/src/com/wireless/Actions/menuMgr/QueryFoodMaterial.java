@@ -4,14 +4,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONObject;
-import net.sf.json.JsonConfig;
 
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -20,14 +18,14 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.QueryMenu;
 import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.menuMgr.FoodMaterial;
 import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.Food;
 import com.wireless.protocol.Terminal;
-import com.wireless.protocol.Util;
+import com.wireless.util.JObject;
 
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class QueryFoodMaterial extends Action {
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -35,14 +33,12 @@ public class QueryFoodMaterial extends Action {
 			throws Exception {
 
 		DBCon dbCon = new DBCon();
-
 		PrintWriter out = null;
-
+		
 		List resultList = new ArrayList();
-		HashMap rootMap = new HashMap();
-
-		boolean isError = false;
-
+		FoodMaterial item = null;
+		JObject jobject = new JObject();
+		
 		try {
 			// 解决后台中文传到前台乱码
 			response.setContentType("text/json; charset=utf-8");
@@ -71,7 +67,7 @@ public class QueryFoodMaterial extends Action {
 
 			String foodID = request.getParameter("foodID");
 
-			String sql = " SELECT A.material_id, B.material_alias, B.name, A.consumption "
+			String sql = " SELECT A.material_id, B.material_alias, B.name, A.consumption, B.cate_id "
 					+ " FROM "
 					+ Params.dbName
 					+ ".food_material A, "
@@ -86,73 +82,50 @@ public class QueryFoodMaterial extends Action {
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 
 			while (dbCon.rs.next()) {
-				HashMap resultMap = new HashMap();
-				/**
-				 *
-				 */
-				resultMap.put("materialID", dbCon.rs.getInt("material_id"));
-				resultMap.put("materialNumber",
-						dbCon.rs.getInt("material_alias"));
-				resultMap.put("materialName", dbCon.rs.getString("name"));
-				resultMap.put("materialCost", dbCon.rs.getFloat("consumption"));
-
-				resultMap.put("message", "normal");
-
-				resultList.add(resultMap);
-
-			}
-
-			if (resultList.size() == 0) {
-				HashMap resultMap = new HashMap();
-				resultMap.put("materialNumber", "NO_DATA");
-				resultMap.put("message", "normal");
-				resultList.add(resultMap);
+//				HashMap resultMap = new HashMap();
+//				resultMap.put("materialID", dbCon.rs.getInt("material_id"));
+//				resultMap.put("materialNumber", dbCon.rs.getInt("material_alias"));
+//				resultMap.put("materialName", dbCon.rs.getString("name"));
+//				resultMap.put("materialCost", dbCon.rs.getFloat("consumption"));
+				item = new FoodMaterial();
+				item.setMaterialId(dbCon.rs.getInt("material_id"));
+				item.setMaterialAlias(dbCon.rs.getInt("material_alias"));
+				item.setCateId(dbCon.rs.getInt("cate_id"));
+				item.setMaterialName(dbCon.rs.getString("name"));
+				item.setConsumption(dbCon.rs.getFloat("consumption"));
+				resultList.add(item);
 			}
 
 			dbCon.rs.close();
 
 		} catch (BusinessException e) {
 			e.printStackTrace();
-			HashMap resultMap = new HashMap();
+			jobject.setCode(e.errCode);
+			jobject.setSuccess(false);
 			if (e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
-				resultMap.put("message", "没有获取到餐厅信息，请重新确认");
+				jobject.setMsg("没有获取到餐厅信息，请重新确认");
 			} else if (e.errCode == ErrorCode.TERMINAL_EXPIRED) {
-				resultMap.put("message", "终端已过期，请重新确认");
+				jobject.setMsg("终端已过期，请重新确认");
 			} else {
-				resultMap.put("message", "没有获取到信息，请重新确认");
+				jobject.setMsg("没有获取到信息，请重新确认");
 			}
-			resultList.add(resultMap);
-			isError = true;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			HashMap resultMap = new HashMap();
-			resultMap.put("message", "数据库请求发生错误，请确认网络是否连接正常");
-			resultList.add(resultMap);
-			isError = true;
+			jobject.setSuccess(false);
+			jobject.setMsg("数据库请求发生错误，请确认网络是否连接正常");
 		} catch (IOException e) {
 			e.printStackTrace();
-			HashMap resultMap = new HashMap();
-			resultMap.put("message", "数据库请求发生错误，请确认网络是否连接正常");
-			resultList.add(resultMap);
-			isError = true;
+			jobject.setSuccess(false);
+			jobject.setMsg("数据库请求发生错误，请确认网络是否连接正常");
 		} finally {
 			dbCon.disconnect();
-
-			if (isError) {
-				rootMap.put("root", resultList);
-			} else {
-				rootMap.put("root", resultList);
-			}
-
-			JsonConfig jsonConfig = new JsonConfig();
-
-			JSONObject obj = JSONObject.fromObject(rootMap, jsonConfig);
-
-			String outputJson = obj.toString();
-
-			//System.out.println(outputJson);
-
-			out.write(outputJson);
+			
+			jobject.setTotalProperty(resultList.size());
+			jobject.setRoot(resultList);
+			
+			JSONObject obj = JSONObject.fromObject(jobject);
+			
+			out.write(obj.toString());
 
 		}
 		return null;
