@@ -170,7 +170,6 @@ var viewBillWin = new Ext.Window({
 				},
 				success : function(response, options) {
 					var resultJSON = Ext.util.JSON.decode(response.responseText);					
-//					alert(response.responseText);
 					if (resultJSON.success == true) {
 //						if (resultJSON.data != "NULL") {
 //							var totalDiscount = 0.0;
@@ -216,10 +215,8 @@ var viewBillWin = new Ext.Window({
 						viewBillStore.loadData(viewBillData);
 						
 					} else {
-						var dataInfo = resultJSON.data;
-						// Ext.Msg.alert(tableData);
 						Ext.MessageBox.show({
-							msg : dataInfo,
+							msg : resultJSON.msg,
 							width : 300,
 							buttons : Ext.MessageBox.OK
 						});

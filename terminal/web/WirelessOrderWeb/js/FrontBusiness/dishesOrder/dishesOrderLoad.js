@@ -316,10 +316,8 @@ function orderedDishesOnLoad() {
 					dishGridRefresh();
 //				}
 				} else {
-					var dataInfo = resultJSON.data;
-					// Ext.Msg.alert(tableData);
 					Ext.MessageBox.show({
-						msg : dataInfo,
+						msg : resultJSON.msg,
 						width : 300,
 						buttons : Ext.MessageBox.OK
 					});

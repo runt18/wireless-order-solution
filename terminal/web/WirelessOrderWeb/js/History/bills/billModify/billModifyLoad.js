@@ -135,8 +135,7 @@ function billModifyOnLoad() {
 					"queryType": "History"
 				},
 				success : function(response, options) {
-					var resultJSON = Ext.util.JSON
-							.decode(response.responseText);
+					var resultJSON = Ext.util.JSON.decode(response.responseText);
 					if (resultJSON.success == true) {
 						if (resultJSON.data != "NULL") {
 							var josnData = resultJSON.data;
@@ -224,10 +223,8 @@ function billModifyOnLoad() {
 							orderedStore.reload();
 						}
 					} else {
-						var dataInfo = resultJSON.data;
-						// Ext.Msg.alert(tableData);
 						Ext.MessageBox.show({
-							msg : dataInfo,
+							msg : resultJSON.msg,
 							width : 300,
 							buttons : Ext.MessageBox.OK
 						});

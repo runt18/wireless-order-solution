@@ -9,29 +9,26 @@
 			"foodID" : foodID
 		},
 		success : function(response, options) {
-			var resultJSON = Ext.util.JSON.decode(response.responseText);
-			var root = resultJSON.root;
-			if (root[0].message == "normal") {
-				materialData.length = 0;
-				if (root.length == 1 && root[0].materialNumber == "NO_DATA") {
-				} else {
-					for ( var i = 0; i < root.length; i++) {
-						materialData.push([ root[i].materialID,
-								root[i].materialNumber, root[i].materialName,
-								root[i].materialCost ]);
-					}
-				}
-				materialStore.reload();
-			} else {
+			var jsonResult = Ext.util.JSON.decode(response.responseText);
+			if(eval(jsonResult.success) == true){
+				materialStore.loadData(jsonResult);
+			}else{
 				Ext.MessageBox.show({
-					msg : root[0].message,
+					title : '错误提示',
+					msg : String.format('错误号:{0},错误信息:{1}', jsonResult.errCode, jsonResult.errMsg),
 					width : 300,
 					buttons : Ext.MessageBox.OK
 				});
 			}
-
 		},
 		failure : function(response, options) {
+			var jsonResult = Ext.util.JSON.decode(response.responseText);
+			Ext.MessageBox.show({
+				title : '错误提示',
+				msg : String.format('错误号:{0},错误信息:{1}', jsonResult.errCode, jsonResult.errMsg),
+				width : 300,
+				buttons : Ext.MessageBox.OK
+			});
 		}
 	});
 }

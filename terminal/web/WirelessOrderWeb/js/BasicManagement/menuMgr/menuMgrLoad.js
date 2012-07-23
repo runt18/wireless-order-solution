@@ -1,7 +1,6 @@
 ﻿function loadAllMaterial() {
 	materialComboData = [];
-	Ext.Ajax
-			.request({
+	Ext.Ajax.request({
 				url : "../../QueryMaterialMgr.do",
 				params : {
 					"pin" : pin,
@@ -129,8 +128,8 @@ function menuMgrOnLoad() {
 	// update the operator name
 	getOperatorName(pin, "../../");
 
-	searchForm.remove("conditionText");
-	operatorComb.setDisabled(true);
+//	searchForm.remove("conditionText");
+//	operatorComb.setDisabled(true);
 
 	// 獲取廚房信息，以便顯示廚房描述
 	// 后台：[厨房编号,"厨房名称",一般折扣1,一般折扣2,一般折扣3,会员折扣1,会员折扣2,会员折扣3]

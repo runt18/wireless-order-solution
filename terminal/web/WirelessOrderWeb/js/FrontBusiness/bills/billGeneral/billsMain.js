@@ -236,9 +236,8 @@ var viewBillWin = new Ext.Window({
 						Ext.getDom('discountBV').innerHTML = "￥" + totalDiscount.toFixed(2);
 						viewBillStore.loadData(viewBillData);
 					} else {
-						var dataInfo = resultJSON.data;						
 						Ext.MessageBox.show({
-							msg : dataInfo,
+							msg : resultJSON.msg,
 							width : 300,
 							buttons : Ext.MessageBox.OK
 						});

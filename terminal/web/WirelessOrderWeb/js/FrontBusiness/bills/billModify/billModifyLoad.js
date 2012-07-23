@@ -170,9 +170,8 @@ function billModifyOnLoad() {
 				orderedStore.loadData(orderedData);
 			
 			} else {
-				var dataInfo = resultJSON.data;			
 				Ext.MessageBox.show({
-					msg : dataInfo,
+					msg : resultJSON.msg,
 					width : 300,
 					buttons : Ext.MessageBox.OK
 				});

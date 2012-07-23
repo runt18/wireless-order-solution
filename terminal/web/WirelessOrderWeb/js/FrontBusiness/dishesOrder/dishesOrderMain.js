@@ -1,4 +1,4 @@
-﻿// dish count input pop window
+﻿
 dishCountInputWin = new Ext.Window({
 	layout : "fit",
 	width : 200,
