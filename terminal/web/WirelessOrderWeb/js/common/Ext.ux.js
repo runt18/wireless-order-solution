@@ -14,7 +14,7 @@
 Ext.ux.txtFormat = {
 	barMsg : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{0}:&nbsp;<span id="{1}" style="color:green; font-size:15px; font-weight:bold;">{2}</span>',
 	barSum : '<span style="font-weight:bold; font-size:13px;">总计</span>',
-	typeName : '类别:&nbsp;<span id="{0}" style="color:green; font-weight:bold; font-size:13px;">{1}</span>',
+	typeName : '<div style="float:left; width:100px;">&nbsp;类别:&nbsp;<span id="{0}" style="color:green; font-weight:bold; font-size:13px;">{1}</span></div>',
 	linkClassOne : '<a id="{0}" href="{1}" onClick="{2}" style="color:green; font-size:15px; font-weight:bold;">{3}</a>',
 	gridDou : function(_v){
 		return _v != '' ? (parseFloat(_v).toFixed(2) + '&nbsp;&nbsp;') : _v;
