@@ -348,6 +348,8 @@
 		</action>
 		<action path="/SalesSubStatistics" type="com.wireless.Actions.billHistory.SalesSubStatisticsAction" scope="request"></action>
 		<action path="/QueryDeptTree" type="com.wireless.Actions.deptMgr.QueryDeptTreeAction" scope="request"></action>
+		<action path="/QueryBackFood" type="com.wireless.Actions.billHistory.QueryBackFoodAction" scope="request"></action>
+		<action path="/UpdateFoodMaterial" type="com.wireless.Actions.menuMgr.UpdateFoodMaterialAction" scope="request"></action>
 	</action-mappings>
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
 </struts-config>
