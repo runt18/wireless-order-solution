@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#fff" >
+
+    <include
+        android:id="@+id/top"
+        layout="@layout/topbar" />
+
+    <!--  -->
+
+    <RelativeLayout
+        android:id="@+id/search_table"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/top"
+        android:background="@drawable/bg02" >
+
+        <AutoCompleteTextView
+            android:id="@+id/autoCompleteTextView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:ems="10"
+            android:hint="输入台号" />
+
+        <ImageButton
+            android:id="@+id/imageButton1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            android:background="#00ffffff"
+            android:src="@drawable/adddown" />
+    </RelativeLayout>
+
+    <com.wireless.ui.view.PullListView
+        android:id="@+id/listView_table"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/arelativeLayout1"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/search_table"
+        android:fadingEdge="vertical"
+        android:fadingEdgeLength="4dp" >
+
+     </com.wireless.ui.view.PullListView>
+
+        <RelativeLayout
+            android:id="@+id/arelativeLayout1"
+            android:layout_width="match_parent"
+            android:layout_height="34dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:background="@drawable/bg01"
+             >
+
+        <ImageButton
+            android:id="@+id/left_btn_bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#00ffff"
+            android:src="@drawable/bg09down" />
+
+
+
+
+
+
+        <ImageButton
+            android:id="@+id/middle_btn_bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="false"
+            android:layout_alignParentRight="true"
+            android:background="#00ffff"
+            android:src="@drawable/amountdown" />
+
+
+        <ImageButton
+            android:id="@+id/right_btn_bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:background="#00ffff"
+            android:src="@drawable/bg10" />
+
+
+        <TextView
+            android:id="@+id/text3_bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:background="@drawable/hint"
+            android:text="67"
+            android:textColor="#fff"
+            android:textSize="18sp"
+            android:visibility="gone" />
+
+
+        <TextView
+            android:id="@+id/text2_bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignRight="@+id/right_btn_bottom"
+            android:background="@drawable/hint"
+            android:text="67"
+            android:textColor="#fff"
+            android:textSize="18sp"
+            android:visibility="gone" />
+
+
+
+        <TextView
+            android:id="@+id/text1_bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignRight="@+id/left_btn_bottom"
+            android:background="@drawable/hint"
+            android:text="67"
+            android:textColor="#fff"
+            android:visibility="gone" />
+
+    </RelativeLayout>
+
+  
+    
+</RelativeLayout>
