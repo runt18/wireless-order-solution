@@ -2,7 +2,7 @@ package com.wireless.pojo.dishesOrder;
 
 import java.text.SimpleDateFormat;
 
-public class BackFood {
+public class CancelledFood {
 	private long orderID;           // 账单号
 	private long orderDate;			// 账单时间
 	private long foodID;			// 食品编号
@@ -16,9 +16,9 @@ public class BackFood {
 	private long reasonID;			// 退菜原因编号
 	private String reason;			// 退菜原因
 	
-	public BackFood(){}
+	public CancelledFood(){}
 	
-	public BackFood(String deptName, String foodName){
+	public CancelledFood(String deptName, String foodName){
 		this.deptName = deptName;
 		this.foodName = foodName;
 	}
