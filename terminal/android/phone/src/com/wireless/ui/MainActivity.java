@@ -239,7 +239,7 @@ public class MainActivity extends Activity {
 					break;
 
 				case 8:
-					Intent intent = new Intent(MainActivity.this, AboutActivity.class);
+					Intent intent = new Intent(MainActivity.this, TableActivity.class);
 					startActivity(intent);
 					break;
 				}

@@ -32,14 +32,17 @@ import android.widget.TextView;
 import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
 import com.wireless.lib.PinReader;
+
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.PinGen;
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqOTAUpdate;
 import com.wireless.protocol.ReqPackage;
 import com.wireless.protocol.ReqQueryMenu;
+import com.wireless.protocol.ReqQueryRegion;
 import com.wireless.protocol.ReqQueryRestaurant;
 import com.wireless.protocol.ReqQueryStaff;
+import com.wireless.protocol.ReqQueryTable;
 import com.wireless.protocol.RespParser;
 import com.wireless.protocol.Terminal;
 import com.wireless.protocol.Type;
@@ -358,6 +361,124 @@ public class StartupActivity extends Activity {
 								}).show();
 
 			} else {
+				new QueryRegionTask().execute();
+			}
+		}
+	}
+	
+	/**
+	 * 请求查询区域信息
+	 */
+	private class QueryRegionTask extends AsyncTask<Void, Void, String>{
+		/**
+		 * 在执行请求区域信息前显示提示信息
+		 */
+		@Override
+		protected void onPreExecute(){			
+			_msgTxtView.setText("更新区域信息...请稍候");
+		}
+		
+		/**
+		 * 在新的线程中执行请求区域信息的操作
+		 */
+		@Override
+		protected String doInBackground(Void... arg0) {
+		
+			String errMsg = null;
+			try{
+				WirelessOrder.regions = null;
+				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryRegion());
+				if(resp.header.type == Type.ACK){
+					WirelessOrder.regions = RespParser.parseQueryRegion(resp);
+				}
+			}catch(IOException e){
+				errMsg = e.getMessage();
+			}
+			
+			return errMsg;
+		}
+		
+		/**
+		 * 根据返回的error message判断，如果发错异常则提示用户，
+		 * 如果成功，则执行请求餐台的操作。
+		 */
+		@Override
+		protected void onPostExecute(String errMsg){
+			/**
+			 * Prompt user message if any error occurred.
+			 */		
+			if(errMsg != null){
+				new AlertDialog.Builder(StartupActivity.this)
+				.setTitle("提示")
+				.setMessage(errMsg)
+				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						Intent intent = new Intent(StartupActivity.this, MainActivity.class);
+						startActivity(intent);
+						finish();
+					}
+				}).show();
+				
+			}else{				
+				new QueryTableTask().execute();
+			}
+		}
+	};
+	
+	/**
+	 * 请求餐台信息
+	 */
+	private class QueryTableTask extends AsyncTask<Void, Void, String>{
+		/**
+		 * 在执行请求区域信息前显示提示信息
+		 */
+		@Override
+		protected void onPreExecute(){			
+			_msgTxtView.setText("更新餐台信息...请稍候");
+		}
+		
+		/**
+		 * 在新的线程中执行请求餐台信息的操作
+		 */
+		@Override
+		protected String doInBackground(Void... arg0) {
+		
+			String errMsg = null;
+			try{
+				WirelessOrder.tables = null;
+				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryTable());
+				if(resp.header.type == Type.ACK){
+					WirelessOrder.tables = RespParser.parseQueryTable(resp);
+				}
+			}catch(IOException e){
+				errMsg = e.getMessage();
+			}
+			
+			return errMsg;
+		}
+		
+		/**
+		 * 根据返回的error message判断，如果发错异常则提示用户，
+		 * 如果成功，则执行请求餐厅的操作。
+		 */
+		@Override
+		protected void onPostExecute(String errMsg){
+			/**
+			 * Prompt user message if any error occurred.
+			 */		
+			if(errMsg != null){
+				new AlertDialog.Builder(StartupActivity.this)
+				.setTitle("提示")
+				.setMessage(errMsg)
+				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						Intent intent = new Intent(StartupActivity.this, MainActivity.class);
+						startActivity(intent);
+						finish();
+					}
+				}).show();
+				
+			}else{				
 				new QueryRestaurantTask().execute();
 			}
 		}
