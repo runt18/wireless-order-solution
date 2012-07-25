@@ -14,11 +14,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -124,87 +122,46 @@ public class NetworkSettingActivity extends Activity {
 			}
 		});
 
-		/*
+		/**
 		 * 确认Button
 		 */
-		((ImageView) findViewById(R.id.netdefinite))
-				.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						// 保存信息到文件里面
-						Editor editor = getSharedPreferences(
-								Params.PREFS_NAME,
-								Context.MODE_PRIVATE)
-								.edit();// 获取编辑器
-						editor.putString(Params.IP_ADDR,
-								_ipEdtTxt.getText()
-										.toString());
-						editor.putInt(
-								Params.IP_PORT,
-								Integer.parseInt(_portEdtTxt
-										.getText()
-										.toString()));
-						editor.putString(Params.APN,
-								_apnEdtTxt.getText()
-										.toString());
-						editor.putString(Params.USER_NAME,
-								_userEdtTxt.getText()
-										.toString());
-						editor.putString(Params.PWD,
-								_pwdEdtTxt.getText()
-										.toString());
-						// 提交修改
-						editor.commit();
+		((ImageView) findViewById(R.id.netdefinite)).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// 保存信息到文件里面
+				Editor editor = getSharedPreferences(Params.PREFS_NAME,	Context.MODE_PRIVATE).edit();// 获取编辑器
+				editor.putString(Params.IP_ADDR, _ipEdtTxt.getText().toString());
+				editor.putInt(Params.IP_PORT, Integer.parseInt(_portEdtTxt.getText().toString()));
+				editor.putString(Params.APN, _apnEdtTxt.getText().toString());
+				editor.putString(Params.USER_NAME,	_userEdtTxt.getText().toString());
+				editor.putString(Params.PWD, _pwdEdtTxt.getText().toString());
+				// 提交修改
+				editor.commit();
 
-						ServerConnector
-								.instance()
-								.setNetAddr(
-										_ipEdtTxt.getText()
-												.toString());
-						ServerConnector
-								.instance()
-								.setNetPort(
-										Integer.parseInt(_portEdtTxt
-												.getText()
-												.toString()));
-
-						Toast.makeText(
-								NetworkSettingActivity.this,
-								"网络设置成功", 0).show();
-						if (!_address.equals(_ipEdtTxt
-								.getText().toString())
-								|| !String
-										.valueOf(_port)
-										.equals(_portEdtTxt
-												.getText()
-												.toString())
-								|| !_apn.equals(_apnEdtTxt
-										.getText()
-										.toString())
-								|| !_username
-										.equals(_userEdtTxt
-												.getText()
-												.toString())
-								|| !_password
-										.equals(_pwdEdtTxt
-												.getText()
-												.toString())) {
-							setResult(RESULT_OK);
-						}
-						finish();
-					}
-				});
+				ServerConnector.instance().setNetAddr(_ipEdtTxt.getText().toString());
+				ServerConnector.instance().setNetPort(Integer.parseInt(_portEdtTxt.getText().toString()));
+				
+				Toast.makeText(NetworkSettingActivity.this,	"网络设置成功", Toast.LENGTH_SHORT).show();
+				if (!_address.equals(_ipEdtTxt.getText().toString()) || 
+					!String.valueOf(_port).equals(_portEdtTxt.getText().toString())	|| 
+					!_apn.equals(_apnEdtTxt.getText().toString()) || 
+					!_username.equals(_userEdtTxt.getText().toString())	|| 
+					!_password.equals(_pwdEdtTxt.getText().toString())) {
+					setResult(RESULT_OK);
+				}
+				finish();
+			}
+		});
 
 		/**
 		 * 取消按钮
 		 */
-		((ImageView) findViewById(R.id.netcancle))
-				.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						finish();
-					}
-				});
+		((ImageView) findViewById(R.id.netcancle)).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				finish();
+			}
+		});
 	}
 
 	/**
@@ -245,25 +202,21 @@ public class NetworkSettingActivity extends Activity {
 		protected void onPostExecute(String result) {
 			if (_errMsg != null) {
 				_progDialog.dismiss();
-				new AlertDialog.Builder(
-						NetworkSettingActivity.this)
-						.setTitle("提示")
-						.setMessage(_errMsg)
-						.setNegativeButton("返回", null)
-						.setOnKeyListener(
-								new OnKeyListener() {
-									@Override
-									public boolean onKey(
-											DialogInterface arg0,
-											int arg1,
-											KeyEvent arg2) {
-										return true;
-									}
-								}).show();
+				new AlertDialog.Builder(NetworkSettingActivity.this)
+					.setTitle("提示")
+					.setMessage(_errMsg)
+					.setNegativeButton("返回", null)
+					.setOnKeyListener(
+						new OnKeyListener() {
+							@Override
+							public boolean onKey(DialogInterface arg0, int arg1, KeyEvent arg2) {
+								return true;
+							}
+						})
+					.show();
 			} else {
 				_progDialog.dismiss();
-				Toast.makeText(NetworkSettingActivity.this,
-						"网络连接成功", 0).show();
+				Toast.makeText(NetworkSettingActivity.this, "网络连接成功", Toast.LENGTH_SHORT).show();
 			}
 
 			ServerConnector.instance().setNetAddr(_address);

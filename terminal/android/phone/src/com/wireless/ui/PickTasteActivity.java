@@ -21,7 +21,6 @@ import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -378,22 +377,22 @@ public class PickTasteActivity extends Activity{
 						if(s.length() == 0){
 							_selectedFood.tmpTaste.setPrice(new Float(0));
 						}else{
-							Float price = Float.parseFloat(s.toString());
+							Float price = Float.valueOf(s.toString());
 							if(price >= 0 && price < 9999){
 								_selectedFood.tmpTaste.setPrice(price);
 							}else{
 								priceEdtTxt.setText(_selectedFood.tmpTaste.getPrice() > 9999 ? "" : Util.float2String2(_selectedFood.tmpTaste.getPrice()));
 								priceEdtTxt.setSelection(priceEdtTxt.getText().length());
-								Toast.makeText(PickTasteActivity.this, "临时口味的价格范围是0～9999", 0).show();
+								Toast.makeText(PickTasteActivity.this, "临时口味的价格范围是0～9999", Toast.LENGTH_SHORT).show();
 							}
 						}
 					}catch(NumberFormatException e){
 						priceEdtTxt.setText(_selectedFood.tmpTaste.getPrice() > 9999 ? "" : Util.float2String2(_selectedFood.tmpTaste.getPrice()));
 						priceEdtTxt.setSelection(priceEdtTxt.getText().length());
-						Toast.makeText(PickTasteActivity.this, "临时口味的价钱格式不正确，请重新输入", 0).show();
+						Toast.makeText(PickTasteActivity.this, "临时口味的价钱格式不正确，请重新输入", Toast.LENGTH_SHORT).show();
 					}
 				}else{
-					Toast.makeText(PickTasteActivity.this, "请先输入临时口味", 0).show();
+					Toast.makeText(PickTasteActivity.this, "请先输入临时口味", Toast.LENGTH_SHORT).show();
 				}
 			}
 
@@ -497,16 +496,16 @@ public class PickTasteActivity extends Activity{
 					if(selectChkBox.isChecked()){
 						int pos = _selectedFood.addTaste(_tastes[position]);
 						if(pos >= 0){
-							Toast.makeText(PickTasteActivity.this, "添加" + _tastes[position].preference, 0).show();
+							Toast.makeText(PickTasteActivity.this, "添加" + _tastes[position].preference, Toast.LENGTH_SHORT).show();
 						}else{
-							Toast.makeText(PickTasteActivity.this, "最多只能添加" + _selectedFood.tastes.length + "种口味", 0).show();
+							Toast.makeText(PickTasteActivity.this, "最多只能添加" + _selectedFood.tastes.length + "种口味", Toast.LENGTH_SHORT).show();
 							selectChkBox.setChecked(false);
 						}						
 						
 					}else{
 						int pos = _selectedFood.removeTaste(_tastes[position]);
 						if(pos >= 0){
-							Toast.makeText(PickTasteActivity.this, "删除" + _tastes[position].preference, 0).show();
+							Toast.makeText(PickTasteActivity.this, "删除" + _tastes[position].preference, Toast.LENGTH_SHORT).show();
 						}
 					}
 					_handler.sendEmptyMessage(0);
@@ -525,16 +524,16 @@ public class PickTasteActivity extends Activity{
 						int pos = _selectedFood.removeTaste(_tastes[position]);
 						if(pos >= 0){
 							selectChkBox.setChecked(false);
-							Toast.makeText(PickTasteActivity.this, "删除" + _tastes[position].preference, 0).show();
+							Toast.makeText(PickTasteActivity.this, "删除" + _tastes[position].preference, Toast.LENGTH_SHORT).show();
 						}
 						
 					}else{
 						int pos = _selectedFood.addTaste(_tastes[position]);
 						if(pos >= 0){
 							selectChkBox.setChecked(true);
-							Toast.makeText(PickTasteActivity.this, "添加" + _tastes[position].preference, 0).show();
+							Toast.makeText(PickTasteActivity.this, "添加" + _tastes[position].preference, Toast.LENGTH_SHORT).show();
 						}else{
-							Toast.makeText(PickTasteActivity.this, "最多只能添加" + _selectedFood.tastes.length + "种口味", 0).show();
+							Toast.makeText(PickTasteActivity.this, "最多只能添加" + _selectedFood.tastes.length + "种口味", Toast.LENGTH_SHORT).show();
 						}
 					}
 					_handler.sendEmptyMessage(0);

@@ -20,7 +20,6 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -93,7 +92,7 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 					new InsertOrderTask(reqOrder).execute();
 					
 				}else{
-					Toast.makeText(OrderActivity.this, "您还未点菜，暂时不能下单。", 0).show();
+					Toast.makeText(OrderActivity.this, "您还未点菜，暂时不能下单。", Toast.LENGTH_SHORT).show();
 				}
 			}
 			
@@ -205,7 +204,7 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 			}else{
 				//return to the main activity and show the message
 				OrderActivity.this.finish();
-				Toast.makeText(OrderActivity.this, _reqOrder.table.aliasID + "号台下单成功。", 0).show();
+				Toast.makeText(OrderActivity.this, _reqOrder.table.aliasID + "号台下单成功。", Toast.LENGTH_SHORT).show();
 			}
 		}
 		
@@ -219,7 +218,7 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 	@Override
 	public void onPickTaste(OrderFood selectedFood) {
 		if(selectedFood.isTemporary){
-			Toast.makeText(this, "临时菜不能添加口味", 0).show();
+			Toast.makeText(this, "临时菜不能添加口味", Toast.LENGTH_SHORT).show();
 		}else{
 			Intent intent = new Intent(OrderActivity.this, PickTasteActivity.class);
 			Bundle bundle = new Bundle();

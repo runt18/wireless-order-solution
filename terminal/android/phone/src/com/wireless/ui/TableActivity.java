@@ -7,24 +7,16 @@ import java.util.List;
 import java.util.Map;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.wireless.sccon.ServerConnector;
-import com.wireless.ui.view.PullListView.OnRefreshListener;
 import com.wireless.common.WirelessOrder;
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqQueryRegion;
@@ -32,8 +24,9 @@ import com.wireless.protocol.ReqQueryTable;
 import com.wireless.protocol.RespParser;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Type;
-import com.wireless.ui.R;
+import com.wireless.sccon.ServerConnector;
 import com.wireless.ui.view.PullListView;
+import com.wireless.ui.view.PullListView.OnRefreshListener;
 
 public class TableActivity extends Activity {
 	private SimpleAdapter adapter;
