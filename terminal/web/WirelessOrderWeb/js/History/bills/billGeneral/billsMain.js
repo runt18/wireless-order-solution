@@ -607,13 +607,13 @@ var btnSalesSub = new Ext.ux.ImageButton({
 	}
 });
 
-var btnBackFood = new Ext.ux.ImageButton({
-	imgPath : '../../images/backFoodStatis.png',
+var btnCancelledFood = new Ext.ux.ImageButton({
+	imgPath : '../../images/cancelledFoodStatis.png',
 	imgWidth : 50,
 	imgHeight : 50,
-	tooltip : '退菜汇总',
+	tooltip : '退菜统计',
 	handler : function(btn) {
-		backFood();
+		cancelledFood();
 	}
 });
 
@@ -624,8 +624,6 @@ var pushBackBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "返回",
 	handler : function(btn) {
-//		location.href = "HistoryProtal.html?restaurantID=" + restaurantID
-//				+ "&pin=" + pin;
 		location.href = '../PersonLogin.html?restaurantID=' 
 						+ restaurantID 
 						+ '&isNewAccess=false'
@@ -1558,6 +1556,8 @@ Ext.onReady(function() {
 					{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
 					deptStatBut,
 					{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
+					btnCancelledFood,
+					{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
 					shiftStatBut, 
 					{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
 					dailySettleStatBut,
@@ -1565,8 +1565,6 @@ Ext.onReady(function() {
 					businessStatBut, 
 					{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
 					btnSalesSub,
-					{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
-					btnBackFood,
 					"->", pushBackBut,
 					{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
 					logOutBut 
