@@ -1,0 +1,19 @@
+.btn_search {
+    background-image: url(../images/search.gif) !important;
+}
+
+.btn_add {
+    background-image: url(../images/add.gif) !important;
+}
+
+.btn_delete {
+    background-image: url(../images/delete.png) !important;
+}
+
+.btn_edit {
+    background-image: url(../images/edit.png) !important;
+}
+
+.btn_refresh {
+    background-image: url(../images/refresh.png) !important;
+}
