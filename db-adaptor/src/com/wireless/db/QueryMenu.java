@@ -93,8 +93,8 @@ public class QueryMenu {
         //get all the food information to this restaurant
 		String sql = " SELECT " +
 					 " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, " +
-					 " FOOD.name, FOOD.unit_price, FOOD.kitchen_alias, FOOD.status, FOOD.pinyin, " +
-					 " KITCHEN.dept_id " +
+					 " FOOD.name, FOOD.unit_price, FOOD.kitchen_alias, FOOD.status, FOOD.pinyin, FOOD.taste_ref_type, " +
+					 " KITCHEN.dept_id, KITCHEN.kitchen_id " +
 					 " FROM " + 
 					 Params.dbName + ".food FOOD " +
 					 " LEFT OUTER JOIN " +
@@ -111,9 +111,11 @@ public class QueryMenu {
 								 dbCon.rs.getString("name"),
 								 new Float(dbCon.rs.getFloat("unit_price")),
 								 dbCon.rs.getShort("dept_id"),
+								 dbCon.rs.getLong("kitchen_id"),
 								 dbCon.rs.getShort("kitchen_alias"),
 								 dbCon.rs.getShort("status"),
-								 dbCon.rs.getString("pinyin"));
+								 dbCon.rs.getString("pinyin"),
+								 dbCon.rs.getShort("taste_ref_type"));
 			foods.add(food);
 		}
 	
