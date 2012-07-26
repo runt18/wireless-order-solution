@@ -109,25 +109,25 @@ public class QueryMenuMgrAction extends Action {
 
 			if (type == 1) {
 				// 按编号
-				filterCondition = " AND food_alias " + ope + filterVal;
+				filterCondition = " AND FOOD.food_alias " + ope + filterVal;
 			} else if (type == 2) {
 				// 按名称
-				filterCondition = " AND name like '%" + filterVal + "%'";
+				filterCondition = " AND FOOD.name like '%" + filterVal + "%'";
 			} else if (type == 3) {
 				// 按拼音
-				filterCondition = " AND pinyin like '" + filterVal + "%'";
+				filterCondition = " AND FOOD.pinyin like '" + filterVal + "%'";
 			} else if (type == 4) {
 				// 按价格
-				filterCondition = " AND unit_price " + ope + filterVal;
+				filterCondition = " AND FOOD.unit_price " + ope + filterVal;
 			} else if (type == 5) {
 				// 按厨房
-				filterCondition = " AND kitchen_alias " + ope + filterVal;
+				filterCondition = " AND FOOD.kitchen_alias " + ope + filterVal;
 			} else {
 				// 全部
 				filterCondition = "";
 			}
 			
-			String orderClause = " ORDER BY food_alias ";
+			String orderClause = " ORDER BY FOOD.food_alias ";
 			
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
@@ -136,33 +136,22 @@ public class QueryMenuMgrAction extends Action {
 
 			// 格式：[编号，名称，拼音，价格，厨房，特价，推荐，停售，赠送，時價]
 			for (int i = 0; i < foods.length; i++) {
-				//
-				// String sql = " SELECT id FROM "
-				// + Params.dbName + ".food WHERE restaurant_id = "
-				// + term.restaurant_id + " AND material_id = " + materialID;
-				// dbCon.rs = dbCon.stmt.executeQuery(sql);
-				// dbCon.rs.next();
-				// float totalStock = dbCon.rs.getFloat("stock");
-				// float thisPrice = dbCon.rs.getFloat("price");
-				// dbCon.rs.close();
-
+				
 				HashMap<String, Object> resultMap = new HashMap<String, Object>();
 				resultMap.put("foodID", new Long(foods[i].foodID).toString());
-				resultMap.put("dishNumber",
-						new Integer(foods[i].aliasID).toString());
+				resultMap.put("dishNumber", new Integer(foods[i].aliasID).toString());
 				resultMap.put("dishName", foods[i].name);
 				resultMap.put("dishSpill", foods[i].pinyin);
-				resultMap.put("dishPrice",
-						Util.float2String(foods[i].getPrice()));
+				resultMap.put("dishPrice", Util.float2String(foods[i].getPrice()));
 				resultMap.put("dishSpill", foods[i].pinyin);
-				resultMap
-						.put("kitchenAlias", new Short(foods[i].kitchen.aliasID).toString());
+				resultMap.put("kitchenAlias", new Short(foods[i].kitchen.aliasID).toString());
 				resultMap.put("kitchenID", new Long(foods[i].kitchen.kitchenID).toString());
 				resultMap.put("special", foods[i].isSpecial());
 				resultMap.put("recommend", foods[i].isRecommend());
 				resultMap.put("stop", foods[i].isSellOut());
 				resultMap.put("free", foods[i].isGift());
 				resultMap.put("currPrice", foods[i].isCurPrice());
+				resultMap.put("tasteRefType", foods[i].tasteRefType);
 				resultMap.put("message", "normal");
 
 				resultList.add(resultMap);
@@ -258,8 +247,7 @@ public class QueryMenuMgrAction extends Action {
 
 			JSONObject obj = JSONObject.fromObject(rootMap, jsonConfig);
 
-			String outputJson = "{\"totalProperty\":" + chooseList.size() + ","
-					+ obj.toString().substring(1);
+			String outputJson = "{\"totalProperty\":" + chooseList.size() + "," + obj.toString().substring(1);
 
 			//System.out.println(outputJson);
 
