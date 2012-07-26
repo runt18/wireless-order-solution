@@ -16,19 +16,23 @@
         android:layout_height="40dp"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/top"
-        android:background="@drawable/bg02" >
-
+        android:background="@drawable/search_bg" >
+
         <AutoCompleteTextView
-            android:id="@+id/autoCompleteTextView1"
-            android:layout_width="wrap_content"
+            android:id="@+id/search_view_table"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/imgBtn_table"
+            android:layout_alignTop="@+id/top"
             android:layout_centerHorizontal="true"
+            android:layout_marginTop="6dp"
+            android:background="@null"
             android:ems="10"
-            android:hint="输入台号" />
-
+            android:hint="请输入台号或房间名"
+            android:paddingLeft="6dp"
+            android:paddingTop="2dp" />
+
         <ImageButton
-            android:id="@+id/imgBtn_table"
+            android:id="@+id/deleteBtn_table"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"

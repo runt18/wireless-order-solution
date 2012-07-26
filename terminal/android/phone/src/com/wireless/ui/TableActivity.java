@@ -10,8 +10,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AutoCompleteTextView;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
@@ -60,6 +63,8 @@ public class TableActivity extends Activity {
 		count=String.valueOf(dataPackage.getEatingCount());
 		eatingText.setText(count);
 		eatingText.setVisibility(View.VISIBLE);
+		
+
 		
 	}
 	private void prepareUI() {
@@ -119,7 +124,81 @@ public class TableActivity extends Activity {
 		all.setVisibility(View.VISIBLE);
 		all.setOnClickListener(new AOnClickListener(AOnClickListener.ALL));
 		
-		
+		/**
+		 * 搜索框
+		 */
+		final AutoCompleteTextView txtView = (AutoCompleteTextView)findViewById(R.id.search_view_table);
+		txtView.addTextChangedListener(new TextWatcher(){
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s,
+					int start, int count, int after) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s,
+					int start, int before, int count) {
+				// TODO Auto-generated method stub
+				List<Map<String, ?>> list = null;
+				if(s.length()!=0)
+				{
+
+					list = new ArrayList<Map<String, ?>>();
+					Table[] _tableSource = WirelessOrder.tables == null ? new Table[0]
+							: WirelessOrder.tables;
+					String text = s.toString().trim();
+					for(Table t:_tableSource)
+					{
+
+						if(String.valueOf(t.aliasID).startsWith(text)||t.name.contains(text))
+						{
+							HashMap<String, Object> map = new HashMap<String, Object>();
+							map.put("id", t.aliasID);
+							map.put("custonNum", "人数: " + t.custom_num);
+							map.put("tableName", t.name);
+							String st= t.status==0? "空闲":"就餐";
+							map.put("state","状态： "+st);
+							list.add(map);
+						}
+
+					}
+
+				}
+				else {
+					list = dataPackage.getAll();
+				}
+				adapter = new SimpleAdapter(ctx, list,
+						R.layout.the_table, new String[] {
+								"id", "custonNum", "state",
+								"tableName" }, new int[] {
+								R.id.text1_table,
+								R.id.text2_table,
+								R.id.text3_table,
+								R.id.text4_table });
+				lv.setAdapter(adapter);
+				
+			}
+			
+		});
+		ImageButton deleteBtn = (ImageButton)findViewById(R.id.deleteBtn_table);
+		deleteBtn.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				txtView.setText("");
+			}
+			
+		});
+
 		/**
 		 * region all button
 		 */
@@ -145,8 +224,12 @@ public class TableActivity extends Activity {
 		eatingBtn.setOnClickListener(new AOnClickListener(AOnClickListener.EATING));
 		
 		eatingText = (TextView)findViewById(R.id.right_txt_bottom);
+		
+
 	}
-	
+	/**
+	 * 装配数据
+	 */
 	private void init() {
 		// TODO Auto-generated method stub
 		lv = (PullListView) findViewById(R.id.listView_table);
