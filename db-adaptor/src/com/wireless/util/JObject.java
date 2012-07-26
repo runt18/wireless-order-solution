@@ -17,7 +17,7 @@ public class JObject {
 	private boolean success = true;         		// 操作状态
 	private int totalProperty = 0;		    		// 数据数量
 	private List root = new ArrayList();			// 数据主体
-	private byte code = WebParams.ERROR_CODE;		// 错误码
+	private long code = WebParams.ERROR_CODE;		// 错误码
 	private String msg = WebParams.ERROR_MSG;		// 错误提示信息
 	private String title = WebParams.ERROR_TITLE; 	// 错误信息标题
 	private long lv = WebParams.ERROR_LV;			// 错误等级
@@ -53,11 +53,11 @@ public class JObject {
 		this.root = root;
 	}
 
-	public byte getCode() {
+	public long getCode() {
 		return code;
 	}
 
-	public void setCode(byte code) {
+	public void setCode(long code) {
 		this.code = code;
 	}
 
@@ -85,5 +85,22 @@ public class JObject {
 		this.lv = lv;
 	}
 	
-		
+	public void initTip(boolean success, String msg){
+		this.initTip(success, this.title, WebParams.ERROR_CODE, msg);
+	}
+	
+	public void initTip(boolean success, String title, String msg){
+		this.initTip(success, title, WebParams.ERROR_CODE, msg);
+	}
+	
+	public void initTip(boolean success, long code, String msg){
+		this.initTip(success, this.title, code, msg);
+	}
+	
+	public void initTip(boolean success, String title, long code, String msg){
+		this.success = success;
+		this.title = title;
+		this.code = code;
+		this.msg = msg;
+	}
 }

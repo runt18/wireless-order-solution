@@ -46,7 +46,19 @@ public class WebParams {
 	 * 
 	 */
 	public final static short NO_TASTE = Taste.NO_TASTE;
+	public final static short CATE_TASTE = Taste.CATE_TASTE;	/* 口味 */
+	public final static short CATE_STYLE = Taste.CATE_STYLE;	/* 做法 */
+	public final static short CATE_SPEC = Taste.CATE_SPEC;		/* 规格 */
+	public final static short CALC_PRICE = Taste.CALC_PRICE;	/* 按价格计算  */
+	public final static short CALC_RATE = Taste.CALC_RATE;		/* 按比例计算  */
 	public final static String NO_PREFERENCE = Taste.NO_PREFERENCE; 
+	public final static String CATE_TASTE_TEXT = "口味"; 
+	public final static String CATE_STYLE_TEXT = "做法"; 
+	public final static String CATE_SPEC_TEXT = "规格"; 
+	public final static String CALC_PRICE_TEXT = "按价格"; 
+	public final static String CALC_RATE_TEXT = "按比例"; 
+	public final static long TASTE_REF_TYPE_MANUAL = 2;
+	public final static long TASTE_REF_TYPE_SMART = 1;
 	
 	/**
 	 * The status of the food.
@@ -61,8 +73,13 @@ public class WebParams {
 	/**
 	 * 
 	 */
-	public final static byte ERROR_CODE = 0000;
+	public final static long ERROR_CODE = 0000;
 	public final static String ERROR_MSG = "";
-	public final static String ERROR_TITLE = "";
+	public final static String ERROR_TITLE = WebParams.TIP_TITLE_DEFAULT;
 	public final static long ERROR_LV = 0;
+	
+	public static final String TIP_TITLE_ERROE = "错误";
+	public static final String TIP_TITLE_EXCEPTION = "异常";
+	public static final String TIP_TITLE_WARNING = "警告";
+	public static final String TIP_TITLE_DEFAULT = "提示";
 }
