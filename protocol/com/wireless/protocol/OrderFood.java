@@ -302,9 +302,11 @@ public class OrderFood extends Food {
 			  food.name,
 			  food.getPrice(),
 			  food.kitchen.dept.deptID,
+			  food.kitchen.kitchenID,
 			  food.kitchen.aliasID,
 			  food.status,
-			  food.pinyin);
+			  food.pinyin,
+			  food.tasteRefType);
 		for(int i = 0; i < tastes.length; i++){
 			tastes[i] = new Taste();
 		}

@@ -100,6 +100,7 @@ public final class Kitchen {
 		this.name = kitchenName;
 		this.kitchenID = kitchenID;
 		this.aliasID = kitchenAlias;
+		this.dept.restaurantID = restaurantID;
 		this.dept.deptID = deptID;
 	}
 	
