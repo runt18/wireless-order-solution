@@ -15,7 +15,7 @@ import android.widget.Scroller;
  */
 public class ScrollLayout extends ViewGroup {
 
-	private OnViewChangedListner mViewChangedListner;
+	private OnViewChangedListener mViewChangedListener;
 	
 	private Scroller mScroller;
 	private VelocityTracker mVelocityTracker;
@@ -105,8 +105,8 @@ public class ScrollLayout extends ViewGroup {
 			final int delta = whichScreen * getWidth() - getScrollX();
 			mScroller.startScroll(getScrollX(), 0, delta, 0, Math.abs(delta) * 2);
 			mCurScreen = whichScreen;
-			if(mViewChangedListner != null){
-				mViewChangedListner.onViewChanged(mCurScreen, this, getChildAt(mCurScreen));
+			if(mViewChangedListener != null){
+				mViewChangedListener.onViewChanged(mCurScreen, this, getChildAt(mCurScreen));
 			}
 			invalidate(); // Redraw the layout
 		}
@@ -115,14 +115,14 @@ public class ScrollLayout extends ViewGroup {
 	public void setToScreen(int whichScreen) {
 		whichScreen = Math.max(0, Math.min(whichScreen, getChildCount() - 1));
 		mCurScreen = whichScreen;
-		if(mViewChangedListner != null){
-			mViewChangedListner.onViewChanged(mCurScreen, this, getChildAt(mCurScreen));
+		if(mViewChangedListener != null){
+			mViewChangedListener.onViewChanged(mCurScreen, this, getChildAt(mCurScreen));
 		}
 		scrollTo(whichScreen * getWidth(), 0);
 	}
 
-	public void setOnViewChangedListener(OnViewChangedListner viewChangedListner){
-		mViewChangedListner = viewChangedListner;
+	public void setOnViewChangedListener(OnViewChangedListener viewChangedListener){
+		mViewChangedListener = viewChangedListener;
 	}
 	
 	/**
@@ -226,7 +226,7 @@ public class ScrollLayout extends ViewGroup {
 		return mTouchState != TOUCH_STATE_REST;
 	}
 
-	public static interface OnViewChangedListner{
+	public static interface OnViewChangedListener{
 		public void onViewChanged(int curScreen, View parent, View curView);
 	}
 	

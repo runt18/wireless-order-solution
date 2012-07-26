@@ -33,18 +33,29 @@ import com.wireless.ui.view.PullListView;
 import com.wireless.ui.view.PullListView.OnRefreshListener;
 
 public class TableActivity extends Activity {
-	private SimpleAdapter adapter;
-	PullListView lv;
-	DataPackage dataPackage;
+	private SimpleAdapter mAdapter;
+	PullListView mListView;
+	DataPackage mDataPackage;
 	Context ctx;
-	TextView allText,freeText,eatingText;
+	TextView mAllTextView,mIdleTextView,mBusyTextView;
+	final String[] tabs={
+		"ID", "CUSTOM_NUM", "STATE",
+		"TABLE_NAME" 
+	};
+	
+	final int[] layouts={
+			R.id.text1_table,
+			R.id.text2_table,
+			R.id.text3_table,
+			R.id.text4_table
+	};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.table);
 		ctx = this.getApplicationContext();
-		init();
+		prepareData();
 		prepareUI();
 	}
 
@@ -52,39 +63,39 @@ public class TableActivity extends Activity {
 	protected void onResume()
 	{
 		super.onResume();
-		String count=String.valueOf(dataPackage.getAllCount());
-		allText.setText(count);
-		allText.setVisibility(View.VISIBLE);
+		String count=String.valueOf(mDataPackage.getAllCount());
+		mAllTextView.setText(count);
+		mAllTextView.setVisibility(View.VISIBLE);
 		
-		count=String.valueOf(dataPackage.getFreeCount());
-		freeText.setText(count);
-		freeText.setVisibility(View.VISIBLE);
+		count=String.valueOf(mDataPackage.getFreeCount());
+		mIdleTextView.setText(count);
+		mIdleTextView.setVisibility(View.VISIBLE);
 		
-		count=String.valueOf(dataPackage.getEatingCount());
-		eatingText.setText(count);
-		eatingText.setVisibility(View.VISIBLE);
-		
-
-		
+		count=String.valueOf(mDataPackage.getEatingCount());
+		mBusyTextView.setText(count);
+		mBusyTextView.setVisibility(View.VISIBLE);
 	}
+	/**
+	 * 初始化UI
+	 */
 	private void prepareUI() {
 		// TODO Auto-generated method stub
 		/**
 		 * title
 		 */
-		TextView title = (TextView) findViewById(R.id.toptitle);
-		title.setVisibility(View.VISIBLE);
-		title.setText("餐台");
+		TextView titleTextView = (TextView) findViewById(R.id.toptitle);
+		titleTextView.setVisibility(View.VISIBLE);
+		titleTextView.setText("餐台");
 		/**
 		 * "返回"Button
 		 */
-		TextView left = (TextView) findViewById(R.id.textView_left);
-		left.setText("返回");
-		left.setVisibility(View.VISIBLE);
+		TextView leftTxtView = (TextView) findViewById(R.id.textView_left);
+		leftTxtView.setText("返回");
+		leftTxtView.setVisibility(View.VISIBLE);
 
-		ImageButton back = (ImageButton) findViewById(R.id.btn_left);
-		back.setVisibility(View.VISIBLE);
-		back.setOnClickListener(new View.OnClickListener() {
+		ImageButton backBtn = (ImageButton) findViewById(R.id.btn_left);
+		backBtn.setVisibility(View.VISIBLE);
+		backBtn.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
@@ -94,9 +105,9 @@ public class TableActivity extends Activity {
 		/**
 		 * refresh button
 		 */
-		ImageButton refresh = (ImageButton) findViewById(R.id.btn2_right);
-		refresh.setVisibility(View.VISIBLE);
-		refresh.setOnClickListener(new View.OnClickListener() {
+		ImageButton refreshBtn = (ImageButton) findViewById(R.id.btn2_right);
+		refreshBtn.setVisibility(View.VISIBLE);
+		refreshBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				new RefreshTask().execute();
@@ -118,11 +129,11 @@ public class TableActivity extends Activity {
 
 		lp.addRule(RelativeLayout.VISIBLE);
 
-		ImageButton all = (ImageButton) findViewById(R.id.btn_right);
-		all.setImageResource(R.drawable.home_selector);
-		all.setLayoutParams(lp);
-		all.setVisibility(View.VISIBLE);
-		all.setOnClickListener(new AOnClickListener(AOnClickListener.ALL));
+		ImageButton allBtn = (ImageButton) findViewById(R.id.btn_right);
+		allBtn.setImageResource(R.drawable.home_selector);
+		allBtn.setLayoutParams(lp);
+		allBtn.setVisibility(View.VISIBLE);
+		allBtn.setOnClickListener(new AOnClickListener(AOnClickListener.ALL));
 		
 		/**
 		 * 搜索框
@@ -152,20 +163,20 @@ public class TableActivity extends Activity {
 				{
 
 					list = new ArrayList<Map<String, ?>>();
-					Table[] _tableSource = WirelessOrder.tables == null ? new Table[0]
+					Table[] tableSource = WirelessOrder.tables == null ? new Table[0]
 							: WirelessOrder.tables;
 					String text = s.toString().trim();
-					for(Table t:_tableSource)
+					for(Table t:tableSource)
 					{
 
 						if(String.valueOf(t.aliasID).startsWith(text)||t.name.contains(text))
 						{
 							HashMap<String, Object> map = new HashMap<String, Object>();
-							map.put("id", t.aliasID);
-							map.put("custonNum", "人数: " + t.custom_num);
-							map.put("tableName", t.name);
+							map.put(tabs[0], t.aliasID);
+							map.put(tabs[1], "人数: " + t.custom_num);
+							map.put(tabs[3], t.name);
 							String st= t.status==0? "空闲":"就餐";
-							map.put("state","状态： "+st);
+							map.put(tabs[2],"状态： "+st);
 							list.add(map);
 						}
 
@@ -173,17 +184,11 @@ public class TableActivity extends Activity {
 
 				}
 				else {
-					list = dataPackage.getAll();
+					list = mDataPackage.getAll();
 				}
-				adapter = new SimpleAdapter(ctx, list,
-						R.layout.the_table, new String[] {
-								"id", "custonNum", "state",
-								"tableName" }, new int[] {
-								R.id.text1_table,
-								R.id.text2_table,
-								R.id.text3_table,
-								R.id.text4_table });
-				lv.setAdapter(adapter);
+				mAdapter = new SimpleAdapter(ctx, list,
+						R.layout.the_table, tabs, layouts);
+				mListView.setAdapter(mAdapter);
 				
 			}
 			
@@ -207,7 +212,7 @@ public class TableActivity extends Activity {
 		regionAllBtn.setImageResource(R.drawable.alldown);
 		regionAllBtn.setOnClickListener(new AOnClickListener(AOnClickListener.ALL));
 		
-		allText = (TextView)findViewById(R.id.left_txt_bottom);
+		mAllTextView = (TextView)findViewById(R.id.left_txt_bottom);
 		
 		
 		/**
@@ -215,7 +220,7 @@ public class TableActivity extends Activity {
 		 */
 		ImageButton freeBtn = (ImageButton)findViewById(R.id.middle_btn_bottom);
 		freeBtn.setOnClickListener(new AOnClickListener(AOnClickListener.FREE));
-		freeText = (TextView)findViewById(R.id.middle_txt_bottom);
+		mIdleTextView = (TextView)findViewById(R.id.middle_txt_bottom);
 		
 		/**
 		 * 就餐列表 按钮
@@ -223,37 +228,38 @@ public class TableActivity extends Activity {
 		ImageButton eatingBtn = (ImageButton)findViewById(R.id.right_btn_bottom);
 		eatingBtn.setOnClickListener(new AOnClickListener(AOnClickListener.EATING));
 		
-		eatingText = (TextView)findViewById(R.id.right_txt_bottom);
+		mBusyTextView = (TextView)findViewById(R.id.right_txt_bottom);
 		
 
 	}
 	/**
 	 * 装配数据
 	 */
-	private void init() {
+	private void prepareData() {
 		// TODO Auto-generated method stub
-		lv = (PullListView) findViewById(R.id.listView_table);
+		mListView = (PullListView) findViewById(R.id.listView_table);
 
-		dataPackage = new DataPackage();
-		List<Map<String, ?>> list = dataPackage.getAll();
+		mDataPackage = new DataPackage();
+		List<Map<String, ?>> list = mDataPackage.getAll();
 
-		adapter = new SimpleAdapter(this, list,
-				R.layout.the_table,
-				new String[] { "id", "custonNum", "state",
-						"tableName" },
-				new int[] { R.id.text1_table,
-						R.id.text2_table, R.id.text3_table,
-						R.id.text4_table });
-		lv.setAdapter(adapter);
+		mAdapter = new SimpleAdapter(this, list,
+				R.layout.the_table,tabs,layouts);
+		mListView.setAdapter(mAdapter);
 
-		lv.setOnRefreshListener(new aRefreshListener());
+		mListView.setOnRefreshListener(new OnRefreshListener(){
+			@Override
+			public void onRefresh() {
+				// TODO Auto-generated method stub
+				new RefreshTask().execute();
+			}
+		});
 
 	}
 	
 	private class AOnClickListener implements OnClickListener{
-		public static final int ALL = 0;
-		public static final int FREE = 1;
-		public static final int EATING =2;
+		static final int ALL = 0;
+		static final int FREE = 1;
+		static final int EATING =2;
 		private int which=0;
 		AOnClickListener(int which)
 		{
@@ -265,29 +271,23 @@ public class TableActivity extends Activity {
 			List<Map<String, ?>> list = null;
 			switch(which)
 			{
-			case 0: list = dataPackage.getAll();
+			case 0: list = mDataPackage.getAll();
 				buttonUp();
 				((ImageButton)findViewById(R.id.left_btn_bottom)).setImageResource(R.drawable.alldown);
 				break;
-			case 1: list = dataPackage.getFree();
+			case 1: list = mDataPackage.getFree();
 				buttonUp();
 				((ImageButton)findViewById(R.id.middle_btn_bottom)).setImageResource(R.drawable.freedown);
 				break;
-			case 2: list = dataPackage.getEating();
+			case 2: list = mDataPackage.getEating();
 				buttonUp();
 				((ImageButton)findViewById(R.id.right_btn_bottom)).setImageResource(R.drawable.eatingdown);
 				break;
 			}
 			
-			adapter = new SimpleAdapter(ctx, list,
-					R.layout.the_table, new String[] {
-							"id", "custonNum", "state",
-							"tableName" }, new int[] {
-							R.id.text1_table,
-							R.id.text2_table,
-							R.id.text3_table,
-							R.id.text4_table });
-			lv.setAdapter(adapter);
+			mAdapter = new SimpleAdapter(ctx, list,
+					R.layout.the_table, tabs,layouts);
+			mListView.setAdapter(mAdapter);
 			
 		}
 		
@@ -308,11 +308,6 @@ public class TableActivity extends Activity {
 		@Override
 		protected Void doInBackground(
 				Void... params) {
-			try {
-				Thread.sleep(1000);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
 			// 设置更新list的方法
 
 			new QueryRegionTask().execute();
@@ -321,10 +316,10 @@ public class TableActivity extends Activity {
 
 		@Override
 		protected void onPostExecute(Void result) {
-			dataPackage = new DataPackage();
-			List<Map<String, ?>> list = dataPackage
+			mDataPackage = new DataPackage();
+			List<Map<String, ?>> list = mDataPackage
 					.getAll();
-			adapter = new SimpleAdapter(ctx, list,
+			mAdapter = new SimpleAdapter(ctx, list,
 					R.layout.the_table,
 					new String[] { "id",
 							"custonNum", "state",
@@ -333,25 +328,15 @@ public class TableActivity extends Activity {
 							R.id.text2_table,
 							R.id.text3_table,
 							R.id.text4_table });
-			lv.setAdapter(adapter);
-			lv.onRefreshComplete();
+			mListView.setAdapter(mAdapter);
+			mListView.onRefreshComplete();
 			((ImageButton)findViewById(R.id.left_btn_bottom)).setImageResource(R.drawable.alldown);
 			((ImageButton)findViewById(R.id.middle_btn_bottom)).setImageResource(R.drawable.free);
 			((ImageButton)findViewById(R.id.right_btn_bottom)).setImageResource(R.drawable.eating);
 		}
 		
 	}
-	
-	private class aRefreshListener implements
-			OnRefreshListener {
 
-		@Override
-		public void onRefresh() {
-			// TODO Auto-generated method stub
-			new RefreshTask().execute();
-		}
-
-	}
 
 	private class DataPackage {
 		private List<Map<String, ?>> all, free, eating;
@@ -383,17 +368,17 @@ public class TableActivity extends Activity {
 		private void init() {
 			for (Table t : _tableSource) {
 				HashMap<String, Object> map = new HashMap<String, Object>();
-				map.put("id", t.aliasID);
-				map.put("custonNum", "人数: " + t.custom_num);
-				map.put("tableName", t.name);
+				map.put("ID", t.aliasID);
+				map.put("CUSTOM_NUM", "人数: " + t.custom_num);
+				map.put("TABLE_NAME", t.name);
 
 				if (t.status == 0) {
 					String st = "空闲";
-					map.put("state", "状态： " + st);
+					map.put("STATE", "状态： " + st);
 					free.add(map);
 				} else {
 					String st = "就餐";
-					map.put("state", "状态： " + st);
+					map.put("STATE", "状态： " + st);
 					eating.add(map);
 				}
 				// String st= t.status==0? "空闲":"就餐";

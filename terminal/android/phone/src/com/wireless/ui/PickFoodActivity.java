@@ -55,7 +55,7 @@ import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Util;
 import com.wireless.ui.view.PickFoodListView;
 import com.wireless.ui.view.ScrollLayout;
-import com.wireless.ui.view.ScrollLayout.OnViewChangedListner;
+import com.wireless.ui.view.ScrollLayout.OnViewChangedListener;
 import com.wireless.ui.view.TempListView;
 
 public class PickFoodActivity extends Activity implements PickFoodListView.OnFoodPickedListener {
@@ -144,7 +144,7 @@ public class PickFoodActivity extends Activity implements PickFoodListView.OnFoo
 		});
 		
 		_foodScrollLayout = (ScrollLayout)findViewById(R.id.pickFoodScrollLayout);
-		_foodScrollLayout.setOnViewChangedListener(new OnViewChangedListner() {
+		_foodScrollLayout.setOnViewChangedListener(new OnViewChangedListener() {
 			
 			@Override
 			public void onViewChanged(int curScreen, View parent, View curView) {

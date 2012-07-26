@@ -17,7 +17,7 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/top"
         android:background="@drawable/search_bg" >
-
+
         <AutoCompleteTextView
             android:id="@+id/search_view_table"
             android:layout_width="fill_parent"
@@ -30,7 +30,7 @@
             android:hint="请输入台号或房间名"
             android:paddingLeft="6dp"
             android:paddingTop="2dp" />
-
+
         <ImageButton
             android:id="@+id/deleteBtn_table"
             android:layout_width="wrap_content"
@@ -40,10 +40,10 @@
             android:layout_marginRight="10dp"
             android:background="#00ffffff"
             android:src="@drawable/search_selector" />
-
     </RelativeLayout>
-
-    <com.wireless.ui.view.PullListView
+
+ 
+         <com.wireless.ui.view.PullListView
         android:id="@+id/listView_table"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -55,86 +55,88 @@
         android:paddingTop="4dp" >
 
      </com.wireless.ui.view.PullListView>
-
-        <RelativeLayout
-            android:id="@+id/arelativeLayout1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:background="#9b95e6" >
-
-            <ImageButton
-                android:id="@+id/left_btn_bottom"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true"
-                android:background="@color/transparent"
-                android:src="@drawable/all_selector" />
-
-            <ImageButton
-                android:id="@+id/right_btn_bottom"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-                android:background="@color/transparent"
-                android:src="@drawable/eating_selector" />
-
-            <ImageButton
-                android:id="@+id/middle_btn_bottom"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                android:background="@color/transparent"
-                android:src="@drawable/free_selector" />
-
-            <TextView
-                android:id="@+id/left_txt_bottom"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="false"
-                android:layout_alignParentRight="false"
-                android:layout_alignParentTop="true"
-                android:layout_toLeftOf="@+id/middle_btn_bottom"
-                android:background="@drawable/hint"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
-                android:paddingTop="3dp"
-                android:text="11"
-                android:textColor="@color/white"
-                android:visibility="visible" />
-
-            <TextView
-                android:id="@+id/middle_txt_bottom"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_alignRight="@+id/middle_btn_bottom"
-                android:background="@drawable/hint"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
-                android:paddingTop="4dp"
-                android:text="TextView"
-                android:textColor="@color/white"
-                android:visibility="gone" />
-
-            <TextView
-                android:id="@+id/right_txt_bottom"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-                android:background="@drawable/hint"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
-                android:paddingTop="4dp"
-                android:text="TextView"
-                android:textColor="@color/white"
-                android:visibility="gone" />
-
-        </RelativeLayout>
+  
     
+    <RelativeLayout
+        android:id="@+id/arelativeLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:background="#9b95e6" >
+
+        <ImageButton
+            android:id="@+id/left_btn_bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:background="@color/transparent"
+            android:src="@drawable/all_selector" />
+
+        <ImageButton
+            android:id="@+id/right_btn_bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:background="@color/transparent"
+            android:src="@drawable/eating_selector" />
+
+        <ImageButton
+            android:id="@+id/middle_btn_bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:background="@color/transparent"
+            android:src="@drawable/free_selector" />
+
+        <TextView
+            android:id="@+id/left_txt_bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="false"
+            android:layout_alignParentRight="false"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/middle_btn_bottom"
+            android:background="@drawable/hint"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingTop="3dp"
+            android:text="11"
+            android:textColor="@color/white"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/middle_txt_bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignRight="@+id/middle_btn_bottom"
+            android:background="@drawable/hint"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingTop="4dp"
+            android:text="TextView"
+            android:textColor="@color/white"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/right_txt_bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:background="@drawable/hint"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingTop="4dp"
+            android:text="TextView"
+            android:textColor="@color/white"
+            android:visibility="gone" />
+    </RelativeLayout>
+
+ 
+
 </RelativeLayout>

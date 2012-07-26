@@ -32,7 +32,7 @@ import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Util;
 import com.wireless.ui.view.ScrollLayout;
-import com.wireless.ui.view.ScrollLayout.OnViewChangedListner;
+import com.wireless.ui.view.ScrollLayout.OnViewChangedListener;
 
 public class PickTasteActivity extends Activity{
 	
@@ -92,7 +92,7 @@ public class PickTasteActivity extends Activity{
 		//Ʒע
 		tasteScrollLayout.addView(setupPinZhuView());
 		
-		tasteScrollLayout.setOnViewChangedListener(new OnViewChangedListner() {			
+		tasteScrollLayout.setOnViewChangedListener(new OnViewChangedListener() {			
 			@Override
 			public void onViewChanged(int curScreen, View parent, View curView) {
 				String tag = curView.getTag().toString();
