@@ -116,6 +116,7 @@ public class QueryMenu {
 								 dbCon.rs.getShort("status"),
 								 dbCon.rs.getString("pinyin"),
 								 dbCon.rs.getShort("taste_ref_type"));
+			food.tasteRefType =  dbCon.rs.getLong("taste_ref_type");
 			foods.add(food);
 		}
 	
