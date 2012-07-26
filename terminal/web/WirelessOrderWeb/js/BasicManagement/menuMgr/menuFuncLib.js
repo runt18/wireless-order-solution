@@ -14,8 +14,8 @@
 				materialStore.loadData(jsonResult);
 			}else{
 				Ext.MessageBox.show({
-					title : '错误提示',
-					msg : String.format('错误号:{0},错误信息:{1}', jsonResult.errCode, jsonResult.errMsg),
+					title : '错误',
+					msg : String.format('错误代码:{0},错误信息:{1}', jsonResult.code, jsonResult.msg),
 					width : 300,
 					buttons : Ext.MessageBox.OK
 				});
@@ -24,11 +24,39 @@
 		failure : function(response, options) {
 			var jsonResult = Ext.util.JSON.decode(response.responseText);
 			Ext.MessageBox.show({
-				title : '错误提示',
-				msg : String.format('错误号:{0},错误信息:{1}', jsonResult.errCode, jsonResult.errMsg),
+				title : '错误',
+				msg : String.format('错误代码:{0},错误信息:{1}', jsonResult.code, jsonResult.msg),
 				width : 300,
 				buttons : Ext.MessageBox.OK
 			});
 		}
 	});
 }
+
+/**
+ * 获得所有口味
+ */
+loadAllTaste = function() {
+	Ext.Ajax.request({
+		url : '../../QueryTaste.do',
+		params : {
+			'pin' : pin,
+			'type' : 0,
+			'isCombo' : false,
+			'isPaging' : false 
+		},
+		success : function(response, options) {
+			var jsonResult = Ext.util.JSON.decode(response.responseText);
+			Ext.getCmp('allTasteGrid').getStore().loadData(jsonResult);
+		},
+		failure : function(response, options) {
+			var jsonResult = Ext.util.JSON.decode(response.responseText);
+			Ext.MessageBox.show({
+				title : '错误',
+				msg : String.format('错误代码:{0},错误信息:{1}', jsonResult.code, jsonResult.msg),
+				width : 300,
+				buttons : Ext.MessageBox.OK
+			});
+		}
+	});
+};

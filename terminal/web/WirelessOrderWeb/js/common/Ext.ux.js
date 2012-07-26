@@ -171,13 +171,7 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 	var g_store = null;
 	var b_groupBtn = null;
 
-	if (groupName == '') {
-		/** 普通数据源 * */
-		g_store = new Ext.data.Store({
-					proxy : g_proxy,
-					reader : g_reader
-				});
-	} else {
+	if (typeof(groupName) != 'undefined' && groupName != '') {
 		/** 分组数据源 * */
 		g_store = new Ext.data.GroupingStore({
 					proxy : g_proxy,
@@ -188,6 +182,12 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 					},
 					groupField : groupName
 				});
+	} else {
+		/** 普通数据源 **/
+		g_store = new Ext.data.Store({
+			proxy : g_proxy,
+			reader : g_reader
+		});
 	}
 
 	/** 条件查询参数 * */
@@ -280,4 +280,14 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 	}
 	
 	return g_gridPanel;
+};
+
+Ext.ux.showMsg = function(msg){
+	msg.msg = msg.code == '' || parseInt(msg.code) == 1111 ? msg.msg : String.format('错误代码:{0},错误信息:{1}', msg.code, msg.msg);
+	Ext.MessageBox.show({
+		title : msg.title,
+		msg : msg.msg,
+		autoWidth : true,
+		buttons : Ext.MessageBox.OK
+	});
 };

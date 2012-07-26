@@ -34,49 +34,45 @@ var dishKeyboardSelect = function(relateItemId) {
 
 function dishSpellOnLoad() {
 	// keyboard input dish spell
-	$("#orderSpell")
-			.bind(
-					"keyup",
-					function() {
-						var curDishSpell = Ext.getCmp("orderSpell").getValue()
-								.toUpperCase()
-								+ "";
-						if (curDishSpell == "") {
-							dishesDisplayDataShow.length = 0;
-							for ( var i = 0; i < dishesDisplayData.length; i++) {
-								dishesDisplayDataShow.push([
-										dishesDisplayData[i][0],
-										dishesDisplayData[i][1],
-										dishesDisplayData[i][2],
-										dishesDisplayData[i][3],
-										dishesDisplayData[i][4],
-										dishesDisplayData[i][5],
-										dishesDisplayData[i][6],
-										dishesDisplayData[i][7],
-										dishesDisplayData[i][8],
-										dishesDisplayData[i][9] ]);
-							}
-						} else {
-							dishesDisplayDataShow.length = 0;
-							for ( var i = 0; i < dishesDisplayData.length; i++) {
-								if ((dishesDisplayData[i][2] + "").substring(0,
-										curDishSpell.length).toUpperCase() == curDishSpell) {
-									dishesDisplayDataShow.push([
-											dishesDisplayData[i][0],
-											dishesDisplayData[i][1],
-											dishesDisplayData[i][2],
-											dishesDisplayData[i][3],
-											dishesDisplayData[i][4],
-											dishesDisplayData[i][5],
-											dishesDisplayData[i][6],
-											dishesDisplayData[i][7],
-											dishesDisplayData[i][8],
-											dishesDisplayData[i][9] ]);
-								}
-							}
-						}
-						dishesDisplayStore.reload();
-					});
+	$("#orderSpell").bind("keyup", function() {
+		var curDishSpell = Ext.getCmp("orderSpell").getValue().toUpperCase() + "";
+		if (curDishSpell == "") {
+			dishesDisplayDataShow.length = 0;
+			for ( var i = 0; i < dishesDisplayData.length; i++) {
+				dishesDisplayDataShow.push([
+					dishesDisplayData[i][0],
+					dishesDisplayData[i][1],
+					dishesDisplayData[i][2],
+					dishesDisplayData[i][3],
+					dishesDisplayData[i][4],
+					dishesDisplayData[i][5],
+					dishesDisplayData[i][6],
+					dishesDisplayData[i][7],
+					dishesDisplayData[i][8],
+					dishesDisplayData[i][9] 
+				]);
+			}
+		} else {
+			dishesDisplayDataShow.length = 0;
+			for ( var i = 0; i < dishesDisplayData.length; i++) {
+				if ((dishesDisplayData[i][2] + "").substring(0, curDishSpell.length).toUpperCase() == curDishSpell) {
+					dishesDisplayDataShow.push([
+						dishesDisplayData[i][0],
+						dishesDisplayData[i][1],
+						dishesDisplayData[i][2],
+						dishesDisplayData[i][3],
+						dishesDisplayData[i][4],
+						dishesDisplayData[i][5],
+						dishesDisplayData[i][6],
+						dishesDisplayData[i][7],
+						dishesDisplayData[i][8],
+						dishesDisplayData[i][9] 
+					]);
+				}
+			}
+		}
+		dishesDisplayStore.reload();
+	});
 }
 
 // on page load function
