@@ -3,6 +3,7 @@
 <struts-config>
 	<global-exceptions />
 	<global-forwards />
+	
 	<action-mappings>
 		<action path="/QueryTable"
 			type="com.wireless.Actions.tableSelect.QueryTableAction" scope="request">
@@ -346,10 +347,23 @@
 		<action path="/InventoryAnalysis"
 			type="com.wireless.Actions.inventoryMgr.statistics.InventoryAnalysis" scope="request">
 		</action>
-		<action path="/SalesSubStatistics" type="com.wireless.Actions.billHistory.SalesSubStatisticsAction" scope="request"></action>
-		<action path="/QueryDeptTree" type="com.wireless.Actions.deptMgr.QueryDeptTreeAction" scope="request"></action>
-		<action path="/QueryBackFood" type="com.wireless.Actions.billHistory.QueryBackFoodAction" scope="request"></action>
-		<action path="/UpdateFoodMaterial" type="com.wireless.Actions.menuMgr.UpdateFoodMaterialAction" scope="request"></action>
+		<action path="/SalesSubStatistics" 
+			type="com.wireless.Actions.billHistory.SalesSubStatisticsAction" scope="request"></action>
+		<action path="/QueryDeptTree" 
+			type="com.wireless.Actions.deptMgr.QueryDeptTreeAction" scope="request"></action>
+		<action path="/QueryCancelledFood" 
+			type="com.wireless.Actions.billHistory.QueryCancelledFoodAction" scope="request"></action>
+		<action path="/UpdateFoodMaterial" 
+			type="com.wireless.Actions.menuMgr.UpdateFoodMaterialAction" scope="request"></action>
+		<action path="/QueryFoodTaste" 
+			type="com.wireless.Actions.menuMgr.QueryFoodTasteAction" scope="request"></action>
+		<action path="/InsertFoodTaste" 
+			type="com.wireless.Actions.menuMgr.InsertFoodTasteAction" scope="request"></action>
+		<action path="/DeleteFoodTaste" 
+			type="com.wireless.Actions.menuMgr.DeleteFoodTasteAction" scope="request"></action>	
+		<action path="/UpdateFoodTaste" 
+			type="com.wireless.Actions.menuMgr.UpdateFoodTasteAction" scope="request"></action>
 	</action-mappings>
+	
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
 </struts-config>
