@@ -1,5 +1,6 @@
 package com.wireless.util;
 
+import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
 
@@ -57,8 +58,8 @@ public class WebParams {
 	public final static String CATE_SPEC_TEXT = "规格"; 
 	public final static String CALC_PRICE_TEXT = "按价格"; 
 	public final static String CALC_RATE_TEXT = "按比例"; 
-	public final static long TASTE_REF_TYPE_MANUAL = 2;
-	public final static long TASTE_REF_TYPE_SMART = 1;
+	public final static long TASTE_SMART_REF = Food.TASTE_SMART_REF;
+	public final static long TASTE_MANUAL_REF = Food.TASTE_MANUAL_REF;
 	
 	/**
 	 * The status of the food.
@@ -73,7 +74,7 @@ public class WebParams {
 	/**
 	 * 
 	 */
-	public final static long ERROR_CODE = 0000;
+	public final static long ERROR_CODE = 1111;
 	public final static String ERROR_MSG = "";
 	public final static String ERROR_TITLE = WebParams.TIP_TITLE_DEFAULT;
 	public final static long ERROR_LV = 0;

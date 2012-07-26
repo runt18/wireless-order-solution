@@ -1,11 +1,15 @@
 package com.wireless.db.menuMgr;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.QueryMenu;
+import com.wireless.db.tasteRef.TasteRef;
 import com.wireless.pojo.menuMgr.FoodTaste;
+import com.wireless.protocol.Food;
 import com.wireless.util.WebParams;
 
 public class FoodTasteDao {
@@ -33,7 +37,7 @@ public class FoodTasteDao {
 					" AND A.FOOD_ID = " + ft.getFoodID() +
 					" AND A.RESTAURANT_ID = " + ft.getRestaurantID() +
 					" ORDER BY A.RANK DESC " +
-					" LIMIT 0,15"; 
+					" "; 
 					
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while(dbCon.rs.next()){
@@ -73,8 +77,9 @@ public class FoodTasteDao {
 		DBCon dbCon = new DBCon();
 		int count = 0;
 		try{
-			dbCon.connect();
+			updateFoodTasteRefType(ft.getFoodID(), ft.getRestaurantID(), WebParams.TASTE_MANUAL_REF);
 			
+			dbCon.connect();
 			String sql = "INSERT INTO " + Params.dbName + ".FOOD_TASTE_RANK (FOOD_ID, RESTAURANT_ID, TASTE_ID, RANK) " +
 					" VALUES(" +
 					ft.getFoodID() + "," +
@@ -121,10 +126,10 @@ public class FoodTasteDao {
 	 * @throws Exception
 	 */
 	public static int deleteFoodTaste(FoodTaste ft) throws Exception{
-		updateFoodTasteRefType(ft.getFoodID(), ft.getRestaurantID(), WebParams.TASTE_REF_TYPE_MANUAL);
+		updateFoodTasteRefType(ft.getFoodID(), ft.getRestaurantID(), WebParams.TASTE_MANUAL_REF);
 		String extraCond = " AND FOOD_ID = " + ft.getFoodID() +
-						   " AND TASTE_ID = " + ft.getTasteID() + 
-						   " AND RESTAURANT_ID IN (" + ft.getRestaurantID() + ")";
+						   " AND TASTE_ID IN (" + ft.getTasteID() + ")" + 
+						   " AND RESTAURANT_ID = " + ft.getRestaurantID() + "";
 		return deleteModel(extraCond);
 	}
 	
@@ -137,10 +142,10 @@ public class FoodTasteDao {
 	 * @throws Exception
 	 */
 	public static int deleteFoodTaste(long foodID, long tasteID, long restaurantID) throws Exception{
-		updateFoodTasteRefType(foodID, restaurantID, WebParams.TASTE_REF_TYPE_MANUAL);
+		updateFoodTasteRefType(foodID, restaurantID, WebParams.TASTE_MANUAL_REF);
 		String extraCond = " AND FOOD_ID = " + foodID +
-						   " AND TASTE_ID = " + foodID + 
-						   " AND RESTAURANT_ID IN (" + restaurantID + ")";
+						   " AND RESTAURANT_ID = " + restaurantID + 
+						   " AND TASTE_ID IN (" + tasteID + ")";
 		return deleteModel(extraCond);
 	}
 	
@@ -151,10 +156,10 @@ public class FoodTasteDao {
 	 * @throws Exception
 	 */
 	public static int deleteDiffTaste(FoodTaste ft) throws Exception{
-		updateFoodTasteRefType(ft.getFoodID(), ft.getRestaurantID(), WebParams.TASTE_REF_TYPE_MANUAL);
+		updateFoodTasteRefType(ft.getFoodID(), ft.getRestaurantID(), WebParams.TASTE_MANUAL_REF);
 		String extraCond = " AND FOOD_ID = " + ft.getFoodID() +
-				   " AND TASTE_ID = " + ft.getTasteID() + 
-				   " AND RESTAURANT_ID NOT IN (" + ft.getRestaurantID() + ")";
+				   " AND RESTAURANT_ID = " + ft.getRestaurantID() + 
+				   " AND TASTE_ID NOT IN (" + ft.getTasteID() + ")";
 		return deleteModel(extraCond);
 	}
 	
@@ -167,10 +172,10 @@ public class FoodTasteDao {
 	 * @throws Exception
 	 */
 	public static int deleteDiffTaste(long foodID, String tasteID, long restaurantID) throws Exception{
-		updateFoodTasteRefType(foodID, restaurantID, WebParams.TASTE_REF_TYPE_MANUAL);
+		updateFoodTasteRefType(foodID, restaurantID, WebParams.TASTE_MANUAL_REF);
 		String extraCond = " AND FOOD_ID = " + foodID +
-				   " AND TASTE_ID = " + tasteID + 
-				   " AND RESTAURANT_ID NOT IN (" + restaurantID + ")";
+				   " AND RESTAURANT_ID = " + restaurantID +
+				   " AND TASTE_ID NOT IN (" + tasteID + ")";
 		return deleteModel(extraCond);
 	}
 	
@@ -199,6 +204,49 @@ public class FoodTasteDao {
 			dbCon.disconnect();
 		}
 		return count;
+	}
+	
+	/**
+	 * 
+	 * @param foodID
+	 * @return
+	 * @throws SQLException 
+	 */
+	public static void updataBySmart(long foodID, long restaurantID) throws Exception{
+		updateFoodTasteRefType(foodID, restaurantID, WebParams.TASTE_SMART_REF);
+		Food[] updateFood = QueryMenu.queryFoods(" AND FOOD.FOOD_ID = " + foodID, null);
+		if(updateFood.length != 1){
+			throw new Exception();
+		}
+		TasteRef.execByFood(updateFood[0]);
+	}
+	
+	/**
+	 * 
+	 * @param foodID
+	 * @param tasteID
+	 * @param restaurantID
+	 * @return
+	 * @throws Exception
+	 */
+	public static int updataByManual(long foodID, String tasteID, long restaurantID) throws Exception{
+		if(tasteID == null || tasteID.trim().length() == 0){
+			throw new Exception();
+		}
+		// 容错处理
+		String[] check = tasteID.split(",");
+		tasteID = "";
+		for(int i = 0; i < check.length; i++){
+			if(check[i].trim().length() > 0){
+				tasteID += (tasteID.length() > 0 ? "," : "");
+				tasteID += check[i].trim();
+			}
+		}
+		if(tasteID.trim().length() == 0){
+			throw new Exception();
+		}
+		deleteDiffTaste(foodID, tasteID, restaurantID);
+		return updateFoodTasteRefType(foodID, restaurantID, WebParams.TASTE_MANUAL_REF);
 	}
 	
 }
