@@ -206,6 +206,27 @@ public class TableActivity extends Activity {
 			}
 		});
 		/**
+		 * 搜索框
+		 */
+		final AutoCompleteTextView txtView = (AutoCompleteTextView)findViewById(R.id.search_view_table);
+		txtView.addTextChangedListener(new TextWatcher(){
+			@Override public void afterTextChanged(Editable s) {}
+			@Override public void beforeTextChanged(CharSequence s,int start, int count, int after) {}
+			@Override
+			public void onTextChanged(CharSequence s,
+					int start, int before, int count) {
+				// TODO Auto-generated method stub
+				if(s.length()!=0)
+				{
+					String text = s.toString().trim();
+					mHandler.matching(text);
+				}
+				else {
+					mHandler.sendEmptyMessage(BACK_TO_ALL);
+				}
+			}
+		});
+		/**
 		 * 刷新 button
 		 */
 		ImageButton refreshBtn = (ImageButton) findViewById(R.id.btn2_right);
@@ -214,6 +235,7 @@ public class TableActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				new QueryTableTask().execute();
+				txtView.setText("");
 			}
 		});
 		
@@ -236,27 +258,7 @@ public class TableActivity extends Activity {
 		allBtn.setVisibility(View.VISIBLE);
 		allBtn.setOnClickListener(new BottomOnClickListener(BottomOnClickListener.ALL));
 		
-		/**
-		 * 搜索框
-		 */
-		final AutoCompleteTextView txtView = (AutoCompleteTextView)findViewById(R.id.search_view_table);
-		txtView.addTextChangedListener(new TextWatcher(){
-			@Override public void afterTextChanged(Editable s) {}
-			@Override public void beforeTextChanged(CharSequence s,int start, int count, int after) {}
-			@Override
-			public void onTextChanged(CharSequence s,
-					int start, int before, int count) {
-				// TODO Auto-generated method stub
-				if(s.length()!=0)
-				{
-					String text = s.toString().trim();
-					mHandler.matching(text);
-				}
-				else {
-					mHandler.sendEmptyMessage(BACK_TO_ALL);
-				}
-			}
-		});
+
 		/**
 		 * 清空按钮
 		 */
@@ -460,6 +462,8 @@ public class TableActivity extends Activity {
 				break;
 			case 27: list = allList;
 				((TextView)findViewById(R.id.hint_text_table)).setVisibility(View.INVISIBLE);
+				mListView.setVisibility(View.VISIBLE);
+
 				changed=true;
 				break;
 			}
@@ -489,7 +493,8 @@ public class TableActivity extends Activity {
 			boolean isMatched = false;
 			TextView hint = (TextView)findViewById(R.id.hint_text_table);
 			hint.setVisibility(View.INVISIBLE);
-			
+			mListView.setVisibility(View.VISIBLE);
+
 			List<Map<String, ?>> list = new ArrayList<Map<String, ?>>();
 			/**
 			 * 将全局搜索改成局部搜索
@@ -530,6 +535,7 @@ public class TableActivity extends Activity {
 				list.clear();
 				listChanged(list);
 				hint.setVisibility(View.VISIBLE);
+				mListView.setVisibility(View.GONE);
 			}
 			
 			
@@ -540,6 +546,8 @@ public class TableActivity extends Activity {
 			buttonUp();
 			allBtn.setImageResource(R.drawable.alldown);
 			titleTextView.setText("全部");
+			mListView.setVisibility(View.VISIBLE);
+
 			((TextView)findViewById(R.id.hint_text_table)).setVisibility(View.INVISIBLE);
 
 		}
