@@ -15,6 +15,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
@@ -22,7 +23,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupWindow;
@@ -33,6 +33,7 @@ import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.protocol.ProtocolPackage;
+import com.wireless.protocol.Region;
 import com.wireless.protocol.ReqQueryRegion;
 import com.wireless.protocol.ReqQueryTable;
 import com.wireless.protocol.RespParser;
@@ -54,8 +55,8 @@ public class TableActivity extends Activity {
 	
 	
 	static final int CHANGE_TO_ALL=24;
-	static final int CHANGE_TO_IDLE=25;
-	static final int CHANGE_TO_BUSY=26;
+//	static final int CHANGE_TO_IDLE=25;
+//	static final int CHANGE_TO_BUSY=26;
 	
 	static final int BACK_TO_ALL=27;
 	
@@ -78,7 +79,6 @@ public class TableActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.table);
 		ctx = this.getApplicationContext();
-
 		prepareUI();
 	}
 	@Override
@@ -91,7 +91,7 @@ public class TableActivity extends Activity {
 		titleTextView = (TextView) findViewById(R.id.toptitle);
 		titleTextView.setVisibility(View.VISIBLE);
 		titleTextView.setBackgroundResource(R.drawable.title_selector);
-		titleTextView.setText("全部");
+		titleTextView.setText("全部区域");
 		
 		mHandler = new TableHandler();
 		mListView = (PullListView) findViewById(R.id.listView_table);
@@ -100,13 +100,43 @@ public class TableActivity extends Activity {
 		mListView.setOnRefreshListener(new OnRefreshListener(){
 			@Override
 			public void onRefresh() {
-				new QueryTableTask().execute();
+				new QueryRegionTask().execute();
 			}
 		});
-		
+		new QueryRegionTask().execute();
 	
 		
-		final MyPopupWindow popWnd =new MyPopupWindow();
+		final PopupWindow popWnd;
+		// 创建点击餐台状态后弹出区域的View
+		final View popupView = getLayoutInflater()
+				.inflate(R.layout.main_pop_window, null);
+		// 创建与这个View关联的pop-up window
+		popWnd = new PopupWindow(
+				popupView,
+				LayoutParams.WRAP_CONTENT,
+				LayoutParams.WRAP_CONTENT, true);
+		popWnd.setOutsideTouchable(true);
+		popWnd.setBackgroundDrawable(new BitmapDrawable());
+		popWnd.update();	
+		
+		ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(ctx,R.layout.pop_wnd_item,mHandler.getRegions());
+		ListView popListView = (ListView)popupView.findViewById(R.id.popWndList);
+		
+		popListView.setAdapter(arrayAdapter);
+		
+		popListView.setOnItemClickListener(new OnItemClickListener(){
+
+			@Override
+			public void onItemClick(
+					AdapterView<?> arg0, View arg1,
+					int arg2, long arg3) {
+				// TODO Auto-generated method stub
+				mHandler.sendEmptyMessage(arg2);
+				popWnd.dismiss();
+			}
+			
+		});
+		
 		ImageButton titleBtn = (ImageButton)findViewById(R.id.title_btn_top);
 		titleBtn.setVisibility(View.VISIBLE);
 		titleBtn.setOnClickListener(new OnClickListener(){
@@ -120,75 +150,11 @@ public class TableActivity extends Activity {
 			}
 		});
 	}
-	private class MyPopupWindow{
-		PopupWindow popWnd;
-		MyPopupWindow(){
-			// 创建点击餐台状态后弹出区域的View
-			final View popupView = getLayoutInflater()
-					.inflate(R.layout.main_pop_window, null);
-			// 创建与这个View关联的pop-up window
-			popWnd = new PopupWindow(
-					popupView,
-					LayoutParams.WRAP_CONTENT,
-					LayoutParams.WRAP_CONTENT, true);
-			popWnd.setOutsideTouchable(true);
-			popWnd.setBackgroundDrawable(new BitmapDrawable());
-			popWnd.update();	
-			
-			ArrayList<Short> shortList =mHandler.getRegions();
-			Object[] obj = shortList.toArray();
-			int stringLength = obj.length+1;
-			String[] regionNames = new String[stringLength];
-			regionNames[0] = "全部区域";
-			for(int i=1;i<regionNames.length;i++)
-			{
-				short r = (Short) obj[i-1];
-				r++;
-				regionNames[i]="区域："+r;
-			}
-			
-			ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(ctx,R.layout.pop_wnd_item,regionNames);
-			ListView popListView = (ListView)popupView.findViewById(R.id.popWndList);
-			
-			popListView.setAdapter(arrayAdapter);
-			
-			popListView.setOnItemClickListener(new OnItemClickListener(){
 
-				@Override
-				public void onItemClick(
-						AdapterView<?> arg0, View arg1,
-						int arg2, long arg3) {
-					// TODO Auto-generated method stub
-					System.out.println(arg2);
-					mHandler.sendEmptyMessage(arg2);
-					popWnd.dismiss();
-				}
-				
-			});
-		}
-		
-		boolean isShowing()
-		{
-			return popWnd.isShowing();
-		}
-		
-		void dismiss()
-		{
-			popWnd.dismiss();
-		}
-
-		public void showAsDropDown(View v) {
-			// TODO Auto-generated method stub
-			popWnd.showAsDropDown(v);
-		}
-	}
 	/**
 	 * 初始化UI
 	 */
 	private void prepareUI() {
-		// TODO Auto-generated method stub
-
-
 		/**
 		 * "返回"Button
 		 */
@@ -234,7 +200,7 @@ public class TableActivity extends Activity {
 		refreshBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				new QueryTableTask().execute();
+				new QueryRegionTask().execute();
 				txtView.setText("");
 			}
 		});
@@ -256,7 +222,13 @@ public class TableActivity extends Activity {
 		allBtn.setImageResource(R.drawable.home_selector);
 		allBtn.setLayoutParams(lp);
 		allBtn.setVisibility(View.VISIBLE);
-		allBtn.setOnClickListener(new BottomOnClickListener(BottomOnClickListener.ALL));
+		allBtn.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				mHandler.sendEmptyMessage(CHANGE_TO_ALL);
+			}
+		});
 		
 
 		/**
@@ -264,13 +236,11 @@ public class TableActivity extends Activity {
 		 */
 		ImageButton deleteBtn = (ImageButton)findViewById(R.id.deleteBtn_table);
 		deleteBtn.setOnClickListener(new OnClickListener(){
-
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				txtView.setText("");
 			}
-			
 		});
 
 		/**
@@ -293,7 +263,7 @@ public class TableActivity extends Activity {
 		eatingBtn.setOnClickListener(new BottomOnClickListener(BottomOnClickListener.BUSY));
 		
 	}
-
+	
 	private class BottomOnClickListener implements OnClickListener{
 		static final int ALL = 0;
 		static final int IDLE = 1;
@@ -320,10 +290,10 @@ public class TableActivity extends Activity {
 		private Table[] tableSource;
 		private ImageButton allBtn,idleBtn,busyBtn;
 		TextView mAllTextView,mIdleTextView,mBusyTextView;
-
+		private Region[] regionSource;
+		private ArrayList<String> regionNames= new ArrayList<String>();
 		TableHandler()
 		{
-			tableSource = WirelessOrder.tables == null ? new Table[0]: WirelessOrder.tables;
 			allList = new ArrayList<Map<String, ?>>();
 			idleList = new ArrayList<Map<String, ?>>();
 			busyList = new ArrayList<Map<String, ?>>();
@@ -339,26 +309,52 @@ public class TableActivity extends Activity {
 		}
 		
 		private void init(){
+			tableSource = WirelessOrder.tables == null ? new Table[0]: WirelessOrder.tables;
+			regionSource = WirelessOrder.regions == null ? new Region[0] : WirelessOrder.regions;
+			
 			for (Table t : tableSource) {
 				if(!regions.contains(t.regionID))
 					regions.add(t.regionID);
 				addData(t);
 			}
+			
+			refreshRegion();
 		}
 		
-		ArrayList<Short> getRegions()
+		private void refreshRegion()
 		{
-			return regions;
+			regionNames.add("全部区域");
+			for(int i=0;i<regionSource.length;i++)
+			{
+				if(regions.contains(regionSource[i].regionID))
+				{
+					regionNames.add(regionSource[i].name);
+				}
+			}
+//			
+//			for(String region:regionNames)
+//				Log.d("ddddddddd",region);
 		}
+		/**
+		 * 
+		 * @return 所有有餐台的区域名
+		 */
+		ArrayList<String> getRegions()
+		{
+			return regionNames;
+		}
+		/**
+		 * 刷新handler里面的数据
+		 */
 		void refreshData()
 		{
-			tableSource = WirelessOrder.tables == null ? new Table[0]: WirelessOrder.tables;
 			clearData();
 			regions.clear();
+			regionNames.clear();
 			init();
 		}
 
-		void chooseRegion(int regionID)
+		private void chooseRegion(int regionID)
 		{
 			clearData();
 			for(Table t:tableSource)
@@ -421,7 +417,6 @@ public class TableActivity extends Activity {
 			case 9:
 			case 10:
 				int region= msg.what-1;
-				System.out.println(region);
 				if(regions.contains((short)(region)));
 				{
 					chooseRegion(region);
@@ -429,38 +424,39 @@ public class TableActivity extends Activity {
 					buttonUp();
 					allBtn.setImageResource(R.drawable.alldown);
 					showNum();
-					titleTextView.setText("区域："+msg.what);
+					titleTextView.setText(regionNames.get(msg.what));
 					changed=true;
 				}
 				break;
-			case 21: list = allList;
+			case ALL_BTN_CLICKED:
+				list = allList;
 				buttonUp();
 				allBtn.setImageResource(R.drawable.alldown);
 				changed=true;
 				break;
-			case 22: list = idleList;
+			case IDLE_BTN_CLICKED: list = idleList;
 				buttonUp();
 				idleBtn.setImageResource(R.drawable.freedown);
 				changed=true;
 				break;
-			case 23: list = busyList;
+			case BUSY_BTN_CLICKED: list = busyList;
 				buttonUp();
 				busyBtn.setImageResource(R.drawable.eatingdown);
 				changed=true;
 				break;
-			case 24: refreshData();
+			case CHANGE_TO_ALL: refreshData();
 				list = allList;
 				showNum();
 				resetView();
 				changed=true;
 				break;
-			case 25: list = idleList;
-				changed=true;
-				break;
-			case 26: list = busyList;
-				changed=true;
-				break;
-			case 27: list = allList;
+//			case CHANGE_TO_IDLE: list = idleList;
+//				changed=true;
+//				break;
+//			case CHANGE_TO_BUSY: list = busyList;
+//				changed=true;
+//				break;
+			case BACK_TO_ALL: list = allList;
 				((TextView)findViewById(R.id.hint_text_table)).setVisibility(View.INVISIBLE);
 				mListView.setVisibility(View.VISIBLE);
 
@@ -488,6 +484,10 @@ public class TableActivity extends Activity {
 			mBusyTextView.setVisibility(View.VISIBLE);
 		}
 		
+		/**
+		 * 搜索匹配
+		 * @param text 输入的字符串
+		 */
 		void matching(String text)
 		{
 			boolean isMatched = false;
@@ -496,21 +496,15 @@ public class TableActivity extends Activity {
 			mListView.setVisibility(View.VISIBLE);
 
 			List<Map<String, ?>> list = new ArrayList<Map<String, ?>>();
-			/**
-			 * 将全局搜索改成局部搜索
-			 */
-			
+	
 			for(Map<String,?> t:allList)
 			{
 				String aliasID = t.get(tabs[0]).toString();
 				String customNum = t.get(tabs[1]).toString();
 				String tableName = t.get(tabs[3]).toString();
 				String state = t.get(tabs[2]).toString();
-				System.out.println(customNum+" "+tableName+" "+state);
 				if(aliasID.startsWith(text)||customNum.contains(text))
-//				if(String.valueOf(t.aliasID).startsWith(text)||t.name.contains(text))
 				{
-					System.out.println("true");
 					HashMap<String, Object> map = new HashMap<String, Object>();
 					map.put(tabs[0],aliasID);
 					map.put(tabs[1],customNum );
@@ -518,13 +512,6 @@ public class TableActivity extends Activity {
 					map.put(tabs[2], state);
 					list.add(map);
 					isMatched = true;
-//					map.put(tabs[0], t.aliasID);
-//					map.put(tabs[1], "人数: " + t.custom_num);
-//					map.put(tabs[3], t.name);
-//					String st= t.status==0? "空闲":"就餐";
-//					map.put(tabs[2],"状态： "+st);
-//					list.add(map);
-//					isMatched = true;
 				}
 			}
 			if(isMatched)
@@ -537,15 +524,13 @@ public class TableActivity extends Activity {
 				hint.setVisibility(View.VISIBLE);
 				mListView.setVisibility(View.GONE);
 			}
-			
-			
 		}
 		
 		private void resetView()
 		{
 			buttonUp();
 			allBtn.setImageResource(R.drawable.alldown);
-			titleTextView.setText("全部");
+			titleTextView.setText("全部区域");
 			mListView.setVisibility(View.VISIBLE);
 
 			((TextView)findViewById(R.id.hint_text_table)).setVisibility(View.INVISIBLE);
@@ -559,12 +544,64 @@ public class TableActivity extends Activity {
 		
 		private void listChanged(List<? extends Map<String,?>> list)
 		{
-			mAdapter = new SimpleAdapter(ctx, list,
+			if(list!=null)
+			{
+				mAdapter = new SimpleAdapter(ctx, list,
 					R.layout.the_table, tabs,layouts);
-			mListView.setAdapter(mAdapter);
+				mListView.setAdapter(mAdapter);
+			}
 		}
 	}
 
+	
+	private class QueryRegionTask extends AsyncTask<Void, Void, String>{
+		/**
+		 * 在执行请求区域信息前显示提示信息
+		 */
+		@Override
+		protected void onPreExecute(){			
+			Toast.makeText(ctx, "正在刷新", Toast.LENGTH_SHORT).show();
+		}
+		
+		/**
+		 * 在新的线程中执行请求区域信息的操作
+		 */
+		@Override
+		protected String doInBackground(Void... arg0) {
+		
+			String errMsg = null;
+			try{
+				WirelessOrder.regions = null;
+				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryRegion());
+				if(resp.header.type == Type.ACK){
+					WirelessOrder.regions = RespParser.parseQueryRegion(resp);
+				}
+			}catch(IOException e){
+				errMsg = e.getMessage();
+			}
+			
+			return errMsg;
+		}
+		
+		/**
+		 * 根据返回的error message判断，如果发错异常则提示用户，
+		 * 如果成功，则执行请求餐台的操作。
+		 */
+		@Override
+		protected void onPostExecute(String errMsg){
+			/**
+			 * Prompt user message if any error occurred.
+			 */		
+			if(errMsg != null){
+				mListView.onRefreshComplete();
+				Toast.makeText(ctx, "刷新区域数据失败,请检查网络",
+						Toast.LENGTH_SHORT).show();
+				
+			}else{				
+				new QueryTableTask().execute();
+			}
+		}
+	};
 	/**
 	 * 请求餐台信息
 	 */
@@ -575,7 +612,6 @@ public class TableActivity extends Activity {
 		 */
 		@Override
 		protected void onPreExecute() {
-			Toast.makeText(ctx, "正在刷新", Toast.LENGTH_SHORT).show();
 		}
 
 		/**
@@ -593,7 +629,7 @@ public class TableActivity extends Activity {
 				if (resp.header.type == Type.ACK) {
 					WirelessOrder.tables = RespParser
 							.parseQueryTable(resp);
-					mHandler.refreshData();
+//					mHandler.refreshData();
 				}
 			} catch (IOException e) {
 				errMsg = e.getMessage();
@@ -610,10 +646,16 @@ public class TableActivity extends Activity {
 			/**
 			 * Prompt user message if any error occurred.
 			 */
+			TextView tv = (TextView)findViewById(R.id.hint_text_table);
+
 			if (errMsg != null) {
 				mListView.onRefreshComplete();
 				Toast.makeText(ctx, "刷新餐台数据失败,请检查网络",
 						Toast.LENGTH_SHORT).show();
+				mListView.setVisibility(View.GONE);
+				tv.setText("请重新刷新数据");
+				tv.setVisibility(View.VISIBLE);
+
 
 			} else {
 				mHandler.sendEmptyMessage(CHANGE_TO_ALL);
@@ -621,6 +663,8 @@ public class TableActivity extends Activity {
 				mHandler.resetView();
 				Toast.makeText(ctx, "刷新成功",
 						Toast.LENGTH_SHORT).show();
+				tv.setText("没有找到匹配的项");
+				tv.setVisibility(View.INVISIBLE);
 			}
 		}
 	}
