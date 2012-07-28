@@ -45,21 +45,21 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.order);
         
+	
+		TextView titleTxtView = (TextView) findViewById(R.id.toptitle);
+		titleTxtView.setVisibility(View.VISIBLE);
+		titleTxtView.setText("下单");
+
+		TextView leftTxtView = (TextView) findViewById(R.id.textView_left);
+		leftTxtView.setText("返回");
+		leftTxtView.setVisibility(View.VISIBLE);
+		
 		/**
 		 * "返回"Button
-		 */
-		
-		TextView title = (TextView) findViewById(R.id.toptitle);
-		title.setVisibility(View.VISIBLE);
-		title.setText("下单");
-
-		TextView left = (TextView) findViewById(R.id.textView_left);
-		left.setText("返回");
-		left.setVisibility(View.VISIBLE);
-		
-		ImageButton back = (ImageButton) findViewById(R.id.btn_left);
-		back.setVisibility(View.VISIBLE);
-		back.setOnClickListener(new View.OnClickListener(){
+		 */	
+		ImageButton backImgBtn = (ImageButton) findViewById(R.id.btn_left);
+		backImgBtn.setVisibility(View.VISIBLE);
+		backImgBtn.setOnClickListener(new View.OnClickListener(){
 			@Override
 			public void onClick(View v) {
 				showExitDialog();
@@ -67,20 +67,21 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 		});
 		
 		//set the table No
-		((EditText)findViewById(R.id.tblNoEdtTxt)).setText(getIntent().getExtras().getString("TableAmount"));
+		((EditText)findViewById(R.id.tblNoEdtTxt)).setText(getIntent().getExtras().getString(MainActivity.KEY_TABLE_ID));
 		//set the default customer to 1
 		((EditText)findViewById(R.id.customerNumEdtTxt)).setText("1");
+		
+
+		TextView rightTxtView = (TextView)findViewById(R.id.textView_right);
+		rightTxtView.setText("提交");
+		rightTxtView.setVisibility(View.VISIBLE);
 		
 		/**
 		 * 下单"提交"Button
 		 */
-		TextView right=(TextView)findViewById(R.id.textView_right);
-		right.setText("提交");
-		right.setVisibility(View.VISIBLE);
-		
-		ImageButton next=(ImageButton)findViewById(R.id.btn_right);
-		next.setVisibility(View.VISIBLE);
-		next.setOnClickListener(new View.OnClickListener(){
+		ImageButton commitBtn = (ImageButton)findViewById(R.id.btn_right);
+		commitBtn.setVisibility(View.VISIBLE);
+		commitBtn.setOnClickListener(new View.OnClickListener(){
 
 			@Override
 			public void onClick(View arg0) {

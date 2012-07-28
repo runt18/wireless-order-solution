@@ -42,20 +42,18 @@ import android.widget.Toast;
 
 import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
-import com.wireless.parcel.OrderParcel;
 import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.Order;
 import com.wireless.protocol.PinGen;
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqCancelOrder;
 import com.wireless.protocol.ReqPackage;
 import com.wireless.protocol.ReqQueryMenu;
-import com.wireless.protocol.ReqQueryOrder;
-import com.wireless.protocol.ReqQueryOrder2;
 import com.wireless.protocol.ReqQueryRestaurant;
 import com.wireless.protocol.ReqQueryStaff;
+import com.wireless.protocol.ReqTableStatus;
 import com.wireless.protocol.RespParser;
 import com.wireless.protocol.StaffTerminal;
+import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 import com.wireless.protocol.Type;
 import com.wireless.sccon.ServerConnector;
@@ -63,11 +61,11 @@ import com.wireless.ui.dialog.AskPwdDialog;
 
 public class MainActivity extends Activity {
 
-	private static final String KEY_TABLE_ID = "TableAmount";
+	public static final String KEY_TABLE_ID = "TableAmount";
 	public static final int NETWORK_SET = 6;
 	
 	private static final int DIALOG_INSERT_ORDER = 0;
-	private static final int DIALOG_UPDATE_ORDER = 1;
+	//private static final int DIALOG_UPDATE_ORDER = 1;
 	private static final int DIALOG_CANCEL_ORDER = 2;
 	private static final int DIALOG_BILL_ORDER = 3;
 	private static final int DIALOG_STAFF_LOGIN = 4;
@@ -136,7 +134,7 @@ public class MainActivity extends Activity {
 						   };
 
 		String[] iconDesc = { 
-							 "下单", "改单", "删单", 
+							 "点菜", "查看", "删单", 
 							 "结账", "功能设置", "网络设置", 
 							 "菜谱更新", "注销", "关于" 
 							};
@@ -172,10 +170,10 @@ public class MainActivity extends Activity {
 				 */
 				if(position != 4 && position != 5 && position != 7 && position != 8){
 					if(WirelessOrder.staffs == null){
-						Toast.makeText(MainActivity.this, "没有查询到任何的员工信息，请在管理后台先添加员工信息", 0).show();
+						Toast.makeText(MainActivity.this, "没有查询到任何的员工信息，请在管理后台先添加员工信息", Toast.LENGTH_SHORT).show();
 						return;
 					}else if(WirelessOrder.foodMenu == null){
-						Toast.makeText(MainActivity.this, "没有查询到菜谱信息，请重新执行菜谱更新操作", 0).show();
+						Toast.makeText(MainActivity.this, "没有查询到菜谱信息，请重新执行菜谱更新操作", Toast.LENGTH_SHORT).show();
 						return;
 					}
 				}
@@ -187,8 +185,7 @@ public class MainActivity extends Activity {
 					break;
 
 				case 1:
-					//改单
-					showDialog(DIALOG_UPDATE_ORDER);
+					//TODO 查看
 					break;
 					
 				case 2:
@@ -305,10 +302,6 @@ public class MainActivity extends Activity {
 		if(dialogID == DIALOG_INSERT_ORDER){
 			//下单的餐台输入Dialog
 			return new AskTableDialog(DIALOG_INSERT_ORDER);
-			
-		}else if(dialogID == DIALOG_UPDATE_ORDER){
-			//改单的餐台输入Dialog
-			return new AskTableDialog(DIALOG_UPDATE_ORDER);
 			
 		}else if(dialogID == DIALOG_CANCEL_ORDER){
 			//删单的餐台输入Dialog
@@ -522,7 +515,7 @@ public class MainActivity extends Activity {
 					}
 				}).show();
 			}else{
-				Toast.makeText(MainActivity.this, "菜谱更新成功", 1).show();
+				Toast.makeText(MainActivity.this, "菜谱更新成功", Toast.LENGTH_SHORT).show();
 			}
 		}	
 	}
@@ -817,68 +810,7 @@ public class MainActivity extends Activity {
 		}
 	}
 	
-	/**
-	 * 删单的请求操作 
-	 */
-	private class CancelOrderTask extends AsyncTask<Void, Void, String>{
-		
-		private ProgressDialog _progDialog;
-		private int _tableID;
-		
-		public CancelOrderTask(int tableID) {
-			_tableID = tableID;
-		}
-		
-		/**
-		 * 在执行请求删单操作前显示提示信息
-		 */
-		@Override
-		protected void onPreExecute(){
-			_progDialog = ProgressDialog.show(MainActivity.this, "", "删除" + _tableID + "号餐台的信息...请稍候", true);
-		}
 
-		/**
-		 * 在新的线程中执行删单的请求
-		 */
-		@Override
-		protected String doInBackground(Void... arg0) {
-			String errMsg = null;
-			try{
-				ProtocolPackage resp = ServerConnector.instance().ask(new ReqCancelOrder(_tableID));
-				if(resp.header.type == Type.NAK){
-					errMsg = _tableID + "号餐台删单失败";
-				}
-			}catch(IOException e){
-				errMsg = e.getMessage();
-			}
-			return errMsg;
-		}
-		
-		/**
-		 * 根据返回的error message判断，如果发错异常则提示用户，
-		 * 如果成功，则提示用户删单成功
-		 */
-		@Override
-		protected void onPostExecute(String errMsg){
-			//make the progress dialog disappeared
-			_progDialog.dismiss();
-			/**
-			 * Prompt user message if any error occurred.
-			 */
-			if(errMsg != null){
-				new AlertDialog.Builder(MainActivity.this)
-				.setTitle("提示")
-				.setMessage(errMsg)
-				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						dialog.dismiss();
-					}
-				}).show();
-			}else{
-				Toast.makeText(MainActivity.this, _tableID + "号台删单成功", 1).show();
-			}
-		}
-	}
 	
 	/**
 	 * 餐台输入的Dialog
@@ -886,21 +818,84 @@ public class MainActivity extends Activity {
 	private class AskTableDialog extends Dialog{
 
 		/**
+		 * 删单的请求操作 
+		 */
+		private class CancelOrderTask extends AsyncTask<Void, Void, String>{
+			
+			private ProgressDialog _progDialog;
+			private int _tableID;
+			
+			CancelOrderTask(int tableID) {
+				_tableID = tableID;
+			}
+			
+			/**
+			 * 在执行请求删单操作前显示提示信息
+			 */
+			@Override
+			protected void onPreExecute(){
+				_progDialog = ProgressDialog.show(MainActivity.this, "", "删除" + _tableID + "号餐台的信息...请稍候", true);
+			}
+
+			/**
+			 * 在新的线程中执行删单的请求
+			 */
+			@Override
+			protected String doInBackground(Void... arg0) {
+				String errMsg = null;
+				try{
+					ProtocolPackage resp = ServerConnector.instance().ask(new ReqCancelOrder(_tableID));
+					if(resp.header.type == Type.NAK){
+						errMsg = _tableID + "号餐台删单失败";
+					}
+				}catch(IOException e){
+					errMsg = e.getMessage();
+				}
+				return errMsg;
+			}
+			
+			/**
+			 * 根据返回的error message判断，如果发错异常则提示用户，
+			 * 如果成功，则提示用户删单成功
+			 */
+			@Override
+			protected void onPostExecute(String errMsg){
+				//make the progress dialog disappeared
+				_progDialog.dismiss();
+				/**
+				 * Prompt user message if any error occurred.
+				 */
+				if(errMsg != null){
+					new AlertDialog.Builder(MainActivity.this)
+					.setTitle("提示")
+					.setMessage(errMsg)
+					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							dialog.dismiss();
+						}
+					}).show();
+				}else{
+					Toast.makeText(MainActivity.this, _tableID + "号台删单成功", 1).show();
+				}
+			}
+		}
+		
+		/**
 		 * 请求获得餐台的状态
 		 */
-		private class QueryOrder2Task extends AsyncTask<Void, Void, String>{
+		private class QueryTableStatusTask extends AsyncTask<Void, Void, String>{
 
-			
-			private int _tableID;
+			private byte _tableStatus = Table.TABLE_IDLE;
+			private int _tableAlias;
 			private ProgressDialog _progDialog;
 
-			QueryOrder2Task(int tableID){
-				_tableID =  tableID;
+			QueryTableStatusTask(int tableAlias){
+				_tableAlias =  tableAlias;
 			}
 			
 			@Override
 			protected void onPreExecute(){
-				_progDialog = ProgressDialog.show(MainActivity.this, "", "查询" + _tableID + "号餐台信息...请稍候", true);
+				_progDialog = ProgressDialog.show(MainActivity.this, "", "查询" + _tableAlias + "号餐台信息...请稍候", true);
 			}
 			
 			/**
@@ -910,53 +905,17 @@ public class MainActivity extends Activity {
 			protected String doInBackground(Void... arg0) {
 				String errMsg = null;
 				try{
-					ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryOrder2(_tableID));
+					ProtocolPackage resp = ServerConnector.instance().ask(new ReqTableStatus(_tableAlias));
 
-					if(_type == DIALOG_INSERT_ORDER){
-						if(resp.header.type == Type.ACK){
-							/**
-							 * 如果返回ACK，表示餐台处于占用状态，不能下单
-							 */
-							errMsg = _tableID + "号台已经下单";
-						}else{
-							if(resp.header.reserved == ErrorCode.TABLE_IDLE){
-								/**
-								 * 如果返回TABLE_IDLE的error code，表示餐台处于空闲状态，可以下单
-								 */
-								return null;
-							}else{
-								/**
-								 * 如果返回其他的error code，表示餐台不能下单（不如输入的台号不存在）
-								 */
-								errMsg = genErrMsg(_tableID, resp.header.reserved);
-								if(errMsg == null){
-									errMsg = "未确定的异常错误(" + resp.header.reserved + ")";
-								}
-							}
+					if(resp.header.type == Type.ACK){
+						_tableStatus = resp.header.reserved;
+						
+					}else{
+						errMsg = genErrMsg(_tableAlias, resp.header.reserved);
+						if(errMsg == null){
+							errMsg = "未确定的异常错误(" + resp.header.reserved + ")";
 						}
-					}else if(_type == DIALOG_UPDATE_ORDER || _type == DIALOG_CANCEL_ORDER|| _type == DIALOG_BILL_ORDER){
-						if(resp.header.type == Type.ACK){
-							/**
-							 * 如果返回ACK，表示餐台处于占用状态，可以改单和删单
-							 */
-							return null;
-						}else{
-							/**
-							 * 如果返回TABLE_IDLE的error code，表示餐台处于空闲状态，不能改单和删单
-							 */
-							if(resp.header.reserved == ErrorCode.TABLE_IDLE){
-								errMsg = _tableID + "号台还未下单";
-							}else{
-								/**
-								 * 如果返回其他的error code，表示餐台不能改单和删单（比如输入的台号不存在）
-								 */
-								errMsg = genErrMsg(_tableID, resp.header.reserved);
-								if(errMsg == null){
-									errMsg = "未确定的异常错误(" + resp.header.reserved + ")";
-								}
-							}
-						}
-					}
+					}					
 					
 				}catch(IOException e){
 					errMsg = e.getMessage();
@@ -967,7 +926,7 @@ public class MainActivity extends Activity {
 			
 			/**
 			 * 如果相应的操作不符合条件（比如要改单的餐台还未下单），
-			 * 则把相应信息提示给用户，否则，根据不用的动作类型，分别执行下/改/删单的操作。
+			 * 则把相应信息提示给用户，否则根据餐台状态，分别跳转到下单或改单界面。
 			 */
 			@Override
 			protected void onPostExecute(String errMsg){
@@ -989,176 +948,86 @@ public class MainActivity extends Activity {
 					
 				}else{
 					
-					if(_type == DIALOG_INSERT_ORDER){
-						//jump to the order activity with the table id
-						Intent intent = new Intent(MainActivity.this, OrderActivity.class);
-						intent.putExtra(KEY_TABLE_ID,String.valueOf(_tableID));
-						startActivity(intent);
-						dismiss();
-						
-					}else if(_type == DIALOG_UPDATE_ORDER){
-						//perform to query the order detail to this table 
-						new QueryOrderTask(_tableID, _type).execute();
-						dismiss();
-						
-					}else if(_type == DIALOG_BILL_ORDER){
-						//perform to query the order detail to this table
-						new QueryOrderTask(_tableID, _type).execute();
-						dismiss();
-						
-					}else if(_type == DIALOG_CANCEL_ORDER){
-						//perform to cancel the order associated with this table
-						new CancelOrderTask(_tableID).execute();					
-						dismiss();
-					}
-				}
-			}
-			
-		}
-		
-		/**
-		 * 执行请求对应餐台的账单信息 
-		 */
-		private class QueryOrderTask extends AsyncTask<Void, Void, String>{
-
-			private ProgressDialog _progDialog;
-			private int _tableID;
-			private Order _order;
-			private int _type = Type.UPDATE_ORDER;;
-			
-			QueryOrderTask(int tableID, int type){
-				_tableID = tableID;
-				_type = type;
-			}
-			
-			/**
-			 * 在执行请求删单操作前显示提示信息
-			 */
-			@Override
-			protected void onPreExecute(){
-				_progDialog = ProgressDialog.show(MainActivity.this, "", "查询" + _tableID + "号餐台的信息...请稍候", true);
-			}
-			
-			@Override
-			protected String doInBackground(Void... arg0) {
-				String errMsg = null;
-				try{
-					//根据tableID请求数据
-					ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryOrder(_tableID));
-					if(resp.header.type == Type.ACK){
-						_order = RespParser.parseQueryOrder(resp, WirelessOrder.foodMenu);
-						
-					}else{
-	    				if(resp.header.reserved == ErrorCode.TABLE_IDLE) {
-	    					errMsg = _tableID + "号台还未下单";
-	    					
-	    				}else if(resp.header.reserved == ErrorCode.TABLE_NOT_EXIST) {
-	    					errMsg = _tableID + "号台信息不存在";
-
-	    				}else if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
-	    					errMsg = "终端没有登记到餐厅，请联系管理人员。";
-
-	    				}else if(resp.header.reserved == ErrorCode.TERMINAL_EXPIRED) {
-	    					errMsg = "终端已过期，请联系管理人员。";
-
-	    				}else{
-	    					errMsg = "未确定的异常错误(" + resp.header.reserved + ")";
-	    				}
-					}
-				}catch(IOException e){
-					errMsg = e.getMessage();
-				}
-				
-				return errMsg;
-			}
-			
-			/**
-			 * 根据返回的error message判断，如果发错异常则提示用户，
-			 * 如果成功，则迁移到改单页面
-			 */
-			@Override
-			protected void onPostExecute(String errMsg){
-				//make the progress dialog disappeared
-				_progDialog.dismiss();
-				/**
-				 * Prompt user message if any error occurred.
-				 */
-				if(errMsg != null){
-					new AlertDialog.Builder(MainActivity.this)
-					.setTitle("提示")
-					.setMessage(errMsg)
-					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int id) {
-							dialog.dismiss();
+					if(_dialogType == DIALOG_INSERT_ORDER){
+						if(_tableStatus == Table.TABLE_IDLE){
+							//jump to the order activity with the table id if the table is idle
+							Intent intent = new Intent(MainActivity.this, OrderActivity.class);
+							intent.putExtra(KEY_TABLE_ID, String.valueOf(_tableAlias));
+							startActivity(intent);
+							dismiss();
+						}else if(_tableStatus == Table.TABLE_BUSY){
+							//jump to change order activity with the table alias id if the table is busy
+							Intent intent = new Intent(MainActivity.this, ChgOrderActivity.class);
+							intent.putExtra(KEY_TABLE_ID, String.valueOf(_tableAlias));
+							startActivity(intent);
+							dismiss();						
 						}
-					}).show();
-				}else{
-					if(_type == Type.UPDATE_ORDER){
-						//jump to the update order activity
-						Intent intent = new Intent(MainActivity.this, ChgOrderActivity.class);
-						Bundle bundle = new Bundle();
-						bundle.putParcelable(OrderParcel.KEY_VALUE, new OrderParcel(_order));
-						intent.putExtras(bundle);
-						startActivity(intent);
 						
-					}else if(_type == Type.PAY_ORDER){
-						//jump to the pay order activity
-						Intent intent = new Intent(MainActivity.this, BillActivity.class);
-						Bundle bundle = new Bundle();
-						bundle.putParcelable(OrderParcel.KEY_VALUE, new OrderParcel(_order));
-						intent.putExtras(bundle);
-						startActivity(intent);
+					}else if(_dialogType == DIALOG_BILL_ORDER){
+						if(_tableStatus == Table.TABLE_IDLE){
+							//prompt user the message if the table is idle when performing to pay order
+							new AlertDialog.Builder(MainActivity.this)
+								.setTitle("提示")
+								.setMessage(_tableAlias + "号台还未下单")
+								.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog, int id) {
+										dialog.dismiss();
+								}
+							}).show();
+						}else if(_tableStatus == Table.TABLE_BUSY){
+							//jump to the bill activity with table alias id if the table is busy
+							Intent intent = new Intent(MainActivity.this, BillActivity.class);
+							intent.putExtra(KEY_TABLE_ID, String.valueOf(_tableAlias));
+							startActivity(intent);
+							dismiss();						
+						}
 					}
 				}
-			}
-			
+			}			
 		}
 		
-		private int _type = DIALOG_INSERT_ORDER; 
+		private int _dialogType = DIALOG_INSERT_ORDER; 
 		
-		public AskTableDialog(int type) {
+		AskTableDialog(int dialogType) {
 			super(MainActivity.this, R.style.FullHeightDialog);
 			setContentView(R.layout.alert);
 			//getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
 			
 			//((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).showSoftInput((EditText)findViewById(R.id.mycount), InputMethodManager.SHOW_FORCED);
 			
-			_type = type;
+			_dialogType = dialogType;
 			TextView title = (TextView)findViewById(R.id.ordername);
-			if(_type == DIALOG_INSERT_ORDER){
-				title.setText("请输入需要下单的台号:");
-			}else if(_type == DIALOG_UPDATE_ORDER){
-				title.setText("请输入需要改单的台号:");
-			}else if(_type == DIALOG_CANCEL_ORDER){
+			if(_dialogType == DIALOG_INSERT_ORDER){
+				title.setText("请输入需要点菜的台号:");
+			}else if(_dialogType == DIALOG_CANCEL_ORDER){
 				title.setText("请输入需要删单的台号:");
-			}else if(_type == DIALOG_BILL_ORDER){
+			}else if(_dialogType == DIALOG_BILL_ORDER){
 				title.setText("请输入需要结账的台号:");
 			}else{
 				title.setText("请输入需要下单的台号:");
 			}
 			((TextView)findViewById(R.id.table)).setText("台号：");
-			Button ok = (Button)findViewById(R.id.confirm);
-			ok.setText("确定");
-			ok.setOnClickListener(new View.OnClickListener() {
+			Button okBtn = (Button)findViewById(R.id.confirm);
+			okBtn.setText("确定");
+			okBtn.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					EditText tblNoEdtTxt = (EditText)findViewById(R.id.mycount);
 					try{
-						int tableID = Integer.parseInt(tblNoEdtTxt.getText().toString().trim());
-						if(_type == DIALOG_UPDATE_ORDER){
-							new QueryOrderTask(tableID, Type.UPDATE_ORDER).execute();
+						int tableAlias = Integer.parseInt(tblNoEdtTxt.getText().toString().trim());
+						if(_dialogType == DIALOG_INSERT_ORDER){
+							new QueryTableStatusTask(tableAlias).execute();
 							dismiss();
 							
-						}else if(_type == DIALOG_BILL_ORDER){
-							new QueryOrderTask(tableID, Type.PAY_ORDER).execute();
+						}else if(_dialogType == DIALOG_BILL_ORDER){
+							new QueryTableStatusTask(tableAlias).execute();
 							dismiss();
-							tblNoEdtTxt.setText("");
 							
-						}else{
-							new QueryOrder2Task(tableID).execute();
+						}else if(_dialogType == DIALOG_CANCEL_ORDER){
+							new CancelOrderTask(tableAlias).execute();
 							dismiss();
-							tblNoEdtTxt.setText("");
 						}
+						
 					}catch(NumberFormatException e){
 						Toast.makeText(MainActivity.this, "您输入的台号" + tblNoEdtTxt.getText().toString().trim() + "格式不正确，请重新输入" , 0).show();
 					}
@@ -1166,9 +1035,9 @@ public class MainActivity extends Activity {
 				}
 			});
 			
-			Button cancel = (Button)findViewById(R.id.alert_cancel);
-			cancel.setText("取消");
-			cancel.setOnClickListener(new View.OnClickListener() {
+			Button cancelBtn = (Button)findViewById(R.id.alert_cancel);
+			cancelBtn.setText("取消");
+			cancelBtn.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					dismiss();					

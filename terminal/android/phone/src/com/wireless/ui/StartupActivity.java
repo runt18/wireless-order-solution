@@ -487,8 +487,7 @@ public class StartupActivity extends Activity {
 	/**
 	 * 请求查询餐厅信息
 	 */
-	private class QueryRestaurantTask extends
-			AsyncTask<Void, Void, String> {
+	private class QueryRestaurantTask extends AsyncTask<Void, Void, String> {
 
 		/**
 		 * 在执行请求餐厅请求信息前显示提示信息
@@ -506,12 +505,9 @@ public class StartupActivity extends Activity {
 
 			String errMsg = null;
 			try {
-				ProtocolPackage resp = ServerConnector
-						.instance().ask(
-								new ReqQueryRestaurant());
+				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryRestaurant());
 				if (resp.header.type == Type.ACK) {
-					WirelessOrder.restaurant = RespParser
-							.parseQueryRestaurant(resp);
+					WirelessOrder.restaurant = RespParser.parseQueryRestaurant(resp);
 				}
 			} catch (IOException e) {
 				errMsg = e.getMessage();
@@ -528,30 +524,21 @@ public class StartupActivity extends Activity {
 			/**
 			 * Prompt user message if any error occurred.
 			 */
-
 			if (errMsg != null) {
-				new AlertDialog.Builder(
-						StartupActivity.this)
-						.setTitle("提示")
-						.setMessage(errMsg)
-						.setPositiveButton(
-								"确定",
-								new DialogInterface.OnClickListener() {
-									public void onClick(
-											DialogInterface dialog,
-											int id) {
-										finish();
-
-									}
-								}).show();
+				new AlertDialog.Builder(StartupActivity.this)
+					.setTitle("提示")
+					.setMessage(errMsg)
+					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog,	int id) {
+							finish();
+						}
+					})
+					.show();
 
 			} else {
-				Intent intent = new Intent(
-						StartupActivity.this,
-						MainActivity.class);
+				Intent intent = new Intent(StartupActivity.this, MainActivity.class);
 				startActivity(intent);
-				overridePendingTransition(R.anim.enter,
-						android.R.anim.fade_out);
+				overridePendingTransition(R.anim.enter,	android.R.anim.fade_out);
 				finish();
 			}
 		}

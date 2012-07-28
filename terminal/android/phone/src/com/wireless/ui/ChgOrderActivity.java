@@ -27,6 +27,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.wireless.common.WirelessOrder;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.OrderParcel;
 import com.wireless.protocol.ErrorCode;
@@ -35,7 +36,9 @@ import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqInsertOrder;
+import com.wireless.protocol.ReqQueryOrder;
 import com.wireless.protocol.Reserved;
+import com.wireless.protocol.RespParser;
 import com.wireless.protocol.Type;
 import com.wireless.protocol.Util;
 import com.wireless.sccon.ServerConnector;
@@ -63,33 +66,34 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 		/**
 		 * "返回"Button
 		 */
-		TextView title=(TextView)findViewById(R.id.toptitle);
-		title.setVisibility(View.VISIBLE);
-		title.setText("改单");
+		TextView titleTxtView = (TextView)findViewById(R.id.toptitle);
+		titleTxtView.setVisibility(View.VISIBLE);
+		titleTxtView.setText("改单");
 		
-		TextView left=(TextView)findViewById(R.id.textView_left);
-		left.setText("返回");
-		left.setVisibility(View.VISIBLE);
+		TextView leftTxtView = (TextView)findViewById(R.id.textView_left);
+		leftTxtView.setText("返回");
+		leftTxtView.setVisibility(View.VISIBLE);
 		
-		ImageButton back = (ImageButton)findViewById(R.id.btn_left);
-		back.setVisibility(View.VISIBLE);
-		back.setOnClickListener(new View.OnClickListener(){
+		ImageButton backBtn = (ImageButton)findViewById(R.id.btn_left);
+		backBtn.setVisibility(View.VISIBLE);
+		backBtn.setOnClickListener(new View.OnClickListener(){
 			@Override
 			public void onClick(View v) {
 				showExitDialog();
 			}
 		});
 
+
+		TextView rightTxtView = (TextView)findViewById(R.id.textView_right);
+		rightTxtView.setText("提交");
+		rightTxtView.setVisibility(View.VISIBLE);
+		
 		/**
 		 * "提交"Button
 		 */
-		TextView right=(TextView)findViewById(R.id.textView_right);
-		right.setText("提交");
-		right.setVisibility(View.VISIBLE);
-		
-		ImageButton next=(ImageButton)findViewById(R.id.btn_right);
-		next.setVisibility(View.VISIBLE);
-		next.setOnClickListener(new View.OnClickListener() {
+		ImageButton commitBtn=(ImageButton)findViewById(R.id.btn_right);
+		commitBtn.setVisibility(View.VISIBLE);
+		commitBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				/**
@@ -134,20 +138,19 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 					reqOrder.oriTbl.aliasID = _oriOrder.table.aliasID;
 					new UpdateOrderTask(reqOrder).execute();
 				}else{
-					Toast.makeText(ChgOrderActivity.this, "您还未点菜，暂时不能下单。", 0).show();
+					Toast.makeText(ChgOrderActivity.this, "您还未点菜，暂时不能下单。", Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
 
 		//get the order parcel from the intent sent by main activity
-		OrderParcel orderParcel = getIntent().getParcelableExtra(OrderParcel.KEY_VALUE);
-		_oriOrder = orderParcel;
+//		OrderParcel orderParcel = getIntent().getParcelableExtra(OrderParcel.KEY_VALUE);
+//		_oriOrder = orderParcel;
 		
 		/**
 		 * "已点菜"的ListView
 		 */
 		_oriFoodLstView = (OrderFoodListView)findViewById(R.id.oriFoodLstView);
-		//_oriFoodLstView.setGroupIndicator(getResources().getDrawable(R.layout.expander_folder));
 		_oriFoodLstView.setType(Type.UPDATE_ORDER);
 		_oriFoodLstView.setOperListener(this);
 		//滚动的时候隐藏输入法
@@ -166,8 +169,8 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 				_handler.sendEmptyMessage(0);
 			}
 		});
-		_oriFoodLstView.notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(_oriOrder.foods)));
-		_oriFoodLstView.expandGroup(0);
+		//根据账单号请求相应的信息
+		new QueryOrderTask(Integer.valueOf(getIntent().getExtras().getString(MainActivity.KEY_TABLE_ID))).execute();
 
 		/**
 		 * "新点菜"的ListView
@@ -194,10 +197,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 		});	
 		_newFoodLstView.notifyDataChanged(new ArrayList<OrderFood>());
 		
-		//set the table ID
-		((EditText)findViewById(R.id.valueplatform)).setText(Integer.toString(_oriOrder.table.aliasID));
-		//set the amount of customer
-		((EditText)findViewById(R.id.valuepeople)).setText(Integer.toString(_oriOrder.custom_num));
+
 
 	}
 
@@ -207,7 +207,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 	@Override
 	public void onPickTaste(OrderFood selectedFood) {
 		if(selectedFood.isTemporary){
-			Toast.makeText(this, "临时菜不能添加口味", 0).show();
+			Toast.makeText(this, "临时菜不能添加口味", Toast.LENGTH_SHORT).show();
 		}else{
 			Intent intent = new Intent(ChgOrderActivity.this, PickTasteActivity.class);
 			Bundle bundle = new Bundle();
@@ -382,9 +382,8 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 		}
 	}
 
-	/*
+	/**
 	 * 监听返回键
-	 * 
 	 */
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -394,4 +393,96 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 		return super.onKeyDown(keyCode, event);
 	}
  
+	/**
+	 * 执行请求对应餐台的账单信息 
+	 */
+	private class QueryOrderTask extends AsyncTask<Void, Void, String>{
+
+		private ProgressDialog _progDialog;
+		private int _tableAlias;
+	
+		QueryOrderTask(int tableAlias){
+			_tableAlias = tableAlias;
+		}
+		
+		/**
+		 * 在执行请求删单操作前显示提示信息
+		 */
+		@Override
+		protected void onPreExecute(){
+			_progDialog = ProgressDialog.show(ChgOrderActivity.this, "", "查询" + _tableAlias + "号餐台的信息...请稍候", true);
+		}
+		
+		@Override
+		protected String doInBackground(Void... arg0) {
+			String errMsg = null;
+			try{
+				//根据tableID请求数据
+				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryOrder(_tableAlias));
+				if(resp.header.type == Type.ACK){
+					_oriOrder = RespParser.parseQueryOrder(resp, WirelessOrder.foodMenu);
+					
+				}else{
+					_oriOrder = new Order();
+    				if(resp.header.reserved == ErrorCode.TABLE_IDLE) {
+    					errMsg = _tableAlias + "号台还未下单";
+    					
+    				}else if(resp.header.reserved == ErrorCode.TABLE_NOT_EXIST) {
+    					errMsg = _tableAlias + "号台信息不存在";
+
+    				}else if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
+    					errMsg = "终端没有登记到餐厅，请联系管理人员。";
+
+    				}else if(resp.header.reserved == ErrorCode.TERMINAL_EXPIRED) {
+    					errMsg = "终端已过期，请联系管理人员。";
+
+    				}else{
+    					errMsg = "未确定的异常错误(" + resp.header.reserved + ")";
+    				}
+				}
+			}catch(IOException e){
+				errMsg = e.getMessage();
+			}
+			
+			return errMsg;
+		}
+		
+		/**
+		 * 根据返回的error message判断，如果发错异常则提示用户，
+		 * 如果成功，则迁移到改单页面
+		 */
+		@Override
+		protected void onPostExecute(String errMsg){
+
+			if(errMsg != null){
+				/**
+				 * 如果请求账单信息失败，则跳转会MainActivity
+				 */
+				new AlertDialog.Builder(ChgOrderActivity.this)
+					.setTitle("提示")
+					.setMessage(errMsg)
+					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							dialog.dismiss();
+							finish();
+						}
+					})
+					.show();
+			}else{
+				/**
+				 * 请求账单成功则更新相关的控件
+				 */
+				//set date source to original food list view
+				_oriFoodLstView.notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(_oriOrder.foods)));
+				//expand the original food list view
+				_oriFoodLstView.expandGroup(0);
+				//set the table ID
+				((EditText)findViewById(R.id.valueplatform)).setText(Integer.toString(_oriOrder.table.aliasID));
+				//set the amount of customer
+				((EditText)findViewById(R.id.valuepeople)).setText(Integer.toString(_oriOrder.custom_num));				
+				//make the progress dialog disappeared
+				_progDialog.dismiss();
+			}			
+		}		
+	}
 }
