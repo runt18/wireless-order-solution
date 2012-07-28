@@ -19,6 +19,7 @@ public final class Type{
 	public final static byte QUERY_STAFF = 11;
 	public final static byte QUERY_TABLE = 12;
 	public final static byte QUERY_REGION = 13;
+	public final static byte QUERY_TABLE_STATUS = 14;
 	
 	/* belong to OTA */
 	public final static byte CHECK_VER = 1;

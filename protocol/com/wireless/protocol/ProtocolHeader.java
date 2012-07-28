@@ -6,7 +6,7 @@ package com.wireless.protocol;
 * mode : 1-byte indicating the mode
 * type : 1-byte indicating the type
 * seq : 1-byte indicating the sequence number
-* reserved[4] : 4-byte reserved 
+* reserved : 1-byte reserved 
 * pin[6] : 6-bytes indicating the phone's id 
 * len[2] : 2-bytes indicating the length of the body
 *******************************************************/

@@ -5,6 +5,26 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 public class ReqParser {
+	
+	/******************************************************
+	* Design the query table status request looks like below
+	* <Header>
+	* mode : type : seq : reserved : pin[6] : len[2]
+	* mode - ORDER_BUSSINESS
+	* type - QUERY_TABLE_STATUS
+	* seq - auto calculated and filled in
+	* reserved - 0x00
+	* pin[6] - auto calculated and filled in
+	* len[2] - 0x02, 0x00
+	* <Body>
+	* table[2]
+	* table[2] - 2-byte indicates the table id
+	*******************************************************/
+	public static int parseQueryTblStatus(ProtocolPackage req){
+		//return the table to query
+		return ((req.body[0] & 0x000000FF) | ((req.body[1] & 0x000000FF) << 8));
+	}
+	
 	/******************************************************
 	* Design the query order request looks like below
 	* <Header>

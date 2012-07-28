@@ -5,4 +5,9 @@ public class RespACK extends RespPackage{
 		super(reqHeader);
 		header.type = Type.ACK;
 	}
+	
+	public RespACK(ProtocolHeader reqHeader, byte reserved){
+		this(reqHeader);
+		header.reserved = reserved;
+	}
 }
