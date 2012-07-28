@@ -185,7 +185,9 @@ public class MainActivity extends Activity {
 					break;
 
 				case 1:
-					//TODO 查看
+					//查看
+					Intent intent = new Intent(MainActivity.this, TableActivity.class);
+					startActivity(intent);
 					break;
 					
 				case 2:
@@ -236,7 +238,7 @@ public class MainActivity extends Activity {
 					break;
 
 				case 8:
-					Intent intent = new Intent(MainActivity.this, TableActivity.class);
+					intent = new Intent(MainActivity.this, AboutActivity.class);
 					startActivity(intent);
 					break;
 				}

@@ -10,9 +10,9 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:background="#fff" >
-
+
         <ImageButton
-            android:id="@+id/up_table"
+            android:id="@+id/add_table"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
@@ -20,7 +20,7 @@
             android:layout_marginBottom="4dp"
             android:layout_marginRight="20dp"
             android:layout_marginTop="4dp"
-            android:background="#00ffffff"
+            android:background="@color/transparent"
             android:src="@drawable/adddown" />
 
         <TextView
