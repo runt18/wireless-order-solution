@@ -227,6 +227,7 @@ public class TableActivity extends Activity {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				mHandler.sendEmptyMessage(CHANGE_TO_ALL);
+				((AutoCompleteTextView)findViewById(R.id.search_view_table)).setText("");
 			}
 		});
 		
@@ -659,6 +660,7 @@ public class TableActivity extends Activity {
 
 			} else {
 				mHandler.sendEmptyMessage(CHANGE_TO_ALL);
+				((AutoCompleteTextView)findViewById(R.id.search_view_table)).setText("");
 				mListView.onRefreshComplete();
 				mHandler.resetView();
 				Toast.makeText(ctx, "Ë¢ÐÂ³É¹¦",
