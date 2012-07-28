@@ -13,9 +13,9 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.billStatistics.QueryBackFood;
+import com.wireless.db.billStatistics.QueryCancelledFood;
 import com.wireless.pojo.billStatistics.DutyRange;
-import com.wireless.pojo.dishesOrder.BackFood;
+import com.wireless.pojo.dishesOrder.CancelledFood;
 import com.wireless.util.JObject;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
@@ -41,18 +41,18 @@ public class QueryBackFoodAction extends Action {
 		Integer qt = Integer.valueOf(qtype), ot = Integer.valueOf(otype);
 		
 		JObject jobject = new JObject();
-		BackFood[] bf = null;
-		List<BackFood> list = new ArrayList();
+		CancelledFood[] bf = null;
+		List<CancelledFood> list = new ArrayList();
 		
 		DutyRange queryDate = new DutyRange(beginDate+" 00:00:00", endDate+" 23:59:59");
 		
 		try{
-			if(qt == QueryBackFood.QUERY_BY_DEPT){
-				bf = QueryBackFood.getBackFoodByDept(Long.valueOf(pin), queryDate, ot);
-			}else if(qt == QueryBackFood.QUERY_BY_REASON){
+			if(qt == QueryCancelledFood.QUERY_BY_DEPT){
+				bf = QueryCancelledFood.getCancelledFoodByDept(Long.valueOf(pin), queryDate, ot);
+			}else if(qt == QueryCancelledFood.QUERY_BY_REASON){
 				
-			}else if(qt == QueryBackFood.QUERY_BY_FOOD){
-				bf = QueryBackFood.getBackFood(Long.valueOf(pin), queryDate, ot, deptID);
+			}else if(qt == QueryCancelledFood.QUERY_BY_FOOD){
+				bf = QueryCancelledFood.getCancelledFood(Long.valueOf(pin), queryDate, ot, deptID);
 			}
 		} catch(Exception e){
 			System.out.println(e.getMessage());
@@ -70,7 +70,7 @@ public class QueryBackFoodAction extends Action {
 					}
 				}
 				
-				BackFood sum = new BackFood("汇总", "汇总"), tp = null;
+				CancelledFood sum = new CancelledFood("汇总", "汇总"), tp = null;
 				float sumPrice = 0.00f, sumCount = 0.00f;
 				for(int i = 0; i < bf.length; i++){
 					tp = bf[i];
