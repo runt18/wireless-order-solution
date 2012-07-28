@@ -695,8 +695,7 @@ public class PickFoodActivity extends Activity implements PickFoodListView.OnFoo
 					}
 					kitchenChild.add(kitchens);
 				}
-				new KitchenSelectDialog(pickLstView, _validDepts, kitchenChild)
-						.show();
+				new KitchenSelectDialog(pickLstView, _validDepts, kitchenChild).show();
 			}
 		});
 		
