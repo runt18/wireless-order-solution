@@ -15,7 +15,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
@@ -78,7 +77,6 @@ public class TableActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.table);
-		ctx = this.getApplicationContext();
 		prepareUI();
 	}
 	@Override
@@ -119,7 +117,7 @@ public class TableActivity extends Activity {
 		popWnd.setBackgroundDrawable(new BitmapDrawable());
 		popWnd.update();	
 		
-		ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(ctx,R.layout.pop_wnd_item,mHandler.getRegions());
+		ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.pop_wnd_item,mHandler.getRegions());
 		ListView popListView = (ListView)popupView.findViewById(R.id.popWndList);
 		
 		popListView.setAdapter(arrayAdapter);
@@ -547,7 +545,7 @@ public class TableActivity extends Activity {
 		{
 			if(list!=null)
 			{
-				mAdapter = new SimpleAdapter(ctx, list,
+				mAdapter = new SimpleAdapter(getApplicationContext(), list,
 					R.layout.the_table, tabs,layouts);
 				mListView.setAdapter(mAdapter);
 			}
@@ -561,7 +559,7 @@ public class TableActivity extends Activity {
 		 */
 		@Override
 		protected void onPreExecute(){			
-			Toast.makeText(ctx, "正在刷新", Toast.LENGTH_SHORT).show();
+			Toast.makeText(getApplicationContext(), "正在刷新", Toast.LENGTH_SHORT).show();
 		}
 		
 		/**
@@ -595,7 +593,7 @@ public class TableActivity extends Activity {
 			 */		
 			if(errMsg != null){
 				mListView.onRefreshComplete();
-				Toast.makeText(ctx, "刷新区域数据失败,请检查网络",
+				Toast.makeText(getApplicationContext(), "刷新区域数据失败,请检查网络",
 						Toast.LENGTH_SHORT).show();
 				
 			}else{				
@@ -651,7 +649,7 @@ public class TableActivity extends Activity {
 
 			if (errMsg != null) {
 				mListView.onRefreshComplete();
-				Toast.makeText(ctx, "刷新餐台数据失败,请检查网络",
+				Toast.makeText(getApplicationContext(), "刷新餐台数据失败,请检查网络",
 						Toast.LENGTH_SHORT).show();
 				mListView.setVisibility(View.GONE);
 				tv.setText("请重新刷新数据");
@@ -663,7 +661,7 @@ public class TableActivity extends Activity {
 				((AutoCompleteTextView)findViewById(R.id.search_view_table)).setText("");
 				mListView.onRefreshComplete();
 				mHandler.resetView();
-				Toast.makeText(ctx, "刷新成功",
+				Toast.makeText(getApplicationContext(), "刷新成功",
 						Toast.LENGTH_SHORT).show();
 				tv.setText("没有找到匹配的项");
 				tv.setVisibility(View.INVISIBLE);
