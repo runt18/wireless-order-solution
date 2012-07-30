@@ -199,13 +199,9 @@ public class TasteRef {
 		 * The hash map to store the taste reference count to all the foods
 		 */
 		HashMap<Food, Set<TasteRefCnt>> foodTasteRef = new HashMap<Food, Set<TasteRefCnt>>();
-		int i = 0;
 		for(Food food : foods){
-			System.out.println(i+"  :  "+food.foodID);
-			HashSet<TasteRefCnt> tasteRefByFood = getFoodTaste(dbCon, food);
-			
+			HashSet<TasteRefCnt> tasteRefByFood = getFoodTaste(dbCon, food);			
 			foodTasteRef.put(food, tasteRefByFood);		
-			i++;
 		}	
 		
 		/**
