@@ -1,13 +1,15 @@
 package com.wireless.ui;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -45,7 +47,6 @@ import com.wireless.ui.view.PullListView.OnRefreshListener;
 public class TableActivity extends Activity {
 	private SimpleAdapter mAdapter;
 	PullListView mListView;
-	Context ctx;
 	TextView titleTextView;
 	
 	static final int ALL_BTN_CLICKED=21;
@@ -72,6 +73,119 @@ public class TableActivity extends Activity {
 	};
 	
 	TableHandler mHandler;
+	
+	private int mTableCond = FILTER_TABLE_ALL;			//the current table filter condition
+	
+	private final static int FILTER_TABLE_ALL = 0;		//table filter condition to all
+	private final static int FILTER_TABLE_IDLE = 1;		//table filter condition to idle
+	private final static int FILTER_TABLE_BUSY = 2;		//table filter condition to busy
+	
+	private int mRegionCond = FILTER_REGION_ALL;		//the current region filter condition
+	
+	private final static int FILTER_REGION_ALL = 0;		//region filter condition to all
+	private final static int FILTER_REGION_1 = 1;		//region filter condition to 1st
+	private final static int FILTER_REGION_2 = 2;		//region filter condition to 2nd
+	private final static int FILTER_REGION_3 = 3;		//region filter condition to 3rd
+	private final static int FILTER_REGION_4 = 4;		//region filter condition to 4th
+	private final static int FILTER_REGION_5 = 5;		//region filter condition to 5th
+	private final static int FILTER_REGION_6 = 6;		//region filter condition to 6th
+	private final static int FILTER_REGION_7 = 7;		//region filter condition to 7th
+	private final static int FILTER_REGION_8 = 8;		//region filter condition to 8th
+	private final static int FILTER_REGION_9 = 9;		//region filter condition to 9th
+	private final static int FILTER_REGION_10 = 10;		//region filter condition to 10th
+	
+	private static class RefreshHandler extends Handler{
+		
+		private List<Table> mFilterTable = new ArrayList<Table>();
+		
+		private WeakReference<TableActivity> mActivity;
+				
+		RefreshHandler(TableActivity activity){
+			mActivity = new WeakReference<TableActivity>(activity);
+		}
+		
+		@Override
+		public void handleMessage(Message msg){
+			mFilterTable.clear();
+			TableActivity theActivity = mActivity.get();
+			
+			mFilterTable.addAll(Arrays.asList(WirelessOrder.tables));
+			
+			Iterator<Table> iter = mFilterTable.iterator();
+			while(iter.hasNext()){
+				Table t = iter.next();
+				/**
+				 * Filter the table source according to status & region condition
+				 */
+				if(theActivity.mTableCond == FILTER_TABLE_IDLE && t.status == Table.TABLE_IDLE){
+					iter.remove();
+					
+				}else if(theActivity.mTableCond == FILTER_TABLE_BUSY && t.status == Table.TABLE_BUSY){
+					iter.remove();
+					
+				}else if(theActivity.mRegionCond == FILTER_REGION_1 && t.regionID == Region.REGION_1){
+					iter.remove();
+					
+				}else if(theActivity.mRegionCond == FILTER_REGION_2 && t.regionID == Region.REGION_2){
+					iter.remove();
+					
+				}else if(theActivity.mRegionCond == FILTER_REGION_3 && t.regionID == Region.REGION_3){
+					iter.remove();
+					
+				}else if(theActivity.mRegionCond == FILTER_REGION_4 && t.regionID == Region.REGION_4){
+					iter.remove();
+					
+				}else if(theActivity.mRegionCond == FILTER_REGION_5 && t.regionID == Region.REGION_5){
+					iter.remove();
+					
+				}else if(theActivity.mRegionCond == FILTER_REGION_6 && t.regionID == Region.REGION_6){
+					iter.remove();
+					
+				}else if(theActivity.mRegionCond == FILTER_REGION_7 && t.regionID == Region.REGION_7){
+					iter.remove();
+					
+				}else if(theActivity.mRegionCond == FILTER_REGION_8 && t.regionID == Region.REGION_8){
+					iter.remove();
+					
+				}else if(theActivity.mRegionCond == FILTER_REGION_9 && t.regionID == Region.REGION_9){
+					iter.remove();
+					
+				}else if(theActivity.mRegionCond == FILTER_REGION_10 && t.regionID == Region.REGION_10){
+					iter.remove();
+					
+				}
+				
+				List<Map<String, ?>> 
+				for(Table t : mFilterTable){
+					
+				}
+				
+				List<>
+				HashMap<String, Object> map = new HashMap<String, Object>();
+				map.put("ID", t.aliasID);
+				map.put("CUSTOM_NUM", "人数: " + t.custom_num);
+				map.put("TABLE_NAME", t.name);
+
+				if (t.status == 0) {
+					String st = "空闲";
+					map.put("STATE", "状态： " + st);
+					idleList.add(map);
+				} else {
+					String st = "就餐";
+					map.put("STATE", "状态： " + st);
+					busyList.add(map);
+				}
+				allList.add(map);
+
+				theActivity.mListView.setAdapter(new SimpleAdapter(theActivity.getApplicationContext(), 
+						 						 				   mFilterTable,
+						 						 				   R.layout.the_table, 
+						 						 				   theActivity.tabs,
+						 						 				   theActivity.layouts));
+				
+			}
+		}
+	}
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -290,7 +404,7 @@ public class TableActivity extends Activity {
 		private ImageButton allBtn,idleBtn,busyBtn;
 		TextView mAllTextView,mIdleTextView,mBusyTextView;
 		private Region[] regionSource;
-		private ArrayList<String> regionNames= new ArrayList<String>();
+		private ArrayList<String> regionNames = new ArrayList<String>();
 		TableHandler()
 		{
 			allList = new ArrayList<Map<String, ?>>();
@@ -323,10 +437,8 @@ public class TableActivity extends Activity {
 		private void refreshRegion()
 		{
 			regionNames.add("全部区域");
-			for(int i=0;i<regionSource.length;i++)
-			{
-				if(regions.contains(regionSource[i].regionID))
-				{
+			for(int i = 0; i < regionSource.length; i++){
+				if(regions.contains(regionSource[i].regionID)){
 					regionNames.add(regionSource[i].name);
 				}
 			}
@@ -393,19 +505,18 @@ public class TableActivity extends Activity {
 		
 		@Override 
 		public void handleMessage(Message msg){
-			super.handleMessage(msg);
 			
 			List<Map<String, ?>> list = null;
 			boolean changed = false;
-			switch(msg.what)
-			{
-			case 0: refreshData();
+			switch (msg.what) {
+			case 0:
+				refreshData();
 				list = allList;
 				showNum();
 				resetView();
 				changed = true;
 				break;
-			case 1: 
+			case 1:
 			case 2:
 			case 3:
 			case 4:
@@ -496,7 +607,7 @@ public class TableActivity extends Activity {
 
 			List<Map<String, ?>> list = new ArrayList<Map<String, ?>>();
 	
-			for(Map<String,?> t:allList)
+			for(Map<String,?> t : allList)
 			{
 				String aliasID = t.get(tabs[0]).toString();
 				String customNum = t.get(tabs[1]).toString();
@@ -593,8 +704,7 @@ public class TableActivity extends Activity {
 			 */		
 			if(errMsg != null){
 				mListView.onRefreshComplete();
-				Toast.makeText(getApplicationContext(), "刷新区域数据失败,请检查网络",
-						Toast.LENGTH_SHORT).show();
+				Toast.makeText(getApplicationContext(), "刷新区域数据失败,请检查网络", Toast.LENGTH_SHORT).show();
 				
 			}else{				
 				new QueryTableTask().execute();
@@ -604,8 +714,7 @@ public class TableActivity extends Activity {
 	/**
 	 * 请求餐台信息
 	 */
-	private class QueryTableTask extends
-			AsyncTask<Void, Void, String> {
+	private class QueryTableTask extends AsyncTask<Void, Void, String> {
 		/**
 		 * 在执行请求区域信息前显示提示信息
 		 */
@@ -622,12 +731,9 @@ public class TableActivity extends Activity {
 			String errMsg = null;
 			try {
 				WirelessOrder.tables = null;
-				ProtocolPackage resp = ServerConnector
-						.instance()
-						.ask(new ReqQueryTable());
+				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryTable());
 				if (resp.header.type == Type.ACK) {
-					WirelessOrder.tables = RespParser
-							.parseQueryTable(resp);
+					WirelessOrder.tables = RespParser.parseQueryTable(resp);
 //					mHandler.refreshData();
 				}
 			} catch (IOException e) {
@@ -649,8 +755,7 @@ public class TableActivity extends Activity {
 
 			if (errMsg != null) {
 				mListView.onRefreshComplete();
-				Toast.makeText(getApplicationContext(), "刷新餐台数据失败,请检查网络",
-						Toast.LENGTH_SHORT).show();
+				Toast.makeText(getApplicationContext(), "刷新餐台数据失败,请检查网络", Toast.LENGTH_SHORT).show();
 				mListView.setVisibility(View.GONE);
 				tv.setText("请重新刷新数据");
 				tv.setVisibility(View.VISIBLE);
@@ -661,11 +766,10 @@ public class TableActivity extends Activity {
 				((AutoCompleteTextView)findViewById(R.id.search_view_table)).setText("");
 				mListView.onRefreshComplete();
 				mHandler.resetView();
-				Toast.makeText(getApplicationContext(), "刷新成功",
-						Toast.LENGTH_SHORT).show();
+				Toast.makeText(getApplicationContext(), "刷新成功",	Toast.LENGTH_SHORT).show();
 				tv.setText("没有找到匹配的项");
 				tv.setVisibility(View.INVISIBLE);
-			}
+			} 
 		}
 	}
 }
