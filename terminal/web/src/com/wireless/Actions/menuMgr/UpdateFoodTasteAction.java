@@ -49,7 +49,7 @@ public class UpdateFoodTasteAction extends Action {
 			if(jobject.isSuccess()){
 				if(Long.valueOf(nValue) == WebParams.TASTE_SMART_REF){
 					FoodTasteDao.updataBySmart(Long.valueOf(foodID), Long.valueOf(restaurantID));
-					jobject.initTip(true, "操作成功,已修改菜品口味关联方式为<只能关联>!");
+					jobject.initTip(true, "操作成功,已修改菜品口味关联方式为<智能关联>!");
 				}else if(Long.valueOf(nValue) == WebParams.TASTE_MANUAL_REF){
 					FoodTasteDao.updataByManual(Long.valueOf(foodID), tasteID, Long.valueOf(restaurantID));
 					jobject.initTip(true, "操作成功,已修改菜品口味关联方式为<人工关联>!");

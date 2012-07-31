@@ -103,12 +103,12 @@ public class InsertMenuAction extends Action {
 			String sql = "INSERT INTO "
 					+ Params.dbName
 					+ ".food"
-					+ "( food_alias, name, pinyin, unit_price, restaurant_id, kitchen_id, kitchen_alias, status, enabled ) "
+					+ "( food_alias, name, pinyin, unit_price, restaurant_id, kitchen_id, kitchen_alias, status, taste_ref_type ) "
 					+ " VALUES(" + dishNumber + ", '" + dishName + "', '"
 					+ dishSpill + "', " + dishPrice + ", " + term.restaurantID
 					+ ", " + kitchenId + "," + kitchenAlias + ", " + status
 					+ ", 1 " + ") ";
-			// System.out.println(sql);
+//			 System.out.println(sql);
 
 			int sqlRowCount = dbCon.stmt.executeUpdate(sql);
 

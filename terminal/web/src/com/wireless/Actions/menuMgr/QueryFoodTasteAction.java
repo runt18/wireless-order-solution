@@ -40,8 +40,8 @@ public class QueryFoodTasteAction extends Action{
 			}
 			
 			if(jobject.isSuccess()){
-				query.setFoodID(Long.valueOf(foodID));
-				query.setRestaurantID(Long.valueOf(restaurantID));
+				query.setFoodID(Integer.valueOf(foodID));
+				query.setRestaurantID(Integer.valueOf(restaurantID));
 				list = FoodTasteDao.getFoodCommonTaste(query);
 			}
 			

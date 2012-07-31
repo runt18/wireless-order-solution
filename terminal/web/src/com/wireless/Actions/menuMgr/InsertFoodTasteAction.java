@@ -34,9 +34,9 @@ public class InsertFoodTasteAction extends Action{
 				jboject.initTip(false, WebParams.TIP_TITLE_ERROE, "操作失败,口味信息不完整!");
 			}
 			if(jboject.isSuccess()){
-				ft.setFoodID(Long.valueOf(foodID));
-				ft.setRestaurantID(Long.valueOf(restaurantID));
-				ft.setTasteID(Long.valueOf(tasteID));
+				ft.setFoodID(Integer.valueOf(foodID));
+				ft.setRestaurantID(Integer.valueOf(restaurantID));
+				ft.setTasteID(Integer.valueOf(tasteID));
 				int count = FoodTasteDao.insertFoodTaste(ft);
 				if(count == 0){
 					jboject.initTip(false, WebParams.TIP_TITLE_ERROE, "操作失败,未知错误!");
