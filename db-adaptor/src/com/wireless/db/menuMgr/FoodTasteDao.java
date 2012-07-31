@@ -33,7 +33,7 @@ public class FoodTasteDao {
 						 " B.taste_alias, B.preference as taste_name, B.price, B.category, B.rate, B.calc, " +
 						 " C.name " +
 						 " from " + Params.dbName + ".food_taste_rank A, " + Params.dbName + ".taste B, " + Params.dbName + ".food C " +
-						 " where A.restaurant_id = B.restaurant_id and a.taste_id = B.taste_id and A.food_id = C.food_id " +
+						 " where A.restaurant_id = B.restaurant_id and A.taste_id = B.taste_id and A.food_id = C.food_id " +
 						 " and A.food_id = " + ft.getFoodID() +
 						 " and A.restaurant_id = " + ft.getRestaurantID() +
 						 " order by A.rank desc " +
