@@ -43,16 +43,16 @@ public class FoodTasteDao {
 			while(dbCon.rs.next()){
 				item = new FoodTaste();
 				item.setFoodID(dbCon.rs.getInt("food_id"));
-				item.setFoodName(dbCon.rs.getInt("name"));
-				item.setTasteID(dbCon.rs.getLong("taste_id"));
+				item.setFoodName(dbCon.rs.getString("name"));
+				item.setTasteID(dbCon.rs.getShort("taste_id"));
 				item.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
 				item.setRank(dbCon.rs.getInt("rank"));
-				item.setTasteAlias(dbCon.rs.getLong("taste_alias"));
+				item.setTasteAlias(dbCon.rs.getShort("taste_alias"));
 				item.setTasteName(dbCon.rs.getString("taste_name"));
 				item.setTastePrice(dbCon.rs.getFloat("price"));
-				item.setTasteCategory(dbCon.rs.getLong("category"));
+				item.setTasteCategory(dbCon.rs.getShort("category"));
 				item.setTasteRate(dbCon.rs.getFloat("rate"));
-				item.setTasteCalc(dbCon.rs.getLong("calc"));
+				item.setTasteCalc(dbCon.rs.getShort("calc"));
 				list.add(item);
 				item = null;
 			}

@@ -5,13 +5,13 @@ import com.wireless.util.WebParams;
 public class FoodTaste extends FoodBasic{
 	
 	private int rank = 0;				// 口味排名
-	private long tasteID;				// 口味编号
-	private long tasteAlias;
+	private int tasteID;				// 口味编号
+	private int tasteAlias;
 	private String tasteName;			// 口味名称
 	private float tastePrice;			// 口味价格
 	private float tasteRate;			// 口味比例
-	private long tasteCategory;			// 口味类型    0:口味  1:做法     2:规格
-	private long tasteCalc;				// 口味计算方式          0:按价格     1:按比例
+	private short tasteCategory;		// 口味类型    0:口味  1:做法     2:规格
+	private short tasteCalc;			// 口味计算方式          0:按价格     1:按比例
 	
 	public int getRank() {
 		return rank;
@@ -19,16 +19,16 @@ public class FoodTaste extends FoodBasic{
 	public void setRank(int rank) {
 		this.rank = rank;
 	}
-	public long getTasteID() {
+	public int getTasteID() {
 		return tasteID;
 	}
-	public void setTasteID(long tasteID) {
+	public void setTasteID(int tasteID) {
 		this.tasteID = tasteID;
 	}
-	public long getTasteAlias() {
+	public int getTasteAlias() {
 		return tasteAlias;
 	}
-	public void setTasteAlias(long tasteAlias) {
+	public void setTasteAlias(int tasteAlias) {
 		this.tasteAlias = tasteAlias;
 	}
 	public String getTasteName() {
@@ -49,7 +49,7 @@ public class FoodTaste extends FoodBasic{
 	public void setTasteRate(float tasteRate) {
 		this.tasteRate = tasteRate;
 	}
-	public long getTasteCategory() {
+	public short getTasteCategory() {
 		return tasteCategory;
 	}
 	public String getTasteCategoryFormat() {
@@ -63,10 +63,10 @@ public class FoodTaste extends FoodBasic{
 			return "";
 		}
 	}
-	public void setTasteCategory(long tasteCategory) {
+	public void setTasteCategory(short tasteCategory) {
 		this.tasteCategory = tasteCategory;
 	}
-	public long getTasteCalc() {
+	public short getTasteCalc() {
 		return tasteCalc;
 	}
 	public String getTasteCalcFormat() {
@@ -78,7 +78,7 @@ public class FoodTaste extends FoodBasic{
 			return "";
 		}
 	}
-	public void setTasteCalc(long tasteCalc) {
+	public void setTasteCalc(short tasteCalc) {
 		this.tasteCalc = tasteCalc;
 	}
 	

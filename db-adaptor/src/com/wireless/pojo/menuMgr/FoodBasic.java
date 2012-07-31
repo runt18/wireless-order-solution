@@ -7,14 +7,14 @@ public class FoodBasic {
 	private int restaurantID;        // 餐厅编号
 	private int foodID;				 // 菜品数据库编号
 	private int foodAlias;			 // 菜品自定义编号
-	private int foodName;			 // 菜品编号
+	private String foodName;			 // 菜品编号
 	private String pinyin;			 // 菜品拼音
 	private float unitPriec;	     // 菜品单价
 	private int kitchenId;		 	 // 菜品所属厨房数据库编号
 	private int kitchenAlias;		 // 菜品所属厨房已定义编号
 	private int kitchenName;		 // 菜品所属厨房名称
 	private short status;			 // 菜品状态    0x01:特价 0x02推荐  0x04:售完  0x08:赠送  0x10:时价
-	private int tasteRefType = 1;    // 菜品口味关联方式,默认智能关联       1:智能关联  2:人工关联
+	private short tasteRefType = 1;    // 菜品口味关联方式,默认智能关联       1:智能关联  2:人工关联
 	
 	public int getRestaurantID() {
 		return restaurantID;
@@ -34,10 +34,10 @@ public class FoodBasic {
 	public void setFoodAlias(int foodAlias) {
 		this.foodAlias = foodAlias;
 	}
-	public int getFoodName() {
+	public String getFoodName() {
 		return foodName;
 	}
-	public void setFoodName(int foodName) {
+	public void setFoodName(String foodName) {
 		this.foodName = foodName;
 	}
 	public String getPinyin() {
@@ -76,10 +76,10 @@ public class FoodBasic {
 	public void setStatus(short status) {
 		this.status = status;
 	}
-	public int getTasteRefType() {
+	public short getTasteRefType() {
 		return tasteRefType;
 	}
-	public void setTasteRefType(int tasteRefType) {
+	public void setTasteRefType(short tasteRefType) {
 		this.tasteRefType = tasteRefType;
 	}
 	
