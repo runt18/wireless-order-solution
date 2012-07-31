@@ -2,10 +2,8 @@ package com.wireless.pojo.menuMgr;
 
 import com.wireless.util.WebParams;
 
-public class FoodTaste {
-	private long foodID;				// 菜品编号
-	private String foodName;				// 菜品名称
-	private long restaurantID;			// 餐厅编号
+public class FoodTaste extends FoodBasic{
+	
 	private int rank = 0;				// 口味排名
 	private long tasteID;				// 口味编号
 	private long tasteAlias;
@@ -15,25 +13,6 @@ public class FoodTaste {
 	private long tasteCategory;			// 口味类型    0:口味  1:做法     2:规格
 	private long tasteCalc;				// 口味计算方式          0:按价格     1:按比例
 	
-	
-	public long getFoodID() {
-		return foodID;
-	}
-	public void setFoodID(long foodID) {
-		this.foodID = foodID;
-	}
-	public String getFoodName() {
-		return foodName;
-	}
-	public void setFoodName(String foodName) {
-		this.foodName = foodName;
-	}
-	public long getRestaurantID() {
-		return restaurantID;
-	}
-	public void setRestaurantID(long restaurantID) {
-		this.restaurantID = restaurantID;
-	}
 	public int getRank() {
 		return rank;
 	}
