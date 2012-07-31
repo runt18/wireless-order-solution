@@ -727,6 +727,23 @@ DEFAULT CHARACTER SET = utf8,
 COMMENT = 'describe the rank of taste reference to each food' ;
 
 
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`combo`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`combo` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`combo` (
+  `food_id` INT NULL DEFAULT NULL COMMENT 'the main food id to this combo' ,
+  `sub_food_id` INT NULL DEFAULT NULL COMMENT 'the sub food id to this combo' ,
+  `restaurant_id` INT NULL DEFAULT NULL COMMENT 'the restaurant id' ,
+  `amount` SMALLINT UNSIGNED NULL DEFAULT 1 COMMENT 'the amount of sub food to this combo' ,
+  INDEX `ix_food_id` (`food_id` ASC) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the combo information' ;
+
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
