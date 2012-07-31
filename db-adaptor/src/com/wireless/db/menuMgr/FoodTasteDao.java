@@ -192,7 +192,7 @@ public class FoodTasteDao {
 		int count = 0;
 		try{
 			dbCon.connect();
-			String sql = " update " + Params.dbName + ".FOOD SET " +
+			String sql = " update " + Params.dbName + ".food SET " +
 						 " taste_ref_type = " + tasteRefType + 
 						 " where 1=1 " +
 						 " and restaurant_id = " + restaurantID + 
