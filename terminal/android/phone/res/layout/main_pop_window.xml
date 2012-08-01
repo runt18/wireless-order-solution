@@ -4,8 +4,8 @@
     android:layout_height="wrap_content"
     android:background="@drawable/pop_window_bg"
     android:gravity="center"
-    android:orientation="vertical" >
-
+    android:orientation="vertical" 
+    android:id="@+id/pop_window">
     <ListView
         android:id="@+id/popWndList"
         android:layout_width="120dp"

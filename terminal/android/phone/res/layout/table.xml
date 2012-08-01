@@ -103,7 +103,7 @@
             android:layout_centerHorizontal="true"
             android:background="@color/transparent"
             android:src="@drawable/free_selector" />
-
+
         <TextView
             android:id="@+id/left_txt_bottom"
             android:layout_width="wrap_content"
@@ -118,7 +118,7 @@
             android:paddingTop="3dp"
             android:text="11"
             android:textColor="@color/white"
-            android:visibility="visible" />
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/middle_txt_bottom"

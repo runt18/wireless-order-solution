@@ -32,7 +32,6 @@ import android.widget.TextView;
 import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
 import com.wireless.lib.PinReader;
-
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.PinGen;
 import com.wireless.protocol.ProtocolPackage;

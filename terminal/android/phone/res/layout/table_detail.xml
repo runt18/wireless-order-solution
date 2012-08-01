@@ -16,7 +16,7 @@
         android:background="@drawable/bg02" >
 
         <TextView
-            android:id="@+id/platform"
+            android:id="@+id/platform_table_detail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
@@ -27,12 +27,12 @@
         </TextView>
 
         <TextView
-            android:id="@+id/valueplatform"
+            android:id="@+id/valueplatform_table_detail"
             android:layout_width="90dip"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="5dip"
-            android:layout_toRightOf="@id/platform"
+            android:layout_toRightOf="@id/platform_table_detail"
             android:background="#00000000"
             android:focusable="true"
             android:focusableInTouchMode="true"
@@ -42,7 +42,7 @@
         </TextView>
 
         <TextView
-            android:id="@+id/people"
+            android:id="@+id/people_table_detail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
@@ -54,12 +54,12 @@
         </TextView>
 
         <TextView
-            android:id="@+id/valuepeople"
+            android:id="@+id/valuepeople_table_detail"
             android:layout_width="100dip"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="3dip"
-            android:layout_toRightOf="@id/people"
+            android:layout_toRightOf="@id/people_table_detail"
             android:background="#00000000"
             android:focusable="true"
             android:focusableInTouchMode="true"
@@ -77,7 +77,7 @@
         android:background="@drawable/bg04" >
 
         <ImageView
-            android:id="@+id/up"
+            android:id="@+id/up_table_detail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
@@ -85,12 +85,12 @@
             android:src="@drawable/point" />
 
         <TextView
-            android:id="@+id/ordermenu"
+            android:id="@+id/ordermenu_table_detail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="15dip"
-            android:layout_toRightOf="@id/up"
+            android:layout_toRightOf="@id/up_table_detail"
             android:text="已点菜"
             android:textColor="#000000"
             android:textSize="20sp" />
@@ -104,7 +104,7 @@
         android:background="@drawable/bg03" >
 
         <ImageView
-            android:id="@+id/normal"
+            android:id="@+id/normal_table_detail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
@@ -113,13 +113,23 @@
             android:src="@drawable/normal_selector" />
 
         <ImageView
-            android:id="@+id/allowance"
+            android:id="@+id/allowance_table_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="false"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/rebate_selector" />
+
+        <ImageView
+            android:id="@+id/order_table_detail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginRight="50dip"
-            android:src="@drawable/rebate_selector" />
+            android:layout_marginRight="50dp"
+            android:src="@drawable/order_selector" />
+
     </RelativeLayout>
 
     <RelativeLayout
@@ -130,7 +140,7 @@
         android:background="@drawable/bg02" >
 
         <TextView
-            android:id="@+id/handsel"
+            android:id="@+id/handsel_table_detail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
@@ -141,36 +151,36 @@
         </TextView>
 
         <TextView
-            android:id="@+id/discountPriceTxtView"
+            android:id="@+id/discountPriceTxtView_table_detail"
             android:layout_width="90dip"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="5dip"
-            android:layout_toRightOf="@id/handsel"
+            android:layout_toRightOf="@id/handsel_table_detail"
             android:background="#00000000"
             android:textColor="#0000ff"
             android:textSize="20sp" >
         </TextView>
 
         <TextView
-            android:id="@+id/confirmed"
+            android:id="@+id/confirmed_table_detail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="110dip"
-            android:layout_toRightOf="@id/handsel"
+            android:layout_toRightOf="@id/handsel_table_detail"
             android:text="实收:"
             android:textColor="#000000"
             android:textSize="20sp" >
         </TextView>
 
         <TextView
-            android:id="@+id/actualPriceTxtView"
+            android:id="@+id/actualPriceTxtView_table_detail"
             android:layout_width="100dip"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="3dip"
-            android:layout_toRightOf="@id/confirmed"
+            android:layout_toRightOf="@id/confirmed_table_detail"
             android:background="#00000000"
             android:textColor="#0000ff"
             android:textSize="20sp" >
@@ -178,17 +188,17 @@
     </RelativeLayout>
 
     <ImageView
-        android:id="@+id/myline"
+        android:id="@+id/myline_table_detail"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_above="@id/mybill"
         android:src="@drawable/line" />
 
     <com.wireless.ui.view.BillFoodListView
-        android:id="@+id/billListView"
+        android:id="@+id/billListView_table_detail"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/myline"
+        android:layout_above="@id/myline_table_detail"
         android:layout_below="@id/t_line"
         android:cacheColorHint="#00000000"
         android:divider="@drawable/line" >
