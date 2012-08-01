@@ -36,7 +36,7 @@ public class FoodTasteDao {
 						 " where A.restaurant_id = B.restaurant_id and A.taste_id = B.taste_id and A.food_id = C.food_id " +
 						 " and A.food_id = " + ft.getFoodID() +
 						 " and A.restaurant_id = " + ft.getRestaurantID() +
-						 " order by A.rank desc " +
+						 " order by A.rank " +
 						 " ";
 					
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -214,7 +214,7 @@ public class FoodTasteDao {
 	 */
 	public static void updataBySmart(long foodID, long restaurantID) throws Exception{
 		updateFoodTasteRefType(foodID, restaurantID, WebParams.TASTE_SMART_REF);
-		Food[] updateFood = QueryMenu.queryFoods(" and Food.food_id = " + foodID, null);
+		Food[] updateFood = QueryMenu.queryFoods(" and FOOD.food_id = " + foodID, null);
 		if(updateFood.length != 1){
 			throw new Exception();
 		}
