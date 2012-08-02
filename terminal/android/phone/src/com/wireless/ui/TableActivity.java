@@ -82,47 +82,51 @@ public class TableActivity extends Activity {
 	private final static int FILTER_TABLE_BUSY = 2;		//table filter condition to busy
 	
 	private int mRegionCond = FILTER_REGION_ALL;		//the current region filter condition
-	
-	private final static int FILTER_REGION_ALL = 0;		//region filter condition to all
-	private final static int FILTER_REGION_1 = 1;		//region filter condition to 1st
-	private final static int FILTER_REGION_2 = 2;		//region filter condition to 2nd
-	private final static int FILTER_REGION_3 = 3;		//region filter condition to 3rd
-	private final static int FILTER_REGION_4 = 4;		//region filter condition to 4th
-	private final static int FILTER_REGION_5 = 5;		//region filter condition to 5th
-	private final static int FILTER_REGION_6 = 6;		//region filter condition to 6th
-	private final static int FILTER_REGION_7 = 7;		//region filter condition to 7th
-	private final static int FILTER_REGION_8 = 8;		//region filter condition to 8th
-	private final static int FILTER_REGION_9 = 9;		//region filter condition to 9th
-	private final static int FILTER_REGION_10 = 10;		//region filter condition to 10th
+	private final static int FILTER_REGION_ALL = Integer.MIN_VALUE;		//region filter condition to all
+	private final static int FILTER_REGION_1 = Region.REGION_1;		//region filter condition to 1st
+	private final static int FILTER_REGION_2 = Region.REGION_2;		//region filter condition to 2nd
+	private final static int FILTER_REGION_3 = Region.REGION_3;		//region filter condition to 3rd
+	private final static int FILTER_REGION_4 = Region.REGION_4;		//region filter condition to 4th
+	private final static int FILTER_REGION_5 = Region.REGION_5;		//region filter condition to 5th
+	private final static int FILTER_REGION_6 = Region.REGION_6;		//region filter condition to 6th
+	private final static int FILTER_REGION_7 = Region.REGION_7;		//region filter condition to 7th
+	private final static int FILTER_REGION_8 = Region.REGION_8;		//region filter condition to 8th
+	private final static int FILTER_REGION_9 = Region.REGION_9;		//region filter condition to 9th
+	private final static int FILTER_REGION_10 = Region.REGION_10;		//region filter condition to 10th
 	
 	private String mFilterCond = "";					//the current filter string
 
 	private final static int REFRESH_REGION = -1;
+	
 	private static class ViewHandler extends Handler
 	{
 		private WeakReference<TableActivity> mActivity;
-		
 		ViewHandler(TableActivity activity){
 			mActivity = new WeakReference<TableActivity>(activity);
 		}
-		ArrayList<String> regionNames = new ArrayList<String>();
+		ArrayList<String> regionNames = new ArrayList<String>();//store all region's name, if it contains table
 
 		@Override
 		public void handleMessage(Message msg)
 		{
 			final TableActivity theActivity = mActivity.get();
-
+			/*
+			 * decide whether refreshing all region's data or just reset the name
+			 */
 			switch(msg.what)
 			{
 			case REFRESH_REGION:
-				((TextView)theActivity.findViewById(R.id.toptitle)).setText(regionNames.get(theActivity.mRegionCond));
-				Log.d("title","changed");
+				if(theActivity.mRegionCond== Integer.MIN_VALUE)
+					((TextView)theActivity.findViewById(R.id.toptitle)).setText(regionNames.get(0));
+				else 
+					((TextView)theActivity.findViewById(R.id.toptitle)).setText(regionNames.get(theActivity.mRegionCond+1));
+
 				break;
 			default:
 	
 				ArrayList<Short> regions = new ArrayList<Short>();
 				regionNames.clear();
-				
+
 				Table[] tableSource = WirelessOrder.tables == null ? new Table[0]: WirelessOrder.tables;
 				Region[] regionSource = WirelessOrder.regions == null ? new Region[0] : WirelessOrder.regions;
 				
@@ -136,14 +140,41 @@ public class TableActivity extends Activity {
 						regionNames.add(regionSource[i].name);
 					}
 				}
-	//			for(String s:regionNames)
-	//			{
-	//				System.out.println(s);
-	//			}
-				((TextView)theActivity.findViewById(R.id.toptitle)).setText(regionNames.get(theActivity.mRegionCond));
-				
+
 				ListView popListView = (ListView)theActivity.popupView.findViewById(R.id.popWndList);
-				ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(theActivity.getApplicationContext(), R.layout.pop_wnd_item,regionNames);
+				/*
+				 * anony class,show region's name and switch the tags
+				 */
+				ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(theActivity.getApplicationContext(), R.layout.pop_wnd_item,regionNames){
+					@Override
+					public View getView(int position, View convertView, ViewGroup parent) {
+						TextView view;
+						if(convertView == null){
+							view =(TextView) LayoutInflater.from(getContext()).inflate(R.layout.pop_wnd_item, null);
+							view.setText(regionNames.get(position));
+						}else{
+							view = (TextView) convertView;
+						}
+						int tag =0;
+						switch(position)
+						{
+						case 0: tag=FILTER_REGION_ALL;break;
+						case 1: tag=FILTER_REGION_1;break;
+						case 2: tag=FILTER_REGION_2;break;
+						case 3: tag=FILTER_REGION_3;break;
+						case 4: tag=FILTER_REGION_4;break;
+						case 5: tag=FILTER_REGION_5;break;
+						case 6: tag=FILTER_REGION_6;break;
+						case 7: tag=FILTER_REGION_7;break;
+						case 8: tag=FILTER_REGION_8;break;
+						case 9: tag=FILTER_REGION_9;break;
+						case 10:tag=FILTER_REGION_10;break;
+						}
+						view.setTag(tag);
+						
+						return view;
+					}
+				};
 				popListView.setAdapter(arrayAdapter);
 			}
 		}
@@ -158,24 +189,41 @@ public class TableActivity extends Activity {
 		RefreshHandler(TableActivity activity){
 			mActivity = new WeakReference<TableActivity>(activity);
 		}
-		
-
-
 		@Override
 		public void handleMessage(Message msg){
 			mFilterTable.clear();
 			final TableActivity theActivity = mActivity.get();
 			
-			mFilterTable.addAll(Arrays.asList(WirelessOrder.tables));
+			if(WirelessOrder.tables!=null)
+				mFilterTable.addAll(Arrays.asList(WirelessOrder.tables));
 			
 			Iterator<Table> iter = mFilterTable.iterator();
+			
+			/**
+			 * Calculate the idle and busy amount of tables
+			 */
+			int idleCnt = 0 ,busyCnt = 0,allCnt = 0;
+			int regionID = 0;
+			if(theActivity.mRegionCond!=Integer.MIN_VALUE)
+				regionID = theActivity.mRegionCond;
+			/**
+			 * Filter the table source according to status & region condition
+			 */
 			while(iter.hasNext()){
 				Table t = iter.next();
-				
-				/**
-				 * Filter the table source according to status & region condition
-				 */
-				if(theActivity.mTableCond == FILTER_TABLE_IDLE && t.status != Table.TABLE_IDLE){
+				if(regionID == t.regionID||theActivity.mRegionCond == FILTER_REGION_ALL){
+					allCnt++;}
+				if(regionID == t.regionID &&t.status==Table.TABLE_IDLE||theActivity.mRegionCond == FILTER_REGION_ALL&&t.status==Table.TABLE_IDLE){
+					idleCnt++;
+				}
+				if(regionID == t.regionID &&t.status==Table.TABLE_BUSY||theActivity.mRegionCond == FILTER_REGION_ALL&&t.status==Table.TABLE_BUSY)
+				{
+					busyCnt++;
+				}
+				if(theActivity.mTableCond == FILTER_REGION_ALL){
+					Log.d("region","all");
+					continue;
+				}else if(theActivity.mTableCond == FILTER_TABLE_IDLE && t.status != Table.TABLE_IDLE){
 					iter.remove();
 				}else if(theActivity.mTableCond == FILTER_TABLE_BUSY && t.status != Table.TABLE_BUSY){
 					iter.remove();
@@ -215,22 +263,10 @@ public class TableActivity extends Activity {
 					}
 				}
 			}
-			
-			int idleCnt = 0;
-			int busyCnt = 0;
+		
 				
 			List<Map<String, ?>> contents = new ArrayList<Map<String, ?>>();
 			for(Table tbl : mFilterTable){
-					
-				/**
-				 * Calculate the idle and busy amount of tables
-				 */
-				if(tbl.status == Table.TABLE_BUSY){
-					busyCnt++;
-				}else if(tbl.status == Table.TABLE_IDLE){
-					idleCnt++;
-				}
-					
 				HashMap<String, Object> map = new HashMap<String, Object>();
 				map.put(ITEM_TAG_ID, tbl.aliasID + (tbl.name.length() == 0 ? "" : "(" + tbl.name + ")"));
 				map.put(ITEM_TAG_CUSTOM, "人数: " + tbl.custom_num);
@@ -239,20 +275,37 @@ public class TableActivity extends Activity {
 				contents.add(map);
 			}
 			
-			if(theActivity.mTableCond!=FILTER_TABLE_IDLE&&theActivity.mTableCond!=FILTER_TABLE_BUSY){
-				TextView allCountTextView = (TextView)theActivity.findViewById(R.id.left_txt_bottom);
-				allCountTextView.setText(Integer.toString(mFilterTable.size()));
-				allCountTextView.setVisibility(View.VISIBLE);
-				TextView idleCountTxtView = (TextView)theActivity.findViewById(R.id.middle_txt_bottom);
-				idleCountTxtView.setText(Integer.toString(idleCnt));
-				idleCountTxtView.setVisibility(View.VISIBLE);
-				
-				TextView busyCountTxtView = (TextView)theActivity.findViewById(R.id.right_txt_bottom);
-				busyCountTxtView.setText(Integer.toString(busyCnt));
-				busyCountTxtView.setVisibility(View.VISIBLE);
-			}
+			/*
+			 * set the counts
+			 */
+			TextView allCountTextView = (TextView)theActivity.findViewById(R.id.left_txt_bottom);
+			allCountTextView.setText(Integer.toString(allCnt));
+			allCountTextView.setVisibility(View.VISIBLE);
+			TextView idleCountTxtView = (TextView)theActivity.findViewById(R.id.middle_txt_bottom);
+			idleCountTxtView.setText(Integer.toString(idleCnt));
+			idleCountTxtView.setVisibility(View.VISIBLE);
 			
+			TextView busyCountTxtView = (TextView)theActivity.findViewById(R.id.right_txt_bottom);
+			busyCountTxtView.setText(Integer.toString(busyCnt));
+			busyCountTxtView.setVisibility(View.VISIBLE);
+			
+			/*
+			 * set the hint if content is empty 
+			 */
+			TextView hintText = (TextView)theActivity.findViewById(R.id.hint_text_table);
 
+			if(contents.isEmpty())
+			{
+				hintText.setText("没有匹配的项");
+				hintText.setVisibility(View.VISIBLE);
+			
+			}else{
+				hintText.setVisibility(View.INVISIBLE);
+			}
+
+			/*
+			 * a holder for listview to hold the imagebutton
+			 */
 			final class ViewHolder {
 				public ImageButton imgBtn;
 			}
@@ -317,6 +370,9 @@ public class TableActivity extends Activity {
 		titleTextView.setBackgroundResource(R.drawable.title_selector);
 		titleTextView.setText("全部区域");
 		
+		/*
+		 * the listview's item listener 
+		 */
 		mListView.setOnItemClickListener(new OnItemClickListener(){
 			@Override
 			public void onItemClick(AdapterView<?> parent,
@@ -327,6 +383,9 @@ public class TableActivity extends Activity {
 		});
 	}
 
+	/*
+	 * set the button's image
+	 */
 	private void buttonUp(){
 		regionAllBtn.setImageResource(R.drawable.all);
 		idleBtn.setImageResource(R.drawable.free);
@@ -412,7 +471,9 @@ public class TableActivity extends Activity {
 			public void onClick(View v) {
 				((AutoCompleteTextView)findViewById(R.id.search_view_table)).setText("");
 				mTableCond = FILTER_TABLE_ALL;
+				mRegionCond = FILTER_REGION_ALL;
 				dataHandler.sendEmptyMessage(0);
+				((TextView)findViewById(R.id.toptitle)).setText("全部区域");
 				buttonUp();
 				regionAllBtn.setImageResource(R.drawable.alldown);
 			}
@@ -494,13 +555,10 @@ public class TableActivity extends Activity {
 		popListView.setOnItemClickListener(new OnItemClickListener(){
 
 			@Override
-			public void onItemClick(
-					AdapterView<?> arg0, View arg1,
-					int arg2, long arg3) {
-				mRegionCond=arg2;
+			public void onItemClick(AdapterView<?> arg0, View item,int arg2, long arg3) {
+				mRegionCond = (Integer) item.getTag();
 				dataHandler.sendEmptyMessage(0);
 				regionHandler.sendEmptyMessage(REFRESH_REGION);
-
 				popWnd.dismiss();
 			}
 			
@@ -592,7 +650,6 @@ public class TableActivity extends Activity {
 				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryTable());
 				if (resp.header.type == Type.ACK) {
 					WirelessOrder.tables = RespParser.parseQueryTable(resp);
-//					mHandler.refreshData();
 				}
 			} catch (IOException e) {
 				errMsg = e.getMessage();
@@ -618,17 +675,12 @@ public class TableActivity extends Activity {
 				tv.setText("请重新刷新数据");
 				tv.setVisibility(View.VISIBLE);
 
-
 			} else {
-				//mHandler.sendEmptyMessage(CHANGE_TO_ALL);
 				regionHandler.sendEmptyMessage(0);
 				dataHandler.sendEmptyMessage(0);
 				((AutoCompleteTextView)findViewById(R.id.search_view_table)).setText("");
 				mListView.onRefreshComplete();
-				//mHandler.resetView();
 				Toast.makeText(getApplicationContext(), "刷新成功",	Toast.LENGTH_SHORT).show();
-				tv.setText("没有找到匹配的项");
-				tv.setVisibility(View.INVISIBLE);
 			} 
 		}
 	}
