@@ -61,7 +61,7 @@ public class BillFoodListView extends ListView {
 		public View getView(int position, View convertView, ViewGroup parent) {
 			View view;
 			if(convertView == null){
-				view =LayoutInflater.from(getContext()).inflate(R.layout.billitem, null);
+				view = LayoutInflater.from(getContext()).inflate(R.layout.billitem, null);
 			}else{
 				view = convertView;
 			}

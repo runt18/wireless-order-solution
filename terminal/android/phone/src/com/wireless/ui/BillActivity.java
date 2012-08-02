@@ -22,7 +22,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
-import com.wireless.parcel.OrderParcel;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Order;
@@ -85,11 +84,6 @@ public class BillActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.bill);
 
-		// get the order detail passed by main activity
-		OrderParcel orderParcel = getIntent().getParcelableExtra(OrderParcel.KEY_VALUE);
-		_orderToPay = orderParcel;
-
-		//TODO
 		new QueryOrderTask(Integer.valueOf(getIntent().getExtras().getString(MainActivity.KEY_TABLE_ID))).execute();
 
 		/**
