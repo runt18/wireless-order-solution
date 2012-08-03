@@ -11,7 +11,10 @@ import java.util.List;
 import java.util.Map;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -31,16 +34,20 @@ import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupWindow;
-import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
+import com.wireless.parcel.OrderParcel;
+import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.Order;
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.Region;
+import com.wireless.protocol.ReqQueryOrder;
 import com.wireless.protocol.ReqQueryRegion;
 import com.wireless.protocol.ReqQueryTable;
+import com.wireless.protocol.ReqTableStatus;
 import com.wireless.protocol.RespParser;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Type;
@@ -54,6 +61,7 @@ public class TableActivity extends Activity {
 	private ImageButton regionAllBtn ;
 	private ImageButton idleBtn;
 	private ImageButton busyBtn;
+	private Order mOrderToPay;
 	
 	private static final String ITEM_TAG_ID = "ID";
 	private static final String ITEM_TAG_CUSTOM = "CUSTOM_NUM";
@@ -73,7 +81,7 @@ public class TableActivity extends Activity {
 			R.id.text3_table,
 			R.id.text4_table
 	};
-	
+
 	private static Handler mDataHandler;
 	private static Handler mRegionHandler;
 	
@@ -249,10 +257,10 @@ public class TableActivity extends Activity {
 			}
 		
 				
-			List<Map<String, ?>> contents = new ArrayList<Map<String, ?>>();
+			final List<Map<String, ?>> contents = new ArrayList<Map<String, ?>>();
 			for(Table tbl : mFilterTable){
 				HashMap<String, Object> map = new HashMap<String, Object>();
-				map.put(ITEM_TAG_ID, tbl.aliasID + (tbl.name.length() == 0 ? "" : "(" + tbl.name + ")"));
+				map.put(ITEM_TAG_ID, tbl.aliasID);
 				map.put(ITEM_TAG_CUSTOM, "人数: " + tbl.custom_num);
 				map.put(ITEM_TAG_TBL_NAME, tbl.name);
 				map.put(ITEM_TAG_STATE, "状态： " + (tbl.status == Table.TABLE_IDLE ? "空闲" : "就餐"));
@@ -286,18 +294,23 @@ public class TableActivity extends Activity {
 				hintText.setVisibility(View.INVISIBLE);
 			}
 
+			
 			theActivity.mListView.setAdapter(new SimpleAdapter(theActivity.getApplicationContext(), 
-					 						 				   contents,
-					 						 				   R.layout.the_table, 
-					 						 				   TableActivity.ITEM_TAGS,
-					 						 				   TableActivity.ITEM_ID){
+					   contents,
+					   R.layout.the_table, 
+					   TableActivity.ITEM_TAGS,
+					   TableActivity.ITEM_ID){
 				@Override
 				public View getView(int position, View convertView, ViewGroup parent){
 					View view = super.getView(position, convertView, parent);
+					final Map<String, ?> map = contents.get(position);
+					view.setTag(map.get(ITEM_TAG_ID));
+					
 					((ImageButton)view.findViewById(R.id.add_table)).setOnClickListener(new OnClickListener(){			
 						@Override
 						public void onClick(View v) {
-							//TODO jump to order activity
+							int tableID = (Integer)map.get(ITEM_TAG_ID);
+							theActivity.new QueryTableStatusTask(tableID).execute();
 						}
 					});
 					return view;
@@ -340,8 +353,8 @@ public class TableActivity extends Activity {
 		mListView.setOnItemClickListener(new OnItemClickListener(){
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				// TODO jump to table detail activity
-				System.out.println("position: "+position);
+				new QueryOrderTask((Integer)view.getTag()).execute();
+
 			}
 		});
 	}
@@ -378,8 +391,8 @@ public class TableActivity extends Activity {
 		/**
 		 * 搜索框
 		 */
-		final AutoCompleteTextView txtView = (AutoCompleteTextView)findViewById(R.id.search_view_table);
-		txtView.addTextChangedListener(new TextWatcher(){
+		final AutoCompleteTextView searchTxtView = (AutoCompleteTextView)findViewById(R.id.search_view_table);
+		searchTxtView.addTextChangedListener(new TextWatcher(){
 			@Override 
 			public void afterTextChanged(Editable s) {}
 			
@@ -394,26 +407,6 @@ public class TableActivity extends Activity {
 		});
 		
 		/**
-		 * 刷新 button
-		 */
-		ImageButton refreshBtn = (ImageButton) findViewById(R.id.btn2_right);
-		refreshBtn.setVisibility(View.VISIBLE);
-		refreshBtn.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				new QueryRegionTask().execute();
-				txtView.setText("");
-			}
-		});
-		
-		RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
-																		 RelativeLayout.LayoutParams.WRAP_CONTENT);
-		lp.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
-		lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
-		lp.setMargins(0, 0, 64, 0);
-		lp.addRule(RelativeLayout.VISIBLE);
-
-		/**
 		 * PullListView
 		 */
 		mListView = (PullListView) findViewById(R.id.listView_table);
@@ -423,20 +416,22 @@ public class TableActivity extends Activity {
 				new QueryRegionTask().execute();
 			}
 		});
+
 		/**
 		 * “全部”按钮
 		 */
 		ImageButton allBtn = (ImageButton)findViewById(R.id.btn_right);
 		allBtn.setImageResource(R.drawable.home_selector);
-		allBtn.setLayoutParams(lp);
 		allBtn.setVisibility(View.VISIBLE);
 		allBtn.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				((AutoCompleteTextView)findViewById(R.id.search_view_table)).setText("");
 				mTableCond = FILTER_TABLE_ALL;
 				mRegionCond = FILTER_REGION_ALL;
-				mDataHandler.sendEmptyMessage(0);
+				
+				new QueryRegionTask().execute();
+				searchTxtView.setText("");
+
 				((TextView)findViewById(R.id.toptitle)).setText("全部区域");
 				buttonUp();
 				regionAllBtn.setImageResource(R.drawable.alldown);
@@ -450,7 +445,7 @@ public class TableActivity extends Activity {
 		idleBtn = (ImageButton)findViewById(R.id.middle_btn_bottom);
 		idleBtn.setOnClickListener(new OnClickListener(){
 			public void onClick(View arg0) {
-				((AutoCompleteTextView)findViewById(R.id.search_view_table)).setText("");
+				searchTxtView.setText("");
 				mTableCond = FILTER_TABLE_IDLE;
 				mDataHandler.sendEmptyMessage(0);
 				buttonUp();
@@ -465,7 +460,7 @@ public class TableActivity extends Activity {
 		busyBtn = (ImageButton)findViewById(R.id.right_btn_bottom);
 		busyBtn.setOnClickListener(new OnClickListener(){
 			public void onClick(View arg0) {
-				((AutoCompleteTextView)findViewById(R.id.search_view_table)).setText("");
+				searchTxtView.setText("");
 				mTableCond = FILTER_TABLE_BUSY;
 				mDataHandler.sendEmptyMessage(0);
 				buttonUp();
@@ -480,7 +475,7 @@ public class TableActivity extends Activity {
 		deleteBtn.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				txtView.setText("");
+				searchTxtView.setText("");
 			}
 		});
 
@@ -493,7 +488,7 @@ public class TableActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				((AutoCompleteTextView)findViewById(R.id.search_view_table)).setText("");
+				searchTxtView.setText("");
 				mTableCond = FILTER_TABLE_ALL;
 				mDataHandler.sendEmptyMessage(0);
 				buttonUp();
@@ -503,7 +498,6 @@ public class TableActivity extends Activity {
 		
 		// 创建点击餐台状态后弹出区域的View
 		popupView = getLayoutInflater().inflate(R.layout.main_pop_window, null);
-//		System.out.println(popupView);
 
 		// 创建与这个View关联的pop-up window
 		final PopupWindow popWnd = new PopupWindow(
@@ -515,7 +509,6 @@ public class TableActivity extends Activity {
 		popWnd.update();
 		
 		ListView popListView = (ListView)popupView.findViewById(R.id.popWndList);
-//		System.out.println(popListView);
 		popListView.setOnItemClickListener(new OnItemClickListener(){
 
 			@Override
@@ -545,6 +538,28 @@ public class TableActivity extends Activity {
 		
 	}
 
+	/**
+	 * Generate the message according to the error code 
+	 * @param tableID the table id associated with this error
+	 * @param errCode the error code
+	 * @return the error message
+	 */
+	private String genErrMsg(int tableID, byte errCode){
+		if(errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
+			return "终端没有登记到餐厅，请联系管理人员。";
+		}else if(errCode == ErrorCode.TERMINAL_EXPIRED) {
+			return "终端已过期，请联系管理人员。";
+		}else if(errCode == ErrorCode.TABLE_NOT_EXIST){
+			return tableID + "号餐台信息不存在";
+		}else{
+			return null;
+		}
+	}
+	/**
+	 * 
+	 * 请求区域信息
+	 *
+	 */
 	private class QueryRegionTask extends AsyncTask<Void, Void, String>{
 		
 		private ProgressDialog mProgDialog;
@@ -661,6 +676,185 @@ public class TableActivity extends Activity {
 				Toast.makeText(getApplicationContext(), "餐台信息刷新成功",	Toast.LENGTH_SHORT).show();
 			} 
 		}
+	}
+	/**
+	 * 请求获得餐台的状态
+	 */
+	private class QueryTableStatusTask extends AsyncTask<Void, Void, String>{
+
+		private byte _tableStatus = Table.TABLE_IDLE;
+		private int _tableAlias;
+		private ProgressDialog _progDialog;
+
+		QueryTableStatusTask(int tableAlias){
+			_tableAlias =  tableAlias;
+		}
+		
+		@Override
+		protected void onPreExecute(){
+			_progDialog = ProgressDialog.show(TableActivity.this, "", "查询" + _tableAlias + "号餐台信息...请稍候", true);
+		}
+		
+		/**
+		 * 在新的线程中执行请求餐台状态的操作
+		 */
+		@Override
+		protected String doInBackground(Void... arg0) {
+			String errMsg = null;
+			try{
+				ProtocolPackage resp = ServerConnector.instance().ask(new ReqTableStatus(_tableAlias));
+
+				if(resp.header.type == Type.ACK){
+					_tableStatus = resp.header.reserved;
+					
+				}else{
+					errMsg = genErrMsg(_tableAlias, resp.header.reserved);
+					if(errMsg == null){
+						errMsg = "未确定的异常错误(" + resp.header.reserved + ")";
+					}
+				}					
+				
+			}catch(IOException e){
+				errMsg = e.getMessage();
+			}
+			
+			return errMsg;
+		}
+		
+		/**
+		 * 如果相应的操作不符合条件（比如要改单的餐台还未下单），
+		 * 则把相应信息提示给用户，否则根据餐台状态，分别跳转到下单或改单界面。
+		 */
+		@Override
+		protected void onPostExecute(String errMsg){
+			//make the progress dialog disappeared
+			_progDialog.dismiss();
+			/**
+			 * Prompt user message if any error occurred.
+			 * Otherwise perform the corresponding action.
+			 */
+			if(errMsg != null){
+				new AlertDialog.Builder(TableActivity.this)
+				.setTitle("提示")
+				.setMessage(errMsg)
+				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.dismiss();
+					}
+				}).show();
+				
+			}else{
+			
+				if(_tableStatus == Table.TABLE_IDLE){
+					//jump to the order activity with the table id if the table is idle
+					Intent intent = new Intent(TableActivity.this, OrderActivity.class);
+					intent.putExtra(MainActivity.KEY_TABLE_ID, String.valueOf(_tableAlias));
+					startActivity(intent);
+				}else if(_tableStatus == Table.TABLE_BUSY){
+					//jump to change order activity with the table alias id if the table is busy
+					Intent intent = new Intent(TableActivity.this, ChgOrderActivity.class);
+					intent.putExtra(MainActivity.KEY_TABLE_ID, String.valueOf(_tableAlias));
+					startActivity(intent);
+				}
+				
+			}
+		}
+	}		
+	
+	/**
+	 * 执行请求对应餐台的账单信息 
+	 */
+	private class QueryOrderTask extends AsyncTask<Void, Void, String>{
+
+		private ProgressDialog _progDialog;
+		private int _tableAlias;
+	
+		QueryOrderTask(int tableAlias){
+			_tableAlias = tableAlias;
+		}
+		
+		/**
+		 * 在执行请求删单操作前显示提示信息
+		 */
+		@Override
+		protected void onPreExecute(){
+			_progDialog = ProgressDialog.show(TableActivity.this, "", "查询" + _tableAlias + "号餐台的信息...请稍候", true);
+		}
+		
+		@Override
+		protected String doInBackground(Void... arg0) {
+			String errMsg = null;
+			if(_tableAlias == -1)
+			{
+				errMsg = "号台信息不存在";
+			}
+			else try{
+				//根据tableID请求数据
+				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryOrder(_tableAlias));
+				if(resp.header.type == Type.ACK){
+					mOrderToPay = RespParser.parseQueryOrder(resp, WirelessOrder.foodMenu);
+					
+				}else{
+    				if(resp.header.reserved == ErrorCode.TABLE_IDLE) {
+    					errMsg = _tableAlias + "号台还未下单";
+    					
+    				}else if(resp.header.reserved == ErrorCode.TABLE_NOT_EXIST) {
+    					errMsg = _tableAlias + "号台信息不存在";
+
+    				}else if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
+    					errMsg = "终端没有登记到餐厅，请联系管理人员。";
+
+    				}else if(resp.header.reserved == ErrorCode.TERMINAL_EXPIRED) {
+    					errMsg = "终端已过期，请联系管理人员。";
+
+    				}else{
+    					errMsg = "未确定的异常错误(" + resp.header.reserved + ")";
+    				}
+				}
+			}catch(IOException e){
+				errMsg = e.getMessage();
+			}
+			
+			return errMsg;
+		}
+		
+		/**
+		 * 根据返回的error message判断，如果发错异常则提示用户，
+		 * 如果成功，则迁移到改单页面
+		 */
+		@Override
+		protected void onPostExecute(String errMsg){
+			//make the progress dialog disappeared
+			_progDialog.dismiss();
+			
+			if(errMsg != null){
+				
+				/**
+				 * 如果请求账单信息失败，则跳转会MainActivity
+				 */
+				new AlertDialog.Builder(TableActivity.this)
+					.setTitle("提示")
+					.setMessage(errMsg)
+					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							dialog.dismiss();
+						}
+					})
+					.show();
+			} else{
+				/**
+				 * 请求账单成功则跳转到detail activity
+				 */
+				Intent intent = new Intent(TableActivity.this,TableDetailActivity.class);
+				intent.putExtra(MainActivity.KEY_TABLE_ID,_tableAlias );
+				OrderParcel order = new OrderParcel(mOrderToPay);
+				intent.putExtra("ORDER", order);
+				startActivity(intent);
+				//make the progress dialog disappeared
+				_progDialog.dismiss();
+
+			}			
+		}		
 	}
 
 }

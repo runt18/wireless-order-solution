@@ -42,7 +42,7 @@
         android:layout_centerVertical="true"
         android:layout_gravity="center_vertical"
         android:src="@drawable/commit_selector"
-        android:layout_marginRight="8dip"
+        android:layout_marginRight="10dip"
         android:background="#00ffffff"
         android:visibility="gone" />
 
