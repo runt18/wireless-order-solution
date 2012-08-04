@@ -20,10 +20,9 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food` (
   `kitchen_id` INT NULL DEFAULT NULL COMMENT 'the kitchen id the food belong to' ,
   `kitchen_alias` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the kitchen number which the food belong to. the maximum value (255) means the food does not belong to any kitchen.' ,
   `status` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates the status to this food, the value is the combination of values below.\n特价菜 ：0x01\n推荐菜 ：0x02\n停售　 ：0x04\n赠送     ：0x08\n时价     ：0x10\n套菜     ：0x20' ,
-  `img1` BINARY NULL DEFAULT NULL ,
-  `img2` BINARY NULL DEFAULT NULL ,
-  `img3` BINARY NULL DEFAULT NULL ,
   `taste_ref_type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the taste reference type is below.\n1 - smart reference\n2 - manual reference' ,
+  `desc` VARCHAR(500) NULL DEFAULT NULL COMMENT 'the description to this food' ,
+  `img` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the image to this food' ,
   PRIMARY KEY (`food_id`) ,
   INDEX `ix_food_alias_id` (`restaurant_id` ASC, `food_alias` ASC) )
 ENGINE = InnoDB

@@ -109,3 +109,15 @@ ALTER TABLE `wireless_order_db`.`setting` ADD COLUMN `setting_id` INT NOT NULL A
 -- Add the field 'taste_ref_type' to table 'food'
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`food` CHANGE COLUMN `enabled` `taste_ref_type` TINYINT(4) NOT NULL DEFAULT '1' COMMENT 'the taste reference type to this food is below.\n1 - smart reference\n2 - manual reference'  ;
+
+-- -----------------------------------------------------
+-- Drop the field 'img1..3' to table 'food'
+-- Add the field 'desc' to table 'food' 
+-- Add the field 'img' to table 'food'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`food` DROP COLUMN `img3` , 
+DROP COLUMN `img2` , 
+DROP COLUMN `img1` , 
+ADD COLUMN `desc` VARCHAR(500) NULL DEFAULT NULL COMMENT 'the description to this food'  AFTER `taste_ref_type` , 
+ADD COLUMN `img` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the image to this food'  AFTER `desc` ;
+
