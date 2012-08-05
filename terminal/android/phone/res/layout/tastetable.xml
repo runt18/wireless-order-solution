@@ -4,10 +4,12 @@
     android:layout_height="fill_parent"
     android:background="@drawable/bgcolor"
     android:orientation="vertical" >
-	   <include
+
+    <include
         android:id="@+id/top"
         layout="@layout/topbar" />
-    <!-- <RelativeLayout
+    <!--
+    <RelativeLayout
         android:id="@+id/tasteHeader"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -38,7 +40,8 @@
             android:textStyle="bold"
             android:typeface="monospace" >
         </TextView>
-    </RelativeLayout> -->
+    </RelativeLayout>
+    -->
 
     <RelativeLayout
         android:id="@+id/foodTaste"
@@ -62,12 +65,37 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:baselineAligned="false"
         android:background="@drawable/tab_bg_selector"
+        android:baselineAligned="false"
         android:gravity="center"
         android:orientation="horizontal"
         android:padding="2dip"
         android:weightSum="4" >
+
+        <LinearLayout
+            android:id="@+id/popTasteLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/tab_bg_selector"
+            android:gravity="center"
+            android:orientation="vertical" >
+
+            <ImageView
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_margin="0dip"
+                android:src="@drawable/ic_tab_artists" />
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:gravity="center"
+                android:paddingTop="1dip"
+                android:text="常用"
+                android:textColor="@drawable/tab_text_selector"
+                android:textSize="20sp" />
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/tasteLayout"
@@ -95,13 +123,14 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/styleLayout"            
+            android:id="@+id/styleLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/tab_bg_selector"
             android:gravity="center"
-            android:orientation="vertical" >
+            android:orientation="vertical"
+            android:visibility="gone" >
 
             <ImageView
                 android:layout_width="fill_parent"
@@ -112,8 +141,8 @@
             <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:paddingTop="1dip"
                 android:gravity="center"
+                android:paddingTop="1dip"
                 android:text="做法"
                 android:textColor="@drawable/tab_text_selector"
                 android:textSize="20sp" />
@@ -137,15 +166,13 @@
             <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:paddingTop="1dip"
                 android:gravity="center"
+                android:paddingTop="1dip"
                 android:text="规格"
                 android:textColor="@drawable/tab_text_selector"
                 android:textSize="20sp" />
         </LinearLayout>
-        
-        
-        
+
         <LinearLayout
             android:id="@+id/pinzhuLayout"
             android:layout_width="wrap_content"
@@ -170,7 +197,6 @@
                 android:textColor="@drawable/tab_text_selector"
                 android:textSize="20sp" />
         </LinearLayout>
-        
     </LinearLayout>
 
     <com.wireless.ui.view.ScrollLayout

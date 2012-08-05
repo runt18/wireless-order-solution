@@ -43,6 +43,7 @@ public class PickTasteActivity extends Activity{
 		}
 	};
 	
+	private final static String TAG_POP_TASTE = "常用";
 	private final static String TAG_TASTE = "口味";
 	private final static String TAG_STYLE = "做法";
 	private final static String TAG_SPEC = "规格";
@@ -83,13 +84,13 @@ public class PickTasteActivity extends Activity{
 		});
 		
 		final ScrollLayout tasteScrollLayout = (ScrollLayout)findViewById(R.id.tasteScrollLayout);
+		//常用View
+		tasteScrollLayout.addView(setupPopularView());
 		//口味View
 		tasteScrollLayout.addView(setupTasteView());
-		//做法View
-		tasteScrollLayout.addView(setupStyleView());
 		//规格View
 		tasteScrollLayout.addView(setupSpecView());
-		//品注
+		//品注View
 		tasteScrollLayout.addView(setupPinZhuView());
 		
 		tasteScrollLayout.setOnViewChangedListener(new OnViewChangedListener() {			
@@ -98,11 +99,17 @@ public class PickTasteActivity extends Activity{
 				String tag = curView.getTag().toString();
 				((TextView)findViewById(R.id.toptitle)).setText(tag);
 				
+				((LinearLayout)findViewById(R.id.popTasteLayout)).setBackgroundResource(R.drawable.tab_bg_unselected);
 				((LinearLayout)findViewById(R.id.tasteLayout)).setBackgroundResource(R.drawable.tab_bg_unselected);
 				((LinearLayout)findViewById(R.id.styleLayout)).setBackgroundResource(R.drawable.tab_bg_unselected);
 				((LinearLayout)findViewById(R.id.specLayout)).setBackgroundResource(R.drawable.tab_bg_unselected);
 				((LinearLayout)findViewById(R.id.pinzhuLayout)).setBackgroundResource(R.drawable.tab_bg_unselected);
-				if(tag.equals(TAG_TASTE)){
+				
+				
+				if(tag.equals(TAG_POP_TASTE)){
+					((LinearLayout)findViewById(R.id.popTasteLayout)).setBackgroundResource(R.drawable.tab_bg_selected);
+					
+				}else if(tag.equals(TAG_TASTE)){
 					((LinearLayout)findViewById(R.id.tasteLayout)).setBackgroundResource(R.drawable.tab_bg_selected);
 					
 				}else if(tag.equals(TAG_STYLE)){
@@ -118,16 +125,16 @@ public class PickTasteActivity extends Activity{
 			}
 		});
 		
-		//口味Button
-		((LinearLayout)findViewById(R.id.tasteLayout)).setOnClickListener(new View.OnClickListener() {			
+		//常用Button
+		((LinearLayout)findViewById(R.id.popTasteLayout)).setOnClickListener(new View.OnClickListener() {			
 			@Override
 			public void onClick(View v) {
 				tasteScrollLayout.setToScreen(0);
 			}
 		});
 		
-		//做法Button
-		((LinearLayout)findViewById(R.id.styleLayout)).setOnClickListener(new View.OnClickListener() {			
+		//口味Button
+		((LinearLayout)findViewById(R.id.tasteLayout)).setOnClickListener(new View.OnClickListener() {			
 			@Override
 			public void onClick(View v) {
 				tasteScrollLayout.setToScreen(1);
@@ -155,6 +162,62 @@ public class PickTasteActivity extends Activity{
 		
 	}
 
+	
+	//设置常用View
+	public View setupPopularView(){
+		View popView = LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.popular, null);
+    	final ListView styleLstView = (ListView)popView.findViewById(R.id.popLstView);
+    	((EditText)popView.findViewById(R.id.popSrchEdtTxt)).setText("");
+		styleLstView.setAdapter(new TasteAdapter(_selectedFood.popTastes));
+		
+	    
+	    //滚动的时候隐藏输入法
+	    styleLstView.setOnScrollListener(new OnScrollListener() {
+				
+				@Override
+				public void onScrollStateChanged(AbsListView view, int scrollState) {
+					((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(((EditText)findViewById(R.id.popSrchEdtTxt)).getWindowToken(), 0);
+				}
+				
+				@Override
+				public void onScroll(AbsListView view, int firstVisibleItem,
+						int visibleItemCount, int totalItemCount) {
+					
+				}
+			});
+	    
+	    /**
+		 * 在常用选择页面中按名称进行筛选
+		 */
+		((EditText)popView.findViewById(R.id.popSrchEdtTxt)).addTextChangedListener(new TextWatcher() {
+			
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				ArrayList<Taste> popTastes = new ArrayList<Taste>();
+				if(s.toString().length() != 0){
+					 for(int i = 0; i < _selectedFood.popTastes.length; i++){
+				    	 if(_selectedFood.popTastes[i].preference.contains(s.toString().trim())){
+				    		 popTastes.add(_selectedFood.popTastes[i]);
+				    	 }
+				    }
+					styleLstView.setAdapter(new TasteAdapter(popTastes.toArray(new Taste[popTastes.size()])));
+					
+				}else{
+					styleLstView.setAdapter(new TasteAdapter(_selectedFood.popTastes));
+				}
+			}
+			
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,	int after) {}
+			
+			@Override
+			public void afterTextChanged(Editable s) {}
+		});
+		
+		popView.setTag(TAG_POP_TASTE);
+		
+		return popView;
+	}
 	
    //设置口味View
 	public View setupTasteView(){

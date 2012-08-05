@@ -22,7 +22,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -52,6 +51,7 @@ import com.wireless.protocol.ReqQueryRestaurant;
 import com.wireless.protocol.ReqQueryStaff;
 import com.wireless.protocol.ReqTableStatus;
 import com.wireless.protocol.RespParser;
+import com.wireless.protocol.RespParserEx;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
@@ -271,7 +271,6 @@ public class MainActivity extends Activity {
 				for(int i = 0; i < WirelessOrder.staffs.length; i++){
 					if(WirelessOrder.staffs[i].pin == pin){
 						_staff = WirelessOrder.staffs[i];
-						Log.e("", _staff.name);
 					}
 				}
 				if(_staff != null){
@@ -403,7 +402,7 @@ public class MainActivity extends Activity {
 		 */
 		@Override
 		protected void onPreExecute(){
-			_progDialog = ProgressDialog.show(MainActivity.this, "", "正在下载菜谱...请稍候", true);
+			_progDialog = ProgressDialog.show(MainActivity.this, "", "正在更新菜谱信息...请稍候", true);
 		}
 		
 		/**
@@ -416,7 +415,7 @@ public class MainActivity extends Activity {
 				WirelessOrder.foodMenu = null;
 				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryMenu());
 				if(resp.header.type == Type.ACK){
-					WirelessOrder.foodMenu = RespParser.parseQueryMenu(resp);
+					WirelessOrder.foodMenu = RespParserEx.parseQueryMenu(resp);
 				}else{
 					if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
 						errMsg = "终端没有登记到餐厅，请联系管理人员。";
@@ -474,7 +473,7 @@ public class MainActivity extends Activity {
 		 */
 		@Override
 		protected void onPreExecute(){
-			_progDialog = ProgressDialog.show(MainActivity.this, "", "更新菜谱信息...请稍候", true);
+			_progDialog = ProgressDialog.show(MainActivity.this, "", "更新餐厅信息...请稍候", true);
 		}
 		
 		/**
@@ -517,7 +516,7 @@ public class MainActivity extends Activity {
 					}
 				}).show();
 			}else{
-				Toast.makeText(MainActivity.this, "菜谱更新成功", Toast.LENGTH_SHORT).show();
+				Toast.makeText(MainActivity.this, "餐厅信息更新成功", Toast.LENGTH_SHORT).show();
 			}
 		}	
 	}

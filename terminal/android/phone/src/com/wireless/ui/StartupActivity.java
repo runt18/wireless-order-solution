@@ -43,6 +43,7 @@ import com.wireless.protocol.ReqQueryRestaurant;
 import com.wireless.protocol.ReqQueryStaff;
 import com.wireless.protocol.ReqQueryTable;
 import com.wireless.protocol.RespParser;
+import com.wireless.protocol.RespParserEx;
 import com.wireless.protocol.Terminal;
 import com.wireless.protocol.Type;
 import com.wireless.sccon.ServerConnector;
@@ -55,37 +56,26 @@ public class StartupActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		SharedPreferences sharedPrefs = getSharedPreferences(
-				Params.PREFS_NAME, Context.MODE_PRIVATE);
+		SharedPreferences sharedPrefs = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE);
 		/*
 		 * getString()第二个参数为缺省值，如果preference中不存在该key，将返回缺省值，
 		 * 返回缺省值表示配置文件还未创建，需要初始化配置文件
 		 */
-		if (sharedPrefs.getString(Params.IP_ADDR, "")
-				.equals("")) {
+		if (sharedPrefs.getString(Params.IP_ADDR, "").equals("")) {
 			Editor editor = sharedPrefs.edit();// 获取编辑器
-			editor.putString(Params.IP_ADDR,
-					Params.DEF_IP_ADDR);
-			editor.putInt(Params.IP_PORT,
-					Params.DEF_IP_PORT);
+			editor.putString(Params.IP_ADDR, Params.DEF_IP_ADDR);
+			editor.putInt(Params.IP_PORT, Params.DEF_IP_PORT);
 			editor.putString(Params.APN, "cmnet");
 			editor.putString(Params.USER_NAME, "");
 			editor.putString(Params.PWD, "");
-			editor.putInt(Params.PRINT_SETTING,
-					Params.PRINT_ASYNC);
-			editor.putInt(Params.CONN_TIME_OUT,
-					Params.TIME_OUT_10s);
-			editor.putInt(Params.LAST_PICK_CATE,
-					Params.PICK_BY_KITCHEN);
+			editor.putInt(Params.PRINT_SETTING,	Params.PRINT_ASYNC);
+			editor.putInt(Params.CONN_TIME_OUT, Params.TIME_OUT_10s);
+			editor.putInt(Params.LAST_PICK_CATE, Params.PICK_BY_KITCHEN);
 			editor.commit();// 提交修改
 
 		} else {
-			ServerConnector.instance().setNetAddr(
-					sharedPrefs.getString(Params.IP_ADDR,
-							Params.DEF_IP_ADDR));
-			ServerConnector.instance().setNetPort(
-					sharedPrefs.getInt(Params.IP_PORT,
-							Params.DEF_IP_PORT));
+			ServerConnector.instance().setNetAddr(sharedPrefs.getString(Params.IP_ADDR,	Params.DEF_IP_ADDR));
+			ServerConnector.instance().setNetPort(sharedPrefs.getInt(Params.IP_PORT, Params.DEF_IP_PORT));
 			// ServerConnector.instance().setNetAPN(_netapn);
 			// ServerConnector.instance().setNetUser(_username);
 			// ServerConnector.instance().setNetPwd(_password);
@@ -127,12 +117,9 @@ public class StartupActivity extends Activity {
 	 * @return true if the network is connected, otherwise return false
 	 */
 	private boolean isNetworkAvail() {
-		ConnectivityManager connectivity = (ConnectivityManager) getApplicationContext()
-				.getSystemService(
-						Context.CONNECTIVITY_SERVICE);
+		ConnectivityManager connectivity = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
 		if (connectivity != null) {
-			NetworkInfo[] info = connectivity
-					.getAllNetworkInfo();
+			NetworkInfo[] info = connectivity.getAllNetworkInfo();
 			if (info != null) {
 				for (int i = 0; i < info.length; i++) {
 					if (info[i].getState() == NetworkInfo.State.CONNECTED) {
@@ -175,8 +162,7 @@ public class StartupActivity extends Activity {
 
 	}
 
-	private class QueryStaffTask extends
-			AsyncTask<Void, Void, String> {
+	private class QueryStaffTask extends AsyncTask<Void, Void, String> {
 
 		// private ProgressDialog _progDialog;
 
@@ -196,12 +182,9 @@ public class StartupActivity extends Activity {
 			String errMsg = null;
 			try {
 				WirelessOrder.staffs = null;
-				ProtocolPackage resp = ServerConnector
-						.instance()
-						.ask(new ReqQueryStaff());
+				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryStaff());
 				if (resp.header.type == Type.ACK) {
-					WirelessOrder.staffs = RespParser
-							.parseQueryStaff(resp);
+					WirelessOrder.staffs = RespParser.parseQueryStaff(resp);
 				} else {
 					if (resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
 						errMsg = "终端没有登记到餐厅，请联系管理人员。";
@@ -239,12 +222,8 @@ public class StartupActivity extends Activity {
 						.setPositiveButton(
 								"确定",
 								new DialogInterface.OnClickListener() {
-									public void onClick(
-											DialogInterface dialog,
-											int id) {
-										Intent intent = new Intent(
-												StartupActivity.this,
-												MainActivity.class);
+									public void onClick(DialogInterface dialog,	int id) {
+										Intent intent = new Intent(StartupActivity.this, MainActivity.class);
 										startActivity(intent);
 										finish();
 									}
@@ -252,24 +231,17 @@ public class StartupActivity extends Activity {
 
 			} else {
 				if (WirelessOrder.staffs == null) {
-					new AlertDialog.Builder(
-							StartupActivity.this)
-							.setTitle("提示")
-							.setMessage(
-									"没有查询到任何的员工信息，请先在管理后台添加员工信息")
-							.setPositiveButton(
-									"确定",
-									new DialogInterface.OnClickListener() {
-										public void onClick(
-												DialogInterface dialog,
-												int id) {
-											Intent intent = new Intent(
-													StartupActivity.this,
-													MainActivity.class);
-											startActivity(intent);
-											finish();
-										}
-									}).show();
+					new AlertDialog.Builder(StartupActivity.this)
+						.setTitle("提示")
+						.setMessage("没有查询到任何的员工信息，请先在管理后台添加员工信息")
+						.setPositiveButton("确定",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,	int id) {
+									Intent intent = new Intent(StartupActivity.this, MainActivity.class);
+									startActivity(intent);
+									finish();
+								}})
+						.show();
 				} else {
 					new QueryMenuTask().execute();
 				}
@@ -305,11 +277,9 @@ public class StartupActivity extends Activity {
 			String errMsg = null;
 			try {
 				WirelessOrder.foodMenu = null;
-				ProtocolPackage resp = ServerConnector
-						.instance().ask(new ReqQueryMenu());
+				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryMenu());
 				if (resp.header.type == Type.ACK) {
-					WirelessOrder.foodMenu = RespParser
-							.parseQueryMenu(resp);
+					WirelessOrder.foodMenu = RespParserEx.parseQueryMenu(resp);
 				} else {
 					if (resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
 						errMsg = "终端没有登记到餐厅，请联系管理人员。";
