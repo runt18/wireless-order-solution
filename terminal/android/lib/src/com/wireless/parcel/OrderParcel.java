@@ -18,7 +18,7 @@ public class OrderParcel extends Order implements Parcelable{
 		discount_type = order.discount_type;
 		pay_manner = order.pay_manner;
 		category = order.category;
-		setServiceRate(new Float(order.getServiceRate()));
+		setServiceRate(Float.valueOf(order.getServiceRate()));
 		id = order.id;
 		restaurantID = order.restaurantID;
 		table = new TableParcel(order.table);
@@ -29,11 +29,11 @@ public class OrderParcel extends Order implements Parcelable{
 		memberID = order.memberID == null ? null : new String(order.memberID);
 		comment = order.comment == null ? null : new String(order.comment);
 		print_type = order.print_type;
-		setMinimumCost(new Float(order.getMinimumCost()));
+		setMinimumCost(Float.valueOf(order.getMinimumCost()));
 		//setGiftPrice(new Float(order.getGiftPrice()));
-		setCashIncome(new Float(order.getCashIncome()));
-		setTotalPrice(new Float(order.getTotalPrice()));
-		setActualPrice(new Float(order.getActualPrice()));
+		setCashIncome(Float.valueOf(order.getCashIncome()));
+		setTotalPrice(Float.valueOf(order.getTotalPrice()));
+		setActualPrice(Float.valueOf(order.getActualPrice()));
 		foods = new OrderFood[order.foods.length];
 		for(int i = 0; i < foods.length; i++){
 			foods[i] = new FoodParcel(order.foods[i]);

@@ -19,8 +19,8 @@ public class TableParcel extends Table implements Parcelable {
 		this.custom_num = table.custom_num;
 		this.name = new String(table.name);
 		this.regionID = table.regionID;
-		this.setMinimumCost(new Float(table.getMinimumCost()));
-		this.setServiceRate(new Float(table.getServiceRate()));
+		this.setMinimumCost(Float.valueOf(table.getMinimumCost()));
+		this.setServiceRate(Float.valueOf(table.getServiceRate()));
 	}
 	
 	TableParcel(Parcel in){
