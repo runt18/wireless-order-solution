@@ -20,7 +20,6 @@ public class Department {
 	public String name;
 	
 	public Department(){
-		this.name = "";
 		this.deptID = DEPT_1;
 		this.restaurantID = 0;
 	}

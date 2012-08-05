@@ -12,7 +12,8 @@ public class Taste {
 	public final static short CALC_PRICE = 0;	/* 按价格计算  */
 	public final static short CALC_RATE = 1;	/* 按比例计算  */
 	
-	public int tasteID = 0;
+	public int restaurantID;
+	public int tasteID;
 	public int aliasID = Taste.NO_TASTE;
 	public String preference = Taste.NO_PREFERENCE;
 	public short category = Taste.CATE_TASTE;
@@ -35,9 +36,14 @@ public class Taste {
 
 	}
 	
-	public Taste(int id, int alias, String pref, short cate, short calcType, Float _rate, Float _price){
-		tasteID = id;
-		aliasID = alias;
+	public Taste(int tasteID, int tasteAlias, int restaurantID){
+		this.tasteID = tasteID;
+		this.aliasID = tasteAlias;
+		this.restaurantID = restaurantID;
+	}
+	
+	public Taste(int tasteID, int tasteAlias, int restaurantID, String pref, short cate, short calcType, Float _rate, Float _price){
+		this(tasteID, tasteAlias, restaurantID);
 		preference = pref.trim();
 		category = cate;
 		calc = calcType;
@@ -45,6 +51,19 @@ public class Taste {
 		setPrice(_price);
 	}
 
+	public boolean equals(Object obj){
+		if(obj == null || !(obj instanceof Taste)){
+			return false;
+		}else{
+			return aliasID == ((Taste)obj).aliasID && restaurantID == ((Taste)obj).restaurantID;
+		}
+	}
+	
+	public int hashCode(){
+		return new Integer(aliasID).hashCode() ^ 
+			   new Integer(restaurantID).hashCode();
+	}
+	
 	/**
 	 * The rule to comparison is below.
 	 * 1 - Put the value of no taste to the end.

@@ -83,29 +83,32 @@ public final class Kitchen {
 	//the name to this kitchen
 	public String name;
 	//the restaurant id to this kitchen
-	public int restaurantID = 0;
+	public int restaurantID;
 	//the id to this kitchen
-	public long kitchenID = 0;
+	public long kitchenID;
 	//the alias id to this kitchen
-	public short aliasID = KITCHEN_NULL;
+	public short aliasID;
 	//the department id to this kitchen
-	public Department dept = new Department();
+	public Department dept;
 	
 	public Kitchen(){
-		
+		this.dept = new Department();
+		this.restaurantID = 0;
+		this.kitchenID = 0;
+		this.aliasID = KITCHEN_NULL;
 	}
 	
-	public Kitchen(int restaurantID, String kitchenName, long kitchenID, short kitchenAlias, short deptID){
+	public Kitchen(int restaurantID, String kitchenName, long kitchenID, short kitchenAlias, Department dept){
 		this.restaurantID = restaurantID;
 		this.name = kitchenName;
 		this.kitchenID = kitchenID;
 		this.aliasID = kitchenAlias;
-		this.dept.restaurantID = restaurantID;
-		this.dept.deptID = deptID;
+		this.dept = dept;
 	}
 	
-	public Kitchen(int restaurantID, String kitchenName, long kitchenID, short kitchenAlias, short deptID, byte dist1, byte dist2, byte dist3, byte memDist1, byte memDist2, byte memDist3){
-		this(restaurantID, kitchenName, kitchenID, kitchenAlias, deptID);
+	public Kitchen(int restaurantID, String kitchenName, long kitchenID, short kitchenAlias, 
+				   Department dept, byte dist1, byte dist2, byte dist3, byte memDist1, byte memDist2, byte memDist3){
+		this(restaurantID, kitchenName, kitchenID, kitchenAlias, dept);
 		discount_1 = dist1;
 		discount_2 = dist2;
 		discount_3 = dist3;

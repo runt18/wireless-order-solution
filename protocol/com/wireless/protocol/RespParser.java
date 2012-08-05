@@ -358,15 +358,16 @@ public class RespParser {
 		 * pin[6] - same as request
 		 * len[2] -  length of the <Body>
 		 * <Body>
-		 * food_amount[2] : <Food1> : <Food2>... 
-		 * taste_amount[2] : <Taste1> : <Taste2> ... 
-		 * style_amount[2] : <Style1> : <Style2>... 
-		 * spec_amount[2] : <Spec1> : <Spec2>... 
-		 * kitchen_amount : <Kitchen1> : <Kitchen2>...
-		 * s_kitchen_amount : <SKitchen1> : <SKitchen2>...
+		 * food_amount[2] : <Food_1> : <Food_2>... 
+		 * taste_amount[2] : <Taste_1> : <Taste_2> ... 
+		 * style_amount[2] : <Style_1> : <Style_2>... 
+		 * spec_amount[2] : <Spec_1> : <Spec_2>... 
+		 * kitchen_amount : <Kitchen_1> : <Kitchen_2>...
+		 * dept_amount : <Dept_1> : <Dept_2>...
+		 * 
 		 * food_amount[2] - 2-byte indicating the amount of the foods listed in the menu
 		 * <Food>
-		 * food_id[2] : price[3] : status : kitchen : len : name[len] : len2 : pinyin[len2]
+		 * food_id[2] : price[3] : status : kitchen : len : name[len] : len2 : pinyin[len2] : taste_ref_amount : taste_alias_1[2] : tase_alias_2[2]...
 		 * food_id[2] - 2-byte indicating the food's id
 		 * price[3] - 3-byte indicating the food's price
 		 * 			  price[0] 1-byte indicating the float point
@@ -376,6 +377,8 @@ public class RespParser {
 		 * name[len1] - the food's name whose length equals "len1"
 		 * len2 - the length of the pinyin
 		 * pinyin[len2] - the pinyin whose length equals "len2"
+		 * taste_ref_amount - the amount to taste reference
+		 * taste_alias_n[2] - 2-byte indicating the alias id to each taste reference 
 		 * 
 		 * taste_amount[2] - 2-byte indicates the amount of the taste preference
 		 * <Taste>
@@ -387,7 +390,7 @@ public class RespParser {
 		 * rate[2] - 2-byte indicating the rate to this taste
 		 * len - 1-byte indicating the length of the preference
 		 * preference[len] - the string to preference whose length is "len"
-		 *
+		 * 
 		 * style_amount[2] - 2-byte indicates the amount of the taste style
 		 * <Style>
 		 * The same as <Taste>
@@ -395,69 +398,97 @@ public class RespParser {
 		 * spec_amount[2] - 2-byte indicates the specifications of the taste style
 		 * <Spec>
 		 * The same as <Taste>
-		 
+		 *  
 		 * <Kitchen>
-		 * kitchen_id : s_kitchen_id : dist_1 : dist_2 : dist_3 : mdist_1 : mdist_2 : mdist_3 : len : kname[len]
+		 * kitchen_id : dept_id : dist_1 : dist_2 : dist_3 : mdist_1 : mdist_2 : mdist_3 : len : kname[len]
 		 * kitchen_id : the id to this kitchen
-		 * s_kitchen_id : the id to super kitchen which this kitchen belong to
+		 * dept_id : the id to department which this kitchen belong to
 		 * dist_1..3 : 3 normal discounts to this kitchen
 		 * mdist_1..3 : 3 member discounts to this kitchen
 		 * len : the length of the kitchen name
 		 * kname[len] : the name to this kitchen
 		 * 
-		 * <SKitchen>
-		 * s_kitchen_id : len : s_kname[len]
-		 * s_kitchen_id : the id to this super kitchen
-		 * len : the length of the super kitchen name
-		 * s_kname[len] : the name to this super kitchen
+		 * <Department>
+		 * dept_id : len : dept_name[len]
+		 * dept_id : the id to this department
+		 * len : the length of the department name
+		 * dept_name[len] : the name to this department
 		 *******************************************************/
 		//make sure the response is ACK
 		if(response.header.type == Type.ACK){
+			
+			int offset = 0;
+			
 			//get the amount of foods
-			int nFoods = (response.body[0] & 0x000000FF) | ((response.body[1] & 0x000000FF) << 8);
+			int foodAmount = (response.body[offset] & 0x000000FF) | ((response.body[offset + 1] & 0x000000FF) << 8);
 			
 			//allocate the memory for foods
-			Food[] foods = new Food[nFoods];
+			Food[] foods = new Food[foodAmount];
 			
-			int index = 2; /* the food number takes up 2-byte */
-			
+			offset += 2; /* the food number takes up 2-byte */			
 			//get each food's information 
-			for(int i = 0; i < nFoods; i++){
+			for(int i = 0; i < foods.length; i++){
 				Food food = new Food();
 				//get the food's id
-				food.aliasID = (response.body[index] & 0x000000FF) |
-							((response.body[index + 1] & 0x000000FF) << 8);
+				food.aliasID = (response.body[offset] & 0x000000FF) |
+							((response.body[offset + 1] & 0x000000FF) << 8);
 				
 				//get the food's price
-				food.price = ((response.body[index + 2] & 0x000000FF) |
-							 ((response.body[index + 3] & 0x000000FF) << 8) |
-							 ((response.body[index + 4] & 0x000000FF) << 16)) &	0x00FFFFFF;
+				food.price = ((response.body[offset + 2] & 0x000000FF) |
+							 ((response.body[offset + 3] & 0x000000FF) << 8) |
+							 ((response.body[offset + 4] & 0x000000FF) << 16)) &	0x00FFFFFF;
 				
 				//get the kitchen no to this food
-				food.kitchen.aliasID = response.body[index + 5];
+				food.kitchen.aliasID = response.body[offset + 5];
 				
 				//get the status to this food
-				food.status = response.body[index + 6];
+				food.status = response.body[offset + 6];
 				
 				//get the length of the food's name
-				int len1 = response.body[index + 7];
+				int lenOfFoodName = response.body[offset + 7];
 				
 				//get the name value 
 				try{
-					food.name = new String(response.body, index + 8, len1, "UTF-16BE");
+					food.name = new String(response.body, offset + 8, lenOfFoodName, "UTF-16BE");
 				}catch(UnsupportedEncodingException e){
 
 				}
 				
 				//get the length of the food's pinyin
-				int len2 = response.body[index + 8 + len1];
+				int lenOfPinyin = response.body[offset + 8 + lenOfFoodName];
 				
 				//get the food's pinyin
-				if(len2 != 0){
-					food.pinyin = new String(response.body, index + 8 + len1 + 1, len2);
+				if(lenOfPinyin != 0){
+					food.pinyin = new String(response.body, offset + 9 + lenOfFoodName, lenOfPinyin);
 				}
 				
-				index += 8 + len1 + 1 + len2;
+				//get the amount of taste reference to this food
+				int nPopTaste = response.body[offset + 9 + lenOfFoodName + lenOfPinyin];
+				
+				//get each alias id to taste reference
+				int lenOfPopTaste = 0;
+				if(nPopTaste != 0){
+					food.popTastes = new Taste[nPopTaste];
+					for(int j = 0; j < food.popTastes.length; j++){
+						food.popTastes[j] = new Taste();
+						food.popTastes[j].aliasID = (response.body[offset + 10 + lenOfFoodName + lenOfPinyin + lenOfPopTaste] & 0x000000FF) | 
+													((response.body[offset + 11 + lenOfFoodName + lenOfPinyin + lenOfPopTaste] & 0x000000FF) << 8);
+						lenOfPopTaste += 2;
+					}
+				}else{
+					food.popTastes = new Taste[0];
+				}
+				
+				offset += 2 +				/* food_alias(2-byte) */
+						  3 + 				/* price(3-byte) */ 
+						  1 + 				/* kitchen id to this food(1-byte) */
+						  1 + 				/* status(1-byte) */ 
+						  1 + 				/* the length to food name(1-byte) */
+						  lenOfFoodName + 	/* the value to food name  */
+						  1 + 				/* the length to pinyin(1-byte) */	
+						  lenOfPinyin +		/* the value to pinyin */
+						  1 +				/* the amount to taste reference(1-byte) */
+						  lenOfPopTaste;	/* all the alias id to taste reference */ 
 				
 				//add to foods
 				foods[i] = food;
@@ -465,92 +496,100 @@ public class RespParser {
 			
 
 			//get the amount of taste preferences
-			int nCount = (response.body[index] & 0x000000FF) | ((response.body[index + 1] & 0x000000FF) << 8);
-			index += 2;
+			int nCount = (response.body[offset] & 0x000000FF) | ((response.body[offset + 1] & 0x000000FF) << 8);
+			offset += 2;
 			//allocate the memory for taste preferences
 			Taste[] tastes = new Taste[nCount];
 			//get the taste preferences
-			index = genTaste(response, index, tastes, 0, tastes.length);			
+			offset = genTaste(response, offset, tastes, 0, tastes.length);			
 
 			//get the amount of taste styles
-			nCount = (response.body[index] & 0x000000FF) | ((response.body[index + 1] & 0x000000FF) << 8);
-			index += 2;
+			nCount = (response.body[offset] & 0x000000FF) | ((response.body[offset + 1] & 0x000000FF) << 8);
+			offset += 2;
 			//allocate the memory for taste preferences
 			Taste[] styles = new Taste[nCount];
 			//get the taste styles
-			index = genTaste(response, index, styles, 0, styles.length);
+			offset = genTaste(response, offset, styles, 0, styles.length);
 
 			//get the amount of taste specifications
-			nCount = (response.body[index] & 0x000000FF) | ((response.body[index + 1] & 0x000000FF) << 8);
-			index += 2;
+			nCount = (response.body[offset] & 0x000000FF) | ((response.body[offset + 1] & 0x000000FF) << 8);
+			offset += 2;
 			//allocate the memory for taste preferences
 			Taste[] specs = new Taste[nCount];
 			//get the taste specifications
-			index = genTaste(response, index, specs, 0, specs.length);
+			offset = genTaste(response, offset, specs, 0, specs.length);
 					
 			//get the amount of kitchens
-			int nKitchens = response.body[index] & 0x000000FF;
-			index++;
+			int nKitchens = response.body[offset] & 0x000000FF;
+			offset++;
 			//allocate the memory for kitchens
 			Kitchen[] kitchens = new Kitchen[nKitchens];
 			//get each kitchen's information
 			for(int i = 0; i < kitchens.length; i++){
 				
 				//get the kitchen alias id
-				short kitchenAlias = (short)(response.body[index] & 0x00FF);
+				short kitchenAlias = (short)(response.body[offset] & 0x00FF);
 				
 				//get the department alias id that the kitchen belong to
-				short deptAlias = (short)(response.body[index + 1] & 0x00FF);
+				short deptAlias = (short)(response.body[offset + 1] & 0x00FF);
 				
 				//get 3 normal discounts
-				byte dist_1 = response.body[index + 2];
-				byte dist_2 = response.body[index + 3];
-				byte dist_3 = response.body[index + 4];
+				byte dist_1 = response.body[offset + 2];
+				byte dist_2 = response.body[offset + 3];
+				byte dist_3 = response.body[offset + 4];
 				
 				//get 3 member discounts
-				byte mdist_1 = response.body[index + 5];
-				byte mdist_2 = response.body[index + 6];
-				byte mdist_3 = response.body[index + 7];
+				byte mdist_1 = response.body[offset + 5];
+				byte mdist_2 = response.body[offset + 6];
+				byte mdist_3 = response.body[offset + 7];
 				
 				//get the length of the kitchen name
-				int length = response.body[index + 8];
+				int kitchenLength = response.body[offset + 8];
 				//get the value of super kitchen name
 				String kitchenName = null;
 				try{
-					kitchenName = new String(response.body, index + 9, length, "UTF-16BE");
+					kitchenName = new String(response.body, offset + 9, kitchenLength, "UTF-16BE");
 				}catch(UnsupportedEncodingException e){}
 				
-				index += 9 + length;
+				offset += 1 + 					/* kitchen_alias(1-byte) */
+						  1 + 					/* dept_id(1-byte) */
+						  3 + 					/* normal discount 1..3(3-byte) */
+						  3 + 					/* member discount 1..3(3-byte) */
+						  1 + 					/* length to kitchen name */
+						  + kitchenLength;		/* the value to kitchen */
 				
 				//add the kitchen
-				kitchens[i] = new Kitchen(0, kitchenName, 0, kitchenAlias, deptAlias,
+				kitchens[i] = new Kitchen(0, kitchenName, 0, kitchenAlias, 
+										  new Department(null, deptAlias, 0),
 										  dist_1, dist_2, dist_3,
 										  mdist_1, mdist_2, mdist_3);
 			}
 			
 			//get the amount of super kitchens
-			int nDept = response.body[index] & 0x000000FF;
-			index++;
+			int nDept = response.body[offset] & 0x000000FF;
+			offset++;
 			//allocate the memory for super kitchens
 			Department[] depts = new Department[nDept];
 			//get each super kitchen's information
 			for(int i = 0; i < depts.length; i++){
 				//get the alias id to department
-				short deptID = (short)(response.body[index] & 0x00FF);
+				short deptID = (short)(response.body[offset] & 0x00FF);
 				
 				//get the length of the department name
-				int length = response.body[index + 1];
+				int deptLen = response.body[offset + 1];
 				
 				//get the value of super department name
 				String deptName = null;
 				try{
-					deptName = new String(response.body, index + 2, length, "UTF-16BE");
+					deptName = new String(response.body, offset + 2, deptLen, "UTF-16BE");
 				}catch(UnsupportedEncodingException e){}
 				
-				index += 2 + length;
+				offset += 1 + 				/* dept_id(1-byte) */
+						  1 + 				/* length to department name */
+						  deptLen;			/* the value to department name */
 				
 				depts[i] = new Department(deptName, deptID, 0);
-			}
+			}	
 			
 			return new FoodMenu(foods, tastes, styles, specs, kitchens, depts);
 			
@@ -592,15 +631,20 @@ public class RespParser {
 			}catch(UnsupportedEncodingException e){}
 			
 			/**
-			 * each taste preference consist of the stuff below.
-			 * toast_id(2-byte) + category(1-byte) + calc(1-byte) + 
-			 * price(3-byte) + rate(2-byte) + length of the preference(1-byte) + preference description(len-byte)
+			 * Each taste preference consist of the stuff below.
 			 */
-			offset += 2 + 1 + 1 + 3 + 2 + 1 + length;
+			offset += 2 + 					/* toast_alias(2-byte) */
+					  1 + 					/* category(1-byte) */
+					  1 + 					/* calculate type(1-byte) */
+					  3 + 					/* price(3-byte) */
+					  2 + 					/* rate(2-byte) */
+					  1 + 					/* the length to taste preference */
+					  length;				/* the value to taste preference */
 			
 			//add the taste
 			tastes[i] = new Taste(0,
 								  alias_id, 
+								  0,
 								  preference, 
 								  category, 
 								  calcType, 
