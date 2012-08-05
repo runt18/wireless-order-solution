@@ -158,6 +158,17 @@ class OrderHandler extends Handler implements Runnable{
 					}
 				}
 				
+				//handle query table status
+			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_TABLE_STATUS){
+				
+				try{
+					Table table = QueryTable.exec(_term, ReqParser.parseQueryTblStatus(request));
+					response = new RespACK(request.header, (byte)table.status);
+						
+				}catch(BusinessException e){
+					response = new RespNAK(request.header, e.errCode);
+				}
+				
 				//handle insert order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.INSERT_ORDER){
 
