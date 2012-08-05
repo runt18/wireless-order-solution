@@ -2,12 +2,16 @@ package com.wireless.db;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import com.wireless.exception.BusinessException;
+import com.wireless.protocol.Department;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodMenu;
 import com.wireless.protocol.Kitchen;
-import com.wireless.protocol.Department;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Terminal;
 
@@ -88,41 +92,101 @@ public class QueryMenu {
 		}
 	}
 	
-	public static Food[] queryFoods(DBCon dbCon, String extraCondition, String orderClause) throws SQLException{
-		ArrayList<Food> foods = new ArrayList<Food>();
+	public static Food[] queryFoods(final DBCon dbCon, String extraCondition, String orderClause) throws SQLException{
+		
+		HashMap<Long, Map.Entry<Food, List<Taste>>> foodTasteMap = new HashMap<Long, Map.Entry<Food, List<Taste>>>();
+		
         //get all the food information to this restaurant
 		String sql = " SELECT " +
 					 " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, " +
 					 " FOOD.name, FOOD.unit_price, FOOD.kitchen_alias, FOOD.status, FOOD.pinyin, FOOD.taste_ref_type, " +
-					 " KITCHEN.dept_id, KITCHEN.kitchen_id, KITCHEN.name kitchenName" +
+					 " KITCHEN.dept_id, KITCHEN.kitchen_id, KITCHEN.name AS kitchen_name, " +
+					 " TASTE.taste_id, TASTE.taste_alias " +
 					 " FROM " + 
 					 Params.dbName + ".food FOOD " +
 					 " LEFT OUTER JOIN " +
 					 Params.dbName + ".kitchen KITCHEN " +
 					 " ON FOOD.kitchen_id = KITCHEN.kitchen_id " +
+					 " LEFT OUTER JOIN " +
+					 Params.dbName + ".food_taste_rank FTR " +
+					 " ON FOOD.food_id = FTR.food_id " +
+					 " LEFT OUTER JOIN " +
+					 Params.dbName + ".taste TASTE " +
+					 " ON TASTE.taste_id = FTR.taste_id " +
 					 " WHERE 1=1 " +
 					 (extraCondition == null ? "" : extraCondition) + " " +
-					 (orderClause == null ? "" : orderClause); 
+					 (orderClause == null ? "ORDER BY FOOD.food_id, FTR.rank" : orderClause); 
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
-			Food food = new Food(dbCon.rs.getInt("restaurant_id"),
-								 dbCon.rs.getLong("food_id"),
-								 dbCon.rs.getInt("food_alias"),
-								 dbCon.rs.getString("name"),
-								 new Float(dbCon.rs.getFloat("unit_price")),
-								 dbCon.rs.getShort("dept_id"),
-								 dbCon.rs.getLong("kitchen_id"),
-								 dbCon.rs.getShort("kitchen_alias"),
-								 dbCon.rs.getShort("status"),
-								 dbCon.rs.getString("pinyin"),
-								 dbCon.rs.getShort("taste_ref_type"));
-			food.kitchen.name = dbCon.rs.getString("kitchenName");
-			foods.add(food);
+			
+			long foodID = dbCon.rs.getLong("food_id");
+			int restaurantID = dbCon.rs.getInt("restaurant_id");
+			
+			Entry<Food, List<Taste>> entry = foodTasteMap.get(foodID);
+			if(entry != null){
+				entry.getValue().add(new Taste(dbCon.rs.getInt("taste_id"),
+											   dbCon.rs.getInt("taste_alias"),
+											   restaurantID));
+				
+				foodTasteMap.put(foodID, entry);
+				
+			}else{
+				final List<Taste> tasteRefs = new ArrayList<Taste>();
+				tasteRefs.add(new Taste(dbCon.rs.getInt("taste_id"),
+										dbCon.rs.getInt("taste_alias"),
+										restaurantID));
+				
+				final Food food = new Food(restaurantID,
+			 			 				   foodID,
+			 			 				   dbCon.rs.getInt("food_alias"),
+			 			 				   dbCon.rs.getString("name"),
+			 			 				   dbCon.rs.getFloat("unit_price"),
+			 			 				   dbCon.rs.getShort("status"),
+			 			 				   dbCon.rs.getString("pinyin"),
+			 			 				   dbCon.rs.getShort("taste_ref_type"),
+			 			 				   new Kitchen(restaurantID, 
+			 			 						   	   dbCon.rs.getString("kitchen_name"),
+			 			 						   	   dbCon.rs.getLong("kitchen_id"),
+			 			 						   	   dbCon.rs.getShort("kitchen_alias"),
+			 			 						   	   new Department(null, dbCon.rs.getShort("dept_id"), restaurantID)));
+				
+				foodTasteMap.put(foodID, new Map.Entry<Food, List<Taste>>(){
+
+					private Food mFood = food;
+					private List<Taste> mTasteRefs = tasteRefs;
+					
+					@Override
+					public Food getKey() {
+						return mFood;
+					}
+
+					@Override
+					public List<Taste> getValue() {
+						return mTasteRefs;
+					}
+
+					@Override
+					public List<Taste> setValue(List<Taste> value) {
+						mTasteRefs = value;
+						return mTasteRefs;
+					}
+					
+				});
+			}
 		}
 	
 		dbCon.rs.close();
 		
-		return foods.toArray(new Food[foods.size()]);
+		Food[] result = new Food[foodTasteMap.size()];
+		int i = 0;
+		for(Entry<Food, List<Taste>> entry : foodTasteMap.values()){
+			Food food = entry.getKey();
+			List<Taste> tasteRefs = entry.getValue();
+			food.popTastes = tasteRefs.toArray(new Taste[tasteRefs.size()]);
+			result[i++] = food; 
+		}
+		
+		return result;
 	}
 	
 	public static Kitchen[] queryKitchens(String extraCond, String orderClause) throws SQLException{
@@ -151,7 +215,7 @@ public class QueryMenu {
 									 dbCon.rs.getString("name"),
 									 dbCon.rs.getLong("kitchen_id"),
 									 dbCon.rs.getShort("kitchen_alias"),
-									 dbCon.rs.getShort("dept_id"),
+									 new Department("", dbCon.rs.getShort("dept_id"), 0),
 									 (byte)(dbCon.rs.getFloat("discount") * 100),
 									 (byte)(dbCon.rs.getFloat("discount_2") * 100),
 									 (byte)(dbCon.rs.getFloat("discount_3") * 100),
@@ -221,6 +285,7 @@ public class QueryMenu {
 		while(dbCon.rs.next()){
 			Taste taste = new Taste(dbCon.rs.getInt("taste_id"),
 								    dbCon.rs.getInt("taste_alias"), 
+								    dbCon.rs.getInt("restaurant_id"),
 									dbCon.rs.getString("preference"),
 									dbCon.rs.getShort("category"),
 									dbCon.rs.getShort("calc"),

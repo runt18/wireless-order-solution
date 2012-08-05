@@ -214,7 +214,7 @@ public class FoodTasteDao {
 	 */
 	public static void updataBySmart(long foodID, long restaurantID) throws Exception{
 		updateFoodTasteRefType(foodID, restaurantID, WebParams.TASTE_SMART_REF);
-		Food[] updateFood = QueryMenu.queryFoods(" and FOOD.food_id = " + foodID, null);
+		Food[] updateFood = QueryMenu.queryFoods(" AND FOOD.food_id = " + foodID, null);
 		if(updateFood.length != 1){
 			throw new Exception();
 		}

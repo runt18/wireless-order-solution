@@ -469,7 +469,7 @@ public class TasteRef {
 										  "",
 										  dbCon.rs.getLong("kitchen_id"),
 										  dbCon.rs.getShort("kitchen_alias"),
-										  (short)0);
+										  null);
 			
 			TasteRefCnt tasteRef = new TasteRefCnt(dbCon.rs.getInt("taste_id"),
 				    							   TasteRefCnt.TASTE_BY_KITCHEN,
