@@ -588,6 +588,8 @@ public class PickTasteActivity extends Activity{
 						if(pos >= 0){
 							selectChkBox.setChecked(false);
 							Toast.makeText(PickTasteActivity.this, "É¾³ý" + _tastes[position].preference, Toast.LENGTH_SHORT).show();
+						}else{
+							selectChkBox.setChecked(false);							
 						}
 						
 					}else{
