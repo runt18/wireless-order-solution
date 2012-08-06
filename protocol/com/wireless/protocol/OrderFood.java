@@ -136,6 +136,9 @@ public class OrderFood extends Food {
 		 */
 		int tastePos = 0;
 		for(; tastePos < tastes.length; tastePos++){
+			if(tastes[tastePos].aliasID == taste.aliasID){
+				return tastePos;
+			}
 			if(tastes[tastePos].aliasID == Taste.NO_TASTE){
 				break;
 			}
