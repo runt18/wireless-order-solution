@@ -2,8 +2,6 @@ package com.wireless.ui.view;
 
 import java.util.Date;
 
-import com.wireless.ui.R;
-
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -13,16 +11,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
-import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.AbsListView.OnScrollListener;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-public class PullListView extends ListView implements OnScrollListener {
+import com.wireless.ui.R;
+
+public class PullListView extends ListView{
 
 	private static final String TAG = "listview";
 
@@ -76,7 +74,6 @@ public class PullListView extends ListView implements OnScrollListener {
 	}
 
 	private void init(Context context) {
-		setCacheColorHint(context.getResources().getColor(R.color.transparent));
 		inflater = LayoutInflater.from(context);
 
 		headView = (LinearLayout) inflater.inflate(R.layout.head, null);
@@ -102,7 +99,6 @@ public class PullListView extends ListView implements OnScrollListener {
 				+ headContentHeight);
 
 		addHeaderView(headView, null, false);
-		setOnScrollListener(this);
 
 		animation = new RotateAnimation(0, -180,
 				RotateAnimation.RELATIVE_TO_SELF, 0.5f,
@@ -121,13 +117,9 @@ public class PullListView extends ListView implements OnScrollListener {
 		state = DONE;
 		isRefreshable = false;
 	}
-
-	public void onScroll(AbsListView arg0, int firstVisiableItem, int arg2,
-			int arg3) {
-		firstItemIndex = firstVisiableItem;
-	}
-
-	public void onScrollStateChanged(AbsListView arg0, int arg1) {
+	
+	public void setFirstItem(int firstVisibleItem){
+		firstItemIndex = firstVisibleItem;
 	}
 
 	public boolean onTouchEvent(MotionEvent event) {

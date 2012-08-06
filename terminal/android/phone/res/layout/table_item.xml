@@ -13,55 +13,79 @@
         android:layout_centerVertical="true"
         android:background="#fff"
         >
-
+
         <TextView
-            android:id="@+id/text1_table"
+            android:id="@+id/table_id_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
             android:text="Medium Text"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="#000" />
-
+            android:textColor="@color/blue"
+            android:textSize="24sp" />
+
         <TextView
-            android:id="@+id/text2_table"
+            android:id="@+id/table_cnt_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
-            android:text="TextView" />
-
+            android:text="人数："
+            android:textSize="16sp" />
+
         <TextView
-            android:id="@+id/text3_table"
+            android:id="@+id/table_cnt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_marginLeft="16dp"
-            android:layout_toRightOf="@+id/text2_table"
-            android:text="TextView" />
-
+            android:layout_toRightOf="@+id/table_cnt_name"
+            android:text="TextView"
+            android:textSize="16sp" />
+
         <TextView
-            android:id="@+id/text4_table"
+            android:id="@+id/table_name_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_marginLeft="16dp"
-            android:layout_toRightOf="@+id/text1_table"
+            android:layout_toRightOf="@+id/table_id_text"
             android:text="Large Text"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="#000" />
+            android:textColor="@color/blue"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/table_state_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="12dp"
+            android:layout_toRightOf="@+id/table_cnt"
+            android:text="状态："
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/table_state"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_toRightOf="@+id/table_state_name"
+            android:text="TextView"
+            android:textColor="@color/green"
+            android:textSize="16sp" />
+
     </RelativeLayout>
-
+
     <ImageButton
         android:id="@+id/add_table"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:layout_marginRight="20dp"
+        android:layout_marginRight="14dp"
         android:background="@color/transparent"
         android:focusable="false"
-        android:src="@drawable/occasional_selector" />
+        android:src="@drawable/table_add_btn_selector" />
 
 </RelativeLayout>

@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="grey">#000000</color>
+    <color name="dartgrey">#808080</color>
     <color name="orange">#FFA500</color>
     <color name="white">#FFFFFF</color>
-    <color name="dartgrey">#A9A9A9</color>
+    <color name="grey">#A9A9A9</color>
     <color name="tasteitembg">#fbfdfe</color>
     <color name="transparent">#00000000</color>
     <color name="gold">#b89766</color>
     <drawable name="nullbg">#00ffffff</drawable>
+    <color name="green">#61bb6e</color>
+    <color name="blue">#4a8dcb</color>
 </resources>

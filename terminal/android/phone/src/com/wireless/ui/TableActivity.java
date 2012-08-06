@@ -9,12 +9,16 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -27,6 +31,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AutoCompleteTextView;
@@ -62,24 +69,26 @@ public class TableActivity extends Activity {
 	private ImageButton idleBtn;
 	private ImageButton busyBtn;
 	private Order mOrderToPay;
-	
+	private Timer mTblReflashTimer;
+
 	private static final String ITEM_TAG_ID = "ID";
 	private static final String ITEM_TAG_CUSTOM = "CUSTOM_NUM";
-	private static final String ITEM_TAG_STATE = "STATE";
+	private static final String ITEM_TAG_STATE_NAME = "STATE";
+	private static final String ITEM_TAG_STATE = "STATE_NAME";
 	private static final String ITEM_TAG_TBL_NAME = "TABLE_NAME";
 	
 	private static final String[] ITEM_TAGS = {
 			ITEM_TAG_ID, 
 			ITEM_TAG_CUSTOM, 
-			ITEM_TAG_STATE,
+			ITEM_TAG_STATE_NAME,
 			ITEM_TAG_TBL_NAME 
 	};
 	
 	private static final int[] ITEM_ID = {
-			R.id.text1_table,
-			R.id.text2_table,
-			R.id.text3_table,
-			R.id.text4_table
+		R.id.table_id_text,
+		R.id.table_cnt,
+		R.id.table_state,
+		R.id.table_name_text
 	};
 
 	private static Handler mDataHandler;
@@ -261,9 +270,10 @@ public class TableActivity extends Activity {
 			for(Table tbl : mFilterTable){
 				HashMap<String, Object> map = new HashMap<String, Object>();
 				map.put(ITEM_TAG_ID, tbl.aliasID);
-				map.put(ITEM_TAG_CUSTOM, "人数: " + tbl.custom_num);
+				map.put(ITEM_TAG_CUSTOM,tbl.custom_num);
 				map.put(ITEM_TAG_TBL_NAME, tbl.name);
-				map.put(ITEM_TAG_STATE, "状态： " + (tbl.status == Table.TABLE_IDLE ? "空闲" : "就餐"));
+				map.put(ITEM_TAG_STATE, tbl.status);
+				map.put(ITEM_TAG_STATE_NAME,tbl.status == Table.TABLE_IDLE ? "空闲" : "就餐");
 				contents.add(map);
 			}
 			
@@ -297,7 +307,7 @@ public class TableActivity extends Activity {
 			
 			theActivity.mListView.setAdapter(new SimpleAdapter(theActivity.getApplicationContext(), 
 					   contents,
-					   R.layout.the_table, 
+					   R.layout.table_item, 
 					   TableActivity.ITEM_TAGS,
 					   TableActivity.ITEM_ID){
 				@Override
@@ -305,6 +315,18 @@ public class TableActivity extends Activity {
 					View view = super.getView(position, convertView, parent);
 					final Map<String, ?> map = contents.get(position);
 					view.setTag(map.get(ITEM_TAG_ID));
+					
+					/*
+					 * set different table state's name color with state 
+					 */
+					short state = (Short) map.get(ITEM_TAG_STATE);
+					TextView stateTxtView = (TextView)view.findViewById(R.id.table_state);
+					if(state == (short)Table.TABLE_BUSY)
+					{
+						stateTxtView.setTextColor(Color.RED);
+					} else {
+						stateTxtView.setTextColor(view.getResources().getColor(R.color.green));
+					}
 					
 					((ImageButton)view.findViewById(R.id.add_table)).setOnClickListener(new OnClickListener(){			
 						@Override
@@ -359,6 +381,34 @@ public class TableActivity extends Activity {
 		});
 	}
 
+	@Override
+	protected void onResume()
+	{
+		super.onResume();
+		
+		mTblReflashTimer = new Timer();
+		/**
+		 * 在MIN_PERIOD和MAX_PERIOD之间产生一个随机时间，按照这个时间段来定期更新餐台信息
+		 */
+		final long MIN_PERIOD = 5 * 60 * 1000;
+		final long MAX_PERIOD = 10 * 60 * 1000;
+		mTblReflashTimer.schedule(new TimerTask() {
+					@Override
+					public void run() {mListView.post(new Runnable() {
+									@Override
+									public void run() {
+										new QueryTableTask().execute();
+										System.out.println("is running");
+									}
+								});
+					}
+				}, Math.round(Math.random()
+						* (MAX_PERIOD - MIN_PERIOD)
+						+ MIN_PERIOD), Math.round(Math
+						.random()
+						* (MAX_PERIOD - MIN_PERIOD)
+						+ MIN_PERIOD));
+	}
 	/*
 	 * set the button's image
 	 */
@@ -418,10 +468,26 @@ public class TableActivity extends Activity {
 		});
 
 		/**
+		 * 菜品List滚动时隐藏软键盘
+		 */
+		mListView.setOnScrollListener(new OnScrollListener() {
+
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
+				((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE))
+				.hideSoftInputFromWindow(searchTxtView.getWindowToken(), 0);
+			}
+
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem,
+					int visibleItemCount, int totalItemCount) {
+				mListView.setFirstItem(firstVisibleItem);
+			}
+		});
+		/**
 		 * “全部”按钮
 		 */
 		ImageButton allBtn = (ImageButton)findViewById(R.id.btn_right);
-		allBtn.setImageResource(R.drawable.home_selector);
 		allBtn.setVisibility(View.VISIBLE);
 		allBtn.setOnClickListener(new OnClickListener(){
 			@Override
@@ -437,6 +503,10 @@ public class TableActivity extends Activity {
 				regionAllBtn.setImageResource(R.drawable.alldown);
 			}
 		});
+		
+		TextView allTextView = (TextView)findViewById(R.id.textView_right);
+		allTextView.setText("刷新");
+		allTextView.setVisibility(View.VISIBLE);
 		
 		
 		/**
