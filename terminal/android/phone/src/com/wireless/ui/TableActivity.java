@@ -319,7 +319,6 @@ public class TableActivity extends Activity {
 					/*
 					 * set different table state's name color with state 
 					 */
-					//TODO
 					short state = (Short) map.get(ITEM_TAG_STATE);
 					TextView stateTxtView = (TextView)view.findViewById(R.id.table_state);
 					if(state == (short)Table.TABLE_BUSY)

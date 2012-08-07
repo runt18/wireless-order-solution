@@ -73,14 +73,14 @@
             android:text="TextView"
             android:textColor="@color/green"
             android:textSize="16sp" />
-
+
         <TextView
             android:id="@+id/textView1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:text="台号 "
+            android:text="台号:"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="@color/blue" />
 
@@ -96,7 +96,7 @@
         android:background="@color/transparent"
         android:focusable="false"
         android:src="@drawable/table_add_btn_selector" />
-
+
         <ImageButton
             android:id="@+id/switch_table"
             android:layout_width="wrap_content"
@@ -105,6 +105,6 @@
             android:layout_toLeftOf="@+id/add_table"
             android:background="@color/transparent"
             android:focusable="false"
-            android:src="@drawable/table_add_btn_selector" />
+            android:src="@drawable/switch_table_selector" />
 
 </RelativeLayout>
