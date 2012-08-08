@@ -2,6 +2,8 @@ package com.wireless.db;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,26 +83,131 @@ public class QueryMenu {
 			dbCon.disconnect();
 		}
 	}
-	
-	public static Food[] queryFoods(String extraCond, String orderClause) throws SQLException{
+
+	/**
+	 * Query the food information according to the food table. 
+	 * @param extraCondition
+	 * 			the extra condition to SQL statement
+	 * @param orderClause
+	 * 			the order clause to SQL statement
+	 * @return an array result
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statements
+	 */
+	public static Food[] queryPureFoods(String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return queryFoods(dbCon, extraCond, orderClause);
+			return queryPureFoods(dbCon, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
-	public static Food[] queryFoods(final DBCon dbCon, String extraCondition, String orderClause) throws SQLException{
+	/**
+	 * Query the food information according to the food table. 
+	 * Note that the data base should be connected before invoking this method.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param extraCondition
+	 * 			the extra condition to SQL statement
+	 * @param orderClause
+	 * 			the order clause to SQL statement
+	 * @return an array result
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statements
+	 */
+	public static Food[] queryPureFoods(DBCon dbCon, String extraCondition, String orderClause) throws SQLException{
+		ArrayList<Food> foods = new ArrayList<Food>();
+        //get all the food information to this restaurant
+		String sql = " SELECT " +
+					 " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, " +
+					 " FOOD.name, FOOD.unit_price, FOOD.kitchen_alias, FOOD.status, FOOD.pinyin, FOOD.taste_ref_type, " +
+					 " KITCHEN.dept_id, KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.name AS kitchen_name " +
+					 " FROM " + 
+					 Params.dbName + ".food FOOD " +
+					 " LEFT OUTER JOIN " +
+					 Params.dbName + ".kitchen KITCHEN " +
+					 " ON FOOD.kitchen_id = KITCHEN.kitchen_id " +
+					 " WHERE 1=1 " +
+					 (extraCondition == null ? "" : extraCondition) + " " +
+					 (orderClause == null ? "" : orderClause); 
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		while(dbCon.rs.next()){
+
+			long foodID = dbCon.rs.getLong("food_id");
+			int restaurantID = dbCon.rs.getInt("restaurant_id");
+			
+			foods.add(new Food(restaurantID,
+	 				   		   foodID,
+	 				   		   dbCon.rs.getInt("food_alias"),
+	 				   		   dbCon.rs.getString("name"),
+	 				   		   dbCon.rs.getFloat("unit_price"),
+	 				   		   dbCon.rs.getShort("status"),
+	 				   		   dbCon.rs.getString("pinyin"),
+	 				   		   dbCon.rs.getShort("taste_ref_type"),
+	 				   		   new Kitchen(restaurantID, 
+	 				   				       dbCon.rs.getString("kitchen_name"),
+	 				   				       dbCon.rs.getLong("kitchen_id"),
+	 				   				       dbCon.rs.getShort("kitchen_alias"),
+	 				   				       new Department(null, dbCon.rs.getShort("dept_id"), restaurantID))));
+		}
+		
+		return foods.toArray(new Food[foods.size()]);
+	}
+	
+	/**
+	 * Query the food and its related information listed below.
+	 * 1 - Popular taste to each food
+	 * 2 - Child food details to the food in case of combo
+	 * Since hash map would destroy the original order,
+	 * using a comparator to sort the result, instead of an order clause in SQL statement, 
+	 * @param dbCon
+	 * 			the database connection
+	 * @param extraCondition
+	 * 			the extra condition to SQL statement
+	 * @param foodComp
+	 * 			the extra comparator to sort the result
+	 * @return	an array result
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statements
+	 */
+	public static Food[] queryFoods(String extraCond, Comparator<Food> foodComp) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return queryFoods(dbCon, extraCond, foodComp);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Query the food and its related information listed below.
+	 * 1 - Popular taste to each food
+	 * 2 - Child food details to the food in case of combo
+	 * Since hash map would destroy the original order,
+	 * using a comparator to sort the result, instead of an order clause in SQL statement. 
+	 * Note that the database should be connected before invoking this method.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param extraCondition
+	 * 			the extra condition to SQL statement
+	 * @param foodComp
+	 * 			the extra comparator to sort the result
+	 * @return	an array result
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statements
+	 */			
+	public static Food[] queryFoods(final DBCon dbCon, String extraCondition, Comparator<Food> foodComp) throws SQLException{
 		
 		HashMap<Long, Map.Entry<Food, List<Taste>>> foodTasteMap = new HashMap<Long, Map.Entry<Food, List<Taste>>>();
 		
         //get all the food information to this restaurant
 		String sql = " SELECT " +
 					 " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, " +
-					 " FOOD.name, FOOD.unit_price, FOOD.kitchen_alias, FOOD.status, FOOD.pinyin, FOOD.taste_ref_type, " +
-					 " KITCHEN.dept_id, KITCHEN.kitchen_id, KITCHEN.name AS kitchen_name, " +
+					 " FOOD.name, FOOD.unit_price, FOOD.status, FOOD.pinyin, FOOD.taste_ref_type, " +
+					 " KITCHEN.dept_id, KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.name AS kitchen_name, " +
 					 " TASTE.taste_id, TASTE.taste_alias " +
 					 " FROM " + 
 					 Params.dbName + ".food FOOD " +
@@ -115,8 +222,10 @@ public class QueryMenu {
 					 " ON TASTE.taste_id = FTR.taste_id " +
 					 " WHERE 1=1 " +
 					 (extraCondition == null ? "" : extraCondition) + " " +
-					 (orderClause == null ? "ORDER BY FOOD.food_id, FTR.rank" : orderClause); 
+					 "ORDER BY FOOD.food_id, FTR.rank"; 
+		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		
 		while(dbCon.rs.next()){
 			
 			long foodID = dbCon.rs.getLong("food_id");
@@ -183,7 +292,58 @@ public class QueryMenu {
 			Food food = entry.getKey();
 			List<Taste> tasteRefs = entry.getValue();
 			food.popTastes = tasteRefs.toArray(new Taste[tasteRefs.size()]);
+			/**
+			 * Get the details if the food belongs to combo
+			 */
+			if(food.isCombo()){
+				sql = " SELECT " +
+ 					  " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, " +
+					  " FOOD.name, FOOD.unit_price, FOOD.status, FOOD.pinyin, FOOD.taste_ref_type, " +
+					  " KITCHEN.dept_id, KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.name AS kitchen_name, " +
+					  " COMBO.amount " +
+					  " FROM " +
+					  Params.dbName + ".food FOOD " + 
+					  " INNER JOIN " +
+					  Params.dbName + ".combo COMBO " +
+					  " ON FOOD.food_id = COMBO.sub_food_id " + 
+					  " LEFT OUTER JOIN " +
+					  Params.dbName + ".kitchen KITCHEN " +
+					  " ON FOOD.kitchen_id = KITCHEN.kitchen_id " +
+					  " WHERE COMBO.food_id = " + food.foodID;
+				
+				dbCon.rs = dbCon.stmt.executeQuery(sql);
+				
+				ArrayList<Food> subFoods = new ArrayList<Food>();
+				while(dbCon.rs.next()){
+					
+					long foodID = dbCon.rs.getLong("food_id");
+					int restaurantID = dbCon.rs.getInt("restaurant_id");
+					
+					Food subFood = new Food(restaurantID,
+			 				   				foodID,
+			 				   				dbCon.rs.getInt("food_alias"),
+			 				   				dbCon.rs.getString("name"),
+			 				   				dbCon.rs.getFloat("unit_price"),
+			 				   				dbCon.rs.getShort("status"),
+			 				   				dbCon.rs.getString("pinyin"),
+			 				   				dbCon.rs.getShort("taste_ref_type"),
+			 				   				new Kitchen(restaurantID, 
+			 				   							dbCon.rs.getString("kitchen_name"),
+			 				   							dbCon.rs.getLong("kitchen_id"),
+			 				   							dbCon.rs.getShort("kitchen_alias"),
+			 				   							new Department(null, dbCon.rs.getShort("dept_id"), restaurantID)));
+					subFood.amount = dbCon.rs.getInt("amount");
+					subFoods.add(subFood);
+				}				
+				dbCon.rs.close();
+				food.subFoods = subFoods.toArray(new Food[subFoods.size()]);
+
+			}
 			result[i++] = food; 
+		}
+		
+		if(foodComp != null){
+			Arrays.sort(result, foodComp);
 		}
 		
 		return result;
@@ -274,12 +434,13 @@ public class QueryMenu {
 	 */
 	public static Taste[] queryTastes(DBCon dbCon, short category, String extraCond, String orderClause) throws SQLException{
 
-		String sql = " SELECT * FROM " + Params.dbName + ".taste " +
+		String sql = " SELECT * " +
+					 " FROM " + 
+					 Params.dbName + ".taste " +
 				     " WHERE 1=1 " +
-					 (category < 0 ? "" : " AND category=" + category) + " " +
+					 (category == Taste.CATE_ALL ? "" : " AND category=" + category) + " " +
 					 (extraCond == null ? "" : extraCond) + " " +
 					 (orderClause == null ? "" : orderClause);
-					 //" ORDER BY alias_id";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		ArrayList<Taste> tastes = new ArrayList<Taste>();
 		while(dbCon.rs.next()){

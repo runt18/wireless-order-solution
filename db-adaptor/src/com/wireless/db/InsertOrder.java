@@ -5,6 +5,7 @@ import java.sql.Statement;
 
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Table;
@@ -151,52 +152,34 @@ public class InsertOrder {
 				 * since the submitted string has contained the details, like name, price and amount. 
 				 */
 				if(!orderToInsert.foods[i].isTemporary){
+					
 					//get the associated foods' unit price and name
-					sql = " SELECT " +
-						  " FOOD.food_id AS food_id, FOOD.unit_price AS unit_price, FOOD.name AS name, FOOD.status AS status, " +
-						  " DEPT.dept_id AS dept_id" +
-						  " FROM " +  Params.dbName + ".food FOOD " +
-						  " LEFT JOIN " + Params.dbName + ".department DEPT ON " +
-						  " DEPT.restaurant_id = FOOD.restaurant_id " + 
-						  " AND " +
-						  " DEPT.dept_id = " + "(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE kitchen_id = FOOD.kitchen_id)" +
-						  " WHERE " +
-						  " FOOD.food_alias=" + orderToInsert.foods[i].aliasID + 
-					 	  " AND " +
-					 	  " FOOD.restaurant_id=" + term.restaurantID;
-					dbCon.rs = dbCon.stmt.executeQuery(sql);
-					//check if the food exist in db 
-					if(dbCon.rs.next()){
-						orderToInsert.foods[i].foodID = dbCon.rs.getInt("food_id");
-						orderToInsert.foods[i].name = dbCon.rs.getString("name");
-						orderToInsert.foods[i].status = dbCon.rs.getShort("status");
-						orderToInsert.foods[i].setPrice(dbCon.rs.getFloat("unit_price"));
-						orderToInsert.foods[i].kitchen.dept.restaurantID = term.restaurantID;
-						orderToInsert.foods[i].kitchen.dept.deptID = dbCon.rs.getShort("dept_id");
+					Food[] detailFood = QueryMenu.queryFoods(dbCon, " AND FOOD.food_alias=" + orderToInsert.foods[i].aliasID + " AND FOOD.restaurant_id=" + term.restaurantID, null);
+					if(detailFood.length > 0){
+						orderToInsert.foods[i].foodID = detailFood[0].foodID;
+						orderToInsert.foods[i].aliasID = detailFood[0].aliasID;
+						orderToInsert.foods[i].restaurantID = detailFood[0].restaurantID;
+						orderToInsert.foods[i].name = detailFood[0].name;
+						orderToInsert.foods[i].status = detailFood[0].status;
+						orderToInsert.foods[i].setPrice(detailFood[0].getPrice());
+						orderToInsert.foods[i].kitchen = detailFood[0].kitchen;
+						orderToInsert.foods[i].subFoods = detailFood[0].subFoods;
 					}else{
 						throw new BusinessException("The food(alias_id=" + orderToInsert.foods[i].aliasID + ", restaurant_id=" + orderToInsert.table.restaurantID+ ") to query doesn't exit.", ErrorCode.MENU_EXPIRED);
 					}
-					dbCon.rs.close();
 					
 					//get three taste information for each food
 					for(int j = 0; j < orderToInsert.foods[i].tastes.length; j++){
 						if(orderToInsert.foods[i].tastes[j].aliasID != Taste.NO_TASTE){
-							sql = " SELECT taste_id, preference, price, category, rate, calc " +
-								  " FROM " + Params.dbName + ".taste " +
-								  " WHERE " +
-								  " restaurant_id=" + orderToInsert.table.restaurantID + 
-								  " AND " +
-								  " taste_alias=" + orderToInsert.foods[i].tastes[j].aliasID;
-							dbCon.rs = dbCon.stmt.executeQuery(sql);
-							if(dbCon.rs.next()){
-								orderToInsert.foods[i].tastes[j].tasteID = dbCon.rs.getInt("taste_id");
-								orderToInsert.foods[i].tastes[j].preference = dbCon.rs.getString("preference");
-								orderToInsert.foods[i].tastes[j].setPrice(dbCon.rs.getFloat("price"));
-								orderToInsert.foods[i].tastes[j].category = dbCon.rs.getShort("category");
-								orderToInsert.foods[i].tastes[j].setRate(dbCon.rs.getFloat("rate"));
-								orderToInsert.foods[i].tastes[j].calc = dbCon.rs.getShort("calc");
-							}		
-							dbCon.rs.close();
+							
+							Taste[] detailTaste = QueryMenu.queryTastes(dbCon, 
+									Taste.CATE_ALL, 
+									" AND restaurant_id=" + term.restaurantID + " AND taste_alias =" + orderToInsert.foods[i].tastes[j].aliasID, 
+									null);
+							
+							if(detailTaste.length > 0){
+								orderToInsert.foods[i].tastes[j] = detailTaste[0];
+							}
 						}
 					}
 					
