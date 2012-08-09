@@ -116,7 +116,8 @@ public class TableActivity extends Activity {
 
 		@Override
 		public void handleMessage(Message msg){
-			
+			if(WirelessOrder.tables == null)
+				return;
 			final TableActivity theActivity = mActivity.get();
 	
 			/**
@@ -185,7 +186,8 @@ public class TableActivity extends Activity {
 		}
 		@Override
 		public void handleMessage(Message msg){
-			
+			if(WirelessOrder.tables == null)
+				return;
 			final TableActivity theActivity = mActivity.get();
 			
 			mFilterTable.clear();
@@ -304,6 +306,25 @@ public class TableActivity extends Activity {
 				hintText.setVisibility(View.INVISIBLE);
 			}
 
+			/*
+			 * set the button's image
+			 */
+			switch(theActivity.mTableCond){
+			case FILTER_TABLE_ALL:
+				theActivity.regionAllBtn.setImageResource(R.drawable.alldown);
+				theActivity.idleBtn.setImageResource(R.drawable.free);
+				theActivity.busyBtn.setImageResource(R.drawable.eating);
+				break;
+			case FILTER_TABLE_IDLE:
+				theActivity.regionAllBtn.setImageResource(R.drawable.all);
+				theActivity.idleBtn.setImageResource(R.drawable.freedown);
+				theActivity.busyBtn.setImageResource(R.drawable.eating);
+				break;
+			case FILTER_TABLE_BUSY:
+				theActivity.regionAllBtn.setImageResource(R.drawable.all);
+				theActivity.idleBtn.setImageResource(R.drawable.free);
+				theActivity.busyBtn.setImageResource(R.drawable.eatingdown);
+			}
 			
 			theActivity.mListView.setAdapter(new SimpleAdapter(theActivity.getApplicationContext(), 
 					   contents,
@@ -324,7 +345,7 @@ public class TableActivity extends Activity {
 					if(state == (short)Table.TABLE_BUSY)
 					{
 						stateTxtView.setTextColor(Color.RED);
-						view.setBackgroundDrawable(view.getResources().getDrawable(R.drawable.orange_drawable));
+						view.setBackgroundResource(R.drawable.busy_item_bg);
 					} else {
 						stateTxtView.setTextColor(view.getResources().getColor(R.color.green));
 						view.setBackgroundDrawable(view.getResources().getDrawable(R.drawable.white_drawable));
@@ -412,14 +433,7 @@ public class TableActivity extends Activity {
 						* (MAX_PERIOD - MIN_PERIOD)
 						+ MIN_PERIOD));
 	}
-	/*
-	 * set the button's image
-	 */
-	private void buttonUp(){
-		regionAllBtn.setImageResource(R.drawable.all);
-		idleBtn.setImageResource(R.drawable.free);
-		busyBtn.setImageResource(R.drawable.eating);
-	}
+
 	/**
 	 * 初始化UI
 	 */
@@ -502,8 +516,6 @@ public class TableActivity extends Activity {
 				searchTxtView.setText("");
 
 				((TextView)findViewById(R.id.toptitle)).setText("全部区域");
-				buttonUp();
-				regionAllBtn.setImageResource(R.drawable.alldown);
 			}
 		});
 		
@@ -521,8 +533,6 @@ public class TableActivity extends Activity {
 				searchTxtView.setText("");
 				mTableCond = FILTER_TABLE_IDLE;
 				mDataHandler.sendEmptyMessage(0);
-				buttonUp();
-				idleBtn.setImageResource(R.drawable.freedown);
 			}
 			
 		});
@@ -536,8 +546,6 @@ public class TableActivity extends Activity {
 				searchTxtView.setText("");
 				mTableCond = FILTER_TABLE_BUSY;
 				mDataHandler.sendEmptyMessage(0);
-				buttonUp();
-				busyBtn.setImageResource(R.drawable.eatingdown);
 			}
 		});
 		
@@ -564,8 +572,6 @@ public class TableActivity extends Activity {
 				searchTxtView.setText("");
 				mTableCond = FILTER_TABLE_ALL;
 				mDataHandler.sendEmptyMessage(0);
-				buttonUp();
-				regionAllBtn.setImageResource(R.drawable.alldown);
 			}
 		});
 		

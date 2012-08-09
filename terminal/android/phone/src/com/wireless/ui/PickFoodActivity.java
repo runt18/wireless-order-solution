@@ -907,7 +907,7 @@ public class PickFoodActivity extends Activity implements PickFoodListView.OnFoo
 	 * 分厨页面中厨房选择的Dialog
 	 */
 	private class KitchenSelectDialog extends Dialog {
-
+//TODO
 		private List<Department> _deptParent;
 		private List<List<Kitchen>> _kitchenChild;
 

@@ -10,6 +10,6 @@
     <drawable name="nullbg">#00ffffff</drawable>
     <color name="green">#61bb6e</color>
     <color name="blue">#4a8dcb</color>
-    <drawable name="orange_drawable">#FFd700</drawable>
+    <drawable name="orange_drawable">#feb041</drawable>
     <drawable name="white_drawable">#ffffff</drawable>
 </resources>
