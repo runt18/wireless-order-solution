@@ -104,7 +104,7 @@ cancelledFoodInit = function(){
 		var cancelledFoodTbar = new Ext.Toolbar({
 			height : 26,
 			items : [
-			    {xtype:'tbtext', text:String.format(Ext.ux.txtFormat.typeName, 'cancelledFoodShowType', '----')}, 
+			    {xtype:'tbtext', text:String.format(Ext.ux.txtFormat.typeName, '类别', 'cancelledFoodShowType', '----')}, 
 			    {xtype:'tbtext',text:'&nbsp;&nbsp;'},	
 				{xtype:'tbtext',text:'日期:'},
 			    {

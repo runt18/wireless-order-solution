@@ -41,7 +41,7 @@ salesSub = function(){
 		buttonAlign : 'left',
 		height : 26,
 		items : [
-		{xtype:'tbtext', text:String.format(Ext.ux.txtFormat.typeName, 'salesSubShowType', '') },
+		{xtype:'tbtext', text:String.format(Ext.ux.txtFormat.typeName, '类别', 'salesSubShowType', '') },
 		{xtype:'tbtext',text:'&nbsp;&nbsp;'},	
 		{xtype:'tbtext',text:'日期:'},
 		{
