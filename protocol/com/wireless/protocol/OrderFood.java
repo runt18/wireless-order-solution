@@ -307,6 +307,8 @@ public class OrderFood extends Food {
 			  food.status,
 			  food.pinyin,
 			  food.tasteRefType,
+			  food.desc,
+			  food.image,
 			  food.kitchen);
 		popTastes = food.popTastes;
 		childFoods = food.childFoods;
