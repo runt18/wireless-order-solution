@@ -292,53 +292,12 @@ public class QueryMenu {
 			Food food = entry.getKey();
 			List<Taste> tasteRefs = entry.getValue();
 			food.popTastes = tasteRefs.toArray(new Taste[tasteRefs.size()]);
+			
 			/**
 			 * Get the details if the food belongs to combo
 			 */
-			if(food.isCombo()){
-				sql = " SELECT " +
- 					  " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, " +
-					  " FOOD.name, FOOD.unit_price, FOOD.status, FOOD.pinyin, FOOD.taste_ref_type, " +
-					  " KITCHEN.dept_id, KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.name AS kitchen_name, " +
-					  " COMBO.amount " +
-					  " FROM " +
-					  Params.dbName + ".food FOOD " + 
-					  " INNER JOIN " +
-					  Params.dbName + ".combo COMBO " +
-					  " ON FOOD.food_id = COMBO.sub_food_id " + 
-					  " LEFT OUTER JOIN " +
-					  Params.dbName + ".kitchen KITCHEN " +
-					  " ON FOOD.kitchen_id = KITCHEN.kitchen_id " +
-					  " WHERE COMBO.food_id = " + food.foodID;
-				
-				dbCon.rs = dbCon.stmt.executeQuery(sql);
-				
-				ArrayList<Food> subFoods = new ArrayList<Food>();
-				while(dbCon.rs.next()){
-					
-					long foodID = dbCon.rs.getLong("food_id");
-					int restaurantID = dbCon.rs.getInt("restaurant_id");
-					
-					Food subFood = new Food(restaurantID,
-			 				   				foodID,
-			 				   				dbCon.rs.getInt("food_alias"),
-			 				   				dbCon.rs.getString("name"),
-			 				   				dbCon.rs.getFloat("unit_price"),
-			 				   				dbCon.rs.getShort("status"),
-			 				   				dbCon.rs.getString("pinyin"),
-			 				   				dbCon.rs.getShort("taste_ref_type"),
-			 				   				new Kitchen(restaurantID, 
-			 				   							dbCon.rs.getString("kitchen_name"),
-			 				   							dbCon.rs.getLong("kitchen_id"),
-			 				   							dbCon.rs.getShort("kitchen_alias"),
-			 				   							new Department(null, dbCon.rs.getShort("dept_id"), restaurantID)));
-					subFood.amount = dbCon.rs.getInt("amount");
-					subFoods.add(subFood);
-				}				
-				dbCon.rs.close();
-				food.subFoods = subFoods.toArray(new Food[subFoods.size()]);
-
-			}
+			food.childFoods = queryComboByParent(dbCon, food);
+			
 			result[i++] = food; 
 		}
 		
@@ -348,6 +307,89 @@ public class QueryMenu {
 		
 		return result;
 	}
+	
+	/**
+	 * Get the combo detail to a specific parent food.
+	 * @param parent
+	 * 			the parent food to query
+	 * @return	Return a food array containing the child foods.
+	 * 			Return null if the parent if NOT combo.
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static Food[] queryComboByParent(Food parent) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return queryComboByParent(dbCon, parent);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the combo detail to a specific parent food.
+	 * Note that the database should be connected before invoking this method.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param parent
+	 * 			the parent food to query
+	 * @return	Return a food array containing the child foods.
+	 * 			Return null if the parent if NOT combo.
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static Food[] queryComboByParent(DBCon dbCon, Food parent) throws SQLException{
+		if(parent.isCombo()){
+			String sql;
+			sql = " SELECT " +
+				  " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, " +
+				  " FOOD.name, FOOD.unit_price, FOOD.status, FOOD.pinyin, FOOD.taste_ref_type, " +
+				  " KITCHEN.dept_id, KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.name AS kitchen_name, " +
+				  " COMBO.amount " +
+				  " FROM " +
+				  Params.dbName + ".food FOOD " + 
+				  " INNER JOIN " +
+				  Params.dbName + ".combo COMBO " +
+				  " ON FOOD.food_id = COMBO.sub_food_id " + 
+				  " LEFT OUTER JOIN " +
+				  Params.dbName + ".kitchen KITCHEN " +
+				  " ON FOOD.kitchen_id = KITCHEN.kitchen_id " +
+				  " WHERE COMBO.food_id = " + parent.foodID;
+				
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+				
+			ArrayList<Food> childFoods = new ArrayList<Food>();
+			while(dbCon.rs.next()){
+					
+				long foodID = dbCon.rs.getLong("food_id");
+				int restaurantID = dbCon.rs.getInt("restaurant_id");
+					
+				Food childFood = new Food(restaurantID,
+						   				  foodID,
+						   				  dbCon.rs.getInt("food_alias"),
+						   				  dbCon.rs.getString("name"),
+						   				  dbCon.rs.getFloat("unit_price"),
+						   				  dbCon.rs.getShort("status"),
+						   				  dbCon.rs.getString("pinyin"),
+						   				  dbCon.rs.getShort("taste_ref_type"),
+						   				  new Kitchen(restaurantID, 
+						   							  dbCon.rs.getString("kitchen_name"),
+						   							  dbCon.rs.getLong("kitchen_id"),
+						   							  dbCon.rs.getShort("kitchen_alias"),
+						   							  new Department(null, dbCon.rs.getShort("dept_id"), restaurantID)));
+				childFood.amount = dbCon.rs.getInt("amount");
+				childFoods.add(childFood);
+			}				
+			dbCon.rs.close();
+			return childFoods.toArray(new Food[childFoods.size()]);
+				
+		}else{
+			return null;
+		}
+	}
+	
+
 	
 	public static Kitchen[] queryKitchens(String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
