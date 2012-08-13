@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <ImageView
+        android:id="@+id/logo_imgview"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:src="@color/blue" />
+
+    <ExpandableListView
+        android:id="@+id/expandableListView1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bottombar"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/logo_imgview"
+        android:fadingEdge="vertical"
+        android:fadingEdgeLength="4dp"
+        android:scrollbarAlwaysDrawVerticalTrack="true" >
+    </ExpandableListView>
+
+    <RelativeLayout
+        android:id="@+id/bottombar"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true" >
+
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="100dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:src="@color/blue" />
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="100dp"
+            android:layout_height="fill_parent"
+            android:layout_toRightOf="@+id/imageView1"
+            android:layout_weight="1"
+            android:src="@color/green" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/imageView1"
+            android:layout_alignParentLeft="false"
+            android:layout_alignRight="@+id/imageView1"
+            android:layout_centerVertical="true"
+            android:text="排行榜"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/white" />
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/textView2"
+            android:layout_alignLeft="@+id/imageView2"
+            android:layout_alignRight="@+id/imageView2"
+            android:text="更多"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/white" />
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/logo_imgview"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="25dp"
+        android:text="电子菜谱"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@color/white" />
+
+</RelativeLayout>

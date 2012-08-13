@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="dartgrey">#808080</color>
+    <color name="orange">#f89827</color>
+    <color name="white">#FFFFFF</color>
+    <color name="grey">#A9A9A9</color>
+    <color name="transparent">#00000000</color>
+    <color name="gold">#b89766</color>
+    <drawable name="nullbg">#00ffffff</drawable>
+    <color name="green">#61bb6e</color>
+    <color name="blue">#4a8dcb</color>
+    <color name="black">#000</color>
+    <color name="half_transparent">#80000000</color>
+    <color name="purple">#b44acb</color>
+    <color name="red">#cb4a4a</color>
+    <color name="blue_green">#61bb89</color>
+        <drawable name="orange_drawable">#feb041</drawable>
+        <drawable name="white_drawable">#ffffff</drawable>
+        <color name="sky_blue">#76bdfa</color>
+        
+</resources>
