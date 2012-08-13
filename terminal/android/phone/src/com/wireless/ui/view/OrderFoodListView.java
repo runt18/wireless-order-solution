@@ -318,7 +318,15 @@ public class OrderFoodListView extends ExpandableListView{
 			}else{
 				hurriedStatus = "";
 			}
-			((TextView) view.findViewById(R.id.foodname)).setText(tempStatus + hangStatus + hurriedStatus + food.name + status);
+			
+			String comboStatus = null;
+			if(food.isCombo()){
+				comboStatus = "(套)";
+			}else{
+				comboStatus = "";
+			}
+			
+			((TextView) view.findViewById(R.id.foodname)).setText(comboStatus + tempStatus + hangStatus + hurriedStatus + food.name + status);
 			//show the order amount to each food
 			((TextView) view.findViewById(R.id.accountvalue)).setText(Util.float2String2(food.getCount()));
 			//show the price to each food
@@ -385,12 +393,12 @@ public class OrderFoodListView extends ExpandableListView{
 					public void onClick(View v) {
 						if(food.isHurried){
 							food.isHurried = false;
-							Toast.makeText(_context, "取消催菜成功", 0).show();
+							Toast.makeText(_context, "取消催菜成功", Toast.LENGTH_SHORT).show();
 							_adapter.notifyDataSetChanged();
 				
 						}else{
 							food.isHurried = true;
-							Toast.makeText(_context, "催菜成功", 0).show();	
+							Toast.makeText(_context, "催菜成功", Toast.LENGTH_SHORT).show();	
 							_adapter.notifyDataSetChanged();
 						}			
 					}
@@ -575,7 +583,7 @@ public class OrderFoodListView extends ExpandableListView{
 						_foods.remove(selectedFood);
 						_adapter.notifyDataSetChanged();
 						dismiss();
-						Toast.makeText(_context, "删除\"" + selectedFood.toString() + "\"" + cancelAmount + "份成功", 1).show();
+						Toast.makeText(_context, "删除\"" + selectedFood.toString() + "\"" + cancelAmount + "份成功", Toast.LENGTH_LONG).show();
 						
 					}else if(foodAmount > cancelAmount){
 						/**
@@ -584,7 +592,7 @@ public class OrderFoodListView extends ExpandableListView{
 						selectedFood.setCount(foodAmount - cancelAmount);
 						_adapter.notifyDataSetChanged();
 						dismiss();
-						Toast.makeText(_context, "删除\"" + selectedFood.toString() + "\"" + cancelAmount + "份成功", 1).show();
+						Toast.makeText(_context, "删除\"" + selectedFood.toString() + "\"" + cancelAmount + "份成功", Toast.LENGTH_LONG).show();
 						
 					}else{
 						new AlertDialog.Builder(_context)
@@ -638,16 +646,16 @@ public class OrderFoodListView extends ExpandableListView{
 					try{
 						float amount = Float.parseFloat(amountEdtTxt.getText().toString());
 						if(amount > 255){
-							Toast.makeText(_context, "对不起，\"" + selectedFood.toString() + "\"最多只能点255份", 0).show();
+							Toast.makeText(_context, "对不起，\"" + selectedFood.toString() + "\"最多只能点255份", Toast.LENGTH_SHORT).show();
 						}else{
 							selectedFood.setCount(amount);
 							_adapter.notifyDataSetChanged();
-							Toast.makeText(_context, "设置\"" + selectedFood.toString() + "\"" + "数量为" + amount + "份", 1).show();
+							Toast.makeText(_context, "设置\"" + selectedFood.toString() + "\"" + "数量为" + amount + "份", Toast.LENGTH_LONG).show();
 							dismiss();
 						}							
 						
 					}catch(NumberFormatException e){
-						Toast.makeText(_context, "您输入的数量格式不正确，请重新输入", 0).show();
+						Toast.makeText(_context, "您输入的数量格式不正确，请重新输入", Toast.LENGTH_SHORT).show();
 					}					
 				}
 			});

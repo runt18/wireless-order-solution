@@ -48,7 +48,7 @@ public class PickFoodListView extends ListView {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position,	long rowID) {
 				if(_foods[position].isSellOut()){
-					Toast.makeText(_context, "对不起，" + _foods[position].name + "已经售完", 0).show();
+					Toast.makeText(_context, "对不起，" + _foods[position].name + "已经售完", Toast.LENGTH_SHORT).show();
 				}else{
 					new AskOrderAmountDialog(_foods[position]).show();
 				}
@@ -141,7 +141,14 @@ public class PickFoodListView extends ListView {
 				status.insert(0, "(").insert(status.length(), ")");
 			}
 			
-			((TextView)view.findViewById(R.id.foodname)).setText(_foods[position].name + status);
+			String comboStatus = null;
+			if(_foods[position].isCombo()){
+				comboStatus = "(套)";
+			}else{
+				comboStatus = "";
+			}
+			
+			((TextView)view.findViewById(R.id.foodname)).setText(comboStatus + _foods[position].name + status);
 			if(_tag == TAG_NUM){
 				((TextView)view.findViewById(R.id.foodpinyin)).setText("编号：");
 				((TextView)view.findViewById(R.id.foodpinyins)).setText(String.valueOf(_foods[position].aliasID));
@@ -214,10 +221,10 @@ public class PickFoodListView extends ListView {
 				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 					if(isChecked){
 						_selectedFood.hangStatus = OrderFood.FOOD_HANG_UP;
-						Toast.makeText(_context, "叫起\"" + _selectedFood.toString() + "\"", 0).show();
+						Toast.makeText(_context, "叫起\"" + _selectedFood.toString() + "\"", Toast.LENGTH_SHORT).show();
 					}else{
 						_selectedFood.hangStatus = OrderFood.FOOD_NORMAL;
-						Toast.makeText(_context, "取消叫起\"" + _selectedFood.toString() + "\"", 0).show();
+						Toast.makeText(_context, "取消叫起\"" + _selectedFood.toString() + "\"", Toast.LENGTH_SHORT).show();
 					}
 					
 				}
@@ -234,7 +241,7 @@ public class PickFoodListView extends ListView {
 				float orderAmount = Float.parseFloat(((EditText)findViewById(R.id.amountEdtTxt)).getText().toString());
 				
        			if(orderAmount > 255){
-       				Toast.makeText(_context, "对不起，\"" + _selectedFood.toString() + "\"最多只能点255份", 0).show();
+       				Toast.makeText(_context, "对不起，\"" + _selectedFood.toString() + "\"最多只能点255份", Toast.LENGTH_SHORT).show();
        			}else{
        				_selectedFood.setCount(orderAmount);
        				if(_foodPickedListener != null){	
@@ -248,7 +255,7 @@ public class PickFoodListView extends ListView {
        			}
 				
 			}catch(NumberFormatException e){
-				Toast.makeText(_context, "您输入的数量格式不正确，请重新输入", 0).show();
+				Toast.makeText(_context, "您输入的数量格式不正确，请重新输入", Toast.LENGTH_SHORT).show();
 			}
 		}
 		
