@@ -309,6 +309,7 @@ public class OrderFood extends Food {
 			  food.tasteRefType,
 			  food.kitchen);
 		popTastes = food.popTastes;
+		childFoods = food.childFoods;
 		
 		for(int i = 0; i < tastes.length; i++){
 			tastes[i] = new Taste();
