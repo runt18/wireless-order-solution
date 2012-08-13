@@ -163,7 +163,7 @@ public class InsertOrder {
 						orderToInsert.foods[i].status = detailFood[0].status;
 						orderToInsert.foods[i].setPrice(detailFood[0].getPrice());
 						orderToInsert.foods[i].kitchen = detailFood[0].kitchen;
-						orderToInsert.foods[i].subFoods = detailFood[0].subFoods;
+						orderToInsert.foods[i].childFoods = detailFood[0].childFoods;
 					}else{
 						throw new BusinessException("The food(alias_id=" + orderToInsert.foods[i].aliasID + ", restaurant_id=" + orderToInsert.table.restaurantID+ ") to query doesn't exit.", ErrorCode.MENU_EXPIRED);
 					}
