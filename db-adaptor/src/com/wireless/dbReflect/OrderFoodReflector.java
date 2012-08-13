@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.QueryMenu;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
 
@@ -96,6 +97,7 @@ public class OrderFoodReflector {
 				food.tmpTaste.aliasID = dbCon.rs.getInt("taste_tmp_alias");
 				food.tmpTaste.setPrice(dbCon.rs.getFloat("taste_tmp_price"));
 			}
+			food.childFoods = QueryMenu.queryComboByParent(food);
 			orderFoods.add(food);
 		}
 		dbCon.rs.close();

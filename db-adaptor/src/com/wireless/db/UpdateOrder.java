@@ -7,6 +7,7 @@ import java.util.Iterator;
 import com.wireless.dbReflect.OrderFoodReflector;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Table;
@@ -735,55 +736,79 @@ public class UpdateOrder {
 			
 		}else{
 			//get the food name and its unit price
-			String sql = " SELECT " +
-						 " FOOD.food_id AS food_id, FOOD.name AS name, FOOD.status AS status, " +
-						 " FOOD.unit_price AS unit_price, FOOD.kitchen_id AS kitchen_id, FOOD.kitchen_alias AS kitchen_alias, " +
-						 " DEPT.dept_id AS dept_id" +
-						 " FROM " + Params.dbName + ".food FOOD " +
-						 " LEFT JOIN " + Params.dbName + ".department DEPT ON " +
-						 " DEPT.restaurant_id = FOOD.restaurant_id " +
-						 " AND " +
-						 " DEPT.dept_id = " + "(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE kitchen_id = FOOD.kitchen_id)" +
-						 " WHERE " +
-						 " FOOD.restaurant_id = " + term.restaurantID +
-						 " AND " +
-						 " FOOD.food_alias = " + foodBasic.aliasID;
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			//check if the food to be inserted exist in db or not
-
-			if(dbCon.rs.next()){
-				food.foodID = dbCon.rs.getInt("food_id");
-				food.status = dbCon.rs.getShort("status");
-				food.name = dbCon.rs.getString("name");
-				food.setPrice(new Float(dbCon.rs.getFloat("unit_price")));
-				food.kitchen.kitchenID = dbCon.rs.getLong("kitchen_id");
-				food.kitchen.aliasID = dbCon.rs.getShort("kitchen_alias");
-				food.kitchen.dept.restaurantID = term.restaurantID;
-				food.kitchen.dept.deptID = dbCon.rs.getShort("dept_id");
+			
+			Food[] detailFood = QueryMenu.queryFoods(dbCon, " AND FOOD.food_alias=" + foodBasic.aliasID + " AND FOOD.restaurant_id=" + term.restaurantID, null);
+			
+			if(detailFood.length > 0){
+				food.foodID = detailFood[0].foodID;
+				food.status = detailFood[0].status;
+				food.name = detailFood[0].name;
+				food.setPrice(detailFood[0].getPrice());
+				food.kitchen = detailFood[0].kitchen;
+				food.childFoods = detailFood[0].childFoods;
 			}else{
 				throw new BusinessException("The food(alias_id=" + foodBasic.aliasID + ", restaurant_id=" + term.restaurantID + ") to query does NOT exist.", ErrorCode.MENU_EXPIRED);
 			}
-			dbCon.rs.close();
+			
+//			String sql = " SELECT " +
+//						 " FOOD.food_id AS food_id, FOOD.name AS name, FOOD.status AS status, " +
+//						 " FOOD.unit_price AS unit_price, FOOD.kitchen_id AS kitchen_id, FOOD.kitchen_alias AS kitchen_alias, " +
+//						 " DEPT.dept_id AS dept_id" +
+//						 " FROM " + Params.dbName + ".food FOOD " +
+//						 " LEFT JOIN " + Params.dbName + ".department DEPT ON " +
+//						 " DEPT.restaurant_id = FOOD.restaurant_id " +
+//						 " AND " +
+//						 " DEPT.dept_id = " + "(SELECT dept_id FROM " + Params.dbName + ".kitchen WHERE kitchen_id = FOOD.kitchen_id)" +
+//						 " WHERE " +
+//						 " FOOD.restaurant_id = " + term.restaurantID +
+//						 " AND " +
+//						 " FOOD.food_alias = " + foodBasic.aliasID;
+//			dbCon.rs = dbCon.stmt.executeQuery(sql);
+//			//check if the food to be inserted exist in db or not
+//
+//			if(dbCon.rs.next()){
+//				food.foodID = dbCon.rs.getInt("food_id");
+//				food.status = dbCon.rs.getShort("status");
+//				food.name = dbCon.rs.getString("name");
+//				food.setPrice(new Float(dbCon.rs.getFloat("unit_price")));
+//				food.kitchen.kitchenID = dbCon.rs.getLong("kitchen_id");
+//				food.kitchen.aliasID = dbCon.rs.getShort("kitchen_alias");
+//				food.kitchen.dept.restaurantID = term.restaurantID;
+//				food.kitchen.dept.deptID = dbCon.rs.getShort("dept_id");
+//			}else{
+//				throw new BusinessException("The food(alias_id=" + foodBasic.aliasID + ", restaurant_id=" + term.restaurantID + ") to query does NOT exist.", ErrorCode.MENU_EXPIRED);
+//			}
+//			dbCon.rs.close();
 			
 			//get the each taste information to this food only if the food has taste preference
 			for(int j = 0; j < foodBasic.tastes.length; j++){
 				if(foodBasic.tastes[j].aliasID != Taste.NO_TASTE){
-					sql = "SELECT taste_id, preference, price, category, rate, calc FROM " + Params.dbName + ".taste WHERE restaurant_id=" + term.restaurantID +
-						" AND taste_alias=" + foodBasic.tastes[j].aliasID;
-					dbCon.rs = dbCon.stmt.executeQuery(sql);
-					//check if the taste preference exist in db
-					if(dbCon.rs.next()){
-						food.tastes[j].tasteID = dbCon.rs.getInt("taste_id");
-						food.tastes[j].aliasID = foodBasic.tastes[j].aliasID;
-						food.tastes[j].preference = dbCon.rs.getString("preference");
-						food.tastes[j].category = dbCon.rs.getShort("category");
-						food.tastes[j].calc = dbCon.rs.getShort("calc");
-						food.tastes[j].setRate(dbCon.rs.getFloat("rate"));
-						food.tastes[j].setPrice(dbCon.rs.getFloat("price"));
-					}else{
-						throw new BusinessException("The taste(alias_id=" + foodBasic.tastes[j].aliasID + ", restaurant_id=" + term.restaurantID +") to query does NOT exist.", ErrorCode.MENU_EXPIRED);
+					
+					Taste[] detailTaste = QueryMenu.queryTastes(dbCon, 
+							Taste.CATE_ALL, 
+							" AND restaurant_id=" + term.restaurantID + " AND taste_alias =" + foodBasic.tastes[j].aliasID, 
+							null);
+					
+					if(detailTaste.length > 0){
+						food.tastes[j] = detailTaste[0];
 					}
-					dbCon.rs.close();
+					
+//					sql = "SELECT taste_id, preference, price, category, rate, calc FROM " + Params.dbName + ".taste WHERE restaurant_id=" + term.restaurantID +
+//						" AND taste_alias=" + foodBasic.tastes[j].aliasID;
+//					dbCon.rs = dbCon.stmt.executeQuery(sql);
+//					//check if the taste preference exist in db
+//					if(dbCon.rs.next()){
+//						food.tastes[j].tasteID = dbCon.rs.getInt("taste_id");
+//						food.tastes[j].aliasID = foodBasic.tastes[j].aliasID;
+//						food.tastes[j].preference = dbCon.rs.getString("preference");
+//						food.tastes[j].category = dbCon.rs.getShort("category");
+//						food.tastes[j].calc = dbCon.rs.getShort("calc");
+//						food.tastes[j].setRate(dbCon.rs.getFloat("rate"));
+//						food.tastes[j].setPrice(dbCon.rs.getFloat("price"));
+//					}else{
+//						throw new BusinessException("The taste(alias_id=" + foodBasic.tastes[j].aliasID + ", restaurant_id=" + term.restaurantID +") to query does NOT exist.", ErrorCode.MENU_EXPIRED);
+//					}
+//					dbCon.rs.close();
 					
 				}
 			}
