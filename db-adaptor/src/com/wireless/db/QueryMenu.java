@@ -123,6 +123,7 @@ public class QueryMenu {
 		String sql = " SELECT " +
 					 " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, " +
 					 " FOOD.name, FOOD.unit_price, FOOD.kitchen_alias, FOOD.status, FOOD.pinyin, FOOD.taste_ref_type, " +
+					 " FOOD.desc, FOOD.img, " +
 					 " KITCHEN.dept_id, KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.name AS kitchen_name " +
 					 " FROM " + 
 					 Params.dbName + ".food FOOD " +
@@ -146,6 +147,8 @@ public class QueryMenu {
 	 				   		   dbCon.rs.getShort("status"),
 	 				   		   dbCon.rs.getString("pinyin"),
 	 				   		   dbCon.rs.getShort("taste_ref_type"),
+	 				   		   dbCon.rs.getString("desc"),
+	 				   		   dbCon.rs.getString("img"),
 	 				   		   new Kitchen(restaurantID, 
 	 				   				       dbCon.rs.getString("kitchen_name"),
 	 				   				       dbCon.rs.getLong("kitchen_id"),
@@ -207,6 +210,7 @@ public class QueryMenu {
 		String sql = " SELECT " +
 					 " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, " +
 					 " FOOD.name, FOOD.unit_price, FOOD.status, FOOD.pinyin, FOOD.taste_ref_type, " +
+					 " FOOD.desc, FOOD.img, " +
 					 " KITCHEN.dept_id, KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.name AS kitchen_name, " +
 					 " TASTE.taste_id, TASTE.taste_alias " +
 					 " FROM " + 
@@ -253,6 +257,8 @@ public class QueryMenu {
 			 			 				   dbCon.rs.getShort("status"),
 			 			 				   dbCon.rs.getString("pinyin"),
 			 			 				   dbCon.rs.getShort("taste_ref_type"),
+			 			 				   dbCon.rs.getString("desc"),
+			 			 				   dbCon.rs.getString("img"),
 			 			 				   new Kitchen(restaurantID, 
 			 			 						   	   dbCon.rs.getString("kitchen_name"),
 			 			 						   	   dbCon.rs.getLong("kitchen_id"),
@@ -345,6 +351,7 @@ public class QueryMenu {
 			sql = " SELECT " +
 				  " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, " +
 				  " FOOD.name, FOOD.unit_price, FOOD.status, FOOD.pinyin, FOOD.taste_ref_type, " +
+				  " FOOD.desc, FOOD.img, " +
 				  " KITCHEN.dept_id, KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.name AS kitchen_name, " +
 				  " COMBO.amount " +
 				  " FROM " +
@@ -373,6 +380,8 @@ public class QueryMenu {
 						   				  dbCon.rs.getShort("status"),
 						   				  dbCon.rs.getString("pinyin"),
 						   				  dbCon.rs.getShort("taste_ref_type"),
+						   				  dbCon.rs.getString("desc"),
+						   				  dbCon.rs.getString("img"),
 						   				  new Kitchen(restaurantID, 
 						   							  dbCon.rs.getString("kitchen_name"),
 						   							  dbCon.rs.getLong("kitchen_id"),
