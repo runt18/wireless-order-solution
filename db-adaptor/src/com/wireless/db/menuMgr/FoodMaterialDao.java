@@ -15,9 +15,9 @@ public class FoodMaterialDao {
 			
 			String sql = "UPDATE " + Params.dbName + ".food_material SET consumption = " + item.getConsumption()
 						 + " WHERE"
-						 + " restaurant_id = " + item.getRestaurantId()
-						 + " AND food_id = " + item.getFoodId()
-						 + " AND material_id = " + item.getMaterialId();
+						 + " restaurant_id = " + item.getRestaurantID()
+						 + " AND food_id = " + item.getFoodID()
+						 + " AND material_id = " + item.getMaterialID();
 			
 			dbCon.stmt.executeUpdate(sql);
 			
