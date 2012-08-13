@@ -46,7 +46,7 @@ public class DailySettlementTask extends SchedulerTask{
 			TasteRef.exec();
 			long elapsedTime = System.currentTimeMillis() - beginTime;
 			
-			taskInfo += "info : The calcation to smart taste reference takes " + elapsedTime / 1000 + " sec." + sep; 
+			taskInfo += "info : The calculation to smart taste reference takes " + elapsedTime / 1000 + " sec." + sep; 
 				
 		}catch(SQLException e){
 			taskInfo += "error : " + e.getMessage() + sep;
