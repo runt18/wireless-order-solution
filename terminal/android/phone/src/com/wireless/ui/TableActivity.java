@@ -843,6 +843,8 @@ public class TableActivity extends Activity {
 			} else {
 				mRegionHandler.sendEmptyMessage(0);
 				mDataHandler.sendEmptyMessage(0);
+				mListView.setVisibility(View.VISIBLE);
+				((TextView)findViewById(R.id.hint_text_table)).setVisibility(View.INVISIBLE);
 				((AutoCompleteTextView)findViewById(R.id.search_view_table)).setText("");
 				mListView.onRefreshComplete();
 				Toast.makeText(getApplicationContext(), "餐台信息刷新成功",	Toast.LENGTH_SHORT).show();
