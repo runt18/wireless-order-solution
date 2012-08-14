@@ -24,7 +24,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
-import com.wireless.parcel.OrderParcel;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Order;
@@ -40,11 +39,14 @@ import com.wireless.sccon.ServerConnector;
 import com.wireless.ui.view.BillFoodListView;
 
 public class TableDetailActivity extends Activity {
+	
+	private int mTblAlias;
 	private Order mOrderToPay;
 	private Handler mHandler;
 	private final static int PAY_ORDER = 1;
 	private final static int PAY_TEMPORARY_ORDER = 2;
 	BillFoodListView mBillFoodListView;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -56,17 +58,11 @@ public class TableDetailActivity extends Activity {
 		/*
 		 * get id and order from last activity
 		 */
-		final int tableID = getIntent().getIntExtra(MainActivity.KEY_TABLE_ID, -1);
-		OrderParcel orderParcel = getIntent().getParcelableExtra("ORDER");
-		mOrderToPay = orderParcel;
-		if(mOrderToPay == null)
-			new QueryOrderTask(tableID).execute();
-		mHandler.sendEmptyMessage(0);
-		
+		mTblAlias = getIntent().getIntExtra(MainActivity.KEY_TABLE_ID, -1);
 	
 		TextView titleTextView = (TextView) findViewById(R.id.toptitle);
 		titleTextView.setVisibility(View.VISIBLE);
-		titleTextView.setText(tableID+"房");
+		titleTextView.setText("详细信息");
 		/**
 		 * "返回"Button
 		 */
@@ -111,11 +107,18 @@ public class TableDetailActivity extends Activity {
 			public void onClick(View v) {
 				//jump to change order activity with the table alias id if the table is busy
 				Intent intent = new Intent(TableDetailActivity.this, ChgOrderActivity.class);
-				intent.putExtra(MainActivity.KEY_TABLE_ID, String.valueOf(tableID));
+				intent.putExtra(MainActivity.KEY_TABLE_ID, String.valueOf(mTblAlias));
 				startActivity(intent);
 			}
 		});
 	}
+	
+	@Override
+	protected void onStart(){
+		super.onStart();
+		new QueryOrderTask(mTblAlias).execute();
+	}
+	
 	/**
 	 * 选择折扣方式后，更新显示的合计金额
 	 */
@@ -374,11 +377,7 @@ public class TableDetailActivity extends Activity {
 		@Override
 		protected String doInBackground(Void... arg0) {
 			String errMsg = null;
-			if(_tableAlias == -1)
-			{
-				errMsg = "号台信息不存在";
-			}
-			else try{
+			try{
 				//根据tableID请求数据
 				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryOrder(_tableAlias));
 				if(resp.header.type == Type.ACK){
