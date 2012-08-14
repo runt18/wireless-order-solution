@@ -35,16 +35,19 @@ import java.io.UnsupportedEncodingException;
  * 
  * food_amount[2] - 2-byte indicating the amount of the foods listed in the menu
  * <Food>
- * food_id[2] : price[3] : status : kitchen : len : name[len] : len2 : pinyin[len2] : taste_ref_amount : taste_alias_1[2] : tase_alias_2[2]...
+ * food_id[2] : price[3] : status : kitchen : name_len : name[name_len] : pinyin_len : pinyin[pinyin_len] : 
+ * img_len : image : taste_ref_amount : taste_alias_1[2] : tase_alias_2[2]...
  * food_id[2] - 2-byte indicating the food's id
  * price[3] - 3-byte indicating the food's price
  * 			  price[0] 1-byte indicating the float point
  * 			  price[1..2] 2-byte indicating the fixed point
  * kitchen - the kitchen id to this food
- * len1 - the length of the food's name
- * name[len1] - the food's name whose length equals "len1"
- * len2 - the length of the pinyin
- * pinyin[len2] - the pinyin whose length equals "len2"
+ * name_len - the length of the food's name
+ * name[name_len] - the food's name whose length equals "len1"
+ * pinyin_len - the length of the pinyin
+ * pinyin[pinyin_len] - the pinyin whose length equals "len2"
+ * img_len : the length to image
+ * image : the image file name
  * taste_ref_amount - the amount to taste reference
  * taste_alias_n[2] - 2-byte indicating the alias id to each taste reference 
  * 
@@ -94,11 +97,17 @@ public class RespQueryMenu extends RespPackage{
 		
 		for(int i = 0; i < foodMenu.foods.length; i++){
 			byte[] name = foodMenu.foods[i].name.getBytes("UTF-16BE");
-			byte[] pinyin = null;
+			byte[] pinyin;
 			if(foodMenu.foods[i].pinyin != null){
 				pinyin = foodMenu.foods[i].pinyin.getBytes();				
 			}else{
 				pinyin = new byte[0];
+			}
+			byte[] image;
+			if(foodMenu.foods[i].image != null){
+				image = foodMenu.foods[i].image.getBytes();
+			}else{
+				image = new byte[0];
 			}
 			/**
 			 * Each item of the food menu consist of the stuff below.
@@ -111,6 +120,8 @@ public class RespQueryMenu extends RespPackage{
 					   name.length + 	/* the value to food name  */
 					   1 + 				/* the length to pinyin(1-byte) */	
 					   pinyin.length + 	/* the value to pinyin */
+					   1 +				/* the length to image */
+					   image.length +	/* the value to image name */
 					   1 + 				/* the amount to taste reference(1-byte) */
 					   (foodMenu.foods[i].popTastes == null ? 0 : (foodMenu.foods[i].popTastes.length * 2)); /* all the alias id to taste reference */ 
 		}
@@ -172,22 +183,31 @@ public class RespQueryMenu extends RespPackage{
 			//assign the food's id
 			body[offset] = (byte)(foodMenu.foods[i].aliasID & 0x000000FF);
 			body[offset + 1] = (byte)((foodMenu.foods[i].aliasID & 0x0000FF00) >> 8);
+			offset += 2;			
 			
 			//assign the unit price to this food
-			body[offset + 2] = (byte)(foodMenu.foods[i].price & 0x000000FF);
-			body[offset + 3] = (byte)((foodMenu.foods[i].price & 0x0000FF00) >> 8);
-			body[offset + 4] = (byte)((foodMenu.foods[i].price & 0x00FF0000) >> 16);
+			body[offset] = (byte)(foodMenu.foods[i].price & 0x000000FF);
+			body[offset + 1] = (byte)((foodMenu.foods[i].price & 0x0000FF00) >> 8);
+			body[offset + 2] = (byte)((foodMenu.foods[i].price & 0x00FF0000) >> 16);
+			offset += 3;
+			
 			//assign the kitchen to this food
-			body[offset + 5] = (byte)foodMenu.foods[i].kitchen.aliasID;
+			body[offset] = (byte)foodMenu.foods[i].kitchen.aliasID;
+			offset += 1;
+			
 			//assign the status to this food
-			body[offset + 6] = (byte)foodMenu.foods[i].status;
+			body[offset] = (byte)foodMenu.foods[i].status;
+			offset += 1;
+			
 			//assign the length of food's name
 			byte[] name = foodMenu.foods[i].name.getBytes("UTF-16BE");
-			body[offset + 7] = (byte)(name.length & 0x000000FF);
+			body[offset] = (byte)(name.length & 0x000000FF);
 			//assign the food name
 			for(int cnt = 0; cnt < name.length; cnt++){
-				body[offset + 8 + cnt] = name[cnt];
+				body[offset + 1 + cnt] = name[cnt];
 			}
+			offset += 1 + name.length;
+			
 			byte[] pinyin;
 			if(foodMenu.foods[i].pinyin != null){
 				pinyin = foodMenu.foods[i].pinyin.getBytes();
@@ -195,40 +215,57 @@ public class RespQueryMenu extends RespPackage{
 				pinyin = new byte[0];
 			}
 			//assign the length of the food's pinyin
-			body[offset + 8 + name.length] = (byte)(pinyin.length & 0x000000FF);
+			body[offset] = (byte)(pinyin.length & 0x000000FF);
 			//assign the food's pinyin
 			for(int cnt = 0; cnt < pinyin.length; cnt++){
-				body[offset + 9 + name.length + cnt] = pinyin[cnt];
+				body[offset + 1 + cnt] = pinyin[cnt];
 			}
+			offset += 1 + pinyin.length;
+			
+			byte[] image;
+			if(foodMenu.foods[i].image != null){
+				image = foodMenu.foods[i].image.getBytes();
+			}else{
+				image = new byte[0];
+			}
+			//assign the length of food's image
+			body[offset] = (byte)(image.length & 0x000000FF);
+			//assign the value to food's image
+			for(int cnt = 0; cnt < image.length; cnt++){
+				body[offset + 1 + cnt] = image[cnt];
+			}
+			offset += 1 + image.length;
 			
 			int lenOfPopTaste = 0;
 			if(foodMenu.foods[i].popTastes == null){
 				//assign the amount taste reference
-				body[offset + 9 + name.length + pinyin.length] = 0; 
+				body[offset] = 0; 
 			}else{
 				//assign the amount taste reference
-				body[offset + 9 + name.length + pinyin.length] = (byte)foodMenu.foods[i].popTastes.length;
+				body[offset] = (byte)foodMenu.foods[i].popTastes.length;
 				//assign each taste reference alias id to this food
 				for(int cnt = 0; cnt < foodMenu.foods[i].popTastes.length; cnt++){
-					body[offset + 10 + name.length + pinyin.length + lenOfPopTaste] = (byte)(foodMenu.foods[i].popTastes[cnt].aliasID & 0x00FF);
-					body[offset + 11 + name.length + pinyin.length + lenOfPopTaste] = (byte)((foodMenu.foods[i].popTastes[cnt].aliasID & 0xFF00) >> 8);
+					body[offset + 1 + lenOfPopTaste] = (byte)(foodMenu.foods[i].popTastes[cnt].aliasID & 0x00FF);
+					body[offset + 2 + lenOfPopTaste] = (byte)((foodMenu.foods[i].popTastes[cnt].aliasID & 0xFF00) >> 8);
 					lenOfPopTaste += 2;
 				}
 			}
-
+			offset += 1 + lenOfPopTaste;
 			/**
 			 * Each item of the food menu consist of the stuff below.
 			 */
-			offset += 2 + 				/* food_alias(2-byte) */
-					  3 + 				/* price(3-byte) */ 
-					  1 + 				/* kitchen id to this food(1-byte) */
-					  1 + 				/* status(1-byte) */ 
-					  1 + 				/* the length to food name(1-byte) */
-					  name.length + 	/* the value to food name  */
-					  1 + 				/* the length to pinyin(1-byte) */	
-					  pinyin.length + 	/* the value to pinyin */
-					  1 + 				/* the amount to taste reference(1-byte) */
-					  lenOfPopTaste; 	/* all the alias id to taste reference */ 
+//			offset += 2 + 				/* food_alias(2-byte) */
+//					  3 + 				/* price(3-byte) */ 
+//					  1 + 				/* kitchen id to this food(1-byte) */
+//					  1 + 				/* status(1-byte) */ 
+//					  1 + 				/* the length to food name(1-byte) */
+//					  name.length + 	/* the value to food name  */
+//					  1 + 				/* the length to pinyin(1-byte) */	
+//					  pinyin.length + 	/* the value to pinyin */
+//					  1 +				/* the length to image */
+//					  image.length +	/* the value to image */		
+//					  1 + 				/* the amount to taste reference(1-byte) */
+//					  lenOfPopTaste; 	/* all the alias id to taste reference */ 
 		}
 		
 		//assign the taste preferences
@@ -248,38 +285,42 @@ public class RespQueryMenu extends RespPackage{
 		for(int i = 0; i < foodMenu.kitchens.length; i++){
 			//assign the kitchen id
 			body[offset] = (byte)(foodMenu.kitchens[i].aliasID & 0x00FF);
+			offset++;
 			
 			//assign the super kitchen id that this kitchen belong to 
-			body[offset + 1] = (byte)(foodMenu.kitchens[i].dept.deptID & 0x00FF);
+			body[offset] = (byte)(foodMenu.kitchens[i].dept.deptID & 0x00FF);
+			offset++;
 			
 			//assign 3 normal discounts
-			body[offset + 2] = (byte)(foodMenu.kitchens[i].discount_1 & 0x000000FF);
-			body[offset + 3] = (byte)(foodMenu.kitchens[i].discount_2 & 0x000000FF);
-			body[offset + 4] = (byte)(foodMenu.kitchens[i].discount_3 & 0x000000FF);
+			body[offset] = (byte)(foodMenu.kitchens[i].discount_1 & 0x000000FF);
+			body[offset + 1] = (byte)(foodMenu.kitchens[i].discount_2 & 0x000000FF);
+			body[offset + 2] = (byte)(foodMenu.kitchens[i].discount_3 & 0x000000FF);
+			offset += 3;
 			
 			//assign 3 member discounts
-			body[offset + 5] = (byte)(foodMenu.kitchens[i].memberDist_1 & 0x000000FF);
-			body[offset + 6] = (byte)(foodMenu.kitchens[i].memberDist_2 & 0x000000FF);
-			body[offset + 7] = (byte)(foodMenu.kitchens[i].memberDist_3 & 0x000000FF);
+			body[offset] = (byte)(foodMenu.kitchens[i].memberDist_1 & 0x000000FF);
+			body[offset + 1] = (byte)(foodMenu.kitchens[i].memberDist_2 & 0x000000FF);
+			body[offset + 2] = (byte)(foodMenu.kitchens[i].memberDist_3 & 0x000000FF);
+			offset += 3;
 			
 			byte[] kname = foodMenu.kitchens[i].name.getBytes("UTF-16BE");
 			//assign the length of the kitchen name
-			body[offset + 8] = (byte)(kname.length & 0x000000FF);
-			
+			body[offset] = (byte)(kname.length & 0x000000FF);			
 			//assign the kitchen name
 			for(int cnt = 0; cnt < kname.length; cnt++){
-				body[offset + 9 + cnt] = kname[cnt];
+				body[offset + 1 + cnt] = kname[cnt];
 			}
+			offset += 1 + kname.length;
 			
 			/**
 			 * Each kitchen consist of the stuff below.
 			 */
-			offset += 1 + 					/* kitchen_alias(1-byte) */
-					  1 + 					/* dept_id(1-byte) */
-					  3 + 					/* normal discount 1..3(3-byte) */
-					  3 + 					/* member discount 1..3(3-byte) */
-					  1 + 					/* length to kitchen name */
-					  kname.length;			/* the value to kitchen */
+//			offset += 1 + 					/* kitchen_alias(1-byte) */
+//					  1 + 					/* dept_id(1-byte) */
+//					  3 + 					/* normal discount 1..3(3-byte) */
+//					  3 + 					/* member discount 1..3(3-byte) */
+//					  1 + 					/* length to kitchen name */
+//					  kname.length;			/* the value to kitchen */
 		}
 		
 		//assign the amount of super kitchen
@@ -290,22 +331,25 @@ public class RespQueryMenu extends RespPackage{
 		for(int i = 0; i < foodMenu.depts.length; i++){
 			//assign the super kitchen id
 			body[offset] = (byte)(foodMenu.depts[i].deptID & 0x00FF);
+			offset++;
 			
 			//assign the length of the super kitchen name
 			byte[] deptName = foodMenu.depts[i].name.getBytes("UTF-16BE");
-			body[offset + 1] = (byte)(deptName.length & 0x000000FF);
+			body[offset] = (byte)(deptName.length & 0x000000FF);
+			offset++;
 			
 			//assign the department name
 			for(int cnt = 0; cnt < deptName.length; cnt++){
-				body[offset + 2 + cnt] = deptName[cnt];
+				body[offset + cnt] = deptName[cnt];
 			}			
+			offset += deptName.length;
 
 			/**
 			 * Each department consist of the stuff below.
 			 */
-			offset += 1 + 				/* dept_id(1-byte) */
-					  1 + 				/* length to department name */
-					  deptName.length;	/* the value to department name */
+//			offset += 1 + 				/* dept_id(1-byte) */
+//					  1 + 				/* length to department name */
+//					  deptName.length;	/* the value to department name */
 		}
 	}
 	
@@ -341,38 +385,47 @@ public class RespQueryMenu extends RespPackage{
 			//assign the taste preference alias id
 			body[offset] = (byte)(tastes[i].aliasID & 0x00FF);
 			body[offset + 1] = (byte)((tastes[i].aliasID & 0xFF00) >> 8);
-			     
+			offset += 2;     
+			
 			//assign the category of taste preference
-			body[offset + 2] = (byte)(tastes[i].category & 0x00FF);
+			body[offset] = (byte)(tastes[i].category & 0x00FF);
+			offset++;
+			
 			//assign the calculate type of taste preference
-			body[offset + 3] = (byte)(tastes[i].calc & 0x00FF);
+			body[offset] = (byte)(tastes[i].calc & 0x00FF);
+			offset++;
+			
 			//assign the float-point of taste preference price
-			body[offset + 4] = (byte)(tastes[i].price & 0x000000FF);
+			body[offset] = (byte)(tastes[i].price & 0x000000FF);
 			//assign the fixed-point of the taste preference price
-			body[offset + 5] = (byte)((tastes[i].price & 0x0000FF00) >> 8);
-			body[offset + 6] = (byte)((tastes[i].price & 0x00FF0000) >> 16);
+			body[offset + 1] = (byte)((tastes[i].price & 0x0000FF00) >> 8);
+			body[offset + 2] = (byte)((tastes[i].price & 0x00FF0000) >> 16);
+			offset += 3;
+			
 			//assign the rate of the taste preference
-			body[offset + 7] = (byte)(tastes[i].rate & 0x00FF);
-			body[offset + 8] = (byte)((tastes[i].rate & 0xFF00) >> 8);
+			body[offset] = (byte)(tastes[i].rate & 0x00FF);
+			body[offset + 1] = (byte)((tastes[i].rate & 0xFF00) >> 8);
+			offset += 2;
 			
 			//assign the length of the preference string
 			byte[] preference = tastes[i].preference.getBytes("UTF-16BE");
-			body[offset + 9] = (byte)(preference.length & 0x000000FF);
+			body[offset] = (byte)(preference.length & 0x000000FF);
 			//assign the preference string
 			for(int cnt = 0; cnt < preference.length; cnt++){
-				body[offset + 10 + cnt] = preference[cnt];
+				body[offset + 1 + cnt] = preference[cnt];
 			}
+			offset += 1 + preference.length;
 
 			/**
 			 * Each taste preference consist of the stuff below.
 			 */
-			offset += 2 + 					/* toast_alias(2-byte) */
-					  1 + 					/* category(1-byte) */
-					  1 + 					/* calculate type(1-byte) */
-					  3 + 					/* price(3-byte) */
-					  2 + 					/* rate(2-byte) */
-					  1 + 					/* the length to taste preference */
-					  preference.length;	/* the value to taste preference */
+//			offset += 2 + 					/* toast_alias(2-byte) */
+//					  1 + 					/* category(1-byte) */
+//					  1 + 					/* calculate type(1-byte) */
+//					  3 + 					/* price(3-byte) */
+//					  2 + 					/* rate(2-byte) */
+//					  1 + 					/* the length to taste preference */
+//					  preference.length;	/* the value to taste preference */
 		}	
 		
 		return offset;

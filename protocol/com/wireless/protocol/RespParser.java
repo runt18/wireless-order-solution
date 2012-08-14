@@ -367,16 +367,19 @@ public class RespParser {
 		 * 
 		 * food_amount[2] - 2-byte indicating the amount of the foods listed in the menu
 		 * <Food>
-		 * food_id[2] : price[3] : status : kitchen : len : name[len] : len2 : pinyin[len2] : taste_ref_amount : taste_alias_1[2] : tase_alias_2[2]...
+		 * food_id[2] : price[3] : status : kitchen : name_len : name[name_len] : pinyin_len : pinyin[pinyin_len] : 
+		 * img_len : image : taste_ref_amount : taste_alias_1[2] : tase_alias_2[2]...
 		 * food_id[2] - 2-byte indicating the food's id
 		 * price[3] - 3-byte indicating the food's price
 		 * 			  price[0] 1-byte indicating the float point
 		 * 			  price[1..2] 2-byte indicating the fixed point
 		 * kitchen - the kitchen id to this food
-		 * len1 - the length of the food's name
-		 * name[len1] - the food's name whose length equals "len1"
-		 * len2 - the length of the pinyin
-		 * pinyin[len2] - the pinyin whose length equals "len2"
+		 * name_len - the length of the food's name
+		 * name[name_len] - the food's name whose length equals "len1"
+		 * pinyin_len - the length of the pinyin
+		 * pinyin[pinyin_len] - the pinyin whose length equals "len2"
+		 * img_len : the length to image
+		 * image : the image file name
 		 * taste_ref_amount - the amount to taste reference
 		 * taste_alias_n[2] - 2-byte indicating the alias id to each taste reference 
 		 * 
@@ -425,45 +428,66 @@ public class RespParser {
 			//allocate the memory for foods
 			Food[] foods = new Food[foodAmount];
 			
-			offset += 2; /* the food number takes up 2-byte */			
+			//the food number takes up 2-byte
+			offset += 2; 
+			
 			//get each food's information 
 			for(int i = 0; i < foods.length; i++){
 				Food food = new Food();
 				//get the food's id
 				food.aliasID = (response.body[offset] & 0x000000FF) |
 							((response.body[offset + 1] & 0x000000FF) << 8);
+				offset += 2;
 				
 				//get the food's price
-				food.price = ((response.body[offset + 2] & 0x000000FF) |
-							 ((response.body[offset + 3] & 0x000000FF) << 8) |
-							 ((response.body[offset + 4] & 0x000000FF) << 16)) &	0x00FFFFFF;
+				food.price = ((response.body[offset] & 0x000000FF) |
+							 ((response.body[offset + 1] & 0x000000FF) << 8) |
+							 ((response.body[offset + 2] & 0x000000FF) << 16)) & 0x00FFFFFF;
+				offset += 3;
 				
 				//get the kitchen no to this food
-				food.kitchen.aliasID = response.body[offset + 5];
+				food.kitchen.aliasID = response.body[offset];
+				offset++;
 				
 				//get the status to this food
-				food.status = response.body[offset + 6];
+				food.status = response.body[offset];
+				offset++;
 				
 				//get the length of the food's name
-				int lenOfFoodName = response.body[offset + 7];
+				int lenOfFoodName = response.body[offset];
+				offset++;
 				
 				//get the name value 
 				try{
-					food.name = new String(response.body, offset + 8, lenOfFoodName, "UTF-16BE");
+					food.name = new String(response.body, offset, lenOfFoodName, "UTF-16BE");
 				}catch(UnsupportedEncodingException e){
 
 				}
+				offset += lenOfFoodName;				
 				
 				//get the length of the food's pinyin
-				int lenOfPinyin = response.body[offset + 8 + lenOfFoodName];
+				int lenOfPinyin = response.body[offset];
+				offset++;
 				
 				//get the food's pinyin
-				if(lenOfPinyin != 0){
-					food.pinyin = new String(response.body, offset + 9 + lenOfFoodName, lenOfPinyin);
+				if(lenOfPinyin > 0){
+					food.pinyin = new String(response.body, offset, lenOfPinyin);
+					offset += lenOfPinyin;
 				}
 				
+				//get the length of food's image
+				int lenOfImage = response.body[offset];
+				offset++;
+				
+				//get the value of food's image
+				if(lenOfImage > 0){
+					food.image = new String(response.body, offset, lenOfImage);
+					offset += lenOfImage;
+				}				
+				
 				//get the amount of taste reference to this food
-				int nPopTaste = response.body[offset + 9 + lenOfFoodName + lenOfPinyin];
+				int nPopTaste = response.body[offset];
+				offset++;
 				
 				//get each alias id to taste reference
 				int lenOfPopTaste = 0;
@@ -471,24 +495,25 @@ public class RespParser {
 					food.popTastes = new Taste[nPopTaste];
 					for(int j = 0; j < food.popTastes.length; j++){
 						food.popTastes[j] = new Taste();
-						food.popTastes[j].aliasID = (response.body[offset + 10 + lenOfFoodName + lenOfPinyin + lenOfPopTaste] & 0x000000FF) | 
-													((response.body[offset + 11 + lenOfFoodName + lenOfPinyin + lenOfPopTaste] & 0x000000FF) << 8);
+						food.popTastes[j].aliasID = (response.body[offset + lenOfPopTaste] & 0x000000FF) | 
+													((response.body[offset + 1 + lenOfPopTaste] & 0x000000FF) << 8);
 						lenOfPopTaste += 2;
 					}
 				}else{
 					food.popTastes = new Taste[0];
 				}
+				offset += lenOfPopTaste;
 				
-				offset += 2 +				/* food_alias(2-byte) */
-						  3 + 				/* price(3-byte) */ 
-						  1 + 				/* kitchen id to this food(1-byte) */
-						  1 + 				/* status(1-byte) */ 
-						  1 + 				/* the length to food name(1-byte) */
-						  lenOfFoodName + 	/* the value to food name  */
-						  1 + 				/* the length to pinyin(1-byte) */	
-						  lenOfPinyin +		/* the value to pinyin */
-						  1 +				/* the amount to taste reference(1-byte) */
-						  lenOfPopTaste;	/* all the alias id to taste reference */ 
+//				offset += 2 +				/* food_alias(2-byte) */
+//						  3 + 				/* price(3-byte) */ 
+//						  1 + 				/* kitchen id to this food(1-byte) */
+//						  1 + 				/* status(1-byte) */ 
+//						  1 + 				/* the length to food name(1-byte) */
+//						  lenOfFoodName + 	/* the value to food name  */
+//						  1 + 				/* the length to pinyin(1-byte) */	
+//						  lenOfPinyin +		/* the value to pinyin */
+//						  1 +				/* the amount to taste reference(1-byte) */
+//						  lenOfPopTaste;	/* all the alias id to taste reference */ 
 				
 				//add to foods
 				foods[i] = food;
@@ -529,34 +554,40 @@ public class RespParser {
 				
 				//get the kitchen alias id
 				short kitchenAlias = (short)(response.body[offset] & 0x00FF);
+				offset++;
 				
 				//get the department alias id that the kitchen belong to
-				short deptAlias = (short)(response.body[offset + 1] & 0x00FF);
+				short deptAlias = (short)(response.body[offset] & 0x00FF);
+				offset++;
 				
 				//get 3 normal discounts
-				byte dist_1 = response.body[offset + 2];
-				byte dist_2 = response.body[offset + 3];
-				byte dist_3 = response.body[offset + 4];
+				byte dist_1 = response.body[offset];
+				byte dist_2 = response.body[offset + 1];
+				byte dist_3 = response.body[offset + 2];
+				offset += 3;
 				
 				//get 3 member discounts
-				byte mdist_1 = response.body[offset + 5];
-				byte mdist_2 = response.body[offset + 6];
-				byte mdist_3 = response.body[offset + 7];
+				byte mdist_1 = response.body[offset];
+				byte mdist_2 = response.body[offset + 1];
+				byte mdist_3 = response.body[offset + 2];
+				offset += 3;
 				
 				//get the length of the kitchen name
-				int kitchenLength = response.body[offset + 8];
+				int lenOfKitchenName = response.body[offset];
+				offset++;
 				//get the value of super kitchen name
 				String kitchenName = null;
 				try{
-					kitchenName = new String(response.body, offset + 9, kitchenLength, "UTF-16BE");
+					kitchenName = new String(response.body, offset, lenOfKitchenName, "UTF-16BE");
 				}catch(UnsupportedEncodingException e){}
+				offset += lenOfKitchenName;
 				
-				offset += 1 + 					/* kitchen_alias(1-byte) */
-						  1 + 					/* dept_id(1-byte) */
-						  3 + 					/* normal discount 1..3(3-byte) */
-						  3 + 					/* member discount 1..3(3-byte) */
-						  1 + 					/* length to kitchen name */
-						  + kitchenLength;		/* the value to kitchen */
+//				offset += 1 + 					/* kitchen_alias(1-byte) */
+//						  1 + 					/* dept_id(1-byte) */
+//						  3 + 					/* normal discount 1..3(3-byte) */
+//						  3 + 					/* member discount 1..3(3-byte) */
+//						  1 + 					/* length to kitchen name */
+//						  + lenOfKitchenName;		/* the value to kitchen */
 				
 				//add the kitchen
 				kitchens[i] = new Kitchen(0, kitchenName, 0, kitchenAlias, 
@@ -574,19 +605,22 @@ public class RespParser {
 			for(int i = 0; i < depts.length; i++){
 				//get the alias id to department
 				short deptID = (short)(response.body[offset] & 0x00FF);
+				offset++;
 				
 				//get the length of the department name
-				int deptLen = response.body[offset + 1];
+				int lenOfDeptName = response.body[offset];
+				offset++;
 				
 				//get the value of super department name
 				String deptName = null;
 				try{
-					deptName = new String(response.body, offset + 2, deptLen, "UTF-16BE");
+					deptName = new String(response.body, offset, lenOfDeptName, "UTF-16BE");
 				}catch(UnsupportedEncodingException e){}
+				offset += lenOfDeptName;
 				
-				offset += 1 + 				/* dept_id(1-byte) */
-						  1 + 				/* length to department name */
-						  deptLen;			/* the value to department name */
+//				offset += 1 + 				/* dept_id(1-byte) */
+//						  1 + 				/* length to department name */
+//						  deptLen;			/* the value to department name */
 				
 				depts[i] = new Department(deptName, deptID, 0);
 			}	
@@ -605,41 +639,48 @@ public class RespParser {
 			//get the alias id to taste preference
 			int alias_id = (response.body[offset] & 0x000000FF) |
 						   ((response.body[offset + 1] & 0x000000FF) << 8);
+			offset += 2;
 			
 			//get the category to taste preference
-			short category = response.body[offset + 2];
+			short category = response.body[offset];
+			offset++;
 			
 			//get the calculate type to taste preference
-			short calcType = response.body[offset + 3];
+			short calcType = response.body[offset];
+			offset++;
 			
 			//get the price to taste preference
-			int price = ((response.body[offset + 4] & 0x000000FF) |
-						((response.body[offset + 5] & 0x000000FF) << 8) |
-						((response.body[offset + 6] & 0x000000FF) << 16)) & 0x00FFFFFF ;
+			int price = ((response.body[offset] & 0x000000FF) |
+						((response.body[offset + 1] & 0x000000FF) << 8) |
+						((response.body[offset + 2] & 0x000000FF) << 16)) & 0x00FFFFFF ;
+			offset += 3;
 			
 			//get the rate to taste preference
-			int rate = response.body[offset + 7] & 0x000000FF | 
-					   ((response.body[offset + 8] & 0x000000FF) << 8);
+			int rate = response.body[offset] & 0x000000FF | 
+					   ((response.body[offset + 1] & 0x000000FF) << 8);
+			offset += 2;
 			
 			//get the length to taste preference string
-			int length = response.body[offset + 9];
+			int lenOfTaste = response.body[offset];
+			offset++;
 			
 			String preference = null;
 			//get the taste preference string
 			try{
-				preference = new String(response.body, offset + 10, length, "UTF-16BE");
+				preference = new String(response.body, offset, lenOfTaste, "UTF-16BE");
 			}catch(UnsupportedEncodingException e){}
+			offset += lenOfTaste;
 			
 			/**
 			 * Each taste preference consist of the stuff below.
 			 */
-			offset += 2 + 					/* toast_alias(2-byte) */
-					  1 + 					/* category(1-byte) */
-					  1 + 					/* calculate type(1-byte) */
-					  3 + 					/* price(3-byte) */
-					  2 + 					/* rate(2-byte) */
-					  1 + 					/* the length to taste preference */
-					  length;				/* the value to taste preference */
+//			offset += 2 + 					/* toast_alias(2-byte) */
+//					  1 + 					/* category(1-byte) */
+//					  1 + 					/* calculate type(1-byte) */
+//					  3 + 					/* price(3-byte) */
+//					  2 + 					/* rate(2-byte) */
+//					  1 + 					/* the length to taste preference */
+//					  lenOfTaste;				/* the value to taste preference */
 			
 			//add the taste
 			tastes[i] = new Taste(0,
@@ -832,7 +873,7 @@ public class RespParser {
 	/**
 	 * Parse the response associated with the query table. 
 	 * @param response The response containing the table info.
-	 * @return Return the array of table info, null if no table info.
+	 * @return Return the array of table info.
 	 */
 	public static Table[] parseQueryTable(ProtocolPackage response){
 		/******************************************************
@@ -861,68 +902,66 @@ public class RespParser {
 		 * category - the category to this table
 		 * custom_num - the custom number to this table
 		 *******************************************************/
-		Table[] tables = null;
-		try{
-			//get the amount to staff
-			int nTable = (response.body[0] & 0x000000FF) |
-						 ((response.body[1] & 0x000000FF) << 8);
+
+		//get the amount to staff
+		int nTable = (response.body[0] & 0x000000FF) |
+					 ((response.body[1] & 0x000000FF) << 8);
+		
+		Table[] tables = new Table[nTable];
+		
+		int offset = 2;
+		for(int i = 0; i < tables.length; i++){
 			
-			if(nTable > 0){
-				tables = new Table[nTable];
-				
-				int offset = 2;
-				for(int i = 0; i < tables.length; i++){
+			tables[i] = new Table();
+			
+			//get the length to this table name
+			int nameLen = response.body[offset];
+			offset++;
+			
+			//get the value to this table name
+			if(nameLen > 0){
+				try{
+					tables[i].name = new String(response.body, offset, nameLen, "UTF-16BE");
+				}catch(UnsupportedEncodingException e){
 					
-					tables[i] = new Table();
-					
-					//get the length to this table name
-					int nameLen = response.body[offset];
-					offset++;
-					
-					//get the value to this table name
-					if(nameLen > 0){
-						tables[i].name = new String(response.body, offset, nameLen, "UTF-16BE");
-						offset += nameLen;
-					}
-					
-					//get the table alias
-					tables[i].aliasID = ((int)(response.body[offset] & 0x000000FF)) | 
-										((int)(response.body[offset + 1] & 0x000000FF) << 8);
-					offset += 2;
-					
-					//get the region alias
-					tables[i].regionID = response.body[offset];
-					offset++;
-					
-					//get the service rate
-					tables[i].serviceRate = (response.body[offset] & 0x000000FF) |
-										    ((response.body[offset + 1] & 0x000000FF) << 8);
-					offset += 2;
-					
-					//get the minimum cost
-					tables[i].minimumCost = (response.body[offset] & 0x000000FF) | 
-											((response.body[offset + 1] & 0x000000FF) << 8) |
-											((response.body[offset + 2] & 0x000000FF) << 16) |
-											((response.body[offset + 3] & 0x000000FF) << 24);
-					offset += 4;
-					
-					//get the status
-					tables[i].status = response.body[offset];
-					offset++;
-					
-					//get the category
-					tables[i].category = response.body[offset];
-					offset++;
-					
-					//get the custom number;
-					tables[i].custom_num = response.body[offset];
-					offset++;
 				}
+				offset += nameLen;
 			}
 			
-		}catch(UnsupportedEncodingException e){
+			//get the table alias
+			tables[i].aliasID = ((int)(response.body[offset] & 0x000000FF)) | 
+								((int)(response.body[offset + 1] & 0x000000FF) << 8);
+			offset += 2;
 			
+			//get the region alias
+			tables[i].regionID = response.body[offset];
+			offset++;
+			
+			//get the service rate
+			tables[i].serviceRate = (response.body[offset] & 0x000000FF) |
+								    ((response.body[offset + 1] & 0x000000FF) << 8);
+			offset += 2;
+			
+			//get the minimum cost
+			tables[i].minimumCost = (response.body[offset] & 0x000000FF) | 
+									((response.body[offset + 1] & 0x000000FF) << 8) |
+									((response.body[offset + 2] & 0x000000FF) << 16) |
+									((response.body[offset + 3] & 0x000000FF) << 24);
+			offset += 4;
+			
+			//get the status
+			tables[i].status = response.body[offset];
+			offset++;
+			
+			//get the category
+			tables[i].category = response.body[offset];
+			offset++;
+			
+			//get the custom number;
+			tables[i].custom_num = response.body[offset];
+			offset++;
 		}
+		
 		return tables;
 	}
 	
@@ -952,38 +991,37 @@ public class RespParser {
 		 * region_name - the value to region name
 		 * region_alias[2] - the alias id to this region
 		 *******************************************************/
-		Region[] regions = null;
-		try{
-			//get the amount to staff
-			int nRegion = response.body[0];
+		//get the amount to region
+		int nRegion = response.body[0];
+		
+		Region[] regions = new Region[nRegion];
 			
-			if(nRegion > 0){
-				regions = new Region[nRegion];
-				
-				int offset = 1;
-				for(int i = 0; i < regions.length; i++){
+		int offset = 1;
+		for(int i = 0; i < regions.length; i++){
+			
+			regions[i] = new Region();
+			
+			//get the length to this region name
+			int nameLen = response.body[offset];
+			offset++;
+			
+			//get the value to this region name
+			if(nameLen > 0){
+				try{
+					regions[i].name = new String(response.body, offset, nameLen, "UTF-16BE");
+				}catch(UnsupportedEncodingException e){
 					
-					regions[i] = new Region();
-					
-					//get the length to this region name
-					int nameLen = response.body[offset];
-					offset++;
-					
-					//get the value to this region name
-					if(nameLen > 0){
-						regions[i].name = new String(response.body, offset, nameLen, "UTF-16BE");
-						offset += nameLen;
-					}
-					
-					//get the region alias
-					regions[i].regionID = (short)(((int)(response.body[offset] & 0x0000000FF)) | 
-										((int)(response.body[offset + 1] & 0x0000000FF) << 8));
-					offset += 2;				
 				}
-			}			
-		}catch(UnsupportedEncodingException e){
+				offset += nameLen;
+			}
 			
+			//get the region alias
+			regions[i].regionID = (short)(((int)(response.body[offset] & 0x0000000FF)) | 
+								((int)(response.body[offset + 1] & 0x0000000FF) << 8));
+			offset += 2;			
 		}
+		
 		return regions;
+
 	}
 }
