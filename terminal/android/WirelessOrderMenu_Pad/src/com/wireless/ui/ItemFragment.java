@@ -155,9 +155,7 @@ public class ItemFragment extends Fragment{
 					int groupPosition, int childPosition,
 					long id) {
 				// TODO Auto-generated method stub
-				Log.i("G:"+groupPosition,"c:"+childPosition);
 				short kitchenID = mValidKitchens.get(groupPosition).get(childPosition).aliasID;
-				Log.i("id","is "+kitchenID);
 				
 				mOnItemChangeListener.onItemChange(kitchenID);
 				return false;
