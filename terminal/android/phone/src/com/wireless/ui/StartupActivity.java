@@ -573,13 +573,11 @@ public class StartupActivity extends Activity {
 	/**
 	 * 检查版本信息的Task
 	 */
-	private class CheckVersionTask extends
-			AsyncTask<Void, Void, Boolean> {
+	private class CheckVersionTask extends AsyncTask<Void, Void, Boolean> {
 
 		private String[] _updateInfo;
 
-		private Boolean compareVer(String local,
-				String remote) {
+		private Boolean compareVer(String local, String remote) {
 
 			String[] verLocal = local.split("\\.");
 			// extract the major to local version
@@ -590,15 +588,12 @@ public class StartupActivity extends Activity {
 			int revLocal = Integer.parseInt(verLocal[2]);
 
 			char[] indicator = { 0xfeff };
-			remote = remote.replace(new String(indicator),
-					"");
+			remote = remote.replace(new String(indicator), "");
 			String[] verRemote = remote.split("\\.");
 			// extract the major to remote version
-			int majorRemote = Integer
-					.parseInt(verRemote[0]);
+			int majorRemote = Integer.parseInt(verRemote[0]);
 			// extract the major to remote version
-			int minorRemote = Integer
-					.parseInt(verRemote[1]);
+			int minorRemote = Integer.parseInt(verRemote[1]);
 			// extract the revision to remote version
 			int revRemote = Integer.parseInt(verRemote[2]);
 
@@ -630,39 +625,22 @@ public class StartupActivity extends Activity {
 			try {
 
 				// 从服务器取得OTA的配置（IP地址和端口）
-				ProtocolPackage resp = ServerConnector
-						.instance().ask(new ReqOTAUpdate());
+				ProtocolPackage resp = ServerConnector.instance().ask(new ReqOTAUpdate());
 				if (resp.header.type == Type.NAK) {
-					throw new IOException(
-							"无法获取更新服务器信息，请检查网络设置");
+					throw new IOException("无法获取更新服务器信息，请检查网络设置");
 				}
 				// parse the ip address from the response
-				String otaIP = new Short(
-						(short) (resp.body[0] & 0xFF))
-						+ "."
-						+ new Short(
-								(short) (resp.body[1] & 0xFF))
-						+ "."
-						+ new Short(
-								(short) (resp.body[2] & 0xFF))
-						+ "."
-						+ new Short(
-								(short) (resp.body[3] & 0xFF));
-				int otaPort = (resp.body[4] & 0x000000FF)
-						| ((resp.body[5] & 0x000000FF) << 8);
+				String otaIP = new Short((short)(resp.body[0] & 0xFF)) + "." + 
+							   new Short((short)(resp.body[1] & 0xFF)) + "." + 
+							   new Short((short)(resp.body[2] & 0xFF)) + "." + 
+							   new Short((short)(resp.body[3] & 0xFF));
+				int otaPort = (resp.body[4] & 0x000000FF) | ((resp.body[5] & 0x000000FF) << 8);
 
-				conn = (HttpURLConnection) new URL(
-						"http://"
-								+ otaIP
-								+ ":"
-								+ otaPort
-								+ "/ota/android/phone/version.php")
-						.openConnection();
+				conn = (HttpURLConnection) new URL("http://" + otaIP + ":" + otaPort + "/ota/android/phone/version.php").openConnection();
 
 				// conn.setRequestProperty("Charset", "UTF-8");
 				BufferedReader reader = new BufferedReader(
-						new InputStreamReader(
-								conn.getInputStream()));
+											new InputStreamReader(conn.getInputStream()));
 				StringBuffer updateString = new StringBuffer();
 				String inputLine;
 				while ((inputLine = reader.readLine()) != null) {
@@ -670,20 +648,16 @@ public class StartupActivity extends Activity {
 				}
 				reader.close();
 
-				_updateInfo = updateString.toString()
-						.trim().split("</br>");
+				_updateInfo = updateString.toString().trim().split("</br>");
 
-				return compareVer(
-						getPackageManager().getPackageInfo(
-								StartupActivity.this
-										.getPackageName(),
-								0).versionName.trim(),
-						_updateInfo[0]);
+				return compareVer(getPackageManager().getPackageInfo(StartupActivity.this.getPackageName(),	0).versionName.trim(), _updateInfo[0]);
 
 			} catch (NameNotFoundException e) {
 				return Boolean.FALSE;
+				
 			} catch (IOException e) {
 				return Boolean.FALSE;
+				
 			} finally {
 				if (conn != null) {
 					conn.disconnect();
@@ -701,16 +675,11 @@ public class StartupActivity extends Activity {
 						StartupActivity.this)
 						.setTitle("提示")
 						.setMessage(_updateInfo[1])
-						.setNeutralButton(
-								"确定",
+						.setNeutralButton("确定",
 								new DialogInterface.OnClickListener() {
 									@Override
-									public void onClick(
-											DialogInterface dialog,
-											int which) {
-										new ApkDownloadTask(
-												_updateInfo[2])
-												.execute();
+									public void onClick(DialogInterface dialog,	int which) {
+										new ApkDownloadTask(_updateInfo[2]).execute();
 									}
 								}).show();
 			} else {
@@ -724,15 +693,12 @@ public class StartupActivity extends Activity {
 	 * @author Ying.Zhang
 	 * 
 	 */
-	private class ApkDownloadTask extends
-			AsyncTask<Void, Void, String> {
+	private class ApkDownloadTask extends AsyncTask<Void, Void, String> {
 
 		private ProgressDialog _progDialog;
 		private String _url;
 		private String _fileName;
-		private final String FILE_DIR = android.os.Environment
-				.getExternalStorageDirectory().getPath()
-				+ "/digi-e/download/";
+		private final String FILE_DIR = android.os.Environment.getExternalStorageDirectory().getPath() + "/digi-e/download/";
 
 		ApkDownloadTask(String url) {
 			_url = url;
@@ -740,10 +706,8 @@ public class StartupActivity extends Activity {
 
 		@Override
 		protected void onPreExecute() {
-			_progDialog = new ProgressDialog(
-					StartupActivity.this);
-			_progDialog
-					.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);// 设置风格为长进度条
+			_progDialog = new ProgressDialog(StartupActivity.this);
+			_progDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);// 设置风格为长进度条
 			_progDialog.setTitle("提示");// 设置标题
 			_progDialog.setMessage("正在下载中...请稍侯");
 			_progDialog.setIndeterminate(false);// 设置进度条是否为不明确 false 就是不设置为不明确
@@ -760,9 +724,7 @@ public class StartupActivity extends Activity {
 			OutputStream fos = null;
 			String errMsg = null;
 			HttpURLConnection conn = null;
-			_fileName = _url.substring(
-					_url.lastIndexOf("/") + 1,
-					_url.length());
+			_fileName = _url.substring(_url.lastIndexOf("/") + 1, _url.length());
 			try {
 				// create the file
 				File dir = new File(FILE_DIR);
@@ -776,8 +738,7 @@ public class StartupActivity extends Activity {
 				file.createNewFile();
 
 				// open the http URL and create the input stream
-				conn = (HttpURLConnection) new URL(_url)
-						.openConnection();
+				conn = (HttpURLConnection) new URL(_url).openConnection();
 				InputStream is = conn.getInputStream();
 				// get the size to apk file
 				int fileSize = conn.getContentLength();
@@ -789,12 +750,10 @@ public class StartupActivity extends Activity {
 				byte[] buf = new byte[BUF_SIZE];
 				int bytesToRead = 0;
 				int recvSize = 0;
-				while ((bytesToRead = is.read(buf, 0,
-						BUF_SIZE)) != -1) {
+				while ((bytesToRead = is.read(buf, 0, BUF_SIZE)) != -1) {
 					fos.write(buf, 0, bytesToRead);
 					recvSize += bytesToRead;
-					int progress = recvSize * 100
-							/ fileSize;
+					int progress = recvSize * 100 / fileSize;
 					_progDialog.setProgress(progress);
 				}
 
@@ -836,13 +795,9 @@ public class StartupActivity extends Activity {
 								}).show();
 			} else {
 				// 得到Intent对象，其Action为ACTION_VIEW.
-				Intent intent = new Intent(
-						Intent.ACTION_VIEW);
+				Intent intent = new Intent(Intent.ACTION_VIEW);
 				// 同时Intent对象设置数据类型
-				intent.setDataAndType(
-						Uri.fromFile(new File(FILE_DIR
-								+ _fileName)),
-						"application/vnd.android.package-archive");
+				intent.setDataAndType(Uri.fromFile(new File(FILE_DIR + _fileName)),	"application/vnd.android.package-archive");
 				startActivity(intent);
 			}
 		}
