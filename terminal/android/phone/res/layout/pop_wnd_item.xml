@@ -3,8 +3,7 @@
         android:id="@+id/pop_wnd_item_text"
         android:layout_width="fill_parent"
         android:layout_height="38dp"
-        android:paddingBottom="6dp"
-        android:paddingTop="6dp"
+        android:padding="10dp"
         android:text="Large Text"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 

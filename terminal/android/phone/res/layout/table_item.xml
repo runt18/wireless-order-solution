@@ -4,13 +4,15 @@
     android:layout_height="match_parent"
      android:descendantFocusability="blocksDescendants"
      >
-
+
     <RelativeLayout
         android:id="@+id/table_item_layout"
         android:layout_width="fill_parent"
         android:layout_height="56dp"
         android:layout_alignParentLeft="true"
-        android:layout_centerVertical="true" >
+        android:layout_centerVertical="true"
+        android:background="@drawable/table_item_selector"
+        android:descendantFocusability="blocksDescendants" >
 
         <TextView
             android:id="@+id/table_id_text"
@@ -88,24 +90,22 @@
             android:textColor="@color/blue" />
 
     </RelativeLayout>
-
+
     <ImageButton
         android:id="@+id/add_table"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:layout_marginRight="8dp"
         android:background="@color/transparent"
         android:focusable="false"
         android:src="@drawable/table_add_btn_selector" />
-
+
         <ImageButton
             android:id="@+id/switch_table"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginRight="6dp"
             android:layout_toLeftOf="@+id/add_table"
             android:background="@color/transparent"
             android:focusable="false"

@@ -43,6 +43,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -370,19 +371,20 @@ public class TableActivity extends Activity {
 					View view = super.getView(position, convertView, parent);
 					final Map<String, ?> map = contents.get(position);
 					view.setTag(map.get(ITEM_TAG_ID));
-					
+					//TODO
 					/*
 					 * set different table state's name color with state 
 					 */
 					short tblStatus = (Short)map.get(ITEM_TAG_STATE);
 					TextView stateTxtView = (TextView)view.findViewById(R.id.table_state);
+					RelativeLayout itemLayout = (RelativeLayout) view.findViewById(R.id.table_item_layout);
 					if(tblStatus == (short)Table.TABLE_BUSY){
 						stateTxtView.setTextColor(Color.RED);
-						view.setBackgroundResource(R.drawable.busy_item_bg);
+						itemLayout.setBackgroundResource(R.drawable.busy_item_bg);
 						
 					}else{
 						stateTxtView.setTextColor(view.getResources().getColor(R.color.green));
-						view.setBackgroundDrawable(view.getResources().getDrawable(R.drawable.white_drawable));
+						itemLayout.setBackgroundResource(R.drawable.table_item_selector);
 					}
 					
 					((ImageButton)view.findViewById(R.id.add_table)).setOnClickListener(new OnClickListener(){			
