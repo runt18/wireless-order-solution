@@ -480,6 +480,7 @@ public class StartupActivity extends Activity {
 				.setMessage(errMsg)
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
+						//TODO 改到设置页面
 						Intent intent = new Intent(StartupActivity.this, MainActivity.class);
 						startActivity(intent);
 						finish();
@@ -493,6 +494,7 @@ public class StartupActivity extends Activity {
 					               .setMessage("没有查询到任何的员工信息，请先在管理后台添加员工信息")
 					               .setPositiveButton("确定", new DialogInterface.OnClickListener() {
 					            	   public void onClick(DialogInterface dialog, int id) {
+					            		 //TODO 改到设置页面
 											Intent intent = new Intent(StartupActivity.this, MainActivity.class);
 											startActivity(intent);
 											finish();
@@ -571,6 +573,7 @@ public class StartupActivity extends Activity {
 				.setMessage(errMsg)
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
+						//TODO 改到设置页面
 						Intent intent = new Intent(StartupActivity.this, MainActivity.class);
 						startActivity(intent);
 						finish();
@@ -630,6 +633,7 @@ public class StartupActivity extends Activity {
 				.setMessage(errMsg)
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
+						//TODO 改到设置页面
 						Intent intent = new Intent(StartupActivity.this, MainActivity.class);
 						startActivity(intent);
 						finish();
@@ -689,6 +693,7 @@ public class StartupActivity extends Activity {
 				.setMessage(errMsg)
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
+						//TODO 改到设置页面
 						Intent intent = new Intent(StartupActivity.this, MainActivity.class);
 						startActivity(intent);
 						finish();
@@ -749,6 +754,7 @@ public class StartupActivity extends Activity {
 				.setMessage(errMsg)
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
+						//TODO 改到设置页面
 						Intent intent = new Intent(StartupActivity.this, MainActivity.class);
 						startActivity(intent);
 						finish();						

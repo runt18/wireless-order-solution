@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,7 +15,6 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
-import android.widget.ExpandableListView.OnGroupCollapseListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -24,20 +24,20 @@ import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
 
 public class ItemFragment extends Fragment{
-	private ArrayList<Kitchen> mValidKitchens;
+	private ArrayList<Kitchen> mAllKitchens;
 	private ArrayList<Department> mValidDepts;
-	private List<List<Kitchen>> mKitchenChild;//分厨
+	private List<List<Kitchen>> mValidKitchens;//分厨
 	
 	ExpandableListView mKitchenLstView;
 	
-	private static OnItemChangeListener onItemChangeListener;
+	private static OnItemChangeListener mOnItemChangeListener;
 
 	public interface OnItemChangeListener{
-		void onItemChange(int position);
+		void onItemChange(int value);
 	}
 	
 	public static void setItemChangeListener(OnItemChangeListener l){
-		onItemChangeListener = l;
+		mOnItemChangeListener = l;
 	}
 	
 	@Override
@@ -67,7 +67,7 @@ public class ItemFragment extends Fragment{
 
 			@Override
 			public int getChildrenCount(int groupPosition) {
-				return mKitchenChild.get(groupPosition).size();
+				return mValidKitchens.get(groupPosition).size();
 			}
 
 			@Override
@@ -77,7 +77,7 @@ public class ItemFragment extends Fragment{
 
 			@Override
 			public Object getChild(int groupPosition, int childPosition) {
-				return mKitchenChild.get(groupPosition).get(childPosition);
+				return mValidKitchens.get(groupPosition).get(childPosition);
 			}
 
 			@Override
@@ -125,7 +125,7 @@ public class ItemFragment extends Fragment{
 				} else {
 					view = View.inflate(ItemFragment.this.getActivity(), R.layout.xpd_lstview_child, null);
 				}
-				((TextView) view.findViewById(R.id.mychild)).setText(mKitchenChild.get(groupPosition).get(childPosition).name);
+				((TextView) view.findViewById(R.id.mychild)).setText(mValidKitchens.get(groupPosition).get(childPosition).name);
 				return view;
 			}
 
@@ -140,9 +140,9 @@ public class ItemFragment extends Fragment{
 			}
 		});
 	   
+	   mKitchenLstView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 	   return fragmentView;
    }
-	
 	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState)
@@ -155,11 +155,23 @@ public class ItemFragment extends Fragment{
 					int groupPosition, int childPosition,
 					long id) {
 				// TODO Auto-generated method stub
-
-				onItemChangeListener.onItemChange(childPosition);
+				Log.i("G:"+groupPosition,"c:"+childPosition);
+				short kitchenID = mValidKitchens.get(groupPosition).get(childPosition).aliasID;
+				Log.i("id","is "+kitchenID);
+				
+				mOnItemChangeListener.onItemChange(kitchenID);
 				return false;
 			}
 		});
+	}
+	
+	@Override
+	public void onAttach(Activity activity){
+		super.onAttach(activity);
+		if(!(activity instanceof OnItemChangeListener))
+			throw new IllegalStateException("Activity must implement fragment's OnItemChangeListener");
+		
+		mOnItemChangeListener = (OnItemChangeListener) activity;
 	}
 	
    private void prepareDatas(){
@@ -187,7 +199,7 @@ public class ItemFragment extends Fragment{
 		/**
 		 * 使用二分查找算法筛选出有菜品的厨房
 		 */
-		mValidKitchens = new ArrayList<Kitchen>();
+		mAllKitchens = new ArrayList<Kitchen>();
 		for (int i = 0; i < WirelessOrder.foodMenu.kitchens.length; i++) {
 			Food keyFood = new Food();
 			keyFood.kitchen.aliasID = WirelessOrder.foodMenu.kitchens[i].aliasID;
@@ -206,7 +218,7 @@ public class ItemFragment extends Fragment{
 					});
 
 			if (index >= 0) {
-				mValidKitchens.add(WirelessOrder.foodMenu.kitchens[i]);
+				mAllKitchens.add(WirelessOrder.foodMenu.kitchens[i]);
 			}
 		}
 		
@@ -216,8 +228,8 @@ public class ItemFragment extends Fragment{
 	   
 		mValidDepts = new ArrayList<Department>();
 		for (int i = 0; i < WirelessOrder.foodMenu.depts.length; i++) {
-			for (int j = 0; j < mValidKitchens.size(); j++) {
-				if (WirelessOrder.foodMenu.depts[i].deptID == mValidKitchens.get(j).dept.deptID) {
+			for (int j = 0; j < mAllKitchens.size(); j++) {
+				if (WirelessOrder.foodMenu.depts[i].deptID == mAllKitchens.get(j).dept.deptID) {
 					mValidDepts.add(WirelessOrder.foodMenu.depts[i]);
 					break;
 				}
@@ -227,16 +239,16 @@ public class ItemFragment extends Fragment{
 		/**
 		 * 筛选出每个部门中有菜品的厨房
 		 */
-		List<List<Kitchen>> kitchenChild = new ArrayList<List<Kitchen>>();
+		mValidKitchens = new ArrayList<List<Kitchen>>();
 		for (int i = 0; i < mValidDepts.size(); i++) {
 			List<Kitchen> kitchens = new ArrayList<Kitchen>();
-			for (int j = 0; j < mValidKitchens.size(); j++) {
-				if (mValidKitchens.get(j).dept.deptID == mValidDepts.get(i).deptID) {
-					kitchens.add(mValidKitchens.get(j));
+			for (int j = 0; j < mAllKitchens.size(); j++) {
+				if (mAllKitchens.get(j).dept.deptID == mValidDepts.get(i).deptID) {
+					kitchens.add(mAllKitchens.get(j));
 				}
 			}
-			kitchenChild.add(kitchens);
+			mValidKitchens.add(kitchens);
 		}
-		mKitchenChild = kitchenChild;
    }
 }
+

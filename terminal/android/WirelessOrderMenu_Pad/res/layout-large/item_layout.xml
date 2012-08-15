@@ -18,9 +18,11 @@
         android:layout_above="@+id/bottombar"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/logo_imgview"
+        android:childIndicator="@drawable/expandable_child_selector"
         android:fadingEdge="vertical"
         android:fadingEdgeLength="4dp"
         android:scrollbarAlwaysDrawVerticalTrack="true" >
+
     </ExpandableListView>
 
     <RelativeLayout

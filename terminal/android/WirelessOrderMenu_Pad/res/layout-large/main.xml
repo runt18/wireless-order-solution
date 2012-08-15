@@ -124,12 +124,12 @@
 
             <ImageView
                 android:id="@+id/imgView_set_table"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="72dp"
+                android:layout_height="fill_parent"
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
                 android:layout_toRightOf="@+id/textView1"
-                android:src="@drawable/white_drawable" />
+                android:src="@color/transparent" />
 
             <TextView
                 android:id="@+id/textView14"
@@ -142,12 +142,12 @@
                 android:text="人数:" />
 
             <ImageView
-                android:id="@+id/imageView6"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:id="@+id/imageView_num_people"
+                android:layout_width="72dp"
+                android:layout_height="fill_parent"
                 android:layout_centerVertical="true"
                 android:layout_toRightOf="@+id/textView14"
-                android:src="@drawable/orange_drawable" />
+                android:src="@color/transparent" />
 
             <TextView
                 android:id="@+id/textView15"
@@ -155,7 +155,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignBaseline="@+id/textView14"
                 android:layout_alignBottom="@+id/textView14"
-                android:layout_alignLeft="@+id/imageView6"
+                android:layout_alignLeft="@+id/imageView_num_people"
                 android:text="点击设置" />
 
             <TextView
@@ -213,20 +213,20 @@
                 android:text="点击设置" />
 
             <ImageView
-                android:id="@+id/imageView7"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:id="@+id/imageView_vip"
+                android:layout_width="72dp"
+                android:layout_height="fill_parent"
                 android:layout_alignLeft="@+id/textView19"
                 android:layout_centerVertical="true"
-                android:src="@drawable/orange_drawable" />
+                android:src="@color/transparent" />
 
             <ImageView
-                android:id="@+id/imageView8"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:id="@+id/imageView_server"
+                android:layout_width="72dp"
+                android:layout_height="fill_parent"
                 android:layout_alignLeft="@+id/textView21"
                 android:layout_centerVertical="true"
-                android:src="@drawable/orange_drawable" />
+                android:src="@color/transparent" />
 
         </RelativeLayout>
     </LinearLayout>
@@ -355,7 +355,7 @@
         android:layout_height="40dp"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="40dp"
-        android:visibility="gone" >
+        android:visibility="visible" >
 
         <LinearLayout
             android:layout_width="fill_parent"
