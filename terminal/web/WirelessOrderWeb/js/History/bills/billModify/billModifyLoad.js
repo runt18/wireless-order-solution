@@ -185,17 +185,17 @@ function billModifyOnLoad() {
 								if (orderedData[i][9] == "true") {
 									// 特
 									orderedData[i][0] = orderedData[i][0]
-											+ "<img src='../../images/icon_tip_te.gif'></img>";
+											+ "<img src='../../images/icon_tip_te.png'></img>";
 								}
 								if (orderedData[i][10] == "true") {
 									// 荐
 									orderedData[i][0] = orderedData[i][0]
-											+ "<img src='../../images/icon_tip_jian.gif'></img>";
+											+ "<img src='../../images/icon_tip_jian.png'></img>";
 								}
 								if (orderedData[i][11] == "true") {
 									// 停
 									orderedData[i][0] = orderedData[i][0]
-											+ "<img src='../../images/icon_tip_ting.gif'></img>";
+											+ "<img src='../../images/icon_tip_ting.png'></img>";
 								}
 								if (orderedData[i][12] == "true") {
 									// 送
@@ -402,17 +402,17 @@ function orderedMenuOnLoad() {
 							if (dishesDisplayData[i][5] == "true") {
 								// 特
 								dishesDisplayData[i][0] = dishesDisplayData[i][0]
-										+ "<img src='../../images/icon_tip_te.gif'></img>";
+										+ "<img src='../../images/icon_tip_te.png'></img>";
 							}
 							if (dishesDisplayData[i][6] == "true") {
 								// 荐
 								dishesDisplayData[i][0] = dishesDisplayData[i][0]
-										+ "<img src='../../images/icon_tip_jian.gif'></img>";
+										+ "<img src='../../images/icon_tip_jian.png'></img>";
 							}
 							if (dishesDisplayData[i][7] == "true") {
 								// 停
 								dishesDisplayData[i][0] = dishesDisplayData[i][0]
-										+ "<img src='../../images/icon_tip_ting.gif'></img>";
+										+ "<img src='../../images/icon_tip_ting.png'></img>";
 							}
 							if (dishesDisplayData[i][8] == "true") {
 								// 送

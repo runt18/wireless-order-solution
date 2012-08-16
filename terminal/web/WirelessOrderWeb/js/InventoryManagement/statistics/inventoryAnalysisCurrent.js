@@ -749,7 +749,7 @@ var currInvenAnaGrid = new Ext.grid.EditorGridPanel({
 	bbar : new Ext.Toolbar({
 		height : 23,
 		items : [
-		    {xtype:'tbtext', text:Ext.ux.txtFormat.barSum},
+		    {xtype:'tbtext', text:String.format(Ext.ux.txtFormat.barTitle, '总计')},
 		    '-',
 			'->',
 			{xtype:'tbtext', text:String.format(Ext.ux.txtFormat.barMsg, '数量', 'txtCurrInvenAnaDisplayAmount', 0)},
@@ -982,7 +982,7 @@ var inOutSumGrid = new Ext.grid.EditorGridPanel({
 	bbar : new Ext.Toolbar({
 		height : 23,
 		items : [
-			{xtype:'tbtext', text:Ext.ux.txtFormat.barSum},
+			{xtype:'tbtext', text:String.format(Ext.ux.txtFormat.barTitle, '总计')},
 		    '-',
 			'->',
 //			{xtype:'tbtext', text:String.format(Ext.ux.txtFormat.barMsg,'进货数量','txtInOutDisplayInCount',0)},
@@ -1305,7 +1305,7 @@ var inventoryAnalysisGrid = new Ext.grid.EditorGridPanel({
 	bbar : new Ext.Toolbar({
 		height : 23,
 		items : [
-		    {xtype:'tbtext', text:Ext.ux.txtFormat.barSum},
+		    {xtype:'tbtext', text:String.format(Ext.ux.txtFormat.barTitle, '总计')},
 		    '-',
 		    '->',
 //		    {xtype:'tbtext', text:String.format(Ext.ux.txtFormat.barMsg,'期初数量','txtIADisplayCountBegin',0)},

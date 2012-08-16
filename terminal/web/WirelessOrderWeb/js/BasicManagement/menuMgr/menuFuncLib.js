@@ -11,7 +11,7 @@
 		success : function(response, options) {
 			var jsonResult = Ext.util.JSON.decode(response.responseText);
 			if(eval(jsonResult.success) == true){
-				materialStore.loadData(jsonResult);
+//				materialStore.loadData(jsonResult);
 			}else{
 				Ext.MessageBox.show({
 					title : '错误',
@@ -47,7 +47,7 @@ loadAllTaste = function() {
 		},
 		success : function(response, options) {
 			var jsonResult = Ext.util.JSON.decode(response.responseText);
-			Ext.getCmp('allTasteGrid').getStore().loadData(jsonResult);
+//			Ext.getCmp('allTasteGrid').getStore().loadData(jsonResult);
 		},
 		failure : function(response, options) {
 			var jsonResult = Ext.util.JSON.decode(response.responseText);
@@ -60,3 +60,20 @@ loadAllTaste = function() {
 		}
 	});
 };
+
+
+setFiledDisabled = function(start, idList){
+	var st = true;
+	st = typeof(start) == 'boolean' ? start : st;
+	for(var i = 0; i < idList.length; i++){
+		var tp = Ext.getCmp(idList[i]);
+		if(tp){
+			tp.setDisabled(st);
+		}
+	}
+};
+
+
+
+
+

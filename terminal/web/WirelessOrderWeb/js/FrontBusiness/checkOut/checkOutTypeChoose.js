@@ -120,15 +120,15 @@ var checkOurListRefresh = function() {
 		tpItem.foodName = (tpItem.foodName.indexOf('<') > 0 ? tpItem.foodName.substring(0, tpItem.foodName.indexOf('<')) : tpItem.foodName);
 		if (tpItem.special == true) {
 			// 特
-			tpItem.foodName = tpItem.foodName + "<img src='../../images/icon_tip_te.gif'></img>";
+			tpItem.foodName = tpItem.foodName + "<img src='../../images/icon_tip_te.png'></img>";
 		}
 		if (tpItem.recommed == true) {
 			// 荐
-			tpItem.foodName = tpItem.foodName + "<img src='../../images/icon_tip_jian.gif'></img>";
+			tpItem.foodName = tpItem.foodName + "<img src='../../images/icon_tip_jian.png'></img>";
 		}
 		if (tpItem.soldout == true) {
 			// 停
-			tpItem.foodName = tpItem.foodName + "<img src='../../images/icon_tip_ting.gif'></img>";
+			tpItem.foodName = tpItem.foodName + "<img src='../../images/icon_tip_ting.png'></img>";
 		}
 		if (tpItem.gift == true) {
 			// 赠

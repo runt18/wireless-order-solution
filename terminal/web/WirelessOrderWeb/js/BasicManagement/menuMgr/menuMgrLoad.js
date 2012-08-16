@@ -23,17 +23,19 @@
 								materialComboData.push([
 										rootData[i].materialID,
 										rootData[i].materialName,
-										rootData[i].cateID ]);
+										rootData[i].cateID 
+								]);
 							}
 							for ( var i = 0; i < materialComboData.length; i++) {
 								if (materialComboData[i][2] == materialComboData[0][2]) {
 									materialComboDisplayData.push([
 											materialComboData[i][0],
 											materialComboData[i][1],
-											materialComboData[i][2] ]);
+											materialComboData[i][2]
+									]);
 								}
 							}
-							materialAddStore.loadData(materialComboDisplayData);
+//							materialAddStore.loadData(materialComboDisplayData);
 						} else {
 							Ext.MessageBox.show({
 								msg : rootData[0].message,
@@ -67,12 +69,12 @@ function loadAllDishes() {
 				var josnData = resultJSON.data;
 				var menuList = josnData.split("，");
 				for ( var i = 0; i < menuList.length; i++) {
-					var menuInfo = menuList[i]
-							.substr(1, menuList[i].length - 2).split(",");
+					var menuInfo = menuList[i].substr(1, menuList[i].length - 2).split(",");
 					// 格式：[菜品编号，菜品名称]
 					// 后台格式：[厨房编号,"菜品名称",菜品编号,"菜品拼音","￥菜品单价",特,荐,停,送,時]
-					dishMultSelectData.push([ menuInfo[2],// 菜名编号
-					menuInfo[1].substr(1, menuInfo[1].length - 2) // 菜名
+					dishMultSelectData.push([ 
+					    menuInfo[2],// 菜名编号
+					    menuInfo[1].substr(1, menuInfo[1].length - 2) // 菜名
 					]);
 				}
 			}
@@ -99,10 +101,12 @@ function loadMaterialCate() {
 			if (rootData.length != 0) {
 				if (rootData[0].message == "normal") {
 					for ( var i = 0; i < rootData.length; i++) {
-						materialCateComboData.push([ rootData[i].cateID,
-								rootData[i].cateName ]);
+						materialCateComboData.push([ 
+						    rootData[i].cateID,
+							rootData[i].cateName 
+						]);
 					}
-					materialCateCombAdd.store.loadData(materialCateComboData);
+//					materialCateCombAdd.store.loadData(materialCateComboData);
 				} else {
 					Ext.MessageBox.show({
 						msg : rootData[0].message,
@@ -147,11 +151,11 @@ function menuMgrOnLoad() {
 				var josnData = resultJSON.data;
 				var keichenList = josnData.split("，");
 				for ( var i = 0; i < keichenList.length; i++) {
-					var keichenInfo = keichenList[i].substr(1,
-							keichenList[i].length - 2).split(",");
-					kitchenTypeData.push([ keichenInfo[0],// 厨房编号
-					keichenInfo[2], // 厨房名称
-					keichenInfo[1] // 厨房id
+					var keichenInfo = keichenList[i].substr(1, keichenList[i].length - 2).split(",");
+					kitchenTypeData.push([
+					    keichenInfo[0],// 厨房编号
+					    keichenInfo[2], // 厨房名称
+					    keichenInfo[1] // 厨房id
 					]);
 				}
 				kitchenTypeData.push([ 255, "空", -1 ]);
@@ -170,7 +174,7 @@ function menuMgrOnLoad() {
 		}
 	});
 
-	loadAllDishes();
+//	loadAllDishes();
 	loadAllMaterial();
 	loadMaterialCate();
 };

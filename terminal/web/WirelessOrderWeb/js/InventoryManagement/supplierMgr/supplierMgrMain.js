@@ -672,68 +672,7 @@ Ext
 						});
 						this.removeAll();
 					} else {
-						// menuGrid
-						// .getStore()
-						// .each(
-						// function(record) {
-						// // 廚房顯示
-						// for ( var i = 0; i < kitchenTypeData.length; i++) {
-						// if (record
-						// .get("kitchen") == kitchenTypeData[i][0]) {
-						// record
-						// .set(
-						// "kitchenDisplay",
-						// kitchenTypeData[i][1]);
-						// }
-						// }
-						// // 菜品狀態顯示
-						// record
-						// .set(
-						// "dishNameDisplay",
-						// record
-						// .get("dishName"));
-						// if (record
-						// .get("special") == true) {
-						// record
-						// .set(
-						// "dishNameDisplay",
-						// record
-						// .get("dishNameDisplay")
-						// + "<img src='../../images/icon_tip_te.gif'></img>");
-						// }
-						// if (record
-						// .get("recommend") == true) {
-						// record
-						// .set(
-						// "dishNameDisplay",
-						// record
-						// .get("dishNameDisplay")
-						// + "<img
-						// src='../../images/icon_tip_jian.gif'></img>");
-						// }
-						// if (record
-						// .get("stop") == true) {
-						// record
-						// .set(
-						// "dishNameDisplay",
-						// record
-						// .get("dishNameDisplay")
-						// + "<img
-						// src='../../images/icon_tip_ting.gif'></img>");
-						// }
-						// if (record
-						// .get("free") == true) {
-						// record
-						// .set(
-						// "dishNameDisplay",
-						// record
-						// .get("dishNameDisplay")
-						// + "<img src='../../images/forFree.png'></img>");
-						// }
-						//
-						// // 提交，去掉修改標記
-						// record.commit();
-						// });
+						
 					}
 				}
 			});

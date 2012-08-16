@@ -13,11 +13,12 @@
  */
 Ext.ux.txtFormat = {
 	barMsg : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{0}:&nbsp;<span id="{1}" style="color:green; font-size:15px; font-weight:bold;">{2}</span>',
-	barSum : '<span style="font-weight:bold; font-size:13px;">总计</span>',
-	typeName : '<div style="float:left; width:100px;">&nbsp;类别:&nbsp;<span id="{0}" style="color:green; font-weight:bold; font-size:13px;">{1}</span></div>',
+	barTitle : '<span style="font-weight:bold; font-size:13px;">{0}</span>',
+	typeName : '<div style="float:left; width:100px;">&nbsp;{0}:&nbsp;<span id="{1}" style="color:green; font-weight:bold; font-size:13px;">{2}</span></div>',
 	linkClassOne : '<a id="{0}" href="{1}" onClick="{2}" style="color:green; font-size:15px; font-weight:bold;">{3}</a>',
+	renderer : '<a href="javascript:{0}({1})" {2}>{3}</a>',
 	gridDou : function(_v){
-		return _v != '' ? (parseFloat(_v).toFixed(2) + '&nbsp;&nbsp;') : _v;
+		return _v == '' ? '0.00&nbsp;&nbsp;' : (parseFloat(_v).toFixed(2) + '&nbsp;&nbsp;');
 	},
 	getDate : function(){
 		var nd = new Date(), r = '';
@@ -230,12 +231,12 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 		ds : g_store, // 数据源
 		cm : g_cm, // 列模型
 		sm : cmData[0][1] ? g_ckbox : null, // 全选
-		stripeRows : true, // 奇偶行颜色
+//		stripeRows : true, // 奇偶行颜色
 		loadMask : { msg: '数据请求中，请稍后...' }, // 加载数据时遮蔽表格
 		border : true, // 加上边框
 		frame : true, // 显示天蓝色圆角框
-		animCollapse : false, // 收缩/展开
-		animate : false, // 动画效果
+//		animCollapse : false, // 收缩/展开
+//		animate : false, // 动画效果
 		autoScroll : true,
 		height : height, // 高度
 		width : width, // 宽度
@@ -282,7 +283,13 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 	return g_gridPanel;
 };
 
+/**
+ * 
+ */
 Ext.ux.showMsg = function(msg){
+	if(msg == null || typeof(msg) == 'undefined'){
+		return false;
+	}
 	msg.msg = msg.code == '' || parseInt(msg.code) == 1111 ? msg.msg : String.format('错误代码:{0},错误信息:{1}', msg.code, msg.msg);
 	Ext.MessageBox.show({
 		title : msg.title,
@@ -290,4 +297,31 @@ Ext.ux.showMsg = function(msg){
 		autoWidth : true,
 		buttons : Ext.MessageBox.OK
 	});
+};
+
+/**
+ * 
+ */
+Ext.ux.formatFoodName = function(record){
+	var img = '';
+	if (record.get('special') == true) {
+		img += '&nbsp;<img src="../../images/icon_tip_te.png"></img>';
+	}
+	if (record.get('recommend') == true) {
+		img += '&nbsp;<img src="../../images/icon_tip_jian.png"></img>';
+	}
+	if (record.get('stop') == true) {
+		img += '&nbsp;<img src="../../images/icon_tip_ting.png"></img>';
+	}
+	if (record.get('gift') == true) {
+		img += '&nbsp;<img src="../../images/forFree.png"></img>';
+	}
+	if (record.get('currPrice') == true) {
+		img += '&nbsp;<img src="../../images/currPrice.png"></img>';
+	}
+	if (record.get('combination') == true) {
+		img += '&nbsp;<img src="../../images/combination.png"></img>';
+	}
+	record.set('displayFoodName', record.get('foodName') + img);
+	record.commit();
 };

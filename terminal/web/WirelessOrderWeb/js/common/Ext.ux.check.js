@@ -143,18 +143,10 @@ Ext.ux.RegCheck = function(jsonList){
 Ext.ux.getSelData = function(_id){
 	var score_grid = Ext.getCmp(_id);
 	var records = score_grid.getSelectionModel().getSelections();
-	if(records.length == 0 || records.length > 1){		
-//		Ext.Msg.show({
-//			title:'提示', 
-//			autoWidth:true, 
-//			msg:'操作提示,请选中一条数据，再进行操作！', 
-//			buttons:Ext.Msg.OK
-//		});
+	if(records.length == 0 || records.length > 1){
 		return false;
 	}
-	var index = records.length - 1;
-	
-	return records[index].data;
+	return records[0].data;
 };
 
 /**

@@ -140,15 +140,15 @@ function billModifyOnLoad() {
 					var tpItem = orderedData.root[i];
 					if (tpItem.special == true) {
 						// 特
-						tpItem.foodName = tpItem.foodName + "<img src='../../images/icon_tip_te.gif'></img>";
+						tpItem.foodName = tpItem.foodName + "<img src='../../images/icon_tip_te.png'></img>";
 					}
 					if (tpItem.recommed == true) {
 						// 荐
-						tpItem.foodName = tpItem.foodName + "<img src='../../images/icon_tip_jian.gif'></img>";
+						tpItem.foodName = tpItem.foodName + "<img src='../../images/icon_tip_jian.png'></img>";
 					}
 					if (tpItem.soldout == true) {
 						// 停
-						tpItem.foodName = tpItem.foodName + "<img src='../../images/icon_tip_ting.gif'></img>";
+						tpItem.foodName = tpItem.foodName + "<img src='../../images/icon_tip_ting.png'></img>";
 					}
 					if (tpItem.gift == true) {
 						// 赠
@@ -346,17 +346,17 @@ function orderedMenuOnLoad() {
 							if (dishesDisplayData[i][5] == "true") {
 								// 特
 								dishesDisplayData[i][0] = dishesDisplayData[i][0]
-										+ "<img src='../../images/icon_tip_te.gif'></img>";
+										+ "<img src='../../images/icon_tip_te.png'></img>";
 							}
 							if (dishesDisplayData[i][6] == "true") {
 								// 荐
 								dishesDisplayData[i][0] = dishesDisplayData[i][0]
-										+ "<img src='../../images/icon_tip_jian.gif'></img>";
+										+ "<img src='../../images/icon_tip_jian.png'></img>";
 							}
 							if (dishesDisplayData[i][7] == "true") {
 								// 停
 								dishesDisplayData[i][0] = dishesDisplayData[i][0]
-										+ "<img src='../../images/icon_tip_ting.gif'></img>";
+										+ "<img src='../../images/icon_tip_ting.png'></img>";
 							}
 							if (dishesDisplayData[i][8] == "true") {
 								// 送
