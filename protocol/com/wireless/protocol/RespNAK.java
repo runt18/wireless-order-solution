@@ -16,9 +16,9 @@ public class RespNAK extends RespPackage{
 	 * @param reqHeader the request header help to build the NAK
 	 * @param errCode one of the error values specified in class ErrorCode 
 	 */
-	public RespNAK(ProtocolHeader reqHeader, byte errCode){
+	public RespNAK(ProtocolHeader reqHeader, int errCode){
 		super(reqHeader);
 		header.type = Type.NAK;
-		header.reserved = errCode;
+		header.reserved = (byte)errCode;
 	}
 }
