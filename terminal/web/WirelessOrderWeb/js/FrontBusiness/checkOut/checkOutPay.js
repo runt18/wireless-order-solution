@@ -65,7 +65,7 @@
 				if (resultJSON.success == true) {
 					var dataInfo = resultJSON.data;
 					Ext.MessageBox.show({
-						msg : dataInfo,
+						msg : ('<center>' + dataInfo + '.&nbsp;<span id="returnInterval" style="color:red;"></span>&nbsp;之后自动跳转.</center>'),
 						width : 300,
 						buttons : Ext.MessageBox.OK,
 						fn : function() {
@@ -77,7 +77,24 @@
 							}
 						}
 					});
+					
 					setFormButtonStatus(false);
+					
+					var interval = 3;
+					if (submitType != 6) {
+						new Ext.util.TaskRunner().start({
+							run: function(){
+								if(interval <= 0){
+									location.href = "TableSelect.html?pin="
+										+ Request["pin"] + "&restaurantID="
+										+ restaurantID;
+								}
+								Ext.getDom('returnInterval').innerHTML = interval;
+								interval--;
+						    },
+						    interval : 1000
+						});
+					}
 				} else {
 					setFormButtonStatus(false);
 
