@@ -363,6 +363,10 @@
 			type="com.wireless.Actions.menuMgr.DeleteFoodTasteAction" scope="request"></action>	
 		<action path="/UpdateFoodTaste" 
 			type="com.wireless.Actions.menuMgr.UpdateFoodTasteAction" scope="request"></action>
+		<action path="/QueryFoodCombination" 
+			type="com.wireless.Actions.menuMgr.QueryFoodCombinationAction" scope="request"></action>
+		<action path="/UpdateFoodCombination" 
+			type="com.wireless.Actions.menuMgr.UpdateFoodCombinationAction" scope="request"></action>
 	</action-mappings>
 	
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
