@@ -1,19 +1,52 @@
 .btn_search {
-    background-image: url(../images/search.gif) !important;
+    background-image: url(../images/btnSearch.gif) !important;
 }
 
 .btn_add {
-    background-image: url(../images/add.gif) !important;
+    background-image: url(../images/btnAdd.gif) !important;
 }
 
 .btn_delete {
-    background-image: url(../images/delete.png) !important;
+    background-image: url(../images/btnDelete.png) !important;
 }
 
 .btn_edit {
-    background-image: url(../images/edit.png) !important;
+    background-image: url(../images/btnEdit.png) !important;
 }
 
 .btn_refresh {
-    background-image: url(../images/refresh.png) !important;
+    background-image: url(../images/btnRefresh.png) !important;
+}
+
+.btn_save {
+    background-image: url(../images/btnSave.png) !important;
+}
+
+.btn_close {
+    background-image: url(../images/btnClose.png) !important;
+}
+
+.btn_app {
+    background-image: url(../images/btnApp.png) !important;
+}
+
+.btn_next {
+    background-image: url(../images/btnNext.png) !important;
+}
+
+.btn_previous {
+    background-image: url(../images/btnPrevious.png) !important;
+}
+
+a{
+	color: blue;
+	text-decoration: none;
+}
+a:link { 
+	text-decoration: none;
+	color: blue;
+}
+a:hover { 
+	text-decoration: underline;
+	color: green;
 }
