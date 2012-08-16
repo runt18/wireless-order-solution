@@ -14,7 +14,7 @@ public class BusinessException extends Exception{
 	/**
 	 * one of the error values specified in class ErrorCode 
 	 */
-	public byte errCode = ErrorCode.UNKNOWN;	
+	public int errCode = ErrorCode.UNKNOWN;	
 	
 	/**
 	 * Construct the exception with "unknown" error code
@@ -28,7 +28,7 @@ public class BusinessException extends Exception{
 	 * Construct the exception with the specified error code
 	 * @param errCode one of the error values specified in class ErrorCode
 	 */
-	public BusinessException(byte errCode){
+	public BusinessException(int errCode){
 		this.errCode = errCode;
 	}
 	
@@ -37,7 +37,7 @@ public class BusinessException extends Exception{
 	 * @param errMsg the error string
 	 * @param errCode one of the error values specified in class ErrorCode
 	 */
-	public BusinessException(String errMsg, byte errCode){
+	public BusinessException(String errMsg, int errCode){
 		super(errMsg);
 		this.errCode = errCode;
 	}

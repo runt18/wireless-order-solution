@@ -1,31 +1,34 @@
 package com.wireless.pojo.menuMgr;
 
-public class FoodMaterial {
+public class FoodMaterial extends FoodBasic{
 	
-	private long foodId;
-	private long cateId;
-	private long restaurantId;
-	private float consumption;
-	private long materialId;
-	private long materialAlias;
-	private String materialName;
-	public long getFoodId() {
-		return foodId;
+	private int cateID;				// 食材种类编号
+	private String cateName;		// 食材种类名称
+	private int restaurantID;		// 餐厅编号
+	private float consumption;		// 食材消耗数量
+	private int materialID;			// 食材数据编号
+	private int materialAliasID;	// 食材自定义编号
+	private String materialName;	// 食材名称
+	private float price;			// 食材价格
+	
+	
+	public int getCateID() {
+		return cateID;
 	}
-	public void setFoodId(long foodId) {
-		this.foodId = foodId;
+	public void setCateID(int cateID) {
+		this.cateID = cateID;
 	}
-	public long getCateId() {
-		return cateId;
+	public String getCateName() {
+		return cateName;
 	}
-	public void setCateId(long cateId) {
-		this.cateId = cateId;
+	public void setCateName(String cateName) {
+		this.cateName = cateName;
 	}
-	public long getRestaurantId() {
-		return restaurantId;
+	public int getRestaurantID() {
+		return restaurantID;
 	}
-	public void setRestaurantId(long restaurantId) {
-		this.restaurantId = restaurantId;
+	public void setRestaurantID(int restaurantID) {
+		this.restaurantID = restaurantID;
 	}
 	public float getConsumption() {
 		return consumption;
@@ -33,17 +36,17 @@ public class FoodMaterial {
 	public void setConsumption(float consumption) {
 		this.consumption = consumption;
 	}
-	public long getMaterialId() {
-		return materialId;
+	public int getMaterialID() {
+		return materialID;
 	}
-	public void setMaterialId(long materialId) {
-		this.materialId = materialId;
+	public void setMaterialID(int materialID) {
+		this.materialID = materialID;
 	}
-	public long getMaterialAlias() {
-		return materialAlias;
+	public int getMaterialAliasID() {
+		return materialAliasID;
 	}
-	public void setMaterialAlias(long materialAlias) {
-		this.materialAlias = materialAlias;
+	public void setMaterialAliasID(int materialAliasID) {
+		this.materialAliasID = materialAliasID;
 	}
 	public String getMaterialName() {
 		return materialName;
@@ -51,7 +54,11 @@ public class FoodMaterial {
 	public void setMaterialName(String materialName) {
 		this.materialName = materialName;
 	}
-	
-	
+	public float getPrice() {
+		return price;
+	}
+	public void setPrice(float price) {
+		this.price = price;
+	}
 	
 }

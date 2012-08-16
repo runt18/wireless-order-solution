@@ -6,89 +6,129 @@ public class FoodBasic {
 	
 	private int restaurantID;        // 餐厅编号
 	private int foodID;				 // 菜品数据库编号
-	private int foodAlias;			 // 菜品自定义编号
-	private String foodName;			 // 菜品编号
+	private int foodAliasID;		 // 菜品自定义编号
+	private String foodName;	     // 菜品编号
 	private String pinyin;			 // 菜品拼音
-	private float unitPriec;	     // 菜品单价
-	private int kitchenId;		 	 // 菜品所属厨房数据库编号
-	private int kitchenAlias;		 // 菜品所属厨房已定义编号
-	private int kitchenName;		 // 菜品所属厨房名称
-	private short status;			 // 菜品状态    0x01:特价 0x02推荐  0x04:售完  0x08:赠送  0x10:时价
-	private short tasteRefType = 1;    // 菜品口味关联方式,默认智能关联       1:智能关联  2:人工关联
-	
+	private float unitPrice;	     // 菜品单价
+	private int kitchenID;		 	 // 菜品所属厨房数据库编号
+	private int kitchenAliasID;		 // 菜品所属厨房已定义编号
+	private String kitchenName;		 // 菜品所属厨房名称
+	private byte status;			 // 菜品状态    0x01:特价 0x02推荐  0x04:售完  0x08:赠送  0x10:时价 0x20:套菜
+	private String desc;			 // 菜品简介
+	private String img;				 // 图片名称
+	private short tasteRefType = WebParams.TASTE_SMART_REF;  // 菜品口味关联方式,默认智能关联       1:智能关联  2:人工关联
+		
 	public int getRestaurantID() {
 		return restaurantID;
 	}
+
 	public void setRestaurantID(int restaurantID) {
 		this.restaurantID = restaurantID;
 	}
+
 	public int getFoodID() {
 		return foodID;
 	}
+
 	public void setFoodID(int foodID) {
 		this.foodID = foodID;
 	}
-	public int getFoodAlias() {
-		return foodAlias;
+
+	public int getFoodAliasID() {
+		return foodAliasID;
 	}
-	public void setFoodAlias(int foodAlias) {
-		this.foodAlias = foodAlias;
+
+	public void setFoodAliasID(int foodAliasID) {
+		this.foodAliasID = foodAliasID;
 	}
+
 	public String getFoodName() {
 		return foodName;
 	}
+
 	public void setFoodName(String foodName) {
 		this.foodName = foodName;
 	}
+
 	public String getPinyin() {
 		return pinyin;
 	}
+
 	public void setPinyin(String pinyin) {
 		this.pinyin = pinyin;
 	}
-	public float getUnitPriec() {
-		return unitPriec;
+	
+	public float getUnitPrice() {
+		return unitPrice;
 	}
-	public void setUnitPriec(float unitPriec) {
-		this.unitPriec = unitPriec;
+
+	public void setUnitPrice(float unitPrice) {
+		this.unitPrice = unitPrice;
 	}
-	public int getKitchenId() {
-		return kitchenId;
+
+	public int getKitchenID() {
+		return kitchenID;
 	}
-	public void setKitchenId(int kitchenId) {
-		this.kitchenId = kitchenId;
+
+	public void setKitchenID(int kitchenID) {
+		this.kitchenID = kitchenID;
 	}
-	public int getKitchenAlias() {
-		return kitchenAlias;
+
+	public int getKitchenAliasID() {
+		return kitchenAliasID;
 	}
-	public void setKitchenAlias(int kitchenAlias) {
-		this.kitchenAlias = kitchenAlias;
-	}	
-	public int getKitchenName() {
+
+	public void setKitchenAliasID(int kitchenAliasID) {
+		this.kitchenAliasID = kitchenAliasID;
+	}
+
+	public String getKitchenName() {
 		return kitchenName;
 	}
-	public void setKitchenName(int kitchenName) {
+
+	public void setKitchenName(String kitchenName) {
 		this.kitchenName = kitchenName;
 	}
-	public short getStatus() {
+
+	public byte getStatus() {
 		return status;
 	}
-	public void setStatus(short status) {
+
+	public void setStatus(byte status) {
 		this.status = status;
 	}
+	
+	public String getDesc() {
+		desc = desc == null ? desc : desc.trim().length() == 0 ? null : desc;
+		return desc;
+	}
+
+	public void setDesc(String desc) {
+		this.desc = desc;
+	}
+
+	public String getImg() {
+		return img;
+	}
+
+	public void setImg(String img) {
+		this.img = img;
+	}
+
 	public short getTasteRefType() {
 		return tasteRefType;
 	}
+
 	public void setTasteRefType(short tasteRefType) {
 		this.tasteRefType = tasteRefType;
 	}
-	
+
 	/**
 	 * 是否特价
 	 * @return
 	 */
 	public boolean isSpecial(){
-		return ((this.status & WebParams.SPECIAL) != 0);
+		return ((this.status & WebParams.FS_SPECIAL) != 0);
 	}
 	
 	/**
@@ -96,15 +136,15 @@ public class FoodBasic {
 	 * @return
 	 */
 	public boolean isRecommend(){
-		return ((this.status & WebParams.RECOMMEND) != 0);
+		return ((this.status & WebParams.FS_RECOMMEND) != 0);
 	}
 	
 	/**
-	 * 是否售完
+	 * 是否停售
 	 * @return
 	 */
-	public boolean isSellOut(){
-		return ((this.status & WebParams.SELL_OUT) != 0);
+	public boolean isStop(){
+		return ((this.status & WebParams.FS_STOP) != 0);
 	}
 	
 	/**
@@ -112,15 +152,23 @@ public class FoodBasic {
 	 * @return
 	 */
 	public boolean isGift(){
-		return ((this.status & WebParams.GIFT) != 0);	
+		return ((this.status & WebParams.FS_GIFT) != 0);	
 	}
 	
 	/**
 	 * 是否时价
 	 * @return
 	 */
-	public boolean isCurPrice(){
-		return ((this.status & WebParams.CUR_PRICE) != 0);
+	public boolean isCurrPrice(){
+		return ((this.status & WebParams.FS_CUR_PRICE) != 0);
+	}
+	
+	/**
+	 * 是否套菜
+	 * @return
+	 */
+	public boolean isCombination(){
+		return ((this.status & WebParams.FS_COMBO) != 0);
 	}
 	
 }

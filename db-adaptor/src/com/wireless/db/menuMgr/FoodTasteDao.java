@@ -141,7 +141,7 @@ public class FoodTasteDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static int deleteFoodTaste(long foodID, long tasteID, long restaurantID) throws Exception{
+	public static int deleteFoodTaste(int foodID, short tasteID, int restaurantID) throws Exception{
 		updateFoodTasteRefType(foodID, restaurantID, WebParams.TASTE_MANUAL_REF);
 		String extraCond = " and food_id = " + foodID +
 						   " and restaurant_id = " + restaurantID + 
@@ -171,7 +171,7 @@ public class FoodTasteDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static int deleteDiffTaste(long foodID, String tasteID, long restaurantID) throws Exception{
+	public static int deleteDiffTaste(int foodID, String tasteID, int restaurantID) throws Exception{
 		updateFoodTasteRefType(foodID, restaurantID, WebParams.TASTE_MANUAL_REF);
 		String extraCond = " and food_id = " + foodID +
 				   " and restaurant_id = " + restaurantID +
@@ -187,12 +187,12 @@ public class FoodTasteDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static int updateFoodTasteRefType(long foodID, long restaurantID, long tasteRefType) throws Exception{
+	public static int updateFoodTasteRefType(int foodID, int restaurantID, short tasteRefType) throws Exception{
 		DBCon dbCon = new DBCon();
 		int count = 0;
 		try{
 			dbCon.connect();
-			String sql = " update " + Params.dbName + ".food SET " +
+			String sql = " update " + Params.dbName + ".food set " +
 						 " taste_ref_type = " + tasteRefType + 
 						 " where 1=1 " +
 						 " and restaurant_id = " + restaurantID + 
@@ -212,7 +212,7 @@ public class FoodTasteDao {
 	 * @return
 	 * @throws SQLException 
 	 */
-	public static void updataBySmart(long foodID, long restaurantID) throws Exception{
+	public static void updataBySmart(int foodID, int restaurantID) throws Exception{
 		updateFoodTasteRefType(foodID, restaurantID, WebParams.TASTE_SMART_REF);
 		Food[] updateFood = QueryMenu.queryFoods(" AND FOOD.food_id = " + foodID, null);
 		if(updateFood.length != 1){
@@ -229,7 +229,7 @@ public class FoodTasteDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static int updataByManual(long foodID, String tasteID, long restaurantID) throws Exception{
+	public static int updataByManual(int foodID, String tasteID, int restaurantID) throws Exception{
 		if(tasteID == null || tasteID.trim().length() == 0){
 			throw new Exception();
 		}
@@ -247,6 +247,120 @@ public class FoodTasteDao {
 		}
 		deleteDiffTaste(foodID, tasteID, restaurantID);
 		return updateFoodTasteRefType(foodID, restaurantID, WebParams.TASTE_MANUAL_REF);
+	}
+	
+	/**
+	 * 
+	 * @param parent
+	 * @param list
+	 * @throws Exception
+	 */
+	public static void updateFoodTaste(FoodTaste parent, FoodTaste[] list) throws Exception{
+		DBCon dbCon = new DBCon();
+		
+		try{
+			if(parent == null){
+				throw new Exception("操作失败,获取菜品信息失败!");
+			}
+			
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			
+			String deleteSQL = "delete from " + Params.dbName + ".food_taste_rank where food_id = " + parent.getFoodID() + " and restaurant_id = " + parent.getRestaurantID();
+			StringBuffer insertSQL = new StringBuffer();
+			
+			FoodTasteDao.updateFoodTasteRefType(parent.getFoodID(), parent.getRestaurantID(), parent.getTasteRefType());
+			
+			if(parent.getTasteRefType() == WebParams.TASTE_SMART_REF){
+				Food[] updateFood = QueryMenu.queryFoods(" AND FOOD.food_id = " + parent.getFoodID(), null);
+				if(updateFood.length != 1){
+					throw new Exception("操作失败,修改菜品口味关联方式为智能关联时发生异常!");
+				}
+				TasteRef.execByFood(updateFood[0]);
+			}else if(parent.getTasteRefType() == WebParams.TASTE_MANUAL_REF){
+				dbCon.stmt.execute(deleteSQL);
+				
+				if(list != null && list.length > 0){
+					insertSQL.append("insert into food_taste_rank ");
+					insertSQL.append("(food_id, taste_id, restaurant_id, rank) ");
+					insertSQL.append(" values");
+					for(int i = 0; i< list.length; i++){
+						insertSQL.append(i > 0 ? "," : "");
+						insertSQL.append("(");
+						insertSQL.append(parent.getFoodID());
+						insertSQL.append(",");
+						insertSQL.append(list[i].getTasteID());
+						insertSQL.append(",");
+						insertSQL.append(parent.getRestaurantID());
+						insertSQL.append(",");
+						insertSQL.append(list[i].getRank());
+						insertSQL.append(")");
+					}
+					dbCon.stmt.executeUpdate(insertSQL.toString());
+				}
+			}
+			
+			dbCon.conn.commit();
+		}catch(Exception e){
+			dbCon.conn.rollback();
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * 
+	 * @param parent
+	 * @param content
+	 * @throws Exception
+	 */
+	public static void updateFoodTaste(FoodTaste parent, String content) throws Exception{
+		try{
+			FoodTaste[] list = null;
+			FoodTaste item = null;
+			String[] sl = content.split("<split>");
+			if(sl != null && sl.length != 0){
+				if(sl.length == 1 && sl[0].trim().length() == 0){
+					list = null;
+				}else{
+					list = new FoodTaste[sl.length];
+					for(int i = 0; i < sl.length; i++){
+						String[] temp = sl[i].split(",");
+						item = new FoodTaste();
+						item.setFoodID(parent.getFoodID());
+						item.setRestaurantID(parent.getRestaurantID());
+						item.setTasteID(Integer.parseInt(temp[0]));
+						item.setRank(Integer.parseInt(temp[1]));
+						list[i] = item;
+						item = null;
+					}
+				}
+				FoodTasteDao.updateFoodTaste(parent, list);
+			}
+		}catch(Exception e){
+			throw e;
+		}
+	}
+	
+	/**
+	 * 
+	 * @param foodID
+	 * @param restaurantID
+	 * @param tasteRefType
+	 * @param content
+	 * @throws Exception
+	 */
+	public static void updateFoodTaste(int foodID, int restaurantID, short tasteRefType, String content) throws Exception{
+		try{
+			FoodTaste parent = new FoodTaste();
+			parent.setFoodID(foodID);
+			parent.setRestaurantID(restaurantID);
+			parent.setTasteRefType(tasteRefType);
+			FoodTasteDao.updateFoodTaste(parent, content);
+		}catch(Exception e){
+			throw e;
+		}
 	}
 	
 }

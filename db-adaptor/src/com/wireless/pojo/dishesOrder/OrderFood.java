@@ -145,26 +145,26 @@ public class OrderFood {
 	}
 	
 	public boolean isSpecial() {
-		isSpecial = ((status & WebParams.SPECIAL) != 0);
+		isSpecial = ((status & WebParams.FS_SPECIAL) != 0);
 		return isSpecial;
 	}
 	
 	public boolean isRecommed() {
-		isRecommed = ((status & WebParams.RECOMMEND) != 0);
+		isRecommed = ((status & WebParams.FS_RECOMMEND) != 0);
 		return isRecommed;
 	}
 	
 	public boolean isSoldout() {
-		isSoldout = ((status & WebParams.SELL_OUT) != 0);
+		isSoldout = ((status & WebParams.FS_STOP) != 0);
 		return isSoldout;
 	}
 	public boolean isGift() {
-		isGift = ((status & WebParams.GIFT) != 0);
+		isGift = ((status & WebParams.FS_GIFT) != 0);
 		return isGift;
 	}
 	
 	public boolean isCurrPrice() {
-		isCurrPrice = ((status & WebParams.CUR_PRICE) != 0);
+		isCurrPrice = ((status & WebParams.FS_CUR_PRICE) != 0);
 		return isCurrPrice;
 	}
 	

@@ -232,7 +232,7 @@ public class QuerySaleDetails {
 		
 		String queryFoodExtraCond;
 		queryFoodExtraCond = " AND FOOD.restaurant_id=" + term.restaurantID +
-							 " AND kitchen_alias IN " +
+							 " AND FOOD.kitchen_alias IN " +
 							 " (SELECT kitchen_alias FROM " + 
 							 Params.dbName + ".kitchen" +
 							 " WHERE " +
@@ -240,7 +240,7 @@ public class QuerySaleDetails {
 							 " AND " +
 							 " restaurant_id=" + term.restaurantID + ")";
 		
-		Food[] foodList = QueryMenu.queryFoods(dbCon, queryFoodExtraCond, null);
+		Food[] foodList = QueryMenu.queryPureFoods(dbCon, queryFoodExtraCond, null);
 		HashMap<Food, SalesDetail> foodSalesDetail = new HashMap<Food, SalesDetail>();
 		for(Food item : foodList){
 			foodSalesDetail.put(item, new SalesDetail(item.name));

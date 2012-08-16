@@ -58,26 +58,32 @@ public class WebParams {
 	public final static String CATE_SPEC_TEXT = "规格"; 
 	public final static String CALC_PRICE_TEXT = "按价格"; 
 	public final static String CALC_RATE_TEXT = "按比例"; 
-	public final static long TASTE_SMART_REF = Food.TASTE_SMART_REF;
-	public final static long TASTE_MANUAL_REF = Food.TASTE_MANUAL_REF;
+	public final static short TASTE_SMART_REF = Food.TASTE_SMART_REF;
+	public final static short TASTE_MANUAL_REF = Food.TASTE_MANUAL_REF;
 	
 	/**
 	 * The status of the food.
 	 * It can be the combination of values below.
 	 */
-	public final static byte SPECIAL = OrderFood.SPECIAL;		/* 特价 */
-	public final static byte RECOMMEND = OrderFood.RECOMMEND;	/* 推荐 */ 
-	public final static byte SELL_OUT = OrderFood.SELL_OUT;		/* 售完 */
-	public final static byte GIFT = OrderFood.GIFT;				/* 赠送 */
-	public final static byte CUR_PRICE = OrderFood.CUR_PRICE;	/* 时价 */
+	public final static byte FS_SPECIAL = Food.SPECIAL;			/* 特价 */
+	public final static byte FS_RECOMMEND = Food.RECOMMEND;		/* 推荐 */ 
+	public final static byte FS_STOP = Food.SELL_OUT;			/* 停售 */
+	public final static byte FS_GIFT = Food.GIFT;				/* 赠送 */
+	public final static byte FS_CUR_PRICE = Food.CUR_PRICE;		/* 时价 */
+	public final static byte FS_COMBO = Food.COMBO;				/* 套菜 */
 	
 	/**
 	 * 
 	 */
-	public final static long ERROR_CODE = 1111;
-	public final static String ERROR_MSG = "";
-	public final static String ERROR_TITLE = WebParams.TIP_TITLE_DEFAULT;
-	public final static long ERROR_LV = 0;
+	public static final int ERROR_CODE = WebParams.TIP_CODE_DEFAULT;
+	public static final String ERROR_MSG = "";
+	public static final String ERROR_TITLE = WebParams.TIP_TITLE_DEFAULT;
+	public static final int ERROR_LV = 0;
+	
+	public static final int TIP_CODE_ERROE = 3333;
+	public static final int TIP_CODE_EXCEPTION = 9999;
+	public static final int TIP_CODE_WARNING = 2222;
+	public static final int TIP_CODE_DEFAULT = 1111;
 	
 	public static final String TIP_TITLE_ERROE = "错误";
 	public static final String TIP_TITLE_EXCEPTION = "异常";
