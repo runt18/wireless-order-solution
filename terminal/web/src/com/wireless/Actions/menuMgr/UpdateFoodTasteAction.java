@@ -1,7 +1,5 @@
 package com.wireless.Actions.menuMgr;
 
-import java.sql.SQLException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -13,7 +11,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.menuMgr.FoodTasteDao;
-import com.wireless.db.tasteRef.TasteRef;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
@@ -32,34 +29,38 @@ public class UpdateFoodTasteAction extends Action {
 			String restaurantID = request.getParameter("restaurantID");
 			String nValue = request.getParameter("nValue");
 			String oValue = request.getParameter("oValue");
-			String tasteID = request.getParameter("tasteID");
+			String tasteContent = request.getParameter("tasteContent");
 			
 			if(foodID == null){
 				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, "操作失败,获取菜品失败!");
+				return null;
 			}
 			if(restaurantID == null){
 				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, "操作失败,获取餐厅失败!");
+				return null;
 			}
 			if(nValue == null || oValue == null){
 				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, "操作失败,获取菜品口味关联方式失败!");
+				return null;
 			}
-			if(nValue.trim().equals(oValue.trim())){
-				jobject.initTip(false, "无需修改!");
+			if(Short.valueOf(nValue) == WebParams.TASTE_SMART_REF && nValue.trim().equals(oValue.trim())){
+				jobject.initTip(true, "智能关联方式无需修改!");
+				return null;
 			}
 			if(jobject.isSuccess()){
-				if(Long.valueOf(nValue) == WebParams.TASTE_SMART_REF){
-					FoodTasteDao.updataBySmart(Long.valueOf(foodID), Long.valueOf(restaurantID));
+				if(Short.valueOf(nValue) == WebParams.TASTE_SMART_REF ){
+					FoodTasteDao.updateFoodTaste(Integer.parseInt(foodID), Integer.parseInt(restaurantID), WebParams.TASTE_SMART_REF, tasteContent);
 					jobject.initTip(true, "操作成功,已修改菜品口味关联方式为<智能关联>!");
-				}else if(Long.valueOf(nValue) == WebParams.TASTE_MANUAL_REF){
-					FoodTasteDao.updataByManual(Long.valueOf(foodID), tasteID, Long.valueOf(restaurantID));
+				}else if(Short.valueOf(nValue) == WebParams.TASTE_MANUAL_REF){
+					FoodTasteDao.updateFoodTaste(Integer.parseInt(foodID), Integer.parseInt(restaurantID), WebParams.TASTE_MANUAL_REF, tasteContent);
 					jobject.initTip(true, "操作成功,已修改菜品口味关联方式为<人工关联>!");
 				}else{
 					jobject.initTip(false, WebParams.TIP_TITLE_ERROE, "操作失败,菜品口味关联方式选择不正确!");
 				}
 			}
 		} catch(Exception e) {
-			System.out.println(e.getMessage());
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败,修改菜品口味关联方式发生异常!");
+			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 数据库操作请求发生错误!");
 		} finally {
 			JSONObject json = JSONObject.fromObject(jobject);
 			response.getWriter().print(json.toString());

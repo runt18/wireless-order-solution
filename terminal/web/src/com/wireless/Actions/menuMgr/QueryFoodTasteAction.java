@@ -24,7 +24,7 @@ public class QueryFoodTasteAction extends Action{
 			throws Exception {
 		
 		String foodID = request.getParameter("foodID");
-		String restaurantID = request.getParameter("resturantID");
+		String restaurantID = request.getParameter("restaurantID");
 		FoodTaste query = new FoodTaste();
 		JObject jobject = new JObject();
 		FoodTaste[] list = null;
@@ -49,8 +49,10 @@ public class QueryFoodTasteAction extends Action{
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, "操作失败,读取菜品已关联口味发生异常!");
 			System.out.println(e.getMessage());
 		} finally{
-			jobject.setTotalProperty(list.length);
-			jobject.setRoot(Arrays.asList(list));
+			if(list != null){
+				jobject.setTotalProperty(list.length);
+				jobject.setRoot(Arrays.asList(list));
+			}
 			
 			JSONObject json = JSONObject.fromObject(jobject);
 			response.getWriter().print(json.toString());

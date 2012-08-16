@@ -157,12 +157,11 @@ public class QueryMaterialMgrAction extends Action {
 			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
 					Terminal.MODEL_STAFF);
 			// 编号 名称 库存量 价格（￥） 预警阀值 危险阀值
-			String sql = " SELECT A.material_id, A.material_alias, A.name, SUM(B.stock) AS stock, B.price, A.warning_threshold, A.danger_threshold, A.cate_id "
+			String sql = " SELECT A.material_id, A.material_alias, A.name, SUM(B.stock) AS stock, B.price, A.warning_threshold, A.danger_threshold, A.cate_id, C.name cateName "
 					+ " FROM "
-					+ Params.dbName
-					+ ".material A LEFT OUTER JOIN "
-					+ Params.dbName
-					+ ".material_dept B ON ( A.restaurant_id = B.restaurant_id AND A.material_id = B.material_id ) "
+					+ Params.dbName + ".material A " 
+					+ " LEFT OUTER JOIN " + Params.dbName + ".material_cate C ON ( A.restaurant_id = C.restaurant_id AND A.cate_id =  C.cate_id) "
+					+ " LEFT OUTER JOIN " + Params.dbName + ".material_dept B ON ( A.restaurant_id = B.restaurant_id AND A.material_id = B.material_id ) "
 					+ " WHERE A.restaurant_id = "
 					+ term.restaurantID
 					+ " "
@@ -179,16 +178,14 @@ public class QueryMaterialMgrAction extends Action {
 				 * 危险阀值
 				 */
 				resultMap.put("materialID", dbCon.rs.getInt("material_id"));
-				resultMap.put("materialAlias",
-						dbCon.rs.getInt("material_alias"));
+				resultMap.put("materialAlias", dbCon.rs.getInt("material_alias"));
 				resultMap.put("materialName", dbCon.rs.getString("name"));
 				resultMap.put("storage", dbCon.rs.getFloat("stock"));
 				resultMap.put("price", dbCon.rs.getFloat("price"));
-				resultMap.put("warningNbr",
-						dbCon.rs.getFloat("warning_threshold"));
-				resultMap.put("dangerNbr",
-						dbCon.rs.getFloat("danger_threshold"));
+				resultMap.put("warningNbr", dbCon.rs.getFloat("warning_threshold"));
+				resultMap.put("dangerNbr", dbCon.rs.getFloat("danger_threshold"));
 				resultMap.put("cateID", dbCon.rs.getInt("cate_id"));
+				resultMap.put("cateName", dbCon.rs.getString("cateName"));
 
 				resultMap.put("message", "normal");
 

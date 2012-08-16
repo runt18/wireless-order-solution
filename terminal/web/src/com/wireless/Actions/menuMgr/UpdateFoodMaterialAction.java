@@ -11,8 +11,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.menuMgr.FoodMaterialDao;
-import com.wireless.pojo.menuMgr.FoodMaterial;
 import com.wireless.util.JObject;
+import com.wireless.util.WebParams;
 
 public class UpdateFoodMaterialAction extends Action{
 
@@ -26,26 +26,26 @@ public class UpdateFoodMaterialAction extends Action{
 		JObject jobject = new JObject();
 		
 		try{
-			String restaurantId = request.getParameter("restaurantId");
-			String foodId = request.getParameter("foodId");
-			String materailId = request.getParameter("materailId");
-			String consumption = request.getParameter("consumption");
+			String restaurantID = request.getParameter("restaurantID");
+			String foodID = request.getParameter("foodID");
+			String materailContent = request.getParameter("materailContent");					
 			
-			FoodMaterial fm = new FoodMaterial();
-			fm.setRestaurantId(Long.valueOf(restaurantId.trim()));
-			fm.setFoodId(Long.valueOf(foodId.trim()));
-			fm.setMaterialId(Long.valueOf(materailId.trim()));
-			fm.setConsumption(Float.valueOf(consumption.trim()));
+			if(restaurantID == null || restaurantID.trim().length() == 0){
+				jobject.initTip(false, "操作失败,获取餐厅信息失败!");
+				return null;
+			}
+			if(foodID == null || foodID.trim().length() == 0){
+				jobject.initTip(false, "操作失败,获取需要修改的菜品编号失败!");
+				return null;
+			}
 			
-			FoodMaterialDao.updateFoodMaterial(fm);
+			FoodMaterialDao.updateFoodMaterial(Integer.parseInt(foodID), Integer.parseInt(restaurantID), materailContent);
 			
-			jobject.setSuccess(true);
-			jobject.setMsg("消耗修改成功!");
+			jobject.initTip(true, "操作成功,已修改菜品食材关联信息!");
 			
 		} catch(Exception e){
-			System.out.println(e.getMessage());
-			jobject.setSuccess(false);
-			jobject.setMsg("消耗修改失败!");
+			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 数据库操作请求发生错误!");
 		} finally {
 			JSONObject json = JSONObject.fromObject(jobject);
 			response.getWriter().print(json.toString());

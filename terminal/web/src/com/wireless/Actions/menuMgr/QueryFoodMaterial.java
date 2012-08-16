@@ -62,37 +62,38 @@ public class QueryFoodMaterial extends Action {
 			String pin = request.getParameter("pin");
 
 			dbCon.connect();
-			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
-					Terminal.MODEL_STAFF);
+			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF);
 
 			String foodID = request.getParameter("foodID");
 
-			String sql = " SELECT A.material_id, B.material_alias, B.name, A.consumption, B.cate_id "
+			String sql = " SELECT DISTINCT A.material_id, B.material_alias, B.name materialName, A.consumption, B.cate_id, C.name cateName, D.price "
 					+ " FROM "
-					+ Params.dbName
-					+ ".food_material A, "
-					+ Params.dbName
-					+ ".material B "
+					+ Params.dbName + ".food_material A, "
+					+ Params.dbName + ".material B, "
+					+ Params.dbName + ".material_cate C, "
+					+ Params.dbName + ".material_dept D "
 					+ " WHERE A.restaurant_id = "
 					+ term.restaurantID
 					+ " AND A.restaurant_id = B.restaurant_id"
 					+ " AND A.material_id = B.material_id "
-					+ " AND A.food_id = " + foodID;
+					+ " AND B.restaurant_id = C.restaurant_id"
+					+ " AND B.cate_id = C.cate_id "
+					+ " AND B.restaurant_id = D.restaurant_id"
+					+ " AND B.material_id = D.material_id "
+					+ " AND A.food_id = " + foodID
+					+ " ORDER BY D.price DESC";
 
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 
 			while (dbCon.rs.next()) {
-//				HashMap resultMap = new HashMap();
-//				resultMap.put("materialID", dbCon.rs.getInt("material_id"));
-//				resultMap.put("materialNumber", dbCon.rs.getInt("material_alias"));
-//				resultMap.put("materialName", dbCon.rs.getString("name"));
-//				resultMap.put("materialCost", dbCon.rs.getFloat("consumption"));
 				item = new FoodMaterial();
-				item.setMaterialId(dbCon.rs.getInt("material_id"));
-				item.setMaterialAlias(dbCon.rs.getInt("material_alias"));
-				item.setCateId(dbCon.rs.getInt("cate_id"));
-				item.setMaterialName(dbCon.rs.getString("name"));
+				item.setMaterialID(dbCon.rs.getInt("material_id"));
+				item.setMaterialAliasID(dbCon.rs.getInt("material_alias"));
+				item.setCateID(dbCon.rs.getInt("cate_id"));
+				item.setCateName(dbCon.rs.getString("cateName"));
+				item.setMaterialName(dbCon.rs.getString("materialName"));
 				item.setConsumption(dbCon.rs.getFloat("consumption"));
+				item.setPrice(dbCon.rs.getFloat("price"));
 				resultList.add(item);
 			}
 

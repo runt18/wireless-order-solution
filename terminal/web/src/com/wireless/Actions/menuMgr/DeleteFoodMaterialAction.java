@@ -62,7 +62,7 @@ public class DeleteFoodMaterialAction extends Action {
 					+ materialID;
 			;
 
-			int sqlRowCount = dbCon.stmt.executeUpdate(sql);
+			dbCon.stmt.executeUpdate(sql);
 
 			jsonResp = jsonResp.replace("$(result)", "true");
 			jsonResp = jsonResp.replace("$(value)", "关联食材删除成功！");

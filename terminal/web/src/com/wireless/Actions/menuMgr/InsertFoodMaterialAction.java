@@ -49,8 +49,7 @@ public class InsertFoodMaterialAction extends Action {
 					Terminal.MODEL_STAFF);
 
 			// get the query condition
-			int materialID = Integer.parseInt(request
-					.getParameter("materialID"));
+			int materialID = Integer.parseInt(request.getParameter("materialID"));
 			int foodID = Integer.parseInt(request.getParameter("foodID"));
 			float cost = Float.parseFloat(request.getParameter("cost"));
 
@@ -64,7 +63,7 @@ public class InsertFoodMaterialAction extends Action {
 					+ ", " + foodID + ", " + cost + " ) ";
 			//System.out.println(sql);
 
-			int sqlRowCount = dbCon.stmt.executeUpdate(sql);
+			dbCon.stmt.executeUpdate(sql);
 
 			jsonResp = jsonResp.replace("$(result)", "true");
 			jsonResp = jsonResp.replace("$(value)", "添加食材成功！");

@@ -4,14 +4,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONObject;
-import net.sf.json.JsonConfig;
 
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -22,10 +20,11 @@ import com.wireless.db.DBCon;
 import com.wireless.db.QueryMenu;
 import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.menuMgr.FoodBasic;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Terminal;
-import com.wireless.protocol.Util;
+import com.wireless.util.JObject;
 
 public class QueryMenuMgrAction extends Action {
 
@@ -45,16 +44,17 @@ public class QueryMenuMgrAction extends Action {
 			index = Integer.parseInt(start);
 			pageSize = Integer.parseInt(limit);
 		}
-
-		List resultList = new ArrayList();
-		List outputList = new ArrayList();
-		List chooseList = new ArrayList();
-		HashMap rootMap = new HashMap();
-
-		boolean isError = false;
-
+		
+		Food[] foods = new Food[0];
+		
+		JObject jobject = new JObject();
+		List<FoodBasic> list = new ArrayList<FoodBasic>();
+		List<FoodBasic> root = new ArrayList<FoodBasic>();
+		FoodBasic item = null;	
+		
 		// 是否分頁
 		String isPaging = request.getParameter("isPaging");
+		isPaging = isPaging == null || isPaging.trim().length() == 0 ? "false" : isPaging;
 
 		try {
 			// 解决后台中文传到前台乱码
@@ -83,7 +83,7 @@ public class QueryMenuMgrAction extends Action {
 
 			// get the operator to filter
 			String ope = request.getParameter("ope");
-			if (ope != null) {
+			if (ope != null && ope.trim().length() > 0) {
 				int opeType = Integer.parseInt(ope);
 
 				if (opeType == 1) {
@@ -103,6 +103,7 @@ public class QueryMenuMgrAction extends Action {
 
 			// get the value to filter
 			String filterVal = request.getParameter("value");
+			filterVal = filterVal == null || filterVal.trim().length() == 0 ? "" : filterVal;
 
 			// combine the operator and filter value
 			String filterCondition = null;
@@ -127,132 +128,107 @@ public class QueryMenuMgrAction extends Action {
 				filterCondition = "";
 			}
 			
-			String orderClause = " ORDER BY FOOD.food_alias ";
+			String orderClause = " ORDER BY FOOD.food_id DESC";
 			
 			dbCon.connect();
-			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
-					Terminal.MODEL_STAFF);
-			Food[] foods = QueryMenu.queryFoods(filterCondition + " AND FOOD.restaurant_id=" + term.restaurantID, orderClause);
-
-			// 格式：[编号，名称，拼音，价格，厨房，特价，推荐，停售，赠送，時價]
-			for (int i = 0; i < foods.length; i++) {
+			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF);
+			foods = QueryMenu.queryPureFoods(filterCondition + " AND FOOD.restaurant_id=" + term.restaurantID, orderClause);
+			
+			for(int i= 0; i < foods.length; i++){
+				Food tp = foods[i];
+				item = new FoodBasic();
+				item.setRestaurantID(tp.restaurantID);
+				item.setFoodID((int)tp.foodID);
+				item.setFoodAliasID(tp.aliasID);
+				item.setFoodName(tp.name);
+				item.setPinyin(tp.pinyin);
+				item.setUnitPrice(tp.getPrice());
+				item.setKitchenID((int)tp.kitchen.kitchenID);
+				item.setKitchenAliasID((int)tp.kitchen.aliasID);
+				item.setKitchenName(tp.kitchen.name == null || tp.kitchen.name.trim().length() == 0 ? "空" : tp.kitchen.name);
+				item.setStatus((byte)tp.status);
+				item.setTasteRefType(tp.tasteRefType);
+				item.setDesc(tp.desc);
+				item.setImg(tp.image);
 				
-				HashMap<String, Object> resultMap = new HashMap<String, Object>();
-				resultMap.put("foodID", new Long(foods[i].foodID).toString());
-				resultMap.put("dishNumber", new Integer(foods[i].aliasID).toString());
-				resultMap.put("dishName", foods[i].name);
-				resultMap.put("dishSpill", foods[i].pinyin);
-				resultMap.put("dishPrice", Util.float2String(foods[i].getPrice()));
-				resultMap.put("dishSpill", foods[i].pinyin);
-				resultMap.put("kitchenAlias", new Short(foods[i].kitchen.aliasID).toString());
-				resultMap.put("kitchenID", new Long(foods[i].kitchen.kitchenID).toString());
-				resultMap.put("special", foods[i].isSpecial());
-				resultMap.put("recommend", foods[i].isRecommend());
-				resultMap.put("stop", foods[i].isSellOut());
-				resultMap.put("free", foods[i].isGift());
-				resultMap.put("currPrice", foods[i].isCurPrice());
-				resultMap.put("tasteRefType", foods[i].tasteRefType);
-				resultMap.put("message", "normal");
-
-				resultList.add(resultMap);
+				list.add(item);
 			}
 
 		} catch (BusinessException e) {
 			e.printStackTrace();
-			HashMap resultMap = new HashMap();
 			if (e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
-				resultMap.put("message", "没有获取到餐厅信息，请重新确认");
+				jobject.initTip(false, "没有获取到餐厅信息,请重新确认");
 			} else if (e.errCode == ErrorCode.TERMINAL_EXPIRED) {
-				resultMap.put("message", "终端已过期，请重新确认");
+				jobject.initTip(false, "终端已过期,请重新确认");
 			} else {
-				resultMap.put("message", "没有获取到菜谱信息，请重新确认");
+				jobject.initTip(false, "没有获取到菜谱信息,请重新确认");
 			}
-			resultList.add(resultMap);
-			isError = true;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			HashMap resultMap = new HashMap();
-			resultMap.put("message", "数据库请求发生错误，请确认网络是否连接正常");
-			resultList.add(resultMap);
-			isError = true;
+			jobject.initTip(false, "数据库请求发生错误,请确认网络是否连接正常");
 		} catch (IOException e) {
 			e.printStackTrace();
-			HashMap resultMap = new HashMap();
-			resultMap.put("message", "数据库请求发生错误，请确认网络是否连接正常");
-			resultList.add(resultMap);
-			isError = true;
+			jobject.initTip(false, "数据库请求发生错误,请确认网络是否连接正常");
 		} finally {
 			dbCon.disconnect();
 
-			if (isError) {
-				rootMap.put("root", resultList);
+			if (!jobject.isSuccess()) {
+				jobject.setTotalProperty(0);
+				jobject.setRoot(null);
 			} else {
-				// 特荐停送時 筛选
-				String isSpecial = request.getParameter("isSpecial");
-				String isRecommend = request.getParameter("isRecommend");
-				String isFree = request.getParameter("isFree");
-				String isStop = request.getParameter("isStop");
-				String isCurrPrice = request.getParameter("isCurrPrice");
-				if (isSpecial.equals("false") && isRecommend.equals("false")
-						&& isFree.equals("false") && isStop.equals("false")
-						&& isCurrPrice.equals("false")) {
-					for (int i = 0; i < resultList.size(); i++) {
-						chooseList.add(resultList.get(i));
-					}
-				} else {
-					for (int i = 0; i < resultList.size(); i++) {
-						if ((isSpecial.equals("true") && Boolean
-								.parseBoolean(((HashMap) (resultList.get(i)))
-										.get("special").toString()))
-								|| (isRecommend.equals("true") && Boolean
-										.parseBoolean(((HashMap) (resultList
-												.get(i))).get("recommend")
-												.toString()))
-								|| (isFree.equals("true") && Boolean
-										.parseBoolean(((HashMap) (resultList
-												.get(i))).get("free")
-												.toString()))
-								|| (isStop.equals("true") && Boolean
-										.parseBoolean(((HashMap) (resultList
-												.get(i))).get("stop")
-												.toString()))
-								|| (isCurrPrice.equals("true") && Boolean
-										.parseBoolean(((HashMap) (resultList
-												.get(i))).get("currPrice")
-												.toString()))) {
-							chooseList.add(resultList.get(i));
+				
+				if(isPaging != null && isPaging.trim().equals("true")){
+					// 特荐停送時 筛选
+					String isSpecial = request.getParameter("isSpecial");
+					String isRecommend = request.getParameter("isRecommend");
+					String isFree = request.getParameter("isFree");
+					String isStop = request.getParameter("isStop");
+					String isCurPrice = request.getParameter("isCurrPrice");
+					String isCombination = request.getParameter("isCombination");
+					isSpecial = isSpecial == null || isSpecial.trim().length() == 0 ? "false" : isSpecial.trim();
+					isRecommend = isRecommend == null || isRecommend.trim().length() == 0 ? "false" : isRecommend.trim();
+					isFree = isFree == null || isFree.trim().length() == 0 ? "false" : isFree.trim();
+					isStop = isStop == null || isStop.trim().length() == 0 ? "false" : isStop.trim();
+					isCurPrice = isCurPrice == null || isCurPrice.trim().length() == 0 ? "false" : isCurPrice.trim();
+					isCombination = isCombination == null || isCombination.trim().length() == 0 ? "false" : isCombination.trim();
+					
+					if (isSpecial.equals("false") && isRecommend.equals("false")
+							&& isFree.equals("false") && isStop.equals("false")
+							&& isCurPrice.equals("false") && isCombination.equals("false")) {
+						jobject.setTotalProperty(list.size());
+						jobject.setRoot(list);
+					} else {
+						for(int i = list.size() - 1; i >= 0; i--){
+							FoodBasic temp = list.get(i);
+							if((isSpecial.equals("true") && Boolean.valueOf(isSpecial) == temp.isSpecial())
+									|| (isRecommend.equals("true") && Boolean.valueOf(isRecommend) == temp.isRecommend())
+									|| (isFree.equals("true") && Boolean.valueOf(isFree) == temp.isGift()) 
+									|| (isStop.equals("true") && Boolean.valueOf(isStop) == temp.isStop()) 
+									|| (isCurPrice.equals("true") && Boolean.valueOf(isCurPrice) == temp.isCurrPrice())
+									|| (isCombination.equals("true") && Boolean.valueOf(isCombination) == temp.isCombination())){
+								
+							}else{
+								list.remove(i);
+							}
 						}
 					}
-				}
-
-				if (isPaging.equals("true")) {
-					// 分页
-					for (int i = index; i < pageSize + index; i++) {
-						try {
-							outputList.add(chooseList.get(i));
-						} catch (Exception e) {
-							// 最后一页可能不足一页，会报错，忽略
-						}
+					
+					pageSize = (index + pageSize) > list.size() ? (pageSize - ((index + pageSize) - list.size())) : pageSize;
+					for(int i = 0; i < pageSize; i++){
+						root.add(list.get(index + i));
 					}
-				} else {
-					for (int i = 0; i < chooseList.size(); i++) {
-						outputList.add(chooseList.get(i));
-
-					}
+					
+					jobject.setTotalProperty(list.size());
+					jobject.setRoot(root);
+				}else{
+					root = list;
+					jobject.setTotalProperty(list.size());
+					jobject.setRoot(root);
 				}
-				rootMap.put("root", outputList);
 			}
-
-			JsonConfig jsonConfig = new JsonConfig();
-
-			JSONObject obj = JSONObject.fromObject(rootMap, jsonConfig);
-
-			String outputJson = "{\"totalProperty\":" + chooseList.size() + "," + obj.toString().substring(1);
-
-			//System.out.println(outputJson);
-
-			out.write(outputJson);
-
+			
+			JSONObject json = JSONObject.fromObject(jobject);
+			out.write(json.toString());
 		}
 		return null;
 	}

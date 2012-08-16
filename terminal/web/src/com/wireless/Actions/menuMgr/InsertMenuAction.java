@@ -1,41 +1,32 @@
 package com.wireless.Actions.menuMgr;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import net.sf.json.JSONObject;
 
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.DBCon;
-import com.wireless.db.Params;
-import com.wireless.db.VerifyPin;
+import com.wireless.db.menuMgr.FoodBasicDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.Terminal;
-import com.wireless.util.Util;
+import com.wireless.pojo.menuMgr.FoodBasic;
+import com.wireless.util.JObject;
+import com.wireless.util.WebParams;
 
 public class InsertMenuAction extends Action {
+	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-
-		DBCon dbCon = new DBCon();
-
-		String jsonResp = "{success:$(result), data:'$(value)'}";
-		PrintWriter out = null;
+		
+		response.setContentType("text/json; charset=utf-8");
+		JObject jobject = new JObject();
+		FoodBasic fb = new FoodBasic();
+				
 		try {
-			// 解决后台中文传到前台乱码
-			response.setContentType("text/json; charset=utf-8");
-			out = response.getWriter();
-
 			/**
 			 * The parameters looks like below. 1st example, filter the order
 			 * whose id equals 321 pin=0x1 & type=1 & ope=1 & value=321 2nd
@@ -46,108 +37,86 @@ public class InsertMenuAction extends Action {
 			 * dishPrice: kitchen: isSpecial : isRecommend : isFree : isStop :
 			 * 
 			 */
-			byte SPECIAL = 0x01; /* 特价 */
-			byte RECOMMEND = 0x02; /* 推荐 */
-			byte SELL_OUT = 0x04; /* 售完 */
-			byte GIFT = 0x08; /* 赠送 */
-			byte CUR_PRICE = 0x10; /* 时价 */
-
 			String pin = request.getParameter("pin");
-
-			dbCon.connect();
-			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
-					Terminal.MODEL_STAFF);
-
-			// get the query condition
-			int dishNumber = Integer.parseInt(request
-					.getParameter("dishNumber"));
-			String dishName = request.getParameter("dishName");
-			String dishSpill = request.getParameter("dishSpill");
-			float dishPrice = Float.parseFloat(request
-					.getParameter("dishPrice"));
-			int kitchenAlias = Integer.parseInt(request
-					.getParameter("kitchenAlias"));
-			int kitchenId = Integer.parseInt(request.getParameter("kitchenId"));
-
+			String restaurantID = request.getParameter("restaurantID");
+			
+			String foodAliasID = request.getParameter("foodAliasID");
+			String foodName = request.getParameter("foodName");
+			String foodPinyin = request.getParameter("foodPinyin");
+			String foodPrice = request.getParameter("foodPrice");
+			
+			String kitchenAliasID = request.getParameter("kitchenAliasID");
+			String kitchenID = request.getParameter("kitchenID");
+			String foodDesc = request.getParameter("foodDesc");
 			String isSpecial = request.getParameter("isSpecial");
 			String isRecommend = request.getParameter("isRecommend");
 			String isFree = request.getParameter("isFree");
 			String isStop = request.getParameter("isStop");
 			String isCurrPrice = request.getParameter("isCurrPrice");
-
-			/**
-			 * 
-			 */
-			int status = 0x00;
-			if (isSpecial.equals("true")) {
-				status |= SPECIAL;
+			String isCombination = request.getParameter("isCombination");
+			String comboContent = request.getParameter("comboContent");
+			
+			if(pin == null || restaurantID == null || pin.trim().length() == 0 || restaurantID.trim().length() == 0){
+				jobject.initTip(false, "操作失败,获取餐厅编号失败.");
+				return null;
 			}
-			;
-			if (isRecommend.equals("true")) {
-				status |= RECOMMEND;
+			
+			if((foodAliasID == null || foodAliasID.trim().length() == 0)
+					|| (foodName == null || foodName.trim().length() == 0)
+					|| (foodPrice == null || foodPrice.trim().length() == 0)){
+				jobject.initTip(false, "操作失败,获取食品基础信息失败.");
+				return null;
 			}
-			;
-			if (isStop.equals("true")) {
-				status |= SELL_OUT;
+				
+			if(jobject.isSuccess()){
+				byte status = 0x00;
+				if (isSpecial != null && isSpecial.equals("true")) {
+					status |= WebParams.FS_SPECIAL;
+				}
+				if (isRecommend != null && isRecommend.equals("true")) {
+					status |= WebParams.FS_RECOMMEND;
+				}
+				if (isStop != null && isStop.equals("true")) {
+					status |= WebParams.FS_STOP;
+				}
+				if (isFree != null && isFree.equals("true")) {
+					status |= WebParams.FS_GIFT;
+				}
+				if (isCurrPrice != null && isCurrPrice.equals("true")) {
+					status |= WebParams.FS_CUR_PRICE;
+				}
+				if (isCombination != null && isCombination.equals("true")) {
+					status |= WebParams.FS_COMBO;
+				}
+										
+				fb.setRestaurantID(Integer.parseInt(restaurantID));
+				fb.setFoodAliasID(Integer.parseInt(foodAliasID));
+				fb.setFoodName(foodName);
+				fb.setPinyin(foodPinyin);
+				fb.setUnitPrice(Float.parseFloat(foodPrice));
+				fb.setKitchenAliasID(Integer.parseInt(kitchenAliasID));
+				fb.setKitchenID(Integer.parseInt(kitchenID));
+				fb.setStatus(status);
+				fb.setDesc(foodDesc);
+				
+				jobject.initTip(true, "操作成功,已添加新菜品.");
+				
+				if (isCombination != null && isCombination.equals("true")) {
+					FoodBasicDao.insertFoodBaisc(fb, comboContent);
+				}else{
+					FoodBasicDao.insertFoodBaisc(fb);
+				}
 			}
-			;
-			if (isFree.equals("true")) {
-				status |= GIFT;
-			}
-			;
-			if (isCurrPrice.equals("true")) {
-				status |= CUR_PRICE;
-			}
-			;
-
-			String sql = "INSERT INTO "
-					+ Params.dbName
-					+ ".food"
-					+ "( food_alias, name, pinyin, unit_price, restaurant_id, kitchen_id, kitchen_alias, status, taste_ref_type ) "
-					+ " VALUES(" + dishNumber + ", '" + dishName + "', '"
-					+ dishSpill + "', " + dishPrice + ", " + term.restaurantID
-					+ ", " + kitchenId + "," + kitchenAlias + ", " + status
-					+ ", 1 " + ") ";
-//			 System.out.println(sql);
-
-			int sqlRowCount = dbCon.stmt.executeUpdate(sql);
-
-			jsonResp = jsonResp.replace("$(result)", "true");
-			jsonResp = jsonResp.replace("$(value)", "添加新菜成功！");
-
-			dbCon.rs.close();
-
 		} catch (BusinessException e) {
+			jobject.initTip(false, e.getMessage());
+		} catch (Exception e) {
 			e.printStackTrace();
-			jsonResp = jsonResp.replace("$(result)", "false");
-			if (e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
-				jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");
-
-			} else if (e.errCode == ErrorCode.TERMINAL_EXPIRED) {
-				jsonResp = jsonResp.replace("$(value)", "终端已过期，请重新确认");
-
-			} else {
-				jsonResp = jsonResp.replace("$(value)", "未处理错误");
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-			jsonResp = jsonResp.replace("$(result)", "false");
-			jsonResp = jsonResp.replace("$(value)", "数据库请求发生错误，请确认网络是否连接正常");
-
-		} catch (IOException e) {
-			e.printStackTrace();
-			jsonResp = jsonResp.replace("$(result)", "false");
-			jsonResp = jsonResp.replace("$(value)", "数据库请求发生错误，请确认网络是否连接正常");
-
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 数据库操作请求发生错误!");
 		} finally {
-			dbCon.disconnect();
-			// just for debug
-			// System.out.println(jsonResp);
-			out.write(jsonResp);
+			JSONObject json = JSONObject.fromObject(jobject);
+			response.getWriter().write(json.toString());
 		}
-
 		return null;
 	}
-
+	
 }
