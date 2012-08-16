@@ -16,16 +16,12 @@
 
 <!-- 实现多选JS -->
 <script type="text/javascript" src="../../extjs/multiselect/DDView.js"></script>
-<script type="text/javascript"
-	src="../../extjs/multiselect/MultiSelect.js"></script>
-<script type="text/javascript"
-	src="../../extjs/multiselect/ItemSelector.js"></script>
-<link rel="stylesheet" type="text/css"
-	href="../../extjs/multiselect/multiselect.css" />
+<script type="text/javascript" src="../../extjs/multiselect/MultiSelect.js"></script>
+<script type="text/javascript" src="../../extjs/multiselect/ItemSelector.js"></script>
+<link rel="stylesheet" type="text/css" href="../../extjs/multiselect/multiselect.css" />
 
 <!-- css -->
-<link rel="stylesheet" type="text/css"
-	href="../../css/systemSetting.css" />
+<link rel="stylesheet" type="text/css" href="../../css/systemSetting.css" />
 <link rel="stylesheet" type="text/css" href="../../css/header.css" />
 <link rel="stylesheet" type="text/css" href="../../css/tableList.css" />
 <link rel="stylesheet" type="text/css" href="../../css/tableStatus.css" />
@@ -47,6 +43,24 @@
 	});
 </script>
 
+<style type="text/css"> 
+	
+	.x-grid3-row td, .x-grid3-summary-row td{ 
+		line-height : 20px;
+		vertical-align : middle;
+	}
+	
+	.x-grid3-row img, .x-grid3-summary-row img{ 
+		vertical-align : middle;
+	}
+	
+	.x-toolbar table{
+		vertical-align : middle;
+		height : 24px;
+	}
+	
+</style> 
+
 <script type="text/javascript">
 	var Request = new URLParaQuery();
 
@@ -60,7 +74,7 @@
 	var currRowIndex = -1;
 	var conditionType = "text";
 
-	var dishesPageRecordCount = 20;
+	var dishesPageRecordCount = 50;
 	var dishesStaticRecordCount = 11;
 
 	var kitchenTypeData = [];//前台：kitchenTypeData：[厨房编号,厨房名称]
@@ -76,17 +90,32 @@
 	var materialData = [];
 	var materialComboData = [];
 	var materialComboDisplayData = [];
-
+	
 	var isPrompt = false;
 	
-	var mmObj = {};   // 自定义参数变量
+	var mmObj = {};
+	mmObj.operation = {
+		insert : 'INSERT',
+		update : 'UPDATE',
+		select : 'SELECT'
+	};
+	
 </script>
 <script type="text/javascript"
 	src="../../js/BasicManagement/menuMgr/menuFuncLib.js"></script>
 <script type="text/javascript"
 	src="../../js/BasicManagement/menuMgr/menuMgrLoad.js"></script>
 <script type="text/javascript"
+	src="../../js/BasicManagement/menuMgr/menuMgrAddBasic.js"></script>
+<script type="text/javascript"
+	src="../../js/BasicManagement/menuMgr/menuMgrAddMaterial.js"></script>
+<script type="text/javascript"
+	src="../../js/BasicManagement/menuMgr/menuMgrAddTaste.js"></script>
+<script type="text/javascript"
+	src="../../js/BasicManagement/menuMgr/menuMgrAddCombination.js"></script>
+<script type="text/javascript"
 	src="../../js/BasicManagement/menuMgr/menuMgrMain.js"></script>
+
 
 </head>
 <body onload="menuMgrOnLoad()">
