@@ -485,7 +485,9 @@ public class QueryMenu {
 	 */
 	public static Taste[] queryTastes(DBCon dbCon, short category, String extraCond, String orderClause) throws SQLException{
 
-		String sql = " SELECT * " +
+		String sql = " SELECT " +
+					 " taste_id, taste_alias, restaurant_id, preference, " +
+					 " category, calc, rate, price, type " +
 					 " FROM " + 
 					 Params.dbName + ".taste " +
 				     " WHERE 1=1 " +
@@ -502,7 +504,8 @@ public class QueryMenu {
 									dbCon.rs.getShort("category"),
 									dbCon.rs.getShort("calc"),
 									new Float(dbCon.rs.getFloat("rate")),
-									new Float(dbCon.rs.getFloat("price")));
+									new Float(dbCon.rs.getFloat("price")),
+									dbCon.rs.getShort("type"));
 			tastes.add(taste);
 		}
 		dbCon.rs.close();
