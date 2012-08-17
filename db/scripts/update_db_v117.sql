@@ -121,3 +121,7 @@ DROP COLUMN `img1` ,
 ADD COLUMN `desc` VARCHAR(500) NULL DEFAULT NULL COMMENT 'the description to this food'  AFTER `taste_ref_type` , 
 ADD COLUMN `img` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the image to this food'  AFTER `desc` ;
 
+-- -----------------------------------------------------
+-- Add the field 'type' to table 'taste'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`taste` ADD COLUMN `type` TINYINT NOT NULL DEFAULT 0 COMMENT 'the type to this taste as below.\n0 - normal\n1 - reserved'  AFTER `calc` ;

@@ -214,6 +214,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`taste` (
   `category` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the category to this taste, one of the values below.\n0 - 口味\n1 - 做法\n2 - 规格' ,
   `rate` DECIMAL(3,2) NOT NULL DEFAULT 0 COMMENT 'the rate to this taste, used for the calc type is 按比例' ,
   `calc` TINYINT NOT NULL DEFAULT 0 COMMENT 'the calculate type to this taste, one of the values below.\n0 - 按价格\n1 - 按比例' ,
+  `type` TINYINT NOT NULL DEFAULT 0 COMMENT 'the type to this taste as below.\n0 - normal\n1 - reserved' ,
   PRIMARY KEY (`taste_id`) ,
   INDEX `ix_taste_alias_id` (`restaurant_id` ASC, `taste_alias` ASC) )
 ENGINE = InnoDB
