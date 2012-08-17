@@ -47,5 +47,5 @@ public final class Params {
 	/* The default staff pin */
 	public final static long DEF_STAFF_PIN = -1;
 	
-	public final static String IMG_STORE_STRING = "/digi-e/android/cache";
+	public final static String IMG_STORE_STRING = "/digi-e/android/cache/";
 }

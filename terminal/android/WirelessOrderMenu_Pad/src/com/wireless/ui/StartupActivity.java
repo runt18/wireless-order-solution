@@ -1,25 +1,30 @@
 package com.wireless.ui;
 
 
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.provider.Settings;
+import android.widget.TextView;
 
 import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
 import com.wireless.lib.PinReader;
+import com.wireless.ordermenu.R;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.PinGen;
 import com.wireless.protocol.ProtocolPackage;
-import com.wireless.protocol.ReqOTAUpdate;
 import com.wireless.protocol.ReqPackage;
 import com.wireless.protocol.ReqQueryMenu;
 import com.wireless.protocol.ReqQueryRegion;
@@ -31,25 +36,6 @@ import com.wireless.protocol.RespParserEx;
 import com.wireless.protocol.Terminal;
 import com.wireless.protocol.Type;
 import com.wireless.sccon.ServerConnector;
-
-
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.provider.Settings;
-import android.util.Log;
-import android.widget.TextView;
 
 public class StartupActivity extends Activity {
 	private TextView mMsgTxtView;

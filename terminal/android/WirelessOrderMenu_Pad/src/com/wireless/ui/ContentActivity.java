@@ -3,7 +3,8 @@ package com.wireless.ui;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
+
+import com.wireless.ordermenu.R;
 
 public class ContentActivity extends Activity {
 
