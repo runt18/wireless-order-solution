@@ -17,12 +17,13 @@
 					tasteData = rootData.slice(0);
 
 					// 我也說不清這裡為什麽要刷一次，就是找個藉口刷新一下表格
-					tasteStore.reload({
-						params : {
-							start : 0,
-							limit : pageRecordCount
-						}
-					});
+//					tasteStore.load({
+//						params : {
+//							start : 0,
+//							limit : pageRecordCount
+//						}
+//					});
+//					tasteData.loadData(tasteData);
 				} else {
 					Ext.MessageBox.show({
 						msg : rootData[0].message,
@@ -47,11 +48,6 @@ function tasteMgrOnLoad() {
 
 	// update the operator name
 	getOperatorName(pin, "../../");
-
-	searchForm.remove("conditionText");
-
-	// regionCombStore.reload();
-
-	// loadAllRegion();
+	
 	loadAllTaste();
 };
