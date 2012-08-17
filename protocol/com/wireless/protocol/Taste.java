@@ -10,14 +10,18 @@ public class Taste {
 	public final static short CATE_STYLE = 1;				/* 做法 */
 	public final static short CATE_SPEC = 2;				/* 规格 */
 	
-	public final static short CALC_PRICE = 0;	/* 按价格计算  */
-	public final static short CALC_RATE = 1;	/* 按比例计算  */
+	public final static short CALC_PRICE = 0;				/* 按价格计算  */
+	public final static short CALC_RATE = 1;				/* 按比例计算  */
+	
+	public final static short TYPE_NORMAL = 0;				/* 一般 */
+	public final static short TYPE_RESERVED = 1;			/* 保留 */
 	
 	public int restaurantID;
 	public int tasteID;
 	public int aliasID = Taste.NO_TASTE;
 	public String preference = Taste.NO_PREFERENCE;
 	public short category = Taste.CATE_TASTE;
+	public short type = TYPE_NORMAL;
 	public short calc = Taste.CALC_PRICE;
 	
 	/**
@@ -43,13 +47,15 @@ public class Taste {
 		this.restaurantID = restaurantID;
 	}
 	
-	public Taste(int tasteID, int tasteAlias, int restaurantID, String pref, short cate, short calcType, Float _rate, Float _price){
+	public Taste(int tasteID, int tasteAlias, int restaurantID, String pref, 
+				 short cate, short calcType, Float _rate, Float _price, short tasteType){
 		this(tasteID, tasteAlias, restaurantID);
 		preference = pref.trim();
 		category = cate;
 		calc = calcType;
 		setRate(_rate);
 		setPrice(_price);
+		type = tasteType;
 	}
 
 	public boolean equals(Object obj){

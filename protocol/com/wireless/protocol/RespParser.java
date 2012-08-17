@@ -690,7 +690,8 @@ public class RespParser {
 								  category, 
 								  calcType, 
 							      Util.int2Float(rate),
-							      Util.int2Float(price));
+							      Util.int2Float(price),
+							      Taste.TYPE_NORMAL);
 		}
 		
 		return offset;
