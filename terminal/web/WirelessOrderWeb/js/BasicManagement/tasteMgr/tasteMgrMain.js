@@ -58,6 +58,7 @@ tasteAddWin = new Ext.Window({
 	closeAction : 'hide',
 	closable : false,
 	resizable : false,
+	buttonAlign : 'center',
 	items : [ {
 		layout : 'form',
 		id : 'tasteAddForm',
