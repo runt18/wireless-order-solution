@@ -309,6 +309,8 @@ tasteGrid.frame = false;
 tasteGrid.getStore().on('beforeload', function(){
 	var selData = Ext.ux.getSelData('menuMgrGrid');
 	this.baseParams['foodID'] = selData.foodID;
+	this.baseParams['pin'] = pin;
+	this.baseParams['restaurantID'] = restaurantID;
 });
 
 var materialGrid = createGridPanel(
@@ -823,15 +825,15 @@ Ext.onReady(function() {
 			height : 55,
 			items : [
 			    btnAddFood, 
-			    { xtype:'tbtext', text : '&nbsp;&nbsp;&nbsp;' },
+			    { xtype:'tbtext', text : '&nbsp;&nbsp;&nbsp;&nbsp;' },
 			    btnTaste,
-			    { xtype:'tbtext', text : '&nbsp;&nbsp;&nbsp;' },
+			    { xtype:'tbtext', text : '&nbsp;&nbsp;&nbsp;&nbsp;' },
 			    btnMaterial,
-			    { xtype:'tbtext', text : '&nbsp;&nbsp;&nbsp;' },
+			    { xtype:'tbtext', text : '&nbsp;&nbsp;&nbsp;&nbsp;' },
 			    btnCombination,
 			    '->', 
 				pushBackBut, 
-				{ xtype:'tbtext', text : '&nbsp;&nbsp;&nbsp;' }, 
+				{ xtype:'tbtext', text : '&nbsp;&nbsp;&nbsp;&nbsp;' },
 				logOutBut 
 			]
 		}),
@@ -849,7 +851,7 @@ Ext.onReady(function() {
 		}
 	});
 
-	var viewport = new Ext.Viewport({
+	new Ext.Viewport({
 		layout : 'border',
 		id : 'viewport',
 		items : [
