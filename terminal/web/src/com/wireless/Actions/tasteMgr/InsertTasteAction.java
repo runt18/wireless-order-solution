@@ -54,26 +54,35 @@ public class InsertTasteAction extends Action {
 			 * “口味分类”的值如下： 0 - 口味 ， 1 - 做法， 2 - 规格 “计算方式”的值如下：0 - 按价格，1 - 按比例
 			 */
 			// get the query condition
-			int tasteNumber = Integer.parseInt(request
-					.getParameter("tasteNumber"));
+			String tasteNumber = request.getParameter("tasteNumber");
 			String tasteName = request.getParameter("tasteName");
-			float tastePrice = Float.parseFloat(request
-					.getParameter("tastePrice"));
-			float tasteRate = Float.parseFloat(request
-					.getParameter("tasteRate"));
-			int cal = Integer.parseInt(request.getParameter("cal"));
-			int type = Integer.parseInt(request.getParameter("type"));
-
+			String tastePrice = request.getParameter("tastePrice");
+			String tasteRate = request.getParameter("tasteRate");
+//			String cal = request.getParameter("cal");
+			String type = request.getParameter("type");
+			int cal = 0;
+			
+			if(type != null && Integer.parseInt(type) == 0){
+				cal = 0;
+			}else if(type != null && Integer.parseInt(type) == 2){
+				cal = 1;
+			}
+			
 			/**
 			 * 
 			 */
 			String sql = "INSERT INTO "
-					+ Params.dbName
-					+ ".taste"
+					+ Params.dbName + ".taste"
 					+ "( restaurant_id, taste_alias, preference, price, category, rate, calc ) "
-					+ " VALUES(" + term.restaurantID + ", " + tasteNumber
-					+ ", '" + tasteName + "', " + tastePrice + ", " + type
-					+ "," + tasteRate + "," + cal + " ) ";
+					+ " VALUES(" 
+					+ term.restaurantID + ", " 
+					+ tasteNumber + ", "
+					+ "'" + tasteName + "', "
+					+ (tastePrice == null ? 0.00 : Float.parseFloat(tastePrice)) + ", " 
+					+ (type == null ? 0 : Integer.parseInt(type)) + "," 
+					+ (tasteRate == null ? 0.00 : Float.parseFloat(tasteRate)) + "," 
+					+ cal 
+					+ " ) ";
 
 			int sqlRowCount = dbCon.stmt.executeUpdate(sql);
 
