@@ -20,15 +20,15 @@ public class MaterialDetail{
 	
 	public int type = TYPE_CONSUME;
 	
-	public final static int TYPE_CONSUME = 0;	//ÏûºÄ
-	public final static int TYPE_WEAR = 1;		//±¨Ëğ
-	public final static int TYPE_SELL = 2;		//ÏúÊÛ
-	public final static int TYPE_RETURN = 3;	//ÍË»õ
-	public final static int TYPE_OUT_WARE = 4;	//³ö²Ö
-	public final static int TYPE_INCOME = 5;	//Èë¿â
-	public final static int TYPE_OUT = 6;		//µ÷³ö
-	public final static int TYPE_IN = 7;		//µ÷Èë
-	public final static int TYPE_CHECK = 8;		//ÅÌµã
+	public final static int TYPE_CONSUME = 0;	//æ¶ˆè€—
+	public final static int TYPE_WEAR = 1;		//æŠ¥æŸ
+	public final static int TYPE_SELL = 2;		//é”€å”®
+	public final static int TYPE_RETURN = 3;	//é€€è´§
+	public final static int TYPE_OUT_WARE = 4;	//å‡ºä»“
+	public final static int TYPE_INCOME = 5;	//å…¥åº“
+	public final static int TYPE_OUT = 6;		//è°ƒå‡º
+	public final static int TYPE_IN = 7;		//è°ƒå…¥
+	public final static int TYPE_CHECK = 8;		//ç›˜ç‚¹
 	
 	/**
 	 * Calculate the price to this material detail.

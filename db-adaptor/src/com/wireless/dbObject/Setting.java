@@ -3,20 +3,20 @@ package com.wireless.dbObject;
 
 public class Setting{
 	
-	/* Î²Êı´¦ÀíµÄ·½Ê½ */
-	public final static short TAIL_NO_ACTION = 0;			//Ğ¡Êı²¿·Ö²»´¦Àí
-	public final static short TAIL_DECIMAL_CUT = 1;			//Ğ¡ÊıÄ¨Áã
-	public final static short TAIL_DECIMAL_ROUND = 2;		//Ğ¡ÊıËÄÉáÎåÈë	
+	/* å°¾æ•°å¤„ç†çš„æ–¹å¼ */
+	public final static short TAIL_NO_ACTION = 0;			//å°æ•°éƒ¨åˆ†ä¸å¤„ç†
+	public final static short TAIL_DECIMAL_CUT = 1;			//å°æ•°æŠ¹é›¶
+	public final static short TAIL_DECIMAL_ROUND = 2;		//å°æ•°å››èˆäº”å…¥	
 	public int priceTail = TAIL_NO_ACTION;
 
 	
 	public boolean autoReprint = true;
 	
-	/* ½áÕÊµ¥ÏÔÊ¾µÄÑ¡ÏîÉèÖÃ  */
-	public final static int RECEIPT_DISCOUNT = 0x01;		//½áÕÊµ¥ÊÇ·ñÏÔÊ¾ÕÛ¿Û
-	public final static int RECEIPT_AMOUNT = 0x02;			//½áÕÊµ¥ÊÇ·ñÏÔÊ¾ÊıÁ¿
-	public final static int RECEIPT_STATUS = 0x04;			//½áÕÊµ¥ÊÇ·ñÏÔÊ¾×´Ì¬
-	public final static int RECEIPT_TOTAL_DISCOUNT = 0x08;	//½áÕÊµ¥ÊÇ·ñÏÔÊ¾ÕÛ¿Û¶î
+	/* ç»“å¸å•æ˜¾ç¤ºçš„é€‰é¡¹è®¾ç½®  */
+	public final static int RECEIPT_DISCOUNT = 0x01;		//ç»“å¸å•æ˜¯å¦æ˜¾ç¤ºæŠ˜æ‰£
+	public final static int RECEIPT_AMOUNT = 0x02;			//ç»“å¸å•æ˜¯å¦æ˜¾ç¤ºæ•°é‡
+	public final static int RECEIPT_STATUS = 0x04;			//ç»“å¸å•æ˜¯å¦æ˜¾ç¤ºçŠ¶æ€
+	public final static int RECEIPT_TOTAL_DISCOUNT = 0x08;	//ç»“å¸å•æ˜¯å¦æ˜¾ç¤ºæŠ˜æ‰£é¢
 	public final static int RECEIPT_DEF = RECEIPT_DISCOUNT | RECEIPT_AMOUNT | RECEIPT_STATUS | RECEIPT_TOTAL_DISCOUNT;
 	public int receiptStyle = 0;
 	
