@@ -33,7 +33,7 @@ public class QueryFoodCombinationAction extends Action{
 		JObject jobject = new JObject();
 		
 		try{
-			String extraCondition = "and B.sub_food_id = " + foodID + " and B.restaurant_id = " + restaurantID;
+			String extraCondition = "and B.food_id = " + foodID + " and B.restaurant_id = " + restaurantID;
 			list = FoodCombinationDao.getFoodCombination(extraCondition);
 			root = Arrays.asList(list);
 		}catch(Exception e){
