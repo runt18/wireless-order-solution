@@ -27,7 +27,7 @@ public class FoodCombinationDao {
 						 + " A.kitchen_alias, A.kitchen_id, A.status, A.pinyin, A.taste_ref_type, A.desc, A.img," 
 						 + " B.sub_food_id, B.amount, " 
 						 + " C.dept_id, C.name AS kitchen_name"
-						 + " from " + Params.dbName + ".food A join " + Params.dbName + ".combo B on A.food_id = B.food_id left join " + Params.dbName + ".kitchen C on A.kitchen_id = C.kitchen_id" 
+						 + " from " + Params.dbName + ".food A join " + Params.dbName + ".combo B on A.food_id = B.sub_food_id left join " + Params.dbName + ".kitchen C on A.kitchen_id = C.kitchen_id" 
 						 + " where 1=1 "
 						 + (extraCondition == null ? "" : extraCondition)
 						 + " order by A.unit_price desc";
@@ -36,7 +36,8 @@ public class FoodCombinationDao {
 			while(dbCon.rs != null && dbCon.rs.next()){
 				tempItem = new FoodCombination();
 				tempItem.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
-				tempItem.setFoodID(dbCon.rs.getInt("food_id"));
+				tempItem.setParentFoodID(dbCon.rs.getInt("food_id"));
+				tempItem.setFoodID(dbCon.rs.getInt("sub_food_id"));
 				tempItem.setFoodAliasID(dbCon.rs.getInt("food_alias"));
 				tempItem.setFoodName(dbCon.rs.getString("name"));
 				tempItem.setUnitPrice(dbCon.rs.getFloat("unit_price"));
@@ -47,7 +48,7 @@ public class FoodCombinationDao {
 				tempItem.setTasteRefType(dbCon.rs.getShort("taste_ref_type"));
 				tempItem.setDesc(dbCon.rs.getString("desc"));
 				tempItem.setImg(dbCon.rs.getString("img"));
-				tempItem.setParentFoodID(dbCon.rs.getInt("sub_food_id"));
+				
 				tempItem.setAmount(dbCon.rs.getInt("amount"));
 				tempItem.setKitchenName(dbCon.rs.getString("kitchen_name"));
 				
@@ -79,7 +80,7 @@ public class FoodCombinationDao {
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
 			
-			String deleteSQL = "delete from " + Params.dbName + ".combo where sub_food_id = " + parent.getParentFoodID() + " and restaurant_id = " + parent.getRestaurantID();
+			String deleteSQL = "delete from " + Params.dbName + ".combo where food_id = " + parent.getParentFoodID() + " and restaurant_id = " + parent.getRestaurantID();
 			String udpateSQL = "";
 			StringBuffer insertSQL = new StringBuffer();
 			
@@ -94,9 +95,9 @@ public class FoodCombinationDao {
 				for(int i = 0; i < list.length; i++){
 					insertSQL.append(i > 0 ? "," : "");
 					insertSQL.append("(");
-					insertSQL.append(list[i].getFoodID());
-					insertSQL.append(",");
 					insertSQL.append(parent.getParentFoodID());
+					insertSQL.append(",");
+					insertSQL.append(list[i].getFoodID());
 					insertSQL.append(",");
 					insertSQL.append(parent.getRestaurantID());
 					insertSQL.append(",");
