@@ -969,7 +969,7 @@ public class RespParser {
 	/**
 	 * Parse the response associated with the query region. 
 	 * @param response The response containing the region info.
-	 * @return Return the array of region info, null if no region info.
+	 * @return Return the array of region info.
 	 */
 	public static Region[] parseQueryRegion(ProtocolPackage response){
 		/******************************************************
