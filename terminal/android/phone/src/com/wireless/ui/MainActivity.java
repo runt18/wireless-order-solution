@@ -42,16 +42,12 @@ import android.widget.Toast;
 import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
 import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.FoodMenu;
 import com.wireless.protocol.PinGen;
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqCancelOrder;
 import com.wireless.protocol.ReqPackage;
-import com.wireless.protocol.ReqQueryMenu;
-import com.wireless.protocol.ReqQueryRestaurant;
-import com.wireless.protocol.ReqQueryStaff;
-import com.wireless.protocol.ReqTableStatus;
-import com.wireless.protocol.RespParser;
-import com.wireless.protocol.RespParserEx;
+import com.wireless.protocol.Restaurant;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
@@ -393,7 +389,7 @@ public class MainActivity extends Activity {
 	/**
 	 * 请求菜谱信息
 	 */
-	private class QueryMenuTask extends AsyncTask<Void, Void, String>{
+	private class QueryMenuTask extends com.wireless.lib.task.QueryMenuTask{
 
 		private ProgressDialog _progDialog;
 		
@@ -406,38 +402,11 @@ public class MainActivity extends Activity {
 		}
 		
 		/**
-		 * 在新的线程中执行请求菜谱信息的操作
-		 */
-		@Override
-		protected String doInBackground(Void... arg0) {
-			String errMsg = null;
-			try{
-				WirelessOrder.foodMenu = null;
-				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryMenu());
-				if(resp.header.type == Type.ACK){
-					WirelessOrder.foodMenu = RespParserEx.parseQueryMenu(resp);
-				}else{
-					if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
-						errMsg = "终端没有登记到餐厅，请联系管理人员。";
-					}else if(resp.header.reserved == ErrorCode.TERMINAL_EXPIRED) {
-						errMsg = "终端已过期，请联系管理人员。";
-					}else{
-						errMsg = "菜谱下载失败，请检查网络信号或重新连接。";
-					}
-				}
-			}catch(IOException e){
-				errMsg = e.getMessage();
-			}
-			return errMsg;
-		}
-		
-
-		/**
 		 * 根据返回的error message判断，如果发错异常则提示用户，
 		 * 如果菜谱请求成功，则继续进行请求餐厅信息的操作。
 		 */
 		@Override
-		protected void onPostExecute(String errMsg){
+		protected void onPostExecute(FoodMenu foodMenu){
 			//make the progress dialog disappeared
 			_progDialog.dismiss();					
 			//notify the main activity to redraw the food menu
@@ -446,16 +415,19 @@ public class MainActivity extends Activity {
 			 * Prompt user message if any error occurred,
 			 * otherwise continue to query restaurant info.
 			 */
-			if(errMsg != null){
+			if(mErrMsg != null){
 				new AlertDialog.Builder(MainActivity.this)
 				.setTitle("提示")
-				.setMessage(errMsg)
+				.setMessage(mErrMsg)
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						dialog.dismiss();
 					}
 				}).show();
+				
 			}else{
+				
+				WirelessOrder.foodMenu = foodMenu;
 				new QueryRestaurantTask().execute();
 			}
 		}		
@@ -464,7 +436,7 @@ public class MainActivity extends Activity {
 	/**
 	 * 请求查询餐厅信息
 	 */
-	private class QueryRestaurantTask extends AsyncTask<Void, Void, String>{
+	private class QueryRestaurantTask extends com.wireless.lib.task.QueryRestaurantTask{
 		
 		private ProgressDialog _progDialog;
 		
@@ -476,29 +448,13 @@ public class MainActivity extends Activity {
 			_progDialog = ProgressDialog.show(MainActivity.this, "", "更新餐厅信息...请稍候", true);
 		}
 		
-		/**
-		 * 在新的线程中执行请求餐厅信息的操作
-		 */
-		@Override
-		protected String doInBackground(Void... arg0) {
-			String errMsg = null;
-			try{
-				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryRestaurant());
-				if(resp.header.type == Type.ACK){
-					WirelessOrder.restaurant = RespParser.parseQueryRestaurant(resp);
-				}
-			}catch(IOException e){
-				errMsg = e.getMessage();
-			}
-			return errMsg;
-		}
-		
+	
 		/**
 		 * 根据返回的error message判断，如果发错异常则提示用户，
 		 * 如果成功，则通知Handler更新界面的相关控件。
 		 */
 		@Override
-		protected void onPostExecute(String errMsg){
+		protected void onPostExecute(Restaurant restaurant){
 			//make the progress dialog disappeared
 			_progDialog.dismiss();
 			//notify the main activity to update the food menu
@@ -506,16 +462,18 @@ public class MainActivity extends Activity {
 			/**
 			 * Prompt user message if any error occurred.
 			 */
-			if(errMsg != null){
+			if(mErrMsg != null){
 				new AlertDialog.Builder(MainActivity.this)
 				.setTitle("提示")
-				.setMessage(errMsg)
+				.setMessage(mErrMsg)
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						dialog.dismiss();
 					}
 				}).show();
 			}else{
+				
+				WirelessOrder.restaurant = restaurant;
 				Toast.makeText(MainActivity.this, "餐厅信息更新成功", Toast.LENGTH_SHORT).show();
 			}
 		}	
@@ -524,7 +482,7 @@ public class MainActivity extends Activity {
 	/**
 	 * 请求查询员工信息 
 	 */
-	private class QueryStaffTask extends AsyncTask<Void, Void, String>{
+	private class QueryStaffTask extends com.wireless.lib.task.QueryStaffTask{
 		
 		private ProgressDialog _progDialog;
 		
@@ -539,7 +497,6 @@ public class MainActivity extends Activity {
 		 */
 		@Override
 		protected void onPreExecute(){
-
 			_progDialog = ProgressDialog.show(MainActivity.this, "", "正在更新员工信息...请稍后", true);
 		}
 		
@@ -547,37 +504,18 @@ public class MainActivity extends Activity {
 		 * 在新的线程中执行请求员工信息的操作
 		 */
 		@Override
-		protected String doInBackground(Void... arg0){
-			String errMsg = null;
-			try{
-				WirelessOrder.staffs = null;
-				ReqPackage.setGen(new PinGen(){
-					@Override
-					public long getDeviceId() {
-						return WirelessOrder.pin;
-					}
-					@Override
-					public short getDeviceType() {
-						return Terminal.MODEL_ANDROID;
-					}				
-				});
-				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryStaff());
-				if(resp.header.type == Type.ACK){
-					WirelessOrder.staffs = RespParser.parseQueryStaff(resp);
-				}else{
-					if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
-						errMsg = "终端没有登记到餐厅，请联系管理人员。";
-					}else if(resp.header.reserved == ErrorCode.TERMINAL_EXPIRED) {
-						errMsg = "终端已过期，请联系管理人员。";
-					}else{
-						errMsg = "更新员工信息失败，请检查网络信号或重新连接。";
-					}
-					throw new IOException(errMsg);
+		protected StaffTerminal[] doInBackground(Void... arg0){
+			ReqPackage.setGen(new PinGen(){
+				@Override
+				public long getDeviceId() {
+					return WirelessOrder.pin;
 				}
-			}catch(IOException e){
-				errMsg = e.getMessage();
-			}
-			return errMsg;
+				@Override
+				public short getDeviceType() {
+					return Terminal.MODEL_ANDROID;
+				}				
+			});
+			return super.doInBackground(arg0);
 		}
 		
 		/**
@@ -585,7 +523,7 @@ public class MainActivity extends Activity {
 		 * 如果员工信息请求成功，则显示登录Dialog。
 		 */
 		@Override
-		protected void onPostExecute(String errMsg){
+		protected void onPostExecute(StaffTerminal[] staffs){
 			//make the progress dialog disappeared
 			_progDialog.dismiss();		
 			_handler.sendEmptyMessage(REDRAW_STAFF_LOGIN);
@@ -593,20 +531,24 @@ public class MainActivity extends Activity {
 			 * Prompt user message if any error occurred,
 			 * otherwise show the login dialog
 			 */
-			if(errMsg != null){
+			if(mErrMsg != null){
 				new AlertDialog.Builder(MainActivity.this)
 						.setTitle("提示")
-						.setMessage(errMsg)
+						.setMessage(mErrMsg)
 						.setPositiveButton("确定", null)
 						.show();
 				
 			}else{
-				if(WirelessOrder.staffs == null){
+				
+				WirelessOrder.staffs = staffs;
+				
+				if(WirelessOrder.staffs.length == 0){
 					new AlertDialog.Builder(MainActivity.this)
 								   .setTitle("提示")
 					               .setMessage("没有查询到任何的员工信息，请在管理后台先添加员工信息")
 					               .setPositiveButton("确定", null)
 					               .show();
+					
 				}else{
 					Editor editor = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).edit();//获取编辑器
 					editor.putLong(Params.STAFF_PIN, Params.DEF_STAFF_PIN);
@@ -876,7 +818,7 @@ public class MainActivity extends Activity {
 						}
 					}).show();
 				}else{
-					Toast.makeText(MainActivity.this, _tableID + "号台删单成功", 1).show();
+					Toast.makeText(MainActivity.this, _tableID + "号台删单成功", Toast.LENGTH_LONG).show();
 				}
 			}
 		}
@@ -884,63 +826,36 @@ public class MainActivity extends Activity {
 		/**
 		 * 请求获得餐台的状态
 		 */
-		private class QueryTableStatusTask extends AsyncTask<Void, Void, String>{
+		private class QueryTableStatusTask extends com.wireless.lib.task.QueryTableStatusTask{
 
-			private byte _tableStatus = Table.TABLE_IDLE;
-			private int _tableAlias;
 			private ProgressDialog _progDialog;
 
 			QueryTableStatusTask(int tableAlias){
-				_tableAlias =  tableAlias;
+				super(tableAlias);
 			}
 			
 			@Override
 			protected void onPreExecute(){
-				_progDialog = ProgressDialog.show(MainActivity.this, "", "查询" + _tableAlias + "号餐台信息...请稍候", true);
+				_progDialog = ProgressDialog.show(MainActivity.this, "", "查询" + mTblAlias + "号餐台信息...请稍候", true);
 			}
 			
-			/**
-			 * 在新的线程中执行请求餐台状态的操作
-			 */
-			@Override
-			protected String doInBackground(Void... arg0) {
-				String errMsg = null;
-				try{
-					ProtocolPackage resp = ServerConnector.instance().ask(new ReqTableStatus(_tableAlias));
-
-					if(resp.header.type == Type.ACK){
-						_tableStatus = resp.header.reserved;
-						
-					}else{
-						errMsg = genErrMsg(_tableAlias, resp.header.reserved);
-						if(errMsg == null){
-							errMsg = "未确定的异常错误(" + resp.header.reserved + ")";
-						}
-					}					
-					
-				}catch(IOException e){
-					errMsg = e.getMessage();
-				}
-				
-				return errMsg;
-			}
 			
 			/**
 			 * 如果相应的操作不符合条件（比如要改单的餐台还未下单），
 			 * 则把相应信息提示给用户，否则根据餐台状态，分别跳转到下单或改单界面。
 			 */
 			@Override
-			protected void onPostExecute(String errMsg){
+			protected void onPostExecute(Byte tblStatus){
 				//make the progress dialog disappeared
 				_progDialog.dismiss();
 				/**
 				 * Prompt user message if any error occurred.
 				 * Otherwise perform the corresponding action.
 				 */
-				if(errMsg != null){
+				if(mErrMsg != null){
 					new AlertDialog.Builder(MainActivity.this)
 					.setTitle("提示")
-					.setMessage(errMsg)
+					.setMessage(mErrMsg)
 					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int id) {
 							dialog.dismiss();
@@ -950,35 +865,35 @@ public class MainActivity extends Activity {
 				}else{
 					
 					if(_dialogType == DIALOG_INSERT_ORDER){
-						if(_tableStatus == Table.TABLE_IDLE){
+						if(tblStatus == Table.TABLE_IDLE){
 							//jump to the order activity with the table id if the table is idle
 							Intent intent = new Intent(MainActivity.this, OrderActivity.class);
-							intent.putExtra(KEY_TABLE_ID, String.valueOf(_tableAlias));
+							intent.putExtra(KEY_TABLE_ID, String.valueOf(mTblAlias));
 							startActivity(intent);
 							dismiss();
-						}else if(_tableStatus == Table.TABLE_BUSY){
+						}else if(tblStatus == Table.TABLE_BUSY){
 							//jump to change order activity with the table alias id if the table is busy
 							Intent intent = new Intent(MainActivity.this, ChgOrderActivity.class);
-							intent.putExtra(KEY_TABLE_ID, String.valueOf(_tableAlias));
+							intent.putExtra(KEY_TABLE_ID, String.valueOf(mTblAlias));
 							startActivity(intent);
 							dismiss();						
 						}
 						
 					}else if(_dialogType == DIALOG_BILL_ORDER){
-						if(_tableStatus == Table.TABLE_IDLE){
+						if(tblStatus == Table.TABLE_IDLE){
 							//prompt user the message if the table is idle when performing to pay order
 							new AlertDialog.Builder(MainActivity.this)
 								.setTitle("提示")
-								.setMessage(_tableAlias + "号台还未下单")
+								.setMessage(mTblAlias + "号台还未下单")
 								.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog, int id) {
 										dialog.dismiss();
 								}
 							}).show();
-						}else if(_tableStatus == Table.TABLE_BUSY){
+						}else if(tblStatus == Table.TABLE_BUSY){
 							//jump to the bill activity with table alias id if the table is busy
 							Intent intent = new Intent(MainActivity.this, BillActivity.class);
-							intent.putExtra(KEY_TABLE_ID, String.valueOf(_tableAlias));
+							intent.putExtra(KEY_TABLE_ID, String.valueOf(mTblAlias));
 							startActivity(intent);
 							dismiss();						
 						}
@@ -1030,7 +945,7 @@ public class MainActivity extends Activity {
 						}
 						
 					}catch(NumberFormatException e){
-						Toast.makeText(MainActivity.this, "您输入的台号" + tblNoEdtTxt.getText().toString().trim() + "格式不正确，请重新输入" , 0).show();
+						Toast.makeText(MainActivity.this, "您输入的台号" + tblNoEdtTxt.getText().toString().trim() + "格式不正确，请重新输入" , Toast.LENGTH_SHORT).show();
 					}
 
 				}

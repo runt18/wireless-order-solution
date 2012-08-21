@@ -1,5 +1,6 @@
 package com.wireless.ui;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 import android.app.Activity;
@@ -36,10 +37,20 @@ import com.wireless.ui.view.ScrollLayout.OnViewChangedListener;
 
 public class PickTasteActivity extends Activity{
 	
-	private Handler _handler = new Handler(){
+	private Handler _handler; 
+	
+	private static class TasteHandler extends Handler{
+		
+		private WeakReference<PickTasteActivity> mActivity;
+		
+		TasteHandler(PickTasteActivity activity){
+			mActivity = new WeakReference<PickTasteActivity>(activity);
+		}
+		
 		@Override
 		public void handleMessage(Message message){
-			((TextView)findViewById(R.id.foodTasteTxtView)).setText(_selectedFood.toString());
+			final PickTasteActivity theActivity = mActivity.get();
+			((TextView)theActivity.findViewById(R.id.foodTasteTxtView)).setText(theActivity._selectedFood.toString());
 		}
 	};
 	
@@ -156,8 +167,14 @@ public class PickTasteActivity extends Activity{
 				tasteScrollLayout.setToScreen(3);
 			}
 		});
-		tasteScrollLayout.setToScreen(0);
 		
+		if(_selectedFood.popTastes.length != 0){
+			tasteScrollLayout.setToScreen(0);
+		}else{
+			tasteScrollLayout.setToScreen(1);			
+		}
+		
+		_handler = new TasteHandler(this);
 		_handler.sendEmptyMessage(0);	
 		
 	}
@@ -438,7 +455,7 @@ public class PickTasteActivity extends Activity{
 				if(_selectedFood.tmpTaste != null){
 					try{
 						if(s.length() == 0){
-							_selectedFood.tmpTaste.setPrice(new Float(0));
+							_selectedFood.tmpTaste.setPrice(Float.valueOf(0));
 						}else{
 							Float price = Float.valueOf(s.toString());
 							if(price >= 0 && price < 9999){

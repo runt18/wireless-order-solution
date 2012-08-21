@@ -30,9 +30,7 @@ import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqPayOrder;
-import com.wireless.protocol.ReqQueryOrder;
 import com.wireless.protocol.Reserved;
-import com.wireless.protocol.RespParser;
 import com.wireless.protocol.Type;
 import com.wireless.protocol.Util;
 import com.wireless.sccon.ServerConnector;
@@ -116,7 +114,7 @@ public class TableDetailActivity extends Activity {
 	@Override
 	protected void onStart(){
 		super.onStart();
-		new QueryOrderTask(mTblAlias).execute();
+		new QueryOrderTask(mTblAlias).execute(WirelessOrder.foodMenu);
 	}
 	
 	/**
@@ -357,13 +355,12 @@ public class TableDetailActivity extends Activity {
 	/**
 	 * 执行请求对应餐台的账单信息 
 	 */
-	private class QueryOrderTask extends AsyncTask<Void, Void, String>{
+	private class QueryOrderTask extends com.wireless.lib.task.QueryOrderTask{
 
 		private ProgressDialog _progDialog;
-		private int _tableAlias;
 	
 		QueryOrderTask(int tableAlias){
-			_tableAlias = tableAlias;
+			super(tableAlias);
 		}
 		
 		/**
@@ -371,59 +368,28 @@ public class TableDetailActivity extends Activity {
 		 */
 		@Override
 		protected void onPreExecute(){
-			_progDialog = ProgressDialog.show(TableDetailActivity.this, "", "查询" + _tableAlias + "号餐台的信息...请稍候", true);
+			_progDialog = ProgressDialog.show(TableDetailActivity.this, "", "查询" + mTblAlias + "号餐台的信息...请稍候", true);
 		}
 		
-		@Override
-		protected String doInBackground(Void... arg0) {
-			String errMsg = null;
-			try{
-				//根据tableID请求数据
-				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryOrder(_tableAlias));
-				if(resp.header.type == Type.ACK){
-					mOrderToPay = RespParser.parseQueryOrder(resp, WirelessOrder.foodMenu);
-					
-				}else{
-    				if(resp.header.reserved == ErrorCode.TABLE_IDLE) {
-    					errMsg = _tableAlias + "号台还未下单";
-    					
-    				}else if(resp.header.reserved == ErrorCode.TABLE_NOT_EXIST) {
-    					errMsg = _tableAlias + "号台信息不存在";
 
-    				}else if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
-    					errMsg = "终端没有登记到餐厅，请联系管理人员。";
-
-    				}else if(resp.header.reserved == ErrorCode.TERMINAL_EXPIRED) {
-    					errMsg = "终端已过期，请联系管理人员。";
-
-    				}else{
-    					errMsg = "未确定的异常错误(" + resp.header.reserved + ")";
-    				}
-				}
-			}catch(IOException e){
-				errMsg = e.getMessage();
-			}
-			
-			return errMsg;
-		}
 		
 		/**
 		 * 根据返回的error message判断，如果发错异常则提示用户，
 		 * 如果成功，则迁移到改单页面
 		 */
 		@Override
-		protected void onPostExecute(String errMsg){
+		protected void onPostExecute(Order order){
 			//make the progress dialog disappeared
 			_progDialog.dismiss();
 			
-			if(errMsg != null){
+			if(mErrMsg != null){
 				
 				/**
 				 * 如果请求账单信息失败，则跳转回本页面
 				 */
 				new AlertDialog.Builder(TableDetailActivity.this)
 					.setTitle("提示")
-					.setMessage(errMsg)
+					.setMessage(mErrMsg)
 					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int id) {
 							dialog.dismiss();
@@ -432,6 +398,9 @@ public class TableDetailActivity extends Activity {
 					})
 					.show();
 			} else{
+				
+				mOrderToPay = order;
+				
 				/**
 				 * 请求账单成功则更新相关的控件
 				 */

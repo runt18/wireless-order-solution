@@ -1,6 +1,7 @@
 package com.wireless.ui;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -36,9 +37,7 @@ import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqInsertOrder;
-import com.wireless.protocol.ReqQueryOrder;
 import com.wireless.protocol.Reserved;
-import com.wireless.protocol.RespParser;
 import com.wireless.protocol.Type;
 import com.wireless.protocol.Util;
 import com.wireless.sccon.ServerConnector;
@@ -46,15 +45,25 @@ import com.wireless.ui.view.OrderFoodListView;
 
 public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOperListener {
 
-	private Order _oriOrder;
-	private OrderFoodListView _oriFoodLstView;
-	private OrderFoodListView _newFoodLstView;
+	private Order mOriOrder;
+	private OrderFoodListView mOriFoodLstView;
+	private OrderFoodListView mNewFoodLstView;
 	
-	private Handler _handler = new Handler(){
+	private Handler mHandler;
+	
+	private static class ChgOrderHandler extends Handler{
+		
+		private WeakReference<ChgOrderActivity> mActivity;
+		
+		ChgOrderHandler(ChgOrderActivity activity){
+			mActivity = new WeakReference<ChgOrderActivity>(activity);
+		}
+		
 		public void handleMessage(Message message){
-			float totalPrice = new Order(_oriFoodLstView.getSourceData().toArray(new OrderFood[_oriFoodLstView.getSourceData().size()])).calcPriceWithTaste() +
-							   new Order(_newFoodLstView.getSourceData().toArray(new OrderFood[_newFoodLstView.getSourceData().size()])).calcPriceWithTaste();
-			((TextView)findViewById(R.id.amountvalue)).setText(Util.float2String((float)Math.round(totalPrice * 100) / 100));
+			ChgOrderActivity theActivity = mActivity.get();
+			float totalPrice = new Order(theActivity.mOriFoodLstView.getSourceData().toArray(new OrderFood[theActivity.mOriFoodLstView.getSourceData().size()])).calcPriceWithTaste() +
+							   new Order(theActivity.mNewFoodLstView.getSourceData().toArray(new OrderFood[theActivity.mNewFoodLstView.getSourceData().size()])).calcPriceWithTaste();
+			((TextView)theActivity.findViewById(R.id.amountvalue)).setText(Util.float2String((float)Math.round(totalPrice * 100) / 100));
 		}
 	};
 	
@@ -63,6 +72,8 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.drop);
 
+		mHandler = new ChgOrderHandler(this);
+		
 		/**
 		 * "返回"Button
 		 */
@@ -101,10 +112,10 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 				 * 如果有就将他们的点菜数量相加
 				 */
 				List<Food> foods = new ArrayList<Food>();
-				Iterator<OrderFood> oriIter = _oriFoodLstView.getSourceData().iterator();
+				Iterator<OrderFood> oriIter = mOriFoodLstView.getSourceData().iterator();
 				while(oriIter.hasNext()){
 					OrderFood oriFood = oriIter.next();
-					Iterator<OrderFood> newIter = _newFoodLstView.getSourceData().iterator();
+					Iterator<OrderFood> newIter = mNewFoodLstView.getSourceData().iterator();
 					while(newIter.hasNext()){
 						OrderFood newFood = newIter.next();
 						if(oriFood.equals(newFood)){
@@ -120,7 +131,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 				 * 遍历新点菜品中是否有新增加的菜品，
 				 * 有则添加到菜品列表中
 				 */
-				Iterator<OrderFood> newIter = _newFoodLstView.getSourceData().iterator();
+				Iterator<OrderFood> newIter = mNewFoodLstView.getSourceData().iterator();
 				while(newIter.hasNext()){
 					Food newFood = newIter.next();
 					if(!foods.contains(newFood)){
@@ -135,7 +146,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 					Order reqOrder = new Order(foods.toArray(new OrderFood[foods.size()]),
 											   Short.parseShort(((EditText)findViewById(R.id.valueplatform)).getText().toString()),
 											   Integer.parseInt(((EditText)findViewById(R.id.valuepeople)).getText().toString()));
-					reqOrder.oriTbl.aliasID = _oriOrder.table.aliasID;
+					reqOrder.oriTbl.aliasID = mOriOrder.table.aliasID;
 					new UpdateOrderTask(reqOrder).execute();
 				}else{
 					Toast.makeText(ChgOrderActivity.this, "您还未点菜，暂时不能下单。", Toast.LENGTH_SHORT).show();
@@ -150,11 +161,11 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 		/**
 		 * "已点菜"的ListView
 		 */
-		_oriFoodLstView = (OrderFoodListView)findViewById(R.id.oriFoodLstView);
-		_oriFoodLstView.setType(Type.UPDATE_ORDER);
-		_oriFoodLstView.setOperListener(this);
+		mOriFoodLstView = (OrderFoodListView)findViewById(R.id.oriFoodLstView);
+		mOriFoodLstView.setType(Type.UPDATE_ORDER);
+		mOriFoodLstView.setOperListener(this);
 		//滚动的时候隐藏输入法
-		_oriFoodLstView.setOnScrollListener(new OnScrollListener() {				
+		mOriFoodLstView.setOnScrollListener(new OnScrollListener() {				
 			@Override
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
 				((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(((EditText)findViewById(R.id.valueplatform)).getWindowToken(), 0);
@@ -163,24 +174,24 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 			@Override
 			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {}
 		});	
-		_oriFoodLstView.setChangedListener(new OrderFoodListView.OnChangedListener() {			
+		mOriFoodLstView.setChangedListener(new OrderFoodListView.OnChangedListener() {			
 			@Override
 			public void onSourceChanged() {
-				_handler.sendEmptyMessage(0);
+				mHandler.sendEmptyMessage(0);
 			}
 		});
 		//根据账单号请求相应的信息
-		new QueryOrderTask(Integer.valueOf(getIntent().getExtras().getString(MainActivity.KEY_TABLE_ID))).execute();
+		new QueryOrderTask(Integer.valueOf(getIntent().getExtras().getString(MainActivity.KEY_TABLE_ID))).execute(WirelessOrder.foodMenu);
 
 		/**
 		 * "新点菜"的ListView
 		 */
-		_newFoodLstView = (OrderFoodListView)findViewById(R.id.newFoodLstView);
+		mNewFoodLstView = (OrderFoodListView)findViewById(R.id.newFoodLstView);
 		//_newFoodLstView.setGroupIndicator(getResources().getDrawable(R.layout.expander_folder));
-		_newFoodLstView.setType(Type.INSERT_ORDER);
-		_newFoodLstView.setOperListener(this);
+		mNewFoodLstView.setType(Type.INSERT_ORDER);
+		mNewFoodLstView.setOperListener(this);
 		//滚动的时候隐藏输入法
-		_newFoodLstView.setOnScrollListener(new OnScrollListener() {				
+		mNewFoodLstView.setOnScrollListener(new OnScrollListener() {				
 			@Override
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
 				((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(((EditText)findViewById(R.id.valueplatform)).getWindowToken(), 0);
@@ -189,13 +200,13 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 			@Override
 			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {}
 		});	
-		_newFoodLstView.setChangedListener(new OrderFoodListView.OnChangedListener() {			
+		mNewFoodLstView.setChangedListener(new OrderFoodListView.OnChangedListener() {			
 			@Override
 			public void onSourceChanged() {
-				_handler.sendEmptyMessage(0);
+				mHandler.sendEmptyMessage(0);
 			}
 		});	
-		_newFoodLstView.notifyDataChanged(new ArrayList<OrderFood>());
+		mNewFoodLstView.notifyDataChanged(new ArrayList<OrderFood>());
 		
 
 
@@ -226,7 +237,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 		Intent intent = new Intent(ChgOrderActivity.this, PickFoodActivity.class);
 		Bundle bundle = new Bundle();
 		Order tmpOrder = new Order();
-		tmpOrder.foods = _newFoodLstView.getSourceData().toArray(new OrderFood[_newFoodLstView.getSourceData().size()]);
+		tmpOrder.foods = mNewFoodLstView.getSourceData().toArray(new OrderFood[mNewFoodLstView.getSourceData().size()]);
 		bundle.putParcelable(OrderParcel.KEY_VALUE, new OrderParcel(tmpOrder));
 		intent.putExtras(bundle);
 		startActivityForResult(intent, OrderFoodListView.PICK_FOOD);		
@@ -240,18 +251,18 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 				 * 口味改变时通知ListView进行更新
 				 */
 				FoodParcel foodParcel = data.getParcelableExtra(FoodParcel.KEY_VALUE);
-				_newFoodLstView.notifyDataChanged(foodParcel);
-				_newFoodLstView.expandGroup(0);
-				_oriFoodLstView.collapseGroup(0);
+				mNewFoodLstView.notifyDataChanged(foodParcel);
+				mNewFoodLstView.expandGroup(0);
+				mOriFoodLstView.collapseGroup(0);
 				
 			}else if(requestCode == OrderFoodListView.PICK_FOOD){
 				/**
 				 * 选菜改变时通知新点菜的ListView进行更新
 				 */
 				OrderParcel orderParcel = data.getParcelableExtra(OrderParcel.KEY_VALUE);
-				_newFoodLstView.notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(orderParcel.foods)));
-				_newFoodLstView.expandGroup(0);
-				_oriFoodLstView.collapseGroup(0);
+				mNewFoodLstView.notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(orderParcel.foods)));
+				mNewFoodLstView.expandGroup(0);
+				mOriFoodLstView.collapseGroup(0);
 			}
 			
 		}
@@ -349,7 +360,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 					promptMsg = _reqOrder.oriTbl.aliasID + "号台转至" + 
 							 	 _reqOrder.table.aliasID + "号台，并改单成功。";
 				}
-				Toast.makeText(ChgOrderActivity.this, promptMsg, 0).show();
+				Toast.makeText(ChgOrderActivity.this, promptMsg, Toast.LENGTH_SHORT).show();
 			}
 		}
 		
@@ -359,7 +370,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 	 * 退出是如果有新点菜，提示确认退出
 	 */
 	public void showExitDialog(){
-		if(_newFoodLstView.getSourceData().size() != 0){
+		if(mNewFoodLstView.getSourceData().size() != 0){
 			new AlertDialog.Builder(this)
 			.setTitle("提示")
 			.setMessage("账单还未提交，是否确认退出?")
@@ -396,13 +407,12 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 	/**
 	 * 执行请求对应餐台的账单信息 
 	 */
-	private class QueryOrderTask extends AsyncTask<Void, Void, String>{
+	private class QueryOrderTask extends com.wireless.lib.task.QueryOrderTask{
 
 		private ProgressDialog _progDialog;
-		private int _tableAlias;
 	
 		QueryOrderTask(int tableAlias){
-			_tableAlias = tableAlias;
+			super(tableAlias);
 		}
 		
 		/**
@@ -410,41 +420,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 		 */
 		@Override
 		protected void onPreExecute(){
-			_progDialog = ProgressDialog.show(ChgOrderActivity.this, "", "查询" + _tableAlias + "号餐台的信息...请稍候", true);
-		}
-		
-		@Override
-		protected String doInBackground(Void... arg0) {
-			String errMsg = null;
-			try{
-				//根据tableID请求数据
-				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryOrder(_tableAlias));
-				if(resp.header.type == Type.ACK){
-					_oriOrder = RespParser.parseQueryOrder(resp, WirelessOrder.foodMenu);
-					
-				}else{
-					_oriOrder = new Order();
-    				if(resp.header.reserved == ErrorCode.TABLE_IDLE) {
-    					errMsg = _tableAlias + "号台还未下单";
-    					
-    				}else if(resp.header.reserved == ErrorCode.TABLE_NOT_EXIST) {
-    					errMsg = _tableAlias + "号台信息不存在";
-
-    				}else if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
-    					errMsg = "终端没有登记到餐厅，请联系管理人员。";
-
-    				}else if(resp.header.reserved == ErrorCode.TERMINAL_EXPIRED) {
-    					errMsg = "终端已过期，请联系管理人员。";
-
-    				}else{
-    					errMsg = "未确定的异常错误(" + resp.header.reserved + ")";
-    				}
-				}
-			}catch(IOException e){
-				errMsg = e.getMessage();
-			}
-			
-			return errMsg;
+			_progDialog = ProgressDialog.show(ChgOrderActivity.this, "", "查询" + mTblAlias + "号餐台的信息...请稍候", true);
 		}
 		
 		/**
@@ -452,15 +428,15 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 		 * 如果成功，则迁移到改单页面
 		 */
 		@Override
-		protected void onPostExecute(String errMsg){
+		protected void onPostExecute(Order order){
 
-			if(errMsg != null){
+			if(mErrMsg != null){
 				/**
 				 * 如果请求账单信息失败，则跳转会MainActivity
 				 */
 				new AlertDialog.Builder(ChgOrderActivity.this)
 					.setTitle("提示")
-					.setMessage(errMsg)
+					.setMessage(mErrMsg)
 					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int id) {
 							dialog.dismiss();
@@ -469,17 +445,20 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 					})
 					.show();
 			}else{
+				
+				mOriOrder = order;
+				
 				/**
 				 * 请求账单成功则更新相关的控件
 				 */
 				//set date source to original food list view
-				_oriFoodLstView.notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(_oriOrder.foods)));
+				mOriFoodLstView.notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(mOriOrder.foods)));
 				//expand the original food list view
-				_oriFoodLstView.expandGroup(0);
+				mOriFoodLstView.expandGroup(0);
 				//set the table ID
-				((EditText)findViewById(R.id.valueplatform)).setText(Integer.toString(_oriOrder.table.aliasID));
+				((EditText)findViewById(R.id.valueplatform)).setText(Integer.toString(mOriOrder.table.aliasID));
 				//set the amount of customer
-				((EditText)findViewById(R.id.valuepeople)).setText(Integer.toString(_oriOrder.custom_num));				
+				((EditText)findViewById(R.id.valuepeople)).setText(Integer.toString(mOriOrder.custom_num));				
 				//make the progress dialog disappeared
 				_progDialog.dismiss();
 			}			

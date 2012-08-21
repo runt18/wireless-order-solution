@@ -1,6 +1,5 @@
 package com.wireless.ui;
 
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,7 +21,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -49,16 +47,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
-import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.Region;
-import com.wireless.protocol.ReqQueryRegion;
-import com.wireless.protocol.ReqQueryTable;
-import com.wireless.protocol.ReqTableStatus;
-import com.wireless.protocol.RespParser;
 import com.wireless.protocol.Table;
-import com.wireless.protocol.Type;
-import com.wireless.sccon.ServerConnector;
 import com.wireless.ui.view.PullListView;
 import com.wireless.ui.view.PullListView.OnRefreshListener;
 
@@ -371,7 +361,6 @@ public class TableActivity extends Activity {
 					View view = super.getView(position, convertView, parent);
 					final Map<String, ?> map = contents.get(position);
 					view.setTag(map.get(ITEM_TAG_ID));
-					//TODO
 					/*
 					 * set different table state's name color with state 
 					 */
@@ -714,27 +703,9 @@ public class TableActivity extends Activity {
 	}
 
 	/**
-	 * Generate the message according to the error code 
-	 * @param tableID the table id associated with this error
-	 * @param errCode the error code
-	 * @return the error message
-	 */
-	private String genErrMsg(int tableID, byte errCode){
-		if(errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
-			return "终端没有登记到餐厅，请联系管理人员。";
-		}else if(errCode == ErrorCode.TERMINAL_EXPIRED) {
-			return "终端已过期，请联系管理人员。";
-		}else if(errCode == ErrorCode.TABLE_NOT_EXIST){
-			return tableID + "号餐台信息不存在";
-		}else{
-			return null;
-		}
-	}
-	
-	/**
 	 * 请求区域信息
 	 */
-	private class QueryRegionTask extends AsyncTask<Void, Void, String>{
+	private class QueryRegionTask extends com.wireless.lib.task.QueryRegionTask{
 		
 		private ProgressDialog mProgDialog;
 		
@@ -744,49 +715,32 @@ public class TableActivity extends Activity {
 		@Override
 		protected void onPreExecute(){			
 			mProgDialog = ProgressDialog.show(TableActivity.this, "", "正在更新区域信息...请稍后", true);
-		}
-		
-		/**
-		 * 在新的线程中执行请求区域信息的操作
-		 */
-		@Override
-		protected String doInBackground(Void... arg0) {
-		
-			String errMsg = null;
-			try{
-				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryRegion());
-				if(resp.header.type == Type.ACK){
-					WirelessOrder.regions = RespParser.parseQueryRegion(resp);
-				}else{
-					WirelessOrder.regions = new Region[0];
-				}
-			}catch(IOException e){
-				errMsg = e.getMessage();
-			}
-			
-			return errMsg;
-		}
+		}		
+	
 		
 		/**
 		 * 根据返回的error message判断，如果发错异常则提示用户，
 		 * 如果成功，则执行请求餐台的操作。
 		 */
 		@Override
-		protected void onPostExecute(String errMsg){
+		protected void onPostExecute(Region[] regions){
 			
 			mProgDialog.dismiss();
 			
 			/**
 			 * Prompt user message if any error occurred.
 			 */		
-			if(errMsg != null){
+			if(mErrMsg != null){
 				mListView.onRefreshComplete();
 				Toast.makeText(getApplicationContext(), "刷新区域数据失败,请检查网络", Toast.LENGTH_SHORT).show();
 				mListView.setVisibility(View.GONE);
 				mRegionHandler.sendEmptyMessage(0);
 				WirelessOrder.tables = new Table[0];
 				mDataHandler.sendEmptyMessage(0);
-			}else{				
+			}else{			
+				
+				WirelessOrder.regions = regions;
+				
 				new QueryTableTask().execute();
 			}
 		}
@@ -794,7 +748,7 @@ public class TableActivity extends Activity {
 	/**
 	 * 请求餐台信息
 	 */
-	private class QueryTableTask extends AsyncTask<Void, Void, String> {
+	private class QueryTableTask extends com.wireless.lib.task.QueryTableTask {
 		
 		private ProgressDialog mProgDialog;
 		
@@ -806,43 +760,26 @@ public class TableActivity extends Activity {
 			mProgDialog = ProgressDialog.show(TableActivity.this, "", "正在更新餐台信息...请稍后", true);
 		}
 
-		/**
-		 * 在新的线程中执行请求餐台信息的操作
-		 */
-		@Override
-		protected String doInBackground(Void... arg0) {
-
-			String errMsg = null;
-			try {
-				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryTable());
-				if (resp.header.type == Type.ACK) {
-					WirelessOrder.tables = RespParser.parseQueryTable(resp);
-				}else{
-					WirelessOrder.tables = new Table[0];
-				}
-			} catch (IOException e) {
-				errMsg = e.getMessage();
-			}
-
-			return errMsg;
-		}
 
 		/**
 		 * 根据返回的error message判断，如果发错异常则提示用户， 如果成功，则执行请求餐厅的操作。
 		 */
 		@Override
-		protected void onPostExecute(String errMsg) {
+		protected void onPostExecute(Table[] tables) {
 			
 			mProgDialog.dismiss();
 			
 			/**
 			 * Prompt user message if any error occurred.
 			 */
-			if (errMsg != null) {
+			if(mErrMsg != null) {
 				mListView.onRefreshComplete();
 				Toast.makeText(getApplicationContext(), "刷新餐台数据失败,请检查网络", Toast.LENGTH_SHORT).show();
 
 			} else {
+				
+				WirelessOrder.tables = tables;
+				
 				mRegionHandler.sendEmptyMessage(0);
 				mDataHandler.sendEmptyMessage(0);
 				mListView.setVisibility(View.VISIBLE);
@@ -856,45 +793,17 @@ public class TableActivity extends Activity {
 	/**
 	 * 请求获得餐台的状态
 	 */
-	private abstract class QueryTableStatusTask extends AsyncTask<Void, Void, String>{
+	private abstract class QueryTableStatusTask extends com.wireless.lib.task.QueryTableStatusTask{
 
-		private byte _tableStatus = Table.TABLE_IDLE;
-		private int _tableAlias;
 		private ProgressDialog _progDialog;
 
 		QueryTableStatusTask(int tableAlias){
-			_tableAlias =  tableAlias;
+			super(tableAlias);
 		}
 		
 		@Override
 		protected void onPreExecute(){
-			_progDialog = ProgressDialog.show(TableActivity.this, "", "查询" + _tableAlias + "号餐台信息...请稍候", true);
-		}
-		
-		/**
-		 * 在新的线程中执行请求餐台状态的操作
-		 */
-		@Override
-		protected String doInBackground(Void... arg0) {
-			String errMsg = null;
-			try{
-				ProtocolPackage resp = ServerConnector.instance().ask(new ReqTableStatus(_tableAlias));
-
-				if(resp.header.type == Type.ACK){
-					_tableStatus = resp.header.reserved;
-					
-				}else{
-					errMsg = genErrMsg(_tableAlias, resp.header.reserved);
-					if(errMsg == null){
-						errMsg = "未确定的异常错误(" + resp.header.reserved + ")";
-					}
-				}					
-				
-			}catch(IOException e){
-				errMsg = e.getMessage();
-			}
-			
-			return errMsg;
+			_progDialog = ProgressDialog.show(TableActivity.this, "", "查询" + mTblAlias + "号餐台信息...请稍候", true);
 		}
 		
 		/**
@@ -902,17 +811,17 @@ public class TableActivity extends Activity {
 		 * 则把相应信息提示给用户，否则根据餐台状态，分别跳转到下单或改单界面。
 		 */
 		@Override
-		protected void onPostExecute(String errMsg){
+		protected void onPostExecute(Byte tblStatus){
 			//make the progress dialog disappeared
 			_progDialog.dismiss();
 			/**
 			 * Prompt user message if any error occurred.
 			 * Otherwise perform the corresponding action.
 			 */
-			if(errMsg != null){
+			if(mErrMsg != null){
 				new AlertDialog.Builder(TableActivity.this)
 				.setTitle("提示")
-				.setMessage(errMsg)
+				.setMessage(mErrMsg)
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						dialog.dismiss();
@@ -920,7 +829,7 @@ public class TableActivity extends Activity {
 				}).show();
 				
 			}else{			
-				OnQueryTblStatus(_tableStatus);
+				OnQueryTblStatus(tblStatus);
 			}
 		}	
 		
