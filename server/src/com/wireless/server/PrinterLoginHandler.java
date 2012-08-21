@@ -187,22 +187,22 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 					}					
 					
 				}catch(BusinessException e){
-					respNAK(loginReq, e.errCode);
+					send(_out, new RespNAK(loginReq.header));
 					e.printStackTrace();
 					closeSocket(connection);
 					
 				}catch(IOException e){
-					respNAK(loginReq, ErrorCode.UNKNOWN);
+					send(_out, new RespNAK(loginReq.header));
 					e.printStackTrace();
 					closeSocket(connection);
 					
 				}catch(SQLException e){
-					respNAK(loginReq, ErrorCode.UNKNOWN);
+					send(_out, new RespNAK(loginReq.header));
 					e.printStackTrace();
 					closeSocket(connection);
 					
 				}catch(Exception e){
-					respNAK(loginReq, ErrorCode.UNKNOWN);
+					send(_out, new RespNAK(loginReq.header));
 					e.printStackTrace();
 					closeSocket(connection);
 					
@@ -223,15 +223,15 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 	 * @param errCode
 	 * 			the error code
 	 */
-	private void respNAK(ProtocolPackage loginReq, byte errCode){
-		if(loginReq != null){
-			try{
-				send(_out, new RespNAK(loginReq.header));
-			}catch(IOException e){
-				e.printStackTrace();
-			}
-		}
-	}
+//	private void respNAK(ProtocolPackage loginReq, byte errCode){
+//		if(loginReq != null){
+//			try{
+//				send(_out, new RespNAK(loginReq.header));
+//			}catch(IOException e){
+//				e.printStackTrace();
+//			}
+//		}
+//	}
 	
 	/**
 	 * Release the socket resources in the case the printer login failed .
