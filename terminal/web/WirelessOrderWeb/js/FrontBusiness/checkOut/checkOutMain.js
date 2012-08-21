@@ -36,74 +36,35 @@
 //checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "100%", "50%" ]);
 //checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "100%", "50%" ]);
 //checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "100%", "50%" ]);
-//
-//var nonMemberTotalCount = 0.0;
-//var nonMemberSingleCountArray = [];
-//var memberTotalCount = 0.0;
-//var memberSingleCountArray = [];
-//for ( var i = 0; i < checkOutData.length; i++) {
-//	// non member
-//	var singleCount = parseFloat(checkOutData[i][3].substring(1))
-//			* (parseFloat(checkOutData[i][4].substring(0,
-//					checkOutData[i][4].length)) / 100) * checkOutData[i][2];
-//	singleCount = singleCount.toFixed(2);
-//	// nonMemberSingleCountArray.push(checkOutData[i][3] + " × "
-//	// + checkOutData[i][4] + " × " + checkOutData[i][2] + " = " + "￥<b>"
-//	// + singleCount + "</b>");
-//	nonMemberSingleCountArray.push("￥<b>" + singleCount + "</b>");
-//	nonMemberTotalCount = parseFloat(nonMemberTotalCount)
-//			+ parseFloat(singleCount);
-//	nonMemberTotalCount = nonMemberTotalCount.toFixed(2);
-//
-//	// member
-//	singleCount = parseFloat(checkOutData[i][3].substring(1))
-//			* (parseFloat(checkOutData[i][5].substring(0,
-//					checkOutData[i][5].length)) / 100) * checkOutData[i][2];
-//	singleCount = singleCount.toFixed(2);
-//	// memberSingleCountArray.push(checkOutData[i][3] + " × "
-//	// + checkOutData[i][5] + " × " + checkOutData[i][2] + " = " + "￥<b>"
-//	// + singleCount + "</b>");
-//	memberSingleCountArray.push("￥<b>" + singleCount + "</b>");
-//	memberTotalCount = parseFloat(memberTotalCount) + parseFloat(singleCount);
-//	memberTotalCount = memberTotalCount.toFixed(2);
-//}
-//
-//checkOutDataDisplay = [];
-//for ( var i = 0; i < checkOutData.length; i++) {
-//	checkOutDataDisplay.push([ checkOutData[i][0], checkOutData[i][1],
-//			checkOutData[i][2], checkOutData[i][3], checkOutData[i][4],
-//			nonMemberSingleCountArray[i] ]);
-//}
-//
-//checkOutDataDisplay.push([
-//		"",
-//		"",
-//		"",
-//		"",
-//		"<div style='font-size:18px;font-weight:bold;'>合计</div>",
-//		"<div style='font-size:18px;font-weight:bold;'>￥" + nonMemberTotalCount
-//				+ "</div>" ]);
+
+
 
 // 2，表格的数据store
 var checkOutStore = new Ext.data.Store({
 	proxy : new Ext.data.MemoryProxy(checkOutDataDisplay),
-	reader : new Ext.data.JsonReader(Ext.ux.readConfig, [ {
-		name : "foodName"
-	}, {
-		name : "tastePref"
-	}, {
-		name : "count"
-	}, {
-		name : "unitPrice"
-	}, {
-		name : "discount"
-	}, {
-		name : "totalPrice"
-	},  {
-		name : "orderDateFormat"
-	},  {
-		name : "waiter"
-	}  ])
+	reader : new Ext.data.JsonReader(Ext.ux.readConfig, 
+		[ 
+			{
+				name : "displayFoodName"
+			}, {
+				name : "foodName"
+			}, {
+				name : "tastePref"
+			}, {
+				name : "count"
+			}, {
+				name : "unitPrice"
+			}, {
+				name : "discount"
+			}, {
+				name : "totalPrice"
+			},  {
+				name : "orderDateFormat"
+			},  {
+				name : "waiter"
+			}  
+		]
+	)
 });
 
 checkOutStore.reload();
@@ -115,12 +76,12 @@ var checkOutColumnModel = new Ext.grid.ColumnModel([
 			sortable : true,
 			dataIndex : "foodName",
 			id : "dishNameCOCM",
-			width : 290
+			width : 260
 		}, {
 			header : "口味",
 			sortable : true,
 			dataIndex : "tastePref",
-			width : 160
+			width : 150
 		}, {
 			header : "数量",
 			sortable : true,
@@ -168,8 +129,8 @@ var checkOutGrid = new Ext.grid.GridPanel({
 	style : "margin:0 auto",
 	xtype : "grid",
 	ds : checkOutStore,
-	cm : checkOutColumnModel,
-	autoExpandColumn : "dishNameCOCM"
+	cm : checkOutColumnModel
+//	,autoExpandColumn : "dishNameCOCM"
 });
 
 // member number input pop window
@@ -502,7 +463,7 @@ Ext.onReady(function() {
 				id : "centerPanelDO",
 				region : "center",
 				border : false,
-				margins : "0 5 0 0",
+				margins : "0 0 0 0",
 				layout : "border",
 				items : [ checkOutCenterPanel, checkOutNorthPanel ]
 			});

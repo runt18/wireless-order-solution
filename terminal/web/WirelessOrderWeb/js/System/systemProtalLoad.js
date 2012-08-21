@@ -1,9 +1,16 @@
 ﻿// on page load function
 function loginOnLoad() {
-
-	// protal function register
-	protalFuncReg();
-
+	
+	Ext.getDom('passwordConfig').onclick = function(){		
+		passwordConfigWin.show();
+		passwordConfigWin.center();
+	};
+	
+	Ext.getDom('formatPrice').onclick = function(){		
+		formatPrice.show();
+		formatPrice.center();
+	};
+	
 	// update the operator name
 	if (pin != "") {
 		getOperatorName(pin, "../../");
@@ -44,27 +51,18 @@ function loginOnLoad() {
 			}
 		},
 		failure : function(response, options) {
+			
 		}
 	});
-
+	
 	// mouse over & mouse off -- heightlight the icon
-	$("#passwordConfig")
-			.each(
-					function() {
-						$(this)
-								.hover(
-										function() {
-											$(this)
-													.stop()
-													.css("background",
-															"url(../../images/passwordConfig_select.png) no-repeat 50%");
-										},
-										function() {
-											$(this)
-													.stop()
-													.css("background",
-															"url(../../images/passwordConfig.png) no-repeat 50%");
-										});
-					});
+	$("#passwordConfig").each(function() {
+		$(this).hover(function() {
+			$(this).stop().css("background", "url(../../images/passwordConfig_select.png) no-repeat 50%");
+		},
+		function() {
+			$(this).stop().css("background", "url(../../images/passwordConfig.png) no-repeat 50%");
+		});
+	});
 
 };

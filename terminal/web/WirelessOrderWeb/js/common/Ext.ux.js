@@ -290,7 +290,7 @@ Ext.ux.showMsg = function(msg){
 	if(msg == null || typeof(msg) == 'undefined'){
 		return false;
 	}
-	msg.msg = msg.code == '' || parseInt(msg.code) == 1111 ? msg.msg : String.format('错误代码:{0},错误信息:{1}', msg.code, msg.msg);
+	msg.msg = msg.code == '' || parseInt(msg.code) == 1111 ? msg.msg : String.format('错误代码:{0}<br/>错误信息:{1}', msg.code, msg.msg);
 	Ext.MessageBox.show({
 		title : msg.title,
 		msg : msg.msg,

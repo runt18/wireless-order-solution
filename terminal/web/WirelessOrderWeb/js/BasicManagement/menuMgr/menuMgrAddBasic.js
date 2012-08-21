@@ -12,7 +12,7 @@ var basicOperationPanel = new Ext.Panel({
 		 	    defaults : {
 		 	    	xtype : 'panel',
 	 	    	    layout : 'form',
-	 	    	   labelWidth : 30
+	 	    	    labelWidth : 30
 		 	    },
 		 	    items : [
 		 	        {

@@ -125,9 +125,7 @@ function checkOutOnLoad() {
 												]);
 											}
 										}
-//										for(k in checkOutData){
-//											alert(k+'    :   '+checkOutData[k]);
-//										}
+										
 										// 4,显示
 										for ( var i = 0; i < checkOutData.root.length; i++) {
 											var tpItem = checkOutData.root[i];

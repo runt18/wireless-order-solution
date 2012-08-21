@@ -2,38 +2,12 @@
 var filterTypeData = [[ '0', '全部' ], [ '1', '编号' ], [ '2', '名称' ], [ '3', '价格' ], [ '4', '类型' ]];
 
 // ----------------- 添加口味  --------------------
-// 計算方式　－－　添加
-var calAddData = [ [ 0, '按价格' ], [ 1, '按比例' ] ];
-
-var calAddStore = new Ext.data.SimpleStore({
-	fields : [ 'value', 'text' ],
-	data : calAddData
-});
-
-var calAddComb = new Ext.form.ComboBox({
-	fieldLabel : '计算方式',
-	forceSelection : true,
-	width : 160,
-	value : calAddData[0][0],
-	id : 'calAddComb',
-	store : calAddStore,
-	valueField : 'value',
-	displayField : 'text',
-	typeAhead : true,
-	mode : 'local',
-	triggerAction : 'all',
-	selectOnFocus : true,
-	allowBlank : false
-});
-
 // 類別 －－ 增加
 var typeAddData = [ [ 0, '口味' ], [ 2, '规格' ] ];
-
 var typeAddStore = new Ext.data.SimpleStore({
 	fields : [ 'value', 'text' ],
 	data : typeAddData
 });
-
 var typeAddComb = new Ext.form.ComboBox({
 	fieldLabel : '类别',
 	forceSelection : true,
@@ -47,17 +21,27 @@ var typeAddComb = new Ext.form.ComboBox({
 	mode : 'local',
 	triggerAction : 'all',
 	selectOnFocus : true,
-	allowBlank : false
+	allowBlank : false,
+	readOnly : true,
+	listeners : {
+		select : function(e){
+			var tp = Ext.getCmp('tasteAddPrice');
+			var tr = Ext.getCmp('tasteAddRate');
+			tp.setValue(0.00);
+			tr.setValue(0.00);
+		}
+	}
 });
 
 tasteAddWin = new Ext.Window({
 	layout : 'fit',
 	title : '添加',
 	width : 260,
-	height : 235,
+	height : 220,
 	closeAction : 'hide',
 	closable : false,
 	resizable : false,
+	modal : true,
 	buttonAlign : 'center',
 	items : [ {
 		layout : 'form',
@@ -65,40 +49,43 @@ tasteAddWin = new Ext.Window({
 		labelWidth : 60,
 		border : false,
 		frame : true,
-		items : [ {
-			xtype : 'numberfield',
-			fieldLabel : '编号',
-			id : 'tasteAddNumber',
-			allowBlank : false,
-			width : 160
-		}, {
-			xtype : 'textfield',
-			fieldLabel : '名称',
-			id : 'tasteAddName',
-			allowBlank : false,
-			width : 160
-		}, {
-			xtype : 'numberfield',
-			fieldLabel : '价格',
-			id : 'tasteAddPrice',
-			value : 0.00,
-			// allowBlank : false,
-			width : 160
-		}, {
-			xtype : 'numberfield',
-			fieldLabel : '比例',
-			id : 'tasteAddRate',
-			value : 0.00,
-			// allowBlank : false,
-			width : 160,
-			validator : function(v) {
-				if (v < 0.00 || v > 9.99) {
-					return '比例范围是0.00至9.99！';
-				} else {
-					return true;
+		items : [
+		     {
+				xtype : 'numberfield',
+				fieldLabel : '编号',
+				id : 'tasteAddNumber',
+				allowBlank : false,
+				width : 160
+			}, {
+				xtype : 'textfield',
+				fieldLabel : '名称',
+				id : 'tasteAddName',
+				allowBlank : false,
+				width : 160
+			}, {
+				xtype : 'numberfield',
+				fieldLabel : '价格',
+				id : 'tasteAddPrice',
+				value : 0.00,
+//				allowBlank : false,
+				width : 160
+			}, {
+				xtype : 'numberfield',
+				fieldLabel : '比例',
+				id : 'tasteAddRate',
+				value : 0.00,
+//				allowBlank : false,
+				width : 160,
+				validator : function(v) {
+					if (v < 0.00 || v > 9.99) {
+						return '比例范围是0.00至9.99！';
+					} else {
+						return true;
+					}
 				}
-			}
-		}, calAddComb, typeAddComb ]
+			}, 
+			typeAddComb
+		]
 	} ],
 	buttons : [
 	    {
@@ -106,104 +93,98 @@ tasteAddWin = new Ext.Window({
 			handler : function() {
 				if (Ext.getCmp('tasteAddNumber').isValid() && Ext.getCmp('tasteAddName').isValid()) {
 					var tasteAddNumber = Ext.getCmp('tasteAddNumber').getValue();
-						var tasteAddName = Ext.getCmp('tasteAddName').getValue();
-						var tasteAddPrice = Ext.getCmp('tasteAddPrice').getValue();
-						if (tasteAddPrice == '') {
-							tasteAddPrice = 0;
-						}
-						var tasteAddRate = Ext.getCmp('tasteAddRate').getValue();
-						if (tasteAddRate == '') {
-							tasteAddRate = 0;
-						}
-
-						var calAdd = calAddComb.getValue();
-						var typeAdd = typeAddComb.getValue();
-
-						var isDuplicate = false;
-						for ( var i = 0; i < tasteData.length; i++) {
-							if (tasteAddNumber == tasteData[i].tasteAlias) {
-								isDuplicate = true;
-							}
-						}
-
-						if (!isDuplicate) {
-							tasteAddWin.hide();
-							isPrompt = false;
-
-							Ext.Ajax.request({
-								url : '../../InsertTaste.do',
-								params : {
-									'pin' : pin,
-									'tasteNumber' : tasteAddNumber,
-									'tasteName' : tasteAddName,
-									'tastePrice' : tasteAddPrice,
-									'tasteRate' : tasteAddRate,
-									'cal' : calAdd,
-									'type' : typeAdd
-								},
-								success : function(response, options) {
-									var resultJSON = Ext.util.JSON.decode(response.responseText);
-									if (resultJSON.success == true) {										
-										tasteStore.load({
-											params : {
-												start : 0,
-												limit : pageRecordCount
-											}
-										});
-
-										Ext.example.msg('提示', resultJSON.data);
-									} else {
-										var dataInfo = resultJSON.data;
-										Ext.MessageBox.show({
-											msg : dataInfo,
-											width : 300,
-											buttons : Ext.MessageBox.OK
-										});
-									}
-								},
-								failure : function(response, options) {
-									
-								}
-							});
-						} else {
-							Ext.MessageBox.show({
-								msg : '该口味编号已存在！',
-								width : 300,
-								buttons : Ext.MessageBox.OK
-							});
-						}
-
+					var tasteAddName = Ext.getCmp('tasteAddName').getValue();
+					var tasteAddPrice = Ext.getCmp('tasteAddPrice').getValue();
+					if (tasteAddPrice == '') {
+						tasteAddPrice = 0;
+					}
+					var tasteAddRate = Ext.getCmp('tasteAddRate').getValue();
+					if (tasteAddRate == '') {
+						tasteAddRate = 0;
 					}
 
+					var typeAdd = typeAddComb.getValue();
+
+					var isDuplicate = false;
+					for ( var i = 0; i < tasteData.length; i++) {
+						if (tasteAddNumber == tasteData[i].tasteAlias) {
+							isDuplicate = true;
+						}
+					}
+
+					if (!isDuplicate) {
+						tasteAddWin.hide();
+						isPrompt = false;
+
+						Ext.Ajax.request({
+							url : '../../InsertTaste.do',
+							params : {
+								'pin' : pin,
+								'tasteNumber' : tasteAddNumber,
+								'tasteName' : tasteAddName,
+								'tastePrice' : tasteAddPrice,
+								'tasteRate' : tasteAddRate,
+								'type' : typeAdd
+							},
+							success : function(response, options) {
+								var resultJSON = Ext.util.JSON.decode(response.responseText);
+								if (resultJSON.success == true) {										
+									tasteStore.load({
+										params : {
+											start : 0,
+											limit : pageRecordCount
+										}
+									});
+
+									Ext.example.msg('提示', resultJSON.data);
+								} else {
+									var dataInfo = resultJSON.data;
+									Ext.MessageBox.show({
+										msg : dataInfo,
+										width : 300,
+										buttons : Ext.MessageBox.OK
+									});
+								}
+							},
+							failure : function(response, options) {
+								
+							}
+						});
+					} else {
+						Ext.MessageBox.show({
+							msg : '该口味编号已存在！',
+							width : 300,
+							buttons : Ext.MessageBox.OK
+						});
+					}
 				}
-			}, {
-				text : '取消',
-				handler : function() {
-					tasteAddWin.hide();
-					isPrompt = false;
-				}
-			} ],
+			}
+		}, {
+			text : '取消',
+			handler : function() {
+				tasteAddWin.hide();
+				isPrompt = false;
+			}
+		}
+	],
 	listeners : {
 		'show' : function(thiz) {
 
-			Ext.getCmp('tasteAddNumber').setValue('');
-			tasteAddWin.findById('tasteAddNumber').clearInvalid();
+			Ext.getCmp('tasteAddNumber').setValue();
+			Ext.getCmp('tasteAddNumber').clearInvalid();
 
-			Ext.getCmp('tasteAddName').setValue('');
+			Ext.getCmp('tasteAddName').setValue();
 			Ext.getCmp('tasteAddName').clearInvalid();
 
 			Ext.getCmp('tasteAddPrice').setValue(0.00);
 			Ext.getCmp('tasteAddRate').setValue(0.00);
-
-			calAddComb.setValue(calAddData[0][0]);
-			calAddComb.clearInvalid();
-
-			typeAddComb.setValue(typeAddData[0][0]);
-			typeAddComb.clearInvalid();
+			
+			Ext.getCmp('typeAddComb').setValue(typeAddData[0][0]);
+			Ext.getCmp('typeAddComb').clearInvalid();
 
 			var f = Ext.get('tasteAddNumber');
 			f.focus.defer(100, f);
-
+			
 		}
 	}
 });
@@ -375,27 +356,6 @@ function tasteDeleteHandler(rowIndex) {
 	});
 };
 
-var calModStore = new Ext.data.SimpleStore({
-	fields : [ 'value', 'text' ],
-	data : calAddData
-});
-
-var calModComb = new Ext.form.ComboBox({
-	// fieldLabel : '计算方式',
-	forceSelection : true,
-	width : 160,
-	value : calAddData[0][0],
-	id : 'calModComb',
-	store : calModStore,
-	valueField : 'value',
-	displayField : 'text',
-	typeAhead : true,
-	mode : 'local',
-	triggerAction : 'all',
-	selectOnFocus : true,
-	allowBlank : false
-});
-
 var typeModStore = new Ext.data.SimpleStore({
 	fields : [ 'value', 'text' ],
 	data : typeAddData
@@ -475,7 +435,14 @@ var tasteColumnModel = new Ext.grid.ColumnModel([
 		align : 'right',
 		renderer :Ext.ux.txtFormat.gridDou,
 		editor : new Ext.form.NumberField({
-			selectOnFocus : true
+			selectOnFocus : true,
+			validator : function(v) {
+				if (v < 0.00 || v > 99999.99) {
+					return '价格范围是 0.00 至 99999.99';
+				} else {
+					return true;
+				}
+			}
 		})
 	}, {
 		header : '比例',
@@ -485,20 +452,27 @@ var tasteColumnModel = new Ext.grid.ColumnModel([
 		align : 'right',
 		renderer :Ext.ux.txtFormat.gridDou,
 		editor : new Ext.form.NumberField({
-			selectOnFocus : true
+			selectOnFocus : true,
+			validator : function(v) {
+				if (v < 0.00 || v > 9.99) {
+					return '比例范围是 0.00 至 9.99';
+				} else {
+					return true;
+				}
+			}
 		})
 	}, {
 		header : '计算方式',
 		sortable : true,
 		dataIndex : 'tasteCalc',
 		width : 100,
-		editor : calModComb,
+//		editor : calModComb,
 		renderer : function(value, cellmeta, record) {
 			var calDesc = '';
-			for ( var i = 0; i < calAddData.length; i++) {
-				if (calAddData[i][0] == value) {
-					calDesc = calAddData[i][1];
-				}
+			if(eval(record.get('tasteCategory') == 0)){
+				calDesc = '按价格';
+			}else if(eval(record.get('tasteCategory') == 2)){
+				calDesc = '按比例';
 			}
 			return calDesc;
 		}
@@ -509,11 +483,13 @@ var tasteColumnModel = new Ext.grid.ColumnModel([
 		width : 100,
 		editor : typeModComb,
 		renderer : function(value, cellmeta, record) {
-			var typeDesc = '';
-			for ( var i = 0; i < typeAddData.length; i++) {
-				if (typeAddData[i][0] == value) {
-					typeDesc = typeAddData[i][1];
-				}
+			var typeDesc = '';			
+			if(eval(value == 0)){
+				record.set('tasteCalc', 0);
+				typeDesc = '口味';
+			}else if(eval(value == 2)){
+				record.set('tasteCalc', 1);
+				typeDesc = '规格';
 			}
 			return typeDesc;
 		}
