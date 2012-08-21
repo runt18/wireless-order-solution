@@ -37,7 +37,7 @@ tasteAddWin = new Ext.Window({
 	layout : 'fit',
 	title : '添加',
 	width : 260,
-	height : 220,
+	height : 200,
 	closeAction : 'hide',
 	closable : false,
 	resizable : false,
@@ -87,9 +87,12 @@ tasteAddWin = new Ext.Window({
 			typeAddComb
 		]
 	} ],
-	buttons : [
+	bbar : [
+	    '->',
 	    {
-	    	text : '确定',
+	    	text : '保存',
+	    	id : 'btnSaveAddTaste',
+	    	iconCls : 'btn_save',
 			handler : function() {
 				if (Ext.getCmp('tasteAddNumber').isValid() && Ext.getCmp('tasteAddName').isValid()) {
 					var tasteAddNumber = Ext.getCmp('tasteAddNumber').getValue();
@@ -113,9 +116,10 @@ tasteAddWin = new Ext.Window({
 					}
 
 					if (!isDuplicate) {
-						tasteAddWin.hide();
-						isPrompt = false;
-
+						
+						Ext.getCmp('btnSaveAddTaste').setDisabled(true);
+						Ext.getCmp('btnCloseAddTaste').setDisabled(true);
+						
 						Ext.Ajax.request({
 							url : '../../InsertTaste.do',
 							params : {
@@ -135,7 +139,7 @@ tasteAddWin = new Ext.Window({
 											limit : pageRecordCount
 										}
 									});
-
+									tasteAddWin.hide();
 									Ext.example.msg('提示', resultJSON.data);
 								} else {
 									var dataInfo = resultJSON.data;
@@ -145,9 +149,18 @@ tasteAddWin = new Ext.Window({
 										buttons : Ext.MessageBox.OK
 									});
 								}
+								Ext.getCmp('btnSaveAddTaste').setDisabled(false);
+								Ext.getCmp('btnCloseAddTaste').setDisabled(false);
 							},
 							failure : function(response, options) {
-								
+								var dataInfo = Ext.util.JSON.decode(response.responseText).data;
+								Ext.MessageBox.show({
+									msg : dataInfo,
+									width : 300,
+									buttons : Ext.MessageBox.OK
+								});
+								Ext.getCmp('btnSaveAddTaste').setDisabled(false);
+								Ext.getCmp('btnCloseAddTaste').setDisabled(false);
 							}
 						});
 					} else {
@@ -160,10 +173,11 @@ tasteAddWin = new Ext.Window({
 				}
 			}
 		}, {
-			text : '取消',
+			text : '关闭',
+			id : 'btnCloseAddTaste',
+			iconCls : 'btn_close',
 			handler : function() {
 				tasteAddWin.hide();
-				isPrompt = false;
 			}
 		}
 	],
@@ -196,10 +210,7 @@ var tasteAddBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '添加口味',
 	handler : function(btn) {
-		if (!isPrompt) {
-			tasteAddWin.show();
-			isPrompt = true;
-		}
+		tasteAddWin.show();
 	}
 });
 
