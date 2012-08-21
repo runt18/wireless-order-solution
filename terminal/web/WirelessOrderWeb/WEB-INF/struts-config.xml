@@ -367,6 +367,12 @@
 			type="com.wireless.Actions.menuMgr.QueryFoodCombinationAction" scope="request"></action>
 		<action path="/UpdateFoodCombination" 
 			type="com.wireless.Actions.menuMgr.UpdateFoodCombinationAction" scope="request"></action>
+		<action path="/UpdatePriceTail" 
+			type="com.wireless.Actions.system.UpdatePriceTailAction" scope="request"></action>
+		<action path="/QuerySystemSetting" 
+			type="com.wireless.Actions.system.QuerySystemSettingAction" scope="request"></action>
+		<action path="/UpdatePriceTail" 
+			type="com.wireless.Actions.system.UpdatePriceTailAction" scope="request"></action>	
 	</action-mappings>
 	
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
