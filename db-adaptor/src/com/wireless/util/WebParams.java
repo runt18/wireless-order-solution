@@ -9,9 +9,9 @@ public class WebParams {
 	/**
 	 * 
 	 */
-	public static final int FOOD_NORMAL = OrderFood.FOOD_NORMAL;		/* 正常 */
-	public static final int FOOD_HANG_UP = OrderFood.FOOD_HANG_UP;		/* 叫起 */
-	public static final int FOOD_IMMEDIATE = OrderFood.FOOD_IMMEDIATE;	/* 即起 */
+	public final static int FOOD_NORMAL = OrderFood.FOOD_NORMAL;		/* 正常 */
+	public final static int FOOD_HANG_UP = OrderFood.FOOD_HANG_UP;		/* 叫起 */
+	public final static int FOOD_IMMEDIATE = OrderFood.FOOD_IMMEDIATE;	/* 即起 */
 	
 	/**
 	 * The payment type is as below
@@ -75,18 +75,23 @@ public class WebParams {
 	/**
 	 * 
 	 */
-	public static final int ERROR_CODE = WebParams.TIP_CODE_DEFAULT;
-	public static final String ERROR_MSG = "";
-	public static final String ERROR_TITLE = WebParams.TIP_TITLE_DEFAULT;
-	public static final int ERROR_LV = 0;
+	public final static int ERROR_CODE = WebParams.TIP_CODE_DEFAULT;
+	public final static String ERROR_MSG = "";
+	public final static String ERROR_TITLE = WebParams.TIP_TITLE_DEFAULT;
+	public final static int ERROR_LV = 0;
 	
-	public static final int TIP_CODE_ERROE = 3333;
-	public static final int TIP_CODE_EXCEPTION = 9999;
-	public static final int TIP_CODE_WARNING = 2222;
-	public static final int TIP_CODE_DEFAULT = 1111;
+	public final static int TIP_CODE_ERROE = 3333;
+	public final static int TIP_CODE_EXCEPTION = 9999;
+	public final static int TIP_CODE_WARNING = 2222;
+	public final static int TIP_CODE_DEFAULT = 1111;
 	
-	public static final String TIP_TITLE_ERROE = "错误";
-	public static final String TIP_TITLE_EXCEPTION = "异常";
-	public static final String TIP_TITLE_WARNING = "警告";
-	public static final String TIP_TITLE_DEFAULT = "提示";
+	public final static String TIP_TITLE_ERROE = "错误";
+	public final static String TIP_TITLE_EXCEPTION = "异常";
+	public final static String TIP_TITLE_WARNING = "警告";
+	public final static String TIP_TITLE_DEFAULT = "提示";
+	
+	/* 尾数处理的方式 */
+	public final static short TAIL_NO_ACTION = 0;			//小数部分不处理
+	public final static short TAIL_DECIMAL_CUT = 1;			//小数抹零
+	public final static short TAIL_DECIMAL_ROUND = 2;		//小数四舍五入	
 }
