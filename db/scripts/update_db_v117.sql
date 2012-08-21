@@ -125,3 +125,28 @@ ADD COLUMN `img` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the image to this food' 
 -- Add the field 'type' to table 'taste'
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`taste` ADD COLUMN `type` TINYINT NOT NULL DEFAULT 0 COMMENT 'the type to this taste as below.\n0 - normal\n1 - reserved'  AFTER `calc` ;
+
+-- -----------------------------------------------------
+-- Add the '例牌' to each restaurant's taste
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.taste (`restaurant_id`, `taste_alias`, `preference`, `category`, `calc`, `type`)
+SELECT id, 0, '例牌', 2, 1, 1 FROM wireless_order_db.restaurant WHERE id > 10;
+
+-- -----------------------------------------------------
+-- Add the '中牌' to each restaurant's taste
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.taste (`restaurant_id`, `taste_alias`, `preference`, `category`, `calc`, `type`)
+SELECT id, 0, '中牌', 2, 1, 1 FROM wireless_order_db.restaurant WHERE id > 10;
+
+-- -----------------------------------------------------
+-- Add the '大牌' to each restaurant's taste
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.taste (`restaurant_id`, `taste_alias`, `preference`, `category`, `calc`, `type`)
+SELECT id, 0, '大牌', 2, 1, 1 FROM wireless_order_db.restaurant WHERE id > 10;
+
+-- -----------------------------------------------------
+-- Change the all the '做法' to '口味'
+-- -----------------------------------------------------
+UPDATE `wireless_order_db`.`taste` SET 
+category = 0,rate = 0,calc = 0
+WHERE category = 1
