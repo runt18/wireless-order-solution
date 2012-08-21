@@ -28,17 +28,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" >
 
-                <LinearLayout
-                    android:id="@+id/tab1"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" >
-                </LinearLayout>
+                <include android:id="@+id/tab1"
+                    layout="@layout/dialog_tab1"/>
 
-                <LinearLayout
-                    android:id="@+id/tab2"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" >
-                </LinearLayout>
+                <include android:id="@+id/tab2" 
+                    layout="@layout/dialog_tab2"/>
 
                 <LinearLayout
                     android:id="@+id/tab3"
@@ -48,21 +42,6 @@
             </FrameLayout>
         </LinearLayout>
     </TabHost>
-
-    <!-- <RelativeLayout
-        android:id="@+id/bottom"
-        android:layout_width="fill_parent"
-        android:layout_height="50dp"
-        android:layout_alignParentBottom="true" >
 
-        <Button
-            android:id="@+id/button1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:text="Button" />
-
-    </RelativeLayout> -->
 
 </RelativeLayout>

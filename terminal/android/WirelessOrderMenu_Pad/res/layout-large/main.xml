@@ -4,52 +4,6 @@
     android:layout_height="fill_parent"
     android:orientation="horizontal" >
 
-    <!--
-    <LinearLayout
-        android:id="@+id/topbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true" >
-
-        <ImageView
-            android:id="@+id/logo_imageView_main"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:src="@drawable/ic_launcher" />
-
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="3" >
-
-            <ImageView
-                android:id="@+id/special_imageView_main"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:src="@drawable/special_imgview" />
-
-            <ImageView
-                android:id="@+id/comment_imageView_main"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_toRightOf="@+id/special_imageView_main"
-                android:src="@drawable/comment_imgview" />
-
-            <ImageView
-                android:id="@+id/current_imageView_main"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_toRightOf="@+id/comment_imageView_main"
-                android:src="@drawable/current_imgview" />
-        </RelativeLayout>
-    </LinearLayout>
-    -->
-
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
@@ -70,166 +24,9 @@
             class="com.wireless.ui.ContentFragment" />
     </LinearLayout>
 
-    <LinearLayout
+    <include
         android:id="@+id/bottombar"
-        android:layout_width="fill_parent"
-        android:layout_height="40dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:background="@color/grey"
-        android:orientation="vertical" >
-
-        <!--
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent" >
-
-            <ImageView
-                android:id="@+id/ranking_list_imageView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true"
-                android:src="@drawable/ranking_list_imgview" />
-
-            <ImageView
-                android:id="@+id/more_imageView_main"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/ranking_list_imageView"
-                android:src="@drawable/more_imgview" />
-        </RelativeLayout>
-        -->
-
-        <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="40dp" >
-
-            <TextView
-                android:id="@+id/textView1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:text="餐台:"
-                android:textColor="@color/black" />
-
-            <TextView
-                android:id="@+id/txtView_table_count"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_toRightOf="@+id/textView1"
-                android:text="点击设置" />
-
-            <ImageView
-                android:id="@+id/imgView_set_table"
-                android:layout_width="72dp"
-                android:layout_height="fill_parent"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:layout_toRightOf="@+id/textView1"
-                android:src="@color/transparent" />
-
-            <TextView
-                android:id="@+id/textView14"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBaseline="@+id/txtView_table_count"
-                android:layout_alignBottom="@+id/txtView_table_count"
-                android:layout_marginLeft="28dp"
-                android:layout_toRightOf="@+id/txtView_table_count"
-                android:text="人数:" />
-
-            <ImageView
-                android:id="@+id/imageView_num_people"
-                android:layout_width="72dp"
-                android:layout_height="fill_parent"
-                android:layout_centerVertical="true"
-                android:layout_toRightOf="@+id/textView14"
-                android:src="@color/transparent" />
-
-            <TextView
-                android:id="@+id/textView15"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBaseline="@+id/textView14"
-                android:layout_alignBottom="@+id/textView14"
-                android:layout_alignLeft="@+id/imageView_num_people"
-                android:text="点击设置" />
-
-            <TextView
-                android:id="@+id/textView16"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBaseline="@+id/textView15"
-                android:layout_alignBottom="@+id/textView15"
-                android:layout_marginLeft="28dp"
-                android:layout_toRightOf="@+id/textView15"
-                android:text="已点菜:" />
-
-            <TextView
-                android:id="@+id/textView17"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/textView16"
-                android:layout_toRightOf="@+id/textView16"
-                android:text="9" />
-
-            <TextView
-                android:id="@+id/textView18"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/textView17"
-                android:layout_marginLeft="28dp"
-                android:layout_toRightOf="@+id/textView17"
-                android:text="会员:" />
-
-            <TextView
-                android:id="@+id/textView19"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBaseline="@+id/textView18"
-                android:layout_alignBottom="@+id/textView18"
-                android:layout_toRightOf="@+id/textView18"
-                android:text="点击设置" />
-
-            <TextView
-                android:id="@+id/textView20"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/textView19"
-                android:layout_marginLeft="28dp"
-                android:layout_toRightOf="@+id/textView19"
-                android:text="服务员:" />
-
-            <TextView
-                android:id="@+id/textView21"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBaseline="@+id/textView20"
-                android:layout_alignBottom="@+id/textView20"
-                android:layout_toRightOf="@+id/textView20"
-                android:text="点击设置" />
-
-            <ImageView
-                android:id="@+id/imageView_vip"
-                android:layout_width="72dp"
-                android:layout_height="fill_parent"
-                android:layout_alignLeft="@+id/textView19"
-                android:layout_centerVertical="true"
-                android:src="@color/transparent" />
-
-            <ImageView
-                android:id="@+id/imageView_server"
-                android:layout_width="72dp"
-                android:layout_height="fill_parent"
-                android:layout_alignLeft="@+id/textView21"
-                android:layout_centerVertical="true"
-                android:src="@color/transparent" />
-
-        </RelativeLayout>
-    </LinearLayout>
+        layout="@layout/bottombar" />
 
     <RelativeLayout
         android:id="@+id/relativeLayout2"
@@ -251,7 +48,9 @@
             <RelativeLayout
                 android:layout_width="fill_parent"
                 android:layout_height="40dp"
-                android:background="@color/half_transparent" >
+                android:background="@color/half_transparent"
+                android:focusable="true"
+                android:focusableInTouchMode="true" >
 
                 <ImageView
                     android:id="@+id/imageView1"
@@ -353,13 +152,15 @@
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="40dp"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="40dp"
+        android:layout_above="@+id/bottombar"
+        android:layout_alignParentBottom="false"
         android:visibility="visible" >
 
         <LinearLayout
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:focusableInTouchMode="true" >
 
             <TextView
                 android:id="@+id/textView2"
@@ -429,7 +230,6 @@
                     android:ems="10"
                     android:inputType="number" >
 
-                    <requestFocus />
                 </EditText>
 
                 <ImageView

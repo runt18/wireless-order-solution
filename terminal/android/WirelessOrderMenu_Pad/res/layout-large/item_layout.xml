@@ -26,11 +26,8 @@
         android:layout_above="@+id/bottombar"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/item_recommend_imgView"
-        android:childIndicator="@drawable/expandable_child_selector"
         android:fadingEdge="vertical"
-        android:fadingEdgeLength="4dp"
-        android:scrollbarAlwaysDrawVerticalTrack="true" >
-
+        android:fadingEdgeLength="4dp" >
     </ExpandableListView>
 
     <RelativeLayout
@@ -77,7 +74,6 @@
             android:text="更多"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="@color/white" />
-
     </RelativeLayout>
 
     <TextView

@@ -31,6 +31,7 @@ import android.widget.TextView;
 import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
 import com.wireless.lib.task.PicDownloadTask;
+import com.wireless.ordermenu.R;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodMenu;

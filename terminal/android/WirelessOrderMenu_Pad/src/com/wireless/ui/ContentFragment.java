@@ -11,10 +11,15 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.BaseAdapter;
 import android.widget.Gallery;
 import android.widget.ImageView;
@@ -25,6 +30,22 @@ import com.wireless.ordermenu.R;
 public class ContentFragment extends Fragment {
 	ImageAdapter mAdapter = null;
 	Gallery mGallery;
+	Handler mHandler;
+	
+	public interface OnViewChangeListener{
+		void onViewChange(int value);
+	}
+	
+	public static OnViewChangeListener sDummyListener = new OnViewChangeListener() {
+		@Override
+		public void onViewChange(int value) {}
+	};
+	
+	public static OnViewChangeListener mOnViewChangeListener = sDummyListener;
+	
+	public void setOnViewChangeListener(OnViewChangeListener l)
+	{	mOnViewChangeListener = l;}
+	
    @Override  
     public View onCreateView(LayoutInflater inflater, ViewGroup container,  
             Bundle savedInstanceState) {  
@@ -35,8 +56,6 @@ public class ContentFragment extends Fragment {
 	public void onUpdateContent(int position) {
 		mGallery.setSelection(position);
 		Log.i("#########@@@@@@",""+position);
-//		mAdapter.setImages(imageNames);
-//		mAdapter.notifyDataSetChanged();
 	}
 	
 	public void setContent(ArrayList<String> imageNames)
@@ -51,36 +70,55 @@ public class ContentFragment extends Fragment {
 		super.onActivityCreated(savedInstanceState);
 		
         mGallery = (Gallery)this.getActivity().findViewById(R.id.gallery1);
-        mAdapter = new ImageAdapter(this.getActivity());
+        mHandler = new Handler();
+        mAdapter = new ImageAdapter(this.getActivity(),mHandler);
 		File imagesDir = Environment.getExternalStorageDirectory();
 		if(imagesDir != null)
 			mAdapter.setStoreDir(imagesDir);
         mGallery.setAdapter(mAdapter);
+        mGallery.setCallbackDuringFling(true);
+        mGallery.setOnItemSelectedListener(new OnItemSelectedListener(){
+
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view,int position, long id) {
+				// TODO Auto-generated method stub
+				mOnViewChangeListener.onViewChange(position);
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+				// TODO Auto-generated method stub
+			}
+        });
 	}
 }
 
 class ImageAdapter extends BaseAdapter {
 	private final String NULL = "sign_null";
-	private File storeDir = null;
+	private File mStoreDir = null;
 	private Context mContext;
+	private AsynImageLoader mImgLoader;
 	// 图片的资源ID
-	private ArrayList<String> imgPaths = new ArrayList<String>();
+	private ArrayList<String> mImgPaths = new ArrayList<String>();
+	private Bitmap mDefaultBitmap ;
 
 	// 构造函数
-	public ImageAdapter(Context context) {
+	public ImageAdapter(Context context,Handler handler) {
 		this.mContext = context;
+		mImgLoader = new AsynImageLoader(handler);
+		mDefaultBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.loading_pic);
 	}
 
 	// 返回所有图片的个数
 	@Override
 	public int getCount() {
-		return imgPaths.size();
+		return mImgPaths.size();
 	}
 
 	// 返回图片路径
 	@Override
 	public Object getItem(int position) {
-		return imgPaths.get(position);
+		return mImgPaths.get(position);
 	}
 
 	// 返回图片在资源的位置
@@ -103,25 +141,33 @@ class ImageAdapter extends BaseAdapter {
 		else {
 			imageView = (ImageView)convertView;
 		}
-		
-		String filePath = imgPaths.get(position);
+		//XXX
+		String filePath = mImgPaths.get(position);
 		if(filePath != NULL)
 		{
-			Bitmap bm = BitmapFactory.decodeFile(filePath);
+//			Bitmap bm = BitmapFactory.decodeFile(filePath);
 			// 通过索引获得图片并设置给ImageView
-			imageView.setImageBitmap(bm);
+//			imageView.setImageBitmap(bm);
+//			imageView.setImageResource(R.drawable.ic_launcher);
+			imageView.setTag(filePath);
+			mImgLoader.loadBitmap(imageView,mDefaultBitmap);
 		}
+		else {
+			imageView.setImageResource(R.drawable.null_pic);
+		}
+		
+
 		
 		return imageView;
 	}
 	
 	public void setStoreDir(File dir)
 	{
-		storeDir = dir;
-		String storeDirString = storeDir.toString();
+		mStoreDir = dir;
+		String storeDirString = mStoreDir.toString();
 		if(storeDirString.endsWith("/"))
-			storeDir = new File(storeDirString+Params.IMG_STORE_STRING);
-		else storeDir = new File(storeDirString+"/"+Params.IMG_STORE_STRING);
+			mStoreDir = new File(storeDirString+Params.IMG_STORE_PATH);
+		else mStoreDir = new File(storeDirString+"/"+Params.IMG_STORE_PATH);
 //		Log.i("dir ", storeDir.getAbsolutePath());
 //		Log.i("dir string",  storeDirString);
 
@@ -135,15 +181,15 @@ class ImageAdapter extends BaseAdapter {
 	 public void setImages(ArrayList<String> imageNames){
 		if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
 		{
-			if(!storeDir.exists())
-				storeDir.mkdir();
+			if(!mStoreDir.exists())
+				mStoreDir.mkdir();
 			
-			 imgPaths.clear();
+			mImgPaths.clear();
 			 HashSet<String> existImgs = new HashSet<String>();
 	
-			 if(storeDir != null)
+			 if(mStoreDir != null)
 			 {
-				 File[] allFiles = storeDir.listFiles();
+				 File[] allFiles = mStoreDir.listFiles();
 				 for(File f:allFiles)
 				 {
 					 existImgs.add(f.getAbsolutePath());
@@ -151,19 +197,19 @@ class ImageAdapter extends BaseAdapter {
 				 }
 			 }
 			 
-			 String storePath = storeDir.getAbsolutePath();
+			 String storePath = mStoreDir.getAbsolutePath();
 			 for(String s:imageNames)
 			 {
 //				 Log.i(s,"*********@");
 				 String imgAbsPath = storePath+"/"+s;
 //				 Log.i("ffffffffffffff",imgAbsPath);
 				 if(existImgs.contains(imgAbsPath)){
-					 imgPaths.add(imgAbsPath);
+					 mImgPaths.add(imgAbsPath);
 //					 Log.i("rrrrrrrrrrrr",imgAbsPath);
 				 }
 				 else {
 //					 Log.i("ddddddddddd","9");
-					 imgPaths.add(NULL);
+					 mImgPaths.add(NULL);
 				 }
 			 }
 //			 Log.i(NULL,""+imgPaths.size());

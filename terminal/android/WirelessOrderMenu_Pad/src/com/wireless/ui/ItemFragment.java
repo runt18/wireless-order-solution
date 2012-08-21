@@ -28,12 +28,7 @@ import com.wireless.protocol.Kitchen;
 public class ItemFragment extends Fragment{
     private static final String STATE_ACTIVATED_GROUP = "activated_group";
     private static final String STATE_ACTIVATED_CHILD = "activated_child";
-	
-    private static OnItemChangeListener sDummyListener = new OnItemChangeListener(){
-		@Override
-		public void onItemChange(int value) {
-		}
-    };
+
     
 	private List<Department> mGroups = new ArrayList<Department>();
 	private List<List<Kitchen>> mChildren = new ArrayList<List<Kitchen>>();//分厨
@@ -43,20 +38,37 @@ public class ItemFragment extends Fragment{
 	
 	private int mActivatedGroup,mActivatedChild;
 	
+	
+    private static OnItemChangeListener sDummyListener = new OnItemChangeListener(){
+		@Override
+		public void onItemChange(int value) {
+		}
+    };
+	
 	private static OnItemChangeListener mOnItemChangeListener = sDummyListener;
 
 	public interface OnItemChangeListener{
 		void onItemChange(int value);
 	}
 	
-	public static void setItemChangeListener(OnItemChangeListener l){
+	public void setOnItemChangeListener(OnItemChangeListener l){
 		mOnItemChangeListener = l;
 	}
 	
-	public void onUpdateContent(List<Department> groups , List<List<Kitchen>> children){
+	
+	public void setContent(List<Department> groups , List<List<Kitchen>> children){
 		mGroups = groups;
 		mChildren = children;
 		mAdapter.notifyDataSetChanged();
+	}
+	
+	public void setPosition(int groupPosition,int childPosition)
+	{
+		//TODO 
+		Log.i(""+groupPosition,""+ childPosition);
+		mListView.expandGroup(groupPosition);
+		mListView.setSelectedChild(groupPosition, childPosition, true);
+//		mListView.setSelectedGroup(groupPosition);
 	}
 	
 	@Override
@@ -116,19 +128,19 @@ public class ItemFragment extends Fragment{
 		});
 	}
 	
-	@Override
-	public void onAttach(Activity activity){
-		super.onAttach(activity);
-		if(!(activity instanceof OnItemChangeListener))
-			throw new IllegalStateException("Activity must implement fragment's OnItemChangeListener");
-		mOnItemChangeListener = (OnItemChangeListener) activity;
-	}
-	
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mOnItemChangeListener = sDummyListener;
-    }
+//	@Override
+//	public void onAttach(Activity activity){
+//		super.onAttach(activity);
+//		if(!(activity instanceof OnItemChangeListener))
+//			throw new IllegalStateException("Activity must implement fragment's OnItemChangeListener");
+//		mOnItemChangeListener = (OnItemChangeListener) activity;
+//	}
+//	
+//    @Override
+//    public void onDetach() {
+//        super.onDetach();
+//        mOnItemChangeListener = sDummyListener;
+//    }
     
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -185,12 +197,10 @@ public class ItemFragment extends Fragment{
 			if (convertView != null) {
 				view = convertView;
 			} else {
-				view = View.inflate(ItemFragment.this.getActivity(),
-						R.layout.xpd_lstview_group, null);
+				view = View.inflate(ItemFragment.this.getActivity(),R.layout.xpd_lstview_group, null);
 			}
 
-			((TextView) view.findViewById(R.id.kitchenGroup))
-					.setText(mGroups.get(groupPosition).name);
+			((TextView) view.findViewById(R.id.kitchenGroup)).setText(mGroups.get(groupPosition).name);
 
 			return view;
 		}

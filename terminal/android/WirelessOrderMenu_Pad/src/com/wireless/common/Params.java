@@ -51,5 +51,4 @@ public final class Params {
 	public final static String IMG_STORE_PATH = "/digi-e/images/";
 	
 	public final static String FOOD_IMG_PROJECT_TBL = "FoodImgProj";
-	public final static String IMG_STORE_STRING = "/digi-e/android/cache/";
 }
