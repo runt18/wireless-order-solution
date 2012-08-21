@@ -47,5 +47,9 @@ public final class Params {
 	/* The default staff pin */
 	public final static long DEF_STAFF_PIN = -1;
 	
+	/* The folder path to image */
+	public final static String IMG_STORE_PATH = "/digi-e/images/";
+	
+	public final static String FOOD_IMG_PROJECT_TBL = "FoodImgProj";
 	public final static String IMG_STORE_STRING = "/digi-e/android/cache/";
 }

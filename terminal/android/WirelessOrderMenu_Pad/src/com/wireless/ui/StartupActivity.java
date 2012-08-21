@@ -1,8 +1,17 @@
 package com.wireless.ui;
 
 
-import java.io.FileNotFoundException;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -16,23 +25,23 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
-import com.wireless.lib.PinReader;
-import com.wireless.ordermenu.R;
+import com.wireless.lib.task.PicDownloadTask;
 import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.Food;
+import com.wireless.protocol.FoodMenu;
 import com.wireless.protocol.PinGen;
 import com.wireless.protocol.ProtocolPackage;
+import com.wireless.protocol.Region;
 import com.wireless.protocol.ReqPackage;
-import com.wireless.protocol.ReqQueryMenu;
-import com.wireless.protocol.ReqQueryRegion;
-import com.wireless.protocol.ReqQueryRestaurant;
 import com.wireless.protocol.ReqQueryStaff;
-import com.wireless.protocol.ReqQueryTable;
 import com.wireless.protocol.RespParser;
-import com.wireless.protocol.RespParserEx;
+import com.wireless.protocol.Restaurant;
+import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 import com.wireless.protocol.Type;
 import com.wireless.sccon.ServerConnector;
@@ -63,7 +72,8 @@ public class StartupActivity extends Activity {
     			editor.putInt(Params.LAST_PICK_CATE, Params.PICK_BY_KITCHEN);
     			editor.commit();//提交修改
     			
-    		}else{		//FIXME
+    		}else{		
+    			//FIXME
     			ServerConnector.instance().setNetAddr("122.115.57.66");
     			ServerConnector.instance().setNetPort(sharedPrefs.getInt(Params.IP_PORT, Params.DEF_IP_PORT));
     		}
@@ -137,7 +147,7 @@ public class StartupActivity extends Activity {
 	/**
 	 * 从SDCard中读取PIN的验证信息
 	 */
-	private class ReadPinTask extends AsyncTask<Void, Void, String>{
+	private class ReadPinTask extends com.wireless.lib.task.ReadPinTask{
 		
 		/**
 		 * 在读取Pin信息前显示提示信息
@@ -145,33 +155,18 @@ public class StartupActivity extends Activity {
 		@Override
 		protected void onPreExecute(){			
 			mMsgTxtView.setText("正在读取验证PIN码...请稍候");
-		}
+		}		
 		
 		/**
-		 * 从SDCard的指定位置读取Pin的值
+		 * 如果读取成功，执行QueryStaff的操作。
+		 * 否则提示用户错误信息。
 		 */
 		@Override
-		protected String doInBackground(Void... arg0) {
-			String errMsg = null;
-			
-			try{
-				WirelessOrder.pin = Long.parseLong(PinReader.read(), 16);
-			}catch(FileNotFoundException e){
-				errMsg = "找不到PIN验证文件，请确认是否已插入验证用的SDCard";
-			}catch(IOException e){
-				errMsg = "读取PIN验证信息失败";
-			}catch(NumberFormatException e){
-				errMsg = "PIN验证信息的格式不正确";
-			}
-			return errMsg;
-		}
-		
-		@Override
-		protected void onPostExecute(String errMsg){
-			if(errMsg != null){
+		protected void onPostExecute(Long pin){
+			if(mErrMsg != null){
 				new AlertDialog.Builder(StartupActivity.this)
 				.setTitle("提示")
-				.setMessage(errMsg)
+				.setMessage(mErrMsg)
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						finish();
@@ -179,6 +174,7 @@ public class StartupActivity extends Activity {
 				}).show();				
 				
 			}else{
+				WirelessOrder.pin = pin;
 				new QueryStaffTask().execute();
 			}
 		}
@@ -466,41 +462,46 @@ public class StartupActivity extends Activity {
 				.setMessage(errMsg)
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
-						//TODO 改到设置页面
-						Intent intent = new Intent(StartupActivity.this, MainActivity.class);
-						startActivity(intent);
 						finish();
 					}
 				}).show();
 				
 			}else{
 				if(WirelessOrder.staffs == null){
-					new AlertDialog.Builder(StartupActivity.this)
-								   .setTitle("提示")
-					               .setMessage("没有查询到任何的员工信息，请先在管理后台添加员工信息")
-					               .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-					            	   public void onClick(DialogInterface dialog, int id) {
-					            		 //TODO 改到设置页面
-											Intent intent = new Intent(StartupActivity.this, MainActivity.class);
-											startActivity(intent);
-											finish();
-					            	   }
-					               })
-					               .show();
+					new AlertDialog
+						.Builder(StartupActivity.this)
+						.setTitle("提示")
+					    .setMessage("没有查询到任何的员工信息，请先在管理后台添加员工信息")
+					    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					    	public void onClick(DialogInterface dialog, int id) {
+							   finish();
+					        }
+					     })
+					     .show();
 				}else{
-					new QueryMenuTask().execute();					
+	
+					new QueryMenuTask().execute();
 				}
 			}
 		}	
 	}
 	
-	/**
-	 * 请求菜谱信息
-	 */
-	private class QueryMenuTask extends AsyncTask<Void, Void, String>{
-
-		//private ProgressDialog _progDialog;
+	private class QueryMenuTask extends com.wireless.lib.task.QueryMenuTask{
 		
+		private Comparator<Food> mFoodComp = new Comparator<Food>() {
+			@Override
+			public int compare(Food lhs, Food rhs) {
+				if(lhs.aliasID == rhs.aliasID){
+					return 0;
+				}else if(lhs.aliasID > rhs.aliasID){
+					return 1;
+				}else{
+					return -1;
+				}
+			}
+		};
+		
+		private SharedPreferences mSharedPrefs = getSharedPreferences(Params.FOOD_IMG_PROJECT_TBL, Context.MODE_PRIVATE);
 		/**
 		 * 执行菜谱请求操作前显示提示信息
 		 */
@@ -510,72 +511,165 @@ public class StartupActivity extends Activity {
 		}
 		
 		/**
-		 * 在新的线程中执行请求菜谱信息的操作
+		 * 执行菜谱请求操作
 		 */
 		@Override
-		protected String doInBackground(Void... arg0) {
-			
-			String errMsg = null;
-			try{
-				WirelessOrder.foodMenu = null;
-				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryMenu());
-				if(resp.header.type == Type.ACK){
-					WirelessOrder.foodMenu = RespParserEx.parseQueryMenu(resp);
-				}else{
-					if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
-						errMsg = "终端没有登记到餐厅，请联系管理人员。";
-					}else if(resp.header.reserved == ErrorCode.TERMINAL_EXPIRED) {
-						errMsg = "终端已过期，请联系管理人员。";
-					}else{
-						errMsg = "菜谱下载失败，请检查网络信号或重新连接。";
+		protected FoodMenu doInBackground(Void... arg0) {
+			FoodMenu foodMenu = super.doInBackground(arg0);
+			if(foodMenu != null){
+				/**
+				 * Filter the food without image and sort the food by alias id
+				 */
+				List<Food> validFoods = new ArrayList<Food>();
+				for(Food food : foodMenu.foods){
+					if(food.image != null){
+						validFoods.add(food);
 					}
-					throw new IOException(errMsg);
 				}
-			}catch(IOException e){
-				errMsg = e.getMessage();
+				Collections.sort(validFoods, mFoodComp);
+				foodMenu.foods = validFoods.toArray(new Food[validFoods.size()]);
 			}
-			
-			return errMsg;
+			return foodMenu;
 		}
 		
-
 		/**
 		 * 根据返回的error message判断，如果发错异常则提示用户，
 		 * 如果菜谱请求成功，则继续进行请求餐厅信息的操作。
 		 */
 		@Override
-		protected void onPostExecute(String errMsg){
-			//make the progress dialog disappeared
-			//_progDialog.dismiss();					
-			//notify the main activity to redraw the food menu
-			//_handler.sendEmptyMessage(REDRAW_FOOD_MENU);
+		protected void onPostExecute(FoodMenu foodMenu){
+
+			WirelessOrder.foodMenu = foodMenu;
+			
 			/**
 			 * Prompt user message if any error occurred,
 			 * otherwise continue to query restaurant info.
 			 */
-			if(errMsg != null){
+			if(mErrMsg != null){
 				new AlertDialog.Builder(StartupActivity.this)
 				.setTitle("提示")
-				.setMessage(errMsg)
+				.setMessage(mErrMsg)
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
-						//TODO 改到设置页面
-						Intent intent = new Intent(StartupActivity.this, MainActivity.class);
-						startActivity(intent);
 						finish();
 					}
 				}).show();
 				
 			}else{
-				new QueryRegionTask().execute();
+				
+				List<Food> downloadQueue = new ArrayList<Food>();
+				Map<String, ?> foodImg = mSharedPrefs.getAll();
+				for(Food food : WirelessOrder.foodMenu.foods){
+					if(food.image != null){
+						/**
+						 * Push the food to download queue in the three cases below.
+						 * 1 - the food is NOT contained in original list
+						 * 2 - the food's image is NOT the same as the original
+						 * 3 - the food's image file is NOT exist in the current file system
+						 */
+						Object image = foodImg.get(Integer.toString(food.aliasID));
+						if(image == null){
+							downloadQueue.add(food);
+							
+						}else if(!image.equals(food.image)){
+							downloadQueue.add(food);
+							
+						}else if(!new File(android.os.Environment.getExternalStorageDirectory().getPath() + Params.IMG_STORE_PATH + food.image).exists()){
+							downloadQueue.add(food);										
+						}										
+					}
+				}								
+				
+				/**
+				 * Enumerate the food image to check if each item is contained in the food menu.
+				 * If NOT contained, means the food associated with this image is no longer exist.
+				 * Just delete the image and remove it from preference in this case.
+				 */
+				Editor edit = mSharedPrefs.edit();								
+				for(Map.Entry<String, ?> entry : foodImg.entrySet()){
+					
+					int index = Arrays.binarySearch(WirelessOrder.foodMenu.foods, new Food(Integer.parseInt(entry.getKey()), ""), mFoodComp);			
+					
+					if(index < 0){
+						File file = new File(android.os.Environment.getExternalStorageDirectory().getPath() + 
+							 			 	 Params.IMG_STORE_PATH + 
+							 			 	 entry.getValue());
+						/**
+						 * Remove the food key and delete the image file if it exist.
+						 * Otherwise just remove the food key.
+						 */
+						if(file.exists()){
+							if(file.delete()){
+								edit.remove(entry.getKey());
+							}
+						}else{
+							edit.remove(entry.getKey());
+						}
+					}
+				}
+				edit.commit();
+				
+				new PicDownloadTask("http://122.115.57.66/eMenu/37/images/"){
+					
+					Editor edit = mSharedPrefs.edit();
+
+					@Override 
+					protected void onPreExecute(){			
+						File folder = new File(android.os.Environment.getExternalStorageDirectory().getPath() + Params.IMG_STORE_PATH);
+						if(!folder.exists()){
+							folder.mkdirs();
+						}
+					}
+					
+					@Override
+					protected void onProgressFinish(Food food, ByteArrayOutputStream picOutputStream) {
+						try{
+							picOutputStream.writeTo(new BufferedOutputStream(
+														new FileOutputStream(new File(android.os.Environment.getExternalStorageDirectory().getPath() + 
+																			 		  Params.IMG_STORE_PATH + 
+																			 		  food.image))));
+							
+							edit.putString(Integer.toString(food.aliasID), food.image);			
+							
+						}catch(IOException e){
+							Log.e("", e.getMessage());
+						}
+					}
+					
+					@Override
+				    protected void onProgressUpdate(Progress... progress) {
+						if(progress[0].status == Progress.IN_QUEUE){
+							mMsgTxtView.setText("正在下载" + progress[0].food.name + "的图片..." + "准备下载");
+							
+						}else if(progress[0].status == Progress.IN_PROGRESS){
+							mMsgTxtView.setText("正在下载" + progress[0].food.name + "的图片..." + progress[0].progress + "%");
+
+						}else if(progress[0].status == Progress.DOWNLOAD_SUCCESS){
+							mMsgTxtView.setText("正在下载" + progress[0].food.name + "的图片..." + "完成");											
+							
+						}else if(progress[0].status == Progress.DOWNLOAD_FAIL){
+							mMsgTxtView.setText("正在下载" + progress[0].food.name + "的图片..." + "失败");											
+						}
+				    }
+					
+					@Override
+					protected void onPostExecute(Progress[] result){
+
+						edit.commit();
+						
+						new QueryRegionTask().execute();
+					}
+					
+				}.execute(downloadQueue.toArray(new Food[downloadQueue.size()]));				
+				
 			}
-		}		
+		}
 	}
 	
 	/**
 	 * 请求查询区域信息
 	 */
-	private class QueryRegionTask extends AsyncTask<Void, Void, String>{
+	private class QueryRegionTask extends com.wireless.lib.task.QueryRegionTask{
 		/**
 		 * 在执行请求区域信息前显示提示信息
 		 */
@@ -585,48 +679,26 @@ public class StartupActivity extends Activity {
 		}
 		
 		/**
-		 * 在新的线程中执行请求区域信息的操作
-		 */
-		@Override
-		protected String doInBackground(Void... arg0) {
-		
-			String errMsg = null;
-			try{
-				WirelessOrder.regions = null;
-				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryRegion());
-				if(resp.header.type == Type.ACK){
-					WirelessOrder.regions = RespParser.parseQueryRegion(resp);
-				}
-			}catch(IOException e){
-				errMsg = e.getMessage();
-			}
-			
-			return errMsg;
-		}
-		
-		/**
 		 * 根据返回的error message判断，如果发错异常则提示用户，
 		 * 如果成功，则执行请求餐台的操作。
 		 */
 		@Override
-		protected void onPostExecute(String errMsg){
+		protected void onPostExecute(Region[] regions){
 			/**
 			 * Prompt user message if any error occurred.
 			 */		
-			if(errMsg != null){
+			if(mErrMsg != null){
 				new AlertDialog.Builder(StartupActivity.this)
-				.setTitle("提示")
-				.setMessage(errMsg)
-				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						//TODO 改到设置页面
-						Intent intent = new Intent(StartupActivity.this, MainActivity.class);
-						startActivity(intent);
-						finish();
-					}
-				}).show();
+					.setTitle("提示")
+					.setMessage(mErrMsg)
+					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							finish();
+						}
+					}).show();
 				
-			}else{				
+			}else{		
+				WirelessOrder.regions = regions;
 				new QueryTableTask().execute();
 			}
 		}
@@ -635,58 +707,37 @@ public class StartupActivity extends Activity {
 	/**
 	 * 请求餐台信息
 	 */
-	private class QueryTableTask extends AsyncTask<Void, Void, String>{
+	private class QueryTableTask extends com.wireless.lib.task.QueryTableTask{
 		/**
-		 * 在执行请求区域信息前显示提示信息
+		 * 在执行请求餐台信息前显示提示信息
 		 */
 		@Override
 		protected void onPreExecute(){			
 			mMsgTxtView.setText("更新餐台信息...请稍候");
 		}
 		
-		/**
-		 * 在新的线程中执行请求餐台信息的操作
-		 */
-		@Override
-		protected String doInBackground(Void... arg0) {
-		
-			String errMsg = null;
-			try{
-				WirelessOrder.tables = null;
-				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryTable());
-				if(resp.header.type == Type.ACK){
-					WirelessOrder.tables = RespParser.parseQueryTable(resp);
-				}
-			}catch(IOException e){
-				errMsg = e.getMessage();
-			}
-			
-			return errMsg;
-		}
 		
 		/**
 		 * 根据返回的error message判断，如果发错异常则提示用户，
 		 * 如果成功，则执行请求餐厅的操作。
 		 */
 		@Override
-		protected void onPostExecute(String errMsg){
+		protected void onPostExecute(Table[] tables){
 			/**
 			 * Prompt user message if any error occurred.
 			 */		
-			if(errMsg != null){
+			if(mErrMsg != null){
 				new AlertDialog.Builder(StartupActivity.this)
-				.setTitle("提示")
-				.setMessage(errMsg)
-				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						//TODO 改到设置页面
-						Intent intent = new Intent(StartupActivity.this, MainActivity.class);
-						startActivity(intent);
-						finish();
-					}
-				}).show();
+					.setTitle("提示")
+					.setMessage(mErrMsg)
+					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							finish();
+						}
+					}).show();
 				
-			}else{				
+			}else{		
+				WirelessOrder.tables = tables;
 				new QueryRestaurantTask().execute();
 			}
 		}
@@ -695,7 +746,7 @@ public class StartupActivity extends Activity {
 	/**
 	 * 请求查询餐厅信息
 	 */
-	private class QueryRestaurantTask extends AsyncTask<Void, Void, String>{
+	private class QueryRestaurantTask extends com.wireless.lib.task.QueryRestaurantTask{
 		
 		/**
 		 * 在执行请求餐厅信息前显示提示信息
@@ -703,51 +754,30 @@ public class StartupActivity extends Activity {
 		@Override
 		protected void onPreExecute(){			
 			mMsgTxtView.setText("更新餐厅信息...请稍候");
-		}
-		
-		/**
-		 * 在新的线程中执行请求餐厅信息的操作
-		 */
-		@Override
-		protected String doInBackground(Void... arg0) {
-		
-			String errMsg = null;
-			try{
-				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryRestaurant());
-				if(resp.header.type == Type.ACK){
-					WirelessOrder.restaurant = RespParser.parseQueryRestaurant(resp);
-				}
-			}catch(IOException e){
-				errMsg = e.getMessage();
-			}
-			
-			return errMsg;
-		}
+		}		
 		
 		/**
 		 * 根据返回的error message判断，如果发错异常则提示用户，
 		 * 如果成功，则跳转到主界面。
 		 */
 		@Override
-		protected void onPostExecute(String errMsg){
+		protected void onPostExecute(Restaurant restaurant){
 			/**
 			 * Prompt user message if any error occurred.
 			 */
 		
-			if(errMsg != null){
+			if(mErrMsg != null){
 				new AlertDialog.Builder(StartupActivity.this)
 				.setTitle("提示")
-				.setMessage(errMsg)
+				.setMessage(mErrMsg)
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
-						//TODO 改到设置页面
-						Intent intent = new Intent(StartupActivity.this, MainActivity.class);
-						startActivity(intent);
 						finish();						
 					}
 				}).show();
 				
-			}else{				
+			}else{		
+				WirelessOrder.restaurant = restaurant;
 				Intent intent = new Intent(StartupActivity.this,MainActivity.class);
 				startActivity(intent);
 				overridePendingTransition(android.R.anim.fade_in,android.R.anim.fade_out);    
