@@ -4,12 +4,14 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>无线点餐网页终端</title>
 
-<link rel="stylesheet" type="text/css"
-	href="../../extjs/resources/css/ext-all.css" />
+<link rel="stylesheet" type="text/css" href="../../extjs/resources/css/ext-all.css" />
+<link rel="stylesheet" type="text/css" href="../../css/myExt.css" />
+<link rel="stylesheet" type="text/css" href="../../extjs/ext-patch.css" />
 <script type="text/javascript" src="../../extjs/ext-base.js"></script>
 <script type="text/javascript" src="../../extjs/ext-all.js"></script>
+<script type="text/javascript" src="../../js/common/Ext.ux.js"></script>
+<script type="text/javascript" src="../../js/common/Ext.ux.check.js"></script>
 <!-- 解决Grid不能选择复制问题 -->
-<script type="text/javascript" src="../../js/GridViewRewrite.js"></script>
 <script type="text/javascript" src="../../extjs/ext-lang-zh_CN.js"></script>
 
 <!-- 实现多选JS -->
@@ -73,12 +75,8 @@
 	var orderCancelLock = "YES";
 </script>
 
-<script type="text/javascript"
-	src="../../js/System/systemProtalAction.js"></script>
+<script type="text/javascript" src="../../js/System/systemProtalLoad.js "></script>
 <script type="text/javascript" src="../../js/System/systemProtalMain.js"></script>
-<script type="text/javascript"
-	src="../../js/System/systemProtalLoad.js "></script>
-
 
 </head>
 <body onload="loginOnLoad()">
@@ -101,12 +99,13 @@
 				<td style="height: 80px;"></td>
 			</tr>
 			<tr>
-				<td id="passwordConfig"
-					style="width: 160px; height: 220px; background: url(../../images/passwordConfig.png) no-repeat 50%;"></td>
+				<td id="passwordConfig" style="width: 160px; height: 220px; background: url(../../images/passwordConfig.png) no-repeat 50%;"></td>
+				<td style="width: 100px;">&nbsp;</td>
+				<td id="formatPrice" style="width: 160px; height: 220px; background: url(../../images/passwordConfig.png) no-repeat 50%;"></td>
 				<td style="width: 100px;">&nbsp;</td>
 			</tr>
 			<tr>
-				<td style="height: 80px;"></td>
+				
 			</tr>
 		</table>
 	</div>
