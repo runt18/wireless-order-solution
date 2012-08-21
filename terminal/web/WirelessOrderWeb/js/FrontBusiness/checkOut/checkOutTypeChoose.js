@@ -150,11 +150,9 @@ var checkOurListRefresh = function() {
 	var totalCount = 0;
 	var forFreeCount = 0;
 	for ( var i = 0; i < checkOutDataDisplay.root.length; i++) {
-//		var singleCount = parseFloat(checkOutDataDisplay[i][5].substr(1));
 		var tpItem = checkOutDataDisplay.root[i];
 		var singleCount = parseFloat(tpItem.totalPrice);
 		if (tpItem.gift == true) {
-//			forFreeCount = forFreeCount + parseFloat(checkOutData[i][4].substring(1)) * checkOutData[i][3];
 			forFreeCount = forFreeCount + parseFloat(tpItem.discount) * tpItem.totalPrice;
 		} else {
 			totalCount = totalCount + singleCount;

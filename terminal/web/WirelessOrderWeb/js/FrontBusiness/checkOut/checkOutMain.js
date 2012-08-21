@@ -125,6 +125,7 @@ var checkOutColumnModel = new Ext.grid.ColumnModel([
 // 4，表格
 var checkOutGrid = new Ext.grid.GridPanel({
 	title : "菜式",
+	border : true,
 	width : 1000,
 	style : "margin:0 auto",
 	xtype : "grid",
@@ -452,54 +453,52 @@ var checkOutNorthPanel = new Ext.Panel({
 });
 
 Ext.onReady(function() {
-			// 解决ext中文传入后台变问号问题
-			Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
-			Ext.QuickTips.init();
-
-			// alert(window.location.href
-			// .substr(window.location.href.indexOf("=") + 1));
-			// *************整体布局*************
-			var centerPanelCO = new Ext.Panel({
-				id : "centerPanelDO",
-				region : "center",
+	// 解决ext中文传入后台变问号问题
+	Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
+	Ext.QuickTips.init();
+	
+	// *************整体布局*************
+	var centerPanelCO = new Ext.Panel({
+		id : "centerPanelDO",
+		region : "center",
+		border : false,
+		margins : "0 0 0 0",
+		layout : "border",
+		items : [ checkOutCenterPanel, checkOutNorthPanel ]
+	});
+	
+	new Ext.Viewport({
+		layout : "border",
+		items : [
+		    {
+		    	region : "north",
+		    	html : "<div style='padding:10px; background-color:#A9D0F5'><h4 style='font-size:150%'>无线点餐网页终端<h4></div>",
+				height : 50,
+				margins : "0 0 0 0"
+			},
+			centerPanelCO,
+			{
+				region : "south",
+				height : 30,
+				layout : "form",
+				frame : true,
 				border : false,
-				margins : "0 0 0 0",
-				layout : "border",
-				items : [ checkOutCenterPanel, checkOutNorthPanel ]
-			});
+				html : "<div style='font-size:11pt; text-align:center;'><b>版权所有(c) 2011 智易科技</b></div>"
+			}
+		]
+	});
 
-			var viewport = new Ext.Viewport(
-					{
-						layout : "border",
-						items : [
-								{
-									region : "north",
-									html : "<div style='padding:10px; background-color:#A9D0F5'><h4 style='font-size:150%'>无线点餐网页终端<h4></div>",
-									height : 50,
-									margins : "0 0 0 0"
-								},
-								centerPanelCO,
-								{
-									region : "south",
-									height : 30,
-									layout : "form",
-									frame : true,
-									border : false,
-									html : "<div style='font-size:11pt; text-align:center;'><b>版权所有(c) 2011 智易科技</b></div>"
-								} ]
-					});
-
-			// -------------------- 浏览器大小改变 -------------------------------
-			// 1,调整colDisplayFormUQ中表格的高度
-			Ext.EventManager.onWindowResize(function() {
-						checkOutGrid.setHeight(checkOutCenterPanel.getInnerHeight() - gridHeightOffset);
-						if (checkOutCenterPanel.getInnerWidth() < 1000) {
-							checkOutGrid.setWidth(checkOutCenterPanel.getInnerWidth() - 20);
-						} else {
-							checkOutGrid.setWidth(1000);
-						}
-					});
-		});
+	// -------------------- 浏览器大小改变 -------------------------------
+	// 1,调整colDisplayFormUQ中表格的高度
+	Ext.EventManager.onWindowResize(function() {
+		checkOutGrid.setHeight(checkOutCenterPanel.getInnerHeight() - gridHeightOffset);
+		if (checkOutCenterPanel.getInnerWidth() < 1000) {
+			checkOutGrid.setWidth(checkOutCenterPanel.getInnerWidth() - 20);
+		} else {
+			checkOutGrid.setWidth(1000);
+		}
+	});
+});
 
 setFormButtonStatus = function(_s){
 	checkOutForm.buttons[0].setDisabled(_s);

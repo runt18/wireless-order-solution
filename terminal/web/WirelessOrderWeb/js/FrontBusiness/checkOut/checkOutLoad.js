@@ -15,9 +15,7 @@ function checkOutOnLoad() {
 		document.getElementById("minCostDivTS").style["display"] = "none";
 		document.getElementById("minCostImgTS").style["display"] = "none";
 	}
-	document.getElementById("serviceRateDivTS").innerHTML = (Request["serviceRate"] * 100)
-			+ "%";
-	+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+	document.getElementById("serviceRateDivTS").innerHTML = (Request["serviceRate"] * 100) + "%" + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 	if (Request["serviceRate"] == "0") {
 		document.getElementById("serviceRateDivTS").style["display"] = "none";
 		document.getElementById("serviceRateImgTS").style["display"] = "none";
@@ -43,35 +41,6 @@ function checkOutOnLoad() {
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
 			if (resultJSON.success == true) {
 				// 1,获取已点菜式
-//				var josnData = resultJSON.data;
-//				var orderList = josnData.split("，");
-//				for ( var i = 0; i < orderList.length; i++) {
-//					var orderInfo = orderList[i].substr(1, orderList[i].length - 2).split(",");
-//					// 实价 = 单价 + 口味价钱
-//					var singlePrice = parseFloat(orderInfo[6].substr(2, orderInfo[6].length - 3));
-//					var tastePrice = parseFloat(orderInfo[14].substr(2, orderInfo[14].length - 3));
-//					var acturalPrice = 0.0;
-//					acturalPrice = singlePrice + tastePrice;
-//					acturalPrice = "￥" + acturalPrice.toFixed(2);
-//					checkOutData.push([ 
-//					    orderInfo[2],// 厨房编号
-//					    orderInfo[0].substr(1, orderInfo[0].length - 2), // 菜名
-//					    orderInfo[3].substr(1, orderInfo[3].length - 2),// 口味
-//						orderInfo[5],// 数量
-//						acturalPrice, // 实价
-//						orderInfo[19],// 时间
-//						orderInfo[20],// 服务员 
-//						orderInfo[7],// 特
-//						orderInfo[8],// 荐							
-//						orderInfo[9], // 停
-//						orderInfo[10], // 赠
-//						orderInfo[14].substr(2, orderInfo[14].length - 3),// 口味价钱
-//						orderInfo[6].substr(2, orderInfo[6].length - 3), // 单价
-//						orderInfo[15], // 時
-//						orderInfo[16] // 臨
-//					]);
-//				}
-				
 				checkOutData = resultJSON;
 				
 				// 2,获取折扣率
@@ -371,7 +340,16 @@ function moneyCount(opt) {
 
 			// “合计”加上服务费
 			totalCount_out = (parseFloat(originalTotalCount) * (1 + parseFloat(serviceRate) / 100)).toFixed(2);
-
+			
+			// 
+			if(restaurantData[0][5] == 1){
+				shouldPay_out = parseFloat(parseInt(totalCount_out)).toFixed(2);
+			}else if(restaurantData[0][5] == 2){
+				shouldPay_out = parseFloat(parseFloat(totalCount_out).toFixed(0)).toFixed(2);
+			}else{
+				shouldPay_out = parseFloat(totalCount_out).toFixed(2);
+			}
+			
 			// “找零”计算
 			if (actualPay != "" && actualPay != "0.00") {
 				if (opt == "button") {
@@ -380,7 +358,7 @@ function moneyCount(opt) {
 					change_out = "0.00";
 				}
 			}
-//			alert('totalCount_out: '+totalCount_out+'   shouldPay_out: '+shouldPay_out+'change_out: '+change_out);
+//			alert('totalCount_out: '+totalCount_out+'   shouldPay_out: '+shouldPay_out+'    change_out: '+change_out);
 			document.getElementById("totalCount").innerHTML = totalCount_out;
 			document.getElementById("shouldPay").innerHTML = shouldPay_out;
 			document.getElementById("change").innerHTML = change_out;
