@@ -53,7 +53,14 @@ var combinationFoodGrid = new Ext.grid.EditorGridPanel({
 		    		minValue : 1,
 		    		maxValue : 65535,
 		    		allowBlank : false,
-		    		style : 'color:green; font-weight:bold;'
+		    		style : 'color:green; font-weight:bold;',
+		    		validator : function(v){
+ 	    	    		if(/^\d+$/.test(v)){
+ 	    	    			return true;
+ 	    	    		}else{
+ 	    	    			return '输入有误,份数只能是正整数!';
+ 	    	    		}
+ 	    	    	}
 		    	})
 		    },
 		    {header:'成本',  dataIndex:'sumPrice', align:'right', width:90, renderer:Ext.ux.txtFormat.gridDou},
