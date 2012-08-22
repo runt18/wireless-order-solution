@@ -416,9 +416,13 @@ var typeModComb = new Ext.form.ComboBox({
 });
 
 function tasteOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
-	return '<center>'
+	if(eval(record.get('type') == 1)){
+		return '<center>系统保留</center>';
+	}else{
+		return '<center>'
 		   + '<a href=\"javascript:tasteDeleteHandler(' + rowIndex + ')\">删除</a>'
 		   + '</center>';
+	}
 };
 
 // 1，表格的数据store
@@ -444,6 +448,8 @@ var tasteStore = new Ext.data.Store({
 		name : 'operator'
 	}, {
 		name : 'message'
+	}, {
+		name : 'type'
 	} ])
 });
 
