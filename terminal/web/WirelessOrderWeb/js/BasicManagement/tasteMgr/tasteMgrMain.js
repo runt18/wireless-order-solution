@@ -740,6 +740,7 @@ Ext.onReady(function() {
 			celldblclick : function(thiz, rowIndex, columIndex, e){
 				var record = thiz.getStore().getAt(rowIndex);
 				if(record.get('type') == 1 && (columIndex == 2 || columIndex == 3 || columIndex == 6)){
+					Ext.example.msg('提示','系统保留规格只能修改<font color="red">比例</font>');
 					return false;
 				}
 			}
