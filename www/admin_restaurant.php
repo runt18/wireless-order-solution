@@ -104,6 +104,18 @@ else if($editType == "addRestaurant" || $editType == "editAdminRestaurant")
 					$sql = "SELECT id FROM restaurant WHERE account='$account'";
 					$rs = $db ->GetOne($sql);		
 					$id = $rs;
+					
+					//insert the '大牌', '中牌', '例牌'
+					$sql = "INSERT INTO taste(taste_alias, restaurant_id, preference, category, calc, type) 
+							VALUES(0, $id, '大牌', 2, 1, 1)";
+					$db->Execute($sql);
+					$sql = "INSERT INTO taste(taste_alias, restaurant_id, preference, category, calc, type) 
+							VALUES(0, $id, '中牌', 2, 1, 1)";
+					$db->Execute($sql);
+					$sql = "INSERT INTO taste(taste_alias, restaurant_id, preference, category, calc, type) 
+							VALUES(0, $id, '例牌', 2, 1, 1)";
+					$db->Execute($sql);
+
 					//insert the kitchen
 					$sql = "INSERT INTO kitchen(restaurant_id,kitchen_alias,name) VALUES($id, 0, '厨房1')";
 					$db->Execute($sql);
