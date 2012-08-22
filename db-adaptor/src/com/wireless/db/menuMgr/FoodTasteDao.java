@@ -30,7 +30,7 @@ public class FoodTasteDao {
 			dbCon.connect();
 			
 			String sql = " select A.food_id, A.taste_id, A.restaurant_id, A.rank, " + 
-						 " B.taste_alias, B.preference as taste_name, B.price, B.category, B.rate, B.calc, " +
+						 " B.taste_alias, B.preference as taste_name, B.price, B.category, B.rate, B.calc, B.type, " +
 						 " C.name " +
 						 " from " + Params.dbName + ".food_taste_rank A, " + Params.dbName + ".taste B, " + Params.dbName + ".food C " +
 						 " where A.restaurant_id = B.restaurant_id and A.taste_id = B.taste_id and A.food_id = C.food_id " +
@@ -53,6 +53,7 @@ public class FoodTasteDao {
 				item.setTasteCategory(dbCon.rs.getShort("category"));
 				item.setTasteRate(dbCon.rs.getFloat("rate"));
 				item.setTasteCalc(dbCon.rs.getShort("calc"));
+				item.setType(dbCon.rs.getInt("type"));
 				list.add(item);
 				item = null;
 			}

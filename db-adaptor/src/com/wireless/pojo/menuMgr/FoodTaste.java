@@ -12,6 +12,7 @@ public class FoodTaste extends FoodBasic{
 	private float tasteRate;			// 口味比例
 	private short tasteCategory;		// 口味类型    0:口味  1:做法     2:规格
 	private short tasteCalc;			// 口味计算方式          0:按价格     1:按比例
+	private int type;					// 操作类型	0:默认    1:系统保留(不可删除)
 	
 	public int getRank() {
 		return rank;
@@ -80,6 +81,12 @@ public class FoodTaste extends FoodBasic{
 	}
 	public void setTasteCalc(short tasteCalc) {
 		this.tasteCalc = tasteCalc;
+	}
+	public int getType() {
+		return type;
+	}
+	public void setType(int type) {
+		this.type = type;
 	}
 	
 }
