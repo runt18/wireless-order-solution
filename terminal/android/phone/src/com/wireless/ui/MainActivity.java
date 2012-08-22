@@ -41,7 +41,6 @@ import android.widget.Toast;
 
 import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
-import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.FoodMenu;
 import com.wireless.protocol.PinGen;
 import com.wireless.protocol.ProtocolPackage;
@@ -368,24 +367,6 @@ public class MainActivity extends Activity {
 		super.onActivityResult(requestCode, resultCode, data);
 	}
 
-	/**
-	 * Generate the message according to the error code 
-	 * @param tableID the table id associated with this error
-	 * @param errCode the error code
-	 * @return the error message
-	 */
-	private String genErrMsg(int tableID, byte errCode){
-		if(errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
-			return "终端没有登记到餐厅，请联系管理人员。";
-		}else if(errCode == ErrorCode.TERMINAL_EXPIRED) {
-			return "终端已过期，请联系管理人员。";
-		}else if(errCode == ErrorCode.TABLE_NOT_EXIST){
-			return tableID + "号餐台信息不存在";
-		}else{
-			return null;
-		}
-	}
-	
 	/**
 	 * 请求菜谱信息
 	 */
