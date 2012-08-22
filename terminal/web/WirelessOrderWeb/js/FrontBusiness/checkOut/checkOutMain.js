@@ -393,7 +393,6 @@ var checkOutForm = new Ext.form.FormPanel({
 			},
 			{
 				text : "签单",
-				// hidden : true,
 				handler : function() {
 					setFormButtonStatus(true);
 					paySubmit(4);
@@ -401,7 +400,6 @@ var checkOutForm = new Ext.form.FormPanel({
 			},
 			{
 				text : "挂账",
-				// hidden : true,
 				handler : function() {
 					setFormButtonStatus(true);
 					paySubmit(5);
@@ -409,7 +407,6 @@ var checkOutForm = new Ext.form.FormPanel({
 			},
 			{
 				text : "暂结",
-				// hidden : true,
 				handler : function() {
 					setFormButtonStatus(true);
 					paySubmit(6);
@@ -507,4 +504,5 @@ setFormButtonStatus = function(_s){
 	checkOutForm.buttons[3].setDisabled(_s);
 	checkOutForm.buttons[4].setDisabled(_s);
 	checkOutForm.buttons[5].setDisabled(_s);
+	checkOutForm.buttons[6].setDisabled(_s);
 };

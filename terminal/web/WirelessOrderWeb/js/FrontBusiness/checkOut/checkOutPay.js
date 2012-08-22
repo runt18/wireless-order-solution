@@ -62,26 +62,15 @@
 			},
 			success : function(response, options) {
 				var resultJSON = Ext.util.JSON.decode(response.responseText);
+				var dataInfo = resultJSON.data;
+				
 				if (resultJSON.success == true) {
-					var dataInfo = resultJSON.data;
-					Ext.MessageBox.show({
-						msg : ('<center>' + dataInfo + '.&nbsp;<span id="returnInterval" style="color:red;"></span>&nbsp;之后自动跳转.</center>'),
-						width : 300,
-						buttons : Ext.MessageBox.OK,
-						fn : function() {
-							var Request = new URLParaQuery();
-							if (submitType != 6) {
-								location.href = "TableSelect.html?pin="
-										+ Request["pin"] + "&restaurantID="
-										+ restaurantID;
-							}
-						}
-					});
-					
-					setFormButtonStatus(false);
-					
 					var interval = 3;
-					if (submitType != 6) {
+					var action = '';
+					if (submitType == 6) {
+						Ext.example.msg('提示', dataInfo);						
+					}else{
+						action = '&nbsp;<span id="returnInterval" style="color:red;"></span>&nbsp;之后自动跳转.';
 						new Ext.util.TaskRunner().start({
 							run: function(){
 								if(interval <= 0){
@@ -94,10 +83,22 @@
 						    },
 						    interval : 1000
 						});
+						
+						Ext.MessageBox.show({
+							msg : ('<center>' + dataInfo + '.' + action + '</center>'),
+							width : 300,
+							buttons : Ext.MessageBox.OK,
+							fn : function() {
+								var Request = new URLParaQuery();
+								if (submitType != 6) {
+									location.href = "TableSelect.html?pin="
+											+ Request["pin"] + "&restaurantID="
+											+ restaurantID;
+								}
+							}
+						});
 					}
 				} else {
-					setFormButtonStatus(false);
-
 					var dataInfo = resultJSON.data;
 					Ext.MessageBox.show({
 						msg : dataInfo,
@@ -105,6 +106,7 @@
 						buttons : Ext.MessageBox.OK
 					});
 				}
+				setFormButtonStatus(false);
 			},
 			failure : function(response, options) {
 				setFormButtonStatus(false);
