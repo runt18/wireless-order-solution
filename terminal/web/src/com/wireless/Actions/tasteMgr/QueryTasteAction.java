@@ -136,6 +136,7 @@ public class QueryTasteAction extends Action {
 				resultMap.put("tasteRate", tastes[i].getRate());
 				resultMap.put("tasteCategory", tastes[i].category);
 				resultMap.put("tasteCalc", tastes[i].calc);
+				resultMap.put("type", tastes[i].type);
 
 				resultMap.put("message", "normal");
 
