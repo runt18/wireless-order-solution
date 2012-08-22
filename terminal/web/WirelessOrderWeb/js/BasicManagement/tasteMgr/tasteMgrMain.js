@@ -736,6 +736,12 @@ Ext.onReady(function() {
 						limit : pageRecordCount
 					}
 				});
+			},
+			celldblclick : function(thiz, rowIndex, columIndex, e){
+				var record = thiz.getStore().getAt(rowIndex);
+				if(record.get('type') == 1 && (columIndex == 2 || columIndex == 3 || columIndex == 6)){
+					return false;
+				}
 			}
 		}
 	});
