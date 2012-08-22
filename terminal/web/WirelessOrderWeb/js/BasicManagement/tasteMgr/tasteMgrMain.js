@@ -27,8 +27,20 @@ var typeAddComb = new Ext.form.ComboBox({
 		select : function(e){
 			var tp = Ext.getCmp('tasteAddPrice');
 			var tr = Ext.getCmp('tasteAddRate');
-			tp.setValue(0.00);
-			tr.setValue(0.00);
+			var dcw = Ext.getCmp('txtDisplayCalculationWay');
+			if(e.getValue() == 0){
+				tp.setValue(0.00);
+				tp.setDisabled(false);
+				tr.setDisabled(true);
+				dcw.setValue('按价格');
+			}else if(e.getValue() == 2){
+				tr.setValue(0.00);
+				tr.setDisabled(false);
+				tp.setDisabled(true);
+				dcw.setValue('按比例');
+			}
+			
+			
 		}
 	}
 });
@@ -37,7 +49,7 @@ tasteAddWin = new Ext.Window({
 	layout : 'fit',
 	title : '添加',
 	width : 260,
-	height : 200,
+	height : 225,
 	closeAction : 'hide',
 	closable : false,
 	resizable : false,
@@ -84,6 +96,16 @@ tasteAddWin = new Ext.Window({
 					}
 				}
 			}, 
+			{
+				xtype : 'textfield',
+				id : 'txtDisplayCalculationWay',
+				fieldLabel : '计算方式',
+				readOnly : true,
+				disabled : true,
+				width : 160,
+				value : '按价格',
+				style : 'color:green;'
+			},
 			typeAddComb
 		]
 	} ],
@@ -191,11 +213,16 @@ tasteAddWin = new Ext.Window({
 			Ext.getCmp('tasteAddName').clearInvalid();
 
 			Ext.getCmp('tasteAddPrice').setValue(0.00);
+			Ext.getCmp('tasteAddPrice').setDisabled(false);
+			
 			Ext.getCmp('tasteAddRate').setValue(0.00);
+			Ext.getCmp('tasteAddRate').setDisabled(true);
 			
 			Ext.getCmp('typeAddComb').setValue(typeAddData[0][0]);
 			Ext.getCmp('typeAddComb').clearInvalid();
-
+			
+			Ext.getCmp('txtDisplayCalculationWay').setValue('按价格');
+			
 			var f = Ext.get('tasteAddNumber');
 			f.focus.defer(100, f);
 			
@@ -633,11 +660,11 @@ Ext.onReady(function() {
 									+ ' field_separator '
 									+ record.get('tasteName')
 									+ ' field_separator '
-									+ record.get('tastePrice')
+									+ (record.get('tastePrice') == '' ? 0 : record.get('tastePrice'))
 									+ ' field_separator '
-									+ record.get('tasteRate')
+									+ (record.get('tasteRate') == '' ? 0 : record.get('tasteRate'))
 									+ ' field_separator '
-									+ record.get('tasteCalc')
+									+ (record.get('tasteCalc') == '' ? 0 : record.get('tasteCalc'))
 									+ ' field_separator '
 									+ record.get('tasteCategory'));
 						}
