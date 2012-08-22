@@ -27,7 +27,6 @@ public class MainActivity extends Activity{
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		new OptionBar(MainActivity.this);
 		/**
 		 * 设置各种按钮的listener
 		 */

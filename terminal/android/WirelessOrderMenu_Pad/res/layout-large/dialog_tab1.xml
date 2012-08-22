@@ -3,27 +3,68 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white" >
-
+
     <TextView
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="46dp"
+        android:layout_marginLeft="51dp"
+        android:layout_marginTop="58dp"
         android:text="餐台:"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <EditText
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textView1"
+        android:layout_marginTop="172dp"
+        android:text="人数："
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <AutoCompleteTextView
         android:id="@+id/editText_table_num"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/textView1"
-        android:layout_marginLeft="48dp"
+        android:layout_marginLeft="40dp"
         android:layout_toRightOf="@+id/textView1"
-        android:ems="10" >
+        android:ems="10"
+        android:hint="请输入餐台号"
+        android:inputType="number" />
+
+    <EditText
+        android:id="@+id/editText_people_cnt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/editText_table_num"
+        android:layout_alignTop="@+id/textView2"
+        android:ems="10"
+        android:inputType="number"
+        android:text="1"
+        android:visibility="visible" >
 
-        <requestFocus />
     </EditText>
+
+    <Button
+        android:id="@+id/button_tab1_confirm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textView2"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="43dp"
+        android:layout_toLeftOf="@+id/editText_people_cnt"
+        android:text="确定" />
+
+    <Button
+        android:id="@+id/button_tab1_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/button_tab1_confirm"
+        android:layout_alignBottom="@+id/button_tab1_confirm"
+        android:layout_alignRight="@+id/editText_people_cnt"
+        android:text="取消" />
 
 </RelativeLayout>

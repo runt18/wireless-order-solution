@@ -12,6 +12,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -55,7 +56,6 @@ public class ContentFragment extends Fragment {
 
 	public void onUpdateContent(int position) {
 		mGallery.setSelection(position);
-		Log.i("#########@@@@@@",""+position);
 	}
 	
 	public void setContent(ArrayList<String> imageNames)
@@ -69,7 +69,7 @@ public class ContentFragment extends Fragment {
 	{
 		super.onActivityCreated(savedInstanceState);
 		
-        mGallery = (Gallery)this.getActivity().findViewById(R.id.gallery1);
+        mGallery = (Gallery)this.getActivity().findViewById(R.id.noneInertanceGallery1);
         mHandler = new Handler();
         mAdapter = new ImageAdapter(this.getActivity(),mHandler);
 		File imagesDir = Environment.getExternalStorageDirectory();
@@ -92,6 +92,7 @@ public class ContentFragment extends Fragment {
         });
 	}
 }
+
 
 class ImageAdapter extends BaseAdapter {
 	private final String NULL = "sign_null";

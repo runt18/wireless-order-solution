@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="@color/white" >
 
-    <TextView
+ <!--    <TextView
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -27,25 +27,26 @@
         android:visibility="visible" >
 
         <requestFocus />
-    </EditText>
-
+    </EditText> -->
+
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView1"
-        android:layout_below="@+id/editText_people_cnt"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
         android:layout_marginTop="35dp"
         android:text="会员账号："
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:visibility="visible" />
-
+
     <EditText
         android:id="@+id/editText_vipId"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/editText_people_cnt"
         android:layout_alignTop="@+id/textView2"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@+id/textView2"
         android:ems="10"
         android:inputType="textPersonName"
         android:visibility="visible" />
@@ -97,13 +98,54 @@
         android:layout_below="@+id/editText_serverId"
         android:text="服务员密码："
         android:textAppearance="?android:attr/textAppearanceLarge" />
-
+
     <EditText
         android:id="@+id/editText_serverPswd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/editText_serverId"
         android:layout_alignTop="@+id/textView5"
-        android:ems="10" />
+        android:ems="10"
+        android:inputType="textPassword" />
+
+    <ImageView
+        android:id="@+id/imageView_expand"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/textView4"
+        android:layout_alignRight="@+id/editText_serverId"
+        android:src="@drawable/expand_server_id" />
+
+    <TextView
+        android:id="@+id/textView_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/editText_serverPswd"
+        android:layout_below="@+id/editText_serverPswd"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:visibility="visible" />
+
+    <Button
+        android:id="@+id/button_tab2_confirm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textView5"
+        android:layout_below="@+id/editText_serverPswd"
+        android:layout_marginTop="49dp"
+        android:layout_toLeftOf="@+id/button_tab2_cancel"
+        android:text="确定" />
+
+    <Button
+        android:id="@+id/button_tab2_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/button_tab2_confirm"
+        android:layout_alignBottom="@+id/button_tab2_confirm"
+        android:layout_alignLeft="@+id/editText_serverPswd"
+        android:layout_marginLeft="65dp"
+        android:layout_toLeftOf="@+id/imageView_expand"
+        android:text="取消" />
+
+    
 
 </RelativeLayout>

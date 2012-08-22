@@ -24,9 +24,12 @@
             class="com.wireless.ui.ContentFragment" />
     </LinearLayout>
 
-    <include
-        android:id="@+id/bottombar"
-        layout="@layout/bottombar" />
+        <fragment
+            android:id="@+id/bottombar"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            class="com.wireless.util.OptionBar" />
 
     <RelativeLayout
         android:id="@+id/relativeLayout2"
