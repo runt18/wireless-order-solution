@@ -245,9 +245,12 @@ public class QueryMenu {
 				
 			}else{
 				final List<Taste> tasteRefs = new ArrayList<Taste>();
-				tasteRefs.add(new Taste(dbCon.rs.getInt("taste_id"),
-										dbCon.rs.getInt("taste_alias"),
-										restaurantID));
+				int tasteID = dbCon.rs.getInt("taste_id");
+				if(tasteID != 0){
+					tasteRefs.add(new Taste(dbCon.rs.getInt("taste_id"),
+											dbCon.rs.getInt("taste_alias"),
+											restaurantID));
+				}
 				
 				final Food food = new Food(restaurantID,
 			 			 				   foodID,
