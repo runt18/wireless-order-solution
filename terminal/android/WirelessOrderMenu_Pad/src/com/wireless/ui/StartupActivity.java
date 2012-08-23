@@ -404,8 +404,6 @@ public class StartupActivity extends Activity {
 	
 	private class QueryStaffTask extends com.wireless.lib.task.QueryStaffTask{
 		
-		//private ProgressDialog _progDialog;
-		
 		/**
 		 * 执行员工信息请求前显示提示信息
 		 */
@@ -414,8 +412,6 @@ public class StartupActivity extends Activity {
 			mMsgTxtView.setText("正在更新员工信息...请稍后");
 
 		}
-		
-
 		
 		/**
 		 * 根据返回的error message判断，如果发错异常则提示用户，
