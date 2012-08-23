@@ -22,7 +22,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
@@ -32,19 +31,15 @@ import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
 import com.wireless.lib.task.PicDownloadTask;
 import com.wireless.ordermenu.R;
-import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodMenu;
 import com.wireless.protocol.PinGen;
-import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.Region;
 import com.wireless.protocol.ReqPackage;
-import com.wireless.protocol.ReqQueryStaff;
-import com.wireless.protocol.RespParser;
 import com.wireless.protocol.Restaurant;
+import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
-import com.wireless.protocol.Type;
 import com.wireless.sccon.ServerConnector;
 
 public class StartupActivity extends Activity {
@@ -407,7 +402,7 @@ public class StartupActivity extends Activity {
 //		
 //	}
 	
-	private class QueryStaffTask extends AsyncTask<Void, Void, String>{
+	private class QueryStaffTask extends com.wireless.lib.task.QueryStaffTask{
 		
 		//private ProgressDialog _progDialog;
 		
@@ -420,47 +415,22 @@ public class StartupActivity extends Activity {
 
 		}
 		
-		/**
-		 * 在新的线程中执行请求员工信息的操作
-		 */
-		@Override
-		protected String doInBackground(Void... arg0){
-			String errMsg = null;
-			try{
-				WirelessOrder.staffs = null;
-				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryStaff());
-				if(resp.header.type == Type.ACK){
-					WirelessOrder.staffs = RespParser.parseQueryStaff(resp);
-				}else{
-					if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
-						errMsg = "终端没有登记到餐厅，请联系管理人员。";
-					}else if(resp.header.reserved == ErrorCode.TERMINAL_EXPIRED) {
-						errMsg = "终端已过期，请联系管理人员。";
-					}else{
-						errMsg = "更新员工信息失败，请检查网络信号或重新连接。";
-					}
-					throw new IOException(errMsg);
-				}
-			}catch(IOException e){
-				errMsg = e.getMessage();
-			}
-			return errMsg;
-		}
+
 		
 		/**
 		 * 根据返回的error message判断，如果发错异常则提示用户，
 		 * 如果员工信息请求成功，则继续进行请求菜谱信息的操作。
 		 */
 		@Override
-		protected void onPostExecute(String errMsg){
+		protected void onPostExecute(StaffTerminal[] staffs){
 			/**
 			 * Prompt user message if any error occurred,
 			 * otherwise continue to query restaurant info.
 			 */
-			if(errMsg != null){
+			if(mErrMsg != null){
 				new AlertDialog.Builder(StartupActivity.this)
 				.setTitle("提示")
-				.setMessage(errMsg)
+				.setMessage(mErrMsg)
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						finish();
@@ -468,7 +438,7 @@ public class StartupActivity extends Activity {
 				}).show();
 				
 			}else{
-				if(WirelessOrder.staffs == null){
+				if(staffs.length == 0){
 					new AlertDialog
 						.Builder(StartupActivity.this)
 						.setTitle("提示")
@@ -481,6 +451,8 @@ public class StartupActivity extends Activity {
 					     .show();
 				}else{
 	
+					WirelessOrder.staffs = staffs;
+					
 					new QueryMenuTask().execute();
 				}
 			}
