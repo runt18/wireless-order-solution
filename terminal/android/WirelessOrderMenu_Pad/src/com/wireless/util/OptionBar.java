@@ -1,7 +1,5 @@
 package com.wireless.util;
 
-import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -15,9 +13,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences.Editor;
 import android.graphics.drawable.BitmapDrawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -34,28 +30,21 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TabHost;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
-import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.PinGen;
-import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqPackage;
-import com.wireless.protocol.ReqQueryOrder;
-import com.wireless.protocol.ReqTableStatus;
-import com.wireless.protocol.RespParser;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
-import com.wireless.protocol.Type;
-import com.wireless.sccon.ServerConnector;
 
 public class OptionBar extends Fragment{
 	private AlertDialog mDialog;
 	private TabHost mTabHost;
-	private Order mOrder;
 	private StaffTerminal mStaff;
 
 	public static enum Selection{
@@ -66,7 +55,7 @@ public class OptionBar extends Fragment{
 	private AutoCompleteTextView mTableNumEditText;
 	private EditText mVipIdEditText;
 	private EditText mServerIdEditText;
-	private EditText mVipPswdEditText ;
+//	private EditText mVipPswdEditText ;
 	private EditText mServerPswdEditText ;
 	private TextView mSelectedFoodTextView;
 	
@@ -139,7 +128,7 @@ public class OptionBar extends Fragment{
 		
 		mVipIdEditText = (EditText) dialogLayout.findViewById(R.id.editText_vipId);
 		mServerIdEditText  = (EditText) dialogLayout.findViewById(R.id.editText_serverId);
-		mVipPswdEditText = (EditText) dialogLayout.findViewById(R.id.editText_vipPswd);
+//		mVipPswdEditText = (EditText) dialogLayout.findViewById(R.id.editText_vipPswd);
 		mServerPswdEditText = (EditText) dialogLayout.findViewById(R.id.editText_serverPswd);
 
 		mDialog = new AlertDialog.Builder(activity).setView(dialogLayout).create();
@@ -156,16 +145,17 @@ public class OptionBar extends Fragment{
 					new QueryTableStatusTask(Integer.parseInt(gotTableNum)){
 						@Override
 						void OnQueryTblStatus(int status) {
+							tableNumTextView.setText(gotTableNum);
 							if(status == Table.TABLE_IDLE){
 								mSelectedFoodTextView.setText("0");
+								Toast.makeText(activity.getApplicationContext(), "该餐台尚未点菜", Toast.LENGTH_SHORT).show();
 							}else if(status == Table.TABLE_BUSY){
 								 new QueryOrderTask(Integer.parseInt(gotTableNum)){
 									@Override
-									void onOrderChanged() {
-										mSelectedFoodTextView.setText(""+mOrder.foods.length);
+									void onOrderChanged(Order order) {
+										mSelectedFoodTextView.setText(""+order.foods.length);
 									}
-								 }.execute();
-								tableNumTextView.setText(gotTableNum);
+								 }.execute(WirelessOrder.foodMenu);
 							}
 						}								
 					}.execute();
@@ -358,11 +348,6 @@ public class OptionBar extends Fragment{
 	 * 员工信息下拉框的Adapter 
 	 */
 	private class StaffsAdapter extends BaseAdapter{
-		
-		public StaffsAdapter(){
-
-		}
-		
 		@Override
 		public int getCount() {			
 			return WirelessOrder.staffs.length;
@@ -391,66 +376,21 @@ public class OptionBar extends Fragment{
 		
 	}
 	
-	/**
-	 * Generate the message according to the error code 
-	 * @param tableID the table id associated with this error
-	 * @param errCode the error code
-	 * @return the error message
-	 */
-	private String genErrMsg(int tableID, byte errCode){
-		if(errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
-			return "终端没有登记到餐厅，请联系管理人员。";
-		}else if(errCode == ErrorCode.TERMINAL_EXPIRED) {
-			return "终端已过期，请联系管理人员。";
-		}else if(errCode == ErrorCode.TABLE_NOT_EXIST){
-			return tableID + "号餐台信息不存在";
-		}else{
-			return null;
-		}
-	}
 	
 	/**
 	 * 请求获得餐台的状态
 	 */
-	private abstract class QueryTableStatusTask extends AsyncTask<Void, Void, String>{
+	private abstract class QueryTableStatusTask extends com.wireless.lib.task.QueryTableStatusTask{
 
-		private byte _tableStatus = Table.TABLE_IDLE;
-		private int _tableAlias;
 		private ProgressDialog _progDialog;
 
 		QueryTableStatusTask(int tableAlias){
-			_tableAlias =  tableAlias;
+			super(tableAlias);
 		}
 		
 		@Override
 		protected void onPreExecute(){
-			_progDialog = ProgressDialog.show(OptionBar.this.getActivity(), "", "查询" + _tableAlias + "号餐台信息...请稍候", true);
-		}
-		
-		/**
-		 * 在新的线程中执行请求餐台状态的操作
-		 */
-		@Override
-		protected String doInBackground(Void... arg0) {
-			String errMsg = null;
-			try{
-				ProtocolPackage resp = ServerConnector.instance().ask(new ReqTableStatus(_tableAlias));
-
-				if(resp.header.type == Type.ACK){
-					_tableStatus = resp.header.reserved;
-					
-				}else{
-					errMsg = genErrMsg(_tableAlias, resp.header.reserved);
-					if(errMsg == null){
-						errMsg = "未确定的异常错误(" + resp.header.reserved + ")";
-					}
-				}					
-				
-			}catch(IOException e){
-				errMsg = e.getMessage();
-			}
-			
-			return errMsg;
+			_progDialog = ProgressDialog.show(OptionBar.this.getActivity(), "", "查询" + mTblAlias + "号餐台信息...请稍候", true);
 		}
 		
 		/**
@@ -458,17 +398,16 @@ public class OptionBar extends Fragment{
 		 * 则把相应信息提示给用户，否则根据餐台状态，分别跳转到下单或改单界面。
 		 */
 		@Override
-		protected void onPostExecute(String errMsg){
-			//make the progress dialog disappeared
+		protected void onPostExecute(Byte tblStatus){
 			_progDialog.dismiss();
 			/**
 			 * Prompt user message if any error occurred.
 			 * Otherwise perform the corresponding action.
 			 */
-			if(errMsg != null){
+			if(mErrMsg != null){
 				new AlertDialog.Builder(OptionBar.this.getActivity())
 				.setTitle("提示")
-				.setMessage(errMsg)
+				.setMessage(mErrMsg)
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						dialog.dismiss();
@@ -476,7 +415,7 @@ public class OptionBar extends Fragment{
 				}).show();
 				
 			}else{			
-				OnQueryTblStatus(_tableStatus);
+				OnQueryTblStatus(tblStatus);
 			}
 		}	
 		
@@ -487,13 +426,11 @@ public class OptionBar extends Fragment{
 	/**
 	 * 执行请求对应餐台的账单信息 
 	 */
-	private abstract class QueryOrderTask extends AsyncTask<Void, Void, String>{
-
+	private abstract class QueryOrderTask extends com.wireless.lib.task.QueryOrderTask{
 		private ProgressDialog _progDialog;
-		private int _tableAlias;
 	
 		QueryOrderTask(int tableAlias){
-			_tableAlias = tableAlias;
+			super(tableAlias);
 		}
 		
 		/**
@@ -501,40 +438,7 @@ public class OptionBar extends Fragment{
 		 */
 		@Override
 		protected void onPreExecute(){
-			_progDialog = ProgressDialog.show(OptionBar.this.getActivity(), "", "查询" + _tableAlias + "号餐台的信息...请稍候", true);
-		}
-		
-		@Override
-		protected String doInBackground(Void... arg0) {
-			String errMsg = null;
-			try{
-				//根据tableID请求数据
-				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryOrder(_tableAlias));
-				if(resp.header.type == Type.ACK){
-					mOrder = RespParser.parseQueryOrder(resp, WirelessOrder.foodMenu);
-					
-				}else{
-    				if(resp.header.reserved == ErrorCode.TABLE_IDLE) {
-    					errMsg = _tableAlias + "号台还未下单";
-    					
-    				}else if(resp.header.reserved == ErrorCode.TABLE_NOT_EXIST) {
-    					errMsg = _tableAlias + "号台信息不存在";
-
-    				}else if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
-    					errMsg = "终端没有登记到餐厅，请联系管理人员。";
-
-    				}else if(resp.header.reserved == ErrorCode.TERMINAL_EXPIRED) {
-    					errMsg = "终端已过期，请联系管理人员。";
-
-    				}else{
-    					errMsg = "未确定的异常错误(" + resp.header.reserved + ")";
-    				}
-				}
-			}catch(IOException e){
-				errMsg = e.getMessage();
-			}
-			
-			return errMsg;
+			_progDialog = ProgressDialog.show(OptionBar.this.getActivity(), "", "查询" + mTblAlias + "号账单信息...请稍候", true);
 		}
 		
 		/**
@@ -542,18 +446,18 @@ public class OptionBar extends Fragment{
 		 * 如果成功，则迁移到改单页面
 		 */
 		@Override
-		protected void onPostExecute(String errMsg){
+		protected void onPostExecute(Order order){
 			//make the progress dialog disappeared
 			_progDialog.dismiss();
 			
-			if(errMsg != null){
+			if(mErrMsg != null){
 				
 				/**
 				 * 如果请求账单信息失败，则跳转回本页面
 				 */
 				new AlertDialog.Builder(OptionBar.this.getActivity())
 					.setTitle("提示")
-					.setMessage(errMsg)
+					.setMessage(mErrMsg)
 					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int id) {
 							dialog.dismiss();
@@ -564,12 +468,10 @@ public class OptionBar extends Fragment{
 				/**
 				 * 请求账单成功则更新相关的控件
 				 */
-				//make the progress dialog disappeared
-				_progDialog.dismiss();
-				onOrderChanged();
+				onOrderChanged(order);
 			}			
 		}
 		
-		abstract void onOrderChanged();
+		abstract void onOrderChanged(Order order);
 	}
 }
