@@ -626,6 +626,24 @@ public class StartupActivity extends Activity {
 
 						edit.commit();
 						
+						if(WirelessOrder.foodMenu.foods.length>0)
+						{
+							/**
+							 * 将所有菜品进行按厨房编号进行排序
+							 */
+							Arrays.sort(WirelessOrder.foodMenu.foods, new Comparator<Food>() {
+								@Override
+								public int compare(Food food1, Food food2) {
+									if (food1.kitchen.aliasID > food2.kitchen.aliasID) {
+										return 1;
+									} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
+										return -1;
+									} else {
+										return 0;
+									}
+								}
+							});
+						}
 						new QueryRegionTask().execute();
 					}
 					

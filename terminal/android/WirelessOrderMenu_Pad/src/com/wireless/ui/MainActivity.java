@@ -126,25 +126,24 @@ class KitchenData implements OnItemChangeListener,OnViewChangeListener{
 		
 		if(WirelessOrder.foodMenu.foods.length>0)
 		{
-			Food[] mTempFoods = new Food[WirelessOrder.foodMenu.foods.length];
-			/**
-			 * 将所有菜品进行按厨房编号进行排序
-			 */
-			System.arraycopy(WirelessOrder.foodMenu.foods, 0, mTempFoods, 0,
-					WirelessOrder.foodMenu.foods.length);
-			Arrays.sort(mTempFoods, new Comparator<Food>() {
-				@Override
-				public int compare(Food food1, Food food2) {
-					if (food1.kitchen.aliasID > food2.kitchen.aliasID) {
-						return 1;
-					} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
-						return -1;
-					} else {
-						return 0;
-					}
-				}
-			});
-	
+//			Food[] mTempFoods = new Food[WirelessOrder.foodMenu.foods.length];
+//			/**
+//			 * 将所有菜品进行按厨房编号进行排序
+//			 */
+//			System.arraycopy(WirelessOrder.foodMenu.foods, 0, mTempFoods, 0,WirelessOrder.foodMenu.foods.length);
+//			Arrays.sort(mTempFoods, new Comparator<Food>() {
+//				@Override
+//				public int compare(Food food1, Food food2) {
+//					if (food1.kitchen.aliasID > food2.kitchen.aliasID) {
+//						return 1;
+//					} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
+//						return -1;
+//					} else {
+//						return 0;
+//					}
+//				}
+//			});
+			Food[] mTempFoods = WirelessOrder.foodMenu.foods;
 			
 			/**
 			 * 使用二分查找算法筛选出有菜品的厨房
