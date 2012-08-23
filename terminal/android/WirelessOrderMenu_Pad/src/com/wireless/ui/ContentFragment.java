@@ -6,18 +6,12 @@ import java.util.HashSet;
 
 import android.app.Fragment;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -28,6 +22,7 @@ import android.widget.ImageView;
 import com.wireless.common.Params;
 import com.wireless.ordermenu.R;
 import com.wireless.protocol.Food;
+import com.wireless.util.ImageLoader;
 
 public class ContentFragment extends Fragment {
 	ImageAdapter mAdapter = null;
@@ -107,16 +102,16 @@ class ImageAdapter extends BaseAdapter {
 	private final String NULL = "sign_null";
 	private File mStoreDir = null;
 	private Context mContext;
-	private AsynImageLoader mImgLoader;
+	private ImageLoader mImgLoader;
 	// 图片的资源ID
 	private ArrayList<String> mImgPaths = new ArrayList<String>();
-	private Bitmap mDefaultBitmap ;
+	//private Bitmap mDefaultBitmap ;
 
 	// 构造函数
 	public ImageAdapter(Context context,Handler handler) {
 		this.mContext = context;
-		mImgLoader = new AsynImageLoader(handler);
-		mDefaultBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.loading_pic);
+		mImgLoader = new ImageLoader(context);
+		//mDefaultBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.loading_pic);
 	}
 
 	// 返回所有图片的个数
@@ -153,20 +148,20 @@ class ImageAdapter extends BaseAdapter {
 		}
 		//XXX
 		String filePath = mImgPaths.get(position);
-		if(filePath != NULL)
-		{
-//			Bitmap bm = BitmapFactory.decodeFile(filePath);
-			// 通过索引获得图片并设置给ImageView
-//			imageView.setImageBitmap(bm);
-//			imageView.setImageResource(R.drawable.ic_launcher);
-			imageView.setTag(filePath);
-			mImgLoader.loadBitmap(imageView,mDefaultBitmap);
-		}
-		else {
-			imageView.setImageResource(R.drawable.null_pic);
-		}
+//		if(filePath != NULL)
+//		{
+////			Bitmap bm = BitmapFactory.decodeFile(filePath);
+//			// 通过索引获得图片并设置给ImageView
+////			imageView.setImageBitmap(bm);
+////			imageView.setImageResource(R.drawable.ic_launcher);
+//			imageView.setTag(filePath);
+//			mImgLoader.loadBitmap(imageView,mDefaultBitmap);
+//		}
+//		else {
+//			imageView.setImageResource(R.drawable.null_pic);
+//		}
 		
-
+		imageView.setImageBitmap(mImgLoader.loadImage(filePath));
 		
 		return imageView;
 	}
@@ -214,7 +209,7 @@ class ImageAdapter extends BaseAdapter {
 				 String imgAbsPath = storePath+"/"+s;
 //				 Log.i("ffffffffffffff",imgAbsPath);
 				 if(existImgs.contains(imgAbsPath)){
-					 mImgPaths.add(imgAbsPath);
+					 mImgPaths.add(s);
 //					 Log.i("rrrrrrrrrrrr",imgAbsPath);
 				 }
 				 else {
