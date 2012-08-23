@@ -27,19 +27,21 @@ import android.widget.ImageView;
 
 import com.wireless.common.Params;
 import com.wireless.ordermenu.R;
+import com.wireless.protocol.Food;
 
 public class ContentFragment extends Fragment {
 	ImageAdapter mAdapter = null;
 	Gallery mGallery;
 	Handler mHandler;
+	ArrayList<Food> mFoods ;
 	
 	public interface OnViewChangeListener{
-		void onViewChange(int value);
+		void onViewChange(Food value);
 	}
 	
 	public static OnViewChangeListener sDummyListener = new OnViewChangeListener() {
 		@Override
-		public void onViewChange(int value) {}
+		public void onViewChange(Food value) {}
 	};
 	
 	public static OnViewChangeListener mOnViewChangeListener = sDummyListener;
@@ -58,8 +60,14 @@ public class ContentFragment extends Fragment {
 		mGallery.setSelection(position);
 	}
 	
-	public void setContent(ArrayList<String> imageNames)
+	public void setContent(ArrayList<Food> foods)
 	{
+		mFoods = foods;
+		ArrayList<String> imageNames = new ArrayList<String>();
+		for(Food f:foods)
+		{
+			imageNames.add(f.image);
+		}
 		mAdapter.setImages(imageNames);
 		mAdapter.notifyDataSetChanged();
 	}
@@ -82,7 +90,8 @@ public class ContentFragment extends Fragment {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view,int position, long id) {
 				// TODO Auto-generated method stub
-				mOnViewChangeListener.onViewChange(position);
+				Log.i("post:"+position,"food:"+mFoods.get(position).aliasID);
+				mOnViewChangeListener.onViewChange(mFoods.get(position));
 			}
 
 			@Override

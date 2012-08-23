@@ -41,14 +41,14 @@ public class ItemFragment extends Fragment{
 	
     private static OnItemChangeListener sDummyListener = new OnItemChangeListener(){
 		@Override
-		public void onItemChange(int value) {
+		public void onItemChange(Kitchen value) {
 		}
     };
 	
 	private static OnItemChangeListener mOnItemChangeListener = sDummyListener;
 
 	public interface OnItemChangeListener{
-		void onItemChange(int value);
+		void onItemChange(Kitchen value);
 	}
 	
 	public void setOnItemChangeListener(OnItemChangeListener l){
@@ -120,9 +120,8 @@ public class ItemFragment extends Fragment{
 			public boolean onChildClick(ExpandableListView parent, View v,
 					int groupPosition, int childPosition,
 					long id) {
-				short kitchenID = mChildren.get(groupPosition).get(childPosition).aliasID;
-				Log.i("kitchenid",""+kitchenID);
-				mOnItemChangeListener.onItemChange(kitchenID);
+				Kitchen currentKitchen = mChildren.get(groupPosition).get(childPosition);
+				mOnItemChangeListener.onItemChange(currentKitchen);
 				return false;
 			}
 		});

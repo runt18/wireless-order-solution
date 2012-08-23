@@ -148,12 +148,11 @@ public class OptionBar extends Fragment{
 			@Override
 			public void onClick(View v) {
 				final String gotTableNum = mTableNumEditText.getText().toString();
-				TextView tableNumTextView = (TextView)activity.findViewById(R.id.txtView_table_count);
+				final TextView tableNumTextView = (TextView)activity.findViewById(R.id.txtView_table_count);
 
 				if(gotTableNum.isEmpty())
 					tableNumTextView.setText("点击设置");
 				else{
-					tableNumTextView.setText(gotTableNum);
 					new QueryTableStatusTask(Integer.parseInt(gotTableNum)){
 						@Override
 						void OnQueryTblStatus(int status) {
@@ -161,13 +160,12 @@ public class OptionBar extends Fragment{
 								mSelectedFoodTextView.setText("0");
 							}else if(status == Table.TABLE_BUSY){
 								 new QueryOrderTask(Integer.parseInt(gotTableNum)){
-
 									@Override
 									void onOrderChanged() {
 										mSelectedFoodTextView.setText(""+mOrder.foods.length);
 									}
-									 
 								 }.execute();
+								tableNumTextView.setText(gotTableNum);
 							}
 						}								
 					}.execute();
