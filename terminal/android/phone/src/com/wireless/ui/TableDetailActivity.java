@@ -14,6 +14,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
@@ -25,6 +26,7 @@ import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
@@ -405,9 +407,6 @@ public class TableDetailActivity extends Activity {
 				 * 请求账单成功则更新相关的控件
 				 */
 				mHandler.sendEmptyMessage(0);
-				//make the progress dialog disappeared
-				_progDialog.dismiss();
-
 			}			
 		}		
 	}
