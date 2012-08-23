@@ -695,7 +695,7 @@ public class TableActivity extends Activity {
 				if (popWnd.isShowing()) {
 					popWnd.dismiss();
 				} else {
-					popWnd.showAsDropDown(v, -44, 0);
+					popWnd.showAsDropDown(v, -24, 0);
 				}
 			}
 		});

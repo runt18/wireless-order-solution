@@ -6,13 +6,12 @@
     android:background="@drawable/pop_window_bg"
     android:gravity="center"
     android:orientation="vertical" >
-
+
     <ListView
         android:id="@+id/popWndList"
         android:layout_width="152dp"
         android:layout_height="192dp"
-        android:layout_marginTop="4dp"
-        android:background="@color/transparent"
+        android:layout_marginTop="16dp"
         android:cacheColorHint="@color/transparent"
         android:fadingEdge="none" >
 	
