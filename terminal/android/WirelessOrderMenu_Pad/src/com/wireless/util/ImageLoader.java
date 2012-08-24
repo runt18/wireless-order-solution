@@ -30,8 +30,10 @@ public class ImageLoader {
 
 	};
 	
+	
 	public ImageLoader(Context context){
 		mContext = context;
+		//mImageWoker.start();
 	}
 	
 	public Bitmap loadImage(String imgName){
@@ -56,13 +58,96 @@ public class ImageLoader {
 		Bitmap image = BitmapFactory.decodeFile(android.os.Environment.getExternalStorageDirectory().getPath() + Params.IMG_STORE_PATH + imgName);
 		if(image != null){
 			Log.d("ImageLoader", imgName + " succeed to create ");
-			mImageCaches.put(imgName, new SoftReference<Bitmap>(image));
+			synchronized (mImageCaches) {
+				mImageCaches.put(imgName, new SoftReference<Bitmap>(image));				
+			}
 			return image;
 		}else{
 			Log.d("ImageLoader", imgName + " failed to create ");
 			return BitmapFactory.decodeResource(mContext.getResources(), R.drawable.null_pic);
 		}
-
 	}
+	
+//	private static Bitmap createBitmap(ImageView imgView, String imgName){
+//		Bitmap image = BitmapFactory.decodeFile(android.os.Environment.getExternalStorageDirectory().getPath() + Params.IMG_STORE_PATH + imgName);
+//		if(image != null){
+//			Log.d("ImageLoader", imgName + " succeed to create ");
+//			synchronized (mImageCaches) {
+//				mImageCaches.put(imgName, new SoftReference<Bitmap>(image));
+//			}
+//			return image;
+//		}else{
+//			Log.d("ImageLoader", imgName + " failed to create ");
+//			return BitmapFactory.decodeResource(imgView.getResources(), R.drawable.null_pic);
+//		}
+//	}
+	
+//	public void loadImageEx(ImageView imgView, String imgName){
+//		Log.d("ImageLoader", imgName + " wants to create ");
+//		SoftReference<Bitmap> imgSoftRef;
+//		synchronized (mImageCaches) {
+//			imgSoftRef = mImageCaches.get(imgName);
+//		}
+//		if(imgSoftRef != null){
+//			Bitmap image = imgSoftRef.get();
+//			if(image != null){
+//				Log.d("ImageLoader", imgName + " is hit in caches ");
+//				imgView.setImageBitmap(image);
+//			}else{
+//				imgMap.put(imgView, imgName);
+//				synchronized (imgMap) {
+//					imgMap.notifyAll();					
+//				}
+//			}
+//			
+//		}else{
+//			imgMap.put(imgView, imgName);
+//			synchronized (imgMap) {
+//				imgMap.notifyAll();					
+//			}
+//		}
+//	}
+//	
+//	private static ConcurrentHashMap<ImageView, String> imgMap = new ConcurrentHashMap<ImageView, String>();
+//	
+//	private static Thread mImageWoker = new Thread(){
+//		
+//		boolean isRunning = false;
+//		
+//		@Override
+//		public void start(){
+//			if(!isRunning){
+//				super.start();
+//				isRunning = true;
+//			}
+//		}
+//		
+//		@Override
+//		public void run(){
+//			while(true){
+//				while(imgMap.size() == 0){
+//					synchronized (imgMap) {
+//						try{ imgMap.wait(); }
+//						catch(InterruptedException e){}
+//					}
+//				}
+//				
+//				Iterator<Map.Entry<ImageView, String>> iter = imgMap.entrySet().iterator();
+//				while(iter.hasNext()){
+//					Map.Entry<ImageView, String> entry = iter.next();
+//					final ImageView imgView = entry.getKey();
+//					final Bitmap image = createBitmap(imgView, entry.getValue());
+//					imgView.post(new Runnable(){
+//						@Override
+//						public void run(){
+//							imgView.setImageBitmap(image);
+//						}
+//					});
+//					iter.remove();
+//				}
+//				
+//			}
+//		}
+//	};
 	
 }
