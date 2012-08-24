@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -22,11 +23,13 @@ import com.wireless.ui.ContentFragment.OnViewChangeListener;
 import com.wireless.ui.ItemFragment.OnItemChangeListener;
 
 public class MainActivity extends Activity{
-	
+	public static final String CURRENT_FOOD = "currentFood";
+	KitchenData mkitchenData;
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+
 		/**
 		 * 设置各种按钮的listener
 		 */
@@ -35,7 +38,10 @@ public class MainActivity extends Activity{
 
 			@Override
 			public void onClick(View v) {
-				System.out.println("btn clicked");
+				Intent intent = new Intent(MainActivity.this,FullScreenActivity.class);
+				Log.i("id:"+mkitchenData.getCurrentFoodId(),"sdf");
+				intent.putExtra(CURRENT_FOOD, mkitchenData.getCurrentFoodId());
+				startActivity(intent);
 			}
 		});
 		
@@ -55,7 +61,7 @@ public class MainActivity extends Activity{
 	{
 		super.onStart();
 		//初始化 厨房数据
-		new KitchenData((ItemFragment)getFragmentManager().findFragmentById(R.id.item),(ContentFragment)getFragmentManager().findFragmentById(R.id.content));
+		mkitchenData = new KitchenData((ItemFragment)getFragmentManager().findFragmentById(R.id.item),(ContentFragment)getFragmentManager().findFragmentById(R.id.content));
 	}
 
 }
@@ -69,13 +75,14 @@ class KitchenData implements OnItemChangeListener,OnViewChangeListener{
 	
 	private Kitchen mCurrentkitchen = null;
 	private ArrayList<Food> mAllFoods = new ArrayList<Food>();
+	private Food mCurrentFood;
 	/**
 	 * 左边列表项改变的回调
 	 * 重新设置显示的内容
 	 */
 	@Override
 	public void onItemChange(Kitchen value) {
-		mContentFragment.onUpdateContent(getPosition(value));
+		mContentFragment.setContentPosition(getPosition(value));
 	}
 	/**
 	 * 右边改变的回调
@@ -84,6 +91,7 @@ class KitchenData implements OnItemChangeListener,OnViewChangeListener{
 	 */
 	@Override
 	public void onViewChange(Food value) {
+		mCurrentFood = value;
 		Kitchen currentKc = value.kitchen;
 		if(!mCurrentkitchen.equals(currentKc))
 		{
@@ -107,6 +115,10 @@ class KitchenData implements OnItemChangeListener,OnViewChangeListener{
 	{
 		return kcPositions.get(k);
 	}
+	
+	int getCurrentFoodId(){
+		return mCurrentFood.aliasID;
+	}
 	/*
 	 * 默认传递所有有food给右边的画廊
 	 */
@@ -124,27 +136,9 @@ class KitchenData implements OnItemChangeListener,OnViewChangeListener{
 		mItemFragment.setOnItemChangeListener(this);
 		mContentFragment.setOnViewChangeListener(this);
 		
-		if(WirelessOrder.foodMenu.foods.length>0)
+		if(WirelessOrder.foods.length>0)
 		{
-//			Food[] mTempFoods = new Food[WirelessOrder.foodMenu.foods.length];
-//			/**
-//			 * 将所有菜品进行按厨房编号进行排序
-//			 */
-//			System.arraycopy(WirelessOrder.foodMenu.foods, 0, mTempFoods, 0,WirelessOrder.foodMenu.foods.length);
-//			Arrays.sort(mTempFoods, new Comparator<Food>() {
-//				@Override
-//				public int compare(Food food1, Food food2) {
-//					if (food1.kitchen.aliasID > food2.kitchen.aliasID) {
-//						return 1;
-//					} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
-//						return -1;
-//					} else {
-//						return 0;
-//					}
-//				}
-//			});
-			Food[] mTempFoods = WirelessOrder.foodMenu.foods;
-			
+			Food[] mTempFoods = WirelessOrder.foods;
 			/**
 			 * 使用二分查找算法筛选出有菜品的厨房
 			 */
@@ -167,13 +161,13 @@ class KitchenData implements OnItemChangeListener,OnViewChangeListener{
 						});
 				if (index >= 0 ) {
 					mAllKitchens.add(WirelessOrder.foodMenu.kitchens[i]);
-	//				Log.i("start position",""+i);
 				}
 			}
 			for(Food f:mTempFoods)
 			{
 				mAllFoods.add(f);
 			}
+			mCurrentFood = mAllFoods.get(0);
 			/**
 			 * 获取不同厨房的菜品的起始位置
 			 */

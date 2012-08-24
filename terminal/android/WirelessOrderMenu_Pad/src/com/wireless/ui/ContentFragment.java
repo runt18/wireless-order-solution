@@ -51,7 +51,7 @@ public class ContentFragment extends Fragment {
 	   return view;
    }
 
-	public void onUpdateContent(int position) {
+	public void setContentPosition(int position) {
 		mGallery.setSelection(position);
 	}
 	
