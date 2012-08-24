@@ -885,7 +885,7 @@ Ext.onReady(function() {
 			modal : true,
 			resizable : false,
 			width : 900,
-			height : 483,
+			height : 540,
 			layout : 'fit',
 			bbar : [
 			    {

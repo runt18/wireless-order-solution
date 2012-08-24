@@ -27,7 +27,7 @@ var combinationFoodGrid = new Ext.grid.EditorGridPanel({
 	title : '<center>已关联菜品<font color="red">(关联菜品即可设为套菜,否则留空)</font></center>',
 	id : 'combinationFoodGrid',
 	columnWidth : .55,
-	height : 395,
+	height : 452,
 	loadMask : { msg: '数据请求中，请稍后...' },
 	frame : true,
 	trackMouseOver : true,
@@ -141,7 +141,7 @@ var allFoodMiniGridTbar = new Ext.Toolbar({
 var allFoodMiniGrid = createGridPanel(
     'allFoodMiniGrid',
     '<center>所有菜品</center>',
-    395,
+    452,
     '',
     '../../QueryMenuMgr.do',
     [
@@ -179,7 +179,7 @@ allFoodMiniGrid.on('render', function(thiz){
 	});
 });
 allFoodMiniGrid.on('resize', function(thiz){
-	thiz.setHeight(395);
+	thiz.setHeight(452);
 });
 allFoodMiniGrid.on('rowdblclick', function(thiz){
 	var cfd = Ext.getCmp('combinationFoodGrid');

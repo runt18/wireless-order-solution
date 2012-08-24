@@ -162,45 +162,73 @@ var basicOperationPanel = new Ext.Panel({
 		 	    layout : 'form',
 		 	    labelWidth : 60,
 		 	    items : [
-		 	        {
+		 	        new Ext.BoxComponent({
 		 	        	xtype : 'box',
 		 	        	id : 'foodBasicImg',
 		 	        	name : 'foodBasicImg',
-		 	        	width : 560,
-		 	        	height : 400,
+		 	        	width : 555,
+		 	        	height : 420,
 		 	        	autoEl : {
 		 	        		tag : 'img',
 		 	        		src : '../../images/nophoto.jpg',
 		 	        		style : 'filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale);'
 		 	        	}
+		 	    	}),
+		 	        {
+		 	        	tag : 'div',
+		 	        	height : 5
+		 	        }, {
+		 	    		xtype : 'textfield',
+		 	    		id : 'txtImgFile',
+		 	    		name : 'txtImgFile',
+		 	    		fieldLabel : '选择图片',
+		 	    		width : 430,
+		 	    		height : 25,
+		 	    		inputType : 'file',
+		 	    		listeners : {
+		 	    			render : function(e){
+		 	    				Ext.get('txtImgFile').on('change', function(){
+		 	    					if(Ext.isIE){
+		 	    						var img = Ext.get('foodBasicImg').dom;
+		 	    						var file = document.getElementById('txtImgFile');
+		 	    						file.select();
+		 	    						img.src = Ext.BLANK_IMAGE_URL;
+		 	    						img.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = document.selection.createRange().text;
+		 	    					}else{
+		 	    						var img = document.getElementById('foodBasicImg');
+		 	    						var file = document.getElementById('txtImgFile'); 
+		 	    						if(file.files && file.files[0]){
+		 	    							var reader = new FileReader();
+		 	    							reader.onload = function(evt){img.src = evt.target.result;};
+		 	    							reader.readAsDataURL(file.files[0]);
+		 	    						}
+		 	    					}
+		 	    				}, this);
+		 	    			}
+		 	    		}
 		 	    	}
-//		 	        , {
-//		 	    		xtype : 'textfield',
-//		 	    		id : 'txtImgFile',
-//		 	    		name : 'txtImgFile',
-//		 	    		fieldLabel : '选择图片',
-//		 	    		width : 350,
-//		 	    		height : 23,
-//		 	    		inputType : 'file',
-//		 	    		listeners : {
-//		 	    			render : function(e){
-//		 	    				Ext.get('txtImgFile').on('change', function(){
-//		 	    					if(Ext.isIE){
-//		 	    						var img = Ext.get('foodBasicImg').dom;
-//			 	    					img.src = Ext.BLANK_IMAGE_URL;
-//			 	    					img.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = 'file:///' + Ext.get('txtImgFile').dom.value;
-//		 	    					}else{
-//		 	    						 Ext.get('foodBasicImg').dom.src = Ext.get('txtImgFile').dom.files.item(0).getAsDataURL();
-//		 	    					}
-//		 	    				}, this);
-//		 	    			}
-//		 	    		}
-//		 	    	}
 		 	    ]
 		 	}
 		]
 	}]
 });
+
+
+function getPath(obj){
+	if(obj){  
+		if (window.navigator.userAgent.indexOf("MSIE")>=1)  {  
+			obj.select();  
+			return document.selection.createRange().text;  
+		}else if(window.navigator.userAgent.indexOf("Firefox")>=1){  
+//			if(obj.files){
+//				return obj.files.item(0).getAsDataURL();
+//			}  
+//			return obj.value;
+			
+		}  
+		return obj.value;  
+    }  
+} 
 
 /**
  * 
