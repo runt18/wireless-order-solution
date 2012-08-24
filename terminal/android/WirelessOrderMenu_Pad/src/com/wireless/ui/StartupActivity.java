@@ -496,7 +496,7 @@ public class StartupActivity extends Activity {
 					}
 				}
 				Collections.sort(validFoods, mFoodComp);
-				foodMenu.foods = validFoods.toArray(new Food[validFoods.size()]);
+				WirelessOrder.foods = validFoods.toArray(new Food[validFoods.size()]);
 			}
 			return foodMenu;
 		}
