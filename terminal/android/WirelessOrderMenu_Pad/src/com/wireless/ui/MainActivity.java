@@ -23,13 +23,17 @@ import com.wireless.ui.ContentFragment.OnViewChangeListener;
 import com.wireless.ui.ItemFragment.OnItemChangeListener;
 
 public class MainActivity extends Activity{
-	public static final String CURRENT_FOOD = "currentFood";
+	public static final String CURRENT_FOOD_POST = "currentFoodPost";
 	KitchenData mkitchenData;
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-
+		
+        if (savedInstanceState != null && savedInstanceState
+                .containsKey(CURRENT_FOOD_POST)) {
+//            setActivatedPosition(savedInstanceState.getInt(CURRENT_FOOD_POST));
+        }
 		/**
 		 * 设置各种按钮的listener
 		 */
@@ -39,8 +43,8 @@ public class MainActivity extends Activity{
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent(MainActivity.this,FullScreenActivity.class);
-				Log.i("id:"+mkitchenData.getCurrentFoodId(),"sdf");
-				intent.putExtra(CURRENT_FOOD, mkitchenData.getCurrentFoodId());
+//				Log.i("id:"+mkitchenData.getCurrentFoodId(),"sdf");
+//				intent.putExtra(CURRENT_FOOD_POST, mkitchenData.getCurrentPosition());
 				startActivity(intent);
 			}
 		});
@@ -61,12 +65,13 @@ public class MainActivity extends Activity{
 	{
 		super.onStart();
 		//初始化 厨房数据
-		mkitchenData = new KitchenData((ItemFragment)getFragmentManager().findFragmentById(R.id.item),(ContentFragment)getFragmentManager().findFragmentById(R.id.content));
+		mkitchenData = KitchenData.newInstance((ItemFragment)getFragmentManager().findFragmentById(R.id.item),(ContentFragment)getFragmentManager().findFragmentById(R.id.content));
 	}
 
 }
 
 class KitchenData implements OnItemChangeListener,OnViewChangeListener{
+	private static KitchenData mInstance = null;
 	private ContentFragment mContentFragment;
 	private ItemFragment mItemFragment;
 	
@@ -75,7 +80,19 @@ class KitchenData implements OnItemChangeListener,OnViewChangeListener{
 	
 	private Kitchen mCurrentkitchen = null;
 	private ArrayList<Food> mAllFoods = new ArrayList<Food>();
-	private Food mCurrentFood;
+	private int mCurFoodPost = 0;
+	
+	static KitchenData newInstance(ItemFragment item,ContentFragment content){
+		mInstance = new KitchenData(item,content);
+		return mInstance;
+	}
+	
+	static KitchenData getInstance()
+	{
+		if(mInstance == null)
+			throw new IllegalStateException("the KitchenData class is not initial");
+		return mInstance;
+	}
 	/**
 	 * 左边列表项改变的回调
 	 * 重新设置显示的内容
@@ -90,8 +107,9 @@ class KitchenData implements OnItemChangeListener,OnViewChangeListener{
 	 * 并改变当前显示的food的kitchenID ，mCurrentkitchenID
 	 */
 	@Override
-	public void onViewChange(Food value) {
-		mCurrentFood = value;
+	public void onViewChange(Food value,int position) {
+		mCurFoodPost = position;
+		Log.i("mCurFoodPost",""+mCurFoodPost);
 		Kitchen currentKc = value.kitchen;
 		if(!mCurrentkitchen.equals(currentKc))
 		{
@@ -116,21 +134,21 @@ class KitchenData implements OnItemChangeListener,OnViewChangeListener{
 		return kcPositions.get(k);
 	}
 	
-	int getCurrentFoodId(){
-		return mCurrentFood.aliasID;
+	int getCurrentPosition(){
+		return mCurFoodPost;
 	}
+	
 	/*
 	 * 默认传递所有有food给右边的画廊
 	 */
-	private ArrayList<Food> getValidFood() {
-		mCurrentkitchen = mAllFoods.get(0).kitchen;
+	ArrayList<Food> getValidFood() {
 		return mAllFoods;
 	}
 
 	/*
 	 * 打包所有数据，并设置侦听器
 	 */
-	KitchenData(ItemFragment item,ContentFragment content){
+	private KitchenData(ItemFragment item,ContentFragment content){
 		mItemFragment = item;
 		mContentFragment = content;
 		mItemFragment.setOnItemChangeListener(this);
@@ -167,7 +185,6 @@ class KitchenData implements OnItemChangeListener,OnViewChangeListener{
 			{
 				mAllFoods.add(f);
 			}
-			mCurrentFood = mAllFoods.get(0);
 			/**
 			 * 获取不同厨房的菜品的起始位置
 			 */
@@ -212,7 +229,7 @@ class KitchenData implements OnItemChangeListener,OnViewChangeListener{
 				}
 				mValidKitchens.add(kitchens);
 			}
-			
+			mCurrentkitchen = mAllFoods.get(0).kitchen;
 			mItemFragment.setContent(mValidDepts,mValidKitchens);
 			mContentFragment.setContent(getValidFood());
 			mItemFragment.setPosition(0, 0);

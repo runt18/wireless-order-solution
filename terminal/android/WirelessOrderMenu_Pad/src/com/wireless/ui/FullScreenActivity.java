@@ -12,6 +12,7 @@ import android.os.Bundle;
 public class FullScreenActivity extends Activity {
 	private ContentFragment mContentFragment;
 	private ArrayList<Food> mAllFoods = new ArrayList<Food>();
+	private KitchenData mDatas;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -19,13 +20,9 @@ public class FullScreenActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.full_screen);
 		
+		mDatas = KitchenData.getInstance();
 		mContentFragment = (ContentFragment)getFragmentManager().findFragmentById(R.id.content);
-		Food[] mTempFoods = WirelessOrder.foodMenu.foods;
-		
-		for(int i=0;i<mTempFoods.length;i++)
-		{
-			mAllFoods.add(mTempFoods[i]);
-		}
+		mAllFoods = mDatas.getValidFood();
 	}
 	
 	@Override
@@ -34,6 +31,14 @@ public class FullScreenActivity extends Activity {
 		super.onStart();
 		mContentFragment.setContent(mAllFoods);
 //		int position = getIntent().getIntExtra(MainActivity.CURRENT_FOOD_POST, 0);
-//		mContentFragment.setContentPosition(position);
+		mContentFragment.setContentPosition(mDatas.getCurrentPosition());
+	}
+	
+	@Override 
+	protected void onStop()
+	{
+		super.onStop();
+		//TODO 添加返回功能
+		finish();
 	}
 }

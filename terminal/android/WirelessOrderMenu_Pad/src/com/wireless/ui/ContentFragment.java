@@ -31,12 +31,12 @@ public class ContentFragment extends Fragment {
 	ArrayList<Food> mFoods ;
 	
 	public interface OnViewChangeListener{
-		void onViewChange(Food value);
+		void onViewChange(Food value,int position);
 	}
 	
 	public static OnViewChangeListener sDummyListener = new OnViewChangeListener() {
 		@Override
-		public void onViewChange(Food value) {}
+		public void onViewChange(Food value,int position) {}
 	};
 	
 	public static OnViewChangeListener mOnViewChangeListener = sDummyListener;
@@ -52,6 +52,7 @@ public class ContentFragment extends Fragment {
    }
 
 	public void setContentPosition(int position) {
+		Log.i("set position",""+position);
 		mGallery.setSelection(position);
 	}
 	
@@ -84,14 +85,11 @@ public class ContentFragment extends Fragment {
 
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view,int position, long id) {
-				// TODO Auto-generated method stub
-				Log.i("post:"+position,"food:"+mFoods.get(position).aliasID);
-				mOnViewChangeListener.onViewChange(mFoods.get(position));
+				mOnViewChangeListener.onViewChange(mFoods.get(position),position);
 			}
 
 			@Override
 			public void onNothingSelected(AdapterView<?> parent) {
-				// TODO Auto-generated method stub
 			}
         });
 	}
