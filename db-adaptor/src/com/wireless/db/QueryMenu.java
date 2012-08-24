@@ -4,7 +4,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -189,7 +189,7 @@ public class QueryMenu {
 	 * Query the food and its related information listed below.
 	 * 1 - Popular taste to each food
 	 * 2 - Child food details to the food in case of combo
-	 * Since hash map would destroy the original order,
+	 * Since hash map might destroy the original order,
 	 * using a comparator to sort the result, instead of an order clause in SQL statement. 
 	 * Note that the database should be connected before invoking this method.
 	 * @param dbCon
@@ -204,7 +204,7 @@ public class QueryMenu {
 	 */			
 	public static Food[] queryFoods(final DBCon dbCon, String extraCondition, Comparator<Food> foodComp) throws SQLException{
 		
-		HashMap<Long, Map.Entry<Food, List<Taste>>> foodTasteMap = new HashMap<Long, Map.Entry<Food, List<Taste>>>();
+		LinkedHashMap<Long, Map.Entry<Food, List<Taste>>> foodTasteMap = new LinkedHashMap<Long, Map.Entry<Food, List<Taste>>>();
 		
         //get all the food information to this restaurant
 		String sql = " SELECT " +

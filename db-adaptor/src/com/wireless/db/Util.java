@@ -55,6 +55,7 @@ public class Util {
 			//四舍五入
 			return Math.round(totalPrice);
 		}else{
+			//不处理
 			return totalPrice;
 		}
 	}
