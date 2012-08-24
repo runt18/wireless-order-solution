@@ -528,7 +528,7 @@ public class StartupActivity extends Activity {
 				
 				List<Food> downloadQueue = new ArrayList<Food>();
 				Map<String, ?> foodImg = mSharedPrefs.getAll();
-				for(Food food : WirelessOrder.foodMenu.foods){
+				for(Food food : WirelessOrder.foods){
 					if(food.image != null){
 						/**
 						 * Push the food to download queue in the three cases below.
@@ -557,7 +557,7 @@ public class StartupActivity extends Activity {
 				Editor edit = mSharedPrefs.edit();								
 				for(Map.Entry<String, ?> entry : foodImg.entrySet()){
 					
-					int index = Arrays.binarySearch(WirelessOrder.foodMenu.foods, new Food(Integer.parseInt(entry.getKey()), ""), mFoodComp);			
+					int index = Arrays.binarySearch(WirelessOrder.foods, new Food(Integer.parseInt(entry.getKey()), ""), mFoodComp);			
 					
 					if(index < 0){
 						File file = new File(android.os.Environment.getExternalStorageDirectory().getPath() + 
@@ -626,24 +626,22 @@ public class StartupActivity extends Activity {
 
 						edit.commit();
 						
-						if(WirelessOrder.foods.length>0)
-						{
-							/**
-							 * 将所有菜品进行按厨房编号进行排序
-							 */
-							Arrays.sort(WirelessOrder.foods, new Comparator<Food>() {
-								@Override
-								public int compare(Food food1, Food food2) {
-									if (food1.kitchen.aliasID > food2.kitchen.aliasID) {
-										return 1;
-									} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
-										return -1;
-									} else {
-										return 0;
-									}
+						/**
+						 * 将所有菜品进行按厨房编号进行排序
+						 */
+						Arrays.sort(WirelessOrder.foods, new Comparator<Food>() {
+							@Override
+							public int compare(Food food1, Food food2) {
+								if (food1.kitchen.aliasID > food2.kitchen.aliasID) {
+									return 1;
+								} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
+									return -1;
+								} else {
+									return 0;
 								}
-							});
-						}
+							}
+						});
+						
 						new QueryRegionTask().execute();
 					}
 					
