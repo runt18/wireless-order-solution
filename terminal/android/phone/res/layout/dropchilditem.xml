@@ -35,18 +35,23 @@
 			android:textSize="18sp" android:layout_below="@id/account" />
 	</RelativeLayout>
 
+	<RelativeLayout
+	    android:id="@+id/r2"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_centerVertical="true"
+	    android:gravity="right" >
 
+		<ImageView
+		    android:id="@+id/deletefood"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content" />
 
-	<RelativeLayout android:id="@+id/r2"
-		android:layout_width="fill_parent" android:layout_height="wrap_content"
-		android:gravity="right" android:layout_marginTop="5dip">
-		<ImageView android:id="@+id/deletefood"
-			android:layout_width="wrap_content" android:layout_height="wrap_content"
-			android:layout_marginRight="20dip" />
+		<ImageView
+		    android:id="@+id/addtaste"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_toRightOf="@+id/deletefood" />
 
-		<ImageView android:id="@+id/addtaste" android:layout_width="wrap_content"
-		    android:layout_marginTop="5dip"
-			android:layout_height="wrap_content" android:layout_marginRight="20dip"
-			android:layout_below="@id/deletefood" />
 	</RelativeLayout>
 </RelativeLayout>
