@@ -1,10 +1,11 @@
 package com.wireless.ui;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import android.app.Fragment;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,24 +21,19 @@ import com.wireless.protocol.Food;
 import com.wireless.util.ImageLoader;
 
 public class ContentFragment extends Fragment {
-	private BaseAdapter mGalleryAdapter = null;
-	Gallery mGallery;
-	Handler mHandler;
-	ArrayList<Food> mFoods = new ArrayList<Food>();
 	
-	public interface OnViewChangeListener{
-		void onViewChange(Food value,int position);
+	private BaseAdapter mGalleryAdapter = null;
+	private Gallery mGallery;
+	private List<Food> mFoods = new ArrayList<Food>();
+	
+	public static interface OnPicChangedListener{
+		void onPicChanged(Food value, int position);
 	}
 	
-	public static OnViewChangeListener sDummyListener = new OnViewChangeListener() {
-		@Override
-		public void onViewChange(Food value,int position) {}
-	};
+	private OnPicChangedListener mPicChangeListener;
 	
-	public static OnViewChangeListener mOnViewChangeListener = sDummyListener;
-	
-	public void setOnViewChangeListener(OnViewChangeListener l){
-		mOnViewChangeListener = l;
+	public void setOnViewChangeListener(OnPicChangedListener l){
+		mPicChangeListener = l;
 	}
 	
     @Override  
@@ -45,14 +41,24 @@ public class ContentFragment extends Fragment {
 	   return inflater.inflate(R.layout.content_layout, container, false);
    }
 
-	public void setContentPosition(int position) {
-		Log.i("set position",""+position);
+	public void setContentPosition(int position){
+		Log.i("set position", "" + position);
 		mGallery.setSelection(position);
 	}
 	
+	//FIXME to be deleted
 	public void setContent(ArrayList<Food> foods){
 		mFoods = foods;
 		mGalleryAdapter.notifyDataSetChanged();
+	}
+	
+	/**
+	 * 设置新的Gallery数据源，并更新Gallery
+	 * @param foods
+	 */
+	public void notifyDataChanged(Food[] foods){
+		mFoods = Arrays.asList(foods);
+		mGalleryAdapter.notifyDataSetChanged();		
 	}
 	
 	@Override
@@ -111,7 +117,9 @@ public class ContentFragment extends Fragment {
 
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view,int position, long id) {
-				mOnViewChangeListener.onViewChange(mFoods.get(position),position);
+				if(mPicChangeListener != null){
+					mPicChangeListener.onPicChanged(mFoods.get(position), position);
+				}
 			}
 
 			@Override

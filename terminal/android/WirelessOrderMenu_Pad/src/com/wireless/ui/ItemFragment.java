@@ -1,12 +1,9 @@
 package com.wireless.ui;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,13 +13,10 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
-import android.widget.ListView;
 import android.widget.TextView;
 
-import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
 import com.wireless.protocol.Department;
-import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
 
 public class ItemFragment extends Fragment{
@@ -55,25 +49,58 @@ public class ItemFragment extends Fragment{
 		mOnItemChangeListener = l;
 	}
 	
+	/**
+	 * 设置部门和厨房的数据源，并通知List进行更新
+	 * @param groups
+	 * @param children
+	 */
+	public void notifyDataChanged(List<Department> depts , List<Kitchen> kitchens){
+		mGroups = depts;
+		for(Department dept : depts){
+			List<Kitchen> childKitchens = new ArrayList<Kitchen>();
+			for(Kitchen kitchen : kitchens){
+				if(kitchen.dept.equals(dept)){
+					childKitchens.add(kitchen);
+				}
+			}
+			mChildren.add(childKitchens);
+		}
+		mAdapter.notifyDataSetChanged();		
+	}
 	
+	public void setPosition(Kitchen kitchenToSet){
+		int groupPos = 0;
+		for(List<Kitchen> kitchens : mChildren){
+			int childPos = 0;
+			for(Kitchen kitchen : kitchens){
+				if(kitchen.equals(kitchenToSet)){
+					mListView.expandGroup(groupPos);
+					mListView.setSelectedChild(groupPos, childPos, true);
+					break;
+				}
+				childPos++;
+			}
+			groupPos++;
+		}
+	}
+	
+	//FIXME to be deleted
 	public void setContent(List<Department> groups , List<List<Kitchen>> children){
 		mGroups = groups;
 		mChildren = children;
 		mAdapter.notifyDataSetChanged();
 	}
 	
-	public void setPosition(int groupPosition,int childPosition)
-	{
-		//TODO 
-		Log.i(""+groupPosition,""+ childPosition);
+	//FIXME to be deleted
+	public void setPosition(int groupPosition, int childPosition){
+		Log.i("" + groupPosition, "" + childPosition);
 		mListView.expandGroup(groupPosition);
 		mListView.setSelectedChild(groupPosition, childPosition, true);
 //		mListView.setSelectedGroup(groupPosition);
 	}
 	
 	@Override
-	public void onCreate(Bundle savedInstanceState)
-	{
+	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 	}
 	
@@ -82,7 +109,7 @@ public class ItemFragment extends Fragment{
 	 */
 	@Override  
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {  
-	   View fragmentView = inflater.inflate(R.layout.item_layout, container,false);
+	   View fragmentView = inflater.inflate(R.layout.item_layout, container, false);
 	   
 	   /*
 	    * setup kitchen listview and it's adapter

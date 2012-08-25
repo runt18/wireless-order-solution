@@ -19,12 +19,20 @@ import com.wireless.ordermenu.R;
 import com.wireless.protocol.Department;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
-import com.wireless.ui.ContentFragment.OnViewChangeListener;
+import com.wireless.ui.ContentFragment.OnPicChangedListener;
 import com.wireless.ui.ItemFragment.OnItemChangeListener;
 
-public class MainActivity extends Activity{
+public class MainActivity extends Activity  
+						  implements OnItemChangeListener,
+							 	     OnPicChangedListener{
+	
 	public static final String CURRENT_FOOD_POST = "currentFoodPost";
-	KitchenData mkitchenData;
+	
+	private HashMap<Kitchen, Integer> mFoodPosByKitchenMap = new HashMap<Kitchen, Integer>();
+	
+	private ContentFragment mPicBrowserFragment;
+	private ItemFragment mItemFragment;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -61,16 +69,96 @@ public class MainActivity extends Activity{
 	}
 	
 	@Override
-	public void onStart()
-	{
+	public void onStart(){
 		super.onStart();
 		//初始化 厨房数据
-		mkitchenData = KitchenData.newInstance((ItemFragment)getFragmentManager().findFragmentById(R.id.item),(ContentFragment)getFragmentManager().findFragmentById(R.id.content));
+		//mkitchenData = KitchenData.newInstance((ItemFragment)getFragmentManager().findFragmentById(R.id.item),(ContentFragment)getFragmentManager().findFragmentById(R.id.content));
+		
+		Comparator<Food> foodCompByKitchen = new Comparator<Food>() {
+			@Override
+			public int compare(Food food1, Food food2) {
+				if (food1.kitchen.aliasID > food2.kitchen.aliasID) {
+					return 1;
+				} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
+					return -1;
+				} else {
+					return 0;
+				}
+			}
+		};
+		
+		//取得content fragment的实例
+		mPicBrowserFragment = (ContentFragment)getFragmentManager().findFragmentById(R.id.content);
+		
+		//设置content fragment的回调函数
+		mPicBrowserFragment.setOnViewChangeListener(this);
+		
+		/**
+		 * 将所有菜品进行按厨房编号进行排序
+		 */
+		Arrays.sort(WirelessOrder.foods, foodCompByKitchen);
+		//设置picture browser fragment的数据源
+		mPicBrowserFragment.notifyDataChanged(WirelessOrder.foods);
+		
+		//清空所有厨房和对应菜品首张图片位置的Map数据
+		mFoodPosByKitchenMap.clear();
+		
+		/**
+		 * 使用二分查找算法筛选出有菜品的厨房
+		 */
+		ArrayList<Kitchen> validKitchens = new ArrayList<Kitchen>();
+		for(Kitchen kitchen : WirelessOrder.foodMenu.kitchens) {
+			Food keyFood = new Food();
+			keyFood.kitchen = kitchen;
+			int index = Arrays.binarySearch(WirelessOrder.foods, keyFood, foodCompByKitchen);
+			if (index >= 0 ) {
+				//设置厨房和对应菜品首张图片位置
+				mFoodPosByKitchenMap.put(kitchen, index);
+				validKitchens.add(kitchen);
+			}
+		}		
+		
+		/**
+		 * 筛选出有菜品的部门
+		 */
+		ArrayList<Department> validDepts = new ArrayList<Department>();
+		for (Department dept : WirelessOrder.foodMenu.depts) {
+			for (Kitchen kitchen : validKitchens) {
+				if(dept.deptID == kitchen.dept.deptID) {
+					validDepts.add(dept);
+					break;
+				}
+			}
+		}
+		
+		//取得item fragment的实例
+		mItemFragment = (ItemFragment)getFragmentManager().findFragmentById(R.id.item);
+		//设置item fragment的回调函数
+		mItemFragment.setOnItemChangeListener(this);
+		//设置item fragment的数据源		
+		mItemFragment.notifyDataChanged(validDepts, validKitchens);
+	}
+
+
+	/**
+	 * 右边画廊Gallery的回调函数，联动显示左边的部门-厨房ListView
+	 */
+	@Override
+	public void onPicChanged(Food food, int position) {
+		mItemFragment.setPosition(food.kitchen);
+	}
+
+	/**
+	 * 左边部门-厨房View的回调函数，点击后右边画廊跳转到相应厨房的首张图片
+	 */
+	@Override
+	public void onItemChange(Kitchen kitchen) {
+		mPicBrowserFragment.setContentPosition(mFoodPosByKitchenMap.get(kitchen));
 	}
 
 }
 
-class KitchenData implements OnItemChangeListener,OnViewChangeListener{
+class KitchenData implements OnItemChangeListener,OnPicChangedListener{
 	private static KitchenData mInstance = null;
 	private ContentFragment mContentFragment;
 	private ItemFragment mItemFragment;
@@ -101,13 +189,14 @@ class KitchenData implements OnItemChangeListener,OnViewChangeListener{
 	public void onItemChange(Kitchen value) {
 		mContentFragment.setContentPosition(getPosition(value));
 	}
+	
 	/**
 	 * 右边改变的回调
 	 * 计算出 expandableListView所需要的groupPosition 和 childPosition
 	 * 并改变当前显示的food的kitchenID ，mCurrentkitchenID
 	 */
 	@Override
-	public void onViewChange(Food value,int position) {
+	public void onPicChanged(Food value,int position) {
 		mCurFoodPost = position;
 		Log.i("mCurFoodPost",""+mCurFoodPost);
 		Kitchen currentKc = value.kitchen;
@@ -177,6 +266,7 @@ class KitchenData implements OnItemChangeListener,OnViewChangeListener{
 								}
 							}
 						});
+				
 				if (index >= 0 ) {
 					mAllKitchens.add(WirelessOrder.foodMenu.kitchens[i]);
 				}
@@ -192,8 +282,7 @@ class KitchenData implements OnItemChangeListener,OnViewChangeListener{
 			Kitchen firstKc = mAllFoods.get(0).kitchen;
 			kcPositions.put(firstKc, 0);
 			int k = 0;
-			for(Food f:mAllFoods)
-			{
+			for(Food f : mAllFoods){
 				if(!firstKc.equals(f.kitchen))
 				{
 					kcPositions.put(f.kitchen, k);
@@ -230,7 +319,7 @@ class KitchenData implements OnItemChangeListener,OnViewChangeListener{
 				mValidKitchens.add(kitchens);
 			}
 			mCurrentkitchen = mAllFoods.get(0).kitchen;
-			mItemFragment.setContent(mValidDepts,mValidKitchens);
+			mItemFragment.setContent(mValidDepts, mValidKitchens);
 			mContentFragment.setContent(getValidFood());
 			mItemFragment.setPosition(0, 0);
 		}
