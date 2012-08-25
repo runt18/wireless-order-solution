@@ -153,11 +153,12 @@ public class MainActivity extends Activity
 	 */
 	@Override
 	public void onItemChange(Kitchen kitchen) {
-		mPicBrowserFragment.setContentPosition(mFoodPosByKitchenMap.get(kitchen));
+		mPicBrowserFragment.setPosition(mFoodPosByKitchenMap.get(kitchen));
 	}
 
 }
 
+//FIXME to be deleted
 class KitchenData implements OnItemChangeListener,OnPicChangedListener{
 	private static KitchenData mInstance = null;
 	private ContentFragment mContentFragment;
@@ -187,7 +188,7 @@ class KitchenData implements OnItemChangeListener,OnPicChangedListener{
 	 */
 	@Override
 	public void onItemChange(Kitchen value) {
-		mContentFragment.setContentPosition(getPosition(value));
+		mContentFragment.setPosition(getPosition(value));
 	}
 	
 	/**

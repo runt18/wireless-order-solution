@@ -1,12 +1,11 @@
 package com.wireless.ui;
 import java.util.ArrayList;
 
-import com.wireless.common.WirelessOrder;
-import com.wireless.ordermenu.R;
-import com.wireless.protocol.Food;
-
 import android.app.Activity;
 import android.os.Bundle;
+
+import com.wireless.ordermenu.R;
+import com.wireless.protocol.Food;
 
 
 public class FullScreenActivity extends Activity {
@@ -31,7 +30,7 @@ public class FullScreenActivity extends Activity {
 		super.onStart();
 		mContentFragment.setContent(mAllFoods);
 //		int position = getIntent().getIntExtra(MainActivity.CURRENT_FOOD_POST, 0);
-		mContentFragment.setContentPosition(mDatas.getCurrentPosition());
+		mContentFragment.setPosition(mDatas.getCurrentPosition());
 	}
 	
 	@Override 

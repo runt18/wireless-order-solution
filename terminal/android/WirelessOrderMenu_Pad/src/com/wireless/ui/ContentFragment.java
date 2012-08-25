@@ -36,14 +36,33 @@ public class ContentFragment extends Fragment {
 		mPicChangeListener = l;
 	}
 	
-    @Override  
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {  
-	   return inflater.inflate(R.layout.content_layout, container, false);
-   }
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		return inflater.inflate(R.layout.content_layout, container, false);
+	}
 
-	public void setContentPosition(int position){
+	/**
+	 * 根据position设置画廊显示的图片
+	 * @param position
+	 */
+	public void setPosition(int position){
 		Log.i("set position", "" + position);
 		mGallery.setSelection(position);
+	}
+	
+	/**
+	 * 根据Food设置画廊显示的图片
+	 * @param foodToSet
+	 */
+	public void setPosition(Food foodToSet){
+		int pos = 0;
+		for(Food food : mFoods){
+			if(food.equals(foodToSet)){
+				mGallery.setSelection(pos);
+				break;
+			}
+			pos++;
+		}
 	}
 	
 	//FIXME to be deleted
