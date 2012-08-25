@@ -20,18 +20,11 @@ import com.wireless.protocol.Department;
 import com.wireless.protocol.Kitchen;
 
 public class ItemFragment extends Fragment{
-    private static final String STATE_ACTIVATED_GROUP = "activated_group";
-    private static final String STATE_ACTIVATED_CHILD = "activated_child";
-
-    
 	private List<Department> mGroups = new ArrayList<Department>();
 	private List<List<Kitchen>> mChildren = new ArrayList<List<Kitchen>>();//分厨
 	
 	private ExpandableListView mListView;
 	private KitchenExpandableAdapter mAdapter;
-	
-	private int mActivatedGroup,mActivatedChild;
-	
 	
     private static OnItemChangeListener sDummyListener = new OnItemChangeListener(){
 		@Override
@@ -93,15 +86,8 @@ public class ItemFragment extends Fragment{
 	
 	//FIXME to be deleted
 	public void setPosition(int groupPosition, int childPosition){
-		Log.i("" + groupPosition, "" + childPosition);
 		mListView.expandGroup(groupPosition);
 		mListView.setSelectedChild(groupPosition, childPosition, true);
-//		mListView.setSelectedGroup(groupPosition);
-	}
-	
-	@Override
-	public void onCreate(Bundle savedInstanceState){
-		super.onCreate(savedInstanceState);
 	}
 	
 	/**
@@ -121,22 +107,6 @@ public class ItemFragment extends Fragment{
 	   return fragmentView;
    }
 	
-    @TargetApi(13)
-	@Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        if (savedInstanceState != null && savedInstanceState.containsKey(STATE_ACTIVATED_GROUP) && savedInstanceState.containsKey(STATE_ACTIVATED_CHILD)){
-            setActivatedPosition(savedInstanceState.getInt(STATE_ACTIVATED_GROUP),savedInstanceState.getInt(STATE_ACTIVATED_CHILD));
-        }
-    }
-    
-    public void setActivatedPosition(int group , int child)
-    {
-    	//TODO 定义活动项样式改变的方法
-    	mActivatedGroup = group;
-    	mActivatedChild = child;
-    }
-	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState)
 	{
@@ -153,29 +123,6 @@ public class ItemFragment extends Fragment{
 			}
 		});
 	}
-	
-//	@Override
-//	public void onAttach(Activity activity){
-//		super.onAttach(activity);
-//		if(!(activity instanceof OnItemChangeListener))
-//			throw new IllegalStateException("Activity must implement fragment's OnItemChangeListener");
-//		mOnItemChangeListener = (OnItemChangeListener) activity;
-//	}
-//	
-//    @Override
-//    public void onDetach() {
-//        super.onDetach();
-//        mOnItemChangeListener = sDummyListener;
-//    }
-    
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-            outState.putInt(STATE_ACTIVATED_GROUP, mActivatedGroup );
-            outState.putInt(STATE_ACTIVATED_CHILD, mActivatedChild);
-    }
-    
-
     
     class KitchenExpandableAdapter extends BaseExpandableListAdapter{
 

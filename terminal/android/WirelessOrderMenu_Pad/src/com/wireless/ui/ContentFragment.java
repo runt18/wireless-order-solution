@@ -46,7 +46,6 @@ public class ContentFragment extends Fragment {
 	 * @param position
 	 */
 	public void setPosition(int position){
-		Log.i("set position", "" + position);
 		mGallery.setSelection(position);
 	}
 	
@@ -80,13 +79,16 @@ public class ContentFragment extends Fragment {
 		mGalleryAdapter.notifyDataSetChanged();		
 	}
 	
+	public int getSelectedPosition(){
+       return mGallery.getSelectedItemPosition();
+	}
+	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState){
 		
 		super.onActivityCreated(savedInstanceState);
 		
         mGallery = (Gallery)this.getActivity().findViewById(R.id.noneInertanceGallery1);
-        
         mGalleryAdapter = new BaseAdapter(){
         	
         	private ImageLoader mImgLoader = new ImageLoader(getActivity());
@@ -123,8 +125,6 @@ public class ContentFragment extends Fragment {
         		}
         		
         		imageView.setImageBitmap(mImgLoader.loadImage(mFoods.get(position).image));
-        		//mImgLoader.loadImageEx(imageView, mFoods.get(position).image);
-        		
         		return imageView;
         	}
         };

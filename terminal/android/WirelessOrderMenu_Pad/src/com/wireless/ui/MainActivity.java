@@ -28,6 +28,8 @@ public class MainActivity extends Activity
 	
 	public static final String CURRENT_FOOD_POST = "currentFoodPost";
 	
+	protected static final int MAIN_ACTIVITY_RES_CODE = 340;
+
 	private HashMap<Kitchen, Integer> mFoodPosByKitchenMap = new HashMap<Kitchen, Integer>();
 	
 	private ContentFragment mPicBrowserFragment;
@@ -38,10 +40,10 @@ public class MainActivity extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		
-        if (savedInstanceState != null && savedInstanceState
-                .containsKey(CURRENT_FOOD_POST)) {
-//            setActivatedPosition(savedInstanceState.getInt(CURRENT_FOOD_POST));
-        }
+//        if (savedInstanceState != null && savedInstanceState
+//                .containsKey(CURRENT_FOOD_POST)) {
+////            setActivatedPosition(savedInstanceState.getInt(CURRENT_FOOD_POST));
+//        }
 		/**
 		 * 设置各种按钮的listener
 		 */
@@ -51,9 +53,8 @@ public class MainActivity extends Activity
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent(MainActivity.this,FullScreenActivity.class);
-//				Log.i("id:"+mkitchenData.getCurrentFoodId(),"sdf");
-//				intent.putExtra(CURRENT_FOOD_POST, mkitchenData.getCurrentPosition());
-				startActivity(intent);
+				intent.putExtra(CURRENT_FOOD_POST, mPicBrowserFragment.getSelectedPosition());
+				startActivityForResult(intent, MAIN_ACTIVITY_RES_CODE);
 			}
 		});
 		
@@ -71,8 +72,6 @@ public class MainActivity extends Activity
 	@Override
 	public void onStart(){
 		super.onStart();
-		//初始化 厨房数据
-		//mkitchenData = KitchenData.newInstance((ItemFragment)getFragmentManager().findFragmentById(R.id.item),(ContentFragment)getFragmentManager().findFragmentById(R.id.content));
 		
 		Comparator<Food> foodCompByKitchen = new Comparator<Food>() {
 			@Override
@@ -86,6 +85,10 @@ public class MainActivity extends Activity
 				}
 			}
 		};
+		/**
+		 * 将所有菜品进行按厨房编号进行排序
+		 */
+		Arrays.sort(WirelessOrder.foods, foodCompByKitchen);
 		
 		//取得content fragment的实例
 		mPicBrowserFragment = (ContentFragment)getFragmentManager().findFragmentById(R.id.content);
@@ -93,10 +96,6 @@ public class MainActivity extends Activity
 		//设置content fragment的回调函数
 		mPicBrowserFragment.setOnViewChangeListener(this);
 		
-		/**
-		 * 将所有菜品进行按厨房编号进行排序
-		 */
-		Arrays.sort(WirelessOrder.foods, foodCompByKitchen);
 		//设置picture browser fragment的数据源
 		mPicBrowserFragment.notifyDataChanged(WirelessOrder.foods);
 		
@@ -156,174 +155,184 @@ public class MainActivity extends Activity
 		mPicBrowserFragment.setPosition(mFoodPosByKitchenMap.get(kitchen));
 	}
 
+	@Override  
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {  
+		if(requestCode == MAIN_ACTIVITY_RES_CODE)
+		{
+	        switch(resultCode)
+	        {
+	        case FullScreenActivity.FULL_RES_CODE:
+	        	mPicBrowserFragment.setPosition(data.getIntExtra(CURRENT_FOOD_POST, 0));
+	        	break;
+	        }
+		}
+    }  
 }
 
 //FIXME to be deleted
-class KitchenData implements OnItemChangeListener,OnPicChangedListener{
-	private static KitchenData mInstance = null;
-	private ContentFragment mContentFragment;
-	private ItemFragment mItemFragment;
-	
-	private ArrayList<List<Kitchen>> mValidKitchens = new ArrayList<List<Kitchen>>();
-	private HashMap<Kitchen, Integer> kcPositions;
-	
-	private Kitchen mCurrentkitchen = null;
-	private ArrayList<Food> mAllFoods = new ArrayList<Food>();
-	private int mCurFoodPost = 0;
-	
-	static KitchenData newInstance(ItemFragment item,ContentFragment content){
-		mInstance = new KitchenData(item,content);
-		return mInstance;
-	}
-	
-	static KitchenData getInstance()
-	{
-		if(mInstance == null)
-			throw new IllegalStateException("the KitchenData class is not initial");
-		return mInstance;
-	}
-	/**
-	 * 左边列表项改变的回调
-	 * 重新设置显示的内容
-	 */
-	@Override
-	public void onItemChange(Kitchen value) {
-		mContentFragment.setPosition(getPosition(value));
-	}
-	
-	/**
-	 * 右边改变的回调
-	 * 计算出 expandableListView所需要的groupPosition 和 childPosition
-	 * 并改变当前显示的food的kitchenID ，mCurrentkitchenID
-	 */
-	@Override
-	public void onPicChanged(Food value,int position) {
-		mCurFoodPost = position;
-		Log.i("mCurFoodPost",""+mCurFoodPost);
-		Kitchen currentKc = value.kitchen;
-		if(!mCurrentkitchen.equals(currentKc))
-		{
-			int dSize = mValidKitchens.size();
-			for(int i =0;i<dSize ;i++)
-			{
-				int kSize = mValidKitchens.get(i).size();
-				for(int j =0;j<kSize;j++)
-				{
-					if(mValidKitchens.get(i).get(j).equals(currentKc))
-					{
-						mItemFragment.setPosition(i, j);
-						mCurrentkitchen = currentKc;
-					}
-				}
-			}
-		}
-	}
-	
-	private int getPosition(Kitchen k)
-	{
-		return kcPositions.get(k);
-	}
-	
-	int getCurrentPosition(){
-		return mCurFoodPost;
-	}
-	
-	/*
-	 * 默认传递所有有food给右边的画廊
-	 */
-	ArrayList<Food> getValidFood() {
-		return mAllFoods;
-	}
-
-	/*
-	 * 打包所有数据，并设置侦听器
-	 */
-	private KitchenData(ItemFragment item,ContentFragment content){
-		mItemFragment = item;
-		mContentFragment = content;
-		mItemFragment.setOnItemChangeListener(this);
-		mContentFragment.setOnViewChangeListener(this);
-		
-		if(WirelessOrder.foods.length>0)
-		{
-			Food[] mTempFoods = WirelessOrder.foods;
-			/**
-			 * 使用二分查找算法筛选出有菜品的厨房
-			 */
-			ArrayList<Kitchen> mAllKitchens = new ArrayList<Kitchen>();
-			for (int i = 0; i < WirelessOrder.foodMenu.kitchens.length; i++) {
-				Food keyFood = new Food();
-				keyFood.kitchen.aliasID = WirelessOrder.foodMenu.kitchens[i].aliasID;
-				int index = Arrays.binarySearch(mTempFoods, keyFood,
-						new Comparator<Food>() {
-		
-							public int compare(Food food1, Food food2) {
-								if (food1.kitchen.aliasID > food2.kitchen.aliasID) {
-									return 1;
-								} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
-									return -1;
-								} else {
-									return 0;
-								}
-							}
-						});
-				
-				if (index >= 0 ) {
-					mAllKitchens.add(WirelessOrder.foodMenu.kitchens[i]);
-				}
-			}
-			for(Food f:mTempFoods)
-			{
-				mAllFoods.add(f);
-			}
-			/**
-			 * 获取不同厨房的菜品的起始位置
-			 */
-			kcPositions = new HashMap<Kitchen,Integer>();
-			Kitchen firstKc = mAllFoods.get(0).kitchen;
-			kcPositions.put(firstKc, 0);
-			int k = 0;
-			for(Food f : mAllFoods){
-				if(!firstKc.equals(f.kitchen))
-				{
-					kcPositions.put(f.kitchen, k);
-					firstKc = f.kitchen;
-				}
-				k++;
-			}
-	
-			/**
-			 * 筛选出有菜品的部门
-			 */
-			ArrayList<Department> mValidDepts = new ArrayList<Department>();
-			for (int i = 0; i < WirelessOrder.foodMenu.depts.length; i++) {
-				for (int j = 0; j < mAllKitchens.size(); j++) {
-					if (WirelessOrder.foodMenu.depts[i].deptID == mAllKitchens.get(j).dept.deptID) {
-						mValidDepts.add(WirelessOrder.foodMenu.depts[i]);
-						break;
-					}
-				}
-			}
-			
-			/**
-			 * 筛选出每个部门中有菜品的厨房
-			 */
-	
-			mValidKitchens = new ArrayList<List<Kitchen>>();
-			for (int i = 0; i < mValidDepts.size(); i++) {
-				List<Kitchen> kitchens = new ArrayList<Kitchen>();
-				for (int j = 0; j < mAllKitchens.size(); j++) {
-					if (mAllKitchens.get(j).dept.deptID == mValidDepts.get(i).deptID) {
-						kitchens.add(mAllKitchens.get(j));
-					}
-				}
-				mValidKitchens.add(kitchens);
-			}
-			mCurrentkitchen = mAllFoods.get(0).kitchen;
-			mItemFragment.setContent(mValidDepts, mValidKitchens);
-			mContentFragment.setContent(getValidFood());
-			mItemFragment.setPosition(0, 0);
-		}
-	}
-
-}
+//class KitchenData implements OnItemChangeListener,OnPicChangedListener{
+//	private static KitchenData mInstance = null;
+//	private ContentFragment mContentFragment;
+//	private ItemFragment mItemFragment;
+//	
+//	private ArrayList<List<Kitchen>> mValidKitchens = new ArrayList<List<Kitchen>>();
+//	private HashMap<Kitchen, Integer> kcPositions;
+//	
+//	private Kitchen mCurrentkitchen = null;
+//	private ArrayList<Food> mAllFoods = new ArrayList<Food>();
+//	private int mCurFoodPost = 0;
+//	
+//	static KitchenData newInstance(ItemFragment item,ContentFragment content){
+//		mInstance = new KitchenData(item,content);
+//		return mInstance;
+//	}
+//	
+//	static KitchenData getInstance()
+//	{
+//		if(mInstance == null)
+//			throw new IllegalStateException("the KitchenData class is not initial");
+//		return mInstance;
+//	}
+//	/**
+//	 * 左边列表项改变的回调
+//	 * 重新设置显示的内容
+//	 */
+//	@Override
+//	public void onItemChange(Kitchen value) {
+//		mContentFragment.setPosition(getPosition(value));
+//	}
+//	
+//	/**
+//	 * 右边改变的回调
+//	 * 计算出 expandableListView所需要的groupPosition 和 childPosition
+//	 * 并改变当前显示的food的kitchenID ，mCurrentkitchenID
+//	 */
+//	@Override
+//	public void onPicChanged(Food value,int position) {
+//		mCurFoodPost = position;
+//		Log.i("mCurFoodPost",""+mCurFoodPost);
+//		Kitchen currentKc = value.kitchen;
+//		if(!mCurrentkitchen.equals(currentKc))
+//		{
+//			int dSize = mValidKitchens.size();
+//			for(int i =0;i<dSize ;i++)
+//			{
+//				int kSize = mValidKitchens.get(i).size();
+//				for(int j =0;j<kSize;j++)
+//				{
+//					if(mValidKitchens.get(i).get(j).equals(currentKc))
+//					{
+//						mItemFragment.setPosition(i, j);
+//						mCurrentkitchen = currentKc;
+//					}
+//				}
+//			}
+//		}
+//	}
+//	
+//	private int getPosition(Kitchen k)
+//	{
+//		return kcPositions.get(k);
+//	}
+//	
+//	int getCurrentPosition(){
+//		return mCurFoodPost;
+//	}
+//	
+//	/*
+//	 * 默认传递所有有food给右边的画廊
+//	 */
+//	ArrayList<Food> getValidFood() {
+//		return mAllFoods;
+//	}
+//
+//	/*
+//	 * 打包所有数据，并设置侦听器
+//	 */
+//	private KitchenData(ItemFragment item,ContentFragment content){
+//		mItemFragment = item;
+//		mContentFragment = content;
+//		mItemFragment.setOnItemChangeListener(this);
+//		mContentFragment.setOnViewChangeListener(this);
+//		
+//		if(WirelessOrder.foods.length>0)
+//		{
+//			Food[] mTempFoods = WirelessOrder.foods;
+//			/**
+//			 * 使用二分查找算法筛选出有菜品的厨房
+//			 */
+//			ArrayList<Kitchen> mAllKitchens = new ArrayList<Kitchen>();
+//			for (int i = 0; i < WirelessOrder.foodMenu.kitchens.length; i++) {
+//				Food keyFood = new Food();
+//				keyFood.kitchen.aliasID = WirelessOrder.foodMenu.kitchens[i].aliasID;
+//				int index = Arrays.binarySearch(mTempFoods, keyFood,
+//						new Comparator<Food>() {
+//		
+//							public int compare(Food food1, Food food2) {
+//								if (food1.kitchen.aliasID > food2.kitchen.aliasID) {
+//									return 1;
+//								} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
+//									return -1;
+//								} else {
+//									return 0;
+//								}
+//							}
+//						});
+//				
+//				if (index >= 0 ) {
+//					mAllKitchens.add(WirelessOrder.foodMenu.kitchens[i]);
+//				}
+//			}
+//			
+//			mAllFoods = (ArrayList<Food>) Arrays.asList(mTempFoods);
+//			/**
+//			 * 获取不同厨房的菜品的起始位置
+//			 */
+//			kcPositions = new HashMap<Kitchen,Integer>();
+//			Kitchen firstKc = mAllFoods.get(0).kitchen;
+//			kcPositions.put(firstKc, 0);
+//			int k = 0;
+//			for(Food f : mAllFoods){
+//				if(!firstKc.equals(f.kitchen))
+//				{
+//					kcPositions.put(f.kitchen, k);
+//					firstKc = f.kitchen;
+//				}
+//				k++;
+//			}
+//	
+//			/**
+//			 * 筛选出有菜品的部门
+//			 */
+//			ArrayList<Department> mValidDepts = new ArrayList<Department>();
+//			for (int i = 0; i < WirelessOrder.foodMenu.depts.length; i++) {
+//				for (int j = 0; j < mAllKitchens.size(); j++) {
+//					if (WirelessOrder.foodMenu.depts[i].deptID == mAllKitchens.get(j).dept.deptID) {
+//						mValidDepts.add(WirelessOrder.foodMenu.depts[i]);
+//						break;
+//					}
+//				}
+//			}
+//			
+//			/**
+//			 * 筛选出每个部门中有菜品的厨房
+//			 */
+//	
+//			mValidKitchens = new ArrayList<List<Kitchen>>();
+//			for (int i = 0; i < mValidDepts.size(); i++) {
+//				List<Kitchen> kitchens = new ArrayList<Kitchen>();
+//				for (int j = 0; j < mAllKitchens.size(); j++) {
+//					if (mAllKitchens.get(j).dept.deptID == mValidDepts.get(i).deptID) {
+//						kitchens.add(mAllKitchens.get(j));
+//					}
+//				}
+//				mValidKitchens.add(kitchens);
+//			}
+//			mCurrentkitchen = mAllFoods.get(0).kitchen;
+//			mItemFragment.setContent(mValidDepts, mValidKitchens);
+//			mContentFragment.setContent(getValidFood());
+//			mItemFragment.setPosition(0, 0);
+//		}
+//	}
+//
+//}
