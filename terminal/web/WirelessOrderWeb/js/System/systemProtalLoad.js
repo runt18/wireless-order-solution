@@ -64,5 +64,14 @@ function loginOnLoad() {
 			$(this).stop().css("background", "url(../../images/passwordConfig.png) no-repeat 50%");
 		});
 	});
-
+	
+	$("#formatPrice").each(function() {
+		$(this).hover(function() {
+			$(this).stop().css("background", "url(../../images/formatPrice_select.png) no-repeat 50%");
+		},
+		function() {
+			$(this).stop().css("background", "url(../../images/formatPrice.png) no-repeat 50%");
+		});
+	});
+	
 };

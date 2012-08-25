@@ -442,7 +442,7 @@ var passwordConfigWin = new Ext.Window({
 });
 
 var formatPrice = new Ext.Window({
-	title : '金额尾数处理方式设置',
+	title : '收款金额尾数处理方式设置',
 	modal : true,
 	resizable : false,
 	closable : false,
