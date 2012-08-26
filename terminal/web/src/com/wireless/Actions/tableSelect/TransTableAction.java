@@ -80,7 +80,7 @@ public class TransTableAction extends Action implements PinGen {
 			printParam.orderID = orderID;
 			printParam.srcTblID = srcTbl.aliasID;
 			printParam.destTblID = destTbl.aliasID;
-			ServerConnector.instance().ask(new ReqPrintOrder2(printParam));
+			ServerConnector.instance().ask(new ReqPrintOrder2(printParam));			
 
 		}catch(NumberFormatException e){
 			jsonResp = jsonResp.replace("$(result)", "false");
@@ -93,11 +93,11 @@ public class TransTableAction extends Action implements PinGen {
 				
 			}else if(e.errCode == ErrorCode.TABLE_IDLE){
 				jsonResp = jsonResp.replace("$(result)", "false");
-				jsonResp = jsonResp.replace("$(value)", srcTbl.aliasID + "号台是空闲状态，可能已经结帐，请跟餐厅经理确认");
+				jsonResp = jsonResp.replace("$(value)", "原" + srcTbl.aliasID + "号台是空闲状态，可能已经结帐，请跟餐厅经理确认");
 				
 			}else if(e.errCode == ErrorCode.TABLE_BUSY){
 				jsonResp = jsonResp.replace("$(result)", "false");
-				jsonResp = jsonResp.replace("$(value)", destTbl.aliasID	+ "号台是就餐状态，请跟餐厅经理确认");
+				jsonResp = jsonResp.replace("$(value)", "新" + destTbl.aliasID	+ "号台是就餐状态，请跟餐厅经理确认");
 				
 			}else{
 				jsonResp = jsonResp.replace("$(result)", "false");
