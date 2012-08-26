@@ -29,8 +29,8 @@ public class ReqPrintOrder2 extends ReqPackage{
 	public static class ReqParam{
 		public int printConf = Reserved.DEFAULT_CONF;		//the print configuration parameter  
 		public int orderID;									//the order id to print
-		public int oriTblID;								//the id to original table 
-		public int newTblID;								//the id to new table 
+		public int srcTblID;								//the id to original table 
+		public int destTblID;								//the id to new table 
 		public long onDuty;									//the on duty 
 		public long offDuty;								//the off duty
 	}
@@ -69,12 +69,12 @@ public class ReqPrintOrder2 extends ReqPackage{
 		body[7] = (byte)((param.orderID & 0xFF000000) >> 24);
 		
 		//assign the original table id
-		body[8] = (byte)(param.oriTblID & 0x000000FF);
-		body[9] = (byte)((param.oriTblID & 0x0000FF00) >> 8);
+		body[8] = (byte)(param.srcTblID & 0x000000FF);
+		body[9] = (byte)((param.srcTblID & 0x0000FF00) >> 8);
 		
 		//assign the new table id
-		body[10] = (byte)(param.newTblID & 0x000000FF);
-		body[11] = (byte)((param.newTblID & 0x0000FF00) >> 8);
+		body[10] = (byte)(param.destTblID & 0x000000FF);
+		body[11] = (byte)((param.destTblID & 0x0000FF00) >> 8);
 		
 		//assign the on duty
 		body[12] = (byte)(param.onDuty & 0x00000000000000FFL);

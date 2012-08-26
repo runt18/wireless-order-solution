@@ -71,8 +71,8 @@ public class ReqPayOrder extends ReqPackage{
 		body[3] = (byte)((printType & 0xFF000000) >> 24);		
 		
 		//assign the table id
-		body[4] = (byte)(order.table.aliasID & 0x00FF);
-		body[5] = (byte)((order.table.aliasID >> 8) & 0x00FF);
+		body[4] = (byte)(order.destTbl.aliasID & 0x00FF);
+		body[5] = (byte)((order.destTbl.aliasID >> 8) & 0x00FF);
 		
 		//assign the total price
 		body[6] = (byte)(order.cashIncome & 0x000000FF);

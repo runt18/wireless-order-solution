@@ -108,10 +108,10 @@ public class ReqParser {
 		order.print_type = ((req.body[0] & 0x000000FF) | ((req.body[1] & 0x000000FF) << 8));
 		
 		//get the table id
-		order.table.aliasID = ((req.body[2] & 0x000000FF) | ((req.body[3] & 0x000000FF) << 8));
+		order.destTbl.aliasID = ((req.body[2] & 0x000000FF) | ((req.body[3] & 0x000000FF) << 8));
 		
 		//get the 2nd table id
-		order.table2.aliasID = ((req.body[4] & 0x000000FF) | ((req.body[5] & 0x000000FF) << 8));
+		order.destTbl2.aliasID = ((req.body[4] & 0x000000FF) | ((req.body[5] & 0x000000FF) << 8));
 		
 		//get the category
 		order.category = (short)(req.body[6] & 0x000000FF);
@@ -269,7 +269,7 @@ public class ReqParser {
 		order.foods = orderFoods;
 		
 		//assign the original table id
-		order.oriTbl.aliasID = ((req.body[offset] & 0x000000FF) | 
+		order.srcTbl.aliasID = ((req.body[offset] & 0x000000FF) | 
 									((req.body[offset + 1] & 0x000000FF) << 8));
 		return order;
 	}
@@ -338,8 +338,8 @@ public class ReqParser {
 		ReqPrintOrder2.ReqParam reqParam = new ReqPrintOrder2.ReqParam();
 		reqParam.printConf = printConf;
 		reqParam.orderID = orderID;
-		reqParam.oriTblID = oriTblID;
-		reqParam.newTblID = newTblID;
+		reqParam.srcTblID = oriTblID;
+		reqParam.destTblID = newTblID;
 		reqParam.onDuty = onDuty;
 		reqParam.offDuty = offDuty;
 		
@@ -443,7 +443,7 @@ public class ReqParser {
 		}
 		Order orderToPay = new Order();
 		orderToPay.print_type = printType;
-		orderToPay.table.aliasID = tableToPay;
+		orderToPay.destTbl.aliasID = tableToPay;
 		orderToPay.cashIncome = cashIncome;
 		orderToPay.giftPrice = giftPrice;
 		orderToPay.pay_type = payType;
@@ -453,6 +453,30 @@ public class ReqParser {
 		orderToPay.memberID = memberID;
 		orderToPay.comment = comment;
 		return orderToPay;
+	}
+	
+	/******************************************************
+	* Design the table transfer request looks like below
+	* <Header>
+	* mode : type : seq : reserved : pin[6] : len[2]
+	* mode - ORDER_BUSSINESS
+	* type - TRANS_TABLE
+	* seq - auto calculated and filled in
+	* reserved - 0x00
+	* pin[6] - auto calculated and filled in
+	* len[2] - 0x02, 0x00
+	* <Table>
+	* srcTbl[2] : destTbl[2]
+	* srcTbl[2] - 2-byte indicating table alias to source table
+	* destTbl[2] - 2-byte indicating table alias to destination table
+	*******************************************************/
+	public static Table[] parseTransTbl(ProtocolPackage req){
+		Table[] tables = new Table[2];
+		tables[0] = new Table();
+		tables[1] = new Table();
+		tables[0].aliasID = ((req.body[0] & 0x000000FF) | ((req.body[1] & 0x000000FF) << 8));
+		tables[1].aliasID = ((req.body[2] & 0x000000FF) | ((req.body[3] & 0x000000FF) << 8));
+		return tables;		
 	}
 }
 

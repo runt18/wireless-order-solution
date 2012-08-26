@@ -98,7 +98,7 @@ public final class RespQueryTable extends RespPackage {
 			offset++;
 			
 			//assign the custom number
-			body[offset] = (byte)(tables[i].custom_num);
+			body[offset] = (byte)(tables[i].customNum);
 			offset++;
 		}
 	}

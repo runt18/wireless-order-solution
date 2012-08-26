@@ -14,7 +14,7 @@ public class Table {
 	//the alias name to this table
 	public String name = "";
 	//the number of the custom to this table
-	public short custom_num = 0;
+	public short customNum = 0;
 	//the status to this table
 	public short status = TABLE_IDLE;
 	//the category to this table
