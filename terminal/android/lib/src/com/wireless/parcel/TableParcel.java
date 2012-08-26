@@ -16,7 +16,7 @@ public class TableParcel extends Table implements Parcelable {
 		this.aliasID = table.aliasID;
 		this.category = table.category;
 		this.status = table.status;
-		this.custom_num = table.custom_num;
+		this.customNum = table.customNum;
 		this.name = new String(table.name);
 		this.regionID = table.regionID;
 		this.setMinimumCost(Float.valueOf(table.getMinimumCost()));
@@ -29,7 +29,7 @@ public class TableParcel extends Table implements Parcelable {
 		this.aliasID = in.readInt();
 		this.category = (short)in.readInt();
 		this.status = (short)in.readInt();
-		this.custom_num = (short)in.readInt();
+		this.customNum = (short)in.readInt();
 		this.name = in.readString();
 		this.regionID = (short)in.readInt();
 		this.setMinimumCost(Util.int2Float(in.readInt()));
@@ -58,7 +58,7 @@ public class TableParcel extends Table implements Parcelable {
 		parcel.writeInt(this.aliasID);
 		parcel.writeInt(this.category);
 		parcel.writeInt(this.status);
-		parcel.writeInt(this.custom_num);
+		parcel.writeInt(this.customNum);
 		parcel.writeString(this.name);
 		parcel.writeInt(this.regionID);
 		parcel.writeInt(Util.float2Int(this.getMinimumCost()));
