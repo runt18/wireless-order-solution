@@ -82,7 +82,7 @@ public class BillActivity extends Activity {
 		OrderParcel orderParcel = getIntent().getParcelableExtra(OrderParcel.KEY_VALUE);
 		_orderToPay = orderParcel;
 			
-		((TextView)findViewById(R.id.valueplatform)).setText(String.valueOf(_orderToPay.table.aliasID));
+		((TextView)findViewById(R.id.valueplatform)).setText(String.valueOf(_orderToPay.destTbl.aliasID));
 		((TextView)findViewById(R.id.valuepeople)).setText(String.valueOf(_orderToPay.custom_num));
 		_handler.sendEmptyMessage(0);
 				
@@ -138,7 +138,7 @@ public class BillActivity extends Activity {
 		 */
 		@Override
 		protected void onPreExecute() {
-			_progDialog = ProgressDialog.show(BillActivity.this, "", "提交" + _orderToPay.table.aliasID + "号台" + (_payCate == PAY_ORDER ? "结帐" : "暂结") + "信息...请稍候", true);
+			_progDialog = ProgressDialog.show(BillActivity.this, "", "提交" + _orderToPay.destTbl.aliasID + "号台" + (_payCate == PAY_ORDER ? "结帐" : "暂结") + "信息...请稍候", true);
 			super.onPreExecute();
 		}
 
@@ -166,13 +166,13 @@ public class BillActivity extends Activity {
 					byte errCode = resp.header.reserved;
 								
 					if(errCode == ErrorCode.TABLE_NOT_EXIST){
-						errMsg =_orderToPay.table.aliasID + "号台已被删除，请与餐厅负责人确认。";
+						errMsg =_orderToPay.destTbl.aliasID + "号台已被删除，请与餐厅负责人确认。";
 					}else if(errCode == ErrorCode.TABLE_IDLE){
-						errMsg =_orderToPay.table.aliasID + "号台的账单已结帐或删除，请与餐厅负责人确认。";
+						errMsg =_orderToPay.destTbl.aliasID + "号台的账单已结帐或删除，请与餐厅负责人确认。";
 					}else if(errCode == ErrorCode.PRINT_FAIL){
-						errMsg = _orderToPay.table.aliasID + "号结帐打印未成功，请与餐厅负责人确认。";
+						errMsg = _orderToPay.destTbl.aliasID + "号结帐打印未成功，请与餐厅负责人确认。";
 					}else{
-						errMsg =_orderToPay.table.aliasID + "号台结帐未成功，请重新结帐";
+						errMsg =_orderToPay.destTbl.aliasID + "号台结帐未成功，请重新结帐";
 					}
 				}
 				
@@ -211,7 +211,7 @@ public class BillActivity extends Activity {
 				}else{				
 					_handler.sendEmptyMessage(0);
 				}
-				Toast.makeText(BillActivity.this, _orderToPay.table.aliasID + "号台" + (_payCate == PAY_ORDER ? "结帐" : "暂结") + "成功", 0).show();
+				Toast.makeText(BillActivity.this, _orderToPay.destTbl.aliasID + "号台" + (_payCate == PAY_ORDER ? "结帐" : "暂结") + "成功", 0).show();
 				
 			}
 		}
