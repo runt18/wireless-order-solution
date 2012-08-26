@@ -14,18 +14,20 @@ import com.wireless.protocol.Food;
 import com.wireless.ui.ContentFragment.OnPicChangedListener;
 
 public class FullScreenActivity extends Activity implements OnPicChangedListener{
+	
 	private ContentFragment mPicBrowserFragment;
+	
 	static final int FULL_RES_CODE = 130;
+	
 	@Override
-	protected void onCreate(Bundle savedInstanceState)
-	{
+	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.full_screen);
 	}
 	
 	@Override
-	protected void onStart()
-	{
+	protected void onStart(){
+		
 		super.onStart();
 		//取得content fragment的实例
 		mPicBrowserFragment = (ContentFragment)getFragmentManager().findFragmentById(R.id.content);
@@ -58,13 +60,13 @@ public class FullScreenActivity extends Activity implements OnPicChangedListener
             return super.onKeyDown(keyCode, event);  
     }  
 	
-	/*
+	/**
 	 * 将当前gallery 位置返回给mainActivity
 	 */
 	private void setResultInformations(){
 		Intent intent = new Intent();
 		intent.putExtra(MainActivity.CURRENT_FOOD_POST, mPicBrowserFragment.getSelectedPosition());
-		setResult(FULL_RES_CODE,intent);
+		setResult(FULL_RES_CODE, intent);
 		finish();
 	}
 

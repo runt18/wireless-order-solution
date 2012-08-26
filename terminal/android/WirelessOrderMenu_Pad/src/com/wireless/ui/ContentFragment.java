@@ -138,7 +138,7 @@ public class ContentFragment extends Fragment {
 	}
 	
 	public static interface OnPicChangedListener{
-		void onPicChanged(Food value, int position);
+		void onPicChanged(Food selectedFood, int position);
 	}
 }
 

@@ -18,19 +18,15 @@ import com.wireless.protocol.Department;
 import com.wireless.protocol.Kitchen;
 
 public class ItemFragment extends Fragment{
-	private List<Department> mGroups = new ArrayList<Department>();
-	private List<List<Kitchen>> mChildren = new ArrayList<List<Kitchen>>();//分厨
+	
+	private List<Department> mGroups = new ArrayList<Department>();			//部门
+	private List<List<Kitchen>> mChildren = new ArrayList<List<Kitchen>>();	//分厨
 	
 	private ExpandableListView mListView;
 	private KitchenExpandableAdapter mAdapter;
 	
-    private static OnItemChangeListener sDummyListener = new OnItemChangeListener(){
-		@Override
-		public void onItemChange(Kitchen value) {
-		}
-    };
 	
-	private static OnItemChangeListener mOnItemChangeListener = sDummyListener;
+	private OnItemChangeListener mOnItemChangeListener;
 
 	public interface OnItemChangeListener{
 		void onItemChange(Kitchen value);
@@ -46,7 +42,11 @@ public class ItemFragment extends Fragment{
 	 * @param children
 	 */
 	public void notifyDataChanged(List<Department> depts , List<Kitchen> kitchens){
-		mGroups = depts;
+		
+		mGroups.clear();
+		mChildren.clear();
+		
+		mGroups.addAll(depts);
 		for(Department dept : depts){
 			List<Kitchen> childKitchens = new ArrayList<Kitchen>();
 			for(Kitchen kitchen : kitchens){
@@ -59,6 +59,10 @@ public class ItemFragment extends Fragment{
 		mAdapter.notifyDataSetChanged();		
 	}
 	
+	/**
+	 * 设置ListView显示某个特定的厨房
+	 * @param kitchenToSet
+	 */
 	public void setPosition(Kitchen kitchenToSet){
 		int groupPos = 0;
 		for(List<Kitchen> kitchens : mChildren){
@@ -75,19 +79,6 @@ public class ItemFragment extends Fragment{
 		}
 	}
 	
-	//FIXME to be deleted
-	public void setContent(List<Department> groups , List<List<Kitchen>> children){
-		mGroups = groups;
-		mChildren = children;
-		mAdapter.notifyDataSetChanged();
-	}
-	
-	//FIXME to be deleted
-	public void setPosition(int groupPosition, int childPosition){
-		mListView.expandGroup(groupPosition);
-		mListView.setSelectedChild(groupPosition, childPosition, true);
-	}
-	
 	/**
 	 * create the left fragment view
 	 */
@@ -95,9 +86,7 @@ public class ItemFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {  
 	   View fragmentView = inflater.inflate(R.layout.item_layout, container, false);
 	   
-	   /*
-	    * setup kitchen listview and it's adapter
-	    */
+	   //Setup kitchen list view and it's adapter.
 	   mListView = (ExpandableListView) fragmentView.findViewById(R.id.expandableListView1);
 	   mAdapter = new KitchenExpandableAdapter();
 	   mListView.setAdapter(mAdapter);
@@ -122,7 +111,7 @@ public class ItemFragment extends Fragment{
 		});
 	}
     
-    class KitchenExpandableAdapter extends BaseExpandableListAdapter{
+    private class KitchenExpandableAdapter extends BaseExpandableListAdapter{
 
 		@Override
 		public int getGroupCount() {
