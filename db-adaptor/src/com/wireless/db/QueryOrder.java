@@ -143,11 +143,11 @@ public class QueryOrder {
 		if(dbCon.rs.next()) {
 			orderInfo.seqID = dbCon.rs.getInt("seq_id");
 			orderInfo.restaurantID = dbCon.rs.getInt("restaurant_id");
-			orderInfo.table.tableID = dbCon.rs.getInt("table_id");
-			orderInfo.table.aliasID = dbCon.rs.getInt("table_alias");
-			orderInfo.table.name = dbCon.rs.getString("table_name");
-			orderInfo.table2.aliasID = dbCon.rs.getShort("table2_alias");
-			orderInfo.table2.name = dbCon.rs.getString("table2_name");
+			orderInfo.destTbl.tableID = dbCon.rs.getInt("table_id");
+			orderInfo.destTbl.aliasID = dbCon.rs.getInt("table_alias");
+			orderInfo.destTbl.name = dbCon.rs.getString("table_name");
+			orderInfo.destTbl2.aliasID = dbCon.rs.getShort("table2_alias");
+			orderInfo.destTbl2.name = dbCon.rs.getString("table2_name");
 			orderInfo.region.regionID = dbCon.rs.getShort("region_id");
 			orderInfo.region.name = dbCon.rs.getString("region_name");
 			orderInfo.custom_num = dbCon.rs.getShort("custom_num");
@@ -179,7 +179,7 @@ public class QueryOrder {
 		 */
 		sql = "SELECT minimum_cost FROM " + Params.dbName +	
 			  ".table WHERE restaurant_id=" + orderInfo.restaurantID +
-			  " AND table_alias=" + orderInfo.table.aliasID;
+			  " AND table_alias=" + orderInfo.destTbl.aliasID;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			//orderInfo.minimum_cost = new Float(dbCon.rs.getFloat("minimum_cost") * 100).intValue();

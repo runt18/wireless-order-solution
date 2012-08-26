@@ -139,16 +139,16 @@ public class UpdateOrder {
 		 * In the case the table is the same as before,
 		 * need to assure the table to update remains in busy.
 		 */
-		if(orderToUpdate.table.aliasID == orderToUpdate.oriTbl.aliasID){
+		if(orderToUpdate.destTbl.aliasID == orderToUpdate.srcTbl.aliasID){
 			
-			orderToUpdate.table = QueryTable.exec(dbCon, term, orderToUpdate.table.aliasID);
-			if(orderToUpdate.table.status == Table.TABLE_IDLE){
-				throw new BusinessException("The table(alias_id=" + orderToUpdate.table.aliasID + ", restaurant_id=" + term.restaurantID + ") to change order is IDLE."
+			orderToUpdate.destTbl = QueryTable.exec(dbCon, term, orderToUpdate.destTbl.aliasID);
+			if(orderToUpdate.destTbl.status == Table.TABLE_IDLE){
+				throw new BusinessException("The table(alias_id=" + orderToUpdate.destTbl.aliasID + ", restaurant_id=" + term.restaurantID + ") to change order is IDLE."
 											,ErrorCode.TABLE_IDLE);
 			}
 			//orderToUpdate.table_name = oriTbl.name;
 			//orderToUpdate.category = oriTbl.category;
-			orderToUpdate.id = Util.getUnPaidOrderID(dbCon, orderToUpdate.table);
+			orderToUpdate.id = Util.getUnPaidOrderID(dbCon, orderToUpdate.destTbl);
 			
 		/**
 		 * In the case that the table is different from before,
@@ -158,19 +158,19 @@ public class UpdateOrder {
 		 */
 		}else{			
 			
-			orderToUpdate.oriTbl = QueryTable.exec(dbCon, term, orderToUpdate.oriTbl.aliasID);
-			orderToUpdate.table = QueryTable.exec(dbCon, term, orderToUpdate.table.aliasID);
+			orderToUpdate.srcTbl = QueryTable.exec(dbCon, term, orderToUpdate.srcTbl.aliasID);
+			orderToUpdate.destTbl = QueryTable.exec(dbCon, term, orderToUpdate.destTbl.aliasID);
 			
-			if(orderToUpdate.table.status == Table.TABLE_BUSY){
-				throw new BusinessException("The table(alias_id=" + orderToUpdate.table.aliasID + ", restaurant_id=" + orderToUpdate.table.restaurantID + ") to be transferred is BUSY.",
+			if(orderToUpdate.destTbl.status == Table.TABLE_BUSY){
+				throw new BusinessException("The table(alias_id=" + orderToUpdate.destTbl.aliasID + ", restaurant_id=" + orderToUpdate.destTbl.restaurantID + ") to be transferred is BUSY.",
 											ErrorCode.TABLE_BUSY);
 				
-			}else if(orderToUpdate.oriTbl.status == Table.TABLE_IDLE){
-				throw new BusinessException("The original table(alias_id=" + orderToUpdate.oriTbl.aliasID + ", restaurant_id=" + orderToUpdate.oriTbl.restaurantID + ") to be transferred is IDLE.",
+			}else if(orderToUpdate.srcTbl.status == Table.TABLE_IDLE){
+				throw new BusinessException("The original table(alias_id=" + orderToUpdate.srcTbl.aliasID + ", restaurant_id=" + orderToUpdate.srcTbl.restaurantID + ") to be transferred is IDLE.",
 											ErrorCode.TABLE_IDLE);
 			}
 			//orderToUpdate.table_name = newTbl.name;
-			orderToUpdate.id = Util.getUnPaidOrderID(dbCon, orderToUpdate.oriTbl);
+			orderToUpdate.id = Util.getUnPaidOrderID(dbCon, orderToUpdate.srcTbl);
 		}
 		
 		
@@ -247,11 +247,11 @@ public class UpdateOrder {
 		String sql = "SELECT table_id, table_alias, table_name, category FROM " + Params.dbName + ".order WHERE id=" + orderToUpdate.id;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
-			orderToUpdate.table.tableID = dbCon.rs.getInt("table_id");
-			orderToUpdate.table.aliasID = dbCon.rs.getInt("table_alias");
+			orderToUpdate.destTbl.tableID = dbCon.rs.getInt("table_id");
+			orderToUpdate.destTbl.aliasID = dbCon.rs.getInt("table_alias");
 			String tblName = dbCon.rs.getString("table_name");
-			orderToUpdate.table.name = (tblName != null ? tblName : "");
-			orderToUpdate.oriTbl.aliasID = orderToUpdate.table.aliasID;
+			orderToUpdate.destTbl.name = (tblName != null ? tblName : "");
+			orderToUpdate.srcTbl.aliasID = orderToUpdate.destTbl.aliasID;
 			orderToUpdate.category = dbCon.rs.getShort("category");
 			dbCon.rs.close();
 			
@@ -364,7 +364,7 @@ public class UpdateOrder {
 		 * Get the region to this table if the order has NOT been paid before
 		 */
 		if(!isPaidAgain){
-			orderToUpdate.region = QueryRegion.exec(dbCon, term, orderToUpdate.table.aliasID);
+			orderToUpdate.region = QueryRegion.exec(dbCon, term, orderToUpdate.destTbl.aliasID);
 		}
 		
 		try{
@@ -494,9 +494,9 @@ public class UpdateOrder {
 					"is_paid=" + (isPaidAgain ? 1 : 0) + ", " +
 					(isPaidAgain ? "" : "region_id=" + orderToUpdate.region.regionID + ", ") +
 					(isPaidAgain ? "" : "region_name='" + orderToUpdate.region.name + "', ") +
-					(isPaidAgain ? "" : "table_id=" + orderToUpdate.table.tableID + ", ") +
-					(isPaidAgain ? "" : "table_alias=" + orderToUpdate.table.aliasID + ", ") +
-					(isPaidAgain ? "" : "table_name='" + orderToUpdate.table.name + "', ") +
+					(isPaidAgain ? "" : "table_id=" + orderToUpdate.destTbl.tableID + ", ") +
+					(isPaidAgain ? "" : "table_alias=" + orderToUpdate.destTbl.aliasID + ", ") +
+					(isPaidAgain ? "" : "table_name='" + orderToUpdate.destTbl.name + "', ") +
 					"waiter='" + term.owner + "' " +
 					"WHERE id=" + orderToUpdate.id;
 			dbCon.stmt.executeUpdate(sql);
@@ -511,7 +511,7 @@ public class UpdateOrder {
 						  "category=" + Order.CATE_MERGER_TABLE + ", " +
 						  "custom_num=" + orderToUpdate.custom_num +
 					  	  " WHERE restaurant_id=" + term.restaurantID + 
-					  	  " AND table_alias=" + orderToUpdate.table2.aliasID;
+					  	  " AND table_alias=" + orderToUpdate.destTbl2.aliasID;
 					dbCon.stmt.executeUpdate(sql);				
 				}
 				
@@ -520,22 +520,22 @@ public class UpdateOrder {
 				 * 1 - Transfer table
 				 * 2 - Not transfer table
 				 */
-				if(orderToUpdate.table.aliasID != orderToUpdate.oriTbl.aliasID){
+				if(orderToUpdate.destTbl.aliasID != orderToUpdate.srcTbl.aliasID){
 					// update the original table status to idle
 					sql = "UPDATE " + Params.dbName + ".table SET status="
 							+ Table.TABLE_IDLE + "," + "custom_num=NULL,"
 							+ "category=NULL" + " WHERE restaurant_id="
-							+ orderToUpdate.oriTbl.restaurantID + " AND table_alias="
-							+ orderToUpdate.oriTbl.aliasID;
+							+ orderToUpdate.srcTbl.restaurantID + " AND table_alias="
+							+ orderToUpdate.srcTbl.aliasID;
 					dbCon.stmt.executeUpdate(sql);				
 					
 					// update the new table status to busy
 					sql = "UPDATE " + Params.dbName + ".table SET " +
 							  "status=" + Table.TABLE_BUSY + ", " +
-							  "category=" + orderToUpdate.oriTbl.category + ", " +
+							  "category=" + orderToUpdate.srcTbl.category + ", " +
 							  "custom_num=" + orderToUpdate.custom_num + 
-							  " WHERE restaurant_id=" + orderToUpdate.table.restaurantID + 
-							  " AND table_alias=" + orderToUpdate.table.aliasID;
+							  " WHERE restaurant_id=" + orderToUpdate.destTbl.restaurantID + 
+							  " AND table_alias=" + orderToUpdate.destTbl.aliasID;
 					dbCon.stmt.executeUpdate(sql);				
 					
 				}else{
@@ -545,7 +545,7 @@ public class UpdateOrder {
 						  "category=" + orderToUpdate.category + ", " +
 						  "custom_num=" + orderToUpdate.custom_num +
 						  " WHERE restaurant_id=" + term.restaurantID + 
-						  " AND table_alias=" + orderToUpdate.table.aliasID;
+						  " AND table_alias=" + orderToUpdate.destTbl.aliasID;
 					dbCon.stmt.executeUpdate(sql);				
 				}				
 			}
@@ -616,7 +616,7 @@ public class UpdateOrder {
 				if(!tmpFoods.isEmpty()){
 					result.canceledOrder = new Order();
 					result.canceledOrder.id = orderToUpdate.id;
-					result.canceledOrder.table = orderToUpdate.table;
+					result.canceledOrder.destTbl = orderToUpdate.destTbl;
 					result.canceledOrder.custom_num = orderToUpdate.custom_num;
 					result.canceledOrder.region = orderToUpdate.region;
 					result.canceledOrder.foods = tmpFoods.toArray(new OrderFood[tmpFoods.size()]);
@@ -659,7 +659,7 @@ public class UpdateOrder {
 				if(!tmpFoods.isEmpty()){
 					result.extraOrder = new Order();
 					result.extraOrder.id = orderToUpdate.id;
-					result.extraOrder.table = orderToUpdate.table;
+					result.extraOrder.destTbl = orderToUpdate.destTbl;
 					result.extraOrder.custom_num = orderToUpdate.custom_num;
 					result.extraOrder.region = orderToUpdate.region;
 					result.extraOrder.foods = tmpFoods.toArray(new OrderFood[tmpFoods.size()]);
@@ -672,7 +672,7 @@ public class UpdateOrder {
 			if(!hurriedFoods.isEmpty()){
 				result.hurriedOrder = new Order();
 				result.hurriedOrder.id = orderToUpdate.id;
-				result.hurriedOrder.table = orderToUpdate.table;
+				result.hurriedOrder.destTbl = orderToUpdate.destTbl;
 				result.hurriedOrder.custom_num = orderToUpdate.custom_num;
 				result.hurriedOrder.region = orderToUpdate.region;
 				result.hurriedOrder.foods = hurriedFoods.toArray(new OrderFood[hurriedFoods.size()]);

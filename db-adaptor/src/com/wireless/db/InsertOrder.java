@@ -111,18 +111,18 @@ public class InsertOrder {
 		 */
 		if(orderToInsert.category == Order.CATE_JOIN_TABLE){
 			Table newTable = new Table();
-			newTable.name = "并" + Integer.toString(orderToInsert.table.aliasID);
-			orderToInsert.table = InsertTable.exec(dbCon, term, newTable, true);
+			newTable.name = "并" + Integer.toString(orderToInsert.destTbl.aliasID);
+			orderToInsert.destTbl = InsertTable.exec(dbCon, term, newTable, true);
 			
 		}else if(orderToInsert.category == Order.CATE_TAKE_OUT){
 			Table newTable = new Table();
-			orderToInsert.table = InsertTable.exec(dbCon, term, newTable, true);		
+			orderToInsert.destTbl = InsertTable.exec(dbCon, term, newTable, true);		
 			
 		}else{
-			orderToInsert.table = QueryTable.exec(dbCon, term, orderToInsert.table.aliasID);
+			orderToInsert.destTbl = QueryTable.exec(dbCon, term, orderToInsert.destTbl.aliasID);
 		}		
 			
-		if(orderToInsert.table.status == Table.TABLE_IDLE){
+		if(orderToInsert.destTbl.status == Table.TABLE_IDLE){
 			
 			/**
 			 * In the case of table merger,
@@ -130,9 +130,9 @@ public class InsertOrder {
 			 * Assure both tables to be merger remains in idle. 
 			 */
 			if(orderToInsert.category == Order.CATE_MERGER_TABLE){
-				orderToInsert.table2 = QueryTable.exec(dbCon, term, orderToInsert.table2.aliasID);
-				if(orderToInsert.table2.status == Table.TABLE_BUSY){
-					throw new BusinessException("The tabe(alias_id=" + orderToInsert.table2.aliasID + ") to be mergerd is BUSY.", ErrorCode.TABLE_BUSY);
+				orderToInsert.destTbl2 = QueryTable.exec(dbCon, term, orderToInsert.destTbl2.aliasID);
+				if(orderToInsert.destTbl2.status == Table.TABLE_BUSY){
+					throw new BusinessException("The tabe(alias_id=" + orderToInsert.destTbl2.aliasID + ") to be mergerd is BUSY.", ErrorCode.TABLE_BUSY);
 				}
 			}
 			
@@ -165,7 +165,7 @@ public class InsertOrder {
 						orderToInsert.foods[i].kitchen = detailFood[0].kitchen;
 						orderToInsert.foods[i].childFoods = detailFood[0].childFoods;
 					}else{
-						throw new BusinessException("The food(alias_id=" + orderToInsert.foods[i].aliasID + ", restaurant_id=" + orderToInsert.table.restaurantID+ ") to query doesn't exit.", ErrorCode.MENU_EXPIRED);
+						throw new BusinessException("The food(alias_id=" + orderToInsert.foods[i].aliasID + ", restaurant_id=" + orderToInsert.destTbl.restaurantID+ ") to query doesn't exit.", ErrorCode.MENU_EXPIRED);
 					}
 					
 					//get three taste information for each food
@@ -204,7 +204,7 @@ public class InsertOrder {
 			/**
 			 * Get the region to this table
 			 */
-			orderToInsert.region = QueryRegion.exec(dbCon, term, orderToInsert.table.aliasID);
+			orderToInsert.region = QueryRegion.exec(dbCon, term, orderToInsert.destTbl.aliasID);
 
 			/**
 			 * Put all the INSERT statements into a database transition so as to assure 
@@ -222,16 +222,16 @@ public class InsertOrder {
 						"`table_id`, `table_alias`, `table_name`, `table2_id`, `table2_alias`, `table2_name`, " +
 						"`terminal_model`, `terminal_pin`, `order_date`, `custom_num`, `waiter`) VALUES (" +
 						"NULL, " + 
-						orderToInsert.table.restaurantID + ", " + 
+						orderToInsert.destTbl.restaurantID + ", " + 
 						orderToInsert.category + ", " +
 						orderToInsert.region.regionID + ", '" +
 						orderToInsert.region.name + "', " +
-						orderToInsert.table.tableID + ", " +
-						orderToInsert.table.aliasID + ", '" + 
-						orderToInsert.table.name + "', " +
-						(orderToInsert.category == Order.CATE_MERGER_TABLE ? orderToInsert.table2.tableID : "NULL") + ", " +
-						(orderToInsert.category == Order.CATE_MERGER_TABLE ? orderToInsert.table2.aliasID : "NULL") + ", " +
-						(orderToInsert.category == Order.CATE_MERGER_TABLE ? "'" + orderToInsert.table2.name + "'" : "NULL") + ", " +
+						orderToInsert.destTbl.tableID + ", " +
+						orderToInsert.destTbl.aliasID + ", '" + 
+						orderToInsert.destTbl.name + "', " +
+						(orderToInsert.category == Order.CATE_MERGER_TABLE ? orderToInsert.destTbl2.tableID : "NULL") + ", " +
+						(orderToInsert.category == Order.CATE_MERGER_TABLE ? orderToInsert.destTbl2.aliasID : "NULL") + ", " +
+						(orderToInsert.category == Order.CATE_MERGER_TABLE ? "'" + orderToInsert.destTbl2.name + "'" : "NULL") + ", " +
 						term.modelID + ", " + 
 						term.pin + 
 						", NOW(), " + 
@@ -255,7 +255,7 @@ public class InsertOrder {
 						  "category=" + orderToInsert.category + ", " +
 						  "custom_num=" + orderToInsert.custom_num +
 						  " WHERE restaurant_id=" + term.restaurantID +
-						  " AND table_alias=" + orderToInsert.table2.aliasID;
+						  " AND table_alias=" + orderToInsert.destTbl2.aliasID;
 					dbCon.stmt.executeUpdate(sql);
 				}
 				/**
@@ -266,7 +266,7 @@ public class InsertOrder {
 					  "category=" + orderToInsert.category + ", " +
 					  "custom_num=" + orderToInsert.custom_num +
 					  " WHERE restaurant_id=" + term.restaurantID + 
-					  " AND table_alias=" + orderToInsert.table.aliasID;
+					  " AND table_alias=" + orderToInsert.destTbl.aliasID;
 				dbCon.stmt.executeUpdate(sql);
 				
 				/**
@@ -340,8 +340,8 @@ public class InsertOrder {
 			
 			return orderToInsert;
 			
-		}else if(orderToInsert.table.status == Table.TABLE_BUSY){
-			throw new BusinessException("The table(alias_id=" + orderToInsert.table.aliasID + ", restaurant_id=" + term.restaurantID + ") to insert order is BUSY.", ErrorCode.TABLE_BUSY);
+		}else if(orderToInsert.destTbl.status == Table.TABLE_BUSY){
+			throw new BusinessException("The table(alias_id=" + orderToInsert.destTbl.aliasID + ", restaurant_id=" + term.restaurantID + ") to insert order is BUSY.", ErrorCode.TABLE_BUSY);
 			
 		}else{
 			throw new BusinessException("Unknown error occourred while inserting order.", ErrorCode.UNKNOWN);

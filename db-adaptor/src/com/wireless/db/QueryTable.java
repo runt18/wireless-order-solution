@@ -166,7 +166,7 @@ public class QueryTable {
 			table.aliasID = dbCon.rs.getInt("table_alias");
 			table.name = dbCon.rs.getString("name");
 			table.setMinimumCost(dbCon.rs.getFloat("minimum_cost"));
-			table.custom_num = dbCon.rs.getShort("custom_num");
+			table.customNum = dbCon.rs.getShort("custom_num");
 			table.category = dbCon.rs.getShort("category");
 			table.status = dbCon.rs.getShort("status");
 			table.regionID = dbCon.rs.getShort("region_id");
@@ -383,7 +383,7 @@ public class QueryTable {
 			table.aliasID = tableAliasID;
 			table.name = dbCon.rs.getString("name");
 			table.setMinimumCost(dbCon.rs.getFloat("minimum_cost"));
-			table.custom_num = dbCon.rs.getShort("custom_num");
+			table.customNum = dbCon.rs.getShort("custom_num");
 			table.category = dbCon.rs.getShort("category");
 			table.status = dbCon.rs.getShort("status");
 			table.regionID = dbCon.rs.getShort("region_id");
