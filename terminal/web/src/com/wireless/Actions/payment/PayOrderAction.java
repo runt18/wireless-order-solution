@@ -84,7 +84,7 @@ public class PayOrderAction extends Action implements PinGen{
 			
 			Order orderToPay = new Order();
 			
-			orderToPay.table.aliasID = Integer.parseInt(request.getParameter("tableID"));
+			orderToPay.destTbl.aliasID = Integer.parseInt(request.getParameter("tableID"));
 			
 			if(request.getParameter("payType") != null){
 				orderToPay.pay_type = Integer.parseInt(request.getParameter("payType"));				
@@ -158,12 +158,12 @@ public class PayOrderAction extends Action implements PinGen{
 				jsonResp = jsonResp.replace("$(result)", "true");
 				if(tempPay != null){
 					if(Boolean.parseBoolean(tempPay)){
-						jsonResp = jsonResp.replace("$(value)", orderToPay.table.aliasID + "号餐台暂结成功");
+						jsonResp = jsonResp.replace("$(value)", orderToPay.destTbl.aliasID + "号餐台暂结成功");
 					}else{
-						jsonResp = jsonResp.replace("$(value)", orderToPay.table.aliasID + "号餐台结帐成功");
+						jsonResp = jsonResp.replace("$(value)", orderToPay.destTbl.aliasID + "号餐台结帐成功");
 					}
 				}else{
-					jsonResp = jsonResp.replace("$(value)", orderToPay.table.aliasID + "号餐台结帐成功");
+					jsonResp = jsonResp.replace("$(value)", orderToPay.destTbl.aliasID + "号餐台结帐成功");
 				}
 				
 			}else if(resp.header.type == Type.NAK){
@@ -172,21 +172,21 @@ public class PayOrderAction extends Action implements PinGen{
 					jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");
 					
 				}else if(resp.header.reserved == ErrorCode.TABLE_NOT_EXIST){					
-					jsonResp = jsonResp.replace("$(value)", orderToPay.table.aliasID + "号餐台信息不存在，请重新确认");
+					jsonResp = jsonResp.replace("$(value)", orderToPay.destTbl.aliasID + "号餐台信息不存在，请重新确认");
 					
 				}else if(resp.header.reserved == ErrorCode.TABLE_IDLE){
-					jsonResp = jsonResp.replace("$(value)", orderToPay.table.aliasID + "号餐台是空闲状态，可能已结帐，请重新确认");
+					jsonResp = jsonResp.replace("$(value)", orderToPay.destTbl.aliasID + "号餐台是空闲状态，可能已结帐，请重新确认");
 					
 				}else if(resp.header.reserved == ErrorCode.PRINT_FAIL){
-					jsonResp = jsonResp.replace("$(value)", orderToPay.table.aliasID + "号餐台结帐成功，但未能成功打印，请立刻补打结帐单并与相关人员确认");
+					jsonResp = jsonResp.replace("$(value)", orderToPay.destTbl.aliasID + "号餐台结帐成功，但未能成功打印，请立刻补打结帐单并与相关人员确认");
 					
 				}else{
-					jsonResp = jsonResp.replace("$(value)", orderToPay.table.aliasID + "号餐台结帐失败，请重新确认");
+					jsonResp = jsonResp.replace("$(value)", orderToPay.destTbl.aliasID + "号餐台结帐失败，请重新确认");
 				}
 				
 			}else{
 				jsonResp = jsonResp.replace("$(result)", "false");
-				jsonResp = jsonResp.replace("$(value)", orderToPay.table.aliasID + "号餐台结帐不成功，请重新确认");
+				jsonResp = jsonResp.replace("$(value)", orderToPay.destTbl.aliasID + "号餐台结帐不成功，请重新确认");
 			}
 			
 		}catch(IOException e){
