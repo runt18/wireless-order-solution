@@ -6,7 +6,6 @@ import java.util.List;
 
 import android.app.Fragment;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,65 +21,15 @@ import com.wireless.util.ImageLoader;
 
 public class ContentFragment extends Fragment {
 	
-	private BaseAdapter mGalleryAdapter = null;
+	private BaseAdapter mGalleryAdapter;
 	private Gallery mGallery;
 	private List<Food> mFoods = new ArrayList<Food>();
 	
-	public static interface OnPicChangedListener{
-		void onPicChanged(Food value, int position);
-	}
-	
 	private OnPicChangedListener mPicChangeListener;
-	
-	public void setOnViewChangeListener(OnPicChangedListener l){
-		mPicChangeListener = l;
-	}
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.content_layout, container, false);
-	}
-
-	/**
-	 * 根据position设置画廊显示的图片
-	 * @param position
-	 */
-	public void setPosition(int position){
-		mGallery.setSelection(position);
-	}
-	
-	/**
-	 * 根据Food设置画廊显示的图片
-	 * @param foodToSet
-	 */
-	public void setPosition(Food foodToSet){
-		int pos = 0;
-		for(Food food : mFoods){
-			if(food.equals(foodToSet)){
-				mGallery.setSelection(pos);
-				break;
-			}
-			pos++;
-		}
-	}
-	
-	//FIXME to be deleted
-	public void setContent(ArrayList<Food> foods){
-		mFoods = foods;
-		mGalleryAdapter.notifyDataSetChanged();
-	}
-	
-	/**
-	 * 设置新的Gallery数据源，并更新Gallery
-	 * @param foods
-	 */
-	public void notifyDataChanged(Food[] foods){
-		mFoods = Arrays.asList(foods);
-		mGalleryAdapter.notifyDataSetChanged();		
-	}
-	
-	public int getSelectedPosition(){
-       return mGallery.getSelectedItemPosition();
 	}
 	
 	@Override
@@ -145,6 +94,51 @@ public class ContentFragment extends Fragment {
 			public void onNothingSelected(AdapterView<?> parent) {
 			}
         });
+	}
+	
+	
+	/**
+	 * 根据position设置画廊显示的图片
+	 * @param position
+	 */
+	public void setPosition(int position){
+		mGallery.setSelection(position);
+	}
+	
+	/**
+	 * 根据Food设置画廊显示的图片
+	 * @param foodToSet
+	 */
+	public void setPosition(Food foodToSet){
+		int pos = 0;
+		for(Food food : mFoods){
+			if(food.equals(foodToSet)){
+				mGallery.setSelection(pos);
+				break;
+			}
+			pos++;
+		}
+	}
+	
+	/**
+	 * 设置新的Gallery数据源，并更新Gallery
+	 * @param foods
+	 */
+	public void notifyDataChanged(Food[] foods){
+		mFoods = Arrays.asList(foods);
+		mGalleryAdapter.notifyDataSetChanged();		
+	}
+	
+	public int getSelectedPosition(){
+       return mGallery.getSelectedItemPosition();
+	}
+	
+	public void setOnViewChangeListener(OnPicChangedListener l){
+		mPicChangeListener = l;
+	}
+	
+	public static interface OnPicChangedListener{
+		void onPicChanged(Food value, int position);
 	}
 }
 
