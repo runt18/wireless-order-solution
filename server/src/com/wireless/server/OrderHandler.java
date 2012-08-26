@@ -20,6 +20,7 @@ import com.wireless.db.QueryRegion;
 import com.wireless.db.QueryRestaurant;
 import com.wireless.db.QueryStaffTerminal;
 import com.wireless.db.QueryTable;
+import com.wireless.db.TransTblDao;
 import com.wireless.db.UpdateOrder;
 import com.wireless.db.VerifyPin;
 import com.wireless.db.payment.ConsumeMaterial;
@@ -245,6 +246,17 @@ class OrderHandler extends Handler implements Runnable{
 				
 				response = new RespACK(request.header);
 
+				//handle the table transfer request 
+			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.TRANS_TABLE){
+				Table[] tbl = ReqParser.parseTransTbl(request);
+				TransTblDao.exec(_term, tbl[0], tbl[1]);
+				response = new RespACK(request.header);
+				//TODO
+				PrintHandler.PrintParam printParam = new PrintHandler.PrintParam();
+				printParam.orderInfo.srcTbl.aliasID = tbl[0].aliasID;
+				printParam.orderInfo.destTbl.aliasID = tbl[1].aliasID;
+				printOrder(Reserved.PRINT_TRANSFER_TABLE_2, printParam);
+				
 				//handle the cancel order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.CANCEL_ORDER){
 				int tableToCancel = ReqParser.parseCancelOrder(request);
@@ -317,8 +329,8 @@ class OrderHandler extends Handler implements Runnable{
 				 * If print table transfer, need to assign the original and new table id to order.
 				 */
 				if((printConf & Reserved.PRINT_TRANSFER_TABLE_2) != 0){
-					printParam.orderInfo.table.aliasID = reqParam.newTblID;
-					printParam.orderInfo.oriTbl.aliasID = reqParam.oriTblID;
+					printParam.orderInfo.destTbl.aliasID = reqParam.destTblID;
+					printParam.orderInfo.srcTbl.aliasID = reqParam.srcTblID;
 				}
 				
 				printOrder(printConf, printParam);
