@@ -154,7 +154,7 @@ public class TableDetailActivity extends Activity {
 			//set the actual price
 			((TextView) theActivity.findViewById(R.id.actualPriceTxtView_table_detail)).setText(Util.CURRENCY_SIGN + Float.toString(Math.round(theActivity.mOrderToPay.calcPriceWithTaste())));
 			//set the table ID
-			((TextView) theActivity.findViewById(R.id.valueplatform_table_detail)).setText(String.valueOf(theActivity.mOrderToPay.table.aliasID));
+			((TextView) theActivity.findViewById(R.id.valueplatform_table_detail)).setText(String.valueOf(theActivity.mOrderToPay.destTbl.aliasID));
 			//set the amount of customer
 			((TextView) theActivity.findViewById(R.id.valuepeople_table_detail)).setText(String.valueOf(theActivity.mOrderToPay.custom_num));
 		}
@@ -181,7 +181,7 @@ public class TableDetailActivity extends Activity {
 		protected void onPreExecute() {
 			_progDialog = ProgressDialog.show(TableDetailActivity.this, 
 											  "", 
-											  "提交"	+ _orderToPay.table.aliasID + "号台" + 
+											  "提交"	+ _orderToPay.destTbl.aliasID + "号台" + 
 											 (_payCate == PAY_ORDER ? "结帐"	: "暂结") + "信息...请稍候",
 											 true);
 		}
@@ -210,16 +210,16 @@ public class TableDetailActivity extends Activity {
 					byte errCode = resp.header.reserved;
 
 					if (errCode == ErrorCode.TABLE_NOT_EXIST) {
-						errMsg = _orderToPay.table.aliasID
+						errMsg = _orderToPay.destTbl.aliasID
 								+ "号台已被删除，请与餐厅负责人确认。";
 					} else if (errCode == ErrorCode.TABLE_IDLE) {
-						errMsg = _orderToPay.table.aliasID
+						errMsg = _orderToPay.destTbl.aliasID
 								+ "号台的账单已结帐或删除，请与餐厅负责人确认。";
 					} else if (errCode == ErrorCode.PRINT_FAIL) {
-						errMsg = _orderToPay.table.aliasID
+						errMsg = _orderToPay.destTbl.aliasID
 								+ "号结帐打印未成功，请与餐厅负责人确认。";
 					} else {
-						errMsg = _orderToPay.table.aliasID
+						errMsg = _orderToPay.destTbl.aliasID
 								+ "号台结帐未成功，请重新结帐";
 					}
 				}
@@ -262,7 +262,7 @@ public class TableDetailActivity extends Activity {
 				}
 
 				Toast.makeText(TableDetailActivity.this, 
-							  _orderToPay.table.aliasID	+ "号台" + (_payCate == PAY_ORDER ? "结帐" : "暂结") + "成功", 
+							  _orderToPay.destTbl.aliasID	+ "号台" + (_payCate == PAY_ORDER ? "结帐" : "暂结") + "成功", 
 							  Toast.LENGTH_SHORT).show();
 
 			}

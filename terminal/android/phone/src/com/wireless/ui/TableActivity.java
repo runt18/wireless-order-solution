@@ -298,7 +298,7 @@ public class TableActivity extends Activity {
 			for(Table tbl : mFilterTable){
 				HashMap<String, Object> map = new HashMap<String, Object>();
 				map.put(ITEM_TAG_ID, tbl.aliasID);
-				map.put(ITEM_TAG_CUSTOM,tbl.custom_num);
+				map.put(ITEM_TAG_CUSTOM, tbl.customNum);
 				map.put(ITEM_TAG_TBL_NAME, tbl.name);
 				map.put(ITEM_TAG_STATE, tbl.status);
 				map.put(ITEM_TAG_STATE_NAME, tbl.status == Table.TABLE_IDLE ? "¿ÕÏÐ" : "¾Í²Í");

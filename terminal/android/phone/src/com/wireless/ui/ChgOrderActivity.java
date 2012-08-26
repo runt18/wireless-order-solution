@@ -146,7 +146,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 					Order reqOrder = new Order(foods.toArray(new OrderFood[foods.size()]),
 											   Short.parseShort(((EditText)findViewById(R.id.valueplatform)).getText().toString()),
 											   Integer.parseInt(((EditText)findViewById(R.id.valuepeople)).getText().toString()));
-					reqOrder.oriTbl.aliasID = mOriOrder.table.aliasID;
+					reqOrder.srcTbl.aliasID = mOriOrder.destTbl.aliasID;
 					new UpdateOrderTask(reqOrder).execute();
 				}else{
 					Toast.makeText(ChgOrderActivity.this, "您还未点菜，暂时不能下单。", Toast.LENGTH_SHORT).show();
@@ -285,7 +285,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 		 */
 		@Override
 		protected void onPreExecute(){
-			_progDialog = ProgressDialog.show(ChgOrderActivity.this, "", "提交" + _reqOrder.table.aliasID + "号餐台的改单信息...请稍候", true);
+			_progDialog = ProgressDialog.show(ChgOrderActivity.this, "", "提交" + _reqOrder.destTbl.aliasID + "号餐台的改单信息...请稍候", true);
 		}
 		
 		/**
@@ -309,19 +309,19 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 						errMsg = "菜谱有更新，请更新菜谱后再重新改单。"; 
 						
 					}else if(errCode == ErrorCode.TABLE_NOT_EXIST){			
-						errMsg = _reqOrder.table.aliasID + "号台信息不存在，请与餐厅负责人确认。";
+						errMsg = _reqOrder.destTbl.aliasID + "号台信息不存在，请与餐厅负责人确认。";
 						
 					}else if(errCode == ErrorCode.TABLE_IDLE){			
-						errMsg = _reqOrder.table.aliasID + "号台的账单已结帐或删除，请与餐厅负责人确认。";
+						errMsg = _reqOrder.destTbl.aliasID + "号台的账单已结帐或删除，请与餐厅负责人确认。";
 						
 					}else if(errCode == ErrorCode.TABLE_BUSY){
-						errMsg = _reqOrder.table.aliasID + "号台已经下单。";
+						errMsg = _reqOrder.destTbl.aliasID + "号台已经下单。";
 						
 					}else if(errCode == ErrorCode.EXCEED_GIFT_QUOTA){
 						errMsg = "赠送的菜品已超出赠送额度，请与餐厅负责人确认。";
 						
 					}else{
-						errMsg = _reqOrder.table.aliasID + "号台改单失败，请重新提交改单。";
+						errMsg = _reqOrder.destTbl.aliasID + "号台改单失败，请重新提交改单。";
 					}
 				}
 			}catch(IOException e){
@@ -354,11 +354,11 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 				//return to the main activity and show the successful message
 				ChgOrderActivity.this.finish();
 				String promptMsg;
-				if(_reqOrder.table.aliasID == _reqOrder.oriTbl.aliasID){
-					promptMsg = _reqOrder.table.aliasID + "号台改单成功。";
+				if(_reqOrder.destTbl.aliasID == _reqOrder.srcTbl.aliasID){
+					promptMsg = _reqOrder.destTbl.aliasID + "号台改单成功。";
 				}else{
-					promptMsg = _reqOrder.oriTbl.aliasID + "号台转至" + 
-							 	 _reqOrder.table.aliasID + "号台，并改单成功。";
+					promptMsg = _reqOrder.srcTbl.aliasID + "号台转至" + 
+							 	 _reqOrder.destTbl.aliasID + "号台，并改单成功。";
 				}
 				Toast.makeText(ChgOrderActivity.this, promptMsg, Toast.LENGTH_SHORT).show();
 			}
@@ -456,7 +456,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 				//expand the original food list view
 				mOriFoodLstView.expandGroup(0);
 				//set the table ID
-				((EditText)findViewById(R.id.valueplatform)).setText(Integer.toString(mOriOrder.table.aliasID));
+				((EditText)findViewById(R.id.valueplatform)).setText(Integer.toString(mOriOrder.destTbl.aliasID));
 				//set the amount of customer
 				((EditText)findViewById(R.id.valuepeople)).setText(Integer.toString(mOriOrder.custom_num));				
 				//make the progress dialog disappeared

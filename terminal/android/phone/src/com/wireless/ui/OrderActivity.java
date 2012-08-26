@@ -145,7 +145,7 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 		 */
 		@Override
 		protected void onPreExecute(){
-			_progDialog = ProgressDialog.show(OrderActivity.this, "", "提交" + _reqOrder.table.aliasID + "号餐台的下单信息...请稍候", true);
+			_progDialog = ProgressDialog.show(OrderActivity.this, "", "提交" + _reqOrder.destTbl.aliasID + "号餐台的下单信息...请稍候", true);
 		}
 		
 		/**
@@ -164,15 +164,15 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 					if(errCode == ErrorCode.MENU_EXPIRED){
 						errMsg = "菜谱有更新，请更新菜谱后再重新改单。"; 
 					}else if(errCode == ErrorCode.TABLE_NOT_EXIST){
-						errMsg = _reqOrder.table.aliasID + "号台信息不存在，请与餐厅负责人确认。";
+						errMsg = _reqOrder.destTbl.aliasID + "号台信息不存在，请与餐厅负责人确认。";
 					}else if(errCode == ErrorCode.TABLE_BUSY){
-						errMsg = _reqOrder.table.aliasID + "号台已经下单。";
+						errMsg = _reqOrder.destTbl.aliasID + "号台已经下单。";
 					}else if(errCode == ErrorCode.PRINT_FAIL){
-						errMsg = _reqOrder.table.aliasID + "号台下单打印未成功，请与餐厅负责人确认。";
+						errMsg = _reqOrder.destTbl.aliasID + "号台下单打印未成功，请与餐厅负责人确认。";
 					}else if(errCode == ErrorCode.EXCEED_GIFT_QUOTA){
 						errMsg = "赠送的菜品已超出赠送额度，请与餐厅负责人确认。";
 					}else{
-						errMsg = _reqOrder.table.aliasID + "号台下单失败，请重新提交下单。";
+						errMsg = _reqOrder.destTbl.aliasID + "号台下单失败，请重新提交下单。";
 					}
 				}
 				
@@ -205,7 +205,7 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 			}else{
 				//return to the main activity and show the message
 				OrderActivity.this.finish();
-				Toast.makeText(OrderActivity.this, _reqOrder.table.aliasID + "号台下单成功。", Toast.LENGTH_SHORT).show();
+				Toast.makeText(OrderActivity.this, _reqOrder.destTbl.aliasID + "号台下单成功。", Toast.LENGTH_SHORT).show();
 			}
 		}
 		
