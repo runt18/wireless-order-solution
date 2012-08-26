@@ -92,7 +92,7 @@ public class ChangeOrderScreen extends MainScreen implements PostSubmitOrder{
 			category = "";
 		}
 		
-		_tableTitleLabel = new LabelField(_originalOrder.table.aliasID + "号餐台信息" + category, LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
+		_tableTitleLabel = new LabelField(_originalOrder.destTbl.aliasID + "号餐台信息" + category, LabelField.USE_ALL_WIDTH | DrawStyle.HCENTER){
 			protected void paintBackground(Graphics g) {
 				g.clear();
 				g.setBackgroundColor(Color.BLUE);
@@ -107,7 +107,7 @@ public class ChangeOrderScreen extends MainScreen implements PostSubmitOrder{
 
 		vfm.add(_tableTitleLabel);
 		
-		_tableEdt = new EditField("台号：", Integer.toString(_originalOrder.table.aliasID),
+		_tableEdt = new EditField("台号：", Integer.toString(_originalOrder.destTbl.aliasID),
 			   	   			   5, TextField.NO_NEWLINE | EditField.FILTER_NUMERIC);
 		if(bill.category == Order.CATE_NORMAL){
 			vfm.add(_tableEdt);			
@@ -261,7 +261,7 @@ public class ChangeOrderScreen extends MainScreen implements PostSubmitOrder{
 					Order reqOrder = new Order(foods, 
 											   Integer.parseInt(_tableEdt.getText()), 
 											   Integer.parseInt(_customNumEdt.getText()));
-					reqOrder.oriTbl.aliasID = _originalOrder.table.aliasID;
+					reqOrder.srcTbl.aliasID = _originalOrder.destTbl.aliasID;
 					
 					UiApplication.getUiApplication().pushScreen(new SubmitChangePopup(reqOrder, _self));
 				}

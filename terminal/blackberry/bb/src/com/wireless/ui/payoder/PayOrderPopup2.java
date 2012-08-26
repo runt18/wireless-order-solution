@@ -21,7 +21,7 @@ class PayOrderPopup2 extends PopupScreen{
 		super(new VerticalFieldManager());
 		_orderToPay = order;
 		_postPayOrder = postPayOrder;
-		add(new LabelField("提交" + _orderToPay.table.aliasID + "号台结帐信息...请稍候"));
+		add(new LabelField("提交" + _orderToPay.destTbl.aliasID + "号台结帐信息...请稍候"));
 	}
 	
 	protected void onUiEngineAttached(boolean attached){
@@ -40,7 +40,7 @@ class PayOrderPopup2 extends PopupScreen{
 						if(_resp.header.type == Type.ACK){
 							UiApplication.getUiApplication().invokeLater(new Runnable(){
 								public void run(){
-									Dialog.alert(_orderToPay.table.aliasID + "号台结帐成功");
+									Dialog.alert(_orderToPay.destTbl.aliasID + "号台结帐成功");
 									if(_postPayOrder != null){								
 										_postPayOrder.payOrderPass();
 									}
@@ -51,13 +51,13 @@ class PayOrderPopup2 extends PopupScreen{
 							UiApplication.getUiApplication().invokeLater(new Runnable(){
 								public void run(){
 									if(_errCode == ErrorCode.TABLE_NOT_EXIST){
-										Dialog.alert(_orderToPay.table.aliasID + "号台已被删除，请与餐厅负责人确认。");
+										Dialog.alert(_orderToPay.destTbl.aliasID + "号台已被删除，请与餐厅负责人确认。");
 									}else if(_errCode == ErrorCode.TABLE_IDLE){
-										Dialog.alert(_orderToPay.table.aliasID + "号台的账单已结帐或删除，请与餐厅负责人确认。");
+										Dialog.alert(_orderToPay.destTbl.aliasID + "号台的账单已结帐或删除，请与餐厅负责人确认。");
 									}else if(_errCode == ErrorCode.PRINT_FAIL){
-										Dialog.alert(_orderToPay.table.aliasID + "号结帐打印未成功，请与餐厅负责人确认。");
+										Dialog.alert(_orderToPay.destTbl.aliasID + "号结帐打印未成功，请与餐厅负责人确认。");
 									}else{
-										Dialog.alert(_orderToPay.table.aliasID + "号台结帐未成功，请重新结帐");
+										Dialog.alert(_orderToPay.destTbl.aliasID + "号台结帐未成功，请重新结帐");
 									}
 									if(_postPayOrder != null){
 										_postPayOrder.payOrderFail();
