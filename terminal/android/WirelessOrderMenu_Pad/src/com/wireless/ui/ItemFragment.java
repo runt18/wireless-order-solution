@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Fragment;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -63,20 +64,35 @@ public class ItemFragment extends Fragment{
 	 * 设置ListView显示某个特定的厨房
 	 * @param kitchenToSet
 	 */
-	public void setPosition(Kitchen kitchenToSet){
-		int groupPos = 0;
-		for(List<Kitchen> kitchens : mChildren){
-			int childPos = 0;
-			for(Kitchen kitchen : kitchens){
-				if(kitchen.equals(kitchenToSet)){
-					mListView.expandGroup(groupPos);
-					mListView.setSelectedChild(groupPos, childPos, true);
-					break;
+	public void setPosition(final Kitchen kitchenToSet){
+		new AsyncTask<Void, Void, int[]>(){
+			@Override
+			public int[] doInBackground(Void...args){
+				int[] positions = new int[2];
+				int groupPos = 0;
+				for(List<Kitchen> kitchens : mChildren){
+					int childPos = 0;
+					for(Kitchen kitchen : kitchens){
+						if(kitchen.equals(kitchenToSet)){
+							positions[0] = groupPos;
+							positions[1] = childPos;
+//							mListView.expandGroup(groupPos);
+//							mListView.setSelectedChild(groupPos, childPos, true);
+							break;
+						}
+						childPos++;
+					}
+					groupPos++;
 				}
-				childPos++;
+				return positions;
 			}
-			groupPos++;
-		}
+				
+			@Override
+			protected void onPostExecute(int[] positions){
+				mListView.expandGroup(positions[0]);
+				mListView.setSelectedChild(positions[0], positions[1], true);
+			}
+		}.execute();
 	}
 	
 	/**
@@ -85,7 +101,6 @@ public class ItemFragment extends Fragment{
 	@Override  
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {  
 	   View fragmentView = inflater.inflate(R.layout.item_layout, container, false);
-	   
 	   //Setup kitchen list view and it's adapter.
 	   mListView = (ExpandableListView) fragmentView.findViewById(R.id.expandableListView1);
 	   mAdapter = new KitchenExpandableAdapter();
