@@ -100,7 +100,7 @@
         android:background="@color/transparent"
         android:focusable="false"
         android:src="@drawable/table_add_btn_selector" />
-
+
         <ImageButton
             android:id="@+id/switch_table"
             android:layout_width="wrap_content"
@@ -109,6 +109,7 @@
             android:layout_toLeftOf="@+id/add_table"
             android:background="@color/transparent"
             android:focusable="false"
-            android:src="@drawable/switch_table_selector" />
+            android:src="@drawable/switch_table_selector"
+            android:visibility="gone" />
 
 </RelativeLayout>

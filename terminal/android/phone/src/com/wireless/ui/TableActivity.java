@@ -13,6 +13,7 @@ import java.util.TimerTask;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -38,6 +39,8 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupWindow;
@@ -69,6 +72,8 @@ public class TableActivity extends Activity {
 	private static final String ITEM_TAG_STATE_NAME = "STATE";
 	private static final String ITEM_TAG_STATE = "STATE_NAME";
 	private static final String ITEM_TAG_TBL_NAME = "TABLE_NAME";
+	private static final String ITEM_THE_TABLE = "the_table";
+
 	
 	private static final String[] ITEM_TAGS = {
 			ITEM_TAG_ID, 
@@ -98,6 +103,7 @@ public class TableActivity extends Activity {
 	
 	private String mFilterCond = "";					//the current filter string
 
+	private final static int DIALOG_TRANS_TABLE = 923;
 	
 	private static class RegionRefreshHandler extends Handler{
 		
@@ -297,6 +303,7 @@ public class TableActivity extends Activity {
 			final List<Map<String, ?>> contents = new ArrayList<Map<String, ?>>();
 			for(Table tbl : mFilterTable){
 				HashMap<String, Object> map = new HashMap<String, Object>();
+				map.put(ITEM_THE_TABLE, tbl);
 				map.put(ITEM_TAG_ID, tbl.aliasID);
 				map.put(ITEM_TAG_CUSTOM, tbl.customNum);
 				map.put(ITEM_TAG_TBL_NAME, tbl.name);
@@ -366,15 +373,26 @@ public class TableActivity extends Activity {
 					 */
 					short tblStatus = (Short)map.get(ITEM_TAG_STATE);
 					TextView stateTxtView = (TextView)view.findViewById(R.id.table_state);
+					ImageButton switchImgBtn = (ImageButton) view.findViewById(R.id.switch_table);
 					RelativeLayout itemLayout = (RelativeLayout) view.findViewById(R.id.table_item_layout);
 					if(tblStatus == (short)Table.TABLE_BUSY){
 						stateTxtView.setTextColor(Color.RED);
 						itemLayout.setBackgroundResource(R.drawable.busy_item_bg);
-						
+						switchImgBtn.setVisibility(View.VISIBLE);
 					}else{
 						stateTxtView.setTextColor(view.getResources().getColor(R.color.green));
 						itemLayout.setBackgroundResource(R.drawable.table_item_selector);
 					}
+					
+					switchImgBtn.setOnClickListener(new OnClickListener(){
+						@Override
+						public void onClick(View v)
+						{
+							//TODO
+//							theActivity.showDialog(DIALOG_TRANS_TABLE);
+							theActivity.new AskTableDialog((Table) map.get(ITEM_THE_TABLE)).show();
+						}
+					});
 					
 					((ImageButton)view.findViewById(R.id.add_table)).setOnClickListener(new OnClickListener(){			
 						@Override
@@ -403,6 +421,15 @@ public class TableActivity extends Activity {
 			});
 		}
 	}
+	
+//	@Override
+//	protected Dialog onCreateDialog(int dialogID){
+//		if(dialogID == DIALOG_TRANS_TABLE)
+//		{
+//			return new AskTableDialog(table);
+//		}
+//		else return null;
+//	}
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -590,6 +617,7 @@ public class TableActivity extends Activity {
 				mListView.setFirstItem(firstVisibleItem);
 			}
 		});
+		
 		/**
 		 * “全部”按钮
 		 */
@@ -702,6 +730,94 @@ public class TableActivity extends Activity {
 		
 	}
 
+	private class AskTableDialog extends Dialog
+	{
+		AskTableDialog(final Table srcTable) {
+			super(TableActivity.this, R.style.FullHeightDialog);
+			setContentView(R.layout.alert);
+			//getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
+			
+			//((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).showSoftInput((EditText)findViewById(R.id.mycount), InputMethodManager.SHOW_FORCED);
+			TextView title = (TextView)findViewById(R.id.ordername);
+			title.setText("请输入需要更换的台号:");
+			
+			((TextView)findViewById(R.id.table)).setText("台号：");
+			Button okBtn = (Button)findViewById(R.id.confirm);
+			okBtn.setText("确定");
+			okBtn.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					EditText tblNoEdtTxt = (EditText)findViewById(R.id.mycount);
+					try{
+						int tableAlias = Integer.parseInt(tblNoEdtTxt.getText().toString().trim());
+						Table table = new Table();
+						table.aliasID = tableAlias;
+						new TransTblTask().execute(srcTable,table);
+						dismiss();
+					}catch(NumberFormatException e){
+						Toast.makeText(TableActivity.this, "您输入的台号" + tblNoEdtTxt.getText().toString().trim() + "格式不正确，请重新输入" , Toast.LENGTH_SHORT).show();
+					}
+
+				}
+			});
+			
+			Button cancelBtn = (Button)findViewById(R.id.alert_cancel);
+			cancelBtn.setText("取消");
+			cancelBtn.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					dismiss();					
+				}
+			});
+		}
+
+		@Override
+		public void onAttachedToWindow(){
+			((EditText)findViewById(R.id.mycount)).setText("");
+		}
+	
+	}
+	
+	private class TransTblTask extends com.wireless.lib.task.TransTblTask{
+		private ProgressDialog mProgDialog;
+		
+		/**
+		 * 在执行请求区域信息前显示提示信息
+		 */
+		@Override
+		protected void onPreExecute(){			
+			mProgDialog = ProgressDialog.show(TableActivity.this, "", "正在交换数据...请稍后", true);
+		}		
+	
+		
+		/**
+		 * 根据返回的error message判断，如果发错异常则提示用户，
+		 * 如果成功，则执行请求餐台的操作。
+		 */
+		@Override
+		protected void onPostExecute(Void nothing){
+			
+			mProgDialog.dismiss();
+			
+			/**
+			 * Prompt user message if any error occurred.
+			 */		
+			if(mErrMsg != null){
+				new AlertDialog.Builder(TableActivity.this)
+				.setTitle("提示")
+				.setMessage(mErrMsg)
+				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.dismiss();
+					}
+				}).show();
+			}else{		
+				Toast.makeText(getApplicationContext(), "换台成功", Toast.LENGTH_SHORT);
+				new QueryRegionTask().execute();
+			}
+		}
+	}
+	
 	/**
 	 * 请求区域信息
 	 */
@@ -744,7 +860,7 @@ public class TableActivity extends Activity {
 				new QueryTableTask().execute();
 			}
 		}
-	};
+	}
 	/**
 	 * 请求餐台信息
 	 */
