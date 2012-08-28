@@ -103,8 +103,6 @@ public class TableActivity extends Activity {
 	
 	private String mFilterCond = "";					//the current filter string
 
-	private final static int DIALOG_TRANS_TABLE = 923;
-	
 	private static class RegionRefreshHandler extends Handler{
 		
 		private WeakReference<TableActivity> mActivity;
@@ -382,14 +380,13 @@ public class TableActivity extends Activity {
 					}else{
 						stateTxtView.setTextColor(view.getResources().getColor(R.color.green));
 						itemLayout.setBackgroundResource(R.drawable.table_item_selector);
+						switchImgBtn.setVisibility(View.GONE);
 					}
 					
 					switchImgBtn.setOnClickListener(new OnClickListener(){
 						@Override
 						public void onClick(View v)
 						{
-							//TODO
-//							theActivity.showDialog(DIALOG_TRANS_TABLE);
 							theActivity.new AskTableDialog((Table) map.get(ITEM_THE_TABLE)).show();
 						}
 					});
@@ -812,7 +809,7 @@ public class TableActivity extends Activity {
 					}
 				}).show();
 			}else{		
-				Toast.makeText(getApplicationContext(), "换台成功", Toast.LENGTH_SHORT);
+				Toast.makeText(getApplicationContext(), "换台成功", Toast.LENGTH_SHORT).show();
 				new QueryRegionTask().execute();
 			}
 		}
