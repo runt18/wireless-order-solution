@@ -1,4 +1,4 @@
-package com.wireless.ui;
+package com.wireless.util;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -11,7 +11,8 @@ import android.widget.TextView;
 import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
 import com.wireless.protocol.Food;
-import com.wireless.ui.ContentFragment.OnPicChangedListener;
+import com.wireless.util.ContentFragment;
+import com.wireless.util.ContentFragment.OnPicChangedListener;
 
 public class FullScreenActivity extends Activity implements OnPicChangedListener{
 	

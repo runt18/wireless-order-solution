@@ -1,4 +1,4 @@
-package com.wireless.ui;
+package com.wireless.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,7 +18,6 @@ import android.widget.ImageView;
 
 import com.wireless.ordermenu.R;
 import com.wireless.protocol.Food;
-import com.wireless.util.ImageLoader;
 
 public class ContentFragment extends Fragment {
 	

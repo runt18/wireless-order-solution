@@ -1,70 +1,132 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    android:layout_width="600dp"
     android:layout_height="match_parent"
-    android:background="@color/white" >
+    android:background="@color/white"
+    android:focusable="true"
+    android:focusableInTouchMode="true" >
 
-    <TextView
-        android:id="@+id/textView1"
+    <RelativeLayout
+        android:id="@+id/bottomLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerVertical="false" >
+
+        <Button
+            android:id="@+id/button_tab1_cancel"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="取消" />
+
+        <Button
+            android:id="@+id/button_tab1_refresh"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="false"
+            android:layout_toLeftOf="@+id/button_tab1_cancel"
+            android:text="刷新" />
+
+    </RelativeLayout>
+
+    <com.wireless.util.ScrollLayout
+        android:id="@+id/tableFlipper"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/page_point"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/topbar" >
+    </com.wireless.util.ScrollLayout>
+
+    <LinearLayout
+        android:id="@+id/page_point"
         android:layout_width="wrap_content"
+        android:layout_height="12dp"
+        android:layout_above="@+id/horizontalScrollView"
+        android:layout_centerHorizontal="true"
+        android:orientation="horizontal" >
+    </LinearLayout>
+
+    <HorizontalScrollView
+        android:id="@+id/horizontalScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_above="@+id/bottomLayout"
+        android:layout_alignParentLeft="false"
+        android:layout_centerVertical="false" >
+
+        <LinearLayout
+            android:id="@+id/hScrollView_linearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal" >
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <RelativeLayout
+        android:id="@+id/topbar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="51dp"
-        android:layout_marginTop="58dp"
-        android:text="餐台:"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView1"
-        android:layout_marginTop="172dp"
-        android:text="人数："
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <AutoCompleteTextView
-        android:id="@+id/editText_table_num"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/textView1"
-        android:layout_marginLeft="40dp"
-        android:layout_toRightOf="@+id/textView1"
-        android:ems="10"
-        android:hint="请输入餐台号"
-        android:inputType="number" />
-
-    <EditText
-        android:id="@+id/editText_people_cnt"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/editText_table_num"
-        android:layout_alignTop="@+id/textView2"
-        android:ems="10"
-        android:inputType="number"
-        android:text="1"
-        android:visibility="visible" >
+        android:layout_alignParentTop="true" >
 
-    </EditText>
-
-    <Button
-        android:id="@+id/button_tab1_confirm"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView2"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="43dp"
-        android:layout_toLeftOf="@+id/editText_people_cnt"
-        android:text="确定" />
-
-    <Button
-        android:id="@+id/button_tab1_cancel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/button_tab1_confirm"
-        android:layout_alignBottom="@+id/button_tab1_confirm"
-        android:layout_alignRight="@+id/editText_people_cnt"
-        android:text="取消" />
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_weight="0.5"
+            android:text="设置人数："
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <TextView
+            android:id="@+id/textView_customNum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/textView2"
+            android:paddingLeft="10dp"
+            android:paddingRight="20dp"
+            android:text="1"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <ImageButton
+            android:id="@+id/imageButton_plus_tab1"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/textView_customNum"
+            android:src="@drawable/plus_btn_selector" />
+
+        <ImageButton
+            android:id="@+id/imageButton_minus_tab1"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/imageButton_plus_tab1"
+            android:src="@drawable/minus_btn_selector" />
+
+        <AutoCompleteTextView
+            android:id="@+id/editText_table_num"
+            android:layout_width="260dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignWithParentIfMissing="false"
+            android:layout_toRightOf="@+id/imageButton_minus_tab1"
+            android:ems="10"
+            android:hint="输入餐台号查找"
+            android:inputType="number" />
+
+        <ImageButton
+            android:id="@+id/deleteBtn_dialog_tab1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="false"
+            android:background="@color/transparent"
+            android:padding="10dp"
+            android:src="@drawable/delete_all_selector" />
+
+    </RelativeLayout>
 
 </RelativeLayout>

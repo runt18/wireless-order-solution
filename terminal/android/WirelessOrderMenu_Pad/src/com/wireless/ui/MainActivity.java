@@ -17,8 +17,10 @@ import com.wireless.ordermenu.R;
 import com.wireless.protocol.Department;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
-import com.wireless.ui.ContentFragment.OnPicChangedListener;
-import com.wireless.ui.ItemFragment.OnItemChangeListener;
+import com.wireless.util.ContentFragment;
+import com.wireless.util.ItemFragment;
+import com.wireless.util.ContentFragment.OnPicChangedListener;
+import com.wireless.util.ItemFragment.OnItemChangeListener;
 
 public class MainActivity extends Activity  
 						  implements OnItemChangeListener,
