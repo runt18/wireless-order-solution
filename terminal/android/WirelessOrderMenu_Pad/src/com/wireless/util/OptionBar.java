@@ -1,11 +1,16 @@
 package com.wireless.util;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.Fragment;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,13 +24,19 @@ import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
 import com.wireless.protocol.Order;
+import com.wireless.protocol.PinGen;
+import com.wireless.protocol.ReqPackage;
+import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Table;
+import com.wireless.protocol.Terminal;
+import com.wireless.util.SetServerFragment.OnServerChangeListener;
 import com.wireless.util.SetTableFragment.OnTableChangedListener;
 
-public class OptionBar extends Fragment implements OnTableChangedListener{
+public class OptionBar extends Fragment implements OnTableChangedListener , OnServerChangeListener{
 	private Dialog mDialog;
 	private TabHost mTabHost;
 	private TextView mSelectedFoodTextView;
@@ -36,9 +47,6 @@ public class OptionBar extends Fragment implements OnTableChangedListener{
 		TAB1,TAB2,TAB3
 	}
 
-//	private EditText mVipIdEditText;
-//	private EditText mVipPswdEditText ;
-	
    @Override  
     public View onCreateView(LayoutInflater inflater, ViewGroup container,  
             Bundle savedInstanceState) {  
@@ -82,16 +90,14 @@ public class OptionBar extends Fragment implements OnTableChangedListener{
 	 */
 	private  void onCreateDialog(final Activity activity)
 	{
-
 		View dialogLayout = activity.getLayoutInflater().inflate(R.layout.option_dialog,(ViewGroup)activity.findViewById(R.id.tab_dialog));
+		
 		mTabHost = (TabHost) dialogLayout.findViewById(R.id.tabhost);
 		mTabHost.setup();
 		
 		mTabHost.addTab(mTabHost.newTabSpec("tab1").setIndicator("餐台设置").setContent(R.id.tab1));
 		mTabHost.addTab(mTabHost.newTabSpec("tab2").setIndicator("服务员设置").setContent(R.id.tab2));
 		
-//		mVipIdEditText = (EditText) dialogLayout.findViewById(R.id.editText_vipId);
-//		mVipPswdEditText = (EditText) dialogLayout.findViewById(R.id.editText_vipPswd);
 		mDialog = new Dialog(activity);
 		mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		mDialog.setContentView(dialogLayout);
@@ -109,33 +115,18 @@ public class OptionBar extends Fragment implements OnTableChangedListener{
 			}
 		});
 		
-//		((Button)mDialog.findViewById(R.id.button_tab1_refresh)).setOnClickListener(new OnClickListener(){
-//
-//			@Override
-//			public void onClick(View v) {
-//				
-//			}
-//		});
+		((Button)mDialog.findViewById(R.id.button_tab2_cancel)).setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				mDialog.dismiss();
+			}
+		});
 		
 		SetTableFragment.setOnTableChangedListener(this);
+		SetServerFragment.setOnServerChangeListener(this);
 	}
 	
-	/**
-	 * Convert the md5 byte to hex string.
-	 * @param md5Msg the md5 byte value
-	 * @return the hex string to this md5 byte value
-	 */
-	private String toHexString(byte[] md5Msg){
-		StringBuffer hexString = new StringBuffer();
-		for (int i=0; i < md5Msg.length; i++) {
-			if(md5Msg[i] >= 0x00 && md5Msg[i] < 0x10){
-				hexString.append("0").append(Integer.toHexString(0xFF & md5Msg[i]));
-			}else{
-				hexString.append(Integer.toHexString(0xFF & md5Msg[i]));					
-			}
-		}
-		return hexString.toString();
-	}
 	
 	/*
 	 * 底部侦听按钮，根据按钮的不同来传入不同的tab id和selection值
@@ -218,7 +209,9 @@ public class OptionBar extends Fragment implements OnTableChangedListener{
 		abstract void onOrderChanged(Order order);
 	}
 
-
+	/**
+	 * 餐台设置时的回调，根据餐台的状态来判断是否请求订单
+	 */
 	@Override
 	public void onTableChange(Table table, int tableStatus,int customNum) {
 		mDialog.dismiss();
@@ -235,5 +228,63 @@ public class OptionBar extends Fragment implements OnTableChangedListener{
 				}
 			 }.execute(WirelessOrder.foodMenu);
 		}
+	}
+
+	/**
+	 * 服务员改变时的回调，判断登陆信息是否正确
+	 */
+	@Override
+	public void onServerChange(final StaffTerminal staff, String id, String pwd) {
+		try {
+			//Convert the password into MD5
+			MessageDigest digester = MessageDigest.getInstance("MD5");
+			digester.update(pwd.getBytes(), 0 , pwd.getBytes().length); 
+		
+			if(id.equals("")){
+				Toast.makeText(getActivity(), "账号不能为空", Toast.LENGTH_SHORT).show();
+			}else if(staff.pwd.equals(toHexString(digester.digest()))){
+				//保存staff pin到文件里面
+				Editor editor = getActivity().getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).edit();//获取编辑器
+				editor.putLong(Params.STAFF_PIN, staff.pin);
+				//提交修改
+				editor.commit();	
+				((TextView) getActivity().findViewById(R.id.textView_serverName)).setText(staff.name);
+				//set the pin generator according to the staff login
+				ReqPackage.setGen(new PinGen(){
+					@Override
+					public long getDeviceId() {
+						return staff.pin;
+					}
+					@Override
+					public short getDeviceType() {
+						return Terminal.MODEL_STAFF;
+					}
+					
+				});
+				mDialog.dismiss();
+			}else{		
+				Toast.makeText(getActivity(), "密码错误", Toast.LENGTH_SHORT).show();
+			}
+			
+		}catch(NoSuchAlgorithmException e) {
+			Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
+		}
+	}
+	
+	/**
+	 * Convert the md5 byte to hex string.
+	 * @param md5Msg the md5 byte value
+	 * @return the hex string to this md5 byte value
+	 */
+	private String toHexString(byte[] md5Msg){
+		StringBuffer hexString = new StringBuffer();
+		for (int i=0; i < md5Msg.length; i++) {
+			if(md5Msg[i] >= 0x00 && md5Msg[i] < 0x10){
+				hexString.append("0").append(Integer.toHexString(0xFF & md5Msg[i]));
+			}else{
+				hexString.append(Integer.toHexString(0xFF & md5Msg[i]));					
+			}
+		}
+		return hexString.toString();
 	}
 }
