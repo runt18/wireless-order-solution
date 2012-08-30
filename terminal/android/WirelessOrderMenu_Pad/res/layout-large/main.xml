@@ -15,13 +15,13 @@
             android:id="@+id/item"
             android:layout_width="200dp"
             android:layout_height="fill_parent"
-            class="com.wireless.util.ItemFragment" />
+            class="com.wireless.util.ExpandableListFragment" />
 
         <fragment
             android:id="@+id/content"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            class="com.wireless.util.ContentFragment" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            class="com.wireless.util.GalleryFragment" />
     </LinearLayout>
 
         <fragment
@@ -187,13 +187,13 @@
 
                     <ImageView
                         android:id="@+id/imageView1"
-                        android:layout_width="128dp"
+                        android:layout_width="228dp"
                         android:layout_height="fill_parent"
                         android:src="@color/purple"
                         android:visibility="invisible" />
 
                     <TextView
-                        android:id="@+id/textView7"
+                        android:id="@+id/textView_foodName_main"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerHorizontal="true"
@@ -217,30 +217,33 @@
                 <ImageView
                     android:id="@+id/imageView4"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_centerVertical="true"
-                    android:layout_marginLeft="6dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
                     android:layout_toRightOf="@+id/textView8"
                     android:src="@drawable/plus_btn_selector" />
 
-                <EditText
-                    android:id="@+id/editText2"
-                    android:layout_width="64dp"
+                <TextView
+                    android:id="@+id/textView_price_main"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_toRightOf="@+id/imageView4"
-                    android:background="@color/white"
-                    android:ems="10"
-                    android:inputType="number" >
+                    android:text="1"
+                    android:textColor="@color/white"
+                    android:textSize="22sp" >
 
-                </EditText>
+                </TextView>
 
                 <ImageView
                     android:id="@+id/imageView5"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_centerVertical="true"
-                    android:layout_toRightOf="@+id/editText2"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_toRightOf="@+id/textView_price_main"
                     android:src="@drawable/minus_btn_selector" />
 
                 <TextView
@@ -256,7 +259,7 @@
                     android:textColor="@color/white" />
 
                 <TextView
-                    android:id="@+id/textView10"
+                    android:id="@+id/textView_foodPrice_main"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignBaseline="@+id/textView9"
@@ -270,9 +273,8 @@
                     android:id="@+id/textView11"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignBaseline="@+id/textView10"
-                    android:layout_alignBottom="@+id/textView10"
-                    android:layout_toRightOf="@+id/textView10"
+                    android:layout_alignBaseline="@+id/textView_foodPrice_main"
+                    android:layout_toRightOf="@+id/textView_foodPrice_main"
                     android:text=" 元"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="@color/white" />

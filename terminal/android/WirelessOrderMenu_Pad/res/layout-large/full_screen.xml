@@ -7,7 +7,7 @@
         android:id="@+id/content"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        class="com.wireless.util.ContentFragment" />
+        class="com.wireless.util.GalleryFragment" />
 
     <TextView
         android:id="@+id/textView_food_name_fullScreen"

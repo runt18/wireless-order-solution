@@ -97,13 +97,13 @@
             android:layout_alignParentRight="true"
             android:text="取消" />
     </RelativeLayout>
-
+
     <TextView
         android:id="@+id/textView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/listView_server_tab2"
-        android:layout_marginLeft="20dp"
+        android:layout_marginLeft="120dp"
         android:layout_marginTop="65dp"
         android:layout_toRightOf="@+id/listView_server_tab2"
         android:text="服务员账号："

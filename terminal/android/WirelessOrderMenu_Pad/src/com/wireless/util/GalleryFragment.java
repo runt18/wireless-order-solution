@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.BaseAdapter;
 import android.widget.Gallery;
@@ -19,7 +20,7 @@ import android.widget.ImageView;
 import com.wireless.ordermenu.R;
 import com.wireless.protocol.Food;
 
-public class ContentFragment extends Fragment {
+public class GalleryFragment extends Fragment {
 	
 	private BaseAdapter mGalleryAdapter = null;
 	private Gallery mGallery;
@@ -33,6 +34,17 @@ public class ContentFragment extends Fragment {
 	
 	public void setOnViewChangeListener(OnPicChangedListener l){
 		mPicChangeListener = l;
+	}
+	
+	public static interface OnItemClickListener{
+		void onItemClick(Food food , int position);
+	}
+	
+	private OnItemClickListener mOnItemClickListener;
+	
+	public void setOnItemClickListener(OnItemClickListener l)
+	{
+		mOnItemClickListener = l;
 	}
 	
 	@Override
@@ -142,6 +154,14 @@ public class ContentFragment extends Fragment {
 
 			@Override
 			public void onNothingSelected(AdapterView<?> parent) {
+			}
+        });
+        
+        mGallery.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener(){
+			@Override
+			public void onItemClick(AdapterView<?> parent,View view, int position, long id) {
+				// TODO Auto-generated method stub
+				mOnItemClickListener.onItemClick(mFoods.get(position), position);
 			}
         });
 	}

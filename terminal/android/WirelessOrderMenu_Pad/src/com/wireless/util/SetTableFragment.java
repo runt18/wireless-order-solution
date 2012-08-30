@@ -146,7 +146,6 @@ public class SetTableFragment extends Fragment {
 		((Button) view.findViewById(R.id.button_tab1_refresh)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				Log.i("is","run");
 				new QueryTableTask().execute();
 			}
 		});

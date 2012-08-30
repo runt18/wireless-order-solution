@@ -11,12 +11,12 @@ import android.widget.TextView;
 import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
 import com.wireless.protocol.Food;
-import com.wireless.util.ContentFragment;
-import com.wireless.util.ContentFragment.OnPicChangedListener;
+import com.wireless.util.GalleryFragment;
+import com.wireless.util.GalleryFragment.OnPicChangedListener;
 
 public class FullScreenActivity extends Activity implements OnPicChangedListener{
 	
-	private ContentFragment mPicBrowserFragment;
+	private GalleryFragment mPicBrowserFragment;
 	
 	static final int FULL_RES_CODE = 130;
 	
@@ -31,7 +31,7 @@ public class FullScreenActivity extends Activity implements OnPicChangedListener
 		
 		super.onStart();
 		//取得content fragment的实例
-		mPicBrowserFragment = (ContentFragment)getFragmentManager().findFragmentById(R.id.content);
+		mPicBrowserFragment = (GalleryFragment)getFragmentManager().findFragmentById(R.id.content);
 		//设置picture browser fragment的数据源
 		mPicBrowserFragment.notifyDataChanged(WirelessOrder.foods);
 		//设置content fragment的回调函数
