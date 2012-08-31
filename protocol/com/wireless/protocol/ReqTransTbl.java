@@ -19,7 +19,7 @@ public class ReqTransTbl extends ReqPackage {
 	public ReqTransTbl(Table srcTbl, Table destTbl){
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.TRANS_TABLE;
-		header.length[0] = 0x02;
+		header.length[0] = 0x04;
 		header.length[1] = 0x00;
 		body = new byte[4];
 		body[0] = (byte)(srcTbl.aliasID & 0x00FF);

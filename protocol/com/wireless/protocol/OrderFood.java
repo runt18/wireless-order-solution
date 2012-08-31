@@ -67,6 +67,41 @@ public class OrderFood extends Food {
 	public boolean isHurried = false;
 	
 	/**
+	 * Comparing two foods without the tastes
+	 * @param food
+	 * @return
+	 */
+	public boolean equalsIgnoreTaste(OrderFood food){
+		if(isTemporary != food.isTemporary){
+			return false;
+		}else if(isTemporary && food.isTemporary){
+			return name.equals(food.name) && (price == food.price);
+		}else{
+			return aliasID == food.aliasID && hangStatus == food.hangStatus;
+		}
+	}
+	
+	/**
+	 * Comparing two foods without the hang status.
+	 * @param food
+	 * @return
+	 */
+	public boolean equalsIgnoreHangStauts(OrderFood food){
+		if(isTemporary != food.isTemporary){
+			return false;
+		}else if(isTemporary && food.isTemporary){
+			return name.equals(food.name) && (price == food.price);
+		}else{
+			return aliasID == food.aliasID &&
+				   tastes[0].aliasID == food.tastes[0].aliasID &&
+				   tastes[1].aliasID == food.tastes[1].aliasID &&
+				   tastes[2].aliasID == food.tastes[2].aliasID &&
+				   ((tmpTaste == null && food.tmpTaste == null) ? true : 
+					   ((tmpTaste != null && food.tmpTaste != null) ? tmpTaste.aliasID == food.tmpTaste.aliasID : false));
+		}
+	}
+	
+	/**
 	 * There are three ways to determine whether two foods is the same as each other.
 	 * 1 - If one food is temporary while the other NOT, means they are NOT the same.
 	 * 2 - If both of foods are temporary, check to see whether their names and price are the same.
@@ -77,21 +112,19 @@ public class OrderFood extends Food {
 	public boolean equals(Object obj){
 		if(obj == null || !(obj instanceof OrderFood)){
 			return false;
+			
 		}else{
 			OrderFood food = (OrderFood)obj;
 			if(isTemporary != food.isTemporary){
 				return false;
-			}else if(isTemporary && food.isTemporary){
-				return name.equals(food.name) && (price == food.price) && (hangStatus == food.hangStatus);
+				
+			}else if(hangStatus != food.hangStatus){
+				return false;
+				
 			}else{
-				return aliasID == food.aliasID &&
-					   tastes[0].aliasID == food.tastes[0].aliasID &&
-					   tastes[1].aliasID == food.tastes[1].aliasID &&
-					   tastes[2].aliasID == food.tastes[2].aliasID &&
-					   ((tmpTaste == null && food.tmpTaste == null) ? true : 
-						   ((tmpTaste != null && food.tmpTaste != null) ? tmpTaste.aliasID == food.tmpTaste.aliasID : false)) &&
-					   hangStatus == food.hangStatus;
+				return equalsIgnoreHangStauts(food);
 			}
+			
 		}
 	}
 
@@ -109,18 +142,6 @@ public class OrderFood extends Food {
 				   (tmpTaste == null ? new Integer(0).hashCode() : new Integer(tmpTaste.aliasID).hashCode()) ^
 				   new Short(hangStatus).hashCode();
 		}
-	}
-	
-	/**
-	 * Two foods are the same if both food and taste id is matched
-	 * @param food
-	 * @return
-	 */
-	public boolean equals2(OrderFood food){
-		return aliasID == food.aliasID &&
-		   tastes[0].aliasID == food.tastes[0].aliasID &&
-		   tastes[1].aliasID == food.tastes[1].aliasID &&
-		   tastes[2].aliasID == food.tastes[2].aliasID ;
 	}
 	
 	/**

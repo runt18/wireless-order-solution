@@ -5,7 +5,7 @@ import java.io.UnsupportedEncodingException;
 /******************************************************
  * In the case query order successfully, 
  * design the query order response looks like below
- * mode : type : seq : reserved : pin[6] : len[2] : <Order>
+ * mode : type : seq : reserved : pin[6] : len[2] : <Body>
  * <Header>
  * mode - ORDER_BUSSINESS
  * type - ACK
@@ -14,7 +14,7 @@ import java.io.UnsupportedEncodingException;
  * pin[6] : same as request
  * len[2] -  length of the <Body>
  * <Body>
- * table[2] : table_2[2] : minimum_cost[4] : category : 
+ * table[2] : table_2[2] : order_date[8] : minimum_cost[4] : category : 
  * custom_num : price[4] : food_num : 
  * <Food1> : <Food2>...
  * <TmpFood1> : <TmpFood2>...
@@ -22,6 +22,8 @@ import java.io.UnsupportedEncodingException;
  * table[2] - 2-byte indicates the table id 
  * 
  * table_2[2] - 2-byte indicates the 2nd table id, only used table merger
+ * 
+ * order_date[8] - 8-byte indicates the order date time
  * 
  * minimum_cost[4] - 4-byte indicates the minimum cost to this order
  * 
@@ -108,12 +110,15 @@ public class RespQueryOrder extends RespPackage{
 		//calculate the body's length
 		int bodyLen = 2 + /* table id takes up 2-byte */
 					2 + /* 2nd table id takes up 2-byte */
+					8 + /* order date time takes up 8-byte */
 					4 + /* minimum cost takes up 4-byte */
 					1 + /* category takes up 1-byte */
 					1 + /* custom number takes up 1-byte */ 
 					4 + /* price takes up 4-byte */ 
 					1 + /* food number takes up 1-byte */
 					foodLen;  /* the amount of bytes that food list needs */
+		
+		
 		
 		//assign the body length to header's length field
 		header.length[0] = (byte)(bodyLen & 0x000000FF);
@@ -122,36 +127,54 @@ public class RespQueryOrder extends RespPackage{
 		//allocate the memory for body
 		body = new byte[bodyLen];
 		
+		int offset = 0;
+		
 		//assign the table id
-		body[0] = (byte)(order.destTbl.aliasID & 0x00FF);
-		body[1] = (byte)((order.destTbl.aliasID & 0xFF00) >> 8);
+		body[offset] = (byte)(order.destTbl.aliasID & 0x00FF);
+		body[offset + 1] = (byte)((order.destTbl.aliasID & 0xFF00) >> 8);
+		offset += 2;
 		
 		//assign the 2nd table id
-		body[2] = (byte)(order.destTbl2.aliasID & 0x00FF);
-		body[3] = (byte)((order.destTbl2.aliasID & 0xFF00) >> 8);
+		body[offset] = (byte)(order.destTbl2.aliasID & 0x00FF);
+		body[offset + 1] = (byte)((order.destTbl2.aliasID & 0xFF00) >> 8);
+		offset += 2;
+		
+		//assign the order date time
+		body[offset] = (byte)(order.orderDate & 0x00000000000000FFL);
+		body[offset + 1] = (byte)((order.orderDate & 0x000000000000FF00L) >> 8);
+		body[offset + 2] = (byte)((order.orderDate & 0x0000000000FF0000L) >> 16);
+		body[offset + 3] = (byte)((order.orderDate & 0x00000000FF000000L) >> 24);
+		body[offset + 4] = (byte)((order.orderDate & 0x000000FF00000000L) >> 32);
+		body[offset + 5] = (byte)((order.orderDate & 0x0000FF0000000000L) >> 40);
+		body[offset + 6] = (byte)((order.orderDate & 0x00FF000000000000L) >> 48);
+		body[offset + 7] = (byte)((order.orderDate & 0xFF00000000000000L) >> 56);
+		offset += 8;
 		
 		//assign the minimum cost
-		body[4] = (byte)(order.minCost & 0x000000FF);
-		body[5] = (byte)((order.minCost & 0x0000FF00) >> 8);
-		body[6] = (byte)((order.minCost & 0x00FF0000) >> 16);
-		body[7] = (byte)((order.minCost & 0xFF000000) >> 24);
+		body[offset] = (byte)(order.minCost & 0x000000FF);
+		body[offset + 1] = (byte)((order.minCost & 0x0000FF00) >> 8);
+		body[offset + 2] = (byte)((order.minCost & 0x00FF0000) >> 16);
+		body[offset + 3] = (byte)((order.minCost & 0xFF000000) >> 24);
+		offset += 4;
 		
 		//assign the category
-		body[8] = (byte)(order.category & 0x00FF);
+		body[offset] = (byte)(order.category & 0x00FF);
+		offset += 1;
 		
 		//assign the custom number
-		body[9] = (byte)(order.custom_num & 0x000000FF);
+		body[offset] = (byte)(order.customNum & 0x000000FF);
+		offset += 1;
 		
 		//assign the total price
-		body[10] = (byte)(order.cashIncome & 0x000000FF);
-		body[11] = (byte)((order.cashIncome & 0x0000FF00) >> 8);
-		body[12] = (byte)((order.cashIncome & 0x00FF0000) >> 16);
-		body[13] = (byte)((order.cashIncome & 0xFF000000) >> 24);
+		body[offset] = (byte)(order.cashIncome & 0x000000FF);
+		body[offset + 1] = (byte)((order.cashIncome & 0x0000FF00) >> 8);
+		body[offset + 2] = (byte)((order.cashIncome & 0x00FF0000) >> 16);
+		body[offset + 3] = (byte)((order.cashIncome & 0xFF000000) >> 24);
+		offset += 4;
 		
 		//assign the food number
-		body[14] = (byte)(order.foods.length & 0x000000FF);
-		
-		int offset = 15;
+		body[offset] = (byte)(order.foods.length & 0x000000FF);		
+		offset += 1;
 		
 		//assign each food information, including food'id and order number
 		for(int i = 0; i < order.foods.length; i++){

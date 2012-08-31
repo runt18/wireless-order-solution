@@ -48,4 +48,16 @@ public class Table {
 		return Util.int2Float(minimumCost);
 	}
 	
+	public boolean equals(Object obj){
+		if(obj == null || !(obj instanceof Table)){
+			return false;
+		}else{
+			return restaurantID == ((Table)obj).restaurantID && aliasID == ((Table)obj).aliasID;
+		}
+	}
+	
+	public int hashCode(){
+		return new Integer(restaurantID).hashCode() ^ new Integer(aliasID).hashCode();
+	}
+	
 }

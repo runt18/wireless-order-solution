@@ -2,8 +2,6 @@ package com.wireless.protocol;
 
 import java.io.UnsupportedEncodingException;
 
-import com.wireless.protocol.Reserved;
-
 /******************************************************
  * Design the insert order request looks like below
  * <Header>
@@ -13,27 +11,29 @@ import com.wireless.protocol.Reserved;
  * seq - auto calculated and filled in
  * reserved - 0x00
  * pin[6] - auto calculated and filled in
- * len[2] - length of the <Order>
+ * len[2] - length of the <Body>
  * <Body>
- * print_type[2] : table[2] : table2[2] : category : custom_num : food_num : 
- * <Food1> : <Food2>... :
- * <TmpFood1> : <TmpFood2>... : 
- * original_table[2] 
+ * print_type[2] : src_tbl[2] : dest_tbl[2] : dest_tbl_2[2] : order_date[8] : category : custom_num : 
+ * food_amount : <Food1> : <Food2>... : <TmpFood1> : <TmpFood2>... : 
  * 
  * print_type[2] - 2-byte indicates the print type
- * table[2] - 2-byte indicates the table id
- * table_2[2] - 2-byte indicates the 2nd table id  
- * category - 1-byte indicating the category to this order
+ * src_tbl[2] - 2-byte indicates the alias to source table
+ * dest_tbl[2] - 2-byte indicates the alias to destination table
+ * dest_tbl_2[2] - 2-byte indicates the alias to 2nd destination table
+ * order_date[8] - 8-byte indicates the last modified order date
+ * category - 1-byte indicates the category to this order  
  * custom_num - 1-byte indicating the custom number for this table
- * food_num - 1-byte indicating the number of foods
+ * food_amount - 1-byte indicating the amount of foods
  * 
  * <Food>
- * is_temp(0) : food_id[2] : order_amount[2] : taste_id[2] : taste_id2[2] : taste_id3[2] : 
+ * is_temp(0) : food_id[2] : order_num[2] : taste_id[2] : taste_id2[2] : taste_id3[2] : 
  * len_tmp_taste : tmp_taste[n] : tmp_taste_alias[2] : tmp_taste_price[4] : 
  * kitchen : hang_status : is_hurried
  * is_temp(0) - "0" means this food is NOT temporary
  * food_id[2] - 2-byte indicating the food's id
- * order_amount[2] - 2-byte indicating how many this foods are ordered
+ * order_num[2] - 2-byte indicating how many this foods are ordered
+ * 			   order_num[0] - 1-byte indicates the float-point
+ * 			   order_num[1] - 1-byte indicates the fixed-point
  * taste_id[2] - 2-byte indicates the 1st taste preference id
  * taste_id2[2] - 2-byte indicates the 2nd taste preference id
  * taste_id3[2] - 2-byte indicates the 3rd taste preference id
@@ -44,7 +44,7 @@ import com.wireless.protocol.Reserved;
  * kitchen - the kitchen to this food
  * hang_status - the hang status to the food
  * is_hurried - indicates whether the food is hurried
- * 
+ *
  * <TmpFood>
  * is_temp(1) : food_id[2] : order_amount[2] : unit_price[3] : hang_status : is_hurried : len : food_name[len] 
  * is_temp(1) - "1" means this food is temporary
@@ -55,10 +55,7 @@ import com.wireless.protocol.Reserved;
  * is_hurried - indicates whether the food is hurried
  * len - the length of food's name
  * food_name[len] - the value of the food name
- * 
- * origianal_table[2] - 2-bytes indicates the original table id,
- *                      These two bytes are used for table transferred
- *  
+ *
  *******************************************************/
 public class ReqInsertOrder extends ReqPackage {
 
@@ -68,34 +65,24 @@ public class ReqInsertOrder extends ReqPackage {
 	 * @param type indicates insert or update request
 	 * @param reqConf indicates the request configuration, like sync or asyn print 
 	 */
-	public ReqInsertOrder(Order reqOrder, byte type, short reqConf) throws UnsupportedEncodingException{
-		makePackage(reqOrder, type, reqConf);
-	}
-	
-	/**
-	 * Make the insert or update order request package with default request configuration
-	 * @param reqOrder the order detail information
-	 * @param type indicates insert or update request
-	 */
-	//public ReqInsertOrder(Order reqOrder, byte type){
-	//	makePackage(reqOrder, type, Reserved.DEFAULT_CONF);
-	//}  
+	public ReqInsertOrder(Order reqOrder, byte type) throws UnsupportedEncodingException{
+		makePackage(reqOrder, type);
+	}	
 	
 	/**
 	 * Make the insert order request package with default request configuration
 	 * @param reqOrder the order detail information
 	 */
 	public ReqInsertOrder(Order reqOrder) throws UnsupportedEncodingException{
-		makePackage(reqOrder, Type.INSERT_ORDER, Reserved.DEFAULT_CONF);
+		makePackage(reqOrder, Type.INSERT_ORDER);
 	}	
 	
 	/**
 	 * Make the insert or update order request package
 	 * @param reqOrder the order detail information
 	 * @param type indicates insert or update request
-	 * @param reqConf indicates the request configuration, like sync or asyn print 
 	 */
-	private void makePackage(Order reqOrder, byte type, int reqConf) throws UnsupportedEncodingException{
+	private void makePackage(Order reqOrder, byte type) throws UnsupportedEncodingException{
 		if(type != Type.INSERT_ORDER && type != Type.UPDATE_ORDER)
 			throw new IllegalArgumentException();
 		
@@ -131,42 +118,66 @@ public class ReqInsertOrder extends ReqPackage {
 		}
 		
 		//calculate the body's length
-		int bodyLen = 2 + /* print type takes up 2 bytes */
-					2 + /* table id takes up 2 bytes */
-					2 + /* 2nd table id takes up 2 bytes */
-					1 + /* category takes up 1 byte */
-					1 + /* custom number takes up 1 byte */ 
-					1 + /* food number takes up 1 byte */
-					foodLen + /* the amount of bytes that food list needs */
-					2; /* original table id takes up 2 bytes */
+		int bodyLen = 2 + 		/* print type takes up 2 bytes */
+					  2 +		/* alias to source table takes up 2 bytes */
+					  2 + 		/* alias to destination takes up 2 bytes */
+					  2 + 		/* alias to 2nd destination table id takes up 2 bytes */
+					  8 + 		/* last modified date takes up 8-byte */
+					  1 + 		/* category takes up 1 byte */
+					  1 + 		/* custom number takes up 1 byte */ 
+					  1 + 		/* food number takes up 1 byte */
+					  foodLen; 	/* the amount of bytes that food list needs */
 		header.length[0] = (byte)(bodyLen & 0x000000FF) ;
 		header.length[1] = (byte)((bodyLen & 0x0000FF00) >> 8);
 		
 		body = new byte[bodyLen];
-		
-		//assign the print type
-		body[0] = (byte)(reqConf & 0x00FF);
-		body[1] = (byte)((reqConf & 0xFF00) >> 8);
-		
-		//assign the table id
-		body[2] = (byte)(reqOrder.destTbl.aliasID & 0x00FF);
-		body[3] = (byte)((reqOrder.destTbl.aliasID & 0xFF00) >> 8);
 
-		//assign the 2nd table id
-		body[4] = (byte)(reqOrder.destTbl2.aliasID & 0x00FF);
-		body[5] = (byte)((reqOrder.destTbl2.aliasID & 0xFF00) >> 8);
+		int offset = 0;
+
+		//assign the print type
+		body[offset] = 0x00;
+		body[offset + 1] = 0x00;
+		offset += 2;
+		
+		//assign the alias to source table
+		body[offset] = (byte)(reqOrder.srcTbl.aliasID & 0x00FF);
+		body[offset + 1] = (byte)((reqOrder.srcTbl.aliasID & 0xFF00) >> 8);
+		offset += 2;
+		
+		//assign the alias to destination table
+		body[offset] = (byte)(reqOrder.destTbl.aliasID & 0x00FF);
+		body[offset + 1] = (byte)((reqOrder.destTbl.aliasID & 0xFF00) >> 8);
+		offset += 2;
+
+		//assign the alias to 2nd destination table
+		body[offset] = (byte)(reqOrder.destTbl2.aliasID & 0x00FF);
+		body[offset + 1] = (byte)((reqOrder.destTbl2.aliasID & 0xFF00) >> 8);
+		offset += 2;
+		
+		//assign the last modified date
+		body[offset] = (byte)(reqOrder.orderDate & 0x00000000000000FFL);
+		body[offset + 1] = (byte)((reqOrder.orderDate & 0x000000000000FF00L) >> 8);
+		body[offset + 2] = (byte)((reqOrder.orderDate & 0x0000000000FF0000L) >> 16);
+		body[offset + 3] = (byte)((reqOrder.orderDate & 0x00000000FF000000L) >> 24);
+		body[offset + 4] = (byte)((reqOrder.orderDate & 0x000000FF00000000L) >> 32);
+		body[offset + 5] = (byte)((reqOrder.orderDate & 0x0000FF0000000000L) >> 40);
+		body[offset + 6] = (byte)((reqOrder.orderDate & 0x00FF000000000000L) >> 48);
+		body[offset + 7] = (byte)((reqOrder.orderDate & 0xFF00000000000000L) >> 56);
+		offset += 8;
 		
 		//assign the category
-		body[6] = (byte)(reqOrder.category & 0x00FF); 
+		body[offset] = (byte)(reqOrder.category & 0x00FF);
+		offset += 1;
 		
 		//assign the custom number
-		body[7] = (byte)(reqOrder.custom_num & 0x000000FF);
+		body[offset] = (byte)(reqOrder.customNum & 0x000000FF);
+		offset += 1;
 		
 		//assign the number of foods
-		body[8] = (byte)(reqOrder.foods.length & 0x000000FF);
+		body[offset] = (byte)(reqOrder.foods.length & 0x000000FF);
+		offset += 1;
 		
 		//assign each order food's id and count
-		int offset = 9;
 		for(int i = 0; i < reqOrder.foods.length; i++){
 			if(reqOrder.foods[i].isTemporary){
 				byte[] nameBytes = reqOrder.foods[i].name.getBytes("UTF-8");
@@ -284,11 +295,8 @@ public class ReqInsertOrder extends ReqPackage {
 				body[offset] = (byte)(reqOrder.foods[i].isHurried ? 1 : 0);
 				offset += 1;
 			}
-		}		
-		
-		//assign the original table id
-		body[offset] = (byte)(reqOrder.srcTbl.aliasID & 0x000000FF);
-		body[offset + 1] = (byte)((reqOrder.srcTbl.aliasID & 0x0000FF00) >> 8);
+		}	
+
 	}
 	
 	/******************************************************
