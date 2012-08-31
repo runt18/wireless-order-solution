@@ -86,7 +86,7 @@ public class BillActivity extends Activity {
 			//set the table ID
 			((TextView)theActivity.findViewById(R.id.valueplatform)).setText(String.valueOf(theActivity.mOrderToPay.destTbl.aliasID));
 			//set the amount of customer
-			((TextView)theActivity.findViewById(R.id.valuepeople)).setText(String.valueOf(theActivity.mOrderToPay.custom_num));
+			((TextView)theActivity.findViewById(R.id.valuepeople)).setText(String.valueOf(theActivity.mOrderToPay.customNum));
 		}
 	};
 

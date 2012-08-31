@@ -4,7 +4,6 @@ import java.util.Date;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -22,7 +21,7 @@ import com.wireless.ui.R;
 
 public class PullListView extends ListView{
 
-	private static final String TAG = "listview";
+//	private static final String TAG = "listview";
 
 	private final static int RELEASE_To_REFRESH = 0;
 	private final static int PULL_To_REFRESH = 1;
@@ -49,7 +48,7 @@ public class PullListView extends ListView{
 	// 用于保证startY的值在一个完整的touch事件中只被记录一次
 	private boolean isRecored;
 
-	private int headContentWidth;
+//	private int headContentWidth;
 	private int headContentHeight;
 
 	private int startY;
@@ -90,13 +89,12 @@ public class PullListView extends ListView{
 
 		measureView(headView);
 		headContentHeight = headView.getMeasuredHeight();
-		headContentWidth = headView.getMeasuredWidth();
+//		headContentWidth = headView.getMeasuredWidth();
 
 		headView.setPadding(0, -1 * headContentHeight, 0, 0);
 		headView.invalidate();
 
-		Log.v("size", "width:" + headContentWidth + " height:"
-				+ headContentHeight);
+		//Log.v("size", "width:" + headContentWidth + " height:" + headContentHeight);
 
 		addHeaderView(headView, null, false);
 
@@ -130,7 +128,7 @@ public class PullListView extends ListView{
 				if (firstItemIndex == 0 && !isRecored) {
 					isRecored = true;
 					startY = (int) event.getY();
-					Log.v(TAG, "在down时候记录当前位置‘");
+					//Log.v(TAG, "在down时候记录当前位置‘");
 				}
 				break;
 
@@ -144,14 +142,14 @@ public class PullListView extends ListView{
 						state = DONE;
 						changeHeaderViewByState();
 
-						Log.v(TAG, "由下拉刷新状态，到done状态");
+						//Log.v(TAG, "由下拉刷新状态，到done状态");
 					}
 					if (state == RELEASE_To_REFRESH) {
 						state = REFRESHING;
 						changeHeaderViewByState();
 						onRefresh();
 
-						Log.v(TAG, "由松开刷新状态，到done状态");
+						//Log.v(TAG, "由松开刷新状态，到done状态");
 					}
 				}
 
@@ -164,7 +162,7 @@ public class PullListView extends ListView{
 				int tempY = (int) event.getY();
 
 				if (!isRecored && firstItemIndex == 0) {
-					Log.v(TAG, "在move时候记录下位置");
+					//Log.v(TAG, "在move时候记录下位置");
 					isRecored = true;
 					startY = tempY;
 				}
@@ -184,14 +182,14 @@ public class PullListView extends ListView{
 							state = PULL_To_REFRESH;
 							changeHeaderViewByState();
 
-							Log.v(TAG, "由松开刷新状态转变到下拉刷新状态");
+							//Log.v(TAG, "由松开刷新状态转变到下拉刷新状态");
 						}
 						// 一下子推到顶了
 						else if (tempY - startY <= 0) {
 							state = DONE;
 							changeHeaderViewByState();
 
-							Log.v(TAG, "由松开刷新状态转变到done状态");
+							//Log.v(TAG, "由松开刷新状态转变到done状态");
 						}
 						// 往下拉了，或者还没有上推到屏幕顶部掩盖head的地步
 						else {
@@ -209,14 +207,14 @@ public class PullListView extends ListView{
 							isBack = true;
 							changeHeaderViewByState();
 
-							Log.v(TAG, "由done或者下拉刷新状态转变到松开刷新");
+//							Log.v(TAG, "由done或者下拉刷新状态转变到松开刷新");
 						}
 						// 上推到顶了
 						else if (tempY - startY <= 0) {
 							state = DONE;
 							changeHeaderViewByState();
 
-							Log.v(TAG, "由DOne或者下拉刷新状态转变到done状态");
+//							Log.v(TAG, "由DOne或者下拉刷新状态转变到done状态");
 						}
 					}
 
@@ -264,7 +262,7 @@ public class PullListView extends ListView{
 
 			tipsTextview.setText("松开刷新");
 
-			Log.v(TAG, "当前状态，松开刷新");
+//			Log.v(TAG, "当前状态，松开刷新");
 			break;
 		case PULL_To_REFRESH:
 			progressBar.setVisibility(View.GONE);
@@ -282,7 +280,7 @@ public class PullListView extends ListView{
 			} else {
 				tipsTextview.setText("下拉刷新");
 			}
-			Log.v(TAG, "当前状态，下拉刷新");
+//			Log.v(TAG, "当前状态，下拉刷新");
 			break;
 
 		case REFRESHING:
@@ -295,7 +293,7 @@ public class PullListView extends ListView{
 			tipsTextview.setText("正在刷新...");
 			lastUpdatedTextView.setVisibility(View.VISIBLE);
 
-			Log.v(TAG, "当前状态,正在刷新...");
+//			Log.v(TAG, "当前状态,正在刷新...");
 			break;
 		case DONE:
 			headView.setPadding(0, -1 * headContentHeight, 0, 0);
@@ -306,7 +304,7 @@ public class PullListView extends ListView{
 			tipsTextview.setText("下拉刷新");
 			lastUpdatedTextView.setVisibility(View.VISIBLE);
 
-			Log.v(TAG, "当前状态，done");
+//			Log.v(TAG, "当前状态，done");
 			break;
 		}
 	}

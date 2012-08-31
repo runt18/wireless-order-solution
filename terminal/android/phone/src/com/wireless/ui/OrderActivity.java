@@ -1,6 +1,5 @@
 package com.wireless.ui;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -11,7 +10,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnKeyListener;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -25,15 +23,10 @@ import android.widget.Toast;
 
 import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.OrderParcel;
-import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.ProtocolPackage;
-import com.wireless.protocol.ReqInsertOrder;
-import com.wireless.protocol.Reserved;
 import com.wireless.protocol.Type;
 import com.wireless.protocol.Util;
-import com.wireless.sccon.ServerConnector;
 import com.wireless.ui.view.OrderFoodListView;
 
 public class OrderActivity extends Activity implements OrderFoodListView.OnOperListener{
@@ -90,7 +83,7 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 					Order reqOrder = new Order(foods,											   
 											   Short.parseShort(((EditText)findViewById(R.id.tblNoEdtTxt)).getText().toString()),
 											   Integer.parseInt(((EditText)findViewById(R.id.customerNumEdtTxt)).getText().toString()));
-					new InsertOrderTask(reqOrder).execute();
+					new InsertOrderTask(reqOrder).execute(Type.INSERT_ORDER);
 					
 				}else{
 					Toast.makeText(OrderActivity.this, "您还未点菜，暂时不能下单。", Toast.LENGTH_SHORT).show();
@@ -131,13 +124,12 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 	/**
 	 * 执行下单的请求操作
 	 */
-	private class InsertOrderTask extends AsyncTask<Void, Void, String>{
+	private class InsertOrderTask extends com.wireless.lib.task.CommitOrderTask{
 
 		private ProgressDialog _progDialog;
-		private Order _reqOrder;
 		
 		public InsertOrderTask(Order reqOrder) {
-			_reqOrder = reqOrder;
+			super(reqOrder);
 		}
 		
 		/**
@@ -145,58 +137,25 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 		 */
 		@Override
 		protected void onPreExecute(){
-			_progDialog = ProgressDialog.show(OrderActivity.this, "", "提交" + _reqOrder.destTbl.aliasID + "号餐台的下单信息...请稍候", true);
+			_progDialog = ProgressDialog.show(OrderActivity.this, "", "提交" + mReqOrder.destTbl.aliasID + "号餐台的下单信息...请稍候", true);
 		}
 		
-		/**
-		 * 在新的线程中执行下单的请求操作
-		 */
-		@Override
-		protected String doInBackground(Void... arg0) {
-			String errMsg = null;
-			byte printType = Reserved.DEFAULT_CONF;
-			//print both order and order order while inserting a new order
-			printType |= Reserved.PRINT_ORDER_2 | Reserved.PRINT_ORDER_DETAIL_2;
-			try{
-				ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(_reqOrder, Type.INSERT_ORDER, printType));
-				if(resp.header.type == Type.NAK){
-					byte errCode = resp.header.reserved;					
-					if(errCode == ErrorCode.MENU_EXPIRED){
-						errMsg = "菜谱有更新，请更新菜谱后再重新改单。"; 
-					}else if(errCode == ErrorCode.TABLE_NOT_EXIST){
-						errMsg = _reqOrder.destTbl.aliasID + "号台信息不存在，请与餐厅负责人确认。";
-					}else if(errCode == ErrorCode.TABLE_BUSY){
-						errMsg = _reqOrder.destTbl.aliasID + "号台已经下单。";
-					}else if(errCode == ErrorCode.PRINT_FAIL){
-						errMsg = _reqOrder.destTbl.aliasID + "号台下单打印未成功，请与餐厅负责人确认。";
-					}else if(errCode == ErrorCode.EXCEED_GIFT_QUOTA){
-						errMsg = "赠送的菜品已超出赠送额度，请与餐厅负责人确认。";
-					}else{
-						errMsg = _reqOrder.destTbl.aliasID + "号台下单失败，请重新提交下单。";
-					}
-				}
-				
-			}catch(IOException e){
-				errMsg = e.getMessage();
-			}
-			return errMsg;
-		}
 		
 		/**
 		 * 根据返回的error message判断，如果发错异常则提示用户，
 		 * 如果成功，则返回到主界面，并提示用户下单成功
 		 */
 		@Override
-		protected void onPostExecute(String errMsg){
+		protected void onPostExecute(Byte errCode){
 			//make the progress dialog disappeared
 			_progDialog.dismiss();
 			/**
 			 * Prompt user message if any error occurred.
 			 */
-			if(errMsg != null){
+			if(mErrMsg != null){
 				new AlertDialog.Builder(OrderActivity.this)
 				.setTitle("提示")
-				.setMessage(errMsg)
+				.setMessage(mErrMsg)
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						dialog.dismiss();
@@ -205,7 +164,7 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 			}else{
 				//return to the main activity and show the message
 				OrderActivity.this.finish();
-				Toast.makeText(OrderActivity.this, _reqOrder.destTbl.aliasID + "号台下单成功。", Toast.LENGTH_SHORT).show();
+				Toast.makeText(OrderActivity.this, mReqOrder.destTbl.aliasID + "号台下单成功。", Toast.LENGTH_SHORT).show();
 			}
 		}
 		

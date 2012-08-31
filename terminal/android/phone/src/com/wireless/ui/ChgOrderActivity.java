@@ -1,6 +1,5 @@
 package com.wireless.ui;
 
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,7 +13,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnKeyListener;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -35,12 +33,8 @@ import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.ProtocolPackage;
-import com.wireless.protocol.ReqInsertOrder;
-import com.wireless.protocol.Reserved;
 import com.wireless.protocol.Type;
 import com.wireless.protocol.Util;
-import com.wireless.sccon.ServerConnector;
 import com.wireless.ui.view.OrderFoodListView;
 
 public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOperListener {
@@ -147,7 +141,8 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 											   Short.parseShort(((EditText)findViewById(R.id.valueplatform)).getText().toString()),
 											   Integer.parseInt(((EditText)findViewById(R.id.valuepeople)).getText().toString()));
 					reqOrder.srcTbl.aliasID = mOriOrder.destTbl.aliasID;
-					new UpdateOrderTask(reqOrder).execute();
+					reqOrder.orderDate = mOriOrder.orderDate;
+					new UpdateOrderTask(reqOrder).execute(Type.UPDATE_ORDER);
 				}else{
 					Toast.makeText(ChgOrderActivity.this, "您还未点菜，暂时不能下单。", Toast.LENGTH_SHORT).show();
 				}
@@ -180,6 +175,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 				mHandler.sendEmptyMessage(0);
 			}
 		});
+		
 		//根据账单号请求相应的信息
 		new QueryOrderTask(Integer.valueOf(getIntent().getExtras().getString(MainActivity.KEY_TABLE_ID))).execute(WirelessOrder.foodMenu);
 
@@ -190,6 +186,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 		//_newFoodLstView.setGroupIndicator(getResources().getDrawable(R.layout.expander_folder));
 		mNewFoodLstView.setType(Type.INSERT_ORDER);
 		mNewFoodLstView.setOperListener(this);
+		
 		//滚动的时候隐藏输入法
 		mNewFoodLstView.setOnScrollListener(new OnScrollListener() {				
 			@Override
@@ -200,15 +197,15 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 			@Override
 			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {}
 		});	
+		
 		mNewFoodLstView.setChangedListener(new OrderFoodListView.OnChangedListener() {			
 			@Override
 			public void onSourceChanged() {
 				mHandler.sendEmptyMessage(0);
 			}
 		});	
-		mNewFoodLstView.notifyDataChanged(new ArrayList<OrderFood>());
 		
-
+		mNewFoodLstView.notifyDataChanged(new ArrayList<OrderFood>());
 
 	}
 
@@ -271,13 +268,13 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 	/**
 	 * 执行改单的提交请求
 	 */
-	private class UpdateOrderTask extends AsyncTask<Void, Void, String>{
+	private class UpdateOrderTask extends com.wireless.lib.task.CommitOrderTask{
 
 		private ProgressDialog _progDialog;
-		private Order _reqOrder;
+		
 		
 		UpdateOrderTask(Order reqOrder){
-			_reqOrder = reqOrder;
+			super(reqOrder);
 		}
 		
 		/**
@@ -285,85 +282,69 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 		 */
 		@Override
 		protected void onPreExecute(){
-			_progDialog = ProgressDialog.show(ChgOrderActivity.this, "", "提交" + _reqOrder.destTbl.aliasID + "号餐台的改单信息...请稍候", true);
-		}
-		
-		/**
-		 * 在新的线程中执行改单的请求操作
-		 */
-		@Override
-		protected String doInBackground(Void... arg0) {
-			String errMsg = null;
-			short printType = Reserved.DEFAULT_CONF;
-			printType |= Reserved.PRINT_EXTRA_FOOD_2;
-			printType |= Reserved.PRINT_CANCELLED_FOOD_2;
-			printType |= Reserved.PRINT_TRANSFER_TABLE_2;
-			printType |= Reserved.PRINT_ALL_EXTRA_FOOD_2;
-			printType |= Reserved.PRINT_ALL_CANCELLED_FOOD_2;
-			printType |= Reserved.PRINT_ALL_HURRIED_FOOD_2;
-			try{
-				ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(_reqOrder, Type.UPDATE_ORDER, printType));
-				if(resp.header.type == Type.NAK){
-					byte errCode = resp.header.reserved;
-					if(errCode == ErrorCode.MENU_EXPIRED){
-						errMsg = "菜谱有更新，请更新菜谱后再重新改单。"; 
-						
-					}else if(errCode == ErrorCode.TABLE_NOT_EXIST){			
-						errMsg = _reqOrder.destTbl.aliasID + "号台信息不存在，请与餐厅负责人确认。";
-						
-					}else if(errCode == ErrorCode.TABLE_IDLE){			
-						errMsg = _reqOrder.destTbl.aliasID + "号台的账单已结帐或删除，请与餐厅负责人确认。";
-						
-					}else if(errCode == ErrorCode.TABLE_BUSY){
-						errMsg = _reqOrder.destTbl.aliasID + "号台已经下单。";
-						
-					}else if(errCode == ErrorCode.EXCEED_GIFT_QUOTA){
-						errMsg = "赠送的菜品已超出赠送额度，请与餐厅负责人确认。";
-						
-					}else{
-						errMsg = _reqOrder.destTbl.aliasID + "号台改单失败，请重新提交改单。";
-					}
-				}
-			}catch(IOException e){
-				errMsg = e.getMessage();
-			}
-			return errMsg;
-		}
+			_progDialog = ProgressDialog.show(ChgOrderActivity.this, "", "提交" + mReqOrder.destTbl.aliasID + "号餐台的改单信息...请稍候", true);
+		}		
+
 		
 		/**
 		 * 根据返回的error message判断，如果发错异常则提示用户，
 		 * 如果成功，则返回到主界面，并提示用户改单成功
 		 */
 		@Override
-		protected void onPostExecute(String errMsg){
+		protected void onPostExecute(Byte errCode){
 			//make the progress dialog disappeared
 			_progDialog.dismiss();
-			/**
-			 * Prompt user message if any error occurred.
-			 */
-			if(errMsg != null){
-				new AlertDialog.Builder(ChgOrderActivity.this)
-				.setTitle("提示")
-				.setMessage(errMsg)
-				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						dialog.dismiss();
-					}
-				}).show();
+
+			if(mErrMsg != null){
+				if(errCode == ErrorCode.ORDER_EXPIRED){
+					/**
+					 * 如果账单已经过期，提示用户两种选择：
+					 * 1 - 下载最新的账单信息，并更新已点菜的内容
+					 * 2 - 退出改单界面，重新进入
+					 */
+					new AlertDialog.Builder(ChgOrderActivity.this)
+						.setTitle("提示")
+						.setMessage(mErrMsg)
+						.setPositiveButton("刷新", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								dialog.dismiss();
+								new QueryOrderTask(Short.parseShort(((EditText)findViewById(R.id.valueplatform)).getText().toString())).execute(WirelessOrder.foodMenu);
+							}
+						})
+						.setNeutralButton("退出", new DialogInterface.OnClickListener() {							
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								dialog.dismiss();
+							}
+						})
+						.show();	
+					
+				}else{
+					/**
+					 * Prompt user message if any error occurred.
+					 */
+					new AlertDialog.Builder(ChgOrderActivity.this)
+					.setTitle("提示")
+					.setMessage(mErrMsg)
+					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							dialog.dismiss();
+						}
+					}).show();					
+				}
 			}else{
 				//return to the main activity and show the successful message
 				ChgOrderActivity.this.finish();
 				String promptMsg;
-				if(_reqOrder.destTbl.aliasID == _reqOrder.srcTbl.aliasID){
-					promptMsg = _reqOrder.destTbl.aliasID + "号台改单成功。";
+				if(mReqOrder.destTbl.aliasID == mReqOrder.srcTbl.aliasID){
+					promptMsg = mReqOrder.destTbl.aliasID + "号台改单成功。";
 				}else{
-					promptMsg = _reqOrder.srcTbl.aliasID + "号台转至" + 
-							 	 _reqOrder.destTbl.aliasID + "号台，并改单成功。";
+					promptMsg = mReqOrder.srcTbl.aliasID + "号台转至" + 	mReqOrder.destTbl.aliasID + "号台，并改单成功。";
 				}
 				Toast.makeText(ChgOrderActivity.this, promptMsg, Toast.LENGTH_SHORT).show();
 			}
-		}
-		
+		}		
+
 	}
 
 	/**
@@ -430,6 +411,9 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 		@Override
 		protected void onPostExecute(Order order){
 
+			//make the progress dialog disappeared
+			_progDialog.dismiss();
+			
 			if(mErrMsg != null){
 				/**
 				 * 如果请求账单信息失败，则跳转会MainActivity
@@ -458,9 +442,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 				//set the table ID
 				((EditText)findViewById(R.id.valueplatform)).setText(Integer.toString(mOriOrder.destTbl.aliasID));
 				//set the amount of customer
-				((EditText)findViewById(R.id.valuepeople)).setText(Integer.toString(mOriOrder.custom_num));				
-				//make the progress dialog disappeared
-				_progDialog.dismiss();
+				((EditText)findViewById(R.id.valuepeople)).setText(Integer.toString(mOriOrder.customNum));				
 			}			
 		}		
 	}
