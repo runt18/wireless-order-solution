@@ -42,7 +42,6 @@ import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqInsertOrder;
 import com.wireless.protocol.ReqQueryMenu;
-import com.wireless.protocol.Reserved;
 import com.wireless.protocol.RespParserEx;
 import com.wireless.protocol.Type;
 import com.wireless.protocol.Util;
@@ -258,7 +257,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 		//set the table ID
 		((EditText)findViewById(R.id.tblNoEdtTxt)).setText(Integer.toString(_oriOrder.destTbl.aliasID));
 		//set the amount of customer
-		((EditText)findViewById(R.id.customerNumEdtTxt)).setText(Integer.toString(_oriOrder.custom_num));
+		((EditText)findViewById(R.id.customerNumEdtTxt)).setText(Integer.toString(_oriOrder.customNum));
 
 		//”“≤‡«–ªªµΩµ„≤ÀView
 		switchToOrderView();
@@ -384,15 +383,9 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 		@Override
 		protected String doInBackground(Void... arg0) {
 			String errMsg = null;
-			short printType = Reserved.DEFAULT_CONF;
-			printType |= Reserved.PRINT_EXTRA_FOOD_2;
-			printType |= Reserved.PRINT_CANCELLED_FOOD_2;
-			printType |= Reserved.PRINT_TRANSFER_TABLE_2;
-			printType |= Reserved.PRINT_ALL_EXTRA_FOOD_2;
-			printType |= Reserved.PRINT_ALL_CANCELLED_FOOD_2;
-			printType |= Reserved.PRINT_ALL_HURRIED_FOOD_2;
+
 			try{
-				ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(_reqOrder, Type.UPDATE_ORDER, printType));
+				ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(_reqOrder, Type.UPDATE_ORDER));
 				if(resp.header.type == Type.NAK){
 					byte errCode = resp.header.reserved;
 					if(errCode == ErrorCode.MENU_EXPIRED){

@@ -69,6 +69,7 @@ import com.wireless.protocol.ReqQueryRestaurant;
 import com.wireless.protocol.ReqQueryStaff;
 import com.wireless.protocol.ReqQueryTable;
 import com.wireless.protocol.RespParser;
+import com.wireless.protocol.RespQueryOrderParser;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
@@ -1300,7 +1301,7 @@ public class MainActivity extends Activity {
 				// 根据tableID请求数据
 				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryOrder(_tbl2Query.aliasID));
 				if (resp.header.type == Type.ACK) {
-					_order = RespParser.parseQueryOrder(resp, WirelessOrder.foodMenu);
+					_order = RespQueryOrderParser.parse(resp, WirelessOrder.foodMenu);
 					_tblStatus = ErrorCode.TABLE_BUSY;
 
 				} else {
@@ -1766,7 +1767,7 @@ public class MainActivity extends Activity {
 				//根据tableID请求数据
 				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryOrder(_tableID));
 				if(resp.header.type == Type.ACK){
-					_order = RespParser.parseQueryOrder(resp, WirelessOrder.foodMenu);
+					_order = RespQueryOrderParser.parse(resp, WirelessOrder.foodMenu);
 					
 				}else{
     				if(resp.header.reserved == ErrorCode.TABLE_IDLE) {

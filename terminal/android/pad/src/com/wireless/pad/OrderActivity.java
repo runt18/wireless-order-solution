@@ -37,7 +37,6 @@ import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqInsertOrder;
 import com.wireless.protocol.ReqQueryMenu;
-import com.wireless.protocol.Reserved;
 import com.wireless.protocol.RespParserEx;
 import com.wireless.protocol.Type;
 import com.wireless.protocol.Util;
@@ -443,13 +442,9 @@ public class OrderActivity extends ActivityGroup implements
 		@Override
 		protected String doInBackground(Void... arg0) {
 			String errMsg = null;
-			byte printType = Reserved.DEFAULT_CONF;
-			// print both order and order order while inserting a new order
-			printType |= Reserved.PRINT_ORDER_2 | Reserved.PRINT_ORDER_DETAIL_2;
 			try {
 				ProtocolPackage resp = ServerConnector.instance().ask(
-						new ReqInsertOrder(_reqOrder, Type.INSERT_ORDER,
-								printType));
+						new ReqInsertOrder(_reqOrder, Type.INSERT_ORDER));
 				if (resp.header.type == Type.NAK) {
 					byte errCode = resp.header.reserved;
 					if (errCode == ErrorCode.MENU_EXPIRED) {

@@ -83,7 +83,7 @@ public class BillActivity extends Activity {
 		_orderToPay = orderParcel;
 			
 		((TextView)findViewById(R.id.valueplatform)).setText(String.valueOf(_orderToPay.destTbl.aliasID));
-		((TextView)findViewById(R.id.valuepeople)).setText(String.valueOf(_orderToPay.custom_num));
+		((TextView)findViewById(R.id.valuepeople)).setText(String.valueOf(_orderToPay.customNum));
 		_handler.sendEmptyMessage(0);
 				
 		/**
