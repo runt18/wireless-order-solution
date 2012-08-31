@@ -419,15 +419,6 @@ public class TableActivity extends Activity {
 		}
 	}
 	
-//	@Override
-//	protected Dialog onCreateDialog(int dialogID){
-//		if(dialogID == DIALOG_TRANS_TABLE)
-//		{
-//			return new AskTableDialog(table);
-//		}
-//		else return null;
-//	}
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -720,7 +711,7 @@ public class TableActivity extends Activity {
 				if (popWnd.isShowing()) {
 					popWnd.dismiss();
 				} else {
-					popWnd.showAsDropDown(v, -24, 0);
+					popWnd.showAsDropDown(v, -34, 0);
 				}
 			}
 		});
@@ -732,9 +723,6 @@ public class TableActivity extends Activity {
 		AskTableDialog(final Table srcTable) {
 			super(TableActivity.this, R.style.FullHeightDialog);
 			setContentView(R.layout.alert);
-			//getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
-			
-			//((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).showSoftInput((EditText)findViewById(R.id.mycount), InputMethodManager.SHOW_FORCED);
 			TextView title = (TextView)findViewById(R.id.ordername);
 			title.setText("请输入需要更换的台号:");
 			

@@ -10,7 +10,7 @@
     <ListView
         android:id="@+id/popWndList"
         android:layout_width="182dp"
-        android:layout_height="192dp"
+        android:layout_height="236dp"
         android:layout_marginTop="16dp"
         android:cacheColorHint="@color/transparent"
         android:fadingEdge="none" >

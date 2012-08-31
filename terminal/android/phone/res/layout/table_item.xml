@@ -2,9 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-     android:descendantFocusability="blocksDescendants"
-     >
-
+    android:descendantFocusability="blocksDescendants" >
+
     <RelativeLayout
         android:id="@+id/table_item_layout"
         android:layout_width="fill_parent"
@@ -13,7 +12,7 @@
         android:layout_centerVertical="true"
         android:background="@drawable/table_item_selector"
         android:descendantFocusability="blocksDescendants" >
-
+
         <TextView
             android:id="@+id/table_id_text"
             android:layout_width="wrap_content"
@@ -25,7 +24,7 @@
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="@color/blue"
             android:textSize="24sp" />
-
+
         <TextView
             android:id="@+id/table_cnt_name"
             android:layout_width="wrap_content"
@@ -35,7 +34,7 @@
             android:text="人数："
             android:textColor="@color/dartgrey"
             android:textSize="16sp" />
-
+
         <TextView
             android:id="@+id/table_cnt"
             android:layout_width="wrap_content"
@@ -45,7 +44,7 @@
             android:text="TextView"
             android:textColor="@color/dartgrey"
             android:textSize="16sp" />
-
+
         <TextView
             android:id="@+id/table_name_text"
             android:layout_width="wrap_content"
@@ -57,7 +56,7 @@
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="@color/blue"
             android:textSize="24sp" />
-
+
         <TextView
             android:id="@+id/table_state_name"
             android:layout_width="wrap_content"
@@ -67,18 +66,9 @@
             android:layout_toRightOf="@+id/table_cnt"
             android:text="状态："
             android:textColor="@color/dartgrey"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/table_state"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_toRightOf="@+id/table_state_name"
-            android:text="TextView"
-            android:textColor="@color/dartgrey"
-            android:textSize="16sp" />
-
+            android:textSize="16sp"
+            android:visibility="visible" />
+
         <TextView
             android:id="@+id/textView1"
             android:layout_width="wrap_content"
@@ -89,9 +79,20 @@
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="@color/blue"
             android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/table_state"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/table_cnt"
+            android:layout_toRightOf="@+id/table_state_name"
+            android:text="TextView"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/dartgrey"
+            android:textSize="16sp" />
 
     </RelativeLayout>
-
+
     <ImageButton
         android:id="@+id/add_table"
         android:layout_width="wrap_content"
@@ -101,16 +102,16 @@
         android:background="@color/transparent"
         android:focusable="false"
         android:src="@drawable/table_add_btn_selector" />
-
-        <ImageButton
-            android:id="@+id/switch_table"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toLeftOf="@+id/add_table"
-            android:background="@color/transparent"
-            android:focusable="false"
-            android:src="@drawable/switch_table_selector"
-            android:visibility="gone" />
+
+    <ImageButton
+        android:id="@+id/switch_table"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@+id/add_table"
+        android:background="@color/transparent"
+        android:focusable="false"
+        android:src="@drawable/switch_table_selector"
+        android:visibility="gone" />
 
 </RelativeLayout>

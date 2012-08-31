@@ -8,40 +8,6 @@
     <include
         android:id="@+id/top"
         layout="@layout/topbar" />
-    <!--
-    <RelativeLayout
-        android:id="@+id/tasteHeader"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:background="@drawable/bg01" >
-
-        <ImageView
-            android:id="@+id/tasteback"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="20dip"
-            android:src="@drawable/back_selector" >
-        </ImageView>
-
-        <TextView
-            android:id="@+id/tasteTitleTxtView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:shadowDx="1"
-            android:shadowDy="1"
-            android:shadowRadius="3.0"
-            android:text="口味"
-            android:textColor="#FFFFFF"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:typeface="monospace" >
-        </TextView>
-    </RelativeLayout>
-    -->
 
     <RelativeLayout
         android:id="@+id/foodTaste"

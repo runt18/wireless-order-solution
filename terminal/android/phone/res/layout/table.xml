@@ -9,17 +9,20 @@
         layout="@layout/topbar" />
 
     <!--  -->
-<LinearLayout
-        android:focusable="true" android:focusableInTouchMode="true"
-        android:layout_width="0px" android:layout_height="0px"/>
+
+    <LinearLayout
+        android:layout_width="0px"
+        android:layout_height="0px"
+        android:focusable="true"
+        android:focusableInTouchMode="true" />
+
     <RelativeLayout
         android:id="@+id/search_table"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/top"
-         >
-
+        android:layout_below="@+id/top" >
+
         <AutoCompleteTextView
             android:id="@+id/search_view_table"
             android:layout_width="fill_parent"
@@ -32,7 +35,7 @@
             android:inputType="number|text"
             android:paddingLeft="6dp"
             android:paddingTop="2dp" />
-
+
         <ImageButton
             android:id="@+id/deleteBtn_table"
             android:layout_width="wrap_content"
@@ -43,9 +46,8 @@
             android:layout_marginTop="10dp"
             android:background="@color/transparent"
             android:src="@drawable/search_selector" />
-
     </RelativeLayout>
-
+
     <TextView
         android:id="@+id/hint_text_table"
         android:layout_width="wrap_content"
@@ -57,21 +59,19 @@
         android:textColor="@color/dartgrey"
         android:textSize="36sp"
         android:visibility="gone" />
- 
-         <com.wireless.ui.view.PullListView
-             android:id="@+id/listView_table"
-             android:layout_width="match_parent"
-             android:layout_height="wrap_content"
-             android:layout_above="@+id/arelativeLayout1"
-             android:layout_alignParentLeft="true"
-             android:layout_below="@+id/search_table"
-             android:cacheColorHint="@color/dartgrey"
-             android:fadingEdge="vertical"
-             android:fadingEdgeLength="2dp" >
 
-     </com.wireless.ui.view.PullListView>
-  
-    
+    <com.wireless.ui.view.PullListView
+        android:id="@+id/listView_table"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/arelativeLayout1"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/search_table"
+        android:cacheColorHint="@color/dartgrey"
+        android:fadingEdge="vertical"
+        android:fadingEdgeLength="2dp" >
+    </com.wireless.ui.view.PullListView>
+
     <RelativeLayout
         android:id="@+id/arelativeLayout1"
         android:layout_width="match_parent"
@@ -106,7 +106,7 @@
             android:layout_centerHorizontal="true"
             android:background="@color/transparent"
             android:src="@drawable/free_selector" />
-
+
         <TextView
             android:id="@+id/left_txt_bottom"
             android:layout_width="wrap_content"
@@ -151,7 +151,5 @@
             android:textColor="@color/white"
             android:visibility="gone" />
     </RelativeLayout>
-
- 
 
 </RelativeLayout>
