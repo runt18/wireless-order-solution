@@ -235,7 +235,7 @@ public class InsertOrder {
 						term.modelID + ", " + 
 						term.pin + 
 						", NOW(), " + 
-						orderToInsert.custom_num + ", '" + 
+						orderToInsert.customNum + ", '" + 
 						term.owner + "')";
 				dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 				//get the generated id to order 
@@ -253,7 +253,7 @@ public class InsertOrder {
 					sql = "UPDATE " + Params.dbName + ".table SET " +
 						  "status=" + Table.TABLE_BUSY + ", " +
 						  "category=" + orderToInsert.category + ", " +
-						  "custom_num=" + orderToInsert.custom_num +
+						  "custom_num=" + orderToInsert.customNum +
 						  " WHERE restaurant_id=" + term.restaurantID +
 						  " AND table_alias=" + orderToInsert.destTbl2.aliasID;
 					dbCon.stmt.executeUpdate(sql);
@@ -264,7 +264,7 @@ public class InsertOrder {
 				sql = "UPDATE " + Params.dbName + ".table SET " +
 					  "status=" + Table.TABLE_BUSY + ", " +
 					  "category=" + orderToInsert.category + ", " +
-					  "custom_num=" + orderToInsert.custom_num +
+					  "custom_num=" + orderToInsert.customNum +
 					  " WHERE restaurant_id=" + term.restaurantID + 
 					  " AND table_alias=" + orderToInsert.destTbl.aliasID;
 				dbCon.stmt.executeUpdate(sql);

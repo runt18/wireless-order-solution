@@ -56,6 +56,8 @@ public class QueryOrder {
 	 * 			  - QUERY_TODAY
 	 *            - QUERY_HISTORY
 	 * @return the order detail information
+	 * @throws BusinessException
+	 * 			   throws if the order to this id does NOT exist
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
@@ -114,6 +116,8 @@ public class QueryOrder {
 	 * 			  - QUERY_TODAY
 	 *            - QUERY_HISTORY
 	 * @return the order detail information
+	 * @throws BusinessException
+	 * 			   throws if the order to this id does NOT exist
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
@@ -131,10 +135,11 @@ public class QueryOrder {
 		/**
 		 * Get the related info to this order.
 		 */
-		String sql = "SELECT seq_id, custom_num, table_id, table_alias, table_name, table2_alias, table2_name, " +
-					 "region_id, region_name, restaurant_id, type, discount_type, category, is_paid FROM " + Params.dbName	+ 
-					 "." + orderTbl + " " +
-					 "WHERE id=" + orderID;
+		String sql = " SELECT " +
+					 " order_date, seq_id, custom_num, table_id, table_alias, table_name, table2_alias, table2_name, " +
+					 " region_id, region_name, restaurant_id, type, discount_type, category, is_paid " +
+					 " FROM " + Params.dbName + "." + orderTbl + 
+					 " WHERE id= " + orderID;
 
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
@@ -142,6 +147,7 @@ public class QueryOrder {
 
 		if(dbCon.rs.next()) {
 			orderInfo.seqID = dbCon.rs.getInt("seq_id");
+			orderInfo.orderDate = dbCon.rs.getTimestamp("order_date").getTime();
 			orderInfo.restaurantID = dbCon.rs.getInt("restaurant_id");
 			orderInfo.destTbl.tableID = dbCon.rs.getInt("table_id");
 			orderInfo.destTbl.aliasID = dbCon.rs.getInt("table_alias");
@@ -150,7 +156,7 @@ public class QueryOrder {
 			orderInfo.destTbl2.name = dbCon.rs.getString("table2_name");
 			orderInfo.region.regionID = dbCon.rs.getShort("region_id");
 			orderInfo.region.name = dbCon.rs.getString("region_name");
-			orderInfo.custom_num = dbCon.rs.getShort("custom_num");
+			orderInfo.customNum = dbCon.rs.getShort("custom_num");
 			orderInfo.category = dbCon.rs.getShort("category");
 			orderInfo.pay_manner = dbCon.rs.getShort("type");
 			orderInfo.discount_type = dbCon.rs.getShort("discount_type");
@@ -163,10 +169,13 @@ public class QueryOrder {
 		/**
 		 * Get the total and actual price if the order has been paid
 		 */
-		sql = "SELECT total_price, total_price_2 FROM " + Params.dbName +
-			   "." + orderTbl + 
-			   " WHERE id=" + orderID +
-			   " AND total_price IS NOT NULL";
+		sql = " SELECT " +
+			  " total_price, total_price_2 " +
+			  " FROM " + Params.dbName + "." + orderTbl + 
+			  " WHERE " +
+			  " id= " + orderID +
+			  " AND " +
+			  " total_price IS NOT NULL ";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			orderInfo.setTotalPrice(dbCon.rs.getFloat("total_price"));
@@ -177,9 +186,13 @@ public class QueryOrder {
 		/**
 		 * Get the minimum cost
 		 */
-		sql = "SELECT minimum_cost FROM " + Params.dbName +	
-			  ".table WHERE restaurant_id=" + orderInfo.restaurantID +
-			  " AND table_alias=" + orderInfo.destTbl.aliasID;
+		sql = " SELECT " +
+			  " minimum_cost " +
+			  " FROM " + Params.dbName + ".table " +
+			  " WHERE " +
+			  " restaurant_id= " + orderInfo.restaurantID +
+			  " AND " +
+			  " table_alias= " + orderInfo.destTbl.aliasID;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			//orderInfo.minimum_cost = new Float(dbCon.rs.getFloat("minimum_cost") * 100).intValue();

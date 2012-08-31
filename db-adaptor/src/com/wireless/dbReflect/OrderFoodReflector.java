@@ -45,7 +45,7 @@ public class OrderFoodReflector {
 				+ " MAX(A.dept_id) AS dept_id, MAX(A.id) AS id, SUM(A.order_count) AS order_sum, "
 				+ " MAX(B.type) AS type, MAX(B.table_id) AS table_id, MAX(B.table_alias) AS table_alias, "
 				+ " MAX(B.region_id) AS region_id, MAX(B.table_name) AS table_name, MAX(B.region_name) AS region_name, "
-				+ " MAX(A.order_date) AS pay_datetime, date_format(MAX(A.order_date), '%Y-%m-%d') AS pay_date, "
+				+ " MAX(A.order_date) AS pay_datetime, "
 				+ " MAX(A.taste_tmp) AS taste_tmp, MAX(A.taste_tmp_price) AS taste_tmp_price "
 				+ " FROM " 
 				+ Params.dbName
@@ -132,7 +132,7 @@ public class OrderFoodReflector {
 				+ " MAX(A.taste_tmp) AS taste_tmp, MAX(A.taste_tmp_price) AS taste_tmp_price, "
 				+ " MAX(B.type) AS type, MAX(B.table_id) AS table_id, MAX(B.table_alias) AS table_alias, "
 				+ " MAX(B.region_id) AS region_id, MAX(B.table_name) AS table_name, MAX(B.region_name) AS region_name, "
-				+ " MAX(B.order_date) AS pay_datetime, date_format(MAX(B.order_date), '%Y-%m-%d') AS pay_date "
+				+ " MAX(B.order_date) AS pay_datetime "
 				+ " FROM " 
 				+ Params.dbName
 				+ ".order_food_history A, "
