@@ -77,7 +77,7 @@ public class PayOrderScreen extends MainScreen
 		});
 		
 		HorizontalFieldManager hfm = new HorizontalFieldManager(Field.USE_ALL_WIDTH);
-		_customNum = new LabelField("人数：" + Integer.toString(_bill.custom_num));
+		_customNum = new LabelField("人数：" + Integer.toString(_bill.customNum));
 		hfm.add(_customNum);
 		
 		if(Util.float2Int(bill.getMinimumCost()) != 0){

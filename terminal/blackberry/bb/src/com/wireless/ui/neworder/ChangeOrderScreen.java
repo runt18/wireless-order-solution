@@ -113,7 +113,7 @@ public class ChangeOrderScreen extends MainScreen implements PostSubmitOrder{
 			vfm.add(_tableEdt);			
 		}
 
-		_customNumEdt = new EditField("人数：", Integer.toString(_originalOrder.custom_num), 2,
+		_customNumEdt = new EditField("人数：", Integer.toString(_originalOrder.customNum), 2,
 								   TextField.NO_NEWLINE | EditField.FILTER_NUMERIC) {
 			protected boolean navigationClick(int status, int time) {
 				return true;

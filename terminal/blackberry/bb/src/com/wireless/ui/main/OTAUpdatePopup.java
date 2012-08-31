@@ -1,7 +1,5 @@
 package com.wireless.ui.main;
 
-import com.wireless.util.IOTAUpdate;
-import com.wireless.util.OTAUpdate;
 import net.rim.blackberry.api.browser.Browser;
 import net.rim.blackberry.api.browser.BrowserSession;
 import net.rim.device.api.ui.UiApplication;
@@ -9,6 +7,9 @@ import net.rim.device.api.ui.component.Dialog;
 import net.rim.device.api.ui.component.LabelField;
 import net.rim.device.api.ui.container.PopupScreen;
 import net.rim.device.api.ui.container.VerticalFieldManager;
+
+import com.wireless.util.IOTAUpdate;
+import com.wireless.util.OTAUpdate;
 
 public class OTAUpdatePopup extends PopupScreen implements IOTAUpdate{
 

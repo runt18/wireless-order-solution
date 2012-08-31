@@ -12,9 +12,7 @@ import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqInsertOrder;
-import com.wireless.protocol.Reserved;
 import com.wireless.protocol.Type;
-import com.wireless.terminal.Params;
 import com.wireless.util.ServerConnector;
 
 class SubmitChangePopup extends PopupScreen{
@@ -37,20 +35,8 @@ class SubmitChangePopup extends PopupScreen{
 			new Thread(){
 				public void run(){
 					try{
-						short printType = Reserved.DEFAULT_CONF;
-						//check if the print sync or async
-						int tmp = Integer.parseInt((String)Params.getParam(Params.PRINT_ACTION));
-						if(tmp == Params.PRINT_SYNC){
-							printType |= Reserved.PRINT_SYNC;
-						}
-						printType |= Reserved.PRINT_EXTRA_FOOD_2;
-						printType |= Reserved.PRINT_CANCELLED_FOOD_2;
-						printType |= Reserved.PRINT_TRANSFER_TABLE_2;
-						printType |= Reserved.PRINT_ALL_EXTRA_FOOD_2;
-						printType |= Reserved.PRINT_ALL_CANCELLED_FOOD_2;
-						printType |= Reserved.PRINT_ALL_HURRIED_FOOD_2;
 						//Update the current order normally
-						ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(_reqOrder, Type.UPDATE_ORDER, printType));
+						ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(_reqOrder, Type.UPDATE_ORDER));
 						if(resp.header.type == Type.ACK){
 							UiApplication.getUiApplication().invokeLater(new Runnable(){
 								public void run(){

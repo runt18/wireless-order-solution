@@ -19,7 +19,7 @@ import net.rim.device.api.ui.container.VerticalFieldManager;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.ProtocolPackage;
-import com.wireless.protocol.RespParser;
+import com.wireless.protocol.RespQueryOrderParser;
 import com.wireless.protocol.Type;
 import com.wireless.terminal.WirelessOrder;
 import com.wireless.ui.neworder.ChangeOrderScreen;
@@ -87,7 +87,7 @@ class UpdateOrderPopup extends PopupScreen implements FieldChangeListener, IPost
 
 	public void postQueryOrder(ProtocolPackage response) {
 		if (response.header.type == Type.ACK) {
-			Order _order = RespParser.parseQueryOrder(response, WirelessOrder.foodMenu);
+			Order _order = RespQueryOrderParser.parse(response, WirelessOrder.foodMenu);
 			UiApplication.getUiApplication().pushScreen(new ChangeOrderScreen(_order));
 		} else {
 			if (response.header.reserved == ErrorCode.TABLE_IDLE) {
