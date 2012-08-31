@@ -17,7 +17,6 @@ import com.wireless.protocol.PinGen;
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqInsertOrder;
 import com.wireless.protocol.ReqPackage;
-import com.wireless.protocol.Reserved;
 import com.wireless.protocol.Terminal;
 import com.wireless.protocol.Type;
 import com.wireless.sccon.ServerConnector;
@@ -87,14 +86,13 @@ public class InsertOrderAction extends Action implements PinGen {
 				orderToInsert.destTbl2.aliasID = Integer.parseInt(table2ID);
 			}			
 			orderToInsert.category = Short.parseShort(request.getParameter("category"));
-			orderToInsert.custom_num = Integer.parseInt(request.getParameter("customNum"));
+			orderToInsert.customNum = Integer.parseInt(request.getParameter("customNum"));
 			int type = Integer.parseInt(request.getParameter("type"));
 			String orderType = null;
-			short printType = Reserved.DEFAULT_CONF;
+
 			if(type == 1){
 				orderType = "下单";
 				orderToInsert.srcTbl.aliasID = tableAlias;				
-				printType = Reserved.PRINT_ORDER_2 | Reserved.PRINT_ORDER_DETAIL_2;
 			}else{
 				orderType = "改单";
 				String oriTableID = request.getParameter("originalTableID");
@@ -103,18 +101,13 @@ public class InsertOrderAction extends Action implements PinGen {
 				}else{
 					orderToInsert.srcTbl.aliasID = Integer.parseInt(oriTableID);
 				}
-				printType |= Reserved.PRINT_EXTRA_FOOD_2 | 
-							 Reserved.PRINT_CANCELLED_FOOD_2 | 
-							 Reserved.PRINT_TRANSFER_TABLE_2 |
-						     Reserved.PRINT_ALL_CANCELLED_FOOD_2 | 
-						     Reserved.PRINT_ALL_EXTRA_FOOD_2;
+
 			}
 			orderToInsert.foods = Util.toFoodArray(request.getParameter("foods"));
 			
 			ReqPackage.setGen(this);
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(orderToInsert, 
-																					 (type == 1) ? Type.INSERT_ORDER : Type.UPDATE_ORDER, 
-																					 printType));
+																					 (type == 1) ? Type.INSERT_ORDER : Type.UPDATE_ORDER));
 			
 		
 			if(resp.header.type == Type.ACK){
