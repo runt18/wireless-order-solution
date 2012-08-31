@@ -30,7 +30,10 @@ import com.wireless.protocol.Department;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Mode;
 import com.wireless.protocol.Order;
+import com.wireless.protocol.OrderDiff.DiffResult;
+import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.ProtocolPackage;
+import com.wireless.protocol.ReqInsertOrderParser;
 import com.wireless.protocol.ReqParser;
 import com.wireless.protocol.ReqPrintOrder2;
 import com.wireless.protocol.Reserved;
@@ -173,76 +176,51 @@ class OrderHandler extends Handler implements Runnable{
 				//handle insert order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.INSERT_ORDER){
 
-				Order orderToInsert = ReqParser.parseInsertOrder(request);	
+				Order orderToInsert = ReqInsertOrderParser.parse(request);	
 				PrintHandler.PrintParam printParam = new PrintHandler.PrintParam();
 				printParam.orderInfo = InsertOrder.exec(_term, orderToInsert);
-				printOrder(orderToInsert.print_type, printParam);
+				printOrder(Reserved.PRINT_ORDER_2 | Reserved.PRINT_ORDER_DETAIL_2, printParam);
 				response = new RespACK(request.header);
 
 				//handle update order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.UPDATE_ORDER){
-				Order orderToUpdate = ReqParser.parseInsertOrder(request);
-				UpdateOrder.Result result = UpdateOrder.exec(_term, orderToUpdate);				
+				
+				DiffResult result = UpdateOrder.exec(_term, ReqInsertOrderParser.parse(request));
 				
 				PrintHandler.PrintParam printParam = new PrintHandler.PrintParam();
-				short printConf = Reserved.DEFAULT_CONF;			
 				
-				int conf = orderToUpdate.print_type;
+				short printConf = Reserved.DEFAULT_CONF;				
 				
 				//perform to print if hurried foods exist
-				if(result.hurriedOrder != null){
-					if((conf & Reserved.PRINT_SYNC) != 0){
-						printConf |= Reserved.PRINT_SYNC;
-					}
-					if((conf & Reserved.PRINT_ALL_HURRIED_FOOD_2) != 0){
-						printConf |= Reserved.PRINT_ALL_HURRIED_FOOD_2 | Reserved.PRINT_HURRIED_FOOD_2;
-					}
-					printParam.orderInfo = result.hurriedOrder;
+				if(!result.hurriedFoods.isEmpty()){
+					printConf = Reserved.PRINT_SYNC | Reserved.PRINT_ALL_HURRIED_FOOD_2 | Reserved.PRINT_HURRIED_FOOD_2;
+					printParam.orderInfo = result.newOrder;
+					printParam.orderInfo.foods = result.hurriedFoods.toArray(new OrderFood[result.hurriedFoods.size()]);
 					printOrder(printConf, printParam);					
 				}
 				
 				//perform to print if extra foods exist
-				if(result.extraOrder != null){
-					printConf = Reserved.DEFAULT_CONF;
-					if((conf & Reserved.PRINT_SYNC) != 0){
-						printConf |= Reserved.PRINT_SYNC;
-					}
-					if((conf & Reserved.PRINT_EXTRA_FOOD_2) != 0){
-						printConf |= Reserved.PRINT_EXTRA_FOOD_2;
-					}
-					if((conf & Reserved.PRINT_ALL_EXTRA_FOOD_2) != 0){
-						printConf |= Reserved.PRINT_ALL_EXTRA_FOOD_2;
-					}
-					printParam.orderInfo = result.extraOrder;
+				if(!result.extraFoods.isEmpty()){
+					printConf = Reserved.PRINT_SYNC | Reserved.PRINT_EXTRA_FOOD_2 | Reserved.PRINT_ALL_EXTRA_FOOD_2;
+					printParam.orderInfo = result.newOrder;
+					printParam.orderInfo.foods = result.extraFoods.toArray(new OrderFood[result.extraFoods.size()]);
 					printOrder(printConf, printParam);
 				}
 					
 				//perform to print if canceled foods exist
-				if(result.canceledOrder != null){
-					printConf = Reserved.DEFAULT_CONF;
-					if((conf & Reserved.PRINT_SYNC) != 0){
-						printConf |= Reserved.PRINT_SYNC;
-					}
-					if((conf & Reserved.PRINT_CANCELLED_FOOD_2) != 0){
-						printConf |= Reserved.PRINT_CANCELLED_FOOD_2;
-					}
-					if((conf & Reserved.PRINT_ALL_CANCELLED_FOOD_2) != 0){
-						printConf |= Reserved.PRINT_ALL_CANCELLED_FOOD_2;
-					}
-					printParam.orderInfo = result.canceledOrder;
+				if(!result.cancelledFoods.isEmpty()){
+					printConf = Reserved.PRINT_SYNC | Reserved.PRINT_CANCELLED_FOOD_2 | Reserved.PRINT_ALL_CANCELLED_FOOD_2;
+					printParam.orderInfo = result.newOrder;
+					printParam.orderInfo.foods = result.cancelledFoods.toArray(new OrderFood[result.cancelledFoods.size()]);
 					printOrder(printConf, printParam);
 				}
 				
 				//print the table transfer
-				printConf = Reserved.DEFAULT_CONF;
-				if((conf & Reserved.PRINT_SYNC) != 0){
-					printConf |= Reserved.PRINT_SYNC;
+				if(!result.newOrder.srcTbl.equals(result.newOrder.destTbl)){
+					printConf = Reserved.PRINT_SYNC | Reserved.PRINT_TRANSFER_TABLE_2;
+					printParam.orderInfo = result.newOrder;
+					printOrder(printConf, printParam);
 				}
-				if((conf & Reserved.PRINT_TRANSFER_TABLE_2) != 0){
-					printConf |= Reserved.PRINT_TRANSFER_TABLE_2;
-				}
-				printParam.orderInfo = orderToUpdate;
-				printOrder(printConf, printParam);
 				
 				response = new RespACK(request.header);
 
@@ -251,7 +229,7 @@ class OrderHandler extends Handler implements Runnable{
 				Table[] tbl = ReqParser.parseTransTbl(request);
 				TransTblDao.exec(_term, tbl[0], tbl[1]);
 				response = new RespACK(request.header);
-				//TODO
+				
 				PrintHandler.PrintParam printParam = new PrintHandler.PrintParam();
 				printParam.orderInfo.srcTbl.aliasID = tbl[0].aliasID;
 				printParam.orderInfo.destTbl.aliasID = tbl[1].aliasID;

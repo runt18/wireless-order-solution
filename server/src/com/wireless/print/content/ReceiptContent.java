@@ -87,7 +87,7 @@ public class ReceiptContent extends ConcreteContent {
 		//replace the "$(var_5)"
 		_template = _template.replace(PVar.VAR_5, 
 							new Grid2ItemsContent("餐台：" + _order.destTbl.aliasID, 
-												  "人数：" + _order.custom_num, 
+												  "人数：" + _order.customNum, 
 												  _printType, 
 												  _style).toString());
 		
