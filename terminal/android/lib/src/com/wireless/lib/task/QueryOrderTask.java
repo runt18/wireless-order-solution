@@ -9,7 +9,7 @@ import com.wireless.protocol.FoodMenu;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqQueryOrder;
-import com.wireless.protocol.RespParser;
+import com.wireless.protocol.RespQueryOrderParser;
 import com.wireless.protocol.Type;
 import com.wireless.sccon.ServerConnector;
 
@@ -30,7 +30,7 @@ public class QueryOrderTask extends AsyncTask<FoodMenu, Void, Order>{
 			//根据tableID请求数据
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryOrder(mTblAlias));
 			if(resp.header.type == Type.ACK){
-				order = RespParser.parseQueryOrder(resp, foodMenu[0]);
+				order = RespQueryOrderParser.parse(resp, foodMenu[0]);
 				
 			}else{
 				if(resp.header.reserved == ErrorCode.TABLE_IDLE) {

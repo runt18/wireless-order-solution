@@ -25,7 +25,7 @@ public class OrderParcel extends Order implements Parcelable{
 		destTbl2 = new TableParcel(order.destTbl2);
 		srcTbl = new TableParcel(order.srcTbl);
 
-		custom_num = order.custom_num;
+		customNum = order.customNum;
 		memberID = order.memberID == null ? null : new String(order.memberID);
 		comment = order.comment == null ? null : new String(order.comment);
 		print_type = order.print_type;
@@ -51,7 +51,7 @@ public class OrderParcel extends Order implements Parcelable{
 		destTbl = new TableParcel(in);
 		destTbl2 = new TableParcel(in);
 		srcTbl = new TableParcel(in);
-		custom_num = in.readInt();
+		customNum = in.readInt();
 		String memberID = in.readString();
 		this.memberID = memberID.equals("") ? null : memberID;
 		String comment = in.readString();
@@ -95,7 +95,7 @@ public class OrderParcel extends Order implements Parcelable{
 		new TableParcel(destTbl).writeToParcel(parcel, flags);
 		new TableParcel(destTbl2).writeToParcel(parcel, flags);
 		new TableParcel(srcTbl).writeToParcel(parcel, flags);
-		parcel.writeInt(custom_num);
+		parcel.writeInt(customNum);
 		parcel.writeString(memberID == null ? "" : memberID);
 		parcel.writeString(comment == null ? "" : comment);
 		parcel.writeInt(print_type);
