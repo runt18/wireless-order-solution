@@ -372,7 +372,9 @@
 		<action path="/QuerySystemSetting" 
 			type="com.wireless.Actions.system.QuerySystemSettingAction" scope="request"></action>
 		<action path="/UpdatePriceTail" 
-			type="com.wireless.Actions.system.UpdatePriceTailAction" scope="request"></action>	
+			type="com.wireless.Actions.system.UpdatePriceTailAction" scope="request"></action>
+		<action path="/ImageFileUpload"
+			type="com.wireless.Actions.menuMgr.ImageFileUploadAction" scope="request"></action>
 	</action-mappings>
 	
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />

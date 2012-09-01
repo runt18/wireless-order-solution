@@ -25,7 +25,7 @@
 		</init-param>
 		<init-param>
 			<param-name>db_host</param-name>
-			<param-value>192.168.189.128</param-value>
+			<param-value>127.0.0.1</param-value>
 		</init-param>
 		<init-param>
 			<param-name>db_port</param-name>
@@ -37,7 +37,7 @@
 		</init-param>
 		<init-param>
 			<param-name>db_pwd</param-name>
-			<param-value>HelloZ315</param-value>
+			<param-value>root</param-value>
 		</init-param>
 		<!-- Below is the configuration parameters to socket -->
 		<init-param>
@@ -47,6 +47,26 @@
 		<init-param>
 			<param-name>socket_port</param-name>
 			<param-value>55555</param-value>
+		</init-param>
+		<init-param>
+			<param-name>imageBrowseDefaultFile</param-name>
+			<param-value>http://192.168.1.63:8080/WirelessOrderWeb/images/nophoto.jpg</param-value>
+		</init-param>
+		<init-param>
+			<param-name>imageBrowsePath</param-name>
+			<param-value>http://192.168.1.63:8080/WirelessOrderWeb/images/upload</param-value>
+		</init-param>
+		<init-param>
+			<param-name>imageUploadPath</param-name>
+			<param-value>F:\JavaDemo\.metadata\.plugins\org.eclipse.wst.server.core\tmp0\wtpwebapps\WirelessOrderWeb\images\upload</param-value>
+		</init-param>
+		<init-param>
+			<param-name>imageUploadMaxSize</param-name>
+			<param-value>300</param-value>
+		</init-param>
+		<init-param>
+			<param-name>imageUploadType</param-name>
+			<param-value>jpg,gif,png,bmp</param-value>
 		</init-param>
 		<load-on-startup>0</load-on-startup>
 	</servlet>
