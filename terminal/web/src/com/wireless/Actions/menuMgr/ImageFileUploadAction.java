@@ -1,0 +1,245 @@
+package com.wireless.Actions.menuMgr;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.MessageDigest;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import net.sf.json.JSONObject;
+
+import org.apache.struts.action.Action;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+
+import com.oreilly.servlet.multipart.FilePart;
+import com.oreilly.servlet.multipart.MultipartParser;
+import com.oreilly.servlet.multipart.Part;
+import com.wireless.db.menuMgr.FoodBasicDao;
+import com.wireless.pojo.menuMgr.FoodBasic;
+import com.wireless.util.JObject;
+import com.wireless.util.WebParams;
+
+@SuppressWarnings({"unused"})
+public class ImageFileUploadAction extends Action{
+	
+	@SuppressWarnings("unchecked")
+	public ActionForward execute(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {	
+		
+		response.setCharacterEncoding("UTF-8");
+		
+		JObject jobject = new JObject();
+		
+		try{
+//			System.out.println("--------------------------------------------------");
+			
+			String restaurantID = request.getParameter("restaurantID");
+			String foodID = request.getParameter("foodID");
+			
+			try{
+				Integer.parseInt(restaurantID);
+				Integer.parseInt(foodID);
+			}catch(Exception e){
+				jobject.initTip(false, "操作失败,获取餐厅信息或菜品信息失败.");
+				return null;
+			}
+			
+			FoodBasic fb = new FoodBasic();
+			fb.setRestaurantID(Integer.parseInt(restaurantID));
+			fb.setFoodID(Integer.parseInt(foodID));
+			
+			// 获取菜品原图信息,用于更新图片成功之后删除原文件,否则保留原文件
+			fb = FoodBasicDao.getFoodBasicImage(fb);
+			String oldName = fb.getImg();
+			
+			// 获取图片操作路径
+			String imageUploadPath = this.getServlet().getInitParameter("imageUploadPath");
+			
+			File actualImageFile = new File(imageUploadPath + File.separator + restaurantID);
+			
+			// 创建存放图片的新路径(物理路径)
+			if(!actualImageFile.exists()){
+				actualImageFile.mkdirs();
+//				System.out.println("操作成功,已自动创建生产环境新文件夹.");
+//				System.out.println("生产环境文件夹路径: " + actualImageFile);
+			}
+			
+			// 上传图片最大尺寸,单位:KB
+			int imgMaxSize = Integer.valueOf(this.getServlet().getInitParameter("imageUploadMaxSize"));
+			String[] imgType = this.getServlet().getInitParameter("imageUploadType").split(",");
+			String encoding = "UTF-8";
+			
+			MultipartParser parser = null;
+			try{
+				parser = new MultipartParser(request, (imgMaxSize * 1024), true, true, encoding);
+			}catch(Exception e){
+				jobject.initTip(false, "操作失败,请检查图片大小是否超过<" + imgMaxSize + "KB>或图片内容是否可用.");
+				return null;
+			}
+			Part part1;
+			while((part1 = parser.readNextPart()) != null) 
+	        {
+	            if(part1.isFile())
+	            {
+	                FilePart filePart = (FilePart)part1;
+	                String fileName = filePart.getFileName();
+	                if(fileName != null)
+	                {
+	                	// 过滤图片类型
+	                	int index = fileName.lastIndexOf(".");
+	                	String type = fileName.substring(index + 1, fileName.length());
+	                	boolean cs = false;
+	                	for(String temp : imgType){
+	                		if(temp.toLowerCase().equals(type.toLowerCase())){
+	                			cs = true;
+	                			break;
+	                		}
+	                	}
+	                	if(!cs){
+	                		jobject.initTip(false, "操作失败,读取上传图片信息失败!");
+	                		return null;
+	                	}
+	                	
+	                	// 生成新文件名
+	                	String date = new SimpleDateFormat("yyyyMMddHHmmss").format(Calendar.getInstance().getTime());
+	                	String newFileName = "";
+	                	
+	                	newFileName = foodID + date;   // 新文件前缀部分,需要格式化
+	                	
+	                	MessageDigest md = MessageDigest.getInstance("MD5");
+	                	md.update(newFileName.getBytes(encoding));
+	                	
+	                	StringBuffer sb = new StringBuffer();
+	                	byte[] byteArray = md.digest();
+	                	int bi = 0;
+	                	for(int offset = 0; offset < byteArray.length; offset++){
+	                		bi = byteArray[offset];
+	                		if(bi < 0)
+	                			bi += 256;
+	                		if(bi < 16)
+	                			sb.append("0");
+	                		sb.append(Integer.toHexString(bi));
+	                	}
+	                	
+	                	newFileName = sb.toString().substring(8,24) + "." + type.toLowerCase();  // 组合新文件名,统一文件后缀为小写
+	                	
+	                	// 生成新图片相关信息
+	                	String op = actualImageFile.getPath() + File.separator + fileName;
+	                	String ap = actualImageFile.getPath() + File.separator + newFileName;
+	                	
+	                	try{
+	                		// 还原原始图片
+	                		filePart.writeTo(actualImageFile);
+	                		jobject.initTip(true, "操作成功,读取上传图片信息成功!");
+	                	}catch(Exception e){
+	                		jobject.initTip(false, "操作失败,读取上传图片信息失败!");
+	                		deleteImage(op);
+	                		e.printStackTrace();
+	                		return null;
+	                	}
+	                    try{
+	                    	copyImage(op, ap);
+	                    }catch(Exception e){
+	                    	jobject.initTip(false, "操作失败,复制上传文件至生产环境目录失败!");
+	                    	deleteImage(op);
+	                    	deleteImage(ap);
+	                    	e.printStackTrace();
+	                    	return null;
+	                    }	                  
+	                    
+	                    // 删除原始上传文件
+	                    actualImageFile = new File(op);
+	                    actualImageFile.delete();
+	                    
+	                    // 更新菜品数据库信息 
+	                    try{
+	                    	FoodBasicDao.updateFoodImageName(Integer.parseInt(restaurantID), Integer.parseInt(foodID), newFileName);
+	                    }catch(Exception e){
+	                    	jobject.initTip(false, "操作失败,更新编号为 " + foodID + " 的菜品图片信息失败!");
+	                    	deleteImage(op);
+	                    	deleteImage(ap);
+	                    	e.printStackTrace();
+	                    	return null;
+	                    }
+	                    fb.setImg(this.getServlet().getInitParameter("imageBrowsePath") + "/" + fb.getRestaurantID() + "/" + newFileName);
+	                    jobject.getRoot().add(fb);
+	                    
+	                    // 新文件操作成功后删除原图片
+	        			deleteImage(imageUploadPath + File.separator + restaurantID + File.separator + oldName);
+	                    
+	                }else{
+	                	fb.setImg(this.getServlet().getInitParameter("imageBrowseDefaultFile"));
+		                jobject.getRoot().add(fb);
+	                	
+	                	FoodBasicDao.updateFoodImageName(Integer.parseInt(restaurantID), Integer.parseInt(foodID), null);
+	                	deleteImage(imageUploadPath + File.separator + restaurantID + File.separator + oldName);
+	                }
+	            }
+	        }
+			
+			jobject.initTip(true, "操作成功,已更新菜品图片信息成功!");
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 更新菜品图片信息失败!");
+		}finally{
+			JSONObject josn = JSONObject.fromObject(jobject);
+			response.getWriter().print(josn.toString());
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * operation
+	 * @param op
+	 * @param np
+	 * @throws Exception
+	 */
+	private void copyImage(String op, String np) throws Exception{
+		if(op == null || np == null || op.trim().length() == 0 || np.trim().length() == 0)
+			throw new Exception();
+		
+		FileInputStream inStream = null;
+        FileOutputStream outStream = null;
+        
+    	try{
+    		inStream = new FileInputStream(op);
+    		outStream = new FileOutputStream(np);
+    		int byteread = 0;
+            byte[] buffer = new byte[8192];
+        	while ((byteread = inStream.read(buffer)) != -1){  
+        		outStream.write(buffer,  0,  byteread);  
+        	}
+    	}catch(Exception e){
+    		throw e;
+    	}finally{
+    		if(outStream != null){
+        		outStream.flush();
+        		outStream.close();	                    		
+        	}
+        	if(inStream != null)
+        		inStream.close();
+    	}
+	}
+	
+	/**
+	 * 
+	 * @param path
+	 */
+	private void deleteImage(String path){
+		File temp = new File(path);
+		if(temp.exists()){
+			temp.delete();
+		}
+	}
+}

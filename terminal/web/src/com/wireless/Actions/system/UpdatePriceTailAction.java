@@ -35,14 +35,14 @@ public class UpdatePriceTailAction extends Action{
 			}
 			
 			if( priceTail == null ||  priceTail.trim().length() == 0){
-				jobject.initTip(false, "操作失败,获取金额尾数处理方式失败.");
+				jobject.initTip(false, "操作失败,获取收款金额尾数处理方式失败.");
 				return null;
 			}
 			set = new SystemSetting();
 			set.setPriceTail(Integer.parseInt(priceTail));
 			set.setId(Integer.parseInt(restaurantID));
 			SystemDao.updatePriceTail(set);
-			jobject.initTip(true, "操作成功,已修改金额尾数处理方式.");
+			jobject.initTip(true, "操作成功,已修改收款金额尾数处理方式.");
 			
 		} catch(Exception e){
 			e.printStackTrace();

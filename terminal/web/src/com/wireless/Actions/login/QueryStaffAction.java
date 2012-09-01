@@ -53,8 +53,7 @@ public class QueryStaffAction extends Action {
 			response.setContentType("text/json; charset=utf-8");
 			out = response.getWriter();
 
-			int restaurantID = Integer.parseInt(request
-					.getParameter("restaurantID"));
+			int restaurantID = Integer.parseInt(request.getParameter("restaurantID"));
 
 			// get the type to filter
 			int type = Integer.parseInt(request.getParameter("type"));
@@ -96,8 +95,7 @@ public class QueryStaffAction extends Action {
 				filterCondition = "";
 			}
 
-			StaffTerminal[] staffTerminals = QueryStaffTerminal.exec(
-					restaurantID, filterCondition, "");
+			StaffTerminal[] staffTerminals = QueryStaffTerminal.exec(restaurantID, filterCondition, " order by staff_alias ");
 
 			// if (staffs.length != 0) {
 			for (int i = 0; i < staffTerminals.length; i++) {
@@ -113,6 +111,8 @@ public class QueryStaffAction extends Action {
 				resultMap.put("quotaOrig", staffTerminals[i].getGiftQuota());
 				resultMap.put("staffQuota", staffTerminals[i].getGiftQuota());
 				resultMap.put("pin", staffTerminals[i].pin);
+				resultMap.put("type", staffTerminals[i].type);
+				
 				if (staffTerminals[i].getGiftQuota() < 0) {
 					resultMap.put("noLimit", true);
 				} else {
@@ -160,12 +160,10 @@ public class QueryStaffAction extends Action {
 
 						outString = outString
 								+ "{staffID:"
-								+ ((HashMap) (resultList.get(i)))
-										.get("staffID").toString() + ",";
+								+ ((HashMap) (resultList.get(i))).get("staffID").toString() + ",";
 						outString = outString
 								+ "staffName:'"
-								+ ((HashMap) (resultList.get(i))).get(
-										"staffName").toString() + "'},";
+								+ ((HashMap) (resultList.get(i))).get("staffName").toString() + "'},";
 
 					}
 					outString = outString.substring(0, outString.length() - 1);
@@ -194,8 +192,7 @@ public class QueryStaffAction extends Action {
 
 			JSONObject obj = JSONObject.fromObject(rootMap, jsonConfig);
 
-			String outputJson = "{\"totalProperty\":" + resultList.size() + ","
-					+ obj.toString().substring(1);
+			String outputJson = "{\"totalProperty\":" + resultList.size() + "," + obj.toString().substring(1);
 
 			if (isCombo.equals("true")) {
 				// System.out.println(outString);

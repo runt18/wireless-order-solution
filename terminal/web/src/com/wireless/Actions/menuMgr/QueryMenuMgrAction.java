@@ -1,5 +1,6 @@
 package com.wireless.Actions.menuMgr;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -77,9 +78,15 @@ public class QueryMenuMgrAction extends Action {
 			 */
 
 			String pin = request.getParameter("pin");
-
+			
+			String paramsType = request.getParameter("type");
+			
+			if(paramsType == null || paramsType.trim().length() == 0){
+				return null;
+			}
+			
 			// get the type to filter
-			int type = Integer.parseInt(request.getParameter("type"));
+			int type = Integer.parseInt(paramsType);
 
 			// get the operator to filter
 			String ope = request.getParameter("ope");
@@ -134,6 +141,9 @@ public class QueryMenuMgrAction extends Action {
 			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF);
 			foods = QueryMenu.queryPureFoods(filterCondition + " AND FOOD.restaurant_id=" + term.restaurantID, orderClause);
 			
+			String imageBrowseDefaultFile = this.getServlet().getInitParameter("imageBrowseDefaultFile");
+			String imageBrowsePath = this.getServlet().getInitParameter("imageBrowsePath");
+			
 			for(int i= 0; i < foods.length; i++){
 				Food tp = foods[i];
 				item = new FoodBasic();
@@ -149,8 +159,7 @@ public class QueryMenuMgrAction extends Action {
 				item.setStatus((byte)tp.status);
 				item.setTasteRefType(tp.tasteRefType);
 				item.setDesc(tp.desc);
-				item.setImg(tp.image);
-				
+				item.setImg(tp.image == null || tp.image.trim().length() == 0 ? imageBrowseDefaultFile : (imageBrowsePath + "/" + tp.restaurantID + "/" + tp.image));
 				list.add(item);
 			}
 
