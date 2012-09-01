@@ -71,7 +71,7 @@ Ext.grid.CheckColumn = function(config) {
 Ext.grid.CheckColumn.prototype = {
 	init : function(grid) {
 		this.grid = grid;
-		this.grid.on('render', function() {
+		this.grid.on('render', function(){
 			var view = this.grid.getView();
 			view.mainBody.on('mousedown', this.onMouseDown, this);
 		}, this);

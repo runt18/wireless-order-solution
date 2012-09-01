@@ -62,9 +62,10 @@
 						items : [
 								{
 									region : "north",
-									html : "<div style='padding:10px; background-color:#A9D0F5'><h4 style='font-size:150%'>无线点餐网页终端<h4></div>",
+									html : "<div style='padding:10px; background-color:#DFE8F6;'><h4 style='font-size:150%'>无线点餐网页终端<h4></div>",
 									height : 50,
-									margins : '0 0 5 0'
+									border : false,
+									margins : '0 0 0 0'
 								},
 								centerPanel,
 								{

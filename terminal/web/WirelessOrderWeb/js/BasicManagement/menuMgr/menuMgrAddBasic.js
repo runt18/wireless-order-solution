@@ -157,78 +157,202 @@ var basicOperationPanel = new Ext.Panel({
 		 	    		}]
 		 	    	}
 		 	    ]
-		 	 },  {
-		 	    columnWidth : .65,
-		 	    layout : 'form',
-		 	    labelWidth : 60,
-		 	    items : [
-		 	        new Ext.BoxComponent({
-		 	        	xtype : 'box',
+		 	 }, {
+		 		 columnWidth : .65,
+		 	     labelWidth : 60,
+		 	     items : [
+		 	         new Ext.BoxComponent({
+		 	            xtype : 'box',
 		 	        	id : 'foodBasicImg',
 		 	        	name : 'foodBasicImg',
 		 	        	width : 555,
 		 	        	height : 420,
 		 	        	autoEl : {
 		 	        		tag : 'img',
-		 	        		src : '../../images/nophoto.jpg',
-		 	        		style : 'filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale);'
+		 	        		title : '菜品图预览.',
+		 	        		style : 'filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale); width:555; height:420; cursor:hand;'
+		 	        	},
+		 	        	listeners : {
+		 	        		render : function(){
+//		 	        			Ext.getDom('foodBasicImg').ondblclick = function(){
+//		 	        				Ext.getDom('txtImgFile').click();
+//		 	        			};
+		 	        		}
 		 	        	}
-		 	    	}),
-		 	        {
+		 	    	}), {
 		 	        	tag : 'div',
-		 	        	height : 5
+		 	        	height : 10
 		 	        }, {
-		 	    		xtype : 'textfield',
-		 	    		id : 'txtImgFile',
-		 	    		name : 'txtImgFile',
-		 	    		fieldLabel : '选择图片',
-		 	    		width : 430,
-		 	    		height : 25,
-		 	    		inputType : 'file',
-		 	    		listeners : {
-		 	    			render : function(e){
-		 	    				Ext.get('txtImgFile').on('change', function(){
-		 	    					if(Ext.isIE){
-		 	    						var img = Ext.get('foodBasicImg').dom;
-		 	    						var file = document.getElementById('txtImgFile');
-		 	    						file.select();
-		 	    						img.src = Ext.BLANK_IMAGE_URL;
-		 	    						img.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = document.selection.createRange().text;
-		 	    					}else{
-		 	    						var img = document.getElementById('foodBasicImg');
-		 	    						var file = document.getElementById('txtImgFile'); 
-		 	    						if(file.files && file.files[0]){
-		 	    							var reader = new FileReader();
-		 	    							reader.onload = function(evt){img.src = evt.target.result;};
-		 	    							reader.readAsDataURL(file.files[0]);
-		 	    						}
-		 	    					}
-		 	    				}, this);
-		 	    			}
-		 	    		}
-		 	    	}
+		 	        	xtype : 'panel',
+		 	        	layout : 'column',
+		 	        	items : [
+		 	        	    {
+		 	        	    	xtype : 'form',
+		 	        	    	layout : 'form',
+		 	        	    	labelWidth : 60,
+		 	        	    	columnWidth : .7,
+		 	        	    	url : '../../ImageFileUpload.do',
+			 	  		 	    id : 'imgFileUploadForm',
+			 	  		 	    fileUpload : true,
+		 	        	    	items : [
+		 	        	    	    {
+										xtype : 'textfield',
+										id : 'txtImgFile',
+										name : 'txtImgFile',
+										fieldLabel : '选择图片',
+										height : 22,
+										inputType : 'file',
+										listeners : {
+											render : function(e){
+												if(Ext.isIE){
+													e.el.dom.size = 45;
+												}else{
+													e.el.dom.size = 40;
+												}
+												Ext.get('txtImgFile').on('change', function(){
+													try{
+														if(Ext.isIE){
+									 						var img = Ext.getDom('foodBasicImg');
+									 						var file = Ext.getDom('txtImgFile');
+									 						file.select();
+									 						var imgURL = document.selection.createRange().text;
+									 						if(imgURL && imgURL.length > 0){
+									 							var index = imgURL.lastIndexOf('.');
+								 	        	    			var type = imgURL.substring(index+1, img.length);
+								 	        	    			var check = false;
+								 	        	    			for(var i = 0; i < imgTypeTmp.length; i++){
+								 	        	    				if(type.toLowerCase() == imgTypeTmp[i].toLowerCase()){
+								 	        	    					check = true;
+								 	        	    					break;
+								 	        	    				}
+								 	        	    			}
+								 	        	    			if(check){
+								 	        	    				img.src = Ext.BLANK_IMAGE_URL;
+								 	        	    				img.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = imgURL;								 	        	    				
+								 	        	    			}else{
+								 	        	    				file.select();
+								 	        	    				document.execCommand('Delete');
+								 	        	    				Ext.example.msg('提示', '操作失败,选择的图片类型不正确,请重新选择!');
+								 	        	    			}
+									 						}
+									 					}else{
+									 						var img = Ext.getDom('foodBasicImg');
+									 						var file = Ext.getDom('txtImgFile'); 
+									 						if(file.files && file.files[0]){
+									 							var index = file.value.lastIndexOf('.');
+								 	        	    			var type = file.value.substring(index+1, img.length);
+								 	        	    			var check = false;
+								 	        	    			for(var i = 0; i < imgTypeTmp.length; i++){
+								 	        	    				if(type.toLowerCase() == imgTypeTmp[i].toLowerCase()){
+								 	        	    					check = true;
+								 	        	    					break;
+								 	        	    				}
+								 	        	    			}
+								 	        	    			if(check){
+								 	        	    				var reader = new FileReader();
+								 	        	    				reader.onload = function(evt){img.src = evt.target.result;};
+								 	        	    				reader.readAsDataURL(file.files[0]);
+								 	        	    			}else{
+								 	        	    				file.value = '';
+								 	        	    				Ext.example.msg('提示', '操作失败,选择的图片类型不正确,请重新选择!');
+								 	        	    			}
+									 						}
+									 					}
+													} catch(e){
+														Ext.example.msg('提示', '操作失败,无法获取图片信息.请换浏览器后重试.');
+													}
+												}, this);
+											}
+										}
+									}
+		 	        	    	],
+			 	    		 	listeners : {
+			 	  			 		render : function(e){
+			 	  			 			Ext.getDom(e.getId()).setAttribute('enctype', 'multipart/form-data');
+			 	  			 		}
+			 	  			 	}
+		 	        	    }, {
+		 	        	    	xtype : 'panel',
+		 	        	    	columnWidth : .15,
+		 	        	    	items : [
+		 	        	    	    {
+		 	        	    	    	xtype : 'button',
+		 	        	    	    	id : 'btnUploadFoodImage',
+		 	        	    	    	text : '上传图片',
+				 	        	    	handler : function(e){
+				 	        	    		
+				 	        	    		var check = true;
+				 	        	    		var img = '';
+				 	        	    		if(Ext.isIE){
+				 	        	    			var file = Ext.getDom('txtImgFile');
+				 	        	    			file.select();
+				 	        	    			img = document.selection.createRange().text;
+				 	        	    		}else{
+				 	        	    			var file = Ext.getDom('txtImgFile'); 
+				 	        	    			img = file.value;
+				 	        	    		}
+				 	        	    		
+				 	        	    		if(typeof(img) != 'undefined' && img.length > 0){
+				 	        	    			var index = img.lastIndexOf('.');
+				 	        	    			var type = img.substring(index+1, img.length);
+				 	        	    			check = false;
+				 	        	    			for(var i = 0; i < imgTypeTmp.length; i++){
+				 	        	    				if(type.toLowerCase() == imgTypeTmp[i].toLowerCase()){
+				 	        	    					check = true;
+				 	        	    					break;
+				 	        	    				}
+				 	        	    			}
+				 	        	    		}else{
+				 	        	    			check = false;
+				 	        	    		}
+				 	        	    		
+				 	        	    		if(check){
+				 	        	    			var selData = Ext.ux.getSelData('menuMgrGrid');
+				 	        	    			selData.arrt = {
+				 	        	    				type : mmObj.operation.img.upload
+				 	        	    			};
+				 	        	    			uploadFoodImage(selData);
+				 	        	    		}else{
+				 	        	    			Ext.example.msg('提示', '上传图片失败,未选择图片或图片类型正确.');
+				 	        	    		}
+				 	        	    	}
+		 	        	    	    }
+		 	        	    	]
+		 	        	    }, {
+		 	        	    	xtype : 'panel',
+		 	        	    	columnWidth : .15,
+		 	        	    	items : [{
+		 	        	    		xtype : 'button',
+		 	        	    		id : 'btnDeleteFoodImage',
+		 	        	    		text : '删除图片',
+		 	        	    		handler : function(e){
+		 	        	    			var selData = Ext.ux.getSelData('menuMgrGrid');
+		 	        	    			if(!selData)
+		 	        	    				return;
+		 	        	    			
+		 	        	    			if(selData.img.indexOf('nophoto.jpg') != -1){
+		 	        	    				Ext.example.msg('提示', '该菜品没有图片,无需删除.');
+		 	        	    				return;
+		 	        	    			}
+		 	        	    			
+		 	        	    			Ext.Msg.confirm('提示', '是否确定删除菜品图片?', function(e){
+			 	       						if(e == 'yes'){
+			 	       							selData.arrt = {
+			 	       								type : mmObj.operation.img.del
+			 	       							};
+				 	       						uploadFoodImage(selData);
+			 	       						}
+			 	       					}, this);
+		 	        	    		}
+		 	        	    	}]
+		 	        	    }
+		 	        	]
+		 	        }
 		 	    ]
 		 	}
 		]
 	}]
 });
-
-
-function getPath(obj){
-	if(obj){  
-		if (window.navigator.userAgent.indexOf("MSIE")>=1)  {  
-			obj.select();  
-			return document.selection.createRange().text;  
-		}else if(window.navigator.userAgent.indexOf("Firefox")>=1){  
-//			if(obj.files){
-//				return obj.files.item(0).getAsDataURL();
-//			}  
-//			return obj.value;
-			
-		}  
-		return obj.value;  
-    }  
-} 
 
 /**
  * 
@@ -245,14 +369,27 @@ resetbBasicOperation = function(_d){
 	var isFree = Ext.getCmp('chbForBasicFree');
 	var isStop = Ext.getCmp('chbForBasicStop');
 	var isCurrPrice = Ext.getCmp('chbForBasicCurrPrice');
+	var img = Ext.getDom('foodBasicImg');
+	var btnUploadFoodImage = Ext.getCmp('btnUploadFoodImage');
+	var btnDeleteFoodImage = Ext.getCmp('btnDeleteFoodImage');
+	var imgFile = Ext.getCmp('txtImgFile');
 	var data = {};
+	
+	// 清空图片信息
+	refreshFoodImageMsg();
 	
 	if(_d != null && typeof(_d) != 'undefined'){
 		data = _d;
 		foodAliasID.setDisabled(true);
+		btnUploadFoodImage.setDisabled(false);
+		btnDeleteFoodImage.setDisabled(false);
+		imgFile.setDisabled(false);
 	}else{
 		data = {};
 		foodAliasID.setDisabled(false);
+		btnUploadFoodImage.setDisabled(true);
+		btnDeleteFoodImage.setDisabled(true);
+		imgFile.setDisabled(true);
 	}
 	
 	if(foodKitchenAlias.store.getCount() == 0){
@@ -270,11 +407,13 @@ resetbBasicOperation = function(_d){
 	isFree.setValue(typeof(data.gift) == 'undefined' ? false : eval(data.gift));
 	isStop.setValue(typeof(data.stop) == 'undefined' ? false : eval(data.stop));
 	isCurrPrice.setValue(typeof(data.currPrice) == 'undefined' ? false : eval(data.currPrice));
+	img.src = typeof(data.img) == 'undefined' || data.img == '' ? '../../images/nophoto.jpg' : data.img;
 	
 	foodName.clearInvalid();
 	foodAliasID.clearInvalid();
 	foodPinyin.clearInvalid();
 	foodPrice.clearInvalid();
+	
 };
 
 /**
@@ -451,4 +590,63 @@ basicOperationBasicHandler = function(c){
 		}
 	});
 	
+};
+
+/**
+ * 
+ */
+uploadFoodImage = function(c){
+	var btnUploadFoodImage = Ext.getCmp('btnUploadFoodImage');
+	var btnDeleteFoodImage = Ext.getCmp('btnDeleteFoodImage');
+	
+	btnUploadFoodImage.setDisabled(true);
+	btnDeleteFoodImage.setDisabled(true);
+	setButtonStateOne(true);
+	Ext.getCmp('imgFileUploadForm').getForm().submit({
+		url : '../../ImageFileUpload.do?restaurantID=' + c.restaurantID + '&foodID=' + c.foodID + '&time=' + new Date(), 
+		success : function(thiz, result){
+			var jr = Ext.util.JSON.decode(result.response.responseText);
+			if(eval(jr.success)){
+				Ext.example.msg(jr.title, jr.msg);
+				Ext.getCmp('menuMgrGrid').getStore().each(function(record){
+					if(record.get('foodID') == c.foodID){
+						record.set('img', jr.root[0].img);
+						record.commit();
+						return;
+					}
+				});
+				
+				if(typeof(c.arrt) != 'undefined' && typeof(c.arrt.type) != 'undefined' && c.arrt.type == mmObj.operation.img.del)
+					refreshFoodImageMsg();
+				
+			}else{
+				Ext.ux.showMsg(jr);
+			}
+			btnUploadFoodImage.setDisabled(false);
+			btnDeleteFoodImage.setDisabled(false);
+			setButtonStateOne(false);
+		},
+		failure : function(thiz, result){
+			btnUploadFoodImage.setDisabled(false);
+			btnDeleteFoodImage.setDisabled(false);
+			setButtonStateOne(false);
+			Ext.ux.showMsg(Ext.util.JSON.decode(result.response.responseText));
+		}
+	});
+};
+
+/**
+ * 
+ */
+refreshFoodImageMsg = function(){
+	var img = Ext.getDom('foodBasicImg');
+	var file = Ext.getDom('txtImgFile');
+	
+	img.src = '../../images/nophoto.jpg';
+	if(Ext.isIE){
+		file.select();
+		document.execCommand('Delete');		 	        	    				
+	}else{
+		file.value = '';
+	}
 };

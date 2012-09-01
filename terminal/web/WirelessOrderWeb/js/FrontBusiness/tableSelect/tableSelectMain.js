@@ -618,17 +618,6 @@ Ext.onReady(function() {
 
 			});
 
-			// ***************tableSelectSouthPanel******************
-			// var tableSelectSouthPanel = new Ext.Panel({
-			// region : "south",
-			// height : 55,
-			// // width : 800,
-			// layout : "fit",
-			// border : false,
-			// bodyStyle : "background-color:#d8ebef;padding-left:20px;",
-			// contentEl : "tableStatusTS"
-			// });
-
 			// ***************tableSelectEastPanel******************
 			var regionTreeRoot = new Ext.tree.AsyncTreeNode({
 				id : "regionTreeRoot",
@@ -1064,7 +1053,7 @@ Ext.onReady(function() {
 
 			var centerTabPanel = new Ext.Panel({
 				region : "center",
-				margins : '0 5 0 0',
+				margins : '0 0 0 0',
 				tbar : new Ext.Toolbar({
 					height : 55,
 					items : [ {
@@ -1097,25 +1086,21 @@ Ext.onReady(function() {
 					}, logOutBut ]
 				}),
 				layout : "border",
-				border : false,
-				items : [ tableSelectNorthPanel, tableSelectCenterPanel,
-						tableSelectWestPanel
-				// ,
-				// tableSelectSouthPanel
-				]
+				items : [ tableSelectNorthPanel, tableSelectCenterPanel, tableSelectWestPanel]
 			});
 
-			var viewport = new Ext.Viewport(
+			new Ext.Viewport(
 					{
 						layout : "border",
 						id : "viewport",
 						items : [
 								{
 									region : "north",
-									bodyStyle : "background-color:#A9D0F5",
+									bodyStyle : "background-color:#DFE8F6;",
 									html : "<h4 style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4><div id='optName' class='optName'></div>",
 									height : 50,
-									margins : '0 0 5 0'
+									border : false,
+									margins : '0 0 0 0'
 								},
 								centerTabPanel,
 								{
@@ -1127,13 +1112,4 @@ Ext.onReady(function() {
 									html : "<div style='font-size:11pt; text-align:center;'><b>版权所有(c) 2011 智易科技</b></div>"
 								} ]
 					});
-
-			// -------------------- 浏览器大小改变 -------------------------------
-			// Ext.EventManager.onWindowResize(function() {
-			// // obj.style[attr]
-			// document.getElementById("wrap").style["height"] =
-			// (tableSelectCenterPanel
-			// .getInnerHeight() - 100)
-			// + "px";
-			// });
 		});

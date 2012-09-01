@@ -232,7 +232,7 @@ tasteAddWin = new Ext.Window({
 
 // --------------------------------------------------------------------------
 var tasteAddBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/material_add.png',
+	imgPath : '../../images/btnAddForBigBar.png',
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : '添加口味',
@@ -815,7 +815,7 @@ Ext.onReady(function() {
 					Ext.getCmp('btnSerach').handler(); 
 				}
 			}
-		],
+		]
 	});
 	
 	new Ext.Viewport({
@@ -824,9 +824,10 @@ Ext.onReady(function() {
 		items : [
 		    {
 		    	region : 'north',
-		    	bodyStyle : 'background-color:#A9D0F5',
+		    	bodyStyle : 'background-color:#DFE8F6;',
 				html : '<h4 style="padding:10px;font-size:150%;float:left;">无线点餐网页终端</h4><div id="optName" class="optName"></div>',
 				height : 50,
+				border : false,
 				margins : '0 0 0 0'
 			},
 			centerPanel,

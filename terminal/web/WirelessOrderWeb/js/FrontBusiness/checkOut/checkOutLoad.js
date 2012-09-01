@@ -1,8 +1,10 @@
 ﻿var Request = new URLParaQuery();
 
 // on page load function
-function checkOutOnLoad() {
-
+function checkOutOnLoad() {	
+	
+	getOperatorName(pin, "../../");
+	
 	// 1,update table status
 	restaurantID = Request["restaurantID"];
 

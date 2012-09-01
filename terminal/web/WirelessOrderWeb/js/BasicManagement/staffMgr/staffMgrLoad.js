@@ -50,5 +50,5 @@ function staffMgrOnLoad() {
 
 	searchForm.remove("conditionText");
 
-	loadAllStaff();
+//	loadAllStaff();
 };

@@ -76,7 +76,7 @@ var checkOutColumnModel = new Ext.grid.ColumnModel([
 			sortable : true,
 			dataIndex : "foodName",
 			id : "dishNameCOCM",
-			width : 260
+			width : 250
 		}, {
 			header : "口味",
 			sortable : true,
@@ -86,21 +86,21 @@ var checkOutColumnModel = new Ext.grid.ColumnModel([
 			header : "数量",
 			sortable : true,
 			dataIndex : "count",
-			width : 80,
+			width : 70,
 			align : 'right',
 			renderer : Ext.ux.txtFormat.gridDou
 		}, {
 			header : "单价",
 			sortable : true,
 			dataIndex : "unitPrice",
-			width : 80,
+			width : 70,
 			align : 'right',
 			renderer : Ext.ux.txtFormat.gridDou
 		}, {
 			header : "打折率",
 			sortable : true,
 			dataIndex : "discount",
-			width : 80,
+			width : 70,
 			align : 'right',
 			renderer : Ext.ux.txtFormat.gridDou
 		}, {
@@ -124,7 +124,7 @@ var checkOutColumnModel = new Ext.grid.ColumnModel([
 
 // 4，表格
 var checkOutGrid = new Ext.grid.GridPanel({
-	title : "菜式",
+	title : "账单列表",
 	border : true,
 	width : 1000,
 	style : "margin:0 auto",
@@ -469,8 +469,10 @@ Ext.onReady(function() {
 		items : [
 		    {
 		    	region : "north",
-		    	html : "<div style='padding:10px; background-color:#A9D0F5'><h4 style='font-size:150%'>无线点餐网页终端<h4></div>",
+		    	bodyStyle : "background-color:#DFE8F6;",
+				html : "<h4 style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4><div id='optName' class='optName'></div>",
 				height : 50,
+				border : false,
 				margins : "0 0 0 0"
 			},
 			centerPanelCO,
@@ -487,14 +489,14 @@ Ext.onReady(function() {
 
 	// -------------------- 浏览器大小改变 -------------------------------
 	// 1,调整colDisplayFormUQ中表格的高度
-	Ext.EventManager.onWindowResize(function() {
-		checkOutGrid.setHeight(checkOutCenterPanel.getInnerHeight() - gridHeightOffset);
-		if (checkOutCenterPanel.getInnerWidth() < 1000) {
-			checkOutGrid.setWidth(checkOutCenterPanel.getInnerWidth() - 20);
-		} else {
-			checkOutGrid.setWidth(1000);
-		}
-	});
+//	Ext.EventManager.onWindowResize(function() {
+//		checkOutGrid.setHeight(checkOutCenterPanel.getInnerHeight() - gridHeightOffset);
+//		if (checkOutCenterPanel.getInnerWidth() < 1000) {
+//			checkOutGrid.setWidth(checkOutCenterPanel.getInnerWidth() - 20);
+//		} else {
+//			checkOutGrid.setWidth(1000);
+//		}
+//	});
 });
 
 setFormButtonStatus = function(_s){

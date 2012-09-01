@@ -1007,20 +1007,11 @@ Ext.onReady(function() {
 						items : [
 								{
 									region : "north",
-									// html : "<div style='padding:10px;
-									// background-color:#A9D0F5'><h4
-									// style='font-size:150%'>无线点餐网页终端<h4><div
-									// style='float:right;background:
-									// url(../images/UserLogout.png) no-repeat
-									// 50%;'></div></div>",
-									bodyStyle : "background-color:#A9D0F5",
-									// html : "<h4
-									// style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4><div
-									// style='float:right;width:50px;height:50px;background:url(../images/UserLogout.png)
-									// no-repeat 50%;'></div>",
+									bodyStyle : "background-color:#DFE8F6;",
 									html : "<h4 style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4><div id='optName' class='optName'></div>",
 									height : 50,
-									margins : '0 0 5 0'
+									border : false,
+									margins : '0 0 0 0'
 								},
 								centerPanel,
 								{

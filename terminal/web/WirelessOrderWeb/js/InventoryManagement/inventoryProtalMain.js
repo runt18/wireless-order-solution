@@ -51,10 +51,11 @@ Ext.onReady(function() {
 						items : [
 								{
 									region : "north",
-									bodyStyle : "background-color:#A9D0F5",
+									bodyStyle : "background-color:#DFE8F6;",
 									html : "<h4 style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4><div id='optName' class='optName'></div>",
 									height : 50,
-									margins : '0 0 5 0'
+									border : false,
+									margins : '0 0 0 0'
 								},
 								centerPanel,
 								{

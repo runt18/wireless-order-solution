@@ -194,7 +194,7 @@ function deleteFoodHandler() {
 };
 
 function menuDishOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
-	return '<center>' 
+	return '' 
 		 + '<a href=\"javascript:btnTaste.handler()">口味</a>'
 		 + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
 		 + '<a href=\"javascript:btnMaterial.handler()">食材</a>'
@@ -202,7 +202,18 @@ function menuDishOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
 		 + '<a href=\"javascript:btnFood.handler()">修改</a>'
 		 + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
 		 + '<a href=\"javascript:btnDeleteFood.handler()">删除</a>'
-		 + '</center>';
+		 + '';
+};
+
+function menuIsHaveImage(value, cellmeta, record, rowIndex, columnIndex, store){
+	var style = '', content = '';
+	if(record.get('img').indexOf('nophoto.jpg') == -1){
+		style = 'style="color:green;"';
+		content = '已上传';
+	}else{
+		content = '未设置';
+	}
+	return '<a href=\"javascript:btnFood.handler()" ' + style + ' >' + content + '</a>';
 };
 
 var menuStore = new Ext.data.Store({
@@ -261,7 +272,7 @@ var menuColumnModel = new Ext.grid.ColumnModel([
 	{
 		header : '编号',
 		dataIndex : 'foodAliasID',
-		width : 80
+		width : 65
 	}, {
 		header : '名称',
 		dataIndex : 'displayFoodName',
@@ -269,21 +280,27 @@ var menuColumnModel = new Ext.grid.ColumnModel([
 	}, {
 		header : '拼音',
 		dataIndex : 'pinyin',
-		width : 80
+		width : 65
 	}, {
 		header : '价格（￥）',
 		dataIndex : 'unitPrice',
-		width : 90,
+		width : 65,
 		align : 'right',
 		renderer : Ext.ux.txtFormat.gridDou
 	}, {
 		header : '厨房打印',
 		dataIndex : 'kitchenName',
-		width : 80
+		width : 65
 	}, {
-		header : '<center>操作</center>',
+		header : '图片状态',
+		width : 65,
+		align : 'center',
+		renderer : menuIsHaveImage
+	}, {
+		header : '操作',
 		dataIndex : 'operator',
-		width : 230,
+		width : 200,
+		align : 'center',
 		renderer : menuDishOpt
 	}
 ]);
@@ -366,7 +383,7 @@ var displayInfoPanel = new Ext.Panel({
 	layout : 'fit',
 	collapsible : true,
 	titleCollapse : true,
-//	frame : true,
+	frame : true,
 	width : 350,
 	items : [new Ext.TabPanel({
 		id : 'displayInfoPanelTab',
@@ -538,7 +555,7 @@ foodOperation = function(active, type){
 		btnAppForOW.setVisible(false);
 		btnSaveForOW.setVisible(false);
 		btnPreviousFood.setVisible(false);
-		btnNextFood.setVisible(false);
+		btnNextFood.setVisible(false);		
 		
 		btnAddForOW.setDisabled(false);
 		btnAppForOW.setDisabled(true);
@@ -594,6 +611,8 @@ setButtonStateOne = function(s){
 	if(typeof(s) != 'boolean'){
 		return;
 	}
+	Ext.getCmp('btnPreviousFood').setDisabled(s);
+	Ext.getCmp('btnNextFood').setDisabled(s);
 	Ext.getCmp('btnAppForOW').setDisabled(s);
 	Ext.getCmp('btnSaveForOW').setDisabled(s);
 	Ext.getCmp('btnCloseForOW').setDisabled(s);
@@ -614,7 +633,7 @@ Ext.onReady(function() {
 		id : 'menuMgrGrid',
 		region : 'center',
 		frame : true,
-		margins : '0 0 0 0',
+		margins : '0 5 0 0',
 		ds : menuStore,
 		cm : menuColumnModel,
 		sm : new Ext.grid.RowSelectionModel({
@@ -818,8 +837,8 @@ Ext.onReady(function() {
 		frame : true,
 		title : '菜品管理',
 		items : [ {
-				layout : 'border',
-				items : [  menuGrid, displayInfoPanel ]
+			layout : 'border',
+			items : [  menuGrid, displayInfoPanel ]
 		} ],
 		tbar : new Ext.Toolbar({
 			height : 55,
@@ -857,16 +876,16 @@ Ext.onReady(function() {
 		items : [
 		    {
 		    	region : 'north',
-		    	bodyStyle : 'background-color:#A9D0F5',
+		    	bodyStyle : 'background-color:#DFE8F6;',
 				html : '<h4 style="padding:10px;font-size:150%;float:left;">无线点餐网页终端</h4><div id="optName" class="optName"></div>',
 				height : 50,
+				border : false,
 				margins : '0 0 0 0'
 			},
 			centerPanel,
 			{
 				region : 'south',
 				height : 30,
-				layout : 'form',
 				frame : true,
 				border : false,
 				html : '<div style="font-size:11pt; text-align:center;"><b>版权所有(c) 2011 智易科技</b></div>'
@@ -901,8 +920,7 @@ Ext.onReady(function() {
 			    		Ext.getCmp('btnPreviousFood').setDisabled(!Ext.getCmp('menuMgrGrid').getSelectionModel().hasPrevious());
 			    		Ext.getCmp('btnNextFood').setDisabled(false);
 			    	}
-			    },
-			    {
+			    }, {
 			    	text : '下一道菜品',
 			    	id : 'btnNextFood',
 			    	iconCls : 'btn_next',
@@ -972,7 +990,7 @@ Ext.onReady(function() {
 			    				Ext.getCmp('btnSearchForAllFoodMiniGridTbar').handler();
 			    			}
 			    		}else{
-			    			varfoWinTab.fireEvent('tabchange');
+			    			foWinTab.fireEvent('tabchange');
 			    		}
 			    	}
 			    }
