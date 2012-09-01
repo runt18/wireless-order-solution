@@ -16,6 +16,8 @@ public class StaffTerminal {
 	//the gift quota represented as an integer
 	int giftQuota = -1;
 	
+	public int type;
+	
 	public void setGiftQuota(Float quota){
 		giftQuota = Util.float2Int(quota);
 	}
