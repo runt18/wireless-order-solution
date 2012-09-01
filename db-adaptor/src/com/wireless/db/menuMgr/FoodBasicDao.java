@@ -169,6 +169,71 @@ public class FoodBasicDao {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param foodID
+	 * @param newPath
+	 * @throws Exception
+	 */
+	public static void updateFoodImageName(int restaurantID, int foodID, String imgName) throws Exception{
+		FoodBasic fb = new FoodBasic();
+		fb.setRestaurantID(restaurantID);
+		fb.setFoodID(foodID);
+		fb.setImg(imgName);
+		updateFoodImageName(fb);
+	}
+	
+	/**
+	 * 
+	 * @param fb
+	 * @throws Exception
+	 */
+	public static void updateFoodImageName(FoodBasic fb) throws Exception{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			String updateSQL = "update " + Params.dbName + ".food set "
+						       + " img = " + (fb.getImg() == null || fb.getImg().trim().length() == 0 ? null : "'" + fb.getImg() + "'") 
+						       + " where food_id = " + fb.getFoodID() + " and restaurant_id = " + fb.getRestaurantID();
+			
+			int count = dbCon.stmt.executeUpdate(updateSQL);
+			if(count <= 0){
+				throw new BusinessException("操作失败,未更新编号为" + fb.getFoodID() + "的菜品图片信息!");
+			}
+		}catch(Exception e){
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * 
+	 * @param fb
+	 * @return
+	 */
+	public static FoodBasic getFoodBasicImage(FoodBasic fb) throws Exception{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			String selectSQL = "select A.img" 
+						       + " from " + Params.dbName + ".food A"
+						       + " where A.food_id = " + fb.getFoodID() + " and A.restaurant_id = " + fb.getRestaurantID();
+			
+			dbCon.rs = dbCon.stmt.executeQuery(selectSQL);
+			
+			if(dbCon.rs != null && dbCon.rs.next()){
+				fb.setImg(dbCon.rs.getString("img"));
+			}
+			
+		}catch(Exception e){
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+		return fb;
+	}
+	
 }
 
 
