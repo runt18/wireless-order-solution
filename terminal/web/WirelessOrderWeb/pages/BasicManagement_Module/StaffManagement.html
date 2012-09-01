@@ -4,12 +4,14 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>无线点餐网页终端</title>
 
-<link rel="stylesheet" type="text/css"
-	href="../../extjs/resources/css/ext-all.css" />
+<link rel="stylesheet" type="text/css" href="../../extjs/resources/css/ext-all.css" />
+<link rel="stylesheet" type="text/css" href="../../css/myExt.css" />
+<link rel="stylesheet" type="text/css" href="../../extjs/ext-patch.css" />
 <script type="text/javascript" src="../../extjs/ext-base.js"></script>
 <script type="text/javascript" src="../../extjs/ext-all.js"></script>
+<script type="text/javascript" src="../../js/common/Ext.ux.js"></script>
+<script type="text/javascript" src="../../js/common/Ext.ux.check.js"></script>
 <!-- 解决Grid不能选择复制问题 -->
-<script type="text/javascript" src="../../js/GridViewRewrite.js"></script>
 <script type="text/javascript" src="../../extjs/ext-lang-zh_CN.js"></script>
 
 <!-- 实现多选JS -->
@@ -44,12 +46,6 @@
 	});
 </script>
 
-<style type="text/css">
-.save {
-	background-image: url(../../images/save.gif) !important;
-}
-</style>
-
 <script type="text/javascript">
 	var Request = new URLParaQuery();
 
@@ -59,7 +55,7 @@
 	
 	var isPrompt = false;
 	
-	var conditionType = "text";
+	var conditionType = '';
 
 	var currPageIndex = 0;
 	var currRowIndex = -1;
@@ -69,10 +65,15 @@
 	
 </script>
 
-<script type="text/javascript"
-	src="../../js/BasicManagement/staffMgr/staffMgrLoad.js"></script>
-<script type="text/javascript"
-	src="../../js/BasicManagement/staffMgr/staffMgrMain.js"></script>
+<script type="text/javascript" src="../../js/BasicManagement/staffMgr/staffMgrLoad.js"></script>
+<script type="text/javascript" src="../../js/BasicManagement/staffMgr/staffMgrMain.js"></script>
+
+<style type="text/css"> 
+	.x-grid3-row td, .x-grid3-summary-row td{
+		line-height : 20px;
+		vertical-align : middle;
+	}
+</style> 
 
 </head>
 <body onload="staffMgrOnLoad()">

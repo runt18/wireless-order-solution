@@ -37,8 +37,12 @@
 </script>
 
 <script type="text/javascript">
+	var Request = new URLParaQuery();
+	var pin = Request["pin"];
+	var restaurantID = Request["restaurantID"];
+	
 	// global variable
-	var gridHeightOffset = 155; // bill grid heigth offset
+	var gridHeightOffset = 100; // bill grid heigth offset
 	var checkOutData = {};
 	// the ordered dished display list
 	var discountData = [];
@@ -54,7 +58,6 @@
 	var actualMemberID = -1
 	//menber id
 
-	var restaurantID = "";
 	var restaurantData = [];
 
 	var operatorName = "XXX";
