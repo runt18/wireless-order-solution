@@ -8,6 +8,7 @@ import java.util.HashMap;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
@@ -15,20 +16,20 @@ import android.widget.TextView;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
+import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Department;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.OrderFood;
+import com.wireless.util.ExpandableListFragment;
+import com.wireless.util.ExpandableListFragment.OnItemChangeListener;
 import com.wireless.util.GalleryFragment;
 import com.wireless.util.GalleryFragment.OnItemClickListener;
 import com.wireless.util.GalleryFragment.OnPicChangedListener;
-import com.wireless.util.ExpandableListFragment;
-import com.wireless.util.ExpandableListFragment.OnItemChangeListener;
 
 public class MainActivity extends Activity  
 						  implements OnItemChangeListener,
 							 	     OnPicChangedListener, OnItemClickListener{
-	
-	public static final String CURRENT_FOOD_POST = "currentFoodPost";
 	
 	protected static final int MAIN_ACTIVITY_RES_CODE = 340;
 
@@ -53,7 +54,7 @@ public class MainActivity extends Activity
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent(MainActivity.this,FullScreenActivity.class);
-				intent.putExtra(CURRENT_FOOD_POST, mPicBrowserFragment.getSelectedPosition());
+				intent.putExtra(FoodParcel.KEY_VALUE, mPicBrowserFragment.getSelectedPosition());
 				startActivityForResult(intent, MAIN_ACTIVITY_RES_CODE);
 			}
 		});
@@ -166,7 +167,7 @@ public class MainActivity extends Activity
 	        switch(resultCode)
 	        {
 	        case FullScreenActivity.FULL_RES_CODE:
-	        	mPicBrowserFragment.setPosition(data.getIntExtra(CURRENT_FOOD_POST, 0));
+	        	mPicBrowserFragment.setPosition(data.getIntExtra(FoodParcel.KEY_VALUE, 0));
 	        	break;
 	        }
 		}
@@ -175,7 +176,10 @@ public class MainActivity extends Activity
 	@Override
 	public void onItemClick(Food food, int position) {
 		Intent intent = new Intent(MainActivity.this,FoodDetailActivity.class);
-		intent.putExtra(CURRENT_FOOD_POST, position);
+		Bundle bundle = new Bundle();
+		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(new OrderFood(food)));
+		intent.putExtras(bundle);
+		
 		startActivity(intent);
 	}  
 }

@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
+import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
 import com.wireless.util.GalleryFragment;
 import com.wireless.util.GalleryFragment.OnPicChangedListener;
@@ -37,7 +38,7 @@ public class FullScreenActivity extends Activity implements OnPicChangedListener
 		//设置content fragment的回调函数
 		mPicBrowserFragment.setOnViewChangeListener(this);
 		
-		mPicBrowserFragment.setPosition(getIntent().getIntExtra(MainActivity.CURRENT_FOOD_POST, 0));
+		mPicBrowserFragment.setPosition(getIntent().getIntExtra(FoodParcel.KEY_VALUE, 0));
 		
 		((ImageView) findViewById(R.id.imageView_back_fullScreen)).setOnClickListener(new OnClickListener(){
 
@@ -66,7 +67,7 @@ public class FullScreenActivity extends Activity implements OnPicChangedListener
 	 */
 	private void setResultInformations(){
 		Intent intent = new Intent();
-		intent.putExtra(MainActivity.CURRENT_FOOD_POST, mPicBrowserFragment.getSelectedPosition());
+		intent.putExtra(FoodParcel.KEY_VALUE, mPicBrowserFragment.getSelectedPosition());
 		setResult(FULL_RES_CODE, intent);
 		finish();
 	}

@@ -160,8 +160,8 @@ public class GalleryFragment extends Fragment {
         mGallery.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener(){
 			@Override
 			public void onItemClick(AdapterView<?> parent,View view, int position, long id) {
-				// TODO Auto-generated method stub
-				mOnItemClickListener.onItemClick(mFoods.get(position), position);
+				if(mOnItemClickListener != null)
+					mOnItemClickListener.onItemClick(mFoods.get(position), position);
 			}
         });
 	}

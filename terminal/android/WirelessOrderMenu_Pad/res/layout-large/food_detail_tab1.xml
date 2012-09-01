@@ -148,7 +148,7 @@
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <Button
-            android:id="@+id/button1"
+            android:id="@+id/button_pickTaste_foodDetail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
@@ -170,9 +170,9 @@
             android:layout_centerVertical="true"
             android:text="品注："
             android:textAppearance="?android:attr/textAppearanceLarge" />
-
+
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/button_pinzhu_foodDetail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"

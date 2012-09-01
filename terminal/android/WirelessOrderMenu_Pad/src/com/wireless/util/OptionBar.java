@@ -46,7 +46,7 @@ public class OptionBar extends Fragment implements OnTableChangedListener , OnSe
 	public static enum Selection{
 		TAB1,TAB2,TAB3
 	}
-
+	
    @Override  
     public View onCreateView(LayoutInflater inflater, ViewGroup container,  
             Bundle savedInstanceState) {  
