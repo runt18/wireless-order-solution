@@ -44,7 +44,7 @@
 
     <RelativeLayout
         android:id="@+id/buttom"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="28dp"
         android:layout_alignParentBottom="true"
         android:background="@drawable/bg03" >

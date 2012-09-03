@@ -372,14 +372,11 @@ public class TableActivity extends Activity {
 					short tblStatus = (Short)map.get(ITEM_TAG_STATE);
 					TextView stateTxtView = (TextView)view.findViewById(R.id.table_state);
 					ImageButton switchImgBtn = (ImageButton) view.findViewById(R.id.switch_table);
-					RelativeLayout itemLayout = (RelativeLayout) view.findViewById(R.id.table_item_layout);
 					if(tblStatus == (short)Table.TABLE_BUSY){
 						stateTxtView.setTextColor(Color.RED);
-						itemLayout.setBackgroundResource(R.drawable.busy_item_bg);
 						switchImgBtn.setVisibility(View.VISIBLE);
 					}else{
 						stateTxtView.setTextColor(view.getResources().getColor(R.color.green));
-						itemLayout.setBackgroundResource(R.drawable.table_item_selector);
 						switchImgBtn.setVisibility(View.GONE);
 					}
 					

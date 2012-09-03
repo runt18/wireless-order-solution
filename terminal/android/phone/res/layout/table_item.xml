@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:descendantFocusability="blocksDescendants" >
-
+
     <RelativeLayout
         android:id="@+id/table_item_layout"
         android:layout_width="fill_parent"
@@ -11,7 +11,8 @@
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
         android:background="@drawable/table_item_selector"
-        android:descendantFocusability="blocksDescendants" >
+        android:descendantFocusability="blocksDescendants"
+        android:paddingLeft="10dp" >
 
         <TextView
             android:id="@+id/table_id_text"
@@ -68,17 +69,18 @@
             android:textColor="@color/dartgrey"
             android:textSize="16sp"
             android:visibility="visible" />
-
+
         <TextView
             android:id="@+id/textView1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:text="台号:"
+            android:text="台号: "
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="@color/blue"
-            android:textSize="24sp" />
+            android:textSize="24sp"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/table_state"
