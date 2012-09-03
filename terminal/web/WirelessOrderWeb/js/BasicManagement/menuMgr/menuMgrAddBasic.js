@@ -431,7 +431,6 @@ addBasicHandler = function(){
  * 修改菜品基础信息
  */
 updateBasicHandler = function(c){
-//	Ext.example.msg('提示','修改菜品基础信息!');
 	c.type = mmObj.operation.update;
 	basicOperationBasicHandler(c);
 };
@@ -593,9 +592,23 @@ basicOperationBasicHandler = function(c){
 };
 
 /**
- * 
+ * 图片操作
  */
 uploadFoodImage = function(c){
+	var otype = null;
+	if(typeof(c.arrt) == 'undefined' || typeof(c.arrt.type) == 'undefined'){
+		Ext.example.msg('提示', '操作失败,获取图片操作类型失败,请联系客服人员.');
+		return;
+	}
+	if(c.arrt.type == mmObj.operation.img.upload){
+		otype = 0;
+	}else if(c.arrt.type == mmObj.operation.img.del){
+		otype = 1;
+	}else{
+		Ext.example.msg('提示', '操作失败,获取图片操作类型失败,请联系客服人员.');
+		return;
+	}
+	
 	var btnUploadFoodImage = Ext.getCmp('btnUploadFoodImage');
 	var btnDeleteFoodImage = Ext.getCmp('btnDeleteFoodImage');
 	
@@ -603,7 +616,7 @@ uploadFoodImage = function(c){
 	btnDeleteFoodImage.setDisabled(true);
 	setButtonStateOne(true);
 	Ext.getCmp('imgFileUploadForm').getForm().submit({
-		url : '../../ImageFileUpload.do?restaurantID=' + c.restaurantID + '&foodID=' + c.foodID + '&time=' + new Date(), 
+		url : '../../ImageFileUpload.do?restaurantID=' + c.restaurantID + '&foodID=' + c.foodID + '&otype=' + otype + '&time=' + new Date(), 
 		success : function(thiz, result){
 			var jr = Ext.util.JSON.decode(result.response.responseText);
 			if(eval(jr.success)){
