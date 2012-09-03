@@ -592,7 +592,8 @@ var orderedForm = new Ext.form.FormPanel({
 							"type" : type,
 							"originalTableID" : Request["tableNbr"],// no use
 							"foods" : foodPara,
-							"category" : category
+							"category" : category,
+							'orderDate' : orderedData.root[0].orderDate
 						},
 						success : function(response, options) {
 							var resultJSON = Ext.util.JSON.decode(response.responseText);
@@ -703,7 +704,8 @@ var orderedForm = new Ext.form.FormPanel({
 							"type" : type,
 							"originalTableID" : Request["tableNbr"],// no use
 							"foods" : foodPara,
-							"category" : category
+							"category" : category,
+							'orderDate' : orderedData.root[0].orderDate
 						},
 						success : function(response, options) {
 							var resultJSON = Ext.util.JSON.decode(response.responseText);

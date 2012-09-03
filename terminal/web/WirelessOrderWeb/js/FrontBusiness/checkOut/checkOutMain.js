@@ -133,8 +133,9 @@ var checkOutColumnModel = new Ext.grid.ColumnModel([
 
 // 4，表格
 var checkOutGrid = new Ext.grid.GridPanel({
-	title : '菜式',
+	title : '账单列表',
 	border : true,
+	frame : true,
 	width : 1000,
 	style : 'margin:0 auto',
 	xtype : 'grid',
