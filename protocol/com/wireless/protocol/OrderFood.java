@@ -253,7 +253,7 @@ public class OrderFood extends Food {
 	 * The taste price along with both normal and temporary taste.
 	 * @return the taste price represented as an integer
 	 */
-	int tastePrice(){
+	int getTastePriceInternal(){
 		return tasteNormalPrice + (tmpTaste == null ? 0 : tmpTaste.price);
 	}
 	
@@ -262,18 +262,19 @@ public class OrderFood extends Food {
 	 * @return the taste price represented as a Float
 	 */
 	public Float getTastePrice(){
-		return Util.int2Float(tastePrice());
+		return Util.int2Float(getTastePriceInternal());
 	}
 	
 	/**
 	 * The unit price with taste to a specific food is as below.
-	 * unit_price = food_price * discount + taste_price + tmp_taste_price
+	 * unit_price = (food_price + taste_price + tmp_taste_price) * discount 
 	 * If taste price is calculated by rate, then
 	 * taste_price = food_price * taste_rate
-	 * @return the unit price represented as an integer
+	 * @return the unit price represented as integer
 	 */
-	int priceWithTaste(){
-		return price * discount / 100 + tastePrice();
+	int getPriceWithTasteInternal(){
+		//return price * discount / 100 + tastePrice();
+		return (price + getTastePriceInternal()) * discount / 100;
 	}	
 	
 	/**
@@ -284,7 +285,7 @@ public class OrderFood extends Food {
 	 * @return the unit price represented as a Float
 	 */
 	public Float getPriceWithTaste(){
-		return Util.int2Float(priceWithTaste());
+		return Util.int2Float(getPriceWithTasteInternal());
 	}
 	
 	/**
@@ -295,23 +296,46 @@ public class OrderFood extends Food {
 	public Float calcPrice(){
 		return Util.int2Float((price * discount * count) / 10000);
 	}	
+
+	/**
+	 * Calculate the total price to this food along with taste as below<br>.
+	 * price = ((food_price + taste_price) * discount) * count 
+	 * @return the total price to this food represented as integer
+	 */
+	int calcPriceWithTasteInternal(){
+		return getPriceWithTasteInternal() * count / 100;
+	}
 	
 	/**
-	 * Calculate the total price to this food along with taste as below.
-	 * <br>price = (food_price * discount + taste_price) * count 
-	 * @return the total price to this food
+	 * Calculate the total price to this food along with taste as below<br>.
+	 * price = ((food_price + taste_price) * discount) * count 
+	 * @return the total price to this food represented as float
 	 */
 	public Float calcPriceWithTaste(){
-		return Util.int2Float(priceWithTaste() * count / 100);
+		return Util.int2Float(calcPriceWithTasteInternal());
 	}
+	
 	/**
 	 * Calculate the discount price to this food as below.<br>
 	 * price = unit_price * (1 - discount)
-	 * @return the discount price to this food
+	 * @return the discount price to this food represented as an integer
+	 */
+	int calcDiscountPriceInternal(){
+		if(discount != 100){
+			return (price + getTastePriceInternal()) * count * (100 - discount) / 10000;
+		}else{
+			return 0;
+		}
+	}
+	
+	/**
+	 * Calculate the discount price to this food as below.<br>
+	 * price = unit_price * (1 - discount)
+	 * @return the discount price to this food represented as an float
 	 */
 	public Float calcDiscountPrice(){
-		return Util.int2Float((price * count * (100 - discount)) / 10000);
-	}
+		return Util.int2Float(calcDiscountPriceInternal());
+	}	
 	
 	public OrderFood(){
 		for(int i = 0; i < tastes.length; i++){
