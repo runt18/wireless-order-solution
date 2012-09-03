@@ -745,6 +745,8 @@ Ext.onReady(function() {
 								limit : dishesPageRecordCount
 							}
 						});
+						Ext.getCmp('menuMgrGrid').getSelectionModel().clearSelections();
+						Ext.getCmp('menuMgrGrid').fireEvent('rowclick');
 					},
 					listeners : {
 						
