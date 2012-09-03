@@ -573,34 +573,36 @@ public class OrderFoodListView extends ExpandableListView{
 			okBtn.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					float foodAmount = selectedFood.getCount();
-					float cancelAmount = Float.parseFloat(cancelEdtTxt.getText().toString());
-					
-					if(foodAmount == cancelAmount){
-						/**
-						 * 如果数量相等，则从列表中删除此菜
-						 */
-						_foods.remove(selectedFood);
-						_adapter.notifyDataSetChanged();
-						dismiss();
-						Toast.makeText(_context, "删除\"" + selectedFood.toString() + "\"" + cancelAmount + "份成功", Toast.LENGTH_LONG).show();
+					try{
+						float foodAmount = selectedFood.getCount();
+						float cancelAmount = Float.parseFloat(cancelEdtTxt.getText().toString());
 						
-					}else if(foodAmount > cancelAmount){
-						/**
-						 * 如果删除数量少于已点数量，则相应减去删除数量
-						 */
-						selectedFood.setCount(foodAmount - cancelAmount);
-						_adapter.notifyDataSetChanged();
-						dismiss();
-						Toast.makeText(_context, "删除\"" + selectedFood.toString() + "\"" + cancelAmount + "份成功", Toast.LENGTH_LONG).show();
+						if(foodAmount == cancelAmount){
+							/**
+							 * 如果数量相等，则从列表中删除此菜
+							 */
+							_foods.remove(selectedFood);
+							_adapter.notifyDataSetChanged();
+							dismiss();
+							Toast.makeText(_context, "删除\"" + selectedFood.toString() + "\"" + cancelAmount + "份成功", Toast.LENGTH_LONG).show();
+							
+						}else if(foodAmount > cancelAmount){
+							/**
+							 * 如果删除数量少于已点数量，则相应减去删除数量
+							 */
+							selectedFood.setCount(foodAmount - cancelAmount);
+							_adapter.notifyDataSetChanged();
+							dismiss();
+							Toast.makeText(_context, "删除\"" + selectedFood.toString() + "\"" + cancelAmount + "份成功", Toast.LENGTH_LONG).show();
+							
+						}else{
+							Toast.makeText(_context, "输入的删除数量大于已点数量, 请重新输入", Toast.LENGTH_LONG).show();
+						}
 						
-					}else{
-						new AlertDialog.Builder(_context)
-							.setTitle("提示")
-							.setMessage("你输入的删除数量大于已点数量, 请重新输入")
-							.setNeutralButton("确定", null)
-							.show();
+					}catch(NumberFormatException e){
+						Toast.makeText(_context, "你输入删菜数量不正确", Toast.LENGTH_LONG).show();
 					}
+
 				}
 			});
 			
