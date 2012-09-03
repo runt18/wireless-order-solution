@@ -1,5 +1,7 @@
 package com.wireless.Actions.menuMgr;
 
+import java.io.File;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -41,8 +43,17 @@ public class DeleteMenuAction extends Action {
 			fb.setFoodID(Integer.parseInt(foodID));
 			fb.setRestaurantID(Integer.parseInt(restaurantID));
 			
+			// 获取菜品图片信息,删除菜品成功删除菜品相关信息
+			fb = FoodBasicDao.getFoodBasicImage(fb);
+			
 			FoodBasicDao.deleteFood(fb);
 			jobject.initTip(true, "操作成功,已删除菜品相关信息.");
+			
+			try{
+				deleteImageFile(fb);
+			}catch(Exception e){
+				jobject.setMsg(jobject.getMsg() + "但删除菜品图片失败.");
+			}
 			
 		} catch (Exception e) {
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 数据库操作请求发生错误!");
@@ -54,5 +65,26 @@ public class DeleteMenuAction extends Action {
 
 		return null;
 	}
-
+	
+	/**
+	 * 
+	 * @param fb
+	 * @throws Exception
+	 */
+	private void deleteImageFile(FoodBasic fb) throws Exception{
+		try{
+			if(fb.getImg() != null && fb.getImg().trim().length() > 0){
+				String imageUploadPath = this.getServlet().getInitParameter("imageUploadPath");
+				imageUploadPath = imageUploadPath + File.separator + fb.getRestaurantID() + File.separator + fb.getImg();
+				File img = new File(imageUploadPath);
+				if(img.exists()){
+					img.delete();
+				}
+			}
+		}catch(Exception e){
+			throw e;
+		}
+	}
+	
+	
 }
