@@ -45,23 +45,25 @@ var checkOutStore = new Ext.data.Store({
 	reader : new Ext.data.JsonReader(Ext.ux.readConfig, 
 		[ 
 			{
-				name : "displayFoodName"
+				name : 'displayFoodName'
 			}, {
-				name : "foodName"
+				name : 'foodName'
 			}, {
-				name : "tastePref"
+				name : 'tastePref'
 			}, {
-				name : "count"
+				name : 'tastePrice'
 			}, {
-				name : "unitPrice"
+				name : 'count'
 			}, {
-				name : "discount"
+				name : 'unitPrice'
 			}, {
-				name : "totalPrice"
+				name : 'discount'
+			}, {
+				name : 'totalPrice'
 			},  {
-				name : "orderDateFormat"
+				name : 'orderDateFormat'
 			},  {
-				name : "waiter"
+				name : 'waiter'
 			}  
 		]
 	)
@@ -72,95 +74,101 @@ checkOutStore.reload();
 // 3，栏位模型
 var checkOutColumnModel = new Ext.grid.ColumnModel([
 		new Ext.grid.RowNumberer(), {
-			header : "菜名",
+			header : '菜名',
 			sortable : true,
-			dataIndex : "foodName",
-			id : "dishNameCOCM",
-			width : 250
+			dataIndex : 'foodName',
+			id : 'dishNameCOCM',
+			width : 230
 		}, {
-			header : "口味",
+			header : '口味',
 			sortable : true,
-			dataIndex : "tastePref",
-			width : 150
+			dataIndex : 'tastePref',
+			width : 130
 		}, {
-			header : "数量",
+			header : '口味价钱',
 			sortable : true,
-			dataIndex : "count",
-			width : 70,
-			align : 'right',
-			renderer : Ext.ux.txtFormat.gridDou
-		}, {
-			header : "单价",
-			sortable : true,
-			dataIndex : "unitPrice",
-			width : 70,
-			align : 'right',
-			renderer : Ext.ux.txtFormat.gridDou
-		}, {
-			header : "打折率",
-			sortable : true,
-			dataIndex : "discount",
-			width : 70,
-			align : 'right',
-			renderer : Ext.ux.txtFormat.gridDou
-		}, {
-			header : "总价",
-			sortable : true,
-			dataIndex : "totalPrice",
+			dataIndex : 'tastePrice',
 			width : 80,
 			align : 'right',
 			renderer : Ext.ux.txtFormat.gridDou
 		}, {
-			header : "时间",
+			header : '数量',
 			sortable : true,
-			dataIndex : "orderDateFormat",
-			width : 160
+			dataIndex : 'count',
+			width : 70,
+			align : 'right',
+			renderer : Ext.ux.txtFormat.gridDou
 		}, {
-			header : "服务员",
+			header : '单价',
 			sortable : true,
-			dataIndex : "waiter",
+			dataIndex : 'unitPrice',
+			width : 70,
+			align : 'right',
+			renderer : Ext.ux.txtFormat.gridDou
+		}, {
+			header : '打折率',
+			sortable : true,
+			dataIndex : 'discount',
+			width : 70,
+			align : 'right',
+			renderer : Ext.ux.txtFormat.gridDou
+		}, {
+			header : '总价',
+			sortable : true,
+			dataIndex : 'totalPrice',
+			width : 80,
+			align : 'right',
+			renderer : Ext.ux.txtFormat.gridDou
+		}, {
+			header : '时间',
+			sortable : true,
+			dataIndex : 'orderDateFormat',
+			width : 130
+		}, {
+			header : '服务员',
+			sortable : true,
+			dataIndex : 'waiter',
 			width : 80
 		} ]);
 
 // 4，表格
 var checkOutGrid = new Ext.grid.GridPanel({
-	title : "账单列表",
+	title : '菜式',
 	border : true,
 	width : 1000,
-	style : "margin:0 auto",
-	xtype : "grid",
+	style : 'margin:0 auto',
+	xtype : 'grid',
 	ds : checkOutStore,
 	cm : checkOutColumnModel
-//	,autoExpandColumn : "dishNameCOCM"
 });
 
 // member number input pop window
 var memberNbrInputWin = new Ext.Window({
-	layout : "fit",
+	layout : 'fit',
 	width : 240,
 	height : 100,
-	closeAction : "hide",
-	buttonAlign : "center",
+	closeAction : 'hide',
+	buttonAlign : 'center',
 	resizable : false,
 	items : [ {
-		layout : "form",
+		layout : 'form',
 		labelWidth : 60,
 		border : false,
 		frame : true,
 		items : [ {
-			xtype : "numberfield",
-			fieldLabel : "会员证号",
-			id : "memberNbrInput",
+			xtype : 'numberfield',
+			fieldLabel : '会员证号',
+			id : 'memberNbrInput',
 			width : 140
 		} ]
 	} ],
 	buttons : [
 			{
-				text : "确定",
+				text : '确定',
 				handler : function() {
-					var memberNbr = memberNbrInputWin.findById("memberNbrInput").getValue();
-					memberNbrInputWin.findById("memberNbrInput").setValue("");
-					if (memberNbr != "") {
+					var memberNbr = memberNbrInputWin.findById('memberNbrInput').getValue();
+					memberNbrInputWin.findById('memberNbrInput').setValue('');
+					if (memberNbr != '') {
 
 						getMemberInfo(memberNbr);
 						//checkOurListRefresh();
@@ -169,17 +177,17 @@ var memberNbrInputWin = new Ext.Window({
 					}
 				}
 			}, {
-				text : "取消",
+				text : '取消',
 				handler : function() {
 					memberNbrInputWin.hide();
 					checkOutForm.buttons[2].hide();
-					memberNbrInputWin.findById("memberNbrInput").setValue("");
+					memberNbrInputWin.findById('memberNbrInput').setValue('');
 				}
 			} ],
 	listeners : {
 		beforehide : function(thiz) {
-			if (!checkOutForm.findById("memberInfoPanel").isVisible()) {
-				discountKindComb.setValue("一般");
+			if (!checkOutForm.findById('memberInfoPanel').isVisible()) {
+				discountKindComb.setValue('一般');
 				checkOurListRefresh();
 				actualMemberID = -1;
 			}
@@ -188,35 +196,35 @@ var memberNbrInputWin = new Ext.Window({
 });
 
 // membership select comb
-var discountKindData = [ [ "0", "一般" ], [ "1", "会员" ] ];
+var discountKindData = [ [ '0', '一般' ], [ '1', '会员' ] ];
 
 var discountKindComb = new Ext.form.ComboBox({
-	fieldLabel : "结账方式",
-	labelStyle : "font-size:14px;font-weight:bold;",
+	fieldLabel : '结账方式',
+	labelStyle : 'font-size:14px;font-weight:bold;',
 	readOnly : true,
 	forceSelection : true,
-	value : "一般",
-	id : "payTpye",
+	value : '一般',
+	id : 'payTpye',
 	store : new Ext.data.SimpleStore({
-		fields : [ "value", "text" ],
+		fields : [ 'value', 'text' ],
 		data : discountKindData
 	}),
-	valueField : "value",
-	displayField : "text",
+	valueField : 'value',
+	displayField : 'text',
 	typeAhead : true,
-	mode : "local",
-	triggerAction : "all",
+	mode : 'local',
+	triggerAction : 'all',
 	selectOnFocus : true,
 	allowBlank : false,
 	listeners : {
 		select : function(combo, record, index) {
-			if (record.get("text") == "一般") {
+			if (record.get('text') == '一般') {
 				// set the memeber card balance to -1;
 				mBalance = -1;
 				checkOurListRefresh();
 				checkOutForm.buttons[2].hide();
 				// hide the member info
-				checkOutForm.findById("memberInfoPanel").hide();
+				checkOutForm.findById('memberInfoPanel').hide();
 			} else {
 				memberNbrInputWin.show();
 			}
@@ -228,14 +236,14 @@ var checkOutForm = new Ext.form.FormPanel({
 	frame : true,
 	border : false,
 	items : [ {
-		layout : "column",
+		layout : 'column',
 		border : false,
 		items : [ {
-			html : "<div>&nbsp;&nbsp;</div>",
-			id : "placeHolderCOF1",
+			html : '<div>&nbsp;&nbsp;</div>',
+			id : 'placeHolderCOF1',
 			width : 150
 		}, {
-			layout : "form",
+			layout : 'form',
 			border : false,
 			labelSeparator : '：',
 			labelWidth : 30,
@@ -259,7 +267,7 @@ var checkOutForm = new Ext.form.FormPanel({
 				anchor : '95%',
 				listeners : {
 					check : function(thiz, newValue, oldValue) {
-						// alert("1");
+						// alert('1');
 						checkOurListRefresh();
 					}
 				}
@@ -281,7 +289,7 @@ var checkOutForm = new Ext.form.FormPanel({
 				anchor : '95%',
 				listeners : {
 					check : function(thiz, newValue, oldValue) {
-						// alert("2");
+						// alert('2');
 						checkOurListRefresh();
 					}
 				}
@@ -303,88 +311,88 @@ var checkOutForm = new Ext.form.FormPanel({
 				anchor : '95%',
 				listeners : {
 					check : function(thiz, newValue, oldValue) {
-						// alert("3");
+						// alert('3');
 						checkOurListRefresh();
 					}
 				}
 			} ]
 		} ]
 	}, {
-		layout : "column",
+		layout : 'column',
 		border : false,
 		items : [ {
-			html : "<div>&nbsp;&nbsp;</div>",
-			id : "placeHolderCOF2",
+			html : '<div>&nbsp;&nbsp;</div>',
+			id : 'placeHolderCOF2',
 			hidden : true,
 			width : 150
 		}, {
-			layout : "fit",
-			id : "memberInfoPanel",
+			layout : 'fit',
+			id : 'memberInfoPanel',
 			width : 1000,
-			contentEl : "memberInfo",
+			contentEl : 'memberInfo',
 			hidden : true,
 			listeners : {
 				hide : function(thiz) {
-					checkOutForm.findById("placeHolderCOF2").hide();
+					checkOutForm.findById('placeHolderCOF2').hide();
 					// gridHeightOffset = 80;
 				},
 				show : function(thiz) {
-					checkOutForm.findById("placeHolderCOF2").show();
+					checkOutForm.findById('placeHolderCOF2').show();
 					// gridHeightOffset = 120;
 				}
 			}
 		} ]
 	}, checkOutGrid, {
-		layout : "column",
+		layout : 'column',
 		border : false,
 		items : [ {
-			html : "<div>&nbsp;&nbsp;</div>",
-			id : "placeHolderCOF3",
+			html : '<div>&nbsp;&nbsp;</div>',
+			id : 'placeHolderCOF3',
 			// hidden : true,
 			width : 150
 		}, {
 			border : false,
-			contentEl : "payInfo"
+			contentEl : 'payInfo'
 		} ]
 	}, {
-		layout : "column",
+		layout : 'column',
 		border : false,
 		items : [ {
-			html : "<div>&nbsp;&nbsp;</div>",
-			id : "placeHolderCOF4",
+			html : '<div>&nbsp;&nbsp;</div>',
+			id : 'placeHolderCOF4',
 			// hidden : true,
 			width : 150
 		}, {
-			layout : "form",
+			layout : 'form',
 			border : false,
 			labelSeparator : '：',
 			labelWidth : 40,
 			width : 1000,
 			items : [ {
-				xtype : "textfield",
-				fieldLabel : "备注",
-				id : "remark",
-				anchor : "%99"
+				xtype : 'textfield',
+				fieldLabel : '备注',
+				id : 'remark',
+				anchor : '%99'
 			} ]
 		} ]
 	} ],
 	buttons : [
 			{
-				text : "现金结账",
+				text : '现金结账',
 				handler : function() {
 					setFormButtonStatus(true);
 					paySubmit(1);
 				}
 			},
 			{
-				text : "刷卡结账",
+				text : '刷卡结账',
 				handler : function() {
 					setFormButtonStatus(true);
 					paySubmit(2);
 				}
 			},
 			{
-				text : "会员卡结账",
+				text : '会员卡结账',
 				hidden : true,
 				handler : function() {
 					setFormButtonStatus(true);
@@ -392,61 +400,61 @@ var checkOutForm = new Ext.form.FormPanel({
 				}
 			},
 			{
-				text : "签单",
+				text : '签单',
 				handler : function() {
 					setFormButtonStatus(true);
 					paySubmit(4);
 				}
 			},
 			{
-				text : "挂账",
+				text : '挂账',
 				handler : function() {
 					setFormButtonStatus(true);
 					paySubmit(5);
 				}
 			},
 			{
-				text : "暂结",
+				text : '暂结',
 				handler : function() {
 					setFormButtonStatus(true);
 					paySubmit(6);
 				}
 			},
 			{
-				text : "返回",
+				text : '返回',
 				handler : function() {
 					var Request = new URLParaQuery();
-					location.href = "TableSelect.html?pin=" + Request["pin"] + "&restaurantID=" + restaurantID;
+					location.href = 'TableSelect.html?pin=' + Request['pin'] + '&restaurantID=' + restaurantID;
 				}
 			} ],
 	listeners : {
 		afterlayout : function(thiz) {
 			checkOutGrid.setHeight(thiz.getInnerHeight() - gridHeightOffset);
-			thiz.findById("placeHolderCOF1").setWidth((thiz.getInnerWidth() - 1000) / 2);
-			thiz.findById("placeHolderCOF2").setWidth((thiz.getInnerWidth() - 1000) / 2);
-			thiz.findById("placeHolderCOF3").setWidth((thiz.getInnerWidth() - 1000) / 2);
-			thiz.findById("placeHolderCOF4").setWidth((thiz.getInnerWidth() - 1000) / 2);
+			thiz.findById('placeHolderCOF1').setWidth((thiz.getInnerWidth() - 1000) / 2);
+			thiz.findById('placeHolderCOF2').setWidth((thiz.getInnerWidth() - 1000) / 2);
+			thiz.findById('placeHolderCOF3').setWidth((thiz.getInnerWidth() - 1000) / 2);
+			thiz.findById('placeHolderCOF4').setWidth((thiz.getInnerWidth() - 1000) / 2);
 		}
 	}
 });
 
 var checkOutCenterPanel = new Ext.Panel({
-	region : "center",
-	id : "checkOutCenterPanel",
-	layout : "fit",
+	region : 'center',
+	id : 'checkOutCenterPanel',
+	layout : 'fit',
 	items : [ checkOutForm ]
 });
 
 // --------------check-out north panel-----------------
 var checkOutNorthPanel = new Ext.Panel({
-	id : "checkOutNorthPanel",
-	region : "north",
-	title : "<div style='font-size:18px;padding-left:2px'>结账<div>",
+	id : 'checkOutNorthPanel',
+	region : 'north',
+	title : '<div style="font-size:18px;padding-left:2px">结账<div>',
 	height : 75,
 	border : false,
-	layout : "form",
+	layout : 'form',
 	frame : true,
-	contentEl : "tableStatusCO"
+	contentEl : 'tableStatusCO'
 });
 
 Ext.onReady(function() {
@@ -456,47 +464,36 @@ Ext.onReady(function() {
 	
 	// *************整体布局*************
 	var centerPanelCO = new Ext.Panel({
-		id : "centerPanelDO",
-		region : "center",
+		id : 'centerPanelDO',
+		region : 'center',
 		border : false,
-		margins : "0 0 0 0",
-		layout : "border",
+		margins : '0 0 0 0',
+		layout : 'border',
 		items : [ checkOutCenterPanel, checkOutNorthPanel ]
 	});
 	
 	new Ext.Viewport({
-		layout : "border",
+		layout : 'border',
 		items : [
 		    {
-		    	region : "north",
-		    	bodyStyle : "background-color:#DFE8F6;",
-				html : "<h4 style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4><div id='optName' class='optName'></div>",
+		    	region : 'north',
+		    	bodyStyle : 'background-color:#DFE8F6;',
+				html : '<h4 style="padding:10px;font-size:150%;float:left;">无线点餐网页终端</h4><div id="optName" class="optName"></div>',
 				height : 50,
 				border : false,
-				margins : "0 0 0 0"
+				margins : '0 0 0 0'
 			},
 			centerPanelCO,
 			{
-				region : "south",
+				region : 'south',
 				height : 30,
-				layout : "form",
+				layout : 'form',
 				frame : true,
 				border : false,
-				html : "<div style='font-size:11pt; text-align:center;'><b>版权所有(c) 2011 智易科技</b></div>"
+				html : '<div style="font-size:11pt; text-align:center;"><b>版权所有(c) 2011 智易科技</b></div>'
 			}
 		]
 	});
-
-	// -------------------- 浏览器大小改变 -------------------------------
-	// 1,调整colDisplayFormUQ中表格的高度
-//	Ext.EventManager.onWindowResize(function() {
-//		checkOutGrid.setHeight(checkOutCenterPanel.getInnerHeight() - gridHeightOffset);
-//		if (checkOutCenterPanel.getInnerWidth() < 1000) {
-//			checkOutGrid.setWidth(checkOutCenterPanel.getInnerWidth() - 20);
-//		} else {
-//			checkOutGrid.setWidth(1000);
-//		}
-//	});
 });
 
 setFormButtonStatus = function(_s){

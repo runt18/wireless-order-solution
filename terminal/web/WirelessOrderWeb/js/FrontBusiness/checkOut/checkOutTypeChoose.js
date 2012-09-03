@@ -153,7 +153,7 @@ var checkOurListRefresh = function() {
 		var tpItem = checkOutDataDisplay.root[i];
 		var singleCount = parseFloat(tpItem.totalPrice);
 		if (tpItem.gift == true) {
-			forFreeCount = forFreeCount + parseFloat(tpItem.discount) * tpItem.totalPrice;
+			forFreeCount = forFreeCount + parseFloat(tpItem.discount) * singleCount;
 		} else {
 			totalCount = totalCount + singleCount;
 		}
