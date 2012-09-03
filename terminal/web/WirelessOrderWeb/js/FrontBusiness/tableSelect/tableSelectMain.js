@@ -973,10 +973,10 @@ Ext.onReady(function() {
 //						return;
 						
 						var pageSize = 300;
-						var cmData = [[true,false,false],['日期','order_date',150],['名称','food_name',150],['单价','unit_price',80],
-						              ['数量','amount',80],['折扣','discount',80],['口味','taste_pref'],
-						              ['口味价钱','taste_price',80],['厨房','kitchen'],['服务员','waiter',80],
-						              ['反结帐','isPaid',80,'','getIsPaidDisplay'],['备注','comment']];
+						var cmData = [[true,false,false],['日期','order_date',150],['名称','food_name',150],['单价','unit_price',80, 'right', 'Ext.ux.txtFormat.gridDou'],
+						              ['数量','amount', 80, 'right', 'Ext.ux.txtFormat.gridDou'], ['折扣','discount',80, 'right', 'Ext.ux.txtFormat.gridDou'],['口味','taste_pref'],
+						              ['口味价钱','taste_price',80, 'right', 'Ext.ux.txtFormat.gridDou'],['厨房','kitchen'],['服务员','waiter']];
+//						              ['反结帐','isPaid',80,'','getIsPaidDisplay'],['备注','comment']];
 						var url = '../../QueryDetail.do?tiem=' + new Date();
 						var readerData = ['order_date','food_name','unit_price','amount','discount','taste_pref','taste_price','kitchen','waiter','comment','isPaid','isDiscount','isGift','isReturn','message'];
 						var baseParams = [['pin', pin], ['queryType', 'TodayByTbl'], ['tableAlias', selTabContent.tableAlias], ['restaurantID', restaurantID]];							
@@ -988,6 +988,14 @@ Ext.onReady(function() {
 						if(!selTabContentGrid){					
 							selTabContentGrid = createGridPanel(id,title,height,width,url,cmData,readerData,baseParams,pageSize,groupName,null);
 							selTabContentGrid.bbar = '';
+							selTabContentGrid.getStore().on('load', function(store, records, options){
+								for(var i = 0; i < records.length; i++){
+									if(eval(records[i].get('amount') < 0)){
+										var sumRow = selTabContentGrid.getView().getRow(i);
+										sumRow.style.backgroundColor = '#FF0000';
+									}
+								}
+							});
 						}
 						
 						if(!selTabContentWin){
