@@ -183,25 +183,24 @@ public class PickTasteActivity extends Activity{
 	//设置常用View
 	public View setupPopularView(){
 		View popView = LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.popular, null);
-    	final ListView styleLstView = (ListView)popView.findViewById(R.id.popLstView);
+    	final ListView popLstView = (ListView)popView.findViewById(R.id.popLstView);
     	((EditText)popView.findViewById(R.id.popSrchEdtTxt)).setText("");
-		styleLstView.setAdapter(new TasteAdapter(_selectedFood.popTastes));
+		popLstView.setAdapter(new TasteAdapter(_selectedFood.popTastes));
 		
 	    
 	    //滚动的时候隐藏输入法
-	    styleLstView.setOnScrollListener(new OnScrollListener() {
+	    popLstView.setOnScrollListener(new OnScrollListener() {
 				
-				@Override
-				public void onScrollStateChanged(AbsListView view, int scrollState) {
-					((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(((EditText)findViewById(R.id.popSrchEdtTxt)).getWindowToken(), 0);
-				}
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
+				((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(((EditText)findViewById(R.id.popSrchEdtTxt)).getWindowToken(), 0);
+			}
 				
-				@Override
-				public void onScroll(AbsListView view, int firstVisibleItem,
-						int visibleItemCount, int totalItemCount) {
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 					
-				}
-			});
+			}
+		});
 	    
 	    /**
 		 * 在常用选择页面中按名称进行筛选
@@ -217,10 +216,10 @@ public class PickTasteActivity extends Activity{
 				    		 popTastes.add(_selectedFood.popTastes[i]);
 				    	 }
 				    }
-					styleLstView.setAdapter(new TasteAdapter(popTastes.toArray(new Taste[popTastes.size()])));
+					popLstView.setAdapter(new TasteAdapter(popTastes.toArray(new Taste[popTastes.size()])));
 					
 				}else{
-					styleLstView.setAdapter(new TasteAdapter(_selectedFood.popTastes));
+					popLstView.setAdapter(new TasteAdapter(_selectedFood.popTastes));
 				}
 			}
 			

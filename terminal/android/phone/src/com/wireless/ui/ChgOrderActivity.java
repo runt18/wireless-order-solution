@@ -390,7 +390,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 	 */
 	private class QueryOrderTask extends com.wireless.lib.task.QueryOrderTask{
 
-		private ProgressDialog _progDialog;
+		private ProgressDialog mProgDialog;
 	
 		QueryOrderTask(int tableAlias){
 			super(tableAlias);
@@ -401,7 +401,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 		 */
 		@Override
 		protected void onPreExecute(){
-			_progDialog = ProgressDialog.show(ChgOrderActivity.this, "", "查询" + mTblAlias + "号餐台的信息...请稍候", true);
+			mProgDialog = ProgressDialog.show(ChgOrderActivity.this, "", "查询" + mTblAlias + "号餐台的信息...请稍候", true);
 		}
 		
 		/**
@@ -412,7 +412,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 		protected void onPostExecute(Order order){
 
 			//make the progress dialog disappeared
-			_progDialog.dismiss();
+			mProgDialog.dismiss();
 			
 			if(mErrMsg != null){
 				/**
