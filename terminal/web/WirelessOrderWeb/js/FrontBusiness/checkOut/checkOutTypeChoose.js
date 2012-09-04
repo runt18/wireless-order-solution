@@ -106,11 +106,10 @@ var checkOurListRefresh = function() {
 		
 		if(tpItem.special == true || tpItem.gift == true){
 			// 特价和赠送菜品不打折
-			tpItem.totalPrice = parseFloat(tpItem.unitPrice * tpItem.count);
+			tpItem.totalPrice = parseFloat((tpItem.unitPrice + tpItem.tastePrice) * tpItem.count);
 		}else{
-			tpItem.totalPrice = parseFloat((tpItem.unitPrice * tpItem.discount + tpItem.tastePrice) * tpItem.count);
+			tpItem.totalPrice = parseFloat(((tpItem.unitPrice + tpItem.tastePrice) * tpItem.discount) * tpItem.count);
 		}
-				
 		checkOutDataDisplay.root.push(tpItem);
 	}
 
