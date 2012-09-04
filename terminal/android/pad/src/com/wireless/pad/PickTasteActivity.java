@@ -47,10 +47,11 @@ public class PickTasteActivity extends TabActivity{
 		}
 	};
 	
+	private final static String TAG_POP = "pop";
 	private final static String TAG_TASTE = "taste";
 	private final static String TAG_STYLE = "style";
 	private final static String TAG_SPEC = "spec";
-	private final static String TAG_PIN = "pinzhu";
+	private final static String TAG_PINZHU = "pinzhu";
 	
 	private OrderFood _selectedFood;
 	private TextView _tasteTxtView;
@@ -74,29 +75,40 @@ public class PickTasteActivity extends TabActivity{
 		
 		_tabHost = getTabHost();
 		
+		//常用Tab
+		TabSpec spec = _tabHost.newTabSpec(TAG_POP)
+					   .setIndicator(createTabIndicator("常用", R.drawable.kitchen_selector))
+					   .setContent(new TabHost.TabContentFactory(){
+						   @Override
+						   public View createTabContent(String arg0) {
+							   return LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.pop_taste, null);
+						   }								   
+					   });
+		_tabHost.addTab(spec);
+		
 		//口味Tab
-		TabSpec spec = _tabHost.newTabSpec(TAG_TASTE)
-							   .setIndicator(createTabIndicator("口味", R.drawable.number_selector))
-							   .setContent(new TabHost.TabContentFactory(){
-								   @Override
-								   public View createTabContent(String arg0) {
-									   return LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.taste, null);
-								   }								   
-							   });
+		spec = _tabHost.newTabSpec(TAG_TASTE)
+					   .setIndicator(createTabIndicator("口味", R.drawable.number_selector))
+					   .setContent(new TabHost.TabContentFactory(){
+						   @Override
+						   public View createTabContent(String arg0) {
+							   return LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.taste, null);
+						   }								   
+					   });
 		_tabHost.addTab(spec);
 		
 		
 		
 		//做法Tab
-		spec = _tabHost.newTabSpec(TAG_STYLE)
-					   .setIndicator(createTabIndicator("做法", R.drawable.kitchen_selector))
-					   .setContent(new TabHost.TabContentFactory(){
-						   @Override
-						   public View createTabContent(String arg0) {
-							   return LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.style, null);
-						   }								   
-					   });
-		_tabHost.addTab(spec);
+//		spec = _tabHost.newTabSpec(TAG_STYLE)
+//					   .setIndicator(createTabIndicator("做法", R.drawable.kitchen_selector))
+//					   .setContent(new TabHost.TabContentFactory(){
+//						   @Override
+//						   public View createTabContent(String arg0) {
+//							   return LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.style, null);
+//						   }								   
+//					   });
+//		_tabHost.addTab(spec);
 		
 		
 		
@@ -114,7 +126,7 @@ public class PickTasteActivity extends TabActivity{
 		
 
 		//品注Tab
-		spec = _tabHost.newTabSpec(TAG_PIN)
+		spec = _tabHost.newTabSpec(TAG_PINZHU)
 					   .setIndicator(createTabIndicator("品注",R.drawable.occasional_selector))
 					   .setContent(new TabHost.TabContentFactory(){
 						   @Override
@@ -130,21 +142,32 @@ public class PickTasteActivity extends TabActivity{
 		_tabHost.setOnTabChangedListener(new OnTabChangeListener() {			
 			@Override
 			public void onTabChanged(String tag) {
-				if(tag == TAG_TASTE){
+				if(tag == TAG_POP){
+					setupPopTasteView();
+				}else if(tag == TAG_TASTE){
 					setupTasteView();		
 				}else if(tag == TAG_STYLE){
 					setupStyleView();
 				}else if(tag == TAG_SPEC){
 					setupSpecView();
-				}else if(tag == TAG_PIN){
+				}else if(tag == TAG_PINZHU){
 					setupPinZhuView();
 				}
 				_handler.sendEmptyMessage(0);
 			}
 		});
 		
-		_tabHost.setCurrentTabByTag(TAG_TASTE);
-		setupTasteView();
+		if(_selectedFood.popTastes.length != 0){
+			_tabHost.setCurrentTabByTag(TAG_POP);
+			setupPopTasteView();
+		}else{
+			_tabHost.setCurrentTabByTag(TAG_TASTE);
+			setupTasteView();
+		}
+		
+//		_tabHost.setCurrentTabByTag(TAG_TASTE);
+//		setupTasteView();
+
 		_handler.sendEmptyMessage(0);	
 		
 	}	
@@ -180,8 +203,77 @@ public class PickTasteActivity extends TabActivity{
 			sendPickTasteBoradcast();
 		}
 	}
+	
+   //设置口味View
+	private void setupPopTasteView(){
+		
+		//删除所有口味Button
+		((Button)findViewById(R.id.cancelPopBtn)).setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				removeAllTaste();
+			}
+		});
+		
+		_tasteTxtView = (TextView)findViewById(R.id.foodPopTasteTxtView);
+	    final GridView popLstView = (GridView)findViewById(R.id.popLstView);
+	    popLstView.setNumColumns(4);
+	   ((EditText)findViewById(R.id.popSrchEdtTxt)).setText("");
+	   
+	   _tasteAdapter = new TasteAdapter(_selectedFood.popTastes);
+	   popLstView.setAdapter(_tasteAdapter);
+		
+		
+		//滚动的时候隐藏输入法
+		popLstView.setOnScrollListener(new OnScrollListener() {
+				
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
+				((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(((EditText)findViewById(R.id.tastesearch)).getWindowToken(), 0);
+			}
+				
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+		
+			}
+		});
+		
+		
+		/**
+		 * 在口味选择页面中按编号进行口味的筛选
+		 */
+		((EditText)findViewById(R.id.popSrchEdtTxt)).addTextChangedListener(new TextWatcher() {
+			
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				
+				ArrayList<Taste> popTastes = new ArrayList<Taste>();
+				if(s.toString().length() != 0){
+					 for(int i = 0; i < _selectedFood.popTastes.length; i++){
+				    	 if(_selectedFood.popTastes[i].preference.contains(s.toString().trim())){
+				    		 popTastes.add(_selectedFood.popTastes[i]);
+				    	 }
+				    }
+					 
+					_tasteAdapter = new TasteAdapter(popTastes.toArray(new Taste[popTastes.size()]));
+					popLstView.setAdapter(_tasteAdapter);
+					
+				}else{
+					_tasteAdapter = new TasteAdapter(_selectedFood.popTastes);
+					popLstView.setAdapter(_tasteAdapter);
+				}
+			}
+			
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,	int after) {}
+			
+			@Override
+			public void afterTextChanged(Editable s) {}
+		});			
+	}
 	    //设置口味View
-	public void setupTasteView(){
+	private void setupTasteView(){
 		
 		//删除所有口味Button
 		((Button)findViewById(R.id.cancelTasteBtn)).setOnClickListener(new View.OnClickListener() {
@@ -204,16 +296,15 @@ public class PickTasteActivity extends TabActivity{
 		//滚动的时候隐藏输入法
 		tasteLstView.setOnScrollListener(new OnScrollListener() {
 				
-				@Override
-				public void onScrollStateChanged(AbsListView view, int scrollState) {
-					((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(((EditText)findViewById(R.id.tastesearch)).getWindowToken(), 0);
-				}
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
+				((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(((EditText)findViewById(R.id.tastesearch)).getWindowToken(), 0);
+			}
 				
-				@Override
-				public void onScroll(AbsListView view, int firstVisibleItem,
-						int visibleItemCount, int totalItemCount) {
-					
-				}
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+		
+			}
 		});
 		
 		
@@ -251,7 +342,7 @@ public class PickTasteActivity extends TabActivity{
 	
 	
 	//设置做法View
-	public void setupStyleView(){
+	private void setupStyleView(){
 		_tasteTxtView = (TextView)findViewById(R.id.foodStyleTxtView);
     	final GridView styleLstView = (GridView)findViewById(R.id.styleLstView);
     	styleLstView.setNumColumns(4);
@@ -272,17 +363,16 @@ public class PickTasteActivity extends TabActivity{
 	    //滚动的时候隐藏输入法
 	    styleLstView.setOnScrollListener(new OnScrollListener() {
 				
-				@Override
-				public void onScrollStateChanged(AbsListView view, int scrollState) {
-					((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(((EditText)findViewById(R.id.stylesearch)).getWindowToken(), 0);
-				}
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
+				((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(((EditText)findViewById(R.id.stylesearch)).getWindowToken(), 0);
+			}
 				
-				@Override
-				public void onScroll(AbsListView view, int firstVisibleItem,
-						int visibleItemCount, int totalItemCount) {
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 					
-				}
-			});
+			}
+		});
 	    
 	    /**
 		 * 在做法选择页面中按编号进行做法的筛选
@@ -316,7 +406,7 @@ public class PickTasteActivity extends TabActivity{
 	}
 	
 	//设置规格View
-	public void setupSpecView(){
+	private void setupSpecView(){
 		_tasteTxtView = (TextView)findViewById(R.id.foodSpecTxtView);
 		final GridView specLstView = (GridView)findViewById(R.id.specLstView);
 		specLstView.setNumColumns(4);
@@ -380,7 +470,7 @@ public class PickTasteActivity extends TabActivity{
 	}
 	
 	//设置品注View
-	public void setupPinZhuView(){
+	private void setupPinZhuView(){
 	
 		final EditText pinZhuEdtTxt = ((EditText)findViewById(R.id.pinZhuEdtTxt));
 		final EditText priceEdtTxt = ((EditText)findViewById(R.id.priceEdtTxt));

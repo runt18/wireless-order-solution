@@ -1,53 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:orientation="vertical" android:layout_width="fill_parent"
-	android:layout_height="fill_parent"
-	android:background="@drawable/conternbg"
-	>
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/conternbg"
+    android:orientation="vertical" >
 
-	
-<RelativeLayout android:id="@+id/second"
-		android:layout_width="fill_parent" android:layout_height="wrap_content"
-		android:background="@drawable/bg02">
-		<TextView android:id="@+id/ordernum" android:layout_width="wrap_content"
-			android:layout_height="wrap_content" android:textColor="#000000"
-			android:layout_centerVertical="true" android:textSize="20sp"
-			android:text="做法:" android:layout_marginLeft="5dip" />
-		<EditText android:id="@+id/stylesearch" android:layout_width="300dip"
-			android:layout_height="wrap_content" android:layout_centerVertical="true"
-			android:layout_toRightOf="@id/ordernum" android:layout_marginLeft="10dip" />
-	</RelativeLayout>
-	<ImageView android:id="@+id/line" android:layout_width="fill_parent"
-		android:layout_height="wrap_content" android:src="@drawable/line"
-		android:layout_below="@id/second" />
-	
-	
-	<RelativeLayout android:id="@+id/r_taste"
-		android:layout_width="fill_parent" android:layout_height="wrap_content"
-		  android:background="@drawable/dropgrounpitem_selector"
-		  android:layout_below="@id/second" 
-		>
-		<TextView android:id="@+id/foodStyleTxtView" android:layout_width="wrap_content"
-			android:layout_height="wrap_content" android:textSize="20sp"
-			android:textColor="#000000" android:layout_centerVertical="true"
-			android:layout_marginLeft="5dip"></TextView>
-		<Button
-		    android:id="@+id/cancelStyleBtn"
-		    android:layout_width="wrap_content"
-		    android:layout_height="wrap_content"
-		    android:layout_alignParentRight="true"
-		    android:layout_alignParentTop="true"
-		    android:text="删除口味" />
+    <RelativeLayout
+        android:id="@+id/second"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg02" >
 
+        <TextView
+            android:id="@+id/ordernum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dip"
+            android:text="做法:"
+            android:textColor="#000000"
+            android:textSize="20sp" />
 
-	</RelativeLayout>
+        <EditText
+            android:id="@+id/stylesearch"
+            android:layout_width="300dip"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dip"
+            android:layout_toRightOf="@id/ordernum" />
+    </RelativeLayout>
 
-	
+    <ImageView
+        android:id="@+id/line"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/second"
+        android:src="@drawable/line" />
 
-	<GridView
-		android:id="@+id/styleLstView" android:layout_width="fill_parent"
-		android:layout_height="wrap_content" android:layout_below="@id/r_taste"
-		android:divider="@drawable/line" android:cacheColorHint="#00000000"
-		>
-	</GridView>
+    <RelativeLayout
+        android:id="@+id/r_taste"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/second"
+        android:background="@drawable/dropgrounpitem_selector" >
+
+        <TextView
+            android:id="@+id/foodStyleTxtView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dip"
+            android:textColor="#000000"
+            android:textSize="20sp" >
+        </TextView>
+
+        <Button
+            android:id="@+id/cancelStyleBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:text="删除口味" />
+    </RelativeLayout>
+
+    <GridView
+        android:id="@+id/styleLstView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/r_taste"
+        android:cacheColorHint="#00000000"
+        android:divider="@drawable/line" >
+    </GridView>
+
 </RelativeLayout>

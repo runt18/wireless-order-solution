@@ -1,55 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:orientation="vertical" android:layout_width="fill_parent"
-	android:layout_height="fill_parent"
-	android:background="@drawable/conternbg"
-	>
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/conternbg"
+    android:orientation="vertical" >
 
+    <RelativeLayout
+        android:id="@+id/second"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg02" >
 
-   <RelativeLayout android:id="@+id/second"
-		android:layout_width="fill_parent" android:layout_height="wrap_content"
-		 android:background="@drawable/bg02">
-		<TextView android:id="@+id/ordernum" android:layout_width="wrap_content"
-			android:layout_height="wrap_content" android:textColor="#000000"
-			android:layout_centerVertical="true" android:textSize="20sp"
-			android:text="口味:" android:layout_marginLeft="5dip" />
-		<EditText android:id="@+id/tastesearch" android:layout_width="300dip"
-			android:layout_height="wrap_content" android:layout_centerVertical="true"
-			android:layout_toRightOf="@id/ordernum" android:layout_marginLeft="10dip" />
-	</RelativeLayout>
-	
-	<ImageView android:id="@+id/line" android:layout_width="fill_parent"
-		android:layout_height="wrap_content" android:src="@drawable/line"
-		android:layout_below="@id/second" />
-	
-	<RelativeLayout android:id="@+id/r_taste"
-		android:layout_width="fill_parent" android:layout_height="wrap_content"
-		android:layout_below="@id/line"
-		android:background="@drawable/dropgrounpitem_selector"
-		>
-		<TextView android:id="@+id/foodTasteTxtView" android:layout_width="wrap_content"
-			android:layout_height="wrap_content" android:textSize="20sp"
-			android:textColor="#000000" android:layout_centerVertical="true"
-			android:layout_marginLeft="5dip"></TextView>
+        <TextView
+            android:id="@+id/ordernum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dip"
+            android:text="口味:"
+            android:textColor="#000000"
+            android:textSize="20sp" />
 
-		<Button
-		    android:id="@+id/cancelTasteBtn"
-		    android:layout_width="wrap_content"
-		    android:layout_height="wrap_content"
-		    android:layout_alignParentRight="true"
-		    android:layout_alignParentTop="true"
-		    android:background="@drawable/number_selector"
-		    android:textSize="18sp"
-		    android:text="删除口味" />
+        <EditText
+            android:id="@+id/tastesearch"
+            android:layout_width="300dip"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dip"
+            android:layout_toRightOf="@id/ordernum" />
+    </RelativeLayout>
 
-	</RelativeLayout>
+    <ImageView
+        android:id="@+id/line"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/second"
+        android:src="@drawable/line" />
 
-	
+    <RelativeLayout
+        android:id="@+id/r_taste"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/line"
+        android:background="@drawable/dropgrounpitem_selector" >
 
-	<GridView
-		android:id="@+id/tasteLstView" android:layout_width="fill_parent"
-		android:layout_height="wrap_content" android:layout_below="@id/r_taste"
-		android:divider="@drawable/line" android:cacheColorHint="#00000000"
-		>
-	</GridView>
+        <TextView
+            android:id="@+id/foodTasteTxtView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dip"
+            android:textColor="#000000"
+            android:textSize="20sp" >
+        </TextView>
+
+        <Button
+            android:id="@+id/cancelTasteBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:background="@drawable/number_selector"
+            android:text="删除口味"
+            android:textSize="18sp" />
+    </RelativeLayout>
+
+    <GridView
+        android:id="@+id/tasteLstView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/r_taste"
+        android:cacheColorHint="#00000000"
+        android:divider="@drawable/line" >
+    </GridView>
+
 </RelativeLayout>
