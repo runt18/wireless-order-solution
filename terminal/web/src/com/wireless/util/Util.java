@@ -110,7 +110,7 @@ public class Util {
 				// extract the amount to order food
 				foods[i].setCount(Float.parseFloat(values[2]));
 				// extract the taste alias id
-				foods[i].tastes[0].aliasID = Short.parseShort(values[3]);
+				foods[i].tastes[0].aliasID = Integer.parseInt(values[3]);
 				// extract the kitchen number
 				foods[i].kitchen.aliasID = Short.parseShort(values[4]);
 				// extract the discount
