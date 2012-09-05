@@ -116,9 +116,9 @@ public class Util {
 				// extract the discount
 				foods[i].setDiscount(Float.parseFloat(values[5]));
 				// extract the 2nd taste alias id
-				foods[i].tastes[1].aliasID = Short.parseShort(values[6]);
+				foods[i].tastes[1].aliasID = Integer.parseInt(values[6]);
 				// extract the 3rd taste alias id
-				foods[i].tastes[2].aliasID = Short.parseShort(values[7]);
+				foods[i].tastes[2].aliasID = Integer.parseInt(values[7]);
 				// check to see whether containing temporary taste
 				if(Boolean.parseBoolean(values[8])){
 					foods[i].tmpTaste = new Taste();
