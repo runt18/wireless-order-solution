@@ -16,7 +16,7 @@ public class FoodBasic {
 	private byte status;			 // 菜品状态    0x01:特价 0x02推荐  0x04:售完  0x08:赠送  0x10:时价 0x20:套菜
 	private String desc;			 // 菜品简介
 	private String img;				 // 图片名称
-	private short tasteRefType = WebParams.TASTE_SMART_REF;  // 菜品口味关联方式,默认智能关联       1:智能关联  2:人工关联
+	private int tasteRefType = WebParams.TASTE_SMART_REF;  // 菜品口味关联方式,默认智能关联       1:智能关联  2:人工关联
 		
 	public int getRestaurantID() {
 		return restaurantID;
@@ -115,11 +115,11 @@ public class FoodBasic {
 		this.img = img;
 	}
 
-	public short getTasteRefType() {
+	public int getTasteRefType() {
 		return tasteRefType;
 	}
 
-	public void setTasteRefType(short tasteRefType) {
+	public void setTasteRefType(int tasteRefType) {
 		this.tasteRefType = tasteRefType;
 	}
 
