@@ -130,19 +130,19 @@ ALTER TABLE `wireless_order_db`.`taste` ADD COLUMN `type` TINYINT NOT NULL DEFAU
 -- Add the '例牌' to each restaurant's taste
 -- -----------------------------------------------------
 INSERT INTO wireless_order_db.taste (`restaurant_id`, `taste_alias`, `preference`, `category`, `calc`, `type`)
-SELECT id, 0, '例牌', 2, 1, 1 FROM wireless_order_db.restaurant WHERE id > 10;
+SELECT id, 60001, '例牌', 2, 1, 1 FROM wireless_order_db.restaurant WHERE id > 10;
 
 -- -----------------------------------------------------
 -- Add the '中牌' to each restaurant's taste
 -- -----------------------------------------------------
 INSERT INTO wireless_order_db.taste (`restaurant_id`, `taste_alias`, `preference`, `category`, `calc`, `type`)
-SELECT id, 0, '中牌', 2, 1, 1 FROM wireless_order_db.restaurant WHERE id > 10;
+SELECT id, 60002, '中牌', 2, 1, 1 FROM wireless_order_db.restaurant WHERE id > 10;
 
 -- -----------------------------------------------------
 -- Add the '大牌' to each restaurant's taste
 -- -----------------------------------------------------
 INSERT INTO wireless_order_db.taste (`restaurant_id`, `taste_alias`, `preference`, `category`, `calc`, `type`)
-SELECT id, 0, '大牌', 2, 1, 1 FROM wireless_order_db.restaurant WHERE id > 10;
+SELECT id, 60003, '大牌', 2, 1, 1 FROM wireless_order_db.restaurant WHERE id > 10;
 
 -- -----------------------------------------------------
 -- Change all the '做法' to '口味'
