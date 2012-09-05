@@ -232,7 +232,7 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 		cm : g_cm, // 列模型
 		sm : cmData[0][1] ? g_ckbox : null, // 全选
 //		stripeRows : true, // 奇偶行颜色
-		loadMask : { msg: '数据请求中，请稍后...' }, // 加载数据时遮蔽表格
+		loadMask : { msg: '数据请求中,请稍等......' }, // 加载数据时遮蔽表格
 		border : true, // 加上边框
 		frame : true, // 显示天蓝色圆角框
 //		animCollapse : false, // 收缩/展开
