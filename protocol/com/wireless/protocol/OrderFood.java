@@ -437,7 +437,7 @@ public class OrderFood extends Food {
 			return mNormalTastePref;
 			
 		}else{
-			String tastePref = new String();
+			String tastePref = "";
 			for(int i = 0; i < tastes.length; i++){
 				if(tastes[i].aliasID != Taste.NO_TASTE && tastes[i].preference != null){
 					if(tastePref.length() != 0){
