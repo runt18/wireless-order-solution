@@ -630,8 +630,8 @@ var orderedForm = new Ext.form.FormPanel({
 															orderedData.root[i].status = 1;
 														}
 														
-														for(var i = 0; i < selData.length; i++){
-															orderedData.root.push(selData[0]);
+														for(var i = (selData.length - 1); i >= 0 ; i++){
+															orderedData.root.push(selData[i]);
 														}
 														
 														orderedStore.loadData(orderedData);
@@ -839,13 +839,12 @@ var orderedForm = new Ext.form.FormPanel({
 														
 														orderedData = rj;
 														
-														// 更新菜品状态为已点菜
 														for(var i = 0; i < orderedData.root.length; i++){
 															orderedData.root[i].status = 1;
 														}
 														
-														for(var i = 0; i < selData.length; i++){
-															orderedData.root.push(selData[0]);
+														for(var i = (selData.length - 1); i >= 0 ; i++){
+															orderedData.root.push(selData[i]);
 														}
 														
 														orderedStore.loadData(orderedData);
