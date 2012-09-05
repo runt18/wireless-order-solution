@@ -1,10 +1,11 @@
 package com.wireless.Actions.dishesOrder;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import net.sf.json.JSONObject;
 
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -20,7 +21,9 @@ import com.wireless.protocol.ReqPackage;
 import com.wireless.protocol.Terminal;
 import com.wireless.protocol.Type;
 import com.wireless.sccon.ServerConnector;
+import com.wireless.util.JObject;
 import com.wireless.util.Util;
+import com.wireless.util.WebParams;
 
 
 public class InsertOrderAction extends Action implements PinGen {
@@ -31,14 +34,11 @@ public class InsertOrderAction extends Action implements PinGen {
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		
-		String jsonResp = "{success:$(result), data:'$(value)'}";
-		PrintWriter out = null;
+		JObject jobject = new JObject();
 		try {
 			// 解决后台中文传到前台乱码
 			response.setContentType("text/json; charset=utf-8");
-			out = response.getWriter();
 			
-
 			/**
 			 * The parameters looks like below.
 			 * e.g. pin=0x1 & tableID=201 & tableID_2=0 & 
@@ -61,6 +61,8 @@ public class InsertOrderAction extends Action implements PinGen {
 			 * 
 			 * type : "1" means insert order
 			 * 		  "2" means update order
+			 * 
+			 * orderDate : last modified date to this order
 			 * 
 			 * originalTableID : the original table id, this parameter is optional.
 			 * 					 if the type is insert order, NOT need this parameter.
@@ -87,9 +89,12 @@ public class InsertOrderAction extends Action implements PinGen {
 			}			
 			orderToInsert.category = Short.parseShort(request.getParameter("category"));
 			orderToInsert.customNum = Integer.parseInt(request.getParameter("customNum"));
+			if(request.getParameter("orderDate") != null && request.getParameter("orderDate").trim().length() > 0){
+				orderToInsert.orderDate = Long.parseLong(request.getParameter("orderDate"));				
+			}
 			int type = Integer.parseInt(request.getParameter("type"));
 			String orderType = null;
-
+			
 			if(type == 1){
 				orderType = "下单";
 				orderToInsert.srcTbl.aliasID = tableAlias;				
@@ -101,76 +106,59 @@ public class InsertOrderAction extends Action implements PinGen {
 				}else{
 					orderToInsert.srcTbl.aliasID = Integer.parseInt(oriTableID);
 				}
-
 			}
 			orderToInsert.foods = Util.toFoodArray(request.getParameter("foods"));
 			
 			ReqPackage.setGen(this);
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(orderToInsert, 
-																					 (type == 1) ? Type.INSERT_ORDER : Type.UPDATE_ORDER));
+			ProtocolPackage resp = ServerConnector.instance().ask(
+					new ReqInsertOrder(orderToInsert, (type == 1) ? Type.INSERT_ORDER : Type.UPDATE_ORDER));
 			
-		
 			if(resp.header.type == Type.ACK){
-				jsonResp = jsonResp.replace("$(result)", "true");
 				if(orderToInsert.category == Order.CATE_NORMAL){
 					if(orderToInsert.destTbl.aliasID == orderToInsert.srcTbl.aliasID){
-						jsonResp = jsonResp.replace("$(value)", orderToInsert.destTbl.aliasID + "号餐台" + orderType + "成功");
+						jobject.initTip(true, (orderToInsert.destTbl.aliasID + "号餐台" + orderType + "成功."));
 					}else{
-						jsonResp = jsonResp.replace("$(value)", orderToInsert.srcTbl.aliasID + "号台转至" + orderToInsert.destTbl.aliasID + "号台，改单成功。");
+						jobject.initTip(true, (orderToInsert.srcTbl.aliasID + "号台转至" + orderToInsert.destTbl.aliasID + "号台，改单成功."));
 					}					
-					
 				}else if(orderToInsert.category == Order.CATE_TAKE_OUT){
-					jsonResp = jsonResp.replace("$(value)", "外卖" + orderType + "成功");
-					
+					jobject.initTip(true, ("外卖" + orderType + "成功."));
 				}else if(orderToInsert.category == Order.CATE_MERGER_TABLE){
-					jsonResp = jsonResp.replace("$(value)", orderToInsert.destTbl.aliasID + "号台拼" + orderToInsert.destTbl2.aliasID + "号台" + orderType + "成功");
-					
+					jobject.initTip(true, (orderToInsert.destTbl.aliasID + "号台拼" + orderToInsert.destTbl2.aliasID + "号台" + orderType + "成功."));
 				}else if(orderToInsert.category == Order.CATE_JOIN_TABLE){
-					jsonResp = jsonResp.replace("$(value)", "并" + orderToInsert.destTbl.aliasID + "号" + orderType + "成功");
+					jobject.initTip(true, ("并" + orderToInsert.destTbl.aliasID + "号" + orderType + "成功."));
 				}
 				
 			}else if(resp.header.type == Type.NAK){
-				jsonResp = jsonResp.replace("$(result)", "false");
 				if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED){
-					jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");
-					
+					jobject.initTip(false, ErrorCode.TERMINAL_NOT_ATTACHED, "没有获取到餐厅信息，请重新确认.");
 				}else if(resp.header.reserved == ErrorCode.TABLE_NOT_EXIST){					
-					jsonResp = jsonResp.replace("$(value)", orderToInsert.destTbl.aliasID + "号餐台信息不存在，请重新确认");
-					
+					jobject.initTip(false, ErrorCode.TABLE_NOT_EXIST, (orderToInsert.destTbl.aliasID + "号餐台信息不存在，请重新确认."));
 				}else if(resp.header.reserved == ErrorCode.TABLE_BUSY){
-					jsonResp = jsonResp.replace("$(value)", orderToInsert.destTbl.aliasID + "号餐台正在就餐，可能已下单，请重新确认");
-					
+					jobject.initTip(false, ErrorCode.TABLE_BUSY, (orderToInsert.destTbl.aliasID + "号餐台正在就餐，可能已下单，请重新确认."));
 				}else if(resp.header.reserved == ErrorCode.PRINT_FAIL){
-					jsonResp = jsonResp.replace("$(value)", orderToInsert.destTbl.aliasID + "号餐台" + orderType + "成功，但未能成功打印，请立刻补打下单并与相关人员确认");
-					
+					jobject.initTip(false, ErrorCode.PRINT_FAIL, (orderToInsert.destTbl.aliasID + "号餐台" + orderType + "成功，但未能成功打印，请立刻补打下单并与相关人员确认."));
 				}else if(resp.header.reserved == ErrorCode.EXCEED_GIFT_QUOTA){
-					jsonResp = jsonResp.replace("$(value)", "赠送菜品金额已超过赠送额度，请与餐厅负责人确认");
-					
+					jobject.initTip(false, ErrorCode.EXCEED_GIFT_QUOTA, "赠送菜品金额已超过赠送额度，请与餐厅负责人确认.");
+				}else if(resp.header.reserved == ErrorCode.ORDER_EXPIRED){
+					jobject.initTip(false, ErrorCode.ORDER_EXPIRED, "账单信息已更新,请重新刷新或返回.");
+				}else if(resp.header.reserved == ErrorCode.TABLE_IDLE){
+					jobject.initTip(false, ErrorCode.TABLE_IDLE, "该账单已结账或已删除.");
 				}else{
-					jsonResp = jsonResp.replace("$(value)", orderToInsert.destTbl.aliasID + "号餐台" + orderType + "失败，请重新确认");
+					jobject.initTip(false, (orderToInsert.destTbl.aliasID + "号餐台" + orderType + "失败，请重新确认."));
 				}
-				
 			}else{
-				jsonResp = jsonResp.replace("$(result)", "false");
-				jsonResp = jsonResp.replace("$(value)", orderToInsert.destTbl.aliasID + "号餐台" + orderType + "不成功，请重新确认");
+				jobject.initTip(false, (orderToInsert.destTbl.aliasID + "号餐台" + orderType + "不成功，请重新确认."));
 			}
-			
 		}catch(IOException e){
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "服务器请求不成功，请重新检查网络是否连通.");
 			e.printStackTrace();
-			jsonResp = jsonResp.replace("$(result)", "false");
-			jsonResp = jsonResp.replace("$(value)", "服务器请求不成功，请重新检查网络是否连通");
-			
 		}catch(NumberFormatException e){
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "菜品提交的数量不正确，请检查后重新提交.");
 			e.printStackTrace();
-			jsonResp = jsonResp.replace("$(result)", "false");
-			jsonResp = jsonResp.replace("$(value)", "菜品提交的数量不正确，请检查后重新提交");
-			
 		}finally{
-			//just for debug
-			//System.out.println(jsonResp);
-			out.write(jsonResp);
+			JSONObject json = JSONObject.fromObject(jobject);
+			response.getWriter().print(json);
 		}
-
 		return null;
 	}
 	
