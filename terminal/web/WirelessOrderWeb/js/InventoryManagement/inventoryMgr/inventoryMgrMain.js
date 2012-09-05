@@ -1620,7 +1620,7 @@ var inventoryAnalysisBut = new Ext.ux.ImageButton({
 });
 
 var materialAddBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/material_add.png",
+	imgPath : '../../images/btnAddForBigBar.png',
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : "添加食材",
