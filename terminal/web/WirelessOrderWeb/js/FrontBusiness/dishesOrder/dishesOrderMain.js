@@ -661,7 +661,7 @@ var orderedForm = new Ext.form.FormPanel({
 									var action = '<br/>点击确定返回或&nbsp;<span id="returnInterval" style="color:red;"></span>&nbsp;之后自动跳转.';
 									new Ext.util.TaskRunner().start({
 										run: function(){
-											if(interval <= 1){
+											if(interval < 1){
 												location.href = href;
 											}
 											Ext.getDom('returnInterval').innerHTML = interval;
@@ -874,7 +874,7 @@ var orderedForm = new Ext.form.FormPanel({
 									var action = '<br/>点击确定返回或&nbsp;<span id="returnInterval" style="color:red;"></span>&nbsp;之后自动跳转.';
 									new Ext.util.TaskRunner().start({
 										run: function(){
-											if(interval <= 1){
+											if(interval < 1){
 												var r = new URLParaQuery();
 												var href = 'TableSelect.html?pin=' + r['pin'] + '&restaurantID=' + r['restaurantID'];
 												location.href = href;
