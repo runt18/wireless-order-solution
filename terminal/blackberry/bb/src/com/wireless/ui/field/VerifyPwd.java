@@ -164,7 +164,8 @@ public class VerifyPwd extends PopupScreen implements FieldChangeListener{
 			}
 			
 		}else if(_pwdType == PWD_5){
-			if(WirelessOrder.restaurant.pwd.equals(password) || WirelessOrder.restaurant.pwd3.equals(password)){
+			if(WirelessOrder.restaurant.pwd == null || WirelessOrder.restaurant.pwd3 == null || 
+					WirelessOrder.restaurant.pwd.equals(password) || WirelessOrder.restaurant.pwd3.equals(password)){
 				return VERIFY_PASS;
 			}else{
 				if(WirelessOrder.restaurant.pwd5.equals(password)){
