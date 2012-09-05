@@ -3,7 +3,6 @@ package com.wireless.print.content;
 import com.wireless.print.PVar;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Reserved;
-import com.wireless.protocol.Taste;
 import com.wireless.protocol.Util;
 
 public class FoodDetailContent extends ConcreteContent {
@@ -32,11 +31,11 @@ public class FoodDetailContent extends ConcreteContent {
 		String foodPrice = Util.CURRENCY_SIGN + Util.float2String(_food.calcPriceWithTaste());
 		
 		String taste = "";
-		if(_food.getTastePref().equals(Taste.NO_PREFERENCE)){
-			_format = _format.replace(PVar.FOOD_TASTE, "");
-		}else{
+		if(_food.hasTaste()){
 			taste = "-" + _food.getTastePref();
 			_format = _format.replace(PVar.FOOD_TASTE, taste);				
+		}else{
+			_format = _format.replace(PVar.FOOD_TASTE, "");
 		}
 
 		String combo;
