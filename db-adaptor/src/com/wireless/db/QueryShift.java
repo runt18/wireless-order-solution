@@ -444,6 +444,7 @@ public class QueryShift {
 		for(float cashByEachOrder : cashIncomeByOrder.values()){
 			result.cashIncome2 += Util.calcByTail(setting.priceTail, cashByEachOrder);
 		}
+		result.cashIncome2 = (float)Math.round(result.cashIncome2 * 100) / 100;
 		result.cashAmount = cashIncomeByOrder.size();
 		
 		/**
@@ -453,6 +454,7 @@ public class QueryShift {
 		for(float creditByEachOrder : creditIncomeByOrder.values()){
 			result.creditCardIncome2 += Util.calcByTail(setting.priceTail, creditByEachOrder);
 		}
+		result.creditCardIncome2 = (float)Math.round(result.creditCardIncome2 * 100) / 100;
 		result.creditCardAmount = creditIncomeByOrder.size();
 		
 		/**
@@ -462,6 +464,7 @@ public class QueryShift {
 		for(float memberCardByEachOrder : memberCardIncomeByOrder.values()){
 			result.memberCardIncome2 += Util.calcByTail(setting.priceTail, memberCardByEachOrder);			
 		}
+		result.memberCardIncome2 = (float)Math.round(result.memberCardIncome2 * 100) / 100;
 		result.memeberCardAmount = memberCardIncomeByOrder.size();
 		
 		/**
@@ -471,6 +474,7 @@ public class QueryShift {
 		for(float hangByEachOrder : hangIncomeByOrder.values()){
 			result.hangIncome2 += Util.calcByTail(setting.priceTail, hangByEachOrder);
 		}
+		result.hangIncome2 = (float)Math.round(result.hangIncome2 * 100) / 100;
 		result.hangAmount = hangIncomeByOrder.size();		
 		
 		/**
@@ -480,6 +484,7 @@ public class QueryShift {
 		for(float signByEachOrder : signIncomeByOrder.values()){
 			result.signIncome2 += Util.calcByTail(setting.priceTail, signByEachOrder);
 		}
+		result.signIncome2 = (float)Math.round(result.signIncome2 * 100) / 100;
 		result.signAmount = signIncomeByOrder.size();
 		
 		/**

@@ -50,7 +50,7 @@ public class Util {
 	public static float calcByTail(int priceTail, float totalPrice){
 		if(priceTail == Setting.TAIL_DECIMAL_CUT){
 			//小数抹零
-			return new Float(totalPrice).intValue();
+			return Float.valueOf(totalPrice).intValue();
 		}else if(priceTail == Setting.TAIL_DECIMAL_ROUND){
 			//四舍五入
 			return Math.round(totalPrice);

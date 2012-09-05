@@ -134,7 +134,7 @@ public class OrderFood {
 	}
 	
 	public float getTotalDiscount() {
-		totalDiscount = unitPrice * count * (1 - discount);
+		totalDiscount = (unitPrice + tastePrice) * count * (1 - discount);
 		return totalDiscount;
 	}
 	

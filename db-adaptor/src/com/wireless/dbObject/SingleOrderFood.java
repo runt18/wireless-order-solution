@@ -52,7 +52,7 @@ public class SingleOrderFood {
 	 * @return the discount price to this food
 	 */
 	public float calcDiscountPrice(){
-		return (float)Math.round(unitPrice * orderCount * (1 - discount) * 100) / 100;
+		return (float)Math.round((unitPrice + taste.getPrice()) * orderCount * (1 - discount) * 100) / 100;
 	}
 	
 	/**
@@ -70,7 +70,7 @@ public class SingleOrderFood {
 	 * @return the total price to this food
 	 */
 	public float calcPriceWithTaste(){
-		return (float)Math.round((unitPrice * discount + taste.getPrice()) * orderCount * 100) / 100;
+		return (float)Math.round((unitPrice + taste.getPrice()) * discount * orderCount * 100) / 100;
 	}
 	
 	/**
