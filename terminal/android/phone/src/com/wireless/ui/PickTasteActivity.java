@@ -360,17 +360,16 @@ public class PickTasteActivity extends Activity{
 	    //滚动的时候隐藏输入法
 	    specLstView.setOnScrollListener(new OnScrollListener() {
 				
-				@Override
-				public void onScrollStateChanged(AbsListView view, int scrollState) {
-					((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(((EditText)findViewById(R.id.specsearch)).getWindowToken(), 0);
-				}
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
+				((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(((EditText)findViewById(R.id.specsearch)).getWindowToken(), 0);
+			}
+			
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 				
-				@Override
-				public void onScroll(AbsListView view, int firstVisibleItem,
-						int visibleItemCount, int totalItemCount) {
-					
-				}
-			});
+			}
+		});
 	    /**
 		 * 在规格选择页面中按编号进行规格的筛选
 		 */
@@ -384,7 +383,7 @@ public class PickTasteActivity extends Activity{
 				    	 if(WirelessOrder.foodMenu.specs[i].getPreference().contains(s.toString().trim())){
 				    		 specs.add(WirelessOrder.foodMenu.specs[i]);
 				    	 }
-				    }
+					 }
 					 specLstView.setAdapter(new TasteAdapter(specs.toArray(new Taste[specs.size()])));
 					
 				}else{
