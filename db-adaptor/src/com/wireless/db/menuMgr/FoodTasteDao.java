@@ -188,7 +188,7 @@ public class FoodTasteDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static int updateFoodTasteRefType(int foodID, int restaurantID, short tasteRefType) throws Exception{
+	public static int updateFoodTasteRefType(int foodID, int restaurantID, int tasteRefType) throws Exception{
 		DBCon dbCon = new DBCon();
 		int count = 0;
 		try{
@@ -352,7 +352,7 @@ public class FoodTasteDao {
 	 * @param content
 	 * @throws Exception
 	 */
-	public static void updateFoodTaste(int foodID, int restaurantID, short tasteRefType, String content) throws Exception{
+	public static void updateFoodTaste(int foodID, int restaurantID, int tasteRefType, String content) throws Exception{
 		try{
 			FoodTaste parent = new FoodTaste();
 			parent.setFoodID(foodID);
