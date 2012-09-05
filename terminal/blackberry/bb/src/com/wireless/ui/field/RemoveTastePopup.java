@@ -78,7 +78,7 @@ public class RemoveTastePopup extends PopupScreen {
 			}
 			
 			private void delTaste(){
-				int resp = Dialog.ask(Dialog.D_YES_NO, "确认删除-" + _tastes[getSelectedIndex()].preference, Dialog.NO);
+				int resp = Dialog.ask(Dialog.D_YES_NO, "确认删除-" + _tastes[getSelectedIndex()].getPreference(), Dialog.NO);
 				if(resp == Dialog.YES){
 					
 					_selectedFood.removeTaste(_tastes[getSelectedIndex()]);
@@ -100,7 +100,7 @@ public class RemoveTastePopup extends PopupScreen {
 
 			public void drawListRow(ListField listField, Graphics g, int index, int y, int w) {
 	    		int priceWidth = 85;
-		    	g.drawText(_tastes[index].preference, 0, y, 0, w - priceWidth);
+		    	g.drawText(_tastes[index].getPreference(), 0, y, 0, w - priceWidth);
 		    	if(_tastes[index].calc == Taste.CALC_PRICE){
 		    		g.drawText(Util.CURRENCY_SIGN + Util.float2String(_tastes[index].getPrice()), w - priceWidth, y, DrawStyle.RIGHT, priceWidth);
 		    		

@@ -125,7 +125,7 @@ public class SelectTastePopup extends PopupScreen{
 			
 			private void addTaste(){
 				if(getSelectedIndex() != -1){
-					int resp = Dialog.ask(Dialog.D_YES_NO, "确认" + _cate + "-" + _tastes[_tasteMatchedIdx[getSelectedIndex()]].preference + " ?", Dialog.YES);
+					int resp = Dialog.ask(Dialog.D_YES_NO, "确认" + _cate + "-" + _tastes[_tasteMatchedIdx[getSelectedIndex()]].getPreference() + " ?", Dialog.YES);
 					if(resp == Dialog.YES){
 
 						int tastePos = _selectedFood.addTaste(_tastes[_tasteMatchedIdx[getSelectedIndex()]]);
@@ -146,7 +146,7 @@ public class SelectTastePopup extends PopupScreen{
 		    public void drawListRow(ListField list, Graphics g, int index, int y, int w){
 	    		Taste taste = (Taste)_tastes[_tasteMatchedIdx[index]];
 	    		int priceWidth = 85;
-		    	g.drawText(taste.preference, 0, y, 0, w - priceWidth);
+		    	g.drawText(taste.getPreference(), 0, y, 0, w - priceWidth);
 		    	if(taste.calc == Taste.CALC_PRICE){
 		    		g.drawText(Util.CURRENCY_SIGN + Util.float2String(taste.getPrice()), w - priceWidth, y, DrawStyle.RIGHT, priceWidth);
 		    		
