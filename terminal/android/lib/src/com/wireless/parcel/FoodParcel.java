@@ -27,7 +27,7 @@ public class FoodParcel extends OrderFood implements Parcelable{
 		orderDate  = food.orderDate;
 		waiter = food.waiter == null ? "" : food.waiter;
 		//setNormalTastePref(new String(food.getNormalTastePref()));
-		setTasteNormalPrice(Float.valueOf(food.getTasteNormalPrice()));
+		//setTasteNormalPrice(Float.valueOf(food.getTasteNormalPrice()));
 		setCount(Float.valueOf(food.getCount()));
 		setPrice(Float.valueOf(food.getPrice()));
 		if(food.tmpTaste != null){
@@ -56,7 +56,7 @@ public class FoodParcel extends OrderFood implements Parcelable{
 		orderDate = in.readLong();
 		waiter = in.readString();
 		//setNormalTastePref(in.readString());
-		setTasteNormalPrice(Util.int2Float(in.readInt()));
+		//setTasteNormalPrice(Util.int2Float(in.readInt()));
 		setCount(Util.int2Float(in.readInt()));
 		setPrice(Util.int2Float(in.readInt()));
 		// un-marshal the tastes
@@ -100,7 +100,7 @@ public class FoodParcel extends OrderFood implements Parcelable{
 		parcel.writeLong(orderDate);
 		parcel.writeString(waiter);
 		//parcel.writeString(getNormalTastePref());
-		parcel.writeInt(Util.float2Int(getTasteNormalPrice()));
+		//parcel.writeInt(Util.float2Int(getTasteNormalPrice()));
 		parcel.writeInt(Util.float2Int(getCount()));
 		parcel.writeInt(Util.float2Int(getPrice()));
 		//marshal the tastes
