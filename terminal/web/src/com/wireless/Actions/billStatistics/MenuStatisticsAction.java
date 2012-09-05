@@ -97,7 +97,7 @@ public class MenuStatisticsAction extends Action {
 					+ term.restaurantID;
 
 			// String orderClause = " ORDER BY D.food_id DESC, D.pay_date ";
-			String orderClause = " ORDER BY food_alias ASC, pay_date ";
+			String orderClause = " ORDER BY food_alias ASC, pay_datetime ";
 
 			// OrderFood orderFoods[] = foodRef.getDetailHistory(dbCon,
 			// condition,
