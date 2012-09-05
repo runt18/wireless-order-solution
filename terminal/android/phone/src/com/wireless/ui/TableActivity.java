@@ -593,6 +593,7 @@ public class TableActivity extends Activity {
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
 				((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE))
 				.hideSoftInputFromWindow(searchTxtView.getWindowToken(), 0);
+				mListView.requestFocus();
 			}
 
 			@Override
