@@ -73,7 +73,7 @@
 						action = '&nbsp;<span id="returnInterval" style="color:red;"></span>&nbsp;之后自动跳转.';
 						new Ext.util.TaskRunner().start({
 							run: function(){
-								if(interval <= 0){
+								if(interval <= 1){
 									location.href = "TableSelect.html?pin="
 										+ Request["pin"] + "&restaurantID="
 										+ restaurantID;
