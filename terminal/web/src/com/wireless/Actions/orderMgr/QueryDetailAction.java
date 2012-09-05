@@ -100,7 +100,7 @@ public class QueryDetailAction extends Action {
 				resultMay.put("unit_price", singleOrderFood.unitPrice);
 				resultMay.put("amount", singleOrderFood.orderCount);
 				resultMay.put("discount", singleOrderFood.discount);
-				resultMay.put("taste_pref",	singleOrderFood.taste.preference.replaceAll(",", "；"));
+				resultMay.put("taste_pref",	singleOrderFood.taste.getPreference().replaceAll(",", "；"));
 				resultMay.put("taste_price", singleOrderFood.taste.getPrice());
 				resultMay.put("kitchen", singleOrderFood.kitchen.name);
 				resultMay.put("waiter", singleOrderFood.staff.name);

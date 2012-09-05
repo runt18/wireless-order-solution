@@ -123,7 +123,7 @@ public class Util {
 				if(Boolean.parseBoolean(values[8])){
 					foods[i].tmpTaste = new Taste();
 					//extract the value to temporary taste
-					foods[i].tmpTaste.preference = values[9];
+					foods[i].tmpTaste.setPreference(values[9]);
 					//extract the price to temporary taste
 					foods[i].tmpTaste.setPrice(Float.parseFloat(values[10]));
 					//extract the alias to temporary taste

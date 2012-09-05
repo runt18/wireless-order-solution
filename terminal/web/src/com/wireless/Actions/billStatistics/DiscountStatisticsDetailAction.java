@@ -111,7 +111,7 @@ public class DiscountStatisticsDetailAction extends Action {
 				resultMap.put("singlePrice", SingleOrderFoods[i].unitPrice);
 				resultMap.put("count", SingleOrderFoods[i].orderCount);
 				resultMap.put("discount", SingleOrderFoods[i].discount);
-				resultMap.put("taste", SingleOrderFoods[i].taste.preference);
+				resultMap.put("taste", SingleOrderFoods[i].taste.getPreference());
 				resultMap.put("tastePrice",
 						SingleOrderFoods[i].taste.getPrice());
 				resultMap.put("kitchenID",

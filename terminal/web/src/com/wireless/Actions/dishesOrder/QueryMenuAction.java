@@ -165,7 +165,7 @@ public class QueryMenuAction extends Action {
 			String jsonTaste = "[$(taste_id),$(taste_cate),$(taste_pref),$(taste_price),$(taste_rate),$(calc_type)]";
 			jsonTaste = jsonTaste.replace("$(taste_id)", Integer.toString((tastes[i].aliasID)));
 			jsonTaste = jsonTaste.replace("$(taste_cate)", Integer.toString((tastes[i].category)));
-			jsonTaste = jsonTaste.replace("$(taste_pref)", tastes[i].preference.replace(",", ";"));
+			jsonTaste = jsonTaste.replace("$(taste_pref)", tastes[i].getPreference().replace(",", ";"));
 			jsonTaste = jsonTaste.replace("$(taste_price)", Util.float2String(tastes[i].getPrice()));
 			jsonTaste = jsonTaste.replace("$(taste_rate)", tastes[i].getRate().toString());
 			jsonTaste = jsonTaste.replace("$(calc_type)", Integer.toString(tastes[i].calc));
