@@ -3,7 +3,7 @@ package com.wireless.protocol;
 public class Taste {
 	
 	public final static short NO_TASTE = 0;
-	public final static String NO_PREFERENCE = "无口味"; 
+	final static String NO_PREFERENCE = "无口味"; 
 	
 	public final static short CATE_ALL = Short.MIN_VALUE;	/* 全部 */
 	public final static short CATE_TASTE = 0;				/* 口味 */
@@ -19,7 +19,6 @@ public class Taste {
 	public int restaurantID;
 	public int tasteID;
 	public int aliasID = Taste.NO_TASTE;
-	public String preference = Taste.NO_PREFERENCE;
 	public short category = Taste.CATE_TASTE;
 	public short type = TYPE_NORMAL;
 	public short calc = Taste.CALC_PRICE;
@@ -110,6 +109,16 @@ public class Taste {
 
 	public Float getPrice(){
 		return Util.int2Float(price);
+	}
+	
+	String preference;
+
+	public void setPreference(String pref){
+		preference = pref;
+	}
+	
+	public String getPreference(){
+		return preference == null ? NO_PREFERENCE : preference;
 	}
 	
 	/**

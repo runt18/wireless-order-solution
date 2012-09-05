@@ -5,9 +5,9 @@ public class OrderFood extends Food {
 	public String waiter;
 	public int payManner = Order.MANNER_CASH;
 	
-	public static final int FOOD_NORMAL = 0;		/* 正常 */
-	public static final int FOOD_HANG_UP = 1;		/* 叫起 */
-	public static final int FOOD_IMMEDIATE = 2;		/* 即起 */
+	public static final int FOOD_NORMAL = 0;		/* æ­£å¸¸ */
+	public static final int FOOD_HANG_UP = 1;		/* å�«èµ· */
+	public static final int FOOD_IMMEDIATE = 2;		/* å�³èµ· */
 	public short hangStatus = FOOD_NORMAL;			//the hang status to the food
 	
 	public Taste[] tastes = new Taste[3];			//three tastes the food can consist of
@@ -17,22 +17,6 @@ public class OrderFood extends Food {
 	public Table table = new Table();				//the table this order food belongs to
 	
 	public boolean isTemporary = false;				//indicates whether the food is temporary
-
-	int tasteNormalPrice = 0; 							//the normal taste price to this food
-	
-	public void setTasteNormalPrice(Float price){
-		tasteNormalPrice = Util.float2Int(price);
-	}
-	
-	public Float getTasteNormalPrice(){
-		return Util.int2Float(tasteNormalPrice);
-	}
-	
-	/**
-	 * Since a food can consist of three normal tastes at most,
-	 * combine these three normal tastes into a signal string.
-	 */
-	public String tasteNormalPref = Taste.NO_PREFERENCE;
 	
 	/**
 	 * The value of discount ranges from 0.00 through 1.00
@@ -198,8 +182,8 @@ public class OrderFood extends Food {
 			/**
 			 * Calculate the taste price and preference
 			 */
-			tasteNormalPref = Util.genTastePref(tastes);
-			setTasteNormalPrice(Util.genTastePrice(tastes, getPrice()));
+			//tasteNormalPref = Util.genTastePref(tastes);
+			//setTasteNormalPrice(Util.genTastePrice(tastes, getPrice()));
 			
 			return tastePos;
 			
@@ -240,21 +224,56 @@ public class OrderFood extends Food {
 			/**
 			 * Calculate the taste price and preference
 			 */
-			tasteNormalPref = Util.genTastePref(tastes);
-			setTasteNormalPrice(Util.genTastePrice(tastes, getPrice()));
+			//tasteNormalPref = Util.genTastePref(tastes);
+			//setTasteNormalPrice(Util.genTastePrice(tastes, getPrice()));
 			return tastePos;
 		}else{
 			return -1;
 		}
 	}
 
-
+	int mTasteNormalPrice = Integer.MIN_VALUE; 						//the normal taste price to this food
+	
+	public void setTasteNormalPrice(Float price){
+		if(price.floatValue() >= 0){
+			mTasteNormalPrice = Util.float2Int(price);
+		}else{
+			mTasteNormalPrice = Integer.MIN_VALUE;
+		}
+	}
+	
+	/**
+	 * There are two ways to get the normal taste price.
+	 * One is to combine three normal tastes price.
+	 * The other is to use the mTasteNormalPrice directly.
+	 * Note that the mTasteNormalPrice is preferred.
+	 * @return
+	 */
+	int getTasteNormalPriceInternal(){
+		if(mTasteNormalPrice >= 0){
+			return mTasteNormalPrice;
+			
+		}else{
+			int tastePrice = 0;
+			for(int i = 0; i < tastes.length; i++){
+				if(tastes[i].aliasID != Taste.NO_TASTE){
+					tastePrice += (tastes[i].calc == Taste.CALC_PRICE ? tastes[i].price : price * tastes[i].rate / 100);
+				}
+			}
+			return tastePrice;
+		}
+	}
+	
+	public Float getTasteNormalPrice(){
+		return Util.int2Float(getTasteNormalPriceInternal());
+	}
+	
 	/**
 	 * The taste price along with both normal and temporary taste.
 	 * @return the taste price represented as an integer
 	 */
 	int getTastePriceInternal(){
-		return tasteNormalPrice + (tmpTaste == null ? 0 : tmpTaste.price);
+		return getTasteNormalPriceInternal() + (tmpTaste == null ? 0 : tmpTaste.price);
 	}
 	
 	/**
@@ -362,16 +381,84 @@ public class OrderFood extends Food {
 			tastes[i] = new Taste();
 		}
 	}
+
+	/**
+	 * Check to see whether the food has temporary taste.
+	 * @return true if the food has temporary taste, otherwise false
+	 */
+	public boolean hasTmpTaste(){
+		return tmpTaste != null;
+	}
+
+	/**
+	 * Check to see whether the food has taste(either normal {@link #hasNormalTaste()} or temporary {@link #hasTmpTaste()}).
+	 * @return true if the food has taste, otherwise false
+	 */
+	public boolean hasTaste(){
+		return hasNormalTaste() || hasTmpTaste();
+	}	
+
+	String mNormalTastePref;
+	
+	public void setNormalTastePref(String pref){
+		mNormalTastePref = pref;
+	}
+	
+	/**
+	 * Check to see if the food has any normal taste.
+	 * @return true if food has normal taste, otherwise false
+	 */
+	public boolean hasNormalTaste(){
+		if(mNormalTastePref != null){
+			return true;
+			
+		}else{
+			boolean isNormalTasted = false;
+			for(int i = 0; i < tastes.length; i++){
+				if(tastes[i].aliasID != Taste.NO_TASTE){
+					isNormalTasted = true;
+					break;
+				}
+			}
+			return isNormalTasted;			
+		}
+	}
+	
+	/**
+	 * There are two ways to get the normal taste preference.
+	 * One is to combine three normal tastes into a single string.
+	 * The other is to use the mNormalTastePref directly.
+	 * Note that the mNormalTastePref is preferred.
+	 * @return the normal taste string to this food
+	 */
+	public String getNormalTastePref(){
+		
+		if(mNormalTastePref != null){
+			return mNormalTastePref;
+			
+		}else{
+			String tastePref = new String();
+			for(int i = 0; i < tastes.length; i++){
+				if(tastes[i].aliasID != Taste.NO_TASTE && tastes[i].preference != null){
+					if(tastePref.length() != 0){
+						tastePref += ",";
+					}
+					tastePref += tastes[i].preference;
+				}
+			}			
+			return tastePref.length() == 0 ? Taste.NO_PREFERENCE : tastePref;			
+		}		
+	}
 	
 	/**
 	 * Get the taste combined with both normal and temporary preference.
 	 * @return the combined taste preference
 	 */
 	public String getTastePref(){
-		if(tmpTaste != null){
-			return (tasteNormalPref.equals(Taste.NO_PREFERENCE) ? "" : (tasteNormalPref + ",")) + tmpTaste.preference;
+		if(hasTmpTaste()){
+			return (hasNormalTaste() ? getNormalTastePref() + "," : "") + tmpTaste.preference;
 		}else{
-			return tasteNormalPref;
+			return getNormalTastePref();
 		}
 	}
 	

@@ -141,24 +141,24 @@ public class Util {
 	 * @param tastes the tastes to this food
 	 * @return the combined taste string
 	 */
-	public static String genTastePref(Taste[] tastes){
-		String tastePref = "";
-		boolean isTasted = false;
-		for(int i = 0; i < tastes.length; i++){
-			if(tastes[i].aliasID != Taste.NO_TASTE){
-				isTasted = true;
-				if(tastePref.length() != 0){
-					tastePref += ",";
-				}
-				tastePref += tastes[i].preference;
-			}
-		}
-		if(isTasted){
-			return tastePref;
-		}else{
-			return Taste.NO_PREFERENCE;
-		}
-	}
+//	public static String genTastePref(Taste[] tastes){
+//		String tastePref = "";
+//		boolean isTasted = false;
+//		for(int i = 0; i < tastes.length; i++){
+//			if(tastes[i].aliasID != Taste.NO_TASTE){
+//				isTasted = true;
+//				if(tastePref.length() != 0){
+//					tastePref += ",";
+//				}
+//				tastePref += tastes[i].preference;
+//			}
+//		}
+//		if(isTasted){
+//			return tastePref;
+//		}else{
+//			return Taste.NO_PREFERENCE;
+//		}
+//	}
 	
 	/**
 	 * Calculate the total taste price.
@@ -166,9 +166,9 @@ public class Util {
 	 * @param foodPrice the price to the food this taste attached to
 	 * @return the total taste price represented Float
 	 */
-	public static Float genTastePrice(Taste[] tastes, Float foodPrice){
-		return Util.int2Float(genTastePrice(tastes, Util.float2Int(foodPrice)));
-	}
+//	public static Float genTastePrice(Taste[] tastes, Float foodPrice){
+//		return Util.int2Float(genTastePrice(tastes, Util.float2Int(foodPrice)));
+//	}
 	
 	/**
 	 * Calculate the total taste price.
@@ -177,13 +177,13 @@ public class Util {
 	 * @param foodPrice the price to the food this taste attached to
 	 * @return the total taste price represented as integer
 	 */
-	static int genTastePrice(Taste[] tastes, int foodPrice){
-		int tastePrice = 0;
-		for(int i = 0; i < tastes.length; i++){
-			tastePrice += (tastes[i].calc == Taste.CALC_PRICE ? tastes[i].price : foodPrice * tastes[i].rate / 100);
-		}
-		return tastePrice;
-	}
+//	static int genTastePrice(Taste[] tastes, int foodPrice){
+//		int tastePrice = 0;
+//		for(int i = 0; i < tastes.length; i++){
+//			tastePrice += (tastes[i].calc == Taste.CALC_PRICE ? tastes[i].price : foodPrice * tastes[i].rate / 100);
+//		}
+//		return tastePrice;
+//	}
 	
 	/**
 	 * Generate the alias id to temporary food.

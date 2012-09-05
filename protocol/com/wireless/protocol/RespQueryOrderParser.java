@@ -319,9 +319,9 @@ public final class RespQueryOrderParser {
 				}
 				
 				//set the taste preference to this food
-				order.foods[i].tasteNormalPref = Util.genTastePref(order.foods[i].tastes);
+				//order.foods[i].tasteNormalPref = Util.genTastePref(order.foods[i].tastes);
 				//set the taste total price to this food
-				order.foods[i].setTasteNormalPrice(Util.genTastePrice(order.foods[i].tastes, order.foods[i].getPrice()));
+				//order.foods[i].setTasteNormalPrice(Util.genTastePrice(order.foods[i].tastes, order.foods[i].getPrice()));
 			}			
 		}		
 
