@@ -199,7 +199,7 @@ tableAddWin = new Ext.Window({
 
 // --------------------------------------------------------------------------
 var tableAddBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/material_add.png",
+	imgPath : '../../images/btnAddForBigBar.png',
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : "添加餐桌",

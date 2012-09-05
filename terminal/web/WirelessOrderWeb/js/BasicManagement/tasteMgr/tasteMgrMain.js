@@ -67,7 +67,14 @@ tasteAddWin = new Ext.Window({
 				fieldLabel : '编号',
 				id : 'tasteAddNumber',
 				allowBlank : false,
-				width : 160
+				width : 160,
+				validator : function(v) {
+					if (v < 1 || v > 60000 || eval(v.indexOf('.')) != -1) {
+						return '自定口味编号范围在 1 ~ 60000 之间,且为整数.';
+					} else {
+						return true;
+					}
+				}
 			}, {
 				xtype : 'textfield',
 				fieldLabel : '名称',
