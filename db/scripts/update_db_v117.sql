@@ -1,4 +1,4 @@
-﻿SET NAMES utf8;
+SET NAMES utf8;
 USE wireless_order_db;
 
 -- -----------------------------------------------------
@@ -145,8 +145,36 @@ INSERT INTO wireless_order_db.taste (`restaurant_id`, `taste_alias`, `preference
 SELECT id, 0, '大牌', 2, 1, 1 FROM wireless_order_db.restaurant WHERE id > 10;
 
 -- -----------------------------------------------------
--- Change the all the '做法' to '口味'
+-- Change all the '做法' to '口味'
 -- -----------------------------------------------------
 UPDATE `wireless_order_db`.`taste` SET 
 category = 0,rate = 0,calc = 0
-WHERE category = 1
+WHERE category = 1;
+
+-- -----------------------------------------------------
+-- Change field 'taste' and 'taste_price' to default NULL in 'order_food'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_food` 
+CHANGE COLUMN `taste` `taste` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the taste preference to the ordered food'  , 
+CHANGE COLUMN `taste_price` `taste_price` DECIMAL(7,2) NULL DEFAULT NULL COMMENT 'the price to taste preference'  ;
+
+-- -----------------------------------------------------
+-- Update taste to NULL in case of '无口味'
+-- Update taste_price to NULL in case of 0.00
+-- -----------------------------------------------------
+UPDATE wireless_order_db.order_food SET taste = NULL WHERE taste = '无口味';
+UPDATE wireless_order_db.order_food SET taste_price = NULL WHERE taste_price = 0 AND taste IS NULL;
+
+-- -----------------------------------------------------
+-- Change field 'taste' and 'taste_price' to default NULL in 'order_food_history'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_food_history` 
+CHANGE COLUMN `taste` `taste` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the taste preference to the ordered food'  , 
+CHANGE COLUMN `taste_price` `taste_price` DECIMAL(7,2) NULL DEFAULT NULL COMMENT 'the price to taste preference'  ;
+
+-- -----------------------------------------------------
+-- Update taste to NULL in case of '无口味'
+-- Update taste_price to NULL in case of 0.00
+-- -----------------------------------------------------
+UPDATE wireless_order_db.order_food_history SET taste = NULL WHERE taste = '无口味';
+UPDATE wireless_order_db.order_food_history SET taste_price = NULL WHERE taste_price = 0 AND taste IS NULL;
