@@ -10,7 +10,7 @@ public class TasteParcel extends Taste implements Parcelable{
 
 	public TasteParcel(Taste taste){
 		aliasID = taste.aliasID;
-		preference = new String(taste.preference);
+		setPreference(new String(taste.getPreference()));
 		category = taste.category;
 		calc = taste.calc;
 		setRate(Float.valueOf(taste.getRate()));
@@ -19,7 +19,7 @@ public class TasteParcel extends Taste implements Parcelable{
 	
 	TasteParcel(Parcel in){
 		aliasID = in.readInt();
-		preference = in.readString();
+		setPreference(in.readString());
 		category = (short)in.readInt();
 		calc = (short)in.readInt();
 		setRate(Util.int2Float(in.readInt()));
@@ -45,7 +45,7 @@ public class TasteParcel extends Taste implements Parcelable{
 	@Override
 	public void writeToParcel(Parcel parcel, int flags) {
 		parcel.writeInt(aliasID);
-		parcel.writeString(preference);
+		parcel.writeString(getPreference());
 		parcel.writeInt(category);
 		parcel.writeInt(calc);
 		parcel.writeInt(Util.float2Int(getRate()));
