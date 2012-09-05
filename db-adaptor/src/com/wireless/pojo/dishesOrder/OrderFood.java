@@ -42,7 +42,6 @@ public class OrderFood {
 	private float totalPrice;				// 总价 = （菜品单价 * 折扣率 + 口味价格）* 数量
 	
 	private short hangStatus = WebParams.FOOD_NORMAL;			// 菜品状态  0:正常,1:叫起,2:即起
-	private String tasteNormalPref = WebParams.NO_PREFERENCE;
 	
 	public String getFoodName() {
 		return foodName;
@@ -85,11 +84,6 @@ public class OrderFood {
 		this.taste = taste;
 	}
 	public String getTastePref() {
-		if(tmpTaste != null){
-			tastePref = (tasteNormalPref.equals(WebParams.NO_PREFERENCE) ? "" : (tasteNormalPref + ",")) + tmpTaste.preference;
-		}else{
-			tastePref = tasteNormalPref;
-		}
 		return tastePref;
 	}
 	public void setTastePref(String tastePref) {
@@ -187,7 +181,7 @@ public class OrderFood {
 	}
 	
 	public String getTmpTastePref() {
-		tmpTastePref = this.tmpTaste != null ? this.tmpTaste.preference : "";
+		tmpTastePref = this.tmpTaste != null ? this.tmpTaste.getPreference() : "";
 		return tmpTastePref;
 	}
 	
@@ -241,18 +235,9 @@ public class OrderFood {
 	public short getHangStatus() {
 		return hangStatus;
 	}
+	
 	public void setHangStatus(short hangStatus) {
 		this.hangStatus = hangStatus;
-	}
-	public String getTasteNormalPref() {
-		return tasteNormalPref;
-	}
-	public void setTasteNormalPref(String tasteNormalPref) {
-		this.tasteNormalPref = tasteNormalPref;
-	}
-	
-	
-	
-		
+	}	
 	
 }

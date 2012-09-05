@@ -8,7 +8,6 @@ import com.wireless.db.Params;
 import com.wireless.dbObject.SingleOrderFood;
 import com.wireless.protocol.Department;
 import com.wireless.protocol.Kitchen;
-import com.wireless.protocol.Taste;
 
 public class SingleOrderFoodReflector {
 	
@@ -123,10 +122,14 @@ public class SingleOrderFoodReflector {
 			
 			String normalTastePref = dbCon.rs.getString("taste");
 			String tmpTastePref = dbCon.rs.getString("taste_tmp");
-			if(tmpTastePref != null){
-				singleOrderFood.taste.preference = (normalTastePref.equals(Taste.NO_PREFERENCE) ? "" : (normalTastePref + ",")) + tmpTastePref;				
-			}else{
-				singleOrderFood.taste.preference = normalTastePref;
+			if(normalTastePref != null && tmpTastePref != null){
+				singleOrderFood.taste.setPreference(normalTastePref + "," + tmpTastePref);
+				
+			}else if(normalTastePref != null){
+				singleOrderFood.taste.setPreference(normalTastePref);
+				
+			}else if(tmpTastePref != null){
+				singleOrderFood.taste.setPreference(tmpTastePref);
 			}
 			
 			float normalTastePrice = dbCon.rs.getFloat("taste_price");

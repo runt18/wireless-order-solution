@@ -53,7 +53,7 @@ public class WebParams {
 	public final static int CATE_SPEC = Taste.CATE_SPEC;		/* 规格 */
 	public final static int CALC_PRICE = Taste.CALC_PRICE;		/* 按价格计算  */
 	public final static int CALC_RATE = Taste.CALC_RATE;		/* 按比例计算  */
-	public final static String NO_PREFERENCE = Taste.NO_PREFERENCE; 
+//	public final static String NO_PREFERENCE = Taste.NO_PREFERENCE; 
 	public final static String CATE_TASTE_TEXT = "口味"; 
 	public final static String CATE_STYLE_TEXT = "做法"; 
 	public final static String CATE_SPEC_TEXT = "规格"; 

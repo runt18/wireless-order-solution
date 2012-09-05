@@ -7,20 +7,20 @@ import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Taste;
 
 public class SingleOrderFood {
-	public StaffTerminal staff = new StaffTerminal();		//·şÎñÔ±ĞÕÃû
-	public long orderID;									//ÕËµ¥ºÅ
-	public long orderDate;									//²Ù×÷Ê±¼ä
-	public float unitPrice;									//²ËÆ·µ¥¼Û
-	public float orderCount;								//µã²ËÊıÁ¿
-	public float discount = 1;								//ÕÛ¿Û
-	public Taste taste = new Taste();						//²ËÆ·¿ÚÎ¶
-	public Kitchen kitchen = new Kitchen();					//²ËÆ·ËùÊô³ø·¿
-	public Food food = new Food();							//²ËÆ·µÄĞÅÏ¢
-	public boolean isTemporary = false;						//ÊÇ·ñÁÙÊ±²Ë
-	public boolean isPaid = false;							//ÊÇ·ñÔø¾­·´½áÕÊ
-	public int payManner = Order.MANNER_CASH;				//½áÕÊ·½Ê½(ÏÖ½ğ¡¢Ë¢¿¨¡¢¹ÒÕË...)
-	public float serviceRate = 0;							//·şÎñ·ÑÂÊ
-	public String comment = null;							//±¸×¢
+	public StaffTerminal staff = new StaffTerminal();		//æœåŠ¡å‘˜å§“å
+	public long orderID;									//è´¦å•å·
+	public long orderDate;									//æ“ä½œæ—¶é—´
+	public float unitPrice;									//èœå“å•ä»·
+	public float orderCount;								//ç‚¹èœæ•°é‡
+	public float discount = 1;								//æŠ˜æ‰£
+	public Taste taste = new Taste();						//èœå“å£å‘³
+	public Kitchen kitchen = new Kitchen();					//èœå“æ‰€å±å¨æˆ¿
+	public Food food = new Food();							//èœå“çš„ä¿¡æ¯
+	public boolean isTemporary = false;						//æ˜¯å¦ä¸´æ—¶èœ
+	public boolean isPaid = false;							//æ˜¯å¦æ›¾ç»åç»“å¸
+	public int payManner = Order.MANNER_CASH;				//ç»“å¸æ–¹å¼(ç°é‡‘ã€åˆ·å¡ã€æŒ‚è´¦...)
+	public float serviceRate = 0;							//æœåŠ¡è´¹ç‡
+	public String comment = null;							//å¤‡æ³¨
 	
 	/**
 	 * Return whether the order food is gifted.

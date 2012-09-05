@@ -184,10 +184,9 @@ public class InsertOrder {
 					}
 					
 					//set the taste preference
-					orderToInsert.foods[i].tasteNormalPref = com.wireless.protocol.Util.genTastePref(orderToInsert.foods[i].tastes);
+					//orderToInsert.foods[i].setNormalTastePref(com.wireless.protocol.Util.genTastePref(orderToInsert.foods[i].tastes));
 					//set the total taste price
-					orderToInsert.foods[i].setTasteNormalPrice(com.wireless.protocol.Util.genTastePrice(orderToInsert.foods[i].tastes, 
-																							 orderToInsert.foods[i].getPrice()));
+					//orderToInsert.foods[i].setTasteNormalPrice(com.wireless.protocol.Util.genTastePrice(orderToInsert.foods[i].tastes, orderToInsert.foods[i].getPrice()));
 				}					
 			}
 			
@@ -303,9 +302,9 @@ public class InsertOrder {
 							orderToInsert.foods[i].name + "', " +
 							orderToInsert.foods[i].status + ", " +
 							(orderToInsert.foods[i].hangStatus == OrderFood.FOOD_HANG_UP ? OrderFood.FOOD_HANG_UP : OrderFood.FOOD_NORMAL) + ", " +
-							orderToInsert.foods[i].getDiscount() + ", '" +
-							orderToInsert.foods[i].tasteNormalPref + "', " + 
-							orderToInsert.foods[i].getTasteNormalPrice() + ", " +
+							orderToInsert.foods[i].getDiscount() + ", " +
+							(orderToInsert.foods[i].hasNormalTaste() ? ("'" + orderToInsert.foods[i].getNormalTastePref() + "'") : "NULL") + ", " + 
+							(orderToInsert.foods[i].hasNormalTaste() ? orderToInsert.foods[i].getTasteNormalPrice() : "NULL") + ", " +
 							(orderToInsert.foods[i].tastes[0].tasteID == 0 ? "NULL" : orderToInsert.foods[i].tastes[0].tasteID) + ", " +
 							(orderToInsert.foods[i].tastes[1].tasteID == 0 ? "NULL" : orderToInsert.foods[i].tastes[1].tasteID) + ", " +
 							(orderToInsert.foods[i].tastes[2].tasteID == 0 ? "NULL" : orderToInsert.foods[i].tastes[2].tasteID) + ", " +
@@ -313,7 +312,7 @@ public class InsertOrder {
 							orderToInsert.foods[i].tastes[1].aliasID + ", " + 
 							orderToInsert.foods[i].tastes[2].aliasID + ", " +
 							(orderToInsert.foods[i].tmpTaste == null ? "NULL" : orderToInsert.foods[i].tmpTaste.aliasID) + ", " +
-							(orderToInsert.foods[i].tmpTaste == null ? "NULL" : ("'" + orderToInsert.foods[i].tmpTaste.preference + "'")) + ", " +
+							(orderToInsert.foods[i].tmpTaste == null ? "NULL" : ("'" + orderToInsert.foods[i].tmpTaste.getPreference() + "'")) + ", " +
 							(orderToInsert.foods[i].tmpTaste == null ? "NULL" : orderToInsert.foods[i].tmpTaste.getPrice()) + ", " +
 							orderToInsert.foods[i].kitchen.dept.deptID + ", " +
 							"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurantID + " AND kitchen_alias=" + orderToInsert.foods[i].kitchen.aliasID + "), " + 

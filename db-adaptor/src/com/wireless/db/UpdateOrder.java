@@ -421,10 +421,10 @@ public class UpdateOrder {
 						extraFood.tastes[0].aliasID + "," +
 						extraFood.tastes[1].aliasID + "," +
 						extraFood.tastes[2].aliasID + "," +
-						extraFood.getTasteNormalPrice() + ", '" +
-						extraFood.tasteNormalPref + "', " + 
+						(extraFood.hasNormalTaste() ? extraFood.getTasteNormalPrice() : "NULL") + ", " +
+						(extraFood.hasNormalTaste() ? ("'" + extraFood.getNormalTastePref() + "'") : "NULL") + ", " + 
 						(extraFood.tmpTaste == null ? "NULL" : extraFood.tmpTaste.aliasID) + ", " +
-						(extraFood.tmpTaste == null ? "NULL" : ("'" + extraFood.tmpTaste.preference + "'")) + ", " +
+						(extraFood.tmpTaste == null ? "NULL" : ("'" + extraFood.tmpTaste.getPreference() + "'")) + ", " +
 						(extraFood.tmpTaste == null ? "NULL" : extraFood.tmpTaste.getPrice()) + ", " +
 						extraFood.kitchen.dept.deptID + ", " + 
 						"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurantID + " AND kitchen_alias=" + extraFood.kitchen.aliasID + "), " + 
@@ -468,10 +468,10 @@ public class UpdateOrder {
 						canceledFood.tastes[0].aliasID + "," +
 						canceledFood.tastes[1].aliasID + "," +
 						canceledFood.tastes[2].aliasID + "," +
-						canceledFood.getTasteNormalPrice() + ", '" +
-						canceledFood.tasteNormalPref + "', " + 
+						(canceledFood.hasNormalTaste() ? canceledFood.getTasteNormalPrice() : "NULL") + ", " +
+						(canceledFood.hasNormalTaste() ? ("'" + canceledFood.getNormalTastePref() + "'") : "NULL") + ", " + 
 						(canceledFood.tmpTaste == null ? "NULL" : canceledFood.tmpTaste.aliasID) + ", " +
-						(canceledFood.tmpTaste == null ? "NULL" : ("'" + canceledFood.tmpTaste.preference + "'")) + ", " +
+						(canceledFood.tmpTaste == null ? "NULL" : ("'" + canceledFood.tmpTaste.getPreference() + "'")) + ", " +
 						(canceledFood.tmpTaste == null ? "NULL" : canceledFood.tmpTaste.getPrice()) + ", " +
 						canceledFood.kitchen.dept.deptID + ", " + 
 						"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurantID + " AND kitchen_alias=" + canceledFood.kitchen.aliasID + "), " + 
@@ -747,9 +747,9 @@ public class UpdateOrder {
 		}		
 		
 		//set the taste preference to this food
-		foodBasic.tasteNormalPref = com.wireless.protocol.Util.genTastePref(foodBasic.tastes);
+		//foodBasic.setNormalTastePref(com.wireless.protocol.Util.genTastePref(foodBasic.tastes));
 		//set the total taste price to this food
-		foodBasic.setTasteNormalPrice(com.wireless.protocol.Util.genTastePrice(foodBasic.tastes, foodBasic.getPrice()));		
+		//foodBasic.setTasteNormalPrice(com.wireless.protocol.Util.genTastePrice(foodBasic.tastes, foodBasic.getPrice()));		
 	}
 	
 }

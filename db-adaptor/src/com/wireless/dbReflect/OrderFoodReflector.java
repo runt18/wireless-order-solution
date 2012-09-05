@@ -75,7 +75,8 @@ public class OrderFoodReflector {
 			food.kitchen.dept.restaurantID = dbCon.rs.getInt("restaurant_id");
 			food.kitchen.dept.deptID = dbCon.rs.getShort("dept_id");
 			food.setDiscount(dbCon.rs.getFloat("discount"));
-			food.tasteNormalPref = dbCon.rs.getString("taste");
+			food.setNormalTastePref(dbCon.rs.getString("taste"));
+			//food.tasteNormalPref = dbCon.rs.getString("taste");
 			food.setTasteNormalPrice(dbCon.rs.getFloat("taste_price"));
 			food.tastes[0].tasteID = dbCon.rs.getInt("taste_id");
 			food.tastes[1].tasteID = dbCon.rs.getInt("taste2_id");
@@ -93,7 +94,7 @@ public class OrderFoodReflector {
 			String tmpTastePref = dbCon.rs.getString("taste_tmp");
 			if(tmpTastePref != null){
 				food.tmpTaste = new Taste();
-				food.tmpTaste.preference = tmpTastePref;
+				food.tmpTaste.setPreference(tmpTastePref);
 				food.tmpTaste.aliasID = dbCon.rs.getInt("taste_tmp_alias");
 				food.tmpTaste.setPrice(dbCon.rs.getFloat("taste_tmp_price"));
 			}
@@ -161,7 +162,8 @@ public class OrderFoodReflector {
 			food.kitchen.dept.restaurantID = dbCon.rs.getInt("restaurant_id");
 			food.kitchen.dept.deptID = dbCon.rs.getShort("dept_id");
 			food.setDiscount(dbCon.rs.getFloat("discount"));
-			food.tasteNormalPref = dbCon.rs.getString("taste");
+			food.setNormalTastePref(dbCon.rs.getString("taste"));
+			//food.tasteNormalPref = dbCon.rs.getString("taste");
 			food.setTasteNormalPrice(dbCon.rs.getFloat("taste_price"));
 			food.tastes[0].tasteID = dbCon.rs.getInt("taste_id");
 			food.tastes[1].tasteID = dbCon.rs.getInt("taste2_id");
@@ -179,7 +181,7 @@ public class OrderFoodReflector {
 			String tmpTastePref = dbCon.rs.getString("taste_tmp");
 			if(tmpTastePref != null){
 				food.tmpTaste = new Taste();
-				food.tmpTaste.preference = tmpTastePref;
+				food.tmpTaste.setPreference(tmpTastePref);
 				food.tmpTaste.aliasID = dbCon.rs.getInt("taste_tmp_alias");
 				food.tmpTaste.setPrice(dbCon.rs.getFloat("taste_tmp_price"));
 			}
