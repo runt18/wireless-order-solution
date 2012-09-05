@@ -218,16 +218,16 @@ public class OrderFood {
 	}
 	
 	public float getActuralPrice() {
-		acturalPrice = unitPrice * discount + tastePrice;
+		acturalPrice = this.getTotalPrice();
 		return acturalPrice;
 	}
 	
 	public float getTotalPrice() {
 		if(isSpecial == true || isGift == true){
 			// 特价和赠送菜品不打折
-			totalPrice = unitPrice * count; 
+			totalPrice = (unitPrice + tastePrice) * count; 
 		}else{
-			totalPrice = (unitPrice * discount + tastePrice ) * count;
+			totalPrice = (unitPrice + tastePrice) * discount * count;
 		}
 		return totalPrice;
 	}
