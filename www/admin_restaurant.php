@@ -107,13 +107,13 @@ else if($editType == "addRestaurant" || $editType == "editAdminRestaurant")
 					
 					//insert the '大牌', '中牌', '例牌'
 					$sql = "INSERT INTO taste(taste_alias, restaurant_id, preference, category, calc, type) 
-							VALUES(0, $id, '大牌', 2, 1, 1)";
+							VALUES(60001, $id, '大牌', 2, 1, 1)";
 					$db->Execute($sql);
 					$sql = "INSERT INTO taste(taste_alias, restaurant_id, preference, category, calc, type) 
-							VALUES(0, $id, '中牌', 2, 1, 1)";
+							VALUES(60002, $id, '中牌', 2, 1, 1)";
 					$db->Execute($sql);
 					$sql = "INSERT INTO taste(taste_alias, restaurant_id, preference, category, calc, type) 
-							VALUES(0, $id, '例牌', 2, 1, 1)";
+							VALUES(60003, $id, '例牌', 2, 1, 1)";
 					$db->Execute($sql);
 
 					//insert the kitchen
