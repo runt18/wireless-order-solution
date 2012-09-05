@@ -605,7 +605,7 @@ var orderedForm = new Ext.form.FormPanel({
 											    removeMask : true
 											});
 
-											for(var i = (girdData.length - 1); i > 0; i--){
+											for(var i = (girdData.length - 1); i >= 0; i--){
 												if(girdData[i].status == 2){
 													selData.push(girdData[i]);
 												}
@@ -630,7 +630,7 @@ var orderedForm = new Ext.form.FormPanel({
 															orderedData.root[i].status = 1;
 														}
 														
-														for(var i = (selData.length - 1); i >= 0 ; i++){
+														for(var i = (selData.length - 1); i >= 0 ; i--){
 															orderedData.root.push(selData[i]);
 														}
 														
@@ -819,7 +819,7 @@ var orderedForm = new Ext.form.FormPanel({
 											    removeMask : true
 											});
 
-											for(var i = (girdData.length - 1); i > 0; i--){
+											for(var i = (girdData.length - 1); i >= 0; i--){
 												if(girdData[i].status == 2){
 													selData.push(girdData[i]);
 												}
@@ -843,7 +843,7 @@ var orderedForm = new Ext.form.FormPanel({
 															orderedData.root[i].status = 1;
 														}
 														
-														for(var i = (selData.length - 1); i >= 0 ; i++){
+														for(var i = (selData.length - 1); i >= 0 ; i--){
 															orderedData.root.push(selData[i]);
 														}
 														
