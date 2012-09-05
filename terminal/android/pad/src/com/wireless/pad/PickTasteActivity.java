@@ -195,7 +195,7 @@ public class PickTasteActivity extends TabActivity{
 			}
 			_selectedFood.tmpTaste = null;
 			
-			//refresh the taste preference
+			//refresh the taste getPreference()
 			_handler.sendEmptyMessage(0);
 			//refresh the taste list view
 			_tasteAdapter.notifyDataSetChanged();
@@ -251,7 +251,7 @@ public class PickTasteActivity extends TabActivity{
 				ArrayList<Taste> popTastes = new ArrayList<Taste>();
 				if(s.toString().length() != 0){
 					 for(int i = 0; i < _selectedFood.popTastes.length; i++){
-				    	 if(_selectedFood.popTastes[i].preference.contains(s.toString().trim())){
+				    	 if(_selectedFood.popTastes[i].getPreference().contains(s.toString().trim())){
 				    		 popTastes.add(_selectedFood.popTastes[i]);
 				    	 }
 				    }
@@ -318,7 +318,7 @@ public class PickTasteActivity extends TabActivity{
 				ArrayList<Taste> tastes = new ArrayList<Taste>();
 				if(s.toString().length() != 0){
 				    for(int i = 0; i < WirelessOrder.foodMenu.tastes.length;i++){
-				    	 if(WirelessOrder.foodMenu.tastes[i].preference.contains(s.toString().trim())){
+				    	 if(WirelessOrder.foodMenu.tastes[i].getPreference().contains(s.toString().trim())){
 				    		 tastes.add(WirelessOrder.foodMenu.tastes[i]);
 				    	 }
 				    }
@@ -384,7 +384,7 @@ public class PickTasteActivity extends TabActivity{
 				ArrayList<Taste> styles = new ArrayList<Taste>();
 				if(s.toString().length() != 0){
 					 for(int i = 0; i < WirelessOrder.foodMenu.styles.length;i++){
-				    	 if(WirelessOrder.foodMenu.styles[i].preference.contains(s.toString().trim())){
+				    	 if(WirelessOrder.foodMenu.styles[i].getPreference().contains(s.toString().trim())){
 				    		 styles.add(WirelessOrder.foodMenu.styles[i]);
 				    	 }
 				    }
@@ -448,7 +448,7 @@ public class PickTasteActivity extends TabActivity{
 				ArrayList<Taste> specs = new ArrayList<Taste>();
 				if(s.toString().length() != 0){
 					 for(int i = 0; i < WirelessOrder.foodMenu.specs.length;i++){
-				    	 if(WirelessOrder.foodMenu.specs[i].preference.contains(s.toString().trim())){
+				    	 if(WirelessOrder.foodMenu.specs[i].getPreference().contains(s.toString().trim())){
 				    		 specs.add(WirelessOrder.foodMenu.specs[i]);
 				    	 }
 				    }
@@ -477,7 +477,7 @@ public class PickTasteActivity extends TabActivity{
 		pinZhuEdtTxt.requestFocus();
 		
 		if(_selectedFood.tmpTaste != null){
-			pinZhuEdtTxt.setText(_selectedFood.tmpTaste.preference);
+			pinZhuEdtTxt.setText(_selectedFood.tmpTaste.getPreference());
 			priceEdtTxt.setText(_selectedFood.tmpTaste.getPrice().toString());
 		}
 		
@@ -501,7 +501,7 @@ public class PickTasteActivity extends TabActivity{
 				if(tmpTasteValue.length() != 0){
 					_selectedFood.tmpTaste = new Taste();
 					_selectedFood.tmpTaste.aliasID = Util.genTempFoodID();
-					_selectedFood.tmpTaste.preference = tmpTasteValue;
+					_selectedFood.tmpTaste.setPreference(tmpTasteValue);
 				}else{
 					_selectedFood.tmpTaste = null;
 				}
@@ -532,23 +532,23 @@ public class PickTasteActivity extends TabActivity{
 							_selectedFood.tmpTaste.setPrice(new Float(0));
 							sendPickTasteBoradcast();
 						}else{
-							Float price = Float.parseFloat(s.toString());
+							Float price = Float.valueOf(s.toString());
 							if(price >= 0 && price < 9999){
 								_selectedFood.tmpTaste.setPrice(price);
 								sendPickTasteBoradcast();
 							}else{
 								priceEdtTxt.setText(_selectedFood.tmpTaste.getPrice() > 9999 ? "" : Util.float2String2(_selectedFood.tmpTaste.getPrice()));
 								priceEdtTxt.setSelection(priceEdtTxt.getText().length());
-								Toast.makeText(PickTasteActivity.this, "临时口味的价格范围是0～9999", 0).show();
+								Toast.makeText(PickTasteActivity.this, "临时口味的价格范围是0～9999", Toast.LENGTH_SHORT).show();
 							}
 						}
 					}catch(NumberFormatException e){
 						priceEdtTxt.setText(_selectedFood.tmpTaste.getPrice() > 9999 ? "" : Util.float2String2(_selectedFood.tmpTaste.getPrice()));
 						priceEdtTxt.setSelection(priceEdtTxt.getText().length());
-						Toast.makeText(PickTasteActivity.this, "临时口味的价钱格式不正确，请重新输入", 0).show();
+						Toast.makeText(PickTasteActivity.this, "临时口味的价钱格式不正确，请重新输入", Toast.LENGTH_SHORT).show();
 					}
 				}else{
-					Toast.makeText(PickTasteActivity.this, "请先输入临时口味", 0).show();
+					Toast.makeText(PickTasteActivity.this, "请先输入临时口味", Toast.LENGTH_SHORT).show();
 				}
 			}
 
@@ -626,7 +626,7 @@ public class PickTasteActivity extends TabActivity{
 				view = convertView;
 			}
 			//set name to taste
-			((TextView)view.findViewById(R.id.foodname)).setText(_tastes[position].preference);
+			((TextView)view.findViewById(R.id.foodname)).setText(_tastes[position].getPreference());
 			//set number to taste
 			((TextView)view.findViewById(R.id.nums)).setText(String.valueOf(_tastes[position].aliasID));
 			//set the price to taste
@@ -658,9 +658,9 @@ public class PickTasteActivity extends TabActivity{
 						int pos = _selectedFood.addTaste(_tastes[position]);
 						if(pos >= 0){
 							sendPickTasteBoradcast();
-							Toast.makeText(PickTasteActivity.this, "添加" + _tastes[position].preference, 0).show();
+							Toast.makeText(PickTasteActivity.this, "添加" + _tastes[position].getPreference(), Toast.LENGTH_SHORT).show();
 						}else{
-							Toast.makeText(PickTasteActivity.this, "最多只能添加" + _selectedFood.tastes.length + "种口味", 0).show();
+							Toast.makeText(PickTasteActivity.this, "最多只能添加" + _selectedFood.tastes.length + "种口味", Toast.LENGTH_SHORT).show();
 							selectChkBox.setChecked(false);
 						}						
 						
@@ -668,7 +668,7 @@ public class PickTasteActivity extends TabActivity{
 						int pos = _selectedFood.removeTaste(_tastes[position]);
 						if(pos >= 0){
 							sendPickTasteBoradcast();
-							Toast.makeText(PickTasteActivity.this, "删除" + _tastes[position].preference, 0).show();
+							Toast.makeText(PickTasteActivity.this, "删除" + _tastes[position].getPreference(), Toast.LENGTH_SHORT).show();
 						}
 					}
 					_handler.sendEmptyMessage(0);
@@ -688,7 +688,7 @@ public class PickTasteActivity extends TabActivity{
 						if(pos >= 0){
 							sendPickTasteBoradcast();
 							selectChkBox.setChecked(false);
-							Toast.makeText(PickTasteActivity.this, "删除" + _tastes[position].preference, 0).show();
+							Toast.makeText(PickTasteActivity.this, "删除" + _tastes[position].getPreference(), Toast.LENGTH_SHORT).show();
 						}
 						((LinearLayout)arg0.findViewById(R.id.item_body)).setBackgroundResource(R.drawable.item_bg_selector);
 					}else{
@@ -697,9 +697,9 @@ public class PickTasteActivity extends TabActivity{
 							sendPickTasteBoradcast();
 							selectChkBox.setChecked(true);
 							((LinearLayout)arg0.findViewById(R.id.item_body)).setBackgroundResource(R.drawable.item_bg2);
-							Toast.makeText(PickTasteActivity.this, "添加" + _tastes[position].preference, 0).show();
+							Toast.makeText(PickTasteActivity.this, "添加" + _tastes[position].getPreference(), Toast.LENGTH_SHORT).show();
 						}else{
-							Toast.makeText(PickTasteActivity.this, "最多只能添加" + _selectedFood.tastes.length + "种口味", 0).show();
+							Toast.makeText(PickTasteActivity.this, "最多只能添加" + _selectedFood.tastes.length + "种口味", Toast.LENGTH_SHORT).show();
 							((LinearLayout)arg0.findViewById(R.id.item_body)).setBackgroundResource(R.drawable.item_bg_selector);
 						}
 
