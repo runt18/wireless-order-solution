@@ -61,7 +61,7 @@ public class OrderListContent extends ConcreteContent {
 		}
 		
 		_template = _template.replace(PVar.VAR_2, 
-						new Grid2ItemsContent("餐台：" + _order.destTbl.aliasID, 
+						new Grid2ItemsContent("餐台：" + _order.destTbl.aliasID + (_order.destTbl.name.length() == 0 ? "" : ("(" + _order.destTbl.name + ")")), 
 											  "人数：" + _order.customNum, 
 											  _printType, 
 											  _style).toString());
