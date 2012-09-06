@@ -319,7 +319,7 @@ var tasteGrid = createGridPanel(
 	    ['计算方式', 'tasteCalcFormat']
 	],
 	['tasteID', 'tasteAlias','tasteName','tastePrice','tasteRate', 'tasteCategory', 'tasteCalc', 'tasteCalcFormat', 'foodID', 'foodName'],
-	[['pin', pin], ['resturantID', restaurantID], ['foodID', 0]],
+	[['pin', pin], ['restaurantID', restaurantID], ['foodID', 0]],
 	0
 );
 tasteGrid.frame = false;
