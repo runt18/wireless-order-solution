@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.dbObject.SingleOrderFood;
-import com.wireless.protocol.Department;
 import com.wireless.protocol.Kitchen;
 
 public class SingleOrderFoodReflector {
@@ -83,14 +82,18 @@ public class SingleOrderFoodReflector {
 			  " A.taste_tmp_alias, A.taste_tmp, A.taste_tmp_price, " + 
 			  " A.order_date, A.is_temporary, A.is_paid, A.waiter, A.comment, " +
 			  " B.type, B.service_rate, " +
-			  " (CASE WHEN A.dept_id = " + Department.DEPT_TEMP + " THEN '临时菜' ELSE D.name END) as dept_name " +
+			  " (CASE WHEN A.kitchen_alias = " + Kitchen.KITCHEN_TEMP + " THEN '临时菜' ELSE D.name END) as dept_name " +
 			  " FROM " + 
-			  Params.dbName + "." + orderFoodTbl + " A LEFT OUTER JOIN " +
-			  Params.dbName + ".kitchen C " + " ON A.kitchen_id = C.kitchen_id, " +
-			  Params.dbName + "." + orderTbl + " B, " +
-			  Params.dbName + ".department D " +
-			  " WHERE " +
-			  " A.order_id = B.id AND (A.dept_id = D.dept_id OR A.dept_id = " + Department.DEPT_TEMP + ") AND B.restaurant_id = D.restaurant_id " +
+			  Params.dbName + "." + orderFoodTbl + " A LEFT JOIN " +
+			  Params.dbName + ".kitchen C " + 
+			  " ON A.restaurant_id = C.restaurant_id AND A.kitchen_alias = C.kitchen_alias " + 
+			  " LEFT JOIN " +
+			  Params.dbName + ".department D " + 
+			  " ON C.restaurant_id = D.restaurant_id  AND C.dept_id = D.dept_id " +
+			  " JOIN " +
+			  Params.dbName + "." + orderTbl + " B " +
+			  " ON  A.order_id = B.id " +
+			  " WHERE 1=1 " +
 			  (extraCond == null ? "" : extraCond) + " " +
 			  (orderClause == null ? "" : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
