@@ -134,7 +134,8 @@ public class QueryMenuMgrAction extends Action {
 				filterCondition = "";
 			}
 			
-			String orderClause = " ORDER BY FOOD.food_id DESC";
+//			String orderClause = " ORDER BY FOOD.food_id DESC";
+			String orderClause = " ORDER BY FOOD.food_alias ";
 			
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF);
