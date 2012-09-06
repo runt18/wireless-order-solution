@@ -47,12 +47,12 @@ public class FoodTasteDao {
 				item.setTasteID(dbCon.rs.getShort("taste_id"));
 				item.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
 				item.setRank(dbCon.rs.getInt("rank"));
-				item.setTasteAlias(dbCon.rs.getShort("taste_alias"));
+				item.setTasteAlias(dbCon.rs.getInt("taste_alias"));
 				item.setTasteName(dbCon.rs.getString("taste_name"));
 				item.setTastePrice(dbCon.rs.getFloat("price"));
-				item.setTasteCategory(dbCon.rs.getShort("category"));
+				item.setTasteCategory(dbCon.rs.getInt("category"));
 				item.setTasteRate(dbCon.rs.getFloat("rate"));
-				item.setTasteCalc(dbCon.rs.getShort("calc"));
+				item.setTasteCalc(dbCon.rs.getInt("calc"));
 				item.setType(dbCon.rs.getInt("type"));
 				list.add(item);
 				item = null;
