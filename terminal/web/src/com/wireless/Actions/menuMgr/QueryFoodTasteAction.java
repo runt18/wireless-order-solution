@@ -47,7 +47,7 @@ public class QueryFoodTasteAction extends Action{
 			
 		} catch(Exception e){
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, "操作失败,读取菜品已关联口味发生异常!");
-			System.out.println(e.getMessage());
+			e.printStackTrace();
 		} finally{
 			if(list != null){
 				jobject.setTotalProperty(list.length);
