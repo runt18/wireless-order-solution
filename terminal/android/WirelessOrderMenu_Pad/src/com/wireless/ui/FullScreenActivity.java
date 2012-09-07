@@ -12,13 +12,14 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
+import com.wireless.protocol.OrderFood;
 import com.wireless.util.GalleryFragment;
+import com.wireless.util.PackOrderFoods;
 import com.wireless.util.GalleryFragment.OnPicChangedListener;
 
 public class FullScreenActivity extends Activity implements OnPicChangedListener{
-	
 	private GalleryFragment mPicBrowserFragment;
-	
+	private OrderFood mOrderFood;
 	static final int FULL_RES_CODE = 130;
 	
 	@Override
@@ -37,8 +38,13 @@ public class FullScreenActivity extends Activity implements OnPicChangedListener
 		mPicBrowserFragment.notifyDataChanged(WirelessOrder.foods);
 		//设置content fragment的回调函数
 		mPicBrowserFragment.setOnViewChangeListener(this);
+		Intent intent = getIntent();
 		
-		mPicBrowserFragment.setPosition(getIntent().getIntExtra(FoodParcel.KEY_VALUE, 0));
+		if(intent.hasExtra(FoodParcel.KEY_VALUE))
+		{
+			mOrderFood = intent.getParcelableExtra(FoodParcel.KEY_VALUE);
+			mPicBrowserFragment.setPosition(mOrderFood);
+		}
 		
 		((ImageView) findViewById(R.id.imageView_back_fullScreen)).setOnClickListener(new OnClickListener(){
 
@@ -67,13 +73,15 @@ public class FullScreenActivity extends Activity implements OnPicChangedListener
 	 */
 	private void setResultInformations(){
 		Intent intent = new Intent();
-		intent.putExtra(FoodParcel.KEY_VALUE, mPicBrowserFragment.getSelectedPosition());
-		setResult(FULL_RES_CODE, intent);
+		setResult(FULL_RES_CODE, PackOrderFoods.pack(mOrderFood, intent));
 		finish();
 	}
 
 	@Override
 	public void onPicChanged(Food value, int position) {
+		float count = mOrderFood.getCount();
+		mOrderFood = new OrderFood(value);
+		mOrderFood.setCount(count);
 		((TextView) findViewById(R.id.textView_food_name_fullScreen)).setText(value.name);
 	}
 }

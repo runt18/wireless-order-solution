@@ -11,21 +11,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true" >
-
+
         <Button
             android:id="@+id/button_confirm_pickTaste_dialog"
             android:layout_width="120dp"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
-            android:text="确定" />
-
-        <Button
-            android:id="@+id/button_cancel_pickTaste_dialog"
-            android:layout_width="120dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@+id/button_confirm_pickTaste_dialog"
             android:text="返回" />
 
     </RelativeLayout>
@@ -36,22 +28,26 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/relativeLayout_bottom"
         android:minHeight="60dp" >
-
-        <TextView
-            android:id="@+id/textView_selectedTaste"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-
+
         <TextView
             android:id="@+id/textView_selected_tastePrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
+            android:layout_centerHorizontal="false"
+            android:layout_centerVertical="false"
             android:layout_marginRight="100dp"
             android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <LinearLayout
+            android:id="@+id/pickedTaste_linearLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true" >
+
+        </LinearLayout>
+
     </RelativeLayout>
 
     <RelativeLayout

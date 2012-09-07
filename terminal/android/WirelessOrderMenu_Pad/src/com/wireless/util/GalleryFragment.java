@@ -21,7 +21,7 @@ import com.wireless.ordermenu.R;
 import com.wireless.protocol.Food;
 
 public class GalleryFragment extends Fragment {
-	
+	private ImageView.ScaleType curScaleType = ImageView.ScaleType.CENTER_CROP;
 	private BaseAdapter mGalleryAdapter = null;
 	private Gallery mGallery;
 	private List<Food> mFoods = new ArrayList<Food>();
@@ -75,10 +75,14 @@ public class GalleryFragment extends Fragment {
 		}
 	}
 	
-	//FIXME to be deleted
-	public void setContent(ArrayList<Food> foods){
+	public void notifyDataChanged(ArrayList<Food> foods){
 		mFoods = foods;
 		mGalleryAdapter.notifyDataSetChanged();
+	}
+	
+	public void setScaleType(ImageView.ScaleType type)
+	{
+		curScaleType = type;
 	}
 	
 	/**
@@ -129,12 +133,12 @@ public class GalleryFragment extends Fragment {
         			convertView = new ImageView(getActivity());
         			imageView = (ImageView)convertView;
         			// 设置ImageView的伸缩规格，用了自带的属性值
-        			imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        			imageView.setScaleType(curScaleType);
         			
         		}else {
         			imageView = (ImageView)convertView;
         		}
-        		
+        		imageView.setAdjustViewBounds(true);
         		imageView.setImageBitmap(mImgLoader.loadImage(mFoods.get(position).image));
         		return imageView;
         	}

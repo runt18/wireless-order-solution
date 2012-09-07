@@ -1,8 +1,10 @@
 package com.wireless.ui;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -10,10 +12,17 @@ import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Gallery;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TabHost;
 import android.widget.TextView;
 
@@ -22,24 +31,30 @@ import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.Taste;
+import com.wireless.util.GalleryFragment;
 import com.wireless.util.ImageLoader;
+import com.wireless.util.PackOrderFoods;
 import com.wireless.util.PickTasteFragment;
 import com.wireless.util.PickTasteFragment.OnTasteChangeListener;
 
 public class FoodDetailActivity extends Activity implements OnTasteChangeListener{
 	private static final int ORDER_FOOD_CHANGED = 234841;
-	
+	private static final String RECOMMEND_DIALOG = "recommend_dialog";
+
 	private OrderFood mOrderFood;
 	
 	private ImageLoader mImgLoader;
-	private LinearLayout mHsvLinearLayout;
-	
 	private DisplayHandler mDisplayHandler;
+	private ArrayList<Food> mRecommendfoods;
+	private ImageView mFoodImageView;
 
 	private static class DisplayHandler extends Handler{
 		private WeakReference<FoodDetailActivity> mActivity;
 		private TextView mFoodNameTextView;
 		private TextView mFoodPriceTextView;
+		private TextView mTasteTextView;
+		private TextView mPinzhuTextView;
 
 		DisplayHandler(FoodDetailActivity activity)
 		{
@@ -54,14 +69,19 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 				mFoodNameTextView = (TextView) activity.findViewById(R.id.textView_foodName_foodDetail);
 			if(mFoodPriceTextView == null)
 				mFoodPriceTextView = (TextView) activity.findViewById(R.id.textView_price_foodDetail);
-
+			if(mTasteTextView == null)
+				mTasteTextView = (TextView) activity.findViewById(R.id.textView_pickedTaste_foodDetail);
+			if(mPinzhuTextView == null)
+				mPinzhuTextView = (TextView) activity.findViewById(R.id.textView_pinzhu_foodDetail);
 
 			switch(msg.what)
 			{
 			case ORDER_FOOD_CHANGED:
-				Log.i("order changed",activity.mOrderFood.toString());
 				mFoodNameTextView.setText(activity.mOrderFood.name);
 				mFoodPriceTextView.setText("" + activity.mOrderFood.getPriceWithTaste());
+				mTasteTextView.setText(activity.mOrderFood.getNormalTastePref());
+				if(activity.mOrderFood.tmpTaste != null)
+					mPinzhuTextView.setText(activity.mOrderFood.tmpTaste.getPreference());
 				break;
 			}
 		}
@@ -80,26 +100,28 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		mDisplayHandler = new DisplayHandler(this);
 		mDisplayHandler.sendEmptyMessage(ORDER_FOOD_CHANGED);
 		
-		ImageView foodImageView = (ImageView) findViewById(R.id.imageView_foodDetail);
-		foodImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-		foodImageView.setImageBitmap(mImgLoader.loadImage(mOrderFood.image));
-		foodImageView.setOnClickListener(new OnClickListener(){
+		mFoodImageView = (ImageView) findViewById(R.id.imageView_foodDetail);
+		mFoodImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+		mFoodImageView.setImageBitmap(mImgLoader.loadImage(mOrderFood.image));
+		mFoodImageView.setOnClickListener(new OnClickListener(){
 
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent(FoodDetailActivity.this ,FullScreenActivity.class);
-				intent.putExtra(FoodParcel.KEY_VALUE, getIntent().getIntExtra(FoodParcel.KEY_VALUE, 0));
-				startActivity(intent);
+				startActivity(PackOrderFoods.pack(mOrderFood, intent));
 			}
 		});
 		
-		final TextView countTextView = (TextView) findViewById(R.id.textView_count_foodDetail);
+		final EditText countEditText = (EditText) findViewById(R.id.editText_count_foodDetail);
+		countEditText.setText(String.valueOf(mOrderFood.getCount()));
+		
 		((ImageButton) findViewById(R.id.imageButton_plus_foodDetail)).setOnClickListener(new OnClickListener(){
 
 			@Override
 			public void onClick(View v) {
-				int curNum = Integer.parseInt(countTextView.getText().toString());
-				countTextView.setText("" + ++curNum);
+				float curNum = Float.parseFloat(countEditText.getText().toString());
+				countEditText.setText("" + ++curNum);
+				mOrderFood.setCount(curNum);
 			}
 		});
 		
@@ -107,9 +129,12 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 
 			@Override
 			public void onClick(View v) {
-				int curNum = Integer.parseInt(countTextView.getText().toString());
+				float curNum = Float.parseFloat(countEditText.getText().toString());
 				if(--curNum >= 0)
-					countTextView.setText("" + curNum);
+				{
+					countEditText.setText("" + curNum);
+					mOrderFood.setCount(curNum);
+				}
 			}
 		});
 		
@@ -117,7 +142,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 
 			@Override
 			public void onClick(View v) {
-				showDialog(PickTasteFragment.FOCUS_TASTE);
+				showDialog(PickTasteFragment.FOCUS_TASTE, 0);
 			}
 		});
 		
@@ -125,41 +150,131 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 
 			@Override
 			public void onClick(View v) {
-				showDialog(PickTasteFragment.FOCUS_NOTE);
+				showDialog(PickTasteFragment.FOCUS_NOTE, 0);
 			}
 		});
 		
-		mHsvLinearLayout = (LinearLayout) findViewById(R.id.hsv_linearLyout_food_detail);
-
+		((Button) findViewById(R.id.button_removeAllTaste)).setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				if(mOrderFood.tastes.length > 0){
+					for(Taste t:mOrderFood.tastes.clone())
+					{	
+						mOrderFood.removeTaste(t);
+					}
+					mOrderFood.tmpTaste = null;
+					mDisplayHandler.sendEmptyMessage(ORDER_FOOD_CHANGED);
+				}
+			}
+		});
+		
 		TabHost mTabHost = (TabHost) findViewById(R.id.tabhost_foodDetail);
 		mTabHost.setup();
 		
 		mTabHost.addTab(mTabHost.newTabSpec("tab1").setIndicator("基本").setContent(R.id.tab1_foodDetail));
 		mTabHost.addTab(mTabHost.newTabSpec("tab2").setIndicator("其它").setContent(R.id.tab2_foodDetail));
+		
+		
+		mRecommendfoods = new ArrayList<Food>();
+		for(Food f:WirelessOrder.foods)
+		{
+			if(f.isRecommend())
+				mRecommendfoods.add(f);
+		}
+		
+		Gallery gallery = (Gallery) findViewById(R.id.gallery_food_detail);
+		gallery.setAdapter(new RecommendFoodAdapter());
+		gallery.setOnItemClickListener(new OnItemClickListener(){
+			@Override
+			public void onItemClick(AdapterView<?> parent,View view, int position, long id) {
+				showDialog(RECOMMEND_DIALOG, position);
+			}
+		});
 	}
 	
-	protected void showDialog(String tab) {
-		PickTasteFragment pickTasteFg = new PickTasteFragment();
-		pickTasteFg.setOnTasteChangeListener(this);
-		pickTasteFg.show(getFragmentManager(), tab);
-	}
-
-	@Override
-	protected void onStart(){
-		super.onStart();
-		for(Food f : WirelessOrder.foods)
+	protected void showDialog(String tab, int position) {
+		if(tab == RECOMMEND_DIALOG)
 		{
-			ImageView imgView = new ImageView(this);
-			imgView.setAdjustViewBounds(true);
-			imgView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-			imgView.setImageBitmap(mImgLoader.loadImage(f.image));
-			mHsvLinearLayout.addView(imgView);
+			View dialogLayout = getLayoutInflater().inflate(R.layout.recommend_dialog, (ViewGroup) findViewById(R.id.recommend_dialog_layout));
+			final Dialog dialog = new Dialog(FoodDetailActivity.this);
+			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+			dialog.setContentView(dialogLayout);
+			dialog.show();
+			
+			Window dialogWindow = dialog.getWindow();
+			WindowManager.LayoutParams lp = dialogWindow.getAttributes();
+			lp.width = 900;
+			lp.height = 650;
+			dialogWindow.setAttributes(lp);
+			
+			Gallery gallery = (Gallery) dialog.findViewById(R.id.gallery_recommed_food_dialog);
+			gallery.setAdapter(new RecommendFoodAdapter());
+			gallery.setSelection(position);
+			
+			gallery.setOnItemClickListener(new OnItemClickListener(){
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
+					float count = mOrderFood.getCount();
+					mOrderFood = new OrderFood(mRecommendfoods.get(position));
+					mOrderFood.setCount(count);
+					
+					Intent intent = getIntent();
+					Bundle bundle = new Bundle();
+					bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(mOrderFood));
+					intent.putExtras(bundle);
+					
+					mFoodImageView.setImageBitmap(mImgLoader.loadImage(mOrderFood.image));
+					mDisplayHandler.sendEmptyMessage(ORDER_FOOD_CHANGED);
+					dialog.dismiss();
+				}
+			});
+		} else{
+			PickTasteFragment pickTasteFg = new PickTasteFragment();
+			pickTasteFg.setOnTasteChangeListener(this);
+			pickTasteFg.show(getFragmentManager(), tab);
 		}
 	}
 
 	@Override
 	public void onTasteChange(OrderFood food) {
-//		mOrderFood = food;
 		mDisplayHandler.sendEmptyMessage(ORDER_FOOD_CHANGED);
+	}
+	
+	class RecommendFoodAdapter extends BaseAdapter{
+    	
+    	@Override
+    	public int getCount() {
+    		return mRecommendfoods.size();
+    	}
+
+    	// 返回图片路径
+    	@Override
+    	public Object getItem(int position) {
+    		return mRecommendfoods.get(position);
+    	}
+
+    	// 返回图片在资源的位置
+    	@Override
+    	public long getItemId(int position) {
+    		return position;
+    	}
+
+    	// 此方法是最主要的，他设置好的ImageView对象返回给Gallery
+    	@Override
+    	public View getView(int position, View convertView, ViewGroup parent) {
+    		ImageView imageView;
+    		if(convertView == null){
+    			convertView = new ImageView(FoodDetailActivity.this);
+    			imageView = (ImageView)convertView;
+    			// 设置ImageView的伸缩规格，用了自带的属性值
+    			imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+    			
+    		}else {
+    			imageView = (ImageView)convertView;
+    		}
+    		imageView.setAdjustViewBounds(true);
+    		imageView.setImageBitmap(mImgLoader.loadImage(mRecommendfoods.get(position).image));
+    		return imageView;
+    	}
 	}
 }

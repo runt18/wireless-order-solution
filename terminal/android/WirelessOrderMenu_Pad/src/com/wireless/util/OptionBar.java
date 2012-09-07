@@ -37,13 +37,18 @@ import com.wireless.util.SetServerFragment.OnServerChangeListener;
 import com.wireless.util.SetTableFragment.OnTableChangedListener;
 
 public class OptionBar extends Fragment implements OnTableChangedListener , OnServerChangeListener{
+	private static Table mTable;
+	private static int mCustomCount;
+	private static int mPickedFood;
+	private static StaffTerminal mStaff;
+	
 	private Dialog mDialog;
 	private TabHost mTabHost;
 	private TextView mSelectedFoodTextView;
 	private TextView mTableNumTextView;
 	private TextView mCustomCntTextView;
 
-	public static enum Selection{
+	private static enum Selection{
 		TAB1,TAB2,TAB3
 	}
 	
@@ -59,14 +64,14 @@ public class OptionBar extends Fragment implements OnTableChangedListener , OnSe
 	{
 		super.onActivityCreated(savedInstanceState);
 		Activity activity = this.getActivity();
-		onCreate(activity);
+		initial(activity);
 		onCreateDialog(activity);
 	}
 
 	/*
 	 * 初始化各个按钮
 	 */
-	private void onCreate(Activity activity){
+	private void initial(Activity activity){
 		ImageView setTableImgView = (ImageView)activity.findViewById(R.id.imgView_set_table);
 		setTableImgView.setOnClickListener(new BottomClickListener(Selection.TAB1));
 
@@ -79,8 +84,23 @@ public class OptionBar extends Fragment implements OnTableChangedListener , OnSe
 		mSelectedFoodTextView = (TextView) activity.findViewById(R.id.textView_selectedFood);
 		mTableNumTextView = (TextView) activity.findViewById(R.id.txtView_table_count);
 		mCustomCntTextView = (TextView) activity.findViewById(R.id.textView_peopCnt);
+		
+
 	}
 	
+	@Override
+	public void onStart(){
+		super.onStart();
+		if(mTable != null)
+		{
+			mTableNumTextView.setText("" + mTable.aliasID);
+			mCustomCntTextView.setText("" + mCustomCount);
+			mSelectedFoodTextView.setText("" + mPickedFood);
+		}
+		
+		if(mStaff != null)
+			((TextView) getActivity().findViewById(R.id.textView_serverName)).setText(mStaff.name);
+	}
 	/*
 	 * 初始化dialog所需要的数据
 	 * 包括tabHost和各种editText
@@ -157,6 +177,93 @@ public class OptionBar extends Fragment implements OnTableChangedListener , OnSe
 	}
 	
 
+
+
+	/**
+	 * 餐台设置时的回调，根据餐台的状态来判断是否请求订单
+	 */
+	@Override
+	public void onTableChange(Table table, int tableStatus,int customCount) {
+		mDialog.dismiss();
+		
+		mTable = table;
+		mCustomCount = customCount;
+		
+		mTableNumTextView.setText("" + mTable.aliasID);
+		mCustomCntTextView.setText("" + mCustomCount);
+		if(tableStatus == Table.TABLE_IDLE){
+			mSelectedFoodTextView.setText("0");
+			Toast.makeText(this.getActivity(), "该餐台尚未点菜", Toast.LENGTH_SHORT).show();
+		}else if(tableStatus == Table.TABLE_BUSY){
+			 new QueryOrderTask(table.aliasID){
+				@Override
+				void onOrderChanged(Order order) {
+					mPickedFood = order.foods.length;
+					mSelectedFoodTextView.setText(""+ mPickedFood);
+				}
+			 }.execute(WirelessOrder.foodMenu);
+		}
+	}
+
+	/**
+	 * 服务员改变时的回调，判断登陆信息是否正确
+	 */
+	@Override
+	public void onServerChange(final StaffTerminal staff, String id, String pwd) {
+		try {
+			//Convert the password into MD5
+			MessageDigest digester = MessageDigest.getInstance("MD5");
+			digester.update(pwd.getBytes(), 0 , pwd.getBytes().length); 
+		
+			if(id.equals("")){
+				Toast.makeText(getActivity(), "账号不能为空", Toast.LENGTH_SHORT).show();
+			}else if(staff.pwd.equals(toHexString(digester.digest()))){
+				mStaff = staff;
+				//保存staff pin到文件里面
+				Editor editor = getActivity().getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).edit();//获取编辑器
+				editor.putLong(Params.STAFF_PIN, staff.pin);
+				//提交修改
+				editor.commit();	
+				((TextView) getActivity().findViewById(R.id.textView_serverName)).setText(staff.name);
+				//set the pin generator according to the staff login
+				ReqPackage.setGen(new PinGen(){
+					@Override
+					public long getDeviceId() {
+						return staff.pin;
+					}
+					@Override
+					public short getDeviceType() {
+						return Terminal.MODEL_STAFF;
+					}
+					
+				});
+				mDialog.dismiss();
+			}else{		
+				Toast.makeText(getActivity(), "密码错误", Toast.LENGTH_SHORT).show();
+			}
+			
+		}catch(NoSuchAlgorithmException e) {
+			Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
+		}
+	}
+	
+	/**
+	 * Convert the md5 byte to hex string.
+	 * @param md5Msg the md5 byte value
+	 * @return the hex string to this md5 byte value
+	 */
+	private String toHexString(byte[] md5Msg){
+		StringBuffer hexString = new StringBuffer();
+		for (int i=0; i < md5Msg.length; i++) {
+			if(md5Msg[i] >= 0x00 && md5Msg[i] < 0x10){
+				hexString.append("0").append(Integer.toHexString(0xFF & md5Msg[i]));
+			}else{
+				hexString.append(Integer.toHexString(0xFF & md5Msg[i]));					
+			}
+		}
+		return hexString.toString();
+	}
+	
 	/**
 	 * 执行请求对应餐台的账单信息 
 	 */
@@ -207,84 +314,5 @@ public class OptionBar extends Fragment implements OnTableChangedListener , OnSe
 		}
 		
 		abstract void onOrderChanged(Order order);
-	}
-
-	/**
-	 * 餐台设置时的回调，根据餐台的状态来判断是否请求订单
-	 */
-	@Override
-	public void onTableChange(Table table, int tableStatus,int customNum) {
-		mDialog.dismiss();
-		mTableNumTextView.setText("" + table.aliasID);
-		mCustomCntTextView.setText("" + customNum);
-		if(tableStatus == Table.TABLE_IDLE){
-			mSelectedFoodTextView.setText("0");
-			Toast.makeText(this.getActivity(), "该餐台尚未点菜", Toast.LENGTH_SHORT).show();
-		}else if(tableStatus == Table.TABLE_BUSY){
-			 new QueryOrderTask(table.aliasID){
-				@Override
-				void onOrderChanged(Order order) {
-					mSelectedFoodTextView.setText(""+order.foods.length);
-				}
-			 }.execute(WirelessOrder.foodMenu);
-		}
-	}
-
-	/**
-	 * 服务员改变时的回调，判断登陆信息是否正确
-	 */
-	@Override
-	public void onServerChange(final StaffTerminal staff, String id, String pwd) {
-		try {
-			//Convert the password into MD5
-			MessageDigest digester = MessageDigest.getInstance("MD5");
-			digester.update(pwd.getBytes(), 0 , pwd.getBytes().length); 
-		
-			if(id.equals("")){
-				Toast.makeText(getActivity(), "账号不能为空", Toast.LENGTH_SHORT).show();
-			}else if(staff.pwd.equals(toHexString(digester.digest()))){
-				//保存staff pin到文件里面
-				Editor editor = getActivity().getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).edit();//获取编辑器
-				editor.putLong(Params.STAFF_PIN, staff.pin);
-				//提交修改
-				editor.commit();	
-				((TextView) getActivity().findViewById(R.id.textView_serverName)).setText(staff.name);
-				//set the pin generator according to the staff login
-				ReqPackage.setGen(new PinGen(){
-					@Override
-					public long getDeviceId() {
-						return staff.pin;
-					}
-					@Override
-					public short getDeviceType() {
-						return Terminal.MODEL_STAFF;
-					}
-					
-				});
-				mDialog.dismiss();
-			}else{		
-				Toast.makeText(getActivity(), "密码错误", Toast.LENGTH_SHORT).show();
-			}
-			
-		}catch(NoSuchAlgorithmException e) {
-			Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
-		}
-	}
-	
-	/**
-	 * Convert the md5 byte to hex string.
-	 * @param md5Msg the md5 byte value
-	 * @return the hex string to this md5 byte value
-	 */
-	private String toHexString(byte[] md5Msg){
-		StringBuffer hexString = new StringBuffer();
-		for (int i=0; i < md5Msg.length; i++) {
-			if(md5Msg[i] >= 0x00 && md5Msg[i] < 0x10){
-				hexString.append("0").append(Integer.toHexString(0xFF & md5Msg[i]));
-			}else{
-				hexString.append(Integer.toHexString(0xFF & md5Msg[i]));					
-			}
-		}
-		return hexString.toString();
 	}
 }

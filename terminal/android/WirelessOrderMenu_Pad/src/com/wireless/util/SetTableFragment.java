@@ -304,8 +304,7 @@ public class SetTableFragment extends Fragment {
 			grid.setLayoutParams(lp);
 			// 设置显示的列数
 			grid.setNumColumns(6);
-			grid.setHorizontalSpacing(8);
-			grid.setVerticalSpacing(8);
+			grid.setVerticalSpacing(16);
 
 			grid.setSelector(android.R.color.transparent);
 

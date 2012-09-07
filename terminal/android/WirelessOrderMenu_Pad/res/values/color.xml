@@ -7,12 +7,12 @@
     <color name="transparent">#00000000</color>
     <color name="gold">#b89766</color>
     <drawable name="nullbg">#00ffffff</drawable>
-    <color name="green">#49cc5d</color>
+    <color name="green">#2dcf2d</color>
     <color name="blue">#33b5e5</color>
     <color name="black">#000</color>
     <color name="half_transparent">#80000000</color>
     <color name="purple">#b44acb</color>
-    <color name="red">#cb4a4a</color>
+    <color name="red">#e53232</color>
     <color name="blue_green">#61bb89</color>
         <drawable name="orange_drawable">#feb041</drawable>
         <drawable name="white_drawable">#ffffff</drawable>

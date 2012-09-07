@@ -9,7 +9,7 @@
         android:id="@+id/relativeLayout1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp" >
+        android:layout_marginBottom="6dp" >
 
         <TextView
             android:id="@+id/textView1"
@@ -49,14 +49,16 @@
                 android:text="例" />
         </RadioGroup>
     </RelativeLayout>
-
+
     <RelativeLayout
         android:id="@+id/relativeLayout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/relativeLayout1"
-        android:layout_marginBottom="10dp" >
+        android:layout_marginBottom="6dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true" >
 
         <ImageButton
             android:id="@+id/imageButton_plus_foodDetail"
@@ -80,16 +82,18 @@
             android:layout_centerVertical="true"
             android:text="数量："
             android:textAppearance="?android:attr/textAppearanceLarge" />
-
-        <TextView
-            android:id="@+id/textView_count_foodDetail"
+
+        <EditText
+            android:id="@+id/editText_count_foodDetail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="20dp"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/imageButton_plus_foodDetail"
             android:layout_toRightOf="@+id/textView2"
-            android:text="1"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
+            android:ems="10"
+            android:inputType="number" >
+
+        </EditText>
     </RelativeLayout>
 
     <RelativeLayout
@@ -128,14 +132,13 @@
             android:text="40"
             android:textAppearance="?android:attr/textAppearanceLarge" />
     </RelativeLayout>
-
+
     <RelativeLayout
         android:id="@+id/relativeLayout4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/relativeLayout3"
-        android:paddingBottom="10dp" >
+        android:layout_below="@+id/relativeLayout3" >
 
         <TextView
             android:id="@+id/textView3"
@@ -153,16 +156,41 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
+            android:layout_centerVertical="true"
             android:text="选择口味" />
+
+        <Button
+            android:id="@+id/button_removeAllTaste"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/button_pickTaste_foodDetail"
+            android:text="原始口味" />
     </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/relativeLayout5"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/relativeLayout4"
+        android:layout_marginBottom="6dp" >
+
+        <TextView
+            android:id="@+id/textView_pickedTaste_foodDetail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout6"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/relativeLayout4" >
-
+        android:layout_below="@+id/relativeLayout5" >
+
         <TextView
             android:id="@+id/textView5"
             android:layout_width="wrap_content"
@@ -170,15 +198,31 @@
             android:layout_centerVertical="true"
             android:text="品注："
             android:textAppearance="?android:attr/textAppearanceLarge" />
-
+
         <Button
             android:id="@+id/button_pinzhu_foodDetail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
+            android:layout_centerVertical="true"
             android:text="手写品注" />
+    </RelativeLayout>
 
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/relativeLayout6" >
+
+        <TextView
+            android:id="@+id/textView_pinzhu_foodDetail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="false"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="false"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
     </RelativeLayout>
 
 </RelativeLayout>

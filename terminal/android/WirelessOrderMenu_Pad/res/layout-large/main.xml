@@ -208,42 +208,39 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:layout_marginLeft="24dp"
                     android:layout_toRightOf="@+id/relativeLayout1"
                     android:text="数量:"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="@color/white" />
 
-                <ImageView
-                    android:id="@+id/imageView4"
-                    android:layout_width="wrap_content"
+                <ImageButton
+                    android:id="@+id/imageView_plus_main"
+                    android:layout_width="100dp"
                     android:layout_height="match_parent"
                     android:layout_centerVertical="true"
-                    android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
                     android:layout_toRightOf="@+id/textView8"
                     android:src="@drawable/plus_btn_selector" />
 
                 <TextView
-                    android:id="@+id/textView_price_main"
+                    android:id="@+id/textView_count_main"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:layout_toRightOf="@+id/imageView4"
-                    android:text="1"
+                    android:layout_toRightOf="@+id/imageView_plus_main"
+                    android:text="1.0"
                     android:textColor="@color/white"
                     android:textSize="22sp" >
 
                 </TextView>
 
-                <ImageView
-                    android:id="@+id/imageView5"
-                    android:layout_width="wrap_content"
+                <ImageButton
+                    android:id="@+id/imageView_minus_main"
+                    android:layout_width="100dp"
                     android:layout_height="match_parent"
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="20dp"
-                    android:layout_marginRight="20dp"
-                    android:layout_toRightOf="@+id/textView_price_main"
+                    android:layout_toRightOf="@+id/textView_count_main"
                     android:src="@drawable/minus_btn_selector" />
 
                 <TextView
@@ -253,7 +250,7 @@
                     android:layout_alignBaseline="@+id/textView8"
                     android:layout_alignBottom="@+id/textView8"
                     android:layout_marginLeft="24dp"
-                    android:layout_toRightOf="@+id/imageView5"
+                    android:layout_toRightOf="@+id/imageView_minus_main"
                     android:text="单价:"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="@color/white" />

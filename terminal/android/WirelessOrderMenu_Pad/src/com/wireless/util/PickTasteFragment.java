@@ -12,7 +12,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -22,6 +21,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
@@ -48,6 +48,7 @@ public class PickTasteFragment extends DialogFragment {
 	private static final int TASTE_FOOD = 243459;
 	private static final int TASTE_ALL = 89457;
 	private static final int TASTE_SELECTED = 34874;
+	private static final int TASTE_REMOVED = 33486;
 
 	private String mFilterCond = "";
 	private TasteRefreshHandler mTasteHandler;
@@ -66,8 +67,8 @@ public class PickTasteFragment extends DialogFragment {
 	private static class TasteRefreshHandler extends Handler{
 		private List<Taste> mFilterTaste = new ArrayList<Taste>();
 		private WeakReference<PickTasteFragment> mFragment;
-		private TextView mSelectedTasteTextView ;
 		private TextView mSelectedFoodPriceTextView ;
+		private LinearLayout mPickedTasteLinear;
 		
 		TasteRefreshHandler(PickTasteFragment fragment)
 		{
@@ -77,9 +78,9 @@ public class PickTasteFragment extends DialogFragment {
 		@Override
 		public void handleMessage(Message msg)
 		{
-			PickTasteFragment fragment = mFragment.get();
-			if(mSelectedTasteTextView == null)
-				mSelectedTasteTextView = (TextView) fragment.getView().findViewById(R.id.textView_selectedTaste);
+			final PickTasteFragment fragment = mFragment.get();
+			if(mPickedTasteLinear == null)
+				mPickedTasteLinear = (LinearLayout) fragment.getView().findViewById(R.id.pickedTaste_linearLayout);
 			
 			if(mSelectedFoodPriceTextView == null)
 				mSelectedFoodPriceTextView = (TextView) fragment.getView().findViewById(R.id.textView_selected_tastePrice);
@@ -95,9 +96,10 @@ public class PickTasteFragment extends DialogFragment {
 				break;
 				
 			case TASTE_SELECTED :
-				mSelectedTasteTextView.setText(fragment.mOrderFood.toString());
-				mSelectedFoodPriceTextView.setText("" + fragment.mOrderFood.getPriceWithTaste());
+				refreshPickedTaste();
 				return;
+			case TASTE_REMOVED:
+				refreshPickedTaste();
 			}
 			
 			mFilterTaste.clear();
@@ -107,12 +109,38 @@ public class PickTasteFragment extends DialogFragment {
 			{
 				Taste t = iter.next();
 				if(fragment.mFilterCond.length() != 0){
-					if(!(t.preference.contains(fragment.mFilterCond))){
+					if(!(t.getPreference().contains(fragment.mFilterCond))){
 						iter.remove();
 					}
 				}
 			}
 			fragment.refreshTaste(mFilterTaste);
+		}
+		
+		private void refreshPickedTaste(){
+			//FIXME 无口味对象不显示
+			// getPriceWithTaste() 不起作用？
+			final PickTasteFragment fragment = mFragment.get();
+			mPickedTasteLinear.removeAllViews();
+			if(fragment.mOrderFood.hasNormalTaste())
+				for(Taste t: fragment.mOrderFood.tastes)
+				{
+					Button btn = new Button(fragment.getActivity());
+					btn.setText(t.getPreference());
+					btn.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.search, 0);
+					btn.setTag(t);
+					mPickedTasteLinear.addView(btn);
+					
+					btn.setOnClickListener(new OnClickListener(){
+						@Override
+						public void onClick(View v) {
+							Taste t = (Taste) v.getTag();
+							fragment.mOrderFood.removeTaste(t);
+							TasteRefreshHandler.this.sendEmptyMessage(TASTE_REMOVED);
+						}
+					});
+				}
+			mSelectedFoodPriceTextView.setText("" + fragment.mOrderFood.getPriceWithTaste());
 		}
 	}
 	
@@ -129,8 +157,6 @@ public class PickTasteFragment extends DialogFragment {
 		
 		mTasteHandler.sendEmptyMessage(TASTE_FOOD);
 		mTasteHandler.sendEmptyMessage(TASTE_SELECTED);
-		
-//		rawTastes = Arrays.copyOf(mOrderFood.tastes, mOrderFood.tastes.length);
 		
 	}
 	
@@ -157,8 +183,11 @@ public class PickTasteFragment extends DialogFragment {
 			}
 		});
 		
+		final EditText pinzhuEditText = (EditText) view.findViewById(R.id.editText_note_pickTaste);
+		if(mOrderFood.tmpTaste != null)
+			pinzhuEditText.setText(mOrderFood.tmpTaste.getPreference());
 		if(getTag() == FOCUS_NOTE)
-			((EditText) view.findViewById(R.id.editText_note_pickTaste)).requestFocus();
+			pinzhuEditText.requestFocus();
 
 		final EditText tasteEditText = (EditText)view.findViewById(R.id.editText_pickTaste);
 		
@@ -181,25 +210,13 @@ public class PickTasteFragment extends DialogFragment {
 
 			@Override
 			public void onClick(View v) {
+				if(mOrderFood.tmpTaste == null)
+					mOrderFood.tmpTaste = new Taste();
+				mOrderFood.tmpTaste.setPreference(pinzhuEditText.getText().toString());
+				
 				if(mOnTasteChangeListener != null)
 					mOnTasteChangeListener.onTasteChange(mOrderFood);
-//				System.arraycopy(mOrderFood.tastes, 0, rawTastes, 0, mOrderFood.tastes.length);
-				onDestroyView();
-			}
-		});
-		Button cancelBtn = (Button) view.findViewById(R.id.button_cancel_pickTaste_dialog);
-		cancelBtn.setOnClickListener(new OnClickListener(){
-
-			@Override
-			public void onClick(View v) {
-				//TODO 创建还原初始值的方法
-//				for(Taste t:rawTastes)
-//					Log.i("tas1 ",t.toString());
-//				System.arraycopy(rawTastes, 0, mOrderFood.tastes, 0, rawTastes.length);
-//				
-//				for(Taste t:mOrderFood.tastes)
-//					Log.i("tas2 ",t.toString());
-				onDestroyView();
+				dismissAllowingStateLoss();
 			}
 		});
 		return view;
@@ -292,7 +309,7 @@ public class PickTasteFragment extends DialogFragment {
 			view.setTag(taste);
 			
 			TextView tasteName = (TextView) view.findViewById(R.id.textView_tasteName_gridItem);
-			tasteName.setText(taste.preference);
+			tasteName.setText(taste.getPreference());
 			
 			TextView tastePrice = (TextView) view.findViewById(R.id.textView_tastePrice_gridItem);
 			tastePrice.setText("" + taste.getPrice());
@@ -321,7 +338,7 @@ public class PickTasteFragment extends DialogFragment {
 						int pos = mOrderFood.removeTaste(mTastes.get(position));
 						if(pos >= 0){
 							selectChkBox.setChecked(false);
-							Toast.makeText(PickTasteFragment.this.getActivity(), "删除" + mTastes.get(position).preference, Toast.LENGTH_SHORT).show();
+							Toast.makeText(PickTasteFragment.this.getActivity(), "删除" + mTastes.get(position).getPreference(), Toast.LENGTH_SHORT).show();
 						}
 						background.setBackgroundResource(R.color.blue);
 					}else{
@@ -329,7 +346,7 @@ public class PickTasteFragment extends DialogFragment {
 						if(pos >= 0){
 							selectChkBox.setChecked(true);
 							background.setBackgroundResource(R.color.green);
-							Toast.makeText(PickTasteFragment.this.getActivity(), "添加" + mTastes.get(position).preference, Toast.LENGTH_SHORT).show();
+							Toast.makeText(PickTasteFragment.this.getActivity(), "添加" + mTastes.get(position).getPreference(), Toast.LENGTH_SHORT).show();
 						}else{
 							Toast.makeText(PickTasteFragment.this.getActivity(), "最多只能添加" + mOrderFood.tastes.length + "种口味", Toast.LENGTH_SHORT).show();
 							background.setBackgroundResource(R.color.blue);
@@ -337,8 +354,6 @@ public class PickTasteFragment extends DialogFragment {
 
 					}
 					mTasteHandler.sendEmptyMessage(TASTE_SELECTED);
-//					for(Taste t:rawTastes)
-//						Log.i("tas3 ",t.preference);
 				}
 			});
 			

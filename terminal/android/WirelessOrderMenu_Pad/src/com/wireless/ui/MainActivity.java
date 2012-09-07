@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -26,6 +27,7 @@ import com.wireless.util.ExpandableListFragment.OnItemChangeListener;
 import com.wireless.util.GalleryFragment;
 import com.wireless.util.GalleryFragment.OnItemClickListener;
 import com.wireless.util.GalleryFragment.OnPicChangedListener;
+import com.wireless.util.PackOrderFoods;
 
 public class MainActivity extends Activity  
 						  implements OnItemChangeListener,
@@ -33,12 +35,12 @@ public class MainActivity extends Activity
 	
 	protected static final int MAIN_ACTIVITY_RES_CODE = 340;
 
-	public static final String CURRENT_FOOD = "currentFood";
-
 	private HashMap<Kitchen, Integer> mFoodPosByKitchenMap = new HashMap<Kitchen, Integer>();
 	
 	private GalleryFragment mPicBrowserFragment;
 	private ExpandableListFragment mItemFragment;
+	
+	private OrderFood mOrderFood;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
@@ -54,8 +56,7 @@ public class MainActivity extends Activity
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent(MainActivity.this,FullScreenActivity.class);
-				intent.putExtra(FoodParcel.KEY_VALUE, mPicBrowserFragment.getSelectedPosition());
-				startActivityForResult(intent, MAIN_ACTIVITY_RES_CODE);
+				startActivityForResult(PackOrderFoods.pack(mOrderFood, intent), MAIN_ACTIVITY_RES_CODE);
 			}
 		});
 		
@@ -65,6 +66,30 @@ public class MainActivity extends Activity
 			@Override
 			public void onClick(View v) {
 				System.out.println("add dish btn clicked");
+			}
+		});
+		
+		final TextView countTextView = (TextView) findViewById(R.id.textView_count_main);
+		((ImageButton) findViewById(R.id.imageView_plus_main)).setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				float curNum = Float.parseFloat(countTextView.getText().toString());
+				countTextView.setText("" + ++curNum);
+				mOrderFood.setCount(curNum);
+			}
+		});
+		
+		((ImageButton) findViewById(R.id.imageView_minus_main)).setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				float curNum = Float.parseFloat(countTextView.getText().toString());
+				if(--curNum >= 0)
+				{
+					countTextView.setText("" + curNum);
+					mOrderFood.setCount(curNum);
+				}
 			}
 		});
 		
@@ -150,6 +175,9 @@ public class MainActivity extends Activity
 		mItemFragment.setPosition(food.kitchen);
 		((TextView) findViewById(R.id.textView_foodName_main)).setText(food.name);
 		((TextView) findViewById(R.id.textView_foodPrice_main)).setText("" + food.getPrice());
+		mOrderFood = new OrderFood(food);
+		float count = Float.parseFloat(((TextView) findViewById(R.id.textView_count_main)).getText().toString());
+		mOrderFood.setCount(count);
 	}
 
 	/**
@@ -167,7 +195,7 @@ public class MainActivity extends Activity
 	        switch(resultCode)
 	        {
 	        case FullScreenActivity.FULL_RES_CODE:
-	        	mPicBrowserFragment.setPosition(data.getIntExtra(FoodParcel.KEY_VALUE, 0));
+	        	mPicBrowserFragment.setPosition((OrderFood)data.getParcelableExtra(FoodParcel.KEY_VALUE));
 	        	break;
 	        }
 		}
@@ -176,10 +204,6 @@ public class MainActivity extends Activity
 	@Override
 	public void onItemClick(Food food, int position) {
 		Intent intent = new Intent(MainActivity.this,FoodDetailActivity.class);
-		Bundle bundle = new Bundle();
-		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(new OrderFood(food)));
-		intent.putExtras(bundle);
-		
-		startActivity(intent);
+		startActivity(PackOrderFoods.pack(mOrderFood, intent));
 	}  
 }
