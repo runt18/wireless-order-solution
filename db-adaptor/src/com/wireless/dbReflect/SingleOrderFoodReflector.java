@@ -86,7 +86,7 @@ public class SingleOrderFoodReflector {
 			  " FROM " + 
 			  Params.dbName + "." + orderFoodTbl + " A LEFT JOIN " +
 			  Params.dbName + ".kitchen C " + 
-			  " ON A.restaurant_id = C.restaurant_id AND A.kitchen_alias = C.kitchen_alias " + 
+			  " ON A.kitchen_id = C.kitchen_id " + 
 			  " LEFT JOIN " +
 			  Params.dbName + ".department D " + 
 			  " ON C.restaurant_id = D.restaurant_id  AND C.dept_id = D.dept_id " +

@@ -272,7 +272,7 @@ public class UpdateOrder {
 		
 		//Throws exception if the new order is expired.
 		if(newOrder.orderDate != 0 && newOrder.orderDate < oriOrder.orderDate){
-			throw new BusinessException(ErrorCode.ORDER_EXPIRED);
+			throw new BusinessException("The order(order_id=" + newOrder.id + ",restaurant_id=" + term.restaurantID + ") has expired.", ErrorCode.ORDER_EXPIRED);
 		}
 		
 		List<OrderFood> extraFoods;
@@ -288,94 +288,6 @@ public class UpdateOrder {
 		extraFoods = diffResult.extraFoods;
 		canceledFoods = diffResult.cancelledFoods;
 		//hurriedFoods = diffResult.hurriedFoods;
-		
-//		for(int i = 0; i < newOrder.foods.length; i++){
-//					
-//			/**
-//			 * Check to see whether the food to update is hurried.
-//			 */
-//			if(newOrder.foods[i].isHurried){
-//				OrderFood food = genFoodDetail(dbCon, term, newOrder.foods[i]);
-//				food.setCount(newOrder.foods[i].getCount());
-//				hurriedFoods.add(food);
-//			}
-//			
-//			/**
-//			 * Assume the order record is new, means not matched any original record.
-//			 * So the difference is equal to the amount of new order food
-//			 */
-//			STATUS status = STATUS.NOT_MATCHED;
-//			float diff = newOrder.foods[i].getCount().floatValue();
-//			
-//			for(int j = 0; j < oriFoods.length; j++){
-//				/**
-//				 * In the case below,
-//				 * 1 - both food alias id and taste id is matched
-//				 * 2 - order count is matched
-//				 * Skip this record since it is totally the same as original.
-//				 */
-//				if(newOrder.foods[i].equals(oriFoods[j]) &&
-//					newOrder.foods[i].getCount().equals(oriFoods[j].getCount())){
-//					diff = 0;
-//					status = STATUS.FULL_MATCHED;
-//					break;
-//					
-//				/**
-//				 * In the case below,
-//				 * 1 - both food alias id and taste id is matched
-//				 * 2 - order count isn't matched
-//				 * Calculate the difference between these two records and insert a new record to keep track of this incremental
-//				 */
-//				}else if(newOrder.foods[i].equals(oriFoods[j]) &&
-//						!newOrder.foods[i].getCount().equals(oriFoods[j].getCount())){
-//
-//					//calculate the difference between the submitted and original record
-//					diff = newOrder.foods[i].getCount().floatValue() - oriFoods[j].getCount().floatValue();					
-//					status = STATUS.FULL_MATCHED_BUT_COUNT;
-//					break;					
-//				}
-//			}
-//			
-//			if(status == STATUS.NOT_MATCHED || status == STATUS.FULL_MATCHED_BUT_COUNT){
-//				
-//				OrderFood food = genFoodDetail(dbCon, term, newOrder.foods[i]);
-//				
-//				food.setCount(new Float((float)Math.round(Math.abs(diff) * 100) / 100));
-//				
-//				if(diff > 0){
-//					extraFoods.add(food);
-//				}else if(diff < 0){
-//					canceledFoods.add(food);
-//				}
-//			}
-//		}	
-//		
-//		//insert the canceled order records
-//		for(int i = 0; i < oriFoods.length; i++){
-//			/**
-//			 * If the sum to original record's order count is zero,
-//			 * means the record to this food has been canceled before.
-//			 * So we should skip to check this record.
-//			 */
-//			if(oriFoods[i].getCount() > 0){
-//				boolean isCancelled = true;
-//				for(int j = 0; j < newOrder.foods.length; j++){
-//					if(oriFoods[i].equals(newOrder.foods[j])){
-//						isCancelled = false;
-//						break;
-//					}
-//				}
-//				/**
-//				 * If the original records are excluded from the submitted, means the food is to be cancel.
-//				 * So we insert an record whose order count is negative to original record
-//				 */
-//				if(isCancelled){
-//					OrderFood food = genFoodDetail(dbCon, term, oriFoods[i]);
-//					food.setCount(oriFoods[i].getCount());
-//					canceledFoods.add(food);
-//				}			
-//			}
-//		}
 		
 		/**
 		 * Get the region to this table if the order has NOT been paid before
