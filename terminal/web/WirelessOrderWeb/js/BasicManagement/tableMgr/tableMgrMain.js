@@ -566,8 +566,7 @@ var regionModComb = new Ext.form.ComboBox({
 });
 
 function tableOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
-	return "<center><a href=\"javascript:tableDeleteHandler(" + rowIndex
-			+ ")\">" + "<img src='../../images/del.png'/>删除</a>" + "</center>";
+	return "<a href=\"javascript:tableDeleteHandler(" + rowIndex + ")\">" + "<img src='../../images/del.png'/>删除</a>" ;
 };
 
 // 1，表格的数据store
@@ -619,13 +618,15 @@ var tableColumnModel = new Ext.grid.ColumnModel([
 			header : "编号",
 			sortable : true,
 			dataIndex : "tableAlias",
-			width : 80
+			width : 130,
+			fixed : true
 		},
 		{
 			header : "名称",
 			sortable : true,
 			dataIndex : "tableName",
-			width : 100,
+			width : 230,
+			fixed : true,
 			editor : new Ext.form.TextField({
 				// allowBlank : false,
 				allowNegative : false,
@@ -644,7 +645,8 @@ var tableColumnModel = new Ext.grid.ColumnModel([
 			header : "区域",
 			sortable : true,
 			dataIndex : "tableRegion",
-			width : 100,
+			fixed : true,
+			width : 130,
 			editor : regionModComb,
 			renderer : function(value, cellmeta, record) {
 				var regionDesc = "";
@@ -660,7 +662,8 @@ var tableColumnModel = new Ext.grid.ColumnModel([
 			header : "最低消（￥）",
 			sortable : true,
 			dataIndex : "tableMinCost",
-			width : 100,
+			width : 130,
+			fixed : true,
 			editor : new Ext.form.NumberField({
 				allowBlank : false,
 				allowNegative : false,
@@ -679,7 +682,8 @@ var tableColumnModel = new Ext.grid.ColumnModel([
 			header : "服务费率",
 			sortable : true,
 			dataIndex : "tableServiceRate",
-			width : 100,
+			width : 130,
+			fixed : true,
 			editor : new Ext.form.TextField({
 				allowBlank : false,
 				allowNegative : false,
@@ -704,17 +708,19 @@ var tableColumnModel = new Ext.grid.ColumnModel([
 			header : "状态",
 			sortable : true,
 			dataIndex : "tableStatusDisplay",
-			width : 90
+			width : 130,
+			fixed : true
 		}, {
 			header : "类型",
 			sortable : true,
 			dataIndex : "tableCategoryDisplay",
-			width : 90
+			width : 130,
+			fixed : true
 		}, {
-			header : "<center>操作</center>",
+			header : "操作",
+			align : 'center',
 			sortable : true,
 			dataIndex : "operator",
-			width : 180,
 			renderer : tableOpt
 		} ]);
 
