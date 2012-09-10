@@ -79,9 +79,12 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 			case ORDER_FOOD_CHANGED:
 				mFoodNameTextView.setText(activity.mOrderFood.name);
 				mFoodPriceTextView.setText("" + activity.mOrderFood.getPriceWithTaste());
-				mTasteTextView.setText(activity.mOrderFood.getNormalTastePref());
-				if(activity.mOrderFood.tmpTaste != null)
+				if(activity.mOrderFood.hasNormalTaste())
+					mTasteTextView.setText(activity.mOrderFood.getNormalTastePref());
+				else mTasteTextView.setText("");
+				if(activity.mOrderFood.hasTmpTaste())
 					mPinzhuTextView.setText(activity.mOrderFood.tmpTaste.getPreference());
+				else mPinzhuTextView.setText("");
 				break;
 			}
 		}
@@ -217,11 +220,13 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 					float count = mOrderFood.getCount();
 					mOrderFood = new OrderFood(mRecommendfoods.get(position));
 					mOrderFood.setCount(count);
+					mOrderFood.tmpTaste = new Taste();
+					mOrderFood.tmpTaste.setPreference("");
 					
 					Intent intent = getIntent();
 					Bundle bundle = new Bundle();
 					bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(mOrderFood));
-					intent.putExtras(bundle);
+					intent.replaceExtras(bundle);
 					
 					mFoodImageView.setImageBitmap(mImgLoader.loadImage(mOrderFood.image));
 					mDisplayHandler.sendEmptyMessage(ORDER_FOOD_CHANGED);
@@ -237,6 +242,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 
 	@Override
 	public void onTasteChange(OrderFood food) {
+		mOrderFood = food;
 		mDisplayHandler.sendEmptyMessage(ORDER_FOOD_CHANGED);
 	}
 	

@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -125,20 +126,23 @@ public class PickTasteFragment extends DialogFragment {
 			if(fragment.mOrderFood.hasNormalTaste())
 				for(Taste t: fragment.mOrderFood.tastes)
 				{
-					Button btn = new Button(fragment.getActivity());
-					btn.setText(t.getPreference());
-					btn.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.search, 0);
-					btn.setTag(t);
-					mPickedTasteLinear.addView(btn);
-					
-					btn.setOnClickListener(new OnClickListener(){
-						@Override
-						public void onClick(View v) {
-							Taste t = (Taste) v.getTag();
-							fragment.mOrderFood.removeTaste(t);
-							TasteRefreshHandler.this.sendEmptyMessage(TASTE_REMOVED);
-						}
-					});
+					if(t.aliasID != Taste.NO_TASTE)
+					{
+						Button btn = new Button(fragment.getActivity());
+						btn.setText(t.getPreference());
+						btn.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.search, 0);
+						btn.setTag(t);
+						mPickedTasteLinear.addView(btn);
+						
+						btn.setOnClickListener(new OnClickListener(){
+							@Override
+							public void onClick(View v) {
+								Taste t = (Taste) v.getTag();
+								fragment.mOrderFood.removeTaste(t);
+								TasteRefreshHandler.this.sendEmptyMessage(TASTE_REMOVED);
+							}
+						});
+					}
 				}
 			mSelectedFoodPriceTextView.setText("" + fragment.mOrderFood.getPriceWithTaste());
 		}
@@ -152,7 +156,6 @@ public class PickTasteFragment extends DialogFragment {
 		
 		FoodParcel foodParcel = getActivity().getIntent().getParcelableExtra(FoodParcel.KEY_VALUE);
 		mOrderFood = foodParcel;
-		
 		mTasteHandler = new TasteRefreshHandler(this);
 		
 		mTasteHandler.sendEmptyMessage(TASTE_FOOD);
@@ -184,7 +187,7 @@ public class PickTasteFragment extends DialogFragment {
 		});
 		
 		final EditText pinzhuEditText = (EditText) view.findViewById(R.id.editText_note_pickTaste);
-		if(mOrderFood.tmpTaste != null)
+		if(mOrderFood.hasTmpTaste())
 			pinzhuEditText.setText(mOrderFood.tmpTaste.getPreference());
 		if(getTag() == FOCUS_NOTE)
 			pinzhuEditText.requestFocus();
@@ -210,13 +213,13 @@ public class PickTasteFragment extends DialogFragment {
 
 			@Override
 			public void onClick(View v) {
-				if(mOrderFood.tmpTaste == null)
+				if(!mOrderFood.hasTmpTaste())
 					mOrderFood.tmpTaste = new Taste();
 				mOrderFood.tmpTaste.setPreference(pinzhuEditText.getText().toString());
 				
 				if(mOnTasteChangeListener != null)
 					mOnTasteChangeListener.onTasteChange(mOrderFood);
-				dismissAllowingStateLoss();
+				dismiss();
 			}
 		});
 		return view;
@@ -264,7 +267,6 @@ public class PickTasteFragment extends DialogFragment {
 				}
 			}
 			grid.setAdapter(new TasteAdapter(taste4Page));
-			
 			mScrollLayout.addView(grid);
 		}
 	}
