@@ -125,14 +125,10 @@ kitchenStatWin = new Ext.Window(
 											+ " " + kitchenStaticBeginDate;
 								}
 
-								kitchenStaticEndDate = kitchenStatWin.findById(
-										"endDateMStatKitchen").getValue();
+								kitchenStaticEndDate = kitchenStatWin.findById("endDateMStatKitchen").getValue();
 								if (kitchenStaticEndDate != "") {
-									kitchenStaticEndDate = dateFormated
-											.format('Y-m-d')
-											+ " " + orderStaticEndDate;
+									kitchenStaticEndDate = dateFormated.format('Y-m-d') + " " + kitchenStaticEndDate;
 								}
-
 								kitchenStaticString = selectKitchens;
 
 								isPrompt = true;
