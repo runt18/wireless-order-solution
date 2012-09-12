@@ -90,9 +90,7 @@ menuStatWin = new Ext.Window(
 						text : "确定",
 						handler : function() {
 
-							var selectCount = menuStatWin
-									.findById("dishMultSelectMStat").toMultiselect.store
-									.getCount();
+							var selectCount = Ext.getCmp("dishMultSelectMStat").toMultiselect.store.getCount();
 
 							if (selectCount != 0) {
 								isPrompt = false;
@@ -100,38 +98,33 @@ menuStatWin = new Ext.Window(
 
 								var selectDishes = "";
 								for ( var i = 0; i < selectCount; i++) {
-									var selectItem = menuStatWin
-											.findById("dishMultSelectMStat").toMultiselect.store
-											.getAt(i).get("retrunValue");
+									var selectItem = Ext.getCmp("dishMultSelectMStat").toMultiselect.store.getAt(i).get("retrunValue");
 									if (selectItem != "") {
-										selectDishes = selectDishes
-												+ selectItem + ",";
+										selectDishes = selectDishes + selectItem + ",";
 									}
 								}
 								// 去掉最后一个逗号
-								selectDishes = selectDishes.substring(0,
-										selectDishes.length - 1);
+								selectDishes = selectDishes.substring(0, selectDishes.length - 1);
 
 								// 保存条件
 								var dateFormated = new Date();
-								orderStaticBeginDate = menuStatWin.findById(
-										"begDateMStatOrder").getValue();
-								if (orderStaticBeginDate != "") {
-									orderStaticBeginDate = dateFormated
-											.format('Y-m-d')
-											+ " " + orderStaticBeginDate;
-								} 
-
-								orderStaticEndDate = menuStatWin.findById(
-										"endDateMStatOrder").getValue();
-								if (orderStaticEndDate != "") {
-									orderStaticEndDate = dateFormated
-											.format('Y-m-d')
-											+ " " + orderStaticEndDate;
-								} 
+								orderStaticBeginDate = menuStatWin.findById("begDateMStatOrder").getValue();
+								orderStaticEndDate = menuStatWin.findById("endDateMStatOrder").getValue();
+								
+								orderStaticBeginDate =  dateFormated.format('Y-m-d') + " " + (orderStaticBeginDate == '' ? '00:00:00' : orderStaticBeginDate);
+								
+								orderStaticEndDate =  dateFormated.format('Y-m-d') + " " + (orderStaticEndDate == '' ? '23:59:59' : orderStaticEndDate);
+								
+//								if(orderStaticBeginDate != "") {
+//									orderStaticBeginDate = dateFormated.format('Y-m-d') + " " + orderStaticBeginDate;
+//								} 
+//
+//								if(orderStaticEndDate != "") {
+//									orderStaticEndDate = dateFormated.format('Y-m-d') + " " + orderStaticEndDate;
+//								}
 								
 								orderStaticDishesString = selectDishes;
-
+								
 								isPrompt = true;
 								menuStatResultWin.show();
 
@@ -304,7 +297,7 @@ menuStatResultGrid
 				});
 
 menuStatResultWin = new Ext.Window({
-	title : "统计结果",
+	title : "点菜统计",
 	width : 450,
 	height : 380,
 	closeAction : "hide",

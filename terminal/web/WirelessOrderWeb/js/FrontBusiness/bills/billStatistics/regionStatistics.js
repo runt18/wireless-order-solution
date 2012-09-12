@@ -92,9 +92,7 @@ regionStatWin = new Ext.Window(
 						text : "确定",
 						handler : function() {
 
-							var selectCount = regionStatWin
-									.findById("regionMultSelectMStat").toMultiselect.store
-									.getCount();
+							var selectCount = Ext.getCmp("regionMultSelectMStat").toMultiselect.store.getCount();
 
 							if (selectCount != 0) {
 								isPrompt = false;
@@ -102,35 +100,27 @@ regionStatWin = new Ext.Window(
 
 								var selectRegions = "";
 								for ( var i = 0; i < selectCount; i++) {
-									var selectItem = regionStatWin
-											.findById("regionMultSelectMStat").toMultiselect.store
-											.getAt(i).get("retrunValue");
-									// if (selectItem != "") {
-									selectRegions = selectRegions + selectItem
-											+ ",";
-									// }
+									var selectItem = Ext.getCmp("regionMultSelectMStat").toMultiselect.store.getAt(i).get("retrunValue");
+									selectRegions = selectRegions + selectItem + ",";
 								}
 								// 去掉最后一个逗号
-								selectRegions = selectRegions.substring(0,
-										selectRegions.length - 1);
+								selectRegions = selectRegions.substring(0, selectRegions.length - 1);
 
 								// 保存条件
 								var dateFormated = new Date();
-								regionStaticBeginDate = regionStatWin.findById(
-										"begDateMStatRegion").getValue();
-								if (regionStaticBeginDate != "") {
-									regionStaticBeginDate = dateFormated
-											.format('Y-m-d')
-											+ " " + regionStaticBeginDate;
-								}
-
-								regionStaticEndDate = regionStatWin.findById(
-										"endDateMStatRegion").getValue();
-								if (regionStaticEndDate != "") {
-									regionStaticEndDate = dateFormated
-											.format('Y-m-d')
-											+ " " + regionStaticEndDate;
-								}
+								regionStaticBeginDate = Ext.getCmp("begDateMStatRegion").getValue();
+								regionStaticEndDate = Ext.getCmp("endDateMStatRegion").getValue();
+								
+								regionStaticBeginDate = dateFormated.format('Y-m-d') + ' ' + (regionStaticBeginDate == '' ? '00:00:00' : regionStaticBeginDate);
+								regionStaticEndDate = dateFormated.format('Y-m-d') + ' ' + (regionStaticEndDate == '' ? '23:59:59' : regionStaticEndDate);
+								
+//								if (regionStaticBeginDate != "") {
+//									regionStaticBeginDate = dateFormated.format('Y-m-d') + " " + regionStaticBeginDate;
+//								}
+//
+//								if (regionStaticEndDate != "") {
+//									regionStaticEndDate = dateFormated.format('Y-m-d') + " " + regionStaticEndDate;
+//								}
 
 								regionStaticString = selectRegions;
 
@@ -330,7 +320,7 @@ regionStatResultGrid
 				});
 
 regionStatResultWin = new Ext.Window({
-	title : "统计结果",
+	title : "区域统计",
 	width : 800,
 	height : 370,
 	closeAction : "hide",

@@ -90,9 +90,7 @@ deptStatWin = new Ext.Window(
 						text : "确定",
 						handler : function() {
 
-							var selectCount = deptStatWin
-									.findById("deptMultSelectMStat").toMultiselect.store
-									.getCount();
+							var selectCount = Ext.getCmp("deptMultSelectMStat").toMultiselect.store.getCount();
 
 							if (selectCount != 0) {
 								isPrompt = false;
@@ -100,35 +98,29 @@ deptStatWin = new Ext.Window(
 
 								var selectDepts = "";
 								for ( var i = 0; i < selectCount; i++) {
-									var selectItem = deptStatWin
-											.findById("deptMultSelectMStat").toMultiselect.store
-											.getAt(i).get("retrunValue");
+									var selectItem = Ext.getCmp("deptMultSelectMStat").toMultiselect.store.getAt(i).get("retrunValue");
 									// if (selectItem != "") {
-									selectDepts = selectDepts + selectItem
-											+ ",";
+									selectDepts = selectDepts + selectItem + ",";
 									// }
 								}
 								// 去掉最后一个逗号
-								selectDepts = selectDepts.substring(0,
-										selectDepts.length - 1);
+								selectDepts = selectDepts.substring(0, selectDepts.length - 1);
 
 								// 保存条件
 								var dateFormated = new Date();
-								deptStaticBeginDate = deptStatWin.findById(
-										"begDateMStatDept").getValue();
-								if (deptStaticBeginDate != "") {
-									deptStaticBeginDate = dateFormated
-											.format('Y-m-d')
-											+ " " + deptStaticBeginDate;
-								}
-
-								deptStaticEndDate = deptStatWin.findById(
-										"endDateMStatDept").getValue();
-								if (deptStaticEndDate != "") {
-									deptStaticEndDate = dateFormated
-											.format('Y-m-d')
-											+ " " + deptStaticEndDate;
-								}
+								deptStaticBeginDate = Ext.getCmp("begDateMStatDept").getValue();
+								deptStaticEndDate = deptStatWin.findById("endDateMStatDept").getValue();
+								
+								deptStaticBeginDate = dateFormated.format('Y-m-d') + ' ' + (deptStaticBeginDate == '' ? '00:00:00' : deptStaticBeginDate);
+								deptStaticEndDate = dateFormated.format('Y-m-d') + ' ' + (deptStaticEndDate == '' ? '23:59:59' : deptStaticEndDate);
+								
+//								if (deptStaticBeginDate != "") {
+//									deptStaticBeginDate = dateFormated.format('Y-m-d') + " " + deptStaticBeginDate;
+//								}
+//
+//								if (deptStaticEndDate != "") {
+//									deptStaticEndDate = dateFormated.format('Y-m-d') + " " + deptStaticEndDate;
+//								}
 
 								deptStaticString = selectDepts;
 
@@ -315,7 +307,7 @@ deptStatResultGrid.getStore().on('load', function() {
 });
 
 deptStatResultWin = new Ext.Window({
-	title : "统计结果",
+	title : "部门统计",
 	width : 800,
 	height : 370,
 	closeAction : "hide",

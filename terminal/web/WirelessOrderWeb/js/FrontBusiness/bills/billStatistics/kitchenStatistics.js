@@ -92,9 +92,7 @@ kitchenStatWin = new Ext.Window(
 						text : "确定",
 						handler : function() {
 
-							var selectCount = kitchenStatWin
-									.findById("kitchenMultSelectMStat").toMultiselect.store
-									.getCount();
+							var selectCount = Ext.getCmp("kitchenMultSelectMStat").toMultiselect.store.getCount();
 
 							if (selectCount != 0) {
 								isPrompt = false;
@@ -102,33 +100,30 @@ kitchenStatWin = new Ext.Window(
 
 								var selectKitchens = "";
 								for ( var i = 0; i < selectCount; i++) {
-									var selectItem = kitchenStatWin
-											.findById("kitchenMultSelectMStat").toMultiselect.store
-											.getAt(i).get("retrunValue");
+									var selectItem = Ext.getCmp("kitchenMultSelectMStat").toMultiselect.store.getAt(i).get("retrunValue");
 									// if (selectItem != "") {
-									selectKitchens = selectKitchens
-											+ selectItem + ",";
+									selectKitchens = selectKitchens + selectItem + ",";
 									// }
 								}
 								// 去掉最后一个逗号
-								selectKitchens = selectKitchens.substring(0,
-										selectKitchens.length - 1);
+								selectKitchens = selectKitchens.substring(0, selectKitchens.length - 1);
 
 								// 保存条件
 								var dateFormated = new Date();
-								kitchenStaticBeginDate = kitchenStatWin
-										.findById("begDateMStatKitchen")
-										.getValue();
-								if (kitchenStaticBeginDate != "") {
-									kitchenStaticBeginDate = dateFormated
-											.format('Y-m-d')
-											+ " " + kitchenStaticBeginDate;
-								}
-
+								kitchenStaticBeginDate = Ext.getCmp("begDateMStatKitchen").getValue();
 								kitchenStaticEndDate = kitchenStatWin.findById("endDateMStatKitchen").getValue();
-								if (kitchenStaticEndDate != "") {
-									kitchenStaticEndDate = dateFormated.format('Y-m-d') + " " + kitchenStaticEndDate;
-								}
+								
+								kitchenStaticBeginDate = dateFormated.format('Y-m-d') + ' ' + (kitchenStaticBeginDate == '' ? '00:00:00' : kitchenStaticBeginDate);
+								kitchenStaticEndDate = dateFormated.format('Y-m-d') + ' ' + (kitchenStaticEndDate == '' ? '23:59:59' : kitchenStaticEndDate);
+								
+//								if (kitchenStaticBeginDate != "") {
+//									kitchenStaticBeginDate = dateFormated.format('Y-m-d') + " " + kitchenStaticBeginDate;
+//								}
+//
+//								if (kitchenStaticEndDate != "") {
+//									kitchenStaticEndDate = dateFormated.format('Y-m-d') + " " + kitchenStaticEndDate;
+//								}
+								
 								kitchenStaticString = selectKitchens;
 
 								isPrompt = true;
@@ -327,7 +322,7 @@ kitchenStatResultGrid
 				});
 
 kitchenStatResultWin = new Ext.Window({
-	title : "统计结果",
+	title : "分厨统计",
 	width : 800,
 	height : 370,
 	closeAction : "hide",
