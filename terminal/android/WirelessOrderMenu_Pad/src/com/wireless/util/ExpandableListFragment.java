@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Fragment;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -76,8 +78,6 @@ public class ExpandableListFragment extends Fragment{
 						if(kitchen.equals(kitchenToSet)){
 							positions[0] = groupPos;
 							positions[1] = childPos;
-//							mListView.expandGroup(groupPos);
-//							mListView.setSelectedChild(groupPos, childPos, true);
 							break;
 						}
 						childPos++;
@@ -105,6 +105,22 @@ public class ExpandableListFragment extends Fragment{
 	   mListView = (ExpandableListView) fragmentView.findViewById(R.id.expandableListView1);
 	   mAdapter = new KitchenExpandableAdapter();
 	   mListView.setAdapter(mAdapter);
+	   
+	   mListView.setOnChildClickListener(new OnChildClickListener(){
+
+		@Override
+		public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+			// TODO 解决无响应的问题
+			if(parent.getTag() != null)
+			{
+				((View)(parent.getTag())).setBackgroundDrawable(null);
+			}
+			Log.i("checked","s");
+			parent.setTag(v);
+			v.setBackgroundColor(Color.BLUE);
+			return false;
+			}
+	   });
 
 	   return fragmentView;
    }

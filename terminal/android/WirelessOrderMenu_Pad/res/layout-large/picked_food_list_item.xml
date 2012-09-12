@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:descendantFocusability="blocksDescendants"
+    android:padding="6dp" >
+
+    <TextView
+        android:id="@+id/textView_picked_food_name_item"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:text="1"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@color/black" />
+
+    <TextView
+        android:id="@+id/textView_picked_food_price_item"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@+id/textView_picked_food_name_item"
+        android:text="2"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@color/black" />
+
+    <ImageButton
+        android:id="@+id/imageButton2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="false"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/editText_picked_food_count_item"
+        android:src="@drawable/minus_btn_selector" />
+
+    <TextView
+        android:id="@+id/textView_picked_food_state_item"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="false"
+        android:layout_alignParentTop="false"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="80dp"
+        android:layout_toRightOf="@+id/editText_picked_food_count_item"
+        android:text="4"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@color/black" />
+
+    <EditText
+        android:id="@+id/editText_picked_food_count_item"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/imageButton_plus_pickedFood_item"
+        android:ems="10"
+        android:inputType="numberDecimal"
+        android:textColor="@color/black" >
+    </EditText>
+
+    <ImageButton
+        android:id="@+id/imageButton_plus_pickedFood_item"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="30dp"
+        android:layout_toRightOf="@+id/textView_picked_food_price_item"
+        android:src="@drawable/plus_btn_selector" />
+
+</RelativeLayout>

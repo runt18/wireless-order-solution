@@ -46,6 +46,8 @@
         <activity android:name="com.wireless.ui.FoodDetailActivity"
             android:screenOrientation="landscape">
         </activity>
+        <activity android:name="com.wireless.ui.PickedFoodActivity"
+            android:screenOrientation="landscape"></activity>
     </application>
 
 </manifest>
