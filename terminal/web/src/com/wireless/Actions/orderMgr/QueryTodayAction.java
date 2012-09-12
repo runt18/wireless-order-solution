@@ -184,7 +184,7 @@ public class QueryTodayAction extends Action {
 					 " AND A.restaurant_id=" + term.restaurantID + " " +
 					 " AND A.total_price IS NOT NULL" +
 					 filterCondition +
-					 " GROUP BY A.id " +
+					 " GROUP BY A.seq_id " +
 					 havingCond +
 					 " ORDER BY order_date ASC ";
 

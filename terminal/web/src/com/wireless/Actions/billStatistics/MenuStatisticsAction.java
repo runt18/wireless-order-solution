@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -22,14 +20,12 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.Params;
 import com.wireless.db.VerifyPin;
 import com.wireless.dbReflect.OrderFoodReflector;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Terminal;
-import com.wireless.util.Util;
 
 public class MenuStatisticsAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -45,9 +41,9 @@ public class MenuStatisticsAction extends Action {
 		int index = Integer.parseInt(start);
 		int pageSize = Integer.parseInt(limit);
 
-		List resultList = new ArrayList();
-		List outputList = new ArrayList();
-		HashMap rootMap = new HashMap();
+		List<HashMap<String, Object>> resultList = new ArrayList<HashMap<String, Object>>();
+		List<HashMap<String, Object>> outputList = new ArrayList<HashMap<String, Object>>();
+		HashMap<String, Object> rootMap = new HashMap<String, Object>();
 
 		boolean isError = false;
 		float totalPrice = 0;
@@ -70,45 +66,41 @@ public class MenuStatisticsAction extends Action {
 			String pin = request.getParameter("pin");
 
 			dbCon.connect();
-			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
-					Terminal.MODEL_STAFF);
+			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF);
 
 			// get the query condition
 			String dateBegin = request.getParameter("dateBegin");
 			String dateEnd = request.getParameter("dateEnd");
 			String foodAlias = request.getParameter("foodAlias");
-			String StatisticsType = request.getParameter("StatisticsType");
+			String statType = request.getParameter("StatisticsType");
 
 			/**
 			 * Select all the today orders matched the conditions below. 1 -
 			 * belong to this restaurant 2 - has been paid 3 - match extra
 			 * filter condition
 			 */
-			String condition = " AND A.food_alias IN (" + foodAlias + ") ";
-			if (!dateBegin.equals("")) {
-				condition = condition + " AND MAX(B.order_date) >= '" + dateBegin
-						+ " 00:00:00" + "' ";
-			}
-			if (!dateEnd.equals("")) {
-				condition = condition + " AND MAX(B.order_date) <= '" + dateEnd
-						+ " 23:59:59" + "' ";
-			}
-			condition = condition + " AND B.total_price IS NOT NULL AND B.restaurant_id =  "
-					+ term.restaurantID;
+			
 
-			// String orderClause = " ORDER BY D.food_id DESC, D.pay_date ";
-			String orderClause = " ORDER BY food_alias ASC, pay_datetime ";
 
-			// OrderFood orderFoods[] = foodRef.getDetailHistory(dbCon,
-			// condition,
-			// orderClause);
 			OrderFood orderFoods[] = null;
-			if (StatisticsType.equals("Today")) {
-				orderFoods = OrderFoodReflector.getDetailToday(dbCon, condition,
-						orderClause);
-			} else if (StatisticsType.equals("History")) {
-				orderFoods = OrderFoodReflector.getDetailHistory(dbCon, condition,
-						orderClause);
+			if (statType.equals("Today")) {
+				String condition = " AND A.food_alias IN (" + foodAlias + ") " +
+								   " AND B.order_date >= '" + dateBegin + "' " + 
+								   " AND B.order_date <= '" + dateEnd + "'" +
+								   " AND B.total_price IS NOT NULL AND B.restaurant_id = " + term.restaurantID;
+
+				String orderClause = " ORDER BY food_alias ASC, pay_datetime ";	
+				orderFoods = OrderFoodReflector.getDetailToday(dbCon, condition, orderClause);
+				
+			} else if (statType.equals("History")) {
+				
+				String condition = " AND A.food_alias IN (" + foodAlias + ") " +
+								   " AND B.order_date >= '" + dateBegin + "' " + 
+								   " AND B.order_date <= '" + dateEnd + "'" +
+								   " AND B.total_price IS NOT NULL AND B.restaurant_id = " + term.restaurantID;
+
+				String orderClause = " ORDER BY food_alias ASC, pay_datetime ";
+				orderFoods = OrderFoodReflector.getDetailHistory(dbCon, condition, orderClause);
 			}
 
 			int lastFoodAlias = -100;
@@ -123,7 +115,7 @@ public class MenuStatisticsAction extends Action {
 
 				if (thisFoodAlias != lastFoodAlias) {
 					if (rowCount != 0) {
-						HashMap resultMap = new HashMap();
+						HashMap<String, Object> resultMap = new HashMap<String, Object>();
 
 						resultMap.put("dishNumber", lastFoodAlias);
 						resultMap.put("dishName", lastFoodName);
@@ -160,7 +152,7 @@ public class MenuStatisticsAction extends Action {
 			}
 
 			if (totalPrice != 0) {
-				HashMap resultMap = new HashMap();
+				HashMap<String, Object> resultMap = new HashMap<String, Object>();
 
 				resultMap.put("dishNumber", lastFoodAlias);
 				resultMap.put("dishName", lastFoodName);
@@ -179,7 +171,7 @@ public class MenuStatisticsAction extends Action {
 
 		} catch (BusinessException e) {
 			e.printStackTrace();
-			HashMap resultMap = new HashMap();
+			HashMap<String, Object> resultMap = new HashMap<String, Object>();
 			if (e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
 				resultMap.put("message", "没有获取到餐厅信息，请重新确认");
 
@@ -193,14 +185,14 @@ public class MenuStatisticsAction extends Action {
 			isError = true;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			HashMap resultMap = new HashMap();
+			HashMap<String, Object> resultMap = new HashMap<String, Object>();
 			resultMap.put("message", "数据库请求发生错误，请确认网络是否连接正常");
 			resultList.add(resultMap);
 			isError = true;
 
 		} catch (IOException e) {
 			e.printStackTrace();
-			HashMap resultMap = new HashMap();
+			HashMap<String, Object> resultMap = new HashMap<String, Object>();
 			resultMap.put("message", "数据库请求发生错误，请确认网络是否连接正常");
 			resultList.add(resultMap);
 			isError = true;
@@ -221,7 +213,7 @@ public class MenuStatisticsAction extends Action {
 				}
 				DecimalFormat fnum = new DecimalFormat("##0.00");
 				String totalPriceDiaplay = fnum.format(totalPrice);
-				HashMap resultMap = new HashMap();
+				HashMap<String, Object> resultMap = new HashMap<String, Object>();
 				resultMap.put("kitchenAlias", "SUM");
 				resultMap.put("dishCount", "汇总");
 				resultMap.put("dishTotalPrice", totalPriceDiaplay);

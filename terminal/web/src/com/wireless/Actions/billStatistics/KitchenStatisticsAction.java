@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -22,12 +20,11 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.Params;
 import com.wireless.db.VerifyPin;
 import com.wireless.dbReflect.OrderFoodReflector;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
-import com.wireless.protocol.Food;
+import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Terminal;
 
@@ -45,9 +42,9 @@ public class KitchenStatisticsAction extends Action {
 		int index = Integer.parseInt(start);
 		int pageSize = Integer.parseInt(limit);
 
-		List resultList = new ArrayList();
-		List outputList = new ArrayList();
-		HashMap rootMap = new HashMap();
+		List<HashMap<String, Object>> resultList = new ArrayList<HashMap<String, Object>>();
+		List<HashMap<String, Object>> outputList = new ArrayList<HashMap<String, Object>>();
+		HashMap<String, Object> rootMap = new HashMap<String, Object>();
 
 		boolean isError = false;
 		float allTotalCount = 0;
@@ -86,48 +83,24 @@ public class KitchenStatisticsAction extends Action {
 			String kitchenAlias = request.getParameter("kitchenAlias");
 			String StatisticsType = request.getParameter("StatisticsType");
 
-			String condition = " ";
-			String orderClause = " ";
-
 			OrderFood orderFoods[] = null;
 			if (StatisticsType.equals("Today")) {
+				String condition = " AND A.kitchen_alias IN (" + kitchenAlias + ") " +
+						   		   " AND B.order_date >= '" + dateBegin + "' " +
+						   		   " AND B.order_date <= '" + dateEnd + "' " +
+						   		   " AND B.total_price IS NOT NULL AND A.restaurant_id = " + term.restaurantID;
 
-				condition = " AND A.kitchen_alias IN (" + kitchenAlias + ") ";
-				if (!dateBegin.equals("")) {
-					condition = condition + " AND MAX(B.order_date) >= '"
-							+ dateBegin + " 00:00:00" + "' ";
-				}
-				if (!dateEnd.equals("")) {
-					condition = condition + " AND MAX(B.order_date) <= '"
-							+ dateEnd + " 23:59:59" + "' ";
-				}
-				condition = condition
-						+ " AND B.total_price IS NOT NULL AND A.restaurant_id =  "
-						+ term.restaurantID;
-
-				orderClause = " ORDER BY kitchen_alias ";
-
-				orderFoods = OrderFoodReflector.getDetailToday(dbCon, condition,
-						orderClause);
+				String orderClause = " ORDER BY kitchen_alias ";
+				orderFoods = OrderFoodReflector.getDetailToday(dbCon, condition, orderClause);
+				
 			} else if (StatisticsType.equals("History")) {
+				String condition = " AND A.kitchen_alias IN (" + kitchenAlias + ") " +
+						   		   " AND B.order_date >= '" + dateBegin + "' " +
+						   		   " AND B.order_date <= '" + dateEnd + "' " +
+						   		   " AND B.total_price IS NOT NULL AND A.restaurant_id = " + term.restaurantID;
 
-				condition = " AND A.kitchen_alias IN (" + kitchenAlias + ") ";
-				if (!dateBegin.equals("")) {
-					orderClause = orderClause + " AND MAX(B.order_date) >= '"
-							+ dateBegin + " 00:00:00" + "' ";
-				}
-				if (!dateEnd.equals("")) {
-					orderClause = orderClause + " AND MAX(B.order_date) <= '" + dateEnd
-							+ " 23:59:59" + "' ";
-				}
-				condition = condition
-						+ " AND A.restaurant_id =  "
-						+ term.restaurantID;
-
-				orderClause = orderClause + " ORDER BY kitchen_alias ";
-
-				orderFoods = OrderFoodReflector.getDetailHistory(dbCon, condition,
-						orderClause);
+				String orderClause = " ORDER BY kitchen_alias ";
+				orderFoods = OrderFoodReflector.getDetailHistory(dbCon, condition, orderClause);
 			}
 
 			/**
@@ -156,18 +129,18 @@ public class KitchenStatisticsAction extends Action {
 
 					if (/* !orderDate.equals(lastDate) || */kitchen != lastKitchen) {
 						if (rowCount != 0) {
-							HashMap resultMap = new HashMap();
+							HashMap<String, Object> resultMap = new HashMap<String, Object>();
 
 							// resultMap.put("statDate", lastDate);
 							resultMap.put("kitchenName", lastKitchen);
-							resultMap.put("cash", cashCount);
-							resultMap.put("bankCard", bankCardCount);
-							resultMap.put("memberCard", memberCardCount);
-							resultMap.put("credit", handCount);
-							resultMap.put("sign", signCount);
-							resultMap.put("discount", discountCount);
-							resultMap.put("gift", giftCount);
-							resultMap.put("total", totalCount);
+							resultMap.put("cash", (float)Math.round(cashCount * 100) / 100);
+							resultMap.put("bankCard", (float)Math.round(bankCardCount * 100) / 100);
+							resultMap.put("memberCard", (float)Math.round(memberCardCount * 100) / 100);
+							resultMap.put("credit", (float)Math.round(handCount * 100) / 100);
+							resultMap.put("sign", (float)Math.round(signCount * 100) / 100);
+							resultMap.put("discount", (float)Math.round(discountCount * 100) / 100);
+							resultMap.put("gift", (float)Math.round(giftCount * 100) / 100);
+							resultMap.put("total", (float)Math.round(totalCount * 100) / 100);
 
 							resultMap.put("message", "normal");
 
@@ -188,84 +161,70 @@ public class KitchenStatisticsAction extends Action {
 					// lastDate = orderDate;
 					lastKitchen = kitchen;
 
-					float allPrice = (float) Math.round(orderFood.calcPriceWithTaste() * 100) / 100;
+					float allPrice = orderFood.calcPriceWithTaste();
 
 					// pay
 					int payManner = orderFood.payManner;
 					switch (payManner) {
-					case 1:
-						cashCount = (float) Math
-								.round((cashCount + allPrice) * 100) / 100;
-						allCashCount = (float) Math
-								.round((allCashCount + allPrice) * 100) / 100;
+					case Order.MANNER_CASH:
+						cashCount = cashCount + allPrice;
+						allCashCount = allCashCount + allPrice;
 						break;
-					case 2:
-						bankCardCount = (float) Math
-								.round((bankCardCount + allPrice) * 100) / 100;
-						allBankCardCount = (float) Math
-								.round((allBankCardCount + allPrice) * 100) / 100;
+						
+					case Order.MANNER_CREDIT_CARD:
+						bankCardCount = bankCardCount + allPrice;
+						allBankCardCount = allBankCardCount + allPrice;
 						break;
-					case 3:
-						memberCardCount = (float) Math
-								.round((memberCardCount + allPrice) * 100) / 100;
-						allMemberCardCount = (float) Math
-								.round((allMemberCardCount + allPrice) * 100) / 100;
+						
+					case Order.MANNER_MEMBER:
+						memberCardCount = memberCardCount + allPrice;
+						allMemberCardCount = allMemberCardCount + allPrice;
 						break;
-					case 4:
-						signCount = (float) Math
-								.round((signCount + allPrice) * 100) / 100;
-						allSignCount = (float) Math
-								.round((allSignCount + allPrice) * 100) / 100;
+						
+					case Order.MANNER_SIGN:
+						signCount = signCount + allPrice;
+						allSignCount = allSignCount + allPrice;
 						break;
-					case 5:
-						handCount = (float) Math
-								.round((handCount + allPrice) * 100) / 100;
-						allHandCount = (float) Math
-								.round((allHandCount + allPrice) * 100) / 100;
+						
+					case Order.MANNER_HANG:
+						handCount = handCount + allPrice;
+						allHandCount = allHandCount + allPrice;
 						break;
 					}
 
 					// discount : unit_price * order_count * (1 - discount)
-					float singlePriceXcount = (float) Math
-							.round((orderFood.getPrice().floatValue() * orderFood
-									.getCount()) * 100) / 100;
-					float thisDiscount = (float) Math.round(singlePriceXcount
-							* (1 - orderFood.getDiscount()) * 100) / 100;
-					discountCount = (float) Math
-							.round((discountCount + thisDiscount) * 100) / 100;
-					allDiscountCount = (float) Math
-							.round((allDiscountCount + thisDiscount) * 100) / 100;
+					// float singlePriceXcount = (float) Math.round((orderFood.getPrice().floatValue() * orderFood.getCount()) * 100) / 100;
+					// float thisDiscount = (float) Math.round(singlePriceXcount * (1 - orderFood.getDiscount()) * 100) / 100;
+					float thisDiscount = orderFood.calcDiscountPrice();
+					discountCount = discountCount + thisDiscount;
+					allDiscountCount = allDiscountCount + thisDiscount;
 
 					// gift
 					if (orderFood.isGift()) {
-						giftCount = (float) Math
-								.round((giftCount + allPrice) * 100) / 100;
-						allGiftCount = (float) Math
-								.round((allGiftCount + allPrice) * 100) / 100;
+						giftCount = giftCount + allPrice;
+						allGiftCount = allGiftCount + allPrice;
 					}
 
 					// total price
-					totalCount = (float) Math
-							.round((totalCount + allPrice) * 100) / 100;
-					allTotalCount = (float) Math
-							.round((allTotalCount + allPrice) * 100) / 100;
+					totalCount = totalCount + allPrice;
+					allTotalCount = allTotalCount + allPrice;
 
 				}
 			}
 
 			if (totalCount != 0) {
-				HashMap resultMap = new HashMap();
+				HashMap<String, Object> resultMap = new HashMap<String, Object>();
 
 				// resultMap.put("statDate", lastDate);
 				resultMap.put("kitchenName", lastKitchen);
-				resultMap.put("cash", cashCount);
-				resultMap.put("bankCard", bankCardCount);
-				resultMap.put("memberCard", memberCardCount);
-				resultMap.put("credit", handCount);
-				resultMap.put("sign", signCount);
-				resultMap.put("discount", discountCount);
-				resultMap.put("gift", giftCount);
-				resultMap.put("total", totalCount);
+				resultMap.put("cash", (float)Math.round(cashCount * 100) / 100);
+				resultMap.put("bankCard", (float)Math.round(bankCardCount * 100) / 100);
+				resultMap.put("memberCard", (float)Math.round(memberCardCount * 100) / 100);
+				resultMap.put("credit", (float)Math.round(handCount * 100) / 100);
+				resultMap.put("sign", (float)Math.round(signCount * 100) / 100);
+				resultMap.put("discount", (float)Math.round(discountCount * 100) / 100);
+				resultMap.put("gift", (float)Math.round(giftCount * 100) / 100);
+				resultMap.put("total", (float)Math.round(totalCount * 100) / 100);
 
 				resultMap.put("message", "normal");
 
@@ -276,7 +235,7 @@ public class KitchenStatisticsAction extends Action {
 
 		} catch (BusinessException e) {
 			e.printStackTrace();
-			HashMap resultMap = new HashMap();
+			HashMap<String, Object> resultMap = new HashMap<String, Object>();
 			if (e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED) {
 				resultMap.put("message", "没有获取到餐厅信息，请重新确认");
 
@@ -290,14 +249,14 @@ public class KitchenStatisticsAction extends Action {
 			isError = true;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			HashMap resultMap = new HashMap();
+			HashMap<String, Object> resultMap = new HashMap<String, Object>();
 			resultMap.put("message", "数据库请求发生错误，请确认网络是否连接正常");
 			resultList.add(resultMap);
 			isError = true;
 
 		} catch (IOException e) {
 			e.printStackTrace();
-			HashMap resultMap = new HashMap();
+			HashMap<String, Object> resultMap = new HashMap<String, Object>();
 			resultMap.put("message", "数据库请求发生错误，请确认网络是否连接正常");
 			resultList.add(resultMap);
 			isError = true;
@@ -319,15 +278,15 @@ public class KitchenStatisticsAction extends Action {
 
 				DecimalFormat fnum = new DecimalFormat("##0.00");
 				String totalPriceDiaplay = fnum.format(allTotalCount);
-				HashMap resultMap = new HashMap();
+				HashMap<String, Object> resultMap = new HashMap<String, Object>();
 				resultMap.put("kitchenName", "汇总");
-				resultMap.put("cash", allCashCount);
-				resultMap.put("bankCard", allBankCardCount);
-				resultMap.put("memberCard", allMemberCardCount);
-				resultMap.put("credit", allHandCount);
-				resultMap.put("sign", allSignCount);
-				resultMap.put("discount", allDiscountCount);
-				resultMap.put("gift", allGiftCount);
+				resultMap.put("cash", (float)Math.round(allCashCount * 100) / 100);
+				resultMap.put("bankCard", (float)Math.round(allBankCardCount * 100) / 100);
+				resultMap.put("memberCard", (float)Math.round(allMemberCardCount * 100) / 100);
+				resultMap.put("credit", (float)Math.round(allHandCount * 100) / 100);
+				resultMap.put("sign", (float)Math.round(allSignCount * 100) / 100);
+				resultMap.put("discount", (float)Math.round(allDiscountCount * 100) / 100);
+				resultMap.put("gift", (float)Math.round(allGiftCount * 100) / 100);
 				resultMap.put("total", totalPriceDiaplay);
 				resultMap.put("message", "normal");
 				outputList.add(resultMap);
