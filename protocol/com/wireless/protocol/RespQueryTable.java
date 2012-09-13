@@ -18,8 +18,8 @@ public final class RespQueryTable extends RespPackage {
 	 * nTable[2] : <table_1> : ... : <table_2>
 	 * nTable[2] - the amount of tables
 	 * <table_n>
-	 * len_1 : table_name : table_alias[2] : region : service_rate[2] : minimum_cost[4] : status : category : custom_num
-	 * len_1 - the length to the table name
+	 * len_to_tbl_name : table_name : table_alias[2] : region : service_rate[2] : minimum_cost[4] : status : category : custom_num
+	 * len_to_tbl_name - the length to the table name
 	 * table_name - the value to table name
 	 * table_alias[2] - the alias id to this table
 	 * region - the region alias id to this table
@@ -35,11 +35,11 @@ public final class RespQueryTable extends RespPackage {
 		/**
 		 * calculate the body length
 		 */		
-		int bodyLen = 1;	/* the amount of tables takes up 1-byte */
+		int bodyLen = 2;	/* the amount of tables takes up 2-byte */
 		
 		for(int i = 0; i < tables.length; i++){
 			byte[] name = tables[i].name.getBytes("UTF-16BE");
-			bodyLen += 2 + 					/* the length takes up 2-byte */
+			bodyLen += 1 + 					/* the length to name takes up 1-byte */
 					   name.length + 		/* the name to this table */
 					   2 + 					/* the table alias takes up 2-byte */
 					   1 + 					/* the region alias takes up 1-byte */

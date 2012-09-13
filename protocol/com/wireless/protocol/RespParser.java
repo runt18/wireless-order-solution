@@ -573,7 +573,7 @@ public class RespParser {
 		 * custom_num - the custom number to this table
 		 *******************************************************/
 
-		//get the amount to staff
+		//get the amount to tables
 		int nTable = (response.body[0] & 0x000000FF) |
 					 ((response.body[1] & 0x000000FF) << 8);
 		
