@@ -10,7 +10,6 @@ import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -34,13 +33,8 @@ import com.wireless.protocol.ReqPackage;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
-import com.wireless.util.SetServerFragment.OnServerChangeListener;
-import com.wireless.util.SetServerFragment.OnServerChangeListener;
 import com.wireless.util.StaffPanelFragment.OnStaffChangedListener;
 import com.wireless.util.TablePanelFragment.OnTableChangedListener;
-import com.wireless.ui.PickedFoodActivity;
-import com.wireless.util.SetServerFragment.OnServerChangeListener;
-import com.wireless.util.SetTableFragment.OnTableChangedListener;
 
 public class OptionBar extends Fragment implements OnTableChangedListener, OnStaffChangedListener{
 	public static final String CUR_TABLE = "current_table";
@@ -96,9 +90,6 @@ public class OptionBar extends Fragment implements OnTableChangedListener, OnSta
 				mDialog.show();
 			}
 		});
-	private void initial(final Activity activity){
-		ImageView setTableImgView = (ImageView)activity.findViewById(R.id.imgView_set_table);
-		setTableImgView.setOnClickListener(new BottomClickListener(Selection.TAB1));
 
 		//服务员选择Button
 		ImageView pickStaffImgView = (ImageView)activity.findViewById(R.id.imageView_server);
@@ -120,18 +111,18 @@ public class OptionBar extends Fragment implements OnTableChangedListener, OnSta
 			}
 		});
 		
-		ImageView pickedFoodImgView = (ImageView) activity.findViewById(R.id.imageView_selectedFood);
-		pickedFoodImgView.setOnClickListener(new OnClickListener(){
-			@Override
-			public void onClick(View v) {
-				if(mTable != null)
-				{
-					Intent intent = new Intent(activity,PickedFoodActivity.class);
-					intent.putExtra(CUR_TABLE, mTable.aliasID);
-					activity.startActivity(intent);
-				}
-			}
-		});
+//		ImageView pickedFoodImgView = (ImageView) activity.findViewById(R.id.imageView_selectedFood);
+//		pickedFoodImgView.setOnClickListener(new OnClickListener(){
+//			@Override
+//			public void onClick(View v) {
+//				if(mTable != null)
+//				{
+//					Intent intent = new Intent(activity,PickedFoodActivity.class);
+//					intent.putExtra(CUR_TABLE, mTable.aliasID);
+//					activity.startActivity(intent);
+//				}
+//			}
+//		});
 		mSelectedFoodTextView = (TextView) activity.findViewById(R.id.textView_selectedFood);
 		mTableNumTextView = (TextView) activity.findViewById(R.id.txtView_table_count);
 		mCustomCntTextView = (TextView) activity.findViewById(R.id.textView_peopCnt);
