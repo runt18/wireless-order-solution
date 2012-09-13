@@ -187,23 +187,23 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 					}					
 					
 				}catch(BusinessException e){
-					send(_out, new RespNAK(loginReq.header));
 					e.printStackTrace();
+					send(_out, new RespNAK(loginReq.header));
 					closeSocket(connection);
 					
 				}catch(IOException e){
-					send(_out, new RespNAK(loginReq.header));
 					e.printStackTrace();
+					send(_out, new RespNAK(loginReq.header));
 					closeSocket(connection);
 					
 				}catch(SQLException e){
-					send(_out, new RespNAK(loginReq.header));
 					e.printStackTrace();
+					send(_out, new RespNAK(loginReq.header));
 					closeSocket(connection);
 					
 				}catch(Exception e){
-					send(_out, new RespNAK(loginReq.header));
 					e.printStackTrace();
+					send(_out, new RespNAK(loginReq.header));
 					closeSocket(connection);
 					
 				}finally{	
