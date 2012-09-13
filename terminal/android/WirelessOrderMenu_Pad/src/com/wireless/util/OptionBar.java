@@ -34,55 +34,91 @@ import com.wireless.protocol.ReqPackage;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
+import com.wireless.util.SetServerFragment.OnServerChangeListener;
+import com.wireless.util.SetServerFragment.OnServerChangeListener;
+import com.wireless.util.StaffPanelFragment.OnStaffChangedListener;
+import com.wireless.util.TablePanelFragment.OnTableChangedListener;
 import com.wireless.ui.PickedFoodActivity;
 import com.wireless.util.SetServerFragment.OnServerChangeListener;
 import com.wireless.util.SetTableFragment.OnTableChangedListener;
 
-public class OptionBar extends Fragment implements OnTableChangedListener , OnServerChangeListener{
+public class OptionBar extends Fragment implements OnTableChangedListener, OnStaffChangedListener{
 	public static final String CUR_TABLE = "current_table";
 	private static Table mTable;
 	private static int mCustomCount;
 	private static int mPickedFood;
 	private static StaffTerminal mStaff;
 	
+	private static final String TAB_PICK_TBL = "tab_pick_table";
+	private static final String TAB_PICK_STAFF = "tab_pick_staff";
+	private static final String TAB_PICK_VIP = "tab_pick_vip";
+	
 	private Dialog mDialog;
 	private TabHost mTabHost;
 	private TextView mSelectedFoodTextView;
 	private TextView mTableNumTextView;
 	private TextView mCustomCntTextView;
-
-	private static enum Selection{
-		TAB1,TAB2,TAB3
-	}
 	
    @Override  
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,  
-            Bundle savedInstanceState) {  
-	   View view = inflater.inflate(R.layout.bottombar, container,false);
-	   return view;
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {  
+	   return inflater.inflate(R.layout.bottombar, container, false);
    }
 	
 	@Override
-	public void onActivityCreated(Bundle savedInstanceState)
-	{
+	public void onActivityCreated(Bundle savedInstanceState){
 		super.onActivityCreated(savedInstanceState);
-		Activity activity = this.getActivity();
-		initial(activity);
-		onCreateDialog(activity);
+		init(this.getActivity());
 	}
 
-	/*
-	 * 初始化各个按钮
+	@Override
+	public void onStart(){
+		super.onStart();
+		if(mTable != null){
+			mTableNumTextView.setText("" + mTable.aliasID);
+			mCustomCntTextView.setText("" + mCustomCount);
+			mSelectedFoodTextView.setText("" + mPickedFood);
+		}
+		
+		if(mStaff != null)
+			((TextView) getActivity().findViewById(R.id.textView_serverName)).setText(mStaff.name);
+	}
+	
+	/**
+	 * 初始化BBar上的控件
 	 */
+	private void init(Activity activity){
+		//餐台选择Button
+		ImageView pickTblImgView = (ImageView)activity.findViewById(R.id.imgView_set_table);
+		pickTblImgView.setOnClickListener(new View.OnClickListener() {			
+			@Override
+			public void onClick(View v) {
+				mTabHost.setCurrentTabByTag(TAB_PICK_TBL);
+				mDialog.show();
+			}
+		});
 	private void initial(final Activity activity){
 		ImageView setTableImgView = (ImageView)activity.findViewById(R.id.imgView_set_table);
 		setTableImgView.setOnClickListener(new BottomClickListener(Selection.TAB1));
 
-		ImageView serverImgView = (ImageView)activity.findViewById(R.id.imageView_server);
-		serverImgView.setOnClickListener(new BottomClickListener(Selection.TAB2));
+		//服务员选择Button
+		ImageView pickStaffImgView = (ImageView)activity.findViewById(R.id.imageView_server);
+		pickStaffImgView.setOnClickListener(new View.OnClickListener() {			
+			@Override
+			public void onClick(View v) {
+				mTabHost.setCurrentTabByTag(TAB_PICK_STAFF);
+				mDialog.show();
+			}
+		});
 		
+		//会员选择Button
 		ImageView vipImgView = (ImageView)activity.findViewById(R.id.imageView_vip);
-		vipImgView.setOnClickListener(new BottomClickListener(Selection.TAB3));
+		vipImgView.setOnClickListener(new View.OnClickListener() {			
+			@Override
+			public void onClick(View v) {
+				mTabHost.setCurrentTabByTag(TAB_PICK_VIP);
+				mDialog.show();
+			}
+		});
 		
 		ImageView pickedFoodImgView = (ImageView) activity.findViewById(R.id.imageView_selectedFood);
 		pickedFoodImgView.setOnClickListener(new OnClickListener(){
@@ -100,38 +136,24 @@ public class OptionBar extends Fragment implements OnTableChangedListener , OnSe
 		mTableNumTextView = (TextView) activity.findViewById(R.id.txtView_table_count);
 		mCustomCntTextView = (TextView) activity.findViewById(R.id.textView_peopCnt);
 		
+		initDialog(activity);
 
 	}
 	
-	@Override
-	public void onStart(){
-		super.onStart();
-		if(mTable != null)
-		{
-			mTableNumTextView.setText("" + mTable.aliasID);
-			mCustomCntTextView.setText("" + mCustomCount);
-			mSelectedFoodTextView.setText("" + mPickedFood);
-		}
-		
-		if(mStaff != null)
-			((TextView) getActivity().findViewById(R.id.textView_serverName)).setText(mStaff.name);
-	}
-	/*
+	/**
 	 * 初始化dialog所需要的数据
 	 * 包括tabHost和各种editText
 	 * 
-	 * @param tab 要显示的tab id
 	 * @param activity 调用这个dialog的activity
 	 */
-	private  void onCreateDialog(final Activity activity)
-	{
-		View dialogLayout = activity.getLayoutInflater().inflate(R.layout.option_dialog,(ViewGroup)activity.findViewById(R.id.tab_dialog));
+	private void initDialog(final Activity activity){
+		View dialogLayout = activity.getLayoutInflater().inflate(R.layout.option_dialog, (ViewGroup)activity.findViewById(R.id.tab_dialog));
 		
 		mTabHost = (TabHost) dialogLayout.findViewById(R.id.tabhost);
 		mTabHost.setup();
 		
-		mTabHost.addTab(mTabHost.newTabSpec("tab1").setIndicator("餐台设置").setContent(R.id.tab1));
-		mTabHost.addTab(mTabHost.newTabSpec("tab2").setIndicator("服务员设置").setContent(R.id.tab2));
+		mTabHost.addTab(mTabHost.newTabSpec(TAB_PICK_TBL).setIndicator("餐台设置").setContent(R.id.tab1));
+		mTabHost.addTab(mTabHost.newTabSpec(TAB_PICK_STAFF).setIndicator("服务员设置").setContent(R.id.tab2));
 		
 		mDialog = new Dialog(activity);
 		mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -143,7 +165,6 @@ public class OptionBar extends Fragment implements OnTableChangedListener , OnSe
 		dialogWindow.setAttributes(lp);
 		
 		((Button)mDialog.findViewById(R.id.button_tab1_cancel)).setOnClickListener(new OnClickListener(){
-
 			@Override
 			public void onClick(View v) {
 				mDialog.dismiss();
@@ -151,54 +172,22 @@ public class OptionBar extends Fragment implements OnTableChangedListener , OnSe
 		});
 		
 		((Button)mDialog.findViewById(R.id.button_tab2_cancel)).setOnClickListener(new OnClickListener(){
-
 			@Override
 			public void onClick(View v) {
 				mDialog.dismiss();
 			}
 		});
 		
-		SetTableFragment.setOnTableChangedListener(this);
-		SetServerFragment.setOnServerChangeListener(this);
+		((TablePanelFragment)getFragmentManager().findFragmentById(R.id.tab1)).setOnTableChangedListener(this);
+		((StaffPanelFragment)getFragmentManager().findFragmentById(R.id.tab2)).setOnServerChangeListener(this);
 	}
-	
-	
-	/*
-	 * 底部侦听按钮，根据按钮的不同来传入不同的tab id和selection值
-	 *
-	 */
-	private final class BottomClickListener implements OnClickListener{
-		Selection tabId;
-		BottomClickListener(Selection tabId){
-			this.tabId = tabId;
-		}
-		
-		@Override
-		public void onClick(View v) {
-			switch(tabId)
-			{
-			case TAB1:
-				mTabHost.setCurrentTab(0);
-				break;
-			case TAB2:
-				mTabHost.setCurrentTab(1);
-				break;
-			case TAB3:
-				mTabHost.setCurrentTab(2);
-				break;
-			}
-			mDialog.show();
-		}
-	}
-	
-
 
 
 	/**
 	 * 餐台设置时的回调，根据餐台的状态来判断是否请求订单
 	 */
 	@Override
-	public void onTableChange(Table table, int tableStatus,int customCount) {
+	public void onTableChanged(Table table, int tableStatus, int customCount) {
 		mDialog.dismiss();
 		
 		mTable = table;
@@ -214,7 +203,7 @@ public class OptionBar extends Fragment implements OnTableChangedListener , OnSe
 				@Override
 				void onOrderChanged(Order order) {
 					mPickedFood = order.foods.length;
-					mSelectedFoodTextView.setText(""+ mPickedFood);
+					mSelectedFoodTextView.setText("" + mPickedFood);
 				}
 			 }.execute(WirelessOrder.foodMenu);
 		}
@@ -224,11 +213,11 @@ public class OptionBar extends Fragment implements OnTableChangedListener , OnSe
 	 * 服务员改变时的回调，判断登陆信息是否正确
 	 */
 	@Override
-	public void onServerChange(final StaffTerminal staff, String id, String pwd) {
+	public void onStaffChanged(final StaffTerminal staff, String id, String pwd) {
 		try {
 			//Convert the password into MD5
 			MessageDigest digester = MessageDigest.getInstance("MD5");
-			digester.update(pwd.getBytes(), 0 , pwd.getBytes().length); 
+			digester.update(pwd.getBytes(), 0, pwd.getBytes().length); 
 		
 			if(id.equals("")){
 				Toast.makeText(getActivity(), "账号不能为空", Toast.LENGTH_SHORT).show();
@@ -283,7 +272,7 @@ public class OptionBar extends Fragment implements OnTableChangedListener , OnSe
 	 * 执行请求对应餐台的账单信息 
 	 */
 	private abstract class QueryOrderTask extends com.wireless.lib.task.QueryOrderTask{
-		private ProgressDialog _progDialog;
+		private ProgressDialog mProgDialog;
 	
 		QueryOrderTask(int tableAlias){
 			super(tableAlias);
@@ -294,7 +283,7 @@ public class OptionBar extends Fragment implements OnTableChangedListener , OnSe
 		 */
 		@Override
 		protected void onPreExecute(){
-			_progDialog = ProgressDialog.show(OptionBar.this.getActivity(), "", "查询" + mTblAlias + "号账单信息...请稍候", true);
+			mProgDialog = ProgressDialog.show(OptionBar.this.getActivity(), "", "查询" + mTblAlias + "号账单信息...请稍候", true);
 		}
 		
 		/**
@@ -304,7 +293,7 @@ public class OptionBar extends Fragment implements OnTableChangedListener , OnSe
 		@Override
 		protected void onPostExecute(Order order){
 			//make the progress dialog disappeared
-			_progDialog.dismiss();
+			mProgDialog.dismiss();
 			
 			if(mErrMsg != null){
 				

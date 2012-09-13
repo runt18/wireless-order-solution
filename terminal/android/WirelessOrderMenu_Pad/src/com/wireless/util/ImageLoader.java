@@ -17,7 +17,7 @@ public class ImageLoader {
 	private Context mContext;
 	
 	private static LruCache<String, SoftReference<Bitmap>> mImageCaches = 
-		new LruCache<String, SoftReference<Bitmap>>(6){
+		new LruCache<String, SoftReference<Bitmap>>(5){
 		
 		@Override
 		protected void entryRemoved(boolean evicted, String key, SoftReference<Bitmap> oldValue, SoftReference<Bitmap> newValue){

@@ -12,7 +12,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -22,7 +21,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.GridView;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
@@ -217,8 +215,9 @@ public class PickTasteFragment extends DialogFragment {
 					mOrderFood.tmpTaste = new Taste();
 				mOrderFood.tmpTaste.setPreference(pinzhuEditText.getText().toString());
 				
-				if(mOnTasteChangeListener != null)
+				if(mOnTasteChangeListener != null){
 					mOnTasteChangeListener.onTasteChange(mOrderFood);
+				}
 				dismiss();
 			}
 		});

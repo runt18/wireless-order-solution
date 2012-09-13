@@ -8,7 +8,6 @@ import java.util.HashMap;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
@@ -31,7 +30,8 @@ import com.wireless.util.PackOrderFoods;
 
 public class MainActivity extends Activity  
 						  implements OnItemChangeListener,
-							 	     OnPicChangedListener, OnItemClickListener{
+							 	     OnPicChangedListener, 
+							 	     OnItemClickListener{
 	
 	protected static final int MAIN_ACTIVITY_RES_CODE = 340;
 
@@ -55,7 +55,7 @@ public class MainActivity extends Activity
 
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(MainActivity.this,FullScreenActivity.class);
+				Intent intent = new Intent(MainActivity.this, FullScreenActivity.class);
 				startActivityForResult(PackOrderFoods.pack(mOrderFood, intent), MAIN_ACTIVITY_RES_CODE);
 			}
 		});
@@ -203,7 +203,7 @@ public class MainActivity extends Activity
 	
 	@Override
 	public void onItemClick(Food food, int position) {
-		Intent intent = new Intent(MainActivity.this,FoodDetailActivity.class);
+		Intent intent = new Intent(MainActivity.this, FoodDetailActivity.class);
 		startActivity(PackOrderFoods.pack(mOrderFood, intent));
 	}  
 }

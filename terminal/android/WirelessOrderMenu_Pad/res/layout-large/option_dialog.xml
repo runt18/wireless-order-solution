@@ -32,13 +32,13 @@
                     android:id="@+id/tab1"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    class="com.wireless.util.SetTableFragment" />
+                    class="com.wireless.util.TablePanelFragment" />
 
                 <fragment
                     android:id="@+id/tab2"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    class="com.wireless.util.SetServerFragment" />
+                    class="com.wireless.util.StaffPanelFragment" />
 
                 <LinearLayout
                     android:id="@+id/tab3"
