@@ -17,6 +17,7 @@ public class FoodParcel extends OrderFood implements Parcelable{
 		aliasID = food.aliasID;
 		kitchen = food.kitchen;
 		name = new String(food.name);
+		image = food.image == null ? "" : food.image;
 		tastes = new Taste[food.tastes.length];
 		for(int i = 0; i < tastes.length; i++){
 			tastes[i] = new TasteParcel(food.tastes[i]);
@@ -26,8 +27,6 @@ public class FoodParcel extends OrderFood implements Parcelable{
 		status = food.status;
 		orderDate  = food.orderDate;
 		waiter = food.waiter == null ? "" : food.waiter;
-		//setNormalTastePref(new String(food.getNormalTastePref()));
-		//setTasteNormalPrice(Float.valueOf(food.getTasteNormalPrice()));
 		setCount(Float.valueOf(food.getCount()));
 		setPrice(Float.valueOf(food.getPrice()));
 		if(food.tmpTaste != null){
@@ -50,13 +49,12 @@ public class FoodParcel extends OrderFood implements Parcelable{
 		aliasID = in.readInt();
 		kitchen.aliasID = (short)in.readInt();
 		name = in.readString();
+		image = in.readString().length() != 0 ? in.readString() : null;
 		hangStatus = (short)in.readInt();
 		isTemporary = in.readInt() == 1 ? true : false;
 		status = (short)in.readInt();
 		orderDate = in.readLong();
 		waiter = in.readString();
-		//setNormalTastePref(in.readString());
-		//setTasteNormalPrice(Util.int2Float(in.readInt()));
 		setCount(Util.int2Float(in.readInt()));
 		setPrice(Util.int2Float(in.readInt()));
 		// un-marshal the tastes
@@ -94,13 +92,12 @@ public class FoodParcel extends OrderFood implements Parcelable{
 		parcel.writeInt(aliasID);
 		parcel.writeInt(kitchen.aliasID);
 		parcel.writeString(name);
+		parcel.writeString(image);
 		parcel.writeInt(hangStatus);
 		parcel.writeInt(isTemporary ? 1 : 0);
 		parcel.writeInt(status);
 		parcel.writeLong(orderDate);
 		parcel.writeString(waiter);
-		//parcel.writeString(getNormalTastePref());
-		//parcel.writeInt(Util.float2Int(getTasteNormalPrice()));
 		parcel.writeInt(Util.float2Int(getCount()));
 		parcel.writeInt(Util.float2Int(getPrice()));
 		//marshal the tastes
