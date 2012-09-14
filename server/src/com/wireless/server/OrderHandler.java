@@ -9,7 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.List;
 
 import com.wireless.db.CancelOrder;
 import com.wireless.db.DBCon;
@@ -407,7 +407,7 @@ class OrderHandler extends Handler implements Runnable{
 	private void printOrder(int printConf, PrintHandler.PrintParam param) throws PrintLogicException{
 		if(param != null){
 			//find the printer connection socket to the restaurant for this terminal
-			ArrayList<Socket> printerConn = WirelessSocketServer.printerConnections.get(new Integer(_term.restaurantID));
+			List<Socket> printerConn = WirelessSocketServer.printerConnections.get(new Integer(_term.restaurantID));
 			Socket[] connections = null;
 			if(printerConn != null){
 				connections = printerConn.toArray(new Socket[printerConn.size()]);			

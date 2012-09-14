@@ -5,9 +5,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.TreeMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.tiling.scheduling.SchedulerTask;
 
 
@@ -22,9 +24,9 @@ import org.tiling.scheduling.SchedulerTask;
  */
 public class SweepPrtConTask extends SchedulerTask{
 
-	private TreeMap<Integer, ArrayList<Socket>> _printerConnections = null;
+	private Map<Integer, List<Socket>> _printerConnections = null;
 	
-	public SweepPrtConTask(TreeMap<Integer, ArrayList<Socket>> conn){
+	public SweepPrtConTask(Map<Integer, List<Socket>> conn){
 		_printerConnections = conn;
 	}
 	
@@ -36,37 +38,38 @@ public class SweepPrtConTask extends SchedulerTask{
 			int nConnection = 0;
 			int nRestaurant = 0;
 			synchronized(_printerConnections){
-				//enumerate the values of printer connection to remove the sockets not connected,
-				Iterator<ArrayList<Socket>> iter1 = _printerConnections.values().iterator();
-				while(iter1.hasNext()){
-					ArrayList<Socket> sockets = iter1.next();
-					Iterator<Socket> iter2 = sockets.iterator();
-					while(iter2.hasNext()){
-						Socket printSocket = iter2.next();
+				Iterator<Entry<Integer, List<Socket>>> iter = _printerConnections.entrySet().iterator();
+				
+				while(iter.hasNext()){
+					Entry<Integer, List<Socket>> entry = iter.next();
+					
+					Iterator<Socket> iterSock = entry.getValue().iterator();
+					//Enumerate the socket list and remove the socket has been disconnected. 
+					while(iterSock.hasNext()){
+						Socket printSock = iterSock.next();
 						try{
-							printSocket.sendUrgentData(0);
+							printSock.sendUrgentData(0);
 						}catch(IOException e){
 							try{
-								printSocket.close();
-							}catch(IOException ex){}
-							nConnection++;
-							iter2.remove();							
+								printSock.close();
+							}catch(IOException ex){
+								
+							}finally{
+								nConnection++;
+								iterSock.remove();
+							}
 						}
 					}
-				}
-				//enumerate the keys of printer connection to remove the restaurant not containing any 
-				//printer socket connections
-				Iterator<Integer> iter3 = _printerConnections.keySet().iterator();
-				while(iter3.hasNext()){
-					Integer restaurantID = iter3.next();
-					if(_printerConnections.get(restaurantID).size() == 0){
+					
+					//Remove the restaurant if no valid socket exist 
+					if(entry.getValue().isEmpty()){
 						nRestaurant++;
-						iter3.remove();
-					}
+						iter.remove();
+					}					
 				}
 			}	
 			taskInfo += "info : " + nConnection + " printer socket(s) are removed" + sep;
-			taskInfo += "info : " + nRestaurant + " restaurant's printer info is removed" + sep;
+			taskInfo += "info : " + nRestaurant + " restaurant's printer(s) info is removed" + sep;
 			
 		}catch(Exception e){
 			taskInfo += "info : " + e.getMessage() + sep;

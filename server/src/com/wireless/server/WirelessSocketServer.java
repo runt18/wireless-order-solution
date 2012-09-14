@@ -4,10 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.TreeMap;
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -33,7 +32,7 @@ import com.wireless.task.SweepPrtConTask;
 public class WirelessSocketServer {
 
 	//the version of the wireless socket server
-	static final String VERSION = "1.0.7";
+	static final String VERSION = "1.0.8";
 	//the OTA server address
 	static String OTA_IP = ""; 
 	//the OTA server port
@@ -63,7 +62,7 @@ public class WirelessSocketServer {
     static int blockQueueSize = 200;
 	
     //the tree map holding the restaurant id and the corresponding printer socket
-    static TreeMap<Integer, ArrayList<Socket>> printerConnections = new TreeMap<Integer, ArrayList<Socket>>();
+    static HashMap<Integer, List<Socket>> printerConnections = new HashMap<Integer, List<Socket>>();
     //the hash map holding the information is as below
     static HashMap<Integer, HashMap<Integer, String>> printTemplates = new HashMap<Integer, HashMap<Integer, String>>();    
     

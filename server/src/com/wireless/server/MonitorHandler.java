@@ -252,7 +252,7 @@ class MonitorStatus extends Thread{
 				status = status.replace("$(restaurant_printer)", Integer.toString(nRestaurant));
 				
 				//calculate the number of the printer sockets
-				Iterator<ArrayList<Socket>> iter = WirelessSocketServer.printerConnections.values().iterator();
+				Iterator<List<Socket>> iter = WirelessSocketServer.printerConnections.values().iterator();
 				int nPrtSocket = 0;
 				while(iter.hasNext()){
 					nPrtSocket += iter.next().size();
