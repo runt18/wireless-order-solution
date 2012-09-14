@@ -149,6 +149,8 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 										}catch(IOException e){
 											try{
 												printerSock.close();
+											}catch(IOException ex){
+												
 											}finally{
 												iterSock.remove();
 											}
