@@ -69,8 +69,7 @@ public class PickTasteFragment extends DialogFragment {
 		private TextView mSelectedFoodPriceTextView ;
 		private LinearLayout mPickedTasteLinear;
 		
-		TasteRefreshHandler(PickTasteFragment fragment)
-		{
+		TasteRefreshHandler(PickTasteFragment fragment){
 			mFragment = new WeakReference<PickTasteFragment>(fragment);
 		}
 		
@@ -121,8 +120,8 @@ public class PickTasteFragment extends DialogFragment {
 			// getPriceWithTaste() 不起作用？
 			final PickTasteFragment fragment = mFragment.get();
 			mPickedTasteLinear.removeAllViews();
-			if(fragment.mOrderFood.hasNormalTaste())
-				for(Taste t: fragment.mOrderFood.tastes)
+			if(fragment.mOrderFood.hasNormalTaste()){
+				for(Taste t : fragment.mOrderFood.tastes)
 				{
 					if(t.aliasID != Taste.NO_TASTE)
 					{
@@ -142,6 +141,7 @@ public class PickTasteFragment extends DialogFragment {
 						});
 					}
 				}
+			}
 			mSelectedFoodPriceTextView.setText("" + fragment.mOrderFood.getPriceWithTaste());
 		}
 	}
@@ -152,7 +152,8 @@ public class PickTasteFragment extends DialogFragment {
 		super.onCreate(savedInstanceState);
 		setStyle(PickTasteFragment.STYLE_NO_TITLE, android.R.style.Theme_Holo_Light_Dialog);
 		
-		FoodParcel foodParcel = getActivity().getIntent().getParcelableExtra(FoodParcel.KEY_VALUE);
+		//FoodParcel foodParcel = getActivity().getIntent().getParcelableExtra(FoodParcel.KEY_VALUE);
+		FoodParcel foodParcel = getArguments().getParcelable(FoodParcel.KEY_VALUE);
 		mOrderFood = foodParcel;
 		mTasteHandler = new TasteRefreshHandler(this);
 		
@@ -236,8 +237,7 @@ public class PickTasteFragment extends DialogFragment {
 		mScrollLayout.mCurScreen = 0;
 		mScrollLayout.mDefaultScreen = 0;
 		
-		for(int pageNo=0;pageNo<pageSize;pageNo++)
-		{
+		for(int pageNo=0; pageNo < pageSize; pageNo++){
 			// 每页餐台的Grid View
 			GridView grid = new GridView(this.getActivity());
 			grid.setSelected(true);

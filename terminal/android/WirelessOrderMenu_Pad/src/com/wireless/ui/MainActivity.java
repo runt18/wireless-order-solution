@@ -26,14 +26,13 @@ import com.wireless.util.ExpandableListFragment.OnItemChangeListener;
 import com.wireless.util.GalleryFragment;
 import com.wireless.util.GalleryFragment.OnItemClickListener;
 import com.wireless.util.GalleryFragment.OnPicChangedListener;
-import com.wireless.util.PackOrderFoods;
 
 public class MainActivity extends Activity  
 						  implements OnItemChangeListener,
 							 	     OnPicChangedListener, 
 							 	     OnItemClickListener{
 	
-	protected static final int MAIN_ACTIVITY_RES_CODE = 340;
+	private static final int MAIN_ACTIVITY_RES_CODE = 340;
 
 	private HashMap<Kitchen, Integer> mFoodPosByKitchenMap = new HashMap<Kitchen, Integer>();
 	
@@ -51,12 +50,17 @@ public class MainActivity extends Activity
 		 * 设置各种按钮的listener
 		 */
 		ImageView amplifyImgView = (ImageView)findViewById(R.id.amplify_btn_imgView);
+		/**
+		 * Gallery上的全屏Button，点击后跳转到FullScreenActivity
+		 */
 		amplifyImgView.setOnClickListener(new OnClickListener(){
-
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent(MainActivity.this, FullScreenActivity.class);
-				startActivityForResult(PackOrderFoods.pack(mOrderFood, intent), MAIN_ACTIVITY_RES_CODE);
+				Bundle bundle = new Bundle();
+				bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(mOrderFood));
+				intent.putExtras(bundle);
+				startActivityForResult(intent, MAIN_ACTIVITY_RES_CODE);
 			}
 		});
 		
@@ -175,9 +179,9 @@ public class MainActivity extends Activity
 		mItemFragment.setPosition(food.kitchen);
 		((TextView) findViewById(R.id.textView_foodName_main)).setText(food.name);
 		((TextView) findViewById(R.id.textView_foodPrice_main)).setText("" + food.getPrice());
+		((TextView) findViewById(R.id.textView_count_main)).setText("1");
 		mOrderFood = new OrderFood(food);
-		float count = Float.parseFloat(((TextView) findViewById(R.id.textView_count_main)).getText().toString());
-		mOrderFood.setCount(count);
+		mOrderFood.setCount(Float.parseFloat(((TextView) findViewById(R.id.textView_count_main)).getText().toString()));
 	}
 
 	/**
@@ -190,10 +194,8 @@ public class MainActivity extends Activity
 
 	@Override  
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {  
-		if(requestCode == MAIN_ACTIVITY_RES_CODE)
-		{
-	        switch(resultCode)
-	        {
+		if(requestCode == MAIN_ACTIVITY_RES_CODE){
+	        switch(resultCode){
 	        case FullScreenActivity.FULL_RES_CODE:
 	        	mPicBrowserFragment.setPosition((OrderFood)data.getParcelableExtra(FoodParcel.KEY_VALUE));
 	        	break;
@@ -201,9 +203,15 @@ public class MainActivity extends Activity
 		}
     }
 	
+	/**
+	 * 点击Gallery，跳转到FoodDetailActivity
+	 */
 	@Override
 	public void onItemClick(Food food, int position) {
 		Intent intent = new Intent(MainActivity.this, FoodDetailActivity.class);
-		startActivity(PackOrderFoods.pack(mOrderFood, intent));
+		Bundle bundle = new Bundle();
+		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(mOrderFood));
+		intent.putExtras(bundle);
+		startActivity(intent);
 	}  
 }

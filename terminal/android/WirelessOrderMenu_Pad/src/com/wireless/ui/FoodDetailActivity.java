@@ -77,12 +77,17 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 			case ORDER_FOOD_CHANGED:
 				mFoodNameTextView.setText(activity.mOrderFood.name);
 				mFoodPriceTextView.setText("" + activity.mOrderFood.getPriceWithTaste());
-				if(activity.mOrderFood.hasNormalTaste())
-					mTasteTextView.setText(activity.mOrderFood.getNormalTastePref());
-				else mTasteTextView.setText("");
-				if(activity.mOrderFood.hasTmpTaste())
+				if(activity.mOrderFood.hasNormalTaste()){
+					mTasteTextView.setText(activity.mOrderFood.getNormalTastePref());					
+				}else{
+					mTasteTextView.setText("");
+				}
+				
+				if(activity.mOrderFood.hasTmpTaste()){
 					mPinzhuTextView.setText(activity.mOrderFood.tmpTaste.getPreference());
-				else mPinzhuTextView.setText("");
+				}else{
+					mPinzhuTextView.setText("");
+				}
 				break;
 			}
 		}
@@ -159,7 +164,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 			@Override
 			public void onClick(View v) {
 				if(mOrderFood.tastes.length > 0){
-					for(Taste t:mOrderFood.tastes.clone())
+					for(Taste t : mOrderFood.tastes.clone())
 					{	
 						mOrderFood.removeTaste(t);
 					}
@@ -234,6 +239,9 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		} else{
 			PickTasteFragment pickTasteFg = new PickTasteFragment();
 			pickTasteFg.setOnTasteChangeListener(this);
+			Bundle args = new Bundle();
+			args.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(mOrderFood));
+			pickTasteFg.setArguments(args);
 			pickTasteFg.show(getFragmentManager(), tab);
 		}
 	}

@@ -24,8 +24,8 @@ public class GalleryFragment extends Fragment {
 	private Gallery mGallery;
 	private List<Food> mFoods = new ArrayList<Food>();
 	
-	public static interface OnPicChangedListener{
-		void onPicChanged(Food value, int position);
+	public interface OnPicChangedListener{
+		void onPicChanged(Food curFood, int position);
 	}
 	
 	private OnPicChangedListener mPicChangeListener;
