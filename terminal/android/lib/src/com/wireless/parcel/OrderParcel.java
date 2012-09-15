@@ -48,9 +48,9 @@ public class OrderParcel extends Order implements Parcelable{
 		setServiceRate(Util.int2Float(in.readInt()));
 		id = in.readInt();
 		restaurantID = in.readInt();
-		destTbl = new TableParcel(in);
-		destTbl2 = new TableParcel(in);
-		srcTbl = new TableParcel(in);
+		destTbl = TableParcel.CREATOR.createFromParcel(in);
+		destTbl2 = TableParcel.CREATOR.createFromParcel(in);
+		srcTbl = TableParcel.CREATOR.createFromParcel(in);
 		customNum = in.readInt();
 		String memberID = in.readString();
 		this.memberID = memberID.equals("") ? null : memberID;

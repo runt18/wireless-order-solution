@@ -1,7 +1,5 @@
 package com.wireless.parcel;
 
-import java.util.ArrayList;
-
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -11,35 +9,24 @@ import com.wireless.protocol.Util;
 
 public class FoodParcel extends OrderFood implements Parcelable{
 	
-	public static final String KEY_VALUE = "com.wireless.common.FoodParcel";
+	public static final String KEY_VALUE = "com.wireless.lib.parcel.FoodParcel";
 	
 	public FoodParcel(OrderFood food){
 		aliasID = food.aliasID;
 		kitchen = food.kitchen;
-		name = new String(food.name);
-		image = food.image == null ? "" : food.image;
-		tastes = new Taste[food.tastes.length];
-		for(int i = 0; i < tastes.length; i++){
-			tastes[i] = new TasteParcel(food.tastes[i]);
-		}
+		name = food.name;
+		image = food.image;
+		tastes = food.tastes;
 		hangStatus = food.hangStatus;
 		isTemporary = food.isTemporary;
 		status = food.status;
 		orderDate  = food.orderDate;
-		waiter = food.waiter == null ? "" : food.waiter;
-		setCount(Float.valueOf(food.getCount()));
-		setPrice(Float.valueOf(food.getPrice()));
-		if(food.tmpTaste != null){
-			tmpTaste = food.tmpTaste;
-		}else{
-			tmpTaste = new Taste();
-			tmpTaste.aliasID = Integer.MIN_VALUE;
-		}
+		waiter = food.waiter;
+		setCount(food.getCount());
+		setPrice(food.getPrice());
+		tmpTaste = food.tmpTaste;
 		if(food.popTastes != null){
-			popTastes = new Taste[food.popTastes.length];
-			for(int i = 0; i < food.popTastes.length; i++){
-				popTastes[i] = new TasteParcel(food.popTastes[i]);
-			}
+			popTastes = food.popTastes;
 		}else{
 			popTastes = new Taste[0];
 		}
@@ -49,7 +36,7 @@ public class FoodParcel extends OrderFood implements Parcelable{
 		aliasID = in.readInt();
 		kitchen.aliasID = (short)in.readInt();
 		name = in.readString();
-		image = in.readString().length() != 0 ? in.readString() : null;
+		image = in.readString();
 		hangStatus = (short)in.readInt();
 		isTemporary = in.readInt() == 1 ? true : false;
 		status = (short)in.readInt();
@@ -57,19 +44,27 @@ public class FoodParcel extends OrderFood implements Parcelable{
 		waiter = in.readString();
 		setCount(Util.int2Float(in.readInt()));
 		setPrice(Util.int2Float(in.readInt()));
+		
 		// un-marshal the tastes
-		ArrayList<TasteParcel> tasteParcels = new ArrayList<TasteParcel>();
-		in.readTypedList(tasteParcels, TasteParcel.CREATOR);
-		tastes = tasteParcels.toArray(new Taste[tasteParcels.size()]);
-		//un-marshal the temporary taste
-		tmpTaste = new TasteParcel(in);
-		if(tmpTaste.aliasID == Integer.MIN_VALUE){
-			tmpTaste = null;
+		TasteParcel[] tasteParcels = in.createTypedArray(TasteParcel.CREATOR);
+		if(tasteParcels != null){
+			tastes = new Taste[tasteParcels.length];
+			System.arraycopy(tasteParcels, 0, tastes, 0, tasteParcels.length);
+		}else{
+			tastes = new Taste[0];
 		}
+		
+		//un-marshal the temporary taste
+		tmpTaste = TasteParcel.CREATOR.createFromParcel(in);
+		
 		//un-marshal the most popular taste references
-		ArrayList<TasteParcel> popTasteParcels = new ArrayList<TasteParcel>();
-		in.readTypedList(popTasteParcels, TasteParcel.CREATOR);
-		popTastes = popTasteParcels.toArray(new Taste[popTasteParcels.size()]);
+		TasteParcel[] popTasteParcels = in.createTypedArray(TasteParcel.CREATOR);
+		if(popTasteParcels != null){
+			popTastes = new Taste[popTasteParcels.length];
+			System.arraycopy(popTasteParcels, 0, popTastes, 0, popTasteParcels.length);
+		}else{
+			popTastes = new Taste[0];
+		}
 	}
 	
 	public static final Parcelable.Creator<FoodParcel> CREATOR = new Parcelable.Creator<FoodParcel>() {
@@ -101,18 +96,31 @@ public class FoodParcel extends OrderFood implements Parcelable{
 		parcel.writeInt(Util.float2Int(getCount()));
 		parcel.writeInt(Util.float2Int(getPrice()));
 		//marshal the tastes
-		ArrayList<TasteParcel> tasteParcels = new ArrayList<TasteParcel>(tastes.length);
-		for(int i = 0; i < tastes.length; i++){
-			tasteParcels.add(new TasteParcel(tastes[i]));
+		if(tastes != null){
+			TasteParcel[] tasteParcels = new TasteParcel[tastes.length];
+			for(int i = 0; i < tasteParcels.length; i++){
+				tasteParcels[i] = new TasteParcel(tastes[i]);
+			}
+			parcel.writeTypedArray(tasteParcels, flags);
+			
+		}else{
+			parcel.writeTypedArray(null, flags);
 		}
-		parcel.writeTypedList(tasteParcels);
+		
 		//marshal the temporary taste
 		new TasteParcel(tmpTaste).writeToParcel(parcel, flags);
+		
 		//marshal the most popular taste references
-		ArrayList<TasteParcel> popTasteParcels = new ArrayList<TasteParcel>(popTastes.length);
-		for(int i = 0; i < popTastes.length; i++){
-			popTasteParcels.add(new TasteParcel(popTastes[i]));
+		if(popTastes != null){
+			TasteParcel[] popTasteParcels = new TasteParcel[popTastes.length];
+			for(int i = 0; i < popTasteParcels.length; i++){
+				popTasteParcels[i] = new TasteParcel(popTastes[i]);
+			}
+			parcel.writeTypedArray(popTasteParcels, flags);
+			
+		}else{
+			parcel.writeTypedArray(null, flags);
 		}
-		parcel.writeTypedList(popTasteParcels);
+
 	}
 }
