@@ -226,7 +226,7 @@ public class QueryMenu {
 					 " ON TASTE.taste_id = FTR.taste_id " +
 					 " WHERE 1=1 " +
 					 (extraCondition == null ? "" : extraCondition) + " " +
-					 "ORDER BY FOOD.food_id, FTR.rank"; 
+					 "ORDER BY FOOD.food_alias, FTR.rank"; 
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
