@@ -270,7 +270,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 	 */
 	private class UpdateOrderTask extends com.wireless.lib.task.CommitOrderTask{
 
-		private ProgressDialog _progDialog;
+		private ProgressDialog mProgDialog;
 		
 		
 		UpdateOrderTask(Order reqOrder){
@@ -282,7 +282,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 		 */
 		@Override
 		protected void onPreExecute(){
-			_progDialog = ProgressDialog.show(ChgOrderActivity.this, "", "提交" + mReqOrder.destTbl.aliasID + "号餐台的改单信息...请稍候", true);
+			mProgDialog = ProgressDialog.show(ChgOrderActivity.this, "", "提交" + mReqOrder.destTbl.aliasID + "号餐台的改单信息...请稍候", true);
 		}		
 
 		
@@ -293,7 +293,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 		@Override
 		protected void onPostExecute(Byte errCode){
 			//make the progress dialog disappeared
-			_progDialog.dismiss();
+			mProgDialog.dismiss();
 
 			if(mErrMsg != null){
 				if(errCode == ErrorCode.ORDER_EXPIRED){

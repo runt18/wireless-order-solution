@@ -8,7 +8,9 @@ import com.wireless.protocol.Util;
 
 public class TasteParcel extends Taste implements Parcelable{
 
-	private boolean isNull = false;
+	private boolean mIsNull = false;
+	
+	public static final String KEY_VALUE = "com.wireless.lib.parcel.TasteParcel";
 	
 	public TasteParcel(Taste taste){
 		if(taste != null){
@@ -19,7 +21,7 @@ public class TasteParcel extends Taste implements Parcelable{
 			setRate(Float.valueOf(taste.getRate()));
 			setPrice(Float.valueOf(taste.getPrice()));			
 		}else{
-			isNull = true;
+			mIsNull = true;
 		}
 	}
 	
@@ -56,7 +58,7 @@ public class TasteParcel extends Taste implements Parcelable{
 
 	@Override
 	public void writeToParcel(Parcel parcel, int flags) {
-		if(isNull){
+		if(mIsNull){
 			parcel.writeInt(1);
 		}else{
 			parcel.writeInt(0);

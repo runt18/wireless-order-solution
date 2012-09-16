@@ -8,19 +8,25 @@ import com.wireless.protocol.Util;
 
 public class TableParcel extends Table implements Parcelable {
 
-	public static final String KEY_VALUE = "com.wireless.common.TableParcel";
+	private boolean nIsNull = false;
+	
+	public static final String KEY_VALUE = "com.wireless.lib.parcel.TableParcel";
 	
 	public TableParcel(Table table){
-		this.restaurantID = table.restaurantID;
-		this.tableID = table.tableID;
-		this.aliasID = table.aliasID;
-		this.category = table.category;
-		this.status = table.status;
-		this.customNum = table.customNum;
-		this.name = new String(table.name);
-		this.regionID = table.regionID;
-		this.setMinimumCost(Float.valueOf(table.getMinimumCost()));
-		this.setServiceRate(Float.valueOf(table.getServiceRate()));
+		if(table != null){
+			this.restaurantID = table.restaurantID;
+			this.tableID = table.tableID;
+			this.aliasID = table.aliasID;
+			this.category = table.category;
+			this.status = table.status;
+			this.customNum = table.customNum;
+			this.name = table.name;
+			this.regionID = table.regionID;
+			this.setMinimumCost(table.getMinimumCost());
+			this.setServiceRate(table.getServiceRate());			
+		}else{
+			nIsNull = true;
+		}
 	}
 	
 	private TableParcel(Parcel in){
@@ -38,7 +44,12 @@ public class TableParcel extends Table implements Parcelable {
 	
 	public static final Parcelable.Creator<TableParcel> CREATOR = new Parcelable.Creator<TableParcel>() {
 		public TableParcel createFromParcel(Parcel in) {
-			return new TableParcel(in);
+			boolean isNull = in.readInt() == 1 ? true : false;
+			if(isNull){
+				return null;
+			}else{
+				return new TableParcel(in);
+			}
 		}
 
 		public TableParcel[] newArray(int size) {
@@ -53,16 +64,21 @@ public class TableParcel extends Table implements Parcelable {
 
 	@Override
 	public void writeToParcel(Parcel parcel, int flags) {
-		parcel.writeInt(this.restaurantID);
-		parcel.writeInt(this.tableID);
-		parcel.writeInt(this.aliasID);
-		parcel.writeInt(this.category);
-		parcel.writeInt(this.status);
-		parcel.writeInt(this.customNum);
-		parcel.writeString(this.name);
-		parcel.writeInt(this.regionID);
-		parcel.writeInt(Util.float2Int(this.getMinimumCost()));
-		parcel.writeInt(Util.float2Int(this.getServiceRate()));
+		if(nIsNull){
+			parcel.writeInt(1);
+		}else{
+			parcel.writeInt(0);
+			parcel.writeInt(this.restaurantID);
+			parcel.writeInt(this.tableID);
+			parcel.writeInt(this.aliasID);
+			parcel.writeInt(this.category);
+			parcel.writeInt(this.status);
+			parcel.writeInt(this.customNum);
+			parcel.writeString(this.name);
+			parcel.writeInt(this.regionID);
+			parcel.writeInt(Util.float2Int(this.getMinimumCost()));
+			parcel.writeInt(Util.float2Int(this.getServiceRate()));
+		}
 	}
 
 }
