@@ -37,7 +37,7 @@ import com.wireless.util.StaffPanelFragment.OnStaffChangedListener;
 import com.wireless.util.TablePanelFragment.OnTableChangedListener;
 
 public class OptionBar extends Fragment implements OnTableChangedListener, OnStaffChangedListener{
-	public static final String CUR_TABLE = "current_table";
+	//public static final String CUR_TABLE = "current_table";
 	private static Table mTable;
 	private static int mCustomCount;
 	private static int mPickedFood;

@@ -32,7 +32,6 @@ import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
 import com.wireless.util.ImageLoader;
-import com.wireless.util.PackOrderFoods;
 import com.wireless.util.PickTasteFragment;
 import com.wireless.util.PickTasteFragment.OnTasteChangeListener;
 
@@ -114,7 +113,10 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent(FoodDetailActivity.this ,FullScreenActivity.class);
-				startActivity(PackOrderFoods.pack(mOrderFood, intent));
+				Bundle bundle = new Bundle();
+				bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(mOrderFood));
+				intent.putExtras(bundle);
+				startActivity(intent);
 			}
 		});
 		
