@@ -26,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
+import com.wireless.excep.BusinessException;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.OrderParcel;
 import com.wireless.protocol.FoodMenu;
@@ -375,16 +376,16 @@ public class OrderActivity extends ActivityGroup implements	OrderFoodListView.On
 		 * 根据返回的error message判断，如果发错异常则提示用户， 如果成功，则返回到主界面，并提示用户下单成功
 		 */
 		@Override
-		protected void onPostExecute(Byte errCode) {
+		protected void onPostExecute(BusinessException e) {
 			// make the progress dialog disappeared
 			mProgDialog.dismiss();
 			/**
 			 * Prompt user message if any error occurred.
 			 */
-			if (mErrMsg != null) {
+			if (e != null) {
 				new AlertDialog.Builder(OrderActivity.this)
 					.setTitle("提示")
-					.setMessage(mErrMsg)
+					.setMessage(e.getMessage())
 					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog,	int id) {
 							dialog.dismiss();
