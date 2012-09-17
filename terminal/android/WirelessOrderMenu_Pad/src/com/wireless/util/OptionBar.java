@@ -12,6 +12,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -25,6 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.Params;
+import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
 import com.wireless.protocol.Order;
@@ -38,10 +41,10 @@ import com.wireless.util.TablePanelFragment.OnTableChangedListener;
 
 public class OptionBar extends Fragment implements OnTableChangedListener, OnStaffChangedListener{
 	//public static final String CUR_TABLE = "current_table";
-	private static Table mTable;
-	private static int mCustomCount;
-	private static int mPickedFood;
-	private static StaffTerminal mStaff;
+	//private static Table mTable;
+	//private static int mCustomCount;
+	//private static int mPickedFood;
+	//private static StaffTerminal mStaff;
 	
 	private static final String TAB_PICK_TBL = "tab_pick_table";
 	private static final String TAB_PICK_STAFF = "tab_pick_staff";
@@ -49,11 +52,56 @@ public class OptionBar extends Fragment implements OnTableChangedListener, OnSta
 	
 	private Dialog mDialog;
 	private TabHost mTabHost;
-	private TextView mSelectedFoodTextView;
-	private TextView mTableNumTextView;
-	private TextView mCustomCntTextView;
+
 	
-   @Override  
+	private BBarHandler  mBBarRefleshHandler;
+	
+	private static class BBarHandler extends Handler{		
+		
+		private TextView mSelectedFoodTextView;
+		private TextView mTableNumTextView;
+		private TextView mCustomCntTextView;
+		private TextView mStaffTxtView;
+		
+		BBarHandler(OptionBar fragment){
+			mSelectedFoodTextView = (TextView)fragment.getActivity().findViewById(R.id.textView_selectedFood);
+			mTableNumTextView = (TextView)fragment.getActivity().findViewById(R.id.txtView_table_count);
+			mCustomCntTextView = (TextView)fragment.getActivity().findViewById(R.id.textView_peopCnt);
+			mStaffTxtView = (TextView)fragment.getActivity().findViewById(R.id.textView_serverName);
+		}
+		
+		@Override
+		public void handleMessage(Message msg){
+			//BBar显示餐台号和人数
+			Table destTbl =  ShoppingCart.instance().getDestTable();
+			if(destTbl != null){
+				mTableNumTextView.setText("" + destTbl.aliasID);
+				mCustomCntTextView.setText("" + destTbl.customNum);
+			}else{
+				mTableNumTextView.setText("未设定");
+				mCustomCntTextView.setText("" + 0);
+			}
+			
+			//BBar显示已点菜的数量
+			Order oriOrder = ShoppingCart.instance().getOriOrder();
+			if(oriOrder != null){
+				mSelectedFoodTextView.setText("" + oriOrder.foods.length);
+			}else{
+				mSelectedFoodTextView.setText("" + 0);
+			}
+			
+			//BBar显示服务员姓名
+			StaffTerminal staff = ShoppingCart.instance().getStaff();
+			if(staff != null){
+				mStaffTxtView.setText(staff.name);
+			}else{
+				mStaffTxtView.setText("未设定");
+			}
+		}
+	}
+	
+	
+    @Override  
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {  
 	   return inflater.inflate(R.layout.bottombar, container, false);
    }
@@ -61,20 +109,14 @@ public class OptionBar extends Fragment implements OnTableChangedListener, OnSta
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState){
 		super.onActivityCreated(savedInstanceState);
+		mBBarRefleshHandler = new BBarHandler(this);
 		init(this.getActivity());
 	}
 
 	@Override
 	public void onStart(){
-		super.onStart();
-		if(mTable != null){
-			mTableNumTextView.setText("" + mTable.aliasID);
-			mCustomCntTextView.setText("" + mCustomCount);
-			mSelectedFoodTextView.setText("" + mPickedFood);
-		}
-		
-		if(mStaff != null)
-			((TextView) getActivity().findViewById(R.id.textView_serverName)).setText(mStaff.name);
+		super.onStart();		
+		mBBarRefleshHandler.sendEmptyMessage(0);
 	}
 	
 	/**
@@ -123,9 +165,7 @@ public class OptionBar extends Fragment implements OnTableChangedListener, OnSta
 //				}
 //			}
 //		});
-		mSelectedFoodTextView = (TextView) activity.findViewById(R.id.textView_selectedFood);
-		mTableNumTextView = (TextView) activity.findViewById(R.id.txtView_table_count);
-		mCustomCntTextView = (TextView) activity.findViewById(R.id.textView_peopCnt);
+
 		
 		initDialog(activity);
 
@@ -178,23 +218,21 @@ public class OptionBar extends Fragment implements OnTableChangedListener, OnSta
 	 * 餐台设置时的回调，根据餐台的状态来判断是否请求订单
 	 */
 	@Override
-	public void onTableChanged(Table table, int tableStatus, int customCount) {
+	public void onTableChanged(Table table) {
 		mDialog.dismiss();
 		
-		mTable = table;
-		mCustomCount = customCount;
-		
-		mTableNumTextView.setText("" + mTable.aliasID);
-		mCustomCntTextView.setText("" + mCustomCount);
-		if(tableStatus == Table.TABLE_IDLE){
-			mSelectedFoodTextView.setText("0");
+		ShoppingCart.instance().setDestTable(table);		
+
+		if(table.status == Table.TABLE_IDLE){		
+			ShoppingCart.instance().setOriOrder(null);
+			mBBarRefleshHandler.sendEmptyMessage(0);
 			Toast.makeText(this.getActivity(), "该餐台尚未点菜", Toast.LENGTH_SHORT).show();
-		}else if(tableStatus == Table.TABLE_BUSY){
+			
+		}else if(table.status == Table.TABLE_BUSY){
 			 new QueryOrderTask(table.aliasID){
 				@Override
 				void onOrderChanged(Order order) {
-					mPickedFood = order.foods.length;
-					mSelectedFoodTextView.setText("" + mPickedFood);
+					ShoppingCart.instance().setOriOrder(order);
 				}
 			 }.execute(WirelessOrder.foodMenu);
 		}
@@ -213,7 +251,10 @@ public class OptionBar extends Fragment implements OnTableChangedListener, OnSta
 			if(id.equals("")){
 				Toast.makeText(getActivity(), "账号不能为空", Toast.LENGTH_SHORT).show();
 			}else if(staff.pwd.equals(toHexString(digester.digest()))){
-				mStaff = staff;
+				
+				ShoppingCart cart = ShoppingCart.instance(); 
+				cart.setStaff(staff);
+				
 				//保存staff pin到文件里面
 				Editor editor = getActivity().getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).edit();//获取编辑器
 				editor.putLong(Params.STAFF_PIN, staff.pin);
@@ -237,6 +278,8 @@ public class OptionBar extends Fragment implements OnTableChangedListener, OnSta
 				Toast.makeText(getActivity(), "密码错误", Toast.LENGTH_SHORT).show();
 			}
 			
+			mBBarRefleshHandler.sendEmptyMessage(0);
+
 		}catch(NoSuchAlgorithmException e) {
 			Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
 		}
@@ -305,6 +348,7 @@ public class OptionBar extends Fragment implements OnTableChangedListener, OnSta
 				 * 请求账单成功则更新相关的控件
 				 */
 				onOrderChanged(order);
+				mBBarRefleshHandler.sendEmptyMessage(0);
 			}			
 		}
 		

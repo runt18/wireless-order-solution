@@ -68,7 +68,7 @@ public class TablePanelFragment extends Fragment {
 	}
 	
 	public interface OnTableChangedListener{
-		void onTableChanged(Table table, int tableStatus , int customNum);
+		void onTableChanged(Table table);
 	}
 	
 	@Override
@@ -344,13 +344,15 @@ public class TablePanelFragment extends Fragment {
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 					final Table table = (Table) view.getTag();
 					
-					final int customNum = Integer.parseInt(((TextView)getView().findViewById(R.id.textView_customNum)).getText().toString());
+					final short customNum = Short.parseShort(((TextView)getView().findViewById(R.id.textView_customNum)).getText().toString());
 					
 					new QueryTableStatusTask(table.aliasID){
 						@Override
-						void OnQueryTblStatus(int status) {
+						void OnQueryTblStatus(byte status) {
 							if(mOnTableChangedListener != null){
-								mOnTableChangedListener.onTableChanged(table, status, customNum);
+								table.status = status;
+								table.customNum = customNum;
+								mOnTableChangedListener.onTableChanged(table);
 							}
 						}								
 					}.execute();
@@ -541,7 +543,7 @@ public class TablePanelFragment extends Fragment {
 			}
 		}	
 		
-		abstract void OnQueryTblStatus(int status);
+		abstract void OnQueryTblStatus(byte status);
 		
 	}	
 
