@@ -1,4 +1,4 @@
-package com.wireless.util;
+package com.wireless.fragment;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -10,6 +10,7 @@ import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.os.Handler;
@@ -29,6 +30,8 @@ import android.widget.Toast;
 import com.wireless.common.Params;
 import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
+import com.wireless.fragment.StaffPanelFragment.OnStaffChangedListener;
+import com.wireless.fragment.TablePanelFragment.OnTableChangedListener;
 import com.wireless.ordermenu.R;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.PinGen;
@@ -36,11 +39,10 @@ import com.wireless.protocol.ReqPackage;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
-import com.wireless.util.StaffPanelFragment.OnStaffChangedListener;
-import com.wireless.util.TablePanelFragment.OnTableChangedListener;
+import com.wireless.ui.PickedFoodActivity;
 
-public class OptionBar extends Fragment implements OnTableChangedListener, OnStaffChangedListener{
-	//public static final String CUR_TABLE = "current_table";
+public class OptionBarFragment extends Fragment implements OnTableChangedListener, OnStaffChangedListener{
+//	public static final String CUR_TABLE = "current_table";
 	//private static Table mTable;
 	//private static int mCustomCount;
 	//private static int mPickedFood;
@@ -63,7 +65,7 @@ public class OptionBar extends Fragment implements OnTableChangedListener, OnSta
 		private TextView mCustomCntTextView;
 		private TextView mStaffTxtView;
 		
-		BBarHandler(OptionBar fragment){
+		BBarHandler(OptionBarFragment fragment){
 			mSelectedFoodTextView = (TextView)fragment.getActivity().findViewById(R.id.textView_selectedFood);
 			mTableNumTextView = (TextView)fragment.getActivity().findViewById(R.id.txtView_table_count);
 			mCustomCntTextView = (TextView)fragment.getActivity().findViewById(R.id.textView_peopCnt);
@@ -122,7 +124,7 @@ public class OptionBar extends Fragment implements OnTableChangedListener, OnSta
 	/**
 	 * 初始化BBar上的控件
 	 */
-	private void init(Activity activity){
+	private void init(final Activity activity){
 		//餐台选择Button
 		ImageView pickTblImgView = (ImageView)activity.findViewById(R.id.imgView_set_table);
 		pickTblImgView.setOnClickListener(new View.OnClickListener() {			
@@ -153,19 +155,17 @@ public class OptionBar extends Fragment implements OnTableChangedListener, OnSta
 			}
 		});
 		
-//		ImageView pickedFoodImgView = (ImageView) activity.findViewById(R.id.imageView_selectedFood);
-//		pickedFoodImgView.setOnClickListener(new OnClickListener(){
-//			@Override
-//			public void onClick(View v) {
-//				if(mTable != null)
-//				{
-//					Intent intent = new Intent(activity,PickedFoodActivity.class);
-//					intent.putExtra(CUR_TABLE, mTable.aliasID);
-//					activity.startActivity(intent);
-//				}
-//			}
-//		});
-
+		ImageView pickedFoodImgView = (ImageView) activity.findViewById(R.id.imageView_selectedFood);
+		pickedFoodImgView.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				if(ShoppingCart.instance().getDestTable() != null)
+				{
+					Intent intent = new Intent(activity,PickedFoodActivity.class);
+					activity.startActivity(intent);
+				}
+			}
+		});
 		
 		initDialog(activity);
 
@@ -317,7 +317,7 @@ public class OptionBar extends Fragment implements OnTableChangedListener, OnSta
 		 */
 		@Override
 		protected void onPreExecute(){
-			mProgDialog = ProgressDialog.show(OptionBar.this.getActivity(), "", "查询" + mTblAlias + "号账单信息...请稍候", true);
+			mProgDialog = ProgressDialog.show(OptionBarFragment.this.getActivity(), "", "查询" + mTblAlias + "号账单信息...请稍候", true);
 		}
 		
 		/**
@@ -334,7 +334,7 @@ public class OptionBar extends Fragment implements OnTableChangedListener, OnSta
 				/**
 				 * 如果请求账单信息失败，则跳转回本页面
 				 */
-				new AlertDialog.Builder(OptionBar.this.getActivity())
+				new AlertDialog.Builder(OptionBarFragment.this.getActivity())
 					.setTitle("提示")
 					.setMessage(mErrMsg)
 					.setPositiveButton("确定", new DialogInterface.OnClickListener() {

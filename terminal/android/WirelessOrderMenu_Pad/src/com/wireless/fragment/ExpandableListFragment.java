@@ -1,4 +1,4 @@
-package com.wireless.util;
+package com.wireless.fragment;
 
 import java.util.ArrayList;
 import java.util.List;

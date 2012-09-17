@@ -15,17 +15,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.wireless.common.WirelessOrder;
+import com.wireless.fragment.ExpandableListFragment;
+import com.wireless.fragment.GalleryFragment;
+import com.wireless.fragment.ExpandableListFragment.OnItemChangeListener;
+import com.wireless.fragment.GalleryFragment.OnItemClickListener;
+import com.wireless.fragment.GalleryFragment.OnPicChangedListener;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Department;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.OrderFood;
-import com.wireless.util.ExpandableListFragment;
-import com.wireless.util.ExpandableListFragment.OnItemChangeListener;
-import com.wireless.util.GalleryFragment;
-import com.wireless.util.GalleryFragment.OnItemClickListener;
-import com.wireless.util.GalleryFragment.OnPicChangedListener;
 
 public class MainActivity extends Activity  
 						  implements OnItemChangeListener,

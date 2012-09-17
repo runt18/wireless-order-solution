@@ -1,4 +1,4 @@
-package com.wireless.util;
+package com.wireless.fragment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,6 +17,7 @@ import android.widget.ImageView;
 
 import com.wireless.ordermenu.R;
 import com.wireless.protocol.Food;
+import com.wireless.util.ImageLoader;
 
 public class GalleryFragment extends Fragment {
 	private ImageView.ScaleType curScaleType = ImageView.ScaleType.CENTER_CROP;

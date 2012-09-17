@@ -15,13 +15,13 @@
             android:id="@+id/item"
             android:layout_width="200dp"
             android:layout_height="fill_parent"
-            class="com.wireless.util.ExpandableListFragment" />
+            class="com.wireless.fragment.ExpandableListFragment" />
 
         <fragment
             android:id="@+id/content"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            class="com.wireless.util.GalleryFragment" />
+            class="com.wireless.fragment.GalleryFragment" />
     </LinearLayout>
 
         <fragment
@@ -29,7 +29,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            class="com.wireless.util.OptionBar" />
+            class="com.wireless.fragment.OptionBarFragment" />
 
     <RelativeLayout
         android:id="@+id/relativeLayout2"

@@ -26,14 +26,14 @@ import android.widget.TabHost;
 import android.widget.TextView;
 
 import com.wireless.common.WirelessOrder;
+import com.wireless.fragment.PickTasteFragment;
+import com.wireless.fragment.PickTasteFragment.OnTasteChangeListener;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
 import com.wireless.util.ImageLoader;
-import com.wireless.util.PickTasteFragment;
-import com.wireless.util.PickTasteFragment.OnTasteChangeListener;
 
 public class FoodDetailActivity extends Activity implements OnTasteChangeListener{
 	private static final int ORDER_FOOD_CHANGED = 234841;

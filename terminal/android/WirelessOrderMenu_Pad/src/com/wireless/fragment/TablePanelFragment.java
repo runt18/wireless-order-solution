@@ -1,4 +1,4 @@
-package com.wireless.util;
+package com.wireless.fragment;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -38,6 +38,7 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
 import com.wireless.protocol.Region;
 import com.wireless.protocol.Table;
+import com.wireless.util.ScrollLayout;
 import com.wireless.util.ScrollLayout.OnViewChangedListner;
 
 public class TablePanelFragment extends Fragment {

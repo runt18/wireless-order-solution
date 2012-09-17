@@ -12,7 +12,6 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -30,7 +29,10 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.wireless.common.ShoppingCart.OnCommitListener;
+import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
+import com.wireless.excep.BusinessException;
 import com.wireless.ordermenu.R;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
@@ -38,7 +40,6 @@ import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Type;
 import com.wireless.protocol.Util;
-import com.wireless.util.OptionBar;
 
 public class PickedFoodActivity extends Activity {
 	//列表项的显示标签
@@ -69,6 +70,7 @@ public class PickedFoodActivity extends Activity {
 	private OrderFood mCurOrderFood;
 	private FoodDataHandler mFoodDataHandler;
 	private Table mTable;
+	protected ShoppingCart mSCart;
 
 	/*
 	 * 显示已点菜的列表的handler
@@ -194,6 +196,8 @@ public class PickedFoodActivity extends Activity {
 		
 		mFoodHandler = new FoodHandler(this);
 		mFoodDataHandler = new FoodDataHandler(this);
+		mSCart = ShoppingCart.instance();
+		mTable = mSCart.getDestTable();
 		new QueryOrderTask(mTable.aliasID).execute(WirelessOrder.foodMenu);
 		//催菜按钮的行为
 		Button hurryBtn = (Button) findViewById(R.id.button_hurry_pickedFood);
@@ -228,10 +232,19 @@ public class PickedFoodActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				if(mOrderFoods.size() != 0){
+					//FIXME 修改成持有order
 					Order reqOrder = new Order(mOrderFoods.toArray(new OrderFood[mOrderFoods.size()]), mTable.aliasID, mTable.customNum);
 					reqOrder.srcTbl.aliasID = mOrder.destTbl.aliasID;
 					reqOrder.orderDate = mOrder.orderDate;
-					new UpdateOrderTask(reqOrder).execute(Type.UPDATE_ORDER);
+					try {
+						mSCart.commit(reqOrder, new IOnCommitListener());
+					} catch (BusinessException e) {
+						if(e.errCode == ErrorCode.TERMINAL_NOT_ATTACHED)
+						{
+							Toast.makeText(PickedFoodActivity.this, "您还未设置服务员，暂时不能下单。", Toast.LENGTH_SHORT).show();
+						}
+						e.printStackTrace();
+					}
 				}else{
 					Toast.makeText(PickedFoodActivity.this, "您还未点菜，暂时不能下单。", Toast.LENGTH_SHORT).show();
 				}
@@ -358,35 +371,21 @@ public class PickedFoodActivity extends Activity {
 	/**
 	 * 执行改单的提交请求
 	 */
-	private class UpdateOrderTask extends com.wireless.lib.task.CommitOrderTask{
+	private class IOnCommitListener implements OnCommitListener{
+		private ProgressDialog mProgDialog;
 
-		private ProgressDialog _progDialog;
-		
-		
-		UpdateOrderTask(Order reqOrder){
-			super(reqOrder);
+		@Override
+		public void OnPreCommit(Order reqOrder) {
+			mProgDialog = ProgressDialog.show(PickedFoodActivity.this, "", "提交" + reqOrder.destTbl.aliasID + "号餐台的菜单信息...请稍候", true);
 		}
-		
-		/**
-		 * 在执行请求改单操作前显示提示信息
-		 */
-		@Override
-		protected void onPreExecute(){
-			_progDialog = ProgressDialog.show(PickedFoodActivity.this, "", "提交" + mReqOrder.destTbl.aliasID + "号餐台的菜单信息...请稍候", true);
-		}		
 
-		
-		/**
-		 * 根据返回的error message判断，如果发错异常则提示用户，
-		 * 如果成功，则返回到主界面，并提示用户改单成功
-		 */
-		@Override
-		protected void onPostExecute(Byte errCode){
-			//make the progress dialog disappeared
-			_progDialog.dismiss();
 
-			if(mErrMsg != null){
-				if(errCode == ErrorCode.ORDER_EXPIRED){
+		@Override
+		public void onPostCommit(Order reqOrder, BusinessException e) {
+			mProgDialog.dismiss();
+
+			if(e != null){
+				if(e.errCode == ErrorCode.ORDER_EXPIRED){
 					/**
 					 * 如果账单已经过期，提示用户两种选择：
 					 * 1 - 下载最新的账单信息，并更新已点菜的内容
@@ -394,7 +393,7 @@ public class PickedFoodActivity extends Activity {
 					 */
 					new AlertDialog.Builder(PickedFoodActivity.this)
 						.setTitle("提示")
-						.setMessage(mErrMsg)
+						.setMessage(e.getMessage())
 						.setPositiveButton("刷新", new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
 								dialog.dismiss();
@@ -415,7 +414,7 @@ public class PickedFoodActivity extends Activity {
 					 */
 					new AlertDialog.Builder(PickedFoodActivity.this)
 					.setTitle("提示")
-					.setMessage(mErrMsg)
+					.setMessage(e.getMessage())
 					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int id) {
 							dialog.dismiss();
@@ -426,10 +425,10 @@ public class PickedFoodActivity extends Activity {
 				//return to the main activity and show the successful message
 				PickedFoodActivity.this.finish();
 				String promptMsg;
-				if(mReqOrder.destTbl.aliasID == mReqOrder.srcTbl.aliasID){
-					promptMsg = mReqOrder.destTbl.aliasID + "号台下单成功。";
+				if(reqOrder.destTbl.aliasID == reqOrder.srcTbl.aliasID){
+					promptMsg = reqOrder.destTbl.aliasID + "号台下单成功。";
 				}else{
-					promptMsg = mReqOrder.srcTbl.aliasID + "号台转至" + 	mReqOrder.destTbl.aliasID + "号台，并下单成功。";
+					promptMsg = reqOrder.srcTbl.aliasID + "号台转至" + reqOrder.destTbl.aliasID + "号台，并下单成功。";
 				}
 				Toast.makeText(PickedFoodActivity.this, promptMsg, Toast.LENGTH_SHORT).show();
 			}

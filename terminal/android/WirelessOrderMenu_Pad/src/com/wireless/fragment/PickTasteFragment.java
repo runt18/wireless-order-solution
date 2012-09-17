@@ -1,4 +1,4 @@
-package com.wireless.util;
+package com.wireless.fragment;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -33,6 +33,7 @@ import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
+import com.wireless.util.ScrollLayout;
 
 public class PickTasteFragment extends DialogFragment {
 	private ScrollLayout mScrollLayout;

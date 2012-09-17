@@ -9,12 +9,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.wireless.common.WirelessOrder;
+import com.wireless.fragment.GalleryFragment;
+import com.wireless.fragment.GalleryFragment.OnPicChangedListener;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
-import com.wireless.util.GalleryFragment;
-import com.wireless.util.GalleryFragment.OnPicChangedListener;
 
 public class FullScreenActivity extends Activity implements OnPicChangedListener{
 	private GalleryFragment mPicBrowserFragment;
