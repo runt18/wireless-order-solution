@@ -35,12 +35,13 @@ import com.wireless.ordermenu.R;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.Table;
 import com.wireless.protocol.Type;
 import com.wireless.protocol.Util;
 import com.wireless.util.OptionBar;
 
 public class PickedFoodActivity extends Activity {
-	
+	//列表项的显示标签
 	private static final String ITEM_FOOD_NAME = "item_food_name";
 	private static final String ITEM_FOOD_PRICE = "item_food_price";
 	private static final String ITEM_FOOD_COUNT = "item_food_count";
@@ -59,16 +60,20 @@ public class PickedFoodActivity extends Activity {
 		R.id.editText_picked_food_count_item,
 		R.id.textView_picked_food_state_item
 	};
-	protected static final int CUR_FOOD_CHANGED = 388962;
-	protected static final int LIST_CHANGED = 878633;
+	protected static final int CUR_FOOD_CHANGED = 388962;//删菜标记
+	protected static final int LIST_CHANGED = 878633;//已点菜更新标记
 	
 	private Order mOrder;
 	private ArrayList<OrderFood> mOrderFoods = new ArrayList<OrderFood>();
 	private FoodHandler mFoodHandler;
 	private OrderFood mCurOrderFood;
 	private FoodDataHandler mFoodDataHandler;
-	private int mTableId;
+	private Table mTable;
 
+	/*
+	 * 显示已点菜的列表的handler
+	 * 负责更新已点菜的显示
+	 */
 	private static class FoodHandler extends Handler{
 		private WeakReference<PickedFoodActivity> mActivity;
 		private ListView mPickedFoodList;
@@ -84,7 +89,7 @@ public class PickedFoodActivity extends Activity {
 		public void handleMessage(Message msg)
 		{
 			final PickedFoodActivity activity = mActivity.get();
-			
+			//若未初始化，则先初始化
 			if(mPickedFoodList == null)
 				mPickedFoodList = (ListView) activity.findViewById(R.id.listView_pickedFood);
 			if(mTotalCountTextView == null)
@@ -94,6 +99,7 @@ public class PickedFoodActivity extends Activity {
 			
 			mTotalCountTextView.setText(""+ activity.mOrderFoods.size());
 			
+			//将所有已点菜装载并统计总价
 			float totalPrice = 0;
 			final List<Map<String, ?>> listContents = new ArrayList<Map<String, ?>>();
 			for(OrderFood f: activity.mOrderFoods)
@@ -119,6 +125,8 @@ public class PickedFoodActivity extends Activity {
 				}
 			};
 			mPickedFoodList.setAdapter(adapter);
+			//设置侦听
+			//当点击菜品是改变右边菜品详情的显示
 			mPickedFoodList.setOnItemClickListener(new OnItemClickListener(){
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -135,7 +143,9 @@ public class PickedFoodActivity extends Activity {
 			});
 		}
 	}
-
+	/*
+	 * 负责显示右边菜品详情的handler
+	 */
 	private static class FoodDataHandler extends Handler{
 		private WeakReference<PickedFoodActivity> mActivity;
 		private boolean isInitialed = false;
@@ -154,6 +164,7 @@ public class PickedFoodActivity extends Activity {
 		public void handleMessage(Message Msg)
 		{
 			final PickedFoodActivity activity = mActivity.get();
+			//若未初始化，则先初始化
 			if(!isInitialed)
 			{
 				mFoodNameTextView = (TextView) activity.findViewById(R.id.textView_food_name_pickedFood);
@@ -166,7 +177,7 @@ public class PickedFoodActivity extends Activity {
 					isInitialed = true;
 				else return;
 			}
-			
+			//设置菜品的各个数据
 			mFoodNameTextView.setText(activity.mCurOrderFood.name);
 			mOriPriceTextView.setText(""+ activity.mCurOrderFood.getPrice());
 			mConPriceTextView.setText(""+ activity.mCurOrderFood.calcDiscountPrice());
@@ -180,12 +191,11 @@ public class PickedFoodActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.picked_food);
-		Intent intent = getIntent();
-		mTableId = intent.getIntExtra(OptionBar.CUR_TABLE, 0);
+		
 		mFoodHandler = new FoodHandler(this);
 		mFoodDataHandler = new FoodDataHandler(this);
-		new QueryOrderTask(mTableId).execute(WirelessOrder.foodMenu);
-
+		new QueryOrderTask(mTable.aliasID).execute(WirelessOrder.foodMenu);
+		//催菜按钮的行为
 		Button hurryBtn = (Button) findViewById(R.id.button_hurry_pickedFood);
 		hurryBtn.setOnClickListener(new View.OnClickListener() {				
 			@Override
@@ -203,6 +213,7 @@ public class PickedFoodActivity extends Activity {
 			}
 		}); 
 		
+		//删菜按钮
 		Button deleteBtn = (Button) findViewById(R.id.button_delete_pickedFood);
 		deleteBtn.setOnClickListener(new OnClickListener(){
 			@Override
@@ -211,17 +222,13 @@ public class PickedFoodActivity extends Activity {
 			}
 		});
 		
+		//下单按钮
 		ImageButton submitBtn = (ImageButton) findViewById(R.id.imageButton_submit_pickedFood);
 		submitBtn.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				/**
-				 * 已点菜和新点菜合并后，生成新的Order，执行改单请求
-				 */
-				//TODO 添加人数和台号
 				if(mOrderFoods.size() != 0){
-					Order reqOrder = new Order(mOrderFoods.toArray(new OrderFood[mOrderFoods.size()]), mTableId, 3);
-//											   Integer.parseInt(((EditText)findViewById(R.id.valuepeople)).getText().toString()));
+					Order reqOrder = new Order(mOrderFoods.toArray(new OrderFood[mOrderFoods.size()]), mTable.aliasID, mTable.customNum);
 					reqOrder.srcTbl.aliasID = mOrder.destTbl.aliasID;
 					reqOrder.orderDate = mOrder.orderDate;
 					new UpdateOrderTask(reqOrder).execute(Type.UPDATE_ORDER);
@@ -391,7 +398,7 @@ public class PickedFoodActivity extends Activity {
 						.setPositiveButton("刷新", new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
 								dialog.dismiss();
-								new QueryOrderTask(mTableId).execute(WirelessOrder.foodMenu);
+								new QueryOrderTask(mTable.aliasID).execute(WirelessOrder.foodMenu);
 							}
 						})
 						.setNeutralButton("退出", new DialogInterface.OnClickListener() {							
@@ -429,5 +436,4 @@ public class PickedFoodActivity extends Activity {
 		}		
 
 	}
-
 }

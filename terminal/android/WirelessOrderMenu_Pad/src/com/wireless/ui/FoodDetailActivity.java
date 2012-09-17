@@ -46,6 +46,10 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 	private ArrayList<Food> mRecommendfoods;
 	private ImageView mFoodImageView;
 
+	/*
+	 * 显示该菜品详细情况的handler
+	 * 当菜品改变时改变显示
+	 */
 	private static class DisplayHandler extends Handler{
 		private WeakReference<FoodDetailActivity> mActivity;
 		private TextView mFoodNameTextView;
@@ -62,6 +66,9 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		public void handleMessage(Message msg)
 		{
 			FoodDetailActivity activity = mActivity.get();
+			/*
+			 * 初始化各个view
+			 */
 			if(mFoodNameTextView == null)
 				mFoodNameTextView = (TextView) activity.findViewById(R.id.textView_foodName_foodDetail);
 			if(mFoodPriceTextView == null)
@@ -73,6 +80,9 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 
 			switch(msg.what)
 			{
+			/*
+			 * 当口味改变时改变显示
+			 */
 			case ORDER_FOOD_CHANGED:
 				mFoodNameTextView.setText(activity.mOrderFood.name);
 				mFoodPriceTextView.setText("" + activity.mOrderFood.getPriceWithTaste());
@@ -104,12 +114,12 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		mImgLoader = new ImageLoader(this);
 		mDisplayHandler = new DisplayHandler(this);
 		mDisplayHandler.sendEmptyMessage(ORDER_FOOD_CHANGED);
-		
+		//显示该菜品的主图
 		mFoodImageView = (ImageView) findViewById(R.id.imageView_foodDetail);
 		mFoodImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 		mFoodImageView.setImageBitmap(mImgLoader.loadImage(mOrderFood.image));
 		mFoodImageView.setOnClickListener(new OnClickListener(){
-
+			//点击主图进入全屏界面
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent(FoodDetailActivity.this ,FullScreenActivity.class);
@@ -122,7 +132,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		
 		final EditText countEditText = (EditText) findViewById(R.id.editText_count_foodDetail);
 		countEditText.setText(String.valueOf(mOrderFood.getCount()));
-		
+		//增加数量的按钮
 		((ImageButton) findViewById(R.id.imageButton_plus_foodDetail)).setOnClickListener(new OnClickListener(){
 
 			@Override
@@ -132,7 +142,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 				mOrderFood.setCount(curNum);
 			}
 		});
-		
+		//减少数量的按钮
 		((ImageButton) findViewById(R.id.imageButton_minus_foodDetail)).setOnClickListener(new OnClickListener(){
 
 			@Override
@@ -145,7 +155,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 				}
 			}
 		});
-		
+		//打开菜品选择对话框
 		((Button) findViewById(R.id.button_pickTaste_foodDetail)).setOnClickListener(new OnClickListener(){
 
 			@Override
@@ -161,7 +171,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 				showDialog(PickTasteFragment.FOCUS_NOTE, 0);
 			}
 		});
-		
+		//清空品注
 		((Button) findViewById(R.id.button_removeAllTaste)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
@@ -175,14 +185,14 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 				}
 			}
 		});
-		
+		//设置两个tab
 		TabHost mTabHost = (TabHost) findViewById(R.id.tabhost_foodDetail);
 		mTabHost.setup();
 		
 		mTabHost.addTab(mTabHost.newTabSpec("tab1").setIndicator("基本").setContent(R.id.tab1_foodDetail));
 		mTabHost.addTab(mTabHost.newTabSpec("tab2").setIndicator("其它").setContent(R.id.tab2_foodDetail));
 		
-		
+		//设置底部推荐菜的数据和显示
 		mRecommendfoods = new ArrayList<Food>();
 		for(Food f:WirelessOrder.foods)
 		{
@@ -201,14 +211,17 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 	}
 	
 	protected void showDialog(String tab, int position) {
+		//设置推荐菜对话框或口味选择对话框
 		if(tab == RECOMMEND_DIALOG)
 		{
+			//推荐菜对话框的view
 			View dialogLayout = getLayoutInflater().inflate(R.layout.recommend_dialog, (ViewGroup) findViewById(R.id.recommend_dialog_layout));
 			final Dialog dialog = new Dialog(FoodDetailActivity.this);
 			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 			dialog.setContentView(dialogLayout);
 			dialog.show();
 			
+			//设置对话框长宽
 			Window dialogWindow = dialog.getWindow();
 			WindowManager.LayoutParams lp = dialogWindow.getAttributes();
 			lp.width = 900;
@@ -222,6 +235,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 			gallery.setOnItemClickListener(new OnItemClickListener(){
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
+					//当点击推荐菜时更新当前菜品
 					float count = mOrderFood.getCount();
 					mOrderFood = new OrderFood(mRecommendfoods.get(position));
 					mOrderFood.setCount(count);

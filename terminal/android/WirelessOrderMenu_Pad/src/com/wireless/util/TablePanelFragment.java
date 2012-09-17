@@ -121,6 +121,9 @@ public class TablePanelFragment extends Fragment {
 			}
 		});
 		
+		/*
+		 * 人数增加的按钮
+		 */
 		final TextView cstmNumTextView = (TextView) view.findViewById(R.id.textView_customNum);
 		((ImageButton) view.findViewById(R.id.imageButton_plus_tab1)).setOnClickListener(new OnClickListener(){
 
@@ -131,6 +134,9 @@ public class TablePanelFragment extends Fragment {
 			}
 		});
 		
+		/*
+		 * 人数减少的按钮
+		 */
 		((ImageButton) view.findViewById(R.id.imageButton_minus_tab1)).setOnClickListener(new OnClickListener(){
 
 			@Override
@@ -141,6 +147,9 @@ public class TablePanelFragment extends Fragment {
 			}
 		});
 		
+		/*
+		 * 刷新餐台按钮
+		 */
 		((Button) view.findViewById(R.id.button_tab1_refresh)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
@@ -151,6 +160,10 @@ public class TablePanelFragment extends Fragment {
 		return view;
 	}
 	
+	/*
+	 * 区域选择的handler
+	 * 根据选择的区域显示不同的餐台
+	 */
 	private static class RegionRefreshHandler extends Handler{
 		
 		private WeakReference<TablePanelFragment> mFragment;
@@ -172,7 +185,10 @@ public class TablePanelFragment extends Fragment {
 			for(Table tbl : WirelessOrder.tables){
 				validRegionID.add(tbl.regionID);
 			}
-				
+			
+			/*
+			 * 根据条件筛选出所有要显示的区域
+			 */
 			final List<Region> validRegions = new ArrayList<Region>();
 			validRegions.add(new Region(FILTER_REGION_ALL, REGION_ALL_STR));
 			for(Region region : WirelessOrder.regions){
@@ -202,7 +218,10 @@ public class TablePanelFragment extends Fragment {
 			}
 		}
 	}
-	
+	/*
+	 * 餐台显示的handler
+	 * 根据区域显示不同数量的餐台
+	 */
 	private static class DataRefreshHandler extends Handler{
 		private List<Table> mFilterTable = new ArrayList<Table>();
 		private WeakReference<TablePanelFragment> mFragment;

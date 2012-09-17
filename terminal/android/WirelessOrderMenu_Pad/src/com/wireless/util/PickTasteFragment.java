@@ -64,6 +64,7 @@ public class PickTasteFragment extends DialogFragment {
 	}
 	
 	private static class TasteRefreshHandler extends Handler{
+		private int mCurTasteGroup = TASTE_FOOD;
 		private List<Taste> mFilterTaste = new ArrayList<Taste>();
 		private WeakReference<PickTasteFragment> mFragment;
 		private TextView mSelectedFoodPriceTextView ;
@@ -77,29 +78,40 @@ public class PickTasteFragment extends DialogFragment {
 		public void handleMessage(Message msg)
 		{
 			final PickTasteFragment fragment = mFragment.get();
+			//初始化
 			if(mPickedTasteLinear == null)
 				mPickedTasteLinear = (LinearLayout) fragment.getView().findViewById(R.id.pickedTaste_linearLayout);
-			
 			if(mSelectedFoodPriceTextView == null)
 				mSelectedFoodPriceTextView = (TextView) fragment.getView().findViewById(R.id.textView_selected_tastePrice);
 			
 			switch(msg.what)
 			{
 			case TASTE_FOOD :
+				mCurTasteGroup = TASTE_FOOD;
 				fragment.mTastes = Arrays.asList(fragment.mOrderFood.popTastes);
+				refreshDisplay();
 				break;
 				
 			case TASTE_ALL :
+				mCurTasteGroup = TASTE_ALL;
 				fragment.mTastes = Arrays.asList(WirelessOrder.foodMenu.tastes);
+				refreshDisplay();
 				break;
 				
 			case TASTE_SELECTED :
 				refreshPickedTaste();
-				return;
+				break;
 			case TASTE_REMOVED:
 				refreshPickedTaste();
+				refreshDisplay();
+				break;
 			}
-			
+		}
+		
+		private void refreshDisplay(){
+			final PickTasteFragment fragment = mFragment.get();
+
+			//重新加载要显示的taste数据
 			mFilterTaste.clear();
 			mFilterTaste.addAll(fragment.mTastes);
 			Iterator<Taste> iter = mFilterTaste.iterator();
@@ -116,8 +128,6 @@ public class PickTasteFragment extends DialogFragment {
 		}
 		
 		private void refreshPickedTaste(){
-			//FIXME 无口味对象不显示
-			// getPriceWithTaste() 不起作用？
 			final PickTasteFragment fragment = mFragment.get();
 			mPickedTasteLinear.removeAllViews();
 			if(fragment.mOrderFood.hasNormalTaste()){
@@ -144,6 +154,10 @@ public class PickTasteFragment extends DialogFragment {
 			}
 			mSelectedFoodPriceTextView.setText("" + fragment.mOrderFood.getPriceWithTaste());
 		}
+
+		int getCurTasteGroup() {
+			return mCurTasteGroup;
+		}
 	}
 	
 	@Override 
@@ -152,7 +166,6 @@ public class PickTasteFragment extends DialogFragment {
 		super.onCreate(savedInstanceState);
 		setStyle(PickTasteFragment.STYLE_NO_TITLE, android.R.style.Theme_Holo_Light_Dialog);
 		
-		//FoodParcel foodParcel = getActivity().getIntent().getParcelableExtra(FoodParcel.KEY_VALUE);
 		FoodParcel foodParcel = getArguments().getParcelable(FoodParcel.KEY_VALUE);
 		mOrderFood = foodParcel;
 		mTasteHandler = new TasteRefreshHandler(this);
@@ -167,10 +180,8 @@ public class PickTasteFragment extends DialogFragment {
 		View view = inflater.inflate(R.layout.pick_taste_dialog, container, false);
 		
 		mScrollLayout  = (ScrollLayout) view.findViewById(R.id.scrollLayout_pickTaste);
-
-		RadioGroup group = (RadioGroup) view.findViewById(R.id.radioGroup_taste_pickTaste);
-		group.setOnCheckedChangeListener(new OnCheckedChangeListener(){
-
+		//点击不同的radiogroup按钮时显示不同的口味
+		((RadioGroup) view.findViewById(R.id.radioGroup_taste_pickTaste)).setOnCheckedChangeListener(new OnCheckedChangeListener(){
 			@Override
 			public void onCheckedChanged(RadioGroup group,int checkedId) {
 				switch(checkedId)
@@ -185,15 +196,14 @@ public class PickTasteFragment extends DialogFragment {
 			}
 		});
 		
+		//设置品注的显示
 		final EditText pinzhuEditText = (EditText) view.findViewById(R.id.editText_note_pickTaste);
 		if(mOrderFood.hasTmpTaste())
 			pinzhuEditText.setText(mOrderFood.tmpTaste.getPreference());
 		if(getTag() == FOCUS_NOTE)
 			pinzhuEditText.requestFocus();
-
-		final EditText tasteEditText = (EditText)view.findViewById(R.id.editText_pickTaste);
-		
-		tasteEditText.addTextChangedListener(new TextWatcher(){
+		//搜索框
+		((EditText)view.findViewById(R.id.editText_pickTaste)).addTextChangedListener(new TextWatcher(){
 			@Override 
 			public void afterTextChanged(Editable s) {}
 			
@@ -203,13 +213,12 @@ public class PickTasteFragment extends DialogFragment {
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				mFilterCond = s.length() == 0 ? "" : s.toString().trim();
-				mTasteHandler.sendEmptyMessage(0);
+				mTasteHandler.sendEmptyMessage(mTasteHandler.getCurTasteGroup());
 			}
 		});
-		
-		Button confirmBtn = (Button) view.findViewById(R.id.button_confirm_pickTaste_dialog);
-		confirmBtn.setOnClickListener(new OnClickListener(){
-
+		//返回按钮，保存口味并隐藏对话框
+		((Button) view.findViewById(R.id.button_confirm_pickTaste_dialog)).setOnClickListener(new OnClickListener(){
+			
 			@Override
 			public void onClick(View v) {
 				if(!mOrderFood.hasTmpTaste())
@@ -309,12 +318,11 @@ public class PickTasteFragment extends DialogFragment {
 			final Taste taste = mTastes.get(position);
 			view.setTag(taste);
 			
-			TextView tasteName = (TextView) view.findViewById(R.id.textView_tasteName_gridItem);
-			tasteName.setText(taste.getPreference());
+			//口味名和价格的显示
+			((TextView) view.findViewById(R.id.textView_tasteName_gridItem)).setText(taste.getPreference());
+			((TextView) view.findViewById(R.id.textView_tastePrice_gridItem)).setText("" + taste.getPrice());
 			
-			TextView tastePrice = (TextView) view.findViewById(R.id.textView_tastePrice_gridItem);
-			tastePrice.setText("" + taste.getPrice());
-			
+			//根据是否是被选的菜来显示不同的外观
 			final CheckBox selectChkBox = (CheckBox) view.findViewById(R.id.checkBox_pickTaste_item);
 			final RelativeLayout background = (RelativeLayout)view.findViewById(R.id.realativeLayout_pickTaste_item);
 			selectChkBox.setChecked(false);

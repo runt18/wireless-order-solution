@@ -4,7 +4,7 @@
     android:layout_height="match_parent" >
 
     <fragment
-        android:id="@+id/bottombar"
+        android:id="@+id/bottombar_pickedFood"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -13,7 +13,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/bottombar"
+        android:layout_above="@+id/bottombar_pickedFood"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_toLeftOf="@+id/relativeLayout_right_pickedFood"
@@ -151,7 +151,7 @@
         android:id="@+id/relativeLayout_right_pickedFood"
         android:layout_width="400dp"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/bottombar"
+        android:layout_above="@+id/bottombar_pickedFood"
         android:layout_alignParentLeft="false"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
