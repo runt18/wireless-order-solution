@@ -216,7 +216,7 @@ public final class ShoppingCart {
 		@Override
 		protected void onPreExecute(){
 			if(mCommitListener != null){
-				mCommitListener.OnPreCommit();
+				mCommitListener.OnPreCommit(mReqOrder);
 			}
 		}
 		
@@ -225,16 +225,16 @@ public final class ShoppingCart {
 		protected void onPostExecute(BusinessException e){
 			mExtraFoods.clear();
 			if(e != null && mCommitListener != null){	
-				mCommitListener.onPostCommit(e);
+				mCommitListener.onPostCommit(mReqOrder, e);
 			}
 		}		
 
 	}
 	
 	public static interface OnCommitListener{
-		public void OnPreCommit();
+		public void OnPreCommit(Order reqOrder);
 		//public void onCommit(){};
-		public void onPostCommit(BusinessException e);
+		public void onPostCommit(Order reqOrder, BusinessException e);
 	}
 	
 }
