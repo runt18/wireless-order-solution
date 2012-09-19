@@ -308,9 +308,12 @@ var choosenTasteWin = new Ext.Window({
 dishCountInputWin = new Ext.Window({
 	layout : 'fit',
 	width : 200,
-	height : 100,
+	height : 90,
 	closeAction : 'hide',
+	closable : false,
 	resizable : false,
+	modal : true,
+	buttonAlign : 'center',
 	items : [ {
 		layout : 'form',
 		labelWidth : 30,
@@ -320,7 +323,7 @@ dishCountInputWin = new Ext.Window({
 			xtype : 'numberfield',
 			fieldLabel : '数量',
 			id : 'dishCountInput',
-			width : 110
+			width : 130
 		} ]
 	} ],
 	buttons : [{
@@ -331,15 +334,13 @@ dishCountInputWin = new Ext.Window({
 				dishCountInputWin.hide();
 				var ds = orderedGrid.getStore().getAt(dishOrderCurrRowIndex_).data;
 				for(var i = 0; i < orderedData.root.length; i++){						
-//					if(ds.foodID == orderedData.root[i].foodID){							
-//						orderedData.root[i].count = inputCount.getValue();
-//						break;
-//					}
-					if(eval(ds.tasteID == orderedData.root[i].tasteID)
-							&& eval(ds.tasteIDTwo == orderedData.root[i].tasteIDTwo)
-							&& eval(ds.tasteIDThree == orderedData.root[i].tasteIDThree)){
-						orderedData.root[i].count = inputCount.getValue();
-						break;
+					if(ds.foodID == orderedData.root[i].foodID){							
+						if(eval(ds.tasteID == orderedData.root[i].tasteID)
+								&& eval(ds.tasteIDTwo == orderedData.root[i].tasteIDTwo)
+								&& eval(ds.tasteIDThree == orderedData.root[i].tasteIDThree)){
+							orderedData.root[i].count = inputCount.getValue();
+							break;
+						}
 					}
 				}
 				orderedStore.loadData(orderedData);	
@@ -358,7 +359,8 @@ dishCountInputWin = new Ext.Window({
 	listeners : {
 		show : function(thiz) {
 			var f = Ext.get('dishCountInput');
-			f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
+			f.focus.defer(100, f);
+			thiz.center();
 		}
 	}
 });
@@ -630,8 +632,10 @@ var tasteChooseImgBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '口味',
 	handler : function(btn) {
-		if(orderedGrid.getSelectionModel().getSelections().length != 1)
+		if(orderedGrid.getSelectionModel().getSelections().length != 1){
+			Ext.example.msg('提示', '请选中一条数据再进行操作.');
 			return;
+		}
 		
 		dishOptTasteHandler(dishOrderCurrRowIndex_);
 	}
@@ -643,8 +647,10 @@ var dishDeleteImgBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '删除',
 	handler : function(btn) {
-		if(orderedGrid.getSelectionModel().getSelections().length != 1)
+		if(orderedGrid.getSelectionModel().getSelections().length != 1){
+			Ext.example.msg('提示', '请选中一条数据再进行操作.');
 			return;
+		}
 		
 		dishOptDeleteHandler(dishOrderCurrRowIndex_);
 	}
@@ -655,8 +661,13 @@ var dishPressImgBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '催菜',
 	handler : function(btn) {
-		if(orderedGrid.getSelectionModel().getSelections().length != 1)
+		Ext.example.msg('提示', '<font color="red">感谢您的使用!此功能正在开发中,请关注系统升级.</font>');
+		return;
+		
+		if(orderedGrid.getSelectionModel().getSelections().length != 1){
+			Ext.example.msg('提示', '请选中一条数据再进行操作.');
 			return;
+		}
 		
 		dishOptPressHandler(dishOrderCurrRowIndex_);
 	}
@@ -667,8 +678,10 @@ var countAddImgBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '数量加1',
 	handler : function(btn) {
-		if(orderedGrid.getSelectionModel().getSelections().length != 1)
+		if(orderedGrid.getSelectionModel().getSelections().length != 1){
+			Ext.example.msg('提示', '请选中一条数据再进行操作.');
 			return;
+		}
 		
 		if (dishOrderCurrRowIndex_ != -1) {
 			var ds = orderedGrid.getStore().getAt(dishOrderCurrRowIndex_).data;		
@@ -698,8 +711,10 @@ var countMinusImgBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '数量减1',
 	handler : function(btn) {
-		if(orderedGrid.getSelectionModel().getSelections().length != 1)
+		if(orderedGrid.getSelectionModel().getSelections().length != 1){
+			Ext.example.msg('提示', '请选中一条数据再进行操作.');
 			return;
+		}
 		
 		if (dishOrderCurrRowIndex_ != -1) {
 			var ds = orderedGrid.getStore().getAt(dishOrderCurrRowIndex_).data;		
@@ -733,8 +748,10 @@ var countEqualImgBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '数量等于',
 	handler : function(btn) {
-		if(orderedGrid.getSelectionModel().getSelections().length != 1)
+		if(orderedGrid.getSelectionModel().getSelections().length != 1){
+			Ext.example.msg('提示', '请选中一条数据再进行操作.');
 			return;
+		}
 		
 		if (dishOrderCurrRowIndex_ != -1) {
 			var ds = orderedGrid.getStore().getAt(dishOrderCurrRowIndex_).data;	
@@ -866,6 +883,11 @@ var orderedGrid = new Ext.grid.GridPanel({
 	    btnSubmitOrder, 
 	    btnSubmitAndCheckoutOrder,
 	    {
+	    	text : '刷新',
+	    	handler : function(){
+	    		refreshOrderHandler();
+	    	}
+	    }, {
 			text : '返回',
 			handler : function() {
 				var Request = new URLParaQuery();
@@ -898,16 +920,6 @@ var orderedGrid = new Ext.grid.GridPanel({
 		}
 	}
 });
-
-
-
-
-//--------------------------------------------------------------------------------------
-
-
-
-
-
 
 var dishesOrderNorthPanel = new Ext.Panel({
 	id : 'dishesOrderNorthPanel',
@@ -1156,12 +1168,12 @@ allFoodTabPanelGrid.on('rowdblclick', function(thiz, ri, e){
 				waiter : Ext.getDom('optName').innerHTML,
 				foodID : r.get('foodID'),
 				kitchenId : r.get('kitchen.kitchenID'),
-				tasteID : 0,
 				special : r.get('special'),
 				recommend : r.get('recommend'),
 				soldout : r.get('stop'),
 				gift : r.get('gift'),
 				tastePrice : 0,
+				tasteID : 0,
 				tasteIDTwo : 0,
 				tasteIDThree : 0,
 				status : 2,
@@ -1265,20 +1277,21 @@ var tempFoodTabPanel = new Ext.Panel({
 	    		}
 	    		
 	    		orderedData.root.push({
-					foodName : (name.getValue() + '<img src="../../images/tempDish.png" />'),
+					foodName : name.getValue().replace(/,/g,';').replace(/，/g,';'),
 					tastePref : '无口味',
 					count : count.getValue(),
 					unitPrice : price.getValue(),
 					acturalPrice : price.getValue(),
 					orderDateFormat : (new Date().format('Y-m-d H:i:s')),
 					waiter : Ext.getDom('optName').innerHTML,
-					foodID : -1,
+					foodID : (new Date().format('His')),
 					kitchenID : 0,
 					special : false,
 					recommend : false,
 					soldout : false,
 					gift : false,
 					tastePrice : 0,
+					tasteID : 0,
 					tasteIDTwo : 0,
 					tasteIDThree : 0,
 					status : 2,
@@ -1390,6 +1403,68 @@ Ext.onReady(function() {
 });
 
 /**
+ * 刷新账单信息 
+ */
+refreshOrderHandler = function(){
+	var girdData = orderedData.root;
+	var selData = new Array();
+	
+	var refresh = new Ext.LoadMask(document.body, {
+	    msg  : '正在更新已点菜列表,请稍等......',
+	    disabled : false,
+	    removeMask : true
+	});
+
+	for(var i = (girdData.length - 1); i >= 0; i--){
+		if(girdData[i].status == 2){
+			selData.push(girdData[i]);
+		}
+	}
+	
+	refresh.show();
+	
+	Ext.Ajax.request({
+		url : '../../QueryOrder.do',
+		params : {
+			'pin' : Request['pin'],
+			'tableID' : Request['tableNbr']
+		},
+		success : function(response, options) {
+			var rj = Ext.util.JSON.decode(response.responseText);
+			if (rj.success == true) {
+				
+				orderedData = rj;
+				
+				// 更新菜品状态为已点菜
+				for(var i = 0; i < orderedData.root.length; i++){
+					orderedData.root[i].status = 1;
+				}
+				
+				for(var i = (selData.length - 1); i >= 0 ; i--){
+					orderedData.root.push(selData[i]);
+				}
+				
+				orderedStore.loadData(orderedData);
+				
+				dishGridRefresh();
+				
+				Ext.example.msg('提示', '已更新已点菜列表,请继续操作.');
+				
+			} else {
+				Ext.ux.showMsg(rj);
+			}
+			refresh.hide();
+		},
+		failure : function(response, options) {
+			var rj = Ext.util.JSON.decode(response.responseText);
+			Ext.ux.showMsg(rj);
+			refresh.hide();
+		}
+	});
+};
+
+
+/**
  * 根据返回做错误码作相关操作
  */
 refreshOrder = function(res){
@@ -1399,63 +1474,7 @@ refreshOrder = function(res){
 	if(eval(res.code == 14)){
 		Ext.MessageBox.confirm('警告', '账单信息已更新,是否刷新已点菜并继续操作?否则返回.', function(btn){
 			if(btn == 'yes'){
-				
-				var girdData = orderedData.root;
-				var selData = new Array();
-				
-				var refresh = new Ext.LoadMask(document.body, {
-				    msg  : '正在更新已点菜列表,请稍等......',
-				    disabled : false,
-				    removeMask : true
-				});
-
-				for(var i = (girdData.length - 1); i >= 0; i--){
-					if(girdData[i].status == 2){
-						selData.push(girdData[i]);
-					}
-				}
-				
-				refresh.show();
-				
-				Ext.Ajax.request({
-					url : '../../QueryOrder.do',
-					params : {
-						'pin' : Request['pin'],
-						'tableID' : Request['tableNbr']
-					},
-					success : function(response, options) {
-						var rj = Ext.util.JSON.decode(response.responseText);
-						if (rj.success == true) {
-							
-							orderedData = rj;
-							
-							// 更新菜品状态为已点菜
-							for(var i = 0; i < orderedData.root.length; i++){
-								orderedData.root[i].status = 1;
-							}
-							
-							for(var i = (selData.length - 1); i >= 0 ; i--){
-								orderedData.root.push(selData[i]);
-							}
-							
-							orderedStore.loadData(orderedData);
-							
-							dishGridRefresh();
-							
-							Ext.example.msg('提示', '已更新已点菜列表,请继续操作.');
-							
-						} else {
-							Ext.ux.showMsg(rj);
-						}
-						refresh.hide();
-					},
-					failure : function(response, options) {
-						var rj = Ext.util.JSON.decode(response.responseText);
-						Ext.ux.showMsg(rj);
-						refresh.hide();
-					}
-				});
-				
+				refreshOrderHandler();
 			}else{
 				location.href = href;
 			}
@@ -1543,6 +1562,7 @@ submitOrderHandler = function(c){
 		orderedGrid.buttons[0].setDisabled(true);
 		orderedGrid.buttons[1].setDisabled(true);
 		orderedGrid.buttons[2].setDisabled(true);
+		orderedGrid.buttons[3].setDisabled(true);
 		
 		Ext.Ajax.request({
 			url : '../../InsertOrder.do',
@@ -1558,9 +1578,7 @@ submitOrderHandler = function(c){
 				'orderDate' : typeof(orderedData.other) == 'undefined' || typeof(orderedData.other.order) == 'undefined' ? '' : orderedData.other.order.orderDate
 			},
 			success : function(response, options) {
-				
 				var rj = Ext.util.JSON.decode(response.responseText);
-				
 				if (rj.success == true) {
 					Ext.MessageBox.show({
 						msg : rj.msg,
@@ -1578,17 +1596,15 @@ submitOrderHandler = function(c){
 					orderedGrid.buttons[0].setDisabled(false);
 					orderedGrid.buttons[1].setDisabled(false);
 					orderedGrid.buttons[2].setDisabled(false);
+					orderedGrid.buttons[3].setDisabled(false);
 				}
 			},
 			failure : function(response, options) {
 				orderedGrid.buttons[0].setDisabled(false);
 				orderedGrid.buttons[1].setDisabled(false);
 				orderedGrid.buttons[2].setDisabled(false);
-				Ext.MessageBox.show({
-					msg : 'Unknow page error',
-					width : 300,
-					buttons : Ext.MessageBox.OK
-				});
+				orderedGrid.buttons[3].setDisabled(false);
+				Ext.ux.showMsg(Ext.util.JSON.decode(response.responseText));
 			}
 		});
 	}else if(orderedData.root.length == 0){
