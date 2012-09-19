@@ -50,3 +50,12 @@ a:hover {
 	text-decoration: underline;
 	color: green;
 }
+
+.x-grid3-row td, .x-grid3-summary-row td{ 
+	line-height : 19px;
+	vertical-align : middle;
+}
+	
+.x-grid3-row img, .x-grid3-summary-row img{ 
+	vertical-align : middle;
+}	
