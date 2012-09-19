@@ -49,9 +49,10 @@ public class StaffPanelFragment extends Fragment {
 		 */
 		final ListView staffLstView = (ListView) view.findViewById(R.id.listView_server_tab2);
 		List<String> staffNames = new ArrayList<String>();
-		for(StaffTerminal s : WirelessOrder.staffs){
-			staffNames.add(s.name);
-		}
+		if(WirelessOrder.staffs != null)
+			for(StaffTerminal s : WirelessOrder.staffs){
+				staffNames.add(s.name);
+			}
 		staffLstView.setAdapter(new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_list_item_checked, staffNames));
 		/*
 		 * 从列表框中选择员工信息的操作

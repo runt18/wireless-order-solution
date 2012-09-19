@@ -100,9 +100,9 @@
         android:text="Large Text"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="@color/white" />
-
+
     <ImageButton
-        android:id="@+id/imageButton1"
+        android:id="@+id/imageButton_addDish_foodDetail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/imageView_foodDetail"

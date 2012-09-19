@@ -8,16 +8,19 @@ import java.util.HashMap;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
 import com.wireless.fragment.ExpandableListFragment;
-import com.wireless.fragment.GalleryFragment;
 import com.wireless.fragment.ExpandableListFragment.OnItemChangeListener;
+import com.wireless.fragment.GalleryFragment;
 import com.wireless.fragment.GalleryFragment.OnItemClickListener;
 import com.wireless.fragment.GalleryFragment.OnPicChangedListener;
 import com.wireless.ordermenu.R;
@@ -63,13 +66,12 @@ public class MainActivity extends Activity
 				startActivityForResult(intent, MAIN_ACTIVITY_RES_CODE);
 			}
 		});
-		
-		ImageView addDishImgView = (ImageView)findViewById(R.id.add_dish_imgView);
-		addDishImgView.setOnClickListener(new OnClickListener(){
-
+		//点菜按钮
+		((ImageView)findViewById(R.id.add_dish_imgView)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				System.out.println("add dish btn clicked");
+				ShoppingCart.instance().addFood(mOrderFood);
+				Toast.makeText(getApplicationContext(), mOrderFood.name + "已添加", Toast.LENGTH_SHORT).show();
 			}
 		});
 		

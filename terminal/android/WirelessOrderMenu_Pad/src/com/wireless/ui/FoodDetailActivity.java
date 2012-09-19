@@ -24,7 +24,9 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TabHost;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
 import com.wireless.fragment.PickTasteFragment;
 import com.wireless.fragment.PickTasteFragment.OnTasteChangeListener;
@@ -127,6 +129,15 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 				bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(mOrderFood));
 				intent.putExtras(bundle);
 				startActivity(intent);
+			}
+		});
+		
+		//点菜按钮
+		((ImageView)findViewById(R.id.imageButton_addDish_foodDetail)).setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				ShoppingCart.instance().addFood(mOrderFood);
+				Toast.makeText(getApplicationContext(), mOrderFood.name + "已添加", Toast.LENGTH_SHORT).show();
 			}
 		});
 		

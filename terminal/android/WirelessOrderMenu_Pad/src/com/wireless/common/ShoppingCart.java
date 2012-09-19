@@ -1,5 +1,7 @@
 package com.wireless.common;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -22,13 +24,23 @@ public final class ShoppingCart {
 	private static ShoppingCart mInstance = new ShoppingCart();
 	
 	private ShoppingCart(){
-		
 	}
 	
 	public static ShoppingCart instance(){
 		return mInstance;
 	}
 
+	public interface OnFoodsChangeListener{
+		void onFoodsChange(List<OrderFood> newFoods);
+	}
+	private OnFoodsChangeListener mOnFoodsChangeListener;
+	
+	public void setOnFoodsChangeListener(OnFoodsChangeListener l)
+	{
+		mOnFoodsChangeListener = l;
+	}
+	
+	
 	/**
 	 * Commit the order.
 	 * Perform to insert a new order if original order NOT exist.
@@ -143,7 +155,7 @@ public final class ShoppingCart {
 		}else{
 			mExtraFoods.add(extraFood);
 		}
-
+		notifyFoodsChange();
 	}
 
 	/**
@@ -200,6 +212,22 @@ public final class ShoppingCart {
 		this.mOriOrder = mOriOrder;
 	}
 
+	public boolean hasExtraFoods(){
+		return !mExtraFoods.isEmpty();
+	}
+	
+	private void notifyFoodsChange(){
+		if(mOnFoodsChangeListener != null)
+		{
+			ArrayList<OrderFood> newFoods = new ArrayList<OrderFood>();
+			if(mOriOrder != null)
+				for(OrderFood f:mOriOrder.foods)
+					newFoods.add(f);
+			for(OrderFood f:getExtraFoods())
+				newFoods.add(f);
+			mOnFoodsChangeListener.onFoodsChange(newFoods);
+		}
+	}
 
 	/**
 	 * 执行账单的提交请求
@@ -224,7 +252,7 @@ public final class ShoppingCart {
 		@Override
 		protected void onPostExecute(BusinessException e){
 			mExtraFoods.clear();
-			if(e != null && mCommitListener != null){	
+			if(mCommitListener != null){	
 				mCommitListener.onPostCommit(mReqOrder, e);
 			}
 		}		

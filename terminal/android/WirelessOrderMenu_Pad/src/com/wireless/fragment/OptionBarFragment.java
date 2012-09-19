@@ -2,6 +2,7 @@ package com.wireless.fragment;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -29,11 +30,13 @@ import android.widget.Toast;
 
 import com.wireless.common.Params;
 import com.wireless.common.ShoppingCart;
+import com.wireless.common.ShoppingCart.OnFoodsChangeListener;
 import com.wireless.common.WirelessOrder;
 import com.wireless.fragment.StaffPanelFragment.OnStaffChangedListener;
 import com.wireless.fragment.TablePanelFragment.OnTableChangedListener;
 import com.wireless.ordermenu.R;
 import com.wireless.protocol.Order;
+import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.PinGen;
 import com.wireless.protocol.ReqPackage;
 import com.wireless.protocol.StaffTerminal;
@@ -41,7 +44,7 @@ import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 import com.wireless.ui.PickedFoodActivity;
 
-public class OptionBarFragment extends Fragment implements OnTableChangedListener, OnStaffChangedListener{
+public class OptionBarFragment extends Fragment implements OnTableChangedListener, OnStaffChangedListener, OnFoodsChangeListener{
 //	public static final String CUR_TABLE = "current_table";
 	//private static Table mTable;
 	//private static int mCustomCount;
@@ -113,6 +116,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 		super.onActivityCreated(savedInstanceState);
 		mBBarRefleshHandler = new BBarHandler(this);
 		init(this.getActivity());
+		ShoppingCart.instance().setOnFoodsChangeListener(this);
 	}
 
 	@Override
@@ -159,7 +163,8 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 		pickedFoodImgView.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				if(ShoppingCart.instance().getDestTable() != null)
+				if(ShoppingCart.instance().getDestTable() != null && !(activity instanceof PickedFoodActivity) && 
+						(ShoppingCart.instance().getOriOrder() != null || !ShoppingCart.instance().getExtraFoods().isEmpty()))
 				{
 					Intent intent = new Intent(activity,PickedFoodActivity.class);
 					activity.startActivity(intent);
@@ -353,5 +358,11 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 		}
 		
 		abstract void onOrderChanged(Order order);
+	}
+
+
+	@Override
+	public void onFoodsChange(List<OrderFood> newFoods) {
+		mBBarRefleshHandler.sendEmptyMessage(0);
 	}
 }
