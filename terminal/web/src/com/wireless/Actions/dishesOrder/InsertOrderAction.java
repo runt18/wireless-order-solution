@@ -150,10 +150,10 @@ public class InsertOrderAction extends Action implements PinGen {
 				jobject.initTip(false, (orderToInsert.destTbl.aliasID + "号餐台" + orderType + "不成功，请重新确认."));
 			}
 		}catch(IOException e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "服务器请求不成功，请重新检查网络是否连通.");
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9997, "服务器请求不成功，请重新检查网络是否连通.");
 			e.printStackTrace();
 		}catch(NumberFormatException e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "菜品提交的数量不正确，请检查后重新提交.");
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9998, "菜品提交的数量不正确，请检查后重新提交.");
 			e.printStackTrace();
 		}finally{
 			JSONObject json = JSONObject.fromObject(jobject);
