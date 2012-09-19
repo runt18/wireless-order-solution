@@ -1,7 +1,6 @@
 package com.wireless.common;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -40,6 +39,15 @@ public final class ShoppingCart {
 		mOnFoodsChangeListener = l;
 	}
 	
+	public interface OnTableChangeListener{
+		void onTableChange(Table table);
+	}
+	private OnTableChangeListener mOnTableChangeListener;
+	
+	public void setOnTableChangeListener(OnTableChangeListener l)
+	{
+		mOnTableChangeListener = l;
+	}
 	
 	/**
 	 * Commit the order.
@@ -179,6 +187,10 @@ public final class ShoppingCart {
 	public StaffTerminal getStaff() {
 		return mStaff;
 	}
+	
+	public boolean hasStaff(){
+		return mStaff == null ? false : true;
+	}
 
 	/**
 	 * @param mStaff
@@ -201,6 +213,8 @@ public final class ShoppingCart {
 	 */
 	public void setDestTable(Table table) {
 		this.mDestTable = table;
+		if(mOnTableChangeListener != null)
+			mOnTableChangeListener.onTableChange(table);
 	}
 
 	
@@ -216,17 +230,39 @@ public final class ShoppingCart {
 		return !mExtraFoods.isEmpty();
 	}
 	
+	public boolean hasFoods(){
+		return (!mExtraFoods.isEmpty() || mOriOrder != null) ? true : false;
+	}
+	
+	public boolean hasTable(){
+		return mDestTable == null ? false : true;
+	}
+	
+	public boolean hasOrder(){
+		return mOriOrder !=  null ? true : false;
+	}
+	
 	private void notifyFoodsChange(){
 		if(mOnFoodsChangeListener != null)
 		{
-			ArrayList<OrderFood> newFoods = new ArrayList<OrderFood>();
-			if(mOriOrder != null)
-				for(OrderFood f:mOriOrder.foods)
-					newFoods.add(f);
+			mOnFoodsChangeListener.onFoodsChange(getAllFoods());
+		}
+	}
+	
+	public ArrayList<OrderFood> getAllFoods(){
+		ArrayList<OrderFood> newFoods = new ArrayList<OrderFood>();
+		if(mOriOrder != null)
+		{
+			for(OrderFood f:mOriOrder.foods)
+				newFoods.add(f);
+		}
+		if(hasExtraFoods())
+		{
 			for(OrderFood f:getExtraFoods())
 				newFoods.add(f);
-			mOnFoodsChangeListener.onFoodsChange(newFoods);
 		}
+		
+		return newFoods;
 	}
 
 	/**

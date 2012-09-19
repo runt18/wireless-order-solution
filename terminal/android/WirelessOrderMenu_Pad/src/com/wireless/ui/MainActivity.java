@@ -8,7 +8,6 @@ import java.util.HashMap;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
@@ -70,6 +69,7 @@ public class MainActivity extends Activity
 		((ImageView)findViewById(R.id.add_dish_imgView)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
+				mOrderFood.setCount(Float.parseFloat(((TextView) findViewById(R.id.textView_count_main)).getText().toString()));
 				ShoppingCart.instance().addFood(mOrderFood);
 				Toast.makeText(getApplicationContext(), mOrderFood.name + "已添加", Toast.LENGTH_SHORT).show();
 			}
@@ -82,7 +82,6 @@ public class MainActivity extends Activity
 			public void onClick(View v) {
 				float curNum = Float.parseFloat(countTextView.getText().toString());
 				countTextView.setText("" + ++curNum);
-				mOrderFood.setCount(curNum);
 			}
 		});
 		
@@ -94,7 +93,6 @@ public class MainActivity extends Activity
 				if(--curNum >= 0)
 				{
 					countTextView.setText("" + curNum);
-					mOrderFood.setCount(curNum);
 				}
 			}
 		});
@@ -181,7 +179,7 @@ public class MainActivity extends Activity
 		mItemFragment.setPosition(food.kitchen);
 		((TextView) findViewById(R.id.textView_foodName_main)).setText(food.name);
 		((TextView) findViewById(R.id.textView_foodPrice_main)).setText("" + food.getPrice());
-		((TextView) findViewById(R.id.textView_count_main)).setText("1");
+		((TextView) findViewById(R.id.textView_count_main)).setText("1.0");
 		mOrderFood = new OrderFood(food);
 		mOrderFood.setCount(Float.parseFloat(((TextView) findViewById(R.id.textView_count_main)).getText().toString()));
 	}

@@ -39,22 +39,23 @@
             android:ems="10"
             android:inputType="numberDecimal" >
         </EditText>
-
+
         <ImageButton
-            android:id="@+id/imageButton1"
+            android:id="@+id/imageButton_plus_deleteCount_dialog"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_toRightOf="@+id/editText_count_deleteCount"
             android:src="@drawable/plus_btn_selector" />
-
+
         <ImageButton
-            android:id="@+id/imageButton2"
+            android:id="@+id/imageButton_minus_deleteCount_dialog"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/imageButton1"
+            android:layout_toRightOf="@+id/imageButton_plus_deleteCount_dialog"
             android:src="@drawable/minus_btn_selector" />
+
     </RelativeLayout>
 
     <RelativeLayout

@@ -102,7 +102,7 @@ public class GalleryFragment extends Fragment {
 		
 		super.onActivityCreated(savedInstanceState);
 		
-        mGallery = (Gallery)this.getActivity().findViewById(R.id.noneInertanceGallery1);
+        mGallery = (Gallery) this.getView().findViewById(R.id.noneInertanceGallery1);
         mGalleryAdapter = new BaseAdapter(){
         	
         	private ImageLoader mImgLoader = new ImageLoader(getActivity());

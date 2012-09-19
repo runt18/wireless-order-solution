@@ -88,9 +88,8 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 			}
 			
 			//BBar显示已点菜的数量
-			Order oriOrder = ShoppingCart.instance().getOriOrder();
-			if(oriOrder != null){
-				mSelectedFoodTextView.setText("" + oriOrder.foods.length);
+			if(ShoppingCart.instance().hasFoods()){
+				mSelectedFoodTextView.setText("" + ShoppingCart.instance().getAllFoods().size());
 			}else{
 				mSelectedFoodTextView.setText("" + 0);
 			}
@@ -158,12 +157,12 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 				mDialog.show();
 			}
 		});
-		
+		//已点菜button
 		ImageView pickedFoodImgView = (ImageView) activity.findViewById(R.id.imageView_selectedFood);
 		pickedFoodImgView.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				if(ShoppingCart.instance().getDestTable() != null && !(activity instanceof PickedFoodActivity) && 
+				if(!(activity instanceof PickedFoodActivity) && 
 						(ShoppingCart.instance().getOriOrder() != null || !ShoppingCart.instance().getExtraFoods().isEmpty()))
 				{
 					Intent intent = new Intent(activity,PickedFoodActivity.class);
