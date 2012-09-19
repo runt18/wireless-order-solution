@@ -9,10 +9,8 @@ public class FoodBasic {
 	private int foodAliasID;		 // 菜品自定义编号
 	private String foodName;	     // 菜品编号
 	private String pinyin;			 // 菜品拼音
-	private float unitPrice;	     // 菜品单价
-	private int kitchenID;		 	 // 菜品所属厨房数据库编号
-	private int kitchenAliasID;		 // 菜品所属厨房已定义编号
-	private String kitchenName;		 // 菜品所属厨房名称
+	private double unitPrice;	     // 菜品单价
+	private Kitchen kitchen = new Kitchen();	// 菜品所属厨房信息
 	private byte status;			 // 菜品状态    0x01:特价 0x02推荐  0x04:售完  0x08:赠送  0x10:时价 0x20:套菜
 	private String desc;			 // 菜品简介
 	private String img;				 // 图片名称
@@ -58,36 +56,20 @@ public class FoodBasic {
 		this.pinyin = pinyin;
 	}
 	
-	public float getUnitPrice() {
+	public double getUnitPrice() {
 		return unitPrice;
 	}
 
-	public void setUnitPrice(float unitPrice) {
+	public void setUnitPrice(double unitPrice) {
 		this.unitPrice = unitPrice;
 	}
 
-	public int getKitchenID() {
-		return kitchenID;
+	public Kitchen getKitchen() {
+		return kitchen;
 	}
 
-	public void setKitchenID(int kitchenID) {
-		this.kitchenID = kitchenID;
-	}
-
-	public int getKitchenAliasID() {
-		return kitchenAliasID;
-	}
-
-	public void setKitchenAliasID(int kitchenAliasID) {
-		this.kitchenAliasID = kitchenAliasID;
-	}
-
-	public String getKitchenName() {
-		return kitchenName;
-	}
-
-	public void setKitchenName(String kitchenName) {
-		this.kitchenName = kitchenName;
+	public void setKitchen(Kitchen kitchen) {
+		this.kitchen = kitchen;
 	}
 
 	public byte getStatus() {

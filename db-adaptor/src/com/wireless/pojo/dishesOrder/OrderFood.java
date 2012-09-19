@@ -2,7 +2,7 @@ package com.wireless.pojo.dishesOrder;
 
 import java.text.SimpleDateFormat;
 
-import com.wireless.protocol.Kitchen;
+import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.protocol.Taste;
 import com.wireless.util.WebParams;
 
@@ -12,8 +12,8 @@ public class OrderFood {
 	private long foodID;					// 菜品编号
 	private int aliasID;					// 菜品账单编号
 	private short status;					// 菜品状态    0x01:特价 0x02推荐  0x04:售完  0x08:赠送  0x10:时价
-	private Kitchen kitchen;				// 厨房
-	private short kitchenId;				// 厨房编号
+	private Kitchen kitchen = new Kitchen();// 厨房
+	private int kitchenId;				// 厨房编号
 	private Taste[] taste = new Taste[3];	// 口味
 	private String tastePref;				// 口味名称
 	private int tasteID;					// 口味编号
@@ -73,8 +73,8 @@ public class OrderFood {
 	public void setKitchen(Kitchen kitchen) {
 		this.kitchen = kitchen;
 	}
-	public short getKitchenId() {
-		kitchenId = this.kitchen.aliasID;
+	public int getKitchenId() {
+		kitchenId = this.kitchen.getKitchenID();
 		return kitchenId;
 	}
 	public Taste[] getTaste() {
@@ -143,7 +143,7 @@ public class OrderFood {
 		return isSpecial;
 	}
 	
-	public boolean isRecommed() {
+	public boolean isRecommend() {
 		isRecommed = ((status & WebParams.FS_RECOMMEND) != 0);
 		return isRecommed;
 	}

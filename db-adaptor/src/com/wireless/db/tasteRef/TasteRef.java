@@ -198,16 +198,22 @@ public class TasteRef {
 		/**
 		 * The hash map to store the taste reference count to all the foods
 		 */
+		long begTime = System.currentTimeMillis();
 		HashMap<Food, Set<TasteRefCnt>> foodTasteRef = new HashMap<Food, Set<TasteRefCnt>>();
 		for(Food food : foods){
 			HashSet<TasteRefCnt> tasteRefByFood = getFoodTaste(dbCon, food);			
 			foodTasteRef.put(food, tasteRefByFood);		
 		}	
+		long elapsed = System.currentTimeMillis() - begTime;
+		System.err.println("Calculate food tastes takes " + elapsed / 1000 + " sec.");
 		
+		begTime = System.currentTimeMillis();
 		/**
 		 * Write the food taste to db & update the kitchen and department taste
 		 */
-		storeFoodTaste(dbCon, foodTasteRef);	
+		storeFoodTaste(dbCon, foodTasteRef);
+		elapsed = System.currentTimeMillis() - begTime;
+		System.out.println("Insert db takes " + elapsed / 1000 + " sec.");
 	
 	}
 	
@@ -223,6 +229,8 @@ public class TasteRef {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	private static HashSet<TasteRefCnt> getFoodTaste(DBCon dbCon, Food food) throws SQLException{
+		
+		long begTime = System.currentTimeMillis();
 		
 		String sqlTmp = QUERY_TASTE_SQL.replace(FOOD_ID, Long.toString(food.foodID));
 		
@@ -288,6 +296,9 @@ public class TasteRef {
 			tasteRefByFood.add(new TasteRefCnt(entry.getKey(), TasteRefCnt.TASTE_BY_FOOD, entry.getValue()));
 		}
 		
+		long elapsed = System.currentTimeMillis() - begTime;
+		System.out.println(food.foodID + " takes " + elapsed / 1000 + " sec.");
+		
 		return tasteRefByFood;
 	}
 	
@@ -301,11 +312,14 @@ public class TasteRef {
 		
 		String sql;
 		
+		//long begTime = System.currentTimeMillis();
 		/**
 		 * Delete all the food taste before updating.
 		 */
 		sql = " DELETE FROM " + Params.dbName + ".food_taste";
 		dbCon.stmt.executeUpdate(sql);
+		//long elapsed = System.currentTimeMillis() - begTime;
+		//System.out.println("Delete table food_taste takes " + elapsed / 1000 + " sec.");
 		
 
 		dbCon.stmt.clearBatch();
@@ -319,6 +333,7 @@ public class TasteRef {
 			}
 		}
 		dbCon.stmt.executeBatch();			
+
 		
 		/**
 		 * Delete all the kitchen taste before updating.

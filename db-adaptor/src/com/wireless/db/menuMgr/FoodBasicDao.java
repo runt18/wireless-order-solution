@@ -43,8 +43,8 @@ public class FoodBasicDao {
 					+ "'" + fb.getPinyin() + "', " 
 					+ fb.getUnitPrice() + ", " 
 					+ fb.getRestaurantID() + ", " 
-					+ fb.getKitchenID() + ", " 
-					+ fb.getKitchenAliasID() + ", " 
+					+ fb.getKitchen().getKitchenID() + ", " 
+					+ fb.getKitchen().getKitchenAliasID() + ", " 
 					+ fb.getStatus() + ", " 
 					+ WebParams.TASTE_SMART_REF + ", "
 					+ (fb.getDesc() == null ? null : "'" + fb.getDesc() + "'")
@@ -112,8 +112,8 @@ public class FoodBasicDao {
 					" set name = '" + fb.getFoodName() + "', " + 
 					" pinyin = '"+ fb.getPinyin() + "', " + 
 					" unit_price =  " + fb.getUnitPrice() + ", " + 
-					" kitchen_id =  " + (fb.getKitchenID() < 0 ? null : fb.getKitchenID()) + ", " + 
-					" kitchen_alias = " + fb.getKitchenAliasID() + ", " + 
+					" kitchen_id =  " + (fb.getKitchen().getKitchenID() < 0 ? null : fb.getKitchen().getKitchenID()) + ", " + 
+					" kitchen_alias = " + fb.getKitchen().getKitchenAliasID() + ", " + 
 					" status =  " + fb.getStatus() + ", " + 
 					" food.desc = " + (fb.getDesc() == null || fb.getDesc().trim().length() == 0 ? null : "'" + fb.getDesc() + "'") +
 					" where restaurant_id=" + fb.getRestaurantID() + " and food_id = " + fb.getFoodID();

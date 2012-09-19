@@ -6,12 +6,12 @@ public class FoodTaste extends FoodBasic{
 	
 	private int rank = 0;				// 口味排名
 	private int tasteID;				// 口味编号
-	private int tasteAlias;
+	private int tasteAliasID;			// 口味自定义编号
 	private String tasteName;			// 口味名称
-	private float tastePrice;			// 口味价格
-	private float tasteRate;			// 口味比例
-	private int tasteCategory;		// 口味类型    0:口味  1:做法     2:规格
-	private int tasteCalc;			// 口味计算方式          0:按价格     1:按比例
+	private double tastePrice;			// 口味价格
+	private double tasteRate;			// 口味比例
+	private int tasteCategory;			// 口味类型    0:口味  1:做法     2:规格
+	private int tasteCalc;				// 口味计算方式          0:按价格     1:按比例
 	private int type;					// 操作类型	0:默认    1:系统保留(不可删除)
 	
 	public int getRank() {
@@ -26,11 +26,11 @@ public class FoodTaste extends FoodBasic{
 	public void setTasteID(int tasteID) {
 		this.tasteID = tasteID;
 	}
-	public int getTasteAlias() {
-		return tasteAlias;
+	public int getTasteAliasID() {
+		return tasteAliasID;
 	}
-	public void setTasteAlias(int tasteAlias) {
-		this.tasteAlias = tasteAlias;
+	public void setTasteAliasID(int tasteAliasID) {
+		this.tasteAliasID = tasteAliasID;
 	}
 	public String getTasteName() {
 		return tasteName;
@@ -38,16 +38,16 @@ public class FoodTaste extends FoodBasic{
 	public void setTasteName(String tasteName) {
 		this.tasteName = tasteName;
 	}
-	public float getTastePrice() {
+	public double getTastePrice() {
 		return tastePrice;
 	}
-	public void setTastePrice(float tastePrice) {
+	public void setTastePrice(double tastePrice) {
 		this.tastePrice = tastePrice;
 	}
-	public float getTasteRate() {
+	public double getTasteRate() {
 		return tasteRate;
 	}
-	public void setTasteRate(float tasteRate) {
+	public void setTasteRate(double tasteRate) {
 		this.tasteRate = tasteRate;
 	}
 	public int getTasteCategory() {

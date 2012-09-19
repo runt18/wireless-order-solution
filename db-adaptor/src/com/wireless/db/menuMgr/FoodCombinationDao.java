@@ -41,8 +41,8 @@ public class FoodCombinationDao {
 				tempItem.setFoodAliasID(dbCon.rs.getInt("food_alias"));
 				tempItem.setFoodName(dbCon.rs.getString("name"));
 				tempItem.setUnitPrice(dbCon.rs.getFloat("unit_price"));
-				tempItem.setKitchenID(dbCon.rs.getInt("kitchen_id"));
-				tempItem.setKitchenAliasID(dbCon.rs.getInt("kitchen_alias"));
+				tempItem.getKitchen().setKitchenID(dbCon.rs.getInt("kitchen_id"));
+				tempItem.getKitchen().setKitchenAliasID(dbCon.rs.getInt("kitchen_alias"));
 				tempItem.setStatus(dbCon.rs.getByte("status"));
 				tempItem.setPinyin(dbCon.rs.getString("pinyin"));
 				tempItem.setTasteRefType(dbCon.rs.getShort("taste_ref_type"));
@@ -50,7 +50,7 @@ public class FoodCombinationDao {
 				tempItem.setImg(dbCon.rs.getString("img"));
 				
 				tempItem.setAmount(dbCon.rs.getInt("amount"));
-				tempItem.setKitchenName(dbCon.rs.getString("kitchen_name"));
+				tempItem.getKitchen().setKitchenName(dbCon.rs.getString("kitchen_name"));
 				
 				tempList.add(tempItem);
 			}
