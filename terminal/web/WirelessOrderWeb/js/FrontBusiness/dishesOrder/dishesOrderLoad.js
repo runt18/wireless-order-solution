@@ -15,8 +15,13 @@ function dishOptTasteHandler(rowIndex) {
 				buttons : Ext.MessageBox.OK
 			});
 		} else {
-			dishOrderCurrRowIndex_ = rowIndex;
-			dishTasteWindow.show();
+			if(orderedGrid.getSelectionModel().getSelections().length == 1){
+				dishOrderCurrRowIndex_ = rowIndex;			
+				choosenTasteWin.show();
+				choosenTasteWin.center(); 				
+			}else{
+				Ext.example.msg('提示', '请选中一条数据再进行操作!');
+			}
 		}
 	}
 };
@@ -53,95 +58,6 @@ function dishGridRefresh() {
 		}
 	}
 };
-
-// keyboard select handler
-var dishKeyboardSelect = function(relateItemId) {
-	if (relateItemId == 'orderNbr') {
-		var curDishNbr = Ext.getCmp('orderNbr').getValue() + '';
-
-		if (curDishNbr == '') {
-			dishesDisplayDataShow.length = 0;
-			for ( var i = 0; i < dishesDisplayData.length; i++) {
-				dishesDisplayDataShow.push([ dishesDisplayData[i][0],
-						dishesDisplayData[i][1], dishesDisplayData[i][2],
-						dishesDisplayData[i][3], dishesDisplayData[i][4],
-						dishesDisplayData[i][5], dishesDisplayData[i][6],
-						dishesDisplayData[i][7], dishesDisplayData[i][8],
-						dishesDisplayData[i][9] ]);
-			}
-		} else {
-			dishesDisplayDataShow.length = 0;
-			for ( var i = 0; i < dishesDisplayData.length; i++) {
-				if ((dishesDisplayData[i][1] + '').substring(0,
-						curDishNbr.length) == curDishNbr) {
-					dishesDisplayDataShow.push([ dishesDisplayData[i][0],
-							dishesDisplayData[i][1], dishesDisplayData[i][2],
-							dishesDisplayData[i][3], dishesDisplayData[i][4],
-							dishesDisplayData[i][5], dishesDisplayData[i][6],
-							dishesDisplayData[i][7], dishesDisplayData[i][8],
-							dishesDisplayData[i][9] ]);
-				}
-			}
-		}
-
-		dishesDisplayStore.reload();
-	}
-};
-
-// on page load function
-function dishNbrOnLoad() {
-	
-	// keyboard input dish number
-	$('#orderNbr').bind('keyup', function() {
-		dishKeyboardSelect('orderNbr');
-	});
-};
-
-function dishSpellOnLoad() {
-	// keyboard input dish spell
-	$('#orderSpell').bind('keyup', function() {
-		var curDishSpell = Ext.getCmp('orderSpell').getValue();
-		curDishSpell += '';
-		curDishSpell = curDishSpell.replace(/(^\s*)|(\s*$)/g, '');
-		
-		if (curDishSpell == '') {
-			dishesDisplayDataShow.length = 0;
-			for ( var i = 0; i < dishesDisplayData.length; i++) {
-				dishesDisplayDataShow.push([
-					dishesDisplayData[i][0],
-					dishesDisplayData[i][1],
-					dishesDisplayData[i][2],
-					dishesDisplayData[i][3],
-					dishesDisplayData[i][4],
-					dishesDisplayData[i][5],
-					dishesDisplayData[i][6],
-					dishesDisplayData[i][7],
-					dishesDisplayData[i][8],
-					dishesDisplayData[i][9] ]);
-			};
-		} else {
-			dishesDisplayDataShow.length = 0;			
-//			var firstST = /^[a-zA-Z]$/.test(curDishSpell.substring(0, 1)) ? true : false;
-			for ( var i = 0; i < dishesDisplayData.length; i++) {
-				if (dishesDisplayData[i][0].indexOf(curDishSpell) != -1 || dishesDisplayData[i][2].toUpperCase().indexOf(curDishSpell.toUpperCase()) != -1) {
-					dishesDisplayDataShow.push([
-						dishesDisplayData[i][0],
-						dishesDisplayData[i][1],
-						dishesDisplayData[i][2],
-						dishesDisplayData[i][3],
-						dishesDisplayData[i][4],
-				    	dishesDisplayData[i][5],
-						dishesDisplayData[i][6],
-						dishesDisplayData[i][7],
-						dishesDisplayData[i][8],
-						dishesDisplayData[i][9] 
-					]);
-				}
-			};
-		}
-		dishesDisplayStore.reload();
-	});
-}
 
 function tableStuLoad() {
 	
@@ -181,13 +97,12 @@ function tableStuLoad() {
 		document.getElementById('serviceRateImgTS').style['display'] = 'none';
 	}
 	
-	// update label new or mod
-	var Request = new URLParaQuery();
 	var status = Request['tableStat'];
+	
 	if (status == 'free') {
-		dishesOrderNorthPanel.setTitle('<div style="font-size:18px;padding-left:2px">新下单<div>');
+		centerPanel.setTitle('新下单');
 	} else {
-		dishesOrderNorthPanel.setTitle('<div style="font-size:18px;padding-left:2px">改单<div>');
+		centerPanel.setTitle('改单');
 	}
 	
 	// update the operator name
@@ -232,37 +147,8 @@ function orderedDishesOnLoad() {
 						orderedData.root[i].status = 1;
 					}
 					
-					// 根据“特荐停”重新写菜名
-					for ( var i = 0; i < orderedData.root.length; i++) {
-						var tpItem = orderedData.root[i];
-						if (tpItem.special == true) {
-							// 特
-							tpItem.foodName = tpItem.foodName + '<img src="../../images/icon_tip_te.png"></img>';
-						}
-						if (tpItem.recommed == true) {
-							// 荐
-							tpItem.foodName = tpItem.foodName + '<img src="../../images/icon_tip_jian.png"></img>';
-						}
-						if (tpItem.soldout == true) {
-							// 停
-							tpItem.foodName = tpItem.foodName + '<img src="../../images/icon_tip_ting.png"></img>';
-						}
-						if (tpItem.gift == true) {
-							// 赠
-							tpItem.foodName = tpItem.foodName + '<img src="../../images/forFree.png"></img>';
-						}
-						if (tpItem.currPrice == true) {
-							// 時
-							tpItem.foodName = tpItem.foodName + '<img src="../../images/currPrice.png"></img>';
-						}
-						if (tpItem.temporary == true) {
-							// 臨
-							tpItem.foodName = tpItem.foodName + '<img src="../../images/tempDish.png"></img>';
-						}
-					}
-					
 					orderedStore.loadData(orderedData);
-					// 底色处理，已点菜式原色底色
+					
 					dishGridRefresh();
 				} else {
 					Ext.MessageBox.show({
@@ -278,7 +164,6 @@ function orderedDishesOnLoad() {
 		});
 	}
 
-	// upate the tool bar
 	if (Request['tableStat'] == 'free') {
 		// orderedGrid.getTopToolbar().addSeparator();
 		// orderedGrid.getTopToolbar().addSpacer();
@@ -296,153 +181,36 @@ function orderedDishesOnLoad() {
 	}
 };
 
-// 菜谱
-function orderedMenuOnLoad() {
-	var Request = new URLParaQuery();
-	Ext.Ajax.request({
-		url : '../../QueryMenu.do',
-		params : {
-			'pin' : Request['pin'],
-			'type' : 1
-		},
-		success : function(response, options) {
-			var resultJSON = Ext.util.JSON.decode(response.responseText);
-			if (resultJSON.success == true) {
-			var josnData = resultJSON.data;
-			var menuList = josnData.split('，');
-			for ( var i = 0; i < menuList.length; i++) {
-				var menuInfo = menuList[i].substr(1, menuList[i].length - 2).split(',');
-				// 格式：[菜名，菜名编号，菜名拼音，单价，厨房编号,特,荐,停,送,時]
-				// 后台格式：[厨房编号,"菜品名称",菜品编号,"菜品拼音","￥菜品单价",特,荐,停,送,時]
-				// 前后台格式有差异，厨房编号前台存储放在最后一位
-				dishesDisplayData.push([
-				    menuInfo[1].substr(1, menuInfo[1].length - 2),// 菜名
-					menuInfo[2],// 菜名编号
-					menuInfo[3].substr(1, menuInfo[3].length - 2),// 菜名拼音
-					menuInfo[4].substr(1, menuInfo[4].length - 2),// 单价
-					menuInfo[0], // 厨房编号
-					menuInfo[5], // 特
-					menuInfo[6], // 荐
-					menuInfo[7], // 停
-					menuInfo[8], // 送
-					menuInfo[9] // 時
-				]);
-			}
-			
-			// 根据“特荐停”重新写菜名
-			for ( var i = 0; i < dishesDisplayData.length; i++) {
-				if (dishesDisplayData[i][5] == 'true') {
-					// 特
-					dishesDisplayData[i][0] = dishesDisplayData[i][0] + '<img src="../../images/icon_tip_te.png"></img>';
-				}
-				if (dishesDisplayData[i][6] == 'true') {
-					// 荐
-					dishesDisplayData[i][0] = dishesDisplayData[i][0] + '<img src="../../images/icon_tip_jian.png"></img>';
-				}
-				if (dishesDisplayData[i][7] == 'true') {
-					// 停
-					dishesDisplayData[i][0] = dishesDisplayData[i][0] + '<img src="../../images/icon_tip_ting.png"></img>';
-				}
-				if (dishesDisplayData[i][8] == 'true') {
-					// 送
-					dishesDisplayData[i][0] = dishesDisplayData[i][0] + '<img src="../../images/forFree.png"></img>';
-				}
-				if (dishesDisplayData[i][9] == 'true') {
-					// 時
-					dishesDisplayData[i][0] = dishesDisplayData[i][0] + '<img src="../../images/currPrice.png"></img>';
-				}
-			}
-			
-			for(var i = 0; i < dishesDisplayData.length; i++) {
-				dishesDisplayDataShow.push([
-					dishesDisplayData[i][0],
-					dishesDisplayData[i][1],
-					dishesDisplayData[i][2],
-					dishesDisplayData[i][3],
-					dishesDisplayData[i][4],
-					dishesDisplayData[i][5],
-					dishesDisplayData[i][6],
-					dishesDisplayData[i][7],
-					dishesDisplayData[i][8],
-					dishesDisplayData[i][9] ]);
-				}
-				dishesDisplayStore.reload();
-			}
-		},
-		failure : function(response, options) {
-			
-		}
-	});
-};
-
-// 口味
-// dishTasteData.push([ "咸死你", "￥8" ]);
-// 后台：[口味编号,口味分类,口味名称,价钱,比例,计算方式]
-// “口味分类”的值如下： 0 - 口味 ， 1 - 做法， 2 - 规格
-// “计算方式”的值如下：0 - 按价格，1 - 按比例
-// 前台：[口味编号,口味分类,口味名称,价钱,比例,计算方式，计算方式显示，选择]
+// loading taste 
 function tasteOnLoad() {
-	var Request = new URLParaQuery();
 	Ext.Ajax.request({
 		url : '../../QueryMenu.do',
 		params : {
-			'pin' : Request['pin'],
-			'type' : '2'
+			pin : pin,
+			restaurantID : restaurantID,
+			type : 2
 		},
 		success : function(response, options) {
-			var resultJSON = Ext.util.JSON.decode(response.responseText);
-			if (resultJSON.success == true) {
-				var josnData = resultJSON.data;
-				var tasteList = josnData.split('，');
-				for ( var i = 0; i < tasteList.length; i++) {
-					var tasteInfo = tasteList[i].substr(1,
-							tasteList[i].length - 2).split(',');
-					var countTypeDescr;
-					if (tasteInfo[5] == '0') {
-						countTypeDescr = '按价格';
-					} else {
-						countTypeDescr = '按比例';
+			var rj = Ext.util.JSON.decode(response.responseText);
+			if (rj.success == true) {
+				tasteMenuData.root = [];
+				allTasteData.root = [];
+				ggTasteData.root = [];
+				
+				for(var i = 0; i < rj.root.length; i++){
+					tasteMenuData.root.push(rj.root[i]);
+					if(rj.root[i].tasteCategory == 0){
+						allTasteData.root.push(rj.root[i]);
+					}else if(rj.root[i].tasteCategory == 2){
+						ggTasteData.root.push(rj.root[i]);
 					}
-
-					if (tasteInfo[1] == '0') {
-						dishTasteDataTas.push([ tasteInfo[0], // 口味编号
-						tasteInfo[1], // 口味分类
-						tasteInfo[2], // 口味名称
-						tasteInfo[3], // 价钱
-						tasteInfo[4], // 比例
-						tasteInfo[5], // 计算方式
-						countTypeDescr, // 计算方式显示
-						false // 选择
-						]);
-					} else if (tasteInfo[1] == '1') {
-						dishTasteDataPar.push([ tasteInfo[0], // 口味编号
-						tasteInfo[1], // 口味分类
-						tasteInfo[2], // 口味名称
-						tasteInfo[3], // 价钱
-						tasteInfo[4], // 比例
-						tasteInfo[5], // 计算方式
-						countTypeDescr, // 计算方式显示
-						false // 选择
-						]);
-					} else {
-						dishTasteDataSiz.push([ tasteInfo[0], // 口味编号
-						tasteInfo[1], // 口味分类
-						tasteInfo[2], // 口味名称
-						tasteInfo[3], // 价钱
-						tasteInfo[4], // 比例
-						tasteInfo[5], // 计算方式
-						countTypeDescr, // 计算方式显示
-						false // 选择
-						]);
-					}
-
 				}
-				dishTasteStoreTas.reload();
-				dishTasteStorePar.reload();
-				dishTasteStoreSiz.reload();
+				allTasteGridForTabPanel.getStore().loadData(allTasteData);
+				ggForTabPanel.getStore().loadData(ggTasteData);
 			}
 		},
 		failure : function(response, options) {
+			Ext.ux.showMsg(Ext.util.JSON.decode(response.responseText));
 		}
 	});
 };

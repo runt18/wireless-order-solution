@@ -170,7 +170,7 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 			}, g_readerData);
 
 	var g_store = null;
-	var b_groupBtn = null;
+//	var b_groupBtn = null;
 
 	if (typeof(groupName) != 'undefined' && groupName != '') {
 		/** 分组数据源 * */
@@ -302,7 +302,7 @@ Ext.ux.showMsg = function(msg){
 /**
  * 
  */
-Ext.ux.formatFoodName = function(record){
+Ext.ux.formatFoodName = function(record, iname, name){
 	var img = '';
 	if (record.get('special') == true) {
 		img += '&nbsp;<img src="../../images/icon_tip_te.png"></img>';
@@ -322,6 +322,10 @@ Ext.ux.formatFoodName = function(record){
 	if (record.get('combination') == true) {
 		img += '&nbsp;<img src="../../images/combination.png"></img>';
 	}
-	record.set('displayFoodName', record.get('foodName') + img);
+	if (record.get('temporary') == true) {
+		img += '&nbsp;<img src="../../images/tempDish.png"></img>';
+	}
+	record.set(iname, record.get(name) + img);
 	record.commit();
 };
+

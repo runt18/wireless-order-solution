@@ -36,8 +36,9 @@ function checkOutOnLoad() {
 	Ext.Ajax.request({
 		url : "../../QueryOrder.do",
 		params : {
-			"pin" : Request["pin"],
-			"tableID" : Request["tableNbr"]
+			pin : Request["pin"],
+			restaurantID : restaurantID,
+			tableID : Request["tableNbr"]
 		},
 		success : function(response, options) {
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
@@ -49,115 +50,48 @@ function checkOutOnLoad() {
 				Ext.Ajax.request({
 					url : "../../QueryMenu.do",
 					params : {
-						"pin" : Request["pin"],
-						"type" : "3"
+						pin : Request["pin"],
+						restaurantID : restaurantID,
+						type : 3
 					},
 					success : function(response, options) {
 						var resultJSON = Ext.util.JSON.decode(response.responseText);
 						if (resultJSON.success == true) {
-							var discountJSONData = resultJSON.data;
-							var discountList = discountJSONData.split("，");
-							for ( var i = 0; i < discountList.length; i++) {
-								var discountInfo = discountList[i].substr(1,discountList[i].length - 2).split(",");
-								discountData.push([
-									discountInfo[0], // 厨房编号
-									discountInfo[3],// 一般折扣1
-									discountInfo[4],// 一般折扣2
-									discountInfo[5],// 一般折扣3
-									discountInfo[6],// 会员折扣1
-									discountInfo[7],// 会员折扣2
-									discountInfo[8], // 会员折扣3
-									discountInfo[1] // 厨房id
-								]);
-							}
+							
+							discountData = resultJSON;
 							
 							// 3,请求口味
 							Ext.Ajax.request({
 								url : "../../QueryMenu.do",
 								params : {
-									"pin" : Request["pin"],
-									"type" : "2"
+									pin : Request["pin"],
+									restaurantID : restaurantID,
+									type : 2
 								},
 								success : function(response,options) {
 									var resultTasteJSON = Ext.util.JSON.decode(response.responseText);
 									if (resultTasteJSON.success == true) {
-										if (resultTasteJSON.data != "") {
-											var josnTasteData = resultTasteJSON.data;
-											var tasteList = josnTasteData.split("，");
-
-											for ( var i = 0; i < tasteList.length; i++) {
-												var tasteInfo = tasteList[i].substr(1,tasteList[i].length - 2).split(",");
-												// 后台格式：[1,"加辣","￥2.50"]，[2,"少盐","￥0.00"]，[3,"少辣","￥5.00"]
-												// 前后台格式有差异，口味编号前台存储放在最后一位
-												dishTasteData.push([
-													tasteInfo[1].substr(1,tasteInfo[1].length - 2), // 口味
-													tasteInfo[2].substr(1,tasteInfo[2].length - 2), // 价钱
-													tasteInfo[0] // 口味编号
-												]);
-											}
+										dishTasteData = resultTasteJSON;									
+										
+										for(var i = 0; i < checkOutData.root.length; i++) {
+											checkOutDataDisplay.root.push(checkOutData.root[i]);
 										}
 										
-										// 4,显示
-										for ( var i = 0; i < checkOutData.root.length; i++) {
-											var tpItem = checkOutData.root[i];
-											var KitchenNum = tpItem.kitchenId;
-											var discountRate = 1;
-											for ( var j = 0; j < discountData.length; j++) {
-												if (KitchenNum == discountData[j][0]) {
-													// 默认“一般”的“折扣1”
-													discountRate = discountData[j][1];													
-												}
-											}
-											
-											// 特价，送 --
-											// 折扣率
-											// --1
-											if (tpItem.special == true || tpItem.gift == true) {
-												tpItem.discount = parseFloat("1").toFixed(2);
-											} else {
-												tpItem.discount = parseFloat(discountRate).toFixed(2);
-											}
+										for(var i = 0; i < checkOutDataDisplay.root.length; i++) {
+											var tpItem = checkOutDataDisplay.root[i];
 											
 											if(tpItem.special == true || tpItem.gift == true){
-												// 特价和赠送菜品不打折
-												tpItem.totalPrice = parseFloat(tpItem.unitPrice * tpItem.count);
+												tpItem.discount = parseFloat(1).toFixed(2);
 											}else{
-												tpItem.totalPrice = parseFloat((tpItem.unitPrice * tpItem.discount + tpItem.tastePrice) * tpItem.count);
-											}											
+												tpItem.discount = parseFloat(tpItem.kitchen.discount1).toFixed(2);
+											}
 											
-											checkOutDataDisplay.root.push(tpItem);
+											tpItem.totalPrice = parseFloat((tpItem.unitPrice + tpItem.tastePrice) * tpItem.discount * tpItem.count);
+											
+											checkOutDataDisplay.root[i] = tpItem;
 										}
 										
-										// 根据“特荐停”重新写菜名
-										for ( var i = 0; i < checkOutDataDisplay.root.length; i++) {
-											var tpItem = checkOutDataDisplay.root[i];
-											if (tpItem.special == true) {
-												// 特
-												tpItem.foodName = tpItem.foodName + "<img src='../../images/icon_tip_te.png'></img>";
-											}
-											if (tpItem.recommed == true) {
-												// 荐
-												tpItem.foodName = tpItem.foodName + "<img src='../../images/icon_tip_jian.png'></img>";
-											}
-											if (tpItem.soldout == true) {
-												// 停
-												tpItem.foodName = tpItem.foodName + "<img src='../../images/icon_tip_ting.png'></img>";
-											}
-											if (tpItem.gift == true) {
-												// 赠
-												tpItem.foodName = tpItem.foodName + "<img src='../../images/forFree.png'></img>";
-											}
-											if (tpItem.currPrice == true) {
-												// 時
-												tpItem.foodName = tpItem.foodName + "<img src='../../images/currPrice.png'></img>";
-											}
-											if (tpItem.temporary == true) {
-												// 臨
-												tpItem.foodName = tpItem.foodName + "<img src='../../images/tempDish.png'></img>";
-											}
-										}
-
-										checkOutStore.reload();
+										checkOutStore.loadData(checkOutDataDisplay);
 										
 										// 4,算总价
 										var totalCount = 0;
@@ -243,9 +177,10 @@ function checkOutOnLoad() {
 													});
 												}
 											},
-											failure : function(response,options) {  }
+											failure : function(response,options) {
+												
+											}
 										});
-
 									} else {
 										var dataTasteInfo = resultTasteJSON.data;
 										Ext.MessageBox.show({
@@ -255,7 +190,9 @@ function checkOutOnLoad() {
 										});
 									}
 								},
-								failure : function(response,options) { }
+								failure : function(response,options) { 
+									
+								}
 							});
 						} else {
 							var dataInfo = resultJSON.data;
@@ -266,7 +203,9 @@ function checkOutOnLoad() {
 							});
 						}
 					},
-					failure : function(response, options) { }
+					failure : function(response, options) {
+						
+					}
 				});
 			} else {
 				Ext.MessageBox.show({
@@ -276,7 +215,9 @@ function checkOutOnLoad() {
 				});
 			}
 		},
-		failure : function(response, options) { }
+		failure : function(response, options) { 
+			
+		}
 	});
 
 	Ext.Ajax.request({
@@ -301,7 +242,7 @@ function checkOutOnLoad() {
 };
 
 function moneyCount(opt) {
-	var shouldPay = document.getElementById("shouldPay").innerHTML;
+//	var shouldPay = document.getElementById("shouldPay").innerHTML;
 	var actualPay = document.getElementById("actualCount").value;
 	var minCost = Request["minCost"];
 	var serviceRate = document.getElementById("serviceCharge").value;

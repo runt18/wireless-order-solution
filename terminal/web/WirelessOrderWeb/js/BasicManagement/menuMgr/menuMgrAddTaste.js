@@ -107,7 +107,7 @@ var commonTasteGrid = new Ext.grid.EditorGridPanel({
 	ds : new Ext.data.JsonStore({
 		url : '../../QueryFoodTaste.do',
 		root : 'root',		
-		fields : ['tasteID', 'tasteAlias','tasteName','tastePrice','tasteRate', 'tasteCategory', 'tasteCalc', 'tasteCalcFormat', 'foodID', 'foodName', 'rank'],
+		fields : ['tasteID', 'tasteAliasID','tasteName','tastePrice','tasteRate', 'tasteCategory', 'tasteCalc', 'tasteCalcFormat', 'foodID', 'foodName', 'rank'],
 		listeners : {
 			beforeload : function(){
 				var selData = Ext.ux.getSelData('menuMgrGrid');

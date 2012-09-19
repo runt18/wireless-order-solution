@@ -131,8 +131,6 @@ function billQueryHandler() {
 			queryValue = 1;
 		}
 	}
-	// alert(queryTpye + " , " + queryOperator + " , " + queryValue);
-
 	// -- 獲取額外過濾條件--
 	var additionFilter = 0;
 	var conditionRadio = billsQueryCondPanel.getForm().findField(
@@ -163,7 +161,6 @@ function billQueryHandler() {
 	}
 
 	if (isInputValid) {
-
 		billQuery(queryTpye, queryOperator, queryValue, additionFilter);
 	}
 
@@ -171,61 +168,27 @@ function billQueryHandler() {
 
 };
 
-var billListRefresh = function() {
+billListRefresh = function(){
+	
 	var discountValue = billGenModForm.getForm().findField("discountRadio").getGroupValue();
-	discountType = 0;
-	// 获取discountType
-	if (discountValue == "discount1") {
-		discountType = 1;
-	} else if (discountValue == "discount2") {
-		discountType = 2;
-	} else {
-		discountType = 3;
-	}
-	// 一般、会员、0、1
-	// 获取payType
-	var payTypeValue = billGenModForm.findById("payTpye").getValue();
-	var discountIndex = -1;
-	// discountData [厨房编号,一般折扣1,一般折扣2,一般折扣3,会员折扣1,会员折扣2,会员折扣3]
-	if ((payTypeValue == "一般" || payTypeValue == 0) && discountType == 1) {
-		discountIndex = 1;
-		payType = 1;
-	} else if ((payTypeValue == "一般" || payTypeValue == 0) && discountType == 2) {
-		discountIndex = 2;
-		payType = 1;
-	} else if ((payTypeValue == "一般" || payTypeValue == 0) && discountType == 3) {
-		discountIndex = 3;
-		payType = 1;
-	} else if ((payTypeValue == "会员" || payTypeValue == 1) && discountType == 1) {
-		discountIndex = 4;
-		payType = 2;
-	} else if ((payTypeValue == "会员" || payTypeValue == 1) && discountType == 2) {
-		discountIndex = 5;
-		payType = 2;
-	} else if ((payTypeValue == "会员" || payTypeValue == 1) && discountType == 3) {
-		discountIndex = 6;
-		payType = 2;
-	}
-
-	// 显示
+	
 	for ( var i = 0; i < orderedData.root.length; i++) {
 		var tpItem = orderedData.root[i];
-		var KitchenNum = tpItem.kitchenId;
-		var discountRate = 1;
-		for ( var j = 0; j < discountData.length; j++) {
-			if (KitchenNum == discountData[j][0]) {
-				discountRate = discountData[j][discountIndex];
-			}
-		}
 		
-		// alert(orderedData[i][12]);
 		if (tpItem.special == true || tpItem.gift == true || tpItem.temporary == true) {
 			// 特价，送，臨時菜 不打折
 			tpItem.discount = 1.00;
 		} else {
 			// 非 特价，送，臨時菜
-			tpItem.discount = discountRate;
+			if (discountValue == "discount1") {
+				tpItem.discount = tpItem.kitchen.discount1;
+			} else if (discountValue == "discount2") {
+				tpItem.discount = tpItem.kitchen.discount2;
+			} else {
+				tpItem.discount = tpItem.kitchen.discount3;
+			}
+			tpItem.discount = tpItem.discount == 0 ? 1 : tpItem.discount;
 		}
-	}
+	}	
 	orderedStore.loadData(orderedData);
 };

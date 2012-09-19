@@ -1,26 +1,17 @@
 ﻿// 獲取所有菜品
 function loadAllDishes() {
-	dishMultSelectData = [];
+	dishMultSelectData = {};
 	Ext.Ajax.request({
 		url : "../../QueryMenu.do",
 		params : {
-			"pin" : pin,
-			"type" : "1"
+			pin : pin,
+			restaurantID : restaurantID,
+			type : 1
 		},
 		success : function(response, options) {
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
 			if (resultJSON.success == true) {
-				var josnData = resultJSON.data;
-				var menuList = josnData.split("，");
-				for ( var i = 0; i < menuList.length; i++) {
-					var menuInfo = menuList[i]
-							.substr(1, menuList[i].length - 2).split(",");
-					// 格式：[菜品编号，菜品名称]
-					// 后台格式：[厨房编号,"菜品名称",菜品编号,"菜品拼音","￥菜品单价",特,荐,停,送,時]
-					dishMultSelectData.push([ menuInfo[2],// 菜名编号
-					menuInfo[1].substr(1, menuInfo[1].length - 2) // 菜名
-					]);
-				}
+				dishMultSelectData = resultJSON;
 			}
 		},
 		failure : function(response, options) {

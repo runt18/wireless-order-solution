@@ -144,7 +144,8 @@ var filterTypeComb = new Ext.form.ComboBox({
 				cn.setVisible(false);
 				ct.setVisible(false);
 				ktCombo.store.loadData(kitchenTypeData);
-				ktCombo.setValue(kitchenTypeData[0][0]);	
+//				ktCombo.setValue(kitchenTypeData[0][0]);
+				ktCombo.setValue(255);	
 				conditionType = ktCombo.getId();
 			}
 		}
@@ -234,11 +235,11 @@ var menuStore = new Ext.data.Store({
 		}, {
 			name : 'unitPrice'
 		}, {
-			name : 'kitchenAliasID'
+			name : 'kitchen.kitchenAliasID'
 		}, {
-			name : 'kitchenName'
+			name : 'kitchen.kitchenName'
 		}, {
-			name : 'kitchenID'
+			name : 'kitchen.kitchenID'
 		}, {
 			name : 'operator'
 		}, {
@@ -289,7 +290,7 @@ var menuColumnModel = new Ext.grid.ColumnModel([
 		renderer : Ext.ux.txtFormat.gridDou
 	}, {
 		header : '厨房打印',
-		dataIndex : 'kitchenName',
+		dataIndex : 'kitchen.kitchenName',
 		width : 65
 	}, {
 		header : '图片状态',
@@ -690,11 +691,11 @@ Ext.onReady(function() {
 					hidden : true,
 					width : 120,
 					id : 'kitchenTypeComb',
-					store : new Ext.data.SimpleStore({
-						fields : [ 'value', 'text' ]
+					store : new Ext.data.JsonStore({
+						fields : [ 'kitchenAliasID', 'kitchenName' ]
 					}),
-					valueField : 'value',
-					displayField : 'text',
+					valueField : 'kitchenAliasID',
+					displayField : 'kitchenName',
 					typeAhead : true,
 					mode : 'local',
 					triggerAction : 'all',
@@ -829,7 +830,7 @@ Ext.onReady(function() {
 
 	menuGrid.getStore().on('load', function() {
 		menuGrid.getStore().each(function(record) {			
-			Ext.ux.formatFoodName(record);
+			Ext.ux.formatFoodName(record, 'displayFoodName', 'foodName');
 		});
 	});
 	

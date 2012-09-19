@@ -149,9 +149,8 @@ var allFoodMiniGrid = createGridPanel(
 	    ['编号', 'foodAliasID', 70] , 
 	    ['菜名', 'foodName', 200] , 
 	    ['价格', 'unitPrice', '', 'right', 'Ext.ux.txtFormat.gridDou']
-//	    ['厨房', 'kitchenName']
 	],
-	['foodID', 'foodAliasID', 'foodName', 'unitPrice', 'kitchenID', 'kitchenName', 'combination'],
+	['foodID', 'foodAliasID', 'foodName', 'unitPrice', 'combination'],
     [
         ['isCurrPrice', false],
         ['isFree', false],
@@ -171,12 +170,7 @@ var allFoodMiniGrid = createGridPanel(
 allFoodMiniGrid.columnWidth = .44;
 allFoodMiniGrid.getBottomToolbar().displayMsg = '共&nbsp;{2}&nbsp;条记录';
 allFoodMiniGrid.on('render', function(thiz){
-	thiz.getStore().load({
-		params : {
-			limit : 30,
-			start : 0
-		}
-	});
+	
 });
 allFoodMiniGrid.on('resize', function(thiz){
 	thiz.setHeight(452);
@@ -260,7 +254,7 @@ updateCombinationHandler = function(c){
 						}else{
 							record.set('combination', false);
 						}
-						Ext.ux.formatFoodName(record);
+						Ext.ux.formatFoodName(record, 'displayFoodName', 'foodName');
 						record.commit();
 						return;
 					}

@@ -43,41 +43,58 @@
 var checkOutStore = new Ext.data.Store({
 	proxy : new Ext.data.MemoryProxy(checkOutDataDisplay),
 	reader : new Ext.data.JsonReader(Ext.ux.readConfig, 
-		[ 
-			{
-				name : 'displayFoodName'
-			}, {
-				name : 'foodName'
-			}, {
-				name : 'tastePref'
-			}, {
-				name : 'tastePrice'
-			}, {
-				name : 'count'
-			}, {
-				name : 'unitPrice'
-			}, {
-				name : 'discount'
-			}, {
-				name : 'totalPrice'
-			},  {
-				name : 'orderDateFormat'
-			},  {
-				name : 'waiter'
-			}  
-		]
-	)
+		[{
+			name : 'displayFoodName'
+		}, {
+			name : 'foodName'
+		}, {
+			name : 'tastePref'
+		}, {
+			name : 'tastePrice'
+		}, {
+			name : 'count'
+		}, {
+			name : 'unitPrice'
+		}, {
+			name : 'discount'
+		}, {
+			name : 'totalPrice'
+		}, {
+			name : 'orderDateFormat'
+		}, {
+			name : 'waiter'
+		}, {
+			name : 'special'
+		}, {
+			name : 'recommend'
+		}, {
+			name : 'stop'
+		}, {
+			name : 'gift'
+		}, {
+			name : 'currPrice'
+		}, {
+			name : 'combination'
+		}, {
+			name : 'temporary'
+		}]
+	),
+	listeners : {
+		load : function(thiz, records){
+			for(var i = 0; i < records.length; i++){
+				Ext.ux.formatFoodName(records[i], 'displayFoodName', 'foodName');
+			}
+		}
+	}
 });
-
-checkOutStore.reload();
 
 // 3，栏位模型
 var checkOutColumnModel = new Ext.grid.ColumnModel([
 		new Ext.grid.RowNumberer(), {
 			header : '菜名',
 			sortable : true,
-			dataIndex : 'foodName',
-			id : 'dishNameCOCM',
+			dataIndex : 'displayFoodName',
+//			id : 'dishNameCOCM',
 			width : 230
 		}, {
 			header : '口味',

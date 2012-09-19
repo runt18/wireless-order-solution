@@ -86,11 +86,11 @@ var basicOperationPanel = new Ext.Panel({
 		 	    	    	fieldLabel : '厨房',
 		 	    	    	width : 86,
 		 	    	    	listWidth : 99,
-							store : new Ext.data.SimpleStore({
-								fields : [ 'value', 'text' ]
+		 	    	    	store : new Ext.data.JsonStore({
+								fields : [ 'kitchenAliasID', 'kitchenName' ]
 							}),
-							valueField : 'value',
-							displayField : 'text',
+							valueField : 'kitchenAliasID',
+							displayField : 'kitchenName',
 							mode : 'local',
 							triggerAction : 'all',
 							typeAhead : true,
@@ -331,7 +331,7 @@ resetbBasicOperation = function(_d){
 	foodAliasID.setValue(typeof(data.foodAliasID) == 'undefined' ? '' : data.foodAliasID);
 	foodPinyin.setValue(typeof(data.pinyin) == 'undefined' ? '' : data.pinyin);
 	foodPrice.setValue(typeof(data.unitPrice) == 'undefined' ? '' : data.unitPrice);
-	foodKitchenAlias.setValue(typeof(data.kitchenAliasID) == 'undefined' ? kitchenTypeData[0][0] : data.kitchenAliasID);
+	foodKitchenAlias.setValue(typeof(data['kitchen.kitchenAliasID']) == 'undefined' ? 255 : data['kitchen.kitchenAliasID']);
 	foodDesc.setValue(typeof(data.desc) == 'undefined' ? '' : data.desc);
 	isSpecial.setValue(typeof(data.special) == 'undefined' ? false : eval(data.special));
 	isRecommend.setValue(typeof(data.recommend) == 'undefined' ? false : eval(data.recommend));
@@ -351,11 +351,9 @@ resetbBasicOperation = function(_d){
  * 添加菜品基础信息
  */
 addBasicHandler = function(){
-	
 	basicOperationBasicHandler({
 		type : mmObj.operation.insert
 	});
-	
 };
 
 /**
@@ -371,7 +369,7 @@ updateBasicHandler = function(c){
  */
 basicOperationBasicHandler = function(c){
 	
-	if(c == null || typeof c == undefined || typeof c.type == undefined){
+	if(c == null || typeof(c) == 'undefined' || typeof(c.type) == 'undefined'){
 		return;
 	}
 	
@@ -418,8 +416,8 @@ basicOperationBasicHandler = function(c){
 	}
 	
 	for(var i = 0; i < kitchenTypeData.length; i++){
-		if(kitchenTypeData[i][0] == foodKitchenAlias.getValue()){
-			kitchenID = kitchenTypeData[i][2];
+		if(kitchenTypeData[i].kitchenAliasID == foodKitchenAlias.getValue()){
+			kitchenID = kitchenTypeData[i].kitchenID;
 			break;
 		}
 	}
@@ -486,7 +484,7 @@ basicOperationBasicHandler = function(c){
 							record.set('gift', isFree.getValue());
 							record.set('stop', isStop.getValue());
 							record.set('currPrice', isCurrPrice.getValue());
-							Ext.ux.formatFoodName(record);
+							Ext.ux.formatFoodName(record, 'displayFoodName', 'foodName');
 							record.commit();
 							return;
 						}

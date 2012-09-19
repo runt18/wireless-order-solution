@@ -162,12 +162,7 @@ var allMaterialGrid = createGridPanel(
 allMaterialGrid.columnWidth = .44;
 allMaterialGrid.getBottomToolbar().displayMsg = '共&nbsp;{2}&nbsp;条记录';
 allMaterialGrid.on('render', function(thiz){
-	thiz.getStore().load({
-		params : {
-			limit : 30,
-			start : 0
-		}
-	});
+	
 });
 allMaterialGrid.on('resize', function(thiz){
 	thiz.setHeight(452);

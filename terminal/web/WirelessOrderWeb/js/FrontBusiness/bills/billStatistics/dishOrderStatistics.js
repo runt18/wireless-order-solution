@@ -1,6 +1,6 @@
-﻿var dishMultSelectDS = new Ext.data.SimpleStore({
-	fields : [ "retrunValue", "displayText" ],
-	data : []
+﻿var dishMultSelectDS = new Ext.data.JsonStore({
+	root : 'root',
+	fields : [ "foodAliasID", "foodName" ]
 });
 
 menuStatWin = new Ext.Window(
@@ -58,11 +58,11 @@ menuStatWin = new Ext.Window(
 					name : "dishMultSelectMStat",
 					id : "dishMultSelectMStat",
 					fromStore : dishMultSelectDS,
-					dataFields : [ "retrunValue", "displayText" ],
+					dataFields : [ "foodAliasID", "foodName" ],
 					toData : [ [ "", "" ] ],
 					msHeight : 250,
-					valueField : "retrunValue",
-					displayField : "displayText",
+					valueField : "foodAliasID",
+					displayField : "foodName",
 					imagePath : "../../extjs/multiselect/images/",
 					toLegend : "已选择菜品",
 					fromLegend : "可选择菜品"
@@ -74,10 +74,8 @@ menuStatWin = new Ext.Window(
 						handler : function() {
 							var i = menuStatWin.findById("dishMultSelectMStat").fromMultiselect.view;
 							i.selectRange(0, i.store.length);
-							menuStatWin.findById("dishMultSelectMStat")
-									.fromTo();
-							menuStatWin.findById("dishMultSelectMStat").toMultiselect.view
-									.clearSelections();
+							menuStatWin.findById("dishMultSelectMStat").fromTo();
+							menuStatWin.findById("dishMultSelectMStat").toMultiselect.view.clearSelections();
 						}
 					},
 					{
@@ -98,7 +96,7 @@ menuStatWin = new Ext.Window(
 
 								var selectDishes = "";
 								for ( var i = 0; i < selectCount; i++) {
-									var selectItem = Ext.getCmp("dishMultSelectMStat").toMultiselect.store.getAt(i).get("retrunValue");
+									var selectItem = Ext.getCmp("dishMultSelectMStat").toMultiselect.store.getAt(i).get("foodAliasID");
 									if (selectItem != "") {
 										selectDishes = selectDishes + selectItem + ",";
 									}
