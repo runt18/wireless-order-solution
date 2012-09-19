@@ -153,9 +153,9 @@ public class QueryMenuMgrAction extends Action {
 				item.setFoodName(tp.name);
 				item.setPinyin(tp.pinyin);
 				item.setUnitPrice(tp.getPrice());
-				item.setKitchenID((int)tp.kitchen.kitchenID);
-				item.setKitchenAliasID((int)tp.kitchen.aliasID);
-				item.setKitchenName(tp.kitchen.name == null || tp.kitchen.name.trim().length() == 0 ? "空" : tp.kitchen.name);
+				item.getKitchen().setKitchenID((int)tp.kitchen.kitchenID);
+				item.getKitchen().setKitchenAliasID((int)tp.kitchen.aliasID);
+				item.getKitchen().setKitchenName(tp.kitchen.name == null || tp.kitchen.name.trim().length() == 0 ? "空" : tp.kitchen.name);
 				item.setStatus((byte)tp.status);
 				item.setTasteRefType(tp.tasteRefType);
 				item.setDesc(tp.desc);

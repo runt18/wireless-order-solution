@@ -18,8 +18,10 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.QueryOrder;
 import com.wireless.db.QueryShift;
+import com.wireless.db.menuMgr.MenuDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.Terminal;
@@ -48,7 +50,9 @@ public class QueryOrderAction extends Action {
 			 */
 			String pin = request.getParameter("pin");
 			String queryType = request.getParameter("queryType");
-
+			String restaurantID = request.getParameter("restaurantID");
+			
+			
 			Order order = null;
 			if (request.getParameter("tableID") != null) {
 				tableID = Integer.parseInt(request.getParameter("tableID"));
@@ -72,7 +76,8 @@ public class QueryOrderAction extends Action {
 					item.setFoodName(order.foods[i].name);
 					item.setFoodID(order.foods[i].foodID);
 					item.setAliasID(order.foods[i].aliasID);
-					item.setKitchen(order.foods[i].kitchen);
+//					item.setKitchen(order.foods[i].kitchen);
+					item.getKitchen().setKitchenID(Integer.parseInt(order.foods[i].kitchen.kitchenID+""));
 					item.setTaste(order.foods[i].tastes);
 					item.setTastePref(order.foods[i].getTastePref());
 					item.setCount(order.foods[i].getCount());
@@ -90,6 +95,19 @@ public class QueryOrderAction extends Action {
 					item = null;
 				}
 			}
+			
+			if(restaurantID != null && restaurantID.trim().length() > 0){
+				List<Kitchen> kl = MenuDao.getKitchen(Integer.parseInt(restaurantID));
+				for(OrderFood of : root){
+					for(Kitchen temp : kl){
+						if(of.getKitchenId() == temp.getKitchenID()){
+							of.setKitchen(temp);
+							break;
+						}
+					}
+				}
+			}
+			
 			jobject.setSuccess(true);
 			jobject.setTotalProperty(root.size());
 			jobject.setRoot(root);

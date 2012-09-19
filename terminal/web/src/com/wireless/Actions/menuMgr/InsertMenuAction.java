@@ -94,20 +94,21 @@ public class InsertMenuAction extends Action {
 				fb.setFoodName(foodName);
 				fb.setPinyin(foodPinyin);
 				fb.setUnitPrice(Float.parseFloat(foodPrice));
-				fb.setKitchenAliasID(Integer.parseInt(kitchenAliasID));
-				fb.setKitchenID(Integer.parseInt(kitchenID));
+				fb.getKitchen().setKitchenAliasID(Integer.parseInt(kitchenAliasID));
+				fb.getKitchen().setKitchenID(Integer.parseInt(kitchenID));
 				fb.setStatus(status);
 				fb.setDesc(foodDesc);
-				
-				jobject.initTip(true, "操作成功,已添加新菜品.");
 				
 				if (isCombination != null && isCombination.equals("true")) {
 					FoodBasicDao.insertFoodBaisc(fb, comboContent);
 				}else{
 					FoodBasicDao.insertFoodBaisc(fb);
 				}
+				
+				jobject.initTip(true, "操作成功,已添加新菜品.");
 			}
 		} catch (BusinessException e) {
+			e.printStackTrace();
 			jobject.initTip(false, e.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
