@@ -4,8 +4,9 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>无线点餐网页终端</title>
 
-<link rel="stylesheet" type="text/css"
-	href="../../extjs/resources/css/ext-all.css" />
+<link rel="stylesheet" type="text/css" href="../../extjs/resources/css/ext-all.css" />
+<link rel="stylesheet" type="text/css" href="../../css/myExt.css" />
+<link rel="stylesheet" type="text/css" href="../../extjs/ext-patch.css" />
 <script type="text/javascript" src="../../extjs/ext-base.js"></script>
 <script type="text/javascript" src="../../extjs/ext-all.js"></script>
 <script type="text/javascript" src="../../js/common/Ext.ux.js"></script>
@@ -46,16 +47,19 @@
 <link rel="stylesheet" type="text/css" href="../../css/dishOrder.css" />
 
 <script type="text/javascript">
+	var Request = new URLParaQuery();
+	
 	// global variable
 	var dishOrderCurrRowIndex_ = -1; // the selected row index in the chosen dishes display grid
 	var softKBRelateItemId = ""; // soft keyboard relate item id
 	var dishesDisplayData = []; // all dishes display data 
 	var dishesDisplayDataShow = []; // all dishes display data for show in page
-
-	var dishTasteDataTas = [];
-	var dishTasteDataPar = [];
-	var dishTasteDataSiz = [];
-
+	
+	var tasteMenuData = {};
+	var commonTasteData = {};
+	var allTasteData = {};
+	var ggTasteData = {};
+	
 	// 格式：[{編號,描述,價錢或比例,計算方式}]
 	var choosenTaset = [];
 	// 格式：[{編號,描述}]
@@ -71,25 +75,17 @@
 
 	var operatorName = "XXX";
 
-	var restaurantID = "";
-	var category = "X"
+	var restaurantID = Request["restaurantID"];
+	var category = Request["category"];
+	var pin = Request['pin'];
 	var ketchenSelectIndex = -1;
-
-	var Request = new URLParaQuery();
-	restaurantID = Request["restaurantID"];
-	category = Request["category"];
+	var orderMainObject = {};
+	orderMainObject.searchField = '';
 </script>
 
-<script type="text/javascript"
-	src="../../js/FrontBusiness/dishesOrder/dishesOrderFuncLib.js"></script>
-<script type="text/javascript"
-	src="../../js/FrontBusiness/dishesOrder/dishesOrderLoad.js"></script>
-<script type="text/javascript"
-	src="../../js/FrontBusiness/dishesOrder/kitchenSelect.js"></script>
-<script type="text/javascript"
-	src="../../js/FrontBusiness/dishesOrder/dishesOrderMain.js"></script>
-
-
+<script type="text/javascript" src="../../js/FrontBusiness/dishesOrder/dishesOrderFuncLib.js"></script>
+<script type="text/javascript" src="../../js/FrontBusiness/dishesOrder/dishesOrderLoad.js"></script>
+<script type="text/javascript" src="../../js/FrontBusiness/dishesOrder/dishesOrderMain.js"></script>
 
 </head>
 <body>
@@ -121,14 +117,13 @@
 		<div id="minCostDivTS" class="tableStatusChar">0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
 	</div>
 -->
-	<div id="tableStatusTableNbr" style="padding-left: 5px">
-		<img title="桌号" src='../../images/TableID.png' style='float: left;' />
+	<div id="tableStatusTableNbr" style="padding-left: 5px;  vertical-align : middle;">
+		<img title="桌号" src='../../images/TableID.png' style='float: left;'/>
 		<div id="tblNbrDivTS" class="tableStatusChar">100&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
 	</div>
 
 	<div id="tableStatusPerCount" style="padding-left: 5px">
-		<img title="人数" src='../../images/DinnerAmount.png'
-			style='float: left;' />
+		<img title="人数" src='../../images/DinnerAmount.png' style='float: left;' />
 	</div>
 
 	<!--
