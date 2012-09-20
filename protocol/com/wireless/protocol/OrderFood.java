@@ -392,12 +392,20 @@ public class OrderFood extends Food {
 		this.discount = src.discount;
 		this.count = src.count;
 		this.isHurried = src.isHurried;
-		this.table = new Table(src.table);
-		this.tmpTaste = new Taste(src.tmpTaste);
-		this.tastes = new Taste[src.tastes.length];
-		for(int i = 0; i < this.tastes.length; i++){
-			this.tastes[i] = new Taste(src.tastes[i]);
-		}		
+		if(src.table != null){
+			this.table = new Table(src.table);
+		}
+		if(src.tmpTaste != null){
+			this.tmpTaste = new Taste(src.tmpTaste);
+		}
+		if(src.tastes != null){
+			this.tastes = new Taste[src.tastes.length];
+			for(int i = 0; i < this.tastes.length; i++){
+				if(src.tastes[i] != null){
+					this.tastes[i] = new Taste(src.tastes[i]);
+				}
+			}
+		}
 	}
 	
 	/**
