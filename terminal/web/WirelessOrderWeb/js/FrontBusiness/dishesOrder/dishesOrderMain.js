@@ -992,6 +992,9 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 				}, {
 					type : 2,
 					name : '拼音'
+				}, {
+					type : 3,
+					name : '编号'
 				}]
 			}),
 			valueField : 'type',
@@ -1011,24 +1014,35 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 					var kitchen = Ext.getCmp('comSearchKitchen');
 					var foodName = Ext.getCmp('txtSearchFoodName');
 					var pinyin = Ext.getCmp('txtSearchPinyin');
+					var foodAliasID = Ext.getCmp('txtSearchFoodAliasID');
 					if(index == 0){
 						kitchen.setVisible(true);
 						foodName.setVisible(false);
 						pinyin.setVisible(false);
+						foodAliasID.setVisible(false);
 						kitchen.setValue(254);
 						orderMainObject.searchField = kitchen.getId();
 					}else if(index == 1){
 						kitchen.setVisible(false);
 						foodName.setVisible(true);
 						pinyin.setVisible(false);
+						foodAliasID.setVisible(false);
 						foodName.setValue();
 						orderMainObject.searchField = foodName.getId();
 					}else if(index == 2){
 						kitchen.setVisible(false);
 						foodName.setVisible(false);
 						pinyin.setVisible(true);
+						foodAliasID.setVisible(false);
 						pinyin.setValue();
 						orderMainObject.searchField = pinyin.getId();
+					}else if(index == 3){
+						kitchen.setVisible(false);
+						foodName.setVisible(false);
+						pinyin.setVisible(false);
+						foodAliasID.setVisible(true);
+						foodAliasID.setValue();
+						orderMainObject.searchField = foodAliasID.getId();
 					}
 				}
 			}
@@ -1086,6 +1100,11 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 		}), new Ext.form.TextField({
 			xtype : 'textfield',
 			id : 'txtSearchPinyin',
+			hidden : true,
+			width : 100
+		}),  new Ext.form.TextField({
+			xtype : 'textfield',
+			id : 'txtSearchFoodAliasID',
 			hidden : true,
 			width : 100
 		}),
