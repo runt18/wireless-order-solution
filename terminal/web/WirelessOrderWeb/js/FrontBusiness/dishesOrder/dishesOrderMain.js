@@ -466,16 +466,18 @@ var dishPushBackWin = new Ext.Window({
 							dishPushBackWin.findById('dishPushBackCount').setValue('');
 							var ds = orderedGrid.getStore().getAt(dishOrderCurrRowIndex_).data;
 							for(var i = 0; i < orderedData.root.length; i++){
-								if(eval(ds.tasteID == orderedData.root[i].tasteID)
-										&& eval(ds.tasteIDTwo == orderedData.root[i].tasteIDTwo)
-										&& eval(ds.tasteIDThree == orderedData.root[i].tasteIDThree)){
-
-									if((orderedData.root[i].count - pushCount) <= 0){
-										orderedData.root.splice(i,1);
-									}else if((orderedData.root[i].count - pushCount)> 0){
-										orderedData.root[i].count -= pushCount;
+								if(ds.foodID == orderedData.root[i].foodID){
+									if(eval(ds.tasteID == orderedData.root[i].tasteID)
+											&& eval(ds.tasteIDTwo == orderedData.root[i].tasteIDTwo)
+											&& eval(ds.tasteIDThree == orderedData.root[i].tasteIDThree)){
+										
+										if((orderedData.root[i].count - pushCount) <= 0){
+											orderedData.root.splice(i,1);
+										}else if((orderedData.root[i].count - pushCount)> 0){
+											orderedData.root[i].count -= pushCount;
+										}
+										break;
 									}
-									break;
 								}
 							}
 									
@@ -537,7 +539,7 @@ function dishOptDeleteHandler(rowIndex) {
 				width : 300,
 				buttons : Ext.MessageBox.YESNO,
 				fn : function(btn) {
-					if (btn == 'yes') {						
+					if (btn == 'yes') {
 						for(var i = 0; i < orderedData.root.length; i++){						
 							if(ds.foodID == orderedData.root[i].foodID){
 								if(eval(ds.tasteID == orderedData.root[i].tasteID)
@@ -572,7 +574,7 @@ function dishOptDispley(value, cellmeta, record, rowIndex, columnIndex, store) {
 			+ '口味</a>'
 			+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
 			+ '<a href="javascript:dishOptDeleteHandler(' + rowIndex + ')">'
-			+ '删除</a>'
+			+ (record.get('status') == 1 ? '退菜' : '删除') + '</a>'
 			+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
 			+ '<a href="javascript:dishOptPressHandler(' + rowIndex + ')">'
 			+ '催菜</a>'
