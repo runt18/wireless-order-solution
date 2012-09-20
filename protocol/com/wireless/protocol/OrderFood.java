@@ -382,6 +382,24 @@ public class OrderFood extends Food {
 		}
 	}
 
+	public OrderFood(OrderFood src){
+		this((Food)src);
+		this.orderDate = src.orderDate;
+		this.waiter = src.waiter;
+		this.payManner = src.payManner;
+		this.hangStatus = src.hangStatus;
+		this.isTemporary = src.isTemporary;
+		this.discount = src.discount;
+		this.count = src.count;
+		this.isHurried = src.isHurried;
+		this.table = new Table(src.table);
+		this.tmpTaste = new Taste(src.tmpTaste);
+		this.tastes = new Taste[src.tastes.length];
+		for(int i = 0; i < this.tastes.length; i++){
+			this.tastes[i] = new Taste(src.tastes[i]);
+		}		
+	}
+	
 	/**
 	 * Check to see whether the food has temporary taste.
 	 * @return true if the food has temporary taste, otherwise false

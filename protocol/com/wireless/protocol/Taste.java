@@ -57,6 +57,18 @@ public class Taste {
 		type = tasteType;
 	}
 
+	public Taste(Taste src){
+		this.tasteID = src.tasteID;
+		this.aliasID = src.aliasID;
+		this.restaurantID = src.restaurantID;
+		this.preference = src.preference;
+		this.category = src.category;
+		this.calc = src.calc;
+		this.rate = src.rate;
+		this.price = src.price;
+		this.type = src.type;
+	}
+	
 	public boolean equals(Object obj){
 		if(obj == null || !(obj instanceof Taste)){
 			return false;

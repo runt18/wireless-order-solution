@@ -60,4 +60,21 @@ public class Table {
 		return new Integer(restaurantID).hashCode() ^ new Integer(aliasID).hashCode();
 	}
 	
+	public Table(){
+		
+	}
+	
+	public Table(Table src){
+		this.restaurantID = src.restaurantID;
+		this.tableID = src.tableID;
+		this.aliasID = src.aliasID;
+		this.name = src.name;
+		this.customNum = src.customNum;
+		this.status = src.status;
+		this.category = src.category;
+		this.regionID = src.regionID;
+		this.serviceRate = src.serviceRate;
+		this.minimumCost = src.minimumCost;
+	}
+	
 }
