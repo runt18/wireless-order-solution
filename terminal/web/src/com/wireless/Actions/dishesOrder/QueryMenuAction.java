@@ -73,6 +73,8 @@ public class QueryMenuAction extends Action {
 						cond += " and A.name like '%" + searchValue.trim() + "%'";
 					}else if(searchType.equals("2")){
 						cond += " and A.pinyin like '%" + searchValue.trim() + "%'";
+					}else if(searchType.equals("3")){
+						cond += " and A.food_alias like '" + searchValue.trim() + "%'";
 					}
 				}
 				root = MenuDao.getFood(cond, orderBy);
