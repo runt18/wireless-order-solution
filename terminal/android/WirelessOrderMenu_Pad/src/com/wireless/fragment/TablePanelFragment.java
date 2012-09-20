@@ -77,9 +77,7 @@ public class TablePanelFragment extends Fragment {
 	{
 		super.onCreate(savedInstanceState);
 		mTableRefreshHandler = new DataRefreshHandler(this);
-		mTableRefreshHandler.sendEmptyMessage(0);
 		mRegionRefreshHandler = new RegionRefreshHandler(this);
-		mRegionRefreshHandler.sendEmptyMessage(0);
 	}
 	
 	@Override
@@ -157,10 +155,15 @@ public class TablePanelFragment extends Fragment {
 				new QueryTableTask().execute();
 			}
 		});
-		
+
 		return view;
 	}
 	
+	@Override
+	public void onStart(){
+		super.onStart();
+		new QueryTableTask().execute();
+	}
 	/*
 	 * 区域选择的handler
 	 * 根据选择的区域显示不同的餐台

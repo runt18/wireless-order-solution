@@ -44,7 +44,8 @@ import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 import com.wireless.ui.PickedFoodActivity;
 
-public class OptionBarFragment extends Fragment implements OnTableChangedListener, OnStaffChangedListener, OnFoodsChangeListener{
+public class OptionBarFragment extends Fragment implements OnTableChangedListener, OnStaffChangedListener, 
+									OnFoodsChangeListener{
 //	public static final String CUR_TABLE = "current_table";
 	//private static Table mTable;
 	//private static int mCustomCount;
@@ -113,14 +114,14 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState){
 		super.onActivityCreated(savedInstanceState);
-		mBBarRefleshHandler = new BBarHandler(this);
 		init(this.getActivity());
-		ShoppingCart.instance().setOnFoodsChangeListener(this);
 	}
 
 	@Override
 	public void onStart(){
 		super.onStart();		
+		mBBarRefleshHandler = new BBarHandler(this);
+		ShoppingCart.instance().setOnFoodsChangeListener(this);
 		mBBarRefleshHandler.sendEmptyMessage(0);
 	}
 	
@@ -216,8 +217,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 		((TablePanelFragment)getFragmentManager().findFragmentById(R.id.tab1)).setOnTableChangedListener(this);
 		((StaffPanelFragment)getFragmentManager().findFragmentById(R.id.tab2)).setOnServerChangeListener(this);
 	}
-
-
+	
 	/**
 	 * 餐台设置时的回调，根据餐台的状态来判断是否请求订单
 	 */
@@ -229,7 +229,6 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 
 		if(table.status == Table.TABLE_IDLE){		
 			ShoppingCart.instance().setOriOrder(null);
-			mBBarRefleshHandler.sendEmptyMessage(0);
 			Toast.makeText(this.getActivity(), "该餐台尚未点菜", Toast.LENGTH_SHORT).show();
 			
 		}else if(table.status == Table.TABLE_BUSY){
@@ -240,6 +239,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 				}
 			 }.execute(WirelessOrder.foodMenu);
 		}
+
 	}
 
 	/**
@@ -364,4 +364,5 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 	public void onFoodsChange(List<OrderFood> newFoods) {
 		mBBarRefleshHandler.sendEmptyMessage(0);
 	}
+
 }

@@ -176,6 +176,7 @@ public final class ShoppingCart {
 	 */
 	public boolean replaceFood(OrderFood foodToReplace){
 		int index = mExtraFoods.indexOf(foodToReplace);
+		notifyFoodsChange();
 		if(index != -1){
 			mExtraFoods.set(index, foodToReplace);
 			return true;
@@ -227,6 +228,7 @@ public final class ShoppingCart {
 
 	public void setOriOrder(Order mOriOrder) {
 		this.mOriOrder = mOriOrder;
+		notifyFoodsChange();
 	}
 
 	public boolean hasExtraFoods(){

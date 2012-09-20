@@ -2,6 +2,7 @@ package com.wireless.ui;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,13 +20,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ImageButton;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
+import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,6 +46,17 @@ public class PickedFoodActivity extends Activity implements OnTableChangeListene
 	private static final String ITEM_FOOD_PRICE = "item_food_price";
 	private static final String ITEM_FOOD_COUNT = "item_food_count";
 	private static final String ITEM_FOOD_STATE = "item_food_state";
+	private static final String ITEM_THE_FOOD = "theFood";
+	
+	private static final String ITEM_GROUP_NAME = "itemGroupName";
+
+	private static final String[] GROUP_ITEM_TAGS = {
+		ITEM_GROUP_NAME
+	};
+	
+	private static final int[] GROUP_ITEM_ID = {
+		R.id.textView_groupName_pickedFood_list_item
+	};
 	
 	private static final String[] ITEM_TAGS = {
 		ITEM_FOOD_NAME, 
@@ -74,7 +85,7 @@ public class PickedFoodActivity extends Activity implements OnTableChangeListene
 	 */
 	private static class FoodHandler extends Handler{
 		private WeakReference<PickedFoodActivity> mActivity;
-		private ListView mPickedFoodList;
+		private ExpandableListView mPickedFoodList;
 		private TextView mTotalCountTextView;
 		private TextView mTotalPriceTextView;
 		private float mTotalPrice = 0;
@@ -82,53 +93,90 @@ public class PickedFoodActivity extends Activity implements OnTableChangeListene
 		FoodHandler(PickedFoodActivity activity)
 		{
 			mActivity = new WeakReference<PickedFoodActivity>(activity);
+			mPickedFoodList = (ExpandableListView) activity.findViewById(R.id.expandableListView_pickedFood);
+			mTotalCountTextView = (TextView) activity.findViewById(R.id.textView_total_count_pickedFood);
+			mTotalPriceTextView = (TextView)  activity.findViewById(R.id.textView_total_price_pickedFood);
 		}
 		
 		@Override
 		public void handleMessage(Message msg)
 		{
 			final PickedFoodActivity activity = mActivity.get();
-			//若未初始化，则先初始化
-			if(mPickedFoodList == null)
-				mPickedFoodList = (ListView) activity.findViewById(R.id.listView_pickedFood);
-			if(mTotalCountTextView == null)
-				mTotalCountTextView = (TextView) activity.findViewById(R.id.textView_total_count_pickedFood);
-			if(mTotalPriceTextView == null)
-				mTotalPriceTextView = (TextView)  activity.findViewById(R.id.textView_total_price_pickedFood);
-			
-			//获取原始数据
-			final ArrayList<OrderFood> orderFoods = ShoppingCart.instance().getAllFoods();
-			
-			if(orderFoods.isEmpty())
+			ShoppingCart sCart = ShoppingCart.instance();
+			//若完全没有菜式，则关闭该activity
+			if(!sCart.hasExtraFoods() && !sCart.hasOrder())
 				activity.finish();
-			else activity.mCurOrderFood = orderFoods.get(0);
 			
-			mTotalCountTextView.setText(""+ orderFoods.size());
+			int totalCount = 0;
+			mTotalPrice = 0;
 
-			//将所有已点菜装载并统计总价
-			final List<Map<String, ?>> listContents = new ArrayList<Map<String, ?>>();
-			for(OrderFood f: orderFoods)
-			{
-				HashMap<String, Object> map = new HashMap<String, Object>();
-				map.put(ITEM_FOOD_NAME, f.name);
-				map.put(ITEM_FOOD_PRICE, f.getPriceWithTaste());
-				map.put(ITEM_FOOD_COUNT, f.getCount());
-				map.put(ITEM_FOOD_STATE, f.status);
-				listContents.add(map);
-				mTotalPrice += f.getPriceWithTaste() * f.getCount(); 
+			List<Map<String, ?>> groupData = new ArrayList<Map<String, ?>>();
+			final List<List<Map<String, ?>>> childData =  new ArrayList<List<Map<String, ?>>>();
+			//若包含菜单，则将已点菜添加进列表
+			if(sCart.hasOrder()){
+				List<OrderFood> pickedFoods = Arrays.asList(ShoppingCart.instance().getOriOrder().foods);
+				activity.mCurOrderFood = pickedFoods.get(0);
+				totalCount += pickedFoods.size();
+				List<Map<String, ?>> pickedFoodDatas = new ArrayList<Map<String,?>>();
+				for(OrderFood f:pickedFoods)
+				{
+					HashMap<String, Object> map = new HashMap<String, Object>();
+					map.put(ITEM_FOOD_NAME, f.name);
+					map.put(ITEM_FOOD_PRICE, String.valueOf(f.getPriceWithTaste()));
+					map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
+//					map.put(ITEM_FOOD_STATE, f.status);
+					map.put(ITEM_THE_FOOD, f);
+					pickedFoodDatas.add(map);
+					mTotalPrice += f.getPriceWithTaste() * f.getCount(); 
+
+				}
+				childData.add(pickedFoodDatas);
+				
+				HashMap<String, Object> map1 = new HashMap<String, Object>();
+				map1.put(ITEM_GROUP_NAME, "新点菜");
+				groupData.add(map1);
 			}
-			
+			//若包含新点菜，则将新点菜添加进列表
+			if(sCart.hasExtraFoods()){
+				List<OrderFood> newFoods = sCart.getExtraFoods();
+				activity.mCurOrderFood = newFoods.get(0);
+				totalCount += newFoods.size();
+				
+				List<Map<String, ?>> newFoodDatas = new ArrayList<Map<String,?>>();
+				for(OrderFood f:newFoods)
+				{
+					HashMap<String, Object> map = new HashMap<String, Object>();
+					map.put(ITEM_FOOD_NAME, f.name);
+					map.put(ITEM_FOOD_PRICE, String.valueOf(f.getPriceWithTaste()));
+					map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
+//					map.put(ITEM_FOOD_STATE, f.status);
+					map.put(ITEM_THE_FOOD, f);
+					newFoodDatas.add(map);
+					mTotalPrice += f.getPriceWithTaste() * f.getCount(); 
+
+				}
+				childData.add(newFoodDatas);
+				
+				HashMap<String, Object> map2 = new HashMap<String, Object>();
+				map2.put(ITEM_GROUP_NAME, "已点菜");
+				groupData.add(map2);
+			}
+
+			mTotalCountTextView.setText(""+ totalCount);
 			mTotalPriceTextView.setText("" + mTotalPrice);
-			
-			SimpleAdapter adapter = new SimpleAdapter(activity.getApplicationContext(), listContents ,R.layout.picked_food_list_item, ITEM_TAGS, ITEM_ID){
+			//创建listview的adapter
+			SimpleExpandableListAdapter adapter = new SimpleExpandableListAdapter(activity.getApplicationContext(), 
+					groupData, R.layout.picked_food_list_group_item, GROUP_ITEM_TAGS, GROUP_ITEM_ID, 
+					childData, R.layout.picked_food_list_item, ITEM_TAGS, ITEM_ID){
 				@Override
-				public View getView(int position, View convertView, ViewGroup parent){
-					View view = super.getView(position, convertView, parent);
+				public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+					View view = super.getChildView(groupPosition, childPosition, isLastChild, convertView, parent);
 					
-					final OrderFood orderFood = orderFoods.get(position);
+					final OrderFood orderFood = (OrderFood) childData.get(groupPosition).get(childPosition).get(ITEM_THE_FOOD);
 					view.setTag(orderFood);
 					//数量输入框
 					final EditText countEditText = (EditText) view.findViewById(R.id.editText_picked_food_count_item);
+					countEditText.setText("" + orderFood.getCount());
 					countEditText.setOnClickListener(new OnClickListener(){
 						@Override
 						public void onClick(View v) {
@@ -167,11 +215,16 @@ public class PickedFoodActivity extends Activity implements OnTableChangeListene
 				}
 			};
 			mPickedFoodList.setAdapter(adapter);
+			//展开所有列表
+			for(int i=0;i<groupData.size();i++)
+			{
+				mPickedFoodList.expandGroup(i);
+			}
 			//设置侦听
 			//当点击菜品是改变右边菜品详情的显示
-			mPickedFoodList.setOnItemClickListener(new OnItemClickListener(){
+			mPickedFoodList.setOnChildClickListener(new OnChildClickListener(){
 				@Override
-				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				public boolean onChildClick(ExpandableListView parent, View view, int groupPosition, int childPosition, long id) {
 					if(parent.getTag() != null)
 					{
 						((View)(parent.getTag())).setBackgroundDrawable(null);
@@ -181,6 +234,7 @@ public class PickedFoodActivity extends Activity implements OnTableChangeListene
 					activity.mCurOrderFood =  (OrderFood) view.getTag();
 					activity.mFoodDataHandler.sendEmptyMessage(PickedFoodActivity.CUR_FOOD_CHANGED);
 					view.setBackgroundColor(view.getResources().getColor(R.color.blue));
+					return false;
 				}
 			});
 		}
@@ -190,7 +244,6 @@ public class PickedFoodActivity extends Activity implements OnTableChangeListene
 	 */
 	private static class FoodDataHandler extends Handler{
 		private WeakReference<PickedFoodActivity> mActivity;
-		private boolean isInitialed = false;
 		private TextView mFoodNameTextView;
 		private TextView mOriPriceTextView;
 		private TextView mConPriceTextView;
@@ -200,25 +253,18 @@ public class PickedFoodActivity extends Activity implements OnTableChangeListene
 		FoodDataHandler(PickedFoodActivity activity)
 		{
 			mActivity = new WeakReference<PickedFoodActivity>(activity);
+			mFoodNameTextView = (TextView) activity.findViewById(R.id.textView_food_name_pickedFood);
+			mOriPriceTextView = (TextView) activity.findViewById(R.id.textView_ori_price_pickedFood);
+			mConPriceTextView = (TextView) activity.findViewById(R.id.textView_con_price_pickedFood);
+			mDiscountTextView = (TextView) activity.findViewById(R.id.textView_discount_pickedFood);
+			mTasteTextView = (TextView) activity.findViewById(R.id.textView_taste_pickedFood);
+			mTempTasteTextView = (TextView) activity.findViewById(R.id.textView_tempTaste_pickedFood);
 		}
 		
 		@Override
 		public void handleMessage(Message Msg)
 		{
 			final PickedFoodActivity activity = mActivity.get();
-			//若未初始化，则先初始化
-			if(!isInitialed)
-			{
-				mFoodNameTextView = (TextView) activity.findViewById(R.id.textView_food_name_pickedFood);
-				mOriPriceTextView = (TextView) activity.findViewById(R.id.textView_ori_price_pickedFood);
-				mConPriceTextView = (TextView) activity.findViewById(R.id.textView_con_price_pickedFood);
-				mDiscountTextView = (TextView) activity.findViewById(R.id.textView_discount_pickedFood);
-				mTasteTextView = (TextView) activity.findViewById(R.id.textView_taste_pickedFood);
-				mTempTasteTextView = (TextView) activity.findViewById(R.id.textView_tempTaste_pickedFood);
-				if(mFoodNameTextView != null && mOriPriceTextView != null && mConPriceTextView != null)
-					isInitialed = true;
-				else return;
-			}
 			//设置菜品的各个数据
 			mFoodNameTextView.setText(activity.mCurOrderFood.name);
 			mOriPriceTextView.setText(""+ activity.mCurOrderFood.getPriceWithTaste());
@@ -281,10 +327,8 @@ public class PickedFoodActivity extends Activity implements OnTableChangeListene
 					Toast.makeText(PickedFoodActivity.this, "您还未设置服务员，暂时不能下单。", Toast.LENGTH_SHORT).show();
 				} 
 				else if(ShoppingCart.instance().hasFoods()){
-					ArrayList<OrderFood> orderFoods = ShoppingCart.instance().getAllFoods();
-					Order reqOrder = new Order(orderFoods.toArray(new OrderFood[orderFoods.size()]), sCart.getDestTable().aliasID, sCart.getDestTable().customNum);
 					try {
-						sCart.commit(reqOrder, new IOnCommitListener());
+						sCart.commit(new IOnCommitListener());
 					} catch (BusinessException e) {
 						e.printStackTrace();
 					}
@@ -297,11 +341,18 @@ public class PickedFoodActivity extends Activity implements OnTableChangeListene
 	public void onTableChange(Table table) {
 		new QueryOrderTask(ShoppingCart.instance().getDestTable().aliasID).execute(WirelessOrder.foodMenu);
 	}
+	//activity关闭后不再侦听购物车变化
+	@Override
+	public void finish(){
+		super.finish();
+		ShoppingCart.instance().setOnTableChangeListener(null);
+	}
 	
 	private class AskCancelAmountDialog extends Dialog{
 		
 		AskCancelAmountDialog(final OrderFood selectedFood) {
 			super(PickedFoodActivity.this);
+		
 			final Context context = PickedFoodActivity.this;
 			View view = LayoutInflater.from(context).inflate(R.layout.delete_count_dialog, null);
 			setContentView(view);
