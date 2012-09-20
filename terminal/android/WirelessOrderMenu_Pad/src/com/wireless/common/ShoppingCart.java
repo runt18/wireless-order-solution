@@ -72,8 +72,11 @@ public final class ShoppingCart {
 				throw new BusinessException(ErrorCode.UNKNOWN);
 			}else{
 				checkCommitValid();
-				new CommitOrderTask(new Order(mExtraFoods.toArray(new OrderFood[mExtraFoods.size()]), mDestTable.aliasID, mDestTable.customNum), 
-									commitListener).execute(Type.INSERT_ORDER);
+				new CommitOrderTask(new Order(mExtraFoods.toArray(new OrderFood[mExtraFoods.size()]), 
+											  mDestTable.aliasID, 
+											  mDestTable.customNum), 
+									commitListener)
+									.execute(Type.INSERT_ORDER);
 			}
 		}
 	}
@@ -161,7 +164,7 @@ public final class ShoppingCart {
 			float orderAmount = oriFood.getCount() + extraFood.getCount();
 			oriFood.setCount(orderAmount);
 		}else{
-			mExtraFoods.add(extraFood);
+			mExtraFoods.add(new OrderFood(extraFood));
 		}
 		notifyFoodsChange();
 	}
