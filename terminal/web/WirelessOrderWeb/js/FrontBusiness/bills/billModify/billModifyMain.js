@@ -31,7 +31,7 @@ dishCountInputWin = new Ext.Window({
 					dishCountInputWin.hide();
 					var ds = orderedGrid.getStore().getAt(dishOrderCurrRowIndex_).data;
 					for(var i = 0; i < orderedData.root.length; i++){						
-						if(ds.foodID == orderedData.root[i].foodID){
+						if(ds.aliasID == orderedData.root[i].aliasID){
 							if(ds.tasteID == orderedData.root[i].tasteID
 									&& ds.tasteIDTwo == orderedData.root[i].tasteIDTwo
 									&& ds.tasteIDThree == orderedData.root[i].tasteIDThree){
@@ -98,7 +98,7 @@ function dishOptDeleteHandler(rowIndex) {
 				if (btn == "yes") {
 					var ds = orderedGrid.getStore().getAt(rowIndex).data;
 					for(var i = 0; i < orderedData.root.length; i++){						
-						if(ds.foodID == orderedData.root[i].foodID){
+						if(ds.aliasID == orderedData.root[i].aliasID){
 							if(ds.tasteID == orderedData.root[i].tasteID
 									&& ds.tasteIDTwo == orderedData.root[i].tasteIDTwo
 									&& ds.tasteIDThree == orderedData.root[i].tasteIDThree){
@@ -136,6 +136,7 @@ var orderedStore = new Ext.data.Store({
 		{name : 'waiter'}, 		    
 		{name : 'acturalPrice'}, 
 		{name : 'foodID'}, 
+		{name : 'aliasID'},
 		{name : 'currPrice'}, 
 		{name : 'gift'}, 
 		{name : 'recommend'}, 
@@ -245,7 +246,7 @@ var countAddImgBut = new Ext.ux.ImageButton({
 		if (dishOrderCurrRowIndex_ != -1) {
 			var ds = orderedGrid.getStore().getAt(dishOrderCurrRowIndex_).data;					
 			for(var i = 0; i < orderedData.root.length; i++){						
-				if(ds.foodID == orderedData.root[i].foodID){
+				if(ds.aliasID == orderedData.root[i].aliasID){
 					if(ds.tasteID == orderedData.root[i].tasteID
 							&& ds.tasteIDTwo == orderedData.root[i].tasteIDTwo
 							&& ds.tasteIDThree == orderedData.root[i].tasteIDThree){
@@ -274,7 +275,7 @@ var countMinusImgBut = new Ext.ux.ImageButton({
 			var ds = orderedGrid.getStore().getAt(dishOrderCurrRowIndex_).data;
 			if (ds.count > 1) {
 				for(var i = 0; i < orderedData.root.length; i++){						
-					if(ds.foodID == orderedData.root[i].foodID){	
+					if(ds.aliasID == orderedData.root[i].aliasID){	
 						if(ds.tasteID == orderedData.root[i].tasteID
 								&& ds.tasteIDTwo == orderedData.root[i].tasteIDTwo
 								&& ds.tasteIDThree == orderedData.root[i].tasteIDThree){

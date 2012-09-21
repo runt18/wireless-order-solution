@@ -475,7 +475,7 @@ var dishPushBackWin = new Ext.Window({
 							dishPushBackWin.findById('dishPushBackCount').setValue('');
 							var ds = orderedGrid.getStore().getAt(dishOrderCurrRowIndex_).data;
 							for(var i = 0; i < orderedData.root.length; i++){
-								if(ds.foodID == orderedData.root[i].foodID){
+								if(ds.aliasID == orderedData.root[i].aliasID){
 									if(eval(ds.tasteID == orderedData.root[i].tasteID)
 											&& eval(ds.tasteIDTwo == orderedData.root[i].tasteIDTwo)
 											&& eval(ds.tasteIDThree == orderedData.root[i].tasteIDThree)){
