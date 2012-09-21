@@ -1188,6 +1188,7 @@ allFoodTabPanelGrid.on('rowdblclick', function(thiz, ri, e){
 				orderDateFormat : new Date().format('Y-m-d H:i:s'),
 				waiter : Ext.getDom('optName').innerHTML,
 				foodID : r.get('foodID'),
+				aliasID : r.get('foodAliasID'),
 				kitchenId : r.get('kitchen.kitchenID'),
 				special : r.get('special'),
 				recommend : r.get('recommend'),
@@ -1306,6 +1307,7 @@ var tempFoodTabPanel = new Ext.Panel({
 					orderDateFormat : (new Date().format('Y-m-d H:i:s')),
 					waiter : Ext.getDom('optName').innerHTML,
 					foodID : (new Date().format('His')),
+					aliasID  : (new Date().format('His')),
 					kitchenID : 0,
 					special : false,
 					recommend : false,
@@ -1555,7 +1557,7 @@ submitOrderHandler = function(c){
 						+ orderedData.root[i].tmpTastePrice + ','  // 临时口味价钱
 						+ orderedData.root[i].tmpTasteAlias + ',' // 临时口味编号
 						+ orderedData.root[i].hangStatus + ','  // 菜品状态
-						+ orderedData.root[i].status  // 是否已点菜 1:是 2:否
+						+ orderedData.root[i].status  // 菜品操作状态 1:已点菜 2:新点菜
 						+ ']';
 			} else {
 				var foodname = orderedData.root[i].foodName;
@@ -1563,12 +1565,12 @@ submitOrderHandler = function(c){
 				// [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价]
 				foodPara = foodPara 
 						+ '[true,'// 是否临时菜(true)
-						+ orderedData.root[i].foodID + ',' // 临时菜1编号
+						+ orderedData.root[i].aliasID + ',' // 临时菜1编号
 						+ foodname + ',' // 临时菜1名称
 						+ orderedData.root[i].count + ',' // 临时菜1数量
 						+ orderedData.root[i].unitPrice + ',' // 临时菜1单价(原料單價)
 						+ orderedData.root[i].hangStatus + ','  // 菜品状态
-						+ orderedData.root[i].status    // 是否已点菜 1:是 2:否
+						+ orderedData.root[i].status   // 菜品操作状态 1:已点菜 2:新点菜
 						+ ']';
 			}									
 		}	
