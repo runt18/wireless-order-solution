@@ -1098,9 +1098,6 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 							thiz.store.loadData(root, true);
 						}
 					});
-				},
-				select : function(thiz, r, index){
-					
 				}
 			}
 		}), new Ext.form.TextField({
@@ -1113,7 +1110,7 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 			id : 'txtSearchPinyin',
 			hidden : true,
 			width : 100
-		}),  new Ext.form.TextField({
+		}), new Ext.form.TextField({
 			xtype : 'textfield',
 			id : 'txtSearchFoodAliasID',
 			hidden : true,
@@ -1121,6 +1118,15 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 		}),
 		'->',
 		{
+			text : '重置',
+			iconCls : 'btn_refresh',
+			handler : function(){
+				var st = Ext.getCmp('comSearchType');
+				st.setValue(0);
+				st.fireEvent('select', null, null, 0);
+				Ext.getCmp('btnSearchMenu').handler();
+			}
+		}, {
 			text : '搜索',
 			id : 'btnSearchMenu',
 			iconCls : 'btn_search',

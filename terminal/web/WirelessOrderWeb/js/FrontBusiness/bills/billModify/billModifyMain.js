@@ -17,12 +17,14 @@ dishCountInputWin = new Ext.Window({
 			id : "dishCountInput",
 			maxValue : 65535,
 			minValue : 1,
-			width : 110
+			width : 130
 		} ]
 	} ],
+	buttonAlign : 'center',
 	buttons : [
 	    {
 			text : "确定",
+			id : 'btnSetFoodCount',
 			handler : function(){
 				var inputCount = dishCountInputWin.findById("dishCountInput");
 				if (inputCount.getValue() != "" && inputCount.getValue() > 0 && inputCount.getValue() < 65535) {
@@ -52,56 +54,20 @@ dishCountInputWin = new Ext.Window({
 	listeners : {
 		show : function(thiz) {
 			var f = Ext.getCmp("dishCountInput");
-			f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
+			f.focus.defer(100, f); 
+			f.setValue();
 		}
-	}
+	},
+	keys : [{
+		key : Ext.EventObject.ENTER,
+		scope : this,
+		fn : function(){
+			Ext.getCmp('btnSetFoodCount').handler(); 
+		}
+	}]
 });
 
 // --------------dishes order center panel-----------------
-
-// 已点菜式
-// 2，表格的数据store
-var orderedStore = new Ext.data.Store({
-	proxy : new Ext.data.MemoryProxy(orderedData),
-	reader : new Ext.data.JsonReader(Ext.ux.readConfig,
-	[
-	    {name : 'foodName'},
-	    {name : 'displayFoodName'}, 
-		{name : 'tastePref'}, 
-		{name : 'count'}, 
-		{name : 'unitPrice'}, 
-		{name : 'dishOpt'}, 
-		{name : 'discount'}, 
-		{name : 'orderDateFormat'}, 
-		{name : 'waiter'}, 		    
-		{name : 'acturalPrice'}, 
-		{name : 'foodID'}, 
-		{name : 'currPrice'}, 
-		{name : 'gift'}, 
-		{name : 'recommend'}, 
-		{name : 'soldout'}, 
-		{name : 'special'}, 
-		{name : 'seqID'}, 
-		{name : 'status'},
-		{name : 'count'},
-		{name : 'tasteID'},
-		{name : 'tasteIDThree'},
-		{name : 'tasteIDTwo'},
-		{name : 'tastePrice'},
-		{name : 'temporary'},
-		{name : 'kitchen'}
-	   ]
-	),
-	listeners : {
-		load : function(thiz, records){
-			for(var i = 0; i < records.length; i++){
-				Ext.ux.formatFoodName(records[i], 'displayFoodName', 'foodName');				
-			}
-		}
-	}
-});
-
-// 3，栏位模型
 function dishOptTasteHandler(rowIndex) {	
 	if (dishOrderCurrRowIndex_ != -1) {
 		var ds = orderedStore.getAt(rowIndex).data;		
@@ -155,6 +121,46 @@ function dishOptDispley(value, cellmeta, record, rowIndex, columnIndex, store) {
 			+ '';
 };
 
+var orderedStore = new Ext.data.Store({
+	proxy : new Ext.data.MemoryProxy(orderedData),
+	reader : new Ext.data.JsonReader(Ext.ux.readConfig,
+	[
+	    {name : 'foodName'},
+	    {name : 'displayFoodName'}, 
+		{name : 'tastePref'}, 
+		{name : 'count'}, 
+		{name : 'unitPrice'}, 
+		{name : 'dishOpt'}, 
+		{name : 'discount'}, 
+		{name : 'orderDateFormat'}, 
+		{name : 'waiter'}, 		    
+		{name : 'acturalPrice'}, 
+		{name : 'foodID'}, 
+		{name : 'currPrice'}, 
+		{name : 'gift'}, 
+		{name : 'recommend'}, 
+		{name : 'soldout'}, 
+		{name : 'special'}, 
+		{name : 'seqID'}, 
+		{name : 'status'},
+		{name : 'count'},
+		{name : 'tasteID'},
+		{name : 'tasteIDThree'},
+		{name : 'tasteIDTwo'},
+		{name : 'tastePrice'},
+		{name : 'temporary'},
+		{name : 'kitchen'}
+	   ]
+	),
+	listeners : {
+		load : function(thiz, records){
+			for(var i = 0; i < records.length; i++){
+				Ext.ux.formatFoodName(records[i], 'displayFoodName', 'foodName');				
+			}
+		}
+	}
+});
+
 var orderedColumnModel = new Ext.grid.ColumnModel([
 	new Ext.grid.RowNumberer(),
 	{
@@ -165,7 +171,7 @@ var orderedColumnModel = new Ext.grid.ColumnModel([
 		header : "口味",
 		sortable : true,
 		dataIndex : "tastePref",
-		width : 160
+		width : 150
 	}, {
 		header : "数量",
 		sortable : true,
@@ -539,6 +545,9 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 				}, {
 					type : 2,
 					name : '拼音'
+				}, {
+					type : 3,
+					name : '编号'
 				}]
 			}),
 			valueField : 'type',
@@ -558,24 +567,35 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 					var kitchen = Ext.getCmp('comSearchKitchen');
 					var foodName = Ext.getCmp('txtSearchFoodName');
 					var pinyin = Ext.getCmp('txtSearchPinyin');
+					var foodAliasID = Ext.getCmp('txtSearchFoodAliasID');
 					if(index == 0){
 						kitchen.setVisible(true);
 						foodName.setVisible(false);
 						pinyin.setVisible(false);
+						foodAliasID.setVisible(false);
 						kitchen.setValue(254);
 						bmObject.searchField = kitchen.getId();
 					}else if(index == 1){
 						kitchen.setVisible(false);
 						foodName.setVisible(true);
 						pinyin.setVisible(false);
+						foodAliasID.setVisible(false);
 						foodName.setValue();
 						bmObject.searchField = foodName.getId();
 					}else if(index == 2){
 						kitchen.setVisible(false);
 						foodName.setVisible(false);
 						pinyin.setVisible(true);
+						foodAliasID.setVisible(false);
 						pinyin.setValue();
 						bmObject.searchField = pinyin.getId();
+					}else if(index == 3){
+						kitchen.setVisible(false);
+						foodName.setVisible(false);
+						pinyin.setVisible(false);
+						foodAliasID.setVisible(true);
+						foodAliasID.setValue();
+						bmObject.searchField = foodAliasID.getId();
 					}
 				}
 			}
@@ -635,9 +655,23 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 			id : 'txtSearchPinyin',
 			hidden : true,
 			width : 100
+		}), new Ext.form.TextField({
+			xtype : 'textfield',
+			id : 'txtSearchFoodAliasID',
+			hidden : true,
+			width : 100
 		}),
 		'->',
 		{
+			text : '重置',
+			iconCls : 'btn_refresh',
+			handler : function(){
+				var st = Ext.getCmp('comSearchType');
+				st.setValue(0);
+				st.fireEvent('select', null, null, 0);
+				Ext.getCmp('btnSearchMenu').handler();
+			}
+		}, {
 			text : '搜索',
 			id : 'btnSearchMenu',
 			iconCls : 'btn_search',
@@ -666,7 +700,7 @@ var allFoodTabPanelGrid = createGridPanel(
 		['拼音', 'pinyin', 70], 
 		['价格', 'unitPrice', 70, 'right', 'Ext.ux.txtFormat.gridDou']
 	],
-	['displayFoodName', 'foodName', 'foodAliasID', 'foodID', 'pinyin', 'unitPrice', 'stop', 'special', 'recommend', 'gift', 'currPrice', 'combination', 'kitchen.kitchenID'],
+	['displayFoodName', 'foodName', 'foodAliasID', 'foodID', 'pinyin', 'unitPrice', 'stop', 'special', 'recommend', 'gift', 'currPrice', 'combination', 'kitchen.kitchenID', 'kitchen', 'discount'],
 	[['pin',pin], ['type', 1], ['restaurantID', restaurantID], ['isPaging', true]],
 	30,
 	'',
@@ -715,6 +749,8 @@ allFoodTabPanelGrid.on('rowdblclick', function(thiz, ri, e){
 				waiter : Ext.getDom('optName').innerHTML,
 				foodID : r.get('foodID'),
 				kitchenId : r.get('kitchen.kitchenID'),
+				kitchen : r.get('kitchen'),
+//				discount : 1,
 				tasteID : 0,
 				special : r.get('special'),
 				recommend : r.get('recommend'),
@@ -734,9 +770,10 @@ allFoodTabPanelGrid.on('rowdblclick', function(thiz, ri, e){
 			});
 		}
 		
-		orderedStore.loadData(orderedData);				
+		orderedStore.loadData(orderedData);	
 		
-//		dishGridRefresh();
+		billListRefresh();
+		
 	}
 	
 });
