@@ -239,6 +239,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`kitchen` (
   `member_discount_1` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the 1st member discount to the food belong to this kitchen, range from 0.00 to 1.00' ,
   `member_discount_2` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the 2nd member discount to the food belong to this kitchen, range from 0.00 to 1.00' ,
   `member_discount_3` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the 3rd member discount to the food belong to this kitchen, range from 0.00 to 1.00' ,
+  `type` TINYINT NOT NULL DEFAULT 0 COMMENT 'the type to this taste as below.\n0 - normal\n1 - reserved' ,
   PRIMARY KEY (`kitchen_id`) ,
   INDEX `ix_kitchen_alias_id` (`restaurant_id` ASC, `kitchen_alias` ASC) )
 ENGINE = InnoDB
@@ -516,16 +517,11 @@ COMMENT = 'describe the region information to the tables' ;
 DROP TABLE IF EXISTS `wireless_order_db`.`department` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`department` (
-  `restaurant_id` INT UNSIGNED NOT NULL ,
   `dept_id` TINYINT UNSIGNED NOT NULL DEFAULT 0 ,
+  `restaurant_id` INT UNSIGNED NOT NULL DEFAULT 0 ,
   `name` VARCHAR(45) NOT NULL DEFAULT '' ,
-  INDEX `fk_super_kitchen_restaurant` (`restaurant_id` ASC) ,
-  PRIMARY KEY (`dept_id`, `restaurant_id`) ,
-  CONSTRAINT `fk_super_kitchen_restaurant1`
-    FOREIGN KEY (`restaurant_id` )
-    REFERENCES `wireless_order_db`.`restaurant` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+  `type` TINYINT NOT NULL DEFAULT 0 COMMENT 'the type to this taste as below.\n0 - normal\n1 - reserved' ,
+  PRIMARY KEY (`restaurant_id`, `dept_id`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the department information' ;
@@ -744,10 +740,37 @@ DEFAULT CHARACTER SET = utf8,
 COMMENT = 'describe the combo information' ;
 
 
+-- -----------------------------------------------------
+-- Placeholder table for view `wireless_order_db`.`restaurant_view`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `wireless_order_db`.`restaurant_view` (`id` INT, `account` INT, `restaurant_name` INT, `tele1` INT, `tele2` INT, `address` INT, `restaurant_info` INT, `record_alive` INT, `order_num` INT, `order_history_num` INT, `terminal_num` INT, `terminal_virtual_num` INT, `food_num` INT, `table_num` INT, `order_paid` INT, `order_history_paid` INT, `table_using` INT);
+
+-- -----------------------------------------------------
+-- Placeholder table for view `wireless_order_db`.`terminal_view`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `wireless_order_db`.`terminal_view` (`pin` INT, `restaurant_id` INT, `restaurant_name` INT, `model_name` INT, `model_id` INT, `model_id_name` INT, `entry_date` INT, `discard_date` INT, `idle_month` INT, `work_month` INT, `expire_date` INT, `status` INT, `use_rate` INT, `owner_name` INT, `idle_duration` INT, `work_duration` INT);
+
+-- -----------------------------------------------------
+-- View `wireless_order_db`.`restaurant_view`
+-- -----------------------------------------------------
+DROP VIEW IF EXISTS `wireless_order_db`.`restaurant_view` ;
+DROP TABLE IF EXISTS `wireless_order_db`.`restaurant_view`;
+USE `wireless_order_db`;
+CREATE  OR REPLACE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `wireless_order_db`.`restaurant_view` AS select `r`.`id` AS `id`,`r`.`account` AS `account`,`r`.`restaurant_name` AS `restaurant_name`,`r`.`tele1` AS `tele1`,`r`.`tele2` AS `tele2`,`r`.`address` AS `address`,`r`.`restaurant_info` AS `restaurant_info`,`r`.`record_alive` AS `record_alive`,(select count(`wireless_order_db`.`order`.`id`) AS `count(``order``.``id``)` from `wireless_order_db`.`order` where (`wireless_order_db`.`order`.`restaurant_id` = `r`.`id`)) AS `order_num`,(select count(`wireless_order_db`.`order_history`.`id`) AS `count(``order_history``.``id``)` from `wireless_order_db`.`order_history` where (`wireless_order_db`.`order_history`.`restaurant_id` = `r`.`id`)) AS `order_history_num`,(select count(`wireless_order_db`.`terminal`.`pin`) AS `count(``terminal``.``pin``)` from `wireless_order_db`.`terminal` where ((`wireless_order_db`.`terminal`.`restaurant_id` = `r`.`id`) and (`wireless_order_db`.`terminal`.`model_id` <= 0x7f))) AS `terminal_num`,(select count(`wireless_order_db`.`terminal`.`pin`) AS `count(``terminal``.``pin``)` from `wireless_order_db`.`terminal` where ((`wireless_order_db`.`terminal`.`restaurant_id` = `r`.`id`) and (`wireless_order_db`.`terminal`.`model_id` > 0x7f))) AS `terminal_virtual_num`,(select count(`wireless_order_db`.`food`.`id`) AS `count(``food``.``id``)` from `wireless_order_db`.`food` where (`wireless_order_db`.`food`.`restaurant_id` = `r`.`id`)) AS `food_num`,(select count(`wireless_order_db`.`table`.`id`) AS `count(``table``.``id``)` from `wireless_order_db`.`table` where (`wireless_order_db`.`table`.`restaurant_id` = `r`.`id`)) AS `table_num`,(select count(`wireless_order_db`.`order`.`id`) AS `count(``order``.``id``)` from `wireless_order_db`.`order` where ((`wireless_order_db`.`order`.`restaurant_id` = `r`.`id`) and (`wireless_order_db`.`order`.`total_price` is not null))) AS `order_paid`,(select count(`wireless_order_db`.`order_history`.`id`) AS `count(``order_history``.``id``)` from `wireless_order_db`.`order_history` where ((`wireless_order_db`.`order_history`.`restaurant_id` = `r`.`id`) and (`wireless_order_db`.`order_history`.`total_price` is not null))) AS `order_history_paid`,(select count(`wireless_order_db`.`table`.`id`) AS `count(``table``.``id``)` from `wireless_order_db`.`table` where ((`wireless_order_db`.`table`.`restaurant_id` = `r`.`id`) and exists(select 1 AS `1` from `wireless_order_db`.`order` where ((`wireless_order_db`.`order`.`table_id` = `wireless_order_db`.`table`.`alias_id`) and isnull(`wireless_order_db`.`order`.`total_price`) and (`wireless_order_db`.`order`.`restaurant_id` = `r`.`id`))))) AS `table_using` from `wireless_order_db`.`restaurant` `r`;
+
+-- -----------------------------------------------------
+-- View `wireless_order_db`.`terminal_view`
+-- -----------------------------------------------------
+DROP VIEW IF EXISTS `wireless_order_db`.`terminal_view` ;
+DROP TABLE IF EXISTS `wireless_order_db`.`terminal_view`;
+USE `wireless_order_db`;
+CREATE  OR REPLACE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `wireless_order_db`.`terminal_view` AS select `t`.`pin` AS `pin`,`t`.`restaurant_id` AS `restaurant_id`,`r`.`restaurant_name` AS `restaurant_name`,`t`.`model_name` AS `model_name`,`t`.`model_id` AS `model_id`,(case `t`.`model_id` when 0 then 'BlackBerry' when 1 then 'Android' when 2 then 'iPhone' when 3 then 'WindowsMobile' end) AS `model_id_name`,`t`.`entry_date` AS `entry_date`,`t`.`discard_date` AS `discard_date`,format((((`t`.`idle_duration` / 3600) / 24) / 30),1) AS `idle_month`,format((((`t`.`work_duration` / 3600) / 24) / 30),1) AS `work_month`,`t`.`expire_date` AS `expire_date`,(case when (`t`.`restaurant_id` = 2) then '空闲' when (`t`.`restaurant_id` = 3) then '废弃' when ((`t`.`restaurant_id` > 10) and (now() <= `t`.`expire_date`)) then '使用' when ((`t`.`restaurant_id` > 10) and (now() > `t`.`expire_date`)) then '过期' end) AS `status`,format(((`t`.`work_duration` / (`t`.`work_duration` + `t`.`idle_duration`)) * 100),0) AS `use_rate`,`t`.`owner_name` AS `owner_name`,`t`.`idle_duration` AS `idle_duration`,`t`.`work_duration` AS `work_duration` from (`wireless_order_db`.`terminal` `t` left join `wireless_order_db`.`restaurant` `r` on((`t`.`restaurant_id` = `r`.`id`)));
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
 
 -- -----------------------------------------------------
 -- Data for table `wireless_order_db`.`restaurant`
