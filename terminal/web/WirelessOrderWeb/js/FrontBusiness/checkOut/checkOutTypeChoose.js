@@ -65,10 +65,13 @@ var checkOurListRefresh = function() {
 			tpItem.discount = parseFloat(1).toFixed(2);
 		}else{
 			if (discountValue == "discount1") {
+				discountType = 1;
 				tpItem.discount = parseFloat(tpItem.kitchen.discount1).toFixed(2);	
 			} else if (discountValue == "discount2") {
+				discountType = 2;
 				tpItem.discount = parseFloat(tpItem.kitchen.discount2).toFixed(2);			
 			} else {
+				discountType = 3;
 				tpItem.discount = parseFloat(tpItem.kitchen.discount3).toFixed(2);
 			}
 		}
