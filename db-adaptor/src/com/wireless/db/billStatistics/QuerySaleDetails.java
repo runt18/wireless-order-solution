@@ -83,7 +83,7 @@ public class QuerySaleDetails {
 		/**
 		 * Put the temporary department
 		 */
-		deptSalesDetail.put(new Department("临时菜", Department.DEPT_TEMP, term.restaurantID), new SalesDetail("临时菜"));
+		deptSalesDetail.put(new Department("临时菜", Department.DEPT_TEMP, term.restaurantID, Department.TYPE_RESERVED), new SalesDetail("临时菜"));
 			
 		/**
 		 * Calculate the gift, discount, income to each department during this period

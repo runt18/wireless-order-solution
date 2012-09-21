@@ -72,7 +72,7 @@ public class QueryCancelledFood {
 		/**
 		 * Put the temporary department
 		 */
-		deptCancelledFoodDetail.put(new Department("临时菜", Department.DEPT_TEMP, term.restaurantID), new CancelledFood("临时菜", ""));
+		deptCancelledFoodDetail.put(new Department("临时菜", Department.DEPT_TEMP, term.restaurantID, Department.TYPE_RESERVED), new CancelledFood("临时菜", ""));
 		
 		/**
 		 * Calculate the orderCount to each department during this period

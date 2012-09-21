@@ -6,6 +6,7 @@ import java.sql.Statement;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Food;
+import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Table;
@@ -151,8 +152,13 @@ public class InsertOrder {
 				 * Not to get the detail if the submitted food is temporary,
 				 * since the submitted string has contained the details, like name, price and amount. 
 				 */
-				if(!orderToInsert.foods[i].isTemporary){
+				if(orderToInsert.foods[i].isTemporary){
+					Kitchen[] kitchens = QueryMenu.queryKitchens(dbCon, "AND KITCHEN.kitchen_alias=" + orderToInsert.foods[i].kitchen.aliasID + " AND KITCHEN.restaurant_id=" + term.restaurantID, null);
+					if(kitchens.length > 0){
+						orderToInsert.foods[i].kitchen = kitchens[0];
+					}
 					
+				}else{					
 					//get the associated foods' unit price and name
 					Food[] detailFood = QueryMenu.queryFoods(dbCon, " AND FOOD.food_alias=" + orderToInsert.foods[i].aliasID + " AND FOOD.restaurant_id=" + term.restaurantID, null);
 					if(detailFood.length > 0){
@@ -315,7 +321,7 @@ public class InsertOrder {
 							(orderToInsert.foods[i].tmpTaste == null ? "NULL" : ("'" + orderToInsert.foods[i].tmpTaste.getPreference() + "'")) + ", " +
 							(orderToInsert.foods[i].tmpTaste == null ? "NULL" : orderToInsert.foods[i].tmpTaste.getPrice()) + ", " +
 							orderToInsert.foods[i].kitchen.dept.deptID + ", " +
-							"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurantID + " AND kitchen_alias=" + orderToInsert.foods[i].kitchen.aliasID + "), " + 
+							orderToInsert.foods[i].kitchen.kitchenID + ", " +
 							orderToInsert.foods[i].kitchen.aliasID + ", '" + 
 							term.owner + "', NOW(), " + 
 							(orderToInsert.foods[i].isTemporary ? "1" : "0") + ")";

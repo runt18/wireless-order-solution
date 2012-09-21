@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.dbObject.SingleOrderFood;
-import com.wireless.protocol.Kitchen;
 
 public class SingleOrderFoodReflector {
 	
@@ -74,22 +73,21 @@ public class SingleOrderFoodReflector {
 			  " A.food_id, A.name, A.food_alias, A.food_status, " +
 			  " A.order_count, A.unit_price, A.discount, " + 
 			  " A.kitchen_id, A.kitchen_alias, A.dept_id, " +
-			  "(CASE WHEN A.kitchen_alias = " + Kitchen.KITCHEN_TEMP + " THEN '临时厨房' " +
-			  " WHEN A.kitchen_alias = " + Kitchen.KITCHEN_NULL + " THEN '空' " +
-			  " WHEN A.kitchen_id IS NULL OR C.kitchen_id IS NULL THEN '已删除厨房' " +
+			  "(CASE WHEN C.kitchen_id IS NULL THEN '已删除厨房' " +
 			  " ELSE C.name END) AS kitchen_name, " +
 			  " A.taste, A.taste_price, A.taste_id, A.taste2_id, A.taste3_id, A.taste_alias, A.taste2_alias, A.taste3_alias, " +
 			  " A.taste_tmp_alias, A.taste_tmp, A.taste_tmp_price, " + 
 			  " A.order_date, A.is_temporary, A.is_paid, A.waiter, A.comment, " +
 			  " B.type, B.service_rate, " +
-			  " (CASE WHEN A.kitchen_alias = " + Kitchen.KITCHEN_TEMP + " THEN '临时菜' ELSE D.name END) as dept_name " +
+			  " (CASE WHEN D.dept_id IS NULL THEN '已删除部门' " + 
+			  " ELSE D.name END) as dept_name " +
 			  " FROM " + 
 			  Params.dbName + "." + orderFoodTbl + " A LEFT JOIN " +
 			  Params.dbName + ".kitchen C " + 
 			  " ON A.kitchen_id = C.kitchen_id " + 
 			  " LEFT JOIN " +
 			  Params.dbName + ".department D " + 
-			  " ON C.restaurant_id = D.restaurant_id  AND C.dept_id = D.dept_id " +
+			  " ON C.restaurant_id = D.restaurant_id AND C.dept_id = D.dept_id " +
 			  " JOIN " +
 			  Params.dbName + "." + orderTbl + " B " +
 			  " ON  A.order_id = B.id " +

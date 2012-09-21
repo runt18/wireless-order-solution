@@ -469,6 +469,7 @@ public class TasteRef {
 										  "",
 										  dbCon.rs.getLong("kitchen_id"),
 										  dbCon.rs.getShort("kitchen_alias"),
+										  Kitchen.TYPE_NORMAL,
 										  null);
 			
 			TasteRefCnt tasteRef = new TasteRefCnt(dbCon.rs.getInt("taste_id"),
@@ -520,7 +521,7 @@ public class TasteRef {
 		
 		HashMap<Department, Set<TasteRefCnt>> result = new HashMap<Department, Set<TasteRefCnt>>();
 		while(dbCon.rs.next()){
-			Department dept = new Department("", dbCon.rs.getShort("dept_id"), dbCon.rs.getInt("restaurant_id"));
+			Department dept = new Department("", dbCon.rs.getShort("dept_id"), dbCon.rs.getInt("restaurant_id"), Department.TYPE_NORMAL);
 			
 			TasteRefCnt tasteRef = new TasteRefCnt(dbCon.rs.getInt("taste_id"),
 				    							   TasteRefCnt.TASTE_BY_DEPT,

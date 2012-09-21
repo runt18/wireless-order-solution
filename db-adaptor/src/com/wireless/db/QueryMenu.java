@@ -53,8 +53,8 @@ public class QueryMenu {
 			    			queryTastes(dbCon, Taste.CATE_TASTE, "AND restaurant_id=" + term.restaurantID, null),
 			    			queryTastes(dbCon, Taste.CATE_STYLE, "AND restaurant_id=" + term.restaurantID, null),
 			    			queryTastes(dbCon, Taste.CATE_SPEC, "AND restaurant_id=" + term.restaurantID, null),
-			    			queryKitchens(dbCon, "AND KITCHEN.restaurant_id=" + term.restaurantID, null),
-			    			queryDepartments(dbCon, "AND DEPT.restaurant_id=" + term.restaurantID, null));
+			    			queryKitchens(dbCon, "AND KITCHEN.restaurant_id=" + term.restaurantID + " AND KITCHEN.type=" + Kitchen.TYPE_NORMAL, null),
+			    			queryDepartments(dbCon, "AND DEPT.restaurant_id=" + term.restaurantID + " AND DEPT.type=" + Department.TYPE_NORMAL, null));
 	}
 	
 	/**
@@ -124,12 +124,16 @@ public class QueryMenu {
 					 " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, " +
 					 " FOOD.name, FOOD.unit_price, FOOD.kitchen_alias, FOOD.status, FOOD.pinyin, FOOD.taste_ref_type, " +
 					 " FOOD.desc, FOOD.img, " +
-					 " KITCHEN.dept_id, KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.name AS kitchen_name " +
+					 " KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.name AS kitchen_name, KITCHEN.type AS kitchen_type, " +
+					 " DEPT.dept_id, DEPT.name AS dept_name, DEPT.type AS dept_type " +
 					 " FROM " + 
 					 Params.dbName + ".food FOOD " +
 					 " LEFT OUTER JOIN " +
 					 Params.dbName + ".kitchen KITCHEN " +
 					 " ON FOOD.kitchen_id = KITCHEN.kitchen_id " +
+					 " LEFT OUTER JOIN " +
+					 Params.dbName + ".department DEPT " +
+					 " ON KITCHEN.dept_id = DEPT.dept_id AND KITCHEN.restaurant_id = DEPT.restaurant_id " +
 					 " WHERE 1=1 " +
 					 (extraCondition == null ? "" : extraCondition) + " " +
 					 (orderClause == null ? "" : orderClause); 
@@ -153,7 +157,11 @@ public class QueryMenu {
 	 				   				       dbCon.rs.getString("kitchen_name"),
 	 				   				       dbCon.rs.getLong("kitchen_id"),
 	 				   				       dbCon.rs.getShort("kitchen_alias"),
-	 				   				       new Department(null, dbCon.rs.getShort("dept_id"), restaurantID))));
+	 				   				       dbCon.rs.getShort("kitchen_type"),
+	 				   				       new Department(dbCon.rs.getString("dept_name"), 
+	 				   				    		   		  dbCon.rs.getShort("dept_id"), 
+	 				   				    		   		  restaurantID,
+	 				   				    		   		  dbCon.rs.getShort("dept_type")))));
 		}
 		
 		return foods.toArray(new Food[foods.size()]);
@@ -211,13 +219,17 @@ public class QueryMenu {
 					 " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, " +
 					 " FOOD.name, FOOD.unit_price, FOOD.status, FOOD.pinyin, FOOD.taste_ref_type, " +
 					 " FOOD.desc, FOOD.img, " +
-					 " KITCHEN.dept_id, KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.name AS kitchen_name, " +
+					 " KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.name AS kitchen_name, KITCHEN.type AS kitchen_type, " +
+					 " DEPT.dept_id, DEPT.name AS dept_name, DEPT.type AS dept_type, " +
 					 " TASTE.taste_id, TASTE.taste_alias " +
 					 " FROM " + 
 					 Params.dbName + ".food FOOD " +
 					 " LEFT OUTER JOIN " +
 					 Params.dbName + ".kitchen KITCHEN " +
 					 " ON FOOD.kitchen_id = KITCHEN.kitchen_id " +
+					 " LEFT OUTER JOIN " +
+					 Params.dbName + ".department DEPT " +
+					 " ON KITCHEN.dept_id = DEPT.dept_id AND KITCHEN.restaurant_id = DEPT.restaurant_id " +
 					 " LEFT OUTER JOIN " +
 					 Params.dbName + ".food_taste_rank FTR " +
 					 " ON FOOD.food_id = FTR.food_id " +
@@ -266,7 +278,11 @@ public class QueryMenu {
 			 			 						   	   dbCon.rs.getString("kitchen_name"),
 			 			 						   	   dbCon.rs.getLong("kitchen_id"),
 			 			 						   	   dbCon.rs.getShort("kitchen_alias"),
-			 			 						   	   new Department(null, dbCon.rs.getShort("dept_id"), restaurantID)));
+			 			 						   	   dbCon.rs.getShort("kitchen_type"),
+			 			 						   	   new Department(dbCon.rs.getString("dept_name"), 
+			 			 						   			   		  dbCon.rs.getShort("dept_id"), 
+			 			 						   			   		  restaurantID,
+			 			 						   			   		  dbCon.rs.getShort("dept_type"))));
 				
 				foodTasteMap.put(foodID, new Map.Entry<Food, List<Taste>>(){
 
@@ -355,7 +371,8 @@ public class QueryMenu {
 				  " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, " +
 				  " FOOD.name, FOOD.unit_price, FOOD.status, FOOD.pinyin, FOOD.taste_ref_type, " +
 				  " FOOD.desc, FOOD.img, " +
-				  " KITCHEN.dept_id, KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.name AS kitchen_name, " +
+				  " KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.name AS kitchen_name, KITCHEN.type AS kitchen_type, " +
+				  " DEPT.dept_id, DEPT.name AS dept_name, DEPT.type AS dept_type, " +
 				  " COMBO.amount " +
 				  " FROM " +
 				  Params.dbName + ".food FOOD " + 
@@ -365,6 +382,9 @@ public class QueryMenu {
 				  " LEFT OUTER JOIN " +
 				  Params.dbName + ".kitchen KITCHEN " +
 				  " ON FOOD.kitchen_id = KITCHEN.kitchen_id " +
+				  " LEFT OUTER JOIN " +
+				  Params.dbName + ".department DEPT " +
+				  " ON KITCHEN.dept_id = DEPT.dept_id AND KITCHEN.restaurant_id = DEPT.restaurant_id " +
 				  " WHERE COMBO.food_id = " + parent.foodID;
 				
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -389,7 +409,11 @@ public class QueryMenu {
 						   							  dbCon.rs.getString("kitchen_name"),
 						   							  dbCon.rs.getLong("kitchen_id"),
 						   							  dbCon.rs.getShort("kitchen_alias"),
-						   							  new Department(null, dbCon.rs.getShort("dept_id"), restaurantID)));
+						   							  dbCon.rs.getShort("kitchen_type"),
+						   							  new Department(dbCon.rs.getString("dept_name"), 
+						   									  		 dbCon.rs.getShort("dept_id"), 
+						   									  		 restaurantID,
+						   									  		 dbCon.rs.getShort("dept_type"))));
 				childFood.amount = dbCon.rs.getInt("amount");
 				childFoods.add(childFood);
 			}				
@@ -416,20 +440,30 @@ public class QueryMenu {
 	public static Kitchen[] queryKitchens(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
 		//get all the kitchen information to this restaurant,
 		ArrayList<Kitchen> kitchens = new ArrayList<Kitchen>();
-		String sql = " SELECT restaurant_id, kitchen_id, kitchen_alias, name, discount, discount_2, discount_3, " +
-					 " member_discount_1, member_discount_2, member_discount_3, " +
-					 " dept_id FROM " + 
+		String sql = " SELECT " +
+					 " KITCHEN.restaurant_id, KITCHEN.kitchen_id, KITCHEN.kitchen_alias, " +
+					 " KITCHEN.name AS kitchen_name, KITCHEN.type AS kitchen_type, " +
+					 " KITCHEN.discount, KITCHEN.discount_2, KITCHEN.discount_3, " +
+					 " KITCHEN.member_discount_1, KITCHEN.member_discount_2, KITCHEN.member_discount_3, " +
+					 " DEPT.dept_id, DEPT.name AS dept_name, DEPT.type AS dept_type FROM " + 
 			  		 Params.dbName + ".kitchen KITCHEN " +
+					 " JOIN " +
+					 Params.dbName + ".department DEPT " +
+					 " ON KITCHEN.dept_id = DEPT.dept_id AND KITCHEN.restaurant_id = DEPT.restaurant_id " +
 			  		 " WHERE 1=1 " + 
 			  		 (extraCond == null ? "" : extraCond) + " " +
 			  		 (orderClause == null ? "" : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
 			kitchens.add(new Kitchen(dbCon.rs.getInt("restaurant_id"),
-									 dbCon.rs.getString("name"),
+									 dbCon.rs.getString("kitchen_name"),
 									 dbCon.rs.getLong("kitchen_id"),
 									 dbCon.rs.getShort("kitchen_alias"),
-									 new Department("", dbCon.rs.getShort("dept_id"), 0),
+									 dbCon.rs.getShort("kitchen_type"),
+									 new Department(dbCon.rs.getString("dept_name"), 
+											 		dbCon.rs.getShort("dept_id"), 
+											 		dbCon.rs.getInt("restaurant_id"),
+											 		dbCon.rs.getShort("dept_type")),
 									 (byte)(dbCon.rs.getFloat("discount") * 100),
 									 (byte)(dbCon.rs.getFloat("discount_2") * 100),
 									 (byte)(dbCon.rs.getFloat("discount_3") * 100),
@@ -445,7 +479,7 @@ public class QueryMenu {
 	public static Department[] queryDepartments(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
 		//get tall the super kitchen information to this restaurant
 		ArrayList<Department> departments = new ArrayList<Department>();
-		String sql = " SELECT dept_id, name, restaurant_id FROM " + Params.dbName + ".department DEPT " +
+		String sql = " SELECT dept_id, name, restaurant_id, type FROM " + Params.dbName + ".department DEPT " +
 					 " WHERE 1=1 " +
 					 (extraCond != null ? extraCond : "") + " " +
 					 (orderClause != null ? orderClause : "");
@@ -453,7 +487,8 @@ public class QueryMenu {
 		while(dbCon.rs.next()){
 			departments.add(new Department(dbCon.rs.getString("name"),
 									   	   dbCon.rs.getShort("dept_id"),
-									   	   dbCon.rs.getInt("restaurant_id")));
+									   	   dbCon.rs.getInt("restaurant_id"),
+									   	   dbCon.rs.getShort("type")));
 		}
 		dbCon.rs.close();
 		

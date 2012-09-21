@@ -8,6 +8,7 @@ import java.util.List;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Food;
+import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderDiff;
 import com.wireless.protocol.OrderDiff.DiffResult;
@@ -338,8 +339,8 @@ public class UpdateOrder {
 						(extraFood.tmpTaste == null ? "NULL" : extraFood.tmpTaste.aliasID) + ", " +
 						(extraFood.tmpTaste == null ? "NULL" : ("'" + extraFood.tmpTaste.getPreference() + "'")) + ", " +
 						(extraFood.tmpTaste == null ? "NULL" : extraFood.tmpTaste.getPrice()) + ", " +
-						extraFood.kitchen.dept.deptID + ", " + 
-						"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurantID + " AND kitchen_alias=" + extraFood.kitchen.aliasID + "), " + 
+						extraFood.kitchen.dept.deptID + ", " +
+						extraFood.kitchen.kitchenID + ", " +
 						extraFood.kitchen.aliasID + ", '" + 
 						term.owner + "', " +
 						"NOW(), " + 
@@ -385,8 +386,8 @@ public class UpdateOrder {
 						(canceledFood.tmpTaste == null ? "NULL" : canceledFood.tmpTaste.aliasID) + ", " +
 						(canceledFood.tmpTaste == null ? "NULL" : ("'" + canceledFood.tmpTaste.getPreference() + "'")) + ", " +
 						(canceledFood.tmpTaste == null ? "NULL" : canceledFood.tmpTaste.getPrice()) + ", " +
-						canceledFood.kitchen.dept.deptID + ", " + 
-						"(SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE restaurant_id=" + term.restaurantID + " AND kitchen_alias=" + canceledFood.kitchen.aliasID + "), " + 
+						canceledFood.kitchen.dept.deptID + ", " +
+						canceledFood.kitchen.kitchenID + ", " +
 						canceledFood.kitchen.aliasID + ", '" + 
 						term.owner + "', " +
 						"NOW(), " + 
@@ -615,6 +616,7 @@ public class UpdateOrder {
 	 * 			Throws if fail to execute any SQL statement
 	 */
 	private static void fillFoodDetail(DBCon dbCon, Terminal term, OrderFood foodBasic) throws BusinessException, SQLException{
+		
 		/**
 		 * Firstly, check to see whether the submitted food is temporary.
 		 * If temporary, assign food basic's the name and price directly.
@@ -624,10 +626,14 @@ public class UpdateOrder {
 		 * secondly, check to see whether the taste preference submitted by terminal exist in db or not.
 		 * If the taste preference can't be found in db, means the taste in terminal has been expired,
 		 * and then sent back an error to tell the terminal to update the menu.
-		 */		
-		
-		if(!foodBasic.isTemporary){
+		 */			
+		if(foodBasic.isTemporary){
+			Kitchen[] kitchens = QueryMenu.queryKitchens(dbCon, "AND KITCHEN.kitchen_alias=" + foodBasic.kitchen.aliasID + " AND KITCHEN.restaurant_id=" + term.restaurantID, null);
+			if(kitchens.length > 0){
+				foodBasic.kitchen = kitchens[0];
+			}
 			
+		}else{
 			//Get the details 			
 			Food[] detailFood = QueryMenu.queryFoods(dbCon, " AND FOOD.food_alias=" + foodBasic.aliasID + " AND FOOD.restaurant_id=" + term.restaurantID, null);
 			
