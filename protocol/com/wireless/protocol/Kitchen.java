@@ -2,6 +2,9 @@ package com.wireless.protocol;
 
 public final class Kitchen {
 	
+	public final static short TYPE_NORMAL = 0;				/* 一般 */
+	public final static short TYPE_RESERVED = 1;			/* 保留 */
+	
 	public final static short KITCHEN_NULL = 255;
 	public final static short KITCHEN_FULL = 254;
 	public final static short KITCHEN_TEMP = 253;
@@ -24,8 +27,8 @@ public final class Kitchen {
 	public final static short KITCHEN_17 = 16;
 	public final static short KITCHEN_18 = 17;
 	public final static short KITCHEN_19 = 18;
-	public final static short KITCHEN_20 = 19;
-		
+	public final static short KITCHEN_20 = 19;	
+
 	int discount_1 = 100;	
 	int discount_2 = 100;
 	int discount_3 = 100;
@@ -80,6 +83,8 @@ public final class Kitchen {
 	public void setMemDist3(Float distVal){
 		memberDist_3 = Util.float2Int(distVal);
 	}
+	//the type to this kitchen
+	public short type = TYPE_NORMAL;	
 	//the name to this kitchen
 	public String name;
 	//the restaurant id to this kitchen
@@ -98,23 +103,33 @@ public final class Kitchen {
 		this.aliasID = KITCHEN_NULL;
 	}
 	
-	public Kitchen(int restaurantID, String kitchenName, long kitchenID, short kitchenAlias, Department dept){
+	public Kitchen(int restaurantID, String kitchenName, long kitchenID, short kitchenAlias, short type, Department dept){
 		this.restaurantID = restaurantID;
 		this.name = kitchenName;
 		this.kitchenID = kitchenID;
 		this.aliasID = kitchenAlias;
+		this.type = type;
 		this.dept = dept;
 	}
 	
-	public Kitchen(int restaurantID, String kitchenName, long kitchenID, short kitchenAlias, 
+	public boolean isNormal(){
+		return type == TYPE_NORMAL;
+	}
+	
+	public boolean isReserved(){
+		return type == TYPE_RESERVED;
+	}
+	
+	public Kitchen(int restaurantID, String kitchenName, long kitchenID, short kitchenAlias, short type,
 				   Department dept, byte dist1, byte dist2, byte dist3, byte memDist1, byte memDist2, byte memDist3){
-		this(restaurantID, kitchenName, kitchenID, kitchenAlias, dept);
+		this(restaurantID, kitchenName, kitchenID, kitchenAlias, type, dept);
 		discount_1 = dist1;
 		discount_2 = dist2;
 		discount_3 = dist3;
 		memberDist_1 = memDist1;
 		memberDist_2 = memDist2;
 		memberDist_3 = memDist3;
+		this.type = type;
 	}
 	
 	public boolean equals(Object obj){

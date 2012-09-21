@@ -2,12 +2,7 @@ package com.wireless.protocol;
 
 import java.io.UnsupportedEncodingException;
 
-public class RespParser {
-	
-
-
-
-	
+public class RespParser {	
 	/**
 	 * Parse the response associated with query menu request.
 	 * @param response the protocol package return from ProtocolConnector's ask() function
@@ -251,16 +246,9 @@ public class RespParser {
 				}catch(UnsupportedEncodingException e){}
 				offset += lenOfKitchenName;
 				
-//				offset += 1 + 					/* kitchen_alias(1-byte) */
-//						  1 + 					/* dept_id(1-byte) */
-//						  3 + 					/* normal discount 1..3(3-byte) */
-//						  3 + 					/* member discount 1..3(3-byte) */
-//						  1 + 					/* length to kitchen name */
-//						  + lenOfKitchenName;		/* the value to kitchen */
-				
 				//add the kitchen
-				kitchens[i] = new Kitchen(0, kitchenName, 0, kitchenAlias, 
-										  new Department(null, deptAlias, 0),
+				kitchens[i] = new Kitchen(0, kitchenName, 0, kitchenAlias, Kitchen.TYPE_NORMAL, 
+										  new Department(null, deptAlias, 0, Department.TYPE_NORMAL),
 										  dist_1, dist_2, dist_3,
 										  mdist_1, mdist_2, mdist_3);
 			}
@@ -291,7 +279,7 @@ public class RespParser {
 //						  1 + 				/* length to department name */
 //						  deptLen;			/* the value to department name */
 				
-				depts[i] = new Department(deptName, deptID, 0);
+				depts[i] = new Department(deptName, deptID, 0, Department.TYPE_NORMAL);
 			}	
 			
 			return new FoodMenu(foods, tastes, styles, specs, kitchens, depts);
@@ -339,17 +327,6 @@ public class RespParser {
 				preference = new String(response.body, offset, lenOfTaste, "UTF-16BE");
 			}catch(UnsupportedEncodingException e){}
 			offset += lenOfTaste;
-			
-			/**
-			 * Each taste preference consist of the stuff below.
-			 */
-//			offset += 2 + 					/* toast_alias(2-byte) */
-//					  1 + 					/* category(1-byte) */
-//					  1 + 					/* calculate type(1-byte) */
-//					  3 + 					/* price(3-byte) */
-//					  2 + 					/* rate(2-byte) */
-//					  1 + 					/* the length to taste preference */
-//					  lenOfTaste;				/* the value to taste preference */
 			
 			//add the taste
 			tastes[i] = new Taste(0,
