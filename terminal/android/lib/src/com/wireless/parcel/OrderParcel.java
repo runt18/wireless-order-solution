@@ -59,10 +59,8 @@ public class OrderParcel extends Order implements Parcelable{
 		destTbl2 = TableParcel.CREATOR.createFromParcel(in);
 		srcTbl = TableParcel.CREATOR.createFromParcel(in);
 		customNum = in.readInt();
-		String memberID = in.readString();
-		this.memberID = memberID.equals("") ? null : memberID;
-		String comment = in.readString();
-		this.comment = comment.equals("") ? null : comment;
+		this.memberID = in.readString();
+		this.comment = in.readString();;
 		print_type = in.readInt();
 		setMinimumCost(Util.int2Float(in.readInt()));
 		//setGiftPrice(Util.int2Float(in.readInt()));
