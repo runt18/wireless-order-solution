@@ -295,20 +295,21 @@ function moneyCount(opt) {
 			
 			// “找零”计算
 			if (actualPay != "" && actualPay != "0.00") {
-				if (opt == "button") {
-					change_out = (parseFloat(actualPay) - parseFloat(shouldPay_out)).toFixed(2);
-				} else {
+//				if (opt == "button") {
+//					change_out = (parseFloat(actualPay) - parseFloat(shouldPay_out)).toFixed(2);
+//				} else {
 					change_out = "0.00";
-				}
+//				}
 			}
 //			alert('totalCount_out: '+totalCount_out+'   shouldPay_out: '+shouldPay_out+'    change_out: '+change_out);
 			document.getElementById("totalCount").innerHTML = totalCount_out;
 			document.getElementById("shouldPay").innerHTML = shouldPay_out;
 			document.getElementById("change").innerHTML = change_out;
-			if (opt == "button") {
-			} else {
+//			if (opt == "button") {
+//				
+//			} else {
 				document.getElementById("actualCount").value = shouldPay_out;
-			}
+//			}
 		}
 	}
 };

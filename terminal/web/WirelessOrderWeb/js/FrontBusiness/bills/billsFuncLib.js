@@ -168,6 +168,9 @@ function billQueryHandler() {
 
 };
 
+/**
+ * 刷新相关折扣信息 
+ */
 billListRefresh = function(){
 	
 	var discountValue = billGenModForm.getForm().findField("discountRadio").getGroupValue();
@@ -182,10 +185,13 @@ billListRefresh = function(){
 			// 非 特价，送，臨時菜
 			if (discountValue == "discount1") {
 				tpItem.discount = tpItem.kitchen.discount1;
+				discountType = 1;
 			} else if (discountValue == "discount2") {
 				tpItem.discount = tpItem.kitchen.discount2;
+				discountType = 2;
 			} else {
 				tpItem.discount = tpItem.kitchen.discount3;
+				discountType = 3;
 			}
 			tpItem.discount = tpItem.discount == 0 ? 1 : tpItem.discount;
 		}

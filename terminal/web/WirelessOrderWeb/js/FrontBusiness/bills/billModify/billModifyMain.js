@@ -332,7 +332,8 @@ var btnSubmitOrder = new Ext.Button({
 										+ orderedData.root[i].tmpTastePref + ',' // 临时口味
 										+ orderedData.root[i].tmpTastePrice + ','  // 临时口味价钱
 										+ orderedData.root[i].tmpTasteAlias + ','  // 临时口味编号
-										+ orderedData.root[i].hangStatus + '' // 菜品叫起状态
+										+ orderedData.root[i].hangStatus + ',' // 菜品叫起状态
+										+ orderedData.root[i].status  // 菜品操作状态 1:已点菜 2:新点菜 3:反结账 
 										+ ']';
 				} else {
 					var foodname = orderedData.root[i].foodName;
@@ -343,7 +344,8 @@ var btnSubmitOrder = new Ext.Button({
 										+ foodname + ',' // 临时菜1名称
 										+ orderedData.root[i].count + ',' // 临时菜1数量
 										+ orderedData.root[i].unitPrice + ',' // 临时菜1单价(原材料單價)
-										+ orderedData.root[i].hangStatus + '' // 菜品叫起状态
+										+ orderedData.root[i].hangStatus + ',' // 菜品叫起状态
+										+ orderedData.root[i].status  // 菜品操作状态 1:已点菜 2:新点菜 3:反结账
 										+ ']';
 				}
 			}
@@ -361,15 +363,6 @@ var btnSubmitOrder = new Ext.Button({
 				payMannerOut = 5;
 			} else if (payMannerIn == "signPay") {
 				payMannerOut = 4;
-			}
-			
-			var discountValue = billGenModForm.getForm().findField("discountRadio").getGroupValue();
-			if (discountValue == "discount1") {
-				discountType = 1;
-			} else if (discountValue == "discount2") {
-				discountType = 2;
-			} else {
-				discountType = 3;
 			}
 			
 			var serviceRateIn = billGenModForm.findById("serviceRate").getValue();

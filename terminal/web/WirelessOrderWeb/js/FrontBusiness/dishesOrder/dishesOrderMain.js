@@ -328,13 +328,14 @@ dishCountInputWin = new Ext.Window({
 	} ],
 	buttons : [{
 		text : '确定',
+		id : 'btnSetFoodCount',
 		handler : function() {
 			var inputCount = dishCountInputWin.findById('dishCountInput');
 			if (inputCount.getValue() != '' && inputCount.getValue() > 0 && inputCount.getValue() < 65535) {
 				dishCountInputWin.hide();
 				var ds = orderedGrid.getStore().getAt(dishOrderCurrRowIndex_).data;
 				for(var i = 0; i < orderedData.root.length; i++){						
-					if(ds.foodID == orderedData.root[i].foodID){							
+					if(ds.foodID == orderedData.root[i].foodID && ds.status == orderedData.root[i].status){							
 						if(eval(ds.tasteID == orderedData.root[i].tasteID)
 								&& eval(ds.tasteIDTwo == orderedData.root[i].tasteIDTwo)
 								&& eval(ds.tasteIDThree == orderedData.root[i].tasteIDThree)){
@@ -360,9 +361,17 @@ dishCountInputWin = new Ext.Window({
 		show : function(thiz) {
 			var f = Ext.get('dishCountInput');
 			f.focus.defer(100, f);
+			Ext.getCmp('dishCountInput').setValue();
 			thiz.center();
 		}
-	}
+	},
+	keys : [{
+		key : Ext.EventObject.ENTER,
+		scope : this,
+		fn : function(){
+			Ext.getCmp('btnSetFoodCount').handler(); 
+		}
+	}]
 });
 
 // 已点菜式
@@ -1557,7 +1566,7 @@ submitOrderHandler = function(c){
 						+ orderedData.root[i].tmpTastePrice + ','  // 临时口味价钱
 						+ orderedData.root[i].tmpTasteAlias + ',' // 临时口味编号
 						+ orderedData.root[i].hangStatus + ','  // 菜品状态
-						+ orderedData.root[i].status  // 菜品操作状态 1:已点菜 2:新点菜
+						+ orderedData.root[i].status  // 菜品操作状态 1:已点菜 2:新点菜 3:反结账
 						+ ']';
 			} else {
 				var foodname = orderedData.root[i].foodName;
@@ -1570,7 +1579,7 @@ submitOrderHandler = function(c){
 						+ orderedData.root[i].count + ',' // 临时菜1数量
 						+ orderedData.root[i].unitPrice + ',' // 临时菜1单价(原料單價)
 						+ orderedData.root[i].hangStatus + ','  // 菜品状态
-						+ orderedData.root[i].status   // 菜品操作状态 1:已点菜 2:新点菜
+						+ orderedData.root[i].status  // 菜品操作状态 1:已点菜 2:新点菜 3:反结账
 						+ ']';
 			}									
 		}	
