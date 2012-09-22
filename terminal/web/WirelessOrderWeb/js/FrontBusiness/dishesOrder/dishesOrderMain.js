@@ -33,8 +33,8 @@ var commonTasteGridForTabPanel = new Ext.grid.GridPanel({
 	},
 	cm : new Ext.grid.ColumnModel([
 		new Ext.grid.RowNumberer(),
-		{header:'口味名', dataIndex:'tasteName', width:130},
-		{header:'价钱', dataIndex:'tastePrice', width:70, align:'right', renderer:Ext.ux.txtFormat.gridDou},
+		{header:'口味名', dataIndex:'tasteName', width:120},
+		{header:'价钱', dataIndex:'tastePrice', width:80, align:'right', renderer:Ext.ux.txtFormat.gridDou},
 		{header:'', dataIndex:'tasteRate', hidden:true},
 		{header:'', dataIndex:'tasteCalcFormat', hidden:true},
 		{header:'', dataIndex:'operation', hidden:true}
@@ -77,8 +77,8 @@ var allTasteGridForTabPanel = new Ext.grid.GridPanel({
 	},
 	cm : new Ext.grid.ColumnModel([
 		new Ext.grid.RowNumberer(),
-		{header:'口味名', dataIndex:'tasteName', width:130},
-		{header:'价钱', dataIndex:'tastePrice', width:70, align:'right', renderer:Ext.ux.txtFormat.gridDou},
+		{header:'口味名', dataIndex:'tasteName', width:120},
+		{header:'价钱', dataIndex:'tastePrice', width:80, align:'right', renderer:Ext.ux.txtFormat.gridDou},
 		{header:'', dataIndex:'tasteRate', hidden:true},
 		{header:'', dataIndex:'tasteCalcFormat', hidden:true},
 		{header:'', dataIndex:'operation', hidden:true}
@@ -105,9 +105,9 @@ var ggForTabPanel = new Ext.grid.GridPanel({
 	},
 	cm : new Ext.grid.ColumnModel([
 		new Ext.grid.RowNumberer(),
-		{header:'规格名', dataIndex:'tasteName', width:130},
+		{header:'规格名', dataIndex:'tasteName', width:120},
 		{header:'', dataIndex:'tastePrice', hidden:true},
-		{header:'比例', dataIndex:'tasteRate', width:70, align:'right', renderer:Ext.ux.txtFormat.gridDou},
+		{header:'比例', dataIndex:'tasteRate', width:80, align:'right', renderer:Ext.ux.txtFormat.gridDou},
 		{header:'', dataIndex:'tasteCalcFormat', hidden:true},
 		{header:'', dataIndex:'operation', hidden:true}
 	]),
@@ -1620,8 +1620,23 @@ submitOrderHandler = function(c){
 			success : function(response, options) {
 				var rj = Ext.util.JSON.decode(response.responseText);
 				if (rj.success == true) {
+					var interval = 3;
+					var action = '&nbsp;<span id="returnInterval" style="color:red;"></span>&nbsp;之后自动跳转.';
+					new Ext.util.TaskRunner().start({
+						run: function(){
+							if(interval < 1){
+								if(typeof(c.href) != 'undefined'){
+									location.href = c.href;								
+								}								
+							}
+							Ext.getDom('returnInterval').innerHTML = interval;
+							interval--;
+					    },
+					    interval : 1000
+					});
+					
 					Ext.MessageBox.show({
-						msg : rj.msg,
+						msg : (rj.msg + action),
 						width : 300,
 						buttons : Ext.MessageBox.OK,
 						fn : function() {
