@@ -117,6 +117,10 @@ else if($editType == "addRestaurant" || $editType == "editAdminRestaurant")
 					$db->Execute($sql);
 
 					//insert the kitchen
+					$sql = "INSERT INTO kitchen(restaurant_id,kitchen_alias,name,type) VALUES($id, 253, '临时厨房', 1)";
+					$db->Execute($sql);
+					$sql = "INSERT INTO kitchen(restaurant_id,kitchen_alias,name,type) VALUES($id, 255, '空', 1)";
+					$db->Execute($sql);
 					$sql = "INSERT INTO kitchen(restaurant_id,kitchen_alias,name) VALUES($id, 0, '厨房1')";
 					$db->Execute($sql);
 					$sql = "INSERT INTO kitchen(restaurant_id,kitchen_alias,name) VALUES($id, 1, '厨房2')";
@@ -319,6 +323,10 @@ else if($editType == "addRestaurant" || $editType == "editAdminRestaurant")
 					$sql = "INSERT INTO `wireless_order_db`.`material_cate` (`restaurant_id`, `cate_id`, `name`) VALUES ($id, 49, '种类50')";
 					$db->Execute($sql);
 					//insert the department
+					$sql = "INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`, `type`) VALUES ($id, 253, '临时部门', 1)";
+					$db->Execute($sql);
+					$sql = "INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`, `type`) VALUES ($id, 255, '空', 1)";
+					$db->Execute($sql);
 					$sql = "INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`) VALUES ($id, 0, '仓管部')";
 					$db->Execute($sql);
 					$sql = "INSERT INTO `wireless_order_db`.`department` (`restaurant_id`, `dept_id`, `name`) VALUES ($id, 1, '部门1')";
