@@ -48,14 +48,18 @@ public class Util {
 	 * 
 	 * @param submitFoods
 	 *            the submitted string looks like below.<br>
-	 *            {[是否临时菜(false),菜品1编号,菜品1数量,口味1编号,厨房1编号,菜品1折扣,2nd口味1编号,3rd口味1编号,是否临时口味,临时口味,临时口味价钱,临时口味编号,叫起状态]，
-	 *             [是否临时菜(false),菜品2编号,菜品2数量,口味2编号,厨房2编号,菜品2折扣,2nd口味1编号,3rd口味1编号,是否临时口味,临时口味,临时口味价钱,临时口味编号,叫起状态]，... 
-	 *             [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价,叫起状态]，
-	 *             [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价,叫起状态]...}
+	 *            {[是否临时菜(false),菜品1编号,菜品1数量,口味1编号,厨房1编号,菜品1折扣,2nd口味1编号,3rd口味1编号,是否临时口味,临时口味,临时口味价钱,临时口味编号,叫起状态,是否新添加]，
+	 *             [是否临时菜(false),菜品2编号,菜品2数量,口味2编号,厨房2编号,菜品2折扣,2nd口味1编号,3rd口味1编号,是否临时口味,临时口味,临时口味价钱,临时口味编号,叫起状态,是否新添加]，... 
+	 *             [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价,叫起状态,是否新添加]，
+	 *             [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价,叫起状态,是否新添加]...}
 	 * @return the class food array
 	 */
-	public static OrderFood[] toFoodArray(String submitFoods)
-			throws NumberFormatException {
+	public static OrderFood[] toFoodArray(String submitFoods) throws NumberFormatException {
+		
+		final int ORIGINAL_ORDER_FOOD = 1;
+		final int EXTRA_ORDER_FOOD = 2;
+		final int PAY_AGAIN_ORDER_FOOD = 3;
+		
 		// remove the "{}"
 		submitFoods = submitFoods.substring(1, submitFoods.length() - 1);
 		// extract each food item string
@@ -73,8 +77,18 @@ public class Util {
 				foods[i].isTemporary = true;
 				// extract the alias id to this temporary food
 				int aliasID = Integer.parseInt(values[1]);
-				if(aliasID < 0){
-					//generate an unique food id to temporary food if it is new 
+				// extract the name to this temporary food
+				foods[i].name = values[2];
+				// extract the amount to this temporary food
+				foods[i].setCount(Float.parseFloat(values[3]));
+				// extract the unit price to this temporary food
+				foods[i].setPrice(Float.parseFloat(values[4]));
+				// extract the hang status to this temporary food
+				foods[i].hangStatus = Short.parseShort(values[5]);
+				// extract the flag to indicates whether the food is original or extra
+				if (Short.parseShort(values[6]) == EXTRA_ORDER_FOOD) {
+					//Generate an unique food id to temporary food if it is extra.
+					//Otherwise just assign the alias id.
 					int tmpFoodID;
 					boolean isUnique;
 					do{
@@ -88,22 +102,16 @@ public class Util {
 								}
 							}
 						}						
-					}while(!isUnique);
-					
+					}while(!isUnique);					
 					foods[i].aliasID = tmpFoodID;
 					
-				}else{			
-					//assign the alias id
-					foods[i].aliasID = aliasID;					
+				}else if(Short.parseShort(values[6]) == ORIGINAL_ORDER_FOOD){
+					foods[i].aliasID = aliasID;
+					
+				}else if(Short.parseShort(values[6]) == PAY_AGAIN_ORDER_FOOD){
+					
 				}
-				// extract the name to this temporary food
-				foods[i].name = values[2];
-				// extract the amount to this temporary food
-				foods[i].setCount(Float.parseFloat(values[3]));
-				// extract the unit price to this temporary food
-				foods[i].setPrice(Float.parseFloat(values[4]));
-				// extract the hang status to this temporary food
-				foods[i].hangStatus = Short.parseShort(values[5]);
+				
 			} else {
 				// extract the food alias id
 				foods[i].aliasID = Integer.parseInt(values[1]);
