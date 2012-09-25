@@ -301,6 +301,28 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 					}
 				}
 			});
+			//点菜按钮
+			((ImageButton) dialogLayout.findViewById(R.id.imageButton_addFood_rec_dialog)).setOnClickListener(new OnClickListener(){
+				@Override
+				public void onClick(View v) {
+					mOrderFood = new OrderFood(mRecommendfoods.get(mGalleryFragment.getSelectedPosition()));
+					mOrderFood.setCount(Float.parseFloat(((EditText) mDialog.findViewById(R.id.editText_count_rec_dialog)).getText().toString()));
+					ShoppingCart.instance().addFood(mOrderFood);
+					Toast.makeText(getApplicationContext(), mOrderFood.name + "已添加", Toast.LENGTH_SHORT).show();
+				}
+			});
+			
+			((ImageButton) dialogLayout.findViewById(R.id.imageButton_amplify_rec_dialog)).setOnClickListener(new OnClickListener(){
+				@Override
+				public void onClick(View v) {
+					Intent intent = new Intent(FoodDetailActivity.this ,FullScreenActivity.class);
+					Bundle bundle = new Bundle();
+					bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(mOrderFood));
+					intent.putExtras(bundle);
+					startActivity(intent);
+				}
+			});
+			
 		}
 		
 		void show(){

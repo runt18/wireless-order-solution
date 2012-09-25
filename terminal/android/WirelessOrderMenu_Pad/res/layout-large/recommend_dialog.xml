@@ -34,9 +34,9 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="@color/white"
         android:textSize="36sp" />
-
+
     <ImageButton
-        android:id="@+id/imageButton1"
+        android:id="@+id/imageButton_amplify_rec_dialog"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
@@ -72,12 +72,14 @@
             android:text="简介："
             android:textAppearance="?android:attr/textAppearanceMedium" />
     </RelativeLayout>
-
+
     <RelativeLayout
         android:id="@+id/bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true" >
+        android:layout_alignParentBottom="true"
+        android:focusable="true"
+        android:focusableInTouchMode="true" >
 
         <TextView
             android:id="@+id/textView2"
@@ -144,14 +146,15 @@
             android:text="元/份"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="@color/white" />
-
+
         <ImageButton
-            android:id="@+id/imageButton2"
+            android:id="@+id/imageButton_addFood_rec_dialog"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
             android:src="@drawable/set_table_btn_selector" />
+
     </RelativeLayout>
 
 </RelativeLayout>

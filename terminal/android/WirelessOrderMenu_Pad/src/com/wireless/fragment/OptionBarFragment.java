@@ -134,6 +134,8 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 		pickTblImgView.setOnClickListener(new View.OnClickListener() {			
 			@Override
 			public void onClick(View v) {
+				if(mDialog == null)
+					initDialog(activity);
 				mTabHost.setCurrentTabByTag(TAB_PICK_TBL);
 				mDialog.show();
 			}
@@ -144,6 +146,8 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 		pickStaffImgView.setOnClickListener(new View.OnClickListener() {			
 			@Override
 			public void onClick(View v) {
+				if(mDialog == null)
+					initDialog(activity);
 				mTabHost.setCurrentTabByTag(TAB_PICK_STAFF);
 				mDialog.show();
 			}
@@ -154,6 +158,8 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 		vipImgView.setOnClickListener(new View.OnClickListener() {			
 			@Override
 			public void onClick(View v) {
+				if(mDialog == null)
+					initDialog(activity);
 				mTabHost.setCurrentTabByTag(TAB_PICK_VIP);
 				mDialog.show();
 			}
@@ -172,8 +178,6 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 			}
 		});
 		
-		initDialog(activity);
-
 	}
 	
 	/**

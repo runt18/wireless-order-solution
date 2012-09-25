@@ -230,7 +230,7 @@ public class PickedFoodActivity extends Activity implements OnTableChangeListene
 						((View)(parent.getTag())).setBackgroundDrawable(null);
 					}
 					parent.setTag(view);
-					
+					//点击后改变该项的颜色显示
 					activity.mCurOrderFood =  (OrderFood) view.getTag();
 					activity.mFoodDataHandler.sendEmptyMessage(PickedFoodActivity.CUR_FOOD_CHANGED);
 					view.setBackgroundColor(view.getResources().getColor(R.color.blue));

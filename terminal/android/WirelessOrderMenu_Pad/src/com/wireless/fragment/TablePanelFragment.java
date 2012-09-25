@@ -76,6 +76,7 @@ public class TablePanelFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
+		new QueryTableTask().execute();
 		mTableRefreshHandler = new DataRefreshHandler(this);
 		mRegionRefreshHandler = new RegionRefreshHandler(this);
 	}
@@ -84,7 +85,6 @@ public class TablePanelFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater , ViewGroup container, Bundle savedInstanceState)
 	{
 		final View view = inflater.inflate(R.layout.dialog_tab1,container,false);
-		
 		final AutoCompleteTextView tableNumEditText = (AutoCompleteTextView)view.findViewById(R.id.editText_table_num);
 		
 		tableNumEditText.addTextChangedListener(new TextWatcher(){
@@ -159,11 +159,6 @@ public class TablePanelFragment extends Fragment {
 		return view;
 	}
 	
-	@Override
-	public void onStart(){
-		super.onStart();
-		new QueryTableTask().execute();
-	}
 	/*
 	 * 区域选择的handler
 	 * 根据选择的区域显示不同的餐台
