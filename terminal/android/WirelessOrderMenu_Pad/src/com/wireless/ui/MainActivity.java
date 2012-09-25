@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 
 import android.app.Activity;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -20,8 +21,8 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.fragment.ExpandableListFragment;
 import com.wireless.fragment.ExpandableListFragment.OnItemChangeListener;
 import com.wireless.fragment.GalleryFragment;
-import com.wireless.fragment.GalleryFragment.OnPicClickedListener;
 import com.wireless.fragment.GalleryFragment.OnPicChangedListener;
+import com.wireless.fragment.GalleryFragment.OnPicClickedListener;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Department;
@@ -42,11 +43,39 @@ public class MainActivity extends Activity
 	private ExpandableListFragment mItemFragment;
 	
 	private OrderFood mOrderFood;
+
+	private Comparator<Food> mFoodCompByKitchen;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+		
+		mFoodCompByKitchen = new Comparator<Food>() {
+			@Override
+			public int compare(Food food1, Food food2) {
+				if (food1.kitchen.aliasID > food2.kitchen.aliasID) {
+					return 1;
+				} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
+					return -1;
+				} else {
+					return 0;
+				}
+			}
+		};
+		/**
+		 * 将所有菜品进行按厨房编号进行排序
+		 */
+		Arrays.sort(WirelessOrder.foods, mFoodCompByKitchen);
+		
+		//取得content fragment的实例
+		mPicBrowserFragment = new GalleryFragment();
+		Bundle arguments = new Bundle();
+		//设置fragment的参数
+		mPicBrowserFragment.setArguments(arguments);
+		FragmentTransaction fragmentTransaction = this.getFragmentManager().beginTransaction();
+		fragmentTransaction.replace(R.id.main_viewPager_container, mPicBrowserFragment).commit();
+//		mPicBrowserFragment = (GalleryFragment)getFragmentManager().findFragmentById(R.id.content);
 		
 		/**
 		 * 设置各种按钮的listener
@@ -102,28 +131,7 @@ public class MainActivity extends Activity
 	@Override
 	public void onStart(){
 		super.onStart();
-		
-		Comparator<Food> foodCompByKitchen = new Comparator<Food>() {
-			@Override
-			public int compare(Food food1, Food food2) {
-				if (food1.kitchen.aliasID > food2.kitchen.aliasID) {
-					return 1;
-				} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
-					return -1;
-				} else {
-					return 0;
-				}
-			}
-		};
-		/**
-		 * 将所有菜品进行按厨房编号进行排序
-		 */
-		Arrays.sort(WirelessOrder.foods, foodCompByKitchen);
-		
-		//取得content fragment的实例
-		mPicBrowserFragment = (GalleryFragment)getFragmentManager().findFragmentById(R.id.content);
-		
-		//设置picture browser fragment的数据源
+//		//设置picture browser fragment的数据源
 		mPicBrowserFragment.notifyDataChanged(WirelessOrder.foods);
 		
 		//清空所有厨房和对应菜品首张图片位置的Map数据
@@ -136,7 +144,7 @@ public class MainActivity extends Activity
 		for(Kitchen kitchen : WirelessOrder.foodMenu.kitchens) {
 			Food keyFood = new Food();
 			keyFood.kitchen = kitchen;
-			int index = Arrays.binarySearch(WirelessOrder.foods, keyFood, foodCompByKitchen);
+			int index = Arrays.binarySearch(WirelessOrder.foods, keyFood, mFoodCompByKitchen);
 			if (index >= 0 ) {
 				//设置厨房和对应菜品首张图片位置
 				mFoodPosByKitchenMap.put(kitchen, index);

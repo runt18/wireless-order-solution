@@ -17,11 +17,13 @@
             android:layout_height="fill_parent"
             class="com.wireless.fragment.ExpandableListFragment" />
 
-        <fragment
-            android:id="@+id/content"
+        <FrameLayout
+            android:id="@+id/main_viewPager_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            class="com.wireless.fragment.GalleryFragment" />
+            android:layout_height="match_parent" >
+
+        </FrameLayout>
+
     </LinearLayout>
 
         <fragment
