@@ -6,24 +6,26 @@ import java.util.List;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.support.v13.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.BaseAdapter;
-import android.widget.Gallery;
 import android.widget.ImageView;
 
 import com.wireless.ordermenu.R;
 import com.wireless.protocol.Food;
-import com.wireless.util.ImageLoader;
+import com.wireless.util.imgFetcher.ImageCache;
+import com.wireless.util.imgFetcher.ImageFetcher;
 
 public class GalleryFragment extends Fragment {
-	private ImageView.ScaleType curScaleType = ImageView.ScaleType.CENTER_CROP;
-	private BaseAdapter mGalleryAdapter = null;
-	private Gallery mGallery;
+	private ImageView.ScaleType mCurScaleType = ImageView.ScaleType.CENTER_CROP;
+	private FragmentStatePagerAdapter mGalleryAdapter = null;
+	//private Gallery mGallery;
+	private ViewPager mViewPager;
 	private List<Food> mFoods = new ArrayList<Food>();
+	private ImageFetcher mImgFetcher;
 	
 	public interface OnPicChangedListener{
 		void onPicChanged(Food curFood, int position);
@@ -31,32 +33,25 @@ public class GalleryFragment extends Fragment {
 	
 	private OnPicChangedListener mPicChangeListener;
 	
-	public void setOnViewChangeListener(OnPicChangedListener l){
-		mPicChangeListener = l;
+	
+	public static interface OnPicClickedListener{
+		void onPicClicked(Food food , int position);
 	}
 	
-	public static interface OnItemClickListener{
-		void onItemClick(Food food , int position);
-	}
-	
-	private OnItemClickListener mOnItemClickListener;
-	
-	public void setOnItemClickListener(OnItemClickListener l)
-	{
-		mOnItemClickListener = l;
-	}
+	OnPicClickedListener mOnPicClickListener;	
+
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.content_layout, container, false);
 	}
-
+	
 	/**
 	 * 根据position设置画廊显示的图片
 	 * @param position
 	 */
 	public void setPosition(int position){
-		mGallery.setSelection(position);
+		mViewPager.setCurrentItem(position);
 	}
 	
 	/**
@@ -67,7 +62,7 @@ public class GalleryFragment extends Fragment {
 		int pos = 0;
 		for(Food food : mFoods){
 			if(food.equals(foodToSet)){
-				mGallery.setSelection(pos);
+				mViewPager.setCurrentItem(pos);
 				break;
 			}
 			pos++;
@@ -79,9 +74,8 @@ public class GalleryFragment extends Fragment {
 		mGalleryAdapter.notifyDataSetChanged();
 	}
 	
-	public void setScaleType(ImageView.ScaleType type)
-	{
-		curScaleType = type;
+	public void setScaleType(ImageView.ScaleType type){
+		mCurScaleType = type;
 	}
 	
 	/**
@@ -94,79 +88,105 @@ public class GalleryFragment extends Fragment {
 	}
 	
 	public int getSelectedPosition(){
-       return mGallery.getSelectedItemPosition();
+		return mViewPager.getCurrentItem();
 	}
 	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState){
 		
-		super.onActivityCreated(savedInstanceState);
+		super.onActivityCreated(savedInstanceState);		
+
+		try{
+			mOnPicClickListener = (OnPicClickedListener)getActivity();
+		}catch(ClassCastException e){
+			
+		}
 		
-        mGallery = (Gallery) this.getView().findViewById(R.id.noneInertanceGallery1);
-        mGalleryAdapter = new BaseAdapter(){
+		try{
+			mPicChangeListener = (OnPicChangedListener)getActivity();
+		}catch(ClassCastException e){
+			
+		}
+		
+    	mImgFetcher = new ImageFetcher(getActivity(), 
+				GalleryFragment.this.getView().getWidth(), 
+				GalleryFragment.this.getView().getHeight());
+    	
+    	mImgFetcher.addImageCache(getFragmentManager(), new ImageCache.ImageCacheParams(getActivity()));
+		
+        mViewPager = (ViewPager) this.getView().findViewById(R.id.picViewPager);
+        mViewPager.setOffscreenPageLimit(2);
+        
+        mGalleryAdapter = new FragmentStatePagerAdapter (getFragmentManager()){
         	
-        	private ImageLoader mImgLoader = new ImageLoader(getActivity());
+            @Override
+            public int getCount() {
+                return mFoods.size();
+            }
         	
-        	@Override
-        	public int getCount() {
-        		return mFoods.size();
-        	}
+            @Override
+            public Fragment getItem(int position) {
+                return ImageDetailFragment.newInstance(mFoods.get(position), GalleryFragment.this.getId());
+            }            
 
-        	// 返回图片路径
-        	@Override
-        	public Object getItem(int position) {
-        		return mFoods.get(position);
-        	}
 
-        	// 返回图片在资源的位置
-        	@Override
-        	public long getItemId(int position) {
-        		return position;
-        	}
-
-        	// 此方法是最主要的，他设置好的ImageView对象返回给Gallery
-        	@Override
-        	public View getView(int position, View convertView, ViewGroup parent) {
-        		ImageView imageView;
-        		if(convertView == null){
-        			convertView = new ImageView(getActivity());
-        			imageView = (ImageView)convertView;
-        			// 设置ImageView的伸缩规格，用了自带的属性值
-        			imageView.setScaleType(curScaleType);
-        			
-        		}else {
-        			imageView = (ImageView)convertView;
-        		}
-        		imageView.setAdjustViewBounds(true);
-        		imageView.setImageBitmap(mImgLoader.loadImage(mFoods.get(position).image));
-        		return imageView;
-        	}
+//        	// 此方法是最主要的，他设置好的ImageView对象返回给Gallery
+//        	@Override
+//        	public View getView(int position, View convertView, ViewGroup parent) {
+//        		ImageView imageView;
+//        		if(convertView == null){
+//        			convertView = new ImageView(getActivity());
+//        			imageView = (ImageView)convertView;
+//        			// 设置ImageView的伸缩规格，用了自带的属性值
+//        			imageView.setScaleType(curScaleType);
+//        			
+//        		}else {
+//        			imageView = (ImageView)convertView;
+//        		}
+//        		imageView.setAdjustViewBounds(true);
+//        		//imageView.setImageBitmap(mImgLoader.loadImage(mFoods.get(position).image));
+//        		mImgFetcher.loadImage(mFoods.get(position).image, imageView);
+//        		return imageView;
+//        	}
         };
         
-        mGallery.setAdapter(mGalleryAdapter);        
+        mViewPager.setAdapter(mGalleryAdapter);        
         
-        mGallery.setCallbackDuringFling(true);
-        mGallery.setOnItemSelectedListener(new OnItemSelectedListener(){
-
+        mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+			
 			@Override
-			public void onItemSelected(AdapterView<?> parent, View view,int position, long id) {
+			public void onPageSelected(int position) {
 				if(mPicChangeListener != null){
 					mPicChangeListener.onPicChanged(mFoods.get(position), position);
 				}
 			}
+			
+			@Override
+			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {			
+				
+			}
+			
+			@Override
+			public void onPageScrollStateChanged(int state) {
+				
+			}
+		});
 
-			@Override
-			public void onNothingSelected(AdapterView<?> parent) {
-			}
-        });
-        
-        mGallery.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener(){
-			@Override
-			public void onItemClick(AdapterView<?> parent,View view, int position, long id) {
-				if(mOnItemClickListener != null)
-					mOnItemClickListener.onItemClick(mFoods.get(position), position);
-			}
-        });
+	}
+	
+	@Override 
+	public void onStop(){
+		super.onStop();
+	}
+	
+	@Override 
+	public void onDestroy(){
+		super.onDestroy();
+		mImgFetcher.clearCache();
+	}
+	
+	public ImageFetcher getImgFetcher(){
+		return mImgFetcher;
 	}
 }
 

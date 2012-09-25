@@ -35,8 +35,7 @@ public class FullScreenActivity extends Activity implements OnPicChangedListener
 		mPicBrowserFragment = (GalleryFragment)getFragmentManager().findFragmentById(R.id.content);
 		//设置picture browser fragment的数据源
 		mPicBrowserFragment.notifyDataChanged(WirelessOrder.foods);
-		//设置content fragment的回调函数
-		mPicBrowserFragment.setOnViewChangeListener(this);
+		
 		Intent intent = getIntent();
 		
 		if(intent.hasExtra(FoodParcel.KEY_VALUE)){

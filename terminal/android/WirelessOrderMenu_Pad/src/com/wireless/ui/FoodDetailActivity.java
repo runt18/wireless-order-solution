@@ -29,7 +29,6 @@ import android.widget.Toast;
 import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
 import com.wireless.fragment.GalleryFragment;
-import com.wireless.fragment.GalleryFragment.OnPicChangedListener;
 import com.wireless.fragment.PickTasteFragment;
 import com.wireless.fragment.PickTasteFragment.OnTasteChangeListener;
 import com.wireless.ordermenu.R;
@@ -248,15 +247,19 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 	/*
 	 * 推荐菜对话框
 	 */
-	class RecFoodDialog implements GalleryFragment.OnItemClickListener{
-		Dialog mDialog;
-		GalleryFragment mGalleryFragment;
-		RecFoodDialog()
-		{
-			final View dialogLayout = getLayoutInflater().inflate(R.layout.recommend_dialog, (ViewGroup) findViewById(R.id.recommend_dialog_layout));
+	private class RecFoodDialog implements GalleryFragment.OnPicClickedListener,
+										   GalleryFragment.OnPicChangedListener
+	{
+		private Dialog mDialog;
+		private GalleryFragment mGalleryFragment;
+		private View mDialogLayout;
+		
+		RecFoodDialog(){
+			
+			mDialogLayout = getLayoutInflater().inflate(R.layout.recommend_dialog, (ViewGroup) findViewById(R.id.recommend_dialog_layout));
 			mDialog = new Dialog(FoodDetailActivity.this);
 			mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-			mDialog.setContentView(dialogLayout);
+			mDialog.setContentView(mDialogLayout);
 			
 			//设置对话框长宽
 			Window dialogWindow = mDialog.getWindow();
@@ -266,22 +269,12 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 			dialogWindow.setAttributes(lp);
 			
 			mGalleryFragment = (GalleryFragment)getFragmentManager().findFragmentById(R.id.gallery_recommed_food_dialog);
-			mGalleryFragment.notifyDataChanged(mRecommendfoods);
-
-			mGalleryFragment.setOnViewChangeListener(new OnPicChangedListener(){
-				@Override
-				public void onPicChanged(Food curFood, int position) {
-					((TextView) dialogLayout.findViewById(R.id.textView_price_rec_dialog)).setText("" + curFood.getPrice());
-					((TextView) dialogLayout.findViewById(R.id.textView_food_name_recommend_dialog)).setText(curFood.name);
-
-				}
-			});
+			mGalleryFragment.notifyDataChanged(mRecommendfoods);			
 			
-			mGalleryFragment.setOnItemClickListener(this);
+			final EditText countEditText = (EditText) mDialogLayout.findViewById(R.id.editText_count_rec_dialog);
 			
 			//设置数量加减
-			final EditText countEditText = (EditText) dialogLayout.findViewById(R.id.editText_count_rec_dialog);
-			((ImageButton) dialogLayout.findViewById(R.id.imageButton_plus_rec_dialog)).setOnClickListener(new OnClickListener(){
+			((ImageButton) mDialogLayout.findViewById(R.id.imageButton_plus_rec_dialog)).setOnClickListener(new OnClickListener(){
 
 				@Override
 				public void onClick(View v) {
@@ -290,19 +283,19 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 				}
 			});
 			
-			((ImageButton) dialogLayout.findViewById(R.id.imageButton_minus_recommendDialog)).setOnClickListener(new OnClickListener(){
+			//设置数量减
+			((ImageButton)mDialogLayout.findViewById(R.id.imageButton_minus_recommendDialog)).setOnClickListener(new OnClickListener(){
 
 				@Override
 				public void onClick(View v) {
 					float curNum = Float.parseFloat(countEditText.getText().toString());
-					if(--curNum >= 0)
-					{
+					if(--curNum >= 0){
 						countEditText.setText("" + curNum);
 					}
 				}
 			});
 			//点菜按钮
-			((ImageButton) dialogLayout.findViewById(R.id.imageButton_addFood_rec_dialog)).setOnClickListener(new OnClickListener(){
+			((ImageButton)mDialogLayout.findViewById(R.id.imageButton_addFood_rec_dialog)).setOnClickListener(new OnClickListener(){
 				@Override
 				public void onClick(View v) {
 					mOrderFood = new OrderFood(mRecommendfoods.get(mGalleryFragment.getSelectedPosition()));
@@ -312,7 +305,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 				}
 			});
 			
-			((ImageButton) dialogLayout.findViewById(R.id.imageButton_amplify_rec_dialog)).setOnClickListener(new OnClickListener(){
+			((ImageButton)mDialogLayout.findViewById(R.id.imageButton_amplify_rec_dialog)).setOnClickListener(new OnClickListener(){
 				@Override
 				public void onClick(View v) {
 					Intent intent = new Intent(FoodDetailActivity.this ,FullScreenActivity.class);
@@ -329,17 +322,16 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 			mDialog.show();
 		}
 		
-		void dismiss(){
-			mDialog.dismiss();
-		}
+//		void dismiss(){
+//			mDialog.dismiss();
+//		}
 		
-		void setPosition(int position)
-		{
+		void setPosition(int position){
 			mGalleryFragment.setPosition(position);
 		}
 
 		@Override
-		public void onItemClick(Food food, int position) {
+		public void onPicClicked(Food food, int position) {
 //			//当点击推荐菜时更新当前菜品
 			float count = Float.parseFloat(((EditText) mDialog.findViewById(R.id.editText_count_rec_dialog)).getText().toString());
 			mOrderFood = new OrderFood(mRecommendfoods.get(position));
@@ -355,6 +347,12 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 			mFoodImageView.setImageBitmap(mImgLoader.loadImage(mOrderFood.image));
 			mDisplayHandler.sendEmptyMessage(ORDER_FOOD_CHANGED);
 			mDialog.dismiss();
+		}
+
+		@Override
+		public void onPicChanged(Food curFood, int position) {
+			((TextView) mDialogLayout.findViewById(R.id.textView_price_rec_dialog)).setText("" + curFood.getPrice());
+			((TextView) mDialogLayout.findViewById(R.id.textView_food_name_recommend_dialog)).setText(curFood.name);
 		}
 	}
 	@Override

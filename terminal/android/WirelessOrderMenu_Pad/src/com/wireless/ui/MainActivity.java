@@ -20,7 +20,7 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.fragment.ExpandableListFragment;
 import com.wireless.fragment.ExpandableListFragment.OnItemChangeListener;
 import com.wireless.fragment.GalleryFragment;
-import com.wireless.fragment.GalleryFragment.OnItemClickListener;
+import com.wireless.fragment.GalleryFragment.OnPicClickedListener;
 import com.wireless.fragment.GalleryFragment.OnPicChangedListener;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
@@ -32,7 +32,7 @@ import com.wireless.protocol.OrderFood;
 public class MainActivity extends Activity  
 						  implements OnItemChangeListener,
 							 	     OnPicChangedListener, 
-							 	     OnItemClickListener{
+							 	     OnPicClickedListener{
 	
 	private static final int MAIN_ACTIVITY_RES_CODE = 340;
 
@@ -123,11 +123,6 @@ public class MainActivity extends Activity
 		//取得content fragment的实例
 		mPicBrowserFragment = (GalleryFragment)getFragmentManager().findFragmentById(R.id.content);
 		
-		//设置content fragment的回调函数
-		mPicBrowserFragment.setOnViewChangeListener(this);
-		
-		mPicBrowserFragment.setOnItemClickListener(this);
-		
 		//设置picture browser fragment的数据源
 		mPicBrowserFragment.notifyDataChanged(WirelessOrder.foods);
 		
@@ -207,10 +202,10 @@ public class MainActivity extends Activity
 	 * 点击Gallery，跳转到FoodDetailActivity
 	 */
 	@Override
-	public void onItemClick(Food food, int position) {
+	public void onPicClicked(Food food, int position) {
 		Intent intent = new Intent(MainActivity.this, FoodDetailActivity.class);
 		Bundle bundle = new Bundle();
-		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(mOrderFood));
+		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(new OrderFood(food)));
 		intent.putExtras(bundle);
 		startActivity(intent);
 	}  
