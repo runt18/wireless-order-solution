@@ -65,7 +65,7 @@ public class GalleryFragment extends Fragment {
 		Bundle args = new Bundle();
 		args.putFloat(KEY_MEMORY_CACHE_PERCENT, percent);
 		args.putInt(KEY_CACHE_VIEW_AMOUNT, nCachedViews < 0 ? 0 : nCachedViews);
-		args.putInt(KEY_IMAGE_SCALE_TYPE, ScaleType.CENTER_CROP.ordinal());
+		args.putInt(KEY_IMAGE_SCALE_TYPE, scaleType.ordinal());
 		gf.setArguments(args);
 		return gf;
 	}

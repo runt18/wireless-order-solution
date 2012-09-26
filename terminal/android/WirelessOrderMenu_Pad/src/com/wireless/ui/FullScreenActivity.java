@@ -30,7 +30,7 @@ public class FullScreenActivity extends Activity implements OnPicChangedListener
 		setContentView(R.layout.full_screen);
 		
 		//创建Gallery Fragment的实例
-		mPicBrowserFragment = GalleryFragment.newInstance(0.2f, 4, ScaleType.CENTER_CROP);
+		mPicBrowserFragment = GalleryFragment.newInstance(0.1f, 2, ScaleType.CENTER_CROP);
 		//替换XML中为GalleryFragment预留的Layout
 		FragmentTransaction fragmentTransaction = this.getFragmentManager().beginTransaction();
 		fragmentTransaction.replace(R.id.fullScreen_viewPager_container, mPicBrowserFragment).commit();
