@@ -8,11 +8,12 @@ import android.app.Fragment;
 import android.os.Bundle;
 import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 
 import com.wireless.ordermenu.R;
 import com.wireless.protocol.Food;
@@ -20,7 +21,15 @@ import com.wireless.util.imgFetcher.ImageCache;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
 public class GalleryFragment extends Fragment {
-	private ImageView.ScaleType mCurScaleType = ImageView.ScaleType.CENTER_CROP;
+	
+	private final static String KEY_MEMORY_CACHE_PERCENT = "key_memory_cache_percent";
+	private final static String KEY_CACHE_VIEW_AMOUNT = "key_cache_view_amount";
+	private final static String KEY_IMAGE_SCALE_TYPE = "key_image_scale_type";
+	
+	private final static float DEFAULT_PERCENT_MEMORY_CACHE = 0.2f;
+	private final static int DEFAULT_CACHE_VIEW_AMOUNT = 2;
+	private final static ScaleType DEFAULT_IMAGE_SCALE_TYPE = ScaleType.CENTER_CROP;
+	
 	private FragmentStatePagerAdapter mGalleryAdapter = null;
 	//private Gallery mGallery;
 	private ViewPager mViewPager;
@@ -40,10 +49,25 @@ public class GalleryFragment extends Fragment {
 	
 	OnPicClickedListener mOnPicClickListener;	
 
-	
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.content_layout, container, false);
+	/**
+	 * Factory method to generate a new instance of the fragment.
+	 * 
+	 * @param percent Percent of memory class to use to size memory cache
+	 * @param nCachedViews Amount of the cached pagers in the view pager
+	 * @param scaleType 
+	 * @return A new instance of GalleryFragment
+	 */
+	public static GalleryFragment newInstance(float percent, int nCachedViews, ImageView.ScaleType scaleType){
+		GalleryFragment gf = new GalleryFragment();
+        if (percent < 0.05f || percent > 0.8f) {
+            throw new IllegalArgumentException("newInstance - percent must be between 0.05 and 0.8 (inclusive)");
+        }
+		Bundle args = new Bundle();
+		args.putFloat(KEY_MEMORY_CACHE_PERCENT, percent);
+		args.putInt(KEY_CACHE_VIEW_AMOUNT, nCachedViews < 0 ? 0 : nCachedViews);
+		args.putInt(KEY_IMAGE_SCALE_TYPE, ScaleType.CENTER_CROP.ordinal());
+		gf.setArguments(args);
+		return gf;
 	}
 	
 	/**
@@ -74,10 +98,6 @@ public class GalleryFragment extends Fragment {
 		mGalleryAdapter.notifyDataSetChanged();
 	}
 	
-	public void setScaleType(ImageView.ScaleType type){
-		mCurScaleType = type;
-	}
-	
 	/**
 	 * 设置新的Gallery数据源，并更新Gallery
 	 * @param foods
@@ -89,6 +109,11 @@ public class GalleryFragment extends Fragment {
 	
 	public int getSelectedPosition(){
 		return mViewPager.getCurrentItem();
+	}
+	
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		return inflater.inflate(R.layout.content_layout, container, false);
 	}
 	
 	@Override
@@ -108,15 +133,34 @@ public class GalleryFragment extends Fragment {
 			
 		}
 		
-    	mImgFetcher = new ImageFetcher(getActivity(), 
-				GalleryFragment.this.getView().getWidth(), 
-				GalleryFragment.this.getView().getHeight());
-    	
-    	mImgFetcher.addImageCache(getFragmentManager(), new ImageCache.ImageCacheParams(getActivity()));
+		float percent = DEFAULT_PERCENT_MEMORY_CACHE;
+		int nCacheViews = DEFAULT_CACHE_VIEW_AMOUNT;
+		ScaleType scaleType = DEFAULT_IMAGE_SCALE_TYPE;
 		
+        Bundle bundle = getArguments();
+        if(bundle != null){
+        	percent = bundle.getFloat(KEY_MEMORY_CACHE_PERCENT);
+        	nCacheViews = bundle.getInt(KEY_CACHE_VIEW_AMOUNT);
+        	scaleType = ScaleType.values()[bundle.getInt(KEY_IMAGE_SCALE_TYPE)];
+        }
+		
+        //Create the image fetcher without the image size since it only can be retrieved later. 
+    	mImgFetcher = new ImageFetcher(getActivity(), 0, 0);
+    	//Add the image cache with the percent of memory to the application.
+    	mImgFetcher.addImageCache(getFragmentManager(), new ImageCache.ImageCacheParams(getActivity(), percent));
+    	//Add the listener to retrieve the width and height of this fragment, then set them to image fetcher.
+    	getView().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+    	     @Override
+   	          public void onGlobalLayout() {
+    	    	 mImgFetcher.setImageSize(getView().getWidth(), getView().getHeight());
+    	    	 getView().getViewTreeObserver().removeGlobalOnLayoutListener(this);
+   	          }
+    	});
+    	
         mViewPager = (ViewPager) this.getView().findViewById(R.id.picViewPager);
-        mViewPager.setOffscreenPageLimit(2);
+        mViewPager.setOffscreenPageLimit(nCacheViews);
         
+        final ScaleType scale = scaleType;
         mGalleryAdapter = new FragmentStatePagerAdapter (getFragmentManager()){
         	
             @Override
@@ -126,7 +170,7 @@ public class GalleryFragment extends Fragment {
         	
             @Override
             public Fragment getItem(int position) {
-                return ImageDetailFragment.newInstance(mFoods.get(position), GalleryFragment.this.getId());
+                return ImageDetailFragment.newInstance(mFoods.get(position), GalleryFragment.this.getId(), scale);
             }            
 
 

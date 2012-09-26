@@ -374,8 +374,8 @@ public class ImageCache {
         public boolean clearDiskCacheOnStart = DEFAULT_CLEAR_DISK_CACHE_ON_START;
         public boolean initDiskCacheOnCreate = DEFAULT_INIT_DISK_CACHE_ON_CREATE;
 
-        public ImageCacheParams(Context context){
-        	setMemCacheSizePercent(context, 0.25f);
+        public ImageCacheParams(Context context, float percent){
+        	setMemCacheSizePercent(context, percent);
         }
         
         public ImageCacheParams(Context context, String uniqueName) {

@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -68,14 +69,11 @@ public class MainActivity extends Activity
 		 */
 		Arrays.sort(WirelessOrder.foods, mFoodCompByKitchen);
 		
-		//取得content fragment的实例
-		mPicBrowserFragment = new GalleryFragment();
-		Bundle arguments = new Bundle();
-		//设置fragment的参数
-		mPicBrowserFragment.setArguments(arguments);
+		//创建Gallery Fragment的实例
+		mPicBrowserFragment = GalleryFragment.newInstance(0.1f, 4, ScaleType.CENTER_CROP);
+		//替换XML中为GalleryFragment预留的Layout
 		FragmentTransaction fragmentTransaction = this.getFragmentManager().beginTransaction();
 		fragmentTransaction.replace(R.id.main_viewPager_container, mPicBrowserFragment).commit();
-//		mPicBrowserFragment = (GalleryFragment)getFragmentManager().findFragmentById(R.id.content);
 		
 		/**
 		 * 设置各种按钮的listener

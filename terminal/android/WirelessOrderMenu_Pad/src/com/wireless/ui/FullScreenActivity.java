@@ -1,5 +1,6 @@
 package com.wireless.ui;
 import android.app.Activity;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -7,6 +8,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.ImageView.ScaleType;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.fragment.GalleryFragment;
@@ -24,15 +26,21 @@ public class FullScreenActivity extends Activity implements OnPicChangedListener
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
+		
 		setContentView(R.layout.full_screen);
+		
+		//创建Gallery Fragment的实例
+		mPicBrowserFragment = GalleryFragment.newInstance(0.2f, 4, ScaleType.CENTER_CROP);
+		//替换XML中为GalleryFragment预留的Layout
+		FragmentTransaction fragmentTransaction = this.getFragmentManager().beginTransaction();
+		fragmentTransaction.replace(R.id.fullScreen_viewPager_container, mPicBrowserFragment).commit();
 	}
 	
 	@Override
 	protected void onStart(){
 		
 		super.onStart();
-		//取得content fragment的实例
-		mPicBrowserFragment = (GalleryFragment)getFragmentManager().findFragmentById(R.id.content);
+
 		//设置picture browser fragment的数据源
 		mPicBrowserFragment.notifyDataChanged(WirelessOrder.foods);
 		

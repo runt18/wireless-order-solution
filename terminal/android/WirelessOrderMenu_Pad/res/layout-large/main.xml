@@ -21,17 +21,15 @@
             android:id="@+id/main_viewPager_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent" >
-
         </FrameLayout>
-
     </LinearLayout>
 
-        <fragment
-            android:id="@+id/bottombar"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            class="com.wireless.fragment.OptionBarFragment" />
+    <fragment
+        android:id="@+id/bottombar"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        class="com.wireless.fragment.OptionBarFragment" />
 
     <RelativeLayout
         android:id="@+id/relativeLayout2"
@@ -233,7 +231,6 @@
                     android:text="1.0"
                     android:textColor="@color/white"
                     android:textSize="22sp" >
-
                 </TextView>
 
                 <ImageButton

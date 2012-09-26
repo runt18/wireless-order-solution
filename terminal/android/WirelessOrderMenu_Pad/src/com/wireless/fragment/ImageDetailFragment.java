@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
@@ -36,9 +37,11 @@ import com.wireless.util.imgFetcher.ImageWorker;
  * This fragment will populate the children of the ViewPager from {@link GalleryFragment}.
  */
 public class ImageDetailFragment extends Fragment {
-    private static final String PARENT_RES_ID = "gallery_resource_id";
+	
+    private static final String KEY_PARENT_RES_ID = "gallery_resource_id";
+	private final static String KEY_IMAGE_SCALE_TYPE = "key_image_scale_type";
+
     private Food mFood;
-    private int mParentResId;
     private ImageView mImageView;
 
     /**
@@ -46,14 +49,16 @@ public class ImageDetailFragment extends Fragment {
      *
      * @param food The food source associated with this fragment
      * @param parentResId The id to parent gallery fragment 
+     * @param scaleType The scale type to the image view
      * @return A new instance of ImageDetailFragment with the food and id to parent gallery fragment
      */
-    public static ImageDetailFragment newInstance(Food food, int parentResId) {
+    public static ImageDetailFragment newInstance(Food food, int parentResId, ScaleType scaleType) {
         final ImageDetailFragment f = new ImageDetailFragment();
 
         final Bundle args = new Bundle();
         args.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(new OrderFood(food)));
-        args.putInt(PARENT_RES_ID, parentResId);
+        args.putInt(KEY_PARENT_RES_ID, parentResId);
+        args.putInt(KEY_IMAGE_SCALE_TYPE, scaleType.ordinal());
         f.setArguments(args);
 
         return f;
@@ -69,37 +74,47 @@ public class ImageDetailFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Bundle bundle = getArguments();
-        if(bundle != null){
-        	mFood = bundle.getParcelable(FoodParcel.KEY_VALUE);
-        	mParentResId = bundle.getInt(PARENT_RES_ID);
-        }
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate and locate the main ImageView
-        final View v = inflater.inflate(R.layout.image_detail_fragment, container, false);
-        mImageView = (ImageView) v.findViewById(R.id.detailImgView);
-        return v;
+        return inflater.inflate(R.layout.image_detail_fragment, container, false);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
  
-        final GalleryFragment gf = (GalleryFragment)getActivity().getFragmentManager().findFragmentById(mParentResId);
-        gf.getImgFetcher().loadImage(mFood.image, mImageView);
+        int parentGalleryResId = 0;
+        ScaleType scaleType = ScaleType.CENTER_CROP;
         
-        mImageView.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				if(gf.mOnPicClickListener != null){
-					gf.mOnPicClickListener.onPicClicked(mFood, gf.getSelectedPosition());
-				}
-			}
-		});
+        Bundle bundle = getArguments();
+        if(bundle != null){
+        	mFood = bundle.getParcelable(FoodParcel.KEY_VALUE);
+        	parentGalleryResId = bundle.getInt(KEY_PARENT_RES_ID);
+        	scaleType = ScaleType.values()[bundle.getInt(KEY_IMAGE_SCALE_TYPE)];
+        }
+        
+        final GalleryFragment gf = (GalleryFragment)getActivity().getFragmentManager().findFragmentById(parentGalleryResId);
+        if(gf != null){
+        	
+        	mImageView = (ImageView)getView().findViewById(R.id.detailImgView);
+            mImageView.setScaleType(scaleType);
+            
+            gf.getImgFetcher().loadImage(mFood.image, mImageView);
+            
+            mImageView.setOnClickListener(new OnClickListener() {
+    			
+    			@Override
+    			public void onClick(View v) {
+    				if(gf.mOnPicClickListener != null){
+    					gf.mOnPicClickListener.onPicClicked(mFood, gf.getSelectedPosition());
+    				}
+    			}
+    		});        	
+        }
     }
 
     @Override

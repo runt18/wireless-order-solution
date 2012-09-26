@@ -3,12 +3,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <fragment
-        android:id="@+id/content"
+
+    <FrameLayout
+        android:id="@+id/fullScreen_viewPager_container"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        class="com.wireless.fragment.GalleryFragment" />
-
+        android:layout_height="fill_parent" >
+    </FrameLayout>
+
     <TextView
         android:id="@+id/textView_food_name_fullScreen"
         android:layout_width="wrap_content"
