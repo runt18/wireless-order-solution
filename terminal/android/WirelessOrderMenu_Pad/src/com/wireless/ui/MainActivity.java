@@ -70,7 +70,7 @@ public class MainActivity extends Activity
 		Arrays.sort(WirelessOrder.foods, mFoodCompByKitchen);
 		
 		//创建Gallery Fragment的实例
-		mPicBrowserFragment = GalleryFragment.newInstance(0.1f, 4, ScaleType.CENTER_CROP);
+		mPicBrowserFragment = GalleryFragment.newInstance(WirelessOrder.foods, 0.1f, 4, ScaleType.CENTER_CROP);
 		//替换XML中为GalleryFragment预留的Layout
 		FragmentTransaction fragmentTransaction = this.getFragmentManager().beginTransaction();
 		fragmentTransaction.replace(R.id.main_viewPager_container, mPicBrowserFragment).commit();
@@ -130,7 +130,7 @@ public class MainActivity extends Activity
 	public void onStart(){
 		super.onStart();
 //		//设置picture browser fragment的数据源
-		mPicBrowserFragment.notifyDataChanged(WirelessOrder.foods);
+		//mPicBrowserFragment.notifyDataChanged(WirelessOrder.foods);
 		
 		//清空所有厨房和对应菜品首张图片位置的Map数据
 		mFoodPosByKitchenMap.clear();

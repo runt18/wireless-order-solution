@@ -16,7 +16,9 @@ import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 
 import com.wireless.ordermenu.R;
+import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
+import com.wireless.protocol.OrderFood;
 import com.wireless.util.imgFetcher.ImageCache;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
@@ -25,8 +27,9 @@ public class GalleryFragment extends Fragment {
 	private final static String KEY_MEMORY_CACHE_PERCENT = "key_memory_cache_percent";
 	private final static String KEY_CACHE_VIEW_AMOUNT = "key_cache_view_amount";
 	private final static String KEY_IMAGE_SCALE_TYPE = "key_image_scale_type";
+	private final static String KEY_SRC_FOODS = "key_src_foods";
 	
-	private final static float DEFAULT_PERCENT_MEMORY_CACHE = 0.2f;
+	private final static float DEFAULT_PERCENT_MEMORY_CACHE = 0.1f;
 	private final static int DEFAULT_CACHE_VIEW_AMOUNT = 2;
 	private final static ScaleType DEFAULT_IMAGE_SCALE_TYPE = ScaleType.CENTER_CROP;
 	
@@ -57,7 +60,7 @@ public class GalleryFragment extends Fragment {
 	 * @param scaleType 
 	 * @return A new instance of GalleryFragment
 	 */
-	public static GalleryFragment newInstance(float percent, int nCachedViews, ImageView.ScaleType scaleType){
+	public static GalleryFragment newInstance(Food[] srcFoods, float percent, int nCachedViews, ImageView.ScaleType scaleType){
 		GalleryFragment gf = new GalleryFragment();
         if (percent < 0.05f || percent > 0.8f) {
             throw new IllegalArgumentException("newInstance - percent must be between 0.05 and 0.8 (inclusive)");
@@ -66,6 +69,11 @@ public class GalleryFragment extends Fragment {
 		args.putFloat(KEY_MEMORY_CACHE_PERCENT, percent);
 		args.putInt(KEY_CACHE_VIEW_AMOUNT, nCachedViews < 0 ? 0 : nCachedViews);
 		args.putInt(KEY_IMAGE_SCALE_TYPE, scaleType.ordinal());
+		ArrayList<FoodParcel> foodParcels = new ArrayList<FoodParcel>(srcFoods.length);
+		for(int i = 0; i < srcFoods.length; i++){
+			foodParcels.add(new FoodParcel(new OrderFood(srcFoods[i])));
+		}
+		args.putParcelableArrayList(KEY_SRC_FOODS, foodParcels);
 		gf.setArguments(args);
 		return gf;
 	}
@@ -142,6 +150,11 @@ public class GalleryFragment extends Fragment {
         	percent = bundle.getFloat(KEY_MEMORY_CACHE_PERCENT);
         	nCacheViews = bundle.getInt(KEY_CACHE_VIEW_AMOUNT);
         	scaleType = ScaleType.values()[bundle.getInt(KEY_IMAGE_SCALE_TYPE)];
+        	ArrayList<FoodParcel> foodParcels = bundle.getParcelableArrayList(KEY_SRC_FOODS);
+        	mFoods.clear();
+        	for(FoodParcel foodParcel : foodParcels){
+        		mFoods.add(foodParcel);
+        	}        	
         }
 		
         //Create the image fetcher without the image size since it only can be retrieved later. 
