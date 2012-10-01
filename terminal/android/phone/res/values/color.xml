@@ -12,4 +12,6 @@
     <color name="blue">#4a8dcb</color>
     <drawable name="orange_drawable">#feb041</drawable>
     <drawable name="white_drawable">#ffffff</drawable>
+        <color name="black">#000</color>
+    
 </resources>
