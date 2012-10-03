@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:background="@color/blue"
     android:paddingLeft="4dp" >
-
+
     <TextView
         android:id="@+id/textView_foodName_pickFoodFragment_item"
         android:layout_width="wrap_content"
@@ -14,7 +14,7 @@
         android:text="菜名..."
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textSize="15sp" />
-
+
     <TextView
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
@@ -23,7 +23,7 @@
         android:text="￥"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textSize="13sp" />
-
+
     <TextView
         android:id="@+id/textView_price_pickFoodFragment_item"
         android:layout_width="wrap_content"
@@ -40,7 +40,7 @@
         android:layout_height="70dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true" />
-
+
     <TextView
         android:id="@+id/textView_num_pickFoodFragment_item"
         android:layout_width="wrap_content"

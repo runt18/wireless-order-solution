@@ -77,7 +77,7 @@ public class PickFoodFragment extends Fragment{
 		private WeakReference<PickFoodFragment> mFragment;
 		private Food[] mFoods;
 
-		public FoodHandler(PickFoodFragment fragment) {
+		FoodHandler(PickFoodFragment fragment) {
 			this.mFragment = new WeakReference<PickFoodFragment>(fragment);
 			
 			/**
@@ -137,9 +137,6 @@ public class PickFoodFragment extends Fragment{
 			((TextView) view.findViewById(R.id.textView_searchTitle_numberFragment)).setText(getArguments().get(PickFoodFragmentTag).toString());
 		
         mGridView = (GridView) view.findViewById(R.id.gridView_numberFragment);
-        mGridView.setHorizontalSpacing(8);
-        mGridView.setVerticalSpacing(8);
-        
         mGridView.setOnItemClickListener(new OnItemClickListener(){
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -192,6 +189,13 @@ public class PickFoodFragment extends Fragment{
         return view;
 	}
 	
+	//关闭时清除侦听
+	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		mGridView.setOnScrollListener(null);
+	}
+
 	//菜品显示的adapter
 	private class FoodAdapter extends BaseAdapter{
 
