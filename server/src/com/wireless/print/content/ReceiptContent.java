@@ -111,7 +111,7 @@ public class ReceiptContent extends ConcreteContent {
 	 * Generate the total price to print.
 	 * The style to total price is as below.<br>
 	 * --------------------------
-	 *   赠送：￥0.00   实收：￥245.00
+	 *   赠送：￥0.00   应收：￥245.00
 	 *   收款：￥250    找零：￥5.00 
 	 * @param style one of the print style
 	 * @return the generated sting for total price
@@ -119,7 +119,7 @@ public class ReceiptContent extends ConcreteContent {
 	private String genTotalPrice(boolean isTempReceipt){
 		
 		String line1 = "$(gifted)  $(total_price)";
-		String actualPrice = "实收：" + Util.CURRENCY_SIGN + Util.float2String(_order.getActualPrice());
+		String actualPrice = "应收：" + Util.CURRENCY_SIGN + Util.float2String(_order.calcPriceBeforeDiscount());
 		String gifted = "赠送：" + Util.CURRENCY_SIGN + Util.float2String(_order.calcGiftPrice());
 
 		line1 = line1.replace("$(gifted)", gifted);
