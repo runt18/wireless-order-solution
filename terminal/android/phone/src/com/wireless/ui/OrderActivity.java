@@ -21,9 +21,11 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.wireless.common.WirelessOrder;
 import com.wireless.excep.BusinessException;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.OrderParcel;
+import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Type;
@@ -119,6 +121,9 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 			}
 		});
 		_newFoodLstView.notifyDataChanged(new ArrayList<OrderFood>());
+		
+		//执行请求更新沽清菜品
+		new QuerySellOutTask().execute(WirelessOrder.foodMenu.foods);
 	}
 
 
@@ -267,5 +272,18 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 		return super.onKeyDown(keyCode, event);
 	}
 
+	/**
+	 * 请求更新沽清菜品
+	 */
+	private class QuerySellOutTask extends com.wireless.lib.task.QuerySellOutTask{
+		@Override
+		protected void onPostExecute(Food[] sellOutFoods){
+			if(mErrMsg != null){
+				Toast.makeText(OrderActivity.this, "沽清菜品更新失败", Toast.LENGTH_SHORT).show();				
+			}else{
+				Toast.makeText(OrderActivity.this, "沽清菜品更新成功", Toast.LENGTH_SHORT).show();
+			}
+		}
+	}
 	
 }
