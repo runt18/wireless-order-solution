@@ -831,10 +831,10 @@ public class TableActivity extends Activity {
 			if(mErrMsg != null){
 				mListView.onRefreshComplete();
 				Toast.makeText(getApplicationContext(), "刷新区域数据失败,请检查网络", Toast.LENGTH_SHORT).show();
-				mListView.setVisibility(View.GONE);
-				mRegionHandler.sendEmptyMessage(0);
-				WirelessOrder.tables = new Table[0];
-				mDataHandler.sendEmptyMessage(0);
+				//mListView.setVisibility(View.GONE);
+				//mRegionHandler.sendEmptyMessage(0);
+				//WirelessOrder.tables = new Table[0];
+				//mDataHandler.sendEmptyMessage(0);
 			}else{			
 				
 				WirelessOrder.regions = regions;
@@ -878,12 +878,12 @@ public class TableActivity extends Activity {
 				
 				WirelessOrder.tables = tables;
 				
+				mListView.onRefreshComplete();				
 				mRegionHandler.sendEmptyMessage(0);
 				mDataHandler.sendEmptyMessage(0);
 				mListView.setVisibility(View.VISIBLE);
 				((TextView)findViewById(R.id.hint_text_table)).setVisibility(View.INVISIBLE);
 				((AutoCompleteTextView)findViewById(R.id.search_view_table)).setText("");
-				mListView.onRefreshComplete();
 				Toast.makeText(getApplicationContext(), "餐台信息刷新成功",	Toast.LENGTH_SHORT).show();
 			} 
 		}
