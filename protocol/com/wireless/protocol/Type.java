@@ -21,6 +21,7 @@ public final class Type{
 	public final static byte QUERY_REGION = 13;
 	public final static byte QUERY_TABLE_STATUS = 14;
 	public final static byte TRANS_TABLE = 15;
+	public final static byte QUERY_SELL_OUT = 16;
 	
 	/* belong to OTA */
 	public final static byte CHECK_VER = 1;

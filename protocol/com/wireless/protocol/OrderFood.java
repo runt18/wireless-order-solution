@@ -285,6 +285,30 @@ public class OrderFood extends Food {
 	}
 	
 	/**
+	 * The unit price with taste before discount to a specific food.
+	 * @return The unit price represented as integer.
+	 */
+	int getPriceBeforeDiscountInternal(){
+		return (price + getTastePriceInternal());
+	}
+	
+	/**
+	 * Calculate the price with taste before discount to a specific food.
+	 * @return The price represented as integer.
+	 */
+	int calcPriceBeforeDiscountInternal(){
+		return getPriceBeforeDiscountInternal() * count / 100;
+	}
+	
+	/**
+	 * Calculate the price with taste before discount to a specific food.
+	 * @return The price represented as float.
+	 */	
+	Float calcPriceBeforeDiscount(){
+		return Util.int2Float(calcPriceBeforeDiscountInternal());
+	}
+	
+	/**
 	 * The unit price with taste to a specific food is as below.
 	 * unit_price = (food_price + taste_price + tmp_taste_price) * discount 
 	 * If taste price is calculated by rate, then
@@ -308,11 +332,11 @@ public class OrderFood extends Food {
 	}
 	
 	/**
-	 * Calculate the total price to this food without taste as below.
+	 * Calculate the pure total price to this food without taste as below.
 	 * <br>price = food_price * discount * count 
 	 * @return the total price to this food
 	 */
-	public Float calcPrice(){
+	public Float calcPurePrice(){
 		return Util.int2Float((price * discount * count) / 10000);
 	}	
 

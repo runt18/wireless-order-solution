@@ -10,7 +10,7 @@ public class RespParserEx {
 	 * @return the vector containing the food instance
 	 */
 	public static FoodMenu parseQueryMenu(ProtocolPackage response){
-		FoodMenu foodMenu = RespParser.parseQueryMenu(response);
+		FoodMenu foodMenu = RespQueryMenuParser.parse(response);
 		
 		Comparator<Taste> tasteComp = new Comparator<Taste>(){
 			@Override
@@ -22,7 +22,18 @@ public class RespParserEx {
 		Arrays.sort(foodMenu.tastes, tasteComp);
 		Arrays.sort(foodMenu.styles, tasteComp);
 		Arrays.sort(foodMenu.specs, tasteComp);
-		
+		Arrays.sort(foodMenu.foods, new Comparator<Food>(){
+			@Override
+			public int compare(Food arg0, Food arg1) {
+				if(arg0.aliasID > arg1.aliasID){
+					return 1;
+				}else if(arg0.aliasID < arg1.aliasID){
+					return -1;
+				}else{
+					return 0;
+				}
+			}			
+		});
 		for(int i = 0; i < foodMenu.foods.length; i++){
 			if(foodMenu.foods[i].popTastes != null){
 				for(int j = 0; j < foodMenu.foods[i].popTastes.length; j++){
