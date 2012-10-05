@@ -5,7 +5,7 @@ import java.io.IOException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqQueryMenu;
-import com.wireless.protocol.RespParser;
+import com.wireless.protocol.RespQueryMenuParser;
 import com.wireless.protocol.Type;
 import com.wireless.terminal.WirelessOrder;
 
@@ -28,7 +28,7 @@ public class QueryMenu extends Thread{
 			_queryCallBack.preQueryMenu();
 			resp = ServerConnector.instance().ask(new ReqQueryMenu());	
 			if(resp.header.type == Type.ACK){
-				WirelessOrder.foodMenu = RespParser.parseQueryMenu(resp);
+				WirelessOrder.foodMenu = RespQueryMenuParser.parse(resp);
 				_queryCallBack.passMenu(resp);
 				
 			}else{
