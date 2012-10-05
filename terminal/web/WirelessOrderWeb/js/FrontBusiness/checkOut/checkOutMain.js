@@ -191,7 +191,6 @@ var memberNbrInputWin = new Ext.Window({
 					if (memberNbr != '') {
 
 						getMemberInfo(memberNbr);
-						//checkOurListRefresh();
 						checkOutForm.buttons[2].show();
 
 					}
@@ -270,7 +269,6 @@ var checkOutForm = new Ext.form.FormPanel({
 			width : 300,
 			items : [ discountKindComb ]
 		}, {
-			// columnWidth : .25,
 			width : 80,
 			layout : 'form',
 			labelWidth : 0,
@@ -279,7 +277,6 @@ var checkOutForm = new Ext.form.FormPanel({
 			border : false,
 			items : [ {
 				xtype : 'radio',
-				// fieldLabel : '是否连带2A',
 				boxLabel : '折扣1',
 				checked : true,
 				name : 'discountRadio',
@@ -293,7 +290,6 @@ var checkOutForm = new Ext.form.FormPanel({
 				}
 			} ]
 		}, {
-			// columnWidth : .25,
 			width : 80,
 			layout : 'form',
 			labelWidth : 0,
@@ -302,7 +298,6 @@ var checkOutForm = new Ext.form.FormPanel({
 			border : false,
 			items : [ {
 				xtype : 'radio',
-				// fieldLabel : '',
 				boxLabel : '折扣2',
 				name : 'discountRadio',
 				inputValue : 'discount2',
@@ -315,7 +310,6 @@ var checkOutForm = new Ext.form.FormPanel({
 				}
 			} ]
 		}, {
-			// columnWidth : .25,
 			width : 80,
 			layout : 'form',
 			labelWidth : 0,
@@ -324,7 +318,6 @@ var checkOutForm = new Ext.form.FormPanel({
 			border : false,
 			items : [ {
 				xtype : 'radio',
-				// fieldLabel : '',
 				boxLabel : '折扣3',
 				name : 'discountRadio',
 				inputValue : 'discount3',
@@ -354,11 +347,9 @@ var checkOutForm = new Ext.form.FormPanel({
 			listeners : {
 				hide : function(thiz) {
 					checkOutForm.findById('placeHolderCOF2').hide();
-					// gridHeightOffset = 80;
 				},
 				show : function(thiz) {
 					checkOutForm.findById('placeHolderCOF2').show();
-					// gridHeightOffset = 120;
 				}
 			}
 		} ]
