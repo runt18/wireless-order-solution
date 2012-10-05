@@ -77,6 +77,8 @@ var checkOutStore = new Ext.data.Store({
 			name : 'combination'
 		}, {
 			name : 'temporary'
+		}, {
+			name : 'tmpTastePrice'
 		}]
 	),
 	listeners : {

@@ -76,7 +76,7 @@ var checkOurListRefresh = function() {
 			}
 		}
 		
-		tpItem.totalPrice = parseFloat((tpItem.unitPrice + tpItem.tastePrice) * tpItem.discount * tpItem.count);
+		tpItem.totalPrice = parseFloat((tpItem.unitPrice + tpItem.tastePrice + tpItem.tmpTastePrice) * tpItem.discount * tpItem.count);
 		
 		checkOutDataDisplay.root.push(tpItem);
 	}
