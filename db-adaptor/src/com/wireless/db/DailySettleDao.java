@@ -9,7 +9,13 @@ import com.wireless.exception.BusinessException;
 import com.wireless.protocol.Restaurant;
 import com.wireless.protocol.Terminal;
 
-public class DailySettle {
+public class DailySettleDao {
+	
+	public enum SettleType{
+		MANUAL, 
+		AUTO_MATION
+	}
+	
 	/**
 	 * The result to daily settle is as below.
 	 * 1 - the amount to the order 
@@ -45,7 +51,7 @@ public class DailySettle {
 	}	
 	
 	/**
-	 * Perform the daily settlement to all the restaurant.
+	 * Perform the daily settlement to the restaurant whose order record exceeds 1 day.
 	 * Note that the database should be connected before invoking this method.
 	 * @return the result to daily settlement
 	 * @throws SQLException
@@ -57,7 +63,15 @@ public class DailySettle {
 		
 		ArrayList<Terminal> terms = new ArrayList<Terminal>();
 		
-		sql = "SELECT id AS restaurant_id FROM " + Params.dbName + ".restaurant WHERE id > " + Restaurant.RESERVED_7;
+		//Filter the restaurant whose order record exceed 1 day.
+		sql = " SELECT restaurant_id " +
+			  " FROM " + Params.dbName + ".order " +
+			  " WHERE " +
+			  " restaurant_id > " + Restaurant.RESERVED_7 +
+			  " AND " +
+			  " total_price IS NOT NULL " +
+			  " GROUP BY restaurant_id " +
+			  " HAVING TO_DAYS(NOW()) - TO_DAYS(MIN(order_date)) > 1 ";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
 			Terminal term = new Terminal();
@@ -69,7 +83,7 @@ public class DailySettle {
 		
 		Result result = new Result();
 		for(Terminal term : terms){			
-			Result eachResult = exec(dbCon, term, false);
+			Result eachResult = exec(dbCon, term, SettleType.AUTO_MATION);
 			
 			result.totalOrder += eachResult.totalOrder;
 			result.totalOrderDetail += eachResult.totalOrderDetail;
@@ -102,7 +116,7 @@ public class DailySettle {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return exec(dbCon, VerifyPin.exec(dbCon, pin, model), true);
+			return exec(dbCon, VerifyPin.exec(dbCon, pin, model), SettleType.MANUAL);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -128,7 +142,7 @@ public class DailySettle {
 	 *             throws if fail to execute any SQL statement
 	 */
 	public static Result exec(DBCon dbCon, long pin, short model) throws BusinessException, SQLException{
-		return exec(dbCon, VerifyPin.exec(dbCon, pin, model), true);
+		return exec(dbCon, VerifyPin.exec(dbCon, pin, model), SettleType.MANUAL);
 	}
 	
 	/**
@@ -144,7 +158,7 @@ public class DailySettle {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return exec(dbCon, term, true);
+			return exec(dbCon, term, SettleType.MANUAL);
 			
 		}finally{
 			dbCon.disconnect();
@@ -158,14 +172,14 @@ public class DailySettle {
 	 *            the database connection
 	 * @param term
 	 * 			  the terminal with both user name and restaurant id
-	 * @param isManual
+	 * @param type
 	 * 			  indicates whether the daily settle is manual or automation
 	 * @return the result to daily settle
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 * @throws BusinessException
 	 */
-	public static Result exec(DBCon dbCon, Terminal term, boolean isManual) throws SQLException, BusinessException{
+	public static Result exec(DBCon dbCon, Terminal term, SettleType type) throws SQLException, BusinessException{
 		Result result = new Result();
 		
 		String sql;
@@ -298,7 +312,7 @@ public class DailySettle {
 			/**
 			 * Insert the daily settle record in case of manual.
 			 */
-			if(isManual){
+			if(type == SettleType.MANUAL){
 				dbCon.stmt.executeUpdate(sql);				
 			}else{
 				/**
