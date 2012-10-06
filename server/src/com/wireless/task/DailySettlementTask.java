@@ -8,7 +8,7 @@ import java.text.SimpleDateFormat;
 
 import org.tiling.scheduling.SchedulerTask;
 
-import com.wireless.db.DailySettle;
+import com.wireless.db.DailySettleDao;
 import com.wireless.db.tasteRef.TasteRef;
 import com.wireless.exception.BusinessException;
 import com.wireless.server.WirelessSocketServer;
@@ -32,7 +32,7 @@ public class DailySettlementTask extends SchedulerTask{
 				WirelessSocketServer.printLosses.clear();
 			}
 			
-			DailySettle.Result result = DailySettle.exec();		
+			DailySettleDao.Result result = DailySettleDao.exec();		
 					
 			taskInfo += "info : " + result.totalOrder + " record(s) are moved from \"order\" to \"order_history\"" + sep;
 			taskInfo += "info : " + result.totalOrderDetail + " record(s) are moved from \"order_food\" to \"order_food_history\"" + sep;
