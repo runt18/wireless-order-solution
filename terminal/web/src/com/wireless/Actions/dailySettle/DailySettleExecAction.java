@@ -19,7 +19,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.DailySettle;
+import com.wireless.db.DailySettleDao;
 
 import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
@@ -55,7 +55,7 @@ public class DailySettleExecAction extends Action {
 
 			HashMap resultMap = new HashMap();
 
-			DailySettle.exec(term);
+			DailySettleDao.exec(term);
 			
 			resultMap.put("message", "normal");
 			
