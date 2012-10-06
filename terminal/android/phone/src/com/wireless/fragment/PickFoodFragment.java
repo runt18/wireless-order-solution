@@ -104,7 +104,7 @@ public class PickFoodFragment extends Fragment{
 		public void handleMessage(Message msg)
 		{
 			PickFoodFragment fragment = mFragment.get();
-			
+			//将所有菜品进行条件筛选后存入adapter
 			List<Food> foods = new ArrayList<Food>();
 			foods.addAll(Arrays.asList(mFoods));
 			Iterator<Food> iter = foods.iterator();

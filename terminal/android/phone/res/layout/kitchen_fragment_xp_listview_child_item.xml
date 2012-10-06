@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" >
-
-    <GridView
-    android:id="@+id/gridView_kitchenFgm_xplv_child_each_item"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/linearLayout_kitchenFgm_xplv_child_item"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:horizontalSpacing="6dp"
-    android:numColumns="3"
-    android:verticalSpacing="6dp" >
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/linearLayout_kcFgm_xplv_child_child"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="4" >
 
-</GridView>
-</RelativeLayout>
+    </LinearLayout>
+
+</LinearLayout>

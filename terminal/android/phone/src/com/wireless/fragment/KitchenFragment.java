@@ -4,22 +4,18 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.util.SparseIntArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver.OnGlobalLayoutListener;
-import android.widget.AbsListView.LayoutParams;
-import android.widget.BaseAdapter;
 import android.widget.BaseExpandableListAdapter;
-import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -43,7 +39,10 @@ public class KitchenFragment extends Fragment {
 	private ArrayList<Department> mValidDepts;
 	private ArrayList<List<Food>> mValidFoods;
 	
+	private short mDeptFilter = Short.MIN_VALUE;
+	
 	private PinnedExpandableListView mXpListView;
+	private Food[] mOriFoods;
 	
 	private static class DepartmentHandler extends Handler{
 		private WeakReference<KitchenFragment> mFragment;
@@ -56,7 +55,7 @@ public class KitchenFragment extends Fragment {
 		@Override
 		public void handleMessage(Message msg)
 		{
-			KitchenFragment fragment = mFragment.get();
+			final KitchenFragment fragment = mFragment.get();
 			
 			if(mDeptLayout == null)
 				mDeptLayout = (LinearLayout)fragment.getView().findViewById(R.id.linearLayout_kitchenFragment);
@@ -72,7 +71,10 @@ public class KitchenFragment extends Fragment {
 					@Override
 					public void onClick(View v) {
 						//TODO 刷新厨房显示
-//						Department dept = (Department) v.getTag();
+						Department dept = (Department) v.getTag();
+						fragment.mDeptFilter = dept.deptID;
+						
+						fragment.mKitchenHandler.sendEmptyMessage(REFRESH_FOODS);
 					}
 				});
 				
@@ -91,8 +93,47 @@ public class KitchenFragment extends Fragment {
 		@Override
 		public void handleMessage(Message msg) {
 			KitchenFragment fragment = mFragment.get();
-
-			fragment.mXpListView.setAdapter(fragment.new KitchenExpandableListAdapter());
+			//根据条件筛选出要显示的厨房
+			ArrayList<Kitchen> kitchens = new ArrayList<Kitchen>();
+			for(Kitchen k:fragment.mValidKitchens)
+			{
+				if(k.dept.deptID == fragment.mDeptFilter){
+					kitchens.add(k);
+				}
+			}
+			//筛选出这些厨房中包含的菜品
+			ArrayList<Food> foods = new ArrayList<Food>();
+			for(Food f:fragment.mOriFoods)
+			{
+				for(Kitchen k:kitchens)
+					if(f.kitchen.aliasID == k.aliasID)
+					{
+						foods.add(f);
+					}
+			}
+			//将筛选出的菜品打包成List<List<T>>格式
+			ArrayList<List<Food>> tidyFoods = new ArrayList<List<Food>>();
+			Kitchen lastKitchen = foods.get(0).kitchen;
+			List<Food> list = new ArrayList<Food>();
+			int size = foods.size();
+			for(int i=0;i<size;i++)
+			{
+				Food f = foods.get(i);
+				if(f.kitchen.equals(lastKitchen))
+				{
+					list.add(f);
+				}
+				else{
+					tidyFoods.add(list);
+					list = new ArrayList<Food>();
+					lastKitchen = f.kitchen;
+					list.add(f);
+				}
+				if(i == size - 1)
+					tidyFoods.add(list);
+			}
+			
+			fragment.mXpListView.setAdapter(fragment.new KitchenExpandableListAdapter(kitchens, tidyFoods, 4));
 		}
 	}
 	
@@ -100,13 +141,13 @@ public class KitchenFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		/**
+		/*
 		 * 将所有菜品进行按厨房编号进行排序
 		 */
-		Food[] tmpFoods = new Food[WirelessOrder.foodMenu.foods.length];
-		System.arraycopy(WirelessOrder.foodMenu.foods, 0, tmpFoods, 0,
+		mOriFoods = new Food[WirelessOrder.foodMenu.foods.length];
+		System.arraycopy(WirelessOrder.foodMenu.foods, 0, mOriFoods, 0,
 				WirelessOrder.foodMenu.foods.length);
-		Arrays.sort(tmpFoods, new Comparator<Food>() {
+		Arrays.sort(mOriFoods, new Comparator<Food>() {
 			@Override
 			public int compare(Food food1, Food food2) {
 				if (food1.kitchen.aliasID > food2.kitchen.aliasID) {
@@ -118,15 +159,14 @@ public class KitchenFragment extends Fragment {
 				}
 			}
 		});
-
-		/**
+		/*
 		 * 使用二分查找算法筛选出有菜品的厨房
 		 */
 		mValidKitchens = new ArrayList<Kitchen>();
 		for (int i = 0; i < WirelessOrder.foodMenu.kitchens.length; i++) {
 			Food keyFood = new Food();
 			keyFood.kitchen.aliasID = WirelessOrder.foodMenu.kitchens[i].aliasID;
-			int index = Arrays.binarySearch(tmpFoods, keyFood,
+			int index = Arrays.binarySearch(mOriFoods, keyFood,
 					new Comparator<Food>() {
 
 						public int compare(Food food1, Food food2) {
@@ -144,7 +184,7 @@ public class KitchenFragment extends Fragment {
 				mValidKitchens.add(WirelessOrder.foodMenu.kitchens[i]);
 			}
 		}
-		/**
+		/*
 		 * 筛选出有菜品的部门
 		 */
 		mValidDepts = new ArrayList<Department>();
@@ -156,25 +196,28 @@ public class KitchenFragment extends Fragment {
 				}
 			}
 		}
-		
+		//将筛选出的菜品打包成List<List<T>>格式
 		mValidFoods = new ArrayList<List<Food>>();
-		Kitchen lastKitchen = tmpFoods[0].kitchen;
+		Kitchen lastKitchen = mOriFoods[0].kitchen;
 		List<Food> list = new ArrayList<Food>();
-		for(int i=0;i<tmpFoods.length;i++)
+		for(int i=0;i<mOriFoods.length;i++)
 		{
-			if(tmpFoods[i].kitchen.equals(lastKitchen))
+			if(mOriFoods[i].kitchen.equals(lastKitchen))
 			{
-				list.add(tmpFoods[i]);
+				list.add(mOriFoods[i]);
 			}
 			else{
 				mValidFoods.add(list);
 				list = new ArrayList<Food>();
-				lastKitchen = tmpFoods[i].kitchen;
-				list.add(tmpFoods[i]);
+				lastKitchen = mOriFoods[i].kitchen;
+				list.add(mOriFoods[i]);
 			}
-			if(i == tmpFoods.length-1)
+			if(i == mOriFoods.length-1)
 				mValidFoods.add(list);
 		}
+		
+		
+		mDeptFilter = mValidKitchens.get(0).dept.deptID;
 		
 		mDepartmentHandler = new DepartmentHandler(this);
 		mKitchenHandler = new KitchenHandler(this);
@@ -193,25 +236,58 @@ public class KitchenFragment extends Fragment {
 	}
 	
 	class KitchenExpandableListAdapter extends BaseExpandableListAdapter implements PinnedExpandableHeaderAdapter{
+		private SparseIntArray mGroupStatusMap ;
+		private ArrayList<ArrayList<ArrayList<Food>>> mChilds;
+		private ArrayList<Kitchen> mGroups;
+		private int mRow = 4;
+		
+		public KitchenExpandableListAdapter(ArrayList<Kitchen> groups, List<List<Food>> rowChilds, int row) {
+			super();
+			mGroupStatusMap = new  SparseIntArray();
+			mChilds = new ArrayList<ArrayList<ArrayList<Food>>>();
+			mGroups = groups;
+			mRow = row;
+			/*
+			 * 将每个分厨中的菜品分成4个一组存入subChild中，再将所有的subChild存入subChilds中，
+			 * 最后将该subChilds存入mChilds中
+			 */
+			for(List<Food> l:rowChilds)
+			{
+				ArrayList<ArrayList<Food>>  subChilds = new ArrayList<ArrayList<Food>>();
+				int i=0;
+				ArrayList<Food> subChild = new ArrayList<Food>();
+				for(int j=0;j<l.size();j++)
+				{
+					subChild.add(l.get(j));
+					i++;
+					if(i == 4 || j == l.size() -1){
+						i = 0;
+						subChilds.add(subChild);
+						subChild = new ArrayList<Food>();
+					}
+				}
+				mChilds.add(subChilds);
+			}
+		}
 
 		@Override
 		public int getGroupCount() {
-			return mValidKitchens.size();
+			return mGroups.size();
 		}
 
 		@Override
 		public int getChildrenCount(int groupPosition) {
-			return 1;
+			return mChilds.get(groupPosition).size();
 		}
 
 		@Override
 		public Object getGroup(int groupPosition) {
-			return mValidKitchens.get(groupPosition);
+			return mGroups.get(groupPosition);
 		}
 
 		@Override
-		public Object getChild(int groupPosition, int childPosition) {
-			return mValidFoods.get(groupPosition);
+		public ArrayList<Food> getChild(int groupPosition, int childPosition) {
+			return mChilds.get(groupPosition).get(childPosition);
 		}
 
 		@Override
@@ -237,10 +313,11 @@ public class KitchenFragment extends Fragment {
 			else view = View.inflate(getActivity(), R.layout.kitchen_fragment_xplistview_group_item, null);
 			//设置厨房名
 			((TextView) view.findViewById(R.id.textView_name_kitchenFragment_xp_group_item))
-				.setText(mValidKitchens.get(groupPosition).name);
+				.setText(mGroups.get(groupPosition).name);
 			//设置厨房菜数量
+			int size = mChilds.get(groupPosition).size();
 			((TextView) view.findViewById(R.id.textView_count_kitchenFragment_xp_group_item))
-				.setText("" + mValidFoods.get(groupPosition).size());
+				.setText("" + ((size - 1) * mRow  + mChilds.get(groupPosition).get(size -1).size()));
 			
 			return view;
 		}
@@ -252,19 +329,21 @@ public class KitchenFragment extends Fragment {
 			if(convertView != null)
 				view = convertView;
 			else view = View.inflate(getActivity(), R.layout.kitchen_fragment_xp_listview_child_item, null);
+			//设置该行的gridview
+			LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.linearLayout_kcFgm_xplv_child_child);
+			linearLayout.removeAllViews();
+			linearLayout.setWeightSum(4);
+			ArrayList<Food> childFoods = mChilds.get(groupPosition).get(childPosition);
 			
-			//FIXME 无效，修改
-//			view.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener(){
-//				@Override
-//				public void onGlobalLayout() {
-//					View view = getChildView(groupPosition, childPosition, isLastChild,convertView, parent);
-//					LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
-//					view.setLayoutParams(lp);
-//					
-//				}
-//			});
-			GridView gridView = (GridView) view.findViewById(R.id.gridView_kitchenFgm_xplv_child_each_item);
-			gridView.setAdapter(new FoodAdapter(mValidFoods.get(groupPosition)));
+			for(Food k :childFoods)
+			{
+				View childView = View.inflate(getActivity(), R.layout.kitchen_fragment_xplistview_child_item_item, null);
+				
+				((TextView) childView.findViewById(R.id.textView_foodName_kitchenFgm_child_item_item)).setText(k.name);
+				((TextView) childView.findViewById(R.id.textView_num_kitchenFgm_child_item_item)).setText("" + k.aliasID);
+				((TextView) childView.findViewById(R.id.textView_price_kitchenFgm_child_item_item)).setText("" + k.getPrice());
+				linearLayout.addView(childView);
+			}
 			
 			return view;
 		}
@@ -288,66 +367,35 @@ public class KitchenFragment extends Fragment {
 				return PINNED_HEADER_VISIBLE;
 			}
 		}
-
+		/**
+		 * 设置header的显示内容
+		 */
 		@Override
-		public void configurePinnedExpandableHeader(View header, int groupPosition,
-				int childPosition, int alpha) {
-//			Map<String,String> groupData = (Map<String,String>)this.getGroup(groupPosition);
-//			((TextView)header.findViewById(R.id.groupto)).setText(groupData.get("g"));
+		public void configurePinnedExpandableHeader(View header, int groupPosition, int childPosition, int alpha) {
+			Kitchen kitchen = (Kitchen) this.getGroup(groupPosition);
+			((TextView)header.findViewById(R.id.textView_name_kitchenFragment_xp_group_header)).setText(kitchen.name);
+			
+			//设置厨房菜数量
+			int size = mChilds.get(groupPosition).size();
+			((TextView) header.findViewById(R.id.textView_count_kitchenFragment_xp_group_header))
+				.setText("" + ((size - 1) * mRow + mChilds.get(groupPosition).get(size -1).size()));
+			
 		}
-		private HashMap<Integer,Integer> groupStatusMap = new HashMap<Integer, Integer>();
-
+		
 		@Override
 		public void setGroupClickStatus(int groupPosition, int status) {
-			groupStatusMap.put(groupPosition, status);
+			mGroupStatusMap.put(groupPosition, status);
 		}
 		
 		@Override
 		public int getGroupClickStatus(int groupPosition) {
-			if(groupStatusMap.containsKey(groupPosition)){
-				return groupStatusMap.get(groupPosition);
+			if(mGroupStatusMap.get(groupPosition, -1) != -1){
+				return mGroupStatusMap.get(groupPosition);
 			}
 			else{
 				return 0;
 			}
 		}
 	}
-	
-	class FoodAdapter extends BaseAdapter{
-		List<Food> mFoods;
-		
-		FoodAdapter(List<Food> foods){
-			mFoods = foods;
-		}
-		@Override
-		public int getCount() {
-			return mFoods.size();
-		}
 
-		@Override
-		public Object getItem(int position) {
-			return mFoods.get(position);
-		}
-
-		@Override
-		public long getItemId(int position) {
-			return position;
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			View view;
-			if(convertView != null)
-				view = convertView;
-			else view = View.inflate(getActivity(), R.layout.kitchen_fragment_xplistview_child_item_item, null);
-			
-			Food food = mFoods.get(position);
-			view.setTag(food);
-			
-			((TextView) view.findViewById(R.id.textView_foodName_kcFgm_xpLsv_child_item_item)).setText(food.name);
-			((TextView) view.findViewById(R.id.textView_foodNum_kcFgm_xpLsv_child_item_item)).setText("" + food.aliasID);
-			((TextView) view.findViewById(R.id.textView_price_kcFgm_xpLsv_child_item_item)).setText("" + food.getPrice());
-			return view;
-		}
-	}
 }

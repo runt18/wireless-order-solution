@@ -19,13 +19,15 @@
 
         </LinearLayout>
     </HorizontalScrollView>
-
+
     <com.wireless.ui.view.PinnedExpandableListView
         android:id="@+id/expandableListView_kitchenFragment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/horizontalScrollView1" >
+        android:layout_below="@+id/horizontalScrollView1"
+        android:fadingEdgeLength="2dp" >
+
     </com.wireless.ui.view.PinnedExpandableListView>
 
 </RelativeLayout>

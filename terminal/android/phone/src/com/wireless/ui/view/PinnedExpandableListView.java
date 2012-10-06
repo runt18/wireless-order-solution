@@ -1,7 +1,5 @@
 package com.wireless.ui.view;
 
-import com.wireless.ui.view.PinnedExpandableListView.PinnedExpandableHeaderAdapter;
-
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
@@ -14,6 +12,8 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnGroupClickListener;
+
+import com.wireless.ui.view.PinnedExpandableListView.PinnedExpandableHeaderAdapter;
 
 public class PinnedExpandableListView extends ExpandableListView implements OnScrollListener,OnGroupClickListener {
 	public PinnedExpandableListView(Context context, AttributeSet attrs, int defStyle) {
@@ -111,7 +111,7 @@ public class PinnedExpandableListView extends ExpandableListView implements OnSc
 	/**
 	 * 点击 HeaderView 触发的事件
 	 */
-	private void headerViewClick() {
+	public void headerViewClick() {
 		long packedPosition = getExpandableListPosition(this.getFirstVisiblePosition());
 		
 		int groupPosition = ExpandableListView.getPackedPositionGroup(packedPosition);
@@ -131,6 +131,7 @@ public class PinnedExpandableListView extends ExpandableListView implements OnSc
 	private float mDownX;
 	private float mDownY;
 
+	//FIXME imagebutton抢占了touchevent事件，以至于处理不到
 	/**
 	 * 如果 HeaderView 是可见的 , 此函数用于判断是否点击了 HeaderView, 并对做相应的处理 ,
 	 * 因为 HeaderView 是画上去的 , 所以设置事件监听是无效的 , 只有自行控制 .
@@ -157,7 +158,6 @@ public class PinnedExpandableListView extends ExpandableListView implements OnSc
 					if (mHeaderView != null) {
 						headerViewClick();
 					}
-
 					return true;
 				}
 				break;
