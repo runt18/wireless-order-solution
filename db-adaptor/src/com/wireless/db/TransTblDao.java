@@ -73,7 +73,7 @@ public class TransTblDao {
 		} else if (destTbl.status == Table.TABLE_BUSY) {
 			throw new BusinessException("The destination table(restaurant_id=" + destTbl.restaurantID +
 										", alias_id=" + destTbl.aliasID + ")" +
-										"wants to be transferred is BUSY.", ErrorCode.TABLE_BUSY);
+										" wants to be transferred is BUSY.", ErrorCode.TABLE_BUSY);
 
 		} else {
 
