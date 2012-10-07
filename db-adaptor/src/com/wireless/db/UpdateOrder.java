@@ -17,12 +17,6 @@ import com.wireless.protocol.Table;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Terminal;
 
-enum STATUS{
-	NOT_MATCHED,
-	FULL_MATCHED,
-	FULL_MATCHED_BUT_COUNT
-}
-
 public class UpdateOrder {
 	
 //	public static class Result{
@@ -147,7 +141,7 @@ public class UpdateOrder {
 			
 			newOrder.destTbl = QueryTable.exec(dbCon, term, newOrder.destTbl.aliasID);
 			if(newOrder.destTbl.status == Table.TABLE_IDLE){
-				throw new BusinessException("The destination table(alias_id=" + newOrder.destTbl.aliasID + ", restaurant_id=" + term.restaurantID + ") ange order is IDLE."
+				throw new BusinessException("The destination table(alias_id=" + newOrder.destTbl.aliasID + ", restaurant_id=" + term.restaurantID + ") to update is IDLE."
 											,ErrorCode.TABLE_IDLE);
 			}
 			newOrder.id = Util.getUnPaidOrderID(dbCon, newOrder.destTbl);
