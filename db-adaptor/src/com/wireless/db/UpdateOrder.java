@@ -141,7 +141,7 @@ public class UpdateOrder {
 			
 			newOrder.destTbl = QueryTable.exec(dbCon, term, newOrder.destTbl.aliasID);
 			if(newOrder.destTbl.status == Table.TABLE_IDLE){
-				throw new BusinessException("The destination table(alias_id=" + newOrder.destTbl.aliasID + ", restaurant_id=" + term.restaurantID + ") to update is IDLE."
+				throw new BusinessException("The destination table(alias_id=" + newOrder.destTbl.aliasID + ", restaurant_id=" + term.restaurantID + ") to update order is IDLE."
 											,ErrorCode.TABLE_IDLE);
 			}
 			newOrder.id = Util.getUnPaidOrderID(dbCon, newOrder.destTbl);
