@@ -94,3 +94,92 @@ dept_id =
     WHERE KITCHEN.kitchen_alias = OFH.kitchen_alias AND KITCHEN.restaurant_id = OFH.restaurant_id
 )
 WHERE OFH.kitchen_alias = 253 OR OFH.kitchen_alias = 255;
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`discount`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`discount` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`discount` (
+  `discount_id` INT UNSIGNED NULL AUTO_INCREMENT COMMENT 'the id to this discount' ,
+  `restaurant_id` INT UNSIGNED NULL COMMENT 'the restaurant id this discount belongs to' ,
+  `name` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the name to this discount' ,
+  `level` SMALLINT NULL DEFAULT 0 ,
+  PRIMARY KEY (`discount_id`) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the discount plan' ;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`discount_plan`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`discount_plan` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`discount_plan` (
+  `discount_id` INT UNSIGNED NOT NULL DEFAULT 0 ,
+  `kitchen_id` INT NOT NULL DEFAULT 0 ,
+  `kitchen_alias` TINYINT UNSIGNED NOT NULL DEFAULT 0 ,
+  `rate` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the discount rate which ranges from 0.00 to 1.00' ,
+  INDEX `ix_discount_id` (`discount_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the plan to each discount' ;
+
+-- -----------------------------------------------------
+-- Insert "折扣方案1" to table 'discount'
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.discount
+(`restaurant_id`, `name`, `level`)
+SELECT id, '折扣方案1', 200 FROM wireless_order_db.restaurant WHERE id > 10;
+
+-- -----------------------------------------------------
+-- Insert the detail of "折扣方案1" to table 'discount_plan'
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.discount_plan
+(`discount_id`, `kitchen_id`, `kitchen_alias`, `rate`)
+SELECT DIST.discount_id, KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.discount FROM 
+wireless_order_db.kitchen KITCHEN
+INNER JOIN
+wireless_order_db.discount DIST
+ON KITCHEN.restaurant_id = DIST.restaurant_id AND DIST.level = 200
+WHERE KITCHEN.type = 0;
+
+-- -----------------------------------------------------
+-- Insert "折扣方案2" to table 'discount'
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.discount
+(`restaurant_id`, `name`, `level`)
+SELECT id, '折扣方案2', 199 FROM wireless_order_db.restaurant WHERE id > 10;
+
+-- -----------------------------------------------------
+-- Insert the detail of "折扣方案2" to table 'discount_plan'
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.discount_plan
+(`discount_id`, `kitchen_id`, `kitchen_alias`, `rate`)
+SELECT DIST.discount_id, KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.discount_2 FROM 
+wireless_order_db.kitchen KITCHEN
+INNER JOIN
+wireless_order_db.discount DIST
+ON KITCHEN.restaurant_id = DIST.restaurant_id AND DIST.level = 199
+WHERE KITCHEN.type = 0;
+
+-- -----------------------------------------------------
+-- Insert "折扣方案3" to table 'discount'
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.discount
+(`restaurant_id`, `name`, `level`)
+SELECT id, '折扣方案3', 198 FROM wireless_order_db.restaurant WHERE id > 10;
+
+-- -----------------------------------------------------
+-- Insert the detail of "折扣方案3" to table 'discount_plan'
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.discount_plan
+(`discount_id`, `kitchen_id`, `kitchen_alias`, `rate`)
+SELECT DIST.discount_id, KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.discount_3 FROM 
+wireless_order_db.kitchen KITCHEN
+INNER JOIN
+wireless_order_db.discount DIST
+ON KITCHEN.restaurant_id = DIST.restaurant_id AND DIST.level = 198
+WHERE KITCHEN.type = 0;
