@@ -14,24 +14,24 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
-import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.Params;
 import com.wireless.fragment.KitchenFragment;
 import com.wireless.fragment.PickFoodFragment;
-import com.wireless.fragment.PickFoodFragment.OnFoodPickedListener;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.OrderParcel;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Util;
 
-public class PickFoodActivity extends FragmentActivity implements OnFoodPickedListener{
+public class PickFoodActivity extends FragmentActivity implements com.wireless.fragment.PickFoodFragment.OnFoodPickedListener, com.wireless.fragment.KitchenFragment.OnFoodPickedListener{
 	//每个点菜方式的标签
 	private static final int NUMBER_FRAGMENT = 1320;
 	private static final int KITCHEN_FRAGMENT = 1321;
+	private static final int SPELL_FRAGMENT = 1322;
+
 	//activity返回标签
 	private final static int PICK_WITH_TASTE = 6755;
 
@@ -42,12 +42,20 @@ public class PickFoodActivity extends FragmentActivity implements OnFoodPickedLi
 	private static class ViewHandler extends Handler{
 		private WeakReference<PickFoodActivity> mActivity;
 		private TextView mTitleTextView;
+		private ImageButton mNumBtn;
+		private ImageButton mKitchenBtn;
+		private ImageButton mSpellBtn;
 		
 		ViewHandler(PickFoodActivity activity)
 		{
 			mActivity = new WeakReference<PickFoodActivity>(activity);
 			mTitleTextView = (TextView) activity.findViewById(R.id.toptitle);
 			mTitleTextView.setVisibility(View.VISIBLE);
+			
+			mNumBtn = (ImageButton) activity.findViewById(R.id.imageButton_num_pickFood);
+			mKitchenBtn = (ImageButton) activity.findViewById(R.id.imageButton_kitchen_pickFood);
+			mSpellBtn = (ImageButton) activity.findViewById(R.id.imageButton_spell_pickFood);
+
 		}
 		
 		@Override
@@ -63,7 +71,8 @@ public class PickFoodActivity extends FragmentActivity implements OnFoodPickedLi
 				numFragment.setFoodPickedListener(activity);
 				//设置显示参数
 				Bundle args = new Bundle();
-				args.putString(PickFoodFragment.PickFoodFragmentTag, "编号：");
+				args.putInt(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG, PickFoodFragment.PICK_FOOD_FRAGMENT_NUMBER);
+				args.putString(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG_NAME, "编号：");
 				numFragment.setArguments(args);
 				//替换原本的fragment
 				ftrans.replace(R.id.frameLayout_container_pickFood, numFragment).commit();
@@ -74,10 +83,26 @@ public class PickFoodActivity extends FragmentActivity implements OnFoodPickedLi
 				
 			case KITCHEN_FRAGMENT:
 				KitchenFragment kitchenFragment = new KitchenFragment();
+				kitchenFragment.setFoodPickedListener(activity);
 				ftrans.replace(R.id.frameLayout_container_pickFood, kitchenFragment).commit();
 				
 				mTitleTextView.setText("点菜 - 分厨");
 				setLastCate(KITCHEN_FRAGMENT);
+				break;
+			case SPELL_FRAGMENT:
+				//创建新菜品选择fragment
+				PickFoodFragment spellFragment = new PickFoodFragment();
+				spellFragment.setFoodPickedListener(activity);
+				//设置显示参数
+				Bundle spellAargs = new Bundle();
+				spellAargs.putInt(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG, PickFoodFragment.PICK_FOOD_FRAGMENT_SPELL);
+				spellAargs.putString(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG_NAME, "拼音：");
+				spellFragment.setArguments(spellAargs);
+				//替换原本的fragment
+				ftrans.replace(R.id.frameLayout_container_pickFood, spellFragment).commit();
+				
+				mTitleTextView.setText("点菜 - 拼音");
+				setLastCate(SPELL_FRAGMENT);
 				break;
 				//TODO 添加更多点菜方式
 			}
@@ -86,7 +111,10 @@ public class PickFoodActivity extends FragmentActivity implements OnFoodPickedLi
 		private void setLastCate(int cate)
 		{
 			PickFoodActivity activity = mActivity.get();
-			
+			//还原按样式
+			mNumBtn.setImageResource(R.drawable.number_btn);
+			mKitchenBtn.setImageResource(R.drawable.kitchen);
+			mSpellBtn.setImageResource(R.drawable.pinyin);
 			//切换点菜方式时，保存当前的点菜模式
 			Editor editor = activity.getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).edit();
 			
@@ -94,9 +122,15 @@ public class PickFoodActivity extends FragmentActivity implements OnFoodPickedLi
 			{
 			case NUMBER_FRAGMENT:
 				editor.putInt(Params.LAST_PICK_CATE, Params.PICK_BY_NUMBER);
+				mNumBtn.setImageResource(R.drawable.number_btn_down);
 				break;
 			case KITCHEN_FRAGMENT:
 				editor.putInt(Params.LAST_PICK_CATE, Params.PICK_BY_KITCHEN);
+				mKitchenBtn.setImageResource(R.drawable.kitchen_down);
+				break;
+			case SPELL_FRAGMENT:
+				editor.putInt(Params.LAST_PICK_CATE, Params.PICK_BY_PINYIN);
+				mSpellBtn.setImageResource(R.drawable.pinyin_down);
 				break;
 				//TODO 添加更多点菜方式
 			//	editor.putInt(Params.LAST_PICK_CATE, Params.PICK_BY_PINYIN);
@@ -137,20 +171,29 @@ public class PickFoodActivity extends FragmentActivity implements OnFoodPickedLi
 		});
 
 		//编号
-		((RadioButton) findViewById(R.id.radio0_bbar4btn)).setOnClickListener(new OnClickListener(){
+		((ImageButton) findViewById(R.id.imageButton_num_pickFood)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
 				mViewHandler.sendEmptyMessage(NUMBER_FRAGMENT);
 			}
 		});
 		//分厨
-		((RadioButton) findViewById(R.id.radio1_bbar4btn)).setOnClickListener(new OnClickListener(){
+		((ImageButton) findViewById(R.id.imageButton_kitchen_pickFood)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
 				mViewHandler.sendEmptyMessage(KITCHEN_FRAGMENT);
 			}
 		});
 		
+		//拼音
+		((ImageButton) findViewById(R.id.imageButton_spell_pickFood)).setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				mViewHandler.sendEmptyMessage(SPELL_FRAGMENT);
+			}
+		});
+
+		//TODO 添加更多点菜方式
 		/**
 		 * 根据上次保存的记录，切换到相应的点菜方式
 		 */
@@ -164,6 +207,7 @@ public class PickFoodActivity extends FragmentActivity implements OnFoodPickedLi
 			mViewHandler.sendEmptyMessage(KITCHEN_FRAGMENT);
 			break;
 		case Params.PICK_BY_PINYIN:
+			mViewHandler.sendEmptyMessage(SPELL_FRAGMENT);
 			//TODO
 			break;
 		default :

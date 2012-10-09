@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+import android.app.Dialog;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -16,14 +17,22 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.EditText;
+import android.widget.ExpandableListView.OnGroupExpandListener;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.protocol.Department;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.OrderFood;
 import com.wireless.ui.R;
 import com.wireless.ui.view.PinnedExpandableListView;
 import com.wireless.ui.view.PinnedExpandableListView.PinnedExpandableHeaderAdapter;
@@ -43,6 +52,30 @@ public class KitchenFragment extends Fragment {
 	
 	private PinnedExpandableListView mXpListView;
 	private Food[] mOriFoods;
+	
+	private OnFoodPickedListener mFoodPickedListener;
+
+	public static interface OnFoodPickedListener{
+		/**
+		 * 当PickFoodListView选中菜品后，回调此函数通知Activity选中的Food信息
+		 * @param food 选中Food的信息
+		 */
+		public void onPicked(OrderFood food);
+		
+		/**
+		 * 当PickFoodListView选中菜品后，回调此函数通知Activity选中的Food信息，并跳转到口味Activity
+		 * @param food
+		 * 			选中Food的信息
+		 */
+		public void onPickedWithTaste(OrderFood food);
+	}
+	/**
+	 * 设置点完某个菜品后的回调函数
+	 * @param foodPickedListener
+	 */
+	public void setFoodPickedListener(OnFoodPickedListener foodPickedListener){
+		mFoodPickedListener = foodPickedListener;
+	}
 	
 	private static class DepartmentHandler extends Handler{
 		private WeakReference<KitchenFragment> mFragment;
@@ -70,7 +103,7 @@ public class KitchenFragment extends Fragment {
 				view.setOnClickListener(new OnClickListener(){
 					@Override
 					public void onClick(View v) {
-						//TODO 刷新厨房显示
+						//刷新厨房显示
 						Department dept = (Department) v.getTag();
 						fragment.mDeptFilter = dept.deptID;
 						
@@ -229,7 +262,20 @@ public class KitchenFragment extends Fragment {
 		
 		mXpListView = (PinnedExpandableListView) view.findViewById(R.id.expandableListView_kitchenFragment);
 		mXpListView.setHeaderView(getActivity().getLayoutInflater().inflate(R.layout.kitchen_fragment_xplistview_group_item_header, mXpListView, false));
-
+		//设置group展开侦听器，每次只打开一项
+		mXpListView.setOnGroupExpandListener(new OnGroupExpandListener() {
+					@Override
+					public void onGroupExpand( int groupPosition) {
+						int groupCount = mXpListView.getExpandableListAdapter().getGroupCount();
+						
+						for (int i = 0; i < groupCount; i++) {
+							if (groupPosition != i) {
+								mXpListView.collapseGroup(i);
+							}
+						}
+					}
+				});
+		
 		mDepartmentHandler.sendEmptyMessage(REFRESH_DEPTS);
 		mKitchenHandler.sendEmptyMessage(REFRESH_FOODS);
 		return view;
@@ -239,14 +285,14 @@ public class KitchenFragment extends Fragment {
 		private SparseIntArray mGroupStatusMap ;
 		private ArrayList<ArrayList<ArrayList<Food>>> mChilds;
 		private ArrayList<Kitchen> mGroups;
-		private int mRow = 4;
+		private int ROW = 4;
 		
 		public KitchenExpandableListAdapter(ArrayList<Kitchen> groups, List<List<Food>> rowChilds, int row) {
 			super();
 			mGroupStatusMap = new  SparseIntArray();
 			mChilds = new ArrayList<ArrayList<ArrayList<Food>>>();
 			mGroups = groups;
-			mRow = row;
+			ROW = row;
 			/*
 			 * 将每个分厨中的菜品分成4个一组存入subChild中，再将所有的subChild存入subChilds中，
 			 * 最后将该subChilds存入mChilds中
@@ -260,7 +306,7 @@ public class KitchenFragment extends Fragment {
 				{
 					subChild.add(l.get(j));
 					i++;
-					if(i == 4 || j == l.size() -1){
+					if(i == ROW || j == l.size() -1){
 						i = 0;
 						subChilds.add(subChild);
 						subChild = new ArrayList<Food>();
@@ -317,7 +363,7 @@ public class KitchenFragment extends Fragment {
 			//设置厨房菜数量
 			int size = mChilds.get(groupPosition).size();
 			((TextView) view.findViewById(R.id.textView_count_kitchenFragment_xp_group_item))
-				.setText("" + ((size - 1) * mRow  + mChilds.get(groupPosition).get(size -1).size()));
+				.setText("" + ((size - 1) * ROW  + mChilds.get(groupPosition).get(size -1).size()));
 			
 			return view;
 		}
@@ -332,17 +378,23 @@ public class KitchenFragment extends Fragment {
 			//设置该行的gridview
 			LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.linearLayout_kcFgm_xplv_child_child);
 			linearLayout.removeAllViews();
-			linearLayout.setWeightSum(4);
+			linearLayout.setWeightSum(ROW);
 			ArrayList<Food> childFoods = mChilds.get(groupPosition).get(childPosition);
-			
+			//将每行的4个菜品添加进该行的linearlayout
 			for(Food k :childFoods)
 			{
-				View childView = View.inflate(getActivity(), R.layout.kitchen_fragment_xplistview_child_item_item, null);
-				
+				final View childView = View.inflate(getActivity(), R.layout.kitchen_fragment_xplistview_child_item_item, null);
+				childView.setTag(k);
 				((TextView) childView.findViewById(R.id.textView_foodName_kitchenFgm_child_item_item)).setText(k.name);
 				((TextView) childView.findViewById(R.id.textView_num_kitchenFgm_child_item_item)).setText("" + k.aliasID);
 				((TextView) childView.findViewById(R.id.textView_price_kitchenFgm_child_item_item)).setText("" + k.getPrice());
 				linearLayout.addView(childView);
+				childView.setOnClickListener(new OnClickListener(){
+					@Override
+					public void onClick(View v) {
+						new AskOrderAmountDialog((Food) childView.getTag()).show();
+					}
+				});
 			}
 			
 			return view;
@@ -378,7 +430,7 @@ public class KitchenFragment extends Fragment {
 			//设置厨房菜数量
 			int size = mChilds.get(groupPosition).size();
 			((TextView) header.findViewById(R.id.textView_count_kitchenFragment_xp_group_header))
-				.setText("" + ((size - 1) * mRow + mChilds.get(groupPosition).get(size -1).size()));
+				.setText("" + ((size - 1) * ROW + mChilds.get(groupPosition).get(size -1).size()));
 			
 		}
 		
@@ -398,4 +450,119 @@ public class KitchenFragment extends Fragment {
 		}
 	}
 
+	/*
+	 * 提示输入点菜数量的Dialog
+	 */
+	private class AskOrderAmountDialog extends Dialog{
+
+		private OrderFood _selectedFood;
+		
+		AskOrderAmountDialog(Food food) {
+			super(getActivity(), R.style.FullHeightDialog);
+			
+			_selectedFood = new OrderFood(food);
+			
+			setContentView(R.layout.order_confirm);
+			
+			((TextView)findViewById(R.id.orderTitleTxt)).setText("请输入" + _selectedFood.name + "的点菜数量");
+			final TextView countEditText = (EditText)findViewById(R.id.amountEdtTxt);
+			countEditText.setText("1");
+			
+			((Button) findViewById(R.id.button_plus_orderConfirm)).setOnClickListener(new View.OnClickListener(){
+
+				@Override
+				public void onClick(View v) {
+					float curNum = Float.parseFloat(countEditText.getText().toString());
+					countEditText.setText("" + ++curNum);
+				}
+			});
+			
+			((Button) findViewById(R.id.button_minus_orderConfirm)).setOnClickListener(new View.OnClickListener(){
+
+				@Override
+				public void onClick(View v) {
+					float curNum = Float.parseFloat(countEditText.getText().toString());
+					if(--curNum >= 1)
+					{
+						countEditText.setText("" + curNum);
+					}
+				}
+			});
+			
+			//"确定"Button
+			Button okBtn = (Button)findViewById(R.id.orderConfirmBtn);
+			okBtn.setText("确定");
+			okBtn.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {			
+					onPick(false);
+				}
+			});
+			
+			//"口味"Button
+			Button tasteBtn = (Button)findViewById(R.id.orderTasteBtn);
+			tasteBtn.setText("口味");
+			tasteBtn.setOnClickListener(new View.OnClickListener() {				
+				@Override
+				public void onClick(View arg0) {
+					onPick(true);
+				}
+			});
+			
+			//"取消"Button
+			Button cancelBtn = (Button)findViewById(R.id.orderCancelBtn);
+			cancelBtn.setText("取消");
+			cancelBtn.setOnClickListener(new View.OnClickListener(){
+				@Override
+				public void onClick(View v) {
+					dismiss();
+				}
+			});
+			
+			//"叫起"CheckBox
+			CheckBox hurriedChkBox = (CheckBox)findViewById(R.id.orderHurriedChk);
+			hurriedChkBox.setText("叫起");
+			hurriedChkBox.setOnCheckedChangeListener(new OnCheckedChangeListener(){			
+				@Override
+				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+					if(isChecked){
+						_selectedFood.hangStatus = OrderFood.FOOD_HANG_UP;
+						Toast.makeText(getActivity(), "叫起\"" + _selectedFood.toString() + "\"", Toast.LENGTH_SHORT).show();
+					}else{
+						_selectedFood.hangStatus = OrderFood.FOOD_NORMAL;
+						Toast.makeText(getActivity(), "取消叫起\"" + _selectedFood.toString() + "\"", Toast.LENGTH_SHORT).show();
+					}
+					
+				}
+			});
+		}
+		
+		/**
+		 * 
+		 * @param selectedFood
+		 * @param pickTaste
+		 */
+		private void onPick(boolean pickTaste){
+			try{
+				float orderAmount = Float.parseFloat(((EditText)findViewById(R.id.amountEdtTxt)).getText().toString());
+				
+       			if(orderAmount > 255){
+       				Toast.makeText(getActivity(), "对不起，\"" + _selectedFood.toString() + "\"最多只能点255份", Toast.LENGTH_SHORT).show();
+       			}else{
+       				_selectedFood.setCount(orderAmount);
+       				if(mFoodPickedListener != null){	
+       					if(pickTaste){
+       						mFoodPickedListener.onPickedWithTaste(_selectedFood);
+       					}else{
+       						mFoodPickedListener.onPicked(_selectedFood);
+       					}
+       				}
+					dismiss();
+       			}
+				
+			}catch(NumberFormatException e){
+				Toast.makeText(getActivity(), "您输入的数量格式不正确，请重新输入", Toast.LENGTH_SHORT).show();
+			}
+		}
+	}
 }

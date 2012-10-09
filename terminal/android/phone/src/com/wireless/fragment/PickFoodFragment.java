@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,7 +43,12 @@ import com.wireless.ui.R;
 
 public class PickFoodFragment extends Fragment{
 	private static final int REFRESH_FOODS = 43552;
-	public static final String PickFoodFragmentTag = "pickFoodFragmentTag";
+	
+	public static final String PICK_FOOD_FRAGMENT_TAG_NAME = "pickFoodFragmentTagName";
+	public static final String PICK_FOOD_FRAGMENT_TAG = "pickFoodFragmentTag";
+	public static final int PICK_FOOD_FRAGMENT_NUMBER = 87514;
+	public static final int PICK_FOOD_FRAGMENT_SPELL = 87515;
+
 	private FoodAdapter mAdapter;
 	private FoodHandler mHandler ;
 	private GridView mGridView;
@@ -133,10 +139,11 @@ public class PickFoodFragment extends Fragment{
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.pick_food_fragment, container, false);
-		if(getArguments().get(PickFoodFragmentTag) != null)
-			((TextView) view.findViewById(R.id.textView_searchTitle_numberFragment)).setText(getArguments().get(PickFoodFragmentTag).toString());
+		Bundle args = getArguments();
+		((TextView) view.findViewById(R.id.textView_searchTitle_numberFragment)).setText(args.get(PICK_FOOD_FRAGMENT_TAG_NAME).toString());
 		
         mGridView = (GridView) view.findViewById(R.id.gridView_numberFragment);
+        //设置点菜侦听
         mGridView.setOnItemClickListener(new OnItemClickListener(){
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -146,6 +153,11 @@ public class PickFoodFragment extends Fragment{
         
 		//搜索框
         final EditText searchTxtView = (EditText)view.findViewById(R.id.editText_pickFoodFragment);
+        //设置输入类型
+        if(args.getInt(PICK_FOOD_FRAGMENT_TAG) == PICK_FOOD_FRAGMENT_NUMBER)
+        	searchTxtView.setInputType(InputType.TYPE_CLASS_NUMBER);
+        else searchTxtView.setInputType(InputType.TYPE_CLASS_TEXT);
+        
         searchTxtView.addTextChangedListener(new TextWatcher(){
 			@Override 
 			public void afterTextChanged(Editable s) {}
@@ -255,7 +267,30 @@ public class PickFoodFragment extends Fragment{
 			setContentView(R.layout.order_confirm);
 			
 			((TextView)findViewById(R.id.orderTitleTxt)).setText("请输入" + _selectedFood.name + "的点菜数量");
-			((EditText)findViewById(R.id.amountEdtTxt)).setText("1");
+			
+			final TextView countEditText = (EditText)findViewById(R.id.amountEdtTxt);
+			countEditText.setText("1");
+			
+			((Button) findViewById(R.id.button_plus_orderConfirm)).setOnClickListener(new View.OnClickListener(){
+
+				@Override
+				public void onClick(View v) {
+					float curNum = Float.parseFloat(countEditText.getText().toString());
+					countEditText.setText("" + ++curNum);
+				}
+			});
+			
+			((Button) findViewById(R.id.button_minus_orderConfirm)).setOnClickListener(new View.OnClickListener(){
+
+				@Override
+				public void onClick(View v) {
+					float curNum = Float.parseFloat(countEditText.getText().toString());
+					if(--curNum >= 1)
+					{
+						countEditText.setText("" + curNum);
+					}
+				}
+			});
 			
 			//"确定"Button
 			Button okBtn = (Button)findViewById(R.id.orderConfirmBtn);

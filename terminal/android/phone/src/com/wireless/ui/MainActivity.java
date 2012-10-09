@@ -1,6 +1,5 @@
 package com.wireless.ui;
 
-import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -18,7 +17,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.drawable.BitmapDrawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -43,16 +41,11 @@ import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
 import com.wireless.protocol.FoodMenu;
 import com.wireless.protocol.PinGen;
-import com.wireless.protocol.ProtocolPackage;
-import com.wireless.protocol.ReqCancelOrder;
 import com.wireless.protocol.ReqPackage;
 import com.wireless.protocol.Restaurant;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
-import com.wireless.protocol.Type;
-import com.wireless.sccon.ServerConnector;
-import com.wireless.ui.dialog.AskPwdDialog;
 
 public class MainActivity extends Activity {
 
@@ -61,7 +54,7 @@ public class MainActivity extends Activity {
 	
 	private static final int DIALOG_INSERT_ORDER = 0;
 	//private static final int DIALOG_UPDATE_ORDER = 1;
-	private static final int DIALOG_CANCEL_ORDER = 2;
+//	private static final int DIALOG_CANCEL_ORDER = 2;
 	private static final int DIALOG_BILL_ORDER = 3;
 	private static final int DIALOG_STAFF_LOGIN = 4;
 	
@@ -129,7 +122,7 @@ public class MainActivity extends Activity {
 						   };
 
 		String[] iconDesc = { 
-							 "点菜", "查看", "删单", 
+							 "点菜", "查看", "沽清", 
 							 "结账", "功能设置", "网络设置", 
 							 "菜谱更新", "注销", "关于" 
 							};
@@ -186,22 +179,24 @@ public class MainActivity extends Activity {
 					break;
 					
 				case 2:
-					//删单
-					/**
-					 * 提示输入密码，验证通过的情况下执行删单，
-					 * 否则直接执行删单
-					 */
-					if(WirelessOrder.restaurant.pwd != null){
-						new AskPwdDialog(MainActivity.this, AskPwdDialog.PWD_1){
-							@Override
-							protected void onPwdPass(Context context){
-								dismiss();
-								showDialog(DIALOG_CANCEL_ORDER);
-							}
-						}.show();						
-					}else{
-						showDialog(DIALOG_CANCEL_ORDER);
-					}
+					Intent sellOutIntent = new Intent(MainActivity.this,SellOutActivity.class);
+					startActivity(sellOutIntent);
+//					//删单
+//					/**
+//					 * 提示输入密码，验证通过的情况下执行删单，
+//					 * 否则直接执行删单
+//					 */
+//					if(WirelessOrder.restaurant.pwd != null){
+//						new AskPwdDialog(MainActivity.this, AskPwdDialog.PWD_1){
+//							@Override
+//							protected void onPwdPass(Context context){
+//								dismiss();
+//								showDialog(DIALOG_CANCEL_ORDER);
+//							}
+//						}.show();						
+//					}else{
+//						showDialog(DIALOG_CANCEL_ORDER);
+//					}
 					
 					break;
 					
@@ -287,11 +282,6 @@ public class MainActivity extends Activity {
 			_handler.sendEmptyMessage(REDRAW_RESTAURANT);
 		}		  
 	}
-
-	@Override
-	protected void onStart(){
-		super.onStart();
-	}
 	
 	@Override
 	protected Dialog onCreateDialog(int dialogID){
@@ -299,11 +289,12 @@ public class MainActivity extends Activity {
 			//下单的餐台输入Dialog
 			return new AskTableDialog(DIALOG_INSERT_ORDER);
 			
-		}else if(dialogID == DIALOG_CANCEL_ORDER){
-			//删单的餐台输入Dialog
-			return new AskTableDialog(DIALOG_CANCEL_ORDER);
-			
-		}else if(dialogID == DIALOG_BILL_ORDER){
+		}
+//		else if(dialogID == DIALOG_CANCEL_ORDER){
+//			//删单的餐台输入Dialog
+//			return new AskTableDialog(DIALOG_CANCEL_ORDER);
+//		}
+		else if(dialogID == DIALOG_BILL_ORDER){
 			//结账的餐台输入Dialog
 			return new AskTableDialog(DIALOG_BILL_ORDER);
 			
@@ -744,65 +735,65 @@ public class MainActivity extends Activity {
 		/**
 		 * 删单的请求操作 
 		 */
-		private class CancelOrderTask extends AsyncTask<Void, Void, String>{
-			
-			private ProgressDialog _progDialog;
-			private int _tableID;
-			
-			CancelOrderTask(int tableID) {
-				_tableID = tableID;
-			}
-			
-			/**
-			 * 在执行请求删单操作前显示提示信息
-			 */
-			@Override
-			protected void onPreExecute(){
-				_progDialog = ProgressDialog.show(MainActivity.this, "", "删除" + _tableID + "号餐台的信息...请稍候", true);
-			}
-
-			/**
-			 * 在新的线程中执行删单的请求
-			 */
-			@Override
-			protected String doInBackground(Void... arg0) {
-				String errMsg = null;
-				try{
-					ProtocolPackage resp = ServerConnector.instance().ask(new ReqCancelOrder(_tableID));
-					if(resp.header.type == Type.NAK){
-						errMsg = _tableID + "号餐台删单失败";
-					}
-				}catch(IOException e){
-					errMsg = e.getMessage();
-				}
-				return errMsg;
-			}
-			
-			/**
-			 * 根据返回的error message判断，如果发错异常则提示用户，
-			 * 如果成功，则提示用户删单成功
-			 */
-			@Override
-			protected void onPostExecute(String errMsg){
-				//make the progress dialog disappeared
-				_progDialog.dismiss();
-				/**
-				 * Prompt user message if any error occurred.
-				 */
-				if(errMsg != null){
-					new AlertDialog.Builder(MainActivity.this)
-					.setTitle("提示")
-					.setMessage(errMsg)
-					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int id) {
-							dialog.dismiss();
-						}
-					}).show();
-				}else{
-					Toast.makeText(MainActivity.this, _tableID + "号台删单成功", Toast.LENGTH_LONG).show();
-				}
-			}
-		}
+//		private class CancelOrderTask extends AsyncTask<Void, Void, String>{
+//			
+//			private ProgressDialog _progDialog;
+//			private int _tableID;
+//			
+//			CancelOrderTask(int tableID) {
+//				_tableID = tableID;
+//			}
+//			
+//			/**
+//			 * 在执行请求删单操作前显示提示信息
+//			 */
+//			@Override
+//			protected void onPreExecute(){
+//				_progDialog = ProgressDialog.show(MainActivity.this, "", "删除" + _tableID + "号餐台的信息...请稍候", true);
+//			}
+//
+//			/**
+//			 * 在新的线程中执行删单的请求
+//			 */
+//			@Override
+//			protected String doInBackground(Void... arg0) {
+//				String errMsg = null;
+//				try{
+//					ProtocolPackage resp = ServerConnector.instance().ask(new ReqCancelOrder(_tableID));
+//					if(resp.header.type == Type.NAK){
+//						errMsg = _tableID + "号餐台删单失败";
+//					}
+//				}catch(IOException e){
+//					errMsg = e.getMessage();
+//				}
+//				return errMsg;
+//			}
+//			
+//			/**
+//			 * 根据返回的error message判断，如果发错异常则提示用户，
+//			 * 如果成功，则提示用户删单成功
+//			 */
+//			@Override
+//			protected void onPostExecute(String errMsg){
+//				//make the progress dialog disappeared
+//				_progDialog.dismiss();
+//				/**
+//				 * Prompt user message if any error occurred.
+//				 */
+//				if(errMsg != null){
+//					new AlertDialog.Builder(MainActivity.this)
+//					.setTitle("提示")
+//					.setMessage(errMsg)
+//					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+//						public void onClick(DialogInterface dialog, int id) {
+//							dialog.dismiss();
+//						}
+//					}).show();
+//				}else{
+//					Toast.makeText(MainActivity.this, _tableID + "号台删单成功", Toast.LENGTH_LONG).show();
+//				}
+//			}
+//		}
 		
 		/**
 		 * 请求获得餐台的状态
@@ -896,9 +887,11 @@ public class MainActivity extends Activity {
 			TextView title = (TextView)findViewById(R.id.ordername);
 			if(_dialogType == DIALOG_INSERT_ORDER){
 				title.setText("请输入需要点菜的台号:");
-			}else if(_dialogType == DIALOG_CANCEL_ORDER){
-				title.setText("请输入需要删单的台号:");
-			}else if(_dialogType == DIALOG_BILL_ORDER){
+			}
+//			else if(_dialogType == DIALOG_CANCEL_ORDER){
+//				title.setText("请输入需要删单的台号:");
+//			}
+			else if(_dialogType == DIALOG_BILL_ORDER){
 				title.setText("请输入需要结账的台号:");
 			}else{
 				title.setText("请输入需要下单的台号:");
@@ -920,10 +913,11 @@ public class MainActivity extends Activity {
 							new QueryTableStatusTask(tableAlias).execute();
 							dismiss();
 							
-						}else if(_dialogType == DIALOG_CANCEL_ORDER){
-							new CancelOrderTask(tableAlias).execute();
-							dismiss();
 						}
+//						else if(_dialogType == DIALOG_CANCEL_ORDER){
+//							new CancelOrderTask(tableAlias).execute();
+//							dismiss();
+//						}
 						
 					}catch(NumberFormatException e){
 						Toast.makeText(MainActivity.this, "您输入的台号" + tblNoEdtTxt.getText().toString().trim() + "格式不正确，请重新输入" , Toast.LENGTH_SHORT).show();
