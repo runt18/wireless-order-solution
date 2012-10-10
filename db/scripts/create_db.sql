@@ -746,12 +746,11 @@ COMMENT = 'describe the combo information' ;
 DROP TABLE IF EXISTS `wireless_order_db`.`discount` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`discount` (
-  `discount_id` INT UNSIGNED NULL AUTO_INCREMENT COMMENT 'the id to this discount' ,
+  `discount_id` INT UNSIGNED NULL AUTO_INCREMENT ,
   `restaurant_id` INT UNSIGNED NULL COMMENT 'the restaurant id this discount belongs to' ,
   `name` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the name to this discount' ,
   `level` SMALLINT NULL DEFAULT 0 ,
-  PRIMARY KEY (`discount_id`) ,
-  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
+  PRIMARY KEY (`discount_id`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the discount plan' ;
@@ -763,11 +762,12 @@ COMMENT = 'describe the discount plan' ;
 DROP TABLE IF EXISTS `wireless_order_db`.`discount_plan` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`discount_plan` (
+  `dist_plan_id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this discount plan' ,
   `discount_id` INT UNSIGNED NOT NULL DEFAULT 0 ,
   `kitchen_id` INT NOT NULL DEFAULT 0 ,
   `kitchen_alias` TINYINT UNSIGNED NOT NULL DEFAULT 0 ,
   `rate` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the discount rate which ranges from 0.00 to 1.00' ,
-  INDEX `ix_discount_id` (`discount_id` ASC) )
+  PRIMARY KEY (`dist_plan_id`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the plan to each discount' ;

@@ -118,11 +118,12 @@ COMMENT = 'describe the discount plan' ;
 DROP TABLE IF EXISTS `wireless_order_db`.`discount_plan` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`discount_plan` (
-  `discount_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the discount id to this discount plan',
-  `kitchen_id` INT NOT NULL DEFAULT 0 COMMENT 'the kitchen id to this discount plan',
-  `kitchen_alias` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the kitchen_alias to this discount plan',
+  `dist_plan_id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this discount plan' ,
+  `discount_id` INT UNSIGNED NOT NULL DEFAULT 0 ,
+  `kitchen_id` INT NOT NULL DEFAULT 0 ,
+  `kitchen_alias` TINYINT UNSIGNED NOT NULL DEFAULT 0 ,
   `rate` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the discount rate which ranges from 0.00 to 1.00' ,
-  INDEX `ix_discount_id` (`discount_id` ASC) )
+  PRIMARY KEY (`dist_plan_id`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the plan to each discount' ;
