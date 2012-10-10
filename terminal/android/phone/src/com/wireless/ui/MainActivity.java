@@ -24,6 +24,8 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
@@ -53,8 +55,6 @@ public class MainActivity extends Activity {
 	public static final int NETWORK_SET = 6;
 	
 	private static final int DIALOG_INSERT_ORDER = 0;
-	//private static final int DIALOG_UPDATE_ORDER = 1;
-//	private static final int DIALOG_CANCEL_ORDER = 2;
 	private static final int DIALOG_BILL_ORDER = 3;
 	private static final int DIALOG_STAFF_LOGIN = 4;
 	
@@ -181,23 +181,6 @@ public class MainActivity extends Activity {
 				case 2:
 					Intent sellOutIntent = new Intent(MainActivity.this,SellOutActivity.class);
 					startActivity(sellOutIntent);
-//					//删单
-//					/**
-//					 * 提示输入密码，验证通过的情况下执行删单，
-//					 * 否则直接执行删单
-//					 */
-//					if(WirelessOrder.restaurant.pwd != null){
-//						new AskPwdDialog(MainActivity.this, AskPwdDialog.PWD_1){
-//							@Override
-//							protected void onPwdPass(Context context){
-//								dismiss();
-//								showDialog(DIALOG_CANCEL_ORDER);
-//							}
-//						}.show();						
-//					}else{
-//						showDialog(DIALOG_CANCEL_ORDER);
-//					}
-					
 					break;
 					
 				case 3:
@@ -290,10 +273,6 @@ public class MainActivity extends Activity {
 			return new AskTableDialog(DIALOG_INSERT_ORDER);
 			
 		}
-//		else if(dialogID == DIALOG_CANCEL_ORDER){
-//			//删单的餐台输入Dialog
-//			return new AskTableDialog(DIALOG_CANCEL_ORDER);
-//		}
 		else if(dialogID == DIALOG_BILL_ORDER){
 			//结账的餐台输入Dialog
 			return new AskTableDialog(DIALOG_BILL_ORDER);
@@ -733,69 +712,6 @@ public class MainActivity extends Activity {
 	private class AskTableDialog extends Dialog{
 
 		/**
-		 * 删单的请求操作 
-		 */
-//		private class CancelOrderTask extends AsyncTask<Void, Void, String>{
-//			
-//			private ProgressDialog _progDialog;
-//			private int _tableID;
-//			
-//			CancelOrderTask(int tableID) {
-//				_tableID = tableID;
-//			}
-//			
-//			/**
-//			 * 在执行请求删单操作前显示提示信息
-//			 */
-//			@Override
-//			protected void onPreExecute(){
-//				_progDialog = ProgressDialog.show(MainActivity.this, "", "删除" + _tableID + "号餐台的信息...请稍候", true);
-//			}
-//
-//			/**
-//			 * 在新的线程中执行删单的请求
-//			 */
-//			@Override
-//			protected String doInBackground(Void... arg0) {
-//				String errMsg = null;
-//				try{
-//					ProtocolPackage resp = ServerConnector.instance().ask(new ReqCancelOrder(_tableID));
-//					if(resp.header.type == Type.NAK){
-//						errMsg = _tableID + "号餐台删单失败";
-//					}
-//				}catch(IOException e){
-//					errMsg = e.getMessage();
-//				}
-//				return errMsg;
-//			}
-//			
-//			/**
-//			 * 根据返回的error message判断，如果发错异常则提示用户，
-//			 * 如果成功，则提示用户删单成功
-//			 */
-//			@Override
-//			protected void onPostExecute(String errMsg){
-//				//make the progress dialog disappeared
-//				_progDialog.dismiss();
-//				/**
-//				 * Prompt user message if any error occurred.
-//				 */
-//				if(errMsg != null){
-//					new AlertDialog.Builder(MainActivity.this)
-//					.setTitle("提示")
-//					.setMessage(errMsg)
-//					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-//						public void onClick(DialogInterface dialog, int id) {
-//							dialog.dismiss();
-//						}
-//					}).show();
-//				}else{
-//					Toast.makeText(MainActivity.this, _tableID + "号台删单成功", Toast.LENGTH_LONG).show();
-//				}
-//			}
-//		}
-		
-		/**
 		 * 请求获得餐台的状态
 		 */
 		private class QueryTableStatusTask extends com.wireless.lib.task.QueryTableStatusTask{
@@ -879,23 +795,18 @@ public class MainActivity extends Activity {
 		AskTableDialog(int dialogType) {
 			super(MainActivity.this, R.style.FullHeightDialog);
 			setContentView(R.layout.alert);
-			//getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
-			
-			//((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).showSoftInput((EditText)findViewById(R.id.mycount), InputMethodManager.SHOW_FORCED);
 			
 			_dialogType = dialogType;
 			TextView title = (TextView)findViewById(R.id.ordername);
 			if(_dialogType == DIALOG_INSERT_ORDER){
 				title.setText("请输入需要点菜的台号:");
 			}
-//			else if(_dialogType == DIALOG_CANCEL_ORDER){
-//				title.setText("请输入需要删单的台号:");
-//			}
 			else if(_dialogType == DIALOG_BILL_ORDER){
 				title.setText("请输入需要结账的台号:");
 			}else{
 				title.setText("请输入需要下单的台号:");
 			}
+			
 			((TextView)findViewById(R.id.table)).setText("台号：");
 			Button okBtn = (Button)findViewById(R.id.confirm);
 			okBtn.setText("确定");
@@ -914,10 +825,6 @@ public class MainActivity extends Activity {
 							dismiss();
 							
 						}
-//						else if(_dialogType == DIALOG_CANCEL_ORDER){
-//							new CancelOrderTask(tableAlias).execute();
-//							dismiss();
-//						}
 						
 					}catch(NumberFormatException e){
 						Toast.makeText(MainActivity.this, "您输入的台号" + tblNoEdtTxt.getText().toString().trim() + "格式不正确，请重新输入" , Toast.LENGTH_SHORT).show();
@@ -934,6 +841,13 @@ public class MainActivity extends Activity {
 					dismiss();					
 				}
 			});
+			
+           getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE); 
+           InputMethodManager imm = (InputMethodManager)
+                           getSystemService(INPUT_METHOD_SERVICE);
+                            imm.showSoftInput(this.getCurrentFocus(), 0); //显示软键盘
+                            imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS); //显示软键盘
+
 		}
 
 		@Override

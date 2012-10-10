@@ -131,7 +131,6 @@ public class PinnedExpandableListView extends ExpandableListView implements OnSc
 	private float mDownX;
 	private float mDownY;
 
-	//FIXME imagebutton抢占了touchevent事件，以至于处理不到
 	/**
 	 * 如果 HeaderView 是可见的 , 此函数用于判断是否点击了 HeaderView, 并对做相应的处理 ,
 	 * 因为 HeaderView 是画上去的 , 所以设置事件监听是无效的 , 只有自行控制 .

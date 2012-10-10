@@ -19,25 +19,14 @@
             android:textStyle="bold"
             android:typeface="serif" />
     </RelativeLayout>
-
-    <TextView
-        android:id="@+id/orderTxtView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/orderConfirmRL"
-        android:layout_marginLeft="10dip"
-        android:layout_marginTop="20dip"
-        android:text="数量:"
-        android:textColor="#000000"
-        android:textSize="18sp" />
-
+
     <EditText
         android:id="@+id/amountEdtTxt"
-        android:layout_width="50dip"
+        android:layout_width="70dip"
         android:layout_height="50dip"
         android:layout_below="@id/orderConfirmRL"
         android:layout_marginTop="10dip"
-        android:layout_toRightOf="@id/orderTxtView1"
+        android:layout_toRightOf="@+id/button_minus_orderConfirm"
         android:background="@drawable/input"
         android:digits="0123456789."
         android:focusableInTouchMode="true"
@@ -46,7 +35,9 @@
         android:textColor="#000000"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:typeface="sans" />
+        android:typeface="sans" >
+        <requestFocus/>
+    </EditText>
 
     <RelativeLayout
         android:id="@+id/relativeLayout1"
@@ -99,15 +90,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/button_plus_orderConfirm"
-        android:layout_toRightOf="@+id/button_plus_orderConfirm"
+        android:layout_marginLeft="10dp"
         android:text="数量减" />
 
     <CheckBox
         android:id="@+id/orderHurriedChk"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/amountEdtTxt"
-        android:layout_toRightOf="@+id/button_minus_orderConfirm"
+        android:layout_alignBaseline="@+id/amountEdtTxt"
+        android:layout_alignBottom="@+id/amountEdtTxt"
+        android:layout_toRightOf="@+id/button_plus_orderConfirm"
         android:focusable="false"
         android:textColor="#000000"
         android:textSize="18sp" />

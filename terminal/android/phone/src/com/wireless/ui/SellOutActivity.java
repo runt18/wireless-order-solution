@@ -27,16 +27,26 @@ public class SellOutActivity extends Activity {
 	
 	private static class FoodHandler extends Handler{
 		private WeakReference<SellOutActivity> mActivity;
+		private TextView mHintText;
 
 		FoodHandler(SellOutActivity activity)
 		{
 			mActivity = new WeakReference<SellOutActivity>(activity);
+			mHintText = (TextView) activity.findViewById(R.id.textView_hintText);
 		}
 
 		@Override
 		public void handleMessage(Message msg) {
 			SellOutActivity activity = mActivity.get();
-			activity.mSellOutListView.setAdapter(activity.new FoodAdapter(WirelessOrder.foodMenu.foods));
+			FoodAdapter adapter = activity.new FoodAdapter(WirelessOrder.foodMenu.foods);
+			if(adapter.getCount() == 0)
+			{
+				mHintText.setVisibility(View.VISIBLE);
+			}
+			else {
+				mHintText.setVisibility(View.GONE);
+				activity.mSellOutListView.setAdapter(adapter);
+			}
 		}
 	}
 	@Override

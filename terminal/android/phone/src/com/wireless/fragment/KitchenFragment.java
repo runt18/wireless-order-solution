@@ -23,6 +23,7 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.ExpandableListView.OnGroupExpandListener;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -409,9 +410,9 @@ public class KitchenFragment extends Fragment {
 				((TextView) childView.findViewById(R.id.textView_price_kitchenFgm_child_item_item)).setText("" + k.getPrice());
 				linearLayout.addView(childView);
 				//设置该项的侦听
-//				((ImageView)childView.findViewById(R.id.imageView_kitchenFgm_xplistview_child_item_item))
-				
-				childView
+				((ImageView)childView.findViewById(R.id.imageView_kitchenFgm_xplistview_child_item_item))
+				//FIXME ontouchevent事件冲突问题
+//				childView
 				.setOnClickListener(new OnClickListener(){
 					@Override
 					public void onClick(View v) {
