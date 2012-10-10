@@ -47,16 +47,16 @@
             android:paddingTop="10dp"
             android:src="@drawable/search_selector" />
     </RelativeLayout>
-
+
     <GridView
         android:id="@+id/gridView_numberFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/relativeLayout1"
-        android:horizontalSpacing="6dp"
-        android:numColumns="3"
-        android:verticalSpacing="6dp" >
+        android:horizontalSpacing="1px"
+        android:numColumns="4"
+        android:verticalSpacing="1px" >
 
     </GridView>
 

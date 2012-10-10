@@ -13,5 +13,6 @@
     <drawable name="orange_drawable">#feb041</drawable>
     <drawable name="white_drawable">#ffffff</drawable>
         <color name="black">#000</color>
+        <color name="red">#ef1a1a</color>
     
 </resources>

@@ -1,25 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content" >
+    android:layout_height="wrap_content"
+    android:paddingLeft="1px" >
 
-    <ImageView
-        android:id="@+id/imageView_kitchen_fragment_dept_item"
-        android:layout_width="70dp"
-        android:layout_height="60dp"
-        android:paddingRight="1dp"
-        android:src="@color/orange" />
-
-    <TextView
-        android:id="@+id/textView_kitchenFragment_dept_item"
-        android:layout_width="64dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="false"
-        android:layout_centerInParent="false"
-        android:layout_centerVertical="true"
-        android:gravity="center"
-        android:text="部门"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textSize="16sp" />
+    <RelativeLayout
+        android:id="@+id/relativeLayout_child_kcFgm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/textView_kitchenFragment_dept_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="false"
+            android:layout_centerInParent="true"
+            android:layout_centerVertical="false"
+            android:gravity="center"
+            android:text="部门"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/white"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="70dp"
+            android:layout_height="60dp" />
+    </RelativeLayout>
 
 </RelativeLayout>

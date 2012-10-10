@@ -2,54 +2,64 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@color/blue"
-    android:paddingLeft="4dp" >
+    android:paddingLeft="1px" >
 
-    <TextView
-        android:id="@+id/textView_foodName_pickFoodFragment_item"
+    <RelativeLayout
+        android:id="@+id/relativeLayout"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:text="菜名..."
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textSize="15sp" />
+        android:layout_height="wrap_content" >
 
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/textView2"
-        android:text="￥"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textSize="13sp" />
+        <ImageView
+            android:id="@+id/imageView_pickFoodFragment_item"
+            android:layout_width="79dp"
+            android:layout_height="90dp"
+            android:src="@drawable/kitchen_fragment_xplistview_item_item_selector" />
 
-    <TextView
-        android:id="@+id/textView_price_pickFoodFragment_item"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/textView1"
-        android:layout_toRightOf="@+id/textView1"
-        android:text="1.0"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textSize="13sp" />
+        <TextView
+            android:id="@+id/textView_foodName_pickFoodFragment_item"
+            android:layout_width="79dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:text="坑爹菜名..."
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/white"
+            android:textSize="18sp" />
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="70dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true" />
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/imageView_pickFoodFragment_item"
+            android:layout_marginBottom="4dp"
+            android:text="￥"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/orange"
+            android:textSize="13sp" />
 
-    <TextView
-        android:id="@+id/textView_num_pickFoodFragment_item"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/textView1"
-        android:layout_alignParentLeft="true"
-        android:text="1"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@color/white"
-        android:textSize="13sp" />
+        <TextView
+            android:id="@+id/textView_price_pickFoodFragment_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/textView1"
+            android:layout_toRightOf="@+id/textView1"
+            android:text="1.0"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/orange"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/textView_num_pickFoodFragment_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/textView_price_pickFoodFragment_item"
+            android:layout_alignBottom="@+id/textView_price_pickFoodFragment_item"
+            android:layout_alignRight="@+id/imageView_pickFoodFragment_item"
+            android:text="132"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/white"
+            android:textSize="13sp" />
+
+    </RelativeLayout>
 
 </RelativeLayout>

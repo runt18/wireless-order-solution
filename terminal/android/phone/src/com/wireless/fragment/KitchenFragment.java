@@ -23,6 +23,7 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.ExpandableListView.OnGroupExpandListener;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -94,24 +95,42 @@ public class KitchenFragment extends Fragment {
 				mDeptLayout = (LinearLayout)fragment.getView().findViewById(R.id.linearLayout_kitchenFragment);
 			//添加所有部门
 			mDeptLayout.removeAllViews();
-			for(Department d:fragment.mValidDepts)
+			for(int i=0;i<fragment.mValidDepts.size();i++)
 			{
+				//解析跟图层
 				RelativeLayout view = (RelativeLayout) LayoutInflater.from(fragment.getActivity()).inflate(R.layout.kitchen_fragment_dept_item, null);
-				((TextView)view.findViewById(R.id.textView_kitchenFragment_dept_item)).setText(d.name);
-				view.setTag(d);
-				
+				//解析子图层并设置颜色
+				final RelativeLayout childView = (RelativeLayout) view.findViewById(R.id.relativeLayout_child_kcFgm);
+				childView.setBackgroundResource(R.color.orange);
+				//设置该项名称
+				((TextView)view.findViewById(R.id.textView_kitchenFragment_dept_item)).setText(fragment.mValidDepts.get(i).name);
+				view.setTag(fragment.mValidDepts.get(i));
+				//设置该项侦听器
 				view.setOnClickListener(new OnClickListener(){
 					@Override
 					public void onClick(View v) {
 						//刷新厨房显示
 						Department dept = (Department) v.getTag();
 						fragment.mDeptFilter = dept.deptID;
-						
 						fragment.mKitchenHandler.sendEmptyMessage(REFRESH_FOODS);
+						//将前一项的外观设置为弹起状态
+						if(mDeptLayout.getTag() != null)
+						{
+							((View)(mDeptLayout.getTag())).setBackgroundResource(R.color.orange);
+						}
+						mDeptLayout.setTag(childView);
+						//设置该项的点击状态
+						childView.setBackgroundResource(R.color.gold);
+
 					}
 				});
-				
 				mDeptLayout.addView(view);
+				//设置第一项的外观
+				if(i==0)
+				{
+					mDeptLayout.setTag(childView);
+					childView.setBackgroundResource(R.color.gold);
+				}
 			}
 		}
 	}
@@ -385,11 +404,14 @@ public class KitchenFragment extends Fragment {
 			{
 				final View childView = View.inflate(getActivity(), R.layout.kitchen_fragment_xplistview_child_item_item, null);
 				childView.setTag(k);
+				//设置该项的显示
 				((TextView) childView.findViewById(R.id.textView_foodName_kitchenFgm_child_item_item)).setText(k.name);
 				((TextView) childView.findViewById(R.id.textView_num_kitchenFgm_child_item_item)).setText("" + k.aliasID);
 				((TextView) childView.findViewById(R.id.textView_price_kitchenFgm_child_item_item)).setText("" + k.getPrice());
 				linearLayout.addView(childView);
-				childView.setOnClickListener(new OnClickListener(){
+				//设置该项的侦听
+				((ImageView)childView.findViewById(R.id.imageView_kitchenFgm_xplistview_child_item_item))
+				.setOnClickListener(new OnClickListener(){
 					@Override
 					public void onClick(View v) {
 						new AskOrderAmountDialog((Food) childView.getTag()).show();
