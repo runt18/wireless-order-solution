@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.Params;
+import com.wireless.exception.BusinessException;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.FoodBasic;
 import com.wireless.pojo.menuMgr.FoodTaste;
@@ -255,6 +257,49 @@ public class MenuDao {
 			dbCon.disconnect();
 		}
 		return list;
+	}
+	
+	/**
+	 * 
+	 * @param dept
+	 * @throws Exception
+	 */
+	public static void updateDepartment(Department dept) throws Exception{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			
+			dbCon.conn.setAutoCommit(false);
+			
+			String updateSQL = "";
+			
+			updateSQL = "UPDATE " 
+					+ Params.dbName + ".department "
+					+ " SET name = '" + dept.getDeptName() + "'"
+					+ " WHERE restaurant_id=" + dept.getRestaurantID()
+					+ " AND dept_id = " + dept.getDeptID();
+			
+			if(dbCon.stmt.executeUpdate(updateSQL) == 0){
+				throw new BusinessException("操作失败,修改部门信息失败.");
+			}
+			
+			updateSQL = "UPDATE " 
+					+ Params.dbName + ".material_dept "
+					+ " SET dept_name = '" + dept.getDeptName() + "'"
+					+ " WHERE restaurant_id=" + dept.getRestaurantID()
+					+ " AND dept_id = " + dept.getDeptID();
+			
+			if(dbCon.stmt.executeUpdate(updateSQL) == 0){
+				throw new BusinessException("操作失败,修改部门食材信息失败.");
+			}
+			
+			dbCon.conn.commit();
+			
+		}catch(Exception e){
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
 	}
 	
 }
