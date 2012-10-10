@@ -1,9 +1,9 @@
 package com.wireless.pojo.distMgr;
 
-import java.util.HashMap;
+import java.util.List;
 
 import com.wireless.protocol.Discount;
-import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.DiscountPlan;
 
 
 public class DiscountPojo {
@@ -54,11 +54,11 @@ public class DiscountPojo {
 		mDiscount.level = level;
 	}
 	
-	public HashMap<Kitchen, Float> getPlan(){
+	public List<DiscountPlan> getPlan(){
 		return mDiscount.plan;
 	}
 	
-	public void setPlan(HashMap<Kitchen, Float> plan){
+	public void setPlan(List<DiscountPlan> plan){
 		mDiscount.plan = plan;
 	}
 }
