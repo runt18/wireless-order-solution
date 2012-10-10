@@ -1,6 +1,6 @@
 package com.wireless.print.content;
 
-import com.wireless.db.QueryShift;
+import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.print.PStyle;
 import com.wireless.print.PVar;
 import com.wireless.protocol.Order;
@@ -10,10 +10,10 @@ import com.wireless.protocol.Util;
 
 public class ShiftContent extends ConcreteContent {
 
-	private QueryShift.Result _shiftDetail;
+	private QueryShiftDao.Result _shiftDetail;
 	private String _template;
 	
-	public ShiftContent(QueryShift.Result shiftDetail, String template, Order order, Terminal term, int printType, int style) {
+	public ShiftContent(QueryShiftDao.Result shiftDetail, String template, Order order, Terminal term, int printType, int style) {
 		super(order, term, printType, style);
 		_shiftDetail = shiftDetail;
 		_template = template;
@@ -110,7 +110,7 @@ public class ShiftContent extends ConcreteContent {
 		
 		StringBuffer var3 = new StringBuffer();
 		var3.append(new Grid4ItemsContent(new String[]{ "²¿ÃÅ", "ÕÛ¿Û", "ÔùËÍ", "½ð¶î" }, pos4Item, _printType, _style).toString());
-		for(QueryShift.DeptIncome deptIncome : _shiftDetail.deptIncome){
+		for(QueryShiftDao.DeptIncome deptIncome : _shiftDetail.deptIncome){
 			var3.append("\r\n");
 			var3.append(new Grid4ItemsContent(
 					new String[]{ deptIncome.dept.name, 
