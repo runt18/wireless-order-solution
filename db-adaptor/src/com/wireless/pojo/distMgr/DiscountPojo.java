@@ -46,6 +46,14 @@ public class DiscountPojo {
 		mDiscount.restaurantID = restId;
 	}
 	
+	public int getLevel(){
+		return mDiscount.level;
+	}
+	
+	public void setLevel(int level){
+		mDiscount.level = level;
+	}
+	
 	public HashMap<Kitchen, Float> getPlan(){
 		return mDiscount.plan;
 	}

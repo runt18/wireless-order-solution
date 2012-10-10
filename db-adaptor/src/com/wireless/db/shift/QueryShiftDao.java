@@ -1,4 +1,4 @@
-package com.wireless.db;
+package com.wireless.db.shift;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -10,6 +10,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TimeZone;
 
+import com.wireless.db.DBCon;
+import com.wireless.db.Params;
+import com.wireless.db.QueryMenu;
+import com.wireless.db.QuerySetting;
+import com.wireless.db.Util;
+import com.wireless.db.VerifyPin;
 import com.wireless.dbObject.Setting;
 import com.wireless.dbObject.SingleOrderFood;
 import com.wireless.dbReflect.SingleOrderFoodReflector;
@@ -18,7 +24,7 @@ import com.wireless.protocol.Department;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.Terminal;
 
-public class QueryShift {
+public class QueryShiftDao {
 	
 	public final static int QUERY_TODAY = 0;
 	public final static int QUERY_HISTORY = 1;
@@ -80,6 +86,76 @@ public class QueryShift {
 	}
 	
 	/**
+	 * Perform to query the shift information through now to last daily settlement.
+	 * @param dbCon
+	 * 			The database connection
+	 * @return The daily detail record
+	 * @throws BusinessException
+	 *             throws if one the cases below.<br>
+	 *             - The terminal is NOT attached to any restaurant.<br>
+	 *             - The terminal is expired.<br>
+	 * @throws SQLException
+	 *             throws if fail to execute any SQL statement
+	 */
+	public static Result execDailybyNow(Terminal term) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return execDailyByNow(dbCon, term);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Perform to query the shift information through now to last daily settlement.
+	 * Note that the database base should be connected before invoking this method.
+	 * @param dbCon
+	 * 			The database connection
+	 * @param term
+	 * 			The terminal
+	 * @return The daily detail record
+	 * @throws BusinessException
+	 *             throws if one the cases below.<br>
+	 *             - The terminal is NOT attached to any restaurant.<br>
+	 *             - The terminal is expired.<br>
+	 * @throws SQLException
+	 *             throws if fail to execute any SQL statement
+	 */
+	public static Result execDailyByNow(DBCon dbCon, Terminal term) throws BusinessException, SQLException{
+		/**
+		 * Get the latest off duty date from daily settle history 
+		 * and make it as the on duty date to this daily shift
+		 */
+		String onDuty;
+		String sql = " SELECT MAX(off_duty) FROM " +
+					 Params.dbName + ".daily_settle_history " +
+					 " WHERE " +
+					 " restaurant_id=" + term.restaurantID;
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			Timestamp offDuty = dbCon.rs.getTimestamp(1);
+			if(offDuty == null){
+				onDuty = "2011-07-30 00:00:00";
+			}else{
+				onDuty = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(offDuty);
+			}
+		}else{
+			onDuty = "2011-07-30 00:00:00";
+		}
+		dbCon.rs.close();
+		
+		/**
+		 * Make the current date as the off duty date
+		 */
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		sdf.setTimeZone(TimeZone.getTimeZone("GMT+8"));
+		String offDuty = sdf.format(System.currentTimeMillis());
+		
+		return exec(dbCon, term, onDuty, offDuty, QUERY_TODAY);
+	}
+	
+	/**
 	 * Perform to query the shift information through now to last shift.
 	 * 
 	 * @param pin
@@ -91,7 +167,6 @@ public class QueryShift {
 	 *             throws if one the cases below.<br>
 	 *             - The terminal is NOT attached to any restaurant.<br>
 	 *             - The terminal is expired.<br>
-	 *             - The member to query does NOT exist.
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
@@ -120,7 +195,6 @@ public class QueryShift {
 	 *             throws if one the cases below.<br>
 	 *             - The terminal is NOT attached to any restaurant.<br>
 	 *             - The terminal is expired.<br>
-	 *             - The member to query does NOT exist.
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
