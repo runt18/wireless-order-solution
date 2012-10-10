@@ -17,8 +17,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.QueryOrder;
-import com.wireless.db.QueryShift;
 import com.wireless.db.menuMgr.MenuDao;
+import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Kitchen;
@@ -61,9 +61,9 @@ public class QueryOrderAction extends Action {
 			} else if (request.getParameter("orderID") != null) {
 				orderID = Integer.parseInt(request.getParameter("orderID"));
 				if (queryType.equals("History")) {
-					order = QueryOrder.execByID(orderID, QueryShift.QUERY_HISTORY);
+					order = QueryOrder.execByID(orderID, QueryShiftDao.QUERY_HISTORY);
 				} else {
-					order = QueryOrder.execByID(orderID, QueryShift.QUERY_TODAY);
+					order = QueryOrder.execByID(orderID, QueryShiftDao.QUERY_TODAY);
 				}
 			}
 			

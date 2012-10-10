@@ -13,7 +13,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.QueryShift;
+import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Terminal;
@@ -37,7 +37,7 @@ public class QueryShiftAction extends Action {
 			 */
 			String pin = request.getParameter("pin");
 					
-			QueryShift.Result result = QueryShift.execByNow(Long.parseLong(pin), Terminal.MODEL_STAFF);
+			QueryShiftDao.Result result = QueryShiftDao.execByNow(Long.parseLong(pin), Terminal.MODEL_STAFF);
 			
 			/**
 			 * The json to shift record like below

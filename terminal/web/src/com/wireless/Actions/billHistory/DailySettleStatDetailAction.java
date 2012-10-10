@@ -23,8 +23,8 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.QueryShift;
 import com.wireless.db.VerifyPin;
+import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.dbReflect.OrderFoodReflector;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
@@ -71,10 +71,10 @@ public class DailySettleStatDetailAction extends Action {
 			String onDuty = request.getParameter("onDuty");
 			String offDuty = request.getParameter("offDuty");
 
-			QueryShift.Result resutl = null;
-			resutl = QueryShift.exec(dbCon, Long.parseLong(pin),
+			QueryShiftDao.Result resutl = null;
+			resutl = QueryShiftDao.exec(dbCon, Long.parseLong(pin),
 					Terminal.MODEL_STAFF, onDuty, offDuty,
-					QueryShift.QUERY_HISTORY);
+					QueryShiftDao.QUERY_HISTORY);
 
 			/**
 			 */
@@ -117,7 +117,7 @@ public class DailySettleStatDetailAction extends Action {
 			resultMap.put("serviceAmount", resutl.serviceIncome);
 			resultMap.put("serviceBillCount", resutl.serviceAmount);
 
-			QueryShift.DeptIncome[] deptIncomes = resutl.deptIncome;
+			QueryShiftDao.DeptIncome[] deptIncomes = resutl.deptIncome;
 			List deptList = new ArrayList();
 			for (int i = 0; i < deptIncomes.length; i++) {
 				HashMap deptMap = new HashMap();

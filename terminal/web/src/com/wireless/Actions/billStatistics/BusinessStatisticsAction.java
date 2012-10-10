@@ -23,9 +23,9 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.QueryShift;
 import com.wireless.db.VerifyPin;
 import com.wireless.db.billStatistics.QueryDutyRange;
+import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.protocol.Terminal;
 
@@ -131,18 +131,18 @@ public class BusinessStatisticsAction extends Action {
 														  new SimpleDateFormat("yyyy-MM-dd").format(dateBegin), 
 														  new SimpleDateFormat("yyyy-MM-dd").format(c.getTime()));
 				
-				QueryShift.Result result;
+				QueryShiftDao.Result result;
 				
 				if (dutyRange != null) {
 					
-					result = QueryShift.exec(dbCon, 
+					result = QueryShiftDao.exec(dbCon, 
 											term,
 											dutyRange.getOnDuty(), 
 											dutyRange.getOffDuty(), 
-											QueryShift.QUERY_HISTORY);
+											QueryShiftDao.QUERY_HISTORY);
 					
 				}else{
-					result = new QueryShift.Result();
+					result = new QueryShiftDao.Result();
 				}
 				
 				HashMap<String, Object> resultMap = new HashMap<String, Object>();
