@@ -29,8 +29,10 @@ public class QueryDeptTreeAction extends Action{
 		}
 		StringBuffer jsonSB = new StringBuffer();
 		try{
-			String sql = " SELECT dept_id, name " + " FROM " + Params.dbName
-					+ ".department " + " WHERE restaurant_id = "
+			String sql = " SELECT dept_id, name, type, restaurant_id " 
+					+ " FROM " 
+					+ Params.dbName + ".department " 
+					+ " WHERE restaurant_id = "
 					+ restaurantID 
 					+ " ORDER BY dept_id ";
 			
@@ -44,6 +46,8 @@ public class QueryDeptTreeAction extends Action{
 				jsonSB.append(",");
 				jsonSB.append("text:'" + dbCon.rs.getString("name") + "'");
 				jsonSB.append(",deptID:'" + dbCon.rs.getInt("dept_id") + "'");
+				jsonSB.append(",type:'" + dbCon.rs.getInt("type") + "'");
+				jsonSB.append(",restaurantID:'" + dbCon.rs.getInt("restaurant_id") + "'");
 				jsonSB.append(",leaf:true");
 				jsonSB.append("}");
 				index++;

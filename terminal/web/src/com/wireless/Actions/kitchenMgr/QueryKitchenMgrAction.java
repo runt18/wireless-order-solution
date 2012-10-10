@@ -73,15 +73,18 @@ public class QueryKitchenMgrAction extends Action {
 			 */
 
 			String pin = request.getParameter("pin");
-
+			String deptID = request.getParameter("deptID");
+			String kitchenName = request.getParameter("kitchenName");
+			
 			dbCon.connect();
-			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
-					Terminal.MODEL_STAFF);
+			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF);
 
 			String sql = " SELECT kitchen_id, kitchen_alias, name, discount, discount_2, discount_3, "
 				    + " member_discount_1, member_discount_2, member_discount_3, dept_id "
 					+ " FROM " + Params.dbName + ".kitchen "
 					+ " WHERE restaurant_id = " + term.restaurantID 
+					+ (deptID == null || deptID.trim().equals("") || deptID == "" || deptID.equals("-1") || deptID == "-1" ? "" : (" AND dept_id = " + deptID))
+					+ (kitchenName == null || kitchenName.trim().equals("") ? "" : " AND name like '%" + kitchenName + "%' ")
 					+ " AND kitchen_alias BETWEEN 0 AND 49 ";
 
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
