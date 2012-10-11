@@ -22,7 +22,9 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
+import android.widget.ExpandableListView.OnGroupCollapseListener;
 import android.widget.ExpandableListView.OnGroupExpandListener;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -34,6 +36,7 @@ import com.wireless.protocol.Department;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.Util;
 import com.wireless.ui.R;
 import com.wireless.ui.view.PinnedExpandableListView;
 import com.wireless.ui.view.PinnedExpandableListView.PinnedExpandableHeaderAdapter;
@@ -278,23 +281,46 @@ public class KitchenFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view =  inflater.inflate(R.layout.kitchen_fragment, container, false);
-		
+		//FIXME 尝试将header写在XML上面
 		mXpListView = (PinnedExpandableListView) view.findViewById(R.id.expandableListView_kitchenFragment);
-		mXpListView.setHeaderView(getActivity().getLayoutInflater().inflate(R.layout.kitchen_fragment_xplistview_group_item_header, mXpListView, false));
+//		RelativeLayout headerView = (RelativeLayout) view.findViewById(R.id.relativeLayout_header);
+//
+//		mXpListView.setHeaderView(headerView);
+		//关闭组按钮
+		final ImageButton collapseBtn = (ImageButton) view.findViewById(R.id.imageButton_collaps_kitchenFgm);
+		collapseBtn.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				//关闭当前组
+				int groupPosition  = (Integer) collapseBtn.getTag();
+				mXpListView.collapseGroup(groupPosition);
+			}
+		});
 		//设置group展开侦听器，每次只打开一项
 		mXpListView.setOnGroupExpandListener(new OnGroupExpandListener() {
 					@Override
 					public void onGroupExpand( int groupPosition) {
+						//关闭其它组
 						int groupCount = mXpListView.getExpandableListAdapter().getGroupCount();
-						
 						for (int i = 0; i < groupCount; i++) {
 							if (groupPosition != i) {
 								mXpListView.collapseGroup(i);
 							}
 						}
+						
+						//显示关闭组按钮
+						collapseBtn.setVisibility(View.VISIBLE);
+						collapseBtn.setTag(groupPosition);
 					}
 				});
 		
+		mXpListView.setOnGroupCollapseListener(new OnGroupCollapseListener(){
+			@Override
+			public void onGroupCollapse(int groupPosition) {
+				//组关闭时按钮消失
+				collapseBtn.setVisibility(View.GONE);
+			}
+		});
 		mDepartmentHandler.sendEmptyMessage(REFRESH_DEPTS);
 		mKitchenHandler.sendEmptyMessage(REFRESH_FOODS);
 		return view;
@@ -409,16 +435,22 @@ public class KitchenFragment extends Fragment {
 				((TextView) childView.findViewById(R.id.textView_num_kitchenFgm_child_item_item)).setText("" + k.aliasID);
 				((TextView) childView.findViewById(R.id.textView_price_kitchenFgm_child_item_item)).setText("" + k.getPrice());
 				linearLayout.addView(childView);
+				
+				if(k.isSellOut())
+					((TextView)childView.findViewById(R.id.textView_sellout_kcFgm_xplistview_item_item)).setVisibility(View.VISIBLE);
 				//设置该项的侦听
-				((ImageView)childView.findViewById(R.id.imageView_kitchenFgm_xplistview_child_item_item))
-				//FIXME ontouchevent事件冲突问题
-//				childView
-				.setOnClickListener(new OnClickListener(){
+				else {
+					((TextView)childView.findViewById(R.id.textView_sellout_kcFgm_xplistview_item_item)).setVisibility(View.GONE);
+					((ImageView)childView.findViewById(R.id.imageView_kitchenFgm_xplistview_child_item_item))
+					//FIXME ontouchevent事件冲突问题
+	//				childView
+					.setOnClickListener(new OnClickListener(){
 					@Override
 					public void onClick(View v) {
 						new AskOrderAmountDialog((Food) childView.getTag()).show();
 					}
 				});
+				}
 			}
 			
 			return view;
@@ -497,7 +529,7 @@ public class KitchenFragment extends Fragment {
 				@Override
 				public void onClick(View v) {
 					float curNum = Float.parseFloat(countEditText.getText().toString());
-					countEditText.setText("" + ++curNum);
+					countEditText.setText(Util.float2String2(++curNum));
 				}
 			});
 			
@@ -506,9 +538,9 @@ public class KitchenFragment extends Fragment {
 				@Override
 				public void onClick(View v) {
 					float curNum = Float.parseFloat(countEditText.getText().toString());
-					if(--curNum >= 1)
+					if(--curNum >= 1.0f)
 					{
-						countEditText.setText("" + curNum);
+						countEditText.setText(Util.float2String2(curNum));
 					}
 				}
 			});

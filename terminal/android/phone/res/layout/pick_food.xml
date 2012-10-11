@@ -92,23 +92,24 @@
             android:layout_weight="1"
             android:background="@null"
             android:src="@drawable/kitchen_btn_selector" />
-
+
         <ImageButton
             android:id="@+id/imageButton_spell_pickFood"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@null"
-            android:src="@drawable/spell_selector" />
-
+            android:src="@drawable/spell_selector"
+            android:visibility="visible" />
+
         <ImageButton
             android:id="@+id/imageButton_remark_pickFood"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@null"
-            android:src="@drawable/change_order_selector"
-            android:visibility="invisible" />
+            android:src="@drawable/linshicai_selector"
+            android:visibility="visible" />
 
     </LinearLayout>
 

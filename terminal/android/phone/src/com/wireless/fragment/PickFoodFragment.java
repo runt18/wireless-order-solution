@@ -147,7 +147,11 @@ public class PickFoodFragment extends Fragment{
         mGridView.setOnItemClickListener(new OnItemClickListener(){
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				new AskOrderAmountDialog((Food) view.getTag()).show();
+				Food food = (Food) view.getTag();
+				if(!food.isSellOut())
+				{
+					new AskOrderAmountDialog(food).show();
+				}
 			}
         });
         
@@ -247,7 +251,11 @@ public class PickFoodFragment extends Fragment{
 			((TextView) view.findViewById(R.id.textView_foodName_pickFoodFragment_item)).setText(food.name);
 			((TextView) view.findViewById(R.id.textView_num_pickFoodFragment_item)).setText("" + food.aliasID);
 			((TextView) view.findViewById(R.id.textView_price_pickFoodFragment_item)).setText("" + food.getPrice());
-			
+			//设置售罄的显示
+			if(food.isSellOut())
+				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
+			else ((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.GONE);
+
 			return view;
 		}
 	}

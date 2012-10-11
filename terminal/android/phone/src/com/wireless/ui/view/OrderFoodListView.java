@@ -15,6 +15,8 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -211,42 +213,6 @@ public class OrderFoodListView extends ExpandableListView{
 			}			
 		}
 	}
-	
-//	private void trim(OrderFood food){
-//	   	/**
-//    	 * Keep track of the first food and position in the list that matched the food modified.
-//    	 * Combine the food if there is the same food exist in the following position.    	  
-//    	 */
-//    	int pos = -1;
-//		OrderFood firstFood = null;
-//    	int firstPos = -1;
-//    	int srchPos = 0;
-//    	int nCount = 0;
-//    	List<OrderFood> tmpFoods = _foods.subList(0, _foods.size());
-//    	while((pos = tmpFoods.indexOf(food)) != -1){
-//    		nCount++;
-//    		if(nCount == 1){
-//    			firstFood = tmpFoods.get(pos);
-//    			firstPos = pos;
-//    		}else{
-//   	   			int count = Util.float2Int(firstFood.getCount()) + Util.float2Int(tmpFoods.get(pos).getCount());
-//       			if((count / 100) > 255){
-//       				Toast.makeText(_context, "对不起，\"" + firstFood.toString() + "\"最多只能点255份", 0).show();
-//       				firstFood.setCount(new Float(255));
-//       			}else{
-//       				firstFood.setCount(Util.int2Float(count));        				
-//       			}
-//    			_foods.set(firstPos, firstFood);
-//    			_foods.remove(srchPos + pos);
-//    		}
-//			srchPos += pos + 1;
-//			if(srchPos >= _foods.size()){
-//				break;
-//			}else{
-//				tmpFoods = _foods.subList(srchPos, _foods.size());
-//			}
-//    	}
-//	}
 
 	public class Adapter extends BaseExpandableListAdapter{
 
@@ -671,6 +637,13 @@ public class OrderFoodListView extends ExpandableListView{
 					dismiss();
 				}
 			});
+			
+			//弹出软键盘
+	           getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE); 
+	           InputMethodManager imm = (InputMethodManager)
+	        		   _context.getSystemService(Context.INPUT_METHOD_SERVICE);
+	                            imm.showSoftInput(this.getCurrentFocus(), 0); //显示软键盘
+	                            imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
 		}		
 	}
 	
