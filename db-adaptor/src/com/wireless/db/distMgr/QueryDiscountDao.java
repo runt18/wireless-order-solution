@@ -15,6 +15,18 @@ import com.wireless.protocol.Terminal;
 
 public class QueryDiscountDao {
 	
+	/**
+	 * Get the discount and corresponding plan detail, along with the kitchen details.
+	 * @param term
+	 * 			The terminal to query.
+	 * @param extraCond
+	 * 			The extra condition.
+	 * @param orderClause
+	 * 			The order clause.
+	 * @return The array holding the discount info matching the condition. 
+	 * @throws SQLException
+	 * 			Throws if failed to execute any SQL statement.
+	 */
 	public static DiscountPojo[] exec(Terminal term, String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
@@ -25,6 +37,21 @@ public class QueryDiscountDao {
 		}
 	}
 	
+	/**
+	 * Get the discount and corresponding plan detail, along with the kitchen details.
+	 * Note that the database should be connected before connected.
+	 * @param dbCon
+	 * 			The database connection.
+	 * @param term
+	 * 			The terminal to query.
+	 * @param extraCond
+	 * 			The extra condition.
+	 * @param orderClause
+	 * 			The order clause.
+	 * @return The array holding the discount info matching the condition. 
+	 * @throws SQLException
+	 * 			Throws if failed to execute any SQL statement.
+	 */
 	public static DiscountPojo[] exec(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
 		String sql;
 		sql = " SELECT " +
@@ -59,18 +86,18 @@ public class QueryDiscountDao {
 				distPojo.getPlan().add(new DiscountPlan(kitchen, dbCon.rs.getFloat("rate")));
 				discounts.put(tmp, distPojo);
 			}else{
-				Discount discount = new Discount();
-				discount.discountID = dbCon.rs.getInt("discount_id");
-				discount.restaurantID = dbCon.rs.getInt("restaurant_id");
-				discount.name = dbCon.rs.getString("dist_name");
-				discount.level = dbCon.rs.getShort("level");
+				distPojo = new DiscountPojo();
+				distPojo.setId(dbCon.rs.getInt("discount_id"));
+				distPojo.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
+				distPojo.setName(dbCon.rs.getString("dist_name"));
+				distPojo.setLevel(dbCon.rs.getShort("level"));
 				Kitchen kitchen = new Kitchen();
 				kitchen.restaurantID = dbCon.rs.getInt("restaurant_id");
 				kitchen.kitchenID = dbCon.rs.getInt("kitchen_id");
 				kitchen.aliasID = dbCon.rs.getShort("kitchen_alias");
 				kitchen.name = dbCon.rs.getString("kitchen_name");
-				discount.plan.add(new DiscountPlan(kitchen, dbCon.rs.getFloat("rate")));
-				discounts.put(discount, new DiscountPojo(discount));
+				distPojo.addPlan(new DiscountPlan(kitchen, dbCon.rs.getFloat("rate")));
+				discounts.put(distPojo.toOrigin(), distPojo);
 			}
 		}
 		
@@ -78,6 +105,18 @@ public class QueryDiscountDao {
 
 	}
 	
+	/**
+	 * Get the pure discount info(such as id, name and so on).
+	 * @param term
+	 * 			The terminal to query.
+	 * @param extraCond
+	 * 			The extra condition.
+	 * @param orderClause
+	 * 			The order clause.
+	 * @return The array holding the pure discount info.
+	 * @throws SQLException
+	 * 			Throws if failed to execute any SQL statement.
+	 */
 	public static DiscountPojo[] execPureDiscount(Terminal term, String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
@@ -88,6 +127,21 @@ public class QueryDiscountDao {
 		}
 	}
 	
+	/**
+	 * Get the pure discount info(such as id, name and so on).
+	 * Note that the database should be connected before invoking this method.
+	 * @param dbCon
+	 * 			The database connection.
+	 * @param term
+	 * 			The terminal to query.
+	 * @param extraCond
+	 * 			The extra condition.
+	 * @param orderClause
+	 * 			The order clause.
+	 * @return The array holding the pure discount info.
+	 * @throws SQLException
+	 * 			Throws if failed to execute any SQL statement.
+	 */
 	public static DiscountPojo[] execPureDiscount(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
 		String sql;
 		sql = " SELECT " +
