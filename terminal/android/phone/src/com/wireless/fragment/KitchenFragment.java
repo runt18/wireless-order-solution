@@ -124,7 +124,10 @@ public class KitchenFragment extends Fragment {
 						mDeptLayout.setTag(childView);
 						//设置该项的点击状态
 						childView.setBackgroundResource(R.color.gold);
-
+						//若关闭按钮显示，则取消显示
+						ImageButton collapseBtn = (ImageButton) fragment.getView().findViewById(R.id.imageButton_collaps_kitchenFgm);
+						if(collapseBtn.isShown())
+							collapseBtn.setVisibility(View.GONE);
 					}
 				});
 				mDeptLayout.addView(view);
@@ -281,11 +284,9 @@ public class KitchenFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view =  inflater.inflate(R.layout.kitchen_fragment, container, false);
-		//FIXME 尝试将header写在XML上面
+		//FIXME 去掉这个标题
 		mXpListView = (PinnedExpandableListView) view.findViewById(R.id.expandableListView_kitchenFragment);
-//		RelativeLayout headerView = (RelativeLayout) view.findViewById(R.id.relativeLayout_header);
-//
-//		mXpListView.setHeaderView(headerView);
+//		mXpListView.setHeaderView(inflater.inflate(R.layout.kitchen_fragment_xplistview_group_item_header, container, false));
 		//关闭组按钮
 		final ImageButton collapseBtn = (ImageButton) view.findViewById(R.id.imageButton_collaps_kitchenFgm);
 		collapseBtn.setOnClickListener(new OnClickListener(){
@@ -519,11 +520,11 @@ public class KitchenFragment extends Fragment {
 			_selectedFood = new OrderFood(food);
 			
 			setContentView(R.layout.order_confirm);
-			
+			//输入的框
 			((TextView)findViewById(R.id.orderTitleTxt)).setText("请输入" + _selectedFood.name + "的点菜数量");
-			final TextView countEditText = (EditText)findViewById(R.id.amountEdtTxt);
+			final EditText countEditText = (EditText)findViewById(R.id.amountEdtTxt);
 			countEditText.setText("1");
-			
+			//数量减按钮
 			((Button) findViewById(R.id.button_plus_orderConfirm)).setOnClickListener(new View.OnClickListener(){
 
 				@Override
@@ -532,7 +533,7 @@ public class KitchenFragment extends Fragment {
 					countEditText.setText(Util.float2String2(++curNum));
 				}
 			});
-			
+			//数量加按钮
 			((Button) findViewById(R.id.button_minus_orderConfirm)).setOnClickListener(new View.OnClickListener(){
 
 				@Override

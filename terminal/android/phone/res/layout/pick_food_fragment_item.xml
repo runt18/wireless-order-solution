@@ -59,7 +59,7 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="@color/white"
             android:textSize="13sp" />
-
+
         <TextView
             android:id="@+id/textView_sellout_pickFoodFgm_item"
             android:layout_width="wrap_content"
@@ -67,7 +67,7 @@
             android:layout_alignParentLeft="false"
             android:layout_alignRight="@+id/imageView_pickFoodFragment_item"
             android:layout_centerVertical="true"
-            android:text="售罄"
+            android:text="停"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="@color/red"
             android:textSize="26sp"

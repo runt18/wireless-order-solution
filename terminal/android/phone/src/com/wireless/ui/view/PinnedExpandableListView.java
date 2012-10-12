@@ -87,7 +87,7 @@ public class PinnedExpandableListView extends ExpandableListView implements OnSc
 	private boolean mHeaderViewVisible;
 
 	private int mHeaderViewWidth;
-
+//
 	private int mHeaderViewHeight;
 
 	public void setHeaderView(View view) {
@@ -217,6 +217,7 @@ public class PinnedExpandableListView extends ExpandableListView implements OnSc
 		int state = mAdapter.getPinnedExpandableHeaderState(groupPos, childPos);
 		if (mHeaderView != null && mAdapter != null && state != mOldState) {
 			mOldState = state;
+			mHeaderView.setVisibility(View.VISIBLE);
 			mHeaderView.layout(0, 0, mHeaderViewWidth, mHeaderViewHeight);
 		}
 
@@ -234,12 +235,12 @@ public class PinnedExpandableListView extends ExpandableListView implements OnSc
 		switch (state) {
 			case PinnedExpandableHeaderAdapter.PINNED_HEADER_GONE: {
 				mHeaderViewVisible = false;
+
 				break;
 			}
 	
 			case PinnedExpandableHeaderAdapter.PINNED_HEADER_VISIBLE: {
 				mAdapter.configurePinnedExpandableHeader(mHeaderView, groupPosition,childPosition, MAX_ALPHA);
-	
 				if (mHeaderView.getTop() != 0){
 					mHeaderView.layout(0, 0, mHeaderViewWidth, mHeaderViewHeight);
 				}
@@ -253,7 +254,6 @@ public class PinnedExpandableListView extends ExpandableListView implements OnSc
 				View firstView = getChildAt(0);
 				int bottom = firstView.getBottom();
 	
-				// intitemHeight = firstView.getHeight();
 				int headerHeight = mHeaderView.getHeight();
 	
 				int y;
@@ -273,7 +273,7 @@ public class PinnedExpandableListView extends ExpandableListView implements OnSc
 				if (mHeaderView.getTop() != y) {
 					mHeaderView.layout(0, y, mHeaderViewWidth, mHeaderViewHeight + y);
 				}
-	
+
 				mHeaderViewVisible = true;
 				break;
 			}
