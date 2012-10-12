@@ -10,54 +10,64 @@ import com.wireless.protocol.DiscountPlan;
 
 public class DiscountPojo {
 	
-	private Discount mDiscount;
+	private String mName;
+	private int mId;
+	private int mRestaurantId;
+	private int mLevel;
 	private List<DiscountPlan> mPlans;
 	
 	public DiscountPojo(){
 		mPlans = new ArrayList<DiscountPlan>();
-		mDiscount = new Discount();
 	}
 	
 	public DiscountPojo(Discount discount){
-		mDiscount = discount;
-		mPlans = new ArrayList<DiscountPlan>(Arrays.asList(mDiscount.plans));
+		mName = discount.name;
+		mId = discount.discountID;
+		mRestaurantId = discount.restaurantID;
+		mLevel = discount.level;
+		mPlans = new ArrayList<DiscountPlan>(Arrays.asList(discount.plans));
 	}
 	
-	public Discount toOrigin(){
-		mDiscount.plans = mPlans.toArray(new DiscountPlan[mPlans.size()]);
-		return mDiscount;
+	public Discount toProtocol(){
+		Discount dist = new Discount();
+		dist.name = mName;
+		dist.discountID = mId;
+		dist.restaurantID = mRestaurantId;
+		dist.plans = mPlans.toArray(new DiscountPlan[mPlans.size()]);
+		dist.level = mLevel;
+		return dist;
 	}
 	
 	public String getName(){
-		return mDiscount.name;
+		return mName;
 	}
 	
 	public void setName(String name){
-		mDiscount.name = name;
+		this.mName = name;
 	}
 	
 	public int getId(){
-		return mDiscount.discountID;
+		return mId;
 	}
 	
 	public void setId(int id){
-		mDiscount.discountID = id; 
+		this.mId = id; 
 	}
 	
 	public int getRestaurantID(){
-		return mDiscount.restaurantID;
+		return mRestaurantId;
 	}
 	
 	public void setRestaurantID(int restId){
-		mDiscount.restaurantID = restId;
+		this.mRestaurantId = restId;
 	}
 	
 	public int getLevel(){
-		return mDiscount.level;
+		return mLevel;
 	}
 	
 	public void setLevel(int level){
-		mDiscount.level = level;
+		this.mLevel = level;
 	}
 	
 	public void addPlan(DiscountPlan plan){
@@ -69,6 +79,6 @@ public class DiscountPojo {
 	}
 	
 	public void setPlan(List<DiscountPlan> plan){
-		mPlans = plan;
+		this.mPlans = plan;
 	}
 }
