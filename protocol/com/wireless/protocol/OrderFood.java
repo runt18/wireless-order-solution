@@ -24,8 +24,8 @@ public class OrderFood extends Food {
 	 */
 	int discount = 100;	//the discount to this food 
 	
-	public void setDiscount(Float _discount){
-		discount = Util.float2Int(_discount);
+	public void setDiscount(Float discount){
+		this.discount = Util.float2Int(discount);
 	}
 	
 	public Float getDiscount(){

@@ -1,20 +1,19 @@
 package com.wireless.protocol;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class Discount {
 	public int discountID;
 	public String name;
 	public int restaurantID;
 	public int level;
-	public List<DiscountPlan> plan = new ArrayList<DiscountPlan>();
+	public DiscountPlan[] plans;
 	
 	public Discount(){
-		
+		plans = new DiscountPlan[0];
 	}
 	
 	public Discount(int discountID){
+		this();
 		this.discountID = discountID;
 	}
 	
