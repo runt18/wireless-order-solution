@@ -145,7 +145,7 @@ wireless_order_db.kitchen KITCHEN
 INNER JOIN
 wireless_order_db.discount DIST
 ON KITCHEN.restaurant_id = DIST.restaurant_id AND DIST.level = 200
-WHERE KITCHEN.type = 0;
+WHERE KITCHEN.type = 0 AND KITCHEN.discount <> 1;
 
 -- -----------------------------------------------------
 -- Insert "折扣方案2" to table 'discount'
@@ -164,7 +164,7 @@ wireless_order_db.kitchen KITCHEN
 INNER JOIN
 wireless_order_db.discount DIST
 ON KITCHEN.restaurant_id = DIST.restaurant_id AND DIST.level = 199
-WHERE KITCHEN.type = 0;
+WHERE KITCHEN.type = 0 AND KITCHEN.discount_2 <> 1;
 
 -- -----------------------------------------------------
 -- Insert "折扣方案3" to table 'discount'
@@ -183,4 +183,14 @@ wireless_order_db.kitchen KITCHEN
 INNER JOIN
 wireless_order_db.discount DIST
 ON KITCHEN.restaurant_id = DIST.restaurant_id AND DIST.level = 198
-WHERE KITCHEN.type = 0;
+WHERE KITCHEN.type = 0 AND KITCHEN.discount_3 <> 1;
+
+-- -----------------------------------------------------
+-- Drop the field 'discount_type' from table 'order'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order` DROP COLUMN `discount_type` ;
+
+-- -----------------------------------------------------
+-- Drop the field 'discount_type' from table 'order_history'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_history` DROP COLUMN `discount_type` ;
