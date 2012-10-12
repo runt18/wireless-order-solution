@@ -83,7 +83,7 @@ public class QueryDiscountDao {
 				kitchen.kitchenID = dbCon.rs.getInt("kitchen_id");
 				kitchen.aliasID = dbCon.rs.getShort("kitchen_alias");
 				kitchen.name = dbCon.rs.getString("kitchen_name");
-				distPojo.getPlan().add(new DiscountPlan(kitchen, dbCon.rs.getFloat("rate")));
+				distPojo.addPlan(new DiscountPlan(kitchen, dbCon.rs.getFloat("rate")));
 				discounts.put(tmp, distPojo);
 			}else{
 				distPojo = new DiscountPojo();
@@ -97,7 +97,7 @@ public class QueryDiscountDao {
 				kitchen.aliasID = dbCon.rs.getShort("kitchen_alias");
 				kitchen.name = dbCon.rs.getString("kitchen_name");
 				distPojo.addPlan(new DiscountPlan(kitchen, dbCon.rs.getFloat("rate")));
-				discounts.put(distPojo.toOrigin(), distPojo);
+				discounts.put(distPojo.toProtocol(), distPojo);
 			}
 		}
 		
