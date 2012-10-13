@@ -10,75 +10,75 @@ import com.wireless.protocol.DiscountPlan;
 
 public class DiscountPojo {
 	
-	private String mName;
-	private int mId;
-	private int mRestaurantId;
-	private int mLevel;
-	private List<DiscountPlan> mPlans;
+	private String name;
+	private int id;
+	private int restaurantID;
+	private int level;
+	private List<DiscountPlan> plans;
 	
 	public DiscountPojo(){
-		mPlans = new ArrayList<DiscountPlan>();
+		plans = new ArrayList<DiscountPlan>();
 	}
 	
 	public DiscountPojo(Discount discount){
-		mName = discount.name;
-		mId = discount.discountID;
-		mRestaurantId = discount.restaurantID;
-		mLevel = discount.level;
-		mPlans = new ArrayList<DiscountPlan>(Arrays.asList(discount.plans));
+		name = discount.name;
+		id = discount.discountID;
+		restaurantID = discount.restaurantID;
+		level = discount.level;
+		plans = new ArrayList<DiscountPlan>(Arrays.asList(discount.plans));
 	}
 	
 	public Discount toProtocol(){
 		Discount dist = new Discount();
-		dist.name = mName;
-		dist.discountID = mId;
-		dist.restaurantID = mRestaurantId;
-		dist.plans = mPlans.toArray(new DiscountPlan[mPlans.size()]);
-		dist.level = mLevel;
+		dist.name = name;
+		dist.discountID = id;
+		dist.restaurantID = restaurantID;
+		dist.plans = plans.toArray(new DiscountPlan[plans.size()]);
+		dist.level = level;
 		return dist;
 	}
 	
 	public String getName(){
-		return mName;
+		return name;
 	}
 	
 	public void setName(String name){
-		this.mName = name;
+		this.name = name;
 	}
 	
 	public int getId(){
-		return mId;
+		return id;
 	}
 	
 	public void setId(int id){
-		this.mId = id; 
+		this.id = id; 
 	}
 	
 	public int getRestaurantID(){
-		return mRestaurantId;
+		return restaurantID;
 	}
 	
 	public void setRestaurantID(int restId){
-		this.mRestaurantId = restId;
+		this.restaurantID = restId;
 	}
 	
 	public int getLevel(){
-		return mLevel;
+		return level;
 	}
 	
 	public void setLevel(int level){
-		this.mLevel = level;
+		this.level = level;
 	}
 	
 	public void addPlan(DiscountPlan plan){
-		mPlans.add(plan);
+		plans.add(plan);
 	}
 	
-	public List<DiscountPlan> getPlan(){
-		return mPlans;
+	public List<DiscountPlan> getPlans(){
+		return plans;
 	}
 	
-	public void setPlan(List<DiscountPlan> plan){
-		this.mPlans = plan;
+	public void setPlans(List<DiscountPlan> plan){
+		this.plans = plan;
 	}
 }
