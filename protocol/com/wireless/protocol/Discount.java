@@ -23,7 +23,7 @@ public class Discount {
 	}
 	
 	public boolean equals(Object obj){
-		if(obj == null || !(obj instanceof Kitchen)){
+		if(obj == null || !(obj instanceof Discount)){
 			return false;
 		}else{
 			return discountID == ((Discount)obj).discountID;
