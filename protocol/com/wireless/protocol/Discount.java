@@ -11,7 +11,7 @@ public class Discount {
 	public int restaurantID;
 	public int level;
 	public DiscountPlan[] plans;
-	public int type = NORMAL;
+	public int status = NORMAL;
 	
 	public Discount(){
 		plans = new DiscountPlan[0];
