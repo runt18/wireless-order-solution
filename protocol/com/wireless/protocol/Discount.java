@@ -2,11 +2,16 @@ package com.wireless.protocol;
 
 
 public class Discount {
+	
+	public final static int NORMAL = 0;
+	public final static int DEFAULT = 1;
+	
 	public int discountID;
 	public String name;
 	public int restaurantID;
 	public int level;
 	public DiscountPlan[] plans;
+	public int type = NORMAL;
 	
 	public Discount(){
 		plans = new DiscountPlan[0];
@@ -17,7 +22,6 @@ public class Discount {
 		this.discountID = discountID;
 	}
 	
-	@Override
 	public boolean equals(Object obj){
 		if(obj == null || !(obj instanceof Kitchen)){
 			return false;
@@ -26,7 +30,6 @@ public class Discount {
 		}
 	}
 	
-	@Override
 	public int hashCode(){
 		return new Integer(discountID).hashCode();
 	}
