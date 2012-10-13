@@ -748,7 +748,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`discount` (
   `restaurant_id` INT UNSIGNED NULL COMMENT 'the restaurant id this discount belongs to' ,
   `name` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the name to this discount' ,
   `level` SMALLINT NULL DEFAULT 0 ,
-  `type` TINYINT NULL DEFAULT 0 COMMENT 'the type is as below.\n0 - normal\n1 - default' ,
+  `status` TINYINT NULL DEFAULT 0 COMMENT 'the type is as below.\n0 - normal\n1 - default' ,
   PRIMARY KEY (`discount_id`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
