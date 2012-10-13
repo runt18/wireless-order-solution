@@ -764,7 +764,6 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`discount_plan` (
   `dist_plan_id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this discount plan' ,
   `discount_id` INT UNSIGNED NOT NULL DEFAULT 0 ,
   `kitchen_id` INT NOT NULL DEFAULT 0 ,
-  `kitchen_alias` TINYINT UNSIGNED NOT NULL DEFAULT 0 ,
   `rate` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the discount rate which ranges from 0.00 to 1.00' ,
   PRIMARY KEY (`dist_plan_id`) )
 ENGINE = InnoDB

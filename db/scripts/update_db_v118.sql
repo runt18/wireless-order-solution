@@ -122,7 +122,6 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`discount_plan` (
   `dist_plan_id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this discount plan' ,
   `discount_id` INT UNSIGNED NOT NULL DEFAULT 0 ,
   `kitchen_id` INT NOT NULL DEFAULT 0 ,
-  `kitchen_alias` TINYINT UNSIGNED NOT NULL DEFAULT 0 ,
   `rate` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the discount rate which ranges from 0.00 to 1.00' ,
   PRIMARY KEY (`dist_plan_id`) )
 ENGINE = InnoDB
@@ -134,14 +133,14 @@ COMMENT = 'describe the plan to each discount' ;
 -- -----------------------------------------------------
 INSERT INTO wireless_order_db.discount
 (`restaurant_id`, `name`, `level`)
-SELECT id, '折扣方案1', 200 FROM wireless_order_db.restaurant WHERE id > 10;
+SELECT id, '折扣1', 200 FROM wireless_order_db.restaurant WHERE id > 10;
 
 -- -----------------------------------------------------
 -- Insert the detail of "折扣方案1" to table 'discount_plan'
 -- -----------------------------------------------------
 INSERT INTO wireless_order_db.discount_plan
-(`discount_id`, `kitchen_id`, `kitchen_alias`, `rate`)
-SELECT DIST.discount_id, KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.discount FROM 
+(`discount_id`, `kitchen_id`, `rate`)
+SELECT DIST.discount_id, KITCHEN.kitchen_id, KITCHEN.discount FROM 
 wireless_order_db.kitchen KITCHEN
 INNER JOIN
 wireless_order_db.discount DIST
@@ -153,14 +152,14 @@ WHERE KITCHEN.type = 0 AND KITCHEN.discount <> 1;
 -- -----------------------------------------------------
 INSERT INTO wireless_order_db.discount
 (`restaurant_id`, `name`, `level`)
-SELECT id, '折扣方案2', 199 FROM wireless_order_db.restaurant WHERE id > 10;
+SELECT id, '折扣2', 199 FROM wireless_order_db.restaurant WHERE id > 10;
 
 -- -----------------------------------------------------
 -- Insert the detail of "折扣方案2" to table 'discount_plan'
 -- -----------------------------------------------------
 INSERT INTO wireless_order_db.discount_plan
-(`discount_id`, `kitchen_id`, `kitchen_alias`, `rate`)
-SELECT DIST.discount_id, KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.discount_2 FROM 
+(`discount_id`, `kitchen_id`, `rate`)
+SELECT DIST.discount_id, KITCHEN.kitchen_id, KITCHEN.discount_2 FROM 
 wireless_order_db.kitchen KITCHEN
 INNER JOIN
 wireless_order_db.discount DIST
@@ -172,14 +171,14 @@ WHERE KITCHEN.type = 0 AND KITCHEN.discount_2 <> 1;
 -- -----------------------------------------------------
 INSERT INTO wireless_order_db.discount
 (`restaurant_id`, `name`, `level`)
-SELECT id, '折扣方案3', 198 FROM wireless_order_db.restaurant WHERE id > 10;
+SELECT id, '折扣3', 198 FROM wireless_order_db.restaurant WHERE id > 10;
 
 -- -----------------------------------------------------
 -- Insert the detail of "折扣方案3" to table 'discount_plan'
 -- -----------------------------------------------------
 INSERT INTO wireless_order_db.discount_plan
-(`discount_id`, `kitchen_id`, `kitchen_alias`, `rate`)
-SELECT DIST.discount_id, KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.discount_3 FROM 
+(`discount_id`, `kitchen_id`, `rate`)
+SELECT DIST.discount_id, KITCHEN.kitchen_id, KITCHEN.discount_3 FROM 
 wireless_order_db.kitchen KITCHEN
 INNER JOIN
 wireless_order_db.discount DIST
