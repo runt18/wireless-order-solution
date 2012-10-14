@@ -17,7 +17,7 @@ public class Order {
 	private int customNum;								// 客户人数
 	private String waiter;								// 服务员名
 	private int payManner = WebParams.MANNER_CASH;		// 结账方式  1:现金  2:刷卡  3:会员卡  4:签单  5:挂账
-	private int discountType = WebParams.DISCOUNT_1;	// 折扣方式
+	//private int discountType = WebParams.DISCOUNT_1;	// 折扣方式
 	private String memberID;							// 会员编号
 	private String member;								// 会员名称
 	private int terminalModel;							//
@@ -109,13 +109,13 @@ public class Order {
 		this.payManner = payManner;
 	}
 
-	public int getDiscountType() {
-		return discountType;
-	}
-
-	public void setDiscountType(int discountType) {
-		this.discountType = discountType;
-	}
+//	public int getDiscountType() {
+//		return discountType;
+//	}
+//
+//	public void setDiscountType(int discountType) {
+//		this.discountType = discountType;
+//	}
 
 	public String getMemberID() {
 		return memberID;

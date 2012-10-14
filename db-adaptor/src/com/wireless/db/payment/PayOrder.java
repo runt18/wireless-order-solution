@@ -4,6 +4,7 @@ import java.sql.SQLException;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.QueryMenu;
 import com.wireless.db.QueryOrder;
 import com.wireless.db.QuerySetting;
 import com.wireless.db.QueryTable;
@@ -11,7 +12,7 @@ import com.wireless.db.Util;
 import com.wireless.db.VerifyPin;
 import com.wireless.dbObject.Setting;
 import com.wireless.exception.BusinessException;
-import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.Discount;
 import com.wireless.protocol.Member;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.Table;
@@ -161,7 +162,7 @@ public class PayOrder {
 		/**
 		 * Get the completed order information.
 		 */			
-		Order orderInfo = queryOrderByID(dbCon, orderToPay); 
+		Order orderInfo = queryOrderByID(dbCon, term, orderToPay); 
 			
 		float totalPrice = orderInfo.getTotalPrice().floatValue();
 		float totalPrice2 = orderInfo.getActualPrice().floatValue();
@@ -240,7 +241,7 @@ public class PayOrder {
 				  ", total_price=" + totalPrice + 
 				  ", total_price_2=" + totalPrice2 +
 				  ", type=" + orderInfo.pay_manner + 
-				  ", discount_type=" + orderInfo.discount_type +
+				  //", discount_type=" + orderInfo.discount_type +
 				  ", service_rate=" + orderInfo.getServiceRate() +
 				  (isPaidAgain ? "" : ", seq_id=" + orderInfo.seqID) +
 			   	  (isPaidAgain ? "" : ", order_date=NOW()") + 
@@ -345,7 +346,7 @@ public class PayOrder {
 			orderToPay.id = Util.getUnPaidOrderID(dbCon, QueryTable.exec(dbCon, term, orderToPay.destTbl.aliasID));
 			orderToPay.restaurantID = term.restaurantID;
 			
-			return queryOrderByID(dbCon, orderToPay);
+			return queryOrderByID(dbCon, term, orderToPay);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -385,7 +386,7 @@ public class PayOrder {
 			orderToPay.id = Util.getUnPaidOrderID(dbCon, QueryTable.exec(dbCon, term, orderToPay.destTbl.aliasID));
 			orderToPay.restaurantID = term.restaurantID;
 			
-			return queryOrderByID(dbCon, orderToPay);
+			return queryOrderByID(dbCon, term, orderToPay);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -406,11 +407,11 @@ public class PayOrder {
 	 * 							 - The order to query does NOT exist.
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Order queryOrderByID(long pin, short model, Order orderToPay) throws BusinessException, SQLException{
+	public static Order queryOrderByID(long pin, short model, Terminal term, Order orderToPay) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return queryOrderByID(dbCon, orderToPay);
+			return queryOrderByID(dbCon, term, orderToPay);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -430,72 +431,18 @@ public class PayOrder {
 	 * 							 - The order to query does NOT exist.
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
-	public static Order queryOrderByID(DBCon dbCon, Order orderToPay) throws BusinessException, SQLException{
+	public static Order queryOrderByID(DBCon dbCon, Terminal term, Order orderToPay) throws BusinessException, SQLException{
 		
+		//Get the detail to this order
 		Order orderInfo = QueryOrder.execByID(dbCon, orderToPay.id, QueryOrder.QUERY_TODAY);
 		
-		/**
-		 * If the pay order formation does NOT comprise the discount,
-		 * get the discount according the pay type and manner.
-		 */
-		String discount = "discount";
-		if(orderToPay.pay_type == Order.PAY_NORMAL && orderToPay.discount_type == Order.DISCOUNT_1){
-			discount = "discount";
-				
-		}else if(orderToPay.pay_type == Order.PAY_NORMAL && orderToPay.discount_type == Order.DISCOUNT_2){
-			discount = "discount_2";
-				
-		}else if(orderToPay.pay_type == Order.PAY_NORMAL && orderToPay.discount_type == Order.DISCOUNT_3){
-			discount = "discount_3";
-				
-		}else if(orderToPay.pay_type == Order.PAY_MEMBER && orderToPay.memberID != null){
-			//validate the member id
-			String sql = "SELECT id FROM " + Params.dbName + 
-						 ".member WHERE restaurant_id=" + orderToPay.restaurantID + 
-						 " AND alias_id='" + orderToPay.memberID + "'";
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			if(dbCon.rs.next()){
-				if(orderToPay.discount_type == Order.DISCOUNT_1){
-					discount = "member_discount_1";
-				}else if(orderToPay.discount_type == Order.DISCOUNT_2){
-					discount = "member_discount_2";
-				}else if(orderToPay.discount_type == Order.DISCOUNT_3){
-					discount = "member_discount_3";
-				}
-			}else{
-				throw new BusinessException("The member id(" + orderToPay.memberID + ") is invalid.", ErrorCode.MEMBER_NOT_EXIST);
-			}
-				
-		}else if(orderToPay.pay_type == Order.PAY_MEMBER && orderToPay.memberID == null){
-			if(orderToPay.discount_type == Order.DISCOUNT_1){
-				discount = "member_discount_1";
-			}else if(orderToPay.discount_type == Order.DISCOUNT_2){
-				discount = "member_discount_2";
-			}else if(orderToPay.discount_type == Order.DISCOUNT_3){
-				discount = "member_discount_3";
-			}
-		}
-				
-		for(int i = 0; i < orderInfo.foods.length; i++){
-			/**
-			 * Both the special food and gifted food does NOT discount
-			 */
-			if(orderInfo.foods[i].isSpecial() || orderInfo.foods[i].isGift()){
-				orderInfo.foods[i].setDiscount(new Float(1.0));
-			}else{
-				/**
-				 * Get the discount to each food according to the kitchen of this restaurant.
-				 */
-				String sql = "SELECT " + discount + " FROM " + Params.dbName + 
-							 ".kitchen WHERE restaurant_id=" + orderInfo.restaurantID + 
-							 " AND kitchen_alias=" + orderInfo.foods[i].kitchen.aliasID;
-				
-				dbCon.rs = dbCon.stmt.executeQuery(sql);
-				if(dbCon.rs.next()){
-					orderInfo.foods[i].setDiscount(dbCon.rs.getFloat(discount));
-				}
-				dbCon.rs.close();				
-			}
+		//Get the discount to this order
+		Discount[] discount = QueryMenu.queryDiscounts(dbCon, 
+													   " AND DIST.restaurant_id=" + term.restaurantID +
+													   " AND DIST.discount_id=" + orderToPay.getDiscount().discountID +
+													   " AND DIST_PLAN.rate <> 1", null);
+		if(discount.length > 0){
+			orderInfo.setDiscount(discount[0]);
 		}
 		
 		orderInfo.setTotalPrice(orderInfo.calcPriceWithTaste());
@@ -528,7 +475,6 @@ public class PayOrder {
 		
 		orderInfo.restaurantID = orderToPay.restaurantID;
 		orderInfo.pay_type = orderToPay.pay_type;
-		orderInfo.discount_type = orderToPay.discount_type;
 		orderInfo.memberID = orderToPay.memberID; 
 		orderInfo.setCashIncome(orderToPay.getCashIncome());
 		orderInfo.pay_manner = orderToPay.pay_manner;

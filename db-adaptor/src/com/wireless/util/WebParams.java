@@ -23,9 +23,9 @@ public class WebParams {
 	/**
 	 * The discount type is as below
 	 */
-	public static final int DISCOUNT_1 = Order.DISCOUNT_1;
-	public static final int DISCOUNT_2 = Order.DISCOUNT_2;
-	public static final int DISCOUNT_3 = Order.DISCOUNT_3;
+//	public static final int DISCOUNT_1 = Order.DISCOUNT_1;
+//	public static final int DISCOUNT_2 = Order.DISCOUNT_2;
+//	public static final int DISCOUNT_3 = Order.DISCOUNT_3;
 
 	/**
 	 * The pay manner is as below
