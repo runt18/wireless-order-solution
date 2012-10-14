@@ -16,7 +16,6 @@ public class OrderParcel extends Order implements Parcelable{
 	public OrderParcel(Order order){
 		if(order != null){
 			pay_type = order.pay_type;
-			discount_type = order.discount_type;
 			pay_manner = order.pay_manner;
 			category = order.category;
 			setServiceRate(order.getServiceRate());
@@ -49,7 +48,6 @@ public class OrderParcel extends Order implements Parcelable{
 	
 	private OrderParcel(Parcel in){
 		pay_type = in.readInt();
-		discount_type = in.readInt();
 		pay_manner = in.readInt();
 		category = (short)in.readInt();
 		setServiceRate(Util.int2Float(in.readInt()));
@@ -102,7 +100,6 @@ public class OrderParcel extends Order implements Parcelable{
 		}else{
 			parcel.writeInt(0);
 			parcel.writeInt(pay_type);
-			parcel.writeInt(discount_type);
 			parcel.writeInt(pay_manner);
 			parcel.writeInt(category);
 			parcel.writeInt(Util.float2Int(getServiceRate()));
