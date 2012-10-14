@@ -546,17 +546,44 @@ public class QuickPickActivity extends FragmentActivity implements com.wireless.
            	imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
            	
            	final AutoCompleteTextView tableText = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextView_commitDialog);
+           	//改单按钮
+           	final Button changeBtn = (Button) findViewById(R.id.button_changeOrder_commitDialog);
+           	changeBtn.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					dismiss();
+					mViewHandler.sendEmptyMessage(PICKED_FOOD_INTERFACE);
+				}
+			});
            	
+           	final View line = (View) findViewById(R.id.view1);
            	((Button)this.findViewById(R.id.button_detail_commit_dialog)).setOnClickListener(new View.OnClickListener(){
 				@Override
 				public void onClick(View v) {
 					//判断listview状态并收起键盘
 					if(mListView.isShown())
+					{
+						//显示更多项
 						mListView.setVisibility(View.GONE);
+						changeBtn.setVisibility(View.GONE);
+						line.setVisibility(View.GONE);
+						//设置对话框為自适应
+						LayoutParams lp = getWindow().getAttributes();
+						lp.height = LayoutParams.WRAP_CONTENT;
+						lp.width = 440;
+						getWindow().setAttributes(lp);
+					}
 					else {
 						imm.hideSoftInputFromWindow(tableText.getWindowToken(), 0);
 						mListView.requestFocus();
 						mListView.setVisibility(View.VISIBLE);
+						changeBtn.setVisibility(View.VISIBLE);
+						line.setVisibility(View.VISIBLE);
+						//设置对话框长宽为600px
+						LayoutParams lp = getWindow().getAttributes();
+						lp.height = 600;
+						lp.width = 440;
+						getWindow().setAttributes(lp);
 					}
 				}
            	});
