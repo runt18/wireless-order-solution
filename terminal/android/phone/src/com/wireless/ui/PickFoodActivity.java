@@ -26,17 +26,24 @@ import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Util;
 
-public class PickFoodActivity extends FragmentActivity implements com.wireless.fragment.PickFoodFragment.OnFoodPickedListener, com.wireless.fragment.KitchenFragment.OnFoodPickedListener{
-	//æ¯ä¸ªç‚¹èœæ–¹å¼çš„æ ‡ç­¾
-	private static final int NUMBER_FRAGMENT = 1320;
-	private static final int KITCHEN_FRAGMENT = 1321;
-	private static final int SPELL_FRAGMENT = 1322;
-
-	//activityè¿”å›æ ‡ç­¾
-	private final static int PICK_WITH_TASTE = 6755;
+public class PickFoodActivity extends FragmentActivity implements 
+			com.wireless.fragment.PickFoodFragment.OnFoodPickedListener, 
+			com.wireless.fragment.KitchenFragment.OnFoodPickedListener
+{
+	
+	//Ã¿¸öµã²Ë·½Ê½µÄ±êÇ©
+	private static final int NUMBER_FRAGMENT = 1320;	//±àºÅ
+	private static final int KITCHEN_FRAGMENT = 1321;	//·Ö³ø
+	private static final int PINYIN_FRAGMENT = 1322;	//Æ´Òô
+	private static final int DEFAULT_FRAGMENT = PINYIN_FRAGMENT;
+	
+	private int mCurFg = -1;
+	
+	//activity·µ»Ø±êÇ©
+	private static final int PICK_WITH_TASTE = 6755;
 
 	private ViewHandler mViewHandler;
-	//å‚¨å­˜å·²ç‚¹èœçš„åˆ—è¡¨
+	//´¢´æÒÑµã²ËµÄÁĞ±í
 	private ArrayList<OrderFood> mPickFoods = new ArrayList<OrderFood>();
 
 	private static class ViewHandler extends Handler{
@@ -61,61 +68,69 @@ public class PickFoodActivity extends FragmentActivity implements com.wireless.f
 		@Override
 		public void handleMessage(Message msg) {
 			PickFoodActivity activity = mActivity.get();
-			FragmentTransaction ftrans = activity.getSupportFragmentManager().beginTransaction();
+			FragmentTransaction fgTrans = activity.getSupportFragmentManager().beginTransaction();
 
-			switch(msg.what)
-			{
+			switch(msg.what){
+			
 			case NUMBER_FRAGMENT:
-				//åˆ›å»ºæ–°èœå“é€‰æ‹©fragment
-				PickFoodFragment numFragment = new PickFoodFragment();
-				numFragment.setFoodPickedListener(activity);
-				//è®¾ç½®æ˜¾ç¤ºå‚æ•°
-				Bundle args = new Bundle();
-				args.putInt(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG, PickFoodFragment.PICK_FOOD_FRAGMENT_NUMBER);
-				args.putString(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG_NAME, "ç¼–å·ï¼š");
-				numFragment.setArguments(args);
-				//æ›¿æ¢åŸæœ¬çš„fragment
-				ftrans.replace(R.id.frameLayout_container_pickFood, numFragment).commit();
-				
-				mTitleTextView.setText("ç‚¹èœ - ç¼–å·");
-				setLastCate(NUMBER_FRAGMENT);
+				if(mActivity.get().mCurFg != NUMBER_FRAGMENT){
+					//´´½¨ĞÂ²ËÆ·Ñ¡Ôñfragment
+					PickFoodFragment numFragment = new PickFoodFragment();
+					numFragment.setFoodPickedListener(activity);
+					//ÉèÖÃÏÔÊ¾²ÎÊı
+					Bundle args = new Bundle();
+					args.putInt(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG, PickFoodFragment.PICK_FOOD_FRAGMENT_NUMBER);
+					args.putString(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG_NAME, "±àºÅ£º");
+					numFragment.setArguments(args);
+					//Ìæ»»Ô­±¾µÄfragment
+					fgTrans.replace(R.id.frameLayout_container_pickFood, numFragment).commit();
+					
+					mTitleTextView.setText("µã²Ë - ±àºÅ");
+					setLastCate(NUMBER_FRAGMENT);
+					mActivity.get().mCurFg = NUMBER_FRAGMENT;
+				}
 				break;
 				
 			case KITCHEN_FRAGMENT:
-				KitchenFragment kitchenFragment = new KitchenFragment();
-				kitchenFragment.setFoodPickedListener(activity);
-				ftrans.replace(R.id.frameLayout_container_pickFood, kitchenFragment).commit();
-				
-				mTitleTextView.setText("ç‚¹èœ - åˆ†å¨");
-				setLastCate(KITCHEN_FRAGMENT);
+				if(mActivity.get().mCurFg != KITCHEN_FRAGMENT){
+					KitchenFragment kitchenFragment = new KitchenFragment();
+					kitchenFragment.setFoodPickedListener(activity);
+					fgTrans.replace(R.id.frameLayout_container_pickFood, kitchenFragment).commit();
+					
+					mTitleTextView.setText("µã²Ë - ·Ö³ø");
+					setLastCate(KITCHEN_FRAGMENT);
+					mActivity.get().mCurFg = KITCHEN_FRAGMENT;
+				}
 				break;
-			case SPELL_FRAGMENT:
-				//åˆ›å»ºæ–°èœå“é€‰æ‹©fragment
-				PickFoodFragment spellFragment = new PickFoodFragment();
-				spellFragment.setFoodPickedListener(activity);
-				//è®¾ç½®æ˜¾ç¤ºå‚æ•°
-				Bundle spellAargs = new Bundle();
-				spellAargs.putInt(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG, PickFoodFragment.PICK_FOOD_FRAGMENT_SPELL);
-				spellAargs.putString(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG_NAME, "æ‹¼éŸ³ï¼š");
-				spellFragment.setArguments(spellAargs);
-				//æ›¿æ¢åŸæœ¬çš„fragment
-				ftrans.replace(R.id.frameLayout_container_pickFood, spellFragment).commit();
 				
-				mTitleTextView.setText("ç‚¹èœ - æ‹¼éŸ³");
-				setLastCate(SPELL_FRAGMENT);
+			case PINYIN_FRAGMENT:
+				if(mActivity.get().mCurFg != PINYIN_FRAGMENT){
+					//´´½¨ĞÂ²ËÆ·Ñ¡Ôñfragment
+					PickFoodFragment spellFragment = new PickFoodFragment();
+					spellFragment.setFoodPickedListener(activity);
+					//ÉèÖÃÏÔÊ¾²ÎÊı
+					Bundle spellArgs = new Bundle();
+					spellArgs.putInt(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG, PickFoodFragment.PICK_FOOD_FRAGMENT_SPELL);
+					spellArgs.putString(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG_NAME, "Æ´Òô£º");
+					spellFragment.setArguments(spellArgs);
+					//Ìæ»»Ô­±¾µÄfragment
+					fgTrans.replace(R.id.frameLayout_container_pickFood, spellFragment).commit();
+					
+					mTitleTextView.setText("µã²Ë - Æ´Òô");
+					setLastCate(PINYIN_FRAGMENT);
+					mActivity.get().mCurFg = PINYIN_FRAGMENT;
+				}
 				break;
-				//TODO æ·»åŠ æ›´å¤šç‚¹èœæ–¹å¼
 			}
 		}
 		
-		private void setLastCate(int cate)
-		{
+		private void setLastCate(int cate){
 			PickFoodActivity activity = mActivity.get();
-			//è¿˜åŸæŒ‰æ ·å¼
+			//»¹Ô­°´ÑùÊ½
 			mNumBtn.setImageResource(R.drawable.number_btn);
 			mKitchenBtn.setImageResource(R.drawable.kitchen);
 			mSpellBtn.setImageResource(R.drawable.pinyin);
-			//åˆ‡æ¢ç‚¹èœæ–¹å¼æ—¶ï¼Œä¿å­˜å½“å‰çš„ç‚¹èœæ¨¡å¼
+			//ÇĞ»»µã²Ë·½Ê½Ê±£¬±£´æµ±Ç°µÄµã²ËÄ£Ê½
 			Editor editor = activity.getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).edit();
 			
 			switch(cate)
@@ -128,12 +143,10 @@ public class PickFoodActivity extends FragmentActivity implements com.wireless.f
 				editor.putInt(Params.LAST_PICK_CATE, Params.PICK_BY_KITCHEN);
 				mKitchenBtn.setImageResource(R.drawable.kitchen_down);
 				break;
-			case SPELL_FRAGMENT:
+			case PINYIN_FRAGMENT:
 				editor.putInt(Params.LAST_PICK_CATE, Params.PICK_BY_PINYIN);
 				mSpellBtn.setImageResource(R.drawable.pinyin_down);
 				break;
-				//TODO æ·»åŠ æ›´å¤šç‚¹èœæ–¹å¼
-			//	editor.putInt(Params.LAST_PICK_CATE, Params.PICK_BY_PINYIN);
 			default:
 				
 			}
@@ -148,16 +161,16 @@ public class PickFoodActivity extends FragmentActivity implements com.wireless.f
 		
 		mViewHandler = new ViewHandler(this);
 		
-		// å–å¾—æ–°ç‚¹èœä¸­å·²æœ‰çš„èœå“Listï¼Œå¹¶ä¿å­˜åˆ°pickFoodçš„Listä¸­
+		// È¡µÃĞÂµã²ËÖĞÒÑÓĞµÄ²ËÆ·List£¬²¢±£´æµ½pickFoodµÄListÖĞ
 		OrderParcel orderParcel = getIntent().getParcelableExtra(
 				OrderParcel.KEY_VALUE);
 		for (int i = 0; i < orderParcel.foods.length; i++) {
 			mPickFoods.add(orderParcel.foods[i]);
 		}
 		
-		//è¿”å›Button
+		//·µ»ØButton
 		TextView left = (TextView) findViewById(R.id.textView_left);
-		left.setText("è¿”å›");
+		left.setText("·µ»Ø");
 		left.setVisibility(View.VISIBLE);
 		
 		ImageButton back = (ImageButton) findViewById(R.id.btn_left);
@@ -170,14 +183,14 @@ public class PickFoodActivity extends FragmentActivity implements com.wireless.f
 			}
 		});
 
-		//ç¼–å·
+		//±àºÅ
 		((ImageButton) findViewById(R.id.imageButton_num_pickFood)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
 				mViewHandler.sendEmptyMessage(NUMBER_FRAGMENT);
 			}
 		});
-		//åˆ†å¨
+		//·Ö³ø
 		((ImageButton) findViewById(R.id.imageButton_kitchen_pickFood)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
@@ -185,17 +198,16 @@ public class PickFoodActivity extends FragmentActivity implements com.wireless.f
 			}
 		});
 		
-		//æ‹¼éŸ³
+		//Æ´Òô
 		((ImageButton) findViewById(R.id.imageButton_spell_pickFood)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				mViewHandler.sendEmptyMessage(SPELL_FRAGMENT);
+				mViewHandler.sendEmptyMessage(PINYIN_FRAGMENT);
 			}
 		});
 
-		//TODO æ·»åŠ æ›´å¤šç‚¹èœæ–¹å¼
 		/**
-		 * æ ¹æ®ä¸Šæ¬¡ä¿å­˜çš„è®°å½•ï¼Œåˆ‡æ¢åˆ°ç›¸åº”çš„ç‚¹èœæ–¹å¼
+		 * ¸ù¾İÉÏ´Î±£´æµÄ¼ÇÂ¼£¬ÇĞ»»µ½ÏàÓ¦µÄµã²Ë·½Ê½
 		 */
 		int lastPickCate = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).getInt(Params.LAST_PICK_CATE, Params.PICK_BY_KITCHEN);
 		switch(lastPickCate)
@@ -207,20 +219,18 @@ public class PickFoodActivity extends FragmentActivity implements com.wireless.f
 			mViewHandler.sendEmptyMessage(KITCHEN_FRAGMENT);
 			break;
 		case Params.PICK_BY_PINYIN:
-			mViewHandler.sendEmptyMessage(SPELL_FRAGMENT);
-			//TODO
+			mViewHandler.sendEmptyMessage(PINYIN_FRAGMENT);
 			break;
 		default :
-			mViewHandler.sendEmptyMessage(NUMBER_FRAGMENT);
+			mViewHandler.sendEmptyMessage(DEFAULT_FRAGMENT);
 		}
 	}
 
 	/**
-	 * è¿”å›æ—¶å°†æ–°ç‚¹èœå“çš„Listè¿”å›åˆ°ä¸Šä¸€ä¸ªActivity
+	 * ·µ»ØÊ±½«ĞÂµã²ËÆ·µÄList·µ»Øµ½ÉÏÒ»¸öActivity
 	 */
 	@Override
 	public void onBackPressed() {
-		//TODO æ·»åŠ ä¸´æ—¶èœåˆ°èœå•ä¸­
 		// Add the temporary foods to the picked food list
 		// except the ones without food name
 //		if (_tempLstView != null) {
@@ -236,13 +246,14 @@ public class PickFoodActivity extends FragmentActivity implements com.wireless.f
 		setResult(RESULT_OK, intent);
 		super.onBackPressed();
 	}
-	//activityè¿”å›åå°†èœå“æ·»åŠ è¿›å·²ç‚¹èœä¸­
+	
+	//activity·µ»Øºó½«²ËÆ·Ìí¼Ó½øÒÑµã²ËÖĞ
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode == RESULT_OK) {
 			if (requestCode == PICK_WITH_TASTE) {
 				/**
-				 * æ·»åŠ å£å‘³åæ·»åŠ åˆ°pickListä¸­
+				 * Ìí¼Ó¿ÚÎ¶ºóÌí¼Óµ½pickListÖĞ
 				 */
 				FoodParcel foodParcel = data.getParcelableExtra(FoodParcel.KEY_VALUE);
 				addFood(foodParcel);
@@ -250,10 +261,10 @@ public class PickFoodActivity extends FragmentActivity implements com.wireless.f
 		}
 	}
 	/**
-	 * é€šè¿‡"ç¼–å·"ã€"åˆ†å¨"ã€"æ‹¼éŸ³"æ–¹å¼é€‰ä¸­èœå“åï¼Œ å°†èœå“ä¿å­˜åˆ°Listä¸­ï¼Œé€€å‡ºæ—¶å°†æ­¤Listä½œä¸ºç»“æœè¿”å›åˆ°ä¸Šä¸€ä¸ªActivity
+	 * Í¨¹ı"±àºÅ"¡¢"·Ö³ø"¡¢"Æ´Òô"·½Ê½Ñ¡ÖĞ²ËÆ·ºó£¬ ½«²ËÆ·±£´æµ½ListÖĞ£¬ÍË³öÊ±½«´ËList×÷Îª½á¹û·µ»Øµ½ÉÏÒ»¸öActivity
 	 * 
 	 * @param food
-	 *            é€‰ä¸­èœå“çš„ä¿¡æ¯
+	 *            Ñ¡ÖĞ²ËÆ·µÄĞÅÏ¢
 	 */
 	@Override
 	public void onPicked(OrderFood food) {
@@ -261,10 +272,10 @@ public class PickFoodActivity extends FragmentActivity implements com.wireless.f
 	}
 
 	/**
-	 * é€šè¿‡"ç¼–å·"ã€"åˆ†å¨"ã€"æ‹¼éŸ³"æ–¹å¼é€‰ä¸­èœå“åï¼Œ å°†èœå“ä¿å­˜åˆ°Listä¸­ï¼Œå¹¶è·³è½¬åˆ°å£å‘³Activityé€‰æ‹©å£å‘³
+	 * Í¨¹ı"±àºÅ"¡¢"·Ö³ø"¡¢"Æ´Òô"·½Ê½Ñ¡ÖĞ²ËÆ·ºó£¬ ½«²ËÆ·±£´æµ½ListÖĞ£¬²¢Ìø×ªµ½¿ÚÎ¶ActivityÑ¡Ôñ¿ÚÎ¶
 	 * 
 	 * @param food
-	 *            é€‰ä¸­èœå“çš„ä¿¡æ¯
+	 *            Ñ¡ÖĞ²ËÆ·µÄĞÅÏ¢
 	 */
 	@Override
 	public void onPickedWithTaste(OrderFood food) {
@@ -276,10 +287,10 @@ public class PickFoodActivity extends FragmentActivity implements com.wireless.f
 	}
 	
 	/**
-	 * æ·»åŠ èœå“åˆ°å·²ç‚¹èœçš„Listä¸­
+	 * Ìí¼Ó²ËÆ·µ½ÒÑµã²ËµÄListÖĞ
 	 * 
 	 * @param food
-	 *            é€‰ä¸­çš„èœå“ä¿¡æ¯
+	 *            Ñ¡ÖĞµÄ²ËÆ·ĞÅÏ¢
 	 */
 	private void addFood(OrderFood food) {
 
@@ -287,25 +298,25 @@ public class PickFoodActivity extends FragmentActivity implements com.wireless.f
 
 		if (index != -1) {
 			/**
-			 * å¦‚æœåŸæ¥çš„èœå“åˆ—è¡¨ä¸­å·²åŒ…å«æœ‰ç›¸åŒçš„èœå“ï¼Œ åˆ™å°†æ–°ç‚¹èœçš„æ•°é‡ç´¯åŠ åˆ°åŸæ¥çš„èœå“ä¸­
+			 * Èç¹ûÔ­À´µÄ²ËÆ·ÁĞ±íÖĞÒÑ°üº¬ÓĞÏàÍ¬µÄ²ËÆ·£¬ Ôò½«ĞÂµã²ËµÄÊıÁ¿ÀÛ¼Óµ½Ô­À´µÄ²ËÆ·ÖĞ
 			 */
 			OrderFood pickedFood = mPickFoods.get(index);
 
 			float orderAmount = food.getCount() + pickedFood.getCount();
 			if (orderAmount > 255) {
-				Toast.makeText(this, "å¯¹ä¸èµ·ï¼Œ\"" + food.toString() + "\"æœ€å¤šåªèƒ½ç‚¹255ä»½", Toast.LENGTH_SHORT).show();
+				Toast.makeText(this, "¶Ô²»Æğ£¬\"" + food.toString() + "\"×î¶àÖ»ÄÜµã255·İ", Toast.LENGTH_SHORT).show();
 			} else {
-				Toast.makeText(this, "æ·»åŠ "	+ (food.hangStatus == OrderFood.FOOD_HANG_UP ? "å¹¶å«èµ·\"" : "\"") + food.toString() + "\""
-								+ Util.float2String2(food.getCount()) + "ä»½", Toast.LENGTH_SHORT)	.show();
+				Toast.makeText(this, "Ìí¼Ó"	+ (food.hangStatus == OrderFood.FOOD_HANG_UP ? "²¢½ĞÆğ\"" : "\"") + food.toString() + "\""
+								+ Util.float2String2(food.getCount()) + "·İ", Toast.LENGTH_SHORT)	.show();
 				pickedFood.setCount(orderAmount);
 				mPickFoods.set(index, pickedFood);
 			}
 		} else {
 			if (food.getCount() > 255) {
-				Toast.makeText(this, "å¯¹ä¸èµ·ï¼Œ\"" + food.toString() + "\"æœ€å¤šåªèƒ½ç‚¹255ä»½", Toast.LENGTH_SHORT).show();
+				Toast.makeText(this, "¶Ô²»Æğ£¬\"" + food.toString() + "\"×î¶àÖ»ÄÜµã255·İ", Toast.LENGTH_SHORT).show();
 			} else {
-				Toast.makeText(this, "æ–°å¢"	+ (food.hangStatus == OrderFood.FOOD_HANG_UP ? "å¹¶å«èµ·\"" : "\"") + food.toString() + "\""
-								+ Util.float2String2(food.getCount()) + "ä»½", Toast.LENGTH_SHORT).show();
+				Toast.makeText(this, "ĞÂÔö"	+ (food.hangStatus == OrderFood.FOOD_HANG_UP ? "²¢½ĞÆğ\"" : "\"") + food.toString() + "\""
+								+ Util.float2String2(food.getCount()) + "·İ", Toast.LENGTH_SHORT).show();
 				mPickFoods.add(food);
 			}
 		}

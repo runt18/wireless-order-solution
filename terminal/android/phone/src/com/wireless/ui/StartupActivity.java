@@ -225,16 +225,12 @@ public class StartupActivity extends Activity {
 	 */
 	private class QueryMenuTask extends com.wireless.lib.task.QueryMenuTask {
 
-		// private ProgressDialog _progDialog;
-
 		/**
 		 * 执行菜谱请求操作前显示提示信息
 		 */
 		@Override
 		protected void onPreExecute() {
 			_msgTxtView.setText("正在下载菜谱...请稍候");
-			// _progDialog = ProgressDialog.show(EnterActivity.this, "",
-			// "正在下载菜谱...请稍候", true);
 		}
 
 
@@ -243,10 +239,7 @@ public class StartupActivity extends Activity {
 		 */
 		@Override
 		protected void onPostExecute(FoodMenu foodMenu) {
-			// make the progress dialog disappeared
-			// _progDialog.dismiss();
-			// notify the main activity to redraw the food menu
-			// _handler.sendEmptyMessage(REDRAW_FOOD_MENU);
+
 			/**
 			 * Prompt user message if any error occurred, otherwise continue to
 			 * query restaurant info.

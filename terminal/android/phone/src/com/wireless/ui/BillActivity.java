@@ -21,7 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
-import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.Discount;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Util;
@@ -49,24 +49,6 @@ public class BillActivity extends Activity {
 			
 			BillActivity theActivity = mActivity.get();
 			
-			// 选择折扣方式后，设定每个菜品的折扣率
-			for (int i = 0; i < theActivity.mOrderToPay.foods.length; i++) {
-				if (!(theActivity.mOrderToPay.foods[i].isGift()	|| theActivity.mOrderToPay.foods[i].isTemporary || theActivity.mOrderToPay.foods[i].isSpecial())) {
-					for (Kitchen kitchen : WirelessOrder.foodMenu.kitchens) {
-						if (theActivity.mOrderToPay.foods[i].kitchen.aliasID == kitchen.aliasID) {
-							if (theActivity.mOrderToPay.discount_type == Order.DISCOUNT_1) {
-								theActivity.mOrderToPay.foods[i].setDiscount(kitchen.getDist1());
-
-							} else if (theActivity.mOrderToPay.discount_type == Order.DISCOUNT_2) {
-								theActivity.mOrderToPay.foods[i].setDiscount(kitchen.getDist2());
-
-							} else if (theActivity.mOrderToPay.discount_type == Order.DISCOUNT_3) {
-								theActivity.mOrderToPay.foods[i].setDiscount(kitchen.getDist3());
-							}
-						}
-					}
-				}
-			}
 			((BillFoodListView)theActivity.findViewById(R.id.billListView)).notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(theActivity.mOrderToPay.foods)));
 			//set the discount price
 			((TextView)theActivity.findViewById(R.id.discountPriceTxtView)).setText(Util.CURRENCY_SIGN	+ Float.toString(theActivity.mOrderToPay.calcDiscountPrice()));
@@ -164,12 +146,7 @@ public class BillActivity extends Activity {
 				new AlertDialog.Builder(BillActivity.this)
 					.setTitle("提示")
 					.setMessage(mErrMsg)
-					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog,	int id) {
-							finish();
-						}
-					})
+					.setPositiveButton("确定", null)
 					.show();
 
 			} else {
@@ -227,34 +204,24 @@ public class BillActivity extends Activity {
 
 			}
 		});
-		
-		// 根据折扣方式显示"折扣1","折扣2","折扣3"
-		if (mOrderToPay.discount_type == Order.DISCOUNT_1) {
-			((RadioButton) view.findViewById(R.id.discount1)).setChecked(true);
 
-		} else if (mOrderToPay.discount_type == Order.DISCOUNT_2) {
-			((RadioButton) view.findViewById(R.id.discount2)).setChecked(true);
-
-		} else if (mOrderToPay.discount_type == Order.DISCOUNT_3) {
-			((RadioButton) view.findViewById(R.id.discount3)).setChecked(true);
-		}
+		//FIXME
+		((RadioButton) view.findViewById(R.id.discount1)).setText("无折扣");
+		((RadioButton) view.findViewById(R.id.discount2)).setTag(WirelessOrder.foodMenu.discounts[0]);
+		((RadioButton) view.findViewById(R.id.discount2)).setText(WirelessOrder.foodMenu.discounts[0].name);
+		((RadioButton) view.findViewById(R.id.discount3)).setTag(WirelessOrder.foodMenu.discounts[1]);
+		((RadioButton) view.findViewById(R.id.discount3)).setText(WirelessOrder.foodMenu.discounts[1].name);
 
 		// 折扣方式方式添加事件监听器
-		((RadioGroup) view.findViewById(R.id.radioGroup2))
-				.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-
-					@Override
-					public void onCheckedChanged(RadioGroup group, int checkedId) {
-						if (checkedId == R.id.discount1) {
-							mOrderToPay.discount_type = Order.DISCOUNT_1;
-						} else if (checkedId == R.id.discount2) {
-							mOrderToPay.discount_type = Order.DISCOUNT_2;
-						} else {
-							mOrderToPay.discount_type = Order.DISCOUNT_3;
-						}
-					}
-
-				});
+		((RadioGroup) view.findViewById(R.id.radioGroup2)).setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(RadioGroup group, int checkedId) {
+				Object obj = group.findViewById(checkedId).getTag();
+				if(obj != null){
+					mOrderToPay.setDiscount((Discount)obj);
+				}
+			}
+		});
 
 		new AlertDialog.Builder(this).setTitle(payCate == PayOrderTask.PAY_NORMAL_ORDER ? "结帐" : "暂结")
 			.setView(view)

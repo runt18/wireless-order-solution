@@ -3,7 +3,6 @@ package com.wireless.fragment;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -60,20 +59,20 @@ public class PickFoodFragment extends Fragment{
 
 	public static interface OnFoodPickedListener{
 		/**
-		 * å½“PickFoodListViewé€‰ä¸­èœå“åï¼Œå›è°ƒæ­¤å‡½æ•°é€šçŸ¥Activityé€‰ä¸­çš„Foodä¿¡æ¯
-		 * @param food é€‰ä¸­Foodçš„ä¿¡æ¯
+		 * µ±PickFoodListViewÑ¡ÖĞ²ËÆ·ºó£¬»Øµ÷´Ëº¯ÊıÍ¨ÖªActivityÑ¡ÖĞµÄFoodĞÅÏ¢
+		 * @param food Ñ¡ÖĞFoodµÄĞÅÏ¢
 		 */
 		public void onPicked(OrderFood food);
 		
 		/**
-		 * å½“PickFoodListViewé€‰ä¸­èœå“åï¼Œå›è°ƒæ­¤å‡½æ•°é€šçŸ¥Activityé€‰ä¸­çš„Foodä¿¡æ¯ï¼Œå¹¶è·³è½¬åˆ°å£å‘³Activity
+		 * µ±PickFoodListViewÑ¡ÖĞ²ËÆ·ºó£¬»Øµ÷´Ëº¯ÊıÍ¨ÖªActivityÑ¡ÖĞµÄFoodĞÅÏ¢£¬²¢Ìø×ªµ½¿ÚÎ¶Activity
 		 * @param food
-		 * 			é€‰ä¸­Foodçš„ä¿¡æ¯
+		 * 			Ñ¡ÖĞFoodµÄĞÅÏ¢
 		 */
 		public void onPickedWithTaste(OrderFood food);
 	}
 	/**
-	 * è®¾ç½®ç‚¹å®ŒæŸä¸ªèœå“åçš„å›è°ƒå‡½æ•°
+	 * ÉèÖÃµãÍêÄ³¸ö²ËÆ·ºóµÄ»Øµ÷º¯Êı
 	 * @param foodPickedListener
 	 */
 	public void setFoodPickedListener(OnFoodPickedListener foodPickedListener){
@@ -82,50 +81,52 @@ public class PickFoodFragment extends Fragment{
 	
 	private static class FoodHandler extends Handler{
 		private WeakReference<PickFoodFragment> mFragment;
-		private Food[] mFoods;
+		private List<Food> mSrcFoods;
 
 		FoodHandler(PickFoodFragment fragment) {
 			this.mFragment = new WeakReference<PickFoodFragment>(fragment);
 			
-			/**
-			 * å°†æ‰€æœ‰èœå“è¿›è¡ŒæŒ‰å¨æˆ¿ç¼–å·è¿›è¡Œæ’åº
-			 */
-			mFoods = new Food[WirelessOrder.foodMenu.foods.length];
-			System.arraycopy(WirelessOrder.foodMenu.foods, 0, mFoods, 0,
-					WirelessOrder.foodMenu.foods.length);
-			Arrays.sort(mFoods, new Comparator<Food>() {
-				@Override
-				public int compare(Food food1, Food food2) {
-					if (food1.kitchen.aliasID > food2.kitchen.aliasID) {
-						return 1;
-					} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
-						return -1;
-					} else {
-						return 0;
-					}
-				}
-			});
+			mSrcFoods = Arrays.asList(WirelessOrder.foodMenu.foods);
+//			/**
+//			 * ½«ËùÓĞ²ËÆ·½øĞĞ°´³ø·¿±àºÅ½øĞĞÅÅĞò
+//			 */
+//			mFoods = new Food[WirelessOrder.foodMenu.foods.length];
+//			System.arraycopy(WirelessOrder.foodMenu.foods, 0, mFoods, 0,
+//					WirelessOrder.foodMenu.foods.length);
+//			Arrays.sort(mFoods, new Comparator<Food>() {
+//				@Override
+//				public int compare(Food food1, Food food2) {
+//					if (food1.kitchen.aliasID > food2.kitchen.aliasID) {
+//						return 1;
+//					} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
+//						return -1;
+//					} else {
+//						return 0;
+//					}
+//				}
+//			});
 		}
 		
 		@Override
-		public void handleMessage(Message msg)
-		{
+		public void handleMessage(Message msg){
 			PickFoodFragment fragment = mFragment.get();
-			//å°†æ‰€æœ‰èœå“è¿›è¡Œæ¡ä»¶ç­›é€‰åå­˜å…¥adapter
-			List<Food> foods = new ArrayList<Food>();
-			foods.addAll(Arrays.asList(mFoods));
-			Iterator<Food> iter = foods.iterator();
-			while(iter.hasNext())
-			{
-				Food f = iter.next();
-				if(fragment.mFilterCond.length() != 0){
+			//½«ËùÓĞ²ËÆ·½øĞĞÌõ¼şÉ¸Ñ¡ºó´æÈëadapter
+			
+			List<Food> tmpFoods;
+			if(fragment.mFilterCond.length() != 0){
+				tmpFoods = new ArrayList<Food>(mSrcFoods);
+				Iterator<Food> iter = tmpFoods.iterator();
+				while(iter.hasNext()){
+					Food f = iter.next();
 					if(!(String.valueOf(f.aliasID).startsWith(fragment.mFilterCond) || f.name.contains(fragment.mFilterCond))){
 						iter.remove();
 					}
-				}
+				}				
+			}else{
+				tmpFoods = mSrcFoods;
 			}
 			
-			fragment.mAdapter = fragment.new FoodAdapter(foods);
+			fragment.mAdapter = fragment.new FoodAdapter(tmpFoods);
 			fragment.mGridView.setAdapter(fragment.mAdapter);
 		}
 	}
@@ -144,21 +145,20 @@ public class PickFoodFragment extends Fragment{
 		((TextView) view.findViewById(R.id.textView_searchTitle_numberFragment)).setText(args.get(PICK_FOOD_FRAGMENT_TAG_NAME).toString());
 		
         mGridView = (GridView) view.findViewById(R.id.gridView_numberFragment);
-        //è®¾ç½®ç‚¹èœä¾¦å¬
+        //ÉèÖÃµã²ËÕìÌı
         mGridView.setOnItemClickListener(new OnItemClickListener(){
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				Food food = (Food) view.getTag();
-				if(!food.isSellOut())
-				{
+				if(!food.isSellOut()){
 					new AskOrderAmountDialog(food).show();
 				}
 			}
         });
         
-		//æœç´¢æ¡†
+		//ËÑË÷¿ò
         final EditText searchTxtView = (EditText)view.findViewById(R.id.editText_pickFoodFragment);
-        //è®¾ç½®è¾“å…¥ç±»å‹
+        //ÉèÖÃÊäÈëÀàĞÍ
         if(args.getInt(PICK_FOOD_FRAGMENT_TAG) == PICK_FOOD_FRAGMENT_NUMBER)
         	searchTxtView.setInputType(InputType.TYPE_CLASS_NUMBER);
         else searchTxtView.setInputType(InputType.TYPE_CLASS_TEXT);
@@ -176,7 +176,8 @@ public class PickFoodFragment extends Fragment{
 				mHandler.sendEmptyMessage(REFRESH_FOODS);
 			}
 		});
-		//åˆ é™¤æŒ‰é’®
+        
+		//É¾³ıËÑË÷Ìõ¼ş°´Å¥
 		((ImageButton) view.findViewById(R.id.imageButton_delete_numberFragment)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
@@ -185,7 +186,7 @@ public class PickFoodFragment extends Fragment{
 		});
 		
 		/**
-		 * èœå“Listæ»šåŠ¨æ—¶éšè—è½¯é”®ç›˜
+		 * ²ËÆ·List¹ö¶¯Ê±Òş²ØÈí¼üÅÌ
 		 */
 		mGridView.setOnScrollListener(new OnScrollListener() {
 
@@ -201,19 +202,20 @@ public class PickFoodFragment extends Fragment{
 					int visibleItemCount, int totalItemCount) {
 			}
 		});
-		//åˆ·æ–°èœå“
+		
+		//Ë¢ĞÂ²ËÆ·
 		mHandler.sendEmptyMessage(REFRESH_FOODS);
         return view;
 	}
 	
-	//å…³é—­æ—¶æ¸…é™¤ä¾¦å¬
+	//¹Ø±ÕÊ±Çå³ıÕìÌı
 	@Override
 	public void onDestroyView() {
 		super.onDestroyView();
 		mGridView.setOnScrollListener(null);
 	}
 
-	//èœå“æ˜¾ç¤ºçš„adapter
+	//²ËÆ·ÏÔÊ¾µÄadapter
 	private class FoodAdapter extends BaseAdapter{
 
 		private List<Food> mFoods;
@@ -229,9 +231,11 @@ public class PickFoodFragment extends Fragment{
 
 		@Override
 		public Object getItem(int position) {
-			if(position < mFoods.size() && position >= 0)
+			if(position < mFoods.size() && position >= 0){
 				return mFoods.get(position);
-			else return null;
+			}else{
+				return null;
+			}
 		}
 
 		@Override
@@ -242,27 +246,31 @@ public class PickFoodFragment extends Fragment{
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			View view ;
-			if(convertView == null)
+			if(convertView == null){
 				view = LayoutInflater.from(parent.getContext()).inflate(R.layout.pick_food_fragment_item, null);
-			else view = convertView;
+			}else{
+				view = convertView;
+			}
 			
 			Food food = mFoods.get(position);
 			view.setTag(food);
 			
 			((TextView) view.findViewById(R.id.textView_foodName_pickFoodFragment_item)).setText(food.name);
-			((TextView) view.findViewById(R.id.textView_num_pickFoodFragment_item)).setText("" + food.aliasID);
-			((TextView) view.findViewById(R.id.textView_price_pickFoodFragment_item)).setText("" + food.getPrice());
-			//è®¾ç½®å”®ç½„çš„æ˜¾ç¤º
-			if(food.isSellOut())
+			((TextView) view.findViewById(R.id.textView_num_pickFoodFragment_item)).setText(Integer.toString(food.aliasID));
+			((TextView) view.findViewById(R.id.textView_price_pickFoodFragment_item)).setText(Util.float2String2(food.getPrice()));
+			//ÉèÖÃÊÛóÀµÄÏÔÊ¾
+			if(food.isSellOut()){
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
-			else ((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.GONE);
+			}else{
+				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.GONE);
+			}
 
 			return view;
 		}
 	}
 	
 	/*
-	 * æç¤ºè¾“å…¥ç‚¹èœæ•°é‡çš„Dialog
+	 * ÌáÊ¾ÊäÈëµã²ËÊıÁ¿µÄDialog
 	 */
 	private class AskOrderAmountDialog extends Dialog{
 
@@ -275,12 +283,12 @@ public class PickFoodFragment extends Fragment{
 			
 			setContentView(R.layout.order_confirm);
 			
-			((TextView)findViewById(R.id.orderTitleTxt)).setText("è¯·è¾“å…¥" + _selectedFood.name + "çš„ç‚¹èœæ•°é‡");
+			((TextView)findViewById(R.id.orderTitleTxt)).setText("ÇëÊäÈë" + _selectedFood.name + "µÄµã²ËÊıÁ¿");
 			
 			final EditText countEditText = (EditText)findViewById(R.id.amountEdtTxt);
 			countEditText.setText("1");
 			
-			//æ•°é‡å‡æŒ‰é’®
+			//ÊıÁ¿¼õ°´Å¥
 			((Button) findViewById(R.id.button_plus_orderConfirm)).setOnClickListener(new View.OnClickListener(){
 
 				@Override
@@ -289,7 +297,7 @@ public class PickFoodFragment extends Fragment{
 					countEditText.setText(Util.float2String2(++curNum));
 				}
 			});
-			//æ•°é‡åŠ æŒ‰é’®
+			//ÊıÁ¿¼Ó°´Å¥
 			((Button) findViewById(R.id.button_minus_orderConfirm)).setOnClickListener(new View.OnClickListener(){
 
 				@Override
@@ -302,9 +310,9 @@ public class PickFoodFragment extends Fragment{
 				}
 			});
 			
-			//"ç¡®å®š"Button
+			//"È·¶¨"Button
 			Button okBtn = (Button)findViewById(R.id.orderConfirmBtn);
-			okBtn.setText("ç¡®å®š");
+			okBtn.setText("È·¶¨");
 			okBtn.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {			
@@ -312,9 +320,9 @@ public class PickFoodFragment extends Fragment{
 				}
 			});
 			
-			//"å£å‘³"Button
+			//"¿ÚÎ¶"Button
 			Button tasteBtn = (Button)findViewById(R.id.orderTasteBtn);
-			tasteBtn.setText("å£å‘³");
+			tasteBtn.setText("¿ÚÎ¶");
 			tasteBtn.setOnClickListener(new View.OnClickListener() {				
 				@Override
 				public void onClick(View arg0) {
@@ -322,9 +330,9 @@ public class PickFoodFragment extends Fragment{
 				}
 			});
 			
-			//"å–æ¶ˆ"Button
+			//"È¡Ïû"Button
 			Button cancelBtn = (Button)findViewById(R.id.orderCancelBtn);
-			cancelBtn.setText("å–æ¶ˆ");
+			cancelBtn.setText("È¡Ïû");
 			cancelBtn.setOnClickListener(new View.OnClickListener(){
 				@Override
 				public void onClick(View v) {
@@ -332,18 +340,18 @@ public class PickFoodFragment extends Fragment{
 				}
 			});
 			
-			//"å«èµ·"CheckBox
+			//"½ĞÆğ"CheckBox
 			CheckBox hurriedChkBox = (CheckBox)findViewById(R.id.orderHurriedChk);
-			hurriedChkBox.setText("å«èµ·");
+			hurriedChkBox.setText("½ĞÆğ");
 			hurriedChkBox.setOnCheckedChangeListener(new OnCheckedChangeListener(){			
 				@Override
 				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 					if(isChecked){
 						_selectedFood.hangStatus = OrderFood.FOOD_HANG_UP;
-						Toast.makeText(getActivity(), "å«èµ·\"" + _selectedFood.toString() + "\"", Toast.LENGTH_SHORT).show();
+						Toast.makeText(getActivity(), "½ĞÆğ\"" + _selectedFood.toString() + "\"", Toast.LENGTH_SHORT).show();
 					}else{
 						_selectedFood.hangStatus = OrderFood.FOOD_NORMAL;
-						Toast.makeText(getActivity(), "å–æ¶ˆå«èµ·\"" + _selectedFood.toString() + "\"", Toast.LENGTH_SHORT).show();
+						Toast.makeText(getActivity(), "È¡Ïû½ĞÆğ\"" + _selectedFood.toString() + "\"", Toast.LENGTH_SHORT).show();
 					}
 					
 				}
@@ -360,7 +368,7 @@ public class PickFoodFragment extends Fragment{
 				float orderAmount = Float.parseFloat(((EditText)findViewById(R.id.amountEdtTxt)).getText().toString());
 				
        			if(orderAmount > 255){
-       				Toast.makeText(getActivity(), "å¯¹ä¸èµ·ï¼Œ\"" + _selectedFood.toString() + "\"æœ€å¤šåªèƒ½ç‚¹255ä»½", Toast.LENGTH_SHORT).show();
+       				Toast.makeText(getActivity(), "¶Ô²»Æğ£¬\"" + _selectedFood.toString() + "\"×î¶àÖ»ÄÜµã255·İ", Toast.LENGTH_SHORT).show();
        			}else{
        				_selectedFood.setCount(orderAmount);
        				if(mFoodPickedListener != null){	
@@ -374,7 +382,7 @@ public class PickFoodFragment extends Fragment{
        			}
 				
 			}catch(NumberFormatException e){
-				Toast.makeText(getActivity(), "æ‚¨è¾“å…¥çš„æ•°é‡æ ¼å¼ä¸æ­£ç¡®ï¼Œè¯·é‡æ–°è¾“å…¥", Toast.LENGTH_SHORT).show();
+				Toast.makeText(getActivity(), "ÄúÊäÈëµÄÊıÁ¿¸ñÊ½²»ÕıÈ·£¬ÇëÖØĞÂÊäÈë", Toast.LENGTH_SHORT).show();
 			}
 		}
 	}
