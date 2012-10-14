@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -107,7 +108,6 @@ public class BillActivity extends Activity {
 				showBillDialog(PayOrderTask.PAY_TEMP_ORDER);
 			}
 		});
-
 
 	}
 
@@ -205,15 +205,19 @@ public class BillActivity extends Activity {
 			}
 		});
 
-		//FIXME
 		((RadioButton) view.findViewById(R.id.discount1)).setText("无折扣");
-		((RadioButton) view.findViewById(R.id.discount2)).setTag(WirelessOrder.foodMenu.discounts[0]);
-		((RadioButton) view.findViewById(R.id.discount2)).setText(WirelessOrder.foodMenu.discounts[0].name);
-		((RadioButton) view.findViewById(R.id.discount3)).setTag(WirelessOrder.foodMenu.discounts[1]);
-		((RadioButton) view.findViewById(R.id.discount3)).setText(WirelessOrder.foodMenu.discounts[1].name);
+		//根据discount数量添加radiobutton
+		RadioGroup radioGroup = (RadioGroup) view.findViewById(R.id.radioGroup2);
+		for(Discount d:WirelessOrder.foodMenu.discounts)
+		{
+			RadioButton rBtn = new RadioButton(BillActivity.this);
+			rBtn.setTag(d);
+			rBtn.setText(d.name);
+			radioGroup.addView(rBtn, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		}
 
 		// 折扣方式方式添加事件监听器
-		((RadioGroup) view.findViewById(R.id.radioGroup2)).setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+		radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
 				Object obj = group.findViewById(checkedId).getTag();

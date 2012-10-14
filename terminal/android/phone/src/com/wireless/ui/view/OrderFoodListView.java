@@ -73,11 +73,6 @@ public class OrderFoodListView extends ExpandableListView{
 		});
 	}
 	
-	@Override
-	public void onDraw(Canvas canvas){  
-		super.onDraw(canvas);
-	}
-	
 	/**
 	 * 设置ListView的类型，目前分为"新点菜"和"已点菜"两种
 	 * @param type

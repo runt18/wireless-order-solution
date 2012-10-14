@@ -209,9 +209,10 @@ public class MainActivity extends Activity {
 					//×¢Ïú
 					new QueryStaffTask(false).execute();
 					break;
-
+					
 				case 8:
-					intent = new Intent(MainActivity.this, AboutActivity.class);
+					//FIXME
+					intent = new Intent(MainActivity.this, QuickPickActivity.class);
 					startActivity(intent);
 					break;
 				}
