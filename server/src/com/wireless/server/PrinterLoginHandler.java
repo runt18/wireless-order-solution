@@ -237,6 +237,8 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 			send(out, new RespNAK(loginReq.header));
 		}catch(IOException e){
 			e.printStackTrace();
+		}catch(Exception e){
+			e.printStackTrace();
 		}finally{
 			try{
 				if(in != null){
@@ -253,7 +255,9 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 				}
 			}catch(IOException e){
 				e.printStackTrace();
-			}				
+			}catch(Exception e){
+				e.printStackTrace();
+			}
 		}
 	}
 

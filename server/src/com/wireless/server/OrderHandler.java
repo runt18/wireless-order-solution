@@ -35,6 +35,7 @@ import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqInsertOrderParser;
 import com.wireless.protocol.ReqParser;
+import com.wireless.protocol.ReqPayOrderParser;
 import com.wireless.protocol.ReqPrintOrder2;
 import com.wireless.protocol.Reserved;
 import com.wireless.protocol.RespACK;
@@ -249,7 +250,7 @@ class OrderHandler extends Handler implements Runnable{
 
 				//handle the pay order request
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.PAY_ORDER){
-				Order orderToPay = ReqParser.parsePayOrder(request);
+				Order orderToPay = ReqPayOrderParser.parse(request);
 				/**
 				 * If pay order temporary, just only print the temporary receipt.
 				 * Otherwise perform the pay action and print receipt 
