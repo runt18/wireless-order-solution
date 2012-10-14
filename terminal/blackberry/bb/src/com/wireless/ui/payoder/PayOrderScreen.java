@@ -17,9 +17,11 @@ import net.rim.device.api.ui.container.HorizontalFieldManager;
 import net.rim.device.api.ui.container.MainScreen;
 import net.rim.device.api.ui.container.VerticalFieldManager;
 
+import com.wireless.protocol.Discount;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.Type;
 import com.wireless.protocol.Util;
+import com.wireless.terminal.WirelessOrder;
 import com.wireless.ui.field.OrderListField;
 import com.wireless.ui.field.TopBannerField;
 
@@ -138,30 +140,30 @@ public class PayOrderScreen extends MainScreen
 		ButtonField submitNormal = new ButtonField("一般", ButtonField.CONSUME_CLICK);
 		HorizontalFieldManager hfm3 = new HorizontalFieldManager(Manager.FIELD_HCENTER);
 		hfm3.add(submitNormal);
-		hfm3.add(new LabelField("    "));
-		ButtonField submitDiscount = new ButtonField("折扣", ButtonField.CONSUME_CLICK);
-		hfm3.add(submitDiscount);
-		add(hfm3);
-		
 		//Set the submit button's listener
 		submitNormal.setChangeListener(new FieldChangeListener(){
 			public void fieldChanged(Field field, int context) {
-				payOrder(Order.PAY_NORMAL, Order.DISCOUNT_1);
+				payOrder(Order.PAY_NORMAL, null);
 	         }
 		});
-		
-		//Set the submit discount's listener
-		submitDiscount.setChangeListener(new FieldChangeListener(){
-			public void fieldChanged(Field field, int context) {
-				payOrder(Order.PAY_NORMAL, Order.DISCOUNT_2);
-			}			
-		});
-		
+
+		if(WirelessOrder.foodMenu.discounts.length > 0){
+			hfm3.add(new LabelField("    "));
+			ButtonField submitDiscount = new ButtonField("折扣", ButtonField.CONSUME_CLICK);
+			hfm3.add(submitDiscount);
+			add(hfm3);		
+			//Set the submit discount's listener
+			submitDiscount.setChangeListener(new FieldChangeListener(){
+				public void fieldChanged(Field field, int context) {
+					payOrder(Order.PAY_NORMAL, WirelessOrder.foodMenu.discounts[0]);
+				}			
+			});
+		}
 		//Focus on order button
 		submitNormal.setFocus();
 	}  
 	
-	private void payOrder(int payType, int distType){
+	private void payOrder(int payType, Discount discount){
 		try{
 			int totalPrice = Util.float2Int(_bill.calcPriceWithTaste());
 			int minimumCost = Util.float2Int(_bill.getMinimumCost());
@@ -170,14 +172,18 @@ public class PayOrderScreen extends MainScreen
 				int resp = Dialog.ask(Dialog.D_YES_NO, "消费额还没到最低消费，是否结帐?", Dialog.NO);
 				if(resp == Dialog.YES){
 					_bill.pay_type = payType;
-					_bill.discount_type = distType;
+					if(discount != null){
+						_bill.setDiscount(discount);
+					}
 					UiApplication.getUiApplication().pushScreen(new SelectMannerPopup(_bill, _self));
 				}
 				
 			}else{
 				//_bill.setCashIncome(new Float(Float.parseFloat(_cashIncome.getText())));				
 				_bill.pay_type = payType;
-				_bill.discount_type = distType;
+				if(discount != null){
+					_bill.setDiscount(discount);
+				}
 				UiApplication.getUiApplication().pushScreen(new SelectMannerPopup(_bill, _self));
 			}
 		}catch(NumberFormatException e){
