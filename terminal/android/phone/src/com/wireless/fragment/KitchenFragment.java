@@ -524,24 +524,30 @@ public class KitchenFragment extends Fragment {
 			((TextView)findViewById(R.id.orderTitleTxt)).setText("请输入" + _selectedFood.name + "的点菜数量");
 			final EditText countEditText = (EditText)findViewById(R.id.amountEdtTxt);
 			countEditText.setText("1");
-			//数量减按钮
+			//数量加按钮
 			((Button) findViewById(R.id.button_plus_orderConfirm)).setOnClickListener(new View.OnClickListener(){
 
 				@Override
 				public void onClick(View v) {
-					float curNum = Float.parseFloat(countEditText.getText().toString());
-					countEditText.setText(Util.float2String2(++curNum));
+					if(!countEditText.getText().toString().equals(""))
+					{
+						float curNum = Float.parseFloat(countEditText.getText().toString());
+						countEditText.setText(Util.float2String2(++curNum));
+					}
 				}
 			});
-			//数量加按钮
+			//数量减按钮
 			((Button) findViewById(R.id.button_minus_orderConfirm)).setOnClickListener(new View.OnClickListener(){
 
 				@Override
 				public void onClick(View v) {
-					float curNum = Float.parseFloat(countEditText.getText().toString());
-					if(--curNum >= 1.0f)
+					if(!countEditText.getText().toString().equals(""))
 					{
-						countEditText.setText(Util.float2String2(curNum));
+						float curNum = Float.parseFloat(countEditText.getText().toString());
+						if(--curNum >= 1.0f)
+						{
+							countEditText.setText(Util.float2String2(curNum));
+						}
 					}
 				}
 			});

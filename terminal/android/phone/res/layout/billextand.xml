@@ -93,37 +93,28 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:src="@drawable/line" />
-
-    <RadioGroup
-        android:id="@+id/radioGroup2"
+
+    <ScrollView
+        android:id="@+id/scrollView1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:layout_height="wrap_content" >
 
-        <RadioButton
-            android:id="@+id/discount1"
-            android:layout_width="fill_parent"
+        <RadioGroup
+            android:id="@+id/radioGroup2"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:checked="true"
-            android:text="折扣1"
-            android:textColor="#000000"
-            android:textSize="18sp" />
+            android:orientation="vertical" >
 
-<!--         <RadioButton
-            android:id="@+id/discount2"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="折扣2"
-            android:textColor="#000000"
-            android:textSize="18sp" />
+            <RadioButton
+                android:id="@+id/discount1"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="折扣1"
+                android:textColor="#000000"
+                android:textSize="18sp" />
+        </RadioGroup>
 
-        <RadioButton
-            android:id="@+id/discount3"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="折扣3"
-            android:textColor="#000000"
-            android:textSize="18sp" /> -->
-    </RadioGroup>
+    </ScrollView>
 
 </LinearLayout>

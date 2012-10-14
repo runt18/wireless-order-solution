@@ -165,48 +165,56 @@ public class QuickPickActivity extends FragmentActivity implements com.wireless.
 			switch(msg.what)
 			{
 			case NUMBER_FRAGMENT:
-				//创建新菜品选择fragment
-				PickFoodFragment numFragment = new PickFoodFragment();
-				numFragment.setFoodPickedListener(activity);
-				//设置显示参数
-				Bundle args = new Bundle();
-				args.putInt(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG, PickFoodFragment.PICK_FOOD_FRAGMENT_NUMBER);
-				args.putString(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG_NAME, "编号：");
-				numFragment.setArguments(args);
-				//替换原本的fragment
-				ftrans.replace(R.id.frameLayout_container_quickPick, numFragment).commit();
-				
+				if(LAST_VIEW != NUMBER_FRAGMENT)
+				{
+					//创建新菜品选择fragment
+					PickFoodFragment numFragment = new PickFoodFragment();
+					numFragment.setFoodPickedListener(activity);
+					//设置显示参数
+					Bundle args = new Bundle();
+					args.putInt(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG, PickFoodFragment.PICK_FOOD_FRAGMENT_NUMBER);
+					args.putString(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG_NAME, "编号：");
+					numFragment.setArguments(args);
+					//替换原本的fragment
+					ftrans.replace(R.id.frameLayout_container_quickPick, numFragment).commit();
+					
+					LAST_VIEW = NUMBER_FRAGMENT;
+				}
 				mTitleTextView.setText("点菜 - 编号");
 				setLastCate(NUMBER_FRAGMENT);
-				LAST_VIEW = NUMBER_FRAGMENT;
 				break;
 				
 			case KITCHEN_FRAGMENT:
-				KitchenFragment kitchenFragment = new KitchenFragment();
-				kitchenFragment.setFoodPickedListener(activity);
-				ftrans.replace(R.id.frameLayout_container_quickPick, kitchenFragment).commit();
-				
+				if(LAST_VIEW != KITCHEN_FRAGMENT)
+				{
+					KitchenFragment kitchenFragment = new KitchenFragment();
+					kitchenFragment.setFoodPickedListener(activity);
+					ftrans.replace(R.id.frameLayout_container_quickPick, kitchenFragment).commit();
+					
+					LAST_VIEW = KITCHEN_FRAGMENT;
+				}
 				mTitleTextView.setText("点菜 - 分厨");
 				setLastCate(KITCHEN_FRAGMENT);
-				LAST_VIEW = KITCHEN_FRAGMENT;
 				break;
 			case SPELL_FRAGMENT:
-				//创建新菜品选择fragment
-				PickFoodFragment spellFragment = new PickFoodFragment();
-				spellFragment.setFoodPickedListener(activity);
-				//设置显示参数
-				Bundle spellAargs = new Bundle();
-				spellAargs.putInt(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG, PickFoodFragment.PICK_FOOD_FRAGMENT_SPELL);
-				spellAargs.putString(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG_NAME, "拼音：");
-				spellFragment.setArguments(spellAargs);
-				//替换原本的fragment
-				ftrans.replace(R.id.frameLayout_container_quickPick, spellFragment).commit();
+				if(LAST_VIEW != SPELL_FRAGMENT)
+				{
+					//创建新菜品选择fragment
+					PickFoodFragment spellFragment = new PickFoodFragment();
+					spellFragment.setFoodPickedListener(activity);
+					//设置显示参数
+					Bundle spellAargs = new Bundle();
+					spellAargs.putInt(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG, PickFoodFragment.PICK_FOOD_FRAGMENT_SPELL);
+					spellAargs.putString(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG_NAME, "拼音：");
+					spellFragment.setArguments(spellAargs);
+					//替换原本的fragment
+					ftrans.replace(R.id.frameLayout_container_quickPick, spellFragment).commit();
+					LAST_VIEW = SPELL_FRAGMENT;
+				}
 				
 				mTitleTextView.setText("点菜 - 拼音");
 				setLastCate(SPELL_FRAGMENT);
-				LAST_VIEW = SPELL_FRAGMENT;
 				break;
-				//FIXME 修正闪烁问题
 			case PICKED_FOOD_INTERFACE:
 				//将fragment容器隐藏，显示已点菜界面
 				mFgmContainer.setVisibility(View.GONE);
@@ -450,7 +458,6 @@ public class QuickPickActivity extends FragmentActivity implements com.wireless.
 
 	@Override
 	public void onPickFood() {
-		
 	}
 	
 	class CommitDialog extends Dialog{

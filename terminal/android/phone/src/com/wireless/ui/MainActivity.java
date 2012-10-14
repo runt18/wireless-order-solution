@@ -844,10 +844,9 @@ public class MainActivity extends Activity {
 			});
 			//µØ≥ˆ»Ìº¸≈Ã
            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE); 
-           InputMethodManager imm = (InputMethodManager)
-                           getSystemService(INPUT_METHOD_SERVICE);
-                            imm.showSoftInput(this.getCurrentFocus(), 0); //œ‘ æ»Ìº¸≈Ã
-                            imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+           InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+           imm.showSoftInput(this.getWindow().getDecorView(), 0); //œ‘ æ»Ìº¸≈Ã
+           imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
 
 		}
 

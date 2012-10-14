@@ -87,24 +87,6 @@ public class PickFoodFragment extends Fragment{
 			this.mFragment = new WeakReference<PickFoodFragment>(fragment);
 			
 			mSrcFoods = Arrays.asList(WirelessOrder.foodMenu.foods);
-//			/**
-//			 * 将所有菜品进行按厨房编号进行排序
-//			 */
-//			mFoods = new Food[WirelessOrder.foodMenu.foods.length];
-//			System.arraycopy(WirelessOrder.foodMenu.foods, 0, mFoods, 0,
-//					WirelessOrder.foodMenu.foods.length);
-//			Arrays.sort(mFoods, new Comparator<Food>() {
-//				@Override
-//				public int compare(Food food1, Food food2) {
-//					if (food1.kitchen.aliasID > food2.kitchen.aliasID) {
-//						return 1;
-//					} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
-//						return -1;
-//					} else {
-//						return 0;
-//					}
-//				}
-//			});
 		}
 		
 		@Override
@@ -288,24 +270,30 @@ public class PickFoodFragment extends Fragment{
 			final EditText countEditText = (EditText)findViewById(R.id.amountEdtTxt);
 			countEditText.setText("1");
 			
-			//数量减按钮
+			//数量加按钮
 			((Button) findViewById(R.id.button_plus_orderConfirm)).setOnClickListener(new View.OnClickListener(){
 
 				@Override
 				public void onClick(View v) {
-					float curNum = Float.parseFloat(countEditText.getText().toString());
-					countEditText.setText(Util.float2String2(++curNum));
+					if(!countEditText.getText().toString().equals(""))
+					{
+						float curNum = Float.parseFloat(countEditText.getText().toString());
+						countEditText.setText(Util.float2String2(++curNum));
+					}
 				}
 			});
-			//数量加按钮
+			//数量减按钮
 			((Button) findViewById(R.id.button_minus_orderConfirm)).setOnClickListener(new View.OnClickListener(){
 
 				@Override
 				public void onClick(View v) {
-					float curNum = Float.parseFloat(countEditText.getText().toString());
-					if(--curNum >= 1.0f)
+					if(!countEditText.getText().toString().equals(""))
 					{
-						countEditText.setText(Util.float2String2(curNum));
+						float curNum = Float.parseFloat(countEditText.getText().toString());
+						if(--curNum >= 1.0f)
+						{
+							countEditText.setText(Util.float2String2(curNum));
+						}
 					}
 				}
 			});
