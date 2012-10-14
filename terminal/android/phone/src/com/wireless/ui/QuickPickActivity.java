@@ -3,8 +3,11 @@ package com.wireless.ui;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
@@ -30,9 +33,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.Params;
+import com.wireless.excep.BusinessException;
 import com.wireless.fragment.KitchenFragment;
 import com.wireless.fragment.PickFoodFragment;
 import com.wireless.parcel.FoodParcel;
+import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Type;
 import com.wireless.protocol.Util;
@@ -460,6 +465,54 @@ public class QuickPickActivity extends FragmentActivity implements com.wireless.
 	public void onPickFood() {
 	}
 	
+	/**
+	 * 执行下单的请求操作
+	 */
+	private class InsertOrderTask extends com.wireless.lib.task.CommitOrderTask{
+
+		private ProgressDialog _progDialog;
+		
+		public InsertOrderTask(Order reqOrder) {
+			super(reqOrder);
+		}
+		
+		/**
+		 * 在执行请求下单操作前显示提示信息
+		 */
+		@Override
+		protected void onPreExecute(){
+			_progDialog = ProgressDialog.show(QuickPickActivity.this, "", "提交" + mReqOrder.destTbl.aliasID + "号餐台的下单信息...请稍候", true);
+		}
+		
+		
+		/**
+		 * 根据返回的error message判断，如果发错异常则提示用户，
+		 * 如果成功，则返回到主界面，并提示用户下单成功
+		 */
+		@Override
+		protected void onPostExecute(BusinessException e){
+			//make the progress dialog disappeared
+			_progDialog.dismiss();
+			/**
+			 * Prompt user message if any error occurred.
+			 */
+			if(e != null){
+				new AlertDialog.Builder(QuickPickActivity.this)
+				.setTitle("提示")
+				.setMessage(e.getMessage())
+				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.dismiss();
+					}
+				}).show();
+			}else{
+				//return to the main activity and show the message
+				QuickPickActivity.this.finish();
+				Toast.makeText(QuickPickActivity.this, mReqOrder.destTbl.aliasID + "号台下单成功。", Toast.LENGTH_SHORT).show();
+			}
+		}
+	}	
+	
 	class CommitDialog extends Dialog{
 
 		private ListView mListView;
@@ -507,6 +560,60 @@ public class QuickPickActivity extends FragmentActivity implements com.wireless.
 					}
 				}
            	});
+           	//取消按钮
+        	((Button)this.findViewById(R.id.button_cancel_commitDialog)).setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					dismiss();
+				}
+			});
+        	
+        	final TextView peopleCountTextView = (TextView)findViewById(R.id.textView_peopleCnt_commitDialog);
+        	//确定按钮
+        	((Button)this.findViewById(R.id.button_confirm_commitDialog)).setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					//FIXME 
+					OrderFood[] foods = mPickFoods.toArray(new OrderFood[mPickFoods.size()]);
+					if(foods.length != 0 && !tableText.getText().toString().equals("")){
+						Order reqOrder = new Order(foods,											   
+												   Short.parseShort(tableText.getText().toString()),
+												   Integer.parseInt(peopleCountTextView.getText().toString()));
+						new InsertOrderTask(reqOrder).execute(Type.INSERT_ORDER);
+						
+					}else{
+						Toast.makeText(QuickPickActivity.this, "请输入台号", Toast.LENGTH_SHORT).show();
+					}
+				}
+			});
+        	
+			//数量加按钮
+			((Button) findViewById(R.id.button_plus_people_commitDialog)).setOnClickListener(new View.OnClickListener(){
+
+				@Override
+				public void onClick(View v) {
+					if(!peopleCountTextView.getText().toString().equals(""))
+					{
+						float curNum = Float.parseFloat(peopleCountTextView.getText().toString());
+						peopleCountTextView.setText(Util.float2String2(++curNum));
+					}
+				}
+			});
+			//数量减按钮
+			((Button) findViewById(R.id.button_minus_people_commitDialog)).setOnClickListener(new View.OnClickListener(){
+
+				@Override
+				public void onClick(View v) {
+					if(!peopleCountTextView.getText().toString().equals(""))
+					{
+						float curNum = Float.parseFloat(peopleCountTextView.getText().toString());
+						if(--curNum >= 1.0f)
+						{
+							peopleCountTextView.setText(Util.float2String2(curNum));
+						}
+					}
+				}
+			});
            	
            	mListView = (ListView) this.findViewById(R.id.listView_commitDialog);
            	mListView.setAdapter(new BaseAdapter(){
@@ -534,7 +641,10 @@ public class QuickPickActivity extends FragmentActivity implements com.wireless.
 						view = LayoutInflater.from(getContext()).inflate(R.layout.quick_pick_commit_dialog_item, null);
 					else view = convertView;
 					
-					((TextView)view.findViewById(R.id.textView_foodName_commit_dialog_item)).setText(mPickFoods.get(position).name);
+					OrderFood food = mPickFoods.get(position);
+					((TextView)view.findViewById(R.id.textView_foodName_commit_dialog_item)).setText(food.name);
+					((TextView)view.findViewById(R.id.textView_amount_quickPick_commitDialog_item)).setText(Util.float2String2(food.getCount()));
+					((TextView)view.findViewById(R.id.textView_price_quickPick_commitDialog_item)).setText(Util.CURRENCY_SIGN + Util.float2String2(food.calcPriceWithTaste()));
 					return view;
 				}
            	});

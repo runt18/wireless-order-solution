@@ -13,7 +13,8 @@
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="输入台号" >
+            android:hint="输入台号"
+            android:inputType="number" >
 
             <requestFocus />
         </AutoCompleteTextView>
@@ -22,64 +23,63 @@
             android:id="@+id/button_minus_people_commitDialog"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/autoCompleteTextView_commitDialog"
+            android:layout_toLeftOf="@+id/textView_peopleCnt_commitDialog"
             android:text="人数减" />
 
-        <EditText
-            android:id="@+id/editText_peopleCnt_commitDialog"
-            android:layout_width="50dp"
+        <TextView
+            android:id="@+id/textView_peopleCnt_commitDialog"
+            android:layout_width="40dp"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/button_minus_people_commitDialog"
-            android:ems="10"
-            android:inputType="number"
-            android:text="1" >
-        </EditText>
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/button_plus_people_commitDialog"
+            android:gravity="center"
+            android:text="1"
+            android:textSize="24sp" >
+        </TextView>
 
         <Button
             android:id="@+id/button_plus_people_commitDialog"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/editText_peopleCnt_commitDialog"
+            android:layout_alignParentRight="true"
             android:text="人数加" />
     </RelativeLayout>
-
+
     <LinearLayout
         android:id="@+id/linearLayout_commitDialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/relativeLayout1"
         android:weightSum="3" >
-
+
         <Button
-            android:id="@+id/button1"
+            android:id="@+id/button_confirm_commitDialog"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="确定" />
-
+
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/button_cancel_commitDialog"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="取消" />
-
+
         <Button
             android:id="@+id/button_detail_commit_dialog"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="详细" />
-
     </LinearLayout>
-
+
     <ListView
         android:id="@+id/listView_commitDialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/linearLayout_commitDialog"
         android:visibility="gone" >
-
     </ListView>
 
 </RelativeLayout>

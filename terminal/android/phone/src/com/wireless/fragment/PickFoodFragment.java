@@ -17,6 +17,7 @@ import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -367,6 +368,19 @@ public class PickFoodFragment extends Fragment{
        					}
        				}
 					dismiss();
+					//FIXME 修正不同activity下键盘弹出问题
+					//将搜索项清零
+					EditText searchText = (EditText) getView().findViewById(R.id.editText_pickFoodFragment);
+					searchText.setText("");
+					//若刚才是通过搜索点菜的，则再次弹出键盘
+					if(searchText.hasFocus())
+					{
+						//弹出软键盘
+			           getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE); 
+			           InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+			           imm.showSoftInput(searchText, 0); //显示软键盘
+			           imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+					}
        			}
 				
 			}catch(NumberFormatException e){

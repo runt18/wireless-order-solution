@@ -173,7 +173,6 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 				Toast.makeText(OrderActivity.this, mReqOrder.destTbl.aliasID + "号台下单成功。", Toast.LENGTH_SHORT).show();
 			}
 		}
-		
 	}	
 
 	
