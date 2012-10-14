@@ -33,4 +33,13 @@ public class Discount {
 	public int hashCode(){
 		return new Integer(discountID).hashCode();
 	}
+	
+	public boolean isNormal(){
+		return status == NORMAL;
+	}
+	
+	public boolean isDefault(){
+		return status == DEFAULT;
+	}	
+
 }
