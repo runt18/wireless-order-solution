@@ -171,7 +171,7 @@ public class QueryTodayAction extends Action {
 					 " MAX(A.type) AS type, MAX(A.total_price) AS total_price, MAX(A.total_price_2) AS total_price_2, " +
 					 " MAX(A.table2_alias) AS table2_alias, MAX(A.custom_num) AS custom_num, MAX(A.service_rate) AS service_rate, " +
 					 " MAX(A.gift_price) AS gift_price, MAX(A.member_id) AS member_id, MAX(A.member) AS member, " +
-					 " MAX(A.comment) AS comment, MAX(A.discount_type) AS discount_type, MAX(A.waiter) AS waiter, " +
+					 " MAX(A.comment) AS comment, MAX(A.waiter) AS waiter, " +
 					 "(CASE WHEN MIN(B.discount) < 1 THEN 1 ELSE 0 END) AS is_discount, " +
 					 "(CASE WHEN SUM(B.food_status & " + Food.GIFT + ") <= 0 THEN 0 ELSE 1 END) AS is_gift, " +
 					 "(CASE WHEN SUM(IF(B.is_paid, 1, 0)) <= 0 THEN 0 ELSE 1 END) AS is_paid, " +
@@ -239,7 +239,7 @@ public class QueryTodayAction extends Action {
 				String comment = dbCon.rs.getString("comment");
 				jsonOrder = jsonOrder.replace("$(comment)", comment != null ? comment.replace("，", " ") : "");
 				jsonOrder = jsonOrder.replace("$(pay_type)", dbCon.rs.getString("member") == null ? "1" : "2");
-				jsonOrder = jsonOrder.replace("$(discount_type)", Short.toString(dbCon.rs.getShort("discount_type")));
+				jsonOrder = jsonOrder.replace("$(discount_type)", "0");
 				jsonOrder = jsonOrder.replace("$(waiter)", dbCon.rs.getString("waiter"));
 				jsonOrder = jsonOrder.replace("$(isPaid)", String.valueOf(dbCon.rs.getInt("is_paid")));
 				jsonOrder = jsonOrder.replace("$(isDiscount)", String.valueOf(dbCon.rs.getInt("is_discount")));
