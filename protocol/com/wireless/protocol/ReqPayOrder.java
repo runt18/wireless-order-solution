@@ -14,13 +14,13 @@ public class ReqPayOrder extends ReqPackage{
 	* pin[6] - auto calculated and filled in
 	* len[2] - 0x06, 0x00
 	* <Body>
-	* print_type[4] : table[2] : cash_income[4] : gift_price[4] : pay_type : discount_type : pay_manner : service_rate : len_member : member_id[len] : len_comment : comment[len]
+	* print_type[4] : table[2] : cash_income[4] : gift_price[4] : pay_type : discount_id[4] : pay_manner : service_rate : len_member : member_id[len] : len_comment : comment[len]
 	* print_type[4] - 4-byte indicates the print type
 	* table[2] - 2-byte indicates the table id
 	* cash_income[4] - 4-byte indicates the total price
 	* gift_price[4] - 4-byte indicates the gift price
 	* pay_type - one of the values of pay type
-	* discount_type - one of the values of discount type
+	* discount_id[4] - 4-byte indicates the id to discount
 	* pay_manner - one of the values of pay manner
 	* service_rate - the service rate to this order
 	* len_member - length of the id to member
@@ -51,7 +51,7 @@ public class ReqPayOrder extends ReqPackage{
 					  4 + /* actual total price takes up 4 bytes */
 					  4 + /* gift price takes up 4 bytes */
 					  1 + /* pay type takes up 1 byte */
-					  1 + /* discount type takes up 1 byte */
+					  4 + /* discount id takes up 4 byte */
 					  1 + /* the pay manner takes up 1 byte */
 					  1 + /* the service rate takes up 1 byte */
 					  1 + /* the length of member id takes up 1 byte */
@@ -59,56 +59,72 @@ public class ReqPayOrder extends ReqPackage{
 					  1 + /* the length of comment takes up 1 byte */
 					  commentBytes.length;	 /* the comment takes up length bytes */
 		
+		
 		//assign the length of the body
 		header.length[0] = (byte)(bodyLen & 0x000000FF);
 		header.length[1] = (byte)((bodyLen >> 8) & 0x000000FF);
 		
+		int offset = 0;
 		body = new byte[bodyLen];
 		//assign the print type
-		body[0] = (byte)(printType & 0x000000FF);
-		body[1] = (byte)((printType & 0x0000FF00) >> 8);
-		body[2] = (byte)((printType & 0x00FF0000) >> 16);
-		body[3] = (byte)((printType & 0xFF000000) >> 24);		
+		body[offset] = (byte)(printType & 0x000000FF);
+		body[offset + 1] = (byte)((printType & 0x0000FF00) >> 8);
+		body[offset + 2] = (byte)((printType & 0x00FF0000) >> 16);
+		body[offset + 3] = (byte)((printType & 0xFF000000) >> 24);
+		offset += 4;
 		
 		//assign the table id
-		body[4] = (byte)(order.destTbl.aliasID & 0x00FF);
-		body[5] = (byte)((order.destTbl.aliasID >> 8) & 0x00FF);
+		body[offset] = (byte)(order.destTbl.aliasID & 0x00FF);
+		body[offset + 1] = (byte)((order.destTbl.aliasID >> 8) & 0x00FF);
+		offset += 2;
 		
 		//assign the total price
-		body[6] = (byte)(order.cashIncome & 0x000000FF);
-		body[7] = (byte)((order.cashIncome >> 8) & 0x000000FF);
-		body[8] = (byte)((order.cashIncome >> 16) & 0x000000FF);
-		body[9] = (byte)((order.cashIncome >> 24) & 0x000000FF);
+		body[offset] = (byte)(order.cashIncome & 0x000000FF);
+		body[offset + 1] = (byte)((order.cashIncome >> 8) & 0x000000FF);
+		body[offset + 2] = (byte)((order.cashIncome >> 16) & 0x000000FF);
+		body[offset + 3] = (byte)((order.cashIncome >> 24) & 0x000000FF);
+		offset += 4;
 		
 		//assign the gift price
-		body[10] = (byte)(order.giftPrice & 0x000000FF);
-		body[11] = (byte)((order.giftPrice >> 8) & 0x000000FF);
-		body[12] = (byte)((order.giftPrice >> 16) & 0x000000FF);
-		body[13] = (byte)((order.giftPrice >> 24) & 0x000000FF);
+		body[offset] = (byte)(order.giftPrice & 0x000000FF);
+		body[offset + 1] = (byte)((order.giftPrice >> 8) & 0x000000FF);
+		body[offset + 2] = (byte)((order.giftPrice >> 16) & 0x000000FF);
+		body[offset + 3] = (byte)((order.giftPrice >> 24) & 0x000000FF);
+		offset += 4;
 		
 		//assign the payment type
-		body[14] = (byte)(order.pay_type & 0x000000FF);
+		body[offset] = (byte)(order.pay_type & 0x000000FF);
+		offset += 1;
 		
 		//assign the discount type
-		body[15] = (byte)(order.discount_type & 0x000000FF);
+		body[offset] = (byte)(order.discount.discountID & 0x000000FF);
+		body[offset + 1] = (byte)((order.discount.discountID >> 8) & 0x000000FF);
+		body[offset + 2] = (byte)((order.discount.discountID >> 16) & 0x000000FF);
+		body[offset + 3] = (byte)((order.discount.discountID >> 24) & 0x000000FF);
+		offset += 4;
 		
 		//assign the payment manner
-		body[16] = (byte)(order.pay_manner & 0x000000FF);
+		body[offset] = (byte)(order.pay_manner & 0x000000FF);
+		offset += 1;
 		
 		//assign the service rate
-		body[17] = (byte)order.serviceRate;
+		body[offset] = (byte)order.serviceRate;
+		offset += 1;
 		
 		//assign the length of the member id
-		body[18] = (byte)(memberIDBytes.length & 0x000000FF);
+		body[offset] = (byte)(memberIDBytes.length & 0x000000FF);
+		offset += 1;
 		
 		//assign the value of the member id
-		System.arraycopy(memberIDBytes, 0, body, 19, memberIDBytes.length);
+		System.arraycopy(memberIDBytes, 0, body, offset, memberIDBytes.length);
+		offset += memberIDBytes.length;
 		
 		//assign the length of comment
-		body[19 + memberIDBytes.length] = (byte)(commentBytes.length & 0x000000FF);
+		body[offset] = (byte)(commentBytes.length & 0x000000FF);
+		offset += 1;		
 		
 		//assign the value of comment
-		System.arraycopy(commentBytes, 0, body, 20 + memberIDBytes.length, commentBytes.length);
+		System.arraycopy(commentBytes, 0, body, offset, commentBytes.length);
 	} 
 
 	/******************************************************

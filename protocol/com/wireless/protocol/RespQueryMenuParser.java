@@ -28,6 +28,7 @@ public class RespQueryMenuParser {
 		 * spec_amount[2] : <Spec_1> : <Spec_2>... 
 		 * kitchen_amount : <Kitchen_1> : <Kitchen_2>...
 		 * dept_amount : <Dept_1> : <Dept_2>...
+		 * discount_amount : <Discount_1> : <Discount_2>...
 		 * 
 		 * food_amount[2] - 2-byte indicating the amount of the foods listed in the menu
 		 * <Food>
@@ -66,20 +67,33 @@ public class RespQueryMenuParser {
 		 * <Spec>
 		 * The same as <Taste>
 		 *  
+		 * kitchen_amount[] - 1 byte indicates the amount of kitchen
 		 * <Kitchen>
-		 * kitchen_id : dept_id : dist_1 : dist_2 : dist_3 : mdist_1 : mdist_2 : mdist_3 : len : kname[len]
-		 * kitchen_id : the id to this kitchen
+		 * kitchen_alias : dept_id : len : kitchen_name[len]
+		 * kitchen_alias : the alias id to this kitchen
 		 * dept_id : the id to department which this kitchen belong to
-		 * dist_1..3 : 3 normal discounts to this kitchen
-		 * mdist_1..3 : 3 member discounts to this kitchen
 		 * len : the length of the kitchen name
-		 * kname[len] : the name to this kitchen
+		 * kitchen_name[len] : the name to this kitchen
 		 * 
+		 * dept_amount - 1 byte indicates the amount of department
 		 * <Department>
 		 * dept_id : len : dept_name[len]
 		 * dept_id : the id to this department
 		 * len : the length of the department name
 		 * dept_name[len] : the name to this department
+		 * 
+		 * discount_amount - 1 byte indicates the amount of discount
+		 * <Discount>
+		 * discount_id[4] : len : dist_name[len] : level[2] : status : dist_plan_amount : <DiscountPlan_1> : <DiscountPlan_2> : ...
+		 * discount_id[4] - 4 bytes indicates the discount id
+		 * len - 1 byes indicates the length of discount name
+		 * dist_name[len] - the name of discount
+		 * level[2] - the level of discount
+		 * status - the status to discount
+		 * <DiscountPlan>
+		 * kitchen_alias : rate
+		 * kitchen_alias : 1 bytes indicates the kitchen alias 
+		 * rate - 1 byte indicates the discount rate		  
 		 *******************************************************/
 		//make sure the response is ACK
 		if(response.header.type == Type.ACK){
@@ -168,17 +182,6 @@ public class RespQueryMenuParser {
 				}
 				offset += lenOfPopTaste;
 				
-//				offset += 2 +				/* food_alias(2-byte) */
-//						  3 + 				/* price(3-byte) */ 
-//						  1 + 				/* kitchen id to this food(1-byte) */
-//						  1 + 				/* status(1-byte) */ 
-//						  1 + 				/* the length to food name(1-byte) */
-//						  lenOfFoodName + 	/* the value to food name  */
-//						  1 + 				/* the length to pinyin(1-byte) */	
-//						  lenOfPinyin +		/* the value to pinyin */
-//						  1 +				/* the amount to taste reference(1-byte) */
-//						  lenOfPopTaste;	/* all the alias id to taste reference */ 
-				
 				//add to foods
 				foods[i] = food;
 			}
@@ -224,18 +227,6 @@ public class RespQueryMenuParser {
 				short deptAlias = (short)(response.body[offset] & 0x00FF);
 				offset++;
 				
-				//get 3 normal discounts
-				byte dist_1 = response.body[offset];
-				byte dist_2 = response.body[offset + 1];
-				byte dist_3 = response.body[offset + 2];
-				offset += 3;
-				
-				//get 3 member discounts
-				byte mdist_1 = response.body[offset];
-				byte mdist_2 = response.body[offset + 1];
-				byte mdist_3 = response.body[offset + 2];
-				offset += 3;
-				
 				//get the length of the kitchen name
 				int lenOfKitchenName = response.body[offset];
 				offset++;
@@ -248,44 +239,96 @@ public class RespQueryMenuParser {
 				
 				//add the kitchen
 				kitchens[i] = new Kitchen(0, kitchenName, 0, kitchenAlias, Kitchen.TYPE_NORMAL, 
-										  new Department(null, deptAlias, 0, Department.TYPE_NORMAL),
-										  dist_1, dist_2, dist_3,
-										  mdist_1, mdist_2, mdist_3);
+										  new Department(null, deptAlias, 0, Department.TYPE_NORMAL));
 			}
 			
-			//get the amount of super kitchens
+			//get the amount of departments
 			int nDept = response.body[offset] & 0x000000FF;
 			offset++;
-			//allocate the memory for super kitchens
+			//allocate the memory for departments
 			Department[] depts = new Department[nDept];
-			//get each super kitchen's information
+			//get each department's information
 			for(int i = 0; i < depts.length; i++){
 				//get the alias id to department
 				short deptID = (short)(response.body[offset] & 0x00FF);
 				offset++;
 				
-				//get the length of the department name
+				//get the length of department name
 				int lenOfDeptName = response.body[offset];
 				offset++;
 				
-				//get the value of super department name
+				//get the value of department name
 				String deptName = null;
 				try{
 					deptName = new String(response.body, offset, lenOfDeptName, "UTF-16BE");
 				}catch(UnsupportedEncodingException e){}
-				offset += lenOfDeptName;
-				
-//				offset += 1 + 				/* dept_id(1-byte) */
-//						  1 + 				/* length to department name */
-//						  deptLen;			/* the value to department name */
+				offset += lenOfDeptName;				
 				
 				depts[i] = new Department(deptName, deptID, 0, Department.TYPE_NORMAL);
 			}	
 			
-			return new FoodMenu(foods, tastes, styles, specs, kitchens, depts);
+			//get the amount of discount
+			int nDiscount = response.body[offset] & 0x000000FF;
+			offset++;
+			//allocate the memory for discounts
+			Discount[] discounts = new Discount[nDiscount];
+			//get each discount's information
+			for(int i = 0; i < discounts.length; i++){
+				discounts[i] = new Discount();
+				//get the discount id
+				discounts[i].discountID = ((response.body[offset] & 0x000000FF) |
+						 				  ((response.body[offset + 1] & 0x000000FF) << 8) |
+						 				  ((response.body[offset + 2] & 0x000000FF) << 16)|
+						 				  ((response.body[offset + 3] & 0x000000FF) << 24));
+				offset += 4;
+				
+				//get the length of discount name
+				int lenOfDistName = response.body[offset];
+				offset++;
+				
+				//get the value of discount name
+				try{
+					discounts[i].name = new String(response.body, offset, lenOfDistName, "UTF-16BE");
+				}catch(UnsupportedEncodingException e){}
+				offset += lenOfDistName;
+				
+				//get the level to this discount
+				discounts[i].level = ((response.body[offset] & 0x000000FF) |
+		 				  			 ((response.body[offset + 1] & 0x000000FF) << 8)) & 0x0000FFFF;
+				offset += 2;
+				
+				//get the status to this discount
+				discounts[i].status = response.body[offset];
+				offset++;
+				
+				//get the amount of discount plan
+				int nDistPlan = response.body[offset];
+				offset++;
+				
+				//allocate the memory for discount plan
+				discounts[i].plans = new DiscountPlan[nDistPlan];
+				
+				//get value to each discount plan
+				for(int j = 0; j < discounts[i].plans.length; j++){
+					
+					//get the kitchen alias
+					Kitchen kitchen = new Kitchen();
+					kitchen.aliasID = response.body[offset];
+					offset++;
+					
+					//get the discount rate associated with this kitchen
+					int rate = response.body[offset];
+					offset++;
+					
+					discounts[i].plans[j] = new DiscountPlan(kitchen, rate);
+				}
+				
+			}
+			
+			return new FoodMenu(foods, tastes, styles, specs, kitchens, depts, discounts);
 			
 		}else{
-			return new FoodMenu(new Food[0], new Taste[0], new Taste[0], new Taste[0], new Kitchen[0], new Department[0]);
+			return new FoodMenu(new Food[0], new Taste[0], new Taste[0], new Taste[0], new Kitchen[0], new Department[0], new Discount[0]);
 		}
 	}
 	

@@ -29,60 +29,6 @@ public final class Kitchen {
 	public final static short KITCHEN_19 = 18;
 	public final static short KITCHEN_20 = 19;	
 
-	int discount_1 = 100;	
-	int discount_2 = 100;
-	int discount_3 = 100;
-	int memberDist_1 = 100;
-	int memberDist_2 = 100;
-	int memberDist_3 = 100;
-	
-	public Float getDist1(){
-		return Util.int2Float(discount_1);
-	}
-	
-	public void setDist1(Float distVal){
-		discount_1 = Util.float2Int(distVal);
-	}
-	
-	public Float getDist2(){
-		return Util.int2Float(discount_2);
-	}
-	
-	public void setDist2(Float distVal){
-		discount_2 = Util.float2Int(distVal);
-	}
-	
-	public Float getDist3(){
-		return Util.int2Float(discount_3);
-	}
-	
-	public void setDist3(Float distVal){
-		discount_3 = Util.float2Int(distVal);
-	}
-	
-	public Float getMemDist1(){
-		return Util.int2Float(memberDist_1);
-	}
-	
-	public void setMemDist1(Float distVal){
-		memberDist_1 = Util.float2Int(distVal);
-	}
-	
-	public Float getMemDist2(){
-		return Util.int2Float(memberDist_2);
-	}
-	
-	public void setMemDist2(Float distVal){
-		memberDist_2 = Util.float2Int(distVal);
-	}
-	
-	public Float getMemDist3(){
-		return Util.int2Float(memberDist_3);
-	}
-	
-	public void setMemDist3(Float distVal){
-		memberDist_3 = Util.float2Int(distVal);
-	}
 	//the type to this kitchen
 	public short type = TYPE_NORMAL;	
 	//the name to this kitchen
@@ -118,18 +64,6 @@ public final class Kitchen {
 	
 	public boolean isReserved(){
 		return type == TYPE_RESERVED;
-	}
-	
-	public Kitchen(int restaurantID, String kitchenName, long kitchenID, short kitchenAlias, short type,
-				   Department dept, byte dist1, byte dist2, byte dist3, byte memDist1, byte memDist2, byte memDist3){
-		this(restaurantID, kitchenName, kitchenID, kitchenAlias, type, dept);
-		discount_1 = dist1;
-		discount_2 = dist2;
-		discount_3 = dist3;
-		memberDist_1 = memDist1;
-		memberDist_2 = memDist2;
-		memberDist_3 = memDist3;
-		this.type = type;
 	}
 	
 	public boolean equals(Object obj){

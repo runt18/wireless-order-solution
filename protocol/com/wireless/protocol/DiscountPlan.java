@@ -8,6 +8,11 @@ public class DiscountPlan {
 		kitchen = new Kitchen();
 	}
 	
+	DiscountPlan(Kitchen kitchen, int rate){
+		this.kitchen = kitchen;
+		this.rate = rate;
+	}
+	
 	public DiscountPlan(Kitchen kitchen, Float rate){
 		this.kitchen = kitchen;
 		this.rate = Util.float2Int(rate);

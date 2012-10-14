@@ -22,10 +22,27 @@ public class OrderFood extends Food {
 	 * The value of discount ranges from 0.00 through 1.00
 	 * So the real price should be divided 100 at last. 
 	 */
-	int discount = 100;	//the discount to this food 
+	private int discount = 100;	//the discount to this food 
+	
+	/**
+	 * Set the discount for internal.
+	 * @param discount the discount to set
+	 */
+	public void setDiscountInternal(int discount){
+		//The discount remains as before in case of temporary, gift or special
+		if(isTemporary || isGift() || isSpecial()){
+			//this.discount = 100;
+		}else{
+			this.discount = discount;
+		}
+	}
+	
+	public int getDiscountInternal(){
+		return discount;
+	}
 	
 	public void setDiscount(Float discount){
-		this.discount = Util.float2Int(discount);
+		setDiscountInternal(Util.float2Int(discount));
 	}
 	
 	public Float getDiscount(){
