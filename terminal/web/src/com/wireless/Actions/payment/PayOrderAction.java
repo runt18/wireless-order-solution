@@ -11,6 +11,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import com.wireless.protocol.Discount;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.PinGen;
@@ -100,9 +101,9 @@ public class PayOrderAction extends Action implements PinGen{
 			}
 			
 			if(request.getParameter("discountType") != null){
-				orderToPay.discount_type = Integer.parseInt(request.getParameter("discountType"));				
+				orderToPay.setDiscount(new Discount(Integer.parseInt(request.getParameter("discountType"))));				
 			}else{
-				orderToPay.discount_type = Order.DISCOUNT_1;
+				orderToPay.setDiscount(new Discount());
 			}
 			
 			if(request.getParameter("payManner") != null){

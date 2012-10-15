@@ -15,6 +15,7 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.UpdateOrder;
 import com.wireless.db.payment.PayOrder;
 import com.wireless.exception.BusinessException;
+import com.wireless.protocol.Discount;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.Terminal;
@@ -93,7 +94,7 @@ public class UpdateOrderAction2 extends Action{
 			//get the pay type to this order
 			orderToUpdate.pay_type = Integer.parseInt(request.getParameter("payType"));	
 			//get the discount type to this order
-			orderToUpdate.discount_type = Integer.parseInt(request.getParameter("discountType"));
+			orderToUpdate.setDiscount(new Discount(Integer.parseInt(request.getParameter("discountID"))));
 			//get the pay manner to this order
 			orderToUpdate.pay_manner = Integer.parseInt(request.getParameter("payManner"));
 			//get the service rate to this order
