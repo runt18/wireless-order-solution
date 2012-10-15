@@ -38,7 +38,7 @@ public class InsertDiscountAction extends Action{
 			pojo.setName(discountName.trim());
 			pojo.setRestaurantID(Integer.valueOf(resturantID));
 			pojo.setLevel(Integer.valueOf(level));
-			pojo.setIsDefault(Boolean.valueOf(isDefault));
+			pojo.setDefault(Boolean.valueOf(isDefault));
 			
 			DiscountPlanPojo plan = null;
 			
