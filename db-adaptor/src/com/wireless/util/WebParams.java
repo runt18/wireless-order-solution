@@ -19,14 +19,7 @@ public class WebParams {
 	 */
 	public static final int PAY_NORMAL = Order.PAY_NORMAL;
 	public static final int PAY_MEMBER = Order.PAY_MEMBER;
-
-	/**
-	 * The discount type is as below
-	 */
-//	public static final int DISCOUNT_1 = Order.DISCOUNT_1;
-//	public static final int DISCOUNT_2 = Order.DISCOUNT_2;
-//	public static final int DISCOUNT_3 = Order.DISCOUNT_3;
-
+	
 	/**
 	 * The pay manner is as below
 	 */

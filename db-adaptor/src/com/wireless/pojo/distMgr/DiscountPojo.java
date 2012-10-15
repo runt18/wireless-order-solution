@@ -14,6 +14,7 @@ public class DiscountPojo {
 	private int id;
 	private int restaurantID;
 	private int level;
+	private int status = Discount.NORMAL;
 	private List<DiscountPlan> plans;
 	
 	public DiscountPojo(){
@@ -21,11 +22,12 @@ public class DiscountPojo {
 	}
 	
 	public DiscountPojo(Discount discount){
-		name = discount.name;
-		id = discount.discountID;
-		restaurantID = discount.restaurantID;
-		level = discount.level;
-		plans = new ArrayList<DiscountPlan>(Arrays.asList(discount.plans));
+		this.name = discount.name;
+		this.id = discount.discountID;
+		this.restaurantID = discount.restaurantID;
+		this.level = discount.level;
+		this.status = discount.status;
+		this.plans = new ArrayList<DiscountPlan>(Arrays.asList(discount.plans));
 	}
 	
 	public Discount toProtocol(){
@@ -35,50 +37,53 @@ public class DiscountPojo {
 		dist.restaurantID = restaurantID;
 		dist.plans = plans.toArray(new DiscountPlan[plans.size()]);
 		dist.level = level;
+		dist.status = status;
 		return dist;
 	}
 	
 	public String getName(){
 		return name;
 	}
-	
 	public void setName(String name){
 		this.name = name;
 	}
-	
 	public int getId(){
 		return id;
 	}
-	
 	public void setId(int id){
 		this.id = id; 
 	}
-	
 	public int getRestaurantID(){
 		return restaurantID;
 	}
-	
 	public void setRestaurantID(int restId){
 		this.restaurantID = restId;
 	}
-	
 	public int getLevel(){
 		return level;
 	}
-	
 	public void setLevel(int level){
 		this.level = level;
 	}
-	
 	public void addPlan(DiscountPlan plan){
 		plans.add(plan);
 	}
-	
+	public int getStatus() {
+		return status;
+	}
+	public void setStatus(int status) {
+		this.status = status;
+	}
 	public List<DiscountPlan> getPlans(){
 		return plans;
 	}
-	
 	public void setPlans(List<DiscountPlan> plan){
 		this.plans = plan;
+	}
+	public void setIsDefault(boolean isDefault){
+		this.status = isDefault ? Discount.DEFAULT : this.status;
+	}
+	public boolean isDefault(){
+		return this.status == Discount.DEFAULT;
 	}
 }

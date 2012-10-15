@@ -10,6 +10,7 @@ import com.wireless.db.QueryMenu;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.distMgr.DiscountPlanPojo;
 import com.wireless.pojo.distMgr.DiscountPojo;
+import com.wireless.protocol.Discount;
 import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Terminal;
 
@@ -56,7 +57,7 @@ public class QueryDiscountDao {
 	public static DiscountPojo[] execPureDiscount(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
 		String sql;
 		sql = " SELECT " +
-			  " DIST.discount_id, DIST.restaurant_id, DIST.name AS dist_name, DIST.level " +
+			  " DIST.discount_id, DIST.restaurant_id, DIST.name AS dist_name, DIST.level, DIST.status " +
 			  " FROM " +  Params.dbName + ".discount DIST " +
 			  " WHERE 1=1 " +
 			  " AND DIST.restaurant_id = " + term.restaurantID +
@@ -70,11 +71,11 @@ public class QueryDiscountDao {
 			distPojo.setName(dbCon.rs.getString("dist_name"));
 			distPojo.setLevel(dbCon.rs.getInt("level"));
 			distPojo.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
+			distPojo.setStatus(dbCon.rs.getInt("status"));
 			pureDiscounts.add(distPojo);
 		}
 		
 		return pureDiscounts.toArray(new DiscountPojo[pureDiscounts.size()]);
-		
 	}
 	
 	/**
@@ -91,7 +92,7 @@ public class QueryDiscountDao {
 		try{
 			dbCon.connect();
 			
-			String selectSQL = "SELECT A.dist_plan_id, A.rate, B.discount_id,  B.name as discount_name, B.restaurant_id, B.level, K.kitchen_id, K.name as kitchen_name "
+			String selectSQL = "SELECT A.dist_plan_id, A.rate, B.discount_id, B.name as discount_name, B.restaurant_id, B.level, B.status, K.kitchen_id, K.name as kitchen_name "
 							+ " FROM " +  Params.dbName + ".discount_plan A LEFT JOIN " +  Params.dbName + ".kitchen K ON A.kitchen_id = K.kitchen_id, " +  Params.dbName + ".discount B "
 							+ " WHERE A.discount_id = B.discount_id "
 							+ (extraCond == null ? "" : extraCond) 
@@ -110,6 +111,7 @@ public class QueryDiscountDao {
 				item.getDiscount().setName(dbCon.rs.getString("discount_name"));
 				item.getDiscount().setRestaurantID(dbCon.rs.getInt("restaurant_id"));
 				item.getDiscount().setLevel(dbCon.rs.getInt("level"));
+				item.getDiscount().setStatus(dbCon.rs.getInt("status"));
 				
 				item.getKitchen().setKitchenID(dbCon.rs.getInt("kitchen_id"));
 				item.getKitchen().setKitchenName(dbCon.rs.getString("kitchen_name"));
@@ -137,9 +139,14 @@ public class QueryDiscountDao {
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
 			
+			// 取消原默认方案
+			if(pojo.isDefault()){
+				dbCon.stmt.executeUpdate("UPDATE " +  Params.dbName + ".discount SET status = 0 WHERE status = " + Discount.DEFAULT + " AND restaurant_id = " + pojo.getRestaurantID());
+			}
+			
 			String insertSQL = "INSERT INTO " +  Params.dbName + ".discount " 
-							+ " (restaurant_id, name, level)"
-							+ " values(" + pojo.getRestaurantID() + ",'" + pojo.getName() + "'," + pojo.getLevel()+ ")";
+							+ " (restaurant_id, name, level, status)"
+							+ " values(" + pojo.getRestaurantID() + ",'" + pojo.getName() + "'," + pojo.getLevel()+ "," + pojo.getStatus() + ")";
 			dbCon.stmt.executeUpdate(insertSQL);
 			
 			// 获得新方案数据编号
@@ -159,7 +166,7 @@ public class QueryDiscountDao {
 					 insertSQL += " values";
 					 for(int i = 0; i < kl.length; i++){
 						 insertSQL += ( i > 0 ? "," : "");
-						 insertSQL += ("("+discountID+","+kl[i].kitchenID+","+plan.getRate()+")");
+						 insertSQL += ("(" + discountID + "," + kl[i].kitchenID + "," + plan.getRate() + ")");
 					 }
 					 dbCon.stmt.executeUpdate(insertSQL);
 				 }
@@ -182,16 +189,24 @@ public class QueryDiscountDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			
+			// 取消原默认方案
+			if(pojo.isDefault()){
+				dbCon.stmt.executeUpdate("UPDATE " +  Params.dbName + ".discount SET status = 0 WHERE status = " + Discount.DEFAULT + " AND restaurant_id = " + pojo.getRestaurantID());
+			}
 			
 			String updateSQL = "UPDATE " +  Params.dbName + ".discount SET "
 							+ " name = '" + pojo.getName() + "'"
 							+ " ,level = " + pojo.getLevel()
+							+ " ,status = " + pojo.getStatus()
 							+ " WHERE restaurant_id = " + pojo.getRestaurantID() + " AND discount_id = " + pojo.getId();
 			
 			if(dbCon.stmt.executeUpdate(updateSQL) == 0){
 				throw new Exception("操作失败, 找不到该记录原信息.");
 			}
 			
+			dbCon.conn.commit();
 		}catch(Exception e){
 			throw e;
 		}finally{
@@ -217,7 +232,6 @@ public class QueryDiscountDao {
 			
 			String deleteSQL = "DELETE FROM " +  Params.dbName + ".discount " + " WHERE restaurant_id = " + pojo.getRestaurantID() + " AND discount_id = " + pojo.getId();
 			dbCon.stmt.executeUpdate(deleteSQL);
-			
 		}catch(Exception e){
 			throw e;
 		}finally{
@@ -269,7 +283,6 @@ public class QueryDiscountDao {
 			if(dbCon.stmt.executeUpdate(updateSQL) == 0){
 				throw new Exception();
 			}
-			
 		}catch(Exception e){
 			throw e;
 		}finally{
@@ -291,7 +304,6 @@ public class QueryDiscountDao {
 			if(dbCon.stmt.executeUpdate(deleteSQL) == 0){
 				throw new Exception();
 			}
-			
 		}catch(Exception e){
 			throw e;
 		}finally{
