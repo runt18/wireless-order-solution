@@ -36,10 +36,10 @@ var basicOperationPanel = new Ext.Panel({
 		 	    	    	allowBlank : false,
 		 	    	    	width : 100,
 		 	    	    	validator : function(v){
-		 	    	    		if(v > 0 && v <= 65535){
+		 	    	    		if(v > 0 && v <= 65535 && v.indexOf('.') == -1){
 		 	    	    			return true;
 		 	    	    		}else{
-		 	    	    			return '编号需在 1  至 65535 之间!';
+		 	    	    			return '编号需在 1  至 65535 之间,且为整数!';
 		 	    	    		}
 		 	    	    	}
 		 	    	    }]
@@ -174,9 +174,7 @@ var basicOperationPanel = new Ext.Panel({
 		 	        	},
 		 	        	listeners : {
 		 	        		render : function(){
-//		 	        			Ext.getDom('foodBasicImg').ondblclick = function(){
-//		 	        				Ext.getDom('txtImgFile').click();
-//		 	        			};
+		 	        			
 		 	        		}
 		 	        	}
 		 	    	}), {
@@ -458,10 +456,16 @@ basicOperationBasicHandler = function(c){
 				if(c.type == mmObj.operation.insert){
 					Ext.Msg.confirm(jr.titile, jr.msg + '\n是否继续添加?', function(e){
 						if(e == 'yes'){
+							var faid = foodAliasID.getValue();
+							var kaid = foodKitchenAlias.getValue();	
+							
 							resetbBasicOperation();
 							Ext.getCmp('combinationFoodGrid').getStore().removeAll();
 							Ext.getCmp('txtMiniAllFoodNameSearch').setValue('');
 							Ext.getCmp('btnSearchForAllFoodMiniGridTbar').handler();
+							
+							foodAliasID.setValue(parseInt(faid+1));
+							foodKitchenAlias.setValue(kaid);
 						}else{
 							Ext.getCmp('foodOperationWin').hide();
 						}

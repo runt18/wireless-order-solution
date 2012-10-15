@@ -84,5 +84,15 @@
 			}
 		});
 	});
+	
+	$("#discountMgr").each(function() {
+		$(this).bind("click", function() {
+			if (!isPrompt) {
+				location.href = "DiscountManagement.html?pin="
+					+ currPin + "&restaurantID="
+					+ restaurantID;
+			}
+		});
+	});
 
 };

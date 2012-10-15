@@ -2,7 +2,7 @@
 function URLParaQuery() {
 	var name, value, i;
 	var str = location.href;
-	var num = str.indexOf("?")
+	var num = str.indexOf("?");
 	str = str.substr(num + 1);
 	var arrtmp = str.split("&");
 	for (i = 0; i < arrtmp.length; i++) {

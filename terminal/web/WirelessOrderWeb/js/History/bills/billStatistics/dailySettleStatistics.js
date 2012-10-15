@@ -13,35 +13,46 @@ var dailySettleCheckDetpStore = new Ext.data.Store({
 	} ])
 });
 
-// shiftCheckDetpStore.reload();
-
 // 2，栏位模型
 var dailySettleCheckDetpColumnModel = new Ext.grid.ColumnModel([
-		new Ext.grid.RowNumberer(), {
-			header : "部门",
-			sortable : true,
-			dataIndex : "deptName",
-			width : 100
-		}, {
-			header : "折扣",
-			sortable : true,
-			dataIndex : "discount",
-			width : 100
-		}, {
-			header : "赠送",
-			sortable : true,
-			dataIndex : "gift",
-			width : 100
-		}, {
-			header : "金额",
-			sortable : true,
-			dataIndex : "amount",
-			width : 100
-		} ]);
+	new Ext.grid.RowNumberer(), 
+	{
+		header : "部门",
+		sortable : true,
+		dataIndex : "deptName",
+		width : 100
+	}, {
+		header : "折扣",
+		sortable : true,
+		dataIndex : "discount",
+		width : 100,
+		align : 'right',
+		renderer : function(val){
+			return val.toFixed(2);
+		}
+	}, {
+		header : "赠送",
+		sortable : true,
+		dataIndex : "gift",
+		width : 100,
+		align : 'right',
+		renderer : function(val){
+			return val.toFixed(2);
+		}
+	}, {
+		header : "金额",
+		sortable : true,
+		dataIndex : "amount",
+		width : 100,
+		align : 'right',
+		renderer : function(val){
+			return val.toFixed(2);
+		}
+	} 
+]);
 
 // 3,表格
 var dailySettleCheckDetpGrid = new Ext.grid.GridPanel({
-	// title : "已点菜",
 	border : false,
 	layout : "fit",
 	ds : dailySettleCheckDetpStore,
@@ -66,6 +77,7 @@ var dailySettleCheckTablePanel = new Ext.Panel({
 	frame : true,
 	region : "north",
 	height : 415,
+//	bodyStyle : 'backgroundColor:#FFFFFF;',
 	items : [ {
 		border : false,
 		contentEl : "shiftCheckTableDiv"
@@ -124,8 +136,8 @@ var dailySettleCheckTableWin = new Ext.Window({
 // -----------------------------------------------------------------------------
 dailySettleStatWin = new Ext.Window({
 	title : "日结记录",
-	width : 450,
-	height : 101,
+	width : 430,
+	height : 100,
 //	closeAction : "hide",
 	resizable : false,
 	modal:true,
@@ -170,49 +182,42 @@ dailySettleStatWin = new Ext.Window({
 			} ]
 		} ]
 	} ],
-	buttons : [
-
-			{
-				text : "确定",
-				handler : function() {
-
-					isPrompt = false;
-					dailySettleStatWin.hide();
-
-					// 保存条件
-					var dateFormated = new Date();
-					begDateMStatDailySettle = dailySettleStatWin.findById(
-							"begDateMStatDailySettle").getValue();
-					if (begDateMStatDailySettle != "") {
-						dateFormated = begDateMStatDailySettle;
-						begDateMStatDailySettle = dateFormated.format('Y-m-d');
-						begDateMStatDailySettle = begDateMStatDailySettle + " 00:00:00";
-					}
-
-					endDateMStatDailySettle = dailySettleStatWin.findById(
-							"endDateMStatDailySettle").getValue();
-					if (endDateMStatDailySettle != "") {
-						dateFormated = endDateMStatDailySettle;
-						endDateMStatDailySettle = dateFormated.format('Y-m-d');
-						endDateMStatDailySettle = endDateMStatDailySettle + " 23:59:59";
-					}
-
-					isPrompt = true;
-					dailySettleStatResultWin.show();
-
-				}
-			}, {
-				text : "取消",
-				handler : function() {
-					isPrompt = false;
-					dailySettleStatWin.hide();
-				}
-			} ],
+	buttons : [{
+		text : "确定",
+		handler : function() {
+			isPrompt = false;
+			dailySettleStatWin.hide();
+			
+			// 保存条件
+			var dateFormated = new Date();
+			begDateMStatDailySettle = dailySettleStatWin.findById("begDateMStatDailySettle").getValue();
+			if(begDateMStatDailySettle != ""){
+				dateFormated = begDateMStatDailySettle;
+				begDateMStatDailySettle = dateFormated.format('Y-m-d');
+				begDateMStatDailySettle = begDateMStatDailySettle + " 00:00:00";
+			}
+			
+			endDateMStatDailySettle = dailySettleStatWin.findById("endDateMStatDailySettle").getValue();
+			if(endDateMStatDailySettle != ""){
+				dateFormated = endDateMStatDailySettle;
+				endDateMStatDailySettle = dateFormated.format('Y-m-d');
+				endDateMStatDailySettle = endDateMStatDailySettle + " 23:59:59";
+			}
+			
+			isPrompt = true;
+			dailySettleStatResultWin.show();
+		}
+	}, {
+		text : "取消",
+		handler : function() {
+			isPrompt = false;
+			dailySettleStatWin.hide();
+		}
+	} ],
 	listeners : {
 		"show" : function(thiz) {
-
-			dailySettleStatWin.findById("begDateMStatDailySettle").setValue("");
-			dailySettleStatWin.findById("endDateMStatDailySettle").setValue("");
+			Ext.getCmp("begDateMStatDailySettle").setValue("");
+			Ext.getCmp("endDateMStatDailySettle").setValue("");
 
 		}
 	}
@@ -247,121 +252,114 @@ function dailySettleStatDetalHandler(rowIndex) {
 	var onDuty = dailySettleStatResultStore.getAt(rowIndex).get("beginTime");
 	var offDuty = dailySettleStatResultStore.getAt(rowIndex).get("endTime");
 
-	Ext.Ajax
-			.request({
-				url : "../../dailySettleStatDetail.do",
-				params : {
-					"pin" : pin,
-					"onDuty" : onDuty,
-					"offDuty" : offDuty
-				},
-				success : function(response, options) {
-					var resultJSON = Ext.util.JSON
-							.decode(response.responseText);
-					// 
-					var rootData = resultJSON.root;
-					if (rootData[0].message == "normal") {
-						
-						document.getElementById("shiftTitle").innerHTML = "日结表";
-						document.getElementById("shiftOperator").innerHTML = dailySettleStatResultStore
-								.getAt(rowIndex).get("staff");
-						document.getElementById("shiftBillCount").innerHTML = rootData[0].allBillCount;
-						document.getElementById("shiftStartTime").innerHTML = onDuty;
-						document.getElementById("shiftEndTime").innerHTML = offDuty;
+	Ext.Ajax.request({
+		url : "../../dailySettleStatDetail.do",
+		params : {
+			"pin" : pin,
+			"onDuty" : onDuty,
+			"offDuty" : offDuty
+		},
+		success : function(response, options) {
+			var resultJSON = Ext.util.JSON.decode(response.responseText);
+			
+			var rootData = resultJSON.root;
+			if (rootData[0].message == "normal") {
+				document.getElementById("shiftTitle").innerHTML = "日结表";
+				document.getElementById("shiftOperator").innerHTML = dailySettleStatResultStore.getAt(rowIndex).get("staff");
+				document.getElementById("shiftBillCount").innerHTML = rootData[0].allBillCount;
+				document.getElementById("shiftStartTime").innerHTML = onDuty;
+				document.getElementById("shiftEndTime").innerHTML = offDuty;
 
-						// 現金
-						document.getElementById("billCount1").innerHTML = rootData[0].cashBillCount;
-						document.getElementById("amount1").innerHTML = rootData[0].cashAmount;
-						document.getElementById("actual1").innerHTML = rootData[0].cashActual;
+				// 現金
+				document.getElementById("billCount1").innerHTML = rootData[0].cashBillCount;
+				document.getElementById("amount1").innerHTML = rootData[0].cashAmount.toFixed(2);
+				document.getElementById("actual1").innerHTML = rootData[0].cashActual.toFixed(2);
 
-						// 刷卡
-						document.getElementById("billCount2").innerHTML = rootData[0].creditBillCount;
-						document.getElementById("amount2").innerHTML = rootData[0].creditAmount;
-						document.getElementById("actual2").innerHTML = rootData[0].creditActual;
+				// 刷卡
+				document.getElementById("billCount2").innerHTML = rootData[0].creditBillCount;
+				document.getElementById("amount2").innerHTML = rootData[0].creditAmount.toFixed(2);
+				document.getElementById("actual2").innerHTML = rootData[0].creditActual.toFixed(2);
 
-						// 會員卡
-						document.getElementById("billCount3").innerHTML = rootData[0].memberBillCount;
-						document.getElementById("amount3").innerHTML = rootData[0].memberAmount;
-						document.getElementById("actual3").innerHTML = rootData[0].memberActual;
+				// 會員卡
+				document.getElementById("billCount3").innerHTML = rootData[0].memberBillCount;
+				document.getElementById("amount3").innerHTML = rootData[0].memberAmount.toFixed(2);
+				document.getElementById("actual3").innerHTML = rootData[0].memberActual.toFixed(2);
 
-						// 簽單
-						document.getElementById("billCount4").innerHTML = rootData[0].signBillCount;
-						document.getElementById("amount4").innerHTML = rootData[0].signAmount;
-						document.getElementById("actual4").innerHTML = rootData[0].signActual;
+				// 簽單
+				document.getElementById("billCount4").innerHTML = rootData[0].signBillCount;
+				document.getElementById("amount4").innerHTML = rootData[0].signAmount.toFixed(2);
+				document.getElementById("actual4").innerHTML = rootData[0].signActual.toFixed(2);
 
-						// 掛賬
-						document.getElementById("billCount5").innerHTML = rootData[0].hangBillCount;
-						document.getElementById("amount5").innerHTML = rootData[0].hangAmount;
-						document.getElementById("actual5").innerHTML = rootData[0].hangActual;
+				// 掛賬
+				document.getElementById("billCount5").innerHTML = rootData[0].hangBillCount;
+				document.getElementById("amount5").innerHTML = rootData[0].hangAmount.toFixed(2);
+				document.getElementById("actual5").innerHTML = rootData[0].hangActual.toFixed(2);
 
-						// 合計
-						var sumAmout = rootData[0].cashAmount
-								+ rootData[0].creditAmount
-								+ rootData[0].memberAmount
-								+ rootData[0].signAmount
-								+ rootData[0].hangAmount;
-						var sumActual = rootData[0].cashActual
-								+ rootData[0].creditActual
-								+ rootData[0].memberActual
-								+ rootData[0].signActual
-								+ rootData[0].hangActual;
-						document.getElementById("amountSum").innerHTML = sumAmout
-								.toFixed(2);
-						document.getElementById("actualSum").innerHTML = sumActual
-								.toFixed(2);
-
-						// --------------
-						// 折扣
-						document.getElementById("discountAmount").innerHTML = rootData[0].discountAmount;
-						document.getElementById("discountBillCount").innerHTML = rootData[0].discountBillCount;
-
-						// 赠送
-						document.getElementById("giftAmount").innerHTML = rootData[0].giftAmount;
-						document.getElementById("giftBillCount").innerHTML = rootData[0].giftBillCount;
-
-						// 退菜
-						document.getElementById("returnAmount").innerHTML = rootData[0].returnAmount;
-						document.getElementById("returnBillCount").innerHTML = rootData[0].returnBillCount;
-
-						// 反结帐
-						document.getElementById("repayAmount").innerHTML = rootData[0].repayAmount;
-						document.getElementById("repayBillCount").innerHTML = rootData[0].repayBillCount;
-
-						// 服务费
-						document.getElementById("serviceAmount").innerHTML = rootData[0].serviceAmount;
-						// document.getElementById("serviceBillCount").innerHTML
-						// = rootData[0].serviceBillCount;
-
-						dailySettleCheckDetpData.length = 0;
-						var deptInfos = rootData[0].deptInfos;
-						for ( var i = 0; i < deptInfos.length; i++) {
-							dailySettleCheckDetpData.push([ deptInfos[i].deptName,
-									deptInfos[i].deptDiscount,
-									deptInfos[i].deptGift,
-									deptInfos[i].deptAmount ]);
-						}
-
-						dailySettleCheckDetpStore.reload();
-
-					} else {
-						Ext.MessageBox.show({
-							msg : rootData[0].message,
-							width : 300,
-							buttons : Ext.MessageBox.OK
-						});
-					}
-				},
-				failure : function(response, options) {
-					Ext.MessageBox.show({
-						msg : " Unknown page error ",
-						width : 300,
-						buttons : Ext.MessageBox.OK
-					});
+				// 合計
+				var sumAmout = rootData[0].cashAmount
+						+ rootData[0].creditAmount
+						+ rootData[0].memberAmount
+						+ rootData[0].signAmount
+						+ rootData[0].hangAmount;
+				var sumActual = rootData[0].cashActual
+						+ rootData[0].creditActual
+						+ rootData[0].memberActual
+						+ rootData[0].signActual
+						+ rootData[0].hangActual;
+				document.getElementById("billCountSum").innerHTML = rootData[0].allBillCount;
+				document.getElementById("amountSum").innerHTML = sumAmout.toFixed(2);
+				document.getElementById("actualSum").innerHTML = sumActual.toFixed(2);
+				
+				// 折扣
+				document.getElementById("discountAmount").innerHTML = rootData[0].discountAmount.toFixed(2);
+				document.getElementById("discountBillCount").innerHTML = rootData[0].discountBillCount;
+				
+				// 赠送
+				document.getElementById("giftAmount").innerHTML = rootData[0].giftAmount.toFixed(2);
+				document.getElementById("giftBillCount").innerHTML = rootData[0].giftBillCount;
+				
+				// 退菜
+				document.getElementById("returnAmount").innerHTML = rootData[0].returnAmount.toFixed(2);
+				document.getElementById("returnBillCount").innerHTML = rootData[0].returnBillCount;
+				
+				// 反结帐
+				document.getElementById("repayAmount").innerHTML = rootData[0].repayAmount.toFixed(2);
+				document.getElementById("repayBillCount").innerHTML = rootData[0].repayBillCount;
+				
+				// 服务费
+				document.getElementById("serviceAmount").innerHTML = rootData[0].serviceAmount.toFixed(2);
+				// document.getElementById("serviceBillCount").innerHTML = rootData[0].serviceBillCount;
+				
+				dailySettleCheckDetpData.length = 0;
+				var deptInfos = rootData[0].deptInfos;
+				for ( var i = 0; i < deptInfos.length; i++) {
+					dailySettleCheckDetpData.push([
+					    deptInfos[i].deptName,
+						deptInfos[i].deptDiscount,
+						deptInfos[i].deptGift,
+						deptInfos[i].deptAmount 
+					]);
 				}
+
+				dailySettleCheckDetpStore.reload();
+
+			} else {
+				Ext.MessageBox.show({
+					msg : rootData[0].message,
+					width : 300,
+					buttons : Ext.MessageBox.OK
+				});
+			}
+		},
+		failure : function(response, options) {
+			Ext.MessageBox.show({
+				msg : " Unknown page error ",
+				width : 300,
+				buttons : Ext.MessageBox.OK
 			});
-
+		}
+	});
 	dailySettleCheckTableWin.show();
-
 };
 
 function dailySettleStatPrintHandler(rowIndex) {
@@ -384,9 +382,9 @@ function dailySettleStatPrintHandler(rowIndex) {
 				width : 300,
 				buttons : Ext.MessageBox.OK
 			});
-
 		},
-		failure : function(response, options) {
+		failure : function(response, options){
+			
 		}
 	});
 };
@@ -400,32 +398,32 @@ function dailySettleStatOpt(value, cellmeta, record, rowIndex, columnIndex, stor
 };
 
 var dailySettleStatResultColumnModel = new Ext.grid.ColumnModel([
-		new Ext.grid.RowNumberer(), {
-			header : "操作人",
-			sortable : true,
-			dataIndex : "staff",
-			width : 80
-		}, {
-			header : "开始时间",
-			sortable : true,
-			dataIndex : "beginTime",
-			width : 120
-		}, {
-			header : "结束时间",
-			sortable : true,
-			dataIndex : "endTime",
-			width : 120
-		}, {
-			header : "<center>操作</center>",
-			sortable : true,
-			dataIndex : "operator",
-			width : 230,
-			renderer : dailySettleStatOpt
-		} ]);
+	new Ext.grid.RowNumberer(), {
+		header : "操作人",
+		sortable : true,
+		dataIndex : "staff",
+		width : 80
+	}, {
+		header : "开始时间",
+		sortable : true,
+		dataIndex : "beginTime",
+		width : 120
+	}, {
+		header : "结束时间",
+		sortable : true,
+		dataIndex : "endTime",
+		width : 120
+	}, {
+		header : "<center>操作</center>",
+		sortable : true,
+		dataIndex : "operator",
+		width : 230,
+		renderer : dailySettleStatOpt
+	} 
+]);
 
 var dailySettleStatResultGrid = new Ext.grid.GridPanel({
 	xtype : "grid",
-	anchor : "99%",
 	border : false,
 	ds : dailySettleStatResultStore,
 	cm : dailySettleStatResultColumnModel,
@@ -483,7 +481,7 @@ dailySettleStatResultGrid.getStore().on('load', function() {
 dailySettleStatResultWin = new Ext.Window({
 	title : "统计结果",
 	width : 800,
-	height : 370,
+	height : 390,
 //	closeAction : "hide",
 	resizable : false,
 	modal:true,

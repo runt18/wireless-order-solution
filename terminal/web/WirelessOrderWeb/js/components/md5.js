@@ -473,7 +473,7 @@ function binl2b64(binarray) {
 }
 String.prototype.trim = function() {
 	return this.replace(/(^\s*)|(\s*$)/g, "");
-}
+};
 var lastInput;
 function md5(text) {
 	text = text.trim();

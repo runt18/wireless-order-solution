@@ -85,6 +85,9 @@ var checkOutStore = new Ext.data.Store({
 		load : function(thiz, records){
 			for(var i = 0; i < records.length; i++){
 				Ext.ux.formatFoodName(records[i], 'displayFoodName', 'foodName');
+				if(i % 2 == 0){
+					checkOutGrid.getView().getRow(i).style.backgroundColor = '#FFE4B5';					
+				}
 			}
 		}
 	}

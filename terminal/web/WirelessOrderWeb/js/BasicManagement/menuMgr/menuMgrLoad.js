@@ -102,10 +102,7 @@ function menuMgrOnLoad() {
 
 	// update the operator name
 	getOperatorName(pin, "../../");
-
-//	searchForm.remove("conditionText");
-//	operatorComb.setDisabled(true);
-
+	
 	// 獲取廚房信息，以便顯示廚房描述
 	// 后台：[厨房编号,"厨房名称",一般折扣1,一般折扣2,一般折扣3,会员折扣1,会员折扣2,会员折扣3]
 	// 前台：kitchenData：[厨房编号,厨房名称]
@@ -119,24 +116,8 @@ function menuMgrOnLoad() {
 		success : function(response, options) {
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
 			if (resultJSON.success == true) {
-				// get the kitchen data
-//				var josnData = resultJSON.data;
-//				var keichenList = josnData.split("，");
-//				for ( var i = 0; i < keichenList.length; i++) {
-//					var keichenInfo = keichenList[i].substr(1, keichenList[i].length - 2).split(",");
-//					kitchenTypeData.push([
-//					    keichenInfo[0],// 厨房编号
-//					    keichenInfo[2], // 厨房名称
-//					    keichenInfo[1] // 厨房id
-//					]);
-//				}
-//				kitchenTypeData.push([ 255, "空", -1 ]);
 				kitchenTypeData = resultJSON.root;
-				kitchenTypeData.push({kitchenAliasID:255, kitchenName:'空', kitchenID:-1});
-//				menuStore.reload();
 			} else {
-//				var dataInfo = resultJSON.data;
-				// Ext.Msg.alert(tableData);
 				Ext.MessageBox.show({
 					msg : resultJSON.msg,
 					width : 300,
@@ -145,6 +126,7 @@ function menuMgrOnLoad() {
 			}
 		},
 		failure : function(response, options) {
+			
 		}
 	});
 
