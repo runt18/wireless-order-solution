@@ -23,7 +23,7 @@ import com.wireless.fragment.ExpandableListFragment;
 import com.wireless.fragment.ExpandableListFragment.OnItemChangeListener;
 import com.wireless.fragment.GalleryFragment;
 import com.wireless.fragment.GalleryFragment.OnPicChangedListener;
-import com.wireless.fragment.GalleryFragment.OnPicClickedListener;
+import com.wireless.fragment.GalleryFragment.OnPicClickListener;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Department;
@@ -34,7 +34,7 @@ import com.wireless.protocol.OrderFood;
 public class MainActivity extends Activity  
 						  implements OnItemChangeListener,
 							 	     OnPicChangedListener, 
-							 	     OnPicClickedListener{
+							 	     OnPicClickListener{
 	
 	private static final int MAIN_ACTIVITY_RES_CODE = 340;
 
@@ -129,8 +129,8 @@ public class MainActivity extends Activity
 	@Override
 	public void onStart(){
 		super.onStart();
-//		//设置picture browser fragment的数据源
-		//mPicBrowserFragment.notifyDataChanged(WirelessOrder.foods);
+		//设置picture browser fragment的数据源
+		mPicBrowserFragment.notifyDataChanged(WirelessOrder.foods);
 		
 		//清空所有厨房和对应菜品首张图片位置的Map数据
 		mFoodPosByKitchenMap.clear();
@@ -208,7 +208,7 @@ public class MainActivity extends Activity
 	 * 点击Gallery，跳转到FoodDetailActivity
 	 */
 	@Override
-	public void onPicClicked(Food food, int position) {
+	public void onPicClick(Food food, int position) {
 		Intent intent = new Intent(MainActivity.this, FoodDetailActivity.class);
 		Bundle bundle = new Bundle();
 		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(new OrderFood(food)));

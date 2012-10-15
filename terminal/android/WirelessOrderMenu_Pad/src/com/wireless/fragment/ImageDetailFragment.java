@@ -110,7 +110,7 @@ public class ImageDetailFragment extends Fragment {
     			@Override
     			public void onClick(View v) {
     				if(gf.mOnPicClickListener != null){
-    					gf.mOnPicClickListener.onPicClicked(mFood, gf.getSelectedPosition());
+    					gf.mOnPicClickListener.onPicClick(mFood, gf.getSelectedPosition());
     				}
     			}
     		});        	

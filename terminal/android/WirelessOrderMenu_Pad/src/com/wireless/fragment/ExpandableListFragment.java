@@ -57,7 +57,8 @@ public class ExpandableListFragment extends Fragment{
 			}
 			mChildren.add(childKitchens);
 		}
-		mAdapter.notifyDataSetChanged();		
+		mAdapter.notifyDataSetChanged();
+		setPosition(mChildren.get(0).get(0));
 	}
 	
 	/**
@@ -88,7 +89,6 @@ public class ExpandableListFragment extends Fragment{
 			@Override
 			protected void onPostExecute(int[] positions){
 				mListView.expandGroup(positions[0]);
-				mListView.setSelectedChild(positions[0], positions[1], true);
 			}
 		}.execute();
 	}
@@ -196,6 +196,12 @@ public class ExpandableListFragment extends Fragment{
 				view = View.inflate(ExpandableListFragment.this.getActivity(), R.layout.xpd_lstview_child, null);
 			}
 			((TextView) view.findViewById(R.id.mychild)).setText(mChildren.get(groupPosition).get(childPosition).name);
+			//如果是第一个且之前没有按下过child，则默认设置第一个按下
+			if(groupPosition ==0 && childPosition ==0 && mListView.getTag() == null)
+			{
+				view.setBackgroundColor(getResources().getColor(R.color.blue));
+				mListView.setTag(view);
+			}
 			return view;
 		}
 

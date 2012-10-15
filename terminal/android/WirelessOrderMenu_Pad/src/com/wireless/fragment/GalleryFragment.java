@@ -23,7 +23,6 @@ import com.wireless.util.imgFetcher.ImageCache;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
 public class GalleryFragment extends Fragment {
-	
 	private final static String KEY_MEMORY_CACHE_PERCENT = "key_memory_cache_percent";
 	private final static String KEY_CACHE_VIEW_AMOUNT = "key_cache_view_amount";
 	private final static String KEY_IMAGE_SCALE_TYPE = "key_image_scale_type";
@@ -43,14 +42,21 @@ public class GalleryFragment extends Fragment {
 		void onPicChanged(Food curFood, int position);
 	}
 	
+	public void setOnPicChangedListener(OnPicChangedListener l)
+	{
+		mPicChangeListener = l;
+	}
 	private OnPicChangedListener mPicChangeListener;
 	
-	
-	public static interface OnPicClickedListener{
-		void onPicClicked(Food food , int position);
+	public static interface OnPicClickListener{
+		void onPicClick(Food food , int position);
 	}
-	
-	OnPicClickedListener mOnPicClickListener;	
+	public void setOnPicClickListener(OnPicClickListener l)
+	{
+		mOnPicClickListener = l;
+	}
+
+	OnPicClickListener mOnPicClickListener;	
 
 	/**
 	 * Factory method to generate a new instance of the fragment.
@@ -130,7 +136,7 @@ public class GalleryFragment extends Fragment {
 		super.onActivityCreated(savedInstanceState);		
 
 		try{
-			mOnPicClickListener = (OnPicClickedListener)getActivity();
+			mOnPicClickListener = (OnPicClickListener)getActivity();
 		}catch(ClassCastException e){
 			
 		}

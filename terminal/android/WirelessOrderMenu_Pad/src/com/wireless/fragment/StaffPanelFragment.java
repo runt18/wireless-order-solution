@@ -66,15 +66,7 @@ public class StaffPanelFragment extends Fragment {
 			}
 		});
 		
-		return view;
-	}
-	
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState)
-	{
-		super.onActivityCreated(savedInstanceState);
-
-		((Button) getView().findViewById(R.id.button_tab2_confirm)).setOnClickListener(new OnClickListener(){
+		((Button) view.findViewById(R.id.button_tab2_confirm)).setOnClickListener(new OnClickListener(){
 
 			@Override
 			public void onClick(View v) {
@@ -84,6 +76,6 @@ public class StaffPanelFragment extends Fragment {
 				mServerPswdEditText.setText("");
 			}
 		});
+		return view;
 	}
-	
 }
