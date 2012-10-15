@@ -12,7 +12,6 @@ import com.wireless.db.DBCon;
 import com.wireless.db.VerifyPin;
 import com.wireless.db.distMgr.QueryDiscountDao;
 import com.wireless.pojo.distMgr.DiscountPojo;
-import com.wireless.protocol.Discount;
 import com.wireless.protocol.Terminal;
 
 public class QueryDiscountTreeAction extends Action{

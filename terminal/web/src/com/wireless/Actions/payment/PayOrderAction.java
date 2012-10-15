@@ -100,8 +100,8 @@ public class PayOrderAction extends Action implements PinGen{
 				orderToPay.memberID = request.getParameter("memberID");
 			}
 			
-			if(request.getParameter("discountType") != null){
-				orderToPay.setDiscount(new Discount(Integer.parseInt(request.getParameter("discountType"))));				
+			if(request.getParameter("discountID") != null && !request.getParameter("discountID").equals("-1")){
+				orderToPay.setDiscount(new Discount(Integer.parseInt(request.getParameter("discountID"))));				
 			}else{
 				orderToPay.setDiscount(new Discount());
 			}
