@@ -10,6 +10,7 @@ import com.wireless.db.QueryMenu;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.distMgr.DiscountPlanPojo;
 import com.wireless.pojo.distMgr.DiscountPojo;
+import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Terminal;
 
 @SuppressWarnings({"finally"})
