@@ -1,9 +1,58 @@
-﻿var Request = new URLParaQuery();
+﻿loadDiscount = function(){
+//	Ext.Ajax.request({
+//		url : '../../QueryDiscountTree.do',
+//		params : {
+//			pin : pin,
+//			restaurantID : restaurantID
+//		},
+//		success : function(res, opt){
+//			var jr = eval(res.responseText);
+//			discountData = jr;
+//			discountData.push({discountID:-1, text:'不打折'});
+//			
+//			Ext.Ajax.request({
+//				url : '../../QueryDiscountPlan.do',
+//				params : {
+//					pin : pin,
+//					restaurantID : restaurantID
+//				},
+//				success : function(res, opt){
+//					discountPlanData = Ext.util.JSON.decode(res.responseText);
+//					
+//					var discount = Ext.getCmp('comboDiscount');
+//					discount.store.loadData({root:discountData});
+//					discount.setValue(-1);
+//					for(var i = 0; i < discountData.length; i++){
+//						if(eval(discountData[i].isDefault == true)){
+//							discount.setValue(discountData[i].discountID);
+//							break;
+//						}
+//					}
+//					discount.fireEvent('select', discount);
+//				},
+//				failure : function(res, pot){
+//					Ext.ux.showMsg({
+//						code : 9999,
+//						msg : '加载分厨折扣信息失败.'
+//					});
+//				}
+//			});
+//		},
+//		failure : function(res, pot){
+//			Ext.ux.showMsg({
+//				code : 9999,
+//				msg : '加载折扣方案信息失败.'
+//			});
+//		}
+//	});
+};
 
 // on page load function
 function checkOutOnLoad() {	
 	
 	getOperatorName(pin, "../../");
+	
+	loadDiscount();
 	
 	// 1,update table status
 	restaurantID = Request["restaurantID"];
@@ -48,160 +97,206 @@ function checkOutOnLoad() {
 				
 				// 2,获取折扣率
 				Ext.Ajax.request({
-					url : "../../QueryMenu.do",
+					url : '../../QueryDiscountTree.do',
 					params : {
-						pin : Request["pin"],
-						restaurantID : restaurantID,
-						type : 3
+						pin : pin,
+						restaurantID : restaurantID
 					},
 					success : function(response, options) {
-						var resultJSON = Ext.util.JSON.decode(response.responseText);
-						if (resultJSON.success == true) {
+//						var resultJSON = Ext.util.JSON.decode(response.responseText);
+//						if (resultJSON.success == true) {
+						
+						var jr = eval(response.responseText);
+						discountData = jr;
+						discountData.push({discountID:-1, text:'不打折'});
+						
+						Ext.Ajax.request({
+							url : '../../QueryDiscountPlan.do',
+							params : {
+								pin : pin,
+								restaurantID : restaurantID
+							},
+							success : function(res, opt){
+//								discountPlanData = Ext.util.JSON.decode(res.responseText);
+								var jr = Ext.util.JSON.decode(res.responseText);
+								discountPlanData = {root:[]};
+								for(var i = 0; i < jr.root.length; i++){
+									if(jr.root[i].rate > 0 && jr.root[i].rate < 1){
+										discountPlanData.root.push(jr.root[i]);
+									}
+								}
+								
+								var discount = Ext.getCmp('comboDiscount');
+								discount.store.loadData({root:discountData});
+								discount.setValue(-1);
+								for(var i = 0; i < discountData.length; i++){
+									if(eval(discountData[i].isDefault == true)){
+										discount.setValue(discountData[i].discountID);
+										break;
+									}
+								}
+//								discount.fireEvent('select', discount);
 							
-							discountData = resultJSON;
-							
-							// 3,请求口味
-							Ext.Ajax.request({
-								url : "../../QueryMenu.do",
-								params : {
-									pin : Request["pin"],
-									restaurantID : restaurantID,
-									type : 2
-								},
-								success : function(response,options) {
-									var resultTasteJSON = Ext.util.JSON.decode(response.responseText);
-									if (resultTasteJSON.success == true) {
-										dishTasteData = resultTasteJSON;									
-										
-										for(var i = 0; i < checkOutData.root.length; i++) {
-											checkOutDataDisplay.root.push(checkOutData.root[i]);
-										}
-										
-										for(var i = 0; i < checkOutDataDisplay.root.length; i++) {
-											var tpItem = checkOutDataDisplay.root[i];
+								// 3,请求口味
+								Ext.Ajax.request({
+									url : "../../QueryMenu.do",
+									params : {
+										pin : Request["pin"],
+										restaurantID : restaurantID,
+										type : 2
+									},
+									success : function(response,options) {
+										var resultTasteJSON = Ext.util.JSON.decode(response.responseText);
+										if (resultTasteJSON.success == true) {
+											dishTasteData = resultTasteJSON;									
 											
-											if(tpItem.special == true || tpItem.gift == true){
-												tpItem.discount = parseFloat(1).toFixed(2);
-											}else{
-												tpItem.discount = parseFloat(tpItem.kitchen.discount1).toFixed(2);
+											for(var i = 0; i < checkOutData.root.length; i++) {
+												checkOutDataDisplay.root.push(checkOutData.root[i]);
 											}
 											
-											tpItem.totalPrice = parseFloat((tpItem.unitPrice + tpItem.tastePrice) * tpItem.discount * tpItem.count);
-											
-											checkOutDataDisplay.root[i] = tpItem;
-										}
-										
-										checkOutStore.loadData(checkOutDataDisplay);
-										
-										// 4,算总价
-										var totalCount = 0;
-										var forFreeCount = 0;
-										for ( var i = 0; i < checkOutDataDisplay.root.length; i++) {
-											var tpItem = checkOutDataDisplay.root[i];
-											var singleCount = parseFloat(tpItem.totalPrice);
-											if (tpItem.gift == true) {
-												forFreeCount = forFreeCount + parseFloat(tpItem.discount) * tpItem.totalPrice;
-											} else {
-												totalCount = totalCount + singleCount;
+											for(var i = 0; i < checkOutDataDisplay.root.length; i++) {
+												var tpItem = checkOutDataDisplay.root[i];
+												
+												if(tpItem.special == true || tpItem.gift == true){
+													tpItem.discount = parseFloat(1).toFixed(2);
+												}else{
+	//												tpItem.discount = parseFloat(tpItem.kitchen.discount1).toFixed(2);
+													tpItem.discount = parseFloat(1).toFixed(2);
+													for(var di = 0; di < discountPlanData.root.length; di++){
+														if(discount.getValue() != -1 && discountPlanData.root[di].discount.id == discount.getValue() 
+																&& discountPlanData.root[di].kitchen.kitchenID == tpItem.kitchen.kitchenID){
+															tpItem.discount = parseFloat(discountPlanData.root[di].rate).toFixed(2);
+															break;
+														}
+													}
+												}
+												
+												tpItem.totalPrice = parseFloat((tpItem.unitPrice + tpItem.tastePrice) * tpItem.discount * tpItem.count);
+												
+												checkOutDataDisplay.root[i] = tpItem;
 											}
-										}
-										
-										totalCount = totalCount.toFixed(2);
-										forFreeCount = forFreeCount.toFixed(2);
-										originalTotalCount = totalCount;
-										document.getElementById("totalCount").innerHTML = totalCount;
-										document.getElementById("forFree").innerHTML = forFreeCount;
-										document.getElementById("shouldPay").innerHTML = totalCount;
-										// 4,（尾数处理）
-										// 后台：["餐厅名称","餐厅信息","电话1","电话2","地址",$(尾数处理),$(自动补打)]
-										// 前台：restaurantData，格式一样
-										Ext.Ajax.request({
-											url : "../../QueryRestaurant.do",
-											params : {
-												"restaurantID" : restaurantID
-											},
-											success : function(response, options) {
-												var resultJSON = Ext.util.JSON.decode(response.responseText);
-												if (resultJSON.success == true) {
-													var dataInfo = resultJSON.data;
-													var restaurantInfo = dataInfo.split(",");
-													restaurantData.push([
-														restaurantInfo[0].substr(1, restaurantInfo[0].length - 2),// 餐厅名称
-														restaurantInfo[1].substr(1, restaurantInfo[1].length - 2),// 餐厅信息
-														restaurantInfo[2].substr(1, restaurantInfo[2].length - 2),// 电话1
-														restaurantInfo[3].substr(1, restaurantInfo[3].length - 2),// 电话2
-														restaurantInfo[4].substr(1, restaurantInfo[4].length - 2),// 地址
-														restaurantInfo[5],// 尾数处理
-														restaurantInfo[6] // 自动补打
-													]);
-													var sPay = document.getElementById("shouldPay").innerHTML;
-
-													// 5,最低消费处理
-													var minCost = Request["minCost"];
-													if (parseFloat(minCost) > parseFloat(sPay)) {
-														sPay = minCost;
-														Ext.MessageBox.show({
-															msg : "消费额小于最低消费额，是否继续结帐？",
-															width : 300,
-															buttons : Ext.MessageBox.YESNO,
-															fn : function(btn) {
-																if (btn == "no") {
-																	location.href = "TableSelect.html?pin="
-																					+ Request["pin"]
-																					+ "&restaurantID="
-																					+ restaurantID;
+											
+											checkOutStore.loadData(checkOutDataDisplay);
+											
+											discount.fireEvent('select', discount);
+											
+											// 4,算总价
+											var totalCount = 0;
+											var forFreeCount = 0;
+											for ( var i = 0; i < checkOutDataDisplay.root.length; i++) {
+												var tpItem = checkOutDataDisplay.root[i];
+												var singleCount = parseFloat(tpItem.totalPrice);
+												if (tpItem.gift == true) {
+													forFreeCount = forFreeCount + parseFloat(tpItem.discount) * tpItem.totalPrice;
+												} else {
+													totalCount = totalCount + singleCount;
+												}
+											}
+											
+											totalCount = totalCount.toFixed(2);
+											forFreeCount = forFreeCount.toFixed(2);
+											originalTotalCount = totalCount;
+											document.getElementById("totalCount").innerHTML = totalCount;
+											document.getElementById("forFree").innerHTML = forFreeCount;
+											document.getElementById("shouldPay").innerHTML = totalCount;
+											// 4,（尾数处理）
+											// 后台：["餐厅名称","餐厅信息","电话1","电话2","地址",$(尾数处理),$(自动补打)]
+											// 前台：restaurantData，格式一样
+											Ext.Ajax.request({
+												url : "../../QueryRestaurant.do",
+												params : {
+													"restaurantID" : restaurantID
+												},
+												success : function(response, options) {
+													var resultJSON = Ext.util.JSON.decode(response.responseText);
+													if (resultJSON.success == true) {
+														var dataInfo = resultJSON.data;
+														var restaurantInfo = dataInfo.split(",");
+														restaurantData.push([
+															restaurantInfo[0].substr(1, restaurantInfo[0].length - 2),// 餐厅名称
+															restaurantInfo[1].substr(1, restaurantInfo[1].length - 2),// 餐厅信息
+															restaurantInfo[2].substr(1, restaurantInfo[2].length - 2),// 电话1
+															restaurantInfo[3].substr(1, restaurantInfo[3].length - 2),// 电话2
+															restaurantInfo[4].substr(1, restaurantInfo[4].length - 2),// 地址
+															restaurantInfo[5],// 尾数处理
+															restaurantInfo[6] // 自动补打
+														]);
+														var sPay = document.getElementById("shouldPay").innerHTML;
+	
+														// 5,最低消费处理
+														var minCost = Request["minCost"];
+														if (parseFloat(minCost) > parseFloat(sPay)) {
+															sPay = minCost;
+															Ext.MessageBox.show({
+																msg : "消费额小于最低消费额，是否继续结帐？",
+																width : 300,
+																buttons : Ext.MessageBox.YESNO,
+																fn : function(btn) {
+																	if (btn == "no") {
+																		location.href = "TableSelect.html?pin="
+																						+ Request["pin"]
+																						+ "&restaurantID="
+																						+ restaurantID;
+																	}
 																}
-															}
+															});
+														}
+	
+														// 6,尾数处理
+														if (restaurantData[0][5] == 1) {
+															sPay = sPay.substr(0, sPay.indexOf(".")) + ".00";
+														} else if (restaurantData[0][5] == 2) {
+															sPay = parseFloat(sPay).toFixed(0) + ".00";
+														}
+														
+														document.getElementById("shouldPay").innerHTML = sPay;
+														document.getElementById("actualCount").value = sPay;
+														document.getElementById("change").innerHTML = "0.00";
+	
+														moneyCount("");
+	
+													} else {
+														var dataInfo = resultJSON.data;
+														Ext.MessageBox.show({
+															msg : dataInfo,
+															width : 300,
+															buttons : Ext.MessageBox.OK
 														});
 													}
-
-													// 6,尾数处理
-													if (restaurantData[0][5] == 1) {
-														sPay = sPay.substr(0, sPay.indexOf(".")) + ".00";
-													} else if (restaurantData[0][5] == 2) {
-														sPay = parseFloat(sPay).toFixed(0) + ".00";
-													}
+												},
+												failure : function(response,options) {
 													
-													document.getElementById("shouldPay").innerHTML = sPay;
-													document.getElementById("actualCount").value = sPay;
-													document.getElementById("change").innerHTML = "0.00";
-
-													moneyCount("");
-
-												} else {
-													var dataInfo = resultJSON.data;
-													Ext.MessageBox.show({
-														msg : dataInfo,
-														width : 300,
-														buttons : Ext.MessageBox.OK
-													});
 												}
-											},
-											failure : function(response,options) {
-												
-											}
-										});
-									} else {
-										var dataTasteInfo = resultTasteJSON.data;
-										Ext.MessageBox.show({
-											msg : dataTasteInfo,
-											width : 300,
-											buttons : Ext.MessageBox.OK
-										});
+											});
+										} else {
+											var dataTasteInfo = resultTasteJSON.data;
+											Ext.MessageBox.show({
+												msg : dataTasteInfo,
+												width : 300,
+												buttons : Ext.MessageBox.OK
+											});
+										}
+									},
+									failure : function(response,options) { 
+										
 									}
-								},
-								failure : function(response,options) { 
-									
-								}
-							});
-						} else {
-							var dataInfo = resultJSON.data;
-							Ext.MessageBox.show({
-								msg : dataInfo,
-								width : 300,
-								buttons : Ext.MessageBox.OK
-							});
-						}
+								});
+							},
+							failure : function(res, pot){
+								Ext.ux.showMsg({
+									code : 9999,
+									msg : '加载分厨折扣信息失败.'
+								});
+							}
+						});
+//						} else {
+//							var dataInfo = resultJSON.data;
+//							Ext.MessageBox.show({
+//								msg : dataInfo,
+//								width : 300,
+//								buttons : Ext.MessageBox.OK
+//							});
+//						}
 					},
 					failure : function(response, options) {
 						
@@ -232,7 +327,6 @@ function checkOutOnLoad() {
 			'restaurantID' : Request['restaurantID']
 		},
 		success : function(response, options){
-//			alert(response.responseText)
 			createBackFoodDetail(Ext.util.JSON.decode(response.responseText));
 		},
 		failure : function(response, options){
@@ -284,7 +378,6 @@ function moneyCount(opt) {
 			// “合计”加上服务费
 			totalCount_out = (parseFloat(originalTotalCount) * (1 + parseFloat(serviceRate) / 100)).toFixed(2);
 			
-			// 
 			if(restaurantData[0][5] == 1){
 				shouldPay_out = parseFloat(parseInt(totalCount_out)).toFixed(2);
 			}else if(restaurantData[0][5] == 2){
@@ -295,21 +388,13 @@ function moneyCount(opt) {
 			
 			// “找零”计算
 			if (actualPay != "" && actualPay != "0.00") {
-//				if (opt == "button") {
-//					change_out = (parseFloat(actualPay) - parseFloat(shouldPay_out)).toFixed(2);
-//				} else {
-					change_out = "0.00";
-//				}
+				change_out = "0.00";
 			}
 //			alert('totalCount_out: '+totalCount_out+'   shouldPay_out: '+shouldPay_out+'    change_out: '+change_out);
 			document.getElementById("totalCount").innerHTML = totalCount_out;
 			document.getElementById("shouldPay").innerHTML = shouldPay_out;
 			document.getElementById("change").innerHTML = change_out;
-//			if (opt == "button") {
-//				
-//			} else {
-				document.getElementById("actualCount").value = shouldPay_out;
-//			}
+			document.getElementById("actualCount").value = shouldPay_out;
 		}
 	}
 };
@@ -391,7 +476,7 @@ showBackFoodDetail = function(){
 				 	{name:'kitchen'},
 				 	{name:'waiter'},
 				 	{name:'comment'}
-				 ]
+				]
 				)
 			})
 		});		

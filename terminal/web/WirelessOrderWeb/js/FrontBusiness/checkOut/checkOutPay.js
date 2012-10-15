@@ -7,6 +7,7 @@
 	var shouldPay = document.getElementById("shouldPay").innerHTML;
 	var serviceRate = document.getElementById("serviceCharge").value;
 	var submitPrice = -1;
+	var discountID = Ext.getCmp('comboDiscount');
 
 	var payManner = -1;
 	var tempPay;
@@ -53,7 +54,8 @@
 				"tableID" : Request["tableNbr"],
 				"cashIncome" : submitPrice,
 				"payType" : payType,
-				"discountType" : discountType,
+//				"discountType" : discountType,
+				'discountID' : discountID.getValue(),
 				"payManner" : payManner,
 				"tempPay" : tempPay,
 				"memberID" : actualMemberID,

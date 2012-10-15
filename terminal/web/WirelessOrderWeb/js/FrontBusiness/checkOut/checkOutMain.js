@@ -1,45 +1,4 @@
-﻿// --------------check-out center panel-----------------
-// 1，数据
-// 格式:[菜名，口味，数量，单价，一般折扣率，会员折扣率，总价]
-//checkOutData = [];
-//checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 2, "￥56.2", "100%", "50%" ]);
-//checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 3, "￥56.2", "100%", "50%" ]);
-//checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 4, "￥56.2", "100%", "50%" ]);
-//checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 5, "￥56.2", "100%", "50%" ]);
-//checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "100%", "50%" ]);
-//checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "100%", "50%" ]);
-//checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "100%", "50%" ]);
-//checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 2, "￥56.2", "100%", "50%" ]);
-//checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 3, "￥56.2", "100%", "50%" ]);
-//checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 4, "￥56.2", "100%", "50%" ]);
-//checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 5, "￥56.2", "100%", "50%" ]);
-//checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "100%", "50%" ]);
-//checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "100%", "50%" ]);
-//checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "100%", "50%" ]);
-//checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "100%", "100%" ]);
-//checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "100%", "100%" ]);
-//checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "100%", "100%" ]);
-//checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "100%", "100%" ]);
-//checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "100%", "100%" ]);
-//checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "100%", "100%" ]);
-//checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "100%", "100%" ]);
-//checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "100%", "50%" ]);
-//checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "100%", "50%" ]);
-//checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "100%", "50%" ]);
-//checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "100%", "50%" ]);
-//checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "100%", "50%" ]);
-//checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "100%", "50%" ]);
-//checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 2, "￥56.2", "100%", "50%" ]);
-//checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 3, "￥56.2", "100%", "50%" ]);
-//checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 4, "￥56.2", "100%", "50%" ]);
-//checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 5, "￥56.2", "100%", "50%" ]);
-//checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "100%", "50%" ]);
-//checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "100%", "50%" ]);
-//checkOutData.push([ "酸菜鱼", "只要酸菜不要鱼", 1, "￥56.2", "100%", "50%" ]);
-
-
-
-// 2，表格的数据store
+﻿
 var checkOutStore = new Ext.data.Store({
 	proxy : new Ext.data.MemoryProxy(checkOutDataDisplay),
 	reader : new Ext.data.JsonReader(Ext.ux.readConfig, 
@@ -272,67 +231,34 @@ var checkOutForm = new Ext.form.FormPanel({
 			width : 300,
 			items : [ discountKindComb ]
 		}, {
-			width : 80,
 			layout : 'form',
-			labelWidth : 0,
-			labelSeparator : '',
-			hideLabels : true,
 			border : false,
-			items : [ {
-				xtype : 'radio',
-				boxLabel : '折扣1',
-				checked : true,
-				name : 'discountRadio',
-				inputValue : 'discount1',
-				anchor : '95%',
+			width : 300,
+			items : [{
+				xtype : 'combo',
+				id : 'comboDiscount',
+				fieldLabel : '折扣方案',
+				labelStyle : 'font-size:14px;font-weight:bold;',
+				readOnly : true,
+				forceSelection : true,
+				store : new Ext.data.JsonStore({
+					root : 'root',
+					fields : [ 'discountID', 'text']
+				}),
+				valueField : 'discountID',
+				displayField : 'text',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true,
 				listeners : {
-					check : function(thiz, newValue, oldValue) {
-						// alert('1');
+					select : function(combo, record, index) {
+//						alert(combo.getValue());
 						checkOurListRefresh();
 					}
 				}
-			} ]
-		}, {
-			width : 80,
-			layout : 'form',
-			labelWidth : 0,
-			labelSeparator : '',
-			hideLabels : true,
-			border : false,
-			items : [ {
-				xtype : 'radio',
-				boxLabel : '折扣2',
-				name : 'discountRadio',
-				inputValue : 'discount2',
-				anchor : '95%',
-				listeners : {
-					check : function(thiz, newValue, oldValue) {
-						// alert('2');
-						checkOurListRefresh();
-					}
-				}
-			} ]
-		}, {
-			width : 80,
-			layout : 'form',
-			labelWidth : 0,
-			labelSeparator : '',
-			hideLabels : true,
-			border : false,
-			items : [ {
-				xtype : 'radio',
-				boxLabel : '折扣3',
-				name : 'discountRadio',
-				inputValue : 'discount3',
-				anchor : '95%',
-				listeners : {
-					check : function(thiz, newValue, oldValue) {
-						// alert('3');
-						checkOurListRefresh();
-					}
-				}
-			} ]
-		} ]
+			}]
+		}]
 	}, {
 		layout : 'column',
 		border : false,
@@ -390,57 +316,50 @@ var checkOutForm = new Ext.form.FormPanel({
 			} ]
 		} ]
 	} ],
-	buttons : [
-			{
-				text : '现金结账',
-				handler : function() {
-					setFormButtonStatus(true);
-					paySubmit(1);
-				}
-			},
-			{
-				text : '刷卡结账',
-				handler : function() {
-					setFormButtonStatus(true);
-					paySubmit(2);
-				}
-			},
-			{
-				text : '会员卡结账',
-				hidden : true,
-				handler : function() {
-					setFormButtonStatus(true);
-					paySubmit(3);
-				}
-			},
-			{
-				text : '签单',
-				handler : function() {
-					setFormButtonStatus(true);
-					paySubmit(4);
-				}
-			},
-			{
-				text : '挂账',
-				handler : function() {
-					setFormButtonStatus(true);
-					paySubmit(5);
-				}
-			},
-			{
-				text : '暂结',
-				handler : function() {
-					setFormButtonStatus(true);
-					paySubmit(6);
-				}
-			},
-			{
-				text : '返回',
-				handler : function() {
-					var Request = new URLParaQuery();
-					location.href = 'TableSelect.html?pin=' + Request['pin'] + '&restaurantID=' + restaurantID;
-				}
-			} ],
+	buttons : [ {
+		text : '现金结账',
+		handler : function() {
+			setFormButtonStatus(true);
+			paySubmit(1);
+		}
+	}, {
+		text : '刷卡结账',
+		handler : function() {
+			setFormButtonStatus(true);
+			paySubmit(2);
+		}
+	}, {
+		text : '会员卡结账',
+		hidden : true,
+		handler : function() {
+			setFormButtonStatus(true);
+			paySubmit(3);
+		}
+	}, {
+		text : '签单',
+		handler : function() {
+			setFormButtonStatus(true);
+			paySubmit(4);
+		}
+	}, {
+		text : '挂账',
+		handler : function() {
+			setFormButtonStatus(true);
+			paySubmit(5);
+		}
+	}, {
+		text : '暂结',
+		handler : function() {
+			setFormButtonStatus(true);
+			paySubmit(6);
+		}
+	}, {
+		text : '返回',
+		handler : function() {
+			var Request = new URLParaQuery();
+			location.href = 'TableSelect.html?pin=' + Request['pin'] + '&restaurantID=' + restaurantID;
+		}
+	}],
 	listeners : {
 		afterlayout : function(thiz) {
 			checkOutGrid.setHeight(thiz.getInnerHeight() - gridHeightOffset);

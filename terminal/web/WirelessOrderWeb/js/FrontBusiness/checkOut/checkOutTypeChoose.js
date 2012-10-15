@@ -46,13 +46,15 @@
 	});
 };
 
-var checkOurListRefresh = function() {
+checkOurListRefresh = function() {
 	
-	var discountValue = checkOutForm.getForm().findField("discountRadio").getGroupValue();
+//	var discountValue = checkOutForm.getForm().findField("discountRadio").getGroupValue();
 	
 	if(typeof(checkOutData.root) == 'undefined'){
 		return;
 	}
+	
+	var discount = Ext.getCmp('comboDiscount');
 	
 	checkOutDataDisplay.length = 0;
 	checkOutDataDisplay.root = [];
@@ -64,15 +66,23 @@ var checkOurListRefresh = function() {
 		if(tpItem.special == true || tpItem.gift == true  || tpItem.temporary == true){
 			tpItem.discount = parseFloat(1).toFixed(2);
 		}else{
-			if (discountValue == "discount1") {
-				discountType = 1;
-				tpItem.discount = parseFloat(tpItem.kitchen.discount1).toFixed(2);	
-			} else if (discountValue == "discount2") {
-				discountType = 2;
-				tpItem.discount = parseFloat(tpItem.kitchen.discount2).toFixed(2);			
-			} else {
-				discountType = 3;
-				tpItem.discount = parseFloat(tpItem.kitchen.discount3).toFixed(2);
+//			if (discountValue == "discount1") {
+//				discountType = 1;
+//				tpItem.discount = parseFloat(tpItem.kitchen.discount1).toFixed(2);	
+//			} else if (discountValue == "discount2") {
+//				discountType = 2;
+//				tpItem.discount = parseFloat(tpItem.kitchen.discount2).toFixed(2);			
+//			} else {
+//				discountType = 3;
+//				tpItem.discount = parseFloat(tpItem.kitchen.discount3).toFixed(2);
+//			}
+			tpItem.discount = parseFloat(1).toFixed(2);
+			for(var di = 0; di < discountPlanData.root.length; di++){
+				if(discount.getValue() != -1 && discountPlanData.root[di].discount.id == discount.getValue() 
+						&& discountPlanData.root[di].kitchen.kitchenID == tpItem.kitchen.kitchenID){
+					tpItem.discount = parseFloat(discountPlanData.root[di].rate).toFixed(2);
+					break;
+				}
 			}
 		}
 		
