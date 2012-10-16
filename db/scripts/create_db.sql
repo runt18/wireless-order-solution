@@ -59,6 +59,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order` (
   `table2_id` INT NULL DEFAULT NULL COMMENT 'the 2nd table id to this order' ,
   `table2_alias` SMALLINT UNSIGNED NULL DEFAULT NULL COMMENT 'the 2nd table alias id to this order(used for table merger)' ,
   `table2_name` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the 2nd table name to this order(used for table merger)' ,
+  `discount_id` INT NOT NULL DEFAULT 0 COMMENT 'the discount id to this order' ,
   `service_rate` DECIMAL(3,2) NOT NULL DEFAULT 0 COMMENT 'the service rate to this order' ,
   `comment` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the comment to this order' ,
   `is_paid` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates whether the order has been paid before' ,
@@ -748,7 +749,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`discount` (
   `restaurant_id` INT UNSIGNED NULL COMMENT 'the restaurant id this discount belongs to' ,
   `name` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the name to this discount' ,
   `level` SMALLINT NULL DEFAULT 0 ,
-  `status` TINYINT NULL DEFAULT 0 COMMENT 'the type is as below.\n0 - normal\n1 - default' ,
+  `status` TINYINT NULL DEFAULT 0 COMMENT 'the status is as below.\n0 - normal\n1 - default' ,
   PRIMARY KEY (`discount_id`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 

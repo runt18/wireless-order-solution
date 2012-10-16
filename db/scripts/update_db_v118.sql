@@ -129,11 +129,18 @@ DEFAULT CHARACTER SET = utf8,
 COMMENT = 'describe the plan to each discount' ;
 
 -- -----------------------------------------------------
--- Insert "折扣方案1" to table 'discount'
+-- Insert "" to table 'discount' and set to reserved
 -- -----------------------------------------------------
 INSERT INTO wireless_order_db.discount
-(`restaurant_id`, `name`, `level`)
-SELECT id, '折扣1', 200 FROM wireless_order_db.restaurant WHERE id > 10;
+(`restaurant_id`, `name`, `level`, `status`)
+SELECT id, 'system', 201, 2 FROM wireless_order_db.restaurant WHERE id > 10;
+
+-- -----------------------------------------------------
+-- Insert "折扣方案1" to table 'discount' and set to default
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.discount
+(`restaurant_id`, `name`, `level`, `status`)
+SELECT id, '折扣1', 200, 1 FROM wireless_order_db.restaurant WHERE id > 10;
 
 -- -----------------------------------------------------
 -- Insert the detail of "折扣方案1" to table 'discount_plan'
@@ -189,6 +196,18 @@ WHERE KITCHEN.type = 0 AND KITCHEN.discount_3 <> 1;
 -- Drop the field 'discount_type' from table 'order'
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`order` DROP COLUMN `discount_type` ;
+
+-- -----------------------------------------------------
+-- Add the field 'discount_id' to table 'order'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order` ADD COLUMN `discount_id` INT NOT NULL DEFAULT 0 COMMENT 'the discount_id to this order'  AFTER `table2_name` ;
+
+-- -----------------------------------------------------
+-- Update the all the today paid order's discount_id to default discount
+-- -----------------------------------------------------
+UPDATE `wireless_order_db`.`order` ORDER_TODAY SET `discount_id` = 
+(SELECT discount_id FROM `wireless_order_db`.`discount` DIST WHERE DIST.restaurant_id = ORDER_TODAY.restaurant_id AND DIST.level = 200)
+WHERE ORDER_TODAY.total_price IS NOT NULL;
 
 -- -----------------------------------------------------
 -- Drop the field 'discount_type' from table 'order_history'
