@@ -3,8 +3,9 @@ package com.wireless.protocol;
 
 public class Discount {
 	
-	public final static int NORMAL = 0;
-	public final static int DEFAULT = 1;
+	public final static int NORMAL = 0;			//一般类型
+	public final static int DEFAULT = 1;		//默认类型
+	public final static int RESERVED = 2;		//系统保留
 	
 	public int discountID;
 	public String name;
@@ -42,4 +43,7 @@ public class Discount {
 		return status == DEFAULT;
 	}	
 
+	public boolean isReserved(){
+		return status == RESERVED;
+	}
 }
