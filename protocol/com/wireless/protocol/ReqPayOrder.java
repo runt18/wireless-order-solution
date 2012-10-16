@@ -14,11 +14,10 @@ public class ReqPayOrder extends ReqPackage{
 	* pin[6] - auto calculated and filled in
 	* len[2] - 0x06, 0x00
 	* <Body>
-	* print_type[4] : table[2] : cash_income[4] : gift_price[4] : pay_type : discount_id[4] : pay_manner : service_rate : len_member : member_id[len] : len_comment : comment[len]
+	* print_type[4] : table[2] : cash_income[4] : pay_type : discount_id[4] : pay_manner : service_rate : len_member : member_id[len] : len_comment : comment[len]
 	* print_type[4] - 4-byte indicates the print type
 	* table[2] - 2-byte indicates the table id
 	* cash_income[4] - 4-byte indicates the total price
-	* gift_price[4] - 4-byte indicates the gift price
 	* pay_type - one of the values of pay type
 	* discount_id[4] - 4-byte indicates the id to discount
 	* pay_manner - one of the values of pay manner
@@ -83,13 +82,6 @@ public class ReqPayOrder extends ReqPackage{
 		body[offset + 1] = (byte)((order.cashIncome >> 8) & 0x000000FF);
 		body[offset + 2] = (byte)((order.cashIncome >> 16) & 0x000000FF);
 		body[offset + 3] = (byte)((order.cashIncome >> 24) & 0x000000FF);
-		offset += 4;
-		
-		//assign the gift price
-		body[offset] = (byte)(order.giftPrice & 0x000000FF);
-		body[offset + 1] = (byte)((order.giftPrice >> 8) & 0x000000FF);
-		body[offset + 2] = (byte)((order.giftPrice >> 16) & 0x000000FF);
-		body[offset + 3] = (byte)((order.giftPrice >> 24) & 0x000000FF);
 		offset += 4;
 		
 		//assign the payment type

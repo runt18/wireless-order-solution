@@ -15,11 +15,10 @@ public final class ReqPayOrderParser {
 	* pin[6] - auto calculated and filled in
 	* len[2] - 0x06, 0x00
 	* <Body>
-	* print_type[4] : table[2] : cash_income[4] : gift_price[4] : pay_type : discount_id[4] : pay_manner : service_rate : len_member : member_id[len] : len_comment : comment[len]
+	* print_type[4] : table[2] : cash_income[4] : pay_type : discount_id[4] : pay_manner : service_rate : len_member : member_id[len] : len_comment : comment[len]
 	* print_type[4] - 4-byte indicates the print type
 	* table[2] - 2-byte indicates the table id
 	* cash_income[4] - 4-byte indicates the total price
-	* gift_price[4] - 4-byte indicates the gift price
 	* pay_type - one of the values of pay type
 	* discount_id[4] - 4-byte indicates the discount id to this order
 	* pay_manner - one of the values of pay manner
@@ -49,13 +48,6 @@ public final class ReqPayOrderParser {
 						 ((req.body[offset + 1] & 0x000000FF) << 8) | 
 						 ((req.body[offset + 2] & 0x000000FF) << 16) |
 						 ((req.body[offset + 3] & 0x000000FF) << 24);
-		offset += 4;
-		
-		//get the gift price
-		int giftPrice = (req.body[offset] & 0x000000FF) | 
-		 				((req.body[offset + 1] & 0x000000FF) << 8) | 
-		 				((req.body[offset + 2] & 0x000000FF) << 16) |
-		 				((req.body[offset + 3] & 0x000000FF) << 24);
 		offset += 4;
 		
 		//get the payment type
@@ -110,7 +102,6 @@ public final class ReqPayOrderParser {
 		orderToPay.print_type = printType;
 		orderToPay.destTbl.aliasID = tableToPay;
 		orderToPay.cashIncome = cashIncome;
-		orderToPay.giftPrice = giftPrice;
 		orderToPay.pay_type = payType;
 		orderToPay.discount.discountID = discountId;
 		orderToPay.pay_manner = payManner;
