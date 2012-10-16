@@ -241,7 +241,7 @@ public class PayOrder {
 				  ", total_price=" + totalPrice + 
 				  ", total_price_2=" + totalPrice2 +
 				  ", type=" + orderInfo.pay_manner + 
-				  //", discount_type=" + orderInfo.discount_type +
+				  ", discount_id=" + orderInfo.getDiscount().discountID +
 				  ", service_rate=" + orderInfo.getServiceRate() +
 				  (isPaidAgain ? "" : ", seq_id=" + orderInfo.seqID) +
 			   	  (isPaidAgain ? "" : ", order_date=NOW()") + 

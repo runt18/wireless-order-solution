@@ -4,6 +4,7 @@ import java.sql.SQLException;
 
 import com.wireless.dbReflect.OrderFoodReflector;
 import com.wireless.exception.BusinessException;
+import com.wireless.protocol.Discount;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.Table;
@@ -123,24 +124,28 @@ public class QueryOrder {
 	 */
 	public static Order execByID(DBCon dbCon, int orderID, int queryType) throws BusinessException, SQLException{
 
-		String orderTbl;
+		String sql;
 		if(queryType == QUERY_TODAY){
-			orderTbl = "order";
+			sql = " SELECT " +
+				  " order_date, seq_id, custom_num, table_id, table_alias, table_name, table2_alias, table2_name, " +
+				  " region_id, region_name, restaurant_id, type, category, is_paid, discount_id, " +
+				  " total_price, total_price_2 " +
+				  " FROM " + Params.dbName + ".order" + 
+				  " WHERE id= " + orderID;
 		}else if(queryType == QUERY_HISTORY){
-			orderTbl = "order_history";
+			sql = " SELECT " +
+				  " order_date, seq_id, custom_num, table_id, table_alias, table_name, table2_alias, table2_name, " +
+				  " region_id, region_name, restaurant_id, type, category, is_paid, 0 AS discount_id " +
+				  " total_price, total_price_2 " +
+				  " FROM " + Params.dbName + ".order" + 
+				  " WHERE id= " + orderID;
 		}else{
-			orderTbl = "order";			
+			throw new IllegalArgumentException("The query type passed to query order is NOT valid.");
 		}
 		
 		/**
 		 * Get the related info to this order.
 		 */
-		String sql = " SELECT " +
-					 " order_date, seq_id, custom_num, table_id, table_alias, table_name, table2_alias, table2_name, " +
-					 " region_id, region_name, restaurant_id, type, category, is_paid " +
-					 " FROM " + Params.dbName + "." + orderTbl + 
-					 " WHERE id= " + orderID;
-
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
 		Order orderInfo = new Order();
@@ -158,29 +163,15 @@ public class QueryOrder {
 			orderInfo.region.name = dbCon.rs.getString("region_name");
 			orderInfo.customNum = dbCon.rs.getShort("custom_num");
 			orderInfo.category = dbCon.rs.getShort("category");
+			orderInfo.setDiscount(new Discount(dbCon.rs.getInt("discount_id")));
 			orderInfo.pay_manner = dbCon.rs.getShort("type");
 			orderInfo.isPaid = dbCon.rs.getBoolean("is_paid");
+			orderInfo.setTotalPrice(dbCon.rs.getFloat("total_price"));
+			orderInfo.setActualPrice(dbCon.rs.getFloat("total_price_2"));
 		}else{
 			throw new BusinessException("The order(id=" + orderID + ") does NOT exist.", ErrorCode.ORDER_NOT_EXIST);
 		}
-		dbCon.rs.close();
-		
-		/**
-		 * Get the total and actual price if the order has been paid
-		 */
-		sql = " SELECT " +
-			  " total_price, total_price_2 " +
-			  " FROM " + Params.dbName + "." + orderTbl + 
-			  " WHERE " +
-			  " id= " + orderID +
-			  " AND " +
-			  " total_price IS NOT NULL ";
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			orderInfo.setTotalPrice(dbCon.rs.getFloat("total_price"));
-			orderInfo.setActualPrice(dbCon.rs.getFloat("total_price_2"));
-		}
-		dbCon.rs.close();
+		dbCon.rs.close();		
 		
 		/**
 		 * Get the minimum cost
