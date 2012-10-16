@@ -133,7 +133,7 @@ COMMENT = 'describe the plan to each discount' ;
 -- -----------------------------------------------------
 INSERT INTO wireless_order_db.discount
 (`restaurant_id`, `name`, `level`, `status`)
-SELECT id, 'system', 201, 2 FROM wireless_order_db.restaurant WHERE id > 10;
+SELECT id, '无折扣', 201, 2 FROM wireless_order_db.restaurant WHERE id > 10;
 
 -- -----------------------------------------------------
 -- Insert "折扣方案1" to table 'discount' and set to default
