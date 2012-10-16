@@ -18,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -130,25 +131,6 @@ public class TableDetailActivity extends Activity {
 		public void handleMessage(Message message) {
 			final TableDetailActivity theActivity = mActivity.get();
 
-			//FIXME The code below need to be removed.
-			// 选择折扣方式后，设定每个菜品的折扣率
-//			for (int i = 0; i < theActivity.mOrderToPay.foods.length; i++) {
-//				if (!(theActivity.mOrderToPay.foods[i].isGift()	|| theActivity.mOrderToPay.foods[i].isTemporary || theActivity.mOrderToPay.foods[i].isSpecial())) {
-//					for (Kitchen kitchen : WirelessOrder.foodMenu.kitchens) {
-//						if (theActivity.mOrderToPay.foods[i].kitchen.aliasID == kitchen.aliasID) {
-//							if (theActivity.mOrderToPay.discount_type == Order.DISCOUNT_1) {
-//								theActivity.mOrderToPay.foods[i].setDiscount(kitchen.getDist1());
-//
-//							} else if (theActivity.mOrderToPay.discount_type == Order.DISCOUNT_2) {
-//								theActivity.mOrderToPay.foods[i].setDiscount(kitchen.getDist2());
-//
-//							} else if (theActivity.mOrderToPay.discount_type == Order.DISCOUNT_3) {
-//								theActivity.mOrderToPay.foods[i].setDiscount(kitchen.getDist3());
-//							}
-//						}
-//					}
-//				}
-//			}
 			theActivity.mBillFoodListView.notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(theActivity.mOrderToPay.foods)));
 			//set the discount price
 			((TextView) theActivity.findViewById(R.id.discountPriceTxtView_table_detail)).setText(Util.CURRENCY_SIGN	+ Float.toString(theActivity.mOrderToPay.calcDiscountPrice()));
@@ -301,16 +283,28 @@ public class TableDetailActivity extends Activity {
 			}
 		});
 		
-		//FIXME
-		//((RadioButton) view.findViewById(R.id.discount1)).setTag(WirelessOrder.discouts[0]);
-		//((RadioButton) view.findViewById(R.id.discount2)).setTag(WirelessOrder.discouts[1]);
-		//((RadioButton) view.findViewById(R.id.discount3)).setTag(WirelessOrder.discouts[2]);
+		((RadioButton) view.findViewById(R.id.discount1)).setText("无折扣");
+		((RadioButton) view.findViewById(R.id.discount1)).setTag(new Discount());
+		//根据discount数量添加Radio Button
+		RadioGroup radioGroup = (RadioGroup) view.findViewById(R.id.radioGroup2);
+		for(Discount discount : WirelessOrder.foodMenu.discounts){
+			RadioButton radioBtn = new RadioButton(TableDetailActivity.this);
+			radioBtn.setTag(discount);
+			radioBtn.setText(discount.name);
+			radioGroup.addView(radioBtn, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+			if(discount.equals(mOrderToPay.getDiscount())){
+				radioBtn.setChecked(true);
+			}
+		}
 
 		// 折扣方式方式添加事件监听器
-		((RadioGroup) view.findViewById(R.id.radioGroup2)).setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+		radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
-				mOrderToPay.setDiscount((Discount)group.findViewById(checkedId).getTag());
+				Object obj = group.findViewById(checkedId).getTag();
+				if(obj != null){
+					mOrderToPay.setDiscount((Discount)obj);
+				}
 			}
 		});
 

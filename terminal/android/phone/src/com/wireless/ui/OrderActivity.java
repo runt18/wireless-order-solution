@@ -1,8 +1,5 @@
 package com.wireless.ui;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -81,7 +78,7 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 
 			@Override
 			public void onClick(View arg0) {
-				OrderFood[] foods = _newFoodLstView.getSourceData().toArray(new OrderFood[_newFoodLstView.getSourceData().size()]);
+				OrderFood[] foods = _newFoodLstView.getSourceData();
 				if(foods.length != 0){
 					Order reqOrder = new Order(foods,											   
 											   Short.parseShort(((EditText)findViewById(R.id.tblNoEdtTxt)).getText().toString()),
@@ -116,11 +113,11 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 			@Override
 			public void onSourceChanged(){
 				//update the total price
-				Order tmpOrder = new Order(_newFoodLstView.getSourceData().toArray(new OrderFood[_newFoodLstView.getSourceData().size()]));
+				Order tmpOrder = new Order(_newFoodLstView.getSourceData());
 				((TextView)findViewById(R.id.totalTxtView)).setText(Util.CURRENCY_SIGN + Util.float2String(tmpOrder.calcPriceWithTaste()));	
 			}
 		});
-		_newFoodLstView.notifyDataChanged(new ArrayList<OrderFood>());
+		_newFoodLstView.init();
 		
 		//执行请求更新沽清菜品
 		new QuerySellOutTask().execute(WirelessOrder.foodMenu.foods);
@@ -198,13 +195,8 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 	 */
 	@Override
 	public void onPickFood() {
-		// 调转到选菜Activity，并将新点菜的已有菜品传递过去
+		// 跳转到选菜Activity
 		Intent intent = new Intent(OrderActivity.this, PickFoodActivity.class);
-		Bundle bundle = new Bundle();
-		Order tmpOrder = new Order();
-		tmpOrder.foods = _newFoodLstView.getSourceData().toArray(new OrderFood[_newFoodLstView.getSourceData().size()]);
-		bundle.putParcelable(OrderParcel.KEY_VALUE, new OrderParcel(tmpOrder));
-		intent.putExtras(bundle);
 		startActivityForResult(intent, OrderFoodListView.PICK_FOOD);	
 	}
 	
@@ -216,7 +208,7 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 				 * 口味改变时通知ListView进行更新
 				 */
 				FoodParcel foodParcel = data.getParcelableExtra(FoodParcel.KEY_VALUE);
-				_newFoodLstView.notifyDataChanged(foodParcel);
+				_newFoodLstView.setFood(foodParcel);
 				_newFoodLstView.expandGroup(0);
 				 
 				
@@ -225,7 +217,8 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 				 * 选菜改变时通知新点菜的ListView进行更新
 				 */
 				OrderParcel orderParcel = data.getParcelableExtra(OrderParcel.KEY_VALUE);
-				_newFoodLstView.notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(orderParcel.foods)));
+				//_newFoodLstView.notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(orderParcel.foods)));
+				_newFoodLstView.addFoods(orderParcel.foods);
 				_newFoodLstView.expandGroup(0);
 			}
 			
@@ -237,7 +230,7 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 	 * 点解返回键进行监听弹出的Dialog
 	 */
 	public void showExitDialog(){
-		if(_newFoodLstView.getSourceData().size() != 0){			
+		if(_newFoodLstView.getSourceData().length != 0){			
 			new AlertDialog.Builder(this)
 			.setTitle("提示")
 			.setMessage("账单还未提交，是否确认退出?")

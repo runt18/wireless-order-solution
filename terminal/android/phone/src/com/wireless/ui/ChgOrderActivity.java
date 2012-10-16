@@ -1,10 +1,6 @@
 package com.wireless.ui;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -56,8 +52,8 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 		
 		public void handleMessage(Message message){
 			ChgOrderActivity theActivity = mActivity.get();
-			float totalPrice = new Order(theActivity.mOriFoodLstView.getSourceData().toArray(new OrderFood[theActivity.mOriFoodLstView.getSourceData().size()])).calcPriceWithTaste() +
-							   new Order(theActivity.mNewFoodLstView.getSourceData().toArray(new OrderFood[theActivity.mNewFoodLstView.getSourceData().size()])).calcPriceWithTaste();
+			float totalPrice = new Order(theActivity.mOriFoodLstView.getSourceData()).calcPriceWithTaste() +
+							   new Order(theActivity.mNewFoodLstView.getSourceData()).calcPriceWithTaste();
 			((TextView)theActivity.findViewById(R.id.amountvalue)).setText(Util.float2String((float)Math.round(totalPrice * 100) / 100));
 		}
 	};
@@ -102,51 +98,23 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 		commitBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				/**
-				 * 遍历查找已点和新点菜品中是否相同的菜品，
-				 * 如果有就将他们的点菜数量相加
-				 */
-				List<Food> foods = new ArrayList<Food>();
-				Iterator<OrderFood> oriIter = mOriFoodLstView.getSourceData().iterator();
-				while(oriIter.hasNext()){
-					OrderFood oriFood = oriIter.next();
-					Iterator<OrderFood> newIter = mNewFoodLstView.getSourceData().iterator();
-					while(newIter.hasNext()){
-						OrderFood newFood = newIter.next();
-						if(oriFood.equals(newFood)){
-							float orderAmount = oriFood.getCount() + newFood.getCount();
-							oriFood.setCount(orderAmount);
-							break;
-						}
-					}
-					foods.add(oriFood);
-				}
+			
+				OrderFood[] oriFoods = mOriFoodLstView.getSourceData();
+				OrderFood[] newFoods = mNewFoodLstView.getSourceData();
 				
-				/**
-				 * 遍历新点菜品中是否有新增加的菜品，
-				 * 有则添加到菜品列表中
-				 */
-				Iterator<OrderFood> newIter = mNewFoodLstView.getSourceData().iterator();
-				while(newIter.hasNext()){
-					Food newFood = newIter.next();
-					if(!foods.contains(newFood)){
-						foods.add(newFood);
-					}
-				}
+				Order orderToUpdate = new Order(oriFoods,
+												Short.parseShort(((EditText)findViewById(R.id.valueplatform)).getText().toString()),
+												Integer.parseInt(((EditText)findViewById(R.id.valuepeople)).getText().toString()));
+				//新点菜和已点菜的菜品合并
+				orderToUpdate.addFoods(newFoods);
 				
-				/**
-				 * 已点菜和新点菜合并后，生成新的Order，执行改单请求
-				 */
-				if(foods.size() != 0){
-					Order reqOrder = new Order(foods.toArray(new OrderFood[foods.size()]),
-											   Short.parseShort(((EditText)findViewById(R.id.valueplatform)).getText().toString()),
-											   Integer.parseInt(((EditText)findViewById(R.id.valuepeople)).getText().toString()));
-					reqOrder.srcTbl.aliasID = mOriOrder.destTbl.aliasID;
-					reqOrder.orderDate = mOriOrder.orderDate;
-					new UpdateOrderTask(reqOrder).execute(Type.UPDATE_ORDER);
+				if(orderToUpdate.foods.length != 0){
+					orderToUpdate.srcTbl.aliasID = mOriOrder.destTbl.aliasID;
+					orderToUpdate.orderDate = mOriOrder.orderDate;
+					new UpdateOrderTask(orderToUpdate).execute(Type.UPDATE_ORDER);
 				}else{
 					Toast.makeText(ChgOrderActivity.this, "您还未点菜，暂时不能下单。", Toast.LENGTH_SHORT).show();
-				}
+				}				
 			}
 		});
 
@@ -177,6 +145,8 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 			}
 		});
 		
+		mOriFoodLstView.init();
+		
 		//根据账单号请求相应的信息
 		new QueryOrderTask(Integer.valueOf(getIntent().getExtras().getString(MainActivity.KEY_TABLE_ID))).execute(WirelessOrder.foodMenu);
 
@@ -206,7 +176,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 			}
 		});	
 		
-		mNewFoodLstView.notifyDataChanged(new ArrayList<OrderFood>());
+		mNewFoodLstView.init();
 
 	}
 
@@ -231,13 +201,13 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 	 */
 	@Override
 	public void onPickFood() {
-		// 调转到选菜Activity，并将新点菜的已有菜品传递过去
+		// 调转到选菜Activity
 		Intent intent = new Intent(ChgOrderActivity.this, PickFoodActivity.class);
-		Bundle bundle = new Bundle();
-		Order tmpOrder = new Order();
-		tmpOrder.foods = mNewFoodLstView.getSourceData().toArray(new OrderFood[mNewFoodLstView.getSourceData().size()]);
-		bundle.putParcelable(OrderParcel.KEY_VALUE, new OrderParcel(tmpOrder));
-		intent.putExtras(bundle);
+//		Bundle bundle = new Bundle();
+//		Order tmpOrder = new Order();
+//		tmpOrder.foods = mNewFoodLstView.getSourceData();
+//		bundle.putParcelable(OrderParcel.KEY_VALUE, new OrderParcel(tmpOrder));
+//		intent.putExtras(bundle);
 		startActivityForResult(intent, OrderFoodListView.PICK_FOOD);		
 	}
 	
@@ -249,7 +219,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 				 * 口味改变时通知ListView进行更新
 				 */
 				FoodParcel foodParcel = data.getParcelableExtra(FoodParcel.KEY_VALUE);
-				mNewFoodLstView.notifyDataChanged(foodParcel);
+				mNewFoodLstView.setFood(foodParcel);
 				mNewFoodLstView.expandGroup(0);
 				mOriFoodLstView.collapseGroup(0);
 				
@@ -258,7 +228,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 				 * 选菜改变时通知新点菜的ListView进行更新
 				 */
 				OrderParcel orderParcel = data.getParcelableExtra(OrderParcel.KEY_VALUE);
-				mNewFoodLstView.notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(orderParcel.foods)));
+				mNewFoodLstView.addFoods(orderParcel.foods);
 				mNewFoodLstView.expandGroup(0);
 				mOriFoodLstView.collapseGroup(0);
 			}
@@ -352,7 +322,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 	 * 退出是如果有新点菜，提示确认退出
 	 */
 	public void showExitDialog(){
-		if(mNewFoodLstView.getSourceData().size() != 0){
+		if(mNewFoodLstView.getSourceData().length != 0){
 			new AlertDialog.Builder(this)
 			.setTitle("提示")
 			.setMessage("账单还未提交，是否确认退出?")
@@ -437,7 +407,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 				 * 请求账单成功则更新相关的控件
 				 */
 				//set date source to original food list view
-				mOriFoodLstView.notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(mOriOrder.foods)));
+				mOriFoodLstView.setFoods(mOriOrder.foods);
 				//expand the original food list view
 				mOriFoodLstView.expandGroup(0);
 				//set the table ID

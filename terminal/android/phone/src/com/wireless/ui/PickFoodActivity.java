@@ -1,7 +1,6 @@
 package com.wireless.ui;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 
 import android.content.Context;
 import android.content.Intent;
@@ -18,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.Params;
+import com.wireless.excep.BusinessException;
 import com.wireless.fragment.KitchenFragment;
 import com.wireless.fragment.PickFoodFragment;
 import com.wireless.parcel.FoodParcel;
@@ -43,8 +43,12 @@ public class PickFoodActivity extends FragmentActivity implements
 	private static final int PICK_WITH_TASTE = 6755;
 
 	private ViewHandler mViewHandler;
+	
 	//储存已点菜的列表
-	private ArrayList<OrderFood> mPickFoods = new ArrayList<OrderFood>();
+	//private ArrayList<OrderFood> mPickFoods = new ArrayList<OrderFood>();
+	
+	//通过临时账单保存新点菜
+	private Order mTmpOrder = new Order();;
 
 	private static class ViewHandler extends Handler{
 		private WeakReference<PickFoodActivity> mActivity;
@@ -162,11 +166,11 @@ public class PickFoodActivity extends FragmentActivity implements
 		mViewHandler = new ViewHandler(this);
 		
 		// 取得新点菜中已有的菜品List，并保存到pickFood的List中
-		OrderParcel orderParcel = getIntent().getParcelableExtra(
-				OrderParcel.KEY_VALUE);
-		for (int i = 0; i < orderParcel.foods.length; i++) {
-			mPickFoods.add(orderParcel.foods[i]);
-		}
+//		OrderParcel orderParcel = getIntent().getParcelableExtra(OrderParcel.KEY_VALUE);
+//		for (int i = 0; i < orderParcel.foods.length; i++) {
+//			mPickFoods.add(orderParcel.foods[i]);
+//		}
+		//mTmpOrder = getIntent().getParcelableExtra(OrderParcel.KEY_VALUE);
 		
 		//返回Button
 		TextView left = (TextView) findViewById(R.id.textView_left);
@@ -239,9 +243,7 @@ public class PickFoodActivity extends FragmentActivity implements
 
 		Intent intent = new Intent();
 		Bundle bundle = new Bundle();
-		Order tmpOrder = new Order();
-		tmpOrder.foods = mPickFoods.toArray(new OrderFood[mPickFoods.size()]);
-		bundle.putParcelable(OrderParcel.KEY_VALUE, new OrderParcel(tmpOrder));
+		bundle.putParcelable(OrderParcel.KEY_VALUE, new OrderParcel(mTmpOrder));
 		intent.putExtras(bundle);
 		setResult(RESULT_OK, intent);
 		super.onBackPressed();
@@ -293,32 +295,14 @@ public class PickFoodActivity extends FragmentActivity implements
 	 *            选中的菜品信息
 	 */
 	private void addFood(OrderFood food) {
-
-		int index = mPickFoods.indexOf(food);
-
-		if (index != -1) {
-			/**
-			 * 如果原来的菜品列表中已包含有相同的菜品， 则将新点菜的数量累加到原来的菜品中
-			 */
-			OrderFood pickedFood = mPickFoods.get(index);
-
-			float orderAmount = food.getCount() + pickedFood.getCount();
-			if (orderAmount > 255) {
-				Toast.makeText(this, "对不起，\"" + food.toString() + "\"最多只能点255份", Toast.LENGTH_SHORT).show();
-			} else {
-				Toast.makeText(this, "添加"	+ (food.hangStatus == OrderFood.FOOD_HANG_UP ? "并叫起\"" : "\"") + food.toString() + "\""
-								+ Util.float2String2(food.getCount()) + "份", Toast.LENGTH_SHORT)	.show();
-				pickedFood.setCount(orderAmount);
-				mPickFoods.set(index, pickedFood);
-			}
-		} else {
-			if (food.getCount() > 255) {
-				Toast.makeText(this, "对不起，\"" + food.toString() + "\"最多只能点255份", Toast.LENGTH_SHORT).show();
-			} else {
-				Toast.makeText(this, "新增"	+ (food.hangStatus == OrderFood.FOOD_HANG_UP ? "并叫起\"" : "\"") + food.toString() + "\""
-								+ Util.float2String2(food.getCount()) + "份", Toast.LENGTH_SHORT).show();
-				mPickFoods.add(food);
-			}
+		try{
+			mTmpOrder.addFood(food);
+			
+			Toast.makeText(this, "添加"	+ (food.hangStatus == OrderFood.FOOD_HANG_UP ? "并叫起\"" : "\"") + food.toString() + "\"" +
+								 Util.float2String2(food.getCount()) + "份", Toast.LENGTH_SHORT)	.show();
+			
+		}catch(BusinessException e){
+			Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
 		}
 	}
 }

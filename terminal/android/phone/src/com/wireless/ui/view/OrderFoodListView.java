@@ -1,10 +1,6 @@
 package com.wireless.ui.view;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -26,6 +22,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
+import com.wireless.excep.BusinessException;
+import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Type;
 import com.wireless.protocol.Util;
@@ -37,32 +35,30 @@ public class OrderFoodListView extends ExpandableListView{
 	public final static int PICK_TASTE = 1;
 	public final static int PICK_FOOD = 2;
 	
-	private OnOperListener _operListener;
-	private OnChangedListener _chgListener;
-	private Context _context;
-	private List<OrderFood> _foods = new ArrayList<OrderFood>();
-	private int _selectedPos;
-	private byte _type = Type.INSERT_ORDER;
-	private BaseExpandableListAdapter _adapter;
+	private OnOperListener mOperListener;
+	private OnChangedListener mChgListener;
+//	private OrderFood[] mSrcFoods;
+	private Order mTmpOrder = new Order();;
+	private int mSelectedPos;
+	private byte mType = Type.INSERT_ORDER;
+	private BaseExpandableListAdapter mAdapter;
 	
 	public OrderFoodListView(Context context, AttributeSet attrs){
 		super(context, attrs);
-		_context = context;
 		/**
 		 * 选择每个菜品的操作
 		 */
 		setOnChildClickListener(new OnChildClickListener() {
 			@Override
-			public boolean onChildClick(ExpandableListView parent, View v,
-										int groupPosition, int childPosition, long id) {
-				if(_type == Type.INSERT_ORDER){
-					_selectedPos = childPosition;
-					new ExtOperDialg(_foods.get(childPosition)).show();
+			public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+				if(mType == Type.INSERT_ORDER){
+					mSelectedPos = childPosition;
+					new ExtOperDialg(mTmpOrder.foods[childPosition]).show();
 					return true;
 					
-				}else if(_type == Type.UPDATE_ORDER){
-					_selectedPos = childPosition;
-					new ExtOperDialg(_foods.get(childPosition)).show();
+				}else if(mType == Type.UPDATE_ORDER){
+					mSelectedPos = childPosition;
+					new ExtOperDialg(mTmpOrder.foods[childPosition]).show();
 					return true;
 					
 				}else{
@@ -81,11 +77,11 @@ public class OrderFoodListView extends ExpandableListView{
 	 */
 	public void setType(int type){
 		if(type == Type.INSERT_ORDER){
-			_type = Type.INSERT_ORDER;
+			mType = Type.INSERT_ORDER;
 		}else if(type == Type.UPDATE_ORDER){
-			_type = Type.UPDATE_ORDER;
+			mType = Type.UPDATE_ORDER;
 		}else{
-			_type = Type.INSERT_ORDER;
+			mType = Type.INSERT_ORDER;
 		}
 	}
 	
@@ -94,7 +90,7 @@ public class OrderFoodListView extends ExpandableListView{
 	 * @param operListener
 	 */
 	public void setOperListener(OnOperListener operListener){
-		_operListener = operListener;
+		mOperListener = operListener;
 	}
 	     
 	/**
@@ -102,71 +98,17 @@ public class OrderFoodListView extends ExpandableListView{
 	 * @param chgListener
 	 */
 	public void setChangedListener(OnChangedListener chgListener){
-		_chgListener = chgListener;
+		mChgListener = chgListener;
 	}
 	
-	/**
-	 * 取得List中的数据源（就是菜品的List信息）
-	 * @return
-	 * 		OrderFood的List
-	 */
-	public List<OrderFood> getSourceData(){
-		return _foods;
+	public void addFood(OrderFood foodToAdd) throws BusinessException{
+		mTmpOrder.addFood(foodToAdd);
+		notifyDataChanged();
 	}
 	
-	/**
-	 * 在source data变化的时候，调用此函数来更新ListView的数据。
-	 */
-	public void notifyDataChanged(){
-		if(_adapter != null){
-			_adapter.notifyDataSetChanged();
-		}
-	}
-
-	/**
-	 * 函数用于更新ListView的source data，第一次调用此函数的时候，会中同时创建相应的Adapter。
-	 * @param foods
-	 * 			在ListView上显示的菜品数据
-	 */
-	public void notifyDataChanged(List<OrderFood> foods){
-		if(foods != null){
-			_foods = foods;
-			trim();
-			if(_adapter != null){
-				_adapter.notifyDataSetChanged();
-			}else{
-				if(_type == Type.INSERT_ORDER){
-					_adapter = new Adapter("新点菜"){
-						@Override
-						public void notifyDataSetChanged(){
-							trim();
-							super.notifyDataSetChanged();
-							if(_chgListener != null){
-								_chgListener.onSourceChanged();
-							}
-						}
-					};
-				}else{
-					_adapter = new Adapter("已点菜"){
-						@Override
-						public void notifyDataSetChanged(){
-							trim();
-							super.notifyDataSetChanged();
-							if(_chgListener != null){
-								_chgListener.onSourceChanged();
-							}
-						}						
-					};
-				}
-				setAdapter(_adapter);	
-				if(_chgListener != null){
-					_chgListener.onSourceChanged();
-				}
-			}
-
-		}else{
-			throw new NullPointerException();
-		}
+	public void addFoods(OrderFood[] foodsToAdd){
+		mTmpOrder.addFoods(foodsToAdd);
+		notifyDataChanged();
 	}
 	
 	/**
@@ -174,51 +116,97 @@ public class OrderFoodListView extends ExpandableListView{
 	 * 这种情况就调用此函数来更新选中的菜品
 	 * @param food
 	 */
-	public void notifyDataChanged(OrderFood food){
-		if(food != null && _adapter != null){
-			_foods.set(_selectedPos, food);
-			_adapter.notifyDataSetChanged();
+	public void setFood(OrderFood foodToSet){
+		if(foodToSet != null && mAdapter != null){
+			mTmpOrder.foods[mSelectedPos] = foodToSet;
+			mAdapter.notifyDataSetChanged();
 		
 		}else{
 			throw new NullPointerException();
 		}
 	}
-
-	private void trim(){
-		Iterator<OrderFood> iter = _foods.iterator();
-		HashMap<OrderFood, Integer> foodMap = new HashMap<OrderFood, Integer>();
-		while(iter.hasNext()){
-			OrderFood food = iter.next();
-			if(foodMap.containsKey(food)){
-				int amount = foodMap.get(food).intValue() + Util.float2Int(food.getCount());
-				foodMap.put(food, amount);
-			}else{
-				foodMap.put(food, Util.float2Int(food.getCount()));
-			}
+	
+	public void setFoods(OrderFood[] foods){
+		mTmpOrder.foods = foods;
+		notifyDataChanged();
+	}
+	
+	public void init(){
+		if(mType == Type.INSERT_ORDER){
+			mAdapter = new Adapter("新点菜"){
+				@Override
+				public void notifyDataSetChanged(){
+					trim();
+					super.notifyDataSetChanged();
+					if(mChgListener != null){
+						mChgListener.onSourceChanged();
+					}
+				}
+			};
+		}else{
+			mAdapter = new Adapter("已点菜"){
+				@Override
+				public void notifyDataSetChanged(){
+					trim();
+					super.notifyDataSetChanged();
+					if(mChgListener != null){
+						mChgListener.onSourceChanged();
+					}
+				}						
+			};
 		}
-		if(_foods.size() != foodMap.size()){
-			_foods.clear();
-			Iterator<Map.Entry<OrderFood, Integer>> iter2 = foodMap.entrySet().iterator();
-			while(iter2.hasNext()){
-				Map.Entry<OrderFood, Integer> entry = iter2.next();
-				OrderFood food = entry.getKey();
-				food.setCount(Util.int2Float(entry.getValue().intValue()));
-				_foods.add(food);
-			}			
+		setAdapter(mAdapter);	
+		if(mChgListener != null){
+			mChgListener.onSourceChanged();
+		}
+		
+	}
+	
+	/**
+	 * 取得List中的数据源（就是菜品的List信息）
+	 * @return
+	 * 		OrderFood的List
+	 */
+	public OrderFood[] getSourceData(){
+		return mTmpOrder.foods;
+	}
+	
+	/**
+	 * 在source data变化的时候，调用此函数来更新ListView的数据。
+	 */
+	private void notifyDataChanged(){
+		if(mAdapter != null){
+			mAdapter.notifyDataSetChanged();
 		}
 	}
 
-	public class Adapter extends BaseExpandableListAdapter{
+	private void trim(){
+		HashMap<OrderFood, OrderFood> foodMap = new HashMap<OrderFood, OrderFood>();
+		for(OrderFood food : mTmpOrder.foods){
+			if(foodMap.containsKey(food)){
+				float amount = foodMap.get(food).getCount() + food.getCount();
+				food.setCount((float)Math.round(amount * 100) / 100);
+				foodMap.put(food, food);
+			}else{
+				foodMap.put(food, food);
+			}			
+		}
+		if(mTmpOrder.foods.length != foodMap.size()){
+			mTmpOrder.foods = foodMap.values().toArray(new OrderFood[foodMap.values().size()]);
+		}
+	}
 
-		private String _groupTitle;
+	private class Adapter extends BaseExpandableListAdapter{
+
+		private String mGroupTitle;
 		
 		public Adapter(String groupTitle){
-			_groupTitle = groupTitle;
+			mGroupTitle = groupTitle;
 		}
 		
 		@Override
 		public Object getChild(int groupPosition, int childPosition) {
-			return _foods.get(childPosition);
+			return mTmpOrder.foods[childPosition];
 		}
 
 		@Override
@@ -228,8 +216,14 @@ public class OrderFoodListView extends ExpandableListView{
 
 		@Override
 		public View getChildView(int groupPosition, final int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-			View view = View.inflate(_context, R.layout.dropchilditem, null);
-			final OrderFood food = _foods.get(childPosition);
+			View view;
+			if(convertView == null){
+				view = View.inflate(getContext(), R.layout.dropchilditem, null);
+			}else{
+				view = convertView;
+			}
+			
+			final OrderFood food = mTmpOrder.foods[childPosition];
 			//show the name to each food
 			String status = "";
 			if(food.isSpecial()){
@@ -297,7 +291,7 @@ public class OrderFoodListView extends ExpandableListView{
 			 * "新点菜"的ListView显示"删菜"和"口味"
 			 * "已点菜"的ListView显示"退菜"和"催菜"
 			 */
-			if(_type == Type.INSERT_ORDER){
+			if(mType == Type.INSERT_ORDER){
 				//"删菜"操作			 
 				ImageView delFoodImgView = (ImageView)view.findViewById(R.id.deletefood);
 				delFoodImgView.setBackgroundResource(R.drawable.delete_selector);
@@ -307,7 +301,7 @@ public class OrderFoodListView extends ExpandableListView{
 					 */
 					@Override
 					public void onClick(View v) {
-						new AskCancelAmountDialog(_foods.get(childPosition)).show();
+						new AskCancelAmountDialog(mTmpOrder.foods[childPosition]).show();
 					}
 				});
 
@@ -317,8 +311,8 @@ public class OrderFoodListView extends ExpandableListView{
 				addTasteImgView.setOnClickListener(new View.OnClickListener() {				
 					@Override
 					public void onClick(View v) {
-						_selectedPos = childPosition;
-						new AskOrderAmountDialog(_foods.get(childPosition)).show();
+						mSelectedPos = childPosition;
+						new AskOrderAmountDialog(mTmpOrder.foods[childPosition]).show();
 					}
 				});
 				
@@ -333,15 +327,15 @@ public class OrderFoodListView extends ExpandableListView{
 							/**
 							 * 提示退菜权限密码，验证通过的情况下显示删菜数量Dialog
 							 */
-							new AskPwdDialog(_context, AskPwdDialog.PWD_5){
+							new AskPwdDialog(getContext(), AskPwdDialog.PWD_5){
 								@Override
 								protected void onPwdPass(Context context){
 									dismiss();
-									new AskCancelAmountDialog(_foods.get(childPosition)).show();
+									new AskCancelAmountDialog(mTmpOrder.foods[childPosition]).show();
 								}
 							}.show();
 						}else{
-							new AskCancelAmountDialog(_foods.get(childPosition)).show();
+							new AskCancelAmountDialog(mTmpOrder.foods[childPosition]).show();
 						}
 					}
 				});
@@ -353,13 +347,13 @@ public class OrderFoodListView extends ExpandableListView{
 					public void onClick(View v) {
 						if(food.isHurried){
 							food.isHurried = false;
-							Toast.makeText(_context, "取消催菜成功", Toast.LENGTH_SHORT).show();
-							_adapter.notifyDataSetChanged();
+							Toast.makeText(getContext(), "取消催菜成功", Toast.LENGTH_SHORT).show();
+							mAdapter.notifyDataSetChanged();
 				
 						}else{
 							food.isHurried = true;
-							Toast.makeText(_context, "催菜成功", Toast.LENGTH_SHORT).show();	
-							_adapter.notifyDataSetChanged();
+							Toast.makeText(getContext(), "催菜成功", Toast.LENGTH_SHORT).show();	
+							mAdapter.notifyDataSetChanged();
 						}			
 					}
 				}); 
@@ -369,12 +363,12 @@ public class OrderFoodListView extends ExpandableListView{
 
 		@Override
 		public int getChildrenCount(int groupPosition) {
-			return _foods.size();
+			return mTmpOrder.foods.length;
 		}
 
 		@Override
 		public Object getGroup(int groupPosition) {
-			return _groupTitle;
+			return mGroupTitle;
 		}
 
 		@Override
@@ -389,13 +383,19 @@ public class OrderFoodListView extends ExpandableListView{
 
 		@Override
 		public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
-			View view = View.inflate(_context, R.layout.dropgrounpitem, null);
-			((TextView)view.findViewById(R.id.grounname)).setText(_groupTitle);
+			View view;
+			if(convertView == null){
+				view = View.inflate(getContext(), R.layout.dropgrounpitem, null);
+			}else{
+				view = convertView;
+			}
+			
+			((TextView)view.findViewById(R.id.grounname)).setText(mGroupTitle);
 			
 			/**
 			 * "新点菜"的Group显示"点菜"Button
 			 */
-			if(_type == Type.INSERT_ORDER){
+			if(mType == Type.INSERT_ORDER){
 				/**
 				 * 点击点菜按钮
 				 */
@@ -405,8 +405,8 @@ public class OrderFoodListView extends ExpandableListView{
 				orderImg.setOnClickListener(new View.OnClickListener() {				
 					@Override
 					public void onClick(View v) {
-						if(_operListener != null){
-							_operListener.onPickFood();
+						if(mOperListener != null){
+							mOperListener.onPickFood();
 						}
 					}
 				});
@@ -419,20 +419,20 @@ public class OrderFoodListView extends ExpandableListView{
 				hurriedImgView.setOnClickListener(new View.OnClickListener() {				
 					@Override
 					public void onClick(View v) {						
-						if(_foods.size() > 0){
-							new AlertDialog.Builder(_context)
+						if(mTmpOrder.foods.length > 0){
+							new AlertDialog.Builder(getContext())
 								.setTitle("提示")
 								.setMessage("确定全单叫起吗?")
 								.setNeutralButton("确定", new DialogInterface.OnClickListener() {
 										@Override
 										public void onClick(DialogInterface dialog,	int which){
-											for(int i = 0; i < _foods.size(); i++){
-												OrderFood food = _foods.get(i);
+											for(int i = 0; i < mTmpOrder.foods.length; i++){
+												OrderFood food = mTmpOrder.foods[i];
 												if(food.hangStatus == OrderFood.FOOD_NORMAL){
 													food.hangStatus = OrderFood.FOOD_HANG_UP;
 												}							
 											}
-											_adapter.notifyDataSetChanged();
+											mAdapter.notifyDataSetChanged();
 										}
 									})
 									.setNegativeButton("取消", null)
@@ -443,8 +443,8 @@ public class OrderFoodListView extends ExpandableListView{
 				
 			}else{
 				boolean hasHangupFood = false;
-				for(int i = 0; i < _foods.size(); i++){
-					if(_foods.get(i).hangStatus == OrderFood.FOOD_HANG_UP){
+				for(int i = 0; i < mTmpOrder.foods.length; i++){
+					if(mTmpOrder.foods[i].hangStatus == OrderFood.FOOD_HANG_UP){
 						hasHangupFood = true;
 						break;
 					}
@@ -460,20 +460,20 @@ public class OrderFoodListView extends ExpandableListView{
 					immediateImgView.setOnClickListener(new View.OnClickListener() {				
 						@Override
 						public void onClick(View v) {						
-							if(_foods.size() > 0){
-								new AlertDialog.Builder(_context)
+							if(mTmpOrder.foods.length > 0){
+								new AlertDialog.Builder(getContext())
 								.setTitle("提示")
 								.setMessage("确定全单即起吗?")
 								.setNeutralButton("确定", new DialogInterface.OnClickListener() {
 										@Override
 										public void onClick(DialogInterface dialog,	int which){
-											for(int i = 0; i < _foods.size(); i++){
-												OrderFood food = _foods.get(i);
+											for(int i = 0; i < mTmpOrder.foods.length; i++){
+												OrderFood food = mTmpOrder.foods[i];
 												if(food.hangStatus == OrderFood.FOOD_HANG_UP){
 													food.hangStatus = OrderFood.FOOD_IMMEDIATE;
 												}								
 											}
-											_adapter.notifyDataSetChanged();
+											mAdapter.notifyDataSetChanged();
 										}
 									})
 									.setNegativeButton("取消", null)
@@ -515,9 +515,9 @@ public class OrderFoodListView extends ExpandableListView{
 	private class AskCancelAmountDialog extends Dialog{
 	
 		AskCancelAmountDialog(final OrderFood selectedFood) {
-			super(_context, R.style.FullHeightDialog);
+			super(OrderFoodListView.this.getContext(), R.style.FullHeightDialog);
 			
-			View view = LayoutInflater.from(_context).inflate(R.layout.alert, null);
+			View view = LayoutInflater.from(getContext()).inflate(R.layout.alert, null);
 			setContentView(view);
 			//getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
 			((TextView)view.findViewById(R.id.ordername)).setText("请输入" + selectedFood.name + "的删除数量");
@@ -541,26 +541,26 @@ public class OrderFoodListView extends ExpandableListView{
 							/**
 							 * 如果数量相等，则从列表中删除此菜
 							 */
-							_foods.remove(selectedFood);
-							_adapter.notifyDataSetChanged();
+							mTmpOrder.remove(selectedFood);
+							mAdapter.notifyDataSetChanged();
 							dismiss();
-							Toast.makeText(_context, "删除\"" + selectedFood.toString() + "\"" + cancelAmount + "份成功", Toast.LENGTH_LONG).show();
+							Toast.makeText(getContext(), "删除\"" + selectedFood.toString() + "\"" + cancelAmount + "份成功", Toast.LENGTH_LONG).show();
 							
 						}else if(foodAmount > cancelAmount){
 							/**
 							 * 如果删除数量少于已点数量，则相应减去删除数量
 							 */
 							selectedFood.setCount(foodAmount - cancelAmount);
-							_adapter.notifyDataSetChanged();
+							mAdapter.notifyDataSetChanged();
 							dismiss();
-							Toast.makeText(_context, "删除\"" + selectedFood.toString() + "\"" + cancelAmount + "份成功", Toast.LENGTH_LONG).show();
+							Toast.makeText(getContext(), "删除\"" + selectedFood.toString() + "\"" + cancelAmount + "份成功", Toast.LENGTH_LONG).show();
 							
 						}else{
-							Toast.makeText(_context, "输入的删除数量大于已点数量, 请重新输入", Toast.LENGTH_LONG).show();
+							Toast.makeText(getContext(), "输入的删除数量大于已点数量, 请重新输入", Toast.LENGTH_LONG).show();
 						}
 						
 					}catch(NumberFormatException e){
-						Toast.makeText(_context, "你输入删菜数量不正确", Toast.LENGTH_LONG).show();
+						Toast.makeText(getContext(), "你输入删菜数量不正确", Toast.LENGTH_LONG).show();
 					}
 
 				}
@@ -587,9 +587,9 @@ public class OrderFoodListView extends ExpandableListView{
 	private class AskOrderAmountDialog extends Dialog{
 	
 		AskOrderAmountDialog(final OrderFood selectedFood) {
-			super(_context, R.style.FullHeightDialog);
+			super(OrderFoodListView.this.getContext(), R.style.FullHeightDialog);
 			
-			View view = LayoutInflater.from(_context).inflate(R.layout.alert, null);
+			View view = LayoutInflater.from(getContext()).inflate(R.layout.alert, null);
 			setContentView(view);
 			//getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
 			((TextView)view.findViewById(R.id.ordername)).setText("请输入" + selectedFood.name + "的数量");
@@ -608,16 +608,16 @@ public class OrderFoodListView extends ExpandableListView{
 					try{
 						float amount = Float.parseFloat(amountEdtTxt.getText().toString());
 						if(amount > 255){
-							Toast.makeText(_context, "对不起，\"" + selectedFood.toString() + "\"最多只能点255份", Toast.LENGTH_SHORT).show();
+							Toast.makeText(getContext(), "对不起，\"" + selectedFood.toString() + "\"最多只能点255份", Toast.LENGTH_SHORT).show();
 						}else{
 							selectedFood.setCount(amount);
-							_adapter.notifyDataSetChanged();
-							Toast.makeText(_context, "设置\"" + selectedFood.toString() + "\"" + "数量为" + amount + "份", Toast.LENGTH_LONG).show();
+							mAdapter.notifyDataSetChanged();
+							Toast.makeText(getContext(), "设置\"" + selectedFood.toString() + "\"" + "数量为" + amount + "份", Toast.LENGTH_LONG).show();
 							dismiss();
 						}							
 						
 					}catch(NumberFormatException e){
-						Toast.makeText(_context, "您输入的数量格式不正确，请重新输入", Toast.LENGTH_SHORT).show();
+						Toast.makeText(getContext(), "您输入的数量格式不正确，请重新输入", Toast.LENGTH_SHORT).show();
 					}					
 				}
 			});
@@ -635,7 +635,7 @@ public class OrderFoodListView extends ExpandableListView{
 			//弹出软键盘
 	           getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE); 
 	           InputMethodManager imm = (InputMethodManager)
-	        		   _context.getSystemService(Context.INPUT_METHOD_SERVICE);
+	        		   getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
 	                            imm.showSoftInput(this.getCurrentFocus(), 0); //显示软键盘
 	                            imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
 		}		
@@ -648,11 +648,11 @@ public class OrderFoodListView extends ExpandableListView{
 
 		
 		ExtOperDialg(final OrderFood selectedFood) {
-			super(_context, R.style.FullHeightDialog);
+			super(OrderFoodListView.this.getContext(), R.style.FullHeightDialog);
 			setContentView(R.layout.item_alert);
 			getWindow().setBackgroundDrawableResource(R.drawable.dialog_content_bg);
 			((TextView)findViewById(R.id.ordername)).setText("请选择" + selectedFood.name + "的操作");
-			if(_type == Type.INSERT_ORDER){
+			if(mType == Type.INSERT_ORDER){
 				/**
 				 * 新点菜是扩展功能为"删菜"、"口味"、"叫起/取消叫起"、“数量”
 				 */
@@ -671,9 +671,9 @@ public class OrderFoodListView extends ExpandableListView{
 				((RelativeLayout)findViewById(R.id.r2)).setOnClickListener(new View.OnClickListener() {						
 					@Override
 					public void onClick(View arg0) {
-						if(_operListener != null){
+						if(mOperListener != null){
 							dismiss();
-							_operListener.onPickTaste(selectedFood);
+							mOperListener.onPickTaste(selectedFood);
 						}
 					}
 				});
@@ -720,7 +720,7 @@ public class OrderFoodListView extends ExpandableListView{
 					public void onClick(View arg0) {
 						dismiss();
 						if(WirelessOrder.restaurant.pwd5 != null){
-							new AskPwdDialog(_context, AskPwdDialog.PWD_5){							
+							new AskPwdDialog(getContext(), AskPwdDialog.PWD_5){							
 								@Override
 								protected void onPwdPass(Context context){
 									dismiss();
@@ -823,7 +823,7 @@ public class OrderFoodListView extends ExpandableListView{
 		@Override
 		protected void onStop(){
 			//trim(_selectedFood);
-			_adapter.notifyDataSetChanged();
+			mAdapter.notifyDataSetChanged();
 		}		
 	}
 	

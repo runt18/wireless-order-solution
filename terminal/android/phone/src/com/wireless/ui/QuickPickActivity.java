@@ -1,7 +1,6 @@
 package com.wireless.ui;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -48,9 +47,11 @@ import com.wireless.protocol.Util;
 import com.wireless.ui.view.OrderFoodListView;
 import com.wireless.ui.view.OrderFoodListView.OnChangedListener;
 
-public class QuickPickActivity extends FragmentActivity implements com.wireless.fragment.PickFoodFragment.OnFoodPickedListener, 
-	com.wireless.fragment.KitchenFragment.OnFoodPickedListener,
-	com.wireless.ui.view.OrderFoodListView.OnOperListener{
+public class QuickPickActivity extends FragmentActivity implements 
+							com.wireless.fragment.PickFoodFragment.OnFoodPickedListener, 
+							com.wireless.fragment.KitchenFragment.OnFoodPickedListener,
+							com.wireless.ui.view.OrderFoodListView.OnOperListener
+{
 	//每个点菜方式的标签
 	private static final int NUMBER_FRAGMENT = 6320;
 	private static final int KITCHEN_FRAGMENT = 6321;
@@ -60,37 +61,36 @@ public class QuickPickActivity extends FragmentActivity implements com.wireless.
 	//activity返回标签
 	private final static int PICK_WITH_TASTE = 7755;
 	
-	private static final int REFRESH_TOTAL_TEXT = 7734;
-	private static final int REFRESH_ALL = 7733;
-	private static final int REFRESH_FOODS = 7735;
-	
 	//储存已点菜的列表
-	private ArrayList<OrderFood> mPickFoods = new ArrayList<OrderFood>();
+	//private ArrayList<OrderFood> mPickFoods = new ArrayList<OrderFood>();
+	
 
 	private TextHandler mTextHandler;
-	/*
-	 * 刷新已点菜显示的handler
+	
+	private OrderFoodListView mNewFoodLstView;
+	
+	/**
+	 * 刷新新点菜显示的Handler
 	 */
 	private static class TextHandler extends Handler{
 		private WeakReference<QuickPickActivity> mActivity;
 		private TextView mTotalCnt;
 		private TextView mTotalPrice;
-		private OrderFoodListView mOriFoodLstView;
+		private OrderFoodListView mNewFoodLstView;
 		
-		TextHandler(final QuickPickActivity activity)
-		{
+		TextHandler(final QuickPickActivity activity){
 			mActivity = new WeakReference<QuickPickActivity>(activity);
 			mTotalCnt = (TextView) activity.findViewById(R.id.textView_totalCount_revealFood__quickPick);
 			mTotalPrice = (TextView) activity.findViewById(R.id.textView_totalPrice_revealFood_quickPick);
 			
-			mOriFoodLstView = (OrderFoodListView)activity.findViewById(R.id.orderFoodListView_revealFood_quickPick);
-			mOriFoodLstView.setOperListener(activity);
-			//设置已点菜listview的类型和侦听器
-			mOriFoodLstView.setType(Type.INSERT_ORDER);
-			mOriFoodLstView.setChangedListener(new OnChangedListener(){
+			mNewFoodLstView = mActivity.get().mNewFoodLstView;
+			mNewFoodLstView.setOperListener(activity);
+			//设置已点菜ListView的类型和侦听器
+			mNewFoodLstView.setType(Type.INSERT_ORDER);
+			mNewFoodLstView.setChangedListener(new OnChangedListener(){
 				@Override
 				public void onSourceChanged() {
-					activity.mTextHandler.sendEmptyMessage(REFRESH_TOTAL_TEXT);
+					activity.mTextHandler.sendEmptyMessage(0);
 				}
 			});
 
@@ -99,42 +99,13 @@ public class QuickPickActivity extends FragmentActivity implements com.wireless.
 		@Override
 		public void handleMessage(Message msg) {
 			QuickPickActivity activity = mActivity.get();
-			//根据不同的信息刷新list的显示或总数的显示
-			switch(msg.what)
-			{
-			case REFRESH_ALL:
-				refreshFoods(activity);
-				refreshTotalText(activity);
-				break;
-			case REFRESH_TOTAL_TEXT:
-				refreshTotalText(activity);
-				break;
-			case REFRESH_FOODS:
-				refreshFoods(activity);
-				break;
-			}
-		}
-		
-		private void refreshFoods(QuickPickActivity activity){
-			mOriFoodLstView.notifyDataChanged(activity.mPickFoods);
-			mOriFoodLstView.expandGroup(0);
-		}
-		
-		private void refreshTotalText(QuickPickActivity activity)
-		{
-			//计算总数和总价
-			int totalCount = 0;
-			float totalPrice = 0.0f;
-			for(OrderFood f:activity.mPickFoods)
-			{
-				totalCount += f.getCount();
-				totalPrice += f.getPriceWithTaste() * f.getCount();
-			}
-			
-			mTotalCnt.setText(""+ totalCount);
-			mTotalPrice.setText(Util.float2String((float)Math.round(totalPrice * 100) / 100));
-		}
+			//刷新新点菜List的显示总数和金额
+			mTotalCnt.setText(Integer.toString(activity.mNewFoodLstView.getSourceData().length));
+			mTotalPrice.setText(Util.CURRENCY_SIGN + Util.float2String(new Order(activity.mNewFoodLstView.getSourceData()).calcPriceWithTaste()));
+		}		
+
 	}
+	
 	//刷新每个view的handler
 	private ViewHandler mViewHandler;
 	
@@ -150,8 +121,7 @@ public class QuickPickActivity extends FragmentActivity implements com.wireless.
 		private FrameLayout mFgmContainer;
 		private int LAST_VIEW;
 
-		ViewHandler(QuickPickActivity activity)
-		{
+		ViewHandler(QuickPickActivity activity){
 			mActivity = new WeakReference<QuickPickActivity>(activity);
 			mTitleTextView = (TextView) activity.findViewById(R.id.toptitle);
 			mTitleTextView.setVisibility(View.VISIBLE);
@@ -229,15 +199,15 @@ public class QuickPickActivity extends FragmentActivity implements com.wireless.
 				mFgmContainer.setVisibility(View.GONE);
 				((RelativeLayout) activity.findViewById(R.id.relativeLayout_bottom_revealFood_quickPick)).setVisibility(View.VISIBLE);
 				mTitleTextView.setText("已点菜");
-				//刷新已点菜数据和按钮状态
-				activity.mTextHandler.sendEmptyMessage(REFRESH_ALL); 
+				//展开新点菜ListView
+				mActivity.get().mNewFoodLstView.expandGroup(0);
 				setLastCate(PICKED_FOOD_INTERFACE);
 				break;
 			}
 		}
 		
-		private void setLastCate(int cate)
-		{
+		private void setLastCate(int cate){
+			
 			QuickPickActivity activity = mActivity.get();
 			//还原按样式
 			mNumBtn.setImageResource(R.drawable.number_btn);
@@ -263,6 +233,7 @@ public class QuickPickActivity extends FragmentActivity implements com.wireless.
 				break;
 			case PICKED_FOOD_INTERFACE:
 				mPickedBtn.setImageResource(R.drawable.picked_food_down);
+				break;
 			}
 			editor.commit();
 		}
@@ -272,6 +243,8 @@ public class QuickPickActivity extends FragmentActivity implements com.wireless.
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.quick_pick);
+		
+		mNewFoodLstView = (OrderFoodListView)findViewById(R.id.orderFoodListView_revealFood_quickPick);
 		
 		mViewHandler = new ViewHandler(this);
 		mTextHandler = new TextHandler(this);
@@ -302,13 +275,14 @@ public class QuickPickActivity extends FragmentActivity implements com.wireless.
 			@Override
 			public void onClick(View v) {
 				//若未点菜，则提示。
-				if(mPickFoods.size() != 0)
-				{
+				if(mNewFoodLstView.getSourceData().length != 0){
 					CommitDialog dialog = new CommitDialog(QuickPickActivity.this);
 					dialog.setTitle("请输入餐台号或核对点菜信息");
 					dialog.show();
+					
+				}else{
+					Toast.makeText(getApplicationContext(), "您尚未点菜", Toast.LENGTH_SHORT).show();
 				}
-				else Toast.makeText(getApplicationContext(), "您尚未点菜", Toast.LENGTH_SHORT).show();
 			}
 		});
 
@@ -369,25 +343,20 @@ public class QuickPickActivity extends FragmentActivity implements com.wireless.
 			FoodParcel foodParcel;
 			switch (requestCode) {
 			case PICK_WITH_TASTE:
-				/*
-				 * 添加口味后添加到pickList中
-				 */
+				
+				 //添加口味后添加到pickList中
 				foodParcel = data.getParcelableExtra(FoodParcel.KEY_VALUE);
 				addFood(foodParcel);
+				
 				break;
+				
 			case OrderFoodListView.PICK_TASTE:
-				/*
-				 * 口味改变时通知ListView进行更新
-				 */
+				
+				 //口味改变时通知ListView进行更新
 				foodParcel = data.getParcelableExtra(FoodParcel.KEY_VALUE);
-				for(int i =0;i<mPickFoods.size();i++)
-				{
-					if(mPickFoods.get(i).equalsIgnoreTaste(foodParcel))
-					{
-						mPickFoods.set(i, foodParcel);
-						mTextHandler.sendEmptyMessage(REFRESH_FOODS);
-					}
-				}
+				mNewFoodLstView.setFood(foodParcel);				
+
+				break;
 			}
 		}
 	}
@@ -414,7 +383,7 @@ public class QuickPickActivity extends FragmentActivity implements com.wireless.
 		Bundle bundle = new Bundle();
 		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(food));
 		intent.putExtras(bundle);
-		startActivityForResult(intent, PICK_WITH_TASTE);
+		startActivityForResult(intent, OrderFoodListView.PICK_TASTE);
 	}
 	
 	/**
@@ -425,31 +394,16 @@ public class QuickPickActivity extends FragmentActivity implements com.wireless.
 	 */
 	private void addFood(OrderFood food) {
 
-		int index = mPickFoods.indexOf(food);
+		try{
 
-		if (index != -1) {
-			/**
-			 * 如果原来的菜品列表中已包含有相同的菜品， 则将新点菜的数量累加到原来的菜品中
-			 */
-			OrderFood pickedFood = mPickFoods.get(index);
-
-			float orderAmount = food.getCount() + pickedFood.getCount();
-			if (orderAmount > 255) {
-				Toast.makeText(this, "对不起，\"" + food.toString() + "\"最多只能点255份", Toast.LENGTH_SHORT).show();
-			} else {
-				Toast.makeText(this, "添加"	+ (food.hangStatus == OrderFood.FOOD_HANG_UP ? "并叫起\"" : "\"") + food.toString() + "\""
-								+ Util.float2String2(food.getCount()) + "份", Toast.LENGTH_SHORT)	.show();
-				pickedFood.setCount(orderAmount);
-				mPickFoods.set(index, pickedFood);
-			}
-		} else {
-			if (food.getCount() > 255) {
-				Toast.makeText(this, "对不起，\"" + food.toString() + "\"最多只能点255份", Toast.LENGTH_SHORT).show();
-			} else {
-				Toast.makeText(this, "新增"	+ (food.hangStatus == OrderFood.FOOD_HANG_UP ? "并叫起\"" : "\"") + food.toString() + "\""
-								+ Util.float2String2(food.getCount()) + "份", Toast.LENGTH_SHORT).show();
-				mPickFoods.add(food);
-			}
+			mNewFoodLstView.addFood(food);
+			
+			Toast.makeText(this, "添加"	+ (food.hangStatus == OrderFood.FOOD_HANG_UP ? "并叫起\"" : "\"") + food.toString() + "\"" +
+								 Util.float2String2(food.getCount()) + "份", Toast.LENGTH_SHORT)	.show();
+			
+			
+		}catch(BusinessException e){
+			Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
 		}
 	}
 
@@ -605,17 +559,17 @@ public class QuickPickActivity extends FragmentActivity implements com.wireless.
         	((Button)this.findViewById(R.id.button_confirm_commitDialog)).setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					//FIXME 
-					OrderFood[] foods = mPickFoods.toArray(new OrderFood[mPickFoods.size()]);
-					if(foods.length != 0 && !tableText.getText().toString().equals("")){
-						Order reqOrder = new Order(foods,											   
-												   Short.parseShort(tableText.getText().toString()),
-												   Integer.parseInt(peopleCountTextView.getText().toString()));
-						new InsertOrderTask(reqOrder).execute(Type.INSERT_ORDER);
-						
-					}else{
-						Toast.makeText(QuickPickActivity.this, "请输入台号", Toast.LENGTH_SHORT).show();
-					}
+					//TODO complete the order commit
+//					OrderFood[] foods = mPickFoods.toArray(new OrderFood[mPickFoods.size()]);
+//					if(foods.length != 0 && !tableText.getText().toString().equals("")){
+//						Order reqOrder = new Order(foods,											   
+//												   Short.parseShort(tableText.getText().toString()),
+//												   Integer.parseInt(peopleCountTextView.getText().toString()));
+//						new InsertOrderTask(reqOrder).execute(Type.INSERT_ORDER);
+//						
+//					}else{
+//						Toast.makeText(QuickPickActivity.this, "请输入台号", Toast.LENGTH_SHORT).show();
+//					}
 				}
 			});
         	
@@ -624,8 +578,7 @@ public class QuickPickActivity extends FragmentActivity implements com.wireless.
 
 				@Override
 				public void onClick(View v) {
-					if(!peopleCountTextView.getText().toString().equals(""))
-					{
+					if(!peopleCountTextView.getText().toString().equals("")){
 						float curNum = Float.parseFloat(peopleCountTextView.getText().toString());
 						peopleCountTextView.setText(Util.float2String2(++curNum));
 					}
@@ -670,14 +623,16 @@ public class QuickPickActivity extends FragmentActivity implements com.wireless.
            	
            	mListView.setAdapter(new BaseAdapter(){
 
+           		OrderFood[] mSrcFoods = mNewFoodLstView.getSourceData();
+           		
 				@Override
 				public int getCount() {
-					return mPickFoods.size();
+					return mSrcFoods.length;
 				}
 
 				@Override
 				public Object getItem(int position) {
-					return mPickFoods.get(position);
+					return mSrcFoods[position];
 				}
 
 				@Override
@@ -688,11 +643,13 @@ public class QuickPickActivity extends FragmentActivity implements com.wireless.
 				@Override
 				public View getView(int position, View convertView, ViewGroup parent) {
 					View view;
-					if(convertView == null)
+					if(convertView == null){
 						view = LayoutInflater.from(getContext()).inflate(R.layout.quick_pick_commit_dialog_item, null);
-					else view = convertView;
+					}else{
+						view = convertView;
+					}
 					
-					OrderFood food = mPickFoods.get(position);
+					OrderFood food = mSrcFoods[position];
 					if(food.name.length() >= 8)
 						((TextView)view.findViewById(R.id.textView_foodName_commit_dialog_item)).setText(food.name.substring(0,	8));
 					else ((TextView)view.findViewById(R.id.textView_foodName_commit_dialog_item)).setText(food.name);
@@ -704,5 +661,6 @@ public class QuickPickActivity extends FragmentActivity implements com.wireless.
            	});
 		}
 	}
+
 }
 

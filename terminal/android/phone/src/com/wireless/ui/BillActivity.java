@@ -90,6 +90,7 @@ public class BillActivity extends Activity {
 				finish();
 			}
 		});
+		
 		/**
 		 * "结帐"Button
 		 */
@@ -206,14 +207,17 @@ public class BillActivity extends Activity {
 		});
 
 		((RadioButton) view.findViewById(R.id.discount1)).setText("无折扣");
-		//根据discount数量添加radiobutton
+		((RadioButton) view.findViewById(R.id.discount1)).setTag(new Discount());
+		//根据discount数量添加Radio Button
 		RadioGroup radioGroup = (RadioGroup) view.findViewById(R.id.radioGroup2);
-		for(Discount d:WirelessOrder.foodMenu.discounts)
-		{
-			RadioButton rBtn = new RadioButton(BillActivity.this);
-			rBtn.setTag(d);
-			rBtn.setText(d.name);
-			radioGroup.addView(rBtn, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		for(Discount discount : WirelessOrder.foodMenu.discounts){
+			RadioButton radioBtn = new RadioButton(BillActivity.this);
+			radioBtn.setTag(discount);
+			radioBtn.setText(discount.name);
+			radioGroup.addView(radioBtn, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+			if(discount.equals(mOrderToPay.getDiscount())){
+				radioBtn.setChecked(true);
+			}
 		}
 
 		// 折扣方式方式添加事件监听器
@@ -289,6 +293,13 @@ public class BillActivity extends Activity {
 			}else{
 				
 				mOrderToPay = order;
+				
+				 //Apply discount in case of default
+				for(Discount discount : WirelessOrder.foodMenu.discounts){
+					if(discount.isDefault()){
+						mOrderToPay.setDiscount(discount);
+					}
+				}
 				
 				/**
 				 * 请求账单成功则更新相关的控件
