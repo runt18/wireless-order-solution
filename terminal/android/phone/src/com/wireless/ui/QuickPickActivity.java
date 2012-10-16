@@ -22,6 +22,10 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -272,6 +276,7 @@ public class QuickPickActivity extends FragmentActivity implements com.wireless.
 		mViewHandler = new ViewHandler(this);
 		mTextHandler = new TextHandler(this);
 		
+		this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 		//返回Button
 		TextView left = (TextView) findViewById(R.id.textView_left);
 		left.setText("返回");
@@ -299,7 +304,7 @@ public class QuickPickActivity extends FragmentActivity implements com.wireless.
 				//若未点菜，则提示。
 				if(mPickFoods.size() != 0)
 				{
-					CommitDialog dialog = new CommitDialog(QuickPickActivity.this, android.R.style.Theme_Dialog);
+					CommitDialog dialog = new CommitDialog(QuickPickActivity.this);
 					dialog.setTitle("请输入餐台号或核对点菜信息");
 					dialog.show();
 				}
@@ -533,19 +538,21 @@ public class QuickPickActivity extends FragmentActivity implements com.wireless.
 		}
 		private void init(){
 			this.setContentView(R.layout.commit_dialog);
+
 			//设置对话框长宽
-			LayoutParams lp = getWindow().getAttributes();
-			lp.height = LayoutParams.WRAP_CONTENT;
-			lp.width = 440;
+			final LayoutParams lp = getWindow().getAttributes();
+			lp.height = 660;
+			lp.width = LayoutParams.MATCH_PARENT;
 			getWindow().setAttributes(lp);
 			
+           	final AutoCompleteTextView tableText = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextView_commitDialog);
+           	
 			//弹出软键盘
 			getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE); 
 			final InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-           	imm.showSoftInput(this.getCurrentFocus(), 0); //显示软键盘
+           	imm.showSoftInput(tableText, 0); //显示软键盘
            	imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
            	
-           	final AutoCompleteTextView tableText = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextView_commitDialog);
            	//改单按钮
            	final Button changeBtn = (Button) findViewById(R.id.button_changeOrder_commitDialog);
            	changeBtn.setOnClickListener(new View.OnClickListener() {
@@ -556,37 +563,35 @@ public class QuickPickActivity extends FragmentActivity implements com.wireless.
 				}
 			});
            	
-           	final View line = (View) findViewById(R.id.view1);
-           	((Button)this.findViewById(R.id.button_detail_commit_dialog)).setOnClickListener(new View.OnClickListener(){
-				@Override
-				public void onClick(View v) {
-					//判断listview状态并收起键盘
-					if(mListView.isShown())
-					{
-						//显示更多项
-						mListView.setVisibility(View.GONE);
-						changeBtn.setVisibility(View.GONE);
-						line.setVisibility(View.GONE);
-						//设置对话框為自适应
-						LayoutParams lp = getWindow().getAttributes();
-						lp.height = LayoutParams.WRAP_CONTENT;
-						lp.width = 440;
-						getWindow().setAttributes(lp);
-					}
-					else {
-						imm.hideSoftInputFromWindow(tableText.getWindowToken(), 0);
-						mListView.requestFocus();
-						mListView.setVisibility(View.VISIBLE);
-						changeBtn.setVisibility(View.VISIBLE);
-						line.setVisibility(View.VISIBLE);
-						//设置对话框长宽为600px
-						LayoutParams lp = getWindow().getAttributes();
-						lp.height = 600;
-						lp.width = 440;
-						getWindow().setAttributes(lp);
-					}
-				}
-           	});
+//           	final View line = (View) findViewById(R.id.view1);
+//           	((Button)this.findViewById(R.id.button_detail_commit_dialog)).setOnClickListener(new View.OnClickListener(){
+//				@Override
+//				public void onClick(View v) {
+//					//判断listview状态并收起键盘
+//					if(mListView.isShown())
+//					{
+//						//显示更多项
+//						mListView.setVisibility(View.GONE);
+//						changeBtn.setVisibility(View.GONE);
+//						line.setVisibility(View.GONE);
+//						//设置对话框為自适应
+//						lp.height = LayoutParams.WRAP_CONTENT;
+//						lp.width = 440;
+//						getWindow().setAttributes(lp);
+//					}
+//					else {
+//						imm.hideSoftInputFromWindow(tableText.getWindowToken(), 0);
+//						mListView.requestFocus();
+//						mListView.setVisibility(View.VISIBLE);
+//						changeBtn.setVisibility(View.VISIBLE);
+//						line.setVisibility(View.VISIBLE);
+//						//设置对话框长宽为600px
+//						lp.height = 600;
+//						lp.width = 440;
+//						getWindow().setAttributes(lp);
+//					}
+//				}
+//           	});
            	//取消按钮
         	((Button)this.findViewById(R.id.button_cancel_commitDialog)).setOnClickListener(new View.OnClickListener() {
 				@Override
@@ -643,6 +648,26 @@ public class QuickPickActivity extends FragmentActivity implements com.wireless.
 			});
            	
            	mListView = (ListView) this.findViewById(R.id.listView_commitDialog);
+           	//当被点击或滚动时隐藏键盘
+           	mListView.setOnScrollListener(new OnScrollListener() {
+				@Override
+				public void onScrollStateChanged(AbsListView view, int scrollState) {
+					imm.hideSoftInputFromWindow(tableText.getWindowToken(), 0);
+				}
+				
+				@Override
+				public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+					
+				}
+			});
+           	
+           	mListView.setOnItemClickListener(new OnItemClickListener(){
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+					imm.hideSoftInputFromWindow(tableText.getWindowToken(), 0); 
+				}
+           	});
+           	
            	mListView.setAdapter(new BaseAdapter(){
 
 				@Override
@@ -662,14 +687,16 @@ public class QuickPickActivity extends FragmentActivity implements com.wireless.
 
 				@Override
 				public View getView(int position, View convertView, ViewGroup parent) {
-					//TODO add more
 					View view;
 					if(convertView == null)
 						view = LayoutInflater.from(getContext()).inflate(R.layout.quick_pick_commit_dialog_item, null);
 					else view = convertView;
 					
 					OrderFood food = mPickFoods.get(position);
-					((TextView)view.findViewById(R.id.textView_foodName_commit_dialog_item)).setText(food.name);
+					if(food.name.length() >= 8)
+						((TextView)view.findViewById(R.id.textView_foodName_commit_dialog_item)).setText(food.name.substring(0,	8));
+					else ((TextView)view.findViewById(R.id.textView_foodName_commit_dialog_item)).setText(food.name);
+					
 					((TextView)view.findViewById(R.id.textView_amount_quickPick_commitDialog_item)).setText(Util.float2String2(food.getCount()));
 					((TextView)view.findViewById(R.id.textView_price_quickPick_commitDialog_item)).setText(Util.CURRENCY_SIGN + Util.float2String2(food.calcPriceWithTaste()));
 					return view;

@@ -17,7 +17,6 @@ import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -108,7 +107,7 @@ public class PickFoodFragment extends Fragment{
 			}else{
 				tmpFoods = mSrcFoods;
 			}
-			
+			  
 			fragment.mAdapter = fragment.new FoodAdapter(tmpFoods);
 			fragment.mGridView.setAdapter(fragment.mAdapter);
 		}
@@ -241,13 +240,63 @@ public class PickFoodFragment extends Fragment{
 			((TextView) view.findViewById(R.id.textView_foodName_pickFoodFragment_item)).setText(food.name);
 			((TextView) view.findViewById(R.id.textView_num_pickFoodFragment_item)).setText(Integer.toString(food.aliasID));
 			((TextView) view.findViewById(R.id.textView_price_pickFoodFragment_item)).setText(Util.float2String2(food.getPrice()));
+			
 			//设置售罄的显示
 			if(food.isSellOut()){
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
 			}else{
-				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.GONE);
+				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.INVISIBLE);
 			}
-
+			
+//			LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.linearLayout_pickFood_fgm_item);
+//			linearLayout.removeAllViews();
+//			XmlResourceParser xrp = getResources().getXml(R.color.my_color);  
+//			try {  
+//			    ColorStateList csl = ColorStateList.createFromXml(getResources(), xrp);  
+//			    tv.setTextColor(csl);  
+//			} catch (Exception e) {  
+//			}  
+//			//赠
+//			if(food.isGift()){
+//				TextView text = new TextView(getActivity());
+//				text.setText("赠");
+//				text.setTextSize(16f);
+//				text.setTextColor(Color.YELLOW);
+//				linearLayout.addView(text);
+//			}
+//			//时
+//			if(food.isCurPrice()){
+//				TextView text = new TextView(getActivity());
+//				text.setText("时");
+//				text.setTextSize(16f);
+//				text.setTextColor(Color.MAGENTA);
+//				linearLayout.addView(text);
+//			}
+//			//推荐
+//			if(food.isRecommend()){
+//				TextView text = new TextView(getActivity());
+//				text.setText("荐");
+//				text.setTextSize(16f);
+//				text.setTextColor(Color.CYAN);
+//				linearLayout.addView(text);
+//			}
+//			//特
+//			if(food.isSpecial()){
+//				TextView text = new TextView(getActivity());
+//				text.setText("特");
+//				text.setTextSize(16f);
+//				text.setTextColor(Color.GREEN);
+//				linearLayout.addView(text);
+//			}
+//			//套
+//			if(food.isCombo()){
+//				TextView text = new TextView(getActivity());
+//				text.setText("套");
+//				text.setTextSize(16f);
+//				text.setTextColor(Color.GREEN);
+//				linearLayout.addView(text);
+//			}
+			 
 			return view;
 		}
 	}
@@ -372,15 +421,15 @@ public class PickFoodFragment extends Fragment{
 					//将搜索项清零
 					EditText searchText = (EditText) getView().findViewById(R.id.editText_pickFoodFragment);
 					searchText.setText("");
-					//若刚才是通过搜索点菜的，则再次弹出键盘
-					if(searchText.hasFocus())
-					{
-						//弹出软键盘
-			           getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE); 
-			           InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-			           imm.showSoftInput(searchText, 0); //显示软键盘
-			           imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
-					}
+//					//若刚才是通过搜索点菜的，则再次弹出键盘
+//					if(searchText.hasFocus())
+//					{
+//						//弹出软键盘
+//			           getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE); 
+//			           InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+//			           imm.showSoftInput(searchText, 0); //显示软键盘
+//			           imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+//					}
        			}
 				
 			}catch(NumberFormatException e){

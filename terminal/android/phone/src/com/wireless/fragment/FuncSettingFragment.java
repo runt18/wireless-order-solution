@@ -1,14 +1,16 @@
-package com.wireless.ui;
+package com.wireless.fragment;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
@@ -19,8 +21,9 @@ import android.widget.Toast;
 
 import com.wireless.common.Params;
 import com.wireless.lib.PinReader;
+import com.wireless.ui.R;
 
-public class FuncSettingActivity extends Activity {
+public class FuncSettingFragment extends Fragment {
 
 	private ArrayAdapter<String> _adapter;
 	private ArrayAdapter<String> _timeAdapter;
@@ -34,14 +37,12 @@ public class FuncSettingActivity extends Activity {
 	private int _connTimeout = Params.TIME_OUT_10s;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.function);
-
-		_printSettingSpinner = (Spinner) findViewById(R.id.afterketchenmethod);
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		View view = inflater.inflate(R.layout.function, container, false);
+		
+		_printSettingSpinner = (Spinner) view.findViewById(R.id.afterketchenmethod);
 		// 将可选内容与ArrayAdapter连接起来
-		_adapter = new ArrayAdapter<String>(this,
-				R.layout.spinner, _values);
+		_adapter = new ArrayAdapter<String>(this.getActivity(), R.layout.spinner, _values);
 		// 设置下拉列表的风格
 		_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		// 将adapter 添加到spinner中
@@ -70,10 +71,9 @@ public class FuncSettingActivity extends Activity {
 					}
 				});
 
-		_connTimeoutSpinner = (Spinner) findViewById(R.id.connectiontime);
+		_connTimeoutSpinner = (Spinner) view.findViewById(R.id.connectiontime);
 		// 将可选内容与ArrayAdapter连接起来
-		_timeAdapter = new ArrayAdapter<String>(this,
-				R.layout.spinner, _connectTimeouts);
+		_timeAdapter = new ArrayAdapter<String>(this.getActivity(), R.layout.spinner, _connectTimeouts);
 		// 设置下拉列表的风格
 		_timeAdapter
 				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -106,9 +106,8 @@ public class FuncSettingActivity extends Activity {
 
 				});
 
-		SharedPreferences sharedPreferences = getSharedPreferences(
-				Params.PREFS_NAME,
-				Context.MODE_WORLD_READABLE);
+		SharedPreferences sharedPreferences = getActivity().getSharedPreferences(
+				Params.PREFS_NAME, Context.MODE_WORLD_READABLE);
 		int printSetting = sharedPreferences.getInt(
 				Params.PRINT_SETTING, Params.PRINT_ASYNC);
 		int timeout = sharedPreferences.getInt(
@@ -135,47 +134,46 @@ public class FuncSettingActivity extends Activity {
 		// 显示PIN值
 		try {
 			String pin = PinReader.read();
-			((TextView) findViewById(R.id.pinnum))
-					.setText("0x" + pin);
+			((TextView) view.findViewById(R.id.pinnum)) .setText("0x" + pin);
 
 		} catch (FileNotFoundException e) {
-			((TextView) findViewById(R.id.pinnum))
+			((TextView) view.findViewById(R.id.pinnum))
 					.setText("PIN验证文件缺失");
 
 		} catch (IOException e) {
-			((TextView) findViewById(R.id.pinnum))
+			((TextView) view.findViewById(R.id.pinnum))
 					.setText("读取PIN文件出错");
 		}
 
 		/**
 		 * 返回Button
 		 */
-		TextView title = (TextView) findViewById(R.id.toptitle);
+		TextView title = (TextView) view.findViewById(R.id.toptitle);
 		title.setVisibility(View.VISIBLE);
 		title.setText("功能设置");
 
-		TextView left = (TextView) findViewById(R.id.textView_left);
+		TextView left = (TextView) view.findViewById(R.id.textView_left);
 		left.setText("返回");
 		left.setVisibility(View.VISIBLE);
 
-		ImageButton back = (ImageButton) findViewById(R.id.btn_left);
+		ImageButton back = (ImageButton) view.findViewById(R.id.btn_left);
 		back.setVisibility(View.VISIBLE);
 		back.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				finish();
+				getActivity().finish();
 			}
 		});
 
 		/**
 		 * 恢复默认Button
 		 */
-		TextView right = (TextView) findViewById(R.id.textView_right);
+		TextView right = (TextView) view.findViewById(R.id.textView_right);
 		right.setText("重置");
 		right.setVisibility(View.VISIBLE);
 
-		ImageButton next = (ImageButton) findViewById(R.id.btn_right);
+		ImageButton next = (ImageButton) view.findViewById(R.id.btn_right);
 		next.setVisibility(View.VISIBLE);
 		next.setOnClickListener(new View.OnClickListener() {
 
@@ -191,11 +189,11 @@ public class FuncSettingActivity extends Activity {
 		/**
 		 * 确认Button
 		 */
-		((ImageView) findViewById(R.id.definite))
+		((ImageView) view.findViewById(R.id.definite))
 				.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						Editor editor = getSharedPreferences(
+						Editor editor = getActivity().getSharedPreferences(
 								Params.PREFS_NAME,
 								Context.MODE_PRIVATE)
 								.edit();// 获取编辑器
@@ -204,23 +202,23 @@ public class FuncSettingActivity extends Activity {
 						editor.putInt(Params.CONN_TIME_OUT,
 								_connTimeout);
 						editor.commit();
-						Toast.makeText(
-								FuncSettingActivity.this,
-								"功能设置成功", 0).show();
-						finish();
+						Toast.makeText( getActivity(), "功能设置成功", Toast.LENGTH_SHORT).show();
+						getActivity().finish();
 					}
 				});
 
 		/**
 		 * 取消Button
 		 */
-		((ImageView) findViewById(R.id.cancle))
+		((ImageView) view.findViewById(R.id.cancle))
 				.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						finish();
+						getActivity().finish();
 					}
 				});
+		
+		return view;
 	}
 
 }

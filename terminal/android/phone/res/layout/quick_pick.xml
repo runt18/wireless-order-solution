@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true" >
-
+
             <TextView
                 android:id="@+id/textView2"
                 android:layout_width="wrap_content"
@@ -39,7 +39,7 @@
                 android:layout_alignParentTop="true"
                 android:text="总数："
                 android:textSize="18sp" />
-
+
             <TextView
                 android:id="@+id/textView_totalPrice_revealFood_quickPick"
                 android:layout_width="wrap_content"
@@ -49,7 +49,7 @@
                 android:layout_marginRight="40dp"
                 android:text="23"
                 android:textSize="18sp" />
-
+
             <TextView
                 android:id="@+id/textView1"
                 android:layout_width="wrap_content"
@@ -58,7 +58,7 @@
                 android:layout_toLeftOf="@+id/textView_totalPrice_revealFood_quickPick"
                 android:text="总价："
                 android:textSize="18sp" />
-
+
             <TextView
                 android:id="@+id/textView_totalCount_revealFood__quickPick"
                 android:layout_width="wrap_content"
@@ -67,7 +67,7 @@
                 android:layout_toRightOf="@+id/textView2"
                 android:text="111"
                 android:textSize="18sp" />
-
+
             <TextView
                 android:id="@+id/textView3"
                 android:layout_width="wrap_content"
@@ -76,7 +76,6 @@
                 android:layout_toRightOf="@+id/textView_totalCount_revealFood__quickPick"
                 android:text="份"
                 android:textSize="18sp" />
-
         </RelativeLayout>
     </RelativeLayout>
 

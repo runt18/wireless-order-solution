@@ -116,14 +116,14 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.main);
 		
 		int[] imageIcons = { 
-							 R.drawable.btnup01, R.drawable.btnup02, R.drawable.btnup03, 
+							 R.drawable.btnup01, R.drawable.btnup03, R.drawable.btnup02, 
 							 R.drawable.btnup04, R.drawable.btnup05, R.drawable.btnup06, 
 							 R.drawable.btnup07, R.drawable.btnup08, R.drawable.btnup09 
 						   };
 
 		String[] iconDesc = { 
-							 "点菜", "查看", "沽清", 
-							 "结账", "功能设置", "网络设置", 
+							 "点菜", "快速点菜", "查看", 
+							 "结账", "沽清", "设置", 
 							 "菜谱更新", "注销", "关于" 
 							};
 
@@ -140,7 +140,7 @@ public class MainActivity extends Activity {
 		/**
 		 * 生成适配器的ImageItem <====> 动态数组的元素，两者一一对应，添加并且显示九宫格。
 		 */
-		funGridView.setAdapter(new SimpleAdapter(MainActivity.this, 		// 没什么解释
+		funGridView.setAdapter(new SimpleAdapter(MainActivity.this, 		// context
 												  imgItems, 			  	// 数据来源
 												  R.layout.grewview_item, 	// night_item的XML实现
 												  new String[] { "ItemImage", "ItemText" }, 	// 动态数组与ImageItem对应的子项
@@ -173,14 +173,16 @@ public class MainActivity extends Activity {
 					break;
 
 				case 1:
-					//查看
-					Intent intent = new Intent(MainActivity.this, TableActivity.class);
+					Intent intent = new Intent(MainActivity.this, QuickPickActivity.class);
 					startActivity(intent);
+
 					break;
 					
 				case 2:
-					Intent sellOutIntent = new Intent(MainActivity.this,SellOutActivity.class);
-					startActivity(sellOutIntent);
+					//查看
+					intent = new Intent(MainActivity.this, TableActivity.class);
+					startActivity(intent);
+
 					break;
 					
 				case 3:
@@ -189,14 +191,14 @@ public class MainActivity extends Activity {
 					break;
 
 				case 4:
-					//功能设置
-					Intent funcIntent = new Intent(MainActivity.this,FuncSettingActivity.class);
-                    startActivity(funcIntent);
+					//沽清
+					Intent sellOutIntent = new Intent(MainActivity.this,SellOutActivity.class);
+					startActivity(sellOutIntent);
 					break;
 
 				case 5:
-					//网络设置
-					Intent netIntent = new Intent(MainActivity.this, NetworkSettingActivity.class);
+					//设置
+					Intent netIntent = new Intent(MainActivity.this, SettingActivity.class);
 					startActivityForResult(netIntent, NETWORK_SET);
 					break;
 
@@ -211,8 +213,7 @@ public class MainActivity extends Activity {
 					break;
 					
 				case 8:
-					//FIXME
-					intent = new Intent(MainActivity.this, QuickPickActivity.class);
+					intent = new Intent(MainActivity.this, AboutActivity.class);
 					startActivity(intent);
 					break;
 				}

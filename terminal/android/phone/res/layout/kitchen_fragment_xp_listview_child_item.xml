@@ -2,15 +2,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/linearLayout_kitchenFgm_xplv_child_item"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+    android:fadingEdge="none"
     android:orientation="vertical" >
-
-    <LinearLayout
-        android:id="@+id/linearLayout_kcFgm_xplv_child_child"
+
+    <GridView
+        android:id="@+id/gridView_kitchenFgm_xplv_child_item"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:weightSum="4" >
+        android:layout_height="90dp"
+        android:fadingEdge="none"
+        android:numColumns="3" >
 
-    </LinearLayout>
+    </GridView>
 
 </LinearLayout>

@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -16,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -24,6 +26,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.ExpandableListView.OnGroupCollapseListener;
 import android.widget.ExpandableListView.OnGroupExpandListener;
+import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -191,7 +194,7 @@ public class KitchenFragment extends Fragment {
 					tidyFoods.add(list);
 			}
 			
-			fragment.mXpListView.setAdapter(fragment.new KitchenExpandableListAdapter(kitchens, tidyFoods, 4));
+			fragment.mXpListView.setAdapter(fragment.new KitchenExpandableListAdapter(kitchens, tidyFoods, 3));
 		}
 	}
 	
@@ -340,7 +343,7 @@ public class KitchenFragment extends Fragment {
 			mGroups = groups;
 			ROW = row;
 			/*
-			 * 将每个分厨中的菜品分成4个一组存入subChild中，再将所有的subChild存入subChilds中，
+			 * 将每个分厨中的菜品分成ROW个一组存入subChild中，再将所有的subChild存入subChilds中，
 			 * 最后将该subChilds存入mChilds中
 			 */
 			for(List<Food> l:rowChilds)
@@ -403,6 +406,9 @@ public class KitchenFragment extends Fragment {
 			if(convertView != null)
 				view = convertView;
 			else view = View.inflate(getActivity(), R.layout.kitchen_fragment_xplistview_group_item, null);
+			
+			view.setBackgroundResource(R.drawable.kitchen_fragment_group_selector);
+			
 			//设置厨房名
 			((TextView) view.findViewById(R.id.textView_name_kitchenFragment_xp_group_item))
 				.setText(mGroups.get(groupPosition).name);
@@ -422,37 +428,12 @@ public class KitchenFragment extends Fragment {
 				view = convertView;
 			else view = View.inflate(getActivity(), R.layout.kitchen_fragment_xp_listview_child_item, null);
 			//设置该行的gridview
-			LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.linearLayout_kcFgm_xplv_child_child);
-			linearLayout.removeAllViews();
-			linearLayout.setWeightSum(ROW);
+			GridView gridView = (GridView) view.findViewById(R.id.gridView_kitchenFgm_xplv_child_item);
+			gridView.setVerticalSpacing(0);
+//			gridView.removeAllViews();
 			ArrayList<Food> childFoods = mChilds.get(groupPosition).get(childPosition);
-			//将每行的4个菜品添加进该行的linearlayout
-			for(Food k :childFoods)
-			{
-				final View childView = View.inflate(getActivity(), R.layout.kitchen_fragment_xplistview_child_item_item, null);
-				childView.setTag(k);
-				//设置该项的显示
-				((TextView) childView.findViewById(R.id.textView_foodName_kitchenFgm_child_item_item)).setText(k.name);
-				((TextView) childView.findViewById(R.id.textView_num_kitchenFgm_child_item_item)).setText("" + k.aliasID);
-				((TextView) childView.findViewById(R.id.textView_price_kitchenFgm_child_item_item)).setText("" + k.getPrice());
-				linearLayout.addView(childView);
-				
-				if(k.isSellOut())
-					((TextView)childView.findViewById(R.id.textView_sellout_kcFgm_xplistview_item_item)).setVisibility(View.VISIBLE);
-				//设置该项的侦听
-				else {
-					((TextView)childView.findViewById(R.id.textView_sellout_kcFgm_xplistview_item_item)).setVisibility(View.GONE);
-					((ImageView)childView.findViewById(R.id.imageView_kitchenFgm_xplistview_child_item_item))
-					//FIXME ontouchevent事件冲突问题
-	//				childView
-					.setOnClickListener(new OnClickListener(){
-					@Override
-					public void onClick(View v) {
-						new AskOrderAmountDialog((Food) childView.getTag()).show();
-					}
-				});
-				}
-			}
+			gridView.setAdapter(new GridAdapter(childFoods, getActivity()));
+			//将每行的几个菜品添加进该行的linearlayout
 			
 			return view;
 		}
@@ -628,4 +609,111 @@ public class KitchenFragment extends Fragment {
 			}
 		}
 	}
+	
+	class GridAdapter extends BaseAdapter{
+		private List<Food> mFoods;
+		private Context mContext;
+		
+		public GridAdapter(List<Food> mFoods, Context mContext) {
+			super();
+			this.mFoods = mFoods;
+			this.mContext = mContext;
+		}
+
+		@Override
+		public int getCount() {
+			return mFoods.size();
+		}
+
+		@Override
+		public Object getItem(int position) {
+			return mFoods.get(position);
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return position;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			final View view;
+			if(convertView == null)
+			{
+				view = View.inflate(mContext, R.layout.pick_food_fragment_item, null);
+			}
+			else view = convertView;
+			
+			Food food = mFoods.get(position);
+			
+			view.setTag(food);
+			//设置该项的显示
+			((TextView) view.findViewById(R.id.textView_foodName_pickFoodFragment_item)).setText(food.name);
+			((TextView) view.findViewById(R.id.textView_num_pickFoodFragment_item)).setText(Integer.toString(food.aliasID));
+			((TextView) view.findViewById(R.id.textView_price_pickFoodFragment_item)).setText(Util.float2String2(food.getPrice()));
+			
+			if(food.isSellOut())
+				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
+			//设置该项的侦听
+			else {
+				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.GONE);
+				((ImageView)view.findViewById(R.id.imageView_pickFoodFragment_item))
+				//FIXME ontouchevent事件冲突问题
+				.setOnClickListener(new View.OnClickListener(){
+					@Override
+					public void onClick(View v) {
+						new AskOrderAmountDialog((Food) view.getTag()).show();
+					}
+				});
+			}
+//			LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.linearLayout_pickFood_fgm_item);
+//			linearLayout.removeAllViews();
+//			//赠
+//			if(food.isGift()){
+//				TextView text = new TextView(getActivity());
+//				text.setText("赠");
+//				text.setTextSize(16f);
+//				text.setTextColor(Color.YELLOW);
+//				linearLayout.addView(text);
+//			}
+//			//时
+//			if(food.isCurPrice()){
+//				TextView text = new TextView(getActivity());
+//				text.setText("时");
+//				text.setTextSize(16f);
+//				text.setTextColor(Color.MAGENTA);
+//				linearLayout.addView(text);
+//			}
+//			//推荐
+//			if(food.isRecommend()){
+//				TextView text = new TextView(getActivity());
+//				text.setText("荐");
+//				text.setTextSize(16f);
+//				text.setTextColor(Color.CYAN);
+//				linearLayout.addView(text);
+//			}
+//			//特
+//			if(food.isSpecial()){
+//				TextView text = new TextView(getActivity());
+//				text.setText("特");
+//				text.setTextSize(16f);
+//				text.setTextColor(Color.GREEN);
+//				linearLayout.addView(text);
+//			}
+//			
+//			//套
+//			if(food.isCombo()){
+//				TextView text = new TextView(getActivity());
+//				text.setText("套");
+//				text.setTextSize(16f);
+//				text.setTextColor(Color.GREEN);
+//				linearLayout.addView(text);
+//			}
+			
+			return view;
+		}
+		
+	}
 }
+
+

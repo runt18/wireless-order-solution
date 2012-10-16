@@ -8,50 +8,6 @@
     <include
         android:id="@+id/top"
         layout="@layout/topbar" />
-    <!--
-    <RelativeLayout
-        android:id="@+id/top"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:background="@drawable/bg01" >
-
-        <ImageView
-            android:id="@+id/networkback"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="20dip"
-            android:src="@drawable/back_selector" >
-        </ImageView>
-
-        <TextView
-            android:id="@+id/networktitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:shadowDx="1"
-            android:shadowDy="1"
-            android:shadowRadius="3.0"
-            android:text="网络设置"
-            android:textColor="#FFFFFF"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:typeface="monospace" >
-        </TextView>
-
-        <ImageView
-            android:id="@+id/testnet"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="20dip"
-            android:src="@drawable/network_selector" >
-        </ImageView>
-    </RelativeLayout>
-    -->
 
     <RelativeLayout
         android:id="@+id/r1"
