@@ -115,6 +115,10 @@ else if($editType == "addRestaurant" || $editType == "editAdminRestaurant")
 					$sql = "INSERT INTO taste(taste_alias, restaurant_id, preference, category, calc, type) 
 							VALUES(60003, $id, '例牌', 2, 1, 1)";
 					$db->Execute($sql);
+					
+					//insert the discount
+					$sql = "INSERT INTO discount(`restaurant_id`, `name`, `level`, `status`) VALUES ($id, '无折扣', 201, 2)";
+					$db->Execute($sql);
 
 					//insert the kitchen
 					$sql = "INSERT INTO kitchen(restaurant_id,kitchen_alias,name,type) VALUES($id, 253, '临时厨房', 1)";
@@ -420,6 +424,8 @@ else if($editType == "addRestaurant" || $editType == "editAdminRestaurant")
 						&& $db->Execute("DELETE FROM wireless_order_db.shift WHERE restaurant_id=$id")
 						&& $db->Execute("DELETE FROM wireless_order_db.shift_history WHERE restaurant_id=$id")
 						&& $db->Execute("DELETE FROM wireless_order_db.daily_settle_history WHERE restaurant_id=$id")
+						&& $db->Execute("DELETE FROM wireless_order_db.discount_plan WHERE discount_id IN (SELECT discount_id FROM wireless_order_db.discount WHERE restaurant_id=$id)")
+						&& $db->Execute("DELETE FROM wireless_order_db.discount WHERE restaurant_id=$id")
 						&& $db->Execute("DELETE FROM wireless_order_db.restaurant WHERE id=$id")){			
 					echo "<script>alert('删除成功！');</script>";
 				}	
