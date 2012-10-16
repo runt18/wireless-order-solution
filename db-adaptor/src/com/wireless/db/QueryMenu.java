@@ -58,7 +58,7 @@ public class QueryMenu {
 			    			queryTastes(dbCon, Taste.CATE_SPEC, "AND restaurant_id=" + term.restaurantID, null),
 			    			queryKitchens(dbCon, "AND KITCHEN.restaurant_id=" + term.restaurantID + " AND KITCHEN.type=" + Kitchen.TYPE_NORMAL, null),
 			    			queryDepartments(dbCon, "AND DEPT.restaurant_id=" + term.restaurantID + " AND DEPT.type=" + Department.TYPE_NORMAL, null),
-			    			queryDiscounts(dbCon, "AND DIST.restaurant_id=" + term.restaurantID + " AND DIST_PLAN.rate <> 1", null));
+			    			queryDiscounts(dbCon, "AND DIST.restaurant_id=" + term.restaurantID, null));
 	}
 	
 	/**
@@ -585,13 +585,14 @@ public class QueryMenu {
 		sql = " SELECT " +
 			  " DIST.discount_id, DIST.restaurant_id, DIST.name AS dist_name, DIST.level, DIST.status AS dist_status, " +
 			  " DIST_PLAN.dist_plan_id, DIST_PLAN.kitchen_id, DIST_PLAN.rate, " +
-			  " KITCHEN.name AS kitchen_name, KITCHEN.kitchen_alias" +
+			  " KITCHEN.name AS kitchen_name, KITCHEN.kitchen_alias, " +
+			  " CASE WHEN DIST_PLAN.discount_id IS NULL THEN '0' ELSE '1' END AS has_plan " +
 			  " FROM " + 
-			  Params.dbName + ".discount_plan DIST_PLAN " +
-			  " JOIN " +
 			  Params.dbName + ".discount DIST " +
+			  " LEFT JOIN " +
+			  Params.dbName + ".discount_plan DIST_PLAN " +
 			  " ON DIST_PLAN.discount_id = DIST.discount_id " +
-			  " JOIN " +
+			  " LEFT JOIN " +
 			  Params.dbName + ".kitchen KITCHEN " +
 			  " ON DIST_PLAN.kitchen_id = KITCHEN.kitchen_id " +
 			  " WHERE 1=1 " +
@@ -619,7 +620,10 @@ public class QueryMenu {
 				plans = new LinkedList<DiscountPlan>();
 			}
 			
-			plans.add(new DiscountPlan(kitchen, dbCon.rs.getFloat("rate")));
+			float rate = dbCon.rs.getFloat("rate");
+			if(dbCon.rs.getBoolean("has_plan") && rate != 1){
+				plans.add(new DiscountPlan(kitchen, rate));
+			}
 			discounts.put(discount, plans);
 		}
 		
