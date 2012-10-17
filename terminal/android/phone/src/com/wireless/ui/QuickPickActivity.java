@@ -42,6 +42,7 @@ import com.wireless.fragment.KitchenFragment;
 import com.wireless.fragment.PickFoodFragment;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Type;
@@ -245,6 +246,9 @@ public class QuickPickActivity extends FragmentActivity implements
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.quick_pick);
+		
+		//Update the sell out foods
+		new QuerySellOutTask().execute(WirelessOrder.foodMenu.foods);
 		
 		mNewFoodLstView = (OrderFoodListView)findViewById(R.id.orderFoodListView_revealFood_quickPick);
 		
@@ -729,5 +733,19 @@ public class QuickPickActivity extends FragmentActivity implements
 		}	
 	}
 
+	/**
+	 * 请求更新沽清菜品
+	 */
+	private class QuerySellOutTask extends com.wireless.lib.task.QuerySellOutTask{
+		@Override
+		protected void onPostExecute(Food[] sellOutFoods){
+			if(mErrMsg != null){
+				Toast.makeText(QuickPickActivity.this, "沽清菜品更新失败", Toast.LENGTH_SHORT).show();				
+			}else{
+				Toast.makeText(QuickPickActivity.this, "沽清菜品更新成功", Toast.LENGTH_SHORT).show();
+			}
+		}
+	}
+	
 }
 
