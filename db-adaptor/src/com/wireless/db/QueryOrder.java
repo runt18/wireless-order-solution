@@ -128,16 +128,16 @@ public class QueryOrder {
 		if(queryType == QUERY_TODAY){
 			sql = " SELECT " +
 				  " order_date, seq_id, custom_num, table_id, table_alias, table_name, table2_alias, table2_name, " +
-				  " region_id, region_name, restaurant_id, type, category, is_paid, discount_id, " +
+				  " region_id, region_name, restaurant_id, type, category, is_paid, discount_id, service_rate, " +
 				  " total_price, total_price_2 " +
 				  " FROM " + Params.dbName + ".order" + 
 				  " WHERE id= " + orderID;
 		}else if(queryType == QUERY_HISTORY){
 			sql = " SELECT " +
 				  " order_date, seq_id, custom_num, table_id, table_alias, table_name, table2_alias, table2_name, " +
-				  " region_id, region_name, restaurant_id, type, category, is_paid, 0 AS discount_id " +
+				  " region_id, region_name, restaurant_id, type, category, is_paid, 0 AS discount_id, service_rate, " +
 				  " total_price, total_price_2 " +
-				  " FROM " + Params.dbName + ".order" + 
+				  " FROM " + Params.dbName + ".order_history" + 
 				  " WHERE id= " + orderID;
 		}else{
 			throw new IllegalArgumentException("The query type passed to query order is NOT valid.");
@@ -166,6 +166,7 @@ public class QueryOrder {
 			orderInfo.setDiscount(new Discount(dbCon.rs.getInt("discount_id")));
 			orderInfo.pay_manner = dbCon.rs.getShort("type");
 			orderInfo.isPaid = dbCon.rs.getBoolean("is_paid");
+			orderInfo.setServiceRate(dbCon.rs.getFloat("service_rate"));
 			orderInfo.setTotalPrice(dbCon.rs.getFloat("total_price"));
 			orderInfo.setActualPrice(dbCon.rs.getFloat("total_price_2"));
 		}else{

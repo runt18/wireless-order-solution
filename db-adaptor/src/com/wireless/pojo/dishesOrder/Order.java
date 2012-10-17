@@ -9,7 +9,7 @@ import com.wireless.util.WebParams;
 
 public class Order {
 	private int id;										// 账单编号
-	private long seq_id;								// 
+	private long seq_id;								// 数据编号
 	private int restaurantID;							// 餐厅编号
 	private long orderDate;								// 账单最后修改时间
 	private float giftPrice;							// 赠送金额
@@ -17,7 +17,7 @@ public class Order {
 	private int customNum;								// 客户人数
 	private String waiter;								// 服务员名
 	private int payManner = WebParams.MANNER_CASH;		// 结账方式  1:现金  2:刷卡  3:会员卡  4:签单  5:挂账
-	//private int discountType = WebParams.DISCOUNT_1;	// 折扣方式
+	private int discountID;								// 折扣方案编号
 	private String memberID;							// 会员编号
 	private String member;								// 会员名称
 	private int terminalModel;							//
@@ -27,9 +27,10 @@ public class Order {
 	private Table srcTbl = new Table();					// 
 	private float totalPrice2;							//
 	private int category = WebParams.CATE_NORMAL;		// 订单类型
-	private String comment;								// 评论
+	private String comment;								// 备注
 	private float serviceRate;							// 服务费率
 	private boolean isPaid;								// 是否已支付
+	private float minCost;								// 最低消费金额
 	private List<OrderFood> orderFoods = new ArrayList<OrderFood>();
 	
 	public String getOrderDateFormat(){
@@ -109,13 +110,13 @@ public class Order {
 		this.payManner = payManner;
 	}
 
-//	public int getDiscountType() {
-//		return discountType;
-//	}
-//
-//	public void setDiscountType(int discountType) {
-//		this.discountType = discountType;
-//	}
+	public int getDiscountID() {
+		return discountID;
+	}
+
+	public void setDiscountID(int discountID) {
+		this.discountID = discountID;
+	}
 
 	public String getMemberID() {
 		return memberID;
@@ -231,6 +232,15 @@ public class Order {
 	public void setOrderFoods(List<OrderFood> orderFoods) {
 		this.orderFoods = orderFoods;
 	}
+
+	public float getMinCost() {
+		return minCost;
+	}
+
+	public void setMinCost(float minCost) {
+		this.minCost = minCost;
+	}
+	
 	
 }
 

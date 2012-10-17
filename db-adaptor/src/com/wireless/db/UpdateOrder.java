@@ -420,6 +420,7 @@ public class UpdateOrder {
 				  " custom_num = " + newOrder.customNum +	", " +
 				  " terminal_pin = " + term.pin + ", " +
 				  " is_paid = " + (isPaidAgain ? 1 : 0) + ", " +
+				  " discount_id = " + newOrder.getDiscount().discountID + ", " +
 				  " order_date = NOW(), " +
 				  (isPaidAgain ? "" : "region_id=" + newOrder.region.regionID + ", ") +
 				  (isPaidAgain ? "" : "region_name='" + newOrder.region.name + "', ") +
