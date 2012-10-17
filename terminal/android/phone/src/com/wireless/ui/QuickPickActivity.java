@@ -60,6 +60,7 @@ public class QuickPickActivity extends FragmentActivity implements
 	private static final int KITCHEN_FRAGMENT = 6321;
 	private static final int SPELL_FRAGMENT = 6322;
 	private static final int PICKED_FOOD_INTERFACE = 6323;
+	private int mLastView;
 
 	//activity返回标签
 	private final static int PICK_WITH_TASTE = 7755;
@@ -121,7 +122,6 @@ public class QuickPickActivity extends FragmentActivity implements
 		private ImageButton mPickedBtn;
 
 		private FrameLayout mFgmContainer;
-		private int LAST_VIEW;
 
 		ViewHandler(QuickPickActivity activity){
 			mActivity = new WeakReference<QuickPickActivity>(activity);
@@ -146,56 +146,53 @@ public class QuickPickActivity extends FragmentActivity implements
 			switch(msg.what)
 			{
 			case NUMBER_FRAGMENT:
-				if(LAST_VIEW != NUMBER_FRAGMENT)
-				{
-					//创建新菜品选择fragment
-					PickFoodFragment numFragment = new PickFoodFragment();
-					numFragment.setFoodPickedListener(activity);
-					//设置显示参数
-					Bundle args = new Bundle();
-					args.putInt(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG, PickFoodFragment.PICK_FOOD_FRAGMENT_NUMBER);
-					args.putString(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG_NAME, "编号：");
-					numFragment.setArguments(args);
-					//替换原本的fragment
-					ftrans.replace(R.id.frameLayout_container_quickPick, numFragment).commit();
-					
-					LAST_VIEW = NUMBER_FRAGMENT;
-				}
+				//创建新菜品选择fragment
+				PickFoodFragment numFragment = new PickFoodFragment();
+				numFragment.setFoodPickedListener(activity);
+				//设置显示参数
+				Bundle args = new Bundle();
+				args.putInt(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG, PickFoodFragment.PICK_FOOD_FRAGMENT_NUMBER);
+				args.putString(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG_NAME, "编号：");
+				numFragment.setArguments(args);
+				//替换原本的fragment
+				ftrans.replace(R.id.frameLayout_container_quickPick, numFragment).commit();
+				
+				activity.mLastView = NUMBER_FRAGMENT;
 				mTitleTextView.setText("点菜 - 编号");
 				setLastCate(NUMBER_FRAGMENT);
+				
 				break;
 				
 			case KITCHEN_FRAGMENT:
-				if(LAST_VIEW != KITCHEN_FRAGMENT)
-				{
-					KitchenFragment kitchenFragment = new KitchenFragment();
-					kitchenFragment.setFoodPickedListener(activity);
-					ftrans.replace(R.id.frameLayout_container_quickPick, kitchenFragment).commit();
+				
+				KitchenFragment kitchenFragment = new KitchenFragment();
+				kitchenFragment.setFoodPickedListener(activity);
+				ftrans.replace(R.id.frameLayout_container_quickPick, kitchenFragment).commit();
 					
-					LAST_VIEW = KITCHEN_FRAGMENT;
-				}
+				activity.mLastView = KITCHEN_FRAGMENT;
+				
 				mTitleTextView.setText("点菜 - 分厨");
 				setLastCate(KITCHEN_FRAGMENT);
 				break;
+				
 			case SPELL_FRAGMENT:
-				if(LAST_VIEW != SPELL_FRAGMENT)
-				{
-					//创建新菜品选择fragment
-					PickFoodFragment spellFragment = new PickFoodFragment();
-					spellFragment.setFoodPickedListener(activity);
-					//设置显示参数
-					Bundle spellAargs = new Bundle();
-					spellAargs.putInt(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG, PickFoodFragment.PICK_FOOD_FRAGMENT_SPELL);
-					spellAargs.putString(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG_NAME, "拼音：");
-					spellFragment.setArguments(spellAargs);
-					//替换原本的fragment
-					ftrans.replace(R.id.frameLayout_container_quickPick, spellFragment).commit();
-					LAST_VIEW = SPELL_FRAGMENT;
-				}
+				//创建新菜品选择fragment
+				PickFoodFragment spellFragment = new PickFoodFragment();
+				spellFragment.setFoodPickedListener(activity);
+				//设置显示参数
+				Bundle spellAargs = new Bundle();
+				spellAargs.putInt(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG, PickFoodFragment.PICK_FOOD_FRAGMENT_SPELL);
+				spellAargs.putString(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG_NAME, "拼音：");
+				spellFragment.setArguments(spellAargs);
+				//替换原本的fragment
+				ftrans.replace(R.id.frameLayout_container_quickPick, spellFragment).commit();
+				
+				activity.mLastView = SPELL_FRAGMENT;
 				
 				mTitleTextView.setText("点菜 - 拼音");
 				setLastCate(SPELL_FRAGMENT);
 				break;
+				
 			case PICKED_FOOD_INTERFACE:
 				//将fragment容器隐藏，显示已点菜界面
 				mFgmContainer.setVisibility(View.GONE);
@@ -203,6 +200,7 @@ public class QuickPickActivity extends FragmentActivity implements
 				mTitleTextView.setText("已点菜");
 				//展开新点菜ListView
 				activity.mNewFoodLstView.expandGroup(0);
+				activity.mTextHandler.sendEmptyMessage(0);
 				setLastCate(PICKED_FOOD_INTERFACE);
 				break;
 			}
@@ -309,14 +307,19 @@ public class QuickPickActivity extends FragmentActivity implements
 		((ImageButton) findViewById(R.id.imageButton_num_quickPick)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				mViewHandler.sendEmptyMessage(NUMBER_FRAGMENT);
+				if(mLastView != NUMBER_FRAGMENT){
+					mViewHandler.sendEmptyMessage(NUMBER_FRAGMENT);
+				}
 			}
 		});
+		
 		//分厨
 		((ImageButton) findViewById(R.id.imageButton_kitchen_quickPick)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				mViewHandler.sendEmptyMessage(KITCHEN_FRAGMENT);
+				if(mLastView != KITCHEN_FRAGMENT){
+					mViewHandler.sendEmptyMessage(KITCHEN_FRAGMENT);
+				}
 			}
 		});
 		
@@ -324,9 +327,12 @@ public class QuickPickActivity extends FragmentActivity implements
 		((ImageButton) findViewById(R.id.imageButton_spell_quickPick)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				mViewHandler.sendEmptyMessage(SPELL_FRAGMENT);
+				if(mLastView != SPELL_FRAGMENT){
+					mViewHandler.sendEmptyMessage(SPELL_FRAGMENT);
+				}
 			}
 		});
+		
 		//已点菜
 		((ImageButton) findViewById(R.id.imageButton_remark_quickPick)).setOnClickListener(new OnClickListener(){
 			@Override
@@ -379,6 +385,7 @@ public class QuickPickActivity extends FragmentActivity implements
 			}
 		}
 	}
+	
 	/**
 	 * 通过"编号"、"分厨"、"拼音"方式选中菜品后， 将菜品保存到List中
 	 * 
@@ -392,7 +399,6 @@ public class QuickPickActivity extends FragmentActivity implements
 
 	/**
 	 * 通过"编号"、"分厨"、"拼音"方式选中菜品后， 将菜品保存到List中，并跳转到口味Activity选择口味
-	 * 
 	 * @param food
 	 *            选中菜品的信息
 	 */
@@ -402,7 +408,30 @@ public class QuickPickActivity extends FragmentActivity implements
 		Bundle bundle = new Bundle();
 		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(food));
 		intent.putExtras(bundle);
-		startActivityForResult(intent, OrderFoodListView.PICK_TASTE);
+		startActivityForResult(intent, PICK_WITH_TASTE);
+	}
+	
+	/**
+	 * 在已点菜列表中选中某个菜品后，选择口味操作，跳转到口味Activity
+	 * @param food
+	 *            选中菜品的信息
+	 */
+	@Override
+	public void onPickTaste(OrderFood selectedFood) {
+		if(selectedFood.isTemporary){
+			Toast.makeText(this, "临时菜不能添加口味", Toast.LENGTH_SHORT).show();
+		}else{
+			Intent intent = new Intent(QuickPickActivity.this, PickTasteActivity.class);
+			Bundle bundle = new Bundle();
+			bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(selectedFood));
+			intent.putExtras(bundle);
+			startActivityForResult(intent, OrderFoodListView.PICK_TASTE);			
+		}		
+	}
+
+	@Override
+	public void onPickFood() {
+		
 	}
 	
 	/**
@@ -426,23 +455,7 @@ public class QuickPickActivity extends FragmentActivity implements
 		}
 	}
 
-	@Override
-	public void onPickTaste(OrderFood selectedFood) {
-		if(selectedFood.isTemporary){
-			Toast.makeText(this, "临时菜不能添加口味", Toast.LENGTH_SHORT).show();
-		}else{
-			Intent intent = new Intent(QuickPickActivity.this, PickTasteActivity.class);
-			Bundle bundle = new Bundle();
-			bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(selectedFood));
-			intent.putExtras(bundle);
-			startActivityForResult(intent, OrderFoodListView.PICK_TASTE);			
-		}		
-	}
 
-	@Override
-	public void onPickFood() {
-		
-	}
 	
 	/**
 	 * 快点界面中的提交Dialog
@@ -755,6 +768,7 @@ public class QuickPickActivity extends FragmentActivity implements
 			if(mErrMsg != null){
 				Toast.makeText(QuickPickActivity.this, "沽清菜品更新失败", Toast.LENGTH_SHORT).show();				
 			}else{
+				mViewHandler.sendEmptyMessage(mLastView);
 				Toast.makeText(QuickPickActivity.this, "沽清菜品更新成功", Toast.LENGTH_SHORT).show();
 			}
 		}
