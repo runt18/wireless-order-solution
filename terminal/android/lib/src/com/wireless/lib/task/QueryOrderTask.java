@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import android.os.AsyncTask;
 
+import com.wireless.excep.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.FoodMenu;
 import com.wireless.protocol.Order;
@@ -15,7 +16,7 @@ import com.wireless.sccon.ServerConnector;
 
 public class QueryOrderTask extends AsyncTask<FoodMenu, Void, Order>{
 
-	protected String mErrMsg;
+	protected BusinessException mBusinessException;
 	
 	protected int mTblAlias;
 
@@ -33,24 +34,26 @@ public class QueryOrderTask extends AsyncTask<FoodMenu, Void, Order>{
 				order = RespQueryOrderParser.parse(resp, foodMenu[0]);
 				
 			}else{
+				mBusinessException = new BusinessException(resp.header.reserved);
+				
 				if(resp.header.reserved == ErrorCode.TABLE_IDLE) {
-					mErrMsg = mTblAlias + "号台还未下单";
+					mBusinessException = new BusinessException(mTblAlias + "号台还未下单", ErrorCode.TABLE_IDLE);
 					
 				}else if(resp.header.reserved == ErrorCode.TABLE_NOT_EXIST) {
-					mErrMsg = mTblAlias + "号台信息不存在";
+					mBusinessException = new BusinessException(mTblAlias + "号台信息不存在", ErrorCode.TABLE_NOT_EXIST);
 
 				}else if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
-					mErrMsg = "终端没有登记到餐厅，请联系管理人员。";
+					mBusinessException = new BusinessException("终端没有登记到餐厅，请联系管理人员。", ErrorCode.TERMINAL_NOT_ATTACHED);
 
 				}else if(resp.header.reserved == ErrorCode.TERMINAL_EXPIRED) {
-					mErrMsg = "终端已过期，请联系管理人员。";
+					mBusinessException = new BusinessException("终端已过期，请联系管理人员。", ErrorCode.TERMINAL_EXPIRED);
 
 				}else{
-					mErrMsg = "未确定的异常错误(" + resp.header.reserved + ")";
+					mBusinessException = new BusinessException("未确定的异常错误(" + resp.header.reserved + ")", ErrorCode.UNKNOWN);
 				}
 			}
 		}catch(IOException e){
-			mErrMsg = e.getMessage();
+			mBusinessException = new BusinessException(e.getMessage());
 		}
 		
 		return order;
