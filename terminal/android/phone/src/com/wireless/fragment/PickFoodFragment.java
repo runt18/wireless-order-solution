@@ -142,7 +142,6 @@ public class PickFoodFragment extends Fragment{
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.pick_food_fragment, container, false);
 		Bundle args = getArguments();
-		((TextView) view.findViewById(R.id.textView_searchTitle_numberFragment)).setText(args.get(PICK_FOOD_FRAGMENT_TAG_NAME).toString());
 		
         mGridView = (GridView) view.findViewById(R.id.gridView_numberFragment);
         //设置点菜侦听
@@ -159,6 +158,7 @@ public class PickFoodFragment extends Fragment{
         
 		//搜索框
         final EditText searchTxtView = (EditText)view.findViewById(R.id.editText_pickFoodFragment);
+        searchTxtView.setHint(args.get(PICK_FOOD_FRAGMENT_TAG_NAME).toString());
         searchTxtView.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -201,7 +201,7 @@ public class PickFoodFragment extends Fragment{
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
 				((InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE))
 				.hideSoftInputFromWindow(searchTxtView.getWindowToken(), 0);
-				mGridView.requestFocus();
+//				mGridView.requestFocus();
 			}
 
 			@Override
@@ -355,7 +355,7 @@ public class PickFoodFragment extends Fragment{
 			});
 			
 			//数量加按钮
-			((Button) findViewById(R.id.button_plus_orderConfirm)).setOnClickListener(new View.OnClickListener(){
+			((ImageButton) findViewById(R.id.button_plus_orderConfirm)).setOnClickListener(new View.OnClickListener(){
 
 				@Override
 				public void onClick(View v) {
@@ -371,13 +371,14 @@ public class PickFoodFragment extends Fragment{
 					}
 					if(!countEditText.getText().toString().equals(""))
 					{
+						//FIXME 加了两次
 						float curNum = Float.parseFloat(countEditText.getText().toString());
 						countEditText.setText(Util.float2String2(++curNum));
 					}
 				}
 			});
 			//数量减按钮
-			((Button) findViewById(R.id.button_minus_orderConfirm)).setOnClickListener(new View.OnClickListener(){
+			((ImageButton) findViewById(R.id.button_minus_orderConfirm)).setOnClickListener(new View.OnClickListener(){
 
 				@Override
 				public void onClick(View v) {
@@ -388,27 +389,6 @@ public class PickFoodFragment extends Fragment{
 						}
 					}catch(NumberFormatException e){
 						
-					}
-				}
-			});
-			//数量加按钮
-			((Button) findViewById(R.id.button_plus_orderConfirm)).setOnClickListener(new View.OnClickListener(){
-
-				@Override
-				public void onClick(View v) {
-					float curNum = Float.parseFloat(countEditText.getText().toString());
-					countEditText.setText(Util.float2String2(++curNum));
-				}
-			});
-			//数量减按钮
-			((Button) findViewById(R.id.button_minus_orderConfirm)).setOnClickListener(new View.OnClickListener(){
-
-				@Override
-				public void onClick(View v) {
-					float curNum = Float.parseFloat(countEditText.getText().toString());
-					if(--curNum >= 1.0f)
-					{
-						countEditText.setText(Util.float2String2(curNum));
 					}
 				}
 			});
@@ -482,19 +462,20 @@ public class PickFoodFragment extends Fragment{
        					}
        				}
 					dismiss();
-					//FIXME 修正不同activity下键盘弹出问题
 					//将搜索项清零
-					EditText searchText = (EditText) getView().findViewById(R.id.editText_pickFoodFragment);
-					searchText.setText("");
-//					//若刚才是通过搜索点菜的，则再次弹出键盘
-//					if(searchText.hasFocus())
-//					{
-//						//弹出软键盘
-//			           getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE); 
-//			           InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-//			           imm.showSoftInput(searchText, 0); //显示软键盘
-//			           imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
-//					}
+					final EditText searchText = (EditText) getView().findViewById(R.id.editText_pickFoodFragment);
+					searchText.selectAll();
+//					searchText.postDelayed(new Runnable(){
+//						@Override
+//						public void run() {
+////							searchText.requestFocus();
+//							getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE); 
+//							InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+//				           	imm.showSoftInput(searchText, 0); //显示软键盘
+//				           	imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+//						}
+//					}, 1000);
+
        			}
 				
 			}catch(NumberFormatException e){

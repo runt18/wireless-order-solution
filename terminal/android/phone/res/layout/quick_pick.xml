@@ -23,13 +23,15 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true" >
         </com.wireless.ui.view.OrderFoodListView>
-
+
         <RelativeLayout
             android:id="@+id/relativeLayout_bottom_revealFood_quickPick"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true" >
+            android:layout_alignParentLeft="true"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp" >
 
             <TextView
                 android:id="@+id/textView2"
@@ -37,26 +39,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
-                android:text="总数："
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/textView_totalPrice_revealFood_quickPick"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-                android:layout_marginRight="40dp"
-                android:text="23"
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/textView1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_toLeftOf="@+id/textView_totalPrice_revealFood_quickPick"
-                android:text="总价："
+                android:text="赠送："
                 android:textSize="18sp" />
 
             <TextView
@@ -65,7 +48,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_toRightOf="@+id/textView2"
-                android:text="111"
+                android:text="0"
                 android:textSize="18sp" />
 
             <TextView
@@ -74,9 +57,38 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_toRightOf="@+id/textView_totalCount_revealFood__quickPick"
-                android:text="份"
+                android:text="元"
                 android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:text="元"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/textView_totalPrice_revealFood_quickPick"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_toLeftOf="@+id/textView4"
+                android:text="0"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_toLeftOf="@+id/textView_totalPrice_revealFood_quickPick"
+                android:text="小计："
+                android:textSize="18sp" />
+
         </RelativeLayout>
+
     </RelativeLayout>
 
     <FrameLayout

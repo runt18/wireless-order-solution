@@ -84,7 +84,7 @@ public class PickFoodActivity extends FragmentActivity implements
 					//设置显示参数
 					Bundle args = new Bundle();
 					args.putInt(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG, PickFoodFragment.PICK_FOOD_FRAGMENT_NUMBER);
-					args.putString(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG_NAME, "编号：");
+					args.putString(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG_NAME, "请输入编号搜索");
 					numFragment.setArguments(args);
 					//替换原本的fragment
 					fgTrans.replace(R.id.frameLayout_container_pickFood, numFragment).commit();
@@ -115,7 +115,7 @@ public class PickFoodActivity extends FragmentActivity implements
 					//设置显示参数
 					Bundle spellArgs = new Bundle();
 					spellArgs.putInt(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG, PickFoodFragment.PICK_FOOD_FRAGMENT_SPELL);
-					spellArgs.putString(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG_NAME, "拼音：");
+					spellArgs.putString(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG_NAME, "请输入拼音搜索");
 					spellFragment.setArguments(spellArgs);
 					//替换原本的fragment
 					fgTrans.replace(R.id.frameLayout_container_pickFood, spellFragment).commit();

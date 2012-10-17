@@ -9,28 +9,16 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true" >
-
-        <TextView
-            android:id="@+id/textView_searchTitle_numberFragment"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="false"
-            android:layout_centerVertical="true"
-            android:text="编号："
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="@color/black" />
-
+
         <EditText
             android:id="@+id/editText_pickFoodFragment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
             android:layout_alignParentTop="false"
-            android:layout_centerHorizontal="false"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="15dp"
-            android:layout_toRightOf="@+id/textView_searchTitle_numberFragment"
             android:ems="10" >
+
         </EditText>
 
         <ImageButton

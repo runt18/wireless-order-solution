@@ -474,7 +474,7 @@ public class KitchenFragment extends Fragment {
 				}
 			});
 			//数量加按钮
-			((Button) findViewById(R.id.button_plus_orderConfirm)).setOnClickListener(new View.OnClickListener(){
+			((ImageButton) findViewById(R.id.button_plus_orderConfirm)).setOnClickListener(new View.OnClickListener(){
 
 				@Override
 				public void onClick(View v) {
@@ -486,7 +486,7 @@ public class KitchenFragment extends Fragment {
 				}
 			});
 			//数量减按钮
-			((Button) findViewById(R.id.button_minus_orderConfirm)).setOnClickListener(new View.OnClickListener(){
+			((ImageButton) findViewById(R.id.button_minus_orderConfirm)).setOnClickListener(new View.OnClickListener(){
 
 				@Override
 				public void onClick(View v) {

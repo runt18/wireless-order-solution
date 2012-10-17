@@ -524,6 +524,21 @@ public class OrderFoodListView extends ExpandableListView{
 			//删除数量默认为此菜品的点菜数量
 			final EditText cancelEdtTxt = (EditText)view.findViewById(R.id.mycount);			
 			cancelEdtTxt.setText(Util.float2String2(selectedFood.getCount()));
+			//弹出后全选
+			cancelEdtTxt.selectAll();
+			
+			cancelEdtTxt.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					cancelEdtTxt.selectAll();
+				}
+			});
+			
+			//弹出软键盘
+           getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE); 
+           InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+           imm.showSoftInput(cancelEdtTxt, 0); //显示软键盘
+           imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
 			
 			//"确定"Button
 			Button okBtn = (Button)view.findViewById(R.id.confirm);
@@ -594,8 +609,14 @@ public class OrderFoodListView extends ExpandableListView{
 			
 			((TextView)findViewById(R.id.table)).setText("数量：");
 			//增加数量默认为此菜品的点菜数量
-			final EditText amountEdtTxt = (EditText)view.findViewById(R.id.mycount);			
-			amountEdtTxt.setText("");
+			final EditText amountEdtTxt = (EditText)view.findViewById(R.id.mycount);
+			amountEdtTxt.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					amountEdtTxt.selectAll();
+				}
+			});
 			
 			//"确定"Button
 			Button okBtn = (Button)view.findViewById(R.id.confirm);
@@ -632,10 +653,9 @@ public class OrderFoodListView extends ExpandableListView{
 			
 			//弹出软键盘
 	           getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE); 
-	           InputMethodManager imm = (InputMethodManager)
-	        		   getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-	                            imm.showSoftInput(this.getCurrentFocus(), 0); //显示软键盘
-	                            imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+	           InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+	           imm.showSoftInput(amountEdtTxt, 0); //显示软键盘
+	           imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
 		}		
 	}
 	

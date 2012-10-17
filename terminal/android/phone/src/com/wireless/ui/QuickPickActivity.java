@@ -103,8 +103,9 @@ public class QuickPickActivity extends FragmentActivity implements
 		public void handleMessage(Message msg) {
 			QuickPickActivity activity = mActivity.get();
 			//刷新新点菜List的显示总数和金额
-			mTotalCnt.setText(Integer.toString(activity.mNewFoodLstView.getSourceData().length));
-			mTotalPrice.setText(Util.CURRENCY_SIGN + Util.float2String(new Order(activity.mNewFoodLstView.getSourceData()).calcPriceWithTaste()));
+			Order order = new Order(activity.mNewFoodLstView.getSourceData());
+			mTotalCnt.setText(Util.CURRENCY_SIGN + Util.float2String(order.calcGiftPrice()));
+			mTotalPrice.setText(Util.CURRENCY_SIGN + Util.float2String(order.calcPriceWithTaste()));
 		}		
 
 	}
@@ -152,11 +153,10 @@ public class QuickPickActivity extends FragmentActivity implements
 				//设置显示参数
 				Bundle args = new Bundle();
 				args.putInt(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG, PickFoodFragment.PICK_FOOD_FRAGMENT_NUMBER);
-				args.putString(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG_NAME, "编号：");
+				args.putString(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG_NAME, "请输入编号搜索");
 				numFragment.setArguments(args);
 				//替换原本的fragment
 				ftrans.replace(R.id.frameLayout_container_quickPick, numFragment).commit();
-				
 				activity.mLastView = NUMBER_FRAGMENT;
 				mTitleTextView.setText("点菜 - 编号");
 				setLastCate(NUMBER_FRAGMENT);
@@ -182,7 +182,7 @@ public class QuickPickActivity extends FragmentActivity implements
 				//设置显示参数
 				Bundle spellAargs = new Bundle();
 				spellAargs.putInt(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG, PickFoodFragment.PICK_FOOD_FRAGMENT_SPELL);
-				spellAargs.putString(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG_NAME, "拼音：");
+				spellAargs.putString(PickFoodFragment.PICK_FOOD_FRAGMENT_TAG_NAME, "请输入拼音搜索");
 				spellFragment.setArguments(spellAargs);
 				//替换原本的fragment
 				ftrans.replace(R.id.frameLayout_container_quickPick, spellFragment).commit();
@@ -564,7 +564,7 @@ public class QuickPickActivity extends FragmentActivity implements
 			});
         	
 			//人数加按钮
-			((Button) findViewById(R.id.button_plus_people_commitDialog)).setOnClickListener(new View.OnClickListener(){
+			((ImageButton) findViewById(R.id.button_plus_people_commitDialog)).setOnClickListener(new View.OnClickListener(){
 
 				@Override
 				public void onClick(View v) {
@@ -576,7 +576,7 @@ public class QuickPickActivity extends FragmentActivity implements
 			});
 			
 			//人数减按钮
-			((Button) findViewById(R.id.button_minus_people_commitDialog)).setOnClickListener(new View.OnClickListener(){
+			((ImageButton) findViewById(R.id.button_minus_people_commitDialog)).setOnClickListener(new View.OnClickListener(){
 
 				@Override
 				public void onClick(View v) {
