@@ -295,9 +295,15 @@ Ext.onReady(function(){
 				Ext.getDom('discountNameShowType').innerHTML = e.text;
 			},
 			load : function(thiz){
-				if(programTree.getRootNode().childNodes.length == 0){
+				var rn = programTree.getRootNode().childNodes;
+				if(rn.length == 0){
 					programTree.getRootNode().getUI().hide();
 				}else{
+					for(var i = (rn.length - 1); i >= 0; i--){
+						if(rn[i].attributes.status == 2){
+							programTree.getRootNode().removeChild(rn[i]);
+						}
+					}
 					programTree.getRootNode().getUI().show();
 				}
 			}

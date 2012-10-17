@@ -173,8 +173,7 @@ function billQueryHandler() {
  */
 billListRefresh = function(){
 	
-	var discountValue = billGenModForm.getForm().findField("discountRadio").getGroupValue();
-	
+	var discount = Ext.getCmp('comboDiscount');
 	for ( var i = 0; i < orderedData.root.length; i++) {
 		var tpItem = orderedData.root[i];
 		
@@ -182,18 +181,14 @@ billListRefresh = function(){
 			// 特价，送，臨時菜 不打折
 			tpItem.discount = 1.00;
 		} else {
-			// 非 特价，送，臨時菜
-			if (discountValue == "discount1") {
-				tpItem.discount = tpItem.kitchen.discount1;
-				discountType = 1;
-			} else if (discountValue == "discount2") {
-				tpItem.discount = tpItem.kitchen.discount2;
-				discountType = 2;
-			} else {
-				tpItem.discount = tpItem.kitchen.discount3;
-				discountType = 3;
+			tpItem.discount = 1.00;
+			for(var di = 0; di < discountPlanData.root.length; di++){
+				if(discount.getValue() != -1 && discountPlanData.root[di].discount.id == discount.getValue() 
+						&& discountPlanData.root[di].kitchen.kitchenID == tpItem.kitchen.kitchenID){
+					tpItem.discount = parseFloat(discountPlanData.root[di].rate).toFixed(2);
+					break;
+				}
 			}
-			tpItem.discount = tpItem.discount == 0 ? 1 : tpItem.discount;
 		}
 	}	
 	orderedStore.loadData(orderedData);

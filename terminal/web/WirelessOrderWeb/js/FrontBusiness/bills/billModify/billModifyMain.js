@@ -358,23 +358,14 @@ var btnSubmitOrder = new Ext.Button({
 			}
 			foodPara = '{'+ foodPara + '}';
 			
-			var payMannerOut;
-			var payMannerIn = billGenModForm.getForm().findField("payManner").getGroupValue();
-			if (payMannerIn == "cashPay") {
-				payMannerOut = 1;
-			} else if (payMannerIn == "cardPay") {
-				payMannerOut = 2;
-			} else if (payMannerIn == "memberPay") {
-				payMannerOut = 3;
-			} else if (payMannerIn == "handPay") {
-				payMannerOut = 5;
-			} else if (payMannerIn == "signPay") {
-				payMannerOut = 4;
-			}
+			var payMannerOut = billGenModForm.getForm().findField("payManner").getGroupValue();
 			
 			var serviceRateIn = billGenModForm.findById("serviceRate").getValue();
 			var commentOut = billGenModForm.findById("remark").getValue();
 			var memberIDOut = Request["memberID"] + "";
+			var discountID = Ext.getCmp('comboDiscount');
+			
+			serviceRateIn = eval(serviceRateIn != 0) ? (serviceRateIn / 100) : serviceRateIn;
 			
 			orderedGrid.buttons[0].setDisabled(true);
 			orderedGrid.buttons[1].setDisabled(true);
@@ -387,7 +378,7 @@ var btnSubmitOrder = new Ext.Button({
 					"category" : Request["category"],
 					"customNum" : Request["personCount"],
 					"payType" : payType,
-					"discountType" : discountType,
+					'discountID' : discountID.getValue(),
 					"payManner" : payMannerOut,
 					"serviceRate" : serviceRateIn,
 					"memberID" : memberIDOut,
@@ -751,7 +742,7 @@ allFoodTabPanelGrid.on('rowdblclick', function(thiz, ri, e){
 				foodID : r.get('foodID'),
 				kitchenId : r.get('kitchen.kitchenID'),
 				kitchen : r.get('kitchen'),
-//				discount : 1,
+//				discountID : Ext.getCmp('comboDiscount').getValue(),
 				tasteID : 0,
 				special : r.get('special'),
 				recommend : r.get('recommend'),
@@ -811,7 +802,7 @@ var dishesOrderNorthPanel = new Ext.Panel({
 	contentEl : "tableStatusDO",
 	listeners : {
 		render : function(thiz) {
-			// tableStuLoad();
+			
 		}
 	}
 });
@@ -835,6 +826,7 @@ var discountKindComb = new Ext.form.ComboBox({
 	triggerAction : "all",
 	selectOnFocus : true,
 	allowBlank : false,
+	disabled : true,
 	listeners : {
 		select : function(combo, record, index) {
 			billListRefresh();
@@ -855,70 +847,34 @@ var billGenModForm = new Ext.form.FormPanel({
 			labelSeparator : '：',
 			labelWidth : 80,
 			width : 300,
-			// columnWidth : .30,
 			items : [ discountKindComb ]
 		}, {
-			// columnWidth : .10,
-			width : 170,
 			layout : 'form',
-			labelWidth : 80,
-			labelSeparator : '',
 			border : false,
-			items : [ {
-				xtype : 'radio',
-				fieldLabel : '折扣方式',
-				boxLabel : '折扣1',
-				checked : true,
-				name : 'discountRadio',
-				inputValue : 'discount1',
-				anchor : '95%',
+			width : 300,
+			items : [{
+				xtype : 'combo',
+				id : 'comboDiscount',
+				fieldLabel : '折扣方案',
+				readOnly : true,
+				forceSelection : true,
+				store : new Ext.data.JsonStore({
+					root : 'root',
+					fields : [ 'discountID', 'text']
+				}),
+				valueField : 'discountID',
+				displayField : 'text',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true,
 				listeners : {
-					check : function(thiz, newValue, oldValue) {
+					select : function(combo, record, index) {
 						billListRefresh();
 					}
 				}
-			} ]
-		}, {
-			// columnWidth : .10,
-			width : 90,
-			layout : 'form',
-			labelWidth : 0,
-			labelSeparator : '',
-			hideLabels : true,
-			border : false,
-			items : [ {
-				xtype : 'radio',
-				boxLabel : '折扣2',
-				name : 'discountRadio',
-				inputValue : 'discount2',
-				anchor : '95%',
-				listeners : {
-					check : function(thiz, newValue, oldValue) {
-						billListRefresh();
-					}
-				}
-			} ]
-		}, {
-			// columnWidth : .10,
-			width : 90,
-			layout : 'form',
-			labelWidth : 0,
-			labelSeparator : '',
-			hideLabels : true,
-			border : false,
-			items : [ {
-				xtype : 'radio',
-				boxLabel : '折扣3',
-				name : 'discountRadio',
-				inputValue : 'discount3',
-				anchor : '95%',
-				listeners : {
-					check : function(thiz, newValue, oldValue) {
-						billListRefresh();
-					}
-				}
-			} ]
-		} ]
+			}]
+		}]
 	}, {
 		layout : "column",
 		// height : 10,
@@ -934,10 +890,11 @@ var billGenModForm = new Ext.form.FormPanel({
 				fieldLabel : "服务费",
 				id : "serviceRate",
 				allowBlank : false,
-				anchor : "%99",
+				anchor : "%100",
+				style : 'text-align:right;',
 				validator : function(v) {
-					if (v < 0 || v > 100) {
-						return "服务费率范围是0%至100%！";
+					if (v < 0 || v > 100 || v.indexOf('.') != -1) {
+						return "服务费率范围是0%至100%,且为整数.";
 					} else {
 						return true;
 					}
@@ -945,7 +902,7 @@ var billGenModForm = new Ext.form.FormPanel({
 			} ]
 		}, {
 			width : 47,
-			html : "%"
+			html : '<font style="font-size:19px;">%</font>'
 		}, {
 			// columnWidth : .10,
 			width : 170,
@@ -959,7 +916,7 @@ var billGenModForm = new Ext.form.FormPanel({
 				boxLabel : '现金结帐',
 				checked : true,
 				name : 'payManner',
-				inputValue : 'cashPay',
+				inputValue : '1',
 				anchor : '95%',
 				listeners : {
 					check : function(thiz, newValue, oldValue) {
@@ -979,12 +936,11 @@ var billGenModForm = new Ext.form.FormPanel({
 				xtype : 'radio',
 				boxLabel : '刷卡结帐',
 				name : 'payManner',
-				inputValue : 'cardPay',
+				inputValue : '2',
 				anchor : '95%',
 				listeners : {
 					check : function(thiz, newValue, oldValue) {
-						// alert("2");
-						// checkOurListRefresh();
+						
 					}
 				}
 			} ]
@@ -1000,12 +956,11 @@ var billGenModForm = new Ext.form.FormPanel({
 				xtype : 'radio',
 				boxLabel : '挂帐',
 				name : 'payManner',
-				inputValue : 'handPay',
+				inputValue : '5',
 				anchor : '95%',
 				listeners : {
 					check : function(thiz, newValue, oldValue) {
-						// alert("3");
-						// checkOurListRefresh();
+						
 					}
 				}
 			} ]
@@ -1021,12 +976,11 @@ var billGenModForm = new Ext.form.FormPanel({
 				xtype : 'radio',
 				boxLabel : '会员卡',
 				name : 'payManner',
-				inputValue : 'memberPay',
+				inputValue : '3',
 				anchor : '95%',
 				listeners : {
 					check : function(thiz, newValue, oldValue) {
-						// alert("3");
-						// checkOurListRefresh();
+						
 					}
 				}
 			} ]
@@ -1042,12 +996,11 @@ var billGenModForm = new Ext.form.FormPanel({
 				xtype : 'radio',
 				boxLabel : '签单',
 				name : 'payManner',
-				inputValue : 'signPay',
+				inputValue : '4',
 				anchor : '95%',
 				listeners : {
 					check : function(thiz, newValue, oldValue) {
-						// alert("3");
-						// checkOurListRefresh();
+						
 					}
 				}
 			} ]

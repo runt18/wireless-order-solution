@@ -253,7 +253,6 @@ var checkOutForm = new Ext.form.FormPanel({
 				selectOnFocus : true,
 				listeners : {
 					select : function(combo, record, index) {
-//						alert(combo.getValue());
 						checkOurListRefresh();
 					}
 				}

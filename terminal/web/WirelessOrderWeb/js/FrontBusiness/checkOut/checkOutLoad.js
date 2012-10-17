@@ -95,7 +95,7 @@ function checkOutOnLoad() {
 				// 1,获取已点菜式
 				checkOutData = resultJSON;
 				
-				// 2,获取折扣率
+				// 2,获取折扣方案
 				Ext.Ajax.request({
 					url : '../../QueryDiscountTree.do',
 					params : {
@@ -108,8 +108,8 @@ function checkOutOnLoad() {
 						
 						var jr = eval(response.responseText);
 						discountData = jr;
-						discountData.push({discountID:-1, text:'不打折'});
 						
+						// 获取折扣方案分厨折扣
 						Ext.Ajax.request({
 							url : '../../QueryDiscountPlan.do',
 							params : {
@@ -128,14 +128,16 @@ function checkOutOnLoad() {
 								
 								var discount = Ext.getCmp('comboDiscount');
 								discount.store.loadData({root:discountData});
-								discount.setValue(-1);
+								
+								// 设置默认显示折扣方案
 								for(var i = 0; i < discountData.length; i++){
 									if(eval(discountData[i].isDefault == true)){
 										discount.setValue(discountData[i].discountID);
 										break;
+									}else if(eval(discountData[i].status == 2)){
+										discount.setValue(discountData[i].discountID);
 									}
 								}
-//								discount.fireEvent('select', discount);
 							
 								// 3,请求口味
 								Ext.Ajax.request({
