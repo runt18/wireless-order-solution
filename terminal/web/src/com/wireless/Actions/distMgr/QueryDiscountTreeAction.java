@@ -50,6 +50,8 @@ public class QueryDiscountTreeAction extends Action{
 				tsb.append("restaurantID:" + discount[i].getRestaurantID());
 				tsb.append(",");
 				tsb.append("isDefault:" + discount[i].isDefault());
+				tsb.append(",");
+				tsb.append("status:" + discount[i].getStatus());
 				tsb.append("}");
 			}
 			

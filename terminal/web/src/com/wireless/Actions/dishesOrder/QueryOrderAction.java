@@ -119,8 +119,14 @@ public class QueryOrderAction extends Action {
 			om.setServiceRate(order.getServiceRate());
 			om.setCategory(order.category);
 			om.setPaid(order.isPaid);
-			om.getDestTbl().setMimnmuCost(order.getMinimumCost());
+			om.setMinCost(order.getMinimumCost());
 			om.setRestaurantID(order.restaurantID);
+			om.setDiscountID(order.getDiscount().discountID);
+			om.setPayManner(order.pay_manner);
+			om.setOrderFoods(null);
+			om.setDestTbl(null);
+			om.setDestTbl2(null);
+			om.setSrcTbl(null);
 			
 			jobject.getOther().put("order", om);
 
