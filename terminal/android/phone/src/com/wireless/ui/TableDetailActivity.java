@@ -283,10 +283,8 @@ public class TableDetailActivity extends Activity {
 			}
 		});
 		
-		((RadioButton) view.findViewById(R.id.discount1)).setText("无折扣");
-		((RadioButton) view.findViewById(R.id.discount1)).setTag(new Discount());
 		//根据discount数量添加Radio Button
-		RadioGroup radioGroup = (RadioGroup) view.findViewById(R.id.radioGroup2);
+		RadioGroup radioGroup = (RadioGroup) view.findViewById(R.id.discountGroup);
 		for(Discount discount : WirelessOrder.foodMenu.discounts){
 			RadioButton radioBtn = new RadioButton(TableDetailActivity.this);
 			radioBtn.setTag(discount);
@@ -302,9 +300,7 @@ public class TableDetailActivity extends Activity {
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
 				Object obj = group.findViewById(checkedId).getTag();
-				if(obj != null){
-					mOrderToPay.setDiscount((Discount)obj);
-				}
+				mOrderToPay.setDiscount((Discount)obj);
 			}
 		});
 
@@ -373,6 +369,18 @@ public class TableDetailActivity extends Activity {
 			} else{
 				
 				mOrderToPay = order;
+				
+				/**
+				 * 设置默认折扣
+				 */
+				for(Discount discount : WirelessOrder.foodMenu.discounts){
+					if(discount.isDefault()){
+						mOrderToPay.setDiscount(discount);
+						break;
+					}else if(discount.isReserved()){
+						mOrderToPay.setDiscount(discount);
+					}
+				}
 				
 				/**
 				 * 请求账单成功则更新相关的控件

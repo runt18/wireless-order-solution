@@ -424,6 +424,7 @@ public class QuickPickActivity extends FragmentActivity implements
 	public void onPickFood() {
 	}
 	
+	
 	/**
 	 * 执行下单的请求操作
 	 */
@@ -573,7 +574,7 @@ public class QuickPickActivity extends FragmentActivity implements
 				}
 			});
         	
-			//数量加按钮
+			//人数加按钮
 			((Button) findViewById(R.id.button_plus_people_commitDialog)).setOnClickListener(new View.OnClickListener(){
 
 				@Override
@@ -584,7 +585,8 @@ public class QuickPickActivity extends FragmentActivity implements
 					}
 				}
 			});
-			//数量减按钮
+			
+			//人数减按钮
 			((Button) findViewById(R.id.button_minus_people_commitDialog)).setOnClickListener(new View.OnClickListener(){
 
 				@Override

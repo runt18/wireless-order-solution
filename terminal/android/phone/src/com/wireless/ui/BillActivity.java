@@ -206,10 +206,8 @@ public class BillActivity extends Activity {
 			}
 		});
 
-		((RadioButton) view.findViewById(R.id.discount1)).setText("无折扣");
-		((RadioButton) view.findViewById(R.id.discount1)).setTag(new Discount());
 		//根据discount数量添加Radio Button
-		RadioGroup radioGroup = (RadioGroup) view.findViewById(R.id.radioGroup2);
+		RadioGroup radioGroup = (RadioGroup) view.findViewById(R.id.discountGroup);
 		for(Discount discount : WirelessOrder.foodMenu.discounts){
 			RadioButton radioBtn = new RadioButton(BillActivity.this);
 			radioBtn.setTag(discount);
@@ -297,6 +295,9 @@ public class BillActivity extends Activity {
 				 //Apply discount in case of default
 				for(Discount discount : WirelessOrder.foodMenu.discounts){
 					if(discount.isDefault()){
+						mOrderToPay.setDiscount(discount);
+						break;
+					}else if(discount.isReserved()){
 						mOrderToPay.setDiscount(discount);
 					}
 				}
