@@ -97,7 +97,6 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 		 */
 		_newFoodLstView = (OrderFoodListView)findViewById(R.id.orderLstView);
 		//_newFoodLstView.setGroupIndicator(getResources().getDrawable(R.layout.expander_folder));
-		_newFoodLstView.setType(Type.INSERT_ORDER);
 		_newFoodLstView.setOperListener(this);
 		//滚动的时候隐藏输入法
 		_newFoodLstView.setOnScrollListener(new OnScrollListener() {				
@@ -117,7 +116,7 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 				((TextView)findViewById(R.id.totalTxtView)).setText(Util.CURRENCY_SIGN + Util.float2String(tmpOrder.calcPriceWithTaste()));	
 			}
 		});
-		_newFoodLstView.init();
+		_newFoodLstView.init(Type.INSERT_ORDER);
 		
 		//执行请求更新沽清菜品
 		new QuerySellOutTask().execute(WirelessOrder.foodMenu.foods);

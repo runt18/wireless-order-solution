@@ -69,23 +69,6 @@ public class OrderFoodListView extends ExpandableListView{
 	}
 	
 	/**
-	 * 设置ListView的类型，目前分为"新点菜"和"已点菜"两种
-	 * @param type
-	 * 			One of values blew.<br>
-	 * 			Type.INSERT_ORDER - 新点菜
-	 * 			Type.UPDATE_ORDER - 已点菜
-	 */
-	public void setType(int type){
-		if(type == Type.INSERT_ORDER){
-			mType = Type.INSERT_ORDER;
-		}else if(type == Type.UPDATE_ORDER){
-			mType = Type.UPDATE_ORDER;
-		}else{
-			mType = Type.INSERT_ORDER;
-		}
-	}
-	
-	/**
 	 * 设置菜品操作的回调接口
 	 * @param operListener
 	 */
@@ -131,7 +114,22 @@ public class OrderFoodListView extends ExpandableListView{
 		notifyDataChanged();
 	}
 	
-	public void init(){
+	/**
+	 * 初始化控件
+	 * @param type
+	 * 			One of values blew.<br>
+	 * 			Type.INSERT_ORDER - 新点菜
+	 * 			Type.UPDATE_ORDER - 已点菜
+	 */
+	public void init(int type){
+		if(type == Type.INSERT_ORDER){
+			mType = Type.INSERT_ORDER;
+		}else if(type == Type.UPDATE_ORDER){
+			mType = Type.UPDATE_ORDER;
+		}else{
+			throw new IllegalArgumentException("The type is NOT valid.");
+		}
+		
 		if(mType == Type.INSERT_ORDER){
 			mAdapter = new Adapter("新点菜"){
 				@Override

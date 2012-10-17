@@ -79,18 +79,17 @@ public class QuickPickActivity extends FragmentActivity implements
 		private WeakReference<QuickPickActivity> mActivity;
 		private TextView mTotalCnt;
 		private TextView mTotalPrice;
-		private OrderFoodListView mNewFoodLstView;
+		//private OrderFoodListView mNewFoodLstView;
 		
 		TextHandler(final QuickPickActivity activity){
 			mActivity = new WeakReference<QuickPickActivity>(activity);
 			mTotalCnt = (TextView) activity.findViewById(R.id.textView_totalCount_revealFood__quickPick);
 			mTotalPrice = (TextView) activity.findViewById(R.id.textView_totalPrice_revealFood_quickPick);
 			
-			mNewFoodLstView = mActivity.get().mNewFoodLstView;
-			mNewFoodLstView.setOperListener(activity);
+			//mNewFoodLstView = mActivity.get().mNewFoodLstView;
+			activity.mNewFoodLstView.setOperListener(activity);
 			//设置已点菜ListView的类型和侦听器
-			mNewFoodLstView.setType(Type.INSERT_ORDER);
-			mNewFoodLstView.setChangedListener(new OnChangedListener(){
+			activity.mNewFoodLstView.setChangedListener(new OnChangedListener(){
 				@Override
 				public void onSourceChanged() {
 					activity.mTextHandler.sendEmptyMessage(0);
@@ -203,7 +202,7 @@ public class QuickPickActivity extends FragmentActivity implements
 				((RelativeLayout) activity.findViewById(R.id.relativeLayout_bottom_revealFood_quickPick)).setVisibility(View.VISIBLE);
 				mTitleTextView.setText("已点菜");
 				//展开新点菜ListView
-				mActivity.get().mNewFoodLstView.expandGroup(0);
+				activity.mNewFoodLstView.expandGroup(0);
 				setLastCate(PICKED_FOOD_INTERFACE);
 				break;
 			}
@@ -251,6 +250,7 @@ public class QuickPickActivity extends FragmentActivity implements
 		new QuerySellOutTask().execute(WirelessOrder.foodMenu.foods);
 		
 		mNewFoodLstView = (OrderFoodListView)findViewById(R.id.orderFoodListView_revealFood_quickPick);
+		mNewFoodLstView.init(Type.INSERT_ORDER);
 		
 		mViewHandler = new ViewHandler(this);
 		mTextHandler = new TextHandler(this);

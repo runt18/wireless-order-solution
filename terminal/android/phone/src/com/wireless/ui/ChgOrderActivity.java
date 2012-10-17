@@ -126,7 +126,6 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 		 * "已点菜"的ListView
 		 */
 		mOriFoodLstView = (OrderFoodListView)findViewById(R.id.oriFoodLstView);
-		mOriFoodLstView.setType(Type.UPDATE_ORDER);
 		mOriFoodLstView.setOperListener(this);
 		//滚动的时候隐藏输入法
 		mOriFoodLstView.setOnScrollListener(new OnScrollListener() {				
@@ -145,7 +144,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 			}
 		});
 		
-		mOriFoodLstView.init();
+		mOriFoodLstView.init(Type.UPDATE_ORDER);
 		
 		//根据账单号请求相应的信息
 		new QueryOrderTask(Integer.valueOf(getIntent().getExtras().getString(MainActivity.KEY_TABLE_ID))).execute(WirelessOrder.foodMenu);
@@ -155,7 +154,6 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 		 */
 		mNewFoodLstView = (OrderFoodListView)findViewById(R.id.newFoodLstView);
 		//_newFoodLstView.setGroupIndicator(getResources().getDrawable(R.layout.expander_folder));
-		mNewFoodLstView.setType(Type.INSERT_ORDER);
 		mNewFoodLstView.setOperListener(this);
 		
 		//滚动的时候隐藏输入法
@@ -176,7 +174,7 @@ public class ChgOrderActivity extends Activity implements OrderFoodListView.OnOp
 			}
 		});	
 		
-		mNewFoodLstView.init();
+		mNewFoodLstView.init(Type.INSERT_ORDER);
 
 	}
 
