@@ -91,7 +91,7 @@ public final class RespQueryOrderParser {
 			offset += 2;
 
 			//get the 2nd table id
-			order.srcTbl.aliasID = order.destTbl2.aliasID = ((resp.body[offset] & 0x000000FF) | ((resp.body[offset + 1] & 0x000000FF) << 8));
+			order.destTbl2.aliasID = ((resp.body[offset] & 0x000000FF) | ((resp.body[offset + 1] & 0x000000FF) << 8));
 			offset += 2;
 			
 			//get the last modified order date

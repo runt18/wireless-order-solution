@@ -10,7 +10,6 @@ import com.wireless.protocol.ErrorCode;
 public class BusinessException extends Exception{
 
 	private static final long serialVersionUID = 1L;
-	
 	/**
 	 * one of the error values specified in class ErrorCode 
 	 */
@@ -41,4 +40,9 @@ public class BusinessException extends Exception{
 		super(errMsg);
 		this.errCode = errCode;
 	}
+	
+	public int getErrCode(){
+		return errCode;
+	}
+
 }
