@@ -14,7 +14,7 @@
             android:layout_width="99dp"
             android:layout_height="79dp"
             android:src="@drawable/kitchen_fragment_xplistview_item_item_selector" />
-
+
         <TextView
             android:id="@+id/textView_foodName_pickFoodFragment_item"
             android:layout_width="wrap_content"
@@ -24,9 +24,9 @@
             android:layout_alignRight="@+id/imageView_pickFoodFragment_item"
             android:text="坑爹的菜名..."
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="@color/white"
+            android:textColor="@color/black"
             android:textSize="19sp" />
-
+
         <TextView
             android:id="@+id/textView1"
             android:layout_width="wrap_content"
@@ -35,9 +35,9 @@
             android:layout_marginBottom="4dp"
             android:text="￥"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@color/orange"
+            android:textColor="@color/blue"
             android:textSize="13sp" />
-
+
         <TextView
             android:id="@+id/textView_price_pickFoodFragment_item"
             android:layout_width="wrap_content"
@@ -46,7 +46,7 @@
             android:layout_toRightOf="@+id/textView1"
             android:text="1.0"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@color/orange"
+            android:textColor="@color/blue"
             android:textSize="22sp" />
 
         <TextView

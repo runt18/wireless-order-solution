@@ -116,8 +116,8 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.main);
 		
 		int[] imageIcons = { 
-							 R.drawable.btnup01, R.drawable.btnup03, R.drawable.btnup02, 
-							 R.drawable.btnup04, R.drawable.btnup05, R.drawable.btnup06, 
+							 R.drawable.btnup01, R.drawable.btnup10, R.drawable.btnup02, 
+							 R.drawable.btnup04, R.drawable.btnup03, R.drawable.btnup06, 
 							 R.drawable.btnup07, R.drawable.btnup08, R.drawable.btnup09 
 						   };
 
@@ -809,13 +809,21 @@ public class MainActivity extends Activity {
 				title.setText("请输入需要下单的台号:");
 			}
 			
+			final EditText tblNoEdtTxt = (EditText)findViewById(R.id.mycount);
+
+			tblNoEdtTxt.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					tblNoEdtTxt.selectAll();
+				}
+			});
+			
 			((TextView)findViewById(R.id.table)).setText("台号：");
 			Button okBtn = (Button)findViewById(R.id.confirm);
 			okBtn.setText("确定");
 			okBtn.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					EditText tblNoEdtTxt = (EditText)findViewById(R.id.mycount);
 					try{
 						int tableAlias = Integer.parseInt(tblNoEdtTxt.getText().toString().trim());
 						if(_dialogType == DIALOG_INSERT_ORDER){

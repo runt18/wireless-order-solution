@@ -20,32 +20,67 @@
             android:typeface="serif" />
     </RelativeLayout>
 
-    <EditText
-        android:id="@+id/amountEdtTxt"
-        android:layout_width="70dip"
-        android:layout_height="50dip"
-        android:layout_below="@id/orderConfirmRL"
-        android:layout_marginTop="10dip"
-        android:layout_toRightOf="@+id/button_minus_orderConfirm"
-        android:background="@drawable/input"
-        android:digits="0123456789."
-        android:focusableInTouchMode="true"
-        android:inputType="numberSigned|text"
-        android:singleLine="true"
-        android:textColor="#000000"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:typeface="sans" >
-        <requestFocus/>
-    </EditText>
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/orderConfirmRL"
+        android:weightSum="5" >
+
+        <Button
+            android:id="@+id/button_minus_orderConfirm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/reduc_selector" />
+
+        <EditText
+            android:id="@+id/amountEdtTxt"
+            android:layout_width="70dip"
+            android:layout_height="50dip"
+            android:layout_marginTop="10dip"
+            android:layout_weight="1"
+            android:background="@drawable/input"
+            android:digits="0123456789."
+            android:focusableInTouchMode="true"
+            android:inputType="numberSigned|text"
+            android:singleLine="true"
+            android:text="1"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:typeface="sans" >
+        </EditText>
+
+        <Button
+            android:id="@+id/button_plus_orderConfirm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/add_selector" />
+
+        <CheckBox
+            android:id="@+id/orderHurriedChk"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_weight="2"
+            android:focusable="false"
+            android:textColor="#000000"
+            android:textSize="18sp" />
+    </LinearLayout>
 
     <RelativeLayout
         android:id="@+id/relativeLayout1"
         android:layout_width="fill_parent"
         android:layout_height="70dip"
-        android:layout_below="@id/amountEdtTxt"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="15dip" >
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/linearLayout1" >
 
         <Button
             android:id="@+id/orderConfirmBtn"
@@ -76,32 +111,5 @@
             android:src="@drawable/cancle_selector"
             android:textColor="#000000" />
     </RelativeLayout>
-
-    <Button
-        android:id="@+id/button_plus_orderConfirm"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/relativeLayout1"
-        android:layout_toRightOf="@+id/amountEdtTxt"
-        android:text="数量加" />
-
-    <Button
-        android:id="@+id/button_minus_orderConfirm"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/button_plus_orderConfirm"
-        android:layout_marginLeft="10dp"
-        android:text="数量减" />
-
-    <CheckBox
-        android:id="@+id/orderHurriedChk"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/amountEdtTxt"
-        android:layout_alignBottom="@+id/amountEdtTxt"
-        android:layout_toRightOf="@+id/button_plus_orderConfirm"
-        android:focusable="false"
-        android:textColor="#000000"
-        android:textSize="18sp" />
 
 </RelativeLayout>

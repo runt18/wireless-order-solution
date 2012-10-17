@@ -14,5 +14,6 @@
     <drawable name="white_drawable">#ffffff</drawable>
         <color name="black">#000</color>
         <color name="red">#ef1a1a</color>
+        <color name="yellow">#fbd67e</color>
     
 </resources>

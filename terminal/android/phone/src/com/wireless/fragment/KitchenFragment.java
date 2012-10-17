@@ -12,11 +12,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
-import android.util.SparseIntArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
@@ -24,11 +24,11 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
+import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnGroupCollapseListener;
 import android.widget.ExpandableListView.OnGroupExpandListener;
 import android.widget.GridView;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -41,8 +41,6 @@ import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Util;
 import com.wireless.ui.R;
-import com.wireless.ui.view.PinnedExpandableListView;
-import com.wireless.ui.view.PinnedExpandableListView.PinnedExpandableHeaderAdapter;
 
 public class KitchenFragment extends Fragment {
 	private static final int REFRESH_DEPTS = 112309;
@@ -57,7 +55,7 @@ public class KitchenFragment extends Fragment {
 	
 	private short mDeptFilter = Short.MIN_VALUE;
 	
-	private PinnedExpandableListView mXpListView;
+	private ExpandableListView mXpListView;
 	private Food[] mOriFoods;
 	
 	private OnFoodPickedListener mFoodPickedListener;
@@ -283,13 +281,12 @@ public class KitchenFragment extends Fragment {
 		mDepartmentHandler = new DepartmentHandler(this);
 		mKitchenHandler = new KitchenHandler(this);
 	}
-
+ 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view =  inflater.inflate(R.layout.kitchen_fragment, container, false);
-		//FIXME 去掉这个标题
-		mXpListView = (PinnedExpandableListView) view.findViewById(R.id.expandableListView_kitchenFragment);
-//		mXpListView.setHeaderView(inflater.inflate(R.layout.kitchen_fragment_xplistview_group_item_header, container, false));
+		
+		mXpListView = (ExpandableListView) view.findViewById(R.id.expandableListView_kitchenFragment);
 		//关闭组按钮
 		final ImageButton collapseBtn = (ImageButton) view.findViewById(R.id.imageButton_collaps_kitchenFgm);
 		collapseBtn.setOnClickListener(new OnClickListener(){
@@ -298,6 +295,7 @@ public class KitchenFragment extends Fragment {
 				//关闭当前组
 				int groupPosition  = (Integer) collapseBtn.getTag();
 				mXpListView.collapseGroup(groupPosition);
+				mXpListView.smoothScrollToPosition(0);
 			}
 		});
 		//设置group展开侦听器，每次只打开一项
@@ -330,15 +328,13 @@ public class KitchenFragment extends Fragment {
 		return view;
 	}
 	
-	class KitchenExpandableListAdapter extends BaseExpandableListAdapter implements PinnedExpandableHeaderAdapter{
-		private SparseIntArray mGroupStatusMap ;
+	class KitchenExpandableListAdapter extends BaseExpandableListAdapter{
 		private ArrayList<ArrayList<ArrayList<Food>>> mChilds;
 		private ArrayList<Kitchen> mGroups;
 		private int ROW = 4;
 		
 		public KitchenExpandableListAdapter(ArrayList<Kitchen> groups, List<List<Food>> rowChilds, int row) {
 			super();
-			mGroupStatusMap = new  SparseIntArray();
 			mChilds = new ArrayList<ArrayList<ArrayList<Food>>>();
 			mGroups = groups;
 			ROW = row;
@@ -430,11 +426,19 @@ public class KitchenFragment extends Fragment {
 			//设置该行的gridview
 			GridView gridView = (GridView) view.findViewById(R.id.gridView_kitchenFgm_xplv_child_item);
 			gridView.setVerticalSpacing(0);
-//			gridView.removeAllViews();
 			ArrayList<Food> childFoods = mChilds.get(groupPosition).get(childPosition);
 			gridView.setAdapter(new GridAdapter(childFoods, getActivity()));
-			//将每行的几个菜品添加进该行的linearlayout
-			
+			//设置侦听器
+			gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+				@Override
+				public void onItemClick( AdapterView<?> parent, View view, int position, long id) {
+					Food food = (Food) view.getTag();
+					if(!food.isSellOut()){
+						new AskOrderAmountDialog(food).show();
+					}
+					else Toast.makeText(getActivity(), "此菜已售罄", Toast.LENGTH_SHORT).show();
+				}
+			});
 			return view;
 		}
 
@@ -442,49 +446,6 @@ public class KitchenFragment extends Fragment {
 		public boolean isChildSelectable(int groupPosition,
 				int childPosition) {
 			return false;
-		}
-		
-		@Override
-		public int getPinnedExpandableHeaderState(int groupPosition, int childPosition) {
-			final int childCount = getChildrenCount(groupPosition);
-			if(childPosition == childCount - 1){  
-				return PINNED_HEADER_PUSHED_UP; 
-			}
-			else if(childPosition == -1 && !mXpListView.isGroupExpanded(groupPosition)){ 
-				return PINNED_HEADER_GONE; 
-			}
-			else{
-				return PINNED_HEADER_VISIBLE;
-			}
-		}
-		/**
-		 * 设置header的显示内容
-		 */
-		@Override
-		public void configurePinnedExpandableHeader(View header, int groupPosition, int childPosition, int alpha) {
-			Kitchen kitchen = (Kitchen) this.getGroup(groupPosition);
-			((TextView)header.findViewById(R.id.textView_name_kitchenFragment_xp_group_header)).setText(kitchen.name);
-			
-			//设置厨房菜数量
-			int size = mChilds.get(groupPosition).size();
-			((TextView) header.findViewById(R.id.textView_count_kitchenFragment_xp_group_header))
-				.setText("" + ((size - 1) * ROW + mChilds.get(groupPosition).get(size -1).size()));
-			
-		}
-		
-		@Override
-		public void setGroupClickStatus(int groupPosition, int status) {
-			mGroupStatusMap.put(groupPosition, status);
-		}
-		
-		@Override
-		public int getGroupClickStatus(int groupPosition) {
-			if(mGroupStatusMap.get(groupPosition, -1) != -1){
-				return mGroupStatusMap.get(groupPosition);
-			}
-			else{
-				return 0;
-			}
 		}
 	}
 
@@ -499,12 +460,19 @@ public class KitchenFragment extends Fragment {
 			super(getActivity(), R.style.FullHeightDialog);
 			
 			_selectedFood = new OrderFood(food);
-			
+			 
 			setContentView(R.layout.order_confirm);
 			//输入的框
 			((TextView)findViewById(R.id.orderTitleTxt)).setText("请输入" + _selectedFood.name + "的点菜数量");
 			final EditText countEditText = (EditText)findViewById(R.id.amountEdtTxt);
 			countEditText.setText("1");
+			//点击时全选
+			countEditText.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					countEditText.selectAll();
+				}
+			});
 			//数量加按钮
 			((Button) findViewById(R.id.button_plus_orderConfirm)).setOnClickListener(new View.OnClickListener(){
 
@@ -647,69 +615,20 @@ public class KitchenFragment extends Fragment {
 			Food food = mFoods.get(position);
 			
 			view.setTag(food);
+			
+			if(food.name.length() >= 10)
+				((TextView) view.findViewById(R.id.textView_foodName_pickFoodFragment_item)).setText(food.name.substring(0, 10));
+			else ((TextView) view.findViewById(R.id.textView_foodName_pickFoodFragment_item)).setText(food.name);
+
 			//设置该项的显示
-			((TextView) view.findViewById(R.id.textView_foodName_pickFoodFragment_item)).setText(food.name);
 			((TextView) view.findViewById(R.id.textView_num_pickFoodFragment_item)).setText(Integer.toString(food.aliasID));
 			((TextView) view.findViewById(R.id.textView_price_pickFoodFragment_item)).setText(Util.float2String2(food.getPrice()));
 			
 			if(food.isSellOut())
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
-			//设置该项的侦听
 			else {
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.GONE);
-				((ImageView)view.findViewById(R.id.imageView_pickFoodFragment_item))
-				//FIXME ontouchevent事件冲突问题
-				.setOnClickListener(new View.OnClickListener(){
-					@Override
-					public void onClick(View v) {
-						new AskOrderAmountDialog((Food) view.getTag()).show();
-					}
-				});
 			}
-//			LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.linearLayout_pickFood_fgm_item);
-//			linearLayout.removeAllViews();
-//			//赠
-//			if(food.isGift()){
-//				TextView text = new TextView(getActivity());
-//				text.setText("赠");
-//				text.setTextSize(16f);
-//				text.setTextColor(Color.YELLOW);
-//				linearLayout.addView(text);
-//			}
-//			//时
-//			if(food.isCurPrice()){
-//				TextView text = new TextView(getActivity());
-//				text.setText("时");
-//				text.setTextSize(16f);
-//				text.setTextColor(Color.MAGENTA);
-//				linearLayout.addView(text);
-//			}
-//			//推荐
-//			if(food.isRecommend()){
-//				TextView text = new TextView(getActivity());
-//				text.setText("荐");
-//				text.setTextSize(16f);
-//				text.setTextColor(Color.CYAN);
-//				linearLayout.addView(text);
-//			}
-//			//特
-//			if(food.isSpecial()){
-//				TextView text = new TextView(getActivity());
-//				text.setText("特");
-//				text.setTextSize(16f);
-//				text.setTextColor(Color.GREEN);
-//				linearLayout.addView(text);
-//			}
-//			
-//			//套
-//			if(food.isCombo()){
-//				TextView text = new TextView(getActivity());
-//				text.setText("套");
-//				text.setTextSize(16f);
-//				text.setTextColor(Color.GREEN);
-//				linearLayout.addView(text);
-//			}
-			
 			return view;
 		}
 		

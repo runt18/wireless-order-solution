@@ -153,11 +153,18 @@ public class PickFoodFragment extends Fragment{
 				if(!food.isSellOut()){
 					new AskOrderAmountDialog(food).show();
 				}
+				else Toast.makeText(getActivity(), "此菜已售罄", Toast.LENGTH_SHORT).show();
 			}
         });
         
 		//搜索框
         final EditText searchTxtView = (EditText)view.findViewById(R.id.editText_pickFoodFragment);
+        searchTxtView.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				searchTxtView.selectAll();
+			}
+		});
         //设置输入类型
         if(args.getInt(PICK_FOOD_FRAGMENT_TAG) == PICK_FOOD_FRAGMENT_NUMBER)
         	searchTxtView.setInputType(InputType.TYPE_CLASS_NUMBER);
@@ -254,8 +261,11 @@ public class PickFoodFragment extends Fragment{
 			
 			Food food = mFoods.get(position);
 			view.setTag(food);
-			
-			((TextView) view.findViewById(R.id.textView_foodName_pickFoodFragment_item)).setText(food.name);
+			//如果字数太长则从10截断
+			if(food.name.length() >= 10)
+				((TextView) view.findViewById(R.id.textView_foodName_pickFoodFragment_item)).setText(food.name.substring(0, 10));
+			else ((TextView) view.findViewById(R.id.textView_foodName_pickFoodFragment_item)).setText(food.name);
+
 			((TextView) view.findViewById(R.id.textView_num_pickFoodFragment_item)).setText(Integer.toString(food.aliasID));
 			((TextView) view.findViewById(R.id.textView_price_pickFoodFragment_item)).setText(Util.float2String2(food.getPrice()));
 			
@@ -336,7 +346,13 @@ public class PickFoodFragment extends Fragment{
 			((TextView)findViewById(R.id.orderTitleTxt)).setText("请输入" + _selectedFood.name + "的点菜数量");
 			
 			final EditText countEditText = (EditText)findViewById(R.id.amountEdtTxt);
-			countEditText.setText("1");
+			//点击时全选
+			countEditText.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					countEditText.selectAll();
+				}
+			});
 			
 			//数量加按钮
 			((Button) findViewById(R.id.button_plus_orderConfirm)).setOnClickListener(new View.OnClickListener(){
@@ -375,7 +391,7 @@ public class PickFoodFragment extends Fragment{
 					}
 				}
 			});
-			//数量减按钮
+			//数量加按钮
 			((Button) findViewById(R.id.button_plus_orderConfirm)).setOnClickListener(new View.OnClickListener(){
 
 				@Override
@@ -384,7 +400,7 @@ public class PickFoodFragment extends Fragment{
 					countEditText.setText(Util.float2String2(++curNum));
 				}
 			});
-			//数量加按钮
+			//数量减按钮
 			((Button) findViewById(R.id.button_minus_orderConfirm)).setOnClickListener(new View.OnClickListener(){
 
 				@Override

@@ -18,7 +18,7 @@
             android:orientation="horizontal" >
         </LinearLayout>
     </HorizontalScrollView>
-    <com.wireless.ui.view.PinnedExpandableListView
+    <ExpandableListView
         android:id="@+id/expandableListView_kitchenFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -27,8 +27,8 @@
         android:fadingEdgeLength="2dp"
         android:groupIndicator="@drawable/kitchen_fragment_expander_group_selector" >
 
-    </com.wireless.ui.view.PinnedExpandableListView>
-
+    </ExpandableListView>
+
     <ImageButton
         android:id="@+id/imageButton_collaps_kitchenFgm"
         android:layout_width="wrap_content"
@@ -36,7 +36,7 @@
         android:layout_alignParentBottom="false"
         android:layout_alignParentRight="true"
         android:layout_marginTop="300dp"
-        android:src="@drawable/add_selector"
+        android:src="@drawable/go_top_selector"
         android:visibility="gone" />
 
 </RelativeLayout>
