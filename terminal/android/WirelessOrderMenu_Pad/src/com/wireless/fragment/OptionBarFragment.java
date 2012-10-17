@@ -337,14 +337,14 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 			//make the progress dialog disappeared
 			mProgDialog.dismiss();
 			
-			if(mErrMsg != null){
+			if(mBusinessException != null){
 				
 				/**
 				 * 如果请求账单信息失败，则跳转回本页面
 				 */
 				new AlertDialog.Builder(OptionBarFragment.this.getActivity())
 					.setTitle("提示")
-					.setMessage(mErrMsg)
+					.setMessage(mBusinessException.getMessage())
 					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int id) {
 							dialog.dismiss();
