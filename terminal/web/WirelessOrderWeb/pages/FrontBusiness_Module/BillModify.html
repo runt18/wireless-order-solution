@@ -11,24 +11,12 @@
 <script type="text/javascript" src="../../extjs/ext-all.js"></script>
 <script type="text/javascript" src="../../js/common/Ext.ux.js"></script>
 <script type="text/javascript" src="../../js/common/Ext.ux.check.js"></script>
-<!-- 解决Grid不能选择复制问题 -->
-<script type="text/javascript" src="../../extjs/ext-lang-zh_CN.js"></script>
 
-<!-- 实现多选JS -->
-<script type="text/javascript" src="../../extjs/multiselect/DDView.js"></script>
-<script type="text/javascript"
-	src="../../extjs/multiselect/MultiSelect.js"></script>
-<script type="text/javascript"
-	src="../../extjs/multiselect/ItemSelector.js"></script>
-<link rel="stylesheet" type="text/css"
-	href="../../extjs/multiselect/multiselect.css" />
+<script type="text/javascript" src="../../extjs/multiselect/ItemSelector.js"></script>
 
-<!-- jquery lib -->
 <script type="text/javascript" src="../../jquery/jquery-1.5.1.min.js"></script>
 
-<!-- components -->
-<script type="text/javascript"
-	src="../../js/components/Ext.ux.ImageButton.js"></script>
+<script type="text/javascript" src="../../js/components/Ext.ux.ImageButton.js"></script>
 <script type="text/javascript" src="../../js/components/md5.js"></script>
 <script type="text/javascript" src="../../js/components/functionLib.js"></script>
 
@@ -55,6 +43,7 @@
 	var payType = Request["payType"];
 	var discountType = Request["discountType"];
 	var orderID = Request["orderID"];
+	var orderBasicMsg = {};
 
 	var orderedData = {totalProperty:0, root:[]}; // the dishes have been ordered
 	var dishOrderCurrRowIndex_ = -1; // the selected row index in the chosen dishes display grid
@@ -63,7 +52,8 @@
 	var dishTasteData = [];
 	var kitchenData = [];
 	var discountData = [];
-
+	var discountPlanData = {root:[]};
+	
 	var softKBRelateItemId = ""; // soft keyboard relate item id
 	var dishesCount = -1; // the dish count user input, in order to keep the same between tabs
 	var category = Request["category"];
@@ -83,14 +73,9 @@
 	var bmObject = {};
 </script>
 
-<script type="text/javascript"
-	src="../../js/FrontBusiness/bills/billsFuncLib.js"></script>
-<script type="text/javascript"
-	src="../../js/FrontBusiness/bills/billModify/billModifyLoad.js"></script>
-<script type="text/javascript"
-	src="../../js/FrontBusiness/bills/billModify/billModifyMain.js"></script>
-
-
+<script type="text/javascript" src="../../js/FrontBusiness/bills/billsFuncLib.js"></script>
+<script type="text/javascript" src="../../js/FrontBusiness/bills/billModify/billModifyLoad.js"></script>
+<script type="text/javascript" src="../../js/FrontBusiness/bills/billModify/billModifyMain.js"></script>
 
 </head>
 <body onload="billModifyOnLoad()">
@@ -122,173 +107,6 @@
 		<img title="服务费率" id="serviceRateImgTS"
 			src='../../images/serviceRate.png' style='float: left;' />
 		<div id="serviceRateDivTS" class="tableStatusChar">4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-	</div>
-
-
-	<!-- kitchen select -->
-	<div id="kitchenSelectDO" style="padding-left: 10px; visibility: hidden;">
-		<div id="kitchen0"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<span style="width: 10px; float: left;"> </span>
-		<div id="kitchen1"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<span style="width: 10px; float: left;"> </span>
-		<div id="kitchen2"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<span style="width: 10px; float: left;"> </span>
-		<div id="kitchen3"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<span style="width: 10px; float: left;"> </span>
-		<div id="kitchen4"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<span style="width: 10px; float: left;"> </span>
-		<div id="kitchen5"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<span style="width: 10px; float: left;"> </span>
-		<div id="kitchen6"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen7"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<span style="width: 10px; float: left;"> </span>
-		<div id="kitchen8"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<span style="width: 10px; float: left;"> </span>
-		<div id="kitchen9"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<span style="width: 10px; float: left;"> </span>
-		<div id="kitchen10"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<span style="width: 10px; float: left;"> </span>
-		<div id="kitchen11"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<span style="width: 10px; float: left;"> </span>
-		<div id="kitchen12"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<span style="width: 10px; float: left;"> </span>
-		<div id="kitchen13"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen14"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen15"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen16"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen17"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen18"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen19"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen20"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen21"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen22"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen23"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen24"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen25"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen26"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen27"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen28"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen29"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen30"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen31"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen32"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen33"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen34"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen35"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen36"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen37"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen38"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen39"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen40"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen41"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen42"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen43"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen44"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen45"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen46"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen47"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen48"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
-		<div id="kitchen49"
-			style='background: url(../../images/KitchenNormal.png) no-repeat 50%;'
-			class="ketchenSelect"></div>
 	</div>
 
 </body>
