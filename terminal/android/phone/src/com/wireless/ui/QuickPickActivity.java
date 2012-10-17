@@ -36,10 +36,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.Params;
+import com.wireless.common.WirelessOrder;
 import com.wireless.excep.BusinessException;
 import com.wireless.fragment.KitchenFragment;
 import com.wireless.fragment.PickFoodFragment;
 import com.wireless.parcel.FoodParcel;
+import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Type;
@@ -422,58 +424,13 @@ public class QuickPickActivity extends FragmentActivity implements
 
 	@Override
 	public void onPickFood() {
+		
 	}
 	
-	
 	/**
-	 * 执行下单的请求操作
+	 * 快点界面中的提交Dialog
 	 */
-	private class InsertOrderTask extends com.wireless.lib.task.CommitOrderTask{
-
-		private ProgressDialog _progDialog;
-		
-		public InsertOrderTask(Order reqOrder) {
-			super(reqOrder);
-		}
-		
-		/**
-		 * 在执行请求下单操作前显示提示信息
-		 */
-		@Override
-		protected void onPreExecute(){
-			_progDialog = ProgressDialog.show(QuickPickActivity.this, "", "提交" + mReqOrder.destTbl.aliasID + "号餐台的下单信息...请稍候", true);
-		}
-		
-		
-		/**
-		 * 根据返回的error message判断，如果发错异常则提示用户，
-		 * 如果成功，则返回到主界面，并提示用户下单成功
-		 */
-		@Override
-		protected void onPostExecute(BusinessException e){
-			//make the progress dialog disappeared
-			_progDialog.dismiss();
-			/**
-			 * Prompt user message if any error occurred.
-			 */
-			if(e != null){
-				new AlertDialog.Builder(QuickPickActivity.this)
-				.setTitle("提示")
-				.setMessage(e.getMessage())
-				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						dialog.dismiss();
-					}
-				}).show();
-			}else{
-				//return to the main activity and show the message
-				QuickPickActivity.this.finish();
-				Toast.makeText(QuickPickActivity.this, mReqOrder.destTbl.aliasID + "号台下单成功。", Toast.LENGTH_SHORT).show();
-			}
-		}
-	}	
-	
-	class CommitDialog extends Dialog{
+	private class CommitDialog extends Dialog{
 
 		private ListView mListView;
 		
@@ -491,6 +448,7 @@ public class QuickPickActivity extends FragmentActivity implements
 			super(context);
 			init();
 		}
+		
 		private void init(){
 			this.setContentView(R.layout.commit_dialog);
 
@@ -560,17 +518,18 @@ public class QuickPickActivity extends FragmentActivity implements
         	((Button)this.findViewById(R.id.button_confirm_commitDialog)).setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					//TODO complete the order commit
-//					OrderFood[] foods = mPickFoods.toArray(new OrderFood[mPickFoods.size()]);
-//					if(foods.length != 0 && !tableText.getText().toString().equals("")){
-//						Order reqOrder = new Order(foods,											   
-//												   Short.parseShort(tableText.getText().toString()),
-//												   Integer.parseInt(peopleCountTextView.getText().toString()));
-//						new InsertOrderTask(reqOrder).execute(Type.INSERT_ORDER);
-//						
-//					}else{
-//						Toast.makeText(QuickPickActivity.this, "请输入台号", Toast.LENGTH_SHORT).show();
-//					}
+					
+					if(mNewFoodLstView.getSourceData().length > 0){
+						try{
+							short tableAlias = Short.parseShort(tableText.getText().toString());
+							new QueryOrderTask(tableAlias).execute(WirelessOrder.foodMenu);
+						}catch(NumberFormatException e){
+							Toast.makeText(QuickPickActivity.this, "你输入的台号不正确，请重新输入", Toast.LENGTH_SHORT).show();
+						}
+						
+					}else{
+						Toast.makeText(QuickPickActivity.this, "您还没有点菜", Toast.LENGTH_SHORT).show();						
+					}
 				}
 			});
         	
@@ -662,6 +621,112 @@ public class QuickPickActivity extends FragmentActivity implements
 				}
            	});
 		}
+		
+		/**
+		 * 执行请求对应餐台的账单信息 
+		 */
+		private class QueryOrderTask extends com.wireless.lib.task.QueryOrderTask{
+
+			private ProgressDialog mProgDialog;
+		
+			QueryOrderTask(int tableAlias){
+				super(tableAlias);
+			}
+			
+			/**
+			 * 在执行请求删单操作前显示提示信息
+			 */
+			@Override
+			protected void onPreExecute(){
+				mProgDialog = ProgressDialog.show(QuickPickActivity.this, "", "查询" + mTblAlias + "号餐台的信息...请稍候", true);
+			}
+			
+			/**
+			 * 根据返回的error message判断，如果发错异常则提示用户，
+			 * 如果成功，则迁移到改单页面
+			 */
+			@Override
+			protected void onPostExecute(Order order){
+				
+				mProgDialog.dismiss();
+
+				int customAmount = Integer.parseInt(((TextView)CommitDialog.this.findViewById(R.id.textView_peopleCnt_commitDialog)).getText().toString());
+
+				if(mBusinessException != null){
+					if(mBusinessException.getErrCode() == ErrorCode.TABLE_IDLE){				
+							
+						//Perform to insert a new order in case of the table is IDLE.
+						Order reqOrder = new Order(mNewFoodLstView.getSourceData(), mTblAlias, customAmount);
+						new InsertOrderTask(reqOrder).execute(Type.INSERT_ORDER);						
+						
+					}else{
+						new AlertDialog.Builder(QuickPickActivity.this)
+						.setTitle("提示")
+						.setMessage(mBusinessException.getMessage())
+						.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								dialog.dismiss();
+							}
+						})
+						.show();
+					}
+				}else{
+					//Merge the original order and update if the table is BUSY.
+					order.addFoods(mNewFoodLstView.getSourceData());
+					order.customNum = customAmount;
+					new InsertOrderTask(order).execute(Type.UPDATE_ORDER);
+				}
+			}
+		}
+		
+		/**
+		 * 执行下单的请求操作
+		 */
+		private class InsertOrderTask extends com.wireless.lib.task.CommitOrderTask{
+
+			private ProgressDialog _progDialog;
+			
+			public InsertOrderTask(Order reqOrder) {
+				super(reqOrder);
+			}
+			
+			/**
+			 * 在执行请求下单操作前显示提示信息
+			 */
+			@Override
+			protected void onPreExecute(){
+				_progDialog = ProgressDialog.show(QuickPickActivity.this, "", "提交" + mReqOrder.destTbl.aliasID + "号餐台的下单信息...请稍候", true);
+			}
+			
+			
+			/**
+			 * 根据返回的error message判断，如果发错异常则提示用户，
+			 * 如果成功，则返回到主界面，并提示用户下单成功
+			 */
+			@Override
+			protected void onPostExecute(BusinessException e){
+				//make the progress dialog disappeared
+				_progDialog.dismiss();
+				/**
+				 * Prompt user message if any error occurred.
+				 */
+				if(e != null){
+					new AlertDialog.Builder(QuickPickActivity.this)
+					.setTitle("提示")
+					.setMessage(e.getMessage())
+					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							dialog.dismiss();
+						}
+					}).show();
+				}else{
+					//return to the main activity and show the message
+					dismiss();
+					QuickPickActivity.this.finish();
+					Toast.makeText(QuickPickActivity.this, mReqOrder.destTbl.aliasID + "号台下单成功。", Toast.LENGTH_SHORT).show();
+				}
+			}
+		}	
 	}
 
 }

@@ -274,13 +274,13 @@ public class BillActivity extends Activity {
 		@Override
 		protected void onPostExecute(Order order){
 
-			if(mErrMsg != null){
+			if(mBusinessException != null){
 				/**
 				 * 如果请求账单信息失败，则跳转会MainActivity
 				 */
 				new AlertDialog.Builder(BillActivity.this)
 					.setTitle("提示")
-					.setMessage(mErrMsg)
+					.setMessage(mBusinessException.getMessage())
 					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int id) {
 							dialog.dismiss();
