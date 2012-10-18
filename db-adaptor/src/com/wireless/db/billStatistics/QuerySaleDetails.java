@@ -22,6 +22,9 @@ import com.wireless.protocol.Terminal;
 
 public class QuerySaleDetails {
 	
+	public final static int QUERY_TODAY = 0;		//查询当日账单
+	public final static int QUERY_HISTORY = 1;		//查询历史账单
+	
 	public final static int QUERY_BY_DEPT = 0;		//按部门显示
 	public final static int QUERY_BY_FOOD = 1;		//按菜品显示
 	
@@ -38,12 +41,14 @@ public class QuerySaleDetails {
 	 * 			the on duty to query
 	 * @param offDuty
 	 * 			the off duty to query
+	 * @param queryType
+	 * 			The query type
 	 * @return
 	 * 			an array containing department sales details which is sorted by profit in descending order
 	 * @throws SQLException
 	 * 			throws if any error occurred while execute any SQL statements.
 	 */
-	public static SalesDetail[] execByDept(DBCon dbCon, Terminal term, String onDuty, String offDuty) throws SQLException{
+	public static SalesDetail[] execByDept(DBCon dbCon, Terminal term, String onDuty, String offDuty, int queryType) throws SQLException{
 	
 		/**
 		 * Get the duty range between on and off duty date
@@ -58,10 +63,17 @@ public class QuerySaleDetails {
 		/**
 		 * Get the single order food information
 		 */
-		orderFoods = SingleOrderFoodReflector.getDetailHistory(dbCon, 
-							"AND B.restaurant_id=" + term.restaurantID + " " + 
-							"AND B.order_date BETWEEN '" + dutyRange.getOnDuty() + "' AND '" + dutyRange.getOffDuty() + "'", 
-							null);				
+		if(queryType == QUERY_HISTORY){
+			orderFoods = SingleOrderFoodReflector.getDetailHistory(dbCon, 
+								"AND B.restaurant_id=" + term.restaurantID + " " + 
+								"AND B.order_date BETWEEN '" + dutyRange.getOnDuty() + "' AND '" + dutyRange.getOffDuty() + "'", 
+								null);
+		}else{
+			orderFoods = SingleOrderFoodReflector.getDetailToday(dbCon, 
+								"AND B.restaurant_id=" + term.restaurantID + " " + 
+								"AND B.order_date BETWEEN '" + dutyRange.getOnDuty() + "' AND '" + dutyRange.getOffDuty() + "'", 
+								null);
+		}
 		
 		/**
 		 * Get the material detail information
@@ -182,12 +194,15 @@ public class QuerySaleDetails {
 	 * 			the off duty to query
 	 * @param deptID
 	 * @param orderType
+	 * 			The order type.
+	 * @param queryType
+	 * 			The query type.
 	 * @return
 	 * 			an array containing department sales details which is sorted by profit in descending order
 	 * @throws SQLException
 	 * 			throws if any error occurred while execute any SQL statements.
 	 */
-	public static SalesDetail[] execByFood(DBCon dbCon, Terminal term, String onDuty, String offDuty, int[] deptID, int orderType) throws SQLException{
+	public static SalesDetail[] execByFood(DBCon dbCon, Terminal term, String onDuty, String offDuty, int[] deptID, int orderType, int queryType) throws SQLException{
 		
 		/**
 		 * Get the duty range between on and off duty date
@@ -213,11 +228,19 @@ public class QuerySaleDetails {
 		/**
 		 * Get the single order food information
 		 */
-		orderFoods = SingleOrderFoodReflector.getDetailHistory(dbCon, 
-							" AND B.restaurant_id=" + term.restaurantID + " " + 
-							" AND B.order_date BETWEEN '" + dutyRange.getOnDuty() + "' AND '" + dutyRange.getOffDuty() + "'" +  
-							(deptID.length != 0 ? " AND A.dept_id IN(" + deptCond + ")" : ""),
-							null);				
+		if(queryType == QUERY_HISTORY){
+			orderFoods = SingleOrderFoodReflector.getDetailHistory(dbCon, 
+								" AND B.restaurant_id=" + term.restaurantID + " " + 
+								" AND B.order_date BETWEEN '" + dutyRange.getOnDuty() + "' AND '" + dutyRange.getOffDuty() + "'" +  
+								(deptID.length != 0 ? " AND A.dept_id IN(" + deptCond + ")" : ""),
+								null);
+		}else{
+			orderFoods = SingleOrderFoodReflector.getDetailToday(dbCon, 
+								" AND B.restaurant_id=" + term.restaurantID + " " + 
+								" AND B.order_date BETWEEN '" + dutyRange.getOnDuty() + "' AND '" + dutyRange.getOffDuty() + "'" +  
+								(deptID.length != 0 ? " AND A.dept_id IN(" + deptCond + ")" : ""),
+								null);			
+		}
 		
 		/**
 		 * Get the material detail information

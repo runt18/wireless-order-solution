@@ -439,8 +439,8 @@ public class PayOrder {
 		//Get the discount to this order
 		Discount[] discount = QueryMenu.queryDiscounts(dbCon, 
 													   " AND DIST.restaurant_id=" + term.restaurantID +
-													   " AND DIST.discount_id=" + orderToPay.getDiscount().discountID +
-													   " AND DIST_PLAN.rate <> 1", null);
+													   " AND DIST.discount_id=" + orderToPay.getDiscount().discountID,
+													   null);
 		if(discount.length > 0){
 			orderInfo.setDiscount(discount[0]);
 		}
