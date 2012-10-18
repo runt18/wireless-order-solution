@@ -7,19 +7,21 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
-import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.Discount;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Util;
@@ -36,24 +38,6 @@ public class BillActivity extends Activity {
 	private Handler _handler = new Handler(){
 		@Override
 		public void handleMessage(Message message){
-			//选择折扣方式后，设定每个菜品的折扣率
-			for(int i = 0; i < mOrderToPay.foods.length; i++){
-				if(!(mOrderToPay.foods[i].isGift() || mOrderToPay.foods[i].isTemporary || mOrderToPay.foods[i].isSpecial())){
-					for(Kitchen kitchen : WirelessOrder.foodMenu.kitchens){
-						if(mOrderToPay.foods[i].kitchen.aliasID == kitchen.aliasID){
-							if(mOrderToPay.discount_type == Order.DISCOUNT_1){
-								mOrderToPay.foods[i].setDiscount(kitchen.getDist1());
-								
-							}else if(mOrderToPay.discount_type == Order.DISCOUNT_2){
-								mOrderToPay.foods[i].setDiscount(kitchen.getDist2());
-								
-							}else if(mOrderToPay.discount_type == Order.DISCOUNT_3){
-								mOrderToPay.foods[i].setDiscount(kitchen.getDist3());
-							}
-						}
-					}
-				}
-			}
 			((BillFoodListView)findViewById(R.id.billListView)).notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(mOrderToPay.foods)));
 			((TextView)findViewById(R.id.giftPriceTxtView)).setText(Util.CURRENCY_SIGN + Float.toString(mOrderToPay.calcGiftPrice()));
 			((TextView)findViewById(R.id.discountPriceTxtView)).setText(Util.CURRENCY_SIGN + Float.toString(mOrderToPay.calcDiscountPrice()));
@@ -146,6 +130,16 @@ public class BillActivity extends Activity {
 			}else{
 				
 				mOrderToPay = order;
+				
+				 //Apply discount in case of default
+				for(Discount discount : WirelessOrder.foodMenu.discounts){
+					if(discount.isDefault()){
+						mOrderToPay.setDiscount(discount);
+						break;
+					}else if(discount.isReserved()){
+						mOrderToPay.setDiscount(discount);
+					}
+				}
 				
 				((TextView)findViewById(R.id.valueplatform)).setText(String.valueOf(mOrderToPay.destTbl.aliasID));
 				((TextView)findViewById(R.id.valuepeople)).setText(String.valueOf(mOrderToPay.customNum));
@@ -249,32 +243,29 @@ public class BillActivity extends Activity {
             }  
         });  
 		
-		//根据折扣方式显示"折扣1","折扣2","折扣3"
-		if(mOrderToPay.discount_type == Order.DISCOUNT_1){
-			((RadioButton)view.findViewById(R.id.discount1)).setChecked(true);
-			
-		}else if(mOrderToPay.discount_type == Order.DISCOUNT_2){
-			((RadioButton)view.findViewById(R.id.discount2)).setChecked(true);
-			
-		}else if(mOrderToPay.discount_type == Order.DISCOUNT_3){
-			((RadioButton)view.findViewById(R.id.discount3)).setChecked(true);
+		//根据discount数量添加Radio Button
+		RadioGroup radioGroup = (RadioGroup) view.findViewById(R.id.discountGroup);
+		for(Discount discount : WirelessOrder.foodMenu.discounts){
+			RadioButton radioBtn = new RadioButton(BillActivity.this);
+			radioBtn.setTag(discount);
+			radioBtn.setTextColor(Color.BLACK);
+			radioBtn.setText(discount.name);
+			radioGroup.addView(radioBtn, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+			if(discount.equals(mOrderToPay.getDiscount())){
+				radioBtn.setChecked(true);
+			}
 		}
-		
-		//折扣方式方式添加事件监听器  
-		((RadioGroup)view.findViewById(R.id.radioGroup2)).setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {  
-		              
-			@Override 
-		    public void onCheckedChanged(RadioGroup group, int checkedId) {  
-				if(checkedId == R.id.discount1){
-		            mOrderToPay.discount_type = Order.DISCOUNT_1;
-		        }else if(checkedId == R.id.discount2){
-		            mOrderToPay.discount_type = Order.DISCOUNT_2;
-		        }else{
-		        	mOrderToPay.discount_type = Order.DISCOUNT_3;
-		        }		               
-		    }  		            
-		            
-		 });  
+
+		// 折扣方式方式添加事件监听器
+		radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(RadioGroup group, int checkedId) {
+				Object obj = group.findViewById(checkedId).getTag();
+				if(obj != null){
+					mOrderToPay.setDiscount((Discount)obj);
+				}
+			}
+		}); 
 		
 		 new AlertDialog.Builder(this)
 		 	.setTitle(payCate == PayOrderTask.PAY_NORMAL_ORDER ? "结帐" : "暂结")
