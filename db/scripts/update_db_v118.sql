@@ -213,3 +213,14 @@ WHERE ORDER_TODAY.total_price IS NOT NULL;
 -- Drop the field 'discount_type' from table 'order_history'
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`order_history` DROP COLUMN `discount_type` ;
+
+-- -----------------------------------------------------
+-- Drop the field 'discount_1..3', 'member_discount_1..3' from table 'kitchen'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`kitchen` 
+DROP COLUMN `member_discount_3` , 
+DROP COLUMN `discount_3` , 
+DROP COLUMN `discount_2` ,
+ DROP COLUMN `member_discount_2` , 
+ DROP COLUMN `member_discount_1` , 
+ DROP COLUMN `discount` ;
