@@ -221,6 +221,6 @@ ALTER TABLE `wireless_order_db`.`kitchen`
 DROP COLUMN `member_discount_3` , 
 DROP COLUMN `discount_3` , 
 DROP COLUMN `discount_2` ,
- DROP COLUMN `member_discount_2` , 
- DROP COLUMN `member_discount_1` , 
- DROP COLUMN `discount` ;
+DROP COLUMN `member_discount_2` , 
+DROP COLUMN `member_discount_1` , 
+DROP COLUMN `discount` ;
