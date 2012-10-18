@@ -68,7 +68,6 @@ var dailySettleCheckDetpGrid = new Ext.grid.GridPanel({
 var dailySettleCheckDetpPanel = new Ext.Panel({
 	region : "center",
 	layout : "fit",
-	// height : 200,
 	frame : true,
 	items : dailySettleCheckDetpGrid
 });
@@ -77,7 +76,6 @@ var dailySettleCheckTablePanel = new Ext.Panel({
 	frame : true,
 	region : "north",
 	height : 415,
-//	bodyStyle : 'backgroundColor:#FFFFFF;',
 	items : [ {
 		border : false,
 		contentEl : "shiftCheckTableDiv"

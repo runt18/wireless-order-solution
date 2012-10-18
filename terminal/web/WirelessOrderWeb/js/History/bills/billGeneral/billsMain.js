@@ -171,34 +171,6 @@ var viewBillWin = new Ext.Window({
 				success : function(response, options) {
 					var resultJSON = Ext.util.JSON.decode(response.responseText);					
 					if (resultJSON.success == true) {
-//						if (resultJSON.data != "NULL") {
-//							var totalDiscount = 0.0;
-//							var josnData = resultJSON.data;
-//							var orderList = josnData.split("，");
-//							for ( var i = 0; i < orderList.length; i++) {
-//								var orderInfo = orderList[i].substr(1, orderList[i].length - 2).split(",");
-//								// 实价 = 单价 * 數量 * 折扣 + 口味价钱
-//								var singlePrice = parseFloat(orderInfo[6].substr(2, orderInfo[6].length - 3));
-//								var tastePrice = parseFloat(orderInfo[14].substr(2, orderInfo[14].length - 3));
-//								var acturalPrice = 0.0;
-//								acturalPrice = singlePrice * parseFloat(orderInfo[5]) * parseFloat(orderInfo[11]) + tastePrice;
-//								acturalPrice = "￥" + acturalPrice.toFixed(1);
-//								viewBillData.push([
-//								    orderInfo[0].substr(1, orderInfo[0].length - 2), // 菜名
-//									orderInfo[5],// 数量
-//									orderInfo[11], // 折扣率
-//									orderInfo[3].substr(1, orderInfo[3].length - 2),// 口味
-//									acturalPrice // 实价
-//								]);
-//
-//									// 算總折扣
-//								totalDiscount = totalDiscount + parseFloat(orderInfo[18]);
-//							}
-//
-//							document.getElementById("discountBV").innerHTML = "￥" + totalDiscount.toFixed(1);
-//
-//							viewBillStore.reload();
-//						}
 						viewBillData = resultJSON;
 						var tpItem = null;
 						var acturalPrice = null;
@@ -243,8 +215,6 @@ function billViewHandler() {
 // 明細link
 // 2，表格的数据store
 // 前台： [日期,名称,单价,数量,折扣,口味,口味价钱,厨房,服务员,备注]
-// var billDetailData = [];
-
 var billDetailStore = new Ext.data.Store({
 	proxy : new Ext.data.HttpProxy({
 		url : "../../QueryDetail.do"

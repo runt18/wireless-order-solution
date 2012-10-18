@@ -82,12 +82,45 @@ updateKitchen = function(){
 				'->',
 				{
 					text : '保存',
+					id : 'btnSaveUpdateKitchen',
 					iconCls : 'btn_save',
 					handler : function(){
-						alert('......');
+						var save = Ext.getCmp('btnSaveUpdateKitchen');
+						var cancel = Ext.getCmp('btnCancelUpdateKitchen');
+						
+						save.setDisabled(true);
+						cancel.setDisabled(true);
+						Ext.Ajax.request({
+							url : '../../UpdateKitchen.do',
+							params : {
+								restaurantID : restaurantID,
+								kitchenID : Ext.getCmp('txtKitchenID').getValue(),
+								kitchenName : Ext.getCmp('txtKitchenName').getValue(),
+								deptID : Ext.getCmp('comboKitchenDept').getValue()
+							},
+							success : function(res, opt){
+								var jr = Ext.util.JSON.decode(res.responseText);
+								if(jr.success){
+									Ext.example.msg(jr.title, jr.msg);
+									updateKitchenWin.hide();
+									Ext.getCmp('btnSearchKitchen').handler();
+								}else{
+									Ext.ux.showMsg(jr);
+								}
+								save.setDisabled(false);
+								cancel.setDisabled(false);
+							},
+							failure : function(res, opt) {
+								Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
+								save.setDisabled(false);
+								cancel.setDisabled(false);
+							}
+						});
+						
 					}
 				}, {
 					text : '关闭',
+					id : 'btnCancelUpdateKitchen',
 					iconCls : 'btn_close',
 					handler : function(){
 						updateKitchenWin.hide();
@@ -281,6 +314,9 @@ Ext.onReady(function() {
 		listeners : {
 			click : function(e){
 				Ext.getDom('deptNameShowType').innerHTML = e.text;
+			},
+			dblclick : function(e){
+				Ext.getCmp('btnSearchKitchen').handler();
 			}
 		}
 	});

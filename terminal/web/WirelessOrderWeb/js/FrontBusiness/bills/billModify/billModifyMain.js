@@ -365,8 +365,6 @@ var btnSubmitOrder = new Ext.Button({
 			var memberIDOut = Request["memberID"] + "";
 			var discountID = Ext.getCmp('comboDiscount');
 			
-			serviceRateIn = eval(serviceRateIn != 0) ? (serviceRateIn / 100) : serviceRateIn;
-			
 			orderedGrid.buttons[0].setDisabled(true);
 			orderedGrid.buttons[1].setDisabled(true);
 			

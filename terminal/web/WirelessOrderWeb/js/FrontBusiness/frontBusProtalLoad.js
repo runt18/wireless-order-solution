@@ -1,7 +1,6 @@
 ﻿// on page load function
 function loginOnLoad() {
-
-	var Request = new URLParaQuery();
+	
 	restaurantID = Request["restaurantID"];
 
 	// for local test
@@ -42,21 +41,6 @@ function loginOnLoad() {
 						staffData[i].staffPassword // 密码
 						]);
 					}
-
-//					emplComboData = [];
-//					for ( var i = 0; i < staffData.length; i++) {
-//						emplComboData.push([ staffData[i].pin,// pin
-//						staffData[i].staffName // 姓名
-//						]);
-//					}
-//
-//					emplStore.reload();
-//					if (isNewAccess) {
-//						personLoginWin.show();
-//					} else {
-//						currPin = Request["pin"];
-//						isVerified = true;
-//					}
 				} else {
 					Ext.MessageBox.show({
 						msg : rootData[0].message,
@@ -71,80 +55,40 @@ function loginOnLoad() {
 	});
 
 	// mouse over & mouse off -- heightlight the icon
-	$("#order")
-			.each(
-					function() {
-						$(this)
-								.hover(
-										function() {
-											$(this)
-													.stop()
-													.css("background",
-															"url(../../images/order_select.png) no-repeat 50%");
-										},
-										function() {
-											$(this)
-													.stop()
-													.css("background",
-															"url(../../images/order.png) no-repeat 50%");
-										});
-					});
+	$("#order").each(function(){
+		$(this).hover(function(){
+			$(this).stop().css("background", "url(../../images/order_select.png) no-repeat 50%");
+		},
+		function(){
+			$(this).stop().css("background", "url(../../images/order.png) no-repeat 50%");
+		});
+	});
 
-	$("#bill")
-			.each(
-					function() {
-						$(this)
-								.hover(
-										function() {
-											$(this)
-													.stop()
-													.css("background",
-															"url(../../images/bill_select.png) no-repeat 50%");
-										},
-										function() {
-											$(this)
-													.stop()
-													.css("background",
-															"url(../../images/bill.png) no-repeat 50%");
-										});
-					});
+	$("#bill").each(function(){
+		$(this).hover(function(){
+			$(this).stop().css("background", "url(../../images/bill_select.png) no-repeat 50%");
+		},
+		function(){
+			$(this).stop().css("background", "url(../../images/bill.png) no-repeat 50%");
+		});
+	});
 
-	$("#shift")
-			.each(
-					function() {
-						$(this)
-								.hover(
-										function() {
-											$(this)
-													.stop()
-													.css("background",
-															"url(../../images/shift_selected.png) no-repeat 50%");
-										},
-										function() {
-											$(this)
-													.stop()
-													.css("background",
-															"url(../../images/shift.png) no-repeat 50%");
-										});
-					});
+	$("#shift").each(function(){
+		$(this).hover(function(){
+			$(this).stop().css("background", "url(../../images/shift_selected.png) no-repeat 50%");
+		},
+		function(){
+			$(this).stop().css("background", "url(../../images/shift.png) no-repeat 50%");
+		});
+	});
 	
-	$("#dailySettle")
-	.each(
-			function() {
-				$(this)
-						.hover(
-								function() {
-									$(this)
-											.stop()
-											.css("background",
-													"url(../../images/dailySettle_select.png) no-repeat 50%");
-								},
-								function() {
-									$(this)
-											.stop()
-											.css("background",
-													"url(../../images/dailySettle.png) no-repeat 50%");
-								});
-			});
-
+	$("#dailySettle").each(function(){
+		$(this).hover(function(){
+			$(this).stop().css("background", "url(../../images/dailySettle_select.png) no-repeat 50%");
+		},
+		function(){
+			$(this).stop().css("background", "url(../../images/dailySettle.png) no-repeat 50%");
+		});
+	});
+	
 };

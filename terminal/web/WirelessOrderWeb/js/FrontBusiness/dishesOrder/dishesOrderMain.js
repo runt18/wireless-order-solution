@@ -1069,9 +1069,6 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 				data : [{
 					kitchenAliasID : 254,
 			    	kitchenName : '全部'
-				}, {
-					kitchenAliasID : 255,
-			    	kitchenName : '空'
 				}]
 			}),
 			valueField : 'kitchenAliasID',

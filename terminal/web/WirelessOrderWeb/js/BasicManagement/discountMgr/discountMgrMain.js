@@ -83,9 +83,9 @@ programOperationHandler = function(c){
 		addProgramWin.setTitle('修改方案');
 	}
 	
-	addProgramWin.OperationType = c.type;
-	addProgramWin.show();
+	addProgramWin.operationType = c.type;
 	addProgramWin.center();
+	addProgramWin.show();
 };
 
 disocuntOperationHandler = function(c){
@@ -141,8 +141,9 @@ disocuntOperationHandler = function(c){
 	rate.clearInvalid();
 	
 	addDiscountWin.operationType = c.type;
-	addDiscountWin.show();
 	addDiscountWin.center();
+	addDiscountWin.show();
+	
 };
 
 updateDisocuntOperationHandler = function(){
@@ -262,7 +263,7 @@ Ext.onReady(function(){
 				programTree.getRootNode().reload();
 				Ext.getDom('discountNameShowType').innerHTML = '------------';
 				Ext.getCmp('txtSearchKitchenName').setValue();
-				Ext.getCmp('btnSearchDiscountPlan').handler();
+//				Ext.getCmp('btnSearchDiscountPlan').handler();
 			}
 		}]
 	});
@@ -287,13 +288,39 @@ Ext.onReady(function(){
 			text : '全部方案',
 	        leaf : false,
 	        border : true,
-	        discountID : '-1'
+	        discountID : '-1',
+	        listeners : {
+	        	expand : function(thiz){
+	        		var rn = programTree.getRootNode().childNodes;
+	        		if(addProgramWin.operationType == dmObj.operation.update){
+	        			for(var i = (rn.length - 1); i >= 0; i--){
+		        			if(eval(rn[i].attributes.discountID == addProgramWin.updateProgram.discountID)){
+		        				rn[i].select();
+		        				rn[i].fireEvent('click', rn[i]);
+		        				rn[i].fireEvent('dblclick', rn[i]);
+		        				break;
+							}
+						}
+	        		}else{
+		        		var node = null, maxDiscountID = 0;
+		        		for(var i = (rn.length - 1); i >= 0; i--){
+		        			if(eval(rn[i].attributes.discountID > maxDiscountID)){
+		        				maxDiscountID = rn[i].attributes.discountID;
+								node = rn[i];
+							}
+						}
+		        		if(node != null){
+		        			node.select();
+		        			node.fireEvent('click', node);
+							node.fireEvent('dblclick', node);
+						}
+	        		}
+	        		addProgramWin.operationType = null;
+	        	}
+	        }
 		}),
 		tbar : programTreeTbar,
 		listeners : {
-			click : function(e){
-				Ext.getDom('discountNameShowType').innerHTML = e.text;
-			},
 			load : function(thiz){
 				var rn = programTree.getRootNode().childNodes;
 				if(rn.length == 0){
@@ -306,6 +333,14 @@ Ext.onReady(function(){
 					}
 					programTree.getRootNode().getUI().show();
 				}
+			},
+			click : function(e){
+				if(e.attributes.discountID != -1)
+					Ext.getDom('discountNameShowType').innerHTML = e.text;
+			},
+			dblclick : function(e){
+				if(e.attributes.discountID != -1)
+					Ext.getCmp('btnSearchDiscountPlan').handler();
 			}
 		}
 	});	
@@ -332,7 +367,7 @@ Ext.onReady(function(){
 				var kitcheName = Ext.getCmp('txtSearchKitchenName');
 				
 				var dgs = discountGrid.getStore();
-				dgs.baseParams['discountID'] = (!sn ? '' : sn.attributes.discountID);
+				dgs.baseParams['discountID'] = (!sn && sn.attributes.discountID != -1 ? '' : sn.attributes.discountID);
 				dgs.baseParams['kitchenName'] = kitcheName.getValue();
 				dgs.load({
 					params : {
@@ -542,16 +577,17 @@ Ext.onReady(function(){
 						return;
 					}
 					
-					if(addProgramWin.OperationType == dmObj.operation.insert){
+					if(addProgramWin.operationType == dmObj.operation.insert){
 						actionURL = '../../InsertDiscount.do';
-					}else if(addProgramWin.OperationType == dmObj.operation.update){
+					}else if(addProgramWin.operationType == dmObj.operation.update){
 						actionURL = '../../UpdateDiscount.do';
 					}else{
 						return;
 					}
 					
+					var btnSave = Ext.getCmp('btnSaveProgram');
 					var btnCancel = Ext.getCmp('btnCancelProgram');
-					e.setDisabled(true);
+					btnSave.setDisabled(true);
 					btnCancel.setDisabled(true);
 					
 					Ext.Ajax.request({
@@ -568,18 +604,19 @@ Ext.onReady(function(){
 						success : function(res, opt){
 							var jr = Ext.util.JSON.decode(res.responseText);
 							if(jr.success){
+								addProgramWin.updateProgram = {discountID:id.getValue()};
 								addProgramWin.hide();
 								Ext.example.msg(jr.title, jr.msg);
-								Ext.getCmp('btnRefreshProgramTree').handler();						
+								Ext.getCmp('btnRefreshProgramTree').handler();
 							}else{
 								Ext.ux.showMsg(jr);
 							}
-							e.setDisabled(false);
+							btnSave.setDisabled(false);
 							btnCancel.setDisabled(false);
 						},
 						failure : function(res, opt){
 							Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
-							e.setDisabled(false);
+							btnSave.setDisabled(false);
 							btnCancel.setDisabled(false);
 						}
 					});
@@ -596,7 +633,14 @@ Ext.onReady(function(){
 				show : function(){
 					Ext.getCmp('txtDiscountName').clearInvalid();
 				}
-			}
+			},
+			keys : [{
+				 key : Ext.EventObject.ENTER,
+				 fn : function(){ 
+					 Ext.getCmp('btnSaveProgram').handler();
+				 },
+				 scope : this 
+			 }]
 		});
 	}
 	
@@ -656,6 +700,7 @@ Ext.onReady(function(){
  	    	    	id : 'numKitchenRate',
  	    	    	fieldLabel : '折扣率',
  	    	    	allowBlank : true,
+ 	    	    	selectOnFocus : true,
  	    	    	value : 1.00,
 					validator : function(v){
 						if(v >= 0.00 && v <= 1.00){
@@ -745,9 +790,17 @@ Ext.onReady(function(){
 			}],
 			listeners : {
 				show : function(){
-					
+					var rate = Ext.get("numKitchenRate");
+					rate.focus.defer(100, rate);
 				}
-			}
+			},
+			keys : [{
+				 key : Ext.EventObject.ENTER,
+				 fn : function(){ 
+					 Ext.getCmp('btnSaveDiscount').handler();
+				 },
+				 scope : this 
+			 }]
 		});
 	}
 	
