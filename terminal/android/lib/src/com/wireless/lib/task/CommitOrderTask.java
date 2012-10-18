@@ -12,7 +12,9 @@ import com.wireless.protocol.ReqInsertOrder;
 import com.wireless.protocol.Type;
 import com.wireless.sccon.ServerConnector;
 
-public class CommitOrderTask extends AsyncTask<Byte, Void, BusinessException>{
+public class CommitOrderTask extends AsyncTask<Byte, Void, Void>{
+	
+	protected BusinessException mBusinessException;
 	
 	protected Order mReqOrder;
 	
@@ -22,9 +24,10 @@ public class CommitOrderTask extends AsyncTask<Byte, Void, BusinessException>{
 	
 	/**
 	 * 在新的线程中执行改单的请求操作
+	 * @return 
 	 */
 	@Override
-	protected BusinessException doInBackground(Byte... types) {
+	protected Void doInBackground(Byte... types) {
 		
 		byte type = types[0];
 		if(type != Type.INSERT_ORDER && type != Type.UPDATE_ORDER){
@@ -72,10 +75,10 @@ public class CommitOrderTask extends AsyncTask<Byte, Void, BusinessException>{
 		}
 		
 		if(errMsg != null){
-			return new BusinessException(errMsg, errCode);
-		}else{
-			return null;
-		}	
+			mBusinessException = new BusinessException(errMsg, errCode);
+		}
+		
+		return null;
 	}
 	
 }
