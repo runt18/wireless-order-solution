@@ -370,15 +370,15 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 		 * 如果成功，则返回到主界面，并提示用户改单成功
 		 */
 		@Override
-		protected void onPostExecute(BusinessException e){
+		protected void onPostExecute(Void arg){
 			//make the progress dialog disappeared
 			_progDialog.dismiss();
 			/**
 			 * Prompt user message if any error occurred.
 			 */
-			if(e != null){
+			if(mBusinessException != null){
 				
-				if(e.errCode == ErrorCode.ORDER_EXPIRED){
+				if(mBusinessException.getErrCode() == ErrorCode.ORDER_EXPIRED){
 					/**
 					 * 如果账单已经过期，提示用户两种选择：
 					 * 1 - 下载最新的账单信息，并更新已点菜的内容
@@ -386,7 +386,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 					 */
 					new AlertDialog.Builder(ChgOrderActivity.this)
 						.setTitle("提示")
-						.setMessage(e.getMessage())
+						.setMessage(mBusinessException.getMessage())
 						.setPositiveButton("刷新", new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
 								dialog.dismiss();
@@ -405,7 +405,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 				
 					new AlertDialog.Builder(ChgOrderActivity.this)
 					.setTitle("提示")
-					.setMessage(e.getMessage())
+					.setMessage(mBusinessException.getMessage())
 					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int id) {
 							dialog.dismiss();
@@ -541,13 +541,13 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 			//make the progress dialog disappeared
 			mProgDialog.dismiss();
 			
-			if(mErrMsg != null){
+			if(mBusinessException != null){
 				/**
 				 * 如果请求账单信息失败，则跳转会MainActivity
 				 */
 				new AlertDialog.Builder(ChgOrderActivity.this)
 					.setTitle("提示")
-					.setMessage(mErrMsg)
+					.setMessage(mBusinessException.getMessage())
 					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int id) {
 							dialog.dismiss();

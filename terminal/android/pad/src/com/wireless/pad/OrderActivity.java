@@ -376,16 +376,16 @@ public class OrderActivity extends ActivityGroup implements	OrderFoodListView.On
 		 * 根据返回的error message判断，如果发错异常则提示用户， 如果成功，则返回到主界面，并提示用户下单成功
 		 */
 		@Override
-		protected void onPostExecute(BusinessException e) {
+		protected void onPostExecute(Void arg) {
 			// make the progress dialog disappeared
 			mProgDialog.dismiss();
 			/**
 			 * Prompt user message if any error occurred.
 			 */
-			if (e != null) {
+			if (mBusinessException != null) {
 				new AlertDialog.Builder(OrderActivity.this)
 					.setTitle("提示")
-					.setMessage(e.getMessage())
+					.setMessage(mBusinessException.getMessage())
 					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog,	int id) {
 							dialog.dismiss();
