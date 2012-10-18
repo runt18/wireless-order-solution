@@ -71,7 +71,7 @@ public class MenuDao {
 			String selectSQL = "select" 
 							+ " A.food_id, A.food_alias, A.restaurant_id, A.name food_name, A.pinyin, A.unit_price, A.status, A.taste_ref_type, A.desc, A.img, A.kitchen_id, A.kitchen_alias, "
 							+ " B.name kitchen_name, B.dept_id, B.discount, B.discount_2, B.discount_3, B.member_discount_1, B.member_discount_2, B.member_discount_3 "
-							+ " from food A left join kitchen B on A.kitchen_id = B.kitchen_id "
+							+ " from " + Params.dbName + ".food A left join " + Params.dbName + ".kitchen B on A.kitchen_id = B.kitchen_id "
 							+ " where 1=1 "
 							+ (cond != null && cond.trim().length() > 0 ? " " + cond : "")
 							+ (orderBy != null && orderBy.trim().length() > 0 ? " " + orderBy : "");
@@ -97,12 +97,6 @@ public class MenuDao {
 				kitchen.setKitchenAliasID(dbCon.rs.getInt("kitchen_alias"));
 				kitchen.setKitchenName(dbCon.rs.getString("kitchen_name"));
 				kitchen.getDept().setDeptID(dbCon.rs.getInt("dept_id"));
-				kitchen.setDiscount1(dbCon.rs.getDouble("discount"));
-				kitchen.setDiscount2(dbCon.rs.getDouble("discount_2"));
-				kitchen.setDiscount3(dbCon.rs.getDouble("discount_3"));
-				kitchen.setMemberDiscount1(dbCon.rs.getDouble("member_discount_1"));
-				kitchen.setMemberDiscount2(dbCon.rs.getDouble("member_discount_2"));
-				kitchen.setMemberDiscount3(dbCon.rs.getDouble("member_discount_3"));
 				
 				item.setKitchen(kitchen);
 				list.add(item);
@@ -134,7 +128,7 @@ public class MenuDao {
 			
 			String selectSQL = "select"
 							+ " A.taste_id, A.taste_alias, A.restaurant_id, A.preference, A.price, A.category, A.rate, A.calc, A.type "
-							+ " from taste A "
+							+ " from " + Params.dbName + ".taste A "
 							+ " where 1=1 "
 							+ (cond != null && cond.trim().length() > 0 ? " " + cond : "")
 							+ (orderBy != null && orderBy.trim().length() > 0 ? " " + orderBy : "");
@@ -183,7 +177,7 @@ public class MenuDao {
 			String selectSQL = "select"
 							+ " A.kitchen_id, A.kitchen_alias, A.restaurant_id, A.name kitchen_name, A.discount, A.discount_2, A.discount_3, A.member_discount_1, A.member_discount_2, A.member_discount_3, "
 							+ " B.dept_id, B.name dept_name"
-							+ " from kitchen A left join department B on A.dept_id = B.dept_id and A.restaurant_id = B.restaurant_id "
+							+ " from " + Params.dbName + ".kitchen A left join " + Params.dbName + ".department B on A.dept_id = B.dept_id and A.restaurant_id = B.restaurant_id "
 							+ " where 1=1 "
 							+ (cond != null && cond.trim().length() > 0 ? " " + cond : "")
 							+ (orderBy != null && orderBy.trim().length() > 0 ? " " + orderBy : "");;
@@ -198,12 +192,6 @@ public class MenuDao {
 				item.setKitchenAliasID(dbCon.rs.getInt("kitchen_alias"));
 				item.setKitchenName(dbCon.rs.getString("kitchen_name"));
 				item.setDept(dbCon.rs.getInt("dept_id"), dbCon.rs.getString("dept_name"));
-				item.setDiscount1(dbCon.rs.getDouble("discount"));
-				item.setDiscount2(dbCon.rs.getDouble("discount_2"));
-				item.setDiscount3(dbCon.rs.getDouble("discount_3"));
-				item.setMemberDiscount1(dbCon.rs.getDouble("member_discount_1"));
-				item.setMemberDiscount2(dbCon.rs.getDouble("member_discount_2"));
-				item.setMemberDiscount3(dbCon.rs.getDouble("member_discount_3"));
 				
 				list.add(item);
 				item = null;
@@ -233,7 +221,7 @@ public class MenuDao {
 			
 			String selectSQL = "select"
 							+ " A.restaurant_id, A.dept_id, A.name "
-							+ " from department A "
+							+ " from " + Params.dbName + ".department A "
 							+ " where 1=1 "
 							+ (cond != null && cond.trim().length() > 0 ? " " + cond : "")
 							+ (orderBy != null && orderBy.trim().length() > 0 ? " " + orderBy : "");;
@@ -294,6 +282,31 @@ public class MenuDao {
 			}
 			
 			dbCon.conn.commit();
+			
+		}catch(Exception e){
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * 
+	 * @param kitchen
+	 * @throws Exception
+	 */
+	public static void updateKitchen(Kitchen kitchen) throws Exception{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			
+			String updateSQL = "UPDATE " + Params.dbName + ".kitchen SET " 
+							+ " name = '" + kitchen.getKitchenName()+ "', dept_id = " + kitchen.getDept().getDeptID()
+							+ " WHERE restaurant_id = " + kitchen.getRestaurantID() + " and kitchen_id = " + kitchen.getKitchenID();
+			
+			if(dbCon.stmt.executeUpdate(updateSQL) == 0){
+				throw new Exception();
+			}
 			
 		}catch(Exception e){
 			throw e;

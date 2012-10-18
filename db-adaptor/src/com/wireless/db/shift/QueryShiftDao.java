@@ -239,6 +239,42 @@ public class QueryShiftDao {
 
 	}
 	
+	public static Result execDailySettleByNow(long pin) throws BusinessException, SQLException{
+		
+		DBCon dbCon = new DBCon();
+		dbCon.connect();
+		
+		Terminal term = VerifyPin.exec(dbCon, pin, Terminal.MODEL_STAFF);
+		
+		String onDuty;
+		String sql = "SELECT MAX(off_duty) FROM (" +
+					 "SELECT off_duty FROM " + Params.dbName + ".daily_settle_history WHERE restaurant_id=" + term.restaurantID +
+					 ") AS all_off_duty";
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			Timestamp offDuty = dbCon.rs.getTimestamp(1);
+			if(offDuty == null){
+				onDuty = "2011-07-30 00:00:00";
+			}else{
+				onDuty = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(offDuty);
+			}
+		}else{
+			onDuty = "2011-07-30 00:00:00";
+		}
+		dbCon.rs.close();
+		
+		/**
+		 * Make the current date as the off duty date
+		 */
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		sdf.setTimeZone(TimeZone.getTimeZone("GMT+8"));
+		String offDuty = sdf.format(System.currentTimeMillis());
+		
+		return exec(dbCon, term, onDuty, offDuty, QUERY_TODAY);
+
+	}
+	
+	
 	/**
 	 * Generate the details to shift within the on & off duty date.
 	 * @param dbCon
