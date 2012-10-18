@@ -82,9 +82,9 @@ public class BillActivity extends Activity {
 		left.setText("返回");
 		left.setVisibility(View.VISIBLE);
 
-		ImageButton back = (ImageButton) findViewById(R.id.btn_left);
-		back.setVisibility(View.VISIBLE);
-		back.setOnClickListener(new View.OnClickListener() {
+		ImageButton backBtn = (ImageButton) findViewById(R.id.btn_left);
+		backBtn.setVisibility(View.VISIBLE);
+		backBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
 				finish();
@@ -207,19 +207,19 @@ public class BillActivity extends Activity {
 		});
 
 		//根据discount数量添加Radio Button
-		RadioGroup radioGroup = (RadioGroup) view.findViewById(R.id.discountGroup);
+		RadioGroup discountsGroup = (RadioGroup) view.findViewById(R.id.discountGroup);
 		for(Discount discount : WirelessOrder.foodMenu.discounts){
 			RadioButton radioBtn = new RadioButton(BillActivity.this);
 			radioBtn.setTag(discount);
 			radioBtn.setText(discount.name);
-			radioGroup.addView(radioBtn, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+			discountsGroup.addView(radioBtn, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 			if(discount.equals(mOrderToPay.getDiscount())){
 				radioBtn.setChecked(true);
 			}
 		}
 
 		// 折扣方式方式添加事件监听器
-		radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+		discountsGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
 				Object obj = group.findViewById(checkedId).getTag();
