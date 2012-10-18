@@ -641,9 +641,11 @@ public class QuickPickActivity extends FragmentActivity implements
 					}
 					
 					OrderFood food = mSrcFoods[position];
-					if(food.name.length() >= 8)
+					if(food.name.length() >= 8){
 						((TextView)view.findViewById(R.id.textView_foodName_commit_dialog_item)).setText(food.name.substring(0,	8));
-					else ((TextView)view.findViewById(R.id.textView_foodName_commit_dialog_item)).setText(food.name);
+					}else{
+						((TextView)view.findViewById(R.id.textView_foodName_commit_dialog_item)).setText(food.name);
+					}
 					
 					((TextView)view.findViewById(R.id.textView_amount_quickPick_commitDialog_item)).setText(Util.float2String2(food.getCount()));
 					((TextView)view.findViewById(R.id.textView_price_quickPick_commitDialog_item)).setText(Util.CURRENCY_SIGN + Util.float2String2(food.calcPriceWithTaste()));
@@ -734,16 +736,16 @@ public class QuickPickActivity extends FragmentActivity implements
 			 * 如果成功，则返回到主界面，并提示用户下单成功
 			 */
 			@Override
-			protected void onPostExecute(BusinessException e){
+			protected void onPostExecute(Void arg){
 				//make the progress dialog disappeared
 				_progDialog.dismiss();
 				/**
 				 * Prompt user message if any error occurred.
 				 */
-				if(e != null){
+				if(mBusinessException != null){
 					new AlertDialog.Builder(QuickPickActivity.this)
 					.setTitle("提示")
-					.setMessage(e.getMessage())
+					.setMessage(mBusinessException.getMessage())
 					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int id) {
 							dialog.dismiss();
@@ -768,7 +770,7 @@ public class QuickPickActivity extends FragmentActivity implements
 			if(mErrMsg != null){
 				Toast.makeText(QuickPickActivity.this, "沽清菜品更新失败", Toast.LENGTH_SHORT).show();				
 			}else{
-				mViewHandler.sendEmptyMessage(mLastView);
+				//mViewHandler.sendEmptyMessage(mLastView);
 				Toast.makeText(QuickPickActivity.this, "沽清菜品更新成功", Toast.LENGTH_SHORT).show();
 			}
 		}

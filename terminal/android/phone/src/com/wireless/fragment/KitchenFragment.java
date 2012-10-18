@@ -434,9 +434,13 @@ public class KitchenFragment extends Fragment {
 				public void onItemClick( AdapterView<?> parent, View view, int position, long id) {
 					Food food = (Food) view.getTag();
 					if(!food.isSellOut()){
+						((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.GONE);
+
 						new AskOrderAmountDialog(food).show();
+					}else{
+						Toast.makeText(getActivity(), food.name + "已售罄", Toast.LENGTH_SHORT).show();
+						((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
 					}
-					else Toast.makeText(getActivity(), "此菜已售罄", Toast.LENGTH_SHORT).show();
 				}
 			});
 			return view;
@@ -454,16 +458,16 @@ public class KitchenFragment extends Fragment {
 	 */
 	private class AskOrderAmountDialog extends Dialog{
 
-		private OrderFood _selectedFood;
+		private OrderFood mSelectedFood;
 		
 		AskOrderAmountDialog(Food food) {
 			super(getActivity(), R.style.FullHeightDialog);
 			
-			_selectedFood = new OrderFood(food);
+			mSelectedFood = new OrderFood(food);
 			 
 			setContentView(R.layout.order_confirm);
 			//输入的框
-			((TextView)findViewById(R.id.orderTitleTxt)).setText("请输入" + _selectedFood.name + "的点菜数量");
+			((TextView)findViewById(R.id.orderTitleTxt)).setText("请输入" + mSelectedFood.name + "的点菜数量");
 			final EditText countEditText = (EditText)findViewById(R.id.amountEdtTxt);
 			countEditText.setText("1");
 			//点击时全选
@@ -538,11 +542,11 @@ public class KitchenFragment extends Fragment {
 				@Override
 				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 					if(isChecked){
-						_selectedFood.hangStatus = OrderFood.FOOD_HANG_UP;
-						Toast.makeText(getActivity(), "叫起\"" + _selectedFood.toString() + "\"", Toast.LENGTH_SHORT).show();
+						mSelectedFood.hangStatus = OrderFood.FOOD_HANG_UP;
+						Toast.makeText(getActivity(), "叫起\"" + mSelectedFood.toString() + "\"", Toast.LENGTH_SHORT).show();
 					}else{
-						_selectedFood.hangStatus = OrderFood.FOOD_NORMAL;
-						Toast.makeText(getActivity(), "取消叫起\"" + _selectedFood.toString() + "\"", Toast.LENGTH_SHORT).show();
+						mSelectedFood.hangStatus = OrderFood.FOOD_NORMAL;
+						Toast.makeText(getActivity(), "取消叫起\"" + mSelectedFood.toString() + "\"", Toast.LENGTH_SHORT).show();
 					}
 					
 				}
@@ -559,14 +563,14 @@ public class KitchenFragment extends Fragment {
 				float orderAmount = Float.parseFloat(((EditText)findViewById(R.id.amountEdtTxt)).getText().toString());
 				
        			if(orderAmount > 255){
-       				Toast.makeText(getActivity(), "对不起，\"" + _selectedFood.toString() + "\"最多只能点255份", Toast.LENGTH_SHORT).show();
+       				Toast.makeText(getActivity(), "对不起，\"" + mSelectedFood.toString() + "\"最多只能点255份", Toast.LENGTH_SHORT).show();
        			}else{
-       				_selectedFood.setCount(orderAmount);
+       				mSelectedFood.setCount(orderAmount);
        				if(mFoodPickedListener != null){	
        					if(pickTaste){
-       						mFoodPickedListener.onPickedWithTaste(_selectedFood);
+       						mFoodPickedListener.onPickedWithTaste(mSelectedFood);
        					}else{
-       						mFoodPickedListener.onPicked(_selectedFood);
+       						mFoodPickedListener.onPicked(mSelectedFood);
        					}
        				}
 					dismiss();
@@ -578,7 +582,7 @@ public class KitchenFragment extends Fragment {
 		}
 	}
 	
-	class GridAdapter extends BaseAdapter{
+	private class GridAdapter extends BaseAdapter{
 		private List<Food> mFoods;
 		private Context mContext;
 		
@@ -606,19 +610,21 @@ public class KitchenFragment extends Fragment {
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			final View view;
-			if(convertView == null)
-			{
+			if(convertView == null){
 				view = View.inflate(mContext, R.layout.pick_food_fragment_item, null);
+			}else{
+				view = convertView;
 			}
-			else view = convertView;
 			
 			Food food = mFoods.get(position);
 			
 			view.setTag(food);
 			
-			if(food.name.length() >= 10)
+			if(food.name.length() >= 10){
 				((TextView) view.findViewById(R.id.textView_foodName_pickFoodFragment_item)).setText(food.name.substring(0, 10));
-			else ((TextView) view.findViewById(R.id.textView_foodName_pickFoodFragment_item)).setText(food.name);
+			}else{
+				((TextView) view.findViewById(R.id.textView_foodName_pickFoodFragment_item)).setText(food.name);
+			}
 
 			//设置该项的显示
 			((TextView) view.findViewById(R.id.textView_num_pickFoodFragment_item)).setText(Integer.toString(food.aliasID));
@@ -629,6 +635,7 @@ public class KitchenFragment extends Fragment {
 			else {
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.GONE);
 			}
+			
 			return view;
 		}
 		

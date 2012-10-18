@@ -150,9 +150,12 @@ public class PickFoodFragment extends Fragment{
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				Food food = (Food) view.getTag();
 				if(!food.isSellOut()){
+					((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.GONE);
 					new AskOrderAmountDialog(food).show();
+				}else{
+					((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
+					Toast.makeText(getActivity(), food.name + "已售罄", Toast.LENGTH_SHORT).show();
 				}
-				else Toast.makeText(getActivity(), "此菜已售罄", Toast.LENGTH_SHORT).show();
 			}
         });
         
@@ -262,9 +265,11 @@ public class PickFoodFragment extends Fragment{
 			Food food = mFoods.get(position);
 			view.setTag(food);
 			//如果字数太长则从10截断
-			if(food.name.length() >= 10)
+			if(food.name.length() >= 10){
 				((TextView) view.findViewById(R.id.textView_foodName_pickFoodFragment_item)).setText(food.name.substring(0, 10));
-			else ((TextView) view.findViewById(R.id.textView_foodName_pickFoodFragment_item)).setText(food.name);
+			}else{
+				((TextView) view.findViewById(R.id.textView_foodName_pickFoodFragment_item)).setText(food.name);
+			}
 
 			((TextView) view.findViewById(R.id.textView_num_pickFoodFragment_item)).setText(Integer.toString(food.aliasID));
 			((TextView) view.findViewById(R.id.textView_price_pickFoodFragment_item)).setText(Util.float2String2(food.getPrice()));
