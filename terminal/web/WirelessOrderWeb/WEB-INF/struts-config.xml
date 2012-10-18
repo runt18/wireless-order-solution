@@ -65,9 +65,6 @@
 		<action path="/QueryShift" type="com.wireless.Actions.shift.QueryShiftAction"
 			scope="request">
 		</action>
-		<action path="/DoShift" type="com.wireless.Actions.shift.DoShiftAction"
-			scope="request">
-		</action>
 		<action path="/QueryMenuMgr" type="com.wireless.Actions.menuMgr.QueryMenuMgrAction"
 			scope="request">
 		</action>
@@ -375,6 +372,25 @@
 			type="com.wireless.Actions.system.UpdatePriceTailAction" scope="request"></action>
 		<action path="/ImageFileUpload"
 			type="com.wireless.Actions.menuMgr.ImageFileUploadAction" scope="request"></action>
+		<action path="/QueryDiscountTree"
+			type="com.wireless.Actions.distMgr.QueryDiscountTreeAction" scope="request"></action>	
+		<action path="/InsertDiscount"
+			type="com.wireless.Actions.distMgr.InsertDiscountAction" scope="request"></action>
+		<action path="/UpdateDiscount"
+			type="com.wireless.Actions.distMgr.UpdateDiscountAction" scope="request"></action>	
+		<action path="/DeleteDiscount"
+			type="com.wireless.Actions.distMgr.DeleteDiscountAction" scope="request"></action>
+		<action path="/QueryDiscountPlan"
+			type="com.wireless.Actions.distMgr.QueryDiscountPlanAction" scope="request"></action>
+		<action path="/InsertDiscountPlan"
+			type="com.wireless.Actions.distMgr.InsertDiscountPlanAction" scope="request"></action>
+		<action path="/UpdateDiscountPlan"
+			type="com.wireless.Actions.distMgr.UpdateDiscountPlanAction" scope="request"></action>
+		<action path="/DeleteDiscountPlan"
+			type="com.wireless.Actions.distMgr.DeleteDiscountPlanAction" scope="request"></action>			
+		<action path="/QueryDailySettleByNow"
+			type="com.wireless.Actions.dailySettle.QueryDailySettleByNowAction" scope="request"></action>		
+			
 	</action-mappings>
 	
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
