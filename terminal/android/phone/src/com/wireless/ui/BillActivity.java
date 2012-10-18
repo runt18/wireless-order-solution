@@ -208,11 +208,12 @@ public class BillActivity extends Activity {
 
 		//根据discount数量添加Radio Button
 		RadioGroup discountsGroup = (RadioGroup) view.findViewById(R.id.discountGroup);
+
 		for(Discount discount : WirelessOrder.foodMenu.discounts){
 			RadioButton radioBtn = new RadioButton(BillActivity.this);
 			radioBtn.setTag(discount);
 			radioBtn.setText(discount.name);
-			discountsGroup.addView(radioBtn, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+			discountsGroup.addView(radioBtn, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 			if(discount.equals(mOrderToPay.getDiscount())){
 				radioBtn.setChecked(true);
 			}

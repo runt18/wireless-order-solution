@@ -376,9 +376,8 @@ public class PickFoodFragment extends Fragment{
 					}
 					if(!countEditText.getText().toString().equals(""))
 					{
-						//FIXME 加了两次
 						float curNum = Float.parseFloat(countEditText.getText().toString());
-						countEditText.setText(Util.float2String2(++curNum));
+						countEditText.setText(Util.float2String2(curNum));
 					}
 				}
 			});

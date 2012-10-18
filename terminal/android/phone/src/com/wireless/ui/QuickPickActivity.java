@@ -543,7 +543,7 @@ public class QuickPickActivity extends FragmentActivity implements
 				}
 			});
         	
-        	final TextView peopleCountTextView = (TextView)findViewById(R.id.textView_peopleCnt_commitDialog);
+//        	final TextView peopleCountTextView = (TextView)findViewById(R.id.textView_peopleCnt_commitDialog);
         	//确定按钮
         	((Button)this.findViewById(R.id.button_confirm_commitDialog)).setOnClickListener(new View.OnClickListener() {
 				@Override
@@ -563,33 +563,33 @@ public class QuickPickActivity extends FragmentActivity implements
 				}
 			});
         	
-			//人数加按钮
-			((ImageButton) findViewById(R.id.button_plus_people_commitDialog)).setOnClickListener(new View.OnClickListener(){
-
-				@Override
-				public void onClick(View v) {
-					if(!peopleCountTextView.getText().toString().equals("")){
-						float curNum = Float.parseFloat(peopleCountTextView.getText().toString());
-						peopleCountTextView.setText(Util.float2String2(++curNum));
-					}
-				}
-			});
+//			//人数加按钮
+//			((ImageButton) findViewById(R.id.button_plus_people_commitDialog)).setOnClickListener(new View.OnClickListener(){
+//
+//				@Override
+//				public void onClick(View v) {
+//					if(!peopleCountTextView.getText().toString().equals("")){
+//						float curNum = Float.parseFloat(peopleCountTextView.getText().toString());
+//						peopleCountTextView.setText(Util.float2String2(++curNum));
+//					}
+//				}
+//			});
 			
-			//人数减按钮
-			((ImageButton) findViewById(R.id.button_minus_people_commitDialog)).setOnClickListener(new View.OnClickListener(){
-
-				@Override
-				public void onClick(View v) {
-					if(!peopleCountTextView.getText().toString().equals(""))
-					{
-						float curNum = Float.parseFloat(peopleCountTextView.getText().toString());
-						if(--curNum >= 1.0f)
-						{
-							peopleCountTextView.setText(Util.float2String2(curNum));
-						}
-					}
-				}
-			});
+//			//人数减按钮
+//			((ImageButton) findViewById(R.id.button_minus_people_commitDialog)).setOnClickListener(new View.OnClickListener(){
+//
+//				@Override
+//				public void onClick(View v) {
+//					if(!peopleCountTextView.getText().toString().equals(""))
+//					{
+//						float curNum = Float.parseFloat(peopleCountTextView.getText().toString());
+//						if(--curNum >= 1.0f)
+//						{
+//							peopleCountTextView.setText(Util.float2String2(curNum));
+//						}
+//					}
+//				}
+//			});
            	
            	mListView = (ListView) this.findViewById(R.id.listView_commitDialog);
            	//当被点击或滚动时隐藏键盘
@@ -682,13 +682,13 @@ public class QuickPickActivity extends FragmentActivity implements
 				
 				mProgDialog.dismiss();
 
-				int customAmount = Integer.parseInt(((TextView)CommitDialog.this.findViewById(R.id.textView_peopleCnt_commitDialog)).getText().toString());
+//				int customAmount = Integer.parseInt(((TextView)CommitDialog.this.findViewById(R.id.textView_peopleCnt_commitDialog)).getText().toString());
 
 				if(mBusinessException != null){
 					if(mBusinessException.getErrCode() == ErrorCode.TABLE_IDLE){				
 							
 						//Perform to insert a new order in case of the table is IDLE.
-						Order reqOrder = new Order(mNewFoodLstView.getSourceData(), mTblAlias, customAmount);
+						Order reqOrder = new Order(mNewFoodLstView.getSourceData(), mTblAlias, order.customNum);
 						new InsertOrderTask(reqOrder).execute(Type.INSERT_ORDER);						
 						
 					}else{
@@ -705,7 +705,7 @@ public class QuickPickActivity extends FragmentActivity implements
 				}else{
 					//Merge the original order and update if the table is BUSY.
 					order.addFoods(mNewFoodLstView.getSourceData());
-					order.customNum = customAmount;
+//					order.customNum = customAmount;
 					new InsertOrderTask(order).execute(Type.UPDATE_ORDER);
 				}
 			}

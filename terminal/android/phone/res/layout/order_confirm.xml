@@ -27,7 +27,7 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/orderConfirmRL"
         android:weightSum="5" >
-
+
         <ImageButton
             android:id="@+id/button_minus_orderConfirm"
             android:layout_width="wrap_content"
@@ -36,8 +36,7 @@
             android:layout_marginRight="10dp"
             android:layout_marginTop="4dp"
             android:background="@null"
-            android:padding="10dp"
-            android:paddingTop="14dp"
+            android:padding="9dp"
             android:src="@drawable/reduc_selector" />
 
         <EditText
@@ -57,7 +56,7 @@
             android:textStyle="bold"
             android:typeface="sans" >
         </EditText>
-
+
         <ImageButton
             android:id="@+id/button_plus_orderConfirm"
             android:layout_width="wrap_content"
@@ -66,7 +65,7 @@
             android:layout_marginRight="10dp"
             android:layout_marginTop="4dp"
             android:background="@null"
-            android:padding="10dp"
+            android:padding="9dp"
             android:src="@drawable/add_selector" />
 
         <CheckBox
