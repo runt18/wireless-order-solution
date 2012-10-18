@@ -291,10 +291,10 @@ public final class ShoppingCart {
 		
 		
 		@Override
-		protected void onPostExecute(BusinessException e){
+		protected void onPostExecute(Void arg){
 			mExtraFoods.clear();
 			if(mCommitListener != null){	
-				mCommitListener.onPostCommit(mReqOrder, e);
+				mCommitListener.onPostCommit(mReqOrder, mBusinessException);
 			}
 		}		
 
