@@ -182,19 +182,12 @@ public class QueryTodayAction extends Action {
 					 " WHERE " +
 					 " A.id = B.order_id " +
 					 " AND A.restaurant_id=" + term.restaurantID + " " +
-					 " AND A.total_price IS NOT NULL" +
+					 " AND A.total_price IS NOT NULL " +
 					 filterCondition +
 					 " GROUP BY A.seq_id " +
 					 havingCond +
-					 " ORDER BY order_date ASC ";
+					 " ORDER BY order_date ASC ";			
 
-			
-//			String sql = "SELECT a.minimum_cost, b.* FROM " + Params.dbName + ".table a, " + Params.dbName + ".order b" +
-//			 " WHERE b.restaurant_id=" + term.restaurant_id + 
-//			 " AND b.total_price IS NOT NULL" +
-//			 " AND a.alias_id=b.table_id" +
-//			 " AND a.restaurant_id=" + term.restaurant_id +
-//			 filterCondition;
 			
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			
@@ -218,7 +211,7 @@ public class QueryTodayAction extends Action {
 								   "\"$(table2_id)\",\"$(custom_num)\",\"$(min_cost)\"," +
 								   "\"$(service_rate)\",\"$(member_id)\",\"$(member)\",\"$(comment)\"," +
 								   "\"$(gift_price)\",\"$(pay_type)\",\"$(discount_type)\",\"$(waiter)\"," +
-								   "$(isPaid),$(isDiscount),$(isGift),$(isCancel),\"$(seq_id)\"]";;
+								   "$(isPaid),$(isDiscount),$(isGift),$(isCancel),\"$(seq_id)\"]";
 				jsonOrder = jsonOrder.replace("$(order_id)", Long.toString(dbCon.rs.getLong("id")));
 				jsonOrder = jsonOrder.replace("$(table_alias)", Integer.toString(dbCon.rs.getInt("table_alias")));
 				jsonOrder = jsonOrder.replace("$(order_date)", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(dbCon.rs.getTimestamp("order_date")));

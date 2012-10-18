@@ -1,6 +1,5 @@
 package com.wireless.Actions.billHistory;
 
-import java.awt.event.ItemListener;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,7 +22,7 @@ import com.wireless.pojo.billStatistics.SalesDetail;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.JObject;
 
-@SuppressWarnings({ "unused", "rawtypes" , "unchecked"})
+@SuppressWarnings({ "rawtypes" , "unchecked"})
 public class SalesSubStatisticsAction extends Action {
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -89,7 +88,9 @@ public class SalesSubStatisticsAction extends Action {
 				saleDetails = QuerySaleDetails.execByDept(dbCon, 
 	  					VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF), 
 	  					dateBeg, 
-	  					dataEnd);	
+	  					dataEnd,
+	  					QuerySaleDetails.QUERY_HISTORY);	
+				
 			}else if(qt == QuerySaleDetails.QUERY_BY_FOOD){
 				String[] splitDeptID = deptID.split(",");
 				int[] did = new int[splitDeptID.length];
@@ -104,7 +105,8 @@ public class SalesSubStatisticsAction extends Action {
 	  					dateBeg, 
 	  					dataEnd,
 	  					did,
-	  					ot);
+	  					ot,
+	  					QuerySaleDetails.QUERY_HISTORY);
 			}
 					
 			
