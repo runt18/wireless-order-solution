@@ -468,17 +468,7 @@ public class PickFoodFragment extends Fragment{
 					dismiss();
 					//将搜索项清零
 					final EditText searchText = (EditText) getView().findViewById(R.id.editText_pickFoodFragment);
-					searchText.selectAll();
-//					searchText.postDelayed(new Runnable(){
-//						@Override
-//						public void run() {
-////							searchText.requestFocus();
-//							getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE); 
-//							InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-//				           	imm.showSoftInput(searchText, 0); //显示软键盘
-//				           	imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
-//						}
-//					}, 1000);
+					searchText.setText("");
 
        			}
 				

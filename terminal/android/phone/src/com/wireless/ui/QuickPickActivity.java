@@ -267,21 +267,7 @@ public class QuickPickActivity extends FragmentActivity implements
 		back.setOnClickListener(new View.OnClickListener() {			
 			@Override
 			public void onClick(View v) {
-				if(mNewFoodLstView.getSourceData().length <= 0)
-				{
-					onBackPressed();
-					finish();
-				}
-				else new AlertDialog.Builder(QuickPickActivity.this).setTitle("退出确认").
-					setMessage("已点菜尚未提交，确定要退出？").
-					setPositiveButton("确定", new DialogInterface.OnClickListener(){
-						@Override
-						public void onClick( DialogInterface dialog, int which) {
-							onBackPressed();
-							finish();
-						}
-					}).
-					setNegativeButton("取消", null).show();
+				onBackPressed();
 			}
 		});
 		
@@ -362,6 +348,26 @@ public class QuickPickActivity extends FragmentActivity implements
 		default :
 			mViewHandler.sendEmptyMessage(NUMBER_FRAGMENT);
 		}
+	}
+
+	@Override
+	public void onBackPressed() {
+		
+		if(mNewFoodLstView.getSourceData().length <= 0)
+		{
+			super.onBackPressed();
+			finish();
+		}
+		else new AlertDialog.Builder(QuickPickActivity.this).setTitle("退出确认").
+			setMessage("已点菜尚未提交，确定要退出？").
+			setPositiveButton("确定", new DialogInterface.OnClickListener(){
+				@Override
+				public void onClick( DialogInterface dialog, int which) {
+					onBackPressed();
+					finish();
+				}
+			}).
+			setNegativeButton("取消", null).show();
 	}
 
 	//activity返回后将菜品添加进已点菜中

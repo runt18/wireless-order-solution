@@ -123,7 +123,7 @@ public class MainActivity extends Activity {
 
 		String[] iconDesc = { 
 							 "点菜", "快速点菜", "查看", 
-							 "结账", "沽清", "设置", 
+							 "结账", "沽清列表", "设置", 
 							 "菜谱更新", "注销", "关于" 
 							};
 

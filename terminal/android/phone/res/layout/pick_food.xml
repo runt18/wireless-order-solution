@@ -7,58 +7,6 @@
         android:id="@+id/top"
         layout="@layout/topbar" />
 
-    <!--
-    <RadioGroup
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/bottombar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="@drawable/bg01"
-        android:orientation="horizontal"
-        android:weightSum="4" >
-
-        <RadioButton
-            android:id="@+id/radio0_bbar4btn"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:button="@drawable/num_btn_selector"
-            android:checked="true"
-            android:gravity="bottom|center_horizontal"
-            android:text=" " />
-
-        <RadioButton
-            android:id="@+id/radio1_bbar4btn"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@drawable/add_selector"
-            android:button="@null"
-            android:gravity="bottom|center_horizontal"
-            android:text="R2" />
-
-        <RadioButton
-            android:id="@+id/radio2_bbar4btn"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:button="@null"
-            android:gravity="bottom|center_horizontal"
-            android:text="R3" />
-
-        <RadioButton
-            android:id="@+id/radio3_bbar4btn"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:button="@null"
-            android:gravity="bottom|center_horizontal"
-            android:text="R4" />
-
-    </RadioGroup>
-    -->
-
     <FrameLayout
         android:id="@+id/frameLayout_container_pickFood"
         android:layout_width="match_parent"
@@ -67,16 +15,16 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/top"
         android:background="@color/white" >
-
     </FrameLayout>
-
+
     <LinearLayout
         android:id="@+id/bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:background="@drawable/bottom_bg"
         android:weightSum="4" >
-
+
         <ImageButton
             android:id="@+id/imageButton_num_pickFood"
             android:layout_width="wrap_content"
@@ -84,7 +32,7 @@
             android:layout_weight="1"
             android:background="@null"
             android:src="@drawable/num_btn_selector" />
-
+
         <ImageButton
             android:id="@+id/imageButton_kitchen_pickFood"
             android:layout_width="wrap_content"
@@ -92,7 +40,7 @@
             android:layout_weight="1"
             android:background="@null"
             android:src="@drawable/kitchen_btn_selector" />
-
+
         <ImageButton
             android:id="@+id/imageButton_spell_pickFood"
             android:layout_width="wrap_content"
@@ -101,7 +49,7 @@
             android:background="@null"
             android:src="@drawable/spell_selector"
             android:visibility="visible" />
-
+
         <ImageButton
             android:id="@+id/imageButton_remark_pickFood"
             android:layout_width="wrap_content"
@@ -109,7 +57,7 @@
             android:layout_weight="1"
             android:background="@null"
             android:src="@drawable/linshicai_selector"
-            android:visibility="visible" />
+            android:visibility="invisible" />
 
     </LinearLayout>
 
