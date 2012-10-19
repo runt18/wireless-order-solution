@@ -271,16 +271,17 @@ public class MenuDao {
 				throw new BusinessException("操作失败,修改部门信息失败.");
 			}
 			
+			// 
 			updateSQL = "UPDATE " 
 					+ Params.dbName + ".material_dept "
 					+ " SET dept_name = '" + dept.getDeptName() + "'"
 					+ " WHERE restaurant_id=" + dept.getRestaurantID()
 					+ " AND dept_id = " + dept.getDeptID();
 			
-			if(dbCon.stmt.executeUpdate(updateSQL) == 0){
-				throw new BusinessException("操作失败,修改部门食材信息失败.");
-			}
-			
+//			if(dbCon.stmt.executeUpdate(updateSQL) == 0){
+//				throw new BusinessException("操作失败,修改部门食材信息失败.");
+//			}
+//			
 			dbCon.conn.commit();
 			
 		}catch(Exception e){
