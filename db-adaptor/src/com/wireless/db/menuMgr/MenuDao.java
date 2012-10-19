@@ -70,7 +70,7 @@ public class MenuDao {
 			
 			String selectSQL = "select" 
 							+ " A.food_id, A.food_alias, A.restaurant_id, A.name food_name, A.pinyin, A.unit_price, A.status, A.taste_ref_type, A.desc, A.img, A.kitchen_id, A.kitchen_alias, "
-							+ " B.name kitchen_name, B.dept_id, B.discount, B.discount_2, B.discount_3, B.member_discount_1, B.member_discount_2, B.member_discount_3 "
+							+ " B.name kitchen_name, B.dept_id "
 							+ " from " + Params.dbName + ".food A left join " + Params.dbName + ".kitchen B on A.kitchen_id = B.kitchen_id "
 							+ " where 1=1 "
 							+ (cond != null && cond.trim().length() > 0 ? " " + cond : "")
@@ -175,7 +175,7 @@ public class MenuDao {
 			dbCon.connect();
 			
 			String selectSQL = "select"
-							+ " A.kitchen_id, A.kitchen_alias, A.restaurant_id, A.name kitchen_name, A.discount, A.discount_2, A.discount_3, A.member_discount_1, A.member_discount_2, A.member_discount_3, "
+							+ " A.kitchen_id, A.kitchen_alias, A.restaurant_id, A.name kitchen_name, "
 							+ " B.dept_id, B.name dept_name"
 							+ " from " + Params.dbName + ".kitchen A left join " + Params.dbName + ".department B on A.dept_id = B.dept_id and A.restaurant_id = B.restaurant_id "
 							+ " where 1=1 "
