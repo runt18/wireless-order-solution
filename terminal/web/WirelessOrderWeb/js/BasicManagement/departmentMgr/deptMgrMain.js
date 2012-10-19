@@ -193,6 +193,11 @@ Ext.onReady(function() {
 	        		var treeRoot = deptTree.getRootNode().childNodes;
 	        		if(treeRoot.length > 0){
 	        			deptData = [];
+	        			for(var i = (treeRoot.length - 1); i >= 0; i--){
+	    					if(treeRoot[i].attributes.deptID == 255 || treeRoot[i].attributes.deptID == 253){
+	    						deptTree.getRootNode().removeChild(treeRoot[i]);
+	    					}
+	    				}
 	        			for(var i = 0; i < treeRoot.length; i++){
 	        				var tp = {};
 	        				tp.type = treeRoot[i].attributes.type;
@@ -200,7 +205,7 @@ Ext.onReady(function() {
 	        				tp.deptName = treeRoot[i].text;
 	        				deptData.push(tp);
 	        			}
-	        			Ext.getCmp('btnRefreshSearchKitchen').handler();	        			
+	        			Ext.getCmp('btnRefreshSearchKitchen').handler();
 	        		}else{
 	        			deptTree.getRootNode().getUI().hide();
 	        			Ext.Msg.show({
@@ -326,9 +331,9 @@ Ext.onReady(function() {
 		items : [
 		    {xtype:'tbtext', text:String.format(Ext.ux.txtFormat.typeName, '部门', 'deptNameShowType', '----')},
 		    {xtype:'tbtext', text:'&nbsp;&nbsp;'},
-		    {xtype:'tbtext', text:'分厨名称:'},
+//		    {xtype:'tbtext', text:'分厨名称:'},
 		    {
-		    	xtype : 'textfield',
+		    	xtype : 'hidden',
 		    	id : 'txtSearchKitchenName'
 		    },
 			'->',
@@ -386,13 +391,20 @@ Ext.onReady(function() {
 			['所属部门', 'deptName', '', '', 'deptNameRenderer'],
 			['操作', 'operation', '', 'center', 'kitchenOperationRenderer']
 		],
-		['kitchenID', 'kitchenName', 'department', 'deptName'],
+		['kitchenID', 'kitchenName', 'department', 'deptName', 'kitchenAlias'],
 		[['pin', pin], ['isPaging', false]],
 		0,
 		'',
 		kitchenGridTbar
 	);
 	kitchenGrid.region = 'center';
+	kitchenGrid.getStore().on('load', function(thiz){
+		thiz.each(function(r){
+			if(r.get('kitchenAlias') == 255 || r.get('kitchenAlias') == 253){
+				thiz.remove(r);
+			}
+		});
+	});
 	
 	var centerPanel = new Ext.Panel({
 		title : '部门相关管理',
