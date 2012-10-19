@@ -198,6 +198,9 @@ public class QuickPickActivity extends FragmentActivity implements
 				mFgmContainer.setVisibility(View.GONE);
 				((RelativeLayout) activity.findViewById(R.id.relativeLayout_bottom_revealFood_quickPick)).setVisibility(View.VISIBLE);
 				mTitleTextView.setText("已点菜");
+				
+				activity.mLastView = PICKED_FOOD_INTERFACE;
+				
 				//展开新点菜ListView
 				activity.mNewFoodLstView.expandGroup(0);
 				activity.mTextHandler.sendEmptyMessage(0);
