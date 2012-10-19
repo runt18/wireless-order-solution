@@ -688,7 +688,7 @@ public class QuickPickActivity extends FragmentActivity implements
 					if(mBusinessException.getErrCode() == ErrorCode.TABLE_IDLE){				
 							
 						//Perform to insert a new order in case of the table is IDLE.
-						Order reqOrder = new Order(mNewFoodLstView.getSourceData(), mTblAlias, order.customNum);
+						Order reqOrder = new Order(mNewFoodLstView.getSourceData(), mTblAlias, 1);
 						new InsertOrderTask(reqOrder).execute(Type.INSERT_ORDER);						
 						
 					}else{
