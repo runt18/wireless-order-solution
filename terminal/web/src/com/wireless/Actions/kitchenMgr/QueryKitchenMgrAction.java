@@ -79,14 +79,11 @@ public class QueryKitchenMgrAction extends Action {
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF);
 
-			String sql = " SELECT kitchen_id, kitchen_alias, name, discount, discount_2, discount_3, "
-				    + " member_discount_1, member_discount_2, member_discount_3, dept_id "
+			String sql = " SELECT kitchen_id, kitchen_alias, name, dept_id "
 					+ " FROM " + Params.dbName + ".kitchen "
 					+ " WHERE restaurant_id = " + term.restaurantID 
 					+ (deptID == null || deptID.trim().equals("") || deptID == "" || deptID.equals("-1") || deptID == "-1" ? "" : (" AND dept_id = " + deptID))
-					+ (kitchenName == null || kitchenName.trim().equals("") ? "" : " AND name like '%" + kitchenName + "%' ")
-					+ " AND kitchen_alias BETWEEN 0 AND 49 ";
-
+					+ (kitchenName == null || kitchenName.trim().equals("") ? "" : " AND name like '%" + kitchenName + "%' ");
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 
 			while (dbCon.rs.next()) {
@@ -97,12 +94,6 @@ public class QueryKitchenMgrAction extends Action {
 				resultMap.put("kitchenID", dbCon.rs.getInt("kitchen_id"));
 				resultMap.put("kitchenAlias", dbCon.rs.getInt("kitchen_alias"));
 				resultMap.put("kitchenName", dbCon.rs.getString("name"));
-				resultMap.put("normalDiscount1", dbCon.rs.getFloat("discount"));
-				resultMap.put("normalDiscount2", dbCon.rs.getFloat("discount_2"));
-				resultMap.put("normalDiscount3", dbCon.rs.getFloat("discount_3"));
-				resultMap.put("memberDiscount1", dbCon.rs.getFloat("member_discount_1"));
-				resultMap.put("memberDiscount2", dbCon.rs.getFloat("member_discount_2"));
-				resultMap.put("memberDiscount3", dbCon.rs.getFloat("member_discount_3"));
 				resultMap.put("department", dbCon.rs.getInt("dept_id"));
 
 				resultMap.put("message", "normal");
