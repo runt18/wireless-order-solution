@@ -1,5 +1,5 @@
 ﻿var btnAddProgram = new Ext.ux.ImageButton({
-	imgPath : ' ',
+	imgPath : '../../images/btnAddProgram.png',
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : '添加方案',
@@ -11,7 +11,7 @@
 });
 
 var btnAddDiscount = new Ext.ux.ImageButton({
-	imgPath : ' ',
+	imgPath : '../../images/btnAddDiscount.png',
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : '添加分厨折扣',

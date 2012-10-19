@@ -307,6 +307,9 @@ Ext.onReady(function() {
 									var node = deptTree.getSelectionModel().getSelectedNode();
 									Ext.getCmp('txtDeptID').setValue(node.attributes.deptID);
 									Ext.getCmp('txtDeptName').setValue(node.text);
+									
+									var deptName = Ext.get("txtDeptName");
+									deptName.focus.defer(100, deptName);
 								}
 							},
 							keys : [{
