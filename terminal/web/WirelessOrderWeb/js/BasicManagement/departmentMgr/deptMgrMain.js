@@ -146,7 +146,14 @@ updateKitchen = function(){
 					kitchenDept.setValue(sd.department);
 					
 				}
-			}
+			},
+			keys : [{
+				 key : Ext.EventObject.ENTER,
+				 fn : function(){ 
+					 Ext.getCmp('btnSaveUpdateKitchen').handler();
+				 },
+				 scope : this 
+			 }]
 		});
 	}
 	
@@ -264,6 +271,7 @@ Ext.onReady(function() {
 							'->',
 							{
 								text : '保存',
+								id : 'btnSaveUpdateDept',
 								iconCls : 'btn_save',
 								handler : function(){
 									var deptID = Ext.getCmp('txtDeptID');
@@ -300,7 +308,14 @@ Ext.onReady(function() {
 									Ext.getCmp('txtDeptID').setValue(node.attributes.deptID);
 									Ext.getCmp('txtDeptName').setValue(node.text);
 								}
-							}
+							},
+							keys : [{
+								 key : Ext.EventObject.ENTER,
+								 fn : function(){ 
+									 Ext.getCmp('btnSaveUpdateDept').handler();
+								 },
+								 scope : this 
+							 }]
 						});
 					}
 					

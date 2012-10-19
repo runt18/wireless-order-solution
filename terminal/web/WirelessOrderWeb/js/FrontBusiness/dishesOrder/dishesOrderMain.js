@@ -1092,6 +1092,11 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 						success : function(response, options){
 							var jr = Ext.util.JSON.decode(response.responseText);
 							var root = jr.root;
+							for(var i = 0; i < root.length; i++){
+								if(root[i].kitchenAliasID == 253){
+									root.splice(i,1);
+								}
+							}
 							thiz.store.loadData(root, true);
 						}
 					});
