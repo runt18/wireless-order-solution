@@ -16,14 +16,14 @@
         android:layout_below="@+id/top"
         android:background="@color/white" >
     </FrameLayout>
-
+
     <LinearLayout
         android:id="@+id/bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:background="@drawable/bottom_bg"
-        android:weightSum="4" >
+        android:weightSum="3" >
 
         <ImageButton
             android:id="@+id/imageButton_num_pickFood"
@@ -49,7 +49,7 @@
             android:background="@null"
             android:src="@drawable/spell_selector"
             android:visibility="visible" />
-
+
         <ImageButton
             android:id="@+id/imageButton_remark_pickFood"
             android:layout_width="wrap_content"
@@ -57,7 +57,7 @@
             android:layout_weight="1"
             android:background="@null"
             android:src="@drawable/linshicai_selector"
-            android:visibility="invisible" />
+            android:visibility="gone" />
 
     </LinearLayout>
 
