@@ -58,7 +58,7 @@ public class QuickPickActivity extends FragmentActivity implements
 	//每个点菜方式的标签
 	private static final int NUMBER_FRAGMENT = 6320;
 	private static final int KITCHEN_FRAGMENT = 6321;
-	private static final int SPELL_FRAGMENT = 6322;
+	private static final int PINYIN_FRAGMENT = 6322;
 	private static final int PICKED_FOOD_INTERFACE = 6323;
 	private int mLastView;
 
@@ -175,7 +175,7 @@ public class QuickPickActivity extends FragmentActivity implements
 				setLastCate(KITCHEN_FRAGMENT);
 				break;
 				
-			case SPELL_FRAGMENT:
+			case PINYIN_FRAGMENT:
 				//创建新菜品选择fragment
 				PickFoodFragment spellFragment = new PickFoodFragment();
 				spellFragment.setFoodPickedListener(activity);
@@ -187,10 +187,10 @@ public class QuickPickActivity extends FragmentActivity implements
 				//替换原本的fragment
 				ftrans.replace(R.id.frameLayout_container_quickPick, spellFragment).commit();
 				
-				activity.mLastView = SPELL_FRAGMENT;
+				activity.mLastView = PINYIN_FRAGMENT;
 				
 				mTitleTextView.setText("点菜 - 拼音");
-				setLastCate(SPELL_FRAGMENT);
+				setLastCate(PINYIN_FRAGMENT);
 				break;
 				
 			case PICKED_FOOD_INTERFACE:
@@ -230,7 +230,7 @@ public class QuickPickActivity extends FragmentActivity implements
 				editor.putInt(Params.LAST_PICK_CATE, Params.PICK_BY_KITCHEN);
 				mKitchenBtn.setImageResource(R.drawable.kitchen_down);
 				break;
-			case SPELL_FRAGMENT:
+			case PINYIN_FRAGMENT:
 				editor.putInt(Params.LAST_PICK_CATE, Params.PICK_BY_PINYIN);
 				mSpellBtn.setImageResource(R.drawable.pinyin_down);
 				break;
@@ -316,8 +316,8 @@ public class QuickPickActivity extends FragmentActivity implements
 		((ImageButton) findViewById(R.id.imageButton_spell_quickPick)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				if(mLastView != SPELL_FRAGMENT){
-					mViewHandler.sendEmptyMessage(SPELL_FRAGMENT);
+				if(mLastView != PINYIN_FRAGMENT){
+					mViewHandler.sendEmptyMessage(PINYIN_FRAGMENT);
 				}
 			}
 		});
@@ -333,7 +333,7 @@ public class QuickPickActivity extends FragmentActivity implements
 		/*
 		 * 根据上次保存的记录，切换到相应的点菜方式
 		 */
-		int lastPickCate = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).getInt(Params.LAST_PICK_CATE, Params.PICK_BY_KITCHEN);
+		int lastPickCate = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).getInt(Params.LAST_PICK_CATE, Params.PICK_BY_PINYIN);
 		switch(lastPickCate)
 		{
 		case Params.PICK_BY_NUMBER:
@@ -343,7 +343,7 @@ public class QuickPickActivity extends FragmentActivity implements
 			mViewHandler.sendEmptyMessage(KITCHEN_FRAGMENT);
 			break;
 		case Params.PICK_BY_PINYIN:
-			mViewHandler.sendEmptyMessage(SPELL_FRAGMENT);
+			mViewHandler.sendEmptyMessage(PINYIN_FRAGMENT);
 			break;
 		default :
 			mViewHandler.sendEmptyMessage(NUMBER_FRAGMENT);
@@ -353,21 +353,23 @@ public class QuickPickActivity extends FragmentActivity implements
 	@Override
 	public void onBackPressed() {
 		
-		if(mNewFoodLstView.getSourceData().length <= 0)
-		{
+		if(mNewFoodLstView.getSourceData().length <= 0){
 			super.onBackPressed();
 			finish();
+			
+		}else{ 
+			new AlertDialog.Builder(QuickPickActivity.this)
+				.setTitle("退出确认")
+				.setMessage("已点菜尚未提交，确定要退出？")
+				.setPositiveButton("确定", new DialogInterface.OnClickListener(){
+					@Override
+					public void onClick( DialogInterface dialog, int which) {
+						onBackPressed();
+						finish();
+					}
+				})
+				.setNegativeButton("取消", null).show();
 		}
-		else new AlertDialog.Builder(QuickPickActivity.this).setTitle("退出确认").
-			setMessage("已点菜尚未提交，确定要退出？").
-			setPositiveButton("确定", new DialogInterface.OnClickListener(){
-				@Override
-				public void onClick( DialogInterface dialog, int which) {
-					onBackPressed();
-					finish();
-				}
-			}).
-			setNegativeButton("取消", null).show();
 	}
 
 	//activity返回后将菜品添加进已点菜中
@@ -438,9 +440,29 @@ public class QuickPickActivity extends FragmentActivity implements
 		}		
 	}
 
+	/**
+	 * 点击点菜按钮，跳转到上次点菜方式的Tab
+	 */
 	@Override
 	public void onPickFood() {
-		
+		/*
+		 * 根据上次保存的记录，切换到相应的点菜方式
+		 */
+		int lastPickCate = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).getInt(Params.LAST_PICK_CATE, Params.PICK_BY_PINYIN);
+		switch(lastPickCate)
+		{
+		case Params.PICK_BY_NUMBER:
+			mViewHandler.sendEmptyMessage(NUMBER_FRAGMENT);
+			break;
+		case Params.PICK_BY_KITCHEN:
+			mViewHandler.sendEmptyMessage(KITCHEN_FRAGMENT);
+			break;
+		case Params.PICK_BY_PINYIN:
+			mViewHandler.sendEmptyMessage(PINYIN_FRAGMENT);
+			break;
+		default :
+			mViewHandler.sendEmptyMessage(PINYIN_FRAGMENT);
+		}
 	}
 	
 	/**
@@ -725,7 +747,7 @@ public class QuickPickActivity extends FragmentActivity implements
 		 */
 		private class InsertOrderTask extends com.wireless.lib.task.CommitOrderTask{
 
-			private ProgressDialog _progDialog;
+			private ProgressDialog mProgDialog;
 			
 			public InsertOrderTask(Order reqOrder) {
 				super(reqOrder);
@@ -736,7 +758,7 @@ public class QuickPickActivity extends FragmentActivity implements
 			 */
 			@Override
 			protected void onPreExecute(){
-				_progDialog = ProgressDialog.show(QuickPickActivity.this, "", "提交" + mReqOrder.destTbl.aliasID + "号餐台的下单信息...请稍候", true);
+				mProgDialog = ProgressDialog.show(QuickPickActivity.this, "", "提交" + mReqOrder.destTbl.aliasID + "号餐台的下单信息...请稍候", true);
 			}
 			
 			
@@ -747,7 +769,7 @@ public class QuickPickActivity extends FragmentActivity implements
 			@Override
 			protected void onPostExecute(Void arg){
 				//make the progress dialog disappeared
-				_progDialog.dismiss();
+				mProgDialog.dismiss();
 				/**
 				 * Prompt user message if any error occurred.
 				 */

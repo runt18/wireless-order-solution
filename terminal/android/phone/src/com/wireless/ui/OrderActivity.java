@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.wireless.common.WirelessOrder;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.OrderParcel;
+import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
@@ -30,7 +31,7 @@ import com.wireless.ui.view.OrderFoodListView;
 
 public class OrderActivity extends Activity implements OrderFoodListView.OnOperListener{
 	 
-	private OrderFoodListView _newFoodLstView;
+	private OrderFoodListView mNewFoodLstView;
 	 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -77,12 +78,13 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 
 			@Override
 			public void onClick(View arg0) {
-				OrderFood[] foods = _newFoodLstView.getSourceData();
-				if(foods.length != 0){
-					Order reqOrder = new Order(foods,											   
-											   Short.parseShort(((EditText)findViewById(R.id.tblNoEdtTxt)).getText().toString()),
-											   Integer.parseInt(((EditText)findViewById(R.id.customerNumEdtTxt)).getText().toString()));
-					new InsertOrderTask(reqOrder).execute(Type.INSERT_ORDER);
+				if(mNewFoodLstView.getSourceData().length != 0){
+//					Order reqOrder = new Order(foods,											   
+//											   Short.parseShort(((EditText)findViewById(R.id.tblNoEdtTxt)).getText().toString()),
+//											   Integer.parseInt(((EditText)findViewById(R.id.customerNumEdtTxt)).getText().toString()));
+//					new InsertOrderTask(reqOrder).execute(Type.INSERT_ORDER);
+					
+					new QueryOrderTask(Short.parseShort(((EditText)findViewById(R.id.tblNoEdtTxt)).getText().toString())).execute(WirelessOrder.foodMenu);
 					
 				}else{
 					Toast.makeText(OrderActivity.this, "您还未点菜，暂时不能下单。", Toast.LENGTH_SHORT).show();
@@ -94,11 +96,11 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 		/**
 		 * 新点菜的ListView
 		 */
-		_newFoodLstView = (OrderFoodListView)findViewById(R.id.orderLstView);
+		mNewFoodLstView = (OrderFoodListView)findViewById(R.id.orderLstView);
 		//_newFoodLstView.setGroupIndicator(getResources().getDrawable(R.layout.expander_folder));
-		_newFoodLstView.setOperListener(this);
+		mNewFoodLstView.setOperListener(this);
 		//滚动的时候隐藏输入法
-		_newFoodLstView.setOnScrollListener(new OnScrollListener() {				
+		mNewFoodLstView.setOnScrollListener(new OnScrollListener() {				
 			@Override
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
 				((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(((EditText)findViewById(R.id.tblNoEdtTxt)).getWindowToken(), 0);
@@ -107,27 +109,85 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 			@Override
 			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {}
 		});		
-		_newFoodLstView.setChangedListener(new OrderFoodListView.OnChangedListener() {			
+		mNewFoodLstView.setChangedListener(new OrderFoodListView.OnChangedListener() {			
 			@Override
 			public void onSourceChanged(){
 				//update the total price
-				Order tmpOrder = new Order(_newFoodLstView.getSourceData());
+				Order tmpOrder = new Order(mNewFoodLstView.getSourceData());
 				((TextView)findViewById(R.id.totalTxtView)).setText(Util.CURRENCY_SIGN + Util.float2String(tmpOrder.calcPriceWithTaste()));	
 			}
 		});
-		_newFoodLstView.init(Type.INSERT_ORDER);
+		mNewFoodLstView.init(Type.INSERT_ORDER);
 		
 		//执行请求更新沽清菜品
 		new QuerySellOutTask().execute(WirelessOrder.foodMenu.foods);
 	}
 
+	/**
+	 * 执行请求对应餐台的账单信息 
+	 */
+	private class QueryOrderTask extends com.wireless.lib.task.QueryOrderTask{
 
+		private ProgressDialog mProgDialog;
+	
+		QueryOrderTask(int tableAlias){
+			super(tableAlias);
+		}
+		
+		/**
+		 * 在执行请求删单操作前显示提示信息
+		 */
+		@Override
+		protected void onPreExecute(){
+			mProgDialog = ProgressDialog.show(OrderActivity.this, "", "查询" + mTblAlias + "号餐台的信息...请稍候", true);
+		}
+		
+		/**
+		 * 根据返回的error message判断，如果发错异常则提示用户，
+		 * 如果成功，则迁移到改单页面
+		 */
+		@Override
+		protected void onPostExecute(Order order){
+			
+			mProgDialog.dismiss();
+
+//			int customAmount = Integer.parseInt(((TextView)CommitDialog.this.findViewById(R.id.textView_peopleCnt_commitDialog)).getText().toString());
+
+			if(mBusinessException != null){
+				if(mBusinessException.getErrCode() == ErrorCode.TABLE_IDLE){				
+						
+					//Perform to insert a new order in case of the table is IDLE.
+					Order reqOrder = new Order(mNewFoodLstView.getSourceData(),											   
+							   				   Short.parseShort(((EditText)findViewById(R.id.tblNoEdtTxt)).getText().toString()),
+							   				   Integer.parseInt(((EditText)findViewById(R.id.customerNumEdtTxt)).getText().toString()));
+					new InsertOrderTask(reqOrder).execute(Type.INSERT_ORDER);						
+					
+				}else{
+					new AlertDialog.Builder(OrderActivity.this)
+					.setTitle("提示")
+					.setMessage(mBusinessException.getMessage())
+					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							dialog.dismiss();
+						}
+					})
+					.show();
+				}
+			}else{
+				//Merge the original order and update if the table is BUSY.
+				order.addFoods(mNewFoodLstView.getSourceData());
+//				order.customNum = customAmount;
+				new InsertOrderTask(order).execute(Type.UPDATE_ORDER);
+			}
+		}
+	}
+	
 	/**
 	 * 执行下单的请求操作
 	 */
 	private class InsertOrderTask extends com.wireless.lib.task.CommitOrderTask{
 
-		private ProgressDialog _progDialog;
+		private ProgressDialog mProgDialog;
 		
 		public InsertOrderTask(Order reqOrder) {
 			super(reqOrder);
@@ -138,7 +198,7 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 		 */
 		@Override
 		protected void onPreExecute(){
-			_progDialog = ProgressDialog.show(OrderActivity.this, "", "提交" + mReqOrder.destTbl.aliasID + "号餐台的下单信息...请稍候", true);
+			mProgDialog = ProgressDialog.show(OrderActivity.this, "", "提交" + mReqOrder.destTbl.aliasID + "号餐台的下单信息...请稍候", true);
 		}
 		
 		
@@ -149,7 +209,7 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 		@Override
 		protected void onPostExecute(Void arg){
 			//make the progress dialog disappeared
-			_progDialog.dismiss();
+			mProgDialog.dismiss();
 			/**
 			 * Prompt user message if any error occurred.
 			 */
@@ -169,6 +229,55 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 			}
 		}
 	}	
+	
+	
+//	/**
+//	 * 执行下单的请求操作
+//	 */
+//	private class InsertOrderTask extends com.wireless.lib.task.CommitOrderTask{
+//
+//		private ProgressDialog _progDialog;
+//		
+//		public InsertOrderTask(Order reqOrder) {
+//			super(reqOrder);
+//		}
+//		
+//		/**
+//		 * 在执行请求下单操作前显示提示信息
+//		 */
+//		@Override
+//		protected void onPreExecute(){
+//			_progDialog = ProgressDialog.show(OrderActivity.this, "", "提交" + mReqOrder.destTbl.aliasID + "号餐台的下单信息...请稍候", true);
+//		}
+//		
+//		
+//		/**
+//		 * 根据返回的error message判断，如果发错异常则提示用户，
+//		 * 如果成功，则返回到主界面，并提示用户下单成功
+//		 */
+//		@Override
+//		protected void onPostExecute(Void arg){
+//			//make the progress dialog disappeared
+//			_progDialog.dismiss();
+//			/**
+//			 * Prompt user message if any error occurred.
+//			 */
+//			if(mBusinessException != null){
+//				new AlertDialog.Builder(OrderActivity.this)
+//				.setTitle("提示")
+//				.setMessage(mBusinessException.getMessage())
+//				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+//					public void onClick(DialogInterface dialog, int id) {
+//						dialog.dismiss();
+//					}
+//				}).show();
+//			}else{
+//				//return to the main activity and show the message
+//				OrderActivity.this.finish();
+//				Toast.makeText(OrderActivity.this, mReqOrder.destTbl.aliasID + "号台下单成功。", Toast.LENGTH_SHORT).show();
+//			}
+//		}
+//	}	
 
 	
 	
@@ -206,8 +315,8 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 				 * 口味改变时通知ListView进行更新
 				 */
 				FoodParcel foodParcel = data.getParcelableExtra(FoodParcel.KEY_VALUE);
-				_newFoodLstView.setFood(foodParcel);
-				_newFoodLstView.expandGroup(0);
+				mNewFoodLstView.setFood(foodParcel);
+				mNewFoodLstView.expandGroup(0);
 				 
 				
 			}else if(requestCode == OrderFoodListView.PICK_FOOD){
@@ -216,8 +325,8 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 				 */
 				OrderParcel orderParcel = data.getParcelableExtra(OrderParcel.KEY_VALUE);
 				//_newFoodLstView.notifyDataChanged(new ArrayList<OrderFood>(Arrays.asList(orderParcel.foods)));
-				_newFoodLstView.addFoods(orderParcel.foods);
-				_newFoodLstView.expandGroup(0);
+				mNewFoodLstView.addFoods(orderParcel.foods);
+				mNewFoodLstView.expandGroup(0);
 			}
 			
 		}
@@ -228,7 +337,7 @@ public class OrderActivity extends Activity implements OrderFoodListView.OnOperL
 	 * 点解返回键进行监听弹出的Dialog
 	 */
 	public void showExitDialog(){
-		if(_newFoodLstView.getSourceData().length != 0){			
+		if(mNewFoodLstView.getSourceData().length != 0){			
 			new AlertDialog.Builder(this)
 			.setTitle("提示")
 			.setMessage("账单还未提交，是否确认退出?")
