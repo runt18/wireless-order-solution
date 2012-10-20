@@ -516,7 +516,7 @@ var dailySettleCheckTableWin = new Ext.Window({
 			
 		}
 	}, {
-		text : '交班打印',
+		text : '交班',
 		id : 'btnJiaoBanDaYin',
 		handler : function(){
 			Ext.Ajax.request({
@@ -529,11 +529,6 @@ var dailySettleCheckTableWin = new Ext.Window({
 				},
 				success : function(response, options) {
 					var resultJSON = Ext.util.JSON.decode(response.responseText);
-//					Ext.MessageBox.show({
-//						msg : resultJSON.data + (omsg.length > 0 ? ('<br/>'+omsg) : ''),
-//						width : 300,
-//						buttons : Ext.MessageBox.OK
-//					});
 					Ext.example.msg('提示', (resultJSON.data + (omsg.length > 0 ? ('<br/>'+omsg) : '')));
 					omsg = '';
 					dailySettleCheckTableWin.hide();
@@ -588,7 +583,7 @@ var dailySettleCheckTableWin = new Ext.Window({
 			});
 		}
 	}, {
-		text : '日结打印',
+		text : '日结',
 		id : 'btnRiJieDaYin',
 		handler : function(e){
 			Ext.Ajax.request({
@@ -600,11 +595,6 @@ var dailySettleCheckTableWin = new Ext.Window({
 					offDuty : shiftCheckDate.offDuty
 				},
 				success : function(response, options) {
-//					Ext.MessageBox.show({
-//						msg : '日结信息打印成功.' + (omsg.length > 0 ? ('<br/>'+omsg) : ''),
-//						width : 300,
-//						buttons : Ext.MessageBox.OK
-//					});
 					Ext.example.msg('提示', ('日结信息打印成功.' + (omsg.length > 0 ? ('<br/>'+omsg) : '')));
 					omsg = '';
 					dailySettleCheckTableWin.hide();
