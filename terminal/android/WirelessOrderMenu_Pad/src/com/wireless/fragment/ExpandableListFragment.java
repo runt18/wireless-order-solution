@@ -58,7 +58,8 @@ public class ExpandableListFragment extends Fragment{
 			mChildren.add(childKitchens);
 		}
 		mAdapter.notifyDataSetChanged();
-		setPosition(mChildren.get(0).get(0));
+		if(!mChildren.isEmpty())
+			setPosition(mChildren.get(0).get(0));
 	}
 	
 	/**

@@ -110,7 +110,7 @@ public class TablePanelFragment extends Fragment {
 					}
 				});
 		
-		/**
+		/*
 		 * “清空”按钮
 		 */
 		((ImageButton) view.findViewById(R.id.deleteBtn_dialog_tab1)).setOnClickListener(new OnClickListener(){
@@ -141,7 +141,7 @@ public class TablePanelFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				int curNum = Integer.parseInt(cstmNumTextView.getText().toString());
-				if(--curNum >= 0)
+				if(--curNum >= 1)
 					cstmNumTextView.setText("" + curNum);
 			}
 		});
@@ -458,14 +458,14 @@ public class TablePanelFragment extends Fragment {
 		}
 	}
 	
-	/**
+	/*
 	 * 请求餐台信息
 	 */
 	private class QueryTableTask extends com.wireless.lib.task.QueryTableTask {
 		
 		private ProgressDialog mProgDialog;
 		
-		/**
+		/*
 		 * 在执行请求餐台信息前显示提示信息
 		 */
 		@Override
@@ -474,7 +474,7 @@ public class TablePanelFragment extends Fragment {
 		}
 
 
-		/**
+		/*
 		 * 根据返回的error message判断，如果发错异常则提示用户， 如果成功，则执行请求餐厅的操作。
 		 */
 		@Override
@@ -500,7 +500,7 @@ public class TablePanelFragment extends Fragment {
 		}
 	}
 	
-	/**
+	/*
 	 * 请求获得餐台的状态
 	 */
 	private abstract class QueryTableStatusTask extends com.wireless.lib.task.QueryTableStatusTask{
@@ -516,14 +516,14 @@ public class TablePanelFragment extends Fragment {
 			_progDialog = ProgressDialog.show(TablePanelFragment.this.getActivity(), "", "查询" + mTblAlias + "号餐台信息...请稍候", true);
 		}
 		
-		/**
+		/*
 		 * 如果相应的操作不符合条件（比如要改单的餐台还未下单），
 		 * 则把相应信息提示给用户，否则根据餐台状态，分别跳转到下单或改单界面。
 		 */
 		@Override
 		protected void onPostExecute(Byte tblStatus){
 			_progDialog.dismiss();
-			/**
+			/*
 			 * Prompt user message if any error occurred.
 			 * Otherwise perform the corresponding action.
 			 */

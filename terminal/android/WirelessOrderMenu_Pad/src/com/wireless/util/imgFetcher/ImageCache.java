@@ -404,6 +404,7 @@ public class ImageCache {
                         + "between 0.05 and 0.8 (inclusive)");
             }
             memCacheSize = Math.round(percent * getMemoryClass(context) * 1024 * 1024);
+            Log.i("memory",""+getMemoryClass(context));
         }
 
         private static int getMemoryClass(Context context) {

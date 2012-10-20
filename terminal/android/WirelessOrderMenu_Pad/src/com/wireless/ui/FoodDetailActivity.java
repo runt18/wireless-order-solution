@@ -4,30 +4,27 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 import android.app.Activity;
-import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Gallery;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
+import android.widget.LinearLayout;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
-import com.wireless.fragment.GalleryFragment;
 import com.wireless.fragment.GalleryFragment.OnPicClickListener;
 import com.wireless.fragment.PickTasteFragment;
 import com.wireless.fragment.PickTasteFragment.OnTasteChangeListener;
@@ -36,7 +33,7 @@ import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
-import com.wireless.util.ImageLoader;
+import com.wireless.util.imgFetcher.ImageFetcher;
 
 public class FoodDetailActivity extends Activity implements OnTasteChangeListener, OnPicClickListener{
 	private static final int ORDER_FOOD_CHANGED = 234841;
@@ -44,12 +41,12 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 
 	private OrderFood mOrderFood;
 	
-	private ImageLoader mImgLoader;
 	private DisplayHandler mDisplayHandler;
 	private ArrayList<Food> mRecommendfoods;
 	private ImageView mFoodImageView;
+	private ImageFetcher mImageFetcher;
 	
-	private GalleryFragment mRecFoodsFragment;
+//	private GalleryFragment mRecFoodsFragment;
 
 	/*
 	 * 显示该菜品详细情况的handler
@@ -116,13 +113,24 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		FoodParcel foodParcel = getIntent().getParcelableExtra(FoodParcel.KEY_VALUE);
 		mOrderFood = foodParcel;
 		
-		mImgLoader = new ImageLoader(this);
 		mDisplayHandler = new DisplayHandler(this);
 		mDisplayHandler.sendEmptyMessage(ORDER_FOOD_CHANGED);
+		
+
 		//显示该菜品的主图
 		mFoodImageView = (ImageView) findViewById(R.id.imageView_foodDetail);
 		mFoodImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-		mFoodImageView.setImageBitmap(mImgLoader.loadImage(mOrderFood.image));
+		
+//		BitmapFactory.Options options = new BitmapFactory.Options();
+//		options.inJustDecodeBounds = true;
+//		BitmapFactory.decodeFile(mOrderFood.image, options);
+//		int imageHeight = options.outHeight;
+//		int imageWidth = options.outWidth;
+		
+		mImageFetcher = new ImageFetcher(this, 600, 400);
+
+		mImageFetcher.loadImage(mOrderFood.image, mFoodImageView);
+		
 		mFoodImageView.setOnClickListener(new OnClickListener(){
 			//点击主图进入全屏界面
 			@Override
@@ -216,13 +224,24 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 			if(f.isRecommend())
 				mRecommendfoods.add(f);
 		}
+		
+		mImageFetcher.setImageSize(160, 160);
+
+		LinearLayout linearLyaout = (LinearLayout) findViewById(R.id.linearLayout_foodDetail);
+		for(Food f:mRecommendfoods)
+		{
+			ImageView image = new ImageView(this);
+			image.setScaleType(ScaleType.CENTER_CROP);
+			mImageFetcher.loadImage(f.image, image);
+			linearLyaout.addView(image);
+		}
 		/*
 		 * FIXME 修正fragment的样式
 		 */
-		mRecFoodsFragment = GalleryFragment.newInstance(mRecommendfoods.toArray(new Food[mRecommendfoods.size()]), 0.1f, 2, ScaleType.FIT_CENTER);
-		FragmentTransaction fragmentTransaction = this.getFragmentManager().beginTransaction();
-		fragmentTransaction.replace(R.id.viewPager_container_foodDetail, mRecFoodsFragment).commit();
-		
+//		mRecFoodsFragment = GalleryFragment.newInstance(mRecommendfoods.toArray(new Food[mRecommendfoods.size()]), 0.5f, 1, ScaleType.FIT_CENTER);
+//		FragmentTransaction fragmentTransaction = this.getFragmentManager().beginTransaction();
+//		fragmentTransaction.replace(R.id.viewPager_container_foodDetail, mRecFoodsFragment).commit();
+		 
 //		Gallery gallery = (Gallery) findViewById(R.id.gallery_food_detail);
 //		gallery.setAdapter(new RecommendFoodAdapter());
 //		gallery.setOnItemClickListener(new OnItemClickListener(){
@@ -233,12 +252,12 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 //		});
 	}
 	
-	@Override
-	protected void onStart() {
-		// TODO Auto-generated method stub
-		super.onStart();
+	@Override 
+	public void onDestroy(){
+		super.onDestroy();
+		mImageFetcher.clearCache();
 	}
-
+	
 	protected void showDialog(String tab, int position) {
 		//设置推荐菜对话框或口味选择对话框
 		if(tab == RECOMMEND_DIALOG)
@@ -260,7 +279,6 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 	}
 
 //	private void initDialog() {
-//		// TODO Auto-generated method stub
 ////		View dialogLayout = getLayoutInflater().inflate(R.layout.recommend_food_fragment, (ViewGroup) findViewById(R.id.rec_food_dialog_layout));
 //		
 //		mDialogFragment = (RecommendFoodFragment) getFragmentManager().findFragmentById(R.id.recommendFoodFragment_rec_dialog);
@@ -430,8 +448,11 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
     		}else {
     			imageView = (ImageView)convertView;
     		}
-    		imageView.setAdjustViewBounds(true);
-    		imageView.setImageBitmap(mImgLoader.loadImage(mRecommendfoods.get(position).image));
+    		
+    		BitmapFactory.Options options = new BitmapFactory.Options();
+    		options.inJustDecodeBounds = true; 
+    		BitmapFactory.decodeFile(mRecommendfoods.get(position).image, options);
+//    		imageView.setImageBitmap(ImageResizer.decodeSampledBitmapFromFile((), reqWidth, reqHeight));
     		return imageView;
     	}
 	}

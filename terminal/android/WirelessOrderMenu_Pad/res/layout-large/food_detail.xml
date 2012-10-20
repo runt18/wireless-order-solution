@@ -2,10 +2,10 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
-
+
     <fragment
         android:id="@+id/bottombar"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         class="com.wireless.fragment.OptionBarFragment" />
@@ -80,20 +80,34 @@
             android:layout_width="50dp"
             android:layout_height="match_parent"
             android:src="@color/orange" />
-
-         <FrameLayout
+
+        <!-- <FrameLayout
             android:id="@+id/viewPager_container_foodDetail"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_toRightOf="@+id/imageView1" >
+        </FrameLayout> -->
 
-        </FrameLayout>
-
-          <!--    <Gallery
+        <!-- <Gallery
             android:id="@+id/gallery_food_detail"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_toRightOf="@+id/imageView1" /> -->
+            android:layout_toRightOf="@+id/imageView1" /> -->
+
+        <HorizontalScrollView
+            android:id="@+id/horizontalScrollView1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toRightOf="@+id/imageView1" >
+
+            <LinearLayout
+                android:id="@+id/linearLayout_foodDetail"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal" >
+
+            </LinearLayout>
+        </HorizontalScrollView>
 
     </RelativeLayout>
 

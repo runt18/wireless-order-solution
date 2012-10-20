@@ -70,11 +70,11 @@ public class MainActivity extends Activity
 		Arrays.sort(WirelessOrder.foods, mFoodCompByKitchen);
 		
 		//创建Gallery Fragment的实例
-		mPicBrowserFragment = GalleryFragment.newInstance(WirelessOrder.foods, 0.1f, 4, ScaleType.CENTER_CROP);
+		mPicBrowserFragment = GalleryFragment.newInstance(WirelessOrder.foods, 0.1f, 2, ScaleType.CENTER_CROP);
 		//替换XML中为GalleryFragment预留的Layout
 		FragmentTransaction fragmentTransaction = this.getFragmentManager().beginTransaction();
 		fragmentTransaction.replace(R.id.main_viewPager_container, mPicBrowserFragment).commit();
-		
+		  
 		/**
 		 * 设置各种按钮的listener
 		 */
