@@ -8,113 +8,11 @@ shiftPanel = new Ext.Panel({
 	} ]
 });
 
-shiftWin = new Ext.Window({
-	layout : "fit",
-	width : 450,
-	height : 450,
-	closeAction : "hide",
-	resizable : false,
-	closable : false,
-	items : shiftPanel,
-	buttonAlign : 'center',
-	buttons : [{
-		text : "交班",
-		handler : function() {
-			shiftWin.hide();
-			isPrompt = false;
-
-			// do shift
-			Ext.Ajax.request({
-				url : "../../DoShift.do",
-				params : {
-					"pin" : currPin,
-					"onDuty" : shiftStartTiem,
-					"offDuty" : shiftEndTiem
-				},
-				success : function(response, options) {
-					var resultJSON = Ext.util.JSON.decode(response.responseText);
-					if (resultJSON.success == true) {
-						Ext.MessageBox.show({
-							msg : resultJSON.data + "，是否打印交班对账单？",
-							width : 300,
-							buttons : Ext.MessageBox.YESNO,
-							fn : function(btn) {
-								if (btn == "yes") {
-									Ext.Ajax.request({
-										url : "../../PrintOrder.do",
-										params : {
-											"pin" : currPin,
-											"printShift" : 1,
-											"onDuty" : shiftStartTiem,
-											"offDuty" : shiftEndTiem
-										},
-										success : function(response, options) {
-											var resultJSON1 = Ext.util.JSON.decode(response.responseText);
-											Ext.MessageBox.show({
-												msg : resultJSON1.data,
-												width : 300,
-												buttons : Ext.MessageBox.OK
-											});
-										},
-										failure : function(response, options) {
-											
-										}
-									});
-								}
-							}
-						});
-					} else {
-						Ext.MessageBox.show({
-							msg : resultJSON.data,
-							width : 300,
-							buttons : Ext.MessageBox.OK
-						});
-					}
-				},
-				failure : function(response, options) {
-					
-				}
-			});
-		}
-	}, {
-		text : "打印",
-		handler : function() {
-			Ext.Ajax.request({
-				url : "../../PrintOrder.do",
-				params : {
-					"pin" : currPin,
-					"printTmpShift" : 1,
-					"onDuty" : shiftStartTiem,
-					"offDuty" : shiftEndTiem
-				},
-				success : function(response, options) {
-					var resultJSON = Ext.util.JSON.decode(response.responseText);
-					Ext.MessageBox.show({
-						msg : resultJSON.data,
-						width : 300,
-						buttons : Ext.MessageBox.OK
-					});
-				},
-				failure : function(response, options) {
-					
-				}
-			});
-		}
-	}, {
-		text : "取消",
-		handler : function() {
-			shiftWin.hide();
-			isPrompt = false;
-		}
-	}]
-});
-
 // billVerifyWin
 var billVerifyWin = new Ext.Window({
 	layout : "fit",
 	width : 200,
 	height : 100,
-//	closeAction : "hide",
 	resizable : false,
 	closable : false,
 	draggable : false,
@@ -338,25 +236,8 @@ doDailySettle = function() {
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
 			var rootData = resultJSON.root;
 			if (rootData[0].message == "normal") {
-				
-				Ext.Ajax.request({
-					url : "../../PrintOrder.do",
-					params : {
-						"pin" : currPin,
-						"printDailySettle" : 1
-					},
-					success : function(response, options) {
-						Ext.MessageBox.show({
-							msg : "日结成功",
-							width : 300,
-							buttons : Ext.MessageBox.OK
-						});
-					},
-					failure : function(response, options) {
-						
-					}
-				});
-				
+				omsg = '日结成功';
+				Ext.getCmp('btnRiJieDaYin').handler();
 			} else {
 				Ext.MessageBox.show({
 					msg : rootData[0].message,
@@ -592,7 +473,85 @@ var dailySettleCheckTableWin = new Ext.Window({
 	items : [ dailySettleCheckTablePanel, dailySettleCheckDetpPanel ],
 	buttonAlign : 'center',
 	buttons : [{
+		text : "交班",
+		id : 'btnJiaoBan',
+		handler : function() {
+			Ext.MessageBox.show({
+				msg : "确认进行交班？",
+				width : 300,
+				buttons : Ext.MessageBox.YESNO,
+				fn : function(btn){
+					if(btn == "yes"){
+						Ext.Ajax.request({
+							url : "../../DoShift.do",
+							params : {
+								pin : currPin,
+								onDuty : shiftCheckDate.onDuty,
+								offDuty : shiftCheckDate.offDuty
+							},
+							success : function(response, options) {
+								var resultJSON = Ext.util.JSON.decode(response.responseText);
+								if (resultJSON.success == true) {
+									omsg = resultJSON.data;
+									Ext.getCmp('btnJiaoBanDaYin').handler();
+								} else {
+									Ext.MessageBox.show({
+										msg : resultJSON.data,
+										width : 300,
+										buttons : Ext.MessageBox.OK
+									});
+								}
+							},
+							failure : function(response, options) {
+								var resultJSON = Ext.util.JSON.decode(response.responseText);
+								Ext.MessageBox.show({
+									msg : resultJSON.data,
+									width : 300,
+									buttons : Ext.MessageBox.OK
+								});
+							}
+						});
+					}
+				}
+			});
+			
+		}
+	}, {
+		text : '交班打印',
+		id : 'btnJiaoBanDaYin',
+		handler : function(){
+			Ext.Ajax.request({
+				url : "../../PrintOrder.do",
+				params : {
+					pin : currPin,
+					onDuty : shiftCheckDate.onDuty,
+					offDuty : shiftCheckDate.offDuty,
+					printTmpShift : 1
+				},
+				success : function(response, options) {
+					var resultJSON = Ext.util.JSON.decode(response.responseText);
+//					Ext.MessageBox.show({
+//						msg : resultJSON.data + (omsg.length > 0 ? ('<br/>'+omsg) : ''),
+//						width : 300,
+//						buttons : Ext.MessageBox.OK
+//					});
+					Ext.example.msg('提示', (resultJSON.data + (omsg.length > 0 ? ('<br/>'+omsg) : '')));
+					omsg = '';
+					dailySettleCheckTableWin.hide();
+				},
+				failure : function(response, options) {
+					var resultJSON = Ext.util.JSON.decode(response.responseText);
+					Ext.MessageBox.show({
+						msg : resultJSON.data,
+						width : 300,
+						buttons : Ext.MessageBox.OK
+					});
+				}
+			});
+		}
+	}, {
 		text : "日结",
+		id : 'btnRiJie',
 		handler : function() {
 			Ext.MessageBox.show({
 				msg : "确认进行日结？",
@@ -617,7 +576,6 @@ var dailySettleCheckTableWin = new Ext.Window({
 									} else {
 										document.getElementById("unShiftBillWarnMsg").innerHTML = rootData[0].text;
 										unShiftBillWarnWin.show();
-										isPrompt = true;
 									}
 								} else {
 									Ext.MessageBox.show({
@@ -640,15 +598,65 @@ var dailySettleCheckTableWin = new Ext.Window({
 			});
 		}
 	}, {
+		text : '日结打印',
+		id : 'btnRiJieDaYin',
+		handler : function(e){
+			Ext.Ajax.request({
+				url : "../../PrintOrder.do",
+				params : {
+					pin : currPin,
+					printDailySettle : 1
+				},
+				success : function(response, options) {
+//					Ext.MessageBox.show({
+//						msg : '日结信息打印成功.' + (omsg.length > 0 ? ('<br/>'+omsg) : ''),
+//						width : 300,
+//						buttons : Ext.MessageBox.OK
+//					});
+					Ext.example.msg('提示', ('日结信息打印成功.' + (omsg.length > 0 ? ('<br/>'+omsg) : '')));
+					omsg = '';
+					dailySettleCheckTableWin.hide();
+				},
+				failure : function(response, options) {
+					var resultJSON = Ext.util.JSON.decode(response.responseText);
+					Ext.MessageBox.show({
+						msg : resultJSON.data,
+						width : 300,
+						buttons : Ext.MessageBox.OK
+					});
+				}
+			});
+		}
+	}, {
 		text : "关闭",
-		handler : function() {
+		handler : function(){
 			dailySettleCheckTableWin.hide();
-			isPrompt = false;
 		}
 	}],
 	listeners : {
-		show : function(){
-//			shiftCheckDate
+		show : function(thiz){
+			
+			var btnJiaoBan = Ext.getCmp('btnJiaoBan');
+			var btnJiaoBanDaYin = Ext.getCmp('btnJiaoBanDaYin');
+			var btnRiJie = Ext.getCmp('btnRiJie');
+			var btnRiJieDaYin = Ext.getCmp('btnRiJieDaYin');
+			if(shiftCheckDate.otype == 0){
+				Ext.getDom('shiftTitle').innerHTML = '交班表';
+				btnJiaoBan.setVisible(true);
+				btnJiaoBanDaYin.setVisible(true);
+				btnRiJie.setVisible(false);
+				btnRiJieDaYin.setVisible(false);
+			}else if(shiftCheckDate.otype == 1){
+				Ext.getDom('shiftTitle').innerHTML = '日结表';
+				btnJiaoBan.setVisible(false);
+				btnJiaoBanDaYin.setVisible(false);
+				btnRiJie.setVisible(true);
+				btnRiJieDaYin.setVisible(true);
+			}else{
+				thiz.hide();
+				return;
+			}
+			
 			Ext.getDom('shiftOperatorCheck').innerHTML = Ext.getDom('optName').innerHTML;
 			Ext.getDom('shiftBillCountCheck').innerHTML = shiftCheckDate.allBillCount;
 			Ext.getDom('shiftStartTimeCheck').innerHTML = shiftCheckDate.onDuty;
@@ -703,7 +711,6 @@ var dailySettleCheckTableWin = new Ext.Window({
 			
 			Ext.getDom('serviceAmountCheck').innerHTML = shiftCheckDate.serviceAmount.toFixed(2);
 			
-//			Ext.getDom('').innerHTML = shiftCheckDate;
 			dailySettleCheckDetpGrid.getStore().loadData(shiftCheckDate.deptInfos);
 		}
 	}
