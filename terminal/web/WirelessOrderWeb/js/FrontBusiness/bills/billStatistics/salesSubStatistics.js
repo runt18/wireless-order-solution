@@ -241,6 +241,9 @@ salesSub = function(){
         			salesSubSetDisplay(false, e.text, 1, false, '菜品');
         			salesSubDeptId = e.attributes.deptID;
         		}	        		
+        	},
+        	dblclick : function(e){
+        		Ext.getCmp('salesSubBtnSearch').handler();
         	}
         }
 	});

@@ -1370,8 +1370,8 @@ Ext.onReady(function() {
 	var menuTabPanel = new Ext.TabPanel({
 		id : 'menuTabPanel',
 		activeItem : 0,
-//		items : [allFoodTabPanel, tempFoodTabPanel],
-		items : [allFoodTabPanel],
+		items : [allFoodTabPanel, tempFoodTabPanel],
+//		items : [allFoodTabPanel],
 		listeners : {
 			tabchange : function(thiz, active){
 				if(active.getId() == tempFoodTabPanel.getId()){
