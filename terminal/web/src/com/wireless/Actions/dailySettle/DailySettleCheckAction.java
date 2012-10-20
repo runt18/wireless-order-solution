@@ -51,7 +51,7 @@ public class DailySettleCheckAction extends Action {
 
 			int[] restOrderID = DailySettleDao.check(dbCon, term);
 			if (restOrderID.length != 0) {
-				jObj.initTip(true, "您还有"
+				jObj.initTip(false, "您还有"
 										+ restOrderID.length
 										+ "张账单未进行交班操作，日结将会有可能导致统计信息不准确，建议先进行交班操作，再执行日结。确定要进行日结吗？");
 			} else {
