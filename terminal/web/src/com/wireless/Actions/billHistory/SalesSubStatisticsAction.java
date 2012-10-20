@@ -1,8 +1,10 @@
 package com.wireless.Actions.billHistory;
 
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -67,29 +69,41 @@ public class SalesSubStatisticsAction extends Action {
 			 * 
 			 */
 			String pin = request.getParameter("pin");
-			String restaurantId = request.getParameter("restaurantID");			
+			String restaurantId = request.getParameter("restaurantID");		
+			String dataType = request.getParameter("dataType");
 			String dateBeg = request.getParameter("dateBeg");
-			String dataEnd = request.getParameter("dataEnd");
+			String dateEnd = request.getParameter("dateEnd");
 			String queryType = request.getParameter("queryType");
 			String orderType = request.getParameter("orderType");
 			String deptID = request.getParameter("deptID");
 			
 			pin = pin != null && pin.length() > 0 ? pin.trim() : "";
 			restaurantId = restaurantId != null && restaurantId.length() > 0 ? restaurantId.trim() : "";
-			dateBeg = dateBeg != null && dateBeg.length() > 0 ? dateBeg.trim() + " 00:00:00" : "";
-			dataEnd = dataEnd != null && dataEnd.length() > 0 ? dataEnd.trim() + " 23:59:59" : "";
+			dataType = dataType != null && dataType.length() > 0 ? dataType.trim() : "1";
 			queryType = queryType != null && queryType.length() > 0 ? queryType.trim() : "0";
 			orderType = orderType != null && orderType.length() > 0 ? orderType.trim() : "0";
 			deptID = deptID != null && deptID.length() > 0 ? deptID.trim() : "-1";
 			
-			Integer qt = Integer.valueOf(queryType), ot = Integer.valueOf(orderType);
+			Integer qt = Integer.valueOf(queryType), ot = Integer.valueOf(orderType), dt = Integer.valueOf(dataType);
+			
+			if(dt == 0){
+				dt = QuerySaleDetails.QUERY_TODAY;
+				dateBeg = dateBeg != null && dateBeg.length() > 0 ? new SimpleDateFormat("yyyy-MM-dd ").format(new Date()) + dateBeg.trim() : "";
+				dateEnd = dateEnd != null && dateEnd.length() > 0 ? new SimpleDateFormat("yyyy-MM-dd ").format(new Date()) + dateEnd.trim() : "";
+			}else if(dt == 1){
+				dateBeg = dateBeg != null && dateBeg.length() > 0 ? dateBeg.trim() + " 00:00:00" : "";
+				dateEnd = dateEnd != null && dateEnd.length() > 0 ? dateEnd.trim() + " 23:59:59" : "";
+				dt = QuerySaleDetails.QUERY_HISTORY;
+			}else{
+				return null;
+			}
 			
 			if(qt == QuerySaleDetails.QUERY_BY_DEPT){
 				saleDetails = QuerySaleDetails.execByDept(dbCon, 
 	  					VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF), 
 	  					dateBeg, 
-	  					dataEnd,
-	  					QuerySaleDetails.QUERY_HISTORY);	
+	  					dateEnd,
+	  					dt);	
 				
 			}else if(qt == QuerySaleDetails.QUERY_BY_FOOD){
 				String[] splitDeptID = deptID.split(",");
@@ -103,10 +117,10 @@ public class SalesSubStatisticsAction extends Action {
 				saleDetails = QuerySaleDetails.execByFood(dbCon, 
 	  					VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF), 
 	  					dateBeg, 
-	  					dataEnd,
+	  					dateEnd,
 	  					did,
 	  					ot,
-	  					QuerySaleDetails.QUERY_HISTORY);
+	  					dt);
 			}
 					
 			
