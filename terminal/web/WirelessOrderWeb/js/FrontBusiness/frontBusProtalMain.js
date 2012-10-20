@@ -239,7 +239,7 @@ doDailySettle = function() {
 				Ext.getCmp('btnRiJieDaYin').handler();
 			} else {
 				Ext.MessageBox.show({
-					msg : resultJSON.msg,
+					msg : rootData[0].message,
 					width : 300,
 					buttons : Ext.MessageBox.OK
 				});
@@ -568,20 +568,11 @@ var dailySettleCheckTableWin = new Ext.Window({
 							},
 							success : function(response, options) {
 								var resultJSON = Ext.util.JSON.decode(response.responseText);
-								var rootData = resultJSON.root;
-								if (rootData[0].message == "normal") {
-									if (rootData[0].text == "NoUnShift") {
-										doDailySettle();
-									} else {
-										document.getElementById("unShiftBillWarnMsg").innerHTML = rootData[0].text;
-										unShiftBillWarnWin.show();
-									}
+								if (eval(resultJSON.success == true)) {
+									doDailySettle();
 								} else {
-									Ext.MessageBox.show({
-										msg : rootData[0].message,
-										width : 300,
-										buttons : Ext.MessageBox.OK
-									});
+									document.getElementById("unShiftBillWarnMsg").innerHTML = resultJSON.msg
+									unShiftBillWarnWin.show();
 								}
 							},
 							failure : function(response, options) {
