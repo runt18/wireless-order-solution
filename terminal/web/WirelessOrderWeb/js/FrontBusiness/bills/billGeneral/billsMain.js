@@ -612,6 +612,16 @@ var shiftStatBut = new Ext.ux.ImageButton({
 	}
 });
 
+var btnSalesSub = new Ext.ux.ImageButton({
+	imgPath : '../../images/HistorySalesSub.png',
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : '销售统计',
+	handler : function(btn) {
+		salesSub();
+	}
+});
+
 // var detailBillBut = new Ext.ux.ImageButton({
 // imgPath : "../../images/detailBill.png",
 // imgWidth : 50,
@@ -1437,148 +1447,102 @@ var billsColumnModel = new Ext.grid.ColumnModel([ new Ext.grid.RowNumberer(), {
 	renderer : billOpt
 } ]);
 
-Ext
-		.onReady(function() {
-			// 解决ext中文传入后台变问号问题
-			Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
-			Ext.QuickTips.init();
+Ext.onReady(function(){
+	// 解决ext中文传入后台变问号问题
+	Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
+	Ext.QuickTips.init();
 
-			// 3,表格
-			var billsGrid = new Ext.grid.GridPanel({
-				title : "帐单",
-				xtype : "grid",
-				anchor : "99%",
-				region : "center",
-				border : false,
-				ds : billsStore,
-				cm : billsColumnModel,
-				viewConfig : {
-					forceFit : true
-				},
-				sm : new Ext.grid.RowSelectionModel({
-					singleSelect : true
-				}),
-				listeners : {
-					rowclick : function(thiz, rowIndex, e) {
-						currRowIndex = rowIndex;
-					}
-				}
+	// 3,表格
+	var billsGrid = new Ext.grid.GridPanel({
+		title : "帐单",
+		xtype : "grid",
+		anchor : "99%",
+		region : "center",
+		border : false,
+		ds : billsStore,
+		cm : billsColumnModel,
+		viewConfig : {
+			forceFit : true
+		},
+		sm : new Ext.grid.RowSelectionModel({
+			singleSelect : true
+		}),
+		listeners : {
+			rowclick : function(thiz, rowIndex, e) {
+				currRowIndex = rowIndex;
+			}
+		}
+	});
+
+	// 为store配置load监听器(即load完后动作)
+	billsGrid.getStore().on('load', function(){
+		if (billsGrid.getStore().getTotalCount() != 0){
+			billsGrid.getStore().each(function(record){
+				// 反結帳顯示
+				record.set("isPaid", norCounPayCode2Descr(record.get("isPaid")));
+				record.commit();
 			});
+		}
+	});
+	
+	var billSum = new Ext.Panel({
+		region : "south",
+		frame : true,
+		border : false,
+		height : 40,
+		contentEl : "billSum"
+	});
+	
+	var centerPanel =new Ext.Panel({
+		region : "center",
+		layout : "fit",
+		frame : true,
+		items : [{
+			layout : "border",
+			title : "<div style='font-size:20px;'>帐单信息<div>",
+			items : [ billsQueryCondPanel, billsGrid, billSum ]
+		}],
+		tbar : new Ext.Toolbar({
+			height : 55,
+			items : [
+			    orderStatBut, 
+			    {xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
+			    kitchenStatBut, 
+				{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
+				deptStatBut,
+				{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
+				regionStatBut,
+				{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
+				shiftStatBut,
+				{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
+				btnSalesSub,
+				'->', 
+				pushBackBut, 
+				{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'}, 
+				logOutBut 
+			]
+		})
+	});
 
-			// 为store配置load监听器(即load完后动作)
-			billsGrid.getStore().on(
-					'load',
-					function() {
-						if (billsGrid.getStore().getTotalCount() != 0) {
-							billsGrid.getStore().each(
-									function(record) {
-										// 反結帳顯示
-										record.set("isPaid",
-												norCounPayCode2Descr(record
-														.get("isPaid")));
-
-										// 提交，去掉修改標記
-										record.commit();
-									});
-
-							// // 底色处理
-							// for ( var i = 0; i < billsGrid.getStore()
-							// .getCount(); i++) {
-							// var record = billsGrid.getStore()
-							// .getAt(i);
-							// if (record.get("isPaid") ==
-							// norCounPayCode2Descr(COUNTER_PAY)) {
-							// billsGrid.getView().getRow(i).style.backgroundColor
-							// = "#FFFF93";
-							// }
-							// }
-
-						}
-					});
-
-			// --------------------------------------------------------------------------
-
-			var billSum = new Ext.Panel({
-				region : "south",
-				frame : true,
-				border : false,
-				height : 40,
-				contentEl : "billSum"
-			});
-
-			var centerPanel = new Ext.Panel({
-				region : "center",
-				layout : "fit",
-				frame : true,
-				items : [ {
-					layout : "border",
-					title : "<div style='font-size:20px;'>帐单信息<div>",
-					items : [ billsQueryCondPanel, billsGrid, billSum ]
-				} ],
-				tbar : new Ext.Toolbar({
-					height : 55,
-					items : [ orderStatBut, {
-						text : "&nbsp;&nbsp;&nbsp;",
-						disabled : true
-					}, kitchenStatBut, {
-						text : "&nbsp;&nbsp;&nbsp;",
-						disabled : true
-					}, deptStatBut, {
-						text : "&nbsp;&nbsp;&nbsp;",
-						disabled : true
-					}, regionStatBut, {
-						text : "&nbsp;&nbsp;&nbsp;",
-						disabled : true
-					},
-					// discountStatBut, {
-					// text : "&nbsp;&nbsp;&nbsp;",
-					// disabled : true
-					// },
-					shiftStatBut, {
-						text : "&nbsp;&nbsp;&nbsp;",
-						disabled : true
-					}
-					// , detailBillBut, {
-					// text : "&nbsp;&nbsp;&nbsp;",
-					// disabled : true
-					// }, printBillImgBut
-					, "->", pushBackBut, {
-						text : "&nbsp;&nbsp;&nbsp;",
-						disabled : true
-					}, logOutBut ]
-				})
-			});
-
-			var viewport = new Ext.Viewport(
-					{
-						layout : "border",
-						id : "viewport",
-						items : [
-								{
-									region : "north",
-									bodyStyle : "background-color:#DFE8F6;",
-									html : "<h4 style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4><div id='optName' class='optName'></div>",
-									height : 50,
-									border : false,
-									margins : '0 0 0 0'
-								},
-								centerPanel,
-								{
-									region : "south",
-									height : 30,
-									layout : "form",
-									frame : true,
-									border : false,
-									html : "<div style='font-size:11pt; text-align:center;'><b>版权所有(c) 2011 智易科技</b></div>"
-								} ]
-					});
-
-			// -------------------- 浏览器大小改变 -------------------------------
-			// Ext.EventManager.onWindowResize(function() {
-			// // obj.style[attr]
-			// document.getElementById("wrap").style["height"] =
-			// (tableSelectCenterPanel
-			// .getInnerHeight() - 100)
-			// + "px";
-			// });
-		});
+	new Ext.Viewport({
+		layout : "border",
+		id : "viewport",
+		items : [{
+			region : "north",
+			bodyStyle : "background-color:#DFE8F6;",
+			html : "<h4 style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4><div id='optName' class='optName'></div>",
+			height : 50,
+			border : false,
+			margins : '0 0 0 0'
+		},
+		centerPanel,
+		{
+			region : "south",
+			height : 30,
+			layout : "form",
+			frame : true,
+			border : false,
+			html : "<div style='font-size:11pt; text-align:center;'><b>版权所有(c) 2011 智易科技</b></div>"
+		} ]
+	});
+});

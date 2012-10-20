@@ -29,7 +29,7 @@ salesSub = function(){
 	              ['毛利率','profitRate','','right','Ext.ux.txtFormat.gridDou']];
 	var url = '../../SalesSubStatistics.do?tiem='+new Date();
 	var readerData = ['item','income','discount','gifted','cost','costRate','profit','profitRate','salesAmount','avgPrice','avgCost'];
-	var baseParams = [['pin', pin], ['restaurantID', restaurantID], ['dataType', 1]];
+	var baseParams = [['pin', pin], ['restaurantID', restaurantID], ['dataType', 0]];
 	var pageSize = 15;
 	var id = 'salesSub_grid';
 	var title = '';
@@ -45,31 +45,31 @@ salesSub = function(){
 		{xtype:'tbtext',text:'&nbsp;&nbsp;'},	
 		{xtype:'tbtext',text:'日期:'},
 		{
-			xtype : 'datefield',		
-			format : 'Y-m-d',
+			xtype : 'timefield',		
+			format : 'H:i:s',
 			id : 'salesSubBegDate',
-//			value : new Date().getFirstDateOfMonth(),
+			value : '00:00:00',
 			width : 100,
 			readOnly : true,
+			increment : 60,
 			listeners : {
 				blur : function(){									
-//					Ext.ux.checkDateForBeginAndEnd(true, 'salesSubBegDate', 'salesSubEndDate');
-					salesSubSearchCheckDate(true, 'salesSubBegDate', 'salesSubEndDate');
+					
 				}
 			}
 		},
 		{xtype:'tbtext',text:'&nbsp;&nbsp;至&nbsp;&nbsp;'},	
 		{
-			xtype : 'datefield',
-			format : 'Y-m-d',
+			xtype : 'timefield',
+			format : 'G:i:s',
 			id : 'salesSubEndDate',
+			value : '23:00:00',
 			width : 100,
-//			value : new Date(),
 			readOnly : true,
+			increment : 60,
 			listeners : {
 				blur : function(){									
-//					Ext.ux.checkDateForBeginAndEnd(false, 'salesSubBegDate', 'salesSubEndDate');
-					salesSubSearchCheckDate(false, 'salesSubBegDate', 'salesSubEndDate');
+					
 				}
 			}
 		},
@@ -121,18 +121,8 @@ salesSub = function(){
 //				Ext.ux.checkDateForBeginAndEnd(true, 'salesSubBegDate', 'salesSubEndDate');
 //				Ext.ux.checkDateForBeginAndEnd(false, 'salesSubBegDate', 'salesSubEndDate');					
 				
-				var bd = Ext.getCmp('salesSubBegDate').getValue();
-				var ed = Ext.getCmp('salesSubEndDate').getValue();
-				if(bd == '' && ed == ''){
-					Ext.getCmp('salesSubEndDate').setValue(new Date());
-					salesSubSearchCheckDate(false, 'salesSubBegDate', 'salesSubEndDate');
-				}else if(bd != '' && ed == ''){
-					salesSubSearchCheckDate(true, 'salesSubBegDate', 'salesSubEndDate');
-				}else if(bd == '' && ed != ''){
-					salesSubSearchCheckDate(false, 'salesSubBegDate', 'salesSubEndDate');
-				}
-									
-				
+//				var bd = Ext.getCmp('salesSubBegDate').getValue();
+//				var ed = Ext.getCmp('salesSubEndDate').getValue();
 				var gs = salesSubGrid.getStore();
 				gs.baseParams['dateBeg'] = Ext.getCmp('salesSubBegDate').getRawValue();
 				gs.baseParams['dateEnd'] = Ext.getCmp('salesSubEndDate').getRawValue();

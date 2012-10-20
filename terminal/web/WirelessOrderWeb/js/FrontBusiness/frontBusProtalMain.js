@@ -571,7 +571,7 @@ var dailySettleCheckTableWin = new Ext.Window({
 								if (eval(resultJSON.success == true)) {
 									doDailySettle();
 								} else {
-									document.getElementById("unShiftBillWarnMsg").innerHTML = resultJSON.msg
+									document.getElementById("unShiftBillWarnMsg").innerHTML = resultJSON.msg;
 									unShiftBillWarnWin.show();
 								}
 							},
