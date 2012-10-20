@@ -49,41 +49,57 @@ public class QuerySaleDetails {
 	 * 			throws if any error occurred while execute any SQL statements.
 	 */
 	public static SalesDetail[] execByDept(DBCon dbCon, Terminal term, String onDuty, String offDuty, int queryType) throws SQLException{
-	
-		/**
-		 * Get the duty range between on and off duty date
-		 */
-		DutyRange dutyRange = QueryDutyRange.exec(dbCon, term, onDuty, offDuty);
-		
-		if(dutyRange == null){
-			return new SalesDetail[0];
-		}
 		
 		SingleOrderFood[] orderFoods = new SingleOrderFood[0];
-		/**
-		 * Get the single order food information
-		 */
+		MaterialDetail[] materialDetails = new MaterialDetail[0];
+
 		if(queryType == QUERY_HISTORY){
+			
+			/**
+			 * Get the duty range between on and off duty date
+			 */
+			DutyRange dutyRange = QueryDutyRange.exec(dbCon, term, onDuty, offDuty);
+			
+			if(dutyRange == null){
+				return new SalesDetail[0];
+			}
+			
+			/**
+			 * Get the single order food information to history.
+			 */
 			orderFoods = SingleOrderFoodReflector.getDetailHistory(dbCon, 
 								"AND B.restaurant_id=" + term.restaurantID + " " + 
 								"AND B.order_date BETWEEN '" + dutyRange.getOnDuty() + "' AND '" + dutyRange.getOffDuty() + "'", 
 								null);
+			
+			/**
+			 * Get the material detail information.
+			 */
+			materialDetails = MaterialDetailReflector.getMaterialDetail(dbCon, 
+								" AND MATE_DETAIL.restaurant_id=" + term.restaurantID + " " +
+								" AND MATE_DETAIL.type=" + MaterialDetail.TYPE_CONSUME +
+								" AND MATE_DETAIL.date BETWEEN '" + dutyRange.getOnDuty() + "' AND '" + dutyRange.getOffDuty() + "'", 
+								"");
+			
 		}else{
+			/**
+			 * Get the single order food information to today.
+			 */
 			orderFoods = SingleOrderFoodReflector.getDetailToday(dbCon, 
 								"AND B.restaurant_id=" + term.restaurantID + " " + 
-								"AND B.order_date BETWEEN '" + dutyRange.getOnDuty() + "' AND '" + dutyRange.getOffDuty() + "'", 
+								"AND B.order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "'", 
 								null);
+			/**
+			 * Get the material detail information.
+			 */
+			materialDetails = MaterialDetailReflector.getMaterialDetail(dbCon, 
+								" AND MATE_DETAIL.restaurant_id=" + term.restaurantID + " " +
+								" AND MATE_DETAIL.type=" + MaterialDetail.TYPE_CONSUME +
+								" AND MATE_DETAIL.date BETWEEN '" + onDuty + "' AND '" + offDuty + "'", 
+								"");
 		}
 		
-		/**
-		 * Get the material detail information
-		 */
-		MaterialDetail[] materialDetails = new MaterialDetail[0];
-		materialDetails = MaterialDetailReflector.getMaterialDetail(dbCon, 
-							" AND MATE_DETAIL.restaurant_id=" + term.restaurantID + " " +
-							" AND MATE_DETAIL.type=" + MaterialDetail.TYPE_CONSUME +
-							" AND MATE_DETAIL.date BETWEEN '" + dutyRange.getOnDuty() + "' AND '" + dutyRange.getOffDuty() + "'", 
-							"");
+
 		
 		/**
 		 * Get all the basic info to department 
@@ -204,14 +220,7 @@ public class QuerySaleDetails {
 	 */
 	public static SalesDetail[] execByFood(DBCon dbCon, Terminal term, String onDuty, String offDuty, int[] deptID, int orderType, int queryType) throws SQLException{
 		
-		/**
-		 * Get the duty range between on and off duty date
-		 */
-		DutyRange dutyRange = QueryDutyRange.exec(dbCon, term, onDuty, offDuty);
-		
-		if(dutyRange == null){
-			return new SalesDetail[0];
-		}
+
 		
 		String deptCond = "";
 		if(deptID.length != 0){
@@ -225,33 +234,49 @@ public class QuerySaleDetails {
 		}
 		
 		SingleOrderFood[] orderFoods = new SingleOrderFood[0];
-		/**
-		 * Get the single order food information
-		 */
+		MaterialDetail[] materialDetails = new MaterialDetail[0];
+
 		if(queryType == QUERY_HISTORY){
+			
+			/**
+			 * Get the duty range between on and off duty date
+			 */
+			DutyRange dutyRange = QueryDutyRange.exec(dbCon, term, onDuty, offDuty);
+			
+			if(dutyRange == null){
+				return new SalesDetail[0];
+			}
+			/**
+			 * Get the single order food information to history.
+			 */
 			orderFoods = SingleOrderFoodReflector.getDetailHistory(dbCon, 
 								" AND B.restaurant_id=" + term.restaurantID + " " + 
 								" AND B.order_date BETWEEN '" + dutyRange.getOnDuty() + "' AND '" + dutyRange.getOffDuty() + "'" +  
 								(deptID.length != 0 ? " AND A.dept_id IN(" + deptCond + ")" : ""),
 								null);
+			/**
+			 * Get the material detail information to history.
+			 */
+			materialDetails = MaterialDetailReflector.getMaterialDetail(dbCon, 
+								" AND MATE_DETAIL.restaurant_id=" + term.restaurantID + " " +
+								" AND MATE_DETAIL.type=" + MaterialDetail.TYPE_CONSUME +
+								" AND MATE_DETAIL.date BETWEEN '" + dutyRange.getOnDuty() + "' AND '" + dutyRange.getOffDuty() + "'" +
+								(deptID.length != 0 ? " AND MATE_DETAIL.dept_id IN(" + deptCond + ")" : ""),
+								"");
 		}else{
 			orderFoods = SingleOrderFoodReflector.getDetailToday(dbCon, 
 								" AND B.restaurant_id=" + term.restaurantID + " " + 
-								" AND B.order_date BETWEEN '" + dutyRange.getOnDuty() + "' AND '" + dutyRange.getOffDuty() + "'" +  
+								" AND B.order_date BETWEEN '" + onDuty + "' AND '" + offDuty + "'" +  
 								(deptID.length != 0 ? " AND A.dept_id IN(" + deptCond + ")" : ""),
-								null);			
+								null);	
+			
+			materialDetails = MaterialDetailReflector.getMaterialDetail(dbCon, 
+								" AND MATE_DETAIL.restaurant_id=" + term.restaurantID + " " +
+								" AND MATE_DETAIL.type=" + MaterialDetail.TYPE_CONSUME +
+								" AND MATE_DETAIL.date BETWEEN '" + onDuty + "' AND '" + offDuty + "'" +
+								(deptID.length != 0 ? " AND MATE_DETAIL.dept_id IN(" + deptCond + ")" : ""),
+								"");
 		}
-		
-		/**
-		 * Get the material detail information
-		 */
-		MaterialDetail[] materialDetails = new MaterialDetail[0];
-		materialDetails = MaterialDetailReflector.getMaterialDetail(dbCon, 
-							" AND MATE_DETAIL.restaurant_id=" + term.restaurantID + " " +
-							" AND MATE_DETAIL.type=" + MaterialDetail.TYPE_CONSUME +
-							" AND MATE_DETAIL.date BETWEEN '" + dutyRange.getOnDuty() + "' AND '" + dutyRange.getOffDuty() + "'" +
-							(deptID.length != 0 ? " AND MATE_DETAIL.dept_id IN(" + deptCond + ")" : ""),
-							"");
 		
 		String queryFoodExtraCond;
 		queryFoodExtraCond = " AND FOOD.restaurant_id=" + term.restaurantID +
