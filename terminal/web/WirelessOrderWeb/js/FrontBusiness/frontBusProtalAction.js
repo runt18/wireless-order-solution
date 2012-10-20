@@ -80,7 +80,8 @@
 			Ext.Ajax.request({
 				url : '../../QueryDailySettleByNow.do',
 				params : {
-					pin : pin
+					pin : pin,
+					queryType : 0
 				},
 				success : function(res, opt){
 					var jr = Ext.util.JSON.decode(res.responseText);
@@ -107,34 +108,33 @@
 
 	$("#dailySettle").each(function(){
 		$(this).bind("click", function(){
-//			if (!isPrompt) {
-				Ext.Ajax.request({
-					url : '../../QueryDailySettleByNow.do',
-					params : {
-						pin : pin
-					},
-					success : function(res, opt){
-//						alert(res.responseText);
-						var jr = Ext.util.JSON.decode(res.responseText);
-						if(jr.success){
-							shiftCheckDate = jr;
-							shiftCheckDate.otype = 1;
-							dailySettleCheckTableWin.show();
-						}else{
-							Ext.Msg.show({
-								title : '错误',
-								msg : '加载日结信息失败.'
-							});
-						}
-					},
-					failure : function(res, opt){
+			Ext.Ajax.request({
+				url : '../../QueryDailySettleByNow.do',
+				params : {
+					pin : pin,
+					queryType : 1
+				},
+				success : function(res, opt){
+//					alert(res.responseText);
+					var jr = Ext.util.JSON.decode(res.responseText);
+					if(jr.success){
+						shiftCheckDate = jr;
+						shiftCheckDate.otype = 1;
+						dailySettleCheckTableWin.show();
+					}else{
 						Ext.Msg.show({
 							title : '错误',
 							msg : '加载日结信息失败.'
 						});
 					}
-				});
-//			}
+				},
+				failure : function(res, opt){
+					Ext.Msg.show({
+						title : '错误',
+						msg : '加载日结信息失败.'
+					});
+				}
+			});
 		});
 	});
 };
