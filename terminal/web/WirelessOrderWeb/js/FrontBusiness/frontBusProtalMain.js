@@ -605,7 +605,9 @@ var dailySettleCheckTableWin = new Ext.Window({
 				url : "../../PrintOrder.do",
 				params : {
 					pin : currPin,
-					printDailySettle : 1
+					printDailySettle : 1,
+					onDuty : shiftCheckDate.onDuty,
+					offDuty : shiftCheckDate.offDuty
 				},
 				success : function(response, options) {
 //					Ext.MessageBox.show({
