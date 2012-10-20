@@ -516,7 +516,7 @@ var dailySettleCheckTableWin = new Ext.Window({
 			
 		}
 	}, {
-		text : '交班',
+		text : '打印',
 		id : 'btnJiaoBanDaYin',
 		handler : function(){
 			Ext.Ajax.request({
@@ -583,7 +583,7 @@ var dailySettleCheckTableWin = new Ext.Window({
 			});
 		}
 	}, {
-		text : '日结',
+		text : '打印',
 		id : 'btnRiJieDaYin',
 		handler : function(e){
 			Ext.Ajax.request({
