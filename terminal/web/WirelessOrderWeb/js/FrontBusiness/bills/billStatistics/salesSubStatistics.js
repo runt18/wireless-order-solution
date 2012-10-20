@@ -226,6 +226,14 @@ salesSub = function(){
             deptID : '-1'
 		}),
         listeners : {
+        	load : function(){
+        		var treeRoot = salesSubMuneTree.getRootNode().childNodes;
+        		for(var i = (treeRoot.length - 1); i >= 0; i--){
+					if(treeRoot[i].attributes.deptID == 253){
+						salesSubMuneTree.getRootNode().removeChild(treeRoot[i]);
+					}
+				}
+        	},
         	click : function(e){
         		if(e.attributes.deptID == '' || e.attributes.deptID == '-1'){
         			salesSubSetDisplay(false, e.text, 1, false, '菜品');
