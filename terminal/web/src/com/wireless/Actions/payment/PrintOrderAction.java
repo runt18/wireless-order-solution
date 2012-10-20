@@ -14,9 +14,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.Params;
 import com.wireless.db.QueryTable;
-import com.wireless.db.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.PinGen;
@@ -167,23 +165,7 @@ public class PrintOrderAction extends Action implements PinGen{
 			}
 			
 			param = request.getParameter("printDailySettle");
-			if(param != null && Byte.parseByte(param) == 1){
-				/**
-				 * Get the last daily settlement record to assign the on & off duty
-				 */
-				dbCon.connect();
-				String sql = " SELECT on_duty, off_duty FROM " + Params.dbName + ".daily_settle_history " +
-							 " WHERE id=(" +
-							 " SELECT MAX(id) FROM " + Params.dbName + ".daily_settle_history WHERE " +
-							 " restaurant_id=" + VerifyPin.exec(dbCon, _pin, Terminal.MODEL_STAFF).restaurantID + 
-							 ")";
-				dbCon.rs = dbCon.stmt.executeQuery(sql);
-				if(dbCon.rs.next()){
-					onDuty = dbCon.rs.getTimestamp("on_duty").getTime();
-					offDuty = dbCon.rs.getTimestamp("off_duty").getTime();
-				}
-				dbCon.rs.close();
-					
+			if(param != null && Byte.parseByte(param) == 1){			
 				conf |= Reserved.PRINT_DAILY_SETTLE_RECEIPT_2;
 			}else{
 				conf &= ~Reserved.PRINT_DAILY_SETTLE_RECEIPT_2;
