@@ -15,6 +15,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.shift.QueryShiftDao;
+import com.wireless.protocol.Terminal;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class QueryDailySettleByNowAction extends Action{
@@ -26,11 +27,21 @@ public class QueryDailySettleByNowAction extends Action{
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		HashMap resultMap = new HashMap();
-		
+		QueryShiftDao.Result res = null;
 		try{
 			String pin = request.getParameter("pin");
+			String queryType = request.getParameter("queryType");
 			
-			QueryShiftDao.Result res = QueryShiftDao.execDailySettleByNow(Long.valueOf(pin));
+			if(queryType == null)
+				return null;
+			
+			if(Integer.valueOf(queryType) == 0)
+				res = QueryShiftDao.execByNow(Long.valueOf(pin), Terminal.MODEL_STAFF);
+			else if(Integer.valueOf(queryType) == 1)
+				res = QueryShiftDao.execDailySettleByNow(Long.valueOf(pin));
+			
+			if(res == null)
+				return null;
 			
 			resultMap.put("onDuty", res.onDuty);
 			resultMap.put("offDuty", res.offDuty);
