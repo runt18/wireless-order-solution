@@ -234,13 +234,12 @@ doDailySettle = function() {
 		},
 		success : function(response, options) {
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
-			var rootData = resultJSON.root;
-			if (rootData[0].message == "normal") {
-				omsg = '日结成功';
+			if (eval(resultJSON.success == true)) {
+				omsg = resultJSON.msg;
 				Ext.getCmp('btnRiJieDaYin').handler();
 			} else {
 				Ext.MessageBox.show({
-					msg : rootData[0].message,
+					msg : resultJSON.msg,
 					width : 300,
 					buttons : Ext.MessageBox.OK
 				});
