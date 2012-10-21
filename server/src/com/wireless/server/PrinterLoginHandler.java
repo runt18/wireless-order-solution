@@ -16,7 +16,9 @@ import com.wireless.db.Params;
 import com.wireless.db.QueryMenu;
 import com.wireless.db.QueryRegion;
 import com.wireless.exception.BusinessException;
+import com.wireless.protocol.Department;
 import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Mode;
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqPing;
@@ -124,8 +126,8 @@ public class PrinterLoginHandler extends Handler implements Runnable{
 							
 							//respond with the related kitchen information
 							send(out, new RespPrintLogin(loginReq.header, 
-														  QueryMenu.queryDepartments(dbCon, "AND DEPT.restaurant_id=" + restaurantID, null),
-														  QueryMenu.queryKitchens(dbCon, "AND KITCHEN.restaurant_id=" + restaurantID, null),
+														  QueryMenu.queryDepartments(dbCon, "AND DEPT.restaurant_id=" + restaurantID + " AND DEPT.type=" + Department.TYPE_NORMAL, null),
+														  QueryMenu.queryKitchens(dbCon, "AND KITCHEN.restaurant_id=" + restaurantID + " AND KITCHEN.type=" + Kitchen.TYPE_NORMAL, null),
 														  QueryRegion.exec(dbCon, term),
 														  restaurantName));
 							
