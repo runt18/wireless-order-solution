@@ -18,6 +18,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.LinearLayout;
 import android.widget.TabHost;
 import android.widget.TextView;
@@ -225,12 +226,14 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 				mRecommendfoods.add(f);
 		}
 		
-		mImageFetcher.setImageSize(160, 160);
+		mImageFetcher.setImageSize(245, 160);
+		LayoutParams lp = new LayoutParams(245,160);
 
 		LinearLayout linearLyaout = (LinearLayout) findViewById(R.id.linearLayout_foodDetail);
 		for(Food f:mRecommendfoods)
 		{
 			ImageView image = new ImageView(this);
+			image.setLayoutParams(lp);
 			image.setScaleType(ScaleType.CENTER_CROP);
 			mImageFetcher.loadImage(f.image, image);
 			linearLyaout.addView(image);

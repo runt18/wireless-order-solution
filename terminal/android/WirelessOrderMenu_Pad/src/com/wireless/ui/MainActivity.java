@@ -111,27 +111,34 @@ public class MainActivity extends Activity
 				countTextView.setText("" + ++curNum);
 			}
 		});
-		
+		//数量减
 		((ImageButton) findViewById(R.id.imageView_minus_main)).setOnClickListener(new OnClickListener(){
 
 			@Override
 			public void onClick(View v) {
 				float curNum = Float.parseFloat(countTextView.getText().toString());
-				if(--curNum >= 0)
+				if(--curNum >= 1)
 				{
 					countTextView.setText("" + curNum);
 				}
 			}
 		});
+		//套餐
+		((ImageView) findViewById(R.id.imageView_combo_main)).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(MainActivity.this,ComboFoodActivity.class);
+				startActivity(intent);
+			}
+		});
 		
+		mOrderFood = new OrderFood(WirelessOrder.foods[0]);
+		mOrderFood.setCount(Float.parseFloat(((TextView) findViewById(R.id.textView_count_main)).getText().toString()));
 	}
 	
 	@Override
 	public void onStart(){
 		super.onStart();
-		//设置picture browser fragment的数据源
-		mPicBrowserFragment.notifyDataChanged(WirelessOrder.foods);
-		
 		//清空所有厨房和对应菜品首张图片位置的Map数据
 		mFoodPosByKitchenMap.clear();
 		
