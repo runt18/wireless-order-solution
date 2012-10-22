@@ -3,6 +3,7 @@ package com.wireless.parcel;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Util;
@@ -37,7 +38,12 @@ public class FoodParcel extends OrderFood implements Parcelable{
 				popTastes = food.popTastes;
 			}else{
 				popTastes = new Taste[0];
-			}			
+			}	
+			if(food.childFoods != null){
+				childFoods = food.childFoods;
+			}else{
+				childFoods = new Food[0];
+			}
 		}else{
 			mIsNull = true;
 		}
@@ -71,6 +77,13 @@ public class FoodParcel extends OrderFood implements Parcelable{
 		if(popTasteParcels != null){
 			popTastes = new Taste[popTasteParcels.length];
 			System.arraycopy(popTasteParcels, 0, popTastes, 0, popTasteParcels.length);
+		}
+		
+		//un-marshal the child foods
+		FoodParcel[] childFoodsParcel = in.createTypedArray(FoodParcel.CREATOR);
+		if(childFoodsParcel != null){
+			childFoods = new Food[childFoodsParcel.length];
+			System.arraycopy(childFoodsParcel, 0, childFoods, 0, childFoodsParcel.length);
 		}
 	}
 	
@@ -134,6 +147,17 @@ public class FoodParcel extends OrderFood implements Parcelable{
 				}
 				parcel.writeTypedArray(popTasteParcels, flags);
 				
+			}else{
+				parcel.writeTypedArray(null, flags);
+			}
+			
+			//marshal the child foods
+			if(childFoods != null){
+				FoodParcel[] childFoodsParcel = new FoodParcel[childFoods.length];
+				for(int i = 0; i < childFoodsParcel.length; i++){
+					childFoodsParcel[i] = new FoodParcel(new OrderFood(childFoods[i]));
+				}
+				parcel.writeTypedArray(childFoodsParcel, flags);
 			}else{
 				parcel.writeTypedArray(null, flags);
 			}
