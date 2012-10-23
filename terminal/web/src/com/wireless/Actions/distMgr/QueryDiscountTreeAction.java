@@ -41,9 +41,11 @@ public class QueryDiscountTreeAction extends Action{
 				tsb.append("{");
 				tsb.append("leaf:true");
 				tsb.append(",");
-				tsb.append("text:'" + discount[i].getName() + "'");
+				tsb.append("text:'" + discount[i].getName() + (discount[i].getStatus() == 1 ? "&nbsp;<font color=\"red\">(默认方案)</font>" : "") + "'" );
 				tsb.append(",");
 				tsb.append("discountID:" + discount[i].getId());
+				tsb.append(",");
+				tsb.append("discountName:'" + discount[i].getName() + "'");
 				tsb.append(",");
 				tsb.append("level:" + discount[i].getLevel());
 				tsb.append(",");
