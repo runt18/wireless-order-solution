@@ -393,7 +393,8 @@
 			type="com.wireless.Actions.distMgr.DeleteDiscountPlanAction" scope="request"></action>			
 		<action path="/QueryDailySettleByNow"
 			type="com.wireless.Actions.dailySettle.QueryDailySettleByNowAction" scope="request"></action>		
-			
+		<action path="/QueryDutyRangeByNow"
+			type="com.wireless.Actions.shift.QueryDutyRangeByNowAction" scope="request"></action>			
 	</action-mappings>
 	
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
