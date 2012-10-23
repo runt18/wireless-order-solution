@@ -23,6 +23,7 @@ import com.wireless.db.billStatistics.QuerySaleDetails;
 import com.wireless.pojo.billStatistics.SalesDetail;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.JObject;
+import com.wireless.util.WebParams;
 
 @SuppressWarnings({ "rawtypes" , "unchecked"})
 public class SalesSubStatisticsAction extends Action {
@@ -41,6 +42,7 @@ public class SalesSubStatisticsAction extends Action {
 		String start = request.getParameter("start");
 		Integer index = Integer.parseInt(start);
 		Integer pageSize = Integer.parseInt(limit);
+		JObject jobject = new JObject();
 		try{
 			dbCon.connect();
 			
@@ -88,8 +90,6 @@ public class SalesSubStatisticsAction extends Action {
 			
 			if(dt == 0){
 				dt = QuerySaleDetails.QUERY_TODAY;
-				dateBeg = dateBeg != null && dateBeg.length() > 0 ? new SimpleDateFormat("yyyy-MM-dd ").format(new Date()) + dateBeg.trim() : "";
-				dateEnd = dateEnd != null && dateEnd.length() > 0 ? new SimpleDateFormat("yyyy-MM-dd ").format(new Date()) + dateEnd.trim() : "";
 			}else if(dt == 1){
 				dateBeg = dateBeg != null && dateBeg.length() > 0 ? dateBeg.trim() + " 00:00:00" : "";
 				dateEnd = dateEnd != null && dateEnd.length() > 0 ? dateEnd.trim() + " 23:59:59" : "";
@@ -125,8 +125,8 @@ public class SalesSubStatisticsAction extends Action {
 					
 			
 		} catch(SQLException e){
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 数据库操作请求发生错误!");
 			e.printStackTrace();
-			
 		} finally{
 			dbCon.disconnect();
 			JSONObject json = null;
@@ -157,13 +157,10 @@ public class SalesSubStatisticsAction extends Action {
 				}
 				itemsList.add(sum);
 			}
-			JObject jobj = new JObject();
-			jobj.setTotalProperty(totalProperty);
-			jobj.setRoot(itemsList);
-			json = JSONObject.fromObject(jobj);
-//			json = JSONArray.fromObject(itemsList);
-//			System.out.println("{totalProperty:" + saleDetails.length + ", root:" + json.toString() + "}");			
-//			response.getWriter().print("{totalProperty:" + totalProperty + ", root:" + json.toString() + "}");
+			
+			jobject.setTotalProperty(totalProperty);
+			jobject.setRoot(itemsList);
+			json = JSONObject.fromObject(jobject);
 			response.getWriter().print(json.toString());
 		}
 		

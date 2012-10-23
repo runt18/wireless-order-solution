@@ -2,9 +2,12 @@ package com.wireless.db.billStatistics;
 
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.VerifyPin;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.protocol.Terminal;
 
@@ -70,6 +73,49 @@ public class QueryDutyRange {
 		}finally{
 			dbCon.rs.close();
 		}
+	}
+	
+	/**
+	 * 
+	 * @param restaurantID
+	 * @return
+	 * @throws Exception
+	 */
+	public static DutyRange[] getDutyRangeByNow(long pin) throws Exception{
+		DBCon dbCon = new DBCon();
+		List<DutyRange> list = new ArrayList<DutyRange>();
+		DutyRange item = null;
+		try{
+			dbCon.connect();
+			Terminal term = VerifyPin.exec(pin, Terminal.MODEL_STAFF);
+			String selectSQL = "SELECT name, DATE_FORMAT(on_duty,'%Y-%m-%d %T') AS on_duty, DATE_FORMAT(off_duty,'%Y-%m-%d %T') AS off_duty "
+							+ " FROM "
+							+ " ("
+							+ " (SELECT '全天' AS name, (SELECT IFNULL(MAX(off_duty), '1970-01-01 00:00:00') FROM " + Params.dbName + ".daily_settle_history WHERE restaurant_id = " + term.restaurantID + ") AS on_duty, NOW() AS off_duty) "
+							+ " UNION ALL"
+							+ " (SELECT name, on_duty, off_duty FROM " + Params.dbName + ".shift WHERE restaurant_id = " + term.restaurantID + " ORDER BY off_duty)"
+							+ " UNION ALL"
+							+ " (SELECT * FROM (SELECT '本班次' AS name, (SELECT off_duty FROM " + Params.dbName + ".shift WHERE restaurant_id = " + term.restaurantID + " ORDER BY off_duty DESC LIMIT 0,1) AS on_duty, NOW() AS off_duty) TT WHERE on_duty IS NOT NULL) "
+							+ " ) "
+							+ " T";
+			
+			dbCon.rs = dbCon.stmt.executeQuery(selectSQL);
+			
+			while(dbCon.rs != null && dbCon.rs.next()){
+				item = new DutyRange();
+				item.setName(dbCon.rs.getString("name"));
+				item.setOnDuty(dbCon.rs.getString("on_duty"));
+				item.setOffDuty(dbCon.rs.getString("off_duty"));
+				
+				list.add(item);
+				item = null;
+			}
+		}catch(Exception e){
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+		return list.toArray(new DutyRange[list.size()]);
 	}
 	
 }

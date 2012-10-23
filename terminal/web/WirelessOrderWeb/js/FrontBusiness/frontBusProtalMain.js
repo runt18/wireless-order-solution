@@ -530,8 +530,9 @@ var dailySettleCheckTableWin = new Ext.Window({
 				success : function(response, options) {
 					var resultJSON = Ext.util.JSON.decode(response.responseText);
 					Ext.example.msg('提示', (resultJSON.data + (omsg.length > 0 ? ('<br/>'+omsg) : '')));
+					if(omsg.length > 0)
+						dailySettleCheckTableWin.hide();
 					omsg = '';
-					dailySettleCheckTableWin.hide();
 				},
 				failure : function(response, options) {
 					var resultJSON = Ext.util.JSON.decode(response.responseText);
@@ -595,9 +596,11 @@ var dailySettleCheckTableWin = new Ext.Window({
 					offDuty : shiftCheckDate.offDuty
 				},
 				success : function(response, options) {
-					Ext.example.msg('提示', ('日结信息打印成功.' + (omsg.length > 0 ? ('<br/>'+omsg) : '')));
+					var jr = Ext.util.JSON.decode(response.responseText);
+					Ext.example.msg('提示', (jr.data + (omsg.length > 0 ? ('<br/>'+omsg) : '')));
+					if(omsg.length > 0)
+						dailySettleCheckTableWin.hide();
 					omsg = '';
-					dailySettleCheckTableWin.hide();
 				},
 				failure : function(response, options) {
 					var resultJSON = Ext.util.JSON.decode(response.responseText);

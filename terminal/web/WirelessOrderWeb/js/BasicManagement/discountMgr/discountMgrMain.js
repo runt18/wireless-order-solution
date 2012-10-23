@@ -76,7 +76,7 @@ programOperationHandler = function(c){
 			return;
 		}
 		id.setValue(sn.attributes.discountID); 
-		name.setValue(sn.text); 
+		name.setValue(sn.attributes.discountName); 
 		level.setValue(sn.attributes.level); 
 		isAuto.setValue(true);
 		isDefault.setValue(eval(sn.attributes.isDefault));
@@ -104,7 +104,7 @@ disocuntOperationHandler = function(c){
 		for(var i = 0; i < trn.length; i++){
 			comboData.root.push({
 				discountID : trn[i].attributes.discountID,
-				discountName : trn[i].text
+				discountName : trn[i].attributes.discountName
 			});
 		}
 		programData = comboData;
@@ -336,7 +336,7 @@ Ext.onReady(function(){
 			},
 			click : function(e){
 				if(e.attributes.discountID != -1)
-					Ext.getDom('discountNameShowType').innerHTML = e.text;
+					Ext.getDom('discountNameShowType').innerHTML = e.attributes.discountName;
 			},
 			dblclick : function(e){
 				if(e.attributes.discountID != -1)
