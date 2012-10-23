@@ -187,12 +187,7 @@ public class InsertOrder {
 								orderToInsert.foods[i].tastes[j] = detailTaste[0];
 							}
 						}
-					}
-					
-					//set the taste preference
-					//orderToInsert.foods[i].setNormalTastePref(com.wireless.protocol.Util.genTastePref(orderToInsert.foods[i].tastes));
-					//set the total taste price
-					//orderToInsert.foods[i].setTasteNormalPrice(com.wireless.protocol.Util.genTastePrice(orderToInsert.foods[i].tastes, orderToInsert.foods[i].getPrice()));
+					}					
 				}					
 			}
 			
@@ -225,7 +220,7 @@ public class InsertOrder {
 				sql = "INSERT INTO `" + Params.dbName + "`.`order` (" +
 						"`id`, `restaurant_id`, `category`, `region_id`, `region_name`, " +
 						"`table_id`, `table_alias`, `table_name`, `table2_id`, `table2_alias`, `table2_name`, " +
-						"`terminal_model`, `terminal_pin`, `order_date`, `custom_num`, `waiter`) VALUES (" +
+						"`terminal_model`, `terminal_pin`, `birth_date`, `order_date`, `custom_num`, `waiter`) VALUES (" +
 						"NULL, " + 
 						orderToInsert.destTbl.restaurantID + ", " + 
 						orderToInsert.category + ", " +
@@ -238,8 +233,9 @@ public class InsertOrder {
 						(orderToInsert.category == Order.CATE_MERGER_TABLE ? orderToInsert.destTbl2.aliasID : "NULL") + ", " +
 						(orderToInsert.category == Order.CATE_MERGER_TABLE ? "'" + orderToInsert.destTbl2.name + "'" : "NULL") + ", " +
 						term.modelID + ", " + 
-						term.pin + 
-						", NOW(), " + 
+						term.pin + ", " +
+						" NOW() " + ", " + 
+						" NOW() " + ", " +
 						orderToInsert.customNum + ", '" + 
 						term.owner + "')";
 				dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
