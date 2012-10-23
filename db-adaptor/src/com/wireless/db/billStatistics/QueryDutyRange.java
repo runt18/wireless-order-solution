@@ -91,13 +91,11 @@ public class QueryDutyRange {
 			String selectSQL = "SELECT name, DATE_FORMAT(on_duty,'%Y-%m-%d %T') AS on_duty, DATE_FORMAT(off_duty,'%Y-%m-%d %T') AS off_duty "
 							+ " FROM "
 							+ " ("
-							+ " SELECT '全天' AS name, (SELECT MAX(off_duty) FROM " + Params.dbName + ".daily_settle_history WHERE restaurant_id = " + term.restaurantID + ") AS on_duty, NOW() AS off_duty "
-							+ " UNION ALL"
-							+ " (SELECT name, on_duty, off_duty FROM " + Params.dbName + ".shift_history WHERE restaurant_id = " + term.restaurantID + " ORDER BY off_duty DESC LIMIT 0,1)"
+							+ " (SELECT '全天' AS name, (SELECT MAX(off_duty) FROM " + Params.dbName + ".daily_settle_history WHERE restaurant_id = " + term.restaurantID + ") AS on_duty, NOW() AS off_duty) "
 							+ " UNION ALL"
 							+ " (SELECT name, on_duty, off_duty FROM " + Params.dbName + ".shift WHERE restaurant_id = " + term.restaurantID + " ORDER BY off_duty)"
 							+ " UNION ALL"
-							+ " SELECT '本班次' AS name, (SELECT off_duty FROM " + Params.dbName + ".shift WHERE restaurant_id = " + term.restaurantID + " ORDER BY off_duty DESC LIMIT 0,1) AS on_duty, NOW() AS off_duty "
+							+ " (SELECT * FROM (SELECT '本班次' AS name, (SELECT off_duty FROM " + Params.dbName + ".shift WHERE restaurant_id = " + term.restaurantID + " ORDER BY off_duty DESC LIMIT 0,1) AS on_duty, NOW() AS off_duty) TT WHERE on_duty IS NOT NULL) "
 							+ " ) "
 							+ " T";
 			
