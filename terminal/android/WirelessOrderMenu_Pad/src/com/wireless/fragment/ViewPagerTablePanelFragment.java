@@ -34,7 +34,7 @@ import com.wireless.protocol.Region;
 import com.wireless.protocol.Table;
 
 public class ViewPagerTablePanelFragment extends Fragment {
-
+	public static final String TAG = "ViewPagerTablePanelFragment";
 	private DataRefreshHandler mTableRefreshHandler;
 	private RegionRefreshHandler mRegionRefreshHandler;
     private ViewPager mPager;
@@ -330,7 +330,7 @@ public class ViewPagerTablePanelFragment extends Fragment {
 
 		@Override
 		public Fragment getItem(int arg0) {
-			return TableItemFragment.newInstance(mTables, ViewPagerTablePanelFragment.this.getId());
+			return TableItemFragment.newInstance(mTables, TAG);
 		}
 
 		@Override

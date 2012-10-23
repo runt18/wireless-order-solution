@@ -30,14 +30,23 @@
             android:text="刷新" />
     </RelativeLayout>
 
-    <com.wireless.util.ScrollLayout
+    <!-- <com.wireless.util.ScrollLayout
         android:id="@+id/tableFlipper"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/page_point"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/topbar" >
-    </com.wireless.util.ScrollLayout>
+    </com.wireless.util.ScrollLayout> -->
+
+    <ViewFlipper
+        android:id="@+id/viewFlipper_dialogTab1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/page_point"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/topbar" >
+    </ViewFlipper>
 
     <LinearLayout
         android:id="@+id/page_point"

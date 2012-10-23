@@ -192,9 +192,9 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 		mTabHost = (TabHost) dialogLayout.findViewById(R.id.tabhost);
 		mTabHost.setup();
 		
-//		mTabHost.addTab(mTabHost.newTabSpec(TAB_PICK_TBL).setIndicator("餐台设置").setContent(R.id.tab1));
+		mTabHost.addTab(mTabHost.newTabSpec(TAB_PICK_TBL).setIndicator("餐台设置").setContent(R.id.tab1));
 		mTabHost.addTab(mTabHost.newTabSpec(TAB_PICK_STAFF).setIndicator("服务员设置").setContent(R.id.tab2));
-		mTabHost.addTab(mTabHost.newTabSpec("TAB_PICK_TBL2").setIndicator("餐台设置").setContent(R.id.tab3));
+//		mTabHost.addTab(mTabHost.newTabSpec("TAB_PICK_TBL2").setIndicator("餐台设置").setContent(R.id.tab3));
 		
 		mDialog = new Dialog(activity);
 		mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -219,9 +219,10 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 			}
 		});
 		
-//		((TablePanelFragment)getFragmentManager().findFragmentById(R.id.tab1)).setOnTableChangedListener(this);
+		((TablePanelFragment)getFragmentManager().findFragmentById(R.id.tab1)).setOnTableChangedListener(this);
 		((StaffPanelFragment)getFragmentManager().findFragmentById(R.id.tab2)).setOnServerChangeListener(this);
 	}
+	
 	
 	/**
 	 * 餐台设置时的回调，根据餐台的状态来判断是否请求订单

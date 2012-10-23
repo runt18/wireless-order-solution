@@ -22,7 +22,7 @@ import com.wireless.protocol.Table;
 public class TableItemFragment extends Fragment{
     private static final String KEY_PARENT_RES_ID = "table_resource_id";
 
-    public static TableItemFragment newInstance(List<Table> rowTables, int parentResId) {
+    public static TableItemFragment newInstance(List<Table> rowTables, String tag) {
         final TableItemFragment f = new TableItemFragment();
 
         final Bundle args = new Bundle();
@@ -33,7 +33,7 @@ public class TableItemFragment extends Fragment{
         }
         
         args.putParcelableArrayList(TableParcel.KEY_VALUE, tables);
-        args.putInt(KEY_PARENT_RES_ID, parentResId);
+        args.putString(KEY_PARENT_RES_ID, tag);
         f.setArguments(args);
 
         return f;
@@ -52,19 +52,20 @@ public class TableItemFragment extends Fragment{
 		super.onActivityCreated(savedInstanceState);
 		Bundle args = this.getArguments();
 		
-		int parentResId = 0;
+		String tag = "";
 		ArrayList<TableParcel> tables = new ArrayList<TableParcel>();
 		if(args != null)
 		{
 			tables = args.getParcelableArrayList(TableParcel.KEY_VALUE);
-			parentResId = args.getInt(KEY_PARENT_RES_ID);
+			tag = args.getString(KEY_PARENT_RES_ID);
 		}
 		
 		GridView gridView = (GridView) this.getView();
 		TableAdapter adapter = new TableAdapter(tables);
 		gridView.setAdapter(adapter);
 		
-        final ViewPagerTablePanelFragment parentFragment = (ViewPagerTablePanelFragment)getActivity().getFragmentManager().findFragmentById(parentResId);
+        final ViewPagerTablePanelFragment parentFragment = 
+        		(ViewPagerTablePanelFragment)getActivity().getFragmentManager().findFragmentByTag(tag);
         
         if(parentFragment != null)
 			gridView.setOnItemClickListener(new OnItemClickListener(){

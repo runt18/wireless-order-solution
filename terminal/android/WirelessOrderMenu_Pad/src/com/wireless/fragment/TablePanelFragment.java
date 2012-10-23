@@ -16,11 +16,16 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.GestureDetector;
+import android.view.GestureDetector.OnGestureListener;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AutoCompleteTextView;
@@ -33,18 +38,16 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ViewFlipper;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
 import com.wireless.protocol.Region;
 import com.wireless.protocol.Table;
-import com.wireless.util.ScrollLayout;
-import com.wireless.util.ScrollLayout.OnViewChangedListner;
 
-public class TablePanelFragment extends Fragment {
+public class TablePanelFragment extends Fragment implements OnGestureListener {
 	// 每页要显示餐台数量
 	private static final int TABLE_AMOUNT_PER_PAGE = 18;
-	private ScrollLayout mTblScrolledArea;
 	private List<Table> mTables = new ArrayList<Table>();
 	
 	private int mTableCond = FILTER_TABLE_ALL;			//the current table filter condition
@@ -63,6 +66,12 @@ public class TablePanelFragment extends Fragment {
 	private RegionRefreshHandler mRegionRefreshHandler;
 	
 	private OnTableChangedListener mOnTableChangedListener;
+	
+	private ViewFlipper mFlipper;
+	private GestureDetector mGDetector;
+	private int CURRENT_VIEW_ID = 0;
+	private int mPageSize = 0;
+
 	
 	public void setOnTableChangedListener(OnTableChangedListener l){
 		mOnTableChangedListener = l;
@@ -101,14 +110,8 @@ public class TablePanelFragment extends Fragment {
 			}
 		});
 		
-		// 显示餐台的scroll view group
-		mTblScrolledArea = (ScrollLayout) view.findViewById(R.id.tableFlipper);
-		mTblScrolledArea.setOnViewChangedListener(new OnViewChangedListner() {
-					@Override
-					public void onViewChanged(int curScreen, View parent,View curView) {
-						reflashPageIndictor(view);
-					}
-				});
+		mGDetector = new GestureDetector(this);
+		mFlipper = (ViewFlipper) view.findViewById(R.id.viewFlipper_dialogTab1);
 		
 		/*
 		 * “清空”按钮
@@ -156,6 +159,9 @@ public class TablePanelFragment extends Fragment {
 			}
 		});
 
+		mRegionRefreshHandler.sendEmptyMessage(0);
+		mTableRefreshHandler.sendEmptyMessage(0);
+		
 		return view;
 	}
 	
@@ -234,6 +240,7 @@ public class TablePanelFragment extends Fragment {
 		public void handleMessage(Message msg)
 		{
 			TablePanelFragment fragment = mFragment.get();
+			fragment.CURRENT_VIEW_ID = 0;
 			mFilterTable.clear();
 			mFilterTable.addAll(Arrays.asList(WirelessOrder.tables));
 			Iterator<Table> iter = mFilterTable.iterator();
@@ -288,34 +295,30 @@ public class TablePanelFragment extends Fragment {
 			}
 			fragment.mTables = mFilterTable;
 			// 加载餐台信息
-			fragment.reflashTableArea(fragment.getView());
+			fragment.reflashTableArea();
 		}
 	}
 	
 	/**
 	 * 根据传入的餐台信息，刷新餐台区域
 	 */
-	private void reflashTableArea(View view) {
+	private void reflashTableArea() {
 		int size = mTables.size();
 		// 计算屏幕的页数
-		int pageSize = (size / TABLE_AMOUNT_PER_PAGE)
+		mPageSize  = (size / TABLE_AMOUNT_PER_PAGE)
 				+ (size	% TABLE_AMOUNT_PER_PAGE == 0 ? 0 : 1);
 
-		// 清空所有Grid View
-		mTblScrolledArea.removeAllViews();
-		mTblScrolledArea.page = 0;
-		mTblScrolledArea.mCurScreen = 0;
-		mTblScrolledArea.mDefaultScreen = 0;
-
-		for (int pageNo = 0; pageNo < pageSize; pageNo++) {
+//		// 清空所有Grid View
+		mFlipper.removeAllViews();
+		
+		LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+				LinearLayout.LayoutParams.MATCH_PARENT,
+				LinearLayout.LayoutParams.MATCH_PARENT);
+		
+		for (int pageNo = 0; pageNo < mPageSize; pageNo++) {
 			// 每页餐台的Grid View
 			GridView grid = new GridView(this.getActivity());
 
-			grid.setSelected(true);
-
-			LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-					LinearLayout.LayoutParams.MATCH_PARENT,
-					LinearLayout.LayoutParams.MATCH_PARENT);
 			lp.gravity = Gravity.CENTER;
 			grid.setLayoutParams(lp);
 			// 设置显示的列数
@@ -336,6 +339,13 @@ public class TablePanelFragment extends Fragment {
 			}
 			// 设置Grid的Adapter
 			grid.setAdapter(new TableAdapter(tables4Page));
+			
+			grid.setOnTouchListener(new OnTouchListener(){
+				@Override
+				public boolean onTouch(View v, MotionEvent event) {
+					return mGDetector.onTouchEvent(event);
+				}
+			});
 			
 			grid.setOnItemClickListener(new OnItemClickListener(){
 
@@ -359,41 +369,38 @@ public class TablePanelFragment extends Fragment {
 			});
 
 			// 添加Grid
-			mTblScrolledArea.addView(grid);
-
+			mFlipper.addView(grid);
 		}
 
-		LinearLayout pageIndicator = (LinearLayout) view.findViewById(R.id.page_point);
+		LinearLayout pageIndicator = (LinearLayout) getView().findViewById(R.id.page_point);
 		pageIndicator.removeAllViews();
 		// 初始化页码指示器的每一项
-		for (int i = 0; i < pageSize; i++) {
+		for (int i = 0; i < mPageSize; i++) {
 			ImageView point = new ImageView(this.getActivity());
 			point.setImageResource(R.drawable.page_point);
-			LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-					LinearLayout.LayoutParams.WRAP_CONTENT,
-					LinearLayout.LayoutParams.WRAP_CONTENT);
+			lp.width =  LinearLayout.LayoutParams.WRAP_CONTENT;
+			lp.width = LinearLayout.LayoutParams.WRAP_CONTENT;
 			lp.setMargins(0, 0, 25, 0);
 			point.setLayoutParams(lp);
 			pageIndicator.addView(point);
 		}
 		 //刷新页码指示器
-		reflashPageIndictor(view);
+		refreshPageIndicator();
 	}
 	
 	/**
 	 * 刷新页码指示器
 	 */
-	private void reflashPageIndictor(View view) {
-		LinearLayout pageIndicator = (LinearLayout) view.findViewById(R.id.page_point);
-		if (mTblScrolledArea.getChildCount() > 0) {
+	private void refreshPageIndicator() {
+		LinearLayout pageIndicator = (LinearLayout) getView().findViewById(R.id.page_point);
+		if (mFlipper.getChildCount() > 0) {
 			pageIndicator.setVisibility(View.VISIBLE);
 			for (int i = 0; i < pageIndicator.getChildCount(); i++) {
 				((ImageView) pageIndicator.getChildAt(i))
 						.setImageResource(R.drawable.page_point);
 			}
 			// highlight the active page point
-			((ImageView) pageIndicator.getChildAt(mTblScrolledArea
-					.getCurScreen())).setImageResource(R.drawable.page_point_on);
+			((ImageView) pageIndicator.getChildAt(CURRENT_VIEW_ID)).setImageResource(R.drawable.page_point_on);
 
 		} else {
 			pageIndicator.setVisibility(View.GONE);
@@ -544,6 +551,55 @@ public class TablePanelFragment extends Fragment {
 		
 		abstract void OnQueryTblStatus(byte status);
 		
+	}
+
+	@Override
+	public boolean onDown(MotionEvent e) {
+		return false;
+	}
+
+	@Override
+	public void onShowPress(MotionEvent e) {
+	}
+
+	@Override
+	public boolean onSingleTapUp(MotionEvent e) {
+		return false;
+	}
+
+	@Override
+	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+		return false;
+	}
+
+	@Override
+	public void onLongPress(MotionEvent e) {
+	}
+
+	@Override
+	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+			float velocityY) {
+		//fly 60px will start scroll
+		if (e1.getX() - e2.getX() > 60) {
+			this.mFlipper.setInAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.push_left_in));
+			this.mFlipper.setOutAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.push_left_out));
+			this.mFlipper.showNext();
+			//refresh indicator
+			if(++CURRENT_VIEW_ID == mPageSize)
+				CURRENT_VIEW_ID = 0;
+			refreshPageIndicator();
+			return true;
+		} else if (e1.getX() - e2.getX() < -60) {
+			this.mFlipper.setInAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.push_right_in));
+			this.mFlipper.setOutAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.push_right_out));
+			this.mFlipper.showPrevious();
+			//refresh indicator
+			if(--CURRENT_VIEW_ID < 0)
+				CURRENT_VIEW_ID = mPageSize - 1;
+			refreshPageIndicator();
+			return true;
+		}		
+		return false;
 	}	
 
 }
