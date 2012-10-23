@@ -3,8 +3,9 @@ package com.wireless.pojo.billStatistics;
 
 public class DutyRange {
 	
-	private String onDuty;		//开始时间
-	private String offDuty;		//结束时间
+	private String onDuty;		// 开始时间
+	private String offDuty;		// 结束时间
+	private String name;		// 操作人
 	
 	public DutyRange(){
 		
@@ -27,6 +28,12 @@ public class DutyRange {
 	}
 	public void setOffDuty(String offDuty) {
 		this.offDuty = offDuty;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
 	}
 
 }
