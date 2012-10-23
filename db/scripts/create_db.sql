@@ -243,30 +243,18 @@ COMMENT = 'describe the kitchen information' ;
 
 
 -- -----------------------------------------------------
--- Table `wireless_order_db`.`member`
+-- Table `wireless_order_db`.`member_type`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `wireless_order_db`.`member` ;
+DROP TABLE IF EXISTS `wireless_order_db`.`member_type` ;
 
-CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member` (
-  `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this memeber' ,
-  `restaurant_id` INT UNSIGNED NOT NULL ,
-  `alias_id` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the alias id to this member, it could be any useful value determined by user' ,
-  `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to this member' ,
-  `tele` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the telephone to this member' ,
-  `birth` DATE NULL DEFAULT NULL COMMENT 'the birthday to this member' ,
-  `balance` DECIMAL(10,2) NOT NULL DEFAULT 0 COMMENT 'the balance to this member' ,
-  `discount_type` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the discount type to this member, it\'s one of the values below.\n0 - using 1st member discount\n1 - using 2nd member discount' ,
-  `exchange_rate` DECIMAL(5,2) NOT NULL DEFAULT 0 COMMENT 'the rate between the balance and the amount of order' ,
-  PRIMARY KEY (`id`) ,
-  INDEX `fk_member_restaurant1` (`restaurant_id` ASC) ,
-  CONSTRAINT `fk_member_restaurant1`
-    FOREIGN KEY (`restaurant_id` )
-    REFERENCES `wireless_order_db`.`restaurant` (`id` )
-    ON DELETE RESTRICT
-    ON UPDATE RESTRICT)
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_type` (
+  `member_type_id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to member type' ,
+  `discount_id` INT UNSIGNED NOT NULL COMMENT 'the discount id this member type uses' ,
+  `name` VARCHAR(45) NOT NULL COMMENT 'the name to this member type' ,
+  PRIMARY KEY (`member_type_id`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
-COMMENT = 'describe the member information' ;
+COMMENT = 'describe the member type information' ;
 
 
 -- -----------------------------------------------------
@@ -354,28 +342,6 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food_material` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the releation ship between food and material' ;
-
-
--- -----------------------------------------------------
--- Table `wireless_order_db`.`member_charge`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `wireless_order_db`.`member_charge` ;
-
-CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_charge` (
-  `id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this record' ,
-  `member_id` INT NOT NULL ,
-  `date` DATETIME NOT NULL DEFAULT 19000101 COMMENT 'the date to recharge' ,
-  `money` DECIMAL(10,2) NOT NULL DEFAULT 0 COMMENT 'the money to recharge' ,
-  PRIMARY KEY (`id`) ,
-  INDEX `fk_member_charge_member1` (`member_id` ASC) ,
-  CONSTRAINT `fk_member_charge_member1`
-    FOREIGN KEY (`member_id` )
-    REFERENCES `wireless_order_db`.`member` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8, 
-COMMENT = 'describe the member charge records ' ;
 
 
 -- -----------------------------------------------------
@@ -766,6 +732,100 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`discount_plan` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the plan to each discount' ;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`client`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`client` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`client` (
+  `client_id` INT NOT NULL AUTO_INCREMENT COMMENT 'thie id to this client' ,
+  `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'the restaurant id to this client' ,
+  `client_type_id` INT NOT NULL COMMENT 'the type this client belongs to' ,
+  `name` VARCHAR(45) NOT NULL COMMENT 'the name to this client' ,
+  `sex` TINYINT NOT NULL DEFAULT 0 COMMENT 'the sex to this client' ,
+  `tele` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the telephone to this client' ,
+  `mobile` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the mobile to this client' ,
+  `birthday` DATE NULL DEFAULT NULL COMMENT 'the birthday to this client' ,
+  `id_card` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the id card to this client' ,
+  `company` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the company to this client' ,
+  `taste_pref` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the taste preference to client' ,
+  `taboo` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the taboo to client' ,
+  `contact_addr` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the contact address to client' ,
+  `comment` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the comment to client' ,
+  `level` TINYINT NULL DEFAULT 0 COMMENT 'the status to client.\n0 - normal\n1 - reserved' ,
+  PRIMARY KEY (`client_id`) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) ,
+  INDEX `ix_client_type_id` (`client_type_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the client' ;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`client_type`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`client_type` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`client_type` (
+  `client_type_id` INT NOT NULL ,
+  `name` VARCHAR(45) NULL ,
+  PRIMARY KEY (`client_type_id`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the clent type' ;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`member_card`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`member_card` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_card` (
+  `member_card_id` INT NOT NULL AUTO_INCREMENT ,
+  `restaurant_id` INT UNSIGNED NOT NULL ,
+  `member_card_alias` VARCHAR(45) NULL DEFAULT NULL ,
+  PRIMARY KEY (`member_card_id`) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the member card' ;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`member_card_ownership`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`member_card_ownership` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_card_ownership` (
+  `member_id` INT NOT NULL COMMENT 'the id to member' ,
+  `member_card_id` INT NOT NULL COMMENT 'the id to member card' ,
+  PRIMARY KEY (`member_id`, `member_card_id`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe which member card belongs to which member' ;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`member`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`member` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member` (
+  `member_id` INT NOT NULL COMMENT 'the id to this member' ,
+  `restaurant_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the restaurant id to this member' ,
+  `client_id` INT NOT NULL COMMENT 'the client id to this member' ,
+  `member_type_id` INT NOT NULL COMMENT 'the type this member belongs to' ,
+  `balance` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the balance to this member' ,
+  `point` INT NOT NULL DEFAULT 0 COMMENT 'the remaining point to this member' ,
+  PRIMARY KEY (`member_id`) ,
+  INDEX `ix_client_id` (`client_id` ASC) ,
+  INDEX `ix_member_type_id` (`member_type_id` ASC) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the member' ;
 
 
 
