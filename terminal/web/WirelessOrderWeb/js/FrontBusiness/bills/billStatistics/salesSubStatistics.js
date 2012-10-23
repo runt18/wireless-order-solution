@@ -37,7 +37,7 @@ salesSub = function(){
 		{
  	    	xtype : 'combo',
  	    	id : 'comboDuty',
- 	    	width : 370,
+ 	    	width : 330,
  	    	store : new Ext.data.JsonStore({
  	    		root : 'root',
 				fields : [ 'duty', 'displayMsg' ]
@@ -50,7 +50,8 @@ salesSub = function(){
 			selectOnFocus : true,
 			forceSelection : true,
 			allowBlank : false,
-			readOnly : true
+			readOnly : true,
+			selectOnFocus : true
  	    },
 		{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;&nbsp;'},
 		{
@@ -282,7 +283,7 @@ salesSub = function(){
 							for(var i = 0; i < jr.root.length; i++){
 								bd.root.push({
 									duty : jr.root[i].onDuty + salesSubSplitSymbol + jr.root[i].offDuty,
-									displayMsg : (jr.root[i].onDuty + ' -- ' + jr.root[i].offDuty + '  交班人:' + jr.root[i].name)
+									displayMsg : (jr.root[i].onDuty + ' -- ' + jr.root[i].offDuty + ' (' + jr.root[i].name + ')')
 								});
 							}
 							Ext.getCmp('comboDuty').store.loadData(bd);
