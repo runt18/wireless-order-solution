@@ -1,26 +1,16 @@
-Ext.BLANK_IMAGE_URL = "../../js/extjs/resources/images/default/s.gif";
-
 //var salesSubGrid = null;
 //var salesSubMune = null;
 //var salesSubWin = null;
 var salesSubQueryType = 0;
 var salesSubOrderType = 0;
 var salesSubDeptId = -1;
+var salesSubSplitSymbol = '|||';
 
 salesSubPanelnit = function(){
 	
-	if(!salesSubGrid){	
-		
-	}
-	
-	if(!salesSubMune){
-		
-	}	
 };
 
 salesSub = function(){	
-	
-//	salesSubPanelnit();
 	
 	var cmData = [[true, false, false, true], 
 	              ['部门','item'], ['销量','salesAmount','','right','Ext.ux.txtFormat.gridDou'], ['均价','avgPrice','','right','Ext.ux.txtFormat.gridDou'], ['单位成本','avgCost','','right','Ext.ux.txtFormat.gridDou'],
@@ -42,37 +32,26 @@ salesSub = function(){
 		height : 26,
 		items : [
 		{xtype:'tbtext', text:String.format(Ext.ux.txtFormat.typeName, '类别', 'salesSubShowType', '') },
-		{xtype:'tbtext',text:'&nbsp;&nbsp;'},	
-		{xtype:'tbtext',text:'日期:'},
+		{xtype:'tbtext',text:'&nbsp;&nbsp;'},
+		{xtype:'tbtext',text:'班次:'},
 		{
-			xtype : 'timefield',		
-			format : 'H:i:s',
-			id : 'salesSubBegDate',
-			value : '00:00:00',
-			width : 100,
-			readOnly : true,
-			increment : 60,
-			listeners : {
-				blur : function(){									
-					
-				}
-			}
-		},
-		{xtype:'tbtext',text:'&nbsp;&nbsp;至&nbsp;&nbsp;'},	
-		{
-			xtype : 'timefield',
-			format : 'G:i:s',
-			id : 'salesSubEndDate',
-			value : '23:00:00',
-			width : 100,
-			readOnly : true,
-			increment : 60,
-			listeners : {
-				blur : function(){									
-					
-				}
-			}
-		},
+ 	    	xtype : 'combo',
+ 	    	id : 'comboDuty',
+ 	    	width : 370,
+ 	    	store : new Ext.data.JsonStore({
+ 	    		root : 'root',
+				fields : [ 'duty', 'displayMsg' ]
+			}),
+			valueField : 'duty',
+			displayField : 'displayMsg',
+			mode : 'local',
+			triggerAction : 'all',
+			typeAhead : true,
+			selectOnFocus : true,
+			forceSelection : true,
+			allowBlank : false,
+			readOnly : true
+ 	    },
 		{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;&nbsp;'},
 		{
 			xtype : 'radio',
@@ -117,15 +96,14 @@ salesSub = function(){
 			id : 'salesSubBtnSearch',
 			width : 150,
 			handler : function(){
-				
-//				Ext.ux.checkDateForBeginAndEnd(true, 'salesSubBegDate', 'salesSubEndDate');
-//				Ext.ux.checkDateForBeginAndEnd(false, 'salesSubBegDate', 'salesSubEndDate');					
-				
-//				var bd = Ext.getCmp('salesSubBegDate').getValue();
-//				var ed = Ext.getCmp('salesSubEndDate').getValue();
+				var duty = Ext.getCmp('comboDuty');
+				if(!duty.isVisible()){
+					Ext.example.msg('提示', '请选择一个班次再操作.');
+					return;
+				}
 				var gs = salesSubGrid.getStore();
-				gs.baseParams['dateBeg'] = Ext.getCmp('salesSubBegDate').getRawValue();
-				gs.baseParams['dateEnd'] = Ext.getCmp('salesSubEndDate').getRawValue();
+				gs.baseParams['dateBeg'] = duty.getValue().split(salesSubSplitSymbol)[0];
+				gs.baseParams['dateEnd'] = duty.getValue().split(salesSubSplitSymbol)[1];
 				gs.baseParams['queryType'] = salesSubQueryType;
 				gs.baseParams['orderType'] = salesSubOrderType;
 				gs.baseParams['deptID'] = salesSubDeptId;
@@ -268,7 +246,6 @@ salesSub = function(){
 	var salesSubWin = new Ext.Window({
 			title : '销售统计',
 			layout : 'border',
-//			closeAction : 'hide',
 			resizable : false,
 			modal : true,
 			closable : false,
@@ -294,15 +271,34 @@ salesSub = function(){
 			],
 			listeners : {
 				show : function(){
-//					Ext.getCmp('salesSubBtnSearch').handler();
+					Ext.Ajax.request({
+						url : '../../QueryDutyRangeByNow.do',
+						params : {
+							pin : pin
+						},
+						success : function(res, opt){
+							var jr = Ext.util.JSON.decode(res.responseText);
+							var bd = {root:[]};
+							for(var i = 0; i < jr.root.length; i++){
+								bd.root.push({
+									duty : jr.root[i].onDuty + salesSubSplitSymbol + jr.root[i].offDuty,
+									displayMsg : (jr.root[i].onDuty + ' -- ' + jr.root[i].offDuty + '  交班人:' + jr.root[i].name)
+								});
+							}
+							Ext.getCmp('comboDuty').store.loadData(bd);
+							Ext.getCmp('comboDuty').setValue(bd.root[0].duty);
+							Ext.getCmp('salesSubBtnSearch').handler();
+						},
+						failure : function(res, opt){
+							Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
+						}
+					});
 				}
 			}
 		});
 //	}
 		
 	salesSubWin.show();	
-//	Ext.getCmp('salesSubBegDate').setValue('');
-//	Ext.getCmp('salesSubEndDate').setValue('');
 	Ext.getCmp('salesSubMuneTreeTypeRadioDept').setValue(true);
 //	Ext.getCmp('salesSubMuneTree').root.reload();
 	Ext.getCmp('salesSub_grid').getStore().removeAll();

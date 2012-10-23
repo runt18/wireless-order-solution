@@ -858,10 +858,10 @@ var billGenModForm = new Ext.form.FormPanel({
 				forceSelection : true,
 				store : new Ext.data.JsonStore({
 					root : 'root',
-					fields : [ 'discountID', 'text']
+					fields : [ 'discountID', 'discountName']
 				}),
 				valueField : 'discountID',
-				displayField : 'text',
+				displayField : 'discountName',
 				typeAhead : true,
 				mode : 'local',
 				triggerAction : 'all',
