@@ -91,7 +91,7 @@ public class QueryDutyRange {
 			String selectSQL = "SELECT name, DATE_FORMAT(on_duty,'%Y-%m-%d %T') AS on_duty, DATE_FORMAT(off_duty,'%Y-%m-%d %T') AS off_duty "
 							+ " FROM "
 							+ " ("
-							+ " (SELECT '全天' AS name, (SELECT MAX(off_duty) FROM " + Params.dbName + ".daily_settle_history WHERE restaurant_id = " + term.restaurantID + ") AS on_duty, NOW() AS off_duty) "
+							+ " (SELECT '全天' AS name, IFNULL(MAX(off_duty), '1970-01-01 00:00:00') FROM " + Params.dbName + ".daily_settle_history WHERE restaurant_id = " + term.restaurantID + ") AS on_duty, NOW() AS off_duty) "
 							+ " UNION ALL"
 							+ " (SELECT name, on_duty, off_duty FROM " + Params.dbName + ".shift WHERE restaurant_id = " + term.restaurantID + " ORDER BY off_duty)"
 							+ " UNION ALL"
