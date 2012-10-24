@@ -13,6 +13,7 @@ DROP TABLE IF EXISTS `wireless_order_db`.`food` ;
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food` (
   `food_id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this food' ,
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'indicates the food belong to which restaurant' ,
+  `food_statistics_id` INT NOT NULL DEFAULT 0 COMMENT 'the food statistics id' ,
   `food_alias` SMALLINT UNSIGNED NOT NULL COMMENT 'the waiter use this alias id to select food in terminal' ,
   `name` VARCHAR(45) NOT NULL COMMENT 'the name of the food' ,
   `pinyin` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the pinyin to this food' ,
@@ -23,9 +24,9 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food` (
   `taste_ref_type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the taste reference type is below.\n1 - smart reference\n2 - manual reference' ,
   `desc` VARCHAR(500) NULL DEFAULT NULL COMMENT 'the description to this food' ,
   `img` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the image to this food' ,
-  `order_cnt` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the order count to this food' ,
   PRIMARY KEY (`food_id`) ,
-  INDEX `ix_food_alias_id` (`restaurant_id` ASC, `food_alias` ASC) )
+  INDEX `ix_food_alias_id` (`restaurant_id` ASC, `food_alias` ASC) ,
+  INDEX `ix_food_statistics_id` (`food_statistics_id` ASC) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'This table contains the all restaurant\'s food information.' ;
@@ -253,7 +254,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_type` (
   `discount_id` INT UNSIGNED NOT NULL COMMENT 'the discount id this member type uses' ,
   `exchange_rate` DECIMAL(4,2) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the exchange rate used to transfer the price to point' ,
   `name` VARCHAR(45) NOT NULL COMMENT 'the name to this member type' ,
-  `type` TINYINT NOT NULL DEFAULT 0 COMMENT 'the type to this member tye as below.\n0 - 优惠类型\n1 - 积分类型\n2 - 充值类型' ,
+  `type` TINYINT NOT NULL DEFAULT 0 COMMENT 'the type to this member tye as below.\n0 - 优惠卡\n1 - 积分卡\n2 - 充值卡' ,
   PRIMARY KEY (`member_type_id`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
@@ -772,7 +773,7 @@ COMMENT = 'describe the client' ;
 DROP TABLE IF EXISTS `wireless_order_db`.`client_type` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`client_type` (
-  `client_type_id` INT NOT NULL AUTO_INCREMENT,
+  `client_type_id` INT NOT NULL AUTO_INCREMENT ,
   `name` VARCHAR(45) NULL ,
   PRIMARY KEY (`client_type_id`) )
 ENGINE = InnoDB
@@ -819,11 +820,24 @@ DEFAULT CHARACTER SET = utf8,
 COMMENT = 'describe the member' ;
 
 
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`food_statistics`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`food_statistics` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food_statistics` (
+  `food_statistics_id` INT NOT NULL AUTO_INCREMENT ,
+  `order_cnt` INT UNSIGNED NOT NULL DEFAULT 0 ,
+  PRIMARY KEY (`food_statistics_id`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the food statistics' ;
+
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
 
 -- -----------------------------------------------------
 -- Data for table `wireless_order_db`.`restaurant`

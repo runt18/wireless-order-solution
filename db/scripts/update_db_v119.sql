@@ -103,7 +103,21 @@ DEFAULT CHARACTER SET = utf8,
 COMMENT = 'describe the member' ;
 
 -- -----------------------------------------------------
--- Add the field 'order_cnt' to table 'food'
+-- Add the field 'food_statistics_id' to table 'food'
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`food` 
-ADD COLUMN `order_cnt` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the order count to this food'  AFTER `img` ;
+ADD COLUMN `food_statistics_id` INT NOT NULL DEFAULT 0 COMMENT 'the food statistics id'  AFTER `restaurant_id`,
+ADD INDEX `ix_food_statistics_id` (`food_statistics_id` ASC);
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`food_statistics`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`food_statistics` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food_statistics` (
+  `food_statistics_id` INT NOT NULL AUTO_INCREMENT ,
+  `order_cnt` INT UNSIGNED NOT NULL DEFAULT 0 ,
+  PRIMARY KEY (`food_statistics_id`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the food statistics' ;
