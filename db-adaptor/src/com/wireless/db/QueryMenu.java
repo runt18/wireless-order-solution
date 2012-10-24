@@ -16,6 +16,7 @@ import com.wireless.protocol.Discount;
 import com.wireless.protocol.DiscountPlan;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.FoodMenu;
+import com.wireless.protocol.FoodStatistics;
 import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Taste;
 import com.wireless.protocol.Terminal;
@@ -152,6 +153,7 @@ public class QueryMenu {
 	 				   		   dbCon.rs.getInt("food_alias"),
 	 				   		   dbCon.rs.getString("name"),
 	 				   		   dbCon.rs.getFloat("unit_price"),
+ 			 				   null,
 	 				   		   dbCon.rs.getShort("status"),
 	 				   		   dbCon.rs.getString("pinyin"),
 	 				   		   dbCon.rs.getShort("taste_ref_type"),
@@ -223,11 +225,15 @@ public class QueryMenu {
 					 " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, " +
 					 " FOOD.name, FOOD.unit_price, FOOD.status, FOOD.pinyin, FOOD.taste_ref_type, " +
 					 " FOOD.desc, FOOD.img, " +
+					 " FOOD_STATISTICS.order_cnt, " +
 					 " KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.name AS kitchen_name, KITCHEN.type AS kitchen_type, " +
 					 " DEPT.dept_id, DEPT.name AS dept_name, DEPT.type AS dept_type, " +
 					 " TASTE.taste_id, TASTE.taste_alias " +
 					 " FROM " + 
 					 Params.dbName + ".food FOOD " +
+					 " LEFT OUTER JOIN " +
+					 Params.dbName + ".food_statistics FOOD_STATISTICS " +
+					 " ON FOOD.food_statistics_id = FOOD_STATISTICS.food_statistics_id " +
 					 " LEFT OUTER JOIN " +
 					 Params.dbName + ".kitchen KITCHEN " +
 					 " ON FOOD.kitchen_id = KITCHEN.kitchen_id " +
@@ -273,6 +279,7 @@ public class QueryMenu {
 			 			 				   dbCon.rs.getInt("food_alias"),
 			 			 				   dbCon.rs.getString("name"),
 			 			 				   dbCon.rs.getFloat("unit_price"),
+			 			 				   new FoodStatistics(dbCon.rs.getLong("order_cnt")),
 			 			 				   dbCon.rs.getShort("status"),
 			 			 				   dbCon.rs.getString("pinyin"),
 			 			 				   dbCon.rs.getShort("taste_ref_type"),
@@ -404,6 +411,7 @@ public class QueryMenu {
 						   				  dbCon.rs.getInt("food_alias"),
 						   				  dbCon.rs.getString("name"),
 						   				  dbCon.rs.getFloat("unit_price"),
+			 			 				  null,
 						   				  dbCon.rs.getShort("status"),
 						   				  dbCon.rs.getString("pinyin"),
 						   				  dbCon.rs.getShort("taste_ref_type"),
