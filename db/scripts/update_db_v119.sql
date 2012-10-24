@@ -57,7 +57,7 @@ COMMENT = 'describe the client' ;
 DROP TABLE IF EXISTS `wireless_order_db`.`client_type` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`client_type` (
-  `client_type_id` INT NOT NULL ,
+  `client_type_id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NULL ,
   PRIMARY KEY (`client_type_id`) )
 ENGINE = InnoDB
@@ -87,7 +87,7 @@ COMMENT = 'describe the member card' ;
 DROP TABLE IF EXISTS `wireless_order_db`.`member` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member` (
-  `member_id` INT NOT NULL COMMENT 'the id to this member' ,
+  `member_id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this member' ,
   `restaurant_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the restaurant id to this member' ,
   `member_type_id` INT NOT NULL COMMENT 'the type this member belongs to' ,
   `member_card_id` INT NULL DEFAULT NULL COMMENT 'the card this member owns' ,
