@@ -23,6 +23,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food` (
   `taste_ref_type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the taste reference type is below.\n1 - smart reference\n2 - manual reference' ,
   `desc` VARCHAR(500) NULL DEFAULT NULL COMMENT 'the description to this food' ,
   `img` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the image to this food' ,
+  `order_cnt` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the order count to this food' ,
   PRIMARY KEY (`food_id`) ,
   INDEX `ix_food_alias_id` (`restaurant_id` ASC, `food_alias` ASC) )
 ENGINE = InnoDB
@@ -250,6 +251,7 @@ DROP TABLE IF EXISTS `wireless_order_db`.`member_type` ;
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_type` (
   `member_type_id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to member type' ,
   `discount_id` INT UNSIGNED NOT NULL COMMENT 'the discount id this member type uses' ,
+  `exchange_rate` DECIMAL(4,2) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the exchange rate used to transfer the price to point' ,
   `name` VARCHAR(45) NOT NULL COMMENT 'the name to this member type' ,
   `type` TINYINT NOT NULL DEFAULT 0 COMMENT 'the type to this member tye as below.\n0 - 优惠卡\n1 - 积分卡\n2 - 充值卡' ,
   PRIMARY KEY (`member_type_id`) )
