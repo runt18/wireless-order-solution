@@ -28,21 +28,29 @@ public class RespQueryMenu extends RespPackage{
 		 * 
 		 * food_amount[2] - 2-byte indicating the amount of the foods listed in the menu
 		 * <Food>
-		 * food_id[2] : price[3] : status : kitchen : name_len : name[name_len] : pinyin_len : pinyin[pinyin_len] : 
-		 * img_len : image : taste_ref_amount : taste_alias_1[2] : tase_alias_2[2]...
+		 * food_id[2] : price[3] : kitchen : status : order_cnt[4] :  
+		 * name_len : name[name_len] : 
+		 * pinyin_len : pinyin[pinyin_len] : 
+		 * img_len : image[img_len] : 
+		 * pop_taste_amount : pop_taste_1[2] : pop_taste_2[2]... : 
+		 * child_foods_amount : child_food_1[2] : child_food_2[2] 
 		 * food_id[2] - 2-byte indicating the food's id
 		 * price[3] - 3-byte indicating the food's price
 		 * 			  price[0] 1-byte indicating the float point
 		 * 			  price[1..2] 2-byte indicating the fixed point
 		 * kitchen - the kitchen id to this food
+		 * status - the status to this food
+		 * order_cnt[4] - 4-byte indicates the order count
 		 * name_len - the length of the food's name
 		 * name[name_len] - the food's name whose length equals "len1"
 		 * pinyin_len - the length of the pinyin
 		 * pinyin[pinyin_len] - the pinyin whose length equals "len2"
 		 * img_len : the length to image
 		 * image : the image file name
-		 * taste_ref_amount - the amount to taste reference
-		 * taste_alias_n[2] - 2-byte indicating the alias id to each taste reference 
+		 * pop_taste_amount - the amount of popular taste to this food
+		 * pop_taste[2] - 2-byte indicating the alias id to each popular taste  
+		 * child_foods_amount - the amount of child to this food
+		 * child_food[2] - 2-byte indicating the alias id to each child food
 		 * 
 		 * taste_amount[2] - 2-byte indicates the amount of the taste preference
 		 * <Taste>
@@ -119,15 +127,18 @@ public class RespQueryMenu extends RespPackage{
 			bodyLen += 2 + 				/* food_alias(2-byte) */
 					   3 + 				/* price(3-byte) */ 
 					   1 + 				/* kitchen id to this food(1-byte) */
-					   1 + 				/* status(1-byte) */ 
+					   1 + 				/* status(1-byte) */
+					   4 + 				/* order count(4-byte) */
 					   1 + 				/* the length to food name(1-byte) */
 					   name.length + 	/* the value to food name  */
 					   1 + 				/* the length to pinyin(1-byte) */	
 					   pinyin.length + 	/* the value to pinyin */
 					   1 +				/* the length to image */
 					   image.length +	/* the value to image name */
-					   1 + 				/* the amount to taste reference(1-byte) */
-					   (foodMenu.foods[i].popTastes == null ? 0 : (foodMenu.foods[i].popTastes.length * 2)); /* all the alias id to taste reference */ 
+					   1 + 				/* the amount to popular taste(1-byte) */
+					   (foodMenu.foods[i].popTastes == null ? 0 : (foodMenu.foods[i].popTastes.length * 2)) + /* all the alias id to popular taste */
+					   1 +				/* the amount of child food(1-byte) */
+					   (foodMenu.foods[i].childFoods == null ? 0 : (foodMenu.foods[i].childFoods.length * 2));/* all the alias id to child food */
 		}
 		
 		//add the length to taste preferences
@@ -215,6 +226,13 @@ public class RespQueryMenu extends RespPackage{
 			body[offset] = (byte)foodMenu.foods[i].status;
 			offset += 1;
 			
+			//assign the order count to this food
+			body[offset] = (byte)(foodMenu.foods[i].statistics.orderCnt & 0x000000FF);
+			body[offset + 1] = (byte)((foodMenu.foods[i].statistics.orderCnt & 0x0000FF00) >> 8);
+			body[offset + 2] = (byte)((foodMenu.foods[i].statistics.orderCnt & 0x00FF0000) >> 16);
+			body[offset + 3] = (byte)((foodMenu.foods[i].statistics.orderCnt & 0xFF000000) >> 24);
+			offset += 4;
+			
 			//assign the length of food's name
 			byte[] name = foodMenu.foods[i].name.getBytes("UTF-16BE");
 			body[offset] = (byte)(name.length & 0x000000FF);
@@ -255,12 +273,12 @@ public class RespQueryMenu extends RespPackage{
 			
 			int lenOfPopTaste = 0;
 			if(foodMenu.foods[i].popTastes == null){
-				//assign the amount taste reference
+				//assign the amount of popular taste
 				body[offset] = 0; 
 			}else{
-				//assign the amount taste reference
+				//assign the amount of popular taste
 				body[offset] = (byte)foodMenu.foods[i].popTastes.length;
-				//assign each taste reference alias id to this food
+				//assign each popular taste alias id to this food
 				for(int cnt = 0; cnt < foodMenu.foods[i].popTastes.length; cnt++){
 					body[offset + 1 + lenOfPopTaste] = (byte)(foodMenu.foods[i].popTastes[cnt].aliasID & 0x00FF);
 					body[offset + 2 + lenOfPopTaste] = (byte)((foodMenu.foods[i].popTastes[cnt].aliasID & 0xFF00) >> 8);
@@ -268,6 +286,23 @@ public class RespQueryMenu extends RespPackage{
 				}
 			}
 			offset += 1 + lenOfPopTaste;
+			
+			int lenOfChildFood = 0;
+			if(foodMenu.foods[i].childFoods == null){
+				//assign the amount of child food
+				body[offset] = 0;
+			}else{
+				//assign the amount of child food
+				body[offset] = (byte)foodMenu.foods[i].childFoods.length;
+				//assign each child food alias id to this food
+				for(int cnt = 0; cnt < foodMenu.foods[i].childFoods.length; cnt++){
+					body[offset + 1 + lenOfChildFood] = (byte)(foodMenu.foods[i].childFoods[cnt].aliasID & 0x00FF);
+					body[offset + 2 + lenOfChildFood] = (byte)((foodMenu.foods[i].childFoods[cnt].aliasID & 0xFF00) >> 8);
+					lenOfChildFood += 2;
+				}
+			}
+			offset += 1 + lenOfChildFood;
+			
 		}
 		
 		//assign the taste preferences

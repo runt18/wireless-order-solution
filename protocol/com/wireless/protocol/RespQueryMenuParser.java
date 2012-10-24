@@ -33,7 +33,8 @@ public class RespQueryMenuParser {
 		 * food_amount[2] - 2-byte indicating the amount of the foods listed in the menu
 		 * <Food>
 		 * food_id[2] : price[3] : status : kitchen : name_len : name[name_len] : pinyin_len : pinyin[pinyin_len] : 
-		 * img_len : image : taste_ref_amount : taste_alias_1[2] : tase_alias_2[2]...
+		 * img_len : image : pop_taste_amount : pop_taste_1[2] : pop_taste_2[2]... : 
+		 * child_foods_amount : child_food_1[2] : child_food_2[2] 
 		 * food_id[2] - 2-byte indicating the food's id
 		 * price[3] - 3-byte indicating the food's price
 		 * 			  price[0] 1-byte indicating the float point
@@ -45,8 +46,10 @@ public class RespQueryMenuParser {
 		 * pinyin[pinyin_len] - the pinyin whose length equals "len2"
 		 * img_len : the length to image
 		 * image : the image file name
-		 * taste_ref_amount - the amount to taste reference
-		 * taste_alias_n[2] - 2-byte indicating the alias id to each taste reference 
+		 * pop_taste_amount - the amount of popular taste to this food
+		 * pop_taste[2] - 2-byte indicating the alias id to each popular taste  
+		 * child_foods_amount - the amount of child to this food
+		 * child_food[2] - 2-byte indicating the alias id to each child food
 		 * 
 		 * taste_amount[2] - 2-byte indicates the amount of the taste preference
 		 * <Taste>
@@ -89,7 +92,7 @@ public class RespQueryMenuParser {
 		 * len - 1 byes indicates the length of discount name
 		 * dist_name[len] - the name of discount
 		 * level[2] - the level of discount
-		 * status - the status to discount
+		 * status - the status of discount
 		 * <DiscountPlan>
 		 * kitchen_alias : rate
 		 * kitchen_alias : 1 bytes indicates the kitchen alias 
@@ -131,6 +134,13 @@ public class RespQueryMenuParser {
 				food.status = response.body[offset];
 				offset++;
 				
+				//get the order count to this food
+				food.statistics = new FoodStatistics(((response.body[offset] & 0x000000FF) |
+		 				   							((response.body[offset + 1] & 0x000000FF) << 8) |
+		 				   							((response.body[offset + 2] & 0x000000FF) << 16) |
+		 				   							((response.body[offset + 3] & 0x000000FF) << 24)) & 0xFFFFFFFF);
+				offset += 4;
+				
 				//get the length of the food's name
 				int lenOfFoodName = response.body[offset];
 				offset++;
@@ -167,7 +177,7 @@ public class RespQueryMenuParser {
 				int nPopTaste = response.body[offset];
 				offset++;
 				
-				//get each alias id to taste reference
+				//get each alias id to popular taste
 				int lenOfPopTaste = 0;
 				if(nPopTaste != 0){
 					food.popTastes = new Taste[nPopTaste];
@@ -181,6 +191,25 @@ public class RespQueryMenuParser {
 					food.popTastes = new Taste[0];
 				}
 				offset += lenOfPopTaste;
+				
+				//get the amount of child food
+				int nChildFood = response.body[offset];
+				offset++;
+				
+				//get alias id to each child food
+				int lenOfChildFood = 0;
+				if(nChildFood != 0){
+					food.childFoods = new Food[nChildFood];
+					for(int j = 0; j < food.childFoods.length; j++){
+						food.childFoods[j] = new Food();
+						food.childFoods[j].aliasID = (response.body[offset + lenOfChildFood] & 0x000000FF) | 
+													 ((response.body[offset + 1 + lenOfChildFood] & 0x000000FF) << 8);
+						lenOfChildFood += 2;
+					}
+				}else{
+					food.childFoods = new Food[0];
+				}
+				offset += lenOfChildFood;
 				
 				//add to foods
 				foods[i] = food;
@@ -227,10 +256,10 @@ public class RespQueryMenuParser {
 				short deptAlias = (short)(response.body[offset] & 0x00FF);
 				offset++;
 				
-				//get the length of the kitchen name
+				//get the length of kitchen name
 				int lenOfKitchenName = response.body[offset];
 				offset++;
-				//get the value of super kitchen name
+				//get the value of kitchen name
 				String kitchenName = null;
 				try{
 					kitchenName = new String(response.body, offset, lenOfKitchenName, "UTF-16BE");

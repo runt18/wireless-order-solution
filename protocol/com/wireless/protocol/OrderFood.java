@@ -409,6 +409,7 @@ public class OrderFood extends Food {
 			  food.aliasID,
 			  food.name,
 			  food.getPrice(),
+			  food.statistics,
 			  food.status,
 			  food.pinyin,
 			  food.tasteRefType,
