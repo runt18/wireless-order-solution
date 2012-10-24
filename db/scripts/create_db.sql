@@ -251,6 +251,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_type` (
   `member_type_id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to member type' ,
   `discount_id` INT UNSIGNED NOT NULL COMMENT 'the discount id this member type uses' ,
   `name` VARCHAR(45) NOT NULL COMMENT 'the name to this member type' ,
+  `type` TINYINT NOT NULL DEFAULT 0 COMMENT 'the type to this member tye as below.\n0 - 优惠卡\n1 - 积分卡\n2 - 充值卡' ,
   PRIMARY KEY (`member_type_id`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
@@ -794,20 +795,6 @@ COMMENT = 'describe the member card' ;
 
 
 -- -----------------------------------------------------
--- Table `wireless_order_db`.`member_card_ownership`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `wireless_order_db`.`member_card_ownership` ;
-
-CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_card_ownership` (
-  `member_id` INT NOT NULL COMMENT 'the id to member' ,
-  `member_card_id` INT NOT NULL COMMENT 'the id to member card' ,
-  PRIMARY KEY (`member_id`, `member_card_id`) )
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8, 
-COMMENT = 'describe which member card belongs to which member' ;
-
-
--- -----------------------------------------------------
 -- Table `wireless_order_db`.`member`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `wireless_order_db`.`member` ;
@@ -817,12 +804,14 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member` (
   `restaurant_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the restaurant id to this member' ,
   `client_id` INT NOT NULL COMMENT 'the client id to this member' ,
   `member_type_id` INT NOT NULL COMMENT 'the type this member belongs to' ,
+  `member_card_id` INT NULL DEFAULT NULL COMMENT 'the card this member owns' ,
   `balance` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the balance to this member' ,
   `point` INT NOT NULL DEFAULT 0 COMMENT 'the remaining point to this member' ,
   PRIMARY KEY (`member_id`) ,
   INDEX `ix_client_id` (`client_id` ASC) ,
   INDEX `ix_member_type_id` (`member_type_id` ASC) ,
-  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) ,
+  INDEX `ix_member_card_id` (`member_card_id` ASC) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the member' ;
@@ -832,6 +821,7 @@ COMMENT = 'describe the member' ;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
 
 -- -----------------------------------------------------
 -- Data for table `wireless_order_db`.`restaurant`
