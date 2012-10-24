@@ -16,7 +16,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_type` (
   `discount_id` INT UNSIGNED NOT NULL COMMENT 'the discount id this member type uses' ,
   `exchange_rate` DECIMAL(4,2) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the exchange rate used to transfer the price to point' ,
   `name` VARCHAR(45) NOT NULL COMMENT 'the name to this member type' ,
-  `type` TINYINT NOT NULL DEFAULT 0 COMMENT 'the type to this member tye as below.\n0 - 优惠卡\n1 - 积分卡\n2 - 充值卡' ,
+  `type` TINYINT NOT NULL DEFAULT 0 COMMENT 'the type to this member tye as below.\n0 - 优惠类型\n1 - 积分类型\n2 - 充值类型' ,
   PRIMARY KEY (`member_type_id`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
