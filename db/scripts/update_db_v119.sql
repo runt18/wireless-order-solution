@@ -103,6 +103,19 @@ DEFAULT CHARACTER SET = utf8,
 COMMENT = 'describe the member' ;
 
 -- -----------------------------------------------------
+-- Table `wireless_order_db`.`member_client`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`member_client` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_client` (
+  `client_id` INT NOT NULL ,
+  `member_id` INT NOT NULL ,
+  PRIMARY KEY (`client_id`, `member_id`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the relationship between member and client' ;
+
+-- -----------------------------------------------------
 -- Table `wireless_order_db`.`food_statistics`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `wireless_order_db`.`food_statistics` ;
