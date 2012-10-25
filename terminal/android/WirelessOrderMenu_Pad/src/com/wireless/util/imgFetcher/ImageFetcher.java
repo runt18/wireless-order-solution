@@ -44,7 +44,6 @@ public class ImageFetcher extends ImageResizer {
      */
     public ImageFetcher(Context context, int imageWidth, int imageHeight) {
         super(context, imageWidth, imageHeight);
-        Log.i("width"+imageWidth,""+imageHeight);
     }
 
     /**

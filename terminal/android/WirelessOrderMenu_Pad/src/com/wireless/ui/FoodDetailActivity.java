@@ -42,7 +42,6 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 	private OrderFood mOrderFood;
 	
 	private DisplayHandler mDisplayHandler;
-	private ArrayList<Food> mRecommendfoods;
 	private ImageView mFoodImageView;
 	private ImageFetcher mImageFetcher;
 	
@@ -198,12 +197,12 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		mTabHost.addTab(mTabHost.newTabSpec("tab2").setIndicator("其它").setContent(R.id.tab2_foodDetail));
 		
 		//设置底部推荐菜的数据和显示
-		mRecommendfoods = new ArrayList<Food>();
+		ArrayList<Food> mRecommendfoods = new ArrayList<Food>();
 		for(Food f:WirelessOrder.foods)
 		{
 			if(f.isRecommend())
 				mRecommendfoods.add(f);
-		}
+		} 
 		
 		mImageFetcher.setImageSize(245, 160);
 		LayoutParams lp = new LayoutParams(245,160);

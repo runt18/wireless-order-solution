@@ -131,7 +131,14 @@ public class MainActivity extends Activity
 				startActivity(intent);
 			}
 		});
-		
+		//排行榜
+		((ImageView) findViewById(R.id.imageView_rankList_main)).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(MainActivity.this, RankListActivity.class);
+				startActivity(intent);
+			}
+		});
 		mOrderFood = new OrderFood(WirelessOrder.foods[0]);
 		mOrderFood.setCount(Float.parseFloat(((TextView) findViewById(R.id.textView_count_main)).getText().toString()));
 	}

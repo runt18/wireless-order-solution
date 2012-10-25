@@ -184,13 +184,6 @@ public class ComboFoodActivity extends Activity {
 				mComboFoods.add(f);
 			}
 		}
-		/////////////删除
-//		//TODO clean
-//		for(int i=0;i<10;i++)
-//		{
-//			mComboFoods.add(WirelessOrder.foodMenu.foods[i]);
-//		}
-		///////////////
 		
 		//设置套餐图层的内容 和大小
 		mImageFetcher = new ImageFetcher(this,245,160);
@@ -199,25 +192,6 @@ public class ComboFoodActivity extends Activity {
 		
 		for(Food f:mComboFoods)
 		{
-			///////////删除 TODO
-//			f.childFoods = new Food[10];
-//			Random r = new Random();
-//			for(int i=0;i<10;i++)
-//			{
-//				Food food = new Food();
-//				food.image = f.image;
-//				food.name = String.valueOf(r.nextInt());
-//				f.childFoods[i] = food;
-//			}
-//			for(int i=0;i<3;i++)
-//			{
-//				Food food = new Food();
-//				food.status |= Food.GIFT;
-//				food.name = String.valueOf(r.nextInt());
-//				f.childFoods[i] = food;
-//			}
-			////////////
-			
 			//设置每个套餐的image view参数
 			ImageView image = new ImageView(this);
 			image.setLayoutParams(lp);
