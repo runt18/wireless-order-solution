@@ -8,7 +8,7 @@ import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.FoodMenu;
 import com.wireless.protocol.ProtocolPackage;
 import com.wireless.protocol.ReqQueryMenu;
-import com.wireless.protocol.RespParserEx;
+import com.wireless.protocol.RespQueryMenuParserEx;
 import com.wireless.protocol.Type;
 import com.wireless.sccon.ServerConnector;
 
@@ -27,7 +27,7 @@ public class QueryMenuTask extends AsyncTask<Void, Void, FoodMenu>{
 		try{
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryMenu());
 			if(resp.header.type == Type.ACK){
-				result = RespParserEx.parseQueryMenu(resp);
+				result = RespQueryMenuParserEx.parse(resp);
 			}else{
 				if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
 					mErrMsg = "终端没有登记到餐厅，请联系管理人员。";
