@@ -13,7 +13,6 @@ DROP TABLE IF EXISTS `wireless_order_db`.`food` ;
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food` (
   `food_id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to this food' ,
   `restaurant_id` INT UNSIGNED NOT NULL COMMENT 'indicates the food belong to which restaurant' ,
-  `food_statistics_id` INT NOT NULL DEFAULT 0 COMMENT 'the food statistics id' ,
   `food_alias` SMALLINT UNSIGNED NOT NULL COMMENT 'the waiter use this alias id to select food in terminal' ,
   `name` VARCHAR(45) NOT NULL COMMENT 'the name of the food' ,
   `pinyin` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the pinyin to this food' ,
@@ -25,8 +24,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food` (
   `desc` VARCHAR(500) NULL DEFAULT NULL COMMENT 'the description to this food' ,
   `img` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the image to this food' ,
   PRIMARY KEY (`food_id`) ,
-  INDEX `ix_food_alias_id` (`restaurant_id` ASC, `food_alias` ASC) ,
-  INDEX `ix_food_statistics_id` (`food_statistics_id` ASC) )
+  INDEX `ix_food_alias_id` (`restaurant_id` ASC, `food_alias` ASC) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'This table contains the all restaurant\'s food information.' ;
@@ -775,6 +773,7 @@ DROP TABLE IF EXISTS `wireless_order_db`.`client_type` ;
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`client_type` (
   `client_type_id` INT NOT NULL AUTO_INCREMENT ,
   `name` VARCHAR(45) NULL ,
+  `parent_id` INT NULL COMMENT 'the parent id to this clent type' ,
   PRIMARY KEY (`client_type_id`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
@@ -826,9 +825,9 @@ COMMENT = 'describe the member' ;
 DROP TABLE IF EXISTS `wireless_order_db`.`food_statistics` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food_statistics` (
-  `food_statistics_id` INT NOT NULL AUTO_INCREMENT ,
+  `food_id` INT NOT NULL ,
   `order_cnt` INT UNSIGNED NOT NULL DEFAULT 0 ,
-  PRIMARY KEY (`food_statistics_id`) )
+  PRIMARY KEY (`food_id`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the food statistics' ;

@@ -57,8 +57,9 @@ COMMENT = 'describe the client' ;
 DROP TABLE IF EXISTS `wireless_order_db`.`client_type` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`client_type` (
-  `client_type_id` INT NOT NULL AUTO_INCREMENT,
+  `client_type_id` INT NOT NULL AUTO_INCREMENT ,
   `name` VARCHAR(45) NULL ,
+  `parent_id` INT NULL COMMENT 'the parent id to this clent type' ,
   PRIMARY KEY (`client_type_id`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
@@ -102,21 +103,14 @@ DEFAULT CHARACTER SET = utf8,
 COMMENT = 'describe the member' ;
 
 -- -----------------------------------------------------
--- Add the field 'food_statistics_id' to table 'food'
--- -----------------------------------------------------
-ALTER TABLE `wireless_order_db`.`food` 
-ADD COLUMN `food_statistics_id` INT NOT NULL DEFAULT 0 COMMENT 'the food statistics id'  AFTER `restaurant_id`,
-ADD INDEX `ix_food_statistics_id` (`food_statistics_id` ASC);
-
--- -----------------------------------------------------
 -- Table `wireless_order_db`.`food_statistics`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `wireless_order_db`.`food_statistics` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`food_statistics` (
-  `food_statistics_id` INT NOT NULL AUTO_INCREMENT ,
+  `food_id` INT NOT NULL ,
   `order_cnt` INT UNSIGNED NOT NULL DEFAULT 0 ,
-  PRIMARY KEY (`food_statistics_id`) )
+  PRIMARY KEY (`food_id`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the food statistics' ;
