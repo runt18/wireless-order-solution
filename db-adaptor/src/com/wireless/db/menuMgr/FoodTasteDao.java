@@ -7,7 +7,7 @@ import java.util.List;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.QueryMenu;
-import com.wireless.db.tasteRef.TasteRef;
+import com.wireless.db.tasteRef.TasteRefDao;
 import com.wireless.pojo.menuMgr.FoodTaste;
 import com.wireless.protocol.Food;
 import com.wireless.util.WebParams;
@@ -219,7 +219,7 @@ public class FoodTasteDao {
 		if(updateFood.length != 1){
 			throw new Exception();
 		}
-		TasteRef.execByFood(updateFood[0]);
+		TasteRefDao.execByFood(updateFood[0]);
 	}
 	
 	/**
@@ -277,7 +277,7 @@ public class FoodTasteDao {
 				if(updateFood.length != 1){
 					throw new Exception("操作失败,修改菜品口味关联方式为智能关联时发生异常!");
 				}
-				TasteRef.execByFood(updateFood[0]);
+				TasteRefDao.execByFood(updateFood[0]);
 			}else if(parent.getTasteRefType() == WebParams.TASTE_MANUAL_REF){
 				dbCon.stmt.execute(deleteSQL);
 				

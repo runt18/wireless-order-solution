@@ -3,7 +3,7 @@ package com.wireless.db.menuMgr;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.QueryMenu;
-import com.wireless.db.tasteRef.TasteRef;
+import com.wireless.db.tasteRef.TasteRefDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.menuMgr.FoodBasic;
 import com.wireless.protocol.Food;
@@ -61,7 +61,7 @@ public class FoodBasicDao {
 			try{
 				Food[] updateFood = QueryMenu.queryFoods(" AND FOOD.food_id = " + fb.getFoodID(), null);
 				if(updateFood.length != 0){
-					TasteRef.execByFood(updateFood[0]);
+					TasteRefDao.execByFood(updateFood[0]);
 				}
 			} catch(Exception e){
 				throw new BusinessException("警告,已保存新添加菜品信息,但更新口味信息失败!", WebParams.TIP_CODE_WARNING);
@@ -87,7 +87,7 @@ public class FoodBasicDao {
 			try{
 				Food[] updateFood = QueryMenu.queryFoods(" AND FOOD.food_id = " + fb.getFoodID(), null);
 				if(updateFood.length != 0){
-					TasteRef.execByFood(updateFood[0]);
+					TasteRefDao.execByFood(updateFood[0]);
 				}
 				FoodCombinationDao.updateFoodCombination(fb.getFoodID(), fb.getRestaurantID(), fb.getStatus(), content);
 			} catch(Exception e){

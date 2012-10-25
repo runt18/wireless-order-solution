@@ -233,7 +233,7 @@ public class QueryMenu {
 					 Params.dbName + ".food FOOD " +
 					 " LEFT OUTER JOIN " +
 					 Params.dbName + ".food_statistics FOOD_STATISTICS " +
-					 " ON FOOD.food_statistics_id = FOOD_STATISTICS.food_statistics_id " +
+					 " ON FOOD.food_id = FOOD_STATISTICS.food_id " +
 					 " LEFT OUTER JOIN " +
 					 Params.dbName + ".kitchen KITCHEN " +
 					 " ON FOOD.kitchen_id = KITCHEN.kitchen_id " +
