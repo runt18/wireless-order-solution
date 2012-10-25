@@ -832,11 +832,11 @@ COMMENT = 'describe the food statistics' ;
 
 
 -- -----------------------------------------------------
--- Table `wireless_order_db`.`member_client`
+-- Table `wireless_order_db`.`client_member`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `wireless_order_db`.`member_client` ;
+DROP TABLE IF EXISTS `wireless_order_db`.`client_member` ;
 
-CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_client` (
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`client_member` (
   `client_id` INT NOT NULL ,
   `member_id` INT NOT NULL ,
   PRIMARY KEY (`client_id`, `member_id`) )
