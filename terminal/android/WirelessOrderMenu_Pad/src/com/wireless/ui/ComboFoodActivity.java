@@ -2,7 +2,6 @@ package com.wireless.ui;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Random;
 
 import android.app.Activity;
 import android.content.Context;
@@ -20,12 +19,12 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.Toast;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
@@ -108,7 +107,7 @@ public class ComboFoodActivity extends Activity {
 				mComboFoodNameTextView.setText(theFood.name);
 				//FIXME 修改成优惠价
 				mComboFoodPriceTextView.setText(Util.float2String2(theFood.getPriceWithTaste()));
-				
+				  
 				ArrayList<Food> childFoods = new ArrayList<Food>();
 				ArrayList<Food> giftFoods = new ArrayList<Food>();
 				//添加"主菜"标题头
@@ -116,9 +115,12 @@ public class ComboFoodActivity extends Activity {
 				//将普通菜和赠送菜归类
 				for(Food f:theFood.childFoods)
 				{
-					if(!f.isGift())
-						childFoods.add(f);
-					else giftFoods.add(f);
+					if(f.name != null)
+					{
+						if(!f.isGift())
+							childFoods.add(f);
+						else giftFoods.add(f);
+					}
 				}
 				
 				//添加赠送菜标题头
@@ -128,7 +130,6 @@ public class ComboFoodActivity extends Activity {
 					//将赠送菜添加
 					childFoods.addAll(giftFoods);
 				}
-
 				mSpecificListView.setAdapter(activity.new SpecificFoodAdapter(childFoods));
 				
 				mSpecificListView.setOnItemClickListener(new OnItemClickListener(){
@@ -184,11 +185,11 @@ public class ComboFoodActivity extends Activity {
 			}
 		}
 		/////////////删除
-		//TODO clean
-		for(int i=0;i<10;i++)
-		{
-			mComboFoods.add(WirelessOrder.foodMenu.foods[i]);
-		}
+//		//TODO clean
+//		for(int i=0;i<10;i++)
+//		{
+//			mComboFoods.add(WirelessOrder.foodMenu.foods[i]);
+//		}
 		///////////////
 		
 		//设置套餐图层的内容 和大小
@@ -199,22 +200,22 @@ public class ComboFoodActivity extends Activity {
 		for(Food f:mComboFoods)
 		{
 			///////////删除 TODO
-			f.childFoods = new Food[10];
-			Random r = new Random();
-			for(int i=0;i<10;i++)
-			{
-				Food food = new Food();
-				food.image = f.image;
-				food.name = String.valueOf(r.nextInt());
-				f.childFoods[i] = food;
-			}
-			for(int i=0;i<3;i++)
-			{
-				Food food = new Food();
-				food.status |= Food.GIFT;
-				food.name = String.valueOf(r.nextInt());
-				f.childFoods[i] = food;
-			}
+//			f.childFoods = new Food[10];
+//			Random r = new Random();
+//			for(int i=0;i<10;i++)
+//			{
+//				Food food = new Food();
+//				food.image = f.image;
+//				food.name = String.valueOf(r.nextInt());
+//				f.childFoods[i] = food;
+//			}
+//			for(int i=0;i<3;i++)
+//			{
+//				Food food = new Food();
+//				food.status |= Food.GIFT;
+//				food.name = String.valueOf(r.nextInt());
+//				f.childFoods[i] = food;
+//			}
 			////////////
 			
 			//设置每个套餐的image view参数

@@ -137,7 +137,7 @@
                 android:text="全部口味" />
         </RadioGroup>
     </RelativeLayout>
-
+<!-- 
     <com.wireless.util.ScrollLayout
         android:id="@+id/scrollLayout_pickTaste"
         android:layout_width="match_parent"
@@ -145,6 +145,15 @@
         android:layout_above="@+id/pinzhu_layout"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/relativeLayout_top" >
-    </com.wireless.util.ScrollLayout>
+    </com.wireless.util.ScrollLayout> -->
+
+    <ViewFlipper
+        android:id="@+id/viewFlipper_pickTasteDialog"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/pinzhu_layout"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/relativeLayout_top" >
+    </ViewFlipper>
 
 </RelativeLayout>

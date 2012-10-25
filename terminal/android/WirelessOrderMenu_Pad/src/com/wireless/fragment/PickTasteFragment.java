@@ -12,10 +12,17 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.GestureDetector;
+import android.view.GestureDetector.OnGestureListener;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -27,17 +34,20 @@ import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ViewFlipper;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
-import com.wireless.util.ScrollLayout;
 
-public class PickTasteFragment extends DialogFragment {
-	private ScrollLayout mScrollLayout;
-	private List<Taste> mTastes;
+public class PickTasteFragment extends DialogFragment  implements OnGestureListener {
+//	private ScrollLayout mScrollLayout;
+	private ViewFlipper mFlipper;
+	private GestureDetector mGDetector;
+
+	private List<Taste> mTastes;	
 	private OrderFood mOrderFood;
 	
 	private static final int TASTE_AMOUNT_PER_PAGE = 20;
@@ -58,6 +68,7 @@ public class PickTasteFragment extends DialogFragment {
 	}
 	
 	private OnTasteChangeListener mOnTasteChangeListener;
+
 	
 	public void setOnTasteChangeListener(OnTasteChangeListener l)
 	{
@@ -98,7 +109,6 @@ public class PickTasteFragment extends DialogFragment {
 				fragment.mTastes = Arrays.asList(WirelessOrder.foodMenu.tastes);
 				refreshDisplay();
 				break;
-				
 			case TASTE_SELECTED :
 				refreshPickedTaste();
 				break;
@@ -167,6 +177,8 @@ public class PickTasteFragment extends DialogFragment {
 		super.onCreate(savedInstanceState);
 		setStyle(PickTasteFragment.STYLE_NO_TITLE, android.R.style.Theme_Holo_Light_Dialog);
 		
+		mGDetector = new GestureDetector(this.getActivity(), this);
+		
 		FoodParcel foodParcel = getArguments().getParcelable(FoodParcel.KEY_VALUE);
 		mOrderFood = foodParcel;
 		mTasteHandler = new TasteRefreshHandler(this);
@@ -180,7 +192,8 @@ public class PickTasteFragment extends DialogFragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.pick_taste_dialog, container, false);
 		
-		mScrollLayout  = (ScrollLayout) view.findViewById(R.id.scrollLayout_pickTaste);
+		mFlipper = (ViewFlipper) view.findViewById(R.id.viewFlipper_pickTasteDialog);
+		
 		//点击不同的radiogroup按钮时显示不同的口味
 		((RadioGroup) view.findViewById(R.id.radioGroup_taste_pickTaste)).setOnCheckedChangeListener(new OnCheckedChangeListener(){
 			@Override
@@ -242,21 +255,15 @@ public class PickTasteFragment extends DialogFragment {
 		// 计算屏幕的页数
 		int pageSize = (tLength / TASTE_AMOUNT_PER_PAGE) + (tLength	% TASTE_AMOUNT_PER_PAGE == 0 ? 0 : 1);
 		// 清空所有Grid View
-		mScrollLayout.removeAllViews();
-		mScrollLayout.page = 0;
-		mScrollLayout.mCurScreen = 0;
-		mScrollLayout.mDefaultScreen = 0;
+		mFlipper.removeAllViews();
+		LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+				LinearLayout.LayoutParams.MATCH_PARENT,
+				LinearLayout.LayoutParams.MATCH_PARENT);
 		
 		for(int pageNo=0; pageNo < pageSize; pageNo++){
 			// 每页餐台的Grid View
 			GridView grid = new GridView(this.getActivity());
 			grid.setSelected(true);
-			
-			LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-					LinearLayout.LayoutParams.MATCH_PARENT,
-					LinearLayout.LayoutParams.MATCH_PARENT);
-			
-			
 			grid.setLayoutParams(lp);
 			
 			// 设置显示的列数
@@ -264,6 +271,42 @@ public class PickTasteFragment extends DialogFragment {
 			
 			grid.setHorizontalSpacing(8);
 			grid.setVerticalSpacing(8);
+			//滚动侦听
+			grid.setOnTouchListener(new OnTouchListener(){
+				@Override
+				public boolean onTouch(View v, MotionEvent event) {
+					return mGDetector.onTouchEvent(event);
+				}
+			});
+			//每项侦听器
+			grid.setOnItemClickListener(new OnItemClickListener(){
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+					final CheckBox selectChkBox = (CheckBox) view.findViewById(R.id.checkBox_pickTaste_item);
+					final RelativeLayout background = (RelativeLayout)view.findViewById(R.id.realativeLayout_pickTaste_item);
+
+					if(selectChkBox.isChecked()){
+						int pos = mOrderFood.removeTaste(mTastes.get(position));
+						if(pos >= 0){
+							selectChkBox.setChecked(false);
+							Toast.makeText(PickTasteFragment.this.getActivity(), "删除" + mTastes.get(position).getPreference(), Toast.LENGTH_SHORT).show();
+						}
+						background.setBackgroundResource(R.color.blue);
+					}else{
+						int pos = mOrderFood.addTaste(mTastes.get(position));
+						if(pos >= 0){
+							selectChkBox.setChecked(true);
+							background.setBackgroundResource(R.color.green);
+							Toast.makeText(PickTasteFragment.this.getActivity(), "添加" + mTastes.get(position).getPreference(), Toast.LENGTH_SHORT).show();
+						}else{
+							Toast.makeText(PickTasteFragment.this.getActivity(), "最多只能添加" + mOrderFood.tastes.length + "种口味", Toast.LENGTH_SHORT).show();
+							background.setBackgroundResource(R.color.blue);
+						}
+	
+					}
+					mTasteHandler.sendEmptyMessage(TASTE_SELECTED);
+				}
+			});
 			
 			// 获取显示在此page显示的Taste对象
 			ArrayList<Taste> taste4Page = new ArrayList<Taste>();
@@ -276,7 +319,7 @@ public class PickTasteFragment extends DialogFragment {
 				}
 			}
 			grid.setAdapter(new TasteAdapter(taste4Page));
-			mScrollLayout.addView(grid);
+			mFlipper.addView(grid);
 		}
 	}
 	
@@ -339,35 +382,49 @@ public class PickTasteFragment extends DialogFragment {
 				}
 			}
 			
-			view.setOnClickListener(new OnClickListener() {
-				
-				@Override
-				public void onClick(View arg0) {
-			        
-					if(selectChkBox.isChecked()){
-						int pos = mOrderFood.removeTaste(mTastes.get(position));
-						if(pos >= 0){
-							selectChkBox.setChecked(false);
-							Toast.makeText(PickTasteFragment.this.getActivity(), "删除" + mTastes.get(position).getPreference(), Toast.LENGTH_SHORT).show();
-						}
-						background.setBackgroundResource(R.color.blue);
-					}else{
-						int pos = mOrderFood.addTaste(mTastes.get(position));
-						if(pos >= 0){
-							selectChkBox.setChecked(true);
-							background.setBackgroundResource(R.color.green);
-							Toast.makeText(PickTasteFragment.this.getActivity(), "添加" + mTastes.get(position).getPreference(), Toast.LENGTH_SHORT).show();
-						}else{
-							Toast.makeText(PickTasteFragment.this.getActivity(), "最多只能添加" + mOrderFood.tastes.length + "种口味", Toast.LENGTH_SHORT).show();
-							background.setBackgroundResource(R.color.blue);
-						}
-
-					}
-					mTasteHandler.sendEmptyMessage(TASTE_SELECTED);
-				}
-			});
-			
 			return view;
 		}
+	}
+
+	@Override
+	public boolean onDown(MotionEvent e) {
+		return false;
+	}
+
+	@Override
+	public void onShowPress(MotionEvent e) {
+	}
+
+	@Override
+	public boolean onSingleTapUp(MotionEvent e) {
+		return false;
+	}
+
+	@Override
+	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
+			float distanceY) {
+		return false;
+	}
+
+	@Override
+	public void onLongPress(MotionEvent e) {
+	}
+
+	@Override
+	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+			float velocityY) {
+		//fly 60px will start scroll 
+		if (e1.getX() - e2.getX() > 60) {
+			this.mFlipper.setInAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.push_left_in));
+			this.mFlipper.setOutAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.push_left_out));
+			this.mFlipper.showNext();
+			return true;
+		} else if (e1.getX() - e2.getX() < -60) {
+			this.mFlipper.setInAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.push_right_in));
+			this.mFlipper.setOutAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.push_right_out));
+			this.mFlipper.showPrevious();
+			return true;
+		}		
+		return false;
 	}
 }

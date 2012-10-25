@@ -202,7 +202,7 @@ public class PickedFoodActivity extends Activity implements OnTableChangeListene
 						@Override
 						public void onClick(View v) {
 							float curNum = Float.parseFloat(countEditText.getText().toString());
-							if(--curNum >= 0)
+							if(--curNum >= 1)
 							{
 								countEditText.setText("" + curNum);
 								orderFood.setCount(curNum);

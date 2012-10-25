@@ -110,7 +110,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 			}
 		});
 		
-		mGDetector = new GestureDetector(this);
+		mGDetector = new GestureDetector(getActivity(), this);
 		mFlipper = (ViewFlipper) view.findViewById(R.id.viewFlipper_dialogTab1);
 		
 		/*

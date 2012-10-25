@@ -4,29 +4,27 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.graphics.BitmapFactory;
+import android.app.Dialog;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
-import android.widget.LinearLayout.LayoutParams;
 import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
-import com.wireless.fragment.GalleryFragment.OnPicClickListener;
 import com.wireless.fragment.PickTasteFragment;
 import com.wireless.fragment.PickTasteFragment.OnTasteChangeListener;
 import com.wireless.ordermenu.R;
@@ -34,9 +32,10 @@ import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
+import com.wireless.protocol.Util;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
-public class FoodDetailActivity extends Activity implements OnTasteChangeListener, OnPicClickListener{
+public class FoodDetailActivity extends Activity implements OnTasteChangeListener{
 	private static final int ORDER_FOOD_CHANGED = 234841;
 	private static final String RECOMMEND_DIALOG = "recommend_dialog";
 
@@ -47,8 +46,6 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 	private ImageView mFoodImageView;
 	private ImageFetcher mImageFetcher;
 	
-//	private GalleryFragment mRecFoodsFragment;
-
 	/*
 	 * 显示该菜品详细情况的handler
 	 * 当菜品改变时改变显示
@@ -122,27 +119,11 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		mFoodImageView = (ImageView) findViewById(R.id.imageView_foodDetail);
 		mFoodImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 		
-//		BitmapFactory.Options options = new BitmapFactory.Options();
-//		options.inJustDecodeBounds = true;
-//		BitmapFactory.decodeFile(mOrderFood.image, options);
-//		int imageHeight = options.outHeight;
-//		int imageWidth = options.outWidth;
+		mFoodImageView.setOnClickListener(new FoodDetailOnClickListener(mOrderFood));
 		
 		mImageFetcher = new ImageFetcher(this, 600, 400);
 
 		mImageFetcher.loadImage(mOrderFood.image, mFoodImageView);
-		
-		mFoodImageView.setOnClickListener(new OnClickListener(){
-			//点击主图进入全屏界面
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(FoodDetailActivity.this ,FullScreenActivity.class);
-				Bundle bundle = new Bundle();
-				bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(mOrderFood));
-				intent.putExtras(bundle);
-				startActivity(intent);
-			}
-		});
 		
 		//点菜按钮
 		((ImageView)findViewById(R.id.imageButton_addDish_foodDetail)).setOnClickListener(new OnClickListener(){
@@ -172,7 +153,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 			@Override
 			public void onClick(View v) {
 				float curNum = Float.parseFloat(countEditText.getText().toString());
-				if(--curNum >= 0)
+				if(--curNum >= 1)
 				{
 					countEditText.setText("" + curNum);
 					mOrderFood.setCount(curNum);
@@ -184,17 +165,15 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 
 			@Override
 			public void onClick(View v) {
-				onPicClick(null,0);
-//FIXME 弹出对话框
-//				showDialog(PickTasteFragment.FOCUS_TASTE, 0);
+				showDialog(PickTasteFragment.FOCUS_TASTE, null);
 			}
 		});
-		
+		//品注按钮
 		((Button) findViewById(R.id.button_pinzhu_foodDetail)).setOnClickListener(new OnClickListener(){
 
 			@Override
 			public void onClick(View v) {
-				showDialog(PickTasteFragment.FOCUS_NOTE, 0);
+				showDialog(PickTasteFragment.FOCUS_NOTE, null);
 			}
 		});
 		//清空品注
@@ -228,31 +207,18 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		
 		mImageFetcher.setImageSize(245, 160);
 		LayoutParams lp = new LayoutParams(245,160);
-
+		//推荐菜层
 		LinearLayout linearLyaout = (LinearLayout) findViewById(R.id.linearLayout_foodDetail);
-		for(Food f:mRecommendfoods)
+		for(final Food f:mRecommendfoods)
 		{
 			ImageView image = new ImageView(this);
 			image.setLayoutParams(lp);
 			image.setScaleType(ScaleType.CENTER_CROP);
 			mImageFetcher.loadImage(f.image, image);
 			linearLyaout.addView(image);
+			//设置推荐菜点击侦听
+			image.setOnClickListener(new FoodDetailOnClickListener(f));
 		}
-		/*
-		 * FIXME 修正fragment的样式
-		 */
-//		mRecFoodsFragment = GalleryFragment.newInstance(mRecommendfoods.toArray(new Food[mRecommendfoods.size()]), 0.5f, 1, ScaleType.FIT_CENTER);
-//		FragmentTransaction fragmentTransaction = this.getFragmentManager().beginTransaction();
-//		fragmentTransaction.replace(R.id.viewPager_container_foodDetail, mRecFoodsFragment).commit();
-		 
-//		Gallery gallery = (Gallery) findViewById(R.id.gallery_food_detail);
-//		gallery.setAdapter(new RecommendFoodAdapter());
-//		gallery.setOnItemClickListener(new OnItemClickListener(){
-//			@Override
-//			public void onItemClick(AdapterView<?> parent,View view, int position, long id) {
-//				showDialog(RECOMMEND_DIALOG, position);
-//			}
-//		});
 	}
 	
 	@Override 
@@ -261,16 +227,71 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		mImageFetcher.clearCache();
 	}
 	
-	protected void showDialog(String tab, int position) {
+	protected void showDialog(String tab, final Food f) {
 		//设置推荐菜对话框或口味选择对话框
 		if(tab == RECOMMEND_DIALOG)
 		{
-//			//推荐菜对话框的view
-//			RecommendFoodFragment recFoodFragment = new RecommendFoodFragment();
-//			recFoodFragment.show(getFragmentManager(), tab);
+			final Dialog dialog = new Dialog(this,android.R.style.Theme_Holo_Light_Dialog_NoActionBar);
+			View dialogLayout = getLayoutInflater().inflate(R.layout.recommend_food_dialog, null);
+			dialog.setContentView(dialogLayout);
+			dialog.show();
 			
-//			mDialog.show();
-//			mDialog.setPosition(position);
+			int width = 900;
+			int height = 500;
+			Window dialogWindow = dialog.getWindow();
+			WindowManager.LayoutParams lp = dialogWindow.getAttributes();
+			lp.width = width;
+			lp.height = height;
+			dialogWindow.setAttributes(lp);
+			
+			mImageFetcher.setImageSize(width, height);
+			ImageView imageView = (ImageView)dialog.findViewById(R.id.imageView_recDialog);
+			imageView.setScaleType(ScaleType.CENTER_CROP);
+			mImageFetcher.loadImage(f.image, imageView);
+			
+			final EditText countEditText = (EditText) dialog.findViewById(R.id.editText_count_rec_dialog);
+			//设置数量加减
+			((ImageButton) dialog.findViewById(R.id.imageButton_plus_rec_dialog)).setOnClickListener(new OnClickListener(){
+
+				@Override
+				public void onClick(View v) {
+					float curNum = Float.parseFloat(countEditText.getText().toString());
+					countEditText.setText("" + ++curNum);
+				}
+			});
+			
+			//设置数量减
+			((ImageButton)dialog.findViewById(R.id.imageButton_minus_recommendDialog)).setOnClickListener(new OnClickListener(){
+
+				@Override
+				public void onClick(View v) {
+					float curNum = Float.parseFloat(countEditText.getText().toString());
+					if(--curNum >= 1){
+						countEditText.setText("" + curNum);
+					}
+				}
+			});
+			//点菜按钮
+			((ImageButton)dialog.findViewById(R.id.imageButton_addFood_rec_dialog)).setOnClickListener(new OnClickListener(){
+				@Override
+				public void onClick(View v) {
+					mOrderFood = new OrderFood(f);
+					mOrderFood.setCount(Float.parseFloat(((EditText) dialog.findViewById(R.id.editText_count_rec_dialog)).getText().toString()));
+					ShoppingCart.instance().addFood(mOrderFood);
+					Toast.makeText(getApplicationContext(), mOrderFood.name + "已添加", Toast.LENGTH_SHORT).show();
+				}
+			});
+			//关闭按钮
+			((ImageButton)dialog.findViewById(R.id.imageButton_close_rec_dialog)).setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					dialog.dismiss();
+				}
+			});
+			//价格和名称的显示
+			((TextView) dialog.findViewById(R.id.textView_price_rec_dialog)).setText(Util.float2String2(f.getPrice()));
+			((TextView) dialog.findViewById(R.id.textView_food_name_recommend_dialog)).setText(f.name);
+
 		} else{
 			PickTasteFragment pickTasteFg = new PickTasteFragment();
 			pickTasteFg.setOnTasteChangeListener(this);
@@ -281,187 +302,20 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		}
 	}
 
-//	private void initDialog() {
-////		View dialogLayout = getLayoutInflater().inflate(R.layout.recommend_food_fragment, (ViewGroup) findViewById(R.id.rec_food_dialog_layout));
-//		
-//		mDialogFragment = (RecommendFoodFragment) getFragmentManager().findFragmentById(R.id.recommendFoodFragment_rec_dialog);
-//		mDialogFragment.show(getFragmentManager(), RECOMMEND_DIALOG);
-//		Dialog mDialog = mDialogFragment.getDialog();
-//		mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-////		mDialog.setContentView(dialogLayout);
-//		
-//		//设置对话框长宽
-//		Window dialogWindow = mDialog.getWindow();
-//		WindowManager.LayoutParams lp = dialogWindow.getAttributes();
-//		lp.width = 900;
-//		lp.height = 550;
-//		dialogWindow.setAttributes(lp);
-//	}
-
-	/*
-	 * 推荐菜对话框
-	 */
-//	private class RecFoodDialog implements GalleryFragment.OnPicClickListener,
-//										   GalleryFragment.OnPicChangedListener
-//	{
-//		private Dialog mDialog;
-//		private GalleryFragment mGalleryFragment;
-//		private View mDialogLayout;
-//		
-//		RecFoodDialog(){
-//			
-//			mDialogLayout = getLayoutInflater().inflate(R.layout.recommend_dialog, (ViewGroup) findViewById(R.id.recommend_dialog_layout));
-//			mDialog = new Dialog(FoodDetailActivity.this);
-//			mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-//			mDialog.setContentView(mDialogLayout);
-//			
-//			//设置对话框长宽
-//			Window dialogWindow = mDialog.getWindow();
-//			WindowManager.LayoutParams lp = dialogWindow.getAttributes();
-//			lp.width = 900;
-//			lp.height = 550;
-//			dialogWindow.setAttributes(lp);
-//			
-//			mGalleryFragment = GalleryFragment.newInstance(0.3f, 8, ScaleType.CENTER_INSIDE);
-//			FragmentTransaction fragmentTransaction = FoodDetailActivity.this.getFragmentManager().beginTransaction();
-//			fragmentTransaction.replace(R.id.viewPager_container_rec_dialog, mGalleryFragment).commit();
-//			mGalleryFragment.setOnPicClickListener(this);
-//			mGalleryFragment.setOnPicChangedListener(this);
-//			
-//			final EditText countEditText = (EditText) mDialogLayout.findViewById(R.id.editText_count_rec_dialog);
-//			
-//			//设置数量加减
-//			((ImageButton) mDialogLayout.findViewById(R.id.imageButton_plus_rec_dialog)).setOnClickListener(new OnClickListener(){
-//
-//				@Override
-//				public void onClick(View v) {
-//					float curNum = Float.parseFloat(countEditText.getText().toString());
-//					countEditText.setText("" + ++curNum);
-//				}
-//			});
-//			
-//			//设置数量减
-//			((ImageButton)mDialogLayout.findViewById(R.id.imageButton_minus_recommendDialog)).setOnClickListener(new OnClickListener(){
-//
-//				@Override
-//				public void onClick(View v) {
-//					float curNum = Float.parseFloat(countEditText.getText().toString());
-//					if(--curNum >= 0){
-//						countEditText.setText("" + curNum);
-//					}
-//				}
-//			});
-//			//点菜按钮
-//			((ImageButton)mDialogLayout.findViewById(R.id.imageButton_addFood_rec_dialog)).setOnClickListener(new OnClickListener(){
-//				@Override
-//				public void onClick(View v) {
-//					mOrderFood = new OrderFood(mRecommendfoods.get(mGalleryFragment.getSelectedPosition()));
-//					mOrderFood.setCount(Float.parseFloat(((EditText) mDialog.findViewById(R.id.editText_count_rec_dialog)).getText().toString()));
-//					ShoppingCart.instance().addFood(mOrderFood);
-//					Toast.makeText(getApplicationContext(), mOrderFood.name + "已添加", Toast.LENGTH_SHORT).show();
-//				}
-//			});
-//			
-//			((ImageButton)mDialogLayout.findViewById(R.id.imageButton_amplify_rec_dialog)).setOnClickListener(new OnClickListener(){
-//				@Override
-//				public void onClick(View v) {
-//					Intent intent = new Intent(FoodDetailActivity.this ,FullScreenActivity.class);
-//					Bundle bundle = new Bundle();
-//					bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(mOrderFood));
-//					intent.putExtras(bundle);
-//					startActivity(intent);
-//				}
-//			});
-//			
-//		}
-//		
-//		void show(){
-//			mGalleryFragment.notifyDataChanged(mRecommendfoods);			
-//			mDialog.show();
-//		}
-//		
-////		void dismiss(){
-////			mDialog.dismiss();
-////		}
-//		
-//		void setPosition(int position){
-//			mGalleryFragment.setPosition(position);
-//		}
-//
-//		@Override
-//		public void onPicClick(Food food, int position) {
-////			//当点击推荐菜时更新当前菜品
-//			float count = Float.parseFloat(((EditText) mDialog.findViewById(R.id.editText_count_rec_dialog)).getText().toString());
-//			mOrderFood = new OrderFood(mRecommendfoods.get(position));
-//			mOrderFood.setCount(count);
-//			mOrderFood.tmpTaste = new Taste();
-//			mOrderFood.tmpTaste.setPreference("");
-//			
-//			Intent intent = getIntent();
-//			Bundle bundle = new Bundle();
-//			bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(mOrderFood));
-//			intent.replaceExtras(bundle);
-//			
-//			mFoodImageView.setImageBitmap(mImgLoader.loadImage(mOrderFood.image));
-//			mDisplayHandler.sendEmptyMessage(ORDER_FOOD_CHANGED);
-//			mDialog.dismiss();
-//		}
-//
-//		@Override
-//		public void onPicChanged(Food curFood, int position) {
-//			((TextView) mDialogLayout.findViewById(R.id.textView_price_rec_dialog)).setText("" + curFood.getPrice());
-//			((TextView) mDialogLayout.findViewById(R.id.textView_food_name_recommend_dialog)).setText(curFood.name);
-//		}
-//	}
 	@Override
 	public void onTasteChange(OrderFood food) {
 		mOrderFood = food;
 		mDisplayHandler.sendEmptyMessage(ORDER_FOOD_CHANGED);
 	}
 	
-	class RecommendFoodAdapter extends BaseAdapter{
-    	
-    	@Override
-    	public int getCount() {
-    		return mRecommendfoods.size();
-    	}
-
-    	// 返回图片路径
-    	@Override
-    	public Object getItem(int position) {
-    		return mRecommendfoods.get(position);
-    	}
-
-    	// 返回图片在资源的位置
-    	@Override
-    	public long getItemId(int position) {
-    		return position;
-    	}
-
-    	// 此方法是最主要的，他设置好的ImageView对象返回给Gallery
-    	@Override
-    	public View getView(int position, View convertView, ViewGroup parent) {
-    		ImageView imageView;
-    		if(convertView == null){
-    			convertView = new ImageView(FoodDetailActivity.this);
-    			imageView = (ImageView)convertView;
-    			// 设置ImageView的伸缩规格，用了自带的属性值
-    			imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-    			
-    		}else {
-    			imageView = (ImageView)convertView;
-    		}
-    		
-    		BitmapFactory.Options options = new BitmapFactory.Options();
-    		options.inJustDecodeBounds = true; 
-    		BitmapFactory.decodeFile(mRecommendfoods.get(position).image, options);
-//    		imageView.setImageBitmap(ImageResizer.decodeSampledBitmapFromFile((), reqWidth, reqHeight));
-    		return imageView;
-    	}
-	}
-
-	@Override
-	public void onPicClick(Food food, int position) {
-		showDialog(RECOMMEND_DIALOG, position);
+	class FoodDetailOnClickListener implements OnClickListener{
+		Food mFood;
+		public FoodDetailOnClickListener(Food mFood) {
+			this.mFood = mFood;
+		}
+		@Override
+		public void onClick(View v) {
+			showDialog(RECOMMEND_DIALOG, mFood);
+		}
 	}
 }
