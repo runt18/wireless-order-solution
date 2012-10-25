@@ -3,13 +3,13 @@ package com.wireless.protocol;
 import java.util.Arrays;
 import java.util.Comparator;
 
-public class RespParserEx {
+public class RespQueryMenuParserEx {
 	/**
 	 * Parse the response associated with query menu request.
 	 * @param response the protocol package return from ProtocolConnector's ask() function
 	 * @return the vector containing the food instance
 	 */
-	public static FoodMenu parseQueryMenu(ProtocolPackage response){
+	public static FoodMenu parse(ProtocolPackage response){
 		FoodMenu foodMenu = RespQueryMenuParser.parse(response);
 		
 		Comparator<Taste> tasteComp = new Comparator<Taste>(){
@@ -22,7 +22,8 @@ public class RespParserEx {
 		Arrays.sort(foodMenu.tastes, tasteComp);
 		Arrays.sort(foodMenu.styles, tasteComp);
 		Arrays.sort(foodMenu.specs, tasteComp);
-		Arrays.sort(foodMenu.foods, new Comparator<Food>(){
+		
+		Comparator<Food> foodComp = new Comparator<Food>(){
 			@Override
 			public int compare(Food arg0, Food arg1) {
 				if(arg0.aliasID > arg1.aliasID){
@@ -33,8 +34,19 @@ public class RespParserEx {
 					return 0;
 				}
 			}			
-		});
+		};
+		
+		Arrays.sort(foodMenu.foods, foodComp);
 		for(int i = 0; i < foodMenu.foods.length; i++){
+			if(foodMenu.foods[i].isCombo()){
+				for(int j = 0; j < foodMenu.foods[i].childFoods.length; j++){
+					int index = Arrays.binarySearch(foodMenu.foods, foodMenu.foods[i].childFoods[j], foodComp);
+					if(index >= 0){
+						foodMenu.foods[i].childFoods[j] = foodMenu.foods[index];
+					}
+				}
+			}
+			
 			if(foodMenu.foods[i].popTastes != null){
 				for(int j = 0; j < foodMenu.foods[i].popTastes.length; j++){
 					int index;
