@@ -43,7 +43,7 @@ import com.wireless.protocol.ReqQueryRestaurant;
 import com.wireless.protocol.ReqQueryStaff;
 import com.wireless.protocol.ReqQueryTable;
 import com.wireless.protocol.RespParser;
-import com.wireless.protocol.RespParserEx;
+import com.wireless.protocol.RespQueryMenuParserEx;
 import com.wireless.protocol.Terminal;
 import com.wireless.protocol.Type;
 import com.wireless.sccon.ServerConnector;
@@ -271,7 +271,7 @@ public class StartupActivity extends Activity {
 				WirelessOrder.foodMenu = null;
 				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryMenu());
 				if(resp.header.type == Type.ACK){
-					WirelessOrder.foodMenu = RespParserEx.parseQueryMenu(resp);
+					WirelessOrder.foodMenu = RespQueryMenuParserEx.parse(resp);
 				}else{
 					if(resp.header.reserved == ErrorCode.TERMINAL_NOT_ATTACHED) {
 						errMsg = "终端没有登记到餐厅，请联系管理人员。";
