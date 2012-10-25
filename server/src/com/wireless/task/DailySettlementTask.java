@@ -9,8 +9,9 @@ import java.text.SimpleDateFormat;
 import org.tiling.scheduling.SchedulerTask;
 
 import com.wireless.db.DailySettleDao;
-import com.wireless.db.tasteRef.TasteRef;
+import com.wireless.db.tasteRef.TasteRefDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.foodStatistics.CalcOrderCntDao;
 import com.wireless.server.WirelessSocketServer;
 
 /**
@@ -27,11 +28,12 @@ public class DailySettlementTask extends SchedulerTask{
 		
 		try {   
 			
-			//clean up the unprinted records
+			//Clean up the unprinted records
 			synchronized(WirelessSocketServer.printLosses){
 				WirelessSocketServer.printLosses.clear();
 			}
 			
+			//Perform daily settlement.
 			DailySettleDao.Result result = DailySettleDao.exec();		
 					
 			taskInfo += "info : " + result.totalOrder + " record(s) are moved from \"order\" to \"order_history\"" + sep;
@@ -42,11 +44,19 @@ public class DailySettlementTask extends SchedulerTask{
 						"maxium order food id : " + result.maxOrderFoodID + ", " +
 						"maxium shift id : " + result.maxShiftID + sep;
 			
+			//Perform to smart taste calculation.
 			long beginTime = System.currentTimeMillis();
-			TasteRef.exec();
+			TasteRefDao.exec();
 			long elapsedTime = System.currentTimeMillis() - beginTime;
 			
-			taskInfo += "info : The calculation to smart taste reference takes " + elapsedTime / 1000 + " sec." + sep; 
+			taskInfo += "info : The calculation to smart taste reference takes " + elapsedTime / 1000 + " sec." + sep;
+			
+			//Perform to calculate the order count to each food from bill history
+			beginTime = System.currentTimeMillis();
+			int nRows = CalcOrderCntDao.exec();
+			elapsedTime = System.currentTimeMillis() - beginTime;
+			
+			taskInfo += "info : The order count to " + nRows + " foods is calculated and takes " + elapsedTime / 1000 + " sec." + sep;
 				
 		}catch(SQLException e){
 			taskInfo += "error : " + e.getMessage() + sep;
