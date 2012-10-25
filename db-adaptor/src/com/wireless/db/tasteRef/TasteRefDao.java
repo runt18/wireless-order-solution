@@ -15,7 +15,7 @@ import com.wireless.protocol.Department;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
 
-public class TasteRef {
+public class TasteRefDao {
 	
 	private final static int TASTE_REF_NUM = 10;
 	
