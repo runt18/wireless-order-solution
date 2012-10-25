@@ -94,7 +94,6 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member` (
   `balance` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the balance to this member' ,
   `point` INT NOT NULL DEFAULT 0 COMMENT 'the remaining point to this member' ,
   PRIMARY KEY (`member_id`) ,
-  INDEX `ix_client_id` (`client_id` ASC) ,
   INDEX `ix_member_type_id` (`member_type_id` ASC) ,
   INDEX `ix_restaurant_id` (`restaurant_id` ASC) ,
   INDEX `ix_member_card_id` (`member_card_id` ASC) )
