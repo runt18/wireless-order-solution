@@ -33,6 +33,7 @@ import com.wireless.protocol.Department;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.OrderFood;
+import com.wireless.util.ImageDialog;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
 public class RankListActivity extends Activity {
@@ -75,8 +76,16 @@ public class RankListActivity extends Activity {
 			image.setScaleType(ScaleType.CENTER_CROP);
 			mImageFetcher.loadImage(f.image, image);
 			recLyaout.addView(image);
+			
+			image.setTag(f);
 			//设置推荐菜点击侦听
-//			image.setOnClickListener(new FoodDetailOnClickListener(f));
+			image.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					Food f = (Food) v.getTag();
+					new ImageDialog(RankListActivity.this, android.R.style.Theme_Holo_Light_Dialog_NoActionBar, f).show();
+				}
+			});
 		}
 		
 		/*

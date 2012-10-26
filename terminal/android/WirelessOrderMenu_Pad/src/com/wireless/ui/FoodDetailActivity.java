@@ -4,14 +4,11 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -32,7 +29,7 @@ import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
-import com.wireless.protocol.Util;
+import com.wireless.util.ImageDialog;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
 public class FoodDetailActivity extends Activity implements OnTasteChangeListener{
@@ -230,67 +227,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		//设置推荐菜对话框或口味选择对话框
 		if(tab == RECOMMEND_DIALOG)
 		{
-			final Dialog dialog = new Dialog(this,android.R.style.Theme_Holo_Light_Dialog_NoActionBar);
-			View dialogLayout = getLayoutInflater().inflate(R.layout.recommend_food_dialog, null);
-			dialog.setContentView(dialogLayout);
-			dialog.show();
-			
-			int width = 900;
-			int height = 500;
-			Window dialogWindow = dialog.getWindow();
-			WindowManager.LayoutParams lp = dialogWindow.getAttributes();
-			lp.width = width;
-			lp.height = height;
-			dialogWindow.setAttributes(lp);
-			
-			mImageFetcher.setImageSize(width, height);
-			ImageView imageView = (ImageView)dialog.findViewById(R.id.imageView_recDialog);
-			imageView.setScaleType(ScaleType.CENTER_CROP);
-			mImageFetcher.loadImage(f.image, imageView);
-			
-			final EditText countEditText = (EditText) dialog.findViewById(R.id.editText_count_rec_dialog);
-			//设置数量加减
-			((ImageButton) dialog.findViewById(R.id.imageButton_plus_rec_dialog)).setOnClickListener(new OnClickListener(){
-
-				@Override
-				public void onClick(View v) {
-					float curNum = Float.parseFloat(countEditText.getText().toString());
-					countEditText.setText("" + ++curNum);
-				}
-			});
-			
-			//设置数量减
-			((ImageButton)dialog.findViewById(R.id.imageButton_minus_recommendDialog)).setOnClickListener(new OnClickListener(){
-
-				@Override
-				public void onClick(View v) {
-					float curNum = Float.parseFloat(countEditText.getText().toString());
-					if(--curNum >= 1){
-						countEditText.setText("" + curNum);
-					}
-				}
-			});
-			//点菜按钮
-			((ImageButton)dialog.findViewById(R.id.imageButton_addFood_rec_dialog)).setOnClickListener(new OnClickListener(){
-				@Override
-				public void onClick(View v) {
-					mOrderFood = new OrderFood(f);
-					mOrderFood.setCount(Float.parseFloat(((EditText) dialog.findViewById(R.id.editText_count_rec_dialog)).getText().toString()));
-					ShoppingCart.instance().addFood(mOrderFood);
-					Toast.makeText(getApplicationContext(), mOrderFood.name + "已添加", Toast.LENGTH_SHORT).show();
-				}
-			});
-			//关闭按钮
-			((ImageButton)dialog.findViewById(R.id.imageButton_close_rec_dialog)).setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					dialog.dismiss();
-				}
-			});
-			//价格和名称的显示
-			((TextView) dialog.findViewById(R.id.textView_price_rec_dialog)).setText(Util.float2String2(f.getPrice()));
-			((TextView) dialog.findViewById(R.id.textView_food_name_recommend_dialog)).setText(f.name);
-
+			new ImageDialog(this,android.R.style.Theme_Holo_Light_Dialog_NoActionBar, f).show();
 		} else{
 			PickTasteFragment pickTasteFg = new PickTasteFragment();
 			pickTasteFg.setOnTasteChangeListener(this);
