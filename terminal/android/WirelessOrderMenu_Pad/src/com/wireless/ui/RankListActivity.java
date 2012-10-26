@@ -209,7 +209,7 @@ public class RankListActivity extends Activity {
 			for(Food f:activity.mOriFoods)
 			{
 				for(Kitchen k:kitchens)
-					if(f.kitchen.aliasID == k.aliasID)
+					if(f.kitchen.aliasID == k.aliasID && f.image != null)
 					{
 						allFoods.add(f);
 					}
@@ -292,7 +292,8 @@ public class RankListActivity extends Activity {
 			mRankListView.postDelayed(new Runnable(){
 				@Override
 				public void run() {
-					mRankListView.performItemClick(mRankListView.getChildAt(0), 0, 0);
+					if(!mRankListView.getAdapter().isEmpty())
+						mRankListView.performItemClick(mRankListView.getChildAt(0), 0, 0);
 				}
 			}, 100);
 		}
