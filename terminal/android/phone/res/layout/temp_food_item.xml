@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
+    <EditText
+        android:id="@+id/editText_foodName_tempFood_item"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/imageButton_delete_tempFood_item"
+        android:layout_toRightOf="@+id/textView_kitchen_tempFood_item"
+        android:ems="10"
+        android:hint="请输入菜名" >
+
+    </EditText>
+
+    <EditText
+        android:id="@+id/editText1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/editText_foodName_tempFood_item"
+        android:layout_alignParentBottom="false"
+        android:layout_below="@+id/editText_foodName_tempFood_item"
+        android:layout_toLeftOf="@+id/imageButton_delete_tempFood_item"
+        android:ems="10"
+        android:hint="请输入数量" />
+
+    <ImageButton
+        android:id="@+id/imageButton_delete_tempFood_item"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="false"
+        android:background="@null"
+        android:src="@drawable/reduc_selector" />
+
+    <TextView
+        android:id="@+id/textView_kitchen_tempFood_item"
+        android:layout_width="100dp"
+        android:layout_height="40dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:background="@color/blue"
+        android:gravity="center"
+        android:text="厨房"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+</RelativeLayout>

@@ -34,7 +34,7 @@
 
     <com.wireless.ui.view.TempListView
         android:id="@+id/tempListView"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:cacheColorHint="#00000000"
         android:divider="@drawable/line"

@@ -20,6 +20,7 @@ import com.wireless.common.Params;
 import com.wireless.excep.BusinessException;
 import com.wireless.fragment.KitchenFragment;
 import com.wireless.fragment.PickFoodFragment;
+import com.wireless.fragment.TempFoodFragment;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.OrderParcel;
 import com.wireless.protocol.Order;
@@ -35,6 +36,8 @@ public class PickFoodActivity extends FragmentActivity implements
 	private static final int NUMBER_FRAGMENT = 1320;	//编号
 	private static final int KITCHEN_FRAGMENT = 1321;	//分厨
 	private static final int PINYIN_FRAGMENT = 1322;	//拼音
+	private static final int TEMP_FOOD_FRAGMENT = 1323;
+
 	private static final int DEFAULT_FRAGMENT = PINYIN_FRAGMENT;
 	
 	private int mCurFg = -1;
@@ -56,6 +59,7 @@ public class PickFoodActivity extends FragmentActivity implements
 		private ImageButton mNumBtn;
 		private ImageButton mKitchenBtn;
 		private ImageButton mSpellBtn;
+		private ImageButton mTempBtn;
 		
 		ViewHandler(PickFoodActivity activity)
 		{
@@ -66,7 +70,7 @@ public class PickFoodActivity extends FragmentActivity implements
 			mNumBtn = (ImageButton) activity.findViewById(R.id.imageButton_num_pickFood);
 			mKitchenBtn = (ImageButton) activity.findViewById(R.id.imageButton_kitchen_pickFood);
 			mSpellBtn = (ImageButton) activity.findViewById(R.id.imageButton_spell_pickFood);
-
+			mTempBtn = (ImageButton) activity.findViewById(R.id.imageButton_tempFood_pickFood);
 		}
 		
 		@Override
@@ -125,6 +129,15 @@ public class PickFoodActivity extends FragmentActivity implements
 					mActivity.get().mCurFg = PINYIN_FRAGMENT;
 				}
 				break;
+			case TEMP_FOOD_FRAGMENT:
+				if(mActivity.get().mCurFg != TEMP_FOOD_FRAGMENT){
+					fgTrans.replace(R.id.frameLayout_container_pickFood, new TempFoodFragment()).commit();
+					
+					mTitleTextView.setText("点菜 - 临时菜");
+					setLastCate(TEMP_FOOD_FRAGMENT);
+					mActivity.get().mCurFg = TEMP_FOOD_FRAGMENT;
+				}
+				break;
 			}
 		}
 		
@@ -134,6 +147,8 @@ public class PickFoodActivity extends FragmentActivity implements
 			mNumBtn.setImageResource(R.drawable.number_btn);
 			mKitchenBtn.setImageResource(R.drawable.kitchen);
 			mSpellBtn.setImageResource(R.drawable.pinyin);
+			mTempBtn.setImageResource(R.drawable.linshicai);
+
 			//切换点菜方式时，保存当前的点菜模式
 			Editor editor = activity.getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).edit();
 			
@@ -151,6 +166,10 @@ public class PickFoodActivity extends FragmentActivity implements
 				editor.putInt(Params.LAST_PICK_CATE, Params.PICK_BY_PINYIN);
 				mSpellBtn.setImageResource(R.drawable.pinyin_down);
 				break;
+			case TEMP_FOOD_FRAGMENT:
+				//TODO 添加一个字段
+				editor.putInt(Params.LAST_PICK_CATE, 5);
+				mTempBtn.setImageResource(R.drawable.linshicai_down);
 			default:
 				
 			}
@@ -209,6 +228,13 @@ public class PickFoodActivity extends FragmentActivity implements
 				mViewHandler.sendEmptyMessage(PINYIN_FRAGMENT);
 			}
 		});
+		//临时菜
+		((ImageButton) findViewById(R.id.imageButton_tempFood_pickFood)).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				mViewHandler.sendEmptyMessage(TEMP_FOOD_FRAGMENT);
+			}
+		});
 
 		/**
 		 * 根据上次保存的记录，切换到相应的点菜方式
@@ -225,6 +251,9 @@ public class PickFoodActivity extends FragmentActivity implements
 		case Params.PICK_BY_PINYIN:
 			mViewHandler.sendEmptyMessage(PINYIN_FRAGMENT);
 			break;
+		case 5:
+			mViewHandler.sendEmptyMessage(TEMP_FOOD_FRAGMENT);
+			break;
 		default :
 			mViewHandler.sendEmptyMessage(DEFAULT_FRAGMENT);
 		}
@@ -237,9 +266,6 @@ public class PickFoodActivity extends FragmentActivity implements
 	public void onBackPressed() {
 		// Add the temporary foods to the picked food list
 		// except the ones without food name
-//		if (_tempLstView != null) {
-//			_pickFoods.addAll(_tempLstView.getSourceData());
-//		}
 
 		Intent intent = new Intent();
 		Bundle bundle = new Bundle();

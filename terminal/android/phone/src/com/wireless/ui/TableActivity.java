@@ -56,7 +56,9 @@ import com.wireless.ui.view.PullListView.OnRefreshListener;
 
 public class TableActivity extends Activity {
 	private PullListView mListView;
-	private View popupView;
+	private PopupWindow mPopWnd;
+
+//	private View popupView;
 	private ImageButton regionAllBtn ;
 	private ImageButton idleBtn;
 	private ImageButton busyBtn;
@@ -131,7 +133,7 @@ public class TableActivity extends Activity {
 				}
 			}
 			
-			ListView popListView = (ListView)theActivity.popupView.findViewById(R.id.popWndList);
+			ListView popListView = (ListView)theActivity.mPopWnd.getContentView().findViewById(R.id.popWndList);
 
 			popListView.setAdapter(new BaseAdapter() {
 				
@@ -676,16 +678,16 @@ public class TableActivity extends Activity {
 		});
 		
 		// 创建点击餐台状态后弹出区域的View
-		popupView = getLayoutInflater().inflate(R.layout.main_pop_window, null);
+		View popupView = getLayoutInflater().inflate(R.layout.main_pop_window, null);
 
 		// 创建与这个View关联的pop-up window
-		final PopupWindow popWnd = new PopupWindow(
+		mPopWnd = new PopupWindow(
 				popupView,
 				LayoutParams.WRAP_CONTENT,
 				LayoutParams.WRAP_CONTENT, true);
-		popWnd.setOutsideTouchable(true);
-		popWnd.setBackgroundDrawable(new BitmapDrawable());
-		popWnd.update();
+		mPopWnd.setOutsideTouchable(true);
+		mPopWnd.setBackgroundDrawable(new BitmapDrawable());
+		mPopWnd.update();
 		
 		ListView popListView = (ListView)popupView.findViewById(R.id.popWndList);
 		popListView.setOnItemClickListener(new OnItemClickListener(){
@@ -695,7 +697,7 @@ public class TableActivity extends Activity {
 				Region region = (Region)view.getTag();
 				mRegionCond = region.regionID;
 				mDataHandler.sendEmptyMessage(0);
-				popWnd.dismiss();
+				mPopWnd.dismiss();
 			}
 			
 		});
@@ -705,10 +707,10 @@ public class TableActivity extends Activity {
 		titleBtn.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				if (popWnd.isShowing()) {
-					popWnd.dismiss();
+				if (mPopWnd.isShowing()) {
+					mPopWnd.dismiss();
 				} else {
-					popWnd.showAsDropDown(v, -34, 0);
+					mPopWnd.showAsDropDown(v, -34, 0);
 				}
 			}
 		});

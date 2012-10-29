@@ -1,10 +1,13 @@
 package com.wireless.ui.view;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
 import android.content.Context;
+import android.graphics.drawable.BitmapDrawable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
@@ -12,13 +15,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.wireless.common.WirelessOrder;
+import com.wireless.protocol.Department;
+import com.wireless.protocol.Food;
+import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Util;
 import com.wireless.ui.R;
@@ -28,10 +37,67 @@ public class TempListView extends ListView {
 	
 	private List<OrderFood> _tmpFoods = new ArrayList<OrderFood>();
 	private BaseAdapter _adapter = new Adapter();
+	private ArrayList<Department> mValidDepts;
 	
 	public TempListView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		setAdapter(_adapter);		
+		
+		/*
+		 * 将所有菜品进行按厨房编号进行排序
+		 */
+		Food[] mOriFoods = new Food[WirelessOrder.foodMenu.foods.length];
+		System.arraycopy(WirelessOrder.foodMenu.foods, 0, mOriFoods, 0,
+				WirelessOrder.foodMenu.foods.length);
+		Arrays.sort(mOriFoods, new Comparator<Food>() {
+			@Override
+			public int compare(Food food1, Food food2) {
+				if (food1.kitchen.aliasID > food2.kitchen.aliasID) {
+					return 1;
+				} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
+					return -1;
+				} else {
+					return 0;
+				}
+			}
+		});
+		/*
+		 * 使用二分查找算法筛选出有菜品的厨房
+		 */
+		ArrayList<Kitchen> mValidKitchens = new ArrayList<Kitchen>();
+		for (int i = 0; i < WirelessOrder.foodMenu.kitchens.length; i++) {
+			Food keyFood = new Food();
+			keyFood.kitchen.aliasID = WirelessOrder.foodMenu.kitchens[i].aliasID;
+			int index = Arrays.binarySearch(mOriFoods, keyFood,
+					new Comparator<Food>() {
+
+						public int compare(Food food1, Food food2) {
+							if (food1.kitchen.aliasID > food2.kitchen.aliasID) {
+								return 1;
+							} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
+								return -1;
+							} else {
+								return 0;
+							}
+						}
+					});
+
+			if (index >= 0) {
+				mValidKitchens.add(WirelessOrder.foodMenu.kitchens[i]);
+			}
+		}
+		/*
+		 * 筛选出有菜品的部门
+		 */
+		mValidDepts = new ArrayList<Department>();
+		for (int i = 0; i < WirelessOrder.foodMenu.depts.length; i++) {
+			for (int j = 0; j < mValidKitchens.size(); j++) {
+				if (WirelessOrder.foodMenu.depts[i].deptID == mValidKitchens.get(j).dept.deptID) {
+					mValidDepts.add(WirelessOrder.foodMenu.depts[i]);
+					break;
+				}
+			}
+		}
 	}
 
 	
@@ -62,6 +128,7 @@ public class TempListView extends ListView {
 		tmpFood.hangStatus = OrderFood.FOOD_NORMAL;
 		tmpFood.setPrice(new Float(10000));
 		tmpFood.setCount(new Float(1));
+		tmpFood.kitchen = new Kitchen();
 		_tmpFoods.add(tmpFood);
 		_adapter.notifyDataSetChanged();
 		//隐藏软键盘
@@ -101,22 +168,48 @@ public class TempListView extends ListView {
 			return position;
 		}
 
-	
 		@Override
 		public View getView(final int position, View convertView, ViewGroup parent) {
 			
 			final OrderFood food = _tmpFoods.get(position);
-			
 			View view;			
-			
+			final  LayoutInflater inflater = LayoutInflater.from(getContext());
 			if(convertView == null){
-				view = LayoutInflater.from(getContext()).inflate(R.layout.temp_item, null);				
+				view = inflater.inflate(R.layout.temp_item, null);				
 			}else{
 				view = convertView;
 			}
-			
-			((TextView)view.findViewById(R.id.occasin)).setText("临时菜" + (position + 1));			
-			
+			TextView kitchenTextView = (TextView)view.findViewById(R.id.textView_occasion_kitchen);
+
+			if(food.kitchen.dept.name != null)
+				kitchenTextView.setText(food.kitchen.dept.name);
+			kitchenTextView.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					//设置弹出框
+					final PopupWindow mPopWindow = new PopupWindow(inflater.inflate(R.layout.temp_food_fragment_popup_window, null),
+							140,LayoutParams.WRAP_CONTENT, true);
+					mPopWindow.update();
+					mPopWindow.setOutsideTouchable(true);
+					mPopWindow.setBackgroundDrawable(new BitmapDrawable());
+					//弹出框的内容
+					ListView popListView = (ListView) mPopWindow.getContentView();
+//					popListView.setTag(v);
+					popListView.setAdapter(new PopupAdapter());
+					popListView.setOnItemClickListener(new OnItemClickListener(){
+						@Override
+						public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+							//TODO 更改类型
+//							TextView v = (TextView) parent.getTag();
+							Department dept = (Department) view.getTag();
+							
+							food.kitchen.dept = dept;
+							mPopWindow.dismiss();
+						}					
+					});
+				}
+			});
 			/**
 			 * 菜名赋值
 			 */
@@ -263,6 +356,43 @@ public class TempListView extends ListView {
 			});
 			return view;
 		}		
+		
+	}
+	
+	class PopupAdapter extends BaseAdapter{
+
+		@Override
+		public int getCount() {
+			return mValidDepts.size();
+		}
+
+		@Override
+		public Object getItem(int position) {
+			return mValidDepts.get(position);
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return position;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			View view = convertView;
+
+			if(view == null)
+			{
+				final LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				view = inflater.inflate(R.layout.temp_food_fragment_pop_list_item, null);
+			}
+			
+			Department dept = mValidDepts.get(position);
+			TextView textView = (TextView) view;
+			textView.setText(dept.name);
+			textView.setTag(dept);
+			
+			return view;
+		}
 		
 	}
 }
