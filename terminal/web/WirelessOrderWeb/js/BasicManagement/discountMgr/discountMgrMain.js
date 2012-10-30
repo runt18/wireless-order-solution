@@ -53,6 +53,7 @@ programOperationHandler = function(c){
 	var rate = Ext.getCmp('numDiscountRate');
 	var isAuto = Ext.getCmp('chbIsAuto');
 	var isDefault = Ext.getCmp('chbIsDefault');
+	var status = Ext.getCmp('hideDiscountStatus');
 	
 	if(c.type == dmObj.operation.insert){
 		Ext.getDom('numDiscountID').parentElement.parentElement.style.display = 'none';
@@ -80,8 +81,9 @@ programOperationHandler = function(c){
 		level.setValue(sn.attributes.level); 
 		isAuto.setValue(true);
 		isDefault.setValue(eval(sn.attributes.isDefault));
+		status.setValue(sn.attributes.status);
 		
-		if(sn.attributes.status == 2){
+		if(sn.attributes.status == 2 || sn.attributes.status == 3){
 			name.setDisabled(true);
 			level.setDisabled(true);
 		}else{
@@ -283,6 +285,7 @@ Ext.onReady(function(){
 		width : 200,
 		border : true,
 		rootVisible : true,
+		autoScroll : true,
 		frame : true,
 		bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
 		loader : new Ext.tree.TreeLoader({
@@ -341,7 +344,7 @@ Ext.onReady(function(){
 //						}
 //					}
 					for(var i = (rn.length - 1); i >= 0; i--){
-						if(rn[i].attributes.status == 1){
+						if(rn[i].attributes.status == 1 || rn[i].attributes.status == 3){
 							rn[i].setText('<font color=\"red\">' + rn[i].attributes.discountName + '&nbsp;(默认方案)</font>');
 						}else if(rn[i].attributes.status == 2){
 							rn[i].setText('<font color=\"#808080\">' + rn[i].attributes.discountName + '&nbsp;(系统保留)</font>');
@@ -505,6 +508,9 @@ Ext.onReady(function(){
 				frame : true,
 				labelWidth : 65,
 				items : [{
+					xtype : 'hidden',
+					id : 'hideDiscountStatus'
+				}, {
 					xtype : 'numberfield',
 					id : 'numDiscountID',
 					fieldLabel : '方案编号',
@@ -586,6 +592,7 @@ Ext.onReady(function(){
 					var rate = Ext.getCmp('numDiscountRate');
 					var isAuto = Ext.getCmp('chbIsAuto');
 					var isDefault = Ext.getCmp('chbIsDefault');
+					var status = Ext.getCmp('hideDiscountStatus');
 					
 					var actionURL = '';
 					
@@ -597,6 +604,12 @@ Ext.onReady(function(){
 						actionURL = '../../InsertDiscount.do';
 					}else if(addProgramWin.operationType == dmObj.operation.update){
 						actionURL = '../../UpdateDiscount.do';
+						if(eval(isDefault.getValue() == true)){
+							if(status.getValue() == 2)
+								status.setValue(3);
+							else
+								status.setValue(1);
+						}
 					}else{
 						return;
 					}
@@ -615,7 +628,8 @@ Ext.onReady(function(){
 							level : level.getValue(),
 							rate : rate.getValue(),
 							isAuto : isAuto.getValue(),
-							isDefault : isDefault.getValue()
+							isDefault : isDefault.getValue(),
+							status : status.getValue()
 						},
 						success : function(res, opt){
 							var jr = Ext.util.JSON.decode(res.responseText);
