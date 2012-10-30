@@ -30,14 +30,16 @@ public class UpdateDiscountAction extends Action{
 			String discountID = request.getParameter("discountID");
 			String discountName = request.getParameter("discountName");
 			String level = request.getParameter("level");
-			String isDefault = request.getParameter("isDefault");
+			String status = request.getParameter("status");
+//			String isDefault = request.getParameter("isDefault");
 			
 			DiscountPojo pojo = new DiscountPojo();
 			pojo.setId(Integer.valueOf(discountID));
 			pojo.setName(discountName.trim());
 			pojo.setRestaurantID(Integer.valueOf(resturantID));
 			pojo.setLevel(Integer.valueOf(level));
-			pojo.setDefault(Boolean.valueOf(isDefault));
+			pojo.setStatus(Integer.valueOf(status));
+//			pojo.setDefault(Boolean.valueOf(isDefault));
 			
 			QueryDiscountDao.updateDiscount(pojo);
 			

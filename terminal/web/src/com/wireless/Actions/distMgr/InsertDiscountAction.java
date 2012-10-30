@@ -32,13 +32,16 @@ public class InsertDiscountAction extends Action{
 			String level = request.getParameter("level");
 			String rate = request.getParameter("rate");
 			String isAuto = request.getParameter("isAuto");
+//			String status = request.getParameter("status");
 			String isDefault = request.getParameter("isDefault");
 			
 			DiscountPojo pojo = new DiscountPojo();
 			pojo.setName(discountName.trim());
 			pojo.setRestaurantID(Integer.valueOf(resturantID));
 			pojo.setLevel(Integer.valueOf(level));
-			pojo.setDefault(Boolean.valueOf(isDefault));
+//			pojo.setStatus(Integer.valueOf(status));
+			if(isDefault != null && Boolean.valueOf(isDefault) == true)
+				pojo.setDefault();
 			
 			DiscountPlanPojo plan = null;
 			
