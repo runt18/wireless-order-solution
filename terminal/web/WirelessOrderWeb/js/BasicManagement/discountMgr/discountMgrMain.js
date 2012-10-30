@@ -80,6 +80,15 @@ programOperationHandler = function(c){
 		level.setValue(sn.attributes.level); 
 		isAuto.setValue(true);
 		isDefault.setValue(eval(sn.attributes.isDefault));
+		
+		if(sn.attributes.status == 2){
+			name.setDisabled(true);
+			level.setDisabled(true);
+		}else{
+			name.setDisabled(false);
+			level.setDisabled(false);
+		}
+		
 		addProgramWin.setTitle('修改方案');
 	}
 	
@@ -326,9 +335,16 @@ Ext.onReady(function(){
 				if(rn.length == 0){
 					programTree.getRootNode().getUI().hide();
 				}else{
+//					for(var i = (rn.length - 1); i >= 0; i--){
+//						if(rn[i].attributes.status == 2){
+//							programTree.getRootNode().removeChild(rn[i]);
+//						}
+//					}
 					for(var i = (rn.length - 1); i >= 0; i--){
-						if(rn[i].attributes.status == 2){
-							programTree.getRootNode().removeChild(rn[i]);
+						if(rn[i].attributes.status == 1){
+							rn[i].setText('<font color=\"red\">' + rn[i].attributes.discountName + '&nbsp;(默认方案)</font>');
+						}else if(rn[i].attributes.status == 2){
+							rn[i].setText('<font color=\"#808080\">' + rn[i].attributes.discountName + '&nbsp;(系统保留)</font>');
 						}
 					}
 					programTree.getRootNode().getUI().show();
