@@ -1,21 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
-
-    <ImageView
-        android:id="@+id/logo_imgview"
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:src="@color/blue" />
+    android:layout_height="match_parent"
+    android:paddingRight="40dp"
+    android:paddingTop="10dp" >
 
     <ImageView
         android:id="@+id/item_recommend_imgView"
         android:layout_width="fill_parent"
         android:layout_height="40dp"
-        android:layout_below="@+id/logo_imgview"
         android:src="@drawable/orange_drawable"
         android:visibility="gone" />
 
@@ -28,16 +21,5 @@
         android:fadingEdge="vertical"
         android:fadingEdgeLength="4dp" >
     </ExpandableListView>
-
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/logo_imgview"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="25dp"
-        android:text="电子菜谱"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="@color/white" />
 
 </RelativeLayout>

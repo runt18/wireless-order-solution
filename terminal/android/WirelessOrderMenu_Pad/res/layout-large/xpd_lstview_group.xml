@@ -15,7 +15,16 @@
       android:layout_marginLeft="36dp"
       android:text="部门"
       android:textColor="#000000"
-      android:textSize="22sp"
+      android:textSize="26sp"
       android:typeface="serif" />
+
+  <View
+      android:id="@+id/view1"
+      android:layout_width="match_parent"
+      android:layout_height="1dp"
+      android:layout_alignLeft="@+id/kitchenGroup"
+      android:layout_alignParentLeft="false"
+      android:layout_below="@+id/kitchenGroup"
+      android:background="@color/blue" />
   
 </RelativeLayout>

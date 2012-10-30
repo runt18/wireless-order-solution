@@ -1,319 +1,272 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:orientation="horizontal" >
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/bottombar"
-        android:layout_below="@+id/topbar"
-        android:orientation="horizontal" >
-
-        <fragment
-            android:id="@+id/item"
-            android:layout_width="200dp"
-            android:layout_height="fill_parent"
-            class="com.wireless.fragment.ExpandableListFragment" />
-
-        <FrameLayout
-            android:id="@+id/main_viewPager_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" >
-        </FrameLayout>
-    </LinearLayout>
 
     <fragment
         android:id="@+id/bottombar"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         class="com.wireless.fragment.OptionBarFragment" />
 
     <RelativeLayout
-        android:id="@+id/relativeLayout2"
+        android:id="@+id/relativeLayout1"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
-
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content" >
-
-            <TextView
-                android:id="@+id/textView2"
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
-                android:background="@color/gold"
-                android:text="TextView"
-                android:visibility="invisible" />
-
-            <RelativeLayout
-                android:layout_width="fill_parent"
-                android:layout_height="40dp"
-                android:background="@color/half_transparent"
-                android:focusable="true"
-                android:focusableInTouchMode="true" >
-
-                <ImageView
-                    android:id="@+id/imageView1"
-                    android:layout_width="56dp"
-                    android:layout_height="fill_parent"
-                    android:src="@drawable/special_btn_selector" />
-
-                <ImageView
-                    android:id="@+id/imageView2"
-                    android:layout_width="56dp"
-                    android:layout_height="fill_parent"
-                    android:layout_alignParentTop="true"
-                    android:layout_toRightOf="@+id/imageView1"
-                    android:src="@drawable/recommend_btn_selector" />
-
-                <ImageView
-                    android:id="@+id/imageView3"
-                    android:layout_width="56dp"
-                    android:layout_height="fill_parent"
-                    android:layout_alignParentTop="true"
-                    android:layout_toRightOf="@+id/imageView2"
-                    android:src="@drawable/current_btn_selector" />
-
-                <EditText
-                    android:id="@+id/editText1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="fill_parent"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentTop="true"
-                    android:background="@color/white"
-                    android:ems="10"
-                    android:hint="请输入菜品名" />
-
-                <LinearLayout
-                    android:id="@+id/order_info_layout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="fill_parent"
-                    android:layout_alignParentTop="true"
-                    android:layout_marginRight="20dp"
-                    android:layout_toLeftOf="@+id/editText1"
-                    android:orientation="vertical" >
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" >
-
-                        <TextView
-                            android:id="@+id/textView3"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="已点金额："
-                            android:textColor="@color/white" />
-
-                        <TextView
-                            android:id="@+id/textView12"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="80"
-                            android:textColor="@color/white" />
-
-                        <TextView
-                            android:id="@+id/textView5"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text=" 元"
-                            android:textColor="@color/white" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" >
-
-                        <TextView
-                            android:id="@+id/textView4"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="已点份数："
-                            android:textColor="@color/white" />
-
-                        <TextView
-                            android:id="@+id/textView13"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="2"
-                            android:textColor="@color/white" />
-
-                        <TextView
-                            android:id="@+id/textView6"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text=" 份数"
-                            android:textColor="@color/white" />
-                    </LinearLayout>
-                </LinearLayout>
-            </RelativeLayout>
-        </LinearLayout>
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="40dp"
+        android:layout_height="match_parent"
         android:layout_above="@+id/bottombar"
-        android:layout_alignParentBottom="false"
-        android:visibility="visible" >
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true" >
 
-        <LinearLayout
-            android:layout_width="fill_parent"
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:focusable="true"
-            android:focusableInTouchMode="true" >
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="false"
+            android:layout_alignParentTop="true"
+            android:scaleType="fitCenter"
+            android:src="@drawable/logo" />
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_alignRight="@+id/imageView1"
+            android:layout_below="@+id/imageView1"
+            android:background="@drawable/expandable_listview_fragment_bg" >
+
+            <fragment
+                android:id="@+id/item"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_above="@+id/linearLayout_func_bottom"
+                android:layout_weight="4"
+                class="com.wireless.fragment.ExpandableListFragment" />
 
             <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent" >
+                android:id="@+id/linearLayout_func_bottom"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_alignParentBottom="true"
+                android:weightSum="4" >
 
                 <ImageView
                     android:id="@+id/imageView_rankList_main"
-                    android:layout_width="100dp"
-                    android:layout_height="fill_parent"
-                    android:layout_weight="1"
-                    android:src="@color/blue" />
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/func_bottom_main" />
 
                 <ImageView
                     android:id="@+id/imageView_combo_main"
-                    android:layout_width="100dp"
-                    android:layout_height="fill_parent"
-                    android:layout_weight="1"
-                    android:src="@color/green" />
-
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/func_bottom_other" />
             </LinearLayout>
-            <!--
-                 <TextView
-                android:id="@+id/textView2"
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
-                android:background="@color/gold"
-                android:text="TextView"
-                android:visibility="invisible" />
-            -->
 
-            <RelativeLayout
-                android:layout_width="fill_parent"
-                android:layout_height="40dp"
-                android:background="@color/half_transparent" >
-
-                <RelativeLayout
-                    android:id="@+id/relativeLayout1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentTop="true" >
-
-                    <ImageView
-                        android:id="@+id/imageView1"
-                        android:layout_width="228dp"
-                        android:layout_height="fill_parent"
-                        android:src="@color/purple"
-                        android:visibility="invisible" />
-
-                    <TextView
-                        android:id="@+id/textView_foodName_main"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerHorizontal="true"
-                        android:layout_centerVertical="true"
-                        android:text="菜品名称"
-                        android:textAppearance="?android:attr/textAppearanceLarge"
-                        android:textColor="@color/white" />
-                </RelativeLayout>
-
-                <TextView
-                    android:id="@+id/textView8"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_toRightOf="@+id/relativeLayout1"
-                    android:text="数量:"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textColor="@color/white" />
-
-                <ImageButton
-                    android:id="@+id/imageView_plus_main"
-                    android:layout_width="100dp"
-                    android:layout_height="match_parent"
-                    android:layout_centerVertical="true"
-                    android:layout_marginRight="20dp"
-                    android:layout_toRightOf="@+id/textView8"
-                    android:src="@drawable/plus_btn_selector" />
-
-                <TextView
-                    android:id="@+id/textView_count_main"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_toRightOf="@+id/imageView_plus_main"
-                    android:text="1.0"
-                    android:textColor="@color/white"
-                    android:textSize="22sp" >
-                </TextView>
-
-                <ImageButton
-                    android:id="@+id/imageView_minus_main"
-                    android:layout_width="100dp"
-                    android:layout_height="match_parent"
-                    android:layout_centerVertical="true"
-                    android:layout_marginLeft="20dp"
-                    android:layout_toRightOf="@+id/textView_count_main"
-                    android:src="@drawable/minus_btn_selector" />
-
-                <TextView
-                    android:id="@+id/textView9"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignBaseline="@+id/textView8"
-                    android:layout_alignBottom="@+id/textView8"
-                    android:layout_marginLeft="24dp"
-                    android:layout_toRightOf="@+id/imageView_minus_main"
-                    android:text="单价:"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textColor="@color/white" />
-
-                <TextView
-                    android:id="@+id/textView_foodPrice_main"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignBaseline="@+id/textView9"
-                    android:layout_alignBottom="@+id/textView9"
-                    android:layout_toRightOf="@+id/textView9"
-                    android:text="83223"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textColor="@color/white" />
-
-                <TextView
-                    android:id="@+id/textView11"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignBaseline="@+id/textView_foodPrice_main"
-                    android:layout_toRightOf="@+id/textView_foodPrice_main"
-                    android:text=" 元"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textColor="@color/white" />
-
-                <ImageView
-                    android:id="@+id/add_dish_imgView"
-                    android:layout_width="100dp"
-                    android:layout_height="fill_parent"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentTop="true"
-                    android:src="@drawable/add_dish_btn_selector" />
-            </RelativeLayout>
-        </LinearLayout>
+        </RelativeLayout>
 
     </RelativeLayout>
 
-    <ImageView
-        android:id="@+id/amplify_btn_imgView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/relativeLayout2"
-        android:src="@drawable/amplify_btn_selector" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bottombar"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/relativeLayout1" >
+
+        <FrameLayout
+            android:id="@+id/main_viewPager_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="6" >
+
+        </FrameLayout>
+
+        <RelativeLayout
+            android:id="@+id/top_bar_main"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/main_top_bg"
+            android:clickable="false"
+            android:descendantFocusability="afterDescendants" >
+
+            <ImageButton
+                android:id="@+id/imageButton_special_main"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginLeft="22dp"
+                android:background="@null"
+                android:src="@drawable/special_btn_selector" />
+
+            <ImageButton
+                android:id="@+id/imageButton_rec_mian"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_toRightOf="@+id/imageButton_special_main"
+                android:background="@null"
+                android:src="@drawable/recommend_btn_selector" />
+
+            <ImageButton
+                android:id="@+id/imageButton_current_main"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_toRightOf="@+id/imageButton_rec_mian"
+                android:background="@null"
+                android:src="@drawable/current_btn_selector" />
+
+            <EditText
+                android:id="@+id/editText_main"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginRight="6dp"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/search_bar"
+                android:ems="10"
+                android:hint="请输入菜名搜索"
+                android:paddingLeft="8dp"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white" />
+
+            <ImageButton
+                android:id="@+id/imageButton1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:background="@null"
+                android:focusable="false"
+                android:paddingBottom="10dp"
+                android:paddingLeft="14dp"
+                android:paddingRight="6dp"
+                android:paddingTop="6dp"
+                android:src="@drawable/delete_all_selector" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/relativeLayout_bottom_right"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/main_bottom_bg"
+            android:descendantFocusability="afterDescendants" >
+
+            <ImageButton
+                android:id="@+id/imageButton_add_main"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="false"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="13dp"
+                android:background="@null"
+                android:scaleType="center"
+                android:src="@drawable/add_dish_btn_selector" />
+
+            <TextView
+                android:id="@+id/textView_foodName_main"
+                android:layout_width="188dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_centerVertical="true"
+                android:gravity="center"
+                android:text="菜名"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/white" />
+
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/textView_foodName_main"
+                android:text="数量："
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/white" />
+
+            <ImageButton
+                android:id="@+id/imageButton_minus_main"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/textView1"
+                android:background="@null"
+                android:paddingBottom="4dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:paddingTop="4dp"
+                android:src="@drawable/minus_btn_selector" />
+
+            <TextView
+                android:id="@+id/textView_amount_main"
+                android:layout_width="26dp"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/imageButton_minus_main"
+                android:gravity="center"
+                android:text="1"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/white" />
+
+            <ImageButton
+                android:id="@+id/imageButton_plus_main"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/textView_amount_main"
+                android:background="@null"
+                android:paddingBottom="4dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="16dp"
+                android:paddingTop="4dp"
+                android:src="@drawable/plus_btn_selector" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="false"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="30dp"
+                android:layout_toRightOf="@+id/imageButton_plus_main"
+                android:text="单价："
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/white" />
+
+            <TextView
+                android:id="@+id/textView_price_main"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/textView2"
+                android:text="88"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/white" />
+
+        </RelativeLayout>
+
+        <ImageButton
+            android:id="@+id/imageButton_amplify_main"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/top_bar_main"
+            android:layout_marginRight="10dp"
+            android:background="@null"
+            android:src="@drawable/amplify_btn_selector" />
+
+    </RelativeLayout>
 
 </RelativeLayout>

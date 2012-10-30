@@ -78,7 +78,7 @@ public class RankListActivity extends Activity {
 			recLyaout.addView(image);
 			
 			image.setTag(f);
-			//设置推荐菜点击侦听
+			//设置推荐菜点击侦听,弹出对话框
 			image.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {

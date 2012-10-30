@@ -8,7 +8,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.Fragment;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -232,7 +231,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 		mDialog.dismiss();
 		
 		ShoppingCart.instance().setDestTable(table);		
-
+ 
 		if(table.status == Table.TABLE_IDLE){		
 			ShoppingCart.instance().setOriOrder(null);
 			Toast.makeText(this.getActivity(), "该餐台尚未点菜", Toast.LENGTH_SHORT).show();
@@ -316,7 +315,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 	 * 执行请求对应餐台的账单信息 
 	 */
 	private abstract class QueryOrderTask extends com.wireless.lib.task.QueryOrderTask{
-		private ProgressDialog mProgDialog;
+//		private ProgressDialog mProgDialog;
 	
 		QueryOrderTask(int tableAlias){
 			super(tableAlias);
@@ -327,7 +326,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 		 */
 		@Override
 		protected void onPreExecute(){
-			mProgDialog = ProgressDialog.show(OptionBarFragment.this.getActivity(), "", "查询" + mTblAlias + "号账单信息...请稍候", true);
+//			mProgDialog = ProgressDialog.show(OptionBarFragment.this.getActivity(), "", "查询" + mTblAlias + "号账单信息...请稍候", true);
 		}
 		
 		/**
@@ -337,7 +336,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 		@Override
 		protected void onPostExecute(Order order){
 			//make the progress dialog disappeared
-			mProgDialog.dismiss();
+//			mProgDialog.dismiss();
 			
 			if(mBusinessException != null){
 				

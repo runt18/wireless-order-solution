@@ -133,7 +133,7 @@ public class PickedFoodActivity extends Activity implements OnTableChangeListene
 				childData.add(pickedFoodDatas);
 				
 				HashMap<String, Object> map1 = new HashMap<String, Object>();
-				map1.put(ITEM_GROUP_NAME, "新点菜");
+				map1.put(ITEM_GROUP_NAME, "已点菜");
 				groupData.add(map1);
 			}
 			//若包含新点菜，则将新点菜添加进列表
@@ -158,7 +158,7 @@ public class PickedFoodActivity extends Activity implements OnTableChangeListene
 				childData.add(newFoodDatas);
 				
 				HashMap<String, Object> map2 = new HashMap<String, Object>();
-				map2.put(ITEM_GROUP_NAME, "已点菜");
+				map2.put(ITEM_GROUP_NAME, "新点菜");
 				groupData.add(map2);
 			}
 
@@ -433,7 +433,7 @@ public class PickedFoodActivity extends Activity implements OnTableChangeListene
 	}
 	
 	private class QueryOrderTask extends com.wireless.lib.task.QueryOrderTask{
-		private ProgressDialog mProgressDialog;
+//		private ProgressDialog mProgressDialog;
 		
 		public QueryOrderTask(int tableAlias) {
 			super(tableAlias);
@@ -441,7 +441,7 @@ public class PickedFoodActivity extends Activity implements OnTableChangeListene
 		
 		@Override
 		protected void onPreExecute(){
-			mProgressDialog = ProgressDialog.show(PickedFoodActivity.this, "", "查询" + mTblAlias + "号账单信息...请稍候", true);
+//			mProgressDialog = ProgressDialog.show(PickedFoodActivity.this, "", "查询" + mTblAlias + "号账单信息...请稍候", true);
 		}
 		
 		/**
@@ -451,7 +451,7 @@ public class PickedFoodActivity extends Activity implements OnTableChangeListene
 		@Override
 		protected void onPostExecute(Order order){
 			//make the progress dialog disappeared
-			mProgressDialog.dismiss();
+//			mProgressDialog.dismiss();
 			
 			if(mBusinessException != null){
 				
@@ -531,15 +531,17 @@ public class PickedFoodActivity extends Activity implements OnTableChangeListene
 					}).show();					
 				}
 			}else{
-				//return to the main activity and show the successful message
-				PickedFoodActivity.this.finish();
 				String promptMsg;
 				if(reqOrder.destTbl.aliasID == reqOrder.srcTbl.aliasID){
 					promptMsg = reqOrder.destTbl.aliasID + "号台下单成功。";
 				}else{
 					promptMsg = reqOrder.srcTbl.aliasID + "号台转至" + reqOrder.destTbl.aliasID + "号台，并下单成功。";
 				}
+				//TODO 更新底栏显示
 				Toast.makeText(PickedFoodActivity.this, promptMsg, Toast.LENGTH_SHORT).show();
+				new QueryOrderTask(ShoppingCart.instance().getDestTable().aliasID).execute(WirelessOrder.foodMenu);
+				//return to the main activity and show the successful message
+				PickedFoodActivity.this.finish();
 			}
 		}		
 

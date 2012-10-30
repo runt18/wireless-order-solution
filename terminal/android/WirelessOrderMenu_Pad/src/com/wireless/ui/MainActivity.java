@@ -14,6 +14,7 @@ import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,12 +31,13 @@ import com.wireless.protocol.Department;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.Util;
 
 public class MainActivity extends Activity  
 						  implements OnItemChangeListener,
 							 	     OnPicChangedListener, 
 							 	     OnPicClickListener{
-	
+	 
 	private static final int MAIN_ACTIVITY_RES_CODE = 340;
 
 	private HashMap<Kitchen, Integer> mFoodPosByKitchenMap = new HashMap<Kitchen, Integer>();
@@ -52,6 +54,20 @@ public class MainActivity extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		
+		((RelativeLayout)this.findViewById(R.id.top_bar_main)).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+ 				
+			}
+		});
+		
+		((RelativeLayout)this.findViewById(R.id.relativeLayout_bottom_right)).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+ 				
+			}
+		});
+		
 		mFoodCompByKitchen = new Comparator<Food>() {
 			@Override
 			public int compare(Food food1, Food food2) {
@@ -64,6 +80,7 @@ public class MainActivity extends Activity
 				}
 			}
 		};
+		 
 		/**
 		 * 将所有菜品进行按厨房编号进行排序
 		 */
@@ -78,7 +95,7 @@ public class MainActivity extends Activity
 		/**
 		 * 设置各种按钮的listener
 		 */
-		ImageView amplifyImgView = (ImageView)findViewById(R.id.amplify_btn_imgView);
+		ImageView amplifyImgView = (ImageView)findViewById(R.id.imageButton_amplify_main);
 		/**
 		 * Gallery上的全屏Button，点击后跳转到FullScreenActivity
 		 */
@@ -92,34 +109,35 @@ public class MainActivity extends Activity
 				startActivityForResult(intent, MAIN_ACTIVITY_RES_CODE);
 			}
 		});
+		
 		//点菜按钮
-		((ImageView)findViewById(R.id.add_dish_imgView)).setOnClickListener(new OnClickListener(){
+		((ImageView)findViewById(R.id.imageButton_add_main)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				mOrderFood.setCount(Float.parseFloat(((TextView) findViewById(R.id.textView_count_main)).getText().toString()));
+				mOrderFood.setCount(Float.parseFloat(((TextView) findViewById(R.id.textView_amount_main)).getText().toString()));
 				ShoppingCart.instance().addFood(mOrderFood);
 				Toast.makeText(getApplicationContext(), mOrderFood.name + "已添加", Toast.LENGTH_SHORT).show();
 			}
 		});
 		
-		final TextView countTextView = (TextView) findViewById(R.id.textView_count_main);
-		((ImageButton) findViewById(R.id.imageView_plus_main)).setOnClickListener(new OnClickListener(){
+		final TextView countTextView = (TextView) findViewById(R.id.textView_amount_main);
+		((ImageButton) findViewById(R.id.imageButton_plus_main)).setOnClickListener(new OnClickListener(){
 
 			@Override
 			public void onClick(View v) {
 				float curNum = Float.parseFloat(countTextView.getText().toString());
-				countTextView.setText("" + ++curNum);
+				countTextView.setText(Util.float2String2(++curNum));
 			}
 		});
-		//数量减
-		((ImageButton) findViewById(R.id.imageView_minus_main)).setOnClickListener(new OnClickListener(){
+		//数量减 
+		((ImageButton) findViewById(R.id.imageButton_minus_main)).setOnClickListener(new OnClickListener(){
 
 			@Override
 			public void onClick(View v) {
 				float curNum = Float.parseFloat(countTextView.getText().toString());
 				if(--curNum >= 1)
 				{
-					countTextView.setText("" + curNum);
+					countTextView.setText(Util.float2String2(curNum));
 				}
 			}
 		});
@@ -140,7 +158,7 @@ public class MainActivity extends Activity
 			}
 		});
 		mOrderFood = new OrderFood(WirelessOrder.foods[0]);
-		mOrderFood.setCount(Float.parseFloat(((TextView) findViewById(R.id.textView_count_main)).getText().toString()));
+		mOrderFood.setCount(Float.parseFloat(((TextView) findViewById(R.id.textView_amount_main)).getText().toString()));
 	}
 	
 	@Override
@@ -193,10 +211,10 @@ public class MainActivity extends Activity
 	public void onPicChanged(Food food, int position) {
 		mItemFragment.setPosition(food.kitchen);
 		((TextView) findViewById(R.id.textView_foodName_main)).setText(food.name);
-		((TextView) findViewById(R.id.textView_foodPrice_main)).setText("" + food.getPrice());
-		((TextView) findViewById(R.id.textView_count_main)).setText("1.0");
+		((TextView) findViewById(R.id.textView_price_main)).setText("" + food.getPrice());
+		((TextView) findViewById(R.id.textView_amount_main)).setText("1");
 		mOrderFood = new OrderFood(food);
-		mOrderFood.setCount(Float.parseFloat(((TextView) findViewById(R.id.textView_count_main)).getText().toString()));
+		mOrderFood.setCount(Float.parseFloat(((TextView) findViewById(R.id.textView_amount_main)).getText().toString()));
 	}
 
 	/**
