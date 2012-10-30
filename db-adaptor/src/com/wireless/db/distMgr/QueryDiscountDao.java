@@ -140,9 +140,26 @@ public class QueryDiscountDao {
 			dbCon.conn.setAutoCommit(false);
 			
 			// 取消原默认方案
-			if(pojo.isDefault()){
-				dbCon.stmt.executeUpdate("UPDATE " +  Params.dbName + ".discount SET status = 0 WHERE status = " + Discount.DEFAULT + " AND restaurant_id = " + pojo.getRestaurantID());
-			}
+			if(pojo.isDefaultOrDefaultReserved()){
+				DiscountPojo opojo = null;
+				String oSQL = "SELECT discount_id, status, restaurant_id FROM " +  Params.dbName + ".discount "
+							+ "WHERE restaurant_id = " + pojo.getRestaurantID() + " AND status in (" + Discount.DEFAULT + "," + Discount.DEFAULT_RESERVED + ")";
+				dbCon.rs = dbCon.stmt.executeQuery(oSQL);
+				if(dbCon.rs != null && dbCon.rs.next()){
+					opojo = new DiscountPojo();
+					opojo.setId(dbCon.rs.getInt("discount_id"));
+					opojo.setStatus(dbCon.rs.getInt("status"));
+					opojo.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
+				}
+				if(opojo != null){
+					if(opojo.getStatus() == Discount.DEFAULT){
+						opojo.setStatus(Discount.NORMAL);
+					}else if(opojo.getStatus() == Discount.DEFAULT_RESERVED){
+						opojo.setStatus(Discount.RESERVED);
+					}
+					dbCon.stmt.executeUpdate("UPDATE " +  Params.dbName + ".discount SET status = " + opojo.getStatus() + " WHERE discount_id = " + opojo.getId());
+				}
+			}						
 			
 			String insertSQL = "INSERT INTO " +  Params.dbName + ".discount " 
 							+ " (restaurant_id, name, level, status)"
@@ -192,8 +209,25 @@ public class QueryDiscountDao {
 			dbCon.conn.setAutoCommit(false);
 			
 			// 取消原默认方案
-			if(pojo.isDefault()){
-				dbCon.stmt.executeUpdate("UPDATE " +  Params.dbName + ".discount SET status = 0 WHERE status = " + Discount.DEFAULT + " AND restaurant_id = " + pojo.getRestaurantID());
+			if(pojo.isDefaultOrDefaultReserved()){
+				DiscountPojo opojo = null;
+				String oSQL = "SELECT discount_id, status, restaurant_id FROM " +  Params.dbName + ".discount "
+							+ "WHERE restaurant_id = " + pojo.getRestaurantID() + " AND status in (" + Discount.DEFAULT + "," + Discount.DEFAULT_RESERVED + ")";
+				dbCon.rs = dbCon.stmt.executeQuery(oSQL);
+				if(dbCon.rs != null && dbCon.rs.next()){
+					opojo = new DiscountPojo();
+					opojo.setId(dbCon.rs.getInt("discount_id"));
+					opojo.setStatus(dbCon.rs.getInt("status"));
+					opojo.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
+				}
+				if(opojo != null){
+					if(opojo.getStatus() == Discount.DEFAULT){
+						opojo.setStatus(Discount.NORMAL);
+					}else if(opojo.getStatus() == Discount.DEFAULT_RESERVED){
+						opojo.setStatus(Discount.RESERVED);
+					}
+					dbCon.stmt.executeUpdate("UPDATE " +  Params.dbName + ".discount SET status = " + opojo.getStatus() + " WHERE discount_id = " + opojo.getId());
+				}
 			}
 			
 			String updateSQL = "UPDATE " +  Params.dbName + ".discount SET "

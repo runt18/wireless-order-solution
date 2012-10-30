@@ -80,10 +80,13 @@ public class DiscountPojo {
 	public void setPlans(List<DiscountPlan> plan){
 		this.plans = plan;
 	}
-	public void setDefault(boolean isDefault){
-		this.status = isDefault ? Discount.DEFAULT : this.status;
+	public void setDefault(){
+		this.status = Discount.DEFAULT;
 	}
-	public boolean isDefault(){
-		return this.status == Discount.DEFAULT;
+	public void setDefaultReserved(){
+		this.status = Discount.DEFAULT_RESERVED;
+	}
+	public boolean isDefaultOrDefaultReserved(){
+		return this.status == Discount.DEFAULT || this.status == Discount.DEFAULT_RESERVED;
 	}
 }
