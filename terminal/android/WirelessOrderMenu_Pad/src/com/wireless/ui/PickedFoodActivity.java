@@ -16,15 +16,18 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,10 +38,12 @@ import com.wireless.common.ShoppingCart.OnTableChangeListener;
 import com.wireless.common.WirelessOrder;
 import com.wireless.excep.BusinessException;
 import com.wireless.ordermenu.R;
+import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Table;
+import com.wireless.protocol.Util;
 
 public class PickedFoodActivity extends Activity implements OnTableChangeListener{
 	//列表项的显示标签
@@ -68,16 +73,18 @@ public class PickedFoodActivity extends Activity implements OnTableChangeListene
 	private static final int[] ITEM_ID = {
 		R.id.textView_picked_food_name_item,
 		R.id.textView_picked_food_price_item,
-		R.id.editText_picked_food_count_item,
+		R.id.textView_picked_food_count_item,
 		R.id.textView_picked_food_state_item
 	};
-	protected static final int CUR_FOOD_CHANGED = 388962;//删菜标记
+//	protected static final int CUR_FOOD_CHANGED = 388962;//删菜标记
 	protected static final int LIST_CHANGED = 878633;//已点菜更新标记
+	protected static final String CUR_FOOD_CHANGED = "cur_food_changed";
 	
 	private FoodHandler mFoodHandler;
 	private FoodDataHandler mFoodDataHandler;
 
 	private OrderFood mCurOrderFood = new OrderFood();
+	private ExpandableListView mPickedFoodList;
 
 	/*
 	 * 显示已点菜的列表的handler
@@ -85,7 +92,7 @@ public class PickedFoodActivity extends Activity implements OnTableChangeListene
 	 */
 	private static class FoodHandler extends Handler{
 		private WeakReference<PickedFoodActivity> mActivity;
-		private ExpandableListView mPickedFoodList;
+//		private ExpandableListView mPickedFoodList;
 		private TextView mTotalCountTextView;
 		private TextView mTotalPriceTextView;
 		private float mTotalPrice = 0;
@@ -93,7 +100,6 @@ public class PickedFoodActivity extends Activity implements OnTableChangeListene
 		FoodHandler(PickedFoodActivity activity)
 		{
 			mActivity = new WeakReference<PickedFoodActivity>(activity);
-			mPickedFoodList = (ExpandableListView) activity.findViewById(R.id.expandableListView_pickedFood);
 			mTotalCountTextView = (TextView) activity.findViewById(R.id.textView_total_count_pickedFood);
 			mTotalPriceTextView = (TextView)  activity.findViewById(R.id.textView_total_price_pickedFood);
 		}
@@ -115,7 +121,6 @@ public class PickedFoodActivity extends Activity implements OnTableChangeListene
 			//若包含菜单，则将已点菜添加进列表
 			if(sCart.hasOrder()){
 				List<OrderFood> pickedFoods = Arrays.asList(ShoppingCart.instance().getOriOrder().foods);
-				activity.mCurOrderFood = pickedFoods.get(0);
 				totalCount += pickedFoods.size();
 				List<Map<String, ?>> pickedFoodDatas = new ArrayList<Map<String,?>>();
 				for(OrderFood f:pickedFoods)
@@ -139,7 +144,6 @@ public class PickedFoodActivity extends Activity implements OnTableChangeListene
 			//若包含新点菜，则将新点菜添加进列表
 			if(sCart.hasExtraFoods()){
 				List<OrderFood> newFoods = sCart.getExtraFoods();
-				activity.mCurOrderFood = newFoods.get(0);
 				totalCount += newFoods.size();
 				
 				List<Map<String, ?>> newFoodDatas = new ArrayList<Map<String,?>>();
@@ -163,7 +167,7 @@ public class PickedFoodActivity extends Activity implements OnTableChangeListene
 			}
 
 			mTotalCountTextView.setText(""+ totalCount);
-			mTotalPriceTextView.setText("" + mTotalPrice);
+			mTotalPriceTextView.setText(Util.float2String2(mTotalPrice));
 			//创建listview的adapter
 			SimpleExpandableListAdapter adapter = new SimpleExpandableListAdapter(activity.getApplicationContext(), 
 					groupData, R.layout.picked_food_list_group_item, GROUP_ITEM_TAGS, GROUP_ITEM_ID, 
@@ -174,14 +178,35 @@ public class PickedFoodActivity extends Activity implements OnTableChangeListene
 					
 					final OrderFood orderFood = (OrderFood) childData.get(groupPosition).get(childPosition).get(ITEM_THE_FOOD);
 					view.setTag(orderFood);
-					//数量输入框
-					final EditText countEditText = (EditText) view.findViewById(R.id.editText_picked_food_count_item);
-					countEditText.setText("" + orderFood.getCount());
+					//数量显示
+					final Button countEditText = (Button) view.findViewById(R.id.textView_picked_food_count_item);
+					countEditText.setText(Util.float2String2(orderFood.getCount()));
+					//数量点击侦听
 					countEditText.setOnClickListener(new OnClickListener(){
 						@Override
-						public void onClick(View v) {
-							//FIXME 修正item和edittext的焦点问题
-							countEditText.requestFocus();
+						public void onClick(final View v) {
+							//新建一个输入框
+							final EditText editText = new EditText(activity);
+							editText.setInputType(EditorInfo.TYPE_CLASS_NUMBER|EditorInfo.TYPE_NUMBER_FLAG_DECIMAL|EditorInfo.TYPE_NUMBER_FLAG_SIGNED);
+							//创建对话框，并将输入框传入
+							new AlertDialog.Builder(activity).setTitle("请输入修改数量")
+								.setView(editText)
+								.setPositiveButton("确定",new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog, int which) {
+										dialog.dismiss();
+										//设置新数值
+										if(!editText.getText().toString().equals(""))
+										{
+											float num = Float.parseFloat(editText.getText().toString());
+											countEditText.setText(Util.float2String2(num));
+											orderFood.setCount(num);
+											mTotalPrice += orderFood.getPriceWithTaste();
+											mTotalPriceTextView.setText(Util.float2String2(mTotalPrice));
+										}
+									}
+								})
+								.setNegativeButton("取消", null).show();
 						}
 					});
 					//数量加按钮
@@ -189,10 +214,10 @@ public class PickedFoodActivity extends Activity implements OnTableChangeListene
 						@Override
 						public void onClick(View v) {
 							float curNum = Float.parseFloat(countEditText.getText().toString());
-							countEditText.setText("" + ++curNum);
+							countEditText.setText(Util.float2String2(++curNum));
 							orderFood.setCount(curNum);
 							mTotalPrice += orderFood.getPriceWithTaste();
-							mTotalPriceTextView.setText("" + mTotalPrice);
+							mTotalPriceTextView.setText(Util.float2String2(mTotalPrice));
 
 						}
 					});
@@ -204,25 +229,25 @@ public class PickedFoodActivity extends Activity implements OnTableChangeListene
 							float curNum = Float.parseFloat(countEditText.getText().toString());
 							if(--curNum >= 1)
 							{
-								countEditText.setText("" + curNum);
+								countEditText.setText(Util.float2String2(curNum));
 								orderFood.setCount(curNum);
 								mTotalPrice -= orderFood.getPriceWithTaste();
-								mTotalPriceTextView.setText("" + mTotalPrice);
+								mTotalPriceTextView.setText(Util.float2String2(mTotalPrice));
 							}
 						}
 					});
 					return view;
 				}
 			};
-			mPickedFoodList.setAdapter(adapter);
+			activity.mPickedFoodList.setAdapter(adapter);
 			//展开所有列表
 			for(int i=0;i<groupData.size();i++)
 			{
-				mPickedFoodList.expandGroup(i);
+				activity.mPickedFoodList.expandGroup(i);
 			}
 			//设置侦听
 			//当点击菜品是改变右边菜品详情的显示
-			mPickedFoodList.setOnChildClickListener(new OnChildClickListener(){
+			activity.mPickedFoodList.setOnChildClickListener(new OnChildClickListener(){
 				@Override
 				public boolean onChildClick(ExpandableListView parent, View view, int groupPosition, int childPosition, long id) {
 					if(parent.getTag() != null)
@@ -231,12 +256,23 @@ public class PickedFoodActivity extends Activity implements OnTableChangeListene
 					}
 					parent.setTag(view);
 					//点击后改变该项的颜色显示
-					activity.mCurOrderFood =  (OrderFood) view.getTag();
-					activity.mFoodDataHandler.sendEmptyMessage(PickedFoodActivity.CUR_FOOD_CHANGED);
+					Message msg = new Message();
+					Bundle data = new Bundle();
+					data.putParcelable(PickedFoodActivity.CUR_FOOD_CHANGED, new FoodParcel((OrderFood) view.getTag()));
+					msg.setData(data);
+					activity.mFoodDataHandler.sendMessage(msg);
+					
 					view.setBackgroundColor(view.getResources().getColor(R.color.blue));
 					return false;
 				}
 			});
+			//默认第一个设置为选中
+			activity.mPickedFoodList.postDelayed(new Runnable(){
+				@Override
+				public void run() {
+					activity.mPickedFoodList.performItemClick(activity.mPickedFoodList.getChildAt(1), 1, 1);
+				}
+			}, 100);
 		}
 	}
 	/*
@@ -244,35 +280,37 @@ public class PickedFoodActivity extends Activity implements OnTableChangeListene
 	 */
 	private static class FoodDataHandler extends Handler{
 		private WeakReference<PickedFoodActivity> mActivity;
-		private TextView mFoodNameTextView;
-		private TextView mOriPriceTextView;
-		private TextView mConPriceTextView;
-		private TextView mDiscountTextView;
-		private TextView mTasteTextView;
-		private TextView mTempTasteTextView;
+//		private TextView mFoodNameTextView;
+//		private TextView mOriPriceTextView;
+//		private TextView mConPriceTextView;
+//		private TextView mDiscountTextView;
+//		private TextView mTasteTextView;
+//		private TextView mTempTasteTextView;
 		FoodDataHandler(PickedFoodActivity activity)
 		{
 			mActivity = new WeakReference<PickedFoodActivity>(activity);
-			mFoodNameTextView = (TextView) activity.findViewById(R.id.textView_food_name_pickedFood);
-			mOriPriceTextView = (TextView) activity.findViewById(R.id.textView_ori_price_pickedFood);
-			mConPriceTextView = (TextView) activity.findViewById(R.id.textView_con_price_pickedFood);
-			mDiscountTextView = (TextView) activity.findViewById(R.id.textView_discount_pickedFood);
-			mTasteTextView = (TextView) activity.findViewById(R.id.textView_taste_pickedFood);
-			mTempTasteTextView = (TextView) activity.findViewById(R.id.textView_tempTaste_pickedFood);
+//			mFoodNameTextView = (TextView) activity.findViewById(R.id.textView_food_name_pickedFood);
+//			mOriPriceTextView = (TextView) activity.findViewById(R.id.textView_ori_price_pickedFood);
+//			mConPriceTextView = (TextView) activity.findViewById(R.id.textView_con_price_pickedFood);
+//			mDiscountTextView = (TextView) activity.findViewById(R.id.textView_discount_pickedFood);
+//			mTasteTextView = (TextView) activity.findViewById(R.id.textView_taste_pickedFood);
+//			mTempTasteTextView = (TextView) activity.findViewById(R.id.textView_tempTaste_pickedFood);
 		}
 		
 		@Override
 		public void handleMessage(Message Msg)
 		{
 			final PickedFoodActivity activity = mActivity.get();
+			OrderFood food = Msg.getData().getParcelable(PickedFoodActivity.CUR_FOOD_CHANGED);
+			Log.i("food",food.name);
 			//设置菜品的各个数据
-			mFoodNameTextView.setText(activity.mCurOrderFood.name);
-			mOriPriceTextView.setText(""+ activity.mCurOrderFood.getPriceWithTaste());
-			mConPriceTextView.setText(""+ activity.mCurOrderFood.getPriceWithTaste() * activity.mCurOrderFood.getDiscount());
-			mDiscountTextView.setText(""+ activity.mCurOrderFood.getDiscount());
-			mTasteTextView.setText(activity.mCurOrderFood.getNormalTastePref());
-			if(activity.mCurOrderFood.tmpTaste != null)
-				mTempTasteTextView.setText(activity.mCurOrderFood.tmpTaste.getPreference());
+//			mFoodNameTextView.setText(activity.mCurOrderFood.name);
+//			mOriPriceTextView.setText(""+ activity.mCurOrderFood.getPriceWithTaste());
+//			mConPriceTextView.setText(""+ activity.mCurOrderFood.getPriceWithTaste() * activity.mCurOrderFood.getDiscount());
+//			mDiscountTextView.setText(""+ activity.mCurOrderFood.getDiscount());
+//			mTasteTextView.setText(activity.mCurOrderFood.getNormalTastePref());
+//			if(activity.mCurOrderFood.tmpTaste != null)
+//				mTempTasteTextView.setText(activity.mCurOrderFood.tmpTaste.getPreference());
 		}
 	}
 	@Override
@@ -285,36 +323,41 @@ public class PickedFoodActivity extends Activity implements OnTableChangeListene
 		final ShoppingCart sCart = ShoppingCart.instance();
 		sCart.setOnTableChangeListener(this);
 		
-		mFoodHandler.sendEmptyMessage(LIST_CHANGED);
-		mFoodDataHandler.sendEmptyMessage(CUR_FOOD_CHANGED);
+		mPickedFoodList = (ExpandableListView) findViewById(R.id.expandableListView_pickedFood);
+
+//		mFoodHandler.sendEmptyMessage(LIST_CHANGED);
+//		mFoodDataHandler.sendEmptyMessage(CUR_FOOD_CHANGED);
 		//请求账单
 		if(sCart.hasTable())
 			new QueryOrderTask(sCart.getDestTable().aliasID).execute(WirelessOrder.foodMenu);
 		
-		//催菜按钮的行为
-		((Button) findViewById(R.id.button_hurry_pickedFood)).setOnClickListener(new View.OnClickListener() {				
-			@Override
-			public void onClick(View v) {
-				if(mCurOrderFood.isHurried){
-					mCurOrderFood.isHurried = false;
-					Toast.makeText(getApplicationContext(), "取消催菜成功", Toast.LENGTH_SHORT).show();
-					//TODO 添加催菜的显示
-				}else{
-					mCurOrderFood.isHurried = true;
-					Toast.makeText(getApplicationContext(), "催菜成功", Toast.LENGTH_SHORT).show();	
-				}		
-				mFoodDataHandler.sendEmptyMessage(CUR_FOOD_CHANGED);
-				mFoodHandler.sendEmptyMessage(LIST_CHANGED);
-			}
-		}); 
+//		//催菜按钮的行为
+//		((Button) findViewById(R.id.button_hurry_pickedFood)).setOnClickListener(new View.OnClickListener() {				
+//			@Override
+//			public void onClick(View v) {
+//				if(mCurOrderFood.isHurried){
+//					mCurOrderFood.isHurried = false;
+//					Toast.makeText(getApplicationContext(), "取消催菜成功", Toast.LENGTH_SHORT).show();
+//					//TODO 添加催菜的显示
+//				}else{
+//					mCurOrderFood.isHurried = true;
+//					Toast.makeText(getApplicationContext(), "催菜成功", Toast.LENGTH_SHORT).show();	
+//				}		
+//				mFoodDataHandler.sendEmptyMessage(CUR_FOOD_CHANGED);
+//				mFoodHandler.sendEmptyMessage(LIST_CHANGED);
+//			}
+//		}); 
 		
 		//删菜按钮
-		((Button) findViewById(R.id.button_delete_pickedFood)).setOnClickListener(new OnClickListener(){
-			@Override
-			public void onClick(View v) {
-				new AskCancelAmountDialog(mCurOrderFood).show();
-			}
-		});
+//		((Button) findViewById(R.id.button_delete_pickedFood)).setOnClickListener(new OnClickListener(){
+//			@Override
+//			public void onClick(View v) {
+//				new AskCancelAmountDialog(mCurOrderFood).show();
+//			}
+//		});
+		
+		((RelativeLayout) findViewById(R.id.relativeLayout_amount_foodDetailTab1)).setVisibility(View.GONE);
+		((RelativeLayout) findViewById(R.id.relativeLayout_price_foodDetailTab1)).setVisibility(View.GONE);
 		
 		//下单按钮
 		((ImageButton) findViewById(R.id.imageButton_submit_pickedFood)).setOnClickListener(new OnClickListener(){
@@ -346,6 +389,7 @@ public class PickedFoodActivity extends Activity implements OnTableChangeListene
 	public void finish(){
 		super.finish();
 		ShoppingCart.instance().setOnTableChangeListener(null);
+		mPickedFoodList.setOnChildClickListener(null);
 	}
 	
 	private class AskCancelAmountDialog extends Dialog{
@@ -454,19 +498,19 @@ public class PickedFoodActivity extends Activity implements OnTableChangeListene
 //			mProgressDialog.dismiss();
 			
 			if(mBusinessException != null){
-				
-				/**
-				 * 如果请求账单信息失败，则跳转回本页面
-				 */
-				new AlertDialog.Builder(PickedFoodActivity.this)
-					.setTitle("提示")
-					.setMessage(mBusinessException.getMessage())
-					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int id) {
-							dialog.dismiss();
-						}
-					})
-					.show();
+				new QueryOrderTask(ShoppingCart.instance().getDestTable().aliasID).execute(WirelessOrder.foodMenu);
+//				/**
+//				 * 如果请求账单信息失败，则跳转回本页面
+//				 */
+//				new AlertDialog.Builder(PickedFoodActivity.this)
+//					.setTitle("提示")
+//					.setMessage(mBusinessException.getMessage())
+//					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+//						public void onClick(DialogInterface dialog, int id) {
+//							dialog.dismiss();
+//						}
+//					})
+//					.show();
 			} else{
 				/**
 				 * 请求账单成功则更新相关的控件
@@ -475,7 +519,7 @@ public class PickedFoodActivity extends Activity implements OnTableChangeListene
 				sCart.setOriOrder(order);
 			}		
 			mFoodHandler.sendEmptyMessage(LIST_CHANGED);
-			mFoodDataHandler.sendEmptyMessage(CUR_FOOD_CHANGED);
+//			mFoodDataHandler.sendEmptyMessage(CUR_FOOD_CHANGED);
 		}
 	}
 	
@@ -537,7 +581,7 @@ public class PickedFoodActivity extends Activity implements OnTableChangeListene
 				}else{
 					promptMsg = reqOrder.srcTbl.aliasID + "号台转至" + reqOrder.destTbl.aliasID + "号台，并下单成功。";
 				}
-				//TODO 更新底栏显示
+				//更新底栏显示
 				Toast.makeText(PickedFoodActivity.this, promptMsg, Toast.LENGTH_SHORT).show();
 				new QueryOrderTask(ShoppingCart.instance().getDestTable().aliasID).execute(WirelessOrder.foodMenu);
 				//return to the main activity and show the successful message

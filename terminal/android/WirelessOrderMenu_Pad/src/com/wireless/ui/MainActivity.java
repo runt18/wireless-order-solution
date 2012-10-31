@@ -201,6 +201,8 @@ public class MainActivity extends Activity
 		mItemFragment.setOnItemChangeListener(this);
 		//设置item fragment的数据源		
 		mItemFragment.notifyDataChanged(validDepts, validKitchens);
+		
+		mItemFragment.performClick(0);
 	}
 
 

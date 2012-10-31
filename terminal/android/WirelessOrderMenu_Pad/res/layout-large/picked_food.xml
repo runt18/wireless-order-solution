@@ -146,9 +146,9 @@
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/relativeLayout1"
              >
-        </ListView>
+        </ListView>
         -->
-
+
         <ExpandableListView
             android:id="@+id/expandableListView_pickedFood"
             android:layout_width="match_parent"
@@ -156,7 +156,6 @@
             android:layout_above="@+id/left_bottom"
             android:layout_alignLeft="@+id/relativeLayout1"
             android:layout_below="@+id/relativeLayout1" >
-
         </ExpandableListView>
     </RelativeLayout>
 
@@ -170,12 +169,14 @@
         android:layout_alignParentTop="true"
         android:padding="10dp" >
 
+        <!--
         <RelativeLayout
             android:id="@+id/relativeLayout2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true" >
+            android:layout_alignParentTop="false"
+            android:layout_below="@+id/imageView_selected_food_pickedFood" >
 
             <TextView
                 android:id="@+id/textView7"
@@ -437,7 +438,22 @@
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
                 android:text="删除" />
-        </RelativeLayout>
+        </RelativeLayout>
+        -->
+
+        <ImageView
+            android:id="@+id/imageView_selected_food_pickedFood"
+            android:layout_width="match_parent"
+            android:layout_height="300dp" />
+
+        <include
+            android:id="@+id/tab1_foodDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/imageView_selected_food_pickedFood"
+            layout="@layout/food_detail_tab1" >
+
+        </include>
     </RelativeLayout>
 
 </RelativeLayout>

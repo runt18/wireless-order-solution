@@ -85,7 +85,6 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		new QueryTableTask().execute();
 		mTableRefreshHandler = new DataRefreshHandler(this);
 		mRegionRefreshHandler = new RegionRefreshHandler(this);
 	}
@@ -165,6 +164,12 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 		return view;
 	}
 	
+	@Override
+	public void onStart() {
+		super.onStart();
+		new QueryTableTask().execute();
+	}
+
 	/*
 	 * 区域选择的handler
 	 * 根据选择的区域显示不同的餐台
@@ -354,7 +359,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 					final Table table = (Table) view.getTag();
 					
 					final short customNum = Short.parseShort(((TextView)getView().findViewById(R.id.textView_customNum)).getText().toString());
-					
+					//FIXME 修正点击之后消失缓慢的问题
 					new QueryTableStatusTask(table.aliasID){
 						@Override
 						void OnQueryTblStatus(byte status) {
@@ -512,7 +517,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 	 */
 	private abstract class QueryTableStatusTask extends com.wireless.lib.task.QueryTableStatusTask{
 
-		private ProgressDialog _progDialog;
+//		private ProgressDialog _progDialog;
 
 		QueryTableStatusTask(int tableAlias){
 			super(tableAlias);
@@ -520,7 +525,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 		
 		@Override
 		protected void onPreExecute(){
-			_progDialog = ProgressDialog.show(TablePanelFragment.this.getActivity(), "", "查询" + mTblAlias + "号餐台信息...请稍候", true);
+//			_progDialog = ProgressDialog.show(TablePanelFragment.this.getActivity(), "", "查询" + mTblAlias + "号餐台信息...请稍候", true);
 		}
 		
 		/*
@@ -529,7 +534,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 		 */
 		@Override
 		protected void onPostExecute(Byte tblStatus){
-			_progDialog.dismiss();
+//			_progDialog.dismiss();
 			/*
 			 * Prompt user message if any error occurred.
 			 * Otherwise perform the corresponding action.

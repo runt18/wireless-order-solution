@@ -32,7 +32,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="false"
         android:layout_centerVertical="true"
-        android:layout_toRightOf="@+id/editText_picked_food_count_item"
+        android:layout_toRightOf="@+id/textView_picked_food_count_item"
         android:focusable="false"
         android:src="@drawable/minus_btn_selector" />
 
@@ -44,23 +44,24 @@
         android:layout_alignParentTop="false"
         android:layout_centerVertical="true"
         android:layout_marginLeft="80dp"
-        android:layout_toRightOf="@+id/editText_picked_food_count_item"
+        android:layout_toRightOf="@+id/textView_picked_food_count_item"
         android:text="4"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="@color/black" />
-
-    <EditText
-        android:id="@+id/editText_picked_food_count_item"
+
+    <Button
+        android:id="@+id/textView_picked_food_count_item"
         android:layout_width="60dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_centerVertical="true"
         android:layout_toRightOf="@+id/imageButton_plus_pickedFood_item"
+        android:background="@null"
         android:ems="10"
         android:focusable="false"
         android:inputType="numberDecimal"
         android:textColor="@color/black" >
 
-    </EditText>
+    </Button>
 
     <ImageButton
         android:id="@+id/imageButton_plus_pickedFood_item"

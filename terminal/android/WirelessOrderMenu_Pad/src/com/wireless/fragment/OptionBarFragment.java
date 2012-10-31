@@ -5,11 +5,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.Fragment;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
@@ -339,19 +337,24 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 //			mProgDialog.dismiss();
 			
 			if(mBusinessException != null){
-				
-				/**
-				 * 如果请求账单信息失败，则跳转回本页面
-				 */
-				new AlertDialog.Builder(OptionBarFragment.this.getActivity())
-					.setTitle("提示")
-					.setMessage(mBusinessException.getMessage())
-					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int id) {
-							dialog.dismiss();
+				 new QueryOrderTask(this.mTblAlias){
+						@Override
+						void onOrderChanged(Order order) {
+							ShoppingCart.instance().setOriOrder(order);
 						}
-					})
-					.show();
+					 }.execute(WirelessOrder.foodMenu);
+//				/**
+//				 * 如果请求账单信息失败，则跳转回本页面
+//				 */
+//				new AlertDialog.Builder(OptionBarFragment.this.getActivity())
+//					.setTitle("提示")
+//					.setMessage(mBusinessException.getMessage())
+//					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+//						public void onClick(DialogInterface dialog, int id) {
+//							dialog.dismiss();
+//						}
+//					})
+//					.show();
 			} else{
 				/**
 				 * 请求账单成功则更新相关的控件

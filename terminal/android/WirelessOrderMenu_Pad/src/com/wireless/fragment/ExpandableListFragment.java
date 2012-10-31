@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Fragment;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -58,40 +57,42 @@ public class ExpandableListFragment extends Fragment{
 			mChildren.add(childKitchens);
 		}
 		mAdapter.notifyDataSetChanged();
-		if(!mChildren.isEmpty())
-			setPosition(mChildren.get(0).get(0));
 	}
-	
+	/**
+	 * 展开第一项
+	 */
+	public void performClick(int groupPosition){
+		mListView.expandGroup(groupPosition);
+		final int childPos = ++groupPosition;
+		getView().postDelayed(new Runnable(){
+			@Override
+			public void run() {
+				mListView.performItemClick(mListView.getChildAt(childPos), childPos, childPos);
+			}
+		}, 100);
+	}
+	//TODO 设置标志，取消连锁反应
 	/**
 	 * 设置ListView显示某个特定的厨房
 	 * @param kitchenToSet
 	 */
 	public void setPosition(final Kitchen kitchenToSet){
-		new AsyncTask<Void, Void, int[]>(){
-			@Override
-			public int[] doInBackground(Void...args){
-				int[] positions = new int[2];
-				int groupPos = 0;
-				for(List<Kitchen> kitchens : mChildren){
-					int childPos = 0;
-					for(Kitchen kitchen : kitchens){
-						if(kitchen.equals(kitchenToSet)){
-							positions[0] = groupPos;
-							positions[1] = childPos;
-							break;
-						}
-						childPos++;
+			int[] positions = new int[2];
+			int groupPos = 0;
+			for(List<Kitchen> kitchens : mChildren){
+				int childPos = 0;
+				for(Kitchen kitchen : kitchens){
+					if(kitchen.equals(kitchenToSet)){
+						positions[0] = groupPos;
+						positions[1] = childPos;
+						break;
 					}
-					groupPos++;
+					childPos++;
 				}
-				return positions;
+				groupPos++;
 			}
-				
-			@Override
-			protected void onPostExecute(int[] positions){
-				mListView.expandGroup(positions[0]);
-			}
-		}.execute();
+//			this.performClick(positions[0]);	
+//			mListView.expandGroup(positions[0]);
 	}
 	
 	/**
@@ -115,8 +116,13 @@ public class ExpandableListFragment extends Fragment{
 		mListView.setOnChildClickListener(new OnChildClickListener(){
 			@Override
 			public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-				Kitchen currentKitchen = mChildren.get(groupPosition).get(childPosition);
-				mOnItemChangeListener.onItemChange(currentKitchen);
+				final Kitchen currentKitchen = mChildren.get(groupPosition).get(childPosition);
+				v.post(new Runnable(){
+					@Override
+					public void run() {
+						mOnItemChangeListener.onItemChange(currentKitchen);						
+					}
+				});
 				
 				if(parent.getTag() != null)
 				{
@@ -197,12 +203,12 @@ public class ExpandableListFragment extends Fragment{
 				view = View.inflate(ExpandableListFragment.this.getActivity(), R.layout.xpd_lstview_child, null);
 			}
 			((TextView) view.findViewById(R.id.mychild)).setText(mChildren.get(groupPosition).get(childPosition).name);
-			//如果是第一个且之前没有按下过child，则默认设置第一个按下
-			if(groupPosition ==0 && childPosition ==0 && mListView.getTag() == null)
-			{
-				view.setBackgroundColor(getResources().getColor(R.color.blue));
-				mListView.setTag(view);
-			}
+//			//如果是第一个且之前没有按下过child，则默认设置第一个按下
+//			if(groupPosition ==0 && childPosition ==0 && mListView.getTag() == null)
+//			{
+//				view.setBackgroundColor(getResources().getColor(R.color.blue));
+//				mListView.setTag(view);
+//			}
 			return view;
 		}
 
