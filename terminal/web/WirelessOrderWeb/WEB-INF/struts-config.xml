@@ -376,25 +376,35 @@
 		<action path="/ImageFileUpload"
 			type="com.wireless.Actions.menuMgr.ImageFileUploadAction" scope="request"></action>
 		<action path="/QueryDiscountTree"
-			type="com.wireless.Actions.distMgr.QueryDiscountTreeAction" scope="request"></action>	
+			type="com.wireless.Actions.distMgr.discount.QueryDiscountTreeAction" scope="request"></action>	
 		<action path="/InsertDiscount"
-			type="com.wireless.Actions.distMgr.InsertDiscountAction" scope="request"></action>
+			type="com.wireless.Actions.distMgr.discount.InsertDiscountAction" scope="request"></action>
 		<action path="/UpdateDiscount"
-			type="com.wireless.Actions.distMgr.UpdateDiscountAction" scope="request"></action>	
+			type="com.wireless.Actions.distMgr.discount.UpdateDiscountAction" scope="request"></action>	
 		<action path="/DeleteDiscount"
-			type="com.wireless.Actions.distMgr.DeleteDiscountAction" scope="request"></action>
+			type="com.wireless.Actions.distMgr.discount.DeleteDiscountAction" scope="request"></action>
 		<action path="/QueryDiscountPlan"
-			type="com.wireless.Actions.distMgr.QueryDiscountPlanAction" scope="request"></action>
+			type="com.wireless.Actions.distMgr.discountPlan.QueryDiscountPlanAction" scope="request"></action>
 		<action path="/InsertDiscountPlan"
-			type="com.wireless.Actions.distMgr.InsertDiscountPlanAction" scope="request"></action>
+			type="com.wireless.Actions.distMgr.discountPlan.InsertDiscountPlanAction" scope="request"></action>
 		<action path="/UpdateDiscountPlan"
-			type="com.wireless.Actions.distMgr.UpdateDiscountPlanAction" scope="request"></action>
+			type="com.wireless.Actions.distMgr.discountPlan.UpdateDiscountPlanAction" scope="request"></action>
 		<action path="/DeleteDiscountPlan"
-			type="com.wireless.Actions.distMgr.DeleteDiscountPlanAction" scope="request"></action>			
+			type="com.wireless.Actions.distMgr.discountPlan.DeleteDiscountPlanAction" scope="request"></action>			
 		<action path="/QueryDailySettleByNow"
 			type="com.wireless.Actions.dailySettle.QueryDailySettleByNowAction" scope="request"></action>		
 		<action path="/QueryDutyRangeByNow"
-			type="com.wireless.Actions.shift.QueryDutyRangeByNowAction" scope="request"></action>			
+			type="com.wireless.Actions.shift.QueryDutyRangeByNowAction" scope="request"></action>
+		<action path="/QueryClientTypeTree"
+			type="com.wireless.Actions.client.clientType.QueryClientTypeTreeAction" scope="request"></action>	
+		<action path="/QueryClientType"
+			type="com.wireless.Actions.client.clientType.QueryClientTypeAction" scope="request"></action>	
+		<action path="/InsertClientType"
+			type="com.wireless.Actions.client.clientType.InsertClientTypeAction" scope="request"></action>
+		<action path="/UpdateClientType"
+			type="com.wireless.Actions.client.clientType.UpdateClientTypeAction" scope="request"></action>
+		<action path="/DeleteClientType"
+			type="com.wireless.Actions.client.clientType.DeleteClientTypeAction" scope="request"></action>
 	</action-mappings>
 	
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
