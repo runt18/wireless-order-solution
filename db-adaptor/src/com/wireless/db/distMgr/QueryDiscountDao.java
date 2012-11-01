@@ -129,6 +129,35 @@ public class QueryDiscountDao {
 	
 	/**
 	 * 
+	 * @param dbCon
+	 * @param pojo
+	 * @throws Exception
+	 */
+	public static void checkUpdateOrInsertDiscount(DBCon dbCon, DiscountPojo pojo) throws Exception{
+		if(pojo.isDefaultOrDefaultReserved()){
+			DiscountPojo opojo = null;
+			String oSQL = "SELECT discount_id, status, restaurant_id FROM " +  Params.dbName + ".discount "
+						+ "WHERE restaurant_id = " + pojo.getRestaurantID() + " AND status in (" + Discount.DEFAULT + "," + Discount.DEFAULT_RESERVED + ")";
+			dbCon.rs = dbCon.stmt.executeQuery(oSQL);
+			if(dbCon.rs != null && dbCon.rs.next()){
+				opojo = new DiscountPojo();
+				opojo.setId(dbCon.rs.getInt("discount_id"));
+				opojo.setStatus(dbCon.rs.getInt("status"));
+				opojo.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
+			}
+			if(opojo != null){
+				if(opojo.getStatus() == Discount.DEFAULT){
+					opojo.setStatus(Discount.NORMAL);
+				}else if(opojo.getStatus() == Discount.DEFAULT_RESERVED){
+					opojo.setStatus(Discount.RESERVED);
+				}
+				dbCon.stmt.executeUpdate("UPDATE " +  Params.dbName + ".discount SET status = " + opojo.getStatus() + " WHERE discount_id = " + opojo.getId());
+			}
+		}
+	}
+	
+	/**
+	 * 
 	 * @param pojo
 	 * @param plan
 	 * @throws Exception
@@ -139,28 +168,9 @@ public class QueryDiscountDao {
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
 			
-			// 取消原默认方案
-			if(pojo.isDefaultOrDefaultReserved()){
-				DiscountPojo opojo = null;
-				String oSQL = "SELECT discount_id, status, restaurant_id FROM " +  Params.dbName + ".discount "
-							+ "WHERE restaurant_id = " + pojo.getRestaurantID() + " AND status in (" + Discount.DEFAULT + "," + Discount.DEFAULT_RESERVED + ")";
-				dbCon.rs = dbCon.stmt.executeQuery(oSQL);
-				if(dbCon.rs != null && dbCon.rs.next()){
-					opojo = new DiscountPojo();
-					opojo.setId(dbCon.rs.getInt("discount_id"));
-					opojo.setStatus(dbCon.rs.getInt("status"));
-					opojo.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
-				}
-				if(opojo != null){
-					if(opojo.getStatus() == Discount.DEFAULT){
-						opojo.setStatus(Discount.NORMAL);
-					}else if(opojo.getStatus() == Discount.DEFAULT_RESERVED){
-						opojo.setStatus(Discount.RESERVED);
-					}
-					dbCon.stmt.executeUpdate("UPDATE " +  Params.dbName + ".discount SET status = " + opojo.getStatus() + " WHERE discount_id = " + opojo.getId());
-				}
-			}						
-			
+			// 处理原默认方案信息
+			QueryDiscountDao.checkUpdateOrInsertDiscount(dbCon, pojo);
+								
 			String insertSQL = "INSERT INTO " +  Params.dbName + ".discount " 
 							+ " (restaurant_id, name, level, status)"
 							+ " values(" + pojo.getRestaurantID() + ",'" + pojo.getName() + "'," + pojo.getLevel()+ "," + pojo.getStatus() + ")";
@@ -208,28 +218,9 @@ public class QueryDiscountDao {
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
 			
-			// 取消原默认方案
-			if(pojo.isDefaultOrDefaultReserved()){
-				DiscountPojo opojo = null;
-				String oSQL = "SELECT discount_id, status, restaurant_id FROM " +  Params.dbName + ".discount "
-							+ "WHERE restaurant_id = " + pojo.getRestaurantID() + " AND status in (" + Discount.DEFAULT + "," + Discount.DEFAULT_RESERVED + ")";
-				dbCon.rs = dbCon.stmt.executeQuery(oSQL);
-				if(dbCon.rs != null && dbCon.rs.next()){
-					opojo = new DiscountPojo();
-					opojo.setId(dbCon.rs.getInt("discount_id"));
-					opojo.setStatus(dbCon.rs.getInt("status"));
-					opojo.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
-				}
-				if(opojo != null){
-					if(opojo.getStatus() == Discount.DEFAULT){
-						opojo.setStatus(Discount.NORMAL);
-					}else if(opojo.getStatus() == Discount.DEFAULT_RESERVED){
-						opojo.setStatus(Discount.RESERVED);
-					}
-					dbCon.stmt.executeUpdate("UPDATE " +  Params.dbName + ".discount SET status = " + opojo.getStatus() + " WHERE discount_id = " + opojo.getId());
-				}
-			}
-			
+			// 处理原默认方案信息
+			QueryDiscountDao.checkUpdateOrInsertDiscount(dbCon, pojo);
+						
 			String updateSQL = "UPDATE " +  Params.dbName + ".discount SET "
 							+ " name = '" + pojo.getName() + "'"
 							+ " ,level = " + pojo.getLevel()
