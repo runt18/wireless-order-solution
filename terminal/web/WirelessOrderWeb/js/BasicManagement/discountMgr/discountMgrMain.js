@@ -609,6 +609,11 @@ Ext.onReady(function(){
 								status.setValue(3);
 							else
 								status.setValue(1);
+						}else{
+							if(status.getValue() == 3)
+								status.setValue(2);
+							else
+								status.setValue(0);
 						}
 					}else{
 						return;
