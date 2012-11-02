@@ -9,7 +9,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -30,6 +29,7 @@ import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
 import com.wireless.util.ImageDialog;
+import com.wireless.util.ShadowImageView;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
 public class FoodDetailActivity extends Activity implements OnTasteChangeListener{
@@ -138,9 +138,12 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 
 			@Override
 			public void onClick(View v) {
-				float curNum = Float.parseFloat(countEditText.getText().toString());
-				countEditText.setText("" + ++curNum);
-				mOrderFood.setCount(curNum);
+				if(!countEditText.getText().toString().equals(""))
+				{
+					float curNum = Float.parseFloat(countEditText.getText().toString());
+					countEditText.setText("" + ++curNum);
+					mOrderFood.setCount(curNum);
+				}
 			}
 		});
 		//减少数量的按钮
@@ -148,32 +151,35 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 
 			@Override
 			public void onClick(View v) {
-				float curNum = Float.parseFloat(countEditText.getText().toString());
-				if(--curNum >= 1)
+				if(!countEditText.getText().toString().equals(""))
 				{
-					countEditText.setText("" + curNum);
-					mOrderFood.setCount(curNum);
+					float curNum = Float.parseFloat(countEditText.getText().toString());
+					if(--curNum >= 1)
+					{
+						countEditText.setText("" + curNum);
+						mOrderFood.setCount(curNum);
+					}
 				}
 			}
 		});
 		//打开菜品选择对话框
-		((Button) findViewById(R.id.button_pickTaste_foodDetail)).setOnClickListener(new OnClickListener(){
+		((ImageButton) findViewById(R.id.button_pickTaste_foodDetail)).setOnClickListener(new OnClickListener(){
 
 			@Override
 			public void onClick(View v) {
-				showDialog(PickTasteFragment.FOCUS_TASTE, null);
+				showDialog(PickTasteFragment.FOCUS_TASTE, mOrderFood);
 			}
 		});
 		//品注按钮
-		((Button) findViewById(R.id.button_pinzhu_foodDetail)).setOnClickListener(new OnClickListener(){
+		((ImageButton) findViewById(R.id.button_pinzhu_foodDetail)).setOnClickListener(new OnClickListener(){
 
 			@Override
 			public void onClick(View v) {
-				showDialog(PickTasteFragment.FOCUS_NOTE, null);
+				showDialog(PickTasteFragment.FOCUS_NOTE, mOrderFood);
 			}
 		});
 		//清空品注
-		((Button) findViewById(R.id.button_removeAllTaste)).setOnClickListener(new OnClickListener(){
+		((ImageButton) findViewById(R.id.button_removeAllTaste)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
 				if(mOrderFood.tastes.length > 0){
@@ -207,7 +213,8 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		LinearLayout linearLyaout = (LinearLayout) findViewById(R.id.linearLayout_foodDetail);
 		for(final Food f:mRecommendfoods)
 		{
-			ImageView image = new ImageView(this);
+			ShadowImageView image = new ShadowImageView(this);
+			image.setPadding(0, 0, 3, 3);
 			image.setLayoutParams(lp);
 			image.setScaleType(ScaleType.CENTER_CROP);
 			mImageFetcher.loadImage(f.image, image);
@@ -223,7 +230,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		mImageFetcher.clearCache();
 	}
 	
-	protected void showDialog(String tab, final Food f) {
+	protected void showDialog(String tab, final OrderFood f) {
 		//设置推荐菜对话框或口味选择对话框
 		if(tab == RECOMMEND_DIALOG)
 		{
@@ -232,7 +239,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 			PickTasteFragment pickTasteFg = new PickTasteFragment();
 			pickTasteFg.setOnTasteChangeListener(this);
 			Bundle args = new Bundle();
-			args.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(mOrderFood));
+			args.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(f));
 			pickTasteFg.setArguments(args);
 			pickTasteFg.show(getFragmentManager(), tab);
 		}
@@ -251,7 +258,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		}
 		@Override
 		public void onClick(View v) {
-			showDialog(RECOMMEND_DIALOG, mFood);
+			showDialog(RECOMMEND_DIALOG, new OrderFood(mFood));
 		}
 	}
 }

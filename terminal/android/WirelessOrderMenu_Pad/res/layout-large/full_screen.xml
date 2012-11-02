@@ -41,8 +41,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignRight="@+id/imageView_back_fullScreen"
-        android:layout_marginBottom="14dp"
+        android:layout_alignParentRight="true"
         android:src="@drawable/add_dish_btn_selector" />
 
 </RelativeLayout>

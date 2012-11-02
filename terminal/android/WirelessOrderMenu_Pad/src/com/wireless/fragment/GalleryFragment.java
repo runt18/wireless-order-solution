@@ -191,26 +191,6 @@ public class GalleryFragment extends Fragment {
             public Fragment getItem(int position) {
                 return ImageDetailFragment.newInstance(mFoods.get(position), GalleryFragment.this.getId(), scale);
             }            
-
-
-//        	// 此方法是最主要的，他设置好的ImageView对象返回给Gallery
-//        	@Override
-//        	public View getView(int position, View convertView, ViewGroup parent) {
-//        		ImageView imageView;
-//        		if(convertView == null){
-//        			convertView = new ImageView(getActivity());
-//        			imageView = (ImageView)convertView;
-//        			// 设置ImageView的伸缩规格，用了自带的属性值
-//        			imageView.setScaleType(curScaleType);
-//        			
-//        		}else {
-//        			imageView = (ImageView)convertView;
-//        		}
-//        		imageView.setAdjustViewBounds(true);
-//        		//imageView.setImageBitmap(mImgLoader.loadImage(mFoods.get(position).image));
-//        		mImgFetcher.loadImage(mFoods.get(position).image, imageView);
-//        		return imageView;
-//        	}
         };
         
         mViewPager.setAdapter(mGalleryAdapter);        

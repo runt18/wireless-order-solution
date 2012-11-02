@@ -7,10 +7,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import android.app.AlertDialog;
 import android.app.Fragment;
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -44,6 +41,7 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
 import com.wireless.protocol.Region;
 import com.wireless.protocol.Table;
+import com.wireless.util.ProgressToast;
 
 public class TablePanelFragment extends Fragment implements OnGestureListener {
 	// 每页要显示餐台数量
@@ -167,6 +165,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 	@Override
 	public void onStart() {
 		super.onStart();
+		
 		new QueryTableTask().execute();
 	}
 
@@ -356,20 +355,12 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-					final Table table = (Table) view.getTag();
+					Table table = (Table) view.getTag();
 					
-					final short customNum = Short.parseShort(((TextView)getView().findViewById(R.id.textView_customNum)).getText().toString());
-					//FIXME 修正点击之后消失缓慢的问题
-					new QueryTableStatusTask(table.aliasID){
-						@Override
-						void OnQueryTblStatus(byte status) {
-							if(mOnTableChangedListener != null){
-								table.status = status;
-								table.customNum = customNum;
-								mOnTableChangedListener.onTableChanged(table);
-							}
-						}								
-					}.execute();
+					short customNum = Short.parseShort(((TextView)getView().findViewById(R.id.textView_customNum)).getText().toString());
+					table.customNum = customNum;
+					mOnTableChangedListener.onTableChanged(table);
+					
 				}
 			});
 
@@ -475,14 +466,19 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 	 */
 	private class QueryTableTask extends com.wireless.lib.task.QueryTableTask {
 		
-		private ProgressDialog mProgDialog;
-		
+		private ProgressToast mToast;
+
+		public QueryTableTask() {
+			super();
+		}
+
+
 		/*
 		 * 在执行请求餐台信息前显示提示信息
 		 */
 		@Override
 		protected void onPreExecute() {
-			mProgDialog = ProgressDialog.show(TablePanelFragment.this.getActivity(), "", "正在更新餐台信息...请稍后", true);
+			mToast = ProgressToast.show(getActivity(), "正在更新餐台信息");
 		}
 
 
@@ -491,15 +487,13 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 		 */
 		@Override
 		protected void onPostExecute(Table[] tables) {
-			
-			mProgDialog.dismiss();
-			
+			mToast.cancel();
 			/**
 			 * Prompt user message if any error occurred.
 			 */
 			if(mErrMsg != null) {
-				Toast.makeText(TablePanelFragment.this.getActivity(), "刷新餐台数据失败,请检查网络", Toast.LENGTH_SHORT).show();
-
+//				Toast.makeText(TablePanelFragment.this.getActivity(), "刷新餐台数据失败,请检查网络", Toast.LENGTH_SHORT).show();
+				new QueryTableTask().execute();
 			} else {
 				
 				WirelessOrder.tables = tables;
@@ -512,52 +506,6 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 		}
 	}
 	
-	/*
-	 * 请求获得餐台的状态
-	 */
-	private abstract class QueryTableStatusTask extends com.wireless.lib.task.QueryTableStatusTask{
-
-//		private ProgressDialog _progDialog;
-
-		QueryTableStatusTask(int tableAlias){
-			super(tableAlias);
-		}
-		
-		@Override
-		protected void onPreExecute(){
-//			_progDialog = ProgressDialog.show(TablePanelFragment.this.getActivity(), "", "查询" + mTblAlias + "号餐台信息...请稍候", true);
-		}
-		
-		/*
-		 * 如果相应的操作不符合条件（比如要改单的餐台还未下单），
-		 * 则把相应信息提示给用户，否则根据餐台状态，分别跳转到下单或改单界面。
-		 */
-		@Override
-		protected void onPostExecute(Byte tblStatus){
-//			_progDialog.dismiss();
-			/*
-			 * Prompt user message if any error occurred.
-			 * Otherwise perform the corresponding action.
-			 */
-			if(mErrMsg != null){
-				new AlertDialog.Builder(TablePanelFragment.this.getActivity())
-				.setTitle("提示")
-				.setMessage(mErrMsg)
-				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						dialog.dismiss();
-					}
-				}).show();
-				
-			}else{			
-				OnQueryTblStatus(tblStatus);
-			}
-		}	
-		
-		abstract void OnQueryTblStatus(byte status);
-		
-	}
-
 	@Override
 	public boolean onDown(MotionEvent e) {
 		return false;

@@ -43,7 +43,6 @@ import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
 
 public class PickTasteFragment extends DialogFragment  implements OnGestureListener {
-//	private ScrollLayout mScrollLayout;
 	private ViewFlipper mFlipper;
 	private GestureDetector mGDetector;
 

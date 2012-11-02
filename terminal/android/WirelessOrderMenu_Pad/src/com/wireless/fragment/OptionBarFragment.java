@@ -40,6 +40,7 @@ import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Terminal;
 import com.wireless.ui.PickedFoodActivity;
+import com.wireless.util.ProgressToast;
 
 public class OptionBarFragment extends Fragment implements OnTableChangedListener, OnStaffChangedListener, 
 									OnFoodsChangeListener{
@@ -58,6 +59,8 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 
 	
 	private BBarHandler  mBBarRefleshHandler;
+	
+	private OnOrderChangeListener mOnOrderChangeListener;
 	
 	private static class BBarHandler extends Handler{		
 		
@@ -201,7 +204,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 		WindowManager.LayoutParams lp = dialogWindow.getAttributes();
 		lp.width = 940;
 		dialogWindow.setAttributes(lp);
-		
+		//对话框关闭按钮
 		((Button)mDialog.findViewById(R.id.button_tab1_cancel)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
@@ -227,21 +230,29 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 	@Override
 	public void onTableChanged(Table table) {
 		mDialog.dismiss();
-		
-		ShoppingCart.instance().setDestTable(table);		
- 
-		if(table.status == Table.TABLE_IDLE){		
-			ShoppingCart.instance().setOriOrder(null);
-			Toast.makeText(this.getActivity(), "该餐台尚未点菜", Toast.LENGTH_SHORT).show();
-			
-		}else if(table.status == Table.TABLE_BUSY){
-			 new QueryOrderTask(table.aliasID){
-				@Override
-				void onOrderChanged(Order order) {
-					ShoppingCart.instance().setOriOrder(order);
-				}
-			 }.execute(WirelessOrder.foodMenu);
-		}
+		//对话框关闭后请求餐台状态，根据餐台的状态来判断是否请求订单
+		new QueryTableStatusTask(table)
+//		{
+//		@Override
+//		void OnQueryTblStatus(byte status) {
+//				this.mTable.status = status;
+//				ShoppingCart.instance().setDestTable(mTable);	
+//				
+//				if(mTable.status == Table.TABLE_IDLE){		
+//					ShoppingCart.instance().setOriOrder(null);
+//					Toast.makeText(getActivity(), "该餐台尚未点菜", Toast.LENGTH_SHORT).show();
+//					
+//				}else if(mTable.status == Table.TABLE_BUSY){
+//					 new QueryOrderTask(mTable.aliasID){
+//						@Override
+//						void onOrderChanged(Order order) {
+//							ShoppingCart.instance().setOriOrder(order);
+//						}
+//					 }.execute(WirelessOrder.foodMenu);
+//				}
+//			}								
+//		}
+		.execute();
 
 	}
 
@@ -312,9 +323,9 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 	/**
 	 * 执行请求对应餐台的账单信息 
 	 */
-	private abstract class QueryOrderTask extends com.wireless.lib.task.QueryOrderTask{
+	private class QueryOrderTask extends com.wireless.lib.task.QueryOrderTask{
 //		private ProgressDialog mProgDialog;
-	
+		ProgressToast mToast;
 		QueryOrderTask(int tableAlias){
 			super(tableAlias);
 		}
@@ -325,6 +336,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 		@Override
 		protected void onPreExecute(){
 //			mProgDialog = ProgressDialog.show(OptionBarFragment.this.getActivity(), "", "查询" + mTblAlias + "号账单信息...请稍候", true);
+			mToast = ProgressToast.show(getActivity(), "查询" + mTblAlias + "号账单信息...请稍候");
 		}
 		
 		/**
@@ -335,14 +347,9 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 		protected void onPostExecute(Order order){
 			//make the progress dialog disappeared
 //			mProgDialog.dismiss();
-			
+			mToast.cancel();
 			if(mBusinessException != null){
-				 new QueryOrderTask(this.mTblAlias){
-						@Override
-						void onOrderChanged(Order order) {
-							ShoppingCart.instance().setOriOrder(order);
-						}
-					 }.execute(WirelessOrder.foodMenu);
+				 new QueryOrderTask(this.mTblAlias).execute(WirelessOrder.foodMenu);
 //				/**
 //				 * 如果请求账单信息失败，则跳转回本页面
 //				 */
@@ -364,13 +371,93 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 			}			
 		}
 		
-		abstract void onOrderChanged(Order order);
+		void onOrderChanged(Order order){
+			ShoppingCart.instance().setOriOrder(order);
+			if(mOnOrderChangeListener != null)
+				mOnOrderChangeListener.onOrderChange(order);
+		}
 	}
 
-
+	/*
+	 * 请求获得餐台的状态
+	 */
+	private class QueryTableStatusTask extends com.wireless.lib.task.QueryTableStatusTask{
+		ProgressToast mToast;
+		Table mTable;
+		QueryTableStatusTask(Table table){
+			super(table.aliasID);
+			mTable = table;
+		}
+		
+		@Override
+		protected void onPreExecute(){
+			mToast = ProgressToast.show(getActivity(), "查询" + mTblAlias + "号餐台信息");
+		}
+		
+		/*
+		 * 如果相应的操作不符合条件（比如要改单的餐台还未下单），
+		 * 则把相应信息提示给用户，否则根据餐台状态，分别跳转到下单或改单界面。
+		 */
+		@Override
+		protected void onPostExecute(Byte tblStatus){
+//			_progDialog.dismiss();
+			mToast.cancel();
+			/*
+			 * Prompt user message if any error occurred.
+			 * Otherwise perform the corresponding action.
+			 */
+			if(mErrMsg != null){
+				//对话框关闭后请求餐台状态，根据餐台的状态来判断是否请求订单
+				new QueryTableStatusTask(mTable).execute();
+//				new AlertDialog.Builder(getActivity())
+//				.setTitle("提示")
+//				.setMessage(mErrMsg)
+//				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+//					public void onClick(DialogInterface dialog, int id) {
+//						dialog.dismiss();
+//					}
+//				}).show();
+				
+			}else{			
+				OnQueryTblStatus(tblStatus);
+			}
+		}	
+		
+		void OnQueryTblStatus(byte status){
+			mTable.status = status;
+			ShoppingCart.instance().setDestTable(mTable);	
+			//根据餐台状态更新order和显示
+			if(mTable.status == Table.TABLE_IDLE){		
+				ShoppingCart.instance().setOriOrder(null);
+				Toast.makeText(getActivity(), "该餐台尚未点菜", Toast.LENGTH_SHORT).show();
+				//通知改变更新
+				if(mOnOrderChangeListener != null)
+					mOnOrderChangeListener.onOrderChange(null);
+			}else if(mTable.status == Table.TABLE_BUSY){
+				 new QueryOrderTask(mTable.aliasID).execute(WirelessOrder.foodMenu);
+			}
+		}
+	}
+	
+	
 	@Override
 	public void onFoodsChange(List<OrderFood> newFoods) {
 		mBBarRefleshHandler.sendEmptyMessage(0);
 	}
-
+	/**
+	 * 订单改变的侦听器
+	 */
+	public interface OnOrderChangeListener{
+		void onOrderChange(Order order);
+	}
+	
+	public void setOnOrderChangeListener(OnOrderChangeListener l)
+	{
+		mOnOrderChangeListener = l;
+	}
+	
+	//TODO 添加其他listener
+//	public interface OnTableChangeListener{
+//		void onTableChange(Table table);
+//	}
 }

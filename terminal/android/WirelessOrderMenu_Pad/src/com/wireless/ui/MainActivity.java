@@ -76,7 +76,13 @@ public class MainActivity extends Activity
 				} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
 					return -1;
 				} else {
-					return 0;
+					if(food1.aliasID > food2.aliasID){
+						return 1;
+					}else if(food1.aliasID < food2.aliasID){
+						return -1;
+					}else{
+						return 0;
+					}
 				}
 			}
 		};
@@ -85,12 +91,70 @@ public class MainActivity extends Activity
 		 * 将所有菜品进行按厨房编号进行排序
 		 */
 		Arrays.sort(WirelessOrder.foods, mFoodCompByKitchen);
-		
+			
 		//创建Gallery Fragment的实例
 		mPicBrowserFragment = GalleryFragment.newInstance(WirelessOrder.foods, 0.1f, 2, ScaleType.CENTER_CROP);
 		//替换XML中为GalleryFragment预留的Layout
 		FragmentTransaction fragmentTransaction = this.getFragmentManager().beginTransaction();
 		fragmentTransaction.replace(R.id.main_viewPager_container, mPicBrowserFragment).commit();
+		
+		//清空所有厨房和对应菜品首张图片位置的Map数据
+		mFoodPosByKitchenMap.clear();
+		//设置厨房和对应菜品首张图片位置
+		Food curFood = WirelessOrder.foods[0];
+		mFoodPosByKitchenMap.put(curFood.kitchen, 0);
+		for(int i=0;i<WirelessOrder.foods.length;i++)
+		{
+			if(WirelessOrder.foods[i].kitchen.aliasID != curFood.kitchen.aliasID)
+			{
+				mFoodPosByKitchenMap.put(WirelessOrder.foods[i].kitchen, i);
+				curFood = WirelessOrder.foods[i];
+			}
+		}
+		
+		/**
+		 * 使用二分查找算法筛选出有菜品的厨房
+		 */
+		ArrayList<Kitchen> validKitchens = new ArrayList<Kitchen>();
+		for(Kitchen kitchen : WirelessOrder.foodMenu.kitchens) {
+			Food keyFood = new Food();
+			keyFood.kitchen = kitchen;
+			int index = Arrays.binarySearch(WirelessOrder.foods, keyFood, new Comparator<Food>() {
+						@Override
+						public int compare(Food food1, Food food2) {
+							if (food1.kitchen.aliasID > food2.kitchen.aliasID) {
+								return 1;
+							} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
+								return -1;
+							} else {
+								return 0;
+							}
+						}
+					});
+			if (index >= 0 ) {
+				validKitchens.add(kitchen);
+			}
+		}		
+		
+		/**
+		 * 筛选出有菜品的部门
+		 */
+		ArrayList<Department> validDepts = new ArrayList<Department>();
+		for (Department dept : WirelessOrder.foodMenu.depts) {
+			for (Kitchen kitchen : validKitchens) {
+				if(dept.deptID == kitchen.dept.deptID) {
+					validDepts.add(dept);
+					break;
+				}
+			}
+		}
+		
+		//取得item fragment的实例
+		mItemFragment = (ExpandableListFragment)getFragmentManager().findFragmentById(R.id.item);
+		//设置item fragment的回调函数
+		mItemFragment.setOnItemChangeListener(this);
+		//设置item fragment的数据源		
+		mItemFragment.notifyDataChanged(validDepts, validKitchens);
 		  
 		/**
 		 * 设置各种按钮的listener
@@ -159,59 +223,16 @@ public class MainActivity extends Activity
 		});
 		mOrderFood = new OrderFood(WirelessOrder.foods[0]);
 		mOrderFood.setCount(Float.parseFloat(((TextView) findViewById(R.id.textView_amount_main)).getText().toString()));
-	}
-	
-	@Override
-	public void onStart(){
-		super.onStart();
-		//清空所有厨房和对应菜品首张图片位置的Map数据
-		mFoodPosByKitchenMap.clear();
-		
-		/**
-		 * 使用二分查找算法筛选出有菜品的厨房
-		 */
-		ArrayList<Kitchen> validKitchens = new ArrayList<Kitchen>();
-		for(Kitchen kitchen : WirelessOrder.foodMenu.kitchens) {
-			Food keyFood = new Food();
-			keyFood.kitchen = kitchen;
-			int index = Arrays.binarySearch(WirelessOrder.foods, keyFood, mFoodCompByKitchen);
-			if (index >= 0 ) {
-				//设置厨房和对应菜品首张图片位置
-				mFoodPosByKitchenMap.put(kitchen, index);
-				validKitchens.add(kitchen);
-			}
-		}		
-		
-		/**
-		 * 筛选出有菜品的部门
-		 */
-		ArrayList<Department> validDepts = new ArrayList<Department>();
-		for (Department dept : WirelessOrder.foodMenu.depts) {
-			for (Kitchen kitchen : validKitchens) {
-				if(dept.deptID == kitchen.dept.deptID) {
-					validDepts.add(dept);
-					break;
-				}
-			}
-		}
-		
-		//取得item fragment的实例
-		mItemFragment = (ExpandableListFragment)getFragmentManager().findFragmentById(R.id.item);
-		//设置item fragment的回调函数
-		mItemFragment.setOnItemChangeListener(this);
-		//设置item fragment的数据源		
-		mItemFragment.notifyDataChanged(validDepts, validKitchens);
-		
+		//默认启用第一项
 		mItemFragment.performClick(0);
 	}
-
 
 	/**
 	 * 右边画廊Gallery的回调函数，联动显示左边的部门-厨房ListView
 	 */
 	@Override
 	public void onPicChanged(Food food, int position) {
-		mItemFragment.setPosition(food.kitchen);
+		mItemFragment.setPosition(food.kitchen);  
 		((TextView) findViewById(R.id.textView_foodName_main)).setText(food.name);
 		((TextView) findViewById(R.id.textView_price_main)).setText("" + food.getPrice());
 		((TextView) findViewById(R.id.textView_amount_main)).setText("1");

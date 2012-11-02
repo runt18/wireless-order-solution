@@ -8,8 +8,10 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ImageView.ScaleType;
 
+import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
 import com.wireless.fragment.GalleryFragment;
 import com.wireless.fragment.GalleryFragment.OnPicChangedListener;
@@ -34,6 +36,14 @@ public class FullScreenActivity extends Activity implements OnPicChangedListener
 		//替换XML中为GalleryFragment预留的Layout
 		FragmentTransaction fragmentTransaction = this.getFragmentManager().beginTransaction();
 		fragmentTransaction.replace(R.id.fullScreen_viewPager_container, mPicBrowserFragment).commit();
+		//点菜按钮
+		((ImageView) findViewById(R.id.imageView_selectFood_fullScreen)).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				ShoppingCart.instance().addFood(mOrderFood);
+				Toast.makeText(FullScreenActivity.this, "添加菜：" + mOrderFood.name, Toast.LENGTH_SHORT).show();
+			}
+		});
 	}
 	
 	@Override
@@ -49,6 +59,7 @@ public class FullScreenActivity extends Activity implements OnPicChangedListener
 		if(intent.hasExtra(FoodParcel.KEY_VALUE)){
 			mOrderFood = intent.getParcelableExtra(FoodParcel.KEY_VALUE);
 			mPicBrowserFragment.setPosition(mOrderFood);
+			((TextView) findViewById(R.id.textView_food_name_fullScreen)).setText(mOrderFood.name);
 		}
 		
 		((ImageView) findViewById(R.id.imageView_back_fullScreen)).setOnClickListener(new OnClickListener(){

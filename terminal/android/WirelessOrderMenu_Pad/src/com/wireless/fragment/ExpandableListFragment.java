@@ -117,20 +117,22 @@ public class ExpandableListFragment extends Fragment{
 			@Override
 			public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
 				final Kitchen currentKitchen = mChildren.get(groupPosition).get(childPosition);
-				v.post(new Runnable(){
-					@Override
-					public void run() {
-						mOnItemChangeListener.onItemChange(currentKitchen);						
-					}
-				});
-				
+				//更改点击显示样式
 				if(parent.getTag() != null)
 				{
 					((View)(parent.getTag())).setBackgroundDrawable(null);
 				}
-				
 				parent.setTag(v);
 				v.setBackgroundColor(v.getResources().getColor(R.color.blue));
+				
+				v.post(new Runnable(){
+					@Override
+					public void run() {
+						//通知侦听器改变
+						mOnItemChangeListener.onItemChange(currentKitchen);						
+					}
+				});
+
 				return false;
 			}
 		});
@@ -204,7 +206,7 @@ public class ExpandableListFragment extends Fragment{
 			}
 			((TextView) view.findViewById(R.id.mychild)).setText(mChildren.get(groupPosition).get(childPosition).name);
 //			//如果是第一个且之前没有按下过child，则默认设置第一个按下
-//			if(groupPosition ==0 && childPosition ==0 && mListView.getTag() == null)
+//			if(mListView.getTag() != null)
 //			{
 //				view.setBackgroundColor(getResources().getColor(R.color.blue));
 //				mListView.setTag(view);
