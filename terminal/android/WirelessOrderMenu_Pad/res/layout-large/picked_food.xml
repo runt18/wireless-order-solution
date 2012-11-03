@@ -9,15 +9,14 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         class="com.wireless.fragment.OptionBarFragment" />
-
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/bottombar_pickedFood"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@+id/relativeLayout_right_pickedFood"
-        android:padding="10dp" >
+        android:layout_toLeftOf="@+id/relativeLayout_right_pickedFood" >
 
         <RelativeLayout
             android:id="@+id/relativeLayout1"
@@ -28,7 +27,7 @@
 
             <TextView
                 android:id="@+id/textView1"
-                android:layout_width="200dp"
+                android:layout_width="120dp"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_margin="10dp"
@@ -37,7 +36,7 @@
 
             <TextView
                 android:id="@+id/textView2"
-                android:layout_width="130dp"
+                android:layout_width="80dp"
                 android:layout_height="wrap_content"
                 android:layout_alignBaseline="@+id/textView1"
                 android:layout_centerVertical="true"
@@ -146,7 +145,7 @@
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/relativeLayout1"
              >
-        </ListView>
+        </ListView>
         -->
 
         <ExpandableListView
@@ -157,310 +156,38 @@
             android:layout_alignLeft="@+id/relativeLayout1"
             android:layout_below="@+id/relativeLayout1" >
         </ExpandableListView>
-
+
         <ProgressBar
             android:id="@+id/progressBar_pickedFood"
             style="?android:attr/progressBarStyleLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true" />
-
     </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/relativeLayout_right_pickedFood"
-        android:layout_width="400dp"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_above="@+id/bottombar_pickedFood"
         android:layout_alignParentLeft="false"
         android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:padding="10dp" >
-
-        <!--
-        <RelativeLayout
-            android:id="@+id/relativeLayout2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="false"
-            android:layout_below="@+id/imageView_selected_food_pickedFood" >
-
-            <TextView
-                android:id="@+id/textView7"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true"
-                android:text="菜名："
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-
-            <TextView
-                android:id="@+id/textView_food_name_pickedFood"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_marginLeft="48dp"
-                android:layout_toRightOf="@+id/textView7"
-                android:text="Large Text"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/relativeLayout3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/relativeLayout2"
-            android:layout_below="@+id/relativeLayout2" >
-
-            <TextView
-                android:id="@+id/textView10"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true"
-                android:text="原价："
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-
-            <TextView
-                android:id="@+id/textView_ori_price_pickedFood"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_marginLeft="35dp"
-                android:layout_toRightOf="@+id/textView10"
-                android:text="0"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-
-            <TextView
-                android:id="@+id/textView13"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-                android:text="元"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/relativeLayout4"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/relativeLayout3"
-            android:layout_below="@+id/relativeLayout3" >
-
-            <TextView
-                android:id="@+id/textView11"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true"
-                android:text="优惠价："
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-
-            <TextView
-                android:id="@+id/textView_con_price_pickedFood"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_marginLeft="21dp"
-                android:layout_toRightOf="@+id/textView11"
-                android:text="0"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-
-            <TextView
-                android:id="@+id/textView15"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-                android:text="元"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/relativeLayout5"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/relativeLayout4"
-            android:layout_below="@+id/relativeLayout4" >
-
-            <TextView
-                android:id="@+id/textView16"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true"
-                android:text="折扣："
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-
-            <TextView
-                android:id="@+id/textView_discount_pickedFood"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/textView16"
-                android:text="0"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-
-            <TextView
-                android:id="@+id/textView18"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-                android:text="折"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/relativeLayout6"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/relativeLayout5"
-            android:layout_centerHorizontal="true" >
-        </RelativeLayout>
-
-        <TextView
-            android:id="@+id/textView19"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/relativeLayout5"
-            android:layout_alignTop="@+id/relativeLayout6"
-            android:text="规格："
-            android:textAppearance="?android:attr/textAppearanceLarge" />
-
-        <RadioGroup
-            android:id="@+id/radioGroup1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/textView19"
-            android:layout_toRightOf="@+id/textView19"
-            android:orientation="horizontal" >
-
-            <RadioButton
-                android:id="@+id/radio0"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="大" />
-
-            <RadioButton
-                android:id="@+id/radio1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="中" />
-
-            <RadioButton
-                android:id="@+id/radio2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="小" />
-        </RadioGroup>
-
-        <RelativeLayout
-            android:id="@+id/relativeLayout7"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/textView19"
-            android:layout_below="@+id/radioGroup1" >
-
-            <TextView
-                android:id="@+id/textView20"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true"
-                android:text="口味："
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-
-            <TextView
-                android:id="@+id/textView_taste_pickedFood"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/textView20"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-        </RelativeLayout>
-
-        <Button
-            android:id="@+id/button1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="false"
-            android:layout_alignParentRight="true"
-            android:layout_below="@+id/relativeLayout7"
-            android:text="选择口味" />
-
-        <RelativeLayout
-            android:id="@+id/relativeLayout8"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/relativeLayout7"
-            android:layout_below="@+id/button1" >
-
-            <TextView
-                android:id="@+id/textView22"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true"
-                android:text="品注："
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-
-            <TextView
-                android:id="@+id/textView_tempTaste_pickedFood"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/textView22"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-        </RelativeLayout>
-
-        <Button
-            android:id="@+id/button2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="false"
-            android:layout_alignParentRight="true"
-            android:layout_below="@+id/relativeLayout8"
-            android:text="手写品注" />
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true" >
-
-            <Button
-                android:id="@+id/button_hurry_pickedFood"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true"
-                android:text="催菜" />
-
-            <Button
-                android:id="@+id/button_delete_pickedFood"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-                android:text="删除" />
-        </RelativeLayout>
-        -->
-
+        android:layout_alignParentTop="true" >
+
         <ImageView
             android:id="@+id/imageView_selected_food_pickedFood"
             android:layout_width="match_parent"
-            android:layout_height="300dp" />
-
+            android:layout_height="225dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:scaleType="centerInside" />
+
         <include
             android:id="@+id/tab1_foodDetail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/imageView_selected_food_pickedFood"
             layout="@layout/food_detail_tab1" >
-
         </include>
     </RelativeLayout>
 

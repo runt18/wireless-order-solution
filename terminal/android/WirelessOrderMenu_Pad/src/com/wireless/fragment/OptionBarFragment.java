@@ -20,9 +20,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TabHost;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.Params;
@@ -52,7 +50,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 	
 	private static final String TAB_PICK_TBL = "tab_pick_table";
 	private static final String TAB_PICK_STAFF = "tab_pick_staff";
-	private static final String TAB_PICK_VIP = "tab_pick_vip";
+//	private static final String TAB_PICK_VIP = "tab_pick_vip";
 	
 	private Dialog mDialog;
 	private TabHost mTabHost;
@@ -64,16 +62,16 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 	
 	private static class BBarHandler extends Handler{		
 		
-		private TextView mSelectedFoodTextView;
-		private TextView mTableNumTextView;
-		private TextView mCustomCntTextView;
-		private TextView mStaffTxtView;
+		private Button mTableNumBtn;
+		private Button mCustomCntBtn;
+		private Button mStaffBtn;
+		private Button mSelectedFoodBtn;
 		
 		BBarHandler(OptionBarFragment fragment){
-			mSelectedFoodTextView = (TextView)fragment.getActivity().findViewById(R.id.textView_selectedFood);
-			mTableNumTextView = (TextView)fragment.getActivity().findViewById(R.id.txtView_table_count);
-			mCustomCntTextView = (TextView)fragment.getActivity().findViewById(R.id.textView_peopCnt);
-			mStaffTxtView = (TextView)fragment.getActivity().findViewById(R.id.textView_serverName);
+			mSelectedFoodBtn = (Button)fragment.getActivity().findViewById(R.id.button_pickedFood_bottomBar);
+			mTableNumBtn = (Button)fragment.getActivity().findViewById(R.id.button_table_bottombar);
+			mCustomCntBtn = (Button)fragment.getActivity().findViewById(R.id.button_people_bottomBar);
+			mStaffBtn = (Button)fragment.getActivity().findViewById(R.id.button_server_bottomBar);
 		}
 		
 		@Override
@@ -81,26 +79,26 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 			//BBar显示餐台号和人数
 			Table destTbl =  ShoppingCart.instance().getDestTable();
 			if(destTbl != null){
-				mTableNumTextView.setText("" + destTbl.aliasID);
-				mCustomCntTextView.setText("" + destTbl.customNum);
+				mTableNumBtn.setText("" + destTbl.aliasID);
+				mCustomCntBtn.setText("" + destTbl.customNum);
 			}else{
-				mTableNumTextView.setText("未设定");
-				mCustomCntTextView.setText("" + 0);
+				mTableNumBtn.setText("未设定");
+				mCustomCntBtn.setText("" + 0);
 			}
 			
 			//BBar显示已点菜的数量
 			if(ShoppingCart.instance().hasFoods()){
-				mSelectedFoodTextView.setText("" + ShoppingCart.instance().getAllFoods().size());
+				mSelectedFoodBtn.setText("" + ShoppingCart.instance().getAllFoods().size());
 			}else{
-				mSelectedFoodTextView.setText("" + 0);
+				mSelectedFoodBtn.setText("" + 0);
 			}
 			
 			//BBar显示服务员姓名
 			StaffTerminal staff = ShoppingCart.instance().getStaff();
 			if(staff != null){
-				mStaffTxtView.setText(staff.name);
+				mStaffBtn.setText(staff.name);
 			}else{
-				mStaffTxtView.setText("未设定");
+				mStaffBtn.setText("未设定");
 			}
 		}
 	}
@@ -130,8 +128,8 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 	 */
 	private void init(final Activity activity){
 		//餐台选择Button
-		ImageView pickTblImgView = (ImageView)activity.findViewById(R.id.imgView_set_table);
-		pickTblImgView.setOnClickListener(new View.OnClickListener() {			
+		Button mTableNumBtn = (Button) getActivity().findViewById(R.id.button_table_bottombar);
+		mTableNumBtn.setOnClickListener(new View.OnClickListener() {			
 			@Override
 			public void onClick(View v) {
 				if(mDialog == null)
@@ -142,8 +140,8 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 		});
 
 		//服务员选择Button
-		ImageView pickStaffImgView = (ImageView)activity.findViewById(R.id.imageView_server);
-		pickStaffImgView.setOnClickListener(new View.OnClickListener() {			
+		Button mStaffBtn = (Button) getActivity().findViewById(R.id.button_server_bottomBar);
+		mStaffBtn.setOnClickListener(new View.OnClickListener() {			
 			@Override
 			public void onClick(View v) {
 				if(mDialog == null)
@@ -154,19 +152,19 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 		});
 		
 		//会员选择Button
-		ImageView vipImgView = (ImageView)activity.findViewById(R.id.imageView_vip);
-		vipImgView.setOnClickListener(new View.OnClickListener() {			
-			@Override
-			public void onClick(View v) {
-				if(mDialog == null)
-					initDialog(activity);
-				mTabHost.setCurrentTabByTag(TAB_PICK_VIP);
-				mDialog.show();
-			}
-		});
+//		ImageView vipImgView = (ImageView)activity.findViewById(R.id.imageView_vip);
+//		vipImgView.setOnClickListener(new View.OnClickListener() {			
+//			@Override
+//			public void onClick(View v) {
+//				if(mDialog == null)
+//					initDialog(activity);
+//				mTabHost.setCurrentTabByTag(TAB_PICK_VIP);
+//				mDialog.show();
+//			}
+//		});
 		//已点菜button
-		ImageView pickedFoodImgView = (ImageView) activity.findViewById(R.id.imageView_selectedFood);
-		pickedFoodImgView.setOnClickListener(new OnClickListener(){
+		Button mSelectedFoodBtn = (Button) getActivity().findViewById(R.id.button_pickedFood_bottomBar);
+		mSelectedFoodBtn.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
 				if(!(activity instanceof PickedFoodActivity) && 
@@ -278,7 +276,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 				editor.putLong(Params.STAFF_PIN, staff.pin);
 				//提交修改
 				editor.commit();	
-				((TextView) getActivity().findViewById(R.id.textView_serverName)).setText(staff.name);
+				((Button) getActivity().findViewById(R.id.button_server_bottomBar)).setText(staff.name);
 				//set the pin generator according to the staff login
 				ReqPackage.setGen(new PinGen(){
 					@Override
