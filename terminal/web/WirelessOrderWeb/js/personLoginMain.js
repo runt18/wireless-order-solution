@@ -449,104 +449,94 @@
 //		});
 
 // menuVerifyWin
-var menuVerifyWin = new Ext.Window(
-		{
-			layout : "fit",
-			width : 200,
-			height : 100,
-//			closeAction : "hide",
-			resizable : false,
-			closable : false,
-			draggable : false,
-			modal : true,
-			constrainHeade : true,			
-			items : [ {
-				layout : "form",
-				labelWidth : 30,
-				border : false,
-				frame : true,
-				items : [ {
-					xtype : "textfield",
-					inputType : "password",
-					fieldLabel : "密码",
-					id : "menuVerifyPwd",
-					width : 110
-				} ]
-			} ],
-			buttons : [
-					{
-						text : "确定",
-						id : 'btnMenuVerifyWinSubmit',
-						handler : function() {
-							var menuVerifyPwd = menuVerifyWin.findById(
-									"menuVerifyPwd").getValue();
-							menuVerifyWin.findById("menuVerifyPwd")
-									.setValue("");
+var menuVerifyWin = new Ext.Window({
+	layout : "fit",
+	width : 200,
+	height : 100,
+//	closeAction : "hide",
+	resizable : false,
+	closable : false,
+	draggable : false,
+	modal : true,
+	constrainHeade : true,			
+	items : [{
+		layout : "form",
+		labelWidth : 30,
+		border : false,
+		frame : true,
+		items : [{
+			xtype : "textfield",
+			inputType : "password",
+			fieldLabel : "密码",
+			id : "menuVerifyPwd",
+			width : 110
+		}]
+	}],
+	buttons : [{
+		text : "确定",
+		id : 'btnMenuVerifyWinSubmit',
+		handler : function() {
+			var menuVerifyPwd = menuVerifyWin.findById("menuVerifyPwd").getValue();
+			menuVerifyWin.findById("menuVerifyPwd").setValue("");
+			
+			var pwdTrans;
+			if (menuVerifyPwd != "") {
+				pwdTrans = MD5(menuVerifyPwd);
+			} else {
+				pwdTrans = menuVerifyPwd;
+			}
+			
+			menuVerifyWin.hide();
+			isPrompt = false;
+			menuVerifyWin.findById("menuVerifyPwd").setValue("");
 
-							var pwdTrans;
-							if (menuVerifyPwd != "") {
-								pwdTrans = MD5(menuVerifyPwd);
-							} else {
-								pwdTrans = menuVerifyPwd;
-							}
-
-							menuVerifyWin.hide();
-							isPrompt = false;
-							menuVerifyWin.findById("menuVerifyPwd")
-									.setValue("");
-
-							Ext.Ajax.request({
-										url : "../VerifyPwd.do",
-										params : {
-											"pin" : currPin,
-											"type" : "3",
-											"pwd" : pwdTrans
-										},
-										success : function(response, options) {
-											var resultJSON = Ext.util.JSON
-													.decode(response.responseText);
-											if (resultJSON.success == true) {
-												location.href = "BasicManagement_Module/BasicMgrProtal.html?pin="
-														+ currPin
-														+ "&restaurantID="
-														+ restaurantID;
-											} else {
-												Ext.MessageBox.show({
-													msg : resultJSON.data,
-													width : 300,
-													buttons : Ext.MessageBox.OK
-												});
-											}
-										},
-										failure : function(response, options) {
-										}
-									});
-						}
-					},
-					{
-						text : "取消",
-						handler : function() {
-							menuVerifyWin.hide();
-							isPrompt = false;
-							menuVerifyWin.findById("menuVerifyPwd")
-									.setValue("");
-						}
-					} ],
-			listeners : {
-				show : function(thiz) {
-					// thiz.findById("personCountInput").focus();
-					var f = Ext.get("menuVerifyPwd");
-					f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
-				}
-			},
-			keys : [
-				    {
-						key : Ext.EventObject.ENTER,
-						fn : function(){Ext.getCmp('btnMenuVerifyWinSubmit').handler(); },
-						scope : this 
+			Ext.Ajax.request({
+				url : "../VerifyPwd.do",
+				params : {
+					"pin" : currPin,
+					"type" : "3",
+					"pwd" : pwdTrans
+				},
+				success : function(response, options) {
+					var resultJSON = Ext.util.JSON.decode(response.responseText);
+					if (resultJSON.success == true) {
+						location.href = "BasicManagement_Module/BasicMgrProtal.html?pin=" + currPin
+										+ "&restaurantID=" + restaurantID;
+					} else {
+						Ext.MessageBox.show({
+							msg : resultJSON.data,
+							width : 300,
+							buttons : Ext.MessageBox.OK
+						});
 					}
-				]
-		});
+				},
+				failure : function(response, options) {
+					
+				}
+			});
+		}
+	}, {
+		text : "取消",
+		handler : function() {
+			menuVerifyWin.hide();
+			isPrompt = false;
+			menuVerifyWin.findById("menuVerifyPwd").setValue("");
+		}
+	}],
+	listeners : {
+		show : function(thiz) {
+			var f = Ext.get("menuVerifyPwd");
+			f.focus.defer(100, f); // 万恶的EXT！为什么这样才可以！？！？
+		}
+	},
+	keys : [{
+		key : Ext.EventObject.ENTER,
+		fn : function(){
+			Ext.getCmp('btnMenuVerifyWinSubmit').handler(); 
+		},
+		scope : this 
+	}]
+});
 
 // historyVerifyWin
 var historyVerifyWin = new Ext.Window(
@@ -1000,36 +990,25 @@ Ext.onReady(function() {
 				} ]
 			});
 
-			var viewport = new Ext.Viewport(
-					{
-						layout : "border",
-						id : "viewport",
-						items : [
-								{
-									region : "north",
-									bodyStyle : "background-color:#DFE8F6;",
-									html : "<h4 style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4><div id='optName' class='optName'></div>",
-									height : 50,
-									border : false,
-									margins : '0 0 0 0'
-								},
-								centerPanel,
-								{
-									region : "south",
-									height : 30,
-									layout : "form",
-									frame : true,
-									border : false,
-									html : "<div style='font-size:11pt; text-align:center;'><b>版权所有(c) 2011 智易科技</b></div>"
-								} ]
-					});
-
-			// -------------------- 浏览器大小改变 -------------------------------
-			// Ext.EventManager.onWindowResize(function() {
-			// // obj.style[attr]
-			// document.getElementById("wrap").style["height"] =
-			// (tableSelectCenterPanel
-			// .getInnerHeight() - 100)
-			// + "px";
-			// });
-		});
+	 new Ext.Viewport({
+		layout : "border",
+		id : "viewport",
+		items : [{
+			region : "north",
+			bodyStyle : "background-color:#DFE8F6;",
+			html : "<h4 style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4><div id='optName' class='optName'></div>",
+			height : 50,
+			border : false,
+			margins : '0 0 0 0'
+		},
+		centerPanel,
+		{
+			region : "south",
+			height : 30,
+			layout : "form",
+			frame : true,
+			border : false,
+			html : "<div style='font-size:11pt; text-align:center;'><b>版权所有(c) 2011 智易科技</b></div>"
+		}]
+	 });
+});

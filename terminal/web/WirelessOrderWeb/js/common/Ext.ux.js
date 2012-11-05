@@ -17,6 +17,7 @@ Ext.ux.txtFormat = {
 	typeName : '<div style="float:left; width:100px; font-size:12px;">&nbsp;{0}:&nbsp;<span id="{1}" style="color:green; font-weight:bold; font-size:13px;">{2}</span></div>',
 	linkClassOne : '<a id="{0}" href="{1}" onClick="{2}" style="color:green; font-size:15px; font-weight:bold;">{3}</a>',
 	renderer : '<a href="javascript:{0}({1})" {2}>{3}</a>',
+	xh : '<font color="red">＊</font>',
 	gridDou : function(_v){
 		return _v == '' ? '0.00&nbsp;&nbsp;' : (parseFloat(_v).toFixed(2) + '&nbsp;&nbsp;');
 	},
@@ -220,7 +221,7 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 				pageSize : pageSize,
 				store : g_store,
 				displayInfo : true,
-				displayMsg : '第 {0} ~ {1} 条记录, 共 {2} 条',
+				displayMsg : '第 {0} 至 {1} 条记录, 共 {2} 条',
 				emptyMsg : '没有记录'
 			});
 //	}

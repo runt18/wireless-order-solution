@@ -65,4 +65,15 @@
 			}
 		});
 	});
+	
+	$("#client").each(function() {
+		$(this).bind("click", function() {
+			if (currPin != "" && !isPrompt) {
+				window.location.href = 'Client_Module/ClientMain.html?'
+										+ 'pin=' + currPin
+										+ '&restaurantID=' + restaurantID;
+				isPrompt = true;
+			}
+		});
+	});
 };
