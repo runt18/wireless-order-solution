@@ -85,14 +85,14 @@ if(Ext.DatePicker){
 
 if(Ext.PagingToolbar){
    Ext.apply(Ext.PagingToolbar.prototype, {
-      beforePageText : "页",
-      afterPageText  : "页共 {0} 页",
-      firstText      : "第一页",
-      prevText       : "前一页",
+      beforePageText : "第",
+      afterPageText  : "页, 共 {0} 页",
+      firstText      : "首页",
+      prevText       : "上一页",
       nextText       : "下一页",
-      lastText       : "最后页",
+      lastText       : "尾页",
       refreshText    : "刷新",
-      displayMsg     : "显示 {0} - {1}，共 {2} 条",
+      displayMsg     : "{0} - {1}, 共 {2} 条",
       emptyMsg       : '没有数据需要显示'
    });
 }
@@ -128,7 +128,7 @@ if(Ext.form.DateField){
 
 if(Ext.form.ComboBox){
    Ext.apply(Ext.form.ComboBox.prototype, {
-      loadingText       : "加载...",
+      loadingText       : "加载中......",
       valueNotFoundText : undefined
    });
 }
