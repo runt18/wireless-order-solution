@@ -238,11 +238,7 @@ doDailySettle = function() {
 				omsg = resultJSON.msg;
 				Ext.getCmp('btnRiJieDaYin').handler();
 			} else {
-				Ext.MessageBox.show({
-					msg : rootData[0].message,
-					width : 300,
-					buttons : Ext.MessageBox.OK
-				});
+				Ext.ux.showMsg(resultJSON);
 			}
 		},
 		failure : function(response, options) {
