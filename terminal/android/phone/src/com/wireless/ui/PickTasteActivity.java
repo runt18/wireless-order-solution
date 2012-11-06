@@ -31,6 +31,7 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
+import com.wireless.protocol.TasteGroup;
 import com.wireless.protocol.Util;
 import com.wireless.ui.view.ScrollLayout;
 import com.wireless.ui.view.ScrollLayout.OnViewChangedListener;
@@ -50,7 +51,7 @@ public class PickTasteActivity extends Activity{
 		@Override
 		public void handleMessage(Message message){
 			final PickTasteActivity theActivity = mActivity.get();
-			((TextView)theActivity.findViewById(R.id.foodTasteTxtView)).setText(theActivity._selectedFood.toString());
+			((TextView)theActivity.findViewById(R.id.foodTasteTxtView)).setText(theActivity.mSelectedFood.toString());
 		}
 	};
 	
@@ -60,7 +61,7 @@ public class PickTasteActivity extends Activity{
 	private final static String TAG_SPEC = "规格";
 	private final static String TAG_PINZHU = "品注";
 	
-	private OrderFood _selectedFood;
+	private OrderFood mSelectedFood;
 	//private TabHost _tabHost;
 	
 
@@ -71,7 +72,10 @@ public class PickTasteActivity extends Activity{
 		
 		//get the food parcel from the intent
 		FoodParcel foodParcel = getIntent().getParcelableExtra(FoodParcel.KEY_VALUE);
-		_selectedFood = foodParcel;
+		mSelectedFood = foodParcel;
+		if(mSelectedFood.tasteGroup == null){
+			mSelectedFood.tasteGroup = new TasteGroup(mSelectedFood, null, null);
+		}
 		
 		setContentView(R.layout.tastetable);
 		
@@ -168,7 +172,7 @@ public class PickTasteActivity extends Activity{
 			}
 		});
 		
-		if(_selectedFood.popTastes.length != 0){
+		if(mSelectedFood.popTastes.length != 0){
 			tasteScrollLayout.setToScreen(0);
 		}else{
 			tasteScrollLayout.setToScreen(1);			
@@ -185,7 +189,7 @@ public class PickTasteActivity extends Activity{
 		View popView = LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.popular, null);
     	final ListView popLstView = (ListView)popView.findViewById(R.id.popLstView);
     	((EditText)popView.findViewById(R.id.popSrchEdtTxt)).setText("");
-		popLstView.setAdapter(new TasteAdapter(_selectedFood.popTastes));
+		popLstView.setAdapter(new TasteAdapter(mSelectedFood.popTastes));
 		
 	    
 	    //滚动的时候隐藏输入法
@@ -211,15 +215,15 @@ public class PickTasteActivity extends Activity{
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				ArrayList<Taste> popTastes = new ArrayList<Taste>();
 				if(s.toString().length() != 0){
-					 for(int i = 0; i < _selectedFood.popTastes.length; i++){
-				    	 if(_selectedFood.popTastes[i].getPreference().contains(s.toString().trim())){
-				    		 popTastes.add(_selectedFood.popTastes[i]);
+					 for(int i = 0; i < mSelectedFood.popTastes.length; i++){
+				    	 if(mSelectedFood.popTastes[i].getPreference().contains(s.toString().trim())){
+				    		 popTastes.add(mSelectedFood.popTastes[i]);
 				    	 }
 				    }
 					popLstView.setAdapter(new TasteAdapter(popTastes.toArray(new Taste[popTastes.size()])));
 					
 				}else{
-					popLstView.setAdapter(new TasteAdapter(_selectedFood.popTastes));
+					popLstView.setAdapter(new TasteAdapter(mSelectedFood.popTastes));
 				}
 			}
 			
@@ -411,9 +415,9 @@ public class PickTasteActivity extends Activity{
 		final EditText priceEdtTxt = ((EditText)pinZhuView.findViewById(R.id.priceEdtTxt));
 		pinZhuEdtTxt.requestFocus();
 		
-		if(_selectedFood.tmpTaste != null){
-			pinZhuEdtTxt.setText(_selectedFood.tmpTaste.getPreference());
-			priceEdtTxt.setText(_selectedFood.tmpTaste.getPrice().toString());
+		if(mSelectedFood.hasTmpTaste()){
+			pinZhuEdtTxt.setText(mSelectedFood.tasteGroup.getTmpTastePref());
+			priceEdtTxt.setText(mSelectedFood.tasteGroup.getTmpTastePrice().toString());
 		}
 		
 		//品注的EditText的处理函数
@@ -423,11 +427,12 @@ public class PickTasteActivity extends Activity{
 			public void afterTextChanged(Editable s) {
 				String tmpTasteValue = s.toString().trim();
 				if(tmpTasteValue.length() != 0){
-					_selectedFood.tmpTaste = new Taste();
-					_selectedFood.tmpTaste.aliasID = Util.genTempFoodID();
-					_selectedFood.tmpTaste.setPreference(tmpTasteValue);
+					Taste tmpTaste = new Taste();
+					tmpTaste.aliasID = Util.genTempFoodID();
+					tmpTaste.setPreference(tmpTasteValue);
+					mSelectedFood.tasteGroup.setTmpTaste(tmpTaste);
 				}else{
-					_selectedFood.tmpTaste = null;
+					mSelectedFood.tasteGroup.setTmpTaste(null);
 				}
 				_handler.sendEmptyMessage(0);
 			}
@@ -449,22 +454,23 @@ public class PickTasteActivity extends Activity{
 
 			@Override
 			public void afterTextChanged(Editable s) {
-				if(_selectedFood.tmpTaste != null){
+				if(mSelectedFood.hasTmpTaste()){
+					Taste tmpTaste = mSelectedFood.tasteGroup.getTmpTaste();
 					try{
 						if(s.length() == 0){
-							_selectedFood.tmpTaste.setPrice(Float.valueOf(0));
+							tmpTaste.setPrice(Float.valueOf(0));
 						}else{
 							Float price = Float.valueOf(s.toString());
 							if(price >= 0 && price < 9999){
-								_selectedFood.tmpTaste.setPrice(price);
+								tmpTaste.setPrice(price);
 							}else{
-								priceEdtTxt.setText(_selectedFood.tmpTaste.getPrice() > 9999 ? "" : Util.float2String2(_selectedFood.tmpTaste.getPrice()));
+								priceEdtTxt.setText(tmpTaste.getPrice() > 9999 ? "" : Util.float2String2(tmpTaste.getPrice()));
 								priceEdtTxt.setSelection(priceEdtTxt.getText().length());
 								Toast.makeText(PickTasteActivity.this, "临时口味的价格范围是0～9999", Toast.LENGTH_SHORT).show();
 							}
 						}
 					}catch(NumberFormatException e){
-						priceEdtTxt.setText(_selectedFood.tmpTaste.getPrice() > 9999 ? "" : Util.float2String2(_selectedFood.tmpTaste.getPrice()));
+						priceEdtTxt.setText(tmpTaste.getPrice() > 9999 ? "" : Util.float2String2(tmpTaste.getPrice()));
 						priceEdtTxt.setSelection(priceEdtTxt.getText().length());
 						Toast.makeText(PickTasteActivity.this, "临时口味的价钱格式不正确，请重新输入", Toast.LENGTH_SHORT).show();
 					}
@@ -493,43 +499,33 @@ public class PickTasteActivity extends Activity{
 	
 	@Override
 	public void onBackPressed(){
+		if(!mSelectedFood.tasteGroup.hasTaste()){
+			mSelectedFood.tasteGroup = null;
+		}
 		Intent intent = new Intent(); 
 		Bundle bundle = new Bundle();
-		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(_selectedFood));
+		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(mSelectedFood));
 		intent.putExtras(bundle);
 		setResult(RESULT_OK, intent);
 		super.onBackPressed();
 	}
 	
-	/**
-	 * Create the tab indicator
-	 * @param text
-	 * @param drawable
-	 * @return
-	 */
-//	private View createTabIndicator(String text, int drawable) {
-//		View view = LayoutInflater.from(_tabHost.getContext()).inflate(R.layout.tb_bg, null);
-//		((TextView)view.findViewById(R.id.tabsText)).setText(text);
-//		((ImageView) view.findViewById(R.id.icon)).setImageResource(drawable);
-//		return view;
-//	}
-	
 	private class TasteAdapter extends BaseAdapter{
 
-		private Taste[] _tastes;
+		private Taste[] mTastes;
 		
 		TasteAdapter(Taste[] tastes){
-			_tastes = tastes;
+			mTastes = tastes;
 		}
 		
 		@Override
 		public int getCount() {
-			return _tastes.length;
+			return mTastes.length;
 		}
 
 		@Override
 		public Object getItem(int position) {
-			return _tastes[position];
+			return mTastes[position];
 		}
 
 		@Override
@@ -546,23 +542,25 @@ public class PickTasteActivity extends Activity{
 				view = convertView;
 			}
 			//set name to taste
-			((TextView)view.findViewById(R.id.foodname)).setText(_tastes[position].getPreference());
+			((TextView)view.findViewById(R.id.foodname)).setText(mTastes[position].getPreference());
 			//set number to taste
-			((TextView)view.findViewById(R.id.nums)).setText(String.valueOf(_tastes[position].aliasID));
+			((TextView)view.findViewById(R.id.nums)).setText(String.valueOf(mTastes[position].aliasID));
 			//set the price to taste
-			if(_tastes[position].calc == Taste.CALC_RATE){
-				((TextView)view.findViewById(R.id.foodprice)).setText(Util.float2Int(_tastes[position].getRate()) + "%");
+			if(mTastes[position].calc == Taste.CALC_RATE){
+				((TextView)view.findViewById(R.id.foodprice)).setText(Util.float2Int(mTastes[position].getRate()) + "%");
 			}else{
-				((TextView)view.findViewById(R.id.foodprice)).setText(Util.CURRENCY_SIGN + Util.float2String2(_tastes[position].getPrice()));
+				((TextView)view.findViewById(R.id.foodprice)).setText(Util.CURRENCY_SIGN + Util.float2String2(mTastes[position].getPrice()));
 			}
 			//set the status to whether the taste is selected
 			final CheckBox selectChkBox = (CheckBox)view.findViewById(R.id.chioce);
 			selectChkBox.setChecked(false);
 			selectChkBox.requestFocus();
-			for(int i = 0; i < _selectedFood.tastes.length; i++){
-				if(_tastes[position].aliasID == _selectedFood.tastes[i].aliasID){
-					selectChkBox.setChecked(true);
-					break;
+			if(mSelectedFood.tasteGroup.hasNormalTaste()){
+				for(Taste taste : mSelectedFood.tasteGroup.getNormalTastes()){
+					if(mTastes[position].aliasID == taste.aliasID){
+						selectChkBox.setChecked(true);
+						break;						
+					}
 				}
 			}
 			
@@ -571,18 +569,13 @@ public class PickTasteActivity extends Activity{
 				@Override
 				public void onClick(View arg0) {
 					if(selectChkBox.isChecked()){
-						int pos = _selectedFood.addTaste(_tastes[position]);
-						if(pos >= 0){
-							Toast.makeText(PickTasteActivity.this, "添加" + _tastes[position].getPreference(), Toast.LENGTH_SHORT).show();
-						}else{
-							Toast.makeText(PickTasteActivity.this, "最多只能添加" + _selectedFood.tastes.length + "种口味", Toast.LENGTH_SHORT).show();
-							selectChkBox.setChecked(false);
-						}						
+						if(mSelectedFood.tasteGroup.addTaste(mTastes[position])){
+							Toast.makeText(PickTasteActivity.this, "添加" + mTastes[position].getPreference(), Toast.LENGTH_SHORT).show();
+						}
 						
 					}else{
-						int pos = _selectedFood.removeTaste(_tastes[position]);
-						if(pos >= 0){
-							Toast.makeText(PickTasteActivity.this, "删除" + _tastes[position].getPreference(), Toast.LENGTH_SHORT).show();
+						if(mSelectedFood.tasteGroup.removeTaste(mTastes[position])){
+							Toast.makeText(PickTasteActivity.this, "删除" + mTastes[position].getPreference(), Toast.LENGTH_SHORT).show();
 						}
 					}
 					_handler.sendEmptyMessage(0);
@@ -598,21 +591,17 @@ public class PickTasteActivity extends Activity{
 				public void onClick(View arg0) {
 			        
 					if(selectChkBox.isChecked()){
-						int pos = _selectedFood.removeTaste(_tastes[position]);
-						if(pos >= 0){
+						if(mSelectedFood.tasteGroup.removeTaste(mTastes[position])){
 							selectChkBox.setChecked(false);
-							Toast.makeText(PickTasteActivity.this, "删除" + _tastes[position].getPreference(), Toast.LENGTH_SHORT).show();
+							Toast.makeText(PickTasteActivity.this, "删除" + mTastes[position].getPreference(), Toast.LENGTH_SHORT).show();
 						}else{
 							selectChkBox.setChecked(false);							
 						}
 						
 					}else{
-						int pos = _selectedFood.addTaste(_tastes[position]);
-						if(pos >= 0){
+						if(mSelectedFood.tasteGroup.addTaste(mTastes[position])){
 							selectChkBox.setChecked(true);
-							Toast.makeText(PickTasteActivity.this, "添加" + _tastes[position].getPreference(), Toast.LENGTH_SHORT).show();
-						}else{
-							Toast.makeText(PickTasteActivity.this, "最多只能添加" + _selectedFood.tastes.length + "种口味", Toast.LENGTH_SHORT).show();
+							Toast.makeText(PickTasteActivity.this, "添加" + mTastes[position].getPreference(), Toast.LENGTH_SHORT).show();
 						}
 					}
 					_handler.sendEmptyMessage(0);

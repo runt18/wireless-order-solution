@@ -25,6 +25,7 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.excep.BusinessException;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.TasteGroup;
 import com.wireless.protocol.Type;
 import com.wireless.protocol.Util;
 import com.wireless.ui.R;
@@ -284,7 +285,7 @@ public class OrderFoodListView extends ExpandableListView{
 			//show the price to each food
 			((TextView) view.findViewById(R.id.pricevalue)).setText(Util.CURRENCY_SIGN + Util.float2String2(food.calcPriceWithTaste()));
 			//show the taste to each food
-			((TextView)view.findViewById(R.id.taste)).setText(food.getTastePref());
+			((TextView)view.findViewById(R.id.taste)).setText(food.tasteGroup == null ? TasteGroup.NO_TASTE_PREF : food.tasteGroup.getTastePref());
 			/**
 			 * "新点菜"的ListView显示"删菜"和"口味"
 			 * "已点菜"的ListView显示"退菜"和"催菜"
