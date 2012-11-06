@@ -20,12 +20,7 @@ public class FoodParcel extends OrderFood implements Parcelable{
 			kitchen = food.kitchen;
 			name = food.name;
 			image = food.image;
-			if(food.tastes != null){
-				tastes = food.tastes;
-			}else{
-				tastes = new Taste[0];
-			}
-			tastes = food.tastes;
+			tasteGroup = food.tasteGroup;
 			hangStatus = food.hangStatus;
 			isTemporary = food.isTemporary;
 			status = food.status;
@@ -33,7 +28,6 @@ public class FoodParcel extends OrderFood implements Parcelable{
 			waiter = food.waiter;
 			setCount(food.getCount());
 			setPrice(food.getPrice());
-			tmpTaste = food.tmpTaste;
 			if(food.popTastes != null){
 				popTastes = food.popTastes;
 			}else{
@@ -61,17 +55,10 @@ public class FoodParcel extends OrderFood implements Parcelable{
 		waiter = in.readString();
 		setCount(Util.int2Float(in.readInt()));
 		setPrice(Util.int2Float(in.readInt()));
-		
-		// un-marshal the tastes
-		TasteParcel[] tasteParcels = in.createTypedArray(TasteParcel.CREATOR);
-		if(tasteParcels != null){
-			tastes = new Taste[tasteParcels.length];
-			System.arraycopy(tasteParcels, 0, tastes, 0, tasteParcels.length);
+		tasteGroup = TasteGroupParcel.CREATOR.createFromParcel(in);
+		if(tasteGroup != null){
+			tasteGroup.setAttachedFood(this);
 		}
-		
-		//un-marshal the temporary taste
-		tmpTaste = TasteParcel.CREATOR.createFromParcel(in);
-		
 		//un-marshal the most popular taste references
 		TasteParcel[] popTasteParcels = in.createTypedArray(TasteParcel.CREATOR);
 		if(popTasteParcels != null){
@@ -124,21 +111,8 @@ public class FoodParcel extends OrderFood implements Parcelable{
 			parcel.writeString(waiter);
 			parcel.writeInt(Util.float2Int(getCount()));
 			parcel.writeInt(Util.float2Int(getPrice()));
-			//marshal the tastes
-			if(tastes != null){
-				TasteParcel[] tasteParcels = new TasteParcel[tastes.length];
-				for(int i = 0; i < tasteParcels.length; i++){
-					tasteParcels[i] = new TasteParcel(tastes[i]);
-				}
-				parcel.writeTypedArray(tasteParcels, flags);
-				
-			}else{
-				parcel.writeTypedArray(null, flags);
-			}
-			
-			//marshal the temporary taste
-			new TasteParcel(tmpTaste).writeToParcel(parcel, flags);
-			
+			//marshal the taste group
+			new TasteGroupParcel(tasteGroup).writeToParcel(parcel, flags);			
 			//marshal the most popular taste references
 			if(popTastes != null){
 				TasteParcel[] popTasteParcels = new TasteParcel[popTastes.length];
