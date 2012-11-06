@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
@@ -25,6 +26,7 @@ import com.wireless.fragment.ExpandableListFragment.OnItemChangeListener;
 import com.wireless.fragment.GalleryFragment;
 import com.wireless.fragment.GalleryFragment.OnPicChangedListener;
 import com.wireless.fragment.GalleryFragment.OnPicClickListener;
+import com.wireless.fragment.OptionBarFragment;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Department;
@@ -37,7 +39,6 @@ public class MainActivity extends Activity
 						  implements OnItemChangeListener,
 							 	     OnPicChangedListener, 
 							 	     OnPicClickListener{
-	 
 	private static final int MAIN_ACTIVITY_RES_CODE = 340;
 
 	private HashMap<Kitchen, Integer> mFoodPosByKitchenMap = new HashMap<Kitchen, Integer>();
@@ -48,7 +49,7 @@ public class MainActivity extends Activity
 	private OrderFood mOrderFood;
 
 	private Comparator<Food> mFoodCompByKitchen;
-	
+	//TODO 添加 搜索功能
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -206,7 +207,7 @@ public class MainActivity extends Activity
 			}
 		});
 		//套餐
-		((ImageView) findViewById(R.id.imageView_combo_main)).setOnClickListener(new View.OnClickListener() {
+		((Button) findViewById(R.id.imageView_combo_main)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent(MainActivity.this,ComboFoodActivity.class);
@@ -214,7 +215,9 @@ public class MainActivity extends Activity
 			}
 		});
 		//排行榜
-		((ImageView) findViewById(R.id.imageView_rankList_main)).setOnClickListener(new View.OnClickListener() {
+		Button rankListBtn = (Button) findViewById(R.id.imageView_rankList_main);
+		rankListBtn.getPaint().setFakeBoldText(true);
+		rankListBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent(MainActivity.this, RankListActivity.class);
@@ -225,6 +228,8 @@ public class MainActivity extends Activity
 		mOrderFood.setCount(Float.parseFloat(((TextView) findViewById(R.id.textView_amount_main)).getText().toString()));
 		//默认启用第一项
 		mItemFragment.performClick(0);
+		
+		((OptionBarFragment)this.getFragmentManager().findFragmentById(R.id.bottombar)).setBackButtonDisable();
 	}
 
 	/**

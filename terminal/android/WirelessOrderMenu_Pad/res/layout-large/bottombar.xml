@@ -202,7 +202,7 @@
         android:background="@drawable/bottom_bar_btn_selector"
         android:text="未设定"
         android:textColor="@color/white" />
-
+
     <TextView
         android:id="@+id/textView20"
         android:layout_width="wrap_content"
@@ -210,7 +210,7 @@
         android:layout_alignBaseline="@+id/button_server_bottomBar"
         android:layout_alignBottom="@+id/button_server_bottomBar"
         android:layout_alignLeft="@+id/button_server_bottomBar"
-        android:layout_marginLeft="2dp"
+        android:layout_marginLeft="6dp"
         android:text="服务员:"
         android:textColor="@color/white" />
 

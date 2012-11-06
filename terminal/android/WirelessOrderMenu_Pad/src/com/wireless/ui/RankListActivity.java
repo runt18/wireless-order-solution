@@ -16,6 +16,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
@@ -24,6 +25,7 @@ import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.wireless.common.WirelessOrder;
@@ -34,11 +36,13 @@ import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.OrderFood;
 import com.wireless.util.ImageDialog;
+import com.wireless.util.ShadowImageView;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
 public class RankListActivity extends Activity {
 	private static final int REFRESH_RANK_LIST = 11;
 	private static final String CURRENT_FOOD = "current_food";
+	private static final short DEPT_ALL = Short.MAX_VALUE;
 	
 	private ImageFetcher mImageFetcher;
 	private RankListHandler mRankListHandler;
@@ -65,17 +69,20 @@ public class RankListActivity extends Activity {
 				mRecommendfoods.add(f);
 		}
 		
-		mImageFetcher.setImageSize(245, 160);
-		LayoutParams lp = new LayoutParams(245,160);
+		int recWidth = 200;
+		int recHeight = 150; 
+		mImageFetcher.setImageSize(recWidth, recHeight);
+		final LayoutParams lp = new LayoutParams(recWidth,recHeight);
 		//推荐菜层
-		LinearLayout recLyaout = (LinearLayout) findViewById(R.id.linearLayout_rankList);
+		LinearLayout linearLyaout = (LinearLayout) findViewById(R.id.linearLayout_rankList);
 		for(final Food f:mRecommendfoods)
 		{
-			ImageView image = new ImageView(this);
-			image.setLayoutParams(lp);
+			final ShadowImageView image = new ShadowImageView(this);
+			image.setPadding(0, 0, 3, 3);
+//			image.setLayoutParams(lp);
 			image.setScaleType(ScaleType.CENTER_CROP);
 			mImageFetcher.loadImage(f.image, image);
-			recLyaout.addView(image);
+			linearLyaout.addView(image);
 			
 			image.setTag(f);
 			//设置推荐菜点击侦听,弹出对话框
@@ -87,6 +94,7 @@ public class RankListActivity extends Activity {
 				}
 			});
 		}
+		
 		
 		/*
 		 * 将所有菜品进行按厨房编号进行排序
@@ -135,6 +143,9 @@ public class RankListActivity extends Activity {
 		 * 筛选出有菜品的部门
 		 */
 		ArrayList<Department> mValidDepts = new ArrayList<Department>();
+		//设置"全部 "这个厨房
+		mValidDepts.add(new Department("全部", DEPT_ALL,0,DEPT_ALL));
+		
 		for (int i = 0; i < WirelessOrder.foodMenu.depts.length; i++) {
 			for (int j = 0; j < mValidKitchens.size(); j++) {
 				if (WirelessOrder.foodMenu.depts[i].deptID == mValidKitchens.get(j).dept.deptID) {
@@ -144,9 +155,11 @@ public class RankListActivity extends Activity {
 			}
 		}
 		//设置部门显示
-		lp.height = LayoutParams.MATCH_PARENT;
-		lp.width = LayoutParams.MATCH_PARENT;
+		lp.height = LayoutParams.WRAP_CONTENT;
+		lp.width = LayoutParams.WRAP_CONTENT;
 		final LinearLayout deptLayout = (LinearLayout) findViewById(R.id.linearLayout_dept_rankList);
+	
+		//为每个厨房添加按钮
 		for(Department d:mValidDepts)
 		{
 			TextView textView = new TextView(this);
@@ -154,6 +167,9 @@ public class RankListActivity extends Activity {
 			textView.setText(d.name);
 			textView.setGravity(Gravity.CENTER);
 			textView.setTextSize(26f);
+			textView.setTextColor(getResources().getColor(R.color.brown));
+			textView.setBackgroundResource(R.drawable.rank_list_dept);
+			
 			deptLayout.addView(textView);
 			textView.setTag(d);
 			
@@ -162,14 +178,18 @@ public class RankListActivity extends Activity {
 				public void onClick(View v) {
 					//设置点击效果
 					if(deptLayout.getTag() != null)
-						((View)deptLayout.getTag()).setBackgroundColor(Color.WHITE);
-					v.setBackgroundColor(Color.MAGENTA);
+						((View)deptLayout.getTag()).setBackgroundResource(R.drawable.rank_list_dept);
+					v.setBackgroundResource(R.drawable.rank_list_dept_selected);
 					deptLayout.setTag(v);
 					
 					Department dept = (Department) v.getTag();
-					//刷新排行榜显示
-					mDeptFilter = dept.deptID;
+					if(dept != null)
+					{//刷新排行榜显示
+						mDeptFilter = dept.deptID;
+					}
+					else mDeptFilter = DEPT_ALL;
 					mRankListHandler.sendEmptyMessage(REFRESH_RANK_LIST);
+
 				}
 			});
 		}
@@ -205,23 +225,37 @@ public class RankListActivity extends Activity {
 		@Override
 		public void handleMessage(Message msg) {
 			final RankListActivity activity = mActivity.get();
-			//根据条件筛选出厨房
-			ArrayList<Kitchen> kitchens = new ArrayList<Kitchen>();
-			for(Kitchen k:activity.mValidKitchens)
-			{
-				if(k.dept.deptID == activity.mDeptFilter ){
-					kitchens.add(k);
-				}
-			}
-			//筛选出这些厨房中包含的菜品
+			final ArrayList<Food> sortedFoods = new ArrayList<Food>();
 			ArrayList<Food> allFoods = new ArrayList<Food>();
-			for(Food f:activity.mOriFoods)
+			allFoods.clear();
+			sortedFoods.clear();
+			//如果不是全部选项
+			if(activity.mDeptFilter != RankListActivity.DEPT_ALL)
 			{
-				for(Kitchen k:kitchens)
-					if(f.kitchen.aliasID == k.aliasID && f.image != null)
-					{
-						allFoods.add(f);
+				//根据条件筛选出厨房
+				ArrayList<Kitchen> kitchens = new ArrayList<Kitchen>();
+				for(Kitchen k:activity.mValidKitchens)
+				{
+					if(k.dept.deptID == activity.mDeptFilter ){
+						kitchens.add(k);
 					}
+				}
+				//筛选出这些厨房中包含的菜品
+				for(Food f:activity.mOriFoods)
+				{
+					for(Kitchen k:kitchens)
+						if(f.kitchen.aliasID == k.aliasID && f.image != null)
+						{
+							allFoods.add(f);
+						}
+				}
+			//如果是全部选项
+			} else {
+				for(Food f:activity.mOriFoods)
+				{
+					if(f.image != null)
+						allFoods.add(f);
+				}
 			}
 			//将选出的菜品按频率排序
 			Collections.sort(allFoods, new Comparator<Food>(){
@@ -235,7 +269,6 @@ public class RankListActivity extends Activity {
 				}
 			});
 			//提取最多前10个菜品
-			final ArrayList<Food> sortedFoods = new ArrayList<Food>();
 			if(allFoods.size() >= 10)
 				for(int i = 0;i<10;i++)
 				{
@@ -273,8 +306,31 @@ public class RankListActivity extends Activity {
 					}
 					Food food = sortedFoods.get(position);
 					view.setTag(food);
-					((TextView)view.findViewById(R.id.textView_name_rankList_item)).setText(food.name);
-					((TextView)view.findViewById(R.id.textView_num_rankList_item)).setText("" + ++position);
+					//显示排位信息
+					TextView foodNameTextView = (TextView)view.findViewById(R.id.textView_name_rankList_item);
+					foodNameTextView.setText(food.name);
+					TextView numberTextView = (TextView)view.findViewById(R.id.textView_num_rankList_item);
+					numberTextView.setText("" + ++position);
+					
+					int color = 0;
+					switch(position)
+					{
+					case 1:
+						color = activity.getResources().getColor(R.color.exRed);
+						foodNameTextView.setTextColor(color);
+						numberTextView.setTextColor(color);
+						break;
+					case 2:
+						color = activity.getResources().getColor(R.color.red_orange);
+						foodNameTextView.setTextColor(color);
+						numberTextView.setTextColor(color);
+						break;
+					case 3:
+						color = activity.getResources().getColor(R.color.orange);
+						foodNameTextView.setTextColor(color);
+						numberTextView.setTextColor(color);
+						break;
+					}
 					return view;
 				}
 				
@@ -292,7 +348,7 @@ public class RankListActivity extends Activity {
 					activity.mImageHandler.sendMessage(msg);
 					//设置点击的显示
 					if(parent.getTag() != null)
-						((View)parent.getTag()).setBackgroundColor(Color.WHITE);
+						((View)parent.getTag()).setBackgroundColor(activity.getResources().getColor(R.color.grey));
 					view.setBackgroundColor(Color.CYAN);
 					parent.setTag(view);
 				}
@@ -317,7 +373,7 @@ public class RankListActivity extends Activity {
 //			mActivity = new WeakReference<RankListActivity>(activity);
 			mImageView = (ImageView)activity.findViewById(R.id.imageView_rankList);
 			mImageView.setScaleType(ScaleType.CENTER_CROP);
-			
+//			mImageView.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT));
 			mFetcher = new ImageFetcher(activity,470,400);
 		}
 

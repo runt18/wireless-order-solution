@@ -48,21 +48,29 @@
             <LinearLayout
                 android:id="@+id/linearLayout_func_bottom"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:weightSum="4" >
 
-                <ImageView
+                <Button
                     android:id="@+id/imageView_rankList_main"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:src="@drawable/func_bottom_main" />
+                    android:background="@drawable/func_bottom_main"
+                    android:src="@drawable/func_bottom_main"
+                    android:text="排行榜"
+                    android:textColor="@color/black_red"
+                    android:typeface="monospace" />
 
-                <ImageView
+                <Button
                     android:id="@+id/imageView_combo_main"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:src="@drawable/func_bottom_other" />
+                    android:background="@drawable/func_bottom_other"
+                    android:src="@drawable/func_bottom_other"
+                    android:text="套菜"
+                    android:textColor="@color/dark_yellow" />
+
             </LinearLayout>
 
         </RelativeLayout>

@@ -4,7 +4,8 @@
     android:layout_height="match_parent"
     android:background="@color/white"
     android:focusable="true"
-    android:focusableInTouchMode="true" >
+    android:focusableInTouchMode="true"
+    android:padding="10dp" >
 
     <TextView
         android:id="@+id/textView2"
@@ -47,17 +48,17 @@
         android:ems="10"
         android:inputType="textPassword"
         android:visibility="gone" />
-
+
     <ListView
         android:id="@+id/listView_server_tab2"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/bottombar"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="false"
         android:layout_below="@+id/textView6"
         android:choiceMode="singleChoice"
         android:paddingLeft="20dp" >
+
     </ListView>
 
     <RelativeLayout
@@ -76,27 +77,6 @@
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textSize="48sp" />
     </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/bottombar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true" >
-
-        <Button
-            android:id="@+id/button_tab2_confirm"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:layout_toLeftOf="@+id/button_tab2_cancel"
-            android:text="确定" />
-
-        <Button
-            android:id="@+id/button_tab2_cancel"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:text="取消" />
-    </RelativeLayout>
 
     <TextView
         android:id="@+id/textView4"
@@ -104,7 +84,7 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/listView_server_tab2"
         android:layout_marginLeft="120dp"
-        android:layout_marginTop="65dp"
+        android:layout_marginTop="50dp"
         android:layout_toRightOf="@+id/listView_server_tab2"
         android:text="服务员账号："
         android:textAppearance="?android:attr/textAppearanceLarge"
@@ -116,7 +96,7 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/textView4"
         android:layout_below="@+id/textView4"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="50dp"
         android:text="服务员密码："
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
@@ -156,5 +136,14 @@
         android:layout_alignTop="@+id/textView5"
         android:ems="10"
         android:inputType="textPassword" />
+
+    <ImageView
+        android:id="@+id/imageView_dialogTab2_correct"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/editText_serverPswd"
+        android:layout_toRightOf="@+id/editText_serverPswd"
+        android:src="@android:drawable/btn_star_big_on"
+        android:visibility="invisible" />
 
 </RelativeLayout>

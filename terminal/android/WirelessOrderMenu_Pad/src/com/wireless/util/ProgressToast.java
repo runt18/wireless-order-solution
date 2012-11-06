@@ -15,6 +15,7 @@ public class ProgressToast {
 
 	public ProgressToast(Activity activity, String text) {
 		mToast = new Toast(activity);
+		mToast.setDuration(Toast.LENGTH_SHORT);
 		
         LayoutInflater inflate = (LayoutInflater)
         		activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -32,7 +33,20 @@ public class ProgressToast {
 		return toast;
 	}
 	
+	public static ProgressToast show(Activity activity, String text, int duration)
+	{
+		ProgressToast toast = new ProgressToast(activity, text);
+		toast.show(duration);
+		return toast;
+	}
+	
 	public void show(){
+		mToast.show();
+	}
+	
+	public void show(int duration)
+	{
+		mToast.setDuration(duration);
 		mToast.show();
 	}
 	

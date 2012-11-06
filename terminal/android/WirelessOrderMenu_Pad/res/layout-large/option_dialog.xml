@@ -49,5 +49,13 @@
             </FrameLayout>
         </LinearLayout>
     </TabHost>
+
+    <Button
+        android:id="@+id/button_optionDialog_closeDialog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:text="关闭" />
 
 </RelativeLayout>

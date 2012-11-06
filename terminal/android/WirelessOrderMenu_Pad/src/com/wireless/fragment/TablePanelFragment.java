@@ -27,7 +27,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -146,15 +145,15 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 			}
 		});
 		
-		/*
-		 * 刷新餐台按钮
-		 */
-		((Button) view.findViewById(R.id.button_tab1_refresh)).setOnClickListener(new OnClickListener(){
-			@Override
-			public void onClick(View v) {
-				new QueryTableTask().execute();
-			}
-		});
+//		/*
+//		 * 刷新餐台按钮
+//		 */
+//		((Button) view.findViewById(R.id.button_tab1_refresh)).setOnClickListener(new OnClickListener(){
+//			@Override
+//			public void onClick(View v) {
+//				new QueryTableTask().execute();
+//			}
+//		});
 
 		mRegionRefreshHandler.sendEmptyMessage(0);
 		mTableRefreshHandler.sendEmptyMessage(0);
@@ -165,7 +164,6 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 	@Override
 	public void onStart() {
 		super.onStart();
-		
 		new QueryTableTask().execute();
 	}
 

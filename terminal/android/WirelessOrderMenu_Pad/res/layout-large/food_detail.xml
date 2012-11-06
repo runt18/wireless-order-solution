@@ -110,10 +110,10 @@
             android:layout_toRightOf="@+id/imageView1"
             android:background="@drawable/rec_food_bg"
             android:paddingTop="9dp" >
-
+
             <LinearLayout
                 android:id="@+id/linearLayout_foodDetail"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:divider="@drawable/divider_food_detail"
                 android:dividerPadding="4dp"
@@ -123,23 +123,6 @@
             </LinearLayout>
         </HorizontalScrollView>
     </RelativeLayout>
-
-    <TextView
-        android:id="@+id/textView_foodName_foodDetail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="21dp"
-        android:layout_toLeftOf="@+id/right_part"
-        android:gravity="center"
-        android:shadowColor="@color/black"
-        android:shadowDx="2"
-        android:shadowDy="2"
-        android:shadowRadius="2"
-        android:text="Large Text"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="@color/white" />
 
     <ImageButton
         android:id="@+id/imageButton_addDish_foodDetail"
@@ -149,5 +132,29 @@
         android:layout_alignRight="@+id/imageView_foodDetail"
         android:background="@null"
         android:src="@drawable/add_dish_btn_selector" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignRight="@+id/imageView_foodDetail"
+        android:background="@drawable/main_top_bg" >
+
+        <TextView
+            android:id="@+id/textView_foodName_foodDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:shadowColor="@color/black"
+            android:shadowDx="2"
+            android:shadowDy="2"
+            android:shadowRadius="2"
+            android:text="Large Text"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/white" />
+
+    </RelativeLayout>
 
 </RelativeLayout>

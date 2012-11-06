@@ -120,7 +120,7 @@ public class PickedFoodActivity extends Activity implements OnOrderChangeListene
 			//若完全没有菜式，则关闭该activity
 			if(!sCart.hasExtraFoods() && !sCart.hasOrder())
 			{
-				activity.finish();
+				activity.onBackPressed();
 				return;
 			}
 			int totalCount = 0;

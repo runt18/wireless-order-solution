@@ -33,7 +33,6 @@ public class ShadowImageView extends ImageView {
         super.onDraw(canvas);  
         // 画边框  
         Rect rect1 = getRect(canvas);  
-        
         mPaint.setColor(Color.BLACK);  
         mPaint.setStyle(Paint.Style.STROKE); 
         
