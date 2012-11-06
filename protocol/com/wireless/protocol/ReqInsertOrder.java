@@ -26,7 +26,8 @@ import java.io.UnsupportedEncodingException;
  * food_amount - 1-byte indicating the amount of foods
  * 
  * <Food>
- * is_temp(0) : food_id[2] : order_num[2] : taste_id[2] : taste_id2[2] : taste_id3[2] : 
+ * is_temp(0) : food_id[2] : order_num[2] :
+ * normal_taste_amount : normal_taste_alias[2] : normal_taste_alias2[2]... : 
  * len_tmp_taste : tmp_taste[n] : tmp_taste_alias[2] : tmp_taste_price[4] : 
  * kitchen : hang_status : is_hurried
  * is_temp(0) - "0" means this food is NOT temporary
@@ -34,9 +35,8 @@ import java.io.UnsupportedEncodingException;
  * order_num[2] - 2-byte indicating how many this foods are ordered
  * 			   order_num[0] - 1-byte indicates the float-point
  * 			   order_num[1] - 1-byte indicates the fixed-point
- * taste_id[2] - 2-byte indicates the 1st taste preference id
- * taste_id2[2] - 2-byte indicates the 2nd taste preference id
- * taste_id3[2] - 2-byte indicates the 3rd taste preference id
+ * normal_taste_amount - 1-byte indicates the amount to normal taste
+ * normal_taste_alias[2] - 2-byte indicates the taste alias id
  * len_tmp_taste - 1-byte indicates the length of temporary taste
  * tmp_taste[n] - the temporary taste value
  * tmp_taste_alias[2] - 2-byte indicates the alias id to this temporary taste
@@ -54,8 +54,7 @@ import java.io.UnsupportedEncodingException;
  * hang_status - the hang status to the food
  * is_hurried - indicates whether the food is hurried
  * len - the length of food's name
- * food_name[len] - the value of the food name
- *
+ * food_name[len] - the value of the food name *
  *******************************************************/
 public class ReqInsertOrder extends ReqPackage {
 
@@ -97,18 +96,19 @@ public class ReqInsertOrder extends ReqPackage {
 				foodLen += 1 + 2 + 2 + 3 + 1 + 1 + 1 + reqOrder.foods[i].name.getBytes("UTF-8").length;
 			}else{
 				/**
-				 * is_temp(0) : food_id[2] : order_amount[2] : taste_id[2] : taste_id2[2] : taste_id3[2] : 
+				 * is_temp(0) : food_id[2] : order_amount[2] : normal_taste_amount : normal_taste_alias[2] ... normal_taste_alias2[2] : 
 				 * len_tmp_taste : tmp_taste[n] : tmp_taste_alias[2] : tmp_taste_price[4] : 
 				 * kitchen : hang_status : is_hurried 
 				 **/
+				Taste[] normalTastes = reqOrder.foods[i].tasteGroup == null ? null : reqOrder.foods[i].tasteGroup.mNormalTastes;
+				Taste tmpTaste = reqOrder.foods[i].tasteGroup == null ? null : reqOrder.foods[i].tasteGroup.mTmpTaste;
 				foodLen += 1 + /* is_temp(0) */
 						   2 + /* food_id[2] */ 
 						   2 + /* order_amount[2] */
-						   2 + /* taste_id[2] */
-						   2 + /* taste_id2[2] */
-						   2 + /* taste_id3[2] */
+						   1 + /* normal_taste_amount */
+						   (normalTastes == null ? 0 : normalTastes.length * 2) + /* each normal taste alias takes up 2-byte */
 						   1 + /* len_tmp_taste */
-						   (reqOrder.foods[i].tmpTaste == null ? 0 : reqOrder.foods[i].tmpTaste.preference.getBytes("UTF-8").length) + /* tmp_taset */
+						   (tmpTaste == null ? 0 : tmpTaste.preference.getBytes("UTF-8").length) + /* the name to tmp_taste */
 						   2 + /* tmp_taste_alias[2] */
 						   4 + /* tmp_taste_price[4] */
 						   1 + /* kitchen */
@@ -210,11 +210,7 @@ public class ReqInsertOrder extends ReqPackage {
 				offset += 1 + 2 + 2 + 3 + 1 + 1 + 1 + nameBytes.length;
 				
 			}else{
-				/**
-				 * is_temp(0) : food_id[2] : order_amount[2] : taste_id[2] : taste_id2[2] : taste_id3[2] :
-				 * len_tmp_taste : tmp_taste[n] : tmp_taste_alias[2] : tmp_taste_price[4] 
-				 * kitchen : hang_status : is_hurried
-				 */
+
 				//assign the temporary flag
 				body[offset] = 0;
 				offset += 1;
@@ -229,43 +225,51 @@ public class ReqInsertOrder extends ReqPackage {
 				body[offset + 1] = (byte)((reqOrder.foods[i].count & 0x0000FF00) >> 8);
 				offset += 2;
 				
-				//assign the 1st taste id
-				body[offset] = (byte)(reqOrder.foods[i].tastes[0].aliasID & 0x00FF);
-				body[offset + 1] = (byte)((reqOrder.foods[i].tastes[0].aliasID & 0xFF00) >> 8);
-				offset += 2;
 				
-				//assign the 2nd taste id
-				body[offset] = (byte)(reqOrder.foods[i].tastes[1].aliasID & 0x00FF);
-				body[offset + 1] = (byte)((reqOrder.foods[i].tastes[1].aliasID & 0xFF00) >> 8);
-				offset += 2;
-				
-				//assign the 3rd taste id
-				body[offset] = (byte)(reqOrder.foods[i].tastes[2].aliasID & 0x00FF);
-				body[offset + 1] = (byte)((reqOrder.foods[i].tastes[2].aliasID & 0xFF00) >> 8);
-				offset += 2;
-				
-				if(reqOrder.foods[i].tmpTaste != null){
+				//assign each alias id to normal tastes
+				if(reqOrder.foods[i].hasNormalTaste()){
+					
+					Taste[] normalTastes = reqOrder.foods[i].tasteGroup.mNormalTastes;
+					
+					//assign the amount to normal tastes
+					body[offset] = (byte)normalTastes.length;
+					offset += 1;
+					
+					for(int j = 0; j < normalTastes.length; j++){
+						body[offset] = (byte)(normalTastes[j].aliasID & 0x00FF);
+						body[offset + 1] = (byte)((normalTastes[j].aliasID & 0xFF00) >> 8);
+						offset += 2;
+					}
+				}else{
+					body[offset] = 0;
+					offset += 1;
+				}		
+
+				if(reqOrder.foods[i].hasTmpTaste()){
+					
+					Taste tmpTaste = reqOrder.foods[i].tasteGroup.mTmpTaste;
+					
 					//assign the length of temporary taste
-					byte[] tmpTasteBytes = reqOrder.foods[i].tmpTaste.preference.getBytes("UTF-8");
-					body[offset] = (byte)(tmpTasteBytes.length);
+					byte[] bytesToTmpTaste = tmpTaste.preference.getBytes("UTF-8");
+					body[offset] = (byte)(bytesToTmpTaste.length);
 					offset += 1;
 
 					//assign the temporary taste value
-					for(int cnt = 0; cnt < tmpTasteBytes.length; cnt++){
-						body[offset + cnt] = tmpTasteBytes[cnt];
+					for(int j = 0; j < bytesToTmpTaste.length; j++){
+						body[offset + j] = bytesToTmpTaste[j];
 					}
-					offset += tmpTasteBytes.length;
+					offset += bytesToTmpTaste.length;
 					
 					//assign the alias to temporary taste
-					body[offset] = (byte)(reqOrder.foods[i].tmpTaste.aliasID & 0x00FF);
-					body[offset + 1] = (byte)((reqOrder.foods[i].tmpTaste.aliasID & 0xFF00) >> 8);
+					body[offset] = (byte)(tmpTaste.aliasID & 0x00FF);
+					body[offset + 1] = (byte)((tmpTaste.aliasID & 0xFF00) >> 8);
 					offset += 2;
 					
 					//assign the price to temporary taste
-					body[offset] = (byte)(reqOrder.foods[i].tmpTaste.price & 0x000000FF);
-					body[offset + 1] = (byte)((reqOrder.foods[i].tmpTaste.price & 0x0000FF00) >> 8);
-					body[offset + 2] = (byte)((reqOrder.foods[i].tmpTaste.price & 0x00FF0000) >> 16);
-					body[offset + 3] = (byte)((reqOrder.foods[i].tmpTaste.price & 0xFF000000) >> 24);
+					body[offset] = (byte)(tmpTaste.price & 0x000000FF);
+					body[offset + 1] = (byte)((tmpTaste.price & 0x0000FF00) >> 8);
+					body[offset + 2] = (byte)((tmpTaste.price & 0x00FF0000) >> 16);
+					body[offset + 3] = (byte)((tmpTaste.price & 0xFF000000) >> 24);
 					offset += 4;
 					
 				}else{

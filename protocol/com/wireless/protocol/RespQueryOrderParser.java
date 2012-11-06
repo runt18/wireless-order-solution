@@ -19,7 +19,7 @@ public final class RespQueryOrderParser {
 		/******************************************************
 		 * In the case query order successfully, 
 		 * design the query order response looks like below
-		 * mode : type : seq : reserved : pin[6] : len[2] : <Order>
+		 * mode : type : seq : reserved : pin[6] : len[2] : <Body>
 		 * <Header>
 		 * mode - ORDER_BUSSINESS
 		 * type - ACK
@@ -28,14 +28,14 @@ public final class RespQueryOrderParser {
 		 * pin[6] : same as request
 		 * len[2] -  length of the <Body>
 		 * <Body>
-		 * dest_tbl[2] : dest_tbl_2[2] : order_date[8] : minimum_cost[4] : category : 
+		 * table[2] : table_2[2] : order_date[8] : minimum_cost[4] : category : 
 		 * custom_num : price[4] : food_num : 
 		 * <Food1> : <Food2>...
 		 * <TmpFood1> : <TmpFood2>...
 		 * 
-		 * dest_tbl[2] - 2-byte indicates the alias to destination table 
+		 * table[2] - 2-byte indicates the table id 
 		 * 
-		 * dest_tbl_2[2] - 2-byte indicates the alias to 2nd destination table, only used table merger
+		 * table_2[2] - 2-byte indicates the 2nd table id, only used table merger
 		 * 
 		 * order_date[8] - 8-byte indicates the order date time
 		 * 
@@ -52,7 +52,8 @@ public final class RespQueryOrderParser {
 		 * food_num - 1-byte indicating the number of ordered food
 		 * 
 		 * <Food>
-		 * is_temp(0) : food_id[2] : order_amount[2] : status : taste_id[2] : taste_id2[2] : taste_id3[2] : 
+		 * is_temp(0) : food_id[2] : order_amount[2] : status : 
+		 * normal_taste_amount : normal_taste_alias[2] : normal_taste_alias2[2] ... : 
 		 * len_tmp_taste : tmp_taste[n] : tmp_taste_alias[2] : tmp_taste_price[4] : hang_status : 
 		 * order_date[8] : nWaiter : waiter 
 		 * is_temp : "0" means this food is NOT temporary
@@ -61,9 +62,8 @@ public final class RespQueryOrderParser {
 		 * 			   order_num[0] - 1-byte indicates the float-point
 		 * 			   order_num[1] - 1-byte indicates the fixed-point
 		 * status - the status to this food
-		 * taste_id[2] - 2-byte indicates the 1st taste preference id
-		 * taste_id2[2] - 2-byte indicates the 2nd taste preference id
-		 * taste_id3[2] - 2-byte indicates the 3rd taste preference id
+		 * normal_taste_amount - 1-byte indicates the normal taste amount
+		 * normal_taste_alias[2] - 2-byte indicates the alias id to each normal taste
 		 * len_tmp_taste - indicates the length of temporary taste
 		 * tmp_taste[n] - indicates the value of temporary taste
 		 * tmp_taste_alias[2] - 2-byte indicates the alias to this temporary taste
@@ -138,28 +138,30 @@ public final class RespQueryOrderParser {
 				//get the temporary flag
 				boolean isTemporary = resp.body[offset] == 1 ? true : false;
 				
+				offset++;
+				
 				if(isTemporary){
 					/**
 					 * is_temp(1) : food_id[2] : order_amount[2] : unit_price[3] : hang_status : len : food_name[len]
 					 */
 					//get the food alias id
-					int foodID = (resp.body[offset + 1] & 0x000000FF) |
-								((resp.body[offset + 2] & 0x000000FF) << 8);
+					int foodID = (resp.body[offset] & 0x000000FF) |
+								((resp.body[offset + 1] & 0x000000FF) << 8);
 					//get the order amount
-					int orderAmount = (resp.body[offset + 3] & 0x000000FF) |
-									((resp.body[offset + 4] & 0x000000FF) << 8);
+					int orderAmount = (resp.body[offset + 2] & 0x000000FF) |
+									((resp.body[offset + 3] & 0x000000FF) << 8);
 					//get the unit price
-					int unitPrice = (resp.body[offset + 5] & 0x000000FF) |
-									((resp.body[offset + 6] & 0x000000FF) << 8) |
-									((resp.body[offset + 7] & 0x000000FF) << 16);
+					int unitPrice = (resp.body[offset + 4] & 0x000000FF) |
+									((resp.body[offset + 5] & 0x000000FF) << 8) |
+									((resp.body[offset + 6] & 0x000000FF) << 16);
 					//get the hang status
-					short hangStatus = resp.body[offset + 8];
+					short hangStatus = resp.body[offset + 7];
 					//get the amount of food name bytes
-					int len = resp.body[offset + 9];
+					int len = resp.body[offset + 8];
 					//get the food name
 					String name = null;
 					try{
-						name = new String(resp.body, offset + 10, len, "UTF-8");
+						name = new String(resp.body, offset + 9, len, "UTF-8");
 					}catch(UnsupportedEncodingException e){}
 					
 					orderFoods[i] = new OrderFood();
@@ -170,37 +172,69 @@ public final class RespQueryOrderParser {
 					orderFoods[i].setPrice(Util.int2Float(unitPrice));
 					orderFoods[i].name = (name != null ? name : "");
 					
-					offset += 1 + 2 + 2 + 3 + 1 + 1 + len;
+					offset += 2 + 2 + 3 + 1 + 1 + len;
 					
 				}else{
-					/** 
-					 * is_temp(0) : food_id[2] : order_amount[2] : status : taste_id[2] : taste_id2[2] : taste_id3[2] : 
-					 * len_tmp_taste : tmp_taste[n] : tmp_taste_alias[2] : tmp_taste_price[4] : hang_status 
-					 * order_date[8] : nWaiter : waiter 
-					 */
+
 					//get the food alias id
-					int foodID = (resp.body[offset + 1] & 0x000000FF) |
-								((resp.body[offset + 2] & 0x000000FF) << 8);
+					int foodAliasID = (resp.body[offset] & 0x000000FF) |
+								((resp.body[offset + 1] & 0x000000FF) << 8);
+					offset += 2;
+					
+					//get the detail to food from food menu
+					for(int j = 0; j < foodMenu.foods.length; j++){
+						if(foodAliasID == foodMenu.foods[j].aliasID){
+							orderFoods[i] = new OrderFood(foodMenu.foods[j]);
+							break;
+						}			
+					}
+					
 					//get the order amount
-					int orderAmount = (resp.body[offset + 3] & 0x000000FF) |
-									((resp.body[offset + 4] & 0x000000FF) << 8);
+					int orderAmount = (resp.body[offset] & 0x000000FF) |
+									((resp.body[offset + 1] & 0x000000FF) << 8);
+					offset += 2;
+					
 					//get the food status
-					short status = resp.body[offset + 5];
+					short status = resp.body[offset];
+					offset += 1;
 					
-					int[] tasteID = new int[3];
-					//get the 1st taste id
-					tasteID[0] = (resp.body[offset + 6] & 0x000000FF) | 
-									((resp.body[offset + 7] & 0x000000FF) << 8);
-					//get the 2nd taste id
-					tasteID[1] = (resp.body[offset + 8] & 0x000000FF) | 
-									((resp.body[offset + 9] & 0x000000FF) << 8);
-					//get the 3rd taste id
-					tasteID[2] = (resp.body[offset + 10] & 0x000000FF) | 
-									((resp.body[offset + 11] & 0x000000FF) << 8);
+					//get the amount to normal tastes
+					int nNormalTastes = resp.body[offset];
+					offset += 1;
+					
+					Taste[] normalTastes = null;
+					if(nNormalTastes > 0){
+						//get alias id to each normal taste
+						normalTastes = new Taste[nNormalTastes];
+						for(int j = 0; j < normalTastes.length; j++){
+							int tasteAliasID = (resp.body[offset] & 0x000000FF) | ((resp.body[offset + 1] & 0x000000FF) << 8);
+							offset += 2;
+							
+							//get the details from tastes in food menu
+							Taste taste = srchTaste(tasteAliasID, foodMenu.tastes);
+							if(taste != null){
+								normalTastes[j] = taste;
+								continue;
+							}
+							
+							//get the details from styles in food menu
+							Taste style = srchTaste(tasteAliasID, foodMenu.styles);
+							if(style != null){
+								normalTastes[j] = style;
+								continue;
+							}
+							
+							//get the details from specs in food menu
+							Taste spec = srchTaste(tasteAliasID, foodMenu.specs);
+							if(spec != null){
+								normalTastes[j] = spec;
+								continue;
+							}
+						}					
+					}
 					//get the length of temporary taste
-					int nTmpTaste = resp.body[offset + 12];
-					
-					offset += 13;
+					int nTmpTaste = resp.body[offset];
+					offset += 1;
 					
 					Taste tmpTaste = null;
 					if(nTmpTaste != 0){
@@ -259,71 +293,22 @@ public final class RespQueryOrderParser {
 						waiter = "";
 					}
 					
-					orderFoods[i] = new OrderFood();
 					orderFoods[i].isTemporary = false;
-					orderFoods[i].aliasID = foodID;
+					orderFoods[i].aliasID = foodAliasID;
 					orderFoods[i].count = orderAmount;
 					orderFoods[i].status = status;
 					orderFoods[i].orderDate = orderDate;
-					orderFoods[i].waiter = waiter;
+					orderFoods[i].waiter = waiter;					
 					
-					//Arrays.sort(tasteID, 0, tasteID.length);
-					orderFoods[i].tastes[0].aliasID = tasteID[0];
-					orderFoods[i].tastes[1].aliasID = tasteID[1];
-					orderFoods[i].tastes[2].aliasID = tasteID[2];
-					orderFoods[i].tmpTaste = tmpTaste;
+					if(normalTastes != null || tmpTaste != null){
+						orderFoods[i].tasteGroup = new TasteGroup(orderFoods[i], normalTastes, tmpTaste);
+					}
+					
 					orderFoods[i].hangStatus = hangStatus;
 				}
 			}
 			order.foods = orderFoods;
 		}
-		
-		/**
-		 * Since the food information from response only has the food_id, taste_id, taste_id1, taste_id2,
-		 * we get the corresponding food and taste name from the food menu. 
-		 */
-		for(int i = 0; i < order.foods.length; i++){
-			if(!order.foods[i].isTemporary){
-				//get the food name, unit price and attached kitchen
-				for(int j = 0; j < foodMenu.foods.length; j++){
-					if(order.foods[i].aliasID == foodMenu.foods[j].aliasID){
-						order.foods[i].name = foodMenu.foods[j].name;
-						order.foods[i].setPrice(foodMenu.foods[j].getPrice());
-						order.foods[i].kitchen = foodMenu.foods[j].kitchen;
-						break;
-					}			
-				}	
-				
-				for(int j = 0; j < order.foods[i].tastes.length; j++){
-
-					//search and get the taste match the alias id
-					Taste taste = srchTaste(order.foods[i].tastes[j].aliasID, foodMenu.tastes);
-					if(taste != null){
-						order.foods[i].tastes[j] = taste;
-						continue;
-					}
-					
-					//search and get the style match the alias id
-					Taste style = srchTaste(order.foods[i].tastes[j].aliasID, foodMenu.styles);
-					if(style != null){
-						order.foods[i].tastes[j] = style;
-						continue;
-					}
-					
-					//search and get the specification match the alias id
-					Taste spec = srchTaste(order.foods[i].tastes[j].aliasID, foodMenu.specs);
-					if(spec != null){
-						order.foods[i].tastes[j] = spec;
-						continue;
-					}
-				}
-				
-				//set the taste preference to this food
-				//order.foods[i].tasteNormalPref = Util.genTastePref(order.foods[i].tastes);
-				//set the taste total price to this food
-				//order.foods[i].setTasteNormalPrice(Util.genTastePrice(order.foods[i].tastes, order.foods[i].getPrice()));
-			}			
-		}		
 
 		return order;
 		
@@ -337,30 +322,20 @@ public final class RespQueryOrderParser {
 	 */
 	private static Taste srchTaste(int aliasID, Taste[] tasteSrc){
 		
-		if(aliasID != Taste.NO_TASTE){
-			Taste taste = null;
-			
-			for(int i = 0; i < tasteSrc.length; i++){
-				if(aliasID == tasteSrc[i].aliasID){
-					
-					taste = new Taste();
-					
-					taste.aliasID = tasteSrc[i].aliasID;
-					taste.preference = tasteSrc[i].preference;
-					taste.setPrice(tasteSrc[i].getPrice());
-					taste.calc = tasteSrc[i].calc;
-					taste.category = tasteSrc[i].category;
-					taste.setRate(tasteSrc[i].getRate());
+		Taste taste = null;
+		
+		for(int i = 0; i < tasteSrc.length; i++){
+			if(aliasID == tasteSrc[i].aliasID){
+				
+				taste = new Taste(tasteSrc[i]);
 
-					break;
-				}
+				break;
 			}
-			
-			return taste;
-			
-		}else{
-			return null;
 		}
+		
+		return taste;
+		
 	}
+	
 	
 }

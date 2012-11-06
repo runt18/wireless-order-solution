@@ -52,13 +52,13 @@ public final class OrderDiff {
 		 * <1> Ori = New
 		 * Means the order food is contained in both original and new order,
 		 * Check to see if the difference count is greater or less than zero.
-		 * Add to the extra if the difference is greater than zero, add to cancelled if the difference is less than zero.
+		 * Add to the extra if the difference is greater than zero, add to be cancelled if the difference is less than zero.
 		 * <2> Ori - New
 		 * Means the order foods are only contained in the original order.
-		 * Add these order foods to the cancelled.
+		 * Add these order foods would the cancelled.
 		 * <3> New - Ori
 		 * Means the order foods are only contained in the new order
-		 * Add these order foods to the extra.
+		 * Add these order foods would the extra.
 		 */
 		Iterator<OrderFood> iterNew = newFoods.iterator();
 		while(iterNew.hasNext()){
@@ -78,12 +78,12 @@ public final class OrderDiff {
 				if(newFood.equals(oriFood)){
 					float diff = newFood.getCount() - oriFood.getCount();
 					if(diff > 0){
-						newFood.setCount((float)Math.round(Math.abs(diff) * 100) / 100);
-						result.extraFoods.add(newFood);
+						oriFood.setCount((float)Math.round(Math.abs(diff) * 100) / 100);
+						result.extraFoods.add(oriFood);
 						
 					}else if(diff < 0){
-						newFood.setCount((float)Math.round(Math.abs(diff) * 100) / 100);
-						result.cancelledFoods.add(newFood);
+						oriFood.setCount((float)Math.round(Math.abs(diff) * 100) / 100);
+						result.cancelledFoods.add(oriFood);
 					}
 					
 					iterOri.remove();
@@ -94,7 +94,13 @@ public final class OrderDiff {
 			
 		}
 		
-		result.extraFoods.addAll(newFoods);		
+		for(OrderFood newExtraFood : newFoods){
+			if(newExtraFood.tasteGroup != null){
+				newExtraFood.tasteGroup.setGroupId(TasteGroup.NEW_TASTE_GROUP_ID);
+			}
+			result.extraFoods.add(newExtraFood);
+		}
+		//result.extraFoods.addAll(newFoods);		
 		result.cancelledFoods.addAll(oriFoods);
 		
 		return result;

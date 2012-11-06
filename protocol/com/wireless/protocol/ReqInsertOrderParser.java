@@ -1,8 +1,6 @@
 package com.wireless.protocol;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
-import java.util.Comparator;
 
 public class ReqInsertOrderParser {
 
@@ -30,7 +28,8 @@ public class ReqInsertOrderParser {
 	 * food_amount - 1-byte indicating the amount of foods
 	 * 
 	 * <Food>
-	 * is_temp(0) : food_id[2] : order_num[2] : taste_id[2] : taste_id2[2] : taste_id3[2] : 
+	 * is_temp(0) : food_id[2] : order_num[2] :
+	 * normal_taste_amount : normal_taste_alias[2] : normal_taste_alias2[2]... : 
 	 * len_tmp_taste : tmp_taste[n] : tmp_taste_alias[2] : tmp_taste_price[4] : 
 	 * kitchen : hang_status : is_hurried
 	 * is_temp(0) - "0" means this food is NOT temporary
@@ -38,9 +37,8 @@ public class ReqInsertOrderParser {
 	 * order_num[2] - 2-byte indicating how many this foods are ordered
 	 * 			   order_num[0] - 1-byte indicates the float-point
 	 * 			   order_num[1] - 1-byte indicates the fixed-point
-	 * taste_id[2] - 2-byte indicates the 1st taste preference id
-	 * taste_id2[2] - 2-byte indicates the 2nd taste preference id
-	 * taste_id3[2] - 2-byte indicates the 3rd taste preference id
+	 * normal_taste_amount - 1-byte indicates the amount to normal taste
+	 * normal_taste_alias[2] - 2-byte indicates the taste alias id
 	 * len_tmp_taste - 1-byte indicates the length of temporary taste
 	 * tmp_taste[n] - the temporary taste value
 	 * tmp_taste_alias[2] - 2-byte indicates the alias id to this temporary taste
@@ -58,8 +56,7 @@ public class ReqInsertOrderParser {
 	 * hang_status - the hang status to the food
 	 * is_hurried - indicates whether the food is hurried
 	 * len - the length of food's name
-	 * food_name[len] - the value of the food name
-	 *
+	 * food_name[len] - the value of the food name	 *
 	 *******************************************************/
 	public static Order parse(ProtocolPackage req){
 		Order order = new Order();
@@ -82,7 +79,6 @@ public class ReqInsertOrderParser {
 		order.destTbl2.aliasID = ((req.body[offset] & 0x000000FF) | ((req.body[offset + 1] & 0x000000FF) << 8));
 		offset += 2;
 		
-		//get the last modified order date
 		//get the last modified order date
 		order.orderDate = (req.body[offset] & 0x00000000000000FFL) |
 		 				  ((req.body[offset + 1] & 0x00000000000000FFL) << 8) |
@@ -164,11 +160,6 @@ public class ReqInsertOrderParser {
 				
 				
 			}else{
-				/**
-				 * is_temp(0) : food_id[2] : order_num[2] : taste_id[2] : taste_id2[2] : taste_id3[2] : 
-				 * len_tmp_taste : tmp_taste[n] : tmp_taste_alias[2] : tmp_taste_price[4] : 
-				 * kitchen : hang_status : is_hurried
-				 */
 				
 				//get the food id
 				int foodID = (req.body[offset] & 0x000000FF) | ((req.body[offset + 1] & 0x000000FF) << 8);
@@ -178,12 +169,20 @@ public class ReqInsertOrderParser {
 				int orderAmount = (req.body[offset] & 0x000000FF) | ((req.body[offset + 1] & 0x000000FF) << 8);
 				offset += 2;
 				
-				//get each taste id
-				int[] tasteID = new int[3];
-				tasteID[0] = (req.body[offset] & 0x000000FF) | ((req.body[offset + 1] & 0x000000FF) << 8);
-				tasteID[1] = (req.body[offset + 2] & 0x000000FF) | ((req.body[offset + 3] & 0x000000FF) << 8);
-				tasteID[2] = (req.body[offset + 4] & 0x000000FF) | ((req.body[offset + 5] & 0x000000FF) << 8);
-				offset += 6;
+				//get the amount to normal tastes
+				int nNormalTastes = req.body[offset];
+				offset += 1;
+				
+				Taste[] normalTastes = null;
+				//get alias id to each normal taste
+				if(nNormalTastes > 0){
+					normalTastes = new Taste[nNormalTastes];
+					for(int j = 0; j < normalTastes.length; j++){
+						normalTastes[j] = new Taste();
+						normalTastes[j].aliasID = (req.body[offset] & 0x000000FF) | ((req.body[offset + 1] & 0x000000FF) << 8);
+						offset += 2;
+					}
+				}
 			
 				//get the length of temporary taste value
 				int lenOfTmpTaste = req.body[offset];
@@ -233,19 +232,9 @@ public class ReqInsertOrderParser {
 				
 				orderFoods[i].isTemporary = false;
 				
-				orderFoods[i].tastes[0].aliasID = tasteID[0];
-				orderFoods[i].tastes[1].aliasID = tasteID[1];
-				orderFoods[i].tastes[2].aliasID = tasteID[2];
-				
-				orderFoods[i].tmpTaste = tmpTaste;
-				
-				Arrays.sort(orderFoods[i].tastes, new Comparator<Taste>(){
-
-					public int compare(Taste taste1, Taste taste2) {
-						return taste1.compare(taste2);
-					}
-					
-				});
+				if(normalTastes != null || tmpTaste != null){
+					orderFoods[i].tasteGroup = new TasteGroup(orderFoods[i], normalTastes, tmpTaste);
+				}
 				
 				orderFoods[i].kitchen.aliasID = (short)(kitchen & 0xFF);
 				
