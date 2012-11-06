@@ -30,13 +30,17 @@ public class FoodDetailContent extends ConcreteContent {
 		_format = _format.replace(PVar.FOOD_AMOUNT, "(" + Util.float2String2(_food.getCount()) + ")");
 		String foodPrice = Util.CURRENCY_SIGN + Util.float2String(_food.calcPriceWithTaste());
 		
-		String taste = "";
-		if(_food.hasTaste()){
-			taste = "-" + _food.getTastePref();
-			_format = _format.replace(PVar.FOOD_TASTE, taste);				
-		}else{
-			_format = _format.replace(PVar.FOOD_TASTE, "");
+		String taste = null;
+		if(_food.tasteGroup != null){
+			taste = "-" + _food.tasteGroup.getTastePref();
 		}
+		_format = _format.replace(PVar.FOOD_TASTE, taste == null ? "" : taste);				
+//		if(_food.hasTaste()){
+//			taste = "-" + _food.getTastePref();
+//			_format = _format.replace(PVar.FOOD_TASTE, taste);				
+//		}else{
+//			_format = _format.replace(PVar.FOOD_TASTE, "");
+//		}
 
 		String combo;
 		if(_food.isCombo()){
