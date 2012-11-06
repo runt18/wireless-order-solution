@@ -88,17 +88,6 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food` (
   `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to the ordered food' ,
   `food_status` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates the status to this food, the value is the combination of values below.\n特价菜 ：0x01\n推荐菜 ：0x02\n停售　 ：0x04\n赠送     ：0x08' ,
   `hang_status` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates hang up status.\n0 - normal\n1 - hang_up\n2 - immediate' ,
-  `taste_id` INT NULL DEFAULT NULL COMMENT 'the taste id' ,
-  `taste2_id` INT NULL DEFAULT NULL COMMENT 'the 2nd taste id' ,
-  `taste3_id` INT NULL DEFAULT NULL COMMENT 'the 3rd taste id' ,
-  `taste_alias` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the taste alias id' ,
-  `taste2_alias` SMALLINT UNSIGNED NOT NULL DEFAULT 0 ,
-  `taste3_alias` SMALLINT UNSIGNED NOT NULL DEFAULT 0 ,
-  `taste_tmp_alias` SMALLINT UNSIGNED NULL DEFAULT NULL COMMENT 'the alias id to this temporary taste' ,
-  `taste_tmp` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the value to this temporary taste' ,
-  `taste_tmp_price` DECIMAL(7,2) NULL DEFAULT NULL COMMENT 'the price to this temporary taste' ,
-  `taste` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the taste preference to the ordered food' ,
-  `taste_price` DECIMAL(7,2) NULL DEFAULT NULL COMMENT 'the price to taste preference' ,
   `discount` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the discount to this food' ,
   `kitchen_id` INT NULL DEFAULT NULL COMMENT 'the kitchen id which the order food of this record belong to.' ,
   `kitchen_alias` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the kitchen alias id which the order food of this record belong to.' ,
@@ -107,8 +96,10 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food` (
   `waiter` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name of waiter who deal with this record' ,
   `is_temporary` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates whether the food to this record is temporary' ,
   `is_paid` TINYINT NULL DEFAULT 0 COMMENT 'indicates whether this record is paid before' ,
+  `taste_group_id` INT NOT NULL DEFAULT 1 COMMENT 'the taste group id to this order food, the default value(1) means empty taste group' ,
   INDEX `fk_order_food_order` (`order_id` ASC) ,
   PRIMARY KEY (`id`) ,
+  INDEX `ix_taste_group_id` (`taste_group_id` ASC) ,
   CONSTRAINT `fk_order_food_order`
     FOREIGN KEY (`order_id` )
     REFERENCES `wireless_order_db`.`order` (`id` )
@@ -251,6 +242,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_type` (
   `member_type_id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to member type' ,
   `discount_id` INT UNSIGNED NOT NULL COMMENT 'the discount id this member type uses' ,
   `exchange_rate` DECIMAL(4,2) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the exchange rate used to transfer the price to point' ,
+  `charge_rate` DECIMAL(4,2) NOT NULL DEFAULT 0 COMMENT 'the charge rate used to transfer money to balance' ,
   `name` VARCHAR(45) NOT NULL COMMENT 'the name to this member type' ,
   `type` TINYINT NOT NULL DEFAULT 0 COMMENT 'the type to this member tye as below.\n0 - 优惠卡\n1 - 积分卡\n2 - 充值卡' ,
   PRIMARY KEY (`member_type_id`) )
@@ -362,17 +354,6 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food_history` (
   `food_alias` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the alias id to this food' ,
   `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to the ordered food' ,
   `food_status` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates the status to this food, the value is the combination of values below.\n特价菜 ：0x01\n推荐菜 ：0x02\n停售　 ：0x04\n赠送     ：0x08' ,
-  `taste` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the taste preference to the ordered food' ,
-  `taste_price` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the price to taste preference' ,
-  `taste_id` INT NULL DEFAULT NULL COMMENT 'the taste id' ,
-  `taste2_id` INT NULL DEFAULT NULL COMMENT 'the 2nd taste id' ,
-  `taste3_id` INT NULL DEFAULT NULL COMMENT 'the 3rd taste id' ,
-  `taste_alias` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the taste alias id' ,
-  `taste2_alias` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the 2nd taste alias id to this record' ,
-  `taste3_alias` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the 3rd taste alias id to this record' ,
-  `taste_tmp_alias` SMALLINT UNSIGNED NULL DEFAULT NULL COMMENT 'the alias to this temporary taste' ,
-  `taste_tmp` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the value to this temporay taste' ,
-  `taste_tmp_price` DECIMAL(7,2) NULL DEFAULT NULL COMMENT 'the price to this temporary taste' ,
   `discount` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the discount to this food' ,
   `dept_id` TINYINT UNSIGNED NULL DEFAULT NULL COMMENT 'the department alias id to this record' ,
   `kitchen_id` INT NULL DEFAULT NULL COMMENT 'the kitchen id which the order food of this record belong to.' ,
@@ -381,9 +362,10 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food_history` (
   `waiter` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name of waiter who deal with this record' ,
   `is_temporary` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates whether the food to this record is temporary' ,
   `is_paid` TINYINT NULL DEFAULT 0 COMMENT 'indicates whether this record is paid before' ,
+  `taste_group_id` INT NOT NULL DEFAULT 1 COMMENT 'the taste group id to this order food, the default value(1) is empty taste group' ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_order_food_history_order_history1` (`order_id` ASC) ,
-  INDEX `ix_food_id` (`food_id` ASC) ,
+  INDEX `ix_taste_group_id` (`taste_group_id` ASC) ,
   CONSTRAINT `fk_order_food_history_order_history1`
     FOREIGN KEY (`order_id` )
     REFERENCES `wireless_order_db`.`order_history` (`id` )
@@ -747,6 +729,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`client` (
   `client_type_id` INT NOT NULL COMMENT 'the type this client belongs to' ,
   `name` VARCHAR(45) NOT NULL COMMENT 'the name to this client' ,
   `sex` TINYINT NOT NULL DEFAULT 0 COMMENT 'the sex to this client' ,
+  `birth_date` DATETIME NULL DEFAULT NULL COMMENT 'the birth date to client' ,
   `tele` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the telephone to this client' ,
   `mobile` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the mobile to this client' ,
   `birthday` DATE NULL DEFAULT NULL COMMENT 'the birthday to this client' ,
@@ -757,6 +740,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`client` (
   `contact_addr` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the contact address to client' ,
   `comment` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the comment to client' ,
   `level` TINYINT NULL DEFAULT 0 COMMENT 'the status to client.\n0 - normal\n1 - reserved' ,
+  `last_staff_id` INT NULL DEFAULT NULL COMMENT 'the id to last modifed staff' ,
   PRIMARY KEY (`client_id`) ,
   INDEX `ix_restaurant_id` (`restaurant_id` ASC) ,
   INDEX `ix_client_type_id` (`client_type_id` ASC) )
@@ -772,8 +756,9 @@ DROP TABLE IF EXISTS `wireless_order_db`.`client_type` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`client_type` (
   `client_type_id` INT NOT NULL AUTO_INCREMENT ,
-  `name` VARCHAR(45) NULL ,
+  `restaurant_id` INT NOT NULL ,
   `parent_id` INT NULL COMMENT 'the parent id to this clent type' ,
+  `name` VARCHAR(45) NULL ,
   PRIMARY KEY (`client_type_id`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
@@ -808,6 +793,11 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member` (
   `member_card_id` INT NULL DEFAULT NULL COMMENT 'the card this member owns' ,
   `balance` DECIMAL(7,2) NOT NULL DEFAULT 0 COMMENT 'the balance to this member' ,
   `point` INT NOT NULL DEFAULT 0 COMMENT 'the remaining point to this member' ,
+  `birth_date` DATETIME NULL DEFAULT NULL ,
+  `last_mod_date` DATETIME NULL DEFAULT NULL ,
+  `comment` VARCHAR(500) NULL DEFAULT NULL ,
+  `status` TINYINT NULL DEFAULT 0 COMMENT 'the status to this member\n0 - normal\n1 - disabled' ,
+  `last_staff_id` INT NULL DEFAULT NULL COMMENT 'the id to last modified staff' ,
   PRIMARY KEY (`member_id`) ,
   INDEX `ix_member_type_id` (`member_type_id` ASC) ,
   INDEX `ix_restaurant_id` (`restaurant_id` ASC) ,
@@ -837,12 +827,85 @@ COMMENT = 'describe the food statistics' ;
 DROP TABLE IF EXISTS `wireless_order_db`.`client_member` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`client_member` (
-  `client_id` INT NOT NULL ,
-  `member_id` INT NOT NULL ,
-  PRIMARY KEY (`client_id`, `member_id`) )
+  `id` INT NOT NULL ,
+  `client_id` INT NOT NULL COMMENT 'the id to client' ,
+  `member_id` INT NOT NULL COMMENT 'the id to member' ,
+  `restaurant_id` INT NOT NULL COMMENT 'the id to restaurant' ,
+  PRIMARY KEY (`id`) ,
+  INDEX `ix_client_id` (`client_id` ASC) ,
+  INDEX `ix_memeber_id` (`member_id` ASC) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the relationship between member and client' ;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`taste_group`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`taste_group` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`taste_group` (
+  `taste_group_id` INT NOT NULL AUTO_INCREMENT ,
+  `normal_taste_group_id` INT NOT NULL DEFAULT 1 ,
+  `normal_taste_pref` VARCHAR(45) NULL DEFAULT NULL ,
+  `normal_taste_price` DECIMAL(7,2) UNSIGNED NULL DEFAULT NULL ,
+  `tmp_taste_id` INT NULL DEFAULT NULL ,
+  `tmp_taste_pref` VARCHAR(45) NULL DEFAULT NULL ,
+  `tmp_taste_price` DECIMAL(7,2) UNSIGNED NULL DEFAULT NULL ,
+  PRIMARY KEY (`taste_group_id`) ,
+  INDEX `ix_normal_taste_group_id` (`normal_taste_group_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the taste group' ;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`normal_taste_group`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`normal_taste_group` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`normal_taste_group` (
+  `normal_taste_group_id` INT NOT NULL ,
+  `taste_id` INT NOT NULL ,
+  PRIMARY KEY (`normal_taste_group_id`, `taste_id`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the relationship between taste group and its normal' /* comment truncated */ ;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`taste_group_history`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`taste_group_history` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`taste_group_history` (
+  `taste_group_id` INT NOT NULL AUTO_INCREMENT ,
+  `normal_taste_group_id` INT NOT NULL DEFAULT 1 ,
+  `normal_taste_pref` VARCHAR(45) NULL DEFAULT NULL ,
+  `normal_taste_price` DECIMAL(7,2) UNSIGNED NULL DEFAULT NULL ,
+  `tmp_taste_id` INT NULL DEFAULT NULL ,
+  `tmp_taste_pref` VARCHAR(45) NULL DEFAULT NULL ,
+  `tmp_taste_price` DECIMAL(7,2) UNSIGNED NULL DEFAULT NULL ,
+  PRIMARY KEY (`taste_group_id`) ,
+  INDEX `ix_normal_taste_group_id` (`normal_taste_group_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the taste group' ;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`normal_taste_group_history`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`normal_taste_group_history` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`normal_taste_group_history` (
+  `normal_taste_group_id` INT NOT NULL ,
+  `taste_id` INT NOT NULL ,
+  PRIMARY KEY (`normal_taste_group_id`, `taste_id`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the relationship between taste group and its normal' /* comment truncated */ ;
 
 
 
