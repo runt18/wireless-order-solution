@@ -49,7 +49,6 @@ import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.Taste;
 import com.wireless.protocol.Util;
 import com.wireless.util.ProgressToast;
 import com.wireless.util.imgFetcher.ImageFetcher;
@@ -464,26 +463,24 @@ public class PickedFoodActivity extends Activity implements OnOrderChangeListene
 			//设置菜品的各个数据
 			mImageFetcher.loadImage(activity.mCurFood.image, mFoodImageView);
 			
-			if(activity.mCurFood.hasTmpTaste())
-				mTempTasteTextView.setText(activity.mCurFood.tmpTaste.getPreference());
-			else mTempTasteTextView.setText("");
-			if(activity.mCurFood.hasNormalTaste())
-				mTasteTextView.setText(activity.mCurFood.getNormalTastePref());
-			else mTasteTextView.setText("");
+			if(activity.mCurFood.hasTmpTaste()){
+				mTempTasteTextView.setText(activity.mCurFood.tasteGroup.getTmpTastePref());
+			}else{
+				mTempTasteTextView.setText("");
+			}
+			if(activity.mCurFood.hasNormalTaste()){
+				mTasteTextView.setText(activity.mCurFood.tasteGroup.getNormalTastePref());
+			}else{
+				mTasteTextView.setText("");
+			}
 			
 			//清空品注
 			((ImageButton) activity.findViewById(R.id.button_removeAllTaste)).setOnClickListener(new OnClickListener(){
 				@Override
 				public void onClick(View v) {
-					if(activity.mCurFood.tastes.length > 0){
-						for(Taste t : activity.mCurFood.tastes.clone())
-						{	
-							activity.mCurFood.removeTaste(t);
-						}
-						activity.mCurFood.tmpTaste = null;
-						mTempTasteTextView.setText("");
-						mTasteTextView.setText("");
-					}
+					activity.mCurFood.tasteGroup = null;
+					mTempTasteTextView.setText("");
+					mTasteTextView.setText("");
 				}
 			});
 		}

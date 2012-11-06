@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
+import com.wireless.excep.BusinessException;
 import com.wireless.fragment.ExpandableListFragment;
 import com.wireless.fragment.ExpandableListFragment.OnItemChangeListener;
 import com.wireless.fragment.GalleryFragment;
@@ -179,9 +180,15 @@ public class MainActivity extends Activity
 		((ImageView)findViewById(R.id.imageButton_add_main)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				mOrderFood.setCount(Float.parseFloat(((TextView) findViewById(R.id.textView_amount_main)).getText().toString()));
-				ShoppingCart.instance().addFood(mOrderFood);
-				Toast.makeText(getApplicationContext(), mOrderFood.name + "已添加", Toast.LENGTH_SHORT).show();
+				float oriCnt = mOrderFood.getCount();
+				try{
+					mOrderFood.setCount(Float.parseFloat(((TextView) findViewById(R.id.textView_amount_main)).getText().toString()));
+					ShoppingCart.instance().addFood(mOrderFood);
+					Toast.makeText(getApplicationContext(), mOrderFood.name + "已添加", Toast.LENGTH_SHORT).show();
+				}catch(BusinessException e){
+					mOrderFood.setCount(oriCnt);
+					Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+				}
 			}
 		});
 		

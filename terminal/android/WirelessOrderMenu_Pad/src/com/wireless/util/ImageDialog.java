@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.ShoppingCart;
+import com.wireless.excep.BusinessException;
 import com.wireless.ordermenu.R;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
@@ -79,9 +80,15 @@ public class ImageDialog extends Dialog {
 			@Override
 			public void onClick(View v) {
 				OrderFood mOrderFood = new OrderFood(mFood);
-				mOrderFood.setCount(Float.parseFloat(((EditText)  findViewById(R.id.editText_count_rec_dialog)).getText().toString()));
-				ShoppingCart.instance().addFood(mOrderFood);
-				Toast.makeText(getContext(), mOrderFood.name + "已添加", Toast.LENGTH_SHORT).show();
+				float oriCnt = mOrderFood.getCount();
+				try{
+					mOrderFood.setCount(Float.parseFloat(((EditText)  findViewById(R.id.editText_count_rec_dialog)).getText().toString()));
+					ShoppingCart.instance().addFood(mOrderFood);
+					Toast.makeText(getContext(), mOrderFood.name + "已添加", Toast.LENGTH_SHORT).show();
+				}catch(BusinessException e){
+					mOrderFood.setCount(oriCnt);
+					Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+				}
 			}
 		});
 		//关闭按钮

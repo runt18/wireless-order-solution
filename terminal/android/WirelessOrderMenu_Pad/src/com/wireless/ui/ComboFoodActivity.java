@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
+import com.wireless.excep.BusinessException;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
@@ -230,11 +231,15 @@ public class ComboFoodActivity extends Activity {
 		((ImageButton) findViewById(R.id.imageButton_pickChildFood_comboFood)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				OrderFood food = (OrderFood) mFoodImageView.getTag();
-				//default count is 1
-				food.setCount(1.0f);
-				ShoppingCart.instance().addFood(food);
-				Toast.makeText(ComboFoodActivity.this, food.name+" 已添加", Toast.LENGTH_SHORT).show();
+				OrderFood food = (OrderFood)mFoodImageView.getTag();
+				try{
+					//default count is 1
+					food.setCount(1.0f);
+					ShoppingCart.instance().addFood(food);
+					Toast.makeText(ComboFoodActivity.this, food.name+" 已添加", Toast.LENGTH_SHORT).show();
+				}catch(BusinessException e){
+					Toast.makeText(ComboFoodActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+				}
 			}
 		});
 		//set pick combo food button 
@@ -245,9 +250,13 @@ public class ComboFoodActivity extends Activity {
 				Food food = ((Food)((View)comboFoodlayout.getTag()).getTag());
 				
 				OrderFood orderFood = new OrderFood(food);
-				orderFood.setCount(1.0f);
-				ShoppingCart.instance().addFood(orderFood);
-				Toast.makeText(ComboFoodActivity.this, orderFood.name+" 已添加", Toast.LENGTH_SHORT).show();
+				try{
+					orderFood.setCount(1.0f);
+					ShoppingCart.instance().addFood(orderFood);
+					Toast.makeText(ComboFoodActivity.this, orderFood.name+" 已添加", Toast.LENGTH_SHORT).show();
+				}catch(BusinessException e){
+					Toast.makeText(ComboFoodActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+				}
 			}
 		});
 		//set child image listener

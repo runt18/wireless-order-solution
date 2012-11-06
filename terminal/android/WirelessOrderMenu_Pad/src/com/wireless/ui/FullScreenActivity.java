@@ -13,6 +13,7 @@ import android.widget.ImageView.ScaleType;
 
 import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
+import com.wireless.excep.BusinessException;
 import com.wireless.fragment.GalleryFragment;
 import com.wireless.fragment.GalleryFragment.OnPicChangedListener;
 import com.wireless.ordermenu.R;
@@ -40,8 +41,12 @@ public class FullScreenActivity extends Activity implements OnPicChangedListener
 		((ImageView) findViewById(R.id.imageView_selectFood_fullScreen)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				ShoppingCart.instance().addFood(mOrderFood);
-				Toast.makeText(FullScreenActivity.this, "添加菜：" + mOrderFood.name, Toast.LENGTH_SHORT).show();
+				try{
+					ShoppingCart.instance().addFood(mOrderFood);
+					Toast.makeText(FullScreenActivity.this, "添加菜：" + mOrderFood.name, Toast.LENGTH_SHORT).show();
+				}catch(BusinessException e){
+					Toast.makeText(FullScreenActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+				}
 			}
 		});
 	}

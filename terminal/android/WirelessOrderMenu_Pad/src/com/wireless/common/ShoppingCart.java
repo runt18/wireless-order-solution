@@ -1,7 +1,7 @@
 package com.wireless.common;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.wireless.excep.BusinessException;
@@ -16,7 +16,9 @@ public final class ShoppingCart {
 	
 	private StaffTerminal mStaff;
 	private Table mDestTable;
-	private List<OrderFood> mExtraFoods = new LinkedList<OrderFood>();
+	//private List<OrderFood> mExtraFoods = new LinkedList<OrderFood>();
+	
+	private Order mNewOrder;
 	
 	private Order mOriOrder;
 	
@@ -61,22 +63,16 @@ public final class ShoppingCart {
 	public void commit(OnCommitListener commitListener) throws BusinessException{
 		if(mOriOrder != null){
 			checkCommitValid();
-			for(OrderFood oriFood : mOriOrder.foods){
-				addFood(oriFood);
-			}
-			mOriOrder.foods = mExtraFoods.toArray(new OrderFood[mExtraFoods.size()]);
+			mOriOrder.addFoods(mNewOrder.foods);
 			new CommitOrderTask(mOriOrder, commitListener).execute(Type.UPDATE_ORDER);
 			
 		}else{
-			if(mExtraFoods.isEmpty()){
+			if(mNewOrder != null){
 				throw new BusinessException(ErrorCode.UNKNOWN);
 			}else{
 				checkCommitValid();
-				new CommitOrderTask(new Order(mExtraFoods.toArray(new OrderFood[mExtraFoods.size()]), 
-											  mDestTable.aliasID, 
-											  mDestTable.customNum), 
-									commitListener)
-									.execute(Type.INSERT_ORDER);
+				mNewOrder.destTbl = mDestTable;
+				new CommitOrderTask(mNewOrder, commitListener).execute(Type.INSERT_ORDER);
 			}
 		}
 	}
@@ -119,14 +115,16 @@ public final class ShoppingCart {
 	 * @return
 	 */
 	public List<OrderFood> getExtraFoods(){
-		return mExtraFoods;
+		return Arrays.asList(mNewOrder.foods);
 	}
 	
 	/**
 	 * Remove all the extra foods to this shopping cart.
 	 */
 	public void removeAll(){
-		mExtraFoods.clear();
+		if(mNewOrder != null){
+			mNewOrder.foods = new OrderFood[0];
+		}
 	}
 	
 	/**
@@ -136,7 +134,11 @@ public final class ShoppingCart {
 	 * @return true if the food to be removed exist as before, otherwise return false
 	 */
 	public boolean remove(OrderFood foodToDel){
-		return mExtraFoods.remove(foodToDel);
+		if(mNewOrder != null){
+			return mNewOrder.remove(foodToDel);
+		}else{
+			return false;
+		}
 	}
 	
 	/**
@@ -144,28 +146,31 @@ public final class ShoppingCart {
 	 * 
 	 * @param extraFoods
 	 *            要添加的多个菜品
+	 * @throws BusinessException
+	 * 				Throws if the order amount of the added food exceed MAX_ORDER_AMOUNT
 	 */
-	public void addAll(List<OrderFood> extraFoods){
+	public void addAll(List<OrderFood> extraFoods) throws BusinessException{
+		if(mNewOrder == null){
+			mNewOrder = new Order();
+		}
 		for(OrderFood extraFood : extraFoods){
-			addFood(extraFood);
+			mNewOrder.addFood(extraFood);
 		}
 	}
 	
 	/**
 	 * 把新点菜添加到购物篮中。 遍历查找已点的新菜品中是否相同的菜品， 如果有就将他们的点菜数量相加， 否则就直接添加到新菜品List中。
 	 * 
-	 * @param extraFood
+	 * @param fooodToAdd
 	 *            要添加的菜品
+	 * @throws BusinessException
+	 * 				Throws if the order amount of the added food exceed MAX_ORDER_AMOUNT
 	 */
-	public void addFood(OrderFood extraFood) {
-		int index = mExtraFoods.indexOf(extraFood);
-		if(index != -1){
-			OrderFood oriFood = mExtraFoods.get(index);
-			float orderAmount = oriFood.getCount() + extraFood.getCount();
-			oriFood.setCount(orderAmount);
-		}else{
-			mExtraFoods.add(new OrderFood(extraFood));
+	public void addFood(OrderFood foodToAdd) throws BusinessException{
+		if(mNewOrder == null){
+			mNewOrder = new Order();
 		}
+		mNewOrder.addFood(foodToAdd);
 		notifyFoodsChange();
 	}
 
@@ -175,11 +180,14 @@ public final class ShoppingCart {
 	 * @return true if the food to be replaced exist as before, otherwise return false
 	 */
 	public boolean replaceFood(OrderFood foodToReplace){
-		int index = mExtraFoods.indexOf(foodToReplace);
-		notifyFoodsChange();
-		if(index != -1){
-			mExtraFoods.set(index, foodToReplace);
-			return true;
+		if(mNewOrder != null){
+			for(int i = 0; i < mNewOrder.foods.length; i++){
+				if(mNewOrder.foods[i].equals(foodToReplace)){
+					mNewOrder.foods[i] = foodToReplace;
+					return true;
+				}
+			}
+			return false;
 		}else{
 			return false;
 		}
@@ -232,11 +240,23 @@ public final class ShoppingCart {
 	}
 
 	public boolean hasExtraFoods(){
-		return !mExtraFoods.isEmpty();
+		if(mNewOrder != null){
+			return mNewOrder.foods != null ? mNewOrder.foods.length != 0 : false;
+		}else{
+			return false;
+		}
+	}
+	
+	public boolean hasOriFoods(){
+		if(mOriOrder != null){
+			return mOriOrder.foods != null ? mOriOrder.foods.length != 0 : false;
+		}else{
+			return false;
+		}
 	}
 	
 	public boolean hasFoods(){
-		return (!mExtraFoods.isEmpty() || mOriOrder != null) ? true : false;
+		return hasExtraFoods() || hasOriFoods();
 	}
 	
 	public boolean hasTable(){
@@ -287,12 +307,13 @@ public final class ShoppingCart {
 			if(mCommitListener != null){
 				mCommitListener.OnPreCommit(mReqOrder);
 			}
-		}
-		
+		}		
 		
 		@Override
 		protected void onPostExecute(Void arg){
-			mExtraFoods.clear();
+			if(mBusinessException == null){
+				mNewOrder = null;
+			}
 			if(mCommitListener != null){	
 				mCommitListener.onPostCommit(mReqOrder, mBusinessException);
 			}

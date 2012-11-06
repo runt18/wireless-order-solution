@@ -21,13 +21,13 @@ import android.widget.Toast;
 
 import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
+import com.wireless.excep.BusinessException;
 import com.wireless.fragment.PickTasteFragment;
 import com.wireless.fragment.PickTasteFragment.OnTasteChangeListener;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.Taste;
 import com.wireless.util.ImageDialog;
 import com.wireless.util.ShadowImageView;
 import com.wireless.util.imgFetcher.ImageFetcher;
@@ -83,13 +83,13 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 				mFoodNameTextView.setText(activity.mOrderFood.name);
 				mFoodPriceTextView.setText("" + activity.mOrderFood.getPriceWithTaste());
 				if(activity.mOrderFood.hasNormalTaste()){
-					mTasteTextView.setText(activity.mOrderFood.getNormalTastePref());					
+					mTasteTextView.setText(activity.mOrderFood.tasteGroup.getNormalTastePref());					
 				}else{
 					mTasteTextView.setText("");
 				}
 				
 				if(activity.mOrderFood.hasTmpTaste()){
-					mPinzhuTextView.setText(activity.mOrderFood.tmpTaste.getPreference());
+					mPinzhuTextView.setText(activity.mOrderFood.tasteGroup.getTmpTastePref());
 				}else{
 					mPinzhuTextView.setText("");
 				}
@@ -125,9 +125,15 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		((ImageView)findViewById(R.id.imageButton_addDish_foodDetail)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				mOrderFood.setCount(Float.parseFloat(((TextView) findViewById(R.id.editText_count_foodDetail)).getText().toString()));
-				ShoppingCart.instance().addFood(mOrderFood);
-				Toast.makeText(getApplicationContext(), mOrderFood.name + "已添加", Toast.LENGTH_SHORT).show();
+				float oriCnt = mOrderFood.getCount();
+				try{
+					mOrderFood.setCount(Float.parseFloat(((TextView) findViewById(R.id.editText_count_foodDetail)).getText().toString()));
+					ShoppingCart.instance().addFood(mOrderFood);
+					Toast.makeText(getApplicationContext(), mOrderFood.name + "已添加", Toast.LENGTH_SHORT).show();
+				}catch(BusinessException e){
+					mOrderFood.setCount(oriCnt);
+					Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+				}
 			}
 		});
 		
@@ -182,14 +188,8 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		((ImageButton) findViewById(R.id.button_removeAllTaste)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				if(mOrderFood.tastes.length > 0){
-					for(Taste t : mOrderFood.tastes.clone())
-					{	
-						mOrderFood.removeTaste(t);
-					}
-					mOrderFood.tmpTaste = null;
-					mDisplayHandler.sendEmptyMessage(ORDER_FOOD_CHANGED);
-				}
+				mOrderFood.tasteGroup = null;
+				mDisplayHandler.sendEmptyMessage(ORDER_FOOD_CHANGED);
 			}
 		});
 		//设置两个tab
