@@ -28,6 +28,7 @@ import com.wireless.dbObject.SingleOrderFood;
 import com.wireless.dbReflect.SingleOrderFoodReflector;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.TasteGroup;
 import com.wireless.protocol.Terminal;
 
 public class QueryDetailAction extends Action {
@@ -100,8 +101,8 @@ public class QueryDetailAction extends Action {
 				resultMay.put("unit_price", singleOrderFood.unitPrice);
 				resultMay.put("amount", singleOrderFood.orderCount);
 				resultMay.put("discount", singleOrderFood.discount);
-				resultMay.put("taste_pref",	singleOrderFood.taste.getPreference().replaceAll(",", "；"));
-				resultMay.put("taste_price", singleOrderFood.taste.getPrice());
+				resultMay.put("taste_pref",	singleOrderFood.hasTaste() ? singleOrderFood.tasteGroup.getTastePref().replaceAll(",", "；") : TasteGroup.NO_TASTE_PREF);
+				resultMay.put("taste_price", singleOrderFood.hasTaste() ? singleOrderFood.tasteGroup.getTastePrice() : 0);
 				resultMay.put("kitchen", singleOrderFood.kitchen.name);
 				resultMay.put("waiter", singleOrderFood.staff.name);
 				resultMay.put("comment", singleOrderFood.comment);

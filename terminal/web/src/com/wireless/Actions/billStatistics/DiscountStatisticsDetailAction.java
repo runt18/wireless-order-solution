@@ -27,6 +27,7 @@ import com.wireless.dbObject.SingleOrderFood;
 import com.wireless.dbReflect.SingleOrderFoodReflector;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
+import com.wireless.protocol.TasteGroup;
 import com.wireless.protocol.Terminal;
 
 public class DiscountStatisticsDetailAction extends Action {
@@ -111,9 +112,9 @@ public class DiscountStatisticsDetailAction extends Action {
 				resultMap.put("singlePrice", SingleOrderFoods[i].unitPrice);
 				resultMap.put("count", SingleOrderFoods[i].orderCount);
 				resultMap.put("discount", SingleOrderFoods[i].discount);
-				resultMap.put("taste", SingleOrderFoods[i].taste.getPreference());
+				resultMap.put("taste", SingleOrderFoods[i].hasTaste() ? SingleOrderFoods[i].tasteGroup.getTastePref() : TasteGroup.NO_TASTE_PREF);
 				resultMap.put("tastePrice",
-						SingleOrderFoods[i].taste.getPrice());
+						SingleOrderFoods[i].hasTaste() ? SingleOrderFoods[i].tasteGroup.getTastePrice() : 0);
 				resultMap.put("kitchenID",
 						SingleOrderFoods[i].kitchen.kitchenID);
 				// resultMap.put("kitchenName",
