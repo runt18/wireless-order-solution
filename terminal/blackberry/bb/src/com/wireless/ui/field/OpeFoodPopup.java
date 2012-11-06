@@ -14,7 +14,6 @@ import net.rim.device.api.ui.container.PopupScreen;
 import net.rim.device.api.ui.container.VerticalFieldManager;
 
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.Taste;
 import com.wireless.protocol.Type;
 import com.wireless.terminal.WirelessOrder;
 
@@ -182,16 +181,13 @@ class OpeFoodPopup extends PopupScreen{
 			}	
 			
 			//the button to remove taste, show up only if the food along with the taste
-			for(int i = 0; i < _selectedFood.tastes.length; i++){
-				if(_selectedFood.tastes[i].aliasID != Taste.NO_TASTE){
-					delTasteBtn = new ButtonField("口味-", Field.FIELD_HCENTER | ButtonField.CONSUME_CLICK);
-					delTasteBtn.setChangeListener(new FieldChangeListener(){
-						public void fieldChanged(Field field, int context) {
-							UiApplication.getUiApplication().pushScreen(new RemoveTastePopup(_orderList, _selectedFood));		
-						} 
-					});
-					break;
-				}
+			if(_selectedFood.hasTaste()){
+				delTasteBtn = new ButtonField("口味-", Field.FIELD_HCENTER | ButtonField.CONSUME_CLICK);
+				delTasteBtn.setChangeListener(new FieldChangeListener(){
+					public void fieldChanged(Field field, int context) {
+						UiApplication.getUiApplication().pushScreen(new RemoveTastePopup(_orderList, _selectedFood));		
+					} 
+				});
 			}	
 		}
 

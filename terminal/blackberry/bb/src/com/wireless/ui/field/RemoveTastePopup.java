@@ -1,7 +1,5 @@
 package com.wireless.ui.field;
 
-import java.util.Vector;
-
 import net.rim.device.api.system.Characters;
 import net.rim.device.api.system.Display;
 import net.rim.device.api.ui.DrawStyle;
@@ -33,7 +31,7 @@ public class RemoveTastePopup extends PopupScreen {
 		_orderField = orderField;
 		_selectedFood = selectedFood;
 		
-		_tastes = getTastes();
+		_tastes = _selectedFood.hasTaste() ? _selectedFood.tasteGroup.getNormalTastes() : new Taste[0];
 
 		
 		add(new LabelField("选择要删除的口味"));
@@ -81,14 +79,14 @@ public class RemoveTastePopup extends PopupScreen {
 				int resp = Dialog.ask(Dialog.D_YES_NO, "确认删除-" + _tastes[getSelectedIndex()].getPreference(), Dialog.NO);
 				if(resp == Dialog.YES){
 					
-					_selectedFood.removeTaste(_tastes[getSelectedIndex()]);
+					_selectedFood.tasteGroup.removeTaste(_tastes[getSelectedIndex()]);
 					//_orderField.setSize(_orderField.getSize(), _orderField.getSelectedIndex());
 					_orderField.invalid(_selectedFood);
 					
 					/**
 					 * Redraw the remove taste pop up screen after removing the taste
 					 */
-					_tastes = getTastes();
+					_tastes = _selectedFood.hasTaste() ? _selectedFood.tasteGroup.getNormalTastes() : new Taste[0];
 					setSize(_tastes.length, _tastes.length);
 					
 
@@ -136,21 +134,6 @@ public class RemoveTastePopup extends PopupScreen {
 			}	
 		});
 		add(cancelBtn);
-	}
-	
-	/**
-	 * Filter the taste that are NOT no preference.
-	 * @return the array with the taste preferences
-	 */
-	private Taste[] getTastes(){
-		Vector vectTaste = new Vector();
-		for(int i = 0; i < _selectedFood.tastes.length; i++){
-			if(_selectedFood.tastes[i].aliasID != Taste.NO_TASTE){
-				vectTaste.addElement(_selectedFood.tastes[i]);
-			}
-		}
-		Taste[] tastes = new Taste[vectTaste.size()];
-		vectTaste.copyInto(tastes);
-		return tastes;
-	}
+	}	
+
 }

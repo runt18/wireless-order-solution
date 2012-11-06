@@ -23,7 +23,7 @@ public class FoodDetailPopup extends PopupScreen {
 		add(new LabelField("数量：" + Util.float2String2(selectedFood.getCount())));
 		add(new LabelField("价钱：" + Util.CURRENCY_SIGN + Util.float2String(selectedFood.calcPriceWithTaste())));
 		if(selectedFood.hasTaste()){
-			add(new LabelField("口味：" + selectedFood.getTastePref()));			
+			add(new LabelField("口味：" + selectedFood.tasteGroup.getTastePref()));			
 		}
 		
 		String status = null;
