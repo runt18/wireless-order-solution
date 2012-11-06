@@ -11,6 +11,7 @@ import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Taste;
+import com.wireless.protocol.TasteGroup;
 import com.wireless.protocol.Terminal;
 
 public class InsertOrder {
@@ -174,20 +175,20 @@ public class InsertOrder {
 						throw new BusinessException("The food(alias_id=" + orderToInsert.foods[i].aliasID + ", restaurant_id=" + orderToInsert.destTbl.restaurantID+ ") to query doesn't exit.", ErrorCode.MENU_EXPIRED);
 					}
 					
-					//get three taste information for each food
-					for(int j = 0; j < orderToInsert.foods[i].tastes.length; j++){
-						if(orderToInsert.foods[i].tastes[j].aliasID != Taste.NO_TASTE){
-							
+					//Get the details to normal tastes
+					Taste[] normalTastes = orderToInsert.foods[i].tasteGroup == null ? null : orderToInsert.foods[i].tasteGroup.getNormalTastes();
+					if(normalTastes != null){
+						for(int j = 0; j < normalTastes.length; j++){
 							Taste[] detailTaste = QueryMenu.queryTastes(dbCon, 
-									Taste.CATE_ALL, 
-									" AND restaurant_id=" + term.restaurantID + " AND taste_alias =" + orderToInsert.foods[i].tastes[j].aliasID, 
-									null);
+																		Taste.CATE_ALL, 
+																		" AND restaurant_id=" + term.restaurantID + " AND taste_alias =" + normalTastes[j].aliasID, 
+																		null);
 							
 							if(detailTaste.length > 0){
-								orderToInsert.foods[i].tastes[j] = detailTaste[0];
+								normalTastes[j] = detailTaste[0];
 							}
 						}
-					}					
+					}
 				}					
 			}
 			
@@ -284,43 +285,89 @@ public class InsertOrder {
 				/**
 				 * Insert the detail records to 'order_food' table
 				 */
-				for(int i = 0; i < orderToInsert.foods.length; i++){
+				for(OrderFood foodToInsert : orderToInsert.foods){
+					
+
+					if(foodToInsert.tasteGroup != null){
+						
+						TasteGroup tg = foodToInsert.tasteGroup;
+						
+						/**
+						 * Insert the taste group if containing taste.
+						 */
+						sql = " INSERT INTO " + Params.dbName + ".taste_group " +
+							  " ( " +
+							  " `normal_taste_group_id`, `normal_taste_pref`, `normal_taste_price`, " +
+							  " `tmp_taste_id`, `tmp_taste_pref`, `tmp_taste_price` " +
+							  " ) " +
+							  " SELECT " +
+							  (tg.hasNormalTaste() ? "MAX(normal_taste_group_id) + 1" : TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID) + ", " +
+							  (tg.hasNormalTaste() ? ("'" + tg.getNormalTastePref() + "'") : "NULL") + ", " +
+							  (tg.hasNormalTaste() ? tg.getNormalTastePrice() : "NULL") + ", " +
+							  (tg.hasTmpTaste() ? tg.getTmpTaste().aliasID : "NULL") + ", " +
+							  (tg.hasTmpTaste() ? "'" + tg.getTmpTastePref() + "'" : "NULL") + ", " +
+							  (tg.hasTmpTaste() ? tg.getTmpTastePrice() : "NULL") +
+							  " FROM " +
+							  Params.dbName + ".taste_group" + 
+							  " LIMIT 1 ";
+						dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+						//get the generated id to taste group 
+						dbCon.rs = dbCon.stmt.getGeneratedKeys();
+						if(dbCon.rs.next()){
+							tg.setGroupId(dbCon.rs.getInt(1));
+						}else{
+							throw new SQLException("The id of taste group is not generated successfully.");
+						}
+						
+						/**
+						 * Insert the normal taste group if containing normal tastes.
+						 */
+						if(tg.hasNormalTaste()){
+							for(Taste normalTaste : tg.getNormalTastes()){
+								sql = " INSERT INTO " + Params.dbName + ".normal_taste_group " +
+									  " ( " +
+									  " `normal_taste_group_id`, `taste_id` " +
+									  " ) " +
+									  " VALUES " +
+									  " ( " +
+									  " (SELECT normal_taste_group_id FROM " + Params.dbName + ".taste_group " + 
+									  " WHERE " +
+									  " taste_group_id = " + tg.getGroupId() + "), " +
+									  normalTaste.tasteID + 
+									  " ) ";
+								dbCon.stmt.executeUpdate(sql);
+							}
+						}
+						
+					}
 						
 					//insert the record to table "order_food"
-					sql = "INSERT INTO `" + Params.dbName + "`.`order_food` (" +
-							"`restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `name`, " +
-							"`food_status`, `hang_status`, `discount`, `taste`, `taste_price`, " +
-							"`taste_id`, `taste2_id`, `taste3_id` ," +
-							"`taste_alias`, `taste2_alias`, `taste3_alias`, " +
-							"`taste_tmp_alias`, `taste_tmp`, `taste_tmp_price`, " +
-							"`dept_id`, `kitchen_id`, `kitchen_alias`, " +
-							"`waiter`, `order_date`, `is_temporary`) VALUES (" +	
-							term.restaurantID + ", " +
-							orderToInsert.id + ", " +
-							(orderToInsert.foods[i].foodID == 0 ? "NULL" : orderToInsert.foods[i].foodID) + ", " +
-							orderToInsert.foods[i].aliasID + ", " + 
-							orderToInsert.foods[i].getCount() + ", " + 
-							orderToInsert.foods[i].getPrice() + ", '" + 
-							orderToInsert.foods[i].name + "', " +
-							orderToInsert.foods[i].status + ", " +
-							(orderToInsert.foods[i].hangStatus == OrderFood.FOOD_HANG_UP ? OrderFood.FOOD_HANG_UP : OrderFood.FOOD_NORMAL) + ", " +
-							orderToInsert.foods[i].getDiscount() + ", " +
-							(orderToInsert.foods[i].hasNormalTaste() ? ("'" + orderToInsert.foods[i].getNormalTastePref() + "'") : "NULL") + ", " + 
-							(orderToInsert.foods[i].hasNormalTaste() ? orderToInsert.foods[i].getTasteNormalPrice() : "NULL") + ", " +
-							(orderToInsert.foods[i].tastes[0].tasteID == 0 ? "NULL" : orderToInsert.foods[i].tastes[0].tasteID) + ", " +
-							(orderToInsert.foods[i].tastes[1].tasteID == 0 ? "NULL" : orderToInsert.foods[i].tastes[1].tasteID) + ", " +
-							(orderToInsert.foods[i].tastes[2].tasteID == 0 ? "NULL" : orderToInsert.foods[i].tastes[2].tasteID) + ", " +
-							orderToInsert.foods[i].tastes[0].aliasID + ", " + 
-							orderToInsert.foods[i].tastes[1].aliasID + ", " + 
-							orderToInsert.foods[i].tastes[2].aliasID + ", " +
-							(orderToInsert.foods[i].tmpTaste == null ? "NULL" : orderToInsert.foods[i].tmpTaste.aliasID) + ", " +
-							(orderToInsert.foods[i].tmpTaste == null ? "NULL" : ("'" + orderToInsert.foods[i].tmpTaste.getPreference() + "'")) + ", " +
-							(orderToInsert.foods[i].tmpTaste == null ? "NULL" : orderToInsert.foods[i].tmpTaste.getPrice()) + ", " +
-							orderToInsert.foods[i].kitchen.dept.deptID + ", " +
-							orderToInsert.foods[i].kitchen.kitchenID + ", " +
-							orderToInsert.foods[i].kitchen.aliasID + ", '" + 
-							term.owner + "', NOW(), " + 
-							(orderToInsert.foods[i].isTemporary ? "1" : "0") + ")";
+					sql = " INSERT INTO `" + Params.dbName + "`.`order_food` " +
+						  " ( " +
+						  " `restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `name`, " +
+						  " `food_status`, `hang_status`, `discount`, `taste_group_id`, " +
+						  " `dept_id`, `kitchen_id`, `kitchen_alias`, " +
+						  " `waiter`, `order_date`, `is_temporary` " +
+						  " ) " +
+						  " VALUES " +
+						  " ( " +	
+						  term.restaurantID + ", " +
+						  orderToInsert.id + ", " +
+						  (foodToInsert.foodID == 0 ? "NULL" : foodToInsert.foodID) + ", " +
+						  foodToInsert.aliasID + ", " + 
+						  foodToInsert.getCount() + ", " + 
+						  foodToInsert.getPrice() + ", '" + 
+						  foodToInsert.name + "', " +
+						  foodToInsert.status + ", " +
+						  (foodToInsert.hangStatus == OrderFood.FOOD_HANG_UP ? OrderFood.FOOD_HANG_UP : OrderFood.FOOD_NORMAL) + ", " +
+						  foodToInsert.getDiscount() + ", " +
+						  (foodToInsert.tasteGroup == null ? TasteGroup.EMPTY_TASTE_GROUP_ID : foodToInsert.tasteGroup.getGroupId()) + ", " +
+						  foodToInsert.kitchen.dept.deptID + ", " +
+						  foodToInsert.kitchen.kitchenID + ", " +
+						  foodToInsert.kitchen.aliasID + ", '" + 
+						  term.owner + "', NOW(), " + 
+						  (foodToInsert.isTemporary ? "1" : "0") + 
+						  " ) ";
 						
 					dbCon.stmt.executeUpdate(sql);
 				}

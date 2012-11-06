@@ -1,6 +1,8 @@
 package com.wireless.db.tasteRef;
 
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -14,6 +16,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.protocol.Department;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
+import com.wireless.protocol.TasteGroup;
 
 public class TasteRefDao {
 	
@@ -26,17 +29,26 @@ public class TasteRefDao {
 	private final static String TASTE_RANK = "$(taste_rank)";
 	
 	private final static String QUERY_TASTE_SQL = 
-			" SELECT ORDER_FOOD.taste_id, COUNT(ORDER_FOOD.taste_id) AS ref_cnt " +
+			" SELECT A.food_id, A.taste_id, COUNT(*) AS ref_cnt " +
 			" FROM " +
-			" (SELECT " + TASTE_ID + " AS taste_id, SUM(order_count) AS order_sum FROM " +
-			Params.dbName + ".order_food_history " +
-			" WHERE " +
-			" food_id = " + FOOD_ID +
-			" GROUP BY order_id, food_id, taste_id, taste2_id, taste3_id, taste_tmp_alias, is_temporary " +
-			" HAVING order_sum > 0 ) AS ORDER_FOOD " +
-			" WHERE ORDER_FOOD.taste_id IS NOT NULL " +
-			" GROUP BY ORDER_FOOD.taste_id " +
-			" HAVING ref_cnt > 0 ";
+			" ( " +
+			" SELECT " + 
+			" OFH.order_id, OFH.food_id, NTGH.taste_id " +
+			" FROM " +
+			Params.dbName + ".normal_taste_group_history NTGH " +
+			" JOIN " +
+			Params.dbName + ".taste_group_history TGH " +
+			" ON " + " NTGH.normal_taste_group_id = TGH.normal_taste_group_id " + " AND " + " NTGH.normal_taste_group_id <> " + TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID +
+			" JOIN " +
+			Params.dbName + ".order_food_history OFH " +
+			" ON " + 
+			" TGH.taste_group_id = OFH.taste_group_id " + " AND " + " OFH.is_temporary = 0 " + 
+			" AND " + 
+			" OFH.food_id IN( " + FOOD_ID + ")" + " AND " + " TGH.taste_group_id <> " + TasteGroup.EMPTY_TASTE_GROUP_ID +
+			" GROUP BY " + " OFH.order_id, OFH.food_id, NTGH.taste_id " +
+			" HAVING " + " SUM(OFH.order_count) > 0 " +
+			" ) AS A " +
+			" GROUP BY " + " A.food_id, A.taste_id ";
 	
 	private final static String INSERT_FOOD_TASTE_SQL = 
 			" INSERT INTO " + Params.dbName + ".food_taste" +
@@ -195,20 +207,62 @@ public class TasteRefDao {
 		 */
 		Food[] foods = QueryMenu.queryFoods("AND FOOD.taste_ref_type=" + Food.TASTE_SMART_REF, null);
 		
-		/**
-		 * The hash map to store the taste reference count to all the foods
-		 */
-		HashMap<Food, Set<TasteRefCnt>> foodTasteRef = new HashMap<Food, Set<TasteRefCnt>>();
-		for(Food food : foods){
-			HashSet<TasteRefCnt> tasteRefByFood = getFoodTaste(dbCon, food);			
-			foodTasteRef.put(food, tasteRefByFood);		
-		}	
+		if(foods.length > 0){
+			
+			Comparator<Food> foodComp = new Comparator<Food>(){
+				@Override
+				public int compare(Food arg0, Food arg1) {
+					if(arg0.foodID > arg1.foodID){
+						return 1;
+					}else if(arg0.foodID < arg1.foodID){
+						return -1;
+					}else{
+						return 0;
+					}
+				}			
+			};
 		
-		/**
-		 * Write the food taste to db & update the kitchen and department taste
-		 */
-		storeFoodTaste(dbCon, foodTasteRef);	
-	
+			Arrays.sort(foods, foodComp);
+			
+			/**
+			 * The hash map to store the taste reference count to all the foods
+			 */
+			HashMap<Food, Set<TasteRefCnt>> foodTasteRef = new HashMap<Food, Set<TasteRefCnt>>();
+
+			//Combine the food id to condition string.
+			StringBuffer foodIdCond = new StringBuffer();
+			for(Food food : foods){
+				
+				foodTasteRef.put(food, new HashSet<TasteRefCnt>());
+				
+				if(foodIdCond.length() == 0){
+					foodIdCond.append(food.foodID);
+				}else{
+					foodIdCond.append("," + food.foodID);
+				}
+			}		
+
+			String sqlTmp = QUERY_TASTE_SQL.replace(FOOD_ID, foodIdCond);		
+			
+			dbCon.rs = dbCon.stmt.executeQuery(sqlTmp);
+
+			while(dbCon.rs.next()){
+				int index = Arrays.binarySearch(foods, new Food(dbCon.rs.getInt("food_id"), 0, 0), foodComp);
+				if(index >= 0){
+					Set<TasteRefCnt> tasteRefByFood = foodTasteRef.get(foods[index]);
+					if(tasteRefByFood != null){
+						tasteRefByFood.add(new TasteRefCnt(dbCon.rs.getInt("taste_id"), TasteRefCnt.TASTE_BY_FOOD, dbCon.rs.getInt("ref_cnt")));
+					}
+				}
+			}
+			dbCon.rs.close();
+			
+			/**
+			 * Write the food taste to db & update the kitchen and department taste
+			 */
+			storeFoodTaste(dbCon, foodTasteRef);	
+
+		}	
 	}
 	
 	/**
@@ -224,69 +278,15 @@ public class TasteRefDao {
 	 */
 	private static HashSet<TasteRefCnt> getFoodTaste(DBCon dbCon, Food food) throws SQLException{
 		
-		String sqlTmp = QUERY_TASTE_SQL.replace(FOOD_ID, Long.toString(food.foodID));
+		String sqlTmp = QUERY_TASTE_SQL.replace(FOOD_ID, Long.toString(food.foodID));		
 		
-		HashMap<Integer, Integer> tasteRef = new HashMap<Integer, Integer>();
-		
-		/**
-		 * Get the reference count to taste_id
-		 */
-		String sql = sqlTmp.replace(TASTE_ID, "taste_id");
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		while(dbCon.rs.next()){
-			int tasteID = dbCon.rs.getInt("taste_id");
-			int refCnt = dbCon.rs.getInt("ref_cnt");
-			Integer oriRefCnt = tasteRef.get(tasteID);
-			if(oriRefCnt != null){
-				refCnt += oriRefCnt;
-				tasteRef.put(tasteID, refCnt);
-			}else{
-				tasteRef.put(tasteID, refCnt);
-			}
-		}
-		dbCon.rs.close();
-		
-		/**
-		 * Get the reference count to taste2_id
-		 */
-		sql = sqlTmp.replace(TASTE_ID, "taste2_id");
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		while(dbCon.rs.next()){
-			int tasteID = dbCon.rs.getInt("taste_id");
-			int refCnt = dbCon.rs.getInt("ref_cnt");
-			Integer oriRefCnt = tasteRef.get(tasteID);
-			if(oriRefCnt != null){
-				refCnt += oriRefCnt;
-				tasteRef.put(tasteID, refCnt);
-			}else{
-				tasteRef.put(tasteID, refCnt);
-			}
-		}
-		dbCon.rs.close();
-		
-		/**
-		 * Get the reference count to taste3_id
-		 */
-		sql = sqlTmp.replace(TASTE_ID, "taste3_id");
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		while(dbCon.rs.next()){
-			int tasteID = dbCon.rs.getInt("taste_id");
-			int refCnt = dbCon.rs.getInt("ref_cnt");
-			Integer oriRefCnt = tasteRef.get(tasteID);
-			if(oriRefCnt != null){
-				refCnt += oriRefCnt;
-				tasteRef.put(tasteID, refCnt);
-			}else{
-				tasteRef.put(tasteID, refCnt);
-			}
-		}
-		dbCon.rs.close();
+		dbCon.rs = dbCon.stmt.executeQuery(sqlTmp);
 		
 		HashSet<TasteRefCnt> tasteRefByFood = new HashSet<TasteRefCnt>();
-		
-		for(Map.Entry<Integer, Integer> entry : tasteRef.entrySet()){
-			tasteRefByFood.add(new TasteRefCnt(entry.getKey(), TasteRefCnt.TASTE_BY_FOOD, entry.getValue()));
+		while(dbCon.rs.next()){
+			tasteRefByFood.add(new TasteRefCnt(dbCon.rs.getInt("taste_id"), TasteRefCnt.TASTE_BY_FOOD, dbCon.rs.getInt("ref_cnt")));
 		}
+		dbCon.rs.close();
 		
 		return tasteRefByFood;
 	}

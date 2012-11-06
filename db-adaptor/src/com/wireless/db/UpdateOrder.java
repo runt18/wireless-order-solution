@@ -1,6 +1,7 @@
 package com.wireless.db;
 
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -15,6 +16,7 @@ import com.wireless.protocol.OrderDiff.DiffResult;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Table;
 import com.wireless.protocol.Taste;
+import com.wireless.protocol.TasteGroup;
 import com.wireless.protocol.Terminal;
 
 public class UpdateOrder {
@@ -306,41 +308,87 @@ public class UpdateOrder {
 					giftAmount += extraFood.getPriceWithTaste() * extraFood.getCount();
 				}
 				
-				sql = "INSERT INTO `" + Params.dbName + "`.`order_food` " +
-						"(`restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `name`, `food_status`, `hang_status`, " +
-						"`taste_id`, `taste2_id`, `taste3_id`, " + 
-						"`discount`, `taste_alias`, `taste2_alias`, `taste3_alias`, `taste_price`, `taste`, " +
-						"`taste_tmp_alias`, `taste_tmp`, `taste_tmp_price`, " +
-						"`dept_id`, `kitchen_id`, `kitchen_alias`, `waiter`, `order_date`, `is_temporary`, `is_paid`) VALUES (" +
-						term.restaurantID + ", " +
-						newOrder.id + ", " +
-						(extraFood.foodID == 0 ? "NULL" : extraFood.foodID) + ", " +
-						extraFood.aliasID + ", " + 
-						extraFood.getCount() + ", " + 
-						extraFood.getPrice() + ", '" + 
-						extraFood.name + "', " + 
-						extraFood.status + ", " +
-						(extraFood.hangStatus == OrderFood.FOOD_HANG_UP ? OrderFood.FOOD_HANG_UP : OrderFood.FOOD_NORMAL) + ", " +
-						(extraFood.tastes[0].tasteID == 0 ? "NULL" : extraFood.tastes[0].tasteID) + ", " +
-						(extraFood.tastes[1].tasteID == 0 ? "NULL" : extraFood.tastes[1].tasteID) + ", " +
-						(extraFood.tastes[2].tasteID == 0 ? "NULL" : extraFood.tastes[2].tasteID) + ", " +
-						extraFood.getDiscount() + ", " +
-						extraFood.tastes[0].aliasID + "," +
-						extraFood.tastes[1].aliasID + "," +
-						extraFood.tastes[2].aliasID + "," +
-						(extraFood.hasNormalTaste() ? extraFood.getTasteNormalPrice() : "NULL") + ", " +
-						(extraFood.hasNormalTaste() ? ("'" + extraFood.getNormalTastePref() + "'") : "NULL") + ", " + 
-						(extraFood.tmpTaste == null ? "NULL" : extraFood.tmpTaste.aliasID) + ", " +
-						(extraFood.tmpTaste == null ? "NULL" : ("'" + extraFood.tmpTaste.getPreference() + "'")) + ", " +
-						(extraFood.tmpTaste == null ? "NULL" : extraFood.tmpTaste.getPrice()) + ", " +
-						extraFood.kitchen.dept.deptID + ", " +
-						extraFood.kitchen.kitchenID + ", " +
-						extraFood.kitchen.aliasID + ", '" + 
-						term.owner + "', " +
-						"NOW(), " + 
-						(extraFood.isTemporary ? 1 : 0) + ", " +
-						(isPaidAgain ? 1 : 0) +
-						")";
+				/**
+				 * Insert the taste group info if containing taste and the extra taste group is new
+				 */
+				if(extraFood.tasteGroup != null && extraFood.tasteGroup.getGroupId() == TasteGroup.NEW_TASTE_GROUP_ID){
+					
+					TasteGroup tg = extraFood.tasteGroup;					
+					/**
+					 * Insert the taste group if containing taste.
+					 */
+					sql = " INSERT INTO " + Params.dbName + ".taste_group " +
+						  " ( " +
+						  " `normal_taste_group_id`, `normal_taste_pref`, `normal_taste_price`, " +
+						  " `tmp_taste_id`, `tmp_taste_pref`, `tmp_taste_price` " +
+						  " ) " +
+						  " SELECT " +
+						  (tg.hasNormalTaste() ? "MAX(normal_taste_group_id) + 1" : TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID) + ", " +
+						  (tg.hasNormalTaste() ? ("'" + tg.getNormalTastePref() + "'") : "NULL") + ", " +
+						  (tg.hasNormalTaste() ? tg.getNormalTastePrice() : "NULL") + ", " +
+						  (tg.hasTmpTaste() ? tg.getTmpTaste().aliasID : "NULL") + ", " +
+						  (tg.hasTmpTaste() ? ("'" + tg.getTmpTastePref() + "'") : "NULL") + ", " +
+						  (tg.hasTmpTaste() ? tg.getTmpTastePrice() : "NULL") +
+						  " FROM " + 
+						  Params.dbName + ".taste_group" +
+						  " LIMIT 1 ";
+					dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+					//get the generated id to taste group 
+					dbCon.rs = dbCon.stmt.getGeneratedKeys();
+					if(dbCon.rs.next()){
+						tg.setGroupId(dbCon.rs.getInt(1));
+					}else{
+						throw new SQLException("The id of taste group is not generated successfully.");
+					}
+					
+					/**
+					 * Insert the normal taste group if containing normal tastes.
+					 */
+					if(tg.hasNormalTaste()){
+						for(Taste normalTaste : tg.getNormalTastes()){
+							sql = " INSERT INTO " + Params.dbName + ".normal_taste_group " +
+								  " ( " +
+								  " `normal_taste_group_id`, `taste_id` " +
+								  " ) " +
+								  " VALUES " +
+								  " ( " +
+								  " (SELECT normal_taste_group_id FROM " + Params.dbName + ".taste_group " + 
+								  " WHERE " +
+								  " taste_group_id = " + tg.getGroupId() + ")" + " , " +
+								  normalTaste.tasteID + 
+								  " ) ";
+							dbCon.stmt.executeUpdate(sql);
+						}
+					}
+				}
+				
+				sql = " INSERT INTO " + Params.dbName + ".order_food " +
+					  " ( " + 
+					  " `restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `name`, `food_status`, `hang_status`, " +
+					  " `discount`, `taste_group_id`, " +
+					  " `dept_id`, `kitchen_id`, `kitchen_alias`, `waiter`, `order_date`, `is_temporary`, `is_paid` " +
+					  " ) " +
+					  " VALUES " +
+					  "(" +
+					  term.restaurantID + ", " +
+					  newOrder.id + ", " +
+					  (extraFood.foodID == 0 ? "NULL" : extraFood.foodID) + ", " +
+					  extraFood.aliasID + ", " + 
+					  extraFood.getCount() + ", " + 
+					  extraFood.getPrice() + ", '" + 
+					  extraFood.name + "', " + 
+					  extraFood.status + ", " +
+					  (extraFood.hangStatus == OrderFood.FOOD_HANG_UP ? OrderFood.FOOD_HANG_UP : OrderFood.FOOD_NORMAL) + ", " +
+					  extraFood.getDiscount() + ", " +
+					  (extraFood.tasteGroup == null ? TasteGroup.EMPTY_TASTE_GROUP_ID : extraFood.tasteGroup.getGroupId()) + ", " +
+					  extraFood.kitchen.dept.deptID + ", " +
+					  extraFood.kitchen.kitchenID + ", " +
+					  extraFood.kitchen.aliasID + ", '" + 
+					  term.owner + "', " +
+					  "NOW(), " + 
+					  (extraFood.isTemporary ? 1 : 0) + ", " +
+					  (isPaidAgain ? 1 : 0) +
+					  " ) ";
 				dbCon.stmt.executeUpdate(sql);			
 			}
 			
@@ -352,42 +400,31 @@ public class UpdateOrder {
 					giftAmount -= canceledFood.getPriceWithTaste() * canceledFood.getCount();
 				}
 				
-				sql = "INSERT INTO `" + Params.dbName + "`.`order_food` " +
-						"(`restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `name`, `food_status`, `hang_status`, " +
-						"`taste_id`, `taste2_id`, `taste3_id`, " +
-						"`discount`, `taste_alias`, `taste2_alias`, `taste3_alias`, `taste_price`, `taste`, " +
-						"`taste_tmp_alias`, `taste_tmp`, `taste_tmp_price`, " +
-						"`dept_id`, `kitchen_id`, `kitchen_alias`, " +
-						"`waiter`, `order_date`, `is_temporary`, `is_paid`) VALUES (" +
-						term.restaurantID + ", " +
-						newOrder.id + ", " +
-						(canceledFood.foodID == 0 ? "NULL" : canceledFood.foodID) + ", " +
-						canceledFood.aliasID + ", " + 
-						"-" + canceledFood.getCount() + ", " + 
-						canceledFood.getPrice() + ", '" + 
-						canceledFood.name + "', " + 
-						canceledFood.status + ", " +
-						(canceledFood.hangStatus == OrderFood.FOOD_HANG_UP ? OrderFood.FOOD_HANG_UP : OrderFood.FOOD_NORMAL) + ", " +
-						(canceledFood.tastes[0].tasteID == 0 ? "NULL" : canceledFood.tastes[0].tasteID) + ", " +
-						(canceledFood.tastes[1].tasteID == 0 ? "NULL" : canceledFood.tastes[1].tasteID)+ ", " +
-						(canceledFood.tastes[2].tasteID == 0 ? "NULL" : canceledFood.tastes[2].tasteID)+ ", " +
-						canceledFood.getDiscount() + ", " +
-						canceledFood.tastes[0].aliasID + "," +
-						canceledFood.tastes[1].aliasID + "," +
-						canceledFood.tastes[2].aliasID + "," +
-						(canceledFood.hasNormalTaste() ? canceledFood.getTasteNormalPrice() : "NULL") + ", " +
-						(canceledFood.hasNormalTaste() ? ("'" + canceledFood.getNormalTastePref() + "'") : "NULL") + ", " + 
-						(canceledFood.tmpTaste == null ? "NULL" : canceledFood.tmpTaste.aliasID) + ", " +
-						(canceledFood.tmpTaste == null ? "NULL" : ("'" + canceledFood.tmpTaste.getPreference() + "'")) + ", " +
-						(canceledFood.tmpTaste == null ? "NULL" : canceledFood.tmpTaste.getPrice()) + ", " +
-						canceledFood.kitchen.dept.deptID + ", " +
-						canceledFood.kitchen.kitchenID + ", " +
-						canceledFood.kitchen.aliasID + ", '" + 
-						term.owner + "', " +
-						"NOW(), " + 
-						(canceledFood.isTemporary ? 1 : 0) + ", " +
-						(isPaidAgain ? 1 : 0) +
-						")";
+				sql = " INSERT INTO `" + Params.dbName + "`.`order_food` " +
+					  " ( " +
+					  " `restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `name`, `food_status`, `hang_status`, " +
+					  " `discount`, `taste_group_id`, " +
+					  " `dept_id`, `kitchen_id`, `kitchen_alias`, " +
+					  " `waiter`, `order_date`, `is_temporary`, `is_paid`) VALUES (" +
+					  term.restaurantID + ", " +
+					  newOrder.id + ", " +
+					  (canceledFood.foodID == 0 ? "NULL" : canceledFood.foodID) + ", " +
+					  canceledFood.aliasID + ", " + 
+					  "-" + canceledFood.getCount() + ", " + 
+					  canceledFood.getPrice() + ", '" + 
+					  canceledFood.name + "', " + 
+					  canceledFood.status + ", " +
+					  (canceledFood.hangStatus == OrderFood.FOOD_HANG_UP ? OrderFood.FOOD_HANG_UP : OrderFood.FOOD_NORMAL) + ", " +
+					  canceledFood.getDiscount() + ", " +
+					  (canceledFood.tasteGroup == null ? TasteGroup.EMPTY_TASTE_GROUP_ID : canceledFood.tasteGroup.getGroupId()) + ", " +
+					  canceledFood.kitchen.dept.deptID + ", " +
+					  canceledFood.kitchen.kitchenID + ", " +
+					  canceledFood.kitchen.aliasID + ", '" + 
+					  term.owner + "', " +
+					  "NOW(), " + 
+					  (canceledFood.isTemporary ? 1 : 0) + ", " +
+					  (isPaidAgain ? 1 : 0) +
+					  " ) ";
 				dbCon.stmt.executeUpdate(sql);			
 			}
 			
@@ -629,7 +666,7 @@ public class UpdateOrder {
 			}
 			
 		}else{
-			//Get the details 			
+			//Get the details to each order food			
 			Food[] detailFood = QueryMenu.queryFoods(dbCon, " AND FOOD.food_alias=" + foodBasic.aliasID + " AND FOOD.restaurant_id=" + term.restaurantID, null);
 			
 			if(detailFood.length > 0){
@@ -643,26 +680,21 @@ public class UpdateOrder {
 				throw new BusinessException("The food(alias_id=" + foodBasic.aliasID + ", restaurant_id=" + term.restaurantID + ") to query does NOT exist.", ErrorCode.MENU_EXPIRED);
 			}			
 
-			//get the each taste information to this food only if the food has taste preference
-			for(int j = 0; j < foodBasic.tastes.length; j++){
-				if(foodBasic.tastes[j].aliasID != Taste.NO_TASTE){
-					
+			//Get the details to each normal tastes
+			Taste[] normalTastes = foodBasic.tasteGroup == null ? null : foodBasic.tasteGroup.getNormalTastes();
+			if(normalTastes != null){
+				for(int j = 0; j < normalTastes.length; j++){
 					Taste[] detailTaste = QueryMenu.queryTastes(dbCon, 
-							Taste.CATE_ALL, 
-							" AND restaurant_id=" + term.restaurantID + " AND taste_alias =" + foodBasic.tastes[j].aliasID, 
-							null);
+																Taste.CATE_ALL, 
+																" AND restaurant_id=" + term.restaurantID + " AND taste_alias =" + normalTastes[j].aliasID, 
+																null);
 					
 					if(detailTaste.length > 0){
-						foodBasic.tastes[j] = detailTaste[0];
-					}					
+						normalTastes[j] = detailTaste[0];
+					}
 				}
 			}
 		}		
-		
-		//set the taste preference to this food
-		//foodBasic.setNormalTastePref(com.wireless.protocol.Util.genTastePref(foodBasic.tastes));
-		//set the total taste price to this food
-		//foodBasic.setTasteNormalPrice(com.wireless.protocol.Util.genTastePrice(foodBasic.tastes, foodBasic.getPrice()));		
 	}
 	
 }

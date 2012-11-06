@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.dbObject.SingleOrderFood;
+import com.wireless.protocol.Taste;
+import com.wireless.protocol.TasteGroup;
 
 public class SingleOrderFoodReflector {
 	
@@ -65,6 +67,7 @@ public class SingleOrderFoodReflector {
 		
 		String orderFoodTbl = isHistory ? "order_food_history" : "order_food";
 		String orderTbl = isHistory ? "order_history" : "order";
+		String tgTbl = isHistory ? "taste_group_history" : "taste_group";
 		
 		String sql;
 		sql = " SELECT " +
@@ -72,15 +75,17 @@ public class SingleOrderFoodReflector {
 			  " A.order_id, " +
 			  " A.food_id, A.name, A.food_alias, A.food_status, " +
 			  " A.order_count, A.unit_price, A.discount, " + 
-			  " A.kitchen_id, A.kitchen_alias, A.dept_id, " +
-			  "(CASE WHEN C.kitchen_id IS NULL THEN '已删除厨房' " +
-			  " ELSE C.name END) AS kitchen_name, " +
-			  " A.taste, A.taste_price, A.taste_id, A.taste2_id, A.taste3_id, A.taste_alias, A.taste2_alias, A.taste3_alias, " +
-			  " A.taste_tmp_alias, A.taste_tmp, A.taste_tmp_price, " + 
+			  " A.kitchen_id, A.kitchen_alias, " +
+			  "(CASE WHEN C.kitchen_id IS NULL THEN '已删除厨房' ELSE C.name END) AS kitchen_name, " +
+			  " TG.taste_group_id, " +
+			  " TG.normal_taste_group_id, TG.normal_taste_pref, TG.normal_taste_price, " +
+			  " (CASE WHEN TG.tmp_taste_id IS NULL THEN 0 ELSE 1 END) AS has_tmp_taste, " +
+			  " TG.tmp_taste_pref, TG.tmp_taste_price, " +
+			  //" A.taste, A.taste_price, A.taste_id, A.taste2_id, A.taste3_id, A.taste_alias, A.taste2_alias, A.taste3_alias, " +
+			  //" A.taste_tmp_alias, A.taste_tmp, A.taste_tmp_price, " + 
 			  " A.order_date, A.is_temporary, A.is_paid, A.waiter, A.comment, " +
 			  " B.type, B.service_rate, " +
-			  " (CASE WHEN D.dept_id IS NULL THEN '已删除部门' " + 
-			  " ELSE D.name END) as dept_name " +
+			  " A.dept_id, (CASE WHEN D.dept_id IS NULL THEN '已删除部门' ELSE D.name END) as dept_name " +
 			  " FROM " + 
 			  Params.dbName + "." + orderFoodTbl + " A LEFT JOIN " +
 			  Params.dbName + ".kitchen C " + 
@@ -88,6 +93,10 @@ public class SingleOrderFoodReflector {
 			  " LEFT JOIN " +
 			  Params.dbName + ".department D " + 
 			  " ON C.restaurant_id = D.restaurant_id AND C.dept_id = D.dept_id " +
+			  " JOIN " +
+			  Params.dbName + "." + tgTbl + " TG " +
+			  " ON " +
+			  " A.taste_group_id = TG.taste_group_id " +
 			  " JOIN " +
 			  Params.dbName + "." + orderTbl + " B " +
 			  " ON  A.order_id = B.id " +
@@ -121,21 +130,25 @@ public class SingleOrderFoodReflector {
 			singleOrderFood.kitchen.dept.deptID = dbCon.rs.getShort("dept_id");
 			singleOrderFood.kitchen.dept.name = dbCon.rs.getString("dept_name");
 			
-			String normalTastePref = dbCon.rs.getString("taste");
-			String tmpTastePref = dbCon.rs.getString("taste_tmp");
-			if(normalTastePref != null && tmpTastePref != null){
-				singleOrderFood.taste.setPreference(normalTastePref + "," + tmpTastePref);
+			int tasteGroupId = dbCon.rs.getInt("taste_group_id");
+			if(tasteGroupId != TasteGroup.EMPTY_TASTE_GROUP_ID){
+				Taste normal = null;
+				if(dbCon.rs.getInt("normal_taste_group_id") != TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID){
+					normal = new Taste();
+					normal.setPreference(dbCon.rs.getString("normal_taste_pref"));
+					normal.setPrice(dbCon.rs.getFloat("normal_taste_price"));
+				}
 				
-			}else if(normalTastePref != null){
-				singleOrderFood.taste.setPreference(normalTastePref);
+				Taste temp = null;
+				if(dbCon.rs.getBoolean("has_tmp_taste")){
+					temp = new Taste();
+					temp.setPreference(dbCon.rs.getString("tmp_taste_pref"));
+					temp.setPrice(dbCon.rs.getFloat("tmp_taste_price"));
+				}
 				
-			}else if(tmpTastePref != null){
-				singleOrderFood.taste.setPreference(tmpTastePref);
+				singleOrderFood.tasteGroup = new TasteGroup(tasteGroupId, normal, temp);
+				
 			}
-			
-			float normalTastePrice = dbCon.rs.getFloat("taste_price");
-			float tmpTastePrice = dbCon.rs.getFloat("taste_tmp_price");
-			singleOrderFood.taste.setPrice(normalTastePrice + tmpTastePrice);
 			
 			singleOrderFood.orderDate = dbCon.rs.getTimestamp("order_date").getTime();
 			singleOrderFood.isTemporary = dbCon.rs.getBoolean("is_temporary");

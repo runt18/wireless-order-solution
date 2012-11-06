@@ -4,7 +4,7 @@ import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.StaffTerminal;
-import com.wireless.protocol.Taste;
+import com.wireless.protocol.TasteGroup;
 
 public class SingleOrderFood {
 	public StaffTerminal staff = new StaffTerminal();		//服务员姓名
@@ -13,7 +13,7 @@ public class SingleOrderFood {
 	public float unitPrice;									//菜品单价
 	public float orderCount;								//点菜数量
 	public float discount = 1;								//折扣
-	public Taste taste = new Taste();						//菜品口味
+	public TasteGroup tasteGroup;							//菜品口味
 	public Kitchen kitchen = new Kitchen();					//菜品所属厨房
 	public Food food = new Food();							//菜品的信息
 	public boolean isTemporary = false;						//是否临时菜
@@ -21,6 +21,30 @@ public class SingleOrderFood {
 	public int payManner = Order.MANNER_CASH;				//结帐方式(现金、刷卡、挂账...)
 	public float serviceRate = 0;							//服务费率
 	public String comment = null;							//备注
+	
+	/**
+	 * Check to see if the order food has taste(either normal taste or temporary taste).
+	 * @return true if the order food has taste, otherwise false
+	 */
+	public boolean hasTaste(){
+		return tasteGroup == null ? false : tasteGroup.hasTaste();
+	}
+	
+	/**
+	 * Check to see if the order food has normal taste.
+	 * @return true if the order food has normal taste, otherwise false.
+	 */
+	public boolean hasNormalTaste(){
+		return tasteGroup == null ? false : tasteGroup.hasNormalTaste();
+	}
+	
+	/**
+	 * Check to see if the order food has temporary taste.
+	 * @return true if the order food has temporay taste, otherwise false
+	 */
+	public boolean hasTmpTaste(){
+		return tasteGroup == null ? false : tasteGroup.hasTmpTaste();
+	}
 	
 	/**
 	 * Return whether the order food is gifted.
@@ -52,7 +76,7 @@ public class SingleOrderFood {
 	 * @return the discount price to this food
 	 */
 	public float calcDiscountPrice(){
-		return (float)Math.round((unitPrice + taste.getPrice()) * orderCount * (1 - discount) * 100) / 100;
+		return (float)Math.round((unitPrice + (tasteGroup != null ? tasteGroup.getTastePrice() : 0)) * orderCount * (1 - discount) * 100) / 100;
 	}
 	
 	/**
@@ -70,7 +94,7 @@ public class SingleOrderFood {
 	 * @return the total price to this food
 	 */
 	public float calcPriceWithTaste(){
-		return (float)Math.round((unitPrice + taste.getPrice()) * discount * orderCount * 100) / 100;
+		return (float)Math.round((unitPrice + (tasteGroup != null ? tasteGroup.getTastePrice(): 0)) * discount * orderCount * 100) / 100;
 	}
 	
 	/**
