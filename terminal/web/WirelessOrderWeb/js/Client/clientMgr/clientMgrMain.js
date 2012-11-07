@@ -69,7 +69,6 @@ clientTypeOperationHandler = function(c){
 	var clientTypeParentID = Ext.getCmp('triggerClientTypeParentID');	
 	
 	if(c.type == cmObj.operation['insert']){
-		clientTypeWin.setTitle('添加客户类型');
 		clientTypeID.getEl().dom.parentElement.parentElement.style.display = 'none';
 		
 		clientTypeID.setValue();
@@ -80,6 +79,7 @@ clientTypeOperationHandler = function(c){
 		clientTypeName.clearInvalid();
 		clientTypeParentID.clearInvalid();
 		
+		clientTypeWin.setTitle('添加客户类型');
 		clientTypeWin.show();
 		clientTypeWin.center();
 	}else if(c.type == cmObj.operation['update']){
@@ -88,13 +88,13 @@ clientTypeOperationHandler = function(c){
 			Ext.example.msg('提示', '请选中一个客户类型再进行操作.');
 			return;
 		}
-		clientTypeWin.setTitle('修改客户类型');
 		clientTypeID.getEl().dom.parentElement.parentElement.style.display = 'block';
 		
 		clientTypeID.setValue(sn.attributes.clientTypeID);
 		clientTypeName.setValue(sn.attributes.clientTypeName);
 		clientTypeParentID.setValue(sn);
 		
+		clientTypeWin.setTitle('修改客户类型');
 		clientTypeWin.show();
 		clientTypeWin.center();
 	}else if(c.type == cmObj.operation['delete']){

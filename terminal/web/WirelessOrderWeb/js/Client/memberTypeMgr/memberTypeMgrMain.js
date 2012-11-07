@@ -4,7 +4,7 @@
 	imgHeight : 50,
 	tooltip : '添加会员类型',
 	handler : function(e){
-		
+		insertMemberTypeHandler();
 	}
 });
 
@@ -30,11 +30,54 @@ var btnLogOut =  new Ext.ux.ImageButton({
 
 /**********************************************************************/
 
+insertMemberTypeHandler = function(){
+	memberTypeOperationHandler({
+		type : mtObj.operation['insert']
+	});
+};
+
+updateMemberTypeHandler = function(){
+	memberTypeOperationHandler({
+		type : mtObj.operation['update']
+	});
+};
+
+deleteMemberTypeHandler = function(){
+	memberTypeOperationHandler({
+		type : mtObj.operation['delete']
+	});
+};
+
+memberTypeOperationHandler = function(c){
+	if(c == null || typeof c == 'undefined' || typeof c.type == 'undefined'){
+		return;
+	}
+	memberTypeWin.otype = c.type;
+	
+	if(c.type == mtObj.operation['insert']){
+		
+		memberTypeWin.setTitle('添加会员类别');
+		memberTypeWin.show();
+		memberTypeWin.center();
+		
+	}else if(c.type == mtObj.operation['update']){
+		
+		memberTypeWin.setTitle('修改会员类别');
+		memberTypeWin.show();
+		memberTypeWin.center();
+		
+	}else if(c.type == mtObj.operation['delete']){
+		alert(c.type);
+	}
+	
+};
+
+/**********************************************************************/
 memberTypeRenderer = function(){
 	return ''
-		   + '<a href="">修改</a>'
+		   + '<a href="javascript:updateMemberTypeHandler()">修改</a>'
 		   + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-		   + '<a href="">删除</a>';
+		   + '<a href="javascript:deleteMemberTypeHandler()">删除</a>';
 };
 
 var memberTypeGridTbar = new Ext.Toolbar({
@@ -75,21 +118,21 @@ var memberTypeGridTbar = new Ext.Toolbar({
 		id : 'btnInsertMemberType',
 		iconCls : 'btn_add',
 		handler : function(e){
-			
+			insertMemberTypeHandler();
 		}
 	}, {
 		text : '修改',
 		id : 'btnUpdateMemberType',
 		iconCls : 'btn_edit',
 		handler : function(e){
-			
+			updateMemberTypeHandler();
 		}
 	}, {
 		text : '删除',
 		id : 'btnDeleteMemberType',
 		iconCls : 'btn_delete',
 		handler : function(e){
-			
+			deleteMemberTypeHandler();
 		}
 	}]
 });
