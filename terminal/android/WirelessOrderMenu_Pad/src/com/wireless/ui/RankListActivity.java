@@ -8,7 +8,6 @@ import java.util.Comparator;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -306,7 +305,10 @@ public class RankListActivity extends Activity {
 					view.setTag(food);
 					//显示排位信息
 					TextView foodNameTextView = (TextView)view.findViewById(R.id.textView_name_rankList_item);
-					foodNameTextView.setText(food.name);
+					if(food.name.length() > 7)
+						foodNameTextView.setText(food.name.substring(0, 7));
+					else foodNameTextView.setText(food.name);
+					
 					TextView numberTextView = (TextView)view.findViewById(R.id.textView_num_rankList_item);
 					numberTextView.setText("" + ++position);
 					
@@ -346,8 +348,8 @@ public class RankListActivity extends Activity {
 					activity.mImageHandler.sendMessage(msg);
 					//设置点击的显示
 					if(parent.getTag() != null)
-						((View)parent.getTag()).setBackgroundColor(activity.getResources().getColor(R.color.grey));
-					view.setBackgroundColor(Color.CYAN);
+						((View)parent.getTag()).setBackgroundColor(activity.getResources().getColor(R.color.gray));
+					view.setBackgroundColor(activity.getResources().getColor(R.color.blue));
 					parent.setTag(view);
 				}
 			});

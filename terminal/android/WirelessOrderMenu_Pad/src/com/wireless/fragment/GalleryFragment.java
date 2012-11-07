@@ -38,6 +38,8 @@ public class GalleryFragment extends Fragment {
 	private List<Food> mFoods = new ArrayList<Food>();
 	private ImageFetcher mImgFetcher;
 	
+	private int mCurrentPosition = 0;
+	
 	public interface OnPicChangedListener{
 		void onPicChanged(Food curFood, int position);
 	}
@@ -89,7 +91,11 @@ public class GalleryFragment extends Fragment {
 	 * @param position
 	 */
 	public void setPosition(int position){
-		mViewPager.setCurrentItem(position);
+		if(mCurrentPosition != position)
+		{
+			mViewPager.setCurrentItem(position);
+			mCurrentPosition = position;
+		}
 	}
 	
 	/**
@@ -100,7 +106,11 @@ public class GalleryFragment extends Fragment {
 		int pos = 0;
 		for(Food food : mFoods){
 			if(food.equals(foodToSet)){
-				mViewPager.setCurrentItem(pos);
+				if(mCurrentPosition != pos)
+				{
+					mViewPager.setCurrentItem(pos);
+					mCurrentPosition = pos;
+				}
 				break;
 			}
 			pos++;
@@ -110,6 +120,7 @@ public class GalleryFragment extends Fragment {
 	public void notifyDataChanged(ArrayList<Food> foods){
 		mFoods = foods;
 		mGalleryAdapter.notifyDataSetChanged();
+		mCurrentPosition = 0;
 	}
 	
 	/**
@@ -118,7 +129,8 @@ public class GalleryFragment extends Fragment {
 	 */
 	public void notifyDataChanged(Food[] foods){
 		mFoods = Arrays.asList(foods);
-		mGalleryAdapter.notifyDataSetChanged();		
+		mGalleryAdapter.notifyDataSetChanged();	
+		mCurrentPosition = 0;
 	}
 	
 	public int getSelectedPosition(){

@@ -70,6 +70,14 @@ public class MainActivity extends Activity
 			}
 		});
 		
+		((ImageView) findViewById(R.id.imageView_logo)).setOnLongClickListener(new View.OnLongClickListener() {
+			@Override
+			public boolean onLongClick(View v) {
+				startActivity(new Intent(MainActivity.this,SettingActivity.class));
+				return true;
+			}
+		});
+		
 		mFoodCompByKitchen = new Comparator<Food>() {
 			@Override
 			public int compare(Food food1, Food food2) {
@@ -237,6 +245,32 @@ public class MainActivity extends Activity
 		mItemFragment.performClick(0);
 		
 		((OptionBarFragment)this.getFragmentManager().findFragmentById(R.id.bottombar)).setBackButtonDisable();
+		
+//		final EditText searchEditText = (EditText) findViewById(R.id.editText_main);
+//		final SearchRunnable runnable = new SearchRunnable(); 
+//		searchEditText.addTextChangedListener(new TextWatcher(){
+//			@Override
+//			public void beforeTextChanged(CharSequence s, int start, int count,
+//					int after) {
+//				
+//			}
+//
+//			@Override
+//			public void onTextChanged(CharSequence s, int start, int before,
+//					int count) {
+//				
+//			}
+//
+//			@Override
+//			public void afterTextChanged(Editable s) {
+//				searchEditText.removeCallbacks(runnable);
+//				if(!searchEditText.getText().toString().equals(""))
+//				{
+//					runnable.setPosition(Integer.valueOf(searchEditText.getText().toString()));
+//					searchEditText.postDelayed(runnable, 500);
+//				}
+//			}
+//		});
 	}
 
 	/**
@@ -282,4 +316,17 @@ public class MainActivity extends Activity
 		intent.putExtras(bundle);
 		startActivity(intent);
 	}  
+	
+//	class SearchRunnable implements Runnable{
+//		private int mPos;
+//
+//		public void setPosition(int mPos) {
+//			this.mPos = mPos;
+//		}
+//
+//		@Override
+//		public void run() {
+//			mPicBrowserFragment.setPosition(mPos);
+//		}
+//	}
 }

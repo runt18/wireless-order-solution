@@ -24,7 +24,7 @@ public class ExpandableListFragment extends Fragment{
 	
 	private ExpandableListView mListView;
 	private KitchenExpandableAdapter mAdapter;
-	
+	private Kitchen mCurrentKitchen;
 	
 	private OnItemChangeListener mOnItemChangeListener;
 
@@ -63,7 +63,10 @@ public class ExpandableListFragment extends Fragment{
 	 */
 	public void performClick(int groupPosition){
 		mListView.expandGroup(groupPosition);
-		final int childPos = ++groupPosition;
+		final int childPos = groupPosition+1;
+		
+//		//保存第一个数据
+		mCurrentKitchen = mChildren.get(groupPosition).get(0);
 		getView().postDelayed(new Runnable(){
 			@Override
 			public void run() {
@@ -71,7 +74,6 @@ public class ExpandableListFragment extends Fragment{
 			}
 		}, 100);
 	}
-	//TODO 设置标志，取消连锁反应
 	/**
 	 * 设置ListView显示某个特定的厨房
 	 * @param kitchenToSet
@@ -91,8 +93,21 @@ public class ExpandableListFragment extends Fragment{
 				}
 				groupPos++;
 			}
-//			this.performClick(positions[0]);	
-//			mListView.expandGroup(positions[0]);
+			int groupCount = mListView.getExpandableListAdapter().getGroupCount();
+			
+			for(int i=0;i<groupCount;i++)
+			{
+				if(mListView.isGroupExpanded(i))
+				{
+//					mListView.setTag(null);
+					mListView.collapseGroup(i);
+				}
+			}
+			//FIXME 修正跳到第一个的问题
+			//计算出回调的位置，模拟被点击
+			mListView.expandGroup(positions[0]);
+			int childPos = positions[0] + positions[1] + 1;
+			mListView.performItemClick(mListView.getChildAt(childPos), childPos, childPos);
 	}
 	
 	/**
@@ -117,21 +132,17 @@ public class ExpandableListFragment extends Fragment{
 			@Override
 			public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
 				final Kitchen currentKitchen = mChildren.get(groupPosition).get(childPosition);
-				//更改点击显示样式
-				if(parent.getTag() != null)
+				if(!currentKitchen.equals(mCurrentKitchen))
 				{
-					((View)(parent.getTag())).setBackgroundDrawable(null);
+					v.post(new Runnable(){
+						@Override
+						public void run() {
+							//通知侦听器改变
+							mOnItemChangeListener.onItemChange(currentKitchen);	
+						}
+					});
+					mCurrentKitchen = currentKitchen;
 				}
-				parent.setTag(v);
-				v.setBackgroundColor(v.getResources().getColor(R.color.blue));
-				
-				v.post(new Runnable(){
-					@Override
-					public void run() {
-						//通知侦听器改变
-						mOnItemChangeListener.onItemChange(currentKitchen);						
-					}
-				});
 
 				return false;
 			}
@@ -204,13 +215,13 @@ public class ExpandableListFragment extends Fragment{
 			} else {
 				view = View.inflate(ExpandableListFragment.this.getActivity(), R.layout.xpd_lstview_child, null);
 			}
-			((TextView) view.findViewById(R.id.mychild)).setText(mChildren.get(groupPosition).get(childPosition).name);
-//			//如果是第一个且之前没有按下过child，则默认设置第一个按下
-//			if(mListView.getTag() != null)
-//			{
-//				view.setBackgroundColor(getResources().getColor(R.color.blue));
-//				mListView.setTag(view);
-//			}
+			Kitchen kitchen = mChildren.get(groupPosition).get(childPosition);
+			((TextView) view.findViewById(R.id.mychild)).setText(kitchen.name);
+			
+			//更改点击显示样式
+			if(mCurrentKitchen.equals(kitchen))
+				view.setBackgroundColor(view.getResources().getColor(R.color.blue));
+			else view.setBackgroundDrawable(null);
 			return view;
 		}
 

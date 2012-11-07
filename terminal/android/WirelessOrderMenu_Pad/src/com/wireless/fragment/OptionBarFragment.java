@@ -42,10 +42,14 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 	private Dialog mDialog;
 	private TabHost mTabHost;
 
+	private static boolean TABLE_FIXED = false;
+	private static boolean STAFF_FIXED = false;
 	
 	private BBarHandler  mBBarRefleshHandler;
 	
 	private OnOrderChangeListener mOnOrderChangeListener;
+	private Button mTableNumBtn;
+	private Button mStaffBtn;
 	
 	private static class BBarHandler extends Handler{		
 		
@@ -109,36 +113,42 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 		mBBarRefleshHandler = new BBarHandler(this);
 		ShoppingCart.instance().setOnFoodsChangeListener(this);
 		mBBarRefleshHandler.sendEmptyMessage(0);
+		
+		if(!STAFF_FIXED){
+			mStaffBtn.setClickable(true);
+		}else mStaffBtn.setClickable(false);
+		
+		if(!TABLE_FIXED)
+			mTableNumBtn.setClickable(true);
+		else mTableNumBtn.setClickable(false);
 	}
 	
+	public static boolean isTableFixed() {
+		return TABLE_FIXED;
+	}
+
+	public static void setTableFixed(boolean tABLE_FIXED) {
+		TABLE_FIXED = tABLE_FIXED;
+	}
+
+	public static boolean isStaffFixed() {
+		return STAFF_FIXED;
+	}
+
+	public static void setStaffFixed(boolean sTAFF_FIXED) {
+		STAFF_FIXED = sTAFF_FIXED;
+	}
+
 	/**
 	 * 初始化BBar上的控件
 	 */
 	private void init(final Activity activity){
 		//餐台选择Button
-		Button mTableNumBtn = (Button) getActivity().findViewById(R.id.button_table_bottombar);
-		mTableNumBtn.setOnClickListener(new View.OnClickListener() {			
-			@Override
-			public void onClick(View v) {
-				if(mDialog == null)
-					initDialog(activity);
-				mTabHost.setCurrentTabByTag(TAB_PICK_TBL);
-				mDialog.show();
-			}
-		});
-
+		mTableNumBtn = (Button) getActivity().findViewById(R.id.button_table_bottombar);
 		//服务员选择Button
-		Button mStaffBtn = (Button) getActivity().findViewById(R.id.button_server_bottomBar);
-		mStaffBtn.setOnClickListener(new View.OnClickListener() {			
-			@Override
-			public void onClick(View v) {
-				if(mDialog == null)
-					initDialog(activity);
-				mTabHost.setCurrentTabByTag(TAB_PICK_STAFF);
-				mDialog.show();
-			}
-		});
-		
+		mStaffBtn = (Button) getActivity().findViewById(R.id.button_server_bottomBar);
+		//已点菜button
+		Button mSelectedFoodBtn = (Button) getActivity().findViewById(R.id.button_pickedFood_bottomBar);
 		//会员选择Button
 //		ImageView vipImgView = (ImageView)activity.findViewById(R.id.imageView_vip);
 //		vipImgView.setOnClickListener(new View.OnClickListener() {			
@@ -150,8 +160,27 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 //				mDialog.show();
 //			}
 //		});
-		//已点菜button
-		Button mSelectedFoodBtn = (Button) getActivity().findViewById(R.id.button_pickedFood_bottomBar);
+		
+		mStaffBtn.setOnClickListener(new View.OnClickListener() {			
+			@Override
+			public void onClick(View v) {
+				if(mDialog == null)
+					initDialog(activity);
+				mTabHost.setCurrentTabByTag(TAB_PICK_STAFF);
+				mDialog.show();
+			}
+		});
+	
+		mTableNumBtn.setOnClickListener(new View.OnClickListener() {			
+			@Override
+			public void onClick(View v) {
+				if(mDialog == null)
+					initDialog(activity);
+				mTabHost.setCurrentTabByTag(TAB_PICK_TBL);
+				mDialog.show();
+			}
+		});
+		
 		mSelectedFoodBtn.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
@@ -163,6 +192,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 				}
 			}
 		});
+		
 		//返回按钮
 		Button backBtn = (Button) getActivity().findViewById(R.id.button_back_bottomBar);
 		backBtn.setOnClickListener(new View.OnClickListener() {
