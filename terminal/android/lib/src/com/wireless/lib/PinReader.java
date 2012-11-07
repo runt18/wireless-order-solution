@@ -23,6 +23,7 @@ public class PinReader {
 		while((val = in.read()) != -1){
 			pinValue.append((char)val);
 		}
+		in.close();
 		return pinValue.toString();
 	}
 }
