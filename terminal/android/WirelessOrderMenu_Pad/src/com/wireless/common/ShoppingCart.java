@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.wireless.excep.BusinessException;
-import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.StaffTerminal;
@@ -63,17 +62,17 @@ public final class ShoppingCart {
 	public void commit(OnCommitListener commitListener) throws BusinessException{
 		if(mOriOrder != null){
 			checkCommitValid();
-			mOriOrder.addFoods(mNewOrder.foods);
-			new CommitOrderTask(mOriOrder, commitListener).execute(Type.UPDATE_ORDER);
+			Order reqOrder = new Order(mOriOrder.foods, mDestTable.aliasID, mDestTable.customNum);		
+			reqOrder.orderDate = mOriOrder.orderDate;
+			if(hasNewOrder()){
+				reqOrder.addFoods(mNewOrder.foods);
+			}
+			new CommitOrderTask(reqOrder, commitListener).execute(Type.UPDATE_ORDER);
 			
 		}else{
-			if(mNewOrder != null){
-				throw new BusinessException(ErrorCode.UNKNOWN);
-			}else{
-				checkCommitValid();
-				mNewOrder.destTbl = mDestTable;
-				new CommitOrderTask(mNewOrder, commitListener).execute(Type.INSERT_ORDER);
-			}
+			checkCommitValid();
+			Order reqOrder = new Order(mNewOrder.foods, mDestTable.aliasID, mDestTable.customNum);			
+			new CommitOrderTask(reqOrder, commitListener).execute(Type.INSERT_ORDER);
 		}
 	}
 	
@@ -99,23 +98,19 @@ public final class ShoppingCart {
 	/**
 	 * Check to see whether the commit parameters are valid.
 	 * @throws BusinessException
-	 * 			throws with ErrorCode.TABLE_NOT_EXIST in case table NOT set<br>
-	 * 			throws with ErrorCode.TERMINAL_NOT_ATTACHED is case staff NOT set
+	 * 				Throws in one of cases below.<br>
+	 * 				1 - table NOT be set<br>
+	 * 				2 - staff NOT be set<br>
+	 * 				3 - order NOT be set<br>
 	 */
 	public void checkCommitValid() throws BusinessException{
 		if(mDestTable == null){
-			throw new BusinessException(ErrorCode.TABLE_NOT_EXIST);
+			throw new BusinessException("您还未设置餐台，暂时不能提交");
 		}else if(mStaff == null){
-			throw new BusinessException(ErrorCode.TERMINAL_NOT_ATTACHED);
+			throw new BusinessException("您还未设置服务员，暂时不能提交");
+		}else if(!hasOrder()){
+			throw new BusinessException("您还未点菜，暂时不能提交");
 		}
-	}
-	
-	/**
-	 * Return the list to extra foods.
-	 * @return
-	 */
-	public List<OrderFood> getExtraFoods(){
-		return Arrays.asList(mNewOrder.foods);
 	}
 	
 	/**
@@ -194,17 +189,23 @@ public final class ShoppingCart {
 	}
 	
 	/**
+	 * Get the staff. 
 	 * @return the mStaff
 	 */
 	public StaffTerminal getStaff() {
 		return mStaff;
 	}
 	
+	/**
+	 * Check to see whether the staff has been set.
+	 * @return true if the staff has been set, otherwise false
+	 */
 	public boolean hasStaff(){
 		return mStaff == null ? false : true;
 	}
 
 	/**
+	 * Set the staff.
 	 * @param mStaff
 	 *            the mStaff to set
 	 */
@@ -233,21 +234,52 @@ public final class ShoppingCart {
 	public Order getOriOrder() {
 		return mOriOrder;
 	}
+	
+	public List<OrderFood> getOriFoods(){
+		if(mOriOrder != null && mOriOrder.foods != null){
+			return Arrays.asList(mOriOrder.foods);
+		}else{
+			return new ArrayList<OrderFood>(0);
+		}		
+	}
+	
+	/**
+	 * Return the list to extra foods.
+	 * @return
+	 */
+	public List<OrderFood> getNewFoods(){
+		if(mNewOrder != null && mNewOrder.foods != null){
+			return Arrays.asList(mNewOrder.foods);
+		}else{
+			return new ArrayList<OrderFood>(0);
+		}
+	}
+	
+	public Order getNewOrder(){
+		return mNewOrder;
+	}
+	
+	public List<OrderFood> getAllFoods(){
+		ArrayList<OrderFood> allFoods = new ArrayList<OrderFood>();
+		if(hasNewOrder()){
+			allFoods.addAll(getNewFoods());
+		}
+		if(hasOriOrder()){
+			allFoods.addAll(getOriFoods());
+		}		
+		return allFoods;		
+	}
 
 	public void setOriOrder(Order mOriOrder) {
 		this.mOriOrder = mOriOrder;
 		notifyFoodsChange();
 	}
-
-	public boolean hasExtraFoods(){
-		if(mNewOrder != null){
-			return mNewOrder.foods != null ? mNewOrder.foods.length != 0 : false;
-		}else{
-			return false;
-		}
+	
+	public boolean hasTable(){
+		return mDestTable == null ? false : true;
 	}
 	
-	public boolean hasOriFoods(){
+	public boolean hasOriOrder(){
 		if(mOriOrder != null){
 			return mOriOrder.foods != null ? mOriOrder.foods.length != 0 : false;
 		}else{
@@ -255,41 +287,25 @@ public final class ShoppingCart {
 		}
 	}
 	
-	public boolean hasFoods(){
-		return hasExtraFoods() || hasOriFoods();
-	}
-	
-	public boolean hasTable(){
-		return mDestTable == null ? false : true;
+	public boolean hasNewOrder(){
+		if(mNewOrder != null){
+			return mNewOrder.foods != null ? mNewOrder.foods.length != 0 : false;
+		}else{
+			return false;
+		}
 	}
 	
 	public boolean hasOrder(){
-		return mOriOrder !=  null ? true : false;
-	}
-	
+		return hasOriOrder() || hasNewOrder();
+	}	
+
+
 	private void notifyFoodsChange(){
-		if(mOnFoodsChangeListener != null)
-		{
+		if(mOnFoodsChangeListener != null){
 			mOnFoodsChangeListener.onFoodsChange(getAllFoods());
 		}
 	}
 	
-	public ArrayList<OrderFood> getAllFoods(){
-		ArrayList<OrderFood> newFoods = new ArrayList<OrderFood>();
-		if(mOriOrder != null)
-		{
-			for(OrderFood f:mOriOrder.foods)
-				newFoods.add(f);
-		}
-		if(hasExtraFoods())
-		{
-			for(OrderFood f:getExtraFoods())
-				newFoods.add(f);
-		}
-		
-		return newFoods;
-	}
-
 	/**
 	 * 执行账单的提交请求
 	 */

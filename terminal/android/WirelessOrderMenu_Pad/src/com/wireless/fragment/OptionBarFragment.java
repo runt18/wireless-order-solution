@@ -45,7 +45,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 	private static boolean TABLE_FIXED = false;
 	private static boolean STAFF_FIXED = false;
 	
-	private BBarHandler  mBBarRefleshHandler;
+	private BBarHandler mBBarRefleshHandler;
 	
 	private OnOrderChangeListener mOnOrderChangeListener;
 	private Button mTableNumBtn;
@@ -78,7 +78,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 			}
 			
 			//BBar显示已点菜的数量
-			if(ShoppingCart.instance().hasFoods()){
+			if(ShoppingCart.instance().hasOrder()){
 				mSelectedFoodBtn.setText("" + ShoppingCart.instance().getAllFoods().size());
 			}else{
 				mSelectedFoodBtn.setText("" + 0);
@@ -184,9 +184,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 		mSelectedFoodBtn.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				if(!(activity instanceof PickedFoodActivity) && 
-						(ShoppingCart.instance().getOriOrder() != null || !ShoppingCart.instance().getExtraFoods().isEmpty()))
-				{
+				if(!(activity instanceof PickedFoodActivity) && ShoppingCart.instance().hasOrder()){
 					Intent intent = new Intent(activity,PickedFoodActivity.class);
 					activity.startActivity(intent);
 				}
