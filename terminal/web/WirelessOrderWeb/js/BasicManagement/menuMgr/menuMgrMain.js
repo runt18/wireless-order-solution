@@ -902,7 +902,7 @@ Ext.onReady(function() {
 			closeAction : 'hide',
 			closable : false,
 			collapsed : true,
-			constrain  : true,
+//			constrain  : true,
 //			draggable : false,
 			modal : true,
 			resizable : false,
@@ -1071,6 +1071,7 @@ Ext.onReady(function() {
 	}
 
 	foodOperationWin.operation == mmObj.operation.select;
+	foodOperationWin.setPosition(foodOperationWin.width * -1, 100);
 	foodOperationWin.show();
 	var foWinTab = Ext.getCmp('foodOperationWinTab');
 	foWinTab.setActiveTab('tasteOperationTab');

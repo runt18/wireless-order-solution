@@ -4,10 +4,10 @@ addTasteHandler = function(thiz){
 	var sr = thiz.getSelectionModel().getSelections()[0];
 	var cs = true;
 	
-	if(hgs.getCount() >= 3){
-		Ext.example.msg('提示', '该菜品已选择三种口味,最多只能选择三种.');
-		return;
-	}
+//	if(hgs.getCount() >= 3){
+//		Ext.example.msg('提示', '该菜品已选择三种口味,最多只能选择三种.');
+//		return;
+//	}
 	
 	hgs.each(function(r){
 		if(r.get('tasteAliasID') == sr.get('tasteAliasID')){
@@ -169,23 +169,67 @@ refreshHaveTasteHandler = function(){
 	haveTasteGrid.getStore().removeAll();
 	
 	var or = Ext.getCmp('orderedGrid').getSelectionModel().getSelections()[0];
-	var ht = [], hd = {root:[]};
+	var tasteGroup = or.get('tasteGroup');
+	var hd = {root:[]};
 	
-	ht.push(or.get('tasteID'));
-	ht.push(or.get('tasteIDTwo'));
-	ht.push(or.get('tasteIDThree'));
-	
-	for(var i = 0; i < ht.length; i++){
-		if(ht[i] != null && typeof(ht[i]) != 'undefined'){
-			for(var j = 0; j < tasteMenuData.root.length; j++){
-				if(eval(tasteMenuData.root[j].tasteAliasID) == ht[i]){
-					hd.root.push(tasteMenuData.root[j]);
-					break;
+	if(tasteGroup != null && typeof tasteGroup.normalTasteContent != 'undefined'){
+		for(var i = 0; i < tasteGroup.normalTasteContent.length; i++){
+			var gt = tasteGroup.normalTasteContent[i];
+			if(gt != null && typeof gt != 'undefined'){
+				for(var j = 0; j < tasteMenuData.root.length; j++){
+					if(eval(tasteMenuData.root[j].tasteAliasID) == gt.tasteAliasID){
+						hd.root.push(tasteMenuData.root[j]);
+						break;
+					}
 				}
 			}
 		}
 	}
+	
 	haveTasteGrid.getStore().loadData(hd);
+};
+
+/**
+ * 对比菜品某部分信息
+ */
+compareFoodPart = function(c1, c2){
+	if(c1 == null || c2 == null || typeof c1 == 'undefined' || typeof c2 == 'undefined'){
+		return null;
+	}
+	if(eval(c1['status'] == 2 && c1['foodID'] == c2['foodID']  && c1['status'] == c2['status']))
+		return true;
+	else
+		return false;
+};
+
+/**
+ * 对比操作后的菜品口味是否一样
+ */
+compareNormalTasteContent = function(c1, c2){
+	if(c1 == null || c2 == null || typeof c1 == 'undefined' || typeof c2 == 'undefined'){
+		return null;
+	}
+	
+	var checkStatus = true;
+	if(c1.length == 0 && c2.length == 0){
+		checkStatus = true;
+	}else if(c1.length != c2.length){
+		checkStatus = false;
+	}else if(c1.length == c2.length){
+		c1.sort(function(a, b){
+			return eval(a['tasteID'] > b['tasteID']) ? 1 : -1;
+		});
+		c2.sort(function(a, b){
+			return eval(a['tasteID'] > b['tasteID']) ? 1 : -1;
+		});
+		for(var i = 0; i < c1.length; i++){
+			if(eval(c1[i]['tasteID'] != c2[i]['tasteID'])){
+				checkStatus = false;
+				break;
+			}
+		}
+	}
+	return checkStatus;
 };
 
 var choosenTasteWin = new Ext.Window({
@@ -214,39 +258,31 @@ var choosenTasteWin = new Ext.Window({
 			text : '保存',
 	    	iconCls : 'btn_save',
 			handler : function(){
-				var or = Ext.getCmp('orderedGrid').getSelectionModel().getSelections()[0];
+				var or = Ext.ux.getSelData('orderedGrid');
 				var htgs = haveTasteGrid.getStore();
-				var tastePref = '';
+				var tasteGroup = {
+					normalTasteContent:[],
+					normalTaste:{
+						tasteName : ''
+					}, 
+					tempTaste:{}
+				};			
 				
+				// 
+				for(var i = 0; i < htgs.data.length; i++){
+					var v = htgs.data.get(i).data;
+					tasteGroup.normalTaste.tasteName += ((i > 0 ? ';' : '') + v.tasteName);
+					tasteGroup.normalTasteContent.push(v);
+				}
+				// 修改原数据
 				for(var i = 0; i < orderedData.root.length; i++){
-					if(eval(orderedData.root[i].foodID == or.get('foodID') && orderedData.root[i].status == 2 && orderedData.root[i].status == or.get('status'))){
-						if(orderedData.root[i].tasteID == or.get('tasteID') && orderedData.root[i].tasteIDTwo == or.get('tasteIDTwo') && orderedData.root[i].tasteIDThree == or.get('tasteIDThree')){
-							if(typeof(htgs.getAt(0)) != 'undefined'){
-								orderedData.root[i].tasteID  = htgs.getAt(0).get('tasteAliasID');
-								tastePref += (tastePref.length > 0 ? ';' : '');
-								tastePref += htgs.getAt(0).get('tasteName');
-							}else{
-								orderedData.root[i].tasteID = 0;
-							}
-							if(typeof(htgs.getAt(1)) != 'undefined'){
-								orderedData.root[i].tasteIDTwo  = htgs.getAt(1).get('tasteAliasID');
-								tastePref += (tastePref.length > 0 ? ';' : '');
-								tastePref += htgs.getAt(1).get('tasteName');
-							}else{
-								orderedData.root[i].tasteIDTwo = 0;
-							}
-							if(typeof(htgs.getAt(2)) != 'undefined'){
-								orderedData.root[i].tasteIDThree = htgs.getAt(2).get('tasteAliasID');
-								tastePref += (tastePref.length > 0 ? ';' : '');
-								tastePref += htgs.getAt(2).get('tasteName');
-							}else{
-								orderedData.root[i].tasteIDThree = 0;
-							}
-							orderedData.root[i].tastePref = tastePref.length > 0 ? tastePref : '无口味 ';
+					if(compareFoodPart(orderedData.root[i], or) == true){
+						if(compareNormalTasteContent(orderedData.root[i].tasteGroup.normalTasteContent, or['tasteGroup'].normalTasteContent) == true){
+							orderedData.root[i].tasteGroup = tasteGroup;
+							orderedData.root[i].tastePref = tasteGroup.normalTaste.tasteName.length > 0 ? tasteGroup.normalTaste.tasteName : '无口味';
 						}
 					}
 				}
-				
 				// 合并重复数据
 				var tempData = {root:[]};
 				for(var i = 0; i < orderedData.root.length; i++){
@@ -255,10 +291,8 @@ var choosenTasteWin = new Ext.Window({
 					}else{
 						var cs = true;
 						for(var j = 0; j < tempData.root.length; j++){
-							if(tempData.root[j].status == 2 && tempData.root[j].foodID == orderedData.root[i].foodID && tempData.root[j].status == orderedData.root[i].status){
-								if(eval(tempData.root[j].tasteID == orderedData.root[i].tasteID)
-										&& eval(tempData.root[j].tasteIDTwo == orderedData.root[i].tasteIDTwo)
-										&& eval(tempData.root[j].tasteIDThree == orderedData.root[i].tasteIDThree)){
+							if(compareFoodPart(tempData.root[j], orderedData.root[i]) == true){
+								if(compareNormalTasteContent(tempData.root[j].tasteGroup.normalTasteContent,  orderedData.root[i].tasteGroup.normalTasteContent) == true){
 									cs = false;
 									tempData.root[j].count += orderedData.root[i].count;
 								}
@@ -335,12 +369,9 @@ dishCountInputWin = new Ext.Window({
 				dishCountInputWin.hide();
 				var ds = orderedGrid.getStore().getAt(dishOrderCurrRowIndex_).data;
 				for(var i = 0; i < orderedData.root.length; i++){						
-					if(ds.foodID == orderedData.root[i].foodID && ds.status == orderedData.root[i].status){							
-						if(eval(ds.tasteID == orderedData.root[i].tasteID)
-								&& eval(ds.tasteIDTwo == orderedData.root[i].tasteIDTwo)
-								&& eval(ds.tasteIDThree == orderedData.root[i].tasteIDThree)){
+					if(compareFoodPart(orderedData.root[i], ds) == true){
+						if(compareNormalTasteContent(ds.tasteGroup.normalTasteContent,  orderedData.root[i].tasteGroup.normalTasteContent) == true){
 							orderedData.root[i].count = inputCount.getValue();
-							break;
 						}
 					}
 				}
@@ -373,52 +404,6 @@ dishCountInputWin = new Ext.Window({
 		}
 	}]
 });
-
-// 已点菜式
-// 2，表格的数据store
-var orderedStore = new Ext.data.Store({
-	proxy : new Ext.data.MemoryProxy(orderedData),
-	reader : new Ext.data.JsonReader(Ext.ux.readConfig,
-	    [ 
-			{name : 'foodName'},
-			{name : 'displayFoodName'}, 
-			{name : 'tastePref'}, 
-			{name : 'count'}, 
-			{name : 'unitPrice'}, 
-			{name : 'dishOpt'}, 
-			{name : 'discount'}, 
-			{name : 'orderDateFormat'}, 
-			{name : 'waiter'}, 		    
-			{name : 'acturalPrice'}, 
-			{name : 'foodID'}, 
-			{name : 'currPrice'}, 
-			{name : 'gift'}, 
-			{name : 'recommend'}, 
-			{name : 'soldout'}, 
-			{name : 'special'}, 
-			{name : 'seqID'}, 
-			{name : 'status'},
-			{name : 'count'},
-			{name : 'tasteID'},
-			{name : 'tasteIDThree'},
-			{name : 'tasteIDTwo'},
-			{name : 'tastePrice'},
-			{name : 'temporary'},
-			{name : 'aliasID'}
-		]
-	),
-	listeners : {
-		load : function(thiz, records){
-			for(var i = 0; i < records.length; i++){
-				Ext.ux.formatFoodName(records[i], 'displayFoodName', 'foodName');
-			}
-		}
-	}
-});
-
-//orderedStore.reload();
-// 底色处理，已点菜式原色底色
-//dishGridRefresh();
 
 var dishPushBackWin = new Ext.Window({
 	layout : 'fit',
@@ -476,10 +461,7 @@ var dishPushBackWin = new Ext.Window({
 							var ds = orderedGrid.getStore().getAt(dishOrderCurrRowIndex_).data;
 							for(var i = 0; i < orderedData.root.length; i++){
 								if(ds.aliasID == orderedData.root[i].aliasID){
-									if(eval(ds.tasteID == orderedData.root[i].tasteID)
-											&& eval(ds.tasteIDTwo == orderedData.root[i].tasteIDTwo)
-											&& eval(ds.tasteIDThree == orderedData.root[i].tasteIDThree)){
-										
+									if(compareNormalTasteContent(ds.tasteGroup.normalTasteContent,  orderedData.root[i].tasteGroup.normalTasteContent) == true){
 										if((orderedData.root[i].count - pushCount) <= 0){
 											orderedData.root.splice(i,1);
 										}else if((orderedData.root[i].count - pushCount)> 0){
@@ -550,10 +532,8 @@ function dishOptDeleteHandler(rowIndex) {
 				fn : function(btn) {
 					if (btn == 'yes') {
 						for(var i = 0; i < orderedData.root.length; i++){						
-							if(ds.foodID == orderedData.root[i].foodID){
-								if(eval(ds.tasteID == orderedData.root[i].tasteID)
-										&& eval(ds.tasteIDTwo == orderedData.root[i].tasteIDTwo)
-										&& eval(ds.tasteIDThree == orderedData.root[i].tasteIDThree)){
+							if(compareFoodPart(orderedData.root[i], ds) == true){
+								if(compareNormalTasteContent(ds.tasteGroup.normalTasteContent,  orderedData.root[i].tasteGroup.normalTasteContent) == true){
 									orderedData.root.splice(i,1);
 									break;
 								}
@@ -593,6 +573,46 @@ function dishOptDispley(value, cellmeta, record, rowIndex, columnIndex, store) {
 function dishWaiterDispley(value, cellmeta, record, rowIndex, columnIndex, store) {
 	return Ext.getDom('optName').innerHTML;
 }
+
+// 已点菜式
+// 2，表格的数据store
+var orderedStore = new Ext.data.Store({
+	proxy : new Ext.data.MemoryProxy(orderedData),
+	reader : new Ext.data.JsonReader(Ext.ux.readConfig,
+	    [ 
+			{name : 'foodName'},
+			{name : 'displayFoodName'}, 
+			{name : 'count'}, 
+			{name : 'unitPrice'}, 
+			{name : 'dishOpt'}, 
+			{name : 'discount'}, 
+			{name : 'orderDateFormat'}, 
+			{name : 'waiter'}, 		    
+			{name : 'acturalPrice'}, 
+			{name : 'foodID'}, 
+			{name : 'currPrice'}, 
+			{name : 'gift'}, 
+			{name : 'recommend'}, 
+			{name : 'soldout'}, 
+			{name : 'special'}, 
+			{name : 'seqID'}, 
+			{name : 'status'},
+			{name : 'count'},
+			{name : 'temporary'},
+			{name : 'aliasID'},
+			{name : 'tastePref'},
+			{name : 'tastePrice'},
+			{name : 'tasteGroup'}
+		]
+	),
+	listeners : {
+		load : function(thiz, records){
+			for(var i = 0; i < records.length; i++){
+				Ext.ux.formatFoodName(records[i], 'displayFoodName', 'foodName');
+			}
+		}
+	}
+});
 
 var orderedColumnModel = new Ext.grid.ColumnModel([
     new Ext.grid.RowNumberer(),
@@ -699,11 +719,11 @@ var countAddImgBut = new Ext.ux.ImageButton({
 			if (ds.status == 2) {									
 				for(var i = 0; i < orderedData.root.length; i++){						
 					if(ds.foodID == orderedData.root[i].foodID && orderedData.root[i].status == 2){
-						if(eval(ds.tasteID == orderedData.root[i].tasteID)
-								&& eval(ds.tasteIDTwo == orderedData.root[i].tasteIDTwo)
-								&& eval(ds.tasteIDThree == orderedData.root[i].tasteIDThree)){
-							orderedData.root[i].count += 1;
-							break;
+						if(compareFoodPart(orderedData.root[i], ds) == true){							
+							if(compareNormalTasteContent(ds.tasteGroup.normalTasteContent,  orderedData.root[i].tasteGroup.normalTasteContent) == true){
+								orderedData.root[i].count += 1;
+								break;
+							}
 						}
 					}
 				}
@@ -731,11 +751,9 @@ var countMinusImgBut = new Ext.ux.ImageButton({
 			var ds = orderedGrid.getStore().getAt(dishOrderCurrRowIndex_).data;		
 			if (ds.status == 2) {
 				if (ds.count > 1) {
-					for(var i = 0; i < orderedData.root.length; i++){						
-						if(ds.foodID == orderedData.root[i].foodID && orderedData.root[i].status == 2){							
-							if(eval(ds.tasteID == orderedData.root[i].tasteID)
-									&& eval(ds.tasteIDTwo == orderedData.root[i].tasteIDTwo)
-									&& eval(ds.tasteIDThree == orderedData.root[i].tasteIDThree)){
+					for(var i = 0; i < orderedData.root.length; i++){			
+						if(compareFoodPart(orderedData.root[i], ds) == true){							
+							if(compareNormalTasteContent(ds.tasteGroup.normalTasteContent,  orderedData.root[i].tasteGroup.normalTasteContent) == true){
 								orderedData.root[i].count -= 1;
 								break;
 							}
@@ -1185,7 +1203,7 @@ allFoodTabPanelGrid.on('rowdblclick', function(thiz, ri, e){
 		if(typeof(orderedData) != 'undefined' && typeof(orderedData.root) != 'undefined' ){
 			for ( var i = 0; i < orderedData.root.length; i++) {
 				if (orderedData.root[i].foodID == r.get('foodID') && orderedData.root[i].status == 2) {
-					if(orderedData.root[i].tasteID == 0 && orderedData.root[i].tasteIDTwo == 0 && orderedData.root[i].tasteIDThree == 0){
+					if(orderedData.root[i].tasteGroup.normalTasteContent.length == 0){
 						orderedData.root[i].count += 1;
 						isAlreadyOrderd = false;
 						break;
@@ -1193,12 +1211,12 @@ allFoodTabPanelGrid.on('rowdblclick', function(thiz, ri, e){
 				}
 			}
 		}
+		
 //		alert('isAlreadyOrderd: '+isAlreadyOrderd)
 		if (isAlreadyOrderd) {
 			orderedData.root.push({
 				aliasID : r.get('foodAliasID'),
 				foodName : r.get('foodName'),
-				tastePref : '无口味',
 				count : 1,
 				unitPrice : r.get('unitPrice'),
 				acturalPrice : r.get('unitPrice'),
@@ -1218,11 +1236,14 @@ allFoodTabPanelGrid.on('rowdblclick', function(thiz, ri, e){
 				status : 2,
 				currPrice : r.get('currPrice'),
 				temporary : false,
-				tmpTaste : false,						
-				tmpTastePref : '',
-				tmpTastePrice : 0,
-				tmpTasteAlias : 0,
-				hangStatus : 0
+				hangStatus : 0,
+				tastePref : '无口味',
+				tastePrice : 0,
+				tasteGroup : {
+					normalTaste : {},
+					normalTasteContent : [],
+					tempTaste : {}
+				}
 			});
 		}
 		
@@ -1305,7 +1326,7 @@ var tempFoodTabPanel = new Ext.Panel({
 	    '->',
 	    {
 	    	text : '添加',
-	    	iconCls : 'sss',
+	    	iconCls : 'btn_add',
 	    	handler : function(e){
 	    		var name = Ext.getCmp('txtTempFoodName');
 	    		var count = Ext.getCmp('numTempFoodCount');
@@ -1330,16 +1351,15 @@ var tempFoodTabPanel = new Ext.Panel({
 					recommend : false,
 					soldout : false,
 					gift : false,
-					tastePrice : 0,
-					tasteID : 0,
-					tasteIDTwo : 0,
-					tasteIDThree : 0,
 					status : 2,
 					currPrice : false,
 					temporary : true,
 					tmpFoodName : name.getValue(),
 					tmpTasteAlias : 0,
-					hangStatus : 0
+					hangStatus : 0,
+					tasteGroup : {
+						
+					}
 				});		
 	    		
 	    		orderedStore.loadData(orderedData);
@@ -1558,23 +1578,23 @@ submitOrderHandler = function(c){
 		inputPersCount = inputPersCount == '' || inputPersCount == 0 ? 1 : inputPersCount;
 		var foodPara = '';
 		for ( var i = 0; i < orderedData.root.length; i++) {
-			foodPara += ( i > 0 ? '，' : '');
+			foodPara += ( i > 0 ? '<<sh>>' : '');
 			if (orderedData.root[i].temporary == false) {
 				// [是否临时菜(false),菜品1编号,菜品1数量,口味1编号,厨房1编号,菜品1折扣,2nd口味1编号,3rd口味1编号]，
+				var testeGroup = '';
+				for(var j = 0; j < orderedData.root[i].tasteGroup.normalTasteContent.length; j++){
+					var t = orderedData.root[i].tasteGroup.normalTasteContent[j];
+					testeGroup += ((j > 0 ? '<<st>>' : '') + (t.tasteID + 'stb' + t.tasteAliasID));
+				}
 				foodPara = foodPara 
-						+ '[false,'// 是否临时菜(false)
-						+ orderedData.root[i].aliasID + ',' // 菜品1编号
-						+ orderedData.root[i].count + ',' // 菜品1数量
-						+ orderedData.root[i].tasteID + ',' // 口味1编号
-						+ orderedData.root[i].kitchenId + ','// 厨房1编号
-						+ '0,'// 菜品1折扣
-						+ orderedData.root[i].tasteIDTwo + ','// 2nd口味1编号
-						+ orderedData.root[i].tasteIDThree + ',' // 3rd口味1编号
-						+ orderedData.root[i].tmpTaste + ',' // 是否临时口味
-						+ orderedData.root[i].tmpTastePref + ',' // 临时口味
-						+ orderedData.root[i].tmpTastePrice + ','  // 临时口味价钱
-						+ orderedData.root[i].tmpTasteAlias + ',' // 临时口味编号
-						+ orderedData.root[i].hangStatus + ','  // 菜品状态
+						+ '['
+						+ 'false' + '<<sb>>' // 是否临时菜(false)
+						+ orderedData.root[i].aliasID + '<<sb>>' // 菜品1编号
+						+ orderedData.root[i].count + '<<sb>>' // 菜品1数量
+						+ testeGroup + '<<sb>>'
+						+ orderedData.root[i].kitchenId + '<<sb>>'// 厨房1编号
+						+ '0' + '<<sb>>' // 菜品1折扣
+						+ orderedData.root[i].hangStatus + '<<sb>>'  // 菜品状态
 						+ orderedData.root[i].status  // 菜品操作状态 1:已点菜 2:新点菜 3:反结账
 						+ ']';
 			} else {
@@ -1582,12 +1602,13 @@ submitOrderHandler = function(c){
 				foodname = foodname.indexOf('<') > 0 ? foodname.substring(0,foodname.indexOf('<')) : foodname;
 				// [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价]
 				foodPara = foodPara 
-						+ '[true,'// 是否临时菜(true)
-						+ orderedData.root[i].aliasID + ',' // 临时菜1编号
-						+ foodname + ',' // 临时菜1名称
-						+ orderedData.root[i].count + ',' // 临时菜1数量
-						+ orderedData.root[i].unitPrice + ',' // 临时菜1单价(原料單價)
-						+ orderedData.root[i].hangStatus + ','  // 菜品状态
+						+ '['
+						+ 'true,'// 是否临时菜(true)
+						+ orderedData.root[i].aliasID + '<<sb>>' // 临时菜1编号
+						+ foodname + '<<sb>>' // 临时菜1名称
+						+ orderedData.root[i].count + '<<sb>>' // 临时菜1数量
+						+ orderedData.root[i].unitPrice + '<<sb>>' // 临时菜1单价(原料單價)
+						+ orderedData.root[i].hangStatus + '<<sb>>'  // 菜品状态
 						+ orderedData.root[i].status  // 菜品操作状态 1:已点菜 2:新点菜 3:反结账
 						+ ']';
 			}									
