@@ -200,7 +200,7 @@ clientOperationHandler = function(c){
 		}
 		Ext.Msg.show({
 			title : '提示',
-			msg : ((sd.memberAccount > 0 ? '<font color="red">该客户已关联会员账号!</font><br/>' : '') + '是否删除客户类型?'),
+			msg : ((sd.memberAccount > 0 ? '<font color="red">该客户已关联会员账号!</font><br/>' : '') + '是否删除客户?'),
 			buttons : Ext.Msg.YESNO,
 			fn : function(e){
 				if(e == 'yes'){
@@ -294,6 +294,7 @@ var clientTypeTreeTbar = new Ext.Toolbar({
 			clientTypeTree.getRootNode().reload();
 			Ext.getDom('clientTypeShowType').innerHTML = '----';
 			clientBasicGrid.getStore().baseParams['searchClientType'] = null;
+			Ext.getCmp('btnSearchClient').handler();
 		}
 	}]
 });
@@ -523,6 +524,13 @@ var clientBasicGrid = createGridPanel(
 	clientBasicGridTbar
 );	
 clientBasicGrid.region = 'center';
+clientBasicGrid.keys = [{
+	key : Ext.EventObject.ENTER,
+	fn : function(){ 
+		Ext.getCmp('btnSearchClient').handler();
+	},
+	scope : this 
+}];
 
 /**********************************************************************/
 var clientTypeWin;
