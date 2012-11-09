@@ -10,6 +10,7 @@ import com.wireless.db.Params;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
+import com.wireless.protocol.TasteGroup;
 
 public class Util {
 	public static String toOrderCate(int type) {
@@ -63,14 +64,14 @@ public class Util {
 		// remove the "{}"
 		submitFoods = submitFoods.substring(1, submitFoods.length() - 1);
 		// extract each food item string
-		String[] foodItems = submitFoods.split("，");
+		String[] foodItems = submitFoods.split("<<sh>>");
 		OrderFood[] foods = new OrderFood[foodItems.length];
 		for (int i = 0; i < foodItems.length; i++) {
 			// remove the "[]"
 			String foodItem = foodItems[i].substring(1,	foodItems[i].length() - 1);
 			foods[i] = new OrderFood();
 			// extract each food detail information string
-			String[] values = foodItem.split(",");
+			String[] values = foodItem.split("<<sb>>");
 			// extract the temporary flag
 			if (Boolean.parseBoolean(values[0])) {
 				// set the temporary flag
@@ -117,30 +118,23 @@ public class Util {
 				foods[i].aliasID = Integer.parseInt(values[1]);
 				// extract the amount to order food
 				foods[i].setCount(Float.parseFloat(values[2]));
-				// extract the taste alias id
-				foods[i].tastes[0].aliasID = Integer.parseInt(values[3]);
+				// extract the tasteGroup
+				String[] tasteGroup = values[3].split("<<st>>");
+				if(tasteGroup.length > 0){
+					foods[i].tasteGroup = new TasteGroup();
+					for(int j = 0; j < tasteGroup.length; j++){
+						String[] taste = tasteGroup[j].split("stb");
+						if(taste.length == 2){
+							foods[i].tasteGroup.addTaste(new Taste(Integer.valueOf(taste[0]), Integer.valueOf(taste[1]), 0));
+						}
+					}
+				}
 				// extract the kitchen number
 				foods[i].kitchen.aliasID = Short.parseShort(values[4]);
 				// extract the discount
 				foods[i].setDiscount(Float.parseFloat(values[5]));
-				// extract the 2nd taste alias id
-				foods[i].tastes[1].aliasID = Integer.parseInt(values[6]);
-				// extract the 3rd taste alias id
-				foods[i].tastes[2].aliasID = Integer.parseInt(values[7]);
-				// check to see whether containing temporary taste
-				if(Boolean.parseBoolean(values[8])){
-					foods[i].tmpTaste = new Taste();
-					//extract the value to temporary taste
-					foods[i].tmpTaste.setPreference(values[9]);
-					//extract the price to temporary taste
-					foods[i].tmpTaste.setPrice(Float.parseFloat(values[10]));
-					//extract the alias to temporary taste
-					foods[i].tmpTaste.aliasID = Integer.parseInt(values[11]);
-				}else{
-					foods[i].tmpTaste = null;
-				}
 				// extract the hang status 
-				foods[i].hangStatus = Short.parseShort(values[12]);
+				foods[i].hangStatus = Short.parseShort(values[6]);
 			}
 		}
 
