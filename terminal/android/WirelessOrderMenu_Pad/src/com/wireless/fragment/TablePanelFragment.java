@@ -62,14 +62,14 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 	private DataRefreshHandler mTableRefreshHandler;
 	private RegionRefreshHandler mRegionRefreshHandler;
 	
-	private OnTableChangedListener mOnTableChangedListener;
 	
 	private ViewFlipper mFlipper;
 	private GestureDetector mGDetector;
 	private int CURRENT_VIEW_ID = 0;
 	private int mPageSize = 0;
 
-	
+	private OnTableChangedListener mOnTableChangedListener;
+
 	public void setOnTableChangedListener(OnTableChangedListener l){
 		mOnTableChangedListener = l;
 	}

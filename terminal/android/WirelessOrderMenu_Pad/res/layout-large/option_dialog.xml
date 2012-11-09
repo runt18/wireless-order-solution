@@ -4,58 +4,58 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content" >
 
-    <TabHost
-        android:id="@+id/tabhost"
+    <RelativeLayout
+        android:id="@+id/relativeLayout1"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true" >
 
+        <Button
+            android:id="@+id/button_optionDialog_closeDialog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="关闭" />
+
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical" >
+            android:id="@+id/linearLayout1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true" >
 
-            <TabWidget
-                android:id="@android:id/tabs"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
-            </TabWidget>
+            <Button
+                android:id="@+id/button_optionDialog_tableSetting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="餐台设置"
+                android:visibility="visible" />
 
-            <FrameLayout
-                android:id="@android:id/tabcontent"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" >
-
-                <fragment
-                    android:id="@+id/tab1"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    class="com.wireless.fragment.TablePanelFragment" />
-
-                <fragment
-                    android:id="@+id/tab2"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    class="com.wireless.fragment.StaffPanelFragment" />
-
-                <!--
-                     <fragment
-                    android:id="@+id/tab3"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    class="com.wireless.fragment.ViewPagerTablePanelFragment" />
-                -->
-            </FrameLayout>
+            <Button
+                android:id="@+id/button_optionDialog_staffSetting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="服务员设置" />
         </LinearLayout>
-    </TabHost>
-
-    <Button
-        android:id="@+id/button_optionDialog_closeDialog"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:text="关闭" />
+    </RelativeLayout>
+
+    <fragment
+        android:id="@+id/tablePanelFgm_optionDialog"
+        android:name="com.wireless.fragment.TablePanelFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="false"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/relativeLayout1" />
+
+    <fragment
+        android:id="@+id/staffPanelFgm_optionDialog"
+        android:name="com.wireless.fragment.StaffPanelFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/relativeLayout1"
+        android:visibility="invisible" />
 
 </RelativeLayout>

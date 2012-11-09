@@ -45,7 +45,7 @@ public class StaffPanelFragment extends Fragment {
 		void onStaffChanged(StaffTerminal staff, String id, String pwd);
 	}
 	
-	public void setOnServerChangeListener(OnStaffChangedListener l){
+	public void setOnStaffChangeListener(OnStaffChangedListener l){
 		mOnStaffChangedListener = l;
 	}
 	

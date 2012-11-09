@@ -3,7 +3,6 @@ package com.wireless.fragment;
 import java.util.List;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,34 +12,32 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.TabHost;
 import android.widget.Toast;
 
 import com.wireless.common.ShoppingCart;
 import com.wireless.common.ShoppingCart.OnFoodsChangeListener;
 import com.wireless.common.WirelessOrder;
-import com.wireless.fragment.StaffPanelFragment.OnStaffChangedListener;
-import com.wireless.fragment.TablePanelFragment.OnTableChangedListener;
 import com.wireless.ordermenu.R;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.StaffTerminal;
 import com.wireless.protocol.Table;
 import com.wireless.ui.PickedFoodActivity;
+import com.wireless.util.OptionDialog;
+import com.wireless.util.OptionDialog.OnStaffChangedListener;
+import com.wireless.util.OptionDialog.OnTableChangedListener;
 import com.wireless.util.ProgressToast;
 
 public class OptionBarFragment extends Fragment implements OnTableChangedListener, OnStaffChangedListener, 
 									OnFoodsChangeListener{
 	
-	private static final String TAB_PICK_TBL = "tab_pick_table";
-	private static final String TAB_PICK_STAFF = "tab_pick_staff";
+//	private static final String TAB_PICK_TBL = "tab_pick_table";
+//	private static final String TAB_PICK_STAFF = "tab_pick_staff";
 //	private static final String TAB_PICK_VIP = "tab_pick_vip";
 	
-	private Dialog mDialog;
-	private TabHost mTabHost;
+	private OptionDialog mDialog;
+//	private TabHost mTabHost;
 
 	private static boolean TABLE_FIXED = false;
 	private static boolean STAFF_FIXED = false;
@@ -165,27 +162,28 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 //				mDialog.show();
 //			}
 //		});
+		mDialog = new OptionDialog(getActivity());
+		mDialog.setOwnerActivity(getActivity());
+		mDialog.setOnStaffChangeListener(this);
+		mDialog.setOnTableChangedListener(this);
 		
+		//服务员
 		mStaffBtn.setOnClickListener(new View.OnClickListener() {			
 			@Override
 			public void onClick(View v) {
-				if(mDialog == null)
-					initDialog(activity);
-				mTabHost.setCurrentTabByTag(TAB_PICK_STAFF);
 				mDialog.show();
+				mDialog.setCurrentItem(OptionDialog.ITEM_STAFF);
 			}
 		});
-	
+		//餐台
 		mTableNumBtn.setOnClickListener(new View.OnClickListener() {			
 			@Override
 			public void onClick(View v) {
-				if(mDialog == null)
-					initDialog(activity);
-				mTabHost.setCurrentTabByTag(TAB_PICK_TBL);
 				mDialog.show();
+				mDialog.setCurrentItem(OptionDialog.ITEM_TABLE);
 			}
 		});
-		
+		//已点菜
 		mSelectedFoodBtn.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
@@ -205,42 +203,6 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 			}
 		});
 	}
-	
-	/**
-	 * 初始化dialog所需要的数据
-	 * 包括tabHost和各种editText
-	 * 
-	 * @param activity 调用这个dialog的activity
-	 */
-	private void initDialog(final Activity activity){
-		View dialogLayout = activity.getLayoutInflater().inflate(R.layout.option_dialog, (ViewGroup)activity.findViewById(R.id.tab_dialog));
-		
-		mTabHost = (TabHost) dialogLayout.findViewById(R.id.tabhost);
-		mTabHost.setup();
-		// FIXME 修正无法锁住tab切换的问题
-		mTabHost.addTab(mTabHost.newTabSpec(TAB_PICK_TBL).setIndicator("餐台设置").setContent(R.id.tab1));
-		mTabHost.addTab(mTabHost.newTabSpec(TAB_PICK_STAFF).setIndicator("服务员设置").setContent(R.id.tab2));
-		
-		mDialog = new Dialog(activity);
-		mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		mDialog.setContentView(dialogLayout);
-		//设置对话框大小 
-		Window dialogWindow = mDialog.getWindow();
-		WindowManager.LayoutParams lp = dialogWindow.getAttributes();
-		lp.width = 940;
-		dialogWindow.setAttributes(lp);
-		//对话框关闭按钮
-		((Button) dialogLayout.findViewById(R.id.button_optionDialog_closeDialog)).setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				mDialog.dismiss();
-			}
-		});
-		
-		((TablePanelFragment)getFragmentManager().findFragmentById(R.id.tab1)).setOnTableChangedListener(this);
-		((StaffPanelFragment)getFragmentManager().findFragmentById(R.id.tab2)).setOnServerChangeListener(this);
-	}
-	
 	
 	/**
 	 * 餐台设置时的回调，根据餐台的状态来判断是否请求订单
