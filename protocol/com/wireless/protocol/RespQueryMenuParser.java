@@ -32,14 +32,19 @@ public class RespQueryMenuParser {
 		 * 
 		 * food_amount[2] - 2-byte indicating the amount of the foods listed in the menu
 		 * <Food>
-		 * food_id[2] : price[3] : status : kitchen : name_len : name[name_len] : pinyin_len : pinyin[pinyin_len] : 
-		 * img_len : image : pop_taste_amount : pop_taste_1[2] : pop_taste_2[2]... : 
+		 * food_id[2] : price[3] : kitchen : status : order_cnt[4] :  
+		 * name_len : name[name_len] : 
+		 * pinyin_len : pinyin[pinyin_len] : 
+		 * img_len : image[img_len] : 
+		 * pop_taste_amount : pop_taste_1[2] : pop_taste_2[2]... : 
 		 * child_foods_amount : child_food_1[2] : child_food_2[2] 
 		 * food_id[2] - 2-byte indicating the food's id
 		 * price[3] - 3-byte indicating the food's price
 		 * 			  price[0] 1-byte indicating the float point
 		 * 			  price[1..2] 2-byte indicating the fixed point
 		 * kitchen - the kitchen id to this food
+		 * status - the status to this food
+		 * order_cnt[4] - 4-byte indicates the order count
 		 * name_len - the length of the food's name
 		 * name[name_len] - the food's name whose length equals "len1"
 		 * pinyin_len - the length of the pinyin
@@ -72,8 +77,9 @@ public class RespQueryMenuParser {
 		 *  
 		 * kitchen_amount[] - 1 byte indicates the amount of kitchen
 		 * <Kitchen>
-		 * kitchen_alias : dept_id : len : kitchen_name[len]
+		 * kitchen_alias : is_allow_temp : dept_id : len : kitchen_name[len]
 		 * kitchen_alias : the alias id to this kitchen
+		 * is_allow_temp : flag to indicate whether allow temporary food
 		 * dept_id : the id to department which this kitchen belong to
 		 * len : the length of the kitchen name
 		 * kitchen_name[len] : the name to this kitchen
@@ -252,6 +258,10 @@ public class RespQueryMenuParser {
 				short kitchenAlias = (short)(response.body[offset] & 0x00FF);
 				offset++;
 				
+				//get the flag to indicate whether allow temporary food
+				boolean isAllowTemp = response.body[offset] == 1 ? true : false;
+				offset++;
+				
 				//get the department alias id that the kitchen belong to
 				short deptAlias = (short)(response.body[offset] & 0x00FF);
 				offset++;
@@ -267,7 +277,7 @@ public class RespQueryMenuParser {
 				offset += lenOfKitchenName;
 				
 				//add the kitchen
-				kitchens[i] = new Kitchen(0, kitchenName, 0, kitchenAlias, Kitchen.TYPE_NORMAL, 
+				kitchens[i] = new Kitchen(0, kitchenName, 0, kitchenAlias, isAllowTemp, Kitchen.TYPE_NORMAL, 
 										  new Department(null, deptAlias, 0, Department.TYPE_NORMAL));
 			}
 			

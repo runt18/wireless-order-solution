@@ -73,8 +73,9 @@ public class RespQueryMenu extends RespPackage{
 		 *  
 		 * kitchen_amount[] - 1 byte indicates the amount of kitchen
 		 * <Kitchen>
-		 * kitchen_alias : dept_id : len : kitchen_name[len]
+		 * kitchen_alias : is_allow_temp : dept_id : len : kitchen_name[len]
 		 * kitchen_alias : the alias id to this kitchen
+		 * is_allow_temp : flag to indicate whether allow temporary food
 		 * dept_id : the id to department which this kitchen belong to
 		 * len : the length of the kitchen name
 		 * kitchen_name[len] : the name to this kitchen
@@ -159,8 +160,9 @@ public class RespQueryMenu extends RespPackage{
 			 * Each kitchen consist of the stuff below.
 			 */
 			bodyLen += 1 + 					/* kitchen_alias(1-byte) */
+					   1 +					/* is_allow_temp(1-byte) */
 					   1 + 					/* dept_id(1-byte) */
-					   1 + 					/* length to kitchen name */
+					   1 + 					/* length to kitchen name(1-byte) */
 					   kitchenName.length;	/* the value to kitchen */
 		}
 		
@@ -320,11 +322,15 @@ public class RespQueryMenu extends RespPackage{
 		
 		//assign each kitchen to the body
 		for(int i = 0; i < foodMenu.kitchens.length; i++){
-			//assign the kitchen id
+			//assign the kitchen alias
 			body[offset] = (byte)(foodMenu.kitchens[i].aliasID & 0x00FF);
 			offset++;
 			
-			//assign the super kitchen id that this kitchen belong to 
+			//assign the flag to indicate whether allow temporary food
+			body[offset] = (byte)(foodMenu.kitchens[i].isAllowTemp ? 1 : 0);
+			offset++;
+			
+			//assign the department alias that this kitchen belong to 
 			body[offset] = (byte)(foodMenu.kitchens[i].dept.deptID & 0x00FF);
 			offset++;
 			

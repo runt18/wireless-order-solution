@@ -67,9 +67,10 @@ public class RespQueryOrder extends RespPackage{
 		 * waiter[nWaiter] - the waiter value
 		 * 
 		 * <TmpFood>
-		 * is_temp(1) : food_id[2] : order_amount[2] : unit_price[3] : hang_status : len : food_name[len] 
+		 * is_temp(1) : tmp_food_alias :kitchen_alias[2] : order_amount[2] : unit_price[3] : hang_status : len : food_name[len] 
 		 * is_temp(1) - "1" means this food is temporary
-		 * food_id[2] - 2-byte indicating the food's id
+		 * tmp_food_alias[2] - 2-byte indicating the alias to this temporary food
+		 * kitchen_alias[2] - 2-byte indicating the kitchen alias this temporary food belongs to
 		 * order_amount[2] - 2-byte indicating how many this foods are ordered
 		 * unit_price[3] - 3-byte indicating the unit price to this food
 		 * hang_status - indicates the hang status to the food
@@ -81,9 +82,10 @@ public class RespQueryOrder extends RespPackage{
 		int foodLen = 0;
 		for(int i = 0; i < order.foods.length; i++){
 			if(order.foods[i].isTemporary){
-				/* is_temp(1) : food_id[2] : order_amount[2] : unit_price[3] : hang_status : len : food_name[len] */
+				/* is_temp(1) : kitchen_alias[2] : order_amount[2] : unit_price[3] : hang_status : len : food_name[len] */
 				foodLen += 1 + /* is_temp */
-						   2 + /* food_id[2] */
+						   2 + /* tmp_food_alias[2] */
+						   2 + /* kitchen_alias[2] */
 						   2 + /* order_amount[2] */
 						   3 + /* unit_price[3] */
 						   1 + /* hang_status */
@@ -179,32 +181,49 @@ public class RespQueryOrder extends RespPackage{
 		//assign each food information, including food'id and order number
 		for(int i = 0; i < order.foods.length; i++){
 			if(order.foods[i].isTemporary){
-				byte[] nameBytes = order.foods[i].name.getBytes("UTF-8");
+				byte[] bytesToTempFood = order.foods[i].name.getBytes("UTF-8");
 				
-				/* is_temp(1) : food_id[2] : order_amount[2] : unit_price[3] : hang_status : len : food_name[len] */
+				/* is_temp(1) : tmp_food_alias[2] : kitchen_alias[2] : order_amount[2] : unit_price[3] : hang_status : len : food_name[len] */
 				
 				//assign the temporary flag 
 				body[offset] = 1;
-				//assign the food id
-				body[offset + 1] = (byte)(order.foods[i].aliasID & 0x000000FF);
-				body[offset + 2] = (byte)((order.foods[i].aliasID & 0x0000FF00) >> 8);
-				//assign the order amount
-				body[offset + 3] = (byte)(order.foods[i].count & 0x000000FF);
-				body[offset + 4] = (byte)((order.foods[i].count & 0x0000FF00) >> 8);
-				//assign the unit price
-				body[offset + 5] = (byte)(order.foods[i].price & 0x000000FF);
-				body[offset + 6] = (byte)((order.foods[i].price & 0x0000FF00) >> 8);
-				body[offset + 7] = (byte)((order.foods[i].price & 0x00FF0000) >> 16);
-				//assign the hang status
-				body[offset + 8] = (byte)(order.foods[i].hangStatus);
-				//assign the amount of food name's byte
-				body[offset + 9] = (byte)(nameBytes.length);
-				//assign the value of food name
-				for(int cnt = 0; cnt < nameBytes.length; cnt++){
-					body[offset + 10 + cnt] = nameBytes[cnt];
-				}
+
+				//assign the alias id to this temporary food 
+				body[offset] = (byte)(order.foods[i].aliasID & 0x000000FF);
+				body[offset + 1] = (byte)((order.foods[i].aliasID & 0x0000FF00) >> 8);
+				offset += 2;
+
 				
-				offset += 1 + 2 + 2 + 3 + 1 + 1 + nameBytes.length;
+				//assign the kitchen_alias this temporary food belongs to
+				body[offset] = (byte)(order.foods[i].kitchen.aliasID & 0x000000FF);
+				body[offset + 1] = (byte)((order.foods[i].kitchen.aliasID & 0x0000FF00) >> 8);
+				offset += 2;
+				
+				//assign the order amount
+				body[offset] = (byte)(order.foods[i].count & 0x000000FF);
+				body[offset + 1] = (byte)((order.foods[i].count & 0x0000FF00) >> 8);
+				offset += 2;
+				
+				//assign the unit price
+				body[offset] = (byte)(order.foods[i].price & 0x000000FF);
+				body[offset + 1] = (byte)((order.foods[i].price & 0x0000FF00) >> 8);
+				body[offset + 2] = (byte)((order.foods[i].price & 0x00FF0000) >> 16);
+				offset += 3;
+				
+				//assign the hang status
+				body[offset] = (byte)(order.foods[i].hangStatus);
+				offset += 1;
+				
+				//assign the amount of temporary food name's byte
+				body[offset] = (byte)(bytesToTempFood.length);
+				offset += 1;
+				
+				//assign the value of temporary food name
+				for(int j = 0; j < bytesToTempFood.length; j++){
+					body[offset + j] = bytesToTempFood[j];
+				}
+				offset += bytesToTempFood.length;
+				
 				
 			}else{
 

@@ -41,6 +41,8 @@ public final class Kitchen {
 	public short aliasID;
 	//the department id to this kitchen
 	public Department dept;
+	//the flag to indicate whether allow temporary food
+	boolean isAllowTemp;
 	
 	public Kitchen(){
 		this.dept = new Department();
@@ -49,13 +51,22 @@ public final class Kitchen {
 		this.aliasID = KITCHEN_NULL;
 	}
 	
-	public Kitchen(int restaurantID, String kitchenName, long kitchenID, short kitchenAlias, short type, Department dept){
+	public Kitchen(int restaurantID, String kitchenName, long kitchenID, short kitchenAlias, boolean isAllowTmp, short type, Department dept){
 		this.restaurantID = restaurantID;
 		this.name = kitchenName;
 		this.kitchenID = kitchenID;
 		this.aliasID = kitchenAlias;
+		this.isAllowTemp = isAllowTmp;
 		this.type = type;
 		this.dept = dept;
+	}
+	
+	public void setAllowTemp(boolean isAllowTmp){
+		this.isAllowTemp = isAllowTmp;
+	}
+	
+	public boolean isAllowTemp(){
+		return isAllowTemp;
 	}
 	
 	public boolean isNormal(){

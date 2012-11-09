@@ -26,15 +26,13 @@ import java.io.UnsupportedEncodingException;
  * food_amount - 1-byte indicating the amount of foods
  * 
  * <Food>
- * is_temp(0) : food_id[2] : order_num[2] :
+ * is_temp(0) : food_alias[2] : order_amount[2] :
  * normal_taste_amount : normal_taste_alias[2] : normal_taste_alias2[2]... : 
  * len_tmp_taste : tmp_taste[n] : tmp_taste_alias[2] : tmp_taste_price[4] : 
  * kitchen : hang_status : is_hurried
  * is_temp(0) - "0" means this food is NOT temporary
- * food_id[2] - 2-byte indicating the food's id
- * order_num[2] - 2-byte indicating how many this foods are ordered
- * 			   order_num[0] - 1-byte indicates the float-point
- * 			   order_num[1] - 1-byte indicates the fixed-point
+ * food_alias[2] - 2-byte indicating the alias id to food
+ * order_amount[2] - 2-byte indicating how many this foods are ordered
  * normal_taste_amount - 1-byte indicates the amount to normal taste
  * normal_taste_alias[2] - 2-byte indicates the taste alias id
  * len_tmp_taste - 1-byte indicates the length of temporary taste
@@ -46,9 +44,10 @@ import java.io.UnsupportedEncodingException;
  * is_hurried - indicates whether the food is hurried
  *
  * <TmpFood>
- * is_temp(1) : food_id[2] : order_amount[2] : unit_price[3] : hang_status : is_hurried : len : food_name[len] 
+ * is_temp(1) : tmp_food_alias[2] : kitchen_alias[2] : order_amount[2] : unit_price[3] : hang_status : is_hurried : len : food_name[len] 
  * is_temp(1) - "1" means this food is temporary
- * food_id[2] - 2-byte indicating the food's id
+ * tmp_food_alias[2] - 2-byte indicating the alias to temporary food
+ * kitchen_alias[2] - 2-byte indicating the alias id to kitchen this temporary food belongs to
  * order_amount[2] - 2-byte indicating how many this foods are ordered
  * unit_price[3] - 3-byte indicating the unit price to this food
  * hang_status - the hang status to the food
@@ -92,8 +91,16 @@ public class ReqInsertOrder extends ReqPackage {
 		int foodLen = 0;
 		for(int i = 0; i < reqOrder.foods.length; i++){
 			if(reqOrder.foods[i].isTemporary){
-				/* is_temp(1) : food_id[2] : order_amount[2] : unit_price[3] : hang_status : is_hurried : len : food_name[len] */
-				foodLen += 1 + 2 + 2 + 3 + 1 + 1 + 1 + reqOrder.foods[i].name.getBytes("UTF-8").length;
+				/* is_temp(1) : tmp_food_alias[2] : kitchen_alias[2] : order_amount[2] : unit_price[3] : hang_status : is_hurried : len : food_name[len] */
+				foodLen += 1 + /* is_temp(1) */
+						   2 + /* tmp_food_alias[2] */
+						   2 + /* kitchen_alias[2] */
+						   2 + /* order_amount[2] */
+						   3 + /* unit_price[3] */
+						   1 + /* hang_status */
+						   1 + /* is_hurried */
+						   1 + /* length to temporary food name */
+						   reqOrder.foods[i].name.getBytes("UTF-8").length; /* the name to temporary food */
 			}else{
 				/**
 				 * is_temp(0) : food_id[2] : order_amount[2] : normal_taste_amount : normal_taste_alias[2] ... normal_taste_alias2[2] : 
@@ -180,34 +187,51 @@ public class ReqInsertOrder extends ReqPackage {
 		//assign each order food's id and count
 		for(int i = 0; i < reqOrder.foods.length; i++){
 			if(reqOrder.foods[i].isTemporary){
-				byte[] nameBytes = reqOrder.foods[i].name.getBytes("UTF-8");
+				byte[] bytesToTmpFood = reqOrder.foods[i].name.getBytes("UTF-8");
 				/**
-				 * is_temp(1) : food_id[2] : order_amount[2] : unit_price[3] : hang_status : is_hurried : len : food_name[len]
+				 * is_temp(1) : tmp_food_alias[2] : kitchen_alias[2] : order_amount[2] : unit_price[3] : hang_status : is_hurried : len : food_name[len]
 				 */
 				//assign the temporary flag
 				body[offset] = 1;
-				//assign the food id
-				body[offset + 1] = (byte)(reqOrder.foods[i].aliasID & 0x000000FF);
-				body[offset + 2] = (byte)((reqOrder.foods[i].aliasID & 0x0000FF00) >> 8);
-				//assign the order amount
-				body[offset + 3] = (byte)(reqOrder.foods[i].count & 0x000000FF);
-				body[offset + 4] = (byte)((reqOrder.foods[i].count & 0x0000FF00) >> 8);
-				//assign the unit price
-				body[offset + 5] = (byte)(reqOrder.foods[i].price & 0x000000FF);
-				body[offset + 6] = (byte)((reqOrder.foods[i].price & 0x0000FF00) >> 8);
-				body[offset + 7] = (byte)((reqOrder.foods[i].price & 0x00FF0000) >> 16);
-				//assign the hang status
-				body[offset + 8] = (byte)reqOrder.foods[i].hangStatus;
-				//assign the hurried flag
-				body[offset + 9] = (byte)(reqOrder.foods[i].isHurried ? 1 : 0);
-				//assign the amount of food name's byte
-				body[offset + 10] = (byte)(nameBytes.length);
-				//assign the value of food name
-				for(int cnt = 0; cnt < nameBytes.length; cnt++){
-					body[offset + 11 + cnt] = nameBytes[cnt];
-				}
+				offset += 1;
+				//assign the alias id to this temporary food
+				body[offset] = (byte)(reqOrder.foods[i].aliasID & 0x000000FF);
+				body[offset + 1] = (byte)((reqOrder.foods[i].aliasID & 0x0000FF00) >> 8);
+				offset += 2;
 				
-				offset += 1 + 2 + 2 + 3 + 1 + 1 + 1 + nameBytes.length;
+				//assign the kitchen alias this temporary belongs to
+				body[offset] = (byte)(reqOrder.foods[i].kitchen.aliasID & 0x000000FF);
+				body[offset + 1] = (byte)((reqOrder.foods[i].kitchen.aliasID & 0x0000FF00) >> 8);
+				offset += 2;
+				
+				//assign the order amount
+				body[offset] = (byte)(reqOrder.foods[i].count & 0x000000FF);
+				body[offset + 1] = (byte)((reqOrder.foods[i].count & 0x0000FF00) >> 8);
+				offset += 2;
+				
+				//assign the unit price
+				body[offset] = (byte)(reqOrder.foods[i].price & 0x000000FF);
+				body[offset + 1] = (byte)((reqOrder.foods[i].price & 0x0000FF00) >> 8);
+				body[offset + 2] = (byte)((reqOrder.foods[i].price & 0x00FF0000) >> 16);
+				offset += 3;
+				
+				//assign the hang status
+				body[offset] = (byte)reqOrder.foods[i].hangStatus;
+				offset += 1;
+				
+				//assign the hurried flag
+				body[offset] = (byte)(reqOrder.foods[i].isHurried ? 1 : 0);
+				offset += 1;
+				
+				//assign the amount of food name's byte
+				body[offset] = (byte)(bytesToTmpFood.length);
+				offset += 1;
+				
+				//assign the value of food name
+				for(int j = 0; j < bytesToTmpFood.length; j++){
+					body[offset + j] = bytesToTmpFood[j];
+				}
+				offset += bytesToTmpFood.length;				
 				
 			}else{
 

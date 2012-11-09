@@ -28,15 +28,13 @@ public class ReqInsertOrderParser {
 	 * food_amount - 1-byte indicating the amount of foods
 	 * 
 	 * <Food>
-	 * is_temp(0) : food_id[2] : order_num[2] :
+	 * is_temp(0) : food_alias[2] : order_amount[2] :
 	 * normal_taste_amount : normal_taste_alias[2] : normal_taste_alias2[2]... : 
 	 * len_tmp_taste : tmp_taste[n] : tmp_taste_alias[2] : tmp_taste_price[4] : 
 	 * kitchen : hang_status : is_hurried
 	 * is_temp(0) - "0" means this food is NOT temporary
-	 * food_id[2] - 2-byte indicating the food's id
-	 * order_num[2] - 2-byte indicating how many this foods are ordered
-	 * 			   order_num[0] - 1-byte indicates the float-point
-	 * 			   order_num[1] - 1-byte indicates the fixed-point
+	 * food_alias[2] - 2-byte indicating the alias id to food
+	 * order_amount[2] - 2-byte indicating how many this foods are ordered
 	 * normal_taste_amount - 1-byte indicates the amount to normal taste
 	 * normal_taste_alias[2] - 2-byte indicates the taste alias id
 	 * len_tmp_taste - 1-byte indicates the length of temporary taste
@@ -48,15 +46,16 @@ public class ReqInsertOrderParser {
 	 * is_hurried - indicates whether the food is hurried
 	 *
 	 * <TmpFood>
-	 * is_temp(1) : food_id[2] : order_amount[2] : unit_price[3] : hang_status : is_hurried : len : food_name[len] 
+	 * is_temp(1) : tmp_food_alias[2] : kitchen_alias[2] : order_amount[2] : unit_price[3] : hang_status : is_hurried : len : food_name[len] 
 	 * is_temp(1) - "1" means this food is temporary
-	 * food_id[2] - 2-byte indicating the food's id
+	 * tmp_food_alias[2] - 2-byte indicating the alias to temporary food
+	 * kitchen_alias[2] - 2-byte indicating the alias id to kitchen this temporary food belongs to
 	 * order_amount[2] - 2-byte indicating how many this foods are ordered
 	 * unit_price[3] - 3-byte indicating the unit price to this food
 	 * hang_status - the hang status to the food
 	 * is_hurried - indicates whether the food is hurried
 	 * len - the length of food's name
-	 * food_name[len] - the value of the food name	 *
+	 * food_name[len] - the value of the food name *
 	 *******************************************************/
 	public static Order parse(ProtocolPackage req){
 		Order order = new Order();
@@ -111,12 +110,16 @@ public class ReqInsertOrderParser {
 			
 			if(isTemporary){
 				/**
-				 * is_temp(1) : food_id[2] : order_amount[2] : unit_price[3] : hang_status : is_hurried : len : food_name[len] 
+				 * is_temp(1) : tmp_food_alias[2] : kitchen_alias[2] : order_amount[2] : unit_price[3] : hang_status : is_hurried : len : food_name[len] 
 				 */
-				//get the food id
-				int foodID = (req.body[offset] & 0x000000FF) | ((req.body[offset + 1] & 0x000000FF) << 8);
+				//get the food alias this temporary food belongs to
+				int foodAlias = (req.body[offset] & 0x00FF) | ((req.body[offset + 1] & 0x00FF) << 8);
 				offset += 2;
 				
+				//get the kitchen alias this temporary food belongs to
+				int kitchenAlias = (req.body[offset] & 0x00FF) | ((req.body[offset + 1] & 0x00FF) << 8);
+				offset += 2;				
+		
 				//get the order amount
 				int orderNum = (req.body[offset] & 0x000000FF) | ((req.body[offset + 1] & 0x000000FF) << 8);
 				offset += 2;
@@ -149,9 +152,8 @@ public class ReqInsertOrderParser {
 
 				orderFoods[i] = new OrderFood();
 				orderFoods[i].isTemporary = true;
-				orderFoods[i].kitchen.aliasID = Kitchen.KITCHEN_TEMP;
-				orderFoods[i].kitchen.dept.deptID = Department.DEPT_TEMP;
-				orderFoods[i].aliasID = foodID;
+				orderFoods[i].aliasID = foodAlias;
+				orderFoods[i].kitchen.aliasID = (short)(kitchenAlias & 0x00FF);
 				orderFoods[i].hangStatus = hangStatus;
 				orderFoods[i].isHurried = isHurried;
 				orderFoods[i].count = orderNum;

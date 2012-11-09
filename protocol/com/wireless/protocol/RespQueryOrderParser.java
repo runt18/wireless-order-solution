@@ -74,9 +74,10 @@ public final class RespQueryOrderParser {
 		 * waiter[nWaiter] - the waiter value
 		 * 
 		 * <TmpFood>
-		 * is_temp(1) : food_id[2] : order_amount[2] : unit_price[3] : hang_status : len : food_name[len] 
+		 * is_temp(1) : tmp_food_alias :kitchen_alias[2] : order_amount[2] : unit_price[3] : hang_status : len : food_name[len] 
 		 * is_temp(1) - "1" means this food is temporary
-		 * food_id[2] - 2-byte indicating the food's id
+		 * tmp_food_alias[2] - 2-byte indicating the alias to this temporary food
+		 * kitchen_alias[2] - 2-byte indicating the kitchen alias this temporary food belongs to
 		 * order_amount[2] - 2-byte indicating how many this foods are ordered
 		 * unit_price[3] - 3-byte indicating the unit price to this food
 		 * hang_status - indicates the hang status to the food
@@ -142,37 +143,51 @@ public final class RespQueryOrderParser {
 				
 				if(isTemporary){
 					/**
-					 * is_temp(1) : food_id[2] : order_amount[2] : unit_price[3] : hang_status : len : food_name[len]
+					 * is_temp(1) : tmp_food_alias[2] : kitchen_alias[2] : order_amount[2] : unit_price[3] : hang_status : len : food_name[len]
 					 */
-					//get the food alias id
-					int foodID = (resp.body[offset] & 0x000000FF) |
-								((resp.body[offset + 1] & 0x000000FF) << 8);
+					
+					//get the alias id to this temporary food
+					int foodAlias = (resp.body[offset] & 0x000000FF) | ((resp.body[offset + 1] & 0x000000FF) << 8);
+					offset += 2;
+					
+					//get the kitchen alias this temporary food belongs to
+					int kitchenAlias = (resp.body[offset] & 0x000000FF) | ((resp.body[offset + 1] & 0x000000FF) << 8);
+					offset += 2;
+					
 					//get the order amount
-					int orderAmount = (resp.body[offset + 2] & 0x000000FF) |
-									((resp.body[offset + 3] & 0x000000FF) << 8);
+					int orderAmount = (resp.body[offset] & 0x000000FF) |
+									((resp.body[offset + 1] & 0x000000FF) << 8);
+					offset += 2;
+					
 					//get the unit price
-					int unitPrice = (resp.body[offset + 4] & 0x000000FF) |
-									((resp.body[offset + 5] & 0x000000FF) << 8) |
-									((resp.body[offset + 6] & 0x000000FF) << 16);
+					int unitPrice = (resp.body[offset] & 0x000000FF) |
+									((resp.body[offset + 1] & 0x000000FF) << 8) |
+									((resp.body[offset + 2] & 0x000000FF) << 16);
+					offset += 3;
+					
 					//get the hang status
-					short hangStatus = resp.body[offset + 7];
+					short hangStatus = resp.body[offset];
+					offset += 1;
+					
 					//get the amount of food name bytes
-					int len = resp.body[offset + 8];
+					int lenOfTempFood = resp.body[offset];
+					offset += 1;
+					
 					//get the food name
 					String name = null;
 					try{
-						name = new String(resp.body, offset + 9, len, "UTF-8");
+						name = new String(resp.body, offset, lenOfTempFood, "UTF-8");
 					}catch(UnsupportedEncodingException e){}
+					offset += lenOfTempFood;
 					
 					orderFoods[i] = new OrderFood();
 					orderFoods[i].isTemporary = true;
-					orderFoods[i].aliasID = foodID;
+					orderFoods[i].aliasID = foodAlias;
+					orderFoods[i].kitchen.aliasID = (short)(kitchenAlias & 0x00FF);
 					orderFoods[i].hangStatus = hangStatus;
 					orderFoods[i].count = orderAmount;
 					orderFoods[i].setPrice(Util.int2Float(unitPrice));
 					orderFoods[i].name = (name != null ? name : "");
-					
-					offset += 2 + 2 + 3 + 1 + 1 + len;
 					
 				}else{
 
