@@ -22,8 +22,11 @@ import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.pojo.menuMgr.TasteBasic;
+import com.wireless.pojo.menuMgr.TasteGroup;
 import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Order;
+import com.wireless.protocol.Taste;
 import com.wireless.protocol.Terminal;
 import com.wireless.util.JObject;
 
@@ -76,21 +79,40 @@ public class QueryOrderAction extends Action {
 					item.setFoodName(order.foods[i].name);
 					item.setFoodID(order.foods[i].foodID);
 					item.setAliasID(order.foods[i].aliasID);
-//					item.setKitchen(order.foods[i].kitchen);
 					item.getKitchen().setKitchenID(Integer.parseInt(order.foods[i].kitchen.kitchenID+""));
-					item.setTaste(order.foods[i].tastes);
-					item.setTastePref(order.foods[i].getTastePref());
+					item.getKitchen().setDept(null);
 					item.setCount(order.foods[i].getCount());
 					item.setUnitPrice(order.foods[i].getPrice());
-					item.setTastePrice(order.foods[i].getTastePrice());
 					item.setStatus(order.foods[i].status);
 					item.setDiscount(order.foods[i].getDiscount()); 
 					item.setTemporary(order.foods[i].isTemporary);
 					item.setSeqID(order.seqID);
 					item.setOrderDate(order.foods[i].orderDate); 
 					item.setWaiter(order.foods[i].waiter);
-					item.setTmpTaste(order.foods[i].tmpTaste);
 					item.setHangStatus(order.foods[i].hangStatus);
+					
+					
+					if(order.foods[i].tasteGroup != null && order.foods[i].tasteGroup.getNormalTastes().length > 0){
+						// 
+						TasteGroup tg = new TasteGroup();
+						tg.getNormalTaste().setTasteName(order.foods[i].tasteGroup.getTastePref());
+						tg.getNormalTaste().setTastePrice(order.foods[i].tasteGroup.getTastePrice());
+						tg.getTempTaste().setTasteName(order.foods[i].tasteGroup.getTastePref());
+						tg.getTempTaste().setTastePrice(order.foods[i].tasteGroup.getTastePrice());
+						// 
+						for(int j = 0; j < order.foods[i].tasteGroup.getNormalTastes().length; j++){
+							Taste tl = order.foods[i].tasteGroup.getNormalTastes()[j];
+							TasteBasic tb = new TasteBasic();
+							tb.setTasteID(tl.tasteID);
+							tb.setTasteAliasID(tl.aliasID);
+							item.addTaste(tb);
+						}
+						item.setTasteGroup(tg);
+					}else{
+						item.getTasteGroup().getNormalTaste().setTasteName("无口味");
+						item.getTasteGroup().getNormalTaste().setTastePrice(0);
+					}
+					
 					root.add(item);
 					item = null;
 				}
@@ -102,6 +124,7 @@ public class QueryOrderAction extends Action {
 					for(Kitchen temp : kl){
 						if(of.getKitchenId() == temp.getKitchenID()){
 							of.setKitchen(temp);
+							of.getKitchen().setDept(null);
 							break;
 						}
 					}
