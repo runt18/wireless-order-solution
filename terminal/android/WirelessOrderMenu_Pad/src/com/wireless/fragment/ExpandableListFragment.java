@@ -103,7 +103,6 @@ public class ExpandableListFragment extends Fragment{
 					mListView.collapseGroup(i);
 				}
 			}
-			//FIXME 修正跳到第一个的问题
 			//计算出回调的位置，模拟被点击
 			mListView.expandGroup(positions[0]);
 			int childPos = positions[0] + positions[1] + 1;

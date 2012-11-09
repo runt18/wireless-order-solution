@@ -7,9 +7,9 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ImageView.ScaleType;
 
 import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
@@ -68,7 +68,6 @@ public class FullScreenActivity extends Activity implements OnPicChangedListener
 		}
 		
 		((ImageView) findViewById(R.id.imageView_back_fullScreen)).setOnClickListener(new OnClickListener(){
-
 			@Override
 			public void onClick(View v) {
 				setResultInformations();
@@ -98,7 +97,7 @@ public class FullScreenActivity extends Activity implements OnPicChangedListener
 		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(mOrderFood));
 		intent.putExtras(bundle);
 		setResult(FULL_RES_CODE, intent);
-		finish();
+		this.onBackPressed();
 	}
 
 	@Override

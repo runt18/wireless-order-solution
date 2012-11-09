@@ -357,7 +357,8 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 					
 					short customNum = Short.parseShort(((TextView)getView().findViewById(R.id.textView_customNum)).getText().toString());
 					table.customNum = customNum;
-					mOnTableChangedListener.onTableChanged(table);
+					if(mOnTableChangedListener != null)
+						mOnTableChangedListener.onTableChanged(table);
 					
 				}
 			});

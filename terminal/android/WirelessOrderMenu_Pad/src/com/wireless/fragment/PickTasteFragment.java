@@ -233,7 +233,6 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 			
 			@Override
 			public void onClick(View v) {
-				//FIXME cancel the return Button
 				if(!mOrderFood.hasTaste()){
 					mOrderFood.tasteGroup = new TasteGroup();
 				}

@@ -523,7 +523,7 @@ public class PickedFoodActivity extends Activity implements OnOrderChangeListene
 		}
 		
 		//下单按钮
-		((ImageButton) findViewById(R.id.imageButton_submit_pickedFood)).setOnClickListener(new OnClickListener(){
+		((Button) findViewById(R.id.imageButton_submit_pickedFood)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {				
 				try{

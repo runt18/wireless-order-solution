@@ -30,10 +30,12 @@ import com.wireless.fragment.GalleryFragment.OnPicClickListener;
 import com.wireless.fragment.OptionBarFragment;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
+import com.wireless.parcel.TableParcel;
 import com.wireless.protocol.Department;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.Table;
 import com.wireless.protocol.Util;
 
 public class MainActivity extends Activity  
@@ -67,14 +69,6 @@ public class MainActivity extends Activity
 			@Override
 			public void onClick(View v) {
  				
-			}
-		});
-		
-		((ImageView) findViewById(R.id.imageView_logo)).setOnLongClickListener(new View.OnLongClickListener() {
-			@Override
-			public boolean onLongClick(View v) {
-				startActivity(new Intent(MainActivity.this,SettingActivity.class));
-				return true;
 			}
 		});
 		
@@ -183,7 +177,14 @@ public class MainActivity extends Activity
 				startActivityForResult(intent, MAIN_ACTIVITY_RES_CODE);
 			}
 		});
-		
+		//setting
+		((ImageView) findViewById(R.id.imageView_logo)).setOnLongClickListener(new View.OnLongClickListener() {
+			@Override
+			public boolean onLongClick(View v) {
+				startActivityForResult(new Intent(MainActivity.this,SettingActivity.class), MAIN_ACTIVITY_RES_CODE);
+				return true;
+			}
+		});
 		//点菜按钮
 		((ImageView)findViewById(R.id.imageButton_add_main)).setOnClickListener(new OnClickListener(){
 			@Override
@@ -246,31 +247,6 @@ public class MainActivity extends Activity
 		
 		((OptionBarFragment)this.getFragmentManager().findFragmentById(R.id.bottombar)).setBackButtonDisable();
 		
-//		final EditText searchEditText = (EditText) findViewById(R.id.editText_main);
-//		final SearchRunnable runnable = new SearchRunnable(); 
-//		searchEditText.addTextChangedListener(new TextWatcher(){
-//			@Override
-//			public void beforeTextChanged(CharSequence s, int start, int count,
-//					int after) {
-//				
-//			}
-//
-//			@Override
-//			public void onTextChanged(CharSequence s, int start, int before,
-//					int count) {
-//				
-//			}
-//
-//			@Override
-//			public void afterTextChanged(Editable s) {
-//				searchEditText.removeCallbacks(runnable);
-//				if(!searchEditText.getText().toString().equals(""))
-//				{
-//					runnable.setPosition(Integer.valueOf(searchEditText.getText().toString()));
-//					searchEditText.postDelayed(runnable, 500);
-//				}
-//			}
-//		});
 	}
 
 	/**
@@ -297,9 +273,14 @@ public class MainActivity extends Activity
 	@Override  
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {  
 		if(requestCode == MAIN_ACTIVITY_RES_CODE){
+			
 	        switch(resultCode){
 	        case FullScreenActivity.FULL_RES_CODE:
 	        	mPicBrowserFragment.setPosition((OrderFood)data.getParcelableExtra(FoodParcel.KEY_VALUE));
+	        	break;
+	        case SettingActivity.SETTING_RES_CODE:
+	        	Table table = data.getParcelableExtra(TableParcel.KEY_VALUE);
+	        	((OptionBarFragment)this.getFragmentManager().findFragmentById(R.id.bottombar)).onTableChanged(table);
 	        	break;
 	        }
 		}

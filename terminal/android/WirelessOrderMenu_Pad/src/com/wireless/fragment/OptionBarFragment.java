@@ -116,11 +116,19 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 		
 		if(!STAFF_FIXED){
 			mStaffBtn.setClickable(true);
-		}else mStaffBtn.setClickable(false);
+		}else {
+			mStaffBtn.setClickable(false);
+		}
 		
 		if(!TABLE_FIXED)
 			mTableNumBtn.setClickable(true);
-		else mTableNumBtn.setClickable(false);
+		else {
+			mTableNumBtn.setClickable(false);
+		}
+		
+//		if(mDialog == null)
+//			this.initDialog(getActivity());
+		
 	}
 	
 	public static boolean isTableFixed() {
@@ -212,9 +220,14 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 		
 		mTabHost = (TabHost) dialogLayout.findViewById(R.id.tabhost);
 		mTabHost.setup();
-		
-		mTabHost.addTab(mTabHost.newTabSpec(TAB_PICK_TBL).setIndicator("餐台设置").setContent(R.id.tab1));
-		mTabHost.addTab(mTabHost.newTabSpec(TAB_PICK_STAFF).setIndicator("服务员设置").setContent(R.id.tab2));
+		// FIXME 修正无法锁住tab切换的问题
+		if(!TABLE_FIXED){
+			mTabHost.addTab(mTabHost.newTabSpec(TAB_PICK_TBL).setIndicator("餐台设置").setContent(R.id.tab1));
+		} else 	dialogLayout.findViewById(R.id.tab1).setVisibility(View.GONE);
+
+		if(!STAFF_FIXED){
+			mTabHost.addTab(mTabHost.newTabSpec(TAB_PICK_STAFF).setIndicator("服务员设置").setContent(R.id.tab2));
+		} else dialogLayout.findViewById(R.id.tab1).setVisibility(View.GONE);
 		
 		mDialog = new Dialog(activity);
 		mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -229,6 +242,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 			@Override
 			public void onClick(View v) {
 				mDialog.dismiss();
+				mDialog = null;
 			}
 		});
 		
@@ -242,7 +256,8 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 	 */
 	@Override
 	public void onTableChanged(Table table) {
-		mDialog.dismiss();
+		if(mDialog != null)
+			mDialog.dismiss();
 		//对话框关闭后请求餐台状态，根据餐台的状态来判断是否请求订单
 		new QueryTableStatusTask(table).execute();
 	}
