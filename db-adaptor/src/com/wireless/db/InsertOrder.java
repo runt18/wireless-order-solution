@@ -157,11 +157,18 @@ public class InsertOrder {
 					Kitchen[] kitchens = QueryMenu.queryKitchens(dbCon, "AND KITCHEN.kitchen_alias=" + orderToInsert.foods[i].kitchen.aliasID + " AND KITCHEN.restaurant_id=" + term.restaurantID, null);
 					if(kitchens.length > 0){
 						orderToInsert.foods[i].kitchen = kitchens[0];
+						orderToInsert.foods[i].name = orderToInsert.foods[i].kitchen.dept.name + "临时菜";
+						Taste tmpTaste = new Taste();
+						tmpTaste.setPreference(orderToInsert.foods[i].name);
+						tmpTaste.setPrice(orderToInsert.foods[i].getPrice());
+						orderToInsert.foods[i].setPrice(new Float(0));
+						TasteGroup tg = new TasteGroup(orderToInsert.foods[i], null, tmpTaste);
+						orderToInsert.foods[i].tasteGroup = tg;
 					}
 					
 				}else{					
 					//get the associated foods' unit price and name
-					Food[] detailFood = QueryMenu.queryFoods(dbCon, " AND FOOD.food_alias=" + orderToInsert.foods[i].aliasID + " AND FOOD.restaurant_id=" + term.restaurantID, null);
+					Food[] detailFood = QueryMenu.queryFoods(dbCon, "AND FOOD.food_alias=" + orderToInsert.foods[i].aliasID + " AND FOOD.restaurant_id=" + term.restaurantID, null);
 					if(detailFood.length > 0){
 						orderToInsert.foods[i].foodID = detailFood[0].foodID;
 						orderToInsert.foods[i].aliasID = detailFood[0].aliasID;
@@ -176,8 +183,8 @@ public class InsertOrder {
 					}
 					
 					//Get the details to normal tastes
-					Taste[] normalTastes = orderToInsert.foods[i].tasteGroup == null ? null : orderToInsert.foods[i].tasteGroup.getNormalTastes();
-					if(normalTastes != null){
+					if(orderToInsert.foods[i].hasNormalTaste()){
+						Taste[] normalTastes = orderToInsert.foods[i].tasteGroup.getNormalTastes();
 						for(int j = 0; j < normalTastes.length; j++){
 							Taste[] detailTaste = QueryMenu.queryTastes(dbCon, 
 																		Taste.CATE_ALL, 

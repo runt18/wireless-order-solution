@@ -40,7 +40,7 @@ public class WebParams {
 	/**
 	 * 
 	 */
-	public static final int NO_TASTE = Taste.NO_TASTE;
+//	public static final int NO_TASTE = Taste.NO_TASTE;
 	public static final int CATE_TASTE = Taste.CATE_TASTE;		/* 口味 */
 	public static final int CATE_STYLE = Taste.CATE_STYLE;		/* 做法 */
 	public static final int CATE_SPEC = Taste.CATE_SPEC;		/* 规格 */

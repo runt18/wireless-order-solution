@@ -671,6 +671,8 @@ public class UpdateOrder {
 			
 			if(detailFood.length > 0){
 				foodBasic.foodID = detailFood[0].foodID;
+				foodBasic.aliasID = detailFood[0].aliasID;
+				foodBasic.restaurantID = detailFood[0].restaurantID;
 				foodBasic.status = detailFood[0].status;
 				foodBasic.name = detailFood[0].name;
 				foodBasic.setPrice(detailFood[0].getPrice());
@@ -681,8 +683,8 @@ public class UpdateOrder {
 			}			
 
 			//Get the details to each normal tastes
-			Taste[] normalTastes = foodBasic.tasteGroup == null ? null : foodBasic.tasteGroup.getNormalTastes();
-			if(normalTastes != null){
+			if(foodBasic.hasNormalTaste()){
+				Taste[] normalTastes = foodBasic.tasteGroup.getNormalTastes();
 				for(int j = 0; j < normalTastes.length; j++){
 					Taste[] detailTaste = QueryMenu.queryTastes(dbCon, 
 																Taste.CATE_ALL, 

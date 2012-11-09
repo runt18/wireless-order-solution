@@ -129,7 +129,8 @@ public class QueryMenu {
 					 " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, " +
 					 " FOOD.name, FOOD.unit_price, FOOD.kitchen_alias, FOOD.status, FOOD.pinyin, FOOD.taste_ref_type, " +
 					 " FOOD.desc, FOOD.img, " +
-					 " KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.name AS kitchen_name, KITCHEN.type AS kitchen_type, " +
+					 " KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.name AS kitchen_name, " +
+					 " KITCHEN.type AS kitchen_type , KITCHEN.is_allow_temp AS is_allow_temp, " +
 					 " DEPT.dept_id, DEPT.name AS dept_name, DEPT.type AS dept_type " +
 					 " FROM " + 
 					 Params.dbName + ".food FOOD " +
@@ -163,6 +164,7 @@ public class QueryMenu {
 	 				   				       dbCon.rs.getString("kitchen_name"),
 	 				   				       dbCon.rs.getLong("kitchen_id"),
 	 				   				       dbCon.rs.getShort("kitchen_alias"),
+	 				   				       dbCon.rs.getBoolean("is_allow_temp"),
 	 				   				       dbCon.rs.getShort("kitchen_type"),
 	 				   				       new Department(dbCon.rs.getString("dept_name"), 
 	 				   				    		   		  dbCon.rs.getShort("dept_id"), 
@@ -226,7 +228,8 @@ public class QueryMenu {
 					 " FOOD.name, FOOD.unit_price, FOOD.status, FOOD.pinyin, FOOD.taste_ref_type, " +
 					 " FOOD.desc, FOOD.img, " +
 					 " FOOD_STATISTICS.order_cnt, " +
-					 " KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.name AS kitchen_name, KITCHEN.type AS kitchen_type, " +
+					 " KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.name AS kitchen_name, " +
+					 " KITCHEN.type AS kitchen_type, KITCHEN.is_allow_temp AS is_allow_temp, " +
 					 " DEPT.dept_id, DEPT.name AS dept_name, DEPT.type AS dept_type, " +
 					 " TASTE.taste_id, TASTE.taste_alias " +
 					 " FROM " + 
@@ -289,6 +292,7 @@ public class QueryMenu {
 			 			 						   	   dbCon.rs.getString("kitchen_name"),
 			 			 						   	   dbCon.rs.getLong("kitchen_id"),
 			 			 						   	   dbCon.rs.getShort("kitchen_alias"),
+			 			 						   	   dbCon.rs.getBoolean("is_allow_temp"),
 			 			 						   	   dbCon.rs.getShort("kitchen_type"),
 			 			 						   	   new Department(dbCon.rs.getString("dept_name"), 
 			 			 						   			   		  dbCon.rs.getShort("dept_id"), 
@@ -382,7 +386,8 @@ public class QueryMenu {
 				  " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, " +
 				  " FOOD.name, FOOD.unit_price, FOOD.status, FOOD.pinyin, FOOD.taste_ref_type, " +
 				  " FOOD.desc, FOOD.img, " +
-				  " KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.name AS kitchen_name, KITCHEN.type AS kitchen_type, " +
+				  " KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.name AS kitchen_name, " +
+				  " KITCHEN.type AS kitchen_type, KITCHEN.is_allow_temp AS is_allow_temp, " +
 				  " DEPT.dept_id, DEPT.name AS dept_name, DEPT.type AS dept_type, " +
 				  " COMBO.amount " +
 				  " FROM " +
@@ -421,6 +426,7 @@ public class QueryMenu {
 						   							  dbCon.rs.getString("kitchen_name"),
 						   							  dbCon.rs.getLong("kitchen_id"),
 						   							  dbCon.rs.getShort("kitchen_alias"),
+						   							  dbCon.rs.getBoolean("is_allow_temp"),
 						   							  dbCon.rs.getShort("kitchen_type"),
 						   							  new Department(dbCon.rs.getString("dept_name"), 
 						   									  		 dbCon.rs.getShort("dept_id"), 
@@ -454,7 +460,7 @@ public class QueryMenu {
 		ArrayList<Kitchen> kitchens = new ArrayList<Kitchen>();
 		String sql = " SELECT " +
 					 " KITCHEN.restaurant_id, KITCHEN.kitchen_id, KITCHEN.kitchen_alias, " +
-					 " KITCHEN.name AS kitchen_name, KITCHEN.type AS kitchen_type, " +
+					 " KITCHEN.name AS kitchen_name, KITCHEN.type AS kitchen_type, KITCHEN.is_allow_temp AS is_allow_temp, " +
 					 " DEPT.dept_id, DEPT.name AS dept_name, DEPT.type AS dept_type FROM " + 
 			  		 Params.dbName + ".kitchen KITCHEN " +
 					 " JOIN " +
@@ -469,6 +475,7 @@ public class QueryMenu {
 									 dbCon.rs.getString("kitchen_name"),
 									 dbCon.rs.getLong("kitchen_id"),
 									 dbCon.rs.getShort("kitchen_alias"),
+									 dbCon.rs.getBoolean("is_allow_temp"),
 									 dbCon.rs.getShort("kitchen_type"),
 									 new Department(dbCon.rs.getString("dept_name"), 
 											 		dbCon.rs.getShort("dept_id"), 

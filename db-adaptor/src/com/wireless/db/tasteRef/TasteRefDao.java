@@ -469,6 +469,7 @@ public class TasteRefDao {
 										  "",
 										  dbCon.rs.getLong("kitchen_id"),
 										  dbCon.rs.getShort("kitchen_alias"),
+										  false,
 										  Kitchen.TYPE_NORMAL,
 										  null);
 			
