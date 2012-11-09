@@ -1,8 +1,7 @@
 package com.wireless.fragment;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
+import java.util.List;
 
 import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
@@ -27,16 +26,16 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.wireless.common.WirelessOrder;
-import com.wireless.protocol.Department;
-import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Util;
 import com.wireless.ui.R;
 
 public class TempFoodFragment extends Fragment {
-	private ArrayList<Department> mValidDepts;
+	
 	private TempFoodAdapter mTempFoodAdapter;
+	
+	private List<Kitchen> mKitchens = new ArrayList<Kitchen>();
 	
 	private static class ViewHolder{
 		TextView kitchenTextView;
@@ -50,70 +49,19 @@ public class TempFoodFragment extends Fragment {
 		}
 		
 		void refresh(OrderFood food){
-			if(isInitialized())
-			{
-				kitchenTextView.setText(food.kitchen.dept.name);
+			if(isInitialized()){
+				kitchenTextView.setText(food.kitchen.name);
 				foodNameEditText.setText(food.name);
 			}
 		}
 	}
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		/*
-		 * 将所有菜品进行按厨房编号进行排序
-		 */
-		Food[] mOriFoods = new Food[WirelessOrder.foodMenu.foods.length];
-		System.arraycopy(WirelessOrder.foodMenu.foods, 0, mOriFoods, 0,
-				WirelessOrder.foodMenu.foods.length);
-		Arrays.sort(mOriFoods, new Comparator<Food>() {
-			@Override
-			public int compare(Food food1, Food food2) {
-				if (food1.kitchen.aliasID > food2.kitchen.aliasID) {
-					return 1;
-				} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
-					return -1;
-				} else {
-					return 0;
-				}
-			}
-		});
-		/*
-		 * 使用二分查找算法筛选出有菜品的厨房
-		 */
-		ArrayList<Kitchen> mValidKitchens = new ArrayList<Kitchen>();
-		for (int i = 0; i < WirelessOrder.foodMenu.kitchens.length; i++) {
-			Food keyFood = new Food();
-			keyFood.kitchen.aliasID = WirelessOrder.foodMenu.kitchens[i].aliasID;
-			int index = Arrays.binarySearch(mOriFoods, keyFood,
-					new Comparator<Food>() {
-
-						public int compare(Food food1, Food food2) {
-							if (food1.kitchen.aliasID > food2.kitchen.aliasID) {
-								return 1;
-							} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
-								return -1;
-							} else {
-								return 0;
-							}
-						}
-					});
-
-			if (index >= 0) {
-				mValidKitchens.add(WirelessOrder.foodMenu.kitchens[i]);
-			}
-		}
-		/*
-		 * 筛选出有菜品的部门
-		 */
-		mValidDepts = new ArrayList<Department>();
-		for (int i = 0; i < WirelessOrder.foodMenu.depts.length; i++) {
-			for (int j = 0; j < mValidKitchens.size(); j++) {
-				if (WirelessOrder.foodMenu.depts[i].deptID == mValidKitchens.get(j).dept.deptID) {
-					mValidDepts.add(WirelessOrder.foodMenu.depts[i]);
-					break;
-				}
+		for(Kitchen kitchen : WirelessOrder.foodMenu.kitchens){
+			if(kitchen.isAllowTemp()){
+				mKitchens.add(kitchen);
 			}
 		}
 	}
@@ -125,7 +73,7 @@ public class TempFoodFragment extends Fragment {
 		final ListView tempFoodView = (ListView) view.findViewById(R.id.listView_tempFood_fgm) ;
 		
 		mTempFoodAdapter = new TempFoodAdapter();
-		tempFoodView.setAdapter(mTempFoodAdapter);
+		tempFoodView.setAdapter(mTempFoodAdapter);		
 
 		//添加按钮
 		((ImageView) view.findViewById(R.id.add)).setOnClickListener(new View.OnClickListener() {
@@ -136,9 +84,8 @@ public class TempFoodFragment extends Fragment {
 				v.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener(){
 					@Override
 					public void onGlobalLayout() {
-						View view = tempFoodView.getChildAt(mTempFoodAdapter.getCount()-1).findViewById(R.id.textView_kitchen_tempFood_item);
-						if(view.getHeight() > 0)
-						{
+						View view = tempFoodView.getChildAt(mTempFoodAdapter.getCount() - 1).findViewById(R.id.textView_kitchen_tempFood_item);
+						if(view.getHeight() > 0){
 							view.performClick();
 							view.getViewTreeObserver().removeGlobalOnLayoutListener(this);
 						}
@@ -149,7 +96,7 @@ public class TempFoodFragment extends Fragment {
 		return view;
 	}
 
-	class TempFoodAdapter extends BaseAdapter{
+	private class TempFoodAdapter extends BaseAdapter{
 		private ArrayList<OrderFood> mTempFoods;
 
 		TempFoodAdapter() {
@@ -167,10 +114,9 @@ public class TempFoodFragment extends Fragment {
 			((InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(TempFoodFragment.this.getView().getWindowToken(), 0);
 		}
 		
-		void remove(int position)
-		{
+		void remove(int position){
 			mTempFoods.remove(position);
-			this.notifyDataSetChanged();
+			notifyDataSetChanged();
 		}
 		
 		@Override
@@ -195,8 +141,8 @@ public class TempFoodFragment extends Fragment {
 
 			final ViewHolder holder;
 			final LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			if(view == null)
-			{
+			
+			if(view == null){
 				view = inflater.inflate(R.layout.temp_food_item, null);
 				holder = new ViewHolder();
 
@@ -204,11 +150,14 @@ public class TempFoodFragment extends Fragment {
 				holder.kitchenTextView = (TextView) view.findViewById(R.id.textView_kitchen_tempFood_item);
 				holder.deleteBtn = (ImageButton) view.findViewById(R.id.imageButton_delete_tempFood_item);
 				view.setTag(holder);
+				
+			}else{
+				holder = (ViewHolder) view.getTag();
 			}
-			else holder = (ViewHolder) view.getTag();
+			
 			//默认初始化为第一个部门
-			if(food.kitchen.dept.name == null)
-				food.kitchen.dept = mValidDepts.get(0);
+//			if(food.kitchen.dept.name == null)
+//				food.kitchen.dept = mValidDepts.get(0);
 			/**
 			 * 菜名赋值
 			 */
@@ -242,33 +191,36 @@ public class TempFoodFragment extends Fragment {
 				@Override
 				public void onClick(View v) {
 					//设置弹出框
-					final PopupWindow mPopWindow = new PopupWindow(inflater.inflate(R.layout.temp_food_fragment_popup_window, null),
-							140,LayoutParams.WRAP_CONTENT, true);
-					mPopWindow.update();
-					mPopWindow.setOutsideTouchable(true);
-					mPopWindow.setBackgroundDrawable(new BitmapDrawable());
+					final PopupWindow popWnd = new PopupWindow(inflater.inflate(R.layout.temp_food_fragment_popup_window, null),
+																   140,
+																   LayoutParams.WRAP_CONTENT, 
+																   true);
+					popWnd.update();
+					popWnd.setOutsideTouchable(true);
+					popWnd.setBackgroundDrawable(new BitmapDrawable());
 					//弹出框的内容 
-					ListView popListView = (ListView) mPopWindow.getContentView();
+					ListView popListView = (ListView) popWnd.getContentView();
 					popListView.setTag(v);
-					popListView.setAdapter(new PopupAdapter());
+					popListView.setAdapter(new PopupAdapter(mKitchens));
+					
 					popListView.setOnItemClickListener(new OnItemClickListener(){
 						@Override
 						public void onItemClick(AdapterView<?> parent, View view, int p, long id) {
 							TextView v = (TextView) parent.getTag();
-							Department dept = (Department) view.getTag();
+							Kitchen kitchen = (Kitchen) view.getTag();
 							
 							ViewHolder holder  = (ViewHolder)v.getTag();
-							food.kitchen.dept = dept;
+							food.kitchen = kitchen;
 							mTempFoods.set(position, food);
 							holder.refresh(food);
-							mPopWindow.dismiss();
+							popWnd.dismiss();
 						}
 					});
 					//点击显示弹窗，并传递信息
-					if(mPopWindow.isShowing())
-						mPopWindow.dismiss();
+					if(popWnd.isShowing())
+						popWnd.dismiss();
 					else{
-						mPopWindow.showAsDropDown(v);
+						popWnd.showAsDropDown(v);
 					}
 				}
 			});
@@ -292,16 +244,22 @@ public class TempFoodFragment extends Fragment {
 		}
 	}
 	
-	class PopupAdapter extends BaseAdapter{
+	private class PopupAdapter extends BaseAdapter{
 
+		List<Kitchen> mKitchensAllowTemp;
+		
+		PopupAdapter(List<Kitchen> kitchensAllowTemp){
+			mKitchensAllowTemp = kitchensAllowTemp;
+		}
+		
 		@Override
 		public int getCount() {
-			return mValidDepts.size();
+			return mKitchensAllowTemp.size();
 		}
 
 		@Override
 		public Object getItem(int position) {
-			return mValidDepts.get(position);
+			return mKitchensAllowTemp.get(position);
 		}
 
 		@Override
@@ -311,18 +269,19 @@ public class TempFoodFragment extends Fragment {
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-			View view = convertView;
+			View view;
 
-			if(view == null)
-			{
+			if(convertView == null){
 				final LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 				view = inflater.inflate(R.layout.temp_food_fragment_pop_list_item, null);
+			}else{
+				view = convertView;
 			}
 			
-			Department dept = mValidDepts.get(position);
+			Kitchen kitchen = mKitchensAllowTemp.get(position);
 			TextView textView = (TextView) view;
-			textView.setText(dept.name);
-			textView.setTag(dept);
+			textView.setText(kitchen.name);
+			textView.setTag(kitchen);
 			
 			return view;
 		}
