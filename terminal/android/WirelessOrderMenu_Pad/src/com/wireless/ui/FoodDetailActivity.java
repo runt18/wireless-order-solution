@@ -15,6 +15,8 @@ import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.RadioGroup;
+import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,6 +30,9 @@ import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.Taste;
+import com.wireless.protocol.TasteGroup;
+import com.wireless.protocol.Util;
 import com.wireless.util.ImageDialog;
 import com.wireless.util.ShadowImageView;
 import com.wireless.util.imgFetcher.ImageFetcher;
@@ -138,7 +143,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		});
 		
 		final EditText countEditText = (EditText) findViewById(R.id.editText_count_foodDetail);
-		countEditText.setText(String.valueOf(mOrderFood.getCount()));
+		countEditText.setText(Util.float2String2(mOrderFood.getCount()));
 		//增加数量的按钮
 		((ImageButton) findViewById(R.id.imageButton_plus_foodDetail)).setOnClickListener(new OnClickListener(){
 
@@ -147,7 +152,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 				if(!countEditText.getText().toString().equals(""))
 				{
 					float curNum = Float.parseFloat(countEditText.getText().toString());
-					countEditText.setText("" + ++curNum);
+					countEditText.setText(Util.float2String2(++curNum));
 					mOrderFood.setCount(curNum);
 				}
 			}
@@ -162,7 +167,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 					float curNum = Float.parseFloat(countEditText.getText().toString());
 					if(--curNum >= 1)
 					{
-						countEditText.setText("" + curNum);
+						countEditText.setText(Util.float2String2(curNum));
 						mOrderFood.setCount(curNum);
 					}
 				}
@@ -192,6 +197,30 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 				mDisplayHandler.sendEmptyMessage(ORDER_FOOD_CHANGED);
 			}
 		});
+		//规格
+		((RadioGroup) findViewById(R.id.radioGroup_foodDetail)).setOnCheckedChangeListener(new OnCheckedChangeListener(){
+			@Override
+			public void onCheckedChanged(RadioGroup group, int checkedId) {
+				if(!mOrderFood.hasTaste())
+					mOrderFood.tasteGroup = new TasteGroup(mOrderFood, null, null);
+				for(Taste t:WirelessOrder.foodMenu.specs)
+					mOrderFood.tasteGroup.removeTaste(t);
+				
+				switch(checkedId)
+				{
+				case R.id.radio0:
+					mOrderFood.tasteGroup.addTaste(WirelessOrder.foodMenu.specs[2]);
+					break;
+				case R.id.radio1:
+					mOrderFood.tasteGroup.addTaste(WirelessOrder.foodMenu.specs[1]);
+					break;
+				case R.id.radio2:
+					mOrderFood.tasteGroup.addTaste(WirelessOrder.foodMenu.specs[0]);
+					break;
+				}
+			}
+		});
+		
 		//设置两个tab
 		TabHost mTabHost = (TabHost) findViewById(R.id.tabhost_foodDetail);
 		mTabHost.setup();

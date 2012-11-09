@@ -3,7 +3,10 @@ package com.wireless.ui;
 import java.lang.ref.WeakReference;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.FragmentTransaction;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -22,6 +25,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.wireless.common.ShoppingCart;
 import com.wireless.fragment.OptionBarFragment;
 import com.wireless.fragment.StaffPanelFragment;
 import com.wireless.fragment.TablePanelFragment;
@@ -45,15 +49,19 @@ public class SettingActivity extends Activity implements OnTableChangedListener{
 	
 	private ListView mListView;
 	private Table mTable;
-	// FIXME 修正多次点击后死机问题
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		this.setContentView(R.layout.setting);
 		
+		if(ShoppingCart.instance().hasTable())
+			mTable = ShoppingCart.instance().getDestTable();
+		
 		mSettingItemHandler = new SettingItemHandler(this);
 
 		mListView = (ListView) findViewById(R.id.listView_setting);
+		//set adapter
 		mListView.setAdapter(new BaseAdapter(){
 			@Override
 			public int getCount() {
@@ -82,26 +90,42 @@ public class SettingActivity extends Activity implements OnTableChangedListener{
 				Switch switchBtn = (Switch) view.findViewById(R.id.switch_setting_item);
 				final TextView hintTextView = (TextView) findViewById(R.id.textView_setting_hint);
 				final View container = findViewById(R.id.setting_fgm_container);
-				 
+				 //根据不同的项分别设置行为
 				switch(position)
 				{
 				case ITEM_TABLE:
 					((TextView)view.findViewById(R.id.textView_setting_item_itemName)).setText("绑定餐台");
 					((TextView)view.findViewById(R.id.textView_setting_item_item_intro)).setText("");
+					//设置侦听器
 					switchBtn.setOnCheckedChangeListener(new OnCheckedChangeListener(){
 						@Override
 						public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 							if(isChecked)
 							{
+								//固定餐台
 								OptionBarFragment.setTableFixed(true);
+								//更改样式
+								if(mCurrentItem == ITEM_TABLE)
+								{
+									mSettingItemHandler.sendEmptyMessage(ITEM_TABLE);
+									container.setVisibility(View.VISIBLE);
+									hintTextView.setVisibility(View.INVISIBLE);
+								}
 							}
 							else {
+								//解绑餐台
 								OptionBarFragment.setTableFixed(false);
+								//更改样式
+								if(mCurrentItem == ITEM_TABLE){
+									container.setVisibility(View.GONE);
+									hintTextView.setVisibility(View.VISIBLE);
+									hintTextView.setText("如需绑定餐台，请打开绑定开关");
+								}
 							}
 							buttonView.setTag(isChecked);
 						}
 					});
-					
+					//初始化的时候根据原有的信息设置固定或解绑
 					if(OptionBarFragment.isTableFixed()){
 						switchBtn.setChecked(true);
 						switchBtn.setTag(true);
@@ -110,24 +134,9 @@ public class SettingActivity extends Activity implements OnTableChangedListener{
 						switchBtn.setTag(false);
 					}
 					
-					switchBtn.setOnClickListener(new View.OnClickListener() {
-						@Override
-						public void onClick(View v) {
-							if(mCurrentItem == ITEM_TABLE && ((Boolean)v.getTag()) == true)
-							{
-								mSettingItemHandler.sendEmptyMessage(ITEM_TABLE);
-								container.setVisibility(View.VISIBLE);
-								hintTextView.setVisibility(View.INVISIBLE);
-							}else if(mCurrentItem == ITEM_TABLE && ((Boolean)v.getTag()) == false){
-								container.setVisibility(View.GONE);
-								hintTextView.setVisibility(View.VISIBLE);
-							}
-								
-						}
-					});
-						
 					break;
 				case ITEM_STAFF:
+					//基本同上
 					((TextView)view.findViewById(R.id.textView_setting_item_itemName)).setText("绑定服务员");
 					((TextView)view.findViewById(R.id.textView_setting_item_item_intro)).setText("");
 					switchBtn.setOnCheckedChangeListener(new OnCheckedChangeListener() {
@@ -136,15 +145,27 @@ public class SettingActivity extends Activity implements OnTableChangedListener{
 							if(isChecked)
 							{
 								OptionBarFragment.setStaffFixed(true);
+								//更改样式
+								if(mCurrentItem == ITEM_STAFF)
+								{
+									mSettingItemHandler.sendEmptyMessage(ITEM_STAFF);
+									container.setVisibility(View.VISIBLE);
+									hintTextView.setVisibility(View.INVISIBLE);
+								}
 							}
 							else{
 								OptionBarFragment.setStaffFixed(false);
+								//更改样式
+								if(mCurrentItem == ITEM_STAFF){
+									container.setVisibility(View.GONE);
+									hintTextView.setVisibility(View.VISIBLE);
+									hintTextView.setText("如需绑定服务员账号，请打开绑定开关");
+								}
 							}
 							buttonView.setTag(isChecked);
-
 						}
 					});
-					
+					//根据原有的信息设置固定或解开
 					if(OptionBarFragment.isStaffFixed()){
 						switchBtn.setChecked(true);
 						switchBtn.setTag(true);
@@ -153,27 +174,13 @@ public class SettingActivity extends Activity implements OnTableChangedListener{
 						switchBtn.setTag(false);
 					}
 					
-					switchBtn.setOnClickListener(new View.OnClickListener() {
-						@Override
-						public void onClick(View v) {
-							if(mCurrentItem == ITEM_STAFF && ((Boolean)v.getTag()) == true)
-							{
-								mSettingItemHandler.sendEmptyMessage(ITEM_STAFF);
-								container.setVisibility(View.VISIBLE);
-								hintTextView.setVisibility(View.INVISIBLE);
-							}else if(mCurrentItem == ITEM_STAFF && ((Boolean)v.getTag()) == false){
-								container.setVisibility(View.GONE);
-								hintTextView.setVisibility(View.VISIBLE);
-							}
-						}
-					});
 					break;
 				}
 				return view;
 			}
 			
 		});
-		
+		//列表被单击的侦听
 		mListView.setOnItemClickListener(new OnItemClickListener(){
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -182,7 +189,7 @@ public class SettingActivity extends Activity implements OnTableChangedListener{
 					((View)parent.getTag()).setBackgroundDrawable(null);
 				view.setBackgroundColor(Color.CYAN);
 				parent.setTag(view);
-				
+				//初始化
 				Switch switchBtn = (Switch) view.findViewById(R.id.switch_setting_item);
 				TextView hintTextView = (TextView) findViewById(R.id.textView_setting_hint);
 				View container = findViewById(R.id.setting_fgm_container);
@@ -215,10 +222,18 @@ public class SettingActivity extends Activity implements OnTableChangedListener{
 			}
 		});
 		
+		mListView.postDelayed(new Runnable(){
+			@Override
+			public void run() {
+				mListView.performItemClick(mListView.getChildAt(0), 0, 0);
+			}
+		}, 100);
 	}
 	
 	private static class SettingItemHandler extends Handler{
 		private WeakReference<SettingActivity> mActivity;
+		//current_fragment 确保每次点击列表项时只调用一次transaction
+		private int CURRENT_FRAGMENT = Integer.MAX_VALUE;
 		
 		SettingItemHandler(SettingActivity activity){
 			mActivity = new WeakReference<SettingActivity>(activity);
@@ -231,13 +246,21 @@ public class SettingActivity extends Activity implements OnTableChangedListener{
 			FragmentTransaction fgTrans = activity.getFragmentManager().beginTransaction();
 			switch(msg.what){
 			case ITEM_TABLE:
-				TablePanelFragment tableFgm = new TablePanelFragment(); 
-				tableFgm.setOnTableChangedListener(activity);
-				fgTrans.replace(R.id.setting_fgm_container, tableFgm).commit();
+				if(CURRENT_FRAGMENT != ITEM_TABLE)
+				{
+					TablePanelFragment tableFgm = new TablePanelFragment(); 
+					tableFgm.setOnTableChangedListener(activity);
+					fgTrans.replace(R.id.setting_fgm_container, tableFgm).commit();
+					CURRENT_FRAGMENT = ITEM_TABLE;
+				}
 				break;
 			case ITEM_STAFF:
-				StaffPanelFragment staffFgm = new StaffPanelFragment();
-				fgTrans.replace(R.id.setting_fgm_container, staffFgm).commit();
+				if(CURRENT_FRAGMENT != ITEM_STAFF)
+				{
+					StaffPanelFragment staffFgm = new StaffPanelFragment();
+					fgTrans.replace(R.id.setting_fgm_container, staffFgm).commit();
+					CURRENT_FRAGMENT = ITEM_STAFF;
+				}
 				break;
 			}
 		}
@@ -251,10 +274,15 @@ public class SettingActivity extends Activity implements OnTableChangedListener{
 
 	@Override
 	public void onBackPressed() {
+		boolean tableReady = false,staffReady = false;
+		//判断是否绑定餐台
 		if(OptionBarFragment.isTableFixed())
 		{
-			if(mTable == null)
-				Toast.makeText(this, "您尚未选择餐台，请选择要绑定的餐台", Toast.LENGTH_SHORT).show();
+			//如果餐台为空
+			if(mTable == null && !ShoppingCart.instance().hasTable())
+			{
+				tableReady = false;
+			}
 			else {
 				Intent intent = new Intent();
 				Bundle bundle = new Bundle();
@@ -263,10 +291,55 @@ public class SettingActivity extends Activity implements OnTableChangedListener{
 				intent.putExtras(bundle);
 				
 				setResult(SETTING_RES_CODE, intent);
+				tableReady = true;
 			}
-		}
-		super.onBackPressed();
-
-		// TODO 增加服务员的判断条件
+		} else tableReady = true;
+		//判断服务员是否绑定
+		if(OptionBarFragment.isStaffFixed()){
+			if(!ShoppingCart.instance().hasStaff())
+				staffReady = false;
+			else staffReady = true;
+		} else staffReady = true;
+//		
+		//如果都为空
+		if(!tableReady && !staffReady)
+			new AlertDialog.Builder(this).setTitle("餐台和服务员都未绑定，是否退出？").
+			setPositiveButton("退出", new OnClickListener(){
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					//还原设置并退出
+					OptionBarFragment.setStaffFixed(false);
+					OptionBarFragment.setTableFixed(false);
+					dialog.dismiss();
+					SettingActivity.super.onBackPressed();
+				}
+			}).
+			setNegativeButton("返回", null).show();
+		//如果餐台为空
+		else if(!tableReady)
+			new AlertDialog.Builder(this).setTitle("尚未选择餐台，是否退出？").
+			setPositiveButton("退出", new OnClickListener(){
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					OptionBarFragment.setTableFixed(false);
+					dialog.dismiss();
+					SettingActivity.super.onBackPressed();
+				}
+			}).
+			setNegativeButton("返回", null).show();
+		//服务员为空
+		else if(!staffReady)
+			new AlertDialog.Builder(this).setTitle("尚未绑定服务员账号，是否退出？").
+			setPositiveButton("退出", new OnClickListener(){
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					OptionBarFragment.setStaffFixed(false);
+					dialog.dismiss();
+					SettingActivity.super.onBackPressed();
+				}
+			}).
+			setNegativeButton("返回", null).show();
+		//都不为空
+		else super.onBackPressed();
 	}
 }	

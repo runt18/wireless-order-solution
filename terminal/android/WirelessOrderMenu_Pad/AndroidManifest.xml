@@ -19,11 +19,10 @@
         android:label="@string/app_name"
         android:screenOrientation="landscape"
         android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen" >
-        
         <activity
             android:name="com.wireless.ui.StartupActivity"
-            android:screenOrientation="landscape"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:screenOrientation="landscape" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -32,25 +31,34 @@
         </activity>
         <activity
             android:name="com.wireless.ui.MainActivity"
-            android:screenOrientation="landscape"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:screenOrientation="landscape" >
         </activity>
         <activity
             android:name="com.wireless.ui.ContentActivity"
-            android:screenOrientation="landscape"
-            android:label="@string/app_name" >
-        </activity>
-        <activity android:name="com.wireless.ui.FullScreenActivity"
+            android:label="@string/app_name"
             android:screenOrientation="landscape" >
         </activity>
-        <activity android:name="com.wireless.ui.FoodDetailActivity"
-            android:screenOrientation="landscape">
+        <activity
+            android:name="com.wireless.ui.FullScreenActivity"
+            android:screenOrientation="landscape" >
         </activity>
-        <activity android:name="com.wireless.ui.PickedFoodActivity"
-            android:screenOrientation="landscape"></activity>
-        <activity android:name="com.wireless.ui.ComboFoodActivity"></activity>
-        <activity android:name="com.wireless.ui.RankListActivity"></activity>
-        <activity android:name="com.wireless.ui.SettingActivity"></activity>
+        <activity
+            android:name="com.wireless.ui.FoodDetailActivity"
+            android:screenOrientation="landscape" >
+        </activity>
+        <activity
+            android:name="com.wireless.ui.PickedFoodActivity"
+            android:screenOrientation="landscape" >
+        </activity>
+        <activity android:name="com.wireless.ui.ComboFoodActivity" >
+        </activity>
+        <activity android:name="com.wireless.ui.RankListActivity" >
+        </activity>
+        <activity
+            android:name="com.wireless.ui.SettingActivity"
+            android:screenOrientation="landscape" >
+        </activity>
     </application>
 
 </manifest>

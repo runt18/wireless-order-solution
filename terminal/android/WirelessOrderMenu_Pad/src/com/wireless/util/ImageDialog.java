@@ -54,13 +54,16 @@ public class ImageDialog extends Dialog {
 		mImageFetcher.loadImage(mFood.image, imageView);
 		
 		final EditText countEditText = (EditText) findViewById(R.id.editText_count_rec_dialog);
-		//设置数量加减
+		//设置数量加加
 		((ImageButton)  findViewById(R.id.imageButton_plus_rec_dialog)).setOnClickListener(new View.OnClickListener(){
 
 			@Override
 			public void onClick(View v) {
-				float curNum = Float.parseFloat(countEditText.getText().toString());
-				countEditText.setText("" + ++curNum);
+				if(!countEditText.getText().toString().equals(""))
+				{
+					float curNum = Float.parseFloat(countEditText.getText().toString());
+					countEditText.setText(Util.float2String2(++curNum));
+				}
 			}
 		});
 		
@@ -69,9 +72,13 @@ public class ImageDialog extends Dialog {
 
 			@Override
 			public void onClick(View v) {
-				float curNum = Float.parseFloat(countEditText.getText().toString());
-				if(--curNum >= 1){
-					countEditText.setText("" + curNum);
+				if(!countEditText.getText().toString().equals(""))
+				{
+					float curNum = Float.parseFloat(countEditText.getText().toString());
+					if(--curNum >= 1)
+					{
+						countEditText.setText(Util.float2String2(curNum));
+					}
 				}
 			}
 		});

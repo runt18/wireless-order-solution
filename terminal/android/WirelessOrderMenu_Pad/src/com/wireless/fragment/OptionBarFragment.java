@@ -126,9 +126,6 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 			mTableNumBtn.setClickable(false);
 		}
 		
-//		if(mDialog == null)
-//			this.initDialog(getActivity());
-		
 	}
 	
 	public static boolean isTableFixed() {
@@ -221,13 +218,8 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 		mTabHost = (TabHost) dialogLayout.findViewById(R.id.tabhost);
 		mTabHost.setup();
 		// FIXME 修正无法锁住tab切换的问题
-		if(!TABLE_FIXED){
-			mTabHost.addTab(mTabHost.newTabSpec(TAB_PICK_TBL).setIndicator("餐台设置").setContent(R.id.tab1));
-		} else 	dialogLayout.findViewById(R.id.tab1).setVisibility(View.GONE);
-
-		if(!STAFF_FIXED){
-			mTabHost.addTab(mTabHost.newTabSpec(TAB_PICK_STAFF).setIndicator("服务员设置").setContent(R.id.tab2));
-		} else dialogLayout.findViewById(R.id.tab1).setVisibility(View.GONE);
+		mTabHost.addTab(mTabHost.newTabSpec(TAB_PICK_TBL).setIndicator("餐台设置").setContent(R.id.tab1));
+		mTabHost.addTab(mTabHost.newTabSpec(TAB_PICK_STAFF).setIndicator("服务员设置").setContent(R.id.tab2));
 		
 		mDialog = new Dialog(activity);
 		mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -242,7 +234,6 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 			@Override
 			public void onClick(View v) {
 				mDialog.dismiss();
-				mDialog = null;
 			}
 		});
 		
@@ -273,7 +264,7 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 	 * 服务员改变时的回调，判断登陆信息是否正确
 	 */
 	@Override
-	public void onStaffChanged(final StaffTerminal staff, String id, String pwd) {
+	public void onStaffChanged(StaffTerminal staff, String id, String pwd) {
 		mBBarRefleshHandler.sendEmptyMessage(0);
 	}
 	

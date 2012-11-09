@@ -241,7 +241,7 @@ public class MainActivity extends Activity
 			}
 		});
 		mOrderFood = new OrderFood(WirelessOrder.foods[0]);
-		mOrderFood.setCount(Float.parseFloat(((TextView) findViewById(R.id.textView_amount_main)).getText().toString()));
+		mOrderFood.setCount(1f);
 		//默认启用第一项
 		mItemFragment.performClick(0);
 		
@@ -256,7 +256,7 @@ public class MainActivity extends Activity
 	public void onPicChanged(Food food, int position) {
 		mItemFragment.setPosition(food.kitchen);  
 		((TextView) findViewById(R.id.textView_foodName_main)).setText(food.name);
-		((TextView) findViewById(R.id.textView_price_main)).setText("" + food.getPrice());
+		((TextView) findViewById(R.id.textView_price_main)).setText(Util.float2String2(food.getPrice()));
 		((TextView) findViewById(R.id.textView_amount_main)).setText("1");
 		mOrderFood = new OrderFood(food);
 		mOrderFood.setCount(Float.parseFloat(((TextView) findViewById(R.id.textView_amount_main)).getText().toString()));
@@ -293,7 +293,10 @@ public class MainActivity extends Activity
 	public void onPicClick(Food food, int position) {
 		Intent intent = new Intent(MainActivity.this, FoodDetailActivity.class);
 		Bundle bundle = new Bundle();
-		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(new OrderFood(food)));
+		OrderFood orderFood = new OrderFood(food);
+		orderFood.setCount(1f);
+		
+		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(orderFood));
 		intent.putExtras(bundle);
 		startActivity(intent);
 	}  

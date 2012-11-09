@@ -29,6 +29,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
+import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
@@ -138,10 +139,11 @@ public class PickedFoodActivity extends Activity implements OnOrderChangeListene
 					map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
 					map.put(ITEM_THE_FOOD, f);
 					pickedFoodDatas.add(map);
-					mTotalPrice += f.getPriceWithTaste() * f.getCount(); 
-
+//					mTotalPrice += f.getPriceWithTaste() * f.getCount(); 
 				}
 				childData.add(pickedFoodDatas);
+				
+				mTotalPrice = sCart.getOriOrder().calcPriceWithTaste();
 				
 				HashMap<String, Object> map1 = new HashMap<String, Object>();
 				map1.put(ITEM_GROUP_NAME, "已点菜");
@@ -161,10 +163,10 @@ public class PickedFoodActivity extends Activity implements OnOrderChangeListene
 					map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
 					map.put(ITEM_THE_FOOD, f);
 					newFoodDatas.add(map);
-					mTotalPrice += f.getPriceWithTaste() * f.getCount(); 
 
 				}
 				childData.add(newFoodDatas);
+				mTotalPrice += sCart.getNewOrder().calcPriceWithTaste();
 				
 				HashMap<String, Object> map2 = new HashMap<String, Object>();
 				map2.put(ITEM_GROUP_NAME, "新点菜");
@@ -202,19 +204,23 @@ public class PickedFoodActivity extends Activity implements OnOrderChangeListene
 								.setNeutralButton("确定",new DialogInterface.OnClickListener() {
 									@Override
 									public void onClick(DialogInterface dialog, int which) {
-										if(Float.valueOf(editText.getText().toString()) == 0.0f)
-										{
-											//TODO 修改成其他dialog,让dialog不消失
-											Toast.makeText(activity, "输入的数值不正确，请重新输入", Toast.LENGTH_SHORT).show();
-										}
 										//设置新数值
-										else if(!editText.getText().toString().equals(""))
+										if(!editText.getText().toString().equals(""))
 										{
-											float num = Float.parseFloat(editText.getText().toString());
-											countEditText.setText(Util.float2String2(num));
-											orderFood.setCount(num);
-											mTotalPrice += orderFood.getPriceWithTaste();
-											mTotalPriceTextView.setText(Util.float2String2(mTotalPrice));
+											//如果等于0则提示
+											 if(Float.valueOf(editText.getText().toString()).equals(0f)) {
+												 Toast.makeText(activity, "输入的数值不正确，请重新输入", Toast.LENGTH_SHORT).show();
+											 }
+											 else {
+												float num = Float.parseFloat(editText.getText().toString());
+												countEditText.setText(Util.float2String2(num));
+												orderFood.setCount(num);
+												mTotalPrice += orderFood.getPriceWithTaste();
+												mTotalPriceTextView.setText(Util.float2String2(mTotalPrice));
+												dialog.dismiss();
+											 }
+										//如果为空则直接消失
+										} else if(editText.getText().toString().equals("")){
 											dialog.dismiss();
 										}
 									}
@@ -437,6 +443,7 @@ public class PickedFoodActivity extends Activity implements OnOrderChangeListene
 		private TextView mTempTasteTextView;
 		private ImageButton mTempTasteBtn;
 		private ImageButton mPickTasteBtn;
+		private RadioGroup mRadioGroup;
 		
 		FoodDetailHandler(final PickedFoodActivity activity)
 		{
@@ -454,6 +461,8 @@ public class PickedFoodActivity extends Activity implements OnOrderChangeListene
 			//品注按钮
 			mTempTasteBtn = (ImageButton) activity.findViewById(R.id.button_pinzhu_foodDetail);
 			mTempTasteBtn.setOnClickListener(activity.new PickedFoodOnClickListener(PickTasteFragment.FOCUS_NOTE));
+			
+			mRadioGroup = (RadioGroup) activity.findViewById(R.id.radioGroup_foodDetail);
 		}
 		
 		@Override
@@ -483,6 +492,7 @@ public class PickedFoodActivity extends Activity implements OnOrderChangeListene
 					mTasteTextView.setText("");
 				}
 			});
+			//TODO 添加规格的显示
 		}
 	}
 	@Override
@@ -755,8 +765,14 @@ public class PickedFoodActivity extends Activity implements OnOrderChangeListene
 	
 	@Override
 	public void onTasteChange(OrderFood food) {
+		ShoppingCart.instance().getNewOrder().remove(mCurFood);
 		mCurFood = food;
-		mFoodDataHandler.sendEmptyMessage(PickedFoodActivity.CUR_FOOD_CHANGED);
+		try {
+			ShoppingCart.instance().getNewOrder().addFood(mCurFood);
+		} catch (BusinessException e) {
+			e.printStackTrace();
+		}
+		mFoodHandler.sendEmptyMessage(LIST_CHANGED);
 	}
 	
 	class PickedFoodOnClickListener implements OnClickListener{

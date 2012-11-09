@@ -106,8 +106,7 @@ public class ComboFoodActivity extends Activity {
 				//取得这个套餐
 				OrderFood theFood = msg.getData().getParcelable(COMBO_FOOD_KEY);
 				mComboFoodNameTextView.setText(theFood.name);
-				//FIXME 修改成优惠价
-				mComboFoodPriceTextView.setText(Util.float2String2(theFood.getPriceWithTaste()));
+				mComboFoodPriceTextView.setText(Util.float2String2(theFood.calcPriceWithTaste()));
 				  
 				ArrayList<Food> childFoods = new ArrayList<Food>();
 				ArrayList<Food> giftFoods = new ArrayList<Food>();

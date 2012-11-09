@@ -276,7 +276,7 @@ public final class ShoppingCart {
 	}
 	
 	public boolean hasTable(){
-		return mDestTable == null ? false : true;
+		return mDestTable != null;
 	}
 	
 	public boolean hasOriOrder(){
