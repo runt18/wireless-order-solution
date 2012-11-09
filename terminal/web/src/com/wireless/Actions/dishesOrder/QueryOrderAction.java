@@ -60,7 +60,6 @@ public class QueryOrderAction extends Action {
 			if (request.getParameter("tableID") != null) {
 				tableID = Integer.parseInt(request.getParameter("tableID"));
 				order = QueryOrder.exec(Long.parseLong(pin), Terminal.MODEL_STAFF, tableID);
-
 			} else if (request.getParameter("orderID") != null) {
 				orderID = Integer.parseInt(request.getParameter("orderID"));
 				if (queryType.equals("History")) {
@@ -105,7 +104,7 @@ public class QueryOrderAction extends Action {
 							TasteBasic tb = new TasteBasic();
 							tb.setTasteID(tl.tasteID);
 							tb.setTasteAliasID(tl.aliasID);
-							item.addTaste(tb);
+							tg.addTaste(tb);
 						}
 						item.setTasteGroup(tg);
 					}else{
