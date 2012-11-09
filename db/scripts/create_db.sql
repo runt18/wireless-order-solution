@@ -226,6 +226,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`kitchen` (
   `dept_id` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the department alias id that this kitchen belong to. ' ,
   `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name of this kitchen' ,
   `type` TINYINT NOT NULL DEFAULT 0 COMMENT 'the type to this taste as below.\n0 - normal\n1 - reserved' ,
+  `is_allow_temp` TINYINT NOT NULL DEFAULT 0 COMMENT 'the flag to indicate whether allow temporary food' ,
   PRIMARY KEY (`kitchen_id`) ,
   INDEX `ix_kitchen_alias_id` (`restaurant_id` ASC, `kitchen_alias` ASC) )
 ENGINE = InnoDB
@@ -240,11 +241,12 @@ DROP TABLE IF EXISTS `wireless_order_db`.`member_type` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_type` (
   `member_type_id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to member type' ,
+  `restaurant_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the restaurant id to this member type' ,
   `discount_id` INT UNSIGNED NOT NULL COMMENT 'the discount id this member type uses' ,
   `exchange_rate` DECIMAL(4,2) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the exchange rate used to transfer the price to point' ,
   `charge_rate` DECIMAL(4,2) NOT NULL DEFAULT 0 COMMENT 'the charge rate used to transfer money to balance' ,
   `name` VARCHAR(45) NOT NULL COMMENT 'the name to this member type' ,
-  `type` TINYINT NOT NULL DEFAULT 0 COMMENT 'the type to this member tye as below.\n0 - 优惠卡\n1 - 积分卡\n2 - 充值卡' ,
+  `attribute` TINYINT NOT NULL DEFAULT 0 COMMENT 'the attribute to this member tye as below.\n0 - 充值属性\n1 - 积分属性\n2 - 优惠属性\n\n' ,
   PRIMARY KEY (`member_type_id`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
