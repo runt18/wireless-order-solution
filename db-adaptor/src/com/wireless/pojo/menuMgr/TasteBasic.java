@@ -2,8 +2,7 @@ package com.wireless.pojo.menuMgr;
 
 import com.wireless.util.WebParams;
 
-public class FoodTaste extends FoodBasic{
-	
+public class TasteBasic {
 	private int restaurantID;			// 餐厅编号
 	private int rank = 0;				// 口味排名
 	private int tasteID;				// 口味编号
@@ -11,9 +10,9 @@ public class FoodTaste extends FoodBasic{
 	private String tasteName;			// 口味名称
 	private double tastePrice;			// 口味价格
 	private double tasteRate;			// 口味比例
-	private int tasteCategory;			// 口味类型	0:口味	1:做法     2:规格
-	private int tasteCalc;				// 口味计算方式		0:按价格	1:按比例
-	private int type;					// 操作类型	0:默认	1:系统保留(不可删除)
+	private int tasteCategory;			// 口味类型    0:口味  1:做法     2:规格
+	private int tasteCalc;				// 口味计算方式          0:按价格     1:按比例
+	private int type;					// 操作类型	0:默认    1:系统保留(不可删除)
 	
 	public int getRestaurantID() {
 		return restaurantID;
@@ -68,7 +67,7 @@ public class FoodTaste extends FoodBasic{
 		}else if(tasteCategory == WebParams.CATE_SPEC){
 			return WebParams.CATE_SPEC_TEXT;
 		}else{
-			return "";
+			return null;
 		}
 	}
 	public void setTasteCategory(int tasteCategory) {
@@ -83,7 +82,7 @@ public class FoodTaste extends FoodBasic{
 		}else if(tasteCalc == WebParams.CALC_RATE){
 			return WebParams.CALC_RATE_TEXT;
 		}else{
-			return "";
+			return null;
 		}
 	}
 	public void setTasteCalc(int tasteCalc) {
