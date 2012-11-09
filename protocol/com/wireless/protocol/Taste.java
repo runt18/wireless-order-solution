@@ -2,8 +2,7 @@ package com.wireless.protocol;
 
 public class Taste {
 	
-	public final static short NO_TASTE = 0;
-	final static String NO_PREFERENCE = "无口味"; 
+	private final static String NO_PREFERENCE = "无口味"; 
 	
 	public final static short CATE_ALL = Short.MIN_VALUE;	/* 全部 */
 	public final static short CATE_TASTE = 0;				/* 口味 */
@@ -18,7 +17,7 @@ public class Taste {
 	
 	public int restaurantID;
 	public int tasteID;
-	public int aliasID = Taste.NO_TASTE;
+	public int aliasID;
 	public short category = Taste.CATE_TASTE;
 	public short type = TYPE_NORMAL;
 	public short calc = Taste.CALC_PRICE;
@@ -90,13 +89,7 @@ public class Taste {
 	 * @return
 	 */
 	public int compare(Taste taste2){
-		if(this.aliasID == taste2.aliasID){
-			return 0;
-		}else if(this.aliasID == Taste.NO_TASTE){
-			return 1;
-		}else if(taste2.aliasID == Taste.NO_TASTE){
-			return -1;
-		}else if(this.aliasID > taste2.aliasID){
+		if(this.aliasID > taste2.aliasID){
 			return 1;
 		}else if(this.aliasID < taste2.aliasID){
 			return -1;
@@ -141,4 +134,29 @@ public class Taste {
 	public Float getPrice2(Float foodPrice){
 		return Util.int2Float(Util.float2Int(foodPrice) * rate / 100);
 	}
+	
+	/**
+	 * Check if the taste belongs taste category.
+	 * @return true if the taste belongs to taste, otherwise false
+	 */
+	public boolean isTaste(){
+		return category == CATE_TASTE;
+	}
+	
+	/**
+	 * Check if the taste belongs taste specification.
+	 * @return true if the taste belongs to specification, otherwise false
+	 */
+	public boolean isSpec(){
+		return category == CATE_SPEC;
+	}
+	
+	/**
+	 * Check if the taste belongs taste style.
+	 * @return true if the taste belongs to style, otherwise false
+	 */
+	public boolean isStyle(){ 
+		return category == CATE_STYLE;
+	}
+	
 }

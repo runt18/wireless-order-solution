@@ -91,7 +91,9 @@ public class OrderFood extends Food {
 		}else if(isTemporary && food.isTemporary){
 			return name.equals(food.name) && (price == food.price);
 		}else{
-			return aliasID == food.aliasID && (tasteGroup != null ? tasteGroup.equals(food.tasteGroup) : food.tasteGroup == null);
+			return restaurantID == food.restaurantID && 
+				   aliasID == food.aliasID && 
+				   (tasteGroup != null ? tasteGroup.equals(food.tasteGroup) : food.tasteGroup == null);
 		}
 	}
 	
@@ -536,9 +538,6 @@ public class OrderFood extends Food {
 	 * name-taste1,taste2,taste3
 	 */
 	public String toString(){
-
-		String tastePref = tasteGroup == null ? TasteGroup.NO_TASTE_PREF : tasteGroup.getTastePref();
-		
-		return name + (tastePref.equals(Taste.NO_PREFERENCE) ? "" : ("-" + tastePref));
+		return name + (hasTaste() ? ("-" + tasteGroup.getTastePref()) : "");
 	}
 }
