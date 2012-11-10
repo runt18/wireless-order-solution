@@ -29,7 +29,8 @@ import com.wireless.protocol.Util;
 
 public class PickFoodActivity extends FragmentActivity implements 
 			com.wireless.fragment.PickFoodFragment.OnFoodPickedListener, 
-			com.wireless.fragment.KitchenFragment.OnFoodPickedListener
+			com.wireless.fragment.KitchenFragment.OnFoodPickedListener,
+			com.wireless.fragment.TempFoodFragment.OnFoodPickedListener
 {
 	
 	//每个点菜方式的标签
@@ -131,7 +132,9 @@ public class PickFoodActivity extends FragmentActivity implements
 				break;
 			case TEMP_FOOD_FRAGMENT:
 				if(mActivity.get().mCurFg != TEMP_FOOD_FRAGMENT){
-					fgTrans.replace(R.id.frameLayout_container_pickFood, new TempFoodFragment()).commit();
+					TempFoodFragment tempFgm = new TempFoodFragment();
+					tempFgm.setFoodPickedListener(activity);
+					fgTrans.replace(R.id.frameLayout_container_pickFood, tempFgm).commit();
 					
 					mTitleTextView.setText("点菜 - 临时菜");
 					setLastCate(TEMP_FOOD_FRAGMENT);

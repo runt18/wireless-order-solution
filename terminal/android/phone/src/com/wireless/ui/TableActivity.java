@@ -58,7 +58,6 @@ public class TableActivity extends Activity {
 	private PullListView mListView;
 	private PopupWindow mPopWnd;
 
-//	private View popupView;
 	private ImageButton regionAllBtn ;
 	private ImageButton idleBtn;
 	private ImageButton busyBtn;
@@ -701,7 +700,7 @@ public class TableActivity extends Activity {
 			}
 			
 		});
-		
+		//标题上的按钮
 		ImageButton titleBtn = (ImageButton)findViewById(R.id.title_btn_top);
 		titleBtn.setVisibility(View.VISIBLE);
 		titleBtn.setOnClickListener(new OnClickListener(){

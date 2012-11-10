@@ -14,9 +14,9 @@
         android:hint="请输入菜名" >
 
     </EditText>
-
+
     <EditText
-        android:id="@+id/editText1"
+        android:id="@+id/editText_tempFoodItem_amount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/editText_foodName_tempFood_item"
@@ -24,7 +24,8 @@
         android:layout_below="@+id/editText_foodName_tempFood_item"
         android:layout_toLeftOf="@+id/imageButton_delete_tempFood_item"
         android:ems="10"
-        android:hint="请输入数量" />
+        android:hint="请输入数量"
+        android:inputType="number|numberSigned|numberDecimal" />
 
     <ImageButton
         android:id="@+id/imageButton_delete_tempFood_item"
