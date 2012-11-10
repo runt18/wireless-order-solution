@@ -243,11 +243,13 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_type` (
   `member_type_id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to member type' ,
   `restaurant_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the restaurant id to this member type' ,
   `discount_id` INT UNSIGNED NOT NULL COMMENT 'the discount id this member type uses' ,
+  `discount_type` TINYINT NOT NULL DEFAULT 0 COMMENT 'the discount type is as below.\n0 - discount plan\n1 - entire ' ,
   `exchange_rate` DECIMAL(4,2) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the exchange rate used to transfer the price to point' ,
   `charge_rate` DECIMAL(4,2) NOT NULL DEFAULT 0 COMMENT 'the charge rate used to transfer money to balance' ,
   `name` VARCHAR(45) NOT NULL COMMENT 'the name to this member type' ,
   `attribute` TINYINT NOT NULL DEFAULT 0 COMMENT 'the attribute to this member tye as below.\n0 - 充值属性\n1 - 积分属性\n2 - 优惠属性\n\n' ,
-  PRIMARY KEY (`member_type_id`) )
+  PRIMARY KEY (`member_type_id`) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the member type information' ;
@@ -714,7 +716,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`discount_plan` (
   `discount_id` INT UNSIGNED NOT NULL DEFAULT 0 ,
   `kitchen_id` INT NOT NULL DEFAULT 0 ,
   `rate` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the discount rate which ranges from 0.00 to 1.00' ,
-  PRIMARY KEY (`dist_plan_id`) )
+  PRIMARY KEY (`dist_plan_id`) ,
+  INDEX `ix_discount_id` (`discount_id` ASC) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the plan to each discount' ;
@@ -914,6 +917,7 @@ COMMENT = 'describe the relationship between taste group and its normal' /* comm
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
 
 
 -- -----------------------------------------------------
