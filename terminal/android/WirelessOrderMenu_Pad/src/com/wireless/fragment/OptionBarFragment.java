@@ -113,14 +113,19 @@ public class OptionBarFragment extends Fragment implements OnTableChangedListene
 		
 		if(!STAFF_FIXED){
 			mStaffBtn.setClickable(true);
+			mDialog.setItemEnable(OptionDialog.ITEM_STAFF, true);
 		}else {
 			mStaffBtn.setClickable(false);
+			mDialog.setItemEnable(OptionDialog.ITEM_STAFF, false);
 		}
 		
-		if(!TABLE_FIXED)
+		if(!TABLE_FIXED){
 			mTableNumBtn.setClickable(true);
-		else {
+			mDialog.setItemEnable(OptionDialog.ITEM_TABLE, true);
+		}else {
 			mTableNumBtn.setClickable(false);
+			mDialog.setItemEnable(OptionDialog.ITEM_TABLE, false);
+
 		}
 		
 	}

@@ -1,5 +1,7 @@
 package com.wireless.util;
 
+import java.lang.ref.WeakReference;
+
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
@@ -96,23 +98,30 @@ public class OptionDialog extends Dialog implements OnTableChangedListener, OnSt
 				setCurrentItem(ITEM_STAFF);
 			}
 		});
-		
+		//设置侦听
 		((TablePanelFragment)getOwnerActivity().getFragmentManager().findFragmentById(R.id.tablePanelFgm_optionDialog)).setOnTableChangedListener(this);
 		((StaffPanelFragment)getOwnerActivity().getFragmentManager().findFragmentById(R.id.staffPanelFgm_optionDialog)).setOnStaffChangeListener(this);
 	}
-	// FIXME 完善状态更改的功能
-	public void setItemEnable(int item)
+	/**
+	 * 设置哪个项目可以使用
+	 * @param item	指定项目
+	 * @param enable 是否可以使用
+	 */
+	public void setItemEnable(int item, boolean enable)
 	{
 		switch(item){
 		case ITEM_TABLE:
-			ITEM_TABLE_ENABLE = true;
+			ITEM_TABLE_ENABLE = enable;
 			break;
 		case ITEM_STAFF:
-			ITEM_STAFF_ENABLE = true;
+			ITEM_STAFF_ENABLE = enable;
 			break;
 		}
 	}
-	
+	/**
+	 * 设置当前显示的项
+	 * @param item 
+	 */
 	public void setCurrentItem(int item){
 		switch(item){
 		case ITEM_TABLE:
@@ -133,14 +142,14 @@ public class OptionDialog extends Dialog implements OnTableChangedListener, OnSt
 	}
 	
 	static class SettingHandler extends Handler{
-//		private WeakReference<OptionDialog> mDialog;
+		private WeakReference<OptionDialog> mDialog;
 		private View mTableFragment;
 		private View mStaffFragment;
 		private Button mTableBtn;
 		private Button mStaffBtn;
 		
 		SettingHandler(OptionDialog dialog) {
-//			mDialog = new WeakReference<OptionDialog>(dialog);
+			mDialog = new WeakReference<OptionDialog>(dialog);
 			
 			mTableFragment = dialog.findViewById(R.id.tablePanelFgm_optionDialog);
 			mStaffFragment = dialog.findViewById(R.id.staffPanelFgm_optionDialog);
@@ -150,27 +159,46 @@ public class OptionDialog extends Dialog implements OnTableChangedListener, OnSt
 		
 		@Override
 		public void handleMessage(Message msg) {
+			OptionDialog dialog = mDialog.get();
 			mStaffFragment.setVisibility(View.INVISIBLE);
 			mTableFragment.setVisibility(View.INVISIBLE);
-
+			mTableBtn.setVisibility(View.INVISIBLE);
+			mStaffBtn.setVisibility(View.INVISIBLE);
+			
+			if(dialog.ITEM_STAFF_ENABLE && dialog.ITEM_TABLE_ENABLE)
+			{
+				mTableBtn.setVisibility(View.VISIBLE);
+				mStaffBtn.setVisibility(View.VISIBLE);
+			}
+			
 			switch(msg.what){
 			case ITEM_TABLE :
-				mTableFragment.setVisibility(View.VISIBLE);
+				if(dialog.ITEM_TABLE_ENABLE){
+					mTableFragment.setVisibility(View.VISIBLE);
+					mTableBtn.setVisibility(View.VISIBLE);
+				}
 				break;
 			case ITEM_STAFF:
-				mStaffFragment.setVisibility(View.VISIBLE);
+				if(dialog.ITEM_STAFF_ENABLE){
+					mStaffFragment.setVisibility(View.VISIBLE);
+					mStaffBtn.setVisibility(View.VISIBLE);
+				}
 				break;
 			}
 		}
 		
 	}
-
+	/**
+	 * 直接把fragment返回的餐台返回给侦听器
+	 */
 	@Override
 	public void onTableChanged(Table table) {
 		if(mOnTableChangedListener != null)
 			mOnTableChangedListener.onTableChanged(table);
 	}
-
+	/**
+	 * 直接把fragment返回的服务员返回给侦听器
+	 */
 	@Override
 	public void onStaffChanged(StaffTerminal staff, String id, String pwd) {
 		if(mOnStaffChangedListener != null)
