@@ -20,7 +20,7 @@ public class FoodParcel extends OrderFood implements Parcelable{
 			kitchen = food.kitchen;
 			name = food.name;
 			image = food.image;
-			tasteGroup = food.tasteGroup;
+			setTasteGroup(food.getTasteGroup());
 			hangStatus = food.hangStatus;
 			isTemporary = food.isTemporary;
 			status = food.status;
@@ -55,10 +55,7 @@ public class FoodParcel extends OrderFood implements Parcelable{
 		waiter = in.readString();
 		setCount(Util.int2Float(in.readInt()));
 		setPrice(Util.int2Float(in.readInt()));
-		tasteGroup = TasteGroupParcel.CREATOR.createFromParcel(in);
-		if(tasteGroup != null){
-			tasteGroup.setAttachedFood(this);
-		}
+		setTasteGroup(TasteGroupParcel.CREATOR.createFromParcel(in));
 		//un-marshal the most popular taste references
 		TasteParcel[] popTasteParcels = in.createTypedArray(TasteParcel.CREATOR);
 		if(popTasteParcels != null){
@@ -112,7 +109,7 @@ public class FoodParcel extends OrderFood implements Parcelable{
 			parcel.writeInt(Util.float2Int(getCount()));
 			parcel.writeInt(Util.float2Int(getPrice()));
 			//marshal the taste group
-			new TasteGroupParcel(tasteGroup).writeToParcel(parcel, flags);			
+			new TasteGroupParcel(getTasteGroup()).writeToParcel(parcel, flags);			
 			//marshal the most popular taste references
 			if(popTastes != null){
 				TasteParcel[] popTasteParcels = new TasteParcel[popTastes.length];
