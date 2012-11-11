@@ -107,13 +107,12 @@ public class ReqInsertOrder extends ReqPackage {
 				 * len_tmp_taste : tmp_taste[n] : tmp_taste_alias[2] : tmp_taste_price[4] : 
 				 * kitchen : hang_status : is_hurried 
 				 **/
-				Taste[] normalTastes = reqOrder.foods[i].tasteGroup == null ? null : reqOrder.foods[i].tasteGroup.mNormalTastes;
 				Taste tmpTaste = reqOrder.foods[i].tasteGroup == null ? null : reqOrder.foods[i].tasteGroup.mTmpTaste;
 				foodLen += 1 + /* is_temp(0) */
 						   2 + /* food_id[2] */ 
 						   2 + /* order_amount[2] */
 						   1 + /* normal_taste_amount */
-						   (normalTastes == null ? 0 : normalTastes.length * 2) + /* each normal taste alias takes up 2-byte */
+						   (reqOrder.foods[i].hasNormalTaste() ? reqOrder.foods[i].tasteGroup.getNormalTastes().length * 2 : 0) + /* each normal taste alias takes up 2-byte */
 						   1 + /* len_tmp_taste */
 						   (tmpTaste == null ? 0 : tmpTaste.preference.getBytes("UTF-8").length) + /* the name to tmp_taste */
 						   2 + /* tmp_taste_alias[2] */
@@ -253,7 +252,7 @@ public class ReqInsertOrder extends ReqPackage {
 				//assign each alias id to normal tastes
 				if(reqOrder.foods[i].hasNormalTaste()){
 					
-					Taste[] normalTastes = reqOrder.foods[i].tasteGroup.mNormalTastes;
+					Taste[] normalTastes = reqOrder.foods[i].tasteGroup.getNormalTastes();
 					
 					//assign the amount to normal tastes
 					body[offset] = (byte)normalTastes.length;

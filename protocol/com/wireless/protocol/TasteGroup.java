@@ -12,7 +12,8 @@ public class TasteGroup {
 	
 	OrderFood mAttachedOrderFood;
 	
-	Taste[] mNormalTastes;
+	Taste[] mTastes;
+	Taste[] mSpecs;
 	
 	Taste mTmpTaste;
 	
@@ -33,8 +34,7 @@ public class TasteGroup {
 	
 	public TasteGroup(OrderFood attachedOrderFood, Taste[] normalTastes, Taste tmpTaste){
 		this.mAttachedOrderFood = attachedOrderFood;
-		this.mNormalTastes = normalTastes;
-		sort();
+		this.setNormalTastes(normalTastes);
 		this.mTmpTaste = tmpTaste;
 	}
 	
@@ -46,21 +46,47 @@ public class TasteGroup {
 	 * @return true if the taste to add NOT exist before and succeed to add to list, otherwise return false
 	 */
 	public boolean addTaste(Taste tasteToAdd){
-		int index = indexOf(tasteToAdd);
-		if(index < 0){
-			if(mNormalTastes != null){
-				Taste[] newTastes = new Taste[mNormalTastes.length + 1];
-				System.arraycopy(mNormalTastes, 0, newTastes, 0, mNormalTastes.length);
-				newTastes[mNormalTastes.length] = tasteToAdd;
-				mNormalTastes = newTastes;
-				sort();
+		if(tasteToAdd.isTaste()){
+			Taste[] newTastes = addTaste(mTastes, tasteToAdd);
+			if(newTastes != null){
+				mTastes = newTastes;
+				return true;
 			}else{
-				mNormalTastes = new Taste[1];
-				mNormalTastes[0] = tasteToAdd;
+				return false;
 			}
-			return true;
+			
+		}else if(tasteToAdd.isSpec()){
+			Taste[] newTastes = addTaste(mSpecs, tasteToAdd);
+			if(newTastes != null){
+				mSpecs = newTastes;
+				return true;
+			}else{
+				return false;
+			}
+						
 		}else{
 			return false;
+		}
+	}
+	
+	public Taste[] addTaste(Taste[] addTo, Taste tasteToAdd){
+		int index = indexOf(addTo, tasteToAdd);
+		if(index < 0){
+			Taste[] newTastes;
+			if(addTo != null){
+				newTastes = new Taste[addTo.length + 1];
+				System.arraycopy(addTo, 0, newTastes, 0, addTo.length);
+				newTastes[addTo.length] = tasteToAdd;
+				sort(newTastes);
+				
+			}else{
+				newTastes = new Taste[1];
+				newTastes[0] = tasteToAdd;
+			}			
+			return newTastes;
+			
+		}else{
+			return null;
 		}
 	}
 	
@@ -71,22 +97,46 @@ public class TasteGroup {
 	 * @return	true if taste exist before and succeed to be removed, otherwise return false
 	 */
 	public boolean removeTaste(Taste tasteToRemove){
-		int index = indexOf(tasteToRemove);
+		if(tasteToRemove.isTaste()){
+			Taste[] newTastes = removeTaste(mTastes, tasteToRemove);
+			if(newTastes != null){
+				mTastes = newTastes;
+				return true;
+			}else{
+				return false;
+			}
+			
+		}else if(tasteToRemove.isSpec()){
+			Taste[] newTastes = removeTaste(mSpecs, tasteToRemove);
+			if(newTastes != null){
+				mSpecs = newTastes;
+				return true;
+			}else{
+				return false;
+			}
+			
+		}else{
+			return false;
+		}
+	}
+	
+	private Taste[] removeTaste(Taste[] removeFrom, Taste tasteToRemove){
+		int index = indexOf(removeFrom, tasteToRemove);
 		if(index >= 0){
-			mNormalTastes[index] = null;
-			Taste[] newTastes = new Taste[mNormalTastes.length - 1];
+			removeFrom[index] = null;
+			Taste[] newTastes = new Taste[removeFrom.length - 1];
 			int pos = 0;
-			for(int i = 0; i < mNormalTastes.length; i++){
-				if(mNormalTastes[i] != null){
-					newTastes[pos++] = mNormalTastes[i];
+			for(int i = 0; i < removeFrom.length; i++){
+				if(removeFrom[i] != null){
+					newTastes[pos++] = removeFrom[i];
 				}
 			}
-			mNormalTastes = newTastes;
-			//sort();
-			return true;
+			
+			return newTastes;			
+			
 		}else{
-			return false;			
-		}
+			return null;			
+		}	
 	}
 	
 	/**
@@ -96,11 +146,33 @@ public class TasteGroup {
 	 * 			The taste to search.
 	 * @return the index of the first occurrence of the specified taste in this list, or -1 if this list does not contain the taste
 	 */
-	private int indexOf(Taste tasteToSrch){
+//	private int indexOf(Taste tasteToSrch){
+//		int index = -1;
+//		if(tasteToSrch.isTaste()){
+//			return indexOf(mTastes, tasteToSrch);
+//			
+//		}else if(tasteToSrch.isSpec()){
+//			return indexOf(mSpecs, tasteToSrch);
+//			
+//		}else{
+//			return index;
+//		}
+//	}	
+	
+	/**
+	 * Returns the index of the first occurrence of the specified taste in this list, 
+	 * or -1 if this list does not contain the taste to search.
+	 * @param srchFrom
+	 * 			The source tastes searches from.
+	 * @param tasteToSrch
+	 * 			The taste to search.
+	 * @return the index of the first occurrence of the specified taste in this list, or -1 if this list does not contain the taste
+	 */
+	private int indexOf(Taste[] srchFrom, Taste tasteToSrch){
 		int index = -1;
-		if(mNormalTastes != null){
-			for(int i = 0; i < mNormalTastes.length; i++){
-				if(mNormalTastes[i].equals(tasteToSrch)){
+		if(srchFrom != null){
+			for(int i = 0; i < srchFrom.length; i++){
+				if(srchFrom[i].equals(tasteToSrch)){
 					index = i;
 					break;
 				}
@@ -108,20 +180,20 @@ public class TasteGroup {
 			return index;
 		}else{
 			return index;			
-		}
+		}	
 	}
 	
 	/**
 	 * Sort the tastes according to a specified order.
 	 */
-	private void sort(){
-		if(mNormalTastes != null){
-			for(int i = 0; i < mNormalTastes.length; i++){
-				for(int j = i + 1; j < mNormalTastes.length; j++){
-					if(mNormalTastes[i].compare(mNormalTastes[j]) > 0){
-						Taste tmpTaste = mNormalTastes[i];
-						mNormalTastes[i] = mNormalTastes[j];
-						mNormalTastes[j] = tmpTaste;
+	private void sort(Taste[] tastesToSort){
+		if(tastesToSort != null){
+			for(int i = 0; i < tastesToSort.length; i++){
+				for(int j = i + 1; j < tastesToSort.length; j++){
+					if(tastesToSort[i].compare(tastesToSort[j]) > 0){
+						Taste tmpTaste = tastesToSort[i];
+						tastesToSort[i] = tastesToSort[j];
+						tastesToSort[j] = tmpTaste;
 					}
 				}
 			}			
@@ -131,10 +203,15 @@ public class TasteGroup {
 //	@Override
 	public int hashCode(){
 		int hashCode = 0;
-		if(mNormalTastes != null){
-			for(int i = 0; i < mNormalTastes.length; i++){
-				hashCode ^= new Integer(mNormalTastes[i].aliasID).hashCode();
+		if(mTastes != null){
+			for(int i = 0; i < mTastes.length; i++){
+				hashCode ^= new Integer(mTastes[i].aliasID).hashCode();
 			}
+		}
+		if(mSpecs != null){
+			for(int i = 0; i < mSpecs.length; i++){
+				hashCode ^= new Integer(mSpecs[i].aliasID).hashCode();
+			}			
 		}
 		return hashCode ^ (mTmpTaste != null ? mTmpTaste.hashCode() : 0);		
 	}
@@ -149,42 +226,53 @@ public class TasteGroup {
 			return false;
 		}else{
 			TasteGroup tg = (TasteGroup)obj;
-			return equalsByNormalTastes(tg.mNormalTastes) && equalsByTmpTaste(tg.mTmpTaste);
+			return equalsByNormal(tg) && equalsByTmp(tg);
 		}
 	}
 	
-	public boolean equalsByNormalTastes(Taste[] tastesToCompared){
-		if(mNormalTastes == null && tastesToCompared == null){
+	/**
+	 * Check to see whether the normal tastes is the same.
+	 * @param tg the taste group to be compared
+	 * @return true if the normal tastes to these two taste group is the same, otherwise false
+	 */
+	public boolean equalsByNormal(TasteGroup tg){
+		if(!hasNormalTaste() && !tg.hasNormalTaste()){
 			return true;
 			
-		}else if(mNormalTastes != null && tastesToCompared == null){
+		}else if(hasNormalTaste() != tg.hasNormalTaste()){
 			return false;
 			
-		}else if(mNormalTastes == null && tastesToCompared != null){
-			return false;
-			
-		}else{
-			if(mNormalTastes.length != tastesToCompared.length){
+		}else if(hasNormalTaste() && tg.hasNormalTaste()){
+			Taste[] tastes = getNormalTastes();
+			Taste[] anotherTastes = tg.getNormalTastes();
+			if(tastes.length != anotherTastes.length){
 				return false;
 				
 			}else{
 				boolean isMatched = true;
-				for(int i = 0; i < mNormalTastes.length; i++){
-					if(!mNormalTastes[i].equals(tastesToCompared[i])){
+				for(int i = 0; i < tastes.length; i++){
+					if(!tastes[i].equals(anotherTastes[i])){
 						isMatched = false;
 						break;
 					}
 				}
 				return isMatched;
 			}
+		}else{
+			return false;
 		}
 	}
 	
-	public boolean equalsByTmpTaste(Taste tmpTaste){
+	/**
+	 * Check to whether the temporary taste is the same.
+	 * @param tg the taste group to be compared
+	 * @return true if the temporary taste to these two taste group is the same, otherwise false 
+	 */
+	public boolean equalsByTmp(TasteGroup tg){
 		if(mTmpTaste != null){
-			return mTmpTaste.equals(tmpTaste);
+			return mTmpTaste.equals(tg.mTmpTaste);
 		}else{
-			return tmpTaste == null;
+			return tg.mTmpTaste == null;
 		}
 	}
 	
@@ -192,16 +280,19 @@ public class TasteGroup {
 	 * Get the price to normal tastes represented as integer.
 	 * @return the price to normal tastes represented as integer
 	 */
-	int getNormalTastePriceInternal(){
-		if(mNormalTastes != null){
-			int tastePrice = 0;
-			for(int i = 0; i < mNormalTastes.length; i++){
-				tastePrice += (mNormalTastes[i].calc == Taste.CALC_PRICE ? mNormalTastes[i].price : mAttachedOrderFood.price * mNormalTastes[i].rate / 100);
+	int getNormalTastePriceInternal(){		
+		return getNormalTastePriceInternal(mTastes) + getNormalTastePriceInternal(mSpecs);
+
+	}
+	
+	int getNormalTastePriceInternal(Taste[] src){
+		int tastePrice = 0;
+		if(src != null){
+			for(int i = 0; i < src.length; i++){
+				tastePrice += (src[i].calc == Taste.CALC_PRICE ? src[i].price : mAttachedOrderFood.price * src[i].rate / 100);
 			}
-			return tastePrice;
-		}else{
-			return 0;
 		}
+		return tastePrice;
 	}
 	
 	/**
@@ -259,13 +350,29 @@ public class TasteGroup {
 	 * @return the preference string to normal tastes
 	 */
 	public String getNormalTastePref(){
-		if(mNormalTastes != null){
+		
+		String tastePref;		
+		tastePref = getNormalTastePref(mTastes);
+		
+		String specPref;
+		specPref = getNormalTastePref(mSpecs);
+		
+		if(specPref.length() == 0){
+			return tastePref;
+		}else{
+			return tastePref + "," + specPref;
+		}	
+		
+	}
+	
+	String getNormalTastePref(Taste[] src){
+		if(src != null){
 			String tastePref = "";
-			for(int i = 0; i < mNormalTastes.length; i++){
+			for(int i = 0; i < src.length; i++){
 				if(tastePref.length() != 0){
 					tastePref += ",";
 				}
-				tastePref += mNormalTastes[i].preference;
+				tastePref += src[i].preference;
 			}			
 			return tastePref;
 		}else{
@@ -301,13 +408,13 @@ public class TasteGroup {
 			}
 			
 		}else{
-			if(mNormalTastes != null && mTmpTaste != null){
+			if(hasNormalTaste() && hasTmpTaste()){
 				return getNormalTastePref() + "," + getTmpTastePref();
 				
-			}else if(mNormalTastes == null && mTmpTaste == null){
+			}else if(!hasNormalTaste() && !hasTmpTaste()){
 				return NO_TASTE_PREF;
 				
-			}else if(mNormalTastes != null && mTmpTaste == null){
+			}else if(hasNormalTaste() && !hasTmpTaste()){
 				return getNormalTastePref();
 				
 			}else{
@@ -316,15 +423,27 @@ public class TasteGroup {
 		}		
 	}
 	
+	public boolean hasInternalTaste(){
+		if(mTastes != null){
+			return mTastes.length != 0;
+		}else{
+			return false;
+		}
+	}
+	
+	public boolean hasSpec(){
+		if(mSpecs != null){
+			return mSpecs.length != 0;
+		}else{
+			return false;
+		}
+	}
+	
 	public boolean hasNormalTaste(){
 		if(hasCalc){
 			return mNormalTaste != null;
 		}else{
-			if(mNormalTastes != null){
-				return mNormalTastes.length != 0;
-			}else{
-				return false;
-			}
+			return hasInternalTaste() || hasSpec();
 		}
 	}
 	
@@ -344,12 +463,50 @@ public class TasteGroup {
 		this.mGroupId = groupId;
 	}
 	
+	public Taste[] getTastes(){
+		if(mTastes != null){
+			return mTastes;
+		}else{
+			return new Taste[0];
+		}
+	}
+	
+	public Taste[] getSpecs(){
+		if(mSpecs != null){
+			return mSpecs;
+		}else{
+			return new Taste[0];
+		}
+	}
+	
 	public Taste[] getNormalTastes(){
-		return mNormalTastes;
+		Taste[] normalTastes = new Taste[(mTastes != null ? mTastes.length : 0) + (mSpecs != null ? mSpecs.length : 0)];
+		
+		int pos = 0;
+		if(mTastes != null){
+			for(int i = 0; i < mTastes.length; i++){
+				normalTastes[pos++] = mTastes[i];
+			}
+		}
+		if(mSpecs != null){
+			for(int i = 0; i < mSpecs.length; i++){
+				normalTastes[pos++] = mSpecs[i];
+			}
+		}	
+		
+		sort(normalTastes);
+		
+		return normalTastes;
 	}
 	
 	public void setNormalTastes(Taste[] normalTastes){
-		this.mNormalTastes = normalTastes;
+		mTastes = null;
+		mSpecs = null;
+		if(normalTastes != null){
+			for(int i = 0; i < normalTastes.length; i++){
+				addTaste(normalTastes[i]);
+			}
+		}
 	}
 	
 	public Taste getTmpTaste(){

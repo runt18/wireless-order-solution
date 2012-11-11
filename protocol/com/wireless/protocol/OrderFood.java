@@ -10,7 +10,7 @@ public class OrderFood extends Food {
 	public static final int FOOD_IMMEDIATE = 2;		/* 即起 */
 	public short hangStatus = FOOD_NORMAL;			//the hang status to the food
 	
-	public TasteGroup tasteGroup;					//the taste group to this order food
+	TasteGroup tasteGroup;					//the taste group to this order food
 	
 	public Table table = new Table();				//the table this order food belongs to
 	
@@ -155,167 +155,11 @@ public class OrderFood extends Food {
 	
 	/**
 	 * Check to see if the order food has temporary taste.
-	 * @return true if the order food has temporay taste, otherwise false
+	 * @return true if the order food has temporary taste, otherwise false
 	 */
 	public boolean hasTmpTaste(){
 		return tasteGroup == null ? false : tasteGroup.hasTmpTaste();
 	}
-	
-	/**
-	 * Add a taste to the food.
-	 * @param taste the taste to be add
-	 * @return a negative number if no available taste can be set,
-	 * 		   a positive number if add taste successfully.
-	 * 
-	 */
-//	public int addTaste(Taste taste){
-//		/**
-//		 * Enumerate to check whether an available taste can be added
-//		 */
-//		int tastePos = 0;
-//		for(; tastePos < tastes.length; tastePos++){
-//			if(tastes[tastePos].aliasID == taste.aliasID){
-//				return tastePos;
-//			}
-//			if(tastes[tastePos].aliasID == Taste.NO_TASTE){
-//				break;
-//			}
-//		}
-//		
-//		if(tastePos < tastes.length){
-//			/**
-//			 * Add the taste to one of the three available tastes 
-//			 */
-//			try{
-//				//assign the taste id 
-//				tastes[tastePos].aliasID = taste.aliasID;
-//				//assign the taste preference 
-//				tastes[tastePos].preference = taste.preference;
-//				//assign the taste category
-//				tastes[tastePos].category = taste.category;
-//				//assign the calculate type
-//				tastes[tastePos].calc = taste.calc;
-//				//assign the taste price rate
-//				tastes[tastePos].setRate(taste.getRate());
-//				//assign the taste price
-//				tastes[tastePos].setPrice(taste.getPrice());
-//			}catch(ArrayIndexOutOfBoundsException e){}	
-//			
-//			//sort the tastes
-//			for(int i = 0; i < tastes.length; i++){
-//				for(int j = i + 1; j < tastes.length; j++){
-//					if(tastes[i].compare(tastes[j]) > 0){
-//						Taste tmpTaste = tastes[i];
-//						tastes[i] = tastes[j];
-//						tastes[j] = tmpTaste;
-//					}
-//				}
-//			}
-//			
-//			/**
-//			 * Calculate the taste price and preference
-//			 */
-//			//tasteNormalPref = Util.genTastePref(tastes);
-//			//setTasteNormalPrice(Util.genTastePrice(tastes, getPrice()));
-//			
-//			return tastePos;
-//			
-//		}else{
-//			return -1;
-//		}
-//	}
-	
-	/**
-	 * Remove the specific taste from the food's taste list
-	 * @param taste the taste to be deleted
-	 * @return a negative number if the taste to be deleted is NOT exist,
-	 * 		   a positive number if remove taste successfully.
-	 */
-//	public int removeTaste(Taste taste){
-//		/**
-//		 * Enumerate to check whether the taste to delete is exist
-//		 */
-//		int tastePos = 0;
-//		for(; tastePos < tastes.length; tastePos++){
-//			if(taste.aliasID == tastes[tastePos].aliasID){
-//				break;
-//			}
-//		}
-//		
-//		if(tastePos < tastes.length){
-//			tastes[tastePos] = new Taste();
-//			//sort the tastes
-//			for(int i = 0; i < tastes.length; i++){
-//				for(int j = i + 1; j < tastes.length; j++){
-//					if(tastes[i].compare(tastes[j]) > 0){
-//						Taste tmpTaste = tastes[i];
-//						tastes[i] = tastes[j];
-//						tastes[j] = tmpTaste;
-//					}
-//				}
-//			}
-//			/**
-//			 * Calculate the taste price and preference
-//			 */
-//			//tasteNormalPref = Util.genTastePref(tastes);
-//			//setTasteNormalPrice(Util.genTastePrice(tastes, getPrice()));
-//			return tastePos;
-//		}else{
-//			return -1;
-//		}
-//	}
-
-//	int mTasteNormalPrice = Integer.MIN_VALUE; 						//the normal taste price to this food
-//	
-//	public void setTasteNormalPrice(Float price){
-//		if(price.floatValue() >= 0){
-//			mTasteNormalPrice = Util.float2Int(price);
-//		}else{
-//			mTasteNormalPrice = Integer.MIN_VALUE;
-//		}
-//	}
-	
-	/**
-	 * There are two ways to get the normal taste price.
-	 * One is to combine three normal tastes price.
-	 * The other is to use the mTasteNormalPrice directly.
-	 * Note that the mTasteNormalPrice is preferred.
-	 * @return
-	 */
-//	int getTasteNormalPriceInternal(){
-//		if(mTasteNormalPrice >= 0){
-//			return mTasteNormalPrice;
-//			
-//		}else{
-//			int tastePrice = 0;
-//			for(int i = 0; i < tastes.length; i++){
-//				if(tastes[i].aliasID != Taste.NO_TASTE){
-//					tastePrice += (tastes[i].calc == Taste.CALC_PRICE ? tastes[i].price : price * tastes[i].rate / 100);
-//				}
-//			}
-//			return tastePrice;
-//		}
-//	}
-//	
-//	public Float getTasteNormalPrice(){
-//		return Util.int2Float(getTasteNormalPriceInternal());
-//	}
-	
-	/**
-	 * The taste price along with both normal and temporary taste.
-	 * @return the taste price represented as an integer
-	 */
-//	int getTastePriceInternal(){
-//		return getTasteNormalPriceInternal() + (tmpTaste == null ? 0 : tmpTaste.price);
-//	}
-	
-	/**
-	 * The taste price along with both normal and temporary taste.
-	 * @return the taste price represented as a Float
-	 */
-//	public Float getTastePrice(){
-//		return Util.int2Float(getTastePriceInternal());
-//	}
 	
 	/**
 	 * The unit price with taste before discount to a specific food.
@@ -414,9 +258,7 @@ public class OrderFood extends Food {
 	}	
 	
 	public OrderFood(){
-//		for(int i = 0; i < tastes.length; i++){
-//			tastes[i] = new Taste();
-//		}
+
 	}
 
 	public OrderFood(Food food){
@@ -452,85 +294,35 @@ public class OrderFood extends Food {
 		tasteGroup = src.tasteGroup;
 	}
 	
-	/**
-	 * Check to see whether the food has temporary taste.
-	 * @return true if the food has temporary taste, otherwise false
-	 */
-//	public boolean hasTmpTaste(){
-//		return tmpTaste != null;
-//	}
-
-	/**
-	 * Check to see whether the food has taste(either normal {@link #hasNormalTaste()} or temporary {@link #hasTmpTaste()}).
-	 * @return true if the food has taste, otherwise false
-	 */
-//	public boolean hasTaste(){
-//		return hasNormalTaste() || hasTmpTaste();
-//	}	
-
-//	String mNormalTastePref;
-//	
-//	public void setNormalTastePref(String pref){
-//		mNormalTastePref = pref;
-//	}
+	public TasteGroup makeTasteGroup(){
+		tasteGroup = new TasteGroup(this, null, null);
+		return tasteGroup;
+	}
 	
-	/**
-	 * Check to see if the food has any normal taste.
-	 * @return true if food has normal taste, otherwise false
-	 */
-//	public boolean hasNormalTaste(){
-//		if(mNormalTastePref != null){
-//			return true;
-//			
-//		}else{
-//			boolean isNormalTasted = false;
-//			for(int i = 0; i < tastes.length; i++){
-//				if(tastes[i].aliasID != Taste.NO_TASTE){
-//					isNormalTasted = true;
-//					break;
-//				}
-//			}
-//			return isNormalTasted;			
-//		}
-//	}
+	public TasteGroup makeTasetGroup(Taste[] normal, Taste tmp){
+		tasteGroup = new TasteGroup(this, normal, tmp);
+		return tasteGroup;
+	}
 	
-	/**
-	 * There are two ways to get the normal taste preference.
-	 * One is to combine three normal tastes into a single string.
-	 * The other is to use the mNormalTastePref directly.
-	 * Note that the mNormalTastePref is preferred.
-	 * @return the normal taste string to this food
-	 */
-//	public String getNormalTastePref(){
-//		
-//		if(mNormalTastePref != null){
-//			return mNormalTastePref;
-//			
-//		}else{
-//			String tastePref = "";
-//			for(int i = 0; i < tastes.length; i++){
-//				if(tastes[i].aliasID != Taste.NO_TASTE && tastes[i].preference != null){
-//					if(tastePref.length() != 0){
-//						tastePref += ",";
-//					}
-//					tastePref += tastes[i].preference;
-//				}
-//			}			
-//			return tastePref.length() == 0 ? Taste.NO_PREFERENCE : tastePref;			
-//		}		
-//	}
+	public TasteGroup makeTasteGroup(int groupID, Taste normal, Taste tmp){
+		tasteGroup = new TasteGroup(groupID, normal, tmp);
+		return tasteGroup;
+	}
 	
-	/**
-	 * Get the taste combined with both normal and temporary preference.
-	 * @return the combined taste preference
-	 */
-//	public String getTastePref(){
-//		if(hasTmpTaste()){
-//			return (hasNormalTaste() ? getNormalTastePref() + "," : "") + tmpTaste.preference;
-//		}else{
-//			return getNormalTastePref();
-//		}
-//	}
+	public void clearTasetGroup(){
+		tasteGroup = null;
+	}
+	
+	public TasteGroup getTasteGroup(){
+		return tasteGroup;
+	}
+	
+	public void setTasteGroup(TasteGroup tg){
+		if(tg != null){
+			tasteGroup = tg;
+			tasteGroup.setAttachedFood(this);
+		}
+	}
 	
 	/**
 	 * Return the order food string.

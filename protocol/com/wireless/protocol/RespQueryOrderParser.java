@@ -316,7 +316,7 @@ public final class RespQueryOrderParser {
 					orderFoods[i].waiter = waiter;					
 					
 					if(normalTastes != null || tmpTaste != null){
-						orderFoods[i].tasteGroup = new TasteGroup(orderFoods[i], normalTastes, tmpTaste);
+						orderFoods[i].makeTasetGroup(normalTastes, tmpTaste);
 					}
 					
 					orderFoods[i].hangStatus = hangStatus;

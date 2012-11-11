@@ -97,7 +97,7 @@ public class RespQueryOrder extends RespPackage{
 						   2 + /* order_amount[2] */
 						   1 + /* status */
 						   1 + /* normal_taste_amount */
-						   (order.foods[i].hasNormalTaste() ? order.foods[i].tasteGroup.mNormalTastes.length * 2 : 0) + /* each alias id to normal taste takes up 2-byte */
+						   (order.foods[i].hasNormalTaste() ? order.foods[i].tasteGroup.getNormalTastes().length * 2 : 0) + /* each alias id to normal taste takes up 2-byte */
 						   1 + /* len_tmp_taste */
 						   (order.foods[i].hasTmpTaste() ? order.foods[i].tasteGroup.mTmpTaste.preference.getBytes("UTF-8").length : 0) + /* the value to tmp_taste */
 						   2 + /* tmp_taste_alias[2] */
@@ -246,13 +246,14 @@ public class RespQueryOrder extends RespPackage{
 				offset += 1;
 				
 				if(order.foods[i].hasNormalTaste()){
+					Taste[] normalTaste = order.foods[i].tasteGroup.getNormalTastes();
 					//assign the normal taste amount
-					body[offset] = (byte)(order.foods[i].tasteGroup.mNormalTastes.length);
+					body[offset] = (byte)(normalTaste.length);
 					offset += 1;
 					//assign alias id to each normal taste 
-					for(int j = 0; j < order.foods[i].tasteGroup.mNormalTastes.length; j++){
-						body[offset] = (byte)(order.foods[i].tasteGroup.mNormalTastes[j].aliasID & 0x00FF);
-						body[offset + 1] = (byte)((order.foods[i].tasteGroup.mNormalTastes[j].aliasID & 0xFF00) >> 8);
+					for(int j = 0; j < normalTaste.length; j++){
+						body[offset] = (byte)(normalTaste[j].aliasID & 0x00FF);
+						body[offset + 1] = (byte)((normalTaste[j].aliasID & 0xFF00) >> 8);
 						offset += 2;
 					}					
 				}else{
