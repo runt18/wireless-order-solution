@@ -31,7 +31,6 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
-import com.wireless.protocol.TasteGroup;
 import com.wireless.protocol.Util;
 import com.wireless.ui.view.ScrollLayout;
 import com.wireless.ui.view.ScrollLayout.OnViewChangedListener;
@@ -73,8 +72,8 @@ public class PickTasteActivity extends Activity{
 		//get the food parcel from the intent
 		FoodParcel foodParcel = getIntent().getParcelableExtra(FoodParcel.KEY_VALUE);
 		mSelectedFood = foodParcel;
-		if(mSelectedFood.tasteGroup == null){
-			mSelectedFood.tasteGroup = new TasteGroup(mSelectedFood, null, null);
+		if(!mSelectedFood.hasTaste()){
+			mSelectedFood.makeTasteGroup();
 		}
 		
 		setContentView(R.layout.tastetable);
@@ -416,8 +415,8 @@ public class PickTasteActivity extends Activity{
 		pinZhuEdtTxt.requestFocus();
 		
 		if(mSelectedFood.hasTmpTaste()){
-			pinZhuEdtTxt.setText(mSelectedFood.tasteGroup.getTmpTastePref());
-			priceEdtTxt.setText(mSelectedFood.tasteGroup.getTmpTastePrice().toString());
+			pinZhuEdtTxt.setText(mSelectedFood.getTasteGroup().getTmpTastePref());
+			priceEdtTxt.setText(mSelectedFood.getTasteGroup().getTmpTastePrice().toString());
 		}
 		
 		//品注的EditText的处理函数
@@ -430,9 +429,9 @@ public class PickTasteActivity extends Activity{
 					Taste tmpTaste = new Taste();
 					tmpTaste.aliasID = Util.genTempFoodID();
 					tmpTaste.setPreference(tmpTasteValue);
-					mSelectedFood.tasteGroup.setTmpTaste(tmpTaste);
+					mSelectedFood.getTasteGroup().setTmpTaste(tmpTaste);
 				}else{
-					mSelectedFood.tasteGroup.setTmpTaste(null);
+					mSelectedFood.getTasteGroup().setTmpTaste(null);
 				}
 				_handler.sendEmptyMessage(0);
 			}
@@ -455,7 +454,7 @@ public class PickTasteActivity extends Activity{
 			@Override
 			public void afterTextChanged(Editable s) {
 				if(mSelectedFood.hasTmpTaste()){
-					Taste tmpTaste = mSelectedFood.tasteGroup.getTmpTaste();
+					Taste tmpTaste = mSelectedFood.getTasteGroup().getTmpTaste();
 					try{
 						if(s.length() == 0){
 							tmpTaste.setPrice(Float.valueOf(0));
@@ -499,8 +498,8 @@ public class PickTasteActivity extends Activity{
 	
 	@Override
 	public void onBackPressed(){
-		if(!mSelectedFood.tasteGroup.hasTaste()){
-			mSelectedFood.tasteGroup = null;
+		if(!mSelectedFood.hasTaste()){
+			mSelectedFood.clearTasetGroup();
 		}
 		Intent intent = new Intent(); 
 		Bundle bundle = new Bundle();
@@ -555,8 +554,8 @@ public class PickTasteActivity extends Activity{
 			final CheckBox selectChkBox = (CheckBox)view.findViewById(R.id.chioce);
 			selectChkBox.setChecked(false);
 			selectChkBox.requestFocus();
-			if(mSelectedFood.tasteGroup.hasNormalTaste()){
-				for(Taste taste : mSelectedFood.tasteGroup.getNormalTastes()){
+			if(mSelectedFood.hasNormalTaste()){
+				for(Taste taste : mSelectedFood.getTasteGroup().getNormalTastes()){
 					if(mTastes[position].aliasID == taste.aliasID){
 						selectChkBox.setChecked(true);
 						break;						
@@ -569,12 +568,12 @@ public class PickTasteActivity extends Activity{
 				@Override
 				public void onClick(View arg0) {
 					if(selectChkBox.isChecked()){
-						if(mSelectedFood.tasteGroup.addTaste(mTastes[position])){
+						if(mSelectedFood.getTasteGroup().addTaste(mTastes[position])){
 							Toast.makeText(PickTasteActivity.this, "添加" + mTastes[position].getPreference(), Toast.LENGTH_SHORT).show();
 						}
 						
 					}else{
-						if(mSelectedFood.tasteGroup.removeTaste(mTastes[position])){
+						if(mSelectedFood.getTasteGroup().removeTaste(mTastes[position])){
 							Toast.makeText(PickTasteActivity.this, "删除" + mTastes[position].getPreference(), Toast.LENGTH_SHORT).show();
 						}
 					}
@@ -591,7 +590,7 @@ public class PickTasteActivity extends Activity{
 				public void onClick(View arg0) {
 			        
 					if(selectChkBox.isChecked()){
-						if(mSelectedFood.tasteGroup.removeTaste(mTastes[position])){
+						if(mSelectedFood.getTasteGroup().removeTaste(mTastes[position])){
 							selectChkBox.setChecked(false);
 							Toast.makeText(PickTasteActivity.this, "删除" + mTastes[position].getPreference(), Toast.LENGTH_SHORT).show();
 						}else{
@@ -599,7 +598,7 @@ public class PickTasteActivity extends Activity{
 						}
 						
 					}else{
-						if(mSelectedFood.tasteGroup.addTaste(mTastes[position])){
+						if(mSelectedFood.getTasteGroup().addTaste(mTastes[position])){
 							selectChkBox.setChecked(true);
 							Toast.makeText(PickTasteActivity.this, "添加" + mTastes[position].getPreference(), Toast.LENGTH_SHORT).show();
 						}
