@@ -20,7 +20,6 @@ import net.rim.device.api.ui.container.VerticalFieldManager;
 
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
-import com.wireless.protocol.TasteGroup;
 import com.wireless.protocol.Util;
 import com.wireless.terminal.PlatformInfo;
 import com.wireless.terminal.WirelessOrder;
@@ -129,9 +128,9 @@ public class SelectTastePopup extends PopupScreen{
 					int resp = Dialog.ask(Dialog.D_YES_NO, "确认" + _cate + "-" + _tastes[_tasteMatchedIdx[getSelectedIndex()]].getPreference() + " ?", Dialog.YES);
 					if(resp == Dialog.YES){
 						if(!_selectedFood.hasTaste()){
-							_selectedFood.tasteGroup = new TasteGroup();
+							_selectedFood.makeTasteGroup();
 						}
-						_selectedFood.tasteGroup.addTaste(_tastes[_tasteMatchedIdx[getSelectedIndex()]]);
+						_selectedFood.getTasteGroup().addTaste(_tastes[_tasteMatchedIdx[getSelectedIndex()]]);
 						//_orderListField.setSize(_orderListField.getSize(), _orderListField.getSelectedIndex());
 						_orderListField.invalid(_selectedFood);
 					}

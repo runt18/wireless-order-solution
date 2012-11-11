@@ -31,7 +31,7 @@ public class RemoveTastePopup extends PopupScreen {
 		_orderField = orderField;
 		_selectedFood = selectedFood;
 		
-		_tastes = _selectedFood.hasTaste() ? _selectedFood.tasteGroup.getNormalTastes() : new Taste[0];
+		_tastes = _selectedFood.hasTaste() ? _selectedFood.getTasteGroup().getNormalTastes() : new Taste[0];
 
 		
 		add(new LabelField("选择要删除的口味"));
@@ -79,14 +79,14 @@ public class RemoveTastePopup extends PopupScreen {
 				int resp = Dialog.ask(Dialog.D_YES_NO, "确认删除-" + _tastes[getSelectedIndex()].getPreference(), Dialog.NO);
 				if(resp == Dialog.YES){
 					
-					_selectedFood.tasteGroup.removeTaste(_tastes[getSelectedIndex()]);
+					_selectedFood.getTasteGroup().removeTaste(_tastes[getSelectedIndex()]);
 					//_orderField.setSize(_orderField.getSize(), _orderField.getSelectedIndex());
 					_orderField.invalid(_selectedFood);
 					
 					/**
 					 * Redraw the remove taste pop up screen after removing the taste
 					 */
-					_tastes = _selectedFood.hasTaste() ? _selectedFood.tasteGroup.getNormalTastes() : new Taste[0];
+					_tastes = _selectedFood.hasTaste() ? _selectedFood.getTasteGroup().getNormalTastes() : new Taste[0];
 					setSize(_tastes.length, _tastes.length);
 					
 
