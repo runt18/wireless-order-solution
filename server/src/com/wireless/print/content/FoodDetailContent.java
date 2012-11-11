@@ -31,8 +31,8 @@ public class FoodDetailContent extends ConcreteContent {
 		String foodPrice = Util.CURRENCY_SIGN + Util.float2String(_food.calcPriceWithTaste());
 		
 		String taste = null;
-		if(_food.tasteGroup != null){
-			taste = "-" + _food.tasteGroup.getTastePref();
+		if(_food.hasTaste()){
+			taste = "-" + _food.getTasteGroup().getTastePref();
 		}
 		_format = _format.replace(PVar.FOOD_TASTE, taste == null ? "" : taste);				
 //		if(_food.hasTaste()){
