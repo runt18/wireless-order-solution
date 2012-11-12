@@ -1602,8 +1602,8 @@ submitOrderHandler = function(c){
 				foodname = foodname.indexOf('<') > 0 ? foodname.substring(0,foodname.indexOf('<')) : foodname;
 				// [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价]
 				foodPara = foodPara 
-						+ '['
-						+ 'true,'// 是否临时菜(true)
+						+ '[' 
+						+ 'true' + '<<sb>>'// 是否临时菜(true)
 						+ orderedData.root[i].aliasID + '<<sb>>' // 临时菜1编号
 						+ foodname + '<<sb>>' // 临时菜1名称
 						+ orderedData.root[i].count + '<<sb>>' // 临时菜1数量
