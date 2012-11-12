@@ -42,7 +42,7 @@ var commonTasteGridForTabPanel = new Ext.grid.GridPanel({
 	ds : new Ext.data.JsonStore({
 		url : '../../QueryFoodTaste.do',
 		root : 'root',		
-		fields : ['tasteID', 'tasteAliasID', 'tasteName', 'tastePrice', 'tasteRate', 'tasteCalcFormat'],
+		fields : ['tasteID', 'tasteAliasID', 'tasteName', 'tastePrice', 'tasteRate', 'tasteCalcFormat', 'tasteCategory'],
 		listeners : {
 			beforeload : function(){
 				var selData = Ext.ux.getSelData('orderedGrid');
@@ -85,7 +85,7 @@ var allTasteGridForTabPanel = new Ext.grid.GridPanel({
 	]),
 	ds : new Ext.data.JsonStore({
 		root : 'root',
-		fields : ['tasteID', 'tasteAliasID', 'tasteName', 'tastePrice', 'tasteRate', 'tasteCalcFormat']
+		fields : ['tasteID', 'tasteAliasID', 'tasteName', 'tastePrice', 'tasteRate', 'tasteCalcFormat', 'tasteCategory']
 	}),
 	listeners : {
 		rowdblclick : function(thiz, ri){
@@ -113,7 +113,7 @@ var ggForTabPanel = new Ext.grid.GridPanel({
 	]),
 	ds : new Ext.data.JsonStore({
 		root : 'root',
-		fields : ['tasteID', 'tasteAliasID', 'tasteName', 'tastePrice', 'tasteRate', 'tasteCalcFormat']
+		fields : ['tasteID', 'tasteAliasID', 'tasteName', 'tastePrice', 'tasteRate', 'tasteCalcFormat', 'tasteCategory']
 	}),
 	listeners : {
 		rowdblclick : function(thiz, ri){
@@ -158,7 +158,7 @@ var haveTasteGrid = new Ext.grid.GridPanel({
 	]),
 	ds : new Ext.data.JsonStore({
 		root : 'root',
-		fields : ['tasteID', 'tasteAliasID', 'tasteName', 'tastePrice', 'tasteRate', 'tasteCalcFormat']
+		fields : ['tasteID', 'tasteAliasID', 'tasteName', 'tastePrice', 'tasteRate', 'tasteCalcFormat', 'tasteCategory']
 	})
 });
 
@@ -1584,7 +1584,7 @@ submitOrderHandler = function(c){
 				var testeGroup = '';
 				for(var j = 0; j < orderedData.root[i].tasteGroup.normalTasteContent.length; j++){
 					var t = orderedData.root[i].tasteGroup.normalTasteContent[j];
-					testeGroup += ((j > 0 ? '<<st>>' : '') + (t.tasteID + 'stb' + t.tasteAliasID));
+					testeGroup += ((j > 0 ? '<<st>>' : '') + (t.tasteID + 'stb' + t.tasteAliasID + 'stb' + t.tasteCategory));
 				}
 				foodPara = foodPara 
 						+ '['
