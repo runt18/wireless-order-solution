@@ -2,7 +2,9 @@ package com.wireless.dbReflect;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
@@ -69,6 +71,7 @@ public class QueryTasteGroup {
 		sql = " SELECT " +
 			  " TG.taste_group_id, " +
 			  " TG.normal_taste_group_id, TG.normal_taste_pref, TG.normal_taste_price, " +
+			  " CASE WHEN (TG.tmp_taste_id IS NULL) THEN 0 ELSE 1 END AS has_tmp_taste, " +			  
 			  " TG.tmp_taste_id, TG.tmp_taste_pref, TG.tmp_taste_price, " +
 			  " NTG.taste_id " +
 			  " FROM " +
@@ -81,7 +84,7 @@ public class QueryTasteGroup {
 			  (extraCond == null ? "" : extraCond) +
 			  (orderClause == null ? "" : orderClause);
 		
-		return getTasteGroup(dbCon.stmt.executeQuery(sql));
+		return getTasteGroupGeneral(dbCon.stmt.executeQuery(sql));
 		
 	}
 	
@@ -105,7 +108,7 @@ public class QueryTasteGroup {
 			  " TG.normal_taste_group_id, TG.normal_taste_pref, TG.normal_taste_price, " +
 			  " CASE WHEN (TG.tmp_taste_id IS NULL) THEN 0 ELSE 1 END AS has_tmp_taste, " +
 			  " TG.tmp_taste_id, TG.tmp_taste_pref, TG.tmp_taste_price, " +
-			  " NTG.taste_id, TASTE.taste_alias, TASTE.restaurant_id " +
+			  " NTG.taste_id, TASTE.taste_alias, TASTE.restaurant_id, TASTE.category " +
 			  " FROM " +
 			  Params.dbName + ".taste_group TG " + 
 			  " JOIN " +
@@ -120,11 +123,17 @@ public class QueryTasteGroup {
 			  (extraCond == null ? "" : extraCond) +
 			  (orderClause == null ? "" : orderClause);		
 
-		return getTasteGroup(dbCon.stmt.executeQuery(sql));
+		return getTasteGroupDetail(dbCon.stmt.executeQuery(sql));
 		
 	}
 	
-	private static TasteGroup[] getTasteGroup(ResultSet rs) throws SQLException{
+	/**
+	 * Get taste group with details
+	 * @param rs
+	 * @return
+	 * @throws SQLException
+	 */
+	private static TasteGroup[] getTasteGroupDetail(ResultSet rs) throws SQLException{
 		LinkedHashMap<Integer, TasteGroup> tgs = new LinkedHashMap<Integer, TasteGroup>();
 		while(rs.next()){
 			int tasteGroupId = rs.getInt("taste_group_id");
@@ -134,6 +143,7 @@ public class QueryTasteGroup {
 					Taste normalDetail = new Taste();
 					normalDetail.tasteID = rs.getInt("taste_id");
 					normalDetail.aliasID = rs.getInt("taste_alias");
+					normalDetail.category = rs.getShort("category");
 					normalDetail.restaurantID = rs.getInt("restaurant_id");
 					tg.addTaste(normalDetail);
 				}
@@ -172,6 +182,33 @@ public class QueryTasteGroup {
 		rs.close();
 		
 		return tgs.values().toArray(new TasteGroup[tgs.values().size()]);
+	}
+	
+	private static TasteGroup[] getTasteGroupGeneral(ResultSet rs) throws SQLException{
+		
+		List<TasteGroup> tgs = new ArrayList<TasteGroup>();
+		
+		while(rs.next()){			
+			Taste normal = null;
+			if(rs.getInt("normal_taste_group_id") != TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID){
+				normal = new Taste();
+				normal.setPreference(rs.getString("normal_taste_pref"));
+				normal.setPrice(rs.getFloat("normal_taste_price"));
+			}
+			
+			Taste tmp = null;
+			if(rs.getBoolean("has_tmp_taste")){
+				tmp = new Taste();
+				tmp.aliasID = tmp.tasteID = rs.getInt("tmp_taste_id");
+				tmp.setPreference(rs.getString("tmp_taste_pref"));
+				tmp.setPrice(rs.getFloat("tmp_taste_price"));
+			}				
+			
+			tgs.add(new TasteGroup(rs.getInt("taste_group_id"), normal, tmp));
+		}
+		rs.close();
+		
+		return tgs.toArray(new TasteGroup[tgs.size()]);
 	}
 	
 }

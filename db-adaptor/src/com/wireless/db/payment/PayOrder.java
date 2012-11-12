@@ -295,7 +295,7 @@ public class PayOrder {
 			for(int i = 0; i < orderInfo.foods.length; i++){
 				sql = "UPDATE " + Params.dbName + ".order_food SET discount=" + orderInfo.foods[i].getDiscount() +
 					  " WHERE order_id=" + orderInfo.id + 
-					  " AND food_alias=" + orderInfo.foods[i].aliasID;
+					  " AND food_alias=" + orderInfo.foods[i].getAliasId();
 				dbCon.stmt.executeUpdate(sql);				
 			}			
 			

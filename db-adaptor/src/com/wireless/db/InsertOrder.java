@@ -157,21 +157,14 @@ public class InsertOrder {
 					Kitchen[] kitchens = QueryMenu.queryKitchens(dbCon, "AND KITCHEN.kitchen_alias=" + orderToInsert.foods[i].kitchen.aliasID + " AND KITCHEN.restaurant_id=" + term.restaurantID, null);
 					if(kitchens.length > 0){
 						orderToInsert.foods[i].kitchen = kitchens[0];
-						orderToInsert.foods[i].name = orderToInsert.foods[i].kitchen.dept.name + "临时菜";
-						Taste tmpTaste = new Taste();
-						tmpTaste.setPreference(orderToInsert.foods[i].name);
-						tmpTaste.setPrice(orderToInsert.foods[i].getPrice());
-						orderToInsert.foods[i].setPrice(new Float(0));
-						TasteGroup tg = new TasteGroup(orderToInsert.foods[i], null, tmpTaste);
-						orderToInsert.foods[i].tasteGroup = tg;
 					}
 					
 				}else{					
 					//get the associated foods' unit price and name
-					Food[] detailFood = QueryMenu.queryFoods(dbCon, "AND FOOD.food_alias=" + orderToInsert.foods[i].aliasID + " AND FOOD.restaurant_id=" + term.restaurantID, null);
+					Food[] detailFood = QueryMenu.queryFoods(dbCon, "AND FOOD.food_alias=" + orderToInsert.foods[i].getAliasId() + " AND FOOD.restaurant_id=" + term.restaurantID, null);
 					if(detailFood.length > 0){
 						orderToInsert.foods[i].foodID = detailFood[0].foodID;
-						orderToInsert.foods[i].aliasID = detailFood[0].aliasID;
+						orderToInsert.foods[i].setAliasId(detailFood[0].getAliasId());
 						orderToInsert.foods[i].restaurantID = detailFood[0].restaurantID;
 						orderToInsert.foods[i].name = detailFood[0].name;
 						orderToInsert.foods[i].status = detailFood[0].status;
@@ -179,22 +172,42 @@ public class InsertOrder {
 						orderToInsert.foods[i].kitchen = detailFood[0].kitchen;
 						orderToInsert.foods[i].childFoods = detailFood[0].childFoods;
 					}else{
-						throw new BusinessException("The food(alias_id=" + orderToInsert.foods[i].aliasID + ", restaurant_id=" + orderToInsert.destTbl.restaurantID+ ") to query doesn't exit.", ErrorCode.MENU_EXPIRED);
+						throw new BusinessException("The food(alias_id=" + orderToInsert.foods[i].getAliasId() + ", restaurant_id=" + term.restaurantID + ") to query does NOT exit.", ErrorCode.MENU_EXPIRED);
 					}
 					
 					//Get the details to normal tastes
 					if(orderToInsert.foods[i].hasNormalTaste()){
-						Taste[] normalTastes = orderToInsert.foods[i].tasteGroup.getNormalTastes();
-						for(int j = 0; j < normalTastes.length; j++){
+						Taste[] tastes; 
+						//Get the detail to tastes.
+						tastes = orderToInsert.foods[i].getTasteGroup().getTastes();
+						for(int j = 0; j < tastes.length; j++){
 							Taste[] detailTaste = QueryMenu.queryTastes(dbCon, 
-																		Taste.CATE_ALL, 
-																		" AND restaurant_id=" + term.restaurantID + " AND taste_alias =" + normalTastes[j].aliasID, 
+																		Taste.CATE_TASTE, 
+																		" AND restaurant_id=" + term.restaurantID + " AND taste_alias =" + tastes[j].aliasID, 
 																		null);
-							
+
 							if(detailTaste.length > 0){
-								normalTastes[j] = detailTaste[0];
+								tastes[j] = detailTaste[0];
+							}else{							
+								throw new BusinessException("The taste(alias_id=" + tastes[j].aliasID + ", restaurant_id=" + term.restaurantID + ") to query does NOT exit.", ErrorCode.MENU_EXPIRED);
+							}
+								
+						}
+						//Get the detail to specs.
+						tastes = orderToInsert.foods[i].getTasteGroup().getSpecs();
+						for(int j = 0; j < tastes.length; j++){
+							Taste[] detailTaste = QueryMenu.queryTastes(dbCon, 
+																		Taste.CATE_SPEC, 
+																		" AND restaurant_id=" + term.restaurantID + " AND taste_alias =" + tastes[j].aliasID, 
+																		null);
+
+							if(detailTaste.length > 0){
+								tastes[j] = detailTaste[0];
+							}else{
+								throw new BusinessException("The taste(alias_id=" + tastes[j].aliasID + ", restaurant_id=" + term.restaurantID + ") to query does NOT exit.", ErrorCode.MENU_EXPIRED);
 							}
 						}
+
 					}
 				}					
 			}
@@ -295,9 +308,9 @@ public class InsertOrder {
 				for(OrderFood foodToInsert : orderToInsert.foods){
 					
 
-					if(foodToInsert.tasteGroup != null){
+					if(foodToInsert.hasTaste()){
 						
-						TasteGroup tg = foodToInsert.tasteGroup;
+						TasteGroup tg = foodToInsert.getTasteGroup();
 						
 						/**
 						 * Insert the taste group if containing taste.
@@ -361,14 +374,14 @@ public class InsertOrder {
 						  term.restaurantID + ", " +
 						  orderToInsert.id + ", " +
 						  (foodToInsert.foodID == 0 ? "NULL" : foodToInsert.foodID) + ", " +
-						  foodToInsert.aliasID + ", " + 
+						  foodToInsert.getAliasId() + ", " + 
 						  foodToInsert.getCount() + ", " + 
 						  foodToInsert.getPrice() + ", '" + 
 						  foodToInsert.name + "', " +
 						  foodToInsert.status + ", " +
 						  (foodToInsert.hangStatus == OrderFood.FOOD_HANG_UP ? OrderFood.FOOD_HANG_UP : OrderFood.FOOD_NORMAL) + ", " +
 						  foodToInsert.getDiscount() + ", " +
-						  (foodToInsert.tasteGroup == null ? TasteGroup.EMPTY_TASTE_GROUP_ID : foodToInsert.tasteGroup.getGroupId()) + ", " +
+						  (foodToInsert.hasTaste() ? foodToInsert.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
 						  foodToInsert.kitchen.dept.deptID + ", " +
 						  foodToInsert.kitchen.kitchenID + ", " +
 						  foodToInsert.kitchen.aliasID + ", '" + 

@@ -6,6 +6,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.Table;
+import com.wireless.protocol.TasteGroup;
 import com.wireless.protocol.Terminal;
 
 public class CancelOrder {
@@ -159,9 +160,40 @@ public class CancelOrder {
 					  " AND table_alias=" + table.aliasID;
 				dbCon.stmt.executeUpdate(sql);
 			}
+			
+			//Delete the records to normal taste group. 
+			sql = " DELETE FROM " + Params.dbName + ".normal_taste_group" +
+			      " WHERE " +
+				  " normal_taste_group_id IN (" +
+				  " SELECT normal_taste_group_id " +
+				  " FROM " +
+				  Params.dbName + ".order_food OF " +
+				  " JOIN " +
+				  Params.dbName + ".taste_group TG " +
+				  " ON " +
+				  " OF.taste_group_id = TG.taste_group_id " +
+				  " WHERE " + 
+				  " OF.order_id = " + orderID +
+				  " AND " +
+				  " TG.normal_taste_group_id <> " + TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID +
+				  " ) ";
+			dbCon.stmt.executeUpdate(sql);
+			
+			//Delete the records to taste group.
+			sql = " DELETE FROM " + Params.dbName + ".taste_group " +
+			      " WHERE taste_group_id IN (" +
+				  " SELECT taste_group_id " + " FROM " + Params.dbName + ".order_food " +
+			      " WHERE " + 
+				  " order_id = " + orderID +
+				  " AND " +
+				  " taste_group_id <> " + TasteGroup.EMPTY_TASTE_GROUP_ID +
+				  " ) ";
+			dbCon.stmt.executeUpdate(sql);
+			
 			//delete the records related to the order id and food id in "order_food" table
 			sql = "DELETE FROM `" + Params.dbName + "`.`order_food` WHERE order_id=" + orderID;
 			dbCon.stmt.executeUpdate(sql);
+			
 			//delete the corresponding order record in "order" table
 			sql = "DELETE FROM `" + Params.dbName + "`.`order` WHERE id=" + orderID;
 			dbCon.stmt.executeUpdate(sql);

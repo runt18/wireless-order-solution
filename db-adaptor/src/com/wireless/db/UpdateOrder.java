@@ -311,9 +311,9 @@ public class UpdateOrder {
 				/**
 				 * Insert the taste group info if containing taste and the extra taste group is new
 				 */
-				if(extraFood.tasteGroup != null && extraFood.tasteGroup.getGroupId() == TasteGroup.NEW_TASTE_GROUP_ID){
+				if(extraFood.hasTaste() && extraFood.getTasteGroup().getGroupId() == TasteGroup.NEW_TASTE_GROUP_ID){
 					
-					TasteGroup tg = extraFood.tasteGroup;					
+					TasteGroup tg = extraFood.getTasteGroup();					
 					/**
 					 * Insert the taste group if containing taste.
 					 */
@@ -373,14 +373,14 @@ public class UpdateOrder {
 					  term.restaurantID + ", " +
 					  newOrder.id + ", " +
 					  (extraFood.foodID == 0 ? "NULL" : extraFood.foodID) + ", " +
-					  extraFood.aliasID + ", " + 
+					  extraFood.getAliasId() + ", " + 
 					  extraFood.getCount() + ", " + 
 					  extraFood.getPrice() + ", '" + 
 					  extraFood.name + "', " + 
 					  extraFood.status + ", " +
 					  (extraFood.hangStatus == OrderFood.FOOD_HANG_UP ? OrderFood.FOOD_HANG_UP : OrderFood.FOOD_NORMAL) + ", " +
 					  extraFood.getDiscount() + ", " +
-					  (extraFood.tasteGroup == null ? TasteGroup.EMPTY_TASTE_GROUP_ID : extraFood.tasteGroup.getGroupId()) + ", " +
+					  (extraFood.hasTaste() ? extraFood.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
 					  extraFood.kitchen.dept.deptID + ", " +
 					  extraFood.kitchen.kitchenID + ", " +
 					  extraFood.kitchen.aliasID + ", '" + 
@@ -409,14 +409,14 @@ public class UpdateOrder {
 					  term.restaurantID + ", " +
 					  newOrder.id + ", " +
 					  (canceledFood.foodID == 0 ? "NULL" : canceledFood.foodID) + ", " +
-					  canceledFood.aliasID + ", " + 
+					  canceledFood.getAliasId() + ", " + 
 					  "-" + canceledFood.getCount() + ", " + 
 					  canceledFood.getPrice() + ", '" + 
 					  canceledFood.name + "', " + 
 					  canceledFood.status + ", " +
 					  (canceledFood.hangStatus == OrderFood.FOOD_HANG_UP ? OrderFood.FOOD_HANG_UP : OrderFood.FOOD_NORMAL) + ", " +
 					  canceledFood.getDiscount() + ", " +
-					  (canceledFood.tasteGroup == null ? TasteGroup.EMPTY_TASTE_GROUP_ID : canceledFood.tasteGroup.getGroupId()) + ", " +
+					  (canceledFood.hasTaste() ? canceledFood.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
 					  canceledFood.kitchen.dept.deptID + ", " +
 					  canceledFood.kitchen.kitchenID + ", " +
 					  canceledFood.kitchen.aliasID + ", '" + 
@@ -667,11 +667,11 @@ public class UpdateOrder {
 			
 		}else{
 			//Get the details to each order food			
-			Food[] detailFood = QueryMenu.queryFoods(dbCon, " AND FOOD.food_alias=" + foodBasic.aliasID + " AND FOOD.restaurant_id=" + term.restaurantID, null);
+			Food[] detailFood = QueryMenu.queryFoods(dbCon, " AND FOOD.food_alias=" + foodBasic.getAliasId() + " AND FOOD.restaurant_id=" + term.restaurantID, null);
 			
 			if(detailFood.length > 0){
 				foodBasic.foodID = detailFood[0].foodID;
-				foodBasic.aliasID = detailFood[0].aliasID;
+				foodBasic.setAliasId(detailFood[0].getAliasId());
 				foodBasic.restaurantID = detailFood[0].restaurantID;
 				foodBasic.status = detailFood[0].status;
 				foodBasic.name = detailFood[0].name;
@@ -679,21 +679,35 @@ public class UpdateOrder {
 				foodBasic.kitchen = detailFood[0].kitchen;
 				foodBasic.childFoods = detailFood[0].childFoods;
 			}else{
-				throw new BusinessException("The food(alias_id=" + foodBasic.aliasID + ", restaurant_id=" + term.restaurantID + ") to query does NOT exist.", ErrorCode.MENU_EXPIRED);
+				throw new BusinessException("The food(alias_id=" + foodBasic.getAliasId() + ", restaurant_id=" + term.restaurantID + ") to query does NOT exist.", ErrorCode.MENU_EXPIRED);
 			}			
 
 			//Get the details to each normal tastes
 			if(foodBasic.hasNormalTaste()){
-				Taste[] normalTastes = foodBasic.tasteGroup.getNormalTastes();
-				for(int j = 0; j < normalTastes.length; j++){
+				Taste[] tastes; 
+				//Get the detail to tastes.
+				tastes = foodBasic.getTasteGroup().getTastes();
+				for(int j = 0; j < tastes.length; j++){
 					Taste[] detailTaste = QueryMenu.queryTastes(dbCon, 
-																Taste.CATE_ALL, 
-																" AND restaurant_id=" + term.restaurantID + " AND taste_alias =" + normalTastes[j].aliasID, 
+																Taste.CATE_TASTE, 
+																" AND restaurant_id=" + term.restaurantID + " AND taste_alias =" + tastes[j].aliasID, 
 																null);
-					
+
 					if(detailTaste.length > 0){
-						normalTastes[j] = detailTaste[0];
-					}
+						tastes[j] = detailTaste[0];
+					}							
+				}
+				//Get the detail to specs.
+				tastes = foodBasic.getTasteGroup().getSpecs();
+				for(int j = 0; j < tastes.length; j++){
+					Taste[] detailTaste = QueryMenu.queryTastes(dbCon, 
+																Taste.CATE_SPEC, 
+																" AND restaurant_id=" + term.restaurantID + " AND taste_alias =" + tastes[j].aliasID, 
+																null);
+
+					if(detailTaste.length > 0){
+						tastes[j] = detailTaste[0];
+					}							
 				}
 			}
 		}		
