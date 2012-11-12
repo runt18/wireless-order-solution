@@ -125,7 +125,9 @@ public class Util {
 					for(int j = 0; j < tasteGroup.length; j++){
 						String[] taste = tasteGroup[j].split("stb");
 						if(taste.length == 2){
-							foods[i].tasteGroup.addTaste(new Taste(Integer.valueOf(taste[0]), Integer.valueOf(taste[1]), 0));
+							Taste it = new Taste(Integer.valueOf(taste[0]), Integer.valueOf(taste[1]), 0);
+							it.category = Short.valueOf(taste[2]);
+							foods[i].tasteGroup.addTaste(it);
 						}
 					}
 				}
