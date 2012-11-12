@@ -27,7 +27,7 @@ public class OptionDialog extends Dialog implements OnTableChangedListener, OnSt
 	private boolean ITEM_TABLE_ENABLE = false;
 	private boolean ITEM_STAFF_ENABLE = false;
 	
-	private static int CURRENT_ITEM = 0; 
+	private int CURRENT_ITEM = 0; 
 	
 	private SettingHandler mSettingHandler;
 	
@@ -102,6 +102,12 @@ public class OptionDialog extends Dialog implements OnTableChangedListener, OnSt
 		((TablePanelFragment)getOwnerActivity().getFragmentManager().findFragmentById(R.id.tablePanelFgm_optionDialog)).setOnTableChangedListener(this);
 		((StaffPanelFragment)getOwnerActivity().getFragmentManager().findFragmentById(R.id.staffPanelFgm_optionDialog)).setOnStaffChangeListener(this);
 	}
+	@Override
+	protected void onStart() {
+		CURRENT_ITEM = 0; 
+		super.onStart();
+	}
+
 	/**
 	 * 设置哪个项目可以使用
 	 * @param item	指定项目

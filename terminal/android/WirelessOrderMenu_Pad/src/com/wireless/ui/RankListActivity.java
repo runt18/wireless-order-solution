@@ -209,6 +209,7 @@ public class RankListActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         mImageFetcher.closeCache();
+        mImageFetcher.clearCache();
     }
 	
 	private static class RankListHandler extends Handler{

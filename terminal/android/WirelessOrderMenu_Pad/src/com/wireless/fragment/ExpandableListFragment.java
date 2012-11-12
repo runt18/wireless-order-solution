@@ -133,13 +133,14 @@ public class ExpandableListFragment extends Fragment{
 				final Kitchen currentKitchen = mChildren.get(groupPosition).get(childPosition);
 				if(!currentKitchen.equals(mCurrentKitchen))
 				{
-					v.post(new Runnable(){
-						@Override
-						public void run() {
-							//通知侦听器改变
-							mOnItemChangeListener.onItemChange(currentKitchen);	
-						}
-					});
+					if(v != null)
+						v.post(new Runnable(){
+							@Override
+							public void run() {
+								//通知侦听器改变
+								mOnItemChangeListener.onItemChange(currentKitchen);	
+							}
+						});
 					mCurrentKitchen = currentKitchen;
 				}
 

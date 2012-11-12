@@ -143,21 +143,32 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 			mPickedTasteLinear.removeAllViews();
 			if(fragment.mOrderFood.hasNormalTaste()){
 				for(Taste normalTaste : fragment.mOrderFood.tasteGroup.getNormalTastes()){
-
-					Button btn = new Button(fragment.getActivity());
-					btn.setText(normalTaste.getPreference());
-					btn.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.search, 0);
-					btn.setTag(normalTaste);
-					mPickedTasteLinear.addView(btn);
-					
-					btn.setOnClickListener(new OnClickListener(){
-						@Override
-						public void onClick(View v) {
-							Taste t = (Taste) v.getTag();
-							fragment.mOrderFood.tasteGroup.removeTaste(t);
-							TasteRefreshHandler.this.sendEmptyMessage(TASTE_REMOVED);
+					boolean isSpec = false;
+					for(Taste spec:WirelessOrder.foodMenu.specs)
+					{
+						if(normalTaste.equals(spec)){
+							isSpec = true;
+							break;
 						}
-					});
+					}
+					
+					if(!isSpec)
+					{
+						Button btn = new Button(fragment.getActivity());
+						btn.setText(normalTaste.getPreference());
+						btn.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.search, 0);
+						btn.setTag(normalTaste);
+						mPickedTasteLinear.addView(btn);
+					
+						btn.setOnClickListener(new OnClickListener(){
+							@Override
+							public void onClick(View v) {
+								Taste t = (Taste) v.getTag();
+								fragment.mOrderFood.tasteGroup.removeTaste(t);
+								TasteRefreshHandler.this.sendEmptyMessage(TASTE_REMOVED);
+							}
+						});
+					}
 				}				
 			}
 			mSelectedFoodPriceTextView.setText("" + fragment.mOrderFood.getPriceWithTaste());

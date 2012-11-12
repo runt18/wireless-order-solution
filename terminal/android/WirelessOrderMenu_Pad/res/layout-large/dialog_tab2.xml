@@ -3,60 +3,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:focusable="true"
-    android:focusableInTouchMode="true"
-    android:padding="10dp" >
-
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="35dp"
-        android:text="会员账号："
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:visibility="gone" />
-
-    <EditText
-        android:id="@+id/editText_vipId"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/textView2"
-        android:layout_marginLeft="10dp"
-        android:layout_toRightOf="@+id/textView2"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:visibility="gone" />
-
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView2"
-        android:layout_below="@+id/editText_vipId"
-        android:text="会员密码："
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:visibility="gone" />
-
-    <EditText
-        android:id="@+id/editText_vipPswd"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/editText_vipId"
-        android:layout_alignTop="@+id/textView3"
-        android:ems="10"
-        android:inputType="textPassword"
-        android:visibility="gone" />
-
+    android:focusableInTouchMode="true" >
+
     <ListView
         android:id="@+id/listView_server_tab2"
-        android:layout_width="300dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
+        android:layout_alignLeft="@+id/textView6"
         android:layout_alignParentTop="false"
+        android:layout_alignRight="@+id/textView6"
         android:layout_below="@+id/textView6"
-        android:choiceMode="singleChoice"
-        android:paddingLeft="20dp" >
+        android:background="@drawable/staff_setting_list_bg"
+        android:choiceMode="singleChoice" >
 
     </ListView>
 
@@ -64,49 +22,9 @@
         android:id="@+id/topbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true" >
-
-        <TextView
-            android:id="@+id/textView_setting_staffTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:text="服务员登陆"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textSize="48sp" />
+        android:layout_alignParentTop="true"
+        android:background="@drawable/staff_setting_logo" >
     </RelativeLayout>
-
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/listView_server_tab2"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="50dp"
-        android:layout_toRightOf="@+id/listView_server_tab2"
-        android:text="账号："
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:visibility="visible" />
-
-    <TextView
-        android:id="@+id/textView5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView4"
-        android:layout_below="@+id/textView4"
-        android:layout_marginTop="50dp"
-        android:text="密码："
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <TextView
-        android:id="@+id/TextView_serverId"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/textView4"
-        android:layout_marginLeft="47dp"
-        android:layout_toRightOf="@+id/textView4"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <TextView
         android:id="@+id/textView6"
@@ -115,34 +33,59 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/topbar"
         android:layout_centerHorizontal="true"
-        android:paddingBottom="20dp"
-        android:paddingLeft="100dp"
-        android:text="服务员列表"
+        android:layout_marginLeft="50dp"
+        android:background="@drawable/staff_setting_list_logo"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textSize="28sp" />
 
-    <TextView
-        android:id="@+id/textView_error_tab2"
+    <RelativeLayout
+        android:id="@+id/relativeLayout1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:layout_alignTop="@+id/listView_server_tab2"
+        android:layout_marginLeft="43dp"
+        android:layout_marginTop="36dp"
+        android:layout_toRightOf="@+id/listView_server_tab2"
+        android:background="@drawable/staff_setting_id_bg" >
 
-    <EditText
-        android:id="@+id/editText_serverPswd"
+        <TextView
+            android:id="@+id/TextView_serverId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="190dp"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/TextView_serverId"
-        android:layout_alignTop="@+id/textView5"
-        android:ems="10"
-        android:inputType="textPassword" />
-
+        android:layout_alignLeft="@+id/relativeLayout1"
+        android:layout_below="@+id/relativeLayout1"
+        android:layout_marginTop="59dp"
+        android:background="@drawable/staff_setting_pswd_bg" >
+
+        <EditText
+            android:id="@+id/editText_serverPswd"
+            android:layout_width="180dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="false"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="120dp"
+            android:ems="10"
+            android:inputType="textPassword" />
+    </RelativeLayout>
+
     <ImageView
         android:id="@+id/imageView_dialogTab2_correct"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/editText_serverPswd"
-        android:layout_toRightOf="@+id/editText_serverPswd"
-        android:src="@android:drawable/btn_star_big_on"
+        android:layout_alignBottom="@+id/relativeLayout2"
+        android:layout_marginBottom="4dp"
+        android:layout_toRightOf="@+id/relativeLayout2"
         android:visibility="invisible" />
 
 </RelativeLayout>

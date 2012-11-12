@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -105,6 +104,7 @@ public class ComboFoodActivity extends Activity {
 			{
 				//取得这个套餐
 				OrderFood theFood = msg.getData().getParcelable(COMBO_FOOD_KEY);
+				theFood.setCount(1f);
 				mComboFoodNameTextView.setText(theFood.name);
 				mComboFoodPriceTextView.setText(Util.float2String2(theFood.calcPriceWithTaste()));
 				  
@@ -149,8 +149,8 @@ public class ComboFoodActivity extends Activity {
 							activity.mChildFoodHandler.sendMessage(msg);
 							//set on click style
 							if(parent.getTag() != null)
-								((View)parent.getTag()).setBackgroundColor(Color.WHITE);
-							view.setBackgroundColor(Color.RED);
+								((View)parent.getTag()).setBackgroundDrawable(null);
+							view.setBackgroundColor(activity.getResources().getColor(R.color.blue));
 							parent.setTag(view);
 						}
 					}
@@ -193,39 +193,49 @@ public class ComboFoodActivity extends Activity {
 		for(Food f:mComboFoods)
 		{
 			//设置每个套餐的image view参数
-			ImageView image = new ImageView(this);
-			image.setLayoutParams(lp);
-			image.setScaleType(ScaleType.CENTER_CROP);
 			if(f.image != null)
+			{
+				ImageView image = new ImageView(this);
+				image.setLayoutParams(lp);
+				image.setScaleType(ScaleType.CENTER_CROP);
+//				if(f.image != null)
 				mImageFetcher.loadImage(f.image, image);
-			else image.setImageResource(R.drawable.null_pic);
-			
-			image.setTag(f);
-			//添加到图层中
-			comboFoodlayout.addView(image);
-			
-			image.setOnClickListener(new OnClickListener(){
-				@Override
-				public void onClick(View v) {
-					//将选中的套餐传递给handler
-					Food f = (Food) v.getTag();
-					Message msg = new Message();
-					msg.what = REFRESH_COMBO_FOOD;
-					Bundle data = new Bundle();
-					data.putParcelable(COMBO_FOOD_KEY, new FoodParcel(new OrderFood(f)));
-					msg.setData(data);
-					mComboFoodHandler.sendMessage(msg);
-					//设置被点击项的透明度和还原之前项透明度
-					if(comboFoodlayout.getTag() != null)
-						((View) comboFoodlayout.getTag()).setAlpha(1f);
-					v.setAlpha(0.5f);
-					comboFoodlayout.setTag(v);
-				}
-			});
+//				else image.setImageResource(R.drawable.null_pic);
+				
+				image.setTag(f);
+				//添加到图层中
+				comboFoodlayout.addView(image);
+				
+				image.setOnClickListener(new OnClickListener(){
+					@Override
+					public void onClick(View v) {
+						//将选中的套餐传递给handler
+						Food f = (Food) v.getTag();
+						Message msg = new Message();
+						msg.what = REFRESH_COMBO_FOOD;
+						Bundle data = new Bundle();
+						data.putParcelable(COMBO_FOOD_KEY, new FoodParcel(new OrderFood(f)));
+						msg.setData(data);
+						mComboFoodHandler.sendMessage(msg);
+						//设置被点击项的透明度和还原之前项透明度
+						//FIXME 改成其它显示
+						if(comboFoodlayout.getTag() != null)
+							((View) comboFoodlayout.getTag()).setAlpha(1f);
+						v.setAlpha(0.5f);
+						comboFoodlayout.setTag(v);
+					}
+				});
+			}
 		}
 		//默认第一个套餐选中
 		if(!mComboFoods.isEmpty())
-			comboFoodlayout.getChildAt(0).performClick();
+			comboFoodlayout.postDelayed(new Runnable(){
+				@Override
+				public void run() {
+					comboFoodlayout.getChildAt(0).performClick();
+				}
+			}, 100);
+
 		//set pick child food button listener
 		((ImageButton) findViewById(R.id.imageButton_pickChildFood_comboFood)).setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -287,6 +297,7 @@ public class ComboFoodActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         mImageFetcher.closeCache();
+        mImageFetcher.clearCache();
     }
     
 	class SpecificFoodAdapter extends BaseAdapter{
@@ -327,15 +338,18 @@ public class ComboFoodActivity extends Activity {
 			if(food.name.equals(MAIN_FOOD_KEY) || food.name.equals(GIFT_FOOD_KEY))
 			{
 				//FIXME 修改点击样式
-				view.setBackgroundColor(Color.BLUE);
+				if(food.name.equals(MAIN_FOOD_KEY))
+					view.setBackgroundResource(R.drawable.combo_group_main);
+				else view.setBackgroundResource(R.drawable.combo_group_gift);
+				
+				((TextView) view.findViewById(R.id.textView_name_combo_item)).setText("");
 				view.setTag(null);
 			}
 			else {
-				view.setBackgroundColor(Color.WHITE);
+				view.setBackgroundColor(getResources().getColor(R.color.gray));
 				view.setTag(food);
+				((TextView) view.findViewById(R.id.textView_name_combo_item)).setText(food.name);
 			}
-			//FIXME 修改显示样式
-			((TextView) view.findViewById(R.id.textView_name_combo_item)).setText(food.name);
 			return view;
 		}
 		

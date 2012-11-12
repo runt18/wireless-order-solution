@@ -93,6 +93,9 @@ public class PickedFoodActivity extends Activity implements OnOrderChangeListene
 
 	private ExpandableListView mPickedFoodList;
 	private OrderFood mCurFood;
+	
+	private ImageFetcher mImageFetcher;
+
 
 	/*
 	 * 显示已点菜的列表的handler
@@ -116,11 +119,7 @@ public class PickedFoodActivity extends Activity implements OnOrderChangeListene
 		{
 			final PickedFoodActivity activity = mActivity.get();
 			ShoppingCart sCart = ShoppingCart.instance();
-			//若完全没有菜式，则关闭该activity
-			if(!sCart.hasOrder()){
-				activity.onBackPressed();
-				return;
-			}
+
 			int totalCount = 0;
 			mTotalPrice = 0;
 
@@ -438,7 +437,6 @@ public class PickedFoodActivity extends Activity implements OnOrderChangeListene
 	private static class FoodDetailHandler extends Handler{
 		private WeakReference<PickedFoodActivity> mActivity;
 		private ImageView mFoodImageView;
-		private ImageFetcher mImageFetcher;
 		private TextView mTasteTextView;
 		private TextView mTempTasteTextView;
 		private ImageButton mTempTasteBtn;
@@ -450,7 +448,6 @@ public class PickedFoodActivity extends Activity implements OnOrderChangeListene
 			mActivity = new WeakReference<PickedFoodActivity>(activity);
 			
 			mFoodImageView = (ImageView) activity.findViewById(R.id.imageView_selected_food_pickedFood);
-			mImageFetcher = new ImageFetcher(activity, 300, 225);
 			
 			mTempTasteTextView  = (TextView) activity.findViewById(R.id.textView_pinzhu_foodDetail);
 			mTasteTextView = (TextView) activity.findViewById(R.id.textView_pickedTaste_foodDetail);
@@ -470,7 +467,7 @@ public class PickedFoodActivity extends Activity implements OnOrderChangeListene
 		{
 			final PickedFoodActivity activity = mActivity.get();
 			//设置菜品的各个数据
-			mImageFetcher.loadImage(activity.mCurFood.image, mFoodImageView);
+			activity.mImageFetcher.loadImage(activity.mCurFood.image, mFoodImageView);
 			
 			if(activity.mCurFood.hasTmpTaste()){
 				mTempTasteTextView.setText(activity.mCurFood.tasteGroup.getTmpTastePref());
@@ -499,6 +496,9 @@ public class PickedFoodActivity extends Activity implements OnOrderChangeListene
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.picked_food);
+		
+		mImageFetcher = new ImageFetcher(this, 300, 225);
+
 		//初始化handler
 		mFoodHandler = new FoodHandler(this);
 		mFoodDataHandler = new FoodDetailHandler(this);
@@ -552,6 +552,8 @@ public class PickedFoodActivity extends Activity implements OnOrderChangeListene
 							mToast.cancel();
 							if(e == null){
 								Toast.makeText(PickedFoodActivity.this, reqOrder.destTbl.aliasID + "号餐台下单成功", Toast.LENGTH_SHORT).show();
+//								((OptionBarFragment) getFragmentManager().findFragmentById(R.id.bottombar_pickedFood)).onTableChanged(reqOrder.destTbl);
+
 								finish();
 							}else{
 								if(ShoppingCart.instance().hasOriOrder()){
@@ -651,6 +653,12 @@ public class PickedFoodActivity extends Activity implements OnOrderChangeListene
 		mPickedFoodList.setOnChildClickListener(null);
 	}
 	
+	@Override
+	protected void onDestroy() {
+        mImageFetcher.clearCache();
+		super.onDestroy();
+	}
+
 	private class AskCancelAmountDialog extends Dialog{
 		static final String DELETE = "删除";
 		static final String RETREAT = "退菜";
@@ -704,9 +712,15 @@ public class PickedFoodActivity extends Activity implements OnOrderChangeListene
 							else if(method.equals(RETREAT))
 								ShoppingCart.instance().getOriOrder().remove(selectedFood);
 							
-							mFoodHandler.sendEmptyMessage(PickedFoodActivity.LIST_CHANGED);
-							dismiss();
-							Toast.makeText(context, method+"\"" + selectedFood.toString() + "\"" + cancelAmount + "份成功", Toast.LENGTH_SHORT).show();
+							//若完全没有菜式，则关闭该activity
+							if(!ShoppingCart.instance().hasOrder()){
+								onBackPressed();
+								PickedFoodActivity.this.onBackPressed();
+							} else{
+								mFoodHandler.sendEmptyMessage(PickedFoodActivity.LIST_CHANGED);
+								dismiss();
+								Toast.makeText(context, method+"\"" + selectedFood.toString() + "\"" + cancelAmount + "份成功", Toast.LENGTH_SHORT).show();
+							}
 							
 						}else if(foodAmount > cancelAmount){
 							/**

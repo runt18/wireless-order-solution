@@ -15,8 +15,6 @@ import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
-import android.widget.RadioGroup;
-import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,7 +28,6 @@ import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.Taste;
 import com.wireless.protocol.TasteGroup;
 import com.wireless.protocol.Util;
 import com.wireless.util.ImageDialog;
@@ -111,6 +108,11 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		
 		FoodParcel foodParcel = getIntent().getParcelableExtra(FoodParcel.KEY_VALUE);
 		mOrderFood = foodParcel;
+		if(!mOrderFood.hasTaste())
+		{
+			mOrderFood.tasteGroup = new TasteGroup(mOrderFood, null, null);
+			mOrderFood.tasteGroup.addTaste(WirelessOrder.foodMenu.specs[0]);
+		}
 		
 		mDisplayHandler = new DisplayHandler(this);
 		mDisplayHandler.sendEmptyMessage(ORDER_FOOD_CHANGED);
@@ -197,29 +199,30 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 				mDisplayHandler.sendEmptyMessage(ORDER_FOOD_CHANGED);
 			}
 		});
-		//规格
-		((RadioGroup) findViewById(R.id.radioGroup_foodDetail)).setOnCheckedChangeListener(new OnCheckedChangeListener(){
-			@Override
-			public void onCheckedChanged(RadioGroup group, int checkedId) {
-				if(!mOrderFood.hasTaste())
-					mOrderFood.tasteGroup = new TasteGroup(mOrderFood, null, null);
-				for(Taste t:WirelessOrder.foodMenu.specs)
-					mOrderFood.tasteGroup.removeTaste(t);
-				
-				switch(checkedId)
-				{
-				case R.id.radio0:
-					mOrderFood.tasteGroup.addTaste(WirelessOrder.foodMenu.specs[2]);
-					break;
-				case R.id.radio1:
-					mOrderFood.tasteGroup.addTaste(WirelessOrder.foodMenu.specs[1]);
-					break;
-				case R.id.radio2:
-					mOrderFood.tasteGroup.addTaste(WirelessOrder.foodMenu.specs[0]);
-					break;
-				}
-			}
-		});
+//		//规格
+//		((RadioGroup) findViewById(R.id.radioGroup_foodDetail)).setOnCheckedChangeListener(new OnCheckedChangeListener(){
+//			@Override
+//			public void onCheckedChanged(RadioGroup group, int checkedId) {
+//				if(!mOrderFood.hasTaste())
+//					mOrderFood.tasteGroup = new TasteGroup(mOrderFood, null, null);
+//				for(Taste t:WirelessOrder.foodMenu.specs)
+//					mOrderFood.tasteGroup.removeTaste(t);
+//				
+//				switch(checkedId)
+//				{
+//				case R.id.radio0:
+//					mOrderFood.tasteGroup.addTaste(WirelessOrder.foodMenu.specs[2]);
+//					break;
+//				case R.id.radio1:
+//					mOrderFood.tasteGroup.addTaste(WirelessOrder.foodMenu.specs[1]);
+//					break;
+//				case R.id.radio2:
+//					mOrderFood.tasteGroup.addTaste(WirelessOrder.foodMenu.specs[0]);
+//					break;
+//				}
+//				mDisplayHandler.sendEmptyMessage(ORDER_FOOD_CHANGED);
+//			}
+//		});
 		
 		//设置两个tab
 		TabHost mTabHost = (TabHost) findViewById(R.id.tabhost_foodDetail);

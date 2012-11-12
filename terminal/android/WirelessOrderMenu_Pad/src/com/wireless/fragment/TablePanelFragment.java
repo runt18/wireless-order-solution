@@ -203,7 +203,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 					validRegions.add(region);
 				}
 			}
-			
+			//区域
 			LinearLayout hScrollViewLinearLayout = (LinearLayout) fragment.getView().findViewById(R.id.hScrollView_linearLayout);
 			hScrollViewLinearLayout.removeAllViews();
 			for(Region r : validRegions)
@@ -252,7 +252,8 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 			 */
 			while(iter.hasNext()){
 				Table t = iter.next();
-
+				//XXX delete
+				t.name = "天朗明居";
 				if(fragment.mTableCond == FILTER_TABLE_IDLE && t.status != Table.TABLE_IDLE){
 					iter.remove();
 					
@@ -448,11 +449,14 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 			view.setTag(table);
 			// 根据餐台的不同状态设置背景
 			if (table.status == Table.TABLE_BUSY) {
-				((RelativeLayout) view.findViewById(R.id.table_bg)).setBackgroundResource(R.color.red);
+				((RelativeLayout) view.findViewById(R.id.table_bg)).setBackgroundResource(R.drawable.table_busy);
 				((TextView) view.findViewById(R.id.textView_customNum_gridItem)).setText("" + table.customNum);
-			}
+
+			} 
 			// 设置餐台台号
-			((TextView) view.findViewById(R.id.textView_tableNum)).setText(Integer.toString(table.aliasID));
+			if(Integer.toString(table.aliasID).length() > 3)
+				((TextView) view.findViewById(R.id.textView_tableNum)).setText(Integer.toString(table.aliasID).substring(0, 2));
+			else ((TextView) view.findViewById(R.id.textView_tableNum)).setText(Integer.toString(table.aliasID));
 			// 设置餐台名称
 			((TextView) view.findViewById(R.id.textView_tableName)).setText(table.name);
 

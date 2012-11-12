@@ -23,5 +23,6 @@
     <drawable name="nullbg">#00ffffff</drawable>
     <color name="exRed">#dc0303</color>
     <color name="red_orange">#dc4a03</color>
+    <color name="dark_gray">#282828</color>
 
 </resources>

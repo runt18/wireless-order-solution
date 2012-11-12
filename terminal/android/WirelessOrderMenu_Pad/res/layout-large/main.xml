@@ -108,7 +108,8 @@
                 android:layout_alignParentTop="true"
                 android:layout_marginLeft="22dp"
                 android:background="@null"
-                android:src="@drawable/special_btn_selector" />
+                android:src="@drawable/special_btn_selector"
+                android:visibility="invisible" />
 
             <ImageButton
                 android:id="@+id/imageButton_rec_mian"
@@ -117,7 +118,8 @@
                 android:layout_alignParentTop="true"
                 android:layout_toRightOf="@+id/imageButton_special_main"
                 android:background="@null"
-                android:src="@drawable/recommend_btn_selector" />
+                android:src="@drawable/recommend_btn_selector"
+                android:visibility="invisible" />
 
             <ImageButton
                 android:id="@+id/imageButton_current_main"
@@ -126,7 +128,8 @@
                 android:layout_alignParentTop="true"
                 android:layout_toRightOf="@+id/imageButton_rec_mian"
                 android:background="@null"
-                android:src="@drawable/current_btn_selector" />
+                android:src="@drawable/current_btn_selector"
+                android:visibility="invisible" />
 
             <EditText
                 android:id="@+id/editText_main"

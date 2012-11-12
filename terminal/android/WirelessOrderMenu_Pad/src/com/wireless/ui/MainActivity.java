@@ -6,7 +6,9 @@ import java.util.Comparator;
 import java.util.HashMap;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.FragmentTransaction;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -249,6 +251,18 @@ public class MainActivity extends Activity
 		
 	}
 
+	@Override
+	public void onBackPressed() {
+		new AlertDialog.Builder(this).setTitle("是否退出?")
+		.setPositiveButton("确定", new DialogInterface.OnClickListener(){
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				MainActivity.super.onBackPressed();
+			}
+		})
+		.setNegativeButton("取消", null).show();
+	}
+
 	/**
 	 * 右边画廊Gallery的回调函数，联动显示左边的部门-厨房ListView
 	 */
@@ -260,6 +274,18 @@ public class MainActivity extends Activity
 		((TextView) findViewById(R.id.textView_amount_main)).setText("1");
 		mOrderFood = new OrderFood(food);
 		mOrderFood.setCount(Float.parseFloat(((TextView) findViewById(R.id.textView_amount_main)).getText().toString()));
+		
+		
+		((ImageButton)findViewById(R.id.imageButton_special_main)).setVisibility(View.INVISIBLE);
+		((ImageButton)findViewById(R.id.imageButton_rec_mian)).setVisibility(View.INVISIBLE);
+		((ImageButton)findViewById(R.id.imageButton_current_main)).setVisibility(View.INVISIBLE);
+		if(food.isSpecial())
+			((ImageButton)findViewById(R.id.imageButton_special_main)).setVisibility(View.VISIBLE);
+		if(food.isRecommend())
+			((ImageButton)findViewById(R.id.imageButton_rec_mian)).setVisibility(View.VISIBLE);
+		if(food.isCurPrice())
+			((ImageButton)findViewById(R.id.imageButton_current_main)).setVisibility(View.INVISIBLE);
+
 	}
 
 	/**

@@ -16,7 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -61,12 +61,41 @@ public class StaffPanelFragment extends Fragment {
 		 * 设置服务员列表
 		 */
 		final ListView staffLstView = (ListView) view.findViewById(R.id.listView_server_tab2);
-		List<String> staffNames = new ArrayList<String>();
+		final List<String> staffNames = new ArrayList<String>();
 		if(WirelessOrder.staffs != null)
 			for(StaffTerminal s : WirelessOrder.staffs){
 				staffNames.add(s.name);
 			}
-		staffLstView.setAdapter(new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_list_item_checked, staffNames));
+		staffLstView.setAdapter(new BaseAdapter(){
+
+			@Override
+			public int getCount() {
+				return staffNames.size();
+			}
+
+			@Override
+			public Object getItem(int position) {
+				return staffNames.get(position);
+			}
+
+			@Override
+			public long getItemId(int position) {
+				return position;
+			}
+
+			@Override
+			public View getView(int position, View convertView, ViewGroup parent) {
+				View view = convertView;
+				if(view == null)
+				{
+					view = getActivity().getLayoutInflater().inflate(R.layout.staff_list_item, null);
+				}
+				
+				((TextView) view.findViewById(R.id.textView_staff_item_name)).setText(staffNames.get(position));
+				return view;
+			}
+			
+		});
 		/*
 		 * 从列表框中选择员工信息的操作
 		 */
@@ -75,11 +104,22 @@ public class StaffPanelFragment extends Fragment {
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				mStaff = WirelessOrder.staffs[position];
 				mServerIdTextView.setText(mStaff.name);
-				staffLstView.setItemChecked(position, true);
+//				staffLstView.setItemChecked(position, true);
+				
+				if(parent.getTag() != null)
+					((View)parent.getTag()).setBackgroundDrawable(null);
+				view.setBackgroundResource(R.drawable.staff_list_item);
+				parent.setTag(view);
 			}
 		});
 		//第一个选中
-		staffLstView.performItemClick(staffLstView.getChildAt(0), 0, 0);
+		staffLstView.postDelayed(new Runnable(){
+			@Override
+			public void run() {
+				staffLstView.performItemClick(staffLstView.getChildAt(0), 0, 0);				
+			}
+		}, 100);
+
 
 		final CheckPswdRunnable checkRunnable = new CheckPswdRunnable();
 		mServerPswdEditText.addTextChangedListener(new TextWatcher(){
@@ -150,6 +190,8 @@ public class StaffPanelFragment extends Fragment {
 					Toast.makeText(getActivity(), "账号不能为空", Toast.LENGTH_SHORT).show();
 				//密码正确：
 				}else if(mStaff.pwd.equals(toHexString(digester.digest()))){
+//					mCorrectIcon.setBackgroundDrawable(null);
+					mCorrectIcon.setBackgroundResource(R.drawable.staff_correct);
 					mCorrectIcon.setVisibility(View.VISIBLE);
 					//储存这个服务员
 					ShoppingCart.instance().setStaff(mStaff);
@@ -178,8 +220,12 @@ public class StaffPanelFragment extends Fragment {
 						mOnStaffChangedListener.onStaffChanged(mStaff, mServerIdTextView.getText().toString(), mServerPswdEditText.getText().toString());
 				//密码错误
 				}else{		
-					mCorrectIcon.setVisibility(View.INVISIBLE);
+					mCorrectIcon.setBackgroundResource(R.drawable.staff_wrong);
 					Toast.makeText(getActivity(), "密码错误", Toast.LENGTH_SHORT).show();
+					ShoppingCart.instance().setStaff(null);
+					//通知观察者
+					if(mOnStaffChangedListener != null)
+						mOnStaffChangedListener.onStaffChanged(mStaff, mServerIdTextView.getText().toString(), mServerPswdEditText.getText().toString());
 				}
 				
 			}catch(NoSuchAlgorithmException e) {

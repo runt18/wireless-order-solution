@@ -7,7 +7,7 @@
 
     <TextView
         android:id="@+id/textView_picked_food_name_item"
-        android:layout_width="100dp"
+        android:layout_width="194dp"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
@@ -20,19 +20,19 @@
         android:layout_width="80dp"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         android:layout_toRightOf="@+id/textView_picked_food_name_item"
         android:text="2"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="@color/black" />
-
+
     <ImageButton
         android:id="@+id/imageButton_minus_pickedFood_item"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="false"
         android:layout_centerVertical="true"
-        android:layout_toRightOf="@+id/textView_picked_food_count_item"
+        android:layout_toRightOf="@+id/textView_picked_food_price_item"
         android:background="@null"
         android:focusable="false"
         android:src="@drawable/minus_btn_selector" />
@@ -49,26 +49,27 @@
         android:text="催菜 "
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="@color/black" />
-
+
     <Button
         android:id="@+id/textView_picked_food_count_item"
         android:layout_width="60dp"
         android:layout_height="match_parent"
         android:layout_centerVertical="true"
-        android:layout_toRightOf="@+id/imageButton_plus_pickedFood_item"
+        android:layout_toRightOf="@+id/imageButton_minus_pickedFood_item"
         android:background="@null"
         android:ems="10"
         android:focusable="false"
         android:inputType="numberDecimal"
         android:textColor="@color/black" >
+
     </Button>
-
+
     <ImageButton
         android:id="@+id/imageButton_plus_pickedFood_item"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_toRightOf="@+id/textView_picked_food_price_item"
+        android:layout_toRightOf="@+id/textView_picked_food_count_item"
         android:background="@null"
         android:focusable="false"
         android:src="@drawable/plus_btn_selector" />

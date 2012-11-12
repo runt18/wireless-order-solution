@@ -51,9 +51,11 @@
             android:name="com.wireless.ui.PickedFoodActivity"
             android:screenOrientation="landscape" >
         </activity>
-        <activity android:name="com.wireless.ui.ComboFoodActivity" >
+        <activity android:name="com.wireless.ui.ComboFoodActivity"
+            android:screenOrientation="landscape" >
         </activity>
-        <activity android:name="com.wireless.ui.RankListActivity" >
+        <activity android:name="com.wireless.ui.RankListActivity"
+            android:screenOrientation="landscape" >
         </activity>
         <activity
             android:name="com.wireless.ui.SettingActivity"
