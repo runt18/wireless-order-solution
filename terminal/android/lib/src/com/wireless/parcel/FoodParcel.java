@@ -16,7 +16,7 @@ public class FoodParcel extends OrderFood implements Parcelable{
 	
 	public FoodParcel(OrderFood food){
 		if(food != null){
-			aliasID = food.aliasID;
+			this.setAliasId(food.getAliasId());
 			kitchen = food.kitchen;
 			name = food.name;
 			image = food.image;
