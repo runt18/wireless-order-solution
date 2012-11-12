@@ -118,7 +118,7 @@ public class PickFoodFragment extends Fragment{
 				Iterator<Food> iter = tmpFoods.iterator();
 				while(iter.hasNext()){
 					Food f = iter.next();
-					if(!(String.valueOf(f.aliasID).startsWith(fragment.mFilterCond) || f.name.contains(fragment.mFilterCond))){
+					if(!(String.valueOf(f.getAliasId()).startsWith(fragment.mFilterCond) || f.name.contains(fragment.mFilterCond))){
 						iter.remove();
 					}
 				}				
@@ -271,7 +271,7 @@ public class PickFoodFragment extends Fragment{
 				((TextView) view.findViewById(R.id.textView_foodName_pickFoodFragment_item)).setText(food.name);
 			}
 
-			((TextView) view.findViewById(R.id.textView_num_pickFoodFragment_item)).setText(Integer.toString(food.aliasID));
+			((TextView) view.findViewById(R.id.textView_num_pickFoodFragment_item)).setText(Integer.toString(food.getAliasId()));
 			((TextView) view.findViewById(R.id.textView_price_pickFoodFragment_item)).setText(Util.float2String2(food.getPrice()));
 			
 			//设置售罄的显示

@@ -627,7 +627,7 @@ public class KitchenFragment extends Fragment {
 			}
 
 			//设置该项的显示
-			((TextView) view.findViewById(R.id.textView_num_pickFoodFragment_item)).setText(Integer.toString(food.aliasID));
+			((TextView) view.findViewById(R.id.textView_num_pickFoodFragment_item)).setText(Integer.toString(food.getAliasId()));
 			((TextView) view.findViewById(R.id.textView_price_pickFoodFragment_item)).setText(Util.float2String2(food.getPrice()));
 			
 			if(food.isSellOut())

@@ -151,7 +151,7 @@ public class PickFoodListView extends ListView {
 			((TextView)view.findViewById(R.id.foodname)).setText(comboStatus + _foods[position].name + status);
 			if(_tag == TAG_NUM){
 				((TextView)view.findViewById(R.id.foodpinyin)).setText("±‡∫≈£∫");
-				((TextView)view.findViewById(R.id.foodpinyins)).setText(String.valueOf(_foods[position].aliasID));
+				((TextView)view.findViewById(R.id.foodpinyins)).setText(String.valueOf(_foods[position].getAliasId()));
 			}else{
 				((TextView)view.findViewById(R.id.foodpinyin)).setText("∆¥“Ù£∫");
 				((TextView)view.findViewById(R.id.foodpinyins)).setText(_foods[position].pinyin);

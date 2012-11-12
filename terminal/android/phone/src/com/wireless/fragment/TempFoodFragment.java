@@ -126,7 +126,6 @@ public class TempFoodFragment extends Fragment {
 		void add(){
 			OrderFood tmpFood = new OrderFood();
 			tmpFood.isTemporary = true;
-			tmpFood.aliasID = Util.genTempFoodID();
 			tmpFood.hangStatus = OrderFood.FOOD_NORMAL;
 			tmpFood.kitchen = new Kitchen();
 			tmpFood.setCount(1f);
