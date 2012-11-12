@@ -470,12 +470,12 @@ public class PickedFoodActivity extends Activity implements OnOrderChangeListene
 			activity.mImageFetcher.loadImage(activity.mCurFood.image, mFoodImageView);
 			
 			if(activity.mCurFood.hasTmpTaste()){
-				mTempTasteTextView.setText(activity.mCurFood.tasteGroup.getTmpTastePref());
+				mTempTasteTextView.setText(activity.mCurFood.getTasteGroup().getTmpTastePref());
 			}else{
 				mTempTasteTextView.setText("");
 			}
 			if(activity.mCurFood.hasNormalTaste()){
-				mTasteTextView.setText(activity.mCurFood.tasteGroup.getNormalTastePref());
+				mTasteTextView.setText(activity.mCurFood.getTasteGroup().getNormalTastePref());
 			}else{
 				mTasteTextView.setText("");
 			}
@@ -484,7 +484,7 @@ public class PickedFoodActivity extends Activity implements OnOrderChangeListene
 			((ImageButton) activity.findViewById(R.id.button_removeAllTaste)).setOnClickListener(new OnClickListener(){
 				@Override
 				public void onClick(View v) {
-					activity.mCurFood.tasteGroup = null;
+					activity.mCurFood.clearTasetGroup();
 					mTempTasteTextView.setText("");
 					mTasteTextView.setText("");
 				}
@@ -778,7 +778,7 @@ public class PickedFoodActivity extends Activity implements OnOrderChangeListene
 	}
 	
 	@Override
-	public void onTasteChange(OrderFood food) {
+	public void onTasteChanged(OrderFood food) {
 		ShoppingCart.instance().getNewOrder().remove(mCurFood);
 		mCurFood = food;
 		try {

@@ -85,13 +85,13 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 				mFoodNameTextView.setText(activity.mOrderFood.name);
 				mFoodPriceTextView.setText("" + activity.mOrderFood.getPriceWithTaste());
 				if(activity.mOrderFood.hasNormalTaste()){
-					mTasteTextView.setText(activity.mOrderFood.tasteGroup.getNormalTastePref());					
+					mTasteTextView.setText(activity.mOrderFood.getTasteGroup().getNormalTastePref());					
 				}else{
 					mTasteTextView.setText("");
 				}
 				
 				if(activity.mOrderFood.hasTmpTaste()){
-					mPinzhuTextView.setText(activity.mOrderFood.tasteGroup.getTmpTastePref());
+					mPinzhuTextView.setText(activity.mOrderFood.getTasteGroup().getTmpTastePref());
 				}else{
 					mPinzhuTextView.setText("");
 				}
@@ -195,7 +195,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		((ImageButton) findViewById(R.id.button_removeAllTaste)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				mOrderFood.tasteGroup = null;
+				mOrderFood.clearTasetGroup();
 				mDisplayHandler.sendEmptyMessage(ORDER_FOOD_CHANGED);
 			}
 		});
@@ -278,7 +278,7 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 	}
 
 	@Override
-	public void onTasteChange(OrderFood food) {
+	public void onTasteChanged(OrderFood food) {
 		mOrderFood = food;
 		mDisplayHandler.sendEmptyMessage(ORDER_FOOD_CHANGED);
 	}

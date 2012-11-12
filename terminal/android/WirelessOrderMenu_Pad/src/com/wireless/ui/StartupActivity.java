@@ -460,9 +460,9 @@ public class StartupActivity extends Activity {
 		private Comparator<Food> mFoodComp = new Comparator<Food>() {
 			@Override
 			public int compare(Food lhs, Food rhs) {
-				if(lhs.aliasID == rhs.aliasID){
+				if(lhs.getAliasId() == rhs.getAliasId()){
 					return 0;
-				}else if(lhs.aliasID > rhs.aliasID){
+				}else if(lhs.getAliasId() > rhs.getAliasId()){
 					return 1;
 				}else{
 					return -1;
@@ -536,7 +536,7 @@ public class StartupActivity extends Activity {
 						 * 2 - the food's image is NOT the same as the original
 						 * 3 - the food's image file is NOT exist in the current file system
 						 */
-						Object image = foodImg.get(Integer.toString(food.aliasID));
+						Object image = foodImg.get(Integer.toString(food.getAliasId()));
 						if(image == null){
 							downloadQueue.add(food);
 							
@@ -598,7 +598,7 @@ public class StartupActivity extends Activity {
 																			 		  Params.IMG_STORE_PATH + 
 																			 		  food.image))));
 							
-							edit.putString(Integer.toString(food.aliasID), food.image);			
+							edit.putString(Integer.toString(food.getAliasId()), food.image);			
 							
 						}catch(IOException e){
 							Log.e("", e.getMessage());

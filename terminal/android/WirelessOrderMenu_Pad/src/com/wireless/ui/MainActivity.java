@@ -82,9 +82,9 @@ public class MainActivity extends Activity
 				} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
 					return -1;
 				} else {
-					if(food1.aliasID > food2.aliasID){
+					if(food1.getAliasId() > food2.getAliasId()){
 						return 1;
-					}else if(food1.aliasID < food2.aliasID){
+					}else if(food1.getAliasId() < food2.getAliasId()){
 						return -1;
 					}else{
 						return 0;
