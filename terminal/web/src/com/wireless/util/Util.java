@@ -10,7 +10,6 @@ import com.wireless.db.Params;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Taste;
-import com.wireless.protocol.TasteGroup;
 
 public class Util {
 	public static String toOrderCate(int type) {
@@ -97,17 +96,17 @@ public class Util {
 						isUnique = true;
 						for(int j = 0; j < i; j++){
 							if(foods[j].isTemporary){
-								if(tmpFoodID == foods[j].aliasID){
+								if(tmpFoodID == foods[j].getAliasId()){
 									isUnique = false;
 									break;
 								}
 							}
 						}						
 					}while(!isUnique);					
-					foods[i].aliasID = tmpFoodID;
+					foods[i].setAliasId(tmpFoodID);
 					
 				}else if(Short.parseShort(values[6]) == ORIGINAL_ORDER_FOOD){
-					foods[i].aliasID = aliasID;
+					foods[i].setAliasId(aliasID);
 					
 				}else if(Short.parseShort(values[6]) == PAY_AGAIN_ORDER_FOOD){
 					
@@ -115,19 +114,19 @@ public class Util {
 				
 			} else {
 				// extract the food alias id
-				foods[i].aliasID = Integer.parseInt(values[1]);
+				foods[i].setAliasId(Integer.parseInt(values[1]));
 				// extract the amount to order food
 				foods[i].setCount(Float.parseFloat(values[2]));
 				// extract the tasteGroup
 				String[] tasteGroup = values[3].split("<<st>>");
 				if(tasteGroup.length > 0){
-					foods[i].tasteGroup = new TasteGroup();
+					foods[i].makeTasteGroup();
 					for(int j = 0; j < tasteGroup.length; j++){
 						String[] taste = tasteGroup[j].split("stb");
-						if(taste.length == 2){
+						if(taste.length == 3){
 							Taste it = new Taste(Integer.valueOf(taste[0]), Integer.valueOf(taste[1]), 0);
 							it.category = Short.valueOf(taste[2]);
-							foods[i].tasteGroup.addTaste(it);
+							foods[i].getTasteGroup().addTaste(it);
 						}
 					}
 				}

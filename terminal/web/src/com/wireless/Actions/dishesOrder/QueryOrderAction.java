@@ -77,7 +77,7 @@ public class QueryOrderAction extends Action {
 					item = new OrderFood();
 					item.setFoodName(order.foods[i].name);
 					item.setFoodID(order.foods[i].foodID);
-					item.setAliasID(order.foods[i].aliasID);
+					item.setAliasID(order.foods[i].getAliasId());
 					item.getKitchen().setKitchenID(Integer.parseInt(order.foods[i].kitchen.kitchenID+""));
 					item.getKitchen().setDept(null);
 					item.setCount(order.foods[i].getCount());
@@ -91,19 +91,18 @@ public class QueryOrderAction extends Action {
 					item.setHangStatus(order.foods[i].hangStatus);
 					
 					
-					if(order.foods[i].tasteGroup != null && order.foods[i].tasteGroup.getNormalTastes().length > 0){
+					if(order.foods[i].hasTaste()){
 						// 
 						TasteGroup tg = new TasteGroup();
-						tg.getNormalTaste().setTasteName(order.foods[i].tasteGroup.getTastePref());
-						tg.getNormalTaste().setTastePrice(order.foods[i].tasteGroup.getTastePrice());
-						tg.getTempTaste().setTasteName(order.foods[i].tasteGroup.getTastePref());
-						tg.getTempTaste().setTastePrice(order.foods[i].tasteGroup.getTastePrice());
+						tg.getNormalTaste().setTasteName(order.foods[i].getTasteGroup().getTastePref());
+						tg.getNormalTaste().setTastePrice(order.foods[i].getTasteGroup().getTastePrice());
+						tg.getTempTaste().setTasteName(order.foods[i].getTasteGroup().getTastePref());
+						tg.getTempTaste().setTastePrice(order.foods[i].getTasteGroup().getTastePrice());
 						// 
-						for(int j = 0; j < order.foods[i].tasteGroup.getNormalTastes().length; j++){
-							Taste tl = order.foods[i].tasteGroup.getNormalTastes()[j];
+						for(Taste normalTaste : order.foods[i].getTasteGroup().getNormalTastes()){
 							TasteBasic tb = new TasteBasic();
-							tb.setTasteID(tl.tasteID);
-							tb.setTasteAliasID(tl.aliasID);
+							tb.setTasteID(normalTaste.tasteID);
+							tb.setTasteAliasID(normalTaste.aliasID);
 							tg.addTaste(tb);
 						}
 						item.setTasteGroup(tg);
