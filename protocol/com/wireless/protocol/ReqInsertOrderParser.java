@@ -29,14 +29,17 @@ public class ReqInsertOrderParser {
 	 * 
 	 * <Food>
 	 * is_temp(0) : food_alias[2] : order_amount[2] :
-	 * normal_taste_amount : normal_taste_alias[2] : normal_taste_alias2[2]... : 
+	 * normal_taste_amount : <NormalTaste1> : <NormalTaste2>... : 
 	 * len_tmp_taste : tmp_taste[n] : tmp_taste_alias[2] : tmp_taste_price[4] : 
 	 * kitchen : hang_status : is_hurried
 	 * is_temp(0) - "0" means this food is NOT temporary
 	 * food_alias[2] - 2-byte indicating the alias id to food
 	 * order_amount[2] - 2-byte indicating how many this foods are ordered
 	 * normal_taste_amount - 1-byte indicates the amount to normal taste
+	 * <NormalTaste>
+	 * normal_taste_alias[2] : normal_taste_category
 	 * normal_taste_alias[2] - 2-byte indicates the taste alias id
+	 * normal_taste_category - 1-byte indicates the category to this normal taste
 	 * len_tmp_taste - 1-byte indicates the length of temporary taste
 	 * tmp_taste[n] - the temporary taste value
 	 * tmp_taste_alias[2] - 2-byte indicates the alias id to this temporary taste
@@ -176,13 +179,16 @@ public class ReqInsertOrderParser {
 				offset += 1;
 				
 				Taste[] normalTastes = null;
-				//get alias id to each normal taste
 				if(nNormalTastes > 0){
 					normalTastes = new Taste[nNormalTastes];
 					for(int j = 0; j < normalTastes.length; j++){
 						normalTastes[j] = new Taste();
+						//get alias id to each normal taste
 						normalTastes[j].aliasID = (req.body[offset] & 0x000000FF) | ((req.body[offset + 1] & 0x000000FF) << 8);
 						offset += 2;
+						//get category to each normal taste
+						normalTastes[j].category = req.body[offset];
+						offset += 1;
 					}
 				}
 			

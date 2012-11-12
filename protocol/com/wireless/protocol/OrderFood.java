@@ -16,6 +16,14 @@ public class OrderFood extends Food {
 	
 	public boolean isTemporary = false;				//indicates whether the food is temporary
 	
+	public int getAliasId(){
+		if(isTemporary){
+			return (name.hashCode() + price) % 65535;
+		}else{
+			return this.aliasID;
+		}
+	}
+	
 	/**
 	 * The value of discount ranges from 0.00 through 1.00
 	 * So the real price should be divided 100 at last. 
@@ -26,7 +34,7 @@ public class OrderFood extends Food {
 	 * Set the discount for internal.
 	 * @param discount the discount to set
 	 */
-	public void setDiscountInternal(int discount){
+	void setDiscountInternal(int discount){
 		//The discount remains as before in case of temporary, gift or special
 		if(isTemporary || isGift() || isSpecial()){
 			//this.discount = 100;
@@ -35,7 +43,7 @@ public class OrderFood extends Food {
 		}
 	}
 	
-	public int getDiscountInternal(){
+	int getDiscountInternal(){
 		return discount;
 	}
 	

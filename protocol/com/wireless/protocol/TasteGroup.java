@@ -351,17 +351,28 @@ public class TasteGroup {
 	 */
 	public String getNormalTastePref(){
 		
-		String tastePref;		
-		tastePref = getNormalTastePref(mTastes);
+		String tastePref = null;
+		if(hasInternalTaste()){
+			tastePref = getNormalTastePref(mTastes);
+		}
 		
-		String specPref;
-		specPref = getNormalTastePref(mSpecs);
+		String specPref = null;
+		if(hasSpec()){
+			specPref = getNormalTastePref(mSpecs);
+		}
 		
-		if(specPref.length() == 0){
-			return tastePref;
-		}else{
+		if(tastePref != null && specPref != null){
 			return tastePref + "," + specPref;
-		}	
+			
+		}else if(tastePref != null && specPref == null){
+			return tastePref;
+			
+		}else if(tastePref == null && specPref != null){	
+			return specPref;
+			
+		}else{
+			return NO_TASTE_PREF;
+		}
 		
 	}
 	

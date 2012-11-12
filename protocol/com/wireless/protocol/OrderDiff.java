@@ -95,8 +95,8 @@ public final class OrderDiff {
 		}
 		
 		for(OrderFood newExtraFood : newFoods){
-			if(newExtraFood.tasteGroup != null){
-				newExtraFood.tasteGroup.setGroupId(TasteGroup.NEW_TASTE_GROUP_ID);
+			if(newExtraFood.hasTaste()){
+				newExtraFood.getTasteGroup().setGroupId(TasteGroup.NEW_TASTE_GROUP_ID);
 			}
 			result.extraFoods.add(newExtraFood);
 		}

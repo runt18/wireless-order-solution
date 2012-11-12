@@ -27,14 +27,17 @@ import java.io.UnsupportedEncodingException;
  * 
  * <Food>
  * is_temp(0) : food_alias[2] : order_amount[2] :
- * normal_taste_amount : normal_taste_alias[2] : normal_taste_alias2[2]... : 
+ * normal_taste_amount : <NormalTaste1> : <NormalTaste2>... : 
  * len_tmp_taste : tmp_taste[n] : tmp_taste_alias[2] : tmp_taste_price[4] : 
  * kitchen : hang_status : is_hurried
  * is_temp(0) - "0" means this food is NOT temporary
  * food_alias[2] - 2-byte indicating the alias id to food
  * order_amount[2] - 2-byte indicating how many this foods are ordered
  * normal_taste_amount - 1-byte indicates the amount to normal taste
+ * <NormalTaste>
+ * normal_taste_alias[2] : normal_taste_category
  * normal_taste_alias[2] - 2-byte indicates the taste alias id
+ * normal_taste_category - 1-byte indicates the category to this normal taste
  * len_tmp_taste - 1-byte indicates the length of temporary taste
  * tmp_taste[n] - the temporary taste value
  * tmp_taste_alias[2] - 2-byte indicates the alias id to this temporary taste
@@ -81,8 +84,9 @@ public class ReqInsertOrder extends ReqPackage {
 	 * @param type indicates insert or update request
 	 */
 	private void makePackage(Order reqOrder, byte type) throws UnsupportedEncodingException{
-		if(type != Type.INSERT_ORDER && type != Type.UPDATE_ORDER)
+		if(type != Type.INSERT_ORDER && type != Type.UPDATE_ORDER){
 			throw new IllegalArgumentException();
+		}
 		
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = type;
@@ -91,30 +95,25 @@ public class ReqInsertOrder extends ReqPackage {
 		int foodLen = 0;
 		for(int i = 0; i < reqOrder.foods.length; i++){
 			if(reqOrder.foods[i].isTemporary){
-				/* is_temp(1) : tmp_food_alias[2] : kitchen_alias[2] : order_amount[2] : unit_price[3] : hang_status : is_hurried : len : food_name[len] */
-				foodLen += 1 + /* is_temp(1) */
-						   2 + /* tmp_food_alias[2] */
-						   2 + /* kitchen_alias[2] */
-						   2 + /* order_amount[2] */
-						   3 + /* unit_price[3] */
-						   1 + /* hang_status */
-						   1 + /* is_hurried */
-						   1 + /* length to temporary food name */
+				
+				foodLen += 1 + 	/* is_temp(1) */
+						   2 + 	/* tmp_food_alias[2] */
+						   2 + 	/* kitchen_alias[2] */
+						   2 +	/* order_amount[2] */
+						   3 + 	/* unit_price[3] */
+						   1 + 	/* hang_status */
+						   1 + 	/* is_hurried */
+						   1 + 	/* length to temporary food name */
 						   reqOrder.foods[i].name.getBytes("UTF-8").length; /* the name to temporary food */
 			}else{
-				/**
-				 * is_temp(0) : food_id[2] : order_amount[2] : normal_taste_amount : normal_taste_alias[2] ... normal_taste_alias2[2] : 
-				 * len_tmp_taste : tmp_taste[n] : tmp_taste_alias[2] : tmp_taste_price[4] : 
-				 * kitchen : hang_status : is_hurried 
-				 **/
-				Taste tmpTaste = reqOrder.foods[i].tasteGroup == null ? null : reqOrder.foods[i].tasteGroup.mTmpTaste;
+
 				foodLen += 1 + /* is_temp(0) */
 						   2 + /* food_id[2] */ 
 						   2 + /* order_amount[2] */
 						   1 + /* normal_taste_amount */
-						   (reqOrder.foods[i].hasNormalTaste() ? reqOrder.foods[i].tasteGroup.getNormalTastes().length * 2 : 0) + /* each normal taste alias takes up 2-byte */
+						   (reqOrder.foods[i].hasNormalTaste() ? reqOrder.foods[i].tasteGroup.getNormalTastes().length * 3 : 0) + /* each normal taste alias and category takes up 3-byte */
 						   1 + /* len_tmp_taste */
-						   (tmpTaste == null ? 0 : tmpTaste.preference.getBytes("UTF-8").length) + /* the name to tmp_taste */
+						   (reqOrder.foods[i].hasTmpTaste() ? reqOrder.foods[i].tasteGroup.mTmpTaste.preference.getBytes("UTF-8").length : 0) + /* the name to tmp_taste */
 						   2 + /* tmp_taste_alias[2] */
 						   4 + /* tmp_taste_price[4] */
 						   1 + /* kitchen */
@@ -259,9 +258,13 @@ public class ReqInsertOrder extends ReqPackage {
 					offset += 1;
 					
 					for(int j = 0; j < normalTastes.length; j++){
+						//assign alias id to each normal taste
 						body[offset] = (byte)(normalTastes[j].aliasID & 0x00FF);
 						body[offset + 1] = (byte)((normalTastes[j].aliasID & 0xFF00) >> 8);
-						offset += 2;
+						offset += 2;						
+						//assign category to each normal taste
+						body[offset] = (byte)normalTastes[j].category;
+						offset += 1;
 					}
 				}else{
 					body[offset] = 0;
