@@ -1,6 +1,7 @@
 package org.tiling.scheduling;
 
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * A MonthlyIterator class returns a sequence of dates on subsequent days

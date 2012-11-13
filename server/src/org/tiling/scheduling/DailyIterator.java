@@ -1,7 +1,5 @@
 package org.tiling.scheduling;
 
-import org.tiling.scheduling.ScheduleIterator;
-
 import java.util.Calendar;
 import java.util.Date;
 

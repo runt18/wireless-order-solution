@@ -138,10 +138,11 @@ public class WirelessSocketServer {
 					HashMap<Integer, String> templates = new HashMap<Integer, String>();
 					for(int j = 0; j < fileList.getLength(); j++){
 						int style = Integer.parseInt(((Element)fileList.item(j)).getAttribute("style"));
-						FileInputStream tempIS = new FileInputStream(new File(((Element)fileList.item(j)).getAttribute("path")));
-						byte[] buf = new byte[tempIS.available()];
-						tempIS.read(buf);
+						FileInputStream fis = new FileInputStream(new File(((Element)fileList.item(j)).getAttribute("path")));
+						byte[] buf = new byte[fis.available()];
+						fis.read(buf);
 						templates.put(new Integer(style), new String(buf, "GBK"));
+						fis.close();
 					}
 
 					printTemplates.put(new Integer(func), templates);
