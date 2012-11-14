@@ -14,12 +14,14 @@ public class ReqPayOrder extends ReqPackage{
 	* pin[6] - auto calculated and filled in
 	* len[2] - 0x06, 0x00
 	* <Body>
-	* print_type[4] : table[2] : cash_income[4] : pay_type : discount_id[4] : pay_manner : service_rate : len_member : member_id[len] : len_comment : comment[len]
+	* print_type[4] : table[2] : cash_income[4] : pay_type : discount_id[4] : erase_price[4] : 
+	* pay_manner : service_rate : len_member : member_id[len] : len_comment : comment[len]
 	* print_type[4] - 4-byte indicates the print type
 	* table[2] - 2-byte indicates the table id
 	* cash_income[4] - 4-byte indicates the total price
 	* pay_type - one of the values of pay type
 	* discount_id[4] - 4-byte indicates the id to discount
+	* erase_price[4] - 4-byte indicates the erase price
 	* pay_manner - one of the values of pay manner
 	* service_rate - the service rate to this order
 	* len_member - length of the id to member
@@ -50,7 +52,8 @@ public class ReqPayOrder extends ReqPackage{
 					  4 + /* actual total price takes up 4 bytes */
 					  4 + /* gift price takes up 4 bytes */
 					  1 + /* pay type takes up 1 byte */
-					  4 + /* discount id takes up 4 byte */
+					  4 + /* discount id takes up 4 bytes */
+					  4 + /* erase price takes up 4 bytes */
 					  1 + /* the pay manner takes up 1 byte */
 					  1 + /* the service rate takes up 1 byte */
 					  1 + /* the length of member id takes up 1 byte */
@@ -85,18 +88,25 @@ public class ReqPayOrder extends ReqPackage{
 		offset += 4;
 		
 		//assign the payment type
-		body[offset] = (byte)(order.pay_type & 0x000000FF);
+		body[offset] = (byte)(order.payType & 0x000000FF);
 		offset += 1;
 		
 		//assign the discount type
-		body[offset] = (byte)(order.discount.discountID & 0x000000FF);
-		body[offset + 1] = (byte)((order.discount.discountID >> 8) & 0x000000FF);
-		body[offset + 2] = (byte)((order.discount.discountID >> 16) & 0x000000FF);
-		body[offset + 3] = (byte)((order.discount.discountID >> 24) & 0x000000FF);
+		body[offset] = (byte)(order.mDiscount.discountID & 0x000000FF);
+		body[offset + 1] = (byte)((order.mDiscount.discountID >> 8) & 0x000000FF);
+		body[offset + 2] = (byte)((order.mDiscount.discountID >> 16) & 0x000000FF);
+		body[offset + 3] = (byte)((order.mDiscount.discountID >> 24) & 0x000000FF);
+		offset += 4;
+		
+		//assign the erase price
+		body[offset] = (byte)(order.mErasePrice & 0x000000FF);
+		body[offset + 1] = (byte)((order.mErasePrice >> 8) & 0x000000FF);
+		body[offset + 2] = (byte)((order.mErasePrice >> 16) & 0x000000FF);
+		body[offset + 3] = (byte)((order.mErasePrice >> 24) & 0x000000FF);
 		offset += 4;
 		
 		//assign the payment manner
-		body[offset] = (byte)(order.pay_manner & 0x000000FF);
+		body[offset] = (byte)(order.payManner & 0x000000FF);
 		offset += 1;
 		
 		//assign the service rate

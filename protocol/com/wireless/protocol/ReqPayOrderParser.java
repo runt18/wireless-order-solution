@@ -11,16 +11,18 @@ public final class ReqPayOrderParser {
 	* mode - ORDER_BUSSINESS
 	* type - CANCEL_ORDER
 	* seq - auto calculated and filled in
-	* reserved - PRINT_SYNC or PRINT_ASYNC
+	* reserved - 0x00
 	* pin[6] - auto calculated and filled in
 	* len[2] - 0x06, 0x00
 	* <Body>
-	* print_type[4] : table[2] : cash_income[4] : pay_type : discount_id[4] : pay_manner : service_rate : len_member : member_id[len] : len_comment : comment[len]
+	* print_type[4] : table[2] : cash_income[4] : pay_type : discount_id[4] : erase_price[4] : 
+	* pay_manner : service_rate : len_member : member_id[len] : len_comment : comment[len]
 	* print_type[4] - 4-byte indicates the print type
 	* table[2] - 2-byte indicates the table id
 	* cash_income[4] - 4-byte indicates the total price
 	* pay_type - one of the values of pay type
-	* discount_id[4] - 4-byte indicates the discount id to this order
+	* discount_id[4] - 4-byte indicates the id to discount
+	* erase_price[4] - 4-byte indicates the erase price
 	* pay_manner - one of the values of pay manner
 	* service_rate - the service rate to this order
 	* len_member - length of the id to member
@@ -59,6 +61,13 @@ public final class ReqPayOrderParser {
  						 ((req.body[offset + 1] & 0x000000FF) << 8) | 
  						 ((req.body[offset + 2] & 0x000000FF) << 16) |
  						 ((req.body[offset + 3] & 0x000000FF) << 24);
+		offset += 4;
+
+		//get the erase price
+		int erasePrice = (req.body[offset] & 0x000000FF) | 
+				 		 ((req.body[offset + 1] & 0x000000FF) << 8) | 
+				 		 ((req.body[offset + 2] & 0x000000FF) << 16) |
+				 		 ((req.body[offset + 3] & 0x000000FF) << 24);
 		offset += 4;
 		
 		//get the payment manner
@@ -102,9 +111,10 @@ public final class ReqPayOrderParser {
 		orderToPay.print_type = printType;
 		orderToPay.destTbl.aliasID = tableToPay;
 		orderToPay.cashIncome = cashIncome;
-		orderToPay.pay_type = payType;
-		orderToPay.discount.discountID = discountId;
-		orderToPay.pay_manner = payManner;
+		orderToPay.payType = payType;
+		orderToPay.mDiscount.discountID = discountId;
+		orderToPay.mErasePrice = erasePrice;
+		orderToPay.payManner = payManner;
 		orderToPay.serviceRate = serviceRate;
 		orderToPay.memberID = memberID;
 		orderToPay.comment = comment;
