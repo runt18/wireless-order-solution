@@ -47,11 +47,11 @@ public class Util {
 	 * @param totalPrice
 	 * @return
 	 */
-	public static float calcByTail(int priceTail, float totalPrice){
-		if(priceTail == Setting.TAIL_DECIMAL_CUT){
+	public static float calcByTail(Setting setting, float totalPrice){
+		if(setting.isTailDecimalCut()){
 			//小数抹零
 			return Float.valueOf(totalPrice).intValue();
-		}else if(priceTail == Setting.TAIL_DECIMAL_ROUND){
+		}else if(setting.isTailDecimalRound()){
 			//四舍五入
 			return Math.round(totalPrice);
 		}else{

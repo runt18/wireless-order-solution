@@ -82,6 +82,9 @@ public class QueryShiftDao {
 		public int paidAmount;			//反结帐账单数
 		public float paidIncome;		//反结帐金额
 		
+		public int eraseAmount;			//抹数账单数
+		public float eraseIncome;		//抹数金额
+		
 		public DeptIncome[] deptIncome;	//所有部门营业额
 	}
 	
@@ -403,6 +406,7 @@ public class QueryShiftDao {
 		HashSet<Long> cancelOrderID = new HashSet<Long>();
 		HashSet<Long> giftOrderID = new HashSet<Long>();
 		HashSet<Long> discountOrderID = new HashSet<Long>();
+		HashSet<Long> eraseOrderID = new HashSet<Long>(); 
 		HashSet<Long> paidOrderID = new HashSet<Long>();
 		HashSet<Long> serviceOrderID = new HashSet<Long>();
 		
@@ -523,6 +527,16 @@ public class QueryShiftDao {
 			}
 			
 			/**
+			 * Calculate the price to order containing the erase price
+			 */
+			if(singleOrderFood.erasePrice > 0){
+				if(!eraseOrderID.contains(singleOrderFood.orderID)){
+					result.eraseIncome += singleOrderFood.erasePrice;
+					eraseOrderID.add(singleOrderFood.orderID);
+				}
+			}
+			
+			/**
 			 * Calculate the price to all paid income during this period
 			 */
 			if(singleOrderFood.isPaid){
@@ -552,7 +566,7 @@ public class QueryShiftDao {
 		 */
 		result.cashIncome = (float)Math.round(result.cashIncome * 100) / 100;
 		for(float cashByEachOrder : cashIncomeByOrder.values()){
-			result.cashIncome2 += Util.calcByTail(setting.priceTail, cashByEachOrder);
+			result.cashIncome2 += Util.calcByTail(setting, cashByEachOrder);
 		}
 		result.cashAmount = cashIncomeByOrder.size();
 		
@@ -561,7 +575,7 @@ public class QueryShiftDao {
 		 */
 		result.creditCardIncome = (float)Math.round(result.creditCardIncome * 100) / 100;
 		for(float creditByEachOrder : creditIncomeByOrder.values()){
-			result.creditCardIncome2 += Util.calcByTail(setting.priceTail, creditByEachOrder);
+			result.creditCardIncome2 += Util.calcByTail(setting, creditByEachOrder);
 		}
 		result.creditCardAmount = creditIncomeByOrder.size();
 		
@@ -570,7 +584,7 @@ public class QueryShiftDao {
 		 */
 		result.memberCardIncome = (float)Math.round(result.memberCardIncome * 100) / 100;
 		for(float memberCardByEachOrder : memberCardIncomeByOrder.values()){
-			result.memberCardIncome2 += Util.calcByTail(setting.priceTail, memberCardByEachOrder);			
+			result.memberCardIncome2 += Util.calcByTail(setting, memberCardByEachOrder);			
 		}
 		result.memeberCardAmount = memberCardIncomeByOrder.size();
 		
@@ -579,7 +593,7 @@ public class QueryShiftDao {
 		 */
 		result.hangIncome = (float)Math.round(result.hangIncome * 100) / 100;
 		for(float hangByEachOrder : hangIncomeByOrder.values()){
-			result.hangIncome2 += Util.calcByTail(setting.priceTail, hangByEachOrder);
+			result.hangIncome2 += Util.calcByTail(setting, hangByEachOrder);
 		}
 		result.hangAmount = hangIncomeByOrder.size();		
 		
@@ -588,7 +602,7 @@ public class QueryShiftDao {
 		 */
 		result.signIncome = (float)Math.round(result.signIncome * 100) / 100;
 		for(float signByEachOrder : signIncomeByOrder.values()){
-			result.signIncome2 += Util.calcByTail(setting.priceTail, signByEachOrder);
+			result.signIncome2 += Util.calcByTail(setting, signByEachOrder);
 		}
 		result.signAmount = signIncomeByOrder.size();
 		
@@ -602,6 +616,12 @@ public class QueryShiftDao {
 		 */
 		result.cancelIncome = (float)Math.round(result.cancelIncome * 100) / 100;
 		result.cancelAmount = cancelOrderID.size();
+		
+		/**
+		 * Assign the erase price income and amount
+		 */
+		result.eraseIncome = (float)Math.round(result.eraseIncome * 100) / 100;
+		result.eraseAmount = eraseOrderID.size();
 		
 		/**
 		 * Assign the gift income and amount

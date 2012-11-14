@@ -13,6 +13,7 @@ import com.wireless.db.VerifyPin;
 import com.wireless.dbObject.Setting;
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.Discount;
+import com.wireless.protocol.ErrorCode;
 import com.wireless.protocol.Member;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.Table;
@@ -162,16 +163,13 @@ public class PayOrder {
 		/**
 		 * Get the completed order information.
 		 */			
-		Order orderInfo = queryOrderByID(dbCon, term, orderToPay); 
-			
-		float totalPrice = orderInfo.getTotalPrice().floatValue();
-		float totalPrice2 = orderInfo.getActualPrice().floatValue();
+		Order orderInfo = queryOrderByID(dbCon, term, orderToPay);			
 			
 		/**
 		 * Get the member info if the pay type for member
 		 */
 		Member member = null;
-		if(orderInfo.pay_type == Order.PAY_MEMBER){
+		if(orderInfo.payType == Order.PAY_MEMBER){
 			if(orderInfo.memberID != null){
 				member = QueryMember.exec(dbCon, orderInfo.restaurantID, orderInfo.memberID);
 			}else{
@@ -208,9 +206,9 @@ public class PayOrder {
 			 * The formula is as below.
 			 * balance = balance - actualPrice + actualPrice * exchange_rate
 			 */
-			if(orderInfo.pay_type == Order.PAY_MEMBER && orderInfo.pay_manner == Order.MANNER_MEMBER && orderInfo.memberID != null){
-				sql = "UPDATE " + Params.dbName + ".member SET balance=balance - " + totalPrice2 +
-					  " + " + totalPrice2 + " * exchange_rate" + 
+			if(orderInfo.payType == Order.PAY_MEMBER && orderInfo.payManner == Order.MANNER_MEMBER && orderInfo.memberID != null){
+				sql = "UPDATE " + Params.dbName + ".member SET balance=balance - " + orderInfo.getActualPrice() +
+					  " + " + orderInfo.getActualPrice() + " * exchange_rate" + 
 					  " WHERE restaurant_id=" + orderInfo.restaurantID +
 					  " AND alias_id=" + member.alias_id;
 				
@@ -233,21 +231,23 @@ public class PayOrder {
 			 * - member id if pay type is for member
 			 * - member name if pay type is for member
 			 */
-			sql = "UPDATE `" + Params.dbName + "`.`order` SET " +
-				  "waiter=(SELECT owner_name FROM " + Params.dbName + ".terminal WHERE pin=" + "0x" + Long.toHexString(term.pin) + " AND (model_id=" + term.modelID + " OR model_id=" + Terminal.MODEL_ADMIN + "))" +
-				  ", terminal_model=" + term.modelID +
-				  ", terminal_pin=" + term.pin +
-				  ", gift_price=" + orderInfo.calcGiftPrice() +
-				  ", total_price=" + totalPrice + 
-				  ", total_price_2=" + totalPrice2 +
-				  ", type=" + orderInfo.pay_manner + 
-				  ", discount_id=" + orderInfo.getDiscount().discountID +
-				  ", service_rate=" + orderInfo.getServiceRate() +
-				  (isPaidAgain ? "" : ", seq_id=" + orderInfo.seqID) +
-			   	  (isPaidAgain ? "" : ", order_date=NOW()") + 
-				  (orderInfo.comment != null ? ", comment='" + orderInfo.comment + "'" : "") +
-				  (member != null ? ", member_id='" + member.alias_id + "', member='" + member.name + "'" : ", member_id=NULL, member=NULL") + 
-				  " WHERE id=" + orderInfo.id;
+			sql = "UPDATE " + Params.dbName + ".order SET " +
+				  " waiter = (SELECT owner_name FROM " + Params.dbName + ".terminal WHERE pin=" + "0x" + Long.toHexString(term.pin) + " AND (model_id=" + term.modelID + " OR model_id=" + Terminal.MODEL_ADMIN + "))" + " , " +
+				  " terminal_model = " + term.modelID + ", " +
+				  " terminal_pin = " + term.pin + ", " +
+				  " gift_price = " + orderInfo.calcGiftPrice() + ", " +
+				  " total_price = " + orderInfo.getTotalPrice() + ", " + 
+				  " erase_price = " + orderInfo.getErasePrice() + ", " +
+				  " total_price_2 = " + orderInfo.getActualPrice() + ", " +
+				  " type = " + orderInfo.payManner + ", " + 
+				  " discount_id = " + orderInfo.getDiscount().discountID + ", " +
+				  " service_rate = " + orderInfo.getServiceRate() + ", " +
+				  (isPaidAgain ? "" : (" seq_id = " + orderInfo.seqID + ", ")) +
+			   	  (isPaidAgain ? "" : " order_date = NOW(), ") + 
+				  (orderInfo.comment == null ? "" : " comment= " + "'" + orderInfo.comment + "'" + ", ") +
+				  (member != null ? " member_id= '" + member.alias_id + "', member='" + member.name + "'" : " member_id=NULL, member=NULL ") + 
+				  " WHERE " +
+				  " id = " + orderInfo.id;
 				
 			dbCon.stmt.executeUpdate(sql);			
 				
@@ -432,11 +432,14 @@ public class PayOrder {
 	 * @throws SQLException throws if fail to execute any SQL statement
 	 */
 	public static Order queryOrderByID(DBCon dbCon, Terminal term, Order orderToPay) throws BusinessException, SQLException{
-		
-		//Get the detail to this order
+
+		//Get the setting.
+		Setting setting = QuerySetting.exec(dbCon, orderToPay.restaurantID);
+
+		//Get the detail to this order.
 		Order orderInfo = QueryOrder.execByID(dbCon, orderToPay.id, QueryOrder.QUERY_TODAY);
 		
-		//Get the discount to this order
+		//Get the discount to this order.
 		Discount[] discount = QueryMenu.queryDiscounts(dbCon, 
 													   " AND DIST.restaurant_id=" + term.restaurantID +
 													   " AND DIST.discount_id=" + orderToPay.getDiscount().discountID,
@@ -458,26 +461,34 @@ public class PayOrder {
 		 * Calculate the total price 2 as below.
 		 * total_2 = total * 尾数处理方式
 		 */
-		float totalPrice2;
+		float actualPrice;
 		/**
 		 * Comparing the minimum cost against total price.
 		 * Set the actual price to minimum cost if total price is less than minimum cost.
 		 */
 		if(totalPriceWithServRate < orderInfo.getMinimumCost()){
 			//直接使用最低消费
-			totalPrice2 = orderInfo.getMinimumCost();			
+			actualPrice = orderInfo.getMinimumCost();			
 		}else{
-			Setting setting = QuerySetting.exec(dbCon, orderToPay.restaurantID);
-			totalPrice2 = Util.calcByTail(setting.priceTail, totalPriceWithServRate);
+			actualPrice = Util.calcByTail(setting, totalPriceWithServRate);
 		}
 		
-		orderInfo.setActualPrice(totalPrice2);
+		//Check to see whether the order exceed the erase quota
+		if(setting.hasEraseQuota() && orderToPay.getErasePrice() > setting.getEraseQuota()){
+			throw new BusinessException("The order(id=" + orderToPay.id + ") exceeds the erase quota.", ErrorCode.EXCEED_GIFT_QUOTA);
+		}else{
+			actualPrice = actualPrice - orderToPay.getErasePrice();
+			actualPrice = actualPrice > 0 ? actualPrice : 0;
+		}
 		
+		orderInfo.setActualPrice(actualPrice);
+		
+		orderInfo.setErasePrice(orderToPay.getErasePrice());
 		orderInfo.restaurantID = orderToPay.restaurantID;
-		orderInfo.pay_type = orderToPay.pay_type;
+		orderInfo.payType = orderToPay.payType;
 		orderInfo.memberID = orderToPay.memberID; 
 		orderInfo.setCashIncome(orderToPay.getCashIncome());
-		orderInfo.pay_manner = orderToPay.pay_manner;
+		orderInfo.payManner = orderToPay.payManner;
 		orderInfo.comment = orderToPay.comment;
 		orderInfo.setServiceRate(orderToPay.getServiceRate());
 			

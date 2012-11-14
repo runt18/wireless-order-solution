@@ -81,10 +81,8 @@ public class SingleOrderFoodReflector {
 			  " TG.normal_taste_group_id, TG.normal_taste_pref, TG.normal_taste_price, " +
 			  " (CASE WHEN TG.tmp_taste_id IS NULL THEN 0 ELSE 1 END) AS has_tmp_taste, " +
 			  " TG.tmp_taste_pref, TG.tmp_taste_price, " +
-			  //" A.taste, A.taste_price, A.taste_id, A.taste2_id, A.taste3_id, A.taste_alias, A.taste2_alias, A.taste3_alias, " +
-			  //" A.taste_tmp_alias, A.taste_tmp, A.taste_tmp_price, " + 
 			  " A.order_date, A.is_temporary, A.is_paid, A.waiter, A.comment, " +
-			  " B.type, B.service_rate, " +
+			  " B.type, B.service_rate, B.erase_price, " +
 			  " A.dept_id, (CASE WHEN D.dept_id IS NULL THEN '已删除部门' ELSE D.name END) as dept_name " +
 			  " FROM " + 
 			  Params.dbName + "." + orderFoodTbl + " A LEFT JOIN " +
@@ -159,6 +157,8 @@ public class SingleOrderFoodReflector {
 			singleOrderFood.serviceRate = dbCon.rs.getFloat("service_rate");
 			
 			singleOrderFood.comment = dbCon.rs.getString("comment");
+			
+			singleOrderFood.erasePrice = dbCon.rs.getInt("erase_price");
 			
 			singleOrderFoods.add(singleOrderFood);
 		}

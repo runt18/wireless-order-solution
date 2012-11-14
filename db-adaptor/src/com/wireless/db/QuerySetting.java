@@ -67,13 +67,18 @@ public class QuerySetting {
 	public static Setting exec(DBCon dbCon, int restaurantID) throws SQLException{
 		Setting setting = new Setting();
 		
-		String sql = "SELECT * FROM " + Params.dbName +
-		  			 ".setting WHERE restaurant_id=" + restaurantID;
+		String sql = " SELECT " +
+					 " price_tail, auto_reprint, receipt_style, erase_quota " +
+					 " FROM " + Params.dbName +
+		  			 ".setting " +
+		  			 " WHERE " +
+		  			 " restaurant_id = " + restaurantID;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
-			setting.priceTail = dbCon.rs.getInt("price_tail");
-			setting.autoReprint = dbCon.rs.getBoolean("auto_reprint");
-			setting.receiptStyle = (int)dbCon.rs.getLong("receipt_style");
+			setting.setPriceTail(dbCon.rs.getInt("price_tail"));
+			setting.setAutoReprint(dbCon.rs.getBoolean("auto_reprint"));
+			setting.setReceiptStyle((int)dbCon.rs.getLong("receipt_style"));
+			setting.setEraseQuota(dbCon.rs.getInt("erase_quota"));
 		}
 		dbCon.rs.close();
 		

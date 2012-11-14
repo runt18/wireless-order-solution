@@ -21,6 +21,7 @@ public class SingleOrderFood {
 	public int payManner = Order.MANNER_CASH;				//结帐方式(现金、刷卡、挂账...)
 	public float serviceRate = 0;							//服务费率
 	public String comment = null;							//备注
+	public int erasePrice;									//抹数额
 	
 	/**
 	 * Check to see if the order food has taste(either normal taste or temporary taste).
