@@ -171,7 +171,7 @@ public class PayOrderScreen extends MainScreen
 			if(totalPrice < minimumCost){
 				int resp = Dialog.ask(Dialog.D_YES_NO, "消费额还没到最低消费，是否结帐?", Dialog.NO);
 				if(resp == Dialog.YES){
-					_bill.pay_type = payType;
+					_bill.payType = payType;
 					if(discount != null){
 						_bill.setDiscount(discount);
 					}
@@ -180,7 +180,7 @@ public class PayOrderScreen extends MainScreen
 				
 			}else{
 				//_bill.setCashIncome(new Float(Float.parseFloat(_cashIncome.getText())));				
-				_bill.pay_type = payType;
+				_bill.payType = payType;
 				if(discount != null){
 					_bill.setDiscount(discount);
 				}
