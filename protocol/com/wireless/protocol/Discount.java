@@ -3,10 +3,11 @@ package com.wireless.protocol;
 
 public class Discount {
 	
-	public final static int NORMAL = 0;				//一般类型
-	public final static int DEFAULT = 1;			//默认类型
-	public final static int RESERVED = 2;			//系统保留
-	public final static int DEFAULT_RESERVED = 3;	//既是默认类型, 也是系统保留(默认类型属于用户自定义操作,等级高于系统保留)
+	public static final int NORMAL = 0;				// 一般类型
+	public static final int DEFAULT = 1;			// 默认类型
+	public static final int RESERVED = 2;			// 系统保留
+	public static final int DEFAULT_RESERVED = 3;	// 既是默认类型, 也是系统保留(默认类型属于用户自定义操作,等级高于系统保留)
+	public static final int MEMBERTYPE = 4;			// 会员类型全单使用的
 	
 	public int discountID;
 	public String name;
