@@ -88,15 +88,15 @@ public class PayOrderAction extends Action implements PinGen{
 			orderToPay.destTbl.aliasID = Integer.parseInt(request.getParameter("tableID"));
 			
 			if(request.getParameter("payType") != null){
-				orderToPay.pay_type = Integer.parseInt(request.getParameter("payType"));				
+				orderToPay.payType = Integer.parseInt(request.getParameter("payType"));				
 			}else{
-				orderToPay.pay_type = Order.PAY_NORMAL;
+				orderToPay.payType = Order.PAY_NORMAL;
 			}
 			
 			/**
 			 * Get the member id if the pay type is "会员"
 			 */
-			if(orderToPay.pay_type == Order.PAY_MEMBER){
+			if(orderToPay.payType == Order.PAY_MEMBER){
 				orderToPay.memberID = request.getParameter("memberID");
 			}
 			
@@ -107,9 +107,9 @@ public class PayOrderAction extends Action implements PinGen{
 			}
 			
 			if(request.getParameter("payManner") != null){
-				orderToPay.pay_manner = Integer.parseInt(request.getParameter("payManner"));
+				orderToPay.payManner = Integer.parseInt(request.getParameter("payManner"));
 			}else{
-				orderToPay.pay_manner = Order.MANNER_CASH;
+				orderToPay.payManner = Order.MANNER_CASH;
 			}
 			
 			if(request.getParameter("serviceRate") != null){
@@ -121,7 +121,7 @@ public class PayOrderAction extends Action implements PinGen{
 			/**
 			 * Get the cash income if the pay manner is "现金"
 			 */
-			if(orderToPay.pay_manner == Order.MANNER_CASH){
+			if(orderToPay.payManner == Order.MANNER_CASH){
 				orderToPay.setCashIncome(Float.parseFloat(request.getParameter("cashIncome")));
 			}
 			

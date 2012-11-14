@@ -92,11 +92,11 @@ public class UpdateOrderAction2 extends Action{
 			//get the custom number to this order
 			orderToUpdate.customNum = Integer.parseInt(request.getParameter("customNum"));
 			//get the pay type to this order
-			orderToUpdate.pay_type = Integer.parseInt(request.getParameter("payType"));	
+			orderToUpdate.payType = Integer.parseInt(request.getParameter("payType"));	
 			//get the discount type to this order
 			orderToUpdate.setDiscount(new Discount(Integer.parseInt(request.getParameter("discountID"))));
 			//get the pay manner to this order
-			orderToUpdate.pay_manner = Integer.parseInt(request.getParameter("payManner"));
+			orderToUpdate.payManner = Integer.parseInt(request.getParameter("payManner"));
 			//get the service rate to this order
 			orderToUpdate.setServiceRate(com.wireless.protocol.Util.int2Float(Integer.parseInt(request.getParameter("serviceRate"))));
 			/**

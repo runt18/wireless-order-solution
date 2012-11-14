@@ -107,7 +107,7 @@ public class QueryOrderAction extends Action {
 						}
 						item.setTasteGroup(tg);
 					}else{
-						item.getTasteGroup().getNormalTaste().setTasteName("无口味");
+						item.getTasteGroup().getNormalTaste().setTasteName(com.wireless.protocol.TasteGroup.NO_TASTE_PREF);
 						item.getTasteGroup().getNormalTaste().setTastePrice(0);
 					}
 					
@@ -143,7 +143,7 @@ public class QueryOrderAction extends Action {
 			om.setMinCost(order.getMinimumCost());
 			om.setRestaurantID(order.restaurantID);
 			om.setDiscountID(order.getDiscount().discountID);
-			om.setPayManner(order.pay_manner);
+			om.setPayManner(order.payManner);
 			om.setOrderFoods(null);
 			om.setDestTbl(null);
 			om.setDestTbl2(null);

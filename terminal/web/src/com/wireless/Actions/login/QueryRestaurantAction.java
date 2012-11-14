@@ -61,8 +61,8 @@ public class QueryRestaurantAction extends Action {
 			value = value.replace("$(tele_1)", restaurant.tele_1);	
 			value = value.replace("$(tele_2)", restaurant.tele_2);	
 			value = value.replace("$(addr)", restaurant.addr);	
-			value = value.replace("$(price_tail)", Integer.toString(setting.priceTail));	
-			value = value.replace("$(auto_reprint)", setting.autoReprint ? "1" : "0");	
+			value = value.replace("$(price_tail)", Integer.toString(setting.getPriceTail()));	
+			value = value.replace("$(auto_reprint)", setting.isAutoReprint() ? "1" : "0");	
 			jsonResp = jsonResp.replace("$(value)", value);
 			
 		}catch(BusinessException e){
