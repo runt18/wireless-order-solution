@@ -286,7 +286,7 @@ public class ClientDao {
 			
 			String deleteSQL = "DELETE FROM " +  Params.dbName + ".client WHERE restaurant_id = " + c.getRestaurantID() + " AND client_id = " + c.getClientID();
 			if(dbCon.stmt.executeUpdate(deleteSQL) == 0){
-				throw new BusinessException("操作失败, 未找到删除的原纪录.", 9985);
+				throw new BusinessException("操作失败, 未找到要删除的原纪录.", 9985);
 			}
 			
 			dbCon.conn.commit();
