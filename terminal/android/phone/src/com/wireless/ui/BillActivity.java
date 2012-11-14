@@ -180,13 +180,13 @@ public class BillActivity extends Activity {
 		View view = LayoutInflater.from(this).inflate(R.layout.billextand, null);
 
 		// 设置为一般的结帐方式
-		mOrderToPay.pay_type = Order.PAY_NORMAL;
+		mOrderToPay.payType = Order.PAY_NORMAL;
 
 		// 根据付款方式显示"现金"或"刷卡"
-		if (mOrderToPay.pay_manner == Order.MANNER_CASH) {
+		if (mOrderToPay.payManner == Order.MANNER_CASH) {
 			((RadioButton) view.findViewById(R.id.cash)).setChecked(true);
 
-		} else if (mOrderToPay.pay_manner == Order.MANNER_CREDIT_CARD) {
+		} else if (mOrderToPay.payManner == Order.MANNER_CREDIT_CARD) {
 			((RadioButton) view.findViewById(R.id.card)).setChecked(true);
 
 		}
@@ -198,9 +198,9 @@ public class BillActivity extends Activity {
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
 
 				if (checkedId == R.id.cash) {
-					mOrderToPay.pay_manner = Order.MANNER_CASH;
+					mOrderToPay.payManner = Order.MANNER_CASH;
 				} else {
-					mOrderToPay.pay_manner = Order.MANNER_CREDIT_CARD;
+					mOrderToPay.payManner = Order.MANNER_CREDIT_CARD;
 				}
 
 			}
