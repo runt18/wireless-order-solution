@@ -102,6 +102,7 @@ public class ShiftContent extends ConcreteContent {
 		var2.append(new Grid2ItemsContent("折扣金额：" + _shiftDetail.discountIncome, pos2Item, "账单数：" + _shiftDetail.discountAmount, _printType, _style) + "\r\n");
 		var2.append(new Grid2ItemsContent("赠送金额：" + _shiftDetail.giftIncome, pos2Item, "账单数：" + _shiftDetail.giftAmount, _printType, _style) + "\r\n");
 		var2.append(new Grid2ItemsContent("退菜金额：" + _shiftDetail.cancelIncome, pos2Item, "账单数：" + _shiftDetail.cancelAmount, _printType, _style) + "\r\n");
+		var2.append(new Grid2ItemsContent("抹数金额：" + _shiftDetail.eraseIncome, pos2Item, "账单数：" + _shiftDetail.eraseAmount, _printType, _style) + "\r\n");
 		var2.append(new Grid2ItemsContent("反结帐金额：" + _shiftDetail.paidIncome, pos2Item, "帐单数：" + _shiftDetail.paidAmount, _printType, _style) + "\r\n");
 		var2.append(new Grid2ItemsContent("服务费金额：" + _shiftDetail.serviceIncome, pos2Item, "账单数：" + _shiftDetail.serviceAmount, _printType, _style));
 		//replace the $(var_2) with the shift detail

@@ -31,7 +31,7 @@ public class ReceiptContent extends ConcreteContent {
 		//get the receipt style to print
 		int receiptStyle = Setting.RECEIPT_DEF;
 		try{
-			receiptStyle = QuerySetting.exec(_order.restaurantID).receiptStyle;
+			receiptStyle = QuerySetting.exec(_order.restaurantID).getReceiptStyle();
 		}catch(SQLException e){}
 		
 		if(_printType == Reserved.PRINT_RECEIPT){
@@ -59,15 +59,15 @@ public class ReceiptContent extends ConcreteContent {
 		
 		//replace the "$(pay_manner)"
 		String payManner;
-		if(_order.pay_manner == Order.MANNER_CASH){
+		if(_order.payManner == Order.MANNER_CASH){
 			payManner = "现金";			
-		}else if(_order.pay_manner == Order.MANNER_CREDIT_CARD){
+		}else if(_order.payManner == Order.MANNER_CREDIT_CARD){
 			payManner = "刷卡";			
-		}else if(_order.pay_manner == Order.MANNER_HANG){
+		}else if(_order.payManner == Order.MANNER_HANG){
 			payManner = "挂账";			
-		}else if(_order.pay_manner == Order.MANNER_MEMBER){
+		}else if(_order.payManner == Order.MANNER_MEMBER){
 			payManner = "会员卡";			
-		}else if(_order.pay_manner == Order.MANNER_SIGN){
+		}else if(_order.payManner == Order.MANNER_SIGN){
 			payManner = "签单";			
 		}else{
 			payManner = "现金";	
@@ -126,7 +126,7 @@ public class ReceiptContent extends ConcreteContent {
 		line1 = line1.replace("$(total_price)", actualPrice);		
 	
 		String line2;
-		if(_order.pay_manner == Order.MANNER_CASH && !isTempReceipt && _order.getCashIncome().floatValue() != 0){
+		if(_order.payManner == Order.MANNER_CASH && !isTempReceipt && _order.getCashIncome().floatValue() != 0){
 			float chargeMoney = _order.getCashIncome().floatValue() - _order.getActualPrice().floatValue();
 			chargeMoney = (float)Math.round(chargeMoney * 100) / 100;
 			
@@ -144,18 +144,22 @@ public class ReceiptContent extends ConcreteContent {
 			line2 = "";
 		}
 
-		String line3;
+		StringBuffer line3 = new StringBuffer();
 		Float discount = _order.calcDiscountPrice();
 		if(discount != 0){
-			line3 = "$(discount)";
-			line3 = line3.replace("$(discount)", "折扣：" + Util.CURRENCY_SIGN + Util.float2String(discount));
-		}else{
-			line3 = "";
+			line3.append("折扣：" + Util.CURRENCY_SIGN + Util.float2String(discount));
+		}
+		
+		if(_order.getErasePrice() > 0){
+			if(line3.length() > 0){
+				line3.append("  ");
+			}
+			line3.append("抹数：" + Util.CURRENCY_SIGN + Util.float2String((float)_order.getErasePrice()));
 		}
 		
 		String var = new RightAlignedDecorator(line1, _style).toString() +
 					 (line2.length() != 0 ? "\r\n" + new RightAlignedDecorator(line2, _style) : "").toString() +
-					 (line3.length() != 0 ? "\r\n" + new RightAlignedDecorator(line3, _style) : "").toString();
+					 (line3.length() != 0 ? "\r\n" + new RightAlignedDecorator(line3.toString(), _style) : "").toString();
 		
 		try{
 			var = new String(var.getBytes("GBK"), "GBK");
