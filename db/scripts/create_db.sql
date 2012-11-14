@@ -44,6 +44,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order` (
   `gift_price` DECIMAL(10,2) NOT NULL DEFAULT 0 COMMENT 'the gift price to this order' ,
   `total_price` DECIMAL(10,2) NULL DEFAULT NULL COMMENT 'The total price to this order.\nIts default value is NULL, means the order not be paid, otherwise means the order has been paid.' ,
   `total_price_2` DECIMAL(10,2) NULL DEFAULT NULL COMMENT 'the actual total price to this order' ,
+  `erase_price` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the erase price to this order' ,
   `custom_num` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the amount of custom to this order' ,
   `waiter` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the waiter who operates on this order' ,
   `type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the type to pay order, it would be one of the values below.\n现金 : 1\n刷卡 : 2\n会员卡 : 3\n签单：4\n挂账 ：5\n' ,
@@ -269,6 +270,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_history` (
   `gift_price` DECIMAL(10,2) NOT NULL DEFAULT 0 COMMENT 'the gift price to this order' ,
   `total_price` DECIMAL(10,2) NULL DEFAULT NULL COMMENT 'The total price to this order.\nIts default value is NULL, means the order not be paid, otherwise means the order has been paid.' ,
   `total_price_2` DECIMAL(10,2) NULL DEFAULT NULL COMMENT 'the actual total price to this order' ,
+  `erase_price` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the erase price to this order' ,
   `custom_num` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the amount of custom to this order' ,
   `waiter` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the waiter who operates on this order' ,
   `type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the type to pay order, it would be one of the values below.\n现金 : 1\n刷卡 : 2\n会员卡 : 3\n签单：4\n挂账 ：5\n' ,
@@ -416,11 +418,12 @@ COMMENT = 'the staff information ' ;
 DROP TABLE IF EXISTS `wireless_order_db`.`setting` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`setting` (
-  `setting_id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to setting' ,
+  `setting_id` INT NOT NULL AUTO_INCREMENT ,
   `restaurant_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the restaurant id to this setting' ,
   `price_tail` TINYINT UNSIGNED NOT NULL DEFAULT 2 COMMENT 'indicates how to deal with the tail of price:\n不处理 : 0\n小数抹零 : 1\n小数四舍五入 : 2' ,
   `auto_reprint` TINYINT NOT NULL DEFAULT 1 COMMENT 'indicates whether to auto re-print' ,
   `receipt_style` INT UNSIGNED NOT NULL DEFAULT 4294967295 COMMENT 'the receipt style is as below.\n0x01 : 结帐单是否显示折扣\n0x02 : 结帐单是否显示数量\n0x04 : 结帐单是否显示状态\n0x08 : 结帐单是否显示折扣额' ,
+  `erase_quota` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the erase quota, 0 means no limit' ,
   PRIMARY KEY (`setting_id`) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 

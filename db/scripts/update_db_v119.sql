@@ -636,3 +636,21 @@ ADD COLUMN `is_allow_temp` TINYINT NOT NULL DEFAULT 0 COMMENT 'the flag to indic
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`discount_plan` 
 ADD INDEX `ix_discount_id` (`discount_id` ASC) ;
+
+-- -----------------------------------------------------
+-- Add the field 'erase_quota' to table 'setting'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`setting` 
+ADD COLUMN `erase_quota` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the erase quota, 0 means no limit'  AFTER `receipt_style` ;
+
+-- -----------------------------------------------------
+-- Add the field 'erase_price' to table 'order'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order` 
+ADD COLUMN `erase_price` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the erase price to this order'  AFTER `total_price_2` ;
+
+-- -----------------------------------------------------
+-- Add the field 'erase_price' to table 'order_history'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_history` 
+ADD COLUMN `erase_price` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the erase price to this order'  AFTER `total_price_2` ;
