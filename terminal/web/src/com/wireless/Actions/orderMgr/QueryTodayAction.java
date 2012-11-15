@@ -116,7 +116,10 @@ public class QueryTodayAction extends Action {
 				havingCond = " HAVING SUM(B.food_status & " + Food.GIFT + ") > 0 ";
 			}else if(cond == 4){
 				//是否有退菜
-				havingCond = " HAVING MIN(order_count) < 0 ";
+				havingCond = " HAVING MIN(B.order_count) < 0 ";
+			}else if(cond == 5){
+				//是否有抹数
+				havingCond = " HAVING MIN(A.erase_price) > 0 ";				
 			}else{
 				havingCond = "";
 			}
@@ -175,7 +178,8 @@ public class QueryTodayAction extends Action {
 					 "(CASE WHEN MIN(B.discount) < 1 THEN 1 ELSE 0 END) AS is_discount, " +
 					 "(CASE WHEN SUM(B.food_status & " + Food.GIFT + ") <= 0 THEN 0 ELSE 1 END) AS is_gift, " +
 					 "(CASE WHEN SUM(IF(B.is_paid, 1, 0)) <= 0 THEN 0 ELSE 1 END) AS is_paid, " +
-					 "(CASE WHEN MIN(order_count) < 0 THEN 1 ELSE 0 END) AS is_cancel" +
+					 "(CASE WHEN MIN(B.order_count) < 0 THEN 1 ELSE 0 END) AS is_cancel, " +
+					 "(CASE WHEN MIN(A.erase_price) > 0 THEN 1 ELSE 1 END ) AS is_erase " +
 					 " FROM " + 
 					 Params.dbName + ".order A, " +
 					 Params.dbName + ".order_food B " +
