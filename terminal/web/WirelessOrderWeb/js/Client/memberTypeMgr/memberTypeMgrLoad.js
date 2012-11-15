@@ -43,6 +43,8 @@ memberTypeWinInit = function(){
 					xtype : 'textfield',
 					id : 'txtTypeName',
 					fieldLabel : '类型名称' + Ext.ux.txtFormat.xh,
+					allowBlank : false,
+					blankText : '类型名称不能为空.',
 					validator : function(v){
 						if(Ext.util.Format.trim(v).length == 0){
 							return '类型名称不能为空.';
@@ -188,6 +190,11 @@ memberTypeWinInit = function(){
 							return;
 					}
 					
+					var save = Ext.getCmp('btnSaveMemberType');
+					var close = Ext.getCmp('btnCloseMemberType');
+					
+					save.setDisabled(true);
+					close.setDisabled(true);
 					Ext.Ajax.request({
 						url : actionURL,
 						params : {
@@ -211,9 +218,13 @@ memberTypeWinInit = function(){
 							}else{
 								Ext.ux.showMsg(jr);								
 							}
+							save.setDisabled(false);
+							close.setDisabled(false);
 						},
 						failure : function(res, opt){
 							Ext.ux.showMsg(Ext.decode(res.responseText));
+							save.setDisabled(false);
+							close.setDisabled(false);
 						}
 					});
 				}

@@ -60,7 +60,9 @@ memberTypeOperationHandler = function(c){
 		memberTypeWin.show();
 		memberTypeWin.center();
 		
-		bindMemberTypeData({});
+		bindMemberTypeData({
+			discountType : 0
+		});
 		
 	}else if(c.type == mtObj.operation['update']){
 		var sd = Ext.ux.getSelData(memberTypeGrid.getId());
