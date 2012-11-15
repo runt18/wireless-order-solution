@@ -119,16 +119,16 @@ createGridPanel = function(id, title, height, width, url, cmData, readerData,
 		sb.append("',dataIndex:'");
 		sb.append(data[1] + "'");
 
-		if (data.length > 2 && data[2] != '' && data[2] != NaN) {
+		if (data.length > 2 && data[2] != null && data[2] != '') {
 			sb.append(",width:");
 			sb.append(data[2]);
 		}
-		if (data.length > 3 && data[3] != '' && data[3].length > 0) {
+		if (data.length > 3 && data[3] != null && data[3] != '' && data[3].length > 0) {
 			sb.append(",align:'");
 			sb.append(data[3]);
 			sb.append("'");
 		}
-		if (data.length > 4 && data[4] != '' && data[4].length > 0) {
+		if (data.length > 4 && data[4] != null && data[4] != '' && data[4].length > 0) {
 			sb.append(",renderer:");
 			sb.append(data[4]);
 		}

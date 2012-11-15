@@ -56,23 +56,145 @@ memberTypeOperationHandler = function(c){
 	
 	if(c.type == mtObj.operation['insert']){
 		
-		memberTypeWin.setTitle('添加会员类别');
+		memberTypeWin.setTitle('添加会员类型');
 		memberTypeWin.show();
 		memberTypeWin.center();
+		
+		bindMemberTypeData({});
 		
 	}else if(c.type == mtObj.operation['update']){
-		
-		memberTypeWin.setTitle('修改会员类别');
+		var sd = Ext.ux.getSelData(memberTypeGrid.getId());
+		if(!sd){
+			Ext.example.msg('提示', '请选中一个会员类型再进行操作.');
+			return;
+		}
+		memberTypeWin.setTitle('修改会员类型');
 		memberTypeWin.show();
 		memberTypeWin.center();
 		
+		bindMemberTypeData(sd);
+		
 	}else if(c.type == mtObj.operation['delete']){
-		alert(c.type);
+		var sd = Ext.ux.getSelData(memberTypeGrid.getId());
+		if(!sd){
+			Ext.example.msg('提示', '请选中一个会员类型再进行操作.');
+			return;
+		}
+		Ext.Msg.show({
+			title : '提示',
+			msg : '是否删除会员类型?<br><font color="red">提示:如果该类型下已有会员则删除失败.</font>',
+			buttons : Ext.Msg.YESNO,
+			fn : function(e){
+				if(e == 'yes'){
+					Ext.Ajax.request({
+						url : '../../DeleteMemberType.do',
+						params : {
+							restaurantID : restaurantID,
+							pin : pin,
+							typeID : sd['typeID'],
+							discountType : sd['discountType'],
+							discountID : sd['discountID']
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							if(jr.success){
+								Ext.example.msg(jr.title, jr.msg);
+								memberTypeGrid.getStore().reload();
+							}else{
+								Ext.ux.showMsg(jr);
+							}
+						},
+						failure : function(res, opt){
+							Ext.ux.showMsg(Ext.decode(res.responseText));
+						}
+					});
+				}
+			}
+		});
 	}
 	
 };
 
+bindMemberTypeData = function(d){
+	var typeID = Ext.getCmp('numTypeID');
+	var typeName = Ext.getCmp('txtTypeName');
+	var chargeRate = Ext.getCmp('numChargeRate');
+	var exchangeRate = Ext.getCmp('numExchangeRate');
+	var discountType = Ext.getCmp('comboDiscountType');
+	var discount = Ext.getCmp('comboDiscount');
+	var discountRate = Ext.getCmp('numDiscountRate');
+	var attribute = Ext.getCmp('comboAttribute');
+	
+	typeID.setValue(d['typeID']);
+	typeName.setValue(d['name']);
+	chargeRate.setValue(d['chargeRate']);
+	exchangeRate.setValue(d['exchangeRate']);
+	attribute.setValue(d['attribute']);
+	discountType.setValue(d['discountType']);
+	
+	if(d['discountType'] == 0){
+		discountRate.setValue();
+		discountRate.setDisabled(true);
+		discount.setValue(d['discountID']);
+		discount.setDisabled(false);
+	}else if(d['discountType'] == 1){
+		discountRate.setValue(d['discountRate']);
+		discountRate.setDisabled(false);
+		discount.setValue();
+		discount.setDisabled(true);
+	}else{
+		discountRate.setValue();
+		discount.setValue();
+	}
+	
+	typeID.clearInvalid();
+	typeName.clearInvalid();
+	chargeRate.clearInvalid();
+	exchangeRate.clearInvalid();
+	attribute.clearInvalid();
+	discountType.clearInvalid();
+	discountRate.clearInvalid();
+	discount.clearInvalid();
+};
+
 /**********************************************************************/
+discountTypeRenderer = function(val){
+	for(var i = 0; i < discountTypeData.length; i++){
+		if(eval(discountTypeData[i][0] == val)){
+			return discountTypeData[i][1];
+		}
+	}
+};
+
+discountRateRenderer = function(val, m, r){
+	if(r.get('discountType') == 0){
+		return '--';
+	}else{
+		return Ext.ux.txtFormat.gridDou(val);
+	}
+};
+
+discountRenderer = function(val, m, r){
+	if(r.get('discountType') == 1){
+		return '--';
+	}else{
+		for(var i = 0; i < discountData.length; i++){
+			if(discountData[i].discountID == val){
+				return discountData[i].discountName;
+				break;
+			}
+		}
+	}
+};
+
+memberAttributeRenderer = function(val){
+	for(var i = 0; i < memberAttributData.length; i++){
+		if(eval(memberAttributData[i][0] == val)){
+			return memberAttributData[i][1];
+		}
+	}
+};
+
 memberTypeRenderer = function(){
 	return ''
 		   + '<a href="javascript:updateMemberTypeHandler()">修改</a>'
@@ -93,7 +215,7 @@ var memberTypeGridTbar = new Ext.Toolbar({
 		value : 0,
 		store : new Ext.data.SimpleStore({
 			fields : [ 'value', 'text' ],
-			data : [[0, '全部'], [1, '会员类型'], [2, '折扣方式']]
+			data : [[0, '全部'], [1, '类型名称'], [2, '折扣方式']]
 		}),
 		valueField : 'value',
 		displayField : 'text',
@@ -111,7 +233,13 @@ var memberTypeGridTbar = new Ext.Toolbar({
 		id : 'btnSearchMemberType',
 		iconCls : 'btn_search',
 		handler : function(e){
-			
+			var gs = memberTypeGrid.getStore();
+			gs.load({
+				params : {
+					start : 0,
+					limit : 30
+				}
+			});
 		}
 	}, {
 		text : '添加',
@@ -142,31 +270,34 @@ var memberTypeGrid = createGridPanel(
 	'',
 	'',
 	'',
-	'../../QueryClient.do',
+	'../../QueryMemberType.do',
 	[
-		[true, false, true, false], 
-		['类型编号', 'clientID'],
-		['类型名称', 'name', 150],
-		['折扣方式', 'clientType.name'],
-		['折扣率', 'sexDisplay'],
-		['折扣方案', 'mobile'],
-		['积分比率', 'tele'],
+		[true, false, false, false], 
+		['类型编号', 'typeID'],
+		['类型名称', 'name'],
+		['充值比率', 'chargeRate',,'right', 'Ext.ux.txtFormat.gridDou'],
+		['积分比率', 'exchangeRate',,'right', 'Ext.ux.txtFormat.gridDou'],
+		['折扣方式', 'discountType',,, 'discountTypeRenderer'],
+		['折扣率', 'discountRate',,'right', 'discountRateRenderer'],
+		['折扣方案', 'discountID',,, 'discountRenderer'],
+		['会员属性', 'attribute',,, 'memberAttributeRenderer'],
 		['操作', 'operation', 200, 'center', 'memberTypeRenderer']
 	],
-	['clientID', 'name', 'clientType.name', 'clientType.typeID', 'birthdayFormat', 'birthday',
-	 'memberAccount', 'sexDisplay', 'sex', 'mobile', 'tele', 'company', 
-	 'tastePref', 'clientID', 'taboo', 'comment', 'contactAddress', 'IDCard'],
+	['typeID','name','chargeRate','exchangeRate','discountID','discountType','discountRate','attribute'],
 	[['pin',pin], ['isPaging', true], ['restaurantID', restaurantID]],
 	30,
 	'',
 	memberTypeGridTbar
 );	
 memberTypeGrid.region = 'center';
-
+memberTypeGrid.on('render', function(thiz){
+	thiz.getStore().reload();
+});
 
 /**********************************************************************/
 var memberTypeWin;
 Ext.onReady(function(){
+	dataInit();
 	
 	Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
 	Ext.QuickTips.init();

@@ -50,14 +50,13 @@ updateKitchen = function(){
 				labelWidth : 65,
 				frame : true,
 				items : [{
-					xtype : 'textfield',
+					xtype : 'hidden',
 					id : 'txtKitchenID',
-					fieldLabel : '厨房编号',
-					readOnly : true,
-					disabled : true
+					fieldLabel : '厨房编号'
 				}, {
 					xtype : 'textfield',
 					id : 'txtKitchenName',
+					width : 130,
 					fieldLabel : '厨房名称'
 				}, {
  	    	    	xtype : 'combo',
@@ -404,7 +403,7 @@ Ext.onReady(function() {
 		'../../QueryKitchenMgr.do',
 		[
 		    [true, false, false, false], 
-			['厨房编号', 'kitchenID', '50'] , 
+			['厨房编号', 'kitchenAlias', '50'] , 
 			['厨房名称', 'kitchenName'] , 
 			['所属部门', 'deptName', '', '', 'deptNameRenderer'],
 			['操作', 'operation', '', 'center', 'kitchenOperationRenderer']
