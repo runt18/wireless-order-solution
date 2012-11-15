@@ -63,7 +63,7 @@ public class OrderFoodReflector {
 			food.name = dbCon.rs.getString("name");
 			food.setAliasId(dbCon.rs.getInt("food_alias"));
 			food.restaurantID = dbCon.rs.getInt("restaurant_id");
-			food.status = dbCon.rs.getShort("food_status");
+			food.setStatus(dbCon.rs.getShort("food_status"));
 			int tasteGroupId = dbCon.rs.getInt("taste_group_id");
 			if(tasteGroupId != TasteGroup.EMPTY_TASTE_GROUP_ID){
 				food.makeTasteGroup(tasteGroupId, null, null);
@@ -149,7 +149,7 @@ public class OrderFoodReflector {
 			food.name = dbCon.rs.getString("name");
 			food.setAliasId(dbCon.rs.getInt("food_alias"));
 			food.restaurantID = dbCon.rs.getInt("restaurant_id");
-			food.status = dbCon.rs.getShort("food_status");
+			food.setStatus(dbCon.rs.getShort("food_status"));
 			int tasteGroupId = dbCon.rs.getInt("taste_group_id");
 			if(tasteGroupId != TasteGroup.EMPTY_TASTE_GROUP_ID){
 				food.makeTasteGroup(tasteGroupId, null, null);

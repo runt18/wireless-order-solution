@@ -377,7 +377,7 @@ public class UpdateOrder {
 					  extraFood.getCount() + ", " + 
 					  extraFood.getPrice() + ", '" + 
 					  extraFood.name + "', " + 
-					  extraFood.status + ", " +
+					  extraFood.getStatus() + ", " +
 					  (extraFood.hangStatus == OrderFood.FOOD_HANG_UP ? OrderFood.FOOD_HANG_UP : OrderFood.FOOD_NORMAL) + ", " +
 					  extraFood.getDiscount() + ", " +
 					  (extraFood.hasTaste() ? extraFood.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
@@ -413,7 +413,7 @@ public class UpdateOrder {
 					  "-" + canceledFood.getCount() + ", " + 
 					  canceledFood.getPrice() + ", '" + 
 					  canceledFood.name + "', " + 
-					  canceledFood.status + ", " +
+					  canceledFood.getStatus() + ", " +
 					  (canceledFood.hangStatus == OrderFood.FOOD_HANG_UP ? OrderFood.FOOD_HANG_UP : OrderFood.FOOD_NORMAL) + ", " +
 					  canceledFood.getDiscount() + ", " +
 					  (canceledFood.hasTaste() ? canceledFood.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
@@ -673,7 +673,7 @@ public class UpdateOrder {
 				foodBasic.foodID = detailFood[0].foodID;
 				foodBasic.setAliasId(detailFood[0].getAliasId());
 				foodBasic.restaurantID = detailFood[0].restaurantID;
-				foodBasic.status = detailFood[0].status;
+				foodBasic.setStatus(detailFood[0].getStatus());
 				foodBasic.name = detailFood[0].name;
 				foodBasic.setPrice(detailFood[0].getPrice());
 				foodBasic.kitchen = detailFood[0].kitchen;

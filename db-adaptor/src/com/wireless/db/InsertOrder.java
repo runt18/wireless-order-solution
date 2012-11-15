@@ -167,7 +167,7 @@ public class InsertOrder {
 						orderToInsert.foods[i].setAliasId(detailFood[0].getAliasId());
 						orderToInsert.foods[i].restaurantID = detailFood[0].restaurantID;
 						orderToInsert.foods[i].name = detailFood[0].name;
-						orderToInsert.foods[i].status = detailFood[0].status;
+						orderToInsert.foods[i].setStatus(detailFood[0].getStatus());
 						orderToInsert.foods[i].setPrice(detailFood[0].getPrice());
 						orderToInsert.foods[i].kitchen = detailFood[0].kitchen;
 						orderToInsert.foods[i].childFoods = detailFood[0].childFoods;
@@ -378,7 +378,7 @@ public class InsertOrder {
 						  foodToInsert.getCount() + ", " + 
 						  foodToInsert.getPrice() + ", '" + 
 						  foodToInsert.name + "', " +
-						  foodToInsert.status + ", " +
+						  foodToInsert.getStatus() + ", " +
 						  (foodToInsert.hangStatus == OrderFood.FOOD_HANG_UP ? OrderFood.FOOD_HANG_UP : OrderFood.FOOD_NORMAL) + ", " +
 						  foodToInsert.getDiscount() + ", " +
 						  (foodToInsert.hasTaste() ? foodToInsert.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
