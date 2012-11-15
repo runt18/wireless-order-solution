@@ -32,8 +32,6 @@ import com.wireless.protocol.Department;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.Kitchen;
 import com.wireless.protocol.OrderFood;
-import com.wireless.util.ImageDialog;
-import com.wireless.util.ShadowImageView;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
 public class RankListActivity extends Activity {
@@ -55,7 +53,7 @@ public class RankListActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.rank_list);
 		
-		mImageFetcher = new ImageFetcher(this, 600, 400);
+		mImageFetcher = new ImageFetcher(this, 600, 600);
 		mRankListHandler = new RankListHandler(this);
 		mImageHandler = new ImageHandler(this);
 		//设置底部推荐菜的数据和显示
@@ -66,31 +64,31 @@ public class RankListActivity extends Activity {
 				mRecommendfoods.add(f);
 		}
 		
-		int recWidth = 200;
-		int recHeight = 150; 
-		mImageFetcher.setImageSize(recWidth, recHeight);
-		final LayoutParams lp = new LayoutParams(recWidth,recHeight);
+//		int recWidth = 200;
+//		int recHeight = 150; 
+//		mImageFetcher.setImageSize(recWidth, recHeight);
+//		final LayoutParams lp = new LayoutParams(recWidth,recHeight);
 		//推荐菜层
-		LinearLayout linearLyaout = (LinearLayout) findViewById(R.id.linearLayout_rankList);
-		for(final Food f:mRecommendfoods)
-		{
-			final ShadowImageView image = new ShadowImageView(this);
-			image.setPadding(0, 0, 3, 3);
-//			image.setLayoutParams(lp);
-			image.setScaleType(ScaleType.CENTER_CROP);
-			mImageFetcher.loadImage(f.image, image);
-			linearLyaout.addView(image);
-			
-			image.setTag(f);
-			//设置推荐菜点击侦听,弹出对话框
-			image.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					Food f = (Food) v.getTag();
-					new ImageDialog(RankListActivity.this, android.R.style.Theme_Holo_Light_Dialog_NoActionBar, f).show();
-				}
-			});
-		}
+//		LinearLayout linearLyaout = (LinearLayout) findViewById(R.id.linearLayout_rankList);
+//		for(final Food f:mRecommendfoods)
+//		{
+//			final ShadowImageView image = new ShadowImageView(this);
+//			image.setPadding(0, 0, 3, 3);
+////			image.setLayoutParams(lp);
+//			image.setScaleType(ScaleType.CENTER_CROP);
+//			mImageFetcher.loadImage(f.image, image);
+//			linearLyaout.addView(image);
+//			
+//			image.setTag(f);
+//			//设置推荐菜点击侦听,弹出对话框
+//			image.setOnClickListener(new View.OnClickListener() {
+//				@Override
+//				public void onClick(View v) {
+//					Food f = (Food) v.getTag();
+//					new ImageDialog(RankListActivity.this, android.R.style.Theme_Holo_Light_Dialog_NoActionBar, f).show();
+//				}
+//			});
+//		}
 		
 		
 		/*
@@ -151,9 +149,10 @@ public class RankListActivity extends Activity {
 				}
 			}
 		}
-		//设置部门显示
-		lp.height = LayoutParams.WRAP_CONTENT;
-		lp.width = LayoutParams.WRAP_CONTENT;
+		
+		LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
+//		lp.height = LayoutParams.WRAP_CONTENT;
+//		lp.width = LayoutParams.WRAP_CONTENT;
 		final LinearLayout deptLayout = (LinearLayout) findViewById(R.id.linearLayout_dept_rankList);
 	
 		//为每个厨房添加按钮

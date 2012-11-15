@@ -28,7 +28,6 @@ import com.wireless.fragment.ExpandableListFragment;
 import com.wireless.fragment.ExpandableListFragment.OnItemChangeListener;
 import com.wireless.fragment.GalleryFragment;
 import com.wireless.fragment.GalleryFragment.OnPicChangedListener;
-import com.wireless.fragment.GalleryFragment.OnPicClickListener;
 import com.wireless.fragment.OptionBarFragment;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
@@ -42,8 +41,8 @@ import com.wireless.protocol.Util;
 
 public class MainActivity extends Activity  
 						  implements OnItemChangeListener,
-							 	     OnPicChangedListener, 
-							 	     OnPicClickListener{
+							 	     OnPicChangedListener 
+							 	     {
 	private static final int MAIN_ACTIVITY_RES_CODE = 340;
 
 	private HashMap<Kitchen, Integer> mFoodPosByKitchenMap = new HashMap<Kitchen, Integer>();
@@ -54,7 +53,7 @@ public class MainActivity extends Activity
 	private OrderFood mOrderFood;
 
 	private Comparator<Food> mFoodCompByKitchen;
-	//TODO 添加 搜索功能
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -193,7 +192,7 @@ public class MainActivity extends Activity
 			public void onClick(View v) {
 				float oriCnt = mOrderFood.getCount();
 				try{
-					mOrderFood.setCount(Float.parseFloat(((TextView) findViewById(R.id.textView_amount_main)).getText().toString()));
+//					mOrderFood.setCount(Float.parseFloat(((TextView) findViewById(R.id.textView_amount_main)).getText().toString()));
 					ShoppingCart.instance().addFood(mOrderFood);
 					Toast.makeText(getApplicationContext(), mOrderFood.name + "已添加", Toast.LENGTH_SHORT).show();
 				}catch(BusinessException e){
@@ -202,28 +201,35 @@ public class MainActivity extends Activity
 				}
 			}
 		});
-		
-		final TextView countTextView = (TextView) findViewById(R.id.textView_amount_main);
-		((ImageButton) findViewById(R.id.imageButton_plus_main)).setOnClickListener(new OnClickListener(){
-
+		//菜品详情
+		((Button) findViewById(R.id.button_main_detail)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				float curNum = Float.parseFloat(countTextView.getText().toString());
-				countTextView.setText(Util.float2String2(++curNum));
+				// TODO Auto-generated method stub
+				onPicClick(mOrderFood);
 			}
 		});
-		//数量减 
-		((ImageButton) findViewById(R.id.imageButton_minus_main)).setOnClickListener(new OnClickListener(){
-
-			@Override
-			public void onClick(View v) {
-				float curNum = Float.parseFloat(countTextView.getText().toString());
-				if(--curNum >= 1)
-				{
-					countTextView.setText(Util.float2String2(curNum));
-				}
-			}
-		});
+//		final TextView countTextView = (TextView) findViewById(R.id.textView_amount_main);
+//		((ImageButton) findViewById(R.id.imageButton_plus_main)).setOnClickListener(new OnClickListener(){
+//
+//			@Override
+//			public void onClick(View v) {
+//				float curNum = Float.parseFloat(countTextView.getText().toString());
+//				countTextView.setText(Util.float2String2(++curNum));
+//			}
+//		});
+//		//数量减 
+//		((ImageButton) findViewById(R.id.imageButton_minus_main)).setOnClickListener(new OnClickListener(){
+//
+//			@Override
+//			public void onClick(View v) {
+//				float curNum = Float.parseFloat(countTextView.getText().toString());
+//				if(--curNum >= 1)
+//				{
+//					countTextView.setText(Util.float2String2(curNum));
+//				}
+//			}
+//		});
 		//套餐
 		((Button) findViewById(R.id.imageView_combo_main)).setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -249,6 +255,16 @@ public class MainActivity extends Activity
 		
 		((OptionBarFragment)this.getFragmentManager().findFragmentById(R.id.bottombar)).setBackButtonDisable();
 		
+		((ImageButton)findViewById(R.id.imageButton_special_main)).setVisibility(View.INVISIBLE);
+		((ImageButton)findViewById(R.id.imageButton_rec_mian)).setVisibility(View.INVISIBLE);
+		((ImageButton)findViewById(R.id.imageButton_current_main)).setVisibility(View.INVISIBLE);
+		if(mOrderFood.isSpecial())
+			((ImageButton)findViewById(R.id.imageButton_special_main)).setVisibility(View.VISIBLE);
+		if(mOrderFood.isRecommend())
+			((ImageButton)findViewById(R.id.imageButton_rec_mian)).setVisibility(View.VISIBLE);
+		if(mOrderFood.isCurPrice())
+			((ImageButton)findViewById(R.id.imageButton_current_main)).setVisibility(View.VISIBLE);
+		
 	}
 
 	@Override
@@ -271,9 +287,9 @@ public class MainActivity extends Activity
 		mItemFragment.setPosition(food.kitchen);  
 		((TextView) findViewById(R.id.textView_foodName_main)).setText(food.name);
 		((TextView) findViewById(R.id.textView_price_main)).setText(Util.float2String2(food.getPrice()));
-		((TextView) findViewById(R.id.textView_amount_main)).setText("1");
+//		((TextView) findViewById(R.id.textView_amount_main)).setText("1");
 		mOrderFood = new OrderFood(food);
-		mOrderFood.setCount(Float.parseFloat(((TextView) findViewById(R.id.textView_amount_main)).getText().toString()));
+//		mOrderFood.setCount(Float.parseFloat(((TextView) findViewById(R.id.textView_amount_main)).getText().toString()));
 		
 		
 		((ImageButton)findViewById(R.id.imageButton_special_main)).setVisibility(View.INVISIBLE);
@@ -284,7 +300,7 @@ public class MainActivity extends Activity
 		if(food.isRecommend())
 			((ImageButton)findViewById(R.id.imageButton_rec_mian)).setVisibility(View.VISIBLE);
 		if(food.isCurPrice())
-			((ImageButton)findViewById(R.id.imageButton_current_main)).setVisibility(View.INVISIBLE);
+			((ImageButton)findViewById(R.id.imageButton_current_main)).setVisibility(View.VISIBLE);
 
 	}
 
@@ -312,11 +328,11 @@ public class MainActivity extends Activity
 		}
     }
 	
-	/**
-	 * 点击Gallery，跳转到FoodDetailActivity
-	 */
-	@Override
-	public void onPicClick(Food food, int position) {
+//	/**
+//	 * 点击Gallery，跳转到FoodDetailActivity
+//	 */
+//	@Override
+	public void onPicClick(Food food) {
 		Intent intent = new Intent(MainActivity.this, FoodDetailActivity.class);
 		Bundle bundle = new Bundle();
 		OrderFood orderFood = new OrderFood(food);

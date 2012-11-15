@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
+import android.widget.ExpandableListView.OnGroupClickListener;
 import android.widget.TextView;
 
 import com.wireless.ordermenu.R;
@@ -133,18 +134,39 @@ public class ExpandableListFragment extends Fragment{
 				final Kitchen currentKitchen = mChildren.get(groupPosition).get(childPosition);
 				if(!currentKitchen.equals(mCurrentKitchen))
 				{
-					if(v != null)
-						v.post(new Runnable(){
-							@Override
-							public void run() {
-								//通知侦听器改变
-								mOnItemChangeListener.onItemChange(currentKitchen);	
-							}
-						});
 					mCurrentKitchen = currentKitchen;
+					if(v != null)
+//						v.post(new Runnable(){
+//							@Override
+//							public void run() {
+//								//通知侦听器改变
+								mOnItemChangeListener.onItemChange(currentKitchen);	
+//							}
+//						});
 				}
 
-				return false;
+				return true;
+			}
+		});
+		
+		mListView.setOnGroupClickListener(new OnGroupClickListener(){
+			@Override
+			public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+				int groupCount = mListView.getExpandableListAdapter().getGroupCount();
+				
+				for(int i=0;i<groupCount;i++)
+				{
+					if(mListView.isGroupExpanded(i))
+					{
+						mListView.collapseGroup(i);
+					}
+				}
+				//点击group时默认显示第一个
+				mListView.expandGroup(groupPosition);
+				int childPos = groupPosition +1;
+				mListView.performItemClick(mListView.getChildAt(childPos), childPos, childPos);
+				
+				return true;
 			}
 		});
 		

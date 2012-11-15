@@ -28,7 +28,6 @@ import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
-import com.wireless.protocol.TasteGroup;
 import com.wireless.protocol.Util;
 import com.wireless.util.ImageDialog;
 import com.wireless.util.ShadowImageView;
@@ -110,8 +109,9 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 		mOrderFood = foodParcel;
 		if(!mOrderFood.hasTaste())
 		{
-			mOrderFood.tasteGroup = new TasteGroup(mOrderFood, null, null);
-			mOrderFood.tasteGroup.addTaste(WirelessOrder.foodMenu.specs[0]);
+			//mOrderFood.tasteGroup = new TasteGroup(mOrderFood, null, null);
+			mOrderFood.makeTasteGroup();
+			mOrderFood.getTasteGroup().addTaste(WirelessOrder.foodMenu.specs[0]);
 		}
 		
 		mDisplayHandler = new DisplayHandler(this);
@@ -136,7 +136,8 @@ public class FoodDetailActivity extends Activity implements OnTasteChangeListene
 				try{
 					mOrderFood.setCount(Float.parseFloat(((TextView) findViewById(R.id.editText_count_foodDetail)).getText().toString()));
 					ShoppingCart.instance().addFood(mOrderFood);
-					Toast.makeText(getApplicationContext(), mOrderFood.name + "已添加", Toast.LENGTH_SHORT).show();
+//					Toast.makeText(getApplicationContext(), mOrderFood.name + "已添加", Toast.LENGTH_SHORT).show();
+					onBackPressed();
 				}catch(BusinessException e){
 					mOrderFood.setCount(oriCnt);
 					Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();

@@ -163,7 +163,8 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 							@Override
 							public void onClick(View v) {
 								Taste t = (Taste) v.getTag();
-								fragment.mOrderFood.tasteGroup.removeTaste(t);
+								if(fragment.mOrderFood.hasTaste())
+									fragment.mOrderFood.getTasteGroup().removeTaste(t);
 								TasteRefreshHandler.this.sendEmptyMessage(TASTE_REMOVED);
 							}
 						});

@@ -91,7 +91,8 @@ public class ImageDialog extends Dialog {
 				try{
 					mOrderFood.setCount(Float.parseFloat(((EditText)  findViewById(R.id.editText_count_rec_dialog)).getText().toString()));
 					ShoppingCart.instance().addFood(mOrderFood);
-					Toast.makeText(getContext(), mOrderFood.name + "已添加", Toast.LENGTH_SHORT).show();
+//					Toast.makeText(getContext(), mOrderFood.name + "已添加", Toast.LENGTH_SHORT).show();
+					dismiss();
 				}catch(BusinessException e){
 					mOrderFood.setCount(oriCnt);
 					Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();

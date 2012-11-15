@@ -222,6 +222,7 @@ public class StaffPanelFragment extends Fragment {
 				}else{		
 					mCorrectIcon.setBackgroundResource(R.drawable.staff_wrong);
 					Toast.makeText(getActivity(), "密码错误", Toast.LENGTH_SHORT).show();
+					mCorrectIcon.setVisibility(View.VISIBLE);
 					ShoppingCart.instance().setStaff(null);
 					//通知观察者
 					if(mOnStaffChangedListener != null)

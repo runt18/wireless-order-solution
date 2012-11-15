@@ -10,10 +10,10 @@
         android:layout_height="wrap_content"
         android:text="催菜" />
 
-    <Button
+  <!--   <Button
         android:id="@+id/button_hangUp_option_popupWindow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="叫起" />
+        android:text="叫起" /> -->
 
 </LinearLayout>

@@ -20,6 +20,7 @@ import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
+import com.wireless.protocol.Util;
 
 public class FullScreenActivity extends Activity implements OnPicChangedListener{
 	private GalleryFragment mPicBrowserFragment;
@@ -65,6 +66,8 @@ public class FullScreenActivity extends Activity implements OnPicChangedListener
 			mOrderFood = intent.getParcelableExtra(FoodParcel.KEY_VALUE);
 			mPicBrowserFragment.setPosition(mOrderFood);
 			((TextView) findViewById(R.id.textView_food_name_fullScreen)).setText(mOrderFood.name);
+			((TextView) findViewById(R.id.textView_food_price_fullScreen)).setText(String.valueOf(Util.float2String2(mOrderFood.getPrice())));
+
 		}
 		
 		((ImageView) findViewById(R.id.imageView_back_fullScreen)).setOnClickListener(new OnClickListener(){
@@ -97,7 +100,7 @@ public class FullScreenActivity extends Activity implements OnPicChangedListener
 		bundle.putParcelable(FoodParcel.KEY_VALUE, new FoodParcel(mOrderFood));
 		intent.putExtras(bundle);
 		setResult(FULL_RES_CODE, intent);
-		this.onBackPressed();
+		this.onBackPressed(); 
 	}
 
 	@Override
@@ -105,5 +108,6 @@ public class FullScreenActivity extends Activity implements OnPicChangedListener
 		mOrderFood = new OrderFood(value);
 		mOrderFood.setCount(Float.valueOf(1));
 		((TextView) findViewById(R.id.textView_food_name_fullScreen)).setText(value.name);
+		((TextView) findViewById(R.id.textView_food_price_fullScreen)).setText(String.valueOf(Util.float2String2(mOrderFood.getPrice())));
 	}
 }

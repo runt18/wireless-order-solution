@@ -25,7 +25,7 @@
         android:text="2"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="@color/black" />
-
+
     <ImageButton
         android:id="@+id/imageButton_minus_pickedFood_item"
         android:layout_width="wrap_content"
@@ -35,21 +35,8 @@
         android:layout_toRightOf="@+id/textView_picked_food_price_item"
         android:background="@null"
         android:focusable="false"
-        android:src="@drawable/minus_btn_selector" />
-
-    <TextView
-        android:id="@+id/textView_picked_food_state_hurry_item"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="false"
-        android:layout_alignParentTop="false"
-        android:layout_centerVertical="true"
-        android:layout_marginLeft="80dp"
-        android:layout_toRightOf="@+id/textView_picked_food_count_item"
-        android:text="催菜 "
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="@color/black" />
-
+        android:src="@drawable/minus_btn_selector" /> 
+
     <Button
         android:id="@+id/textView_picked_food_count_item"
         android:layout_width="60dp"
@@ -61,9 +48,8 @@
         android:focusable="false"
         android:inputType="numberDecimal"
         android:textColor="@color/black" >
-
     </Button>
-
+
     <ImageButton
         android:id="@+id/imageButton_plus_pickedFood_item"
         android:layout_width="wrap_content"
@@ -73,7 +59,7 @@
         android:background="@null"
         android:focusable="false"
         android:src="@drawable/plus_btn_selector" />
-
+
     <Button
         android:id="@+id/button_delete_pickedFood_list_item"
         android:layout_width="wrap_content"
@@ -81,22 +67,54 @@
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:text="删除" />
-
+
     <Button
         android:id="@+id/button_operation_pickedFood_list_item"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_toLeftOf="@+id/button_delete_pickedFood_list_item"
-        android:text="操作" />
-
-    <TextView
+        android:text="催菜" />
+
+    <View
+        android:id="@+id/view_pickedFood_cancel_line"
+        android:layout_width="wrap_content"
+        android:layout_height="1px"
+        android:layout_alignLeft="@+id/textView_picked_food_name_item"
+        android:layout_alignRight="@+id/textView_picked_food_name_item"
+        android:layout_centerVertical="true"
+        android:background="@color/black_red"
+        android:visibility="invisible" />
+
+    <ImageView
+        android:id="@+id/imageView_pickedFood_hurry_item"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textView_picked_food_name_item"
+        android:layout_alignTop="@+id/textView_picked_food_name_item"
+        android:layout_marginLeft="77dp"
+        android:src="@android:drawable/btn_star_big_on" />
+
+    <!-- <TextView
         android:id="@+id/textView_hangup_pickedFood_list_item"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_toRightOf="@+id/textView_picked_food_state_hurry_item"
+        android:layout_alignBaseline="@+id/button_operation_pickedFood_list_item"
+        android:layout_alignBottom="@+id/button_operation_pickedFood_list_item"
+        android:layout_marginRight="28dp"
+        android:layout_toLeftOf="@+id/button_operation_pickedFood_list_item"
         android:text="叫起 "
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@color/black" /> -->
+
+    <TextView
+        android:id="@+id/textView_picked_food_sum_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="50dp"
+        android:layout_toLeftOf="@+id/button_operation_pickedFood_list_item"
+        android:text="总价 "
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="@color/black" />
 
