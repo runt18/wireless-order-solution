@@ -63,7 +63,7 @@ public class RankListActivity extends Activity {
 			if(f.isRecommend())
 				mRecommendfoods.add(f);
 		}
-		
+		 
 //		int recWidth = 200;
 //		int recHeight = 150; 
 //		mImageFetcher.setImageSize(recWidth, recHeight);

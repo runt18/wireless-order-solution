@@ -18,7 +18,6 @@ import com.wireless.fragment.GalleryFragment;
 import com.wireless.fragment.GalleryFragment.OnPicChangedListener;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
-import com.wireless.protocol.Food;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.Util;
 
@@ -104,7 +103,7 @@ public class FullScreenActivity extends Activity implements OnPicChangedListener
 	}
 
 	@Override
-	public void onPicChanged(Food value, int position) {
+	public void onPicChanged(OrderFood value, int position) {
 		mOrderFood = new OrderFood(value);
 		mOrderFood.setCount(Float.valueOf(1));
 		((TextView) findViewById(R.id.textView_food_name_fullScreen)).setText(value.name);

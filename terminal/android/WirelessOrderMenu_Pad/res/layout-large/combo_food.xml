@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout android:layout_width="match_parent"
-    android:layout_height="match_parent" xmlns:android="http://schemas.android.com/apk/res/android">
-
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
     <RelativeLayout
         android:id="@+id/relativeLayout1"
         android:layout_width="match_parent"
         android:layout_height="160dp"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true" >
+        android:layout_alignParentTop="false"
+        android:layout_below="@+id/bottom" >
 
         <TextView
             android:id="@+id/textView1"
@@ -17,12 +19,12 @@
             android:gravity="center"
             android:text=" "
             android:textAppearance="?android:attr/textAppearanceLarge" />
-
+
         <HorizontalScrollView
             android:id="@+id/horizontalScrollView1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
+            android:layout_alignParentTop="false"
             android:layout_toRightOf="@+id/textView1"
             android:background="@drawable/rec_food_bg" >
 
@@ -34,12 +36,11 @@
             </LinearLayout>
         </HorizontalScrollView>
     </RelativeLayout>
-
+
     <RelativeLayout
         android:id="@+id/relativeLayout2"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/bottom"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/relativeLayout1"
         android:background="@drawable/combo_left_bg"
@@ -47,7 +48,7 @@
         android:paddingLeft="10dp"
         android:paddingRight="26dp"
         android:paddingTop="26dp" >
-
+
         <TextView
             android:id="@+id/textView_comboFoodName"
             android:layout_width="wrap_content"
@@ -67,29 +68,20 @@
         </ListView>
     </RelativeLayout>
 
-    <fragment
-        android:id="@+id/bottom"
-        android:name="com.wireless.fragment.OptionBarFragment"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true" />
-
     <RelativeLayout
         android:id="@+id/relativeLayout3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/bottom"
         android:layout_alignTop="@+id/relativeLayout2"
         android:layout_toRightOf="@+id/relativeLayout2" >
-
+
         <ImageView
             android:id="@+id/imageView_childImage_comboFood"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_alignParentTop="false"
             android:layout_below="@+id/relativeLayout1" />
-
+
         <RelativeLayout
             android:id="@+id/relativeLayout1"
             android:layout_width="match_parent"
@@ -97,15 +89,14 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
             android:background="@drawable/combo_right_top_bg" >
-
         </RelativeLayout>
-
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/relativeLayout1"
             android:background="@drawable/combo_right_subtop_bg" >
-
+
             <TextView
                 android:id="@+id/textView_childFoodName_comboFood"
                 android:layout_width="wrap_content"
@@ -114,7 +105,7 @@
                 android:text="子菜名称"
                 android:textColor="@color/white"
                 android:textSize="20sp" />
-
+
             <ImageButton
                 android:id="@+id/imageButton_pickChildFood_comboFood"
                 android:layout_width="100dp"
@@ -122,16 +113,15 @@
                 android:layout_alignParentRight="true"
                 android:background="@null"
                 android:src="@drawable/add_dish_simple_selector" />
-
         </RelativeLayout>
-
+
         <RelativeLayout
             android:id="@+id/relativeLayout4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:background="@drawable/main_bottom_bg" >
-
+
             <TextView
                 android:id="@+id/textView3"
                 android:layout_width="wrap_content"
@@ -150,7 +140,7 @@
                 android:layout_alignParentTop="true"
                 android:background="@null"
                 android:src="@drawable/add_dish_btn_selector" />
-
+
             <TextView
                 android:id="@+id/textView_comboFood_price"
                 android:layout_width="wrap_content"
@@ -174,7 +164,12 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/white" />
         </RelativeLayout>
-
     </RelativeLayout>
+
+    <fragment
+        android:id="@+id/bottom"
+        android:name="com.wireless.fragment.OptionBarFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
 </RelativeLayout>

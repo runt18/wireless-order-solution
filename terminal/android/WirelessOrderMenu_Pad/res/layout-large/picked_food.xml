@@ -2,20 +2,13 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
-
-    <fragment
-        android:id="@+id/bottombar_pickedFood"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        class="com.wireless.fragment.OptionBarFragment" />
-
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/bottombar_pickedFood"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
+        android:layout_alignParentTop="false"
+        android:layout_below="@+id/bottombar_pickedFood"
         android:layout_toLeftOf="@+id/relativeLayout_right_pickedFood" >
 
         <RelativeLayout
@@ -26,7 +19,7 @@
             android:layout_alignParentTop="true"
             android:background="@drawable/picked_food_top" >
         </RelativeLayout>
-
+
         <RelativeLayout
             android:id="@+id/left_bottom"
             android:layout_width="match_parent"
@@ -42,7 +35,7 @@
                 android:text="总计："
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/white" />
-
+
             <TextView
                 android:id="@+id/textView_total_price_pickedFood"
                 android:layout_width="70dp"
@@ -54,7 +47,7 @@
                 android:text="1"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/white" />
-
+
             <TextView
                 android:id="@+id/textView_total_count_pickedFood"
                 android:layout_width="wrap_content"
@@ -66,7 +59,7 @@
                 android:text="0"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/white" />
-
+
             <Button
                 android:id="@+id/imageButton_submit_pickedFood"
                 android:layout_width="120dp"
@@ -76,7 +69,7 @@
                 android:layout_centerVertical="true"
                 android:text="下单"
                 android:textColor="@color/white" />
-
+
             <TextView
                 android:id="@+id/textView8"
                 android:layout_width="wrap_content"
@@ -87,7 +80,7 @@
                 android:text="份"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/white" />
-
+
             <TextView
                 android:id="@+id/textView6"
                 android:layout_width="wrap_content"
@@ -98,7 +91,6 @@
                 android:text="元"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/white" />
-
         </RelativeLayout>
 
         <!--
@@ -110,7 +102,7 @@
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/relativeLayout1"
              >
-        </ListView>
+        </ListView>
         -->
 
         <ExpandableListView
@@ -129,15 +121,15 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true" />
     </RelativeLayout>
-
+
     <RelativeLayout
         android:id="@+id/relativeLayout_right_pickedFood"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/bottombar_pickedFood"
         android:layout_alignParentLeft="false"
         android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
+        android:layout_alignParentTop="false"
+        android:layout_below="@+id/bottombar_pickedFood"
         android:background="@drawable/picked_food_right"
         android:paddingLeft="28dp"
         android:paddingRight="10dp"
@@ -151,21 +143,20 @@
             android:layout_alignParentTop="true"
             android:layout_below="@+id/imageView_selected_food_pickedFood"
             android:scaleType="centerInside" />
-
+
         <RelativeLayout
             android:id="@+id/relativeLayout_pickedFood_right_bottom"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@+id/imageView_selected_food_pickedFood"
             android:visibility="invisible" >
-
+
             <TextView
                 android:id="@+id/textView_pickedFood_pickedView_taste"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Medium Text"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
-
         </RelativeLayout>
 
         <include
@@ -176,5 +167,11 @@
             layout="@layout/food_detail_tab1" >
         </include>
     </RelativeLayout>
+
+    <fragment
+        android:id="@+id/bottombar_pickedFood"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        class="com.wireless.fragment.OptionBarFragment" />
 
 </RelativeLayout>

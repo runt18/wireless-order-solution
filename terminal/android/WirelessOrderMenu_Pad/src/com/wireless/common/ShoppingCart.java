@@ -94,7 +94,6 @@ public final class ShoppingCart {
 			throw new NullPointerException("The original order can NOT be null.");
 		}
 	}
-	
 	/**
 	 * Check to see whether the commit parameters are valid.
 	 * @throws BusinessException
@@ -165,7 +164,8 @@ public final class ShoppingCart {
 		if(mNewOrder == null){
 			mNewOrder = new Order();
 		}
-		mNewOrder.addFood(foodToAdd);
+		
+		mNewOrder.addFood(new OrderFood(foodToAdd));
 		notifyFoodsChange();
 	}
 

@@ -53,6 +53,8 @@ public class MainActivity extends Activity
 	private OrderFood mOrderFood;
 
 	private Comparator<Food> mFoodCompByKitchen;
+
+	private View mCountHintView;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
@@ -186,6 +188,10 @@ public class MainActivity extends Activity
 				return true;
 			}
 		});
+		
+		mCountHintView = this.findViewById(R.id.main_popup);
+		mCountHintView.setVisibility(View.INVISIBLE);
+		final DismissRunnable dismissRunnable = new DismissRunnable(); 
 		//点菜按钮
 		((ImageView)findViewById(R.id.imageButton_add_main)).setOnClickListener(new OnClickListener(){
 			@Override
@@ -193,10 +199,24 @@ public class MainActivity extends Activity
 				float oriCnt = mOrderFood.getCount();
 				try{
 //					mOrderFood.setCount(Float.parseFloat(((TextView) findViewById(R.id.textView_amount_main)).getText().toString()));
+					mOrderFood.setCount(1f);
 					ShoppingCart.instance().addFood(mOrderFood);
-					Toast.makeText(getApplicationContext(), mOrderFood.name + "已添加", Toast.LENGTH_SHORT).show();
+					mOrderFood.setCount(++ oriCnt);
+					if(!mCountHintView.isShown())
+						mCountHintView.setVisibility(View.VISIBLE);
+					
+					// TODO 
+					((TextView) findViewById(R.id.textView_main_count)).setText(Util.float2String2(mOrderFood.getCount()));
+
+					TextView countText = (TextView)mCountHintView.findViewById(R.id.textView_main_popup_count);
+					int count = Integer.parseInt(countText.getText().toString());
+					countText.setText(""+ ++count);
+					
+					mCountHintView.removeCallbacks(dismissRunnable);
+					mCountHintView.postDelayed(dismissRunnable, 2000);
+//					Toast.makeText(getApplicationContext(), mOrderFood.name + "已添加", Toast.LENGTH_SHORT).show();
 				}catch(BusinessException e){
-					mOrderFood.setCount(oriCnt);
+					mOrderFood.setCount(-- oriCnt);
 					Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
 				}
 			}
@@ -205,7 +225,6 @@ public class MainActivity extends Activity
 		((Button) findViewById(R.id.button_main_detail)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				onPicClick(mOrderFood);
 			}
 		});
@@ -249,7 +268,7 @@ public class MainActivity extends Activity
 			}
 		});
 		mOrderFood = new OrderFood(WirelessOrder.foods[0]);
-		mOrderFood.setCount(1f);
+//		mOrderFood.setCount(1f);
 		//默认启用第一项
 		mItemFragment.performClick(0);
 		
@@ -265,6 +284,8 @@ public class MainActivity extends Activity
 		if(mOrderFood.isCurPrice())
 			((ImageButton)findViewById(R.id.imageButton_current_main)).setVisibility(View.VISIBLE);
 		
+		if(mOrderFood.getCount() != 0f)
+			((TextView) findViewById(R.id.textView_main_count)).setText(Util.float2String2(mOrderFood.getCount()));
 	}
 
 	@Override
@@ -283,14 +304,14 @@ public class MainActivity extends Activity
 	 * 右边画廊Gallery的回调函数，联动显示左边的部门-厨房ListView
 	 */
 	@Override
-	public void onPicChanged(Food food, int position) {
+	public void onPicChanged(OrderFood food, int position) {
 		mItemFragment.setPosition(food.kitchen);  
 		((TextView) findViewById(R.id.textView_foodName_main)).setText(food.name);
 		((TextView) findViewById(R.id.textView_price_main)).setText(Util.float2String2(food.getPrice()));
 //		((TextView) findViewById(R.id.textView_amount_main)).setText("1");
-		mOrderFood = new OrderFood(food);
+		mOrderFood = food;
+		//TODO 在shoppingcart中找回这个菜
 //		mOrderFood.setCount(Float.parseFloat(((TextView) findViewById(R.id.textView_amount_main)).getText().toString()));
-		
 		
 		((ImageButton)findViewById(R.id.imageButton_special_main)).setVisibility(View.INVISIBLE);
 		((ImageButton)findViewById(R.id.imageButton_rec_mian)).setVisibility(View.INVISIBLE);
@@ -301,6 +322,10 @@ public class MainActivity extends Activity
 			((ImageButton)findViewById(R.id.imageButton_rec_mian)).setVisibility(View.VISIBLE);
 		if(food.isCurPrice())
 			((ImageButton)findViewById(R.id.imageButton_current_main)).setVisibility(View.VISIBLE);
+
+		if(mOrderFood.getCount() != 0f)
+			((TextView) findViewById(R.id.textView_main_count)).setText(Util.float2String2(mOrderFood.getCount()));
+		else ((TextView) findViewById(R.id.textView_main_count)).setText("");
 
 	}
 
@@ -342,7 +367,13 @@ public class MainActivity extends Activity
 		intent.putExtras(bundle);
 		startActivity(intent);
 	}  
-	
+	class DismissRunnable implements Runnable{
+		@Override
+		public void run() {
+			mCountHintView.setVisibility(View.INVISIBLE);
+			((TextView)mCountHintView.findViewById(R.id.textView_main_popup_count)).setText(""+0);
+		}
+	}
 //	class SearchRunnable implements Runnable{
 //		private int mPos;
 //

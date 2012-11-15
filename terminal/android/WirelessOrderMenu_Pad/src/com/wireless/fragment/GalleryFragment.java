@@ -1,7 +1,6 @@
 package com.wireless.fragment;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import android.app.Fragment;
@@ -15,6 +14,7 @@ import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 
+import com.wireless.common.ShoppingCart;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.protocol.Food;
@@ -35,13 +35,13 @@ public class GalleryFragment extends Fragment {
 	private FragmentStatePagerAdapter mGalleryAdapter = null;
 	//private Gallery mGallery;
 	private ViewPager mViewPager;
-	private List<Food> mFoods = new ArrayList<Food>();
+	private List<OrderFood> mFoods = new ArrayList<OrderFood>();
 	private ImageFetcher mImgFetcher;
 	
 	private int mCurrentPosition = 0;
 	
 	public interface OnPicChangedListener{
-		void onPicChanged(Food curFood, int position);
+		void onPicChanged(OrderFood curFood, int position);
 	}
 	
 	public void setOnPicChangedListener(OnPicChangedListener l)
@@ -117,18 +117,28 @@ public class GalleryFragment extends Fragment {
 		}
 	}
 	
-	public void notifyDataChanged(ArrayList<Food> foods){
-		mFoods = foods;
-		mGalleryAdapter.notifyDataSetChanged();
-		mCurrentPosition = 0;
-	}
+//	public void notifyDataChanged1(ArrayList<Food> foods){
+//		mFoods = foods;
+//		mGalleryAdapter.notifyDataSetChanged();
+//		mCurrentPosition = 0;
+//	}
 	
 	/**
 	 * 设置新的Gallery数据源，并更新Gallery
 	 * @param foods
 	 */
 	public void notifyDataChanged(Food[] foods){
-		mFoods = Arrays.asList(foods);
+		for(int i = 0; i < foods.length; i++){
+			OrderFood of = new OrderFood(foods[i]);
+			for(OrderFood foodOrdered : ShoppingCart.instance().getAllFoods()){
+				if(foods[i].equals(foodOrdered)){
+					of.setCount(foodOrdered.getCount());
+					break;
+				}
+			}
+			mFoods.add(of);
+		}
+		//mFoods = Arrays.asList(foods);
 		mGalleryAdapter.notifyDataSetChanged();	
 		mCurrentPosition = 0;
 	}

@@ -11,32 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerVertical="false" >
-
-        <!-- <Button
-            android:id="@+id/button_tab1_cancel"
-            android:layout_width="120dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:text="取消" /> -->
-<!-- 
-        <Button
-            android:id="@+id/button_tab1_refresh"
-            android:layout_width="120dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:text="刷新" /> -->
-
     </RelativeLayout>
-
-    <!-- <com.wireless.util.ScrollLayout
-        android:id="@+id/tableFlipper"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/page_point"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/topbar" >
-    </com.wireless.util.ScrollLayout> -->
 
     <ViewFlipper
         android:id="@+id/viewFlipper_dialogTab1"
@@ -45,9 +20,8 @@
         android:layout_above="@+id/page_point"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/topbar" >
-
     </ViewFlipper>
-
+
     <LinearLayout
         android:id="@+id/page_point"
         android:layout_width="wrap_content"
@@ -56,9 +30,8 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="16dp"
         android:orientation="horizontal" >
-
     </LinearLayout>
-
+
     <HorizontalScrollView
         android:id="@+id/horizontalScrollView"
         android:layout_width="match_parent"
@@ -75,7 +48,7 @@
             android:orientation="horizontal" >
         </LinearLayout>
     </HorizontalScrollView>
-
+
     <RelativeLayout
         android:id="@+id/topbar"
         android:layout_width="match_parent"
@@ -103,7 +76,7 @@
             android:paddingRight="20dp"
             android:text="1"
             android:textAppearance="?android:attr/textAppearanceLarge" />
-
+
         <ImageButton
             android:id="@+id/imageButton_plus_tab1"
             android:layout_width="wrap_content"
@@ -113,7 +86,7 @@
             android:layout_toRightOf="@+id/imageButton_minus_tab1"
             android:background="@null"
             android:src="@drawable/table_setting_plus_selector" />
-
+
         <ImageButton
             android:id="@+id/imageButton_minus_tab1"
             android:layout_width="wrap_content"
@@ -129,6 +102,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/imageButton_plus_tab1"
             android:background="@drawable/table_search_bg"
             android:ems="10"
             android:hint="输入餐台号查找"
@@ -146,7 +120,6 @@
             android:background="@color/transparent"
             android:padding="10dp"
             android:src="@drawable/delete_all_selector" />
-
     </RelativeLayout>
 
 </RelativeLayout>

@@ -2,13 +2,18 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
-
+
     <fragment
         android:id="@+id/bottombar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_alignParentBottom="false"
         class="com.wireless.fragment.OptionBarFragment" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/bottombar" >
 
     <ImageView
         android:id="@+id/imageView_foodDetail"
@@ -72,12 +77,12 @@
             </LinearLayout>
         </TabHost>
     </RelativeLayout>
-
+
     <RelativeLayout
         android:id="@+id/recommd_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/bottombar" >
+        android:layout_alignParentBottom="true" >
 
         <ImageView
             android:id="@+id/imageView1"
@@ -156,5 +161,6 @@
             android:textColor="@color/white" />
 
     </RelativeLayout>
-
+    </RelativeLayout>
+    
 </RelativeLayout>

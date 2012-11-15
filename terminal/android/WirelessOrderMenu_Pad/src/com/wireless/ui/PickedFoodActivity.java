@@ -762,18 +762,24 @@ public class PickedFoodActivity extends Activity implements OnOrderChangeListene
 			((ImageButton) view.findViewById(R.id.imageButton_plus_deleteCount_dialog)).setOnClickListener(new View.OnClickListener(){
 				@Override
 				public void onClick(View v) {
-					float curNum = Float.parseFloat(countEdtTxt.getText().toString());
-					countEdtTxt.setText("" + ++curNum);
+					if(!countEdtTxt.getText().toString().equals(""))
+					{
+						float curNum = Float.parseFloat(countEdtTxt.getText().toString());
+						countEdtTxt.setText(Util.float2String2(++curNum));
+					}
 				}
 			});
 			//减少数量
 			((ImageButton) findViewById(R.id.imageButton_minus_deleteCount_dialog)).setOnClickListener(new View.OnClickListener(){
 				@Override
 				public void onClick(View v) {
-					float curNum = Float.parseFloat(countEdtTxt.getText().toString());
-					if(--curNum >= 1)
+					if(!countEdtTxt.getText().toString().equals(""))
 					{
-						countEdtTxt.setText("" + curNum);
+						float curNum = Float.parseFloat(countEdtTxt.getText().toString());
+						if(--curNum >= 1)
+						{
+							countEdtTxt.setText(Util.float2String2(curNum));
+						}
 					}
 				}
 			});

@@ -8,16 +8,16 @@
         android:id="@+id/bottombar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_alignParentBottom="false"
         class="com.wireless.fragment.OptionBarFragment" />
 
     <RelativeLayout
         android:id="@+id/relativeLayout1"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_above="@+id/bottombar"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true" >
+        android:layout_alignParentTop="false"
+        android:layout_below="@+id/bottombar" >
 
         <ImageView
             android:id="@+id/imageView_logo"
@@ -80,8 +80,8 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/bottombar"
-        android:layout_alignParentTop="true"
+        android:layout_alignParentTop="false"
+        android:layout_below="@+id/bottombar"
         android:layout_toRightOf="@+id/relativeLayout1" >
 
         <FrameLayout
@@ -96,7 +96,6 @@
             android:id="@+id/top_bar_main"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/main_top_bg"
             android:clickable="false"
             android:descendantFocusability="afterDescendants" >
 
@@ -160,6 +159,25 @@
                 android:paddingTop="6dp"
                 android:src="@drawable/delete_all_selector" />
  -->
+
+            <ImageButton
+                android:id="@+id/imageButton_amplify_main"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="10dp"
+                android:background="@null"
+                android:src="@drawable/amplify_btn_selector" />
+
+            <TextView
+                android:id="@+id/textView_main_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
         </RelativeLayout>
 
         <RelativeLayout
@@ -279,15 +297,14 @@
 
         </RelativeLayout>
 
-        <ImageButton
-            android:id="@+id/imageButton_amplify_main"
+        <include
+            android:id="@+id/main_popup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_above="@+id/relativeLayout_bottom_right"
             android:layout_alignParentRight="true"
-            android:layout_below="@+id/top_bar_main"
-            android:layout_marginRight="10dp"
-            android:background="@null"
-            android:src="@drawable/amplify_btn_selector" />
+            android:layout_marginRight="20dp"
+            layout="@layout/main_popup" />
 
     </RelativeLayout>
 
