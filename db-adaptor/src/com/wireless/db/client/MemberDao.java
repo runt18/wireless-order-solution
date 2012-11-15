@@ -78,6 +78,7 @@ public class MemberDao {
 				MemberDao.createDiscount(dbCon, mt);
 			}
 			
+			// 插入新数据
 			String insertSQL = " INSERT INTO member_type ( restaurant_id, name, discount_id, discount_type, exchange_rate, charge_rate, attribute )"
 							 + " VALUES("
 							 + mt.getRestaurantID() + ","
@@ -116,7 +117,7 @@ public class MemberDao {
 			String querySQL = "SELECT count(restaurant_id) AS count FROM discount WHERE restaurant_id = " + mt.getRestaurantID() + " AND discount_id = " + mt.getOther().get(MemberType.OLD_DISCOUNTID_KEY) + " AND status = " + Discount.MEMBERTYPE;
 			dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 			boolean isEntire = (dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt("count") > 0);
-			if(mt.getDiscountType() == 0){
+			if(mt.getDiscountType() == MemberType.DISCOUNT_TYPE_DISCOUNT){
 				// 处理已关联的全单折扣方案				
 				if(isEntire){
 					String deleteSQL = "DELETE FROM discount WHERE discount_id = " + mt.getOther().get(MemberType.OLD_DISCOUNTID_KEY) + " AND restaurant_id = " + mt.getRestaurantID()  + " AND status = " + Discount.MEMBERTYPE;;
@@ -125,7 +126,7 @@ public class MemberDao {
 						dbCon.stmt.executeUpdate(deleteSQL);
 					}
 				}	
-			}else if(mt.getDiscountType() == 1){
+			}else if(mt.getDiscountType() == MemberType.DISCOUNT_TYPE_ENTIRE){
 				if(isEntire){
 					String updateSQL = "UPDATE discount_plan SET rate = " + mt.getDiscountRate() + " WHERE discount_id = " + mt.getOther().get(MemberType.OLD_DISCOUNTID_KEY);
 					if(dbCon.stmt.executeUpdate(updateSQL) == 0){
@@ -137,6 +138,7 @@ public class MemberDao {
 				}
 			}
 			
+			// 更新数据
 			String updateSQL = " UPDATE member_type SET "
 							 + " name = '" + mt.getName() + "', discount_id = " + mt.getDiscountID() + ", discount_type = " + mt.getDiscountType() + ", "
 							 + " exchange_rate = " + mt.getExchangeRate() + ", charge_rate = " + mt.getChargeRate() + ", attribute = " + mt.getAttribute()
@@ -164,22 +166,31 @@ public class MemberDao {
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
+			String querySQL = "";
+			String deleteSQL = "";
 			
-			String querySQL = "SELECT count(restaurant_id) AS count FROM member WHERE restaurant_id = " + mt.getRestaurantID() + " AND member_type_id = " + mt.getTypeID();
+			// 检查该类型下是否还有会员
+			querySQL = "SELECT count(restaurant_id) AS count FROM member WHERE restaurant_id = " + mt.getRestaurantID() + " AND member_type_id = " + mt.getTypeID();
 			dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 			if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt("count") > 0){
 				throw new BusinessException("操作失败, 该类型下已有会员,不允许删除.", 9977);
 			}
 			
+			// 删除全单折扣方案相关信息
+			if(mt.getDiscountType() == MemberType.DISCOUNT_TYPE_ENTIRE){
+				querySQL = "SELECT count(restaurant_id) AS count FROM discount WHERE restaurant_id = " + mt.getRestaurantID() + " AND discount_id = " + mt.getDiscountID() + " AND status = " + Discount.MEMBERTYPE;
+				dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+				if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt("count") > 0){
+					deleteSQL = "DELETE FROM discount WHERE discount_id = " + mt.getDiscountID() + " AND restaurant_id = " + mt.getRestaurantID()  + " AND status = " + Discount.MEMBERTYPE;;
+					if(dbCon.stmt.executeUpdate(deleteSQL) > 0){
+						deleteSQL = "DELETE FROM discount_plan WHERE discount_id = " + mt.getDiscountID();
+						dbCon.stmt.executeUpdate(deleteSQL);
+					}
+				}
+			}
 			
-			
-			
-			
-			
-			
-			
-			
-			String deleteSQL = "DELETE FROM member_type WHERE member_type_id = " + mt.getTypeID() + " AND restaurant_id = " + mt.getRestaurantID();
+			// 删除会员类型
+			deleteSQL = "DELETE FROM member_type WHERE member_type_id = " + mt.getTypeID() + " AND restaurant_id = " + mt.getRestaurantID();
 			
 			if(dbCon.stmt.executeUpdate(deleteSQL) == 0){
 				throw new BusinessException("操作失败, 未找到要删除的原纪录." , 9976);
@@ -209,16 +220,20 @@ public class MemberDao {
 			dp.setLevel(0);
 			dp.setStatus(Discount.MEMBERTYPE);
 			
-			dpp.setRate(Float.valueOf(mt.getDiscountRate() + ""));
+			dpp.setRate(Float.valueOf(String.valueOf(mt.getDiscountRate())));
 			
-			// 生成全单折扣方案信息, 并回写全单折扣方案编号
-			if(QueryDiscountDao.insertDiscountBody(dbCon, dp, dpp) > 0){
-				dbCon.rs = dbCon.stmt.executeQuery("SELECT discount_id FROM " +  Params.dbName + ".discount WHERE restaurant_id = " + mt.getRestaurantID() + " ORDER BY discount_id DESC LIMIT 0,1");
-				if(dbCon.rs != null && dbCon.rs.next()){
-					mt.setDiscountID(dbCon.rs.getInt("discount_id"));
+			try{
+				// 生成全单折扣方案信息, 并回写全单折扣方案编号
+				if(QueryDiscountDao.insertDiscountBody(dbCon, dp, dpp) > 0){
+					dbCon.rs = dbCon.stmt.executeQuery("SELECT discount_id FROM " +  Params.dbName + ".discount WHERE restaurant_id = " + mt.getRestaurantID() + " ORDER BY discount_id DESC LIMIT 0,1");
+					if(dbCon.rs != null && dbCon.rs.next()){
+						mt.setDiscountID(dbCon.rs.getInt("discount_id"));
+					}
+				}else{
+					throw new BusinessException("操作失败, 设置会员类型全单折扣信息失败,未知错误." , 9974);
 				}
-			}else{
-				throw new BusinessException("操作失败, 设置会员类型全单折扣信息失败,未知错误." , 9974);
+			}catch(Exception e){
+				throw e;
 			}
 		}catch(Exception e){
 			e.printStackTrace();
@@ -227,39 +242,5 @@ public class MemberDao {
 	}
 	
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

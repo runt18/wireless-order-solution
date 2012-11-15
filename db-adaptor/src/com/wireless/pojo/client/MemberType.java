@@ -7,6 +7,8 @@ import java.util.Map;
 public class MemberType {
 	
 	public static final String OLD_DISCOUNTID_KEY = "OLD_DISCOUNTID_KEY";
+	public static final int DISCOUNT_TYPE_DISCOUNT = 0;
+	public static final int DISCOUNT_TYPE_ENTIRE = 1;
 	
 	private int typeID;
 	private int restaurantID;
@@ -83,6 +85,5 @@ public class MemberType {
 	public void setOther(Map other) {
 		this.other = other;
 	}
-	
 	
 }
