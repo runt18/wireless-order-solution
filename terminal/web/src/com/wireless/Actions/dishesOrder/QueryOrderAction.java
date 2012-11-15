@@ -82,7 +82,7 @@ public class QueryOrderAction extends Action {
 					item.getKitchen().setDept(null);
 					item.setCount(order.foods[i].getCount());
 					item.setUnitPrice(order.foods[i].getPrice());
-					item.setStatus(order.foods[i].status);
+					item.setStatus(order.foods[i].getStatus());
 					item.setDiscount(order.foods[i].getDiscount()); 
 					item.setTemporary(order.foods[i].isTemporary);
 					item.setSeqID(order.seqID);
