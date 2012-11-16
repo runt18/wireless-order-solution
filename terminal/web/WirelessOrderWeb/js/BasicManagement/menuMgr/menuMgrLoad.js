@@ -117,6 +117,11 @@ function menuMgrOnLoad() {
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
 			if (resultJSON.success == true) {
 				kitchenTypeData = resultJSON.root;
+				for(var i = 0; i < kitchenTypeData.length; i++){
+					if(kitchenTypeData[i].kitchenAliasID == 253){
+						kitchenTypeData.splice(i,1);
+					}
+				}
 			} else {
 				Ext.MessageBox.show({
 					msg : resultJSON.msg,
