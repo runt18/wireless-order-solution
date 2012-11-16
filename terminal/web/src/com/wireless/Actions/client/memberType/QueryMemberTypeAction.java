@@ -31,8 +31,24 @@ public class QueryMemberTypeAction extends Action {
 		
 		try{
 			String restaurantID = request.getParameter("restaurantID");
+			String searchType = request.getParameter("searchType");
+			String searchValue = request.getParameter("searchValue");
 			
-			list = MemberDao.getMemberType(" AND A.restaurant_id = " + restaurantID, null);
+			searchValue = searchValue != null && !searchValue.trim().isEmpty() ? searchValue.trim() : null;
+			
+			String extraCond = (" AND A.restaurant_id = " + restaurantID);
+			
+			if(searchValue != null){
+				if(searchType.equals("1")){
+					extraCond += (" AND A.name like '%" + searchValue.trim() + "%' ");
+				}else if(searchType.equals("2")){
+					extraCond += (" AND A.discount_type = " + searchValue);
+				}else if(searchType.equals("3")){
+					extraCond += (" AND A.attribute = " + searchValue);
+				}
+			}
+			
+			list = MemberDao.getMemberType(extraCond, null);
 			
 		}catch(Exception e){
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 数据库操作请求发生错误!");
