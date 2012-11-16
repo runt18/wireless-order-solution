@@ -144,7 +144,7 @@ memberTypeWinInit = function(){
 					value : 0,
 					store : new Ext.data.SimpleStore({
 						fields : [ 'value', 'text' ],
-						data : memberAttributData
+						data : memberAttributeData
 					}),
 					valueField : 'value',
 					displayField : 'text',

@@ -190,9 +190,9 @@ discountRenderer = function(val, m, r){
 };
 
 memberAttributeRenderer = function(val){
-	for(var i = 0; i < memberAttributData.length; i++){
-		if(eval(memberAttributData[i][0] == val)){
-			return memberAttributData[i][1];
+	for(var i = 0; i < memberAttributeData.length; i++){
+		if(eval(memberAttributeData[i][0] == val)){
+			return memberAttributeData[i][1];
 		}
 	}
 };
@@ -217,7 +217,7 @@ var memberTypeGridTbar = new Ext.Toolbar({
 		value : 0,
 		store : new Ext.data.SimpleStore({
 			fields : [ 'value', 'text' ],
-			data : [[0, '全部'], [1, '类型名称'], [2, '折扣方式']]
+			data : [[0, '全部'], [1, '类型名称'], [2, '折扣方式'], [3, '会员属性']]
 		}),
 		valueField : 'value',
 		displayField : 'text',
@@ -227,15 +227,94 @@ var memberTypeGridTbar = new Ext.Toolbar({
 		selectOnFocus : true,
 		listeners : {
 			select : function(thiz, record, index){
+				var searchType = Ext.getCmp('txtSearchTypeName');
+				var searchDiscountType = Ext.getCmp('comboSearchDiscountType');
+				var searchAttribute = Ext.getCmp('comboSearchMemberAttribute');
+				
+				if(index == 0){
+					searchType.setVisible(false);
+					searchDiscountType.setVisible(false);
+					searchAttribute.setVisible(false);
+					mtObj.searchValue = null;
+				}else if(index == 1){
+					searchType.setVisible(true);
+					searchDiscountType.setVisible(false);
+					searchAttribute.setVisible(false);
+					searchType.setValue();
+					mtObj.searchValue = searchType.getId();
+				}else if(index == 2){
+					searchType.setVisible(false);
+					searchDiscountType.setVisible(true);
+					searchAttribute.setVisible(false);
+					searchDiscountType.setValue(0);
+					mtObj.searchValue = searchDiscountType.getId();
+				}else if(index == 3){
+					searchType.setVisible(false);
+					searchDiscountType.setVisible(false);
+					searchAttribute.setVisible(true);
+					searchAttribute.setValue(0);
+					mtObj.searchValue = searchAttribute.getId();
+				}
 				
 			}
 		}
-	}, '->', {
+	}, {
+		xtype : 'tbtext',
+		text : '&nbsp;&nbsp;'
+	}, {
+		xtype : 'textfield',
+		id : 'txtSearchTypeName',
+		width : 150,
+		hidden : true
+	}, {
+		xtype : 'combo',
+		id : 'comboSearchDiscountType',
+		width : 150,
+		hidden : true,
+		readOnly : true,
+		forceSelection : true,
+		value : 0,
+		store : new Ext.data.SimpleStore({
+			fields : [ 'value', 'text' ],
+			data : discountTypeData
+		}),
+		valueField : 'value',
+		displayField : 'text',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true
+	}, {
+		xtype : 'combo',
+		id : 'comboSearchMemberAttribute',
+		width : 150,
+		hidden : true,
+		readOnly : true,
+		forceSelection : true,
+		value : 0,
+		store : new Ext.data.SimpleStore({
+			fields : [ 'value', 'text' ],
+			data : memberAttributeData
+		}),
+		valueField : 'value',
+		displayField : 'text',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true
+	},
+	'->', 
+	{
 		text : '搜索',
 		id : 'btnSearchMemberType',
 		iconCls : 'btn_search',
 		handler : function(e){
+			var searchType = Ext.getCmp('comboSearchType');
+			var searchValue = Ext.getCmp(mtObj.searchValue);
+			
 			var gs = memberTypeGrid.getStore();
+			gs.baseParams['searchType'] = searchType.getValue();
+			gs.baseParams['searchValue'] = typeof searchValue != 'undefined' ? searchValue.getValue() : '';
 			gs.load({
 				params : {
 					start : 0,
@@ -293,7 +372,7 @@ var memberTypeGrid = createGridPanel(
 );	
 memberTypeGrid.region = 'center';
 memberTypeGrid.on('render', function(thiz){
-	thiz.getStore().reload();
+	Ext.getCmp('btnSearchMemberType').handler();
 });
 
 /**********************************************************************/
