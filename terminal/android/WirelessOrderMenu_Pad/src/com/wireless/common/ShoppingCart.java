@@ -2,9 +2,12 @@ package com.wireless.common;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import com.wireless.excep.BusinessException;
+import com.wireless.protocol.Food;
 import com.wireless.protocol.Order;
 import com.wireless.protocol.OrderFood;
 import com.wireless.protocol.StaffTerminal;
@@ -21,7 +24,23 @@ public final class ShoppingCart {
 	
 	private Order mOriOrder;
 	
+	private List<OrderFood> mFoodsInCart = new ArrayList<OrderFood>();
+	
 	private static ShoppingCart mInstance = new ShoppingCart();
+	
+	private Comparator<OrderFood> mFoodComp = new Comparator<OrderFood>(){
+
+		@Override
+		public int compare(OrderFood lhs, OrderFood rhs) {
+			if(lhs.getAliasId() > rhs.getAliasId()){
+				return 1;
+			}else if(lhs.getAliasId() < rhs.getAliasId()){
+				return -1;
+			}else{
+				return 0;
+			}
+		}		
+	};
 	
 	private ShoppingCart(){
 	}
@@ -35,8 +54,7 @@ public final class ShoppingCart {
 	}
 	private OnFoodsChangeListener mOnFoodsChangeListener;
 	
-	public void setOnFoodsChangeListener(OnFoodsChangeListener l)
-	{
+	public void setOnFoodsChangeListener(OnFoodsChangeListener l){
 		mOnFoodsChangeListener = l;
 	}
 	
@@ -150,6 +168,7 @@ public final class ShoppingCart {
 		for(OrderFood extraFood : extraFoods){
 			mNewOrder.addFood(extraFood);
 		}
+		notifyFoodsChange();
 	}
 	
 	/**
@@ -179,6 +198,7 @@ public final class ShoppingCart {
 			for(int i = 0; i < mNewOrder.foods.length; i++){
 				if(mNewOrder.foods[i].equals(foodToReplace)){
 					mNewOrder.foods[i] = foodToReplace;
+					notifyFoodsChange();
 					return true;
 				}
 			}
@@ -260,14 +280,7 @@ public final class ShoppingCart {
 	}
 	
 	public List<OrderFood> getAllFoods(){
-		ArrayList<OrderFood> allFoods = new ArrayList<OrderFood>();
-		if(hasNewOrder()){
-			allFoods.addAll(getNewFoods());
-		}
-		if(hasOriOrder()){
-			allFoods.addAll(getOriFoods());
-		}		
-		return allFoods;		
+		return mFoodsInCart;
 	}
 
 	public void setOriOrder(Order mOriOrder) {
@@ -302,7 +315,24 @@ public final class ShoppingCart {
 
 	private void notifyFoodsChange(){
 		if(mOnFoodsChangeListener != null){
+			mFoodsInCart.clear();
+			if(mNewOrder != null){
+				mFoodsInCart.addAll(Arrays.asList(mNewOrder.foods));
+			}
+			if(mOriOrder != null){
+				mFoodsInCart.addAll(Arrays.asList(mOriOrder.foods));
+			}
+			Collections.sort(mFoodsInCart, mFoodComp);
 			mOnFoodsChangeListener.onFoodsChange(getAllFoods());
+		}
+	}
+	
+	public OrderFood getFood(int aliasId){
+		int index = Collections.binarySearch(mFoodsInCart, new OrderFood(new Food(aliasId, null)), mFoodComp);
+		if(index >= 0){
+			return mFoodsInCart.get(index);
+		}else{
+			return null;
 		}
 	}
 	
@@ -348,5 +378,6 @@ public final class ShoppingCart {
 		this.mDestTable = null;
 		this.mStaff = null;
 		this.mOriOrder = null;
+		this.mFoodsInCart.clear();
 	}
 }
