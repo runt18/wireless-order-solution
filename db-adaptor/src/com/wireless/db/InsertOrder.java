@@ -2,6 +2,8 @@ package com.wireless.db;
 
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.wireless.exception.BusinessException;
 import com.wireless.protocol.ErrorCode;
@@ -122,8 +124,8 @@ public class InsertOrder {
 			
 		}else{
 			orderToInsert.destTbl = QueryTable.exec(dbCon, term, orderToInsert.destTbl.aliasID);
-		}		
-			
+		}
+		
 		if(orderToInsert.destTbl.status == Table.TABLE_IDLE){
 			
 			/**
@@ -136,81 +138,82 @@ public class InsertOrder {
 				if(orderToInsert.destTbl2.status == Table.TABLE_BUSY){
 					throw new BusinessException("The tabe(alias_id=" + orderToInsert.destTbl2.aliasID + ") to be mergerd is BUSY.", ErrorCode.TABLE_BUSY);
 				}
+			}			
+
+			List<OrderFood> newFoods = new ArrayList<OrderFood>(orderToInsert.foods.length);
+			for(OrderFood newFood : orderToInsert.foods){
+				
+				//Skip the food whose order count is less than zero.
+				if(newFood.getCount() > 0){				
+					/**
+					 * Get all the food's detail info submitted by terminal.
+					 * If the food does NOT exist, tell the terminal that the food menu has been expired.
+					 */
+					if(newFood.isTemporary){
+						Kitchen[] kitchens = QueryMenu.queryKitchens(dbCon, "AND KITCHEN.kitchen_alias=" + newFood.kitchen.aliasID + " AND KITCHEN.restaurant_id=" + term.restaurantID, null);
+						if(kitchens.length > 0){
+							newFood.kitchen = kitchens[0];
+						}
+						
+					}else{					
+						//get the associated foods' unit price and name
+						Food[] detailFood = QueryMenu.queryFoods(dbCon, "AND FOOD.food_alias=" + newFood.getAliasId() + " AND FOOD.restaurant_id=" + term.restaurantID, null);
+						if(detailFood.length > 0){
+							newFood.foodID = detailFood[0].foodID;
+							newFood.setAliasId(detailFood[0].getAliasId());
+							newFood.restaurantID = detailFood[0].restaurantID;
+							newFood.name = detailFood[0].name;
+							newFood.setStatus(detailFood[0].getStatus());
+							newFood.setPrice(detailFood[0].getPrice());
+							newFood.kitchen = detailFood[0].kitchen;
+							newFood.childFoods = detailFood[0].childFoods;
+						}else{
+							throw new BusinessException("The food(alias_id=" + newFood.getAliasId() + ", restaurant_id=" + term.restaurantID + ") to query does NOT exit.", ErrorCode.MENU_EXPIRED);
+						}
+						
+						//Get the details to normal tastes
+						if(newFood.hasNormalTaste()){
+							Taste[] tastes; 
+							//Get the detail to tastes.
+							tastes = newFood.getTasteGroup().getTastes();
+							for(int j = 0; j < tastes.length; j++){
+								Taste[] detailTaste = QueryMenu.queryTastes(dbCon, 
+																			Taste.CATE_TASTE, 
+																			" AND restaurant_id=" + term.restaurantID + " AND taste_alias =" + tastes[j].aliasID, 
+																			null);
+
+								if(detailTaste.length > 0){
+									tastes[j] = detailTaste[0];
+								}else{							
+									throw new BusinessException("The taste(alias_id=" + tastes[j].aliasID + ", restaurant_id=" + term.restaurantID + ") to query does NOT exit.", ErrorCode.MENU_EXPIRED);
+								}
+									
+							}
+							//Get the detail to specs.
+							tastes = newFood.getTasteGroup().getSpecs();
+							for(int j = 0; j < tastes.length; j++){
+								Taste[] detailTaste = QueryMenu.queryTastes(dbCon, 
+																			Taste.CATE_SPEC, 
+																			" AND restaurant_id=" + term.restaurantID + " AND taste_alias =" + tastes[j].aliasID, 
+																			null);
+
+								if(detailTaste.length > 0){
+									tastes[j] = detailTaste[0];
+								}else{
+									throw new BusinessException("The taste(alias_id=" + tastes[j].aliasID + ", restaurant_id=" + term.restaurantID + ") to query does NOT exit.", ErrorCode.MENU_EXPIRED);
+								}
+							}
+
+						}
+					}	
+					
+					newFoods.add(newFood);
+				}
 			}
-			
-			//orderToInsert.table_name = table.name;
 			
 			String sql = null;
-			/**
-			 * Get all the food's detail info submitted by terminal, 
-			 * and then check whether the food exist in db.
-			 * If the food doesn't exist in db or is disabled by user,
-			 * then notify the terminal that the food menu is expired.
-			 */
-			for(int i = 0; i < orderToInsert.foods.length; i++){
-				
-				/**
-				 * Not to get the detail if the submitted food is temporary,
-				 * since the submitted string has contained the details, like name, price and amount. 
-				 */
-				if(orderToInsert.foods[i].isTemporary){
-					Kitchen[] kitchens = QueryMenu.queryKitchens(dbCon, "AND KITCHEN.kitchen_alias=" + orderToInsert.foods[i].kitchen.aliasID + " AND KITCHEN.restaurant_id=" + term.restaurantID, null);
-					if(kitchens.length > 0){
-						orderToInsert.foods[i].kitchen = kitchens[0];
-					}
-					
-				}else{					
-					//get the associated foods' unit price and name
-					Food[] detailFood = QueryMenu.queryFoods(dbCon, "AND FOOD.food_alias=" + orderToInsert.foods[i].getAliasId() + " AND FOOD.restaurant_id=" + term.restaurantID, null);
-					if(detailFood.length > 0){
-						orderToInsert.foods[i].foodID = detailFood[0].foodID;
-						orderToInsert.foods[i].setAliasId(detailFood[0].getAliasId());
-						orderToInsert.foods[i].restaurantID = detailFood[0].restaurantID;
-						orderToInsert.foods[i].name = detailFood[0].name;
-						orderToInsert.foods[i].setStatus(detailFood[0].getStatus());
-						orderToInsert.foods[i].setPrice(detailFood[0].getPrice());
-						orderToInsert.foods[i].kitchen = detailFood[0].kitchen;
-						orderToInsert.foods[i].childFoods = detailFood[0].childFoods;
-					}else{
-						throw new BusinessException("The food(alias_id=" + orderToInsert.foods[i].getAliasId() + ", restaurant_id=" + term.restaurantID + ") to query does NOT exit.", ErrorCode.MENU_EXPIRED);
-					}
-					
-					//Get the details to normal tastes
-					if(orderToInsert.foods[i].hasNormalTaste()){
-						Taste[] tastes; 
-						//Get the detail to tastes.
-						tastes = orderToInsert.foods[i].getTasteGroup().getTastes();
-						for(int j = 0; j < tastes.length; j++){
-							Taste[] detailTaste = QueryMenu.queryTastes(dbCon, 
-																		Taste.CATE_TASTE, 
-																		" AND restaurant_id=" + term.restaurantID + " AND taste_alias =" + tastes[j].aliasID, 
-																		null);
 
-							if(detailTaste.length > 0){
-								tastes[j] = detailTaste[0];
-							}else{							
-								throw new BusinessException("The taste(alias_id=" + tastes[j].aliasID + ", restaurant_id=" + term.restaurantID + ") to query does NOT exit.", ErrorCode.MENU_EXPIRED);
-							}
-								
-						}
-						//Get the detail to specs.
-						tastes = orderToInsert.foods[i].getTasteGroup().getSpecs();
-						for(int j = 0; j < tastes.length; j++){
-							Taste[] detailTaste = QueryMenu.queryTastes(dbCon, 
-																		Taste.CATE_SPEC, 
-																		" AND restaurant_id=" + term.restaurantID + " AND taste_alias =" + tastes[j].aliasID, 
-																		null);
 
-							if(detailTaste.length > 0){
-								tastes[j] = detailTaste[0];
-							}else{
-								throw new BusinessException("The taste(alias_id=" + tastes[j].aliasID + ", restaurant_id=" + term.restaurantID + ") to query does NOT exit.", ErrorCode.MENU_EXPIRED);
-							}
-						}
-
-					}
-				}					
-			}
 			
 			/**
 			 * Throw a business exception if gift amount reach the quota.
@@ -305,7 +308,7 @@ public class InsertOrder {
 				/**
 				 * Insert the detail records to 'order_food' table
 				 */
-				for(OrderFood foodToInsert : orderToInsert.foods){
+				for(OrderFood foodToInsert : newFoods){
 					
 
 					if(foodToInsert.hasTaste()){

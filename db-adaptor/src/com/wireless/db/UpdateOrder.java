@@ -276,9 +276,15 @@ public class UpdateOrder {
 		List<OrderFood> canceledFoods;
 
 		//Get the detail to each order foods of new order.
-		for(int i = 0; i < newOrder.foods.length; i++){
-			fillFoodDetail(dbCon, term, newOrder.foods[i]);
+		List<OrderFood> newFoods = new ArrayList<OrderFood>(newOrder.foods.length);
+		for(OrderFood newFood : newOrder.foods){
+			//Skip the food whose count is less than zero.
+			if(newFood.getCount() > 0){
+				fillFoodDetail(dbCon, term, newFood);
+				newFoods.add(newFood);
+			}
 		}
+		newOrder.foods = newFoods.toArray(new OrderFood[newFoods.size()]);
 		
 		//Get the difference between the original and new order.
 		OrderDiff.DiffResult diffResult = OrderDiff.diff(oriOrder, newOrder);
