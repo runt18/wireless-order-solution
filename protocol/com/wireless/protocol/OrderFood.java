@@ -1,5 +1,7 @@
 package com.wireless.protocol;
 
+import com.wireless.excep.BusinessException;
+
 public class OrderFood extends Food {
 	public long orderDate;
 	public String waiter;
@@ -54,18 +56,138 @@ public class OrderFood extends Food {
 	public Float getDiscount(){
 		return Util.int2Float(discount);
 	}
+
+	final static int MAX_ORDER_AMOUNT = 255 * 100;
+	
+	//the order amount to remove
+	private int mCntToRemove;
+	
+	//the order amount to add
+	private int mCntToAdd;
+
+	//the original order amount to order food
+	private int mCnt = 0;		
 	
 	/**
-	 * Here we use an integer to represent the amount of ordered food.
+	 * Add the order amount to order food.
+	 * @param countToAdd the count to add
+	 * @throws BusinessException
+	 * 			throws if the count to add exceeds {@link MAX_ORDER_AMOUNT}
 	 */
-	int count = 0;		//the number of the food to be ordered
-	
-	public void setCount(Float _count){
-		count = Util.float2Int(_count);
+	public void addCount(Float countToAdd) throws BusinessException{
+		if(countToAdd.floatValue() >= 0){
+			addCountInternal(Util.float2Int(countToAdd));
+		}else{
+			throw new IllegalArgumentException("The count(" + countToAdd.floatValue() + ") to add should be positive.");
+		}
 	}
 	
+	void addCountInternal(int countToAdd) throws BusinessException{
+		if(countToAdd >= 0){
+			if(countToAdd + getCountInternal() <= MAX_ORDER_AMOUNT){
+				this.mCnt = getCountInternal();
+				this.mCntToRemove = 0;
+				this.mCntToAdd = countToAdd;				
+			}else{
+				throw new BusinessException("对不起，\"" + name + "\"每次最多只能点" + MAX_ORDER_AMOUNT / 100 + "份");
+			}
+		}else{
+			throw new IllegalArgumentException("The count(" + countToAdd / 100 + ") to add should be positive.");			
+		}
+	}
+	
+	/**
+	 * Remove the order amount to order food.
+	 * @param countToRemove 
+	 * 			the count to remove
+	 * @throws BusinessException
+	 * 			throws if the count to remove is greater than original count
+	 */
+	public void removeCount(Float countToRemove) throws BusinessException{
+		if(countToRemove.floatValue() >= 0){
+			removeCountInternal(Util.float2Int(countToRemove));
+		}else{
+			throw new IllegalArgumentException("The count(" + countToRemove.floatValue() + ") to remove should be positive.");
+		}
+	}
+	
+	/**
+	 * Remove the order amount to order food for internal.
+	 * @param countToRemove 
+	 * 			the count to remove
+	 * @throws BusinessException
+	 * 			throws if the count to remove is greater than original count
+	 */
+	void removeCountInternal(int countToRemove) throws BusinessException{
+		if(countToRemove >= 0){
+			if(countToRemove <= getCountInternal()){
+				this.mCnt = getCountInternal();
+				this.mCntToAdd = 0;
+				this.mCntToRemove = countToRemove;
+			}else{
+				throw new BusinessException("输入的删除数量大于已点数量, 请重新输入");
+			}
+		}else{
+			throw new IllegalArgumentException("The count(" + countToRemove / 100 + ") to remove should be positive.");
+		}
+	}
+	
+	/**
+	 * Get the offset to order count.
+	 * @return the offset to order count
+	 */
+	public Float getOffset(){
+		return new Float((float)getOffsetInternal() / 100);
+	}
+	
+	int getOffsetInternal(){
+		return mCntToAdd - mCntToRemove;
+	}
+	
+	/**
+	 * Set the current count and reset the offset to zero.
+	 * The current count would set to {@link MAX_ORDER_AMOUNT} if the parameter exceeds it.
+	 * @param count
+	 * 			the order amount to set
+	 */
+	public void setCount(Float count){
+		if(count.floatValue() >= 0){
+			setCountInternal(Util.float2Int(count));			
+		}else{
+			throw new IllegalArgumentException("The count(" + count.floatValue() + ") to set should be positive.");
+		}
+	}
+	
+	/**
+	 * Set the current count(used for internal) and reset the offset to zero.
+	 * The current count would set to {@link MAX_ORDER_AMOUNT} if the parameter exceeds it.
+	 * @param count
+	 * 			the order amount to set represent as integer
+	 */
+	void setCountInternal(int count){
+		if(count >= 0){
+			mCntToAdd = 0;
+			mCntToRemove = 0;
+			mCnt = (count <= MAX_ORDER_AMOUNT ? count : MAX_ORDER_AMOUNT);			
+		}else{
+			throw new IllegalArgumentException("The count(" + count / 100 + ") to set should be positive.");			
+		}
+	}
+	
+	/**
+	 * Get the current count to this order food.
+	 * @return the current count to this order food
+	 */
 	public Float getCount(){
-		return Util.int2Float(count);
+		return Util.int2Float(getCountInternal());
+	}
+	
+	/**
+	 * Get the current count(used for internal) to this order food.
+	 * @return the current count represented as integer to this order food
+	 */
+	int getCountInternal(){
+		return mCnt + getOffsetInternal();
 	}
 	
 	/**
@@ -182,7 +304,7 @@ public class OrderFood extends Food {
 	 * @return The price represented as integer.
 	 */
 	int calcPriceBeforeDiscountInternal(){
-		return getPriceBeforeDiscountInternal() * count / 100;
+		return getPriceBeforeDiscountInternal() * getCountInternal() / 100;
 	}
 	
 	/**
@@ -222,7 +344,7 @@ public class OrderFood extends Food {
 	 * @return the total price to this food
 	 */
 	public Float calcPurePrice(){
-		return Util.int2Float((price * discount * count) / 10000);
+		return Util.int2Float((price * discount * getCountInternal()) / 10000);
 	}	
 
 	/**
@@ -231,7 +353,7 @@ public class OrderFood extends Food {
 	 * @return the total price to this food represented as integer
 	 */
 	int calcPriceWithTasteInternal(){
-		return getPriceWithTasteInternal() * count / 100;
+		return getPriceWithTasteInternal() * getCountInternal() / 100;
 	}
 	
 	/**
@@ -250,7 +372,7 @@ public class OrderFood extends Food {
 	 */
 	int calcDiscountPriceInternal(){
 		if(discount != 100){
-			return (price + (tasteGroup == null ? 0 : tasteGroup.getTastePriceInternal())) * count * (100 - discount) / 10000;
+			return (price + (tasteGroup == null ? 0 : tasteGroup.getTastePriceInternal())) * getCountInternal() * (100 - discount) / 10000;
 		}else{
 			return 0;
 		}
@@ -294,7 +416,9 @@ public class OrderFood extends Food {
 		this.hangStatus = src.hangStatus;
 		this.isTemporary = src.isTemporary;
 		this.discount = src.discount;
-		this.count = src.count;
+		this.mCntToAdd = src.mCntToAdd;
+		this.mCntToRemove = src.mCntToAdd;
+		this.mCnt = src.mCnt;
 		this.isHurried = src.isHurried;
 		if(src.table != null){
 			this.table = new Table(src.table);

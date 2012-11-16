@@ -203,8 +203,9 @@ public class ReqInsertOrder extends ReqPackage {
 				offset += 2;
 				
 				//assign the order amount
-				body[offset] = (byte)(reqOrder.foods[i].count & 0x000000FF);
-				body[offset + 1] = (byte)((reqOrder.foods[i].count & 0x0000FF00) >> 8);
+				int mCnt = reqOrder.foods[i].getCountInternal();
+				body[offset] = (byte)(mCnt & 0x000000FF);
+				body[offset + 1] = (byte)((mCnt & 0x0000FF00) >> 8);
 				offset += 2;
 				
 				//assign the unit price
@@ -243,8 +244,8 @@ public class ReqInsertOrder extends ReqPackage {
 				offset += 2;
 				
 				//assign the order amount
-				body[offset] = (byte)(reqOrder.foods[i].count & 0x000000FF);
-				body[offset + 1] = (byte)((reqOrder.foods[i].count & 0x0000FF00) >> 8);
+				body[offset] = (byte)(reqOrder.foods[i].getCountInternal() & 0x000000FF);
+				body[offset + 1] = (byte)((reqOrder.foods[i].getCountInternal() & 0x0000FF00) >> 8);
 				offset += 2;
 				
 				

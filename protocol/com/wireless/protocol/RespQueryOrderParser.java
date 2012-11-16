@@ -182,10 +182,10 @@ public final class RespQueryOrderParser {
 					
 					orderFoods[i] = new OrderFood();
 					orderFoods[i].isTemporary = true;
-					orderFoods[i].aliasID = foodAlias;
+					orderFoods[i].setAliasId(foodAlias);
 					orderFoods[i].kitchen.aliasID = (short)(kitchenAlias & 0x00FF);
 					orderFoods[i].hangStatus = hangStatus;
-					orderFoods[i].count = orderAmount;
+					orderFoods[i].setCountInternal(orderAmount);
 					orderFoods[i].setPrice(Util.int2Float(unitPrice));
 					orderFoods[i].name = (name != null ? name : "");
 					
@@ -202,6 +202,10 @@ public final class RespQueryOrderParser {
 							orderFoods[i] = new OrderFood(foodMenu.foods[j]);
 							break;
 						}			
+					}
+					
+					if(orderFoods[i] == null){
+						orderFoods[i] = new OrderFood(new Food(0, "已删除菜品"));
 					}
 					
 					//get the order amount
@@ -314,9 +318,9 @@ public final class RespQueryOrderParser {
 					}
 					
 					orderFoods[i].isTemporary = false;
-					orderFoods[i].aliasID = foodAliasID;
-					orderFoods[i].count = orderAmount;
-					orderFoods[i].status = status;
+					orderFoods[i].setAliasId(foodAliasID);
+					orderFoods[i].setCountInternal(orderAmount);
+					orderFoods[i].setStatus(status);
 					orderFoods[i].orderDate = orderDate;
 					orderFoods[i].waiter = waiter;					
 					

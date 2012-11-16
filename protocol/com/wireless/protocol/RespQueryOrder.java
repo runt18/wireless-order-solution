@@ -201,8 +201,8 @@ public class RespQueryOrder extends RespPackage{
 				offset += 2;
 				
 				//assign the order amount
-				body[offset] = (byte)(order.foods[i].count & 0x000000FF);
-				body[offset + 1] = (byte)((order.foods[i].count & 0x0000FF00) >> 8);
+				body[offset] = (byte)(order.foods[i].getCountInternal() & 0x000000FF);
+				body[offset + 1] = (byte)((order.foods[i].getCountInternal() & 0x0000FF00) >> 8);
 				offset += 2;
 				
 				//assign the unit price
@@ -238,8 +238,8 @@ public class RespQueryOrder extends RespPackage{
 				offset += 2;
 				
 				//assign the order amount
-				body[offset] = (byte)(order.foods[i].count & 0x000000FF);
-				body[offset + 1] = (byte)((order.foods[i].count & 0x0000FF00) >> 8);
+				body[offset] = (byte)(order.foods[i].getCountInternal() & 0x000000FF);
+				body[offset + 1] = (byte)((order.foods[i].getCountInternal() & 0x0000FF00) >> 8);
 				offset += 2;
 				
 				//assign the food status

@@ -159,7 +159,7 @@ public class ReqInsertOrderParser {
 				orderFoods[i].kitchen.aliasID = (short)(kitchenAlias & 0x00FF);
 				orderFoods[i].hangStatus = hangStatus;
 				orderFoods[i].isHurried = isHurried;
-				orderFoods[i].count = orderNum;
+				orderFoods[i].setCountInternal(orderNum);
 				orderFoods[i].setPrice(Util.int2Float(unitPrice));
 				orderFoods[i].name = name != null ? name : "";
 				
@@ -167,7 +167,7 @@ public class ReqInsertOrderParser {
 			}else{
 				
 				//get the food id
-				int foodID = (req.body[offset] & 0x000000FF) | ((req.body[offset + 1] & 0x000000FF) << 8);
+				int foodAlias = (req.body[offset] & 0x000000FF) | ((req.body[offset + 1] & 0x000000FF) << 8);
 				offset += 2;
 				
 				//get the order amount
@@ -235,8 +235,8 @@ public class ReqInsertOrderParser {
 				offset += 1;				
 				
 				orderFoods[i] = new OrderFood();
-				orderFoods[i].aliasID = foodID;
-				orderFoods[i].count = orderAmount;
+				orderFoods[i].setAliasId(foodAlias);
+				orderFoods[i].setCountInternal(orderAmount);
 				
 				orderFoods[i].isTemporary = false;
 				
