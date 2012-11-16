@@ -343,4 +343,10 @@ public final class ShoppingCart {
 		public void onPostCommit(Order reqOrder, BusinessException e);
 	}
 	
+	public void clear(){
+		this.mNewOrder = null;
+		this.mDestTable = null;
+		this.mStaff = null;
+		this.mOriOrder = null;
+	}
 }

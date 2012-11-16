@@ -38,7 +38,7 @@ public class GalleryFragment extends Fragment {
 	private List<OrderFood> mFoods = new ArrayList<OrderFood>();
 	private ImageFetcher mImgFetcher;
 	
-	private int mCurrentPosition = 0;
+	private int mCurrentPosition = Integer.MIN_VALUE;
 	
 	public interface OnPicChangedListener{
 		void onPicChanged(OrderFood curFood, int position);
@@ -147,6 +147,10 @@ public class GalleryFragment extends Fragment {
 		return mViewPager.getCurrentItem();
 	}
 	
+	public OrderFood getFood(int position){
+		return mFoods.get(position);
+	}
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.content_layout, container, false);
@@ -236,7 +240,6 @@ public class GalleryFragment extends Fragment {
 				
 			}
 		});
-
 	}
 	
 	@Override 

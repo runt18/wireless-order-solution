@@ -52,8 +52,6 @@ public class MainActivity extends Activity
 	
 	private OrderFood mOrderFood;
 
-	private Comparator<Food> mFoodCompByKitchen;
-
 	private View mCountHintView;
 	
 	@Override
@@ -74,94 +72,25 @@ public class MainActivity extends Activity
  				
 			}
 		});
+		DataHolder holder = new DataHolder();
+
+		holder.sortByKitchen();
 		
-		mFoodCompByKitchen = new Comparator<Food>() {
-			@Override
-			public int compare(Food food1, Food food2) {
-				if (food1.kitchen.aliasID > food2.kitchen.aliasID) {
-					return 1;
-				} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
-					return -1;
-				} else {
-					if(food1.getAliasId() > food2.getAliasId()){
-						return 1;
-					}else if(food1.getAliasId() < food2.getAliasId()){
-						return -1;
-					}else{
-						return 0;
-					}
-				}
-			}
-		};
-		 
-		/**
-		 * 将所有菜品进行按厨房编号进行排序
-		 */
-		Arrays.sort(WirelessOrder.foods, mFoodCompByKitchen);
-			
 		//创建Gallery Fragment的实例
-		mPicBrowserFragment = GalleryFragment.newInstance(WirelessOrder.foods, 0.1f, 2, ScaleType.CENTER_CROP);
+		mPicBrowserFragment = GalleryFragment.newInstance(holder.getSortFoods().toArray(new Food[holder.getSortFoods().size()]), 0.1f, 2, ScaleType.CENTER_CROP);
 		//替换XML中为GalleryFragment预留的Layout
 		FragmentTransaction fragmentTransaction = this.getFragmentManager().beginTransaction();
 		fragmentTransaction.replace(R.id.main_viewPager_container, mPicBrowserFragment).commit();
 		
 		//清空所有厨房和对应菜品首张图片位置的Map数据
-		mFoodPosByKitchenMap.clear();
-		//设置厨房和对应菜品首张图片位置
-		Food curFood = WirelessOrder.foods[0];
-		mFoodPosByKitchenMap.put(curFood.kitchen, 0);
-		for(int i=0;i<WirelessOrder.foods.length;i++)
-		{
-			if(WirelessOrder.foods[i].kitchen.aliasID != curFood.kitchen.aliasID)
-			{
-				mFoodPosByKitchenMap.put(WirelessOrder.foods[i].kitchen, i);
-				curFood = WirelessOrder.foods[i];
-			}
-		}
-		
-		/**
-		 * 使用二分查找算法筛选出有菜品的厨房
-		 */
-		ArrayList<Kitchen> validKitchens = new ArrayList<Kitchen>();
-		for(Kitchen kitchen : WirelessOrder.foodMenu.kitchens) {
-			Food keyFood = new Food();
-			keyFood.kitchen = kitchen;
-			int index = Arrays.binarySearch(WirelessOrder.foods, keyFood, new Comparator<Food>() {
-						@Override
-						public int compare(Food food1, Food food2) {
-							if (food1.kitchen.aliasID > food2.kitchen.aliasID) {
-								return 1;
-							} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
-								return -1;
-							} else {
-								return 0;
-							}
-						}
-					});
-			if (index >= 0 ) {
-				validKitchens.add(kitchen);
-			}
-		}		
-		
-		/**
-		 * 筛选出有菜品的部门
-		 */
-		ArrayList<Department> validDepts = new ArrayList<Department>();
-		for (Department dept : WirelessOrder.foodMenu.depts) {
-			for (Kitchen kitchen : validKitchens) {
-				if(dept.deptID == kitchen.dept.deptID) {
-					validDepts.add(dept);
-					break;
-				}
-			}
-		}
+		mFoodPosByKitchenMap = holder.getFoodPosByKitchenMap();
 		
 		//取得item fragment的实例
 		mItemFragment = (ExpandableListFragment)getFragmentManager().findFragmentById(R.id.item);
 		//设置item fragment的回调函数
 		mItemFragment.setOnItemChangeListener(this);
 		//设置item fragment的数据源		
-		mItemFragment.notifyDataChanged(validDepts, validKitchens);
+		mItemFragment.notifyDataChanged(holder.getValidDepts(), holder.getValidKitchens());
 		  
 		/**
 		 * 设置各种按钮的listener
@@ -198,23 +127,21 @@ public class MainActivity extends Activity
 			public void onClick(View v) {
 				float oriCnt = mOrderFood.getCount();
 				try{
-//					mOrderFood.setCount(Float.parseFloat(((TextView) findViewById(R.id.textView_amount_main)).getText().toString()));
 					mOrderFood.setCount(1f);
 					ShoppingCart.instance().addFood(mOrderFood);
 					mOrderFood.setCount(++ oriCnt);
+
+					//显示已点数量
+					((TextView) findViewById(R.id.textView_main_count)).setText(Util.float2String2(mOrderFood.getCount()));
+					//显示弹出框
 					if(!mCountHintView.isShown())
 						mCountHintView.setVisibility(View.VISIBLE);
-					
-					// TODO 
-					((TextView) findViewById(R.id.textView_main_count)).setText(Util.float2String2(mOrderFood.getCount()));
-
 					TextView countText = (TextView)mCountHintView.findViewById(R.id.textView_main_popup_count);
 					int count = Integer.parseInt(countText.getText().toString());
 					countText.setText(""+ ++count);
-					
+					//一秒之后消失
 					mCountHintView.removeCallbacks(dismissRunnable);
-					mCountHintView.postDelayed(dismissRunnable, 2000);
-//					Toast.makeText(getApplicationContext(), mOrderFood.name + "已添加", Toast.LENGTH_SHORT).show();
+					mCountHintView.postDelayed(dismissRunnable, 1000);
 				}catch(BusinessException e){
 					mOrderFood.setCount(-- oriCnt);
 					Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -228,27 +155,7 @@ public class MainActivity extends Activity
 				onPicClick(mOrderFood);
 			}
 		});
-//		final TextView countTextView = (TextView) findViewById(R.id.textView_amount_main);
-//		((ImageButton) findViewById(R.id.imageButton_plus_main)).setOnClickListener(new OnClickListener(){
-//
-//			@Override
-//			public void onClick(View v) {
-//				float curNum = Float.parseFloat(countTextView.getText().toString());
-//				countTextView.setText(Util.float2String2(++curNum));
-//			}
-//		});
-//		//数量减 
-//		((ImageButton) findViewById(R.id.imageButton_minus_main)).setOnClickListener(new OnClickListener(){
-//
-//			@Override
-//			public void onClick(View v) {
-//				float curNum = Float.parseFloat(countTextView.getText().toString());
-//				if(--curNum >= 1)
-//				{
-//					countTextView.setText(Util.float2String2(curNum));
-//				}
-//			}
-//		});
+		
 		//套餐
 		((Button) findViewById(R.id.imageView_combo_main)).setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -267,25 +174,17 @@ public class MainActivity extends Activity
 				startActivity(intent);
 			}
 		});
-		mOrderFood = new OrderFood(WirelessOrder.foods[0]);
-//		mOrderFood.setCount(1f);
+		
 		//默认启用第一项
 		mItemFragment.performClick(0);
+		mCountHintView.postDelayed(new Runnable(){
+			@Override
+			public void run() {
+				onPicChanged(mPicBrowserFragment.getFood(0), 0);				
+			}
+		}, 100);
 		
 		((OptionBarFragment)this.getFragmentManager().findFragmentById(R.id.bottombar)).setBackButtonDisable();
-		
-		((ImageButton)findViewById(R.id.imageButton_special_main)).setVisibility(View.INVISIBLE);
-		((ImageButton)findViewById(R.id.imageButton_rec_mian)).setVisibility(View.INVISIBLE);
-		((ImageButton)findViewById(R.id.imageButton_current_main)).setVisibility(View.INVISIBLE);
-		if(mOrderFood.isSpecial())
-			((ImageButton)findViewById(R.id.imageButton_special_main)).setVisibility(View.VISIBLE);
-		if(mOrderFood.isRecommend())
-			((ImageButton)findViewById(R.id.imageButton_rec_mian)).setVisibility(View.VISIBLE);
-		if(mOrderFood.isCurPrice())
-			((ImageButton)findViewById(R.id.imageButton_current_main)).setVisibility(View.VISIBLE);
-		
-		if(mOrderFood.getCount() != 0f)
-			((TextView) findViewById(R.id.textView_main_count)).setText(Util.float2String2(mOrderFood.getCount()));
 	}
 
 	@Override
@@ -294,6 +193,7 @@ public class MainActivity extends Activity
 		.setPositiveButton("确定", new DialogInterface.OnClickListener(){
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
+				ShoppingCart.instance().clear();
 				MainActivity.super.onBackPressed();
 			}
 		})
@@ -305,24 +205,28 @@ public class MainActivity extends Activity
 	 */
 	@Override
 	public void onPicChanged(OrderFood food, int position) {
-		mItemFragment.setPosition(food.kitchen);  
+		mItemFragment.setPosition(food.kitchen, false);  
 		((TextView) findViewById(R.id.textView_foodName_main)).setText(food.name);
 		((TextView) findViewById(R.id.textView_price_main)).setText(Util.float2String2(food.getPrice()));
-//		((TextView) findViewById(R.id.textView_amount_main)).setText("1");
 		mOrderFood = food;
-		//TODO 在shoppingcart中找回这个菜
-//		mOrderFood.setCount(Float.parseFloat(((TextView) findViewById(R.id.textView_amount_main)).getText().toString()));
 		
-		((ImageButton)findViewById(R.id.imageButton_special_main)).setVisibility(View.INVISIBLE);
-		((ImageButton)findViewById(R.id.imageButton_rec_mian)).setVisibility(View.INVISIBLE);
-		((ImageButton)findViewById(R.id.imageButton_current_main)).setVisibility(View.INVISIBLE);
 		if(food.isSpecial())
 			((ImageButton)findViewById(R.id.imageButton_special_main)).setVisibility(View.VISIBLE);
+		else ((ImageButton)findViewById(R.id.imageButton_special_main)).setVisibility(View.INVISIBLE);
+
 		if(food.isRecommend())
 			((ImageButton)findViewById(R.id.imageButton_rec_mian)).setVisibility(View.VISIBLE);
+		else ((ImageButton)findViewById(R.id.imageButton_rec_mian)).setVisibility(View.INVISIBLE);
+
 		if(food.isCurPrice())
 			((ImageButton)findViewById(R.id.imageButton_current_main)).setVisibility(View.VISIBLE);
+		else ((ImageButton)findViewById(R.id.imageButton_current_main)).setVisibility(View.INVISIBLE);
 
+		if(food.isHot())
+			((ImageView) findViewById(R.id.imageView_main_hotSignal)).setVisibility(View.VISIBLE);
+		else ((ImageView) findViewById(R.id.imageView_main_hotSignal)).setVisibility(View.INVISIBLE);
+
+		
 		if(mOrderFood.getCount() != 0f)
 			((TextView) findViewById(R.id.textView_main_count)).setText(Util.float2String2(mOrderFood.getCount()));
 		else ((TextView) findViewById(R.id.textView_main_count)).setText("");
@@ -374,16 +278,130 @@ public class MainActivity extends Activity
 			((TextView)mCountHintView.findViewById(R.id.textView_main_popup_count)).setText(""+0);
 		}
 	}
-//	class SearchRunnable implements Runnable{
-//		private int mPos;
-//
-//		public void setPosition(int mPos) {
-//			this.mPos = mPos;
-//		}
-//
-//		@Override
-//		public void run() {
-//			mPicBrowserFragment.setPosition(mPos);
-//		}
-//	}
+}
+
+class DataHolder {
+	private HashMap<Kitchen, Integer> mFoodPosByKitchenMap;
+	private ArrayList<Kitchen> mValidKitchens;
+	private ArrayList<Department> mValidDepts;
+	private ArrayList<Kitchen> mSortKitchens;
+	private ArrayList<Food> mSortFoods;
+
+	public HashMap<Kitchen, Integer> getFoodPosByKitchenMap() {
+		return mFoodPosByKitchenMap;
+	}
+
+	public ArrayList<Kitchen> getValidKitchens() {
+		return mValidKitchens;
+	}
+
+	public ArrayList<Department> getValidDepts() {
+		return mValidDepts;
+	}
+
+	public ArrayList<Kitchen> getSortKitchens() {
+		return mSortKitchens;
+	}
+
+	public ArrayList<Food> getSortFoods() {
+		return mSortFoods;
+	}
+	
+	void sortByKitchen(){
+		Comparator<Food> mFoodCompByKitchen = new Comparator<Food>() {
+			@Override
+			public int compare(Food food1, Food food2) {
+				if (food1.kitchen.aliasID > food2.kitchen.aliasID) {
+					return 1;
+				} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
+					return -1;
+				} else {
+	//				return 0;
+					if(food1.isHot() && !food2.isHot()){
+						return -1;
+					}else if(!food1.isHot() && food2.isHot()){
+						return 1;
+					}else{
+						return 0;
+					}
+				}
+			}
+		};
+		 
+		/*
+		 * 将所有菜品进行按厨房编号进行排序，方便筛选厨房
+		 */
+		Arrays.sort(WirelessOrder.foods, mFoodCompByKitchen);
+		
+		/*
+		 * 使用二分查找算法筛选出有菜品的厨房
+		 */
+		mValidKitchens = new ArrayList<Kitchen>();
+		for(Kitchen kitchen : WirelessOrder.foodMenu.kitchens) {
+			Food keyFood = new Food();
+			keyFood.kitchen = kitchen;
+			int index = Arrays.binarySearch(WirelessOrder.foods, keyFood, new Comparator<Food>() {
+						@Override
+						public int compare(Food food1, Food food2) {
+							if (food1.kitchen.aliasID > food2.kitchen.aliasID) {
+								return 1;
+							} else if (food1.kitchen.aliasID < food2.kitchen.aliasID) {
+								return -1;
+							} else {
+								return 0;
+							}
+						}
+					});
+			if (index >= 0 ) {
+				mValidKitchens.add(kitchen);
+			}
+		}		
+		
+		/*
+		 * 筛选出有菜品的部门
+		 */
+		mValidDepts = new ArrayList<Department>();
+		for (Department dept : WirelessOrder.foodMenu.depts) {
+			for (Kitchen kitchen : mValidKitchens) {
+				if(dept.deptID == kitchen.dept.deptID) {
+					mValidDepts.add(dept);
+					break;
+				}
+			}
+		}
+		//根据部门对厨房排序
+		mSortKitchens = new ArrayList<Kitchen>();
+		for(Department d:mValidDepts)
+		{
+			for(Kitchen k:mValidKitchens)
+			{
+				if(k.dept.equals(d))
+					mSortKitchens.add(k);
+			}
+		}
+		
+		//根据排序了的厨房对食品排序
+		mSortFoods = new ArrayList<Food>();
+		for(Kitchen k:mSortKitchens)
+		{
+			for(Food f:WirelessOrder.foods)
+			{
+				if(f.kitchen.equals(k))
+					mSortFoods.add(f);
+			}
+		}
+		
+		mFoodPosByKitchenMap = new HashMap<Kitchen, Integer>();
+		//设置厨房和对应菜品首张图片位置
+		Food curFood = mSortFoods.get(0);
+		mFoodPosByKitchenMap.put(curFood.kitchen, 0);
+		for(int i=0;i<mSortFoods.size();i++)
+		{
+			if(mSortFoods.get(i).kitchen.aliasID != curFood.kitchen.aliasID)
+			{
+				mFoodPosByKitchenMap.put(mSortFoods.get(i).kitchen, i);
+				curFood = mSortFoods.get(i);
+			}
+		}
+	}
 }
