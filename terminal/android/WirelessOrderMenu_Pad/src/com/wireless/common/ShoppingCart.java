@@ -328,7 +328,7 @@ public final class ShoppingCart {
 	}
 	
 	public OrderFood getFood(int aliasId){
-		int index = Collections.binarySearch(mFoodsInCart, new OrderFood(new Food(aliasId, null)), mFoodComp);
+		int index = Collections.binarySearch(mFoodsInCart, new OrderFood(new Food(aliasId, "")), mFoodComp);
 		if(index >= 0){
 			return mFoodsInCart.get(index);
 		}else{

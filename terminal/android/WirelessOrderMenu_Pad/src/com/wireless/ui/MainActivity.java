@@ -119,7 +119,7 @@ public class MainActivity extends Activity
 		});
 		
 		mCountHintView = this.findViewById(R.id.main_popup);
-		mCountHintView.setVisibility(View.INVISIBLE);
+		mCountHintView.setVisibility(View.GONE);
 		final DismissRunnable dismissRunnable = new DismissRunnable(); 
 		//点菜按钮
 		((ImageView)findViewById(R.id.imageButton_add_main)).setOnClickListener(new OnClickListener(){
@@ -133,6 +133,8 @@ public class MainActivity extends Activity
 
 					//显示已点数量
 					((TextView) findViewById(R.id.textView_main_count)).setText(Util.float2String2(mOrderFood.getCount()));
+					((TextView) findViewById(R.id.textView_main_pickedHint)).setVisibility(View.VISIBLE);
+
 					//显示弹出框
 					if(!mCountHintView.isShown())
 						mCountHintView.setVisibility(View.VISIBLE);
@@ -205,31 +207,40 @@ public class MainActivity extends Activity
 	 */
 	@Override
 	public void onPicChanged(OrderFood food, int position) {
-		mItemFragment.setPosition(food.kitchen, false);  
+		mOrderFood = ShoppingCart.instance().getFood(food.getAliasId());
+		if(mOrderFood == null)
+			mOrderFood = food;
+		
+		mItemFragment.setPosition(food.kitchen);  
 		((TextView) findViewById(R.id.textView_foodName_main)).setText(food.name);
 		((TextView) findViewById(R.id.textView_price_main)).setText(Util.float2String2(food.getPrice()));
-		mOrderFood = food;
 		
 		if(food.isSpecial())
 			((ImageButton)findViewById(R.id.imageButton_special_main)).setVisibility(View.VISIBLE);
-		else ((ImageButton)findViewById(R.id.imageButton_special_main)).setVisibility(View.INVISIBLE);
+		else ((ImageButton)findViewById(R.id.imageButton_special_main)).setVisibility(View.GONE);
 
 		if(food.isRecommend())
 			((ImageButton)findViewById(R.id.imageButton_rec_mian)).setVisibility(View.VISIBLE);
-		else ((ImageButton)findViewById(R.id.imageButton_rec_mian)).setVisibility(View.INVISIBLE);
+		else ((ImageButton)findViewById(R.id.imageButton_rec_mian)).setVisibility(View.GONE);
 
 		if(food.isCurPrice())
 			((ImageButton)findViewById(R.id.imageButton_current_main)).setVisibility(View.VISIBLE);
-		else ((ImageButton)findViewById(R.id.imageButton_current_main)).setVisibility(View.INVISIBLE);
+		else ((ImageButton)findViewById(R.id.imageButton_current_main)).setVisibility(View.GONE);
 
 		if(food.isHot())
 			((ImageView) findViewById(R.id.imageView_main_hotSignal)).setVisibility(View.VISIBLE);
-		else ((ImageView) findViewById(R.id.imageView_main_hotSignal)).setVisibility(View.INVISIBLE);
+		else ((ImageView) findViewById(R.id.imageView_main_hotSignal)).setVisibility(View.GONE);
 
 		
 		if(mOrderFood.getCount() != 0f)
+		{
+			((TextView) findViewById(R.id.textView_main_pickedHint)).setVisibility(View.VISIBLE);
 			((TextView) findViewById(R.id.textView_main_count)).setText(Util.float2String2(mOrderFood.getCount()));
-		else ((TextView) findViewById(R.id.textView_main_count)).setText("");
+		}
+		else{
+			((TextView) findViewById(R.id.textView_main_count)).setText("");
+			((TextView) findViewById(R.id.textView_main_pickedHint)).setVisibility(View.INVISIBLE);
+		}
 
 	}
 
@@ -274,7 +285,7 @@ public class MainActivity extends Activity
 	class DismissRunnable implements Runnable{
 		@Override
 		public void run() {
-			mCountHintView.setVisibility(View.INVISIBLE);
+			mCountHintView.setVisibility(View.GONE);
 			((TextView)mCountHintView.findViewById(R.id.textView_main_popup_count)).setText(""+0);
 		}
 	}
@@ -390,6 +401,8 @@ class DataHolder {
 					mSortFoods.add(f);
 			}
 		}
+		
+		WirelessOrder.foods = mSortFoods.toArray(new Food[mSortFoods.size()]);
 		
 		mFoodPosByKitchenMap = new HashMap<Kitchen, Integer>();
 		//设置厨房和对应菜品首张图片位置

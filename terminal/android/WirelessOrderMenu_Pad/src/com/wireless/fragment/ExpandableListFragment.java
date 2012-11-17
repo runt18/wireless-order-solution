@@ -5,7 +5,6 @@ import java.util.List;
 
 import android.app.Fragment;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,8 +79,8 @@ public class ExpandableListFragment extends Fragment{
 	 * 设置ListView显示某个特定的厨房
 	 * @param kitchenToSet
 	 */
-	public void setPosition(final Kitchen kitchenToSet, boolean isClick){
-			int[] positions = new int[2];
+	public void setPosition(final Kitchen kitchenToSet){
+			final int[] positions = new int[2];
 			int groupPos = 0;
 			for(List<Kitchen> kitchens : mChildren){
 				int childPos = 0;
@@ -101,15 +100,21 @@ public class ExpandableListFragment extends Fragment{
 			{
 				if(mListView.isGroupExpanded(i))
 				{
-//					mListView.setTag(null);
 					mListView.collapseGroup(i);
 				}
 			}
-			//计算出回调的位置，模拟被点击
+			//计算出回调的位置，更改样式和当前厨房
 			mListView.expandGroup(positions[0]);
-			int childPos = positions[0] + positions[1] + 1;
-			mListView.setTag(isClick);
-			mListView.performItemClick(mListView.getChildAt(childPos), childPos, childPos);
+			mCurrentKitchen = mChildren.get(positions[0]).get(positions[1]);
+			
+			mListView.post(new Runnable(){
+				@Override
+				public void run() {
+					int childPos = positions[0] + positions[1] + 1;
+					View curView = mListView.getChildAt(childPos);
+					curView.setBackgroundColor(getResources().getColor(R.color.blue));
+				}
+			});
 	}
 	
 	/**
@@ -139,21 +144,10 @@ public class ExpandableListFragment extends Fragment{
 					mCurrentKitchen = currentKitchen;
 					if(v != null)
 					{	
-						if(parent.getTag() != null && !(Boolean)parent.getTag())
-						{
-							//do nothing
-							Log.i("do","nothing");
-						}
-						else{ 
-							Log.i("clkcke","cx");
 //							//通知侦听器改变
-							mOnItemChangeListener.onItemChange(currentKitchen);
-						}
-						parent.setTag(null);
-
+						mOnItemChangeListener.onItemChange(currentKitchen);
 					}
 				}
-
 				return true;
 			}
 		});
@@ -249,7 +243,7 @@ public class ExpandableListFragment extends Fragment{
 			Kitchen kitchen = mChildren.get(groupPosition).get(childPosition);
 			((TextView) view.findViewById(R.id.mychild)).setText(kitchen.name);
 			
-			//更改点击显示样式
+//			//更改点击显示样式
 			if(mCurrentKitchen.equals(kitchen))
 				view.setBackgroundColor(view.getResources().getColor(R.color.blue));
 			else view.setBackgroundDrawable(null);
