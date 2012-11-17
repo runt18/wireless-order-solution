@@ -348,71 +348,116 @@
 			type="com.wireless.Actions.inventoryMgr.statistics.InventoryAnalysis" scope="request">
 		</action>
 		<action path="/SalesSubStatistics" 
-			type="com.wireless.Actions.billHistory.SalesSubStatisticsAction" scope="request"></action>
+			type="com.wireless.Actions.billHistory.SalesSubStatisticsAction" scope="request">
+		</action>
 		<action path="/QueryDeptTree" 
-			type="com.wireless.Actions.deptMgr.QueryDeptTreeAction" scope="request"></action>
+			type="com.wireless.Actions.deptMgr.QueryDeptTreeAction" scope="request">
+		</action>
 		<action path="/QueryCancelledFood" 
-			type="com.wireless.Actions.billHistory.QueryCancelledFoodAction" scope="request"></action>
+			type="com.wireless.Actions.billHistory.QueryCancelledFoodAction" scope="request">
+		</action>
 		<action path="/UpdateFoodMaterial" 
-			type="com.wireless.Actions.menuMgr.UpdateFoodMaterialAction" scope="request"></action>
+			type="com.wireless.Actions.menuMgr.UpdateFoodMaterialAction" scope="request">
+		</action>
 		<action path="/QueryFoodTaste" 
-			type="com.wireless.Actions.menuMgr.QueryFoodTasteAction" scope="request"></action>
+			type="com.wireless.Actions.menuMgr.QueryFoodTasteAction" scope="request">
+		</action>
 		<action path="/InsertFoodTaste" 
-			type="com.wireless.Actions.menuMgr.InsertFoodTasteAction" scope="request"></action>
+			type="com.wireless.Actions.menuMgr.InsertFoodTasteAction" scope="request">
+		</action>
 		<action path="/DeleteFoodTaste" 
-			type="com.wireless.Actions.menuMgr.DeleteFoodTasteAction" scope="request"></action>	
+			type="com.wireless.Actions.menuMgr.DeleteFoodTasteAction" scope="request">
+		</action>	
 		<action path="/UpdateFoodTaste" 
-			type="com.wireless.Actions.menuMgr.UpdateFoodTasteAction" scope="request"></action>
+			type="com.wireless.Actions.menuMgr.UpdateFoodTasteAction" scope="request">
+		</action>
 		<action path="/QueryFoodCombination" 
-			type="com.wireless.Actions.menuMgr.QueryFoodCombinationAction" scope="request"></action>
+			type="com.wireless.Actions.menuMgr.QueryFoodCombinationAction" scope="request">
+		</action>
 		<action path="/UpdateFoodCombination" 
-			type="com.wireless.Actions.menuMgr.UpdateFoodCombinationAction" scope="request"></action>
+			type="com.wireless.Actions.menuMgr.UpdateFoodCombinationAction" scope="request">
+		</action>
 		<action path="/UpdatePriceTail" 
-			type="com.wireless.Actions.system.UpdatePriceTailAction" scope="request"></action>
+			type="com.wireless.Actions.system.UpdatePriceTailAction" scope="request">
+		</action>
 		<action path="/QuerySystemSetting" 
-			type="com.wireless.Actions.system.QuerySystemSettingAction" scope="request"></action>
+			type="com.wireless.Actions.system.QuerySystemSettingAction" scope="request">
+		</action>
 		<action path="/UpdatePriceTail" 
-			type="com.wireless.Actions.system.UpdatePriceTailAction" scope="request"></action>
+			type="com.wireless.Actions.system.UpdatePriceTailAction" scope="request">
+		</action>
 		<action path="/ImageFileUpload"
-			type="com.wireless.Actions.menuMgr.ImageFileUploadAction" scope="request"></action>
+			type="com.wireless.Actions.menuMgr.ImageFileUploadAction" scope="request">
+		</action>
 		<action path="/QueryDiscountTree"
-			type="com.wireless.Actions.distMgr.discount.QueryDiscountTreeAction" scope="request"></action>	
+			type="com.wireless.Actions.distMgr.discount.QueryDiscountTreeAction" scope="request">
+		</action>	
 		<action path="/InsertDiscount"
-			type="com.wireless.Actions.distMgr.discount.InsertDiscountAction" scope="request"></action>
+			type="com.wireless.Actions.distMgr.discount.InsertDiscountAction" scope="request">
+		</action>
 		<action path="/UpdateDiscount"
-			type="com.wireless.Actions.distMgr.discount.UpdateDiscountAction" scope="request"></action>	
+			type="com.wireless.Actions.distMgr.discount.UpdateDiscountAction" scope="request">
+		</action>	
 		<action path="/DeleteDiscount"
-			type="com.wireless.Actions.distMgr.discount.DeleteDiscountAction" scope="request"></action>
+			type="com.wireless.Actions.distMgr.discount.DeleteDiscountAction" scope="request">
+		</action>
 		<action path="/QueryDiscountPlan"
-			type="com.wireless.Actions.distMgr.discountPlan.QueryDiscountPlanAction" scope="request"></action>
+			type="com.wireless.Actions.distMgr.discountPlan.QueryDiscountPlanAction" scope="request">
+		</action>
 		<action path="/InsertDiscountPlan"
-			type="com.wireless.Actions.distMgr.discountPlan.InsertDiscountPlanAction" scope="request"></action>
+			type="com.wireless.Actions.distMgr.discountPlan.InsertDiscountPlanAction" scope="request">
+		</action>
 		<action path="/UpdateDiscountPlan"
-			type="com.wireless.Actions.distMgr.discountPlan.UpdateDiscountPlanAction" scope="request"></action>
+			type="com.wireless.Actions.distMgr.discountPlan.UpdateDiscountPlanAction" scope="request">
+		</action>
 		<action path="/DeleteDiscountPlan"
-			type="com.wireless.Actions.distMgr.discountPlan.DeleteDiscountPlanAction" scope="request"></action>			
+			type="com.wireless.Actions.distMgr.discountPlan.DeleteDiscountPlanAction" scope="request">
+		</action>			
 		<action path="/QueryDailySettleByNow"
-			type="com.wireless.Actions.dailySettle.QueryDailySettleByNowAction" scope="request"></action>		
+			type="com.wireless.Actions.dailySettle.QueryDailySettleByNowAction" scope="request">
+		</action>		
 		<action path="/QueryDutyRangeByNow"
-			type="com.wireless.Actions.shift.QueryDutyRangeByNowAction" scope="request"></action>
+			type="com.wireless.Actions.shift.QueryDutyRangeByNowAction" scope="request">
+		</action>
 		<action path="/QueryClientTypeTree"
-			type="com.wireless.Actions.client.clientType.QueryClientTypeTreeAction" scope="request"></action>	
+			type="com.wireless.Actions.client.clientType.QueryClientTypeTreeAction" scope="request">
+		</action>	
 		<action path="/QueryClientType"
-			type="com.wireless.Actions.client.clientType.QueryClientTypeAction" scope="request"></action>	
+			type="com.wireless.Actions.client.clientType.QueryClientTypeAction" scope="request">
+		</action>	
 		<action path="/InsertClientType"
-			type="com.wireless.Actions.client.clientType.InsertClientTypeAction" scope="request"></action>
+			type="com.wireless.Actions.client.clientType.InsertClientTypeAction" scope="request">
+		</action>
 		<action path="/UpdateClientType"
-			type="com.wireless.Actions.client.clientType.UpdateClientTypeAction" scope="request"></action>
+			type="com.wireless.Actions.client.clientType.UpdateClientTypeAction" scope="request">
+		</action>
 		<action path="/DeleteClientType"
-			type="com.wireless.Actions.client.clientType.DeleteClientTypeAction" scope="request"></action>
+			type="com.wireless.Actions.client.clientType.DeleteClientTypeAction" scope="request">
+		</action>
 		<action path="/QueryClient"
-			type="com.wireless.Actions.client.client.QueryClientAction" scope="request"></action>
+			type="com.wireless.Actions.client.client.QueryClientAction" scope="request">
+		</action>
 		<action path="/InsertClient"
-			type="com.wireless.Actions.client.client.InsertClientAction" scope="request"></action>
+			type="com.wireless.Actions.client.client.InsertClientAction" scope="request">
+		</action>
 		<action path="/UpdateClient"
-			type="com.wireless.Actions.client.client.UpdateClientAction" scope="request"></action>
+			type="com.wireless.Actions.client.client.UpdateClientAction" scope="request">
+		</action>
 		<action path="/DeleteClient"
-			type="com.wireless.Actions.client.client.DeleteClientAction" scope="request"></action>
+			type="com.wireless.Actions.client.client.DeleteClientAction" scope="request">
+		</action>
+		<action path="/QueryMemberType"
+			type="com.wireless.Actions.client.memberType.QueryMemberTypeAction" scope="request">
+		</action>
+		<action path="/InsertMemberType"
+			type="com.wireless.Actions.client.memberType.InsertMemberTypeAction" scope="request">
+		</action>
+		<action path="/UpdateMemberType"
+			type="com.wireless.Actions.client.memberType.UpdateMemberTypeAction" scope="request">
+		</action>
+		<action path="/DeleteMemberType"
+			type="com.wireless.Actions.client.memberType.DeleteMemberTypeAction" scope="request">
+		</action>
 	</action-mappings>
 	
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
