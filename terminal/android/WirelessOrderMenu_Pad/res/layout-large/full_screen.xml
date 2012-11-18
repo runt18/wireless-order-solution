@@ -1,109 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" >
-
-    <FrameLayout
-        android:id="@+id/fullScreen_viewPager_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="visible" >
-
-    </FrameLayout>
-
-    <TextView
-        android:id="@+id/textView_food_name_fullScreen"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="24dp"
-        android:shadowColor="@color/black"
-        android:shadowDx="2"
-        android:shadowDy="4"
-        android:shadowRadius="10"
-        android:text="Large Text"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="@color/white"
-        android:textSize="48sp" />
-
-    <ImageView
-        android:id="@+id/imageView_back_fullScreen"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        android:src="@drawable/lessen_btn_selector" />
-
-    <ImageView
-        android:id="@+id/imageView_selectFood_fullScreen"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:src="@drawable/add_dish_btn_selector" />
-
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/imageView_selectFood_fullScreen"
-        android:layout_marginLeft="10dp"
-        android:layout_toLeftOf="@+id/imageView_selectFood_fullScreen"
-        android:shadowColor="@color/black"
-        android:shadowDx="2"
-        android:shadowDy="4"
-        android:shadowRadius="10"
-        android:text="元/份"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="@color/white"
-        android:textSize="36sp" />
-
-    <TextView
-        android:id="@+id/textView_food_price_fullScreen"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/textView1"
-        android:layout_alignBottom="@+id/textView1"
-        android:layout_toLeftOf="@+id/textView1"
-        android:shadowColor="@color/black"
-        android:shadowDx="2"
-        android:shadowDy="4"
-        android:shadowRadius="10"
-        android:text="Large Text"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="@color/white"
-        android:textSize="36sp" />
-
-    <TextView
-        android:id="@+id/textView_fullScreen_picked"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/imageView_selectFood_fullScreen"
-        android:layout_alignParentRight="true"
-        android:shadowColor="@color/black"
-        android:shadowDx="2"
-        android:shadowDy="2"
-        android:shadowRadius="2"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="@color/white"
-        android:textSize="30sp" />
-
-    <TextView
-        android:id="@+id/textView_fullScreen_picked_hint"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/textView_fullScreen_picked"
-        android:layout_toLeftOf="@+id/textView_fullScreen_picked"
-        android:shadowColor="@color/black"
-        android:shadowDx="2"
-        android:shadowDy="2"
-        android:shadowRadius="2"
-        android:text="此菜已点"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="@color/white"
-        android:textSize="30sp" />
-
-</RelativeLayout>

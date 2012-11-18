@@ -1,9 +1,0 @@
-<resources>
-
-    <style name="AppTheme" parent="android:Theme.Light" />
-
-    <style name="BlueLightAppTheme" parent="android:Theme.Light" />
-
-    <item name="android:textColor" type="color">#808080</item>
-
-</resources>
