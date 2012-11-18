@@ -155,11 +155,27 @@ IF NOT EXIST terminal\android\pad\bin\WirelessOrderTerminal_Pad.apk GOTO pad_apk
 	@copy terminal\android\pad\version.php dist\www\ota\android\pad > nul
 	@copy terminal\android\pad\AndroidManifest.xml dist\www\ota\android\pad > nul
 	@copy terminal\android\pad\bin\WirelessOrderTerminal_Pad.apk dist\www\ota\android\pad > nul
-	GOTO pserver_files
+	GOTO android_eMenu_apk
 :pad_apk_not_exist
 	@echo the android pad apk file is missing
 	@pause
 	GOTO end
+	
+Rem copy the AndroidManifest.xml and apk file
+:android_eMenu_apk
+IF EXIST terminal\android\eMenu\bin\WirelessOrderMenu_Pad.apk GOTO eMenu_apk_exist
+IF NOT EXIST terminal\android\eMenu\bin\WirelessOrderMenu_Pad.apk GOTO eMenu_apk_not_exist
+:eMenu_apk_exist
+	@echo copying the android eMenu apk files...
+	IF NOT EXIST dist\www\ota\android\eMenu mkdir dist\www\ota\android\eMenu
+	@copy terminal\android\eMenu\version.php dist\www\ota\android\eMenu > nul
+	@copy terminal\android\eMenu\AndroidManifest.xml dist\www\ota\android\eMenu > nul
+	@copy terminal\android\eMenu\bin\WirelessOrderMenu_Pad.apk dist\www\ota\android\eMenu > nul
+	GOTO pserver_files
+:eMenu_apk_not_exist
+	@echo the android eMenu apk file is missing
+	@pause
+	GOTO end	
 	
 :pserver_files
 IF EXIST pserver\setup_nsis\pserver.exe GOTO pserver_exist
