@@ -41,8 +41,13 @@ public class FullScreenActivity extends Activity implements OnPicChangedListener
 		((ImageView) findViewById(R.id.imageView_selectFood_fullScreen)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				float oriCnt = mOrderFood.getCount();
 				try{
+					mOrderFood.setCount(1f);
 					ShoppingCart.instance().addFood(mOrderFood);
+					mOrderFood.setCount(++ oriCnt);
+
+					onPicChanged(mOrderFood,0);
 					Toast.makeText(FullScreenActivity.this, "添加菜：" + mOrderFood.name, Toast.LENGTH_SHORT).show();
 				}catch(BusinessException e){
 					Toast.makeText(FullScreenActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -53,20 +58,13 @@ public class FullScreenActivity extends Activity implements OnPicChangedListener
 	
 	@Override
 	protected void onStart(){
-		
 		super.onStart();
-
-		//设置picture browser fragment的数据源
-		mPicBrowserFragment.notifyDataChanged(WirelessOrder.foods);
-		
 		Intent intent = getIntent();
 		
 		if(intent.hasExtra(FoodParcel.KEY_VALUE)){
 			mOrderFood = intent.getParcelableExtra(FoodParcel.KEY_VALUE);
 			mPicBrowserFragment.setPosition(mOrderFood);
-			((TextView) findViewById(R.id.textView_food_name_fullScreen)).setText(mOrderFood.name);
-			((TextView) findViewById(R.id.textView_food_price_fullScreen)).setText(String.valueOf(Util.float2String2(mOrderFood.getPrice())));
-
+			onPicChanged(mOrderFood,0);
 		}
 		
 		((ImageView) findViewById(R.id.imageView_back_fullScreen)).setOnClickListener(new OnClickListener(){
@@ -104,9 +102,19 @@ public class FullScreenActivity extends Activity implements OnPicChangedListener
 
 	@Override
 	public void onPicChanged(OrderFood value, int position) {
-		mOrderFood = new OrderFood(value);
-		mOrderFood.setCount(Float.valueOf(1));
+		mOrderFood = ShoppingCart.instance().getFood(value.getAliasId());
+		if(mOrderFood == null)
+			mOrderFood = value;
+		
 		((TextView) findViewById(R.id.textView_food_name_fullScreen)).setText(value.name);
 		((TextView) findViewById(R.id.textView_food_price_fullScreen)).setText(String.valueOf(Util.float2String2(mOrderFood.getPrice())));
+		
+		if(mOrderFood.getCount() != 0f){
+			((TextView)findViewById(R.id.textView_fullScreen_picked)).setText(Util.float2String2(mOrderFood.getCount()));
+			((TextView)findViewById(R.id.textView_fullScreen_picked_hint)).setVisibility(View.VISIBLE);
+		} else {
+			((TextView)findViewById(R.id.textView_fullScreen_picked)).setText("");
+			((TextView)findViewById(R.id.textView_fullScreen_picked_hint)).setVisibility(View.INVISIBLE);
+		}
 	}
 }

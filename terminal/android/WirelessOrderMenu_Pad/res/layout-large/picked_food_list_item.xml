@@ -35,7 +35,7 @@
         android:layout_toRightOf="@+id/textView_picked_food_price_item"
         android:background="@null"
         android:focusable="false"
-        android:src="@drawable/minus_btn_selector" /> 
+        android:src="@drawable/minus_btn_selector" />
 
     <Button
         android:id="@+id/textView_picked_food_count_item"
@@ -81,9 +81,9 @@
         android:layout_width="wrap_content"
         android:layout_height="1px"
         android:layout_alignLeft="@+id/textView_picked_food_name_item"
-        android:layout_alignRight="@+id/textView_picked_food_name_item"
+        android:layout_alignRight="@+id/textView_picked_food_sum_price"
         android:layout_centerVertical="true"
-        android:background="@color/black_red"
+        android:background="@color/red"
         android:visibility="invisible" />
 
     <ImageView
@@ -95,7 +95,8 @@
         android:layout_marginLeft="77dp"
         android:src="@android:drawable/btn_star_big_on" />
 
-    <!-- <TextView
+    <!--
+         <TextView
         android:id="@+id/textView_hangup_pickedFood_list_item"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -105,8 +106,9 @@
         android:layout_toLeftOf="@+id/button_operation_pickedFood_list_item"
         android:text="叫起 "
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="@color/black" /> -->
-
+        android:textColor="@color/black" />
+    -->
+
     <TextView
         android:id="@+id/textView_picked_food_sum_price"
         android:layout_width="wrap_content"

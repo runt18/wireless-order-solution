@@ -154,7 +154,7 @@ public class MainActivity extends Activity
 		((Button) findViewById(R.id.button_main_detail)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				onPicClick(mOrderFood);
+				onDetailBtnClick(mOrderFood);
 			}
 		});
 		
@@ -258,6 +258,7 @@ public class MainActivity extends Activity
 			
 	        switch(resultCode){
 	        case FullScreenActivity.FULL_RES_CODE:
+	        	// FIXME 如果是同一个，则不会更新信息
 	        	mPicBrowserFragment.setPosition((OrderFood)data.getParcelableExtra(FoodParcel.KEY_VALUE));
 	        	break;
 	        case SettingActivity.SETTING_RES_CODE:
@@ -272,7 +273,7 @@ public class MainActivity extends Activity
 //	 * 点击Gallery，跳转到FoodDetailActivity
 //	 */
 //	@Override
-	public void onPicClick(Food food) {
+	public void onDetailBtnClick(Food food) {
 		Intent intent = new Intent(MainActivity.this, FoodDetailActivity.class);
 		Bundle bundle = new Bundle();
 		OrderFood orderFood = new OrderFood(food);
@@ -319,6 +320,7 @@ class DataHolder {
 	}
 	
 	void sortByKitchen(){
+		//让菜品按编号排序
 		Comparator<Food> mFoodCompByKitchen = new Comparator<Food>() {
 			@Override
 			public int compare(Food food1, Food food2) {
@@ -380,7 +382,7 @@ class DataHolder {
 				}
 			}
 		}
-		//根据部门对厨房排序
+		//根据部门对厨房排序 XXX
 		mSortKitchens = new ArrayList<Kitchen>();
 		for(Department d:mValidDepts)
 		{
