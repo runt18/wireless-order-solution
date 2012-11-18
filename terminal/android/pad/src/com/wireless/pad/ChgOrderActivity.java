@@ -31,7 +31,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
-import com.wireless.excep.BusinessException;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.OrderParcel;
 import com.wireless.protocol.ErrorCode;

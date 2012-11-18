@@ -61,10 +61,10 @@ public class TempListView extends ListView {
 	public void addTemp(){
 		OrderFood tmpFood = new OrderFood();
 		tmpFood.isTemporary = true;
-		tmpFood.aliasID = Util.genTempFoodID();
+		tmpFood.setAliasId(Util.genTempFoodID());
 		tmpFood.hangStatus = OrderFood.FOOD_NORMAL;
-		tmpFood.setPrice(new Float(10000));
-		tmpFood.setCount(new Float(1));
+		tmpFood.setPrice(Float.valueOf(10000));
+		tmpFood.setCount(Float.valueOf(1));
 		_tmpFoods.add(tmpFood);
 		_adapter.notifyDataSetChanged();
 		//隐藏软键盘
@@ -184,7 +184,7 @@ public class TempListView extends ListView {
 								foodPriceEdtTxt.setSelection(foodPriceEdtTxt.getText().length());
 								Toast.makeText(getContext(), "临时菜" + 
 											   (food.name.length() == 0 ? (position + 1) : "(" + food.name + ")") + 
-											   "的价格范围是0～9999", 0).show();
+											   "的价格范围是0～9999", Toast.LENGTH_SHORT).show();
 							}
 							
 						}catch(NumberFormatException e){
@@ -192,7 +192,7 @@ public class TempListView extends ListView {
 							foodPriceEdtTxt.setSelection(foodPriceEdtTxt.getText().length());
 							Toast.makeText(getContext(), "您输入临时菜" + 
 										  (food.name.length() == 0 ? (position + 1) : "(" + food.name + ")") + 
-										  "的价钱格式不正确，请重新输入", 0).show();
+										  "的价钱格式不正确，请重新输入", Toast.LENGTH_SHORT).show();
 						}						
 					}
 				}
@@ -233,14 +233,14 @@ public class TempListView extends ListView {
 								foodAmountEdtTxt.setSelection(foodAmountEdtTxt.getText().length());
 								Toast.makeText(getContext(), "临时菜" + 
 										   (food.name.length() == 0 ? (position + 1) : "(" + food.name + ")") + 
-											  "的数量范围是1～255", 0).show();
+											  "的数量范围是1～255", Toast.LENGTH_SHORT).show();
 							}
 						}catch(NumberFormatException e){
 							foodAmountEdtTxt.setText(Util.float2String2(food.getCount()));
 							foodAmountEdtTxt.setSelection(foodAmountEdtTxt.getText().length());
 							Toast.makeText(getContext(), "您输入临时菜" + 
 										  (food.name.length() == 0 ? (position + 1) : "(" + food.name + ")") + 
-										  "的数量格式不正确，请重新输入", 0).show();
+										  "的数量格式不正确，请重新输入", Toast.LENGTH_SHORT).show();
 						}						
 					}
 				}
