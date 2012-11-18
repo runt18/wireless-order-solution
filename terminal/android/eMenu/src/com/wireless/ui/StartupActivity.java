@@ -179,7 +179,7 @@ public class StartupActivity extends Activity {
 					public void onCheckVersionPass() {
 						new QueryStaffTask().execute();
 					}					
-				}.execute(CheckVersionTask.PHONE);
+				}.execute(CheckVersionTask.E_MENU);
 				
 			}
 		}
